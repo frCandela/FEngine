@@ -8,10 +8,7 @@
 #include <functional>
 #include <cstdlib>
 #include <vector>
-
-
-
-
+#include <set>
 
 class FEngine
 {
@@ -23,11 +20,24 @@ public:
 	GLFWwindow * window;
 
 private:
+	struct QueueFamilyIndices
+	{
+		int graphicsFamily = -1;	//queue family for drawing commands
+		int presentFamily = -1;		//queue family to present images to the surface
+
+		bool isComplete()
+		{
+			return graphicsFamily >= 0 && presentFamily >= 0;
+		}
+	};
+
 	VkInstance instance;
 	VkDebugReportCallbackEXT callback;
 	VkDevice device;
 	VkPhysicalDevice physicalDevice = VK_NULL_HANDLE;
 	VkQueue graphicsQueue;
+	VkSurfaceKHR surface;
+	VkQueue presentQueue;
 
 	const std::vector<const char*> validationLayers = { "VK_LAYER_LUNARG_standard_validation" };
 
@@ -51,19 +61,11 @@ private:
 		void* userData
 	);
 
-	struct QueueFamilyIndices
-	{
-		int graphicsFamily = -1;
-
-		bool isComplete() {
-			return graphicsFamily >= 0;
-		}
-	};
-
 	void initWindow();
 	void initVulkan();
 	void createLogicalDevice();
 	void createInstance();
+	void createSurface();
 	void pickPhysicalDevice();
 	bool isDeviceSuitable(VkPhysicalDevice device);
 	QueueFamilyIndices findQueueFamilies(VkPhysicalDevice device);

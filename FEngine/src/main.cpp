@@ -11,11 +11,12 @@ int main()
 	catch (const std::runtime_error& e) 
 	{
 		std::cerr << e.what() << std::endl;
+		int zob;
+		std::cin >> zob;
 		return EXIT_FAILURE;
 	}
 
 	int zob;
 	std::cin >> zob;
-
 	return EXIT_SUCCESS;
 }
