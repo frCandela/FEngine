@@ -9,14 +9,15 @@
 #include <cstdlib>
 #include <vector>
 #include <set>
+#include <algorithm>
 
 class FEngine
 {
 public:
 	void Run();
 
-	const int WIDTH = 800;
-	const int HEIGHT = 600;
+	const uint32_t WIDTH = 800;
+	const uint32_t HEIGHT = 600;
 	GLFWwindow * window;
 
 private:
@@ -30,7 +31,13 @@ private:
 			return graphicsFamily >= 0 && presentFamily >= 0;
 		}
 	};
-
+	struct SwapChainSupportDetails 
+	{
+		VkSurfaceCapabilitiesKHR capabilities;
+		std::vector<VkSurfaceFormatKHR> formats;
+		std::vector<VkPresentModeKHR> presentModes;
+	};
+	
 	VkInstance instance;
 	VkDebugReportCallbackEXT callback;
 	VkDevice device;
@@ -38,9 +45,13 @@ private:
 	VkQueue graphicsQueue;
 	VkSurfaceKHR surface;
 	VkQueue presentQueue;
+	VkSwapchainKHR swapChain;
+	std::vector<VkImage> swapChainImages;
+	VkFormat swapChainImageFormat;
+	VkExtent2D swapChainExtent;
 
 	const std::vector<const char*> validationLayers = { "VK_LAYER_LUNARG_standard_validation" };
-
+	const std::vector<const char*> deviceExtensions = {	VK_KHR_SWAPCHAIN_EXTENSION_NAME	};
 #ifdef NDEBUG
 	const bool enableValidationLayers = false;
 #else
@@ -64,16 +75,22 @@ private:
 	void initWindow();
 	void initVulkan();
 	void createLogicalDevice();
+	void createSwapChain();
 	void createInstance();
 	void createSurface();
 	void pickPhysicalDevice();
 	bool isDeviceSuitable(VkPhysicalDevice device);
+	bool checkDeviceExtensionSupport(VkPhysicalDevice device);
 	QueueFamilyIndices findQueueFamilies(VkPhysicalDevice device);
 	void setupDebugCallback();
 	bool checkValidationLayerSupport();
 	std::vector<const char*> getRequiredExtensions();
+	SwapChainSupportDetails querySwapChainSupport(VkPhysicalDevice device);
 
-
+	//swap chain capabilities selection
+	VkSurfaceFormatKHR chooseSwapSurfaceFormat(const std::vector<VkSurfaceFormatKHR>& availableFormats);
+	VkPresentModeKHR chooseSwapPresentMode(const std::vector<VkPresentModeKHR> availablePresentModes);
+	VkExtent2D chooseSwapExtent(const VkSurfaceCapabilitiesKHR& capabilities);//resolution of the swap chain images
 
 	void mainLoop();
 	void cleanup();
