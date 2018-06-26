@@ -10,6 +10,7 @@
 #include <vector>
 #include <set>
 #include <algorithm>
+#include <fstream>
 
 class FEngine
 {
@@ -50,6 +51,9 @@ private:
 	std::vector<VkImageView> swapChainImageViews;
 	VkFormat swapChainImageFormat;
 	VkExtent2D swapChainExtent;
+	VkRenderPass renderPass;
+	VkPipelineLayout pipelineLayout;
+	VkPipeline graphicsPipeline;
 
 	const std::vector<const char*> validationLayers = { "VK_LAYER_LUNARG_standard_validation" };
 	const std::vector<const char*> deviceExtensions = {	VK_KHR_SWAPCHAIN_EXTENSION_NAME	};
@@ -80,6 +84,9 @@ private:
 	void createImageViews();
 	void createInstance();
 	void createSurface();
+	void createRenderPass();
+	void createGraphicsPipeline();
+	VkShaderModule createShaderModule(const std::vector<char>& code);
 	void pickPhysicalDevice();
 	bool isDeviceSuitable(VkPhysicalDevice device);
 	bool checkDeviceExtensionSupport(VkPhysicalDevice device);
@@ -88,6 +95,8 @@ private:
 	bool checkValidationLayerSupport();
 	std::vector<const char*> getRequiredExtensions();
 	SwapChainSupportDetails querySwapChainSupport(VkPhysicalDevice device);
+
+	static std::vector<char> readFile(const std::string& filename);
 
 	//swap chain capabilities selection
 	VkSurfaceFormatKHR chooseSwapSurfaceFormat(const std::vector<VkSurfaceFormatKHR>& availableFormats);
