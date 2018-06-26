@@ -19,6 +19,7 @@ public:
 
 	const uint32_t WIDTH = 800;
 	const uint32_t HEIGHT = 600;
+	const uint32_t MAX_FRAMES_IN_FLIGHT = 2;
 	GLFWwindow * window;
 
 private:
@@ -49,11 +50,21 @@ private:
 	VkSwapchainKHR swapChain;
 	std::vector<VkImage> swapChainImages;
 	std::vector<VkImageView> swapChainImageViews;
+	std::vector<VkFramebuffer> swapChainFramebuffers;
 	VkFormat swapChainImageFormat;
 	VkExtent2D swapChainExtent;
 	VkRenderPass renderPass;
 	VkPipelineLayout pipelineLayout;
 	VkPipeline graphicsPipeline;
+	VkCommandPool commandPool;
+	std::vector<VkCommandBuffer> commandBuffers;
+
+	VkSemaphore imageAvailableSemaphore;
+	VkSemaphore renderFinishedSemaphore;
+	std::vector<VkSemaphore> imageAvailableSemaphores;
+	std::vector<VkSemaphore> renderFinishedSemaphores;
+	std::vector<VkFence> inFlightFences;
+	size_t currentFrame = 0;
 
 	const std::vector<const char*> validationLayers = { "VK_LAYER_LUNARG_standard_validation" };
 	const std::vector<const char*> deviceExtensions = {	VK_KHR_SWAPCHAIN_EXTENSION_NAME	};
@@ -80,12 +91,20 @@ private:
 	void initWindow();
 	void initVulkan();
 	void createLogicalDevice();
+	void recreateSwapChain();
+	void cleanupSwapChain();
 	void createSwapChain();
 	void createImageViews();
 	void createInstance();
 	void createSurface();
 	void createRenderPass();
 	void createGraphicsPipeline();
+	void createFramebuffers();
+	void createCommandPool();
+	void createCommandBuffers();
+	void drawFrame();
+	void createSyncObjects();
+
 	VkShaderModule createShaderModule(const std::vector<char>& code);
 	void pickPhysicalDevice();
 	bool isDeviceSuitable(VkPhysicalDevice device);
