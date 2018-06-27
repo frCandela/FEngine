@@ -883,6 +883,7 @@ VkExtent2D FEngine::chooseSwapExtent(const VkSurfaceCapabilitiesKHR& capabilitie
 
 void FEngine::cleanup()
 {
+	//Deallocate resources
 	cleanupSwapChain();
 
 	for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++) 
