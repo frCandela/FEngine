@@ -1,5 +1,6 @@
 #include "FEngine.h"
 
+//Runs the application
 void FEngine::Run()
 {
 	initWindow();
@@ -8,6 +9,7 @@ void FEngine::Run()
 	cleanup();
 }
 
+//Creates the debug report callback used by the validation layers to display error messages
 VkResult FEngine::CreateDebugReportCallback(VkInstance instance, const VkDebugReportCallbackCreateInfoEXT* pCreateInfo, const VkAllocationCallbacks* pAllocator, VkDebugReportCallbackEXT* pCallback)
 {
 	auto func = (PFN_vkCreateDebugReportCallbackEXT)vkGetInstanceProcAddr(instance, "vkCreateDebugReportCallbackEXT");
@@ -16,12 +18,14 @@ VkResult FEngine::CreateDebugReportCallback(VkInstance instance, const VkDebugRe
 	else
 		return VK_ERROR_EXTENSION_NOT_PRESENT;
 }
+//Destroy the debug report callback used by the validation layers to display error messages
 void FEngine::DestroyDebugReportCallback(VkInstance instance, VkDebugReportCallbackEXT callback, const VkAllocationCallbacks* pAllocator)
 {
 	auto func = (PFN_vkDestroyDebugReportCallbackEXT)vkGetInstanceProcAddr(instance, "vkDestroyDebugReportCallbackEXT");
 	if (func != nullptr)
 		func(instance, callback, pAllocator);
 }
+//Callback used by the validation layers to display error messages
 VKAPI_ATTR VkBool32 VKAPI_CALL FEngine::debugCallback(
 	VkDebugReportFlagsEXT flags,
 	VkDebugReportObjectTypeEXT objType,
@@ -37,14 +41,16 @@ VKAPI_ATTR VkBool32 VKAPI_CALL FEngine::debugCallback(
 
 	return VK_FALSE;
 }
-	
+//Creates a GLFW window
 void FEngine::initWindow()
-	{
-		glfwInit();
-		glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
-		glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
-		window = glfwCreateWindow(WIDTH, HEIGHT, "Vulkan", nullptr/*monitor*/, nullptr);
-	}
+{
+
+	glfwInit();
+	glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);//No opengl context
+	glfwWindowHint(GLFW_RESIZABLE, GLFW_TRUE);
+	window = glfwCreateWindow(WIDTH, HEIGHT, "Vulkan", nullptr/*fullscreen monitor*/, nullptr);
+}
+//Initializes the Vulakan application and required components
 void FEngine::initVulkan()
 {
 	createInstance();
@@ -61,7 +67,7 @@ void FEngine::initVulkan()
 	createCommandBuffers();
 	createSyncObjects();
 }
-
+//Main loop of the program
 void FEngine::mainLoop()
 {
 	while (!glfwWindowShouldClose(window))
@@ -72,12 +78,13 @@ void FEngine::mainLoop()
 
 	vkDeviceWaitIdle(device);
 }
-
+//Draw a frame
 void FEngine::drawFrame()
 {
 	vkWaitForFences(device, 1, &inFlightFences[currentFrame], VK_TRUE, std::numeric_limits<uint64_t>::max());
 	vkResetFences(device, 1, &inFlightFences[currentFrame]);
 
+	//Acquire an image from the swap chain
 	uint32_t imageIndex;
 	VkResult result = vkAcquireNextImageKHR(device, swapChain, std::numeric_limits<uint64_t>::max(), imageAvailableSemaphores[currentFrame], VK_NULL_HANDLE, &imageIndex);
 
@@ -88,54 +95,55 @@ void FEngine::drawFrame()
 		return;
 	}
 	else if (result != VK_SUCCESS && result != VK_SUBOPTIMAL_KHR) 
-		throw std::runtime_error("failed to acquire swap chain image!");
-	
+		throw std::runtime_error("failed to acquire swap chain image!");	
 
+	//Submit info struct
 	VkSubmitInfo submitInfo = {};
 	submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
 
+	//Specify which semaphores to wait on before execution begins and in which stages of the pipeline to wait.
 	VkSemaphore waitSemaphores[] = { imageAvailableSemaphores[currentFrame] };
 	VkPipelineStageFlags waitStages[] = { VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT };
 	submitInfo.waitSemaphoreCount = 1;
 	submitInfo.pWaitSemaphores = waitSemaphores;
 	submitInfo.pWaitDstStageMask = waitStages;
-
 	submitInfo.commandBufferCount = 1;
 	submitInfo.pCommandBuffers = &commandBuffers[imageIndex];
 
+	//Specify which semaphores to signal once the command buffers have finished execution
 	VkSemaphore signalSemaphores[] = { renderFinishedSemaphores[currentFrame] };
 	submitInfo.signalSemaphoreCount = 1;
 	submitInfo.pSignalSemaphores = signalSemaphores;
 
+	//Submit draw command buffer
 	if (vkQueueSubmit(graphicsQueue, 1, &submitInfo, inFlightFences[currentFrame]) != VK_SUCCESS) 
 		throw std::runtime_error("failed to submit draw command buffer!");
 	
-
+	//Specify which semaphores to wait on before presentation can happen
 	VkPresentInfoKHR presentInfo = {};
 	presentInfo.sType = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR;
-
 	presentInfo.waitSemaphoreCount = 1;
 	presentInfo.pWaitSemaphores = signalSemaphores;
 
+	// swap chains to present images to
 	VkSwapchainKHR swapChains[] = { swapChain };
 	presentInfo.swapchainCount = 1;
 	presentInfo.pSwapchains = swapChains;
-
 	presentInfo.pImageIndices = &imageIndex;
 
+	//Submit the result back to the swap chain to have it on screen
 	result = vkQueuePresentKHR(presentQueue, &presentInfo);
 
 	//Suboptimal or out-of-date swap chain
 	if (result == VK_ERROR_OUT_OF_DATE_KHR || result == VK_SUBOPTIMAL_KHR) 
-		recreateSwapChain();
-	
-	else if (result != VK_SUCCESS) 	
-		throw std::runtime_error("failed to present swap chain image!");
+		recreateSwapChain();	
+	else if (result != VK_SUCCESS)
+		throw std::runtime_error("failed to  swap chain image!");
 	
 
 	currentFrame = (currentFrame + 1) % MAX_FRAMES_IN_FLIGHT;
 }
-
+//The logical deviceis the interface with the physical device
 void FEngine::createLogicalDevice()
 {
 	//Get the queue families indices
@@ -184,9 +192,12 @@ void FEngine::createLogicalDevice()
 	vkGetDeviceQueue(device, indices.graphicsFamily, 0, &graphicsQueue);
 	vkGetDeviceQueue(device, indices.presentFamily, 0, &presentQueue);
 }
+//Recreates the swap chain (necessary when the window is resized for example)
 void FEngine::recreateSwapChain()
 {
 	vkDeviceWaitIdle(device);
+
+	cleanupSwapChain();
 
 	createSwapChain();
 	createImageViews();
@@ -195,6 +206,7 @@ void FEngine::recreateSwapChain()
 	createFramebuffers();
 	createCommandBuffers();
 }
+//Cleans up the old versions of the swap chain objects 
 void FEngine::cleanupSwapChain()
 {
 	for (size_t i = 0; i < swapChainFramebuffers.size(); i++) 
@@ -211,6 +223,7 @@ void FEngine::cleanupSwapChain()
 
 	vkDestroySwapchainKHR(device, swapChain, nullptr);
 }
+//Creates the best swap chain possible depending on the device capabilities.
 void FEngine::createSwapChain()
 {
 	SwapChainSupportDetails swapChainSupport = querySwapChainSupport(physicalDevice);
@@ -267,9 +280,9 @@ void FEngine::createSwapChain()
 	swapChainImageFormat = surfaceFormat.format;
 	swapChainExtent = extent;
 }
+//Creates the images views of the swap chain. An image view describes how to access the image and which part of the image to access (2D texture, depth texture, mipmapping levels etc.)
 void FEngine::createImageViews()
 {
-	
 	swapChainImageViews.resize(swapChainImages.size());
 	for (size_t i = 0; i < swapChainImages.size(); i++) 
 	{
@@ -294,6 +307,7 @@ void FEngine::createImageViews()
 			throw std::runtime_error("failed to create image views!");
 	}
 }
+//Connection between the application and the Vulkan library
 void FEngine::createInstance()
 {
 	if (enableValidationLayers && !checkValidationLayerSupport())
@@ -301,7 +315,7 @@ void FEngine::createInstance()
 
 	VkApplicationInfo appInfo = {};
 	appInfo.sType = VK_STRUCTURE_TYPE_APPLICATION_INFO;
-	appInfo.pApplicationName = "Hello Triangle";
+	appInfo.pApplicationName = "FEngine";
 	appInfo.applicationVersion = VK_MAKE_VERSION(1, 0, 0);
 	appInfo.pEngineName = "No Engine";
 	appInfo.engineVersion = VK_MAKE_VERSION(1, 0, 0);
@@ -326,57 +340,17 @@ void FEngine::createInstance()
 	else
 		createInfo.enabledLayerCount = 0;
 
-	if (vkCreateInstance(&createInfo, nullptr, &instance) != VK_SUCCESS)
-	{
+	if (vkCreateInstance(&createInfo, nullptr, &instance) != VK_SUCCESS)	
 		throw std::runtime_error("failed to create instance!");
-	}
+	
 }
+//Create a VkSurface to render images to
 void FEngine::createSurface()
 {
 	if (glfwCreateWindowSurface(instance, window, nullptr, &surface) != VK_SUCCESS) 
 		throw std::runtime_error("failed to create window surface!");	
 }
-void FEngine::createRenderPass()
-{
-	VkSubpassDependency dependency = {};
-	dependency.srcSubpass = VK_SUBPASS_EXTERNAL;
-	dependency.dstSubpass = 0;
-	dependency.srcStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
-	dependency.srcAccessMask = 0;
-	dependency.dstStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
-	dependency.dstAccessMask = VK_ACCESS_COLOR_ATTACHMENT_READ_BIT | VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
-
-	VkAttachmentDescription colorAttachment = {};
-	colorAttachment.format = swapChainImageFormat;
-	colorAttachment.samples = VK_SAMPLE_COUNT_1_BIT;
-	colorAttachment.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
-	colorAttachment.storeOp = VK_ATTACHMENT_STORE_OP_STORE;
-	colorAttachment.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
-	colorAttachment.stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
-	colorAttachment.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
-	colorAttachment.finalLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR;
-
-	VkAttachmentReference colorAttachmentRef = {};
-	colorAttachmentRef.attachment = 0;
-	colorAttachmentRef.layout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
-
-	VkSubpassDescription subpass = {};
-	subpass.pipelineBindPoint = VK_PIPELINE_BIND_POINT_GRAPHICS;
-	subpass.colorAttachmentCount = 1;
-	subpass.pColorAttachments = &colorAttachmentRef;
-
-	VkRenderPassCreateInfo renderPassInfo = {};
-	renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO;
-	renderPassInfo.attachmentCount = 1;
-	renderPassInfo.pAttachments = &colorAttachment;
-	renderPassInfo.subpassCount = 1;
-	renderPassInfo.pSubpasses = &subpass;
-	renderPassInfo.dependencyCount = 1;
-	renderPassInfo.pDependencies = &dependency;
-
-	if (vkCreateRenderPass(device, &renderPassInfo, nullptr, &renderPass) != VK_SUCCESS) 
-		throw std::runtime_error("failed to create render pass!");
-}
+//Creates the graphics pipeline
 void FEngine::createGraphicsPipeline()
 {
 	//Load shader code
@@ -417,7 +391,7 @@ void FEngine::createGraphicsPipeline()
 	inputAssembly.topology = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST;
 	inputAssembly.primitiveRestartEnable = VK_FALSE;
 
-	//Viewport and Scissor
+	//Viewport
 	VkViewport viewport = {};
 	viewport.x = 0.0f;
 	viewport.y = 0.0f;
@@ -426,10 +400,12 @@ void FEngine::createGraphicsPipeline()
 	viewport.minDepth = 0.0f;
 	viewport.maxDepth = 1.0f;
 
+	//Scissor
 	VkRect2D scissor = {};
 	scissor.offset = { 0, 0 };
 	scissor.extent = swapChainExtent;
 
+	//References all the Viewports and Scissors
 	VkPipelineViewportStateCreateInfo viewportState = {};
 	viewportState.sType = VK_STRUCTURE_TYPE_PIPELINE_VIEWPORT_STATE_CREATE_INFO;
 	viewportState.viewportCount = 1;
@@ -437,6 +413,7 @@ void FEngine::createGraphicsPipeline()
 	viewportState.scissorCount = 1;
 	viewportState.pScissors = &scissor;
 
+	//Rasterizer (also performs depth testing, face culling and scissor test)
 	VkPipelineRasterizationStateCreateInfo rasterizer = {};
 	rasterizer.sType = VK_STRUCTURE_TYPE_PIPELINE_RASTERIZATION_STATE_CREATE_INFO;
 	rasterizer.depthClampEnable = VK_FALSE;
@@ -450,6 +427,7 @@ void FEngine::createGraphicsPipeline()
 	rasterizer.depthBiasClamp = 0.0f; // Optional
 	rasterizer.depthBiasSlopeFactor = 0.0f; // Optional
 
+	//Multisampling (used for antialiasing)
 	VkPipelineMultisampleStateCreateInfo multisampling = {};
 	multisampling.sType = VK_STRUCTURE_TYPE_PIPELINE_MULTISAMPLE_STATE_CREATE_INFO;
 	multisampling.sampleShadingEnable = VK_FALSE;
@@ -459,6 +437,7 @@ void FEngine::createGraphicsPipeline()
 	multisampling.alphaToCoverageEnable = VK_FALSE; // Optional
 	multisampling.alphaToOneEnable = VK_FALSE; // Optional
 
+	//Color blending atachemennt (contains the configuration per attached framebuffer)
 	VkPipelineColorBlendAttachmentState colorBlendAttachment = {};
 	colorBlendAttachment.colorWriteMask = VK_COLOR_COMPONENT_R_BIT | VK_COLOR_COMPONENT_G_BIT | VK_COLOR_COMPONENT_B_BIT | VK_COLOR_COMPONENT_A_BIT;
 	colorBlendAttachment.blendEnable = VK_FALSE;
@@ -469,6 +448,7 @@ void FEngine::createGraphicsPipeline()
 	colorBlendAttachment.dstAlphaBlendFactor = VK_BLEND_FACTOR_ZERO; // Optional
 	colorBlendAttachment.alphaBlendOp = VK_BLEND_OP_ADD; // Optional
 
+	//Color blending (contains the global color blending settings)
 	VkPipelineColorBlendStateCreateInfo colorBlending = {};
 	colorBlending.sType = VK_STRUCTURE_TYPE_PIPELINE_COLOR_BLEND_STATE_CREATE_INFO;
 	colorBlending.logicOpEnable = VK_FALSE;
@@ -480,17 +460,20 @@ void FEngine::createGraphicsPipeline()
 	colorBlending.blendConstants[2] = 0.0f; // Optional
 	colorBlending.blendConstants[3] = 0.0f; // Optional
 
+	//Dynamic States (states that can be changed without recreating the pipeline)
 	VkDynamicState dynamicStates[] = 
 	{ 
 		VK_DYNAMIC_STATE_VIEWPORT,
 		VK_DYNAMIC_STATE_LINE_WIDTH
 	};
 
+	//Dynamic States struct
 	VkPipelineDynamicStateCreateInfo dynamicState = {};
 	dynamicState.sType = VK_STRUCTURE_TYPE_PIPELINE_DYNAMIC_STATE_CREATE_INFO;
 	dynamicState.dynamicStateCount = 2;
 	dynamicState.pDynamicStates = dynamicStates;
 
+	//Pipeline layout for setting up uniforms in shaders
 	VkPipelineLayoutCreateInfo pipelineLayoutInfo = {};
 	pipelineLayoutInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
 	pipelineLayoutInfo.setLayoutCount = 0; // Optional
@@ -501,6 +484,7 @@ void FEngine::createGraphicsPipeline()
 	if (vkCreatePipelineLayout(device, &pipelineLayoutInfo, nullptr, &pipelineLayout) != VK_SUCCESS) 
 		throw std::runtime_error("failed to create pipeline layout!");
 
+	//Creates the Graphics Pipeline
 	VkGraphicsPipelineCreateInfo pipelineInfo = {};
 	pipelineInfo.sType = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO;
 	pipelineInfo.stageCount = 2;
@@ -526,8 +510,58 @@ void FEngine::createGraphicsPipeline()
 	vkDestroyShaderModule(device, fragShaderModule, nullptr);
 	vkDestroyShaderModule(device, vertShaderModule, nullptr);
 }
+//Create the render pass ( how many colors and depth buffers, how many samples for each of them, how to handle their contents during the rendering operations etc.)
+void FEngine::createRenderPass()
+{
+	//Subpass dependencies : specify memory and execution dependencies between subpasses
+	VkSubpassDependency dependency = {};
+	dependency.srcSubpass = VK_SUBPASS_EXTERNAL;
+	dependency.dstSubpass = 0;
+	dependency.srcStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
+	dependency.srcAccessMask = 0;
+	dependency.dstStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
+	dependency.dstAccessMask = VK_ACCESS_COLOR_ATTACHMENT_READ_BIT | VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
+
+	//Color attachment
+	VkAttachmentDescription colorAttachment = {};
+	colorAttachment.format = swapChainImageFormat;
+	colorAttachment.samples = VK_SAMPLE_COUNT_1_BIT;
+	colorAttachment.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
+	colorAttachment.storeOp = VK_ATTACHMENT_STORE_OP_STORE;
+	colorAttachment.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
+	colorAttachment.stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
+	colorAttachment.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
+	colorAttachment.finalLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR;
+
+	//Reference to the color attachments
+	VkAttachmentReference colorAttachmentRef = {};
+	colorAttachmentRef.attachment = 0;
+	colorAttachmentRef.layout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
+
+	//Subpass
+	VkSubpassDescription subpass = {};
+	subpass.pipelineBindPoint = VK_PIPELINE_BIND_POINT_GRAPHICS;
+	subpass.colorAttachmentCount = 1;
+	subpass.pColorAttachments = &colorAttachmentRef;
+
+	//Render pass (the attachments referenced by the pipeline stages and their usage)
+	VkRenderPassCreateInfo renderPassInfo = {};
+	renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO;
+	renderPassInfo.attachmentCount = 1;
+	renderPassInfo.pAttachments = &colorAttachment;
+	renderPassInfo.subpassCount = 1;
+	renderPassInfo.pSubpasses = &subpass;
+	renderPassInfo.dependencyCount = 1;
+	renderPassInfo.pDependencies = &dependency;
+
+	if (vkCreateRenderPass(device, &renderPassInfo, nullptr, &renderPass) != VK_SUCCESS)
+		throw std::runtime_error("failed to create render pass!");
+}
+//Creates a frameBuffer for each swapChain image view
 void FEngine::createFramebuffers()
 {
+	//A framebuffer object references all of the VkImageView objects that represent the attachments specified during the render pass creation
+
 	swapChainFramebuffers.resize(swapChainImageViews.size());
 	for (size_t i = 0; i < swapChainImageViews.size(); i++) 
 	{
@@ -546,6 +580,7 @@ void FEngine::createFramebuffers()
 			throw std::runtime_error("failed to create framebuffer!");		
 	}
 }
+//Create the command pool (for ordering drawing operations, memory transfers etc.)
 void FEngine::createCommandPool()
 {
 	QueueFamilyIndices queueFamilyIndices = findQueueFamilies(physicalDevice);
@@ -558,10 +593,12 @@ void FEngine::createCommandPool()
 	if (vkCreateCommandPool(device, &poolInfo, nullptr, &commandPool) != VK_SUCCESS) 
 		throw std::runtime_error("failed to create command pool!");
 }
+//Creates one command buffer per framebuffer . (Commands are recorded in command buffers before being performed)
 void FEngine::createCommandBuffers()
 {
 	commandBuffers.resize(swapChainFramebuffers.size());
 
+	//VkCommandBufferAllocateInfo specifies the command pool and number of buffers to allocate
 	VkCommandBufferAllocateInfo allocInfo = {};
 	allocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
 	allocInfo.commandPool = commandPool;
@@ -571,8 +608,10 @@ void FEngine::createCommandBuffers()
 	if (vkAllocateCommandBuffers(device, &allocInfo, commandBuffers.data()) != VK_SUCCESS) 
 		throw std::runtime_error("failed to allocate command buffers!");	
 
+	//Records every command buffer (one per framebuffer)
 	for (size_t i = 0; i < commandBuffers.size(); i++) 
 	{
+		//Specify the usage of the command buffer
 		VkCommandBufferBeginInfo beginInfo = {};
 		beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
 		beginInfo.flags = VK_COMMAND_BUFFER_USAGE_SIMULTANEOUS_USE_BIT;
@@ -580,6 +619,7 @@ void FEngine::createCommandBuffers()
 		if (vkBeginCommandBuffer(commandBuffers[i], &beginInfo) != VK_SUCCESS) 
 			throw std::runtime_error("failed to begin recording command buffer!");		
 
+		//Configure the render pass
 		VkRenderPassBeginInfo renderPassInfo = {};
 		renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
 		renderPassInfo.renderPass = renderPass;
@@ -603,30 +643,36 @@ void FEngine::createCommandBuffers()
 			throw std::runtime_error("failed to record command buffer!");		
 	}
 }
+//Creates the sync objects (fences and semaphores)
 void FEngine::createSyncObjects()
 {
+	//Fences perform CPU-GPU synchronization to prevent more than MAX_FRAMES_IN_FLIGHT from being submitted
+
 	imageAvailableSemaphores.resize(MAX_FRAMES_IN_FLIGHT);
 	renderFinishedSemaphores.resize(MAX_FRAMES_IN_FLIGHT);
 	inFlightFences.resize(MAX_FRAMES_IN_FLIGHT);
 
+	//Semaphores info
 	VkSemaphoreCreateInfo semaphoreInfo = {};
 	semaphoreInfo.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO;
 
+	//Fences info
 	VkFenceCreateInfo fenceInfo = {};
 	fenceInfo.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
 	fenceInfo.flags = VK_FENCE_CREATE_SIGNALED_BIT;
 
+	//Creates semaphores and fences
 	for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++) 
 	{
 		if (vkCreateSemaphore(device, &semaphoreInfo, nullptr, &imageAvailableSemaphores[i]) != VK_SUCCESS ||
 			vkCreateSemaphore(device, &semaphoreInfo, nullptr, &renderFinishedSemaphores[i]) != VK_SUCCESS ||
 			vkCreateFence(device, &fenceInfo, nullptr, &inFlightFences[i]) != VK_SUCCESS) 
 		{
-
 			throw std::runtime_error("failed to create synchronization objects for a frame!");
 		}
 	}
 }
+//Creates a shader module from its bytecode 
 VkShaderModule FEngine::createShaderModule(const std::vector<char>& code)
 {
 	VkShaderModuleCreateInfo createInfo = {};
@@ -640,15 +686,16 @@ VkShaderModule FEngine::createShaderModule(const std::vector<char>& code)
 
 	return shaderModule;
 }
+//Reads a file and returns it as a vector<char> (used for loading shaders)
 std::vector<char> FEngine::readFile(const std::string& filename) 
 {
-	std::ifstream file(filename, std::ios::ate | std::ios::binary);//ate -> start reading at EOF
+	std::ifstream file(filename, std::ios::ate | std::ios::binary);//ate -> seek to the end of stream immediately after open 
 
 	if (!file.is_open()) 
 		throw std::runtime_error("failed to open file " + filename);
 
 	//Allocate the buffer
-	size_t fileSize = (size_t)file.tellg();
+	size_t fileSize = (size_t)file.tellg(); // tellg -> position in input sequence
 	std::vector<char> buffer(fileSize);
 
 	//Read the file
@@ -659,8 +706,10 @@ std::vector<char> FEngine::readFile(const std::string& filename)
 
 	return buffer;
 }
+//Look for and select a graphics card in the system
 void FEngine::pickPhysicalDevice()
 {
+	//Get devices
 	uint32_t deviceCount = 0;
 	vkEnumeratePhysicalDevices(instance, &deviceCount, nullptr);
 	if (deviceCount == 0)
@@ -669,6 +718,7 @@ void FEngine::pickPhysicalDevice()
 	std::vector<VkPhysicalDevice> devices(deviceCount);
 	vkEnumeratePhysicalDevices(instance, &deviceCount, devices.data());
 
+	//Pick the first suitable device
 	for (const auto& device : devices)
 		if (isDeviceSuitable(device))
 		{
@@ -681,6 +731,7 @@ void FEngine::pickPhysicalDevice()
 
 
 }
+//Returns true if the physical device is suitable for the application
 bool FEngine::isDeviceSuitable(VkPhysicalDevice device)
 {
 	//Get device properties and features
@@ -703,6 +754,7 @@ bool FEngine::isDeviceSuitable(VkPhysicalDevice device)
 
 	return  indices.isComplete() && extensionsSupported && swapChainAdequate && deviceProperties.deviceType == VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU;
 }
+//check if this extension is supported on the GPU
 bool FEngine::checkDeviceExtensionSupport(VkPhysicalDevice device)
 {
 	//get extensions available on the device
@@ -719,6 +771,7 @@ bool FEngine::checkDeviceExtensionSupport(VkPhysicalDevice device)
 
 	return requiredExtensions.empty();
 }
+//Get the queue families needed 
 FEngine::QueueFamilyIndices FEngine::findQueueFamilies(VkPhysicalDevice device)
 {
 	QueueFamilyIndices indices;
@@ -752,6 +805,7 @@ FEngine::QueueFamilyIndices FEngine::findQueueFamilies(VkPhysicalDevice device)
 
 	return indices;
 }
+//Setup the debug callbak used by the validation layers
 void FEngine::setupDebugCallback()
 {
 	if (!enableValidationLayers)
@@ -766,6 +820,7 @@ void FEngine::setupDebugCallback()
 		throw std::runtime_error("failed to set up debug callback!");
 
 }
+//checks if all of the requested layers are available
 bool FEngine::checkValidationLayerSupport()
 {
 	uint32_t layerCount;
@@ -791,8 +846,10 @@ bool FEngine::checkValidationLayerSupport()
 
 	return true;
 }
+//Returns the extensions names required for the VkInstance
 std::vector<const char*> FEngine::getRequiredExtensions()
 {
+	
 	uint32_t glfwExtensionCount = 0;
 	const char** glfwExtensions;
 	glfwExtensions = glfwGetRequiredInstanceExtensions(&glfwExtensionCount);
@@ -804,6 +861,7 @@ std::vector<const char*> FEngine::getRequiredExtensions()
 
 	return extensions;
 }
+//Returns the swap chain details of a physical device (surface formats and presentation modes)
 FEngine::SwapChainSupportDetails FEngine::querySwapChainSupport(VkPhysicalDevice device)
 {
 	SwapChainSupportDetails details;
@@ -831,6 +889,7 @@ FEngine::SwapChainSupportDetails FEngine::querySwapChainSupport(VkPhysicalDevice
 
 	return details;
 }
+//Choose the best SurfaceFormat in a list of available formats (color space)
 VkSurfaceFormatKHR FEngine::chooseSwapSurfaceFormat(const std::vector<VkSurfaceFormatKHR>& availableFormats)
 {
 	//surface has no preferred format
@@ -845,6 +904,7 @@ VkSurfaceFormatKHR FEngine::chooseSwapSurfaceFormat(const std::vector<VkSurfaceF
 	//No good format found
 	return availableFormats[0];	
 }
+//Choose the best presentation mode in a list of available presentation mode
 VkPresentModeKHR FEngine::chooseSwapPresentMode(const std::vector<VkPresentModeKHR> availablePresentModes)
 {
 	VkPresentModeKHR bestMode = VK_PRESENT_MODE_FIFO_KHR;//Default always available
@@ -859,6 +919,7 @@ VkPresentModeKHR FEngine::chooseSwapPresentMode(const std::vector<VkPresentModeK
 
 	return bestMode;
 }
+//Returns the best available swap extent of a surface (resolution of the swap chain images)
 VkExtent2D FEngine::chooseSwapExtent(const VkSurfaceCapabilitiesKHR& capabilities)
 {
     if (capabilities.currentExtent.width != std::numeric_limits<uint32_t>::max()) 
@@ -880,7 +941,7 @@ VkExtent2D FEngine::chooseSwapExtent(const VkSurfaceCapabilitiesKHR& capabilitie
 		return actualExtent;
 	}
 }
-
+//Clean Vulkan objects 
 void FEngine::cleanup()
 {
 	//Deallocate resources

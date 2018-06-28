@@ -23,16 +23,21 @@ public:
 	GLFWwindow * window;
 
 private:
+
+	//Contains the vulkan queues families used
 	struct QueueFamilyIndices
 	{
 		int graphicsFamily = -1;	//queue family for drawing commands
 		int presentFamily = -1;		//queue family to present images to the surface
 
+		//Returns true if all families are represented
 		bool isComplete()
 		{
 			return graphicsFamily >= 0 && presentFamily >= 0;
 		}
 	};
+
+	//Contains the properties of a swap chain for device compatibility
 	struct SwapChainSupportDetails 
 	{
 		VkSurfaceCapabilitiesKHR capabilities;
@@ -47,7 +52,9 @@ private:
 	VkQueue graphicsQueue;
 	VkSurfaceKHR surface;
 	VkQueue presentQueue;
-	VkSwapchainKHR swapChain;
+
+	
+	VkSwapchainKHR swapChain;//collection of buffers used for displaying frames
 	std::vector<VkImage> swapChainImages;
 	std::vector<VkImageView> swapChainImageViews;
 	std::vector<VkFramebuffer> swapChainFramebuffers;
@@ -59,10 +66,8 @@ private:
 	VkCommandPool commandPool;
 	std::vector<VkCommandBuffer> commandBuffers;
 
-	VkSemaphore imageAvailableSemaphore;
-	VkSemaphore renderFinishedSemaphore;
-	std::vector<VkSemaphore> imageAvailableSemaphores;
-	std::vector<VkSemaphore> renderFinishedSemaphores;
+	std::vector<VkSemaphore> imageAvailableSemaphores;//Specifies that an image has been acquired and is ready for rendering
+	std::vector<VkSemaphore> renderFinishedSemaphores;//Specifies that rendering has finished and presentation can happen
 	std::vector<VkFence> inFlightFences;
 	size_t currentFrame = 0;
 
