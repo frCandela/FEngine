@@ -9,9 +9,8 @@
       <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
       <Extensions>h;hh;hpp;hxx;hm;inl;inc;xsd</Extensions>
     </Filter>
-    <Filter Include="Fichiers de ressources">
-      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
-      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    <Filter Include="shaders">
+      <UniqueIdentifier>{422395bb-fb27-4fb8-82d2-d4c0e4a81912}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -26,5 +25,16 @@
     <ClInclude Include="include\FEngine.h">
       <Filter>Fichiers d%27en-tête</Filter>
     </ClInclude>
+    <ClInclude Include="include\Vertex.h">
+      <Filter>Fichiers sources</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="shaders\shader.frag">
+      <Filter>shaders</Filter>
+    </None>
+    <None Include="shaders\shader.vert">
+      <Filter>shaders</Filter>
+    </None>
   </ItemGroup>
 </Project>

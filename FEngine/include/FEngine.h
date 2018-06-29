@@ -12,6 +12,9 @@
 #include <algorithm>
 #include <fstream>
 
+#include "Vertex.h"
+
+
 class FEngine
 {
 public:
@@ -21,6 +24,16 @@ public:
 	const uint32_t HEIGHT = 600;
 	const uint32_t MAX_FRAMES_IN_FLIGHT = 2;
 	GLFWwindow * window;
+
+	VkBuffer vertexBuffer; 
+	VkDeviceMemory vertexBufferMemory;
+
+	const std::vector<Vertex> vertices =
+	{
+		{ { 0.0f, -0.5f },{ 1.0f, 0.0f, 0.0f } },
+	{ { 0.5f, 0.5f },{ 0.0f, 1.0f, 0.0f } },
+	{ { -0.5f, 0.5f },{ 0.0f, 0.0f, 1.0f } }
+	};
 
 private:
 
@@ -109,6 +122,7 @@ private:
 	void createCommandBuffers();
 	void drawFrame();
 	void createSyncObjects();
+	void createVertexBuffer();
 
 	VkShaderModule createShaderModule(const std::vector<char>& code);
 	void pickPhysicalDevice();
@@ -119,6 +133,7 @@ private:
 	bool checkValidationLayerSupport();
 	std::vector<const char*> getRequiredExtensions();
 	SwapChainSupportDetails querySwapChainSupport(VkPhysicalDevice device);
+	uint32_t findMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags properties);
 
 	static std::vector<char> readFile(const std::string& filename);
 

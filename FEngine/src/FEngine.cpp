@@ -44,7 +44,6 @@ VKAPI_ATTR VkBool32 VKAPI_CALL FEngine::debugCallback(
 //Creates a GLFW window
 void FEngine::initWindow()
 {
-
 	glfwInit();
 	glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);//No opengl context
 	glfwWindowHint(GLFW_RESIZABLE, GLFW_TRUE);
@@ -64,6 +63,7 @@ void FEngine::initVulkan()
 	createGraphicsPipeline();
 	createFramebuffers();
 	createCommandPool();
+	createVertexBuffer();
 	createCommandBuffers();
 	createSyncObjects();
 }
@@ -377,13 +377,17 @@ void FEngine::createGraphicsPipeline()
 
 	VkPipelineShaderStageCreateInfo shaderStages[] = { vertShaderStageInfo, fragShaderStageInfo };
 
-	//Vertex input
+	//Get vertex input info
+	auto bindingDescription = Vertex::getBindingDescription();
+	auto attributeDescriptions = Vertex::getAttributeDescriptions();
+
+	//Set vertex input info
 	VkPipelineVertexInputStateCreateInfo vertexInputInfo = {};
 	vertexInputInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
-	vertexInputInfo.vertexBindingDescriptionCount = 0;
-	vertexInputInfo.pVertexBindingDescriptions = nullptr; // Optional
-	vertexInputInfo.vertexAttributeDescriptionCount = 0;
-	vertexInputInfo.pVertexAttributeDescriptions = nullptr; // Optional
+	vertexInputInfo.vertexBindingDescriptionCount = 1;
+	vertexInputInfo.vertexAttributeDescriptionCount = static_cast<uint32_t>(attributeDescriptions.size());
+	vertexInputInfo.pVertexBindingDescriptions = &bindingDescription;
+	vertexInputInfo.pVertexAttributeDescriptions = attributeDescriptions.data();
 
 	//Input assembly
 	VkPipelineInputAssemblyStateCreateInfo inputAssembly = {};
@@ -605,8 +609,8 @@ void FEngine::createCommandBuffers()
 	allocInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
 	allocInfo.commandBufferCount = (uint32_t)commandBuffers.size();
 
-	if (vkAllocateCommandBuffers(device, &allocInfo, commandBuffers.data()) != VK_SUCCESS) 
-		throw std::runtime_error("failed to allocate command buffers!");	
+	if (vkAllocateCommandBuffers(device, &allocInfo, commandBuffers.data()) != VK_SUCCESS)
+		throw std::runtime_error("failed to allocate command buffers!");
 
 	//Records every command buffer (one per framebuffer)
 	for (size_t i = 0; i < commandBuffers.size(); i++) 
@@ -616,8 +620,8 @@ void FEngine::createCommandBuffers()
 		beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
 		beginInfo.flags = VK_COMMAND_BUFFER_USAGE_SIMULTANEOUS_USE_BIT;
 
-		if (vkBeginCommandBuffer(commandBuffers[i], &beginInfo) != VK_SUCCESS) 
-			throw std::runtime_error("failed to begin recording command buffer!");		
+		if (vkBeginCommandBuffer(commandBuffers[i], &beginInfo) != VK_SUCCESS)
+			throw std::runtime_error("failed to begin recording command buffer!");
 
 		//Configure the render pass
 		VkRenderPassBeginInfo renderPassInfo = {};
@@ -631,17 +635,19 @@ void FEngine::createCommandBuffers()
 		renderPassInfo.clearValueCount = 1;
 		renderPassInfo.pClearValues = &clearColor;
 
+		//bind the vertex buffer during rendering operations
 		vkCmdBeginRenderPass(commandBuffers[i], &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
-
-		vkCmdBindPipeline(commandBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, graphicsPipeline);
-
-		vkCmdDraw(commandBuffers[i], 3, 1, 0, 0);
-
+			vkCmdBindPipeline(commandBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, graphicsPipeline);
+			VkBuffer vertexBuffers[] = { vertexBuffer };
+			VkDeviceSize offsets[] = { 0 };
+			vkCmdBindVertexBuffers(commandBuffers[i], 0, 1, vertexBuffers, offsets);
+			vkCmdDraw(commandBuffers[i], static_cast<uint32_t>(vertices.size()), 1, 0, 0);
 		vkCmdEndRenderPass(commandBuffers[i]);
 
 		if (vkEndCommandBuffer(commandBuffers[i]) != VK_SUCCESS) 
-			throw std::runtime_error("failed to record command buffer!");		
+			throw std::runtime_error("failed to record command buffer!");
 	}
+
 }
 //Creates the sync objects (fences and semaphores)
 void FEngine::createSyncObjects()
@@ -941,11 +947,69 @@ VkExtent2D FEngine::chooseSwapExtent(const VkSurfaceCapabilitiesKHR& capabilitie
 		return actualExtent;
 	}
 }
+//Creates a vertex buffer for test rendering
+void FEngine::createVertexBuffer()
+{
+	//Creates a vertex buffer
+	VkBufferCreateInfo bufferInfo = {};
+
+	bufferInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
+	bufferInfo.size = sizeof(vertices[0]) * vertices.size();	//size of the buffer in bytes
+	bufferInfo.usage = VK_BUFFER_USAGE_VERTEX_BUFFER_BIT;
+	bufferInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
+
+	if (vkCreateBuffer(device, &bufferInfo, nullptr, &vertexBuffer) != VK_SUCCESS)
+		throw std::runtime_error("failed to create vertex buffer!");
+
+	//query memory requirements
+	VkMemoryRequirements memRequirements;
+	vkGetBufferMemoryRequirements(device, vertexBuffer, &memRequirements);
+
+	//Allow memory to uffer
+	VkMemoryAllocateInfo allocInfo = {};
+	allocInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
+	allocInfo.allocationSize = memRequirements.size;
+	allocInfo.memoryTypeIndex = findMemoryType(memRequirements.memoryTypeBits, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
+
+	if (vkAllocateMemory(device, &allocInfo, nullptr, &vertexBufferMemory) != VK_SUCCESS) 
+		throw std::runtime_error("failed to allocate vertex buffer memory!");
+
+	// associate this memory with the buffer
+	vkBindBufferMemory(device, vertexBuffer, vertexBufferMemory, 0);
+
+	//copy the vertex data to the buffer
+	void* data;
+	vkMapMemory(device, vertexBufferMemory, 0, bufferInfo.size, 0, &data);
+	memcpy(data, vertices.data(), (size_t)bufferInfo.size);
+	vkUnmapMemory(device, vertexBufferMemory);
+	
+}
+//Find the right type of memory to use for our vertex buffer
+uint32_t FEngine::findMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags properties) 
+{
+	// query info about the available types of memory
+	VkPhysicalDeviceMemoryProperties memProperties;
+	vkGetPhysicalDeviceMemoryProperties(physicalDevice, &memProperties);
+
+	//check for the support of the properties
+	for (uint32_t i = 0; i < memProperties.memoryTypeCount; i++) 
+	{
+		if ((typeFilter & (1 << i)) && (memProperties.memoryTypes[i].propertyFlags & properties) == properties) 
+		{
+			return i;
+		}
+	}
+
+	throw std::runtime_error("failed to find suitable memory type!");
+}
 //Clean Vulkan objects 
 void FEngine::cleanup()
 {
 	//Deallocate resources
 	cleanupSwapChain();
+
+	vkDestroyBuffer(device, vertexBuffer, nullptr);
+	vkFreeMemory(device, vertexBufferMemory, nullptr);
 
 	for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++) 
 	{

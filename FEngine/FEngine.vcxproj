@@ -49,7 +49,7 @@
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>include;C:\VulkanSDK\1.1.73.0\Include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>deps;include;C:\VulkanSDK\1.1.73.0\Include</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
@@ -67,7 +67,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>include;C:\VulkanSDK\1.1.73.0\Include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>deps;include;C:\VulkanSDK\1.1.73.0\Include</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>_MBCS;%(PreprocessorDefinitions);NDEBUG</PreprocessorDefinitions>
       <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
@@ -86,6 +86,11 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\FEngine.h" />
+    <ClInclude Include="include\Vertex.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="shaders\shader.frag" />
+    <None Include="shaders\shader.vert" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
