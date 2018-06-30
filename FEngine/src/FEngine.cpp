@@ -60,26 +60,32 @@ void FEngine::initVulkan()
 	createSwapChain();
 	createImageViews();
 	createRenderPass();
+	createDescriptorSetLayout();
 	createGraphicsPipeline();
 	createFramebuffers();
 	createCommandPool();
 	createVertexBuffer();
-	createIndexBuffer(); 
+	createIndexBuffer();
+	createUniformBuffer();
+	createDescriptorPool();
+	createDescriptorSet();
 	createCommandBuffers();
 	createSyncObjects();
 }
-//Main loop of the program
+// Main loop of the program
 void FEngine::mainLoop()
 {
 	while (!glfwWindowShouldClose(window))
 	{
 		glfwPollEvents();
+
+		updateUniformBuffer();
 		drawFrame();
 	}
 
 	vkDeviceWaitIdle(device);
 }
-//Draw a frame
+// Draw a frame
 void FEngine::drawFrame()
 {
 	vkWaitForFences(device, 1, &inFlightFences[currentFrame], VK_TRUE, std::numeric_limits<uint64_t>::max());
@@ -144,7 +150,31 @@ void FEngine::drawFrame()
 
 	currentFrame = (currentFrame + 1) % MAX_FRAMES_IN_FLIGHT;
 }
-//The logical deviceis the interface with the physical device
+//Do stuff
+void  FEngine::updateUniformBuffer()
+{
+	static auto startTime = std::chrono::high_resolution_clock::now();
+
+	auto currentTime = std::chrono::high_resolution_clock::now();
+	float time = std::chrono::duration<float, std::chrono::seconds::period>(currentTime - startTime).count();
+
+	//efine the model, view and projection transformations in the uniform buffer object
+	UniformBufferObject ubo = {};
+	ubo.model = glm::rotate(glm::mat4(1.0f), time * glm::radians(90.0f), glm::vec3(0.0f, 0.0f, 1.0f));
+	ubo.view = glm::lookAt(glm::vec3(2.0f, 2.0f, 2.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f));
+	ubo.proj = glm::perspective(glm::radians(45.0f), swapChainExtent.width / (float)swapChainExtent.height, 0.1f, 10.0f);
+
+	//the Y coordinate of the clip coordinates is inverted
+	ubo.proj[1][1] *= -1;
+
+	//copy the data in the uniform buffer object to the uniform buffer
+	void* data;
+	vkMapMemory(device, uniformBufferMemory, 0, sizeof(ubo), 0, &data);
+		memcpy(data, &ubo, sizeof(ubo));
+	vkUnmapMemory(device, uniformBufferMemory);
+
+}
+// The logical deviceis the interface with the physical device
 void FEngine::createLogicalDevice()
 {
 	//Get the queue families indices
@@ -193,7 +223,7 @@ void FEngine::createLogicalDevice()
 	vkGetDeviceQueue(device, indices.graphicsFamily, 0, &graphicsQueue);
 	vkGetDeviceQueue(device, indices.presentFamily, 0, &presentQueue);
 }
-//Recreates the swap chain (necessary when the window is resized for example)
+// Recreates the swap chain (necessary when the window is resized for example)
 void FEngine::recreateSwapChain()
 {
 	vkDeviceWaitIdle(device);
@@ -207,7 +237,7 @@ void FEngine::recreateSwapChain()
 	createFramebuffers();
 	createCommandBuffers();
 }
-//Cleans up the old versions of the swap chain objects 
+// Cleans up the old versions of the swap chain objects 
 void FEngine::cleanupSwapChain()
 {
 	for (size_t i = 0; i < swapChainFramebuffers.size(); i++) 
@@ -224,7 +254,7 @@ void FEngine::cleanupSwapChain()
 
 	vkDestroySwapchainKHR(device, swapChain, nullptr);
 }
-//Creates the best swap chain possible depending on the device capabilities.
+// Creates the best swap chain possible depending on the device capabilities.
 void FEngine::createSwapChain()
 {
 	SwapChainSupportDetails swapChainSupport = querySwapChainSupport(physicalDevice);
@@ -281,13 +311,13 @@ void FEngine::createSwapChain()
 	swapChainImageFormat = surfaceFormat.format;
 	swapChainExtent = extent;
 }
-//Creates the images views of the swap chain. An image view describes how to access the image and which part of the image to access (2D texture, depth texture, mipmapping levels etc.)
+// Creates the images views of the swap chain. An image view describes how to access the image and which part of the image to access (2D texture, depth texture, mipmapping levels etc.)
 void FEngine::createImageViews()
 {
 	swapChainImageViews.resize(swapChainImages.size());
 	for (size_t i = 0; i < swapChainImages.size(); i++) 
 	{
-		//Prepare struct
+		// Prepare struct
 		VkImageViewCreateInfo createInfo = {};
 		createInfo.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
 		createInfo.image = swapChainImages[i];
@@ -308,7 +338,7 @@ void FEngine::createImageViews()
 			throw std::runtime_error("failed to create image views!");
 	}
 }
-//Connection between the application and the Vulkan library
+// Connection between the application and the Vulkan library
 void FEngine::createInstance()
 {
 	if (enableValidationLayers && !checkValidationLayerSupport())
@@ -345,24 +375,45 @@ void FEngine::createInstance()
 		throw std::runtime_error("failed to create instance!");
 	
 }
-//Create a VkSurface to render images to
+// Create a VkSurface to render images to
 void FEngine::createSurface()
 {
 	if (glfwCreateWindowSurface(instance, window, nullptr, &surface) != VK_SUCCESS) 
 		throw std::runtime_error("failed to create window surface!");	
 }
-//Creates the graphics pipeline
+//creates descriptor set layouts (like the uniform buffers)
+void FEngine::createDescriptorSetLayout()
+{
+	//Create a descriptor
+	VkDescriptorSetLayoutBinding uboLayoutBinding = {};
+	uboLayoutBinding.binding = 0;
+	uboLayoutBinding.descriptorCount = 1;
+	uboLayoutBinding.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+	uboLayoutBinding.pImmutableSamplers = nullptr;
+	uboLayoutBinding.stageFlags = VK_SHADER_STAGE_VERTEX_BIT;
+
+	//Regroup all bindings
+	VkDescriptorSetLayoutCreateInfo layoutInfo = {};
+	layoutInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
+	layoutInfo.bindingCount = 1;
+	layoutInfo.pBindings = &uboLayoutBinding;
+
+	if (vkCreateDescriptorSetLayout(device, &layoutInfo, nullptr, &descriptorSetLayout) != VK_SUCCESS)
+		throw std::runtime_error("failed to create descriptor set layout!");
+
+}
+// Creates the graphics pipeline
 void FEngine::createGraphicsPipeline()
 {
-	//Load shader code
+	// Load shader code
 	auto vertShaderCode = readFile("shaders/vert.spv");
 	auto fragShaderCode = readFile("shaders/frag.spv");
 
-	//create shader modules
+	// Create shader modules
 	VkShaderModule vertShaderModule = createShaderModule(vertShaderCode);
 	VkShaderModule fragShaderModule = createShaderModule(fragShaderCode);
 
-	//Link vertex shader
+	// Link vertex shader
 	VkPipelineShaderStageCreateInfo vertShaderStageInfo = {};
 	vertShaderStageInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
 	vertShaderStageInfo.stage = VK_SHADER_STAGE_VERTEX_BIT;
@@ -426,11 +477,8 @@ void FEngine::createGraphicsPipeline()
 	rasterizer.polygonMode = VK_POLYGON_MODE_FILL;
 	rasterizer.lineWidth = 1.0f;
 	rasterizer.cullMode = VK_CULL_MODE_BACK_BIT;
-	rasterizer.frontFace = VK_FRONT_FACE_CLOCKWISE;
+	rasterizer.frontFace = VK_FRONT_FACE_COUNTER_CLOCKWISE;
 	rasterizer.depthBiasEnable = VK_FALSE;
-	rasterizer.depthBiasConstantFactor = 0.0f; // Optional
-	rasterizer.depthBiasClamp = 0.0f; // Optional
-	rasterizer.depthBiasSlopeFactor = 0.0f; // Optional
 
 	//Multisampling (used for antialiasing)
 	VkPipelineMultisampleStateCreateInfo multisampling = {};
@@ -481,13 +529,11 @@ void FEngine::createGraphicsPipeline()
 	//Pipeline layout for setting up uniforms in shaders
 	VkPipelineLayoutCreateInfo pipelineLayoutInfo = {};
 	pipelineLayoutInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
-	pipelineLayoutInfo.setLayoutCount = 0; // Optional
-	pipelineLayoutInfo.pSetLayouts = nullptr; // Optional
-	pipelineLayoutInfo.pushConstantRangeCount = 0; // Optional
-	pipelineLayoutInfo.pPushConstantRanges = nullptr; // Optional
+	pipelineLayoutInfo.setLayoutCount = 1;
+	pipelineLayoutInfo.pSetLayouts = &descriptorSetLayout;
 
 	if (vkCreatePipelineLayout(device, &pipelineLayoutInfo, nullptr, &pipelineLayout) != VK_SUCCESS) 
-		throw std::runtime_error("failed to create pipeline layout!");
+		throw std::runtime_error("failed to create pipeline layout!");	
 
 	//Creates the Graphics Pipeline
 	VkGraphicsPipelineCreateInfo pipelineInfo = {};
@@ -499,14 +545,11 @@ void FEngine::createGraphicsPipeline()
 	pipelineInfo.pViewportState = &viewportState;
 	pipelineInfo.pRasterizationState = &rasterizer;
 	pipelineInfo.pMultisampleState = &multisampling;
-	pipelineInfo.pDepthStencilState = nullptr; // Optional
 	pipelineInfo.pColorBlendState = &colorBlending;
-	pipelineInfo.pDynamicState = nullptr; // Optional
 	pipelineInfo.layout = pipelineLayout;
 	pipelineInfo.renderPass = renderPass;
 	pipelineInfo.subpass = 0;
-	pipelineInfo.basePipelineHandle = VK_NULL_HANDLE; // Optional
-	pipelineInfo.basePipelineIndex = -1; // Optional
+	pipelineInfo.basePipelineHandle = VK_NULL_HANDLE;
 
 	if (vkCreateGraphicsPipelines(device, VK_NULL_HANDLE, 1, &pipelineInfo, nullptr, &graphicsPipeline) != VK_SUCCESS) 
 		throw std::runtime_error("failed to create graphics pipeline!");	
@@ -515,18 +558,9 @@ void FEngine::createGraphicsPipeline()
 	vkDestroyShaderModule(device, fragShaderModule, nullptr);
 	vkDestroyShaderModule(device, vertShaderModule, nullptr);
 }
-//Create the render pass ( how many colors and depth buffers, how many samples for each of them, how to handle their contents during the rendering operations etc.)
+// Create the render pass ( how many colors and depth buffers, how many samples for each of them, how to handle their contents during the rendering operations etc.)
 void FEngine::createRenderPass()
-{
-	//Subpass dependencies : specify memory and execution dependencies between subpasses
-	VkSubpassDependency dependency = {};
-	dependency.srcSubpass = VK_SUBPASS_EXTERNAL;
-	dependency.dstSubpass = 0;
-	dependency.srcStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
-	dependency.srcAccessMask = 0;
-	dependency.dstStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
-	dependency.dstAccessMask = VK_ACCESS_COLOR_ATTACHMENT_READ_BIT | VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
-
+{	
 	//Color attachment
 	VkAttachmentDescription colorAttachment = {};
 	colorAttachment.format = swapChainImageFormat;
@@ -549,6 +583,15 @@ void FEngine::createRenderPass()
 	subpass.colorAttachmentCount = 1;
 	subpass.pColorAttachments = &colorAttachmentRef;
 
+	//Subpass dependencies : specify memory and execution dependencies between subpasses
+	VkSubpassDependency dependency = {};
+	dependency.srcSubpass = VK_SUBPASS_EXTERNAL;
+	dependency.dstSubpass = 0;
+	dependency.srcStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
+	dependency.srcAccessMask = 0;
+	dependency.dstStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
+	dependency.dstAccessMask = VK_ACCESS_COLOR_ATTACHMENT_READ_BIT | VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
+
 	//Render pass (the attachments referenced by the pipeline stages and their usage)
 	VkRenderPassCreateInfo renderPassInfo = {};
 	renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO;
@@ -562,7 +605,7 @@ void FEngine::createRenderPass()
 	if (vkCreateRenderPass(device, &renderPassInfo, nullptr, &renderPass) != VK_SUCCESS)
 		throw std::runtime_error("failed to create render pass!");
 }
-//Creates a frameBuffer for each swapChain image view
+// Creates a frameBuffer for each swapChain image view
 void FEngine::createFramebuffers()
 {
 	//A framebuffer object references all of the VkImageView objects that represent the attachments specified during the render pass creation
@@ -585,7 +628,56 @@ void FEngine::createFramebuffers()
 			throw std::runtime_error("failed to create framebuffer!");		
 	}
 }
-//Create the command pool (for ordering drawing operations, memory transfers etc.)
+// Create descriptor pool (for uniform buffers)
+void FEngine::createDescriptorPool()
+{
+	//Create descriptor pool
+	VkDescriptorPoolSize poolSize = {};
+	poolSize.type = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+	poolSize.descriptorCount = 1;
+
+	VkDescriptorPoolCreateInfo poolInfo = {};
+	poolInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
+	poolInfo.poolSizeCount = 1;
+	poolInfo.pPoolSizes = &poolSize;
+	poolInfo.maxSets = 1;
+
+	if (vkCreateDescriptorPool(device, &poolInfo, nullptr, &descriptorPool) != VK_SUCCESS)
+		throw std::runtime_error("failed to create descriptor pool!");
+}
+//Create a desctiptor set from a descriptor pool
+void FEngine::createDescriptorSet()
+{
+	//Create the desctiptor set
+	VkDescriptorSetLayout layouts[] = { descriptorSetLayout };
+	VkDescriptorSetAllocateInfo allocInfo = {};
+	allocInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
+	allocInfo.descriptorPool = descriptorPool;
+	allocInfo.descriptorSetCount = 1;
+	allocInfo.pSetLayouts = layouts;
+
+	if (vkAllocateDescriptorSets(device, &allocInfo, &descriptorSet) != VK_SUCCESS)
+		throw std::runtime_error("failed to allocate descriptor set!");
+
+	//configure the descriptors
+	VkDescriptorBufferInfo bufferInfo = {};
+	bufferInfo.buffer = uniformBuffer;
+	bufferInfo.offset = 0;
+	bufferInfo.range = sizeof(UniformBufferObject);
+
+	VkWriteDescriptorSet descriptorWrite = {};
+	descriptorWrite.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+	descriptorWrite.dstSet = descriptorSet;
+	descriptorWrite.dstBinding = 0;
+	descriptorWrite.dstArrayElement = 0;
+	descriptorWrite.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+	descriptorWrite.descriptorCount = 1;
+	descriptorWrite.pBufferInfo = &bufferInfo;
+
+	vkUpdateDescriptorSets(device, 1, &descriptorWrite, 0, nullptr);
+	
+}
+// Create the command pool (for ordering drawing operations, memory transfers etc.)
 void FEngine::createCommandPool()
 {
 	QueueFamilyIndices queueFamilyIndices = findQueueFamilies(physicalDevice);
@@ -614,7 +706,7 @@ void FEngine::createCommandBuffers()
 		throw std::runtime_error("failed to allocate command buffers!");
 
 	// Records every command buffer (one per framebuffer)
-	for (size_t i = 0; i < commandBuffers.size(); i++) 
+	for (size_t i = 0; i < commandBuffers.size(); i++)
 	{
 		// Specify the usage of the command buffer
 		VkCommandBufferBeginInfo beginInfo = {};
@@ -636,13 +728,13 @@ void FEngine::createCommandBuffers()
 		renderPassInfo.clearValueCount = 1;
 		renderPassInfo.pClearValues = &clearColor;
 
-		// Bind the vertex buffer during rendering operations
 		vkCmdBeginRenderPass(commandBuffers[i], &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
 			vkCmdBindPipeline(commandBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, graphicsPipeline);
 			VkBuffer vertexBuffers[] = { vertexBuffer };
 			VkDeviceSize offsets[] = { 0 };
 			vkCmdBindVertexBuffers(commandBuffers[i], 0, 1, vertexBuffers, offsets);
 			vkCmdBindIndexBuffer(commandBuffers[i], indexBuffer, 0, VK_INDEX_TYPE_UINT16);
+			vkCmdBindDescriptorSets(commandBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineLayout, 0, 1, &descriptorSet, 0, nullptr);
 			vkCmdDrawIndexed(commandBuffers[i], static_cast<uint32_t>(indices.size()), 1, 0, 0, 0);
 		vkCmdEndRenderPass(commandBuffers[i]);
 
@@ -1026,6 +1118,12 @@ void FEngine::createIndexBuffer()
 	vkDestroyBuffer(device, stagingBuffer, nullptr);
 	vkFreeMemory(device, stagingBufferMemory, nullptr);
 }
+// Create the uniforms buffer
+void FEngine::createUniformBuffer()
+{
+	VkDeviceSize bufferSize = sizeof(UniformBufferObject);
+	createBuffer(bufferSize, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, uniformBuffer, uniformBufferMemory);
+}
 // Copy the contents from one buffer to another
 void FEngine::copyBuffer(VkBuffer srcBuffer, VkBuffer dstBuffer, VkDeviceSize size) 
 {
@@ -1085,6 +1183,14 @@ void FEngine::cleanup()
 {
 	// Deallocate resources
 	cleanupSwapChain();
+
+	vkDestroyDescriptorPool(device, descriptorPool, nullptr);
+
+	//Destroy uniform buffer
+	vkDestroyDescriptorSetLayout(device, descriptorSetLayout, nullptr);
+	vkDestroyBuffer(device, uniformBuffer, nullptr);
+	vkFreeMemory(device, uniformBufferMemory, nullptr);
+
 
 	// Destroy index buffer
 	vkDestroyBuffer(device, indexBuffer, nullptr);

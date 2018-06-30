@@ -1,7 +1,7 @@
 #pragma once
 
+#define GLM_FORCE_RADIANS
 #define GLFW_INCLUDE_VULKAN
-#include <GLFW/glfw3.h>
 
 #include <iostream>
 #include <stdexcept>
@@ -11,8 +11,15 @@
 #include <set>
 #include <algorithm>
 #include <fstream>
+#include <chrono>
+
+#include <GLFW/glfw3.h>
+#include "glm/glm.hpp"
+#include "glm/gtc/matrix_transform.hpp"
 
 #include "Vertex.h"
+
+
 
 
 class FEngine
@@ -25,10 +32,15 @@ public:
 	const uint32_t MAX_FRAMES_IN_FLIGHT = 2;
 	GLFWwindow * window;
 
+	//Buffers
 	VkBuffer vertexBuffer; 
 	VkDeviceMemory vertexBufferMemory;
+
 	VkBuffer indexBuffer;
 	VkDeviceMemory indexBufferMemory;
+
+	VkBuffer uniformBuffer;
+	VkDeviceMemory uniformBufferMemory;
 
 	const std::vector<Vertex> vertices = 
 	{
@@ -43,6 +55,13 @@ public:
 		0, 1, 2, 2, 3, 0
 	};
 
+
+	struct UniformBufferObject 
+	{
+		glm::mat4 model;
+		glm::mat4 view;
+		glm::mat4 proj;
+	};
 
 private:
 
@@ -83,9 +102,15 @@ private:
 	VkFormat swapChainImageFormat;
 	VkExtent2D swapChainExtent;
 	VkRenderPass renderPass;
+	VkDescriptorSetLayout descriptorSetLayout;
 	VkPipelineLayout pipelineLayout;
 	VkPipeline graphicsPipeline;
+
+	VkDescriptorPool descriptorPool;
+	VkDescriptorSet descriptorSet;
+
 	VkCommandPool commandPool;
+
 	std::vector<VkCommandBuffer> commandBuffers;
 
 	std::vector<VkSemaphore> imageAvailableSemaphores;//Specifies that an image has been acquired and is ready for rendering
@@ -115,6 +140,8 @@ private:
 		void* userData
 	);
 
+	
+
 	void initWindow();
 	void initVulkan();
 	void createLogicalDevice();
@@ -125,15 +152,25 @@ private:
 	void createInstance();
 	void createSurface();
 	void createRenderPass();
+	void createDescriptorSetLayout();
 	void createGraphicsPipeline();
 	void createFramebuffers();
+
+	void createDescriptorPool();
+	void createDescriptorSet();
+
 	void createCommandPool();
+
+
 	void createCommandBuffers();
 	void drawFrame();
 	void createSyncObjects();
 	void createBuffer(VkDeviceSize size, VkBufferUsageFlags usage, VkMemoryPropertyFlags properties, VkBuffer& buffer, VkDeviceMemory& bufferMemory);
+	
+	//Buffers creation
 	void createVertexBuffer();
 	void createIndexBuffer();
+	void createUniformBuffer();
 	void copyBuffer(VkBuffer srcBuffer, VkBuffer dstBuffer, VkDeviceSize size);
 
 	VkShaderModule createShaderModule(const std::vector<char>& code);
@@ -153,7 +190,8 @@ private:
 	VkSurfaceFormatKHR chooseSwapSurfaceFormat(const std::vector<VkSurfaceFormatKHR>& availableFormats);
 	VkPresentModeKHR chooseSwapPresentMode(const std::vector<VkPresentModeKHR> availablePresentModes);
 	VkExtent2D chooseSwapExtent(const VkSurfaceCapabilitiesKHR& capabilities);//resolution of the swap chain images
-
+	
+	void updateUniformBuffer();
 	void mainLoop();
 	void cleanup();
 };
