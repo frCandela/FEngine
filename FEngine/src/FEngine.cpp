@@ -64,6 +64,7 @@ void FEngine::initVulkan()
 	createFramebuffers();
 	createCommandPool();
 	createVertexBuffer();
+	createIndexBuffer(); 
 	createCommandBuffers();
 	createSyncObjects();
 }
@@ -612,10 +613,10 @@ void FEngine::createCommandBuffers()
 	if (vkAllocateCommandBuffers(device, &allocInfo, commandBuffers.data()) != VK_SUCCESS)
 		throw std::runtime_error("failed to allocate command buffers!");
 
-	//Records every command buffer (one per framebuffer)
+	// Records every command buffer (one per framebuffer)
 	for (size_t i = 0; i < commandBuffers.size(); i++) 
 	{
-		//Specify the usage of the command buffer
+		// Specify the usage of the command buffer
 		VkCommandBufferBeginInfo beginInfo = {};
 		beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
 		beginInfo.flags = VK_COMMAND_BUFFER_USAGE_SIMULTANEOUS_USE_BIT;
@@ -623,7 +624,7 @@ void FEngine::createCommandBuffers()
 		if (vkBeginCommandBuffer(commandBuffers[i], &beginInfo) != VK_SUCCESS)
 			throw std::runtime_error("failed to begin recording command buffer!");
 
-		//Configure the render pass
+		// Configure the render pass
 		VkRenderPassBeginInfo renderPassInfo = {};
 		renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
 		renderPassInfo.renderPass = renderPass;
@@ -635,13 +636,14 @@ void FEngine::createCommandBuffers()
 		renderPassInfo.clearValueCount = 1;
 		renderPassInfo.pClearValues = &clearColor;
 
-		//bind the vertex buffer during rendering operations
+		// Bind the vertex buffer during rendering operations
 		vkCmdBeginRenderPass(commandBuffers[i], &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
 			vkCmdBindPipeline(commandBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, graphicsPipeline);
 			VkBuffer vertexBuffers[] = { vertexBuffer };
 			VkDeviceSize offsets[] = { 0 };
 			vkCmdBindVertexBuffers(commandBuffers[i], 0, 1, vertexBuffers, offsets);
-			vkCmdDraw(commandBuffers[i], static_cast<uint32_t>(vertices.size()), 1, 0, 0);
+			vkCmdBindIndexBuffer(commandBuffers[i], indexBuffer, 0, VK_INDEX_TYPE_UINT16);
+			vkCmdDrawIndexed(commandBuffers[i], static_cast<uint32_t>(indices.size()), 1, 0, 0, 0);
 		vkCmdEndRenderPass(commandBuffers[i]);
 
 		if (vkEndCommandBuffer(commandBuffers[i]) != VK_SUCCESS) 
@@ -649,7 +651,7 @@ void FEngine::createCommandBuffers()
 	}
 
 }
-//Creates the sync objects (fences and semaphores)
+// Creates the sync objects (fences and semaphores)
 void FEngine::createSyncObjects()
 {
 	//Fences perform CPU-GPU synchronization to prevent more than MAX_FRAMES_IN_FLIGHT from being submitted
@@ -678,7 +680,7 @@ void FEngine::createSyncObjects()
 		}
 	}
 }
-//Creates a shader module from its bytecode 
+// Creates a shader module from its bytecode 
 VkShaderModule FEngine::createShaderModule(const std::vector<char>& code)
 {
 	VkShaderModuleCreateInfo createInfo = {};
@@ -692,7 +694,7 @@ VkShaderModule FEngine::createShaderModule(const std::vector<char>& code)
 
 	return shaderModule;
 }
-//Reads a file and returns it as a vector<char> (used for loading shaders)
+// Reads a file and returns it as a vector<char> (used for loading shaders)
 std::vector<char> FEngine::readFile(const std::string& filename) 
 {
 	std::ifstream file(filename, std::ios::ate | std::ios::binary);//ate -> seek to the end of stream immediately after open 
@@ -712,7 +714,7 @@ std::vector<char> FEngine::readFile(const std::string& filename)
 
 	return buffer;
 }
-//Look for and select a graphics card in the system
+// Look for and select a graphics card in the system
 void FEngine::pickPhysicalDevice()
 {
 	//Get devices
@@ -737,7 +739,7 @@ void FEngine::pickPhysicalDevice()
 
 
 }
-//Returns true if the physical device is suitable for the application
+// Returns true if the physical device is suitable for the application
 bool FEngine::isDeviceSuitable(VkPhysicalDevice device)
 {
 	//Get device properties and features
@@ -760,7 +762,7 @@ bool FEngine::isDeviceSuitable(VkPhysicalDevice device)
 
 	return  indices.isComplete() && extensionsSupported && swapChainAdequate && deviceProperties.deviceType == VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU;
 }
-//check if this extension is supported on the GPU
+// check if this extension is supported on the GPU
 bool FEngine::checkDeviceExtensionSupport(VkPhysicalDevice device)
 {
 	//get extensions available on the device
@@ -777,7 +779,7 @@ bool FEngine::checkDeviceExtensionSupport(VkPhysicalDevice device)
 
 	return requiredExtensions.empty();
 }
-//Get the queue families needed 
+// Get the queue families needed 
 FEngine::QueueFamilyIndices FEngine::findQueueFamilies(VkPhysicalDevice device)
 {
 	QueueFamilyIndices indices;
@@ -811,7 +813,7 @@ FEngine::QueueFamilyIndices FEngine::findQueueFamilies(VkPhysicalDevice device)
 
 	return indices;
 }
-//Setup the debug callbak used by the validation layers
+// Setup the debug callbak used by the validation layers
 void FEngine::setupDebugCallback()
 {
 	if (!enableValidationLayers)
@@ -826,7 +828,7 @@ void FEngine::setupDebugCallback()
 		throw std::runtime_error("failed to set up debug callback!");
 
 }
-//checks if all of the requested layers are available
+// Checks if all of the requested layers are available
 bool FEngine::checkValidationLayerSupport()
 {
 	uint32_t layerCount;
@@ -852,7 +854,7 @@ bool FEngine::checkValidationLayerSupport()
 
 	return true;
 }
-//Returns the extensions names required for the VkInstance
+// Returns the extensions names required for the VkInstance
 std::vector<const char*> FEngine::getRequiredExtensions()
 {
 	
@@ -867,7 +869,7 @@ std::vector<const char*> FEngine::getRequiredExtensions()
 
 	return extensions;
 }
-//Returns the swap chain details of a physical device (surface formats and presentation modes)
+// Returns the swap chain details of a physical device (surface formats and presentation modes)
 FEngine::SwapChainSupportDetails FEngine::querySwapChainSupport(VkPhysicalDevice device)
 {
 	SwapChainSupportDetails details;
@@ -895,7 +897,7 @@ FEngine::SwapChainSupportDetails FEngine::querySwapChainSupport(VkPhysicalDevice
 
 	return details;
 }
-//Choose the best SurfaceFormat in a list of available formats (color space)
+// Choose the best SurfaceFormat in a list of available formats (color space)
 VkSurfaceFormatKHR FEngine::chooseSwapSurfaceFormat(const std::vector<VkSurfaceFormatKHR>& availableFormats)
 {
 	//surface has no preferred format
@@ -910,7 +912,7 @@ VkSurfaceFormatKHR FEngine::chooseSwapSurfaceFormat(const std::vector<VkSurfaceF
 	//No good format found
 	return availableFormats[0];	
 }
-//Choose the best presentation mode in a list of available presentation mode
+// Choose the best presentation mode in a list of available presentation mode
 VkPresentModeKHR FEngine::chooseSwapPresentMode(const std::vector<VkPresentModeKHR> availablePresentModes)
 {
 	VkPresentModeKHR bestMode = VK_PRESENT_MODE_FIFO_KHR;//Default always available
@@ -925,7 +927,7 @@ VkPresentModeKHR FEngine::chooseSwapPresentMode(const std::vector<VkPresentModeK
 
 	return bestMode;
 }
-//Returns the best available swap extent of a surface (resolution of the swap chain images)
+// Returns the best available swap extent of a surface (resolution of the swap chain images)
 VkExtent2D FEngine::chooseSwapExtent(const VkSurfaceCapabilitiesKHR& capabilities)
 {
     if (capabilities.currentExtent.width != std::numeric_limits<uint32_t>::max()) 
@@ -947,44 +949,120 @@ VkExtent2D FEngine::chooseSwapExtent(const VkSurfaceCapabilitiesKHR& capabilitie
 		return actualExtent;
 	}
 }
-//Creates a vertex buffer for test rendering
-void FEngine::createVertexBuffer()
+// Helper function for creating buffers
+void FEngine::createBuffer(VkDeviceSize size, VkBufferUsageFlags usage, VkMemoryPropertyFlags properties, VkBuffer& buffer, VkDeviceMemory& bufferMemory)
 {
-	//Creates a vertex buffer
+	// Buffer info structure
 	VkBufferCreateInfo bufferInfo = {};
-
 	bufferInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
-	bufferInfo.size = sizeof(vertices[0]) * vertices.size();	//size of the buffer in bytes
-	bufferInfo.usage = VK_BUFFER_USAGE_VERTEX_BUFFER_BIT;
+	bufferInfo.size = size;
+	bufferInfo.usage = usage;
 	bufferInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
 
-	if (vkCreateBuffer(device, &bufferInfo, nullptr, &vertexBuffer) != VK_SUCCESS)
-		throw std::runtime_error("failed to create vertex buffer!");
-
-	//query memory requirements
+	if (vkCreateBuffer(device, &bufferInfo, nullptr, &buffer) != VK_SUCCESS)
+		throw std::runtime_error("failed to create buffer!");
+	
+	// Query memory requirements
 	VkMemoryRequirements memRequirements;
-	vkGetBufferMemoryRequirements(device, vertexBuffer, &memRequirements);
-
-	//Allow memory to uffer
+	vkGetBufferMemoryRequirements(device, buffer, &memRequirements);
+	
+	// Allow memory to buffer
 	VkMemoryAllocateInfo allocInfo = {};
 	allocInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
 	allocInfo.allocationSize = memRequirements.size;
-	allocInfo.memoryTypeIndex = findMemoryType(memRequirements.memoryTypeBits, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
+	allocInfo.memoryTypeIndex = findMemoryType(memRequirements.memoryTypeBits, properties);
 
-	if (vkAllocateMemory(device, &allocInfo, nullptr, &vertexBufferMemory) != VK_SUCCESS) 
-		throw std::runtime_error("failed to allocate vertex buffer memory!");
-
-	// associate this memory with the buffer
-	vkBindBufferMemory(device, vertexBuffer, vertexBufferMemory, 0);
-
-	//copy the vertex data to the buffer
-	void* data;
-	vkMapMemory(device, vertexBufferMemory, 0, bufferInfo.size, 0, &data);
-	memcpy(data, vertices.data(), (size_t)bufferInfo.size);
-	vkUnmapMemory(device, vertexBufferMemory);
+	if (vkAllocateMemory(device, &allocInfo, nullptr, &bufferMemory) != VK_SUCCESS)
+		throw std::runtime_error("failed to allocate buffer memory!");
 	
+	vkBindBufferMemory(device, buffer, bufferMemory, 0);
 }
-//Find the right type of memory to use for our vertex buffer
+// Creates a vertex buffer for test rendering
+void FEngine::createVertexBuffer()
+{
+	VkDeviceSize bufferSize = sizeof(vertices[0]) * vertices.size();
+	
+	// Create a host visible buffer
+	VkBuffer stagingBuffer;
+	VkDeviceMemory stagingBufferMemory;
+	createBuffer(bufferSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, stagingBuffer, stagingBufferMemory);
+	
+	// Fills it with data
+	void* data;
+	vkMapMemory(device, stagingBufferMemory, 0, bufferSize, 0, &data);
+		memcpy(data, vertices.data(), (size_t)bufferSize);
+	vkUnmapMemory(device, stagingBufferMemory);
+
+	// Create a device local buffer
+	createBuffer(bufferSize, VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, vertexBuffer, vertexBufferMemory);
+	copyBuffer(stagingBuffer, vertexBuffer, bufferSize);
+
+	// Cleaning
+	vkDestroyBuffer(device, stagingBuffer, nullptr);
+	vkFreeMemory(device, stagingBufferMemory, nullptr);
+
+}
+// Create the index buffer
+void FEngine::createIndexBuffer()
+{
+	VkDeviceSize bufferSize = sizeof(indices[0]) * indices.size();
+
+	// Create a host visible buffer
+	VkBuffer stagingBuffer;
+	VkDeviceMemory stagingBufferMemory;
+	createBuffer(bufferSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, stagingBuffer, stagingBufferMemory);
+
+	// Fills it with data
+	void* data;
+	vkMapMemory(device, stagingBufferMemory, 0, bufferSize, 0, &data);
+	memcpy(data, indices.data(), (size_t)bufferSize);
+	vkUnmapMemory(device, stagingBufferMemory);
+
+	// Create a device local buffer
+	createBuffer(bufferSize, VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_INDEX_BUFFER_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, indexBuffer, indexBufferMemory);
+	copyBuffer(stagingBuffer, indexBuffer, bufferSize);
+
+	// Cleaning
+	vkDestroyBuffer(device, stagingBuffer, nullptr);
+	vkFreeMemory(device, stagingBufferMemory, nullptr);
+}
+// Copy the contents from one buffer to another
+void FEngine::copyBuffer(VkBuffer srcBuffer, VkBuffer dstBuffer, VkDeviceSize size) 
+{
+	// Allocate a temporary command buffer for memory transfer operations
+	VkCommandBufferAllocateInfo allocInfo = {};
+	allocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
+	allocInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
+	allocInfo.commandPool = commandPool;
+	allocInfo.commandBufferCount = 1;
+
+	VkCommandBuffer commandBuffer;
+	vkAllocateCommandBuffers(device, &allocInfo, &commandBuffer);
+
+	// Start recording the command buffer
+	VkCommandBufferBeginInfo beginInfo = {};
+	beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
+	beginInfo.flags = VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT;
+
+	vkBeginCommandBuffer(commandBuffer, &beginInfo);
+		VkBufferCopy copyRegion = {};
+		copyRegion.size = size;
+		vkCmdCopyBuffer(commandBuffer, srcBuffer, dstBuffer, 1, &copyRegion);
+	vkEndCommandBuffer(commandBuffer);
+
+	// Execute the command buffer to complete the transfer
+	VkSubmitInfo submitInfo = {};
+	submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
+	submitInfo.commandBufferCount = 1;
+	submitInfo.pCommandBuffers = &commandBuffer;
+
+	vkQueueSubmit(graphicsQueue, 1, &submitInfo, VK_NULL_HANDLE);
+	vkQueueWaitIdle(graphicsQueue);
+
+	// Cleaning
+	vkFreeCommandBuffers(device, commandPool, 1, &commandBuffer);
+}
+// Find the right type of memory to use for our vertex buffer
 uint32_t FEngine::findMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags properties) 
 {
 	// query info about the available types of memory
@@ -1002,12 +1080,17 @@ uint32_t FEngine::findMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags prop
 
 	throw std::runtime_error("failed to find suitable memory type!");
 }
-//Clean Vulkan objects 
+// Clean Vulkan objects 
 void FEngine::cleanup()
 {
-	//Deallocate resources
+	// Deallocate resources
 	cleanupSwapChain();
 
+	// Destroy index buffer
+	vkDestroyBuffer(device, indexBuffer, nullptr);
+	vkFreeMemory(device, indexBufferMemory, nullptr);
+
+	// Destroy index buffer
 	vkDestroyBuffer(device, vertexBuffer, nullptr);
 	vkFreeMemory(device, vertexBufferMemory, nullptr);
 
