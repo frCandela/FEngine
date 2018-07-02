@@ -45,6 +45,8 @@ public:
 
 	VkImage textureImage;
 	VkDeviceMemory textureImageMemory;
+	VkImageView textureImageView;// images are accessed through image views rather than directly
+	VkSampler textureSampler;
 
 	const std::vector<Vertex> vertices = 
 	{
@@ -165,8 +167,10 @@ private:
 
 	void createCommandPool();
 
+	VkImageView createImageView(VkImage image, VkFormat format);
 	void createTextureImage();
-
+	void createTextureImageView();
+	void createTextureSampler();
 
 	void createCommandBuffers();
 	void drawFrame();

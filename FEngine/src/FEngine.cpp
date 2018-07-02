@@ -3,7 +3,7 @@
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
 
-//Runs the application
+// Runs the application
 void FEngine::Run()
 {
 	initWindow();
@@ -12,7 +12,7 @@ void FEngine::Run()
 	cleanup();
 }
 
-//Creates the debug report callback used by the validation layers to display error messages
+// Creates the debug report callback used by the validation layers to display error messages
 VkResult FEngine::CreateDebugReportCallback(VkInstance instance, const VkDebugReportCallbackCreateInfoEXT* pCreateInfo, const VkAllocationCallbacks* pAllocator, VkDebugReportCallbackEXT* pCallback)
 {
 	auto func = (PFN_vkCreateDebugReportCallbackEXT)vkGetInstanceProcAddr(instance, "vkCreateDebugReportCallbackEXT");
@@ -21,14 +21,14 @@ VkResult FEngine::CreateDebugReportCallback(VkInstance instance, const VkDebugRe
 	else
 		return VK_ERROR_EXTENSION_NOT_PRESENT;
 }
-//Destroy the debug report callback used by the validation layers to display error messages
+// Destroy the debug report callback used by the validation layers to display error messages
 void FEngine::DestroyDebugReportCallback(VkInstance instance, VkDebugReportCallbackEXT callback, const VkAllocationCallbacks* pAllocator)
 {
 	auto func = (PFN_vkDestroyDebugReportCallbackEXT)vkGetInstanceProcAddr(instance, "vkDestroyDebugReportCallbackEXT");
 	if (func != nullptr)
 		func(instance, callback, pAllocator);
 }
-//Callback used by the validation layers to display error messages
+// Callback used by the validation layers to display error messages
 VKAPI_ATTR VkBool32 VKAPI_CALL FEngine::debugCallback(
 	VkDebugReportFlagsEXT flags,
 	VkDebugReportObjectTypeEXT objType,
@@ -44,15 +44,15 @@ VKAPI_ATTR VkBool32 VKAPI_CALL FEngine::debugCallback(
 
 	return VK_FALSE;
 }
-//Creates a GLFW window
+// Creates a GLFW window
 void FEngine::initWindow()
 {
 	glfwInit();
-	glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);//No opengl context
+	glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);// No opengl context
 	glfwWindowHint(GLFW_RESIZABLE, GLFW_TRUE);
-	window = glfwCreateWindow(WIDTH, HEIGHT, "Vulkan", nullptr/*fullscreen monitor*/, nullptr);
+	window = glfwCreateWindow(WIDTH, HEIGHT, "Vulkan", nullptr/* fullscreen monitor */, nullptr);
 }
-//Initializes the Vulakan application and required components
+// Initializes the Vulakan application and required components
 void FEngine::initVulkan()
 {
 	createInstance();
@@ -68,6 +68,8 @@ void FEngine::initVulkan()
 	createFramebuffers();
 	createCommandPool();
 	createTextureImage();
+	createTextureImageView();
+	createTextureSampler();
 	createVertexBuffer();
 	createIndexBuffer();
 	createUniformBuffer();
@@ -181,10 +183,10 @@ void  FEngine::updateUniformBuffer()
 // The logical deviceis the interface with the physical device
 void FEngine::createLogicalDevice()
 {
-	//Get the queue families indices
+	// Get the queue families indices
 	QueueFamilyIndices indices = findQueueFamilies(physicalDevice);
 
-	//Creates the queues
+	// Creates the queues
 	std::vector<VkDeviceQueueCreateInfo> queueCreateInfos;
 	std::set<int> uniqueQueueFamilies = { indices.graphicsFamily, indices.presentFamily };//Prevent from creating the same queue twice
 
@@ -199,8 +201,9 @@ void FEngine::createLogicalDevice()
 		queueCreateInfos.push_back(queueCreateInfo);
 	}
 
-	//Prepare the structs to create the logical device
+	// Prepare the structs to create the logical device
 	VkPhysicalDeviceFeatures deviceFeatures = {};
+	deviceFeatures.samplerAnisotropy = VK_TRUE;
 
 	VkDeviceCreateInfo createInfo = {};
 	createInfo.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
@@ -210,7 +213,7 @@ void FEngine::createLogicalDevice()
 	createInfo.pEnabledFeatures = &deviceFeatures;
 	createInfo.enabledExtensionCount = static_cast<uint32_t>(deviceExtensions.size());
 	createInfo.ppEnabledExtensionNames = deviceExtensions.data();
-	//validation layers
+	// Validation layers
 	if (enableValidationLayers)
 	{
 		createInfo.enabledLayerCount = static_cast<uint32_t>(validationLayers.size());
@@ -219,11 +222,11 @@ void FEngine::createLogicalDevice()
 	else
 		createInfo.enabledLayerCount = 0;
 
-	//create the logical device
+	// Create the logical device
 	if (vkCreateDevice(physicalDevice, &createInfo, nullptr, &device) != VK_SUCCESS)
 		throw std::runtime_error("failed to create logical device!");
 
-	//retrieve the queue handle:
+	// Retrieve the queue handle:
 	vkGetDeviceQueue(device, indices.graphicsFamily, 0, &graphicsQueue);
 	vkGetDeviceQueue(device, indices.presentFamily, 0, &presentQueue);
 }
@@ -319,28 +322,9 @@ void FEngine::createSwapChain()
 void FEngine::createImageViews()
 {
 	swapChainImageViews.resize(swapChainImages.size());
-	for (size_t i = 0; i < swapChainImages.size(); i++) 
-	{
-		// Prepare struct
-		VkImageViewCreateInfo createInfo = {};
-		createInfo.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
-		createInfo.image = swapChainImages[i];
-		createInfo.viewType = VK_IMAGE_VIEW_TYPE_2D;
-		createInfo.format = swapChainImageFormat;
-		createInfo.components.r = VK_COMPONENT_SWIZZLE_IDENTITY;
-		createInfo.components.g = VK_COMPONENT_SWIZZLE_IDENTITY;
-		createInfo.components.b = VK_COMPONENT_SWIZZLE_IDENTITY;
-		createInfo.components.a = VK_COMPONENT_SWIZZLE_IDENTITY;
-		createInfo.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
-		createInfo.subresourceRange.baseMipLevel = 0;
-		createInfo.subresourceRange.levelCount = 1;
-		createInfo.subresourceRange.baseArrayLayer = 0;
-		createInfo.subresourceRange.layerCount = 1;
 
-		//Create the image view
-		if (vkCreateImageView(device, &createInfo, nullptr, &swapChainImageViews[i]) != VK_SUCCESS) 
-			throw std::runtime_error("failed to create image views!");
-	}
+	for (uint32_t i = 0; i < swapChainImages.size(); i++)
+		swapChainImageViews[i] = createImageView(swapChainImages[i], swapChainImageFormat);
 }
 // Connection between the application and the Vulkan library
 void FEngine::createInstance()
@@ -836,17 +820,17 @@ void FEngine::pickPhysicalDevice()
 // Returns true if the physical device is suitable for the application
 bool FEngine::isDeviceSuitable(VkPhysicalDevice device)
 {
-	//Get device properties and features
+	// Get device properties and features
 	VkPhysicalDeviceProperties deviceProperties;
 	VkPhysicalDeviceFeatures deviceFeatures;
 	vkGetPhysicalDeviceProperties(device, &deviceProperties);
 	vkGetPhysicalDeviceFeatures(device, &deviceFeatures);
 
-	//retreive queue families
+	// Retreive queue families
 	QueueFamilyIndices indices = findQueueFamilies(device);
 	bool extensionsSupported = checkDeviceExtensionSupport(device);
 
-	//verify that swap chain support is adequate
+	// Verify that swap chain support is adequate
 	bool swapChainAdequate = false;
 	if (extensionsSupported) 
 	{
@@ -854,9 +838,14 @@ bool FEngine::isDeviceSuitable(VkPhysicalDevice device)
 		swapChainAdequate = !swapChainSupport.formats.empty() && !swapChainSupport.presentModes.empty();
 	}
 
-	return  indices.isComplete() && extensionsSupported && swapChainAdequate && deviceProperties.deviceType == VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU;
+	return  
+		indices.isComplete() 
+		&& extensionsSupported 
+		&& swapChainAdequate 
+		&& deviceProperties.deviceType == VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU
+		&& deviceFeatures.samplerAnisotropy;
 }
-// check if this extension is supported on the GPU
+// Check if this extension is supported on the GPU
 bool FEngine::checkDeviceExtensionSupport(VkPhysicalDevice device)
 {
 	//get extensions available on the device
@@ -1198,6 +1187,54 @@ void FEngine::createImage(uint32_t width, uint32_t height, VkFormat format, VkIm
 
 	vkBindImageMemory(device, image, imageMemory, 0);
 }
+// Create an image view for a texture
+void FEngine::createTextureImageView()
+{
+	textureImageView = createImageView(textureImage, VK_FORMAT_R8G8B8A8_UNORM);
+}
+// Create a texture sampler to access a texture
+void FEngine::createTextureSampler()
+{
+	VkSamplerCreateInfo samplerInfo = {};
+	samplerInfo.sType = VK_STRUCTURE_TYPE_SAMPLER_CREATE_INFO;
+	samplerInfo.magFilter = VK_FILTER_LINEAR;
+	samplerInfo.minFilter = VK_FILTER_LINEAR;
+	samplerInfo.addressModeU = VK_SAMPLER_ADDRESS_MODE_REPEAT;
+	samplerInfo.addressModeV = VK_SAMPLER_ADDRESS_MODE_REPEAT;
+	samplerInfo.addressModeW = VK_SAMPLER_ADDRESS_MODE_REPEAT;
+	samplerInfo.anisotropyEnable = VK_TRUE;
+	samplerInfo.maxAnisotropy = 16;
+	samplerInfo.borderColor = VK_BORDER_COLOR_INT_OPAQUE_BLACK;
+	samplerInfo.unnormalizedCoordinates = VK_FALSE;
+	samplerInfo.compareEnable = VK_FALSE;
+	samplerInfo.compareOp = VK_COMPARE_OP_ALWAYS;
+	samplerInfo.mipmapMode = VK_SAMPLER_MIPMAP_MODE_LINEAR;
+	samplerInfo.mipLodBias = 0.0f;
+	samplerInfo.minLod = 0.0f;
+	samplerInfo.maxLod = 0.0f;
+
+	if (vkCreateSampler(device, &samplerInfo, nullptr, &textureSampler) != VK_SUCCESS) 
+		throw std::runtime_error("failed to create texture sampler!");
+}
+// Create an image view
+VkImageView FEngine::createImageView(VkImage image, VkFormat format) {
+	VkImageViewCreateInfo viewInfo = {};
+	viewInfo.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
+	viewInfo.image = image;
+	viewInfo.viewType = VK_IMAGE_VIEW_TYPE_2D;
+	viewInfo.format = format;
+	viewInfo.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+	viewInfo.subresourceRange.baseMipLevel = 0;
+	viewInfo.subresourceRange.levelCount = 1;
+	viewInfo.subresourceRange.baseArrayLayer = 0;
+	viewInfo.subresourceRange.layerCount = 1;
+
+	VkImageView imageView;
+	if (vkCreateImageView(device, &viewInfo, nullptr, &imageView) != VK_SUCCESS) 
+		throw std::runtime_error("failed to create texture image view!");
+
+	return imageView;
+}
 // Allocate a temporary command buffer for memory transfer operations and start recording
 VkCommandBuffer FEngine::beginSingleTimeCommands() 
 {
@@ -1335,7 +1372,6 @@ void FEngine::copyBufferToImage(VkBuffer buffer, VkImage image, uint32_t width, 
 
 	endSingleTimeCommands(commandBuffer);
 }
-
 // Find the right type of memory to use for our vertex buffer
 uint32_t FEngine::findMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags properties) 
 {
@@ -1360,13 +1396,17 @@ void FEngine::cleanup()
 	// Deallocate resources
 	cleanupSwapChain();
 
-	//Cleans the main image
+	// Texture image and sampler
+	vkDestroySampler(device, textureSampler, nullptr);
+	vkDestroyImageView(device, textureImageView, nullptr);
+
+	// Cleans the main image
 	vkDestroyImage(device, textureImage, nullptr);
 	vkFreeMemory(device, textureImageMemory, nullptr);
 
 	vkDestroyDescriptorPool(device, descriptorPool, nullptr);
 
-	//Destroy uniform buffer
+	// Destroy uniform buffer
 	vkDestroyDescriptorSetLayout(device, descriptorSetLayout, nullptr);
 	vkDestroyBuffer(device, uniformBuffer, nullptr);
 	vkFreeMemory(device, uniformBufferMemory, nullptr);
