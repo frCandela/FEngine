@@ -1,7 +1,12 @@
 #pragma once
 
-#define GLM_FORCE_RADIANS
+
 #define GLFW_INCLUDE_VULKAN
+#include <GLFW/glfw3.h>
+
+#define GLM_FORCE_RADIANS
+#include "glm/glm.hpp"
+#include "glm/gtc/matrix_transform.hpp"
 
 #include <iostream>
 #include <stdexcept>
@@ -12,10 +17,6 @@
 #include <algorithm>
 #include <fstream>
 #include <chrono>
-
-#include <GLFW/glfw3.h>
-#include "glm/glm.hpp"
-#include "glm/gtc/matrix_transform.hpp"
 
 #include "Vertex.h"
 
@@ -41,6 +42,9 @@ public:
 
 	VkBuffer uniformBuffer;
 	VkDeviceMemory uniformBufferMemory;
+
+	VkImage textureImage;
+	VkDeviceMemory textureImageMemory;
 
 	const std::vector<Vertex> vertices = 
 	{
@@ -161,17 +165,24 @@ private:
 
 	void createCommandPool();
 
+	void createTextureImage();
+
 
 	void createCommandBuffers();
 	void drawFrame();
 	void createSyncObjects();
 	void createBuffer(VkDeviceSize size, VkBufferUsageFlags usage, VkMemoryPropertyFlags properties, VkBuffer& buffer, VkDeviceMemory& bufferMemory);
-	
+	void createImage(uint32_t width, uint32_t height, VkFormat format, VkImageTiling tiling, VkImageUsageFlags usage, VkMemoryPropertyFlags properties, VkImage& image, VkDeviceMemory& imageMemory);
 	//Buffers creation
 	void createVertexBuffer();
 	void createIndexBuffer();
 	void createUniformBuffer();
+
+	VkCommandBuffer beginSingleTimeCommands();
+	void endSingleTimeCommands(VkCommandBuffer commandBuffer);
 	void copyBuffer(VkBuffer srcBuffer, VkBuffer dstBuffer, VkDeviceSize size);
+	void transitionImageLayout(VkImage image, VkFormat format, VkImageLayout oldLayout, VkImageLayout newLayout);
+	void copyBufferToImage(VkBuffer buffer, VkImage image, uint32_t width, uint32_t height);
 
 	VkShaderModule createShaderModule(const std::vector<char>& code);
 	void pickPhysicalDevice();
