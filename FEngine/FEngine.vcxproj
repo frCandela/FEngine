@@ -82,11 +82,14 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="src\FEngine.cpp" />
+    <ClCompile Include="src\Image.cpp" />
     <ClCompile Include="src\main.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\FEngine.h" />
+    <ClInclude Include="include\Image.h" />
     <ClInclude Include="include\Vertex.h" />
+    <ClInclude Include="include\VulkanUtil.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="shaders\shader.frag" />
