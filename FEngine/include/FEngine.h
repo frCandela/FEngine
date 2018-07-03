@@ -21,9 +21,6 @@
 
 #include "Vertex.h"
 
-
-
-
 class FEngine
 {
 public:
@@ -31,13 +28,14 @@ public:
 
 	const uint32_t WIDTH = 800;
 	const uint32_t HEIGHT = 600;
+
+	const std::string MODEL_PATH = "models/chalet.obj";
+	const std::string TEXTURE_PATH = "textures/chalet.jpg";
+
 	const uint32_t MAX_FRAMES_IN_FLIGHT = 2;
 	GLFWwindow * window;
 
 	//Buffers
-	VkBuffer vertexBuffer; 
-	VkDeviceMemory vertexBufferMemory;
-
 	VkBuffer indexBuffer;
 	VkDeviceMemory indexBufferMemory;
 
@@ -54,25 +52,11 @@ public:
 	VkDeviceMemory depthImageMemory;
 	VkImageView depthImageView;
 
-	const std::vector<Vertex> vertices = 
-	{
-		//Coordinates				Colors					Texture coordinates
-		{ { -0.5f, -0.5f, 0.0f },	{ 1.0f, 0.0f, 0.0f },	{ 0.0f, 0.0f } },
-		{ { 0.5f, -0.5f, 0.0f },	{ 0.0f, 1.0f, 0.0f },	{ 1.0f, 0.0f } },
-		{ { 0.5f, 0.5f, 0.0f },		{ 0.0f, 0.0f, 1.0f },	{ 1.0f, 1.0f } },
-		{ { -0.5f, 0.5f, 0.0f },	{ 1.0f, 1.0f, 1.0f },	{ 0.0f, 1.0f } },
-
-		{ { -0.5f, -0.5f, -0.5f },	{ 1.0f, 0.0f, 0.0f },	{ 0.0f, 0.0f } },
-		{ { 0.5f, -0.5f, -0.5f },	{ 0.0f, 1.0f, 0.0f },	{ 1.0f, 0.0f } },
-		{ { 0.5f, 0.5f, -0.5f },	{ 0.0f, 0.0f, 1.0f },	{ 1.0f, 1.0f } },
-		{ { -0.5f, 0.5f, -0.5f },	{ 1.0f, 1.0f, 1.0f },	{ 0.0f, 1.0f } }
-	};
-
-	const std::vector<uint16_t> indices = 
-	{
-		0, 1, 2, 2, 3, 0,
-		4, 5, 6, 6, 7, 4
-	};
+	//Vertices and indices
+	std::vector<Vertex> vertices;
+	std::vector<uint32_t> indices;
+	VkBuffer vertexBuffer;
+	VkDeviceMemory vertexBufferMemory;
 
 	struct UniformBufferObject 
 	{
@@ -80,6 +64,8 @@ public:
 		glm::mat4 view;
 		glm::mat4 proj;
 	};
+
+	void loadModel();
 
 private:
 
