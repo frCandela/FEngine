@@ -5,6 +5,7 @@
 #include <GLFW/glfw3.h>
 
 #define GLM_FORCE_RADIANS
+#define GLM_FORCE_DEPTH_ZERO_TO_ONE
 #include "glm/glm.hpp"
 #include "glm/gtc/matrix_transform.hpp"
 
@@ -48,20 +49,30 @@ public:
 	VkImageView textureImageView;// images are accessed through image views rather than directly
 	VkSampler textureSampler;
 
+	//Depth
+	VkImage depthImage;
+	VkDeviceMemory depthImageMemory;
+	VkImageView depthImageView;
+
 	const std::vector<Vertex> vertices = 
 	{
-		//Coordinates		Colors					Texture coordinates
-		{ { -0.5f, -0.5f },	{ 1.0f, 0.0f, 0.0f },	{ 1.0f, 0.0f } },
-		{ { 0.5f, -0.5f },	{ 0.0f, 1.0f, 0.0f },	{ 0.0f, 0.0f } },
-		{ { 0.5f, 0.5f },	{ 0.0f, 0.0f, 1.0f },	{ 0.0f, 1.0f } },
-		{ { -0.5f, 0.5f },	{ 1.0f, 1.0f, 1.0f },	{ 1.0f, 1.0f } }
+		//Coordinates				Colors					Texture coordinates
+		{ { -0.5f, -0.5f, 0.0f },	{ 1.0f, 0.0f, 0.0f },	{ 0.0f, 0.0f } },
+		{ { 0.5f, -0.5f, 0.0f },	{ 0.0f, 1.0f, 0.0f },	{ 1.0f, 0.0f } },
+		{ { 0.5f, 0.5f, 0.0f },		{ 0.0f, 0.0f, 1.0f },	{ 1.0f, 1.0f } },
+		{ { -0.5f, 0.5f, 0.0f },	{ 1.0f, 1.0f, 1.0f },	{ 0.0f, 1.0f } },
+
+		{ { -0.5f, -0.5f, -0.5f },	{ 1.0f, 0.0f, 0.0f },	{ 0.0f, 0.0f } },
+		{ { 0.5f, -0.5f, -0.5f },	{ 0.0f, 1.0f, 0.0f },	{ 1.0f, 0.0f } },
+		{ { 0.5f, 0.5f, -0.5f },	{ 0.0f, 0.0f, 1.0f },	{ 1.0f, 1.0f } },
+		{ { -0.5f, 0.5f, -0.5f },	{ 1.0f, 1.0f, 1.0f },	{ 0.0f, 1.0f } }
 	};
 
 	const std::vector<uint16_t> indices = 
 	{
-		0, 1, 2, 2, 3, 0
+		0, 1, 2, 2, 3, 0,
+		4, 5, 6, 6, 7, 4
 	};
-
 
 	struct UniformBufferObject 
 	{
@@ -167,8 +178,15 @@ private:
 	void createDescriptorSet();
 
 	void createCommandPool();
+	void createDepthResources();
+	VkFormat findSupportedFormat(const std::vector<VkFormat>& candidates, VkImageTiling tiling, VkFormatFeatureFlags features);
+	VkFormat findDepthFormat();
+	bool hasStencilComponent(VkFormat format) 
+	{
+		return format == VK_FORMAT_D32_SFLOAT_S8_UINT || format == VK_FORMAT_D24_UNORM_S8_UINT;
+	}
 
-	VkImageView createImageView(VkImage image, VkFormat format);
+	VkImageView createImageView(VkImage image, VkFormat format, VkImageAspectFlags aspectFlags);
 	void createTextureImage();
 	void createTextureImageView();
 	void createTextureSampler();

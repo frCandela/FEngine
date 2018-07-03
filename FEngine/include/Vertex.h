@@ -5,7 +5,7 @@
 
 struct Vertex 
 {
-	glm::vec2 pos;
+	glm::vec3 pos;
 	glm::vec3 color;
 	glm::vec2 texCoord;
 
@@ -29,7 +29,7 @@ struct Vertex
 		// Position
 		attributeDescriptions[0].binding = 0;						// Tells Vulkan from which binding the per-vertex data comes
 		attributeDescriptions[0].location = 0;						// References the location directive of the input in the vertex shader
-		attributeDescriptions[0].format = VK_FORMAT_R32G32_SFLOAT;	// Describes the type of data for the attribute
+		attributeDescriptions[0].format = VK_FORMAT_R32G32B32_SFLOAT;	// Describes the type of data for the attribute
 		attributeDescriptions[0].offset = offsetof(Vertex, pos);
 
 		// Color
