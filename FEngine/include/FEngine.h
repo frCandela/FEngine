@@ -25,11 +25,13 @@
 #include "SwapChain.h"
 #include "Sampler.h"
 #include "Instance.h"
+#include "Buffer.h"
 
 class Image;
 class SwapChain;
 class Device;
 class Sampler;
+class Buffer;
 
 class FEngine
 {
@@ -47,9 +49,7 @@ public:
 	const uint32_t MAX_FRAMES_IN_FLIGHT = 2;
 	GLFWwindow * window;
 
-	//Buffers
-	VkBuffer indexBuffer;
-	VkDeviceMemory indexBufferMemory;
+
 
 	VkBuffer uniformBuffer;
 	VkDeviceMemory uniformBufferMemory;
@@ -59,11 +59,9 @@ public:
 
 	void zobCleanup();
 
-	//Vertices and indices
-	std::vector<Vertex> vertices;
-	std::vector<uint32_t> indices;
-	VkBuffer vertexBuffer;
-	VkDeviceMemory vertexBufferMemory;
+
+	Buffer* buffer;
+
 
 	struct UniformBufferObject 
 	{
@@ -74,8 +72,6 @@ public:
 
 	void loadModel();
 
-
-	
 	static Instance* instance;
 
 	Sampler* textureSampler;
@@ -111,33 +107,17 @@ public:
 	void createDescriptorSet();
 
 	void createCommandPool();
-	static bool hasStencilComponent(VkFormat format) 
-	{
-		return format == VK_FORMAT_D32_SFLOAT_S8_UINT || format == VK_FORMAT_D24_UNORM_S8_UINT;
-	}
 
 	void createCommandBuffers();
 	void drawFrame();
 	void createSyncObjects();
-	void createBuffer(VkDeviceSize size, VkBufferUsageFlags usage, VkMemoryPropertyFlags properties, VkBuffer& buffer, VkDeviceMemory& bufferMemory);
 
 	//Buffers creation
-	void createVertexBuffer();
-	void createIndexBuffer();
 	void createUniformBuffer();
 
-	static VkCommandBuffer beginSingleTimeCommands();
-	static void endSingleTimeCommands(VkCommandBuffer commandBuffer);
-	
-	void copyBuffer(VkBuffer srcBuffer, VkBuffer dstBuffer, VkDeviceSize size);
-
 	VkShaderModule createShaderModule(const std::vector<char>& code);
-	static uint32_t findMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags properties);
 
 	static std::vector<char> readFile(const std::string& filename);
-
-
-
 
 	void updateUniformBuffer();
 	void mainLoop();

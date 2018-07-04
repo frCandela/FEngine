@@ -6,13 +6,16 @@
 #endif // !GLFW_INCLUDE_VULKAN
 
 #include <string>
-
-#include "FEngine.h"
-class FEngine;
+#include "Device.h"
 
 class Image
 {
 public:
+	Image(Device& device) :
+		m_device(device) 
+	{};
+
+	~Image() {};
 
 	const std::string TEXTURE_PATH = "textures/chalet.jpg";
 	VkImage image;
@@ -20,14 +23,7 @@ public:
 	VkImageView imageView;// images are accessed through image views rather than directly
 	uint32_t m_mipLevels = 1;
 
-	VkDevice& m_device;
-	VkPhysicalDevice& m_physicalDevice;
-
-	Image(VkDevice& device, VkPhysicalDevice& physicalDevice) : 
-		m_device(device),
-		m_physicalDevice(physicalDevice){};
-
-	~Image() {};
+	Device& m_device;
 
 	// Load an image and upload it into a Vulkan image object
 	void createTextureImage();
@@ -37,12 +33,17 @@ public:
 	void transitionImageLayout(VkFormat format, VkImageLayout oldLayout, VkImageLayout newLayout, uint32_t mipLevels);
 	void copyBufferToImage(VkBuffer buffer, uint32_t width, uint32_t height);
 	void generateMipmaps(VkFormat imageFormat, int32_t texWidth, int32_t texHeight, uint32_t mipLevels);
+	
+	static bool hasStencilComponent(VkFormat format)
+	{
+		return format == VK_FORMAT_D32_SFLOAT_S8_UINT || format == VK_FORMAT_D24_UNORM_S8_UINT;
+	}
 
 	void Destroy()
 	{
-		vkDestroyImageView(m_device, imageView, nullptr);
-		vkDestroyImage(m_device, image, nullptr);
-		vkFreeMemory(m_device, deviceMemory, nullptr);
+		vkDestroyImageView(m_device.device, imageView, nullptr);
+		vkDestroyImage(m_device.device, image, nullptr);
+		vkFreeMemory(m_device.device, deviceMemory, nullptr);
 	}
 
 	static VkImageView createImageView(VkImage image, VkFormat format, VkImageAspectFlags aspectFlags, uint32_t mipLevels, VkDevice& device);

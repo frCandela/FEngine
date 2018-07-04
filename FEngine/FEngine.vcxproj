@@ -82,6 +82,8 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\Buffer.cpp" />
+    <ClCompile Include="src\CommandPool.cpp" />
     <ClCompile Include="src\FEngine.cpp" />
     <ClCompile Include="src\Image.cpp" />
     <ClCompile Include="src\Instance.cpp" />
@@ -91,6 +93,7 @@
     <ClCompile Include="src\SwapChain.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="include\Buffer.h" />
     <ClInclude Include="include\FEngine.h" />
     <ClInclude Include="include\Image.h" />
     <ClInclude Include="include\Device.h" />
@@ -98,7 +101,7 @@
     <ClInclude Include="include\Sampler.h" />
     <ClInclude Include="include\SwapChain.h" />
     <ClInclude Include="include\Vertex.h" />
-    <ClInclude Include="include\VulkanUtil.h" />
+    <ClInclude Include="include\CommandPool.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="shaders\shader.frag" />

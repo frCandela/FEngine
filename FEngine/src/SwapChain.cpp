@@ -6,7 +6,7 @@
 SwapChain::SwapChain(Device& device) :
 	m_device(device)
 {
-	depthImage = new Image(device.device, device.physicalDevice);
+	depthImage = new Image(device);
 }
 
 // Creates the best swap chain possible depending on the device capabilities.

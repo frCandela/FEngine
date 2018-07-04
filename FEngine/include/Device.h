@@ -26,7 +26,10 @@ const std::vector<const char*> validationLayers = { "VK_LAYER_LUNARG_standard_va
 class Device
 {
 public:
-	Device(VkInstance& instance) : m_instance(instance){}
+	Device(VkInstance& instance, VkCommandPool& commandPool) : 
+		m_instance(instance),
+		m_commandPool(commandPool)
+	{}
 
 	VkInstance& m_instance;
 	VkDevice device;
@@ -35,9 +38,15 @@ public:
 	VkQueue presentQueue;
 	VkSurfaceKHR surface;
 
+	VkCommandPool& m_commandPool;
+
 	void pickPhysicalDevice();
 	void createLogicalDevice();
 	bool checkDeviceExtensionSupport(VkPhysicalDevice device);
 	bool isDeviceSuitable(VkPhysicalDevice device);
 	QueueFamilyIndices findQueueFamilies(VkPhysicalDevice device);
+	uint32_t findMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags properties);
+
+	VkCommandBuffer beginSingleTimeCommands();
+	void endSingleTimeCommands(VkCommandBuffer commandBuffer);
 };

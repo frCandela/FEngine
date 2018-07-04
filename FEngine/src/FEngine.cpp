@@ -6,12 +6,13 @@
 
 VkCommandPool FEngine::commandPool = {};
 Instance* FEngine::instance = new Instance();
-Device* FEngine::device = new Device(instance->instance);
+Device* FEngine::device = new Device(instance->instance, commandPool);
 SwapChain* FEngine::swapChain = new SwapChain(*device);
 
 FEngine::FEngine() :
-	textureImage( new Image(device->device, device->physicalDevice)),
-	textureSampler(new Sampler(*device))
+	textureImage( new Image(*device)),
+	textureSampler(new Sampler(*device)),
+	buffer( new Buffer( *device ))
 {
 
 }
@@ -59,8 +60,8 @@ void FEngine::initVulkan()
 	textureSampler->createSampler( textureImage->m_mipLevels );
 
 	loadModel();
-	createVertexBuffer();
-	createIndexBuffer();
+	buffer->createVertexBuffer();
+	buffer->createIndexBuffer();
 	createUniformBuffer();
 	createDescriptorPool();
 	createDescriptorSet();
@@ -528,9 +529,6 @@ void FEngine::createCommandPool()
 	if (vkCreateCommandPool(device->device, &poolInfo, nullptr, &commandPool) != VK_SUCCESS)
 		throw std::runtime_error("failed to create command pool!");
 }
-
-
-
 // Creates one command buffer per framebuffer . (Commands are recorded in command buffers before being performed)
 void FEngine::createCommandBuffers()
 {
@@ -575,12 +573,12 @@ void FEngine::createCommandBuffers()
 
 		vkCmdBeginRenderPass(commandBuffers[i], &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
 			vkCmdBindPipeline(commandBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, graphicsPipeline);
-			VkBuffer vertexBuffers[] = { vertexBuffer };
+			VkBuffer vertexBuffers[] = { buffer->vertexBuffer };
 			VkDeviceSize offsets[] = { 0 };
 			vkCmdBindVertexBuffers(commandBuffers[i], 0, 1, vertexBuffers, offsets);
-			vkCmdBindIndexBuffer(commandBuffers[i], indexBuffer, 0, VK_INDEX_TYPE_UINT32);
+			vkCmdBindIndexBuffer(commandBuffers[i], buffer->indexBuffer, 0, VK_INDEX_TYPE_UINT32);
 			vkCmdBindDescriptorSets(commandBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineLayout, 0, 1, &descriptorSet, 0, nullptr);
-			vkCmdDrawIndexed(commandBuffers[i], static_cast<uint32_t>(indices.size()), 1, 0, 0, 0);
+			vkCmdDrawIndexed(commandBuffers[i], static_cast<uint32_t>(buffer->indices.size()), 1, 0, 0, 0);
 		vkCmdEndRenderPass(commandBuffers[i]);
 
 		if (vkEndCommandBuffer(commandBuffers[i]) != VK_SUCCESS) 
@@ -656,90 +654,17 @@ std::vector<char> FEngine::readFile(const std::string& filename)
 
 
 
-// Helper function for creating buffers
-void FEngine::createBuffer(VkDeviceSize size, VkBufferUsageFlags usage, VkMemoryPropertyFlags properties, VkBuffer& buffer, VkDeviceMemory& bufferMemory)
-{
-	// Buffer info structure
-	VkBufferCreateInfo bufferInfo = {};
-	bufferInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
-	bufferInfo.size = size;
-	bufferInfo.usage = usage;
-	bufferInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
 
-	if (vkCreateBuffer(device->device, &bufferInfo, nullptr, &buffer) != VK_SUCCESS)
-		throw std::runtime_error("failed to create buffer!");
-	
-	// Query memory requirements
-	VkMemoryRequirements memRequirements;
-	vkGetBufferMemoryRequirements(device->device, buffer, &memRequirements);
-	
-	// Allow memory to buffer
-	VkMemoryAllocateInfo allocInfo = {};
-	allocInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
-	allocInfo.allocationSize = memRequirements.size;
-	allocInfo.memoryTypeIndex = findMemoryType(memRequirements.memoryTypeBits, properties);
 
-	if (vkAllocateMemory(device->device, &allocInfo, nullptr, &bufferMemory) != VK_SUCCESS)
-		throw std::runtime_error("failed to allocate buffer memory!");
-	
-	vkBindBufferMemory(device->device, buffer, bufferMemory, 0);
-}
 
-// Creates a vertex buffer for test rendering
-void FEngine::createVertexBuffer()
-{
-	VkDeviceSize bufferSize = sizeof(vertices[0]) * vertices.size();
-	
-	// Create a host visible buffer
-	VkBuffer stagingBuffer;
-	VkDeviceMemory stagingBufferMemory;
-	createBuffer(bufferSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, stagingBuffer, stagingBufferMemory);
-	
-	// Fills it with data
-	void* data;
-	vkMapMemory(device->device, stagingBufferMemory, 0, bufferSize, 0, &data);
-		memcpy(data, vertices.data(), (size_t)bufferSize);
-	vkUnmapMemory(device->device, stagingBufferMemory);
 
-	// Create a device local buffer
-	createBuffer(bufferSize, VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, vertexBuffer, vertexBufferMemory);
-	copyBuffer(stagingBuffer, vertexBuffer, bufferSize);
-
-	// Cleaning
-	vkDestroyBuffer(device->device, stagingBuffer, nullptr);
-	vkFreeMemory(device->device, stagingBufferMemory, nullptr);
-
-}
-// Create the index buffer
-void FEngine::createIndexBuffer()
-{
-	VkDeviceSize bufferSize = sizeof(indices[0]) * indices.size();
-
-	// Create a host visible buffer
-	VkBuffer stagingBuffer;
-	VkDeviceMemory stagingBufferMemory;
-	createBuffer(bufferSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, stagingBuffer, stagingBufferMemory);
-
-	// Fills it with data
-	void* data;
-	vkMapMemory(device->device, stagingBufferMemory, 0, bufferSize, 0, &data);
-	memcpy(data, indices.data(), (size_t)bufferSize);
-	vkUnmapMemory(device->device, stagingBufferMemory);
-
-	// Create a device local buffer
-	createBuffer(bufferSize, VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_INDEX_BUFFER_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, indexBuffer, indexBufferMemory);
-	copyBuffer(stagingBuffer, indexBuffer, bufferSize);
-
-	// Cleaning
-	vkDestroyBuffer(device->device, stagingBuffer, nullptr);
-	vkFreeMemory(device->device, stagingBufferMemory, nullptr);
-}
 // Create the uniforms buffer
 void FEngine::createUniformBuffer()
 {
 	VkDeviceSize bufferSize = sizeof(UniformBufferObject);
-	createBuffer(bufferSize, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, uniformBuffer, uniformBufferMemory);
+	Buffer::createBuffer(*device,bufferSize, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, uniformBuffer, uniformBufferMemory);
 }
+
 // Load a model from an OBJ file
 void FEngine::loadModel()
 {
@@ -773,86 +698,19 @@ void FEngine::loadModel()
 			vertex.color = { 1.0f, 1.0f, 1.0f };
 
 			if (uniqueVertices.count(vertex) == 0) {
-				uniqueVertices[vertex] = static_cast<uint32_t>(vertices.size());
-				vertices.push_back(vertex);
+				uniqueVertices[vertex] = static_cast<uint32_t>(buffer->vertices.size());
+				buffer->vertices.push_back(vertex);
 			}
 
-			indices.push_back(uniqueVertices[vertex]);
+			buffer->indices.push_back(uniqueVertices[vertex]);
 		}
 	}
 }
 
 
-// Allocate a temporary command buffer for memory transfer operations and start recording
-VkCommandBuffer FEngine::beginSingleTimeCommands() 
-{
-	// Allocate a temporary command buffer for memory transfer operations
-	VkCommandBufferAllocateInfo allocInfo = {};
-	allocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
-	allocInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
-	allocInfo.commandPool = commandPool;
-	allocInfo.commandBufferCount = 1;
-
-	VkCommandBuffer commandBuffer;
-	vkAllocateCommandBuffers(device->device, &allocInfo, &commandBuffer);
-
-	// Start recording the command buffer
-	VkCommandBufferBeginInfo beginInfo = {};
-	beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
-	beginInfo.flags = VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT;
-
-	vkBeginCommandBuffer(commandBuffer, &beginInfo);
-
-	return commandBuffer;
-}
-// Execute a command buffer to complete the transfer and cleans it
-void FEngine::endSingleTimeCommands(VkCommandBuffer commandBuffer) 
-{
-	vkEndCommandBuffer(commandBuffer);
-
-	// Execute the command buffer to complete the transfer
-	VkSubmitInfo submitInfo = {};
-	submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
-	submitInfo.commandBufferCount = 1;
-	submitInfo.pCommandBuffers = &commandBuffer;
-
-	vkQueueSubmit(device->graphicsQueue, 1, &submitInfo, VK_NULL_HANDLE);
-	vkQueueWaitIdle(device->graphicsQueue);
-
-	// Cleaning
-	vkFreeCommandBuffers(device->device, commandPool, 1, &commandBuffer);
-}
-// Copy the contents from one buffer to another
-void FEngine::copyBuffer(VkBuffer srcBuffer, VkBuffer dstBuffer, VkDeviceSize size) 
-{
-	VkCommandBuffer commandBuffer = beginSingleTimeCommands();
-
-	VkBufferCopy copyRegion = {};
-	copyRegion.size = size;
-	vkCmdCopyBuffer(commandBuffer, srcBuffer, dstBuffer, 1, &copyRegion);
-
-	endSingleTimeCommands(commandBuffer);
-}
 
 
-// Find the right type of memory to use for our vertex buffer
-uint32_t FEngine::findMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags properties) 
-{
-	// query info about the available types of memory
-	VkPhysicalDeviceMemoryProperties memProperties;
-	vkGetPhysicalDeviceMemoryProperties(device->physicalDevice, &memProperties);
 
-	//check for the support of the properties
-	for (uint32_t i = 0; i < memProperties.memoryTypeCount; i++) 
-	{
-		if ((typeFilter & (1 << i)) && (memProperties.memoryTypes[i].propertyFlags & properties) == properties) 
-		{
-			return i;
-		}
-	}
-
-	throw std::runtime_error("failed to find suitable memory type!");
-}
 
 void FEngine::zobCleanup()
 {
@@ -896,14 +754,7 @@ void FEngine::cleanup()
 	vkDestroyBuffer(device->device, uniformBuffer, nullptr);
 	vkFreeMemory(device->device, uniformBufferMemory, nullptr);
 
-
-	// Destroy index buffer
-	vkDestroyBuffer(device->device, indexBuffer, nullptr);
-	vkFreeMemory(device->device, indexBufferMemory, nullptr);
-
-	// Destroy index buffer
-	vkDestroyBuffer(device->device, vertexBuffer, nullptr);
-	vkFreeMemory(device->device, vertexBufferMemory, nullptr);
+	delete(buffer);
 
 	for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++) 
 	{

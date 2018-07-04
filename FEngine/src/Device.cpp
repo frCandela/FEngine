@@ -78,6 +78,7 @@ void Device::createLogicalDevice()
 	vkGetDeviceQueue(device, indices.graphicsFamily, 0, &graphicsQueue);
 	vkGetDeviceQueue(device, indices.presentFamily, 0, &presentQueue);
 }
+
 // Returns true if the physical device is suitable for the application
 bool Device::isDeviceSuitable(VkPhysicalDevice device)
 {
@@ -158,4 +159,64 @@ QueueFamilyIndices Device::findQueueFamilies(VkPhysicalDevice device)
 	vkGetPhysicalDeviceSurfaceSupportKHR(device, i, surface, &presentSupport);
 
 	return indices;
+}
+
+// Find the right type of memory to use for our vertex buffer
+uint32_t Device::findMemoryType( uint32_t typeFilter, VkMemoryPropertyFlags properties)
+{
+	// query info about the available types of memory
+	VkPhysicalDeviceMemoryProperties memProperties;
+	vkGetPhysicalDeviceMemoryProperties(physicalDevice, &memProperties);
+
+	//check for the support of the properties
+	for (uint32_t i = 0; i < memProperties.memoryTypeCount; i++)
+	{
+		if ((typeFilter & (1 << i)) && (memProperties.memoryTypes[i].propertyFlags & properties) == properties)
+		{
+			return i;
+		}
+	}
+
+	throw std::runtime_error("failed to find suitable memory type!");
+}
+
+// Allocate a temporary command buffer for memory transfer operations and start recording
+VkCommandBuffer Device::beginSingleTimeCommands()
+{
+	// Allocate a temporary command buffer for memory transfer operations
+	VkCommandBufferAllocateInfo allocInfo = {};
+	allocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
+	allocInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
+	allocInfo.commandPool = m_commandPool;
+	allocInfo.commandBufferCount = 1;
+
+	VkCommandBuffer commandBuffer;
+	vkAllocateCommandBuffers(device, &allocInfo, &commandBuffer);
+
+	// Start recording the command buffer
+	VkCommandBufferBeginInfo beginInfo = {};
+	beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
+	beginInfo.flags = VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT;
+
+	vkBeginCommandBuffer(commandBuffer, &beginInfo);
+
+	return commandBuffer;
+}
+
+// Execute a command buffer to complete the transfer and cleans it
+void Device::endSingleTimeCommands(VkCommandBuffer commandBuffer)
+{
+	vkEndCommandBuffer(commandBuffer);
+
+	// Execute the command buffer to complete the transfer
+	VkSubmitInfo submitInfo = {};
+	submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
+	submitInfo.commandBufferCount = 1;
+	submitInfo.pCommandBuffers = &commandBuffer;
+
+	vkQueueSubmit(graphicsQueue, 1, &submitInfo, VK_NULL_HANDLE);
+	vkQueueWaitIdle(graphicsQueue);
+
+	// Cleaning
+	vkFreeCommandBuffers(device, m_commandPool, 1, &commandBuffer);
 }

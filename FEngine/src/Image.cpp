@@ -25,9 +25,9 @@ void Image::createTextureImage()
 
 	// Copy the pixel values from the image loading library to the buffer
 	void* data;
-	vkMapMemory(m_device, stagingBufferMemory, 0, imageSize, 0, &data);
+	vkMapMemory(m_device.device, stagingBufferMemory, 0, imageSize, 0, &data);
 	memcpy(data, pixels, static_cast<size_t>(imageSize));
-	vkUnmapMemory(m_device, stagingBufferMemory);
+	vkUnmapMemory(m_device.device, stagingBufferMemory);
 
 	stbi_image_free(pixels);
 
@@ -38,15 +38,15 @@ void Image::createTextureImage()
 	copyBufferToImage(stagingBuffer, static_cast<uint32_t>(texWidth), static_cast<uint32_t>(texHeight));
 
 	// Clean up the staging buffer and its memory
-	vkDestroyBuffer(m_device, stagingBuffer, nullptr);
-	vkFreeMemory(m_device, stagingBufferMemory, nullptr);
+	vkDestroyBuffer(m_device.device, stagingBuffer, nullptr);
+	vkFreeMemory(m_device.device, stagingBufferMemory, nullptr);
 
 	generateMipmaps(VK_FORMAT_R8G8B8A8_UNORM, texWidth, texHeight, m_mipLevels);
 }
 // Copy a buffer to an Image
 void Image::copyBufferToImage(VkBuffer buffer, uint32_t width, uint32_t height)
 {
-	VkCommandBuffer commandBuffer = FEngine::beginSingleTimeCommands();
+	VkCommandBuffer commandBuffer = m_device.beginSingleTimeCommands();
 
 	// Specify which part of the buffer is going to be copied to which part of the image
 	VkBufferImageCopy region = {};
@@ -76,7 +76,7 @@ void Image::copyBufferToImage(VkBuffer buffer, uint32_t width, uint32_t height)
 		&region
 	);
 
-	FEngine::endSingleTimeCommands(commandBuffer);
+	m_device.endSingleTimeCommands(commandBuffer);
 }
 // Create a Vulkan Image
 void Image::createImage(uint32_t width, uint32_t height, uint32_t mipLevels, VkFormat format, VkImageTiling tiling, VkImageUsageFlags usage, VkMemoryPropertyFlags properties, VkImage& image, VkDeviceMemory& imageMemory)
@@ -97,27 +97,27 @@ void Image::createImage(uint32_t width, uint32_t height, uint32_t mipLevels, VkF
 	imageInfo.samples = VK_SAMPLE_COUNT_1_BIT;
 	imageInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
 
-	if (vkCreateImage(m_device, &imageInfo, nullptr, &image) != VK_SUCCESS)
+	if (vkCreateImage(m_device.device, &imageInfo, nullptr, &image) != VK_SUCCESS)
 		throw std::runtime_error("failed to create image!");
 
 	// Allocate memory for the image
 	VkMemoryRequirements memRequirements;
-	vkGetImageMemoryRequirements(m_device, image, &memRequirements);
+	vkGetImageMemoryRequirements(m_device.device, image, &memRequirements);
 
 	VkMemoryAllocateInfo allocInfo = {};
 	allocInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
 	allocInfo.allocationSize = memRequirements.size;
-	allocInfo.memoryTypeIndex = FEngine::findMemoryType(memRequirements.memoryTypeBits, properties);
+	allocInfo.memoryTypeIndex = m_device.findMemoryType(memRequirements.memoryTypeBits, properties);
 
-	if (vkAllocateMemory(m_device, &allocInfo, nullptr, &deviceMemory) != VK_SUCCESS)
+	if (vkAllocateMemory(m_device.device, &allocInfo, nullptr, &deviceMemory) != VK_SUCCESS)
 		throw std::runtime_error("failed to allocate image memory!");
 
-	vkBindImageMemory(m_device, image, deviceMemory, 0);
+	vkBindImageMemory(m_device.device, image, deviceMemory, 0);
 }
 // Handle layout transitions to transfer queue family ownership
 void Image::transitionImageLayout(VkFormat format, VkImageLayout oldLayout, VkImageLayout newLayout, uint32_t mipLevels)
 {
-	VkCommandBuffer commandBuffer = FEngine::beginSingleTimeCommands();
+	VkCommandBuffer commandBuffer = m_device.beginSingleTimeCommands();
 
 	// Synchronize access to resources
 	VkImageMemoryBarrier barrier = {};
@@ -132,7 +132,7 @@ void Image::transitionImageLayout(VkFormat format, VkImageLayout oldLayout, VkIm
 	if (newLayout == VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL)
 	{
 		barrier.subresourceRange.aspectMask = VK_IMAGE_ASPECT_DEPTH_BIT;
-		if (FEngine::hasStencilComponent(format))
+		if (hasStencilComponent(format))
 			barrier.subresourceRange.aspectMask |= VK_IMAGE_ASPECT_STENCIL_BIT;
 	}
 	else
@@ -184,7 +184,7 @@ void Image::transitionImageLayout(VkFormat format, VkImageLayout oldLayout, VkIm
 		1, &barrier
 	);
 
-	FEngine::endSingleTimeCommands(commandBuffer);
+	m_device.endSingleTimeCommands(commandBuffer);
 }
 // Helper function for creating buffers
 void Image::createBuffer(VkDeviceSize size, VkBufferUsageFlags usage, VkMemoryPropertyFlags properties, VkBuffer& buffer, VkDeviceMemory& bufferMemory)
@@ -196,34 +196,34 @@ void Image::createBuffer(VkDeviceSize size, VkBufferUsageFlags usage, VkMemoryPr
 	bufferInfo.usage = usage;
 	bufferInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
 
-	if (vkCreateBuffer(m_device, &bufferInfo, nullptr, &buffer) != VK_SUCCESS)
+	if (vkCreateBuffer(m_device.device, &bufferInfo, nullptr, &buffer) != VK_SUCCESS)
 		throw std::runtime_error("failed to create buffer!");
 
 	// Query memory requirements
 	VkMemoryRequirements memRequirements;
-	vkGetBufferMemoryRequirements(m_device, buffer, &memRequirements);
+	vkGetBufferMemoryRequirements(m_device.device, buffer, &memRequirements);
 
 	// Allow memory to buffer
 	VkMemoryAllocateInfo allocInfo = {};
 	allocInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
 	allocInfo.allocationSize = memRequirements.size;
-	allocInfo.memoryTypeIndex = FEngine::findMemoryType(memRequirements.memoryTypeBits, properties);
+	allocInfo.memoryTypeIndex = m_device.findMemoryType(memRequirements.memoryTypeBits, properties);
 
-	if (vkAllocateMemory(m_device, &allocInfo, nullptr, &bufferMemory) != VK_SUCCESS)
+	if (vkAllocateMemory(m_device.device, &allocInfo, nullptr, &bufferMemory) != VK_SUCCESS)
 		throw std::runtime_error("failed to allocate buffer memory!");
 
-	vkBindBufferMemory(m_device, buffer, bufferMemory, 0);
+	vkBindBufferMemory(m_device.device, buffer, bufferMemory, 0);
 }
 // Generate mipmaps for a VkImage
 void Image::generateMipmaps(VkFormat imageFormat, int32_t texWidth, int32_t texHeight, uint32_t mipLevels)
 {
 	// Check if image format supports linear blitting
 	VkFormatProperties formatProperties;
-	vkGetPhysicalDeviceFormatProperties(m_physicalDevice, imageFormat, &formatProperties);
+	vkGetPhysicalDeviceFormatProperties(m_device.physicalDevice, imageFormat, &formatProperties);
 	if (!(formatProperties.optimalTilingFeatures & VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT))
 		throw std::runtime_error("texture image format does not support linear blitting!");
 
-	VkCommandBuffer commandBuffer = FEngine::beginSingleTimeCommands();
+	VkCommandBuffer commandBuffer = m_device.beginSingleTimeCommands();
 
 	VkImageMemoryBarrier barrier = {};
 	barrier.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
@@ -305,7 +305,7 @@ void Image::generateMipmaps(VkFormat imageFormat, int32_t texWidth, int32_t texH
 		0, nullptr,
 		1, &barrier);
 
-	FEngine::endSingleTimeCommands(commandBuffer);
+	m_device.endSingleTimeCommands(commandBuffer);
 }
 VkImageView Image::createImageView(VkImage image, VkFormat format, VkImageAspectFlags aspectFlags, uint32_t mipLevels, VkDevice& device)
 {
