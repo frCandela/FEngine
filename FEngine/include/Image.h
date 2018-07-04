@@ -10,7 +10,6 @@
 #include "FEngine.h"
 class FEngine;
 
-
 class Image
 {
 public:

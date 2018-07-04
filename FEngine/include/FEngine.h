@@ -22,12 +22,13 @@
 #include <chrono>
 
 #include "Vertex.h"
-
 #include "SwapChain.h"
+#include "Sampler.h"
 
 class Image;
 class SwapChain;
 class Device;
+class Sampler;
 
 class FEngine
 {
@@ -53,7 +54,7 @@ public:
 	VkDeviceMemory uniformBufferMemory;
 
 	Image* textureImage; 
-	VkSampler textureSampler;
+
 
 	void zobCleanup();
 
@@ -77,6 +78,7 @@ public:
 	static VkInstance instance;
 	VkDebugReportCallbackEXT callback;
 
+	Sampler* textureSampler;
 	static Device* device;
 	static VkCommandPool commandPool;
 	static SwapChain* swapChain;
@@ -89,18 +91,12 @@ public:
 	VkDescriptorPool descriptorPool;
 	VkDescriptorSet descriptorSet;
 
-
-
 	std::vector<VkCommandBuffer> commandBuffers;
 
 	std::vector<VkSemaphore> imageAvailableSemaphores;//Specifies that an image has been acquired and is ready for rendering
 	std::vector<VkSemaphore> renderFinishedSemaphores;//Specifies that rendering has finished and presentation can happen
 	std::vector<VkFence> inFlightFences;
 	size_t currentFrame = 0;
-
-
-
-
 
 	//Vulkan callbacks
 	static VkResult CreateDebugReportCallback(VkInstance instance, const VkDebugReportCallbackCreateInfoEXT* pCreateInfo, const VkAllocationCallbacks* pAllocator, VkDebugReportCallbackEXT* pCallback );
@@ -137,9 +133,6 @@ public:
 	{
 		return format == VK_FORMAT_D32_SFLOAT_S8_UINT || format == VK_FORMAT_D24_UNORM_S8_UINT;
 	}
-
-	void createTextureImageView();
-	void createTextureSampler();
 
 	void createCommandBuffers();
 	void drawFrame();

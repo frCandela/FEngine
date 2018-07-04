@@ -10,7 +10,8 @@ Device* FEngine::device = new Device(instance);
 SwapChain* FEngine::swapChain = new SwapChain(*device);
 
 FEngine::FEngine() :
-	textureImage( new Image(device->device, device->physicalDevice))
+	textureImage( new Image(device->device, device->physicalDevice)),
+	textureSampler(new Sampler(*device))
 {
 
 }
@@ -77,6 +78,7 @@ void FEngine::initVulkan()
 
 	swapChain->createSwapChain( window );
 	swapChain->createImageViews();
+
 	createRenderPass();
 	createDescriptorSetLayout();
 	createGraphicsPipeline();
@@ -85,8 +87,11 @@ void FEngine::initVulkan()
 	swapChain->createDepthResources();
 	swapChain->createFramebuffers( renderPass);
 	textureImage->createTextureImage();
-	createTextureImageView();
-	createTextureSampler();
+
+	textureImage->imageView = Image::createImageView(textureImage->image, VK_FORMAT_R8G8B8A8_UNORM, VK_IMAGE_ASPECT_COLOR_BIT, textureImage->m_mipLevels, device->device);
+	
+	textureSampler->createSampler( textureImage->m_mipLevels );
+
 	loadModel();
 	createVertexBuffer();
 	createIndexBuffer();
@@ -560,7 +565,7 @@ void FEngine::createDescriptorSet()
 	VkDescriptorImageInfo imageInfo = {};
 	imageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
 	imageInfo.imageView = textureImage->imageView;
-	imageInfo.sampler = textureSampler;
+	imageInfo.sampler = textureSampler->sampler;
 
 	// Regroup descriptors
 	std::array<VkWriteDescriptorSet, 2> descriptorWrites = {};
@@ -908,38 +913,6 @@ void FEngine::loadModel()
 	}
 }
 
-// Create an image view for a texture
-void FEngine::createTextureImageView()
-{
-	textureImage->imageView = Image::createImageView(textureImage->image, VK_FORMAT_R8G8B8A8_UNORM, VK_IMAGE_ASPECT_COLOR_BIT, textureImage->m_mipLevels, device->device);
-}
-
-// Create a texture sampler to access a texture
-void FEngine::createTextureSampler()
-{
-	VkSamplerCreateInfo samplerInfo = {};
-	samplerInfo.sType = VK_STRUCTURE_TYPE_SAMPLER_CREATE_INFO;
-	samplerInfo.magFilter = VK_FILTER_LINEAR;
-	samplerInfo.minFilter = VK_FILTER_LINEAR;
-	samplerInfo.addressModeU = VK_SAMPLER_ADDRESS_MODE_REPEAT;
-	samplerInfo.addressModeV = VK_SAMPLER_ADDRESS_MODE_REPEAT;
-	samplerInfo.addressModeW = VK_SAMPLER_ADDRESS_MODE_REPEAT;
-	samplerInfo.anisotropyEnable = VK_TRUE;
-	samplerInfo.maxAnisotropy = 16;
-	samplerInfo.borderColor = VK_BORDER_COLOR_INT_OPAQUE_BLACK;
-	samplerInfo.unnormalizedCoordinates = VK_FALSE;
-	samplerInfo.compareEnable = VK_FALSE;
-	samplerInfo.compareOp = VK_COMPARE_OP_ALWAYS;
-	samplerInfo.mipmapMode = VK_SAMPLER_MIPMAP_MODE_LINEAR;
-
-	samplerInfo.minLod = 0;//static_cast<float>(textureImage->m_mipLevels / 2); to test
-
-	samplerInfo.maxLod = static_cast<float>(textureImage->m_mipLevels);
-	samplerInfo.mipLodBias = 0;
-
-	if (vkCreateSampler(device->device, &samplerInfo, nullptr, &textureSampler) != VK_SUCCESS)
-		throw std::runtime_error("failed to create texture sampler!");
-}
 
 // Allocate a temporary command buffer for memory transfer operations and start recording
 VkCommandBuffer FEngine::beginSingleTimeCommands() 
@@ -1042,7 +1015,7 @@ void FEngine::cleanup()
 	zobCleanup();
 
 	// Texture image and sampler
-	vkDestroySampler(device->device, textureSampler, nullptr);
+	delete(textureSampler);
 
 	textureImage->Destroy();
 	delete(textureImage);
