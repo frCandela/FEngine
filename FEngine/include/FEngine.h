@@ -23,16 +23,13 @@
 
 #include "Vertex.h"
 #include "Image.h"
+#include "Device.h"
 
 class Image;
-
 
 class FEngine
 {
 public:
-	static FEngine* zobInstance;
-
-
 	FEngine();
 
 	void Run();
@@ -53,7 +50,7 @@ public:
 	VkBuffer uniformBuffer;
 	VkDeviceMemory uniformBufferMemory;
 
-	Image* textureImage;
+	Image* textureImage; 
 	VkSampler textureSampler;
 
 	//Depth
@@ -74,37 +71,18 @@ public:
 
 	void loadModel();
 
-	//Contains the vulkan queues families used
-	struct QueueFamilyIndices
-	{
-		int graphicsFamily = -1;	//queue family for drawing commands
-		int presentFamily = -1;		//queue family to present images to the surface
 
-		//Returns true if all families are represented
-		bool isComplete()
-		{
-			return graphicsFamily >= 0 && presentFamily >= 0;
-		}
-	};
-
-	//Contains the properties of a swap chain for device compatibility
-	struct SwapChainSupportDetails 
-	{
-		VkSurfaceCapabilitiesKHR capabilities;
-		std::vector<VkSurfaceFormatKHR> formats;
-		std::vector<VkPresentModeKHR> presentModes;
-	};
 	
-	VkInstance instance;
+	static VkInstance instance;
 	VkDebugReportCallbackEXT callback;
 
-	static VkDevice device;
-	static VkPhysicalDevice physicalDevice;
-	static VkQueue graphicsQueue;	
+	static Device* device;
+
+
 	static VkCommandPool commandPool;
 
-	VkSurfaceKHR surface;
-	VkQueue presentQueue;
+
+	
 
 	
 	VkSwapchainKHR swapChain;//collection of buffers used for displaying frames
@@ -130,13 +108,9 @@ public:
 	std::vector<VkFence> inFlightFences;
 	size_t currentFrame = 0;
 
-	const std::vector<const char*> validationLayers = { "VK_LAYER_LUNARG_standard_validation" };
-	const std::vector<const char*> deviceExtensions = {	VK_KHR_SWAPCHAIN_EXTENSION_NAME	};
-#ifdef NDEBUG
-	const bool enableValidationLayers = false;
-#else
-	const bool enableValidationLayers = true;
-#endif
+
+
+
 
 	//Vulkan callbacks
 	static VkResult CreateDebugReportCallback(VkInstance instance, const VkDebugReportCallbackCreateInfoEXT* pCreateInfo, const VkAllocationCallbacks* pAllocator, VkDebugReportCallbackEXT* pCallback );
@@ -156,7 +130,6 @@ public:
 
 	void initWindow();
 	void initVulkan();
-	void createLogicalDevice();
 	void recreateSwapChain();
 	void cleanupSwapChain();
 	void createSwapChain();
@@ -199,14 +172,9 @@ public:
 	void copyBuffer(VkBuffer srcBuffer, VkBuffer dstBuffer, VkDeviceSize size);
 
 	VkShaderModule createShaderModule(const std::vector<char>& code);
-	void pickPhysicalDevice();
-	bool isDeviceSuitable(VkPhysicalDevice device);
-	bool checkDeviceExtensionSupport(VkPhysicalDevice device);
-	QueueFamilyIndices findQueueFamilies(VkPhysicalDevice device);
 	void setupDebugCallback();
 	bool checkValidationLayerSupport();
 	std::vector<const char*> getRequiredExtensions();
-	SwapChainSupportDetails querySwapChainSupport(VkPhysicalDevice device);
 	static uint32_t findMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags properties);
 
 	static std::vector<char> readFile(const std::string& filename);
@@ -230,7 +198,7 @@ public:
 		viewInfo.subresourceRange.layerCount = 1;
 
 		VkImageView imageView;
-		if (vkCreateImageView(device, &viewInfo, nullptr, &imageView) != VK_SUCCESS) 
+		if (vkCreateImageView(device->device, &viewInfo, nullptr, &imageView) != VK_SUCCESS) 
 			throw std::runtime_error("failed to create texture image view!");
 		
 
