@@ -5,12 +5,6 @@
 #include <GLFW/glfw3.h>
 #endif // !GLFW_INCLUDE_VULKAN
 
-#ifdef NDEBUG
-const bool enableValidationLayers = false;
-#else
-const bool enableValidationLayers = true;
-#endif
-
 #include <vector>
 
 //Contains the vulkan queues families used

@@ -24,6 +24,7 @@
 #include "Vertex.h"
 #include "SwapChain.h"
 #include "Sampler.h"
+#include "Instance.h"
 
 class Image;
 class SwapChain;
@@ -75,8 +76,7 @@ public:
 
 
 	
-	static VkInstance instance;
-	VkDebugReportCallbackEXT callback;
+	static Instance* instance;
 
 	Sampler* textureSampler;
 	static Device* device;
@@ -98,28 +98,10 @@ public:
 	std::vector<VkFence> inFlightFences;
 	size_t currentFrame = 0;
 
-	//Vulkan callbacks
-	static VkResult CreateDebugReportCallback(VkInstance instance, const VkDebugReportCallbackCreateInfoEXT* pCreateInfo, const VkAllocationCallbacks* pAllocator, VkDebugReportCallbackEXT* pCallback );
-	static void DestroyDebugReportCallback(VkInstance instance, VkDebugReportCallbackEXT callback, const VkAllocationCallbacks* pAllocator);
-	static VKAPI_ATTR VkBool32 VKAPI_CALL debugCallback(
-		VkDebugReportFlagsEXT flags,
-		VkDebugReportObjectTypeEXT objType,
-		uint64_t obj,
-		size_t location,
-		int32_t code,
-		const char* layerPrefix,
-		const char* msg,
-		void* userData
-	);
-
-	
-
 	void initWindow();
 	void initVulkan();
 	void recreateSwapChain();
 
-
-	void createInstance();
 	void createSurface();
 	void createRenderPass();
 	void createDescriptorSetLayout();
@@ -150,9 +132,6 @@ public:
 	void copyBuffer(VkBuffer srcBuffer, VkBuffer dstBuffer, VkDeviceSize size);
 
 	VkShaderModule createShaderModule(const std::vector<char>& code);
-	void setupDebugCallback();
-	bool checkValidationLayerSupport();
-	std::vector<const char*> getRequiredExtensions();
 	static uint32_t findMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags properties);
 
 	static std::vector<char> readFile(const std::string& filename);

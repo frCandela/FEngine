@@ -63,14 +63,12 @@ void Device::createLogicalDevice()
 	createInfo.enabledExtensionCount = static_cast<uint32_t>(deviceExtensions.size());
 	createInfo.ppEnabledExtensionNames = deviceExtensions.data();
 	
-	// Validation layers
-	if (enableValidationLayers)
-	{
+	#ifdef VALIDATION_LAYERS
 		createInfo.enabledLayerCount = static_cast<uint32_t>(validationLayers.size());
 		createInfo.ppEnabledLayerNames = validationLayers.data();
-	}
-	else
+	#else
 		createInfo.enabledLayerCount = 0;
+	#endif
 
 	// Create the logical device
 	if (vkCreateDevice(physicalDevice, &createInfo, nullptr, &device) != VK_SUCCESS)

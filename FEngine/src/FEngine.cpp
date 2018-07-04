@@ -5,8 +5,8 @@
 
 
 VkCommandPool FEngine::commandPool = {};
-VkInstance FEngine::instance = {};
-Device* FEngine::device = new Device(instance);
+Instance* FEngine::instance = new Instance();
+Device* FEngine::device = new Device(instance->instance);
 SwapChain* FEngine::swapChain = new SwapChain(*device);
 
 FEngine::FEngine() :
@@ -25,38 +25,6 @@ void FEngine::Run()
 	cleanup();
 }
 
-// Creates the debug report callback used by the validation layers to display error messages
-VkResult FEngine::CreateDebugReportCallback(VkInstance instance, const VkDebugReportCallbackCreateInfoEXT* pCreateInfo, const VkAllocationCallbacks* pAllocator, VkDebugReportCallbackEXT* pCallback)
-{
-	auto func = (PFN_vkCreateDebugReportCallbackEXT)vkGetInstanceProcAddr(instance, "vkCreateDebugReportCallbackEXT");
-	if (func != nullptr)
-		return func(instance, pCreateInfo, pAllocator, pCallback);
-	else
-		return VK_ERROR_EXTENSION_NOT_PRESENT;
-}
-// Destroy the debug report callback used by the validation layers to display error messages
-void FEngine::DestroyDebugReportCallback(VkInstance instance, VkDebugReportCallbackEXT callback, const VkAllocationCallbacks* pAllocator)
-{
-	auto func = (PFN_vkDestroyDebugReportCallbackEXT)vkGetInstanceProcAddr(instance, "vkDestroyDebugReportCallbackEXT");
-	if (func != nullptr)
-		func(instance, callback, pAllocator);
-}
-// Callback used by the validation layers to display error messages
-VKAPI_ATTR VkBool32 VKAPI_CALL FEngine::debugCallback(
-	VkDebugReportFlagsEXT flags,
-	VkDebugReportObjectTypeEXT objType,
-	uint64_t obj,
-	size_t location,
-	int32_t code,
-	const char* layerPrefix,
-	const char* msg,
-	void* userData)
-{
-
-	std::cerr << "validation layer: " << msg << std::endl;
-
-	return VK_FALSE;
-}
 // Creates a GLFW window
 void FEngine::initWindow()
 {
@@ -68,9 +36,9 @@ void FEngine::initWindow()
 // Initializes the Vulakan application and required components
 void FEngine::initVulkan()
 {
-	createInstance();
+	instance->createInstance();
 
-	setupDebugCallback();
+	instance->setupDebugCallback();
 	createSurface();
 
 	device->pickPhysicalDevice();
@@ -87,9 +55,7 @@ void FEngine::initVulkan()
 	swapChain->createDepthResources();
 	swapChain->createFramebuffers( renderPass);
 	textureImage->createTextureImage();
-
 	textureImage->imageView = Image::createImageView(textureImage->image, VK_FORMAT_R8G8B8A8_UNORM, VK_IMAGE_ASPECT_COLOR_BIT, textureImage->m_mipLevels, device->device);
-	
 	textureSampler->createSampler( textureImage->m_mipLevels );
 
 	loadModel();
@@ -220,49 +186,10 @@ void FEngine::recreateSwapChain()
 	createCommandBuffers();
 }
 
-
-
-// Connection between the application and the Vulkan library
-void FEngine::createInstance()
-{
-	if (enableValidationLayers && !checkValidationLayerSupport())
-		throw std::runtime_error("validation layers requested, but not available!");
-
-	VkApplicationInfo appInfo = {};
-	appInfo.sType = VK_STRUCTURE_TYPE_APPLICATION_INFO;
-	appInfo.pApplicationName = "FEngine";
-	appInfo.applicationVersion = VK_MAKE_VERSION(1, 0, 0);
-	appInfo.pEngineName = "No Engine";
-	appInfo.engineVersion = VK_MAKE_VERSION(1, 0, 0);
-	appInfo.apiVersion = VK_API_VERSION_1_0;
-
-	VkInstanceCreateInfo createInfo = {};
-	createInfo.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
-	createInfo.pApplicationInfo = &appInfo;
-
-	auto extensions = getRequiredExtensions();
-	createInfo.enabledExtensionCount = static_cast<uint32_t>(extensions.size());
-	createInfo.ppEnabledExtensionNames = extensions.data();
-
-	uint32_t glfwExtensionCount = 0;
-	const char** glfwExtensions;
-	glfwExtensions = glfwGetRequiredInstanceExtensions(&glfwExtensionCount);
-	if (enableValidationLayers)
-	{
-		createInfo.enabledLayerCount = static_cast<uint32_t>(validationLayers.size());
-		createInfo.ppEnabledLayerNames = validationLayers.data();
-	}
-	else
-		createInfo.enabledLayerCount = 0;
-
-	if (vkCreateInstance(&createInfo, nullptr, &instance) != VK_SUCCESS)	
-		throw std::runtime_error("failed to create instance!");
-	
-}
 // Create a VkSurface to render images to
 void FEngine::createSurface()
 {
-	if (glfwCreateWindowSurface(instance, window, nullptr, &(device->surface)) != VK_SUCCESS)
+	if (glfwCreateWindowSurface(instance->instance, window, nullptr, &(device->surface)) != VK_SUCCESS)
 		throw std::runtime_error("failed to create window surface!");	
 }
 // Creates descriptor set layouts (like the uniform buffers)
@@ -728,64 +655,6 @@ std::vector<char> FEngine::readFile(const std::string& filename)
 
 
 
-// Setup the debug callbak used by the validation layers
-void FEngine::setupDebugCallback()
-{
-	if (!enableValidationLayers)
-		return;
-
-	VkDebugReportCallbackCreateInfoEXT createInfo = {};
-	createInfo.sType = VK_STRUCTURE_TYPE_DEBUG_REPORT_CALLBACK_CREATE_INFO_EXT;
-	createInfo.flags = VK_DEBUG_REPORT_ERROR_BIT_EXT | VK_DEBUG_REPORT_WARNING_BIT_EXT;
-	createInfo.pfnCallback = debugCallback;
-
-	if (CreateDebugReportCallback(instance, &createInfo, nullptr, &callback) != VK_SUCCESS)
-		throw std::runtime_error("failed to set up debug callback!");
-
-}
-// Checks if all of the requested layers are available
-bool FEngine::checkValidationLayerSupport()
-{
-	uint32_t layerCount;
-	vkEnumerateInstanceLayerProperties(&layerCount, nullptr);
-
-	std::vector<VkLayerProperties> availableLayers(layerCount);
-	vkEnumerateInstanceLayerProperties(&layerCount, availableLayers.data());
-
-	for (const char* layerName : validationLayers)
-	{
-		bool layerFound = false;
-
-		for (const auto& layerProperties : availableLayers) {
-			if (strcmp(layerName, layerProperties.layerName) == 0) {
-				layerFound = true;
-				break;
-			}
-		}
-
-		if (!layerFound)
-			return false;
-	}
-
-	return true;
-}
-// Returns the extensions names required for the VkInstance
-std::vector<const char*> FEngine::getRequiredExtensions()
-{
-	
-	uint32_t glfwExtensionCount = 0;
-	const char** glfwExtensions;
-	glfwExtensions = glfwGetRequiredInstanceExtensions(&glfwExtensionCount);
-
-	std::vector<const char*> extensions(glfwExtensions, glfwExtensions + glfwExtensionCount);
-
-	if (enableValidationLayers)
-		extensions.push_back(VK_EXT_DEBUG_REPORT_EXTENSION_NAME);
-
-	return extensions;
-}
-
-
 
 // Helper function for creating buffers
 void FEngine::createBuffer(VkDeviceSize size, VkBufferUsageFlags usage, VkMemoryPropertyFlags properties, VkBuffer& buffer, VkDeviceMemory& bufferMemory)
@@ -1044,12 +913,11 @@ void FEngine::cleanup()
 	}
 
 	vkDestroyCommandPool(device->device, commandPool, nullptr);
-
+	vkDestroySurfaceKHR(instance->instance, device->surface, nullptr);
 	vkDestroyDevice(device->device, nullptr);
-	if (enableValidationLayers)
-		DestroyDebugReportCallback(instance, callback, nullptr);
-	vkDestroySurfaceKHR(instance, device->surface, nullptr);
-	vkDestroyInstance(instance, nullptr);
+	
+
+	delete(instance);
 
 	glfwDestroyWindow(window);
 

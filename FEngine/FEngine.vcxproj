@@ -51,6 +51,7 @@
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>deps;include;C:\VulkanSDK\1.1.73.0\Include</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
+      <PreprocessorDefinitions>VALIDATION_LAYERS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <AdditionalDependencies>glfw3d.lib;vulkan-1.lib;%(AdditionalDependencies)</AdditionalDependencies>
@@ -83,6 +84,7 @@
   <ItemGroup>
     <ClCompile Include="src\FEngine.cpp" />
     <ClCompile Include="src\Image.cpp" />
+    <ClCompile Include="src\Instance.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\Device.cpp" />
     <ClCompile Include="src\Sampler.cpp" />
@@ -92,6 +94,7 @@
     <ClInclude Include="include\FEngine.h" />
     <ClInclude Include="include\Image.h" />
     <ClInclude Include="include\Device.h" />
+    <ClInclude Include="include\Instance.h" />
     <ClInclude Include="include\Sampler.h" />
     <ClInclude Include="include\SwapChain.h" />
     <ClInclude Include="include\Vertex.h" />
