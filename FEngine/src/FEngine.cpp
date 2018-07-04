@@ -7,10 +7,10 @@
 VkCommandPool FEngine::commandPool = {};
 VkInstance FEngine::instance = {};
 Device* FEngine::device = new Device(instance);
+SwapChain* FEngine::swapChain = new SwapChain(*device);
 
 FEngine::FEngine() :
-	textureImage( new Image(device->device, device->physicalDevice)),
-	depthImage(new Image(device->device, device->physicalDevice))
+	textureImage( new Image(device->device, device->physicalDevice))
 {
 
 }
@@ -75,15 +75,15 @@ void FEngine::initVulkan()
 	device->pickPhysicalDevice();
 	device->createLogicalDevice();
 
-	createSwapChain();
-	createImageViews();
+	swapChain->createSwapChain( window );
+	swapChain->createImageViews();
 	createRenderPass();
 	createDescriptorSetLayout();
 	createGraphicsPipeline();
 	
 	createCommandPool();
-	createDepthResources();
-	createFramebuffers();
+	swapChain->createDepthResources();
+	swapChain->createFramebuffers( renderPass);
 	textureImage->createTextureImage();
 	createTextureImageView();
 	createTextureSampler();
@@ -117,7 +117,7 @@ void FEngine::drawFrame()
 
 	//Acquire an image from the swap chain
 	uint32_t imageIndex;
-	VkResult result = vkAcquireNextImageKHR(device->device, swapChain, std::numeric_limits<uint64_t>::max(), imageAvailableSemaphores[currentFrame], VK_NULL_HANDLE, &imageIndex);
+	VkResult result = vkAcquireNextImageKHR(device->device, swapChain->swapChain, std::numeric_limits<uint64_t>::max(), imageAvailableSemaphores[currentFrame], VK_NULL_HANDLE, &imageIndex);
 
 	//Suboptimal or out-of-date swap chain
 	if (result == VK_ERROR_OUT_OF_DATE_KHR) 
@@ -157,7 +157,7 @@ void FEngine::drawFrame()
 	presentInfo.pWaitSemaphores = signalSemaphores;
 
 	// swap chains to present images to
-	VkSwapchainKHR swapChains[] = { swapChain };
+	VkSwapchainKHR swapChains[] = { swapChain->swapChain };
 	presentInfo.swapchainCount = 1;
 	presentInfo.pSwapchains = swapChains;
 	presentInfo.pImageIndices = &imageIndex;
@@ -186,7 +186,7 @@ void  FEngine::updateUniformBuffer()
 	UniformBufferObject ubo = {};
 	ubo.model = glm::rotate(glm::mat4(1.0f), time * glm::radians(90.0f), glm::vec3(0.0f, 0.0f, 1.0f));
 	ubo.view = glm::lookAt(glm::vec3(2.0f, 2.0f, 2.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f));
-	ubo.proj = glm::perspective(glm::radians(45.0f), swapChainExtent.width / (float)swapChainExtent.height, 0.1f, 10.0f);
+	ubo.proj = glm::perspective(glm::radians(45.0f), swapChain->swapChainExtent.width / (float)swapChain->swapChainExtent.height, 0.1f, 10.0f);
 
 	//the Y coordinate of the clip coordinates is inverted
 	ubo.proj[1][1] *= -1;
@@ -204,102 +204,19 @@ void FEngine::recreateSwapChain()
 {
 	vkDeviceWaitIdle(device->device);
 
-	cleanupSwapChain();
+	zobCleanup();
 
-	createSwapChain();
-	createImageViews();
+	swapChain->createSwapChain(window);
+	swapChain->createImageViews();
 	createRenderPass();
 	createGraphicsPipeline();
-	createDepthResources();
-	createFramebuffers();
+	swapChain->createDepthResources();
+	swapChain->createFramebuffers(  renderPass);
 	createCommandBuffers();
 }
-// Cleans up the old versions of the swap chain objects 
-void FEngine::cleanupSwapChain()
-{
-	vkDestroyImageView(device->device, depthImage->imageView, nullptr);
-	vkDestroyImage(device->device, depthImage->image, nullptr);
-	vkFreeMemory(device->device, depthImage->deviceMemory, nullptr);
 
-	for (size_t i = 0; i < swapChainFramebuffers.size(); i++) 
-		vkDestroyFramebuffer(device->device, swapChainFramebuffers[i], nullptr);
 
-	vkFreeCommandBuffers(device->device, commandPool, static_cast<uint32_t>(commandBuffers.size()), commandBuffers.data());
 
-	vkDestroyPipeline(device->device, graphicsPipeline, nullptr);
-	vkDestroyPipelineLayout(device->device, pipelineLayout, nullptr);
-	vkDestroyRenderPass(device->device, renderPass, nullptr);
-
-	for (size_t i = 0; i < swapChainImageViews.size(); i++) 
-		vkDestroyImageView(device->device, swapChainImageViews[i], nullptr);
-
-	vkDestroySwapchainKHR(device->device, swapChain, nullptr);
-}
-// Creates the best swap chain possible depending on the device capabilities.
-void FEngine::createSwapChain()
-{
-	SwapChainSupportDetails swapChainSupport = device->querySwapChainSupport(device->physicalDevice);
-
-	VkSurfaceFormatKHR surfaceFormat = chooseSwapSurfaceFormat(swapChainSupport.formats);
-	VkPresentModeKHR presentMode = chooseSwapPresentMode(swapChainSupport.presentModes);
-	VkExtent2D extent = chooseSwapExtent(swapChainSupport.capabilities);
-
-	uint32_t imageCount = swapChainSupport.capabilities.minImageCount + 1; //one more frame to implement triple buffering
-	if (swapChainSupport.capabilities.maxImageCount > 0 && imageCount > swapChainSupport.capabilities.maxImageCount) 
-		imageCount = swapChainSupport.capabilities.maxImageCount;
-
-	//create swap chain info structure
-	VkSwapchainCreateInfoKHR createInfo = {};
-	createInfo.sType = VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR;
-	createInfo.surface = device->surface;
-	createInfo.minImageCount = imageCount;
-	createInfo.imageFormat = surfaceFormat.format;
-	createInfo.imageColorSpace = surfaceFormat.colorSpace;
-	createInfo.imageExtent = extent;
-	createInfo.imageArrayLayers = 1;// amount of layers each image consists of
-	createInfo.imageUsage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT;
-
-	QueueFamilyIndices indices = device->findQueueFamilies(device->physicalDevice);
-	uint32_t queueFamilyIndices[] = { (uint32_t)indices.graphicsFamily, (uint32_t)indices.presentFamily };
-	if (indices.graphicsFamily != indices.presentFamily) 
-	{
-		createInfo.imageSharingMode = VK_SHARING_MODE_CONCURRENT;
-		createInfo.queueFamilyIndexCount = 2;
-		createInfo.pQueueFamilyIndices = queueFamilyIndices;
-	}
-	else 
-	{
-		createInfo.imageSharingMode = VK_SHARING_MODE_EXCLUSIVE;
-		createInfo.queueFamilyIndexCount = 0; // Optional
-		createInfo.pQueueFamilyIndices = nullptr; // Optional
-	}
-
-	createInfo.preTransform = swapChainSupport.capabilities.currentTransform;
-	createInfo.compositeAlpha = VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR;
-	createInfo.presentMode = presentMode;
-	createInfo.clipped = VK_TRUE;
-	createInfo.oldSwapchain = VK_NULL_HANDLE;
-
-	//Create the swapchain
-	if (vkCreateSwapchainKHR(device->device, &createInfo, nullptr, &swapChain) != VK_SUCCESS)
-		throw std::runtime_error("failed to create swap chain!");
-
-	//retrieve the swap chain images
-	vkGetSwapchainImagesKHR(device->device, swapChain, &imageCount, nullptr);
-	swapChainImages.resize(imageCount);
-	vkGetSwapchainImagesKHR(device->device, swapChain, &imageCount, swapChainImages.data());
-
-	swapChainImageFormat = surfaceFormat.format;
-	swapChainExtent = extent;
-}
-// Creates the images views of the swap chain. An image view describes how to access the image and which part of the image to access (2D texture, depth texture, mipmapping levels etc.)
-void FEngine::createImageViews()
-{
-	swapChainImageViews.resize(swapChainImages.size());
-
-	for (uint32_t i = 0; i < swapChainImages.size(); i++)
-		swapChainImageViews[i] = createImageView(swapChainImages[i], swapChainImageFormat, VK_IMAGE_ASPECT_COLOR_BIT, 1);
-}
 // Connection between the application and the Vulkan library
 void FEngine::createInstance()
 {
@@ -422,15 +339,15 @@ void FEngine::createGraphicsPipeline()
 	VkViewport viewport = {};
 	viewport.x = 0.0f;
 	viewport.y = 0.0f;
-	viewport.width = (float)swapChainExtent.width;
-	viewport.height = (float)swapChainExtent.height;
+	viewport.width = (float)swapChain->swapChainExtent.width;
+	viewport.height = (float)swapChain->swapChainExtent.height;
 	viewport.minDepth = 0.0f;
 	viewport.maxDepth = 1.0f;
 
 	// Scissor
 	VkRect2D scissor = {};
 	scissor.offset = { 0, 0 };
-	scissor.extent = swapChainExtent;
+	scissor.extent = swapChain->swapChainExtent;
 
 	// References all the Viewports and Scissors
 	VkPipelineViewportStateCreateInfo viewportState = {};
@@ -540,7 +457,7 @@ void FEngine::createRenderPass()
 {	
 	// Color attachment
 	VkAttachmentDescription colorAttachment = {};
-	colorAttachment.format = swapChainImageFormat;
+	colorAttachment.format = swapChain->swapChainImageFormat;
 	colorAttachment.samples = VK_SAMPLE_COUNT_1_BIT;
 	colorAttachment.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
 	colorAttachment.storeOp = VK_ATTACHMENT_STORE_OP_STORE;
@@ -551,7 +468,7 @@ void FEngine::createRenderPass()
 	
 	// Depth attachment
 	VkAttachmentDescription depthAttachment = {};
-	depthAttachment.format = findDepthFormat();
+	depthAttachment.format = swapChain->findDepthFormat();
 	depthAttachment.samples = VK_SAMPLE_COUNT_1_BIT;
 	depthAttachment.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
 	depthAttachment.storeOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
@@ -599,34 +516,6 @@ void FEngine::createRenderPass()
 
 	if (vkCreateRenderPass(device->device, &renderPassInfo, nullptr, &renderPass) != VK_SUCCESS)
 		throw std::runtime_error("failed to create render pass!");
-}
-// Creates a frameBuffer for each swapChain image view
-void FEngine::createFramebuffers()
-{
-	//A framebuffer object references all of the VkImageView objects that represent the attachments specified during the render pass creation
-
-	swapChainFramebuffers.resize(swapChainImageViews.size());
-	for (size_t i = 0; i < swapChainImageViews.size(); i++) 
-	{
-		std::array<VkImageView, 2> attachments = 
-		{
-			swapChainImageViews[i],
-			depthImage->imageView
-		};
-
-		//Specify the differents attachements
-		VkFramebufferCreateInfo framebufferInfo = {};
-		framebufferInfo.sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO;
-		framebufferInfo.renderPass = renderPass;
-		framebufferInfo.attachmentCount = static_cast<uint32_t>(attachments.size());
-		framebufferInfo.pAttachments = attachments.data();
-		framebufferInfo.width = swapChainExtent.width;
-		framebufferInfo.height = swapChainExtent.height;
-		framebufferInfo.layers = 1;
-
-		if (vkCreateFramebuffer(device->device, &framebufferInfo, nullptr, &swapChainFramebuffers[i]) != VK_SUCCESS)
-			throw std::runtime_error("failed to create framebuffer!");		
-	}
 }
 // Create descriptor pool (for uniform buffers)
 void FEngine::createDescriptorPool()
@@ -707,48 +596,13 @@ void FEngine::createCommandPool()
 	if (vkCreateCommandPool(device->device, &poolInfo, nullptr, &commandPool) != VK_SUCCESS)
 		throw std::runtime_error("failed to create command pool!");
 }
-// Create a depth image, memory and view
-void FEngine::createDepthResources()
-{
-	VkFormat depthFormat = findDepthFormat();
 
-	depthImage->createImage(swapChainExtent.width, swapChainExtent.height, 1, depthFormat, VK_IMAGE_TILING_OPTIMAL, VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, depthImage->image, depthImage->deviceMemory);
-	depthImage->imageView = createImageView(depthImage->image, depthFormat, VK_IMAGE_ASPECT_DEPTH_BIT, 1);
 
-	// Setup a pipeline barrier for the transition
-	depthImage->transitionImageLayout(depthFormat, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL, 1);
-}
-// Select a format for the depth buffer 
-VkFormat FEngine::findSupportedFormat(const std::vector<VkFormat>& candidates, VkImageTiling tiling, VkFormatFeatureFlags features)
-{
-	for (VkFormat format : candidates) 
-	{
-		// Query support of a format
-		VkFormatProperties props;
-		vkGetPhysicalDeviceFormatProperties(device->physicalDevice, format, &props);
 
-		if (tiling == VK_IMAGE_TILING_LINEAR && (props.linearTilingFeatures & features) == features) 
-			return format;
-		
-		else if (tiling == VK_IMAGE_TILING_OPTIMAL && (props.optimalTilingFeatures & features) == features) 
-			return format;		
-	}
-
-	throw std::runtime_error("failed to find supported format!");
-}
-//Select a format with a depth component that supports usage as depth attachment
-VkFormat FEngine::findDepthFormat()
-{
-	return findSupportedFormat(
-		{ VK_FORMAT_D32_SFLOAT, VK_FORMAT_D32_SFLOAT_S8_UINT, VK_FORMAT_D24_UNORM_S8_UINT },
-		VK_IMAGE_TILING_OPTIMAL,
-		VK_FORMAT_FEATURE_DEPTH_STENCIL_ATTACHMENT_BIT
-	);
-}
 // Creates one command buffer per framebuffer . (Commands are recorded in command buffers before being performed)
 void FEngine::createCommandBuffers()
 {
-	commandBuffers.resize(swapChainFramebuffers.size());
+	commandBuffers.resize(swapChain->swapChainFramebuffers.size());
 
 	// VkCommandBufferAllocateInfo specifies the command pool and number of buffers to allocate
 	VkCommandBufferAllocateInfo allocInfo = {};
@@ -775,9 +629,9 @@ void FEngine::createCommandBuffers()
 		VkRenderPassBeginInfo renderPassInfo = {};
 		renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
 		renderPassInfo.renderPass = renderPass;
-		renderPassInfo.framebuffer = swapChainFramebuffers[i];
+		renderPassInfo.framebuffer = swapChain->swapChainFramebuffers[i];
 		renderPassInfo.renderArea.offset = { 0, 0 };
-		renderPassInfo.renderArea.extent = swapChainExtent;
+		renderPassInfo.renderArea.extent = swapChain->swapChainExtent;
 
 		//Set clear collors for color and depth attachments
 		std::array<VkClearValue, 2> clearValues = {};
@@ -926,58 +780,7 @@ std::vector<const char*> FEngine::getRequiredExtensions()
 	return extensions;
 }
 
-// Choose the best SurfaceFormat in a list of available formats (color space)
-VkSurfaceFormatKHR FEngine::chooseSwapSurfaceFormat(const std::vector<VkSurfaceFormatKHR>& availableFormats)
-{
-	//surface has no preferred format
-	if (availableFormats.size() == 1 && availableFormats[0].format == VK_FORMAT_UNDEFINED) 
-		return { VK_FORMAT_B8G8R8A8_UNORM, VK_COLOR_SPACE_SRGB_NONLINEAR_KHR };
 
-	//else look for a good format combination
-	for (const auto& availableFormat : availableFormats) 	
-		if (availableFormat.format == VK_FORMAT_B8G8R8A8_UNORM && availableFormat.colorSpace == VK_COLOR_SPACE_SRGB_NONLINEAR_KHR) 
-			return availableFormat;
-		
-	//No good format found
-	return availableFormats[0];	
-}
-// Choose the best presentation mode in a list of available presentation mode
-VkPresentModeKHR FEngine::chooseSwapPresentMode(const std::vector<VkPresentModeKHR> availablePresentModes)
-{
-	VkPresentModeKHR bestMode = VK_PRESENT_MODE_FIFO_KHR;//Default always available
-
-	for (const auto& availablePresentMode : availablePresentModes) 
-	{
-		if (availablePresentMode == VK_PRESENT_MODE_MAILBOX_KHR) //Prefered mode
-			return availablePresentMode;		
-		else if (availablePresentMode == VK_PRESENT_MODE_IMMEDIATE_KHR) //Second choice
-			bestMode = availablePresentMode;
-	}
-
-	return bestMode;
-}
-// Returns the best available swap extent of a surface (resolution of the swap chain images)
-VkExtent2D FEngine::chooseSwapExtent(const VkSurfaceCapabilitiesKHR& capabilities)
-{
-    if (capabilities.currentExtent.width != std::numeric_limits<uint32_t>::max()) 
-        return capabilities.currentExtent;
-    else 
-	{
-        int width, height;
-        glfwGetFramebufferSize(window, &width, &height);
-
-        VkExtent2D actualExtent = {
-            static_cast<uint32_t>(width),
-            static_cast<uint32_t>(height)
-        };
-		
-		//Clamp the values between minImageExtent and maxImageExtent		
-		actualExtent.width = std::clamp(actualExtent.width, capabilities.minImageExtent.width, capabilities.maxImageExtent.width);
-		actualExtent.height = std::clamp(actualExtent.height, capabilities.minImageExtent.height, capabilities.maxImageExtent.height);
-
-		return actualExtent;
-	}
-}
 
 // Helper function for creating buffers
 void FEngine::createBuffer(VkDeviceSize size, VkBufferUsageFlags usage, VkMemoryPropertyFlags properties, VkBuffer& buffer, VkDeviceMemory& bufferMemory)
@@ -1108,8 +911,9 @@ void FEngine::loadModel()
 // Create an image view for a texture
 void FEngine::createTextureImageView()
 {
-	textureImage->imageView = createImageView(textureImage->image, VK_FORMAT_R8G8B8A8_UNORM, VK_IMAGE_ASPECT_COLOR_BIT, textureImage->m_mipLevels);
+	textureImage->imageView = Image::createImageView(textureImage->image, VK_FORMAT_R8G8B8A8_UNORM, VK_IMAGE_ASPECT_COLOR_BIT, textureImage->m_mipLevels, device->device);
 }
+
 // Create a texture sampler to access a texture
 void FEngine::createTextureSampler()
 {
@@ -1207,11 +1011,35 @@ uint32_t FEngine::findMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags prop
 
 	throw std::runtime_error("failed to find suitable memory type!");
 }
+
+void FEngine::zobCleanup()
+{
+	//swapChain->cleanupSwapChain();
+	vkDestroyImageView(device->device, swapChain->depthImage->imageView, nullptr);
+	vkDestroyImage(device->device, swapChain->depthImage->image, nullptr);
+	vkFreeMemory(device->device, swapChain->depthImage->deviceMemory, nullptr);
+
+	for (size_t i = 0; i < swapChain->swapChainFramebuffers.size(); i++)
+		vkDestroyFramebuffer(device->device, swapChain->swapChainFramebuffers[i], nullptr);
+
+	vkFreeCommandBuffers(device->device, commandPool, static_cast<uint32_t>(commandBuffers.size()), commandBuffers.data());
+
+	vkDestroyPipeline(device->device, graphicsPipeline, nullptr);
+	vkDestroyPipelineLayout(device->device, pipelineLayout, nullptr);
+	vkDestroyRenderPass(device->device, renderPass, nullptr);
+
+
+	for (size_t i = 0; i < swapChain->swapChainImageViews.size(); i++)
+		vkDestroyImageView(device->device, swapChain->swapChainImageViews[i], nullptr);
+
+	vkDestroySwapchainKHR(device->device, swapChain->swapChain, nullptr);
+}
+
 // Clean Vulkan objects 
 void FEngine::cleanup()
 {
 	// Deallocate resources
-	cleanupSwapChain();
+	zobCleanup();
 
 	// Texture image and sampler
 	vkDestroySampler(device->device, textureSampler, nullptr);

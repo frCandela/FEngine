@@ -13,14 +13,6 @@ const bool enableValidationLayers = true;
 
 #include <vector>
 
-//Contains the properties of a swap chain for device compatibility
-struct SwapChainSupportDetails
-{
-	VkSurfaceCapabilitiesKHR capabilities;
-	std::vector<VkSurfaceFormatKHR> formats;
-	std::vector<VkPresentModeKHR> presentModes;
-};
-
 //Contains the vulkan queues families used
 struct QueueFamilyIndices
 {
@@ -53,6 +45,5 @@ public:
 	void createLogicalDevice();
 	bool checkDeviceExtensionSupport(VkPhysicalDevice device);
 	bool isDeviceSuitable(VkPhysicalDevice device);
-	SwapChainSupportDetails querySwapChainSupport(VkPhysicalDevice device);
 	QueueFamilyIndices findQueueFamilies(VkPhysicalDevice device);
 };

@@ -45,4 +45,6 @@ public:
 		vkDestroyImage(m_device, image, nullptr);
 		vkFreeMemory(m_device, deviceMemory, nullptr);
 	}
+
+	static VkImageView createImageView(VkImage image, VkFormat format, VkImageAspectFlags aspectFlags, uint32_t mipLevels, VkDevice& device);
 };

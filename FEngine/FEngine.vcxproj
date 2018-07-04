@@ -85,11 +85,13 @@
     <ClCompile Include="src\Image.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\Device.cpp" />
+    <ClCompile Include="src\SwapChain.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\FEngine.h" />
     <ClInclude Include="include\Image.h" />
     <ClInclude Include="include\Device.h" />
+    <ClInclude Include="include\SwapChain.h" />
     <ClInclude Include="include\Vertex.h" />
     <ClInclude Include="include\VulkanUtil.h" />
   </ItemGroup>

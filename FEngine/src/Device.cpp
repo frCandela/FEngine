@@ -1,7 +1,8 @@
 #include "Device.h"
 
-#include <stdexcept>
+#include "SwapChain.h"
 
+#include <stdexcept>
 #include <set>
 
 // Look for and select a graphics card in the system
@@ -96,8 +97,8 @@ bool Device::isDeviceSuitable(VkPhysicalDevice device)
 	bool swapChainAdequate = false;
 	if (extensionsSupported)
 	{
-		SwapChainSupportDetails swapChainSupport = querySwapChainSupport(device);
-		swapChainAdequate = !swapChainSupport.formats.empty() && !swapChainSupport.presentModes.empty();
+		 SwapChainSupportDetails swapChainSupport = SwapChain::querySwapChainSupport(device, surface);
+		 swapChainAdequate = !swapChainSupport.formats.empty() && !swapChainSupport.presentModes.empty();
 	}
 
 	return
@@ -124,35 +125,6 @@ bool Device::checkDeviceExtensionSupport(VkPhysicalDevice device)
 		requiredExtensions.erase(extension.extensionName);
 
 	return requiredExtensions.empty();
-}
-
-// Returns the swap chain details of a physical device (surface formats and presentation modes)
-SwapChainSupportDetails Device::querySwapChainSupport(VkPhysicalDevice device)
-{
-	SwapChainSupportDetails details;
-	vkGetPhysicalDeviceSurfaceCapabilitiesKHR(device, surface, &details.capabilities);
-
-	//query the supported surface formats
-	uint32_t formatCount;
-	vkGetPhysicalDeviceSurfaceFormatsKHR(device, surface, &formatCount, nullptr);
-
-	if (formatCount != 0)
-	{
-		details.formats.resize(formatCount);
-		vkGetPhysicalDeviceSurfaceFormatsKHR(device, surface, &formatCount, details.formats.data());
-	}
-
-	//query the supported presentation modes
-	uint32_t presentModeCount;
-	vkGetPhysicalDeviceSurfacePresentModesKHR(device, surface, &presentModeCount, nullptr);
-
-	if (presentModeCount != 0)
-	{
-		details.presentModes.resize(presentModeCount);
-		vkGetPhysicalDeviceSurfacePresentModesKHR(device, surface, &presentModeCount, details.presentModes.data());
-	}
-
-	return details;
 }
 
 // Get the queue families needed 

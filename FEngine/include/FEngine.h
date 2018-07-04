@@ -22,10 +22,12 @@
 #include <chrono>
 
 #include "Vertex.h"
-#include "Image.h"
-#include "Device.h"
+
+#include "SwapChain.h"
 
 class Image;
+class SwapChain;
+class Device;
 
 class FEngine
 {
@@ -53,8 +55,7 @@ public:
 	Image* textureImage; 
 	VkSampler textureSampler;
 
-	//Depth
-	Image* depthImage;
+	void zobCleanup();
 
 	//Vertices and indices
 	std::vector<Vertex> vertices;
@@ -77,20 +78,9 @@ public:
 	VkDebugReportCallbackEXT callback;
 
 	static Device* device;
-
-
 	static VkCommandPool commandPool;
+	static SwapChain* swapChain;
 
-
-	
-
-	
-	VkSwapchainKHR swapChain;//collection of buffers used for displaying frames
-	std::vector<VkImage> swapChainImages;
-	std::vector<VkImageView> swapChainImageViews;
-	std::vector<VkFramebuffer> swapChainFramebuffers;
-	VkFormat swapChainImageFormat;
-	VkExtent2D swapChainExtent;
 	VkRenderPass renderPass;
 	VkDescriptorSetLayout descriptorSetLayout;
 	VkPipelineLayout pipelineLayout;
@@ -131,23 +121,18 @@ public:
 	void initWindow();
 	void initVulkan();
 	void recreateSwapChain();
-	void cleanupSwapChain();
-	void createSwapChain();
-	void createImageViews();
+
+
 	void createInstance();
 	void createSurface();
 	void createRenderPass();
 	void createDescriptorSetLayout();
 	void createGraphicsPipeline();
-	void createFramebuffers();
 
 	void createDescriptorPool();
 	void createDescriptorSet();
 
 	void createCommandPool();
-	void createDepthResources();
-	VkFormat findSupportedFormat(const std::vector<VkFormat>& candidates, VkImageTiling tiling, VkFormatFeatureFlags features);
-	VkFormat findDepthFormat();
 	static bool hasStencilComponent(VkFormat format) 
 	{
 		return format == VK_FORMAT_D32_SFLOAT_S8_UINT || format == VK_FORMAT_D24_UNORM_S8_UINT;
@@ -179,31 +164,8 @@ public:
 
 	static std::vector<char> readFile(const std::string& filename);
 
-	//swap chain capabilities selection
-	VkSurfaceFormatKHR chooseSwapSurfaceFormat(const std::vector<VkSurfaceFormatKHR>& availableFormats);
-	VkPresentModeKHR chooseSwapPresentMode(const std::vector<VkPresentModeKHR> availablePresentModes);
-	VkExtent2D chooseSwapExtent(const VkSurfaceCapabilitiesKHR& capabilities);//resolution of the swap chain images
-	
-	VkImageView createImageView(VkImage image, VkFormat format, VkImageAspectFlags aspectFlags, uint32_t mipLevels)
-	{
-		VkImageViewCreateInfo viewInfo = {};
-		viewInfo.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
-		viewInfo.image = image;
-		viewInfo.viewType = VK_IMAGE_VIEW_TYPE_2D;
-		viewInfo.format = format;
-		viewInfo.subresourceRange.aspectMask = aspectFlags;
-		viewInfo.subresourceRange.baseMipLevel = 0;
-		viewInfo.subresourceRange.levelCount = mipLevels;
-		viewInfo.subresourceRange.baseArrayLayer = 0;
-		viewInfo.subresourceRange.layerCount = 1;
 
-		VkImageView imageView;
-		if (vkCreateImageView(device->device, &viewInfo, nullptr, &imageView) != VK_SUCCESS) 
-			throw std::runtime_error("failed to create texture image view!");
-		
 
-		return imageView;
-	}
 
 	void updateUniformBuffer();
 	void mainLoop();
