@@ -6,6 +6,7 @@
 #endif // !GLFW_INCLUDE_VULKAN
 
 #include <string>
+
 #include "Device.h"
 
 class Image

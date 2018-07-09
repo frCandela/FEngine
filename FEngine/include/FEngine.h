@@ -17,8 +17,6 @@
 #include <cstdlib>
 #include <vector>
 #include <set>
-
-#include <fstream>
 #include <chrono>
 
 #include "Vertex.h"
@@ -26,12 +24,7 @@
 #include "Sampler.h"
 #include "Instance.h"
 #include "Buffer.h"
-
-class Image;
-class SwapChain;
-class Device;
-class Sampler;
-class Buffer;
+#include "Shader.h"
 
 class FEngine
 {
@@ -43,13 +36,10 @@ public:
 	const uint32_t WIDTH = 800;
 	const uint32_t HEIGHT = 600;
 
-	const std::string MODEL_PATH = "models/chalet.obj";
-	const std::string TEXTURE_PATH = "textures/chalet.jpg";
+
 
 	const uint32_t MAX_FRAMES_IN_FLIGHT = 2;
 	GLFWwindow * window;
-
-
 
 	VkBuffer uniformBuffer;
 	VkDeviceMemory uniformBufferMemory;
@@ -62,6 +52,8 @@ public:
 
 	Buffer* buffer;
 
+	Shader vertShader;
+	Shader fragShader;
 
 	struct UniformBufferObject 
 	{
@@ -69,9 +61,6 @@ public:
 		glm::mat4 view;
 		glm::mat4 proj;
 	};
-
-	void loadModel();
-
 	static Instance* instance;
 
 	Sampler* textureSampler;
@@ -114,11 +103,6 @@ public:
 
 	//Buffers creation
 	void createUniformBuffer();
-
-	VkShaderModule createShaderModule(const std::vector<char>& code);
-
-	static std::vector<char> readFile(const std::string& filename);
-
 	void updateUniformBuffer();
 	void mainLoop();
 	void cleanup();

@@ -1,7 +1,6 @@
 #include "FEngine.h"
 
-#define TINYOBJLOADER_IMPLEMENTATION
-#include <tiny_obj_loader.h>
+
 
 
 VkCommandPool FEngine::commandPool = {};
@@ -12,9 +11,10 @@ SwapChain* FEngine::swapChain = new SwapChain(*device);
 FEngine::FEngine() :
 	textureImage( new Image(*device)),
 	textureSampler(new Sampler(*device)),
-	buffer( new Buffer( *device ))
+	buffer( new Buffer( *device )),
+	vertShader( *device, "shaders/vert.spv"),
+	fragShader(*device, "shaders/frag.spv")
 {
-
 }
 
 // Runs the application
@@ -59,7 +59,7 @@ void FEngine::initVulkan()
 	textureImage->imageView = Image::createImageView(textureImage->image, VK_FORMAT_R8G8B8A8_UNORM, VK_IMAGE_ASPECT_COLOR_BIT, textureImage->m_mipLevels, device->device);
 	textureSampler->createSampler( textureImage->m_mipLevels );
 
-	loadModel();
+	buffer->loadModel();
 	buffer->createVertexBuffer();
 	buffer->createIndexBuffer();
 	createUniformBuffer();
@@ -226,26 +226,21 @@ void FEngine::createDescriptorSetLayout()
 // Creates the graphics pipeline
 void FEngine::createGraphicsPipeline()
 {
-	// Load shader code
-	auto vertShaderCode = readFile("shaders/vert.spv");
-	auto fragShaderCode = readFile("shaders/frag.spv");
-
-	// Create shader modules
-	VkShaderModule vertShaderModule = createShaderModule(vertShaderCode);
-	VkShaderModule fragShaderModule = createShaderModule(fragShaderCode);
+	ShaderModule vertShaderModule = vertShader.GetShaderModule();
+	ShaderModule fragShaderModule = fragShader.GetShaderModule();
 
 	// Link vertex shader
 	VkPipelineShaderStageCreateInfo vertShaderStageInfo = {};
 	vertShaderStageInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
 	vertShaderStageInfo.stage = VK_SHADER_STAGE_VERTEX_BIT;
-	vertShaderStageInfo.module = vertShaderModule;
+	vertShaderStageInfo.module = vertShaderModule.module;
 	vertShaderStageInfo.pName = "main";
 
 	// Link fragment shader
 	VkPipelineShaderStageCreateInfo fragShaderStageInfo = {};
 	fragShaderStageInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
 	fragShaderStageInfo.stage = VK_SHADER_STAGE_FRAGMENT_BIT;
-	fragShaderStageInfo.module = fragShaderModule;
+	fragShaderStageInfo.module = fragShaderModule.module;
 	fragShaderStageInfo.pName = "main";
 
 	VkPipelineShaderStageCreateInfo shaderStages[] = { vertShaderStageInfo, fragShaderStageInfo };
@@ -380,10 +375,6 @@ void FEngine::createGraphicsPipeline()
 
 	if (vkCreateGraphicsPipelines(device->device, VK_NULL_HANDLE, 1, &pipelineInfo, nullptr, &graphicsPipeline) != VK_SUCCESS)
 		throw std::runtime_error("failed to create graphics pipeline!");	
-
-	//Destroy shader modules
-	vkDestroyShaderModule(device->device, fragShaderModule, nullptr);
-	vkDestroyShaderModule(device->device, vertShaderModule, nullptr);
 }
 // Create the render pass ( how many colors and depth buffers, how many samples for each of them, how to handle their contents during the rendering operations etc.)
 void FEngine::createRenderPass()
@@ -615,40 +606,8 @@ void FEngine::createSyncObjects()
 		}
 	}
 }
-// Creates a shader module from its bytecode 
-VkShaderModule FEngine::createShaderModule(const std::vector<char>& code)
-{
-	VkShaderModuleCreateInfo createInfo = {};
-	createInfo.sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO;
-	createInfo.codeSize = code.size();
-	createInfo.pCode = reinterpret_cast<const uint32_t*>(code.data());
 
-	VkShaderModule shaderModule;
-	if (vkCreateShaderModule(device->device, &createInfo, nullptr, &shaderModule) != VK_SUCCESS)
-		throw std::runtime_error("failed to create shader module!");
 
-	return shaderModule;
-}
-// Reads a file and returns it as a vector<char> (used for loading shaders)
-std::vector<char> FEngine::readFile(const std::string& filename) 
-{
-	std::ifstream file(filename, std::ios::ate | std::ios::binary);//ate -> seek to the end of stream immediately after open 
-
-	if (!file.is_open()) 
-		throw std::runtime_error("failed to open file " + filename);
-
-	//Allocate the buffer
-	size_t fileSize = (size_t)file.tellg(); // tellg -> position in input sequence
-	std::vector<char> buffer(fileSize);
-
-	//Read the file
-	file.seekg(0);
-	file.read(buffer.data(), fileSize);
-
-	file.close();
-
-	return buffer;
-}
 
 
 
@@ -665,47 +624,7 @@ void FEngine::createUniformBuffer()
 	Buffer::createBuffer(*device,bufferSize, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, uniformBuffer, uniformBufferMemory);
 }
 
-// Load a model from an OBJ file
-void FEngine::loadModel()
-{
-	// Load a model into the library's data structures
-	tinyobj::attrib_t attrib;
-	std::vector<tinyobj::shape_t> shapes;
-	std::vector<tinyobj::material_t> materials;
-	std::string err;
 
-	if (!tinyobj::LoadObj(&attrib, &shapes, &materials, &err, MODEL_PATH.c_str()))
-		throw std::runtime_error(err);
-
-	std::unordered_map<Vertex, uint32_t> uniqueVertices = {};
-
-	//combine all of the faces in the file into a single model
-	for (const auto& shape : shapes) {
-		for (const auto& index : shape.mesh.indices) {
-			Vertex vertex = {};
-
-			vertex.pos = {
-				attrib.vertices[3 * index.vertex_index + 0],
-				attrib.vertices[3 * index.vertex_index + 1],
-				attrib.vertices[3 * index.vertex_index + 2]
-			};
-
-			vertex.texCoord = {
-				attrib.texcoords[2 * index.texcoord_index + 0],
-				1.0f - attrib.texcoords[2 * index.texcoord_index + 1]
-			};
-
-			vertex.color = { 1.0f, 1.0f, 1.0f };
-
-			if (uniqueVertices.count(vertex) == 0) {
-				uniqueVertices[vertex] = static_cast<uint32_t>(buffer->vertices.size());
-				buffer->vertices.push_back(vertex);
-			}
-
-			buffer->indices.push_back(uniqueVertices[vertex]);
-		}
-	}
-}
 
 
 

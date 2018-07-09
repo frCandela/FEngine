@@ -9,6 +9,8 @@ class Buffer
 public:
 	Buffer(Device& device);
 	~Buffer();
+	const std::string MODEL_PATH = "models/cloud.obj";
+	const std::string TEXTURE_PATH = "textures/chalet.jpg";
 
 
 	Device & m_device;
@@ -20,7 +22,6 @@ public:
 	VkBuffer vertexBuffer;
 	VkDeviceMemory vertexBufferMemory;
 
-
 	//Buffers
 	VkBuffer indexBuffer;
 	VkDeviceMemory indexBufferMemory;
@@ -29,6 +30,6 @@ public:
 
 	static void createBuffer(Device& device, VkDeviceSize size, VkBufferUsageFlags usage, VkMemoryPropertyFlags properties, VkBuffer& buffer, VkDeviceMemory& bufferMemory);
 	void copyBuffer( VkBuffer srcBuffer, VkBuffer dstBuffer, VkDeviceSize size);
-
+	void loadModel();
 	void createVertexBuffer();
 };
