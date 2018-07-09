@@ -5,19 +5,12 @@
 	#include <GLFW/glfw3.h>
 #endif // !GLFW_INCLUDE_VULKAN
 
-
-#define GLM_FORCE_RADIANS
-#define GLM_FORCE_DEPTH_ZERO_TO_ONE
-#include "glm/glm.hpp"
-#include "glm/gtc/matrix_transform.hpp"
-
 #include <iostream>
 #include <stdexcept>
 #include <functional>
 #include <cstdlib>
 #include <vector>
 #include <set>
-#include <chrono>
 
 #include "Vertex.h"
 #include "SwapChain.h"
@@ -26,6 +19,7 @@
 #include "Buffer.h"
 #include "Shader.h"
 #include "RenderPass.h"
+#include "Descriptors.h"
 
 class FEngine
 {
@@ -40,40 +34,27 @@ public:
 	const uint32_t MAX_FRAMES_IN_FLIGHT = 2;
 	GLFWwindow * window;
 
-	VkBuffer uniformBuffer;
-	VkDeviceMemory uniformBufferMemory;
-
 	Image* textureImage; 
-
+	Sampler* textureSampler;
 
 	void zobCleanup();
 
-
 	Buffer* buffer;
+	Descriptors* descriptors;
 
 	Shader vertShader;
 	Shader fragShader;
 
-	struct UniformBufferObject 
-	{
-		glm::mat4 model;
-		glm::mat4 view;
-		glm::mat4 proj;
-	};
 	static Instance* instance;
-
-	Sampler* textureSampler;
+	
 	static Device* device;
 	static VkCommandPool commandPool;
 	static SwapChain* swapChain;
 
 	RenderPass * renderPass;
-	VkDescriptorSetLayout descriptorSetLayout;
+
 	VkPipelineLayout pipelineLayout;
 	VkPipeline graphicsPipeline;
-
-	VkDescriptorPool descriptorPool;
-	VkDescriptorSet descriptorSet;
 
 	std::vector<VkCommandBuffer> commandBuffers;
 
@@ -86,11 +67,7 @@ public:
 	void initVulkan();
 	void recreateSwapChain();
 
-	void createDescriptorSetLayout();
 	void createGraphicsPipeline();
-
-	void createDescriptorPool();
-	void createDescriptorSet();
 
 	void createCommandPool();
 
@@ -98,9 +75,6 @@ public:
 	void drawFrame();
 	void createSyncObjects();
 
-	//Buffers creation
-	void createUniformBuffer();
-	void updateUniformBuffer();
 	void mainLoop();
 	void cleanup();
 };

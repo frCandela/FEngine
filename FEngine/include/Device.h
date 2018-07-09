@@ -5,6 +5,13 @@
 #include <GLFW/glfw3.h>
 #endif // !GLFW_INCLUDE_VULKAN
 
+#ifndef GLM_FORCE_RADIANS
+	#define GLM_FORCE_RADIANS
+	#define GLM_FORCE_DEPTH_ZERO_TO_ONE
+	#include "glm/glm.hpp"
+	#include "glm/gtc/matrix_transform.hpp"
+#endif // !GLM_FORCE_RADIANS
+
 #include <vector>
 
 //Contains the vulkan queues families used
