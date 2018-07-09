@@ -3,9 +3,9 @@
 
 
 
-VkCommandPool FEngine::commandPool = {};
+
 Instance* FEngine::instance = new Instance();
-Device* FEngine::device = new Device(instance->instance, commandPool);
+Device* FEngine::device = new Device(instance->instance);
 SwapChain* FEngine::swapChain = new SwapChain(*device);
 
 FEngine::FEngine() :
@@ -14,8 +14,10 @@ FEngine::FEngine() :
 	buffer( new Buffer( *device )),
 	vertShader( *device, "shaders/vert.spv"),
 	fragShader(*device, "shaders/frag.spv"),
-	descriptors( new Descriptors(*device))
+	descriptors( new Descriptors(*device)),
+	commands(new Commands( *device))
 {
+	device->commands = commands;
 }
 
 // Runs the application
@@ -53,7 +55,7 @@ void FEngine::initVulkan()
 	descriptors->createDescriptorSetLayout();
 	createGraphicsPipeline();
 	
-	createCommandPool();
+	commands->createCommandPool();
 	swapChain->createDepthResources();
 	swapChain->createFramebuffers( renderPass->renderPass);
 	textureImage->createTextureImage();
@@ -66,7 +68,7 @@ void FEngine::initVulkan()
 	descriptors->createUniformBuffer();
 	descriptors->createDescriptorPool();
 	descriptors->createDescriptorSet( *textureImage, *textureSampler);
-	createCommandBuffers();
+	commands->createCommandBuffers(*swapChain, renderPass->renderPass, graphicsPipeline, pipelineLayout, *buffer, descriptors->descriptorSet);
 	createSyncObjects();
 }
 // Main loop of the program
@@ -112,7 +114,7 @@ void FEngine::drawFrame()
 	submitInfo.pWaitSemaphores = waitSemaphores;
 	submitInfo.pWaitDstStageMask = waitStages;
 	submitInfo.commandBufferCount = 1;
-	submitInfo.pCommandBuffers = &commandBuffers[imageIndex];
+	submitInfo.pCommandBuffers = &(commands->commandBuffers[imageIndex]);
 
 	//Specify which semaphores to signal once the command buffers have finished execution
 	VkSemaphore signalSemaphores[] = { renderFinishedSemaphores[currentFrame] };
@@ -148,7 +150,6 @@ void FEngine::drawFrame()
 	currentFrame = (currentFrame + 1) % MAX_FRAMES_IN_FLIGHT;
 }
 
-
 // Recreates the swap chain (necessary when the window is resized for example)
 void FEngine::recreateSwapChain()
 {
@@ -162,9 +163,8 @@ void FEngine::recreateSwapChain()
 	createGraphicsPipeline();
 	swapChain->createDepthResources();
 	swapChain->createFramebuffers(renderPass->renderPass);
-	createCommandBuffers();
+	commands->createCommandBuffers(*swapChain, renderPass->renderPass, graphicsPipeline, pipelineLayout, *buffer, descriptors->descriptorSet);
 }
-
 
 // Creates the graphics pipeline
 void FEngine::createGraphicsPipeline()
@@ -320,77 +320,6 @@ void FEngine::createGraphicsPipeline()
 		throw std::runtime_error("failed to create graphics pipeline!");	
 }
 
-
-// Create the command pool (for ordering drawing operations, memory transfers etc.)
-void FEngine::createCommandPool()
-{
-	QueueFamilyIndices queueFamilyIndices = device->findQueueFamilies(device->physicalDevice);
-
-	VkCommandPoolCreateInfo poolInfo = {};
-	poolInfo.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
-	poolInfo.queueFamilyIndex = queueFamilyIndices.graphicsFamily;
-	poolInfo.flags = 0; // Optional
-
-	if (vkCreateCommandPool(device->device, &poolInfo, nullptr, &commandPool) != VK_SUCCESS)
-		throw std::runtime_error("failed to create command pool!");
-}
-// Creates one command buffer per framebuffer . (Commands are recorded in command buffers before being performed)
-void FEngine::createCommandBuffers()
-{
-	commandBuffers.resize(swapChain->swapChainFramebuffers.size());
-
-	// VkCommandBufferAllocateInfo specifies the command pool and number of buffers to allocate
-	VkCommandBufferAllocateInfo allocInfo = {};
-	allocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
-	allocInfo.commandPool = commandPool;
-	allocInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
-	allocInfo.commandBufferCount = (uint32_t)commandBuffers.size();
-
-	if (vkAllocateCommandBuffers(device->device, &allocInfo, commandBuffers.data()) != VK_SUCCESS)
-		throw std::runtime_error("failed to allocate command buffers!");
-
-	// Records every command buffer (one per framebuffer)
-	for (size_t i = 0; i < commandBuffers.size(); i++)
-	{
-		// Specify the usage of the command buffer
-		VkCommandBufferBeginInfo beginInfo = {};
-		beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
-		beginInfo.flags = VK_COMMAND_BUFFER_USAGE_SIMULTANEOUS_USE_BIT;
-
-		if (vkBeginCommandBuffer(commandBuffers[i], &beginInfo) != VK_SUCCESS)
-			throw std::runtime_error("failed to begin recording command buffer!");
-
-		// Configure the render pass
-		VkRenderPassBeginInfo renderPassInfo = {};
-		renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
-		renderPassInfo.renderPass = renderPass->renderPass;
-		renderPassInfo.framebuffer = swapChain->swapChainFramebuffers[i];
-		renderPassInfo.renderArea.offset = { 0, 0 };
-		renderPassInfo.renderArea.extent = swapChain->swapChainExtent;
-
-		//Set clear collors for color and depth attachments
-		std::array<VkClearValue, 2> clearValues = {};
-		clearValues[0].color = { 0.0f, 0.0f, 0.0f, 1.0f };
-		clearValues[1].depthStencil = { 1.0f, 0 };
-
-		renderPassInfo.clearValueCount = static_cast<uint32_t>(clearValues.size());
-		renderPassInfo.pClearValues = clearValues.data();
-
-		vkCmdBeginRenderPass(commandBuffers[i], &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
-			vkCmdBindPipeline(commandBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, graphicsPipeline);
-			VkBuffer vertexBuffers[] = { buffer->vertexBuffer };
-			VkDeviceSize offsets[] = { 0 };
-			vkCmdBindVertexBuffers(commandBuffers[i], 0, 1, vertexBuffers, offsets);
-			vkCmdBindIndexBuffer(commandBuffers[i], buffer->indexBuffer, 0, VK_INDEX_TYPE_UINT32);
-			vkCmdBindDescriptorSets(commandBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineLayout, 0, 1, &(descriptors->descriptorSet), 0, nullptr);
-			vkCmdDrawIndexed(commandBuffers[i], static_cast<uint32_t>(buffer->indices.size()), 1, 0, 0, 0);
-		vkCmdEndRenderPass(commandBuffers[i]);
-
-		if (vkEndCommandBuffer(commandBuffers[i]) != VK_SUCCESS) 
-			throw std::runtime_error("failed to record command buffer!");
-	}
-
-}
 // Creates the sync objects (fences and semaphores)
 void FEngine::createSyncObjects()
 {
@@ -421,19 +350,12 @@ void FEngine::createSyncObjects()
 	}
 }
 
-
-
 void FEngine::zobCleanup()
 {
-	//swapChain->cleanupSwapChain();
-	vkDestroyImageView(device->device, swapChain->depthImage->imageView, nullptr);
-	vkDestroyImage(device->device, swapChain->depthImage->image, nullptr);
-	vkFreeMemory(device->device, swapChain->depthImage->deviceMemory, nullptr);
+	swapChain->cleanupSwapChain();
 
-	for (size_t i = 0; i < swapChain->swapChainFramebuffers.size(); i++)
-		vkDestroyFramebuffer(device->device, swapChain->swapChainFramebuffers[i], nullptr);
 
-	vkFreeCommandBuffers(device->device, commandPool, static_cast<uint32_t>(commandBuffers.size()), commandBuffers.data());
+	commands->cleanup();
 
 	vkDestroyPipeline(device->device, graphicsPipeline, nullptr);
 	vkDestroyPipelineLayout(device->device, pipelineLayout, nullptr);
@@ -441,10 +363,6 @@ void FEngine::zobCleanup()
 	delete(renderPass);
 
 
-	for (size_t i = 0; i < swapChain->swapChainImageViews.size(); i++)
-		vkDestroyImageView(device->device, swapChain->swapChainImageViews[i], nullptr);
-
-	vkDestroySwapchainKHR(device->device, swapChain->swapChain, nullptr);
 }
 
 // Clean Vulkan objects 
@@ -466,11 +384,9 @@ void FEngine::cleanup()
 		vkDestroyFence(device->device, inFlightFences[i], nullptr);
 	}
 
-	vkDestroyCommandPool(device->device, commandPool, nullptr);
+	vkDestroyCommandPool(device->device, commands->commandPool, nullptr);
 	vkDestroySurfaceKHR(instance->instance, device->surface, nullptr);
 
-	
-	
 	delete (device);
 	delete(instance);
 

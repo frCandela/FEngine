@@ -83,6 +83,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="src\Buffer.cpp" />
+    <ClCompile Include="src\Commands.cpp" />
     <ClCompile Include="src\Descriptors.cpp" />
     <ClCompile Include="src\FEngine.cpp" />
     <ClCompile Include="src\Image.cpp" />
@@ -96,6 +97,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\Buffer.h" />
+    <ClInclude Include="include\Commands.h" />
     <ClInclude Include="include\Descriptors.h" />
     <ClInclude Include="include\FEngine.h" />
     <ClInclude Include="include\Image.h" />

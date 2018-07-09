@@ -46,7 +46,7 @@ void Image::createTextureImage()
 // Copy a buffer to an Image
 void Image::copyBufferToImage(VkBuffer buffer, uint32_t width, uint32_t height)
 {
-	VkCommandBuffer commandBuffer = m_device.beginSingleTimeCommands();
+	VkCommandBuffer commandBuffer = m_device.commands->beginSingleTimeCommands();
 
 	// Specify which part of the buffer is going to be copied to which part of the image
 	VkBufferImageCopy region = {};
@@ -76,7 +76,7 @@ void Image::copyBufferToImage(VkBuffer buffer, uint32_t width, uint32_t height)
 		&region
 	);
 
-	m_device.endSingleTimeCommands(commandBuffer);
+	m_device.commands->endSingleTimeCommands(commandBuffer);
 }
 // Create a Vulkan Image
 void Image::createImage(uint32_t width, uint32_t height, uint32_t mipLevels, VkFormat format, VkImageTiling tiling, VkImageUsageFlags usage, VkMemoryPropertyFlags properties, VkImage& image, VkDeviceMemory& imageMemory)
@@ -117,7 +117,7 @@ void Image::createImage(uint32_t width, uint32_t height, uint32_t mipLevels, VkF
 // Handle layout transitions to transfer queue family ownership
 void Image::transitionImageLayout(VkFormat format, VkImageLayout oldLayout, VkImageLayout newLayout, uint32_t mipLevels)
 {
-	VkCommandBuffer commandBuffer = m_device.beginSingleTimeCommands();
+	VkCommandBuffer commandBuffer = m_device.commands->beginSingleTimeCommands();
 
 	// Synchronize access to resources
 	VkImageMemoryBarrier barrier = {};
@@ -184,7 +184,7 @@ void Image::transitionImageLayout(VkFormat format, VkImageLayout oldLayout, VkIm
 		1, &barrier
 	);
 
-	m_device.endSingleTimeCommands(commandBuffer);
+	m_device.commands->endSingleTimeCommands(commandBuffer);
 }
 // Helper function for creating buffers
 void Image::createBuffer(VkDeviceSize size, VkBufferUsageFlags usage, VkMemoryPropertyFlags properties, VkBuffer& buffer, VkDeviceMemory& bufferMemory)
@@ -223,7 +223,7 @@ void Image::generateMipmaps(VkFormat imageFormat, int32_t texWidth, int32_t texH
 	if (!(formatProperties.optimalTilingFeatures & VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT))
 		throw std::runtime_error("texture image format does not support linear blitting!");
 
-	VkCommandBuffer commandBuffer = m_device.beginSingleTimeCommands();
+	VkCommandBuffer commandBuffer = m_device.commands->beginSingleTimeCommands();
 
 	VkImageMemoryBarrier barrier = {};
 	barrier.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
@@ -305,7 +305,7 @@ void Image::generateMipmaps(VkFormat imageFormat, int32_t texWidth, int32_t texH
 		0, nullptr,
 		1, &barrier);
 
-	m_device.endSingleTimeCommands(commandBuffer);
+	m_device.commands->endSingleTimeCommands(commandBuffer);
 }
 VkImageView Image::createImageView(VkImage image, VkFormat format, VkImageAspectFlags aspectFlags, uint32_t mipLevels, VkDevice& device)
 {

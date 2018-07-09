@@ -196,7 +196,17 @@ void SwapChain::createImageViews()
 // Cleans up the old versions of the swap chain objects 
 void SwapChain::cleanupSwapChain()
 {
+	vkDestroyImageView(m_device.device, depthImage->imageView, nullptr);
+	vkDestroyImage(m_device.device, depthImage->image, nullptr);
+	vkFreeMemory(m_device.device, depthImage->deviceMemory, nullptr);
 
+	for (size_t i = 0; i < swapChainFramebuffers.size(); i++)
+		vkDestroyFramebuffer(m_device.device, swapChainFramebuffers[i], nullptr);
+
+	for (size_t i = 0; i < swapChainImageViews.size(); i++)
+		vkDestroyImageView(m_device.device, swapChainImageViews[i], nullptr);
+
+	vkDestroySwapchainKHR(m_device.device, swapChain, nullptr);
 }
 //Select a format with a depth component that supports usage as depth attachment
 VkFormat SwapChain::findDepthFormat()

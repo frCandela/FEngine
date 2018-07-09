@@ -20,6 +20,9 @@
 #include "Shader.h"
 #include "RenderPass.h"
 #include "Descriptors.h"
+#include "Commands.h"
+
+
 
 class FEngine
 {
@@ -41,6 +44,7 @@ public:
 
 	Buffer* buffer;
 	Descriptors* descriptors;
+	Commands* commands;
 
 	Shader vertShader;
 	Shader fragShader;
@@ -48,15 +52,13 @@ public:
 	static Instance* instance;
 	
 	static Device* device;
-	static VkCommandPool commandPool;
+
 	static SwapChain* swapChain;
 
 	RenderPass * renderPass;
 
 	VkPipelineLayout pipelineLayout;
 	VkPipeline graphicsPipeline;
-
-	std::vector<VkCommandBuffer> commandBuffers;
 
 	std::vector<VkSemaphore> imageAvailableSemaphores;//Specifies that an image has been acquired and is ready for rendering
 	std::vector<VkSemaphore> renderFinishedSemaphores;//Specifies that rendering has finished and presentation can happen
@@ -69,10 +71,10 @@ public:
 
 	void createGraphicsPipeline();
 
-	void createCommandPool();
 
-	void createCommandBuffers();
+
 	void drawFrame();
+
 	void createSyncObjects();
 
 	void mainLoop();

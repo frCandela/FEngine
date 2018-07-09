@@ -13,7 +13,7 @@ class Image
 {
 public:
 	Image(Device& device) :
-		m_device(device) 
+		m_device(device)
 	{};
 
 	~Image();

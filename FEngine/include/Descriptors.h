@@ -4,6 +4,8 @@
 #include "Sampler.h"
 #include "Buffer.h"
 
+class Image;
+
 class Descriptors
 {
 public:

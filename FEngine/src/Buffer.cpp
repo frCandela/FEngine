@@ -79,13 +79,13 @@ void Buffer::createBuffer(Device& device, VkDeviceSize size, VkBufferUsageFlags 
 // Copy the contents from one buffer to another
 void Buffer::copyBuffer( VkBuffer srcBuffer, VkBuffer dstBuffer, VkDeviceSize size)
 {
-	VkCommandBuffer commandBuffer = m_device.beginSingleTimeCommands();
+	VkCommandBuffer commandBuffer = m_device.commands->beginSingleTimeCommands();
 
 	VkBufferCopy copyRegion = {};
 	copyRegion.size = size;
 	vkCmdCopyBuffer(commandBuffer, srcBuffer, dstBuffer, 1, &copyRegion);
 
-	m_device.endSingleTimeCommands(commandBuffer);
+	m_device.commands->endSingleTimeCommands(commandBuffer);
 }
 
 // Creates a vertex buffer for test rendering

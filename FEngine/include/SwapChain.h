@@ -7,12 +7,11 @@
 
 #include <vector>
 
-#include "Image.h"
+class Device;
 class Image;
 
+#include "Image.h"
 #include "Device.h"
-
-
 
 //Contains the properties of a swap chain for device compatibility
 struct SwapChainSupportDetails
@@ -21,7 +20,6 @@ struct SwapChainSupportDetails
 	std::vector<VkSurfaceFormatKHR> formats;
 	std::vector<VkPresentModeKHR> presentModes;
 };
-
 
 class SwapChain
 {
