@@ -25,6 +25,7 @@
 #include "Instance.h"
 #include "Buffer.h"
 #include "Shader.h"
+#include "RenderPass.h"
 
 class FEngine
 {
@@ -35,8 +36,6 @@ public:
 
 	const uint32_t WIDTH = 800;
 	const uint32_t HEIGHT = 600;
-
-
 
 	const uint32_t MAX_FRAMES_IN_FLIGHT = 2;
 	GLFWwindow * window;
@@ -68,7 +67,7 @@ public:
 	static VkCommandPool commandPool;
 	static SwapChain* swapChain;
 
-	VkRenderPass renderPass;
+	RenderPass * renderPass;
 	VkDescriptorSetLayout descriptorSetLayout;
 	VkPipelineLayout pipelineLayout;
 	VkPipeline graphicsPipeline;
@@ -87,8 +86,6 @@ public:
 	void initVulkan();
 	void recreateSwapChain();
 
-	void createSurface();
-	void createRenderPass();
 	void createDescriptorSetLayout();
 	void createGraphicsPipeline();
 

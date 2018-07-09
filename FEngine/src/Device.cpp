@@ -1,5 +1,4 @@
 #include "Device.h"
-
 #include "SwapChain.h"
 
 #include <stdexcept>
@@ -28,7 +27,12 @@ void Device::pickPhysicalDevice()
 	if (physicalDevice == VK_NULL_HANDLE)
 		throw std::runtime_error("failed to find a suitable GPU!");
 }
-
+// Create a VkSurface to render images to
+void Device::createSurface(GLFWwindow * window)
+{
+	if (glfwCreateWindowSurface(m_instance, window, nullptr, &surface) != VK_SUCCESS)
+		throw std::runtime_error("failed to create window surface!");
+}
 // The logical deviceis the interface with the physical device
 void Device::createLogicalDevice()
 {
@@ -179,6 +183,8 @@ uint32_t Device::findMemoryType( uint32_t typeFilter, VkMemoryPropertyFlags prop
 
 	throw std::runtime_error("failed to find suitable memory type!");
 }
+
+
 
 // Allocate a temporary command buffer for memory transfer operations and start recording
 VkCommandBuffer Device::beginSingleTimeCommands()

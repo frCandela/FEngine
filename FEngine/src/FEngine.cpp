@@ -40,21 +40,21 @@ void FEngine::initVulkan()
 	instance->createInstance();
 
 	instance->setupDebugCallback();
-	createSurface();
 
+	device->createSurface( window );
 	device->pickPhysicalDevice();
 	device->createLogicalDevice();
 
 	swapChain->createSwapChain( window );
 	swapChain->createImageViews();
 
-	createRenderPass();
+	renderPass = new RenderPass( *device, *swapChain);
 	createDescriptorSetLayout();
 	createGraphicsPipeline();
 	
 	createCommandPool();
 	swapChain->createDepthResources();
-	swapChain->createFramebuffers( renderPass);
+	swapChain->createFramebuffers( renderPass->renderPass);
 	textureImage->createTextureImage();
 	textureImage->imageView = Image::createImageView(textureImage->image, VK_FORMAT_R8G8B8A8_UNORM, VK_IMAGE_ASPECT_COLOR_BIT, textureImage->m_mipLevels, device->device);
 	textureSampler->createSampler( textureImage->m_mipLevels );
@@ -180,19 +180,13 @@ void FEngine::recreateSwapChain()
 
 	swapChain->createSwapChain(window);
 	swapChain->createImageViews();
-	createRenderPass();
+	renderPass = new RenderPass(*device, *swapChain);
 	createGraphicsPipeline();
 	swapChain->createDepthResources();
-	swapChain->createFramebuffers(  renderPass);
+	swapChain->createFramebuffers(renderPass->renderPass);
 	createCommandBuffers();
 }
 
-// Create a VkSurface to render images to
-void FEngine::createSurface()
-{
-	if (glfwCreateWindowSurface(instance->instance, window, nullptr, &(device->surface)) != VK_SUCCESS)
-		throw std::runtime_error("failed to create window surface!");	
-}
 // Creates descriptor set layouts (like the uniform buffers)
 void FEngine::createDescriptorSetLayout()
 {
@@ -369,78 +363,14 @@ void FEngine::createGraphicsPipeline()
 	pipelineInfo.pDepthStencilState = &depthStencil;
 	pipelineInfo.pColorBlendState = &colorBlending;
 	pipelineInfo.layout = pipelineLayout;
-	pipelineInfo.renderPass = renderPass;
+	pipelineInfo.renderPass = renderPass->renderPass;
 	pipelineInfo.subpass = 0;
 	pipelineInfo.basePipelineHandle = VK_NULL_HANDLE;
 
 	if (vkCreateGraphicsPipelines(device->device, VK_NULL_HANDLE, 1, &pipelineInfo, nullptr, &graphicsPipeline) != VK_SUCCESS)
 		throw std::runtime_error("failed to create graphics pipeline!");	
 }
-// Create the render pass ( how many colors and depth buffers, how many samples for each of them, how to handle their contents during the rendering operations etc.)
-void FEngine::createRenderPass()
-{	
-	// Color attachment
-	VkAttachmentDescription colorAttachment = {};
-	colorAttachment.format = swapChain->swapChainImageFormat;
-	colorAttachment.samples = VK_SAMPLE_COUNT_1_BIT;
-	colorAttachment.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
-	colorAttachment.storeOp = VK_ATTACHMENT_STORE_OP_STORE;
-	colorAttachment.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
-	colorAttachment.stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
-	colorAttachment.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
-	colorAttachment.finalLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR;
-	
-	// Depth attachment
-	VkAttachmentDescription depthAttachment = {};
-	depthAttachment.format = swapChain->findDepthFormat();
-	depthAttachment.samples = VK_SAMPLE_COUNT_1_BIT;
-	depthAttachment.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
-	depthAttachment.storeOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
-	depthAttachment.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
-	depthAttachment.stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
-	depthAttachment.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
-	depthAttachment.finalLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
 
-	// Reference to the color attachments
-	VkAttachmentReference colorAttachmentRef = {};
-	colorAttachmentRef.attachment = 0;
-	colorAttachmentRef.layout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
-
-	// Reference to the depth attachments
-	VkAttachmentReference depthAttachmentRef = {};
-	depthAttachmentRef.attachment = 1;
-	depthAttachmentRef.layout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
-
-	// Subpass
-	VkSubpassDescription subpass = {};
-	subpass.pipelineBindPoint = VK_PIPELINE_BIND_POINT_GRAPHICS;
-	subpass.colorAttachmentCount = 1;
-	subpass.pColorAttachments = &colorAttachmentRef;
-	subpass.pDepthStencilAttachment = &depthAttachmentRef;
-
-	// Subpass dependencies : specify memory and execution dependencies between subpasses
-	VkSubpassDependency dependency = {};
-	dependency.srcSubpass = VK_SUBPASS_EXTERNAL;
-	dependency.dstSubpass = 0;
-	dependency.srcStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
-	dependency.srcAccessMask = 0;
-	dependency.dstStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
-	dependency.dstAccessMask = VK_ACCESS_COLOR_ATTACHMENT_READ_BIT | VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
-
-	//Render pass (the attachments referenced by the pipeline stages and their usage)
-	std::array<VkAttachmentDescription, 2> attachments = { colorAttachment, depthAttachment };
-	VkRenderPassCreateInfo renderPassInfo = {};
-	renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO;
-	renderPassInfo.attachmentCount = static_cast<uint32_t>(attachments.size());
-	renderPassInfo.pAttachments = attachments.data();
-	renderPassInfo.subpassCount = 1;
-	renderPassInfo.pSubpasses = &subpass;
-	renderPassInfo.dependencyCount = 1;
-	renderPassInfo.pDependencies = &dependency;
-
-	if (vkCreateRenderPass(device->device, &renderPassInfo, nullptr, &renderPass) != VK_SUCCESS)
-		throw std::runtime_error("failed to create render pass!");
-}
 // Create descriptor pool (for uniform buffers)
 void FEngine::createDescriptorPool()
 {
@@ -549,7 +479,7 @@ void FEngine::createCommandBuffers()
 		// Configure the render pass
 		VkRenderPassBeginInfo renderPassInfo = {};
 		renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
-		renderPassInfo.renderPass = renderPass;
+		renderPassInfo.renderPass = renderPass->renderPass;
 		renderPassInfo.framebuffer = swapChain->swapChainFramebuffers[i];
 		renderPassInfo.renderArea.offset = { 0, 0 };
 		renderPassInfo.renderArea.extent = swapChain->swapChainExtent;
@@ -607,29 +537,12 @@ void FEngine::createSyncObjects()
 	}
 }
 
-
-
-
-
-
-
-
-
-
-
 // Create the uniforms buffer
 void FEngine::createUniformBuffer()
 {
 	VkDeviceSize bufferSize = sizeof(UniformBufferObject);
 	Buffer::createBuffer(*device,bufferSize, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, uniformBuffer, uniformBufferMemory);
 }
-
-
-
-
-
-
-
 
 void FEngine::zobCleanup()
 {
@@ -645,7 +558,8 @@ void FEngine::zobCleanup()
 
 	vkDestroyPipeline(device->device, graphicsPipeline, nullptr);
 	vkDestroyPipelineLayout(device->device, pipelineLayout, nullptr);
-	vkDestroyRenderPass(device->device, renderPass, nullptr);
+
+	delete(renderPass);
 
 
 	for (size_t i = 0; i < swapChain->swapChainImageViews.size(); i++)

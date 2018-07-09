@@ -88,6 +88,7 @@
     <ClCompile Include="src\Instance.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\Device.cpp" />
+    <ClCompile Include="src\RenderPass.cpp" />
     <ClCompile Include="src\Sampler.cpp" />
     <ClCompile Include="src\Shader.cpp" />
     <ClCompile Include="src\SwapChain.cpp" />
@@ -98,6 +99,7 @@
     <ClInclude Include="include\Image.h" />
     <ClInclude Include="include\Device.h" />
     <ClInclude Include="include\Instance.h" />
+    <ClInclude Include="include\RenderPass.h" />
     <ClInclude Include="include\Sampler.h" />
     <ClInclude Include="include\Shader.h" />
     <ClInclude Include="include\SwapChain.h" />

@@ -29,7 +29,6 @@ public:
 	SwapChain(Device& device);
 
 	Device& m_device;	
-	
 	Image* depthImage;//Depth
 
 	std::vector<VkImage> swapChainImages;
@@ -40,6 +39,7 @@ public:
 	VkSwapchainKHR swapChain;
 
 	void createSwapChain(GLFWwindow* window);
+
 
 	//swap chain capabilities selection
 	VkSurfaceFormatKHR chooseSwapSurfaceFormat(const std::vector<VkSurfaceFormatKHR>& availableFormats);

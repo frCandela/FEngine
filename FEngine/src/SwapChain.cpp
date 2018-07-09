@@ -81,6 +81,7 @@ VkSurfaceFormatKHR SwapChain::chooseSwapSurfaceFormat(const std::vector<VkSurfac
 	//No good format found
 	return availableFormats[0];
 }
+
 // Choose the best presentation mode in a list of available presentation mode
 VkPresentModeKHR SwapChain::chooseSwapPresentMode(const std::vector<VkPresentModeKHR> availablePresentModes)
 {
