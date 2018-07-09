@@ -16,7 +16,7 @@ public:
 		m_device(device) 
 	{};
 
-	~Image() {};
+	~Image();
 
 	const std::string TEXTURE_PATH = "textures/chalet.jpg";
 	VkImage image;
@@ -38,13 +38,6 @@ public:
 	static bool hasStencilComponent(VkFormat format)
 	{
 		return format == VK_FORMAT_D32_SFLOAT_S8_UINT || format == VK_FORMAT_D24_UNORM_S8_UINT;
-	}
-
-	void Destroy()
-	{
-		vkDestroyImageView(m_device.device, imageView, nullptr);
-		vkDestroyImage(m_device.device, image, nullptr);
-		vkFreeMemory(m_device.device, deviceMemory, nullptr);
 	}
 
 	static VkImageView createImageView(VkImage image, VkFormat format, VkImageAspectFlags aspectFlags, uint32_t mipLevels, VkDevice& device);

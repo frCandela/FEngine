@@ -662,8 +662,6 @@ void FEngine::cleanup()
 
 	// Texture image and sampler
 	delete(textureSampler);
-
-	textureImage->Destroy();
 	delete(textureImage);
 
 	vkDestroyDescriptorPool(device->device, descriptorPool, nullptr);
@@ -684,9 +682,10 @@ void FEngine::cleanup()
 
 	vkDestroyCommandPool(device->device, commandPool, nullptr);
 	vkDestroySurfaceKHR(instance->instance, device->surface, nullptr);
-	vkDestroyDevice(device->device, nullptr);
-	
 
+	
+	
+	delete (device);
 	delete(instance);
 
 	glfwDestroyWindow(window);

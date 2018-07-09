@@ -327,3 +327,10 @@ VkImageView Image::createImageView(VkImage image, VkFormat format, VkImageAspect
 
 	return imageView;
 }
+
+Image::~Image()
+{
+	vkDestroyImageView(m_device.device, imageView, nullptr);
+	vkDestroyImage(m_device.device, image, nullptr);
+	vkFreeMemory(m_device.device, deviceMemory, nullptr);
+}

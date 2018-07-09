@@ -31,6 +31,12 @@ public:
 		m_commandPool(commandPool)
 	{}
 
+	~Device()
+	{
+		vkDestroyDevice(device, nullptr);
+	}
+
+
 	VkInstance& m_instance;
 	VkDevice device;
 	VkPhysicalDevice physicalDevice = VK_NULL_HANDLE;
