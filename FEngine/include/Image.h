@@ -16,7 +16,7 @@ public:
 
 	~Image();
 
-	const std::string TEXTURE_PATH = "textures/chalet.jpg";
+	const std::string TEXTURE_PATH = "textures/cube.jpg";
 	VkImage image;
 	VkDeviceMemory deviceMemory;
 	VkImageView imageView;// images are accessed through image views rather than directly

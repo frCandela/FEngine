@@ -3,20 +3,14 @@
 #include "Device.h"
 #include "Vertex.h"
 
-
-
 class Buffer
 {
 public:
 	Buffer(Device& device);
 	~Buffer();
-	const std::string MODEL_PATH = "models/cloud.obj";
-	const std::string TEXTURE_PATH = "textures/chalet.jpg";
-
-
 	Device & m_device;
 
-	//Vertices and indices
+	//Vertices and indices of the loaded model
 	std::vector<Vertex> vertices;
 	std::vector<uint32_t> indices;
 
@@ -27,10 +21,18 @@ public:
 	VkBuffer indexBuffer;
 	VkDeviceMemory indexBufferMemory;
 
-	void createIndexBuffer();
+
 
 	static void createBuffer(Device& device, VkDeviceSize size, VkBufferUsageFlags usage, VkMemoryPropertyFlags properties, VkBuffer& buffer, VkDeviceMemory& bufferMemory);
 	void copyBuffer( VkBuffer srcBuffer, VkBuffer dstBuffer, VkDeviceSize size);
-	void loadModel();
-	void createVertexBuffer();
+	
+	/// Loads a model from an OBJ file
+	void LoadModel( std::string path );
+
+private:
+	/// Creates a vertex buffer from the loaded model data
+	void CreateVertexBuffer();
+
+	/// Create the index buffer from the loaded model data
+	void CreateIndexBuffer();
 };

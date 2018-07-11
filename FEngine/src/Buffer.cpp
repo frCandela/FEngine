@@ -6,9 +6,6 @@
 Buffer::Buffer( Device& device ) :
 	m_device(device)
 {
-	loadModel();
-	createVertexBuffer();
-	createIndexBuffer();
 }
 
 Buffer::~Buffer()
@@ -24,30 +21,6 @@ Buffer::~Buffer()
 
 
 
-// Create the index buffer
-void Buffer::createIndexBuffer(  )
-{
-	VkDeviceSize bufferSize = sizeof(indices[0]) * indices.size();
-
-	// Create a host visible buffer
-	VkBuffer stagingBuffer;
-	VkDeviceMemory stagingBufferMemory;
-	createBuffer(m_device, bufferSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, stagingBuffer, stagingBufferMemory);
-
-	// Fills it with data
-	void* data;
-	vkMapMemory(m_device.device, stagingBufferMemory, 0, bufferSize, 0, &data);
-	memcpy(data, indices.data(), (size_t)bufferSize);
-	vkUnmapMemory(m_device.device, stagingBufferMemory);
-
-	// Create a device local buffer
-	createBuffer(m_device, bufferSize, VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_INDEX_BUFFER_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, indexBuffer, indexBufferMemory);
-	copyBuffer(stagingBuffer, indexBuffer, bufferSize);
-
-	// Cleaning
-	vkDestroyBuffer(m_device.device, stagingBuffer, nullptr);
-	vkFreeMemory(m_device.device, stagingBufferMemory, nullptr);
-}
 
 // Helper function for creating buffers
 void Buffer::createBuffer(Device& device, VkDeviceSize size, VkBufferUsageFlags usage, VkMemoryPropertyFlags properties, VkBuffer& buffer, VkDeviceMemory& bufferMemory)
@@ -90,34 +63,8 @@ void Buffer::copyBuffer( VkBuffer srcBuffer, VkBuffer dstBuffer, VkDeviceSize si
 	m_device.commands->endSingleTimeCommands(commandBuffer);
 }
 
-// Creates a vertex buffer for test rendering
-void Buffer::createVertexBuffer()
-{
-	VkDeviceSize bufferSize = sizeof(vertices[0]) * vertices.size();
 
-	// Create a host visible buffer
-	VkBuffer stagingBuffer;
-	VkDeviceMemory stagingBufferMemory;
-	createBuffer(m_device, bufferSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, stagingBuffer, stagingBufferMemory);
-
-	// Fills it with data
-	void* data;
-	vkMapMemory(m_device.device, stagingBufferMemory, 0, bufferSize, 0, &data);
-	memcpy(data, vertices.data(), (size_t)bufferSize);
-	vkUnmapMemory(m_device.device, stagingBufferMemory);
-
-	// Create a device local buffer
-	createBuffer(m_device, bufferSize, VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, vertexBuffer, vertexBufferMemory);
-	copyBuffer(stagingBuffer, vertexBuffer, bufferSize);
-
-	// Cleaning
-	vkDestroyBuffer(m_device.device, stagingBuffer, nullptr);
-	vkFreeMemory(m_device.device, stagingBufferMemory, nullptr);
-
-}
-
-// Load a model from an OBJ file
-void Buffer::loadModel()
+void Buffer::LoadModel( std::string path )
 {
 	// Load a model into the library's data structures
 	tinyobj::attrib_t attrib;
@@ -125,7 +72,7 @@ void Buffer::loadModel()
 	std::vector<tinyobj::material_t> materials;
 	std::string err;
 
-	if (!tinyobj::LoadObj(&attrib, &shapes, &materials, &err, MODEL_PATH.c_str()))
+	if (!tinyobj::LoadObj(&attrib, &shapes, &materials, &err, path.c_str()))
 		throw std::runtime_error(err);
 
 	std::unordered_map<Vertex, uint32_t> uniqueVertices = {};
@@ -162,4 +109,56 @@ void Buffer::loadModel()
 			indices.push_back(uniqueVertices[vertex]);
 		}
 	}
+
+	CreateVertexBuffer();
+	CreateIndexBuffer();
+}
+
+void Buffer::CreateVertexBuffer()
+{
+	VkDeviceSize bufferSize = sizeof(vertices[0]) * vertices.size();
+
+	// Create a host visible buffer
+	VkBuffer stagingBuffer;
+	VkDeviceMemory stagingBufferMemory;
+	createBuffer(m_device, bufferSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, stagingBuffer, stagingBufferMemory);
+
+	// Fills it with data
+	void* data;
+	vkMapMemory(m_device.device, stagingBufferMemory, 0, bufferSize, 0, &data);
+	memcpy(data, vertices.data(), (size_t)bufferSize);
+	vkUnmapMemory(m_device.device, stagingBufferMemory);
+
+	// Create a device local buffer
+	createBuffer(m_device, bufferSize, VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, vertexBuffer, vertexBufferMemory);
+	copyBuffer(stagingBuffer, vertexBuffer, bufferSize);
+
+	// Cleaning
+	vkDestroyBuffer(m_device.device, stagingBuffer, nullptr);
+	vkFreeMemory(m_device.device, stagingBufferMemory, nullptr);
+
+}
+
+void Buffer::CreateIndexBuffer()
+{
+	VkDeviceSize bufferSize = sizeof(indices[0]) * indices.size();
+
+	// Create a host visible buffer
+	VkBuffer stagingBuffer;
+	VkDeviceMemory stagingBufferMemory;
+	createBuffer(m_device, bufferSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, stagingBuffer, stagingBufferMemory);
+
+	// Fills it with data
+	void* data;
+	vkMapMemory(m_device.device, stagingBufferMemory, 0, bufferSize, 0, &data);
+	memcpy(data, indices.data(), (size_t)bufferSize);
+	vkUnmapMemory(m_device.device, stagingBufferMemory);
+
+	// Create a device local buffer
+	createBuffer(m_device, bufferSize, VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_INDEX_BUFFER_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, indexBuffer, indexBufferMemory);
+	copyBuffer(stagingBuffer, indexBuffer, bufferSize);
+
+	// Cleaning
+	vkDestroyBuffer(m_device.device, stagingBuffer, nullptr);
+	vkFreeMemory(m_device.device, stagingBufferMemory, nullptr);
 }

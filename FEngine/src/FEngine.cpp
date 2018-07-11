@@ -24,7 +24,10 @@ FEngine::FEngine()
 	textureSampler = new Sampler(*device, textureImage->m_mipLevels);
 	descriptors = new Descriptors(*device);
 	createGraphicsPipeline();
+
 	buffer = new Buffer(*device);
+	buffer->LoadModel("models/cube.obj");
+
 	descriptors->createDescriptorSet(*textureImage, *textureSampler);
 	commands->createCommandBuffers(*swapChain, renderPass->renderPass, graphicsPipeline, pipelineLayout, *buffer, descriptors->descriptorSet);
 	createSyncObjects();
