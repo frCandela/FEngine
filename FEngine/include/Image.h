@@ -13,10 +13,8 @@ class Image
 {
 public:
 	Image(Device& device);
+	virtual ~Image();
 
-	~Image();
-
-	const std::string TEXTURE_PATH = "textures/cube.jpg";
 	VkImage image;
 	VkDeviceMemory deviceMemory;
 	VkImageView imageView;// images are accessed through image views rather than directly
@@ -24,8 +22,7 @@ public:
 
 	Device& m_device;
 
-	// Load an image and upload it into a Vulkan image object
-	void createTextureImage();
+
 
 	void createBuffer(VkDeviceSize size, VkBufferUsageFlags usage, VkMemoryPropertyFlags properties, VkBuffer& buffer, VkDeviceMemory& bufferMemory);
 	void createImage(uint32_t width, uint32_t height, uint32_t mipLevels, VkFormat format, VkImageTiling tiling, VkImageUsageFlags usage, VkMemoryPropertyFlags properties, VkImage& image, VkDeviceMemory& imageMemory);

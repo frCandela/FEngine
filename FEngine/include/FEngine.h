@@ -21,6 +21,7 @@
 #include "RenderPass.h"
 #include "Descriptors.h"
 #include "Commands.h"
+#include "Texture.h"
 
 
 
@@ -35,7 +36,7 @@ public:
 	const uint32_t MAX_FRAMES_IN_FLIGHT = 2;
 	GLFWwindow * window;
 
-	Image* textureImage; 
+	Texture* texture; 
 	Sampler* textureSampler;
 	Buffer* buffer;
 	Descriptors* descriptors;

@@ -18,17 +18,18 @@ FEngine::FEngine()
 	fragShader = new Shader(*device, "shaders/frag.spv");
 	renderPass = new RenderPass(*device, *swapChain);
 	swapChain->createFramebuffers(renderPass->renderPass);
-	textureImage = new Image(*device);
-	textureImage->createTextureImage();
-	textureImage->imageView = Image::createImageView(textureImage->image, VK_FORMAT_R8G8B8A8_UNORM, VK_IMAGE_ASPECT_COLOR_BIT, textureImage->m_mipLevels, device->device);
-	textureSampler = new Sampler(*device, textureImage->m_mipLevels);
+
+	texture = new Texture(*device);
+	texture->LoadTexture("textures/cube.jpg");
+
+	textureSampler = new Sampler(*device, texture->m_mipLevels);
 	descriptors = new Descriptors(*device);
 	createGraphicsPipeline();
 
 	buffer = new Buffer(*device);
 	buffer->LoadModel("models/cube.obj");
 
-	descriptors->createDescriptorSet(*textureImage, *textureSampler);
+	descriptors->createDescriptorSet(*texture, *textureSampler);
 	commands->createCommandBuffers(*swapChain, renderPass->renderPass, graphicsPipeline, pipelineLayout, *buffer, descriptors->descriptorSet);
 	createSyncObjects();
 }
@@ -335,7 +336,7 @@ void FEngine::cleanup()
 	delete(buffer);
 	delete(descriptors);
 	delete(textureSampler);
-	delete(textureImage);
+	delete(texture);
 	delete(renderPass);
 	delete(fragShader);
 	delete(vertShader);
