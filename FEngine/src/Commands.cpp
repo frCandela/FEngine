@@ -5,12 +5,13 @@
 Commands::Commands(Device& device) :
 	m_device(device)
 {
-
+	createCommandPool();
 }
 
 Commands::~Commands()
 {
 	vkFreeCommandBuffers(m_device.device, commandPool, static_cast<uint32_t>(commandBuffers.size()), commandBuffers.data());
+	vkDestroyCommandPool(m_device.device, commandPool, nullptr);
 }
 
 void Commands::cleanup()

@@ -2,6 +2,12 @@
 
 #include <iostream>
 
+Instance::Instance()
+{
+	createInstance();
+	setupDebugCallback();
+}
+
 Instance::~Instance()
 {
 	#ifdef VALIDATION_LAYERS

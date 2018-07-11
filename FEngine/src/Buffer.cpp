@@ -6,7 +6,9 @@
 Buffer::Buffer( Device& device ) :
 	m_device(device)
 {
-
+	loadModel();
+	createVertexBuffer();
+	createIndexBuffer();
 }
 
 Buffer::~Buffer()

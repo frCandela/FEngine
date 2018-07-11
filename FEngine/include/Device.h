@@ -36,9 +36,7 @@ const std::vector<const char*> validationLayers = { "VK_LAYER_LUNARG_standard_va
 class Device
 {
 public:
-	Device(VkInstance& instance) : 
-		m_instance(instance)
-	{}
+	Device(VkInstance& instance, GLFWwindow * window);
 
 	~Device()
 	{

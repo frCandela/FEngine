@@ -3,6 +3,14 @@
 #include <array>
 #include <chrono>
 
+Descriptors::Descriptors(Device& device) :
+	m_device(device)
+{
+	createDescriptorSetLayout();
+	createUniformBuffer();
+	createDescriptorPool();
+}
+
 Descriptors::~Descriptors()
 {
 	vkDestroyDescriptorPool(m_device.device, descriptorPool, nullptr);

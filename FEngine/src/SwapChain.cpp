@@ -3,11 +3,20 @@
 #include <algorithm>
 #include <array>
 
-SwapChain::SwapChain(Device& device) :
+SwapChain::SwapChain(Device& device, GLFWwindow * window) :
 	m_device(device)
 {
 	depthImage = new Image(device);
+	createSwapChain(window);
+	createImageViews();
+	createDepthResources();
 }
+
+SwapChain::~SwapChain()
+{
+	cleanupSwapChain();
+}
+
 
 // Creates the best swap chain possible depending on the device capabilities.
 void SwapChain::createSwapChain(GLFWwindow* window)

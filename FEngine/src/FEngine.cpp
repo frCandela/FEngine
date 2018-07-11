@@ -1,78 +1,37 @@
 #include "FEngine.h"
 
-
-
-
-
-Instance* FEngine::instance = new Instance();
-Device* FEngine::device = new Device(instance->instance);
-SwapChain* FEngine::swapChain = new SwapChain(*device);
-
-FEngine::FEngine() :
-	textureImage( new Image(*device)),
-	textureSampler(new Sampler(*device)),
-	buffer( new Buffer( *device )),
-	vertShader( *device, "shaders/vert.spv"),
-	fragShader(*device, "shaders/frag.spv"),
-	descriptors( new Descriptors(*device)),
-	commands(new Commands( *device))
+FEngine::FEngine() 
 {
-	device->commands = commands;
-}
-
-// Runs the application
-void FEngine::Run()
-{
-	initWindow();
-	initVulkan();
-	mainLoop();
-	cleanup();
-}
-
-// Creates a GLFW window
-void FEngine::initWindow()
-{
+	// Init GLFW
 	glfwInit();
 	glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);// No opengl context
 	glfwWindowHint(GLFW_RESIZABLE, GLFW_TRUE);
 	window = glfwCreateWindow(WIDTH, HEIGHT, "Vulkan", nullptr/* fullscreen monitor */, nullptr);
-}
-// Initializes the Vulakan application and required components
-void FEngine::initVulkan()
-{
-	instance->createInstance();
-
-	instance->setupDebugCallback();
-
-	device->createSurface( window );
-	device->pickPhysicalDevice();
-	device->createLogicalDevice();
-
-	swapChain->createSwapChain( window );
-	swapChain->createImageViews();
-
-	renderPass = new RenderPass( *device, *swapChain);
-	descriptors->createDescriptorSetLayout();
-	createGraphicsPipeline();
 	
-	commands->createCommandPool();
-	swapChain->createDepthResources();
-	swapChain->createFramebuffers( renderPass->renderPass);
+	// Initializes the Vulkan application and required components
+	instance = new Instance();
+	device = new Device(instance->instance, window);
+	commands = new Commands(*device);
+	device->commands = commands;	//zob
+	swapChain = new SwapChain(*device, window);
+	vertShader = new Shader(*device, "shaders/vert.spv");
+	fragShader = new Shader(*device, "shaders/frag.spv");
+	renderPass = new RenderPass(*device, *swapChain);
+	swapChain->createFramebuffers(renderPass->renderPass);
+	textureImage = new Image(*device);
 	textureImage->createTextureImage();
 	textureImage->imageView = Image::createImageView(textureImage->image, VK_FORMAT_R8G8B8A8_UNORM, VK_IMAGE_ASPECT_COLOR_BIT, textureImage->m_mipLevels, device->device);
-	textureSampler->createSampler( textureImage->m_mipLevels );
-
-	buffer->loadModel();
-	buffer->createVertexBuffer();
-	buffer->createIndexBuffer();
-	descriptors->createUniformBuffer();
-	descriptors->createDescriptorPool();
-	descriptors->createDescriptorSet( *textureImage, *textureSampler);
+	textureSampler = new Sampler(*device, textureImage->m_mipLevels);
+	descriptors = new Descriptors(*device);
+	createGraphicsPipeline();
+	buffer = new Buffer(*device);
+	descriptors->createDescriptorSet(*textureImage, *textureSampler);
 	commands->createCommandBuffers(*swapChain, renderPass->renderPass, graphicsPipeline, pipelineLayout, *buffer, descriptors->descriptorSet);
 	createSyncObjects();
 }
-// Main loop of the program
-void FEngine::mainLoop()
+
+// Runs the application (loop)
+void FEngine::Run()
 {
 	while (!glfwWindowShouldClose(window))
 	{
@@ -83,7 +42,9 @@ void FEngine::mainLoop()
 	}
 
 	vkDeviceWaitIdle(device->device);
+	cleanup();
 }
+
 // Draw a frame
 void FEngine::drawFrame()
 {
@@ -150,12 +111,17 @@ void FEngine::drawFrame()
 	currentFrame = (currentFrame + 1) % MAX_FRAMES_IN_FLIGHT;
 }
 
-// Recreates the swap chain (necessary when the window is resized for example)
+// Recreates the swap chain (necessary when the window is resized)
 void FEngine::recreateSwapChain()
 {
 	vkDeviceWaitIdle(device->device);
 
-	zobCleanup();
+	//Cleanup
+	swapChain->cleanupSwapChain();
+	commands->cleanup();
+	vkDestroyPipeline(device->device, graphicsPipeline, nullptr);
+	vkDestroyPipelineLayout(device->device, pipelineLayout, nullptr);
+	delete(renderPass);
 
 	swapChain->createSwapChain(window);
 	swapChain->createImageViews();
@@ -169,8 +135,8 @@ void FEngine::recreateSwapChain()
 // Creates the graphics pipeline
 void FEngine::createGraphicsPipeline()
 {
-	ShaderModule vertShaderModule = vertShader.GetShaderModule();
-	ShaderModule fragShaderModule = fragShader.GetShaderModule();
+	ShaderModule vertShaderModule = vertShader->GetShaderModule();
+	ShaderModule fragShaderModule = fragShader->GetShaderModule();
 
 	// Link vertex shader
 	VkPipelineShaderStageCreateInfo vertShaderStageInfo = {};
@@ -350,47 +316,31 @@ void FEngine::createSyncObjects()
 	}
 }
 
-void FEngine::zobCleanup()
-{
-	swapChain->cleanupSwapChain();
-
-
-	commands->cleanup();
-
-	vkDestroyPipeline(device->device, graphicsPipeline, nullptr);
-	vkDestroyPipelineLayout(device->device, pipelineLayout, nullptr);
-
-	delete(renderPass);
-
-
-}
-
 // Clean Vulkan objects 
 void FEngine::cleanup()
 {
-	// Deallocate resources
-	zobCleanup();
-
-	// Texture image and sampler
-	delete(textureSampler);
-	delete(textureImage);
-	delete(descriptors);
-	delete(buffer);
+	vkDestroyPipeline(device->device, graphicsPipeline, nullptr);
+	vkDestroyPipelineLayout(device->device, pipelineLayout, nullptr);
 
 	for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++) 
 	{
 		vkDestroySemaphore(device->device, renderFinishedSemaphores[i], nullptr);
 		vkDestroySemaphore(device->device, imageAvailableSemaphores[i], nullptr);
 		vkDestroyFence(device->device, inFlightFences[i], nullptr);
-	}
-
-	vkDestroyCommandPool(device->device, commands->commandPool, nullptr);
-	vkDestroySurfaceKHR(instance->instance, device->surface, nullptr);
-
+	}	
+	
+	delete(buffer);
+	delete(descriptors);
+	delete(textureSampler);
+	delete(textureImage);
+	delete(renderPass);
+	delete(fragShader);
+	delete(vertShader);
+	delete(swapChain);
+	delete(commands);
 	delete (device);
 	delete(instance);
 
 	glfwDestroyWindow(window);
-
 	glfwTerminate();
 }

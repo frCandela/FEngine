@@ -9,12 +9,7 @@ class Image;
 class Descriptors
 {
 public:
-	Descriptors( Device& device ) :
-		m_device(device)
-	{
-
-	}
-
+	Descriptors(Device& device);
 	~Descriptors();
 
 	struct UniformBufferObject

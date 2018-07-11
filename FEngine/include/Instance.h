@@ -5,7 +5,7 @@
 class Instance
 {
 public:
-
+	Instance();
 	~Instance();
 
 	VkInstance instance;

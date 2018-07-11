@@ -29,8 +29,6 @@ class FEngine
 public:
 	FEngine();
 
-	void Run();
-
 	const uint32_t WIDTH = 800;
 	const uint32_t HEIGHT = 600;
 
@@ -39,45 +37,31 @@ public:
 
 	Image* textureImage; 
 	Sampler* textureSampler;
-
-	void zobCleanup();
-
 	Buffer* buffer;
 	Descriptors* descriptors;
 	Commands* commands;
-
-	Shader vertShader;
-	Shader fragShader;
-
-	static Instance* instance;
-	
-	static Device* device;
-
-	static SwapChain* swapChain;
-
+	Instance* instance;
+	Device* device;
+	SwapChain* swapChain;
 	RenderPass * renderPass;
+
+	Shader* vertShader;
+	Shader* fragShader;
 
 	VkPipelineLayout pipelineLayout;
 	VkPipeline graphicsPipeline;
-
 	std::vector<VkSemaphore> imageAvailableSemaphores;//Specifies that an image has been acquired and is ready for rendering
 	std::vector<VkSemaphore> renderFinishedSemaphores;//Specifies that rendering has finished and presentation can happen
 	std::vector<VkFence> inFlightFences;
 	size_t currentFrame = 0;
 
-	void initWindow();
-	void initVulkan();
 	void recreateSwapChain();
-
 	void createGraphicsPipeline();
+	void createSyncObjects();
+	void cleanup();
 
-
-
+	void Run();
 	void drawFrame();
 
-	void createSyncObjects();
-
-	void mainLoop();
-	void cleanup();
 };
 

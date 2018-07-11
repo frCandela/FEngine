@@ -24,7 +24,8 @@ struct SwapChainSupportDetails
 class SwapChain
 {
 public:
-	SwapChain(Device& device);
+	SwapChain(Device& device, GLFWwindow * window);
+	~SwapChain();
 
 	Device& m_device;	
 	Image* depthImage;//Depth

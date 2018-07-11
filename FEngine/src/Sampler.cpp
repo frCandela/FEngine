@@ -1,9 +1,9 @@
 #include "Sampler.h"
 
-Sampler::Sampler(Device& device) :
+Sampler::Sampler(Device& device, uint32_t mipLevels) :
 	m_device(device)
 {
-
+	createSampler(mipLevels);
 }
 
 Sampler::~Sampler()

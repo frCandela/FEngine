@@ -5,6 +5,12 @@
 
 #include <algorithm>
 
+Image::Image(Device& device) :
+	m_device(device)
+{
+
+}
+
 // Load an image and upload it into a Vulkan image object
 void Image::createTextureImage()
 {

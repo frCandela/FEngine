@@ -4,6 +4,14 @@
 #include <stdexcept>
 #include <set>
 
+Device::Device(VkInstance& instance, GLFWwindow * window) :
+	m_instance(instance)
+{
+	createSurface(window);
+	pickPhysicalDevice();
+	createLogicalDevice();
+}
+
 // Look for and select a graphics card in the system
 void Device::pickPhysicalDevice()
 {
