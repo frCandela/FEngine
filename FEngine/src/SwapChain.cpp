@@ -15,14 +15,14 @@ SwapChain::~SwapChain()
 }
 
 
-void SwapChain::BuildSwapChain( GLFWwindow * window)
+void SwapChain::BuildSwapChain(Window& window)
 {
 	CreateSwapChain(window);
 	CreateImageViews();
 	depthImage->createDepthResources(swapChainExtent.width, swapChainExtent.height);
 }
 
-void SwapChain::CreateSwapChain(GLFWwindow* window)
+void SwapChain::CreateSwapChain(Window& window)
 {
 	SwapChainSupportDetails swapChainSupport = m_device.swapChainSupportDetails; //querySwapChainSupport(m_device.physicalDevice, m_device.surface);
 
@@ -109,19 +109,13 @@ VkPresentModeKHR SwapChain::ChooseSwapPresentMode(const std::vector<VkPresentMod
 	return bestMode;
 }
 
-VkExtent2D SwapChain::ChooseSwapExtent(const VkSurfaceCapabilitiesKHR& capabilities, GLFWwindow* window)
+VkExtent2D SwapChain::ChooseSwapExtent(const VkSurfaceCapabilitiesKHR& capabilities, Window& window)
 {
 	if (capabilities.currentExtent.width != std::numeric_limits<uint32_t>::max())
 		return capabilities.currentExtent;
 	else
 	{
-		int width, height;
-		glfwGetFramebufferSize(window, &width, &height);
-
-		VkExtent2D actualExtent = {
-			static_cast<uint32_t>(width),
-			static_cast<uint32_t>(height)
-		};
+		VkExtent2D actualExtent = window.GetExtend2D();
 
 		//Clamp the values between minImageExtent and maxImageExtent		
 		actualExtent.width = std::clamp(actualExtent.width, capabilities.minImageExtent.width, capabilities.maxImageExtent.width);

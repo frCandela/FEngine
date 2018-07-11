@@ -4,10 +4,10 @@
 #include <stdexcept>
 #include <set>
 
-Device::Device(VkInstance& instance, GLFWwindow * window) :
+Device::Device(VkInstance& instance, Window & window) :
 	m_instance(instance)
 {
-	createSurface(window);
+	window.CreateWindowSurface( instance, &surface);
 	pickPhysicalDevice();
 	createLogicalDevice();
 }
@@ -35,12 +35,7 @@ void Device::pickPhysicalDevice()
 	if (physicalDevice == VK_NULL_HANDLE)
 		throw std::runtime_error("failed to find a suitable GPU!");
 }
-// Create a VkSurface to render images to
-void Device::createSurface(GLFWwindow * window)
-{
-	if (glfwCreateWindowSurface(m_instance, window, nullptr, &surface) != VK_SUCCESS)
-		throw std::runtime_error("failed to create window surface!");
-}
+
 // The logical deviceis the interface with the physical device
 void Device::createLogicalDevice()
 {

@@ -1,9 +1,5 @@
 #pragma once
 
-#ifndef GLFW_INCLUDE_VULKAN
-#define GLFW_INCLUDE_VULKAN
-#include <GLFW/glfw3.h>
-#endif // !GLFW_INCLUDE_VULKAN
 
 #ifndef GLM_FORCE_RADIANS
 	#define GLM_FORCE_RADIANS
@@ -14,6 +10,7 @@
 
 #include <vector>
 
+#include "Window.h"
 #include "Commands.h"
 class Commands;
 
@@ -44,7 +41,7 @@ const std::vector<const char*> validationLayers = { "VK_LAYER_LUNARG_standard_va
 class Device
 {
 public:
-	Device(VkInstance& instance, GLFWwindow * window);
+	Device(VkInstance& instance, Window& window);
 
 	~Device()
 	{
@@ -66,7 +63,6 @@ public:
 	bool isDeviceSuitable(VkPhysicalDevice device);
 	QueueFamilyIndices findQueueFamilies(VkPhysicalDevice device);
 	uint32_t findMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags properties);
-	void createSurface(GLFWwindow * window);
 	SwapChainSupportDetails QuerySwapChainSupport(VkPhysicalDevice device, VkSurfaceKHR& surface);
 
 };

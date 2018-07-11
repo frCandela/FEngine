@@ -14,8 +14,6 @@ class Image;
 #include "DepthImage.h"
 #include "Device.h"
 
-
-
 class SwapChain
 {
 public:
@@ -29,7 +27,7 @@ public:
 	void CleanupSwapChain();
 
 	/// Create the swapChain, the image view and the depth buffer
-	void BuildSwapChain(GLFWwindow * window);
+	void BuildSwapChain(Window& window);
 
 	/// Creates a frameBuffer for each swapChain image view
 	void CreateFramebuffers(VkRenderPass& renderPass);
@@ -47,7 +45,7 @@ private:
 	std::vector<VkImageView> swapChainImageViews;
 
 	/// Creates the best swap chain possible depending on the device capabilities.
-	void CreateSwapChain(GLFWwindow* window);
+	void CreateSwapChain(Window& window);
 
 	/// Creates the images views of the swap chain. An image view describes how to access the image and which part of the image to access (2D texture, depth texture, mipmapping levels etc.)
 	void CreateImageViews();
@@ -59,7 +57,7 @@ private:
 	VkPresentModeKHR ChooseSwapPresentMode(const std::vector<VkPresentModeKHR> availablePresentModes);
 
 	/// Returns the best available swap extent of a surface (resolution of the swap chain images)
-	VkExtent2D ChooseSwapExtent(const VkSurfaceCapabilitiesKHR& capabilities, GLFWwindow* window);
+	VkExtent2D ChooseSwapExtent(const VkSurfaceCapabilitiesKHR& capabilities, Window& window);
 };
 
 

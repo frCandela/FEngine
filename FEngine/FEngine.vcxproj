@@ -96,6 +96,7 @@
     <ClCompile Include="src\DepthImage.cpp" />
     <ClCompile Include="src\Descriptors.cpp" />
     <ClCompile Include="src\FEngine.cpp" />
+    <ClCompile Include="src\Renderer.cpp" />
     <ClCompile Include="src\Image.cpp" />
     <ClCompile Include="src\Instance.cpp" />
     <ClCompile Include="src\main.cpp" />
@@ -105,6 +106,7 @@
     <ClCompile Include="src\Shader.cpp" />
     <ClCompile Include="src\SwapChain.cpp" />
     <ClCompile Include="src\Texture.cpp" />
+    <ClCompile Include="src\Window.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\Buffer.h" />
@@ -112,6 +114,7 @@
     <ClInclude Include="include\DepthImage.h" />
     <ClInclude Include="include\Descriptors.h" />
     <ClInclude Include="include\FEngine.h" />
+    <ClInclude Include="include\Renderer.h" />
     <ClInclude Include="include\Image.h" />
     <ClInclude Include="include\Device.h" />
     <ClInclude Include="include\Instance.h" />
@@ -121,6 +124,7 @@
     <ClInclude Include="include\SwapChain.h" />
     <ClInclude Include="include\Texture.h" />
     <ClInclude Include="include\Vertex.h" />
+    <ClInclude Include="include\Window.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="shaders\shader.frag" />
