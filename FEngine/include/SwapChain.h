@@ -8,50 +8,58 @@
 #include <vector>
 
 class Device;
+class DepthImage;
 class Image;
 
-#include "Image.h"
+#include "DepthImage.h"
 #include "Device.h"
 
-//Contains the properties of a swap chain for device compatibility
-struct SwapChainSupportDetails
-{
-	VkSurfaceCapabilitiesKHR capabilities;
-	std::vector<VkSurfaceFormatKHR> formats;
-	std::vector<VkPresentModeKHR> presentModes;
-};
+
 
 class SwapChain
 {
 public:
-	SwapChain(Device& device, GLFWwindow * window);
+	SwapChain(Device& device);
 	~SwapChain();
 
-	Device& m_device;	
-	Image* depthImage;//Depth
 
-	std::vector<VkImage> swapChainImages;
-	std::vector<VkImageView> swapChainImageViews;
+	DepthImage* depthImage;//Depth
+
+	/// Cleans up the old versions of the swap chain objects 
+	void CleanupSwapChain();
+
+	/// Create the swapChain, the image view and the depth buffer
+	void BuildSwapChain(GLFWwindow * window);
+
+	/// Creates a frameBuffer for each swapChain image view
+	void CreateFramebuffers(VkRenderPass& renderPass);
+
+
+	//Zob
 	std::vector<VkFramebuffer> swapChainFramebuffers;
-	VkFormat swapChainImageFormat;
 	VkExtent2D swapChainExtent;
 	VkSwapchainKHR swapChain;
+	VkFormat swapChainImageFormat;
 
-	void createSwapChain(GLFWwindow* window);
+private:
+	Device & m_device;
+	std::vector<VkImage> swapChainImages;
+	std::vector<VkImageView> swapChainImageViews;
 
+	/// Creates the best swap chain possible depending on the device capabilities.
+	void CreateSwapChain(GLFWwindow* window);
 
-	//swap chain capabilities selection
-	VkSurfaceFormatKHR chooseSwapSurfaceFormat(const std::vector<VkSurfaceFormatKHR>& availableFormats);
-	VkPresentModeKHR chooseSwapPresentMode(const std::vector<VkPresentModeKHR> availablePresentModes);
-	VkExtent2D chooseSwapExtent(const VkSurfaceCapabilitiesKHR& capabilities, GLFWwindow* window);
-	void createDepthResources();
-	static SwapChainSupportDetails querySwapChainSupport(VkPhysicalDevice device, VkSurfaceKHR& surface);
-	void createFramebuffers(VkRenderPass& renderPass);
-	void cleanupSwapChain();
-	VkFormat findDepthFormat();
-	void createImageViews();
-	VkFormat findSupportedFormat(const std::vector<VkFormat>& candidates, VkImageTiling tiling, VkFormatFeatureFlags features);
-	
+	/// Creates the images views of the swap chain. An image view describes how to access the image and which part of the image to access (2D texture, depth texture, mipmapping levels etc.)
+	void CreateImageViews();
+
+	/// Choose the best SurfaceFormat in a list of available formats (color space)
+	VkSurfaceFormatKHR ChooseSwapSurfaceFormat(const std::vector<VkSurfaceFormatKHR>& availableFormats);
+
+	/// Choose the best presentation mode in a list of available presentation mode
+	VkPresentModeKHR ChooseSwapPresentMode(const std::vector<VkPresentModeKHR> availablePresentModes);
+
+	/// Returns the best available swap extent of a surface (resolution of the swap chain images)
+	VkExtent2D ChooseSwapExtent(const VkSurfaceCapabilitiesKHR& capabilities, GLFWwindow* window);
 };
 
 

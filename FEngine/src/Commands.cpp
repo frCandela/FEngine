@@ -35,14 +35,15 @@ void Commands::createCommandPool()
 
 // Creates one command buffer per framebuffer . (Commands are recorded in command buffers before being performed)
 void Commands::createCommandBuffers(
-	SwapChain& swapChain,
+	std::vector<VkFramebuffer>& frameBuffers,
+	VkExtent2D& swapChainExtent,
 	VkRenderPass& renderPass, 
 	VkPipeline& pipeline, 
 	VkPipelineLayout& pipelineLayout, 
 	Buffer& buffer, 
 	VkDescriptorSet& descriptor)
 {
-	commandBuffers.resize(swapChain.swapChainFramebuffers.size());
+	commandBuffers.resize(frameBuffers.size());
 
 	// VkCommandBufferAllocateInfo specifies the command pool and number of buffers to allocate
 	VkCommandBufferAllocateInfo allocInfo = {};
@@ -69,9 +70,9 @@ void Commands::createCommandBuffers(
 		VkRenderPassBeginInfo renderPassInfo = {};
 		renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
 		renderPassInfo.renderPass = renderPass;
-		renderPassInfo.framebuffer = swapChain.swapChainFramebuffers[i];
+		renderPassInfo.framebuffer = frameBuffers[i];
 		renderPassInfo.renderArea.offset = { 0, 0 };
-		renderPassInfo.renderArea.extent = swapChain.swapChainExtent;
+		renderPassInfo.renderArea.extent = swapChainExtent;
 
 		//Set clear collors for color and depth attachments
 		std::array<VkClearValue, 2> clearValues = {};

@@ -1,10 +1,8 @@
 #pragma once
 
-#include "Image.h"
 #include "Sampler.h"
 #include "Buffer.h"
-
-class Image;
+#include "Texture.h"
 
 class Descriptors
 {
@@ -30,7 +28,7 @@ public:
 
 
 	void createDescriptorPool();
-	void createDescriptorSet(Image& textureImage, Sampler& textureSampler);
+	void createDescriptorSet(Texture& textureImage, Sampler& textureSampler);
 	void createDescriptorSetLayout();
 	void updateUniformBuffer( float aspectRatio);
 

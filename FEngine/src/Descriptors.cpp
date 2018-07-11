@@ -41,7 +41,7 @@ void Descriptors::createDescriptorPool()
 		throw std::runtime_error("failed to create descriptor pool!");
 }
 // Create a desctiptor set from a descriptor pool
-void Descriptors::createDescriptorSet(Image& textureImage, Sampler& textureSampler)
+void Descriptors::createDescriptorSet(Texture& textureImage, Sampler& textureSampler)
 {
 	// Allocate the descriptor set
 	VkDescriptorSetLayout layouts[] = { descriptorSetLayout };

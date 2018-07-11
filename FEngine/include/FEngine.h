@@ -12,6 +12,7 @@
 #include <vector>
 #include <set>
 
+
 #include "Vertex.h"
 #include "SwapChain.h"
 #include "Sampler.h"
@@ -19,9 +20,11 @@
 #include "Buffer.h"
 #include "Shader.h"
 #include "RenderPass.h"
+#include "Texture.h"
+#include "DepthImage.h"	
 #include "Descriptors.h"
 #include "Commands.h"
-#include "Texture.h"
+
 
 
 

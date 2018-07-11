@@ -1,10 +1,8 @@
 #pragma once
 
 class Device;
-class SwapChain;
 class Buffer;
 
-#include "SwapChain.h"
 #include "Buffer.h"
 
 class Commands
@@ -22,7 +20,8 @@ public:
 	void endSingleTimeCommands(VkCommandBuffer commandBuffer);
 	void createCommandPool();
 	void createCommandBuffers(
-		SwapChain& swapChain,
+		std::vector<VkFramebuffer>& frameBuffers,
+		VkExtent2D& swapChainExtent,
 		VkRenderPass& renderPass,
 		VkPipeline& pipeline,
 		VkPipelineLayout& pipelineLayout,

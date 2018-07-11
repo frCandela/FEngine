@@ -13,11 +13,14 @@ FEngine::FEngine()
 	device = new Device(instance->instance, window);
 	commands = new Commands(*device);
 	device->commands = commands;	//zob
-	swapChain = new SwapChain(*device, window);
+
+	swapChain = new SwapChain(*device);
+	swapChain->BuildSwapChain(window);
+
 	vertShader = new Shader(*device, "shaders/vert.spv");
 	fragShader = new Shader(*device, "shaders/frag.spv");
 	renderPass = new RenderPass(*device, *swapChain);
-	swapChain->createFramebuffers(renderPass->renderPass);
+	swapChain->CreateFramebuffers(renderPass->renderPass);
 
 	texture = new Texture(*device);
 	texture->LoadTexture("textures/cube.jpg");
@@ -27,10 +30,10 @@ FEngine::FEngine()
 	createGraphicsPipeline();
 
 	buffer = new Buffer(*device);
-	buffer->LoadModel("models/cube.obj");
+	buffer->LoadModel("models/cube.OBJ");
 
 	descriptors->createDescriptorSet(*texture, *textureSampler);
-	commands->createCommandBuffers(*swapChain, renderPass->renderPass, graphicsPipeline, pipelineLayout, *buffer, descriptors->descriptorSet);
+	commands->createCommandBuffers(swapChain->swapChainFramebuffers, swapChain->swapChainExtent, renderPass->renderPass, graphicsPipeline, pipelineLayout, *buffer, descriptors->descriptorSet);
 	createSyncObjects();
 }
 
@@ -121,19 +124,21 @@ void FEngine::recreateSwapChain()
 	vkDeviceWaitIdle(device->device);
 
 	//Cleanup
-	swapChain->cleanupSwapChain();
+	
 	commands->cleanup();
 	vkDestroyPipeline(device->device, graphicsPipeline, nullptr);
 	vkDestroyPipelineLayout(device->device, pipelineLayout, nullptr);
 	delete(renderPass);
 
-	swapChain->createSwapChain(window);
-	swapChain->createImageViews();
+	swapChain->CleanupSwapChain();
+	swapChain->BuildSwapChain(window);
+
 	renderPass = new RenderPass(*device, *swapChain);
+	
 	createGraphicsPipeline();
-	swapChain->createDepthResources();
-	swapChain->createFramebuffers(renderPass->renderPass);
-	commands->createCommandBuffers(*swapChain, renderPass->renderPass, graphicsPipeline, pipelineLayout, *buffer, descriptors->descriptorSet);
+	
+	swapChain->CreateFramebuffers(renderPass->renderPass);
+	commands->createCommandBuffers(swapChain->swapChainFramebuffers, swapChain->swapChainExtent, renderPass->renderPass, graphicsPipeline, pipelineLayout, *buffer, descriptors->descriptorSet);
 }
 
 // Creates the graphics pipeline

@@ -3,29 +3,32 @@
 #include <algorithm>
 #include <array>
 
-SwapChain::SwapChain(Device& device, GLFWwindow * window) :
+SwapChain::SwapChain(Device& device) :
 	m_device(device)
 {
-	depthImage = new Image(device);
-	createSwapChain(window);
-	createImageViews();
-	createDepthResources();
+	depthImage = new DepthImage(device);
 }
 
 SwapChain::~SwapChain()
 {
-	cleanupSwapChain();
+	CleanupSwapChain();
 }
 
 
-// Creates the best swap chain possible depending on the device capabilities.
-void SwapChain::createSwapChain(GLFWwindow* window)
+void SwapChain::BuildSwapChain( GLFWwindow * window)
 {
-	SwapChainSupportDetails swapChainSupport = querySwapChainSupport(m_device.physicalDevice, m_device.surface);
+	CreateSwapChain(window);
+	CreateImageViews();
+	depthImage->createDepthResources(swapChainExtent.width, swapChainExtent.height);
+}
 
-	VkSurfaceFormatKHR surfaceFormat = chooseSwapSurfaceFormat(swapChainSupport.formats);
-	VkPresentModeKHR presentMode = chooseSwapPresentMode(swapChainSupport.presentModes);
-	VkExtent2D extent = chooseSwapExtent(swapChainSupport.capabilities, window);
+void SwapChain::CreateSwapChain(GLFWwindow* window)
+{
+	SwapChainSupportDetails swapChainSupport = m_device.swapChainSupportDetails; //querySwapChainSupport(m_device.physicalDevice, m_device.surface);
+
+	VkSurfaceFormatKHR surfaceFormat = ChooseSwapSurfaceFormat(swapChainSupport.formats);
+	VkPresentModeKHR presentMode = ChooseSwapPresentMode(swapChainSupport.presentModes);
+	VkExtent2D extent = ChooseSwapExtent(swapChainSupport.capabilities, window);
 
 	uint32_t imageCount = swapChainSupport.capabilities.minImageCount + 1; //one more frame to implement triple buffering
 	if (swapChainSupport.capabilities.maxImageCount > 0 && imageCount > swapChainSupport.capabilities.maxImageCount)
@@ -75,8 +78,8 @@ void SwapChain::createSwapChain(GLFWwindow* window)
 	swapChainImageFormat = surfaceFormat.format;
 	swapChainExtent = extent;
 }
-// Choose the best SurfaceFormat in a list of available formats (color space)
-VkSurfaceFormatKHR SwapChain::chooseSwapSurfaceFormat(const std::vector<VkSurfaceFormatKHR>& availableFormats)
+
+VkSurfaceFormatKHR SwapChain::ChooseSwapSurfaceFormat(const std::vector<VkSurfaceFormatKHR>& availableFormats)
 {
 	//surface has no preferred format
 	if (availableFormats.size() == 1 && availableFormats[0].format == VK_FORMAT_UNDEFINED)
@@ -91,8 +94,7 @@ VkSurfaceFormatKHR SwapChain::chooseSwapSurfaceFormat(const std::vector<VkSurfac
 	return availableFormats[0];
 }
 
-// Choose the best presentation mode in a list of available presentation mode
-VkPresentModeKHR SwapChain::chooseSwapPresentMode(const std::vector<VkPresentModeKHR> availablePresentModes)
+VkPresentModeKHR SwapChain::ChooseSwapPresentMode(const std::vector<VkPresentModeKHR> availablePresentModes)
 {
 	VkPresentModeKHR bestMode = VK_PRESENT_MODE_FIFO_KHR;//Default always available
 
@@ -106,8 +108,8 @@ VkPresentModeKHR SwapChain::chooseSwapPresentMode(const std::vector<VkPresentMod
 
 	return bestMode;
 }
-// Returns the best available swap extent of a surface (resolution of the swap chain images)
-VkExtent2D SwapChain::chooseSwapExtent(const VkSurfaceCapabilitiesKHR& capabilities, GLFWwindow* window)
+
+VkExtent2D SwapChain::ChooseSwapExtent(const VkSurfaceCapabilitiesKHR& capabilities, GLFWwindow* window)
 {
 	if (capabilities.currentExtent.width != std::numeric_limits<uint32_t>::max())
 		return capabilities.currentExtent;
@@ -128,36 +130,8 @@ VkExtent2D SwapChain::chooseSwapExtent(const VkSurfaceCapabilitiesKHR& capabilit
 		return actualExtent;
 	}
 }
-// Returns the swap chain details of a physical device (surface formats and presentation modes)
-SwapChainSupportDetails SwapChain::querySwapChainSupport(VkPhysicalDevice device, VkSurfaceKHR& surface)
-{
-	SwapChainSupportDetails details;
-	vkGetPhysicalDeviceSurfaceCapabilitiesKHR(device, surface, &details.capabilities);
 
-	//query the supported surface formats
-	uint32_t formatCount;
-	vkGetPhysicalDeviceSurfaceFormatsKHR(device, surface, &formatCount, nullptr);
-
-	if (formatCount != 0)
-	{
-		details.formats.resize(formatCount);
-		vkGetPhysicalDeviceSurfaceFormatsKHR(device, surface, &formatCount, details.formats.data());
-	}
-
-	//query the supported presentation modes
-	uint32_t presentModeCount;
-	vkGetPhysicalDeviceSurfacePresentModesKHR(device, surface, &presentModeCount, nullptr);
-
-	if (presentModeCount != 0)
-	{
-		details.presentModes.resize(presentModeCount);
-		vkGetPhysicalDeviceSurfacePresentModesKHR(device, surface, &presentModeCount, details.presentModes.data());
-	}
-
-	return details;
-}
-// Creates a frameBuffer for each swapChain image view
-void SwapChain::createFramebuffers(VkRenderPass& renderPass)
+void SwapChain::CreateFramebuffers(VkRenderPass& renderPass)
 {
 	//A framebuffer object references all of the VkImageView objects that represent the attachments specified during the render pass creation
 	swapChainFramebuffers.resize(swapChainImageViews.size());
@@ -183,27 +157,16 @@ void SwapChain::createFramebuffers(VkRenderPass& renderPass)
 			throw std::runtime_error("failed to create framebuffer!");
 	}
 }
-// Create a depth image, memory and view
-void SwapChain::createDepthResources()
-{
-	VkFormat depthFormat = findDepthFormat();
 
-	depthImage->createImage(swapChainExtent.width, swapChainExtent.height, 1, depthFormat, VK_IMAGE_TILING_OPTIMAL, VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, depthImage->image, depthImage->deviceMemory);
-	depthImage->imageView = Image::createImageView(depthImage->image, depthFormat, VK_IMAGE_ASPECT_DEPTH_BIT, 1, m_device.device);
-
-	// Setup a pipeline barrier for the transition
-	depthImage->transitionImageLayout(depthFormat, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL, 1);
-}
-// Creates the images views of the swap chain. An image view describes how to access the image and which part of the image to access (2D texture, depth texture, mipmapping levels etc.)
-void SwapChain::createImageViews()
+void SwapChain::CreateImageViews()
 {
 	swapChainImageViews.resize(swapChainImages.size());
 
 	for (uint32_t i = 0; i < swapChainImages.size(); i++)
 		swapChainImageViews[i] = Image::createImageView(swapChainImages[i], swapChainImageFormat, VK_IMAGE_ASPECT_COLOR_BIT, 1, m_device.device);
 }
-// Cleans up the old versions of the swap chain objects 
-void SwapChain::cleanupSwapChain()
+
+void SwapChain::CleanupSwapChain()
 {
 	vkDestroyImageView(m_device.device, depthImage->imageView, nullptr);
 	vkDestroyImage(m_device.device, depthImage->image, nullptr);
@@ -217,31 +180,5 @@ void SwapChain::cleanupSwapChain()
 
 	vkDestroySwapchainKHR(m_device.device, swapChain, nullptr);
 }
-//Select a format with a depth component that supports usage as depth attachment
-VkFormat SwapChain::findDepthFormat()
-{
-	return findSupportedFormat(
-		{ VK_FORMAT_D32_SFLOAT, VK_FORMAT_D32_SFLOAT_S8_UINT, VK_FORMAT_D24_UNORM_S8_UINT },
-		VK_IMAGE_TILING_OPTIMAL,
-		VK_FORMAT_FEATURE_DEPTH_STENCIL_ATTACHMENT_BIT
-	);
-}
 
-// Select a format for the depth buffer 
-VkFormat SwapChain::findSupportedFormat(const std::vector<VkFormat>& candidates, VkImageTiling tiling, VkFormatFeatureFlags features)
-{
-	for (VkFormat format : candidates)
-	{
-		// Query support of a format
-		VkFormatProperties props;
-		vkGetPhysicalDeviceFormatProperties(m_device.physicalDevice, format, &props);
 
-		if (tiling == VK_IMAGE_TILING_LINEAR && (props.linearTilingFeatures & features) == features)
-			return format;
-
-		else if (tiling == VK_IMAGE_TILING_OPTIMAL && (props.optimalTilingFeatures & features) == features)
-			return format;
-	}
-
-	throw std::runtime_error("failed to find supported format!");
-}

@@ -30,6 +30,14 @@ struct QueueFamilyIndices
 	}
 };
 
+//Contains the properties of a swap chain for device compatibility
+struct SwapChainSupportDetails
+{
+	VkSurfaceCapabilitiesKHR capabilities;
+	std::vector<VkSurfaceFormatKHR> formats;
+	std::vector<VkPresentModeKHR> presentModes;
+};
+
 const std::vector<const char*> deviceExtensions = { VK_KHR_SWAPCHAIN_EXTENSION_NAME };
 const std::vector<const char*> validationLayers = { "VK_LAYER_LUNARG_standard_validation" };
 
@@ -44,7 +52,7 @@ public:
 	}
 
 	Commands * commands;
-
+	SwapChainSupportDetails swapChainSupportDetails;
 	VkInstance& m_instance;
 	VkDevice device;
 	VkPhysicalDevice physicalDevice = VK_NULL_HANDLE;
@@ -59,5 +67,6 @@ public:
 	QueueFamilyIndices findQueueFamilies(VkPhysicalDevice device);
 	uint32_t findMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags properties);
 	void createSurface(GLFWwindow * window);
+	SwapChainSupportDetails QuerySwapChainSupport(VkPhysicalDevice device, VkSurfaceKHR& surface);
 
 };
