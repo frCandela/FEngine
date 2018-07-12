@@ -25,11 +25,11 @@ Renderer::Renderer(Window& window) :
 	createGraphicsPipeline();
 
 	vk::Buffer * cube = new vk::Buffer(*device);
-	cube->LoadModel("models/cube.OBJ");
+	cube->LoadModel("mesh/cube.obj");
 	buffers.push_back(cube);
 
 	vk::Buffer * sphere = new vk::Buffer(*device);
-	sphere->LoadModel("models/sphere.OBJ");
+	sphere->LoadModel("mesh/sphere.obj");
 	buffers.push_back(sphere);
 
 

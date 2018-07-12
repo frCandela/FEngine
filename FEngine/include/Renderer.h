@@ -9,17 +9,17 @@
 
 
 #include "Window.h"
-#include "Vertex.h"
-#include "SwapChain.h"
-#include "Sampler.h"
-#include "Instance.h"
-#include "Buffer.h"
-#include "Shader.h"
-#include "RenderPass.h"
-#include "Texture.h"
-#include "DepthImage.h"	
-#include "Descriptors.h"
-#include "Commands.h"
+#include "vulkan/Vertex.h"
+#include "vulkan/SwapChain.h"
+#include "vulkan/Sampler.h"
+#include "vulkan/Instance.h"
+#include "vulkan/Buffer.h"
+#include "vulkan/Shader.h"
+#include "vulkan/RenderPass.h"
+#include "vulkan/Texture.h"
+#include "vulkan/DepthImage.h"	
+#include "vulkan/Descriptors.h"
+#include "vulkan/Commands.h"
 
 
 class Renderer

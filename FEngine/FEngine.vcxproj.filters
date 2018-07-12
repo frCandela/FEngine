@@ -20,44 +20,8 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="src\Buffer.cpp">
-      <Filter>Fichiers sources\Vulkan</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Descriptors.cpp">
-      <Filter>Fichiers sources\Vulkan</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Device.cpp">
-      <Filter>Fichiers sources\Vulkan</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Image.cpp">
-      <Filter>Fichiers sources\Vulkan</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Instance.cpp">
-      <Filter>Fichiers sources\Vulkan</Filter>
-    </ClCompile>
-    <ClCompile Include="src\RenderPass.cpp">
-      <Filter>Fichiers sources\Vulkan</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Sampler.cpp">
-      <Filter>Fichiers sources\Vulkan</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Shader.cpp">
-      <Filter>Fichiers sources\Vulkan</Filter>
-    </ClCompile>
-    <ClCompile Include="src\SwapChain.cpp">
-      <Filter>Fichiers sources\Vulkan</Filter>
-    </ClCompile>
     <ClCompile Include="src\main.cpp">
       <Filter>Fichiers sources</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Commands.cpp">
-      <Filter>Fichiers sources\Vulkan</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Texture.cpp">
-      <Filter>Fichiers sources\Vulkan</Filter>
-    </ClCompile>
-    <ClCompile Include="src\DepthImage.cpp">
-      <Filter>Fichiers sources\Vulkan</Filter>
     </ClCompile>
     <ClCompile Include="src\Renderer.cpp">
       <Filter>Fichiers sources</Filter>
@@ -68,47 +32,44 @@
     <ClCompile Include="src\Window.cpp">
       <Filter>Fichiers sources</Filter>
     </ClCompile>
+    <ClCompile Include="src\vulkan\Buffer.cpp">
+      <Filter>Fichiers sources\Vulkan</Filter>
+    </ClCompile>
+    <ClCompile Include="src\vulkan\Commands.cpp">
+      <Filter>Fichiers sources\Vulkan</Filter>
+    </ClCompile>
+    <ClCompile Include="src\vulkan\DepthImage.cpp">
+      <Filter>Fichiers sources\Vulkan</Filter>
+    </ClCompile>
+    <ClCompile Include="src\vulkan\Descriptors.cpp">
+      <Filter>Fichiers sources\Vulkan</Filter>
+    </ClCompile>
+    <ClCompile Include="src\vulkan\Device.cpp">
+      <Filter>Fichiers sources\Vulkan</Filter>
+    </ClCompile>
+    <ClCompile Include="src\vulkan\Image.cpp">
+      <Filter>Fichiers sources\Vulkan</Filter>
+    </ClCompile>
+    <ClCompile Include="src\vulkan\RenderPass.cpp">
+      <Filter>Fichiers sources\Vulkan</Filter>
+    </ClCompile>
+    <ClCompile Include="src\vulkan\Sampler.cpp">
+      <Filter>Fichiers sources\Vulkan</Filter>
+    </ClCompile>
+    <ClCompile Include="src\vulkan\Shader.cpp">
+      <Filter>Fichiers sources\Vulkan</Filter>
+    </ClCompile>
+    <ClCompile Include="src\vulkan\SwapChain.cpp">
+      <Filter>Fichiers sources\Vulkan</Filter>
+    </ClCompile>
+    <ClCompile Include="src\vulkan\Texture.cpp">
+      <Filter>Fichiers sources\Vulkan</Filter>
+    </ClCompile>
+    <ClCompile Include="src\vulkan\Instance.cpp">
+      <Filter>Fichiers sources\Vulkan</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="include\Buffer.h">
-      <Filter>Fichiers d%27en-tête\Vulkan</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Commands.h">
-      <Filter>Fichiers d%27en-tête\Vulkan</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Descriptors.h">
-      <Filter>Fichiers d%27en-tête\Vulkan</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Device.h">
-      <Filter>Fichiers d%27en-tête\Vulkan</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Image.h">
-      <Filter>Fichiers d%27en-tête\Vulkan</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Instance.h">
-      <Filter>Fichiers d%27en-tête\Vulkan</Filter>
-    </ClInclude>
-    <ClInclude Include="include\RenderPass.h">
-      <Filter>Fichiers d%27en-tête\Vulkan</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Sampler.h">
-      <Filter>Fichiers d%27en-tête\Vulkan</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Shader.h">
-      <Filter>Fichiers d%27en-tête\Vulkan</Filter>
-    </ClInclude>
-    <ClInclude Include="include\SwapChain.h">
-      <Filter>Fichiers d%27en-tête\Vulkan</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Vertex.h">
-      <Filter>Fichiers d%27en-tête\Vulkan</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Texture.h">
-      <Filter>Fichiers d%27en-tête\Vulkan</Filter>
-    </ClInclude>
-    <ClInclude Include="include\DepthImage.h">
-      <Filter>Fichiers d%27en-tête\Vulkan</Filter>
-    </ClInclude>
     <ClInclude Include="include\Renderer.h">
       <Filter>Fichiers d%27en-tête</Filter>
     </ClInclude>
@@ -117,6 +78,45 @@
     </ClInclude>
     <ClInclude Include="include\FEngine.h">
       <Filter>Fichiers d%27en-tête</Filter>
+    </ClInclude>
+    <ClInclude Include="include\vulkan\Buffer.h">
+      <Filter>Fichiers d%27en-tête\Vulkan</Filter>
+    </ClInclude>
+    <ClInclude Include="include\vulkan\Commands.h">
+      <Filter>Fichiers d%27en-tête\Vulkan</Filter>
+    </ClInclude>
+    <ClInclude Include="include\vulkan\DepthImage.h">
+      <Filter>Fichiers d%27en-tête\Vulkan</Filter>
+    </ClInclude>
+    <ClInclude Include="include\vulkan\Descriptors.h">
+      <Filter>Fichiers d%27en-tête\Vulkan</Filter>
+    </ClInclude>
+    <ClInclude Include="include\vulkan\Device.h">
+      <Filter>Fichiers d%27en-tête\Vulkan</Filter>
+    </ClInclude>
+    <ClInclude Include="include\vulkan\Image.h">
+      <Filter>Fichiers d%27en-tête\Vulkan</Filter>
+    </ClInclude>
+    <ClInclude Include="include\vulkan\RenderPass.h">
+      <Filter>Fichiers d%27en-tête\Vulkan</Filter>
+    </ClInclude>
+    <ClInclude Include="include\vulkan\Sampler.h">
+      <Filter>Fichiers d%27en-tête\Vulkan</Filter>
+    </ClInclude>
+    <ClInclude Include="include\vulkan\Shader.h">
+      <Filter>Fichiers d%27en-tête\Vulkan</Filter>
+    </ClInclude>
+    <ClInclude Include="include\vulkan\SwapChain.h">
+      <Filter>Fichiers d%27en-tête\Vulkan</Filter>
+    </ClInclude>
+    <ClInclude Include="include\vulkan\Texture.h">
+      <Filter>Fichiers d%27en-tête\Vulkan</Filter>
+    </ClInclude>
+    <ClInclude Include="include\vulkan\Vertex.h">
+      <Filter>Fichiers d%27en-tête\Vulkan</Filter>
+    </ClInclude>
+    <ClInclude Include="include\vulkan\Instance.h">
+      <Filter>Fichiers d%27en-tête\Vulkan</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

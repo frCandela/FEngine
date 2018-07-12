@@ -58,7 +58,7 @@
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>deps;include;C:\VulkanSDK\1.1.77.0\Include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>deps\glfw\include;deps;include;C:\VulkanSDK\1.1.77.0\Include</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <PreprocessorDefinitions>VALIDATION_LAYERS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
@@ -77,7 +77,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>deps;include;C:\VulkanSDK\1.1.77.0\Include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>deps\glfw\include;deps;include;C:\VulkanSDK\1.1.77.0\Include</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>_MBCS;%(PreprocessorDefinitions);NDEBUG</PreprocessorDefinitions>
       <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
@@ -91,39 +91,39 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="src\Buffer.cpp" />
-    <ClCompile Include="src\Commands.cpp" />
-    <ClCompile Include="src\DepthImage.cpp" />
-    <ClCompile Include="src\Descriptors.cpp" />
     <ClCompile Include="src\FEngine.cpp" />
     <ClCompile Include="src\Renderer.cpp" />
-    <ClCompile Include="src\Image.cpp" />
-    <ClCompile Include="src\Instance.cpp" />
     <ClCompile Include="src\main.cpp" />
-    <ClCompile Include="src\Device.cpp" />
-    <ClCompile Include="src\RenderPass.cpp" />
-    <ClCompile Include="src\Sampler.cpp" />
-    <ClCompile Include="src\Shader.cpp" />
-    <ClCompile Include="src\SwapChain.cpp" />
-    <ClCompile Include="src\Texture.cpp" />
+    <ClCompile Include="src\vulkan\Buffer.cpp" />
+    <ClCompile Include="src\vulkan\Commands.cpp" />
+    <ClCompile Include="src\vulkan\DepthImage.cpp" />
+    <ClCompile Include="src\vulkan\Descriptors.cpp" />
+    <ClCompile Include="src\vulkan\Device.cpp" />
+    <ClCompile Include="src\vulkan\Image.cpp" />
+    <ClCompile Include="src\vulkan\Instance.cpp" />
+    <ClCompile Include="src\vulkan\RenderPass.cpp" />
+    <ClCompile Include="src\vulkan\Sampler.cpp" />
+    <ClCompile Include="src\vulkan\Shader.cpp" />
+    <ClCompile Include="src\vulkan\SwapChain.cpp" />
+    <ClCompile Include="src\vulkan\Texture.cpp" />
     <ClCompile Include="src\Window.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="include\Buffer.h" />
-    <ClInclude Include="include\Commands.h" />
-    <ClInclude Include="include\DepthImage.h" />
-    <ClInclude Include="include\Descriptors.h" />
     <ClInclude Include="include\FEngine.h" />
     <ClInclude Include="include\Renderer.h" />
-    <ClInclude Include="include\Image.h" />
-    <ClInclude Include="include\Device.h" />
-    <ClInclude Include="include\Instance.h" />
-    <ClInclude Include="include\RenderPass.h" />
-    <ClInclude Include="include\Sampler.h" />
-    <ClInclude Include="include\Shader.h" />
-    <ClInclude Include="include\SwapChain.h" />
-    <ClInclude Include="include\Texture.h" />
-    <ClInclude Include="include\Vertex.h" />
+    <ClInclude Include="include\vulkan\Buffer.h" />
+    <ClInclude Include="include\vulkan\Commands.h" />
+    <ClInclude Include="include\vulkan\DepthImage.h" />
+    <ClInclude Include="include\vulkan\Descriptors.h" />
+    <ClInclude Include="include\vulkan\Device.h" />
+    <ClInclude Include="include\vulkan\Image.h" />
+    <ClInclude Include="include\vulkan\Instance.h" />
+    <ClInclude Include="include\vulkan\RenderPass.h" />
+    <ClInclude Include="include\vulkan\Sampler.h" />
+    <ClInclude Include="include\vulkan\Shader.h" />
+    <ClInclude Include="include\vulkan\SwapChain.h" />
+    <ClInclude Include="include\vulkan\Texture.h" />
+    <ClInclude Include="include\vulkan\Vertex.h" />
     <ClInclude Include="include\Window.h" />
   </ItemGroup>
   <ItemGroup>

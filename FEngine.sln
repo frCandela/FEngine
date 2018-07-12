@@ -11,7 +11,7 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "FEngine", "FEngine\FEngine.
 		{B188CC23-201F-3099-A092-AD294CC7CABC} = {B188CC23-201F-3099-A092-AD294CC7CABC}
 	EndProjectSection
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "glfw", "FEngine\deps\glfw\src\glfw.vcxproj", "{B188CC23-201F-3099-A092-AD294CC7CABC}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "glfw", "FEngine\deps\glfw\glfw.vcxproj", "{B188CC23-201F-3099-A092-AD294CC7CABC}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
