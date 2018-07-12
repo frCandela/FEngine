@@ -32,20 +32,20 @@ public:
 
 	Window& m_window;
 
-	Texture* texture; 
-	Sampler* textureSampler;
+	vk::Texture* texture; 
+	vk::Sampler* textureSampler;
 
-	std::vector<Buffer*> buffers;
+	std::vector<vk::Buffer*> buffers;
 
-	Descriptors* descriptors;
-	Commands* commands;
-	Instance* instance;
-	Device* device;
-	SwapChain* swapChain;
-	RenderPass * renderPass;
+	vk::Descriptors* descriptors;
+	vk::Commands* commands;
+	vk::Instance* instance;
+	vk::Device* device;
+	vk::SwapChain* swapChain;
+	vk::RenderPass * renderPass;
 
-	Shader* vertShader;
-	Shader* fragShader;
+	vk::Shader* vertShader;
+	vk::Shader* fragShader;
 
 	VkPipelineLayout pipelineLayout;
 	VkPipeline graphicsPipeline;

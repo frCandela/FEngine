@@ -5,44 +5,48 @@
 
 #include "Device.h"
 
-class ShaderModule
+namespace vk
 {
-public:
-	VkShaderModule module;
-	Device& m_device;
 
-	ShaderModule(VkShaderModule&& shaderModule, Device& device) :
-		module(shaderModule),
-		m_device(device)
+	class ShaderModule
 	{
-	}
+	public:
+		VkShaderModule module;
+		Device& m_device;
 
-	~ShaderModule()
+		ShaderModule(VkShaderModule&& shaderModule, Device& device) :
+			module(shaderModule),
+			m_device(device)
+		{
+		}
+
+		~ShaderModule()
+		{
+			vkDestroyShaderModule(m_device.device, module, nullptr);
+		}
+
+	};
+
+	class Shader
 	{
-		vkDestroyShaderModule(m_device.device, module, nullptr);
-	}
+	public:
+		Shader(Device& device, std::string path) :
+			m_device(device),
+			m_path(path)
+		{}
+		~Shader() {}
 
-};
+		VkShaderModule createShaderModule();
+		static std::vector<char> readFile(const std::string& filename);
 
-class Shader
-{
-public:
-	Shader(Device& device, std::string path) : 
-		m_device(device),
-		m_path(path)
-	{}
-	~Shader() {}
+		ShaderModule GetShaderModule()
+		{
+			return ShaderModule(createShaderModule(), m_device);
+		}
 
-	VkShaderModule createShaderModule();
-	static std::vector<char> readFile(const std::string& filename);
-	
-	ShaderModule GetShaderModule()
-	{
-		return ShaderModule(createShaderModule(), m_device);
-	}
+		Device& m_device;
+		std::string m_path;
+	};
 
-	Device& m_device;
-	std::string m_path;
-};
-
+}
 

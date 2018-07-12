@@ -3,36 +3,39 @@
 #include "Device.h"
 #include "Vertex.h"
 
-class Buffer
+namespace vk
 {
-public:
-	Buffer(Device& device);
-	~Buffer();
-	Device & m_device;
+	class Buffer
+	{
+	public:
+		Buffer(Device& device);
+		~Buffer();
+		Device & m_device;
 
-	//Vertices and indices of the loaded model
-	std::vector<Vertex> vertices;
-	std::vector<uint32_t> indices;
+		//Vertices and indices of the loaded model
+		std::vector<Vertex> vertices;
+		std::vector<uint32_t> indices;
 
-	VkBuffer vertexBuffer;
-	VkDeviceMemory vertexBufferMemory;
+		VkBuffer vertexBuffer;
+		VkDeviceMemory vertexBufferMemory;
 
-	//Buffers
-	VkBuffer indexBuffer;
-	VkDeviceMemory indexBufferMemory;
+		//Buffers
+		VkBuffer indexBuffer;
+		VkDeviceMemory indexBufferMemory;
 
 
 
-	static void createBuffer(Device& device, VkDeviceSize size, VkBufferUsageFlags usage, VkMemoryPropertyFlags properties, VkBuffer& buffer, VkDeviceMemory& bufferMemory);
-	void copyBuffer( VkBuffer srcBuffer, VkBuffer dstBuffer, VkDeviceSize size);
-	
-	/// Loads a model from an OBJ file
-	void LoadModel( std::string path );
+		static void createBuffer(Device& device, VkDeviceSize size, VkBufferUsageFlags usage, VkMemoryPropertyFlags properties, VkBuffer& buffer, VkDeviceMemory& bufferMemory);
+		void copyBuffer(VkBuffer srcBuffer, VkBuffer dstBuffer, VkDeviceSize size);
 
-private:
-	/// Creates a vertex buffer from the loaded model data
-	void CreateVertexBuffer();
+		/// Loads a model from an OBJ file
+		void LoadModel(std::string path);
 
-	/// Create the index buffer from the loaded model data
-	void CreateIndexBuffer();
-};
+	private:
+		/// Creates a vertex buffer from the loaded model data
+		void CreateVertexBuffer();
+
+		/// Create the index buffer from the loaded model data
+		void CreateIndexBuffer();
+	};
+}

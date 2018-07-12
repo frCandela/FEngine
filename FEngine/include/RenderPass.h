@@ -3,16 +3,20 @@
 #include "Device.h"
 #include "SwapChain.h"
 
-class RenderPass
+namespace vk
 {
-public:
-	RenderPass(Device& device, SwapChain& swapchain);
-	~RenderPass()
+
+	class RenderPass
 	{
-		vkDestroyRenderPass(m_device.device, renderPass, nullptr);
-	}
+	public:
+		RenderPass(Device& device, SwapChain& swapchain);
+		~RenderPass()
+		{
+			vkDestroyRenderPass(m_device.device, renderPass, nullptr);
+		}
 
-	VkRenderPass renderPass;
+		VkRenderPass renderPass;
 
-	Device& m_device;
-};
+		Device& m_device;
+	};
+}

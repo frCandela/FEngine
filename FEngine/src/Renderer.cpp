@@ -4,31 +4,31 @@ Renderer::Renderer(Window& window) :
 	m_window(window)
 {
 	// Initializes the Vulkan application and required components
-	instance = new Instance();
-	device = new Device(instance->instance, m_window);
-	commands = new Commands(*device);
+	instance = new vk::Instance();
+	device = new vk::Device(instance->instance, m_window);
+	commands = new vk::Commands(*device);
 	device->commands = commands;	//zob
 
-	swapChain = new SwapChain(*device);
+	swapChain = new vk::SwapChain(*device);
 	swapChain->BuildSwapChain(m_window);
 
-	vertShader = new Shader(*device, "shaders/vert.spv");
-	fragShader = new Shader(*device, "shaders/frag.spv");
-	renderPass = new RenderPass(*device, *swapChain);
+	vertShader = new vk::Shader(*device, "shaders/vert.spv");
+	fragShader = new vk::Shader(*device, "shaders/frag.spv");
+	renderPass = new vk::RenderPass(*device, *swapChain);
 	swapChain->CreateFramebuffers(renderPass->renderPass);
 
-	texture = new Texture(*device);
+	texture = new vk::Texture(*device);
 	texture->LoadTexture("textures/cube.jpg");
 
-	textureSampler = new Sampler(*device, texture->m_mipLevels);
-	descriptors = new Descriptors(*device);
+	textureSampler = new vk::Sampler(*device, texture->m_mipLevels);
+	descriptors = new vk::Descriptors(*device);
 	createGraphicsPipeline();
 
-	Buffer * cube = new Buffer(*device);
+	vk::Buffer * cube = new vk::Buffer(*device);
 	cube->LoadModel("models/cube.OBJ");
 	buffers.push_back(cube);
 
-	Buffer * sphere = new Buffer(*device);
+	vk::Buffer * sphere = new vk::Buffer(*device);
 	sphere->LoadModel("models/sphere.OBJ");
 	buffers.push_back(sphere);
 
@@ -191,7 +191,7 @@ void Renderer::recreateSwapChain()
 	swapChain->CleanupSwapChain();
 	swapChain->BuildSwapChain(m_window);
 
-	renderPass = new RenderPass(*device, *swapChain);
+	renderPass = new vk::RenderPass(*device, *swapChain);
 	
 	createGraphicsPipeline();
 	
@@ -202,8 +202,8 @@ void Renderer::recreateSwapChain()
 // Creates the graphics pipeline
 void Renderer::createGraphicsPipeline()
 {
-	ShaderModule vertShaderModule = vertShader->GetShaderModule();
-	ShaderModule fragShaderModule = fragShader->GetShaderModule();
+	vk::ShaderModule vertShaderModule = vertShader->GetShaderModule();
+	vk::ShaderModule fragShaderModule = fragShader->GetShaderModule();
 
 	// Link vertex shader
 	VkPipelineShaderStageCreateInfo vertShaderStageInfo = {};
@@ -222,8 +222,8 @@ void Renderer::createGraphicsPipeline()
 	VkPipelineShaderStageCreateInfo shaderStages[] = { vertShaderStageInfo, fragShaderStageInfo };
 
 	// Get vertex input info
-	auto bindingDescription = Vertex::getBindingDescription();
-	auto attributeDescriptions = Vertex::getAttributeDescriptions();
+	auto bindingDescription = vk::Vertex::getBindingDescription();
+	auto attributeDescriptions = vk::Vertex::getAttributeDescriptions();
 
 	// Set vertex input info
 	VkPipelineVertexInputStateCreateInfo vertexInputInfo = {};
@@ -396,7 +396,7 @@ void Renderer::cleanup()
 		vkDestroyFence(device->device, inFlightFences[i], nullptr);
 	}	
 	
-	for( Buffer* buffer : buffers)
+	for(vk::Buffer* buffer : buffers)
 		delete(buffer);
 
 	delete(descriptors);
