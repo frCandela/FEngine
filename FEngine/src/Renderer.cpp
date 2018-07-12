@@ -24,8 +24,14 @@ Renderer::Renderer(Window& window) :
 	descriptors = new Descriptors(*device);
 	createGraphicsPipeline();
 
-	buffer = new Buffer(*device);
-	buffer->LoadModel("models/cube.OBJ");
+	Buffer * cube = new Buffer(*device);
+	cube->LoadModel("models/cube.OBJ");
+	buffers.push_back(cube);
+
+	Buffer * sphere = new Buffer(*device);
+	sphere->LoadModel("models/sphere.OBJ");
+	buffers.push_back(sphere);
+
 
 	descriptors->createDescriptorSet(*texture, *textureSampler);
 	createCommandBuffers();
@@ -77,14 +83,16 @@ void Renderer::createCommandBuffers()
 		vkCmdBeginRenderPass(commands->commandBuffers[i], &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
 		vkCmdBindPipeline(commands->commandBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, graphicsPipeline);
 
-		//Draw call
-		VkBuffer vertexBuffers[] = { buffer->vertexBuffer };
-		VkDeviceSize offsets[] = { 0 };
-		vkCmdBindVertexBuffers(commands->commandBuffers[i], 0, 1, vertexBuffers, offsets);
-		vkCmdBindIndexBuffer(commands->commandBuffers[i], buffer->indexBuffer, 0, VK_INDEX_TYPE_UINT32);
-		vkCmdBindDescriptorSets(commands->commandBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineLayout, 0, 1, &(descriptors->descriptorSet), 0, nullptr);
-		vkCmdDrawIndexed(commands->commandBuffers[i], static_cast<uint32_t>(buffer->indices.size()), 1, 0, 0, 0);
-
+		//Record Draw calls on all existing buffers
+		for (int j = 0; j < buffers.size(); ++j)
+		{
+			VkBuffer vertexBuffers[] = { buffers[j]->vertexBuffer };
+			VkDeviceSize offsets[] = { 0 };
+			vkCmdBindVertexBuffers(commands->commandBuffers[i], 0, 1, vertexBuffers, offsets);
+			vkCmdBindIndexBuffer(commands->commandBuffers[i], buffers[j]->indexBuffer, 0, VK_INDEX_TYPE_UINT32);
+			vkCmdBindDescriptorSets(commands->commandBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineLayout, 0, 1, &(descriptors->descriptorSet), 0, nullptr);
+			vkCmdDrawIndexed(commands->commandBuffers[i], static_cast<uint32_t>(buffers[j]->indices.size()), 1, 0, 0, 0);
+		}
 
 		vkCmdEndRenderPass(commands->commandBuffers[i]);
 
@@ -388,7 +396,9 @@ void Renderer::cleanup()
 		vkDestroyFence(device->device, inFlightFences[i], nullptr);
 	}	
 	
-	delete(buffer);
+	for( Buffer* buffer : buffers)
+		delete(buffer);
+
 	delete(descriptors);
 	delete(textureSampler);
 	delete(texture);

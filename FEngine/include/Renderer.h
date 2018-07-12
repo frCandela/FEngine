@@ -34,7 +34,9 @@ public:
 
 	Texture* texture; 
 	Sampler* textureSampler;
-	Buffer* buffer;
+
+	std::vector<Buffer*> buffers;
+
 	Descriptors* descriptors;
 	Commands* commands;
 	Instance* instance;
