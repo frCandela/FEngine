@@ -28,8 +28,70 @@ Renderer::Renderer(Window& window) :
 	buffer->LoadModel("models/cube.OBJ");
 
 	descriptors->createDescriptorSet(*texture, *textureSampler);
-	commands->createCommandBuffers(swapChain->swapChainFramebuffers, swapChain->swapChainExtent, renderPass->renderPass, graphicsPipeline, pipelineLayout, *buffer, descriptors->descriptorSet);
+	createCommandBuffers();
 	createSyncObjects();
+}
+
+// Setup the command buffers for drawing opérations
+void Renderer::createCommandBuffers()
+{
+	commands->commandBuffers.resize(swapChain->swapChainFramebuffers.size());
+
+	// VkCommandBufferAllocateInfo specifies the command pool and number of buffers to allocate
+	VkCommandBufferAllocateInfo allocInfo = {};
+	allocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
+	allocInfo.commandPool = commands->commandPool;
+	allocInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
+	allocInfo.commandBufferCount = (uint32_t)commands->commandBuffers.size();
+
+	if (vkAllocateCommandBuffers(device->device, &allocInfo, commands->commandBuffers.data()) != VK_SUCCESS)
+		throw std::runtime_error("failed to allocate command buffers!");
+
+	// Records every command buffer (one per framebuffer)
+	for (size_t i = 0; i < commands->commandBuffers.size(); i++)
+	{
+		// Specify the usage of the command buffer
+		VkCommandBufferBeginInfo beginInfo = {};
+		beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
+		beginInfo.flags = VK_COMMAND_BUFFER_USAGE_SIMULTANEOUS_USE_BIT;
+
+		if (vkBeginCommandBuffer(commands->commandBuffers[i], &beginInfo) != VK_SUCCESS)
+			throw std::runtime_error("failed to begin recording command buffer!");
+
+		// Configure the render pass
+		VkRenderPassBeginInfo renderPassInfo = {};
+		renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
+		renderPassInfo.renderPass = renderPass->renderPass;
+		renderPassInfo.framebuffer = swapChain->swapChainFramebuffers[i];
+		renderPassInfo.renderArea.offset = { 0, 0 };
+		renderPassInfo.renderArea.extent = swapChain->swapChainExtent;
+
+		//Set clear collors for color and depth attachments
+		std::array<VkClearValue, 2> clearValues = {};
+		clearValues[0].color = { 0.0f, 0.0f, 0.0f, 1.0f };
+		clearValues[1].depthStencil = { 1.0f, 0 };
+
+		renderPassInfo.clearValueCount = static_cast<uint32_t>(clearValues.size());
+		renderPassInfo.pClearValues = clearValues.data();
+
+		vkCmdBeginRenderPass(commands->commandBuffers[i], &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
+		vkCmdBindPipeline(commands->commandBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, graphicsPipeline);
+
+		//Draw call
+		VkBuffer vertexBuffers[] = { buffer->vertexBuffer };
+		VkDeviceSize offsets[] = { 0 };
+		vkCmdBindVertexBuffers(commands->commandBuffers[i], 0, 1, vertexBuffers, offsets);
+		vkCmdBindIndexBuffer(commands->commandBuffers[i], buffer->indexBuffer, 0, VK_INDEX_TYPE_UINT32);
+		vkCmdBindDescriptorSets(commands->commandBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineLayout, 0, 1, &(descriptors->descriptorSet), 0, nullptr);
+		vkCmdDrawIndexed(commands->commandBuffers[i], static_cast<uint32_t>(buffer->indices.size()), 1, 0, 0, 0);
+
+
+		vkCmdEndRenderPass(commands->commandBuffers[i]);
+
+		if (vkEndCommandBuffer(commands->commandBuffers[i]) != VK_SUCCESS)
+			throw std::runtime_error("failed to record command buffer!");
+	}
+
 }
 
 Renderer::~Renderer()
@@ -126,7 +188,7 @@ void Renderer::recreateSwapChain()
 	createGraphicsPipeline();
 	
 	swapChain->CreateFramebuffers(renderPass->renderPass);
-	commands->createCommandBuffers(swapChain->swapChainFramebuffers, swapChain->swapChainExtent, renderPass->renderPass, graphicsPipeline, pipelineLayout, *buffer, descriptors->descriptorSet);
+	createCommandBuffers();
 }
 
 // Creates the graphics pipeline

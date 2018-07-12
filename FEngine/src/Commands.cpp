@@ -33,70 +33,7 @@ void Commands::createCommandPool()
 		throw std::runtime_error("failed to create command pool!");
 }
 
-// Creates one command buffer per framebuffer . (Commands are recorded in command buffers before being performed)
-void Commands::createCommandBuffers(
-	std::vector<VkFramebuffer>& frameBuffers,
-	VkExtent2D& swapChainExtent,
-	VkRenderPass& renderPass, 
-	VkPipeline& pipeline, 
-	VkPipelineLayout& pipelineLayout, 
-	Buffer& buffer, 
-	VkDescriptorSet& descriptor)
-{
-	commandBuffers.resize(frameBuffers.size());
 
-	// VkCommandBufferAllocateInfo specifies the command pool and number of buffers to allocate
-	VkCommandBufferAllocateInfo allocInfo = {};
-	allocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
-	allocInfo.commandPool = commandPool;
-	allocInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
-	allocInfo.commandBufferCount = (uint32_t)commandBuffers.size();
-
-	if (vkAllocateCommandBuffers(m_device.device, &allocInfo, commandBuffers.data()) != VK_SUCCESS)
-		throw std::runtime_error("failed to allocate command buffers!");
-
-	// Records every command buffer (one per framebuffer)
-	for (size_t i = 0; i < commandBuffers.size(); i++)
-	{
-		// Specify the usage of the command buffer
-		VkCommandBufferBeginInfo beginInfo = {};
-		beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
-		beginInfo.flags = VK_COMMAND_BUFFER_USAGE_SIMULTANEOUS_USE_BIT;
-
-		if (vkBeginCommandBuffer(commandBuffers[i], &beginInfo) != VK_SUCCESS)
-			throw std::runtime_error("failed to begin recording command buffer!");
-
-		// Configure the render pass
-		VkRenderPassBeginInfo renderPassInfo = {};
-		renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
-		renderPassInfo.renderPass = renderPass;
-		renderPassInfo.framebuffer = frameBuffers[i];
-		renderPassInfo.renderArea.offset = { 0, 0 };
-		renderPassInfo.renderArea.extent = swapChainExtent;
-
-		//Set clear collors for color and depth attachments
-		std::array<VkClearValue, 2> clearValues = {};
-		clearValues[0].color = { 0.0f, 0.0f, 0.0f, 1.0f };
-		clearValues[1].depthStencil = { 1.0f, 0 };
-
-		renderPassInfo.clearValueCount = static_cast<uint32_t>(clearValues.size());
-		renderPassInfo.pClearValues = clearValues.data();
-
-		vkCmdBeginRenderPass(commandBuffers[i], &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
-			vkCmdBindPipeline(commandBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline);
-			VkBuffer vertexBuffers[] = { buffer.vertexBuffer };
-			VkDeviceSize offsets[] = { 0 };
-			vkCmdBindVertexBuffers(commandBuffers[i], 0, 1, vertexBuffers, offsets);
-			vkCmdBindIndexBuffer(commandBuffers[i], buffer.indexBuffer, 0, VK_INDEX_TYPE_UINT32);
-			vkCmdBindDescriptorSets(commandBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineLayout, 0, 1, &(descriptor), 0, nullptr);
-			vkCmdDrawIndexed(commandBuffers[i], static_cast<uint32_t>(buffer.indices.size()), 1, 0, 0, 0);
-		vkCmdEndRenderPass(commandBuffers[i]);
-
-		if (vkEndCommandBuffer(commandBuffers[i]) != VK_SUCCESS)
-			throw std::runtime_error("failed to record command buffer!");
-	}
-
-}
 
 // Allocate a temporary command buffer for memory transfer operations and start recording
 VkCommandBuffer Commands::beginSingleTimeCommands()

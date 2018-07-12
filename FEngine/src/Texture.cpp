@@ -3,6 +3,8 @@
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
 
+#include <algorithm>
+
 Texture::Texture(Device& device) :
 	Image(device)
 {

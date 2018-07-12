@@ -1,9 +1,7 @@
 #pragma once
 
+#include "Device.h"
 class Device;
-class Buffer;
-
-#include "Buffer.h"
 
 class Commands
 {
@@ -19,12 +17,4 @@ public:
 	VkCommandBuffer beginSingleTimeCommands();
 	void endSingleTimeCommands(VkCommandBuffer commandBuffer);
 	void createCommandPool();
-	void createCommandBuffers(
-		std::vector<VkFramebuffer>& frameBuffers,
-		VkExtent2D& swapChainExtent,
-		VkRenderPass& renderPass,
-		VkPipeline& pipeline,
-		VkPipelineLayout& pipelineLayout,
-		Buffer& buffer,
-		VkDescriptorSet& descriptor);
 };
