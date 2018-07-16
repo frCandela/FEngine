@@ -1,9 +1,12 @@
 #pragma once
 
-#include "Component.h"
 
-class Transform : public Component
+#include <glm/glm.hpp>
+#include "glm/gtc/quaternion.hpp"
+
+class Transform
 {
 public:
-	bool IsUnique() const override { return false; }
+	glm::quat rotation;
+	glm::vec3 position;
 };

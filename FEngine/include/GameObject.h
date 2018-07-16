@@ -7,6 +7,9 @@
 #include <type_traits>
 
 #include "Component.h"
+class Component;
+
+#include "Transform.h"
 
 ///Base class for all entities in the engine
 class GameObject
@@ -28,15 +31,20 @@ public:
 	/// Remove the component from the GameObject and deletes it
 	bool DeleteComponent(Component* component);
 
+
+	Transform transform;
+
 private:
 	std::vector<Component*> m_components;
 };
-
 
 template<typename ComponentType>
 ComponentType* GameObject::AddComponent()
 {
 	ComponentType* componentType = new ComponentType();
+
+	componentType->m_pGameobject = this;
+
 
 	// Checks if ComponentType derivates from Component
 	assert( (std::is_base_of<Component, ComponentType>::value ));

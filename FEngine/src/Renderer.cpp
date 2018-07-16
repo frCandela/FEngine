@@ -3,8 +3,9 @@
 #include <array>
 #include <chrono>
 
-Renderer::Renderer(Window& window) :
-	m_window(window)
+Renderer::Renderer(Window& rWindow, Camera& rCamera) :
+	m_window(rWindow),
+	m_pCamera(&rCamera)
 {
 	// Initializes the Vulkan application and required components
 	instance = new vk::Instance();
@@ -114,7 +115,7 @@ Renderer::~Renderer()
 // Draw a frame
 void Renderer::drawFrame()
 {
-	/*float aspectRatio = swapChain->swapChainExtent.width / (float)swapChain->swapChainExtent.height;
+	float aspectRatio = swapChain->swapChainExtent.width / (float)swapChain->swapChainExtent.height;
 	static auto startTime = std::chrono::high_resolution_clock::now();
 
 	auto currentTime = std::chrono::high_resolution_clock::now();
@@ -129,7 +130,7 @@ void Renderer::drawFrame()
 	ubo.proj[1][1] *= -1;
 
 
-	descriptors->updateUniformBuffer(ubo);*/
+	descriptors->updateUniformBuffer(ubo);
 
 	vkWaitForFences(device->device, 1, &inFlightFences[currentFrame], VK_TRUE, std::numeric_limits<uint64_t>::max());
 	vkResetFences(device->device, 1, &inFlightFences[currentFrame]);

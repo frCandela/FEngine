@@ -22,11 +22,16 @@
 #include "vulkan/Commands.h"
 
 
+#include "Camera.h"
+
+
 class Renderer
 {
 public:
-	Renderer(Window& window);
+	Renderer(Window& rWindow, Camera& rCamera);
 	~Renderer();
+
+	Camera* m_pCamera;
 
 	const uint32_t MAX_FRAMES_IN_FLIGHT = 2;
 
@@ -63,6 +68,5 @@ public:
 	void cleanup();
 
 	void drawFrame();
-
 };
 
