@@ -95,6 +95,7 @@
     <ClCompile Include="src\Component.cpp" />
     <ClCompile Include="src\FEngine.cpp" />
     <ClCompile Include="src\GameObject.cpp" />
+    <ClCompile Include="src\Input.cpp" />
     <ClCompile Include="src\Renderer.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\Transform.cpp" />
@@ -117,6 +118,7 @@
     <ClInclude Include="include\Component.h" />
     <ClInclude Include="include\FEngine.h" />
     <ClInclude Include="include\GameObject.h" />
+    <ClInclude Include="include\Input.h" />
     <ClInclude Include="include\Renderer.h" />
     <ClInclude Include="include\Transform.h" />
     <ClInclude Include="include\vulkan\Buffer.h" />

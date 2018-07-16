@@ -2,11 +2,14 @@
 
 #include <cstdint>
 #include <string>
+#include <iostream>
 
 #ifndef GLFW_INCLUDE_VULKAN
 #define GLFW_INCLUDE_VULKAN
 #include <GLFW/glfw3.h>
 #endif // !GLFW_INCLUDE_VULKAN
+
+#include "Input.h"
 
 class Window
 {

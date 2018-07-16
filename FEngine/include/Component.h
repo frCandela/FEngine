@@ -1,5 +1,7 @@
 #pragma once
 
+#include "GameObject.h"
+
 class GameObject;
 
 class Component
@@ -11,7 +13,7 @@ public:
 	virtual bool IsUnique() const = 0;
 
 	///Returns a reference on the Gameobject the component is bound to
-	inline GameObject& Gameobject() const { return *m_pGameobject; }
+	inline GameObject& GetGameobject() const { return *m_pGameobject; }
 
 private:
 	GameObject*  m_pGameobject;

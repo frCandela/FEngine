@@ -103,7 +103,6 @@ void Renderer::createCommandBuffers()
 		if (vkEndCommandBuffer(commands->commandBuffers[i]) != VK_SUCCESS)
 			throw std::runtime_error("failed to record command buffer!");
 	}
-
 }
 
 Renderer::~Renderer()
@@ -125,7 +124,6 @@ void Renderer::drawFrame()
 	ubo.model = glm::rotate(glm::mat4(1.0f), time * glm::radians(90.0f), glm::vec3(0.0f, 0.0f, 1.0f));
 	ubo.view = m_pCamera->GetView();
 	ubo.proj = m_pCamera->GetProj();
-
 
 	descriptors->updateUniformBuffer(ubo);
 

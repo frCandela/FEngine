@@ -19,8 +19,6 @@ namespace vk
 		Descriptors(Device& device);
 		~Descriptors();
 
-
-
 		Device& m_device;
 
 		VkDescriptorPool descriptorPool;

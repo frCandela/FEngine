@@ -9,6 +9,9 @@ Window::Window(uint32_t width, uint32_t height, std::string name) :
 	glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);// No opengl context
 	glfwWindowHint(GLFW_RESIZABLE, GLFW_TRUE);
 	m_window = glfwCreateWindow(width, height, name.c_str(), nullptr/* fullscreen monitor */, nullptr);
+
+	Input::Setup(m_window);
+
 }
 
 bool Window::WindowOpen() const
