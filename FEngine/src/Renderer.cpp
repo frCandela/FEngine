@@ -123,11 +123,8 @@ void Renderer::drawFrame()
 	//Define the model, view and projection transformations in the uniform buffer object 
 	vk::UniformBufferObject ubo = {};
 	ubo.model = glm::rotate(glm::mat4(1.0f), time * glm::radians(90.0f), glm::vec3(0.0f, 0.0f, 1.0f));
-	ubo.view = glm::lookAt(glm::vec3(2.0f, 2.0f, 2.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f));
-	ubo.proj = glm::perspective(glm::radians(45.0f), aspectRatio, 0.1f, 10.0f);
-
-	//the Y coordinate of the clip coordinates is inverted 
-	ubo.proj[1][1] *= -1;
+	ubo.view = m_pCamera->GetView();
+	ubo.proj = m_pCamera->GetProj();
 
 
 	descriptors->updateUniformBuffer(ubo);
@@ -191,7 +188,6 @@ void Renderer::drawFrame()
 	else if (result != VK_SUCCESS)
 		throw std::runtime_error("failed to  swap chain image!");
 	
-
 	currentFrame = (currentFrame + 1) % MAX_FRAMES_IN_FLIGHT;
 }
 

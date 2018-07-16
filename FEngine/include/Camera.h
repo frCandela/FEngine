@@ -10,7 +10,11 @@ class Camera : public Component
 public:
 	bool IsUnique() const override { return true; }
 
-private:
-	glm::mat4 view;
-	glm::mat4 proj;
+	glm::mat4 GetView() const;
+	glm::mat4 GetProj() const;
+
+	float fov = 45.f;
+	float aspectRatio = 1.f;
+	float near = 0.1f;
+	float far = 100.f;
 };

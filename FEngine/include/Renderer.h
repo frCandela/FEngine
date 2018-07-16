@@ -60,8 +60,6 @@ public:
 	size_t currentFrame = 0;
 
 	void createCommandBuffers();
-	
-
 	void recreateSwapChain();
 	void createGraphicsPipeline();
 	void createSyncObjects();
