@@ -24,8 +24,6 @@ namespace vk
 
 		Device& m_device;
 
-
-
 		static VkImageView createImageView(VkImage image, VkFormat format, VkImageAspectFlags aspectFlags, uint32_t mipLevels, VkDevice& device);
 
 	protected:

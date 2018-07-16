@@ -6,18 +6,20 @@
 
 namespace vk
 {
+	struct UniformBufferObject
+	{
+		glm::mat4 model;
+		glm::mat4 view;
+		glm::mat4 proj;
+	};
+
 	class Descriptors
 	{
 	public:
 		Descriptors(Device& device);
 		~Descriptors();
 
-		struct UniformBufferObject
-		{
-			glm::mat4 model;
-			glm::mat4 view;
-			glm::mat4 proj;
-		};
+
 
 		Device& m_device;
 
@@ -32,7 +34,7 @@ namespace vk
 		void createDescriptorPool();
 		void createDescriptorSet(Texture& textureImage, Sampler& textureSampler);
 		void createDescriptorSetLayout();
-		void updateUniformBuffer(float aspectRatio);
+		void updateUniformBuffer(UniformBufferObject bufferObject);
 
 		void createUniformBuffer();
 	};

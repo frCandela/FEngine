@@ -23,8 +23,6 @@ namespace vk
 		VkBuffer indexBuffer;
 		VkDeviceMemory indexBufferMemory;
 
-
-
 		static void createBuffer(Device& device, VkDeviceSize size, VkBufferUsageFlags usage, VkMemoryPropertyFlags properties, VkBuffer& buffer, VkDeviceMemory& bufferMemory);
 		void copyBuffer(VkBuffer srcBuffer, VkBuffer dstBuffer, VkDeviceSize size);
 
