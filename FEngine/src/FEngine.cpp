@@ -18,7 +18,7 @@ void FEngine::Run()
 
 	Renderer renderer(window, *camera);
 
-
+	camera->aspectRatio = renderer.swapChain->swapChainExtent.width / (float) renderer.swapChain->swapChainExtent.height;
 	
 	//camera->gameobject = &gameobject;
 

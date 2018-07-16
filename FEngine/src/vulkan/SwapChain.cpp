@@ -27,7 +27,7 @@ namespace vk
 
 	void SwapChain::CreateSwapChain(Window& window)
 	{
-		SwapChainSupportDetails swapChainSupport = m_device.swapChainSupportDetails; //querySwapChainSupport(m_device.physicalDevice, m_device.surface);
+		SwapChainSupportDetails swapChainSupport = m_device.QuerySwapChainSupport(m_device.physicalDevice, m_device.surface);
 
 		VkSurfaceFormatKHR surfaceFormat = ChooseSwapSurfaceFormat(swapChainSupport.formats);
 		VkPresentModeKHR presentMode = ChooseSwapPresentMode(swapChainSupport.presentModes);
