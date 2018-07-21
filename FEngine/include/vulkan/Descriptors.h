@@ -48,6 +48,8 @@ namespace vk
 		void createDescriptorSetLayout();
 		void updateUniformBuffer(UniformBufferObject bufferObject);
 
+		void  UpdateModelBuffer(glm::mat4 mat);
+
 		void createUniformBuffer();
 	};
 }

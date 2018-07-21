@@ -72,7 +72,7 @@ namespace vk
 		VkDescriptorBufferInfo bufferInfo2 = {};
 		bufferInfo2.buffer = uniformBufferDynamic;
 		bufferInfo2.offset = 0;
-		bufferInfo2.range = sizeof(UniformBufferObject);
+		bufferInfo2.range = sizeof(glm::mat4);
 
 		// Regroup descriptors
 		std::array<VkWriteDescriptorSet, 3> descriptorWrites = {};
@@ -172,5 +172,15 @@ namespace vk
 		vkMapMemory(m_device.device, uniformBufferMemory, 0, sizeof(bufferObject), 0, &data);
 		memcpy(data, &bufferObject, sizeof(bufferObject));
 		vkUnmapMemory(m_device.device, uniformBufferMemory);
+	}
+
+	// Do stuff
+	void  Descriptors::UpdateModelBuffer(glm::mat4 mat)
+	{
+		//copy the data in the uniform buffer object to the uniform buffer
+		void* data;
+		vkMapMemory(m_device.device, uniformBufferMemoryDynamic, 0, sizeof(glm::mat4), 0, &data);
+		memcpy(data, &mat, sizeof(mat));
+		vkUnmapMemory(m_device.device, uniformBufferMemoryDynamic);
 	}
 }

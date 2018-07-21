@@ -127,6 +127,9 @@ void Renderer::drawFrame()
 
 	descriptors->updateUniformBuffer(ubo);
 
+	glm::mat4 model = glm::rotate(glm::mat4(1.0f), time * glm::radians(90.0f), glm::vec3(0.0f, 0.0f, 1.0f));
+	descriptors->UpdateModelBuffer(model);
+
 	vkWaitForFences(device->device, 1, &inFlightFences[currentFrame], VK_TRUE, std::numeric_limits<uint64_t>::max());
 	vkResetFences(device->device, 1, &inFlightFences[currentFrame]);
 
