@@ -4,13 +4,22 @@
 #include "Buffer.h"
 #include "Texture.h"
 
+#include <stdlib.h>
+
 namespace vk
 {
+#define OBJECT_INSTANCES 125
+
 	struct UniformBufferObject
 	{
 		glm::mat4 model;
 		glm::mat4 view;
 		glm::mat4 proj;
+	};
+
+	struct UboDataDynamic 
+	{
+		glm::mat4 *model = nullptr;
 	};
 
 	class Descriptors
@@ -28,6 +37,11 @@ namespace vk
 		VkBuffer uniformBuffer;
 		VkDeviceMemory uniformBufferMemory;
 
+		VkBuffer uniformBufferDynamic;
+		VkDeviceMemory uniformBufferMemoryDynamic;
+
+		size_t dynamicAlignment;
+		UboDataDynamic uboDataDynamic;
 
 		void createDescriptorPool();
 		void createDescriptorSet(Texture& textureImage, Sampler& textureSampler);

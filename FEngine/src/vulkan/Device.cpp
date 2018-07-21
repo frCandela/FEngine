@@ -31,6 +31,7 @@ namespace vk
 			if (isDeviceSuitable(device))
 			{
 				physicalDevice = device;
+				vkGetPhysicalDeviceProperties(device, &properties);
 				break;
 			}
 

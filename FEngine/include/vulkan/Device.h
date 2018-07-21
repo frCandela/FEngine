@@ -59,6 +59,7 @@ namespace vk
 		VkQueue graphicsQueue;
 		VkQueue presentQueue;
 		VkSurfaceKHR surface;
+		VkPhysicalDeviceProperties properties;
 
 		void pickPhysicalDevice();
 		void createLogicalDevice();

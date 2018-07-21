@@ -25,11 +25,13 @@ namespace vk
 	void Descriptors::createDescriptorPool()
 	{
 		//Create descriptor pool for vertex and texture uniforms
-		std::array<VkDescriptorPoolSize, 2> poolSizes = {};
+		std::array<VkDescriptorPoolSize, 3> poolSizes = {};
 		poolSizes[0].type = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
 		poolSizes[0].descriptorCount = 1;
 		poolSizes[1].type = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
 		poolSizes[1].descriptorCount = 1;
+		poolSizes[2].type = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+		poolSizes[2].descriptorCount = 1;
 
 		VkDescriptorPoolCreateInfo poolInfo = {};
 		poolInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
@@ -66,8 +68,14 @@ namespace vk
 		imageInfo.imageView = textureImage.imageView;
 		imageInfo.sampler = textureSampler.sampler;
 
+		// Create uniforms descriptor
+		VkDescriptorBufferInfo bufferInfo2 = {};
+		bufferInfo2.buffer = uniformBufferDynamic;
+		bufferInfo2.offset = 0;
+		bufferInfo2.range = sizeof(UniformBufferObject);
+
 		// Regroup descriptors
-		std::array<VkWriteDescriptorSet, 2> descriptorWrites = {};
+		std::array<VkWriteDescriptorSet, 3> descriptorWrites = {};
 		descriptorWrites[0].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
 		descriptorWrites[0].dstSet = descriptorSet;
 		descriptorWrites[0].dstBinding = 0;
@@ -83,6 +91,14 @@ namespace vk
 		descriptorWrites[1].descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
 		descriptorWrites[1].descriptorCount = 1;
 		descriptorWrites[1].pImageInfo = &imageInfo;
+
+		descriptorWrites[2].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+		descriptorWrites[2].dstSet = descriptorSet;
+		descriptorWrites[2].dstBinding = 2;
+		descriptorWrites[2].dstArrayElement = 0;
+		descriptorWrites[2].descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+		descriptorWrites[2].descriptorCount = 1;
+		descriptorWrites[2].pBufferInfo = &bufferInfo2;
 
 		vkUpdateDescriptorSets(m_device.device, static_cast<uint32_t>(descriptorWrites.size()), descriptorWrites.data(), 0, nullptr);
 
@@ -107,8 +123,16 @@ namespace vk
 		samplerLayoutBinding.pImmutableSamplers = nullptr;
 		samplerLayoutBinding.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT;
 
+		// Create a descriptor binding for vertex uniform entries in vertex shaders
+		VkDescriptorSetLayoutBinding uboLayoutBindingDynamic = {};
+		uboLayoutBindingDynamic.binding = 2;
+		uboLayoutBindingDynamic.descriptorCount = 1;
+		uboLayoutBindingDynamic.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+		uboLayoutBindingDynamic.pImmutableSamplers = nullptr;
+		uboLayoutBindingDynamic.stageFlags = VK_SHADER_STAGE_VERTEX_BIT;
+
 		// Regroup all bindings
-		std::array<VkDescriptorSetLayoutBinding, 2> bindings = { uboLayoutBinding, samplerLayoutBinding };
+		std::array<VkDescriptorSetLayoutBinding, 3> bindings = { uboLayoutBinding, samplerLayoutBinding, uboLayoutBindingDynamic };
 		VkDescriptorSetLayoutCreateInfo layoutInfo = {};
 		layoutInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
 		layoutInfo.bindingCount = static_cast<uint32_t>(bindings.size());
@@ -121,8 +145,23 @@ namespace vk
 	// Create the uniforms buffer
 	void Descriptors::createUniformBuffer()
 	{
-		VkDeviceSize bufferSize = sizeof(UniformBufferObject);
-		Buffer::createBuffer(m_device, bufferSize, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, uniformBuffer, uniformBufferMemory);
+		VkDeviceSize bufferSize1 = sizeof(UniformBufferObject);
+		Buffer::createBuffer(m_device, bufferSize1, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, uniformBuffer, uniformBufferMemory);
+	
+		VkDeviceSize bufferSize2 = sizeof(UniformBufferObject);
+		Buffer::createBuffer(m_device, bufferSize2, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, uniformBufferDynamic, uniformBufferMemoryDynamic);
+
+
+		// Calculate required alignment based on minimum device offset alignment
+		/*size_t minUboAlignment = m_device.properties.limits.minUniformBufferOffsetAlignment;
+		dynamicAlignment = sizeof(glm::mat4);
+		if (minUboAlignment > 0) 
+			dynamicAlignment = (dynamicAlignment + minUboAlignment - 1) & ~(minUboAlignment - 1);
+		size_t bufferSize = OBJECT_INSTANCES * dynamicAlignment;
+
+		uboDataDynamic.model = (glm::mat4*)_aligned_malloc(bufferSize, dynamicAlignment);
+		Buffer::createBuffer(m_device, bufferSize, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT , uniformBufferDynamic, uniformBufferMemoryDynamic);*/
+
 	}
 	
 	// Do stuff
