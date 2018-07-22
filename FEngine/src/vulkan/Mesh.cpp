@@ -92,24 +92,24 @@ namespace vk
 		VkDeviceSize bufferSize = sizeof(vertices[0]) * vertices.size();
 
 		// Create a host visible buffer
-		VkBuffer stagingBuffer;
-		VkDeviceMemory stagingBufferMemory;
-		vks::Buffer::createBuffer(m_device, bufferSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, stagingBuffer, stagingBufferMemory);
+
+		vks::Buffer buf;
+		buf.m_device = m_device.device;
+
+		//vks::Buffer buffer = {};
+		vks::Buffer::createBuffer(m_device, bufferSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, buf.m_buffer, buf.memory);
 
 		// Fills it with data
-		void* data;
-		vkMapMemory(m_device.device, stagingBufferMemory, 0, bufferSize, 0, &data);
-		memcpy(data, vertices.data(), (size_t)bufferSize);
-		vkUnmapMemory(m_device.device, stagingBufferMemory);
+		buf.map(bufferSize);
+		memcpy(buf.mappedData, vertices.data(), (size_t)bufferSize);
+		buf.unmap();
 
 		// Create a device local buffer
 		vks::Buffer::createBuffer(m_device, bufferSize, VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, vertexBuffer, vertexBufferMemory);
-		copyBuffer(stagingBuffer, vertexBuffer, bufferSize);
+		copyBuffer(buf.m_buffer, vertexBuffer, bufferSize);
 
 		// Cleaning
-		vkDestroyBuffer(m_device.device, stagingBuffer, nullptr);
-		vkFreeMemory(m_device.device, stagingBufferMemory, nullptr);
-
+		buf.destroy();
 	}
 
 	void Mesh::CreateIndexBuffer()

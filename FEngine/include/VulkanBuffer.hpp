@@ -25,18 +25,18 @@ namespace vks
 	*/
 	struct Buffer
 	{
+		//Buffer( vk::Device& device ) : m_device(device){}
+
 		VkDevice m_device;
-		VkBuffer buffer = VK_NULL_HANDLE;
+		VkBuffer m_buffer = VK_NULL_HANDLE;
 		VkDeviceMemory memory = VK_NULL_HANDLE;
 		VkDescriptorBufferInfo descriptor;
-		VkDeviceSize size = 0;
+		VkDeviceSize m_size = 0;
 		VkDeviceSize alignment = 0;
-		void* mapped = nullptr;
+		void* mappedData = nullptr;
 
-		/** @brief Usage flags to be filled by external source at buffer creation (to query at some later point) */
-		VkBufferUsageFlags usageFlags;
-		/** @brief Memory propertys flags to be filled by external source at buffer creation (to query at some later point) */
-		VkMemoryPropertyFlags memoryPropertyFlags;
+		VkBufferUsageFlags m_usageFlags;
+		VkMemoryPropertyFlags m_memoryPropertyFlags;
 
 		/** 
 		* Map a memory range of this buffer. If successful, mapped points to the specified buffer range.
@@ -48,20 +48,17 @@ namespace vks
 		*/
 		VkResult map(VkDeviceSize size = VK_WHOLE_SIZE, VkDeviceSize offset = 0)
 		{
-			return vkMapMemory(m_device, memory, offset, size, 0, &mapped);
+			return vkMapMemory(m_device, memory, offset, size, 0, &mappedData);
 		}
 
-		/**
-		* Unmap a mapped memory range
-		*
-		* @note Does not return a result as vkUnmapMemory can't fail
-		*/
+
+		//Unmap a mapped memory range
 		void unmap()
 		{
-			if (mapped)
+			if (mappedData)
 			{
 				vkUnmapMemory(m_device, memory);
-				mapped = nullptr;
+				mappedData = nullptr;
 			}
 		}
 
@@ -74,7 +71,7 @@ namespace vks
 		*/
 		VkResult bind(VkDeviceSize offset = 0)
 		{
-			return vkBindBufferMemory(m_device, buffer, memory, offset);
+			return vkBindBufferMemory(m_device, m_buffer, memory, offset);
 		}
 
 		/**
@@ -87,7 +84,7 @@ namespace vks
 		void setupDescriptor(VkDeviceSize size = VK_WHOLE_SIZE, VkDeviceSize offset = 0)
 		{
 			descriptor.offset = offset;
-			descriptor.buffer = buffer;
+			descriptor.buffer = m_buffer;
 			descriptor.range = size;
 		}
 
@@ -96,9 +93,9 @@ namespace vks
 		*/
 		void destroy()
 		{
-			if (buffer)
+			if (m_buffer)
 			{
-				vkDestroyBuffer(m_device, buffer, nullptr);
+				vkDestroyBuffer(m_device, m_buffer, nullptr);
 			}
 			if (memory)
 			{
@@ -106,63 +103,68 @@ namespace vks
 			}
 		}
 
-		VkResult createBuffer(VkBufferUsageFlags usageFlags, VkMemoryPropertyFlags memoryPropertyFlags, vks::Buffer *buffer, VkDeviceSize size, vk::Device& dev)
+		VkResult createBuffer(VkBufferUsageFlags usageFlags, VkMemoryPropertyFlags memoryPropertyFlags, VkDeviceSize size, vk::Device& dev)
 		{
-			buffer->m_device = dev.device;
+			m_device = dev.device;
 
 			// Create the buffer handle
-			VkBufferCreateInfo bufferCreateInfo = vks::initializers::bufferCreateInfo(usageFlags, size);
-			VK_CHECK_RESULT(vkCreateBuffer(dev.device, &bufferCreateInfo, nullptr, &buffer->buffer));
+			VkBufferCreateInfo bufferCreateInfo = {};
+			bufferCreateInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
+			bufferCreateInfo.size = size;
+			bufferCreateInfo.usage = usageFlags;
+
+			VK_CHECK_RESULT(vkCreateBuffer(dev.device, &bufferCreateInfo, nullptr, &m_buffer));
 
 			// Create the memory backing up the buffer handle
-			VkMemoryRequirements memReqs;
-			VkMemoryAllocateInfo memAlloc = vks::initializers::memoryAllocateInfo();
-			vkGetBufferMemoryRequirements(dev.device, buffer->buffer, &memReqs);
-			memAlloc.allocationSize = memReqs.size;
-			// Find a memory type index that fits the properties of the buffer
-			memAlloc.memoryTypeIndex = dev.findMemoryType(memReqs.memoryTypeBits, memoryPropertyFlags);
+			VkMemoryRequirements memRequirements;
+			vkGetBufferMemoryRequirements(dev.device, m_buffer, &memRequirements);
 
-			VK_CHECK_RESULT(vkAllocateMemory(dev.device, &memAlloc, nullptr, &buffer->memory));
+			VkMemoryAllocateInfo memAlloc = {};
+			memAlloc.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
+			memAlloc.allocationSize = memRequirements.size;
+			memAlloc.memoryTypeIndex = dev.findMemoryType(memRequirements.memoryTypeBits, memoryPropertyFlags);			// Find a memory type index that fits the properties of the buffer
 
-			buffer->alignment = memReqs.alignment;
-			buffer->size = memAlloc.allocationSize;
-			buffer->usageFlags = usageFlags;
-			buffer->memoryPropertyFlags = memoryPropertyFlags;
+			VK_CHECK_RESULT(vkAllocateMemory(dev.device, &memAlloc, nullptr, &memory));
+
+			alignment = memRequirements.alignment;
+			m_size = memAlloc.allocationSize;
+			m_usageFlags = usageFlags;
+			m_memoryPropertyFlags = memoryPropertyFlags;
 
 			// Initialize a default descriptor that covers the whole buffer size
-			buffer->setupDescriptor();
+			setupDescriptor();
 
 			// Attach the memory to the buffer object
-			return buffer->bind();
+			return bind();
 		}
 
 		// Helper function for creating buffers
-		static void createBuffer(vk::Device& device, VkDeviceSize size, VkBufferUsageFlags usage, VkMemoryPropertyFlags properties, VkBuffer& buffer, VkDeviceMemory& bufferMemory)
+		static void createBuffer(vk::Device& dev, VkDeviceSize size, VkBufferUsageFlags usage, VkMemoryPropertyFlags memoryPropertyFlags, VkBuffer& buffer, VkDeviceMemory& bufferMemory)
 		{
 			// Buffer info structure
-			VkBufferCreateInfo bufferInfo = {};
-			bufferInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
-			bufferInfo.size = size;
-			bufferInfo.usage = usage;
-			bufferInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
+			VkBufferCreateInfo bufferCreateInfo = {};
+			bufferCreateInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
+			bufferCreateInfo.size = size;
+			bufferCreateInfo.usage = usage;
+			//bufferInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
 
-			if (vkCreateBuffer(device.device, &bufferInfo, nullptr, &buffer) != VK_SUCCESS)
+			if (vkCreateBuffer(dev.device, &bufferCreateInfo, nullptr, &buffer) != VK_SUCCESS)
 				throw std::runtime_error("failed to create buffer!");
 
 			// Query memory requirements
 			VkMemoryRequirements memRequirements;
-			vkGetBufferMemoryRequirements(device.device, buffer, &memRequirements);
+			vkGetBufferMemoryRequirements(dev.device, buffer, &memRequirements);
 
 			// Allow memory to buffer
-			VkMemoryAllocateInfo allocInfo = {};
-			allocInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
-			allocInfo.allocationSize = memRequirements.size;
-			allocInfo.memoryTypeIndex = device.findMemoryType(memRequirements.memoryTypeBits, properties);
+			VkMemoryAllocateInfo memAlloc = {};
+			memAlloc.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
+			memAlloc.allocationSize = memRequirements.size;
+			memAlloc.memoryTypeIndex = dev.findMemoryType(memRequirements.memoryTypeBits, memoryPropertyFlags);
 
-			if (vkAllocateMemory(device.device, &allocInfo, nullptr, &bufferMemory) != VK_SUCCESS)
+			if (vkAllocateMemory(dev.device, &memAlloc, nullptr, &bufferMemory) != VK_SUCCESS)
 				throw std::runtime_error("failed to allocate buffer memory!");
 
-			vkBindBufferMemory(device.device, buffer, bufferMemory, 0);
+			vkBindBufferMemory(dev.device, buffer, bufferMemory, 0);
 		}
 	};
 }

@@ -20,8 +20,6 @@ struct Vertex {
 
 namespace vk
 {
-
-
 	class Descriptors
 	{
 	public:
@@ -32,10 +30,9 @@ namespace vk
 			std::vector<VkVertexInputAttributeDescription> attributeDescriptions;
 		} vertices;
 
-		struct {
-			vks::Buffer view;
-			vks::Buffer dynamic;
-		} uniformBuffers;
+
+		vks::Buffer view;
+		vks::Buffer dynamic;
 
 		struct {
 			glm::mat4 projection;

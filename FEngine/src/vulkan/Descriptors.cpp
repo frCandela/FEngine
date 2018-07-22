@@ -6,6 +6,8 @@ namespace vk
 
 	Descriptors::Descriptors(Device& device) :
 		m_device(device)
+		//, view(device)
+		//, dynamic(device)		
 	{
 		createDescriptorSetLayout();
 		createUniformBuffer();
@@ -15,11 +17,9 @@ namespace vk
 	Descriptors::~Descriptors()
 	{
 		vkDestroyDescriptorPool(m_device.device, descriptorPool, nullptr);
-
-		// Destroy uniform buffer
 		vkDestroyDescriptorSetLayout(m_device.device, descriptorSetLayout, nullptr);
-		/*vkDestroyBuffer(m_device.device, uniformBuffer, nullptr);
-		vkFreeMemory(m_device.device, uniformBufferMemory, nullptr);*/
+		dynamic.destroy();
+		view.destroy();
 	}
 
 	// Create descriptor pool (for uniform buffers)
@@ -74,9 +74,9 @@ namespace vk
 
 		std::vector<VkWriteDescriptorSet> writeDescriptorSets = {
 			// Binding 0 : Projection/View matrix uniform buffer			
-			vks::initializers::writeDescriptorSet(descriptorSet, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 0, &uniformBuffers.view.descriptor),
+			vks::initializers::writeDescriptorSet(descriptorSet, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 0, &view.descriptor),
 			// Binding 1 : Instance matrix as dynamic uniform buffer
-			vks::initializers::writeDescriptorSet(descriptorSet, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC, 1, &uniformBuffers.dynamic.descriptor),
+			vks::initializers::writeDescriptorSet(descriptorSet, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC, 1, &dynamic.descriptor),
 		};
 
 		vkUpdateDescriptorSets(m_device.device, static_cast<uint32_t>(writeDescriptorSets.size()), writeDescriptorSets.data(), 0, NULL);
@@ -236,26 +236,24 @@ namespace vk
 
 		// Static shared uniform buffer object with projection and view matrix
 
-		uniformBuffers.view.createBuffer(
+		view.createBuffer(
 			VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT,
 			VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
-			&uniformBuffers.view,
 			sizeof(uboVS),
 			m_device
 		);
 
 		// Uniform buffer object with per-object matrices
-		uniformBuffers.dynamic.createBuffer(
+		dynamic.createBuffer(
 		VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT,
 		VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT,
-		&uniformBuffers.dynamic,
 		bufferSize,
 		m_device
 		);
 
 		// Map persistent
-		VK_CHECK_RESULT(uniformBuffers.view.map());
-		VK_CHECK_RESULT(uniformBuffers.dynamic.map());
+		VK_CHECK_RESULT(view.map());
+		VK_CHECK_RESULT(dynamic.map());
 
 		// Prepare per-object matrices with offsets and random rotations
 		for (uint32_t i = 0; i < OBJECT_INSTANCES; i++) {
@@ -303,7 +301,7 @@ namespace vk
 		uboVS.projection = camera.GetProj();
 		uboVS.view = camera.GetView();
 
-		memcpy(uniformBuffers.view.mapped, &uboVS, sizeof(uboVS));
+		memcpy(view.mappedData, &uboVS, sizeof(uboVS));
 	}
 
 	void Descriptors::updateDynamicUniformBuffer(bool force)
@@ -315,12 +313,12 @@ namespace vk
 			*modelMat = glm::translate(*modelMat, glm::vec3(0.5f*(i+1), 0, 0));
 		}
 
-		memcpy(uniformBuffers.dynamic.mapped, uboDataDynamic.model, uniformBuffers.dynamic.size);
+		memcpy(dynamic.mappedData, uboDataDynamic.model, dynamic.m_size);
 
 		// Flush to make changes visible to the host 
 		VkMappedMemoryRange memoryRange = vks::initializers::mappedMemoryRange();
-		memoryRange.memory = uniformBuffers.dynamic.memory;
-		memoryRange.size = uniformBuffers.dynamic.size;
+		memoryRange.memory = dynamic.memory;
+		memoryRange.size = dynamic.m_size;
 		vkFlushMappedMemoryRanges(m_device.device, 1, &memoryRange);
 	}
 }
