@@ -42,7 +42,6 @@ Renderer::Renderer(Window& rWindow, Camera& rCamera) :
 	sphere->LoadModel("mesh/sphere.obj");
 	buffers.push_back(sphere);
 
-
 	descriptors->createDescriptorSet(*texture, *textureSampler);
 	createCommandBuffers();
 	createSyncObjects();
@@ -93,14 +92,17 @@ void Renderer::createCommandBuffers()
 		vkCmdBeginRenderPass(commands->commandBuffers[i], &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
 		vkCmdBindPipeline(commands->commandBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, graphicsPipeline);
 
+		
+
 		//Record Draw calls on all existing buffers
 		for (int j = 0; j < buffers.size(); ++j)
 		{
+			std::cout << i << " " << j  << std::endl;
+
 			VkBuffer vertexBuffers[] = { buffers[j]->vertexBuffer };
 			VkDeviceSize offsets[] = { 0 };
 			vkCmdBindVertexBuffers(commands->commandBuffers[i], 0, 1, vertexBuffers, offsets);
 			vkCmdBindIndexBuffer(commands->commandBuffers[i], buffers[j]->indexBuffer, 0, VK_INDEX_TYPE_UINT32);
-
 
 			// One dynamic offset per dynamic descriptor to offset into the ubo containing all model matrices
 			uint32_t dynamicOffset = j * static_cast<uint32_t>(descriptors->dynamicAlignment);

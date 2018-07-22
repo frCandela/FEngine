@@ -1,60 +1,50 @@
-# Unit-volume cube with the same texture coordinates on each face.
-#
-# Created by Morgan McGuire and released into the Public Domain on
-# July 16, 2011.
-#
-# http://graphics.cs.williams.edu/data
-#
-# Added comments - Scott Kuhl
-# Corrected face normals - Scott Kuhl
-# Renamed texture and material file - Scott Kuhl
+# 3ds Max Wavefront OBJ Exporter v0.97b - (c)2007 guruware
+# File Created: 22.07.2018 14:02:06
 
 mtllib cube.mtl
 
-# Vertices
-v -0.5 0.5 -0.5
-v -0.5 0.5 0.5
-v 0.5 0.5 0.5
-v 0.5 0.5 -0.5
-v -0.5 -0.5 -0.5
-v -0.5 -0.5 0.5
-v 0.5 -0.5 0.5
-v 0.5 -0.5 -0.5
+#
+# object cube
+#
 
-# Texture coordinates
-vt 0 1
-vt 0 0
-vt 1 0
-vt 1 1
+v  -0.4224 0.4224 0.4224
+v  -0.4224 0.4224 -0.4224
+v  -0.4224 -0.4224 -0.4224
+v  -0.4224 -0.4224 0.4224
+v  0.4224 -0.4224 0.4224
+v  0.4224 -0.4224 -0.4224
+v  0.4224 0.4224 -0.4224
+v  0.4224 0.4224 0.4224
+# 8 vertices
 
-# Normals
-vn -1 0 0
-vn 1 0 0
-vn 0 -1 0
-vn 0 1 0
-vn 0 0 -1
-vn 0 0 1
+vn -1.0000 0.0000 0.0000
+vn 1.0000 0.0000 0.0000
+vn 0.0000 -0.0000 1.0000
+vn 0.0000 0.0000 -1.0000
+vn 0.0000 -1.0000 -0.0000
+vn 0.0000 1.0000 0.0000
+# 6 vertex normals
 
+vt 1.0000 1.0000 0.0000
+vt 1.0000 0.0000 0.0000
+vt 0.0000 0.0000 0.0000
+vt 0.0000 1.0000 0.0000
+# 4 texture coords
 
 g cube
-usemtl default
+usemtl _cubedefault
+s 1
+f 1/1/1 2/2/1 3/3/1 
+f 1/1/1 3/3/1 4/4/1 
+f 5/1/2 6/2/2 7/3/2 
+f 5/1/2 7/3/2 8/4/2 
+f 5/1/3 8/2/3 1/3/3 
+f 5/1/3 1/3/3 4/4/3 
+f 7/1/4 6/2/4 3/3/4 
+f 7/1/4 3/3/4 2/4/4 
+f 4/1/5 3/2/5 6/3/5 
+f 4/1/5 6/3/5 5/4/5 
+f 8/1/6 7/2/6 2/3/6 
+f 8/1/6 2/3/6 1/4/6 
+# 0 polygons - 12 triangles
 
-# Faces (vertex/texcoord/normal)
-# -X face
-f 6/4/1 2/3/1 1/2/1
-f 6/4/1 1/2/1 5/1/1
-# +X face
-f 8/4/2 4/3/2 3/2/2
-f 8/4/2 3/2/2 7/1/2
-# -Y face
-f 8/4/3 7/3/3 6/2/3
-f 8/4/3 6/2/3 5/1/3
-# +Y face
-f 3/4/4 4/3/4 1/2/4
-f 3/4/4 1/2/4 2/1/4
-# -Z face
-f 5/4/5 1/3/5 4/2/5
-f 5/4/5 4/2/5 8/1/5
-# +Z face
-f 7/4/6 3/3/6 2/2/6
-f 7/4/6 2/2/6 6/1/6

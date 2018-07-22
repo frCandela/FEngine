@@ -310,38 +310,11 @@ namespace vk
 
 	void Descriptors::updateDynamicUniformBuffer(bool force)
 	{
-		// Update at max. 60 fps
-		/*animationTimer += frameTimer;
-		if ((animationTimer <= 1.0f / 60.0f) && (!force)) {
-			return;
-		}*/
-
-		// Dynamic ubo with per-object model matrices indexed by offsets in the command buffer
-		uint32_t dim = static_cast<uint32_t>(pow(OBJECT_INSTANCES, (1.0f / 3.0f)));
-		glm::vec3 offset(5.0f);
-
-		for (uint32_t x = 0; x < dim; x++)
+		for (int i = 0; i < OBJECT_INSTANCES; ++i)
 		{
-			for (uint32_t y = 0; y < dim; y++)
-			{
-				for (uint32_t z = 0; z < dim; z++)
-				{
-					uint32_t index = x * dim * dim + y * dim + z;
-
-					// Aligned offset
-					glm::mat4* modelMat = (glm::mat4*)(((uint64_t)uboDataDynamic.model + (index * dynamicAlignment)));
-
-					// Update rotations
-					rotations[index] += animationTimer * rotationSpeeds[index];
-
-					// Update matrices
-					glm::vec3 pos = glm::vec3(-((dim * offset.x) / 2.0f) + offset.x / 2.0f + x * offset.x, -((dim * offset.y) / 2.0f) + offset.y / 2.0f + y * offset.y, -((dim * offset.z) / 2.0f) + offset.z / 2.0f + z * offset.z);
-					*modelMat = glm::translate(glm::mat4(1.0f), pos);
-					*modelMat = glm::rotate(*modelMat, rotations[index].x, glm::vec3(1.0f, 1.0f, 0.0f));
-					*modelMat = glm::rotate(*modelMat, rotations[index].y, glm::vec3(0.0f, 1.0f, 0.0f));
-					*modelMat = glm::rotate(*modelMat, rotations[index].z, glm::vec3(0.0f, 0.0f, 1.0f));
-				}
-			}
+			glm::mat4* modelMat = (glm::mat4*)(((uint64_t)uboDataDynamic.model + (i * dynamicAlignment)));
+			*modelMat = glm::mat4(1.f);
+			*modelMat = glm::translate(*modelMat, glm::vec3(0.5f*(i+1), 0, 0));
 		}
 
 		animationTimer = 0.0f;
