@@ -226,11 +226,6 @@ namespace vk
 
 		size_t bufferSize = OBJECT_INSTANCES * dynamicAlignment;
 
-
-
-
-
-
 		uboDataDynamic.model = (glm::mat4*)_aligned_malloc(bufferSize, dynamicAlignment);
 		assert(uboDataDynamic.model);
 
@@ -240,20 +235,23 @@ namespace vk
 		// Vertex shader uniform buffer block
 
 		// Static shared uniform buffer object with projection and view matrix
-		VK_CHECK_RESULT(
-			createBuffer(
+
+		uniformBuffers.view.createBuffer(
 			VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT,
 			VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
 			&uniformBuffers.view,
-			sizeof(uboVS)));
+			sizeof(uboVS),
+			m_device
+		);
 
 		// Uniform buffer object with per-object matrices
-		VK_CHECK_RESULT(
-			createBuffer(
-			VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT,
-			VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT,
-			&uniformBuffers.dynamic,
-			bufferSize));
+		uniformBuffers.dynamic.createBuffer(
+		VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT,
+		VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT,
+		&uniformBuffers.dynamic,
+		bufferSize,
+		m_device
+		);
 
 		// Map persistent
 		VK_CHECK_RESULT(uniformBuffers.view.map());

@@ -13,7 +13,7 @@
 #include "vulkan/SwapChain.h"
 #include "vulkan/Sampler.h"
 #include "vulkan/Instance.h"
-#include "vulkan/Buffer.h"
+#include "vulkan/Mesh.h"
 #include "vulkan/Shader.h"
 #include "vulkan/RenderPass.h"
 #include "vulkan/Texture.h"
@@ -40,7 +40,7 @@ public:
 	vk::Texture* texture; 
 	vk::Sampler* textureSampler;
 
-	std::vector<vk::Buffer*> buffers;
+	std::vector<vk::Mesh*> buffers;
 
 	vk::Descriptors* descriptors;
 

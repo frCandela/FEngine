@@ -34,11 +34,11 @@ Renderer::Renderer(Window& rWindow, Camera& rCamera) :
 
 	createGraphicsPipeline();
 
-	vk::Buffer * cube = new vk::Buffer(*device);
+	vk::Mesh * cube = new vk::Mesh(*device);
 	cube->LoadModel("mesh/cube.obj");
 	buffers.push_back(cube);
 
-	vk::Buffer * sphere = new vk::Buffer(*device);
+	vk::Mesh * sphere = new vk::Mesh(*device);
 	sphere->LoadModel("mesh/sphere.obj");
 	buffers.push_back(sphere);
 
@@ -501,7 +501,7 @@ void Renderer::cleanup()
 		vkDestroyFence(device->device, inFlightFences[i], nullptr);
 	}	
 	
-	for(vk::Buffer* buffer : buffers)
+	for(vk::Mesh* buffer : buffers)
 		delete(buffer);
 
 	delete(descriptors);

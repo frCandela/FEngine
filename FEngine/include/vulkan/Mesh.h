@@ -2,15 +2,16 @@
 
 #include "Device.h"
 #include "Vertex.h"
+#include "VulkanBuffer.hpp"
 
 namespace vk
 {
 	/// Buffer class : encapsulates a vulkan buffer
-	class Buffer
+	class Mesh
 	{
 	public:
-		Buffer(Device& device);
-		~Buffer();
+		Mesh(Device& device);
+		~Mesh();
 		Device & m_device;
 
 		//Vertices and indices of the loaded model
@@ -24,7 +25,7 @@ namespace vk
 		VkBuffer indexBuffer;
 		VkDeviceMemory indexBufferMemory;
 
-		static void createBuffer(Device& device, VkDeviceSize size, VkBufferUsageFlags usage, VkMemoryPropertyFlags properties, VkBuffer& buffer, VkDeviceMemory& bufferMemory);
+		//static void createBuffer(Device& device, VkDeviceSize size, VkBufferUsageFlags usage, VkMemoryPropertyFlags properties, VkBuffer& buffer, VkDeviceMemory& bufferMemory);
 		void copyBuffer(VkBuffer srcBuffer, VkBuffer dstBuffer, VkDeviceSize size);
 
 		/// Loads a model from an OBJ file

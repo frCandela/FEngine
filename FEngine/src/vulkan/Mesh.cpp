@@ -1,4 +1,4 @@
-#include "vulkan/Buffer.h"
+#include "vulkan/Mesh.h"
 
 #define TINYOBJLOADER_IMPLEMENTATION
 #include <tiny_obj_loader.h>
@@ -6,12 +6,13 @@
 namespace vk
 {
 
-	Buffer::Buffer(Device& device) :
+	Mesh::Mesh(Device& device) :
 		m_device(device)
 	{
+
 	}
 
-	Buffer::~Buffer()
+	Mesh::~Mesh()
 	{
 		// Destroy index buffer
 		vkDestroyBuffer(m_device.device, indexBuffer, nullptr);
@@ -21,41 +22,11 @@ namespace vk
 		vkDestroyBuffer(m_device.device, vertexBuffer, nullptr);
 		vkFreeMemory(m_device.device, vertexBufferMemory, nullptr);
 	}
+	
 
-
-
-
-	// Helper function for creating buffers
-	void Buffer::createBuffer(Device& device, VkDeviceSize size, VkBufferUsageFlags usage, VkMemoryPropertyFlags properties, VkBuffer& buffer, VkDeviceMemory& bufferMemory)
-	{
-		// Buffer info structure
-		VkBufferCreateInfo bufferInfo = {};
-		bufferInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
-		bufferInfo.size = size;
-		bufferInfo.usage = usage;
-		bufferInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
-
-		if (vkCreateBuffer(device.device, &bufferInfo, nullptr, &buffer) != VK_SUCCESS)
-			throw std::runtime_error("failed to create buffer!");
-
-		// Query memory requirements
-		VkMemoryRequirements memRequirements;
-		vkGetBufferMemoryRequirements(device.device, buffer, &memRequirements);
-
-		// Allow memory to buffer
-		VkMemoryAllocateInfo allocInfo = {};
-		allocInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
-		allocInfo.allocationSize = memRequirements.size;
-		allocInfo.memoryTypeIndex = device.findMemoryType(memRequirements.memoryTypeBits, properties);
-
-		if (vkAllocateMemory(device.device, &allocInfo, nullptr, &bufferMemory) != VK_SUCCESS)
-			throw std::runtime_error("failed to allocate buffer memory!");
-
-		vkBindBufferMemory(device.device, buffer, bufferMemory, 0);
-	}
 
 	// Copy the contents from one buffer to another
-	void Buffer::copyBuffer(VkBuffer srcBuffer, VkBuffer dstBuffer, VkDeviceSize size)
+	void Mesh::copyBuffer(VkBuffer srcBuffer, VkBuffer dstBuffer, VkDeviceSize size)
 	{
 		VkCommandBuffer commandBuffer = m_device.commands->beginSingleTimeCommands();
 
@@ -66,8 +37,7 @@ namespace vk
 		m_device.commands->endSingleTimeCommands(commandBuffer);
 	}
 
-
-	void Buffer::LoadModel(std::string path)
+	void Mesh::LoadModel(std::string path)
 	{
 		// Load a model into the library's data structures
 		tinyobj::attrib_t attrib;
@@ -117,14 +87,14 @@ namespace vk
 		CreateIndexBuffer();
 	}
 
-	void Buffer::CreateVertexBuffer()
+	void Mesh::CreateVertexBuffer()
 	{
 		VkDeviceSize bufferSize = sizeof(vertices[0]) * vertices.size();
 
 		// Create a host visible buffer
 		VkBuffer stagingBuffer;
 		VkDeviceMemory stagingBufferMemory;
-		createBuffer(m_device, bufferSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, stagingBuffer, stagingBufferMemory);
+		vks::Buffer::createBuffer(m_device, bufferSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, stagingBuffer, stagingBufferMemory);
 
 		// Fills it with data
 		void* data;
@@ -133,7 +103,7 @@ namespace vk
 		vkUnmapMemory(m_device.device, stagingBufferMemory);
 
 		// Create a device local buffer
-		createBuffer(m_device, bufferSize, VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, vertexBuffer, vertexBufferMemory);
+		vks::Buffer::createBuffer(m_device, bufferSize, VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, vertexBuffer, vertexBufferMemory);
 		copyBuffer(stagingBuffer, vertexBuffer, bufferSize);
 
 		// Cleaning
@@ -142,14 +112,14 @@ namespace vk
 
 	}
 
-	void Buffer::CreateIndexBuffer()
+	void Mesh::CreateIndexBuffer()
 	{
 		VkDeviceSize bufferSize = sizeof(indices[0]) * indices.size();
 
 		// Create a host visible buffer
 		VkBuffer stagingBuffer;
 		VkDeviceMemory stagingBufferMemory;
-		createBuffer(m_device, bufferSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, stagingBuffer, stagingBufferMemory);
+		vks::Buffer::createBuffer(m_device, bufferSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, stagingBuffer, stagingBufferMemory);
 
 		// Fills it with data
 		void* data;
@@ -158,7 +128,7 @@ namespace vk
 		vkUnmapMemory(m_device.device, stagingBufferMemory);
 
 		// Create a device local buffer
-		createBuffer(m_device, bufferSize, VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_INDEX_BUFFER_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, indexBuffer, indexBufferMemory);
+		vks::Buffer::createBuffer(m_device, bufferSize, VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_INDEX_BUFFER_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, indexBuffer, indexBufferMemory);
 		copyBuffer(stagingBuffer, indexBuffer, bufferSize);
 
 		// Cleaning

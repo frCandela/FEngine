@@ -1,7 +1,6 @@
 #pragma once
 
 #include "Sampler.h"
-#include "Buffer.h"
 #include "Texture.h"
 
 #include "VulkanBuffer.hpp"
@@ -32,10 +31,6 @@ namespace vk
 			std::vector<VkVertexInputBindingDescription> bindingDescriptions;
 			std::vector<VkVertexInputAttributeDescription> attributeDescriptions;
 		} vertices;
-
-		vks::Buffer vertexBuffer;
-		vks::Buffer indexBuffer;
-		uint32_t indexCount;
 
 		struct {
 			vks::Buffer view;
@@ -96,37 +91,7 @@ namespace vk
 		void updateUniformBuffers( Camera& camera );
 		void updateDynamicUniformBuffer(bool force = false);
 
-		VkResult createBuffer(VkBufferUsageFlags usageFlags, VkMemoryPropertyFlags memoryPropertyFlags, vks::Buffer *buffer, VkDeviceSize size)
-		{
-			buffer->device = m_device.device;
 
-			// Create the buffer handle
-			VkBufferCreateInfo bufferCreateInfo = vks::initializers::bufferCreateInfo(usageFlags, size);
-			VK_CHECK_RESULT(vkCreateBuffer(m_device.device, &bufferCreateInfo, nullptr, &buffer->buffer));
-
-			// Create the memory backing up the buffer handle
-			VkMemoryRequirements memReqs;
-			VkMemoryAllocateInfo memAlloc = vks::initializers::memoryAllocateInfo();
-			vkGetBufferMemoryRequirements(m_device.device, buffer->buffer, &memReqs);
-			memAlloc.allocationSize = memReqs.size;
-			// Find a memory type index that fits the properties of the buffer
-			memAlloc.memoryTypeIndex = m_device.findMemoryType(memReqs.memoryTypeBits, memoryPropertyFlags);
-
-			VK_CHECK_RESULT(vkAllocateMemory(m_device.device, &memAlloc, nullptr, &buffer->memory));
-
-			buffer->alignment = memReqs.alignment;
-			buffer->size = memAlloc.allocationSize;
-			buffer->usageFlags = usageFlags;
-			buffer->memoryPropertyFlags = memoryPropertyFlags;
-
-
-
-			// Initialize a default descriptor that covers the whole buffer size
-			buffer->setupDescriptor();
-
-			// Attach the memory to the buffer object
-			return buffer->bind();
-		}
 	};
 }
 
