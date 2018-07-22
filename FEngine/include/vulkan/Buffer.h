@@ -5,6 +5,7 @@
 
 namespace vk
 {
+	/// Buffer class : encapsulates a vulkan buffer
 	class Buffer
 	{
 	public:

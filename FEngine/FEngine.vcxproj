@@ -122,6 +122,7 @@
     <ClInclude Include="include\Input.h" />
     <ClInclude Include="include\Renderer.h" />
     <ClInclude Include="include\Transform.h" />
+    <ClInclude Include="include\VulkanBuffer.hpp" />
     <ClInclude Include="include\VulkanInitializers.hpp" />
     <ClInclude Include="include\VulkanTools.h" />
     <ClInclude Include="include\vulkan\Buffer.h" />

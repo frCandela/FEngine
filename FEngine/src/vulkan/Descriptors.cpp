@@ -317,9 +317,8 @@ namespace vk
 			*modelMat = glm::translate(*modelMat, glm::vec3(0.5f*(i+1), 0, 0));
 		}
 
-		animationTimer = 0.0f;
-
 		memcpy(uniformBuffers.dynamic.mapped, uboDataDynamic.model, uniformBuffers.dynamic.size);
+
 		// Flush to make changes visible to the host 
 		VkMappedMemoryRange memoryRange = vks::initializers::mappedMemoryRange();
 		memoryRange.memory = uniformBuffers.dynamic.memory;
