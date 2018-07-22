@@ -91,6 +91,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="include\VulkanTools.cpp" />
     <ClCompile Include="src\Camera.cpp" />
     <ClCompile Include="src\Component.cpp" />
     <ClCompile Include="src\FEngine.cpp" />
@@ -121,6 +122,8 @@
     <ClInclude Include="include\Input.h" />
     <ClInclude Include="include\Renderer.h" />
     <ClInclude Include="include\Transform.h" />
+    <ClInclude Include="include\VulkanInitializers.hpp" />
+    <ClInclude Include="include\VulkanTools.h" />
     <ClInclude Include="include\vulkan\Buffer.h" />
     <ClInclude Include="include\vulkan\Commands.h" />
     <ClInclude Include="include\vulkan\DepthImage.h" />

@@ -67,5 +67,6 @@ public:
 	void cleanup();
 
 	void drawFrame();
+
 };
 

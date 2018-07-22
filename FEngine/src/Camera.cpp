@@ -11,7 +11,7 @@ glm::mat4 Camera::GetView() const
 
 glm::mat4 Camera::GetProj() const
 {
-	glm::mat4 proj = glm::perspective(glm::radians(fov), aspectRatio, near, far);
+	glm::mat4 proj = glm::perspective(glm::radians(fov), aspectRatio, nearp, farp);
 
 	//the Y coordinate of the clip coordinates is inverted 
 	proj[1][1] *= -1;

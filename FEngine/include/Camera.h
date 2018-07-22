@@ -15,6 +15,6 @@ public:
 
 	float fov = 45.f;
 	float aspectRatio = 1.f;
-	float near = 0.1f;
-	float far = 100.f;
+	float nearp = 0.1f;
+	float farp = 100.f;
 };
