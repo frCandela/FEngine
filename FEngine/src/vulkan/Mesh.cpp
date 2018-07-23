@@ -16,8 +16,8 @@ namespace vk
 
 	Mesh::~Mesh()
 	{
-		vertexBuffer.destroy();
-		indexBuffer.destroy();
+		//vertexBuffer.destroy();
+		//indexBuffer.destroy();
 	}
 
 	// Copy the contents from one buffer to another
@@ -87,22 +87,18 @@ namespace vk
 		VkDeviceSize bufferSize = sizeof(vertices[0]) * vertices.size();
 
 		// Create a host visible buffer
-
-		vks::Buffer buf(m_device);
-		buf.createBuffer(VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, bufferSize);
+		vk::Buffer buf(m_device);
+		buf.CreateBuffer(VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, bufferSize);
 
 		// Fills it with data
-		buf.map(bufferSize);
+		buf.Map(bufferSize);
 		memcpy(buf.mappedData, vertices.data(), (size_t)bufferSize);
-		buf.unmap();
+		buf.Unmap();
 
 		// Create a device local buffer
-		vertexBuffer.createBuffer(VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, bufferSize);
+		vertexBuffer.CreateBuffer(VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, bufferSize);
 
 		copyBuffer(buf.m_buffer, vertexBuffer.m_buffer, bufferSize);
-
-		// Cleaning
-		buf.destroy();
 	}
 
 	void Mesh::CreateIndexBuffer()
@@ -110,20 +106,17 @@ namespace vk
 		VkDeviceSize bufferSize = sizeof(indices[0]) * indices.size();
 
 		// Create a host visible buffer
-		vks::Buffer buf(m_device);
-		buf.createBuffer(VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, bufferSize);
+		vk::Buffer buf(m_device);
+		buf.CreateBuffer(VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, bufferSize);
 
 		// Fills it with data
-		buf.map(bufferSize);
+		buf.Map(bufferSize);
 		memcpy(buf.mappedData, indices.data(), (size_t)bufferSize);
-		buf.unmap();
+		buf.Unmap();
 
 		// Create a device local buffer		
-		indexBuffer.createBuffer(VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_INDEX_BUFFER_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, bufferSize);
+		indexBuffer.CreateBuffer(VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_INDEX_BUFFER_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, bufferSize);
 		
 		copyBuffer(buf.m_buffer, indexBuffer.m_buffer, bufferSize);
-
-		// Cleaning
-		buf.destroy();
 	}
 }

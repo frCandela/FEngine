@@ -23,16 +23,8 @@ namespace vk
 	class Descriptors
 	{
 	public:
-
-		struct {
-			VkPipelineVertexInputStateCreateInfo inputState;
-			std::vector<VkVertexInputBindingDescription> bindingDescriptions;
-			std::vector<VkVertexInputAttributeDescription> attributeDescriptions;
-		} vertices;
-
-
-		vks::Buffer view;
-		vks::Buffer dynamic;
+		vk::Buffer view;
+		vk::Buffer dynamic;
 
 		struct {
 			glm::mat4 projection;
@@ -86,7 +78,7 @@ namespace vk
 		void createUniformBuffer();
 
 		void updateUniformBuffers( Camera& camera );
-		void updateDynamicUniformBuffer(bool force = false);
+		void updateDynamicUniformBuffer( std::vector<glm::mat4> matrices );
 
 
 	};

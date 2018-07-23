@@ -99,6 +99,7 @@
     <ClCompile Include="src\Renderer.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\Transform.cpp" />
+    <ClCompile Include="src\vulkan\Buffer.cpp" />
     <ClCompile Include="src\vulkan\Mesh.cpp" />
     <ClCompile Include="src\vulkan\Commands.cpp" />
     <ClCompile Include="src\vulkan\DepthImage.cpp" />

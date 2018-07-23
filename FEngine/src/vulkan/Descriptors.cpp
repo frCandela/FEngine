@@ -18,8 +18,6 @@ namespace vk
 	{
 		vkDestroyDescriptorPool(m_device.device, descriptorPool, nullptr);
 		vkDestroyDescriptorSetLayout(m_device.device, descriptorSetLayout, nullptr);
-		dynamic.destroy();
-		view.destroy();
 	}
 
 	// Create descriptor pool (for uniform buffers)
@@ -236,22 +234,22 @@ namespace vk
 
 		// Static shared uniform buffer object with projection and view matrix
 
-		view.createBuffer(
+		view.CreateBuffer(
 			VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT,
 			VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
 			sizeof(uboVS)
 		);
 
 		// Uniform buffer object with per-object matrices
-		dynamic.createBuffer(
+		dynamic.CreateBuffer(
 		VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT,
 		VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT,
 		bufferSize
 		);
 
 		// Map persistent
-		VK_CHECK_RESULT(view.map());
-		VK_CHECK_RESULT(dynamic.map());
+		VK_CHECK_RESULT(view.Map());
+		VK_CHECK_RESULT(dynamic.Map());
 
 		// Prepare per-object matrices with offsets and random rotations
 		for (uint32_t i = 0; i < OBJECT_INSTANCES; i++) {
@@ -302,13 +300,15 @@ namespace vk
 		memcpy(view.mappedData, &uboVS, sizeof(uboVS));
 	}
 
-	void Descriptors::updateDynamicUniformBuffer(bool force)
+	void Descriptors::updateDynamicUniformBuffer(std::vector<glm::mat4> matrices)
 	{
 		for (int i = 0; i < OBJECT_INSTANCES; ++i)
 		{
 			glm::mat4* modelMat = (glm::mat4*)(((uint64_t)uboDataDynamic.model + (i * dynamicAlignment)));
-			*modelMat = glm::mat4(1.f);
-			*modelMat = glm::translate(*modelMat, glm::vec3(0.5f*(i+1), 0, 0));
+			*modelMat = matrices[i];
+
+			/**modelMat = glm::mat4(1.f);
+			*modelMat = glm::translate(*modelMat, glm::vec3(0.5f*(i+1), 0, 0));*/
 		}
 
 		memcpy(dynamic.mappedData, uboDataDynamic.model, dynamic.m_size);

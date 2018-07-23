@@ -18,10 +18,9 @@ namespace vk
 		std::vector<Vertex> vertices;
 		std::vector<uint32_t> indices;
 
-		vks::Buffer vertexBuffer;
-		vks::Buffer indexBuffer;
+		vk::Buffer vertexBuffer;
+		vk::Buffer indexBuffer;
 
-		//static void createBuffer(Device& device, VkDeviceSize size, VkBufferUsageFlags usage, VkMemoryPropertyFlags properties, VkBuffer& buffer, VkDeviceMemory& bufferMemory);
 		void copyBuffer(VkBuffer srcBuffer, VkBuffer dstBuffer, VkDeviceSize size);
 
 		/// Loads a model from an OBJ file

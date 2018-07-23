@@ -29,7 +29,7 @@ Renderer::Renderer(Window& rWindow, Camera& rCamera) :
 	descriptors = new vk::Descriptors(*device);
 
 	descriptors->updateUniformBuffers(*m_pCamera);
-	descriptors->updateDynamicUniformBuffer(true);
+	descriptors->updateDynamicUniformBuffer({glm::mat4(1.f), glm::mat4(1.f) });
 
 	createGraphicsPipeline();
 
@@ -207,23 +207,26 @@ void Renderer::drawFrame()
 	ubo.view = m_pCamera->GetView();
 	ubo.proj = m_pCamera->GetProj();*/
 
-	descriptors->updateDynamicUniformBuffer();
+	//descriptors->updateDynamicUniformBuffer();
 
 	/*glm::mat4 model = glm::rotate(glm::mat4(1.0f), time * glm::radians(90.0f), glm::vec3(0.0f, 0.0f, 1.0f));
 	glm::mat4 model2 = glm::rotate(glm::mat4(1.0f),  - time * glm::radians(90.0f), glm::vec3(0.0f, 0.0f, 1.0f));
 	descriptors->UpdateModelBuffer(model, model2);*/
 
+	descriptors->updateDynamicUniformBuffer({ glm::mat4(1.f), glm::mat4(1.f) });
+	
+
 	//std::numeric_limits<uint64_t>::max()
 	vkWaitForFences(device->device, 1, &inFlightFences[currentFrame], VK_TRUE, 0xFFFFFFFFFFFFFFFF);
 	vkResetFences(device->device, 1, &inFlightFences[currentFrame]);
 
-	//Acquire an image from the swap chain
+	// Acquire an image from the swap chain
 	uint32_t imageIndex;
 	
 		//std::numeric_limits<uint64_t>::max()
 	VkResult result = vkAcquireNextImageKHR(device->device, swapChain->swapChain, 0xFFFFFFFFFFFFFFFF, imageAvailableSemaphores[currentFrame], VK_NULL_HANDLE, &imageIndex);
 
-	//Suboptimal or out-of-date swap chain
+	// Suboptimal or out-of-date swap chain
 	if (result == VK_ERROR_OUT_OF_DATE_KHR) 
 	{
 		recreateSwapChain();
@@ -232,11 +235,11 @@ void Renderer::drawFrame()
 	else if (result != VK_SUCCESS && result != VK_SUBOPTIMAL_KHR) 
 		throw std::runtime_error("failed to acquire swap chain image!");	
 
-	//Submit info struct
+	// Submit info struct
 	VkSubmitInfo submitInfo = {};
 	submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
 
-	//Specify which semaphores to wait on before execution begins and in which stages of the pipeline to wait.
+	// Specify which semaphores to wait on before execution begins and in which stages of the pipeline to wait.
 	VkSemaphore waitSemaphores[] = { imageAvailableSemaphores[currentFrame] };
 	VkPipelineStageFlags waitStages[] = { VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT };
 	submitInfo.waitSemaphoreCount = 1;
@@ -245,31 +248,31 @@ void Renderer::drawFrame()
 	submitInfo.commandBufferCount = 1;
 	submitInfo.pCommandBuffers = &(commands->commandBuffers[imageIndex]);
 
-	//Specify which semaphores to signal once the command buffers have finished execution
+	// Specify which semaphores to signal once the command buffers have finished execution
 	VkSemaphore signalSemaphores[] = { renderFinishedSemaphores[currentFrame] };
 	submitInfo.signalSemaphoreCount = 1;
 	submitInfo.pSignalSemaphores = signalSemaphores;
 
-	//Submit draw command buffer
+	// Submit draw command buffer
 	if (vkQueueSubmit(device->graphicsQueue, 1, &submitInfo, inFlightFences[currentFrame]) != VK_SUCCESS) 
 		throw std::runtime_error("failed to submit draw command buffer!");
 	
-	//Specify which semaphores to wait on before presentation can happen
+	// Specify which semaphores to wait on before presentation can happen
 	VkPresentInfoKHR presentInfo = {};
 	presentInfo.sType = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR;
 	presentInfo.waitSemaphoreCount = 1;
 	presentInfo.pWaitSemaphores = signalSemaphores;
 
-	// swap chains to present images to
+	// Swap chains to present images to
 	VkSwapchainKHR swapChains[] = { swapChain->swapChain };
 	presentInfo.swapchainCount = 1;
 	presentInfo.pSwapchains = swapChains;
 	presentInfo.pImageIndices = &imageIndex;
 
-	//Submit the result back to the swap chain to have it on screen
+	// Submit the result back to the swap chain to have it on screen
 	result = vkQueuePresentKHR(device->presentQueue, &presentInfo);
 
-	//Suboptimal or out-of-date swap chain
+	// Suboptimal or out-of-date swap chain
 	if (result == VK_ERROR_OUT_OF_DATE_KHR || result == VK_SUBOPTIMAL_KHR) 
 		recreateSwapChain();	
 	else if (result != VK_SUCCESS)
