@@ -2,7 +2,7 @@
 
 #include "Device.h"
 #include "Vertex.h"
-#include "VulkanBuffer.hpp"
+#include "Buffer.hpp"
 
 namespace vk
 {
@@ -18,12 +18,8 @@ namespace vk
 		std::vector<Vertex> vertices;
 		std::vector<uint32_t> indices;
 
-		VkBuffer vertexBuffer;
-		VkDeviceMemory vertexBufferMemory;
-
-		//Buffers
-		VkBuffer indexBuffer;
-		VkDeviceMemory indexBufferMemory;
+		vks::Buffer vertexBuffer;
+		vks::Buffer indexBuffer;
 
 		//static void createBuffer(Device& device, VkDeviceSize size, VkBufferUsageFlags usage, VkMemoryPropertyFlags properties, VkBuffer& buffer, VkDeviceMemory& bufferMemory);
 		void copyBuffer(VkBuffer srcBuffer, VkBuffer dstBuffer, VkDeviceSize size);

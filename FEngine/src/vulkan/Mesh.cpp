@@ -8,22 +8,17 @@ namespace vk
 
 	Mesh::Mesh(Device& device) :
 		m_device(device)
+		,vertexBuffer(device)
+		,indexBuffer(device)
 	{
 
 	}
 
 	Mesh::~Mesh()
 	{
-		// Destroy index buffer
-		vkDestroyBuffer(m_device.device, indexBuffer, nullptr);
-		vkFreeMemory(m_device.device, indexBufferMemory, nullptr);
-
-		// Destroy vertex buffer
-		vkDestroyBuffer(m_device.device, vertexBuffer, nullptr);
-		vkFreeMemory(m_device.device, vertexBufferMemory, nullptr);
+		vertexBuffer.destroy();
+		indexBuffer.destroy();
 	}
-	
-
 
 	// Copy the contents from one buffer to another
 	void Mesh::copyBuffer(VkBuffer srcBuffer, VkBuffer dstBuffer, VkDeviceSize size)
@@ -93,11 +88,8 @@ namespace vk
 
 		// Create a host visible buffer
 
-		vks::Buffer buf;
-		buf.m_device = m_device.device;
-
-		//vks::Buffer buffer = {};
-		vks::Buffer::createBuffer(m_device, bufferSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, buf.m_buffer, buf.memory);
+		vks::Buffer buf(m_device);
+		buf.createBuffer(VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, bufferSize);
 
 		// Fills it with data
 		buf.map(bufferSize);
@@ -105,8 +97,9 @@ namespace vk
 		buf.unmap();
 
 		// Create a device local buffer
-		vks::Buffer::createBuffer(m_device, bufferSize, VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, vertexBuffer, vertexBufferMemory);
-		copyBuffer(buf.m_buffer, vertexBuffer, bufferSize);
+		vertexBuffer.createBuffer(VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, bufferSize);
+
+		copyBuffer(buf.m_buffer, vertexBuffer.m_buffer, bufferSize);
 
 		// Cleaning
 		buf.destroy();
@@ -117,22 +110,20 @@ namespace vk
 		VkDeviceSize bufferSize = sizeof(indices[0]) * indices.size();
 
 		// Create a host visible buffer
-		VkBuffer stagingBuffer;
-		VkDeviceMemory stagingBufferMemory;
-		vks::Buffer::createBuffer(m_device, bufferSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, stagingBuffer, stagingBufferMemory);
+		vks::Buffer buf(m_device);
+		buf.createBuffer(VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, bufferSize);
 
 		// Fills it with data
-		void* data;
-		vkMapMemory(m_device.device, stagingBufferMemory, 0, bufferSize, 0, &data);
-		memcpy(data, indices.data(), (size_t)bufferSize);
-		vkUnmapMemory(m_device.device, stagingBufferMemory);
+		buf.map(bufferSize);
+		memcpy(buf.mappedData, indices.data(), (size_t)bufferSize);
+		buf.unmap();
 
-		// Create a device local buffer
-		vks::Buffer::createBuffer(m_device, bufferSize, VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_INDEX_BUFFER_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, indexBuffer, indexBufferMemory);
-		copyBuffer(stagingBuffer, indexBuffer, bufferSize);
+		// Create a device local buffer		
+		indexBuffer.createBuffer(VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_INDEX_BUFFER_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, bufferSize);
+		
+		copyBuffer(buf.m_buffer, indexBuffer.m_buffer, bufferSize);
 
 		// Cleaning
-		vkDestroyBuffer(m_device.device, stagingBuffer, nullptr);
-		vkFreeMemory(m_device.device, stagingBufferMemory, nullptr);
+		buf.destroy();
 	}
 }

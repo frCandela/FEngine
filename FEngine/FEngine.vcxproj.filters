@@ -80,9 +80,6 @@
     <ClCompile Include="src\Input.cpp">
       <Filter>Fichiers sources</Filter>
     </ClCompile>
-    <ClCompile Include="include\VulkanTools.cpp">
-      <Filter>Fichiers d%27en-tête</Filter>
-    </ClCompile>
     <ClCompile Include="src\vulkan\Mesh.cpp">
       <Filter>Fichiers sources\Vulkan</Filter>
     </ClCompile>
@@ -148,19 +145,16 @@
     <ClInclude Include="include\Input.h">
       <Filter>Fichiers d%27en-tête</Filter>
     </ClInclude>
-    <ClInclude Include="include\VulkanInitializers.hpp">
-      <Filter>Fichiers d%27en-tête\Vulkan</Filter>
-    </ClInclude>
-    <ClInclude Include="include\VulkanTools.h">
-      <Filter>Fichiers d%27en-tête</Filter>
-    </ClInclude>
-    <ClInclude Include="include\VulkanBuffer.hpp">
-      <Filter>Fichiers d%27en-tête</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Initializers.h">
-      <Filter>Fichiers d%27en-tête\Vulkan</Filter>
-    </ClInclude>
     <ClInclude Include="include\vulkan\Mesh.h">
+      <Filter>Fichiers d%27en-tête\Vulkan</Filter>
+    </ClInclude>
+    <ClInclude Include="include\vulkan\Util.h">
+      <Filter>Fichiers d%27en-tête\Vulkan</Filter>
+    </ClInclude>
+    <ClInclude Include="include\vulkan\Buffer.hpp">
+      <Filter>Fichiers d%27en-tête\Vulkan</Filter>
+    </ClInclude>
+    <ClInclude Include="include\vulkan\Initializers.h">
       <Filter>Fichiers d%27en-tête\Vulkan</Filter>
     </ClInclude>
   </ItemGroup>

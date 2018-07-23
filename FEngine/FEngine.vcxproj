@@ -91,7 +91,6 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="include\VulkanTools.cpp" />
     <ClCompile Include="src\Camera.cpp" />
     <ClCompile Include="src\Component.cpp" />
     <ClCompile Include="src\FEngine.cpp" />
@@ -119,13 +118,10 @@
     <ClInclude Include="include\Component.h" />
     <ClInclude Include="include\FEngine.h" />
     <ClInclude Include="include\GameObject.h" />
-    <ClInclude Include="include\Initializers.h" />
     <ClInclude Include="include\Input.h" />
     <ClInclude Include="include\Renderer.h" />
     <ClInclude Include="include\Transform.h" />
-    <ClInclude Include="include\VulkanBuffer.hpp" />
-    <ClInclude Include="include\VulkanInitializers.hpp" />
-    <ClInclude Include="include\VulkanTools.h" />
+    <ClInclude Include="include\vulkan\Initializers.h" />
     <ClInclude Include="include\vulkan\Mesh.h" />
     <ClInclude Include="include\vulkan\Commands.h" />
     <ClInclude Include="include\vulkan\DepthImage.h" />
@@ -138,7 +134,9 @@
     <ClInclude Include="include\vulkan\Shader.h" />
     <ClInclude Include="include\vulkan\SwapChain.h" />
     <ClInclude Include="include\vulkan\Texture.h" />
+    <ClInclude Include="include\vulkan\Util.h" />
     <ClInclude Include="include\vulkan\Vertex.h" />
+    <ClInclude Include="include\vulkan\Buffer.hpp" />
     <ClInclude Include="include\Window.h" />
   </ItemGroup>
   <ItemGroup>

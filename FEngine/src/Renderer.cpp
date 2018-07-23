@@ -1,5 +1,4 @@
 #include "Renderer.h"
-#include "VulkanInitializers.hpp"
 
 #include <array>
 #include <chrono>
@@ -99,10 +98,10 @@ void Renderer::createCommandBuffers()
 		{
 			std::cout << i << " " << j  << std::endl;
 
-			VkBuffer vertexBuffers[] = { buffers[j]->vertexBuffer };
+			VkBuffer vertexBuffers[] = { buffers[j]->vertexBuffer.m_buffer };
 			VkDeviceSize offsets[] = { 0 };
 			vkCmdBindVertexBuffers(commands->commandBuffers[i], 0, 1, vertexBuffers, offsets);
-			vkCmdBindIndexBuffer(commands->commandBuffers[i], buffers[j]->indexBuffer, 0, VK_INDEX_TYPE_UINT32);
+			vkCmdBindIndexBuffer(commands->commandBuffers[i], buffers[j]->indexBuffer.m_buffer, 0, VK_INDEX_TYPE_UINT32);
 
 			// One dynamic offset per dynamic descriptor to offset into the ubo containing all model matrices
 			uint32_t dynamicOffset = j * static_cast<uint32_t>(descriptors->dynamicAlignment);

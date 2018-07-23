@@ -3,7 +3,7 @@
 #include "Sampler.h"
 #include "Texture.h"
 
-#include "VulkanBuffer.hpp"
+#include "Buffer.hpp"
 #include "Camera.h"
 
 #include <stdlib.h>
@@ -90,14 +90,4 @@ namespace vk
 
 
 	};
-}
-
-#define VK_CHECK_RESULT(f)																				\
-{																										\
-	VkResult res = (f);																					\
-	if (res != VK_SUCCESS)																				\
-	{																									\
-		std::cout << "Fatal : VkResult is \"" << vks::tools::errorString(res) << "\" in " << __FILE__ << " at line " << __LINE__ << std::endl; \
-		assert(res == VK_SUCCESS);																		\
-	}																									\
 }
