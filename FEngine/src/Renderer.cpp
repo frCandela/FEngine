@@ -28,8 +28,8 @@ Renderer::Renderer(Window& rWindow, Camera& rCamera) :
 	textureSampler = new vk::Sampler(*device, texture->m_mipLevels);
 	descriptors = new vk::Descriptors(*device);
 
-	descriptors->updateUniformBuffers(*m_pCamera);
-	descriptors->updateDynamicUniformBuffer({glm::mat4(1.f), glm::mat4(1.f) });
+	descriptors->UpdateUniformBuffers(*m_pCamera);
+	descriptors->UpdateDynamicUniformBuffer({glm::mat4(1.f), glm::mat4(1.f) });
 
 	createGraphicsPipeline();
 
@@ -41,9 +41,15 @@ Renderer::Renderer(Window& rWindow, Camera& rCamera) :
 	sphere->LoadModel("mesh/sphere.obj");
 	buffers.push_back(sphere);
 
-	descriptors->createDescriptorSet(*texture, *textureSampler);
+	descriptors->CreateDescriptorSet(*texture, *textureSampler);
 	createCommandBuffers();
 	createSyncObjects();
+}
+
+Renderer::~Renderer()
+{
+	vkDeviceWaitIdle(device->device);
+	cleanup();
 }
 
 // Setup the command buffers for drawing opérations
@@ -91,13 +97,9 @@ void Renderer::createCommandBuffers()
 		vkCmdBeginRenderPass(commands->commandBuffers[i], &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
 		vkCmdBindPipeline(commands->commandBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, graphicsPipeline);
 
-		
-
 		//Record Draw calls on all existing buffers
 		for (int j = 0; j < buffers.size(); ++j)
 		{
-			std::cout << i << " " << j  << std::endl;
-
 			VkBuffer vertexBuffers[] = { buffers[j]->vertexBuffer.m_buffer };
 			VkDeviceSize offsets[] = { 0 };
 			vkCmdBindVertexBuffers(commands->commandBuffers[i], 0, 1, vertexBuffers, offsets);
@@ -116,115 +118,29 @@ void Renderer::createCommandBuffers()
 		if (vkEndCommandBuffer(commands->commandBuffers[i]) != VK_SUCCESS)
 			throw std::runtime_error("failed to record command buffer!"); 
 	}
-	/*commands->commandBuffers.resize(swapChain->swapChainFramebuffers.size());
-
-	// VkCommandBufferAllocateInfo specifies the command pool and number of buffers to allocate
-	VkCommandBufferAllocateInfo allocInfo = {};
-	allocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
-	allocInfo.commandPool = commands->commandPool;
-	allocInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
-	allocInfo.commandBufferCount = (uint32_t)commands->commandBuffers.size();
-
-	if (vkAllocateCommandBuffers(device->device, &allocInfo, commands->commandBuffers.data()) != VK_SUCCESS)
-		throw std::runtime_error("failed to allocate command buffers!");
-
-	// Records every command buffer (one per framebuffer)
-	for (size_t i = 0; i < commands->commandBuffers.size(); i++)
-	{
-		// Specify the usage of the command buffer
-		VkCommandBufferBeginInfo beginInfo = {};
-		beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
-		beginInfo.flags = VK_COMMAND_BUFFER_USAGE_SIMULTANEOUS_USE_BIT;
-
-		if (vkBeginCommandBuffer(commands->commandBuffers[i], &beginInfo) != VK_SUCCESS)
-			throw std::runtime_error("failed to begin recording command buffer!");
-
-		// Configure the render pass
-		VkRenderPassBeginInfo renderPassInfo = {};
-		renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
-		renderPassInfo.renderPass = renderPass->renderPass;
-		renderPassInfo.framebuffer = swapChain->swapChainFramebuffers[i];
-		renderPassInfo.renderArea.offset = { 0, 0 };
-		renderPassInfo.renderArea.extent = swapChain->swapChainExtent;
-
-		//Set clear collors for color and depth attachments
-		std::array<VkClearValue, 2> clearValues = {};
-		clearValues[0].color = { 0.0f, 0.0f, 0.0f, 1.0f };
-		clearValues[1].depthStencil = { 1.0f, 0 };
-
-		renderPassInfo.clearValueCount = static_cast<uint32_t>(clearValues.size());
-		renderPassInfo.pClearValues = clearValues.data();
-
-		vkCmdBeginRenderPass(commands->commandBuffers[i], &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
-		vkCmdBindPipeline(commands->commandBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, graphicsPipeline);
-
-		//Record Draw calls on all existing buffers
-		for (int j = 0; j < buffers.size(); ++j)
-		{
-			
-
-			VkBuffer vertexBuffers[] = { buffers[j]->vertexBuffer };
-			VkDeviceSize offsets[] = { 0 };
-			vkCmdBindVertexBuffers(commands->commandBuffers[i], 0, 1, vertexBuffers, offsets);
-			vkCmdBindIndexBuffer(commands->commandBuffers[i], buffers[j]->indexBuffer, 0, VK_INDEX_TYPE_UINT32);
-			
-			uint32_t dynamicOffset = j * static_cast<uint32_t>(descriptors->dynamicAlignment);
-			vkCmdBindDescriptorSets(commands->commandBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineLayout, 0, 1, &descriptors->descriptorSet, 1, &dynamicOffset);
-			vkCmdDrawIndexed(commands->commandBuffers[i], static_cast<uint32_t>(buffers[j]->indices.size()), 1, 0, 0, 0);
-
-			VkBuffer vertexBuffers[] = { buffers[j]->vertexBuffer };
-			VkDeviceSize offsets[] = { 0 };
-			vkCmdBindVertexBuffers(commands->commandBuffers[i], 0, 1, vertexBuffers, offsets);
-			vkCmdBindIndexBuffer(commands->commandBuffers[i], buffers[j]->indexBuffer, 0, VK_INDEX_TYPE_UINT32);
-			vkCmdBindDescriptorSets(commands->commandBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineLayout, 0, 1, &(descriptors->descriptorSet), 0, nullptr);
-			vkCmdDrawIndexed(commands->commandBuffers[i], static_cast<uint32_t>(buffers[j]->indices.size()), 1, 0, 0, 0);
-		}
-
-		vkCmdEndRenderPass(commands->commandBuffers[i]);
-
-		if (vkEndCommandBuffer(commands->commandBuffers[i]) != VK_SUCCESS)
-			throw std::runtime_error("failed to record command buffer!");
-	}*/
-}
-
-Renderer::~Renderer()
-{
-	vkDeviceWaitIdle(device->device);
-	cleanup();
 }
 
 // Draw a frame
 void Renderer::drawFrame()
 {
-	/*float aspectRatio = swapChain->swapChainExtent.width / (float)swapChain->swapChainExtent.height;
+	float aspectRatio = swapChain->swapChainExtent.width / (float)swapChain->swapChainExtent.height;
 	static auto startTime = std::chrono::high_resolution_clock::now();
 
 	auto currentTime = std::chrono::high_resolution_clock::now();
 	float time = std::chrono::duration<float, std::chrono::seconds::period>(currentTime - startTime).count();
-	//Define the model, view and projection transformations in the uniform buffer object 
-	vk::UniformBufferObject ubo = {};
-	ubo.model = glm::rotate(glm::mat4(1.0f), time * glm::radians(90.0f), glm::vec3(0.0f, 0.0f, 1.0f));
-	ubo.view = m_pCamera->GetView();
-	ubo.proj = m_pCamera->GetProj();*/
 
-	//descriptors->updateDynamicUniformBuffer();
-
-	/*glm::mat4 model = glm::rotate(glm::mat4(1.0f), time * glm::radians(90.0f), glm::vec3(0.0f, 0.0f, 1.0f));
-	glm::mat4 model2 = glm::rotate(glm::mat4(1.0f),  - time * glm::radians(90.0f), glm::vec3(0.0f, 0.0f, 1.0f));
-	descriptors->UpdateModelBuffer(model, model2);*/
-
-	descriptors->updateDynamicUniformBuffer({ glm::mat4(1.f), glm::mat4(1.f) });
+	descriptors->UpdateDynamicUniformBuffer({
+		glm::rotate(glm::mat4(1.0f), time * glm::radians(90.0f), glm::vec3(0.0f, 0.0f, 1.0f))
+		,glm::rotate(glm::mat4(1.0f), -time * glm::radians(90.0f), glm::vec3(0.0f, 0.0f, 1.0f))
+	});	
 	
-
-	//std::numeric_limits<uint64_t>::max()
-	vkWaitForFences(device->device, 1, &inFlightFences[currentFrame], VK_TRUE, 0xFFFFFFFFFFFFFFFF);
+	vkWaitForFences(device->device, 1, &inFlightFences[currentFrame], VK_TRUE, std::numeric_limits<uint64_t>::max());
 	vkResetFences(device->device, 1, &inFlightFences[currentFrame]);
 
 	// Acquire an image from the swap chain
 	uint32_t imageIndex;
 	
-		//std::numeric_limits<uint64_t>::max()
-	VkResult result = vkAcquireNextImageKHR(device->device, swapChain->swapChain, 0xFFFFFFFFFFFFFFFF, imageAvailableSemaphores[currentFrame], VK_NULL_HANDLE, &imageIndex);
+	VkResult result = vkAcquireNextImageKHR(device->device, swapChain->swapChain, std::numeric_limits<uint64_t>::max(), imageAvailableSemaphores[currentFrame], VK_NULL_HANDLE, &imageIndex);
 
 	// Suboptimal or out-of-date swap chain
 	if (result == VK_ERROR_OUT_OF_DATE_KHR) 
@@ -280,8 +196,6 @@ void Renderer::drawFrame()
 	
 	currentFrame = (currentFrame + 1) % MAX_FRAMES_IN_FLIGHT;
 }
-
-
 
 // Recreates the swap chain (necessary when the window is resized)
 void Renderer::recreateSwapChain()
