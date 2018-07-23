@@ -23,7 +23,7 @@ Renderer::Renderer(Window& rWindow, Camera& rCamera) :
 	swapChain->CreateFramebuffers(renderPass->renderPass);
 
 	texture = new vk::Texture(*device);
-	texture->LoadTexture("textures/cube.jpg");
+	texture->LoadTexture("textures/texture.jpg");
 
 	textureSampler = new vk::Sampler(*device, texture->m_mipLevels);
 	descriptors = new vk::Descriptors(*device);
@@ -66,14 +66,14 @@ Renderer::Renderer(Window& rWindow, Camera& rCamera) :
 
 	sphere->vertices = 
 	{
-		{ {0,0,0},	red,	{} },	//Fbl 0
-		{ {0,0,1},	white,	{} },	//Fbr 1
-		{ {0,1,0},	blue,	{} },	//Ftl 2
-		{ {0,1,1},	green,	{} },	//Ftr 3
-		{ {1,0,0},	yellow,	{} },	//Bbl 4
-		{ {1,0,1},	pink,	{} },	//Bbr 5
-		{ {1,1,0},	cyan,	{} },	//Btl 6
-		{ {1,1,1},	black,	{} },	//Btr 7
+		{ {0,0,0},	red,	{0,0} },	//Fbl 0
+		{ {0,0,1},	white,	{1,0} },	//Fbr 1
+		{ {0,1,0},	blue,	{0,1} },	//Ftl 2
+		{ {0,1,1},	green,	{1,1 } },	//Ftr 3
+		{ {1,0,0},	yellow,	{0,1} },	//Bbl 4
+		{ {1,0,1},	pink,	{1,1} },	//Bbr 5
+		{ {1,1,0},	cyan,	{0,0} },	//Btl 6
+		{ {1,1,1},	black,	{1,0} },	//Btr 7///
 	};
 
 	sphere->CreateBuffers();
@@ -166,6 +166,7 @@ void Renderer::drawFrame()
 
 	auto currentTime = std::chrono::high_resolution_clock::now();
 	float time = std::chrono::duration<float, std::chrono::seconds::period>(currentTime - startTime).count();
+	//time = 0.f;
 	descriptors->UpdateDynamicUniformBuffer({
 		glm::rotate(glm::mat4(1.0f), time * glm::radians(90.0f), glm::vec3(1.f, 1.f, 1.f))
 		,glm::rotate(glm::mat4(1.0f), -time * glm::radians(90.0f), glm::vec3(1.f, 1.f, 1.f))
