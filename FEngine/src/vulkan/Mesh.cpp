@@ -16,8 +16,6 @@ namespace vk
 
 	Mesh::~Mesh()
 	{
-		//vertexBuffer.destroy();
-		//indexBuffer.destroy();
 	}
 
 	// Copy the contents from one buffer to another
@@ -78,6 +76,10 @@ namespace vk
 			}
 		}
 
+	}
+
+	void Mesh::CreateBuffers()
+	{
 		CreateVertexBuffer();
 		CreateIndexBuffer();
 	}

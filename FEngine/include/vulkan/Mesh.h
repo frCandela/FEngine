@@ -25,6 +25,7 @@ namespace vk
 
 		/// Loads a model from an OBJ file
 		void LoadModel(std::string path);
+		void CreateBuffers();
 
 	private:
 		/// Creates a vertex buffer from the loaded model data

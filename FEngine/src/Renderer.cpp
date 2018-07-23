@@ -35,10 +35,48 @@ Renderer::Renderer(Window& rWindow, Camera& rCamera) :
 
 	vk::Mesh * cube = new vk::Mesh(*device);
 	cube->LoadModel("mesh/cube.obj");
+	cube->CreateBuffers();
 	buffers.push_back(cube);
 
 	vk::Mesh * sphere = new vk::Mesh(*device);
 	sphere->LoadModel("mesh/sphere.obj");
+
+	glm::vec2 bl = { 0,0 };
+	glm::vec2 br = { 1,0 };
+	glm::vec2 tl = { 0,1 };//vert
+	glm::vec2 tr = { 1,1 };//jaune
+
+	glm::vec3 red =		{ 1,0,0 };
+	glm::vec3 green =	{ 0,1,0 };
+	glm::vec3 blue =	{ 0,0,1 };
+	glm::vec3 white =	{ 1,1,1 };
+	glm::vec3 yellow =	{ 1,1,0 };
+	glm::vec3 pink =	{ 1,0,1 };
+	glm::vec3 cyan =	{ 0,1,1 };
+	glm::vec3 black =	{ 1,1,1 };
+	
+	sphere->indices = { 
+		0,1,3,0,3,2, //front
+		4,7,5,4,6,7, //back
+		1,5,7,1,7,3, //right
+		0,6,4,0,2,6, //left
+		2,3,7,2,7,6, //top
+		0,5,1,0,4,5  //
+	};
+
+	sphere->vertices = 
+	{
+		{ {0,0,0},	red,	{} },	//Fbl 0
+		{ {0,0,1},	white,	{} },	//Fbr 1
+		{ {0,1,0},	blue,	{} },	//Ftl 2
+		{ {0,1,1},	green,	{} },	//Ftr 3
+		{ {1,0,0},	yellow,	{} },	//Bbl 4
+		{ {1,0,1},	pink,	{} },	//Bbr 5
+		{ {1,1,0},	cyan,	{} },	//Btl 6
+		{ {1,1,1},	black,	{} },	//Btr 7
+	};
+
+	sphere->CreateBuffers();
 	buffers.push_back(sphere);
 
 	descriptors->CreateDescriptorSet(*texture, *textureSampler);
@@ -88,7 +126,7 @@ void Renderer::createCommandBuffers()
 
 		//Set clear collors for color and depth attachments
 		std::array<VkClearValue, 2> clearValues = {};
-		clearValues[0].color = { 0.0f, 0.0f, 0.0f, 1.0f };
+		clearValues[0].color = { 0.5f, 0.5f, 0.5f, 1.0f };
 		clearValues[1].depthStencil = { 1.0f, 0 };
 
 		renderPassInfo.clearValueCount = static_cast<uint32_t>(clearValues.size());
@@ -128,10 +166,9 @@ void Renderer::drawFrame()
 
 	auto currentTime = std::chrono::high_resolution_clock::now();
 	float time = std::chrono::duration<float, std::chrono::seconds::period>(currentTime - startTime).count();
-
 	descriptors->UpdateDynamicUniformBuffer({
-		glm::rotate(glm::mat4(1.0f), time * glm::radians(90.0f), glm::vec3(0.0f, 0.0f, 1.0f))
-		,glm::rotate(glm::mat4(1.0f), -time * glm::radians(90.0f), glm::vec3(0.0f, 0.0f, 1.0f))
+		glm::rotate(glm::mat4(1.0f), time * glm::radians(90.0f), glm::vec3(1.f, 1.f, 1.f))
+		,glm::rotate(glm::mat4(1.0f), -time * glm::radians(90.0f), glm::vec3(1.f, 1.f, 1.f))
 	});	
 	
 	vkWaitForFences(device->device, 1, &inFlightFences[currentFrame], VK_TRUE, std::numeric_limits<uint64_t>::max());
