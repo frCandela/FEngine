@@ -8,6 +8,8 @@ Renderer::Renderer(Window& rWindow, Camera& rCamera) :
 	m_window(rWindow),
 	m_pCamera(&rCamera)
 {
+
+
 	// Initializes the Vulkan application and required components
 	instance = new vk::Instance();
 	device = new vk::Device(instance->instance, m_window);
@@ -80,8 +82,22 @@ Renderer::Renderer(Window& rWindow, Camera& rCamera) :
 	buffers.push_back(sphere);
 
 	descriptors->CreateDescriptorSet(*texture, *textureSampler);
+
+	ImGui::CreateContext();
+	imGui = new ImGUI(device);
+	imGui->camera.type = Kamera::CameraType::lookat;
+	imGui->camera.setPosition(glm::vec3(0.0f, 1.4f, -4.8f));
+	imGui->camera.setRotation(glm::vec3(4.5f, -380.0f, 0.0f));
+	imGui->camera.setPerspective(45.0f, (float)800 / (float)600, 0.1f, 256.0f);
+
+	imGui->init((float)800, (float)600);
+	imGui->initResources( renderPass->renderPass, device->graphicsQueue);
+
+
 	createCommandBuffers();
 	createSyncObjects();
+
+
 }
 
 Renderer::~Renderer()
@@ -124,6 +140,9 @@ void Renderer::createCommandBuffers()
 		renderPassInfo.renderArea.offset = { 0, 0 };
 		renderPassInfo.renderArea.extent = swapChain->swapChainExtent;
 
+		imGui->newFrame(true);
+		imGui->updateBuffers();
+
 		//Set clear collors for color and depth attachments
 		std::array<VkClearValue, 2> clearValues = {};
 		clearValues[0].color = { 0.5f, 0.5f, 0.5f, 1.0f };
@@ -151,6 +170,7 @@ void Renderer::createCommandBuffers()
 			vkCmdDrawIndexed(commands->commandBuffers[i], static_cast<uint32_t>(buffers[j]->indices.size()), 1, 0, 0, 0);
 		}
 
+		imGui->drawFrame(commands->commandBuffers[i]);
 		vkCmdEndRenderPass(commands->commandBuffers[i]);
 
 		if (vkEndCommandBuffer(commands->commandBuffers[i]) != VK_SUCCESS)
@@ -458,6 +478,8 @@ void Renderer::cleanup()
 	for(vk::Mesh* buffer : buffers)
 		delete(buffer);
 
+	delete(imGui);
+
 	delete(descriptors);
 	delete(textureSampler);
 	delete(texture);
@@ -467,5 +489,5 @@ void Renderer::cleanup()
 	delete(swapChain);
 	delete(commands);
 	delete (device);
-	delete(instance);
+	delete(instance);	
 }

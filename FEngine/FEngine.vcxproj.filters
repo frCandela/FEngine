@@ -18,6 +18,9 @@
     <Filter Include="Fichiers d%27en-tête\Vulkan">
       <UniqueIdentifier>{10795a4a-6962-4238-8c48-aceddbdfab86}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Fichiers d%27en-tête\imgui">
+      <UniqueIdentifier>{162d503e-f0a6-47bd-a602-c5ab3ba901b5}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\main.cpp">
@@ -85,6 +88,15 @@
     </ClCompile>
     <ClCompile Include="src\vulkan\Buffer.cpp">
       <Filter>Fichiers sources\Vulkan</Filter>
+    </ClCompile>
+    <ClCompile Include="deps\imgui\imgui.cpp">
+      <Filter>Fichiers d%27en-tête\imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="deps\imgui\imgui_demo.cpp">
+      <Filter>Fichiers d%27en-tête\imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="deps\imgui\imgui_draw.cpp">
+      <Filter>Fichiers d%27en-tête\imgui</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -159,6 +171,12 @@
     </ClInclude>
     <ClInclude Include="include\vulkan\Initializers.h">
       <Filter>Fichiers d%27en-tête\Vulkan</Filter>
+    </ClInclude>
+    <ClInclude Include="include\IMGUI.h">
+      <Filter>Fichiers d%27en-tête</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Kamera.h">
+      <Filter>Fichiers d%27en-tête</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

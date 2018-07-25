@@ -21,7 +21,8 @@
 #include "vulkan/Descriptors.h"
 #include "vulkan/Commands.h"
 
-
+#include "IMGUI.h"
+#include <imgui.h>
 #include "Camera.h"
 
 
@@ -30,6 +31,8 @@ class Renderer
 public:
 	Renderer(Window& rWindow, Camera& rCamera);
 	~Renderer();
+
+	ImGUI *imGui = nullptr;
 
 	Camera* m_pCamera;
 

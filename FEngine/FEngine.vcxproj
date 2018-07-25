@@ -91,6 +91,9 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="deps\imgui\imgui.cpp" />
+    <ClCompile Include="deps\imgui\imgui_demo.cpp" />
+    <ClCompile Include="deps\imgui\imgui_draw.cpp" />
     <ClCompile Include="src\Camera.cpp" />
     <ClCompile Include="src\Component.cpp" />
     <ClCompile Include="src\FEngine.cpp" />
@@ -119,7 +122,9 @@
     <ClInclude Include="include\Component.h" />
     <ClInclude Include="include\FEngine.h" />
     <ClInclude Include="include\GameObject.h" />
+    <ClInclude Include="include\IMGUI.h" />
     <ClInclude Include="include\Input.h" />
+    <ClInclude Include="include\Kamera.h" />
     <ClInclude Include="include\Renderer.h" />
     <ClInclude Include="include\Transform.h" />
     <ClInclude Include="include\vulkan\Initializers.h" />
