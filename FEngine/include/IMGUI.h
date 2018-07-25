@@ -21,6 +21,7 @@
 #include "VulkanBuffer.hpp"
 #include "VulkanInitializers.hpp"
 #include "Kamera.h" 
+#include "vulkan/Shader.h"
 
 #define ASSET_PATH "./../data/"
 
@@ -45,9 +46,12 @@ public:
 	VkDescriptorSetLayout descriptorSetLayout;
 	VkDescriptorSet descriptorSet;
 	vk::Device *device;
-	std::vector<VkShaderModule> shaderModules;
+
 	Kamera camera;
 	float frameTimer = 1.0f;
+
+	vk::Shader * fragShader;
+	vk::Shader * vertShader;
 
 	// Options and values to display/toggle from the UI
 	struct UISettings {
@@ -101,6 +105,9 @@ public:
 		ImGuiIO& io = ImGui::GetIO();
 		io.DisplaySize = ImVec2(width, height);
 		io.DisplayFramebufferScale = ImVec2(1.0f, 1.0f);
+
+		vertShader = new vk::Shader(*device, "shaders/imgui/ui.vert.spv");
+		fragShader = new vk::Shader(*device, "shaders/imgui/ui.frag.spv");
 	}
 
 	// Initialize all Vulkan resources used by the ui
@@ -323,8 +330,26 @@ public:
 
 		pipelineCreateInfo.pVertexInputState = &vertexInputState;
 
-		shaderStages[0] = loadShader("shaders/imgui/ui.vert.spv", VK_SHADER_STAGE_VERTEX_BIT);
-		shaderStages[1] = loadShader("shaders/imgui/ui.frag.spv", VK_SHADER_STAGE_FRAGMENT_BIT);
+
+		vk::ShaderModule vertShaderModule = vertShader->GetShaderModule();
+		vk::ShaderModule fragShaderModule = fragShader->GetShaderModule();
+
+		// Link vertex shader
+		VkPipelineShaderStageCreateInfo vertShaderStageInfo = {};
+		vertShaderStageInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
+		vertShaderStageInfo.stage = VK_SHADER_STAGE_VERTEX_BIT;
+		vertShaderStageInfo.module = vertShaderModule.module;
+		vertShaderStageInfo.pName = "main";
+
+		// Link fragment shader
+		VkPipelineShaderStageCreateInfo fragShaderStageInfo = {};
+		fragShaderStageInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
+		fragShaderStageInfo.stage = VK_SHADER_STAGE_FRAGMENT_BIT;
+		fragShaderStageInfo.module = fragShaderModule.module;
+		fragShaderStageInfo.pName = "main";
+
+		shaderStages[0] = vertShaderStageInfo;
+		shaderStages[1] = fragShaderStageInfo;
 
 		VK_CHECK_RESULT(vkCreateGraphicsPipelines(device->device, pipelineCache, 1, &pipelineCreateInfo, nullptr, &pipeline));
 	}
@@ -621,53 +646,6 @@ public:
 		}
 
 		return cmdBuffer;
-	}
-
-	VkPipelineShaderStageCreateInfo loadShader(std::string fileName, VkShaderStageFlagBits stage)
-	{
-		VkPipelineShaderStageCreateInfo shaderStage = {};
-		shaderStage.sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
-		shaderStage.stage = stage;
-
-		shaderStage.module = loadShader(fileName.c_str(), device->device);
-
-		shaderStage.pName = "main"; // todo : make param
-		assert(shaderStage.module != VK_NULL_HANDLE);
-		shaderModules.push_back(shaderStage.module);
-		return shaderStage;
-	}
-
-	VkShaderModule loadShader(const char *fileName, VkDevice device)
-	{
-		std::ifstream is(fileName, std::ios::binary | std::ios::in | std::ios::ate);
-
-		if (is.is_open())
-		{
-			size_t size = is.tellg();
-			is.seekg(0, std::ios::beg);
-			char* shaderCode = new char[size];
-			is.read(shaderCode, size);
-			is.close();
-
-			assert(size > 0);
-
-			VkShaderModule shaderModule;
-			VkShaderModuleCreateInfo moduleCreateInfo{};
-			moduleCreateInfo.sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO;
-			moduleCreateInfo.codeSize = size;
-			moduleCreateInfo.pCode = (uint32_t*)shaderCode;
-
-			VK_CHECK_RESULT(vkCreateShaderModule(device, &moduleCreateInfo, NULL, &shaderModule));
-
-			delete[] shaderCode;
-
-			return shaderModule;
-		}
-		else
-		{
-			std::cerr << "Error: Could not open shader file \"" << fileName << "\"" << std::endl;
-			return VK_NULL_HANDLE;
-		}
 	}
 
 	void flushCommandBuffer(VkCommandBuffer commandBuffer, VkQueue queue, bool free = true)
