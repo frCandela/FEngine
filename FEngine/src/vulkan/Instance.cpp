@@ -96,7 +96,10 @@ namespace vk
 			}
 
 			if (!layerFound)
+			{
+				std::cerr << layerName << std::endl;
 				return false;
+			}
 		}
 
 		return true;
