@@ -1,5 +1,7 @@
 #include "Input.h"
 
+#include <iostream>
+
 ////////////Input////////////
 unsigned Input::m_count = 0;
 
@@ -44,7 +46,7 @@ bool Input::ShuttingDown()
 void Input::Update()
 {
 	++m_count;
-	Mouse::Update(m_count);
+	Mouse::Update();
 	glfwPollEvents();
 }
 
@@ -106,7 +108,7 @@ bool Mouse::ButtonReleased(int GLFW_MOUSE_BUTTON) { return m_buttonsReleased[GLF
 
 void Mouse::mouse_callback(GLFWwindow* window, double x, double y)
 {
-	
+
 }
 
 void Mouse::scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
@@ -124,7 +126,7 @@ void Mouse::mouse_button_callback(GLFWwindow* window, int button, int action, in
 		m_buttonsReleased[button] = Input::FrameCount();
 }
 
-void Mouse::Update(int count)
+void Mouse::Update()
 {
 	//Mouse
 	double x, y;

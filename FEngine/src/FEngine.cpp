@@ -19,13 +19,21 @@ void FEngine::Run()
 	Renderer renderer(window, *camera);
 
 	camera->aspectRatio = renderer.swapChain->swapChainExtent.width / (float) renderer.swapChain->swapChainExtent.height;
-	
-	//camera->gameobject = &gameobject;
-
 
 	while ( window.WindowOpen() )
 	{
-			glfwPollEvents();
-			renderer.drawFrame();
+		Input::Update();
+
+		// Update imGui
+		/*ImGuiIO& io = ImGui::GetIO();
+		glm::vec2 size = renderer.GetSize();
+		io.DisplaySize = ImVec2(size.x, size.y);
+		io.DeltaTime = 1 / 60.f;
+		io.MousePos = ImVec2(Mouse::Position().x, Mouse::Position().y);
+		io.MouseDown[0] = Mouse::KeyDown(Mouse::left);
+		io.MouseDown[1] = Mouse::KeyDown(Mouse::right);*/
+
+		glfwPollEvents();
+		renderer.drawFrame();
 	}
 }

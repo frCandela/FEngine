@@ -181,6 +181,9 @@ void Renderer::createCommandBuffers()
 // Draw a frame
 void Renderer::drawFrame()
 {
+	// Update imGui
+
+
 	float aspectRatio = swapChain->swapChainExtent.width / (float)swapChain->swapChainExtent.height;
 	static auto startTime = std::chrono::high_resolution_clock::now();
 

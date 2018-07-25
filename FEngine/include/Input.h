@@ -8,10 +8,12 @@
 #include "glm/glm.hpp"
 
 #include <array>
+#include "imgui/imgui.h"
 
 class Input
 {
-	friend class Minecraft;
+	friend class FEngine;
+
 
 public:
 	static void Setup(GLFWwindow * window);
@@ -81,7 +83,7 @@ private:
 	static void mouse_button_callback(GLFWwindow* window, int button, int action, int mods);
 	static void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
 
-	static void Update(int count);
+	static void Update();
 
 	static bool m_lockCursor;
 	static glm::vec2 m_lockPosition;

@@ -71,5 +71,7 @@ public:
 
 	void drawFrame();
 
+	glm::vec2 GetSize() const{return glm::vec2((float)swapChain->swapChainExtent.width, (float)swapChain->swapChainExtent.height);}
+
 };
 
