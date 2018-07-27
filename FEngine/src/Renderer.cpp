@@ -89,10 +89,8 @@ Renderer::Renderer(Window& rWindow, Camera& rCamera) :
 	imGui->camera.setPerspective(45.0f, size.x / size.y, 0.1f, 256.0f);
 	imGui->init(size.x, size.y);
 	imGui->initResources( renderPass->renderPass, device->graphicsQueue);
-	//createCommandBuffers();
+	createCommandBuffers();
 	createSyncObjects();
-
-
 }
 
 Renderer::~Renderer()
@@ -104,9 +102,11 @@ Renderer::~Renderer()
 // Setup the command buffers for drawing opérations
 void Renderer::createCommandBuffers()
 {
+	ImGui::NewFrame();
+	//ImGui::ShowTestWindow();
+	ImGui::Render();
+
 	commands->CreateBuffer(swapChain->swapChainFramebuffers.size());
-
-
 
 	imGui->updateBuffers();
 
@@ -156,7 +156,6 @@ void Renderer::createCommandBuffers()
 
 		commands->End(i);
 	}
-
 }
 
 // Draw a frame

@@ -25,8 +25,6 @@ void FEngine::Run()
 	while ( window.WindowOpen() )
 	{
 		Input::Update();
-		ImGui::NewFrame();
-		ImGui::ShowTestWindow();
 
 		if (once)
 		{
@@ -43,8 +41,7 @@ void FEngine::Run()
 		io.MousePos = ImVec2(Mouse::Position().x, Mouse::Position().y);
 		io.MouseDown[0] = Mouse::KeyDown(Mouse::left);
 		io.MouseDown[1] = Mouse::KeyDown(Mouse::right);
-		
-		ImGui::Render();
+
 		renderer.drawFrame();
 
 	}
