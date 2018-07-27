@@ -36,7 +36,10 @@ namespace vk
 
 		CopyBufferToImage(stagingBuffer.m_buffer, static_cast<uint32_t>(width), static_cast<uint32_t>(height));
 
-		GenerateMipmaps(VK_FORMAT_R8G8B8A8_UNORM, width, height, m_mipLevels);
+		if(m_mipLevels > 1)
+			GenerateMipmaps(VK_FORMAT_R8G8B8A8_UNORM, width, height, m_mipLevels);
+		else
+			TransitionImageLayout(VK_FORMAT_R8G8B8A8_UNORM, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, m_mipLevels);
 
 		// Creates the image View
 		CreateImageView(VK_FORMAT_R8G8B8A8_UNORM, VK_IMAGE_ASPECT_COLOR_BIT, m_mipLevels);

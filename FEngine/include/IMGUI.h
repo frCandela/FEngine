@@ -15,7 +15,7 @@
 #include "vulkan/Shader.h"
 #include "vulkan/Buffer.hpp"
 #include "vulkan/CommandPool.h"
-#include "vulkan/Image.h"
+#include "vulkan/Texture.h"
 
 #include "VulkanInitializers.hpp"
 
@@ -30,7 +30,7 @@ public:
 	int32_t vertexCount = 0;
 	int32_t indexCount = 0;
 
-	vk::Image* fontImage;
+	vk::Texture* fontImage;
 
 	/*VkDeviceMemory fontMemory = VK_NULL_HANDLE;
 	VkImage fontImage = VK_NULL_HANDLE;
@@ -73,7 +73,7 @@ public:
 		, commandPool(pCommandPool)
 		, vertexBuffer(*pdevice)
 		, indexBuffer(*pdevice)
-		, fontImage( new vk::Image( *pdevice, *pCommandPool))
+		, fontImage( new vk::Texture( *pdevice, *pCommandPool))
 		
 	{
 
@@ -152,95 +152,9 @@ public:
 		// Create font texture
 		unsigned char* fontData;
 		int texWidth, texHeight;
-		io.Fonts->GetTexDataAsRGBA32(&fontData, &texWidth, &texHeight);
-		VkDeviceSize uploadSize = texWidth * texHeight * 4 * sizeof(char);
+		io.Fonts->GetTexDataAsRGBA32(&fontData, &texWidth, &texHeight);		
 
-		// Create target image for copy
-		VkImageCreateInfo imageInfo = {};
-		imageInfo.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
-		imageInfo.imageType = VK_IMAGE_TYPE_2D;
-		imageInfo.format = VK_FORMAT_R8G8B8A8_UNORM;
-		imageInfo.extent.width = texWidth;
-		imageInfo.extent.height = texHeight;
-		imageInfo.extent.depth = 1;
-		imageInfo.mipLevels = 1;
-		imageInfo.arrayLayers = 1;
-		imageInfo.samples = VK_SAMPLE_COUNT_1_BIT;
-		imageInfo.tiling = VK_IMAGE_TILING_OPTIMAL;
-		imageInfo.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
-		imageInfo.usage = VK_IMAGE_USAGE_SAMPLED_BIT | VK_IMAGE_USAGE_TRANSFER_DST_BIT;
-		imageInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;		
-
-		VK_CHECK_RESULT(vkCreateImage(device->device, &imageInfo, nullptr, &fontImage->image));
-		
-		VkMemoryRequirements memReqs;
-		vkGetImageMemoryRequirements(device->device, fontImage->image, &memReqs);
-		
-		VkMemoryAllocateInfo memAllocInfo = {};
-		memAllocInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
-		memAllocInfo.allocationSize = memReqs.size;
-		memAllocInfo.memoryTypeIndex = device->findMemoryType( memReqs.memoryTypeBits, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
-		VK_CHECK_RESULT(vkAllocateMemory(device->device, &memAllocInfo, nullptr, &fontImage->deviceMemory));
-		VK_CHECK_RESULT(vkBindImageMemory(device->device, fontImage->image, fontImage->deviceMemory, 0));
-
-		// Image view
-		VkImageViewCreateInfo viewInfo = vks::initializers::imageViewCreateInfo();
-		viewInfo.image = fontImage->image;
-		viewInfo.viewType = VK_IMAGE_VIEW_TYPE_2D;
-		viewInfo.format = VK_FORMAT_R8G8B8A8_UNORM;
-		viewInfo.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
-		viewInfo.subresourceRange.levelCount = 1;
-		viewInfo.subresourceRange.layerCount = 1;
-		VK_CHECK_RESULT(vkCreateImageView(device->device, &viewInfo, nullptr, &fontImage->imageView));
-
-		// Staging buffers for font data upload
-		vk::Buffer stagingBuffer( *device );
-		
-		VK_CHECK_RESULT(stagingBuffer.CreateBuffer(
-			VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
-			VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,			
-			uploadSize));
-
-		stagingBuffer.Map();
-		memcpy(stagingBuffer.mappedData, fontData, uploadSize);
-		stagingBuffer.Unmap();
-
-		// Copy buffer data to font image
-		VkCommandBuffer copyCmd = createCommandBuffer(VK_COMMAND_BUFFER_LEVEL_PRIMARY, true);
-
-		VkImageSubresourceRange subresourceRange = {};
-		subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
-		subresourceRange.baseMipLevel = 0;
-		subresourceRange.levelCount = 1;
-		subresourceRange.layerCount = 1;
-		setImageLayout(copyCmd, fontImage->image, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, subresourceRange, VK_PIPELINE_STAGE_HOST_BIT, VK_PIPELINE_STAGE_TRANSFER_BIT);
-
-		// Copy
-		VkBufferImageCopy bufferCopyRegion = {};
-		bufferCopyRegion.imageSubresource.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
-		bufferCopyRegion.imageSubresource.layerCount = 1;
-		bufferCopyRegion.imageExtent.width = texWidth;
-		bufferCopyRegion.imageExtent.height = texHeight;
-		bufferCopyRegion.imageExtent.depth = 1;
-
-		vkCmdCopyBufferToImage(
-			copyCmd,
-			stagingBuffer.m_buffer,
-			fontImage->image,
-			VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
-			1,
-			&bufferCopyRegion
-		);
-
-		// Prepare for shader read
-		VkImageSubresourceRange subresourceRange2 = {};
-		subresourceRange2.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
-		subresourceRange2.baseMipLevel = 0;
-		subresourceRange2.levelCount = 1;
-		subresourceRange2.layerCount = 1;
-		setImageLayout(copyCmd, fontImage->image, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, subresourceRange2, VK_PIPELINE_STAGE_TRANSFER_BIT, VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT);
-
-		flushCommandBuffer(copyCmd, copyQueue, true);
+		fontImage->Load(fontData, texWidth, texHeight, 1);		
 
 		// Font texture Sampler
 		VkSamplerCreateInfo samplerInfo = vks::initializers::samplerCreateInfo();
@@ -497,179 +411,4 @@ private:
 	{
 		return glfwGetClipboardString((GLFWwindow*)user_data);
 	}
-
-	//zob
-
-	
-	void setImageLayout(
-		VkCommandBuffer cmdbuffer,
-		VkImage image,
-		VkImageLayout oldImageLayout,
-		VkImageLayout newImageLayout,
-		VkImageSubresourceRange subresourceRange,
-		VkPipelineStageFlags srcStageMask,
-		VkPipelineStageFlags dstStageMask)
-	{
-		// Create an image barrier object
-		VkImageMemoryBarrier imageMemoryBarrier = vks::initializers::imageMemoryBarrier();
-		imageMemoryBarrier.oldLayout = oldImageLayout;
-		imageMemoryBarrier.newLayout = newImageLayout;
-		imageMemoryBarrier.image = image;
-		imageMemoryBarrier.subresourceRange = subresourceRange;
-
-		// Source layouts (old)
-		// Source access mask controls actions that have to be finished on the old layout
-		// before it will be transitioned to the new layout
-		switch (oldImageLayout)
-		{
-		case VK_IMAGE_LAYOUT_UNDEFINED:
-			// Image layout is undefined (or does not matter)
-			// Only valid as initial layout
-			// No flags required, listed only for completeness
-			imageMemoryBarrier.srcAccessMask = 0;
-			break;
-
-		case VK_IMAGE_LAYOUT_PREINITIALIZED:
-			// Image is preinitialized
-			// Only valid as initial layout for linear images, preserves memory contents
-			// Make sure host writes have been finished
-			imageMemoryBarrier.srcAccessMask = VK_ACCESS_HOST_WRITE_BIT;
-			break;
-
-		case VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL:
-			// Image is a color attachment
-			// Make sure any writes to the color buffer have been finished
-			imageMemoryBarrier.srcAccessMask = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
-			break;
-
-		case VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL:
-			// Image is a depth/stencil attachment
-			// Make sure any writes to the depth/stencil buffer have been finished
-			imageMemoryBarrier.srcAccessMask = VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT;
-			break;
-
-		case VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL:
-			// Image is a transfer source 
-			// Make sure any reads from the image have been finished
-			imageMemoryBarrier.srcAccessMask = VK_ACCESS_TRANSFER_READ_BIT;
-			break;
-
-		case VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL:
-			// Image is a transfer destination
-			// Make sure any writes to the image have been finished
-			imageMemoryBarrier.srcAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
-			break;
-
-		case VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL:
-			// Image is read by a shader
-			// Make sure any shader reads from the image have been finished
-			imageMemoryBarrier.srcAccessMask = VK_ACCESS_SHADER_READ_BIT;
-			break;
-		default:
-			// Other source layouts aren't handled (yet)
-			break;
-		}
-
-		// Target layouts (new)
-		// Destination access mask controls the dependency for the new image layout
-		switch (newImageLayout)
-		{
-		case VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL:
-			// Image will be used as a transfer destination
-			// Make sure any writes to the image have been finished
-			imageMemoryBarrier.dstAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
-			break;
-
-		case VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL:
-			// Image will be used as a transfer source
-			// Make sure any reads from the image have been finished
-			imageMemoryBarrier.dstAccessMask = VK_ACCESS_TRANSFER_READ_BIT;
-			break;
-
-		case VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL:
-			// Image will be used as a color attachment
-			// Make sure any writes to the color buffer have been finished
-			imageMemoryBarrier.dstAccessMask = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
-			break;
-
-		case VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL:
-			// Image layout will be used as a depth/stencil attachment
-			// Make sure any writes to depth/stencil buffer have been finished
-			imageMemoryBarrier.dstAccessMask = imageMemoryBarrier.dstAccessMask | VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT;
-			break;
-
-		case VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL:
-			// Image will be read in a shader (sampler, input attachment)
-			// Make sure any writes to the image have been finished
-			if (imageMemoryBarrier.srcAccessMask == 0)
-			{
-				imageMemoryBarrier.srcAccessMask = VK_ACCESS_HOST_WRITE_BIT | VK_ACCESS_TRANSFER_WRITE_BIT;
-			}
-			imageMemoryBarrier.dstAccessMask = VK_ACCESS_SHADER_READ_BIT;
-			break;
-		default:
-			// Other source layouts aren't handled (yet)
-			break;
-		}
-
-		// Put barrier inside setup command buffer
-		vkCmdPipelineBarrier(
-			cmdbuffer,
-			srcStageMask,
-			dstStageMask,
-			0,
-			0, nullptr,
-			0, nullptr,
-			1, &imageMemoryBarrier);
-	}
-
-	VkCommandBuffer createCommandBuffer(VkCommandBufferLevel level, bool begin = false)
-	{
-		VkCommandBufferAllocateInfo cmdBufAllocateInfo = vks::initializers::commandBufferAllocateInfo(commandPool->commandPool, level, 1);
-
-		VkCommandBuffer cmdBuffer;
-		VK_CHECK_RESULT(vkAllocateCommandBuffers(device->device, &cmdBufAllocateInfo, &cmdBuffer));
-
-		// If requested, also start recording for the new command buffer
-		if (begin)
-		{
-			VkCommandBufferBeginInfo cmdBufInfo = vks::initializers::commandBufferBeginInfo();
-			VK_CHECK_RESULT(vkBeginCommandBuffer(cmdBuffer, &cmdBufInfo));
-		}
-
-		return cmdBuffer;
-	}
-
-	void flushCommandBuffer(VkCommandBuffer commandBuffer, VkQueue queue, bool free = true)
-	{
-		if (commandBuffer == VK_NULL_HANDLE)
-		{
-			return;
-		}
-
-		VK_CHECK_RESULT(vkEndCommandBuffer(commandBuffer));
-
-		VkSubmitInfo submitInfo = vks::initializers::submitInfo();
-		submitInfo.commandBufferCount = 1;
-		submitInfo.pCommandBuffers = &commandBuffer;
-
-		// Create fence to ensure that the command buffer has finished executing
-		VkFenceCreateInfo fenceInfo = vks::initializers::fenceCreateInfo(0);
-		VkFence fence;
-		VK_CHECK_RESULT(vkCreateFence(device->device, &fenceInfo, nullptr, &fence));
-
-		// Submit to the queue
-		VK_CHECK_RESULT(vkQueueSubmit(queue, 1, &submitInfo, fence));
-		// Wait for the fence to signal that command buffer has finished executing
-		VK_CHECK_RESULT(vkWaitForFences(device->device, 1, &fence, VK_TRUE, 100000000000));
-
-		vkDestroyFence(device->device, fence, nullptr);
-
-		if (free)
-		{
-			vkFreeCommandBuffers(device->device, commandPool->commandPool, 1, &commandBuffer);
-		}
-	}
-	
-
 };
