@@ -16,6 +16,7 @@
 #include "vulkan/Buffer.hpp"
 #include "vulkan/CommandPool.h"
 #include "vulkan/Texture.h"
+#include "vulkan/Sampler.h"
 
 #include "VulkanInitializers.hpp"
 
@@ -24,17 +25,14 @@ class ImGUI
 {
 public:
 	// Vulkan resources for rendering the UI
-	VkSampler sampler;
+	
 	vk::Buffer vertexBuffer;
 	vk::Buffer indexBuffer;
 	int32_t vertexCount = 0;
 	int32_t indexCount = 0;
 
-	vk::Texture* fontImage;
-
-	/*VkDeviceMemory fontMemory = VK_NULL_HANDLE;
-	VkImage fontImage = VK_NULL_HANDLE;
-	VkImageView fontView = VK_NULL_HANDLE;*/
+	vk::Sampler* sampler;
+	vk::Texture* fontTexture;
 
 	VkPipelineCache pipelineCache;
 	VkPipelineLayout pipelineLayout;
@@ -73,8 +71,8 @@ public:
 		, commandPool(pCommandPool)
 		, vertexBuffer(*pdevice)
 		, indexBuffer(*pdevice)
-		, fontImage( new vk::Texture( *pdevice, *pCommandPool))
-		
+		, fontTexture( new vk::Texture( *pdevice, *pCommandPool))	
+		, sampler(new vk::Sampler(*pdevice))
 	{
 
 	}
@@ -83,9 +81,9 @@ public:
 	{
 		// Release all Vulkan resources required for rendering imGui
 
-		delete(fontImage);
+		delete(fontTexture);
+		delete(sampler);
 
-		vkDestroySampler(device->device, sampler, nullptr);
 		vkDestroyPipelineCache(device->device, pipelineCache, nullptr);
 		vkDestroyPipeline(device->device, pipeline, nullptr);
 		vkDestroyPipelineLayout(device->device, pipelineLayout, nullptr);
@@ -154,18 +152,22 @@ public:
 		int texWidth, texHeight;
 		io.Fonts->GetTexDataAsRGBA32(&fontData, &texWidth, &texHeight);		
 
-		fontImage->Load(fontData, texWidth, texHeight, 1);		
+		fontTexture->Load(fontData, texWidth, texHeight, 1);
 
 		// Font texture Sampler
-		VkSamplerCreateInfo samplerInfo = vks::initializers::samplerCreateInfo();
+		/*VkSamplerCreateInfo samplerInfo = {};
+		samplerInfo.sType = VK_STRUCTURE_TYPE_SAMPLER_CREATE_INFO;
+		samplerInfo.maxAnisotropy = 1.0f;
 		samplerInfo.magFilter = VK_FILTER_LINEAR;
-		samplerInfo.minFilter = VK_FILTER_LINEAR;
-		samplerInfo.mipmapMode = VK_SAMPLER_MIPMAP_MODE_LINEAR;
+		samplerInfo.minFilter = VK_FILTER_LINEAR;		
 		samplerInfo.addressModeU = VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_EDGE;
 		samplerInfo.addressModeV = VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_EDGE;
 		samplerInfo.addressModeW = VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_EDGE;
 		samplerInfo.borderColor = VK_BORDER_COLOR_FLOAT_OPAQUE_WHITE;
-		VK_CHECK_RESULT(vkCreateSampler(device->device, &samplerInfo, nullptr, &sampler));
+		samplerInfo.mipmapMode = VK_SAMPLER_MIPMAP_MODE_LINEAR;
+		VK_CHECK_RESULT(vkCreateSampler(device->device, &samplerInfo, nullptr, &sampler));*/
+
+		sampler->CreateSampler(0, 1.f);
 
 		// Descriptor pool
 		std::vector<VkDescriptorPoolSize> poolSizes = {
@@ -185,8 +187,8 @@ public:
 		VkDescriptorSetAllocateInfo allocInfo = vks::initializers::descriptorSetAllocateInfo(descriptorPool, &descriptorSetLayout, 1);
 		VK_CHECK_RESULT(vkAllocateDescriptorSets(device->device, &allocInfo, &descriptorSet));
 		VkDescriptorImageInfo fontDescriptor = vks::initializers::descriptorImageInfo(
-			sampler,
-			fontImage->imageView,
+			sampler->sampler,
+			fontTexture->imageView,
 			VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL
 		);
 

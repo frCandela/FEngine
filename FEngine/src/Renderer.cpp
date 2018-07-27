@@ -25,7 +25,9 @@ Renderer::Renderer(Window& rWindow, Camera& rCamera) :
 	texture = new vk::Texture(*device, *commandPool);
 	texture->LoadTexture("textures/texture.jpg");
 
-	textureSampler = new vk::Sampler(*device, texture->m_mipLevels);
+	textureSampler = new vk::Sampler(*device);
+	textureSampler->CreateSampler(static_cast<float>(texture->m_mipLevels), 16);
+
 	descriptors = new vk::Descriptors(*device);
 
 	descriptors->UpdateUniformBuffers(*m_pCamera);

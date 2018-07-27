@@ -7,11 +7,16 @@ namespace vk
 	class Sampler
 	{
 	public:
-		Device & m_device;
+		Sampler(Device& device);
+		~Sampler();
+
+		// Create a Sampler
+		void CreateSampler(float maxLod, float maxAnisotropy);
+
 		VkSampler sampler;
 
-		Sampler(Device& device, uint32_t mipLevels);
-		~Sampler();
-		void createSampler(uint32_t mipLevels);
+	private:
+		Device & m_rDevice;
+
 	};
 }
