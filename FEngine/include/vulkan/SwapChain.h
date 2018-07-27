@@ -11,7 +11,7 @@ namespace vk
 	class SwapChain
 	{
 	public:
-		SwapChain(Device& device);
+		SwapChain(Device& device, CommandPool& rCommandPool);
 		~SwapChain();
 
 
@@ -21,7 +21,7 @@ namespace vk
 		void CleanupSwapChain();
 
 		/// Create the swapChain, the image view and the depth buffer
-		void BuildSwapChain(Window& window, CommandPool& rCommandPool);
+		void BuildSwapChain(Window& window);
 
 		/// Creates a frameBuffer for each swapChain image view
 		void CreateFramebuffers(VkRenderPass& renderPass);
@@ -35,6 +35,7 @@ namespace vk
 		std::vector<VkImage> swapChainImages;
 	private:
 		Device & m_device;
+		CommandPool & m_rCommandPool;
 		
 		std::vector<VkImageView> swapChainImageViews;
 

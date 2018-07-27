@@ -6,10 +6,11 @@
 namespace vk
 {
 
-	SwapChain::SwapChain(Device& device) :
-		m_device(device)
+	SwapChain::SwapChain(Device& device, CommandPool& rCommandPool) :
+		m_device(device),
+		m_rCommandPool(rCommandPool)
 	{
-		depthImage = new DepthImage(device);
+		depthImage = new DepthImage(device, m_rCommandPool);
 	}
 
 	SwapChain::~SwapChain()
@@ -18,11 +19,11 @@ namespace vk
 	}
 
 
-	void SwapChain::BuildSwapChain(Window& window, CommandPool& rCommandPool)
+	void SwapChain::BuildSwapChain(Window& window)
 	{
 		CreateSwapChain(window);
 		CreateImageViews();
-		depthImage->createDepthResources(swapChainExtent.width, swapChainExtent.height, rCommandPool);
+		depthImage->createDepthResources(swapChainExtent.width, swapChainExtent.height);
 	}
 
 	void SwapChain::CreateSwapChain(Window& window)

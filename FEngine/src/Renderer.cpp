@@ -14,16 +14,16 @@ Renderer::Renderer(Window& rWindow, Camera& rCamera) :
 	commandPool = new vk::CommandPool(*device);
 	commandBuffers = new vk::CommandBuffer(*device, *commandPool);
 
-	swapChain = new vk::SwapChain(*device);
-	swapChain->BuildSwapChain(m_window, *commandPool);
+	swapChain = new vk::SwapChain(*device, *commandPool);
+	swapChain->BuildSwapChain(m_window);
 
 	vertShader = new vk::Shader(*device, "shaders/vert.spv");
 	fragShader = new vk::Shader(*device, "shaders/frag.spv");
 	renderPass = new vk::RenderPass(*device, *swapChain);
 	swapChain->CreateFramebuffers(renderPass->renderPass);
 
-	texture = new vk::Texture(*device);
-	texture->LoadTexture("textures/texture.jpg", *commandPool);
+	texture = new vk::Texture(*device, *commandPool);
+	texture->LoadTexture("textures/texture.jpg");
 
 	textureSampler = new vk::Sampler(*device, texture->m_mipLevels);
 	descriptors = new vk::Descriptors(*device);
@@ -256,7 +256,7 @@ void Renderer::recreateSwapChain()
 	delete(renderPass);
 
 	swapChain->CleanupSwapChain();
-	swapChain->BuildSwapChain(m_window, *commandPool);
+	swapChain->BuildSwapChain(m_window);
 
 	renderPass = new vk::RenderPass(*device, *swapChain);
 	
