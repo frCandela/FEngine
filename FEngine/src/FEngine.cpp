@@ -2,6 +2,7 @@
 
 #include "Camera.h"
 #include "GameObject.h"
+#include "util/Time.h"
 
 FEngine::FEngine()
 {
@@ -17,16 +18,23 @@ void FEngine::Run()
 	Camera* camera = gameobject.AddComponent<Camera>();
 	Renderer renderer(window, *camera);
 	//camera->aspectRatio = size.x / size.y;
+
+	float lastTime = Time::ElapsedSinceStartup();
+	float delta = 1.f / 144.f;
+
+	ImGuiIO& io = ImGui::GetIO();
+	io.DeltaTime = delta;
+
 	while ( window.WindowOpen() )
 	{
-		Input::Update();
-		
+		float time = Time::ElapsedSinceStartup();
+		if (Time::ElapsedSinceStartup() - lastTime > delta)
+		{
+			lastTime = time;
 
-
-
-		ImGui::ShowTestWindow();
-		
-		renderer.drawFrame();
-
+			Input::Update();
+			ImGui::ShowTestWindow();
+			renderer.drawFrame();
+		}
 	}
 }

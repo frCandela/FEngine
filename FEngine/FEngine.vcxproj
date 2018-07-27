@@ -102,6 +102,7 @@
     <ClCompile Include="src\Renderer.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\Transform.cpp" />
+    <ClCompile Include="src\util\Time.cpp" />
     <ClCompile Include="src\vulkan\Buffer.cpp" />
     <ClCompile Include="src\vulkan\Mesh.cpp" />
     <ClCompile Include="src\vulkan\Commands.cpp" />
@@ -127,6 +128,7 @@
     <ClInclude Include="include\Kamera.h" />
     <ClInclude Include="include\Renderer.h" />
     <ClInclude Include="include\Transform.h" />
+    <ClInclude Include="include\util\Time.h" />
     <ClInclude Include="include\vulkan\Initializers.h" />
     <ClInclude Include="include\vulkan\Mesh.h" />
     <ClInclude Include="include\vulkan\Commands.h" />

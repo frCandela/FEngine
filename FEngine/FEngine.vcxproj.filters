@@ -18,8 +18,14 @@
     <Filter Include="Fichiers d%27en-tête\Vulkan">
       <UniqueIdentifier>{10795a4a-6962-4238-8c48-aceddbdfab86}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Fichiers d%27en-tête\imgui">
-      <UniqueIdentifier>{162d503e-f0a6-47bd-a602-c5ab3ba901b5}</UniqueIdentifier>
+    <Filter Include="Fichiers d%27en-tête\util">
+      <UniqueIdentifier>{5cec7470-a395-412a-8aa8-7e1140e0f125}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Fichiers sources\util">
+      <UniqueIdentifier>{9ff751c0-5c88-49ba-8fbc-afdf6ff50be9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="deps">
+      <UniqueIdentifier>{76e291ec-8cc6-4e39-8d39-d1fb28afa2d4}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -89,14 +95,17 @@
     <ClCompile Include="src\vulkan\Buffer.cpp">
       <Filter>Fichiers sources\Vulkan</Filter>
     </ClCompile>
+    <ClCompile Include="deps\imgui\imgui_draw.cpp">
+      <Filter>deps</Filter>
+    </ClCompile>
     <ClCompile Include="deps\imgui\imgui.cpp">
-      <Filter>Fichiers d%27en-tête\imgui</Filter>
+      <Filter>deps</Filter>
     </ClCompile>
     <ClCompile Include="deps\imgui\imgui_demo.cpp">
-      <Filter>Fichiers d%27en-tête\imgui</Filter>
+      <Filter>deps</Filter>
     </ClCompile>
-    <ClCompile Include="deps\imgui\imgui_draw.cpp">
-      <Filter>Fichiers d%27en-tête\imgui</Filter>
+    <ClCompile Include="src\util\Time.cpp">
+      <Filter>Fichiers sources\util</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -177,6 +186,9 @@
     </ClInclude>
     <ClInclude Include="include\vulkan\Util.h">
       <Filter>Fichiers d%27en-tête</Filter>
+    </ClInclude>
+    <ClInclude Include="include\util\Time.h">
+      <Filter>Fichiers d%27en-tête\util</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
