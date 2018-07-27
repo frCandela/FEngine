@@ -14,7 +14,7 @@ namespace vk
 
 	}
 
-	void Texture::LoadTexture(std::string path)
+	void Texture::LoadTexture(std::string path, vk::CommandPool& commandPool)
 	{
 		m_path = path;
 
@@ -45,14 +45,14 @@ namespace vk
 		createImage(texWidth, texHeight, m_mipLevels, VK_FORMAT_R8G8B8A8_UNORM, VK_IMAGE_TILING_OPTIMAL, VK_IMAGE_USAGE_TRANSFER_SRC_BIT | VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, image, deviceMemory);
 
 		// Transitioned to VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL while generating mipmaps
-		transitionImageLayout(VK_FORMAT_R8G8B8A8_UNORM, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, m_mipLevels);
-		copyBufferToImage(stagingBuffer, static_cast<uint32_t>(texWidth), static_cast<uint32_t>(texHeight));
+		transitionImageLayout(VK_FORMAT_R8G8B8A8_UNORM, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, m_mipLevels, commandPool);
+		copyBufferToImage(stagingBuffer, static_cast<uint32_t>(texWidth), static_cast<uint32_t>(texHeight), commandPool);
 
 		// Clean up the staging buffer and its memory
 		vkDestroyBuffer(m_device.device, stagingBuffer, nullptr);
 		vkFreeMemory(m_device.device, stagingBufferMemory, nullptr);
 
-		generateMipmaps(VK_FORMAT_R8G8B8A8_UNORM, texWidth, texHeight, m_mipLevels);
+		generateMipmaps(VK_FORMAT_R8G8B8A8_UNORM, texWidth, texHeight, m_mipLevels, commandPool);
 
 		// Creates the image View
 		imageView = Image::createImageView(image, VK_FORMAT_R8G8B8A8_UNORM, VK_IMAGE_ASPECT_COLOR_BIT, m_mipLevels, m_device.device);

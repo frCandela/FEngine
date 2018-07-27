@@ -13,9 +13,9 @@ namespace vk
 
 
 	// Copy a buffer to an Image
-	void Image::copyBufferToImage(VkBuffer buffer, uint32_t width, uint32_t height)
+	void Image::copyBufferToImage(VkBuffer buffer, uint32_t width, uint32_t height, CommandPool& rCommandPool)
 	{
-		VkCommandBuffer commandBuffer = m_device.commands->beginSingleTimeCommands();
+		VkCommandBuffer commandBuffer = rCommandPool.BeginSingleTimeCommands();
 
 		// Specify which part of the buffer is going to be copied to which part of the image
 		VkBufferImageCopy region = {};
@@ -45,7 +45,7 @@ namespace vk
 			&region
 		);
 
-		m_device.commands->endSingleTimeCommands(commandBuffer);
+		rCommandPool.EndSingleTimeCommands(commandBuffer);
 	}
 	// Create a Vulkan Image
 	void Image::createImage(uint32_t width, uint32_t height, uint32_t mipLevels, VkFormat format, VkImageTiling tiling, VkImageUsageFlags usage, VkMemoryPropertyFlags properties, VkImage& image, VkDeviceMemory& imageMemory)
@@ -84,9 +84,9 @@ namespace vk
 		vkBindImageMemory(m_device.device, image, deviceMemory, 0);
 	}
 	// Handle layout transitions to transfer queue family ownership
-	void Image::transitionImageLayout(VkFormat format, VkImageLayout oldLayout, VkImageLayout newLayout, uint32_t mipLevels)
+	void Image::transitionImageLayout(VkFormat format, VkImageLayout oldLayout, VkImageLayout newLayout, uint32_t mipLevels, CommandPool& rCommandPool)
 	{
-		VkCommandBuffer commandBuffer = m_device.commands->beginSingleTimeCommands();
+		VkCommandBuffer commandBuffer = rCommandPool.BeginSingleTimeCommands();
 
 		// Synchronize access to resources
 		VkImageMemoryBarrier barrier = {};
@@ -153,7 +153,7 @@ namespace vk
 			1, &barrier
 		);
 
-		m_device.commands->endSingleTimeCommands(commandBuffer);
+		rCommandPool.EndSingleTimeCommands(commandBuffer);
 	}
 	// Helper function for creating buffers
 	void Image::createBuffer(VkDeviceSize size, VkBufferUsageFlags usage, VkMemoryPropertyFlags properties, VkBuffer& buffer, VkDeviceMemory& bufferMemory)
@@ -184,7 +184,7 @@ namespace vk
 		vkBindBufferMemory(m_device.device, buffer, bufferMemory, 0);
 	}
 	// Generate mipmaps for a VkImage
-	void Image::generateMipmaps(VkFormat imageFormat, int32_t texWidth, int32_t texHeight, uint32_t mipLevels)
+	void Image::generateMipmaps(VkFormat imageFormat, int32_t texWidth, int32_t texHeight, uint32_t mipLevels, CommandPool& rCommandPool)
 	{
 		// Check if image format supports linear blitting
 		VkFormatProperties formatProperties;
@@ -192,7 +192,7 @@ namespace vk
 		if (!(formatProperties.optimalTilingFeatures & VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT))
 			throw std::runtime_error("texture image format does not support linear blitting!");
 
-		VkCommandBuffer commandBuffer = m_device.commands->beginSingleTimeCommands();
+		VkCommandBuffer commandBuffer = rCommandPool.BeginSingleTimeCommands();
 
 		VkImageMemoryBarrier barrier = {};
 		barrier.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
@@ -274,8 +274,9 @@ namespace vk
 			0, nullptr,
 			1, &barrier);
 
-		m_device.commands->endSingleTimeCommands(commandBuffer);
+		rCommandPool.EndSingleTimeCommands(commandBuffer);
 	}
+
 	VkImageView Image::createImageView(VkImage image, VkFormat format, VkImageAspectFlags aspectFlags, uint32_t mipLevels, VkDevice& device)
 	{
 		VkImageViewCreateInfo viewInfo = {};

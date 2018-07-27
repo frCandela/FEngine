@@ -1,5 +1,7 @@
 #include "vulkan/Mesh.h"
 
+#include "vulkan/CommandBuffer.h"
+
 #define TINYOBJLOADER_IMPLEMENTATION
 #include <tiny_obj_loader.h>
 
@@ -19,15 +21,15 @@ namespace vk
 	}
 
 	// Copy the contents from one buffer to another
-	void Mesh::copyBuffer(VkBuffer srcBuffer, VkBuffer dstBuffer, VkDeviceSize size)
+	void Mesh::copyBuffer(VkBuffer srcBuffer, VkBuffer dstBuffer, VkDeviceSize size, CommandPool& rCommandPool)
 	{
-		VkCommandBuffer commandBuffer = m_device.commands->beginSingleTimeCommands();
+		VkCommandBuffer commandBuffer = rCommandPool.BeginSingleTimeCommands();
 
 		VkBufferCopy copyRegion = {};
 		copyRegion.size = size;
 		vkCmdCopyBuffer(commandBuffer, srcBuffer, dstBuffer, 1, &copyRegion);
 
-		m_device.commands->endSingleTimeCommands(commandBuffer);
+		rCommandPool.EndSingleTimeCommands(commandBuffer);
 	}
 
 	void Mesh::LoadModel(std::string path)
@@ -78,13 +80,13 @@ namespace vk
 
 	}
 
-	void Mesh::CreateBuffers()
+	void Mesh::CreateBuffers(CommandPool& rCommandPool)
 	{
-		CreateVertexBuffer();
-		CreateIndexBuffer();
+		CreateVertexBuffer(rCommandPool);
+		CreateIndexBuffer(rCommandPool);
 	}
 
-	void Mesh::CreateVertexBuffer()
+	void Mesh::CreateVertexBuffer(CommandPool& rCommandPool)
 	{
 		VkDeviceSize bufferSize = sizeof(vertices[0]) * vertices.size();
 
@@ -100,10 +102,10 @@ namespace vk
 		// Create a device local buffer
 		vertexBuffer.CreateBuffer(VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, bufferSize);
 
-		copyBuffer(buf.m_buffer, vertexBuffer.m_buffer, bufferSize);
+		copyBuffer(buf.m_buffer, vertexBuffer.m_buffer, bufferSize, rCommandPool);
 	}
 
-	void Mesh::CreateIndexBuffer()
+	void Mesh::CreateIndexBuffer(CommandPool& rCommandPool)
 	{
 		VkDeviceSize bufferSize = sizeof(indices[0]) * indices.size();
 
@@ -119,6 +121,6 @@ namespace vk
 		// Create a device local buffer		
 		indexBuffer.CreateBuffer(VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_INDEX_BUFFER_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, bufferSize);
 		
-		copyBuffer(buf.m_buffer, indexBuffer.m_buffer, bufferSize);
+		copyBuffer(buf.m_buffer, indexBuffer.m_buffer, bufferSize, rCommandPool);
 	}
 }

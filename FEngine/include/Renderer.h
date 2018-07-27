@@ -19,7 +19,9 @@
 #include "vulkan/Texture.h"
 #include "vulkan/DepthImage.h"	
 #include "vulkan/Descriptors.h"
-#include "vulkan/Commands.h"
+#include "vulkan/CommandPool.h"
+#include "vulkan/CommandBuffer.h"
+
 
 #include "IMGUI.h"
 #include <imgui.h>
@@ -47,7 +49,8 @@ public:
 
 	vk::Descriptors* descriptors;
 
-	vk::Commands* commands;
+	vk::CommandPool* commandPool;
+	vk::CommandBuffer* commandBuffers;
 
 	vk::Instance* instance;
 	vk::Device* device;

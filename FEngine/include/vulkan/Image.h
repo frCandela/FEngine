@@ -8,6 +8,7 @@
 #include <string>
 
 #include "Device.h"
+#include "CommandPool.h"
 
 namespace vk
 {
@@ -29,9 +30,9 @@ namespace vk
 	protected:
 		void createBuffer(VkDeviceSize size, VkBufferUsageFlags usage, VkMemoryPropertyFlags properties, VkBuffer& buffer, VkDeviceMemory& bufferMemory);
 		void createImage(uint32_t width, uint32_t height, uint32_t mipLevels, VkFormat format, VkImageTiling tiling, VkImageUsageFlags usage, VkMemoryPropertyFlags properties, VkImage& image, VkDeviceMemory& imageMemory);
-		void transitionImageLayout(VkFormat format, VkImageLayout oldLayout, VkImageLayout newLayout, uint32_t mipLevels);
-		void copyBufferToImage(VkBuffer buffer, uint32_t width, uint32_t height);
-		void generateMipmaps(VkFormat imageFormat, int32_t texWidth, int32_t texHeight, uint32_t mipLevels);
+		void transitionImageLayout(VkFormat format, VkImageLayout oldLayout, VkImageLayout newLayout, uint32_t mipLevels, CommandPool& rCommandPool);
+		void copyBufferToImage(VkBuffer buffer, uint32_t width, uint32_t height, CommandPool& rCommandPool);
+		void generateMipmaps(VkFormat imageFormat, int32_t texWidth, int32_t texHeight, uint32_t mipLevels, CommandPool& rCommandPool);
 
 		static bool hasStencilComponent(VkFormat format)
 		{

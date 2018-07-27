@@ -20,7 +20,7 @@ namespace vk
 	}
 
 	// Create a depth image, memory and view
-	void DepthImage::createDepthResources(uint32_t width, uint32_t height)
+	void DepthImage::createDepthResources(uint32_t width, uint32_t height, CommandPool& rCommandPool)
 	{
 		VkFormat depthFormat = findDepthFormat();
 
@@ -28,7 +28,7 @@ namespace vk
 		imageView = Image::createImageView(image, depthFormat, VK_IMAGE_ASPECT_DEPTH_BIT, 1, m_device.device);
 
 		// Setup a pipeline barrier for the transition
-		transitionImageLayout(depthFormat, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL, 1);
+		transitionImageLayout(depthFormat, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL, 1, rCommandPool);
 	}
 
 	// Select a format for the depth buffer 

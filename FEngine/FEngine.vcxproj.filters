@@ -41,9 +41,6 @@
     <ClCompile Include="src\Window.cpp">
       <Filter>Fichiers sources</Filter>
     </ClCompile>
-    <ClCompile Include="src\vulkan\Commands.cpp">
-      <Filter>Fichiers sources\Vulkan</Filter>
-    </ClCompile>
     <ClCompile Include="src\vulkan\DepthImage.cpp">
       <Filter>Fichiers sources\Vulkan</Filter>
     </ClCompile>
@@ -107,6 +104,12 @@
     <ClCompile Include="src\util\Input.cpp">
       <Filter>Fichiers sources\util</Filter>
     </ClCompile>
+    <ClCompile Include="src\vulkan\CommandPool.cpp">
+      <Filter>Fichiers sources\Vulkan</Filter>
+    </ClCompile>
+    <ClCompile Include="src\vulkan\CommandBuffer.cpp">
+      <Filter>Fichiers sources\Vulkan</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\Renderer.h">
@@ -117,9 +120,6 @@
     </ClInclude>
     <ClInclude Include="include\FEngine.h">
       <Filter>Fichiers d%27en-tête</Filter>
-    </ClInclude>
-    <ClInclude Include="include\vulkan\Commands.h">
-      <Filter>Fichiers d%27en-tête\Vulkan</Filter>
     </ClInclude>
     <ClInclude Include="include\vulkan\DepthImage.h">
       <Filter>Fichiers d%27en-tête\Vulkan</Filter>
@@ -186,6 +186,12 @@
     </ClInclude>
     <ClInclude Include="include\util\Input.h">
       <Filter>Fichiers d%27en-tête\util</Filter>
+    </ClInclude>
+    <ClInclude Include="include\vulkan\CommandPool.h">
+      <Filter>Fichiers d%27en-tête\Vulkan</Filter>
+    </ClInclude>
+    <ClInclude Include="include\vulkan\CommandBuffer.h">
+      <Filter>Fichiers d%27en-tête\Vulkan</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

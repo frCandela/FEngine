@@ -18,11 +18,11 @@ namespace vk
 	}
 
 
-	void SwapChain::BuildSwapChain(Window& window)
+	void SwapChain::BuildSwapChain(Window& window, CommandPool& rCommandPool)
 	{
 		CreateSwapChain(window);
 		CreateImageViews();
-		depthImage->createDepthResources(swapChainExtent.width, swapChainExtent.height);
+		depthImage->createDepthResources(swapChainExtent.width, swapChainExtent.height, rCommandPool);
 	}
 
 	void SwapChain::CreateSwapChain(Window& window)

@@ -11,11 +11,11 @@
 #include <vector>
 
 #include "Window.h"
-#include "Commands.h"
 
 namespace vk
 {
-	class Commands;
+	class CommandBuffer;
+	class CommandPool;
 
 	//Contains the vulkan queues families used
 	struct QueueFamilyIndices
@@ -59,7 +59,6 @@ namespace vk
 			vkDestroyDevice(device, nullptr);
 		}
 
-		Commands * commands;
 		SwapChainSupportDetails swapChainSupportDetails;
 		VkInstance& m_instance;
 		VkDevice device;

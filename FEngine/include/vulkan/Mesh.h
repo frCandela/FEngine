@@ -3,6 +3,7 @@
 #include "Device.h"
 #include "Vertex.h"
 #include "Buffer.hpp"
+#include "CommandPool.h"
 
 namespace vk
 {
@@ -21,17 +22,17 @@ namespace vk
 		vk::Buffer vertexBuffer;
 		vk::Buffer indexBuffer;
 
-		void copyBuffer(VkBuffer srcBuffer, VkBuffer dstBuffer, VkDeviceSize size);
+		void copyBuffer(VkBuffer srcBuffer, VkBuffer dstBuffer, VkDeviceSize size, CommandPool& rCommandPool);
 
 		/// Loads a model from an OBJ file
 		void LoadModel(std::string path);
-		void CreateBuffers();
+		void CreateBuffers(CommandPool& rCommandPool);
 
 	private:
 		/// Creates a vertex buffer from the loaded model data
-		void CreateVertexBuffer();
+		void CreateVertexBuffer(CommandPool& rCommandPool);
 
 		/// Create the index buffer from the loaded model data
-		void CreateIndexBuffer();
+		void CreateIndexBuffer( CommandPool& rCommandPool);
 	};
 }

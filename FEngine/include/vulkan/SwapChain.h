@@ -4,6 +4,7 @@
 
 #include "DepthImage.h"
 #include "Device.h"
+#include "CommandPool.h"
 
 namespace vk
 {
@@ -20,7 +21,7 @@ namespace vk
 		void CleanupSwapChain();
 
 		/// Create the swapChain, the image view and the depth buffer
-		void BuildSwapChain(Window& window);
+		void BuildSwapChain(Window& window, CommandPool& rCommandPool);
 
 		/// Creates a frameBuffer for each swapChain image view
 		void CreateFramebuffers(VkRenderPass& renderPass);

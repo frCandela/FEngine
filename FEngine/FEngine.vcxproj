@@ -104,8 +104,9 @@
     <ClCompile Include="src\util\Input.cpp" />
     <ClCompile Include="src\util\Time.cpp" />
     <ClCompile Include="src\vulkan\Buffer.cpp" />
+    <ClCompile Include="src\vulkan\CommandPool.cpp" />
     <ClCompile Include="src\vulkan\Mesh.cpp" />
-    <ClCompile Include="src\vulkan\Commands.cpp" />
+    <ClCompile Include="src\vulkan\CommandBuffer.cpp" />
     <ClCompile Include="src\vulkan\DepthImage.cpp" />
     <ClCompile Include="src\vulkan\Descriptors.cpp" />
     <ClCompile Include="src\vulkan\Device.cpp" />
@@ -129,9 +130,10 @@
     <ClInclude Include="include\Transform.h" />
     <ClInclude Include="include\util\Input.h" />
     <ClInclude Include="include\util\Time.h" />
+    <ClInclude Include="include\vulkan\CommandPool.h" />
     <ClInclude Include="include\vulkan\Initializers.h" />
     <ClInclude Include="include\vulkan\Mesh.h" />
-    <ClInclude Include="include\vulkan\Commands.h" />
+    <ClInclude Include="include\vulkan\CommandBuffer.h" />
     <ClInclude Include="include\vulkan\DepthImage.h" />
     <ClInclude Include="include\vulkan\Descriptors.h" />
     <ClInclude Include="include\vulkan\Device.h" />

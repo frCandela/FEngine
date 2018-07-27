@@ -11,11 +11,11 @@ Renderer::Renderer(Window& rWindow, Camera& rCamera) :
 	// Initializes the Vulkan application and required components
 	instance = new vk::Instance();
 	device = new vk::Device(instance->instance, m_window);
-	commands = new vk::Commands(*device);
-	device->commands = commands;	//zob
+	commandPool = new vk::CommandPool(*device);
+	commandBuffers = new vk::CommandBuffer(*device, *commandPool);
 
 	swapChain = new vk::SwapChain(*device);
-	swapChain->BuildSwapChain(m_window);
+	swapChain->BuildSwapChain(m_window, *commandPool);
 
 	vertShader = new vk::Shader(*device, "shaders/vert.spv");
 	fragShader = new vk::Shader(*device, "shaders/frag.spv");
@@ -23,7 +23,7 @@ Renderer::Renderer(Window& rWindow, Camera& rCamera) :
 	swapChain->CreateFramebuffers(renderPass->renderPass);
 
 	texture = new vk::Texture(*device);
-	texture->LoadTexture("textures/texture.jpg");
+	texture->LoadTexture("textures/texture.jpg", *commandPool);
 
 	textureSampler = new vk::Sampler(*device, texture->m_mipLevels);
 	descriptors = new vk::Descriptors(*device);
@@ -35,7 +35,7 @@ Renderer::Renderer(Window& rWindow, Camera& rCamera) :
 
 	vk::Mesh * cube = new vk::Mesh(*device);
 	cube->LoadModel("mesh/cube.obj");
-	cube->CreateBuffers();
+	cube->CreateBuffers( *commandPool );
 	buffers.push_back(cube);
 
 	vk::Mesh * sphere = new vk::Mesh(*device);
@@ -76,13 +76,13 @@ Renderer::Renderer(Window& rWindow, Camera& rCamera) :
 		{ {1,1,1},	black,	{1,0} },	//Btr 7///
 	};
 
-	sphere->CreateBuffers();
+	sphere->CreateBuffers(*commandPool);
 	buffers.push_back(sphere);
 
 	descriptors->CreateDescriptorSet(*texture, *textureSampler);
 	glm::vec2 size = GetSize();
 	ImGui::CreateContext();
-	imGui = new ImGUI(device);
+	imGui = new ImGUI(device, commandPool);
 	imGui->camera.type = Kamera::CameraType::lookat;
 	imGui->camera.setPosition(glm::vec3(0.0f, 1.4f, -4.8f));
 	imGui->camera.setRotation(glm::vec3(4.5f, -380.0f, 0.0f));
@@ -104,14 +104,14 @@ Renderer::~Renderer()
 // Setup the command buffers for drawing opérations
 void Renderer::createCommandBuffers()
 {
-	commands->CreateBuffer(swapChain->swapChainFramebuffers.size());
+	commandBuffers->CreateBuffer(swapChain->swapChainFramebuffers.size());
 
 	imGui->updateBuffers();
 
 	// Records every command buffer (one per framebuffer)
-	for (size_t i = 0; i < commands->commandBuffers.size(); i++)
+	for (size_t i = 0; i < commandBuffers->commandBuffers.size(); i++)
 	{
-		commands->Begin(i);
+		commandBuffers->Begin(i);
 
 		// Configure the render pass
 		VkRenderPassBeginInfo renderPassInfo = {};
@@ -129,30 +129,30 @@ void Renderer::createCommandBuffers()
 		renderPassInfo.clearValueCount = static_cast<uint32_t>(clearValues.size());
 		renderPassInfo.pClearValues = clearValues.data();
 		
-		vkCmdBeginRenderPass(commands->commandBuffers[i], &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);		
-		vkCmdBindPipeline(commands->commandBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, graphicsPipeline);
+		vkCmdBeginRenderPass(commandBuffers->commandBuffers[i], &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
+		vkCmdBindPipeline(commandBuffers->commandBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, graphicsPipeline);
 		
 		//Record Draw calls on all existing buffers
 		for (int j = 0; j < buffers.size(); ++j)
 		{
 			VkBuffer vertexBuffers[] = { buffers[j]->vertexBuffer.m_buffer };
 			VkDeviceSize offsets[] = { 0 };
-			vkCmdBindVertexBuffers(commands->commandBuffers[i], 0, 1, vertexBuffers, offsets);
-			vkCmdBindIndexBuffer(commands->commandBuffers[i], buffers[j]->indexBuffer.m_buffer, 0, VK_INDEX_TYPE_UINT32);
+			vkCmdBindVertexBuffers(commandBuffers->commandBuffers[i], 0, 1, vertexBuffers, offsets);
+			vkCmdBindIndexBuffer(commandBuffers->commandBuffers[i], buffers[j]->indexBuffer.m_buffer, 0, VK_INDEX_TYPE_UINT32);
 
 			// One dynamic offset per dynamic descriptor to offset into the ubo containing all model matrices
 			uint32_t dynamicOffset = j * static_cast<uint32_t>(descriptors->dynamicAlignment);
 		
 			// Bind the descriptor set for rendering a mesh using the dynamic offset
-			vkCmdBindDescriptorSets(commands->commandBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineLayout, 0, 1, &descriptors->descriptorSet, 1, &dynamicOffset);
-			vkCmdDrawIndexed(commands->commandBuffers[i], static_cast<uint32_t>(buffers[j]->indices.size()), 1, 0, 0, 0);
+			vkCmdBindDescriptorSets(commandBuffers->commandBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineLayout, 0, 1, &descriptors->descriptorSet, 1, &dynamicOffset);
+			vkCmdDrawIndexed(commandBuffers->commandBuffers[i], static_cast<uint32_t>(buffers[j]->indices.size()), 1, 0, 0, 0);
 		}
 
-		imGui->drawFrame(commands->commandBuffers[i]);
+		imGui->drawFrame(commandBuffers->commandBuffers[i]);
 
-		vkCmdEndRenderPass(commands->commandBuffers[i]);
+		vkCmdEndRenderPass(commandBuffers->commandBuffers[i]);
 
-		commands->End(i);
+		commandBuffers->End(i);
 	}
 }
 
@@ -197,9 +197,9 @@ void Renderer::drawFrame()
 	VkSubmitInfo submitInfo = {};
 	submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
 
-	std::vector<VkCommandBuffer> commandBuffers = 
+	std::vector<VkCommandBuffer> vkCommandBuffers = 
 	{ 
-		commands->commandBuffers[imageIndex]		
+		commandBuffers->commandBuffers[imageIndex]		
 	};
 
 	// Specify which semaphores to wait on before execution begins and in which stages of the pipeline to wait.
@@ -208,8 +208,8 @@ void Renderer::drawFrame()
 	submitInfo.waitSemaphoreCount = 1;
 	submitInfo.pWaitSemaphores = waitSemaphores;
 	submitInfo.pWaitDstStageMask = waitStages;
-	submitInfo.commandBufferCount = static_cast<uint32_t>(commandBuffers.size());
-	submitInfo.pCommandBuffers = commandBuffers.data();
+	submitInfo.commandBufferCount = static_cast<uint32_t>(vkCommandBuffers.size());
+	submitInfo.pCommandBuffers = vkCommandBuffers.data();
 
 	// Specify which semaphores to signal once the command buffers have finished execution
 	VkSemaphore signalSemaphores[] = { renderFinishedSemaphores[currentFrame] };
@@ -250,13 +250,13 @@ void Renderer::recreateSwapChain()
 	vkDeviceWaitIdle(device->device);
 
 	//Cleanup	
-	commands->cleanup();
+	commandBuffers->cleanup();
 	vkDestroyPipeline(device->device, graphicsPipeline, nullptr);
 	vkDestroyPipelineLayout(device->device, pipelineLayout, nullptr);
 	delete(renderPass);
 
 	swapChain->CleanupSwapChain();
-	swapChain->BuildSwapChain(m_window);
+	swapChain->BuildSwapChain(m_window, *commandPool);
 
 	renderPass = new vk::RenderPass(*device, *swapChain);
 	
@@ -475,7 +475,8 @@ void Renderer::cleanup()
 	delete(fragShader);
 	delete(vertShader);
 	delete(swapChain);
-	delete(commands);
+	delete(commandBuffers);
+	delete(commandPool);
 	delete (device);
 	delete(instance);	
 }

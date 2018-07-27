@@ -14,6 +14,7 @@
 #include "vulkan/Device.h"
 #include "vulkan/Shader.h"
 #include "vulkan/Buffer.hpp"
+#include "vulkan/CommandPool.h"
 
 #include "VulkanInitializers.hpp"
 #include "Kamera.h" 
@@ -43,7 +44,9 @@ public:
 	VkDescriptorPool descriptorPool;
 	VkDescriptorSetLayout descriptorSetLayout;
 	VkDescriptorSet descriptorSet;
+
 	vk::Device *device;
+	vk::CommandPool* commandPool;
 
 	Kamera camera;
 
@@ -68,10 +71,12 @@ public:
 		glm::vec2 translate;
 	} pushConstBlock;
 
-	ImGUI(vk::Device *pdevice) : 
+	ImGUI(vk::Device* pdevice, vk::CommandPool* pCommandPool) :
 		  device(pdevice)
+		, commandPool(pCommandPool)
 		, vertexBuffer(*pdevice)
 		, indexBuffer(*pdevice)
+		
 	{
 	};
 
@@ -635,7 +640,7 @@ private:
 
 	VkCommandBuffer createCommandBuffer(VkCommandBufferLevel level, bool begin = false)
 	{
-		VkCommandBufferAllocateInfo cmdBufAllocateInfo = vks::initializers::commandBufferAllocateInfo(device->commands->commandPool, level, 1);
+		VkCommandBufferAllocateInfo cmdBufAllocateInfo = vks::initializers::commandBufferAllocateInfo(commandPool->commandPool, level, 1);
 
 		VkCommandBuffer cmdBuffer;
 		VK_CHECK_RESULT(vkAllocateCommandBuffers(device->device, &cmdBufAllocateInfo, &cmdBuffer));
@@ -677,7 +682,7 @@ private:
 
 		if (free)
 		{
-			vkFreeCommandBuffers(device->device, device->commands->commandPool, 1, &commandBuffer);
+			vkFreeCommandBuffers(device->device, commandPool->commandPool, 1, &commandBuffer);
 		}
 	}
 	
