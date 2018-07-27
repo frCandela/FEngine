@@ -92,7 +92,7 @@ Renderer::Renderer(Window& rWindow, Camera& rCamera) :
 	createCommandBuffers();
 	createSyncObjects();
 
-	ImGui::NewFrame();
+	//ImGui::NewFrame();
 }
 
 Renderer::~Renderer()
@@ -174,9 +174,10 @@ void Renderer::drawFrame()
 	vkResetFences(device->device, 1, &inFlightFences[currentFrame]);
 	
 	vkDeviceWaitIdle(device->device);//zob
+	
 	ImGui::Render();
 	createCommandBuffers();
-	ImGui::NewFrame();
+	//ImGui::NewFrame();
 
 	// Acquire an image from the swap chain
 	uint32_t imageIndex;

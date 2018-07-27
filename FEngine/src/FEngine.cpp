@@ -35,6 +35,9 @@ void FEngine::Run()
 			io.DeltaTime = time - lastTime;
 			lastTime = time;
 
+			Input::Update();
+			ImGui::NewFrame();
+
 			// Statistics window
 			{
 				ImGui::Begin("Statistics");
@@ -42,7 +45,7 @@ void FEngine::Run()
 				ImGui::End();
 			}
 
-			Input::Update();
+
 			ImGui::ShowTestWindow();
 			renderer.drawFrame();
 		}

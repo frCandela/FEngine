@@ -21,15 +21,16 @@ public:
 	static glm::ivec2 GetWindowSize();
 	static unsigned FrameCount();
 	static bool ShuttingDown();
-
+	static GLFWwindow * m_window;
 private:
 	static void window_size_callback(GLFWwindow* window, int width, int height);
-	static GLFWwindow * m_window;
+	
 	static glm::ivec2 m_windowSize;
 
 	static void Update();
 
 	static unsigned m_count;
+
 };
 
 class Keyboard
@@ -57,7 +58,6 @@ private:
 	//Events
 	static std::array< unsigned, 349 > m_keysPressed;
 	static std::array< unsigned, 349 > m_keysReleased;
-
 };
 
 class Mouse
@@ -96,7 +96,6 @@ private:
 
 	static std::array< unsigned, 11 > m_buttonsPressed;
 	static std::array< unsigned, 11 > m_buttonsReleased;
-
 };
 
 

@@ -19,7 +19,7 @@ void Input::Setup(GLFWwindow * window)
 	glfwSetMouseButtonCallback(m_window, Mouse::mouse_button_callback);
 	glfwSetScrollCallback(window, Mouse::scroll_callback);
 	glfwSetKeyCallback(m_window, Keyboard::key_callback);
-	glfwSetCharCallback(window, Keyboard::char_callback);	
+	glfwSetCharCallback(window, Keyboard::char_callback);
 }
 
 
@@ -43,9 +43,10 @@ bool Input::ShuttingDown()
 
 void Input::Update()
 {
+	glfwPollEvents();
 	++m_count;
 	Mouse::Update();
-	glfwPollEvents();
+	
 
 	ImGuiIO& io = ImGui::GetIO();
 	io.MousePos = ImVec2(Mouse::Position().x, Mouse::Position().y);
@@ -93,6 +94,7 @@ void Keyboard::char_callback(GLFWwindow*, unsigned int c)
 ////////////Mouse////////////
 std::array< unsigned, 11 > Mouse::m_buttonsPressed;
 std::array< unsigned, 11 > Mouse::m_buttonsReleased;
+
 glm::vec2 Mouse::m_lockPosition;
 bool Mouse::m_lockCursor = false;
 glm::vec2 Mouse::m_oldPosition;
