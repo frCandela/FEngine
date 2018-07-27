@@ -91,7 +91,7 @@ public:
 	}
 
 	// Initialize styles, keys, etc.
-	void init(float width, float height)
+	void init(float width, float height, GLFWwindow* window)
 	{
 		// Color scheme
 		ImGuiStyle& style = ImGui::GetStyle();
@@ -108,6 +108,36 @@ public:
 
 		vertShader = new vk::Shader(*device, "shaders/imgui/ui.vert.spv");
 		fragShader = new vk::Shader(*device, "shaders/imgui/ui.frag.spv");
+
+		// Setup back-end capabilities flags
+		io.BackendFlags |= ImGuiBackendFlags_HasMouseCursors;         // We can honor GetMouseCursor() values (optional)
+		io.BackendFlags |= ImGuiBackendFlags_HasSetMousePos;          // We can honor io.WantSetMousePos requests (optional, rarely used)
+																	  // Keyboard mapping. ImGui will use those indices to peek into the io.KeysDown[] array.
+		io.KeyMap[ImGuiKey_Tab] = GLFW_KEY_TAB;
+		io.KeyMap[ImGuiKey_LeftArrow] = GLFW_KEY_LEFT;
+		io.KeyMap[ImGuiKey_RightArrow] = GLFW_KEY_RIGHT;
+		io.KeyMap[ImGuiKey_UpArrow] = GLFW_KEY_UP;
+		io.KeyMap[ImGuiKey_DownArrow] = GLFW_KEY_DOWN;
+		io.KeyMap[ImGuiKey_PageUp] = GLFW_KEY_PAGE_UP;
+		io.KeyMap[ImGuiKey_PageDown] = GLFW_KEY_PAGE_DOWN;
+		io.KeyMap[ImGuiKey_Home] = GLFW_KEY_HOME;
+		io.KeyMap[ImGuiKey_End] = GLFW_KEY_END;
+		io.KeyMap[ImGuiKey_Insert] = GLFW_KEY_INSERT;
+		io.KeyMap[ImGuiKey_Delete] = GLFW_KEY_DELETE;
+		io.KeyMap[ImGuiKey_Backspace] = GLFW_KEY_BACKSPACE;
+		io.KeyMap[ImGuiKey_Space] = GLFW_KEY_SPACE;
+		io.KeyMap[ImGuiKey_Enter] = GLFW_KEY_ENTER;
+		io.KeyMap[ImGuiKey_Escape] = GLFW_KEY_ESCAPE;
+		io.KeyMap[ImGuiKey_A] = GLFW_KEY_A;
+		io.KeyMap[ImGuiKey_C] = GLFW_KEY_C;
+		io.KeyMap[ImGuiKey_V] = GLFW_KEY_V;
+		io.KeyMap[ImGuiKey_X] = GLFW_KEY_X;
+		io.KeyMap[ImGuiKey_Y] = GLFW_KEY_Y;
+		io.KeyMap[ImGuiKey_Z] = GLFW_KEY_Z;
+
+		io.SetClipboardTextFn = SetClipboardText;
+		io.GetClipboardTextFn = GetClipboardText;
+		io.ClipboardUserData = window;
 	}
 
 	// Initialize all Vulkan resources used by the ui
@@ -452,6 +482,22 @@ public:
 		}
 	}
 
+
+private:
+	///Sets the clipboard to the specified string.
+	static void SetClipboardText(void* user_data, const char* text)
+	{
+		glfwSetClipboardString((GLFWwindow*)user_data, text);
+	}
+	///Retrieves the contents of the clipboard as a string
+	static const char* GetClipboardText(void* user_data)
+	{
+		return glfwGetClipboardString((GLFWwindow*)user_data);
+	}
+
+
+
+	//zob
 	void setImageLayout(
 		VkCommandBuffer cmdbuffer,
 		VkImage image,

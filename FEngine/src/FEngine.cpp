@@ -19,6 +19,7 @@ void FEngine::Run()
 	Renderer renderer(window, *camera);
 	//camera->aspectRatio = size.x / size.y;
 
+
 	float lastTime = Time::ElapsedSinceStartup();
 	float delta = 1.f / 144.f;
 
@@ -28,9 +29,18 @@ void FEngine::Run()
 	while ( window.WindowOpen() )
 	{
 		float time = Time::ElapsedSinceStartup();
+
 		if (Time::ElapsedSinceStartup() - lastTime > delta)
 		{
+			io.DeltaTime = time - lastTime;
 			lastTime = time;
+
+			// Statistics window
+			{
+				ImGui::Begin("Statistics");
+				ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / io.Framerate, io.Framerate);
+				ImGui::End();
+			}
 
 			Input::Update();
 			ImGui::ShowTestWindow();

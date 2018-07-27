@@ -87,7 +87,7 @@ Renderer::Renderer(Window& rWindow, Camera& rCamera) :
 	imGui->camera.setPosition(glm::vec3(0.0f, 1.4f, -4.8f));
 	imGui->camera.setRotation(glm::vec3(4.5f, -380.0f, 0.0f));
 	imGui->camera.setPerspective(45.0f, size.x / size.y, 0.1f, 256.0f);
-	imGui->init(size.x, size.y);
+	imGui->init(size.x, size.y, m_window.GetGLFWwindow());
 	imGui->initResources( renderPass->renderPass, device->graphicsQueue);
 	createCommandBuffers();
 	createSyncObjects();
@@ -207,7 +207,7 @@ void Renderer::drawFrame()
 	submitInfo.waitSemaphoreCount = 1;
 	submitInfo.pWaitSemaphores = waitSemaphores;
 	submitInfo.pWaitDstStageMask = waitStages;
-	submitInfo.commandBufferCount = commandBuffers.size();
+	submitInfo.commandBufferCount = static_cast<uint32_t>(commandBuffers.size());
 	submitInfo.pCommandBuffers = commandBuffers.data();
 
 	// Specify which semaphores to signal once the command buffers have finished execution

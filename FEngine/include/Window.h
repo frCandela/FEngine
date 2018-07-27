@@ -20,6 +20,8 @@ public:
 	bool WindowOpen() const;
 	void CreateWindowSurface(VkInstance instance, VkSurfaceKHR* surface);
 	VkExtent2D GetExtend2D() const;
+	GLFWwindow * GetGLFWwindow() const { return m_window; }
+
 
 private:
 	uint32_t m_width;
