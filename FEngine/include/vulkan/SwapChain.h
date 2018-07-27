@@ -31,10 +31,10 @@ namespace vk
 		VkExtent2D swapChainExtent;
 		VkSwapchainKHR swapChain;
 		VkFormat swapChainImageFormat;
-
+		std::vector<VkImage> swapChainImages;
 	private:
 		Device & m_device;
-		std::vector<VkImage> swapChainImages;
+		
 		std::vector<VkImageView> swapChainImageViews;
 
 		/// Creates the best swap chain possible depending on the device capabilities.

@@ -20,5 +20,8 @@ namespace vk
 		VkCommandBuffer beginSingleTimeCommands();
 		void endSingleTimeCommands(VkCommandBuffer commandBuffer);
 		void createCommandPool();
+		void CreateBuffer(size_t size);
+		void Begin(size_t index);
+		void End(size_t index);
 	};
 }

@@ -30,7 +30,7 @@ namespace vk
 		VkCommandPoolCreateInfo poolInfo = {};
 		poolInfo.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
 		poolInfo.queueFamilyIndex = queueFamilyIndices.graphicsFamily;
-		poolInfo.flags = 0; // Optional
+		poolInfo.flags = VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT & VK_COMMAND_POOL_CREATE_TRANSIENT_BIT; // Optional		
 
 		if (vkCreateCommandPool(m_device.device, &poolInfo, nullptr, &commandPool) != VK_SUCCESS)
 			throw std::runtime_error("failed to create command pool!");
@@ -77,5 +77,36 @@ namespace vk
 
 		// Cleaning
 		vkFreeCommandBuffers(m_device.device, commandPool, 1, &commandBuffer);
+	}
+
+	void Commands::CreateBuffer( size_t size)
+	{
+		commandBuffers.resize(size);
+
+		VkCommandBufferAllocateInfo allocInfo = {};
+		allocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
+		allocInfo.commandPool = commandPool;
+		allocInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
+		allocInfo.commandBufferCount = (uint32_t)commandBuffers.size();
+
+		if (vkAllocateCommandBuffers(m_device.device, &allocInfo, commandBuffers.data()) != VK_SUCCESS)
+			throw std::runtime_error("failed to allocate command buffers!");
+	}
+
+	void Commands::Begin(size_t index )
+	{
+		// Specify the usage of the command buffer
+		VkCommandBufferBeginInfo beginInfo = {};
+		beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
+		beginInfo.flags = VK_COMMAND_BUFFER_USAGE_SIMULTANEOUS_USE_BIT;
+
+		if (vkBeginCommandBuffer(commandBuffers[index], &beginInfo) != VK_SUCCESS)
+			throw std::runtime_error("failed to begin recording command buffer!");
+	}
+
+	void Commands::End(size_t index)
+	{
+		if (vkEndCommandBuffer(commandBuffers[index]) != VK_SUCCESS)
+			throw std::runtime_error("failed to record command buffer!");
 	}
 }

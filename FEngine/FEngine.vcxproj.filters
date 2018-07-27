@@ -163,9 +163,6 @@
     <ClInclude Include="include\vulkan\Mesh.h">
       <Filter>Fichiers d%27en-tête\Vulkan</Filter>
     </ClInclude>
-    <ClInclude Include="include\vulkan\Util.h">
-      <Filter>Fichiers d%27en-tête\Vulkan</Filter>
-    </ClInclude>
     <ClInclude Include="include\vulkan\Buffer.hpp">
       <Filter>Fichiers d%27en-tête\Vulkan</Filter>
     </ClInclude>
@@ -176,6 +173,9 @@
       <Filter>Fichiers d%27en-tête</Filter>
     </ClInclude>
     <ClInclude Include="include\Kamera.h">
+      <Filter>Fichiers d%27en-tête</Filter>
+    </ClInclude>
+    <ClInclude Include="include\vulkan\Util.h">
       <Filter>Fichiers d%27en-tête</Filter>
     </ClInclude>
   </ItemGroup>

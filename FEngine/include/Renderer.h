@@ -48,6 +48,7 @@ public:
 	vk::Descriptors* descriptors;
 
 	vk::Commands* commands;
+
 	vk::Instance* instance;
 	vk::Device* device;
 	vk::SwapChain* swapChain;
