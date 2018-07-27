@@ -15,6 +15,33 @@ namespace vk
 
 	}
 
+	void Texture::Load(void* data, int width, int height, uint32_t mipLevels)
+	{
+		m_mipLevels = mipLevels;
+		VkDeviceSize imageSize = width * height * 4 * sizeof(char);
+
+		// Create a buffer in host visible memory
+		Buffer stagingBuffer(m_device);
+		stagingBuffer.CreateBuffer(VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, imageSize);
+
+		stagingBuffer.Map(imageSize, 0);
+		memcpy(stagingBuffer.mappedData, data, imageSize);
+		stagingBuffer.Unmap();		
+
+		// Create the image in Vulkan
+		CreateImage(width, height, m_mipLevels, VK_FORMAT_R8G8B8A8_UNORM, VK_IMAGE_TILING_OPTIMAL, VK_IMAGE_USAGE_TRANSFER_SRC_BIT | VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, image, deviceMemory);
+
+		// Transitioned to VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL while generating mipmaps
+		TransitionImageLayout(VK_FORMAT_R8G8B8A8_UNORM, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, m_mipLevels);
+
+		CopyBufferToImage(stagingBuffer.m_buffer, static_cast<uint32_t>(width), static_cast<uint32_t>(height));
+
+		GenerateMipmaps(VK_FORMAT_R8G8B8A8_UNORM, width, height, m_mipLevels);
+
+		// Creates the image View
+		CreateImageView(VK_FORMAT_R8G8B8A8_UNORM, VK_IMAGE_ASPECT_COLOR_BIT, m_mipLevels);
+	}
+
 	void Texture::LoadTexture(std::string path)
 	{
 		m_path = path;
@@ -22,35 +49,15 @@ namespace vk
 		// Load image from disk
 		int texWidth, texHeight, texChannels;
 		stbi_uc* pixels = stbi_load(path.c_str(), &texWidth, &texHeight, &texChannels, STBI_rgb_alpha);
-		VkDeviceSize imageSize = texWidth * texHeight * 4;
 
 		if (!pixels)
 			throw std::runtime_error("failed to load texture image!");
 
-		m_mipLevels = static_cast<uint32_t>(std::floor(std::log2(std::max(texWidth, texHeight)))) + 1;
+		uint32_t mipLevels =  static_cast<uint32_t>(std::floor(std::log2(std::max(texWidth, texHeight)))) + 1;
 
-		// Create a buffer in host visible memory
-		Buffer stagingBuffer(m_device);
-		stagingBuffer.CreateBuffer( VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, imageSize);
-
-		stagingBuffer.Map(imageSize, 0);
-		memcpy(stagingBuffer.mappedData, pixels, static_cast<size_t>(imageSize));
-		stagingBuffer.Unmap();
+		Load(pixels, texWidth, texHeight, mipLevels);
 
 		stbi_image_free(pixels);
-
-		// Create the image in Vulkan
-		CreateImage(texWidth, texHeight, m_mipLevels, VK_FORMAT_R8G8B8A8_UNORM, VK_IMAGE_TILING_OPTIMAL, VK_IMAGE_USAGE_TRANSFER_SRC_BIT | VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, image, deviceMemory);
-
-		// Transitioned to VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL while generating mipmaps
-		TransitionImageLayout(VK_FORMAT_R8G8B8A8_UNORM, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, m_mipLevels);
-		
-		CopyBufferToImage(stagingBuffer.m_buffer, static_cast<uint32_t>(texWidth), static_cast<uint32_t>(texHeight));
-
-		GenerateMipmaps(VK_FORMAT_R8G8B8A8_UNORM, texWidth, texHeight, m_mipLevels);
-
-		// Creates the image View
-		CreateImageView(VK_FORMAT_R8G8B8A8_UNORM, VK_IMAGE_ASPECT_COLOR_BIT, m_mipLevels);
 	}
 
 	void Texture::CopyBufferToImage(VkBuffer buffer, uint32_t width, uint32_t height)

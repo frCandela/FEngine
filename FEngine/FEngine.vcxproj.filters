@@ -175,12 +175,6 @@
     <ClInclude Include="include\vulkan\Initializers.h">
       <Filter>Fichiers d%27en-tête\Vulkan</Filter>
     </ClInclude>
-    <ClInclude Include="include\IMGUI.h">
-      <Filter>Fichiers d%27en-tête</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Kamera.h">
-      <Filter>Fichiers d%27en-tête</Filter>
-    </ClInclude>
     <ClInclude Include="include\util\Time.h">
       <Filter>Fichiers d%27en-tête\util</Filter>
     </ClInclude>
@@ -192,6 +186,9 @@
     </ClInclude>
     <ClInclude Include="include\vulkan\CommandBuffer.h">
       <Filter>Fichiers d%27en-tête\Vulkan</Filter>
+    </ClInclude>
+    <ClInclude Include="include\ImGUI.h">
+      <Filter>Fichiers d%27en-tête</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

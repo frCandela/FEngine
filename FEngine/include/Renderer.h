@@ -23,10 +23,9 @@
 #include "vulkan/CommandBuffer.h"
 
 
-#include "IMGUI.h"
+#include "ImGUI.h"
 #include <imgui.h>
 #include "Camera.h"
-
 
 class Renderer
 {

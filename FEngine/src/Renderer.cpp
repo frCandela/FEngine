@@ -83,10 +83,7 @@ Renderer::Renderer(Window& rWindow, Camera& rCamera) :
 	glm::vec2 size = GetSize();
 	ImGui::CreateContext();
 	imGui = new ImGUI(device, commandPool);
-	imGui->camera.type = Kamera::CameraType::lookat;
-	imGui->camera.setPosition(glm::vec3(0.0f, 1.4f, -4.8f));
-	imGui->camera.setRotation(glm::vec3(4.5f, -380.0f, 0.0f));
-	imGui->camera.setPerspective(45.0f, size.x / size.y, 0.1f, 256.0f);
+
 	imGui->init(size.x, size.y, m_window.GetGLFWwindow());
 	imGui->initResources( renderPass->renderPass, device->graphicsQueue);
 	createCommandBuffers();

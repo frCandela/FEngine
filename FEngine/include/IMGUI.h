@@ -15,15 +15,11 @@
 #include "vulkan/Shader.h"
 #include "vulkan/Buffer.hpp"
 #include "vulkan/CommandPool.h"
+#include "vulkan/Image.h"
 
 #include "VulkanInitializers.hpp"
-#include "Kamera.h" 
 
-#define ASSET_PATH "./../data/"
-
-// ----------------------------------------------------------------------------
-// ImGUI class
-// ----------------------------------------------------------------------------
+/// ImGUI class
 class ImGUI 
 {
 public:
@@ -33,10 +29,12 @@ public:
 	vk::Buffer indexBuffer;
 	int32_t vertexCount = 0;
 	int32_t indexCount = 0;
-	VkDeviceMemory fontMemory = VK_NULL_HANDLE;
 
+	vk::Image* fontImage;
+
+	/*VkDeviceMemory fontMemory = VK_NULL_HANDLE;
 	VkImage fontImage = VK_NULL_HANDLE;
-	VkImageView fontView = VK_NULL_HANDLE;
+	VkImageView fontView = VK_NULL_HANDLE;*/
 
 	VkPipelineCache pipelineCache;
 	VkPipelineLayout pipelineLayout;
@@ -47,8 +45,6 @@ public:
 
 	vk::Device *device;
 	vk::CommandPool* commandPool;
-
-	Kamera camera;
 
 	vk::Shader * fragShader;
 	vk::Shader * vertShader;
@@ -64,6 +60,7 @@ public:
 		float frameTimeMin = 9999.0f, frameTimeMax = 0.0f;
 		float lightTimer = 0.0f;
 	} uiSettings;
+
 public:
 	// UI params are set via push constants
 	struct PushConstBlock {
@@ -76,16 +73,18 @@ public:
 		, commandPool(pCommandPool)
 		, vertexBuffer(*pdevice)
 		, indexBuffer(*pdevice)
+		, fontImage( new vk::Image( *pdevice, *pCommandPool))
 		
 	{
-	};
+
+	}
 
 	~ImGUI()
 	{
 		// Release all Vulkan resources required for rendering imGui
-		vkDestroyImage(device->device, fontImage, nullptr);
-		vkDestroyImageView(device->device, fontView, nullptr);
-		vkFreeMemory(device->device, fontMemory, nullptr);
+
+		delete(fontImage);
+
 		vkDestroySampler(device->device, sampler, nullptr);
 		vkDestroyPipelineCache(device->device, pipelineCache, nullptr);
 		vkDestroyPipeline(device->device, pipeline, nullptr);
@@ -157,7 +156,8 @@ public:
 		VkDeviceSize uploadSize = texWidth * texHeight * 4 * sizeof(char);
 
 		// Create target image for copy
-		VkImageCreateInfo imageInfo = vks::initializers::imageCreateInfo();
+		VkImageCreateInfo imageInfo = {};
+		imageInfo.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
 		imageInfo.imageType = VK_IMAGE_TYPE_2D;
 		imageInfo.format = VK_FORMAT_R8G8B8A8_UNORM;
 		imageInfo.extent.width = texWidth;
@@ -167,27 +167,31 @@ public:
 		imageInfo.arrayLayers = 1;
 		imageInfo.samples = VK_SAMPLE_COUNT_1_BIT;
 		imageInfo.tiling = VK_IMAGE_TILING_OPTIMAL;
-		imageInfo.usage = VK_IMAGE_USAGE_SAMPLED_BIT | VK_IMAGE_USAGE_TRANSFER_DST_BIT;
-		imageInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
 		imageInfo.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
-		VK_CHECK_RESULT(vkCreateImage(device->device, &imageInfo, nullptr, &fontImage));
+		imageInfo.usage = VK_IMAGE_USAGE_SAMPLED_BIT | VK_IMAGE_USAGE_TRANSFER_DST_BIT;
+		imageInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;		
+
+		VK_CHECK_RESULT(vkCreateImage(device->device, &imageInfo, nullptr, &fontImage->image));
+		
 		VkMemoryRequirements memReqs;
-		vkGetImageMemoryRequirements(device->device, fontImage, &memReqs);
-		VkMemoryAllocateInfo memAllocInfo = vks::initializers::memoryAllocateInfo();
+		vkGetImageMemoryRequirements(device->device, fontImage->image, &memReqs);
+		
+		VkMemoryAllocateInfo memAllocInfo = {};
+		memAllocInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
 		memAllocInfo.allocationSize = memReqs.size;
 		memAllocInfo.memoryTypeIndex = device->findMemoryType( memReqs.memoryTypeBits, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
-		VK_CHECK_RESULT(vkAllocateMemory(device->device, &memAllocInfo, nullptr, &fontMemory));
-		VK_CHECK_RESULT(vkBindImageMemory(device->device, fontImage, fontMemory, 0));
+		VK_CHECK_RESULT(vkAllocateMemory(device->device, &memAllocInfo, nullptr, &fontImage->deviceMemory));
+		VK_CHECK_RESULT(vkBindImageMemory(device->device, fontImage->image, fontImage->deviceMemory, 0));
 
 		// Image view
 		VkImageViewCreateInfo viewInfo = vks::initializers::imageViewCreateInfo();
-		viewInfo.image = fontImage;
+		viewInfo.image = fontImage->image;
 		viewInfo.viewType = VK_IMAGE_VIEW_TYPE_2D;
 		viewInfo.format = VK_FORMAT_R8G8B8A8_UNORM;
 		viewInfo.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
 		viewInfo.subresourceRange.levelCount = 1;
 		viewInfo.subresourceRange.layerCount = 1;
-		VK_CHECK_RESULT(vkCreateImageView(device->device, &viewInfo, nullptr, &fontView));
+		VK_CHECK_RESULT(vkCreateImageView(device->device, &viewInfo, nullptr, &fontImage->imageView));
 
 		// Staging buffers for font data upload
 		vk::Buffer stagingBuffer( *device );
@@ -204,15 +208,12 @@ public:
 		// Copy buffer data to font image
 		VkCommandBuffer copyCmd = createCommandBuffer(VK_COMMAND_BUFFER_LEVEL_PRIMARY, true);
 
-		// Prepare for transfer
-		setImageLayout(
-			copyCmd,
-			fontImage,
-			VK_IMAGE_ASPECT_COLOR_BIT,
-			VK_IMAGE_LAYOUT_UNDEFINED,
-			VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
-			VK_PIPELINE_STAGE_HOST_BIT,
-			VK_PIPELINE_STAGE_TRANSFER_BIT);
+		VkImageSubresourceRange subresourceRange = {};
+		subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+		subresourceRange.baseMipLevel = 0;
+		subresourceRange.levelCount = 1;
+		subresourceRange.layerCount = 1;
+		setImageLayout(copyCmd, fontImage->image, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, subresourceRange, VK_PIPELINE_STAGE_HOST_BIT, VK_PIPELINE_STAGE_TRANSFER_BIT);
 
 		// Copy
 		VkBufferImageCopy bufferCopyRegion = {};
@@ -225,21 +226,19 @@ public:
 		vkCmdCopyBufferToImage(
 			copyCmd,
 			stagingBuffer.m_buffer,
-			fontImage,
+			fontImage->image,
 			VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
 			1,
 			&bufferCopyRegion
 		);
 
 		// Prepare for shader read
-		setImageLayout(
-			copyCmd,
-			fontImage,
-			VK_IMAGE_ASPECT_COLOR_BIT,
-			VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
-			VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL,
-			VK_PIPELINE_STAGE_TRANSFER_BIT,
-			VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT);
+		VkImageSubresourceRange subresourceRange2 = {};
+		subresourceRange2.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+		subresourceRange2.baseMipLevel = 0;
+		subresourceRange2.levelCount = 1;
+		subresourceRange2.layerCount = 1;
+		setImageLayout(copyCmd, fontImage->image, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, subresourceRange2, VK_PIPELINE_STAGE_TRANSFER_BIT, VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT);
 
 		flushCommandBuffer(copyCmd, copyQueue, true);
 
@@ -273,9 +272,10 @@ public:
 		VK_CHECK_RESULT(vkAllocateDescriptorSets(device->device, &allocInfo, &descriptorSet));
 		VkDescriptorImageInfo fontDescriptor = vks::initializers::descriptorImageInfo(
 			sampler,
-			fontView,
+			fontImage->imageView,
 			VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL
 		);
+
 		std::vector<VkWriteDescriptorSet> writeDescriptorSets = {
 			vks::initializers::writeDescriptorSet(descriptorSet, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 0, &fontDescriptor)
 		};
@@ -499,22 +499,7 @@ private:
 	}
 
 	//zob
-	void setImageLayout(
-		VkCommandBuffer cmdbuffer,
-		VkImage image,
-		VkImageAspectFlags aspectMask,
-		VkImageLayout oldImageLayout,
-		VkImageLayout newImageLayout,
-		VkPipelineStageFlags srcStageMask,
-		VkPipelineStageFlags dstStageMask)
-	{
-		VkImageSubresourceRange subresourceRange = {};
-		subresourceRange.aspectMask = aspectMask;
-		subresourceRange.baseMipLevel = 0;
-		subresourceRange.levelCount = 1;
-		subresourceRange.layerCount = 1;
-		setImageLayout(cmdbuffer, image, oldImageLayout, newImageLayout, subresourceRange, srcStageMask, dstStageMask);
-	}
+
 	
 	void setImageLayout(
 		VkCommandBuffer cmdbuffer,

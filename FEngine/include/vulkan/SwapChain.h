@@ -6,7 +6,6 @@
 #include "Device.h"
 #include "CommandPool.h"
 
-
 namespace vk
 {
 	class SwapChain

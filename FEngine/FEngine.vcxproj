@@ -124,8 +124,7 @@
     <ClInclude Include="include\Component.h" />
     <ClInclude Include="include\FEngine.h" />
     <ClInclude Include="include\GameObject.h" />
-    <ClInclude Include="include\IMGUI.h" />
-    <ClInclude Include="include\Kamera.h" />
+    <ClInclude Include="include\ImGUI.h" />
     <ClInclude Include="include\Renderer.h" />
     <ClInclude Include="include\Transform.h" />
     <ClInclude Include="include\util\Input.h" />
