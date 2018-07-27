@@ -84,7 +84,7 @@ Renderer::Renderer(Window& rWindow, Camera& rCamera) :
 	descriptors->CreateDescriptorSet(*texture, *textureSampler);
 	glm::vec2 size = GetSize();
 	
-	imGui = new ImGUI(device, commandPool, size, m_window.GetGLFWwindow(), renderPass->renderPass);
+	imGui = new ImguiManager(device, commandPool, size, m_window.GetGLFWwindow(), renderPass->renderPass);
 
 	createCommandBuffers();
 	createSyncObjects();

@@ -110,6 +110,9 @@
     <ClCompile Include="src\vulkan\CommandBuffer.cpp">
       <Filter>Fichiers sources\Vulkan</Filter>
     </ClCompile>
+    <ClCompile Include="src\vulkan\ImguiManager.cpp">
+      <Filter>Fichiers sources</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\Renderer.h">
@@ -187,7 +190,10 @@
     <ClInclude Include="include\vulkan\CommandBuffer.h">
       <Filter>Fichiers d%27en-tête\Vulkan</Filter>
     </ClInclude>
-    <ClInclude Include="include\ImGUI.h">
+    <ClInclude Include="deps\imgui\imgui.h">
+      <Filter>deps</Filter>
+    </ClInclude>
+    <ClInclude Include="include\ImguiManager.h">
       <Filter>Fichiers d%27en-tête</Filter>
     </ClInclude>
   </ItemGroup>

@@ -23,8 +23,7 @@
 #include "vulkan/CommandBuffer.h"
 
 
-#include "ImGUI.h"
-#include <imgui.h>
+#include "ImguiManager.h"
 #include "Camera.h"
 
 class Renderer
@@ -33,7 +32,7 @@ public:
 	Renderer(Window& rWindow, Camera& rCamera);
 	~Renderer();
 
-	ImGUI *imGui = nullptr;
+	ImguiManager *imGui = nullptr;
 
 	Camera* m_pCamera;
 

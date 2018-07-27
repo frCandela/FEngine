@@ -105,6 +105,7 @@
     <ClCompile Include="src\util\Time.cpp" />
     <ClCompile Include="src\vulkan\Buffer.cpp" />
     <ClCompile Include="src\vulkan\CommandPool.cpp" />
+    <ClCompile Include="src\vulkan\ImguiManager.cpp" />
     <ClCompile Include="src\vulkan\Mesh.cpp" />
     <ClCompile Include="src\vulkan\CommandBuffer.cpp" />
     <ClCompile Include="src\vulkan\DepthImage.cpp" />
@@ -120,11 +121,12 @@
     <ClCompile Include="src\Window.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="deps\imgui\imgui.h" />
     <ClInclude Include="include\Camera.h" />
     <ClInclude Include="include\Component.h" />
     <ClInclude Include="include\FEngine.h" />
     <ClInclude Include="include\GameObject.h" />
-    <ClInclude Include="include\ImGUI.h" />
+    <ClInclude Include="include\ImguiManager.h" />
     <ClInclude Include="include\Renderer.h" />
     <ClInclude Include="include\Transform.h" />
     <ClInclude Include="include\util\Input.h" />
