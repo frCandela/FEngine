@@ -14,6 +14,8 @@ namespace vk
 		Buffer(vk::Device& device);
 		~Buffer();
 
+		void Destroy();
+
 		vk::Device& m_device;
 
 		VkBuffer m_buffer = VK_NULL_HANDLE;
@@ -40,5 +42,15 @@ namespace vk
 
 		VkResult CreateBuffer(VkBufferUsageFlags usageFlags, VkMemoryPropertyFlags memoryPropertyFlags, VkDeviceSize size);
 
+		/// Flush a memory range of the buffer to make it visible to the device
+		VkResult Flush(VkDeviceSize size = VK_WHOLE_SIZE, VkDeviceSize offset = 0)
+		{
+			VkMappedMemoryRange mappedRange = {};
+			mappedRange.sType = VK_STRUCTURE_TYPE_MAPPED_MEMORY_RANGE;
+			mappedRange.memory = memory;
+			mappedRange.offset = offset;
+			mappedRange.size = size;
+			return vkFlushMappedMemoryRanges(m_device.device, 1, &mappedRange);
+		}
 	};
 }

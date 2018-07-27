@@ -9,36 +9,34 @@
 #include <algorithm>
 #include <fstream>
 
-#define GLM_FORCE_RADIANS
-#define GLM_FORCE_DEPTH_ZERO_TO_ONE
-#include <glm/glm.hpp>
-#include <glm/gtc/matrix_transform.hpp>
-
 #include "imgui/imgui.h"
 
 #include "vulkan/Device.h"
+#include "vulkan/Shader.h"
+#include "vulkan/Buffer.hpp"
 
-#include "VulkanBuffer.hpp"
 #include "VulkanInitializers.hpp"
 #include "Kamera.h" 
-#include "vulkan/Shader.h"
 
 #define ASSET_PATH "./../data/"
 
 // ----------------------------------------------------------------------------
 // ImGUI class
 // ----------------------------------------------------------------------------
-class ImGUI {
+class ImGUI 
+{
 public:
 	// Vulkan resources for rendering the UI
 	VkSampler sampler;
-	vks::Buffer vertexBuffer;
-	vks::Buffer indexBuffer;
+	vk::Buffer vertexBuffer;
+	vk::Buffer indexBuffer;
 	int32_t vertexCount = 0;
 	int32_t indexCount = 0;
 	VkDeviceMemory fontMemory = VK_NULL_HANDLE;
+
 	VkImage fontImage = VK_NULL_HANDLE;
 	VkImageView fontView = VK_NULL_HANDLE;
+
 	VkPipelineCache pipelineCache;
 	VkPipelineLayout pipelineLayout;
 	VkPipeline pipeline;
@@ -70,15 +68,16 @@ public:
 		glm::vec2 translate;
 	} pushConstBlock;
 
-	ImGUI(vk::Device *pdevice) : device(pdevice)
+	ImGUI(vk::Device *pdevice) : 
+		  device(pdevice)
+		, vertexBuffer(*pdevice)
+		, indexBuffer(*pdevice)
 	{
 	};
 
 	~ImGUI()
 	{
 		// Release all Vulkan resources required for rendering imGui
-		vertexBuffer.destroy();
-		indexBuffer.destroy();
 		vkDestroyImage(device->device, fontImage, nullptr);
 		vkDestroyImageView(device->device, fontView, nullptr);
 		vkFreeMemory(device->device, fontMemory, nullptr);
@@ -186,17 +185,16 @@ public:
 		VK_CHECK_RESULT(vkCreateImageView(device->device, &viewInfo, nullptr, &fontView));
 
 		// Staging buffers for font data upload
-		vks::Buffer stagingBuffer;
-
-		VK_CHECK_RESULT(createBuffer(
+		vk::Buffer stagingBuffer( *device );
+		
+		VK_CHECK_RESULT(stagingBuffer.CreateBuffer(
 			VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
-			VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
-			&stagingBuffer,
+			VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,			
 			uploadSize));
 
-		stagingBuffer.map();
-		memcpy(stagingBuffer.mapped, fontData, uploadSize);
-		stagingBuffer.unmap();
+		stagingBuffer.Map();
+		memcpy(stagingBuffer.mappedData, fontData, uploadSize);
+		stagingBuffer.Unmap();
 
 		// Copy buffer data to font image
 		VkCommandBuffer copyCmd = createCommandBuffer(VK_COMMAND_BUFFER_LEVEL_PRIMARY, true);
@@ -221,7 +219,7 @@ public:
 
 		vkCmdCopyBufferToImage(
 			copyCmd,
-			stagingBuffer.buffer,
+			stagingBuffer.m_buffer,
 			fontImage,
 			VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
 			1,
@@ -239,8 +237,6 @@ public:
 			VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT);
 
 		flushCommandBuffer(copyCmd, copyQueue, true);
-
-		stagingBuffer.destroy();
 
 		// Font texture Sampler
 		VkSamplerCreateInfo samplerInfo = vks::initializers::samplerCreateInfo();
@@ -397,28 +393,28 @@ public:
 			// Update buffers only if vertex or index count has been changed compared to current buffer size
 
 			// Vertex buffer
-			if ((vertexBuffer.buffer == VK_NULL_HANDLE) || (vertexCount != imDrawData->TotalVtxCount)) {
-				vertexBuffer.unmap();
-				vertexBuffer.destroy();
-				VK_CHECK_RESULT(createBuffer(VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT, &vertexBuffer, vertexBufferSize));
+			if ((vertexBuffer.m_buffer == VK_NULL_HANDLE) || (vertexCount != imDrawData->TotalVtxCount)) {
+				vertexBuffer.Unmap();
+				vertexBuffer.Destroy();
+				VK_CHECK_RESULT(vertexBuffer.CreateBuffer(VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT, vertexBufferSize));
 				vertexCount = imDrawData->TotalVtxCount;
-				vertexBuffer.unmap();
-				vertexBuffer.map();
+				vertexBuffer.Unmap();
+				vertexBuffer.Map();
 			}
 
 			// Index buffer
 			VkDeviceSize indexSize = imDrawData->TotalIdxCount * sizeof(ImDrawIdx);
-			if ((indexBuffer.buffer == VK_NULL_HANDLE) || (indexCount < imDrawData->TotalIdxCount)) {
-				indexBuffer.unmap();
-				indexBuffer.destroy();
-				VK_CHECK_RESULT(createBuffer(VK_BUFFER_USAGE_INDEX_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT, &indexBuffer, indexBufferSize));
+			if ((indexBuffer.m_buffer == VK_NULL_HANDLE) || (indexCount < imDrawData->TotalIdxCount)) {
+				indexBuffer.Unmap();
+				indexBuffer.Destroy();
+				VK_CHECK_RESULT(indexBuffer.CreateBuffer(VK_BUFFER_USAGE_INDEX_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT, indexBufferSize));
 				indexCount = imDrawData->TotalIdxCount;
-				indexBuffer.map();
+				indexBuffer.Map();
 			}
 
 			// Upload data
-			ImDrawVert* vtxDst = (ImDrawVert*)vertexBuffer.mapped;
-			ImDrawIdx* idxDst = (ImDrawIdx*)indexBuffer.mapped;
+			ImDrawVert* vtxDst = (ImDrawVert*)vertexBuffer.mappedData;
+			ImDrawIdx* idxDst = (ImDrawIdx*)indexBuffer.mappedData;
 
 			for (int n = 0; n < imDrawData->CmdListsCount; n++) {
 				const ImDrawList* cmd_list = imDrawData->CmdLists[n];
@@ -429,8 +425,8 @@ public:
 			}
 
 			// Flush to make writes visible to GPU
-			vertexBuffer.flush();
-			indexBuffer.flush();
+			vertexBuffer.Flush();
+			indexBuffer.Flush();
 		}		
 	}
 
@@ -448,8 +444,8 @@ public:
 
 			// Bind vertex and index buffer
 			VkDeviceSize offsets[1] = { 0 };
-			vkCmdBindVertexBuffers(commandBuffer, 0, 1, &vertexBuffer.buffer, offsets);
-			vkCmdBindIndexBuffer(commandBuffer, indexBuffer.buffer, 0, VK_INDEX_TYPE_UINT16);
+			vkCmdBindVertexBuffers(commandBuffer, 0, 1, &vertexBuffer.m_buffer, offsets);
+			vkCmdBindIndexBuffer(commandBuffer, indexBuffer.m_buffer, 0, VK_INDEX_TYPE_UINT16);
 
 			VkViewport viewport = vks::initializers::viewport(ImGui::GetIO().DisplaySize.x, ImGui::GetIO().DisplaySize.y, 0.0f, 1.0f);
 			vkCmdSetViewport(commandBuffer, 0, 1, &viewport);
@@ -490,6 +486,7 @@ private:
 	{
 		glfwSetClipboardString((GLFWwindow*)user_data, text);
 	}
+	
 	///Retrieves the contents of the clipboard as a string
 	static const char* GetClipboardText(void* user_data)
 	{
@@ -683,44 +680,6 @@ private:
 			vkFreeCommandBuffers(device->device, device->commands->commandPool, 1, &commandBuffer);
 		}
 	}
-	VkResult createBuffer(VkBufferUsageFlags usageFlags, VkMemoryPropertyFlags memoryPropertyFlags, vks::Buffer *buffer, VkDeviceSize size, void *data = nullptr)
-	{
-		buffer->device = device->device;
-
-		// Create the buffer handle
-		VkBufferCreateInfo bufferCreateInfo = vks::initializers::bufferCreateInfo(usageFlags, size);
-		VK_CHECK_RESULT(vkCreateBuffer(device->device, &bufferCreateInfo, nullptr, &buffer->buffer));
-
-		// Create the memory backing up the buffer handle
-		VkMemoryRequirements memReqs;
-		VkMemoryAllocateInfo memAlloc = vks::initializers::memoryAllocateInfo();
-		vkGetBufferMemoryRequirements(device->device, buffer->buffer, &memReqs);
-		memAlloc.allocationSize = memReqs.size;
-		// Find a memory type index that fits the properties of the buffer
-		memAlloc.memoryTypeIndex = device->findMemoryType(memReqs.memoryTypeBits, memoryPropertyFlags);
-		VK_CHECK_RESULT(vkAllocateMemory(device->device, &memAlloc, nullptr, &buffer->memory));
-
-		buffer->alignment = memReqs.alignment;
-		buffer->size = memAlloc.allocationSize;
-		buffer->usageFlags = usageFlags;
-		buffer->memoryPropertyFlags = memoryPropertyFlags;
-
-		// If a pointer to the buffer data has been passed, map the buffer and copy over the data
-		if (data != nullptr)
-		{
-			VK_CHECK_RESULT(buffer->map());
-			memcpy(buffer->mapped, data, size);
-			if ((memoryPropertyFlags & VK_MEMORY_PROPERTY_HOST_COHERENT_BIT) == 0)
-				buffer->flush();
-
-			buffer->unmap();
-		}
-
-		// Initialize a default descriptor that covers the whole buffer size
-		buffer->setupDescriptor();
-
-		// Attach the memory to the buffer object
-		return buffer->bind();
-	}
+	
 
 };

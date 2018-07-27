@@ -6,12 +6,17 @@ namespace vk
 
 	Buffer::~Buffer()
 	{
+		Destroy();
+	}
+
+	void Buffer::Destroy()
+	{
 		if (m_buffer)
 			vkDestroyBuffer(m_device.device, m_buffer, nullptr);
-
 		if (memory)
 			vkFreeMemory(m_device.device, memory, nullptr);
 	}
+
 
 
 	VkResult Buffer::Map(VkDeviceSize size, VkDeviceSize offset)
