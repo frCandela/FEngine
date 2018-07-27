@@ -21,9 +21,8 @@ namespace vk
 		VkImage image;
 		VkDeviceMemory deviceMemory;
 		VkImageView imageView;// images are accessed through image views rather than directly
-		uint32_t m_mipLevels = 1;
 
-		static VkImageView CreateImageView(VkImage image, VkFormat format, VkImageAspectFlags aspectFlags, uint32_t mipLevels, VkDevice& device);
+		void CreateImageView(VkFormat format, VkImageAspectFlags aspectFlags, uint32_t mipLevels);
 
 	protected:
 		Device & m_device;

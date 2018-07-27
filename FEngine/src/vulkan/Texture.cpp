@@ -50,7 +50,7 @@ namespace vk
 		GenerateMipmaps(VK_FORMAT_R8G8B8A8_UNORM, texWidth, texHeight, m_mipLevels);
 
 		// Creates the image View
-		imageView = Image::CreateImageView(image, VK_FORMAT_R8G8B8A8_UNORM, VK_IMAGE_ASPECT_COLOR_BIT, m_mipLevels, m_device.device);
+		CreateImageView(VK_FORMAT_R8G8B8A8_UNORM, VK_IMAGE_ASPECT_COLOR_BIT, m_mipLevels);
 	}
 
 	void Texture::CopyBufferToImage(VkBuffer buffer, uint32_t width, uint32_t height)

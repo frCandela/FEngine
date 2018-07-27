@@ -18,11 +18,10 @@ namespace vk
 		CleanupSwapChain();
 	}
 
-
 	void SwapChain::BuildSwapChain(Window& window)
 	{
 		CreateSwapChain(window);
-		CreateImageViews();
+		//CreateImageViews();
 		depthImage->CreateDepthResources(swapChainExtent.width, swapChainExtent.height);
 	}
 
@@ -75,14 +74,29 @@ namespace vk
 			throw std::runtime_error("failed to create swap chain!");
 
 		//retrieve the swap chain images
-		vkGetSwapchainImagesKHR(m_device.device, swapChain, &imageCount, nullptr);
-		swapChainImages.resize(imageCount);
-		vkGetSwapchainImagesKHR(m_device.device, swapChain, &imageCount, swapChainImages.data());
+		vkGetSwapchainImagesKHR(m_device.device, swapChain, &imageCount, nullptr);		
+
+		std::vector<VkImage> imagesArray;
+		imagesArray.resize(imageCount);
+
+		vkGetSwapchainImagesKHR(m_device.device, swapChain, &imageCount, imagesArray.data());
+		
+		images.resize(imageCount);
 
 		swapChainImageFormat = surfaceFormat.format;
 		swapChainExtent = extent;
-	}
 
+		for (uint32_t i = 0; i < imageCount; ++i)
+		{
+			images[i] = new Image(m_device, m_rCommandPool);
+			images[i]->image = imagesArray[i];			
+		}
+
+		//Create image views
+		for (uint32_t i = 0; i < images.size(); i++)
+			images[i]->CreateImageView(swapChainImageFormat, VK_IMAGE_ASPECT_COLOR_BIT, 1);
+	}
+	
 	VkSurfaceFormatKHR SwapChain::ChooseSwapSurfaceFormat(const std::vector<VkSurfaceFormatKHR>& availableFormats)
 	{
 		//surface has no preferred format
@@ -132,12 +146,12 @@ namespace vk
 	void SwapChain::CreateFramebuffers(VkRenderPass& renderPass)
 	{
 		//A framebuffer object references all of the VkImageView objects that represent the attachments specified during the render pass creation
-		swapChainFramebuffers.resize(swapChainImageViews.size());
-		for (size_t i = 0; i < swapChainImageViews.size(); i++)
+		swapChainFramebuffers.resize(images.size());
+		for (size_t i = 0; i < images.size(); i++)
 		{
 			std::array<VkImageView, 2> attachments =
 			{
-				swapChainImageViews[i],
+				images[i]->imageView,
 				depthImage->imageView
 			};
 
@@ -156,14 +170,6 @@ namespace vk
 		}
 	}
 
-	void SwapChain::CreateImageViews()
-	{
-		swapChainImageViews.resize(swapChainImages.size());
-
-		for (uint32_t i = 0; i < swapChainImages.size(); i++)
-			swapChainImageViews[i] = Image::CreateImageView(swapChainImages[i], swapChainImageFormat, VK_IMAGE_ASPECT_COLOR_BIT, 1, m_device.device);
-	}
-
 	void SwapChain::CleanupSwapChain()
 	{
 		vkDestroyImageView(m_device.device, depthImage->imageView, nullptr);
@@ -173,8 +179,8 @@ namespace vk
 		for (size_t i = 0; i < swapChainFramebuffers.size(); i++)
 			vkDestroyFramebuffer(m_device.device, swapChainFramebuffers[i], nullptr);
 
-		for (size_t i = 0; i < swapChainImageViews.size(); i++)
-			vkDestroyImageView(m_device.device, swapChainImageViews[i], nullptr);
+		for (size_t i = 0; i < images.size(); i++)
+			vkDestroyImageView(m_device.device, images[i]->imageView, nullptr);
 
 		vkDestroySwapchainKHR(m_device.device, swapChain, nullptr);
 	}

@@ -121,7 +121,7 @@ namespace vk
 		m_rCommandPool.EndSingleTimeCommands(commandBuffer);
 	}
 	
-	VkImageView Image::CreateImageView(VkImage image, VkFormat format, VkImageAspectFlags aspectFlags, uint32_t mipLevels, VkDevice& device)
+	void Image::CreateImageView(VkFormat format, VkImageAspectFlags aspectFlags, uint32_t mipLevels)
 	{
 		VkImageViewCreateInfo viewInfo = {};
 		viewInfo.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
@@ -134,12 +134,8 @@ namespace vk
 		viewInfo.subresourceRange.baseArrayLayer = 0;
 		viewInfo.subresourceRange.layerCount = 1;
 
-		VkImageView imageView;
-		if (vkCreateImageView(device, &viewInfo, nullptr, &imageView) != VK_SUCCESS)
+		if (vkCreateImageView(m_device.device, &viewInfo, nullptr, &imageView) != VK_SUCCESS)
 			throw std::runtime_error("failed to create texture image view!");
-
-
-		return imageView;
 	}
 
 	Image::~Image()

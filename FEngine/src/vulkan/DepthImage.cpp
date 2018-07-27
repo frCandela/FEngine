@@ -26,7 +26,7 @@ namespace vk
 		VkFormat depthFormat = FindDepthFormat();
 
 		CreateImage(width, height, 1, depthFormat, VK_IMAGE_TILING_OPTIMAL, VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, image, deviceMemory);
-		imageView = Image::CreateImageView(image, depthFormat, VK_IMAGE_ASPECT_DEPTH_BIT, 1, m_device.device);
+		CreateImageView(depthFormat, VK_IMAGE_ASPECT_DEPTH_BIT, 1);
 
 		// Setup a pipeline barrier for the transition
 		TransitionImageLayout(depthFormat, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL, 1);

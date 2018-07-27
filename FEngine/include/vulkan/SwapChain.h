@@ -26,28 +26,18 @@ namespace vk
 		/// Creates a frameBuffer for each swapChain image view
 		void CreateFramebuffers(VkRenderPass& renderPass);
 
-
-		//Zob
 		std::vector<VkFramebuffer> swapChainFramebuffers;
-		std::vector<VkImageView> swapChainImageViews;
+		std::vector<vk::Image*> images;
 
 		VkExtent2D swapChainExtent;
 		VkSwapchainKHR swapChain;
 		VkFormat swapChainImageFormat;
-
-		std::vector<VkImage> swapChainImages;
 	private:
 		Device & m_device;
 		CommandPool & m_rCommandPool;
 		
-
-
-
 		/// Creates the best swap chain possible depending on the device capabilities.
 		void CreateSwapChain(Window& window);
-
-		/// Creates the images views of the swap chain. An image view describes how to access the image and which part of the image to access (2D texture, depth texture, mipmapping levels etc.)
-		void CreateImageViews();
 
 		/// Choose the best SurfaceFormat in a list of available formats (color space)
 		VkSurfaceFormatKHR ChooseSwapSurfaceFormat(const std::vector<VkSurfaceFormatKHR>& availableFormats);

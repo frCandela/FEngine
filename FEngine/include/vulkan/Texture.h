@@ -20,7 +20,10 @@ namespace vk
 		/// Generate mipmaps for a VkImage
 		void GenerateMipmaps(VkFormat imageFormat, int32_t texWidth, int32_t texHeight, uint32_t mipLevels);
 
+		uint32_t m_mipLevels = 1;
+
 	private:
 		std::string m_path;
+
 	};
 }
