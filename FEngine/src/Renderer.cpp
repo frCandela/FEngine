@@ -83,15 +83,11 @@ Renderer::Renderer(Window& rWindow, Camera& rCamera) :
 
 	descriptors->CreateDescriptorSet(*texture, *textureSampler);
 	glm::vec2 size = GetSize();
-	ImGui::CreateContext();
-	imGui = new ImGUI(device, commandPool);
+	
+	imGui = new ImGUI(device, commandPool, size, m_window.GetGLFWwindow(), renderPass->renderPass);
 
-	imGui->init(size.x, size.y, m_window.GetGLFWwindow());
-	imGui->initResources( renderPass->renderPass, device->graphicsQueue);
 	createCommandBuffers();
 	createSyncObjects();
-
-	//ImGui::NewFrame();
 }
 
 Renderer::~Renderer()
@@ -105,7 +101,7 @@ void Renderer::createCommandBuffers()
 {
 	commandBuffers->CreateBuffer(swapChain->swapChainFramebuffers.size());
 
-	imGui->updateBuffers();
+	imGui->UpdateBuffers();
 
 	// Records every command buffer (one per framebuffer)
 	for (size_t i = 0; i < commandBuffers->commandBuffers.size(); i++)
@@ -147,7 +143,7 @@ void Renderer::createCommandBuffers()
 			vkCmdDrawIndexed(commandBuffers->commandBuffers[i], static_cast<uint32_t>(buffers[j]->indices.size()), 1, 0, 0, 0);
 		}
 
-		imGui->drawFrame(commandBuffers->commandBuffers[i]);
+		imGui->DrawFrame(commandBuffers->commandBuffers[i]);
 
 		vkCmdEndRenderPass(commandBuffers->commandBuffers[i]);
 
