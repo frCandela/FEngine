@@ -88,6 +88,7 @@ public:
 		vkDestroyPipelineLayout(device->device, pipelineLayout, nullptr);
 		vkDestroyDescriptorPool(device->device, descriptorPool, nullptr);
 		vkDestroyDescriptorSetLayout(device->device, descriptorSetLayout, nullptr);
+		ImGui::DestroyContext();
 	}
 
 	// Initialize styles, keys, etc.
@@ -494,8 +495,6 @@ private:
 	{
 		return glfwGetClipboardString((GLFWwindow*)user_data);
 	}
-
-
 
 	//zob
 	void setImageLayout(

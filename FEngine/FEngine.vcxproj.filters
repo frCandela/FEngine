@@ -86,9 +86,6 @@
     <ClCompile Include="src\Camera.cpp">
       <Filter>Fichiers sources</Filter>
     </ClCompile>
-    <ClCompile Include="src\Input.cpp">
-      <Filter>Fichiers sources</Filter>
-    </ClCompile>
     <ClCompile Include="src\vulkan\Mesh.cpp">
       <Filter>Fichiers sources\Vulkan</Filter>
     </ClCompile>
@@ -105,6 +102,9 @@
       <Filter>deps</Filter>
     </ClCompile>
     <ClCompile Include="src\util\Time.cpp">
+      <Filter>Fichiers sources\util</Filter>
+    </ClCompile>
+    <ClCompile Include="src\util\Input.cpp">
       <Filter>Fichiers sources\util</Filter>
     </ClCompile>
   </ItemGroup>
@@ -166,9 +166,6 @@
     <ClInclude Include="include\Camera.h">
       <Filter>Fichiers d%27en-tête</Filter>
     </ClInclude>
-    <ClInclude Include="include\Input.h">
-      <Filter>Fichiers d%27en-tête</Filter>
-    </ClInclude>
     <ClInclude Include="include\vulkan\Mesh.h">
       <Filter>Fichiers d%27en-tête\Vulkan</Filter>
     </ClInclude>
@@ -184,10 +181,10 @@
     <ClInclude Include="include\Kamera.h">
       <Filter>Fichiers d%27en-tête</Filter>
     </ClInclude>
-    <ClInclude Include="include\vulkan\Util.h">
-      <Filter>Fichiers d%27en-tête</Filter>
-    </ClInclude>
     <ClInclude Include="include\util\Time.h">
+      <Filter>Fichiers d%27en-tête\util</Filter>
+    </ClInclude>
+    <ClInclude Include="include\util\Input.h">
       <Filter>Fichiers d%27en-tête\util</Filter>
     </ClInclude>
   </ItemGroup>

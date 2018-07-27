@@ -9,7 +9,7 @@
 #include <GLFW/glfw3.h>
 #endif // !GLFW_INCLUDE_VULKAN
 
-#include "Input.h"
+#include "util/Input.h"
 
 class Window
 {
