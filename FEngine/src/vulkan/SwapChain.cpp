@@ -23,7 +23,7 @@ namespace vk
 	{
 		CreateSwapChain(window);
 		CreateImageViews();
-		depthImage->createDepthResources(swapChainExtent.width, swapChainExtent.height);
+		depthImage->CreateDepthResources(swapChainExtent.width, swapChainExtent.height);
 	}
 
 	void SwapChain::CreateSwapChain(Window& window)
@@ -161,7 +161,7 @@ namespace vk
 		swapChainImageViews.resize(swapChainImages.size());
 
 		for (uint32_t i = 0; i < swapChainImages.size(); i++)
-			swapChainImageViews[i] = Image::createImageView(swapChainImages[i], swapChainImageFormat, VK_IMAGE_ASPECT_COLOR_BIT, 1, m_device.device);
+			swapChainImageViews[i] = Image::CreateImageView(swapChainImages[i], swapChainImageFormat, VK_IMAGE_ASPECT_COLOR_BIT, 1, m_device.device);
 	}
 
 	void SwapChain::CleanupSwapChain()

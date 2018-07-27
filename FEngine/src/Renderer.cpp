@@ -177,7 +177,6 @@ void Renderer::drawFrame()
 	
 	ImGui::Render();
 	createCommandBuffers();
-	//ImGui::NewFrame();
 
 	// Acquire an image from the swap chain
 	uint32_t imageIndex;

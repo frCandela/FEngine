@@ -6,6 +6,7 @@
 #include "Device.h"
 #include "CommandPool.h"
 
+
 namespace vk
 {
 	class SwapChain
@@ -13,7 +14,6 @@ namespace vk
 	public:
 		SwapChain(Device& device, CommandPool& rCommandPool);
 		~SwapChain();
-
 
 		DepthImage* depthImage;//Depth
 
@@ -29,15 +29,19 @@ namespace vk
 
 		//Zob
 		std::vector<VkFramebuffer> swapChainFramebuffers;
+		std::vector<VkImageView> swapChainImageViews;
+
 		VkExtent2D swapChainExtent;
 		VkSwapchainKHR swapChain;
 		VkFormat swapChainImageFormat;
+
 		std::vector<VkImage> swapChainImages;
 	private:
 		Device & m_device;
 		CommandPool & m_rCommandPool;
 		
-		std::vector<VkImageView> swapChainImageViews;
+
+
 
 		/// Creates the best swap chain possible depending on the device capabilities.
 		void CreateSwapChain(Window& window);
