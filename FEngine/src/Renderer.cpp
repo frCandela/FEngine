@@ -91,6 +91,8 @@ Renderer::Renderer(Window& rWindow, Camera& rCamera) :
 	imGui->initResources( renderPass->renderPass, device->graphicsQueue);
 	createCommandBuffers();
 	createSyncObjects();
+
+	ImGui::NewFrame();
 }
 
 Renderer::~Renderer()
@@ -102,10 +104,6 @@ Renderer::~Renderer()
 // Setup the command buffers for drawing opérations
 void Renderer::createCommandBuffers()
 {
-	ImGui::NewFrame();
-	//ImGui::ShowTestWindow();
-	ImGui::Render();
-
 	commands->CreateBuffer(swapChain->swapChainFramebuffers.size());
 
 	imGui->updateBuffers();
@@ -176,8 +174,10 @@ void Renderer::drawFrame()
 	vkResetFences(device->device, 1, &inFlightFences[currentFrame]);
 	
 	vkDeviceWaitIdle(device->device);//zob
+	ImGui::Render();
 	createCommandBuffers();
-	
+	ImGui::NewFrame();
+
 	// Acquire an image from the swap chain
 	uint32_t imageIndex;
 	

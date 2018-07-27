@@ -12,22 +12,20 @@ void Input::Setup(GLFWwindow * window)
 
 	double x, y;
 	glfwGetCursorPos(m_window, &x, &y);
-	Input::Update();
 
 	glfwSetFramebufferSizeCallback(m_window, Input::window_size_callback);
 	glfwSetCursorPosCallback(m_window, Mouse::mouse_callback);
-	glfwSetKeyCallback(m_window, Keyboard::key_callback);
-	glfwSetMouseButtonCallback(m_window, Mouse::mouse_button_callback);
-	//glfwSetScrollCallback(window, ImGuiManager::ScrollCallback);
-	//glfwSetCharCallback(window, ImGuiManager::CharCallback);
-	glfwSetScrollCallback(window, Mouse::scroll_callback);
 	
+	glfwSetMouseButtonCallback(m_window, Mouse::mouse_button_callback);
+	glfwSetScrollCallback(window, Mouse::scroll_callback);
+	glfwSetKeyCallback(m_window, Keyboard::key_callback);
+	glfwSetCharCallback(window, Keyboard::char_callback);	
 }
 
 
 void Input::window_size_callback(GLFWwindow* window, int width, int height)
 {
-	//glViewport(0, 0, width, height);
+
 }
 
 GLFWwindow * Input::GetWindow()	{return m_window;}
@@ -48,25 +46,48 @@ void Input::Update()
 	++m_count;
 	Mouse::Update();
 	glfwPollEvents();
+
+	ImGuiIO& io = ImGui::GetIO();
+	io.MousePos = ImVec2(Mouse::Position().x, Mouse::Position().y);
+	io.MouseDown[0] = Mouse::KeyDown(Mouse::left);
+	io.MouseDown[1] = Mouse::KeyDown(Mouse::right);
 }
 
 ////////////Keyboard////////////
 std::array< unsigned, 349 > Keyboard::m_keysPressed;
 std::array< unsigned, 349 > Keyboard::m_keysReleased;
 
-
 int Keyboard::KeyDown(int GLFW_KEY){return glfwGetKey(Input::GetWindow(), GLFW_KEY) == GLFW_PRESS;}
-
 bool Keyboard::KeyPressed(int GLFW_KEY) { return m_keysPressed[GLFW_KEY] == Input::FrameCount();}
+
 bool Keyboard::KeyReleased(int GLFW_KEY) { return m_keysReleased[GLFW_KEY] == Input::FrameCount(); }
+
 void Keyboard::key_callback(GLFWwindow* window, int key, int scancode, int action, int mods)
 {
-	//ImGuiManager::KeyCallback(window, key, scancode, action, mods);
+	//Imgui
+	ImGuiIO& io = ImGui::GetIO();
+	if (action == GLFW_PRESS)
+		io.KeysDown[key] = true;
+	if (action == GLFW_RELEASE)
+		io.KeysDown[key] = false;
 
+	(void)mods; // Modifiers are not reliable across systems
+	io.KeyCtrl = io.KeysDown[GLFW_KEY_LEFT_CONTROL] || io.KeysDown[GLFW_KEY_RIGHT_CONTROL];
+	io.KeyShift = io.KeysDown[GLFW_KEY_LEFT_SHIFT] || io.KeysDown[GLFW_KEY_RIGHT_SHIFT];
+	io.KeyAlt = io.KeysDown[GLFW_KEY_LEFT_ALT] || io.KeysDown[GLFW_KEY_RIGHT_ALT];
+	io.KeySuper = io.KeysDown[GLFW_KEY_LEFT_SUPER] || io.KeysDown[GLFW_KEY_RIGHT_SUPER];
+
+	//Keyboard
 	if (action == GLFW_PRESS)
 		m_keysPressed[key] = Input::FrameCount();
 	else if (action == GLFW_RELEASE)
 		m_keysReleased[key] = Input::FrameCount();
+}
+void Keyboard::char_callback(GLFWwindow*, unsigned int c)
+{
+	ImGuiIO& io = ImGui::GetIO();
+	if (c > 0 && c < 0x10000)
+		io.AddInputCharacter((unsigned short)c);
 }
 
 ////////////Mouse////////////
@@ -113,13 +134,15 @@ void Mouse::mouse_callback(GLFWwindow* window, double x, double y)
 
 void Mouse::scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
 {
+	ImGuiIO& io = ImGui::GetIO();
+	io.MouseWheelH += (float)xoffset;
+	io.MouseWheel += (float)yoffset;
+
 	m_deltaScroll += glm::ivec2(xoffset, yoffset);
 }
 
 void Mouse::mouse_button_callback(GLFWwindow* window, int button, int action, int mods)
 {
-	//ImGuiManager::MouseButtonCallback(window, button, action, mods);
-
 	if (action == GLFW_PRESS)
 		m_buttonsPressed[button] = Input::FrameCount();
 	else if (action == GLFW_RELEASE)

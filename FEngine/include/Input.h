@@ -52,6 +52,7 @@ public:
 
 private:
 	static void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods);
+	static void char_callback(GLFWwindow*, unsigned int c);
 
 	//Events
 	static std::array< unsigned, 349 > m_keysPressed;

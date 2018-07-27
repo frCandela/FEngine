@@ -48,7 +48,6 @@ public:
 	vk::Device *device;
 
 	Kamera camera;
-	float frameTimer = 1.0f;
 
 	vk::Shader * fragShader;
 	vk::Shader * vertShader;
@@ -101,6 +100,7 @@ public:
 		style.Colors[ImGuiCol_MenuBarBg] = ImVec4(1.0f, 0.0f, 0.0f, 0.4f);
 		style.Colors[ImGuiCol_Header] = ImVec4(1.0f, 0.0f, 0.0f, 0.4f);
 		style.Colors[ImGuiCol_CheckMark] = ImVec4(0.0f, 1.0f, 0.0f, 1.0f);
+		
 		// Dimensions
 		ImGuiIO& io = ImGui::GetIO();
 		io.DisplaySize = ImVec2(width, height);
@@ -330,7 +330,6 @@ public:
 
 		pipelineCreateInfo.pVertexInputState = &vertexInputState;
 
-
 		vk::ShaderModule vertShaderModule = vertShader->GetShaderModule();
 		vk::ShaderModule fragShaderModule = fragShader->GetShaderModule();
 
@@ -358,7 +357,7 @@ public:
 	void updateBuffers()
 	{
 		ImDrawData* imDrawData = ImGui::GetDrawData();
-		if (imDrawData->CmdListsCount > 0)
+		if (imDrawData && imDrawData->CmdListsCount > 0)
 		{
 			// Note: Alignment is done inside buffer creation
 			VkDeviceSize vertexBufferSize = imDrawData->TotalVtxCount * sizeof(ImDrawVert);
@@ -408,7 +407,7 @@ public:
 	void drawFrame(VkCommandBuffer commandBuffer)
 	{
 		ImDrawData* imDrawData = ImGui::GetDrawData();
-		if (imDrawData->CmdListsCount > 0)
+		if (imDrawData &&  imDrawData->CmdListsCount > 0)
 		{
 
 			ImGuiIO& io = ImGui::GetIO();
@@ -469,6 +468,7 @@ public:
 		subresourceRange.layerCount = 1;
 		setImageLayout(cmdbuffer, image, oldImageLayout, newImageLayout, subresourceRange, srcStageMask, dstStageMask);
 	}
+	
 	void setImageLayout(
 		VkCommandBuffer cmdbuffer,
 		VkImage image,
