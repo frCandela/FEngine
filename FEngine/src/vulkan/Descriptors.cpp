@@ -49,9 +49,6 @@ namespace vk
 		uboDataDynamic.model = (glm::mat4*)_aligned_malloc(bufferSize, dynamicAlignment);
 		assert(uboDataDynamic.model);
 
-		//std::cout << "minUniformBufferOffsetAlignment = " << minUboAlignment << std::endl;
-		//std::cout << "dynamicAlignment = " << dynamicAlignment << std::endl;
-
 		// Static shared uniform buffer object with projection and view matrix
 		view.CreateBuffer(
 			VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT,
@@ -75,9 +72,8 @@ namespace vk
 	{
 		VkDescriptorSetAllocateInfo allocInfo =	vk::init::descriptorSetAllocateInfo(descriptorPool,	&descriptorSetLayout, 1);
 
-		if (vkAllocateDescriptorSets(m_device.device, &allocInfo, &descriptorSet) != VK_SUCCESS)
-			throw std::runtime_error("failed to allocate descriptor set!");
-		
+		VK_CHECK_RESULT(vkAllocateDescriptorSets(m_device.device, &allocInfo, &descriptorSet));
+
 		// Create image descriptor
 		VkDescriptorImageInfo imageInfo = {};
 		imageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;

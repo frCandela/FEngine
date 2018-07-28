@@ -13,7 +13,7 @@
 	VkResult res = (f);																					\
 	if (res != VK_SUCCESS)																				\
 	{																									\
-		std::cout << "Fatal : VkResult is \"" << ""/*errorString(res)*/ << "\" in " << __FILE__ << " at line " << __LINE__ << std::endl; \
+		std::cout << "Fatal : VkResult is \"" << errorString(res) << "\" in " << __FILE__ << " at line " << __LINE__ << std::endl; \
 		assert(res == VK_SUCCESS);																		\
 	}																									\
 }

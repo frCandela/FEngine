@@ -30,18 +30,20 @@ Renderer::Renderer(Window& rWindow, Camera& rCamera) :
 	textureSampler = new vk::Sampler(*device);
 	textureSampler->CreateSampler(static_cast<float>(texture->m_mipLevels), 16);
 
-	descriptors = new vk::Descriptors(*device);
-
 	CreateDescriptorPool();
+	CreateDescriptorPool2();
 
+	descriptors = new vk::Descriptors(*device);	
 	descriptors->UpdateUniformBuffers(*m_pCamera);
-	descriptors->UpdateDynamicUniformBuffer({glm::mat4(1.f), glm::mat4(1.f) });
+	descriptors->UpdateDynamicUniformBuffer({glm::mat4(1.f), glm::mat4(1.f) });	
+
+	CreateDescriptors2();
 
 	CreateGraphicsPipeline1();
 	CreateGraphicsPipeline2();
 
 	CreateTestMesh();
-
+	
 	descriptors->CreateDescriptorSet(*texture, *textureSampler, descriptorPool);
 	glm::vec2 size = GetSize();
 	
@@ -59,80 +61,91 @@ Renderer::~Renderer()
 	Cleanup();
 }
 
-void Renderer::CreateTestMesh()
+void Renderer::Cleanup()
 {
-	vk::Mesh * cube = new vk::Mesh(*device);
-	cube->LoadModel("mesh/cube.obj");
-	cube->CreateBuffers(*commandPool);
-	buffers.push_back(cube);
+	vkDestroyPipeline(device->device, graphicsPipeline1, nullptr);
+	vkDestroyPipelineLayout(device->device, pipelineLayout1, nullptr);
 
-	vk::Mesh * sphere = new vk::Mesh(*device);
-	sphere->LoadModel("mesh/sphere.obj");
+	vkDestroyPipeline(device->device, graphicsPipeline2, nullptr);
+	vkDestroyPipelineLayout(device->device, pipelineLayout2, nullptr);
 
-	glm::vec2 bl = { 0,0 };
-	glm::vec2 br = { 1,0 };
-	glm::vec2 tl = { 0,1 };//vert
-	glm::vec2 tr = { 1,1 };//jaune
-
-	glm::vec3 red = { 1,0,0 };
-	glm::vec3 green = { 0,1,0 };
-	glm::vec3 blue = { 0,0,1 };
-	glm::vec3 white = { 1,1,1 };
-	glm::vec3 yellow = { 1,1,0 };
-	glm::vec3 pink = { 1,0,1 };
-	glm::vec3 cyan = { 0,1,1 };
-	glm::vec3 black = { 1,1,1 };
-
-	sphere->indices = {
-		0,1,3,0,3,2, //front
-		4,7,5,4,6,7, //back
-		1,5,7,1,7,3, //right
-		0,6,4,0,2,6, //left
-		2,3,7,2,7,6, //top
-		0,5,1,0,4,5  //
-	};
-
-	sphere->vertices =
+	for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++)
 	{
-		{ { 0,0,0 },	red,{ 0,0 } },	//Fbl 0
-	{ { 0,0,1 },	white,{ 1,0 } },	//Fbr 1
-	{ { 0,1,0 },	blue,{ 0,1 } },	//Ftl 2
-	{ { 0,1,1 },	green,{ 1,1 } },	//Ftr 3
-	{ { 1,0,0 },	yellow,{ 0,1 } },	//Bbl 4
-	{ { 1,0,1 },	pink,{ 1,1 } },	//Bbr 5
-	{ { 1,1,0 },	cyan,{ 0,0 } },	//Btl 6
-	{ { 1,1,1 },	black,{ 1,0 } },	//Btr 7///
-	};
+		vkDestroySemaphore(device->device, renderFinishedSemaphores[i], nullptr);
+		vkDestroySemaphore(device->device, imageAvailableSemaphores[i], nullptr);
+		vkDestroyFence(device->device, inFlightFences[i], nullptr);
+	}
 
-	sphere->CreateBuffers(*commandPool);
-	buffers.push_back(sphere);
+	for (vk::Mesh* buffer : buffers)
+		delete(buffer);
+
+	delete(imGui);
+	vkDestroyDescriptorPool(device->device, descriptorPool2, nullptr);
+	vkDestroyDescriptorPool(device->device, descriptorPool, nullptr);
+	delete(descriptors);
+	delete(textureSampler);
+	delete(texture);
+	vkDestroyRenderPass(device->device, renderPass, nullptr);
+	delete(fragShader);
+	delete(vertShader);
+	delete(swapChain);
+	delete(commandBuffers);
+	delete(commandPool);
+	delete (device);
+	delete(instance);
 }
 
-void Renderer::RenderGUI()
+void Renderer::CreateDescriptors2()
 {
-	ImGuiIO& io = ImGui::GetIO();
+	// Descriptor set layout
+	VkDescriptorSetLayoutBinding setLayoutBinding = {};
+	setLayoutBinding.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+	setLayoutBinding.stageFlags = VK_SHADER_STAGE_VERTEX_BIT;
+	setLayoutBinding.binding = 0;
+	setLayoutBinding.descriptorCount = 1;
 
-	ImGui::Begin("Renderer");
+	std::vector<VkDescriptorSetLayoutBinding> setLayoutBindings = { setLayoutBinding };
 
-	// Average FPS
-	ImGui::BulletText("Application average : ");
-	ImGui::SameLine();
-	ImGui::TextColored(ImVec4(200.0f / 255.f, 120.0f / 255.f, 120.0f / 255.f, 1.0f), "%.3f ", 1000.0f / io.Framerate);
-	ImGui::SameLine();
-	ImGui::Text("ms / frame(%.1f FPS)", io.Framerate);
+	VkDescriptorSetLayoutCreateInfo descriptorSetLayoutInfo = {};
+	descriptorSetLayoutInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
+	descriptorSetLayoutInfo.pBindings = setLayoutBindings.data();
+	descriptorSetLayoutInfo.bindingCount = static_cast<uint32_t>(setLayoutBindings.size());
 
-	//Window Size
-	ImGui::BulletText("Window Size : w%.f  h%.f ", io.DisplaySize.x, io.DisplaySize.y);
+	VK_CHECK_RESULT( vkCreateDescriptorSetLayout(device->device, &descriptorSetLayoutInfo, nullptr, &descriptorSetLayout2));
 
-	// Max Framerate
-	framerate.RenderGui();
+	// Static shared uniform buffer object with projection and view matrix
+	projViewBuffer = new vk::Buffer(*device);
+	projViewBuffer->CreateBuffer(
+		VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT,
+		VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
+		sizeof(projView)
+	);
 	
-	ImGui::End();
-}
+	VK_CHECK_RESULT(projViewBuffer->Map());// Map persistent
 
-glm::vec2 Renderer::GetSize() const 
-{ 
-	return glm::vec2((float)swapChain->swapChainExtent.width, (float)swapChain->swapChainExtent.height); 
+
+	// CreateDescriptorSet
+	VkDescriptorSetAllocateInfo allocInfo{};
+	allocInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
+	allocInfo.descriptorPool = descriptorPool2;
+	allocInfo.pSetLayouts = &descriptorSetLayout2;
+	allocInfo.descriptorSetCount = 1;
+
+	VK_CHECK_RESULT(vkAllocateDescriptorSets(device->device, &allocInfo, &descriptorSet2) )
+	
+	// Binding 0 : Projection/View matrix uniform buffer
+	VkWriteDescriptorSet writeDescriptorSet = {};
+	writeDescriptorSet.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+	writeDescriptorSet.dstSet = descriptorSet2;
+	writeDescriptorSet.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+	writeDescriptorSet.dstBinding = 0;
+	writeDescriptorSet.pBufferInfo = &projViewBuffer->descriptor;
+	writeDescriptorSet.descriptorCount = 1;
+
+	// Create image descriptor
+	std::vector<VkWriteDescriptorSet> writeDescriptorSets = { writeDescriptorSet };
+
+	vkUpdateDescriptorSets(device->device, static_cast<uint32_t>(writeDescriptorSets.size()), writeDescriptorSets.data(), 0, NULL);
 }
 
 void Renderer::CreateCommandBuffers()
@@ -186,7 +199,8 @@ void Renderer::CreateCommandBuffers()
 
 			//Bind debug pipeline
 			vkCmdBindPipeline(commandBuffers->commandBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, graphicsPipeline2);
-			
+			vkCmdBindDescriptorSets(commandBuffers->commandBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineLayout2, 0, 1, &descriptorSet2, 0, NULL);
+
 		vkCmdEndRenderPass(commandBuffers->commandBuffers[i]);
 
 		commandBuffers->End(i);
@@ -585,7 +599,7 @@ void Renderer::CreateGraphicsPipeline2()
 	VkPipelineLayoutCreateInfo pipelineLayoutInfo = {};
 	pipelineLayoutInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
 	pipelineLayoutInfo.setLayoutCount = 1;
-	pipelineLayoutInfo.pSetLayouts = &(descriptors->descriptorSetLayout);
+	pipelineLayoutInfo.pSetLayouts = &descriptorSetLayout2;
 
 	if (vkCreatePipelineLayout(device->device, &pipelineLayoutInfo, nullptr, &pipelineLayout2) != VK_SUCCESS)
 		throw std::runtime_error("failed to create pipeline layout!");
@@ -609,6 +623,25 @@ void Renderer::CreateGraphicsPipeline2()
 
 	if (vkCreateGraphicsPipelines(device->device, VK_NULL_HANDLE, 1, &pipelineInfo, nullptr, &graphicsPipeline2) != VK_SUCCESS)
 		throw std::runtime_error("failed to create graphics pipeline!");
+}
+
+void Renderer::CreateDescriptorPool2()
+{
+	VkDescriptorPoolSize descriptorPoolSizeUniform2 = {};
+	descriptorPoolSizeUniform2.type = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+	descriptorPoolSizeUniform2.descriptorCount = 1;
+
+	// Example uses one ubo and one image sampler
+	std::vector<VkDescriptorPoolSize> poolSizes = { descriptorPoolSizeUniform2 };
+
+	VkDescriptorPoolCreateInfo descriptorPoolInfo{};
+	descriptorPoolInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
+	descriptorPoolInfo.poolSizeCount = static_cast<uint32_t>(poolSizes.size());
+	descriptorPoolInfo.pPoolSizes = poolSizes.data();
+	descriptorPoolInfo.maxSets = 1;
+
+	if (vkCreateDescriptorPool(device->device, &descriptorPoolInfo, nullptr, &descriptorPool2) != VK_SUCCESS)
+		throw std::runtime_error("failed to create descriptor pool!");
 }
 
 void Renderer::CreateDescriptorPool()
@@ -741,36 +774,78 @@ void Renderer::CreateRenderPass()
 		throw std::runtime_error("failed to create render pass!");
 }
 
-void Renderer::Cleanup()
+void Renderer::CreateTestMesh()
 {
-	vkDestroyPipeline(device->device, graphicsPipeline1, nullptr);
-	vkDestroyPipelineLayout(device->device, pipelineLayout1, nullptr);
-	
-	vkDestroyPipeline(device->device, graphicsPipeline2, nullptr);
-	vkDestroyPipelineLayout(device->device, pipelineLayout2, nullptr);
-	
-	for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++) 
+	vk::Mesh * cube = new vk::Mesh(*device);
+	cube->LoadModel("mesh/cube.obj");
+	cube->CreateBuffers(*commandPool);
+	buffers.push_back(cube);
+
+	vk::Mesh * sphere = new vk::Mesh(*device);
+	sphere->LoadModel("mesh/sphere.obj");
+
+	glm::vec2 bl = { 0,0 };
+	glm::vec2 br = { 1,0 };
+	glm::vec2 tl = { 0,1 };//vert
+	glm::vec2 tr = { 1,1 };//jaune
+
+	glm::vec3 red = { 1,0,0 };
+	glm::vec3 green = { 0,1,0 };
+	glm::vec3 blue = { 0,0,1 };
+	glm::vec3 white = { 1,1,1 };
+	glm::vec3 yellow = { 1,1,0 };
+	glm::vec3 pink = { 1,0,1 };
+	glm::vec3 cyan = { 0,1,1 };
+	glm::vec3 black = { 1,1,1 };
+
+	sphere->indices = {
+		0,1,3,0,3,2, //front
+		4,7,5,4,6,7, //back
+		1,5,7,1,7,3, //right
+		0,6,4,0,2,6, //left
+		2,3,7,2,7,6, //top
+		0,5,1,0,4,5  //
+	};
+
+	sphere->vertices =
 	{
-		vkDestroySemaphore(device->device, renderFinishedSemaphores[i], nullptr);
-		vkDestroySemaphore(device->device, imageAvailableSemaphores[i], nullptr);
-		vkDestroyFence(device->device, inFlightFences[i], nullptr);
-	}	
-	
-	for(vk::Mesh* buffer : buffers)
-		delete(buffer);
+		{ { 0,0,0 },	red,{ 0,0 } },	//Fbl 0
+	{ { 0,0,1 },	white,{ 1,0 } },	//Fbr 1
+	{ { 0,1,0 },	blue,{ 0,1 } },	//Ftl 2
+	{ { 0,1,1 },	green,{ 1,1 } },	//Ftr 3
+	{ { 1,0,0 },	yellow,{ 0,1 } },	//Bbl 4
+	{ { 1,0,1 },	pink,{ 1,1 } },	//Bbr 5
+	{ { 1,1,0 },	cyan,{ 0,0 } },	//Btl 6
+	{ { 1,1,1 },	black,{ 1,0 } },	//Btr 7///
+	};
 
-	delete(imGui);
+	sphere->CreateBuffers(*commandPool);
+	buffers.push_back(sphere);
+}
 
-	vkDestroyDescriptorPool(device->device, descriptorPool, nullptr);
-	delete(descriptors);
-	delete(textureSampler);
-	delete(texture);
-	vkDestroyRenderPass(device->device, renderPass, nullptr);
-	delete(fragShader);
-	delete(vertShader);
-	delete(swapChain);
-	delete(commandBuffers);
-	delete(commandPool);
-	delete (device);
-	delete(instance);	
+void Renderer::RenderGUI()
+{
+	ImGuiIO& io = ImGui::GetIO();
+
+	ImGui::Begin("Renderer");
+
+	// Average FPS
+	ImGui::BulletText("Application average : ");
+	ImGui::SameLine();
+	ImGui::TextColored(ImVec4(200.0f / 255.f, 120.0f / 255.f, 120.0f / 255.f, 1.0f), "%.3f ", 1000.0f / io.Framerate);
+	ImGui::SameLine();
+	ImGui::Text("ms / frame(%.1f FPS)", io.Framerate);
+
+	//Window Size
+	ImGui::BulletText("Window Size : w%.f  h%.f ", io.DisplaySize.x, io.DisplaySize.y);
+
+	// Max Framerate
+	framerate.RenderGui();
+
+	ImGui::End();
+}
+
+glm::vec2 Renderer::GetSize() const
+{
+	return glm::vec2((float)swapChain->swapChainExtent.width, (float)swapChain->swapChainExtent.height);
 }

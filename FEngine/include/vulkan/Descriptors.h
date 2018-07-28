@@ -20,11 +20,8 @@ namespace vk
 		VkDescriptorSet descriptorSet;
 		VkDescriptorSetLayout descriptorSetLayout;
 
-
-
 		// Creates the descriptor set
 		void CreateDescriptorSet(Texture& textureImage, Sampler& textureSampler, VkDescriptorPool descriptorPool);
-
 
 		// Creates descriptor set layouts
 		void CreateDescriptorSetLayout();

@@ -58,6 +58,7 @@ private:
 
 	// Create the descriptor pool
 	void CreateDescriptorPool();
+	void CreateDescriptorPool2();
 
 	// Creates the sync objects (fences and semaphores)
 	void CreateSyncObjects();
@@ -95,6 +96,13 @@ private:
 
 	VkPipeline graphicsPipeline2;
 	VkPipelineLayout pipelineLayout2;
+
+	VkDescriptorSet descriptorSet2;
+	VkDescriptorSetLayout descriptorSetLayout2;
+	vk::Buffer* projViewBuffer;
+	struct { glm::mat4 projection; glm::mat4 view; } projView;
+	VkDescriptorPool descriptorPool2;
+	void CreateDescriptors2();
 
 	VkRenderPass renderPass;
 	VkDescriptorPool descriptorPool;
