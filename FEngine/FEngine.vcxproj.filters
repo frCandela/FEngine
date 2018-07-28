@@ -53,9 +53,6 @@
     <ClCompile Include="src\vulkan\Image.cpp">
       <Filter>Fichiers sources\Vulkan</Filter>
     </ClCompile>
-    <ClCompile Include="src\vulkan\RenderPass.cpp">
-      <Filter>Fichiers sources\Vulkan</Filter>
-    </ClCompile>
     <ClCompile Include="src\vulkan\Sampler.cpp">
       <Filter>Fichiers sources\Vulkan</Filter>
     </ClCompile>
@@ -134,9 +131,6 @@
       <Filter>Fichiers d%27en-tête\Vulkan</Filter>
     </ClInclude>
     <ClInclude Include="include\vulkan\Image.h">
-      <Filter>Fichiers d%27en-tête\Vulkan</Filter>
-    </ClInclude>
-    <ClInclude Include="include\vulkan\RenderPass.h">
       <Filter>Fichiers d%27en-tête\Vulkan</Filter>
     </ClInclude>
     <ClInclude Include="include\vulkan\Sampler.h">

@@ -374,6 +374,7 @@ void ImguiManager::DrawFrame(VkCommandBuffer commandBuffer)
 	{
 		ImGuiIO& io = ImGui::GetIO();
 
+		// Bind imgui pipeline and Descriptors sets
 		vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineLayout, 0, 1, &descriptorSet, 0, nullptr);
 		vkCmdBindPipeline(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline);
 

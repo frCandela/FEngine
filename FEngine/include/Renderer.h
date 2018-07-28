@@ -16,7 +16,6 @@
 #include "vulkan/Instance.h"
 #include "vulkan/Mesh.h"
 #include "vulkan/Shader.h"
-#include "vulkan/RenderPass.h"
 #include "vulkan/Texture.h"
 #include "vulkan/DepthImage.h"	
 #include "vulkan/Descriptors.h"
@@ -51,7 +50,10 @@ private:
 	void RecreateSwapChain();
 
 	// Creates the graphics pipeline
-	void CreateGraphicsPipeline();
+	void CreateGraphicsPipeline1();
+	void CreateGraphicsPipeline2();
+
+	void CreateRenderPass();
 
 	// Creates the sync objects (fences and semaphores)
 	void CreateSyncObjects();
@@ -78,17 +80,24 @@ private:
 	vk::Instance* instance;
 	vk::Device* device;
 	vk::SwapChain* swapChain;
-	vk::RenderPass * renderPass;
+	
 	vk::Shader* vertShader;
 	vk::Shader* fragShader;
 
-	VkPipelineLayout pipelineLayout;
-	VkPipeline graphicsPipeline;
+	VkPipeline graphicsPipeline1;
+	VkPipelineLayout pipelineLayout1;
+
+	VkPipeline graphicsPipeline2;
+	VkPipelineLayout pipelineLayout2;
+
+	VkRenderPass renderPass;
+
 
 	std::vector<vk::Mesh*> buffers;
 	std::vector<VkSemaphore> imageAvailableSemaphores;//Specifies that an image has been acquired and is ready for rendering
 	std::vector<VkSemaphore> renderFinishedSemaphores;//Specifies that rendering has finished and presentation can happen
 	std::vector<VkFence> inFlightFences;
+
 
 
 public:

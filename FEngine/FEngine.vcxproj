@@ -113,7 +113,6 @@
     <ClCompile Include="src\vulkan\Device.cpp" />
     <ClCompile Include="src\vulkan\Image.cpp" />
     <ClCompile Include="src\vulkan\Instance.cpp" />
-    <ClCompile Include="src\vulkan\RenderPass.cpp" />
     <ClCompile Include="src\vulkan\Sampler.cpp" />
     <ClCompile Include="src\vulkan\Shader.cpp" />
     <ClCompile Include="src\vulkan\SwapChain.cpp" />
@@ -140,7 +139,6 @@
     <ClInclude Include="include\vulkan\Device.h" />
     <ClInclude Include="include\vulkan\Image.h" />
     <ClInclude Include="include\vulkan\Instance.h" />
-    <ClInclude Include="include\vulkan\RenderPass.h" />
     <ClInclude Include="include\vulkan\Sampler.h" />
     <ClInclude Include="include\vulkan\Shader.h" />
     <ClInclude Include="include\vulkan\SwapChain.h" />
