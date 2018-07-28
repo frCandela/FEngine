@@ -16,8 +16,7 @@ void FEngine::Run()
 
 	GameObject gameobject;
 	Camera* camera = gameobject.AddComponent<Camera>();
-	Renderer renderer(window, *camera);
-	
+	Renderer renderer(window, *camera);	
 
 	float lastTime = Time::ElapsedSinceStartup();
 	float delta = 1.f / 144.f;
@@ -28,7 +27,6 @@ void FEngine::Run()
 	while ( window.WindowOpen() )
 	{
 		float time = Time::ElapsedSinceStartup();
-
 
 		if (Time::ElapsedSinceStartup() - lastTime > delta)
 		{
@@ -52,7 +50,7 @@ void FEngine::Run()
 
 
 			ImGui::ShowTestWindow();
-			renderer.drawFrame();
+			renderer.DrawFrame();
 		}
 	}
 }

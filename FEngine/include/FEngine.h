@@ -10,6 +10,4 @@ public:
 
 	/// Runs the application (loop)
 	void Run();
-
-
 };

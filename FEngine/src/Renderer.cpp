@@ -20,6 +20,7 @@ Renderer::Renderer(Window& rWindow, Camera& rCamera) :
 	vertShader = new vk::Shader(*device, "shaders/vert.spv");
 	fragShader = new vk::Shader(*device, "shaders/frag.spv");
 	renderPass = new vk::RenderPass(*device, *swapChain);
+	
 	swapChain->CreateFramebuffers(renderPass->renderPass);
 
 	texture = new vk::Texture(*device, *commandPool);
@@ -33,11 +34,24 @@ Renderer::Renderer(Window& rWindow, Camera& rCamera) :
 	descriptors->UpdateUniformBuffers(*m_pCamera);
 	descriptors->UpdateDynamicUniformBuffer({glm::mat4(1.f), glm::mat4(1.f) });
 
-	createGraphicsPipeline();
+	CreateGraphicsPipeline();
 
+	CreateTestMesh();
+
+	descriptors->CreateDescriptorSet(*texture, *textureSampler);
+	glm::vec2 size = GetSize();
+	
+	imGui = new ImguiManager(device, commandPool, size, m_window.GetGLFWwindow(), renderPass->renderPass);
+
+	CreateCommandBuffers();
+	CreateSyncObjects();
+}
+
+void Renderer::CreateTestMesh()
+{
 	vk::Mesh * cube = new vk::Mesh(*device);
 	cube->LoadModel("mesh/cube.obj");
-	cube->CreateBuffers( *commandPool );
+	cube->CreateBuffers(*commandPool);
 	buffers.push_back(cube);
 
 	vk::Mesh * sphere = new vk::Mesh(*device);
@@ -48,16 +62,16 @@ Renderer::Renderer(Window& rWindow, Camera& rCamera) :
 	glm::vec2 tl = { 0,1 };//vert
 	glm::vec2 tr = { 1,1 };//jaune
 
-	glm::vec3 red =		{ 1,0,0 };
-	glm::vec3 green =	{ 0,1,0 };
-	glm::vec3 blue =	{ 0,0,1 };
-	glm::vec3 white =	{ 1,1,1 };
-	glm::vec3 yellow =	{ 1,1,0 };
-	glm::vec3 pink =	{ 1,0,1 };
-	glm::vec3 cyan =	{ 0,1,1 };
-	glm::vec3 black =	{ 1,1,1 };
-	
-	sphere->indices = { 
+	glm::vec3 red = { 1,0,0 };
+	glm::vec3 green = { 0,1,0 };
+	glm::vec3 blue = { 0,0,1 };
+	glm::vec3 white = { 1,1,1 };
+	glm::vec3 yellow = { 1,1,0 };
+	glm::vec3 pink = { 1,0,1 };
+	glm::vec3 cyan = { 0,1,1 };
+	glm::vec3 black = { 1,1,1 };
+
+	sphere->indices = {
 		0,1,3,0,3,2, //front
 		4,7,5,4,6,7, //back
 		1,5,7,1,7,3, //right
@@ -66,38 +80,34 @@ Renderer::Renderer(Window& rWindow, Camera& rCamera) :
 		0,5,1,0,4,5  //
 	};
 
-	sphere->vertices = 
+	sphere->vertices =
 	{
-		{ {0,0,0},	red,	{0,0} },	//Fbl 0
-		{ {0,0,1},	white,	{1,0} },	//Fbr 1
-		{ {0,1,0},	blue,	{0,1} },	//Ftl 2
-		{ {0,1,1},	green,	{1,1 } },	//Ftr 3
-		{ {1,0,0},	yellow,	{0,1} },	//Bbl 4
-		{ {1,0,1},	pink,	{1,1} },	//Bbr 5
-		{ {1,1,0},	cyan,	{0,0} },	//Btl 6
-		{ {1,1,1},	black,	{1,0} },	//Btr 7///
+		{ { 0,0,0 },	red,{ 0,0 } },	//Fbl 0
+	{ { 0,0,1 },	white,{ 1,0 } },	//Fbr 1
+	{ { 0,1,0 },	blue,{ 0,1 } },	//Ftl 2
+	{ { 0,1,1 },	green,{ 1,1 } },	//Ftr 3
+	{ { 1,0,0 },	yellow,{ 0,1 } },	//Bbl 4
+	{ { 1,0,1 },	pink,{ 1,1 } },	//Bbr 5
+	{ { 1,1,0 },	cyan,{ 0,0 } },	//Btl 6
+	{ { 1,1,1 },	black,{ 1,0 } },	//Btr 7///
 	};
 
 	sphere->CreateBuffers(*commandPool);
 	buffers.push_back(sphere);
-
-	descriptors->CreateDescriptorSet(*texture, *textureSampler);
-	glm::vec2 size = GetSize();
-	
-	imGui = new ImguiManager(device, commandPool, size, m_window.GetGLFWwindow(), renderPass->renderPass);
-
-	createCommandBuffers();
-	createSyncObjects();
 }
 
 Renderer::~Renderer()
 {
 	vkDeviceWaitIdle(device->device);
-	cleanup();
+	Cleanup();
 }
 
-// Setup the command buffers for drawing opérations
-void Renderer::createCommandBuffers()
+glm::vec2 Renderer::GetSize() const 
+{ 
+	return glm::vec2((float)swapChain->swapChainExtent.width, (float)swapChain->swapChainExtent.height); 
+}
+
+void Renderer::CreateCommandBuffers()
 {
 	commandBuffers->CreateBuffer(swapChain->swapChainFramebuffers.size());
 
@@ -151,8 +161,7 @@ void Renderer::createCommandBuffers()
 	}
 }
 
-// Draw a frame
-void Renderer::drawFrame()
+void Renderer::DrawFrame()
 {
 	float aspectRatio = swapChain->swapChainExtent.width / (float)swapChain->swapChainExtent.height;
 	static auto startTime = std::chrono::high_resolution_clock::now();
@@ -171,17 +180,16 @@ void Renderer::drawFrame()
 	vkDeviceWaitIdle(device->device);//zob
 	
 	ImGui::Render();
-	createCommandBuffers();
+	CreateCommandBuffers();
 
 	// Acquire an image from the swap chain
-	uint32_t imageIndex;
-	
+	uint32_t imageIndex;	
 	VkResult result = vkAcquireNextImageKHR(device->device, swapChain->swapChain, std::numeric_limits<uint64_t>::max(), imageAvailableSemaphores[currentFrame], VK_NULL_HANDLE, &imageIndex);
 
 	// Suboptimal or out-of-date swap chain
 	if (result == VK_ERROR_OUT_OF_DATE_KHR) 
 	{
-		recreateSwapChain();
+		RecreateSwapChain();
 		return;
 	}
 	else if (result != VK_SUCCESS && result != VK_SUBOPTIMAL_KHR) 
@@ -231,15 +239,14 @@ void Renderer::drawFrame()
 
 	// Suboptimal or out-of-date swap chain
 	if (result == VK_ERROR_OUT_OF_DATE_KHR || result == VK_SUBOPTIMAL_KHR) 
-		recreateSwapChain();	
+		RecreateSwapChain();	
 	else if (result != VK_SUCCESS)
 		throw std::runtime_error("failed to  swap chain image!");
 	
 	currentFrame = (currentFrame + 1) % MAX_FRAMES_IN_FLIGHT;
 }
 
-// Recreates the swap chain (necessary when the window is resized)
-void Renderer::recreateSwapChain()
+void Renderer::RecreateSwapChain()
 {
 	vkDeviceWaitIdle(device->device);
 
@@ -254,14 +261,13 @@ void Renderer::recreateSwapChain()
 
 	renderPass = new vk::RenderPass(*device, *swapChain);
 	
-	createGraphicsPipeline();
+	CreateGraphicsPipeline();
 	
 	swapChain->CreateFramebuffers(renderPass->renderPass);
-	createCommandBuffers();
+	CreateCommandBuffers();
 }
 
-// Creates the graphics pipeline
-void Renderer::createGraphicsPipeline()
+void Renderer::CreateGraphicsPipeline()
 {
 	vk::ShaderModule vertShaderModule = vertShader->GetShaderModule();
 	vk::ShaderModule fragShaderModule = fragShader->GetShaderModule();
@@ -414,8 +420,7 @@ void Renderer::createGraphicsPipeline()
 		throw std::runtime_error("failed to create graphics pipeline!");	
 }
 
-// Creates the sync objects (fences and semaphores)
-void Renderer::createSyncObjects()
+void Renderer::CreateSyncObjects()
 {
 	//Fences perform CPU-GPU synchronization to prevent more than MAX_FRAMES_IN_FLIGHT from being submitted
 
@@ -444,8 +449,7 @@ void Renderer::createSyncObjects()
 	}
 }
 
-// Clean Vulkan objects 
-void Renderer::cleanup()
+void Renderer::Cleanup()
 {
 	vkDestroyPipeline(device->device, graphicsPipeline, nullptr);
 	vkDestroyPipelineLayout(device->device, pipelineLayout, nullptr);
