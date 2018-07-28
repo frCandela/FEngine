@@ -22,10 +22,13 @@ public:
 	VkExtent2D GetExtend2D() const;
 	GLFWwindow * GetGLFWwindow() const { return m_window; }
 
+	int GetRefreshRate();
+
 
 private:
 	uint32_t m_width;
 	uint32_t m_height;
+
 	GLFWwindow * m_window;
 
 };

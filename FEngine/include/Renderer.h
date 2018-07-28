@@ -6,6 +6,7 @@
 #include <cstdlib>
 #include <vector>
 #include <set>
+#include <sstream>
 
 #include "Window.h"
 
@@ -37,6 +38,9 @@ public:
 
 	// Returns the size of the swapChain extent
 	glm::vec2 GetSize() const; 
+
+	// Render Imgui parameters window
+	void RenderGUI();
 
 private:
 
@@ -87,5 +91,35 @@ private:
 	std::vector<VkFence> inFlightFences;
 
 
-};
+public:
 
+	// Manages the framerate selection
+	class Framerate
+	{
+	public:
+		// Returns the framerate delta
+		float GetDelta() const { return deltas[index];  }
+		
+		// Try to match the refreshRate parameters with the default framerate values to set the framerate
+		void TrySetRefreshRate(int refreshRate)
+		{
+			for (int i = 0; i < deltas.size(); ++i)
+			{
+				if ((int)(1.f / deltas[i]) == refreshRate)
+				{
+					index = i;
+					return;
+				}
+				index = 1; //Default 60 fps
+			}
+		}
+
+		// Create an ImGui combo box for selecting the framerate
+		void RenderGui(){ ImGui::Combo("Max Framerate", &index, imguiComboText);}
+
+	private:
+		int index = 0;
+		const std::array<float, 5> deltas =	{1.f/30.f,	1.f/60.f,	1.f/120.f,	1.f/144.f,	0.f};
+		const char* imguiComboText = " 30 FPS \0 60 FPS \0 120 FPS \0 144 FPS \0 Unlimited";
+	} framerate;
+};

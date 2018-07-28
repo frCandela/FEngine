@@ -11,12 +11,11 @@ FEngine::FEngine()
 
 void FEngine::Run()
 {
-
-	Window window( 800,600, "Vulkan" );
+	Window window( 1200,700, "Vulkan" );
 
 	GameObject gameobject;
 	Camera* camera = gameobject.AddComponent<Camera>();
-	Renderer renderer(window, *camera);	
+	renderer = new Renderer(window, *camera);	
 
 	float lastTime = Time::ElapsedSinceStartup();
 	float delta = 1.f / 144.f;
@@ -28,29 +27,49 @@ void FEngine::Run()
 	{
 		float time = Time::ElapsedSinceStartup();
 
-		if (Time::ElapsedSinceStartup() - lastTime > delta)
+		if (Time::ElapsedSinceStartup() - lastTime > renderer->framerate.GetDelta())
 		{
+			// Updates Imgui io and starts new imgui frame
 			io.DeltaTime = time - lastTime;
 			lastTime = time;
-
 			Input::Update();
-
-			glm::vec2 size = renderer.GetSize();
+			glm::vec2 size = renderer->GetSize();
 			camera->aspectRatio = size.x / size.y;
 			io.DisplaySize = ImVec2(size.x, size.y);
-
-			ImGui::NewFrame();
-
-			// Statistics window
-			{
-				ImGui::Begin("Statistics");
-				ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / io.Framerate, io.Framerate);
-				ImGui::End();
-			}
-
-
-			ImGui::ShowTestWindow();
-			renderer.DrawFrame();
+			
+			ImGui::NewFrame();	
+			RenderGUI();
+			
+			renderer->DrawFrame();
 		}
 	}
+
+	delete(renderer);
+}
+
+void FEngine::RenderGUI()
+{
+	static bool showRenderer = true;
+	static bool showTestWindow = false;
+
+	// Main Menu bar
+	if (ImGui::BeginMainMenuBar())
+	{
+		if (ImGui::BeginMenu("Window"))
+		{
+			ImGui::Checkbox("Renderer", &showRenderer);
+			ImGui::Checkbox("TestWindow", &showTestWindow);
+			ImGui::EndMenu();
+		}
+
+		ImGui::EndMainMenuBar();
+	}	
+
+	// Renderer window
+	if (showRenderer)
+		renderer->RenderGUI();
+	
+	// Tests window
+	if(showTestWindow)
+		ImGui::ShowTestWindow();
 }

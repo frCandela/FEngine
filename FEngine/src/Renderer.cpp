@@ -45,6 +45,8 @@ Renderer::Renderer(Window& rWindow, Camera& rCamera) :
 
 	CreateCommandBuffers();
 	CreateSyncObjects();
+
+	framerate.TrySetRefreshRate(m_window.GetRefreshRate());
 }
 
 void Renderer::CreateTestMesh()
@@ -102,6 +104,29 @@ Renderer::~Renderer()
 	Cleanup();
 }
 
+void Renderer::RenderGUI()
+{
+	ImGuiIO& io = ImGui::GetIO();
+
+	ImGui::Begin("Renderer");
+
+	// Average FPS
+	ImGui::BulletText("Application average : ");
+	ImGui::SameLine();
+	ImGui::TextColored(ImVec4(200.0f / 255.f, 120.0f / 255.f, 120.0f / 255.f, 1.0f), "%.3f ", 1000.0f / io.Framerate);
+	ImGui::SameLine();
+	ImGui::Text("ms / frame(%.1f FPS)", io.Framerate);
+
+	//Window Size
+	ImGui::BulletText("Window Size : w%.f  h%.f ", io.DisplaySize.x, io.DisplaySize.y);
+
+	// Max Framerate
+	framerate.RenderGui();
+	
+	ImGui::End();
+
+}
+
 glm::vec2 Renderer::GetSize() const 
 { 
 	return glm::vec2((float)swapChain->swapChainExtent.width, (float)swapChain->swapChainExtent.height); 
@@ -128,7 +153,7 @@ void Renderer::CreateCommandBuffers()
 
 		//Set clear collors for color and depth attachments
 		std::array<VkClearValue, 2> clearValues = {};
-		clearValues[0].color = { 0.5f, 0.5f, 0.5f, 1.0f };
+		clearValues[0].color = { 1.0f, 1.0f, 1.0f, 1.0f };
 		clearValues[1].depthStencil = { 1.0f, 0 };
 
 		renderPassInfo.clearValueCount = static_cast<uint32_t>(clearValues.size());

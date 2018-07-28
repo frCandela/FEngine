@@ -18,6 +18,7 @@
 #include "vulkan/Texture.h"
 #include "vulkan/Sampler.h"
 
+
 /// ImguiManager.h class
 class ImguiManager
 {
@@ -27,6 +28,7 @@ public:
 
 	// Release all Vulkan resources required for rendering imGui
 	~ImguiManager();
+	
 
 	// Update vertex and index buffer containing the imGui elements when required
 	void UpdateBuffers();

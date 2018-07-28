@@ -32,19 +32,16 @@ ImguiManager::~ImguiManager()
 
 void ImguiManager::InitImgui(float width, float height, GLFWwindow* window)
 {
+
 	// Color scheme
 	ImGuiStyle& style = ImGui::GetStyle();
-	style.Colors[ImGuiCol_TitleBg] = ImVec4(1.0f, 0.0f, 0.0f, 0.6f);
-	style.Colors[ImGuiCol_TitleBgActive] = ImVec4(1.0f, 0.0f, 0.0f, 0.8f);
-	style.Colors[ImGuiCol_MenuBarBg] = ImVec4(1.0f, 0.0f, 0.0f, 0.4f);
-	style.Colors[ImGuiCol_Header] = ImVec4(1.0f, 0.0f, 0.0f, 0.4f);
-	style.Colors[ImGuiCol_CheckMark] = ImVec4(0.0f, 1.0f, 0.0f, 1.0f);
+	style.Colors[ImGuiCol_TitleBg] = ImVec4(50.f / 255.f, 50.f / 255.f, 50.f / 255.f, 1.f);
 
 	// Dimensions
 	ImGuiIO& io = ImGui::GetIO();
 	io.DisplaySize = ImVec2(width, height);
 	io.DisplayFramebufferScale = ImVec2(1.0f, 1.0f);
-
+	vertShader = 0;
 	vertShader = new vk::Shader(*device, "shaders/imgui/ui.vert.spv");
 	fragShader = new vk::Shader(*device, "shaders/imgui/ui.frag.spv");
 

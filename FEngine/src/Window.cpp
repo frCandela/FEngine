@@ -12,11 +12,19 @@ Window::Window(uint32_t width, uint32_t height, std::string name) :
 
 	Input::Setup(m_window);
 
+
 }
 
 bool Window::WindowOpen() const
 {
 	return !glfwWindowShouldClose(m_window);
+}
+
+int Window::GetRefreshRate()
+{
+	GLFWmonitor* monitor = glfwGetPrimaryMonitor();
+	const GLFWvidmode* videoMode = glfwGetVideoMode(monitor);
+	return videoMode->refreshRate;
 }
 
 void Window::CreateWindowSurface(VkInstance instance, VkSurfaceKHR* surface)
