@@ -25,11 +25,10 @@ namespace vk
 		/// Create the uniforms bufferS
 		void CreateUniformBuffer();
 
-		/// Create the descriptor pool
-		void CreateDescriptorPool();
+
 
 		/// Creates the descriptor set
-		void CreateDescriptorSet(Texture& textureImage, Sampler& textureSampler);
+		void CreateDescriptorSet(Texture& textureImage, Sampler& textureSampler, VkDescriptorPool descriptorPool);
 
 		/// Update the view and projection matrices uniform
 		void UpdateUniformBuffers( Camera& camera );
@@ -40,8 +39,6 @@ namespace vk
 
 	private:
 		Device & m_device;
-		VkDescriptorPool descriptorPool;
-		VkPipelineLayout pipelineLayout;
 		vk::Buffer view;
 		vk::Buffer dynamic;
 

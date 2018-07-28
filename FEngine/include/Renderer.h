@@ -53,7 +53,11 @@ private:
 	void CreateGraphicsPipeline1();
 	void CreateGraphicsPipeline2();
 
+	// Creates the render pass (describes the differents subpasses)
 	void CreateRenderPass();
+
+	// Create the descriptor pool
+	void CreateDescriptorPool();
 
 	// Creates the sync objects (fences and semaphores)
 	void CreateSyncObjects();
@@ -74,7 +78,9 @@ private:
 
 	vk::Texture* texture;
 	vk::Sampler* textureSampler;
+
 	vk::Descriptors* descriptors;
+
 	vk::CommandPool* commandPool;
 	vk::CommandBuffer* commandBuffers;
 	vk::Instance* instance;
@@ -91,7 +97,7 @@ private:
 	VkPipelineLayout pipelineLayout2;
 
 	VkRenderPass renderPass;
-
+	VkDescriptorPool descriptorPool;
 
 	std::vector<vk::Mesh*> buffers;
 	std::vector<VkSemaphore> imageAvailableSemaphores;//Specifies that an image has been acquired and is ready for rendering

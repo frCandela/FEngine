@@ -11,12 +11,10 @@ namespace vk
 	{
 		CreateDescriptorSetLayout();
 		CreateUniformBuffer();
-		CreateDescriptorPool();
 	}
 
 	Descriptors::~Descriptors()
 	{
-		vkDestroyDescriptorPool(m_device.device, descriptorPool, nullptr);
 		vkDestroyDescriptorSetLayout(m_device.device, descriptorSetLayout, nullptr);
 	}
 
@@ -73,27 +71,9 @@ namespace vk
 		VK_CHECK_RESULT(dynamic.Map());
 	}
 
-	void Descriptors::CreateDescriptorPool()
-	{
-		// Example uses one ubo and one image sampler
-		std::vector<VkDescriptorPoolSize> poolSizes =
-		{
-			vk::init::descriptorPoolSize(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 1),
-			vk::init::descriptorPoolSize(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC, 1),
-			vk::init::descriptorPoolSize(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1)
-		};
 
-		VkDescriptorPoolCreateInfo descriptorPoolInfo =
-			vk::init::descriptorPoolCreateInfo(
-				static_cast<uint32_t>(poolSizes.size()),
-				poolSizes.data(),
-				2);
-
-		if (vkCreateDescriptorPool(m_device.device, &descriptorPoolInfo, nullptr, &descriptorPool) != VK_SUCCESS)
-			throw std::runtime_error("failed to create descriptor pool!");
-	}
 	
-	void Descriptors::CreateDescriptorSet(Texture& textureImage, Sampler& textureSampler)
+	void Descriptors::CreateDescriptorSet(Texture& textureImage, Sampler& textureSampler, VkDescriptorPool descriptorPool)
 	{
 		VkDescriptorSetAllocateInfo allocInfo =	vk::init::descriptorSetAllocateInfo(descriptorPool,	&descriptorSetLayout, 1);
 

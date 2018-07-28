@@ -32,6 +32,8 @@ Renderer::Renderer(Window& rWindow, Camera& rCamera) :
 
 	descriptors = new vk::Descriptors(*device);
 
+	CreateDescriptorPool();
+
 	descriptors->UpdateUniformBuffers(*m_pCamera);
 	descriptors->UpdateDynamicUniformBuffer({glm::mat4(1.f), glm::mat4(1.f) });
 
@@ -40,7 +42,7 @@ Renderer::Renderer(Window& rWindow, Camera& rCamera) :
 
 	CreateTestMesh();
 
-	descriptors->CreateDescriptorSet(*texture, *textureSampler);
+	descriptors->CreateDescriptorSet(*texture, *textureSampler, descriptorPool);
 	glm::vec2 size = GetSize();
 	
 	imGui = new ImguiManager(device, commandPool, size, m_window.GetGLFWwindow(), renderPass);
@@ -49,6 +51,12 @@ Renderer::Renderer(Window& rWindow, Camera& rCamera) :
 	CreateSyncObjects();
 
 	framerate.TrySetRefreshRate(m_window.GetRefreshRate());
+}
+
+Renderer::~Renderer()
+{
+	vkDeviceWaitIdle(device->device);
+	Cleanup();
 }
 
 void Renderer::CreateTestMesh()
@@ -100,12 +108,6 @@ void Renderer::CreateTestMesh()
 	buffers.push_back(sphere);
 }
 
-Renderer::~Renderer()
-{
-	vkDeviceWaitIdle(device->device);
-	Cleanup();
-}
-
 void Renderer::RenderGUI()
 {
 	ImGuiIO& io = ImGui::GetIO();
@@ -154,7 +156,7 @@ void Renderer::CreateCommandBuffers()
 
 		//Set clear collors for color and depth attachments
 		std::array<VkClearValue, 2> clearValues = {};
-		clearValues[0].color = { 1.0f, 1.0f, 1.0f, 1.0f };
+		clearValues[0].color = { 0.5f, 0.5f, 0.5f, 1.0f };
 		clearValues[1].depthStencil = { 1.0f, 0 };
 
 		renderPassInfo.clearValueCount = static_cast<uint32_t>(clearValues.size());
@@ -608,6 +610,38 @@ void Renderer::CreateGraphicsPipeline2()
 		throw std::runtime_error("failed to create graphics pipeline!");
 }
 
+void Renderer::CreateDescriptorPool()
+{
+	VkDescriptorPoolSize descriptorPoolSizeUniform = {};
+	descriptorPoolSizeUniform.type = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+	descriptorPoolSizeUniform.descriptorCount = 1;
+
+	VkDescriptorPoolSize descriptorPoolSizeUniformDynamic = {};
+	descriptorPoolSizeUniformDynamic.type = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC;
+	descriptorPoolSizeUniformDynamic.descriptorCount = 1;
+
+	VkDescriptorPoolSize descriptorPoolSizeImageSampler = {};
+	descriptorPoolSizeImageSampler.type = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+	descriptorPoolSizeImageSampler.descriptorCount = 1;
+
+
+	// Example uses one ubo and one image sampler
+	std::vector<VkDescriptorPoolSize> poolSizes =
+	{
+		  descriptorPoolSizeUniform
+		, descriptorPoolSizeUniformDynamic
+		, descriptorPoolSizeImageSampler
+	};
+
+	VkDescriptorPoolCreateInfo descriptorPoolInfo{};
+	descriptorPoolInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
+	descriptorPoolInfo.poolSizeCount = static_cast<uint32_t>(poolSizes.size());
+	descriptorPoolInfo.pPoolSizes = poolSizes.data();
+	descriptorPoolInfo.maxSets = 2;
+
+	if (vkCreateDescriptorPool(device->device, &descriptorPoolInfo, nullptr, &descriptorPool) != VK_SUCCESS)
+		throw std::runtime_error("failed to create descriptor pool!");
+}
 
 void Renderer::CreateSyncObjects()
 {
@@ -742,6 +776,7 @@ void Renderer::Cleanup()
 
 	delete(imGui);
 
+	vkDestroyDescriptorPool(device->device, descriptorPool, nullptr);
 	delete(descriptors);
 	delete(textureSampler);
 	delete(texture);
