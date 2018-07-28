@@ -19,6 +19,8 @@ namespace vk
 		std::vector<Vertex> vertices;
 		std::vector<uint32_t> indices;
 
+		std::vector<VertexDebug> verticesDebug;
+
 		vk::Buffer vertexBuffer;
 		vk::Buffer indexBuffer;
 

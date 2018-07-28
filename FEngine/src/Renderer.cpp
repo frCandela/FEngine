@@ -129,7 +129,6 @@ void Renderer::CreateDescriptors2()
 	
 	VK_CHECK_RESULT(projViewBuffer->Map());// Map persistent
 
-
 	// CreateDescriptorSet
 	VkDescriptorSetAllocateInfo allocInfo{};
 	allocInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
@@ -494,8 +493,8 @@ void Renderer::CreateGraphicsPipeline2()
 	VkPipelineShaderStageCreateInfo shaderStages[] = { vertShaderStageInfo, fragShaderStageInfo };
 
 	// Get vertex input info
-	auto bindingDescription = vk::Vertex::getBindingDescription();
-	auto attributeDescriptions = vk::Vertex::getAttributeDescriptions();
+	auto bindingDescription = vk::VertexDebug::GetBindingDescription();
+	auto attributeDescriptions = vk::VertexDebug::GetAttributeDescriptions();
 
 	// Set vertex input info
 	VkPipelineVertexInputStateCreateInfo vertexInputInfo = {};

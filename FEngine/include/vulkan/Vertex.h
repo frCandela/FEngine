@@ -13,6 +13,47 @@
 
 namespace vk
 {
+	struct VertexDebug
+	{
+		glm::vec3 pos;
+		glm::vec3 color;
+
+		bool operator==(const VertexDebug& other) const
+		{
+			return pos == other.pos && color == other.color;
+		}
+
+		// Tells Vulkan how to pass this data format to the vertex shader
+		static VkVertexInputBindingDescription GetBindingDescription()
+		{
+			VkVertexInputBindingDescription bindingDescription = {};
+			bindingDescription.binding = 0;								// Index of the binding in the array of bindings
+			bindingDescription.stride = sizeof(VertexDebug);					// Number of bytes from one entry to the next
+			bindingDescription.inputRate = VK_VERTEX_INPUT_RATE_VERTEX;
+			return bindingDescription;
+		}
+
+		// Describes how to handle vertex input
+		static std::array<VkVertexInputAttributeDescription, 2> GetAttributeDescriptions()
+		{
+			std::array<VkVertexInputAttributeDescription, 2> attributeDescriptions = {};
+
+			// Position
+			attributeDescriptions[0].binding = 0;							// Tells Vulkan from which binding the per-vertex data comes
+			attributeDescriptions[0].location = 0;							// References the location directive of the input in the vertex shader
+			attributeDescriptions[0].format = VK_FORMAT_R32G32B32_SFLOAT;	// Describes the type of data for the attribute
+			attributeDescriptions[0].offset = offsetof(VertexDebug, pos);
+
+			// Color
+			attributeDescriptions[1].binding = 0;
+			attributeDescriptions[1].location = 1;
+			attributeDescriptions[1].format = VK_FORMAT_R32G32B32_SFLOAT;
+			attributeDescriptions[1].offset = offsetof(VertexDebug, color);
+
+			return attributeDescriptions;
+		}
+	};
+
 	struct Vertex
 	{
 		glm::vec3 pos;
