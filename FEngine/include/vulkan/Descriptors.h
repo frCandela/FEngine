@@ -15,33 +15,34 @@ namespace vk
 		~Descriptors();
 
 		size_t dynamicAlignment;
-		VkDescriptorSet descriptorSet;
-		VkDescriptorSetLayout descriptorSetLayout;
 		static const int OBJECT_INSTANCES = 2;
 
-		/// Creates descriptor set layouts
-		void CreateDescriptorSetLayout();
-
-		/// Create the uniforms bufferS
-		void CreateUniformBuffer();
+		VkDescriptorSet descriptorSet;
+		VkDescriptorSetLayout descriptorSetLayout;
 
 
 
-		/// Creates the descriptor set
+		// Creates the descriptor set
 		void CreateDescriptorSet(Texture& textureImage, Sampler& textureSampler, VkDescriptorPool descriptorPool);
 
-		/// Update the view and projection matrices uniform
+
+		// Creates descriptor set layouts
+		void CreateDescriptorSetLayout();
+
+		// Create the uniforms buffers
+		void CreateUniformBuffer();
+
+		// Update the view and projection matrices uniform
 		void UpdateUniformBuffers( Camera& camera );
 
-		/// Update the dynamic model matrices uniform
+		// Update the dynamic model matrices uniform
 		void UpdateDynamicUniformBuffer( std::vector<glm::mat4> matrices );
-
 
 	private:
 		Device & m_device;
-		vk::Buffer view;
-		vk::Buffer dynamic;
 
+		vk::Buffer view;	// Proj view
+		vk::Buffer dynamic;	// Model
 
 		struct 
 		{

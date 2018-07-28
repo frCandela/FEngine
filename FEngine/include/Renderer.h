@@ -104,8 +104,6 @@ private:
 	std::vector<VkSemaphore> renderFinishedSemaphores;//Specifies that rendering has finished and presentation can happen
 	std::vector<VkFence> inFlightFences;
 
-
-
 public:
 
 	// Manages the framerate selection

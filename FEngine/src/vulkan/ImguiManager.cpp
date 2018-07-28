@@ -312,6 +312,7 @@ void ImguiManager::CreateGraphicsPipeline(VkRenderPass renderPass)
 	pipelineCreateInfo.stageCount = static_cast<uint32_t>(shaderStages.size());
 	pipelineCreateInfo.pStages = shaderStages.data();
 	pipelineCreateInfo.pVertexInputState = &vertexInputState;
+	pipelineCreateInfo.subpass = 0;
 
 	VK_CHECK_RESULT(vkCreateGraphicsPipelines(device->device, pipelineCache, 1, &pipelineCreateInfo, nullptr, &pipeline));
 }

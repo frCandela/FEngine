@@ -163,29 +163,30 @@ void Renderer::CreateCommandBuffers()
 		renderPassInfo.pClearValues = clearValues.data();
 		
 		vkCmdBeginRenderPass(commandBuffers->commandBuffers[i], &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
-		vkCmdBindPipeline(commandBuffers->commandBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, graphicsPipeline1);
 		
-		//Record Draw calls on all existing buffers
-		for (int j = 0; j < buffers.size(); ++j)
-		{
-			VkBuffer vertexBuffers[] = { buffers[j]->vertexBuffer.m_buffer };
-			VkDeviceSize offsets[] = { 0 };
-			vkCmdBindVertexBuffers(commandBuffers->commandBuffers[i], 0, 1, vertexBuffers, offsets);
-			vkCmdBindIndexBuffer(commandBuffers->commandBuffers[i], buffers[j]->indexBuffer.m_buffer, 0, VK_INDEX_TYPE_UINT32);
+			vkCmdBindPipeline(commandBuffers->commandBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, graphicsPipeline1);		
+			//Record Draw calls on all existing buffers
+			for (int j = 0; j < buffers.size(); ++j)
+			{
+				VkBuffer vertexBuffers[] = { buffers[j]->vertexBuffer.m_buffer };
+				VkDeviceSize offsets[] = { 0 };
+				vkCmdBindVertexBuffers(commandBuffers->commandBuffers[i], 0, 1, vertexBuffers, offsets);
+				vkCmdBindIndexBuffer(commandBuffers->commandBuffers[i], buffers[j]->indexBuffer.m_buffer, 0, VK_INDEX_TYPE_UINT32);
 
-			// One dynamic offset per dynamic descriptor to offset into the ubo containing all model matrices
-			uint32_t dynamicOffset = j * static_cast<uint32_t>(descriptors->dynamicAlignment);
+				// One dynamic offset per dynamic descriptor to offset into the ubo containing all model matrices
+				uint32_t dynamicOffset = j * static_cast<uint32_t>(descriptors->dynamicAlignment);
 		
-			// Bind the descriptor set for rendering a mesh using the dynamic offset
-			vkCmdBindDescriptorSets(commandBuffers->commandBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineLayout1, 0, 1, &descriptors->descriptorSet, 1, &dynamicOffset);
-			vkCmdDrawIndexed(commandBuffers->commandBuffers[i], static_cast<uint32_t>(buffers[j]->indices.size()), 1, 0, 0, 0);
-		}
+				// Bind the descriptor set for rendering a mesh using the dynamic offset
+				vkCmdBindDescriptorSets(commandBuffers->commandBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineLayout1, 0, 1, &descriptors->descriptorSet, 1, &dynamicOffset);
+				vkCmdDrawIndexed(commandBuffers->commandBuffers[i], static_cast<uint32_t>(buffers[j]->indices.size()), 1, 0, 0, 0);
+			}
 
-		imGui->DrawFrame(commandBuffers->commandBuffers[i]);
+			// Draw imgui on another pipeline
+			imGui->DrawFrame(commandBuffers->commandBuffers[i]);
 
-		vkCmdNextSubpass(commandBuffers->commandBuffers[i], VK_SUBPASS_CONTENTS_INLINE);
-		vkCmdBindPipeline(commandBuffers->commandBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, graphicsPipeline2);
-
+			//Bind debug pipeline
+			vkCmdBindPipeline(commandBuffers->commandBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, graphicsPipeline2);
+			
 		vkCmdEndRenderPass(commandBuffers->commandBuffers[i]);
 
 		commandBuffers->End(i);
@@ -603,7 +604,7 @@ void Renderer::CreateGraphicsPipeline2()
 	pipelineInfo.pColorBlendState = &colorBlending;
 	pipelineInfo.layout = pipelineLayout2;
 	pipelineInfo.renderPass = renderPass;
-	pipelineInfo.subpass = 1;
+	pipelineInfo.subpass = 0;
 	pipelineInfo.basePipelineHandle = VK_NULL_HANDLE;
 
 	if (vkCreateGraphicsPipelines(device->device, VK_NULL_HANDLE, 1, &pipelineInfo, nullptr, &graphicsPipeline2) != VK_SUCCESS)
@@ -624,7 +625,6 @@ void Renderer::CreateDescriptorPool()
 	descriptorPoolSizeImageSampler.type = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
 	descriptorPoolSizeImageSampler.descriptorCount = 1;
 
-
 	// Example uses one ubo and one image sampler
 	std::vector<VkDescriptorPoolSize> poolSizes =
 	{
@@ -637,7 +637,7 @@ void Renderer::CreateDescriptorPool()
 	descriptorPoolInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
 	descriptorPoolInfo.poolSizeCount = static_cast<uint32_t>(poolSizes.size());
 	descriptorPoolInfo.pPoolSizes = poolSizes.data();
-	descriptorPoolInfo.maxSets = 2;
+	descriptorPoolInfo.maxSets = 1;
 
 	if (vkCreateDescriptorPool(device->device, &descriptorPoolInfo, nullptr, &descriptorPool) != VK_SUCCESS)
 		throw std::runtime_error("failed to create descriptor pool!");
@@ -713,14 +713,7 @@ void Renderer::CreateRenderPass()
 	subpass1.pColorAttachments = &colorAttachmentRef;
 	subpass1.pDepthStencilAttachment = &depthAttachmentRef;
 
-	// Subpass2
-	VkSubpassDescription subpass2 = {};
-	subpass2.pipelineBindPoint = VK_PIPELINE_BIND_POINT_GRAPHICS;
-	subpass2.colorAttachmentCount = 1;
-	subpass2.pColorAttachments = &colorAttachmentRef;//layout(location = 0) out vec4 outColor
-	subpass2.pDepthStencilAttachment = &depthAttachmentRef;
-
-	std::vector<VkSubpassDescription> subpassDescriptions = { subpass1 , subpass2 };
+	std::vector<VkSubpassDescription> subpassDescriptions = { subpass1 };
 
 	// Subpass dependencies : specify memory and execution dependencies between subpasses
 	VkSubpassDependency dependency1 = {};
@@ -731,15 +724,7 @@ void Renderer::CreateRenderPass()
 	dependency1.srcAccessMask = 0;
 	dependency1.dstAccessMask = VK_ACCESS_COLOR_ATTACHMENT_READ_BIT | VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
 
-	VkSubpassDependency dependency2 = {};
-	dependency2.srcSubpass = 0;
-	dependency2.dstSubpass = 1;
-	dependency2.srcStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
-	dependency2.dstStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
-	dependency2.srcAccessMask = 0;
-	dependency2.dstAccessMask = VK_ACCESS_COLOR_ATTACHMENT_READ_BIT | VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
-
-	std::vector<VkSubpassDependency> subpassDependencies = { dependency1 , dependency2 };
+	std::vector<VkSubpassDependency> subpassDependencies = { dependency1 };
 
 	//Render pass (the attachments referenced by the pipeline stages and their usage)
 	std::array<VkAttachmentDescription, 2> attachments = { colorAttachment, depthAttachment };

@@ -71,8 +71,6 @@ namespace vk
 		VK_CHECK_RESULT(dynamic.Map());
 	}
 
-
-	
 	void Descriptors::CreateDescriptorSet(Texture& textureImage, Sampler& textureSampler, VkDescriptorPool descriptorPool)
 	{
 		VkDescriptorSetAllocateInfo allocInfo =	vk::init::descriptorSetAllocateInfo(descriptorPool,	&descriptorSetLayout, 1);
