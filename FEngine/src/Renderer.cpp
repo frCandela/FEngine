@@ -19,7 +19,9 @@ Renderer::Renderer(Window& rWindow, Camera& rCamera) :
 
 	vertShader = new vk::Shader(*device, "shaders/vert.spv");
 	fragShader = new vk::Shader(*device, "shaders/frag.spv");
-	
+	vertShaderDebug = new vk::Shader(*device, "shaders/debug/vert.spv");
+	fragShaderDebug = new vk::Shader(*device, "shaders/debug/frag.spv");
+
 	CreateRenderPass();
 
 	swapChain->CreateFramebuffers(renderPass);
@@ -82,12 +84,16 @@ void Renderer::Cleanup()
 	delete(imGui);
 	vkDestroyDescriptorPool(device->device, descriptorPool2, nullptr);
 	vkDestroyDescriptorPool(device->device, descriptorPool, nullptr);
+	delete(projViewBuffer);
 	delete(descriptors);
+	vkDestroyDescriptorSetLayout(device->device, descriptorSetLayout2, nullptr);
 	delete(textureSampler);
 	delete(texture);
 	vkDestroyRenderPass(device->device, renderPass, nullptr);
 	delete(fragShader);
 	delete(vertShader);
+	delete(fragShaderDebug);
+	delete(vertShaderDebug);
 	delete(swapChain);
 	delete(commandBuffers);
 	delete(commandPool);
@@ -321,21 +327,18 @@ void Renderer::RecreateSwapChain()
 
 void Renderer::CreateGraphicsPipeline1()
 {
-	vk::ShaderModule vertShaderModule = vertShader->GetShaderModule();
-	vk::ShaderModule fragShaderModule = fragShader->GetShaderModule();
-
 	// Link vertex shader
 	VkPipelineShaderStageCreateInfo vertShaderStageInfo = {};
 	vertShaderStageInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
 	vertShaderStageInfo.stage = VK_SHADER_STAGE_VERTEX_BIT;
-	vertShaderStageInfo.module = vertShaderModule.module;
+	vertShaderStageInfo.module = vertShader->shaderModule;
 	vertShaderStageInfo.pName = "main";
 
 	// Link fragment shader
 	VkPipelineShaderStageCreateInfo fragShaderStageInfo = {};
 	fragShaderStageInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
 	fragShaderStageInfo.stage = VK_SHADER_STAGE_FRAGMENT_BIT;
-	fragShaderStageInfo.module = fragShaderModule.module;
+	fragShaderStageInfo.module = fragShader->shaderModule;
 	fragShaderStageInfo.pName = "main";
 
 	VkPipelineShaderStageCreateInfo shaderStages[] = { vertShaderStageInfo, fragShaderStageInfo };
@@ -474,21 +477,18 @@ void Renderer::CreateGraphicsPipeline1()
 
 void Renderer::CreateGraphicsPipeline2()
 {
-	vk::ShaderModule vertShaderModule = vertShader->GetShaderModule();
-	vk::ShaderModule fragShaderModule = fragShader->GetShaderModule();
-
 	// Link vertex shader
 	VkPipelineShaderStageCreateInfo vertShaderStageInfo = {};
 	vertShaderStageInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
 	vertShaderStageInfo.stage = VK_SHADER_STAGE_VERTEX_BIT;
-	vertShaderStageInfo.module = vertShaderModule.module;
+	vertShaderStageInfo.module = vertShaderDebug->shaderModule;
 	vertShaderStageInfo.pName = "main";
 
 	// Link fragment shader
 	VkPipelineShaderStageCreateInfo fragShaderStageInfo = {};
 	fragShaderStageInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
 	fragShaderStageInfo.stage = VK_SHADER_STAGE_FRAGMENT_BIT;
-	fragShaderStageInfo.module = fragShaderModule.module;
+	fragShaderStageInfo.module = fragShaderDebug->shaderModule;
 	fragShaderStageInfo.pName = "main";
 
 	VkPipelineShaderStageCreateInfo shaderStages[] = { vertShaderStageInfo, fragShaderStageInfo };

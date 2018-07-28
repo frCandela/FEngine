@@ -90,6 +90,8 @@ private:
 	
 	vk::Shader* vertShader;
 	vk::Shader* fragShader;
+	vk::Shader* vertShaderDebug;
+	vk::Shader* fragShaderDebug;
 
 	VkPipeline graphicsPipeline1;
 	VkPipelineLayout pipelineLayout1;

@@ -21,6 +21,9 @@ ImguiManager::~ImguiManager()
 	delete(fontTexture);
 	delete(sampler);
 
+	delete(fragShader);
+	delete(vertShader);
+
 	vkDestroyPipelineCache(device->device, pipelineCache, nullptr);
 	vkDestroyPipeline(device->device, pipeline, nullptr);
 	vkDestroyPipelineLayout(device->device, pipelineLayout, nullptr);
@@ -32,7 +35,6 @@ ImguiManager::~ImguiManager()
 
 void ImguiManager::InitImgui(float width, float height, GLFWwindow* window)
 {
-
 	// Color scheme
 	ImGuiStyle& style = ImGui::GetStyle();
 	style.Colors[ImGuiCol_TitleBg] = ImVec4(50.f / 255.f, 50.f / 255.f, 50.f / 255.f, 1.f);
@@ -233,22 +235,18 @@ void ImguiManager::CreateGraphicsPipeline(VkRenderPass renderPass)
 	dynamicState.dynamicStateCount = static_cast<uint32_t>(dynamicStateEnables.size());
 	dynamicState.flags = 0;
 
-	// Shaders
-	vk::ShaderModule vertShaderModule = vertShader->GetShaderModule();
-	vk::ShaderModule fragShaderModule = fragShader->GetShaderModule();
-
 	// Vertex shader
 	VkPipelineShaderStageCreateInfo vertShaderStageInfo = {};
 	vertShaderStageInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
 	vertShaderStageInfo.stage = VK_SHADER_STAGE_VERTEX_BIT;
-	vertShaderStageInfo.module = vertShaderModule.module;
+	vertShaderStageInfo.module = vertShader->shaderModule;
 	vertShaderStageInfo.pName = "main";
 
 	// Fragment shader
 	VkPipelineShaderStageCreateInfo fragShaderStageInfo = {};
 	fragShaderStageInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
 	fragShaderStageInfo.stage = VK_SHADER_STAGE_FRAGMENT_BIT;
-	fragShaderStageInfo.module = fragShaderModule.module;
+	fragShaderStageInfo.module = fragShader->shaderModule;
 	fragShaderStageInfo.pName = "main";
 
 	std::array<VkPipelineShaderStageCreateInfo, 2> shaderStages = { vertShaderStageInfo, fragShaderStageInfo };

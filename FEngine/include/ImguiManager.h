@@ -27,15 +27,13 @@ public:
 	ImguiManager(vk::Device* pdevice, vk::CommandPool* pCommandPool, glm::vec2 size, GLFWwindow* window, VkRenderPass renderPass);
 
 	// Release all Vulkan resources required for rendering imGui
-	~ImguiManager();
-	
+	~ImguiManager();	
 
 	// Update vertex and index buffer containing the imGui elements when required
 	void UpdateBuffers();
 
 	// Draw current imGui frame into a command buffer
 	void DrawFrame(VkCommandBuffer commandBuffer);
-
 
 private:
 	void InitImgui(float width, float height, GLFWwindow* window);
