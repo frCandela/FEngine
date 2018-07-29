@@ -45,6 +45,7 @@ Renderer::Renderer(Window& rWindow, Camera& rCamera) :
 	CreateGraphicsPipeline2();
 
 	CreateTestMesh();
+	CreateDebugBuffer();
 	
 	descriptors->CreateDescriptorSet(*texture, *textureSampler, descriptorPool);
 	glm::vec2 size = GetSize();
@@ -55,6 +56,15 @@ Renderer::Renderer(Window& rWindow, Camera& rCamera) :
 	CreateSyncObjects();
 
 	framerate.TrySetRefreshRate(m_window.GetRefreshRate());
+}
+
+void Renderer::UpdateUniformBuffers(Camera& camera)
+{
+	// Fixed ubo with projection and view matrices
+	projView.projection = camera.GetProj();
+	projView.view = camera.GetView();
+
+	memcpy(projViewBuffer->mappedData, &projView, sizeof(projView));
 }
 
 Renderer::~Renderer()
@@ -99,6 +109,35 @@ void Renderer::Cleanup()
 	delete(commandPool);
 	delete (device);
 	delete(instance);
+}
+
+void Renderer::CreateDebugBuffer()
+{
+	glm::vec3 color(1, 0, 0);
+	std::vector<vk::VertexDebug> verticesDebug = 
+	{
+		 { { 0,0,0  },	color }
+		,{ { 0,0,2 },	color }	
+		,{ { 0,2,0 },	color }
+	};
+
+	debugBuffer = new vk::Buffer(*device);
+
+	VkDeviceSize bufferSize = sizeof(verticesDebug[0]) * verticesDebug.size();
+
+	// Create a host visible buffer
+	vk::Buffer buf(*device);
+	buf.CreateBuffer(VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, bufferSize);
+
+	// Fills it with data
+	buf.Map(bufferSize);
+	memcpy(buf.mappedData, verticesDebug.data(), (size_t)bufferSize);
+	buf.Unmap();
+
+	// Create a device local buffer
+	debugBuffer->CreateBuffer(VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, bufferSize);
+
+	vk::Mesh::copyBuffer(buf.m_buffer, debugBuffer->m_buffer, bufferSize, *commandPool);
 }
 
 void Renderer::CreateDescriptors2()
@@ -186,7 +225,7 @@ void Renderer::CreateCommandBuffers()
 			//Record Draw calls on all existing buffers
 			for (int j = 0; j < buffers.size(); ++j)
 			{
-				VkBuffer vertexBuffers[] = { buffers[j]->vertexBuffer.m_buffer };
+				VkBuffer * vertexBuffers = & buffers[j]->vertexBuffer.m_buffer ;
 				VkDeviceSize offsets[] = { 0 };
 				vkCmdBindVertexBuffers(commandBuffers->commandBuffers[i], 0, 1, vertexBuffers, offsets);
 				vkCmdBindIndexBuffer(commandBuffers->commandBuffers[i], buffers[j]->indexBuffer.m_buffer, 0, VK_INDEX_TYPE_UINT32);
@@ -205,6 +244,11 @@ void Renderer::CreateCommandBuffers()
 			//Bind debug pipeline
 			vkCmdBindPipeline(commandBuffers->commandBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, graphicsPipeline2);
 			vkCmdBindDescriptorSets(commandBuffers->commandBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineLayout2, 0, 1, &descriptorSet2, 0, NULL);
+			
+			VkBuffer vertexBuffers[] = { debugBuffer->m_buffer };
+			VkDeviceSize offsets[] = { 0 };
+			vkCmdBindVertexBuffers(commandBuffers->commandBuffers[i], 0, 1, vertexBuffers, offsets);
+			vkCmdDraw(commandBuffers->commandBuffers[i], 3, 1, 0, 0);
 
 		vkCmdEndRenderPass(commandBuffers->commandBuffers[i]);
 
@@ -223,7 +267,8 @@ void Renderer::DrawFrame()
 	descriptors->UpdateDynamicUniformBuffer({
 		glm::rotate(glm::mat4(1.0f), time * glm::radians(90.0f), glm::vec3(1.f, 1.f, 1.f))
 		,glm::rotate(glm::mat4(1.0f), -time * glm::radians(90.0f), glm::vec3(1.f, 1.f, 1.f))
-	});	
+	});
+	UpdateUniformBuffers(*m_pCamera);
 	
 	vkWaitForFences(device->device, 1, &inFlightFences[currentFrame], VK_TRUE, std::numeric_limits<uint64_t>::max());
 	vkResetFences(device->device, 1, &inFlightFences[currentFrame]);
@@ -569,7 +614,7 @@ void Renderer::CreateGraphicsPipeline2()
 	colorBlendAttachment.dstAlphaBlendFactor = VK_BLEND_FACTOR_ZERO; // Optional
 	colorBlendAttachment.alphaBlendOp = VK_BLEND_OP_ADD; // Optional
 
-														 // Color blending (contains the global color blending settings)
+	// Color blending (contains the global color blending settings)
 	VkPipelineColorBlendStateCreateInfo colorBlending = {};
 	colorBlending.sType = VK_STRUCTURE_TYPE_PIPELINE_COLOR_BLEND_STATE_CREATE_INFO;
 	colorBlending.logicOpEnable = VK_FALSE;
@@ -581,7 +626,7 @@ void Renderer::CreateGraphicsPipeline2()
 	colorBlending.blendConstants[2] = 0.0f; // Optional
 	colorBlending.blendConstants[3] = 0.0f; // Optional
 
-											// Dynamic States (states that can be changed without recreating the pipeline)
+	// Dynamic States (states that can be changed without recreating the pipeline)
 	VkDynamicState dynamicStates[] =
 	{
 		VK_DYNAMIC_STATE_VIEWPORT,
@@ -808,14 +853,14 @@ void Renderer::CreateTestMesh()
 
 	sphere->vertices =
 	{
-		{ { 0,0,0 },	red,{ 0,0 } },	//Fbl 0
-	{ { 0,0,1 },	white,{ 1,0 } },	//Fbr 1
-	{ { 0,1,0 },	blue,{ 0,1 } },	//Ftl 2
-	{ { 0,1,1 },	green,{ 1,1 } },	//Ftr 3
-	{ { 1,0,0 },	yellow,{ 0,1 } },	//Bbl 4
-	{ { 1,0,1 },	pink,{ 1,1 } },	//Bbr 5
-	{ { 1,1,0 },	cyan,{ 0,0 } },	//Btl 6
-	{ { 1,1,1 },	black,{ 1,0 } },	//Btr 7///
+		{ { 0,0,0 },	red,{ 0,0 } },		//Fbl 0
+		{ { 0,0,1 },	white,{ 1,0 } },	//Fbr 1
+		{ { 0,1,0 },	blue,{ 0,1 } },		//Ftl 2
+		{ { 0,1,1 },	green,{ 1,1 } },	//Ftr 3
+		{ { 1,0,0 },	yellow,{ 0,1 } },	//Bbl 4
+		{ { 1,0,1 },	pink,{ 1,1 } },		//Bbr 5
+		{ { 1,1,0 },	cyan,{ 0,0 } },		//Btl 6
+		{ { 1,1,1 },	black,{ 1,0 } },	//Btr 7
 	};
 
 	sphere->CreateBuffers(*commandPool);

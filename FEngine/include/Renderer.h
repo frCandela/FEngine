@@ -43,6 +43,8 @@ public:
 
 private:
 
+	void CreateDebugBuffer();
+
 	// Setup the command buffers for drawing operations
 	void CreateCommandBuffers();
 
@@ -105,11 +107,14 @@ private:
 	struct { glm::mat4 projection; glm::mat4 view; } projView;
 	VkDescriptorPool descriptorPool2;
 	void CreateDescriptors2();
+	void UpdateUniformBuffers(Camera& camera);
 
 	VkRenderPass renderPass;
 	VkDescriptorPool descriptorPool;
 
 	std::vector<vk::Mesh*> buffers;
+	vk::Buffer * debugBuffer;	
+
 	std::vector<VkSemaphore> imageAvailableSemaphores;//Specifies that an image has been acquired and is ready for rendering
 	std::vector<VkSemaphore> renderFinishedSemaphores;//Specifies that rendering has finished and presentation can happen
 	std::vector<VkFence> inFlightFences;

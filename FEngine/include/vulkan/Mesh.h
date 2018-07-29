@@ -24,7 +24,7 @@ namespace vk
 		vk::Buffer vertexBuffer;
 		vk::Buffer indexBuffer;
 
-		void copyBuffer(VkBuffer srcBuffer, VkBuffer dstBuffer, VkDeviceSize size, CommandPool& rCommandPool);
+		static void copyBuffer(VkBuffer srcBuffer, VkBuffer dstBuffer, VkDeviceSize size, CommandPool& rCommandPool);
 
 		/// Loads a model from an OBJ file
 		void LoadModel(std::string path);
