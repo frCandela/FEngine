@@ -18,10 +18,8 @@ Renderer::Renderer(Window& rWindow, Camera& rCamera) :
 	swapChain->BuildSwapChain(m_window);
 
 	vertShader = new vk::Shader(*device, "shaders/vert.spv");
-	fragShader = new vk::Shader(*device, "shaders/frag.spv");
-	vertShaderDebug = new vk::Shader(*device, "shaders/debug/vert.spv");
-	fragShaderDebug = new vk::Shader(*device, "shaders/debug/frag.spv");
-
+	fragShader = new vk::Shader(*device, "shaders/frag.spv");	
+	
 	CreateRenderPass();
 
 	swapChain->CreateFramebuffers(renderPass);
@@ -33,20 +31,20 @@ Renderer::Renderer(Window& rWindow, Camera& rCamera) :
 	textureSampler->CreateSampler(static_cast<float>(texture->m_mipLevels), 16);
 
 	CreateDescriptorPool();
-	CreateDescriptorPool2();
+
 
 	descriptors = new vk::Descriptors(*device);	
 	descriptors->UpdateUniformBuffers(*m_pCamera);
 	descriptors->UpdateDynamicUniformBuffer({glm::mat4(1.f), glm::mat4(1.f) });	
-
-	CreateDescriptors2();
+	
+	m_pDebugPipeline = new DebugPipeline(*device);
+	m_pDebugPipeline->CreateGraphicsPipeline(renderPass, swapChain->swapChainExtent);
 
 	CreateGraphicsPipeline1();
-	CreateGraphicsPipeline2();
 
 	CreateTestMesh();
 	CreateDebugBuffer();
-	
+
 	descriptors->CreateDescriptorSet(*texture, *textureSampler, descriptorPool);
 	glm::vec2 size = GetSize();
 	
@@ -58,28 +56,13 @@ Renderer::Renderer(Window& rWindow, Camera& rCamera) :
 	framerate.TrySetRefreshRate(m_window.GetRefreshRate());
 }
 
-void Renderer::UpdateUniformBuffers(Camera& camera)
-{
-	// Fixed ubo with projection and view matrices
-	projView.projection = camera.GetProj();
-	projView.view = camera.GetView();
-
-	memcpy(projViewBuffer->mappedData, &projView, sizeof(projView));
-}
-
 Renderer::~Renderer()
 {
 	vkDeviceWaitIdle(device->device);
-	Cleanup();
-}
-
-void Renderer::Cleanup()
-{
 	vkDestroyPipeline(device->device, graphicsPipeline1, nullptr);
 	vkDestroyPipelineLayout(device->device, pipelineLayout1, nullptr);
 
-	vkDestroyPipeline(device->device, graphicsPipeline2, nullptr);
-	vkDestroyPipelineLayout(device->device, pipelineLayout2, nullptr);
+
 
 	for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++)
 	{
@@ -90,106 +73,28 @@ void Renderer::Cleanup()
 
 	for (vk::Mesh* buffer : buffers)
 		delete(buffer);
+	delete(debugBuffer);
+
+	delete(m_pDebugPipeline);
 
 	delete(imGui);
-	vkDestroyDescriptorPool(device->device, descriptorPool2, nullptr);
+	
 	vkDestroyDescriptorPool(device->device, descriptorPool, nullptr);
-	delete(projViewBuffer);
+	
 	delete(descriptors);
-	vkDestroyDescriptorSetLayout(device->device, descriptorSetLayout2, nullptr);
+	
 	delete(textureSampler);
 	delete(texture);
 	vkDestroyRenderPass(device->device, renderPass, nullptr);
 	delete(fragShader);
 	delete(vertShader);
-	delete(fragShaderDebug);
-	delete(vertShaderDebug);
+
 	delete(swapChain);
 	delete(commandBuffers);
 	delete(commandPool);
+
 	delete (device);
 	delete(instance);
-}
-
-void Renderer::CreateDebugBuffer()
-{
-	glm::vec3 color(1, 0, 0);
-	std::vector<vk::VertexDebug> verticesDebug = 
-	{
-		 { { 0,0,0  },	color }
-		,{ { 0,0,2 },	color }	
-		,{ { 0,2,0 },	color }
-	};
-
-	debugBuffer = new vk::Buffer(*device);
-
-	VkDeviceSize bufferSize = sizeof(verticesDebug[0]) * verticesDebug.size();
-
-	// Create a host visible buffer
-	vk::Buffer buf(*device);
-	buf.CreateBuffer(VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, bufferSize);
-
-	// Fills it with data
-	buf.Map(bufferSize);
-	memcpy(buf.mappedData, verticesDebug.data(), (size_t)bufferSize);
-	buf.Unmap();
-
-	// Create a device local buffer
-	debugBuffer->CreateBuffer(VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, bufferSize);
-
-	vk::Mesh::copyBuffer(buf.m_buffer, debugBuffer->m_buffer, bufferSize, *commandPool);
-}
-
-void Renderer::CreateDescriptors2()
-{
-	// Descriptor set layout
-	VkDescriptorSetLayoutBinding setLayoutBinding = {};
-	setLayoutBinding.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
-	setLayoutBinding.stageFlags = VK_SHADER_STAGE_VERTEX_BIT;
-	setLayoutBinding.binding = 0;
-	setLayoutBinding.descriptorCount = 1;
-
-	std::vector<VkDescriptorSetLayoutBinding> setLayoutBindings = { setLayoutBinding };
-
-	VkDescriptorSetLayoutCreateInfo descriptorSetLayoutInfo = {};
-	descriptorSetLayoutInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
-	descriptorSetLayoutInfo.pBindings = setLayoutBindings.data();
-	descriptorSetLayoutInfo.bindingCount = static_cast<uint32_t>(setLayoutBindings.size());
-
-	VK_CHECK_RESULT( vkCreateDescriptorSetLayout(device->device, &descriptorSetLayoutInfo, nullptr, &descriptorSetLayout2));
-
-	// Static shared uniform buffer object with projection and view matrix
-	projViewBuffer = new vk::Buffer(*device);
-	projViewBuffer->CreateBuffer(
-		VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT,
-		VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
-		sizeof(projView)
-	);
-	
-	VK_CHECK_RESULT(projViewBuffer->Map());// Map persistent
-
-	// CreateDescriptorSet
-	VkDescriptorSetAllocateInfo allocInfo{};
-	allocInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
-	allocInfo.descriptorPool = descriptorPool2;
-	allocInfo.pSetLayouts = &descriptorSetLayout2;
-	allocInfo.descriptorSetCount = 1;
-
-	VK_CHECK_RESULT(vkAllocateDescriptorSets(device->device, &allocInfo, &descriptorSet2) )
-	
-	// Binding 0 : Projection/View matrix uniform buffer
-	VkWriteDescriptorSet writeDescriptorSet = {};
-	writeDescriptorSet.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-	writeDescriptorSet.dstSet = descriptorSet2;
-	writeDescriptorSet.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
-	writeDescriptorSet.dstBinding = 0;
-	writeDescriptorSet.pBufferInfo = &projViewBuffer->descriptor;
-	writeDescriptorSet.descriptorCount = 1;
-
-	// Create image descriptor
-	std::vector<VkWriteDescriptorSet> writeDescriptorSets = { writeDescriptorSet };
-
-	vkUpdateDescriptorSets(device->device, static_cast<uint32_t>(writeDescriptorSets.size()), writeDescriptorSets.data(), 0, NULL);
 }
 
 void Renderer::CreateCommandBuffers()
@@ -242,8 +147,7 @@ void Renderer::CreateCommandBuffers()
 			imGui->DrawFrame(commandBuffers->commandBuffers[i]);
 
 			//Bind debug pipeline
-			vkCmdBindPipeline(commandBuffers->commandBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, graphicsPipeline2);
-			vkCmdBindDescriptorSets(commandBuffers->commandBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineLayout2, 0, 1, &descriptorSet2, 0, NULL);
+			m_pDebugPipeline->Bind(commandBuffers->commandBuffers[i]);
 			
 			VkBuffer vertexBuffers[] = { debugBuffer->m_buffer };
 			VkDeviceSize offsets[] = { 0 };
@@ -268,7 +172,7 @@ void Renderer::DrawFrame()
 		glm::rotate(glm::mat4(1.0f), time * glm::radians(90.0f), glm::vec3(1.f, 1.f, 1.f))
 		,glm::rotate(glm::mat4(1.0f), -time * glm::radians(90.0f), glm::vec3(1.f, 1.f, 1.f))
 	});
-	UpdateUniformBuffers(*m_pCamera);
+	m_pDebugPipeline->UpdateUniforms(m_pCamera->GetProj(), m_pCamera->GetView());
 	
 	vkWaitForFences(device->device, 1, &inFlightFences[currentFrame], VK_TRUE, std::numeric_limits<uint64_t>::max());
 	vkResetFences(device->device, 1, &inFlightFences[currentFrame]);
@@ -349,12 +253,12 @@ void Renderer::RecreateSwapChain()
 	//Cleanup	
 	commandBuffers->cleanup();
 
+
+	if (graphicsPipeline1 == VK_NULL_HANDLE) std::cout << "zob1" << std::endl;
 	vkDestroyPipeline(device->device, graphicsPipeline1, nullptr);
+	if (graphicsPipeline1 == VK_NULL_HANDLE) std::cout << "zob2" << std::endl;
+
 	vkDestroyPipelineLayout(device->device, pipelineLayout1, nullptr);
-
-	vkDestroyPipeline(device->device, graphicsPipeline2, nullptr);
-	vkDestroyPipelineLayout(device->device, pipelineLayout2, nullptr);
-
 	vkDestroyRenderPass(device->device, renderPass, nullptr);
 
 	swapChain->CleanupSwapChain();
@@ -363,7 +267,8 @@ void Renderer::RecreateSwapChain()
 	CreateRenderPass();
 	
 	CreateGraphicsPipeline1();
-	CreateGraphicsPipeline2();
+
+	m_pDebugPipeline->CreateGraphicsPipeline(renderPass, swapChain->swapChainExtent);
 
 	swapChain->CreateFramebuffers(renderPass);
 	CreateCommandBuffers();
@@ -517,175 +422,6 @@ void Renderer::CreateGraphicsPipeline1()
 
 	if (vkCreateGraphicsPipelines(device->device, VK_NULL_HANDLE, 1, &pipelineInfo, nullptr, &graphicsPipeline1) != VK_SUCCESS)
 		throw std::runtime_error("failed to create graphics pipeline!");	
-}
-
-void Renderer::CreateGraphicsPipeline2()
-{
-	// Link vertex shader
-	VkPipelineShaderStageCreateInfo vertShaderStageInfo = {};
-	vertShaderStageInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
-	vertShaderStageInfo.stage = VK_SHADER_STAGE_VERTEX_BIT;
-	vertShaderStageInfo.module = vertShaderDebug->shaderModule;
-	vertShaderStageInfo.pName = "main";
-
-	// Link fragment shader
-	VkPipelineShaderStageCreateInfo fragShaderStageInfo = {};
-	fragShaderStageInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
-	fragShaderStageInfo.stage = VK_SHADER_STAGE_FRAGMENT_BIT;
-	fragShaderStageInfo.module = fragShaderDebug->shaderModule;
-	fragShaderStageInfo.pName = "main";
-
-	VkPipelineShaderStageCreateInfo shaderStages[] = { vertShaderStageInfo, fragShaderStageInfo };
-
-	// Get vertex input info
-	auto bindingDescription = vk::VertexDebug::GetBindingDescription();
-	auto attributeDescriptions = vk::VertexDebug::GetAttributeDescriptions();
-
-	// Set vertex input info
-	VkPipelineVertexInputStateCreateInfo vertexInputInfo = {};
-	vertexInputInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
-	vertexInputInfo.vertexBindingDescriptionCount = 1;
-	vertexInputInfo.vertexAttributeDescriptionCount = static_cast<uint32_t>(attributeDescriptions.size());
-	vertexInputInfo.pVertexBindingDescriptions = &bindingDescription;
-	vertexInputInfo.pVertexAttributeDescriptions = attributeDescriptions.data();
-
-	// Input assembly
-	VkPipelineInputAssemblyStateCreateInfo inputAssembly = {};
-	inputAssembly.sType = VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO;
-	inputAssembly.topology = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST;
-	inputAssembly.primitiveRestartEnable = VK_FALSE;
-
-	// Viewport
-	VkViewport viewport = {};
-	viewport.x = 0.0f;
-	viewport.y = 0.0f;
-	viewport.width = (float)swapChain->swapChainExtent.width;
-	viewport.height = (float)swapChain->swapChainExtent.height;
-	viewport.minDepth = 0.0f;
-	viewport.maxDepth = 1.0f;
-
-	// Scissor
-	VkRect2D scissor = {};
-	scissor.offset = { 0, 0 };
-	scissor.extent = swapChain->swapChainExtent;
-
-	// References all the Viewports and Scissors
-	VkPipelineViewportStateCreateInfo viewportState = {};
-	viewportState.sType = VK_STRUCTURE_TYPE_PIPELINE_VIEWPORT_STATE_CREATE_INFO;
-	viewportState.viewportCount = 1;
-	viewportState.pViewports = &viewport;
-	viewportState.scissorCount = 1;
-	viewportState.pScissors = &scissor;
-
-	// Rasterizer (also performs depth testing, face culling and scissor test)
-	VkPipelineRasterizationStateCreateInfo rasterizer = {};
-	rasterizer.sType = VK_STRUCTURE_TYPE_PIPELINE_RASTERIZATION_STATE_CREATE_INFO;
-	rasterizer.depthClampEnable = VK_FALSE;
-	rasterizer.rasterizerDiscardEnable = VK_FALSE;
-	rasterizer.polygonMode = VK_POLYGON_MODE_FILL;
-	rasterizer.lineWidth = 1.0f;
-	rasterizer.cullMode = VK_CULL_MODE_BACK_BIT;
-	rasterizer.frontFace = VK_FRONT_FACE_COUNTER_CLOCKWISE;
-	rasterizer.depthBiasEnable = VK_FALSE;
-
-	// Multisampling (used for antialiasing)
-	VkPipelineMultisampleStateCreateInfo multisampling = {};
-	multisampling.sType = VK_STRUCTURE_TYPE_PIPELINE_MULTISAMPLE_STATE_CREATE_INFO;
-	multisampling.sampleShadingEnable = VK_FALSE;
-	multisampling.rasterizationSamples = VK_SAMPLE_COUNT_1_BIT;
-
-	// Configure the depth and stencil buffers
-	VkPipelineDepthStencilStateCreateInfo depthStencil = {};
-	depthStencil.sType = VK_STRUCTURE_TYPE_PIPELINE_DEPTH_STENCIL_STATE_CREATE_INFO;
-	depthStencil.depthTestEnable = VK_TRUE;
-	depthStencil.depthWriteEnable = VK_TRUE;
-	depthStencil.depthCompareOp = VK_COMPARE_OP_LESS;
-	depthStencil.depthBoundsTestEnable = VK_FALSE;
-	depthStencil.stencilTestEnable = VK_FALSE;
-
-	// Color blending atachemennt (contains the configuration per attached framebuffer)
-	VkPipelineColorBlendAttachmentState colorBlendAttachment = {};
-	colorBlendAttachment.colorWriteMask = VK_COLOR_COMPONENT_R_BIT | VK_COLOR_COMPONENT_G_BIT | VK_COLOR_COMPONENT_B_BIT | VK_COLOR_COMPONENT_A_BIT;
-	colorBlendAttachment.blendEnable = VK_FALSE;
-	colorBlendAttachment.srcColorBlendFactor = VK_BLEND_FACTOR_ONE; // Optional
-	colorBlendAttachment.dstColorBlendFactor = VK_BLEND_FACTOR_ZERO; // Optional
-	colorBlendAttachment.colorBlendOp = VK_BLEND_OP_ADD; // Optional
-	colorBlendAttachment.srcAlphaBlendFactor = VK_BLEND_FACTOR_ONE; // Optional
-	colorBlendAttachment.dstAlphaBlendFactor = VK_BLEND_FACTOR_ZERO; // Optional
-	colorBlendAttachment.alphaBlendOp = VK_BLEND_OP_ADD; // Optional
-
-	// Color blending (contains the global color blending settings)
-	VkPipelineColorBlendStateCreateInfo colorBlending = {};
-	colorBlending.sType = VK_STRUCTURE_TYPE_PIPELINE_COLOR_BLEND_STATE_CREATE_INFO;
-	colorBlending.logicOpEnable = VK_FALSE;
-	colorBlending.logicOp = VK_LOGIC_OP_COPY; // Optional
-	colorBlending.attachmentCount = 1;
-	colorBlending.pAttachments = &colorBlendAttachment;
-	colorBlending.blendConstants[0] = 0.0f; // Optional
-	colorBlending.blendConstants[1] = 0.0f; // Optional
-	colorBlending.blendConstants[2] = 0.0f; // Optional
-	colorBlending.blendConstants[3] = 0.0f; // Optional
-
-	// Dynamic States (states that can be changed without recreating the pipeline)
-	VkDynamicState dynamicStates[] =
-	{
-		VK_DYNAMIC_STATE_VIEWPORT,
-		VK_DYNAMIC_STATE_LINE_WIDTH
-	};
-
-	// Dynamic States struct
-	VkPipelineDynamicStateCreateInfo dynamicState = {};
-	dynamicState.sType = VK_STRUCTURE_TYPE_PIPELINE_DYNAMIC_STATE_CREATE_INFO;
-	dynamicState.dynamicStateCount = 2;
-	dynamicState.pDynamicStates = dynamicStates;
-
-	//Pipeline layout for setting up uniforms in shaders
-	VkPipelineLayoutCreateInfo pipelineLayoutInfo = {};
-	pipelineLayoutInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
-	pipelineLayoutInfo.setLayoutCount = 1;
-	pipelineLayoutInfo.pSetLayouts = &descriptorSetLayout2;
-
-	if (vkCreatePipelineLayout(device->device, &pipelineLayoutInfo, nullptr, &pipelineLayout2) != VK_SUCCESS)
-		throw std::runtime_error("failed to create pipeline layout!");
-
-	//Creates the Graphics Pipeline
-	VkGraphicsPipelineCreateInfo pipelineInfo = {};
-	pipelineInfo.sType = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO;
-	pipelineInfo.stageCount = 2;
-	pipelineInfo.pStages = shaderStages;
-	pipelineInfo.pVertexInputState = &vertexInputInfo;
-	pipelineInfo.pInputAssemblyState = &inputAssembly;
-	pipelineInfo.pViewportState = &viewportState;
-	pipelineInfo.pRasterizationState = &rasterizer;
-	pipelineInfo.pMultisampleState = &multisampling;
-	pipelineInfo.pDepthStencilState = &depthStencil;
-	pipelineInfo.pColorBlendState = &colorBlending;
-	pipelineInfo.layout = pipelineLayout2;
-	pipelineInfo.renderPass = renderPass;
-	pipelineInfo.subpass = 0;
-	pipelineInfo.basePipelineHandle = VK_NULL_HANDLE;
-
-	if (vkCreateGraphicsPipelines(device->device, VK_NULL_HANDLE, 1, &pipelineInfo, nullptr, &graphicsPipeline2) != VK_SUCCESS)
-		throw std::runtime_error("failed to create graphics pipeline!");
-}
-
-void Renderer::CreateDescriptorPool2()
-{
-	VkDescriptorPoolSize descriptorPoolSizeUniform2 = {};
-	descriptorPoolSizeUniform2.type = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
-	descriptorPoolSizeUniform2.descriptorCount = 1;
-
-	// Example uses one ubo and one image sampler
-	std::vector<VkDescriptorPoolSize> poolSizes = { descriptorPoolSizeUniform2 };
-
-	VkDescriptorPoolCreateInfo descriptorPoolInfo{};
-	descriptorPoolInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
-	descriptorPoolInfo.poolSizeCount = static_cast<uint32_t>(poolSizes.size());
-	descriptorPoolInfo.pPoolSizes = poolSizes.data();
-	descriptorPoolInfo.maxSets = 1;
-
-	if (vkCreateDescriptorPool(device->device, &descriptorPoolInfo, nullptr, &descriptorPool2) != VK_SUCCESS)
-		throw std::runtime_error("failed to create descriptor pool!");
 }
 
 void Renderer::CreateDescriptorPool()
@@ -865,6 +601,35 @@ void Renderer::CreateTestMesh()
 
 	sphere->CreateBuffers(*commandPool);
 	buffers.push_back(sphere);
+}
+
+void Renderer::CreateDebugBuffer()
+{
+	glm::vec3 color(1, 0, 0);
+	std::vector<DebugPipeline::Vertex> verticesDebug =
+	{
+		{ { 0,0,0 },	color }
+		,{ { 0,0,2 },	color }
+		,{ { 0,2,0 },	color }
+	};
+
+	VkDeviceSize bufferSize = sizeof(verticesDebug[0]) * verticesDebug.size();
+
+	// Create a host visible buffer
+	vk::Buffer buf(*device);
+	buf.CreateBuffer(VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, bufferSize);
+
+	// Fills it with data
+	buf.Map(bufferSize);
+	memcpy(buf.mappedData, verticesDebug.data(), (size_t)bufferSize);
+	buf.Unmap();
+
+	// Create a device local buffer
+	debugBuffer = new vk::Buffer(*device);
+	debugBuffer->CreateBuffer(VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, bufferSize);
+
+	// Fills it with the data from the first buffer
+	vk::Mesh::copyBuffer(buf.m_buffer, debugBuffer->m_buffer, bufferSize, *commandPool);
 }
 
 void Renderer::RenderGUI()

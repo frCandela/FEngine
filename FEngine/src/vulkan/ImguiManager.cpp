@@ -361,8 +361,8 @@ void ImguiManager::UpdateBuffers()
 		}
 
 		// Flush to make writes visible to GPU
-		vertexBuffer.Flush();
-		indexBuffer.Flush();
+		/*vertexBuffer.Flush();
+		indexBuffer.Flush();*/
 	}
 }
 

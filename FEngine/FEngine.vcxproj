@@ -96,6 +96,7 @@
     <ClCompile Include="deps\imgui\imgui_draw.cpp" />
     <ClCompile Include="src\Camera.cpp" />
     <ClCompile Include="src\Component.cpp" />
+    <ClCompile Include="src\DebugPipeline.cpp" />
     <ClCompile Include="src\FEngine.cpp" />
     <ClCompile Include="src\GameObject.cpp" />
     <ClCompile Include="src\Renderer.cpp" />
@@ -123,6 +124,7 @@
     <ClInclude Include="deps\imgui\imgui.h" />
     <ClInclude Include="include\Camera.h" />
     <ClInclude Include="include\Component.h" />
+    <ClInclude Include="include\DebugPipeline.h" />
     <ClInclude Include="include\FEngine.h" />
     <ClInclude Include="include\GameObject.h" />
     <ClInclude Include="include\ImguiManager.h" />

@@ -9,6 +9,7 @@
 #include <sstream>
 
 #include "Window.h"
+#include "DebugPipeline.h"
 
 #include "vulkan/Vertex.h"
 #include "vulkan/SwapChain.h"
@@ -43,8 +44,6 @@ public:
 
 private:
 
-	void CreateDebugBuffer();
-
 	// Setup the command buffers for drawing operations
 	void CreateCommandBuffers();
 
@@ -53,30 +52,26 @@ private:
 
 	// Creates the graphics pipeline
 	void CreateGraphicsPipeline1();
-	void CreateGraphicsPipeline2();
 
 	// Creates the render pass (describes the differents subpasses)
 	void CreateRenderPass();
 
 	// Create the descriptor pool
 	void CreateDescriptorPool();
-	void CreateDescriptorPool2();
 
 	// Creates the sync objects (fences and semaphores)
 	void CreateSyncObjects();
 
-	// Creates meshes for test rendering
+	// Creates test vertices data
 	void CreateTestMesh();
-
-	// Clean Vulkan objects 
-	void Cleanup();
+	void CreateDebugBuffer();
 
 	const uint32_t MAX_FRAMES_IN_FLIGHT = 2;
 	size_t currentFrame = 0;
 
 	Camera* m_pCamera;
+	DebugPipeline* m_pDebugPipeline;
 	Window& m_window;
-
 	ImguiManager * imGui = nullptr;
 
 	vk::Texture* texture;
@@ -92,28 +87,16 @@ private:
 	
 	vk::Shader* vertShader;
 	vk::Shader* fragShader;
-	vk::Shader* vertShaderDebug;
-	vk::Shader* fragShaderDebug;
 
 	VkPipeline graphicsPipeline1;
 	VkPipelineLayout pipelineLayout1;
-
-	VkPipeline graphicsPipeline2;
-	VkPipelineLayout pipelineLayout2;
-
-	VkDescriptorSet descriptorSet2;
-	VkDescriptorSetLayout descriptorSetLayout2;
-	vk::Buffer* projViewBuffer;
-	struct { glm::mat4 projection; glm::mat4 view; } projView;
-	VkDescriptorPool descriptorPool2;
-	void CreateDescriptors2();
-	void UpdateUniformBuffers(Camera& camera);
 
 	VkRenderPass renderPass;
 	VkDescriptorPool descriptorPool;
 
 	std::vector<vk::Mesh*> buffers;
-	vk::Buffer * debugBuffer;	
+
+	vk::Buffer* debugBuffer;
 
 	std::vector<VkSemaphore> imageAvailableSemaphores;//Specifies that an image has been acquired and is ready for rendering
 	std::vector<VkSemaphore> renderFinishedSemaphores;//Specifies that rendering has finished and presentation can happen
