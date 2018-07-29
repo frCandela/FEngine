@@ -1,7 +1,7 @@
 #pragma once
 
-#include "Renderer.h"
-#include "Window.h"
+#include "renderer/Renderer.h"
+#include "renderer/Window.h"
 
 class FEngine
 {

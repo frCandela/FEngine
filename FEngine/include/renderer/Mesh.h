@@ -1,9 +1,10 @@
 #pragma once
 
-#include "Device.h"
-#include "Vertex.h"
-#include "Buffer.hpp"
-#include "CommandPool.h"
+#include "ForwardPipeline.h"
+
+#include "vulkan/Device.h"
+#include "vulkan/Buffer.hpp"
+#include "vulkan/CommandPool.h"
 
 namespace vk
 {
@@ -16,7 +17,7 @@ namespace vk
 		Device & m_device;
 
 		//Vertices and indices of the loaded model
-		std::vector<Vertex> vertices;
+		std::vector<ForwardPipeline::Vertex> vertices;
 		std::vector<uint32_t> indices;
 
 		vk::Buffer vertexBuffer;

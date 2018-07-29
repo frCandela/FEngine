@@ -1,9 +1,11 @@
 #pragma once
 
-#ifndef GLFW_INCLUDE_VULKAN
-	#define GLFW_INCLUDE_VULKAN
-	#include <GLFW/glfw3.h>
-#endif // !GLFW_INCLUDE_VULKAN
+#include "vulkan/Sampler.h"
+#include "vulkan/Texture.h"
+#include "vulkan/Buffer.hpp"
+#include "vulkan/Shader.h"
+
+#include "Camera.h"
 
 #define GLM_ENABLE_EXPERIMENTAL
 #include "glm/gtx/hash.hpp"
@@ -11,8 +13,70 @@
 
 #include <array>
 
-namespace vk
+class ForwardPipeline
 {
+public:
+	ForwardPipeline(vk::Device& device, vk::Texture& texture, vk::Sampler& sampler);
+	~ForwardPipeline();
+
+	// Binds the pipeline
+	void BindPipeline(VkCommandBuffer commandBuffer);
+
+	// Binds the pipeline descriptors
+	void BindDescriptors(VkCommandBuffer commandBuffer, int offsetIndex);
+
+	// Update the view and projection matrices uniform
+	void UpdateUniforms(glm::mat4 projectionMat, glm::mat4 viewMat);
+
+	// Update the dynamic model matrices uniform
+	void UpdateDynamicUniformBuffer(std::vector<glm::mat4> matrices);
+
+	// Creates the graphics pipeline
+	void CreateGraphicsPipeline(VkRenderPass renderPass, VkExtent2D extent2D);
+
+private:
+	// Creates descriptor set layouts
+	void CreateDescriptorSetLayout();
+
+	// Create the uniforms buffers
+	void CreateUniformBuffer();
+
+	// Create the descriptor pool
+	void CreateDescriptorPool();
+
+	// Creates the descriptor set
+	void CreateDescriptorSet(vk::Texture& textureImage, vk::Sampler& textureSampler, VkDescriptorPool descriptorPool);
+
+	// References
+	vk::Device & m_device;
+
+	vk::Shader* vertShader;
+	vk::Shader* fragShader;
+	vk::Buffer view;	// Proj view
+	vk::Buffer dynamic;	// Model
+
+	VkDescriptorPool descriptorPool = VK_NULL_HANDLE;
+	VkDescriptorSetLayout descriptorSetLayout = VK_NULL_HANDLE;
+	VkPipeline graphicsPipeline1 = VK_NULL_HANDLE;
+	VkPipelineLayout pipelineLayout1 = VK_NULL_HANDLE;
+	VkDescriptorSet descriptorSet = VK_NULL_HANDLE;
+
+	size_t dynamicAlignment;
+	static const int OBJECT_INSTANCES = 2;
+
+	struct
+	{
+		glm::mat4 projection;
+		glm::mat4 view;
+	} uboVS;
+
+	// One big uniform buffer that contains all matrices(we need to manually allocate the data to cope for GPU-specific uniform buffer offset alignments)
+	struct UboDataDynamic
+	{
+		glm::mat4 *model = nullptr;
+	} uboDataDynamic;
+
+public:
 	struct Vertex
 	{
 		glm::vec3 pos;
@@ -62,15 +126,15 @@ namespace vk
 			return attributeDescriptions;
 		}
 	};
-}
+};
 
-namespace std {
-	template<> struct hash<vk::Vertex> {
-		size_t operator()(vk::Vertex const& vertex) const {
+namespace std
+{
+	template<> struct hash<ForwardPipeline::Vertex> {
+		size_t operator()(ForwardPipeline::Vertex const& vertex) const {
 			return ((hash<glm::vec3>()(vertex.pos) ^
 				(hash<glm::vec3>()(vertex.color) << 1)) >> 1) ^
 				(hash<glm::vec2>()(vertex.texCoord) << 1);
 		}
 	};
 }
-

@@ -12,12 +12,6 @@
     <Filter Include="shaders">
       <UniqueIdentifier>{422395bb-fb27-4fb8-82d2-d4c0e4a81912}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Fichiers sources\Vulkan">
-      <UniqueIdentifier>{98118107-3e8c-4e45-b779-fd2055001013}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Fichiers d%27en-tête\Vulkan">
-      <UniqueIdentifier>{10795a4a-6962-4238-8c48-aceddbdfab86}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Fichiers d%27en-tête\util">
       <UniqueIdentifier>{5cec7470-a395-412a-8aa8-7e1140e0f125}</UniqueIdentifier>
     </Filter>
@@ -27,64 +21,58 @@
     <Filter Include="deps">
       <UniqueIdentifier>{76e291ec-8cc6-4e39-8d39-d1fb28afa2d4}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Fichiers d%27en-tête\renderer">
+      <UniqueIdentifier>{142730d5-6a7b-46f8-a479-d725c6bdf519}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Fichiers d%27en-tête\vulkan">
+      <UniqueIdentifier>{10795a4a-6962-4238-8c48-aceddbdfab86}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Fichiers sources\renderer">
+      <UniqueIdentifier>{7448391b-b6ea-4dec-a968-71571d76f3e9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Fichiers sources\vulkan">
+      <UniqueIdentifier>{98118107-3e8c-4e45-b779-fd2055001013}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Fichiers d%27en-tête\editor">
+      <UniqueIdentifier>{d2b7e06b-bb98-420b-bb13-7d5cf3bfde75}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Fichiers sources\editor">
+      <UniqueIdentifier>{f20851b1-ee7b-40ff-8b59-7a7dbd5cfdae}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\main.cpp">
       <Filter>Fichiers sources</Filter>
     </ClCompile>
-    <ClCompile Include="src\Renderer.cpp">
-      <Filter>Fichiers sources</Filter>
-    </ClCompile>
     <ClCompile Include="src\FEngine.cpp">
       <Filter>Fichiers sources</Filter>
     </ClCompile>
-    <ClCompile Include="src\Window.cpp">
-      <Filter>Fichiers sources</Filter>
-    </ClCompile>
     <ClCompile Include="src\vulkan\DepthImage.cpp">
-      <Filter>Fichiers sources\Vulkan</Filter>
-    </ClCompile>
-    <ClCompile Include="src\vulkan\Descriptors.cpp">
-      <Filter>Fichiers sources\Vulkan</Filter>
+      <Filter>Fichiers sources\vulkan</Filter>
     </ClCompile>
     <ClCompile Include="src\vulkan\Device.cpp">
-      <Filter>Fichiers sources\Vulkan</Filter>
+      <Filter>Fichiers sources\vulkan</Filter>
     </ClCompile>
     <ClCompile Include="src\vulkan\Image.cpp">
-      <Filter>Fichiers sources\Vulkan</Filter>
+      <Filter>Fichiers sources\vulkan</Filter>
     </ClCompile>
     <ClCompile Include="src\vulkan\Sampler.cpp">
-      <Filter>Fichiers sources\Vulkan</Filter>
+      <Filter>Fichiers sources\vulkan</Filter>
     </ClCompile>
     <ClCompile Include="src\vulkan\Shader.cpp">
-      <Filter>Fichiers sources\Vulkan</Filter>
+      <Filter>Fichiers sources\vulkan</Filter>
     </ClCompile>
     <ClCompile Include="src\vulkan\SwapChain.cpp">
-      <Filter>Fichiers sources\Vulkan</Filter>
+      <Filter>Fichiers sources\vulkan</Filter>
     </ClCompile>
     <ClCompile Include="src\vulkan\Texture.cpp">
-      <Filter>Fichiers sources\Vulkan</Filter>
+      <Filter>Fichiers sources\vulkan</Filter>
     </ClCompile>
     <ClCompile Include="src\vulkan\Instance.cpp">
-      <Filter>Fichiers sources\Vulkan</Filter>
-    </ClCompile>
-    <ClCompile Include="src\GameObject.cpp">
-      <Filter>Fichiers sources</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Transform.cpp">
-      <Filter>Fichiers sources</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Component.cpp">
-      <Filter>Fichiers sources</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Camera.cpp">
-      <Filter>Fichiers sources</Filter>
-    </ClCompile>
-    <ClCompile Include="src\vulkan\Mesh.cpp">
-      <Filter>Fichiers sources\Vulkan</Filter>
+      <Filter>Fichiers sources\vulkan</Filter>
     </ClCompile>
     <ClCompile Include="src\vulkan\Buffer.cpp">
-      <Filter>Fichiers sources\Vulkan</Filter>
+      <Filter>Fichiers sources\vulkan</Filter>
     </ClCompile>
     <ClCompile Include="deps\imgui\imgui_draw.cpp">
       <Filter>deps</Filter>
@@ -102,78 +90,75 @@
       <Filter>Fichiers sources\util</Filter>
     </ClCompile>
     <ClCompile Include="src\vulkan\CommandPool.cpp">
-      <Filter>Fichiers sources\Vulkan</Filter>
+      <Filter>Fichiers sources\vulkan</Filter>
     </ClCompile>
     <ClCompile Include="src\vulkan\CommandBuffer.cpp">
-      <Filter>Fichiers sources\Vulkan</Filter>
+      <Filter>Fichiers sources\vulkan</Filter>
     </ClCompile>
-    <ClCompile Include="src\vulkan\ImguiManager.cpp">
-      <Filter>Fichiers sources</Filter>
+    <ClCompile Include="src\editor\Component.cpp">
+      <Filter>Fichiers sources\editor</Filter>
     </ClCompile>
-    <ClCompile Include="src\DebugPipeline.cpp">
-      <Filter>Fichiers sources</Filter>
+    <ClCompile Include="src\editor\GameObject.cpp">
+      <Filter>Fichiers sources\editor</Filter>
+    </ClCompile>
+    <ClCompile Include="src\editor\Transform.cpp">
+      <Filter>Fichiers sources\editor</Filter>
+    </ClCompile>
+    <ClCompile Include="src\renderer\Camera.cpp">
+      <Filter>Fichiers sources\renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="src\renderer\DebugPipeline.cpp">
+      <Filter>Fichiers sources\renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="src\renderer\ForwardPipeline.cpp">
+      <Filter>Fichiers sources\renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="src\renderer\ImguiManager.cpp">
+      <Filter>Fichiers sources\renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="src\renderer\Mesh.cpp">
+      <Filter>Fichiers sources\renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="src\renderer\Renderer.cpp">
+      <Filter>Fichiers sources\renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="src\renderer\Window.cpp">
+      <Filter>Fichiers sources\renderer</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="include\Renderer.h">
-      <Filter>Fichiers d%27en-tête</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Window.h">
-      <Filter>Fichiers d%27en-tête</Filter>
-    </ClInclude>
     <ClInclude Include="include\FEngine.h">
       <Filter>Fichiers d%27en-tête</Filter>
     </ClInclude>
     <ClInclude Include="include\vulkan\DepthImage.h">
-      <Filter>Fichiers d%27en-tête\Vulkan</Filter>
-    </ClInclude>
-    <ClInclude Include="include\vulkan\Descriptors.h">
-      <Filter>Fichiers d%27en-tête\Vulkan</Filter>
+      <Filter>Fichiers d%27en-tête\vulkan</Filter>
     </ClInclude>
     <ClInclude Include="include\vulkan\Device.h">
-      <Filter>Fichiers d%27en-tête\Vulkan</Filter>
+      <Filter>Fichiers d%27en-tête\vulkan</Filter>
     </ClInclude>
     <ClInclude Include="include\vulkan\Image.h">
-      <Filter>Fichiers d%27en-tête\Vulkan</Filter>
+      <Filter>Fichiers d%27en-tête\vulkan</Filter>
     </ClInclude>
     <ClInclude Include="include\vulkan\Sampler.h">
-      <Filter>Fichiers d%27en-tête\Vulkan</Filter>
+      <Filter>Fichiers d%27en-tête\vulkan</Filter>
     </ClInclude>
     <ClInclude Include="include\vulkan\Shader.h">
-      <Filter>Fichiers d%27en-tête\Vulkan</Filter>
+      <Filter>Fichiers d%27en-tête\vulkan</Filter>
     </ClInclude>
     <ClInclude Include="include\vulkan\SwapChain.h">
-      <Filter>Fichiers d%27en-tête\Vulkan</Filter>
+      <Filter>Fichiers d%27en-tête\vulkan</Filter>
     </ClInclude>
     <ClInclude Include="include\vulkan\Texture.h">
-      <Filter>Fichiers d%27en-tête\Vulkan</Filter>
-    </ClInclude>
-    <ClInclude Include="include\vulkan\Vertex.h">
-      <Filter>Fichiers d%27en-tête\Vulkan</Filter>
+      <Filter>Fichiers d%27en-tête\vulkan</Filter>
     </ClInclude>
     <ClInclude Include="include\vulkan\Instance.h">
-      <Filter>Fichiers d%27en-tête\Vulkan</Filter>
-    </ClInclude>
-    <ClInclude Include="include\GameObject.h">
-      <Filter>Fichiers d%27en-tête</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Component.h">
-      <Filter>Fichiers d%27en-tête</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Transform.h">
-      <Filter>Fichiers d%27en-tête</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Camera.h">
-      <Filter>Fichiers d%27en-tête</Filter>
-    </ClInclude>
-    <ClInclude Include="include\vulkan\Mesh.h">
-      <Filter>Fichiers d%27en-tête\Vulkan</Filter>
+      <Filter>Fichiers d%27en-tête\vulkan</Filter>
     </ClInclude>
     <ClInclude Include="include\vulkan\Buffer.hpp">
-      <Filter>Fichiers d%27en-tête\Vulkan</Filter>
+      <Filter>Fichiers d%27en-tête\vulkan</Filter>
     </ClInclude>
     <ClInclude Include="include\vulkan\Initializers.h">
-      <Filter>Fichiers d%27en-tête\Vulkan</Filter>
+      <Filter>Fichiers d%27en-tête\vulkan</Filter>
     </ClInclude>
     <ClInclude Include="include\util\Time.h">
       <Filter>Fichiers d%27en-tête\util</Filter>
@@ -182,19 +167,43 @@
       <Filter>Fichiers d%27en-tête\util</Filter>
     </ClInclude>
     <ClInclude Include="include\vulkan\CommandPool.h">
-      <Filter>Fichiers d%27en-tête\Vulkan</Filter>
+      <Filter>Fichiers d%27en-tête\vulkan</Filter>
     </ClInclude>
     <ClInclude Include="include\vulkan\CommandBuffer.h">
-      <Filter>Fichiers d%27en-tête\Vulkan</Filter>
+      <Filter>Fichiers d%27en-tête\vulkan</Filter>
     </ClInclude>
     <ClInclude Include="deps\imgui\imgui.h">
       <Filter>deps</Filter>
     </ClInclude>
-    <ClInclude Include="include\ImguiManager.h">
-      <Filter>Fichiers d%27en-tête</Filter>
+    <ClInclude Include="include\editor\Component.h">
+      <Filter>Fichiers d%27en-tête\editor</Filter>
     </ClInclude>
-    <ClInclude Include="include\DebugPipeline.h">
-      <Filter>Fichiers d%27en-tête</Filter>
+    <ClInclude Include="include\editor\GameObject.h">
+      <Filter>Fichiers d%27en-tête\editor</Filter>
+    </ClInclude>
+    <ClInclude Include="include\editor\Transform.h">
+      <Filter>Fichiers d%27en-tête\editor</Filter>
+    </ClInclude>
+    <ClInclude Include="include\renderer\Camera.h">
+      <Filter>Fichiers d%27en-tête\renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="include\renderer\DebugPipeline.h">
+      <Filter>Fichiers d%27en-tête\renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="include\renderer\ForwardPipeline.h">
+      <Filter>Fichiers d%27en-tête\renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="include\renderer\ImguiManager.h">
+      <Filter>Fichiers d%27en-tête\renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="include\renderer\Mesh.h">
+      <Filter>Fichiers d%27en-tête\renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="include\renderer\Renderer.h">
+      <Filter>Fichiers d%27en-tête\renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="include\renderer\Window.h">
+      <Filter>Fichiers d%27en-tête\renderer</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

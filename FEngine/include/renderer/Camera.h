@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Component.h"
+#include "editor/Component.h"
 
 #include <glm/glm.hpp>
 

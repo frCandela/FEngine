@@ -3,9 +3,8 @@
 #include "vulkan/Device.h"
 #include "vulkan/Buffer.hpp"
 #include "vulkan/Shader.h"
-#include "vulkan/Vertex.h"
-#include "vulkan/Mesh.h"
 
+#include "Mesh.h"
 #include "imgui/imgui.h"
 
 // Render pipeline and depencencies for drawing 3D debug information (lines, points, sphere, etc.)
@@ -20,10 +19,13 @@ public:
 	void CreateGraphicsPipeline(VkRenderPass renderPass, VkExtent2D extent2D);
 
 	// Binds the pipeline
-	void Bind(VkCommandBuffer commandBuffer);
+	void BindPipeline(VkCommandBuffer commandBuffer);
+
+	// Binds the pipeline descriptors
+	void BindDescriptors(VkCommandBuffer commandBuffer);
 
 	// Updates the projection/view matrices uniform
-	void UpdateUniforms(glm::mat4 projection, glm::mat4 view);
+	void UpdateUniforms(glm::mat4 projectionMat, glm::mat4 viewMat);
 
 	// Render Imgui collapsable header for the DebugPipeline parameters
 	void RenderGui();

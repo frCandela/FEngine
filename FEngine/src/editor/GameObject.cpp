@@ -1,4 +1,4 @@
-#include "GameObject.h"
+#include "editor/GameObject.h"
 
 bool GameObject::DeleteComponent(Component* component)
 {

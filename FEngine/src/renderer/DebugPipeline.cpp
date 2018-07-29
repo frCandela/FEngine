@@ -1,4 +1,4 @@
-#include "DebugPipeline.h"
+#include "renderer/DebugPipeline.h"
 
 DebugPipeline::DebugPipeline(vk::Device& rDevice) :
 	 m_rDevice( rDevice )
@@ -25,10 +25,9 @@ DebugPipeline::~DebugPipeline()
 
 void DebugPipeline::CreateGraphicsPipeline(VkRenderPass renderPass, VkExtent2D extent2D)
 {
+	// Destroy before create
 	vkDestroyPipeline(m_rDevice.device, m_graphicsPipeline, nullptr);
 	vkDestroyPipelineLayout(m_rDevice.device, m_pipelineLayout, nullptr);
-	m_graphicsPipeline = VK_NULL_HANDLE;
-	m_pipelineLayout = VK_NULL_HANDLE;
 
 	// Link vertex shader
 	VkPipelineShaderStageCreateInfo vertShaderStageInfo = {};
@@ -178,18 +177,23 @@ void DebugPipeline::CreateGraphicsPipeline(VkRenderPass renderPass, VkExtent2D e
 		throw std::runtime_error("failed to create graphics pipeline!");
 }
 
-void DebugPipeline::Bind( VkCommandBuffer commandBuffer )
+void DebugPipeline::BindPipeline( VkCommandBuffer commandBuffer )
 {
 	vkCmdBindPipeline(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, m_graphicsPipeline);
+}
+
+// Binds the pipeline descriptors
+void DebugPipeline::BindDescriptors(VkCommandBuffer commandBuffer)
+{
 	vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, m_pipelineLayout, 0, 1, &m_descriptorSet, 0, NULL);
 	vkCmdSetLineWidth(commandBuffer, m_lineWidth);
 }
 
-void DebugPipeline::UpdateUniforms(glm::mat4 projection, glm::mat4 view)
+void DebugPipeline::UpdateUniforms(glm::mat4 projectionMat, glm::mat4 viewMat)
 {
 	// Fixed ubo with projection and view matrices
-	projView.projection = projection;
-	projView.view = view;
+	projView.projection = projectionMat;
+	projView.view = viewMat;
 
 	memcpy(m_projViewBuffer->mappedData, &projView, sizeof(projView));
 }

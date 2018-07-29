@@ -10,21 +10,19 @@
 
 #include "Window.h"
 #include "DebugPipeline.h"
+#include "ForwardPipeline.h"
+#include "Mesh.h"
+#include "ImguiManager.h"
+#include "Camera.h"
 
-#include "vulkan/Vertex.h"
 #include "vulkan/SwapChain.h"
-#include "vulkan/Sampler.h"
 #include "vulkan/Instance.h"
-#include "vulkan/Mesh.h"
+
 #include "vulkan/Shader.h"
 #include "vulkan/Texture.h"
 #include "vulkan/DepthImage.h"	
-#include "vulkan/Descriptors.h"
 #include "vulkan/CommandPool.h"
 #include "vulkan/CommandBuffer.h"
-
-#include "ImguiManager.h"
-#include "Camera.h"
 
 // Main class for rendering objects using Vulkan
 class Renderer
@@ -43,21 +41,14 @@ public:
 	void RenderGUI();
 
 private:
-
 	// Setup the command buffers for drawing operations
 	void CreateCommandBuffers();
 
 	// Recreates the swap chain (necessary when the window is resized)
 	void RecreateSwapChain();
 
-	// Creates the graphics pipeline
-	void CreateGraphicsPipeline1();
-
 	// Creates the render pass (describes the differents subpasses)
 	void CreateRenderPass();
-
-	// Create the descriptor pool
-	void CreateDescriptorPool();
 
 	// Creates the sync objects (fences and semaphores)
 	void CreateSyncObjects();
@@ -71,28 +62,20 @@ private:
 
 	Camera* m_pCamera;
 	DebugPipeline* m_pDebugPipeline;
+	ForwardPipeline* m_pForwardPipeline;
 	Window& m_window;
 	ImguiManager * imGui = nullptr;
 
 	vk::Texture* texture;
-	vk::Sampler* textureSampler;
-
-	vk::Descriptors* descriptors;
+	vk::Sampler* textureSampler;	
 
 	vk::CommandPool* commandPool;
 	vk::CommandBuffer* commandBuffers;
 	vk::Instance* instance;
 	vk::Device* device;
 	vk::SwapChain* swapChain;
-	
-	vk::Shader* vertShader;
-	vk::Shader* fragShader;
-
-	VkPipeline graphicsPipeline1;
-	VkPipelineLayout pipelineLayout1;
 
 	VkRenderPass renderPass;
-	VkDescriptorPool descriptorPool;
 
 	std::vector<vk::Mesh*> buffers;
 	std::vector<DebugPipeline::Vertex> verticesDebug;

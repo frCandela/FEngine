@@ -1,7 +1,7 @@
 #include "FEngine.h"
 
-#include "Camera.h"
-#include "GameObject.h"
+#include "renderer/Camera.h"
+#include "editor/GameObject.h"
 #include "util/Time.h"
 
 FEngine::FEngine()

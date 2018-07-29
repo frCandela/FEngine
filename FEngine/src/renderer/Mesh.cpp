@@ -1,4 +1,4 @@
-#include "vulkan/Mesh.h"
+#include "renderer/Mesh.h"
 
 #include "vulkan/CommandBuffer.h"
 
@@ -7,7 +7,6 @@
 
 namespace vk
 {
-
 	Mesh::Mesh(Device& device) :
 		m_device(device)
 		,vertexBuffer(device)
@@ -43,14 +42,14 @@ namespace vk
 		if (!tinyobj::LoadObj(&attrib, &shapes, &materials, &err, path.c_str()))
 			throw std::runtime_error(err);
 
-		std::unordered_map<Vertex, uint32_t> uniqueVertices = {};
+		std::unordered_map<ForwardPipeline::Vertex, uint32_t> uniqueVertices = {};
 
 		//combine all of the faces in the file into a single model
 		for (const auto& shape : shapes)
 		{
 			for (const auto& index : shape.mesh.indices)
 			{
-				Vertex vertex = {};
+				ForwardPipeline::Vertex vertex = {};
 
 				vertex.pos =
 				{
