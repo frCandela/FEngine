@@ -6,29 +6,32 @@
 namespace vk
 {
 
-	Device::Device(VkInstance& instance, Window & window) :
-		m_instance(instance)
+	Device::Device(VkInstance instance, Window & window)
 	{
 		window.CreateWindowSurface(instance, &surface);
-		pickPhysicalDevice();
-		createLogicalDevice();
+		PickPhysicalDevice(instance);
+		CreateLogicalDevice();
 	}
 
-	// Look for and select a graphics card in the system
-	void Device::pickPhysicalDevice()
+	Device::~Device()
+	{
+		vkDestroyDevice(device, nullptr);
+	}
+
+	void Device::PickPhysicalDevice(VkInstance instance)
 	{
 		// Get devices
 		uint32_t deviceCount = 0;
-		vkEnumeratePhysicalDevices(m_instance, &deviceCount, nullptr);
+		vkEnumeratePhysicalDevices(instance, &deviceCount, nullptr);
 		if (deviceCount == 0)
 			throw std::runtime_error("failed to find GPUs with Vulkan support!");
 
 		std::vector<VkPhysicalDevice> devices(deviceCount);
-		vkEnumeratePhysicalDevices(m_instance, &deviceCount, devices.data());
+		vkEnumeratePhysicalDevices(instance, &deviceCount, devices.data());
 
 		// Pick the first suitable device
 		for (const auto& device : devices)
-			if (isDeviceSuitable(device))
+			if (IsDeviceSuitable(device))
 			{
 				physicalDevice = device;
 				vkGetPhysicalDeviceProperties(device, &properties);
@@ -39,15 +42,14 @@ namespace vk
 			throw std::runtime_error("failed to find a suitable GPU!");
 	}
 
-	// The logical deviceis the interface with the physical device
-	void Device::createLogicalDevice()
+	void Device::CreateLogicalDevice()
 	{
 		// Get the queue families indices
-		QueueFamilyIndices indices = findQueueFamilies(physicalDevice);
+		queueFamilyIndices = FindQueueFamilies(physicalDevice);
 
 		// Creates the queues
 		std::vector<VkDeviceQueueCreateInfo> queueCreateInfos;
-		std::set<int> uniqueQueueFamilies = { indices.graphicsFamily, indices.presentFamily };//Prevent from creating the same queue twice
+		std::set<int> uniqueQueueFamilies = { queueFamilyIndices.graphicsFamily, queueFamilyIndices.presentFamily };//Prevent from creating the same queue twice
 
 		float queuePriority = 1.0f;
 		for (int queueFamily : uniqueQueueFamilies)
@@ -85,12 +87,11 @@ namespace vk
 			throw std::runtime_error("failed to create logical device!");
 
 		// Retrieve the queue handle:
-		vkGetDeviceQueue(device, indices.graphicsFamily, 0, &graphicsQueue);
-		vkGetDeviceQueue(device, indices.presentFamily, 0, &presentQueue);
+		vkGetDeviceQueue(device, queueFamilyIndices.graphicsFamily, 0, &graphicsQueue);
+		vkGetDeviceQueue(device, queueFamilyIndices.presentFamily, 0, &presentQueue);
 	}
 
-	// Returns true if the physical device is suitable for the application
-	bool Device::isDeviceSuitable(VkPhysicalDevice device)
+	bool Device::IsDeviceSuitable(VkPhysicalDevice device)
 	{
 		// Get device properties and features
 		VkPhysicalDeviceProperties deviceProperties;
@@ -99,14 +100,14 @@ namespace vk
 		vkGetPhysicalDeviceFeatures(device, &deviceFeatures);
 
 		// Retreive queue families
-		QueueFamilyIndices indices = findQueueFamilies(device);
-		bool extensionsSupported = checkDeviceExtensionSupport(device);
+		QueueFamilyIndices indices = FindQueueFamilies(device);
+		bool extensionsSupported = CheckDeviceExtensionSupport(device);
 
 		// Verify that swap chain support is adequate
 		bool swapChainAdequate = false;
 		if (extensionsSupported)
 		{
-			swapChainSupportDetails = QuerySwapChainSupport(device, surface);
+			QuerySwapChainSupport(device, surface);
 			swapChainAdequate = !swapChainSupportDetails.formats.empty() && !swapChainSupportDetails.presentModes.empty();
 		}
 
@@ -118,8 +119,7 @@ namespace vk
 			&& deviceFeatures.samplerAnisotropy;
 	}
 
-	// Check if this extension is supported on the GPU
-	bool Device::checkDeviceExtensionSupport(VkPhysicalDevice device)
+	bool Device::CheckDeviceExtensionSupport(VkPhysicalDevice device)
 	{
 		//get extensions available on the device
 		uint32_t extensionCount;
@@ -136,8 +136,7 @@ namespace vk
 		return requiredExtensions.empty();
 	}
 
-	// Returns the swap chain details of a physical device (surface formats and presentation modes)
-	SwapChainSupportDetails Device::QuerySwapChainSupport(VkPhysicalDevice device, VkSurfaceKHR& surface)
+	void Device::QuerySwapChainSupport(VkPhysicalDevice device, VkSurfaceKHR& surface)
 	{
 		SwapChainSupportDetails details;
 		vkGetPhysicalDeviceSurfaceCapabilitiesKHR(device, surface, &details.capabilities);
@@ -162,11 +161,10 @@ namespace vk
 			vkGetPhysicalDeviceSurfacePresentModesKHR(device, surface, &presentModeCount, details.presentModes.data());
 		}
 
-		return details;
+		swapChainSupportDetails = details;
 	}
 
-	// Get the queue families needed 
-	QueueFamilyIndices Device::findQueueFamilies(VkPhysicalDevice device)
+	Device::QueueFamilyIndices Device::FindQueueFamilies(VkPhysicalDevice device)
 	{
 		QueueFamilyIndices indices;
 
@@ -200,8 +198,7 @@ namespace vk
 		return indices;
 	}
 
-	// Find the right type of memory to use for our vertex buffer
-	uint32_t Device::findMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags properties)
+	uint32_t Device::FindMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags properties)
 	{
 		// query info about the available types of memory
 		VkPhysicalDeviceMemoryProperties memProperties;

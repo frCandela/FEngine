@@ -27,15 +27,15 @@ namespace vk
 
 	void SwapChain::CreateSwapChain(Window& window)
 	{
-		SwapChainSupportDetails swapChainSupport = m_device.QuerySwapChainSupport(m_device.physicalDevice, m_device.surface);
+		m_device.QuerySwapChainSupport(m_device.physicalDevice, m_device.surface);
 
-		VkSurfaceFormatKHR surfaceFormat = ChooseSwapSurfaceFormat(swapChainSupport.formats);
-		VkPresentModeKHR presentMode = ChooseSwapPresentMode(swapChainSupport.presentModes);
-		VkExtent2D extent = ChooseSwapExtent(swapChainSupport.capabilities, window);
+		VkSurfaceFormatKHR surfaceFormat = ChooseSwapSurfaceFormat(m_device.swapChainSupportDetails.formats);
+		VkPresentModeKHR presentMode = ChooseSwapPresentMode(m_device.swapChainSupportDetails.presentModes);
+		VkExtent2D extent = ChooseSwapExtent(m_device.swapChainSupportDetails.capabilities, window);
 
-		uint32_t imageCount = swapChainSupport.capabilities.minImageCount + 1; //one more frame to implement triple buffering
-		if (swapChainSupport.capabilities.maxImageCount > 0 && imageCount > swapChainSupport.capabilities.maxImageCount)
-			imageCount = swapChainSupport.capabilities.maxImageCount;
+		uint32_t imageCount = m_device.swapChainSupportDetails.capabilities.minImageCount + 1; //one more frame to implement triple buffering
+		if (m_device.swapChainSupportDetails.capabilities.maxImageCount > 0 && imageCount > m_device.swapChainSupportDetails.capabilities.maxImageCount)
+			imageCount = m_device.swapChainSupportDetails.capabilities.maxImageCount;
 
 		//create swap chain info structure
 		VkSwapchainCreateInfoKHR createInfo = {};
@@ -48,9 +48,8 @@ namespace vk
 		createInfo.imageArrayLayers = 1;// amount of layers each image consists of
 		createInfo.imageUsage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT;
 
-		QueueFamilyIndices indices = m_device.findQueueFamilies(m_device.physicalDevice);
-		uint32_t queueFamilyIndices[] = { (uint32_t)indices.graphicsFamily, (uint32_t)indices.presentFamily };
-		if (indices.graphicsFamily != indices.presentFamily)
+		uint32_t queueFamilyIndices[] = { (uint32_t)m_device.queueFamilyIndices.graphicsFamily, (uint32_t)m_device.queueFamilyIndices.presentFamily };
+		if (m_device.queueFamilyIndices.graphicsFamily != m_device.queueFamilyIndices.presentFamily)
 		{
 			createInfo.imageSharingMode = VK_SHARING_MODE_CONCURRENT;
 			createInfo.queueFamilyIndexCount = 2;
@@ -63,7 +62,7 @@ namespace vk
 			createInfo.pQueueFamilyIndices = nullptr; // Optional
 		}
 
-		createInfo.preTransform = swapChainSupport.capabilities.currentTransform;
+		createInfo.preTransform = m_device.swapChainSupportDetails.capabilities.currentTransform;
 		createInfo.compositeAlpha = VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR;
 		createInfo.presentMode = presentMode;
 		createInfo.clipped = VK_TRUE;

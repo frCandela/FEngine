@@ -61,7 +61,7 @@ void DebugPipeline::CreateGraphicsPipeline(VkRenderPass renderPass, VkExtent2D e
 	// Input assembly
 	VkPipelineInputAssemblyStateCreateInfo inputAssembly = {};
 	inputAssembly.sType = VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO;
-	inputAssembly.topology = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST;
+	inputAssembly.topology = VK_PRIMITIVE_TOPOLOGY_LINE_LIST;
 	inputAssembly.primitiveRestartEnable = VK_FALSE;
 
 	// Viewport
@@ -123,7 +123,7 @@ void DebugPipeline::CreateGraphicsPipeline(VkRenderPass renderPass, VkExtent2D e
 	colorBlendAttachment.dstAlphaBlendFactor = VK_BLEND_FACTOR_ZERO; // Optional
 	colorBlendAttachment.alphaBlendOp = VK_BLEND_OP_ADD; // Optional
 
-														 // Color blending (contains the global color blending settings)
+	// Color blending (contains the global color blending settings)
 	VkPipelineColorBlendStateCreateInfo colorBlending = {};
 	colorBlending.sType = VK_STRUCTURE_TYPE_PIPELINE_COLOR_BLEND_STATE_CREATE_INFO;
 	colorBlending.logicOpEnable = VK_FALSE;
@@ -135,18 +135,17 @@ void DebugPipeline::CreateGraphicsPipeline(VkRenderPass renderPass, VkExtent2D e
 	colorBlending.blendConstants[2] = 0.0f; // Optional
 	colorBlending.blendConstants[3] = 0.0f; // Optional
 
-											// Dynamic States (states that can be changed without recreating the pipeline)
-	VkDynamicState dynamicStates[] =
+	// Dynamic States (states that can be changed without recreating the pipeline)
+	std::vector<VkDynamicState> dynamicStates =
 	{
-		VK_DYNAMIC_STATE_VIEWPORT,
 		VK_DYNAMIC_STATE_LINE_WIDTH
 	};
 
 	// Dynamic States struct
 	VkPipelineDynamicStateCreateInfo dynamicState = {};
 	dynamicState.sType = VK_STRUCTURE_TYPE_PIPELINE_DYNAMIC_STATE_CREATE_INFO;
-	dynamicState.dynamicStateCount = 2;
-	dynamicState.pDynamicStates = dynamicStates;
+	dynamicState.dynamicStateCount = static_cast<uint32_t>(dynamicStates.size());
+	dynamicState.pDynamicStates = dynamicStates.data();
 
 	//Pipeline layout for setting up uniforms in shaders
 	VkPipelineLayoutCreateInfo pipelineLayoutInfo = {};
@@ -169,6 +168,7 @@ void DebugPipeline::CreateGraphicsPipeline(VkRenderPass renderPass, VkExtent2D e
 	pipelineInfo.pMultisampleState = &multisampling;
 	pipelineInfo.pDepthStencilState = &depthStencil;
 	pipelineInfo.pColorBlendState = &colorBlending;
+	pipelineInfo.pDynamicState = &dynamicState;
 	pipelineInfo.layout = m_pipelineLayout;
 	pipelineInfo.renderPass = renderPass;
 	pipelineInfo.subpass = 0;
@@ -182,6 +182,7 @@ void DebugPipeline::Bind( VkCommandBuffer commandBuffer )
 {
 	vkCmdBindPipeline(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, m_graphicsPipeline);
 	vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, m_pipelineLayout, 0, 1, &m_descriptorSet, 0, NULL);
+	vkCmdSetLineWidth(commandBuffer, m_lineWidth);
 }
 
 void DebugPipeline::UpdateUniforms(glm::mat4 projection, glm::mat4 view)
@@ -264,3 +265,11 @@ void DebugPipeline::CreateDescriptors()
 	vkUpdateDescriptorSets(m_rDevice.device, static_cast<uint32_t>(writeDescriptorSets.size()), writeDescriptorSets.data(), 0, NULL);
 }
 
+void DebugPipeline::RenderGui()
+{
+	float* lineWidthRange =  m_rDevice.properties.limits.lineWidthRange;	// lineWidthRange[2] is the range [minimum,maximum] of supported widths for lines
+	float granularity = m_rDevice.properties.limits.lineWidthGranularity;	// granularity of supported point sizes
+
+	if (ImGui::CollapsingHeader("Debug Pipeline"))	
+		ImGui::DragFloat("LineWidth", &m_lineWidth, granularity, lineWidthRange[0], lineWidthRange[1]);
+}

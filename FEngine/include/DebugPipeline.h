@@ -6,7 +6,7 @@
 #include "vulkan/Vertex.h"
 #include "vulkan/Mesh.h"
 
-#include "Camera.h"
+#include "imgui/imgui.h"
 
 // Render pipeline and depencencies for drawing 3D debug information (lines, points, sphere, etc.)
 class DebugPipeline
@@ -24,6 +24,9 @@ public:
 
 	// Updates the projection/view matrices uniform
 	void UpdateUniforms(glm::mat4 projection, glm::mat4 view);
+
+	// Render Imgui collapsable header for the DebugPipeline parameters
+	void RenderGui();
 
 private:
 
@@ -49,6 +52,10 @@ private:
 
 	struct { glm::mat4 projection; glm::mat4 view; } projView;
 
+	// Dynamic states
+	float m_lineWidth = 1.f;
+
+
 public:
 	struct Vertex
 	{
@@ -60,7 +67,7 @@ public:
 		{
 			VkVertexInputBindingDescription bindingDescription = {};
 			bindingDescription.binding = 0;								// Index of the binding in the array of bindings
-			bindingDescription.stride = sizeof(DebugPipeline::Vertex);					// Number of bytes from one entry to the next
+			bindingDescription.stride = sizeof(DebugPipeline::Vertex);	// Number of bytes from one entry to the next
 			bindingDescription.inputRate = VK_VERTEX_INPUT_RATE_VERTEX;
 			return bindingDescription;
 		}

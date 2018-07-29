@@ -3,13 +3,12 @@
 namespace vk
 {
 
-	CommandPool::CommandPool(Device& device) : m_rDevice(device)
+	CommandPool::CommandPool(Device& device) : 
+		m_rDevice(device)
 	{
-		QueueFamilyIndices queueFamilyIndices = m_rDevice.findQueueFamilies(m_rDevice.physicalDevice);
-
 		VkCommandPoolCreateInfo poolInfo = {};
 		poolInfo.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
-		poolInfo.queueFamilyIndex = queueFamilyIndices.graphicsFamily;
+		poolInfo.queueFamilyIndex = m_rDevice.queueFamilyIndices.graphicsFamily;
 		poolInfo.flags = VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT & VK_COMMAND_POOL_CREATE_TRANSIENT_BIT; // Optional		
 
 		if (vkCreateCommandPool(m_rDevice.device, &poolInfo, nullptr, &commandPool) != VK_SUCCESS)

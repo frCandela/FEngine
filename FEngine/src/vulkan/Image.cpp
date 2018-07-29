@@ -40,7 +40,7 @@ namespace vk
 		VkMemoryAllocateInfo allocInfo = {};
 		allocInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
 		allocInfo.allocationSize = memRequirements.size;
-		allocInfo.memoryTypeIndex = m_device.findMemoryType(memRequirements.memoryTypeBits, properties);
+		allocInfo.memoryTypeIndex = m_device.FindMemoryType(memRequirements.memoryTypeBits, properties);
 
 		if (vkAllocateMemory(m_device.device, &allocInfo, nullptr, &deviceMemory) != VK_SUCCESS)
 			throw std::runtime_error("failed to allocate image memory!");

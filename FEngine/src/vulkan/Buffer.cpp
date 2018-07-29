@@ -65,7 +65,7 @@ namespace vk
 		VkMemoryAllocateInfo memAlloc = {};
 		memAlloc.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
 		memAlloc.allocationSize = memRequirements.size;
-		memAlloc.memoryTypeIndex = m_device.findMemoryType(memRequirements.memoryTypeBits, memoryPropertyFlags);			// Find a memory type index that fits the properties of the buffer
+		memAlloc.memoryTypeIndex = m_device.FindMemoryType(memRequirements.memoryTypeBits, memoryPropertyFlags);			// Find a memory type index that fits the properties of the buffer
 
 		VK_CHECK_RESULT(vkAllocateMemory(m_device.device, &memAlloc, nullptr, &memory));
 

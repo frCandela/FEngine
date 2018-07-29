@@ -34,7 +34,5 @@ namespace vk
 			const VkAllocationCallbacks* pAllocator,
 			VkDebugReportCallbackEXT* pCallback
 		);
-
-
 	};
 }

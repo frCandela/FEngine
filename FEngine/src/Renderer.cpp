@@ -148,11 +148,10 @@ void Renderer::CreateCommandBuffers()
 
 			//Bind debug pipeline
 			m_pDebugPipeline->Bind(commandBuffers->commandBuffers[i]);
-			
 			VkBuffer vertexBuffers[] = { debugBuffer->m_buffer };
 			VkDeviceSize offsets[] = { 0 };
 			vkCmdBindVertexBuffers(commandBuffers->commandBuffers[i], 0, 1, vertexBuffers, offsets);
-			vkCmdDraw(commandBuffers->commandBuffers[i], 3, 1, 0, 0);
+			vkCmdDraw(commandBuffers->commandBuffers[i], static_cast<uint32_t>(verticesDebug.size()), 1, 0, 0);
 
 		vkCmdEndRenderPass(commandBuffers->commandBuffers[i]);
 
@@ -248,6 +247,13 @@ void Renderer::DrawFrame()
 
 void Renderer::RecreateSwapChain()
 {
+	//Window minimized
+	int width = 0, height = 0;
+	while (width == 0 || height == 0) {
+		glfwGetFramebufferSize(m_window.GetGLFWwindow(), &width, &height);
+		glfwWaitEvents();
+	}
+
 	vkDeviceWaitIdle(device->device);
 
 	//Cleanup	
@@ -606,11 +612,16 @@ void Renderer::CreateTestMesh()
 void Renderer::CreateDebugBuffer()
 {
 	glm::vec3 color(1, 0, 0);
-	std::vector<DebugPipeline::Vertex> verticesDebug =
+	verticesDebug =
 	{
-		{ { 0,0,0 },	color }
+		 { { 0,0,0 },	color }
+		,{ { 0,0,2 },	color }
+
 		,{ { 0,0,2 },	color }
 		,{ { 0,2,0 },	color }
+
+		,{ { 0,2,0 },	color }
+		,{ { 0,0,0 },	color }
 	};
 
 	VkDeviceSize bufferSize = sizeof(verticesDebug[0]) * verticesDebug.size();
@@ -651,7 +662,11 @@ void Renderer::RenderGUI()
 	// Max Framerate
 	framerate.RenderGui();
 
+	m_pDebugPipeline->RenderGui();
+
 	ImGui::End();
+
+
 }
 
 glm::vec2 Renderer::GetSize() const

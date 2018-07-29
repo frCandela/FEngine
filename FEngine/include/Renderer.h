@@ -95,7 +95,7 @@ private:
 	VkDescriptorPool descriptorPool;
 
 	std::vector<vk::Mesh*> buffers;
-
+	std::vector<DebugPipeline::Vertex> verticesDebug;
 	vk::Buffer* debugBuffer;
 
 	std::vector<VkSemaphore> imageAvailableSemaphores;//Specifies that an image has been acquired and is ready for rendering
