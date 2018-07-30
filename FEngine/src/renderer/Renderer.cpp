@@ -75,7 +75,7 @@ Renderer::~Renderer()
 	delete(commandBuffers);
 	delete(commandPool);
 
-	delete (device);
+	delete(device);
 	delete(instance);
 }
 

@@ -59,7 +59,6 @@ private:
 	// Creates test vertices data
 	void CreateTestMesh();
 
-
 	const uint32_t MAX_FRAMES_IN_FLIGHT = 2;
 	size_t currentFrame = 0;
 
@@ -71,14 +70,13 @@ private:
 	RenderDebug * renderDebug = nullptr;
 
 	vk::Texture* texture;
-	vk::Sampler* textureSampler;	
+	vk::Sampler* textureSampler;
 
-	vk::CommandPool* commandPool;
-	vk::CommandBuffer* commandBuffers;
-	vk::Instance* instance;
 	vk::Device* device;
+	vk::Instance* instance;
+	vk::CommandPool* commandPool;
+	vk::CommandBuffer* commandBuffers;	
 	vk::SwapChain* swapChain;
-
 	VkRenderPass renderPass;
 
 	std::vector<vk::Mesh*> buffers;
