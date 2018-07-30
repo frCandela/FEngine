@@ -12,12 +12,13 @@
 #include "DebugPipeline.h"
 #include "ForwardPipeline.h"
 #include "Mesh.h"
+#include "DebugRender.h"
 #include "ImguiManager.h"
 #include "Camera.h"
 
+
 #include "vulkan/SwapChain.h"
 #include "vulkan/Instance.h"
-
 #include "vulkan/Shader.h"
 #include "vulkan/Texture.h"
 #include "vulkan/DepthImage.h"	
@@ -40,6 +41,8 @@ public:
 	// Render Imgui parameters window
 	void RenderGUI();
 
+	inline void DebugLine(glm::vec3 start, glm::vec3 end, glm::vec4 color = glm::vec4(1.f, 0.f, 0.f, 1.f)) { renderDebug->DebugLine(start, end, color); }
+
 private:
 	// Setup the command buffers for drawing operations
 	void CreateCommandBuffers();
@@ -55,7 +58,7 @@ private:
 
 	// Creates test vertices data
 	void CreateTestMesh();
-	void CreateDebugBuffer();
+
 
 	const uint32_t MAX_FRAMES_IN_FLIGHT = 2;
 	size_t currentFrame = 0;
@@ -65,6 +68,7 @@ private:
 	ForwardPipeline* m_pForwardPipeline;
 	Window& m_window;
 	ImguiManager * imGui = nullptr;
+	RenderDebug * renderDebug = nullptr;
 
 	vk::Texture* texture;
 	vk::Sampler* textureSampler;	
@@ -78,8 +82,6 @@ private:
 	VkRenderPass renderPass;
 
 	std::vector<vk::Mesh*> buffers;
-	std::vector<DebugPipeline::Vertex> verticesDebug;
-	vk::Buffer* debugBuffer;
 
 	std::vector<VkSemaphore> imageAvailableSemaphores;//Specifies that an image has been acquired and is ready for rendering
 	std::vector<VkSemaphore> renderFinishedSemaphores;//Specifies that rendering has finished and presentation can happen

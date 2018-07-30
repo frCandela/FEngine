@@ -18,10 +18,8 @@ void FEngine::Run()
 	renderer = new Renderer(window, *camera);	
 
 	float lastTime = Time::ElapsedSinceStartup();
-	float delta = 1.f / 144.f;
 
 	ImGuiIO& io = ImGui::GetIO();
-	io.DeltaTime = delta;
 
 	while ( window.WindowOpen() )
 	{
@@ -35,15 +33,16 @@ void FEngine::Run()
 			Input::Update();
 			glm::vec2 size = renderer->GetSize();
 			camera->aspectRatio = size.x / size.y;
-			io.DisplaySize = ImVec2(size.x, size.y);
-			
+			io.DisplaySize = ImVec2(size.x, size.y);		
+
+			renderer->DebugLine({ 0,0,0 }, { 0,0,2 });
+
 			ImGui::NewFrame();	
 			RenderGUI();
 			
 			renderer->DrawFrame();
 		}
 	}
-
 	delete(renderer);
 }
 

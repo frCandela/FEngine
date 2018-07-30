@@ -13,18 +13,23 @@ namespace vk
 
 	CommandBuffer::~CommandBuffer()
 	{
-		vkFreeCommandBuffers(m_device.device, m_rCommandPool.commandPool, static_cast<uint32_t>(commandBuffers.size()), commandBuffers.data());
+		cleanup();
 	}
 
 	void CommandBuffer::cleanup()
 	{
-		vkFreeCommandBuffers(m_device.device, m_rCommandPool.commandPool, static_cast<uint32_t>(commandBuffers.size()), commandBuffers.data());
+		if (commandBuffers.size() > 0)
+		{
+			vkFreeCommandBuffers(m_device.device, m_rCommandPool.commandPool, static_cast<uint32_t>(commandBuffers.size()), commandBuffers.data());
+			commandBuffers.clear();
+		}			
 	}
-
-
 
 	void CommandBuffer::CreateBuffer( size_t size)
 	{
+		assert(size > 0);
+		assert(commandBuffers.size() == 0);
+
 		commandBuffers.resize(size);
 
 		VkCommandBufferAllocateInfo allocInfo = {};

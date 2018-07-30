@@ -101,6 +101,7 @@
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\renderer\Camera.cpp" />
     <ClCompile Include="src\renderer\DebugPipeline.cpp" />
+    <ClCompile Include="src\renderer\DebugRender.cpp" />
     <ClCompile Include="src\renderer\ForwardPipeline.cpp" />
     <ClCompile Include="src\renderer\ImguiManager.cpp" />
     <ClCompile Include="src\renderer\Mesh.cpp" />
@@ -128,6 +129,7 @@
     <ClInclude Include="include\FEngine.h" />
     <ClInclude Include="include\renderer\Camera.h" />
     <ClInclude Include="include\renderer\DebugPipeline.h" />
+    <ClInclude Include="include\renderer\DebugRender.h" />
     <ClInclude Include="include\renderer\ForwardPipeline.h" />
     <ClInclude Include="include\renderer\ImguiManager.h" />
     <ClInclude Include="include\renderer\Mesh.h" />

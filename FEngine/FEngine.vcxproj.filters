@@ -125,6 +125,9 @@
     <ClCompile Include="src\renderer\Window.cpp">
       <Filter>Fichiers sources\renderer</Filter>
     </ClCompile>
+    <ClCompile Include="src\renderer\DebugRender.cpp">
+      <Filter>Fichiers sources\renderer</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\FEngine.h">
@@ -203,6 +206,9 @@
       <Filter>Fichiers d%27en-tête\renderer</Filter>
     </ClInclude>
     <ClInclude Include="include\renderer\Window.h">
+      <Filter>Fichiers d%27en-tête\renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="include\renderer\DebugRender.h">
       <Filter>Fichiers d%27en-tête\renderer</Filter>
     </ClInclude>
   </ItemGroup>

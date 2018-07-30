@@ -19,7 +19,9 @@ Renderer::Renderer(Window& rWindow, Camera& rCamera) :
 	CreateRenderPass();
 
 	swapChain->CreateFramebuffers(renderPass);
-	
+
+	renderDebug = new RenderDebug(*device);
+
 	imGui = new ImguiManager(device, commandPool, GetSize(), m_window.GetGLFWwindow(), renderPass);
 
 	texture = new vk::Texture(*device, *commandPool);
@@ -37,10 +39,7 @@ Renderer::Renderer(Window& rWindow, Camera& rCamera) :
 	m_pDebugPipeline->CreateGraphicsPipeline(renderPass, swapChain->swapChainExtent);
 	m_pDebugPipeline->UpdateUniforms(m_pCamera->GetProj(), m_pCamera->GetView());
 
-	CreateTestMesh();
-	CreateDebugBuffer();
-	
-	
+	CreateTestMesh();	
 
 	CreateCommandBuffers();
 	CreateSyncObjects();
@@ -68,7 +67,7 @@ Renderer::~Renderer()
 	delete(texture);
 	for (vk::Mesh* buffer : buffers)
 		delete(buffer);
-	delete(debugBuffer);
+	delete(renderDebug);
 
 	vkDestroyRenderPass(device->device, renderPass, nullptr);
 
@@ -82,6 +81,7 @@ Renderer::~Renderer()
 
 void Renderer::CreateCommandBuffers()
 {
+	commandBuffers->cleanup();
 	commandBuffers->CreateBuffer(swapChain->swapChainFramebuffers.size());
 
 	imGui->UpdateBuffers();
@@ -89,8 +89,6 @@ void Renderer::CreateCommandBuffers()
 	// Records every command buffer (one per framebuffer)
 	for (size_t i = 0; i < commandBuffers->commandBuffers.size(); i++)
 	{
-		commandBuffers->Begin(i);
-
 		// Configure the render pass
 		VkRenderPassBeginInfo renderPassInfo = {};
 		renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
@@ -107,6 +105,7 @@ void Renderer::CreateCommandBuffers()
 		renderPassInfo.clearValueCount = static_cast<uint32_t>(clearValues.size());
 		renderPassInfo.pClearValues = clearValues.data();
 		
+		commandBuffers->Begin(i);
 		vkCmdBeginRenderPass(commandBuffers->commandBuffers[i], &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
 		
 		m_pForwardPipeline->BindPipeline(commandBuffers->commandBuffers[i]);
@@ -124,22 +123,19 @@ void Renderer::CreateCommandBuffers()
 			vkCmdDrawIndexed(commandBuffers->commandBuffers[i], static_cast<uint32_t>(buffers[j]->indices.size()), 1, 0, 0, 0);
 		}
 
-			// Draw imgui on another pipeline
+		// Draw imgui on another pipeline
 		imGui->DrawFrame(commandBuffers->commandBuffers[i]);
 
 		//Bind debug pipeline
 		m_pDebugPipeline->BindPipeline(commandBuffers->commandBuffers[i]);
 		m_pDebugPipeline->BindDescriptors(commandBuffers->commandBuffers[i]);
-
-		VkBuffer vertexBuffers[] = { debugBuffer->m_buffer };
-		VkDeviceSize offsets[] = { 0 };
-		vkCmdBindVertexBuffers(commandBuffers->commandBuffers[i], 0, 1, vertexBuffers, offsets);
-		vkCmdDraw(commandBuffers->commandBuffers[i], static_cast<uint32_t>(verticesDebug.size()), 1, 0, 0);
+		renderDebug->Draw(commandBuffers->commandBuffers[i]);
 
 		vkCmdEndRenderPass(commandBuffers->commandBuffers[i]);
-
-		commandBuffers->End(i);
+		commandBuffers->End(i);		
 	}
+	renderDebug->Clear();
+	
 }
 
 void Renderer::DrawFrame()
@@ -160,6 +156,7 @@ void Renderer::DrawFrame()
 	
 	vkDeviceWaitIdle(device->device);//zob
 	
+	renderDebug->UpdateDebugBuffer(*commandPool);
 	ImGui::Render();
 	CreateCommandBuffers();
 
@@ -401,40 +398,6 @@ void Renderer::CreateTestMesh()
 
 	sphere->CreateBuffers(*commandPool);
 	buffers.push_back(sphere);
-}
-
-void Renderer::CreateDebugBuffer()
-{
-	glm::vec3 color(1, 0, 0);
-	verticesDebug =
-	{
-		 { { 0,0,0 },	color }
-		,{ { 0,0,2 },	color }
-
-		,{ { 0,0,2 },	color }
-		,{ { 0,2,0 },	color }
-
-		,{ { 0,2,0 },	color }
-		,{ { 0,0,0 },	color }
-	};
-
-	VkDeviceSize bufferSize = sizeof(verticesDebug[0]) * verticesDebug.size();
-
-	// Create a host visible buffer
-	vk::Buffer buf(*device);
-	buf.CreateBuffer(VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, bufferSize);
-
-	// Fills it with data
-	buf.Map(bufferSize);
-	memcpy(buf.mappedData, verticesDebug.data(), (size_t)bufferSize);
-	buf.Unmap();
-
-	// Create a device local buffer
-	debugBuffer = new vk::Buffer(*device);
-	debugBuffer->CreateBuffer(VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, bufferSize);
-
-	// Fills it with the data from the first buffer
-	vk::Mesh::copyBuffer(buf.m_buffer, debugBuffer->m_buffer, bufferSize, *commandPool);
 }
 
 void Renderer::RenderGUI()
