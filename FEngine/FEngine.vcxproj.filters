@@ -1753,6 +1753,9 @@
     <ClInclude Include="include\physics\PhysicsEngine.h">
       <Filter>Fichiers d%27en-tête\physics</Filter>
     </ClInclude>
+    <ClInclude Include="include\editor\Editor.h">
+      <Filter>Fichiers d%27en-tête\editor</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="shaders\shader.frag">
