@@ -2,6 +2,7 @@
 
 #include "renderer/Renderer.h"
 #include "renderer/Window.h"
+#include "physics/PhysicsEngine.h"
 
 class FEngine
 {
@@ -16,4 +17,5 @@ public:
 
 private:
 	Renderer * renderer;
+	PhysicsEngine * physicsEngine;
 };

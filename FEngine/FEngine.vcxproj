@@ -628,6 +628,7 @@
     <ClInclude Include="include\editor\GameObject.h" />
     <ClInclude Include="include\editor\Transform.h" />
     <ClInclude Include="include\FEngine.h" />
+    <ClInclude Include="include\physics\PhysicsEngine.h" />
     <ClInclude Include="include\renderer\Camera.h" />
     <ClInclude Include="include\renderer\DebugPipeline.h" />
     <ClInclude Include="include\renderer\DebugRender.h" />

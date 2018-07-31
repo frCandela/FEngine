@@ -1,16 +1,7 @@
 #include "FEngine.h"
 
-#include "bullet3/btBulletDynamicsCommon.h"
-
 int main()
 {
-	btDefaultCollisionConfiguration * collisionConfiguration = new btDefaultCollisionConfiguration();;
-	btCollisionDispatcher* dispatcher = new btCollisionDispatcher(collisionConfiguration);;
-	btBroadphaseInterface* overlappingPairCache = new btDbvtBroadphase();
-	btSequentialImpulseConstraintSolver* solver = new btSequentialImpulseConstraintSolver;;
-	btDiscreteDynamicsWorld* dynamicsWorld = new btDiscreteDynamicsWorld(dispatcher, overlappingPairCache, solver, collisionConfiguration);
-
-	dynamicsWorld->setGravity(btVector3(0, -20, 0));
 
 	FEngine app;
 
@@ -23,7 +14,7 @@ int main()
 		std::cerr << e.what() << std::endl;
 	}
 
-	int zob;
-	std::cin >> zob;
+	int wait;
+	std::cin >> wait;
 	return EXIT_SUCCESS;
 }

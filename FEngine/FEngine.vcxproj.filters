@@ -75,6 +75,9 @@
     <Filter Include="deps\imgui">
       <UniqueIdentifier>{1a3d14ca-1869-4921-bc6b-553f294bb02c}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Fichiers d%27en-tête\physics">
+      <UniqueIdentifier>{828fda8c-4bb8-4d0e-acf7-93b5ea98e47a}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\main.cpp">
@@ -1746,6 +1749,9 @@
     </ClInclude>
     <ClInclude Include="deps\imgui\imgui.h">
       <Filter>deps\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="include\physics\PhysicsEngine.h">
+      <Filter>Fichiers d%27en-tête\physics</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

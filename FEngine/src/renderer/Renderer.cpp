@@ -30,6 +30,8 @@ Renderer::Renderer(Window& rWindow, Camera& rCamera) :
 	textureSampler = new vk::Sampler(*device);
 	textureSampler->CreateSampler(static_cast<float>(texture->m_mipLevels), 16);
 	
+	VkExtent2D size = m_window.GetExtend2D();
+	m_pCamera->aspectRatio = (float)size.width / (float)size.height;
 	m_pForwardPipeline = new ForwardPipeline(*device, *texture, *textureSampler);
 	m_pForwardPipeline->CreateGraphicsPipeline(renderPass, swapChain->swapChainExtent);
 	m_pForwardPipeline->UpdateUniforms(m_pCamera->GetProj(), m_pCamera->GetView());
@@ -60,21 +62,17 @@ Renderer::~Renderer()
 
 	delete(m_pDebugPipeline);
 	delete(m_pForwardPipeline);
-
 	delete(imGui);	
-
 	delete(textureSampler);
 	delete(texture);
 	for (vk::Mesh* buffer : buffers)
 		delete(buffer);
 	delete(renderDebug);
-
 	vkDestroyRenderPass(device->device, renderPass, nullptr);
 
 	delete(swapChain);
 	delete(commandBuffers);
 	delete(commandPool);
-
 	delete(device);
 	delete(instance);
 }
@@ -109,19 +107,26 @@ void Renderer::CreateCommandBuffers()
 		vkCmdBeginRenderPass(commandBuffers->commandBuffers[i], &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
 		
 		m_pForwardPipeline->BindPipeline(commandBuffers->commandBuffers[i]);
-			//Record Draw calls on all existing buffers
-		for (int j = 0; j < buffers.size(); ++j)
+
+		if (stupidCubes)
 		{
-			VkBuffer * vertexBuffers = &buffers[j]->vertexBuffer.m_buffer;
-			VkDeviceSize offsets[] = { 0 };
-			vkCmdBindVertexBuffers(commandBuffers->commandBuffers[i], 0, 1, vertexBuffers, offsets);
-			vkCmdBindIndexBuffer(commandBuffers->commandBuffers[i], buffers[j]->indexBuffer.m_buffer, 0, VK_INDEX_TYPE_UINT32);
+			//Record Draw calls on all existing buffers
+			for (int j = 0; j < buffers.size(); ++j)
+			{
+				VkBuffer * vertexBuffers = &buffers[j]->vertexBuffer.m_buffer;
+				VkDeviceSize offsets[] = { 0 };
+				vkCmdBindVertexBuffers(commandBuffers->commandBuffers[i], 0, 1, vertexBuffers, offsets);
+				vkCmdBindIndexBuffer(commandBuffers->commandBuffers[i], buffers[j]->indexBuffer.m_buffer, 0, VK_INDEX_TYPE_UINT32);
 
-			// Bind the descriptor set for rendering a mesh using the dynamic offset
-			m_pForwardPipeline->BindDescriptors(commandBuffers->commandBuffers[i], j);
+				// Bind the descriptor set for rendering a mesh using the dynamic offset
+				m_pForwardPipeline->BindDescriptors(commandBuffers->commandBuffers[i], j);
 
-			vkCmdDrawIndexed(commandBuffers->commandBuffers[i], static_cast<uint32_t>(buffers[j]->indices.size()), 1, 0, 0, 0);
+				vkCmdDrawIndexed(commandBuffers->commandBuffers[i], static_cast<uint32_t>(buffers[j]->indices.size()), 1, 0, 0, 0);
+			}
 		}
+		
+
+
 
 		// Draw imgui on another pipeline
 		imGui->DrawFrame(commandBuffers->commandBuffers[i]);
@@ -256,7 +261,6 @@ void Renderer::RecreateSwapChain()
 void Renderer::CreateSyncObjects()
 {
 	//Fences perform CPU-GPU synchronization to prevent more than MAX_FRAMES_IN_FLIGHT from being submitted
-
 	imageAvailableSemaphores.resize(MAX_FRAMES_IN_FLIGHT);
 	renderFinishedSemaphores.resize(MAX_FRAMES_IN_FLIGHT);
 	inFlightFences.resize(MAX_FRAMES_IN_FLIGHT);
@@ -412,10 +416,10 @@ void Renderer::RenderGUI()
 	ImGui::TextColored(ImVec4(200.0f / 255.f, 120.0f / 255.f, 120.0f / 255.f, 1.0f), "%.3f ", 1000.0f / io.Framerate);
 	ImGui::SameLine();
 	ImGui::Text("ms / frame(%.1f FPS)", io.Framerate);
-
 	//Window Size
 	ImGui::BulletText("Window Size : w%.f  h%.f ", io.DisplaySize.x, io.DisplaySize.y);
 
+	ImGui::Checkbox("Stupid cubes", &stupidCubes);
 	// Max Framerate
 	framerate.RenderGui();
 
@@ -429,4 +433,15 @@ void Renderer::RenderGUI()
 glm::vec2 Renderer::GetSize() const
 {
 	return glm::vec2((float)swapChain->swapChainExtent.width, (float)swapChain->swapChainExtent.height);
+}
+
+void Renderer::DebugPoint(glm::vec3 pos, glm::vec4 color, float size)
+{
+	using glm::vec3;
+
+	float s = size / 2.f;
+
+	DebugLine(pos - vec3(s, 0, 0), pos + vec3(s, 0, 0), color);
+	DebugLine(pos - vec3(0, s, 0), pos + vec3(0, s, 0), color);
+	DebugLine(pos - vec3(0, 0, s), pos + vec3(0, 0, s), color);
 }
