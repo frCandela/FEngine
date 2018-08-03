@@ -34,12 +34,12 @@ Renderer::Renderer(Window& rWindow, Camera& rCamera) :
 	m_pCamera->aspectRatio = (float)size.width / (float)size.height;
 	m_pForwardPipeline = new ForwardPipeline(*device, *texture, *textureSampler);
 	m_pForwardPipeline->CreateGraphicsPipeline(renderPass, swapChain->swapChainExtent);
-	m_pForwardPipeline->UpdateUniforms(m_pCamera->GetProj(), m_pCamera->GetView());
+	m_pForwardPipeline->UpdateUniforms(m_pCamera->GetProjection(), m_pCamera->GetView());
 	m_pForwardPipeline->UpdateDynamicUniformBuffer({ glm::mat4(1.f), glm::mat4(1.f) });
 	
 	m_pDebugPipeline = new DebugPipeline(*device);
 	m_pDebugPipeline->CreateGraphicsPipeline(renderPass, swapChain->swapChainExtent);
-	m_pDebugPipeline->UpdateUniforms(m_pCamera->GetProj(), m_pCamera->GetView());
+	m_pDebugPipeline->UpdateUniforms(m_pCamera->GetProjection(), m_pCamera->GetView());
 
 	CreateTestMesh();	
 

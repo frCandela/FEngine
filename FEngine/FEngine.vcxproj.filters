@@ -1753,7 +1753,7 @@
     <ClInclude Include="include\physics\PhysicsEngine.h">
       <Filter>Fichiers d%27en-tête\physics</Filter>
     </ClInclude>
-    <ClInclude Include="include\editor\Editor.h">
+    <ClInclude Include="include\editor\Shape.h">
       <Filter>Fichiers d%27en-tête\editor</Filter>
     </ClInclude>
   </ItemGroup>

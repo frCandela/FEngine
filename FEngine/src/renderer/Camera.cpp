@@ -2,13 +2,15 @@
 
 #include "glm/gtc/matrix_transform.hpp"
 
+
+
 glm::mat4 Camera::GetView() const
 {
-	glm::mat4 view = glm::lookAt(pos, pos + dir, glm::vec3(0.0f, 1.0f, 0.f));
+	glm::mat4 view = glm::lookAt(position, position + Forward(), up);
 	return view;
 }
 
-glm::mat4 Camera::GetProj() const
+glm::mat4 Camera::GetProjection() const
 {
 	glm::mat4 proj = glm::perspective(glm::radians(fov), aspectRatio, nearp, farp);
 

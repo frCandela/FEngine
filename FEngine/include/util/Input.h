@@ -66,7 +66,7 @@ class Mouse
 
 public:
 	enum CursorState { disabled = GLFW_CURSOR_DISABLED, hidden = GLFW_CURSOR_HIDDEN, normal = GLFW_CURSOR_NORMAL };
-	enum Button{left = 0, right = 1, button3, button4, button5, button6, button7, button8};
+	enum Button{ button0 = 0, button1 = 1, button2, button3, button4, button5, button6, button7};
 
 	static glm::vec2 Position();
 	static glm::vec2 Delta();

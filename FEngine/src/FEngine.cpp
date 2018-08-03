@@ -14,7 +14,8 @@ void FEngine::Run()
 	Window window( 1200,700, "Vulkan" );
 
 	GameObject gameobject;
-	Camera* camera = gameobject.AddComponent<Camera>();
+	FPSCamera* camera = gameobject.AddComponent<FPSCamera>();
+	camera->position = {0,0,-10};
 
 	renderer = new Renderer(window, *camera);	
 	physicsEngine = new PhysicsEngine();
@@ -34,8 +35,8 @@ void FEngine::Run()
 	while ( window.WindowOpen() )
 	{
 		float time = Time::ElapsedSinceStartup();
-
-		if (Time::ElapsedSinceStartup() - lastTime > renderer->framerate.GetDelta())
+		float deltaTime = time - lastTime;
+		if (deltaTime > renderer->framerate.GetDelta())
 		{
 			// Updates Imgui io and starts new imgui frame
 			io.DeltaTime = time - lastTime;
@@ -44,6 +45,9 @@ void FEngine::Run()
 			glm::vec2 screenSize = renderer->GetSize();
 			camera->aspectRatio = screenSize.x / screenSize.y;
 			io.DisplaySize = ImVec2(screenSize.x, screenSize.y);
+			camera->Update(deltaTime);
+
+			renderer->UpdateCameraUniforms(camera->GetProjection(), camera->GetView());
 
 			glm::vec4 pink{ 1.f,0,1,1.f };
 			glm::vec4 green{ 0,1,0,1.f };
@@ -73,14 +77,14 @@ void FEngine::Run()
 				float nearHeight = camera->nearp * tan(glm::radians(camera->fov / 2));
 				float nearWidth = (screenSize.x / screenSize.y) * nearHeight;
 				  
-				glm::vec3 nearMiddle = camera->pos + camera->nearp * camera->dir;
+				glm::vec3 nearMiddle = camera->position + camera->nearp * camera->Forward();
 				glm::vec3 up =  { 0,1,0 };
-				glm::vec3 right = glm::cross(camera->dir, up);
-				glm::vec3 forward = camera->dir;
+				glm::vec3 right = camera->Right();
+				glm::vec3 forward = camera->Forward();
 				glm::vec2 mousePos = Mouse::Position();
 				glm::vec2 ratio = 2.f * mousePos / screenSize - glm::vec2(1.f,1.f);
 				p2 = nearMiddle + ratio.x * nearWidth * right - ratio.y * nearHeight * up;
-				d2 = 100.f *  glm::normalize( p2 - camera->pos);
+				d2 = 100.f *  glm::normalize( p2 - camera->position);
 
 				//Intersections and rendering
 				for (Triangle& tri : c.triangles)
@@ -100,10 +104,12 @@ void FEngine::Run()
 				renderer->DebugPoint(p2 + d2, green);
 			
 			ImGui::DragFloat3("p2", (float*)&p2, 0.05f);
-			ImGui::DragFloat3("d2", (float*)&d2, 0.05f);			
+			ImGui::DragFloat3("d2", (float*)&d2, 0.05f);	
 
+			ImGui::DragFloat3("camera pos", (float*)&camera->position, 0.05f);
+			ImGui::DragFloat3("camera dir", (float*)&camera->Forward(), 0.05f);
 
-
+			ImGui::DragFloat2("Mouse::Delta()", (float*)&Mouse::Delta(), 0.05f);	
 
 
 

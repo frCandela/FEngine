@@ -625,7 +625,7 @@
     <ClInclude Include="deps\bullet3\LinearMath\btVector3.h" />
     <ClInclude Include="deps\imgui\imgui.h" />
     <ClInclude Include="include\editor\Component.h" />
-    <ClInclude Include="include\editor\Editor.h" />
+    <ClInclude Include="include\editor\Shape.h" />
     <ClInclude Include="include\editor\GameObject.h" />
     <ClInclude Include="include\editor\Transform.h" />
     <ClInclude Include="include\FEngine.h" />

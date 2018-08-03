@@ -3,7 +3,7 @@
 #include "renderer/Renderer.h"
 #include "renderer/Window.h"
 #include "physics/PhysicsEngine.h"
-#include "editor/Editor.h"
+#include "editor/Shape.h"
 
 class FEngine
 {

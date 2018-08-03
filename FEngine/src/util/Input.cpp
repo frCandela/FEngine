@@ -50,8 +50,8 @@ void Input::Update()
 
 	ImGuiIO& io = ImGui::GetIO();
 	io.MousePos = ImVec2(Mouse::Position().x, Mouse::Position().y);
-	io.MouseDown[0] = Mouse::KeyDown(Mouse::left);
-	io.MouseDown[1] = Mouse::KeyDown(Mouse::right);
+	io.MouseDown[0] = Mouse::KeyDown(Mouse::button0);
+	io.MouseDown[1] = Mouse::KeyDown(Mouse::button1);
 }
 
 ////////////Keyboard////////////

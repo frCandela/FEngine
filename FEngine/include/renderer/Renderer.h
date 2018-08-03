@@ -14,7 +14,6 @@
 #include "Mesh.h"
 #include "DebugRender.h"
 #include "ImguiManager.h"
-#include "Camera.h"
 
 
 #include "vulkan/SwapChain.h"
@@ -41,8 +40,14 @@ public:
 	// Render Imgui parameters window
 	void RenderGUI();
 
+	inline void UpdateCameraUniforms(glm::mat4 projectionMat, glm::mat4 viewMat) 
+	{ 
+		m_pForwardPipeline->UpdateUniforms(projectionMat, viewMat); 
+		m_pDebugPipeline->UpdateUniforms(projectionMat, viewMat);
+	}
 	inline void DebugLine(glm::vec3 start, glm::vec3 end, glm::vec4 color = glm::vec4(1.f, 0.f, 0.f, 1.f)) { renderDebug->DebugLine(start, end, color); }
 	void DebugPoint(glm::vec3 pos, glm::vec4 color = glm::vec4(1.f, 0.f, 0.f, 1.f), float size = 1.f);
+
 
 private:
 	// Setup the command buffers for drawing operations
