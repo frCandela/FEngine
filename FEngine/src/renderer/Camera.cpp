@@ -4,7 +4,7 @@
 
 glm::mat4 Camera::GetView() const
 {
-	glm::mat4 view = glm::lookAt(glm::vec3(20, 2, 2), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.f));
+	glm::mat4 view = glm::lookAt(pos, pos + dir, glm::vec3(0.0f, 1.0f, 0.f));
 	return view;
 }
 
