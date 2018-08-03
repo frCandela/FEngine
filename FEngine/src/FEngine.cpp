@@ -62,65 +62,61 @@ void FEngine::Run()
 
 			//Ui
 			ImGui::NewFrame();
+
 			ImGui::Begin("Test");
 			ImGui::DragFloat3("v0", (float*)&t.v0, 0.05f);
 			ImGui::DragFloat3("v1", (float*)&t.v1, 0.05f);
 			ImGui::DragFloat3("v2", (float*)&t.v2, 0.05f);
-
 			ImGui::DragFloat3("cube position", (float*)&cpos, 0.05f);
-
-			static bool follow = true;
-			ImGui::Checkbox("follow mouse", &follow);
-
-				float far = camera->farp;
-				float fov = camera->fov;
-				float nearHeight = camera->nearp * tan(glm::radians(camera->fov / 2));
-				float nearWidth = (screenSize.x / screenSize.y) * nearHeight;
-				  
-				glm::vec3 nearMiddle = camera->position + camera->nearp * camera->Forward();
-				glm::vec3 up =  { 0,1,0 };
-				glm::vec3 right = camera->Right();
-				glm::vec3 forward = camera->Forward();
-				glm::vec2 mousePos = Mouse::Position();
-				glm::vec2 ratio = 2.f * mousePos / screenSize - glm::vec2(1.f,1.f);
-				p2 = nearMiddle + ratio.x * nearWidth * right - ratio.y * nearHeight * up;
-				d2 = 100.f *  glm::normalize( p2 - camera->position);
-
-				//Intersections and rendering
-				for (Triangle& tri : c.triangles)
-				{
-					renderer->DebugLine(tri.v0, tri.v1);
-					renderer->DebugLine(tri.v1, tri.v2);
-					renderer->DebugLine(tri.v2, tri.v0);
-
-					glm::vec3 intersection;
-					if (tri.RayCast(p2, d2, &intersection))
-						renderer->DebugPoint(intersection, green);
-				}
-				glm::vec3 intersection;
-				if (t.RayCast(p2, d2, &intersection))
-					renderer->DebugPoint(intersection, blue);
-				
-				renderer->DebugPoint(p2 + d2, green);
-			
 			ImGui::DragFloat3("p2", (float*)&p2, 0.05f);
-			ImGui::DragFloat3("d2", (float*)&d2, 0.05f);	
+			ImGui::DragFloat3("d2", (float*)&d2, 0.05f);
 
-			ImGui::DragFloat3("camera pos", (float*)&camera->position, 0.05f);
-			ImGui::DragFloat3("camera dir", (float*)&camera->Forward(), 0.05f);
-
-			ImGui::DragFloat2("Mouse::Delta()", (float*)&Mouse::Delta(), 0.05f);	
-
-
-
-			renderer->DebugLine(p2, p2 + d2, yellow);
-
+			static bool test = true;
+			ImGui::Checkbox("test", &test);
 			ImGui::End();
 
+			// Calculates the direction of a ray going from the mouse forward and draws it into p2, d2
+			if (Mouse::KeyDown(Mouse::button3))
+			{
+				const glm::vec3 pos = camera->position;
+				const glm::vec3 up = camera->Up();
+				const glm::vec3 right = camera->Right();
+				const glm::vec3 forward = camera->Forward();
+				const glm::vec2 mousePos = Mouse::Position();
+				const float far = camera->farp;
+				const float fov = camera->fov;
 
+				glm::vec3 nearMiddle = pos + camera->nearp * forward;
+
+				float nearHeight = camera->nearp * tan(glm::radians(camera->fov / 2));
+				float nearWidth = (screenSize.x / screenSize.y) * nearHeight;
+
+				glm::vec2 ratio = 2.f * mousePos / screenSize - glm::vec2(1.f, 1.f);
+				p2 = nearMiddle + ratio.x * nearWidth * right - ratio.y * nearHeight * up;
+				d2 = 100.f * glm::normalize(p2 - camera->position);
+			}
+
+			renderer->DebugPoint(p2);
+			renderer->DebugLine(p2, p2 + d2, yellow);
+
+
+			//Intersections and rendering
+			for (Triangle& tri : c.triangles)
+			{
+				renderer->DebugLine(tri.v0, tri.v1);
+				renderer->DebugLine(tri.v1, tri.v2);
+				renderer->DebugLine(tri.v2, tri.v0);
+
+				glm::vec3 intersection;
+				if (tri.RayCast(p2, d2, &intersection))
+					renderer->DebugPoint(intersection, green);
+			}
+			glm::vec3 intersection;
+			if (t.RayCast(p2, d2, &intersection))
+				renderer->DebugPoint(intersection, blue);
 
 			RenderGUI();
-			
+
 			renderer->DrawFrame();
 		}
 	}

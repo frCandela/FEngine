@@ -18,8 +18,9 @@ struct Camera : public Component
 	glm::quat rotation = {0,0,0,1};
 
 
-	glm::vec3 Right() const { return glm::cross(Forward(), { 0,1,0 }); }
-	glm::vec3 Forward() const { return rotation * glm::vec3(0,0,1); }
+	glm::vec3 Right() const { return  rotation * glm::vec3(1.f, 0, 0); }
+	glm::vec3 Forward() const { return  glm::normalize(rotation * glm::vec3(0,0,1)); }
+	glm::vec3 Up() const { return rotation * glm::vec3(0, -1, 0); } //??
 
 	float fov = 90.f;
 	float aspectRatio = 1.f;
@@ -55,7 +56,7 @@ struct FPSCamera : public Camera
 			upAxis += 1.f;
 		else if (Keyboard::KeyDown(GLFW_KEY_Q))
 			upAxis -= 1.f;
-		position += delta * realSpeed * upAxis * up;
+		position += delta * realSpeed * upAxis * Up();
 
 		// Camera goes forward
 		float forwardAxis = 0.f;
