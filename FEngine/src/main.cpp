@@ -1,9 +1,8 @@
-#include "FEngine.h"
+#include "EditorApplication.h"
 
 int main()
 {
-
-	FEngine app;
+	EditorApplication app;
 
 	try 
 	{

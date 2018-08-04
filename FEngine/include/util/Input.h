@@ -12,8 +12,7 @@
 
 class Input
 {
-	friend class FEngine;
-
+	friend class EditorApplication;
 
 public:
 	static void Setup(GLFWwindow * window);

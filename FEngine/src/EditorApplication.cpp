@@ -1,24 +1,24 @@
-#include "FEngine.h"
+#include "EditorApplication.h"
 
-#include "renderer/Camera.h"
+#include "editor/EditorCamera.h"
 #include "editor/GameObject.h"
 #include "util/Time.h"
 
-FEngine::FEngine()
+EditorApplication::EditorApplication()
 {
-
+	scene = new Scene("test scene");
 }
 
-void FEngine::Run()
+void EditorApplication::Run()
 {
 	Window window( 1200,700, "Vulkan" );
-
-	GameObject gameobject;
-	FPSCamera* camera = gameobject.AddComponent<FPSCamera>();
-	camera->position = {0,0,-10};
-
-	renderer = new Renderer(window, *camera);	
+	renderer = new Renderer(window);	
 	physicsEngine = new PhysicsEngine();
+
+	GameObject* cameraGo = scene->CreateGameobject("Camera");
+	EditorCamera* camera = cameraGo->AddComponent<EditorCamera>();
+	cameraGo->GetTransform().position = { 0,0,-10 };
+	camera->aspectRatio = renderer->GetAspectRatio();
 
 	float lastTime = Time::ElapsedSinceStartup();
 
@@ -78,10 +78,10 @@ void FEngine::Run()
 			// Calculates the direction of a ray going from the mouse forward and draws it into p2, d2
 			if (Mouse::KeyDown(Mouse::button3))
 			{
-				const glm::vec3 pos = camera->position;
-				const glm::vec3 up = camera->Up();
-				const glm::vec3 right = camera->Right();
-				const glm::vec3 forward = camera->Forward();
+				const glm::vec3 pos = camera->GetGameobject()->GetTransform().position;
+				const glm::vec3 up = camera->GetGameobject()->GetTransform().Up();
+				const glm::vec3 right = camera->GetGameobject()->GetTransform().Right();
+				const glm::vec3 forward = camera->GetGameobject()->GetTransform().Forward();
 				const glm::vec2 mousePos = Mouse::Position();
 				const float far = camera->farp;
 				const float fov = camera->fov;
@@ -93,7 +93,7 @@ void FEngine::Run()
 
 				glm::vec2 ratio = 2.f * mousePos / screenSize - glm::vec2(1.f, 1.f);
 				p2 = nearMiddle + ratio.x * nearWidth * right - ratio.y * nearHeight * up;
-				d2 = 100.f * glm::normalize(p2 - camera->position);
+				d2 = 100.f * glm::normalize(p2 - camera->GetGameobject()->GetTransform().position);
 			}
 
 			renderer->DebugPoint(p2);
@@ -117,6 +117,7 @@ void FEngine::Run()
 
 			RenderGUI();
 
+
 			renderer->DrawFrame();
 		}
 	}
@@ -125,28 +126,36 @@ void FEngine::Run()
 	delete(physicsEngine);
 }
 
-void FEngine::RenderGUI()
+void EditorApplication::RenderGUI()
 {
-	static bool showRenderer = true;
-	static bool showTestWindow = false;
 
 	// Main Menu bar
 	if (ImGui::BeginMainMenuBar())
 	{
 		if (ImGui::BeginMenu("Window"))
 		{
-			ImGui::Checkbox("Renderer", &showRenderer);
-			ImGui::Checkbox("TestWindow", &showTestWindow);
+			ImGui::Checkbox("Renderer", &m_showRendererWindow);			
+			ImGui::Checkbox("m_showSceneHierarchy", &m_showSceneHierarchy);
+			ImGui::Checkbox("m_showInspector", &m_showInspector);
+			ImGui::Checkbox("TestWindow", &m_showTestWindow);
 			ImGui::EndMenu();
 		}
 		ImGui::EndMainMenuBar();
 	}	
 
 	// Renderer window
-	if (showRenderer)
+	if (m_showRendererWindow)
 		renderer->RenderGUI();
 	
 	// Tests window
-	if(showTestWindow)
+	if(m_showTestWindow)
 		ImGui::ShowTestWindow();
+
+	// Scene Hierarchy
+	if (m_showSceneHierarchy)
+		scene->RenderSceneGui();
+	
+	// nspector
+	if (m_showInspector)
+		scene->RenderInspectorGui();
 }

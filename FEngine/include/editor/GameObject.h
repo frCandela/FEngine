@@ -11,31 +11,50 @@ class Component;
 
 #include "Transform.h"
 
-///Base class for all entities in the engine
+// Base class for all entities in the engine
 class GameObject
 {
 public:
 
-	/// Creates an instance of ComponentType, adds it to the GameObject and returns a pointer
+	GameObject(std::string nameStr)	: 
+		m_name(nameStr)
+	{
+
+	}
+
+	// Creates an instance of ComponentType, adds it to the GameObject and returns a pointer
 	template<typename ComponentType>
 	ComponentType* AddComponent();
 
-	/// Returns a pointer on the first instance of ComponentType in the GameObject, nullptr if none exists
+	// Returns a pointer on the first instance of ComponentType in the GameObject, nullptr if none exists
 	template<typename ComponentType>
 	ComponentType* GetComponent();
 
-	/// Returns a Vector of pointers the instance of ComponentType in the GameObject
+	// Returns a Vector of pointers the instance of ComponentType in the GameObject
 	template<typename ComponentType>
 	std::vector<ComponentType*> GetComponents();
 
-	/// Remove the component from the GameObject and deletes it
+	// Remove the component from the GameObject and deletes it
 	bool DeleteComponent(Component* component);
 
+	// Returns the number of component of the gameobject
+	size_t ComponentsCount() { return m_components.size(); }
 
-	Transform transform;
+	// Returns the component at the given index
+	Component* GetComponent(size_t index) { return m_components[index]; }
+
+	// Render the gameObject inspector gui
+	virtual void RenderGui();
+
+	//Getters
+	inline Transform& GetTransform() { return m_transform; }
+	inline std::string GetName() { return m_name; }
+
 
 private:
 	std::vector<Component*> m_components;
+	Transform m_transform;
+	std::string m_name;
 };
 
 template<typename ComponentType>

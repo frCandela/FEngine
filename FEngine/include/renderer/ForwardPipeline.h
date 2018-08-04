@@ -5,8 +5,6 @@
 #include "vulkan/Buffer.hpp"
 #include "vulkan/Shader.h"
 
-#include "Camera.h"
-
 #define GLM_ENABLE_EXPERIMENTAL
 #include "glm/gtx/hash.hpp"
 #include "glm/glm.hpp"

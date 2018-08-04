@@ -13,3 +13,16 @@ bool GameObject::DeleteComponent(Component* component)
 	}
 	return false;
 }
+
+void GameObject::RenderGui()
+{
+	ImGui::Text("GameObject : %s", m_name.c_str());
+	ImGui::Separator();
+	m_transform.RenderGui();
+	for (Component* component : m_components)
+	{
+		ImGui::Separator();
+		component->RenderGui();
+	}
+	ImGui::Separator();
+}

@@ -28,7 +28,7 @@
 class Renderer
 {
 public:
-	Renderer(Window& rWindow, Camera& rCamera);
+	Renderer(Window& rWindow);
 	~Renderer();
 
 	// Draw a frame
@@ -36,6 +36,7 @@ public:
 
 	// Returns the size of the swapChain extent
 	glm::vec2 GetSize() const; 
+	float GetAspectRatio() const;
 
 	// Render Imgui parameters window
 	void RenderGUI();
@@ -68,7 +69,6 @@ private:
 	const uint32_t MAX_FRAMES_IN_FLIGHT = 2;
 	size_t currentFrame = 0;
 
-	Camera* m_pCamera;
 	DebugPipeline* m_pDebugPipeline;
 	ForwardPipeline* m_pForwardPipeline;
 	Window& m_window;

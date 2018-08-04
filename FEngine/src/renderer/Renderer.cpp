@@ -4,9 +4,8 @@
 #include <chrono>
 #include "glm/gtc/matrix_transform.hpp"
 
-Renderer::Renderer(Window& rWindow, Camera& rCamera) :
-	m_window(rWindow),
-	m_pCamera(&rCamera)
+Renderer::Renderer(Window& rWindow) :
+	m_window(rWindow)
 {
 	// Initializes the Vulkan application and required components
 	instance = new vk::Instance();	
@@ -29,17 +28,15 @@ Renderer::Renderer(Window& rWindow, Camera& rCamera) :
 
 	textureSampler = new vk::Sampler(*device);
 	textureSampler->CreateSampler(static_cast<float>(texture->m_mipLevels), 16);
-	
-	VkExtent2D size = m_window.GetExtend2D();
-	m_pCamera->aspectRatio = (float)size.width / (float)size.height;
+
 	m_pForwardPipeline = new ForwardPipeline(*device, *texture, *textureSampler);
 	m_pForwardPipeline->CreateGraphicsPipeline(renderPass, swapChain->swapChainExtent);
-	m_pForwardPipeline->UpdateUniforms(m_pCamera->GetProjection(), m_pCamera->GetView());
-	m_pForwardPipeline->UpdateDynamicUniformBuffer({ glm::mat4(1.f), glm::mat4(1.f) });
+	//m_pForwardPipeline->UpdateUniforms(m_pCamera->GetProjection(), m_pCamera->GetView());
+	//m_pForwardPipeline->UpdateDynamicUniformBuffer({ glm::mat4(1.f), glm::mat4(1.f) });
 	
 	m_pDebugPipeline = new DebugPipeline(*device);
 	m_pDebugPipeline->CreateGraphicsPipeline(renderPass, swapChain->swapChainExtent);
-	m_pDebugPipeline->UpdateUniforms(m_pCamera->GetProjection(), m_pCamera->GetView());
+	//m_pDebugPipeline->UpdateUniforms(m_pCamera->GetProjection(), m_pCamera->GetView());
 
 	CreateTestMesh();	
 
@@ -433,6 +430,11 @@ void Renderer::RenderGUI()
 glm::vec2 Renderer::GetSize() const
 {
 	return glm::vec2((float)swapChain->swapChainExtent.width, (float)swapChain->swapChainExtent.height);
+}
+float Renderer::GetAspectRatio() const
+{
+	VkExtent2D size = m_window.GetExtend2D();
+	return (float)size.width / (float)size.height;
 }
 
 void Renderer::DebugPoint(glm::vec3 pos, glm::vec4 color, float size)

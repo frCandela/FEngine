@@ -83,9 +83,6 @@
     <ClCompile Include="src\main.cpp">
       <Filter>Fichiers sources</Filter>
     </ClCompile>
-    <ClCompile Include="src\FEngine.cpp">
-      <Filter>Fichiers sources</Filter>
-    </ClCompile>
     <ClCompile Include="src\vulkan\DepthImage.cpp">
       <Filter>Fichiers sources\vulkan</Filter>
     </ClCompile>
@@ -133,9 +130,6 @@
     </ClCompile>
     <ClCompile Include="src\editor\Transform.cpp">
       <Filter>Fichiers sources\editor</Filter>
-    </ClCompile>
-    <ClCompile Include="src\renderer\Camera.cpp">
-      <Filter>Fichiers sources\renderer</Filter>
     </ClCompile>
     <ClCompile Include="src\renderer\DebugPipeline.cpp">
       <Filter>Fichiers sources\renderer</Filter>
@@ -695,11 +689,20 @@
     <ClCompile Include="deps\imgui\imgui_demo.cpp">
       <Filter>deps\imgui</Filter>
     </ClCompile>
+    <ClCompile Include="src\editor\Scene.cpp">
+      <Filter>Fichiers sources\editor</Filter>
+    </ClCompile>
+    <ClCompile Include="src\editor\Camera.cpp">
+      <Filter>Fichiers sources\editor</Filter>
+    </ClCompile>
+    <ClCompile Include="src\editor\EditorCamera.cpp">
+      <Filter>Fichiers sources\editor</Filter>
+    </ClCompile>
+    <ClCompile Include="src\EditorApplication.cpp">
+      <Filter>Fichiers sources</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="include\FEngine.h">
-      <Filter>Fichiers d%27en-tête</Filter>
-    </ClInclude>
     <ClInclude Include="include\vulkan\DepthImage.h">
       <Filter>Fichiers d%27en-tête\vulkan</Filter>
     </ClInclude>
@@ -750,9 +753,6 @@
     </ClInclude>
     <ClInclude Include="include\editor\Transform.h">
       <Filter>Fichiers d%27en-tête\editor</Filter>
-    </ClInclude>
-    <ClInclude Include="include\renderer\Camera.h">
-      <Filter>Fichiers d%27en-tête\renderer</Filter>
     </ClInclude>
     <ClInclude Include="include\renderer\DebugPipeline.h">
       <Filter>Fichiers d%27en-tête\renderer</Filter>
@@ -1755,6 +1755,18 @@
     </ClInclude>
     <ClInclude Include="include\editor\Shape.h">
       <Filter>Fichiers d%27en-tête\editor</Filter>
+    </ClInclude>
+    <ClInclude Include="include\editor\Scene.h">
+      <Filter>Fichiers d%27en-tête\editor</Filter>
+    </ClInclude>
+    <ClInclude Include="include\editor\Camera.h">
+      <Filter>Fichiers d%27en-tête\editor</Filter>
+    </ClInclude>
+    <ClInclude Include="include\editor\EditorCamera.h">
+      <Filter>Fichiers d%27en-tête\editor</Filter>
+    </ClInclude>
+    <ClInclude Include="include\EditorApplication.h">
+      <Filter>Fichiers d%27en-tête</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
