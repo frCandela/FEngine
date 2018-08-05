@@ -11,6 +11,8 @@
 
 #include <array>
 
+typedef int * render_id;
+
 class ForwardPipeline
 {
 public:
@@ -60,7 +62,7 @@ private:
 	VkDescriptorSet descriptorSet = VK_NULL_HANDLE;
 
 	size_t dynamicAlignment;
-	static const int OBJECT_INSTANCES = 2;
+	static const int OBJECT_INSTANCES = 512;
 
 	struct
 	{

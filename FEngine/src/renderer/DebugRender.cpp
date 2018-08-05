@@ -41,7 +41,7 @@ void RenderDebug::UpdateDebugBuffer(vk::CommandPool& commandPool)
 	m_debugBuffer.CreateBuffer(VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, bufferSize);
 
 	// Fills it with the data from the first buffer
-	vk::Mesh::copyBuffer(buf.m_buffer, m_debugBuffer.m_buffer, bufferSize, commandPool);
+	buf.copyBufferTo(m_debugBuffer.m_buffer, bufferSize, commandPool);
 }
 
 

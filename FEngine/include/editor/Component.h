@@ -20,7 +20,7 @@ public:
 	virtual void RenderGui() { ImGui::Text(GetName().c_str()); }
 
 	// Returns a reference on the Gameobject the component is bound to
-	 inline GameObject* GetGameobject() const { return m_pGameobject; }
+	inline GameObject* GetGameobject() const { return m_pGameobject; }
 
 private:
 	GameObject*  m_pGameobject;	

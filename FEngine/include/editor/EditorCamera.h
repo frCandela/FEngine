@@ -10,5 +10,5 @@ struct EditorCamera : public Camera
 
 	float speed = 20.f;
 	float speedMultiplier = 3.f;
-	float xSensitivity = 1.f;
+	float sensitivity = 0.005f;
 };

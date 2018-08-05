@@ -140,9 +140,6 @@
     <ClCompile Include="src\renderer\ImguiManager.cpp">
       <Filter>Fichiers sources\renderer</Filter>
     </ClCompile>
-    <ClCompile Include="src\renderer\Mesh.cpp">
-      <Filter>Fichiers sources\renderer</Filter>
-    </ClCompile>
     <ClCompile Include="src\renderer\Renderer.cpp">
       <Filter>Fichiers sources\renderer</Filter>
     </ClCompile>
@@ -701,6 +698,9 @@
     <ClCompile Include="src\EditorApplication.cpp">
       <Filter>Fichiers sources</Filter>
     </ClCompile>
+    <ClCompile Include="src\editor\Mesh.cpp">
+      <Filter>Fichiers sources\editor</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\vulkan\DepthImage.h">
@@ -761,9 +761,6 @@
       <Filter>Fichiers d%27en-tête\renderer</Filter>
     </ClInclude>
     <ClInclude Include="include\renderer\ImguiManager.h">
-      <Filter>Fichiers d%27en-tête\renderer</Filter>
-    </ClInclude>
-    <ClInclude Include="include\renderer\Mesh.h">
       <Filter>Fichiers d%27en-tête\renderer</Filter>
     </ClInclude>
     <ClInclude Include="include\renderer\Renderer.h">
@@ -1767,6 +1764,9 @@
     </ClInclude>
     <ClInclude Include="include\EditorApplication.h">
       <Filter>Fichiers d%27en-tête</Filter>
+    </ClInclude>
+    <ClInclude Include="include\editor\Mesh.h">
+      <Filter>Fichiers d%27en-tête\editor</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

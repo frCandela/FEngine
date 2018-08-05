@@ -17,13 +17,10 @@ namespace vk
 			vkFreeMemory(m_device.device, memory, nullptr);
 	}
 
-
-
 	VkResult Buffer::Map(VkDeviceSize size, VkDeviceSize offset)
 	{
 		return vkMapMemory(m_device.device, memory, offset, size, 0, &mappedData);
 	}
-
 
 	void Buffer::Unmap()
 	{
@@ -34,12 +31,21 @@ namespace vk
 		}
 	}
 
-
 	VkResult Buffer::Bind(VkDeviceSize offset)
 	{
 		return vkBindBufferMemory(m_device.device, m_buffer, memory, offset);
 	}
 
+	void Buffer::copyBufferTo(VkBuffer dstBuffer, VkDeviceSize size, vk::CommandPool& rCommandPool)
+	{
+		VkCommandBuffer commandBuffer = rCommandPool.BeginSingleTimeCommands();
+
+		VkBufferCopy copyRegion = {};
+		copyRegion.size = size;
+		vkCmdCopyBuffer(commandBuffer, m_buffer, dstBuffer, 1, &copyRegion);
+
+		rCommandPool.EndSingleTimeCommands(commandBuffer);
+	}
 
 	void Buffer::SetupDescriptor(VkDeviceSize size, VkDeviceSize offset)
 	{

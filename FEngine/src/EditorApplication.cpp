@@ -2,40 +2,57 @@
 
 #include "editor/EditorCamera.h"
 #include "editor/GameObject.h"
+#include "editor/Mesh.h"
 #include "util/Time.h"
 
 EditorApplication::EditorApplication()
 {
-	scene = new Scene("test scene");
+	scene = new Scene("Test scene");
 }
 
 void EditorApplication::Run()
 {
+	// Create required components
 	Window window( 1200,700, "Vulkan" );
 	renderer = new Renderer(window);	
 	physicsEngine = new PhysicsEngine();
 
-	GameObject* cameraGo = scene->CreateGameobject("Camera");
+	// Test rendering
+	GameObject* cameraGo = scene->CreateGameobject("Editor Camera");
 	EditorCamera* camera = cameraGo->AddComponent<EditorCamera>();
 	cameraGo->GetTransform().position = { 0,0,-10 };
 	camera->aspectRatio = renderer->GetAspectRatio();
 
-	float lastTime = Time::ElapsedSinceStartup();
-
-	ImGuiIO& io = ImGui::GetIO();
-
 	Triangle t{ { 0,-5,-5 },{ 0,-5,5 },{ 0,5,0 } };
-	Cube c(3);
+	Cube c(1);
 	glm::vec3 cpos = { 0,0,0 };
 
 	glm::vec3 p2 = { 7,0,5 };
 	glm::vec3 d2 = { -7.5,0,0 };
 	glm::vec2 screenPos = { 400, 400 };
 
+	GameObject* kiwi = scene->CreateGameobject("kiwi");
+	Mesh* kiwiMesh = kiwi->AddComponent<Mesh>();
+	kiwiMesh->LoadModel("mesh/kiwi.obj");
+	kiwiMesh->renderId = renderer->AddMesh(kiwiMesh->vertices, kiwiMesh->indices);
+	kiwi->GetTransform().position = { 5,0,0 };
+	kiwi->GetTransform().scale = { 0.1,0.1,0.1 };
+
+	GameObject* cube1 = scene->CreateGameobject("cube");
+	Mesh* mesh1 = cube1->AddComponent<Mesh>();
+	mesh1->LoadModel("mesh/cube.obj");
+	mesh1->renderId = renderer->AddMesh(mesh1->vertices, mesh1->indices);
+
+	// Intialization before the main loop
+	ImGuiIO& io = ImGui::GetIO();	
+	float lastTime = Time::ElapsedSinceStartup();
+
+	// Main loop
 	while ( window.WindowOpen() )
 	{
 		float time = Time::ElapsedSinceStartup();
 		float deltaTime = time - lastTime;
+
 		if (deltaTime > renderer->framerate.GetDelta())
 		{
 			// Updates Imgui io and starts new imgui frame
@@ -45,9 +62,17 @@ void EditorApplication::Run()
 			glm::vec2 screenSize = renderer->GetSize();
 			camera->aspectRatio = screenSize.x / screenSize.y;
 			io.DisplaySize = ImVec2(screenSize.x, screenSize.y);
+
+
 			camera->Update(deltaTime);
 
+			// camera uniforms
 			renderer->UpdateCameraUniforms(camera->GetProjection(), camera->GetView());
+
+			// Mesh Uniforms
+			for (GameObject * gameObject : scene->GetGameObjects())
+				for( Mesh* mesh : gameObject->GetComponents<Mesh>())				
+					renderer->SetModelMatrix(mesh->renderId, gameObject->GetTransform().GetModelMatrix());
 
 			glm::vec4 pink{ 1.f,0,1,1.f };
 			glm::vec4 green{ 0,1,0,1.f };
@@ -64,6 +89,8 @@ void EditorApplication::Run()
 			ImGui::NewFrame();
 
 			ImGui::Begin("Test");
+			ImGui::Text("camera: ZSQDAE avec clic droit appuyé");
+			ImGui::Text("MOLETTE POUR TIRER DES RAYONS");
 			ImGui::DragFloat3("v0", (float*)&t.v0, 0.05f);
 			ImGui::DragFloat3("v1", (float*)&t.v1, 0.05f);
 			ImGui::DragFloat3("v2", (float*)&t.v2, 0.05f);
@@ -76,7 +103,7 @@ void EditorApplication::Run()
 			ImGui::End();
 
 			// Calculates the direction of a ray going from the mouse forward and draws it into p2, d2
-			if (Mouse::KeyDown(Mouse::button3))
+			if (Mouse::KeyDown(Mouse::button2))
 			{
 				const glm::vec3 pos = camera->GetGameobject()->GetTransform().position;
 				const glm::vec3 up = camera->GetGameobject()->GetTransform().Up();
@@ -99,7 +126,6 @@ void EditorApplication::Run()
 			renderer->DebugPoint(p2);
 			renderer->DebugLine(p2, p2 + d2, yellow);
 
-
 			//Intersections and rendering
 			for (Triangle& tri : c.triangles)
 			{
@@ -116,7 +142,6 @@ void EditorApplication::Run()
 				renderer->DebugPoint(intersection, blue);
 
 			RenderGUI();
-
 
 			renderer->DrawFrame();
 		}
@@ -135,8 +160,8 @@ void EditorApplication::RenderGUI()
 		if (ImGui::BeginMenu("Window"))
 		{
 			ImGui::Checkbox("Renderer", &m_showRendererWindow);			
-			ImGui::Checkbox("m_showSceneHierarchy", &m_showSceneHierarchy);
-			ImGui::Checkbox("m_showInspector", &m_showInspector);
+			ImGui::Checkbox("ShowSceneHierarchy", &m_showSceneHierarchy);
+			ImGui::Checkbox("ShowInspector", &m_showInspector);
 			ImGui::Checkbox("TestWindow", &m_showTestWindow);
 			ImGui::EndMenu();
 		}

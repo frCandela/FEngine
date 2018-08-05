@@ -1,6 +1,6 @@
 #include "editor/EditorCamera.h"
 
-std::string EditorCamera::GetName() const { return "Fps camera"; }
+std::string EditorCamera::GetName() const { return "Editor camera"; }
 
 void EditorCamera::Update(float delta)
 {
@@ -42,8 +42,8 @@ void EditorCamera::Update(float delta)
 	{
 		glm::vec2 mouseDelta = Mouse::Delta();
 
-		glm::quat yaw = glm::angleAxis(-delta * xSensitivity * mouseDelta.x, up);
-		glm::quat pitch = glm::angleAxis(-delta * xSensitivity * mouseDelta.y, transform.Right());
+		glm::quat yaw = glm::angleAxis(-sensitivity * mouseDelta.x, up);
+		glm::quat pitch = glm::angleAxis(-sensitivity * mouseDelta.y, transform.Right());
 		rotation = yaw * pitch * rotation;
 	}
 }
@@ -53,5 +53,5 @@ void EditorCamera::RenderGui()
 	Camera::RenderGui();
 	ImGui::DragFloat("speed", &speed, 1.f, 0.f, std::numeric_limits<float>::max());
 	ImGui::DragFloat("speedMultiplier", &speedMultiplier, 1.f, 0.f, std::numeric_limits<float>::max());
-	ImGui::DragFloat("xSensitivity", &xSensitivity, 0.025f, 0.f, std::numeric_limits<float>::max());
+	ImGui::DragFloat("sensitivity", &sensitivity, 0.001f, 0.f, std::numeric_limits<float>::max());
 }

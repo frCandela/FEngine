@@ -5,6 +5,8 @@
 #include "Util.h"
 #include "Device.h"
 
+#include "vulkan/CommandPool.h"
+
 namespace vk
 {	
 	/// Encapsulates access to a Vulkan buffer backed up by device memory
@@ -28,19 +30,22 @@ namespace vk
 		VkBufferUsageFlags m_usageFlags;
 		VkMemoryPropertyFlags m_memoryPropertyFlags;
 
-		/// Map a memory range of this buffer. If successful, mapped points to the specified buffer range
+		// Map a memory range of this buffer. If successful, mapped points to the specified buffer range
 		VkResult Map(VkDeviceSize size = VK_WHOLE_SIZE, VkDeviceSize offset = 0);
 
-		/// Unmap a mapped memory range
+		// Unmap a mapped memory range
 		void Unmap();
 
-		/// Attach the allocated memory block to the buffer
+		// Attach the allocated memory block to the buffer
 		VkResult Bind(VkDeviceSize offset = 0);
 		
-		/// Setup the default descriptor for this buffer
+		// Setup the default descriptor for this buffer
 		void SetupDescriptor(VkDeviceSize size = VK_WHOLE_SIZE, VkDeviceSize offset = 0);
 
 		VkResult CreateBuffer(VkBufferUsageFlags usageFlags, VkMemoryPropertyFlags memoryPropertyFlags, VkDeviceSize size);
+		
+		// Copy the contents from one buffer to another
+		void copyBufferTo(VkBuffer dstBuffer, VkDeviceSize size, vk::CommandPool& rCommandPool);
 
 		/// Flush a memory range of the buffer to make it visible to the device
 		VkResult Flush(VkDeviceSize size = VK_WHOLE_SIZE, VkDeviceSize offset = 0)

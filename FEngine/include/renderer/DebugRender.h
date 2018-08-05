@@ -4,7 +4,6 @@
 #include "vulkan/CommandPool.h"
 
 #include "renderer/DebugPipeline.h"
-#include "renderer/Mesh.h"
 
 // Class used to facilitate the usage of the DebugPipeline
 class RenderDebug

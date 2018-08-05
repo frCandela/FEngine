@@ -31,12 +31,9 @@ Renderer::Renderer(Window& rWindow) :
 
 	m_pForwardPipeline = new ForwardPipeline(*device, *texture, *textureSampler);
 	m_pForwardPipeline->CreateGraphicsPipeline(renderPass, swapChain->swapChainExtent);
-	//m_pForwardPipeline->UpdateUniforms(m_pCamera->GetProjection(), m_pCamera->GetView());
-	//m_pForwardPipeline->UpdateDynamicUniformBuffer({ glm::mat4(1.f), glm::mat4(1.f) });
 	
 	m_pDebugPipeline = new DebugPipeline(*device);
 	m_pDebugPipeline->CreateGraphicsPipeline(renderPass, swapChain->swapChainExtent);
-	//m_pDebugPipeline->UpdateUniforms(m_pCamera->GetProjection(), m_pCamera->GetView());
 
 	CreateTestMesh();	
 
@@ -62,8 +59,10 @@ Renderer::~Renderer()
 	delete(imGui);	
 	delete(textureSampler);
 	delete(texture);
-	for (vk::Mesh* buffer : buffers)
-		delete(buffer);
+
+	for (MeshData * meshData : m_meshDatas)
+		delete(meshData);	
+
 	delete(renderDebug);
 	vkDestroyRenderPass(device->device, renderPass, nullptr);
 
@@ -72,6 +71,71 @@ Renderer::~Renderer()
 	delete(commandPool);
 	delete(device);
 	delete(instance);
+}
+
+render_id const Renderer::AddMesh(std::vector<ForwardPipeline::Vertex> & vertices, std::vector<uint32_t> & indices)
+{
+	MeshData * newMeshData = new MeshData();
+
+	// Create Vertex Buffer
+	{
+		vk::Buffer* vertexBuffer = new vk::Buffer(*device);
+		newMeshData->vertexBuffer = vertexBuffer;
+
+		VkDeviceSize bufferSize = sizeof(vertices[0]) * vertices.size();
+
+		// Create a host visible buffer
+		vk::Buffer buf(*device);
+		buf.CreateBuffer(VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, bufferSize);
+
+		// Fills it with data
+		buf.Map(bufferSize);
+		memcpy(buf.mappedData, vertices.data(), (size_t)bufferSize);
+		buf.Unmap();
+
+		// Create a device local buffer
+		vertexBuffer->CreateBuffer(VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, bufferSize);
+
+		buf.copyBufferTo(vertexBuffer->m_buffer, bufferSize, *commandPool);
+	}
+
+	// Create Index Buffer
+	{		
+		vk::Buffer* indexBuffer = new vk::Buffer(*device);
+		newMeshData->indexBuffer = indexBuffer;
+		newMeshData->indexBufferSize = indices.size();
+
+		VkDeviceSize bufferSize = sizeof(indices[0]) * indices.size();
+
+		// Create a host visible buffer
+		vk::Buffer buf(*device);
+		buf.CreateBuffer(VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, bufferSize);
+
+		// Fills it with data
+		buf.Map(bufferSize);
+		memcpy(buf.mappedData, indices.data(), (size_t)bufferSize);
+		buf.Unmap();
+
+		// Create a device local buffer		
+		indexBuffer->CreateBuffer(VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_INDEX_BUFFER_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, bufferSize);
+
+		buf.copyBufferTo(indexBuffer->m_buffer, bufferSize, *commandPool);
+	}
+
+	newMeshData->index = m_meshDatas.size();
+	m_meshDatas.push_back(newMeshData);
+
+	return &newMeshData->index;
+}
+
+void Renderer::RemoveMesh(render_id id)
+{
+
+}
+
+void Renderer::SetModelMatrix(render_id ptr_id, glm::mat4 modelMatrix)
+{
+	m_meshDatas[*ptr_id]->model = modelMatrix;
 }
 
 void Renderer::CreateCommandBuffers()
@@ -105,25 +169,19 @@ void Renderer::CreateCommandBuffers()
 		
 		m_pForwardPipeline->BindPipeline(commandBuffers->commandBuffers[i]);
 
-		if (stupidCubes)
+		//Record Draw calls on all existing buffers
+		for (int j = 0; j < m_meshDatas.size(); ++j)
 		{
-			//Record Draw calls on all existing buffers
-			for (int j = 0; j < buffers.size(); ++j)
-			{
-				VkBuffer * vertexBuffers = &buffers[j]->vertexBuffer.m_buffer;
-				VkDeviceSize offsets[] = { 0 };
-				vkCmdBindVertexBuffers(commandBuffers->commandBuffers[i], 0, 1, vertexBuffers, offsets);
-				vkCmdBindIndexBuffer(commandBuffers->commandBuffers[i], buffers[j]->indexBuffer.m_buffer, 0, VK_INDEX_TYPE_UINT32);
+			VkBuffer * vertexBuffers = &m_meshDatas[j]->vertexBuffer->m_buffer;
+			VkDeviceSize offsets[] = { 0 };
+			vkCmdBindVertexBuffers(commandBuffers->commandBuffers[i], 0, 1, vertexBuffers, offsets);
+			vkCmdBindIndexBuffer(commandBuffers->commandBuffers[i], m_meshDatas[j]->indexBuffer->m_buffer, 0, VK_INDEX_TYPE_UINT32);
 
-				// Bind the descriptor set for rendering a mesh using the dynamic offset
-				m_pForwardPipeline->BindDescriptors(commandBuffers->commandBuffers[i], j);
+			// Bind the descriptor set for rendering a mesh using the dynamic offset
+			m_pForwardPipeline->BindDescriptors(commandBuffers->commandBuffers[i], j);
 
-				vkCmdDrawIndexed(commandBuffers->commandBuffers[i], static_cast<uint32_t>(buffers[j]->indices.size()), 1, 0, 0, 0);
-			}
-		}
-		
-
-
+			vkCmdDrawIndexed(commandBuffers->commandBuffers[i], static_cast<uint32_t>(m_meshDatas[j]->indexBufferSize), 1, 0, 0, 0);
+		}		
 
 		// Draw imgui on another pipeline
 		imGui->DrawFrame(commandBuffers->commandBuffers[i]);
@@ -142,16 +200,10 @@ void Renderer::CreateCommandBuffers()
 
 void Renderer::DrawFrame()
 {
-	float aspectRatio = swapChain->swapChainExtent.width / (float)swapChain->swapChainExtent.height;
-	static auto startTime = std::chrono::high_resolution_clock::now();
-
-	auto currentTime = std::chrono::high_resolution_clock::now();
-	float time = std::chrono::duration<float, std::chrono::seconds::period>(currentTime - startTime).count();
-	//time = 0.f;
-	m_pForwardPipeline->UpdateDynamicUniformBuffer({
-		glm::rotate(glm::mat4(1.0f), time * glm::radians(90.0f), glm::vec3(1.f, 1.f, 1.f))
-		,glm::rotate(glm::mat4(1.0f), -time * glm::radians(90.0f), glm::vec3(1.f, 1.f, 1.f))
-	});
+	std::vector<glm::mat4> modelMatrices;
+	for (MeshData* meshData : m_meshDatas)
+		modelMatrices.push_back(meshData->model);
+	m_pForwardPipeline->UpdateDynamicUniformBuffer(modelMatrices);
 	
 	vkWaitForFences(device->device, 1, &inFlightFences[currentFrame], VK_TRUE, std::numeric_limits<uint64_t>::max());
 	vkResetFences(device->device, 1, &inFlightFences[currentFrame]);
@@ -354,7 +406,7 @@ void Renderer::CreateRenderPass()
 
 void Renderer::CreateTestMesh()
 {
-	vk::Mesh * cube = new vk::Mesh(*device);
+	/*vk::Mesh * cube = new vk::Mesh(*device);
 	cube->LoadModel("mesh/cube.obj");
 	cube->CreateBuffers(*commandPool);
 	buffers.push_back(cube);
@@ -398,7 +450,7 @@ void Renderer::CreateTestMesh()
 	};
 
 	sphere->CreateBuffers(*commandPool);
-	buffers.push_back(sphere);
+	buffers.push_back(sphere);*/
 }
 
 void Renderer::RenderGUI()
@@ -416,7 +468,6 @@ void Renderer::RenderGUI()
 	//Window Size
 	ImGui::BulletText("Window Size : w%.f  h%.f ", io.DisplaySize.x, io.DisplaySize.y);
 
-	ImGui::Checkbox("Stupid cubes", &stupidCubes);
 	// Max Framerate
 	framerate.RenderGui();
 
@@ -431,6 +482,7 @@ glm::vec2 Renderer::GetSize() const
 {
 	return glm::vec2((float)swapChain->swapChainExtent.width, (float)swapChain->swapChainExtent.height);
 }
+
 float Renderer::GetAspectRatio() const
 {
 	VkExtent2D size = m_window.GetExtend2D();

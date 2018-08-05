@@ -139,7 +139,9 @@ void ForwardPipeline::UpdateUniforms(glm::mat4 projectionMat, glm::mat4 viewMat)
 
 void ForwardPipeline::UpdateDynamicUniformBuffer(std::vector<glm::mat4> matrices)
 {
-	for (int i = 0; i < OBJECT_INSTANCES; ++i)
+	assert(matrices.size() <= OBJECT_INSTANCES);
+
+	for (int i = 0; i < matrices.size(); ++i)
 	{
 		glm::mat4* modelMat = (glm::mat4*)(((uint64_t)uboDataDynamic.model + (i * dynamicAlignment)));
 		*modelMat = matrices[i];

@@ -275,6 +275,7 @@
     <ClCompile Include="src\editor\Component.cpp" />
     <ClCompile Include="src\editor\EditorCamera.cpp" />
     <ClCompile Include="src\editor\GameObject.cpp" />
+    <ClCompile Include="src\editor\Mesh.cpp" />
     <ClCompile Include="src\editor\Scene.cpp" />
     <ClCompile Include="src\editor\Transform.cpp" />
     <ClCompile Include="src\EditorApplication.cpp" />
@@ -283,7 +284,6 @@
     <ClCompile Include="src\renderer\DebugRender.cpp" />
     <ClCompile Include="src\renderer\ForwardPipeline.cpp" />
     <ClCompile Include="src\renderer\ImguiManager.cpp" />
-    <ClCompile Include="src\renderer\Mesh.cpp" />
     <ClCompile Include="src\renderer\Renderer.cpp" />
     <ClCompile Include="src\renderer\Window.cpp" />
     <ClCompile Include="src\util\Input.cpp" />
@@ -629,6 +629,7 @@
     <ClInclude Include="include\editor\Camera.h" />
     <ClInclude Include="include\editor\Component.h" />
     <ClInclude Include="include\editor\EditorCamera.h" />
+    <ClInclude Include="include\editor\Mesh.h" />
     <ClInclude Include="include\editor\Scene.h" />
     <ClInclude Include="include\editor\Shape.h" />
     <ClInclude Include="include\editor\GameObject.h" />
@@ -639,7 +640,6 @@
     <ClInclude Include="include\renderer\DebugRender.h" />
     <ClInclude Include="include\renderer\ForwardPipeline.h" />
     <ClInclude Include="include\renderer\ImguiManager.h" />
-    <ClInclude Include="include\renderer\Mesh.h" />
     <ClInclude Include="include\renderer\Renderer.h" />
     <ClInclude Include="include\renderer\Window.h" />
     <ClInclude Include="include\util\Input.h" />

@@ -11,10 +11,8 @@
 #include "Window.h"
 #include "DebugPipeline.h"
 #include "ForwardPipeline.h"
-#include "Mesh.h"
 #include "DebugRender.h"
 #include "ImguiManager.h"
-
 
 #include "vulkan/SwapChain.h"
 #include "vulkan/Instance.h"
@@ -49,6 +47,10 @@ public:
 	inline void DebugLine(glm::vec3 start, glm::vec3 end, glm::vec4 color = glm::vec4(1.f, 0.f, 0.f, 1.f)) { renderDebug->DebugLine(start, end, color); }
 	void DebugPoint(glm::vec3 pos, glm::vec4 color = glm::vec4(1.f, 0.f, 0.f, 1.f), float size = 1.f);
 
+	// Adds a mesh to the render pipeline 
+	render_id const AddMesh(std::vector<ForwardPipeline::Vertex> & const vertices, std::vector<uint32_t> & const indices);
+	void RemoveMesh(render_id ptr_id);
+	void SetModelMatrix(render_id ptr_id, glm::mat4 modelMatrix);
 
 private:
 	// Setup the command buffers for drawing operations
@@ -85,14 +87,26 @@ private:
 	vk::SwapChain* swapChain;
 	VkRenderPass renderPass;
 
-	std::vector<vk::Mesh*> buffers;
+	// Mesh datas
+	struct MeshData
+	{
+		vk::Buffer* vertexBuffer = nullptr;
+		vk::Buffer* indexBuffer = nullptr;
+		size_t indexBufferSize;
+		int index = -1;
+		glm::mat4 model = glm::mat4(1.f);	// Model matrix
+
+		~MeshData()
+		{
+			delete(vertexBuffer);
+			delete(indexBuffer);
+		}
+	};
+	std::vector<MeshData * > m_meshDatas;
 
 	std::vector<VkSemaphore> imageAvailableSemaphores;//Specifies that an image has been acquired and is ready for rendering
 	std::vector<VkSemaphore> renderFinishedSemaphores;//Specifies that rendering has finished and presentation can happen
 	std::vector<VkFence> inFlightFences;
-
-	bool stupidCubes = false;
-
 public:
 
 	// Manages the framerate selection

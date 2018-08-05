@@ -17,8 +17,12 @@ public:
 	// Render the scene hierarchy window and gui
 	void RenderSceneGui();
 
+	std::vector<GameObject*> const &  GetGameObjects() { return m_gameObjects; }
+
 private:
 	std::vector<GameObject *> m_gameObjects;
 	std::string m_name;
 	GameObject* m_gameObjectSelected = nullptr;
+
+
 };

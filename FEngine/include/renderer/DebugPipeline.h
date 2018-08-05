@@ -4,7 +4,6 @@
 #include "vulkan/Buffer.hpp"
 #include "vulkan/Shader.h"
 
-#include "Mesh.h"
 #include "imgui/imgui.h"
 
 // Render pipeline and depencencies for drawing 3D debug information (lines, points, sphere, etc.)
