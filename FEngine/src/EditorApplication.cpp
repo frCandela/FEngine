@@ -48,7 +48,7 @@ void EditorApplication::Run()
 	float lastTime = Time::ElapsedSinceStartup();
 
 	// Main loop
-	while ( window.WindowOpen() )
+	while ( window.WindowOpen() &&  ! m_editorShouldQuit)
 	{
 		float time = Time::ElapsedSinceStartup();
 		float deltaTime = time - lastTime;
@@ -99,8 +99,7 @@ void EditorApplication::Run()
 			ImGui::NewFrame();
 
 			ImGui::Begin("Test");
-			ImGui::Text("camera: ZSQDAE avec clic droit appuyé");
-			ImGui::Text("MOLETTE POUR TIRER DES RAYONS");
+
 			ImGui::DragFloat3("v0", (float*)&t.v0, 0.05f);
 			ImGui::DragFloat3("v1", (float*)&t.v1, 0.05f);
 			ImGui::DragFloat3("v2", (float*)&t.v2, 0.05f);
@@ -167,6 +166,15 @@ void EditorApplication::RenderGUI()
 	// Main Menu bar
 	if (ImGui::BeginMainMenuBar())
 	{
+		// File
+		if (ImGui::BeginMenu("File"))
+		{
+			if (ImGui::Button("Quit"))
+				m_editorShouldQuit = true;
+			ImGui::EndMenu();
+		}
+
+		// Window
 		if (ImGui::BeginMenu("Window"))
 		{
 			ImGui::Checkbox("Renderer", &m_showRendererWindow);			
@@ -175,6 +183,16 @@ void EditorApplication::RenderGUI()
 			ImGui::Checkbox("TestWindow", &m_showTestWindow);
 			ImGui::EndMenu();
 		}
+
+		// Help
+		if (ImGui::BeginMenu("Help"))
+		{
+			ImGui::Text("Controle camera: ZSQDAE avec clic droit appuye");
+			ImGui::Text("Clic molette pour caster des rayons");
+			ImGui::Text("Code par Francois Candela - 2018");
+			ImGui::EndMenu();
+		}
+
 		ImGui::EndMainMenuBar();
 	}	
 

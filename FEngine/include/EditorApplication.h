@@ -27,4 +27,6 @@ private:
 	bool m_showTestWindow = false;
 	bool m_showSceneHierarchy = true;
 	bool m_showInspector = true;
+
+	bool m_editorShouldQuit = false;
 };
