@@ -3,12 +3,16 @@
 #include "renderer/ForwardPipeline.h"
 #include "editor/Component.h"
 
+#include <array>
+
 // Mesh class
 class Mesh : public Component
 {
 public:
-	// Loads a model from an OBJ file
-	void LoadModel(std::string path);
+	Mesh();
+
+	// Loads a model from an OBJ file, returns false if loading failed, true otherwise
+	bool LoadModel(std::string path);
 
 	// Component oveload
 	bool IsUnique() const override { return true; }
@@ -21,5 +25,13 @@ public:
 
 	// Render id of the mesh
 	render_id renderId = nullptr;
+
+	bool NeedsUpdate() const { return m_pathChanged; } // Return true if the mesh was changed and needs an update
+	void SetUpdated() { m_pathChanged = false; }
+
+private:
+	std::string m_path;
+	std::array<char, 256> m_pathBuffer;
+	bool m_pathChanged = false;
 
 };

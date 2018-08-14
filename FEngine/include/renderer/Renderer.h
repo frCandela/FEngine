@@ -96,8 +96,9 @@ private:
 		int index = -1;
 		glm::mat4 model = glm::mat4(1.f);	// Model matrix
 
-		~MeshData()
+		void Delete( vk::Device* device )
 		{
+			vkDeviceWaitIdle(device->device);
 			delete(vertexBuffer);
 			delete(indexBuffer);
 		}

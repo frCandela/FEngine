@@ -62,8 +62,6 @@ void EditorApplication::Run()
 			glm::vec2 screenSize = renderer->GetSize();
 			camera->aspectRatio = screenSize.x / screenSize.y;
 			io.DisplaySize = ImVec2(screenSize.x, screenSize.y);
-
-
 			camera->Update(deltaTime);
 
 			// camera uniforms
@@ -71,8 +69,20 @@ void EditorApplication::Run()
 
 			// Mesh Uniforms
 			for (GameObject * gameObject : scene->GetGameObjects())
-				for( Mesh* mesh : gameObject->GetComponents<Mesh>())				
-					renderer->SetModelMatrix(mesh->renderId, gameObject->GetTransform().GetModelMatrix());
+				for (Mesh* mesh : gameObject->GetComponents<Mesh>())
+				{
+					// Mesh geometry changed
+					if (mesh->NeedsUpdate())
+					{
+						// Reload the mesh buffers in the rendere
+						renderer->RemoveMesh(mesh->renderId);
+						mesh->renderId = nullptr;
+						mesh->renderId = renderer->AddMesh(mesh->vertices, mesh->indices);
+						mesh->SetUpdated();
+					}
+					if(mesh->renderId)
+						renderer->SetModelMatrix(mesh->renderId, gameObject->GetTransform().GetModelMatrix());
+				}
 
 			glm::vec4 pink{ 1.f,0,1,1.f };
 			glm::vec4 green{ 0,1,0,1.f };

@@ -34,7 +34,6 @@ void Scene::RenderSceneGui()
 			m_gameObjectSelected = gameObject;
 		if (nodeOpen)
 		{
-			ImGui::Text("test");
 			ImGui::TreePop();
 		}
 	}

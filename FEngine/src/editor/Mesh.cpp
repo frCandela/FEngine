@@ -5,7 +5,12 @@
 #define TINYOBJLOADER_IMPLEMENTATION
 #include <tiny_obj_loader.h>
 
-void Mesh::LoadModel(std::string path)
+Mesh::Mesh()
+{
+
+}
+
+bool Mesh::LoadModel(std::string path)
 {
 	// Load a model into the library's data structures
 	tinyobj::attrib_t attrib;
@@ -14,7 +19,15 @@ void Mesh::LoadModel(std::string path)
 	std::string err;
 
 	if (!tinyobj::LoadObj(&attrib, &shapes, &materials, &err, path.c_str()))
-		throw std::runtime_error(err);
+	{
+		std::cerr << err << std::endl;
+		return false;
+	}
+
+	m_path = path;
+
+	vertices.clear();
+	indices.clear();
 
 	std::unordered_map<ForwardPipeline::Vertex, uint32_t> uniqueVertices = {};
 
@@ -50,10 +63,44 @@ void Mesh::LoadModel(std::string path)
 			indices.push_back(uniqueVertices[vertex]);
 		}
 	}
+
+	return true;
 }
 
 void Mesh::RenderGui()
 {
-	Component::RenderGui();
+	Component::RenderGui();		
+
+	// Set path popup
+	if (ImGui::BeginPopup("set_path"))
+	{
+		ImGui::InputText("path: ", m_pathBuffer.data(), m_pathBuffer.size());
+		if (ImGui::Button("Update"))
+		{
+			if (LoadModel(m_pathBuffer.data()))
+				m_pathChanged = true;
+			ImGui::CloseCurrentPopup();
+		}
+
+		ImGui::SameLine();
+
+		if (ImGui::Button("Cancel"))		
+			ImGui::CloseCurrentPopup();
+		
+		ImGui::EndPopup();
+	}
+
+	// Set path button (open popup)
+	if (ImGui::Button("##set_path_button"))
+	{
+		std::size_t len = m_path.copy(m_pathBuffer.data(), m_pathBuffer.size());
+		m_pathBuffer[len] = '\0';
+
+		ImGui::OpenPopup("set_path");
+	}
+	ImGui::SameLine();
+	ImGui::Text("path: %s", m_path.c_str());
+	
+
 }
 

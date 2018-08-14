@@ -61,7 +61,11 @@ Renderer::~Renderer()
 	delete(texture);
 
 	for (MeshData * meshData : m_meshDatas)
-		delete(meshData);	
+	{
+		meshData->Delete(device);
+		delete(meshData);
+	}
+		
 
 	delete(renderDebug);
 	vkDestroyRenderPass(device->device, renderPass, nullptr);
@@ -130,11 +134,30 @@ render_id const Renderer::AddMesh(std::vector<ForwardPipeline::Vertex> & vertice
 
 void Renderer::RemoveMesh(render_id id)
 {
+	assert( ! m_meshDatas.empty() );
+	assert(id != nullptr);
+	assert(*id >= 0);
 
+	int index = *id;
+
+	// Delete the previous mesh data
+	m_meshDatas[index]->Delete( device);
+	delete m_meshDatas[index];
+
+	// Swap the last element with the deleted one if needed
+	if (m_meshDatas.size() > 1 && index != m_meshDatas.size() - 1)
+	{
+		m_meshDatas[index] = m_meshDatas[m_meshDatas.size() - 1];
+		m_meshDatas[index]->index = index;
+	}
+
+	// Delete le last element
+	m_meshDatas.pop_back();
 }
 
 void Renderer::SetModelMatrix(render_id ptr_id, glm::mat4 modelMatrix)
 {
+	assert(ptr_id);
 	m_meshDatas[*ptr_id]->model = modelMatrix;
 }
 
@@ -207,7 +230,7 @@ void Renderer::DrawFrame()
 	vkWaitForFences(device->device, 1, &inFlightFences[currentFrame], VK_TRUE, std::numeric_limits<uint64_t>::max());
 	vkResetFences(device->device, 1, &inFlightFences[currentFrame]);
 	
-	vkDeviceWaitIdle(device->device);//zob
+	vkDeviceWaitIdle(device->device);//zob THIS IS VERY BAD
 	
 	renderDebug->UpdateDebugBuffer(*commandPool);
 	ImGui::Render();
