@@ -11,9 +11,14 @@
 class Transform
 {
 public:
-	glm::quat rotation = glm::quat(0,0,0,1);	// Rotation in radians
-	glm::vec3 position = glm::vec3(0, 0, 0);
-	glm::vec3 scale = glm::vec3(1, 1, 1);
+
+	void SetPosition(glm::vec3 newPosition);
+	void SetScale(glm::vec3 newScale);
+	void SetRotation(glm::quat newRotation);
+
+	glm::vec3 GetPosition() const;
+	glm::vec3 GetScale() const;
+	glm::quat GetRotation() const;
 
 	glm::vec3 Right() const;
 	glm::vec3 Forward() const;
@@ -21,4 +26,10 @@ public:
 	glm::mat4 GetModelMatrix() const;
 	
 	void RenderGui();
+
+private:
+
+	glm::quat m_rotation = glm::quat(0, 0, 0, 1);	// Rotation in radians
+	glm::vec3 m_position = glm::vec3(0, 0, 0);
+	glm::vec3 m_scale = glm::vec3(1, 1, 1);
 };

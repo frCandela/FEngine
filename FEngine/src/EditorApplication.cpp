@@ -20,7 +20,7 @@ void EditorApplication::Run()
 	// Test rendering
 	GameObject* cameraGo = scene->CreateGameobject("Editor Camera");
 	EditorCamera* camera = cameraGo->AddComponent<EditorCamera>();
-	cameraGo->GetTransform().position = { 0,0,-10 };
+	cameraGo->GetTransform().SetPosition({ 0,0,-10 });
 	camera->aspectRatio = renderer->GetAspectRatio();
 
 	Triangle t{ { 0,-5,-5 },{ 0,-5,5 },{ 0,5,0 } };
@@ -35,8 +35,8 @@ void EditorApplication::Run()
 	Mesh* kiwiMesh = kiwi->AddComponent<Mesh>();
 	kiwiMesh->LoadModel("mesh/kiwi.obj");
 	kiwiMesh->renderId = renderer->AddMesh(kiwiMesh->vertices, kiwiMesh->indices);
-	kiwi->GetTransform().position = { 5,0,0 };
-	kiwi->GetTransform().scale = { 0.1,0.1,0.1 };
+	kiwi->GetTransform().SetPosition( { 5,0,0 });
+	kiwi->GetTransform().SetScale({ 0.1,0.1,0.1 });
 
 	GameObject* cube1 = scene->CreateGameobject("cube");
 	Mesh* mesh1 = cube1->AddComponent<Mesh>();
@@ -105,7 +105,7 @@ void EditorApplication::Run()
 			// Calculates the direction of a ray going from the mouse forward and draws it into p2, d2
 			if (Mouse::KeyDown(Mouse::button2))
 			{
-				const glm::vec3 pos = camera->GetGameobject()->GetTransform().position;
+				const glm::vec3 pos = camera->GetGameobject()->GetTransform().GetPosition();
 				const glm::vec3 up = camera->GetGameobject()->GetTransform().Up();
 				const glm::vec3 right = camera->GetGameobject()->GetTransform().Right();
 				const glm::vec3 forward = camera->GetGameobject()->GetTransform().Forward();
@@ -120,7 +120,7 @@ void EditorApplication::Run()
 
 				glm::vec2 ratio = 2.f * mousePos / screenSize - glm::vec2(1.f, 1.f);
 				p2 = nearMiddle + ratio.x * nearWidth * right - ratio.y * nearHeight * up;
-				d2 = 100.f * glm::normalize(p2 - camera->GetGameobject()->GetTransform().position);
+				d2 = 100.f * glm::normalize(p2 - camera->GetGameobject()->GetTransform().GetPosition());
 			}
 
 			renderer->DebugPoint(p2);

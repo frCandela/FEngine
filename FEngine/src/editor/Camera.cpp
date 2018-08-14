@@ -4,7 +4,7 @@
 
 glm::mat4 Camera::GetView() const
 {
-	glm::mat4 view = glm::lookAt(GetGameobject()->GetTransform().position, GetGameobject()->GetTransform().position + GetGameobject()->GetTransform().Forward(), up);
+	glm::mat4 view = glm::lookAt(GetGameobject()->GetTransform().GetPosition(), GetGameobject()->GetTransform().GetPosition() + GetGameobject()->GetTransform().Forward(), up);
 	return view;
 }
 

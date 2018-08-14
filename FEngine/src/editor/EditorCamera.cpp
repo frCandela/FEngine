@@ -5,8 +5,8 @@ std::string EditorCamera::GetName() const { return "Editor camera"; }
 void EditorCamera::Update(float delta)
 {
 	Transform& transform = GetGameobject()->GetTransform();
-	glm::vec3& position = GetGameobject()->GetTransform().position;
-	glm::quat& rotation = GetGameobject()->GetTransform().rotation;
+	glm::vec3 position = GetGameobject()->GetTransform().GetPosition();
+	glm::quat rotation = GetGameobject()->GetTransform().GetRotation();
 
 	// Calculates speed
 	float realSpeed = speed;
@@ -46,6 +46,9 @@ void EditorCamera::Update(float delta)
 		glm::quat pitch = glm::angleAxis(-sensitivity * mouseDelta.y, transform.Right());
 		rotation = yaw * pitch * rotation;
 	}
+
+	transform.SetPosition(position);
+	transform.SetRotation(rotation);
 }
 
 void EditorCamera::RenderGui()

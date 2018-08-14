@@ -181,16 +181,15 @@ void Renderer::CreateCommandBuffers()
 			m_pForwardPipeline->BindDescriptors(commandBuffers->commandBuffers[i], j);
 
 			vkCmdDrawIndexed(commandBuffers->commandBuffers[i], static_cast<uint32_t>(m_meshDatas[j]->indexBufferSize), 1, 0, 0, 0);
-		}		
-
-		// Draw imgui on another pipeline
-		imGui->DrawFrame(commandBuffers->commandBuffers[i]);
+		}	
 
 		//Bind debug pipeline
 		m_pDebugPipeline->BindPipeline(commandBuffers->commandBuffers[i]);
 		m_pDebugPipeline->BindDescriptors(commandBuffers->commandBuffers[i]);
 		renderDebug->Draw(commandBuffers->commandBuffers[i]);
 
+		// Draw imgui on another pipeline
+		imGui->DrawFrame(commandBuffers->commandBuffers[i]);
 		vkCmdEndRenderPass(commandBuffers->commandBuffers[i]);
 		commandBuffers->End(i);		
 	}
