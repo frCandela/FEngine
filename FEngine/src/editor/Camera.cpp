@@ -19,6 +19,30 @@ glm::mat4 Camera::GetProjection() const
 	return proj;
 }
 
+Ray Camera::ScreenPosToRay(glm::vec2 position)
+{
+	assert(position.x >= -1.f  && position.x <= 1.f);
+	assert(position.y >= -1.f && position.y <= 1.f);
+
+	Transform* transform = GetGameobject()->GetComponent<Transform>();
+
+	const glm::vec3 pos = transform->GetPosition();
+	const glm::vec3 up = transform->Up();
+	const glm::vec3 right = transform->Right();
+	const glm::vec3 forward = transform->Forward();
+
+	glm::vec3 nearMiddle = pos + nearp * forward;
+
+	float nearHeight = nearp * tan(glm::radians(fov / 2));
+	float nearWidth = aspectRatio * nearHeight;
+
+	Ray ray;
+	ray.origin = nearMiddle + position.x * nearWidth * right - position.y * nearHeight * up;
+	ray.direction = 100.f * glm::normalize(ray.origin - pos);
+
+	return ray;
+}
+
 void Camera::RenderGui()
 {
 	Component::RenderGui();

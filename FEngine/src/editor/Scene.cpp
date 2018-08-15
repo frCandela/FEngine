@@ -42,3 +42,6 @@ void Scene::RenderSceneGui()
 	}
 	ImGui::End();
 }
+
+GameObject* Scene::GetSelectedGameobject() { return m_gameObjectSelected; }
+void Scene::SetSelectedGameobject(GameObject * newSelectedGameobject) { m_gameObjectSelected = newSelectedGameobject; }

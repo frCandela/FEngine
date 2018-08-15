@@ -8,6 +8,12 @@
 
 #include "glm/glm.hpp"
 
+struct Ray
+{
+	glm::vec3 origin;
+	glm::vec3 direction;
+};
+
 struct Triangle
 {
 	glm::vec3 v0;
@@ -15,7 +21,7 @@ struct Triangle
 	glm::vec3 v2;
 
 	// Möller–Trumbore intersection algorithm
-	bool RayCast(glm::vec3 origin, glm::vec3 dir, glm::vec3* outIntersection)
+	bool RayCast(glm::vec3 origin, glm::vec3 dir, glm::vec3* outIntersection) const
 	{
 		float EPSILON = 0.0000001f;
 		glm::vec3 e1 = v1 - v0;	// edge 1
@@ -99,36 +105,6 @@ private:
 		m_triangles[9] = { e3,e7,e8 };
 		m_triangles[10] = { e1,e2,e6 };
 		m_triangles[11] = { e1,e5,e6 };
-	}
-	
+	}	
 };
 
-
-
-struct GameobjectEditorData
-{
-
-};
-
-// Creates the editing fonctionalities of the engine
-class Editor
-{
-public:
-	Editor()
-	{
-
-	}
-
-	~Editor()
-	{
-
-	}
-
-private:
-
-
-
-	std::vector< std::pair<GameObject *, GameobjectEditorData > > m_gameObjects;
-
-
-};

@@ -27,7 +27,7 @@ public:
 	inline GameObject* GetGameobject() const { return m_pGameobject; }
 
 protected:
-	bool m_wasModified = false;	// Set this variable to true if the component needs to be updated by the others systems using it.
+	bool m_wasModified = true;	// Set this variable to true if the component needs to be updated by the others systems using it.
 
 private:
 	GameObject*  m_pGameobject;	
