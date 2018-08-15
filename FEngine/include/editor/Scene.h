@@ -14,7 +14,7 @@ public:
 	Scene(std::string name);
 
 	// Creates a game object and adds it to the scene hierarchy
-	GameObject* CreateGameobject(std::string name);
+	GameObject* CreateGameobject(std::string name);	
 
 	// Deletes a gameobject and removes it from the scene hierarchy
 	void DeleteGameobjectLater(GameObject* gameobject);
@@ -47,6 +47,11 @@ public:
 
 	// Raycast on the scene against every gameobject AABB
 	GameObject* RayCast(Ray ray);
+
+	// Delete the AABB of a gameobject
+	void DeleteAABB(GameObject* gameobject);
+
+	Signal<GameObject*> onGameobjectCreated;
 private:
 	std::vector <GameObject*> m_toDeleteLater;
 	std::map<GameObject *, GameObject *> m_gameObjects;

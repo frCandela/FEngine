@@ -134,8 +134,11 @@ render_id const Renderer::AddMesh(std::vector<ForwardPipeline::Vertex> & vertice
 
 void Renderer::RemoveMesh(render_id id)
 {
-	assert( ! m_meshDatas.empty() );
-	assert(id != nullptr);
+	assert(!m_meshDatas.empty());
+
+	if (id == nullptr)
+		return;
+
 	assert(*id >= 0);
 
 	int index = *id;

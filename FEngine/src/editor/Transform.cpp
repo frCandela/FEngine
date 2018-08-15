@@ -30,9 +30,7 @@ void Transform::RenderGui()
 		SetScale(glm::vec3(scaleBuffer[0], scaleBuffer[1], scaleBuffer[2]));
 }
 
-void Transform::SetPosition(glm::vec3 newPosition) {
-	m_position = newPosition; m_wasModified = true;
-}
+void Transform::SetPosition(glm::vec3 newPosition) {m_position = newPosition; m_wasModified = true;}
 void Transform::SetScale(glm::vec3 newScale) { m_scale = newScale; m_wasModified = true; }
 void Transform::SetRotation(glm::quat newRotation) { m_rotation = newRotation; m_wasModified = true; }
 

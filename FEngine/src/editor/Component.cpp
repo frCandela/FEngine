@@ -1,6 +1,5 @@
 #include "editor/Component.h"
 
-
 bool Component::WasModified()
 {
 	if (m_wasModified)

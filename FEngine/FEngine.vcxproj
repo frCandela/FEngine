@@ -643,6 +643,7 @@
     <ClInclude Include="include\renderer\Renderer.h" />
     <ClInclude Include="include\renderer\Window.h" />
     <ClInclude Include="include\util\Input.h" />
+    <ClInclude Include="include\util\Signal.h" />
     <ClInclude Include="include\util\Time.h" />
     <ClInclude Include="include\vulkan\CommandPool.h" />
     <ClInclude Include="include\vulkan\Initializers.h" />

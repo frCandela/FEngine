@@ -46,7 +46,20 @@ void EditorApplication::ProcessComponentsModifications()
 	}
 }
 
+void EditorApplication::OnGameobjectCreatedCallback(GameObject* gameobject)
+{
+	gameobject->onComponentDeleted.connect(&EditorApplication::OnComponentDeletedCallback, this);
+}
 
+void EditorApplication::OnComponentDeletedCallback(GameObject* gameobject, Component* component)
+{
+	Mesh* mesh = dynamic_cast<Mesh*>(component);
+	if (mesh)
+	{
+		m_renderer->RemoveMesh(mesh->renderId);
+		m_scene->DeleteAABB(gameobject);
+	}
+}
 
 void EditorApplication::Run()
 {
@@ -55,6 +68,7 @@ void EditorApplication::Run()
 	m_renderer = new Renderer(window);
 	m_physicsEngine = new PhysicsEngine();
 	m_scene = new Scene("Test scene");
+	m_scene->onGameobjectCreated.connect(&EditorApplication::OnGameobjectCreatedCallback, this);
 
 	// Create editor camera
 	GameObject* cameraGo = m_scene->CreateGameobject("Editor Camera");
@@ -98,7 +112,9 @@ void EditorApplication::Run()
 			glm::vec2 screenSize = m_renderer->GetSize();
 			m_editorCamera->aspectRatio = screenSize.x / screenSize.y;
 			io.DisplaySize = ImVec2(screenSize.x, screenSize.y);
-			m_editorCamera->Update(deltaTime);
+
+			if( !io.WantCaptureKeyboard && ! io.WantCaptureMouse)
+				m_editorCamera->Update(deltaTime);
 
 			// camera uniforms
 			m_renderer->UpdateCameraUniforms(m_editorCamera->GetProjection(), m_editorCamera->GetView());
@@ -198,7 +214,8 @@ void EditorApplication::RenderGUI()
 		if (ImGui::Button("Ok"))
 		{
 			//Create new gameobject 
-			m_scene->CreateGameobject(m_newGameobjectBuffer.data());
+			GameObject* newGameobject =  m_scene->CreateGameobject(m_newGameobjectBuffer.data());
+			m_scene->SetSelectedGameobject(newGameobject);
 			ImGui::CloseCurrentPopup(); 
 		}
 		ImGui::EndPopup();

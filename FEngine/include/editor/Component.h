@@ -1,6 +1,8 @@
 #pragma once
 
 #include "imgui/imgui.h"
+
+
 #include <string>
 
 #include "editor/GameObject.h"
@@ -25,6 +27,8 @@ public:
 
 	// Returns a reference on the Gameobject the component is bound to
 	inline GameObject* GetGameobject() const { return m_pGameobject; }
+
+	Signal<> onComponentDelete;
 
 protected:
 	bool m_wasModified = true;	// Set this variable to true if the component needs to be updated by the others systems using it.

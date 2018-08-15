@@ -22,6 +22,9 @@ private:
 	// Updates the required modules when components are modified (AABB, selection, uniforms etc.)
 	void ProcessComponentsModifications();
 
+	void OnComponentDeletedCallback(GameObject* gameobject, Component* component);
+	void OnGameobjectCreatedCallback(GameObject* gameobject);
+
 	Renderer * m_renderer;
 	PhysicsEngine * m_physicsEngine;
 	Scene* m_scene;	

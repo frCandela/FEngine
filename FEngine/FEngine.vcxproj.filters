@@ -1768,6 +1768,9 @@
     <ClInclude Include="include\editor\Mesh.h">
       <Filter>Fichiers d%27en-tête\editor</Filter>
     </ClInclude>
+    <ClInclude Include="include\util\Signal.h">
+      <Filter>Fichiers d%27en-tête\util</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="shaders\shader.frag">

@@ -6,6 +6,7 @@
 #include <cassert>
 #include <type_traits>
 
+#include "util/Signal.h"
 #include "Component.h"
 class Component;
 
@@ -47,11 +48,13 @@ public:
 	// Returns the component at the given index
 	Component* GetComponent(size_t index) { return m_components[index]; }
 
-	// Render the gameObject inspector gui
-	virtual void RenderGui();
+	// Returns the component vector
+	std::vector<Component*> GetComponents() { return m_components; }
 
 	//Getters
 	inline std::string GetName() { return m_name; }
+
+	Signal<GameObject*, Component*> onComponentDeleted;
 
 private:
 	std::vector<Component*> m_components;
@@ -69,7 +72,9 @@ ComponentType* GameObject::AddComponent()
 	assert( (std::is_base_of<Component, ComponentType>::value ));
 
 	// Checks if ComponentType is unique and doesn't isn't already added to the GameObject
-	assert(!dynamic_cast<Component*>(componentType)->IsUnique() || GetComponent<ComponentType>() == nullptr);
+	//assert(!dynamic_cast<Component*>(componentType)->IsUnique() || GetComponent<ComponentType>() == nullptr);
+	if (dynamic_cast<Component*>(componentType)->IsUnique() && GetComponent<ComponentType>() != nullptr)
+		return nullptr;
 
 	m_components.push_back(componentType);
 

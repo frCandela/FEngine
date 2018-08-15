@@ -2,18 +2,27 @@
 #include "editor/Transform.h"
 
 #include "editor/Mesh.h"
+#include "editor/Camera.h"
 
 #include "glm/gtx/norm.hpp"
+
+#include <sstream>
 
 Scene::Scene(std::string name) :
 	m_name(name)
 {}
+
+void Scene::DeleteAABB(GameObject* gameobject)
+{
+	m_gameObjectsAABB.erase(gameobject);
+}
 
 GameObject* Scene::CreateGameobject(std::string name)
 {
 	GameObject* gameObject = new GameObject(name);
 	m_gameObjects[gameObject] = gameObject;
 	gameObject->AddComponent<Transform>();
+	onGameobjectCreated.emmit(gameObject);
 	return gameObject;
 }
 
@@ -45,7 +54,26 @@ void Scene::RenderInspectorGui()
 	if (m_gameObjectSelected)
 	{
 		// Gameobject gui
-		m_gameObjectSelected->RenderGui();
+		ImGui::Text("GameObject : %s", m_name.c_str());
+		int componentCount = 0;
+		for (Component* component : m_gameObjectSelected->GetComponents())
+		{
+			ImGui::Separator();
+
+
+			// Delete button
+			std::stringstream ss;
+			ss << "X" << "##" << component->GetName() << componentCount++;	// make unique id
+			if (ImGui::Button(ss.str().c_str()))			
+				m_gameObjectSelected->DeleteComponent(component);
+			else
+			{		
+				ImGui::SameLine();
+				component->RenderGui();
+			}
+
+		}
+		ImGui::Separator();
 
 		//Delete button
 		if (ImGui::Button("Delete Gameobject"))
@@ -53,6 +81,36 @@ void Scene::RenderInspectorGui()
 			DeleteGameobjectLater(m_gameObjectSelected);
 			m_gameObjectSelected = nullptr;
 		}
+
+		ImGui::SameLine();
+
+		//Add component button
+		if (ImGui::Button("Add component"))		
+			ImGui::OpenPopup("New component");		
+
+		if (ImGui::BeginPopup("New component"))
+		{
+			// Mesh
+			if (ImGui::MenuItem("Mesh"))
+			{
+				//Create new Component 
+				Mesh* mesh = m_gameObjectSelected->AddComponent<Mesh>();
+				if(mesh)
+					mesh->LoadModel("mesh/cube.obj");
+				ImGui::CloseCurrentPopup();
+			}	
+
+			// Camera
+			if (ImGui::MenuItem("Camera"))
+			{
+				//Create new Component 
+				Camera* mesh = m_gameObjectSelected->AddComponent<Camera>();
+				ImGui::CloseCurrentPopup();
+			}
+
+			ImGui::EndPopup();
+		}
+
 	}
 	ImGui::End();
 }
@@ -73,8 +131,6 @@ void Scene::RenderSceneGui()
 		if (nodeOpen)		
 			ImGui::TreePop();		
 	}
-
-
 	ImGui::End();
 }
 
