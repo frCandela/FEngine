@@ -20,6 +20,12 @@ public:
 
 	}
 
+	~GameObject()
+	{
+		for (Component* component : m_components)
+			delete(component);
+	}
+
 	// Creates an instance of ComponentType, adds it to the GameObject and returns a pointer
 	template<typename ComponentType>
 	ComponentType* AddComponent();
@@ -46,7 +52,6 @@ public:
 
 	//Getters
 	inline std::string GetName() { return m_name; }
-
 
 private:
 	std::vector<Component*> m_components;
