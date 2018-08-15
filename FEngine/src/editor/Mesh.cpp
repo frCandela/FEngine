@@ -78,7 +78,7 @@ void Mesh::RenderGui()
 		if (ImGui::Button("Update"))
 		{
 			if (LoadModel(m_pathBuffer.data()))
-				m_pathChanged = true;
+				m_wasModified = true;
 			ImGui::CloseCurrentPopup();
 		}
 

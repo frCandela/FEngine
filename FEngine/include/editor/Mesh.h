@@ -26,14 +26,8 @@ public:
 	// Render id of the mesh
 	render_id renderId = nullptr;
 
-	bool NeedsUpdate() const { return m_pathChanged; } // Return true if the mesh was changed and needs an update
-	void SetUpdated() { m_pathChanged = false; }
-
-
-
 private:
-	std::string m_path;
-	std::array<char, 256> m_pathBuffer;
-	bool m_pathChanged = false;
+	std::string m_path;	// Obj file path
+	std::array<char, 256> m_pathBuffer;	// Used to change the obj file path with imgui
 
 };

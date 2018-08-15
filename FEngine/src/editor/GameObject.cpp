@@ -18,8 +18,6 @@ bool GameObject::DeleteComponent(Component* component)
 void GameObject::RenderGui()
 {
 	ImGui::Text("GameObject : %s", m_name.c_str());
-	ImGui::Separator();
-	GetComponent<Transform>()->RenderGui();
 	for (Component* component : m_components)
 	{
 		ImGui::Separator();

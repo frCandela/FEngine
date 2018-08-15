@@ -6,6 +6,8 @@
 #include "editor/Shape.h"
 #include "editor/Scene.h"
 
+#include <map>
+
 class EditorApplication
 {
 public:
@@ -18,15 +20,20 @@ public:
 	void RenderGUI();
 
 private:
+	// Update the gameobject bounding box if it contains a Mesh
+	void UpdateGameobjectAABB( GameObject * gameobject, bool updateGeometry = false);
+
 	Renderer * renderer;
 	PhysicsEngine * physicsEngine;
 
 	Scene* scene;
+	std::map<GameObject*, std::pair<Cube, float> > m_gameObjectsAABB; // Used for selecting objects by clicking on them (for now cubes, not AABB)
 
 	bool m_showRendererWindow = true;
 	bool m_showTestWindow = false;
 	bool m_showSceneHierarchy = true;
 	bool m_showInspector = true;
-
 	bool m_editorShouldQuit = false;
+
+
 };

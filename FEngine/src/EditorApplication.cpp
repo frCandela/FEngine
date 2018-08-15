@@ -5,12 +5,53 @@
 #include "editor/Mesh.h"
 #include "util/Time.h"
 
-#include <map>
+
 #include <cmath>
 
 EditorApplication::EditorApplication()
 {
 	scene = new Scene("Test scene");
+}
+
+void EditorApplication::UpdateGameobjectAABB(GameObject * gameobject, bool updateGeometry)
+{
+	if (updateGeometry)
+	{
+		Mesh* mesh = gameobject->GetComponent<Mesh>();
+		if (mesh)
+		{
+			float maxX = 0.f;
+			float maxY = 0.f;
+			float maxZ = 0.f;
+			for (ForwardPipeline::Vertex vertex : mesh->vertices)
+			{
+				float x = std::abs(vertex.pos.x);
+				if (x > maxX)
+					maxX = x;
+				float y = std::abs(vertex.pos.y);
+				if (y > maxY)
+					maxY = y;
+				float z = std::abs(vertex.pos.z);
+				if (z > maxZ)
+					maxZ = z;
+			}
+
+			Transform* transform = gameobject->GetComponent<Transform>();
+			float maxScale = std::max( std::abs(transform->GetScale().x), std::max(std::abs(transform->GetScale().y), std::abs(transform->GetScale().z)));
+			float halfSize = std::max(maxX, std::max(maxY, maxZ));
+
+			m_gameObjectsAABB[gameobject] = std::make_pair( Cube(transform->GetPosition(), maxScale * halfSize), halfSize);
+		}
+	}
+	else
+	{
+		Transform* transform = gameobject->GetComponent<Transform>();
+		float maxScale = std::max(std::abs(transform->GetScale().x), std::max(std::abs(transform->GetScale().y), std::abs(transform->GetScale().z)));
+		float halfSize = m_gameObjectsAABB[gameobject].second;
+
+		m_gameObjectsAABB[gameobject].first = Cube(transform->GetPosition(), maxScale * halfSize);
+	}
+		
 }
 
 void EditorApplication::Run()
@@ -50,36 +91,8 @@ void EditorApplication::Run()
 	ImGuiIO& io = ImGui::GetIO();	
 	float lastTime = Time::ElapsedSinceStartup();
 
-	std::map<GameObject*,  Cube> cubes;
 	for (GameObject * gameObject : scene->GetGameObjects())
-	{
-		Mesh* mesh = gameObject->GetComponent<Mesh>();
-		if (mesh)
-		{
-			float maxX = 0.f;
-			float maxY = 0.f;
-			float maxZ = 0.f;
-			for (ForwardPipeline::Vertex vertex : mesh->vertices)
-			{
-				float x = std::abs(vertex.pos.x);
-				if (x > maxX)
-					maxX = x;
-				float y = std::abs(vertex.pos.y);
-				if (y > maxY)
-					maxY = y;
-				float z = std::abs(vertex.pos.z);
-				if (z > maxZ)
-					maxZ = z;
-			}
-
-			Transform* transform = gameObject->GetComponent<Transform>();
-			float maxScale = std::max(transform->GetScale().x, std::max(transform->GetScale().y, transform->GetScale().z));
-			float halfSize = maxScale *  std::max(maxX, std::max(maxY, maxZ));			
-
-			cubes[gameObject] = Cube({}, halfSize);
-		}			
-	}
-		
+		UpdateGameobjectAABB(gameObject, true);
 
 	// Main loop
 	while ( window.WindowOpen() &&  ! m_editorShouldQuit)
@@ -103,41 +116,52 @@ void EditorApplication::Run()
 
 			// Mesh Uniforms
 			for (GameObject * gameObject : scene->GetGameObjects())
+			{
+				bool updateAABBGeometry = false;
+				bool updateAABBPosition = false;
+				bool hasAABB = false;
+
+				Transform* transform = gameObject->GetComponent<Transform>();
+				if (transform->WasModified())				
+					updateAABBPosition = true;				
+
 				for (Mesh* mesh : gameObject->GetComponents<Mesh>())
 				{
+					hasAABB = true;
+
 					// Mesh geometry changed
-					if (mesh->NeedsUpdate())
+					if (mesh->WasModified())
 					{
 						// Reload the mesh buffers in the rendere
 						renderer->RemoveMesh(mesh->renderId);
 						mesh->renderId = nullptr;
 						mesh->renderId = renderer->AddMesh(mesh->vertices, mesh->indices);
-						mesh->SetUpdated();
+						updateAABBGeometry = true;
 					}
 
-					//Test
-					for( std::pair<GameObject* const, Cube>& pair : cubes)
-					{
-						pair.second.SetPosition(pair.first->GetComponent<Transform>()->GetPosition());
-						for (const Triangle& triangle : pair.second.GetTriangles())
+					//Render AABB
+					for (std::pair<GameObject* const, std::pair<Cube,float > >& pair : m_gameObjectsAABB)
+					{						
+						for (const Triangle& triangle : pair.second.first.GetTriangles())
 						{
-							renderer->DebugLine(triangle.v0, triangle.v1);							
+							renderer->DebugLine(triangle.v0, triangle.v1);
 							renderer->DebugLine(triangle.v1, triangle.v2);
-							renderer->DebugLine(triangle.v2, triangle.v0);						
+							renderer->DebugLine(triangle.v2, triangle.v0);
 						}
 					}
 
-					if(mesh->renderId)
+					if (mesh->renderId)
 						renderer->SetModelMatrix(mesh->renderId, gameObject->GetComponent<Transform>()->GetModelMatrix());
 				}
+				if (hasAABB && (updateAABBGeometry || updateAABBPosition))
+					UpdateGameobjectAABB(gameObject, updateAABBGeometry);				
+			}
+				
 
 			glm::vec4 pink{ 1.f,0,1,1.f };
 			glm::vec4 green{ 0,1,0,1.f };
 			glm::vec4 blue{ 0,0,1,1.f };
 			glm::vec4 yellow{ 1,1,0,1.f };
-
-
-
 
 			// Cube pos
 			/*c.SetPosition(cpos);
