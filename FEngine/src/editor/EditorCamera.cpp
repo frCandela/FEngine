@@ -4,9 +4,9 @@ std::string EditorCamera::GetName() const { return "Editor camera"; }
 
 void EditorCamera::Update(float delta)
 {
-	Transform& transform = GetGameobject()->GetTransform();
-	glm::vec3 position = GetGameobject()->GetTransform().GetPosition();
-	glm::quat rotation = GetGameobject()->GetTransform().GetRotation();
+	Transform* transform = GetGameobject()->GetComponent<Transform>();
+	glm::vec3 position = transform->GetPosition();
+	glm::quat rotation = transform->GetRotation();
 
 	// Calculates speed
 	float realSpeed = speed;
@@ -19,7 +19,7 @@ void EditorCamera::Update(float delta)
 		rightAxis += 1.f;
 	else if (Keyboard::KeyDown(GLFW_KEY_A))
 		rightAxis -= 1.f;
-	position += delta * realSpeed * rightAxis * transform.Right();
+	position += delta * realSpeed * rightAxis * transform->Right();
 
 	// Camera goes up
 	float upAxis = 0.f;
@@ -27,7 +27,7 @@ void EditorCamera::Update(float delta)
 		upAxis += 1.f;
 	else if (Keyboard::KeyDown(GLFW_KEY_Q))
 		upAxis -= 1.f;
-	position += delta * realSpeed * upAxis * transform.Up();
+	position += delta * realSpeed * upAxis * transform->Up();
 
 	// Camera goes forward
 	float forwardAxis = 0.f;
@@ -35,7 +35,7 @@ void EditorCamera::Update(float delta)
 		forwardAxis += 1.f;
 	else if (Keyboard::KeyDown(GLFW_KEY_S))
 		forwardAxis -= 1.f;
-	position += delta * realSpeed * forwardAxis * transform.Forward();
+	position += delta * realSpeed * forwardAxis * transform->Forward();
 
 
 	if (Mouse::KeyDown(Mouse::button1))
@@ -43,12 +43,12 @@ void EditorCamera::Update(float delta)
 		glm::vec2 mouseDelta = Mouse::Delta();
 
 		glm::quat yaw = glm::angleAxis(-sensitivity * mouseDelta.x, up);
-		glm::quat pitch = glm::angleAxis(-sensitivity * mouseDelta.y, transform.Right());
+		glm::quat pitch = glm::angleAxis(-sensitivity * mouseDelta.y, transform->Right());
 		rotation = yaw * pitch * rotation;
 	}
 
-	transform.SetPosition(position);
-	transform.SetRotation(rotation);
+	transform->SetPosition(position);
+	transform->SetRotation(rotation);
 }
 
 void EditorCamera::RenderGui()

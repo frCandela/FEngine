@@ -29,6 +29,8 @@ public:
 	bool NeedsUpdate() const { return m_pathChanged; } // Return true if the mesh was changed and needs an update
 	void SetUpdated() { m_pathChanged = false; }
 
+
+
 private:
 	std::string m_path;
 	std::array<char, 256> m_pathBuffer;

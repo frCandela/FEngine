@@ -2,7 +2,7 @@
 
 void Transform::RenderGui()
 {
-	ImGui::Text("Transform");
+	Component::RenderGui();
 
 	if (ImGui::Button("##TransPos")) 
 		m_position = glm::vec3(0, 0, 0);

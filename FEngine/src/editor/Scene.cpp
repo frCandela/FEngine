@@ -1,4 +1,6 @@
 #include "editor/Scene.h"
+#include "editor/Transform.h"
+
 
 Scene::Scene(std::string name) :
 	m_name(name)
@@ -8,6 +10,7 @@ GameObject* Scene::CreateGameobject(std::string name)
 {
 	GameObject* gameObject = new GameObject(name);
 	m_gameObjects.push_back(gameObject);
+	gameObject->AddComponent<Transform>();
 	return gameObject;
 }
 

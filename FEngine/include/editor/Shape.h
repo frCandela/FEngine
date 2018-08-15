@@ -50,51 +50,55 @@ struct Triangle
 };
 
 struct Cube
-{
-	std::array< Triangle, 12 > triangles;
-	glm::vec3 position;
-	float halfSize;
-		 
-	Cube(float halfSize = 0.5f, glm::vec3 position = {0,0,0}) :
-		position(position)
-		,halfSize(halfSize)
+{		 
+	Cube(glm::vec3 position = { 0,0,0 }, float halfSize = 0.5f) :
+		m_position(position)
+		,m_halfSize(halfSize)
 	{		
 		SetCube();
 	}
 
+	float GetHalfSize() const { return m_halfSize; }
+	glm::vec3 GetPosition() const { return m_position; }
 	void SetPosition(glm::vec3 pos = { 0,0,0 })
 	{
-		if (position != pos)
+		if (m_position != pos)
 		{
-			position = pos;
+			m_position = pos;
 			SetCube();
 		}
 	}
 
+	const std::array< Triangle, 12 >& GetTriangles() const { return m_triangles;}
+
 private:
+	std::array< Triangle, 12 > m_triangles;
+	glm::vec3 m_position;
+	float m_halfSize;
+
 	void SetCube()
 	{
-		const glm::vec3 e1 = position + glm::vec3( -halfSize,-halfSize,-halfSize );
-		const glm::vec3 e2 = position + glm::vec3( -halfSize,-halfSize,halfSize );
-		const glm::vec3 e3 = position + glm::vec3( -halfSize,halfSize,-halfSize );
-		const glm::vec3 e4 = position + glm::vec3( -halfSize,halfSize,halfSize );
-		const glm::vec3 e5 = position + glm::vec3( halfSize,-halfSize,-halfSize );
-		const glm::vec3 e6 = position + glm::vec3( halfSize,-halfSize,halfSize );
-		const glm::vec3 e7 = position + glm::vec3( halfSize,halfSize,-halfSize );
-		const glm::vec3 e8 = position + glm::vec3( halfSize,halfSize,halfSize );
+		const glm::vec3 e1 = m_position + glm::vec3( -m_halfSize,-m_halfSize,-m_halfSize );
+		const glm::vec3 e2 = m_position + glm::vec3( -m_halfSize,-m_halfSize,m_halfSize );
+		const glm::vec3 e3 = m_position + glm::vec3( -m_halfSize,m_halfSize,-m_halfSize );
+		const glm::vec3 e4 = m_position + glm::vec3( -m_halfSize,m_halfSize,m_halfSize );
+		const glm::vec3 e5 = m_position + glm::vec3( m_halfSize,-m_halfSize,-m_halfSize );
+		const glm::vec3 e6 = m_position + glm::vec3( m_halfSize,-m_halfSize,m_halfSize );
+		const glm::vec3 e7 = m_position + glm::vec3( m_halfSize,m_halfSize,-m_halfSize );
+		const glm::vec3 e8 = m_position + glm::vec3( m_halfSize,m_halfSize,m_halfSize );
 
-		triangles[0] = { e1,e2,e4 };
-		triangles[1] = { e1,e3,e4 };
-		triangles[2] = { e5,e6,e8 };
-		triangles[3] = { e5,e7,e8 };
-		triangles[4] = { e2,e6,e8 };
-		triangles[5] = { e2,e4,e8 };
-		triangles[6] = { e1,e5,e7 };
-		triangles[7] = { e1,e3,e7 };
-		triangles[8] = { e3,e4,e8 };
-		triangles[9] = { e3,e7,e8 };
-		triangles[10] = { e1,e2,e6 };
-		triangles[11] = { e1,e5,e6 };
+		m_triangles[0] = { e1,e2,e4 };
+		m_triangles[1] = { e1,e3,e4 };
+		m_triangles[2] = { e5,e6,e8 };
+		m_triangles[3] = { e5,e7,e8 };
+		m_triangles[4] = { e2,e6,e8 };
+		m_triangles[5] = { e2,e4,e8 };
+		m_triangles[6] = { e1,e5,e7 };
+		m_triangles[7] = { e1,e3,e7 };
+		m_triangles[8] = { e3,e4,e8 };
+		m_triangles[9] = { e3,e7,e8 };
+		m_triangles[10] = { e1,e2,e6 };
+		m_triangles[11] = { e1,e5,e6 };
 	}
 	
 };

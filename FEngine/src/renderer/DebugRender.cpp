@@ -25,6 +25,10 @@ void RenderDebug::Clear()
 
 void RenderDebug::UpdateDebugBuffer(vk::CommandPool& commandPool)
 {
+	// No debug data
+	if (m_verticesDebug.size() == 0)
+		return;
+
 	VkDeviceSize bufferSize = sizeof(m_verticesDebug[0]) * m_verticesDebug.size();
 
 	// Create a host visible buffer

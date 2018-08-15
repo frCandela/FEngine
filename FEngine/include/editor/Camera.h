@@ -1,6 +1,7 @@
 #pragma once
 
 #include "editor/Component.h"
+#include "editor/Transform.h"
 
 #include <glm/glm.hpp>
 #include "util/Input.h"

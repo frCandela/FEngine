@@ -9,8 +9,6 @@
 #include "Component.h"
 class Component;
 
-#include "Transform.h"
-
 // Base class for all entities in the engine
 class GameObject
 {
@@ -47,13 +45,11 @@ public:
 	virtual void RenderGui();
 
 	//Getters
-	inline Transform& GetTransform() { return m_transform; }
 	inline std::string GetName() { return m_name; }
 
 
 private:
 	std::vector<Component*> m_components;
-	Transform m_transform;
 	std::string m_name;
 };
 
@@ -63,7 +59,6 @@ ComponentType* GameObject::AddComponent()
 	ComponentType* componentType = new ComponentType();
 
 	componentType->m_pGameobject = this;
-
 
 	// Checks if ComponentType derivates from Component
 	assert( (std::is_base_of<Component, ComponentType>::value ));
