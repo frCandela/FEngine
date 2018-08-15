@@ -39,8 +39,6 @@ void Scene::ApplyDeleteCommands()
 	m_toDeleteLater.clear();
 }
 
-
-
 void Scene::RenderInspectorGui()
 {
 	ImGui::Begin("Inspector");
@@ -49,15 +47,12 @@ void Scene::RenderInspectorGui()
 		// Gameobject gui
 		m_gameObjectSelected->RenderGui();
 
-		float width = ImGui::GetWindowSize().x / 2.f;
-
-
 		//Delete button
-		if (ImGui::Button("Delete"))
+		if (ImGui::Button("Delete Gameobject"))
 		{
 			DeleteGameobjectLater(m_gameObjectSelected);
 			m_gameObjectSelected = nullptr;
-		}	
+		}
 	}
 	ImGui::End();
 }
@@ -78,6 +73,8 @@ void Scene::RenderSceneGui()
 		if (nodeOpen)		
 			ImGui::TreePop();		
 	}
+
+
 	ImGui::End();
 }
 

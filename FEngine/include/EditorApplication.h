@@ -32,4 +32,6 @@ private:
 	bool m_showSceneHierarchy = true;
 	bool m_showInspector = true;
 	bool m_editorShouldQuit = false;
+
+	std::array<char, 64> m_newGameobjectBuffer;
 };

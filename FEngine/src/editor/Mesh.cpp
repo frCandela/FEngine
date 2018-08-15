@@ -1,4 +1,5 @@
 #include "editor/Mesh.h"
+#include "editor/Transform.h"
 
 #include "vulkan/CommandBuffer.h"
 
@@ -78,7 +79,10 @@ void Mesh::RenderGui()
 		if (ImGui::Button("Update"))
 		{
 			if (LoadModel(m_pathBuffer.data()))
+			{
 				m_wasModified = true;
+				GetGameobject()->GetComponent<Transform>()->SetScale({ 1.f,1.f,1.f });
+			}
 			ImGui::CloseCurrentPopup();
 		}
 
@@ -90,17 +94,15 @@ void Mesh::RenderGui()
 		ImGui::EndPopup();
 	}
 
+	ImGui::Text("path: %s", m_path.c_str());
+	ImGui::SameLine();
 	// Set path button (open popup)
-	if (ImGui::Button("##set_path_button"))
+	if (ImGui::Button("Set##set_path_button"))
 	{
 		std::size_t len = m_path.copy(m_pathBuffer.data(), m_pathBuffer.size());
 		m_pathBuffer[len] = '\0';
 
 		ImGui::OpenPopup("set_path");
 	}
-	ImGui::SameLine();
-	ImGui::Text("path: %s", m_path.c_str());
-	
-
 }
 

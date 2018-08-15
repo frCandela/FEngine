@@ -75,7 +75,7 @@ void EditorApplication::Run()
 	mesh1->LoadModel("mesh/cube.obj");
 	mesh1->renderId = m_renderer->AddMesh(mesh1->vertices, mesh1->indices);
 
-	// Initialize gameo
+	// Initialize game
 	for (std::pair<GameObject *, GameObject *> pair : m_scene->GetGameObjects())	
 		m_scene->UpdateGameobjectAABB(pair.first, true);	
 
@@ -140,13 +140,22 @@ void EditorApplication::Run()
 
 void EditorApplication::RenderGUI()
 {
+	bool openNewGameobjectModal = false;
+
 	// Main Menu bar
 	if (ImGui::BeginMainMenuBar())
 	{
 		// File
 		if (ImGui::BeginMenu("File"))
 		{
-			if (ImGui::Button("Quit"))
+			if (ImGui::BeginMenu("New"))
+			{
+				if (ImGui::MenuItem("Gameobject"))
+					openNewGameobjectModal = true;
+				ImGui::EndMenu();
+			}
+
+			if (ImGui::MenuItem("Quit"))
 				m_editorShouldQuit = true;
 			ImGui::EndMenu();
 		}
@@ -169,9 +178,31 @@ void EditorApplication::RenderGUI()
 			ImGui::Text("Code par Francois Candela - 2018");
 			ImGui::EndMenu();
 		}
-
 		ImGui::EndMainMenuBar();
+	}
+
+	// New gameobject modals
+	if (openNewGameobjectModal)
+	{
+		openNewGameobjectModal = false;
+		m_newGameobjectBuffer[0] = '\0';
+		ImGui::OpenPopup("New Gameobject");
 	}	
+	ImGui::SetNextWindowSize({300,300});
+	if (ImGui::BeginPopupModal("New Gameobject"))
+	{
+		ImGui::InputText("Name ", m_newGameobjectBuffer.data(), m_newGameobjectBuffer.size());
+		if (ImGui::Button("Cancel"))
+			ImGui::CloseCurrentPopup();
+		ImGui::SameLine();
+		if (ImGui::Button("Ok"))
+		{
+			//Create new gameobject 
+			m_scene->CreateGameobject(m_newGameobjectBuffer.data());
+			ImGui::CloseCurrentPopup(); 
+		}
+		ImGui::EndPopup();
+	}
 
 	// Renderer window
 	if (m_showRendererWindow)
