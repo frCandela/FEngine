@@ -9,7 +9,7 @@
 #endif // !GLM_FORCE_RADIANS
 
 #include <vector>
-#include "renderer/Window.h"
+#include "renderer/GLFWWindow.h"
 
 namespace vk
 {

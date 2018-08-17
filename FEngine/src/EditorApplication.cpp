@@ -189,9 +189,8 @@ void EditorApplication::RenderGUI()
 		// Help
 		if (ImGui::BeginMenu("Help"))
 		{
-			ImGui::Text("Controle camera: ZSQDAE avec clic droit appuye");
-			ImGui::Text("Clic molette pour caster des rayons");
-			ImGui::Text("Code par Francois Candela - 2018");
+			ImGui::Text("Controle camera: ZSQDAE en maintenant clic droit");
+			ImGui::Text("Francois Candela - 15/08/2018"); 
 			ImGui::EndMenu();
 		}
 		ImGui::EndMainMenuBar();

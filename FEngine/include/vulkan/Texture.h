@@ -15,8 +15,6 @@ namespace vk
 		void LoadTexture(std::string path);
 
 		void Load(void* data, int width, int height, uint32_t mipLevels);
-		
-
 
 		uint32_t m_mipLevels = 1;
 

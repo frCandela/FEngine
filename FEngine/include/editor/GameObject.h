@@ -71,10 +71,10 @@ ComponentType* GameObject::AddComponent()
 	// Checks if ComponentType derivates from Component
 	assert( (std::is_base_of<Component, ComponentType>::value ));
 
-	// Checks if ComponentType is unique and doesn't isn't already added to the GameObject
-	//assert(!dynamic_cast<Component*>(componentType)->IsUnique() || GetComponent<ComponentType>() == nullptr);
-	if (dynamic_cast<Component*>(componentType)->IsUnique() && GetComponent<ComponentType>() != nullptr)
+	// Checks if ComponentType is unique and doesn't isn't already added to the GameObject	
+	if (componentType->IsUnique() && GetComponent<ComponentType>() != nullptr)
 		return nullptr;
+	//zob
 
 	m_components.push_back(componentType);
 
