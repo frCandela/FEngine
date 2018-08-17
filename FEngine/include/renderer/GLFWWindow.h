@@ -4,12 +4,13 @@
 #include <string>
 #include <iostream>
 
+#include "vulkan/vulkan.h"
 #ifndef GLFW_INCLUDE_VULKAN
 #define GLFW_INCLUDE_VULKAN
 #include <GLFW/glfw3.h>
 #endif // !GLFW_INCLUDE_VULKAN
 
-#include "util/Input.h"
+#include "util/UserInput.h"
 
 class Window
 {
@@ -23,7 +24,6 @@ public:
 	GLFWwindow * GetGLFWwindow() const { return m_window; }
 
 	int GetRefreshRate();
-
 
 private:
 	uint32_t m_width;

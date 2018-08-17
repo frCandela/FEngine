@@ -14,7 +14,7 @@
     <VCProjectVersion>15.0</VCProjectVersion>
     <ProjectGuid>{134A4039-2F62-4BBF-982B-84F5AE0D2618}</ProjectGuid>
     <RootNamespace>FEngine</RootNamespace>
-    <WindowsTargetPlatformVersion>10.0.16299.0</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>10.0.17134.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
@@ -58,14 +58,14 @@
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>deps/bullet3;deps\glfw\include;deps;include;C:\VulkanSDK\1.1.77.0\Include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>deps/GLFW/include;deps/bullet3;deps;include;C:\VulkanSDK\1.1.77.0\Include</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <PreprocessorDefinitions>VALIDATION_LAYERS;%(PreprocessorDefinitions);DEBUG;_SCL_SECURE_NO_WARNINGS</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;_GLFW_WIN32;VALIDATION_LAYERS;%(PreprocessorDefinitions);DEBUG;_SCL_SECURE_NO_WARNINGS</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>glfw3d.lib;vulkan-1.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>C:\VulkanSDK\1.1.77.0\Lib;lib</AdditionalLibraryDirectories>
+      <AdditionalDependencies>vulkan-1.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>C:\VulkanSDK\1.1.77.0\Lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <SubSystem>
       </SubSystem>
     </Link>
@@ -78,15 +78,15 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>deps/bullet3;deps\glfw\include;deps;include;C:\VulkanSDK\1.1.77.0\Include</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>_MBCS;%(PreprocessorDefinitions);NDEBUG</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>deps/GLFW/include;deps/bullet3;deps;include;C:\VulkanSDK\1.1.77.0\Include</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;_MBCS;%(PreprocessorDefinitions);NDEBUG;_GLFW_WIN32</PreprocessorDefinitions>
       <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalDependencies>glfw3.lib;vulkan-1.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>C:\VulkanSDK\1.1.77.0\Lib;lib</AdditionalLibraryDirectories>
+      <AdditionalDependencies>vulkan-1.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>C:\VulkanSDK\1.1.77.0\Lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <SubSystem>
       </SubSystem>
     </Link>
@@ -268,6 +268,20 @@
     <ClCompile Include="deps\bullet3\LinearMath\btSerializer64.cpp" />
     <ClCompile Include="deps\bullet3\LinearMath\btThreads.cpp" />
     <ClCompile Include="deps\bullet3\LinearMath\btVector3.cpp" />
+    <ClCompile Include="deps\GLFW\src\context.c" />
+    <ClCompile Include="deps\GLFW\src\egl_context.c" />
+    <ClCompile Include="deps\GLFW\src\init.c" />
+    <ClCompile Include="deps\GLFW\src\input.c" />
+    <ClCompile Include="deps\GLFW\src\monitor.c" />
+    <ClCompile Include="deps\GLFW\src\vulkan.c" />
+    <ClCompile Include="deps\GLFW\src\wgl_context.c" />
+    <ClCompile Include="deps\GLFW\src\win32_init.c" />
+    <ClCompile Include="deps\GLFW\src\win32_joystick.c" />
+    <ClCompile Include="deps\GLFW\src\win32_monitor.c" />
+    <ClCompile Include="deps\GLFW\src\win32_time.c" />
+    <ClCompile Include="deps\GLFW\src\win32_tls.c" />
+    <ClCompile Include="deps\GLFW\src\win32_window.c" />
+    <ClCompile Include="deps\GLFW\src\window.c" />
     <ClCompile Include="deps\imgui\imgui.cpp" />
     <ClCompile Include="deps\imgui\imgui_demo.cpp" />
     <ClCompile Include="deps\imgui\imgui_draw.cpp" />
@@ -285,8 +299,8 @@
     <ClCompile Include="src\renderer\ForwardPipeline.cpp" />
     <ClCompile Include="src\renderer\ImguiManager.cpp" />
     <ClCompile Include="src\renderer\Renderer.cpp" />
-    <ClCompile Include="src\renderer\Window.cpp" />
-    <ClCompile Include="src\util\Input.cpp" />
+    <ClCompile Include="src\renderer\GLFWWindow.cpp" />
+    <ClCompile Include="src\util\UserInput.cpp" />
     <ClCompile Include="src\util\Time.cpp" />
     <ClCompile Include="src\vulkan\Buffer.cpp" />
     <ClCompile Include="src\vulkan\CommandPool.cpp" />
@@ -641,8 +655,8 @@
     <ClInclude Include="include\renderer\ForwardPipeline.h" />
     <ClInclude Include="include\renderer\ImguiManager.h" />
     <ClInclude Include="include\renderer\Renderer.h" />
-    <ClInclude Include="include\renderer\Window.h" />
-    <ClInclude Include="include\util\Input.h" />
+    <ClInclude Include="include\renderer\GLFWWindow.h" />
+    <ClInclude Include="include\util\UserInput.h" />
     <ClInclude Include="include\util\Signal.h" />
     <ClInclude Include="include\util\Time.h" />
     <ClInclude Include="include\vulkan\CommandPool.h" />

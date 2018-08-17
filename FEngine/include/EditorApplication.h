@@ -1,7 +1,7 @@
 #pragma once
 
 #include "renderer/Renderer.h"
-#include "renderer/Window.h"
+#include "renderer/GLFWWindow.h"
 #include "physics/PhysicsEngine.h"
 #include "editor/Scene.h"
 

@@ -8,7 +8,6 @@
 #include <set>
 #include <sstream>
 
-#include "Window.h"
 #include "DebugPipeline.h"
 #include "ForwardPipeline.h"
 #include "DebugRender.h"
@@ -65,9 +64,6 @@ private:
 	// Creates the sync objects (fences and semaphores)
 	void CreateSyncObjects();
 
-	// Creates test vertices data
-	void CreateTestMesh();
-
 	const uint32_t MAX_FRAMES_IN_FLIGHT = 2;
 	size_t currentFrame = 0;
 
@@ -85,6 +81,7 @@ private:
 	vk::CommandPool* commandPool;
 	vk::CommandBuffer* commandBuffers;	
 	vk::SwapChain* swapChain;
+
 	VkRenderPass renderPass;
 
 	// Mesh datas
@@ -110,7 +107,7 @@ private:
 	std::vector<VkFence> inFlightFences;
 public:
 
-	// Manages the framerate selection
+	// Manages the framerate selection with imgui
 	class Framerate
 	{
 	public:

@@ -2,16 +2,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.27130.2036
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "deps", "deps", "{96D57724-9719-44D9-95E7-617EA67875BC}"
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{A857D9D9-3D64-4CE2-B807-BD1D6B931772}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "FEngine", "FEngine\FEngine.vcxproj", "{134A4039-2F62-4BBF-982B-84F5AE0D2618}"
-	ProjectSection(ProjectDependencies) = postProject
-		{B188CC23-201F-3099-A092-AD294CC7CABC} = {B188CC23-201F-3099-A092-AD294CC7CABC}
-	EndProjectSection
-EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "glfw", "FEngine\deps\glfw\glfw.vcxproj", "{B188CC23-201F-3099-A092-AD294CC7CABC}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -31,24 +24,12 @@ Global
 		{134A4039-2F62-4BBF-982B-84F5AE0D2618}.Release|x64.Deploy.0 = Release|x64
 		{134A4039-2F62-4BBF-982B-84F5AE0D2618}.RelWithDebInfo|x64.ActiveCfg = Release|x64
 		{134A4039-2F62-4BBF-982B-84F5AE0D2618}.RelWithDebInfo|x64.Build.0 = Release|x64
-		{B188CC23-201F-3099-A092-AD294CC7CABC}.Debug|x64.ActiveCfg = Debug|x64
-		{B188CC23-201F-3099-A092-AD294CC7CABC}.Debug|x64.Build.0 = Debug|x64
-		{B188CC23-201F-3099-A092-AD294CC7CABC}.MinSizeRel|x64.ActiveCfg = Release|x64
-		{B188CC23-201F-3099-A092-AD294CC7CABC}.MinSizeRel|x64.Build.0 = Release|x64
-		{B188CC23-201F-3099-A092-AD294CC7CABC}.MinSizeRel|x64.Deploy.0 = Release|x64
-		{B188CC23-201F-3099-A092-AD294CC7CABC}.Release|x64.ActiveCfg = Release|x64
-		{B188CC23-201F-3099-A092-AD294CC7CABC}.Release|x64.Build.0 = Release|x64
-		{B188CC23-201F-3099-A092-AD294CC7CABC}.RelWithDebInfo|x64.ActiveCfg = Release|x64
-		{B188CC23-201F-3099-A092-AD294CC7CABC}.RelWithDebInfo|x64.Build.0 = Release|x64
-		{B188CC23-201F-3099-A092-AD294CC7CABC}.RelWithDebInfo|x64.Deploy.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
-		{96D57724-9719-44D9-95E7-617EA67875BC} = {A857D9D9-3D64-4CE2-B807-BD1D6B931772}
 		{134A4039-2F62-4BBF-982B-84F5AE0D2618} = {A857D9D9-3D64-4CE2-B807-BD1D6B931772}
-		{B188CC23-201F-3099-A092-AD294CC7CABC} = {96D57724-9719-44D9-95E7-617EA67875BC}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {5A5B92D7-509D-337F-B600-73C63C85AFE5}

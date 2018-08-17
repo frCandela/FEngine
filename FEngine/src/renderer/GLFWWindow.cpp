@@ -1,4 +1,4 @@
-#include "renderer/Window.h"
+#include "renderer/GLFWWindow.h"
 
 Window::Window(uint32_t width, uint32_t height, std::string name) :
 	m_width(width),

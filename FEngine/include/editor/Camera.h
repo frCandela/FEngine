@@ -5,7 +5,7 @@
 
 #include <glm/glm.hpp>
 
-#include "util/Input.h"
+#include "util/UserInput.h"
 #include "Shape.h"
 
 struct Camera : public Component

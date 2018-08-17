@@ -78,6 +78,9 @@
     <Filter Include="Fichiers d%27en-tête\physics">
       <UniqueIdentifier>{828fda8c-4bb8-4d0e-acf7-93b5ea98e47a}</UniqueIdentifier>
     </Filter>
+    <Filter Include="deps\glfw">
+      <UniqueIdentifier>{efe1ab00-5ed6-495c-add9-079b2b4ca766}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\main.cpp">
@@ -113,9 +116,6 @@
     <ClCompile Include="src\util\Time.cpp">
       <Filter>Fichiers sources\util</Filter>
     </ClCompile>
-    <ClCompile Include="src\util\Input.cpp">
-      <Filter>Fichiers sources\util</Filter>
-    </ClCompile>
     <ClCompile Include="src\vulkan\CommandPool.cpp">
       <Filter>Fichiers sources\vulkan</Filter>
     </ClCompile>
@@ -141,9 +141,6 @@
       <Filter>Fichiers sources\renderer</Filter>
     </ClCompile>
     <ClCompile Include="src\renderer\Renderer.cpp">
-      <Filter>Fichiers sources\renderer</Filter>
-    </ClCompile>
-    <ClCompile Include="src\renderer\Window.cpp">
       <Filter>Fichiers sources\renderer</Filter>
     </ClCompile>
     <ClCompile Include="src\renderer\DebugRender.cpp">
@@ -701,6 +698,54 @@
     <ClCompile Include="src\editor\Mesh.cpp">
       <Filter>Fichiers sources\editor</Filter>
     </ClCompile>
+    <ClCompile Include="src\renderer\GLFWWindow.cpp">
+      <Filter>Fichiers sources\renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="deps\GLFW\src\context.c">
+      <Filter>deps\glfw</Filter>
+    </ClCompile>
+    <ClCompile Include="deps\GLFW\src\egl_context.c">
+      <Filter>deps\glfw</Filter>
+    </ClCompile>
+    <ClCompile Include="deps\GLFW\src\init.c">
+      <Filter>deps\glfw</Filter>
+    </ClCompile>
+    <ClCompile Include="deps\GLFW\src\input.c">
+      <Filter>deps\glfw</Filter>
+    </ClCompile>
+    <ClCompile Include="deps\GLFW\src\monitor.c">
+      <Filter>deps\glfw</Filter>
+    </ClCompile>
+    <ClCompile Include="deps\GLFW\src\vulkan.c">
+      <Filter>deps\glfw</Filter>
+    </ClCompile>
+    <ClCompile Include="deps\GLFW\src\wgl_context.c">
+      <Filter>deps\glfw</Filter>
+    </ClCompile>
+    <ClCompile Include="deps\GLFW\src\win32_init.c">
+      <Filter>deps\glfw</Filter>
+    </ClCompile>
+    <ClCompile Include="deps\GLFW\src\win32_joystick.c">
+      <Filter>deps\glfw</Filter>
+    </ClCompile>
+    <ClCompile Include="deps\GLFW\src\win32_monitor.c">
+      <Filter>deps\glfw</Filter>
+    </ClCompile>
+    <ClCompile Include="deps\GLFW\src\win32_time.c">
+      <Filter>deps\glfw</Filter>
+    </ClCompile>
+    <ClCompile Include="deps\GLFW\src\win32_tls.c">
+      <Filter>deps\glfw</Filter>
+    </ClCompile>
+    <ClCompile Include="deps\GLFW\src\win32_window.c">
+      <Filter>deps\glfw</Filter>
+    </ClCompile>
+    <ClCompile Include="deps\GLFW\src\window.c">
+      <Filter>deps\glfw</Filter>
+    </ClCompile>
+    <ClCompile Include="src\util\UserInput.cpp">
+      <Filter>Fichiers sources\util</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\vulkan\DepthImage.h">
@@ -736,9 +781,6 @@
     <ClInclude Include="include\util\Time.h">
       <Filter>Fichiers d%27en-tête\util</Filter>
     </ClInclude>
-    <ClInclude Include="include\util\Input.h">
-      <Filter>Fichiers d%27en-tête\util</Filter>
-    </ClInclude>
     <ClInclude Include="include\vulkan\CommandPool.h">
       <Filter>Fichiers d%27en-tête\vulkan</Filter>
     </ClInclude>
@@ -764,9 +806,6 @@
       <Filter>Fichiers d%27en-tête\renderer</Filter>
     </ClInclude>
     <ClInclude Include="include\renderer\Renderer.h">
-      <Filter>Fichiers d%27en-tête\renderer</Filter>
-    </ClInclude>
-    <ClInclude Include="include\renderer\Window.h">
       <Filter>Fichiers d%27en-tête\renderer</Filter>
     </ClInclude>
     <ClInclude Include="include\renderer\DebugRender.h">
@@ -1769,6 +1808,12 @@
       <Filter>Fichiers d%27en-tête\editor</Filter>
     </ClInclude>
     <ClInclude Include="include\util\Signal.h">
+      <Filter>Fichiers d%27en-tête\util</Filter>
+    </ClInclude>
+    <ClInclude Include="include\renderer\GLFWWindow.h">
+      <Filter>Fichiers d%27en-tête\renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="include\util\UserInput.h">
       <Filter>Fichiers d%27en-tête\util</Filter>
     </ClInclude>
   </ItemGroup>
