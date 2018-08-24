@@ -24,6 +24,10 @@ namespace vk
 		//"VK_LAYER_GOOGLE_unique_objects"
 	};
 
+	/*
+	The logical  device is one the most important objects created in our application. 
+	It representsreal hardware, along with all the extensions and features enabled for it and all the queuesrequested from it.
+	*/
 	class Device
 	{
 	public:

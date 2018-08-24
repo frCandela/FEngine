@@ -54,7 +54,7 @@ void Scene::RenderInspectorGui()
 	if (m_gameObjectSelected)
 	{
 		// Gameobject gui
-		ImGui::Text("GameObject : %s", m_name.c_str());
+		ImGui::Text("GameObject : %s", m_gameObjectSelected->GetName().c_str());
 		int componentCount = 0;
 		for (Component* component : m_gameObjectSelected->GetComponents())
 		{

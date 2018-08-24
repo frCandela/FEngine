@@ -51,6 +51,7 @@ public:
 	void RemoveMesh(render_id ptr_id);
 	void SetModelMatrix(render_id ptr_id, glm::mat4 modelMatrix);
 
+
 private:
 	// Setup the command buffers for drawing operations
 	void CreateCommandBuffers();
@@ -82,7 +83,7 @@ private:
 	vk::CommandBuffer* commandBuffers;	
 	vk::SwapChain* swapChain;
 
-	VkRenderPass renderPass;
+	VkRenderPass renderPass;//A render pass is acollection of subpasses that describes how image resource (color, depth/stencil, and input attachments) are used
 
 	// Mesh datas
 	struct MeshData
@@ -105,8 +106,9 @@ private:
 	std::vector<VkSemaphore> imageAvailableSemaphores;//Specifies that an image has been acquired and is ready for rendering
 	std::vector<VkSemaphore> renderFinishedSemaphores;//Specifies that rendering has finished and presentation can happen
 	std::vector<VkFence> inFlightFences;
-public:
 
+
+public:
 	// Manages the framerate selection with imgui
 	class Framerate
 	{

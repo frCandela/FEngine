@@ -38,7 +38,7 @@ Renderer::Renderer(Window& rWindow) :
 	CreateCommandBuffers();
 	CreateSyncObjects();
 
-	framerate.TrySetRefreshRate(m_window.GetRefreshRate());
+	framerate.TrySetRefreshRate(m_window.GetRefreshRate());	
 }
 
 Renderer::~Renderer()
@@ -211,14 +211,15 @@ void Renderer::CreateCommandBuffers()
 		m_pDebugPipeline->BindPipeline(commandBuffers->commandBuffers[i]);
 		m_pDebugPipeline->BindDescriptors(commandBuffers->commandBuffers[i]);
 		renderDebug->Draw(commandBuffers->commandBuffers[i]);
-
+		
 		// Draw imgui on another pipeline
 		imGui->DrawFrame(commandBuffers->commandBuffers[i]);
+
 		vkCmdEndRenderPass(commandBuffers->commandBuffers[i]);
-		commandBuffers->End(i);		
+		commandBuffers->End(i);	
 	}
-	renderDebug->Clear();
 	
+	renderDebug->Clear();	
 }
 
 void Renderer::DrawFrame()

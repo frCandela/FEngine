@@ -17,9 +17,11 @@ layout (binding = 1) uniform UboInstance
 layout (location = 0) in vec3 inPos;
 layout (location = 1) in vec3 inColor;
 layout (location = 2) in vec2 inTexCoord;
+layout (location = 3) in vec3 inNormal;
 
-layout (location = 0) out vec3 fragColor;
-layout (location = 1) out vec2 fragTexCoord;
+layout (location = 0) out vec3 outFragColor;
+layout (location = 1) out vec2 outFragTexCoord;
+layout (location = 2) out vec3 outNormal;
 
 out gl_PerVertex 
 {
@@ -31,6 +33,7 @@ void main()
 	mat4 modelView = uboView.view * uboInstance.model;
 	gl_Position = uboView.projection * modelView * vec4(inPos.xyz, 1.0);
 
-	fragColor = inColor;
-	fragTexCoord = inTexCoord;
+	outFragColor = inColor;
+	outFragTexCoord = inTexCoord;
+	outNormal = inNormal;
 }

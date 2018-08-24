@@ -4,6 +4,10 @@
 
 namespace vk
 {
+	/*
+	A Vulkan Instance is an object that gathers the state of an application. It enclosesinformation such as an application name,
+	name and version of an engine used to create an application, or enabled instance-level extensions and layers
+	*/
 	class Instance
 	{
 	public:

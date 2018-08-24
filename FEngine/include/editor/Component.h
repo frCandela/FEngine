@@ -14,7 +14,7 @@ public:
 	friend class GameObject;
 
 	// Returns true is the component is Unique (only one instance per GameObject) false otherwise
-	virtual bool IsUnique() const {	return true;}
+	virtual bool IsUnique() const = 0;
 
 	// Returns the name of the gameObject
 	virtual std::string GetName() const = 0;

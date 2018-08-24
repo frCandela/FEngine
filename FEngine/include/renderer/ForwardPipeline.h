@@ -82,10 +82,11 @@ public:
 		glm::vec3 pos;
 		glm::vec3 color;
 		glm::vec2 texCoord;
+		glm::vec3 normal;
 
 		bool operator==(const Vertex& other) const
 		{
-			return pos == other.pos && color == other.color && texCoord == other.texCoord;
+			return pos == other.pos && color == other.color && normal == other.normal && texCoord == other.texCoord ;
 		}
 
 		// Tells Vulkan how to pass this data format to the vertex shader
@@ -101,9 +102,9 @@ public:
 		}
 
 		// Describes how to handle vertex input
-		static std::array<VkVertexInputAttributeDescription, 3> getAttributeDescriptions()
+		static std::array<VkVertexInputAttributeDescription, 4> getAttributeDescriptions()
 		{
-			std::array<VkVertexInputAttributeDescription, 3> attributeDescriptions = {};
+			std::array<VkVertexInputAttributeDescription, 4> attributeDescriptions = {};
 
 			// Position
 			attributeDescriptions[0].binding = 0;							// Tells Vulkan from which binding the per-vertex data comes
@@ -123,6 +124,12 @@ public:
 			attributeDescriptions[2].format = VK_FORMAT_R32G32_SFLOAT;
 			attributeDescriptions[2].offset = offsetof(Vertex, texCoord);
 
+			// Normals coordinates
+			attributeDescriptions[3].binding = 0;
+			attributeDescriptions[3].location = 3;
+			attributeDescriptions[3].format = VK_FORMAT_R32G32B32_SFLOAT;
+			attributeDescriptions[3].offset = offsetof(Vertex, normal);
+
 			return attributeDescriptions;
 		}
 	};
@@ -132,9 +139,11 @@ namespace std
 {
 	template<> struct hash<ForwardPipeline::Vertex> {
 		size_t operator()(ForwardPipeline::Vertex const& vertex) const {
-			return ((hash<glm::vec3>()(vertex.pos) ^
-				(hash<glm::vec3>()(vertex.color) << 1)) >> 1) ^
-				(hash<glm::vec2>()(vertex.texCoord) << 1);
+			return 
+				(hash<glm::vec3>()(vertex.pos)) ^
+				(hash<glm::vec3>()(vertex.color) << 1) ^
+				(hash<glm::vec2>()(vertex.texCoord) << 2) ^
+				(hash<glm::vec3>()(vertex.normal) << 2);
 		}
 	};
 }
