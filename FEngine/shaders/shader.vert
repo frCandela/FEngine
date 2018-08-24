@@ -22,6 +22,7 @@ layout (location = 3) in vec3 inNormal;
 layout (location = 0) out vec3 outFragColor;
 layout (location = 1) out vec2 outFragTexCoord;
 layout (location = 2) out vec3 outNormal;
+layout (location = 3) out vec3 outToLight;
 
 out gl_PerVertex 
 {
@@ -30,10 +31,13 @@ out gl_PerVertex
 
 void main() 
 {	
-	mat4 modelView = uboView.view * uboInstance.model;
-	gl_Position = uboView.projection * modelView * vec4(inPos.xyz, 1.0);
+	vec4 worldPos = uboInstance.model * vec4(inPos, 1.0);
+	vec3 lightPos = vec3(0,0,0);
+
+	gl_Position = uboView.projection * uboView.view * worldPos;
 
 	outFragColor = inColor;
 	outFragTexCoord = inTexCoord;
 	outNormal = inNormal;
+	outToLight = normalize(lightPos - worldPos.xyz);
 }

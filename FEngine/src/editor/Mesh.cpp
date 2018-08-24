@@ -54,14 +54,14 @@ bool Mesh::LoadModel(std::string path)
 				};
 			}
 
-			vertex.color = { 1.0f, 1.0f, 1.0f };
-
 			vertex.normal = 
 			{ 
-				 attrib.normals[3 * index.normal_index + 0]
-				,attrib.normals[3 * index.normal_index + 1]
+				-attrib.normals[3 * index.normal_index + 0]
+				,-attrib.normals[3 * index.normal_index + 1]
 				,attrib.normals[3 * index.normal_index + 2]
 			};
+
+			vertex.color = { 1.0f, 1.0f, 1.0f };
 
 			if (uniqueVertices.count(vertex) == 0) {
 				uniqueVertices[vertex] = static_cast<uint32_t>(vertices.size());

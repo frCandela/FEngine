@@ -136,10 +136,14 @@ void EditorApplication::Run()
 
 			m_scene->DrawSelectionAABB( *m_renderer);
 
+			// Axis 
+			m_renderer->DebugLine({ 0,0,0 }, { 1000,0,0 }, { 1,0,0,1 });
+			m_renderer->DebugLine({ 0,0,0 }, { 0,1000,0 }, { 0,1,0,1 });
+			m_renderer->DebugLine({ 0,0,0 }, { 0,0,1000 }, { 0,0,1,1 });
+
 			//Ui
 			ImGui::NewFrame();
 			RenderGUI();
-
 			m_renderer->DrawFrame();
 
 			for (GameObject* gameobject : m_scene->GetGameobjectsToDelete())			
