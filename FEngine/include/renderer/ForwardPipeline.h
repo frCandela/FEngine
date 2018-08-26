@@ -34,6 +34,15 @@ public:
 	// Creates the graphics pipeline
 	void CreateGraphicsPipeline(VkRenderPass renderPass, VkExtent2D extent2D);
 
+	// Render the forward pipeline GUI
+	void RenderGui();
+
+	// Getter for light settings
+	inline float GetLightAmbiant() const { return uboRendererData.ambiant; }
+
+	// Setter for light settings
+	inline void SetLightAmbiant(float newAmbiant) { assert(newAmbiant >= 0 && newAmbiant <= 1.f);  uboRendererData.ambiant = newAmbiant; }
+
 private:
 	// Creates descriptor set layouts
 	void CreateDescriptorSetLayout();
@@ -68,7 +77,8 @@ private:
 	{
 		glm::mat4 projection;
 		glm::mat4 view;
-	} uboVS;
+		float ambiant = 0.3f;
+	} uboRendererData;
 
 	// One big uniform buffer that contains all matrices(we need to manually allocate the data to cope for GPU-specific uniform buffer offset alignments)
 	struct UboDataDynamic

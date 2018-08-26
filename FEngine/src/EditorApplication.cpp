@@ -117,7 +117,7 @@ void EditorApplication::Run()
 				m_editorCamera->Update(deltaTime);
 
 			// camera uniforms
-			m_renderer->UpdateCameraUniforms(m_editorCamera->GetProjection(), m_editorCamera->GetView());
+			m_renderer->UpdateUniforms(m_editorCamera->GetProjection(), m_editorCamera->GetView());
 
 			ProcessComponentsModifications();
 			

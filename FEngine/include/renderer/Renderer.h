@@ -38,9 +38,9 @@ public:
 	// Render Imgui parameters window
 	void RenderGUI();
 
-	inline void UpdateCameraUniforms(glm::mat4 projectionMat, glm::mat4 viewMat) 
+	inline void UpdateUniforms(glm::mat4 projectionMat, glm::mat4 viewMat)
 	{ 
-		m_pForwardPipeline->UpdateUniforms(projectionMat, viewMat); 
+		m_pForwardPipeline->UpdateUniforms(projectionMat, viewMat);
 		m_pDebugPipeline->UpdateUniforms(projectionMat, viewMat);
 	}
 	inline void DebugLine(glm::vec3 start, glm::vec3 end, glm::vec4 color = glm::vec4(1.f, 0.f, 0.f, 1.f)) { renderDebug->DebugLine(start, end, color); }
@@ -106,8 +106,6 @@ private:
 	std::vector<VkSemaphore> imageAvailableSemaphores;//Specifies that an image has been acquired and is ready for rendering
 	std::vector<VkSemaphore> renderFinishedSemaphores;//Specifies that rendering has finished and presentation can happen
 	std::vector<VkFence> inFlightFences;
-
-
 public:
 	// Manages the framerate selection with imgui
 	class Framerate

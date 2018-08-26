@@ -440,13 +440,20 @@ void Renderer::RenderGUI()
 	ImGui::TextColored(ImVec4(200.0f / 255.f, 120.0f / 255.f, 120.0f / 255.f, 1.0f), "%.3f ", 1000.0f / io.Framerate);
 	ImGui::SameLine();
 	ImGui::Text("ms / frame(%.1f FPS)", io.Framerate);
-	//Window Size
+
+	// Window Size
 	ImGui::BulletText("Window Size : w%.f  h%.f ", io.DisplaySize.x, io.DisplaySize.y);
+	
+	// Ambiant light
+	/*float ambiantLight = m_pForwardPipeline->GetLightAmbiant();
+	if (ImGui::DragFloat("Ambiant light", &ambiantLight, 0.025, 0.f, 1.f))	
+		m_pForwardPipeline->SetLightAmbiant(ambiantLight);*/
 
 	// Max Framerate
 	framerate.RenderGui();
 
 	m_pDebugPipeline->RenderGui();
+	m_pForwardPipeline->RenderGui();
 
 	ImGui::End();
 

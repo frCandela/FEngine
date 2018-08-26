@@ -28,6 +28,12 @@ ForwardPipeline::~ForwardPipeline()
 	vkDestroyDescriptorSetLayout(m_device.device, descriptorSetLayout, nullptr);
 }
 
+void ForwardPipeline::RenderGui()
+{
+	if (ImGui::CollapsingHeader("Forward Pipeline"))
+		ImGui::DragFloat("Ambiant light", &uboRendererData.ambiant, 0.025, 0.f, 1.f);
+}
+
 void ForwardPipeline::BindPipeline(VkCommandBuffer commandBuffer)
 {
 	vkCmdBindPipeline(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, graphicsPipeline1);
@@ -76,7 +82,7 @@ void ForwardPipeline::CreateUniformBuffer()
 	view.CreateBuffer(
 		VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT,
 		VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
-		sizeof(uboVS)
+		sizeof(uboRendererData)
 	);
 
 	// Uniform buffer object with per-object matrices
@@ -131,10 +137,10 @@ void ForwardPipeline::CreateDescriptorSet(vk::Texture& textureImage, vk::Sampler
 void ForwardPipeline::UpdateUniforms(glm::mat4 projectionMat, glm::mat4 viewMat)
 {
 	// Fixed ubo with projection and view matrices
-	uboVS.projection = projectionMat;
-	uboVS.view = viewMat;
+	uboRendererData.projection = projectionMat;
+	uboRendererData.view = viewMat;
 
-	memcpy(view.mappedData, &uboVS, sizeof(uboVS));
+	memcpy(view.mappedData, &uboRendererData, sizeof(uboRendererData));
 }
 
 void ForwardPipeline::UpdateDynamicUniformBuffer(std::vector<glm::mat4> matrices)
