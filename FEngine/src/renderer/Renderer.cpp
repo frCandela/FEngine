@@ -443,11 +443,6 @@ void Renderer::RenderGUI()
 
 	// Window Size
 	ImGui::BulletText("Window Size : w%.f  h%.f ", io.DisplaySize.x, io.DisplaySize.y);
-	
-	// Ambiant light
-	/*float ambiantLight = m_pForwardPipeline->GetLightAmbiant();
-	if (ImGui::DragFloat("Ambiant light", &ambiantLight, 0.025, 0.f, 1.f))	
-		m_pForwardPipeline->SetLightAmbiant(ambiantLight);*/
 
 	// Max Framerate
 	framerate.RenderGui();
@@ -456,8 +451,6 @@ void Renderer::RenderGUI()
 	m_pForwardPipeline->RenderGui();
 
 	ImGui::End();
-
-
 }
 
 glm::vec2 Renderer::GetSize() const

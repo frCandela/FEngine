@@ -69,12 +69,9 @@ void ForwardPipeline::CreateUniformBuffer()
 	// Calculate required alignment based on minimum device offset alignment
 	size_t minUboAlignment = m_device.properties.limits.minUniformBufferOffsetAlignment;
 	dynamicAlignment = sizeof(glm::mat4);
-	if (minUboAlignment > 0) {
+	if (minUboAlignment > 0) 
 		dynamicAlignment = (dynamicAlignment + minUboAlignment - 1) & ~(minUboAlignment - 1);
-	}
-
 	size_t bufferSize = OBJECT_INSTANCES * dynamicAlignment;
-
 	uboDataDynamic.model = (glm::mat4*)_aligned_malloc(bufferSize, dynamicAlignment);
 	assert(uboDataDynamic.model);
 
@@ -134,11 +131,14 @@ void ForwardPipeline::CreateDescriptorSet(vk::Texture& textureImage, vk::Sampler
 	vkUpdateDescriptorSets(m_device.device, static_cast<uint32_t>(writeDescriptorSets.size()), writeDescriptorSets.data(), 0, NULL);
 }
 
-void ForwardPipeline::UpdateUniforms(glm::mat4 projectionMat, glm::mat4 viewMat)
+void ForwardPipeline::UpdateUniforms(glm::mat4 projectionMat, glm::mat4 viewMat, glm::vec3 position)
 {
 	// Fixed ubo with projection and view matrices
 	uboRendererData.projection = projectionMat;
 	uboRendererData.view = viewMat;
+	uboRendererData.viewPosition = position;
+
+//	std::cout << uboRendererData.viewPosition.x << " " << uboRendererData.viewPosition.y << " " << uboRendererData.viewPosition.z << std::endl;
 
 	memcpy(view.mappedData, &uboRendererData, sizeof(uboRendererData));
 }

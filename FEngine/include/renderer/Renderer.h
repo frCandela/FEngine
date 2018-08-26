@@ -38,9 +38,9 @@ public:
 	// Render Imgui parameters window
 	void RenderGUI();
 
-	inline void UpdateUniforms(glm::mat4 projectionMat, glm::mat4 viewMat)
+	inline void UpdateUniforms(glm::mat4 projectionMat, glm::mat4 viewMat, glm::vec3 cameraPosition)
 	{ 
-		m_pForwardPipeline->UpdateUniforms(projectionMat, viewMat);
+		m_pForwardPipeline->UpdateUniforms(projectionMat, viewMat, cameraPosition);
 		m_pDebugPipeline->UpdateUniforms(projectionMat, viewMat);
 	}
 	inline void DebugLine(glm::vec3 start, glm::vec3 end, glm::vec4 color = glm::vec4(1.f, 0.f, 0.f, 1.f)) { renderDebug->DebugLine(start, end, color); }
@@ -50,7 +50,6 @@ public:
 	render_id const AddMesh(std::vector<ForwardPipeline::Vertex> & const vertices, std::vector<uint32_t> & const indices);
 	void RemoveMesh(render_id ptr_id);
 	void SetModelMatrix(render_id ptr_id, glm::mat4 modelMatrix);
-
 
 private:
 	// Setup the command buffers for drawing operations

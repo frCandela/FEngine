@@ -73,7 +73,8 @@ void EditorApplication::Run()
 	// Create editor camera
 	GameObject* cameraGo = m_scene->CreateGameobject("Editor Camera");
 	m_editorCamera = cameraGo->AddComponent<EditorCamera>();
-	cameraGo->GetComponent<Transform>()->SetPosition({ 0,0,-10 });
+	Transform* cameraTransform = cameraGo->GetComponent<Transform>();
+	cameraTransform->SetPosition({ 0,0,-10 });
 	m_editorCamera->aspectRatio = m_renderer->GetAspectRatio();
 
 	// Test gameobjects
@@ -117,7 +118,7 @@ void EditorApplication::Run()
 				m_editorCamera->Update(deltaTime);
 
 			// camera uniforms
-			m_renderer->UpdateUniforms(m_editorCamera->GetProjection(), m_editorCamera->GetView());
+			m_renderer->UpdateUniforms(m_editorCamera->GetProjection(), m_editorCamera->GetView(), cameraTransform->GetPosition());
 
 			ProcessComponentsModifications();
 			

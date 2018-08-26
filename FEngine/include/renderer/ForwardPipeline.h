@@ -26,7 +26,7 @@ public:
 	void BindDescriptors(VkCommandBuffer commandBuffer, int offsetIndex);
 
 	// Update the view and projection matrices uniform
-	void UpdateUniforms(glm::mat4 projectionMat, glm::mat4 viewMat);
+	void UpdateUniforms(glm::mat4 projectionMat, glm::mat4 viewMat, glm::vec3 position);
 
 	// Update the dynamic model matrices uniform
 	void UpdateDynamicUniformBuffer(std::vector<glm::mat4> matrices);
@@ -61,7 +61,7 @@ private:
 
 	vk::Shader* vertShader;
 	vk::Shader* fragShader;
-	vk::Buffer view;	// Proj view
+	vk::Buffer view;	// Proj view ambiant
 	vk::Buffer dynamic;	// Model
 
 	VkDescriptorPool descriptorPool = VK_NULL_HANDLE;
@@ -77,8 +77,11 @@ private:
 	{
 		glm::mat4 projection;
 		glm::mat4 view;
+		glm::vec3 viewPosition;
 		float ambiant = 0.3f;
+
 	} uboRendererData;
+
 
 	// One big uniform buffer that contains all matrices(we need to manually allocate the data to cope for GPU-specific uniform buffer offset alignments)
 	struct UboDataDynamic

@@ -7,6 +7,7 @@ layout (binding = 0) uniform UboView
 {
 	mat4 projection;
 	mat4 view;
+	vec3 viewPosition;
 	float ambiant;
 } uboView;
 
@@ -23,8 +24,10 @@ layout (location = 3) in vec3 inNormal;
 layout (location = 0) out vec3 outFragColor;
 layout (location = 1) out vec2 outFragTexCoord;
 layout (location = 2) out vec3 outNormal;
-layout (location = 3) out vec3 outToLight;
+layout (location = 3) out vec3 outLightPos;
 layout (location = 4) out float outAmbiant;
+layout (location = 5) out vec3 outViewPos;
+layout (location = 6) out vec3 outFragPos;
 
 out gl_PerVertex 
 {
@@ -41,6 +44,8 @@ void main()
 	outFragColor = inColor;
 	outFragTexCoord = inTexCoord;
 	outNormal = inNormal;
-	outToLight = normalize(lightPos - worldPos.xyz);
+	outLightPos = lightPos;
 	outAmbiant = uboView.ambiant;
+	outViewPos = uboView.viewPosition;
+	outFragPos = worldPos.xyz;
 }
