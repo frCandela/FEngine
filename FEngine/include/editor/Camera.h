@@ -24,5 +24,5 @@ struct Camera : public Component
 	float fov = 90.f;
 	float aspectRatio = 1.f;
 	float nearp = 0.1f;
-	float farp = 100.f;
+	float farp = 1000.f;
 };

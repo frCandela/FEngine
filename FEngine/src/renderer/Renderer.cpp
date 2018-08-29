@@ -23,13 +23,7 @@ Renderer::Renderer(Window& rWindow) :
 
 	imGui = new ImguiManager(device, commandPool, GetSize(), m_window.GetGLFWwindow(), renderPass);
 
-	texture = new vk::Texture(*device, *commandPool);
-	texture->LoadTexture("textures/texture.jpg");
-
-	textureSampler = new vk::Sampler(*device);
-	textureSampler->CreateSampler(static_cast<float>(texture->m_mipLevels), 16);
-
-	m_pForwardPipeline = new ForwardPipeline(*device, *texture, *textureSampler);
+	m_pForwardPipeline = new ForwardPipeline(*device, *commandPool);
 	m_pForwardPipeline->CreateGraphicsPipeline(renderPass, swapChain->swapChainExtent);
 	
 	m_pDebugPipeline = new DebugPipeline(*device);
@@ -55,8 +49,7 @@ Renderer::~Renderer()
 	delete(m_pDebugPipeline);
 	delete(m_pForwardPipeline);
 	delete(imGui);	
-	delete(textureSampler);
-	delete(texture);
+
 
 	for (MeshData * meshData : m_meshDatas)
 	{

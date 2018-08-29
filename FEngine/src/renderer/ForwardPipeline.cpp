@@ -1,8 +1,9 @@
 #include "renderer/ForwardPipeline.h"
 #include "vulkan/Initializers.h"
 
-ForwardPipeline::ForwardPipeline(vk::Device& device, vk::Texture& texture, vk::Sampler& sampler) :
+ForwardPipeline::ForwardPipeline(vk::Device& device, vk::CommandPool& commandPool) :
 	m_device(device)
+	, m_rCommandPool(commandPool)
 	, view(device)
 	, dynamic(device)
 {
@@ -13,13 +14,16 @@ ForwardPipeline::ForwardPipeline(vk::Device& device, vk::Texture& texture, vk::S
 	fragShader = new vk::Shader(m_device, "shaders/frag.spv");
 
 	CreateDescriptorPool();
-	CreateDescriptorSet(texture, sampler, descriptorPool);
+	CreateDescriptorSet(descriptorPool);
 }
 
 ForwardPipeline::~ForwardPipeline()
 {
 	delete(fragShader);
 	delete(vertShader);
+
+	delete(m_sampler);
+	delete(m_texture);
 
 	vkDestroyPipeline(m_device.device, graphicsPipeline1, nullptr);
 	vkDestroyPipelineLayout(m_device.device, pipelineLayout1, nullptr);
@@ -94,17 +98,23 @@ void ForwardPipeline::CreateUniformBuffer()
 	VK_CHECK_RESULT(dynamic.Map());
 }
 
-void ForwardPipeline::CreateDescriptorSet(vk::Texture& textureImage, vk::Sampler& textureSampler, VkDescriptorPool descriptorPool)
+void ForwardPipeline::CreateDescriptorSet(VkDescriptorPool descriptorPool)
 {
 	VkDescriptorSetAllocateInfo allocInfo = vk::init::descriptorSetAllocateInfo(descriptorPool, &descriptorSetLayout, 1);
 
 	VK_CHECK_RESULT(vkAllocateDescriptorSets(m_device.device, &allocInfo, &descriptorSet));
 
+	m_texture = new vk::Texture(m_device, m_rCommandPool);
+	m_texture->LoadTexture("textures/texture.jpg");
+
+	m_sampler = new vk::Sampler(m_device);
+	m_sampler->CreateSampler(static_cast<float>(m_texture->m_mipLevels), 16);
+
 	// Create image descriptor
 	VkDescriptorImageInfo imageInfo = {};
 	imageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
-	imageInfo.imageView = textureImage.imageView;
-	imageInfo.sampler = textureSampler.sampler;
+	imageInfo.imageView = m_texture->imageView;
+	imageInfo.sampler = m_sampler->sampler;
 
 	VkWriteDescriptorSet descriptorWrite = {};
 	descriptorWrite.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;

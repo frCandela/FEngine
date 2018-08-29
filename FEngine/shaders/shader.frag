@@ -12,6 +12,7 @@ layout (location = 3) in vec3 inLightPos;
 layout (location = 4) in float inAmbiant;
 layout (location = 5) in vec3 inViewPos;
 layout (location = 6) in vec3 inFragPos;
+layout (location = 7) in float inSpecularExponent;
 
 layout (location = 0) out vec4 outColor;
 
@@ -21,8 +22,11 @@ void main()
 	vec3 viewDir = normalize(inViewPos - inFragPos);
     vec3 halfwayDir = normalize(toLight + viewDir);
 
-    float specular = pow(max(dot(inNormal, halfwayDir), 0.0), 16.0);
+    float specular = pow(max(dot(inNormal, halfwayDir), 0.0), inSpecularExponent);
 	float diffuse = clamp(dot(inNormal, toLight), 0, 1) ;
 
-	outColor = (inAmbiant + diffuse + specular) * vec4(inFragColor, 1.0) * texture(texSampler, inFragTexCoord);
+	// wrongOrientation is 1 or zero depending on the diffuse value.
+	float wrongOrientation = clamp(10000*diffuse, 0, 1) ;
+
+	outColor = (inAmbiant + diffuse + wrongOrientation*specular) * vec4(inFragColor, 1.0) * texture(texSampler, inFragTexCoord);
 }

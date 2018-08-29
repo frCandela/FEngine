@@ -9,6 +9,7 @@ layout (binding = 0) uniform UboView
 	mat4 view;
 	vec3 viewPosition;
 	float ambiant;
+	float specularExponent;
 } uboView;
 
 layout (binding = 1) uniform UboInstance 
@@ -28,6 +29,7 @@ layout (location = 3) out vec3 outLightPos;
 layout (location = 4) out float outAmbiant;
 layout (location = 5) out vec3 outViewPos;
 layout (location = 6) out vec3 outFragPos;
+layout (location = 7) out float outSpecularExponent;
 
 out gl_PerVertex 
 {
@@ -48,4 +50,5 @@ void main()
 	outAmbiant = uboView.ambiant;
 	outViewPos = uboView.viewPosition;
 	outFragPos = worldPos.xyz;
+	outSpecularExponent = 16.f;
 }

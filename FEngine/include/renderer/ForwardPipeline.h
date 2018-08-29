@@ -16,7 +16,7 @@ typedef int * render_id;
 class ForwardPipeline
 {
 public:
-	ForwardPipeline(vk::Device& device, vk::Texture& texture, vk::Sampler& sampler);
+	ForwardPipeline(vk::Device& device, vk::CommandPool& commandPool);
 	~ForwardPipeline();
 
 	// Binds the pipeline
@@ -54,15 +54,21 @@ private:
 	void CreateDescriptorPool();
 
 	// Creates the descriptor set
-	void CreateDescriptorSet(vk::Texture& textureImage, vk::Sampler& textureSampler, VkDescriptorPool descriptorPool);
+	void CreateDescriptorSet(VkDescriptorPool descriptorPool);
 
 	// References
 	vk::Device & m_device;
+	vk::CommandPool& m_rCommandPool;
 
 	vk::Shader* vertShader;
 	vk::Shader* fragShader;
+
 	vk::Buffer view;	// Proj view ambiant
 	vk::Buffer dynamic;	// Model
+
+
+	vk::Texture* m_texture;
+	vk::Sampler* m_sampler;
 
 	VkDescriptorPool descriptorPool = VK_NULL_HANDLE;
 	VkDescriptorSetLayout descriptorSetLayout = VK_NULL_HANDLE;

@@ -73,9 +73,6 @@ private:
 	ImguiManager * imGui = nullptr;
 	RenderDebug * renderDebug = nullptr;
 
-	vk::Texture* texture;
-	vk::Sampler* textureSampler;
-
 	vk::Device* device;
 	vk::Instance* instance;
 	vk::CommandPool* commandPool;
