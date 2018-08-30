@@ -6,9 +6,9 @@ ForwardPipeline::ForwardPipeline(vk::Device& device, vk::CommandPool& commandPoo
 	, m_rCommandPool(commandPool)
 	, view(device)
 	, dynamic(device)
-{
-	CreateDescriptorSetLayout();
+{	
 	CreateUniformBuffer();
+
 
 	vertShader = new vk::Shader(m_device, "shaders/vert.spv");
 	fragShader = new vk::Shader(m_device, "shaders/frag.spv");
@@ -33,7 +33,7 @@ void ForwardPipeline::RenderGui()
 
 		if (ImGui::Button("TEST"))
 		{
-			ResetDescriptorPool();
+			//ResetDescriptorPool();
 			//CreateDescriptorSet();
 		}
 	}
@@ -52,12 +52,26 @@ void ForwardPipeline::BindDescriptors(VkCommandBuffer commandBuffer, int offsetI
 	vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineLayout1, 0, 1, &descriptorSet, 1, &dynamicOffset);
 }
 
-void ForwardPipeline::CreateDescriptorSetLayout()
+void ForwardPipeline::CreateDescriptors(std::vector<vk::Texture*> textures, std::vector <vk::Sampler*> samplers)
+{
+	assert(textures.size() == samplers.size());
+
+	CreateDescriptorSetLayout();
+	CreateDescriptorPool(); // 1 defaut texture and sampler
+	CreateDescriptorSet(textures, samplers);
+}
+
+/*void ForwardPipeline::ResetDescriptorPool()
+{
+	VK_CHECK_RESULT(vkResetDescriptorPool(m_device.device, descriptorPool, 0));
+}*/
+
+void ForwardPipeline::CreateDescriptorSetLayout( )
 {
 	std::vector<VkDescriptorSetLayoutBinding> setLayoutBindings =
 	{
 		vk::init::descriptorSetLayoutBinding(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_VERTEX_BIT, 0),
-		vk::init::descriptorSetLayoutBinding(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC, VK_SHADER_STAGE_VERTEX_BIT, 1),
+		vk::init::descriptorSetLayoutBinding(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC, VK_SHADER_STAGE_VERTEX_BIT, 1),		
 		vk::init::descriptorSetLayoutBinding(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT, 2)
 	};
 
@@ -69,47 +83,14 @@ void ForwardPipeline::CreateDescriptorSetLayout()
 	VK_CHECK_RESULT(vkCreateDescriptorSetLayout(m_device.device, &descriptorLayout, nullptr, &descriptorSetLayout));
 }
 
-void ForwardPipeline::CreateUniformBuffer()
+void ForwardPipeline::CreateDescriptorPool(  )
 {
-	// Calculate required alignment based on minimum device offset alignment
-	size_t minUboAlignment = m_device.properties.limits.minUniformBufferOffsetAlignment;
-	dynamicAlignment = sizeof(glm::mat4);
-	if (minUboAlignment > 0) 
-		dynamicAlignment = (dynamicAlignment + minUboAlignment - 1) & ~(minUboAlignment - 1);
-	size_t bufferSize = OBJECT_INSTANCES * dynamicAlignment;
-	uboDataDynamic.model = (glm::mat4*)_aligned_malloc(bufferSize, dynamicAlignment);
-	assert(uboDataDynamic.model);
-
-	// Static shared uniform buffer object with projection and view matrix
-	view.CreateBuffer(
-		VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT,
-		VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
-		sizeof(uboRendererData)
-	);
-
-	// Uniform buffer object with per-object matrices
-	dynamic.CreateBuffer(
-		VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT,
-		VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT,
-		bufferSize
-	);
-
-	// Map persistent
-	VK_CHECK_RESULT(view.Map());
-	VK_CHECK_RESULT(dynamic.Map());
-}
-
-void ForwardPipeline::ResetDescriptorPool()
-{
-	VK_CHECK_RESULT(vkResetDescriptorPool(m_device.device, descriptorPool, 0));
-}
-
-void ForwardPipeline::CreateDescriptorPool()
-{
+	// Static buffer for shader information
 	VkDescriptorPoolSize descriptorPoolSizeUniform = {};
 	descriptorPoolSizeUniform.type = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
 	descriptorPoolSizeUniform.descriptorCount = 1;
 
+	// Dynamic buffer for model matrices
 	VkDescriptorPoolSize descriptorPoolSizeUniformDynamic = {};
 	descriptorPoolSizeUniformDynamic.type = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC;
 	descriptorPoolSizeUniformDynamic.descriptorCount = 1;
@@ -122,8 +103,8 @@ void ForwardPipeline::CreateDescriptorPool()
 	std::vector<VkDescriptorPoolSize> poolSizes =
 	{
 		descriptorPoolSizeUniform
-		, descriptorPoolSizeUniformDynamic
-		, descriptorPoolSizeImageSampler
+		, descriptorPoolSizeUniformDynamic	
+		,descriptorPoolSizeImageSampler
 	};
 
 	VkDescriptorPoolCreateInfo descriptorPoolInfo{};
@@ -136,7 +117,7 @@ void ForwardPipeline::CreateDescriptorPool()
 		throw std::runtime_error("failed to create descriptor pool!");
 }
 
-void ForwardPipeline::CreateDescriptorSet(std::vector<vk::Texture*> textures, std::vector <vk::Sampler*> samplers)
+void ForwardPipeline::CreateDescriptorSet(std::vector<vk::Texture*>& textures, std::vector <vk::Sampler*>& samplers)
 {
 	VkDescriptorSetAllocateInfo allocInfo = vk::init::descriptorSetAllocateInfo(descriptorPool, &descriptorSetLayout, 1);
 
@@ -165,11 +146,48 @@ void ForwardPipeline::CreateDescriptorSet(std::vector<vk::Texture*> textures, st
 		// Binding 1 : Instance matrix as dynamic uniform buffer
 		,vk::init::writeDescriptorSet(descriptorSet, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC, 1, &dynamic.descriptor)
 
-		// Binding 1 : Image sampler and texture
+		// Binding 2 : Image sampler and texture
 		,descriptorWrite
 	};
 
+
+
 	vkUpdateDescriptorSets(m_device.device, static_cast<uint32_t>(writeDescriptorSets.size()), writeDescriptorSets.data(), 0, NULL);
+}
+
+void ForwardPipeline::DeleteDescriptorPool()
+{
+
+}
+
+void ForwardPipeline::CreateUniformBuffer()
+{
+	// Calculate required alignment based on minimum device offset alignment
+	size_t minUboAlignment = m_device.properties.limits.minUniformBufferOffsetAlignment;
+	dynamicAlignment = sizeof(glm::mat4);
+	if (minUboAlignment > 0)
+		dynamicAlignment = (dynamicAlignment + minUboAlignment - 1) & ~(minUboAlignment - 1);
+	size_t bufferSize = OBJECT_INSTANCES * dynamicAlignment;
+	uboDataDynamic.model = (glm::mat4*)_aligned_malloc(bufferSize, dynamicAlignment);
+	assert(uboDataDynamic.model);
+
+	// Static shared uniform buffer object with projection and view matrix
+	view.CreateBuffer(
+		VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT,
+		VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
+		sizeof(uboRendererData)
+	);
+
+	// Uniform buffer object with per-object matrices
+	dynamic.CreateBuffer(
+		VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT,
+		VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT,
+		bufferSize
+	);
+
+	// Map persistent
+	VK_CHECK_RESULT(view.Map());
+	VK_CHECK_RESULT(dynamic.Map());
 }
 
 void ForwardPipeline::UpdateUniforms(glm::mat4 projectionMat, glm::mat4 viewMat, glm::vec3 position)

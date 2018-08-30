@@ -87,15 +87,19 @@ private:
 	vk::CommandBuffer* commandBuffers;	
 	vk::SwapChain* swapChain;
 
-	VkRenderPass renderPass;//A render pass is a collection of subpasses that describes how image resource (color, depth/stencil, and input attachments) are used
-	
+	//A render pass is a collection of subpasses that describes how image resource (color, depth/stencil, and input attachments) are used
+	VkRenderPass renderPass;
+
+	//Synchronisation
+	std::vector<VkSemaphore> imageAvailableSemaphores;//Specifies that an image has been acquired and is ready for rendering
+	std::vector<VkSemaphore> renderFinishedSemaphores;//Specifies that rendering has finished and presentation can happen
+	std::vector<VkFence> inFlightFences;
+
+	// Dynamic data
 	KeyList<MeshData*> m_meshDatas;
 	KeyList<vk::Texture*> m_textures;
 	KeyList<vk::Sampler*> m_samplers;
 
-	std::vector<VkSemaphore> imageAvailableSemaphores;//Specifies that an image has been acquired and is ready for rendering
-	std::vector<VkSemaphore> renderFinishedSemaphores;//Specifies that rendering has finished and presentation can happen
-	std::vector<VkFence> inFlightFences;
 public:
 	// Manages the framerate selection with imgui
 	class Framerate

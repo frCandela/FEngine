@@ -30,8 +30,7 @@ Renderer::Renderer(Window& rWindow) :
 	m_samplers.Get(samplerKey)->CreateSampler(static_cast<float>(m_textures.Get(textureKey)->m_mipLevels), 16);
 
 	m_pForwardPipeline = new ForwardPipeline(*device, *commandPool);
-	m_pForwardPipeline->CreateDescriptorPool();
-	m_pForwardPipeline->CreateDescriptorSet( m_textures.ToVector(), m_samplers.ToVector());
+	m_pForwardPipeline->CreateDescriptors( m_textures.ToVector(), m_samplers.ToVector());
 	m_pForwardPipeline->CreateGraphicsPipeline(renderPass, swapChain->swapChainExtent);
 
 	m_pDebugPipeline = new DebugPipeline(*device);
@@ -174,7 +173,6 @@ void Renderer::SetModelMatrix(key_t key, glm::mat4 modelMatrix)
 	assert(key);
 	m_meshDatas.Get(key)->model = modelMatrix;
 }
-
 
 key_t Renderer::CreateTexture(std::string path)
 {

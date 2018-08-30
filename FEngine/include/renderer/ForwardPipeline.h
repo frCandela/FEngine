@@ -43,19 +43,16 @@ public:
 	// Setter for light settings
 	inline void SetLightAmbiant(float newAmbiant) { assert(newAmbiant >= 0 && newAmbiant <= 1.f);  uboRendererData.ambiant = newAmbiant; }
 
-	// Create the descriptor pool
-	void CreateDescriptorPool();
-	void ResetDescriptorPool();
+	// Create the VkDescriptorSetLayout, VkDescriptorPool and all VkDescriptorSet. for each texture , sampler must have an associated sampler at the same index
+	void CreateDescriptors(std::vector<vk::Texture*> textures, std::vector <vk::Sampler*> samplers);
 
-	// Creates the descriptor set
-	void CreateDescriptorSet(std::vector<vk::Texture*> textures, std::vector <vk::Sampler*> samplers);
-
-private:
-	// Creates descriptor set layouts
-	void CreateDescriptorSetLayout();
-
-	// Create the uniforms buffers
-	void CreateUniformBuffer();
+private:	
+	
+	void CreateDescriptorSetLayout( );// Creates descriptor set layouts	
+	void CreateDescriptorPool( );		// Create the descriptor pool
+	void DeleteDescriptorPool();	
+	void CreateDescriptorSet(std::vector<vk::Texture*>& textures, std::vector <vk::Sampler*>& samplers);// Creates the descriptor set
+	void CreateUniformBuffer();// Create the uniforms buffers
 
 	// References
 	vk::Device & m_device;
