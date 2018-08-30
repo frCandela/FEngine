@@ -13,8 +13,9 @@ ForwardPipeline::ForwardPipeline(vk::Device& device, vk::CommandPool& commandPoo
 	vertShader = new vk::Shader(m_device, "shaders/vert.spv");
 	fragShader = new vk::Shader(m_device, "shaders/frag.spv");
 
-	CreateDescriptorPool();
-	CreateDescriptorSet(descriptorPool);
+
+
+
 }
 
 ForwardPipeline::~ForwardPipeline()
@@ -22,20 +23,24 @@ ForwardPipeline::~ForwardPipeline()
 	delete(fragShader);
 	delete(vertShader);
 
-	delete(m_sampler);
-	delete(m_texture);
-
 	vkDestroyPipeline(m_device.device, graphicsPipeline1, nullptr);
 	vkDestroyPipelineLayout(m_device.device, pipelineLayout1, nullptr);
 	vkDestroyDescriptorPool(m_device.device, descriptorPool, nullptr);
-
 	vkDestroyDescriptorSetLayout(m_device.device, descriptorSetLayout, nullptr);
 }
 
 void ForwardPipeline::RenderGui()
 {
 	if (ImGui::CollapsingHeader("Forward Pipeline"))
+	{
 		ImGui::DragFloat("Ambiant light", &uboRendererData.ambiant, 0.025, 0.f, 1.f);
+
+		if (ImGui::Button("TEST"))
+		{
+			ResetDescriptorPool();
+			//CreateDescriptorSet();
+		}
+	}
 }
 
 void ForwardPipeline::BindPipeline(VkCommandBuffer commandBuffer)
@@ -98,23 +103,55 @@ void ForwardPipeline::CreateUniformBuffer()
 	VK_CHECK_RESULT(dynamic.Map());
 }
 
-void ForwardPipeline::CreateDescriptorSet(VkDescriptorPool descriptorPool)
+void ForwardPipeline::ResetDescriptorPool()
+{
+	VK_CHECK_RESULT(vkResetDescriptorPool(m_device.device, descriptorPool, 0));
+}
+
+
+void ForwardPipeline::CreateDescriptorPool()
+{
+	VkDescriptorPoolSize descriptorPoolSizeUniform = {};
+	descriptorPoolSizeUniform.type = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+	descriptorPoolSizeUniform.descriptorCount = 1;
+
+	VkDescriptorPoolSize descriptorPoolSizeUniformDynamic = {};
+	descriptorPoolSizeUniformDynamic.type = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC;
+	descriptorPoolSizeUniformDynamic.descriptorCount = 1;
+
+	VkDescriptorPoolSize descriptorPoolSizeImageSampler = {};
+	descriptorPoolSizeImageSampler.type = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+	descriptorPoolSizeImageSampler.descriptorCount = 1;
+
+	// Example uses one ubo and one image sampler
+	std::vector<VkDescriptorPoolSize> poolSizes =
+	{
+		descriptorPoolSizeUniform
+		, descriptorPoolSizeUniformDynamic
+		, descriptorPoolSizeImageSampler
+	};
+
+	VkDescriptorPoolCreateInfo descriptorPoolInfo{};
+	descriptorPoolInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
+	descriptorPoolInfo.poolSizeCount = static_cast<uint32_t>(poolSizes.size());
+	descriptorPoolInfo.pPoolSizes = poolSizes.data();
+	descriptorPoolInfo.maxSets = 1;
+
+	if (vkCreateDescriptorPool(m_device.device, &descriptorPoolInfo, nullptr, &descriptorPool) != VK_SUCCESS)
+		throw std::runtime_error("failed to create descriptor pool!");
+}
+
+void ForwardPipeline::CreateDescriptorSet(std::vector<vk::Texture*>& textures, std::vector <vk::Sampler*>& samplers)
 {
 	VkDescriptorSetAllocateInfo allocInfo = vk::init::descriptorSetAllocateInfo(descriptorPool, &descriptorSetLayout, 1);
 
 	VK_CHECK_RESULT(vkAllocateDescriptorSets(m_device.device, &allocInfo, &descriptorSet));
 
-	m_texture = new vk::Texture(m_device, m_rCommandPool);
-	m_texture->LoadTexture("textures/texture.jpg");
-
-	m_sampler = new vk::Sampler(m_device);
-	m_sampler->CreateSampler(static_cast<float>(m_texture->m_mipLevels), 16);
-
 	// Create image descriptor
 	VkDescriptorImageInfo imageInfo = {};
 	imageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
-	imageInfo.imageView = m_texture->imageView;
-	imageInfo.sampler = m_sampler->sampler;
+	imageInfo.imageView = textures[0]->imageView;
+	imageInfo.sampler = samplers[0]->sampler;
 
 	VkWriteDescriptorSet descriptorWrite = {};
 	descriptorWrite.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
@@ -135,7 +172,6 @@ void ForwardPipeline::CreateDescriptorSet(VkDescriptorPool descriptorPool)
 
 		// Binding 1 : Image sampler and texture
 		,descriptorWrite
-
 	};
 
 	vkUpdateDescriptorSets(m_device.device, static_cast<uint32_t>(writeDescriptorSets.size()), writeDescriptorSets.data(), 0, NULL);
@@ -326,35 +362,5 @@ void ForwardPipeline::CreateGraphicsPipeline(VkRenderPass renderPass, VkExtent2D
 		throw std::runtime_error("failed to create graphics pipeline!");
 }
 
-void ForwardPipeline::CreateDescriptorPool()
-{
-	VkDescriptorPoolSize descriptorPoolSizeUniform = {};
-	descriptorPoolSizeUniform.type = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
-	descriptorPoolSizeUniform.descriptorCount = 1;
 
-	VkDescriptorPoolSize descriptorPoolSizeUniformDynamic = {};
-	descriptorPoolSizeUniformDynamic.type = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC;
-	descriptorPoolSizeUniformDynamic.descriptorCount = 1;
-
-	VkDescriptorPoolSize descriptorPoolSizeImageSampler = {};
-	descriptorPoolSizeImageSampler.type = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
-	descriptorPoolSizeImageSampler.descriptorCount = 1;
-
-	// Example uses one ubo and one image sampler
-	std::vector<VkDescriptorPoolSize> poolSizes =
-	{
-		descriptorPoolSizeUniform
-		, descriptorPoolSizeUniformDynamic
-		, descriptorPoolSizeImageSampler
-	};
-
-	VkDescriptorPoolCreateInfo descriptorPoolInfo{};
-	descriptorPoolInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
-	descriptorPoolInfo.poolSizeCount = static_cast<uint32_t>(poolSizes.size());
-	descriptorPoolInfo.pPoolSizes = poolSizes.data();
-	descriptorPoolInfo.maxSets = 1;
-
-	if (vkCreateDescriptorPool(m_device.device, &descriptorPoolInfo, nullptr, &descriptorPool) != VK_SUCCESS)
-		throw std::runtime_error("failed to create descriptor pool!");
-}
 

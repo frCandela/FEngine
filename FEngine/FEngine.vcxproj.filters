@@ -1816,6 +1816,12 @@
     <ClInclude Include="include\util\UserInput.h">
       <Filter>Fichiers d%27en-tête\util</Filter>
     </ClInclude>
+    <ClInclude Include="include\renderer\MeshData.h">
+      <Filter>Fichiers d%27en-tête\renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="include\util\KeyList.h">
+      <Filter>Fichiers d%27en-tête\util</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="shaders\shader.frag">

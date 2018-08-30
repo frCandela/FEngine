@@ -29,15 +29,16 @@ void EditorApplication::ProcessComponentsModifications()
 			if (mesh->WasModified())
 			{
 				// Reload the mesh buffers in the rendere
-				m_renderer->RemoveMesh(mesh->renderId);
-				mesh->renderId = nullptr;
-				mesh->renderId = m_renderer->AddMesh(mesh->vertices, mesh->indices);
+				if(mesh->renderKey)
+					m_renderer->RemoveMesh(mesh->renderKey);
+				mesh->renderKey = nullptr;
+				mesh->renderKey = m_renderer->CreateMesh(mesh->vertices, mesh->indices);
 				updateAABBGeometry = true;
 			}
 
 			// Update model matrix
-			if (mesh->renderId && transformModified)
-				m_renderer->SetModelMatrix(mesh->renderId, gameObject->GetComponent<Transform>()->GetModelMatrix());
+			if (mesh->renderKey && transformModified)
+				m_renderer->SetModelMatrix(mesh->renderKey, gameObject->GetComponent<Transform>()->GetModelMatrix());
 		}
 
 		// Update gameobject AABB
@@ -56,7 +57,7 @@ void EditorApplication::OnComponentDeletedCallback(GameObject* gameobject, Compo
 	Mesh* mesh = dynamic_cast<Mesh*>(component);
 	if (mesh)
 	{
-		m_renderer->RemoveMesh(mesh->renderId);
+		m_renderer->RemoveMesh(mesh->renderKey);
 		m_scene->DeleteAABB(gameobject);
 	}
 }
@@ -81,14 +82,14 @@ void EditorApplication::Run()
 	GameObject* kiwi = m_scene->CreateGameobject("kiwi");
 	Mesh* kiwiMesh = kiwi->AddComponent<Mesh>();
 	kiwiMesh->LoadModel("mesh/kiwi.obj");
-	kiwiMesh->renderId = m_renderer->AddMesh(kiwiMesh->vertices, kiwiMesh->indices);
+	kiwiMesh->renderKey = m_renderer->CreateMesh(kiwiMesh->vertices, kiwiMesh->indices);
 	kiwi->GetComponent<Transform>()->SetPosition( { 5,0,0 });
 	kiwi->GetComponent<Transform>()->SetScale({ 0.1,0.1,0.1 });
 
 	GameObject* cube1 = m_scene->CreateGameobject("cube");
 	Mesh* mesh1 = cube1->AddComponent<Mesh>();
 	mesh1->LoadModel("mesh/cube.obj");
-	mesh1->renderId = m_renderer->AddMesh(mesh1->vertices, mesh1->indices);
+	mesh1->renderKey = m_renderer->CreateMesh(mesh1->vertices, mesh1->indices);
 
 	// Initialize game
 	for (std::pair<GameObject *, GameObject *> pair : m_scene->GetGameObjects())	
@@ -149,7 +150,7 @@ void EditorApplication::Run()
 
 			for (GameObject* gameobject : m_scene->GetGameobjectsToDelete())			
 				for (Mesh * mesh : gameobject->GetComponents<Mesh>())
-					m_renderer->RemoveMesh(mesh->renderId);
+					m_renderer->RemoveMesh(mesh->renderKey);
 				
 			m_scene->ApplyDeleteCommands();
 		}

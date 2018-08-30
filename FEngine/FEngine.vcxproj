@@ -654,8 +654,10 @@
     <ClInclude Include="include\renderer\DebugRender.h" />
     <ClInclude Include="include\renderer\ForwardPipeline.h" />
     <ClInclude Include="include\renderer\ImguiManager.h" />
+    <ClInclude Include="include\renderer\MeshData.h" />
     <ClInclude Include="include\renderer\Renderer.h" />
     <ClInclude Include="include\renderer\GLFWWindow.h" />
+    <ClInclude Include="include\util\KeyList.h" />
     <ClInclude Include="include\util\UserInput.h" />
     <ClInclude Include="include\util\Signal.h" />
     <ClInclude Include="include\util\Time.h" />

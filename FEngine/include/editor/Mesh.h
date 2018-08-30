@@ -4,6 +4,7 @@
 #include "editor/Component.h"
 
 #include <array>
+#include "util/KeyList.h"
 
 // Mesh class
 class Mesh : public Component
@@ -24,7 +25,7 @@ public:
 	std::vector<uint32_t> indices;
 
 	// Render id of the mesh
-	render_id renderId = nullptr;
+	key_t renderKey = nullptr;
 
 private:
 	std::string m_path;	// Obj file path

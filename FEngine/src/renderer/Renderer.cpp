@@ -23,9 +23,18 @@ Renderer::Renderer(Window& rWindow) :
 
 	imGui = new ImguiManager(device, commandPool, GetSize(), m_window.GetGLFWwindow(), renderPass);
 
+	m_textures.push_back(new vk::Texture(*device, *commandPool));
+	m_textures[m_textures.size() - 1 ]->LoadTexture("textures/error.png");
+
+	m_samplers.push_back(new vk::Sampler(*device));
+	m_samplers[m_samplers.size() - 1]->CreateSampler(static_cast<float>(m_textures[m_textures.size() - 1]->m_mipLevels), 16);
+
 	m_pForwardPipeline = new ForwardPipeline(*device, *commandPool);
+	m_pForwardPipeline->CreateDescriptorPool();
+	m_pForwardPipeline->CreateDescriptorSet( m_textures, m_samplers );
 	m_pForwardPipeline->CreateGraphicsPipeline(renderPass, swapChain->swapChainExtent);
-	
+
+
 	m_pDebugPipeline = new DebugPipeline(*device);
 	m_pDebugPipeline->CreateGraphicsPipeline(renderPass, swapChain->swapChainExtent);	
 
@@ -46,17 +55,20 @@ Renderer::~Renderer()
 		vkDestroyFence(device->device, inFlightFences[i], nullptr);
 	}
 
+	for( vk::Sampler* sampler : m_samplers)
+		delete(sampler);
+	for (vk::Texture* texture : m_textures)
+		delete(texture);
+
 	delete(m_pDebugPipeline);
 	delete(m_pForwardPipeline);
 	delete(imGui);	
 
-
-	for (MeshData * meshData : m_meshDatas)
+	for(MeshData* meshData : m_meshDatas.ToVector())
 	{
 		meshData->Delete(device);
 		delete(meshData);
 	}
-		
 
 	delete(renderDebug);
 	vkDestroyRenderPass(device->device, renderPass, nullptr);
@@ -68,7 +80,7 @@ Renderer::~Renderer()
 	delete(instance);
 }
 
-render_id const Renderer::AddMesh(std::vector<ForwardPipeline::Vertex> & vertices, std::vector<uint32_t> & indices)
+key_t Renderer::CreateMesh(std::vector<ForwardPipeline::Vertex> const & vertices, std::vector<uint32_t>  const & indices)
 {
 	MeshData * newMeshData = new MeshData();
 
@@ -115,44 +127,22 @@ render_id const Renderer::AddMesh(std::vector<ForwardPipeline::Vertex> & vertice
 		indexBuffer->CreateBuffer(VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_INDEX_BUFFER_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, bufferSize);
 
 		buf.copyBufferTo(indexBuffer->m_buffer, bufferSize, *commandPool);
-	}
-
-	newMeshData->index = m_meshDatas.size();
-	m_meshDatas.push_back(newMeshData);
-
-	return &newMeshData->index;
+	}	
+	return m_meshDatas.Insert(newMeshData);
 }
 
-void Renderer::RemoveMesh(render_id id)
+void Renderer::RemoveMesh( key_t key )
 {
-	assert(!m_meshDatas.empty());
-
-	if (id == nullptr)
-		return;
-
-	assert(*id >= 0);
-
-	int index = *id;
-
-	// Delete the previous mesh data
-	m_meshDatas[index]->Delete( device);
-	delete m_meshDatas[index];
-
-	// Swap the last element with the deleted one if needed
-	if (m_meshDatas.size() > 1 && index != m_meshDatas.size() - 1)
-	{
-		m_meshDatas[index] = m_meshDatas[m_meshDatas.size() - 1];
-		m_meshDatas[index]->index = index;
-	}
-
-	// Delete le last element
-	m_meshDatas.pop_back();
+	MeshData* meshData = m_meshDatas.Get(key);
+	meshData->Delete(device);
+	delete meshData;
+	m_meshDatas.Remove(key);
 }
 
-void Renderer::SetModelMatrix(render_id ptr_id, glm::mat4 modelMatrix)
+void Renderer::SetModelMatrix(key_t key, glm::mat4 modelMatrix)
 {
-	assert(ptr_id);
-	m_meshDatas[*ptr_id]->model = modelMatrix;
+	assert(key);
+	m_meshDatas.Get(key)->model = modelMatrix;
 }
 
 void Renderer::CreateCommandBuffers()
@@ -187,18 +177,21 @@ void Renderer::CreateCommandBuffers()
 		m_pForwardPipeline->BindPipeline(commandBuffers->commandBuffers[i]);
 
 		//Record Draw calls on all existing buffers
-		for (int j = 0; j < m_meshDatas.size(); ++j)
+		int j = 0;
+		for( MeshData * meshData : m_meshDatas.ToVector())
 		{
-			VkBuffer * vertexBuffers = &m_meshDatas[j]->vertexBuffer->m_buffer;
+			
+			VkBuffer * vertexBuffers = & meshData->vertexBuffer->m_buffer;
 			VkDeviceSize offsets[] = { 0 };
 			vkCmdBindVertexBuffers(commandBuffers->commandBuffers[i], 0, 1, vertexBuffers, offsets);
-			vkCmdBindIndexBuffer(commandBuffers->commandBuffers[i], m_meshDatas[j]->indexBuffer->m_buffer, 0, VK_INDEX_TYPE_UINT32);
+			vkCmdBindIndexBuffer(commandBuffers->commandBuffers[i], meshData->indexBuffer->m_buffer, 0, VK_INDEX_TYPE_UINT32);
 
 			// Bind the descriptor set for rendering a mesh using the dynamic offset
 			m_pForwardPipeline->BindDescriptors(commandBuffers->commandBuffers[i], j);
 
-			vkCmdDrawIndexed(commandBuffers->commandBuffers[i], static_cast<uint32_t>(m_meshDatas[j]->indexBufferSize), 1, 0, 0, 0);
-		}	
+			vkCmdDrawIndexed(commandBuffers->commandBuffers[i], static_cast<uint32_t>(meshData->indexBufferSize), 1, 0, 0, 0);
+			++j;
+		}
 
 		//Bind debug pipeline
 		m_pDebugPipeline->BindPipeline(commandBuffers->commandBuffers[i]);
@@ -218,8 +211,9 @@ void Renderer::CreateCommandBuffers()
 void Renderer::DrawFrame()
 {
 	std::vector<glm::mat4> modelMatrices;
-	for (MeshData* meshData : m_meshDatas)
+	for ( MeshData* meshData : m_meshDatas.ToVector())			
 		modelMatrices.push_back(meshData->model);
+	
 	m_pForwardPipeline->UpdateDynamicUniformBuffer(modelMatrices);
 	
 	vkWaitForFences(device->device, 1, &inFlightFences[currentFrame], VK_TRUE, std::numeric_limits<uint64_t>::max());

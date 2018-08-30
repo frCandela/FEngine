@@ -12,6 +12,7 @@
 #include "ForwardPipeline.h"
 #include "DebugRender.h"
 #include "ImguiManager.h"
+#include "MeshData.h"
 
 #include "vulkan/SwapChain.h"
 #include "vulkan/Instance.h"
@@ -20,6 +21,9 @@
 #include "vulkan/DepthImage.h"	
 #include "vulkan/CommandPool.h"
 #include "vulkan/CommandBuffer.h"
+
+#include "util/KeyList.h"
+
 
 // Main class for rendering objects using Vulkan
 class Renderer
@@ -47,9 +51,9 @@ public:
 	void DebugPoint(glm::vec3 pos, glm::vec4 color = glm::vec4(1.f, 0.f, 0.f, 1.f), float size = 1.f);
 
 	// Adds a mesh to the render pipeline 
-	render_id const AddMesh(std::vector<ForwardPipeline::Vertex> & const vertices, std::vector<uint32_t> & const indices);
-	void RemoveMesh(render_id ptr_id);
-	void SetModelMatrix(render_id ptr_id, glm::mat4 modelMatrix);
+	key_t CreateMesh(std::vector<ForwardPipeline::Vertex> const &  vertices, std::vector<uint32_t> const &  indices);
+	void RemoveMesh(key_t key);
+	void SetModelMatrix(key_t key, glm::mat4 modelMatrix);
 
 private:
 	// Setup the command buffers for drawing operations
@@ -79,25 +83,11 @@ private:
 	vk::CommandBuffer* commandBuffers;	
 	vk::SwapChain* swapChain;
 
-	VkRenderPass renderPass;//A render pass is acollection of subpasses that describes how image resource (color, depth/stencil, and input attachments) are used
-
-	// Mesh datas
-	struct MeshData
-	{
-		vk::Buffer* vertexBuffer = nullptr;
-		vk::Buffer* indexBuffer = nullptr;
-		size_t indexBufferSize;
-		int index = -1;
-		glm::mat4 model = glm::mat4(1.f);	// Model matrix
-
-		void Delete( vk::Device* device )
-		{
-			vkDeviceWaitIdle(device->device);
-			delete(vertexBuffer);
-			delete(indexBuffer);
-		}
-	};
-	std::vector<MeshData * > m_meshDatas;
+	VkRenderPass renderPass;//A render pass is a collection of subpasses that describes how image resource (color, depth/stencil, and input attachments) are used
+	
+	KeyList<MeshData*> m_meshDatas;
+	std::vector<vk::Texture*> m_textures;
+	std::vector <vk::Sampler*> m_samplers;
 
 	std::vector<VkSemaphore> imageAvailableSemaphores;//Specifies that an image has been acquired and is ready for rendering
 	std::vector<VkSemaphore> renderFinishedSemaphores;//Specifies that rendering has finished and presentation can happen

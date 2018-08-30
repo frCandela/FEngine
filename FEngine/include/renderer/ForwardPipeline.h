@@ -5,13 +5,13 @@
 #include "vulkan/Buffer.hpp"
 #include "vulkan/Shader.h"
 
+#include <unordered_set>
+
 #define GLM_ENABLE_EXPERIMENTAL
 #include "glm/gtx/hash.hpp"
 #include "glm/glm.hpp"
 
 #include <array>
-
-typedef int * render_id;
 
 class ForwardPipeline
 {
@@ -43,18 +43,19 @@ public:
 	// Setter for light settings
 	inline void SetLightAmbiant(float newAmbiant) { assert(newAmbiant >= 0 && newAmbiant <= 1.f);  uboRendererData.ambiant = newAmbiant; }
 
+	// Create the descriptor pool
+	void CreateDescriptorPool();
+	void ResetDescriptorPool();
+
+	// Creates the descriptor set
+	void CreateDescriptorSet(std::vector<vk::Texture*>& textures, std::vector <vk::Sampler*>& samplers);
+
 private:
 	// Creates descriptor set layouts
 	void CreateDescriptorSetLayout();
 
 	// Create the uniforms buffers
 	void CreateUniformBuffer();
-
-	// Create the descriptor pool
-	void CreateDescriptorPool();
-
-	// Creates the descriptor set
-	void CreateDescriptorSet(VkDescriptorPool descriptorPool);
 
 	// References
 	vk::Device & m_device;
@@ -65,10 +66,6 @@ private:
 
 	vk::Buffer view;	// Proj view ambiant
 	vk::Buffer dynamic;	// Model
-
-
-	vk::Texture* m_texture;
-	vk::Sampler* m_sampler;
 
 	VkDescriptorPool descriptorPool = VK_NULL_HANDLE;
 	VkDescriptorSetLayout descriptorSetLayout = VK_NULL_HANDLE;
