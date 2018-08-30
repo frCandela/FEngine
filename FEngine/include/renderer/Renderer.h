@@ -50,10 +50,14 @@ public:
 	inline void DebugLine(glm::vec3 start, glm::vec3 end, glm::vec4 color = glm::vec4(1.f, 0.f, 0.f, 1.f)) { renderDebug->DebugLine(start, end, color); }
 	void DebugPoint(glm::vec3 pos, glm::vec4 color = glm::vec4(1.f, 0.f, 0.f, 1.f), float size = 1.f);
 
-	// Adds a mesh to the render pipeline 
+	// Manage a mesh in the render pipeline 
 	key_t CreateMesh(std::vector<ForwardPipeline::Vertex> const &  vertices, std::vector<uint32_t> const &  indices);
 	void RemoveMesh(key_t key);
 	void SetModelMatrix(key_t key, glm::mat4 modelMatrix);
+
+	// Manage a texture
+	key_t CreateTexture( std::string path);
+	void RemoveTexture(key_t key);
 
 private:
 	// Setup the command buffers for drawing operations
@@ -86,8 +90,8 @@ private:
 	VkRenderPass renderPass;//A render pass is a collection of subpasses that describes how image resource (color, depth/stencil, and input attachments) are used
 	
 	KeyList<MeshData*> m_meshDatas;
-	std::vector<vk::Texture*> m_textures;
-	std::vector <vk::Sampler*> m_samplers;
+	KeyList<vk::Texture*> m_textures;
+	KeyList<vk::Sampler*> m_samplers;
 
 	std::vector<VkSemaphore> imageAvailableSemaphores;//Specifies that an image has been acquired and is ready for rendering
 	std::vector<VkSemaphore> renderFinishedSemaphores;//Specifies that rendering has finished and presentation can happen

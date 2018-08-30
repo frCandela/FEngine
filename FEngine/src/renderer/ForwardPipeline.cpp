@@ -12,10 +12,6 @@ ForwardPipeline::ForwardPipeline(vk::Device& device, vk::CommandPool& commandPoo
 
 	vertShader = new vk::Shader(m_device, "shaders/vert.spv");
 	fragShader = new vk::Shader(m_device, "shaders/frag.spv");
-
-
-
-
 }
 
 ForwardPipeline::~ForwardPipeline()
@@ -108,7 +104,6 @@ void ForwardPipeline::ResetDescriptorPool()
 	VK_CHECK_RESULT(vkResetDescriptorPool(m_device.device, descriptorPool, 0));
 }
 
-
 void ForwardPipeline::CreateDescriptorPool()
 {
 	VkDescriptorPoolSize descriptorPoolSizeUniform = {};
@@ -141,7 +136,7 @@ void ForwardPipeline::CreateDescriptorPool()
 		throw std::runtime_error("failed to create descriptor pool!");
 }
 
-void ForwardPipeline::CreateDescriptorSet(std::vector<vk::Texture*>& textures, std::vector <vk::Sampler*>& samplers)
+void ForwardPipeline::CreateDescriptorSet(std::vector<vk::Texture*> textures, std::vector <vk::Sampler*> samplers)
 {
 	VkDescriptorSetAllocateInfo allocInfo = vk::init::descriptorSetAllocateInfo(descriptorPool, &descriptorSetLayout, 1);
 

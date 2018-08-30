@@ -163,6 +163,7 @@ void EditorApplication::Run()
 void EditorApplication::RenderGUI()
 {
 	bool openNewGameobjectModal = false;
+	bool openNewTextureModal = false;
 
 	// Main Menu bar
 	if (ImGui::BeginMainMenuBar())
@@ -174,6 +175,8 @@ void EditorApplication::RenderGUI()
 			{
 				if (ImGui::MenuItem("Gameobject"))
 					openNewGameobjectModal = true;
+				if (ImGui::MenuItem("Texture"))
+					openNewTextureModal = true;
 				ImGui::EndMenu();
 			}
 
@@ -206,22 +209,45 @@ void EditorApplication::RenderGUI()
 	if (openNewGameobjectModal)
 	{
 		openNewGameobjectModal = false;
-		m_newGameobjectBuffer[0] = '\0';
+		m_TextBuffer[0] = '\0';
 		ImGui::OpenPopup("New Gameobject");
 	}	
 	ImGui::SetNextWindowSize({300,300});
 	if (ImGui::BeginPopupModal("New Gameobject"))
 	{
-		ImGui::InputText("Name ", m_newGameobjectBuffer.data(), m_newGameobjectBuffer.size());
+		ImGui::InputText("Name ", m_TextBuffer.data(), m_TextBuffer.size());
 		if (ImGui::Button("Cancel"))
 			ImGui::CloseCurrentPopup();
 		ImGui::SameLine();
 		if (ImGui::Button("Ok"))
 		{
 			//Create new gameobject 
-			GameObject* newGameobject =  m_scene->CreateGameobject(m_newGameobjectBuffer.data());
+			GameObject* newGameobject =  m_scene->CreateGameobject(m_TextBuffer.data());
 			m_scene->SetSelectedGameobject(newGameobject);
 			ImGui::CloseCurrentPopup(); 
+		}
+		ImGui::EndPopup();
+	}
+
+	// New texture modals
+	if (openNewTextureModal)
+	{
+		openNewTextureModal = false;
+		m_TextBuffer[0] = '\0';
+		ImGui::OpenPopup("New Texture");
+	}
+	ImGui::SetNextWindowSize({ 300,300 });
+	if (ImGui::BeginPopupModal("New Texture"))
+	{
+		ImGui::InputText("Path", m_TextBuffer.data(), m_TextBuffer.size());
+		if (ImGui::Button("Cancel"))
+			ImGui::CloseCurrentPopup();
+		ImGui::SameLine();
+		if (ImGui::Button("Ok"))
+		{
+			//Create new gameobject 
+			m_renderer->CreateTexture(m_TextBuffer.data());
+			ImGui::CloseCurrentPopup();
 		}
 		ImGui::EndPopup();
 	}

@@ -23,17 +23,16 @@ Renderer::Renderer(Window& rWindow) :
 
 	imGui = new ImguiManager(device, commandPool, GetSize(), m_window.GetGLFWwindow(), renderPass);
 
-	m_textures.push_back(new vk::Texture(*device, *commandPool));
-	m_textures[m_textures.size() - 1 ]->LoadTexture("textures/error.png");
-
-	m_samplers.push_back(new vk::Sampler(*device));
-	m_samplers[m_samplers.size() - 1]->CreateSampler(static_cast<float>(m_textures[m_textures.size() - 1]->m_mipLevels), 16);
+	// Default texture and sampler
+	key_t textureKey = m_textures.Insert(new vk::Texture(*device, *commandPool));
+	m_textures.Get(textureKey)->LoadTexture("textures/error.png");
+	key_t samplerKey = m_samplers.Insert(new vk::Sampler(*device));
+	m_samplers.Get(samplerKey)->CreateSampler(static_cast<float>(m_textures.Get(textureKey)->m_mipLevels), 16);
 
 	m_pForwardPipeline = new ForwardPipeline(*device, *commandPool);
 	m_pForwardPipeline->CreateDescriptorPool();
-	m_pForwardPipeline->CreateDescriptorSet( m_textures, m_samplers );
+	m_pForwardPipeline->CreateDescriptorSet( m_textures.ToVector(), m_samplers.ToVector());
 	m_pForwardPipeline->CreateGraphicsPipeline(renderPass, swapChain->swapChainExtent);
-
 
 	m_pDebugPipeline = new DebugPipeline(*device);
 	m_pDebugPipeline->CreateGraphicsPipeline(renderPass, swapChain->swapChainExtent);	
@@ -55,9 +54,9 @@ Renderer::~Renderer()
 		vkDestroyFence(device->device, inFlightFences[i], nullptr);
 	}
 
-	for( vk::Sampler* sampler : m_samplers)
+	for( vk::Sampler* sampler : m_samplers.ToVector())
 		delete(sampler);
-	for (vk::Texture* texture : m_textures)
+	for (vk::Texture* texture : m_textures.ToVector())
 		delete(texture);
 
 	delete(m_pDebugPipeline);
@@ -78,6 +77,37 @@ Renderer::~Renderer()
 	delete(commandPool);
 	delete(device);
 	delete(instance);
+}
+
+void Renderer::RenderGUI()
+{
+	ImGuiIO& io = ImGui::GetIO();
+
+	ImGui::Begin("Renderer");
+	{
+		// Average FPS
+		ImGui::BulletText("Application average : ");
+		ImGui::SameLine();
+		ImGui::TextColored(ImVec4(200.0f / 255.f, 120.0f / 255.f, 120.0f / 255.f, 1.0f), "%.3f ", 1000.0f / io.Framerate);
+		ImGui::SameLine();
+		ImGui::Text("ms / frame(%.1f FPS)", io.Framerate);
+
+		// Window Size
+		ImGui::BulletText("Window Size : w%.f  h%.f ", io.DisplaySize.x, io.DisplaySize.y);
+
+		// Max Framerate
+		framerate.RenderGui();
+
+		m_pDebugPipeline->RenderGui();
+		m_pForwardPipeline->RenderGui();	}
+
+	ImGui::End();
+
+	ImGui::Begin("Materials");
+	for (vk::Texture * texture : m_textures.ToVector())
+		ImGui::Text(texture->GetPath().c_str());
+	ImGui::End();
+
 }
 
 key_t Renderer::CreateMesh(std::vector<ForwardPipeline::Vertex> const & vertices, std::vector<uint32_t>  const & indices)
@@ -144,6 +174,25 @@ void Renderer::SetModelMatrix(key_t key, glm::mat4 modelMatrix)
 	assert(key);
 	m_meshDatas.Get(key)->model = modelMatrix;
 }
+
+
+key_t Renderer::CreateTexture(std::string path)
+{
+	vk::Texture * texture = new vk::Texture(*device, *commandPool);
+	if (texture->LoadTexture(path))
+	{
+		key_t textureKey = m_textures.Insert(texture);
+		return textureKey;
+	}
+	return null_key_t;
+}
+
+void Renderer::RemoveTexture(key_t key)
+{
+	delete m_textures.Get(key);
+	m_textures.Remove(key);
+}
+
 
 void Renderer::CreateCommandBuffers()
 {
@@ -413,31 +462,6 @@ void Renderer::CreateRenderPass()
 
 	if (vkCreateRenderPass(device->device, &renderPassInfo, nullptr, &renderPass) != VK_SUCCESS)
 		throw std::runtime_error("failed to create render pass!");
-}
-
-void Renderer::RenderGUI()
-{
-	ImGuiIO& io = ImGui::GetIO();
-
-	ImGui::Begin("Renderer");
-
-	// Average FPS
-	ImGui::BulletText("Application average : ");
-	ImGui::SameLine();
-	ImGui::TextColored(ImVec4(200.0f / 255.f, 120.0f / 255.f, 120.0f / 255.f, 1.0f), "%.3f ", 1000.0f / io.Framerate);
-	ImGui::SameLine();
-	ImGui::Text("ms / frame(%.1f FPS)", io.Framerate);
-
-	// Window Size
-	ImGui::BulletText("Window Size : w%.f  h%.f ", io.DisplaySize.x, io.DisplaySize.y);
-
-	// Max Framerate
-	framerate.RenderGui();
-
-	m_pDebugPipeline->RenderGui();
-	m_pForwardPipeline->RenderGui();
-
-	ImGui::End();
 }
 
 glm::vec2 Renderer::GetSize() const

@@ -36,5 +36,5 @@ private:
 	bool m_showInspector = true;
 	bool m_editorShouldQuit = false;
 
-	std::array<char, 64> m_newGameobjectBuffer;
+	std::array<char, 64> m_TextBuffer;
 };

@@ -45,7 +45,7 @@ namespace vk
 		CreateImageView(VK_FORMAT_R8G8B8A8_UNORM, VK_IMAGE_ASPECT_COLOR_BIT, m_mipLevels);
 	}
 
-	void Texture::LoadTexture(std::string path)
+	bool Texture::LoadTexture(std::string path)
 	{
 		m_path = path;
 
@@ -54,13 +54,15 @@ namespace vk
 		stbi_uc* pixels = stbi_load(path.c_str(), &texWidth, &texHeight, &texChannels, STBI_rgb_alpha);
 
 		if (!pixels)
-			throw std::runtime_error("failed to load texture image!");
+			return false;
 
 		uint32_t mipLevels =  static_cast<uint32_t>(std::floor(std::log2(std::max(texWidth, texHeight)))) + 1;
 
 		Load(pixels, texWidth, texHeight, mipLevels);
 
 		stbi_image_free(pixels);
+
+		return true;
 	}
 
 	void Texture::CopyBufferToImage(VkBuffer buffer, uint32_t width, uint32_t height)

@@ -12,11 +12,13 @@ namespace vk
 		Texture(Device& device, vk::CommandPool& commandPool);
 
 		/// Load an image and upload it into a Vulkan image object
-		void LoadTexture(std::string path);
+		bool LoadTexture(std::string path);
 
 		void Load(void* data, int width, int height, uint32_t mipLevels);
 
 		uint32_t m_mipLevels = 1;
+
+		std::string GetPath() const { return m_path; }
 
 	private:
 		/// Copy a buffer to an Image

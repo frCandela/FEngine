@@ -48,7 +48,7 @@ public:
 	void ResetDescriptorPool();
 
 	// Creates the descriptor set
-	void CreateDescriptorSet(std::vector<vk::Texture*>& textures, std::vector <vk::Sampler*>& samplers);
+	void CreateDescriptorSet(std::vector<vk::Texture*> textures, std::vector <vk::Sampler*> samplers);
 
 private:
 	// Creates descriptor set layouts
