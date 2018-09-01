@@ -25,7 +25,7 @@ Renderer::Renderer(Window& rWindow) :
 
 	// Default texture and sampler
 	key_t textureKey = m_textures.Insert(new vk::Texture(*device, *commandPool));
-	m_textures.Get(textureKey)->LoadTexture("textures/error.png");
+	m_textures.Get(textureKey)->LoadTexture("textures/kiwi.png");
 	key_t samplerKey = m_samplers.Insert(new vk::Sampler(*device));
 	m_samplers.Get(samplerKey)->CreateSampler(static_cast<float>(m_textures.Get(textureKey)->m_mipLevels), 16);
 
@@ -98,15 +98,22 @@ void Renderer::RenderGUI()
 		framerate.RenderGui();
 
 		m_pDebugPipeline->RenderGui();
-		m_pForwardPipeline->RenderGui();	}
+		m_pForwardPipeline->RenderGui();	
 
+		if (ImGui::CollapsingHeader("Device properties"))
+		{
+			// maxBoundDescriptorSets
+			std::stringstream ss;
+			ss << "maxBoundDescriptorSets : " << device->properties.limits.maxBoundDescriptorSets;
+			ImGui::Text(ss.str().c_str());
+		}
+	}
 	ImGui::End();
 
 	ImGui::Begin("Materials");
 	for (vk::Texture * texture : m_textures.ToVector())
 		ImGui::Text(texture->GetPath().c_str());
 	ImGui::End();
-
 }
 
 key_t Renderer::CreateMesh(std::vector<ForwardPipeline::Vertex> const & vertices, std::vector<uint32_t>  const & indices)
@@ -190,7 +197,6 @@ void Renderer::RemoveTexture(key_t key)
 	delete m_textures.Get(key);
 	m_textures.Remove(key);
 }
-
 
 void Renderer::CreateCommandBuffers()
 {

@@ -150,8 +150,6 @@ void ForwardPipeline::CreateDescriptorSet(std::vector<vk::Texture*>& textures, s
 		,descriptorWrite
 	};
 
-
-
 	vkUpdateDescriptorSets(m_device.device, static_cast<uint32_t>(writeDescriptorSets.size()), writeDescriptorSets.data(), 0, NULL);
 }
 

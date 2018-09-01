@@ -65,7 +65,7 @@ void EditorApplication::OnComponentDeletedCallback(GameObject* gameobject, Compo
 void EditorApplication::Run()
 {
 	// Create required modules
-	Window window( 1200,700, "Vulkan" );
+	Window window(1280,720, "Vulkan" );
 	m_renderer = new Renderer(window);
 	m_physicsEngine = new PhysicsEngine();
 	m_scene = new Scene("Test scene");
