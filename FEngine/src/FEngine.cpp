@@ -72,8 +72,8 @@ void FEngine::initVulkan()
 	createDepthResources();
 	createFramebuffers();
 	createTextureImage();
-	createTextureImageView();
-	createTextureSampler();
+	//createTextureImageView();
+	//createTextureSampler();
 	loadModel();
 	createVertexBuffer();
 	createIndexBuffer();
@@ -1295,13 +1295,13 @@ void FEngine::createTextureImage()
 	void* data;
 	vkMapMemory(device, stagingBufferMemory, 0, totalImageSize, 0, &data);
 	memcpy(data, pixels1, static_cast<size_t>(imageSize1));
-	memcpy(((char*)data +static_cast<size_t>(0.95*imageSize1)), pixels2, static_cast<size_t>(imageSize2));
+	memcpy(((char*)data +static_cast<size_t>(01*imageSize1)), pixels2, static_cast<size_t>(imageSize2));
 	vkUnmapMemory(device, stagingBufferMemory);
 
 	stbi_image_free(pixels1);
 	stbi_image_free(pixels2);
 
-	/////////////////////////////////// OK ///////////////////////////////////
+	/////////////////////////////////// Image ///////////////////////////////////
 	uint32_t layerCount = 2;
 
 	// Setup buffer copy regions for array layers
@@ -1340,7 +1340,8 @@ void FEngine::createTextureImage()
 	imageCreateInfo.usage = VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT;
 	imageCreateInfo.arrayLayers = layerCount;
 
-	vkCreateImage(device, &imageCreateInfo, nullptr, &textureImage);
+	if(vkCreateImage(device, &imageCreateInfo, nullptr, &textureImage) != VK_SUCCESS)
+		throw std::runtime_error("failed to vkCreateImage!");
 
 	VkMemoryRequirements memReqs;
 	vkGetImageMemoryRequirements(device, textureImage, &memReqs);
@@ -1350,8 +1351,10 @@ void FEngine::createTextureImage()
 	memAllocInfo.allocationSize = memReqs.size;
 	memAllocInfo.memoryTypeIndex = findMemoryType(memReqs.memoryTypeBits, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
 
-	vkAllocateMemory(device, &memAllocInfo, nullptr, &textureImageMemory);
-	vkBindImageMemory(device, textureImage, textureImageMemory, 0);
+	if( vkAllocateMemory(device, &memAllocInfo, nullptr, &textureImageMemory) != VK_SUCCESS)
+		throw std::runtime_error("failed to create vkAllocateMemory!");
+	if( vkBindImageMemory(device, textureImage, textureImageMemory, 0) != VK_SUCCESS)
+		throw std::runtime_error("failed to create vkBindImageMemory!");
 
 	VkCommandBuffer copyCmd = beginSingleTimeCommands();
 
@@ -1391,7 +1394,44 @@ void FEngine::createTextureImage()
 
 	endSingleTimeCommands(copyCmd);
 
-	/////////////////////////////////////////////////////////////////////////////////////////////////////
+	/////////////////////////////////// Sampler ///////////////////////////////////
+
+	VkSamplerCreateInfo sampler{};
+	sampler.sType = VK_STRUCTURE_TYPE_SAMPLER_CREATE_INFO;
+	sampler.maxAnisotropy = 1.0f;
+	sampler.magFilter = VK_FILTER_LINEAR;
+	sampler.minFilter = VK_FILTER_LINEAR;
+	sampler.mipmapMode = VK_SAMPLER_MIPMAP_MODE_LINEAR;
+	sampler.addressModeU = VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_EDGE;
+	sampler.addressModeV = sampler.addressModeU;
+	sampler.addressModeW = sampler.addressModeU;
+	sampler.mipLodBias = 0.0f;
+	sampler.maxAnisotropy = 8;
+	sampler.compareOp = VK_COMPARE_OP_NEVER;
+	sampler.minLod = 0.0f;
+	sampler.maxLod = 0.0f;
+	sampler.borderColor = VK_BORDER_COLOR_FLOAT_OPAQUE_WHITE;
+
+	if (vkCreateSampler(device, &sampler, nullptr, &textureSampler) != VK_SUCCESS)
+		throw std::runtime_error("failed to vkCreateSampler!");
+
+	/////////////////////////////////// image view ///////////////////////////////////
+
+	VkImageViewCreateInfo view{};
+	view.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
+	view.viewType = VK_IMAGE_VIEW_TYPE_2D_ARRAY;
+	view.format = VK_FORMAT_R8G8B8A8_UNORM;
+	view.components = { VK_COMPONENT_SWIZZLE_R, VK_COMPONENT_SWIZZLE_G, VK_COMPONENT_SWIZZLE_B, VK_COMPONENT_SWIZZLE_A };
+	view.subresourceRange = { VK_IMAGE_ASPECT_COLOR_BIT, 0, 1, 0, 1 };
+	view.subresourceRange.layerCount = layerCount;
+	view.subresourceRange.levelCount = 1;
+	view.image = textureImage;
+	if(vkCreateImageView(device, &view, nullptr, &textureImageView) != VK_SUCCESS)
+		throw std::runtime_error("failed to vkCreateSampler!");
+
+	   
+	/////////////////////////////////// OLD ///////////////////////////////////
+
 
 	// Setup buffer copy regions for array layers
 	/*std::vector<VkBufferImageCopy> bufferCopyRegions;
@@ -1649,7 +1689,7 @@ VkImageView FEngine::createImageView(VkImage image, VkFormat format, VkImageAspe
 	VkImageViewCreateInfo viewInfo = {};
 	viewInfo.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
 	viewInfo.image = image;
-	viewInfo.viewType = VK_IMAGE_VIEW_TYPE_2D_ARRAY;
+	viewInfo.viewType = VK_IMAGE_VIEW_TYPE_2D;
 	viewInfo.format = format;
 	viewInfo.subresourceRange.aspectMask = aspectFlags;
 	viewInfo.subresourceRange.baseMipLevel = 0;
