@@ -1269,13 +1269,13 @@ void FEngine::createTextureImage()
 	// Load image from disk
 	int texWidth, texHeight, texChannels;
 	stbi_uc* pixels = stbi_load(TEXTURE_PATH.c_str(), &texWidth, &texHeight, &texChannels, STBI_rgb_alpha);
-	VkDeviceSize imageSize = texWidth * texHeight * 4;
-	
+	VkDeviceSize imageSize = texWidth * texHeight * 4;	
 
 	if (!pixels) 
 		throw std::runtime_error("failed to load texture image!");
 
 	mipLevels = static_cast<uint32_t>(std::floor(std::log2(std::max(texWidth, texHeight)))) + 1;
+	mipLevels = 1;
 
 	// Create a buffer in host visible memory
 	VkBuffer stagingBuffer;
@@ -1467,7 +1467,7 @@ VkImageView FEngine::createImageView(VkImage image, VkFormat format, VkImageAspe
 	VkImageViewCreateInfo viewInfo = {};
 	viewInfo.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
 	viewInfo.image = image;
-	viewInfo.viewType = VK_IMAGE_VIEW_TYPE_2D;
+	viewInfo.viewType = VK_IMAGE_VIEW_TYPE_2D_ARRAY;
 	viewInfo.format = format;
 	viewInfo.subresourceRange.aspectMask = aspectFlags;
 	viewInfo.subresourceRange.baseMipLevel = 0;

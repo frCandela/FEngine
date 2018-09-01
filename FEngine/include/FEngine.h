@@ -31,6 +31,7 @@ public:
 
 	const std::string MODEL_PATH = "mesh/cube.obj";
 	const std::string TEXTURE_PATH = "textures/texture2.jpg";
+	const std::string TEXTURE_PATH2 = "textures/default.png";
 
 	const uint32_t MAX_FRAMES_IN_FLIGHT = 2;
 	GLFWwindow * window;
