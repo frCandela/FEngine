@@ -1267,31 +1267,213 @@ void FEngine::loadModel()
 void FEngine::createTextureImage()
 {
 	// Load image from disk
-	int texWidth, texHeight, texChannels;
-	stbi_uc* pixels = stbi_load(TEXTURE_PATH.c_str(), &texWidth, &texHeight, &texChannels, STBI_rgb_alpha);
-	VkDeviceSize imageSize = texWidth * texHeight * 4;	
-
-	if (!pixels) 
+	int texWidth1, texHeight1, texChannels1;
+	stbi_uc* pixels1 = stbi_load(TEXTURE_PATH1.c_str(), &texWidth1, &texHeight1, &texChannels1, STBI_rgb_alpha);
+	VkDeviceSize imageSize1 = texWidth1 * texHeight1 * 4;	
+	if (!pixels1) 
 		throw std::runtime_error("failed to load texture image!");
-
-	mipLevels = static_cast<uint32_t>(std::floor(std::log2(std::max(texWidth, texHeight)))) + 1;
+	mipLevels = static_cast<uint32_t>(std::floor(std::log2(std::max(texWidth1, texHeight1)))) + 1;
 	mipLevels = 1;
+
+	// Load image from disk
+	int texWidth2, texHeight2, texChannels2;
+	stbi_uc* pixels2 = stbi_load(TEXTURE_PATH2.c_str(), &texWidth2, &texHeight2, &texChannels2, STBI_rgb_alpha);
+	VkDeviceSize imageSize2 = texWidth2 * texHeight2 * 4;
+	if (!pixels2)
+		throw std::runtime_error("failed to load texture image!");
+	mipLevels = static_cast<uint32_t>(std::floor(std::log2(std::max(texWidth2, texHeight2)))) + 1;
+	mipLevels = 1;
+
+	VkDeviceSize totalImageSize = imageSize1 + imageSize2;
 
 	// Create a buffer in host visible memory
 	VkBuffer stagingBuffer;
 	VkDeviceMemory stagingBufferMemory;
-	createBuffer(imageSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, stagingBuffer, stagingBufferMemory);
+	createBuffer(totalImageSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, stagingBuffer, stagingBufferMemory);
 
 	// Copy the pixel values from the image loading library to the buffer
 	void* data;
-	vkMapMemory(device, stagingBufferMemory, 0, imageSize, 0, &data);
-	memcpy(data, pixels, static_cast<size_t>(imageSize));
+	vkMapMemory(device, stagingBufferMemory, 0, totalImageSize, 0, &data);
+	memcpy(data, pixels1, static_cast<size_t>(imageSize1));
+	memcpy(((char*)data +static_cast<size_t>(0.95*imageSize1)), pixels2, static_cast<size_t>(imageSize2));
 	vkUnmapMemory(device, stagingBufferMemory);
 
-	stbi_image_free(pixels);
+	stbi_image_free(pixels1);
+	stbi_image_free(pixels2);
+
+	/////////////////////////////////// OK ///////////////////////////////////
+	uint32_t layerCount = 2;
+
+	// Setup buffer copy regions for array layers
+	std::vector<VkBufferImageCopy> bufferCopyRegions;
+	size_t offset = 0;
+
+	for (uint32_t layer = 0; layer < layerCount; layer++)
+	{
+		VkBufferImageCopy bufferCopyRegion = {};
+		bufferCopyRegion.imageSubresource.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+		bufferCopyRegion.imageSubresource.mipLevel = 0;
+		bufferCopyRegion.imageSubresource.baseArrayLayer = layer;
+		bufferCopyRegion.imageSubresource.layerCount = 1;
+		bufferCopyRegion.imageExtent.width = static_cast<uint32_t>(texWidth1);
+		bufferCopyRegion.imageExtent.height = static_cast<uint32_t>(texHeight1);
+		bufferCopyRegion.imageExtent.depth = 1;
+		bufferCopyRegion.bufferOffset = offset;
+
+		bufferCopyRegions.push_back(bufferCopyRegion);
+
+		// Increase offset into staging buffer for next level / face
+		offset += imageSize1;
+	}
+
+	// Create optimal tiled target image
+	VkImageCreateInfo imageCreateInfo{};
+	imageCreateInfo.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
+	imageCreateInfo.imageType = VK_IMAGE_TYPE_2D;
+	imageCreateInfo.format = VK_FORMAT_R8G8B8A8_UNORM;
+	imageCreateInfo.mipLevels = 1;
+	imageCreateInfo.samples = VK_SAMPLE_COUNT_1_BIT;
+	imageCreateInfo.tiling = VK_IMAGE_TILING_OPTIMAL;
+	imageCreateInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
+	imageCreateInfo.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
+	imageCreateInfo.extent = { static_cast<uint32_t>(texWidth1),  static_cast<uint32_t>(texHeight1), 1 };
+	imageCreateInfo.usage = VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT;
+	imageCreateInfo.arrayLayers = layerCount;
+
+	vkCreateImage(device, &imageCreateInfo, nullptr, &textureImage);
+
+	VkMemoryRequirements memReqs;
+	vkGetImageMemoryRequirements(device, textureImage, &memReqs);
+
+	VkMemoryAllocateInfo memAllocInfo{};
+	memAllocInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
+	memAllocInfo.allocationSize = memReqs.size;
+	memAllocInfo.memoryTypeIndex = findMemoryType(memReqs.memoryTypeBits, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
+
+	vkAllocateMemory(device, &memAllocInfo, nullptr, &textureImageMemory);
+	vkBindImageMemory(device, textureImage, textureImageMemory, 0);
+
+	VkCommandBuffer copyCmd = beginSingleTimeCommands();
+
+	// Image barrier for optimal image (target)
+	// Set initial layout for all array layers (faces) of the optimal (target) tiled texture
+	VkImageSubresourceRange subresourceRange = {};
+	subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+	subresourceRange.baseMipLevel = 0;
+	subresourceRange.levelCount = 1;
+	subresourceRange.layerCount = layerCount;
+
+	setImageLayout(
+		copyCmd,
+		textureImage,
+		VK_IMAGE_LAYOUT_UNDEFINED,
+		VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
+		subresourceRange);
+
+	// Copy the cube map faces from the staging buffer to the optimal tiled image
+	vkCmdCopyBufferToImage(
+		copyCmd,
+		stagingBuffer,
+		textureImage,
+		VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
+		bufferCopyRegions.size(),
+		bufferCopyRegions.data()
+	);
+
+	// Change texture image layout to shader read after all faces have been copied
+	//textureArray.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+	setImageLayout(
+		copyCmd,
+		textureImage,
+		VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
+		VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL,
+		subresourceRange);
+
+	endSingleTimeCommands(copyCmd);
+
+	/////////////////////////////////////////////////////////////////////////////////////////////////////
+
+	// Setup buffer copy regions for array layers
+	/*std::vector<VkBufferImageCopy> bufferCopyRegions;
+	size_t offset = 0;
+
+	uint32_t layerCount = 2;
+
+	for (uint32_t layer = 0; layer < layerCount; layer++)
+	{
+		VkBufferImageCopy bufferCopyRegion = {};
+		bufferCopyRegion.imageSubresource.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+		bufferCopyRegion.imageSubresource.mipLevel = 0;
+		bufferCopyRegion.imageSubresource.baseArrayLayer = layer;
+		bufferCopyRegion.imageSubresource.layerCount = 1;
+		bufferCopyRegion.imageExtent.width = static_cast<uint32_t>(texWidth2);
+		bufferCopyRegion.imageExtent.height = static_cast<uint32_t>(texHeight2);
+		bufferCopyRegion.imageExtent.depth = 1;
+		bufferCopyRegion.bufferOffset = offset;
+
+		bufferCopyRegions.push_back(bufferCopyRegion);
+
+		// Increase offset into staging buffer for next level / face
+		offset += imageSize1;
+	}
+
+	// Create optimal tiled target image
+	VkImageCreateInfo imageCreateInfo{};
+	imageCreateInfo.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
+	imageCreateInfo.imageType = VK_IMAGE_TYPE_2D;
+	imageCreateInfo.format = VK_FORMAT_R8G8B8A8_UNORM;
+	imageCreateInfo.mipLevels = 1;
+	imageCreateInfo.samples = VK_SAMPLE_COUNT_1_BIT;
+	imageCreateInfo.tiling = VK_IMAGE_TILING_OPTIMAL;
+	imageCreateInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
+	imageCreateInfo.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
+	imageCreateInfo.extent = { static_cast<uint32_t>(texWidth2), static_cast<uint32_t>(texHeight2), 1 };
+	imageCreateInfo.usage = VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT;
+	imageCreateInfo.arrayLayers = layerCount;
+
+	if(vkCreateImage(device, &imageCreateInfo, nullptr, &textureImage) != VK_SUCCESS)
+		throw std::runtime_error("failed to create textureImage!");
+
+	// Allocate memory for the image
+	VkMemoryRequirements memRequirements;
+	vkGetImageMemoryRequirements(device, textureImage, &memRequirements);
+
+	VkMemoryAllocateInfo allocInfo = {};
+	allocInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
+	allocInfo.allocationSize = memRequirements.size;
+	allocInfo.memoryTypeIndex = findMemoryType(memRequirements.memoryTypeBits, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
+
+	if (vkAllocateMemory(device, &allocInfo, nullptr, &textureImageMemory) != VK_SUCCESS)
+		throw std::runtime_error("failed to allocate image memory!");
+
+	vkBindImageMemory(device, textureImage, textureImageMemory, 0);
+	transitionImageLayout(textureImage, VK_FORMAT_R8G8B8A8_UNORM, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, mipLevels);
+	std::cout << "zob" << std::endl;
+	{
+		VkCommandBuffer commandBuffer = beginSingleTimeCommands();
+		//Execute
+		vkCmdCopyBufferToImage(
+			commandBuffer,
+			stagingBuffer,
+			textureImage,
+			VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
+			bufferCopyRegions.size(),
+			bufferCopyRegions.data()
+		);
+		endSingleTimeCommands(commandBuffer);
+	}
+	std::cout << "zob2" << std::endl;
+
+	// Clean up the staging buffer and its memory
+	vkDestroyBuffer(device, stagingBuffer, nullptr);
+	vkFreeMemory(device, stagingBufferMemory, nullptr);
+
+
+	
+	generateMipmaps(textureImage, VK_FORMAT_R8G8B8A8_UNORM, texWidth1, texHeight1, mipLevels); 
 
 	// Create the image in Vulkan
-	createImage(texWidth, texHeight, mipLevels, VK_FORMAT_R8G8B8A8_UNORM, VK_IMAGE_TILING_OPTIMAL, VK_IMAGE_USAGE_TRANSFER_SRC_BIT | VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, textureImage, textureImageMemory);
+	/*createImage(texWidth, texHeight, mipLevels, VK_FORMAT_R8G8B8A8_UNORM, VK_IMAGE_TILING_OPTIMAL, VK_IMAGE_USAGE_TRANSFER_SRC_BIT | VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, textureImage, textureImageMemory);
 	
 	// Transitioned to VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL while generating mipmaps
 	transitionImageLayout(textureImage, VK_FORMAT_R8G8B8A8_UNORM, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, mipLevels);
@@ -1301,7 +1483,7 @@ void FEngine::createTextureImage()
 	vkDestroyBuffer(device, stagingBuffer, nullptr);
 	vkFreeMemory(device, stagingBufferMemory, nullptr);
 
-	generateMipmaps(textureImage, VK_FORMAT_R8G8B8A8_UNORM, texWidth, texHeight, mipLevels);
+	generateMipmaps(textureImage, VK_FORMAT_R8G8B8A8_UNORM, texWidth, texHeight, mipLevels);*/
 }
 // Generate mipmaps for a VkImage
 void FEngine::generateMipmaps(VkImage image, VkFormat imageFormat, int32_t texWidth, int32_t texHeight, uint32_t mipLevels)
