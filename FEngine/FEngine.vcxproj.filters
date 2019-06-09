@@ -38,5 +38,11 @@
     <ClInclude Include="include\vkRenderer.h">
       <Filter>Fichiers d%27en-tête\vulkan</Filter>
     </ClInclude>
+    <ClInclude Include="include\vkWindow.h">
+      <Filter>Fichiers d%27en-tête\vulkan</Filter>
+    </ClInclude>
+    <ClInclude Include="include\vkSwapChain.h">
+      <Filter>Fichiers d%27en-tête\vulkan</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

@@ -8,8 +8,8 @@
 
 class Device {
 public:
-	Device( Instance & _instance ) {
-		Create( _instance );
+	Device( Instance & _instance, VkSurfaceKHR _surface ) {
+		Create( _instance, _surface);
 	}
 
 	~Device() {
@@ -24,15 +24,16 @@ private:
 	VkPhysicalDeviceProperties m_deviceProperties;
 	std::vector<VkExtensionProperties> m_availableExtensions;
 	std::vector<VkQueueFamilyProperties> m_queueFamilyProperties;
-	uint32_t m_graphicsQueueFamilyIndex = 1000;
-	uint32_t m_computeQueueFamilyIndex=1000;
+	uint32_t m_graphicsQueueFamilyIndex;
+	uint32_t m_computeQueueFamilyIndex;
+	uint32_t m_presentQueueFamilyIndex;
 	VkQueue m_graphicsQueue;
 	VkQueue m_computeQueue;
 	VkQueue m_presentQueue;
 
-	bool Create( Instance & _instance) {
+	bool Create( Instance & _instance, VkSurfaceKHR _surface) {
 		SelectPhysicalDevice(_instance.vkInstance);
-		GetQueueFamilies();
+		GetQueueFamilies( _surface );
 		std::vector< const char * > existingExtensions = GetDesiredExtensions({ VK_KHR_SWAPCHAIN_EXTENSION_NAME });
 
 		float queuePriority = 1.0f;
@@ -68,6 +69,7 @@ private:
 
 		vkGetDeviceQueue(vkDevice, m_graphicsQueueFamilyIndex, 0, &m_graphicsQueue);
 		vkGetDeviceQueue(vkDevice, m_computeQueueFamilyIndex, 0, &m_computeQueue);
+		vkGetDeviceQueue(vkDevice, m_presentQueueFamilyIndex, 0, &m_presentQueue);
 
 		return true;
 	}
@@ -82,7 +84,7 @@ private:
 
 			uint32_t extensionsCount;
 			if (vkEnumerateDeviceExtensionProperties(vkPhysicalDevice, nullptr, &extensionsCount, nullptr) != VK_SUCCESS) { return false; }
-			m_availableExtensions = std::vector<VkExtensionProperties>(extensionsCount);
+			m_availableExtensions.resize(extensionsCount);
 			if (vkEnumerateDeviceExtensionProperties(vkPhysicalDevice, nullptr, &extensionsCount, m_availableExtensions.data()) != VK_SUCCESS) { return false; }
 
 			vkGetPhysicalDeviceProperties(vkPhysicalDevice, &m_deviceProperties);
@@ -96,7 +98,6 @@ private:
 		std::cout << "Using device : " << m_deviceProperties.deviceName << std::endl;
 		return true;
 	}
-	
 	std::vector < const char *> GetDesiredExtensions(const std::vector < const char *> _desiredExtensions) {
 		std::vector < const char *> existingExtensions;
 		existingExtensions.reserve(_desiredExtensions.size());
@@ -108,7 +109,6 @@ private:
 		}
 		return existingExtensions;
 	}
-	
 	bool IsExtensionAvailable( std::string _requiredExtension) {
 		for (int availableExtensionIndex = 0; availableExtensionIndex < m_availableExtensions.size(); availableExtensionIndex++) {
 			if (_requiredExtension.compare(m_availableExtensions[availableExtensionIndex].extensionName) == 0) {
@@ -120,10 +120,10 @@ private:
 	bool IsFeatureAvailable(std::string _requiredFeature) {
 		return false;
 	}
-	void GetQueueFamilies() {
+	void GetQueueFamilies( VkSurfaceKHR _surface ) {
 		uint32_t queueFamiliesCount;
 		vkGetPhysicalDeviceQueueFamilyProperties(vkPhysicalDevice, &queueFamiliesCount, nullptr);
-		m_queueFamilyProperties = std::vector<VkQueueFamilyProperties>(queueFamiliesCount);
+		m_queueFamilyProperties.resize(queueFamiliesCount);
 		vkGetPhysicalDeviceQueueFamilyProperties(vkPhysicalDevice, &queueFamiliesCount, m_queueFamilyProperties.data());
 
 		VkQueueFlags desiredGraphicsCapabilities = VK_QUEUE_GRAPHICS_BIT;
@@ -143,6 +143,17 @@ private:
 				break;
 			}
 		}
+
+		for (int queueIndex = 0; queueIndex < m_queueFamilyProperties.size(); queueIndex++) {
+			if ( m_queueFamilyProperties[queueIndex].queueCount > 0 ) {
+				VkBool32 presentationSupported;
+				if (vkGetPhysicalDeviceSurfaceSupportKHR(vkPhysicalDevice, queueIndex, _surface, &presentationSupported) == VK_SUCCESS && 
+					presentationSupported == VK_TRUE ){
+					m_presentQueueFamilyIndex = queueIndex;
+					break;
+				}
+			}
+		}		
 	}
 
 };

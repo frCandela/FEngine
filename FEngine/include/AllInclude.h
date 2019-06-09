@@ -1,8 +1,5 @@
 #pragma once
 
-#include <vector>
-#include <iostream>
-
 #pragma warning( push, 0)
 #pragma warning( disable, 4099)
 
@@ -13,5 +10,8 @@
 #define GLM_FORCE_DEPTH_ZERO_TO_ONE
 #include "glm/glm.hpp"
 #include "glm/gtc/matrix_transform.hpp"
+
+#include <vector>
+#include <iostream>
 
 #pragma warning( pop )

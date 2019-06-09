@@ -26,18 +26,18 @@ private:
 	std::vector < const char *> m_extensions;
 
 	bool Create() {
-
-
-
 		// Get desired extensions
 		uint32_t glfwExtensionCount = 0;
 		const char** glfwExtensions;
+		glfwInit();
+		int res = glfwVulkanSupported() == GLFW_TRUE;
+		(void)res;
 		glfwExtensions = glfwGetRequiredInstanceExtensions(&glfwExtensionCount);
 		std::vector< const char * > desiredExtensions = { VK_EXT_DEBUG_REPORT_EXTENSION_NAME, VK_KHR_SURFACE_EXTENSION_NAME };
 		for (unsigned glfwExtensionIndex = 0; glfwExtensionIndex < glfwExtensionCount; glfwExtensionIndex++) {
 			desiredExtensions.push_back(glfwExtensions[glfwExtensionIndex]);
 		}
-		SetDesiredValidationExtensions(desiredExtensions);		
+		SetDesiredExtensions(desiredExtensions);		
 
 
 #ifdef NDEBUG
@@ -92,7 +92,7 @@ private:
 		// Get available layers
 		uint32_t layerCount;
 		vkEnumerateInstanceLayerProperties(&layerCount, nullptr);
-		m_availableLayers = std::vector<VkLayerProperties>(layerCount);
+		m_availableLayers.resize(layerCount);
 		vkEnumerateInstanceLayerProperties(&layerCount, m_availableLayers.data());
 
 		m_validationLayers.clear();
@@ -103,13 +103,13 @@ private:
 			}
 		}
 	}
-	void SetDesiredValidationExtensions(const std::vector < const char *> _desiredExtensions)
+	void SetDesiredExtensions(const std::vector < const char *> _desiredExtensions)
 	{
 		// Get available extensions
-		uint32_t extensions_count;
-		vkEnumerateInstanceExtensionProperties(nullptr, &extensions_count, nullptr);
-		m_availableExtensions = std::vector< VkExtensionProperties >(extensions_count);
-		vkEnumerateInstanceExtensionProperties(nullptr, &extensions_count, m_availableExtensions.data());
+		uint32_t extensionsCount;
+		vkEnumerateInstanceExtensionProperties(nullptr, &extensionsCount, nullptr);
+		m_availableExtensions.resize(extensionsCount);
+		vkEnumerateInstanceExtensionProperties(nullptr, &extensionsCount, m_availableExtensions.data());
 
 		m_extensions.clear();
 		m_extensions.reserve(_desiredExtensions.size());
