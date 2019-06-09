@@ -11,12 +11,6 @@ public:
 	void Run() 
 	{
 		Instance instance;
-		Device device(instance.vkInstance);
-
-
-
-
+		Device device(instance);
 	}
-
-
 };

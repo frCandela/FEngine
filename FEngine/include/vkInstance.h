@@ -8,32 +8,43 @@ public:
 		Create();
 	}
 
+	~Instance() {
+		DestroyDebugReportCallback( m_callback, nullptr);
+		vkDestroyInstance(vkInstance, nullptr);
+	}
+
+	const std::vector < const char *> & GetValidationLayers() const { return m_validationLayers;  }
+
 	VkInstance vkInstance = VK_NULL_HANDLE;
 
 private:
 	std::vector< VkExtensionProperties > m_availableExtensions;
+	std::vector<VkLayerProperties> m_availableLayers;
 	VkDebugReportCallbackEXT m_callback;
+
+	std::vector < const char *> m_validationLayers;
+	std::vector < const char *> m_extensions;
 
 	bool Create() {
 
-		GetAvailableExtensions();
+
 
 		// Get desired extensions
 		uint32_t glfwExtensionCount = 0;
 		const char** glfwExtensions;
 		glfwExtensions = glfwGetRequiredInstanceExtensions(&glfwExtensionCount);
-		std::vector< const char * > desiredExtensions = { VK_EXT_DEBUG_REPORT_EXTENSION_NAME };
+		std::vector< const char * > desiredExtensions = { VK_EXT_DEBUG_REPORT_EXTENSION_NAME, VK_KHR_SURFACE_EXTENSION_NAME };
 		for (unsigned glfwExtensionIndex = 0; glfwExtensionIndex < glfwExtensionCount; glfwExtensionIndex++) {
 			desiredExtensions.push_back(glfwExtensions[glfwExtensionIndex]);
 		}
+		SetDesiredValidationExtensions(desiredExtensions);		
 
-		std::vector< const char * > existingExtensions;
-		existingExtensions.reserve(desiredExtensions.size());
-		for (int extensionIndex = 0; extensionIndex < desiredExtensions.size(); extensionIndex++) {
-			if (IsExtensionAvailable(desiredExtensions[extensionIndex])) {
-				existingExtensions.push_back(desiredExtensions[extensionIndex]);
-			}
-		}
+
+#ifdef NDEBUG
+		const std::vector<const char*> validationLayers = {};
+#else	
+		SetDesiredValidationLayers({ "VK_LAYER_LUNARG_standard_validation" });
+#endif
 
 		VkApplicationInfo appInfo;
 		appInfo.sType = VK_STRUCTURE_TYPE_APPLICATION_INFO;
@@ -47,10 +58,10 @@ private:
 		instanceCreateInfo.pNext = nullptr;
 		instanceCreateInfo.flags = 0;
 		instanceCreateInfo.pApplicationInfo = &appInfo;
-		instanceCreateInfo.enabledLayerCount = 0;
-		instanceCreateInfo.ppEnabledLayerNames = nullptr;
-		instanceCreateInfo.enabledExtensionCount = static_cast<uint32_t>(existingExtensions.size());
-		instanceCreateInfo.ppEnabledExtensionNames = existingExtensions.size() > 0 ? existingExtensions.data() : nullptr;
+		instanceCreateInfo.enabledLayerCount = static_cast<uint32_t>( m_validationLayers.size());
+		instanceCreateInfo.ppEnabledLayerNames = m_validationLayers.data();
+		instanceCreateInfo.enabledExtensionCount = static_cast<uint32_t>(m_extensions.size());
+		instanceCreateInfo.ppEnabledExtensionNames = m_extensions.size() > 0 ? m_extensions.data() : nullptr;
 
 		if (vkCreateInstance(&instanceCreateInfo, nullptr, &vkInstance) != VK_SUCCESS || vkInstance == VK_NULL_HANDLE) {
 			return false;
@@ -68,19 +79,45 @@ private:
 		}
 		return false;
 	}
-	bool GetAvailableExtensions() {
+	bool IsLayerAvailable(std::string _requiredLayer) {
+		for (int availableLayerIndex = 0; availableLayerIndex < m_availableLayers.size(); availableLayerIndex++) {
+			if (_requiredLayer.compare(m_availableLayers[availableLayerIndex].layerName) == 0) {
+				return true;
+			}
+		}
+		return false;
+	}
+	void SetDesiredValidationLayers(const std::vector < const char *> _desiredLayers)
+	{
+		// Get available layers
+		uint32_t layerCount;
+		vkEnumerateInstanceLayerProperties(&layerCount, nullptr);
+		m_availableLayers = std::vector<VkLayerProperties>(layerCount);
+		vkEnumerateInstanceLayerProperties(&layerCount, m_availableLayers.data());
+
+		m_validationLayers.clear();
+		m_validationLayers.reserve(_desiredLayers.size());
+		for (int layerIndex = 0; layerIndex < _desiredLayers.size(); layerIndex++) {
+			if (IsLayerAvailable(_desiredLayers[layerIndex])) {
+				m_validationLayers.push_back(_desiredLayers[layerIndex]);
+			}
+		}
+	}
+	void SetDesiredValidationExtensions(const std::vector < const char *> _desiredExtensions)
+	{
+		// Get available extensions
 		uint32_t extensions_count;
-
-		if (vkEnumerateInstanceExtensionProperties(nullptr, &extensions_count, nullptr) != VK_SUCCESS) {
-			return false;
-		}
-
+		vkEnumerateInstanceExtensionProperties(nullptr, &extensions_count, nullptr);
 		m_availableExtensions = std::vector< VkExtensionProperties >(extensions_count);
-		if (vkEnumerateInstanceExtensionProperties(nullptr, &extensions_count, m_availableExtensions.data()) != VK_SUCCESS) {
-			return false;
-		}
+		vkEnumerateInstanceExtensionProperties(nullptr, &extensions_count, m_availableExtensions.data());
 
-		return true;
+		m_extensions.clear();
+		m_extensions.reserve(_desiredExtensions.size());
+		for (int extensionIndex = 0; extensionIndex < _desiredExtensions.size(); extensionIndex++) {
+			if (IsExtensionAvailable(_desiredExtensions[extensionIndex])) {
+				m_extensions.push_back(_desiredExtensions[extensionIndex]);
+			}
+		}
 	}
 	bool SetupDebugCallback(){
 		VkDebugReportCallbackCreateInfoEXT createInfo = {};

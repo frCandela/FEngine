@@ -4,6 +4,7 @@
 #include <iostream>
 
 #pragma warning( push, 0)
+#pragma warning( disable, 4099)
 
 #define GLFW_INCLUDE_VULKAN
 #include <GLFW/glfw3.h>
