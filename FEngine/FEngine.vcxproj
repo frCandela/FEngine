@@ -45,12 +45,13 @@
   <PropertyGroup />
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
-      <WarningLevel>Level3</WarningLevel>
+      <WarningLevel>Level4</WarningLevel>
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>deps;include;C:\VulkanSDK\1.1.77.0\Include</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
+      <TreatWarningAsError>true</TreatWarningAsError>
     </ClCompile>
     <Link>
       <AdditionalDependencies>glfw3d.lib;vulkan-1.lib;%(AdditionalDependencies)</AdditionalDependencies>
@@ -61,7 +62,7 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
-      <WarningLevel>Level3</WarningLevel>
+      <WarningLevel>Level4</WarningLevel>
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
@@ -70,6 +71,7 @@
       <AdditionalIncludeDirectories>deps;include;C:\VulkanSDK\1.1.77.0\Include</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>_MBCS;%(PreprocessorDefinitions);NDEBUG</PreprocessorDefinitions>
       <LanguageStandard>stdcpp17</LanguageStandard>
+      <TreatWarningAsError>true</TreatWarningAsError>
     </ClCompile>
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
@@ -81,16 +83,17 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="src\FEngine.cpp" />
-    <ClCompile Include="src\main.cpp" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="include\FEngine.h" />
-    <ClInclude Include="include\Vertex.h" />
-  </ItemGroup>
-  <ItemGroup>
     <None Include="shaders\shader.frag" />
     <None Include="shaders\shader.vert" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="include\main.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="include\AllInclude.h" />
+    <ClInclude Include="include\vkDevice.h" />
+    <ClInclude Include="include\vkInstance.h" />
+    <ClInclude Include="include\vkRenderer.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
