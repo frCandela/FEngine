@@ -44,5 +44,17 @@
     <ClInclude Include="include\vkSwapChain.h">
       <Filter>Fichiers d%27en-tête\vulkan</Filter>
     </ClInclude>
+    <ClInclude Include="include\vkBuffer.h">
+      <Filter>Fichiers d%27en-tête\vulkan</Filter>
+    </ClInclude>
+    <ClInclude Include="include\vkImage.h">
+      <Filter>Fichiers d%27en-tête\vulkan</Filter>
+    </ClInclude>
+    <ClInclude Include="include\vkImageView.h">
+      <Filter>Fichiers d%27en-tête\vulkan</Filter>
+    </ClInclude>
+    <ClInclude Include="include\vkFrameBuffer.h">
+      <Filter>Fichiers d%27en-tête\vulkan</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

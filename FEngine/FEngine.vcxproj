@@ -53,6 +53,7 @@
       <LanguageStandard>stdcpp17</LanguageStandard>
       <TreatWarningAsError>true</TreatWarningAsError>
       <PreprocessorDefinitions>_MBCS;%(PreprocessorDefinitions);</PreprocessorDefinitions>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
     </ClCompile>
     <Link>
       <AdditionalDependencies>glfw3.lib;vulkan-1.lib;%(AdditionalDependencies)</AdditionalDependencies>
@@ -73,6 +74,7 @@
       <PreprocessorDefinitions>_MBCS;%(PreprocessorDefinitions);NDEBUG</PreprocessorDefinitions>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <TreatWarningAsError>true</TreatWarningAsError>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
     </ClCompile>
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
@@ -92,6 +94,10 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\AllInclude.h" />
+    <ClInclude Include="include\vkFrameBuffer.h" />
+    <ClInclude Include="include\vkBuffer.h" />
+    <ClInclude Include="include\vkImage.h" />
+    <ClInclude Include="include\vkImageView.h" />
     <ClInclude Include="include\vkSwapChain.h" />
     <ClInclude Include="include\vkWindow.h" />
     <ClInclude Include="include\vkDevice.h" />

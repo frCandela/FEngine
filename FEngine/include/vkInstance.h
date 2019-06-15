@@ -11,6 +11,7 @@ public:
 	~Instance() {
 		DestroyDebugReportCallback( m_callback, nullptr);
 		vkDestroyInstance(vkInstance, nullptr);
+		vkInstance = VK_NULL_HANDLE;
 	}
 
 	const std::vector < const char *> & GetValidationLayers() const { return m_validationLayers;  }
@@ -66,6 +67,7 @@ private:
 		if (vkCreateInstance(&instanceCreateInfo, nullptr, &vkInstance) != VK_SUCCESS || vkInstance == VK_NULL_HANDLE) {
 			return false;
 		}
+		std::cout << std::hex << "VkInstance\t" << vkInstance << std::dec << std::endl;
 
 		SetupDebugCallback();
 
@@ -126,8 +128,11 @@ private:
 		createInfo.pfnCallback = DebugCallback;
 
 		auto func = (PFN_vkCreateDebugReportCallbackEXT)vkGetInstanceProcAddr(vkInstance, "vkCreateDebugReportCallbackEXT");
-		if (func != nullptr)
-			return func(vkInstance, &createInfo , nullptr, &m_callback );
+		if (func != nullptr && func(vkInstance, &createInfo, nullptr, &m_callback) == VK_SUCCESS) {
+			std::cout << std::hex << "VkDebugCallback\t" << m_callback << std::dec << std::endl;
+			return true;
+		}
+			
 		else
 			return false;
 	}

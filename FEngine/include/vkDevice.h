@@ -8,20 +8,68 @@
 
 class Device {
 public:
-	Device( Instance & _instance, VkSurfaceKHR _surface ) {
-		Create( _instance, _surface);
+	Device( Instance * _instance, VkSurfaceKHR _surface ) :
+		m_instance(_instance),
+		m_surface(_surface){
+		Create();
 	}
 
 	~Device() {
 		vkDestroyDevice(vkDevice, nullptr);
+		vkDevice = VK_NULL_HANDLE;
 	}
 
 	VkPhysicalDevice vkPhysicalDevice = VK_NULL_HANDLE;
 	VkDevice vkDevice = VK_NULL_HANDLE;
 
+	VkQueue & GetGraphicsQueue() { return m_graphicsQueue; }
+	uint32_t GetGraphicsQueueFamilyIndex() { return m_graphicsQueueFamilyIndex; }
+	uint32_t FindMemoryType(uint32_t _typeFilter, VkMemoryPropertyFlags _properties)
+	{
+		//check for the support of the properties
+		for (uint32_t propertyIndex = 0; propertyIndex < m_memoryProperties.memoryTypeCount; propertyIndex++)
+		{
+			if ((_typeFilter & (1 << propertyIndex)) && (m_memoryProperties.memoryTypes[propertyIndex].propertyFlags & _properties) == _properties)
+			{
+				return propertyIndex;
+			}
+		}
+		std::cout << "Failed to find suitable memory type " << _typeFilter << " " << _properties << std::endl;
+		return ~0u;
+	}
+
+	VkFormat FindDepthFormat()
+	{
+		const std::vector<VkFormat> candidates {
+			VK_FORMAT_D32_SFLOAT
+			,VK_FORMAT_D32_SFLOAT_S8_UINT
+			,VK_FORMAT_D24_UNORM_S8_UINT 			
+		};
+		VkImageTiling tiling = VK_IMAGE_TILING_OPTIMAL;
+		VkFormatFeatureFlags features = VK_FORMAT_FEATURE_DEPTH_STENCIL_ATTACHMENT_BIT;
+
+		for (int candidateIndex = 0; candidateIndex < candidates.size(); candidateIndex++) {
+			VkFormatProperties props;
+			vkGetPhysicalDeviceFormatProperties(vkPhysicalDevice, candidates[candidateIndex], &props);
+
+			if (tiling == VK_IMAGE_TILING_LINEAR && (props.linearTilingFeatures & features) == features) {
+				return candidates[candidateIndex];
+			}
+
+			else if (tiling == VK_IMAGE_TILING_OPTIMAL && (props.optimalTilingFeatures & features) == features) {
+				return candidates[candidateIndex];
+			}
+		}
+		return VK_FORMAT_MAX_ENUM;
+	}
+
 private:
+	Instance * m_instance;
+	VkSurfaceKHR m_surface;
+
 	VkPhysicalDeviceFeatures m_availableFeatures;
 	VkPhysicalDeviceProperties m_deviceProperties;
+	VkPhysicalDeviceMemoryProperties m_memoryProperties;
 	std::vector<VkExtensionProperties> m_availableExtensions;
 	std::vector<VkQueueFamilyProperties> m_queueFamilyProperties;
 	uint32_t m_graphicsQueueFamilyIndex;
@@ -31,9 +79,9 @@ private:
 	VkQueue m_computeQueue;
 	VkQueue m_presentQueue;
 
-	bool Create( Instance & _instance, VkSurfaceKHR _surface) {
-		SelectPhysicalDevice(_instance.vkInstance);
-		GetQueueFamilies( _surface );
+	bool Create( ) {
+		SelectPhysicalDevice();
+		GetQueueFamilies( );
 		std::vector< const char * > existingExtensions = GetDesiredExtensions({ VK_KHR_SWAPCHAIN_EXTENSION_NAME });
 
 		float queuePriority = 1.0f;
@@ -57,8 +105,8 @@ private:
 		deviceCreateInfo.flags = 0;
 		deviceCreateInfo.queueCreateInfoCount = static_cast<uint32_t>( queueCreateInfos.size() );
 		deviceCreateInfo.pQueueCreateInfos = queueCreateInfos.data();
-		deviceCreateInfo.enabledLayerCount = static_cast<uint32_t>( _instance.GetValidationLayers().size() );
-		deviceCreateInfo.ppEnabledLayerNames = _instance.GetValidationLayers().data();
+		deviceCreateInfo.enabledLayerCount = static_cast<uint32_t>(m_instance->GetValidationLayers().size() );
+		deviceCreateInfo.ppEnabledLayerNames = m_instance->GetValidationLayers().data();
 		deviceCreateInfo.enabledExtensionCount = static_cast<uint32_t>( existingExtensions.size() );
 		deviceCreateInfo.ppEnabledExtensionNames = existingExtensions.data();
 		deviceCreateInfo.pEnabledFeatures = &desiredFeatures;
@@ -66,18 +114,21 @@ private:
 		if (vkCreateDevice(vkPhysicalDevice, &deviceCreateInfo, nullptr, &vkDevice) != VK_SUCCESS) {
 			return false;
 		}
+		std::cout << std::hex << "vkDevice:\t" << vkDevice <<  "\t" << m_deviceProperties.deviceName << std::dec << std::endl;
 
 		vkGetDeviceQueue(vkDevice, m_graphicsQueueFamilyIndex, 0, &m_graphicsQueue);
 		vkGetDeviceQueue(vkDevice, m_computeQueueFamilyIndex, 0, &m_computeQueue);
 		vkGetDeviceQueue(vkDevice, m_presentQueueFamilyIndex, 0, &m_presentQueue);
 
+		vkGetPhysicalDeviceMemoryProperties(vkPhysicalDevice, &m_memoryProperties);
+
 		return true;
 	}
-	bool SelectPhysicalDevice( VkInstance _vkInstance ) {
+	bool SelectPhysicalDevice(  ) {
 		uint32_t devicesCount;
-		if (vkEnumeratePhysicalDevices(_vkInstance, &devicesCount, nullptr) != VK_SUCCESS) { return false; }
+		if (vkEnumeratePhysicalDevices(m_instance->vkInstance, &devicesCount, nullptr) != VK_SUCCESS) { return false; }
 		std::vector< VkPhysicalDevice> availableDevices(devicesCount);
-		if (vkEnumeratePhysicalDevices(_vkInstance, &devicesCount, availableDevices.data()) != VK_SUCCESS) { return false; }
+		if (vkEnumeratePhysicalDevices(m_instance->vkInstance, &devicesCount, availableDevices.data()) != VK_SUCCESS) { return false; }
 
 		for (int deviceIndex = 0; deviceIndex < availableDevices.size(); deviceIndex++) {
 			vkPhysicalDevice = availableDevices[deviceIndex];
@@ -94,8 +145,6 @@ private:
 				break;
 			}
 		}
-
-		std::cout << "Using device : " << m_deviceProperties.deviceName << std::endl;
 		return true;
 	}
 	std::vector < const char *> GetDesiredExtensions(const std::vector < const char *> _desiredExtensions) {
@@ -120,7 +169,7 @@ private:
 	bool IsFeatureAvailable(std::string _requiredFeature) {
 		return false;
 	}
-	void GetQueueFamilies( VkSurfaceKHR _surface ) {
+	void GetQueueFamilies(  ) {
 		uint32_t queueFamiliesCount;
 		vkGetPhysicalDeviceQueueFamilyProperties(vkPhysicalDevice, &queueFamiliesCount, nullptr);
 		m_queueFamilyProperties.resize(queueFamiliesCount);
@@ -147,7 +196,7 @@ private:
 		for (int queueIndex = 0; queueIndex < m_queueFamilyProperties.size(); queueIndex++) {
 			if ( m_queueFamilyProperties[queueIndex].queueCount > 0 ) {
 				VkBool32 presentationSupported;
-				if (vkGetPhysicalDeviceSurfaceSupportKHR(vkPhysicalDevice, queueIndex, _surface, &presentationSupported) == VK_SUCCESS && 
+				if (vkGetPhysicalDeviceSurfaceSupportKHR(vkPhysicalDevice, queueIndex, m_surface, &presentationSupported) == VK_SUCCESS &&
 					presentationSupported == VK_TRUE ){
 					m_presentQueueFamilyIndex = queueIndex;
 					break;

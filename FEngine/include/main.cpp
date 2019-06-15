@@ -4,10 +4,10 @@
 
 int main()
 {
-
- 	Renderer renderer;
-
-	renderer.Run();
+	{
+		Renderer renderer({ 800,600 });
+		renderer.Run();
+	}
 	int wait;
 	std::cin >> wait;
 
