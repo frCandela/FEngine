@@ -3,9 +3,6 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 VisualStudioVersion = 15.0.27130.2036
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{A857D9D9-3D64-4CE2-B807-BD1D6B931772}"
-	ProjectSection(SolutionItems) = preProject
-		FEngine\include\vkRenderer.h = FEngine\include\vkRenderer.h
-	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "FEngine", "FEngine\FEngine.vcxproj", "{134A4039-2F62-4BBF-982B-84F5AE0D2618}"
 EndProject

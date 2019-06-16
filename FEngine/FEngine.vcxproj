@@ -49,14 +49,14 @@
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>deps;include;C:\VulkanSDK\1.1.77.0\Include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>deps;code;C:\VulkanSDK\1.1.106.0\Include</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <TreatWarningAsError>true</TreatWarningAsError>
       <PreprocessorDefinitions>_MBCS;%(PreprocessorDefinitions);</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>glfw3.lib;vulkan-1.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>glslangd.lib;glslang-default-resource-limitsd.lib;HLSLd.lib;OGLCompilerd.lib;OSDependentd.lib;SPIRVd.lib;SPVRemapperd.lib;glfw3.lib;vulkan-1.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>C:\VulkanSDK\1.1.106.0\Lib;lib/debug</AdditionalLibraryDirectories>
       <SubSystem>
       </SubSystem>
@@ -70,7 +70,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>deps;include;C:\VulkanSDK\1.1.77.0\Include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>deps;code;C:\VulkanSDK\1.1.106.0\Include</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>_MBCS;%(PreprocessorDefinitions);NDEBUG</PreprocessorDefinitions>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <TreatWarningAsError>true</TreatWarningAsError>
@@ -90,19 +90,22 @@
     <None Include="shaders\shader.vert" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="include\main.cpp" />
+    <ClCompile Include="code\main.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="include\AllInclude.h" />
-    <ClInclude Include="include\vkFrameBuffer.h" />
-    <ClInclude Include="include\vkBuffer.h" />
-    <ClInclude Include="include\vkImage.h" />
-    <ClInclude Include="include\vkImageView.h" />
-    <ClInclude Include="include\vkSwapChain.h" />
-    <ClInclude Include="include\vkWindow.h" />
-    <ClInclude Include="include\vkDevice.h" />
-    <ClInclude Include="include\vkInstance.h" />
-    <ClInclude Include="include\vkRenderer.h" />
+    <ClInclude Include="code\AllInclude.h" />
+    <ClInclude Include="code\vulkan\vkBuffer.h" />
+    <ClInclude Include="code\vulkan\vkDevice.h" />
+    <ClInclude Include="code\vulkan\vkFrameBuffer.h" />
+    <ClInclude Include="code\vulkan\vkImage.h" />
+    <ClInclude Include="code\vulkan\vkImageView.h" />
+    <ClInclude Include="code\vulkan\vkInstance.h" />
+    <ClInclude Include="code\vulkan\vkRenderer.h" />
+    <ClInclude Include="code\vulkan\vkShader.h" />
+    <ClInclude Include="code\vulkan\vkSpirvCompiler.h" />
+    <ClInclude Include="code\vulkan\vkSwapChain.h" />
+    <ClInclude Include="code\vulkan\vkVertex.h" />
+    <ClInclude Include="code\vulkan\vkWindow.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

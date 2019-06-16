@@ -21,39 +21,48 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="include\main.cpp">
+    <ClCompile Include="code\main.cpp">
       <Filter>Fichiers d%27en-tête</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="include\AllInclude.h">
+    <ClInclude Include="code\vulkan\vkImage.h">
+      <Filter>Fichiers d%27en-tête\vulkan</Filter>
+    </ClInclude>
+    <ClInclude Include="code\vulkan\vkImageView.h">
+      <Filter>Fichiers d%27en-tête\vulkan</Filter>
+    </ClInclude>
+    <ClInclude Include="code\vulkan\vkInstance.h">
+      <Filter>Fichiers d%27en-tête\vulkan</Filter>
+    </ClInclude>
+    <ClInclude Include="code\vulkan\vkRenderer.h">
+      <Filter>Fichiers d%27en-tête\vulkan</Filter>
+    </ClInclude>
+    <ClInclude Include="code\vulkan\vkShader.h">
+      <Filter>Fichiers d%27en-tête\vulkan</Filter>
+    </ClInclude>
+    <ClInclude Include="code\vulkan\vkSpirvCompiler.h">
+      <Filter>Fichiers d%27en-tête\vulkan</Filter>
+    </ClInclude>
+    <ClInclude Include="code\vulkan\vkSwapChain.h">
+      <Filter>Fichiers d%27en-tête\vulkan</Filter>
+    </ClInclude>
+    <ClInclude Include="code\vulkan\vkWindow.h">
+      <Filter>Fichiers d%27en-tête\vulkan</Filter>
+    </ClInclude>
+    <ClInclude Include="code\vulkan\vkBuffer.h">
+      <Filter>Fichiers d%27en-tête\vulkan</Filter>
+    </ClInclude>
+    <ClInclude Include="code\vulkan\vkDevice.h">
+      <Filter>Fichiers d%27en-tête\vulkan</Filter>
+    </ClInclude>
+    <ClInclude Include="code\vulkan\vkFrameBuffer.h">
+      <Filter>Fichiers d%27en-tête\vulkan</Filter>
+    </ClInclude>
+    <ClInclude Include="code\AllInclude.h">
       <Filter>Fichiers d%27en-tête</Filter>
     </ClInclude>
-    <ClInclude Include="include\vkInstance.h">
-      <Filter>Fichiers d%27en-tête\vulkan</Filter>
-    </ClInclude>
-    <ClInclude Include="include\vkDevice.h">
-      <Filter>Fichiers d%27en-tête\vulkan</Filter>
-    </ClInclude>
-    <ClInclude Include="include\vkRenderer.h">
-      <Filter>Fichiers d%27en-tête\vulkan</Filter>
-    </ClInclude>
-    <ClInclude Include="include\vkWindow.h">
-      <Filter>Fichiers d%27en-tête\vulkan</Filter>
-    </ClInclude>
-    <ClInclude Include="include\vkSwapChain.h">
-      <Filter>Fichiers d%27en-tête\vulkan</Filter>
-    </ClInclude>
-    <ClInclude Include="include\vkBuffer.h">
-      <Filter>Fichiers d%27en-tête\vulkan</Filter>
-    </ClInclude>
-    <ClInclude Include="include\vkImage.h">
-      <Filter>Fichiers d%27en-tête\vulkan</Filter>
-    </ClInclude>
-    <ClInclude Include="include\vkImageView.h">
-      <Filter>Fichiers d%27en-tête\vulkan</Filter>
-    </ClInclude>
-    <ClInclude Include="include\vkFrameBuffer.h">
+    <ClInclude Include="code\vulkan\vkVertex.h">
       <Filter>Fichiers d%27en-tête\vulkan</Filter>
     </ClInclude>
   </ItemGroup>
