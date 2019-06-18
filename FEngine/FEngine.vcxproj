@@ -58,8 +58,7 @@
     <Link>
       <AdditionalDependencies>glslangd.lib;glslang-default-resource-limitsd.lib;HLSLd.lib;OGLCompilerd.lib;OSDependentd.lib;SPIRVd.lib;SPVRemapperd.lib;glfw3.lib;vulkan-1.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>C:\VulkanSDK\1.1.106.0\Lib;lib/debug</AdditionalLibraryDirectories>
-      <SubSystem>
-      </SubSystem>
+      <SubSystem>Console</SubSystem>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -79,10 +78,9 @@
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalDependencies>glfw3.lib;vulkan-1.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>glslang.lib;glslang-default-resource-limits.lib;HLSL.lib;OGLCompiler.lib;OSDependent.lib;SPIRV.lib;SPVRemapper.lib;glfw3.lib;vulkan-1.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>C:\VulkanSDK\1.1.106.0\Lib;lib/release</AdditionalLibraryDirectories>
-      <SubSystem>
-      </SubSystem>
+      <SubSystem>Console</SubSystem>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -91,6 +89,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="code\main.cpp" />
+    <ClCompile Include="code\vulkan\vkRenderer.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="code\AllInclude.h" />

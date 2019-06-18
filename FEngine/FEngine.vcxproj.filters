@@ -24,6 +24,9 @@
     <ClCompile Include="code\main.cpp">
       <Filter>Fichiers d%27en-tête</Filter>
     </ClCompile>
+    <ClCompile Include="code\vulkan\vkRenderer.cpp">
+      <Filter>Fichiers d%27en-tête\vulkan</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="code\vulkan\vkImage.h">

@@ -23,22 +23,22 @@ namespace vk {
 			}
 
 		}
-		bool Create(VkDeviceSize _size, VkBufferUsageFlags _usage, VkMemoryPropertyFlagBits _memoryProperties) {
+		bool Create(VkDeviceSize _size, VkBufferUsageFlags _usage, VkMemoryPropertyFlags _memoryProperties) {
 
-			VkBufferCreateInfo bufferCreateInfo;
+			VkBufferCreateInfo bufferCreateInfo = {};
 			bufferCreateInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
 			bufferCreateInfo.pNext = nullptr;
 			bufferCreateInfo.flags = 0;
 			bufferCreateInfo.size = _size;
 			bufferCreateInfo.usage = _usage;
 			bufferCreateInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
-			bufferCreateInfo.queueFamilyIndexCount = 0;
-			bufferCreateInfo.pQueueFamilyIndices = nullptr;
+			//bufferCreateInfo.queueFamilyIndexCount = 0;
+			//bufferCreateInfo.pQueueFamilyIndices = nullptr;
 			if (vkCreateBuffer(m_device->vkDevice, &bufferCreateInfo, nullptr, &m_buffer) != VK_SUCCESS) {
 				std::cout << "Could not create buffer" << std::endl;
 				return false;
 			}
-			std::cout << std::hex << "VkBuffer\t\t\t" << m_buffer << std::dec << std::endl;
+			std::cout << std::hex << "VkBuffer\t\t" << m_buffer << std::dec << std::endl;
 
 			VkMemoryRequirements memoryRequirements;
 			vkGetBufferMemoryRequirements(m_device->vkDevice, m_buffer, &memoryRequirements);
@@ -61,6 +61,22 @@ namespace vk {
 			}
 
 			return true;
+		}
+		void SetData( const void * _data, VkDeviceSize _size ) {
+			void* mappedData;
+			vkMapMemory(m_device->vkDevice, m_bufferMemory, 0, _size, 0, &mappedData);
+			memcpy(mappedData, _data, _size);
+			vkUnmapMemory(m_device->vkDevice, m_bufferMemory);
+		}
+
+		VkBuffer GetBuffer() { return m_buffer; }
+		VkDeviceMemory GetMemory() { return m_bufferMemory; }
+		void CopyBufferTo(VkCommandBuffer _commandBuffer, VkBuffer _dstBuffer, VkDeviceSize _size) {
+			VkBufferCopy copyRegion = {};
+			copyRegion.srcOffset	= 0;
+			copyRegion.dstOffset	= 0;
+			copyRegion.size			= _size;
+			vkCmdCopyBuffer(_commandBuffer, m_buffer, _dstBuffer, 1, &copyRegion);
 		}
 	private:
 		Device * m_device;

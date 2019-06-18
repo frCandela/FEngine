@@ -12,77 +12,57 @@
 #include "vkShader.h"
 #include "vkVertex.h"
 
+
 namespace vk {
 	class Renderer {
 	public:
 		Renderer(const VkExtent2D _size) :
-			m_instance(new Instance()),
-			m_window(new Window("Vulkan", _size, m_instance->vkInstance)),
-			m_device(new Device(m_instance, m_window->GetSurface())),
-			m_swapchain(new SwapChain(m_device, m_window->GetSurface(), _size, VK_NULL_HANDLE))
+			m_instance(new Instance())
+			, m_window(new Window("Vulkan", _size, m_instance->vkInstance))
+			, m_device(new Device(m_instance, m_window->GetSurface()))
+			, m_swapchain(new SwapChain(m_device, m_window->GetSurface(), _size, VK_NULL_HANDLE))
 		{
+			m_fragmentShader = new Shader(m_device);
+			m_fragmentShader->Create("shaders/shader.frag");
+
+			m_vertexShader = new Shader(m_device);
+			m_vertexShader->Create("shaders/shader.vert");
+
 			CreateCommandPool();
 			CreateRenderPass();
 			CreateDepthRessources();
 			CreateFramebuffers();
-			CreateCommandBuffers();		
+			CreateCommandBuffers();	
+			CreateDescriptors();
 			CreatePipeline();
+			CreateVertexBuffers();
 			RecordCommandBuffers();
-			
-
 		}
 
 		~Renderer() {
-			DestroyPipeline();
-			DestroyFramebuffers();
-			DestroyDepthRessources();
-			DestroyRenderPass();
-			FreeCommandBuffers();
-			DestroyCommandPool();
+			vkDeviceWaitIdle(m_device->vkDevice); 
+			
+			DeletePipeline();
+			DeleteFramebuffers();
+			DeleteDepthRessources();
+			DeleteRenderPass();
+			DeleteCommandBuffers();
+			DeleteCommandPool();
+			DeleteDescriptors();
 
+			delete m_indexBuffer;
+			delete m_vertexBuffer;
+			delete m_uniformBuffer;
 			delete m_fragmentShader;
 			delete m_vertexShader;
 			delete m_swapchain;
 			delete m_device;
 			delete m_window;
 			delete m_instance;
-
 		}
 
-		void Run()
-		{
-			while (!glfwWindowShouldClose(m_window->GetWindow()))
-			{
-				glfwPollEvents();
+		void Run();
 
-				VkResult result = m_swapchain->AcquireNextImage();
-				if (result == VK_ERROR_OUT_OF_DATE_KHR) {
-					std::cout << "suboptimal swapchain" << std::endl;
-					vkDeviceWaitIdle(m_device->vkDevice);
-
-					SwapChain * newSwapchain = new SwapChain(m_device, m_window->GetSurface(), m_window->GetFramebufferSize(), m_swapchain->GetVkSwapChain());
-					delete m_swapchain;
-					m_swapchain = newSwapchain;
-
-					m_swapchain->AcquireNextImage();
-				}
-				else if (result != VK_SUCCESS) {
-					std::cout << "Could not acquire next image" << std::endl;
-				}
-
-				uint32_t index = m_swapchain->GetCurrentImageIndex();
-				uint32_t frame = m_swapchain->GetCurrentFrame();
-				(void)index;
-				(void)frame;
-				// rebuild swap chain?
-				SubmitCommandBuffers();
-				m_swapchain->PresentImage();
-
-				vkWaitForFences(m_device->vkDevice, 1, m_swapchain->GetCurrentInFlightFence(), VK_TRUE, std::numeric_limits<uint64_t>::max());
-				vkResetFences(m_device->vkDevice, 1, m_swapchain->GetCurrentInFlightFence());
-				m_swapchain->StartNextFrame();
-			}
-		}
 	private:
 
 		Instance * m_instance;
@@ -92,8 +72,13 @@ namespace vk {
 
 		VkCommandPool m_commandPool;
 		VkRenderPass m_renderPass;
+
 		VkPipelineLayout m_pipelineLayout;
 		VkPipeline	m_pipeline;
+
+		VkDescriptorSetLayout m_descriptorSetLayout;
+		VkDescriptorPool m_descriptorPool;
+		VkDescriptorSet m_descriptorSet;
 
 		std::vector<VkCommandBuffer> m_commandBuffers;
 		std::vector< FrameBuffer * > m_swapChainframeBuffers;
@@ -103,6 +88,20 @@ namespace vk {
 
 		Shader * m_fragmentShader;
 		Shader * m_vertexShader;
+
+		Buffer * m_uniformBuffer;
+
+		Buffer * m_indexBuffer;
+		Buffer * m_vertexBuffer;
+		std::vector<Vertex> m_vertices;
+		std::vector<uint32_t> m_indices;
+
+		struct UniformBufferObject
+		{
+			glm::mat4 model;
+			glm::mat4 view;
+			glm::mat4 proj;
+		} m_ubo;
 
 		VkCommandBuffer BeginSingleTimeCommands()
 		{
@@ -165,9 +164,6 @@ namespace vk {
 			}
 			return true;
 		}
-		void DestroyCommandPool() {
-			vkDestroyCommandPool(m_device->vkDevice, m_commandPool, nullptr);
-		}
 		bool CreateCommandBuffers() {
 			VkCommandBufferAllocateInfo commandBufferAllocateInfo;
 			commandBufferAllocateInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
@@ -184,23 +180,21 @@ namespace vk {
 			}
 			return true;
 		}
-		void FreeCommandBuffers() {
-			vkFreeCommandBuffers(m_device->vkDevice, m_commandPool, static_cast<uint32_t>(m_commandBuffers.size()), m_commandBuffers.data());
-			m_commandBuffers.clear();
-		}
 		void RecordCommandBuffers() {
-			VkCommandBufferBeginInfo commandBufferBeginInfo;
-			commandBufferBeginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
-			commandBufferBeginInfo.pNext = nullptr;
-			commandBufferBeginInfo.flags = VK_COMMAND_BUFFER_USAGE_SIMULTANEOUS_USE_BIT;
-			commandBufferBeginInfo.pInheritanceInfo = nullptr;
-
-			std::vector<VkClearValue> clearValues(2);
-			clearValues[0].color = { 1.0f, 0.0f, 0.0f, 1.0f };
-			clearValues[1].depthStencil = { 1.0f, 0 };
-
 			for (int cmdBufferIndex = 0; cmdBufferIndex < m_commandBuffers.size(); cmdBufferIndex++)
 			{
+				VkCommandBuffer commandBuffer = m_commandBuffers[cmdBufferIndex];
+
+				VkCommandBufferBeginInfo commandBufferBeginInfo;
+				commandBufferBeginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
+				commandBufferBeginInfo.pNext = nullptr;
+				commandBufferBeginInfo.flags = VK_COMMAND_BUFFER_USAGE_SIMULTANEOUS_USE_BIT;
+				commandBufferBeginInfo.pInheritanceInfo = nullptr;
+
+				std::vector<VkClearValue> clearValues(2);
+				clearValues[0].color = { 0.5f, 0.5f, 0.5f, 1.0f };
+				clearValues[1].depthStencil = { 1.0f, 0 };
+
 				VkRenderPassBeginInfo renderPassInfo = {};
 				renderPassInfo.sType= VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
 				renderPassInfo.pNext=nullptr;
@@ -212,17 +206,23 @@ namespace vk {
 				renderPassInfo.clearValueCount= static_cast<uint32_t>(clearValues.size());
 				renderPassInfo.pClearValues= clearValues.data();
 
-				if (vkBeginCommandBuffer(m_commandBuffers[cmdBufferIndex], &commandBufferBeginInfo) != VK_SUCCESS) {
-					std::cout << "Could not record command buffer " << cmdBufferIndex << "." << std::endl;
-				}
+				if (vkBeginCommandBuffer(commandBuffer, &commandBufferBeginInfo) == VK_SUCCESS) {
+					vkCmdBeginRenderPass(commandBuffer, &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE); {
+						vkCmdBindPipeline(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, m_pipeline);
+						
+						VkBuffer vertexBuffers[] = { m_vertexBuffer->GetBuffer() };
 
-				vkCmdBeginRenderPass(m_commandBuffers[cmdBufferIndex], &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
-				vkCmdBindPipeline(m_commandBuffers[cmdBufferIndex], VK_PIPELINE_BIND_POINT_GRAPHICS, m_pipeline);
-				
-				vkCmdEndRenderPass(m_commandBuffers[cmdBufferIndex]);
-
-
-				if (vkEndCommandBuffer(m_commandBuffers[cmdBufferIndex]) != VK_SUCCESS) {
+						VkDeviceSize offsets[] = { 0 };
+						vkCmdBindVertexBuffers(commandBuffer, 0, 1, vertexBuffers, offsets);
+						vkCmdBindIndexBuffer(commandBuffer, m_indexBuffer->GetBuffer(), 0, VK_INDEX_TYPE_UINT32);
+						vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, m_pipelineLayout, 0, 1, &m_descriptorSet, 0, nullptr);
+						vkCmdDrawIndexed(commandBuffer, static_cast<uint32_t>(m_indices.size()), 1, 0, 0, 0);
+					}
+					vkCmdEndRenderPass(commandBuffer);
+					if (vkEndCommandBuffer(commandBuffer) != VK_SUCCESS) {
+						std::cout << "Could not record command buffer " << cmdBufferIndex << "." << std::endl;
+					}
+				} else {
 					std::cout << "Could not record command buffer " << cmdBufferIndex << "." << std::endl;
 				}
 			}
@@ -242,7 +242,8 @@ namespace vk {
 			submitInfo.signalSemaphoreCount = 1;
 			submitInfo.pSignalSemaphores = m_swapchain->GetCurrentRenderFinishedSemaphore();
 
-			if (vkQueueSubmit(m_device->GetGraphicsQueue(), 1, &submitInfo, *m_swapchain->GetCurrentInFlightFence()) != VK_SUCCESS) {
+			VkResult result = vkQueueSubmit(m_device->GetGraphicsQueue(), 1, &submitInfo, *m_swapchain->GetCurrentInFlightFence()); 
+			if (result != VK_SUCCESS) {
 				std::cout << "Could not submit draw command buffer " << std::endl;
 				return false;
 			}
@@ -328,12 +329,6 @@ namespace vk {
 
 			return true;
 		}
-		void DestroyRenderPass() {
-			if (m_renderPass != VK_NULL_HANDLE) {
-				vkDestroyRenderPass(m_device->vkDevice, m_renderPass, nullptr);
-				m_renderPass = VK_NULL_HANDLE;
-			}
-		}
 		bool CreateDepthRessources() {
 			VkFormat depthFormat = m_device->FindDepthFormat();
 			m_depthImage = new Image(m_device);
@@ -346,10 +341,6 @@ namespace vk {
 			EndSingleTimeCommands(cmd);
 
 			return true;
-		}
-		void DestroyDepthRessources() {
-			delete m_depthImageView;
-			delete m_depthImage;
 		}
 		void CreateFramebuffers() {
 			m_swapChainframeBuffers.resize(m_swapchain->GetSwapchainImagesCount());
@@ -364,19 +355,8 @@ namespace vk {
 				m_swapChainframeBuffers[framebufferIndex]->Create(m_renderPass, attachments, m_swapchain->GetExtent());
 
 			}
-		}
-		void DestroyFramebuffers() {
-			for (int framebufferIndex = 0; framebufferIndex < m_swapChainframeBuffers.size(); framebufferIndex++) {
-				delete m_swapChainframeBuffers[framebufferIndex];
-			}
-			m_swapChainframeBuffers.clear();
-		}
+		}	
 		bool CreatePipeline() {
-			m_fragmentShader = new Shader(m_device);
-			m_fragmentShader->Create("shaders/shader.frag");
-			m_vertexShader = new Shader(m_device);
-			m_vertexShader->Create("shaders/shader.vert");
-
 			VkPipelineShaderStageCreateInfo vertshaderStageCreateInfos = {};
 			vertshaderStageCreateInfos.sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
 			vertshaderStageCreateInfos.pNext = nullptr;
@@ -500,7 +480,6 @@ namespace vk {
 			colorBlendStateCreateInfo.blendConstants[3] = 0.0f;
 
 			std::vector<VkDynamicState> dynamicStates = {
-				VK_DYNAMIC_STATE_VIEWPORT
 			};
 
 			VkPipelineDynamicStateCreateInfo dynamicStateCreateInfo = {};
@@ -510,7 +489,9 @@ namespace vk {
 			dynamicStateCreateInfo.dynamicStateCount = static_cast<uint32_t>(dynamicStates.size());
 			dynamicStateCreateInfo.pDynamicStates = dynamicStates.data();
 
-			std::vector<VkDescriptorSetLayout> descriptorSetLayouts(0);
+			std::vector<VkDescriptorSetLayout> descriptorSetLayouts = {
+				m_descriptorSetLayout
+			};
 			std::vector<VkPushConstantRange> pushConstantRanges(0);
 
 			VkPipelineLayoutCreateInfo pipelineLayoutCreateInfo = {};
@@ -574,7 +555,131 @@ namespace vk {
 			}
 			return true;
 		}
-		void DestroyPipeline() {
+		void CreateVertexBuffers();
+		void UpdateUniformBuffer();
+
+		bool CreateDescriptors() {
+			VkDescriptorSetLayoutBinding uboLayoutBinding;
+			uboLayoutBinding.binding			= 0;
+			uboLayoutBinding.descriptorType		= VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+			uboLayoutBinding.descriptorCount	= 1;
+			uboLayoutBinding.stageFlags			= VK_SHADER_STAGE_VERTEX_BIT;
+			uboLayoutBinding.pImmutableSamplers = nullptr;
+
+			std::vector< VkDescriptorSetLayoutBinding > layoutBindings = {
+				uboLayoutBinding
+			};
+
+			VkDescriptorSetLayoutCreateInfo descriptorSetLayoutCreateInfo = {};
+			descriptorSetLayoutCreateInfo.sType			= VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
+			descriptorSetLayoutCreateInfo.pNext			= nullptr;
+			descriptorSetLayoutCreateInfo.flags			= 0;
+			descriptorSetLayoutCreateInfo.bindingCount	= static_cast<uint32_t>(layoutBindings.size());
+			descriptorSetLayoutCreateInfo.pBindings		= layoutBindings.data();
+
+			if (vkCreateDescriptorSetLayout(m_device->vkDevice, &descriptorSetLayoutCreateInfo, nullptr, &m_descriptorSetLayout) != VK_SUCCESS) {
+				std::cout << "Could not allocate descriptor set layout." << std::endl;
+				return false;
+			}
+			std::cout << std::hex << "VkDescriptorSetLayout\t" << m_descriptorSetLayout << std::dec << std::endl;
+			
+			std::vector< VkDescriptorPoolSize > poolSizes(1);
+			poolSizes[0].type				= VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+			poolSizes[0].descriptorCount	= 1;
+
+			VkDescriptorPoolCreateInfo descriptorPoolCreateInfo = {};
+			descriptorPoolCreateInfo.sType			= VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
+			descriptorPoolCreateInfo.pNext			= nullptr;
+			descriptorPoolCreateInfo.flags			= 0;
+			descriptorPoolCreateInfo.maxSets		= 1;
+			descriptorPoolCreateInfo.poolSizeCount	= static_cast<uint32_t>(poolSizes.size());
+			descriptorPoolCreateInfo.pPoolSizes		= poolSizes.data();
+
+			if (vkCreateDescriptorPool(m_device->vkDevice, &descriptorPoolCreateInfo, nullptr, &m_descriptorPool) != VK_SUCCESS) {
+				std::cout << "Could not allocate descriptor pool." << std::endl;
+				return false;
+			}
+			std::cout << std::hex << "VkDescriptorPool\t" << m_descriptorPool << std::dec << std::endl;
+
+			std::vector< VkDescriptorSetLayout > descriptorSetLayouts = {
+				m_descriptorSetLayout
+			};
+
+			VkDescriptorSetAllocateInfo descriptorSetAllocateInfo;
+			descriptorSetAllocateInfo.sType					= VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
+			descriptorSetAllocateInfo.pNext					= nullptr;
+			descriptorSetAllocateInfo.descriptorPool		= m_descriptorPool;
+			descriptorSetAllocateInfo.descriptorSetCount	= static_cast<uint32_t>(descriptorSetLayouts.size());
+			descriptorSetAllocateInfo.pSetLayouts			= descriptorSetLayouts.data();
+
+			std::vector<VkDescriptorSet> descriptorSets( descriptorSetLayouts.size() );
+			if (vkAllocateDescriptorSets(m_device->vkDevice, &descriptorSetAllocateInfo, descriptorSets.data() ) != VK_SUCCESS) {
+				std::cout << "Could not allocate descriptor set." << std::endl;
+				return false;
+			}
+			m_descriptorSet = descriptorSets[0];
+			std::cout << std::hex << "VkDescriptorSet\t\t" << m_descriptorSet << std::dec << std::endl;
+
+			m_uniformBuffer = new Buffer(m_device);
+			m_uniformBuffer->Create(
+				sizeof(UniformBufferObject),
+				VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT,
+				VK_MEMORY_PROPERTY_HOST_COHERENT_BIT | VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT
+			);
+
+			VkDescriptorBufferInfo uboDescriptorBufferInfo = {};
+			uboDescriptorBufferInfo.buffer = m_uniformBuffer->GetBuffer();
+			uboDescriptorBufferInfo.offset = 0;
+			uboDescriptorBufferInfo.range = sizeof(UniformBufferObject);
+
+			VkWriteDescriptorSet uboWriteDescriptorSet = {};
+			uboWriteDescriptorSet.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+			uboWriteDescriptorSet.pNext = nullptr;
+			uboWriteDescriptorSet.dstSet = m_descriptorSet;
+			uboWriteDescriptorSet.dstBinding = 0;
+			uboWriteDescriptorSet.dstArrayElement = 0;
+			uboWriteDescriptorSet.descriptorCount = 1;
+			uboWriteDescriptorSet.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+			uboWriteDescriptorSet.pImageInfo = nullptr;
+			uboWriteDescriptorSet.pBufferInfo = &uboDescriptorBufferInfo;
+			//uboWriteDescriptorSet.pTexelBufferView = nullptr;
+
+			std::vector<VkWriteDescriptorSet> writeDescriptors = { uboWriteDescriptorSet };
+
+			vkUpdateDescriptorSets(
+				m_device->vkDevice,
+				static_cast<uint32_t>(writeDescriptors.size()),
+				writeDescriptors.data(),
+				0,
+				nullptr
+			);
+
+			return true;
+		}
+		void DeleteCommandPool() {
+			vkDestroyCommandPool(m_device->vkDevice, m_commandPool, nullptr);
+		}
+		void DeleteCommandBuffers() {
+			vkFreeCommandBuffers(m_device->vkDevice, m_commandPool, static_cast<uint32_t>(m_commandBuffers.size()), m_commandBuffers.data());
+			m_commandBuffers.clear();
+		}
+		void DeleteRenderPass() {
+			if (m_renderPass != VK_NULL_HANDLE) {
+				vkDestroyRenderPass(m_device->vkDevice, m_renderPass, nullptr);
+				m_renderPass = VK_NULL_HANDLE;
+			}
+		}
+		void DeleteDepthRessources() {
+			delete m_depthImageView;
+			delete m_depthImage;
+		}
+		void DeleteFramebuffers() {
+			for (int framebufferIndex = 0; framebufferIndex < m_swapChainframeBuffers.size(); framebufferIndex++) {
+				delete m_swapChainframeBuffers[framebufferIndex];
+			}
+			m_swapChainframeBuffers.clear();
+		}
+		void DeletePipeline() {
 			if (m_pipelineLayout != VK_NULL_HANDLE) {
 				vkDestroyPipelineLayout(m_device->vkDevice, m_pipelineLayout, nullptr);
 				m_pipelineLayout = VK_NULL_HANDLE;
@@ -585,5 +690,17 @@ namespace vk {
 				m_pipeline = VK_NULL_HANDLE;
 			}
 		}
-};
+		void DeleteDescriptors() {
+
+			if ( m_descriptorPool != VK_NULL_HANDLE) {
+				vkDestroyDescriptorPool(m_device->vkDevice, m_descriptorPool, nullptr);
+				m_descriptorPool = VK_NULL_HANDLE;
+			}
+
+			if (m_descriptorSetLayout != VK_NULL_HANDLE) {
+				vkDestroyDescriptorSetLayout(m_device->vkDevice, m_descriptorSetLayout, nullptr);
+				m_descriptorSetLayout = VK_NULL_HANDLE;
+			}
+		}
+	};
 }

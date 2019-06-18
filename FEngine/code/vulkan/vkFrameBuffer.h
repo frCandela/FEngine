@@ -31,7 +31,7 @@ namespace vk {
 			framebufferCreateInfo.layers = 1;
 
 			if ( vkCreateFramebuffer(m_device->vkDevice, &framebufferCreateInfo, nullptr, &m_framebuffer) != VK_SUCCESS) {
-				std::cout << "Could not create shader module" << std::endl;
+				std::cout << "Could not create framebuffer" << std::endl;
 				return false;
 			}
 			std::cout << std::hex << "VkFramebuffer\t\t" << m_framebuffer << std::dec << std::endl;

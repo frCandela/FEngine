@@ -27,7 +27,7 @@ namespace vk {
 		~SwapChain() {
 			DestroyImageViews();
 
-			for (int semaphoreIndex = 0; semaphoreIndex < m_imagesAvailableSemaphores.size(); semaphoreIndex++) {
+			for (int semaphoreIndex = 0; semaphoreIndex < MAX_FRAMES_IN_FLIGHT; semaphoreIndex++) {
 				vkDestroySemaphore(m_device->vkDevice, m_imagesAvailableSemaphores[semaphoreIndex], nullptr);
 				vkDestroySemaphore(m_device->vkDevice, m_renderFinishedSemaphores[semaphoreIndex], nullptr);
 				vkDestroyFence(m_device->vkDevice, m_inFlightFences[semaphoreIndex], nullptr);
@@ -38,7 +38,7 @@ namespace vk {
 			m_swapchain = VK_NULL_HANDLE;
 		}
 
-		void StartNextFrame() { m_currentFrame = (m_currentFrame + 1) % m_images.size(); }
+		void StartNextFrame() { m_currentFrame = (m_currentFrame + 1) % MAX_FRAMES_IN_FLIGHT; }
 		VkResult AcquireNextImage() {
 			return vkAcquireNextImageKHR(m_device->vkDevice, m_swapchain, std::numeric_limits<uint64_t>::max(), m_imagesAvailableSemaphores[m_currentFrame], VK_NULL_HANDLE, &m_currentImageIndex);
 		}
@@ -70,6 +70,8 @@ namespace vk {
 		VkSurfaceFormatKHR GetSurfaceFormat() const { return m_surfaceFormat; }
 		VkExtent2D GetExtent() const { return m_size; }
 		VkImageView GetImageView(int index) { return m_imageViews[index]->GetImageView(); }
+
+		const int MAX_FRAMES_IN_FLIGHT = 2;
 	private:
 
 		Device * m_device;
@@ -203,9 +205,9 @@ namespace vk {
 		}
 		void CreateSemaphores() {
 
-			m_imagesAvailableSemaphores.resize(m_images.size());
-			m_renderFinishedSemaphores.resize(m_images.size());
-			m_inFlightFences.resize(m_images.size());
+			m_imagesAvailableSemaphores.resize(MAX_FRAMES_IN_FLIGHT);
+			m_renderFinishedSemaphores.resize(MAX_FRAMES_IN_FLIGHT);
+			m_inFlightFences.resize(MAX_FRAMES_IN_FLIGHT);
 
 			VkSemaphoreCreateInfo semaphoreCreateInfo;
 			semaphoreCreateInfo.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO;
@@ -215,9 +217,9 @@ namespace vk {
 			VkFenceCreateInfo fenceCreateInfo;
 			fenceCreateInfo.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
 			fenceCreateInfo.pNext = nullptr;
-			fenceCreateInfo.flags = 0;
+			fenceCreateInfo.flags = VK_FENCE_CREATE_SIGNALED_BIT;
 
-			for (int semaphoreIndex = 0; semaphoreIndex < m_imagesAvailableSemaphores.size(); semaphoreIndex++) {
+			for (int semaphoreIndex = 0; semaphoreIndex < MAX_FRAMES_IN_FLIGHT; semaphoreIndex++) {
 				vkCreateSemaphore(m_device->vkDevice, &semaphoreCreateInfo, nullptr, &m_imagesAvailableSemaphores[semaphoreIndex]);
 				vkCreateSemaphore(m_device->vkDevice, &semaphoreCreateInfo, nullptr, &m_renderFinishedSemaphores[semaphoreIndex]);
 				vkCreateFence(m_device->vkDevice, &fenceCreateInfo, nullptr, &m_inFlightFences[semaphoreIndex]);
