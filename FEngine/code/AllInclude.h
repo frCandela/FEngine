@@ -11,8 +11,12 @@
 #include "glm/glm.hpp"
 #include "glm/gtc/matrix_transform.hpp"
 
+#include "imgui/imgui.h"
+
 #include <vector>
 #include <iostream>
 #include <chrono>
+#include <algorithm>
+
 
 #pragma warning( pop )

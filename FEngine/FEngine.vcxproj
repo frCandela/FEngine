@@ -88,11 +88,16 @@
     <None Include="shaders\shader.vert" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\..\..\Telechargements\FEngine-master\FEngine\deps\imgui\imgui.cpp" />
+    <ClCompile Include="..\..\..\..\Telechargements\FEngine-master\FEngine\deps\imgui\imgui_demo.cpp" />
+    <ClCompile Include="..\..\..\..\Telechargements\FEngine-master\FEngine\deps\imgui\imgui_draw.cpp" />
     <ClCompile Include="code\main.cpp" />
     <ClCompile Include="code\vulkan\vkRenderer.cpp" />
+    <ClCompile Include="code\vulkan\vkTexture.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="code\AllInclude.h" />
+    <ClInclude Include="code\vulkan\ImguiPipeline.h" />
     <ClInclude Include="code\vulkan\vkBuffer.h" />
     <ClInclude Include="code\vulkan\vkDevice.h" />
     <ClInclude Include="code\vulkan\vkFrameBuffer.h" />
@@ -100,9 +105,11 @@
     <ClInclude Include="code\vulkan\vkImageView.h" />
     <ClInclude Include="code\vulkan\vkInstance.h" />
     <ClInclude Include="code\vulkan\vkRenderer.h" />
+    <ClInclude Include="code\vulkan\vkSampler.h" />
     <ClInclude Include="code\vulkan\vkShader.h" />
     <ClInclude Include="code\vulkan\vkSpirvCompiler.h" />
     <ClInclude Include="code\vulkan\vkSwapChain.h" />
+    <ClInclude Include="code\vulkan\vkTexture.h" />
     <ClInclude Include="code\vulkan\vkVertex.h" />
     <ClInclude Include="code\vulkan\vkWindow.h" />
   </ItemGroup>

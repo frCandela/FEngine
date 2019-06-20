@@ -12,6 +12,7 @@
 #include "vkShader.h"
 #include "vkVertex.h"
 
+#include "ImguiPipeline.h"
 
 namespace vk {
 	class Renderer {
@@ -32,11 +33,18 @@ namespace vk {
 			CreateRenderPass();
 			CreateDepthRessources();
 			CreateFramebuffers();
-			CreateCommandBuffers();	
+			CreateCommandBuffers();
 			CreateDescriptors();
 			CreatePipeline();
 			CreateVertexBuffers();
 			RecordCommandBuffers();
+
+			m_imguiPipeline = new ImguiManager(m_device);
+
+			VkCommandBuffer commandBuffer = BeginSingleTimeCommands();
+			glm::vec2 size = { m_swapchain->GetExtent().width, m_swapchain->GetExtent().height };
+			m_imguiPipeline->Create(commandBuffer, size, m_window->GetWindow(), m_renderPass);
+			EndSingleTimeCommands(commandBuffer);
 		}
 
 		~Renderer() {
@@ -69,6 +77,7 @@ namespace vk {
 		Window *  m_window;
 		Device *  m_device;
 		SwapChain  * m_swapchain;
+		ImguiManager * m_imguiPipeline;
 
 		VkCommandPool m_commandPool;
 		VkRenderPass m_renderPass;

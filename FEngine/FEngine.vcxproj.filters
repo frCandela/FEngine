@@ -11,6 +11,9 @@
     <Filter Include="Fichiers d%27en-tête\vulkan">
       <UniqueIdentifier>{6d1ab719-6179-4bc6-ac3a-bc6ff88ce93f}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Fichiers d%27en-tête\deps">
+      <UniqueIdentifier>{438721f2-b2df-4736-b550-620897169813}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include="shaders\shader.frag">
@@ -26,6 +29,18 @@
     </ClCompile>
     <ClCompile Include="code\vulkan\vkRenderer.cpp">
       <Filter>Fichiers d%27en-tête\vulkan</Filter>
+    </ClCompile>
+    <ClCompile Include="code\vulkan\vkTexture.cpp">
+      <Filter>Fichiers d%27en-tête\vulkan</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\Telechargements\FEngine-master\FEngine\deps\imgui\imgui_demo.cpp">
+      <Filter>Fichiers d%27en-tête\deps</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\Telechargements\FEngine-master\FEngine\deps\imgui\imgui_draw.cpp">
+      <Filter>Fichiers d%27en-tête\deps</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\Telechargements\FEngine-master\FEngine\deps\imgui\imgui.cpp">
+      <Filter>Fichiers d%27en-tête\deps</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -66,6 +81,15 @@
       <Filter>Fichiers d%27en-tête</Filter>
     </ClInclude>
     <ClInclude Include="code\vulkan\vkVertex.h">
+      <Filter>Fichiers d%27en-tête\vulkan</Filter>
+    </ClInclude>
+    <ClInclude Include="code\vulkan\ImguiPipeline.h">
+      <Filter>Fichiers d%27en-tête\vulkan</Filter>
+    </ClInclude>
+    <ClInclude Include="code\vulkan\vkSampler.h">
+      <Filter>Fichiers d%27en-tête\vulkan</Filter>
+    </ClInclude>
+    <ClInclude Include="code\vulkan\vkTexture.h">
       <Filter>Fichiers d%27en-tête\vulkan</Filter>
     </ClInclude>
   </ItemGroup>
