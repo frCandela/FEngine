@@ -19,7 +19,7 @@ namespace vk {
 
 			VkResult result = m_swapchain->AcquireNextImage();
 			(void)result;
-			/*if (result == VK_ERROR_OUT_OF_DATE_KHR) {
+			if (result == VK_ERROR_OUT_OF_DATE_KHR) {
 				std::cout << "suboptimal swapchain" << std::endl;
 				vkDeviceWaitIdle(m_device->vkDevice);
 
@@ -27,7 +27,6 @@ namespace vk {
 				DeleteFramebuffers();
 				DeleteDepthRessources();
 				DeleteRenderPass();
-				DeleteCommandBuffers();
 				DeleteCommandPool();
 				DeleteDescriptors();
 
@@ -42,13 +41,13 @@ namespace vk {
 				CreateCommandBuffers();
 				CreateDescriptors();
 				CreatePipeline();
-				RecordCommandBuffers();
-
+				RecordAllCommandBuffers();
+				vkResetFences(m_device->vkDevice, 1, m_swapchain->GetCurrentInFlightFence());
 				m_swapchain->AcquireNextImage();
 			}
 			else if (result != VK_SUCCESS) {
 				std::cout << "Could not acquire next image" << std::endl;
-			}*/
+			}
 			
 			const float time = Time::ElapsedSinceStartup();
 			const float delta = time - lastUpdateTime;
@@ -56,15 +55,15 @@ namespace vk {
 			io.DisplaySize = ImVec2(static_cast<float>(m_swapchain->GetExtent().width), static_cast<float>(m_swapchain->GetExtent().height));
 
 			Input::NewFrame();
-			ImGui::NewFrame();
-
-			UpdateUniformBuffer();
-			ImGui::Render();
+			ImGui::NewFrame();	
+			{
+				UpdateUniformBuffer();
+			}	
 			ImGui::EndFrame();
-			m_imguiPipeline->UpdateBuffers();
-			RecordCommandBuffer( m_swapchain->GetCurrentFrame() );
-			RecordCommandBuffersImgui(m_swapchain->GetCurrentFrame());
+			ImGui::Render();
 
+			RecordCommandBufferImgui(m_swapchain->GetCurrentFrame());
+			RecordPrimaryCommandBuffer( m_swapchain->GetCurrentFrame() );
 			SubmitCommandBuffers();			
 
 			m_swapchain->PresentImage();

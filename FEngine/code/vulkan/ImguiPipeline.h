@@ -14,13 +14,22 @@ namespace vk
 	{
 	public:
 		// Initialize styles, keys, Vulkan resources used by the ui, etc.
-		ImguiManager(Device* _device) :
+		ImguiManager(Device* _device, const int _swapchainImagesCount) :
 			m_device(_device)
-			, m_vertexBuffer(_device)
-			, m_indexBuffer(_device)
 			, m_fontTexture( new vk::Texture(_device))
 			, m_sampler( new vk::Sampler(_device))
-		{}		
+		{
+			m_vertexBuffers.reserve(_swapchainImagesCount);
+			m_indexBuffers.reserve(_swapchainImagesCount);
+			for (int imageIndex = 0; imageIndex < _swapchainImagesCount; imageIndex++){
+				m_vertexBuffers.push_back(Buffer(_device));
+				m_indexBuffers.push_back(Buffer(_device));
+			}
+			m_vertexCount.resize(_swapchainImagesCount, 0);
+			m_indexCount.resize(_swapchainImagesCount, 0);
+
+
+		}		
 		~ImguiManager() {
 			delete(m_fontTexture);
 			delete(m_sampler);
@@ -43,7 +52,7 @@ namespace vk
 			CreateDescriptors();
 			CreateGraphicsPipeline(renderPass);
 		}
-		void UpdateBuffers() {
+		void UpdateBuffer( const int _index ) {
 			ImDrawData* imDrawData = ImGui::GetDrawData();
 
 			// Update buffers only if the imgui command list is not empty
@@ -56,26 +65,28 @@ namespace vk
 				// Update buffers only if vertex or index count has been changed compared to current buffer size
 
 				// Vertex buffer
-				if ((m_vertexBuffer.GetBuffer() == VK_NULL_HANDLE) || (m_vertexCount != imDrawData->TotalVtxCount)) {
-					m_vertexBuffer.Unmap();
-					m_vertexBuffer.Destroy();
-					m_vertexBuffer.Create(vertexBufferSize, VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT);
-					m_vertexCount = imDrawData->TotalVtxCount;
-					m_vertexBuffer.Map();
+				Buffer & vertexBuffer = m_vertexBuffers[_index];
+				if ((vertexBuffer.GetBuffer() == VK_NULL_HANDLE) || (m_vertexCount[_index] != imDrawData->TotalVtxCount)) {
+					vertexBuffer.Unmap();
+					vertexBuffer.Destroy();
+					vertexBuffer.Create(vertexBufferSize, VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT);
+					m_vertexCount[_index] = imDrawData->TotalVtxCount;
+					vertexBuffer.Map();
 				}
 
 				// Index buffer
-				if ((m_indexBuffer.GetBuffer() == VK_NULL_HANDLE) || (m_indexCount < imDrawData->TotalIdxCount)) {
-					m_indexBuffer.Unmap();
-					m_indexBuffer.Destroy();
-					m_indexBuffer.Create(indexBufferSize, VK_BUFFER_USAGE_INDEX_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT);
-					m_indexCount = imDrawData->TotalIdxCount;
-					m_indexBuffer.Map();
+				Buffer & indexBuffer = m_indexBuffers[_index];
+				if ((indexBuffer.GetBuffer() == VK_NULL_HANDLE) || (m_indexCount[_index] < imDrawData->TotalIdxCount)) {
+					indexBuffer.Unmap();
+					indexBuffer.Destroy();
+					indexBuffer.Create(indexBufferSize, VK_BUFFER_USAGE_INDEX_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT);
+					m_indexCount[_index] = imDrawData->TotalIdxCount;
+					indexBuffer.Map();
 				}
 
 				// Upload data
-				ImDrawVert* vtxDst = (ImDrawVert*)m_vertexBuffer.GetMappedData();
-				ImDrawIdx* idxDst = (ImDrawIdx*)m_indexBuffer.GetMappedData();
+				ImDrawVert* vtxDst = (ImDrawVert*)vertexBuffer.GetMappedData();
+				ImDrawIdx* idxDst = (ImDrawIdx*)indexBuffer.GetMappedData();
 
 				for (int n = 0; n < imDrawData->CmdListsCount; n++) {
 					const ImDrawList* cmd_list = imDrawData->CmdLists[n];
@@ -86,11 +97,11 @@ namespace vk
 				}
 
 				// Flush to make writes visible to GPU
-				m_vertexBuffer.Flush();
-				m_indexBuffer.Flush();
+				vertexBuffer.Flush();
+				indexBuffer.Flush();
 			}
 		}
-		void DrawFrame(VkCommandBuffer commandBuffer) {
+		void DrawFrame(VkCommandBuffer commandBuffer, const int _index) {
 			ImDrawData* imDrawData = ImGui::GetDrawData();
 			if (imDrawData &&  imDrawData->CmdListsCount > 0)
 			{
@@ -102,10 +113,10 @@ namespace vk
 
 				// Bind vertex and index buffer
 				VkDeviceSize offsets[1] = { 0 };
-				std::vector<VkBuffer> buffers = { m_vertexBuffer.GetBuffer() };
+				std::vector<VkBuffer> buffers = { m_vertexBuffers[_index].GetBuffer() };
 
 				vkCmdBindVertexBuffers(commandBuffer, 0, static_cast<uint32_t>(buffers.size()), buffers.data(), offsets);
-				vkCmdBindIndexBuffer(commandBuffer, m_indexBuffer.GetBuffer(), 0, VK_INDEX_TYPE_UINT16);
+				vkCmdBindIndexBuffer(commandBuffer, m_indexBuffers[_index].GetBuffer(), 0, VK_INDEX_TYPE_UINT16);
 
 				// Viewport
 				VkViewport viewport{};
@@ -428,10 +439,10 @@ namespace vk
 		}
 
 		// Vulkan resources for rendering the UI	
-		Buffer m_vertexBuffer;
-		Buffer m_indexBuffer;
-		int32_t m_vertexCount = 0;
-		int32_t m_indexCount = 0;
+		std::vector<Buffer> m_vertexBuffers;
+		std::vector<Buffer> m_indexBuffers;
+		std::vector < int32_t> m_vertexCount;
+		std::vector < int32_t> m_indexCount;
 
 		Sampler* m_sampler;
 		Texture* m_fontTexture;

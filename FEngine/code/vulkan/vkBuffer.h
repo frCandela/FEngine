@@ -79,7 +79,7 @@ namespace vk {
 		}
 		void Unmap()
 		{
-			if (m_mappedData)
+			if (m_mappedData && m_memory)
 			{
 				vkUnmapMemory(m_device->vkDevice, m_memory);
 				m_mappedData = nullptr;
@@ -109,8 +109,8 @@ namespace vk {
 	private:
 		Device * m_device;
 
-		VkBuffer m_buffer;
-		VkDeviceMemory m_memory;
+		VkBuffer m_buffer = VK_NULL_HANDLE;
+		VkDeviceMemory m_memory = VK_NULL_HANDLE;
 
 		void * m_mappedData;
 		VkDeviceSize m_size = 0;
