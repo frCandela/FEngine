@@ -39,7 +39,7 @@ namespace vk {
 				std::cout << "Could not create buffer" << std::endl;
 				return false;
 			}
-			std::cout << std::hex << "VkBuffer\t\t" << m_buffer << std::dec << std::endl;
+			//std::cout << std::hex << "VkBuffer\t\t" << m_buffer << std::dec << std::endl;
 
 			VkMemoryRequirements memoryRequirements;
 			vkGetBufferMemoryRequirements(m_device->vkDevice, m_buffer, &memoryRequirements);
@@ -54,12 +54,13 @@ namespace vk {
 				std::cout << "Could not allocate buffer" << std::endl;
 				return false;
 			}
-			std::cout << std::hex << "VkDeviceMemory\t\t" << m_memory << std::dec << std::endl;
+			//std::cout << std::hex << "VkDeviceMemory\t\t" << m_memory << std::dec << std::endl;
 
 			Bind();
 
 			return true;
 		}
+		
 		void SetData(const void * _data, VkDeviceSize _size) {
 			vkMapMemory(m_device->vkDevice, m_memory, 0, _size, 0, &m_mappedData);
 			memcpy(m_mappedData, _data, _size);
@@ -93,19 +94,17 @@ namespace vk {
 			mappedRange.size = _size;
 			return vkFlushMappedMemoryRanges(m_device->vkDevice, 1, &mappedRange);
 		}
-
+		void CopyBufferTo(VkCommandBuffer _commandBuffer, VkBuffer _dstBuffer, VkDeviceSize _size) {
+			VkBufferCopy copyRegion = {};
+			copyRegion.srcOffset = 0;
+			copyRegion.dstOffset = 0;
+			copyRegion.size = _size;
+			vkCmdCopyBuffer(_commandBuffer, m_buffer, _dstBuffer, 1, &copyRegion);
+		}
 
 		VkBuffer GetBuffer() { return m_buffer; }
 		VkDeviceMemory GetMemory() { return m_memory; }
-		void * GetMappedData() { return m_mappedData;}
-		
-		void CopyBufferTo(VkCommandBuffer _commandBuffer, VkBuffer _dstBuffer, VkDeviceSize _size) {
-			VkBufferCopy copyRegion = {};
-			copyRegion.srcOffset	= 0;
-			copyRegion.dstOffset	= 0;
-			copyRegion.size			= _size;
-			vkCmdCopyBuffer(_commandBuffer, m_buffer, _dstBuffer, 1, &copyRegion);
-		}
+		void * GetMappedData() { return m_mappedData;}		
 	
 	private:
 		Device * m_device;

@@ -13,6 +13,7 @@
 #include "vkVertex.h"
 
 #include "ImguiPipeline.h"
+#include "util/glfwInput.h"
 
 namespace vk {
 	class Renderer {
@@ -23,6 +24,10 @@ namespace vk {
 			, m_device(new Device(m_instance, m_window->GetSurface()))
 			, m_swapchain(new SwapChain(m_device, m_window->GetSurface(), _size, VK_NULL_HANDLE))
 		{
+			Input::Setup(m_window->GetWindow());
+
+			ms_globalRenderer = this;
+
 			m_fragmentShader = new Shader(m_device);
 			m_fragmentShader->Create("shaders/shader.frag");
 
@@ -37,19 +42,20 @@ namespace vk {
 			CreateDescriptors();
 			CreatePipeline();
 			CreateVertexBuffers();
-			RecordCommandBuffers();
 
 			m_imguiPipeline = new ImguiManager(m_device);
-
-			VkCommandBuffer commandBuffer = BeginSingleTimeCommands();
 			glm::vec2 size = { m_swapchain->GetExtent().width, m_swapchain->GetExtent().height };
-			m_imguiPipeline->Create(commandBuffer, size, m_window->GetWindow(), m_renderPass);
-			EndSingleTimeCommands(commandBuffer);
+			m_imguiPipeline->Create(size, m_window->GetWindow(), m_renderPass);
+
+			RecordCommandBuffers();
+			RecordCommandBuffersImgui();
 		}
 
 		~Renderer() {
 			vkDeviceWaitIdle(m_device->vkDevice); 
 			
+			delete m_imguiPipeline;
+
 			DeletePipeline();
 			DeleteFramebuffers();
 			DeleteDepthRessources();
@@ -71,46 +77,6 @@ namespace vk {
 
 		void Run();
 
-	private:
-
-		Instance * m_instance;
-		Window *  m_window;
-		Device *  m_device;
-		SwapChain  * m_swapchain;
-		ImguiManager * m_imguiPipeline;
-
-		VkCommandPool m_commandPool;
-		VkRenderPass m_renderPass;
-
-		VkPipelineLayout m_pipelineLayout;
-		VkPipeline	m_pipeline;
-
-		VkDescriptorSetLayout m_descriptorSetLayout;
-		VkDescriptorPool m_descriptorPool;
-		VkDescriptorSet m_descriptorSet;
-
-		std::vector<VkCommandBuffer> m_commandBuffers;
-		std::vector< FrameBuffer * > m_swapChainframeBuffers;
-
-		Image * m_depthImage;
-		ImageView  * m_depthImageView;
-
-		Shader * m_fragmentShader;
-		Shader * m_vertexShader;
-
-		Buffer * m_uniformBuffer;
-
-		Buffer * m_indexBuffer;
-		Buffer * m_vertexBuffer;
-		std::vector<Vertex> m_vertices;
-		std::vector<uint32_t> m_indices;
-
-		struct UniformBufferObject
-		{
-			glm::mat4 model;
-			glm::mat4 view;
-			glm::mat4 proj;
-		} m_ubo;
 
 		VkCommandBuffer BeginSingleTimeCommands()
 		{
@@ -150,6 +116,53 @@ namespace vk {
 			vkFreeCommandBuffers(m_device->vkDevice, m_commandPool, 1, &commandBuffer);
 		}
 
+		static Renderer * GetGlobalRenderer() {	return ms_globalRenderer; }
+
+	private:
+
+		Instance * m_instance;
+		Window *  m_window;
+		Device *  m_device;
+		SwapChain  * m_swapchain;
+		ImguiManager * m_imguiPipeline;
+
+		VkCommandPool m_commandPool;
+		VkRenderPass m_renderPass;
+		VkRenderPass m_renderPassImgui;
+
+		VkPipelineLayout m_pipelineLayout;
+		VkPipeline	m_pipeline;
+
+		VkDescriptorSetLayout m_descriptorSetLayout;
+		VkDescriptorPool m_descriptorPool;
+		VkDescriptorSet m_descriptorSet;
+
+		std::vector<VkCommandBuffer> m_commandBuffers;
+		std::vector<VkCommandBuffer> m_imguiCommandBuffers;
+		std::vector< FrameBuffer * > m_swapChainframeBuffers;
+
+		Image * m_depthImage;
+		ImageView  * m_depthImageView;
+
+		Shader * m_fragmentShader;
+		Shader * m_vertexShader;
+
+		Buffer * m_uniformBuffer;
+
+		Buffer * m_indexBuffer;
+		Buffer * m_vertexBuffer;
+		std::vector<Vertex> m_vertices;
+		std::vector<uint32_t> m_indices;
+
+		struct UniformBufferObject
+		{
+			glm::mat4 model;
+			glm::mat4 view;
+			glm::mat4 proj;
+		} m_ubo;
+
+		static Renderer * ms_globalRenderer;
+
 		bool CreateCommandPool() {
 			VkCommandPoolCreateInfo commandPoolCreateInfo;
 			commandPoolCreateInfo.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
@@ -187,58 +200,128 @@ namespace vk {
 				std::cout << "Could not allocate command buffers." << std::endl;
 				return false;
 			}
+
+			m_imguiCommandBuffers.resize(m_swapchain->GetSwapchainImagesCount());
+			if (vkAllocateCommandBuffers(m_device->vkDevice, &commandBufferAllocateInfo, m_imguiCommandBuffers.data()) != VK_SUCCESS) {
+				std::cout << "Could not allocate command buffers." << std::endl;
+				return false;
+			}
+
 			return true;
 		}
 		void RecordCommandBuffers() {
-			for (int cmdBufferIndex = 0; cmdBufferIndex < m_commandBuffers.size(); cmdBufferIndex++)
-			{
-				VkCommandBuffer commandBuffer = m_commandBuffers[cmdBufferIndex];
+			for (int cmdBufferIndex = 0; cmdBufferIndex < m_commandBuffers.size(); cmdBufferIndex++) {
+				RecordCommandBuffer( cmdBufferIndex );
+			}
+		}
+		void RecordCommandBuffersImgui() {
+			for (int cmdBufferIndex = 0; cmdBufferIndex < m_imguiCommandBuffers.size(); cmdBufferIndex++) {
+				RecordCommandBuffersImgui(cmdBufferIndex);
+			}
+		}
+		void RecordCommandBuffer(const int _index) {
+			VkCommandBuffer commandBuffer = m_commandBuffers[_index];
 
-				VkCommandBufferBeginInfo commandBufferBeginInfo;
-				commandBufferBeginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
-				commandBufferBeginInfo.pNext = nullptr;
-				commandBufferBeginInfo.flags = VK_COMMAND_BUFFER_USAGE_SIMULTANEOUS_USE_BIT;
-				commandBufferBeginInfo.pInheritanceInfo = nullptr;
+			VkCommandBufferBeginInfo commandBufferBeginInfo;
+			commandBufferBeginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
+			commandBufferBeginInfo.pNext = nullptr;
+			commandBufferBeginInfo.flags = VK_COMMAND_BUFFER_USAGE_SIMULTANEOUS_USE_BIT;
+			commandBufferBeginInfo.pInheritanceInfo = nullptr;
 
-				std::vector<VkClearValue> clearValues(2);
-				clearValues[0].color = { 0.5f, 0.5f, 0.5f, 1.0f };
-				clearValues[1].depthStencil = { 1.0f, 0 };
+			std::vector<VkClearValue> clearValues(2);
+			clearValues[0].color = { 0.5f, 0.5f, 0.5f, 1.0f };
+			clearValues[1].depthStencil = { 1.0f, 0 };
 
-				VkRenderPassBeginInfo renderPassInfo = {};
-				renderPassInfo.sType= VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
-				renderPassInfo.pNext=nullptr;
-				renderPassInfo.renderPass= m_renderPass;
-				renderPassInfo.framebuffer= m_swapChainframeBuffers[cmdBufferIndex]->GetFrameBuffer();
-				renderPassInfo.renderArea.offset = { 0,0 };
-				renderPassInfo.renderArea.extent.width = m_swapchain->GetExtent().width;
-				renderPassInfo.renderArea.extent.height = m_swapchain->GetExtent().height;
-				renderPassInfo.clearValueCount= static_cast<uint32_t>(clearValues.size());
-				renderPassInfo.pClearValues= clearValues.data();
+			VkRenderPassBeginInfo renderPassInfo = {};
+			renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
+			renderPassInfo.pNext = nullptr;
+			renderPassInfo.renderPass = m_renderPass;
+			renderPassInfo.framebuffer = m_swapChainframeBuffers[_index]->GetFrameBuffer();
+			renderPassInfo.renderArea.offset = { 0,0 };
+			renderPassInfo.renderArea.extent.width = m_swapchain->GetExtent().width;
+			renderPassInfo.renderArea.extent.height = m_swapchain->GetExtent().height;
+			renderPassInfo.clearValueCount = static_cast<uint32_t>(clearValues.size());
+			renderPassInfo.pClearValues = clearValues.data();
 
-				if (vkBeginCommandBuffer(commandBuffer, &commandBufferBeginInfo) == VK_SUCCESS) {
-					vkCmdBeginRenderPass(commandBuffer, &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE); {
-						vkCmdBindPipeline(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, m_pipeline);
-						
-						VkBuffer vertexBuffers[] = { m_vertexBuffer->GetBuffer() };
+			if (vkBeginCommandBuffer(commandBuffer, &commandBufferBeginInfo) == VK_SUCCESS) {
+				vkCmdBeginRenderPass(commandBuffer, &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE); {
+					vkCmdBindPipeline(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, m_pipeline);
 
-						VkDeviceSize offsets[] = { 0 };
-						vkCmdBindVertexBuffers(commandBuffer, 0, 1, vertexBuffers, offsets);
-						vkCmdBindIndexBuffer(commandBuffer, m_indexBuffer->GetBuffer(), 0, VK_INDEX_TYPE_UINT32);
-						vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, m_pipelineLayout, 0, 1, &m_descriptorSet, 0, nullptr);
-						vkCmdDrawIndexed(commandBuffer, static_cast<uint32_t>(m_indices.size()), 1, 0, 0, 0);
-					}
-					vkCmdEndRenderPass(commandBuffer);
-					if (vkEndCommandBuffer(commandBuffer) != VK_SUCCESS) {
-						std::cout << "Could not record command buffer " << cmdBufferIndex << "." << std::endl;
-					}
-				} else {
-					std::cout << "Could not record command buffer " << cmdBufferIndex << "." << std::endl;
+					VkBuffer vertexBuffers[] = { m_vertexBuffer->GetBuffer() };
+
+					VkDeviceSize offsets[] = { 0 };
+					vkCmdBindVertexBuffers(commandBuffer, 0, 1, vertexBuffers, offsets);
+					vkCmdBindIndexBuffer(commandBuffer, m_indexBuffer->GetBuffer(), 0, VK_INDEX_TYPE_UINT32);
+					vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, m_pipelineLayout, 0, 1, &m_descriptorSet, 0, nullptr);
+					vkCmdDrawIndexed(commandBuffer, static_cast<uint32_t>(m_indices.size()), 1, 0, 0, 0);
+					m_imguiPipeline->DrawFrame(commandBuffer);
+				}
+				vkCmdEndRenderPass(commandBuffer);
+				if (vkEndCommandBuffer(commandBuffer) != VK_SUCCESS) {
+					std::cout << "Could not record command buffer " << _index << "." << std::endl;
 				}
 			}
+			else {
+				std::cout << "Could not record command buffer " << _index << "." << std::endl;
+			}
+
+		}
+		void RecordCommandBuffersImgui(const int _index) {
+
+			VkCommandBuffer commandBuffer = m_imguiCommandBuffers[_index];
+
+			VkCommandBufferBeginInfo commandBufferBeginInfo;
+			commandBufferBeginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
+			commandBufferBeginInfo.pNext = nullptr;
+			commandBufferBeginInfo.flags = VK_COMMAND_BUFFER_USAGE_SIMULTANEOUS_USE_BIT;
+			commandBufferBeginInfo.pInheritanceInfo = nullptr;
+
+			std::vector<VkClearValue> clearValues(2);
+			clearValues[0].color = { 0.5f, 0.5f, 0.5f, 1.0f };
+			clearValues[1].depthStencil = { 1.0f, 0 };
+
+			VkRenderPassBeginInfo renderPassInfo = {};
+			renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
+			renderPassInfo.pNext = nullptr;
+			renderPassInfo.renderPass = m_renderPass;
+			renderPassInfo.framebuffer = m_swapChainframeBuffers[_index]->GetFrameBuffer();
+			renderPassInfo.renderArea.offset = { 0,0 };
+			renderPassInfo.renderArea.extent.width = m_swapchain->GetExtent().width;
+			renderPassInfo.renderArea.extent.height = m_swapchain->GetExtent().height;
+			renderPassInfo.clearValueCount = static_cast<uint32_t>(clearValues.size());
+			renderPassInfo.pClearValues = clearValues.data();
+
+			if (vkBeginCommandBuffer(commandBuffer, &commandBufferBeginInfo) == VK_SUCCESS) {
+				vkCmdBeginRenderPass(commandBuffer, &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE); {
+					vkCmdBindPipeline(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, m_pipeline);
+
+					VkBuffer vertexBuffers[] = { m_vertexBuffer->GetBuffer() };
+
+					VkDeviceSize offsets[] = { 0 };
+					vkCmdBindVertexBuffers(commandBuffer, 0, 1, vertexBuffers, offsets);
+					vkCmdBindIndexBuffer(commandBuffer, m_indexBuffer->GetBuffer(), 0, VK_INDEX_TYPE_UINT32);
+					vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, m_pipelineLayout, 0, 1, &m_descriptorSet, 0, nullptr);
+					vkCmdDrawIndexed(commandBuffer, static_cast<uint32_t>(m_indices.size()), 1, 0, 0, 0);
+					m_imguiPipeline->DrawFrame(commandBuffer);
+				}
+				vkCmdEndRenderPass(commandBuffer);
+				if (vkEndCommandBuffer(commandBuffer) != VK_SUCCESS) {
+					std::cout << "Could not record command buffer " << _index << "." << std::endl;
+				}
+			}
+			else {
+				std::cout << "Could not record command buffer " << _index << "." << std::endl;
+			}
+
 		}
 		bool SubmitCommandBuffers() {
 
 			std::vector<VkPipelineStageFlags> waitSemaphoreStages = { VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT };
+
+			std::vector< VkCommandBuffer> commandBuffers = { 
+				m_commandBuffers[m_swapchain->GetCurrentImageIndex()] 
+				, m_imguiCommandBuffers[m_swapchain->GetCurrentImageIndex()]
+			};
 
 			VkSubmitInfo submitInfo;
 			submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
@@ -246,8 +329,8 @@ namespace vk {
 			submitInfo.waitSemaphoreCount = 1;
 			submitInfo.pWaitSemaphores = m_swapchain->GetCurrentImageAvailableSemaphore();
 			submitInfo.pWaitDstStageMask = waitSemaphoreStages.data();
-			submitInfo.commandBufferCount = 1;
-			submitInfo.pCommandBuffers = &m_commandBuffers[m_swapchain->GetCurrentImageIndex()];
+			submitInfo.commandBufferCount = static_cast<uint32_t>(commandBuffers.size());
+			submitInfo.pCommandBuffers = commandBuffers.data();
 			submitInfo.signalSemaphoreCount = 1;
 			submitInfo.pSignalSemaphores = m_swapchain->GetCurrentRenderFinishedSemaphore();
 
@@ -671,6 +754,8 @@ namespace vk {
 		void DeleteCommandBuffers() {
 			vkFreeCommandBuffers(m_device->vkDevice, m_commandPool, static_cast<uint32_t>(m_commandBuffers.size()), m_commandBuffers.data());
 			m_commandBuffers.clear();
+			vkFreeCommandBuffers(m_device->vkDevice, m_commandPool, static_cast<uint32_t>(m_imguiCommandBuffers.size()), m_imguiCommandBuffers.data());
+			m_imguiCommandBuffers.clear();
 		}
 		void DeleteRenderPass() {
 			if (m_renderPass != VK_NULL_HANDLE) {

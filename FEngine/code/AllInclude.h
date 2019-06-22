@@ -14,6 +14,8 @@
 #include "imgui/imgui.h"
 
 #include <vector>
+#include <array>
+
 #include <iostream>
 #include <chrono>
 #include <algorithm>

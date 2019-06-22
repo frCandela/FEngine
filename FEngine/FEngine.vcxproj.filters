@@ -14,6 +14,9 @@
     <Filter Include="Fichiers d%27en-tête\deps">
       <UniqueIdentifier>{438721f2-b2df-4736-b550-620897169813}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Fichiers d%27en-tête\util">
+      <UniqueIdentifier>{26735d92-fe63-4ca4-a659-b6baa31d270a}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include="shaders\shader.frag">
@@ -41,6 +44,12 @@
     </ClCompile>
     <ClCompile Include="..\..\..\..\Telechargements\FEngine-master\FEngine\deps\imgui\imgui.cpp">
       <Filter>Fichiers d%27en-tête\deps</Filter>
+    </ClCompile>
+    <ClCompile Include="code\util\Time.cpp">
+      <Filter>Fichiers d%27en-tête\util</Filter>
+    </ClCompile>
+    <ClCompile Include="code\util\glfwInput.cpp">
+      <Filter>Fichiers d%27en-tête\util</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -91,6 +100,12 @@
     </ClInclude>
     <ClInclude Include="code\vulkan\vkTexture.h">
       <Filter>Fichiers d%27en-tête\vulkan</Filter>
+    </ClInclude>
+    <ClInclude Include="code\util\Time.h">
+      <Filter>Fichiers d%27en-tête\util</Filter>
+    </ClInclude>
+    <ClInclude Include="code\util\glfwInput.h">
+      <Filter>Fichiers d%27en-tête\util</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

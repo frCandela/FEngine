@@ -38,7 +38,8 @@ namespace vk {
 			m_swapchain = VK_NULL_HANDLE;
 		}
 
-		void StartNextFrame() { m_currentFrame = (m_currentFrame + 1) % MAX_FRAMES_IN_FLIGHT; }
+		void StartNextFrame() { 
+			m_currentFrame = (m_currentFrame + 1) % MAX_FRAMES_IN_FLIGHT; }
 		VkResult AcquireNextImage() {
 			return vkAcquireNextImageKHR(m_device->vkDevice, m_swapchain, std::numeric_limits<uint64_t>::max(), m_imagesAvailableSemaphores[m_currentFrame], VK_NULL_HANDLE, &m_currentImageIndex);
 		}
@@ -71,7 +72,7 @@ namespace vk {
 		VkExtent2D GetExtent() const { return m_size; }
 		VkImageView GetImageView(int index) { return m_imageViews[index]->GetImageView(); }
 
-		const int MAX_FRAMES_IN_FLIGHT = 2;
+		const int MAX_FRAMES_IN_FLIGHT = 3;
 	private:
 
 		Device * m_device;

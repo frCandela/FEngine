@@ -92,11 +92,15 @@
     <ClCompile Include="..\..\..\..\Telechargements\FEngine-master\FEngine\deps\imgui\imgui_demo.cpp" />
     <ClCompile Include="..\..\..\..\Telechargements\FEngine-master\FEngine\deps\imgui\imgui_draw.cpp" />
     <ClCompile Include="code\main.cpp" />
+    <ClCompile Include="code\util\glfwInput.cpp" />
+    <ClCompile Include="code\util\Time.cpp" />
     <ClCompile Include="code\vulkan\vkRenderer.cpp" />
     <ClCompile Include="code\vulkan\vkTexture.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="code\AllInclude.h" />
+    <ClInclude Include="code\util\glfwInput.h" />
+    <ClInclude Include="code\util\Time.h" />
     <ClInclude Include="code\vulkan\ImguiPipeline.h" />
     <ClInclude Include="code\vulkan\vkBuffer.h" />
     <ClInclude Include="code\vulkan\vkDevice.h" />

@@ -1,19 +1,25 @@
 #include "vkRenderer.h"
 
+#include "util/Time.h"
+#include "util/glfwInput.h"
+
 namespace vk {
+
+	Renderer * Renderer::ms_globalRenderer = nullptr;
 
 	void Renderer::Run()
 	{
-		while (!glfwWindowShouldClose(m_window->GetWindow()))
-		{
-			glfwPollEvents();
+		ImGuiIO& io = ImGui::GetIO();
+		float lastUpdateTime = Time::ElapsedSinceStartup();
 
+		while ( glfwWindowShouldClose(m_window->GetWindow()) == false)
+		{
 			vkWaitForFences(m_device->vkDevice, 1, m_swapchain->GetCurrentInFlightFence(), VK_TRUE, std::numeric_limits<uint64_t>::max());
 			vkResetFences(m_device->vkDevice, 1, m_swapchain->GetCurrentInFlightFence());
 
 			VkResult result = m_swapchain->AcquireNextImage();
 			(void)result;
-			if (result == VK_ERROR_OUT_OF_DATE_KHR) {
+			/*if (result == VK_ERROR_OUT_OF_DATE_KHR) {
 				std::cout << "suboptimal swapchain" << std::endl;
 				vkDeviceWaitIdle(m_device->vkDevice);
 
@@ -42,12 +48,24 @@ namespace vk {
 			}
 			else if (result != VK_SUCCESS) {
 				std::cout << "Could not acquire next image" << std::endl;
-			}			
-			UpdateUniformBuffer();
-			SubmitCommandBuffers();
+			}*/
+			
+			const float time = Time::ElapsedSinceStartup();
+			const float delta = time - lastUpdateTime;
+			lastUpdateTime = time;
+			io.DisplaySize = ImVec2(static_cast<float>(m_swapchain->GetExtent().width), static_cast<float>(m_swapchain->GetExtent().height));
 
-			CreateVertexBuffers();
-			RecordCommandBuffers();
+			Input::NewFrame();
+			ImGui::NewFrame();
+
+			UpdateUniformBuffer();
+			ImGui::Render();
+			ImGui::EndFrame();
+			m_imguiPipeline->UpdateBuffers();
+			RecordCommandBuffer( m_swapchain->GetCurrentFrame() );
+			RecordCommandBuffersImgui(m_swapchain->GetCurrentFrame());
+
+			SubmitCommandBuffers();			
 
 			m_swapchain->PresentImage();
 			m_swapchain->StartNextFrame();
@@ -55,7 +73,6 @@ namespace vk {
 	}
 
 	void Renderer::CreateVertexBuffers() {
-		vkDeviceWaitIdle(m_device->vkDevice);
 
 		delete m_indexBuffer;
 		delete m_vertexBuffer;
@@ -124,12 +141,16 @@ namespace vk {
 
 	void Renderer::UpdateUniformBuffer()
 	{
-		static auto startTime = std::chrono::high_resolution_clock::now();
-		auto currentTime = std::chrono::high_resolution_clock::now();
-		float time = std::chrono::duration<float, std::chrono::seconds::period>(currentTime - startTime).count();
+		// Ui
+		static float s_speed = 1.f;
+		ImGui::Begin("UniformBuffer");
+		{
+			ImGui::SliderFloat("rotation speed", &s_speed, 0.f, 1000.f);
+		}
+		ImGui::End();
 
 		UniformBufferObject ubo = {};
-		ubo.model = glm::rotate(glm::mat4(1.0f), time * glm::radians(90.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+		ubo.model = glm::rotate(glm::mat4(1.0f), Time::ElapsedSinceStartup() * glm::radians(s_speed), glm::vec3(0.0f, 1.0f, 0.0f));
 		ubo.view = glm::lookAt(glm::vec3(2.0f, 2.0f, 2.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
 		ubo.proj = glm::perspective(glm::radians(45.0f), m_swapchain->GetExtent().width / (float)m_swapchain->GetExtent().height, 0.1f, 10.0f);
 		ubo.proj[1][1] *= -1; 			//the Y coordinate of the clip coordinates is inverted

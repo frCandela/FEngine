@@ -10,7 +10,6 @@
 
 namespace vk
 {
-	/// ImguiManager.h class
 	class ImguiManager
 	{
 	public:
@@ -21,23 +20,10 @@ namespace vk
 			, m_indexBuffer(_device)
 			, m_fontTexture( new vk::Texture(_device))
 			, m_sampler( new vk::Sampler(_device))
-		{
-
-		}
-
-		void Create( VkCommandBuffer commandBuffer, glm::vec2 size, GLFWwindow* window, VkRenderPass renderPass) {
-			ImGui::CreateContext();
-			InitImgui(size.x, size.y, window);
-			CreateFontAndSampler(commandBuffer);
-			CreateDescriptors();
-			CreateGraphicsPipeline(renderPass);
-		}
-
-		// Release all Vulkan resources required for rendering imGui
+		{}		
 		~ImguiManager() {
 			delete(m_fontTexture);
 			delete(m_sampler);
-
 			delete(m_fragShader);
 			delete(m_vertShader);
 
@@ -50,7 +36,13 @@ namespace vk
 			ImGui::DestroyContext();
 		}
 
-		// Update vertex and index buffer containing the imGui elements when required
+		void Create(glm::vec2 size, GLFWwindow* window, VkRenderPass renderPass) {
+			ImGui::CreateContext();
+			InitImgui(size.x, size.y, window);
+			CreateFontAndSampler();
+			CreateDescriptors();
+			CreateGraphicsPipeline(renderPass);
+		}
 		void UpdateBuffers() {
 			ImDrawData* imDrawData = ImGui::GetDrawData();
 
@@ -98,9 +90,6 @@ namespace vk
 				m_indexBuffer.Flush();
 			}
 		}
-
-
-		// Draw current imGui frame into a command buffer
 		void DrawFrame(VkCommandBuffer commandBuffer) {
 			ImDrawData* imDrawData = ImGui::GetDrawData();
 			if (imDrawData &&  imDrawData->CmdListsCount > 0)
@@ -199,17 +188,15 @@ namespace vk
 			io.GetClipboardTextFn = GetClipboardText;
 			io.ClipboardUserData = window;
 		}
-
-		void CreateFontAndSampler(VkCommandBuffer _commandBuffer) {
+		void CreateFontAndSampler( ) {
 			// Create font texture
 			unsigned char* fontData;
 			int texWidth, texHeight;
 			ImGui::GetIO().Fonts->GetTexDataAsRGBA32(&fontData, &texWidth, &texHeight);
 
-			m_fontTexture->Load(_commandBuffer, fontData, texWidth, texHeight, 1);
+			m_fontTexture->Load(fontData, texWidth, texHeight, 1);
 			m_sampler->CreateSampler(0, 1.f);
 		}
-
 		void CreateDescriptors() {
 			// Descriptor pool
 			VkDescriptorPoolSize descriptorPoolSize = {};
@@ -269,8 +256,7 @@ namespace vk
 
 			vkUpdateDescriptorSets(m_device->vkDevice, static_cast<uint32_t>(writeDescriptorSets.size()), writeDescriptorSets.data(), 0, nullptr);
 		}
-
-		void CreateGraphicsPipeline(VkRenderPass renderPass) {
+		void CreateGraphicsPipeline(VkRenderPass _renderPass) {
 			// Pipeline cache
 			VkPipelineCacheCreateInfo pipelineCacheCreateInfo = {};
 			pipelineCacheCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_CACHE_CREATE_INFO;
@@ -415,7 +401,7 @@ namespace vk
 			VkGraphicsPipelineCreateInfo pipelineCreateInfo = {};
 			pipelineCreateInfo.sType = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO;
 			pipelineCreateInfo.layout = m_pipelineLayout;
-			pipelineCreateInfo.renderPass = renderPass;
+			pipelineCreateInfo.renderPass = _renderPass;
 			pipelineCreateInfo.flags = 0;
 			pipelineCreateInfo.basePipelineIndex = -1;
 			pipelineCreateInfo.basePipelineHandle = VK_NULL_HANDLE;
@@ -433,15 +419,12 @@ namespace vk
 
 			vkCreateGraphicsPipelines(m_device->vkDevice, pipelineCache, 1, &pipelineCreateInfo, nullptr, &m_pipeline);
 		}
-
-		// Sets the clipboard to the specified string.
-		static void SetClipboardText(void* user_data, const char* text) {
-			glfwSetClipboardString((GLFWwindow*)user_data, text);
+		
+		static void SetClipboardText(void* _userData, const char* _text) {
+			glfwSetClipboardString((GLFWwindow*)_userData, _text);
 		}
-
-		//Retrieves the contents of the clipboard as a string
-		static const char* GetClipboardText(void* user_data) {
-			return glfwGetClipboardString((GLFWwindow*)user_data);
+		static const char* GetClipboardText(void* _userData) {
+			return glfwGetClipboardString((GLFWwindow*)_userData);
 		}
 
 		// Vulkan resources for rendering the UI	
