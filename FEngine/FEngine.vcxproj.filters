@@ -51,12 +51,45 @@
     <ClCompile Include="code\util\glfwInput.cpp">
       <Filter>Fichiers d%27en-tête\util</Filter>
     </ClCompile>
+    <ClCompile Include="code\vulkan\vkDevice.cpp">
+      <Filter>Fichiers d%27en-tête\vulkan</Filter>
+    </ClCompile>
+    <ClCompile Include="code\vulkan\vkInstance.cpp">
+      <Filter>Fichiers d%27en-tête\vulkan</Filter>
+    </ClCompile>
+    <ClCompile Include="code\vulkan\vkBuffer.cpp">
+      <Filter>Fichiers d%27en-tête\vulkan</Filter>
+    </ClCompile>
+    <ClCompile Include="code\vulkan\vkFramebuffer.cpp">
+      <Filter>Fichiers d%27en-tête\vulkan</Filter>
+    </ClCompile>
+    <ClCompile Include="code\vulkan\vkImage.cpp">
+      <Filter>Fichiers d%27en-tête\vulkan</Filter>
+    </ClCompile>
+    <ClCompile Include="code\vulkan\vkSampler.cpp">
+      <Filter>Fichiers d%27en-tête\vulkan</Filter>
+    </ClCompile>
+    <ClCompile Include="code\vulkan\vkShader.cpp">
+      <Filter>Fichiers d%27en-tête\vulkan</Filter>
+    </ClCompile>
+    <ClCompile Include="code\vulkan\vkImageView.cpp">
+      <Filter>Fichiers d%27en-tête\vulkan</Filter>
+    </ClCompile>
+    <ClCompile Include="code\vulkan\vkSpirvCompiler.cpp">
+      <Filter>Fichiers d%27en-tête\vulkan</Filter>
+    </ClCompile>
+    <ClCompile Include="code\vulkan\vkVertex.cpp">
+      <Filter>Fichiers d%27en-tête\vulkan</Filter>
+    </ClCompile>
+    <ClCompile Include="code\vulkan\vkWindow.cpp">
+      <Filter>Fichiers d%27en-tête\vulkan</Filter>
+    </ClCompile>
+    <ClCompile Include="code\vulkan\vkSwapChain.cpp">
+      <Filter>Fichiers d%27en-tête\vulkan</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="code\vulkan\vkImage.h">
-      <Filter>Fichiers d%27en-tête\vulkan</Filter>
-    </ClInclude>
-    <ClInclude Include="code\vulkan\vkImageView.h">
       <Filter>Fichiers d%27en-tête\vulkan</Filter>
     </ClInclude>
     <ClInclude Include="code\vulkan\vkInstance.h">
@@ -86,9 +119,6 @@
     <ClInclude Include="code\vulkan\vkFrameBuffer.h">
       <Filter>Fichiers d%27en-tête\vulkan</Filter>
     </ClInclude>
-    <ClInclude Include="code\AllInclude.h">
-      <Filter>Fichiers d%27en-tête</Filter>
-    </ClInclude>
     <ClInclude Include="code\vulkan\vkVertex.h">
       <Filter>Fichiers d%27en-tête\vulkan</Filter>
     </ClInclude>
@@ -106,6 +136,12 @@
     </ClInclude>
     <ClInclude Include="code\util\glfwInput.h">
       <Filter>Fichiers d%27en-tête\util</Filter>
+    </ClInclude>
+    <ClInclude Include="code\vulkan\vkImageView.h">
+      <Filter>Fichiers d%27en-tête\vulkan</Filter>
+    </ClInclude>
+    <ClInclude Include="code\Includes.h">
+      <Filter>Fichiers d%27en-tête</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

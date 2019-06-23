@@ -94,11 +94,23 @@
     <ClCompile Include="code\main.cpp" />
     <ClCompile Include="code\util\glfwInput.cpp" />
     <ClCompile Include="code\util\Time.cpp" />
+    <ClCompile Include="code\vulkan\vkBuffer.cpp" />
+    <ClCompile Include="code\vulkan\vkDevice.cpp" />
+    <ClCompile Include="code\vulkan\vkFramebuffer.cpp" />
+    <ClCompile Include="code\vulkan\vkImage.cpp" />
+    <ClCompile Include="code\vulkan\vkImageView.cpp" />
+    <ClCompile Include="code\vulkan\vkInstance.cpp" />
     <ClCompile Include="code\vulkan\vkRenderer.cpp" />
+    <ClCompile Include="code\vulkan\vkSampler.cpp" />
+    <ClCompile Include="code\vulkan\vkShader.cpp" />
+    <ClCompile Include="code\vulkan\vkSpirvCompiler.cpp" />
+    <ClCompile Include="code\vulkan\vkSwapChain.cpp" />
     <ClCompile Include="code\vulkan\vkTexture.cpp" />
+    <ClCompile Include="code\vulkan\vkVertex.cpp" />
+    <ClCompile Include="code\vulkan\vkWindow.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="code\AllInclude.h" />
+    <ClInclude Include="code\Includes.h" />
     <ClInclude Include="code\util\glfwInput.h" />
     <ClInclude Include="code\util\Time.h" />
     <ClInclude Include="code\vulkan\ImguiPipeline.h" />

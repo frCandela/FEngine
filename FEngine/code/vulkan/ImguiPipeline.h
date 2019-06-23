@@ -1,6 +1,6 @@
 #pragma once
 
-#include "AllInclude.h"
+#include "Includes.h"
 
 #include "vkDevice.h"
 #include "vkShader.h"
@@ -10,11 +10,11 @@
 
 namespace vk
 {
-	class ImguiManager
+	class ImguiPipeline
 	{
 	public:
 		// Initialize styles, keys, Vulkan resources used by the ui, etc.
-		ImguiManager(Device* _device, const int _swapchainImagesCount) :
+		ImguiPipeline(Device* _device, const int _swapchainImagesCount) :
 			m_device(_device)
 			, m_fontTexture( new vk::Texture(_device))
 			, m_sampler( new vk::Sampler(_device))
@@ -30,7 +30,7 @@ namespace vk
 
 
 		}		
-		~ImguiManager() {
+		~ImguiPipeline() {
 			delete(m_fontTexture);
 			delete(m_sampler);
 			delete(m_fragShader);
