@@ -3,13 +3,14 @@
 class Time
 {
 public:
-	static float DeltaTime();
-	static float FixedDeltaTime();
-	static float ElapsedSinceStartup();
+	static float ElapsedSinceStartup() { return static_cast<float>(glfwGetTime()); }
 
-	static void SetDeltaTime(float delta);
-	static void SetFixedDeltaTime(float delta);
+
+	static float GetFPS() { return ms_fps; }
+	static void SetFPS(const float _fps) { ms_fps = _fps > minFps ? _fps : minFps; }
+	
+	static const float minFps;
+
 private:
-	static float m_deltaTime;
-	static float m_fixedDeltaTime;
+	static float ms_fps;
 };

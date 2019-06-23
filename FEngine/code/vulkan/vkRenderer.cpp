@@ -85,69 +85,84 @@ namespace vk {
 	void Renderer::Run()
 	{
 		ImGuiIO& io = ImGui::GetIO();
+
 		float lastUpdateTime = Time::ElapsedSinceStartup();
 
 		while ( glfwWindowShouldClose(m_window->GetWindow()) == false)
 		{
-			vkWaitForFences(m_device->vkDevice, 1, m_swapchain->GetCurrentInFlightFence(), VK_TRUE, std::numeric_limits<uint64_t>::max());
-			vkResetFences(m_device->vkDevice, 1, m_swapchain->GetCurrentInFlightFence());
-
-			const VkResult result = m_swapchain->AcquireNextImage();
-			(void)result;
-			if (result == VK_ERROR_OUT_OF_DATE_KHR) {
-				std::cout << "suboptimal swapchain" << std::endl;
-				vkDeviceWaitIdle(m_device->vkDevice);
-
-				DeletePipeline();
-				DeleteFramebuffers();
-				DeleteDepthRessources();
-				DeleteRenderPass();
-				DeleteCommandPool();
-				DeleteDescriptors();
-
-				SwapChain * newSwapchain = new SwapChain(m_device, m_window->GetSurface(), m_window->GetFramebufferSize(), m_swapchain->GetVkSwapChain());
-				delete m_swapchain;
-				m_swapchain = newSwapchain;
-
-				CreateCommandPool();
-				CreateRenderPass();
-				CreateDepthRessources();
-				CreateFramebuffers();
-				CreateCommandBuffers();
-				CreateDescriptors();
-				CreatePipeline();
-				RecordAllCommandBuffers();
-				vkResetFences(m_device->vkDevice, 1, m_swapchain->GetCurrentInFlightFence());
-				m_swapchain->AcquireNextImage();
-			}
-			else if (result != VK_SUCCESS) {
-				std::cout << "Could not acquire next image" << std::endl;
-			}
-			
 			const float time = Time::ElapsedSinceStartup();
-			const float delta = time - lastUpdateTime;
-			lastUpdateTime = time;
-			io.DisplaySize = ImVec2(static_cast<float>(m_swapchain->GetExtent().width), static_cast<float>(m_swapchain->GetExtent().height));
 
-			Input::NewFrame();
-			ImGui::NewFrame();	
-			{
-				if (ImGui::Button("reload shaders")) {
-					ReloadShaders();
+			const float updateDelta = time - lastUpdateTime;
+			if (updateDelta > 1.f / Time::GetFPS() ) {
+				lastUpdateTime = time;
+				Input::NewFrame();
+				
+				ImGui::NewFrame();
+
+				vkWaitForFences(m_device->vkDevice, 1, m_swapchain->GetCurrentInFlightFence(), VK_TRUE, std::numeric_limits<uint64_t>::max());
+				vkResetFences(m_device->vkDevice, 1, m_swapchain->GetCurrentInFlightFence());
+
+				const VkResult result = m_swapchain->AcquireNextImage();
+				if (result == VK_ERROR_OUT_OF_DATE_KHR) {
+					std::cout << "suboptimal swapchain" << std::endl;
+					vkDeviceWaitIdle(m_device->vkDevice);
+
+					DeletePipeline();
+					DeleteFramebuffers();
+					DeleteDepthRessources();
+					DeleteRenderPass();
+					DeleteCommandPool();
+					DeleteDescriptors();
+
+					SwapChain * newSwapchain = new SwapChain(m_device, m_window->GetSurface(), m_window->GetFramebufferSize(), m_swapchain->GetVkSwapChain());
+					delete m_swapchain;
+					m_swapchain = newSwapchain;
+
+					CreateCommandPool();
+					CreateRenderPass();
+					CreateDepthRessources();
+					CreateFramebuffers();
+					CreateCommandBuffers();
+					CreateDescriptors();
+					CreatePipeline();
+					RecordAllCommandBuffers();
+					vkResetFences(m_device->vkDevice, 1, m_swapchain->GetCurrentInFlightFence());
+					m_swapchain->AcquireNextImage();
+				}
+				else if (result != VK_SUCCESS) {
+					std::cout << "Could not acquire next image" << std::endl;
 				}
 
+				lastUpdateTime = time;
+				io.DisplaySize = ImVec2(static_cast<float>(m_swapchain->GetExtent().width), static_cast<float>(m_swapchain->GetExtent().height));
+				{
+					ImGui::Begin("Debug");
 
-				UpdateUniformBuffer();
+					float tmpFps = Time::GetFPS();
+					if (ImGui::DragFloat("Framerate", &tmpFps, 1.f, Time::minFps, 144.f)) {
+						Time::SetFPS(tmpFps);
+					}
+
+					std::stringstream ssFramerate;
+					ssFramerate << 1.f / updateDelta;
+					ImGui::Text(ssFramerate.str().c_str());
+					if (ImGui::Button("reload shaders")) {
+						ReloadShaders();
+					}
+					UpdateUniformBuffer();
+					ImGui::End();
+				}				
+				ImGui::EndFrame();
+				ImGui::Render();
+
+				RecordCommandBufferImgui(m_swapchain->GetCurrentFrame());
+				RecordPrimaryCommandBuffer(m_swapchain->GetCurrentFrame());
+				SubmitCommandBuffers();
+
+				m_swapchain->PresentImage();
+				m_swapchain->StartNextFrame();
 			}	
-			ImGui::EndFrame();
-			ImGui::Render();
 
-			RecordCommandBufferImgui(m_swapchain->GetCurrentFrame());
-			RecordPrimaryCommandBuffer( m_swapchain->GetCurrentFrame() );
-			SubmitCommandBuffers();			
-
-			m_swapchain->PresentImage();
-			m_swapchain->StartNextFrame();
 		}
 	}
 
@@ -212,11 +227,8 @@ namespace vk {
 	{
 		// Ui
 		static float s_speed = 1.f;
-		ImGui::Begin("UniformBuffer");
-		{
-			ImGui::SliderFloat("rotation speed", &s_speed, 0.f, 1000.f);
-		}
-		ImGui::End();
+
+		ImGui::SliderFloat("rotation speed", &s_speed, 0.f, 1000.f);		
 
 		UniformBufferObject ubo = {};
 		ubo.model = glm::rotate(glm::mat4(1.0f), Time::ElapsedSinceStartup() * glm::radians(s_speed), glm::vec3(0.0f, 1.0f, 0.0f));
