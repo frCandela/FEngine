@@ -22,14 +22,14 @@ namespace vk {
 
 	//================================================================================================================================
 	//================================================================================================================================
-	bool ImageView::Create(VkImage _image, VkFormat _format, VkImageAspectFlags _aspectFlags) {
+	bool ImageView::Create(VkImage _image, VkFormat _format, VkImageAspectFlags _aspectFlags, VkImageViewType _viewType) {
 
 		VkImageViewCreateInfo imageViewCreateInfo;
 		imageViewCreateInfo.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
 		imageViewCreateInfo.pNext = nullptr;
 		imageViewCreateInfo.flags = 0;
 		imageViewCreateInfo.image = _image;
-		imageViewCreateInfo.viewType = VK_IMAGE_VIEW_TYPE_2D_ARRAY;
+		imageViewCreateInfo.viewType = _viewType;
 		imageViewCreateInfo.format = _format;
 		imageViewCreateInfo.components.a = VK_COMPONENT_SWIZZLE_IDENTITY;
 		imageViewCreateInfo.components.b = VK_COMPONENT_SWIZZLE_IDENTITY;

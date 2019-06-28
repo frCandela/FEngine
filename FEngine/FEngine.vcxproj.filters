@@ -19,14 +19,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <None Include="shaders\shader.frag">
-      <Filter>shaders</Filter>
-    </None>
-    <None Include="shaders\shader.vert">
-      <Filter>shaders</Filter>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
     <ClCompile Include="code\main.cpp">
       <Filter>Fichiers d%27en-tête</Filter>
     </ClCompile>
@@ -35,15 +27,6 @@
     </ClCompile>
     <ClCompile Include="code\vulkan\vkTexture.cpp">
       <Filter>Fichiers d%27en-tête\vulkan</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\Telechargements\FEngine-master\FEngine\deps\imgui\imgui_demo.cpp">
-      <Filter>Fichiers d%27en-tête\deps</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\Telechargements\FEngine-master\FEngine\deps\imgui\imgui_draw.cpp">
-      <Filter>Fichiers d%27en-tête\deps</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\Telechargements\FEngine-master\FEngine\deps\imgui\imgui.cpp">
-      <Filter>Fichiers d%27en-tête\deps</Filter>
     </ClCompile>
     <ClCompile Include="code\util\Time.cpp">
       <Filter>Fichiers d%27en-tête\util</Filter>
@@ -87,6 +70,15 @@
     <ClCompile Include="code\vulkan\vkSwapChain.cpp">
       <Filter>Fichiers d%27en-tête\vulkan</Filter>
     </ClCompile>
+    <ClCompile Include="deps\imgui\imgui.cpp">
+      <Filter>Fichiers d%27en-tête\deps</Filter>
+    </ClCompile>
+    <ClCompile Include="deps\imgui\imgui_demo.cpp">
+      <Filter>Fichiers d%27en-tête\deps</Filter>
+    </ClCompile>
+    <ClCompile Include="deps\imgui\imgui_draw.cpp">
+      <Filter>Fichiers d%27en-tête\deps</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="code\vulkan\vkImage.h">
@@ -122,9 +114,6 @@
     <ClInclude Include="code\vulkan\vkVertex.h">
       <Filter>Fichiers d%27en-tête\vulkan</Filter>
     </ClInclude>
-    <ClInclude Include="code\vulkan\ImguiPipeline.h">
-      <Filter>Fichiers d%27en-tête\vulkan</Filter>
-    </ClInclude>
     <ClInclude Include="code\vulkan\vkSampler.h">
       <Filter>Fichiers d%27en-tête\vulkan</Filter>
     </ClInclude>
@@ -143,5 +132,28 @@
     <ClInclude Include="code\Includes.h">
       <Filter>Fichiers d%27en-tête</Filter>
     </ClInclude>
+    <ClInclude Include="code\vulkan\vkImguiPipeline.h">
+      <Filter>Fichiers d%27en-tête\vulkan</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="shaders\forward.frag">
+      <Filter>shaders</Filter>
+    </None>
+    <None Include="shaders\forward.vert">
+      <Filter>shaders</Filter>
+    </None>
+    <None Include="shaders\imgui.frag">
+      <Filter>shaders</Filter>
+    </None>
+    <None Include="shaders\imgui.vert">
+      <Filter>shaders</Filter>
+    </None>
+    <None Include="shaders\postprocess.frag">
+      <Filter>shaders</Filter>
+    </None>
+    <None Include="shaders\postprocess.vert">
+      <Filter>shaders</Filter>
+    </None>
   </ItemGroup>
 </Project>

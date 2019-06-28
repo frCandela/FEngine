@@ -165,9 +165,9 @@ namespace vk
 			io.DisplaySize = ImVec2(width, height);
 			io.DisplayFramebufferScale = ImVec2(1.0f, 1.0f);
 			m_vertShader = new Shader(m_device);			
-			m_vertShader->Create("shaders/imgui/ui.vert");
+			m_vertShader->Create("shaders/imgui.vert");
 			m_fragShader = new Shader(m_device); 
-			m_fragShader->Create("shaders/imgui/ui.frag");
+			m_fragShader->Create("shaders/imgui.frag");
 
 			// Setup back-end capabilities flags
 			io.BackendFlags |= ImGuiBackendFlags_HasMouseCursors;         // We can honor GetMouseCursor() values (optional)

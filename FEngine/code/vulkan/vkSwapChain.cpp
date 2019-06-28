@@ -227,7 +227,7 @@ namespace vk {
 		m_imageViews.resize(m_images.size());
 		for (int imageIndex = 0; imageIndex < m_imageViews.size(); imageIndex++) {
 			m_imageViews[imageIndex] = new ImageView(m_device);
-			m_imageViews[imageIndex]->Create(m_images[imageIndex], m_surfaceFormat.format, VK_IMAGE_ASPECT_COLOR_BIT);
+			m_imageViews[imageIndex]->Create(m_images[imageIndex], m_surfaceFormat.format, VK_IMAGE_ASPECT_COLOR_BIT, VK_IMAGE_VIEW_TYPE_2D);
 		}
 	}
 

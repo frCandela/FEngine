@@ -14,7 +14,7 @@
     <VCProjectVersion>15.0</VCProjectVersion>
     <ProjectGuid>{134A4039-2F62-4BBF-982B-84F5AE0D2618}</ProjectGuid>
     <RootNamespace>FEngine</RootNamespace>
-    <WindowsTargetPlatformVersion>10.0.17134.0</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>10.0.16299.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
@@ -84,13 +84,6 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <None Include="shaders\shader.frag" />
-    <None Include="shaders\shader.vert" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClCompile Include="..\..\..\..\Telechargements\FEngine-master\FEngine\deps\imgui\imgui.cpp" />
-    <ClCompile Include="..\..\..\..\Telechargements\FEngine-master\FEngine\deps\imgui\imgui_demo.cpp" />
-    <ClCompile Include="..\..\..\..\Telechargements\FEngine-master\FEngine\deps\imgui\imgui_draw.cpp" />
     <ClCompile Include="code\main.cpp" />
     <ClCompile Include="code\util\glfwInput.cpp" />
     <ClCompile Include="code\util\Time.cpp" />
@@ -108,12 +101,15 @@
     <ClCompile Include="code\vulkan\vkTexture.cpp" />
     <ClCompile Include="code\vulkan\vkVertex.cpp" />
     <ClCompile Include="code\vulkan\vkWindow.cpp" />
+    <ClCompile Include="deps\imgui\imgui.cpp" />
+    <ClCompile Include="deps\imgui\imgui_demo.cpp" />
+    <ClCompile Include="deps\imgui\imgui_draw.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="code\Includes.h" />
     <ClInclude Include="code\util\glfwInput.h" />
     <ClInclude Include="code\util\Time.h" />
-    <ClInclude Include="code\vulkan\ImguiPipeline.h" />
+    <ClInclude Include="code\vulkan\vkImguiPipeline.h" />
     <ClInclude Include="code\vulkan\vkBuffer.h" />
     <ClInclude Include="code\vulkan\vkDevice.h" />
     <ClInclude Include="code\vulkan\vkFrameBuffer.h" />
@@ -128,6 +124,14 @@
     <ClInclude Include="code\vulkan\vkTexture.h" />
     <ClInclude Include="code\vulkan\vkVertex.h" />
     <ClInclude Include="code\vulkan\vkWindow.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="shaders\forward.frag" />
+    <None Include="shaders\forward.vert" />
+    <None Include="shaders\imgui.frag" />
+    <None Include="shaders\imgui.vert" />
+    <None Include="shaders\postprocess.frag" />
+    <None Include="shaders\postprocess.vert" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
