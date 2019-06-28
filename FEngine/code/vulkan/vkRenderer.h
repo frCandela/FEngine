@@ -73,6 +73,8 @@ namespace vk {
 		Shader * m_vertexShaderPostprocess = nullptr;
 
 		Buffer * m_uniformBuffer;
+		Buffer * m_uniformBufferPostprocess;
+
 		Buffer * m_indexBuffer;
 		Buffer * m_vertexBuffer;
 		Buffer * m_vertexBufferPostprocess;
@@ -86,6 +88,11 @@ namespace vk {
 			glm::mat4 view;
 			glm::mat4 proj;
 		} m_ubo;
+
+		struct UniformsPostprocess
+		{
+			glm::vec4 color;
+		} m_uniformsPostprocess;
 
 		static Renderer * ms_globalRenderer;
 		

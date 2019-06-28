@@ -254,6 +254,11 @@ namespace vk {
 		ubo.proj[1][1] *= -1; 			//the Y coordinate of the clip coordinates is inverted
 
 		m_uniformBuffer->SetData(&ubo, sizeof(ubo));
+
+		UniformsPostprocess uniforms = {};
+		uniforms.color = glm::vec4(1,1,1,1);
+		m_uniformBufferPostprocess->SetData(&uniforms, sizeof(uniforms));
+
 	}
 	
 	//================================================================================================================================
@@ -631,8 +636,16 @@ namespace vk {
 		imageSamplerLayoutBinding.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT;
 		imageSamplerLayoutBinding.pImmutableSamplers = nullptr;
 
+		VkDescriptorSetLayoutBinding uniformsLayoutBinding;
+		uniformsLayoutBinding.binding = 1;
+		uniformsLayoutBinding.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+		uniformsLayoutBinding.descriptorCount = 1;
+		uniformsLayoutBinding.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT;
+		uniformsLayoutBinding.pImmutableSamplers = nullptr;
+
 		std::vector< VkDescriptorSetLayoutBinding > layoutBindings = {
 			imageSamplerLayoutBinding
+			, uniformsLayoutBinding
 		};
 
 		VkDescriptorSetLayoutCreateInfo descriptorSetLayoutCreateInfo = {};
@@ -648,9 +661,11 @@ namespace vk {
 		}
 		std::cout << std::hex << "VkDescriptorSetLayout\t" << m_descriptorSetLayoutPostprocess << std::dec << std::endl;
 
-		std::vector< VkDescriptorPoolSize > poolSizes(1);
+		std::vector< VkDescriptorPoolSize > poolSizes(2);
 		poolSizes[0].type = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
 		poolSizes[0].descriptorCount = 1;
+		poolSizes[1].type = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+		poolSizes[1].descriptorCount = 1;
 
 		VkDescriptorPoolCreateInfo descriptorPoolCreateInfo = {};
 		descriptorPoolCreateInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
@@ -702,7 +717,30 @@ namespace vk {
 		imageSamplerWriteDescriptorSet.pBufferInfo = nullptr;
 		//uboWriteDescriptorSet.pTexelBufferView = nullptr;
 
-		std::vector<VkWriteDescriptorSet> writeDescriptors = { imageSamplerWriteDescriptorSet };
+		m_uniformBufferPostprocess = new Buffer(m_device);
+		m_uniformBufferPostprocess->Create(
+			sizeof(UniformsPostprocess),
+			VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT,
+			VK_MEMORY_PROPERTY_HOST_COHERENT_BIT | VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT
+		);
+
+		VkDescriptorBufferInfo uniformsDescriptorBufferInfo = {};
+		uniformsDescriptorBufferInfo.buffer = m_uniformBufferPostprocess->GetBuffer();
+		uniformsDescriptorBufferInfo.offset = 0;
+		uniformsDescriptorBufferInfo.range = sizeof(UniformsPostprocess);
+
+		VkWriteDescriptorSet uniformsWriteDescriptorSet = {};
+		uniformsWriteDescriptorSet.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+		uniformsWriteDescriptorSet.pNext = nullptr;
+		uniformsWriteDescriptorSet.dstSet = m_descriptorSetPostprocess;
+		uniformsWriteDescriptorSet.dstBinding = 1;
+		uniformsWriteDescriptorSet.dstArrayElement = 0;
+		uniformsWriteDescriptorSet.descriptorCount = 1;
+		uniformsWriteDescriptorSet.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+		uniformsWriteDescriptorSet.pImageInfo = nullptr;
+		uniformsWriteDescriptorSet.pBufferInfo = &uniformsDescriptorBufferInfo;
+
+		std::vector<VkWriteDescriptorSet> writeDescriptors = { imageSamplerWriteDescriptorSet, uniformsWriteDescriptorSet };
 
 		vkUpdateDescriptorSets(
 			m_device->vkDevice,
