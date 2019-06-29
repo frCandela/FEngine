@@ -31,8 +31,8 @@ namespace vk {
 	private:
 		void CreateShaders();
 		bool CreateDescriptors();
-		bool CreatePipeline( VkExtent2D _extent );
-		void CreateImagesAndViews( VkExtent2D _extent);
+		bool CreatePipeline(		VkExtent2D _extent );
+		void CreateImagesAndViews(	VkExtent2D _extent);
 		void CreateVertexBuffer();		
 
 		void DeleteImages();

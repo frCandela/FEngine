@@ -17,6 +17,9 @@
     <Filter Include="Fichiers d%27en-tête\util">
       <UniqueIdentifier>{26735d92-fe63-4ca4-a659-b6baa31d270a}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Fichiers d%27en-tête\vulkan\pipelines">
+      <UniqueIdentifier>{5626cd8c-7763-4394-aa32-3d7e1ce08b06}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="code\main.cpp">
@@ -79,8 +82,11 @@
     <ClCompile Include="deps\imgui\imgui_draw.cpp">
       <Filter>Fichiers d%27en-tête\deps</Filter>
     </ClCompile>
+    <ClCompile Include="code\vulkan\vkForwardPipeline.cpp">
+      <Filter>Fichiers d%27en-tête\vulkan\pipelines</Filter>
+    </ClCompile>
     <ClCompile Include="code\vulkan\vkPostprocessPipeline.cpp">
-      <Filter>Fichiers d%27en-tête\vulkan</Filter>
+      <Filter>Fichiers d%27en-tête\vulkan\pipelines</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -135,11 +141,14 @@
     <ClInclude Include="code\Includes.h">
       <Filter>Fichiers d%27en-tête</Filter>
     </ClInclude>
-    <ClInclude Include="code\vulkan\vkImguiPipeline.h">
-      <Filter>Fichiers d%27en-tête\vulkan</Filter>
+    <ClInclude Include="code\vulkan\vkForwardPipeline.h">
+      <Filter>Fichiers d%27en-tête\vulkan\pipelines</Filter>
     </ClInclude>
     <ClInclude Include="code\vulkan\vkPostprocessPipeline.h">
-      <Filter>Fichiers d%27en-tête\vulkan</Filter>
+      <Filter>Fichiers d%27en-tête\vulkan\pipelines</Filter>
+    </ClInclude>
+    <ClInclude Include="code\vulkan\vkImguiPipeline.h">
+      <Filter>Fichiers d%27en-tête\vulkan\pipelines</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

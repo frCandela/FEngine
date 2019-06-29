@@ -89,6 +89,7 @@
     <ClCompile Include="code\util\Time.cpp" />
     <ClCompile Include="code\vulkan\vkBuffer.cpp" />
     <ClCompile Include="code\vulkan\vkDevice.cpp" />
+    <ClCompile Include="code\vulkan\vkForwardPipeline.cpp" />
     <ClCompile Include="code\vulkan\vkFramebuffer.cpp" />
     <ClCompile Include="code\vulkan\vkImage.cpp" />
     <ClCompile Include="code\vulkan\vkImageView.cpp" />
@@ -110,6 +111,7 @@
     <ClInclude Include="code\Includes.h" />
     <ClInclude Include="code\util\glfwInput.h" />
     <ClInclude Include="code\util\Time.h" />
+    <ClInclude Include="code\vulkan\vkForwardPipeline.h" />
     <ClInclude Include="code\vulkan\vkImguiPipeline.h" />
     <ClInclude Include="code\vulkan\vkBuffer.h" />
     <ClInclude Include="code\vulkan\vkDevice.h" />

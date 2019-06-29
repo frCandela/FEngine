@@ -1,124 +1,116 @@
 #include "Includes.h"
 
-#include "vulkan/vkPostprocessPipeline.h"
+#include "vulkan/vkForwardPipeline.h"
 #include "vulkan/vkDevice.h"
 #include "vulkan/vkShader.h"
-#include "vulkan/vkSampler.h"
 #include "vulkan/vkImage.h"
 #include "vulkan/vkImageView.h" 
 #include "vulkan/vkBuffer.h"
 #include "vulkan/vkRenderer.h"
+#include "vulkan/vkVertex.h"
 
-namespace vk {	
-	
+namespace vk {
 	//================================================================================================================================
 	//================================================================================================================================
-	PostprocessPipeline::PostprocessPipeline(Device& _device, VkRenderPass& _renderPass) :
-	m_device( _device )
-	, m_renderPass(_renderPass){
+	ForwardPipeline::ForwardPipeline(Device& _device, VkRenderPass& _renderPass) :
+		m_device(_device)
+		, m_renderPass(_renderPass) {
 
-		m_uniforms.color = glm::vec4(1, 1, 1, 1);
-
-		//Sampler
-		m_sampler = new Sampler(m_device);
-		m_sampler->CreateSampler(0, 1.f);
-
-		CreateShaders();
 	}
-	
+
 	//================================================================================================================================
 	//================================================================================================================================
-	PostprocessPipeline::~PostprocessPipeline() {
+	ForwardPipeline::~ForwardPipeline() {
 		DeletePipeline();
+		DeleteDepthRessources();
 		DeleteDescriptors();
-		DeleteImages();
+		delete m_indexBuffer;
 		delete m_vertexBuffer;
-		delete m_sampler;
 		delete m_fragmentShader;
 		delete m_vertexShader;
 	}
-
+	
 	//================================================================================================================================
 	//================================================================================================================================
-	bool PostprocessPipeline::Create( const VkFormat _format, VkExtent2D _extent) {
-		m_format = _format;
-
-		CreateVertexBuffer();
-		CreateImagesAndViews(_extent);
+	void ForwardPipeline::Create( VkExtent2D _extent) {
+		CreateShaders();
+		CreateDepthRessources(_extent);
 		CreateDescriptors();
-		CreatePipeline(_extent );
-
-		return true;
+		CreatePipeline(_extent);
+		CreateVertexBuffers();
 	}
 
-	void PostprocessPipeline::Resize( VkExtent2D _extent) {
-		DeleteImages();
+	//================================================================================================================================
+	//================================================================================================================================
+	void ForwardPipeline::Resize(VkExtent2D _extent) {
+		DeleteDepthRessources();
 		DeleteDescriptors();
 		DeletePipeline();
 
-		CreateImagesAndViews(_extent);
+		CreateDepthRessources(_extent);
 		CreateDescriptors();
 		CreatePipeline(_extent);
 	}
 
-	void PostprocessPipeline::Draw(VkCommandBuffer _commandBuffer) {
+	//================================================================================================================================
+	//================================================================================================================================
+	void ForwardPipeline::ReloadShaders() {
+		m_vertexShader->Reload();
+		m_fragmentShader->Reload();
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
+	VkImageView	ForwardPipeline::GetDepthImageView() {
+		return m_depthImageView->GetImageView();
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
+	void ForwardPipeline::SetUniforms(const Uniforms _uniforms) {
+		m_uniforms = _uniforms;
+		m_uniformBuffer->SetData(&m_uniforms, sizeof(m_uniforms));
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
+	void ForwardPipeline::Draw(VkCommandBuffer _commandBuffer) {
 		vkCmdBindPipeline(_commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, m_pipeline);
 
 		VkBuffer vertexBuffers[] = { m_vertexBuffer->GetBuffer() };
 
 		VkDeviceSize offsets[] = { 0 };
 		vkCmdBindVertexBuffers(_commandBuffer, 0, 1, vertexBuffers, offsets);
+		vkCmdBindIndexBuffer(_commandBuffer, m_indexBuffer->GetBuffer(), 0, VK_INDEX_TYPE_UINT32);
 		vkCmdBindDescriptorSets(_commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, m_pipelineLayout, 0, 1, &m_descriptorSet, 0, nullptr);
-		vkCmdDraw(_commandBuffer, static_cast<uint32_t>(4), 1, 0, 0);
+		vkCmdDrawIndexed(_commandBuffer, static_cast<uint32_t>(m_indices.size()), 1, 0, 0, 0);
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void PostprocessPipeline::SetUniforms(const UniformsPostprocess _uniforms) {
-		m_uniforms = _uniforms;
-		m_uniformBuffer->SetData(&m_uniforms, sizeof(m_uniforms));
-	}
-	//================================================================================================================================
-	//================================================================================================================================
-	VkImageView PostprocessPipeline::GetImageView() { return m_imageView->GetImageView(); }
+	void ForwardPipeline::CreateShaders() {
+		delete m_fragmentShader;
+		delete m_vertexShader;
 
-	//================================================================================================================================
-	//================================================================================================================================
-	void PostprocessPipeline::CreateShaders() {
 		m_fragmentShader = new Shader(m_device);
-		m_fragmentShader->Create("shaders/postprocess.frag");
+		m_fragmentShader->Create("shaders/forward.frag");
 
 		m_vertexShader = new Shader(m_device);
-		m_vertexShader->Create("shaders/postprocess.vert");
+		m_vertexShader->Create("shaders/forward.vert");
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void PostprocessPipeline::ReloadShaders() {
-		m_fragmentShader->Reload();
-		m_vertexShader->Reload();
-	}
-
-	//================================================================================================================================
-	//================================================================================================================================
-	bool PostprocessPipeline::CreateDescriptors() {
-		VkDescriptorSetLayoutBinding imageSamplerLayoutBinding;
-		imageSamplerLayoutBinding.binding = 0;
-		imageSamplerLayoutBinding.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
-		imageSamplerLayoutBinding.descriptorCount = 1;
-		imageSamplerLayoutBinding.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT;
-		imageSamplerLayoutBinding.pImmutableSamplers = nullptr;
-
-		VkDescriptorSetLayoutBinding uniformsLayoutBinding;
-		uniformsLayoutBinding.binding = 1;
-		uniformsLayoutBinding.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
-		uniformsLayoutBinding.descriptorCount = 1;
-		uniformsLayoutBinding.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT;
-		uniformsLayoutBinding.pImmutableSamplers = nullptr;
+	bool ForwardPipeline::CreateDescriptors() {
+		VkDescriptorSetLayoutBinding uboLayoutBinding;
+		uboLayoutBinding.binding = 0;
+		uboLayoutBinding.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+		uboLayoutBinding.descriptorCount = 1;
+		uboLayoutBinding.stageFlags = VK_SHADER_STAGE_VERTEX_BIT;
+		uboLayoutBinding.pImmutableSamplers = nullptr;
 
 		std::vector< VkDescriptorSetLayoutBinding > layoutBindings = {
-			imageSamplerLayoutBinding
-			, uniformsLayoutBinding
+			uboLayoutBinding
 		};
 
 		VkDescriptorSetLayoutCreateInfo descriptorSetLayoutCreateInfo = {};
@@ -134,11 +126,9 @@ namespace vk {
 		}
 		std::cout << std::hex << "VkDescriptorSetLayout\t" << m_descriptorSetLayout << std::dec << std::endl;
 
-		std::vector< VkDescriptorPoolSize > poolSizes(2);
-		poolSizes[0].type = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+		std::vector< VkDescriptorPoolSize > poolSizes(1);
+		poolSizes[0].type = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
 		poolSizes[0].descriptorCount = 1;
-		poolSizes[1].type = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
-		poolSizes[1].descriptorCount = 1;
 
 		VkDescriptorPoolCreateInfo descriptorPoolCreateInfo = {};
 		descriptorPoolCreateInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
@@ -152,7 +142,7 @@ namespace vk {
 			std::cout << "Could not allocate descriptor pool." << std::endl;
 			return false;
 		}
-		std::cout << std::hex << "VkDescriptorPoolpp\t" << m_descriptorPool << std::dec << std::endl;
+		std::cout << std::hex << "VkDescriptorPool\t" << m_descriptorPool << std::dec << std::endl;
 
 		std::vector< VkDescriptorSetLayout > descriptorSetLayouts = {
 			m_descriptorSetLayout
@@ -173,47 +163,31 @@ namespace vk {
 		m_descriptorSet = descriptorSets[0];
 		std::cout << std::hex << "VkDescriptorSet\t\t" << m_descriptorSet << std::dec << std::endl;
 
-		VkDescriptorImageInfo descriptorImageInfo = {};
-		descriptorImageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
-		descriptorImageInfo.imageView = m_imageView->GetImageView();
-		descriptorImageInfo.sampler = m_sampler->GetSampler();
-
-		VkWriteDescriptorSet imageSamplerWriteDescriptorSet = {};
-		imageSamplerWriteDescriptorSet.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-		imageSamplerWriteDescriptorSet.pNext = nullptr;
-		imageSamplerWriteDescriptorSet.dstSet = m_descriptorSet;
-		imageSamplerWriteDescriptorSet.dstBinding = 0;
-		imageSamplerWriteDescriptorSet.dstArrayElement = 0;
-		imageSamplerWriteDescriptorSet.descriptorCount = 1;
-		imageSamplerWriteDescriptorSet.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
-		imageSamplerWriteDescriptorSet.pImageInfo = &descriptorImageInfo;
-		imageSamplerWriteDescriptorSet.pBufferInfo = nullptr;
-		//uboWriteDescriptorSet.pTexelBufferView = nullptr;
-
 		m_uniformBuffer = new Buffer(m_device);
 		m_uniformBuffer->Create(
-			sizeof(UniformsPostprocess),
+			sizeof(m_uniforms),
 			VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT,
 			VK_MEMORY_PROPERTY_HOST_COHERENT_BIT | VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT
 		);
 
-		VkDescriptorBufferInfo uniformsDescriptorBufferInfo = {};
-		uniformsDescriptorBufferInfo.buffer = m_uniformBuffer->GetBuffer();
-		uniformsDescriptorBufferInfo.offset = 0;
-		uniformsDescriptorBufferInfo.range = sizeof(UniformsPostprocess);
+		VkDescriptorBufferInfo uboDescriptorBufferInfo = {};
+		uboDescriptorBufferInfo.buffer = m_uniformBuffer->GetBuffer();
+		uboDescriptorBufferInfo.offset = 0;
+		uboDescriptorBufferInfo.range = sizeof(m_uniforms);
 
-		VkWriteDescriptorSet uniformsWriteDescriptorSet = {};
-		uniformsWriteDescriptorSet.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-		uniformsWriteDescriptorSet.pNext = nullptr;
-		uniformsWriteDescriptorSet.dstSet = m_descriptorSet;
-		uniformsWriteDescriptorSet.dstBinding = 1;
-		uniformsWriteDescriptorSet.dstArrayElement = 0;
-		uniformsWriteDescriptorSet.descriptorCount = 1;
-		uniformsWriteDescriptorSet.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
-		uniformsWriteDescriptorSet.pImageInfo = nullptr;
-		uniformsWriteDescriptorSet.pBufferInfo = &uniformsDescriptorBufferInfo;
+		VkWriteDescriptorSet uboWriteDescriptorSet = {};
+		uboWriteDescriptorSet.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+		uboWriteDescriptorSet.pNext = nullptr;
+		uboWriteDescriptorSet.dstSet = m_descriptorSet;
+		uboWriteDescriptorSet.dstBinding = 0;
+		uboWriteDescriptorSet.dstArrayElement = 0;
+		uboWriteDescriptorSet.descriptorCount = 1;
+		uboWriteDescriptorSet.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+		uboWriteDescriptorSet.pImageInfo = nullptr;
+		uboWriteDescriptorSet.pBufferInfo = &uboDescriptorBufferInfo;
+		//uboWriteDescriptorSet.pTexelBufferView = nullptr;
 
-		std::vector<VkWriteDescriptorSet> writeDescriptors = { imageSamplerWriteDescriptorSet, uniformsWriteDescriptorSet };
+		std::vector<VkWriteDescriptorSet> writeDescriptors = { uboWriteDescriptorSet };
 
 		vkUpdateDescriptorSets(
 			m_device.vkDevice,
@@ -228,7 +202,23 @@ namespace vk {
 
 	//================================================================================================================================
 	//================================================================================================================================
-	bool PostprocessPipeline::CreatePipeline( VkExtent2D _extent ) {
+	bool ForwardPipeline::CreateDepthRessources( VkExtent2D _extent ) {
+		VkFormat depthFormat = m_device.FindDepthFormat();
+		m_depthImage = new Image(m_device);
+		m_depthImageView = new ImageView(m_device);
+		m_depthImage->Create(depthFormat, _extent, VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
+		m_depthImageView->Create(m_depthImage->GetImage(), depthFormat, VK_IMAGE_ASPECT_DEPTH_BIT, VK_IMAGE_VIEW_TYPE_2D);
+
+		VkCommandBuffer cmd = Renderer::GetGlobalRenderer()->BeginSingleTimeCommands();
+		m_depthImage->TransitionImageLayout(cmd, depthFormat, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL, 1);
+		Renderer::GetGlobalRenderer()->EndSingleTimeCommands(cmd);
+
+		return true;
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
+	bool ForwardPipeline::CreatePipeline( VkExtent2D _extent ) {
 		VkPipelineShaderStageCreateInfo vertshaderStageCreateInfos = {};
 		vertshaderStageCreateInfos.sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
 		vertshaderStageCreateInfos.pNext = nullptr;
@@ -248,17 +238,8 @@ namespace vk {
 		fragShaderStageCreateInfos.pSpecializationInfo = nullptr;
 
 		std::vector < VkPipelineShaderStageCreateInfo> shaderStages = { vertshaderStageCreateInfos, fragShaderStageCreateInfos };
-
-		std::vector <VkVertexInputBindingDescription> bindingDescription(1);
-		bindingDescription[0].binding = 0;								// Index of the binding in the array of bindings
-		bindingDescription[0].stride = sizeof(glm::vec3);					// Number of bytes from one entry to the next
-		bindingDescription[0].inputRate = VK_VERTEX_INPUT_RATE_VERTEX;
-
-		std::vector<VkVertexInputAttributeDescription> attributeDescriptions(1);
-		attributeDescriptions[0].binding = 0;
-		attributeDescriptions[0].location = 0;
-		attributeDescriptions[0].format = VK_FORMAT_R32G32B32_SFLOAT;
-		attributeDescriptions[0].offset = 0;
+		std::vector < VkVertexInputBindingDescription > bindingDescription = Vertex::GetBindingDescription();
+		std::vector < VkVertexInputAttributeDescription > attributeDescriptions = Vertex::GetAttributeDescriptions();
 
 		VkPipelineVertexInputStateCreateInfo vertexInputStateCreateInfo = {};
 		vertexInputStateCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
@@ -266,21 +247,21 @@ namespace vk {
 		vertexInputStateCreateInfo.flags = 0;
 		vertexInputStateCreateInfo.vertexBindingDescriptionCount = static_cast<uint32_t>(bindingDescription.size());
 		vertexInputStateCreateInfo.pVertexBindingDescriptions = bindingDescription.data();
-		vertexInputStateCreateInfo.vertexAttributeDescriptionCount = static_cast<uint32_t>(attributeDescriptions.size());
+		vertexInputStateCreateInfo.vertexAttributeDescriptionCount = static_cast<uint32_t>(attributeDescriptions.size());;
 		vertexInputStateCreateInfo.pVertexAttributeDescriptions = attributeDescriptions.data();
 
 		VkPipelineInputAssemblyStateCreateInfo inputAssemblyStateCreateInfo = {};
 		inputAssemblyStateCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO;
 		inputAssemblyStateCreateInfo.pNext = nullptr;
 		inputAssemblyStateCreateInfo.flags = 0;
-		inputAssemblyStateCreateInfo.topology = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_STRIP;
+		inputAssemblyStateCreateInfo.topology = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST;
 		inputAssemblyStateCreateInfo.primitiveRestartEnable = VK_FALSE;
 
 		std::vector< VkViewport > viewports(1);
 		viewports[0].x = 0.f;
 		viewports[0].y = 0.f;
-		viewports[0].width = static_cast<float> (_extent.width );
-		viewports[0].height = static_cast<float> (_extent.height );
+		viewports[0].width = static_cast<float> (_extent.width);
+		viewports[0].height = static_cast<float> (_extent.height);
 		viewports[0].minDepth = 0.0f;
 		viewports[0].maxDepth = 1.0f;
 
@@ -304,7 +285,7 @@ namespace vk {
 		rasterizationStateCreateInfo.depthClampEnable = VK_FALSE;
 		rasterizationStateCreateInfo.rasterizerDiscardEnable = VK_FALSE;
 		rasterizationStateCreateInfo.polygonMode = VK_POLYGON_MODE_FILL;
-		rasterizationStateCreateInfo.cullMode = VK_CULL_MODE_NONE;
+		rasterizationStateCreateInfo.cullMode = VK_CULL_MODE_BACK_BIT;
 		rasterizationStateCreateInfo.frontFace = VK_FRONT_FACE_COUNTER_CLOCKWISE;
 		rasterizationStateCreateInfo.depthBiasEnable = VK_FALSE;
 		rasterizationStateCreateInfo.depthBiasConstantFactor = 0.0f;
@@ -439,49 +420,83 @@ namespace vk {
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void PostprocessPipeline::CreateImagesAndViews(  VkExtent2D _extent) {
+	void ForwardPipeline::CreateVertexBuffers() {
 
-		m_image = new Image(m_device);
-		m_image->Create(
-			m_format,
-			_extent,
-			VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT | VK_IMAGE_USAGE_STORAGE_BIT | VK_IMAGE_USAGE_INPUT_ATTACHMENT_BIT | VK_IMAGE_USAGE_SAMPLED_BIT,
-			VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT
-		);
-		m_imageView = new ImageView(m_device);
-		m_imageView->Create(m_image->GetImage(), m_format, VK_IMAGE_ASPECT_COLOR_BIT, VK_IMAGE_VIEW_TYPE_2D);
-	}
+		delete m_indexBuffer;
+		delete m_vertexBuffer;
 
-	void PostprocessPipeline::CreateVertexBuffer() {
-		// Vertex quad
-		glm::vec3 v0 = { -1.0f, -1.0f, 0.0f };
-		glm::vec3 v1 = { -1.0f, 1.0f, 0.0f };
-		glm::vec3 v2 = { 1.0f, -1.0f, 0.0f };
-		glm::vec3 v3 = { 1.0f, 1.0f, 0.0f };
-		std::vector<glm::vec3> vertices = { v0, v1 ,v2 ,v3 };
+		{
+			m_indices = { //cube
+				 0,1,2	,1,3,2	// top
+				,6,5,4	,7,5,6	// bot
+				,7,6,2	,7,2,3
+				,6,4,0	,6,0,2
+				,4,5,0	,5,1,0
+				,7,1,5	,7,3,1
+			};
 
-		const VkDeviceSize size = sizeof(vertices[0]) * vertices.size();
-		m_vertexBuffer = new Buffer(m_device);
-		m_vertexBuffer->Create(
-			size,
-			VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_VERTEX_BUFFER_BIT,
-			VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT
-		);
-		Buffer stagingBuffer(m_device);
-		stagingBuffer.Create(
-			size,
-			VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
-			VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT
-		);
-		stagingBuffer.SetData(vertices.data(), size);
-		VkCommandBuffer cmd = Renderer::GetGlobalRenderer()->BeginSingleTimeCommands();
-		stagingBuffer.CopyBufferTo(cmd, m_vertexBuffer->GetBuffer(), size);
-		Renderer::GetGlobalRenderer()->EndSingleTimeCommands(cmd);
+			const VkDeviceSize size = sizeof(m_indices[0]) * m_indices.size();
+
+			m_indexBuffer = new Buffer(m_device);
+			m_indexBuffer->Create(
+				size,
+				VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_INDEX_BUFFER_BIT,
+				VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT
+			);
+			Buffer stagingBuffer(m_device);
+			stagingBuffer.Create(
+				size,
+				VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
+				VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT
+			);
+			stagingBuffer.SetData(m_indices.data(), size);
+			VkCommandBuffer cmd = Renderer::GetGlobalRenderer()->BeginSingleTimeCommands();
+			stagingBuffer.CopyBufferTo(cmd, m_indexBuffer->GetBuffer(), size);
+			Renderer::GetGlobalRenderer()->EndSingleTimeCommands(cmd);
+		}
+		{
+			glm::vec3 color(0.f, 0.2, 0.f);
+
+			Vertex v0 = { { +0.5,+0.5,+0.5},	color,{} };
+			Vertex v1 = { { +0.5,+0.5,-0.5},	color,{} };
+			Vertex v2 = { { -0.5,+0.5,+0.5},	color,{} };
+			Vertex v3 = { { -0.5,+0.5,-0.5},	color,{} };
+			Vertex v4 = { { +0.5,-0.5,+0.5},	color,{} };
+			Vertex v5 = { { +0.5,-0.5,-0.5},	color,{} };
+			Vertex v6 = { { -0.5,-0.5,+0.5},	color,{} };
+			Vertex v7 = { { -0.5,-0.5,-0.5},	color,{} };
+			m_vertices = { v0, v1 ,v2 ,v3 ,v4 ,v5 ,v6 ,v7 };
+
+			const VkDeviceSize size = sizeof(m_vertices[0]) * m_vertices.size();
+			m_vertexBuffer = new Buffer(m_device);
+			m_vertexBuffer->Create(
+				size,
+				VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_VERTEX_BUFFER_BIT,
+				VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT
+			);
+			Buffer stagingBuffer2(m_device);
+			stagingBuffer2.Create(
+				size,
+				VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
+				VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT
+			);
+			stagingBuffer2.SetData(m_vertices.data(), size);
+			VkCommandBuffer cmd2 = Renderer::GetGlobalRenderer()->BeginSingleTimeCommands();
+			stagingBuffer2.CopyBufferTo(cmd2, m_vertexBuffer->GetBuffer(), size);
+			Renderer::GetGlobalRenderer()->EndSingleTimeCommands(cmd2);
+		}
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void PostprocessPipeline::DeletePipeline() {
+	void ForwardPipeline::DeleteDepthRessources() {
+		delete m_depthImageView;
+		delete m_depthImage;
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
+	void ForwardPipeline::DeletePipeline() {
 		if (m_pipelineLayout != VK_NULL_HANDLE) {
 			vkDestroyPipelineLayout(m_device.vkDevice, m_pipelineLayout, nullptr);
 			m_pipelineLayout = VK_NULL_HANDLE;
@@ -495,15 +510,7 @@ namespace vk {
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void PostprocessPipeline::DeleteImages() {
-		delete m_imageView;
-		delete m_image;
-
-	}
-
-	//================================================================================================================================
-	//================================================================================================================================
-	void PostprocessPipeline::DeleteDescriptors() {
+	void ForwardPipeline::DeleteDescriptors() {
 
 		if (m_descriptorPool != VK_NULL_HANDLE) {
 			vkDestroyDescriptorPool(m_device.vkDevice, m_descriptorPool, nullptr);
@@ -515,5 +522,5 @@ namespace vk {
 			m_descriptorSetLayout = VK_NULL_HANDLE;
 		}
 		delete m_uniformBuffer;
-	}	
+	}
 }
