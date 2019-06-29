@@ -1,12 +1,12 @@
 #include "Includes.h"
 
-#include "vulkan/vkPostprocessPipeline.h"
-#include "vulkan/vkDevice.h"
-#include "vulkan/vkShader.h"
-#include "vulkan/vkSampler.h"
-#include "vulkan/vkImage.h"
-#include "vulkan/vkImageView.h" 
-#include "vulkan/vkBuffer.h"
+#include "vulkan/pipelines/vkPostprocessPipeline.h"
+#include "vulkan/core/vkDevice.h"
+#include "vulkan/core/vkShader.h"
+#include "vulkan/core/vkSampler.h"
+#include "vulkan/core/vkImage.h"
+#include "vulkan/core/vkImageView.h" 
+#include "vulkan/core/vkBuffer.h"
 #include "vulkan/vkRenderer.h"
 
 namespace vk {	

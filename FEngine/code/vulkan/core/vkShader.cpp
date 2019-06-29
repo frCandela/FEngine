@@ -1,8 +1,8 @@
 #include "Includes.h"
 
-#include "vulkan/vkShader.h"
-#include "vulkan/vkDevice.h"
-#include "vkSpirvCompiler.h"
+#include "vulkan/core/vkShader.h"
+#include "vulkan/core/vkDevice.h"
+#include "vulkan/util/vkSpirvCompiler.h"
 
 namespace vk {
 

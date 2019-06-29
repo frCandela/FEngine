@@ -21,7 +21,7 @@ namespace vk {
 		ForwardPipeline(Device& _device, VkRenderPass& _renderPass);
 		~ForwardPipeline();
 
-		void Create( VkExtent2D _extent);
+		void Create( VkExtent2D _extent );
 		void Draw(VkCommandBuffer _commandBuffer);
 		void Resize(VkExtent2D _extent);
 		void ReloadShaders();

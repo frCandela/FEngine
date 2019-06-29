@@ -36,13 +36,12 @@ namespace vk {
 
 		ImguiPipeline *			m_imguiPipeline;
 		PostprocessPipeline *	m_postprocessPipeline;
-		ForwardPipeline * m_forwardPipeline;
-
-		VkCommandPool	m_commandPool;
+		ForwardPipeline *		m_forwardPipeline;
 
 		VkRenderPass	m_renderPass;
 		VkRenderPass	m_renderPassPostprocess;
 
+		VkCommandPool	m_commandPool;
 		std::vector<VkCommandBuffer> m_primaryCommandBuffers;
 		std::vector<VkCommandBuffer> m_geometryCommandBuffers;
 		std::vector<VkCommandBuffer> m_imguiCommandBuffers;
@@ -70,14 +69,13 @@ namespace vk {
 		bool CreateCommandPool();
 		bool CreateRenderPass();
 		bool CreateRenderPassPostprocess();
-
-		void CreateFramebuffers();
+		void CreateForwardFramebuffers();
 		void CreateSwapchainFramebuffers();
 
 		void DeleteCommandPool();
 		void DeleteRenderPass();
 		void DeleteRenderPassPostprocess();
-		void DeleteFramebuffers();
+		void DeleteForwardFramebuffers();
 		void DeleteSwapchainFramebuffers();
 	};
 }

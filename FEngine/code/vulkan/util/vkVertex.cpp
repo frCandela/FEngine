@@ -1,6 +1,6 @@
 #include "Includes.h"
 
-#include "vulkan/vkVertex.h"
+#include "vulkan/util/vkVertex.h"
 
 namespace vk {
 

@@ -1,8 +1,8 @@
 #include "Includes.h"
 
-#include "vulkan/vkTexture.h"
-#include "vulkan/vkDevice.h"
-#include "vulkan/vkBuffer.h"
+#include "vulkan/core/vkTexture.h"
+#include "vulkan/core/vkDevice.h"
+#include "vulkan/core/vkBuffer.h"
 #include "vulkan/vkRenderer.h"
 
 #pragma warning(push, 0)   

@@ -1,7 +1,7 @@
 #include "Includes.h"
 
-#include "vulkan/vkBuffer.h"
-#include "vulkan/vkDevice.h"
+#include "vulkan/core/vkBuffer.h"
+#include "vulkan/core/vkDevice.h"
 
 namespace vk {
 	//================================================================================================================================

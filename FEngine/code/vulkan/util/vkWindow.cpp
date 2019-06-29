@@ -1,6 +1,6 @@
 #include "Includes.h"
 
-#include "vulkan/vkWindow.h"
+#include "vulkan/util/vkWindow.h"
 
 namespace vk {
 

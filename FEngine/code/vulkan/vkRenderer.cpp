@@ -5,18 +5,18 @@
 #include "util/Time.h"
 #include "util/glfwInput.h"
 #include "util/glfwInput.h"
-#include "vulkan/vkInstance.h"
-#include "vulkan/vkDevice.h"
-#include "vulkan/vkWindow.h"
-#include "vulkan/vkSwapChain.h"
-#include "vulkan/vkBuffer.h"
-#include "vulkan/vkImage.h"
-#include "vulkan/vkImageView.h"
-#include "vulkan/vkShader.h"
-#include "vulkan/vkImguiPipeline.h"
-#include "vulkan/vkFrameBuffer.h"
-#include "vulkan/vkPostprocessPipeline.h"
-#include "vulkan/vkForwardPipeline.h"
+#include "vulkan/core/vkInstance.h"
+#include "vulkan/core/vkDevice.h"
+#include "vulkan/core/vkSwapChain.h"
+#include "vulkan/core/vkBuffer.h"
+#include "vulkan/core/vkImage.h"
+#include "vulkan/core/vkImageView.h"
+#include "vulkan/core/vkShader.h"
+#include "vulkan/core/vkFrameBuffer.h"
+#include "vulkan/pipelines/vkImguiPipeline.h"
+#include "vulkan/pipelines/vkPostprocessPipeline.h"
+#include "vulkan/pipelines/vkForwardPipeline.h"
+#include "vulkan/util/vkWindow.h"
 
 namespace vk {
 
@@ -30,12 +30,11 @@ namespace vk {
 		, m_device( * new Device(m_instance, m_window->GetSurface()))
 		, m_swapchain(new SwapChain(m_device ))
 	{
-		m_swapchain->Create(m_window->GetSurface(), _size);
-
-		Input::Setup(m_window->GetWindow());
-
 		ms_globalRenderer = this;
 		m_clearColor = glm::vec4(0.5, 0.5, 0.5, 1.f);
+
+		m_swapchain->Create(m_window->GetSurface(), _size);
+		Input::Setup(m_window->GetWindow());
 
 		CreateCommandPool();
 		CreateRenderPass();
@@ -47,16 +46,13 @@ namespace vk {
 		m_forwardPipeline = new ForwardPipeline(m_device, m_renderPass);
 		m_forwardPipeline->Create( m_swapchain->GetExtent());
 
-		CreateSwapchainFramebuffers();
-		CreateFramebuffers();
-		CreateCommandBuffers();
-
 		m_imguiPipeline = new ImguiPipeline(m_device, m_swapchain->GetSwapchainImagesCount());
-		glm::vec2 size = { m_swapchain->GetExtent().width, m_swapchain->GetExtent().height };
-		m_imguiPipeline->Create(size, m_window->GetWindow(), m_renderPass);
+		m_imguiPipeline->Create(m_renderPass, m_window->GetWindow(), m_swapchain->GetExtent());
 
+		CreateSwapchainFramebuffers();
+		CreateForwardFramebuffers();
+		CreateCommandBuffers();
 		RecordAllCommandBuffers();
-
 	}
 	
 	//================================================================================================================================
@@ -67,7 +63,7 @@ namespace vk {
 		delete m_imguiPipeline;
 		delete m_forwardPipeline;
 
-		DeleteFramebuffers();
+		DeleteForwardFramebuffers();
 		DeleteRenderPass();
 		DeleteRenderPassPostprocess();
 		DeleteCommandPool();
@@ -106,7 +102,7 @@ namespace vk {
 					std::cout << "suboptimal swapchain" << std::endl;
 					vkDeviceWaitIdle(m_device.vkDevice);
 
-					DeleteFramebuffers();
+					DeleteForwardFramebuffers();
 					DeleteSwapchainFramebuffers();
 
 					m_swapchain->Resize( m_window->GetExtent() );
@@ -114,7 +110,7 @@ namespace vk {
 					m_forwardPipeline->Resize(m_window->GetExtent());
 					
 					CreateSwapchainFramebuffers();		
-					CreateFramebuffers();
+					CreateForwardFramebuffers();
 					RecordAllCommandBuffers();
 					vkResetFences(m_device.vkDevice, 1, m_swapchain->GetCurrentInFlightFence());
 					m_swapchain->AcquireNextImage();
@@ -489,8 +485,8 @@ namespace vk {
 		m_postprocessPipeline->Resize(m_swapchain->GetExtent());
 		m_forwardPipeline->Resize(m_swapchain->GetExtent());
 
-		DeleteFramebuffers();
-		CreateFramebuffers();
+		DeleteForwardFramebuffers();
+		CreateForwardFramebuffers();
 		RecordAllCommandBuffers();
 	}	
 
@@ -706,7 +702,7 @@ namespace vk {
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void Renderer::CreateFramebuffers() {
+	void Renderer::CreateForwardFramebuffers() {
 		m_forwardFrameBuffers.resize(m_swapchain->GetSwapchainImagesCount());
 		for (int framebufferIndex = 0; framebufferIndex < m_forwardFrameBuffers.size(); framebufferIndex++) {
 			std::vector<VkImageView> attachments =
@@ -772,7 +768,7 @@ namespace vk {
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void Renderer::DeleteFramebuffers() {
+	void Renderer::DeleteForwardFramebuffers() {
 		for (int framebufferIndex = 0; framebufferIndex < m_forwardFrameBuffers.size(); framebufferIndex++) {
 			delete m_forwardFrameBuffers[framebufferIndex];
 		}
