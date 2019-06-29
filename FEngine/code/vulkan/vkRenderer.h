@@ -30,7 +30,7 @@ namespace vk {
 	private:
 		Instance *		m_instance;
 		Window *		m_window;
-		Device *		m_device;
+		Device &		m_device;
 		SwapChain  *	m_swapchain;
 		ImguiPipeline * m_imguiPipeline;
 		PostprocessPipeline * m_postprocessPipeline;
@@ -38,6 +38,7 @@ namespace vk {
 		VkCommandPool	m_commandPool;
 
 		VkRenderPass	m_renderPass;
+		VkRenderPass	m_renderPassPostprocess;
 
 		VkPipelineLayout	m_pipelineLayout;
 		VkPipeline			m_pipeline;
@@ -89,9 +90,10 @@ namespace vk {
 		bool SubmitCommandBuffers();
 		void ReloadShaders();
 
-		void RecordCommandBufferImgui(const int _index);
-		void RecordCommandBufferGeometry(const int _index);		
-		void RecordPrimaryCommandBuffer(const int _index);
+		void RecordCommandBufferPostProcess	( const int _index);
+		void RecordCommandBufferImgui		( const int _index);
+		void RecordCommandBufferGeometry	( const int _index);		
+		void RecordPrimaryCommandBuffer		( const int _index);
 		void RecordAllCommandBuffers();
 
 		void CreateShaders();
@@ -99,15 +101,16 @@ namespace vk {
 		bool CreateCommandBuffers();
 		bool CreateCommandPool();
 		bool CreateRenderPass();
+		bool CreateRenderPassPostprocess();
 		bool CreateDepthRessources();
 		bool CreatePipeline();
 		void CreateVertexBuffers();
-
 		void CreateFramebuffers();
 		void CreateSwapchainFramebuffers();
 
 		void DeleteCommandPool();
 		void DeleteRenderPass();
+		void DeleteRenderPassPostprocess();
 		void DeleteDepthRessources();
 		void DeleteFramebuffers();
 		void DeletePipeline();

@@ -8,7 +8,7 @@ namespace vk
 	class Texture
 	{
 	public:
-		Texture(Device * _device);
+		Texture(Device & _device);
 		~Texture();
 
 		void Load(void* _data, int width, int _height, uint32_t _mipLevels);
@@ -21,7 +21,7 @@ namespace vk
 		VkImage			m_image;
 		VkDeviceMemory	m_deviceMemory;
 		VkImageView		m_imageView;// images are accessed through image views rather than directly
-		Device *		m_device;
+		Device &		m_device;
 		uint32_t		m_mipLevels = 1;
 		uint32_t		m_layerCount = 1;
 		std::string		m_path;

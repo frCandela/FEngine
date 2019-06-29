@@ -10,7 +10,7 @@ namespace vk {
 		const GLFWwindow *	GetWindow() const	{ return m_window; }
 		GLFWwindow *		GetWindow()			{ return m_window; }
 		VkSurfaceKHR		GetSurface()		{ return m_surface; }
-		VkExtent2D			GetFramebufferSize();
+		VkExtent2D			GetExtent();
 
 
 	private:

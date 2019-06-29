@@ -7,7 +7,7 @@ namespace vk {
 
 	//================================================================================================================================
 	//================================================================================================================================
-	FrameBuffer::FrameBuffer(Device * _device) :
+	FrameBuffer::FrameBuffer(Device & _device) :
 		m_device(_device) {
 	}
 
@@ -15,7 +15,7 @@ namespace vk {
 	//================================================================================================================================
 	FrameBuffer::~FrameBuffer() {
 		if (m_framebuffer != VK_NULL_HANDLE) {
-			vkDestroyFramebuffer(m_device->vkDevice, m_framebuffer, nullptr);
+			vkDestroyFramebuffer(m_device.vkDevice, m_framebuffer, nullptr);
 			m_framebuffer = VK_NULL_HANDLE;
 		}
 	}
@@ -34,7 +34,7 @@ namespace vk {
 		framebufferCreateInfo.height = _size.height;
 		framebufferCreateInfo.layers = 1;
 
-		if (vkCreateFramebuffer(m_device->vkDevice, &framebufferCreateInfo, nullptr, &m_framebuffer) != VK_SUCCESS) {
+		if (vkCreateFramebuffer(m_device.vkDevice, &framebufferCreateInfo, nullptr, &m_framebuffer) != VK_SUCCESS) {
 			std::cout << "Could not create framebuffer" << std::endl;
 			return false;
 		}

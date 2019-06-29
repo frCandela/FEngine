@@ -7,7 +7,7 @@ namespace vk {
 
 	//================================================================================================================================
 	//================================================================================================================================
-	Image::Image(Device * _device) :
+	Image::Image(Device & _device) :
 		m_device(_device) {
 	}
 
@@ -15,13 +15,13 @@ namespace vk {
 	//================================================================================================================================
 	Image::~Image() {
 		if (m_image != VK_NULL_HANDLE) {
-			vkDestroyImage(m_device->vkDevice, m_image, nullptr);
+			vkDestroyImage(m_device.vkDevice, m_image, nullptr);
 			m_image = VK_NULL_HANDLE;
 
 		}
 
 		if (m_imageMemory != VK_NULL_HANDLE) {
-			vkFreeMemory(m_device->vkDevice, m_imageMemory, nullptr);
+			vkFreeMemory(m_device.vkDevice, m_imageMemory, nullptr);
 			m_imageMemory = VK_NULL_HANDLE;
 		}
 	}
@@ -49,25 +49,25 @@ namespace vk {
 		imageCreateInfo.pQueueFamilyIndices = nullptr;
 		imageCreateInfo.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
 
-		if (vkCreateImage(m_device->vkDevice, &imageCreateInfo, nullptr, &m_image) != VK_SUCCESS) {
+		if (vkCreateImage(m_device.vkDevice, &imageCreateInfo, nullptr, &m_image) != VK_SUCCESS) {
 			std::cout << "Could not allocate image" << std::endl;
 			return false;
 		}
 		VkMemoryRequirements memoryRequirements;
-		vkGetImageMemoryRequirements(m_device->vkDevice, m_image, &memoryRequirements);
+		vkGetImageMemoryRequirements(m_device.vkDevice, m_image, &memoryRequirements);
 
 		VkMemoryAllocateInfo bufferMemoryAllocateInfo;
 		bufferMemoryAllocateInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
 		bufferMemoryAllocateInfo.pNext = nullptr;
 		bufferMemoryAllocateInfo.allocationSize = memoryRequirements.size;
-		bufferMemoryAllocateInfo.memoryTypeIndex = m_device->FindMemoryType(memoryRequirements.memoryTypeBits, _memoryProperties);
+		bufferMemoryAllocateInfo.memoryTypeIndex = m_device.FindMemoryType(memoryRequirements.memoryTypeBits, _memoryProperties);
 
-		if (vkAllocateMemory(m_device->vkDevice, &bufferMemoryAllocateInfo, nullptr, &m_imageMemory) != VK_SUCCESS) {
+		if (vkAllocateMemory(m_device.vkDevice, &bufferMemoryAllocateInfo, nullptr, &m_imageMemory) != VK_SUCCESS) {
 			std::cout << "Could not allocate buffer" << std::endl;
 			return false;
 		}
 
-		if (vkBindImageMemory(m_device->vkDevice, m_image, m_imageMemory, 0) != VK_SUCCESS) {
+		if (vkBindImageMemory(m_device.vkDevice, m_image, m_imageMemory, 0) != VK_SUCCESS) {
 			std::cout << "Could not bind memory to image" << std::endl;
 			return false;
 		}

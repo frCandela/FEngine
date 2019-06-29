@@ -7,7 +7,7 @@ namespace vk {
 
 	//================================================================================================================================
 	//================================================================================================================================
-	ImageView::ImageView(Device * _device) :
+	ImageView::ImageView(Device & _device) :
 		m_device(_device) {
 	}
 
@@ -15,7 +15,7 @@ namespace vk {
 	//================================================================================================================================
 	ImageView::~ImageView() {
 		if (m_imageView != VK_NULL_HANDLE) {
-			vkDestroyImageView(m_device->vkDevice, m_imageView, nullptr);
+			vkDestroyImageView(m_device.vkDevice, m_imageView, nullptr);
 			m_imageView = VK_NULL_HANDLE;
 		}
 	}
@@ -41,7 +41,7 @@ namespace vk {
 		imageViewCreateInfo.subresourceRange.baseArrayLayer = 0;
 		imageViewCreateInfo.subresourceRange.layerCount = VK_REMAINING_ARRAY_LAYERS;
 
-		VkResult result = vkCreateImageView(m_device->vkDevice, &imageViewCreateInfo, nullptr, &m_imageView);
+		VkResult result = vkCreateImageView(m_device.vkDevice, &imageViewCreateInfo, nullptr, &m_imageView);
 		std::cout << std::hex << "VkImageView\t\t" << m_imageView << std::dec << std::endl;
 		return result == VK_SUCCESS;
 	}

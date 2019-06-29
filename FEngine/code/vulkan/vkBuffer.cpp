@@ -6,7 +6,7 @@
 namespace vk {
 	//================================================================================================================================
 	//================================================================================================================================
-	Buffer::Buffer(Device * _device) :
+	Buffer::Buffer(Device & _device) :
 		m_device(_device) {
 	}
 
@@ -20,12 +20,12 @@ namespace vk {
 	//================================================================================================================================
 	void Buffer::Destroy() {
 		if (m_memory != VK_NULL_HANDLE) {
-			vkFreeMemory(m_device->vkDevice, m_memory, nullptr);
+			vkFreeMemory(m_device.vkDevice, m_memory, nullptr);
 			m_memory = VK_NULL_HANDLE;
 		}
 
 		if (m_buffer != VK_NULL_HANDLE) {
-			vkDestroyBuffer(m_device->vkDevice, m_buffer, nullptr);
+			vkDestroyBuffer(m_device.vkDevice, m_buffer, nullptr);
 			m_buffer = VK_NULL_HANDLE;
 		}
 	}
@@ -43,22 +43,22 @@ namespace vk {
 		bufferCreateInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
 		//bufferCreateInfo.queueFamilyIndexCount = 0;
 		//bufferCreateInfo.pQueueFamilyIndices = nullptr;
-		if (vkCreateBuffer(m_device->vkDevice, &bufferCreateInfo, nullptr, &m_buffer) != VK_SUCCESS) {
+		if (vkCreateBuffer(m_device.vkDevice, &bufferCreateInfo, nullptr, &m_buffer) != VK_SUCCESS) {
 			std::cout << "Could not create buffer" << std::endl;
 			return false;
 		}
 		//std::cout << std::hex << "VkBuffer\t\t" << m_buffer << std::dec << std::endl;
 
 		VkMemoryRequirements memoryRequirements;
-		vkGetBufferMemoryRequirements(m_device->vkDevice, m_buffer, &memoryRequirements);
+		vkGetBufferMemoryRequirements(m_device.vkDevice, m_buffer, &memoryRequirements);
 
 		VkMemoryAllocateInfo bufferMemoryAllocateInfo;
 		bufferMemoryAllocateInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
 		bufferMemoryAllocateInfo.pNext = nullptr;
 		bufferMemoryAllocateInfo.allocationSize = memoryRequirements.size;
-		bufferMemoryAllocateInfo.memoryTypeIndex = m_device->FindMemoryType(memoryRequirements.memoryTypeBits, _memoryProperties);
+		bufferMemoryAllocateInfo.memoryTypeIndex = m_device.FindMemoryType(memoryRequirements.memoryTypeBits, _memoryProperties);
 
-		if (vkAllocateMemory(m_device->vkDevice, &bufferMemoryAllocateInfo, nullptr, &m_memory) != VK_SUCCESS) {
+		if (vkAllocateMemory(m_device.vkDevice, &bufferMemoryAllocateInfo, nullptr, &m_memory) != VK_SUCCESS) {
 			std::cout << "Could not allocate buffer" << std::endl;
 			return false;
 		}
@@ -72,16 +72,16 @@ namespace vk {
 	//================================================================================================================================
 	//================================================================================================================================
 	void Buffer::SetData(const void * _data, VkDeviceSize _size) {
-		vkMapMemory(m_device->vkDevice, m_memory, 0, _size, 0, &m_mappedData);
+		vkMapMemory(m_device.vkDevice, m_memory, 0, _size, 0, &m_mappedData);
 		memcpy(m_mappedData, _data, _size);
-		vkUnmapMemory(m_device->vkDevice, m_memory);
+		vkUnmapMemory(m_device.vkDevice, m_memory);
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
 	VkResult Buffer::Bind(VkDeviceSize _offset)
 	{
-		VkResult result = vkBindBufferMemory(m_device->vkDevice, m_buffer, m_memory, _offset);
+		VkResult result = vkBindBufferMemory(m_device.vkDevice, m_buffer, m_memory, _offset);
 		if (result != VK_SUCCESS) {
 			std::cout << "Could not bind memory to buffer" << std::endl;
 		}
@@ -91,7 +91,7 @@ namespace vk {
 	//================================================================================================================================
 	//================================================================================================================================
 	VkResult Buffer::Map(VkDeviceSize _size , VkDeviceSize _offset) {
-		return vkMapMemory(m_device->vkDevice, m_memory, _offset, _size, 0, &m_mappedData);
+		return vkMapMemory(m_device.vkDevice, m_memory, _offset, _size, 0, &m_mappedData);
 	}
 
 	//================================================================================================================================
@@ -100,7 +100,7 @@ namespace vk {
 	{
 		if (m_mappedData && m_memory)
 		{
-			vkUnmapMemory(m_device->vkDevice, m_memory);
+			vkUnmapMemory(m_device.vkDevice, m_memory);
 			m_mappedData = nullptr;
 		}
 	}
@@ -114,7 +114,7 @@ namespace vk {
 		mappedRange.memory = m_memory;
 		mappedRange.offset = _offset;
 		mappedRange.size = _size;
-		return vkFlushMappedMemoryRanges(m_device->vkDevice, 1, &mappedRange);
+		return vkFlushMappedMemoryRanges(m_device.vkDevice, 1, &mappedRange);
 	}
 
 	//================================================================================================================================

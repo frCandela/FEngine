@@ -6,7 +6,7 @@ namespace vk {
 
 	class Image {
 	public:
-		Image(Device * _device);
+		Image(Device & _device);
 		~Image();
 		 
 		bool Create(VkFormat _format, VkExtent2D _size, VkImageUsageFlags _usage, VkMemoryPropertyFlags _memoryProperties);
@@ -14,7 +14,7 @@ namespace vk {
 
 		VkImage GetImage() { return m_image; }
 	private:
-		Device *		m_device;
+		Device &		m_device;
 
 		VkImage			m_image;
 		VkDeviceMemory	m_imageMemory;

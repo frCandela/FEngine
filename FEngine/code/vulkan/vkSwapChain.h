@@ -9,7 +9,7 @@ namespace vk {
 
 	class SwapChain {
 	public:
-		SwapChain(Device * _device );
+		SwapChain(Device & _device );
 		~SwapChain();
 
 		void Create( VkSurfaceKHR _surface, VkExtent2D _desiredSize );
@@ -33,7 +33,7 @@ namespace vk {
 		const int MAX_FRAMES_IN_FLIGHT = 3;
 	private:
 
-		Device *		m_device;
+		Device &		m_device;
 
 		VkSurfaceKHR	m_surface;
 		std::vector<VkPresentModeKHR>	m_supportedPresentModes;

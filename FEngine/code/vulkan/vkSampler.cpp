@@ -6,7 +6,7 @@
 namespace vk {
 	//================================================================================================================================
 	//================================================================================================================================
-	Sampler::Sampler(Device * _device) :
+	Sampler::Sampler(Device & _device) :
 		m_device(_device) {
 
 	}
@@ -14,7 +14,7 @@ namespace vk {
 	//================================================================================================================================
 	//================================================================================================================================
 	Sampler::~Sampler() {
-		vkDestroySampler(m_device->vkDevice, m_sampler, nullptr);
+		vkDestroySampler(m_device.vkDevice, m_sampler, nullptr);
 	}
 
 	//================================================================================================================================
@@ -40,7 +40,7 @@ namespace vk {
 		samplerInfo.maxLod = _maxLod;
 		samplerInfo.mipLodBias = 0;
 
-		if (vkCreateSampler(m_device->vkDevice, &samplerInfo, nullptr, &m_sampler) != VK_SUCCESS)
+		if (vkCreateSampler(m_device.vkDevice, &samplerInfo, nullptr, &m_sampler) != VK_SUCCESS)
 			throw std::runtime_error("failed to create texture sampler!");
 	}
 }

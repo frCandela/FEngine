@@ -27,7 +27,7 @@ namespace vk {
 	Renderer::Renderer(const VkExtent2D _size) :
 		m_instance(new Instance())
 		, m_window(new Window("Vulkan", _size, m_instance->vkInstance))
-		, m_device(new Device(m_instance, m_window->GetSurface()))
+		, m_device( * new Device(m_instance, m_window->GetSurface()))
 		, m_swapchain(new SwapChain(m_device ))
 	{
 		m_swapchain->Create(m_window->GetSurface(), _size);
@@ -39,12 +39,16 @@ namespace vk {
 
 
 		CreateCommandPool();
-		m_postprocessPipeline = new PostprocessPipeline(m_device);
-		m_postprocessPipeline->Create(m_swapchain->GetSurfaceFormat().format, m_swapchain->GetExtent());
+
+		CreateRenderPass();
+		CreateRenderPassPostprocess();
+
+		m_postprocessPipeline = new PostprocessPipeline(m_device, m_renderPassPostprocess);
+		m_postprocessPipeline->Create( m_swapchain->GetSurfaceFormat().format, m_swapchain->GetExtent());
 		CreateSwapchainFramebuffers();
 		CreateShaders();
 		
-		CreateRenderPass();
+
 		CreateDepthRessources();
 		CreateFramebuffers();
 		CreateCommandBuffers();
@@ -63,7 +67,7 @@ namespace vk {
 	//================================================================================================================================
 	//================================================================================================================================	
 	Renderer::~Renderer() {
-		vkDeviceWaitIdle(m_device->vkDevice);
+		vkDeviceWaitIdle(m_device.vkDevice);
 
 		delete m_imguiPipeline;
 
@@ -71,6 +75,7 @@ namespace vk {
 		DeleteFramebuffers();
 		DeleteDepthRessources();
 		DeleteRenderPass();
+		DeleteRenderPassPostprocess();
 		DeleteCommandPool();
 		DeleteDescriptors();
 		DeleteSwapchainFramebuffers();
@@ -81,7 +86,7 @@ namespace vk {
 		delete m_fragmentShader;
 		delete m_vertexShader;
 		delete m_swapchain;
-		delete m_device;
+		delete &m_device;
 		delete m_window;
 		delete m_instance;
 	}
@@ -105,39 +110,35 @@ namespace vk {
 
 				const VkResult result = m_swapchain->AcquireNextImage();
 				if (result == VK_ERROR_OUT_OF_DATE_KHR) {
-					if (m_window->GetFramebufferSize().width == 0 && m_window->GetFramebufferSize().height == 0) {
+					if (m_window->GetExtent().width == 0 && m_window->GetExtent().height == 0) {
 						continue;
 					}
 
 					std::cout << "suboptimal swapchain" << std::endl;
-					vkDeviceWaitIdle(m_device->vkDevice);
+					vkDeviceWaitIdle(m_device.vkDevice);
 
 					DeletePipeline();
 					DeleteFramebuffers();
 					DeleteDepthRessources();
 					DeleteSwapchainFramebuffers();
 
-					delete m_postprocessPipeline;
-
-					m_swapchain->Resize( m_window->GetFramebufferSize() );
-
-					m_postprocessPipeline = new PostprocessPipeline(m_device);
-					m_postprocessPipeline->Create(m_swapchain->GetSurfaceFormat().format, m_swapchain->GetExtent());
+					m_swapchain->Resize( m_window->GetExtent() );
+					m_postprocessPipeline->Resize(m_window->GetExtent());
 					
 					CreateSwapchainFramebuffers();
 					CreateDepthRessources();		
 					CreateFramebuffers();
 					CreatePipeline();
 					RecordAllCommandBuffers();
-					vkResetFences(m_device->vkDevice, 1, m_swapchain->GetCurrentInFlightFence());
+					vkResetFences(m_device.vkDevice, 1, m_swapchain->GetCurrentInFlightFence());
 					m_swapchain->AcquireNextImage();
 				}
 				else if (result != VK_SUCCESS) {
 					std::cout << "Could not acquire next image" << std::endl;
 				}
 				else {
-					vkWaitForFences(m_device->vkDevice, 1, m_swapchain->GetCurrentInFlightFence(), VK_TRUE, std::numeric_limits<uint64_t>::max());
-					vkResetFences(m_device->vkDevice, 1, m_swapchain->GetCurrentInFlightFence());
+					vkWaitForFences(m_device.vkDevice, 1, m_swapchain->GetCurrentInFlightFence(), VK_TRUE, std::numeric_limits<uint64_t>::max());
+					vkResetFences(m_device.vkDevice, 1, m_swapchain->GetCurrentInFlightFence());
 				}
 
 				ImGui::NewFrame();
@@ -189,7 +190,7 @@ namespace vk {
 		allocInfo.commandBufferCount = 1;
 
 		VkCommandBuffer commandBuffer;
-		vkAllocateCommandBuffers(m_device->vkDevice, &allocInfo, &commandBuffer);
+		vkAllocateCommandBuffers(m_device.vkDevice, &allocInfo, &commandBuffer);
 
 		// Start recording the command buffer
 		VkCommandBufferBeginInfo beginInfo = {};
@@ -213,11 +214,11 @@ namespace vk {
 		submitInfo.commandBufferCount = 1;
 		submitInfo.pCommandBuffers = &commandBuffer;
 
-		vkQueueSubmit(m_device->GetGraphicsQueue(), 1, &submitInfo, VK_NULL_HANDLE);
-		vkQueueWaitIdle(m_device->GetGraphicsQueue());
+		vkQueueSubmit(m_device.GetGraphicsQueue(), 1, &submitInfo, VK_NULL_HANDLE);
+		vkQueueWaitIdle(m_device.GetGraphicsQueue());
 
 		// Cleaning
-		vkFreeCommandBuffers(m_device->vkDevice, m_commandPool, 1, &commandBuffer);
+		vkFreeCommandBuffers(m_device.vkDevice, m_commandPool, 1, &commandBuffer);
 	}
 
 	//================================================================================================================================
@@ -225,7 +226,7 @@ namespace vk {
 	bool Renderer::ResetCommandPool() {
 		VkCommandPoolResetFlags releaseResources = VK_COMMAND_POOL_RESET_RELEASE_RESOURCES_BIT;
 
-		if (vkResetCommandPool(m_device->vkDevice, m_commandPool, releaseResources) != VK_SUCCESS) {
+		if (vkResetCommandPool(m_device.vkDevice, m_commandPool, releaseResources) != VK_SUCCESS) {
 			std::cout << "Could not reset command pool." << std::endl;
 			return false;
 		}
@@ -289,7 +290,7 @@ namespace vk {
 			RecordCommandBufferGeometry(cmdBufferIndex);
 		}
 		for (int cmdBufferIndex = 0; cmdBufferIndex < m_swapchainFramebuffers.size(); cmdBufferIndex++) {
-			m_postprocessPipeline->RecordCommandBufferPostProcess(m_postprocessCommandBuffers[cmdBufferIndex],m_swapchainFramebuffers[cmdBufferIndex]->GetFrameBuffer());
+			RecordCommandBufferPostProcess( cmdBufferIndex );
 		}
 
 		for (int cmdBufferIndex = 0; cmdBufferIndex < m_primaryCommandBuffers.size(); cmdBufferIndex++) {
@@ -326,7 +327,7 @@ namespace vk {
 		VkRenderPassBeginInfo renderPassInfoPostprocess = {};
 		renderPassInfoPostprocess.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
 		renderPassInfoPostprocess.pNext = nullptr;
-		renderPassInfoPostprocess.renderPass = m_postprocessPipeline->GetRenderPass();
+		renderPassInfoPostprocess.renderPass = m_renderPassPostprocess;
 		renderPassInfoPostprocess.framebuffer = m_swapchainFramebuffers[_index]->GetFrameBuffer();
 		renderPassInfoPostprocess.renderArea.offset = { 0,0 };
 		renderPassInfoPostprocess.renderArea.extent.width = m_swapchain->GetExtent().width;
@@ -351,6 +352,41 @@ namespace vk {
 		}
 		else {
 			std::cout << "Could not record command buffer " << _index << "." << std::endl;
+		}
+
+	}
+	
+	//================================================================================================================================
+	//================================================================================================================================
+	void Renderer::RecordCommandBufferPostProcess( const int _index ) {
+
+		VkCommandBuffer commandBuffer = m_postprocessCommandBuffers[_index];
+
+		VkCommandBufferInheritanceInfo commandBufferInheritanceInfo = {};
+		commandBufferInheritanceInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_INHERITANCE_INFO;
+		commandBufferInheritanceInfo.pNext = nullptr;
+		commandBufferInheritanceInfo.renderPass = m_renderPassPostprocess;
+		commandBufferInheritanceInfo.subpass = 0;
+		commandBufferInheritanceInfo.framebuffer = m_swapchainFramebuffers[_index]->GetFrameBuffer();
+		commandBufferInheritanceInfo.occlusionQueryEnable = VK_FALSE;
+		//commandBufferInheritanceInfo.queryFlags				=;
+		//commandBufferInheritanceInfo.pipelineStatistics		=;
+
+		VkCommandBufferBeginInfo commandBufferBeginInfo;
+		commandBufferBeginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
+		commandBufferBeginInfo.pNext = nullptr;
+		commandBufferBeginInfo.flags = VK_COMMAND_BUFFER_USAGE_SIMULTANEOUS_USE_BIT | VK_COMMAND_BUFFER_USAGE_RENDER_PASS_CONTINUE_BIT;
+		commandBufferBeginInfo.pInheritanceInfo = &commandBufferInheritanceInfo;
+
+		if (vkBeginCommandBuffer(commandBuffer, &commandBufferBeginInfo) == VK_SUCCESS) {
+			m_postprocessPipeline->Draw(commandBuffer);
+
+			if (vkEndCommandBuffer(commandBuffer) != VK_SUCCESS) {
+				std::cout << "Could not record command buffer " << commandBuffer << "." << std::endl;
+			}
+		}
+		else {
+			std::cout << "Could not record command buffer " << commandBuffer << "." << std::endl;
 		}
 
 	}
@@ -456,7 +492,7 @@ namespace vk {
 		submitInfo.signalSemaphoreCount = 1;
 		submitInfo.pSignalSemaphores = m_swapchain->GetCurrentRenderFinishedSemaphore();
 
-		VkResult result = vkQueueSubmit(m_device->GetGraphicsQueue(), 1, &submitInfo, *m_swapchain->GetCurrentInFlightFence());
+		VkResult result = vkQueueSubmit(m_device.GetGraphicsQueue(), 1, &submitInfo, *m_swapchain->GetCurrentInFlightFence());
 		if (result != VK_SUCCESS) {
 			std::cout << "Could not submit draw command buffer " << std::endl;
 			return false;
@@ -468,14 +504,14 @@ namespace vk {
 	//================================================================================================================================
 	//================================================================================================================================
 	void Renderer::ReloadShaders() {
-		vkDeviceWaitIdle(m_device->vkDevice);
+		vkDeviceWaitIdle(m_device.vkDevice);
 
 		CreateShaders();
 		DeletePipeline();
 		delete m_postprocessPipeline;
 		CreatePipeline();
-		m_postprocessPipeline = new PostprocessPipeline(m_device);
-		m_postprocessPipeline->Create(m_swapchain->GetSurfaceFormat().format, m_swapchain->GetExtent());
+		m_postprocessPipeline = new PostprocessPipeline(m_device, m_renderPassPostprocess);
+		m_postprocessPipeline->Create( m_swapchain->GetSurfaceFormat().format, m_swapchain->GetExtent());
 		ResetCommandPool();
 		CreateCommandBuffers();
 		RecordAllCommandBuffers();
@@ -515,7 +551,7 @@ namespace vk {
 		descriptorSetLayoutCreateInfo.bindingCount = static_cast<uint32_t>(layoutBindings.size());
 		descriptorSetLayoutCreateInfo.pBindings = layoutBindings.data();
 
-		if (vkCreateDescriptorSetLayout(m_device->vkDevice, &descriptorSetLayoutCreateInfo, nullptr, &m_descriptorSetLayout) != VK_SUCCESS) {
+		if (vkCreateDescriptorSetLayout(m_device.vkDevice, &descriptorSetLayoutCreateInfo, nullptr, &m_descriptorSetLayout) != VK_SUCCESS) {
 			std::cout << "Could not allocate descriptor set layout." << std::endl;
 			return false;
 		}
@@ -533,7 +569,7 @@ namespace vk {
 		descriptorPoolCreateInfo.poolSizeCount = static_cast<uint32_t>(poolSizes.size());
 		descriptorPoolCreateInfo.pPoolSizes = poolSizes.data();
 
-		if (vkCreateDescriptorPool(m_device->vkDevice, &descriptorPoolCreateInfo, nullptr, &m_descriptorPool) != VK_SUCCESS) {
+		if (vkCreateDescriptorPool(m_device.vkDevice, &descriptorPoolCreateInfo, nullptr, &m_descriptorPool) != VK_SUCCESS) {
 			std::cout << "Could not allocate descriptor pool." << std::endl;
 			return false;
 		}
@@ -551,7 +587,7 @@ namespace vk {
 		descriptorSetAllocateInfo.pSetLayouts = descriptorSetLayouts.data();
 
 		std::vector<VkDescriptorSet> descriptorSets(descriptorSetLayouts.size());
-		if (vkAllocateDescriptorSets(m_device->vkDevice, &descriptorSetAllocateInfo, descriptorSets.data()) != VK_SUCCESS) {
+		if (vkAllocateDescriptorSets(m_device.vkDevice, &descriptorSetAllocateInfo, descriptorSets.data()) != VK_SUCCESS) {
 			std::cout << "Could not allocate descriptor set." << std::endl;
 			return false;
 		}
@@ -585,7 +621,7 @@ namespace vk {
 		std::vector<VkWriteDescriptorSet> writeDescriptors = { uboWriteDescriptorSet };
 
 		vkUpdateDescriptorSets(
-			m_device->vkDevice,
+			m_device.vkDevice,
 			static_cast<uint32_t>(writeDescriptors.size()),
 			writeDescriptors.data(),
 			0,
@@ -607,7 +643,7 @@ namespace vk {
 
 		m_primaryCommandBuffers.resize(m_swapchain->GetSwapchainImagesCount());
 
-		if (vkAllocateCommandBuffers(m_device->vkDevice, &commandBufferAllocateInfo, m_primaryCommandBuffers.data()) != VK_SUCCESS) {
+		if (vkAllocateCommandBuffers(m_device.vkDevice, &commandBufferAllocateInfo, m_primaryCommandBuffers.data()) != VK_SUCCESS) {
 			std::cout << "Could not allocate command buffers." << std::endl;
 			return false;
 		}
@@ -620,19 +656,19 @@ namespace vk {
 		secondaryCommandBufferAllocateInfo.commandBufferCount = m_swapchain->GetSwapchainImagesCount();
 
 		m_geometryCommandBuffers.resize(m_swapchain->GetSwapchainImagesCount());
-		if (vkAllocateCommandBuffers(m_device->vkDevice, &secondaryCommandBufferAllocateInfo, m_geometryCommandBuffers.data()) != VK_SUCCESS) {
+		if (vkAllocateCommandBuffers(m_device.vkDevice, &secondaryCommandBufferAllocateInfo, m_geometryCommandBuffers.data()) != VK_SUCCESS) {
 			std::cout << "Could not allocate command buffers." << std::endl;
 			return false;
 		}
 
 		m_imguiCommandBuffers.resize(m_swapchain->GetSwapchainImagesCount());
-		if (vkAllocateCommandBuffers(m_device->vkDevice, &secondaryCommandBufferAllocateInfo, m_imguiCommandBuffers.data()) != VK_SUCCESS) {
+		if (vkAllocateCommandBuffers(m_device.vkDevice, &secondaryCommandBufferAllocateInfo, m_imguiCommandBuffers.data()) != VK_SUCCESS) {
 			std::cout << "Could not allocate command buffers." << std::endl;
 			return false;
 		}
 
 		m_postprocessCommandBuffers.resize(m_swapchain->GetSwapchainImagesCount());
-		if (vkAllocateCommandBuffers(m_device->vkDevice, &secondaryCommandBufferAllocateInfo, m_postprocessCommandBuffers.data()) != VK_SUCCESS) {
+		if (vkAllocateCommandBuffers(m_device.vkDevice, &secondaryCommandBufferAllocateInfo, m_postprocessCommandBuffers.data()) != VK_SUCCESS) {
 			std::cout << "Could not allocate command buffers." << std::endl;
 			return false;
 		}
@@ -647,9 +683,9 @@ namespace vk {
 		commandPoolCreateInfo.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
 		commandPoolCreateInfo.pNext = nullptr;
 		commandPoolCreateInfo.flags = VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT;
-		commandPoolCreateInfo.queueFamilyIndex = m_device->GetGraphicsQueueFamilyIndex();
+		commandPoolCreateInfo.queueFamilyIndex = m_device.GetGraphicsQueueFamilyIndex();
 
-		if (vkCreateCommandPool(m_device->vkDevice, &commandPoolCreateInfo, nullptr, &m_commandPool) != VK_SUCCESS) {
+		if (vkCreateCommandPool(m_device.vkDevice, &commandPoolCreateInfo, nullptr, &m_commandPool) != VK_SUCCESS) {
 			std::cout << "Could not allocate command pool." << std::endl;
 			return false;
 		}
@@ -673,7 +709,7 @@ namespace vk {
 
 		VkAttachmentDescription depthAttachment;
 		depthAttachment.flags = 0;
-		depthAttachment.format = m_device->FindDepthFormat();
+		depthAttachment.format = m_device.FindDepthFormat();
 		depthAttachment.samples = VK_SAMPLE_COUNT_1_BIT;
 		depthAttachment.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
 		depthAttachment.storeOp = VK_ATTACHMENT_STORE_OP_STORE;
@@ -730,7 +766,7 @@ namespace vk {
 		renderPassCreateInfo.dependencyCount = static_cast<uint32_t>(subpassDependencies.size());;
 		renderPassCreateInfo.pDependencies = subpassDependencies.data();
 
-		if (vkCreateRenderPass(m_device->vkDevice, &renderPassCreateInfo, nullptr, &m_renderPass) != VK_SUCCESS) {
+		if (vkCreateRenderPass(m_device.vkDevice, &renderPassCreateInfo, nullptr, &m_renderPass) != VK_SUCCESS) {
 			std::cout << "Could not create render pass;" << std::endl;
 			return false;
 		}
@@ -741,8 +777,75 @@ namespace vk {
 
 	//================================================================================================================================
 	//================================================================================================================================
+	bool Renderer::CreateRenderPassPostprocess() {
+		VkAttachmentDescription colorAttachment;
+		colorAttachment.flags = 0;
+		colorAttachment.format = m_swapchain->GetSurfaceFormat().format;
+		colorAttachment.samples = VK_SAMPLE_COUNT_1_BIT;
+		colorAttachment.loadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
+		colorAttachment.storeOp = VK_ATTACHMENT_STORE_OP_STORE;
+		colorAttachment.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
+		colorAttachment.stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
+		colorAttachment.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
+		colorAttachment.finalLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR;
+
+		VkAttachmentReference colorAttachmentRef;
+		colorAttachmentRef.attachment = 0;
+		colorAttachmentRef.layout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
+
+		std::vector<VkAttachmentReference>   inputAttachments = {};
+		std::vector<VkAttachmentReference>   colorAttachments = { colorAttachmentRef };
+
+		VkSubpassDescription subpassDescription;
+		subpassDescription.flags = 0;
+		subpassDescription.pipelineBindPoint = VK_PIPELINE_BIND_POINT_GRAPHICS;
+		subpassDescription.inputAttachmentCount = static_cast<uint32_t>(inputAttachments.size());
+		subpassDescription.pInputAttachments = inputAttachments.data();
+		subpassDescription.colorAttachmentCount = static_cast<uint32_t>(colorAttachments.size());
+		subpassDescription.pColorAttachments = colorAttachments.data();
+		subpassDescription.pResolveAttachments = nullptr;
+		subpassDescription.pDepthStencilAttachment = nullptr;
+		subpassDescription.preserveAttachmentCount = 0;
+		subpassDescription.pPreserveAttachments = nullptr;
+
+		VkSubpassDependency dependency;
+		dependency.srcSubpass = 0;
+		dependency.dstSubpass = VK_SUBPASS_EXTERNAL;
+		dependency.srcStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
+		dependency.dstStageMask = VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT;
+		dependency.srcAccessMask = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
+		dependency.dstAccessMask = VK_ACCESS_SHADER_READ_BIT;
+		dependency.dependencyFlags = 0;
+
+		std::vector<VkAttachmentDescription> attachmentsDescriptions = { colorAttachment };
+		std::vector<VkSubpassDescription> subpassDescriptions = { subpassDescription };
+		std::vector<VkSubpassDependency> subpassDependencies = { dependency };
+
+		VkRenderPassCreateInfo renderPassCreateInfo;
+		renderPassCreateInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO;
+		renderPassCreateInfo.pNext = nullptr;
+		renderPassCreateInfo.flags = 0;
+		renderPassCreateInfo.attachmentCount = static_cast<uint32_t>(attachmentsDescriptions.size());
+		renderPassCreateInfo.pAttachments = attachmentsDescriptions.data();
+		renderPassCreateInfo.subpassCount = static_cast<uint32_t>(subpassDescriptions.size());;
+		renderPassCreateInfo.pSubpasses = subpassDescriptions.data();
+		renderPassCreateInfo.dependencyCount = static_cast<uint32_t>(subpassDependencies.size());;
+		renderPassCreateInfo.pDependencies = subpassDependencies.data();
+
+		if (vkCreateRenderPass(m_device.vkDevice, &renderPassCreateInfo, nullptr, &m_renderPassPostprocess) != VK_SUCCESS) {
+			std::cout << "Could not create render pass pp;" << std::endl;
+			return false;
+		}
+		std::cout << std::hex << "VkRenderPass pp\t\t" << m_renderPassPostprocess << std::dec << std::endl;
+
+		return true;
+	}
+
+
+	//================================================================================================================================
+	//================================================================================================================================
 	bool Renderer::CreateDepthRessources() {
-		VkFormat depthFormat = m_device->FindDepthFormat();
+		VkFormat depthFormat = m_device.FindDepthFormat();
 		m_depthImage = new Image(m_device);
 		m_depthImageView = new ImageView(m_device);
 		m_depthImage->Create(depthFormat, m_swapchain->GetExtent(), VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
@@ -784,7 +887,7 @@ namespace vk {
 			};
 
 			m_swapchainFramebuffers[framebufferIndex] = new FrameBuffer(m_device);
-			m_swapchainFramebuffers[framebufferIndex]->Create(m_postprocessPipeline->GetRenderPass(), attachments, m_swapchain->GetExtent());
+			m_swapchainFramebuffers[framebufferIndex]->Create( m_renderPassPostprocess, attachments, m_swapchain->GetExtent());
 
 		}
 	}
@@ -947,7 +1050,7 @@ namespace vk {
 		pipelineLayoutCreateInfo.pushConstantRangeCount = static_cast<uint32_t>(pushConstantRanges.size());
 		pipelineLayoutCreateInfo.pPushConstantRanges = pushConstantRanges.data();
 
-		if (vkCreatePipelineLayout(m_device->vkDevice, &pipelineLayoutCreateInfo, nullptr, &m_pipelineLayout) != VK_SUCCESS) {
+		if (vkCreatePipelineLayout(m_device.vkDevice, &pipelineLayoutCreateInfo, nullptr, &m_pipelineLayout) != VK_SUCCESS) {
 			std::cout << "Could not allocate command pool." << std::endl;
 			return false;
 		}
@@ -981,7 +1084,7 @@ namespace vk {
 		std::vector<VkPipeline> graphicsPipelines(graphicsPipelineCreateInfos.size());
 
 		if (vkCreateGraphicsPipelines(
-			m_device->vkDevice,
+			m_device.vkDevice,
 			VK_NULL_HANDLE,
 			static_cast<uint32_t>(graphicsPipelineCreateInfos.size()),
 			graphicsPipelineCreateInfos.data(),
@@ -1072,15 +1175,24 @@ namespace vk {
 	//================================================================================================================================
 	//================================================================================================================================
 	void Renderer::DeleteCommandPool() {
-		vkDestroyCommandPool(m_device->vkDevice, m_commandPool, nullptr);
+		vkDestroyCommandPool(m_device.vkDevice, m_commandPool, nullptr);
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
 	void Renderer::DeleteRenderPass() {
 		if (m_renderPass != VK_NULL_HANDLE) {
-			vkDestroyRenderPass(m_device->vkDevice, m_renderPass, nullptr);
+			vkDestroyRenderPass(m_device.vkDevice, m_renderPass, nullptr);
 			m_renderPass = VK_NULL_HANDLE;
+		}
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
+	void Renderer::DeleteRenderPassPostprocess() {
+		if (m_renderPassPostprocess != VK_NULL_HANDLE) {
+			vkDestroyRenderPass(m_device.vkDevice, m_renderPassPostprocess, nullptr);
+			m_renderPassPostprocess = VK_NULL_HANDLE;
 		}
 	}
 
@@ -1106,12 +1218,12 @@ namespace vk {
 	//================================================================================================================================
 	void Renderer::DeletePipeline() {
 		if (m_pipelineLayout != VK_NULL_HANDLE) {
-			vkDestroyPipelineLayout(m_device->vkDevice, m_pipelineLayout, nullptr);
+			vkDestroyPipelineLayout(m_device.vkDevice, m_pipelineLayout, nullptr);
 			m_pipelineLayout = VK_NULL_HANDLE;
 		}
 
 		if (m_pipeline != VK_NULL_HANDLE) {
-			vkDestroyPipeline(m_device->vkDevice, m_pipeline, nullptr);
+			vkDestroyPipeline(m_device.vkDevice, m_pipeline, nullptr);
 			m_pipeline = VK_NULL_HANDLE;
 		}
 	}
@@ -1121,12 +1233,12 @@ namespace vk {
 	void Renderer::DeleteDescriptors() {
 
 		if (m_descriptorPool != VK_NULL_HANDLE) {
-			vkDestroyDescriptorPool(m_device->vkDevice, m_descriptorPool, nullptr);
+			vkDestroyDescriptorPool(m_device.vkDevice, m_descriptorPool, nullptr);
 			m_descriptorPool = VK_NULL_HANDLE;
 		}
 
 		if (m_descriptorSetLayout != VK_NULL_HANDLE) {
-			vkDestroyDescriptorSetLayout(m_device->vkDevice, m_descriptorSetLayout, nullptr);
+			vkDestroyDescriptorSetLayout(m_device.vkDevice, m_descriptorSetLayout, nullptr);
 			m_descriptorSetLayout = VK_NULL_HANDLE;
 		}
 		delete m_uniformBuffer;

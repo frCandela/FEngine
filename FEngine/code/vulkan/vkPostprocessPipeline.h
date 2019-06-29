@@ -10,7 +10,7 @@ namespace vk {
 
 	class PostprocessPipeline {
 	public:
-		PostprocessPipeline(Device * _device);
+		PostprocessPipeline(Device& _device, VkRenderPass& _renderPass );
 		~PostprocessPipeline();
 
 		struct UniformsPostprocess {
@@ -18,50 +18,49 @@ namespace vk {
 		};
 
 		bool Create( const VkFormat _format, VkExtent2D _extent);
+		void Draw(VkCommandBuffer _commandBuffer);
+		void Resize( VkExtent2D _extent );
 		void ReloadShaders();
 
-		UniformsPostprocess GetUniforms() const { return m_uniformsPostprocess; }
+		UniformsPostprocess GetUniforms() const { return m_uniforms; }
 		void SetUniforms(const UniformsPostprocess _uniforms);
-		
-		VkRenderPass	GetRenderPass() { return m_renderPassPostprocess; }
-		VkPipeline		GetPipeline()	{ return m_pipelinePostprocess; }
-		VkImageView		GetImageView();
 
-		void RecordCommandBufferPostProcess(VkCommandBuffer _commandBuffer, VkFramebuffer _framebuffer);
+		VkPipeline		GetPipeline()	{ return m_pipeline; }
+		VkImageView		GetImageView();
 
 	private:
 		void CreateShaders();
-		bool CreateDescriptorsPostprocess();
-		bool CreateRenderPassPostprocess( const VkFormat _format );
-		bool CreatePipelinePostprocess( VkExtent2D _extent );
-		void CreatePostprocessImages( const VkFormat _format, VkExtent2D _extent);
-		void CreatePostprocessVertexBuffer();
+		bool CreateDescriptors();
+		bool CreatePipeline( VkExtent2D _extent );
+		void CreateImagesAndViews( VkExtent2D _extent);
+		void CreateVertexBuffer();		
 
-		void DeleteRenderPassPostprocess();
-		void DeletePostprocessRessources();
-		void DeletePipelinePostprocess();
-		void DeleteDescriptorsPostprocess();
+		void DeleteImages();
+		void DeletePipeline();
+		void DeleteDescriptors();
 
-		Device * const m_device;
+		Device& m_device;
+		VkRenderPass& m_renderPass;
+		VkFormat m_format;
 
-		VkRenderPass	m_renderPassPostprocess;
-		VkPipelineLayout	m_pipelineLayoutPostprocess;
-		VkPipeline			m_pipelinePostprocess;
 
-		Shader * m_fragmentShaderPostprocess = nullptr;
-		Shader * m_vertexShaderPostprocess = nullptr;
+		VkPipelineLayout	m_pipelineLayout;
+		VkPipeline			m_pipeline;
 
-		Sampler *		m_samplerPostprocess;
-		Image *			m_imagePostprocess;
-		ImageView *		m_imageViewPostprocess;
+		Shader * m_fragmentShader = nullptr;
+		Shader * m_vertexShader = nullptr;
 
-		VkDescriptorSetLayout	m_descriptorSetLayoutPostprocess;
-		VkDescriptorPool		m_descriptorPoolPostprocess;
-		VkDescriptorSet			m_descriptorSetPostprocess;
+		Sampler *		m_sampler;
+		Image *			m_image;
+		ImageView *		m_imageView;
 
-		Buffer * m_uniformBufferPostprocess;
-		Buffer * m_vertexBufferPostprocess;
+		VkDescriptorSetLayout	m_descriptorSetLayout;
+		VkDescriptorPool		m_descriptorPool;
+		VkDescriptorSet			m_descriptorSet;
 
-		UniformsPostprocess m_uniformsPostprocess;
+		Buffer * m_uniformBuffer;
+		Buffer * m_vertexBuffer;
+
+		UniformsPostprocess m_uniforms;
 	};
 }

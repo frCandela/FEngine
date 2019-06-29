@@ -14,7 +14,7 @@ namespace vk {
 
 	//================================================================================================================================
 	//================================================================================================================================
-	Texture::Texture(Device * _device) :
+	Texture::Texture(Device & _device) :
 		m_device(_device) {
 
 	}
@@ -63,7 +63,7 @@ namespace vk {
 	void Texture::GenerateMipmaps(VkCommandBuffer _commandBuffer, VkFormat _imageFormat, int32_t _texWidth, int32_t _texHeight, uint32_t _mipLevels) {
 		// Check if image format supports linear blitting
 		VkFormatProperties formatProperties;
-		vkGetPhysicalDeviceFormatProperties(m_device->vkPhysicalDevice, _imageFormat, &formatProperties);
+		vkGetPhysicalDeviceFormatProperties(m_device.vkPhysicalDevice, _imageFormat, &formatProperties);
 		if (!(formatProperties.optimalTilingFeatures & VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT))
 			throw std::runtime_error("texture image format does not support linear blitting!");
 
@@ -152,17 +152,17 @@ namespace vk {
 	//================================================================================================================================
 	void Texture::Destroy() {
 		if (m_deviceMemory != VK_NULL_HANDLE) {
-			vkFreeMemory(m_device->vkDevice, m_deviceMemory, nullptr);
+			vkFreeMemory(m_device.vkDevice, m_deviceMemory, nullptr);
 			m_deviceMemory = VK_NULL_HANDLE;
 		}
 
 		if (m_imageView != VK_NULL_HANDLE) {
-			vkDestroyImageView(m_device->vkDevice, m_imageView, nullptr);
+			vkDestroyImageView(m_device.vkDevice, m_imageView, nullptr);
 			m_imageView = VK_NULL_HANDLE;
 		}
 
 		if (m_image != VK_NULL_HANDLE) {
-			vkDestroyImage(m_device->vkDevice, m_image, nullptr);
+			vkDestroyImage(m_device.vkDevice, m_image, nullptr);
 			m_image = VK_NULL_HANDLE;
 		}
 	}
@@ -189,25 +189,25 @@ namespace vk {
 		imageInfo.samples = VK_SAMPLE_COUNT_1_BIT;
 		imageInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
 
-		if (vkCreateImage(m_device->vkDevice, &imageInfo, nullptr, &m_image) != VK_SUCCESS)
+		if (vkCreateImage(m_device.vkDevice, &imageInfo, nullptr, &m_image) != VK_SUCCESS)
 			throw std::runtime_error("failed to create image!");
 
 		std::cout << std::hex << "VkImage \t\t" << m_image << std::dec << std::endl;
 
 		// Allocate memory for the image
 		VkMemoryRequirements memRequirements;
-		vkGetImageMemoryRequirements(m_device->vkDevice, m_image, &memRequirements);
+		vkGetImageMemoryRequirements(m_device.vkDevice, m_image, &memRequirements);
 
 		VkMemoryAllocateInfo allocInfo = {};
 		allocInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
 		allocInfo.allocationSize = memRequirements.size;
-		allocInfo.memoryTypeIndex = m_device->FindMemoryType(memRequirements.memoryTypeBits, _properties);
+		allocInfo.memoryTypeIndex = m_device.FindMemoryType(memRequirements.memoryTypeBits, _properties);
 
-		if (vkAllocateMemory(m_device->vkDevice, &allocInfo, nullptr, &m_deviceMemory) != VK_SUCCESS)
+		if (vkAllocateMemory(m_device.vkDevice, &allocInfo, nullptr, &m_deviceMemory) != VK_SUCCESS)
 			throw std::runtime_error("failed to allocate image memory!");
 		std::cout << std::hex << "VkDeviceMemory \t\t" << m_deviceMemory << std::dec << std::endl;
 
-		vkBindImageMemory(m_device->vkDevice, m_image, m_deviceMemory, 0);
+		vkBindImageMemory(m_device.vkDevice, m_image, m_deviceMemory, 0);
 	}
 
 	//================================================================================================================================
@@ -221,7 +221,7 @@ namespace vk {
 		viewInfo.format = _format;
 		viewInfo.subresourceRange = _subresourceRange;
 
-		if (vkCreateImageView(m_device->vkDevice, &viewInfo, nullptr, &m_imageView) != VK_SUCCESS)
+		if (vkCreateImageView(m_device.vkDevice, &viewInfo, nullptr, &m_imageView) != VK_SUCCESS)
 			throw std::runtime_error("failed to create texture image view!");
 
 		std::cout << std::hex << "VkImageView \t\t" << m_imageView << std::dec << std::endl;
@@ -379,20 +379,20 @@ namespace vk {
 		imageCreateInfo.usage = VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT;
 		imageCreateInfo.arrayLayers = m_layerCount;
 
-		if (vkCreateImage(m_device->vkDevice, &imageCreateInfo, nullptr, &m_image) != VK_SUCCESS)
+		if (vkCreateImage(m_device.vkDevice, &imageCreateInfo, nullptr, &m_image) != VK_SUCCESS)
 			throw std::runtime_error("failed to vkCreateImage!");
 
 		VkMemoryRequirements memReqs;
-		vkGetImageMemoryRequirements(m_device->vkDevice, m_image, &memReqs);
+		vkGetImageMemoryRequirements(m_device.vkDevice, m_image, &memReqs);
 
 		VkMemoryAllocateInfo memAllocInfo{};
 		memAllocInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
 		memAllocInfo.allocationSize = memReqs.size;
-		memAllocInfo.memoryTypeIndex = m_device->FindMemoryType(memReqs.memoryTypeBits, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
+		memAllocInfo.memoryTypeIndex = m_device.FindMemoryType(memReqs.memoryTypeBits, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
 
-		if (vkAllocateMemory(m_device->vkDevice, &memAllocInfo, nullptr, &m_deviceMemory) != VK_SUCCESS)
+		if (vkAllocateMemory(m_device.vkDevice, &memAllocInfo, nullptr, &m_deviceMemory) != VK_SUCCESS)
 			throw std::runtime_error("failed to create vkAllocateMemory!");
-		if (vkBindImageMemory(m_device->vkDevice, m_image, m_deviceMemory, 0) != VK_SUCCESS)
+		if (vkBindImageMemory(m_device.vkDevice, m_image, m_deviceMemory, 0) != VK_SUCCESS)
 			throw std::runtime_error("failed to create vkBindImageMemory!");
 
 		// Image barrier for optimal image (target)

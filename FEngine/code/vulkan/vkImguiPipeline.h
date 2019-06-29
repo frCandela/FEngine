@@ -14,7 +14,7 @@ namespace vk
 	{
 	public:
 		// Initialize styles, keys, Vulkan resources used by the ui, etc.
-		ImguiPipeline(Device* _device, const int _swapchainImagesCount) :
+		ImguiPipeline(Device& _device, const int _swapchainImagesCount) :
 			m_device(_device)
 			, m_fontTexture( new vk::Texture(_device))
 			, m_sampler( new vk::Sampler(_device))
@@ -36,11 +36,11 @@ namespace vk
 			delete(m_fragShader);
 			delete(m_vertShader);
 
-			vkDestroyPipelineCache(m_device->vkDevice, pipelineCache, nullptr);
-			vkDestroyPipeline(m_device->vkDevice, m_pipeline, nullptr);
-			vkDestroyPipelineLayout(m_device->vkDevice, m_pipelineLayout, nullptr);
-			vkDestroyDescriptorPool(m_device->vkDevice, m_descriptorPool, nullptr);
-			vkDestroyDescriptorSetLayout(m_device->vkDevice, m_descriptorSetLayout, nullptr);
+			vkDestroyPipelineCache(m_device.vkDevice, pipelineCache, nullptr);
+			vkDestroyPipeline(m_device.vkDevice, m_pipeline, nullptr);
+			vkDestroyPipelineLayout(m_device.vkDevice, m_pipelineLayout, nullptr);
+			vkDestroyDescriptorPool(m_device.vkDevice, m_descriptorPool, nullptr);
+			vkDestroyDescriptorSetLayout(m_device.vkDevice, m_descriptorSetLayout, nullptr);
 
 			ImGui::DestroyContext();
 		}
@@ -223,7 +223,7 @@ namespace vk
 			descriptorPoolInfo.pPoolSizes = poolSizes.data();
 			descriptorPoolInfo.maxSets = 2;
 
-			vkCreateDescriptorPool(m_device->vkDevice, &descriptorPoolInfo, nullptr, &m_descriptorPool);
+			vkCreateDescriptorPool(m_device.vkDevice, &descriptorPoolInfo, nullptr, &m_descriptorPool);
 
 			// Descriptor set layout
 			VkDescriptorSetLayoutBinding setLayoutBinding{};
@@ -239,7 +239,7 @@ namespace vk
 			descriptorSetLayoutCreateInfo.pBindings = setLayoutBindings.data();
 			descriptorSetLayoutCreateInfo.bindingCount = static_cast<uint32_t>(setLayoutBindings.size());
 
-			vkCreateDescriptorSetLayout(m_device->vkDevice, &descriptorSetLayoutCreateInfo, nullptr, &m_descriptorSetLayout);
+			vkCreateDescriptorSetLayout(m_device.vkDevice, &descriptorSetLayoutCreateInfo, nullptr, &m_descriptorSetLayout);
 
 			// Descriptor set
 			VkDescriptorSetAllocateInfo descriptorSetAllocateInfo{};
@@ -248,7 +248,7 @@ namespace vk
 			descriptorSetAllocateInfo.pSetLayouts = &m_descriptorSetLayout;
 			descriptorSetAllocateInfo.descriptorSetCount = 1;
 
-			vkAllocateDescriptorSets(m_device->vkDevice, &descriptorSetAllocateInfo, &m_descriptorSet);
+			vkAllocateDescriptorSets(m_device.vkDevice, &descriptorSetAllocateInfo, &m_descriptorSet);
 
 			VkDescriptorImageInfo fontDescriptorImageInfo{};
 			fontDescriptorImageInfo.sampler = m_sampler->GetSampler();
@@ -265,13 +265,13 @@ namespace vk
 
 			std::vector<VkWriteDescriptorSet> writeDescriptorSets = { writeDescriptorSet };
 
-			vkUpdateDescriptorSets(m_device->vkDevice, static_cast<uint32_t>(writeDescriptorSets.size()), writeDescriptorSets.data(), 0, nullptr);
+			vkUpdateDescriptorSets(m_device.vkDevice, static_cast<uint32_t>(writeDescriptorSets.size()), writeDescriptorSets.data(), 0, nullptr);
 		}
 		void CreateGraphicsPipeline(VkRenderPass _renderPass) {
 			// Pipeline cache
 			VkPipelineCacheCreateInfo pipelineCacheCreateInfo = {};
 			pipelineCacheCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_CACHE_CREATE_INFO;
-			vkCreatePipelineCache(m_device->vkDevice, &pipelineCacheCreateInfo, nullptr, &pipelineCache);
+			vkCreatePipelineCache(m_device.vkDevice, &pipelineCacheCreateInfo, nullptr, &pipelineCache);
 
 			// Push constants for UI rendering parameters
 			VkPushConstantRange pushConstantRange = {};
@@ -286,7 +286,7 @@ namespace vk
 			pipelineLayoutCreateInfo.pushConstantRangeCount = 1;
 			pipelineLayoutCreateInfo.pPushConstantRanges = &pushConstantRange;
 
-			vkCreatePipelineLayout(m_device->vkDevice, &pipelineLayoutCreateInfo, nullptr, &m_pipelineLayout);
+			vkCreatePipelineLayout(m_device.vkDevice, &pipelineLayoutCreateInfo, nullptr, &m_pipelineLayout);
 
 			// Setup graphics pipeline for UI rendering
 			VkPipelineInputAssemblyStateCreateInfo inputAssemblyState = {};
@@ -428,7 +428,7 @@ namespace vk
 			pipelineCreateInfo.pVertexInputState = &vertexInputState;
 			pipelineCreateInfo.subpass = 0;
 
-			vkCreateGraphicsPipelines(m_device->vkDevice, pipelineCache, 1, &pipelineCreateInfo, nullptr, &m_pipeline);
+			vkCreateGraphicsPipelines(m_device.vkDevice, pipelineCache, 1, &pipelineCreateInfo, nullptr, &m_pipeline);
 		}
 		
 		static void SetClipboardText(void* _userData, const char* _text) {
@@ -454,7 +454,7 @@ namespace vk
 		VkDescriptorSetLayout m_descriptorSetLayout;
 		VkDescriptorSet m_descriptorSet;
 
-		vk::Device * m_device;
+		vk::Device & m_device;
 
 		Shader * m_fragShader;
 		Shader * m_vertShader;

@@ -6,7 +6,7 @@ namespace vk {
 
 	class ImageView {
 	public:
-		ImageView(Device * _device);
+		ImageView(Device & _device);
 		ImageView(const ImageView&) = delete;
 		~ImageView();
 
@@ -14,7 +14,7 @@ namespace vk {
 
 		VkImageView GetImageView() { return m_imageView; }
 	private:
-		Device *	m_device;
+		Device &	m_device;
 		VkImageView m_imageView;
 	};
 }

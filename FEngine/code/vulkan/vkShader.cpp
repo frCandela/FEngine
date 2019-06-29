@@ -8,7 +8,7 @@ namespace vk {
 
 	//================================================================================================================================
 	//================================================================================================================================
-	Shader::Shader(Device * _device) :
+	Shader::Shader(Device & _device) :
 		m_device(_device) {
 
 	}
@@ -17,7 +17,7 @@ namespace vk {
 	//================================================================================================================================
 	Shader::~Shader() {
 		if (m_shaderModule != VK_NULL_HANDLE) {
-			vkDestroyShaderModule(m_device->vkDevice, m_shaderModule, nullptr);
+			vkDestroyShaderModule(m_device.vkDevice, m_shaderModule, nullptr);
 			m_shaderModule = VK_NULL_HANDLE;
 		}
 	}
@@ -41,7 +41,7 @@ namespace vk {
 		shaderModuleCreateInfo.codeSize = spirvCode.size() * sizeof(unsigned int);
 		shaderModuleCreateInfo.pCode = spirvCode.data();
 
-		if (vkCreateShaderModule(m_device->vkDevice, &shaderModuleCreateInfo, nullptr, &m_shaderModule) != VK_SUCCESS) {
+		if (vkCreateShaderModule(m_device.vkDevice, &shaderModuleCreateInfo, nullptr, &m_shaderModule) != VK_SUCCESS) {
 			std::cout << "Could not create shader module: " << _path << std::endl;
 			return false;
 		}
