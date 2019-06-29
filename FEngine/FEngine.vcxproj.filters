@@ -79,6 +79,9 @@
     <ClCompile Include="deps\imgui\imgui_draw.cpp">
       <Filter>Fichiers d%27en-tête\deps</Filter>
     </ClCompile>
+    <ClCompile Include="code\vulkan\vkPostprocessPipeline.cpp">
+      <Filter>Fichiers d%27en-tête\vulkan</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="code\vulkan\vkImage.h">
@@ -133,6 +136,9 @@
       <Filter>Fichiers d%27en-tête</Filter>
     </ClInclude>
     <ClInclude Include="code\vulkan\vkImguiPipeline.h">
+      <Filter>Fichiers d%27en-tête\vulkan</Filter>
+    </ClInclude>
+    <ClInclude Include="code\vulkan\vkPostprocessPipeline.h">
       <Filter>Fichiers d%27en-tête\vulkan</Filter>
     </ClInclude>
   </ItemGroup>

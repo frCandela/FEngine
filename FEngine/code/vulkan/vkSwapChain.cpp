@@ -9,17 +9,34 @@
 namespace vk {
 	//================================================================================================================================
 	//================================================================================================================================
-	SwapChain::SwapChain(Device * _device, VkSurfaceKHR _surface, VkExtent2D _desiredSize, VkSwapchainKHR _oldSwapchain) :
-		m_device(_device),
-		m_surface(_surface) {
+	SwapChain::SwapChain(Device * _device) :
+		m_device(_device){
+	}
 
+	//================================================================================================================================
+	//================================================================================================================================
+	void SwapChain::Create(VkSurfaceKHR _surface, VkExtent2D _desiredSize ) {
+		m_surface = _surface;
+		
 		SetDesiredPresentMode(VK_PRESENT_MODE_MAILBOX_KHR);
 		SetNumberOfImages();
 		SetImagesSize(_desiredSize);
 		SetImagesUsage();
 		SetDesiredSurfaceFormat({ VK_FORMAT_R8G8B8A8_UNORM , VK_COLOR_SPACE_SRGB_NONLINEAR_KHR });
-		CreateSwapChain(_oldSwapchain);
+		CreateSwapChain();
 		CreateSemaphores();
+		CreateImageViews();
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
+	void SwapChain::Resize( VkExtent2D _desiredSize ) {
+		m_currentFrame = 0;
+		
+		DestroyImageViews();
+		SetNumberOfImages();
+		SetImagesSize(_desiredSize);
+		CreateSwapChain();
 		CreateImageViews();
 	}
 
@@ -158,7 +175,9 @@ namespace vk {
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void SwapChain::CreateSwapChain(VkSwapchainKHR _oldSwapchain) {
+	void SwapChain::CreateSwapChain() {
+		VkSwapchainKHR oldSwapchain = m_swapchain;
+
 		VkSwapchainCreateInfoKHR swapchainCreateInfo = {};
 		swapchainCreateInfo.sType = VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR;
 		swapchainCreateInfo.pNext = nullptr;
@@ -177,10 +196,15 @@ namespace vk {
 		swapchainCreateInfo.compositeAlpha = VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR;
 		swapchainCreateInfo.presentMode = m_presentMode;
 		swapchainCreateInfo.clipped = VK_TRUE;
-		swapchainCreateInfo.oldSwapchain = _oldSwapchain;
+		swapchainCreateInfo.oldSwapchain = oldSwapchain;
 
 		vkCreateSwapchainKHR(m_device->vkDevice, &swapchainCreateInfo, nullptr, &m_swapchain);
 		std::cout << std::hex << "VkSwapchainKHR\t\t" << m_swapchain << std::dec << std::endl;
+
+		if (oldSwapchain != VK_NULL_HANDLE) {
+			vkDestroySwapchainKHR(m_device->vkDevice, oldSwapchain, nullptr);
+		}
+
 
 		uint32_t imagesCount;
 		vkGetSwapchainImagesKHR(m_device->vkDevice, m_swapchain, &imagesCount, nullptr);

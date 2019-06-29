@@ -1,6 +1,7 @@
 #pragma once
 
 namespace vk {
+	struct Vertex;
 	class Instance;
 	class Window;
 	class Device;
@@ -12,8 +13,7 @@ namespace vk {
 	class Shader;
 	class Buffer;
 	class Sampler;
-	struct Vertex;
-
+	class PostprocessPipeline;
 
 	class Renderer {
 	public:
@@ -33,25 +33,22 @@ namespace vk {
 		Device *		m_device;
 		SwapChain  *	m_swapchain;
 		ImguiPipeline * m_imguiPipeline;
+		PostprocessPipeline * m_postprocessPipeline;
 
 		VkCommandPool	m_commandPool;
 
 		VkRenderPass	m_renderPass;
-		VkRenderPass	m_renderPassPostprocess;
 
 		VkPipelineLayout	m_pipelineLayout;
 		VkPipeline			m_pipeline;
-		VkPipelineLayout	m_pipelineLayoutPostprocess;
-		VkPipeline			m_pipelinePostprocess;
+
 
 
 		VkDescriptorSetLayout	m_descriptorSetLayout;
 		VkDescriptorPool		m_descriptorPool;
 		VkDescriptorSet			m_descriptorSet;
 
-		VkDescriptorSetLayout	m_descriptorSetLayoutPostprocess;
-		VkDescriptorPool		m_descriptorPoolPostprocess;
-		VkDescriptorSet			m_descriptorSetPostprocess;
+
 
 		std::vector<VkCommandBuffer> m_primaryCommandBuffers;
 		std::vector<VkCommandBuffer> m_geometryCommandBuffers;
@@ -63,21 +60,14 @@ namespace vk {
 
 		Image *			m_depthImage;
 		ImageView  *	m_depthImageView;
-		Sampler *		m_samplerPostprocess;
-		Image *			m_imagePostprocess;
-		ImageView *		m_imageViewPostprocess;
 
 		Shader * m_fragmentShader = nullptr;
 		Shader * m_vertexShader = nullptr;
-		Shader * m_fragmentShaderPostprocess = nullptr;
-		Shader * m_vertexShaderPostprocess = nullptr;
 
 		Buffer * m_uniformBuffer;
-		Buffer * m_uniformBufferPostprocess;
-
 		Buffer * m_indexBuffer;
 		Buffer * m_vertexBuffer;
-		Buffer * m_vertexBufferPostprocess;
+
 
 		std::vector<Vertex>		m_vertices;
 		std::vector<uint32_t>	m_indices;
@@ -92,11 +82,6 @@ namespace vk {
 			glm::mat4 proj;
 		} m_uniformsForward;
 
-		struct UniformsPostprocess
-		{
-			glm::vec4 color;
-		} m_uniformsPostprocess;
-
 		static Renderer * ms_globalRenderer;
 		
 		bool ResetCommandPool();
@@ -105,37 +90,29 @@ namespace vk {
 		void ReloadShaders();
 
 		void RecordCommandBufferImgui(const int _index);
-		void RecordCommandBufferGeometry(const int _index);
-		void RecordCommandBufferPostProcess(const int _index);		
+		void RecordCommandBufferGeometry(const int _index);		
 		void RecordPrimaryCommandBuffer(const int _index);
 		void RecordAllCommandBuffers();
 
-		bool CreateShaders();
+		void CreateShaders();
 		bool CreateDescriptors();
-		bool CreateDescriptorsPostprocess();
 		bool CreateCommandBuffers();
 		bool CreateCommandPool();
 		bool CreateRenderPass();
-		bool CreateRenderPassPostprocess();
 		bool CreateDepthRessources();
-		void CreateFramebuffers();
-		void CreateFramebuffersPostprocess();
 		bool CreatePipeline();
-		bool CreatePipelinePostprocess();
 		void CreateVertexBuffers();
-		void CreatePostprocessImages();
-		void CreatePostprocessVertexBuffer();
+
+		void CreateFramebuffers();
+		void CreateSwapchainFramebuffers();
 
 		void DeleteCommandPool();
 		void DeleteRenderPass();
-		void DeleteRenderPassPostprocess();
 		void DeleteDepthRessources();
-		void DeletePostprocessRessources();
 		void DeleteFramebuffers();
-		void DeleteFramebuffersPostprocess();
 		void DeletePipeline();
-		void DeletePipelinePostprocess();
 		void DeleteDescriptors();
-		void DeleteDescriptorsPostprocess();
+		void DeleteSwapchainFramebuffers();
+
 	};
 }
