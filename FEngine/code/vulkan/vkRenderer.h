@@ -59,7 +59,7 @@ namespace vk {
 		std::vector<VkCommandBuffer> m_postprocessCommandBuffers;
 
 		std::vector< FrameBuffer * > m_forwardFrameBuffers;
-		std::vector< FrameBuffer * > m_postProcessFramebuffers;
+		std::vector< FrameBuffer * > m_swapchainFramebuffers;
 
 		Image *			m_depthImage;
 		ImageView  *	m_depthImageView;
@@ -82,12 +82,15 @@ namespace vk {
 		std::vector<Vertex>		m_vertices;
 		std::vector<uint32_t>	m_indices;
 
-		struct UniformBufferObject
+
+		glm::vec4 m_clearColor;
+
+		struct UniformsForward
 		{
 			glm::mat4 model;
 			glm::mat4 view;
 			glm::mat4 proj;
-		} m_ubo;
+		} m_uniformsForward;
 
 		struct UniformsPostprocess
 		{
@@ -98,13 +101,14 @@ namespace vk {
 		
 		bool ResetCommandPool();
 		void UpdateUniformBuffer();		
-		void RecordAllCommandBuffers();
-		void RecordPrimaryCommandBuffer(const int _index);
+		bool SubmitCommandBuffers();
+		void ReloadShaders();
+
 		void RecordCommandBufferImgui(const int _index);
 		void RecordCommandBufferGeometry(const int _index);
 		void RecordCommandBufferPostProcess(const int _index);		
-		bool SubmitCommandBuffers();
-		void ReloadShaders();
+		void RecordPrimaryCommandBuffer(const int _index);
+		void RecordAllCommandBuffers();
 
 		bool CreateShaders();
 		bool CreateDescriptors();
@@ -119,12 +123,14 @@ namespace vk {
 		bool CreatePipeline();
 		bool CreatePipelinePostprocess();
 		void CreateVertexBuffers();
-		void CreatePostprocess();
-		
+		void CreatePostprocessImages();
+		void CreatePostprocessVertexBuffer();
+
 		void DeleteCommandPool();
 		void DeleteRenderPass();
 		void DeleteRenderPassPostprocess();
 		void DeleteDepthRessources();
+		void DeletePostprocessRessources();
 		void DeleteFramebuffers();
 		void DeleteFramebuffersPostprocess();
 		void DeletePipeline();

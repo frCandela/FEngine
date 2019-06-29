@@ -32,15 +32,25 @@ namespace vk {
 		Input::Setup(m_window->GetWindow());
 
 		ms_globalRenderer = this;
+		m_uniformsPostprocess.color = glm::vec4(1, 1, 1, 1);
+		m_clearColor = glm::vec4(0.5, 0.5, 0.5, 1.f);
 
 		CreateShaders();
 		CreateCommandPool();
-		CreatePostprocess();
+
 		CreateRenderPass();
 		CreateRenderPassPostprocess();
 		CreateDepthRessources();
-		CreateFramebuffers();
+
+		//Sampler
+		m_samplerPostprocess = new Sampler(m_device);
+		m_samplerPostprocess->CreateSampler(0, 1.f);
+		CreatePostprocessVertexBuffer();
 		CreateFramebuffersPostprocess();
+
+
+
+		CreateFramebuffers();
 		CreateCommandBuffers();
 		CreateDescriptors();
 		CreateDescriptorsPostprocess();
@@ -73,11 +83,11 @@ namespace vk {
 		DeleteCommandPool();
 		DeleteDescriptors();
 		DeleteDescriptorsPostprocess();
+		DeletePostprocessRessources();
 
 		delete m_vertexBufferPostprocess;
 		delete m_samplerPostprocess;
-		delete m_imageViewPostprocess;
-		delete m_imagePostprocess;
+		
 		delete m_indexBuffer;
 		delete m_vertexBuffer;
 		delete m_fragmentShader;
@@ -101,19 +111,20 @@ namespace vk {
 		while ( glfwWindowShouldClose(m_window->GetWindow()) == false)
 		{
 			const float time = Time::ElapsedSinceStartup();
+			Input::NewFrame();
 
 			const float updateDelta = time - lastUpdateTime;
 			if (updateDelta > 1.f / Time::GetFPS() ) {
 				lastUpdateTime = time;
-				Input::NewFrame();
-				
-				ImGui::NewFrame();
-
-				vkWaitForFences(m_device->vkDevice, 1, m_swapchain->GetCurrentInFlightFence(), VK_TRUE, std::numeric_limits<uint64_t>::max());
-				vkResetFences(m_device->vkDevice, 1, m_swapchain->GetCurrentInFlightFence());
 
 				const VkResult result = m_swapchain->AcquireNextImage();
 				if (result == VK_ERROR_OUT_OF_DATE_KHR) {
+					if (m_window->GetFramebufferSize().width == 0 && m_window->GetFramebufferSize().height == 0) {
+						continue;
+					}
+
+
+
 					std::cout << "suboptimal swapchain" << std::endl;
 					vkDeviceWaitIdle(m_device->vkDevice);
 
@@ -126,6 +137,8 @@ namespace vk {
 					DeleteRenderPassPostprocess();
 					DeleteCommandPool();
 					DeleteDescriptors();
+					DeleteDescriptorsPostprocess();
+					DeletePostprocessRessources();
 
 					SwapChain * newSwapchain = new SwapChain(m_device, m_window->GetSurface(), m_window->GetFramebufferSize(), m_swapchain->GetVkSwapChain());
 					delete m_swapchain;
@@ -133,9 +146,10 @@ namespace vk {
 
 					CreateCommandPool();
 					CreateRenderPass();
-					CreateDepthRessources();
-					CreateFramebuffers();
+					CreateRenderPassPostprocess();
+					CreateDepthRessources();					
 					CreateFramebuffersPostprocess();
+					CreateFramebuffers();
 					CreateCommandBuffers();
 					CreateDescriptors();
 					CreateDescriptorsPostprocess();
@@ -148,10 +162,20 @@ namespace vk {
 				else if (result != VK_SUCCESS) {
 					std::cout << "Could not acquire next image" << std::endl;
 				}
+				else {
+					vkWaitForFences(m_device->vkDevice, 1, m_swapchain->GetCurrentInFlightFence(), VK_TRUE, std::numeric_limits<uint64_t>::max());
+					vkResetFences(m_device->vkDevice, 1, m_swapchain->GetCurrentInFlightFence());
+				}
+
+
+				ImGui::NewFrame();
+
+
 
 				lastUpdateTime = time;
 				io.DisplaySize = ImVec2(static_cast<float>(m_swapchain->GetExtent().width), static_cast<float>(m_swapchain->GetExtent().height));
 				{
+					ImGui::ShowDemoWindow();
 					ImGui::Begin("Debug");
 
 					float tmpFps = Time::GetFPS();
@@ -238,6 +262,19 @@ namespace vk {
 		return true;
 	}
 
+	static void ShowHelpMarker(const char* desc)
+	{
+		ImGui::TextDisabled("(?)");
+		if (ImGui::IsItemHovered())
+		{
+			ImGui::BeginTooltip();
+			ImGui::PushTextWrapPos(ImGui::GetFontSize() * 35.0f);
+			ImGui::TextUnformatted(desc);
+			ImGui::PopTextWrapPos();
+			ImGui::EndTooltip();
+		}
+	}
+
 	//================================================================================================================================
 	//================================================================================================================================
 	void Renderer::UpdateUniformBuffer()
@@ -247,17 +284,26 @@ namespace vk {
 
 		ImGui::SliderFloat("rotation speed", &s_speed, 0.f, 1000.f);		
 
-		UniformBufferObject ubo = {};
+		UniformsForward ubo = {};
 		ubo.model = glm::rotate(glm::mat4(1.0f), Time::ElapsedSinceStartup() * glm::radians(s_speed), glm::vec3(0.0f, 1.0f, 0.0f));
 		ubo.view = glm::lookAt(glm::vec3(2.0f, 2.0f, 2.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
 		ubo.proj = glm::perspective(glm::radians(45.0f), m_swapchain->GetExtent().width / (float)m_swapchain->GetExtent().height, 0.1f, 10.0f);
 		ubo.proj[1][1] *= -1; 			//the Y coordinate of the clip coordinates is inverted
 
-		m_uniformBuffer->SetData(&ubo, sizeof(ubo));
+		m_uniformBuffer->SetData(&ubo, sizeof(ubo));		
 
-		UniformsPostprocess uniforms = {};
-		uniforms.color = glm::vec4(1,1,1,1);
-		m_uniformBufferPostprocess->SetData(&uniforms, sizeof(uniforms));
+		int misc_flags = 
+			 ImGuiColorEditFlags_PickerHueWheel
+			| ImGuiColorEditFlags_AlphaBar;
+
+		
+		ImGui::ColorEdit3("PostprocessColor##1", &m_uniformsPostprocess.color.r, misc_flags); 
+		ImGui::SameLine(); ShowHelpMarker("Click on the colored square to open a color picker.\nCTRL+click on individual component to input value.\n");
+		
+		ImGui::ColorEdit3("ClearColor##1", &m_clearColor.r, misc_flags);
+		ImGui::SameLine(); ShowHelpMarker("Click on the colored square to open a color picker.\nCTRL+click on individual component to input value.\n");
+		
+		m_uniformBufferPostprocess->SetData(&m_uniformsPostprocess, sizeof(m_uniformsPostprocess));
 
 	}
 	
@@ -291,7 +337,7 @@ namespace vk {
 		commandBufferBeginInfo.pInheritanceInfo = nullptr;
 
 		std::vector<VkClearValue> clearValues(2);
-		clearValues[0].color = { 0.0f, 0.5f, 0.f, 1.0f };
+		clearValues[0].color = { m_clearColor.r, m_clearColor.g, m_clearColor.b, m_clearColor.a };
 		clearValues[1].depthStencil = { 1.0f, 0 };
 
 		VkRenderPassBeginInfo renderPassInfo = {};
@@ -309,7 +355,7 @@ namespace vk {
 		renderPassInfoPostprocess.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
 		renderPassInfoPostprocess.pNext = nullptr;
 		renderPassInfoPostprocess.renderPass = m_renderPassPostprocess;
-		renderPassInfoPostprocess.framebuffer = m_postProcessFramebuffers[_index]->GetFrameBuffer();
+		renderPassInfoPostprocess.framebuffer = m_swapchainFramebuffers[_index]->GetFrameBuffer();
 		renderPassInfoPostprocess.renderArea.offset = { 0,0 };
 		renderPassInfoPostprocess.renderArea.extent.width = m_swapchain->GetExtent().width;
 		renderPassInfoPostprocess.renderArea.extent.height = m_swapchain->GetExtent().height;
@@ -317,10 +363,12 @@ namespace vk {
 		renderPassInfoPostprocess.pClearValues = clearValues.data();
 
 		if (vkBeginCommandBuffer(commandBuffer, &commandBufferBeginInfo) == VK_SUCCESS) {
+			
 			vkCmdBeginRenderPass(commandBuffer, &renderPassInfo, VK_SUBPASS_CONTENTS_SECONDARY_COMMAND_BUFFERS); {
 				vkCmdExecuteCommands(commandBuffer, 1, &m_geometryCommandBuffers[_index]);
 				vkCmdExecuteCommands(commandBuffer, 1, &m_imguiCommandBuffers[_index]);
 			} vkCmdEndRenderPass(commandBuffer);
+			
 			vkCmdBeginRenderPass(commandBuffer, &renderPassInfoPostprocess, VK_SUBPASS_CONTENTS_SECONDARY_COMMAND_BUFFERS); {
 				vkCmdExecuteCommands(commandBuffer, 1, &m_postprocessCommandBuffers[_index]);
 			} vkCmdEndRenderPass(commandBuffer);
@@ -425,7 +473,7 @@ namespace vk {
 		commandBufferInheritanceInfo.pNext = nullptr;
 		commandBufferInheritanceInfo.renderPass = m_renderPassPostprocess;
 		commandBufferInheritanceInfo.subpass = 0;
-		commandBufferInheritanceInfo.framebuffer = m_postProcessFramebuffers[_index]->GetFrameBuffer();
+		commandBufferInheritanceInfo.framebuffer = m_swapchainFramebuffers[_index]->GetFrameBuffer();
 		commandBufferInheritanceInfo.occlusionQueryEnable = VK_FALSE;
 		//commandBufferInheritanceInfo.queryFlags				=;
 		//commandBufferInheritanceInfo.pipelineStatistics		=;
@@ -591,7 +639,7 @@ namespace vk {
 
 		m_uniformBuffer = new Buffer(m_device);
 		m_uniformBuffer->Create(
-			sizeof(UniformBufferObject),
+			sizeof(UniformsForward),
 			VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT,
 			VK_MEMORY_PROPERTY_HOST_COHERENT_BIT | VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT
 		);
@@ -599,7 +647,7 @@ namespace vk {
 		VkDescriptorBufferInfo uboDescriptorBufferInfo = {};
 		uboDescriptorBufferInfo.buffer = m_uniformBuffer->GetBuffer();
 		uboDescriptorBufferInfo.offset = 0;
-		uboDescriptorBufferInfo.range = sizeof(UniformBufferObject);
+		uboDescriptorBufferInfo.range = sizeof(UniformsForward);
 
 		VkWriteDescriptorSet uboWriteDescriptorSet = {};
 		uboWriteDescriptorSet.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
@@ -999,15 +1047,17 @@ namespace vk {
 	//================================================================================================================================
 	//================================================================================================================================
 	void Renderer::CreateFramebuffersPostprocess() {
-		m_postProcessFramebuffers.resize(m_swapchain->GetSwapchainImagesCount());
-		for (int framebufferIndex = 0; framebufferIndex < m_postProcessFramebuffers.size(); framebufferIndex++) {
+		CreatePostprocessImages();
+
+		m_swapchainFramebuffers.resize(m_swapchain->GetSwapchainImagesCount());
+		for (int framebufferIndex = 0; framebufferIndex < m_swapchainFramebuffers.size(); framebufferIndex++) {
 			std::vector<VkImageView> attachments =
 			{
 				m_swapchain->GetImageView(framebufferIndex),					
 			};
 
-			m_postProcessFramebuffers[framebufferIndex] = new FrameBuffer(m_device);
-			m_postProcessFramebuffers[framebufferIndex]->Create(m_renderPassPostprocess, attachments, m_swapchain->GetExtent());
+			m_swapchainFramebuffers[framebufferIndex] = new FrameBuffer(m_device);
+			m_swapchainFramebuffers[framebufferIndex]->Create(m_renderPassPostprocess, attachments, m_swapchain->GetExtent());
 
 		}
 	}
@@ -1499,11 +1549,7 @@ namespace vk {
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void Renderer::CreatePostprocess() {
-
-		//Sampler
-		m_samplerPostprocess = new Sampler( m_device );
-		m_samplerPostprocess->CreateSampler(0, 1.f);
+	void Renderer::CreatePostprocessImages() {
 
 		m_imagePostprocess = new Image( m_device );
 		m_imagePostprocess->Create( 
@@ -1514,7 +1560,9 @@ namespace vk {
 		);
 		m_imageViewPostprocess = new ImageView( m_device );
 		m_imageViewPostprocess->Create( m_imagePostprocess->GetImage(), m_swapchain->GetSurfaceFormat().format, VK_IMAGE_ASPECT_COLOR_BIT, VK_IMAGE_VIEW_TYPE_2D);
+	}
 
+	void Renderer::CreatePostprocessVertexBuffer() {
 		// Vertex quad
 		glm::vec3 v0 = { -1.0f, -1.0f, 0.0f };
 		glm::vec3 v1 = { -1.0f, 1.0f, 0.0f };
@@ -1535,7 +1583,7 @@ namespace vk {
 			VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
 			VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT
 		);
-		stagingBuffer.SetData( vertices.data(), size);
+		stagingBuffer.SetData(vertices.data(), size);
 		VkCommandBuffer cmd = BeginSingleTimeCommands();
 		stagingBuffer.CopyBufferTo(cmd, m_vertexBufferPostprocess->GetBuffer(), size);
 		EndSingleTimeCommands(cmd);
@@ -1574,6 +1622,14 @@ namespace vk {
 
 	//================================================================================================================================
 	//================================================================================================================================
+	void Renderer::DeletePostprocessRessources() {
+		delete m_imageViewPostprocess;
+		delete m_imagePostprocess;
+
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
 	void Renderer::DeleteFramebuffers() {
 		for (int framebufferIndex = 0; framebufferIndex < m_forwardFrameBuffers.size(); framebufferIndex++) {
 			delete m_forwardFrameBuffers[framebufferIndex];
@@ -1584,10 +1640,10 @@ namespace vk {
 	//================================================================================================================================
 	//================================================================================================================================
 	void Renderer::DeleteFramebuffersPostprocess() {
-		for (int framebufferIndex = 0; framebufferIndex < m_postProcessFramebuffers.size(); framebufferIndex++) {
-			delete m_postProcessFramebuffers[framebufferIndex];
+		for (int framebufferIndex = 0; framebufferIndex < m_swapchainFramebuffers.size(); framebufferIndex++) {
+			delete m_swapchainFramebuffers[framebufferIndex];
 		}
-		m_postProcessFramebuffers.clear();
+		m_swapchainFramebuffers.clear();
 	}
 
 	//================================================================================================================================
@@ -1647,5 +1703,6 @@ namespace vk {
 			vkDestroyDescriptorSetLayout(m_device->vkDevice, m_descriptorSetLayoutPostprocess, nullptr);
 			m_descriptorSetLayout = VK_NULL_HANDLE;
 		}
+		delete m_uniformBufferPostprocess;
 	}
 }
