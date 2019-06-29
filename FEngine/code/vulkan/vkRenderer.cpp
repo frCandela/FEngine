@@ -1,10 +1,10 @@
-#include "Includes.h"
+#include "fanIncludes.h"
 
 #include "vkRenderer.h"
 
-#include "util/Time.h"
-#include "util/glfwInput.h"
-#include "util/glfwInput.h"
+#include "util/fanTime.h"
+#include "util/fanInput.h"
+#include "util/fanInput.h"
 #include "vulkan/core/vkInstance.h"
 #include "vulkan/core/vkDevice.h"
 #include "vulkan/core/vkSwapChain.h"
@@ -53,12 +53,16 @@ namespace vk {
 		CreateForwardFramebuffers();
 		CreateCommandBuffers();
 		RecordAllCommandBuffers();
+
+		ImGui::NewFrame();
 	}
 	
 	//================================================================================================================================
 	//================================================================================================================================	
 	Renderer::~Renderer() {
 		vkDeviceWaitIdle(m_device.vkDevice);
+
+		ImGui::EndFrame();
 
 		delete m_imguiPipeline;
 		delete m_forwardPipeline;
@@ -75,89 +79,67 @@ namespace vk {
 		delete m_window;
 		delete m_instance;
 	}
-
+	
 	//================================================================================================================================
-	//================================================================================================================================
-	void Renderer::Run()
-	{
-		ImGuiIO& io = ImGui::GetIO();
+	//================================================================================================================================	
+	bool Renderer::WindowIsOpen() { 
+		return ! glfwWindowShouldClose(m_window->GetWindow()); 
+	}
 
-		float lastUpdateTime = Time::ElapsedSinceStartup();
-
-		while ( glfwWindowShouldClose(m_window->GetWindow()) == false)
-		{
-			const float time = Time::ElapsedSinceStartup();
-			Input::NewFrame();
-
-			const float updateDelta = time - lastUpdateTime;
-			if (updateDelta > 1.f / Time::GetFPS() ) {
-				lastUpdateTime = time;
-
-				const VkResult result = m_swapchain->AcquireNextImage();
-				if (result == VK_ERROR_OUT_OF_DATE_KHR) {
-					if (m_window->GetExtent().width == 0 && m_window->GetExtent().height == 0) {
-						continue;
-					}
-
-					std::cout << "suboptimal swapchain" << std::endl;
-					vkDeviceWaitIdle(m_device.vkDevice);
-
-					DeleteForwardFramebuffers();
-					DeleteSwapchainFramebuffers();
-
-					m_swapchain->Resize( m_window->GetExtent() );
-					m_postprocessPipeline->Resize(m_window->GetExtent());
-					m_forwardPipeline->Resize(m_window->GetExtent());
-					
-					CreateSwapchainFramebuffers();		
-					CreateForwardFramebuffers();
-					RecordAllCommandBuffers();
-					vkResetFences(m_device.vkDevice, 1, m_swapchain->GetCurrentInFlightFence());
-					m_swapchain->AcquireNextImage();
-				}
-				else if (result != VK_SUCCESS) {
-					std::cout << "Could not acquire next image" << std::endl;
-				}
-				else {
-					vkWaitForFences(m_device.vkDevice, 1, m_swapchain->GetCurrentInFlightFence(), VK_TRUE, std::numeric_limits<uint64_t>::max());
-					vkResetFences(m_device.vkDevice, 1, m_swapchain->GetCurrentInFlightFence());
+	void Renderer::DrawFrame( ) {
+			const VkResult result = m_swapchain->AcquireNextImage();
+			if (result == VK_ERROR_OUT_OF_DATE_KHR) {
+				if (m_window->GetExtent().width == 0 && m_window->GetExtent().height == 0) {
+					return;
 				}
 
-				ImGui::NewFrame();
+				std::cout << "suboptimal swapchain" << std::endl;
+				vkDeviceWaitIdle(m_device.vkDevice);
 
-				lastUpdateTime = time;
-				io.DisplaySize = ImVec2(static_cast<float>(m_swapchain->GetExtent().width), static_cast<float>(m_swapchain->GetExtent().height));
-				{
-					ImGui::ShowDemoWindow();
-					ImGui::Begin("Debug");
+				DeleteForwardFramebuffers();
+				DeleteSwapchainFramebuffers();
 
-					float tmpFps = Time::GetFPS();
-					if (ImGui::DragFloat("Framerate", &tmpFps, 1.f, Time::minFps, 144.f)) {
-						Time::SetFPS(tmpFps);
-					}
+				m_swapchain->Resize(m_window->GetExtent());
+				m_postprocessPipeline->Resize(m_window->GetExtent());
+				m_forwardPipeline->Resize(m_window->GetExtent());
 
-					std::stringstream ssFramerate;
-					ssFramerate << 1.f / updateDelta;
-					ImGui::Text(ssFramerate.str().c_str());
-					//ImGui::Text("ARKANEUUUUH!");
-					if (ImGui::Button("reload shaders")) {
-						ReloadShaders();
-					}
-					UpdateUniformBuffer();
-					ImGui::End();
-				}				
-				ImGui::EndFrame();
-				ImGui::Render();
+				CreateSwapchainFramebuffers();
+				CreateForwardFramebuffers();
+				RecordAllCommandBuffers();
+				vkResetFences(m_device.vkDevice, 1, m_swapchain->GetCurrentInFlightFence());
+				m_swapchain->AcquireNextImage();
+			}
+			else if (result != VK_SUCCESS) {
+				std::cout << "Could not acquire next image" << std::endl;
+			}
+			else {
+				vkWaitForFences(m_device.vkDevice, 1, m_swapchain->GetCurrentInFlightFence(), VK_TRUE, std::numeric_limits<uint64_t>::max());
+				vkResetFences(m_device.vkDevice, 1, m_swapchain->GetCurrentInFlightFence());
+			}
+			
+			//io.DisplaySize = ImVec2(static_cast<float>(m_swapchain->GetExtent().width), static_cast<float>(m_swapchain->GetExtent().height));
+			{
+				ImGui::Begin("Debug");
 
-				RecordCommandBufferImgui(m_swapchain->GetCurrentFrame());
-				RecordPrimaryCommandBuffer(m_swapchain->GetCurrentFrame());
-				SubmitCommandBuffers();
 
-				m_swapchain->PresentImage();
-				m_swapchain->StartNextFrame();
-			}	
 
-		}
+				/*std::stringstream ssFramerate;
+				ssFramerate << 1.f / updateDelta;
+				ImGui::Text(ssFramerate.str().c_str());*/
+				//ImGui::Text("ARKANEUUUUH!");
+				UpdateUniformBuffer();
+				ImGui::End();
+			}
+			ImGui::EndFrame();
+			ImGui::Render();
+
+			RecordCommandBufferImgui(m_swapchain->GetCurrentFrame());
+			RecordPrimaryCommandBuffer(m_swapchain->GetCurrentFrame());
+			SubmitCommandBuffers();
+
+			m_swapchain->PresentImage();
+			m_swapchain->StartNextFrame();
+			ImGui::NewFrame();
 	}
 
 	//================================================================================================================================
@@ -183,7 +165,7 @@ namespace vk {
 
 		return commandBuffer;
 	}
-	
+
 	//================================================================================================================================
 	//================================================================================================================================
 	void Renderer::EndSingleTimeCommands(VkCommandBuffer commandBuffer)
@@ -215,19 +197,6 @@ namespace vk {
 		return true;
 	}
 
-	static void ShowHelpMarker(const char* desc)
-	{
-		ImGui::TextDisabled("(?)");
-		if (ImGui::IsItemHovered())
-		{
-			ImGui::BeginTooltip();
-			ImGui::PushTextWrapPos(ImGui::GetFontSize() * 35.0f);
-			ImGui::TextUnformatted(desc);
-			ImGui::PopTextWrapPos();
-			ImGui::EndTooltip();
-		}
-	}
-
 	//================================================================================================================================
 	//================================================================================================================================
 	void Renderer::UpdateUniformBuffer()
@@ -244,22 +213,6 @@ namespace vk {
 		ubo.proj[1][1] *= -1; 			//the Y coordinate of the clip coordinates is inverted
 
 		m_forwardPipeline->SetUniforms(ubo);
-
-		int misc_flags = 
-			 ImGuiColorEditFlags_PickerHueWheel
-			| ImGuiColorEditFlags_AlphaBar;
-
-		
-		PostprocessPipeline::UniformsPostprocess uniforms = m_postprocessPipeline->GetUniforms();
-
-		ImGui::ColorEdit3("PostprocessColor##1", &uniforms.color.r, misc_flags);
-		ImGui::SameLine(); ShowHelpMarker("Click on the colored square to open a color picker.\nCTRL+click on individual component to input value.\n");
-		
-		ImGui::ColorEdit3("ClearColor##1", &m_clearColor.r, misc_flags);
-		ImGui::SameLine(); ShowHelpMarker("Click on the colored square to open a color picker.\nCTRL+click on individual component to input value.\n");
-		
-		m_postprocessPipeline->SetUniforms(uniforms);
-
 	}
 	
 	//================================================================================================================================
@@ -441,7 +394,6 @@ namespace vk {
 		else {
 			std::cout << "Could not record command buffer " << _index << "." << std::endl;
 		}
-
 	}
 
 	//================================================================================================================================

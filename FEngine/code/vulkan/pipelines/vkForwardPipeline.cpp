@@ -1,4 +1,4 @@
-#include "Includes.h"
+#include "fanIncludes.h"
 
 #include "vulkan/pipelines/vkForwardPipeline.h"
 #include "vulkan/core/vkDevice.h"
@@ -50,6 +50,8 @@ namespace vk {
 		CreateDepthRessources(_extent);
 		CreateDescriptors();
 		CreatePipeline(_extent);
+
+		SetUniforms(m_uniforms);
 	}
 
 	//================================================================================================================================
@@ -209,9 +211,9 @@ namespace vk {
 		m_depthImage->Create(depthFormat, _extent, VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
 		m_depthImageView->Create(m_depthImage->GetImage(), depthFormat, VK_IMAGE_ASPECT_DEPTH_BIT, VK_IMAGE_VIEW_TYPE_2D);
 
-		VkCommandBuffer cmd = Renderer::GetGlobalRenderer()->BeginSingleTimeCommands();
+		VkCommandBuffer cmd = Renderer::GetRenderer().BeginSingleTimeCommands();
 		m_depthImage->TransitionImageLayout(cmd, depthFormat, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL, 1);
-		Renderer::GetGlobalRenderer()->EndSingleTimeCommands(cmd);
+		Renderer::GetRenderer().EndSingleTimeCommands(cmd);
 
 		return true;
 	}
@@ -450,9 +452,9 @@ namespace vk {
 				VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT
 			);
 			stagingBuffer.SetData(m_indices.data(), size);
-			VkCommandBuffer cmd = Renderer::GetGlobalRenderer()->BeginSingleTimeCommands();
+			VkCommandBuffer cmd = Renderer::GetRenderer().BeginSingleTimeCommands();
 			stagingBuffer.CopyBufferTo(cmd, m_indexBuffer->GetBuffer(), size);
-			Renderer::GetGlobalRenderer()->EndSingleTimeCommands(cmd);
+			Renderer::GetRenderer().EndSingleTimeCommands(cmd);
 		}
 		{
 			glm::vec3 color(0.f, 0.2, 0.f);
@@ -481,9 +483,9 @@ namespace vk {
 				VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT
 			);
 			stagingBuffer2.SetData(m_vertices.data(), size);
-			VkCommandBuffer cmd2 = Renderer::GetGlobalRenderer()->BeginSingleTimeCommands();
+			VkCommandBuffer cmd2 = Renderer::GetRenderer().BeginSingleTimeCommands();
 			stagingBuffer2.CopyBufferTo(cmd2, m_vertexBuffer->GetBuffer(), size);
-			Renderer::GetGlobalRenderer()->EndSingleTimeCommands(cmd2);
+			Renderer::GetRenderer().EndSingleTimeCommands(cmd2);
 		}
 	}
 

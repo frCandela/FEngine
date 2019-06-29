@@ -21,12 +21,21 @@ namespace vk {
 		Renderer(const VkExtent2D _size);
 		~Renderer();
 
-		void Run();
+		bool WindowIsOpen();
+		void DrawFrame();
+		static Renderer & GetRenderer() {	return * ms_globalRenderer; }
+		void ReloadShaders();
 
 		VkCommandBuffer BeginSingleTimeCommands();
 		void EndSingleTimeCommands(VkCommandBuffer commandBuffer);
 
-		static Renderer * GetGlobalRenderer() {	return ms_globalRenderer; }
+
+		ImguiPipeline *			GetImguiPipeline()			{ return m_imguiPipeline; }
+		PostprocessPipeline *	GetPostprocessPipeline()	{ return m_postprocessPipeline; }
+		ForwardPipeline *		GetForwardPipeline()		{ return m_forwardPipeline; }
+
+		glm::vec4 GetClearColor() const { return m_clearColor;  }
+		void SetClearColor(glm::vec4 _color) { m_clearColor = _color; }
 
 	private:
 		Instance *		m_instance;
@@ -57,7 +66,6 @@ namespace vk {
 		bool ResetCommandPool();
 		void UpdateUniformBuffer();		
 		bool SubmitCommandBuffers();
-		void ReloadShaders();
 
 		void RecordCommandBufferPostProcess	( const int _index);
 		void RecordCommandBufferImgui		( const int _index);

@@ -1,4 +1,4 @@
-#include "Includes.h"
+#include "fanIncludes.h"
 
 #include "vulkan/pipelines/vkPostprocessPipeline.h"
 #include "vulkan/core/vkDevice.h"
@@ -48,6 +48,10 @@ namespace vk {
 		CreateDescriptors();
 		CreatePipeline(_extent );
 
+		Uniforms uniforms;
+		uniforms.color = glm::vec4(1, 1, 1, 1);
+		SetUniforms(uniforms);
+
 		return true;
 	}
 
@@ -59,6 +63,7 @@ namespace vk {
 		CreateImagesAndViews(_extent);
 		CreateDescriptors();
 		CreatePipeline(_extent);
+		SetUniforms(m_uniforms);
 	}
 
 	void PostprocessPipeline::Draw(VkCommandBuffer _commandBuffer) {
@@ -74,7 +79,7 @@ namespace vk {
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void PostprocessPipeline::SetUniforms(const UniformsPostprocess _uniforms) {
+	void PostprocessPipeline::SetUniforms(const Uniforms _uniforms) {
 		m_uniforms = _uniforms;
 		m_uniformBuffer->SetData(&m_uniforms, sizeof(m_uniforms));
 	}
@@ -192,7 +197,7 @@ namespace vk {
 
 		m_uniformBuffer = new Buffer(m_device);
 		m_uniformBuffer->Create(
-			sizeof(UniformsPostprocess),
+			sizeof(Uniforms),
 			VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT,
 			VK_MEMORY_PROPERTY_HOST_COHERENT_BIT | VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT
 		);
@@ -200,7 +205,7 @@ namespace vk {
 		VkDescriptorBufferInfo uniformsDescriptorBufferInfo = {};
 		uniformsDescriptorBufferInfo.buffer = m_uniformBuffer->GetBuffer();
 		uniformsDescriptorBufferInfo.offset = 0;
-		uniformsDescriptorBufferInfo.range = sizeof(UniformsPostprocess);
+		uniformsDescriptorBufferInfo.range = sizeof(Uniforms);
 
 		VkWriteDescriptorSet uniformsWriteDescriptorSet = {};
 		uniformsWriteDescriptorSet.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
@@ -474,9 +479,9 @@ namespace vk {
 			VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT
 		);
 		stagingBuffer.SetData(vertices.data(), size);
-		VkCommandBuffer cmd = Renderer::GetGlobalRenderer()->BeginSingleTimeCommands();
+		VkCommandBuffer cmd = Renderer::GetRenderer().BeginSingleTimeCommands();
 		stagingBuffer.CopyBufferTo(cmd, m_vertexBuffer->GetBuffer(), size);
-		Renderer::GetGlobalRenderer()->EndSingleTimeCommands(cmd);
+		Renderer::GetRenderer().EndSingleTimeCommands(cmd);
 	}
 
 	//================================================================================================================================

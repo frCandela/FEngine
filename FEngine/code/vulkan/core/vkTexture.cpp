@@ -1,4 +1,4 @@
-#include "Includes.h"
+#include "fanIncludes.h"
 
 #include "vulkan/core/vkTexture.h"
 #include "vulkan/core/vkDevice.h"
@@ -460,7 +460,7 @@ namespace vk {
 
 		VkImageSubresourceRange subresourceRange = { VK_IMAGE_ASPECT_COLOR_BIT , 0, m_mipLevels, 0, 1 };
 
-		VkCommandBuffer cmd = Renderer::GetGlobalRenderer()->BeginSingleTimeCommands();
+		VkCommandBuffer cmd = Renderer::GetRenderer().BeginSingleTimeCommands();
 		TransitionImageLayout(cmd, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, subresourceRange);
 		CopyBufferToImage(cmd, stagingBuffer.GetBuffer(), static_cast<uint32_t>(_width), static_cast<uint32_t>(_height));
 		
@@ -473,6 +473,6 @@ namespace vk {
 		// Creates the image View
 		CreateImageView(VK_FORMAT_R8G8B8A8_UNORM, VK_IMAGE_VIEW_TYPE_2D, { VK_IMAGE_ASPECT_COLOR_BIT, 0, m_mipLevels, 0, 1 });
 
-		Renderer::GetGlobalRenderer()->EndSingleTimeCommands(cmd);
+		Renderer::GetRenderer().EndSingleTimeCommands(cmd);
 	}
 }

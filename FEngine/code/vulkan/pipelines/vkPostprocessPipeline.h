@@ -13,7 +13,7 @@ namespace vk {
 		PostprocessPipeline(Device& _device, VkRenderPass& _renderPass );
 		~PostprocessPipeline();
 
-		struct UniformsPostprocess {
+		struct Uniforms {
 			glm::vec4 color;
 		};
 
@@ -22,8 +22,8 @@ namespace vk {
 		void Resize( VkExtent2D _extent );
 		void ReloadShaders();
 
-		UniformsPostprocess GetUniforms() const { return m_uniforms; }
-		void SetUniforms(const UniformsPostprocess _uniforms);
+		Uniforms GetUniforms() const { return m_uniforms; }
+		void SetUniforms(const Uniforms _uniforms);
 
 		VkPipeline		GetPipeline()	{ return m_pipeline; }
 		VkImageView		GetImageView();
@@ -61,6 +61,6 @@ namespace vk {
 		Buffer * m_uniformBuffer;
 		Buffer * m_vertexBuffer;
 
-		UniformsPostprocess m_uniforms;
+		Uniforms m_uniforms;
 	};
 }

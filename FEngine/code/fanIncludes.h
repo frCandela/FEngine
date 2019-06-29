@@ -12,6 +12,8 @@
 #include "glm/gtc/matrix_transform.hpp"
 
 #include "imgui/imgui.h"
+#include "util/fanSignal.h"
+#include "util/fanImguiUtil.h"
 
 #include <vector>
 #include <array>
@@ -22,6 +24,5 @@
 #include <algorithm>
 #include <algorithm>
 #include <fstream>
-
 
 #pragma warning( pop )

@@ -1,6 +1,6 @@
-#include "Includes.h"
+#include "fanIncludes.h"
 
-#include "util/glfwInput.h"
+#include "util/fanInput.h"
 
 //================================================================================================================================
 // INPUT

@@ -1,163 +1,193 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <Filter Include="Fichiers d%27en-tête">
-      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
-      <Extensions>h;hh;hpp;hxx;hm;inl;inc;xsd</Extensions>
-    </Filter>
     <Filter Include="shaders">
       <UniqueIdentifier>{422395bb-fb27-4fb8-82d2-d4c0e4a81912}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Fichiers d%27en-tête\vulkan">
+    <Filter Include="code">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="code\vulkan">
       <UniqueIdentifier>{6d1ab719-6179-4bc6-ac3a-bc6ff88ce93f}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Fichiers d%27en-tête\deps">
-      <UniqueIdentifier>{438721f2-b2df-4736-b550-620897169813}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Fichiers d%27en-tête\util">
-      <UniqueIdentifier>{26735d92-fe63-4ca4-a659-b6baa31d270a}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Fichiers d%27en-tête\vulkan\pipelines">
+    <Filter Include="code\vulkan\pipelines">
       <UniqueIdentifier>{5626cd8c-7763-4394-aa32-3d7e1ce08b06}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Fichiers d%27en-tête\vulkan\core">
+    <Filter Include="code\vulkan\core">
       <UniqueIdentifier>{9731fc01-1c78-441b-aa77-8365a9a60c62}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Fichiers d%27en-tête\vulkan\util">
+    <Filter Include="code\vulkan\util">
       <UniqueIdentifier>{4ff53cec-cd38-4426-be53-be2ed26a9884}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="code\deps">
+      <UniqueIdentifier>{438721f2-b2df-4736-b550-620897169813}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="code\util">
+      <UniqueIdentifier>{26735d92-fe63-4ca4-a659-b6baa31d270a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="code\editor">
+      <UniqueIdentifier>{8d39c302-6e12-4a9c-8a2c-7f32301265c6}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="code\main.cpp">
-      <Filter>Fichiers d%27en-tête</Filter>
-    </ClCompile>
-    <ClCompile Include="code\util\Time.cpp">
-      <Filter>Fichiers d%27en-tête\util</Filter>
-    </ClCompile>
-    <ClCompile Include="code\util\glfwInput.cpp">
-      <Filter>Fichiers d%27en-tête\util</Filter>
-    </ClCompile>
     <ClCompile Include="deps\imgui\imgui.cpp">
-      <Filter>Fichiers d%27en-tête\deps</Filter>
+      <Filter>code\deps</Filter>
     </ClCompile>
     <ClCompile Include="deps\imgui\imgui_demo.cpp">
-      <Filter>Fichiers d%27en-tête\deps</Filter>
+      <Filter>code\deps</Filter>
     </ClCompile>
     <ClCompile Include="deps\imgui\imgui_draw.cpp">
-      <Filter>Fichiers d%27en-tête\deps</Filter>
+      <Filter>code\deps</Filter>
     </ClCompile>
     <ClCompile Include="code\vulkan\vkRenderer.cpp">
-      <Filter>Fichiers d%27en-tête\vulkan</Filter>
+      <Filter>code\vulkan</Filter>
     </ClCompile>
     <ClCompile Include="code\vulkan\util\vkVertex.cpp">
-      <Filter>Fichiers d%27en-tête\vulkan\util</Filter>
+      <Filter>code\vulkan\util</Filter>
     </ClCompile>
     <ClCompile Include="code\vulkan\util\vkWindow.cpp">
-      <Filter>Fichiers d%27en-tête\vulkan\util</Filter>
+      <Filter>code\vulkan\util</Filter>
     </ClCompile>
     <ClCompile Include="code\vulkan\util\vkSpirvCompiler.cpp">
-      <Filter>Fichiers d%27en-tête\vulkan\util</Filter>
+      <Filter>code\vulkan\util</Filter>
     </ClCompile>
     <ClCompile Include="code\vulkan\pipelines\vkPostprocessPipeline.cpp">
-      <Filter>Fichiers d%27en-tête\vulkan\pipelines</Filter>
+      <Filter>code\vulkan\pipelines</Filter>
     </ClCompile>
     <ClCompile Include="code\vulkan\pipelines\vkForwardPipeline.cpp">
-      <Filter>Fichiers d%27en-tête\vulkan\pipelines</Filter>
+      <Filter>code\vulkan\pipelines</Filter>
     </ClCompile>
     <ClCompile Include="code\vulkan\pipelines\vkImguiPipeline.cpp">
-      <Filter>Fichiers d%27en-tête\vulkan\pipelines</Filter>
+      <Filter>code\vulkan\pipelines</Filter>
     </ClCompile>
     <ClCompile Include="code\vulkan\core\vkSampler.cpp">
-      <Filter>Fichiers d%27en-tête\vulkan\core</Filter>
+      <Filter>code\vulkan\core</Filter>
     </ClCompile>
     <ClCompile Include="code\vulkan\core\vkShader.cpp">
-      <Filter>Fichiers d%27en-tête\vulkan\core</Filter>
+      <Filter>code\vulkan\core</Filter>
     </ClCompile>
     <ClCompile Include="code\vulkan\core\vkSwapChain.cpp">
-      <Filter>Fichiers d%27en-tête\vulkan\core</Filter>
+      <Filter>code\vulkan\core</Filter>
     </ClCompile>
     <ClCompile Include="code\vulkan\core\vkTexture.cpp">
-      <Filter>Fichiers d%27en-tête\vulkan\core</Filter>
+      <Filter>code\vulkan\core</Filter>
     </ClCompile>
     <ClCompile Include="code\vulkan\core\vkBuffer.cpp">
-      <Filter>Fichiers d%27en-tête\vulkan\core</Filter>
+      <Filter>code\vulkan\core</Filter>
     </ClCompile>
     <ClCompile Include="code\vulkan\core\vkDevice.cpp">
-      <Filter>Fichiers d%27en-tête\vulkan\core</Filter>
+      <Filter>code\vulkan\core</Filter>
     </ClCompile>
     <ClCompile Include="code\vulkan\core\vkFramebuffer.cpp">
-      <Filter>Fichiers d%27en-tête\vulkan\core</Filter>
+      <Filter>code\vulkan\core</Filter>
     </ClCompile>
     <ClCompile Include="code\vulkan\core\vkImage.cpp">
-      <Filter>Fichiers d%27en-tête\vulkan\core</Filter>
+      <Filter>code\vulkan\core</Filter>
     </ClCompile>
     <ClCompile Include="code\vulkan\core\vkImageView.cpp">
-      <Filter>Fichiers d%27en-tête\vulkan\core</Filter>
+      <Filter>code\vulkan\core</Filter>
     </ClCompile>
     <ClCompile Include="code\vulkan\core\vkInstance.cpp">
-      <Filter>Fichiers d%27en-tête\vulkan\core</Filter>
+      <Filter>code\vulkan\core</Filter>
+    </ClCompile>
+    <ClCompile Include="code\editor\fanMainMenuBar.cpp">
+      <Filter>code\editor</Filter>
+    </ClCompile>
+    <ClCompile Include="code\util\fanInput.cpp">
+      <Filter>code\util</Filter>
+    </ClCompile>
+    <ClCompile Include="code\util\fanTime.cpp">
+      <Filter>code\util</Filter>
+    </ClCompile>
+    <ClCompile Include="code\fanEngine.cpp">
+      <Filter>code</Filter>
+    </ClCompile>
+    <ClCompile Include="code\fanMain.cpp">
+      <Filter>code</Filter>
+    </ClCompile>
+    <ClCompile Include="code\util\fanImguiUtil.cpp">
+      <Filter>code\util</Filter>
+    </ClCompile>
+    <ClCompile Include="code\editor\fanRenderWindow.cpp">
+      <Filter>code\editor</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="code\util\Time.h">
-      <Filter>Fichiers d%27en-tête\util</Filter>
-    </ClInclude>
-    <ClInclude Include="code\util\glfwInput.h">
-      <Filter>Fichiers d%27en-tête\util</Filter>
-    </ClInclude>
-    <ClInclude Include="code\Includes.h">
-      <Filter>Fichiers d%27en-tête</Filter>
-    </ClInclude>
     <ClInclude Include="code\vulkan\vkRenderer.h">
-      <Filter>Fichiers d%27en-tête\vulkan</Filter>
+      <Filter>code\vulkan</Filter>
     </ClInclude>
     <ClInclude Include="code\vulkan\util\vkSpirvCompiler.h">
-      <Filter>Fichiers d%27en-tête\vulkan\util</Filter>
+      <Filter>code\vulkan\util</Filter>
     </ClInclude>
     <ClInclude Include="code\vulkan\util\vkVertex.h">
-      <Filter>Fichiers d%27en-tête\vulkan\util</Filter>
+      <Filter>code\vulkan\util</Filter>
     </ClInclude>
     <ClInclude Include="code\vulkan\util\vkWindow.h">
-      <Filter>Fichiers d%27en-tête\vulkan\util</Filter>
+      <Filter>code\vulkan\util</Filter>
     </ClInclude>
     <ClInclude Include="code\vulkan\pipelines\vkPostprocessPipeline.h">
-      <Filter>Fichiers d%27en-tête\vulkan\pipelines</Filter>
+      <Filter>code\vulkan\pipelines</Filter>
     </ClInclude>
     <ClInclude Include="code\vulkan\pipelines\vkForwardPipeline.h">
-      <Filter>Fichiers d%27en-tête\vulkan\pipelines</Filter>
+      <Filter>code\vulkan\pipelines</Filter>
     </ClInclude>
     <ClInclude Include="code\vulkan\pipelines\vkImguiPipeline.h">
-      <Filter>Fichiers d%27en-tête\vulkan\pipelines</Filter>
+      <Filter>code\vulkan\pipelines</Filter>
     </ClInclude>
     <ClInclude Include="code\vulkan\core\vkSampler.h">
-      <Filter>Fichiers d%27en-tête\vulkan\core</Filter>
+      <Filter>code\vulkan\core</Filter>
     </ClInclude>
     <ClInclude Include="code\vulkan\core\vkShader.h">
-      <Filter>Fichiers d%27en-tête\vulkan\core</Filter>
+      <Filter>code\vulkan\core</Filter>
     </ClInclude>
     <ClInclude Include="code\vulkan\core\vkSwapChain.h">
-      <Filter>Fichiers d%27en-tête\vulkan\core</Filter>
+      <Filter>code\vulkan\core</Filter>
     </ClInclude>
     <ClInclude Include="code\vulkan\core\vkTexture.h">
-      <Filter>Fichiers d%27en-tête\vulkan\core</Filter>
+      <Filter>code\vulkan\core</Filter>
     </ClInclude>
     <ClInclude Include="code\vulkan\core\vkBuffer.h">
-      <Filter>Fichiers d%27en-tête\vulkan\core</Filter>
+      <Filter>code\vulkan\core</Filter>
     </ClInclude>
     <ClInclude Include="code\vulkan\core\vkDevice.h">
-      <Filter>Fichiers d%27en-tête\vulkan\core</Filter>
+      <Filter>code\vulkan\core</Filter>
     </ClInclude>
     <ClInclude Include="code\vulkan\core\vkFrameBuffer.h">
-      <Filter>Fichiers d%27en-tête\vulkan\core</Filter>
+      <Filter>code\vulkan\core</Filter>
     </ClInclude>
     <ClInclude Include="code\vulkan\core\vkImage.h">
-      <Filter>Fichiers d%27en-tête\vulkan\core</Filter>
+      <Filter>code\vulkan\core</Filter>
     </ClInclude>
     <ClInclude Include="code\vulkan\core\vkImageView.h">
-      <Filter>Fichiers d%27en-tête\vulkan\core</Filter>
+      <Filter>code\vulkan\core</Filter>
     </ClInclude>
     <ClInclude Include="code\vulkan\core\vkInstance.h">
-      <Filter>Fichiers d%27en-tête\vulkan\core</Filter>
+      <Filter>code\vulkan\core</Filter>
+    </ClInclude>
+    <ClInclude Include="code\editor\fanMainMenuBar.h">
+      <Filter>code\editor</Filter>
+    </ClInclude>
+    <ClInclude Include="code\util\fanSignal.h">
+      <Filter>code\util</Filter>
+    </ClInclude>
+    <ClInclude Include="code\util\fanInput.h">
+      <Filter>code\util</Filter>
+    </ClInclude>
+    <ClInclude Include="code\util\fanTime.h">
+      <Filter>code\util</Filter>
+    </ClInclude>
+    <ClInclude Include="code\fanEngine.h">
+      <Filter>code</Filter>
+    </ClInclude>
+    <ClInclude Include="code\fanIncludes.h">
+      <Filter>code</Filter>
+    </ClInclude>
+    <ClInclude Include="code\util\fanImguiUtil.h">
+      <Filter>code\util</Filter>
+    </ClInclude>
+    <ClInclude Include="code\editor\fanRenderWindow.h">
+      <Filter>code\editor</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
