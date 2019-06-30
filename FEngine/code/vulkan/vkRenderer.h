@@ -49,6 +49,7 @@ namespace vk {
 
 		VkRenderPass	m_renderPass;
 		VkRenderPass	m_renderPassPostprocess;
+		VkRenderPass	m_renderPassUI;
 
 		VkCommandPool	m_commandPool;
 		std::vector<VkCommandBuffer> m_primaryCommandBuffers;
@@ -75,10 +76,12 @@ namespace vk {
 
 		bool CreateCommandBuffers();
 		bool CreateCommandPool();
-		bool CreateRenderPass();
-		bool CreateRenderPassPostprocess();
 		void CreateForwardFramebuffers();
 		void CreateSwapchainFramebuffers();
+
+		bool CreateRenderPass();
+		bool CreateRenderPassPostprocess();
+		bool CreateRenderPassUI();
 
 		void DeleteCommandPool();
 		void DeleteRenderPass();

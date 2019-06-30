@@ -47,7 +47,7 @@ namespace vk {
 		m_forwardPipeline->Create( m_swapchain->GetExtent());
 
 		m_imguiPipeline = new ImguiPipeline(m_device, m_swapchain->GetSwapchainImagesCount());
-		m_imguiPipeline->Create(m_renderPass, m_window->GetWindow(), m_swapchain->GetExtent());
+		m_imguiPipeline->Create(m_renderPassPostprocess, m_window->GetWindow(), m_swapchain->GetExtent());
 
 		CreateSwapchainFramebuffers();
 		CreateForwardFramebuffers();
@@ -274,11 +274,12 @@ namespace vk {
 			
 			vkCmdBeginRenderPass(commandBuffer, &renderPassInfo, VK_SUBPASS_CONTENTS_SECONDARY_COMMAND_BUFFERS); {
 				vkCmdExecuteCommands(commandBuffer, 1, &m_geometryCommandBuffers[_index]);
-				vkCmdExecuteCommands(commandBuffer, 1, &m_imguiCommandBuffers[_index]);
+
 			} vkCmdEndRenderPass(commandBuffer);
 			
 			vkCmdBeginRenderPass(commandBuffer, &renderPassInfoPostprocess, VK_SUBPASS_CONTENTS_SECONDARY_COMMAND_BUFFERS); {
-				vkCmdExecuteCommands(commandBuffer, 1, &m_postprocessCommandBuffers[_index] );
+				vkCmdExecuteCommands( commandBuffer, 1, &m_postprocessCommandBuffers[_index]	);
+				vkCmdExecuteCommands( commandBuffer, 1, &m_imguiCommandBuffers[_index]			);
 			} vkCmdEndRenderPass(commandBuffer);
 			
 			if (vkEndCommandBuffer(commandBuffer) != VK_SUCCESS) {
@@ -337,9 +338,9 @@ namespace vk {
 		VkCommandBufferInheritanceInfo commandBufferInheritanceInfo = {};
 		commandBufferInheritanceInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_INHERITANCE_INFO;
 		commandBufferInheritanceInfo.pNext = nullptr;
-		commandBufferInheritanceInfo.renderPass = m_renderPass;
+		commandBufferInheritanceInfo.renderPass = m_renderPassPostprocess;
 		commandBufferInheritanceInfo.subpass = 0;
-		commandBufferInheritanceInfo.framebuffer = m_forwardFrameBuffers[_index]->GetFrameBuffer();
+		commandBufferInheritanceInfo.framebuffer = m_swapchainFramebuffers[_index]->GetFrameBuffer();
 		commandBufferInheritanceInfo.occlusionQueryEnable = VK_FALSE;
 		//commandBufferInheritanceInfo.queryFlags				=;
 		//commandBufferInheritanceInfo.pipelineStatistics		=;
@@ -589,6 +590,72 @@ namespace vk {
 	//================================================================================================================================
 	//================================================================================================================================
 	bool Renderer::CreateRenderPassPostprocess() {
+		VkAttachmentDescription colorAttachment;
+		colorAttachment.flags = 0;
+		colorAttachment.format = m_swapchain->GetSurfaceFormat().format;
+		colorAttachment.samples = VK_SAMPLE_COUNT_1_BIT;
+		colorAttachment.loadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
+		colorAttachment.storeOp = VK_ATTACHMENT_STORE_OP_STORE;
+		colorAttachment.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
+		colorAttachment.stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
+		colorAttachment.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
+		colorAttachment.finalLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR;
+
+		VkAttachmentReference colorAttachmentRef;
+		colorAttachmentRef.attachment = 0;
+		colorAttachmentRef.layout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
+
+		std::vector<VkAttachmentReference>   inputAttachments = {};
+		std::vector<VkAttachmentReference>   colorAttachments = { colorAttachmentRef };
+
+		VkSubpassDescription subpassDescription;
+		subpassDescription.flags = 0;
+		subpassDescription.pipelineBindPoint = VK_PIPELINE_BIND_POINT_GRAPHICS;
+		subpassDescription.inputAttachmentCount = static_cast<uint32_t>(inputAttachments.size());
+		subpassDescription.pInputAttachments = inputAttachments.data();
+		subpassDescription.colorAttachmentCount = static_cast<uint32_t>(colorAttachments.size());
+		subpassDescription.pColorAttachments = colorAttachments.data();
+		subpassDescription.pResolveAttachments = nullptr;
+		subpassDescription.pDepthStencilAttachment = nullptr;
+		subpassDescription.preserveAttachmentCount = 0;
+		subpassDescription.pPreserveAttachments = nullptr;
+
+		VkSubpassDependency dependency;
+		dependency.srcSubpass = 0;
+		dependency.dstSubpass = VK_SUBPASS_EXTERNAL;
+		dependency.srcStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
+		dependency.dstStageMask = VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT;
+		dependency.srcAccessMask = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
+		dependency.dstAccessMask = VK_ACCESS_SHADER_READ_BIT;
+		dependency.dependencyFlags = 0;
+
+		std::vector<VkAttachmentDescription> attachmentsDescriptions = { colorAttachment };
+		std::vector<VkSubpassDescription> subpassDescriptions = { subpassDescription };
+		std::vector<VkSubpassDependency> subpassDependencies = { dependency };
+
+		VkRenderPassCreateInfo renderPassCreateInfo;
+		renderPassCreateInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO;
+		renderPassCreateInfo.pNext = nullptr;
+		renderPassCreateInfo.flags = 0;
+		renderPassCreateInfo.attachmentCount = static_cast<uint32_t>(attachmentsDescriptions.size());
+		renderPassCreateInfo.pAttachments = attachmentsDescriptions.data();
+		renderPassCreateInfo.subpassCount = static_cast<uint32_t>(subpassDescriptions.size());;
+		renderPassCreateInfo.pSubpasses = subpassDescriptions.data();
+		renderPassCreateInfo.dependencyCount = static_cast<uint32_t>(subpassDependencies.size());;
+		renderPassCreateInfo.pDependencies = subpassDependencies.data();
+
+		if (vkCreateRenderPass(m_device.vkDevice, &renderPassCreateInfo, nullptr, &m_renderPassPostprocess) != VK_SUCCESS) {
+			std::cout << "Could not create render pass pp;" << std::endl;
+			return false;
+		}
+		std::cout << std::hex << "VkRenderPass pp\t\t" << m_renderPassPostprocess << std::dec << std::endl;
+
+		return true;
+	}
+
+	//================================================================================================================================
+//================================================================================================================================
+	bool Renderer::CreateRenderPassUI() {
 		VkAttachmentDescription colorAttachment;
 		colorAttachment.flags = 0;
 		colorAttachment.format = m_swapchain->GetSurfaceFormat().format;
