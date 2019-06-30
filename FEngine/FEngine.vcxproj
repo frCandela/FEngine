@@ -86,8 +86,13 @@
   <ItemGroup>
     <ClCompile Include="code\editor\fanMainMenuBar.cpp" />
     <ClCompile Include="code\editor\fanRenderWindow.cpp" />
+    <ClCompile Include="code\editor\fanSceneWindow.cpp" />
     <ClCompile Include="code\fanEngine.cpp" />
     <ClCompile Include="code\fanMain.cpp" />
+    <ClCompile Include="code\scene\components\fanComponent.cpp" />
+    <ClCompile Include="code\scene\components\fanTransform.cpp" />
+    <ClCompile Include="code\scene\fanGameobject.cpp" />
+    <ClCompile Include="code\scene\fanScene.cpp" />
     <ClCompile Include="code\util\fanImguiUtil.cpp" />
     <ClCompile Include="code\util\fanInput.cpp" />
     <ClCompile Include="code\util\fanTime.cpp" />
@@ -101,6 +106,7 @@
     <ClCompile Include="code\vulkan\core\vkShader.cpp" />
     <ClCompile Include="code\vulkan\core\vkSwapChain.cpp" />
     <ClCompile Include="code\vulkan\core\vkTexture.cpp" />
+    <ClCompile Include="code\vulkan\pipelines\vkDebugPipeline.cpp" />
     <ClCompile Include="code\vulkan\pipelines\vkForwardPipeline.cpp" />
     <ClCompile Include="code\vulkan\pipelines\vkImguiPipeline.cpp" />
     <ClCompile Include="code\vulkan\pipelines\vkPostprocessPipeline.cpp" />
@@ -115,8 +121,13 @@
   <ItemGroup>
     <ClInclude Include="code\editor\fanMainMenuBar.h" />
     <ClInclude Include="code\editor\fanRenderWindow.h" />
+    <ClInclude Include="code\editor\fanSceneWindow.h" />
     <ClInclude Include="code\fanEngine.h" />
     <ClInclude Include="code\fanIncludes.h" />
+    <ClInclude Include="code\scene\components\fanComponent.h" />
+    <ClInclude Include="code\scene\components\fanTransform.h" />
+    <ClInclude Include="code\scene\fanGameobject.h" />
+    <ClInclude Include="code\scene\fanScene.h" />
     <ClInclude Include="code\util\fanImguiUtil.h" />
     <ClInclude Include="code\util\fanSignal.h" />
     <ClInclude Include="code\util\fanInput.h" />
@@ -131,6 +142,7 @@
     <ClInclude Include="code\vulkan\core\vkShader.h" />
     <ClInclude Include="code\vulkan\core\vkSwapChain.h" />
     <ClInclude Include="code\vulkan\core\vkTexture.h" />
+    <ClInclude Include="code\vulkan\pipelines\vkDebugPipeline.h" />
     <ClInclude Include="code\vulkan\pipelines\vkForwardPipeline.h" />
     <ClInclude Include="code\vulkan\pipelines\vkImguiPipeline.h" />
     <ClInclude Include="code\vulkan\pipelines\vkPostprocessPipeline.h" />
@@ -140,6 +152,8 @@
     <ClInclude Include="code\vulkan\vkRenderer.h" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="shaders\debug.frag" />
+    <None Include="shaders\debug.vert" />
     <None Include="shaders\forward.frag" />
     <None Include="shaders\forward.vert" />
     <None Include="shaders\imgui.frag" />

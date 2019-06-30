@@ -2,15 +2,22 @@
 
 #include "editor/fanMainMenuBar.h"
 #include "editor/fanRenderWindow.h"
+#include "editor/fanSceneWindow.h"
+
 #include "vulkan/vkRenderer.h"
 #include "fanEngine.h"
 
-namespace editor {
+namespace editor {	
+
+	//================================================================================================================================
+	//================================================================================================================================
 	MainMenuBar::MainMenuBar() :
 		  m_showImguiDemoWindow		( true ){
 
 	}
 
+	//================================================================================================================================
+	//================================================================================================================================
 	void MainMenuBar::Draw() {
 		fan::Engine &	engine =	fan::Engine::GetEngine();
 		vk::Renderer &	renderer = vk::Renderer::GetRenderer();
@@ -38,13 +45,17 @@ namespace editor {
 			// View
 			if (ImGui::BeginMenu("View"))
 			{
-				ImGui::Checkbox("Imgui demo", &m_showImguiDemoWindow);
-
 				bool showPostprocessWindow = engine.GetRenderWindow().IsVisible();
 				if (ImGui::Checkbox("Rendering", &showPostprocessWindow)) {
 					engine.GetRenderWindow().SetVisible(showPostprocessWindow);
 				}
-				
+				bool showSceneWindow = engine.GetSceneWindow().IsVisible();
+				if (ImGui::Checkbox("Scene", &showSceneWindow)) {
+					engine.GetSceneWindow().SetVisible(showSceneWindow);
+				}
+				ImGui::Separator();
+				ImGui::Checkbox("Imgui demo", &m_showImguiDemoWindow);
+
 				ImGui::EndMenu();
 			}
 

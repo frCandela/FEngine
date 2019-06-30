@@ -16,6 +16,7 @@
 #include "vulkan/pipelines/vkImguiPipeline.h"
 #include "vulkan/pipelines/vkPostprocessPipeline.h"
 #include "vulkan/pipelines/vkForwardPipeline.h"
+#include "vulkan/pipelines/vkDebugPipeline.h"
 #include "vulkan/util/vkWindow.h"
 
 namespace vk {
@@ -40,12 +41,15 @@ namespace vk {
 		CreateRenderPass();
 		CreateRenderPassPostprocess();
 
-		m_postprocessPipeline = new PostprocessPipeline(m_device, m_renderPassPostprocess);
-		m_postprocessPipeline->Create( m_swapchain->GetSurfaceFormat().format, m_swapchain->GetExtent());
-
 		m_forwardPipeline = new ForwardPipeline(m_device, m_renderPass);
 		m_forwardPipeline->Create( m_swapchain->GetExtent());
 
+		m_postprocessPipeline = new PostprocessPipeline(m_device, m_renderPassPostprocess);
+		m_postprocessPipeline->Create(m_swapchain->GetSurfaceFormat().format, m_swapchain->GetExtent());
+		
+		m_debugPipeline = new DebugPipeline(m_device, m_renderPassPostprocess, m_swapchain->GetSwapchainImagesCount());
+		m_debugPipeline->Create(m_swapchain->GetExtent());
+		
 		m_imguiPipeline = new ImguiPipeline(m_device, m_swapchain->GetSwapchainImagesCount());
 		m_imguiPipeline->Create(m_renderPassPostprocess, m_window->GetWindow(), m_swapchain->GetExtent());
 
@@ -66,6 +70,7 @@ namespace vk {
 
 		delete m_imguiPipeline;
 		delete m_forwardPipeline;
+		delete m_debugPipeline;
 
 		DeleteForwardFramebuffers();
 		DeleteRenderPass();
@@ -102,6 +107,7 @@ namespace vk {
 				m_swapchain->Resize(m_window->GetExtent());
 				m_postprocessPipeline->Resize(m_window->GetExtent());
 				m_forwardPipeline->Resize(m_window->GetExtent());
+				m_debugPipeline->Resize(m_window->GetExtent());
 
 				CreateSwapchainFramebuffers();
 				CreateForwardFramebuffers();
@@ -117,11 +123,9 @@ namespace vk {
 				vkResetFences(m_device.vkDevice, 1, m_swapchain->GetCurrentInFlightFence());
 			}
 			
-			//io.DisplaySize = ImVec2(static_cast<float>(m_swapchain->GetExtent().width), static_cast<float>(m_swapchain->GetExtent().height));
+			ImGui::GetIO().DisplaySize = ImVec2(static_cast<float>(m_swapchain->GetExtent().width), static_cast<float>(m_swapchain->GetExtent().height));
 			{
 				ImGui::Begin("Debug");
-
-
 
 				/*std::stringstream ssFramerate;
 				ssFramerate << 1.f / updateDelta;
@@ -133,13 +137,20 @@ namespace vk {
 			ImGui::EndFrame();
 			ImGui::Render();
 
+			m_debugPipeline->DebugLine({ 0,0,0 }, { 1,0,0 }, { 1,0,0,1 });
+			m_debugPipeline->DebugLine({ 0,0,0 }, { 0,1,0 }, { 0,1,0,1 });
+			m_debugPipeline->DebugLine({ 0,0,0 }, { 0,0,1 }, { 0,0,1,1 });
+
+			RecordCommandBufferDebug(m_swapchain->GetCurrentFrame());
 			RecordCommandBufferImgui(m_swapchain->GetCurrentFrame());
 			RecordPrimaryCommandBuffer(m_swapchain->GetCurrentFrame());
 			SubmitCommandBuffers();
 
 			m_swapchain->PresentImage();
 			m_swapchain->StartNextFrame();
+			Input::NewFrame();
 			ImGui::NewFrame();
+			m_debugPipeline->Clear();
 	}
 
 	//================================================================================================================================
@@ -213,6 +224,14 @@ namespace vk {
 		ubo.proj[1][1] *= -1; 			//the Y coordinate of the clip coordinates is inverted
 
 		m_forwardPipeline->SetUniforms(ubo);
+
+
+		DebugPipeline::Uniforms debugUniforms;
+		debugUniforms.model = ubo.model;
+		debugUniforms.view = ubo.view;
+		debugUniforms.proj = ubo.proj;
+		debugUniforms.color = glm::vec4(1, 1, 1, 1);
+		m_debugPipeline->SetUniforms(debugUniforms);
 	}
 	
 	//================================================================================================================================
@@ -223,6 +242,9 @@ namespace vk {
 		}
 		for (int cmdBufferIndex = 0; cmdBufferIndex < m_geometryCommandBuffers.size(); cmdBufferIndex++) {
 			RecordCommandBufferGeometry(cmdBufferIndex);
+		}
+		for (int cmdBufferIndex = 0; cmdBufferIndex < m_debugCommandBuffers.size(); cmdBufferIndex++) {
+			RecordCommandBufferDebug(cmdBufferIndex);
 		}
 		for (int cmdBufferIndex = 0; cmdBufferIndex < m_swapchainFramebuffers.size(); cmdBufferIndex++) {
 			RecordCommandBufferPostProcess( cmdBufferIndex );
@@ -279,6 +301,9 @@ namespace vk {
 			
 			vkCmdBeginRenderPass(commandBuffer, &renderPassInfoPostprocess, VK_SUBPASS_CONTENTS_SECONDARY_COMMAND_BUFFERS); {
 				vkCmdExecuteCommands( commandBuffer, 1, &m_postprocessCommandBuffers[_index]	);
+				if (m_debugPipeline->HasNothingToDraw() == false) {
+					vkCmdExecuteCommands(commandBuffer, 1, &m_debugCommandBuffers[_index]);
+				}
 				vkCmdExecuteCommands( commandBuffer, 1, &m_imguiCommandBuffers[_index]			);
 			} vkCmdEndRenderPass(commandBuffer);
 			
@@ -365,6 +390,42 @@ namespace vk {
 
 	//================================================================================================================================
 	//================================================================================================================================
+	void Renderer::RecordCommandBufferDebug(const int _index) {
+		if (m_debugPipeline->HasNothingToDraw() == false) {
+			m_debugPipeline->UpdateBuffer(_index);
+
+			VkCommandBuffer commandBuffer = m_debugCommandBuffers[_index];
+
+			VkCommandBufferInheritanceInfo commandBufferInheritanceInfo = {};
+			commandBufferInheritanceInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_INHERITANCE_INFO;
+			commandBufferInheritanceInfo.pNext = nullptr;
+			commandBufferInheritanceInfo.renderPass = m_renderPassPostprocess;
+			commandBufferInheritanceInfo.subpass = 0;
+			commandBufferInheritanceInfo.framebuffer = m_swapchainFramebuffers[_index]->GetFrameBuffer();
+			commandBufferInheritanceInfo.occlusionQueryEnable = VK_FALSE;
+			//commandBufferInheritanceInfo.queryFlags				=;
+			//commandBufferInheritanceInfo.pipelineStatistics		=;
+
+			VkCommandBufferBeginInfo commandBufferBeginInfo;
+			commandBufferBeginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
+			commandBufferBeginInfo.pNext = nullptr;
+			commandBufferBeginInfo.flags = VK_COMMAND_BUFFER_USAGE_SIMULTANEOUS_USE_BIT | VK_COMMAND_BUFFER_USAGE_RENDER_PASS_CONTINUE_BIT;
+			commandBufferBeginInfo.pInheritanceInfo = &commandBufferInheritanceInfo;
+
+			if (vkBeginCommandBuffer(commandBuffer, &commandBufferBeginInfo) == VK_SUCCESS) {
+				m_debugPipeline->Draw(commandBuffer, _index);
+				if (vkEndCommandBuffer(commandBuffer) != VK_SUCCESS) {
+					std::cout << "Could not record command buffer " << _index << "." << std::endl;
+				}
+			}
+			else {
+				std::cout << "Could not record command buffer " << _index << "." << std::endl;
+			}
+		}
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
 	void Renderer::RecordCommandBufferGeometry(const int _index) {
 
 		VkCommandBuffer commandBuffer = m_geometryCommandBuffers[_index];
@@ -387,7 +448,6 @@ namespace vk {
 
 		if (vkBeginCommandBuffer(commandBuffer, &commandBufferBeginInfo) == VK_SUCCESS) {
 			m_forwardPipeline->Draw(commandBuffer);
-
 			if (vkEndCommandBuffer(commandBuffer) != VK_SUCCESS) {
 				std::cout << "Could not record command buffer " << _index << "." << std::endl;
 			}
@@ -435,8 +495,10 @@ namespace vk {
 
 		m_postprocessPipeline->ReloadShaders();
 		m_forwardPipeline->ReloadShaders();
+		m_debugPipeline->ReloadShaders();
 		m_postprocessPipeline->Resize(m_swapchain->GetExtent());
 		m_forwardPipeline->Resize(m_swapchain->GetExtent());
+		m_debugPipeline->Resize(m_swapchain->GetExtent());
 
 		DeleteForwardFramebuffers();
 		CreateForwardFramebuffers();
@@ -470,6 +532,12 @@ namespace vk {
 		m_geometryCommandBuffers.resize(m_swapchain->GetSwapchainImagesCount());
 		if (vkAllocateCommandBuffers(m_device.vkDevice, &secondaryCommandBufferAllocateInfo, m_geometryCommandBuffers.data()) != VK_SUCCESS) {
 			std::cout << "Could not allocate command buffers." << std::endl;
+			return false;
+		}
+
+		m_debugCommandBuffers.resize(m_swapchain->GetSwapchainImagesCount());
+		if (vkAllocateCommandBuffers(m_device.vkDevice, &secondaryCommandBufferAllocateInfo, m_debugCommandBuffers.data()) != VK_SUCCESS) {
+			std::cout << "Could not allocate debug command buffers." << std::endl;
 			return false;
 		}
 

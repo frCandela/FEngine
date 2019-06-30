@@ -4,8 +4,10 @@
 
 int main()
 {	
-	fan::Engine engine;
-	engine.Run();
+	{
+		fan::Engine engine;
+		engine.Run();
+	}
 	
 	int wait;
 	std::cin >> wait;

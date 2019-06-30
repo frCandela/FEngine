@@ -15,6 +15,7 @@ namespace vk {
 	class Sampler;
 	class PostprocessPipeline;
 	class ForwardPipeline;
+	class DebugPipeline;
 
 	class Renderer {
 	public:
@@ -29,10 +30,10 @@ namespace vk {
 		VkCommandBuffer BeginSingleTimeCommands();
 		void EndSingleTimeCommands(VkCommandBuffer commandBuffer);
 
-
 		ImguiPipeline *			GetImguiPipeline()			{ return m_imguiPipeline; }
 		PostprocessPipeline *	GetPostprocessPipeline()	{ return m_postprocessPipeline; }
 		ForwardPipeline *		GetForwardPipeline()		{ return m_forwardPipeline; }
+		DebugPipeline *			GetDebugPipeline()			{ return m_debugPipeline; }
 
 		glm::vec4 GetClearColor() const { return m_clearColor;  }
 		void SetClearColor(glm::vec4 _color) { m_clearColor = _color; }
@@ -46,6 +47,7 @@ namespace vk {
 		ImguiPipeline *			m_imguiPipeline;
 		PostprocessPipeline *	m_postprocessPipeline;
 		ForwardPipeline *		m_forwardPipeline;
+		DebugPipeline *			m_debugPipeline;
 
 		VkRenderPass	m_renderPass;
 		VkRenderPass	m_renderPassPostprocess;
@@ -55,6 +57,7 @@ namespace vk {
 		std::vector<VkCommandBuffer> m_primaryCommandBuffers;
 		std::vector<VkCommandBuffer> m_geometryCommandBuffers;
 		std::vector<VkCommandBuffer> m_imguiCommandBuffers;
+		std::vector<VkCommandBuffer> m_debugCommandBuffers;
 		std::vector<VkCommandBuffer> m_postprocessCommandBuffers;
 
 		std::vector< FrameBuffer * > m_forwardFrameBuffers;
@@ -70,6 +73,7 @@ namespace vk {
 
 		void RecordCommandBufferPostProcess	( const int _index);
 		void RecordCommandBufferImgui		( const int _index);
+		void RecordCommandBufferDebug		(const int _index);
 		void RecordCommandBufferGeometry	( const int _index);		
 		void RecordPrimaryCommandBuffer		( const int _index);
 		void RecordAllCommandBuffers();

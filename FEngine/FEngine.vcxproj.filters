@@ -29,6 +29,12 @@
     <Filter Include="code\editor">
       <UniqueIdentifier>{8d39c302-6e12-4a9c-8a2c-7f32301265c6}</UniqueIdentifier>
     </Filter>
+    <Filter Include="code\scene">
+      <UniqueIdentifier>{8e08d939-af57-4de9-a30d-5ddc1bbe8fba}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="code\scene\components">
+      <UniqueIdentifier>{c32148bd-658b-4850-9756-15c541e7a217}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="deps\imgui\imgui.cpp">
@@ -112,6 +118,24 @@
     <ClCompile Include="code\editor\fanRenderWindow.cpp">
       <Filter>code\editor</Filter>
     </ClCompile>
+    <ClCompile Include="code\vulkan\pipelines\vkDebugPipeline.cpp">
+      <Filter>code\vulkan\pipelines</Filter>
+    </ClCompile>
+    <ClCompile Include="code\scene\fanGameobject.cpp">
+      <Filter>code\scene</Filter>
+    </ClCompile>
+    <ClCompile Include="code\scene\fanScene.cpp">
+      <Filter>code\scene</Filter>
+    </ClCompile>
+    <ClCompile Include="code\editor\fanSceneWindow.cpp">
+      <Filter>code\editor</Filter>
+    </ClCompile>
+    <ClCompile Include="code\scene\components\fanTransform.cpp">
+      <Filter>code\scene\components</Filter>
+    </ClCompile>
+    <ClCompile Include="code\scene\components\fanComponent.cpp">
+      <Filter>code\scene\components</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="code\vulkan\vkRenderer.h">
@@ -189,6 +213,24 @@
     <ClInclude Include="code\editor\fanRenderWindow.h">
       <Filter>code\editor</Filter>
     </ClInclude>
+    <ClInclude Include="code\vulkan\pipelines\vkDebugPipeline.h">
+      <Filter>code\vulkan\pipelines</Filter>
+    </ClInclude>
+    <ClInclude Include="code\scene\fanGameobject.h">
+      <Filter>code\scene</Filter>
+    </ClInclude>
+    <ClInclude Include="code\scene\fanScene.h">
+      <Filter>code\scene</Filter>
+    </ClInclude>
+    <ClInclude Include="code\editor\fanSceneWindow.h">
+      <Filter>code\editor</Filter>
+    </ClInclude>
+    <ClInclude Include="code\scene\components\fanTransform.h">
+      <Filter>code\scene\components</Filter>
+    </ClInclude>
+    <ClInclude Include="code\scene\components\fanComponent.h">
+      <Filter>code\scene\components</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="shaders\forward.frag">
@@ -207,6 +249,12 @@
       <Filter>shaders</Filter>
     </None>
     <None Include="shaders\postprocess.vert">
+      <Filter>shaders</Filter>
+    </None>
+    <None Include="shaders\debug.frag">
+      <Filter>shaders</Filter>
+    </None>
+    <None Include="shaders\debug.vert">
       <Filter>shaders</Filter>
     </None>
   </ItemGroup>
