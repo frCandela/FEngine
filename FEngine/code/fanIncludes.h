@@ -15,6 +15,7 @@
 #include "imgui/imgui.h"
 #include "util/fanSignal.h"
 #include "util/fanImguiUtil.h"
+//#include "util/fanUtil.h"
 
 #include <vector>
 #include <array>
@@ -25,5 +26,6 @@
 #include <algorithm>
 #include <algorithm>
 #include <fstream>
+#include <type_traits>
 
 #pragma warning( pop )

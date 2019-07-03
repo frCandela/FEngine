@@ -84,9 +84,11 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="code\editor\fanInspectorWindow.cpp" />
     <ClCompile Include="code\editor\fanMainMenuBar.cpp" />
     <ClCompile Include="code\editor\fanRenderWindow.cpp" />
     <ClCompile Include="code\editor\fanSceneWindow.cpp" />
+    <ClCompile Include="code\editor\fanWindow.cpp" />
     <ClCompile Include="code\fanEngine.cpp" />
     <ClCompile Include="code\fanMain.cpp" />
     <ClCompile Include="code\scene\components\fanComponent.cpp" />
@@ -119,9 +121,11 @@
     <ClCompile Include="deps\imgui\imgui_draw.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="code\editor\fanInspectorWindow.h" />
     <ClInclude Include="code\editor\fanMainMenuBar.h" />
     <ClInclude Include="code\editor\fanRenderWindow.h" />
     <ClInclude Include="code\editor\fanSceneWindow.h" />
+    <ClInclude Include="code\editor\fanWindow.h" />
     <ClInclude Include="code\fanEngine.h" />
     <ClInclude Include="code\fanIncludes.h" />
     <ClInclude Include="code\scene\components\fanComponent.h" />
@@ -132,6 +136,7 @@
     <ClInclude Include="code\util\fanSignal.h" />
     <ClInclude Include="code\util\fanInput.h" />
     <ClInclude Include="code\util\fanTime.h" />
+    <ClInclude Include="code\util\fanUtil.h" />
     <ClInclude Include="code\vulkan\core\vkBuffer.h" />
     <ClInclude Include="code\vulkan\core\vkDevice.h" />
     <ClInclude Include="code\vulkan\core\vkFrameBuffer.h" />

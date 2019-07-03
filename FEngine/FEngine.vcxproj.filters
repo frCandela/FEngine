@@ -136,6 +136,12 @@
     <ClCompile Include="code\scene\components\fanComponent.cpp">
       <Filter>code\scene\components</Filter>
     </ClCompile>
+    <ClCompile Include="code\editor\fanInspectorWindow.cpp">
+      <Filter>code\editor</Filter>
+    </ClCompile>
+    <ClCompile Include="code\editor\fanWindow.cpp">
+      <Filter>code\editor</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="code\vulkan\vkRenderer.h">
@@ -230,6 +236,15 @@
     </ClInclude>
     <ClInclude Include="code\scene\components\fanComponent.h">
       <Filter>code\scene\components</Filter>
+    </ClInclude>
+    <ClInclude Include="code\editor\fanInspectorWindow.h">
+      <Filter>code\editor</Filter>
+    </ClInclude>
+    <ClInclude Include="code\editor\fanWindow.h">
+      <Filter>code\editor</Filter>
+    </ClInclude>
+    <ClInclude Include="code\util\fanUtil.h">
+      <Filter>code\vulkan\util</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

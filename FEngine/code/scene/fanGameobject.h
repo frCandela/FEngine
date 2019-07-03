@@ -58,8 +58,6 @@ namespace scene
 
 		m_components.push_back(componentType);
 
-		componentType->Initialize();
-
 		onComponentCreated.Emmit(componentType);
 		onComponentModified.Emmit(componentType);
 

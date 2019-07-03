@@ -16,33 +16,36 @@ namespace editor {
 	//================================================================================================================================
 	//================================================================================================================================
 	void RenderWindow::Draw() {
-		vk::Renderer &	renderer = vk::Renderer::GetRenderer();
+		if (IsVisible() == true ) {
 
-		if( ImGui::Begin("Rendering", &m_isVisible) ) {
-			if ( ImGui::CollapsingHeader("Post-processing") ) {
-				vk::PostprocessPipeline::Uniforms uniforms = vk::Renderer::GetRenderer().GetPostprocessPipeline()->GetUniforms();
+			vk::Renderer &	renderer = vk::Renderer::GetRenderer();
 
-				// Filter color
-				if (ImGui::ColorEdit3("Filter##1", &uniforms.color.r, util::Imgui::colorEditFlags)) {
-					
-					vk::Renderer::GetRenderer().GetPostprocessPipeline()->SetUniforms(uniforms);
-				} 
-			}
+			bool isVisible = IsVisible();
+			if (ImGui::Begin("Rendering", &isVisible)) {
+				if (ImGui::CollapsingHeader("Post-processing")) {
+					vk::PostprocessPipeline::Uniforms uniforms = vk::Renderer::GetRenderer().GetPostprocessPipeline()->GetUniforms();
 
-			if (ImGui::CollapsingHeader("Global")) {
-				float tmpFps = Time::GetFPS();
-				if (ImGui::DragFloat("Framerate", &tmpFps, 1.f, Time::minFps, 144.f)) {
-					Time::SetFPS(tmpFps);
+					// Filter color
+					if (ImGui::ColorEdit3("Filter##1", &uniforms.color.r, util::Imgui::colorEditFlags)) {
+
+						vk::Renderer::GetRenderer().GetPostprocessPipeline()->SetUniforms(uniforms);
+					}
 				}
 
-				// Clear color
-				glm::vec4 clearColor = renderer.GetClearColor();
-				if (ImGui::ColorEdit3("Clear color", &clearColor.r, util::Imgui::colorEditFlags)) {
-					renderer.SetClearColor(clearColor);
+				if (ImGui::CollapsingHeader("Global")) {
+					float tmpFps = Time::GetFPS();
+					if (ImGui::DragFloat("Framerate", &tmpFps, 1.f, Time::minFps, 144.f)) {
+						Time::SetFPS(tmpFps);
+					}
+
+					// Clear color
+					glm::vec4 clearColor = renderer.GetClearColor();
+					if (ImGui::ColorEdit3("Clear color", &clearColor.r, util::Imgui::colorEditFlags)) {
+						renderer.SetClearColor(clearColor);
+					}
 				}
-			}
-		} ImGui::End();
-
-
+			} ImGui::End();
+			SetVisible(isVisible);
+		}
 	}
 }

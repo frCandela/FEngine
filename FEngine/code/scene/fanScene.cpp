@@ -2,6 +2,7 @@
 
 #include "scene/fanScene.h"
 #include "scene/fanGameobject.h"
+#include "fanEngine.h"
 
 
 namespace scene {
@@ -41,6 +42,11 @@ namespace scene {
 				if ( m_gameObjects[gameobjectIndex] == gameobjecttoDelete)
 				{
 					m_gameObjects.erase(m_gameObjects.begin() + gameobjectIndex);
+
+					if (fan::Engine::GetEngine().GetSelectedGameobject() == gameobjecttoDelete) {
+						fan::Engine::GetEngine().Deselect();
+					}
+
 					delete(gameobjecttoDelete);
 					break;
 				}

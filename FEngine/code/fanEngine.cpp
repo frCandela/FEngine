@@ -7,6 +7,7 @@
 #include "editor/fanMainMenuBar.h"
 #include "editor/fanRenderWindow.h"	
 #include "editor/fanSceneWindow.h"	
+#include "editor/fanInspectorWindow.h"	
 #include "scene/fanScene.h"
 
 namespace fan {
@@ -21,6 +22,7 @@ namespace fan {
 		m_mainMenuBar = new editor::MainMenuBar();
 		m_renderWindow = new editor::RenderWindow();
 		m_sceneWindow = new editor::SceneWindow();
+		m_inspectorWindow = new editor::InspectorWindow();
 
 		m_renderer = new vk::Renderer({ 1280,720 });
 		m_scene = new scene::Scene("mainScene");
@@ -68,12 +70,8 @@ namespace fan {
 
 	void Engine::DrawUI() {
 		m_mainMenuBar->Draw();
-
-		if (m_renderWindow->IsVisible()) {
-			m_renderWindow->Draw();
-		}
-		if (m_sceneWindow->IsVisible()) {
-			m_sceneWindow->Draw();
-		}
+		m_renderWindow->Draw();
+		m_sceneWindow->Draw();	
+		m_inspectorWindow->Draw();
 	}
 }

@@ -5,6 +5,7 @@
 #include "vulkan/vkRenderer.h"
 #include "scene/fanScene.h"
 #include "scene/fanGameobject.h"
+#include "scene/components/fanTransform.h"
 #include "util/fanInput.h"
 
 #include "fanEngine.h"
@@ -21,53 +22,58 @@ namespace editor {
 	//================================================================================================================================
 	//================================================================================================================================
 	void SceneWindow::Draw() {
-		fan::Engine & engine = fan::Engine::GetEngine();
-		scene::Scene & scene = engine.GetScene();
+		if (IsVisible() == true) {
+			fan::Engine & engine = fan::Engine::GetEngine();
+			scene::Scene & scene = engine.GetScene();
 
-		if( ImGui::Begin("Scene", &m_isVisible) ) {	
+			bool isVisible = IsVisible();
+			if (ImGui::Begin("Scene", &isVisible)) {
 
-			bool newGameobject = false;
-			if (ImGui::BeginPopupContextWindow("PopupContextWindowNewGameobject"))
-			{
-				if (ImGui::Selectable("New Gameobject")) {
-					newGameobject = true;					
-				}
-				ImGui::EndPopup();
-			}
-			if( newGameobject ){ 
-				ImGui::OpenPopup("New Gameobject"); 
-			} NewGameobjectModal();
-
-			ImGui::Text(scene.GetName().c_str());
-			ImGui::Separator();
-
-			bool popupOneTime = true;
-			const std::vector< scene::Gameobject * > & gameobjects = scene.GetGameObjects();
-			for (int gameobjectIndex = 0; gameobjectIndex < gameobjects.size(); gameobjectIndex++)
-			{
-				scene::Gameobject * gameobject = gameobjects[gameobjectIndex];
-
-				ImGuiTreeNodeFlags node_flags = ImGuiTreeNodeFlags_Leaf | (gameobject == engine.GetSelectedGameobject() ? ImGuiTreeNodeFlags_Selected : 0);
-				bool nodeOpen = ImGui::TreeNodeEx(gameobject->GetName().c_str(), node_flags);
-				if (ImGui::IsItemClicked()) {
-					engine.SetSelectedGameobject(gameobject);
-				}		
-
-				if (popupOneTime && ImGui::BeginPopupContextItem(scene.GetName().c_str()))
+				bool newGameobject = false;
+				if (ImGui::BeginPopupContextWindow("PopupContextWindowNewGameobject"))
 				{
-					if (ImGui::Selectable("Delete")) {
-						scene.DeleteGameobject(gameobject);
+					if (ImGui::Selectable("New Gameobject")) {
+						newGameobject = true;
 					}
 					ImGui::EndPopup();
-					popupOneTime = false;
+				}
+				if (newGameobject) {
+					ImGui::OpenPopup("New Gameobject");
+				} NewGameobjectModal();
+
+				ImGui::Text(scene.GetName().c_str());
+				ImGui::Separator();
+
+				bool popupOneTime = true;
+				const std::vector< scene::Gameobject * > & gameobjects = scene.GetGameObjects();
+				for (int gameobjectIndex = 0; gameobjectIndex < gameobjects.size(); gameobjectIndex++)
+				{
+					scene::Gameobject * gameobject = gameobjects[gameobjectIndex];
+
+					ImGuiTreeNodeFlags node_flags = ImGuiTreeNodeFlags_Leaf | (gameobject == engine.GetSelectedGameobject() ? ImGuiTreeNodeFlags_Selected : 0);
+					bool nodeOpen = ImGui::TreeNodeEx(gameobject->GetName().c_str(), node_flags);
+					if (ImGui::IsItemClicked()) {
+						engine.SetSelectedGameobject(gameobject);
+					}
+
+					if (popupOneTime && ImGui::BeginPopupContextItem(scene.GetName().c_str()))
+					{
+						if (ImGui::Selectable("Delete")) {
+							scene.DeleteGameobject(gameobject);
+
+						}
+						ImGui::EndPopup();
+						popupOneTime = false;
+					}
+
+					if (nodeOpen) {
+						ImGui::TreePop();
+					}
 				}
 
-				if (nodeOpen) {
-					ImGui::TreePop();
-				}
-			}		
-
-		} ImGui::End();
+			} ImGui::End();
+			SetVisible(isVisible);
+		}
 	}
 
 	void SceneWindow::NewGameobjectModal()
@@ -86,7 +92,7 @@ namespace editor {
 			{
 				//Create new gameobject 
 				scene::Gameobject* newGameobject = scene.CreateGameobject(m_textBuffer.data());
-				//newGameobject->AddComponent<editor::Transform>();
+				newGameobject->AddComponent<scene::Transform>();
 				engine.SetSelectedGameobject(newGameobject);
 				ImGui::CloseCurrentPopup();
 			}
