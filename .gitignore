@@ -330,3 +330,5 @@ ASALocalRun/
 .mfractor/
 
 no_submit/
+
+FEngine/imgui\.ini

@@ -3,6 +3,8 @@
 #include "editor/fanMainMenuBar.h"
 #include "editor/fanRenderWindow.h"
 #include "editor/fanSceneWindow.h"
+#include "editor/fanInspectorWindow.h"
+
 
 #include "vulkan/vkRenderer.h"
 #include "fanEngine.h"
@@ -53,6 +55,12 @@ namespace editor {
 				if (ImGui::Checkbox("Scene", &showSceneWindow)) {
 					engine.GetSceneWindow().SetVisible(showSceneWindow);
 				}
+				bool showInspector = engine.GetInspector().IsVisible();
+				if (ImGui::Checkbox("Inspector", &showInspector)) {
+					engine.GetInspector().SetVisible(showInspector);
+				}
+
+
 				ImGui::Separator();
 				ImGui::Checkbox("Imgui demo", &m_showImguiDemoWindow);
 

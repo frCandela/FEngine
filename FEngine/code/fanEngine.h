@@ -32,6 +32,7 @@ namespace fan {
 		editor::MainMenuBar  &	GetMainMenuBar() const			{ return * m_mainMenuBar; }
 		editor::RenderWindow &	GetRenderWindow() const			{ return * m_renderWindow; }
 		editor::SceneWindow  &	GetSceneWindow() const			{ return * m_sceneWindow; }
+		editor::InspectorWindow  &	GetInspector() const		{ return * m_inspectorWindow; }
 		scene::Scene &			GetScene() const				{ return * m_scene; }
 
 	private:
