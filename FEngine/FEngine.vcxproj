@@ -91,6 +91,7 @@
     <ClCompile Include="code\editor\fanWindow.cpp" />
     <ClCompile Include="code\fanEngine.cpp" />
     <ClCompile Include="code\fanMain.cpp" />
+    <ClCompile Include="code\scene\components\fanCamera.cpp" />
     <ClCompile Include="code\scene\components\fanComponent.cpp" />
     <ClCompile Include="code\scene\components\fanTransform.cpp" />
     <ClCompile Include="code\scene\fanGameobject.cpp" />
@@ -98,6 +99,7 @@
     <ClCompile Include="code\util\fanImguiUtil.cpp" />
     <ClCompile Include="code\util\fanInput.cpp" />
     <ClCompile Include="code\util\fanTime.cpp" />
+    <ClCompile Include="code\util\shapes\fanRay.cpp" />
     <ClCompile Include="code\vulkan\core\vkBuffer.cpp" />
     <ClCompile Include="code\vulkan\core\vkDevice.cpp" />
     <ClCompile Include="code\vulkan\core\vkFramebuffer.cpp" />
@@ -128,6 +130,7 @@
     <ClInclude Include="code\editor\fanWindow.h" />
     <ClInclude Include="code\fanEngine.h" />
     <ClInclude Include="code\fanIncludes.h" />
+    <ClInclude Include="code\scene\components\fanCamera.h" />
     <ClInclude Include="code\scene\components\fanComponent.h" />
     <ClInclude Include="code\scene\components\fanTransform.h" />
     <ClInclude Include="code\scene\fanGameobject.h" />
@@ -137,6 +140,7 @@
     <ClInclude Include="code\util\fanInput.h" />
     <ClInclude Include="code\util\fanTime.h" />
     <ClInclude Include="code\util\fanUtil.h" />
+    <ClInclude Include="code\util\shapes\fanRay.h" />
     <ClInclude Include="code\vulkan\core\vkBuffer.h" />
     <ClInclude Include="code\vulkan\core\vkDevice.h" />
     <ClInclude Include="code\vulkan\core\vkFrameBuffer.h" />

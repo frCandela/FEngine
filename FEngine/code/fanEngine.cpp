@@ -9,6 +9,9 @@
 #include "editor/fanSceneWindow.h"	
 #include "editor/fanInspectorWindow.h"	
 #include "scene/fanScene.h"
+#include "scene/fanGameobject.h"
+#include "scene/components/fanCamera.h"
+#include "scene/components/fanTransform.h"
 
 namespace fan {
 	Engine * Engine::ms_engine = nullptr;
@@ -26,6 +29,11 @@ namespace fan {
 
 		m_renderer = new vk::Renderer({ 1280,720 });
 		m_scene = new scene::Scene("mainScene");
+
+		scene::Gameobject * camera = m_scene->CreateGameobject("EditorCamera");
+		camera->AddComponent<scene::Transform>();
+		scene::Camera * cameraComponent = camera->AddComponent<scene::Camera>();
+		m_renderer->SetMainCamera(cameraComponent);
 
 	}
 

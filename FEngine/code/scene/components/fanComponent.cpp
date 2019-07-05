@@ -4,5 +4,8 @@
 
 namespace scene
 {
+	Component::Component() : 
+		m_isModified(false){
 
+	}
 }

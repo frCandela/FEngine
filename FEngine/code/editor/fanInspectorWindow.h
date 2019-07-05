@@ -5,6 +5,7 @@
 namespace scene {
 	class Transform;
 	class Component;
+	class Camera;
 }
 
 namespace editor {
@@ -17,5 +18,7 @@ namespace editor {
 	private:
 		void DrawComponent(scene::Component & _component);
 		void DrawTransform(scene::Transform & _transform);
+		void DrawCamera(scene::Camera & _camera);
+		
 	};
 }

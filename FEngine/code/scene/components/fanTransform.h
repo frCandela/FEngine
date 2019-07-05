@@ -22,7 +22,7 @@ namespace scene
 		glm::vec3 Up() const				{ return	m_rotation * glm::vec3(0, 1, 0); }
 
 		bool IsUnique() const override { return true; }
-		std::string GetName() const override { return "Transform"; }
+		std::string GetName() const override { return "transform"; }
 
 	private:
 		glm::quat m_rotation;

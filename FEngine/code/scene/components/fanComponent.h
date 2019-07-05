@@ -8,6 +8,7 @@ namespace scene
 	class Component {	public:
 		friend class scene::Gameobject;
 
+		Component();
 		virtual ~Component() {}
 
 		virtual bool IsUnique() const = 0;		// Returns true if there is only one instance of this type of component per GameObject, false otherwise
@@ -15,8 +16,11 @@ namespace scene
 
 		// Returns a reference on the Gameobject the component is bound to
 		inline Gameobject* GetGameobject() const { return m_gameobject; }
+		bool IsModified() const { return m_isModified;  }
+		void SetModified( const bool _isModified ) { m_isModified = _isModified; }
 
 	private:
 		Gameobject*  m_gameobject;
+		bool m_isModified;
 	};
 }

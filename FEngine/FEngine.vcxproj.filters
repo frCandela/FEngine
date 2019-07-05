@@ -35,6 +35,9 @@
     <Filter Include="code\scene\components">
       <UniqueIdentifier>{c32148bd-658b-4850-9756-15c541e7a217}</UniqueIdentifier>
     </Filter>
+    <Filter Include="code\util\shapes">
+      <UniqueIdentifier>{1ffc6200-2603-4fae-ad52-1a8ca1662e37}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="deps\imgui\imgui.cpp">
@@ -142,6 +145,12 @@
     <ClCompile Include="code\editor\fanWindow.cpp">
       <Filter>code\editor</Filter>
     </ClCompile>
+    <ClCompile Include="code\scene\components\fanCamera.cpp">
+      <Filter>code\scene\components</Filter>
+    </ClCompile>
+    <ClCompile Include="code\util\shapes\fanRay.cpp">
+      <Filter>code\util\shapes</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="code\vulkan\vkRenderer.h">
@@ -245,6 +254,12 @@
     </ClInclude>
     <ClInclude Include="code\util\fanUtil.h">
       <Filter>code\vulkan\util</Filter>
+    </ClInclude>
+    <ClInclude Include="code\scene\components\fanCamera.h">
+      <Filter>code\scene\components</Filter>
+    </ClInclude>
+    <ClInclude Include="code\util\shapes\fanRay.h">
+      <Filter>code\util\shapes</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

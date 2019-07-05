@@ -1,5 +1,9 @@
 #pragma once
 
+namespace scene {
+	class Camera;
+}
+
 namespace vk {
 
 	class Instance;
@@ -38,7 +42,13 @@ namespace vk {
 		glm::vec4 GetClearColor() const { return m_clearColor;  }
 		void SetClearColor(glm::vec4 _color) { m_clearColor = _color; }
 
+		void SetMainCamera( scene::Camera * _camera) { m_mainCamera = _camera; }
+
 	private:
+		//SCENE REFERENCES
+		scene::Camera * m_mainCamera;
+
+		// VULKAN OBJECTS
 		Instance *		m_instance;
 		Window *		m_window;
 		Device &		m_device;

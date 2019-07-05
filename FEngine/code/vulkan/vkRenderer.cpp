@@ -2,6 +2,7 @@
 
 #include "vkRenderer.h"
 
+#include "scene/components/fanCamera.h"
 #include "util/fanTime.h"
 #include "util/fanInput.h"
 #include "util/fanInput.h"
@@ -29,7 +30,8 @@ namespace vk {
 		m_instance(new Instance())
 		, m_window(new Window("Vulkan", _size, m_instance->vkInstance))
 		, m_device( * new Device(m_instance, m_window->GetSurface()))
-		, m_swapchain(new SwapChain(m_device ))
+		, m_swapchain(new SwapChain(m_device))
+		, m_mainCamera(nullptr)
 	{
 		ms_globalRenderer = this;
 		m_clearColor = glm::vec4(0.5, 0.5, 0.5, 1.f);
@@ -218,11 +220,17 @@ namespace vk {
 		ImGui::SliderFloat("rotation speed", &s_speed, 0.f, 1000.f);		
 
 		ForwardPipeline::Uniforms ubo = {};
-		ubo.model = glm::rotate(glm::mat4(1.0f), Time::ElapsedSinceStartup() * glm::radians(s_speed), glm::vec3(0.0f, 1.0f, 0.0f));
-		ubo.view = glm::lookAt(glm::vec3(2.0f, 2.0f, 2.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
-		ubo.proj = glm::perspective(glm::radians(45.0f), m_swapchain->GetExtent().width / (float)m_swapchain->GetExtent().height, 0.1f, 10.0f);
-		ubo.proj[1][1] *= -1; 			//the Y coordinate of the clip coordinates is inverted
+		if (m_mainCamera != nullptr && m_mainCamera->IsModified()) {
+			ubo.view = m_mainCamera->GetView();
+			ubo.proj = m_mainCamera->GetProjection();
+			ubo.proj[1][1] *= -1;
+		}
+		else {
+			ubo.view = glm::lookAt(glm::vec3(2.0f, 2.0f, 2.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+			ubo.proj = glm::perspective(glm::radians(45.0f), m_swapchain->GetExtent().width / (float)m_swapchain->GetExtent().height, 0.1f, 10.0f);
+		}			   
 
+		ubo.model = glm::rotate(glm::mat4(1.0f), Time::ElapsedSinceStartup() * glm::radians(s_speed), glm::vec3(0.0f, 1.0f, 0.0f));
 		m_forwardPipeline->SetUniforms(ubo);
 
 

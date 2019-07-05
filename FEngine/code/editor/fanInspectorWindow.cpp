@@ -4,6 +4,7 @@
 #include "scene/fanGameobject.h"
 #include "scene/components/fanComponent.h"
 #include "scene/components/fanTransform.h"
+#include "scene/components/fanCamera.h"
 #include "fanEngine.h"
 #include "util/fanUtil.h"
 
@@ -89,10 +90,30 @@ namespace editor {
 
 		if( typeInfo == typeid(scene::Transform)){
 			DrawTransform(dynamic_cast<scene::Transform &>(_component));
+		} else if (typeInfo == typeid(scene::Camera)) {
+			DrawCamera(dynamic_cast<scene::Camera &>(_component));
 		} else {
-			ImGui::Text("eeeeeu");
+			ImGui::Text( (std::string("Component not supported: ") + std::string(_component.GetName())).c_str());
 		}
+	}
 
+	void InspectorWindow::DrawCamera(scene::Camera & _camera) {
+		ImGui::Text(_camera.GetName().c_str());
+
+		float fov = _camera.GetFov();
+		if (ImGui::DragFloat("fov", &fov, 1.f, 0.f, 180.f)) {
+			_camera.SetFov(fov);
+		}		
+
+		float near = _camera.GetNearDistance();
+		if (ImGui::DragFloat("near distance", &near, 0.025f, 0.f, std::numeric_limits<float>::max())) {
+			_camera.SetNearDistance(near);
+		}		
+		
+		float far = _camera.GetFarDistance();
+		if ( ImGui::DragFloat("far distance", &far, 1.f, 0.f, std::numeric_limits<float>::max())) {
+			_camera.SetFarDistance(far);
+		}
 	}
 
 	void InspectorWindow::DrawTransform(scene::Transform & _transform) {
