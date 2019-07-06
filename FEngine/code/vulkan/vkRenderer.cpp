@@ -1,8 +1,10 @@
 #include "fanIncludes.h"
 
 #include "vkRenderer.h"
-
+#include "scene/fanGameobject.h"
 #include "scene/components/fanCamera.h"
+#include "scene/components/fanMesh.h"
+#include "scene/components/fanTransform.h"
 #include "util/fanTime.h"
 #include "util/fanInput.h"
 #include "util/fanInput.h"
@@ -18,7 +20,9 @@
 #include "vulkan/pipelines/vkPostprocessPipeline.h"
 #include "vulkan/pipelines/vkForwardPipeline.h"
 #include "vulkan/pipelines/vkDebugPipeline.h"
+#include "vulkan/util/vkVertex.h"
 #include "vulkan/util/vkWindow.h"
+
 
 namespace vk {
 
@@ -73,6 +77,11 @@ namespace vk {
 		delete m_imguiPipeline;
 		delete m_forwardPipeline;
 		delete m_debugPipeline;
+
+		for (int meshIndex = 0; meshIndex < m_meshList.size() ; meshIndex++){
+			delete m_meshList[meshIndex].indexBuffer;
+			delete m_meshList[meshIndex].vertexBuffer;
+		}
 
 		DeleteForwardFramebuffers();
 		DeleteRenderPass();
@@ -131,6 +140,12 @@ namespace vk {
 			{
 				ImGui::Begin("Debug");
 
+				for (int meshIndex = 0; meshIndex < m_meshList.size(); meshIndex++)	{
+					ImGui::Text(m_meshList[meshIndex].mesh->GetPath().c_str());
+					
+				}
+
+
 				/*std::stringstream ssFramerate;
 				ssFramerate << 1.f / updateDelta;
 				ImGui::Text(ssFramerate.str().c_str());*/
@@ -145,9 +160,13 @@ namespace vk {
 			m_debugPipeline->DebugLine({ 0,0,0 }, { 0,1,0 }, { 0,1,0,1 });
 			m_debugPipeline->DebugLine({ 0,0,0 }, { 0,0,1 }, { 0,0,1,1 });
 
-			RecordCommandBufferDebug(m_swapchain->GetCurrentFrame());
-			RecordCommandBufferImgui(m_swapchain->GetCurrentFrame());
-			RecordPrimaryCommandBuffer(m_swapchain->GetCurrentFrame());
+			const uint32_t currentFrame = m_swapchain->GetCurrentFrame();
+			if (m_reloadGeometryCommandBuffers[currentFrame] == true) {
+				RecordCommandBufferGeometry(currentFrame);
+			}
+			RecordCommandBufferDebug(currentFrame);
+			RecordCommandBufferImgui(currentFrame);
+			RecordPrimaryCommandBuffer(currentFrame);
 			SubmitCommandBuffers();
 
 			m_swapchain->PresentImage();
@@ -228,11 +247,16 @@ namespace vk {
 			ubo.view = m_mainCamera->GetView();
 			ubo.proj = m_mainCamera->GetProjection();
 			ubo.proj[1][1] *= -1;
-		}		   
-
+		}
 
 		glm::mat3 model = glm::rotate(glm::mat4(1.f), Time::ElapsedSinceStartup() * glm::radians(s_speed), glm::vec3(0, 1, 0));
-		m_forwardPipeline->SetUniforms(ubo, { {model},{glm::mat4(1.0) } });
+		m_forwardPipeline->SetUniforms(ubo);
+
+		std::vector < ForwardPipeline::DynamicUniforms > dynamicUniforms( m_meshList.size() );
+		for (int meshIndex = 0; meshIndex < m_meshList.size(); meshIndex++) {
+			dynamicUniforms[meshIndex].models = m_meshList[meshIndex].transform->GetModelMatrix();
+		}
+		m_forwardPipeline->SetDynamicUniforms(dynamicUniforms);
 
 		DebugPipeline::Uniforms debugUniforms;
 		debugUniforms.model = glm::mat4(1.0);
@@ -455,7 +479,7 @@ namespace vk {
 		commandBufferBeginInfo.pInheritanceInfo = &commandBufferInheritanceInfo;
 
 		if (vkBeginCommandBuffer(commandBuffer, &commandBufferBeginInfo) == VK_SUCCESS) {
-			m_forwardPipeline->Draw(commandBuffer);
+			m_forwardPipeline->Draw(commandBuffer, m_meshList);
 			if (vkEndCommandBuffer(commandBuffer) != VK_SUCCESS) {
 				std::cout << "Could not record command buffer " << _index << "." << std::endl;
 			}
@@ -515,6 +539,94 @@ namespace vk {
 
 	//================================================================================================================================
 	//================================================================================================================================
+	void Renderer::AddMesh(scene::Mesh * _mesh) {
+		vkDeviceWaitIdle(m_device.vkDevice);
+
+		MeshData * meshData = nullptr;
+		for (int meshIndex = 0; meshIndex < m_meshList.size(); meshIndex++) {
+			if (m_meshList[meshIndex].mesh == _mesh) {
+				meshData = &m_meshList[meshIndex];
+				meshData->indexBuffer->Destroy();
+				meshData->vertexBuffer->Destroy();
+				break;
+			}
+		}
+
+		if (meshData == nullptr) {
+			m_meshList.push_back(MeshData());
+			meshData = & m_meshList[m_meshList.size() - 1];
+			meshData->mesh = _mesh;
+			meshData->transform = _mesh->GetGameobject()->GetComponent<scene::Transform>();
+			meshData->indexBuffer = new Buffer(m_device);
+			meshData->vertexBuffer = new Buffer(m_device);
+		}	
+
+		{
+			/*std::vector<int> indices = { //cube
+				 0,1,2	,1,3,2	// top
+				,6,5,4	,7,5,6	// bot
+				,7,6,2	,7,2,3
+				,6,4,0	,6,0,2
+				,4,5,0	,5,1,0
+				,7,1,5	,7,3,1
+			};*/
+			std::vector<uint32_t> & indices = meshData->mesh->GetIndices();
+			const VkDeviceSize size = sizeof(indices[0]) * indices.size();
+			meshData->indexBuffer->Create(
+				size,
+				VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_INDEX_BUFFER_BIT,
+				VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT
+			);
+			Buffer stagingBuffer(m_device);
+			stagingBuffer.Create(
+				size,
+				VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
+				VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT
+			);
+			stagingBuffer.SetData(indices.data(), size);
+			VkCommandBuffer cmd = Renderer::GetRenderer().BeginSingleTimeCommands();
+			stagingBuffer.CopyBufferTo(cmd, meshData->indexBuffer->GetBuffer(), size);
+			Renderer::GetRenderer().EndSingleTimeCommands(cmd);
+		}
+		{
+
+			/*glm::vec3 color(0.f, 0.2, 0.f);
+
+			Vertex v0 = { { +0.5,+0.5,+0.5},	color,{} };
+			Vertex v1 = { { +0.5,+0.5,-0.5},	color,{} };
+			Vertex v2 = { { -0.5,+0.5,+0.5},	color,{} };
+			Vertex v3 = { { -0.5,+0.5,-0.5},	color,{} };
+			Vertex v4 = { { +0.5,-0.5,+0.5},	color,{} };
+			Vertex v5 = { { +0.5,-0.5,-0.5},	color,{} };
+			Vertex v6 = { { -0.5,-0.5,+0.5},	color,{} };
+			Vertex v7 = { { -0.5,-0.5,-0.5},	color,{} };
+			std::vector<vk::Vertex> vertices = { v0, v1 ,v2 ,v3 ,v4 ,v5 ,v6 ,v7 };*/
+			std::vector<vk::Vertex> & vertices = meshData->mesh->GetVertices();
+			const VkDeviceSize size = sizeof(vertices[0]) * vertices.size();
+			meshData->vertexBuffer->Create(
+				size,
+				VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_VERTEX_BUFFER_BIT,
+				VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT
+			);
+			Buffer stagingBuffer2(m_device);
+			stagingBuffer2.Create(
+				size,
+				VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
+				VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT
+			);
+			stagingBuffer2.SetData(vertices.data(), size);
+			VkCommandBuffer cmd2 = Renderer::GetRenderer().BeginSingleTimeCommands();
+			stagingBuffer2.CopyBufferTo(cmd2, meshData->vertexBuffer->GetBuffer(), size);
+			Renderer::GetRenderer().EndSingleTimeCommands(cmd2);
+		}
+
+		for (int boolIndex = 0; boolIndex < m_reloadGeometryCommandBuffers.size(); boolIndex++) {
+			m_reloadGeometryCommandBuffers[boolIndex] = true;
+		}
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
 	bool Renderer::CreateCommandBuffers() {
 		VkCommandBufferAllocateInfo commandBufferAllocateInfo;
 		commandBufferAllocateInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
@@ -537,6 +649,7 @@ namespace vk {
 		secondaryCommandBufferAllocateInfo.level = VK_COMMAND_BUFFER_LEVEL_SECONDARY;
 		secondaryCommandBufferAllocateInfo.commandBufferCount = m_swapchain->GetSwapchainImagesCount();
 
+		m_reloadGeometryCommandBuffers.resize(m_swapchain->GetSwapchainImagesCount(), false);
 		m_geometryCommandBuffers.resize(m_swapchain->GetSwapchainImagesCount());
 		if (vkAllocateCommandBuffers(m_device.vkDevice, &secondaryCommandBufferAllocateInfo, m_geometryCommandBuffers.data()) != VK_SUCCESS) {
 			std::cout << "Could not allocate command buffers." << std::endl;
@@ -730,7 +843,7 @@ namespace vk {
 	}
 
 	//================================================================================================================================
-//================================================================================================================================
+	//================================================================================================================================
 	bool Renderer::CreateRenderPassUI() {
 		VkAttachmentDescription colorAttachment;
 		colorAttachment.flags = 0;

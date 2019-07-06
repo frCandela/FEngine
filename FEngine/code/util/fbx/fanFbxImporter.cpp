@@ -15,9 +15,8 @@ namespace util {
 		m_sdkManager = FbxManager::Create();
 		if (m_sdkManager == nullptr ) {
 			std::cout << "Error: Unable to create FBX Manager!\n" << std::endl;
-		}
-		else {
-			std::cout << "Autodesk FBX SDK version" << m_sdkManager->GetVersion() << std::endl;
+		} else {
+			//std::cout << "Autodesk FBX SDK version" << m_sdkManager->GetVersion() << std::endl;
 		}
 
 		// fbx manager
@@ -117,7 +116,7 @@ namespace util {
 		}
 
 		// No mesh
-		if (mesh == nullptr && mesh->GetControlPointsCount() > 0) {
+		if (mesh == nullptr || mesh->GetControlPointsCount() == 0) {
 			std::cout << "no mesh found " << m_path << std::endl;
 			return false;
 		}

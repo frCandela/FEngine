@@ -34,7 +34,7 @@ namespace fan {
 		editor::SceneWindow  &	GetSceneWindow() const			{ return * m_sceneWindow; }
 		editor::InspectorWindow  &	GetInspector() const		{ return * m_inspectorWindow; }
 		scene::Scene &			GetScene() const				{ return * m_scene; }
-
+		vk::Renderer & GetRenderer() const						{ return *m_renderer; }
 	private:
 		editor::MainMenuBar *		m_mainMenuBar;
 		editor::RenderWindow *		m_renderWindow;

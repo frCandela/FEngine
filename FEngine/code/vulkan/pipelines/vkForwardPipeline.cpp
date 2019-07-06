@@ -8,6 +8,7 @@
 #include "vulkan/core/vkBuffer.h"
 #include "vulkan/vkRenderer.h"
 #include "vulkan/util/vkVertex.h"
+#include "scene/components/fanMesh.h"
 
 namespace vk {
 	//================================================================================================================================
@@ -44,7 +45,6 @@ namespace vk {
 		CreateDepthRessources(_extent);
 		CreateDescriptors();
 		CreatePipeline(_extent);
-		CreateVertexBuffers();
 	}
 
 	//================================================================================================================================
@@ -58,7 +58,8 @@ namespace vk {
 		CreateDescriptors();
 		CreatePipeline(_extent);
 
-		SetUniforms(m_uniforms, { {glm::mat4(1.0)},{glm::mat4(1.0)} });
+		SetUniforms(m_uniforms);
+		SetDynamicUniforms({ {glm::mat4(1.0)},{glm::mat4(1.0)} });
 	}
 
 	//================================================================================================================================
@@ -76,13 +77,15 @@ namespace vk {
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void ForwardPipeline::SetUniforms(const Uniforms _uniforms, std::vector<DynamicUniforms> _dynamicUniforms) {
-		// uniforms
+	void ForwardPipeline::SetUniforms(const Uniforms _uniforms) {
 		m_uniforms = _uniforms;
 		m_uniformBuffer->SetData(&m_uniforms, sizeof(m_uniforms));
-
-		// dynamic uniforms
-		for (int dynamicUniformIndex = 0; dynamicUniformIndex < _dynamicUniforms.size() ; dynamicUniformIndex++) {
+	}	
+	
+	//================================================================================================================================
+	//================================================================================================================================
+	void ForwardPipeline::SetDynamicUniforms( const std::vector<DynamicUniforms> & _dynamicUniforms ) {
+		for (int dynamicUniformIndex = 0; dynamicUniformIndex < _dynamicUniforms.size(); dynamicUniformIndex++) {
 			m_dynamicUniformsArray[dynamicUniformIndex] = _dynamicUniforms[dynamicUniformIndex];
 		}
 		m_dynamicUniformBuffer->SetData(&m_dynamicUniformsArray[0], m_dynamicUniformsArray.GetSize() * sizeof(DynamicUniforms));
@@ -91,28 +94,30 @@ namespace vk {
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void ForwardPipeline::Draw(VkCommandBuffer _commandBuffer) {
+	void ForwardPipeline::Draw(VkCommandBuffer _commandBuffer, const std::vector<MeshData>& _meshData) {
 		vkCmdBindPipeline(_commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, m_pipeline);
 
-		VkBuffer vertexBuffers[] = { m_vertexBuffer->GetBuffer() };
-
-		VkDeviceSize offsets[] = { 0 };
-		vkCmdBindVertexBuffers(_commandBuffer, 0, 1, vertexBuffers, offsets);
-		vkCmdBindIndexBuffer(_commandBuffer, m_indexBuffer->GetBuffer(), 0, VK_INDEX_TYPE_UINT32);
-
-		uint32_t dynamicOffset =  0 * static_cast<uint32_t>(m_dynamicAlignment);
-		vkCmdBindDescriptorSets(
-			_commandBuffer, 
-			VK_PIPELINE_BIND_POINT_GRAPHICS, 
-			m_pipelineLayout, 
-			0, 
-			1, 
-			&m_descriptorSet, 
-			1, 
-			&dynamicOffset
-		);
 		
-		vkCmdDrawIndexed(_commandBuffer, static_cast<uint32_t>(m_indices.size()), 1, 0, 0, 0);
+		VkDeviceSize offsets[] = { 0 };
+
+		for (int meshIndex = 0; meshIndex < _meshData.size(); meshIndex++){
+			const MeshData& mesh = _meshData[meshIndex];
+			VkBuffer vertexBuffers[] = { mesh.vertexBuffer->GetBuffer() };
+			vkCmdBindVertexBuffers(_commandBuffer, 0, 1, vertexBuffers, offsets);
+			vkCmdBindIndexBuffer(_commandBuffer, mesh.indexBuffer->GetBuffer(), 0, VK_INDEX_TYPE_UINT32);
+			uint32_t dynamicOffset = 0 * static_cast<uint32_t>(m_dynamicAlignment);
+			vkCmdBindDescriptorSets(
+				_commandBuffer,
+				VK_PIPELINE_BIND_POINT_GRAPHICS,
+				m_pipelineLayout,
+				0,
+				1,
+				&m_descriptorSet,
+				1,
+				&dynamicOffset
+			);
+			vkCmdDrawIndexed(_commandBuffer, static_cast<uint32_t>(mesh.mesh->GetIndices().size()), 1, 0, 0, 0);
+		}
 	}
 
 	//================================================================================================================================
@@ -481,75 +486,6 @@ namespace vk {
 			std::cout << std::hex << "VkPipeline\t\t" << graphicsPipelines[pipelineIndex] << std::dec << std::endl;
 		}
 		return true;
-	}
-
-	//================================================================================================================================
-	//================================================================================================================================
-	void ForwardPipeline::CreateVertexBuffers() {
-
-		delete m_indexBuffer;
-		delete m_vertexBuffer;
-
-		{
-			m_indices = { //cube
-				 0,1,2	,1,3,2	// top
-				,6,5,4	,7,5,6	// bot
-				,7,6,2	,7,2,3
-				,6,4,0	,6,0,2
-				,4,5,0	,5,1,0
-				,7,1,5	,7,3,1
-			};
-
-			const VkDeviceSize size = sizeof(m_indices[0]) * m_indices.size();
-
-			m_indexBuffer = new Buffer(m_device);
-			m_indexBuffer->Create(
-				size,
-				VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_INDEX_BUFFER_BIT,
-				VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT
-			);
-			Buffer stagingBuffer(m_device);
-			stagingBuffer.Create(
-				size,
-				VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
-				VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT
-			);
-			stagingBuffer.SetData(m_indices.data(), size);
-			VkCommandBuffer cmd = Renderer::GetRenderer().BeginSingleTimeCommands();
-			stagingBuffer.CopyBufferTo(cmd, m_indexBuffer->GetBuffer(), size);
-			Renderer::GetRenderer().EndSingleTimeCommands(cmd);
-		}
-		{
-			glm::vec3 color(0.f, 0.2, 0.f);
-
-			Vertex v0 = { { +0.5,+0.5,+0.5},	color,{} };
-			Vertex v1 = { { +0.5,+0.5,-0.5},	color,{} };
-			Vertex v2 = { { -0.5,+0.5,+0.5},	color,{} };
-			Vertex v3 = { { -0.5,+0.5,-0.5},	color,{} };
-			Vertex v4 = { { +0.5,-0.5,+0.5},	color,{} };
-			Vertex v5 = { { +0.5,-0.5,-0.5},	color,{} };
-			Vertex v6 = { { -0.5,-0.5,+0.5},	color,{} };
-			Vertex v7 = { { -0.5,-0.5,-0.5},	color,{} };
-			m_vertices = { v0, v1 ,v2 ,v3 ,v4 ,v5 ,v6 ,v7 };
-
-			const VkDeviceSize size = sizeof(m_vertices[0]) * m_vertices.size();
-			m_vertexBuffer = new Buffer(m_device);
-			m_vertexBuffer->Create(
-				size,
-				VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_VERTEX_BUFFER_BIT,
-				VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT
-			);
-			Buffer stagingBuffer2(m_device);
-			stagingBuffer2.Create(
-				size,
-				VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
-				VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT
-			);
-			stagingBuffer2.SetData(m_vertices.data(), size);
-			VkCommandBuffer cmd2 = Renderer::GetRenderer().BeginSingleTimeCommands();
-			stagingBuffer2.CopyBufferTo(cmd2, m_vertexBuffer->GetBuffer(), size);
-			Renderer::GetRenderer().EndSingleTimeCommands(cmd2);
-		}
 	}
 
 	//================================================================================================================================

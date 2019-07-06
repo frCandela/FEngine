@@ -2,6 +2,7 @@
 
 namespace scene {
 	class Camera;
+	class Mesh;
 }
 
 namespace vk {
@@ -20,6 +21,7 @@ namespace vk {
 	class PostprocessPipeline;
 	class ForwardPipeline;
 	class DebugPipeline;
+	struct MeshData;
 
 	class Renderer {
 	public:
@@ -41,12 +43,13 @@ namespace vk {
 
 		glm::vec4 GetClearColor() const { return m_clearColor;  }
 		void SetClearColor(glm::vec4 _color) { m_clearColor = _color; }
-
 		void SetMainCamera( scene::Camera * _camera) { m_mainCamera = _camera; }
 
+		void AddMesh(scene::Mesh * _mesh);
 	private:
 		//SCENE REFERENCES
 		scene::Camera * m_mainCamera;
+		std::vector <MeshData> m_meshList;
 
 		// VULKAN OBJECTS
 		Instance *		m_instance;
@@ -69,6 +72,8 @@ namespace vk {
 		std::vector<VkCommandBuffer> m_imguiCommandBuffers;
 		std::vector<VkCommandBuffer> m_debugCommandBuffers;
 		std::vector<VkCommandBuffer> m_postprocessCommandBuffers;
+
+		std::vector<bool> m_reloadGeometryCommandBuffers;
 
 		std::vector< FrameBuffer * > m_forwardFrameBuffers;
 		std::vector< FrameBuffer * > m_swapchainFramebuffers;

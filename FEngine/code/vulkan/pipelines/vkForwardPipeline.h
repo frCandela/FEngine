@@ -2,6 +2,11 @@
 
 #include "util/fanAlignedMemory.h"
 
+namespace scene { 
+	class Mesh;  
+	class Transform;
+}
+
 namespace vk {
 	struct Vertex;
 	class Device;
@@ -9,6 +14,14 @@ namespace vk {
 	class Image;
 	class ImageView;
 	class Buffer;
+
+
+	struct MeshData {
+		scene::Mesh * mesh;
+		scene::Transform * transform;
+		vk::Buffer * indexBuffer;
+		vk::Buffer * vertexBuffer;
+	};
 
 	class ForwardPipeline {
 	public:
@@ -23,16 +36,18 @@ namespace vk {
 			glm::mat4 models;
 		};
 
+
 		ForwardPipeline(Device& _device, VkRenderPass& _renderPass);
 		~ForwardPipeline();
 
 		void Create( VkExtent2D _extent );
-		void Draw(VkCommandBuffer _commandBuffer);
+		void Draw(VkCommandBuffer _commandBuffer, const std::vector<MeshData>& _meshData );
 		void Resize(VkExtent2D _extent);
 		void ReloadShaders();
 
 		Uniforms GetUniforms() const { return m_uniforms; }
-		void SetUniforms(const Uniforms _uniforms, std::vector<DynamicUniforms> _dynamicUniforms );
+		void SetUniforms(const Uniforms _uniforms);
+		void SetDynamicUniforms( const std::vector<DynamicUniforms> & _dynamicUniforms );
 
 		VkPipeline		GetPipeline() { return m_pipeline; }
 		VkImageView		GetDepthImageView();
@@ -54,9 +69,6 @@ namespace vk {
 		Shader * m_fragmentShader = nullptr;
 		Shader * m_vertexShader = nullptr;
 
-		std::vector<Vertex>		m_vertices;
-		std::vector<uint32_t>	m_indices;
-
 		Buffer * m_dynamicUniformBuffer;
 		Buffer * m_uniformBuffer;
 		Buffer * m_indexBuffer;
@@ -70,7 +82,6 @@ namespace vk {
 		bool CreateDescriptors();
 		bool CreateDepthRessources(	VkExtent2D _extent);
 		bool CreatePipeline(		VkExtent2D _extent );
-		void CreateVertexBuffers();
 
 		void DeleteDepthRessources();
 		void DeletePipeline();

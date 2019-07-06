@@ -41,11 +41,16 @@ namespace fan {
 
 
 		scene::Gameobject * cube = m_scene->CreateGameobject("cube");
+		cube->AddComponent<scene::Transform>();
 		scene::Mesh * mesh = cube->AddComponent<scene::Mesh>();
 
 		util::FBXImporter importer;
 		importer.LoadScene("mesh/cube.fbx");
-		importer.GetMesh(*mesh);
+		if (importer.GetMesh(*mesh) == true) {
+			m_renderer->AddMesh(mesh);
+		}
+		
+		
 	}
 
 	//================================================================================================================================

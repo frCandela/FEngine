@@ -26,12 +26,13 @@ namespace util {
 			m_size = _size;
 			m_alignment = _alignment;
 			m_ratio = m_alignment / sizeof(uint32_t);
-			m_data = AlignedAlloc(_size, _alignment);
+			m_data = AlignedAlloc(_size*_alignment, _alignment);
 		}
 		size_t GetSize() const		{ return m_size; }
 		size_t GetAlignment() const { return m_alignment; }
 
 		T& operator[](const int& _pos) {
+			assert(m_data != nullptr);
 			void * uint32Adress = static_cast<uint32_t*>(m_data) + _pos * m_ratio;
 			return *static_cast<T*>(uint32Adress);
 		}

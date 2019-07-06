@@ -38,29 +38,32 @@ namespace util {
 
 
 			if (_currentPath != "." && ImGui::Selectable(".", false, ImGuiSelectableFlags_DontClosePopups | ImGuiSelectableFlags_AllowDoubleClick)) {
-				if (ImGui::IsItemHovered() && ImGui::IsMouseDoubleClicked(0)) {
-					nextPath = directory_entry(_currentPath.parent_path());
-					if (nextPath.path().empty()) {
-						nextPath = directory_entry(".");
-					}
-				}
+				nextPath = directory_entry(_currentPath.parent_path());
+				if (nextPath.path().empty()) {
+					nextPath = directory_entry(".");
+				}				
 			}
 				// Lists all directories
 			for (const directory_entry& childPath : directory_iterator(_currentPath)) {
 
-				std::string extension = childPath.path().extension().generic_string();
-				
-				
-				// Clicked
-				if ( is_directory(childPath) || _extensionWhiteList.find(extension) != _extensionWhiteList.end() ){
+				std::string extension = childPath.path().extension().generic_string();		
+				const bool isFile = _extensionWhiteList.find(extension) != _extensionWhiteList.end();
+				const bool isDirectory = is_directory(childPath);
+				// Filter
+				if ( isFile || isDirectory ){
+
+					if (isFile) {
+						ImGui::PushStyleColor(ImGuiCol_Text, (ImVec4)(ImColor(1.0f, 0.712f, 0.0f)));
+					}
+					
 
 
-
-					if (ImGui::Selectable(childPath.path().string().c_str(), false, ImGuiSelectableFlags_DontClosePopups | ImGuiSelectableFlags_AllowDoubleClick)) {
-
-						if (ImGui::IsItemHovered() && ImGui::IsMouseDoubleClicked(0)) {
-							nextPath = directory_entry(childPath);
-						}
+					std::string filename = childPath.path().filename().generic_string();
+					if (ImGui::Selectable(filename.c_str(), false, ImGuiSelectableFlags_DontClosePopups | ImGuiSelectableFlags_AllowDoubleClick)) {
+						nextPath = directory_entry(childPath);						
+					}
+					if (isFile) {
+						ImGui::PopStyleColor();
 					}
 				}
 			}

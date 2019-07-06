@@ -6,11 +6,12 @@
 #include "scene/components/fanTransform.h"
 #include "scene/components/fanCamera.h"
 #include "scene/components/fanMesh.h"
-#include "fanEngine.h"
 #include "util/fanUtil.h"
 #include "util/fbx/fanFbxImporter.h"
 #include "util/fanImguiUtil.h"
 #include "util/fanSignal.h"
+#include "vulkan/vkRenderer.h"
+#include "fanEngine.h"
 
 namespace editor {
 	InspectorWindow::InspectorWindow() : 
@@ -181,7 +182,7 @@ namespace editor {
 
 		ImGui::Text("path: %s", _mesh.GetPath().c_str());
 		// Set path  popup on double click
-		if (ImGui::IsItemHovered() && ImGui::IsMouseDoubleClicked(0)) {
+		if (ImGui::IsItemHovered() && ImGui::IsMouseClicked(0)) {
 			if (_mesh.GetPath().empty() == false) {
 				m_cachePathMesh = std::experimental::filesystem::path(_mesh.GetPath()).parent_path();
 				std::cout << m_cachePathMesh << std::endl;
@@ -203,7 +204,9 @@ namespace editor {
 
 				util::FBXImporter importer;
 				if (importer.LoadScene(path) == true ) {
-					importer.GetMesh(_mesh);
+					if (importer.GetMesh(_mesh)) {
+						fan::Engine::GetEngine().GetRenderer().AddMesh(&_mesh);
+					}
 				}
 				ImGui::CloseCurrentPopup();
 			}
