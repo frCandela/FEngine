@@ -27,5 +27,6 @@
 #include <algorithm>
 #include <fstream>
 #include <type_traits>
+#include <cassert>
 
 #pragma warning( pop )

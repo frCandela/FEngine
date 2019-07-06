@@ -21,20 +21,12 @@ namespace scene
 		float GetNearDistance() const	{ return m_nearDistance; };
 		float GetFarDistance() const	{ return m_farDistance; };
 
-		void SetFov(float _fov) {
-			m_fov = _fov; 
-			SetModified(true);
-		};
-		void SetNearDistance(float _nearDistance) {
-			m_nearDistance = _nearDistance; 
-			SetModified(true);
-		};
-		void SetFarDistance(float _farDistance) {
-			m_farDistance = _farDistance; 
-			SetModified(true);
-		};
+		void SetFov(float _fov);
+		void SetNearDistance(float _nearDistance);
+		void SetFarDistance(float _farDistance);
+		void SetAspectRatio(float _aspectRatio);
+
 	private:
-		glm::vec3 m_up = { 0,1,0 };
 		float m_fov = 90.f;
 		float m_aspectRatio = 1.f;
 		float m_nearDistance = 0.1f;

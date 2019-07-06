@@ -11,16 +11,20 @@ namespace scene
 	glm::mat4 Camera::GetView() const
 	{
 		Transform* transform = GetGameobject()->GetComponent<Transform>();
-		glm::mat4 view = glm::lookAt(transform->GetPosition(), transform->GetPosition() + transform->Forward(), m_up);
+		glm::mat4 view = glm::lookAt(transform->GetPosition(), transform->GetPosition() + transform->Forward(), transform->Up());
 		return view;
 	}
 
+	//================================================================================================================================
+	//================================================================================================================================
 	glm::mat4 Camera::GetProjection() const
 	{
 		glm::mat4 proj = glm::perspective(glm::radians(m_fov), m_aspectRatio, m_nearDistance, m_farDistance);
 		return proj;
 	}
 
+	//================================================================================================================================
+	//================================================================================================================================
 	util::Ray Camera::ScreenPosToRay(glm::vec2 position)
 	{
 		assert(position.x >= -1.f  && position.x <= 1.f);
@@ -44,4 +48,23 @@ namespace scene
 
 		return ray;
 	}
+
+	//================================================================================================================================
+	//================================================================================================================================
+	void Camera::SetFov(float _fov) {
+		m_fov = _fov;
+		SetModified(true);
+	};
+	void Camera::SetNearDistance(float _nearDistance) {
+		m_nearDistance = _nearDistance;
+		SetModified(true);
+	};
+	void Camera::SetFarDistance(float _farDistance) {
+		m_farDistance = _farDistance;
+		SetModified(true);
+	};
+	void Camera::SetAspectRatio(float _aspectRatio) {
+		m_aspectRatio = _aspectRatio;
+		SetModified(true);
+	};
 }

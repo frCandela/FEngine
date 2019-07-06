@@ -220,15 +220,14 @@ namespace vk {
 		ImGui::SliderFloat("rotation speed", &s_speed, 0.f, 1000.f);		
 
 		ForwardPipeline::Uniforms ubo = {};
-		if (m_mainCamera != nullptr && m_mainCamera->IsModified()) {
+		assert(m_mainCamera != nullptr);
+		if ( m_mainCamera->IsModified()) {
+			m_mainCamera->SetAspectRatio(static_cast<float>(m_swapchain->GetExtent().width) /m_swapchain->GetExtent().height);
 			ubo.view = m_mainCamera->GetView();
 			ubo.proj = m_mainCamera->GetProjection();
 			ubo.proj[1][1] *= -1;
-		}
-		else {
-			ubo.view = glm::lookAt(glm::vec3(2.0f, 2.0f, 2.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
-			ubo.proj = glm::perspective(glm::radians(45.0f), m_swapchain->GetExtent().width / (float)m_swapchain->GetExtent().height, 0.1f, 10.0f);
-		}			   
+
+		}		   
 
 		ubo.model = glm::rotate(glm::mat4(1.0f), Time::ElapsedSinceStartup() * glm::radians(s_speed), glm::vec3(0.0f, 1.0f, 0.0f));
 		m_forwardPipeline->SetUniforms(ubo);

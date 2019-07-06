@@ -5,7 +5,7 @@
 namespace scene
 {
 	Component::Component() : 
-		m_isModified(false){
+		m_isModified(true){
 
 	}
 }

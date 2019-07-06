@@ -18,9 +18,12 @@ namespace scene
 		inline Gameobject* GetGameobject() const { return m_gameobject; }
 		bool IsModified() const { return m_isModified;  }
 		void SetModified( const bool _isModified ) { m_isModified = _isModified; }
+		bool IsRemovable() const { return m_isRemovable; }
+		void SetRemovable(const bool _isRemovable) { m_isRemovable = _isRemovable; }
 
 	private:
 		Gameobject*  m_gameobject;
 		bool m_isModified;
+		bool m_isRemovable;
 	};
 }
