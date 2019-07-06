@@ -38,6 +38,9 @@
     <Filter Include="code\util\shapes">
       <UniqueIdentifier>{1ffc6200-2603-4fae-ad52-1a8ca1662e37}</UniqueIdentifier>
     </Filter>
+    <Filter Include="code\util\fbx">
+      <UniqueIdentifier>{62c1088f-34f5-45b1-8362-82d150b5b663}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="deps\imgui\imgui.cpp">
@@ -151,6 +154,12 @@
     <ClCompile Include="code\util\shapes\fanRay.cpp">
       <Filter>code\util\shapes</Filter>
     </ClCompile>
+    <ClCompile Include="code\scene\components\fanMesh.cpp">
+      <Filter>code\scene\components</Filter>
+    </ClCompile>
+    <ClCompile Include="code\util\fbx\fanFbxImporter.cpp">
+      <Filter>code\util\fbx</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="code\vulkan\vkRenderer.h">
@@ -260,6 +269,12 @@
     </ClInclude>
     <ClInclude Include="code\util\shapes\fanRay.h">
       <Filter>code\util\shapes</Filter>
+    </ClInclude>
+    <ClInclude Include="code\scene\components\fanMesh.h">
+      <Filter>code\scene\components</Filter>
+    </ClInclude>
+    <ClInclude Include="code\util\fbx\fanFbxImporter.h">
+      <Filter>code\util\fbx</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -1,5 +1,7 @@
 #pragma once
 
+#include "util/fanAlignedMemory.h"
+
 namespace vk {
 	struct Vertex;
 	class Device;

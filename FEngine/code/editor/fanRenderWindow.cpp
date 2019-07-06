@@ -4,6 +4,7 @@
 #include "vulkan/pipelines/vkPostprocessPipeline.h"
 #include "vulkan/vkRenderer.h"
 #include "util/fanTime.h"
+#include "util/fanImguiUtil.h"
 
 namespace editor {
 

@@ -14,12 +14,14 @@ namespace util {
 
 		~AlignedMemory() {
 			AlignedFree(m_data);
+			m_data = nullptr;
 		}
 
 		void Resize(size_t _size, size_t _alignment) {
 			assert(_alignment > sizeof(T));
 
 			AlignedFree(m_data);
+			m_data = nullptr;
 
 			m_size = _size;
 			m_alignment = _alignment;
@@ -67,10 +69,12 @@ namespace util {
 	template<typename T>
 	void AlignedMemory<T>::AlignedFree(void* _data)
 	{
+		if (_data != nullptr) {
 #if	defined(_MSC_VER) || defined(__MINGW32__)
-		_aligned_free(_data);
+			_aligned_free(_data);
 #else 
-		free(_data);
+			free(_data);
 #endif
+		}
 	}
 }

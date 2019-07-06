@@ -2,6 +2,7 @@
 
 #include "scene/components/fanTransform.h"
 #include "scene/fanGameobject.h"
+#include "util/fanSignal.h"
 
 namespace scene
 {

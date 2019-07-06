@@ -5,11 +5,18 @@
 #include "scene/components/fanComponent.h"
 #include "scene/components/fanTransform.h"
 #include "scene/components/fanCamera.h"
+#include "scene/components/fanMesh.h"
 #include "fanEngine.h"
 #include "util/fanUtil.h"
+#include "util/fbx/fanFbxImporter.h"
+#include "util/fanImguiUtil.h"
+#include "util/fanSignal.h"
 
 namespace editor {
-	InspectorWindow::InspectorWindow() {}
+	InspectorWindow::InspectorWindow() : 
+		m_cachePathMesh(".") 
+		,m_meshExtensionFilter({".fbx"}) {
+	}
 
 	//================================================================================================================================
 	//================================================================================================================================
@@ -96,10 +103,13 @@ namespace editor {
 		const std::type_info& typeInfo = typeid(_component);
 
 		if( typeInfo == typeid(scene::Transform)){
-			DrawTransform(dynamic_cast<scene::Transform &>(_component));
+			DrawTransform(static_cast<scene::Transform &>(_component));
 		} else if (typeInfo == typeid(scene::Camera)) {
-			DrawCamera(dynamic_cast<scene::Camera &>(_component));
-		} else {
+			DrawCamera(static_cast<scene::Camera &>(_component));
+		} else if (typeInfo == typeid(scene::Mesh)) {
+			DrawMesh(static_cast<scene::Mesh &>(_component));
+		}
+		else {
 			ImGui::Text( (std::string("Component not supported: ") + std::string(_component.GetName())).c_str());
 		}
 	}
@@ -159,6 +169,46 @@ namespace editor {
 		glm::vec3 scale = _transform.GetScale();
 		if (ImGui::DragFloat3("scale", &scale.x, 0.1f)) {
 			_transform.SetScale(scale);
+		}
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
+	void InspectorWindow::DrawMesh(scene::Mesh & _mesh) {
+		//ImGui::Text(_mesh.GetName().c_str());
+		// Set path popup
+
+
+		ImGui::Text("path: %s", _mesh.GetPath().c_str());
+		// Set path  popup on double click
+		if (ImGui::IsItemHovered() && ImGui::IsMouseDoubleClicked(0)) {
+			if (_mesh.GetPath().empty() == false) {
+				m_cachePathMesh = std::experimental::filesystem::path(_mesh.GetPath()).parent_path();
+				std::cout << m_cachePathMesh << std::endl;
+			} else {
+				m_cachePathMesh = "./";
+			}
+			ImGui::OpenPopup("set_path");
+		}
+
+		if (ImGui::BeginPopup("set_path"))
+		{
+			std::experimental::filesystem::directory_entry newEntry = util::Imgui::FilesSelector(m_cachePathMesh, m_meshExtensionFilter);
+			if (std::experimental::filesystem::is_directory(newEntry)) {
+				m_cachePathMesh = newEntry.path();
+			}
+			else if (std::experimental::filesystem::is_regular_file(newEntry))
+			{
+				const std::string path = newEntry.path().string();
+
+				util::FBXImporter importer;
+				if (importer.LoadScene(path) == true ) {
+					importer.GetMesh(_mesh);
+				}
+				ImGui::CloseCurrentPopup();
+			}
+
+			ImGui::EndPopup();
 		}
 	}
 }

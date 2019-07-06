@@ -2,6 +2,7 @@
 
 #include "scene/fanScene.h"
 #include "scene/fanGameobject.h"
+#include "util/fanSignal.h"
 #include "fanEngine.h"
 
 

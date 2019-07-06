@@ -1,5 +1,7 @@
 #pragma once
 
+#include "util/fanSignal.h"
+
 namespace scene
 {
 	class Gameobject;

@@ -4,6 +4,7 @@
 #include "vulkan/vkRenderer.h"
 #include "util/fanTime.h"
 #include "util/fanInput.h"
+#include "util/fbx/fanFbxImporter.h"
 #include "editor/fanMainMenuBar.h"
 #include "editor/fanRenderWindow.h"	
 #include "editor/fanSceneWindow.h"	
@@ -12,6 +13,7 @@
 #include "scene/fanGameobject.h"
 #include "scene/components/fanCamera.h"
 #include "scene/components/fanTransform.h"
+#include "scene/components/fanMesh.h"
 
 namespace fan {
 	Engine * Engine::ms_engine = nullptr;
@@ -37,6 +39,13 @@ namespace fan {
 		cameraComponent->SetRemovable(false);
 		m_renderer->SetMainCamera(cameraComponent);
 
+
+		scene::Gameobject * cube = m_scene->CreateGameobject("cube");
+		scene::Mesh * mesh = cube->AddComponent<scene::Mesh>();
+
+		util::FBXImporter importer;
+		importer.LoadScene("mesh/cube.fbx");
+		importer.GetMesh(*mesh);
 	}
 
 	//================================================================================================================================
