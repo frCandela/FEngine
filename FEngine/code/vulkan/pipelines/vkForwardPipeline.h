@@ -13,9 +13,12 @@ namespace vk {
 
 		struct Uniforms
 		{
-			glm::mat4 model;
 			glm::mat4 view;
 			glm::mat4 proj;
+		};
+		struct DynamicUniforms
+		{
+			glm::mat4 models;
 		};
 
 		ForwardPipeline(Device& _device, VkRenderPass& _renderPass);
@@ -27,7 +30,7 @@ namespace vk {
 		void ReloadShaders();
 
 		Uniforms GetUniforms() const { return m_uniforms; }
-		void SetUniforms(const Uniforms _uniforms);
+		void SetUniforms(const Uniforms _uniforms, std::vector<DynamicUniforms> _dynamicUniforms );
 
 		VkPipeline		GetPipeline() { return m_pipeline; }
 		VkImageView		GetDepthImageView();
@@ -49,14 +52,17 @@ namespace vk {
 		Shader * m_fragmentShader = nullptr;
 		Shader * m_vertexShader = nullptr;
 
+		std::vector<Vertex>		m_vertices;
+		std::vector<uint32_t>	m_indices;
+
+		Buffer * m_dynamicUniformBuffer;
 		Buffer * m_uniformBuffer;
 		Buffer * m_indexBuffer;
 		Buffer * m_vertexBuffer;
 
-		std::vector<Vertex>		m_vertices;
-		std::vector<uint32_t>	m_indices;
-
 		Uniforms m_uniforms;
+		util::AlignedMemory<DynamicUniforms> m_dynamicUniformsArray;
+		size_t m_dynamicAlignment;
 
 		void CreateShaders();
 		bool CreateDescriptors();

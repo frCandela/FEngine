@@ -16,6 +16,13 @@ namespace vk {
 		m_device(_device)
 		, m_renderPass(_renderPass) {
 
+		// Calculate required alignment based on minimum device offset alignment
+		size_t minUboAlignment = _device.GetDeviceProperties().limits.minUniformBufferOffsetAlignment;
+		if (minUboAlignment > 0) {
+			m_dynamicAlignment = (sizeof(DynamicUniforms) + minUboAlignment - 1) & ~(minUboAlignment - 1);
+		}
+		
+		m_dynamicUniformsArray.Resize(128, m_dynamicAlignment);
 	}
 
 	//================================================================================================================================
@@ -51,7 +58,7 @@ namespace vk {
 		CreateDescriptors();
 		CreatePipeline(_extent);
 
-		SetUniforms(m_uniforms);
+		SetUniforms(m_uniforms, { {glm::mat4(1.0)},{glm::mat4(1.0)} });
 	}
 
 	//================================================================================================================================
@@ -69,9 +76,17 @@ namespace vk {
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void ForwardPipeline::SetUniforms(const Uniforms _uniforms) {
+	void ForwardPipeline::SetUniforms(const Uniforms _uniforms, std::vector<DynamicUniforms> _dynamicUniforms) {
+		// uniforms
 		m_uniforms = _uniforms;
 		m_uniformBuffer->SetData(&m_uniforms, sizeof(m_uniforms));
+
+		// dynamic uniforms
+		for (int dynamicUniformIndex = 0; dynamicUniformIndex < _dynamicUniforms.size() ; dynamicUniformIndex++) {
+			m_dynamicUniformsArray[dynamicUniformIndex] = _dynamicUniforms[dynamicUniformIndex];
+		}
+		m_dynamicUniformBuffer->SetData(&m_dynamicUniformsArray[0], m_dynamicUniformsArray.GetSize() * sizeof(DynamicUniforms));
+
 	}
 
 	//================================================================================================================================
@@ -84,7 +99,19 @@ namespace vk {
 		VkDeviceSize offsets[] = { 0 };
 		vkCmdBindVertexBuffers(_commandBuffer, 0, 1, vertexBuffers, offsets);
 		vkCmdBindIndexBuffer(_commandBuffer, m_indexBuffer->GetBuffer(), 0, VK_INDEX_TYPE_UINT32);
-		vkCmdBindDescriptorSets(_commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, m_pipelineLayout, 0, 1, &m_descriptorSet, 0, nullptr);
+
+		uint32_t dynamicOffset =  0 * static_cast<uint32_t>(m_dynamicAlignment);
+		vkCmdBindDescriptorSets(
+			_commandBuffer, 
+			VK_PIPELINE_BIND_POINT_GRAPHICS, 
+			m_pipelineLayout, 
+			0, 
+			1, 
+			&m_descriptorSet, 
+			1, 
+			&dynamicOffset
+		);
+		
 		vkCmdDrawIndexed(_commandBuffer, static_cast<uint32_t>(m_indices.size()), 1, 0, 0, 0);
 	}
 
@@ -111,8 +138,16 @@ namespace vk {
 		uboLayoutBinding.stageFlags = VK_SHADER_STAGE_VERTEX_BIT;
 		uboLayoutBinding.pImmutableSamplers = nullptr;
 
+		VkDescriptorSetLayoutBinding dynamicLayoutBinding;
+		dynamicLayoutBinding.binding = 1;
+		dynamicLayoutBinding.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC;
+		dynamicLayoutBinding.descriptorCount = 1;
+		dynamicLayoutBinding.stageFlags = VK_SHADER_STAGE_VERTEX_BIT;
+		dynamicLayoutBinding.pImmutableSamplers = nullptr;
+
 		std::vector< VkDescriptorSetLayoutBinding > layoutBindings = {
 			uboLayoutBinding
+			,dynamicLayoutBinding
 		};
 
 		VkDescriptorSetLayoutCreateInfo descriptorSetLayoutCreateInfo = {};
@@ -128,9 +163,11 @@ namespace vk {
 		}
 		std::cout << std::hex << "VkDescriptorSetLayout\t" << m_descriptorSetLayout << std::dec << std::endl;
 
-		std::vector< VkDescriptorPoolSize > poolSizes(1);
+		std::vector< VkDescriptorPoolSize > poolSizes(2);
 		poolSizes[0].type = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
 		poolSizes[0].descriptorCount = 1;
+		poolSizes[1].type = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC;
+		poolSizes[1].descriptorCount = 1;
 
 		VkDescriptorPoolCreateInfo descriptorPoolCreateInfo = {};
 		descriptorPoolCreateInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
@@ -165,6 +202,7 @@ namespace vk {
 		m_descriptorSet = descriptorSets[0];
 		std::cout << std::hex << "VkDescriptorSet\t\t" << m_descriptorSet << std::dec << std::endl;
 
+		// Uniform buffers
 		m_uniformBuffer = new Buffer(m_device);
 		m_uniformBuffer->Create(
 			sizeof(m_uniforms),
@@ -189,7 +227,32 @@ namespace vk {
 		uboWriteDescriptorSet.pBufferInfo = &uboDescriptorBufferInfo;
 		//uboWriteDescriptorSet.pTexelBufferView = nullptr;
 
-		std::vector<VkWriteDescriptorSet> writeDescriptors = { uboWriteDescriptorSet };
+		// Dynamic uniform buffer
+		m_dynamicUniformBuffer = new Buffer(m_device);
+		m_dynamicUniformBuffer->Create(
+			m_dynamicUniformsArray.GetSize() * m_dynamicAlignment,
+			VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT,
+			VK_MEMORY_PROPERTY_HOST_COHERENT_BIT | VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT
+		);
+
+		VkDescriptorBufferInfo dynamicDescriptorBufferInfo = {};
+		dynamicDescriptorBufferInfo.buffer = m_dynamicUniformBuffer->GetBuffer();
+		dynamicDescriptorBufferInfo.offset = 0;
+		dynamicDescriptorBufferInfo.range = m_dynamicAlignment;
+
+		VkWriteDescriptorSet dynamicWriteDescriptorSet = {};
+		dynamicWriteDescriptorSet.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+		dynamicWriteDescriptorSet.pNext = nullptr;
+		dynamicWriteDescriptorSet.dstSet = m_descriptorSet;
+		dynamicWriteDescriptorSet.dstBinding = 1;
+		dynamicWriteDescriptorSet.dstArrayElement = 0;
+		dynamicWriteDescriptorSet.descriptorCount = 1;
+		dynamicWriteDescriptorSet.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC;
+		dynamicWriteDescriptorSet.pImageInfo = nullptr;
+		dynamicWriteDescriptorSet.pBufferInfo = &dynamicDescriptorBufferInfo;
+		//uboWriteDescriptorSet.pTexelBufferView = nullptr;
+
+		std::vector<VkWriteDescriptorSet> writeDescriptors = { uboWriteDescriptorSet, dynamicWriteDescriptorSet };
 
 		vkUpdateDescriptorSets(
 			m_device.vkDevice,
@@ -524,5 +587,6 @@ namespace vk {
 			m_descriptorSetLayout = VK_NULL_HANDLE;
 		}
 		delete m_uniformBuffer;
+		delete m_dynamicUniformBuffer;
 	}
 }

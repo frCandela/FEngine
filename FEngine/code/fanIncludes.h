@@ -15,7 +15,8 @@
 #include "imgui/imgui.h"
 #include "util/fanSignal.h"
 #include "util/fanImguiUtil.h"
-//#include "util/fanUtil.h"
+#include "util/fanUtil.h"
+#include "util/fanAlignedMemory.h"
 
 #include <vector>
 #include <array>

@@ -17,6 +17,8 @@ namespace vk {
 		uint32_t FindMemoryType(uint32_t _typeFilter, VkMemoryPropertyFlags _properties);
 		VkFormat FindDepthFormat();
 
+		const VkPhysicalDeviceProperties& GetDeviceProperties() const { return m_deviceProperties;  }
+
 	private:
 		Instance *		m_instance;
 		VkSurfaceKHR	m_surface;

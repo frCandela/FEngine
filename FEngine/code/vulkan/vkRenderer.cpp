@@ -93,6 +93,8 @@ namespace vk {
 		return ! glfwWindowShouldClose(m_window->GetWindow()); 
 	}
 
+	//================================================================================================================================
+	//================================================================================================================================	
 	void Renderer::DrawFrame( ) {
 			const VkResult result = m_swapchain->AcquireNextImage();
 			if (result == VK_ERROR_OUT_OF_DATE_KHR) {
@@ -226,15 +228,14 @@ namespace vk {
 			ubo.view = m_mainCamera->GetView();
 			ubo.proj = m_mainCamera->GetProjection();
 			ubo.proj[1][1] *= -1;
-
 		}		   
 
-		ubo.model = glm::rotate(glm::mat4(1.0f), Time::ElapsedSinceStartup() * glm::radians(s_speed), glm::vec3(0.0f, 1.0f, 0.0f));
-		m_forwardPipeline->SetUniforms(ubo);
 
+		glm::mat3 model = glm::rotate(glm::mat4(1.f), Time::ElapsedSinceStartup() * glm::radians(s_speed), glm::vec3(0, 1, 0));
+		m_forwardPipeline->SetUniforms(ubo, { {model},{glm::mat4(1.0) } });
 
 		DebugPipeline::Uniforms debugUniforms;
-		debugUniforms.model = ubo.model;
+		debugUniforms.model = glm::mat4(1.0);
 		debugUniforms.view = ubo.view;
 		debugUniforms.proj = ubo.proj;
 		debugUniforms.color = glm::vec4(1, 1, 1, 1);
