@@ -2,10 +2,6 @@
 
 #include "util/fanSignal.h"
 
-#include "scene/components/fanCamera.h"
-#include "scene/components/fanTransform.h"
-#include "scene/components/fanMesh.h"
-
 namespace scene
 {
 	class Component;
@@ -54,9 +50,7 @@ namespace scene
 	template<typename ComponentType>
 	ComponentType* Gameobject::AddComponent()
 	{
-		ComponentType* componentType = new ComponentType();
-
-		componentType->m_gameobject = this;
+		ComponentType* componentType = new ComponentType( this );
 
 		// Checks if ComponentType derivates from Component
 		assert((std::is_base_of<Component, ComponentType>::value));

@@ -1,53 +1,37 @@
 #include "fanIncludes.h"
 
-#include "scene/components/fanTransform.h"
+#include "editor/components/fanEditorCamera.h"
 #include "scene/fanGameobject.h"
 #include "util/fanSignal.h"
+#include "fanEngine.h"
 
 namespace scene
 {
 	//================================================================================================================================
 	//================================================================================================================================
-	Transform::Transform(Gameobject * _gameobject) : 
-		Component(_gameobject)
-		, m_rotation	( glm::vec3(0, 0, 0))
-		, m_position	( glm::vec3(0, 0, 0))
-		, m_scale		( glm::vec3(1, 1, 1)) {
-		SetRemovable(false);
+	EditorCamera::EditorCamera(Gameobject * _gameobject) :
+		Actor(_gameobject) {
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void Transform::SetPosition(glm::vec3 newPosition)
-	{
-		m_position = newPosition;
+	void EditorCamera::Start() {
+		std::cout << "Start" << std::endl;
+	}
+	
+	//================================================================================================================================
+	//================================================================================================================================
+	void EditorCamera::Update(const float _delta) {
+		ImGui::Begin("EditorCamera");
 
-// 		Rigidbody* rb = GetGameobject()->GetComponent<Rigidbody>();
-// 		if (rb)	{
-// 			rb->SetPosition(newPosition);
-// 		}
-
-		GetGameobject()->onComponentModified.Emmit(this);
+		float delta = _delta;
+		ImGui::DragFloat("delta", &delta);
+		ImGui::End();
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void Transform::SetScale(glm::vec3 newScale)
-	{
-		m_scale = newScale;
-		GetGameobject()->onComponentModified.Emmit(this);
-	}
-
-	//================================================================================================================================
-	//================================================================================================================================
-	void Transform::SetRotation(glm::vec3 newRotation)
-	{
-		m_rotation = newRotation;
-
-// 		Rigidbody* rb = GetGameobject()->GetComponent<Rigidbody>();
-// 		if (rb)	{
-// 			rb->SetRotation(newRotation);
-// 		}
-		GetGameobject()->onComponentModified.Emmit(this);
+	void EditorCamera::Stop() {
+		std::cout << "Stop" << std::endl;
 	}
 }

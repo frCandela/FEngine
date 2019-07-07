@@ -9,9 +9,7 @@ namespace scene
 	class Camera : public Component
 	{
 	public:
-
-		bool IsUnique() const override { return true; }
-		std::string GetName() const override { return "camera"; }
+		Camera(Gameobject * _gameobject) : Component(_gameobject) {};
 
 		glm::mat4 GetView() const;
 		glm::mat4 GetProjection() const;
@@ -25,6 +23,9 @@ namespace scene
 		void SetNearDistance(float _nearDistance);
 		void SetFarDistance(float _farDistance);
 		void SetAspectRatio(float _aspectRatio);
+
+		bool IsUnique() const override { return true; }
+		std::string GetName() const override { return "camera"; }
 
 	private:
 		float m_fov = 90.f;

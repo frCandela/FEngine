@@ -1,6 +1,6 @@
 #pragma once
 
-#include "editor/fanWindow.h"
+#include "editor/windows/fanWindow.h"
 
 namespace editor {
 	class PreferencesWindow : public Window {

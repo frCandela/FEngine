@@ -7,7 +7,7 @@ namespace scene
 	class Transform : public Component
 	{
 	public:
-		Transform();
+		Transform(Gameobject * _gameobject);
 
 		void SetPosition( glm::vec3 newPosition);
 		void SetScale	( glm::vec3 newScale);

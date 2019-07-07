@@ -41,6 +41,12 @@
     <Filter Include="code\util\fbx">
       <UniqueIdentifier>{62c1088f-34f5-45b1-8362-82d150b5b663}</UniqueIdentifier>
     </Filter>
+    <Filter Include="code\editor\components">
+      <UniqueIdentifier>{2daa2b21-aa9c-492f-81be-6a2aa4ffd41e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="code\editor\windows">
+      <UniqueIdentifier>{ff20275e-c5cb-4c27-9d2e-c04f9c57cb49}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="deps\imgui\imgui.cpp">
@@ -130,20 +136,11 @@
     <ClCompile Include="code\scene\fanScene.cpp">
       <Filter>code\scene</Filter>
     </ClCompile>
-    <ClCompile Include="code\editor\fanSceneWindow.cpp">
-      <Filter>code\editor</Filter>
-    </ClCompile>
     <ClCompile Include="code\scene\components\fanTransform.cpp">
       <Filter>code\scene\components</Filter>
     </ClCompile>
     <ClCompile Include="code\scene\components\fanComponent.cpp">
       <Filter>code\scene\components</Filter>
-    </ClCompile>
-    <ClCompile Include="code\editor\fanInspectorWindow.cpp">
-      <Filter>code\editor</Filter>
-    </ClCompile>
-    <ClCompile Include="code\editor\fanWindow.cpp">
-      <Filter>code\editor</Filter>
     </ClCompile>
     <ClCompile Include="code\scene\components\fanCamera.cpp">
       <Filter>code\scene\components</Filter>
@@ -157,11 +154,29 @@
     <ClCompile Include="code\util\fbx\fanFbxImporter.cpp">
       <Filter>code\util\fbx</Filter>
     </ClCompile>
-    <ClCompile Include="code\editor\fanPreferencesWindow.cpp">
-      <Filter>code\editor</Filter>
+    <ClCompile Include="code\util\fanUniqueID.cpp">
+      <Filter>code\util</Filter>
     </ClCompile>
-    <ClCompile Include="code\editor\fanRenderWindow.cpp">
-      <Filter>code\editor</Filter>
+    <ClCompile Include="code\scene\components\fanActor.cpp">
+      <Filter>code\scene\components</Filter>
+    </ClCompile>
+    <ClCompile Include="code\editor\components\fanEditorCamera.cpp">
+      <Filter>code\editor\components</Filter>
+    </ClCompile>
+    <ClCompile Include="code\editor\windows\fanPreferencesWindow.cpp">
+      <Filter>code\editor\windows</Filter>
+    </ClCompile>
+    <ClCompile Include="code\editor\windows\fanRenderWindow.cpp">
+      <Filter>code\editor\windows</Filter>
+    </ClCompile>
+    <ClCompile Include="code\editor\windows\fanSceneWindow.cpp">
+      <Filter>code\editor\windows</Filter>
+    </ClCompile>
+    <ClCompile Include="code\editor\windows\fanWindow.cpp">
+      <Filter>code\editor\windows</Filter>
+    </ClCompile>
+    <ClCompile Include="code\editor\windows\fanInspectorWindow.cpp">
+      <Filter>code\editor\windows</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -237,9 +252,6 @@
     <ClInclude Include="code\util\fanImguiUtil.h">
       <Filter>code\util</Filter>
     </ClInclude>
-    <ClInclude Include="code\editor\fanRenderWindow.h">
-      <Filter>code\editor</Filter>
-    </ClInclude>
     <ClInclude Include="code\vulkan\pipelines\vkDebugPipeline.h">
       <Filter>code\vulkan\pipelines</Filter>
     </ClInclude>
@@ -249,20 +261,11 @@
     <ClInclude Include="code\scene\fanScene.h">
       <Filter>code\scene</Filter>
     </ClInclude>
-    <ClInclude Include="code\editor\fanSceneWindow.h">
-      <Filter>code\editor</Filter>
-    </ClInclude>
     <ClInclude Include="code\scene\components\fanTransform.h">
       <Filter>code\scene\components</Filter>
     </ClInclude>
     <ClInclude Include="code\scene\components\fanComponent.h">
       <Filter>code\scene\components</Filter>
-    </ClInclude>
-    <ClInclude Include="code\editor\fanInspectorWindow.h">
-      <Filter>code\editor</Filter>
-    </ClInclude>
-    <ClInclude Include="code\editor\fanWindow.h">
-      <Filter>code\editor</Filter>
     </ClInclude>
     <ClInclude Include="code\util\fanUtil.h">
       <Filter>code\vulkan\util</Filter>
@@ -279,8 +282,29 @@
     <ClInclude Include="code\util\fbx\fanFbxImporter.h">
       <Filter>code\util\fbx</Filter>
     </ClInclude>
-    <ClInclude Include="code\editor\fanPreferencesWindow.h">
-      <Filter>code\editor</Filter>
+    <ClInclude Include="code\util\fanUniqueID.h">
+      <Filter>code\util</Filter>
+    </ClInclude>
+    <ClInclude Include="code\scene\components\fanActor.h">
+      <Filter>code\scene\components</Filter>
+    </ClInclude>
+    <ClInclude Include="code\editor\components\fanEditorCamera.h">
+      <Filter>code\editor\components</Filter>
+    </ClInclude>
+    <ClInclude Include="code\editor\windows\fanPreferencesWindow.h">
+      <Filter>code\editor\windows</Filter>
+    </ClInclude>
+    <ClInclude Include="code\editor\windows\fanRenderWindow.h">
+      <Filter>code\editor\windows</Filter>
+    </ClInclude>
+    <ClInclude Include="code\editor\windows\fanSceneWindow.h">
+      <Filter>code\editor\windows</Filter>
+    </ClInclude>
+    <ClInclude Include="code\editor\windows\fanWindow.h">
+      <Filter>code\editor\windows</Filter>
+    </ClInclude>
+    <ClInclude Include="code\editor\windows\fanInspectorWindow.h">
+      <Filter>code\editor\windows</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

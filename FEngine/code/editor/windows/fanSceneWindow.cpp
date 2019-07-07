@@ -1,6 +1,6 @@
 #include "fanIncludes.h"
 
-#include "editor/fanSceneWindow.h"
+#include "editor/windows/fanSceneWindow.h"
 #include "vulkan/vkRenderer.h"
 #include "scene/fanScene.h"
 #include "scene/fanGameobject.h"

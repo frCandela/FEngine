@@ -1,6 +1,6 @@
 #include "fanIncludes.h"
 
-#include "editor/fanWindow.h"
+#include "editor/windows/fanWindow.h"
 
 namespace editor {
 	//================================================================================================================================

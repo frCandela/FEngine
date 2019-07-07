@@ -4,9 +4,11 @@
 
 namespace scene
 {
-	Component::Component() : 
-		m_isModified(true)
-		, m_isRemovable(true){
+	Component::Component(Gameobject * _gameobject ) :
+		m_gameobject(_gameobject)
+		, m_isModified(true)
+		, m_isRemovable(true)
+	{
 
 	}
 }

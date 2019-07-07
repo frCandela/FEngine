@@ -1,6 +1,6 @@
 #include "fanIncludes.h"
 
-#include "editor/fanPreferencesWindow.h"
+#include "editor/windows/fanPreferencesWindow.h"
 #include "fanEngine.h"
 #include "util/fanImguiUtil.h"
 

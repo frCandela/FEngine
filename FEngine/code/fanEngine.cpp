@@ -7,15 +7,17 @@
 #include "util/fanInput.h"
 #include "util/fbx/fanFbxImporter.h"
 #include "editor/fanMainMenuBar.h"
-#include "editor/fanRenderWindow.h"	
-#include "editor/fanSceneWindow.h"	
-#include "editor/fanInspectorWindow.h"	
-#include "editor/fanPreferencesWindow.h"	
+#include "editor/windows/fanRenderWindow.h"	
+#include "editor/windows/fanSceneWindow.h"	
+#include "editor/windows/fanInspectorWindow.h"	
+#include "editor/windows/fanPreferencesWindow.h"	
+#include "editor/components/fanEditorCamera.h"		
 #include "scene/fanScene.h"
 #include "scene/fanGameobject.h"
 #include "scene/components/fanCamera.h"
 #include "scene/components/fanTransform.h"
 #include "scene/components/fanMesh.h"
+#include "scene/components/fanActor.h"
 
 namespace fan {
 	Engine * Engine::ms_engine = nullptr;
@@ -41,14 +43,15 @@ namespace fan {
 		m_renderer = new vk::Renderer({ 1280,720 });
 		m_scene = new scene::Scene("mainScene");
 
-		scene::Gameobject * camera = m_scene->CreateGameobject("editor_camera");
-		camera->SetRemovable(false);
-		scene::Transform * camTrans = camera->AddComponent<scene::Transform>();
+		scene::Gameobject * cameraGameobject = m_scene->CreateGameobject("editor_camera");
+		cameraGameobject->SetRemovable(false);
+		scene::Transform * camTrans = cameraGameobject->AddComponent<scene::Transform>();
 		camTrans->SetPosition(glm::vec3(0, 0, -2));
-		scene::Camera * cameraComponent = camera->AddComponent<scene::Camera>();
+		scene::Camera * cameraComponent = cameraGameobject->AddComponent<scene::Camera>();
 		cameraComponent->SetRemovable(false);
 		m_renderer->SetMainCamera(cameraComponent);
-
+		scene::EditorCamera * editorCamera = cameraGameobject->AddComponent<scene::EditorCamera>();
+		editorCamera->SetRemovable(true);
 
 		scene::Gameobject * cube = m_scene->CreateGameobject("cube");
 		cube->AddComponent<scene::Transform>();
@@ -59,8 +62,8 @@ namespace fan {
 		if (importer.GetMesh(*mesh) == true) {
 			m_renderer->AddMesh(mesh);
 		}
-		
-		
+
+		cube->GetComponent<scene::Transform>();		
 	}
 
 	//================================================================================================================================
@@ -80,6 +83,11 @@ namespace fan {
 	void Engine::Exit() {
 		m_applicationShouldExit = true;
 		std::cout << "Exit application" << std::endl;
+
+		for (auto actor : m_startingActors) { m_stoppingActors.insert(actor); }
+		m_startingActors.clear();
+		for (auto actor : m_activeActors)	{ m_stoppingActors.insert(actor); }
+		m_activeActors.clear();
 	}
 
 	//================================================================================================================================
@@ -87,20 +95,73 @@ namespace fan {
 	void Engine::Run()
 	{
 		float lastUpdateTime = Time::ElapsedSinceStartup();
-		while (m_renderer->WindowIsOpen() == true && m_applicationShouldExit == false)
+		while ( m_applicationShouldExit == false)
 		{
+			if (m_renderer->WindowIsOpen() == false) {
+				Exit();
+			}
+
 			const float time = Time::ElapsedSinceStartup();
 			const float updateDelta = time - lastUpdateTime;
 
 			if (updateDelta > 1.f / Time::GetFPS()) {
 				lastUpdateTime = time;
 
+				ActorStart();
+
+				for( scene::Actor * actor : m_activeActors ) {
+					actor->Update(updateDelta);
+				}
+
 				DrawUI();
 				DrawEditorGrid();
 				m_renderer->DrawFrame();
 				m_scene->EndFrame();
+
+				ActorStop();
 			}
 		}
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
+	void Engine::AddActor(scene::Actor * _actor) {
+
+		if (m_startingActors.find(_actor) == m_startingActors.end()
+			&& m_activeActors.find(_actor) == m_activeActors.end()
+			&& m_stoppingActors.find(_actor) == m_stoppingActors.end()) {
+			m_startingActors.insert(_actor);
+		}
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
+	void Engine::RemoveActor(scene::Actor * _actor) {
+		auto it = m_activeActors.find(_actor);
+		if (it != m_activeActors.end()) {
+			m_activeActors.erase(_actor);
+			m_stoppingActors.insert(_actor);
+		}
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
+	void Engine::ActorStart() {
+		for ( auto actor : m_startingActors ) {
+			actor->Start();	
+			m_activeActors.insert(actor);
+		}
+		m_startingActors.clear();
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
+	void Engine::ActorStop() {
+		for (auto actor : m_stoppingActors) {
+			actor->Stop();
+			delete actor;
+		}
+		m_stoppingActors.clear();
 	}
 
 	//================================================================================================================================
@@ -120,11 +181,17 @@ namespace fan {
 	//================================================================================================================================
 	//================================================================================================================================
 	void Engine::DrawUI() {
+
+		/*ImGui::Begin("Engine debug");
+		std::stringstream ss;
+		ss <<  "aa: " << m_activeActors.size();
+		ImGui::Text(ss.str().c_str());
+		ImGui::End();*/
+
 		m_mainMenuBar->Draw();
 		m_renderWindow->Draw();
 		m_sceneWindow->Draw();	
 		m_inspectorWindow->Draw();
 		m_preferencesWindow->Draw();
-
 	}
 }

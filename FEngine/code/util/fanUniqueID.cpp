@@ -1,14 +1,10 @@
 #include "fanIncludes.h"
 
-#include "scene/components/fanMesh.h"
-#include "fanEngine.h"
-#include "vulkan/vkRenderer.h"
+#include "util/fanUniqueID.h"
 
-namespace scene
-{
+namespace util {
+	size_t UniqueIdBase::m_globalId = 0;
+
 	//================================================================================================================================
 	//================================================================================================================================
-	Mesh::~Mesh() {
-		fan::Engine::GetEngine().GetRenderer().RemoveMesh(this);		
-	}
 }

@@ -13,6 +13,7 @@ namespace editor {
 namespace scene {
 	class Scene;
 	class Gameobject;
+	class Actor;
 }
 
 namespace fan {
@@ -36,6 +37,12 @@ namespace fan {
 
 		void SetSelectedGameobject( scene::Gameobject * _selectedGameobject) { m_selectedGameobject = _selectedGameobject;	}
 		void Deselect() { m_selectedGameobject = nullptr; }
+		
+		
+		void AddActor( scene::Actor * _actor );
+		void RemoveActor( scene::Actor * _actor );
+		void ActorStart();
+		void ActorStop();
 
 		scene::Gameobject *	const GetSelectedGameobject() const		{ return m_selectedGameobject;  }
 		editor::MainMenuBar  &	GetMainMenuBar() const				{ return * m_mainMenuBar; }
@@ -45,6 +52,7 @@ namespace fan {
 		editor::PreferencesWindow  & GetPreferencesWindow() const	{ return * m_preferencesWindow; }
 		scene::Scene &	GetScene() const							{ return * m_scene; }
 		vk::Renderer & GetRenderer() const							{ return * m_renderer; }
+
 
 
 		EditorGrid GetEditorGrid() const { return m_editorGrid;  }
@@ -57,15 +65,17 @@ namespace fan {
 		editor::InspectorWindow *	m_inspectorWindow;
 		editor::PreferencesWindow *	m_preferencesWindow;
 
-		vk::Renderer * m_renderer;
-		scene::Scene * m_scene;
+		vk::Renderer *		m_renderer;
+		scene::Scene *		m_scene;
 		scene::Gameobject * m_selectedGameobject;
 
-		static Engine * ms_engine;
+		std::set< scene::Actor * > m_startingActors;
+		std::set< scene::Actor * > m_activeActors;
+		std::set< scene::Actor * > m_stoppingActors;
 
+		static Engine * ms_engine;
 		bool m_applicationShouldExit;
 
-		// Scene grid
 		EditorGrid m_editorGrid;
 
 		void DrawUI();

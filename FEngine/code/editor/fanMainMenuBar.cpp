@@ -1,10 +1,10 @@
 #include "fanIncludes.h"
 
 #include "editor/fanMainMenuBar.h"
-#include "editor/fanRenderWindow.h"
-#include "editor/fanSceneWindow.h"
-#include "editor/fanInspectorWindow.h"
-#include "editor/fanPreferencesWindow.h"
+#include "editor/windows/fanRenderWindow.h"
+#include "editor/windows/fanSceneWindow.h"
+#include "editor/windows/fanInspectorWindow.h"
+#include "editor/windows/fanPreferencesWindow.h"
 
 #include "vulkan/vkRenderer.h"
 #include "fanEngine.h"
