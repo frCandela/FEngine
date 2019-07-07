@@ -27,7 +27,16 @@ namespace vk {
 		std::vector<unsigned int> spirvCode = SpirvCompiler::Compile(_path);
 		if (spirvCode.empty()) {
 			std::cout << "Could not create shader module: " << _path << std::endl;
-			return false;
+
+			std::experimental::filesystem::directory_entry path(_path);
+			std::string extension = path.path().extension().generic_string();
+			std::string tmpPath = (extension == ".frag" ? defaultFragmentShader : defaultVertexShader);
+			std::cout << "loading default shader " << tmpPath << std::endl;
+ 			 spirvCode = SpirvCompiler::Compile(tmpPath);
+
+			 if (spirvCode.empty()) {
+				 return false;
+			 }
 		}
 
 

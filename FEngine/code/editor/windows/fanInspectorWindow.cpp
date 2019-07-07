@@ -7,6 +7,7 @@
 #include "scene/components/fanTransform.h"
 #include "scene/components/fanCamera.h"
 #include "scene/components/fanMesh.h"
+#include "editor/components/fanFPSCamera.h"
 #include "util/fanUtil.h"
 #include "util/fbx/fanFbxImporter.h"
 #include "util/fanImguiUtil.h"
@@ -93,6 +94,7 @@ namespace editor {
 			SetVisible( visible );
 		}		
 	}
+	
 	//================================================================================================================================
 	//================================================================================================================================
 	void InspectorWindow::NewComponentPopup() {
@@ -147,6 +149,8 @@ namespace editor {
 			DrawCamera(static_cast<scene::Camera &>(_component));
 		} else if (typeInfo == typeid(scene::Mesh)) {
 			DrawMesh(static_cast<scene::Mesh &>(_component));
+		} else if (typeInfo == typeid(scene::FPSCamera)) {
+			DrawFPSCamera(static_cast<scene::FPSCamera &>(_component));
 		}
 		else {
 			ImGui::Text( (std::string("Component not supported: ") + std::string(_component.GetName())).c_str());
@@ -161,11 +165,11 @@ namespace editor {
 
 		// fov
 		if (ImGui::Button("##fov")) {
-			_camera.SetFov(90.f);
+			_camera.SetFov(110.f);
 		}
 		ImGui::SameLine();
 		float fov = _camera.GetFov();
-		if (ImGui::DragFloat("fov", &fov, 1.f, 0.f, 180.f)) {
+		if (ImGui::DragFloat("fov", &fov, 1.f, 1.f, 179.f)) {
 			_camera.SetFov(fov);
 		}	
 
@@ -175,7 +179,7 @@ namespace editor {
 		}
 		ImGui::SameLine();
 		float near = _camera.GetNearDistance();
-		if (ImGui::DragFloat("near distance", &near, 0.025f, 0.f, std::numeric_limits<float>::max())) {
+		if (ImGui::DragFloat("near distance", &near, 0.01f, 0.01f, 10.f)) {
 			_camera.SetNearDistance(near);
 		}		
 		
@@ -185,7 +189,7 @@ namespace editor {
 		}
 		ImGui::SameLine();
 		float far = _camera.GetFarDistance();
-		if ( ImGui::DragFloat("far distance", &far, 1.f, 0.f, std::numeric_limits<float>::max())) {
+		if ( ImGui::DragFloat("far distance", &far, 10.f, 0.05f, 10000.f)) {
 			_camera.SetFarDistance(far);
 		}
 	}
@@ -198,9 +202,7 @@ namespace editor {
 		// Position
 		if (ImGui::Button("##TransPos")) {
 			_transform.SetPosition(glm::vec3(0, 0, 0));
-		}
-		ImGui::SameLine();
-
+		} ImGui::SameLine();
 		float posBuffer[3] = { _transform.GetPosition().x, _transform.GetPosition().y, _transform.GetPosition().z };
 		if (ImGui::DragFloat3("position", posBuffer, 0.1f)) {
 			_transform.SetPosition(glm::vec3(posBuffer[0], posBuffer[1], posBuffer[2]));
@@ -208,19 +210,18 @@ namespace editor {
 
 		// rotation
 		if (ImGui::Button("##TransRot")) {
-			_transform.SetRotation(glm::vec3(0, 0, 0));
-		}
-		ImGui::SameLine();
-		glm::vec3 euler = _transform.GetRotation();
-		if (ImGui::DragFloat3("rotation", &euler.x, 0.1f)) {
-			_transform.SetRotation(euler);
+			_transform.SetRotationEuler(glm::vec3(0, 0, 0));
+		} ImGui::SameLine(); 	
+		const glm::vec3 rot = _transform.GetRotationEuler();
+		float bufferAngles[3] = { rot.x,rot.y,rot.z};
+		if (ImGui::DragFloat3("rotation", bufferAngles, 0.1f))	{
+			_transform.SetRotationEuler(glm::vec3(bufferAngles[0], bufferAngles[1], bufferAngles[2]));
 		}
 
 		// Scale
 		if (ImGui::Button("##TransScale")) {
 			_transform.SetScale(glm::vec3(1, 1, 1));
-		}
-		ImGui::SameLine();
+		} ImGui::SameLine();
 		glm::vec3 scale = _transform.GetScale();
 		if (ImGui::DragFloat3("scale", &scale.x, 0.1f)) {
 			_transform.SetScale(scale);
@@ -270,5 +271,41 @@ namespace editor {
 
 			ImGui::EndPopup();
 		}
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
+	void InspectorWindow::DrawFPSCamera(scene::FPSCamera & _fpsCamera) {
+		ImGui::Text(_fpsCamera.GetName().c_str());
+
+
+
+		// SetSensitivity
+		if (ImGui::Button("##SetSensitivity")) {
+			_fpsCamera.SetXYSensitivity( glm::vec2(0.005f, 0.005f) );
+		} ImGui::SameLine();
+		glm::vec2 xySensitivity = _fpsCamera.GetXYSensitivity();
+		if (ImGui::DragFloat2("XY sensitivity", &xySensitivity.x, 1.f)) {
+			_fpsCamera.SetXYSensitivity(xySensitivity);
+		}
+
+		// SetSpeed
+		if (ImGui::Button("##SetSpeed")) {
+			_fpsCamera.SetSpeed(10.f);
+		} ImGui::SameLine();
+		float speed = _fpsCamera.GetSpeed();
+		if (ImGui::DragFloat("speed", &speed, 1.f)) {
+			_fpsCamera.SetSpeed(speed);
+		}
+
+		// SetSpeedMultiplier
+		if (ImGui::Button("##SetSpeedMultiplier")) {
+			_fpsCamera.SetSpeedMultiplier(3.f);
+		} ImGui::SameLine();
+		float speedMultiplier = _fpsCamera.GetSpeedMultiplier();
+		if (ImGui::DragFloat("speed multiplier", &speedMultiplier, 1.f)) {
+			_fpsCamera.SetSpeedMultiplier(speedMultiplier);
+		}
+
 	}
 }

@@ -163,6 +163,7 @@ namespace vk {
 			std::cout << "GLSL Parsing Failed for: " << _filename << std::endl;
 			std::cout << Shader.getInfoLog() << std::endl;
 			std::cout << Shader.getInfoDebugLog() << std::endl;
+			return {};
 		}
 
 		glslang::TProgram Program;
@@ -172,12 +173,14 @@ namespace vk {
 			std::cout << "GLSL Linking Failed for: " << _filename << std::endl;
 			std::cout << Shader.getInfoLog() << std::endl;
 			std::cout << Shader.getInfoDebugLog() << std::endl;
+			return {};
 		}
 
 		std::vector< unsigned int > SpirV;
 		spv::SpvBuildLogger			logger;
 		glslang::SpvOptions			spvOptions;
-		glslang::GlslangToSpv(*Program.getIntermediate(ShaderType), SpirV, &logger, &spvOptions);
+
+		glslang::GlslangToSpv(*Program.getIntermediate(ShaderType), SpirV, &logger, &spvOptions);		
 
 		return SpirV;
 	}

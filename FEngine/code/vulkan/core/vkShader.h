@@ -14,6 +14,9 @@ namespace vk {
 
 		VkShaderModule GetModule() { return m_shaderModule; }
 
+		const char * defaultVertexShader = "shaders/empty.vert";
+		const char * defaultFragmentShader = "shaders/empty.frag";
+
 	private:
 		Device &		m_device;
 

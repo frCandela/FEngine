@@ -113,7 +113,9 @@ namespace vk {
 	void Renderer::DrawFrame( ) {
 			const VkResult result = m_swapchain->AcquireNextImage();
 			if (result == VK_ERROR_OUT_OF_DATE_KHR) {
+				// window minimized
 				if (m_window->GetExtent().width == 0 && m_window->GetExtent().height == 0) {
+					glfwPollEvents();
 					return;
 				}
 
@@ -161,10 +163,6 @@ namespace vk {
 			}
 			ImGui::EndFrame();
 			ImGui::Render();
-
-			DebugLine({ 0,0,0 }, { 1,0,0 }, { 1,0,0,1 });
-			DebugLine({ 0,0,0 }, { 0,1,0 }, { 0,1,0,1 });
-			DebugLine({ 0,0,0 }, { 0,0,1 }, { 0,0,1,1 });
 
 			const uint32_t currentFrame = m_swapchain->GetCurrentFrame();
 			if (m_reloadGeometryCommandBuffers[currentFrame] == true) {

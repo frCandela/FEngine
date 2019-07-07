@@ -11,7 +11,7 @@
 #include "editor/windows/fanSceneWindow.h"	
 #include "editor/windows/fanInspectorWindow.h"	
 #include "editor/windows/fanPreferencesWindow.h"	
-#include "editor/components/fanEditorCamera.h"		
+#include "editor/components/fanFPSCamera.h"		
 #include "scene/fanScene.h"
 #include "scene/fanGameobject.h"
 #include "scene/components/fanCamera.h"
@@ -50,8 +50,8 @@ namespace fan {
 		scene::Camera * cameraComponent = cameraGameobject->AddComponent<scene::Camera>();
 		cameraComponent->SetRemovable(false);
 		m_renderer->SetMainCamera(cameraComponent);
-		scene::EditorCamera * editorCamera = cameraGameobject->AddComponent<scene::EditorCamera>();
-		editorCamera->SetRemovable(true);
+		scene::FPSCamera * editorCamera = cameraGameobject->AddComponent<scene::FPSCamera>();
+		editorCamera->SetRemovable(false);
 
 		scene::Gameobject * cube = m_scene->CreateGameobject("cube");
 		cube->AddComponent<scene::Transform>();

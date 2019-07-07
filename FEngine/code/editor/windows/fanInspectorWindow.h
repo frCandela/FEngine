@@ -7,6 +7,7 @@ namespace scene {
 	class Component;
 	class Camera;
 	class Mesh;
+	class FPSCamera;
 }
 
 namespace editor {
@@ -22,7 +23,7 @@ namespace editor {
 		void DrawTransform(scene::Transform & _transform);
 		void DrawCamera(scene::Camera & _camera);
 		void DrawMesh(scene::Mesh & _mesh);
-
+		void DrawFPSCamera(scene::FPSCamera & _fpsCamera);
 
 
 		std::experimental::filesystem::path m_cachePathMesh;
