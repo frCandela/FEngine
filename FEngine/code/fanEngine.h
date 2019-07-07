@@ -8,6 +8,7 @@ namespace editor {
 	class RenderWindow;
 	class SceneWindow;
 	class InspectorWindow;
+	class PreferencesWindow;
 }
 namespace scene {
 	class Scene;
@@ -17,6 +18,13 @@ namespace scene {
 namespace fan {
 	class Engine {
 	public:
+
+		struct EditorGrid {
+			glm::vec4	color;
+			int			linesCount;
+			float		spacing;
+		};
+
 		Engine();
 		~Engine();
 
@@ -28,18 +36,25 @@ namespace fan {
 		void SetSelectedGameobject( scene::Gameobject * _selectedGameobject) { m_selectedGameobject = _selectedGameobject;	}
 		void Deselect() { m_selectedGameobject = nullptr; }
 
-		scene::Gameobject *	const GetSelectedGameobject() const { return m_selectedGameobject;  }
-		editor::MainMenuBar  &	GetMainMenuBar() const			{ return * m_mainMenuBar; }
-		editor::RenderWindow &	GetRenderWindow() const			{ return * m_renderWindow; }
-		editor::SceneWindow  &	GetSceneWindow() const			{ return * m_sceneWindow; }
-		editor::InspectorWindow  &	GetInspector() const		{ return * m_inspectorWindow; }
-		scene::Scene &			GetScene() const				{ return * m_scene; }
-		vk::Renderer & GetRenderer() const						{ return *m_renderer; }
+		scene::Gameobject *	const GetSelectedGameobject() const		{ return m_selectedGameobject;  }
+		editor::MainMenuBar  &	GetMainMenuBar() const				{ return * m_mainMenuBar; }
+		editor::RenderWindow &	GetRenderWindow() const				{ return * m_renderWindow; }
+		editor::SceneWindow  &	GetSceneWindow() const				{ return * m_sceneWindow; }
+		editor::InspectorWindow  &	GetInspectorWindow() const		{ return * m_inspectorWindow; }
+		editor::PreferencesWindow  & GetPreferencesWindow() const	{ return * m_preferencesWindow; }
+		scene::Scene &			GetScene() const					{ return * m_scene; }
+		vk::Renderer & GetRenderer() const							{ return * m_renderer; }
+
+
+		EditorGrid GetEditorGrid() const { return m_editorGrid;  }
+		void SetEditorGrid( const EditorGrid _editorGrid) { m_editorGrid =_editorGrid; }
+
 	private:
 		editor::MainMenuBar *		m_mainMenuBar;
 		editor::RenderWindow *		m_renderWindow;
 		editor::SceneWindow *		m_sceneWindow;
 		editor::InspectorWindow *	m_inspectorWindow;
+		editor::PreferencesWindow *	m_preferencesWindow;
 
 		vk::Renderer * m_renderer;
 		scene::Scene * m_scene;
@@ -49,7 +64,10 @@ namespace fan {
 
 		bool m_applicationShouldExit;
 
-		void DrawUI();
+		// Scene grid
+		EditorGrid m_editorGrid;
 
+		void DrawUI();
+		void DrawEditorGrid();
 	};
 }

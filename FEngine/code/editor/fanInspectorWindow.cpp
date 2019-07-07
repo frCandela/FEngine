@@ -120,16 +120,32 @@ namespace editor {
 	void InspectorWindow::DrawCamera(scene::Camera & _camera) {
 		ImGui::Text(_camera.GetName().c_str());
 
+
+		// fov
+		if (ImGui::Button("##fov")) {
+			_camera.SetFov(90.f);
+		}
+		ImGui::SameLine();
 		float fov = _camera.GetFov();
 		if (ImGui::DragFloat("fov", &fov, 1.f, 0.f, 180.f)) {
 			_camera.SetFov(fov);
-		}		
+		}	
 
+		// fov
+		if (ImGui::Button("##nearDistance")) {
+			_camera.SetNearDistance(0.1f);
+		}
+		ImGui::SameLine();
 		float near = _camera.GetNearDistance();
 		if (ImGui::DragFloat("near distance", &near, 0.025f, 0.f, std::numeric_limits<float>::max())) {
 			_camera.SetNearDistance(near);
 		}		
 		
+		// fov
+		if (ImGui::Button("##fardistance")) {
+			_camera.SetFarDistance(1000.f);
+		}
+		ImGui::SameLine();
 		float far = _camera.GetFarDistance();
 		if ( ImGui::DragFloat("far distance", &far, 1.f, 0.f, std::numeric_limits<float>::max())) {
 			_camera.SetFarDistance(far);
@@ -176,16 +192,19 @@ namespace editor {
 	//================================================================================================================================
 	//================================================================================================================================
 	void InspectorWindow::DrawMesh(scene::Mesh & _mesh) {
-		//ImGui::Text(_mesh.GetName().c_str());
+		ImGui::Text(_mesh.GetName().c_str());
+
 		// Set path popup
-
-
+		bool openSetPathPopup = false;
+		if (ImGui::Button("##setPath")) {
+			openSetPathPopup = true;
+		}
+		ImGui::SameLine();
 		ImGui::Text("path: %s", _mesh.GetPath().c_str());
 		// Set path  popup on double click
-		if (ImGui::IsItemHovered() && ImGui::IsMouseClicked(0)) {
+		if (openSetPathPopup || ImGui::IsItemHovered() && ImGui::IsMouseClicked(0)) {
 			if (_mesh.GetPath().empty() == false) {
 				m_cachePathMesh = std::experimental::filesystem::path(_mesh.GetPath()).parent_path();
-				std::cout << m_cachePathMesh << std::endl;
 			} else {
 				m_cachePathMesh = "./";
 			}

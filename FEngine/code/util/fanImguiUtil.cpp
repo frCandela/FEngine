@@ -55,8 +55,6 @@ namespace util {
 					if (isFile) {
 						ImGui::PushStyleColor(ImGuiCol_Text, (ImVec4)(ImColor(1.0f, 0.712f, 0.0f)));
 					}
-					
-
 
 					std::string filename = childPath.path().filename().generic_string();
 					if (ImGui::Selectable(filename.c_str(), false, ImGuiSelectableFlags_DontClosePopups | ImGuiSelectableFlags_AllowDoubleClick)) {

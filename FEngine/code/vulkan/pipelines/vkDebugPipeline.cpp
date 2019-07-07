@@ -12,11 +12,9 @@
 namespace vk {
 	//================================================================================================================================
 	//================================================================================================================================
-	DebugPipeline::DebugPipeline(Device& _device, VkRenderPass& _renderPass, const int _swapchainImagesCount) :
+	DebugPipeline::DebugPipeline(Device& _device, VkRenderPass& _renderPass) :
 		m_device(_device)
 		, m_renderPass(_renderPass) {
-
-		m_vertexBuffers.resize( _swapchainImagesCount );
 	}
 
 	//================================================================================================================================
@@ -24,10 +22,6 @@ namespace vk {
 	DebugPipeline::~DebugPipeline() {
 		DeletePipeline();
 		DeleteDescriptors();
-
-		for (int bufferIndex = 0; bufferIndex < m_vertexBuffers.size() ; bufferIndex++) {
-			delete m_vertexBuffers[bufferIndex];
-		} m_vertexBuffers.clear();
 
 		delete m_fragmentShader;
 		delete m_vertexShader;
@@ -51,41 +45,6 @@ namespace vk {
 
 		SetUniforms(m_uniforms);
 	}
-	//================================================================================================================================
-	//================================================================================================================================
-	void DebugPipeline::UpdateBuffer(const int _index) {
-		delete m_vertexBuffers[_index];
-
-		glm::vec3 color(0.f, 0.2, 0.f);
-
-		const VkDeviceSize size = sizeof(Vertex) * m_vertices.size();
-		m_vertexBuffers[_index] = new Buffer(m_device);
-		m_vertexBuffers[_index]->Create(
-			size,
-			VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_VERTEX_BUFFER_BIT,
-			VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT
-		);
-
-		if (size > 0) {
-			Buffer stagingBuffer(m_device);
-			stagingBuffer.Create(
-				size,
-				VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
-				VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT
-			);
-			stagingBuffer.SetData(m_vertices.data(), size);
-			VkCommandBuffer cmd = Renderer::GetRenderer().BeginSingleTimeCommands();
-			stagingBuffer.CopyBufferTo(cmd, m_vertexBuffers[_index]->GetBuffer(), size);
-			Renderer::GetRenderer().EndSingleTimeCommands(cmd);
-		}
-	}
-
-	//================================================================================================================================
-	//================================================================================================================================
-	void DebugPipeline::DebugLine(glm::vec3 start, glm::vec3 end, glm::vec4 color) {
-		m_vertices.push_back(vk::DebugPipeline::Vertex( start, color));
-		m_vertices.push_back(vk::DebugPipeline::Vertex(end, color));
-	}
 
 	//================================================================================================================================
 	//================================================================================================================================
@@ -103,15 +62,15 @@ namespace vk {
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void DebugPipeline::Draw(VkCommandBuffer _commandBuffer, int _index ) {
+	void DebugPipeline::Draw(VkCommandBuffer _commandBuffer, vk::Buffer& _vertexBuffer, const uint32_t _count) {
 		vkCmdBindPipeline(_commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, m_pipeline);
 
-		VkBuffer vertexBuffers[] = { m_vertexBuffers[_index]->GetBuffer() };
+		VkBuffer vertexBuffers[] = { _vertexBuffer.GetBuffer() };
 
 		VkDeviceSize offsets[] = { 0 };
 		vkCmdBindVertexBuffers(_commandBuffer, 0, 1, vertexBuffers, offsets);
 		vkCmdBindDescriptorSets(_commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, m_pipelineLayout, 0, 1, &m_descriptorSet, 0, nullptr);
-		vkCmdDraw(_commandBuffer, static_cast<uint32_t>(m_vertices.size()), 1, 0, 0);
+		vkCmdDraw(_commandBuffer, static_cast<uint32_t>(_count), 1, 0, 0);
 	}
 
 	//================================================================================================================================
@@ -250,8 +209,8 @@ namespace vk {
 		fragShaderStageCreateInfos.pSpecializationInfo = nullptr;
 
 		std::vector < VkPipelineShaderStageCreateInfo> shaderStages = { vertshaderStageCreateInfos, fragShaderStageCreateInfos };
-		std::vector < VkVertexInputBindingDescription > bindingDescription = Vertex::GetBindingDescription();
-		std::vector < VkVertexInputAttributeDescription > attributeDescriptions = Vertex::GetAttributeDescriptions();
+		std::vector < VkVertexInputBindingDescription > bindingDescription = DebugVertex::GetBindingDescription();
+		std::vector < VkVertexInputAttributeDescription > attributeDescriptions = DebugVertex::GetAttributeDescriptions();
 
 		VkPipelineVertexInputStateCreateInfo vertexInputStateCreateInfo = {};
 		vertexInputStateCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
@@ -320,8 +279,8 @@ namespace vk {
 		depthStencilStateCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_DEPTH_STENCIL_STATE_CREATE_INFO;
 		depthStencilStateCreateInfo.pNext = nullptr;
 		depthStencilStateCreateInfo.flags = 0;
-		depthStencilStateCreateInfo.depthTestEnable = VK_FALSE;
-		depthStencilStateCreateInfo.depthWriteEnable = VK_FALSE;
+		depthStencilStateCreateInfo.depthTestEnable = VK_TRUE;
+		depthStencilStateCreateInfo.depthWriteEnable = VK_TRUE;
 		depthStencilStateCreateInfo.depthCompareOp = VK_COMPARE_OP_LESS;
 		depthStencilStateCreateInfo.depthBoundsTestEnable = VK_FALSE;
 		depthStencilStateCreateInfo.stencilTestEnable = VK_FALSE;
@@ -458,46 +417,5 @@ namespace vk {
 			m_descriptorSetLayout = VK_NULL_HANDLE;
 		}
 		delete m_uniformBuffer;
-	}
-
-	//================================================================================================================================
-	//================================================================================================================================
-	DebugPipeline::Vertex::Vertex(glm::vec3 _pos, glm::vec3 _color) {
-		pos = _pos;
-		color = _color;
-	}
-
-	//================================================================================================================================
-	//================================================================================================================================
-	std::vector <VkVertexInputBindingDescription> DebugPipeline::Vertex::GetBindingDescription()
-	{
-		std::vector <VkVertexInputBindingDescription> bindingDescription(1);
-
-		bindingDescription[0].binding = 0;								// Index of the binding in the array of bindings
-		bindingDescription[0].stride = sizeof(Vertex);					// Number of bytes from one entry to the next
-		bindingDescription[0].inputRate = VK_VERTEX_INPUT_RATE_VERTEX;
-
-		return bindingDescription;
-	}
-
-	//================================================================================================================================
-	//================================================================================================================================
-	std::vector<VkVertexInputAttributeDescription> DebugPipeline::Vertex::GetAttributeDescriptions()
-	{
-		std::vector<VkVertexInputAttributeDescription> attributeDescriptions(2);
-
-		// Position
-		attributeDescriptions[0].binding = 0;							// Tells Vulkan from which binding the per-vertex data comes
-		attributeDescriptions[0].location = 0;							// References the location directive of the input in the vertex shader
-		attributeDescriptions[0].format = VK_FORMAT_R32G32B32_SFLOAT;	// Describes the type of data for the attribute
-		attributeDescriptions[0].offset = offsetof(Vertex, pos);
-
-		// Color
-		attributeDescriptions[1].binding = 0;
-		attributeDescriptions[1].location = 1;
-		attributeDescriptions[1].format = VK_FORMAT_R32G32B32_SFLOAT;
-		attributeDescriptions[1].offset = offsetof(Vertex, color);
-
-		return attributeDescriptions;
 	}
 }

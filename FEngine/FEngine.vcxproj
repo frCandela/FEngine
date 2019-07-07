@@ -78,7 +78,7 @@
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalDependencies>glslang.lib;glslang-default-resource-limits.lib;HLSL.lib;OGLCompiler.lib;OSDependent.lib;SPIRV.lib;SPVRemapper.lib;glfw3.lib;vulkan-1.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>libfbxsdk-mt.lib;glslang.lib;glslang-default-resource-limits.lib;HLSL.lib;OGLCompiler.lib;OSDependent.lib;SPIRV.lib;SPVRemapper.lib;glfw3.lib;vulkan-1.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>C:\VulkanSDK\1.1.106.0\Lib;lib/release</AdditionalLibraryDirectories>
       <SubSystem>Console</SubSystem>
     </Link>
@@ -86,6 +86,7 @@
   <ItemGroup>
     <ClCompile Include="code\editor\fanInspectorWindow.cpp" />
     <ClCompile Include="code\editor\fanMainMenuBar.cpp" />
+    <ClCompile Include="code\editor\fanPreferencesWindow.cpp" />
     <ClCompile Include="code\editor\fanRenderWindow.cpp" />
     <ClCompile Include="code\editor\fanSceneWindow.cpp" />
     <ClCompile Include="code\editor\fanWindow.cpp" />
@@ -127,6 +128,7 @@
   <ItemGroup>
     <ClInclude Include="code\editor\fanInspectorWindow.h" />
     <ClInclude Include="code\editor\fanMainMenuBar.h" />
+    <ClInclude Include="code\editor\fanPreferencesWindow.h" />
     <ClInclude Include="code\editor\fanRenderWindow.h" />
     <ClInclude Include="code\editor\fanSceneWindow.h" />
     <ClInclude Include="code\editor\fanWindow.h" />

@@ -38,7 +38,7 @@ namespace vk {
 		, m_mainCamera(nullptr)
 	{
 		ms_globalRenderer = this;
-		m_clearColor = glm::vec4(0.5, 0.5, 0.5, 1.f);
+		m_clearColor = glm::vec4(0.781f, 0.776f, 1.0f, 1.f);
 
 		m_swapchain->Create(m_window->GetSurface(), _size);
 		Input::Setup(m_window->GetWindow());
@@ -53,7 +53,7 @@ namespace vk {
 		m_postprocessPipeline = new PostprocessPipeline(m_device, m_renderPassPostprocess);
 		m_postprocessPipeline->Create(m_swapchain->GetSurfaceFormat().format, m_swapchain->GetExtent());
 		
-		m_debugPipeline = new DebugPipeline(m_device, m_renderPassPostprocess, m_swapchain->GetSwapchainImagesCount());
+		m_debugPipeline = new DebugPipeline(m_device, m_renderPass);
 		m_debugPipeline->Create(m_swapchain->GetExtent());
 		
 		m_imguiPipeline = new ImguiPipeline(m_device, m_swapchain->GetSwapchainImagesCount());
@@ -63,6 +63,8 @@ namespace vk {
 		CreateForwardFramebuffers();
 		CreateCommandBuffers();
 		RecordAllCommandBuffers();
+
+		m_vertexBuffers.resize(m_swapchain->GetSwapchainImagesCount());
 
 		ImGui::NewFrame();
 	}
@@ -82,6 +84,10 @@ namespace vk {
 			delete m_meshList[meshIndex].indexBuffer;
 			delete m_meshList[meshIndex].vertexBuffer;
 		}
+
+		for (int bufferIndex = 0; bufferIndex < m_vertexBuffers.size(); bufferIndex++) {
+			delete m_vertexBuffers[bufferIndex];
+		} m_vertexBuffers.clear();
 
 		DeleteForwardFramebuffers();
 		DeleteRenderPass();
@@ -156,9 +162,9 @@ namespace vk {
 			ImGui::EndFrame();
 			ImGui::Render();
 
-			m_debugPipeline->DebugLine({ 0,0,0 }, { 1,0,0 }, { 1,0,0,1 });
-			m_debugPipeline->DebugLine({ 0,0,0 }, { 0,1,0 }, { 0,1,0,1 });
-			m_debugPipeline->DebugLine({ 0,0,0 }, { 0,0,1 }, { 0,0,1,1 });
+			DebugLine({ 0,0,0 }, { 1,0,0 }, { 1,0,0,1 });
+			DebugLine({ 0,0,0 }, { 0,1,0 }, { 0,1,0,1 });
+			DebugLine({ 0,0,0 }, { 0,0,1 }, { 0,0,1,1 });
 
 			const uint32_t currentFrame = m_swapchain->GetCurrentFrame();
 			if (m_reloadGeometryCommandBuffers[currentFrame] == true) {
@@ -173,7 +179,7 @@ namespace vk {
 			m_swapchain->StartNextFrame();
 			Input::NewFrame();
 			ImGui::NewFrame();
-			m_debugPipeline->Clear();
+			ClearDebug();
 	}
 
 	//================================================================================================================================
@@ -328,14 +334,13 @@ namespace vk {
 			
 			vkCmdBeginRenderPass(commandBuffer, &renderPassInfo, VK_SUBPASS_CONTENTS_SECONDARY_COMMAND_BUFFERS); {
 				vkCmdExecuteCommands(commandBuffer, 1, &m_geometryCommandBuffers[_index]);
-
+				if (HasNoDebugToDraw() == false) {
+					vkCmdExecuteCommands(commandBuffer, 1, &m_debugCommandBuffers[_index]);
+				}
 			} vkCmdEndRenderPass(commandBuffer);
 			
 			vkCmdBeginRenderPass(commandBuffer, &renderPassInfoPostprocess, VK_SUBPASS_CONTENTS_SECONDARY_COMMAND_BUFFERS); {
 				vkCmdExecuteCommands( commandBuffer, 1, &m_postprocessCommandBuffers[_index]	);
-				if (m_debugPipeline->HasNothingToDraw() == false) {
-					vkCmdExecuteCommands(commandBuffer, 1, &m_debugCommandBuffers[_index]);
-				}
 				vkCmdExecuteCommands( commandBuffer, 1, &m_imguiCommandBuffers[_index]			);
 			} vkCmdEndRenderPass(commandBuffer);
 			
@@ -423,17 +428,17 @@ namespace vk {
 	//================================================================================================================================
 	//================================================================================================================================
 	void Renderer::RecordCommandBufferDebug(const int _index) {
-		if (m_debugPipeline->HasNothingToDraw() == false) {
-			m_debugPipeline->UpdateBuffer(_index);
+		if (HasNoDebugToDraw() == false) {
+			UpdateDebugBuffer(_index);
 
 			VkCommandBuffer commandBuffer = m_debugCommandBuffers[_index];
 
 			VkCommandBufferInheritanceInfo commandBufferInheritanceInfo = {};
 			commandBufferInheritanceInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_INHERITANCE_INFO;
 			commandBufferInheritanceInfo.pNext = nullptr;
-			commandBufferInheritanceInfo.renderPass = m_renderPassPostprocess;
+			commandBufferInheritanceInfo.renderPass = m_renderPass;
 			commandBufferInheritanceInfo.subpass = 0;
-			commandBufferInheritanceInfo.framebuffer = m_swapchainFramebuffers[_index]->GetFrameBuffer();
+			commandBufferInheritanceInfo.framebuffer = m_forwardFrameBuffers[_index]->GetFrameBuffer();
 			commandBufferInheritanceInfo.occlusionQueryEnable = VK_FALSE;
 			//commandBufferInheritanceInfo.queryFlags				=;
 			//commandBufferInheritanceInfo.pipelineStatistics		=;
@@ -445,7 +450,7 @@ namespace vk {
 			commandBufferBeginInfo.pInheritanceInfo = &commandBufferInheritanceInfo;
 
 			if (vkBeginCommandBuffer(commandBuffer, &commandBufferBeginInfo) == VK_SUCCESS) {
-				m_debugPipeline->Draw(commandBuffer, _index);
+				m_debugPipeline->Draw(commandBuffer,  *m_vertexBuffers[_index], static_cast<uint32_t>(m_vertices.size()));
 				if (vkEndCommandBuffer(commandBuffer) != VK_SUCCESS) {
 					std::cout << "Could not record command buffer " << _index << "." << std::endl;
 				}
@@ -536,6 +541,42 @@ namespace vk {
 		CreateForwardFramebuffers();
 		RecordAllCommandBuffers();
 	}	
+
+	//================================================================================================================================
+	//================================================================================================================================
+	void Renderer::UpdateDebugBuffer(const int _index) {
+		delete m_vertexBuffers[_index];
+
+		glm::vec3 color(0.f, 0.2, 0.f);
+
+		const VkDeviceSize size = sizeof(DebugVertex) * m_vertices.size();
+		m_vertexBuffers[_index] = new Buffer(m_device);
+		m_vertexBuffers[_index]->Create(
+			size,
+			VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_VERTEX_BUFFER_BIT,
+			VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT
+		);
+
+		if (size > 0) {
+			Buffer stagingBuffer(m_device);
+			stagingBuffer.Create(
+				size,
+				VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
+				VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT
+			);
+			stagingBuffer.SetData(m_vertices.data(), size);
+			VkCommandBuffer cmd = Renderer::GetRenderer().BeginSingleTimeCommands();
+			stagingBuffer.CopyBufferTo(cmd, m_vertexBuffers[_index]->GetBuffer(), size);
+			Renderer::GetRenderer().EndSingleTimeCommands(cmd);
+		}
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
+	void Renderer::DebugLine(glm::vec3 start, glm::vec3 end, glm::vec4 color) {
+		m_vertices.push_back(vk::DebugVertex(start, color));
+		m_vertices.push_back(vk::DebugVertex(end, color));
+	}
 
 	//================================================================================================================================
 	//================================================================================================================================

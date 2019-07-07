@@ -121,9 +121,6 @@
     <ClCompile Include="code\util\fanImguiUtil.cpp">
       <Filter>code\util</Filter>
     </ClCompile>
-    <ClCompile Include="code\editor\fanRenderWindow.cpp">
-      <Filter>code\editor</Filter>
-    </ClCompile>
     <ClCompile Include="code\vulkan\pipelines\vkDebugPipeline.cpp">
       <Filter>code\vulkan\pipelines</Filter>
     </ClCompile>
@@ -159,6 +156,12 @@
     </ClCompile>
     <ClCompile Include="code\util\fbx\fanFbxImporter.cpp">
       <Filter>code\util\fbx</Filter>
+    </ClCompile>
+    <ClCompile Include="code\editor\fanPreferencesWindow.cpp">
+      <Filter>code\editor</Filter>
+    </ClCompile>
+    <ClCompile Include="code\editor\fanRenderWindow.cpp">
+      <Filter>code\editor</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -275,6 +278,9 @@
     </ClInclude>
     <ClInclude Include="code\util\fbx\fanFbxImporter.h">
       <Filter>code\util\fbx</Filter>
+    </ClInclude>
+    <ClInclude Include="code\editor\fanPreferencesWindow.h">
+      <Filter>code\editor</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

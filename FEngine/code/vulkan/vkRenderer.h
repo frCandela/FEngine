@@ -1,5 +1,7 @@
 #pragma once
 
+#include "vulkan/util/vkVertex.h"
+
 namespace scene {
 	class Camera;
 	class Mesh;
@@ -30,8 +32,11 @@ namespace vk {
 
 		bool WindowIsOpen();
 		void DrawFrame();
+
 		static Renderer & GetRenderer() {	return * ms_globalRenderer; }
+
 		void ReloadShaders();
+		void UpdateDebugBuffer(const int _index);
 
 		VkCommandBuffer BeginSingleTimeCommands();
 		void EndSingleTimeCommands(VkCommandBuffer commandBuffer);
@@ -39,17 +44,24 @@ namespace vk {
 		ImguiPipeline *			GetImguiPipeline()			{ return m_imguiPipeline; }
 		PostprocessPipeline *	GetPostprocessPipeline()	{ return m_postprocessPipeline; }
 		ForwardPipeline *		GetForwardPipeline()		{ return m_forwardPipeline; }
-		DebugPipeline *			GetDebugPipeline()			{ return m_debugPipeline; }
+		glm::vec4				GetClearColor() const		{ return m_clearColor;  }
 
-		glm::vec4 GetClearColor() const { return m_clearColor;  }
+		void ClearDebug() { m_vertices.clear(); }
 		void SetClearColor(glm::vec4 _color) { m_clearColor = _color; }
 		void SetMainCamera( scene::Camera * _camera) { m_mainCamera = _camera; }
 
+		bool HasNoDebugToDraw() const { return m_vertices.empty(); }
+
 		void AddMesh(scene::Mesh * _mesh);
+		void DebugLine(glm::vec3 start, glm::vec3 end, glm::vec4 color);
 	private:
 		//SCENE REFERENCES
 		scene::Camera * m_mainCamera;
 		std::vector <MeshData> m_meshList;
+
+		// DEBUG DATA
+		std::vector<DebugVertex> m_vertices;
+		std::vector<Buffer *> m_vertexBuffers;
 
 		// VULKAN OBJECTS
 		Instance *		m_instance;
