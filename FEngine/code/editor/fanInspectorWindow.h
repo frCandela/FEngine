@@ -16,11 +16,14 @@ namespace editor {
 
 		void Draw() override;
 
-	private:
+	private:		
+		void NewComponentPopup();
 		void DrawComponent(scene::Component & _component);
 		void DrawTransform(scene::Transform & _transform);
 		void DrawCamera(scene::Camera & _camera);
 		void DrawMesh(scene::Mesh & _mesh);
+
+
 
 		std::experimental::filesystem::path m_cachePathMesh;
 		std::set < std::string > m_meshExtensionFilter;

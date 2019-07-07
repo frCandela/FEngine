@@ -241,10 +241,6 @@ namespace vk {
 	//================================================================================================================================
 	void Renderer::UpdateUniformBuffer()
 	{
-		// Ui
-		static float s_speed = 1.f;
-
-		ImGui::SliderFloat("rotation speed", &s_speed, 0.f, 1000.f);		
 
 		ForwardPipeline::Uniforms ubo = {};
 		assert(m_mainCamera != nullptr);
@@ -255,7 +251,6 @@ namespace vk {
 			ubo.proj[1][1] *= -1;
 		}
 
-		glm::mat3 model = glm::rotate(glm::mat4(1.f), Time::ElapsedSinceStartup() * glm::radians(s_speed), glm::vec3(0, 1, 0));
 		m_forwardPipeline->SetUniforms(ubo);
 
 		std::vector < ForwardPipeline::DynamicUniforms > dynamicUniforms( m_meshList.size() );
@@ -576,6 +571,21 @@ namespace vk {
 	void Renderer::DebugLine(glm::vec3 start, glm::vec3 end, glm::vec4 color) {
 		m_vertices.push_back(vk::DebugVertex(start, color));
 		m_vertices.push_back(vk::DebugVertex(end, color));
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
+	void Renderer::RemoveMesh(scene::Mesh * _mesh) {
+		vkDeviceWaitIdle(m_device.vkDevice);
+
+		for (int meshIndex = 0; meshIndex < m_meshList.size(); meshIndex++) {
+			if (m_meshList[meshIndex].mesh == _mesh) {
+				MeshData & meshData = m_meshList[meshIndex];
+				delete meshData.indexBuffer;
+				delete meshData.vertexBuffer;
+				m_meshList.erase(m_meshList.begin() + meshIndex);
+			}
+		}
 	}
 
 	//================================================================================================================================

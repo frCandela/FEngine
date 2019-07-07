@@ -23,15 +23,20 @@ namespace editor {
 				if (ImGui::CollapsingHeader("3D Grid")) {
 					fan::Engine::EditorGrid  gridData = engine.GetEditorGrid();
 
-					if (ImGui::DragFloat("spacing", &gridData.spacing)) {
+
+					if (ImGui::Checkbox("is visible", &gridData.isVisible)) {
 						engine.SetEditorGrid(gridData);
 					}
 
-					if (ImGui::DragInt("lines count", &gridData.linesCount)) {
+					if (ImGui::DragFloat("spacing", &gridData.spacing, 0.25f, 0.f, 100.f)) {
 						engine.SetEditorGrid(gridData);
 					}
 
-					if (ImGui::ColorEdit3("Filter##1", &gridData.color.r, util::Imgui::colorEditFlags)) {
+					if (ImGui::DragInt("lines count", &gridData.linesCount, 1.f, 0, 1000)) {
+						engine.SetEditorGrid(gridData);
+					}
+
+					if (ImGui::ColorEdit3("color", &gridData.color.r, util::Imgui::colorEditFlags)) {
 						engine.SetEditorGrid(gridData);
 					}
 

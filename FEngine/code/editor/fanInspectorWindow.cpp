@@ -1,4 +1,5 @@
 #include "fanIncludes.h"
+#include "fanIncludes.h"
 
 #include "editor/fanInspectorWindow.h"
 #include "scene/fanGameobject.h"
@@ -42,14 +43,16 @@ namespace editor {
 					ImGui::Separator();
 
 					// Delete button
-					if (component->IsRemovable()) {
+
+					if ( component->IsRemovable()) {
 						std::stringstream ss;
 						ss << "X" << "##" << component->GetName() << componentCount++;	// make unique id
 						if (ImGui::Button(ss.str().c_str())) {
 							selection->DeleteComponent(component);
 							component = nullptr;
 						} ImGui::SameLine();
-					} else if(component != nullptr){
+					}
+					if(component != nullptr){
 						DrawComponent(*component);
 					}
 
@@ -78,24 +81,59 @@ namespace editor {
 					ImGui::EndPopup();
 				}
 
-				//Delete button
-				if (ImGui::Button("Delete Gameobject"))
-				{
-					//m_pEditorApplication->GetCurrentScene()->DeleteGameobjectLater(m_pEditorApplication->GetSelectedGameobject());
-					//m_pEditorApplication->SetSelectedGameobject(nullptr);
-				}
-
 				ImGui::SameLine();
 
 				//Add component button
 				if (ImGui::Button("Add component"))
 					ImGui::OpenPopup("New component");
 
-				//NewComponentPopup();
+				NewComponentPopup();
 
 			} ImGui::End();
 			SetVisible( visible );
 		}		
+	}
+	//================================================================================================================================
+	//================================================================================================================================
+	void InspectorWindow::NewComponentPopup() {
+
+		if (ImGui::BeginPopup("New component"))
+		{
+			fan::Engine & engine = fan::Engine::GetEngine();
+			scene::Gameobject * const selection = engine.GetSelectedGameobject();
+
+			// Mesh
+			if (ImGui::MenuItem("Mesh")){
+				selection->AddComponent<scene::Mesh>();
+				ImGui::CloseCurrentPopup();
+			}
+
+			// Camera
+			if (ImGui::MenuItem("Camera")) {
+				// Create new Component 
+				selection->AddComponent<scene::Camera>();
+				ImGui::CloseCurrentPopup();
+			}
+
+			// Material
+			/*if (ImGui::MenuItem("Material"))
+			{
+				// Create new Component 
+				scene::Material* mat = m_pEditorApplication->GetSelectedGameobject()->AddComponent<editor::Material>();
+				mat->SetTextureKey(m_pEditorApplication->GetRenderer()->GetDefaultTexture());
+				ImGui::CloseCurrentPopup();
+			}*/
+
+			// Material
+			/*if (ImGui::MenuItem("RigidBody"))
+			{
+				// Create new Component 
+				m_pEditorApplication->GetSelectedGameobject()->AddComponent<editor::Rigidbody>();
+				ImGui::CloseCurrentPopup();
+			}*/
+
+			ImGui::EndPopup();
+		}
 	}
 
 	//================================================================================================================================

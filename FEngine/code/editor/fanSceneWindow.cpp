@@ -1,7 +1,6 @@
 #include "fanIncludes.h"
 
 #include "editor/fanSceneWindow.h"
-#include "vulkan/pipelines/vkPostprocessPipeline.h"
 #include "vulkan/vkRenderer.h"
 #include "scene/fanScene.h"
 #include "scene/fanGameobject.h"
@@ -44,6 +43,7 @@ namespace editor {
 				ImGui::Text(scene.GetName().c_str());
 				ImGui::Separator();
 
+				// Show gameobjects tree
 				bool popupOneTime = true;
 				const std::vector< scene::Gameobject * > & gameobjects = scene.GetGameObjects();
 				for (int gameobjectIndex = 0; gameobjectIndex < gameobjects.size(); gameobjectIndex++)
@@ -58,9 +58,8 @@ namespace editor {
 
 					if (popupOneTime && ImGui::BeginPopupContextItem(scene.GetName().c_str()))
 					{
-						if (ImGui::Selectable("Delete")) {
+						if ( gameobject->IsRemovable() && ImGui::Selectable("Delete")) {	
 							scene.DeleteGameobject(gameobject);
-
 						}
 						ImGui::EndPopup();
 						popupOneTime = false;

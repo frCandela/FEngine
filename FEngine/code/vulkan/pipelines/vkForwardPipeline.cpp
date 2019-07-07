@@ -105,7 +105,7 @@ namespace vk {
 			VkBuffer vertexBuffers[] = { mesh.vertexBuffer->GetBuffer() };
 			vkCmdBindVertexBuffers(_commandBuffer, 0, 1, vertexBuffers, offsets);
 			vkCmdBindIndexBuffer(_commandBuffer, mesh.indexBuffer->GetBuffer(), 0, VK_INDEX_TYPE_UINT32);
-			uint32_t dynamicOffset = 0 * static_cast<uint32_t>(m_dynamicAlignment);
+			uint32_t dynamicOffset = meshIndex  * static_cast<uint32_t>(m_dynamicAlignment);
 			vkCmdBindDescriptorSets(
 				_commandBuffer,
 				VK_PIPELINE_BIND_POINT_GRAPHICS,

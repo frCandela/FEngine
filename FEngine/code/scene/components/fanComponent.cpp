@@ -5,7 +5,8 @@
 namespace scene
 {
 	Component::Component() : 
-		m_isModified(true){
+		m_isModified(true)
+		, m_isRemovable(true){
 
 	}
 }

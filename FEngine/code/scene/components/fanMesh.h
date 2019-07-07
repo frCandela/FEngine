@@ -8,6 +8,8 @@ namespace scene
 	class Mesh : public Component
 	{
 	public:
+		~Mesh();
+
 
 		bool IsUnique() const override { return true; }
 		std::string GetName() const override { return "mesh"; }

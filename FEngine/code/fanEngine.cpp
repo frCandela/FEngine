@@ -25,6 +25,7 @@ namespace fan {
 	Engine::Engine() :
 		m_applicationShouldExit(false) {
 
+		m_editorGrid.isVisible = true;
 		m_editorGrid.color = glm::vec4(0.161f, 0.290f, 0.8f, 0.478f);
 		m_editorGrid.linesCount = 100;
 		m_editorGrid.spacing = 1.f;		
@@ -40,7 +41,8 @@ namespace fan {
 		m_renderer = new vk::Renderer({ 1280,720 });
 		m_scene = new scene::Scene("mainScene");
 
-		scene::Gameobject * camera = m_scene->CreateGameobject("EditorCamera");
+		scene::Gameobject * camera = m_scene->CreateGameobject("editor_camera");
+		camera->SetRemovable(false);
 		scene::Transform * camTrans = camera->AddComponent<scene::Transform>();
 		camTrans->SetPosition(glm::vec3(0, 0, -2));
 		scene::Camera * cameraComponent = camera->AddComponent<scene::Camera>();
@@ -53,7 +55,7 @@ namespace fan {
 		scene::Mesh * mesh = cube->AddComponent<scene::Mesh>();
 
 		util::FBXImporter importer;
-		importer.LoadScene("mesh/cube.fbx");
+		importer.LoadScene("content/models/test/cube.fbx");
 		if (importer.GetMesh(*mesh) == true) {
 			m_renderer->AddMesh(mesh);
 		}
@@ -104,13 +106,15 @@ namespace fan {
 	//================================================================================================================================
 	//================================================================================================================================
 	void Engine::DrawEditorGrid() {
-		const float size = m_editorGrid.spacing;
-		const int count = m_editorGrid.linesCount;
+		if (m_editorGrid.isVisible == true) {
+			const float size = m_editorGrid.spacing;
+			const int count = m_editorGrid.linesCount;
 
-		for (int coord = -m_editorGrid.linesCount; coord <= m_editorGrid.linesCount; coord++) {
-			m_renderer->DebugLine(glm::vec3(-count*size, 0.f, coord*size), glm::vec3(  count*size, 0.f, coord*size), m_editorGrid.color);
-			m_renderer->DebugLine(glm::vec3(coord*size, 0.f, -count * size), glm::vec3(coord*size, 0.f, count*size), m_editorGrid.color);
-		}	
+			for (int coord = -m_editorGrid.linesCount; coord <= m_editorGrid.linesCount; coord++) {
+				m_renderer->DebugLine(glm::vec3(-count * size, 0.f, coord*size), glm::vec3(count*size, 0.f, coord*size), m_editorGrid.color);
+				m_renderer->DebugLine(glm::vec3(coord*size, 0.f, -count * size), glm::vec3(coord*size, 0.f, count*size), m_editorGrid.color);
+			}
+		}
 	}
 
 	//================================================================================================================================

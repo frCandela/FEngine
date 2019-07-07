@@ -20,6 +20,7 @@ namespace fan {
 	public:
 
 		struct EditorGrid {
+			bool		isVisible;
 			glm::vec4	color;
 			int			linesCount;
 			float		spacing;
@@ -42,7 +43,7 @@ namespace fan {
 		editor::SceneWindow  &	GetSceneWindow() const				{ return * m_sceneWindow; }
 		editor::InspectorWindow  &	GetInspectorWindow() const		{ return * m_inspectorWindow; }
 		editor::PreferencesWindow  & GetPreferencesWindow() const	{ return * m_preferencesWindow; }
-		scene::Scene &			GetScene() const					{ return * m_scene; }
+		scene::Scene &	GetScene() const							{ return * m_scene; }
 		vk::Renderer & GetRenderer() const							{ return * m_renderer; }
 
 

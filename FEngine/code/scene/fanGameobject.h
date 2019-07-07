@@ -2,6 +2,10 @@
 
 #include "util/fanSignal.h"
 
+#include "scene/components/fanCamera.h"
+#include "scene/components/fanTransform.h"
+#include "scene/components/fanMesh.h"
+
 namespace scene
 {
 	class Component;
@@ -36,8 +40,11 @@ namespace scene
 		//Getters
 		std::string GetName() { return m_name; }
 
+		bool IsRemovable() const { return m_isRemovable; }
+		void SetRemovable(const bool _isRemovable) { m_isRemovable = _isRemovable; }
 	private:
 		std::string m_name;
+		bool m_isRemovable;
 		std::vector<Component*> m_components;
 	};
 
@@ -87,12 +94,13 @@ namespace scene
 	std::vector<ComponentType*> Gameobject::GetComponents()
 	{
 		std::vector<ComponentType*> componentTypeVector;
-		ComponentType* componentType;
-		for (Component* component : m_components)
-		{
-			componentType = dynamic_cast<ComponentType*>(component);
-			if (componentType != nullptr)
-				componentTypeVector.push_back(componentType);
+		for (int componentIndex = 0; componentIndex < m_components.size(); componentIndex++) {
+			scene::Component* component = m_components[componentIndex];
+			const std::type_info& typeInfo = typeid(*component);
+
+			if (typeInfo == typeid(ComponentType)) {
+				componentTypeVector.push_back(static_cast<ComponentType*>(component));
+			}
 		}
 		return componentTypeVector;
 	}

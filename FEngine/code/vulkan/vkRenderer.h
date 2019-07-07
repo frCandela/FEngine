@@ -53,6 +53,7 @@ namespace vk {
 		bool HasNoDebugToDraw() const { return m_vertices.empty(); }
 
 		void AddMesh(scene::Mesh * _mesh);
+		void RemoveMesh(scene::Mesh * _mesh);
 		void DebugLine(glm::vec3 start, glm::vec3 end, glm::vec4 color);
 	private:
 		//SCENE REFERENCES
