@@ -53,17 +53,17 @@ namespace fan {
 		scene::FPSCamera * editorCamera = cameraGameobject->AddComponent<scene::FPSCamera>();
 		editorCamera->SetRemovable(false);
 
-		scene::Gameobject * cube = m_scene->CreateGameobject("cube");
-		cube->AddComponent<scene::Transform>();
-		scene::Mesh * mesh = cube->AddComponent<scene::Mesh>();
-
-		util::FBXImporter importer;
-		importer.LoadScene("content/models/test/cube.fbx");
-		if (importer.GetMesh(*mesh) == true) {
-			m_renderer->AddMesh(mesh);
-		}
-
-		cube->GetComponent<scene::Transform>();		
+// 		scene::Gameobject * cube = m_scene->CreateGameobject("cube");
+// 		cube->AddComponent<scene::Transform>();
+// 		scene::Mesh * mesh = cube->AddComponent<scene::Mesh>();
+// 
+// 		util::FBXImporter importer;
+// 		importer.LoadScene("content/models/test/cube.fbx");
+// 		if (importer.GetMesh(*mesh) == true) {
+// 			m_renderer->AddMesh(mesh);
+// 		}
+// 
+// 		cube->GetComponent<scene::Transform>();		
 	}
 
 	//================================================================================================================================
@@ -181,12 +181,43 @@ namespace fan {
 	//================================================================================================================================
 	//================================================================================================================================
 	void Engine::DrawUI() {
-
-		/*ImGui::Begin("Engine debug");
-		std::stringstream ss;
-		ss <<  "aa: " << m_activeActors.size();
-		ImGui::Text(ss.str().c_str());
-		ImGui::End();*/
+// 		static btBroadphaseInterface *myBroadphase = new btDbvtBroadphase();
+// 		static btDefaultCollisionConfiguration *myCollisionConfiguration = new btDefaultCollisionConfiguration();
+// 		static btCollisionDispatcher *myDispatcher = new	btCollisionDispatcher(myCollisionConfiguration);
+// 		static btSequentialImpulseConstraintSolver *mySequentialImpulseConstraintSolver = new btSequentialImpulseConstraintSolver();
+// 		static btDiscreteDynamicsWorld *myWorld = new btDiscreteDynamicsWorld(myDispatcher, myBroadphase, mySequentialImpulseConstraintSolver, myCollisionConfiguration);
+// 		myWorld->setGravity(btVector3(0, -10, 0));
+// 		btTransform myTransform;
+// 		myTransform.setIdentity();
+// 		myTransform.setOrigin(btVector3(0, 0, 0));
+// 
+// 		btVector3 planeDir(btVector3(1, 0, 0));
+// 		btStaticPlaneShape plane(planeDir, 1.f);
+// 
+// 		btSphereShape sphere(1.f);
+// 
+// 		btDefaultMotionState myMotionState(myTransform);
+// 		btRigidBody *body = new btRigidBody(0.f, &myMotionState, &sphere, btVector3(0,0,0));
+// 
+// 		myWorld->addRigidBody(body);
+// 		myWorld->updateAabbs();
+// 		myWorld->computeOverlappingPairs();
+// 
+// 		btVector3 from(0, 2, 0);
+// 		btVector3 to(0, 3, 0);
+// 
+// 		btCollisionWorld::ClosestRayResultCallback  callback(from, to);
+// 		myWorld->rayTest(from, to, callback);
+// 
+// 		bool val = callback.hasHit();
+// 		ImGui::Begin("zob");
+// 		ImGui::Checkbox("ray hit", &val);
+// 		ImGui::End();
+// 
+// 		m_renderer->DebugLine({ from.x(), from.y() , from.z() }, { to.x(), to.y() , to.z() }, { 1,0,0,1 });
+// 
+// 
+// 		myWorld->removeRigidBody(body);
 
 		m_mainMenuBar->Draw();
 		m_renderWindow->Draw();

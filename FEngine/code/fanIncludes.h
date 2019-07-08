@@ -14,6 +14,8 @@
 #include "glm/gtc/quaternion.hpp"
 #include "imgui/imgui.h"
 
+#include "bullet/btBulletDynamicsCommon.h"
+
 #include <vector>
 #include <map>
 #include <set>
