@@ -105,7 +105,11 @@
     <ClCompile Include="code\util\fanTime.cpp" />
     <ClCompile Include="code\util\fanUniqueID.cpp" />
     <ClCompile Include="code\util\fbx\fanFbxImporter.cpp" />
+    <ClCompile Include="code\util\shapes\fanCube.cpp" />
+    <ClCompile Include="code\util\shapes\fanPlane.cpp" />
     <ClCompile Include="code\util\shapes\fanRay.cpp" />
+    <ClCompile Include="code\util\shapes\fanShape.cpp" />
+    <ClCompile Include="code\util\shapes\fanTriangle.cpp" />
     <ClCompile Include="code\vulkan\core\vkBuffer.cpp" />
     <ClCompile Include="code\vulkan\core\vkDevice.cpp" />
     <ClCompile Include="code\vulkan\core\vkFramebuffer.cpp" />
@@ -152,7 +156,11 @@
     <ClInclude Include="code\util\fanUniqueID.h" />
     <ClInclude Include="code\util\fanUtil.h" />
     <ClInclude Include="code\util\fbx\fanFbxImporter.h" />
+    <ClInclude Include="code\util\shapes\fanCube.h" />
+    <ClInclude Include="code\util\shapes\fanPlane.h" />
     <ClInclude Include="code\util\shapes\fanRay.h" />
+    <ClInclude Include="code\util\shapes\fanShape.h" />
+    <ClInclude Include="code\util\shapes\fanTriangle.h" />
     <ClInclude Include="code\vulkan\core\vkBuffer.h" />
     <ClInclude Include="code\vulkan\core\vkDevice.h" />
     <ClInclude Include="code\vulkan\core\vkFrameBuffer.h" />

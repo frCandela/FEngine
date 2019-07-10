@@ -181,6 +181,18 @@
     <ClCompile Include="code\editor\components\fanFPSCamera.cpp">
       <Filter>code\editor\components</Filter>
     </ClCompile>
+    <ClCompile Include="code\util\shapes\fanPlane.cpp">
+      <Filter>code\util\shapes</Filter>
+    </ClCompile>
+    <ClCompile Include="code\util\shapes\fanShape.cpp">
+      <Filter>code\util\shapes</Filter>
+    </ClCompile>
+    <ClCompile Include="code\util\shapes\fanTriangle.cpp">
+      <Filter>code\util\shapes</Filter>
+    </ClCompile>
+    <ClCompile Include="code\util\shapes\fanCube.cpp">
+      <Filter>code\util\shapes</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="code\vulkan\vkRenderer.h">
@@ -743,6 +755,18 @@
     </ClInclude>
     <ClInclude Include="code\editor\components\fanFPSCamera.h">
       <Filter>code\editor\components</Filter>
+    </ClInclude>
+    <ClInclude Include="code\util\shapes\fanPlane.h">
+      <Filter>code\util\shapes</Filter>
+    </ClInclude>
+    <ClInclude Include="code\util\shapes\fanShape.h">
+      <Filter>code\util\shapes</Filter>
+    </ClInclude>
+    <ClInclude Include="code\util\shapes\fanTriangle.h">
+      <Filter>code\util\shapes</Filter>
+    </ClInclude>
+    <ClInclude Include="code\util\shapes\fanCube.h">
+      <Filter>code\util\shapes</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -3,7 +3,7 @@
 #include "scene/components/fanComponent.h"
 #include "util/shapes/fanRay.h"
 
-namespace util { class ray; }
+namespace shape { class ray; }
 namespace scene
 {
 	class Camera : public Component
@@ -13,7 +13,7 @@ namespace scene
 
 		glm::mat4 GetView() const;
 		glm::mat4 GetProjection() const;
-		util::Ray ScreenPosToRay(glm::vec2 screenSpacePosition); // Returns a ray going from camera through a screen point ( with screenSpacePosition between {-1.f,-1.f} and {1.f,1.f} ).
+		shape::Ray ScreenPosToRay(btVector3 _screenSpacePosition); // Returns a ray going from camera through a screen point ( with screenSpacePosition between {-1.f,-1.f} and {1.f,1.f} ).
 	
 		float GetFov() const			{ return m_fov; };
 		float GetNearDistance() const	{ return m_nearDistance; };

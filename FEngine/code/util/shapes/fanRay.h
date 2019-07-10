@@ -1,9 +1,9 @@
 #pragma once
 
-namespace util {
+namespace shape {
 	struct Ray
 	{
-		glm::vec3 origin;
-		glm::vec3 direction;
+		btVector3 origin;
+		btVector3 direction;
 	};
 }

@@ -34,27 +34,28 @@ namespace scene
 
 	//================================================================================================================================
 	//================================================================================================================================
-	util::Ray Camera::ScreenPosToRay(glm::vec2 position)
+	shape::Ray Camera::ScreenPosToRay(btVector3 _position)
 	{
-		assert(position.x >= -1.f  && position.x <= 1.f);
-		assert(position.y >= -1.f && position.y <= 1.f);
+// 		assert(position.x >= -1.f  && position.x <= 1.f);
+// 		assert(position.y >= -1.f && position.y <= 1.f);
+// 
+// 		Transform* transform = GetGameobject()->GetComponent<Transform>();
+// 
+// 		const glm::vec3 pos = transform->GetPosition();
+// 		const glm::vec3 upVec = transform->Up();
+// 		const glm::vec3 right = transform->Right();
+// 		const glm::vec3 forward = transform->Forward();
+// 
+// 		glm::vec3 nearMiddle = pos + m_nearDistance * forward;
+// 
+// 		float nearHeight = m_nearDistance * tan(glm::radians(m_fov / 2));
+// 		float nearWidth = m_aspectRatio * nearHeight;
 
-		Transform* transform = GetGameobject()->GetComponent<Transform>();
+		shape::Ray ray;
+// 		ray.origin = nearMiddle + position.x * nearWidth * right - position.y * nearHeight * upVec;
+// 		ray.direction = 100.f * glm::normalize(ray.origin - pos);
 
-		const glm::vec3 pos = transform->GetPosition();
-		const glm::vec3 upVec = transform->Up();
-		const glm::vec3 right = transform->Right();
-		const glm::vec3 forward = transform->Forward();
-
-		glm::vec3 nearMiddle = pos + m_nearDistance * forward;
-
-		float nearHeight = m_nearDistance * tan(glm::radians(m_fov / 2));
-		float nearWidth = m_aspectRatio * nearHeight;
-
-		util::Ray ray;
-		ray.origin = nearMiddle + position.x * nearWidth * right - position.y * nearHeight * upVec;
-		ray.direction = 100.f * glm::normalize(ray.origin - pos);
-
+		(void)_position;
 		return ray;
 	}
 
