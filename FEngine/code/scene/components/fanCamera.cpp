@@ -20,7 +20,10 @@ namespace scene
 	glm::mat4 Camera::GetView() const
 	{
 		Transform* transform = GetGameobject()->GetComponent<Transform>();
-		glm::mat4 view = glm::lookAt(transform->GetPosition(), transform->GetPosition() + transform->Forward(), transform->Up());
+		glm::mat4 view = glm::lookAt(
+			util::ToGLM(transform->GetPosition()), 
+			util::ToGLM(transform->GetPosition() + transform->Forward()),
+			util::ToGLM(transform->Up()));
 		return view;
 	}
 

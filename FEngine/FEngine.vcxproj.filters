@@ -193,6 +193,8 @@
     <ClCompile Include="code\util\shapes\fanCube.cpp">
       <Filter>code\util\shapes</Filter>
     </ClCompile>
+    <ClCompile Include="code\util\fanVector2.cpp" />
+    <ClCompile Include="code\util\fanUtil.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="code\vulkan\vkRenderer.h">
@@ -767,6 +769,9 @@
     </ClInclude>
     <ClInclude Include="code\util\shapes\fanCube.h">
       <Filter>code\util\shapes</Filter>
+    </ClInclude>
+    <ClInclude Include="code\util\fanVector2.h">
+      <Filter>code</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -21,15 +21,15 @@ namespace scene
 		// Getters
 		float GetSpeed() const				{ return m_speed; }
 		float GetSpeedMultiplier() const	{ return m_speedMultiplier; }
-		glm::vec2 GetXYSensitivity() const	{ return m_xySensitivity; }
+		btVector2 GetXYSensitivity() const	{ return m_xySensitivity; }
 		void SetSpeed( const float _speed)						{ m_speed = _speed; }
 		void SetSpeedMultiplier( const float _speedMultiplier)  { m_speedMultiplier= _speedMultiplier; }
-		void SetXYSensitivity( const glm::vec2 _sensitivity)		{ m_xySensitivity= _sensitivity; }
+		void SetXYSensitivity( const btVector2 _sensitivity)		{ m_xySensitivity= _sensitivity; }
 
 	private:
 		float m_speed;
 		float m_speedMultiplier;
-		glm::vec2 m_xySensitivity;
+		btVector2 m_xySensitivity;
 
 		scene::Transform & m_transform;
 	};

@@ -17,7 +17,7 @@ namespace scene
 		, m_transform(*GetGameobject()->GetComponent<scene::Transform>())
 		, m_speed( 10.f)
 		, m_speedMultiplier( 3.f)
-		, m_xySensitivity ( glm::vec2(0.005f, 0.005f) ){
+		, m_xySensitivity ( btVector2(0.005f, 0.005f) ){
 
 	}
 
@@ -39,7 +39,7 @@ namespace scene
 			Mouse::LockCursor(false);
 		}
 
-		glm::vec3 position = m_transform.GetPosition();
+		btVector3 position = m_transform.GetPosition();
 		
 		// Calculates speed
 		float realSpeed = m_speed;
@@ -72,12 +72,12 @@ namespace scene
 			forwardAxis -= 1.f;
 		position += _delta * realSpeed * forwardAxis * m_transform.Forward();
 
-		glm::vec2 mouseDelta = Mouse::GetDelta();
-		glm::vec2 mousePos = Mouse::GetPosition();
+		btVector2 mouseDelta = Mouse::GetDelta();
+		btVector2 mousePos = Mouse::GetPosition();
 
 		if (Mouse::IsKeyDown(Mouse::button1)) {
-			const glm::quat rotationY = glm::angleAxis(m_xySensitivity.x * mouseDelta.x, Transform::worldUp);
-			const glm::quat rotationX = glm::angleAxis(m_xySensitivity.y *mouseDelta.y, m_transform.Right());
+			const btQuaternion rotationY(Transform::worldUp, m_xySensitivity.x() * mouseDelta.x() );
+			const btQuaternion rotationX(m_transform.Right(), m_xySensitivity.y() *mouseDelta.y() );
 			m_transform.SetRotationQuat(rotationY * rotationX * m_transform.GetRotationQuat());
 		}
 		m_transform.SetPosition(position);

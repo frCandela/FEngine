@@ -48,7 +48,7 @@ namespace fan {
 		scene::Gameobject * cameraGameobject = m_scene->CreateGameobject("editor_camera");
 		cameraGameobject->SetRemovable(false);
 		scene::Transform * camTrans = cameraGameobject->AddComponent<scene::Transform>();
-		camTrans->SetPosition(glm::vec3(0, 0, -2));
+		camTrans->SetPosition(btVector3(0, 0, -2));
 		scene::Camera * cameraComponent = cameraGameobject->AddComponent<scene::Camera>();
 		cameraComponent->SetRemovable(false);
 		m_renderer->SetMainCamera(cameraComponent);

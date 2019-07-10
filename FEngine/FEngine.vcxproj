@@ -69,7 +69,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>false</ConformanceMode>
-      <AdditionalIncludeDirectories>deps;code;C:\VulkanSDK\1.1.106.0\Include;bullet</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>deps;code;C:\VulkanSDK\1.1.106.0\Include;deps/bullet</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>_MBCS;%(PreprocessorDefinitions);NDEBUG</PreprocessorDefinitions>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <TreatWarningAsError>true</TreatWarningAsError>
@@ -104,6 +104,8 @@
     <ClCompile Include="code\util\fanInput.cpp" />
     <ClCompile Include="code\util\fanTime.cpp" />
     <ClCompile Include="code\util\fanUniqueID.cpp" />
+    <ClCompile Include="code\util\fanUtil.cpp" />
+    <ClCompile Include="code\util\fanVector2.cpp" />
     <ClCompile Include="code\util\fbx\fanFbxImporter.cpp" />
     <ClCompile Include="code\util\shapes\fanCube.cpp" />
     <ClCompile Include="code\util\shapes\fanPlane.cpp" />
@@ -155,6 +157,7 @@
     <ClInclude Include="code\util\fanTime.h" />
     <ClInclude Include="code\util\fanUniqueID.h" />
     <ClInclude Include="code\util\fanUtil.h" />
+    <ClInclude Include="code\util\fanVector2.h" />
     <ClInclude Include="code\util\fbx\fanFbxImporter.h" />
     <ClInclude Include="code\util\shapes\fanCube.h" />
     <ClInclude Include="code\util\shapes\fanPlane.h" />

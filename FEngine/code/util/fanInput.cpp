@@ -47,7 +47,7 @@ void Input::NewFrame()
 	Mouse::Update();
 
 	ImGuiIO& io = ImGui::GetIO();
-	io.MousePos = ImVec2(Mouse::GetPosition().x, Mouse::GetPosition().y);
+	io.MousePos = ImVec2(Mouse::GetPosition().x(), Mouse::GetPosition().y());
 	io.MouseDown[0] = Mouse::IsKeyDown(Mouse::button0);
 	io.MouseDown[1] = Mouse::IsKeyDown(Mouse::button1);
 }
@@ -101,32 +101,32 @@ void Keyboard::CharCallback(GLFWwindow* _window, unsigned int _c)
 //================================================================================================================================
 std::array< unsigned, 11 > Mouse::m_buttonsPressed;
 std::array< unsigned, 11 > Mouse::m_buttonsReleased;
-glm::vec2 Mouse::m_lockPosition;
+btVector2 Mouse::m_lockPosition;
 bool Mouse::m_lockCursor = false;
-glm::vec2 Mouse::m_oldPosition;
-glm::vec2 Mouse::m_position;
-glm::vec2 Mouse::m_delta;
-glm::ivec2 Mouse::m_deltaScroll;
+btVector2 Mouse::m_oldPosition;
+btVector2 Mouse::m_position;
+btVector2 Mouse::m_delta;
+btVector2 Mouse::m_deltaScroll;
 
 //================================================================================================================================
 //================================================================================================================================
-glm::vec2 Mouse::GetScreenSpacePosition(glm::vec2 _screenSize)
+btVector2 Mouse::GetScreenSpacePosition(btVector2 _screenSize)
 {
-	glm::vec2 ratio = 2.f * Mouse::GetPosition() / _screenSize - glm::vec2(1.f, 1.f);
-	ratio.x = std::clamp(ratio.x, -1.f, 1.f);
-	ratio.y = std::clamp(ratio.y, -1.f, 1.f);
+	btVector2 ratio = 2.f * Mouse::GetPosition() / _screenSize - btVector2(1.f, 1.f);
+	ratio.setX( std::clamp(ratio.x(), -1.f, 1.f));
+	ratio.setY( std::clamp(ratio.y(), -1.f, 1.f));
 	return ratio;
 }
 
 //================================================================================================================================
 //================================================================================================================================
-void Mouse::LockCursor(bool _state, glm::vec2 _position)
+void Mouse::LockCursor(bool _state, btVector2 _position)
 {
 	if (m_lockCursor != _state)
 	{
 		m_lockPosition = _position;
 		m_lockCursor = _state;
-		glfwSetCursorPos(Input::GetWindow(), m_lockPosition.x, m_lockPosition.y);
+		glfwSetCursorPos(Input::GetWindow(), m_lockPosition.x(), m_lockPosition.y());
 	}
 }
 
@@ -140,7 +140,7 @@ void Mouse::ScrollCallback(GLFWwindow* _window, double _xoffset, double _yoffset
 	io.MouseWheelH += (float)_xoffset;
 	io.MouseWheel += (float)_yoffset;
 
-	m_deltaScroll += glm::ivec2(_xoffset, _yoffset);
+	m_deltaScroll += btVector2( static_cast<float>(_xoffset), static_cast<float>(_yoffset));
 }
 
 //================================================================================================================================
@@ -172,17 +172,17 @@ void Mouse::Update()
 	{
 		GLFWwindow * window = Input::GetWindow();
 		glm::ivec2 size = Input::GetWindowSize();
-		glfwSetCursorPos(window, m_lockPosition.x, m_lockPosition.y);
+		glfwSetCursorPos(window, m_lockPosition.x(), m_lockPosition.y());
 
-		m_position = glm::vec2(x, y);
+		m_position = btVector2(static_cast<btScalar>(x), static_cast<btScalar>(y));
 		m_delta = m_position - m_lockPosition;
 	}
 	else
 	{
 		m_oldPosition = m_position;
-		m_position = glm::vec2(x, y);
+		m_position = btVector2(static_cast<btScalar>(x), static_cast<btScalar>(y));
 		m_delta = m_position - m_oldPosition;
 	}
 
-	m_deltaScroll = glm::ivec2();
+	m_deltaScroll = btVector2();
 }

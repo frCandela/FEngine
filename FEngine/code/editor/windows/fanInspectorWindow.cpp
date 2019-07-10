@@ -1,5 +1,4 @@
 #include "fanIncludes.h"
-#include "fanIncludes.h"
 
 #include "editor/windows/fanInspectorWindow.h"
 #include "scene/fanGameobject.h"
@@ -201,29 +200,29 @@ namespace editor {
 
 		// Position
 		if (ImGui::Button("##TransPos")) {
-			_transform.SetPosition(glm::vec3(0, 0, 0));
+			_transform.SetPosition(btVector3(0, 0, 0));
 		} ImGui::SameLine();
-		float posBuffer[3] = { _transform.GetPosition().x, _transform.GetPosition().y, _transform.GetPosition().z };
+		float posBuffer[3] = { _transform.GetPosition().x(), _transform.GetPosition().y(), _transform.GetPosition().z() };
 		if (ImGui::DragFloat3("position", posBuffer, 0.1f)) {
-			_transform.SetPosition(glm::vec3(posBuffer[0], posBuffer[1], posBuffer[2]));
+			_transform.SetPosition(btVector3(posBuffer[0], posBuffer[1], posBuffer[2]));
 		}
 
 		// rotation
 		if (ImGui::Button("##TransRot")) {
-			_transform.SetRotationEuler(glm::vec3(0, 0, 0));
+			_transform.SetRotationEuler(btVector3(0, 0, 0));
 		} ImGui::SameLine(); 	
-		const glm::vec3 rot = _transform.GetRotationEuler();
-		float bufferAngles[3] = { rot.x,rot.y,rot.z};
+		const btVector3 rot = _transform.GetRotationEuler();
+		float bufferAngles[3] = { rot.x(),rot.y(),rot.z()};
 		if (ImGui::DragFloat3("rotation", bufferAngles, 0.1f))	{
-			_transform.SetRotationEuler(glm::vec3(bufferAngles[0], bufferAngles[1], bufferAngles[2]));
+			_transform.SetRotationEuler(btVector3(bufferAngles[0], bufferAngles[1], bufferAngles[2]));
 		}
 
 		// Scale
 		if (ImGui::Button("##TransScale")) {
-			_transform.SetScale(glm::vec3(1, 1, 1));
+			_transform.SetScale(btVector3(1, 1, 1));
 		} ImGui::SameLine();
-		glm::vec3 scale = _transform.GetScale();
-		if (ImGui::DragFloat3("scale", &scale.x, 0.1f)) {
+		btVector3 scale = _transform.GetScale();
+		if (ImGui::DragFloat3("scale", &scale[0], 0.1f)) {
 			_transform.SetScale(scale);
 		}
 	}
@@ -282,10 +281,10 @@ namespace editor {
 
 		// SetSensitivity
 		if (ImGui::Button("##SetSensitivity")) {
-			_fpsCamera.SetXYSensitivity( glm::vec2(0.005f, 0.005f) );
+			_fpsCamera.SetXYSensitivity(btVector2(0.005f, 0.005f) );
 		} ImGui::SameLine();
-		glm::vec2 xySensitivity = _fpsCamera.GetXYSensitivity();
-		if (ImGui::DragFloat2("XY sensitivity", &xySensitivity.x, 1.f)) {
+		btVector2 xySensitivity = _fpsCamera.GetXYSensitivity();
+		if (ImGui::DragFloat2("XY sensitivity", &xySensitivity[0], 1.f)) {
 			_fpsCamera.SetXYSensitivity(xySensitivity);
 		}
 

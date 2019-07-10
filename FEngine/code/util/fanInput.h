@@ -51,13 +51,13 @@ public:
 	enum CursorState { disabled = GLFW_CURSOR_DISABLED, hidden = GLFW_CURSOR_HIDDEN, normal = GLFW_CURSOR_NORMAL };
 	enum Button { button0 = 0, button1 = 1, button2, button3, button4, button5, button6, button7 };
 
-	static glm::vec2	GetPosition()			{ return m_position; }
-	static glm::vec2	GetDelta()				{ return m_delta; }
-	static glm::ivec2	GetDeltaScroll()		{ return m_deltaScroll; }
-	static glm::vec2	GetScreenSpacePosition(glm::vec2 screenSize);
+	static btVector2	GetPosition()			{ return m_position; }
+	static btVector2	GetDelta()				{ return m_delta; }
+	static btVector2	GetDeltaScroll()		{ return m_deltaScroll; }
+	static btVector2	GetScreenSpacePosition(btVector2 screenSize);
 
 	static void SetCursor(CursorState _state) { glfwSetInputMode(Input::GetWindow(), GLFW_CURSOR, _state); }
-	static void LockCursor(bool _state, glm::vec2  _position = m_position);
+	static void LockCursor(bool _state, btVector2  _position = m_position);
 
 	static bool IsKeyDown(int  _GLFW_MOUSE_BUTTON)			{ return glfwGetMouseButton(Input::GetWindow(), _GLFW_MOUSE_BUTTON) == GLFW_PRESS; }
 	static bool IsButtonPressed(int _GLFW_MOUSE_BUTTON)		{ return m_buttonsPressed[_GLFW_MOUSE_BUTTON] == Input::GetFrameCount(); }
@@ -71,12 +71,12 @@ private:
 	static void Update();
 
 	static bool			m_lockCursor;
-	static glm::vec2	m_lockPosition;
+	static btVector2	m_lockPosition;
 
-	static glm::vec2	m_oldPosition;
-	static glm::vec2	m_position;
-	static glm::vec2	m_delta;
-	static glm::ivec2	m_deltaScroll;
+	static btVector2	m_oldPosition;
+	static btVector2	m_position;
+	static btVector2	m_delta;
+	static btVector2	m_deltaScroll;
 
 	static std::array< unsigned, 11 > m_buttonsPressed;
 	static std::array< unsigned, 11 > m_buttonsReleased;
