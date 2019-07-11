@@ -20,7 +20,7 @@ namespace vk {
 			glm::vec4 color;
 		};
 
-		DebugPipeline(Device& _device, VkRenderPass& _renderPass);
+		DebugPipeline(Device& _device, VkRenderPass& _renderPass, const VkPrimitiveTopology _primitiveTopology );
 		~DebugPipeline();
 
 		void Create( VkExtent2D _extent );
@@ -37,6 +37,7 @@ namespace vk {
 	private:
 		Device& m_device;
 		VkRenderPass& m_renderPass;
+		VkPrimitiveTopology m_primitiveTopology;
 
 		VkPipelineLayout	m_pipelineLayout;
 		VkPipeline			m_pipeline;

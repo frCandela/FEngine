@@ -31,5 +31,6 @@
 
 #include "util/fanVector2.h"
 #include "util/fanUtil.h"
+#include "vulkan/util/vkColor.h"
 
 #pragma warning( pop )

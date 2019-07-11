@@ -30,7 +30,7 @@ namespace fan {
 		m_applicationShouldExit(false) {
 
 		m_editorGrid.isVisible = true;
-		m_editorGrid.color = glm::vec4(0.161f, 0.290f, 0.8f, 0.478f);
+		m_editorGrid.color = vk::Color(0.161f, 0.290f, 0.8f, 0.478f);
 		m_editorGrid.linesCount = 100;
 		m_editorGrid.spacing = 1.f;		
 
@@ -117,6 +117,7 @@ namespace fan {
 
 				DrawUI();
 				DrawEditorGrid();
+
 				m_renderer->DrawFrame();
 				m_scene->EndFrame();
 
@@ -174,8 +175,8 @@ namespace fan {
 			const int count = m_editorGrid.linesCount;
 
 			for (int coord = -m_editorGrid.linesCount; coord <= m_editorGrid.linesCount; coord++) {
-				m_renderer->DebugLine(glm::vec3(-count * size, 0.f, coord*size), glm::vec3(count*size, 0.f, coord*size), m_editorGrid.color);
-				m_renderer->DebugLine(glm::vec3(coord*size, 0.f, -count * size), glm::vec3(coord*size, 0.f, count*size), m_editorGrid.color);
+				m_renderer->DebugLine(btVector3(-count * size, 0.f, coord*size), btVector3(count*size, 0.f, coord*size), m_editorGrid.color);
+				m_renderer->DebugLine(btVector3(coord*size, 0.f, -count * size), btVector3(coord*size, 0.f, count*size), m_editorGrid.color);
 			}
 		}
 	}
@@ -188,6 +189,8 @@ namespace fan {
 		m_sceneWindow->Draw();	
 		m_inspectorWindow->Draw();
 		m_preferencesWindow->Draw();
+
+		m_renderer->DebugTriangle({ 0.f,0.f,0.f }, { 10.f,0.f,0.f }, { 10.f,0.f,10.f }, { 1.f,0.f, 0.f,0.5f });
 	}
 
 }

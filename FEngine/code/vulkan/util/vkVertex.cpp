@@ -47,7 +47,7 @@ namespace vk {
 	//================================================================================================================================
 	// DebugVertex
 	//================================================================================================================================
-	DebugVertex::DebugVertex(glm::vec3 _pos, glm::vec3 _color) {
+	DebugVertex::DebugVertex(glm::vec3 _pos, glm::vec4 _color) {
 		pos = _pos;
 		color = _color;
 	}
@@ -80,7 +80,7 @@ namespace vk {
 		// Color
 		attributeDescriptions[1].binding = 0;
 		attributeDescriptions[1].location = 1;
-		attributeDescriptions[1].format = VK_FORMAT_R32G32B32_SFLOAT;
+		attributeDescriptions[1].format = VK_FORMAT_R32G32B32A32_SFLOAT;
 		attributeDescriptions[1].offset = offsetof(DebugVertex, color);
 
 		return attributeDescriptions;

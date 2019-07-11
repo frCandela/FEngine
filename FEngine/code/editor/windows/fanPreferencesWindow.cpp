@@ -36,7 +36,7 @@ namespace editor {
 						engine.SetEditorGrid(gridData);
 					}
 
-					if (ImGui::ColorEdit3("color", &gridData.color.r, util::Imgui::colorEditFlags)) {
+					if (ImGui::ColorEdit3("color", &gridData.color[0], util::Imgui::colorEditFlags)) {
 						engine.SetEditorGrid(gridData);
 					}
 

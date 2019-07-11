@@ -14,9 +14,9 @@ namespace vk {
 	struct DebugVertex
 	{
 		glm::vec3 pos;
-		glm::vec3 color;
+		glm::vec4 color;
 
-		DebugVertex(glm::vec3 _pos, glm::vec3 _color);
+		DebugVertex(glm::vec3 _pos, glm::vec4 _color);
 		static std::vector <VkVertexInputBindingDescription>	GetBindingDescription();
 		static std::vector<VkVertexInputAttributeDescription>	GetAttributeDescriptions();
 

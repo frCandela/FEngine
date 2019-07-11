@@ -12,9 +12,10 @@
 namespace vk {
 	//================================================================================================================================
 	//================================================================================================================================
-	DebugPipeline::DebugPipeline(Device& _device, VkRenderPass& _renderPass) :
+	DebugPipeline::DebugPipeline(Device& _device, VkRenderPass& _renderPass, const VkPrimitiveTopology _primitiveTopology) :
 		m_device(_device)
-		, m_renderPass(_renderPass) {
+		, m_renderPass(_renderPass)
+		, m_primitiveTopology(_primitiveTopology){
 	}
 
 	//================================================================================================================================
@@ -63,14 +64,16 @@ namespace vk {
 	//================================================================================================================================
 	//================================================================================================================================
 	void DebugPipeline::Draw(VkCommandBuffer _commandBuffer, vk::Buffer& _vertexBuffer, const uint32_t _count) {
-		vkCmdBindPipeline(_commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, m_pipeline);
+		if (_count > 0) {
+			vkCmdBindPipeline(_commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, m_pipeline);
 
-		VkBuffer vertexBuffers[] = { _vertexBuffer.GetBuffer() };
+			VkBuffer vertexBuffers[] = { _vertexBuffer.GetBuffer() };
 
-		VkDeviceSize offsets[] = { 0 };
-		vkCmdBindVertexBuffers(_commandBuffer, 0, 1, vertexBuffers, offsets);
-		vkCmdBindDescriptorSets(_commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, m_pipelineLayout, 0, 1, &m_descriptorSet, 0, nullptr);
-		vkCmdDraw(_commandBuffer, static_cast<uint32_t>(_count), 1, 0, 0);
+			VkDeviceSize offsets[] = { 0 };
+			vkCmdBindVertexBuffers(_commandBuffer, 0, 1, vertexBuffers, offsets);
+			vkCmdBindDescriptorSets(_commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, m_pipelineLayout, 0, 1, &m_descriptorSet, 0, nullptr);
+			vkCmdDraw(_commandBuffer, static_cast<uint32_t>(_count), 1, 0, 0);
+		}
 	}
 
 	//================================================================================================================================
@@ -225,7 +228,7 @@ namespace vk {
 		inputAssemblyStateCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO;
 		inputAssemblyStateCreateInfo.pNext = nullptr;
 		inputAssemblyStateCreateInfo.flags = 0;
-		inputAssemblyStateCreateInfo.topology = VK_PRIMITIVE_TOPOLOGY_LINE_LIST;
+		inputAssemblyStateCreateInfo.topology = m_primitiveTopology;
 		inputAssemblyStateCreateInfo.primitiveRestartEnable = VK_FALSE;
 
 		std::vector< VkViewport > viewports(1);
@@ -290,9 +293,9 @@ namespace vk {
 		//depthStencilStateCreateInfo.maxDepthBounds=;
 
 		std::vector<VkPipelineColorBlendAttachmentState> attachmentBlendStates(1);
-		attachmentBlendStates[0].blendEnable = VK_FALSE;
-		attachmentBlendStates[0].srcColorBlendFactor = VK_BLEND_FACTOR_ONE;
-		attachmentBlendStates[0].dstColorBlendFactor = VK_BLEND_FACTOR_ZERO;
+		attachmentBlendStates[0].blendEnable = VK_TRUE;
+		attachmentBlendStates[0].srcColorBlendFactor = VK_BLEND_FACTOR_SRC_ALPHA;
+		attachmentBlendStates[0].dstColorBlendFactor = VK_BLEND_FACTOR_ONE_MINUS_SRC_ALPHA;
 		attachmentBlendStates[0].colorBlendOp = VK_BLEND_OP_ADD;
 		attachmentBlendStates[0].srcAlphaBlendFactor = VK_BLEND_FACTOR_ONE;
 		attachmentBlendStates[0].dstAlphaBlendFactor = VK_BLEND_FACTOR_ZERO;

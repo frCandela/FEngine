@@ -23,6 +23,8 @@ namespace vk {
 	class PostprocessPipeline;
 	class ForwardPipeline;
 	class DebugPipeline;
+	class Color;
+
 	struct MeshData;
 
 	class Renderer {
@@ -46,23 +48,29 @@ namespace vk {
 		ForwardPipeline *		GetForwardPipeline()		{ return m_forwardPipeline; }
 		glm::vec4				GetClearColor() const		{ return m_clearColor;  }
 
-		void ClearDebug() { m_vertices.clear(); }
+		void ClearDebug() { 
+			m_debugLines.clear(); 
+			m_debugTriangles.clear();
+		}
 		void SetClearColor(glm::vec4 _color) { m_clearColor = _color; }
 		void SetMainCamera( scene::Camera * _camera) { m_mainCamera = _camera; }
 
-		bool HasNoDebugToDraw() const { return m_vertices.empty(); }
+		bool HasNoDebugToDraw() const { return m_debugLines.empty() && m_debugTriangles.empty(); }
 
-		void AddMesh(scene::Mesh * _mesh);
-		void RemoveMesh(scene::Mesh * _mesh);
-		void DebugLine(glm::vec3 start, glm::vec3 end, glm::vec4 color);
+		void AddMesh		( scene::Mesh * _mesh);
+		void RemoveMesh		( scene::Mesh * _mesh);
+		void DebugLine		( const btVector3 _start, const btVector3 _end, const vk::Color _color);
+		void DebugTriangle	( const btVector3 _v0, const btVector3 _v1, const btVector3 _v2, const vk::Color _color);
 	private:
 		//SCENE REFERENCES
 		scene::Camera * m_mainCamera;
 		std::vector <MeshData> m_meshList;
 
 		// DEBUG DATA
-		std::vector<DebugVertex> m_vertices;
-		std::vector<Buffer *> m_vertexBuffers;
+		std::vector<DebugVertex> m_debugLines;
+		std::vector<Buffer *> m_debugLinesvertexBuffers;
+		std::vector<DebugVertex> m_debugTriangles;
+		std::vector<Buffer *> m_debugTrianglesvertexBuffers;
 
 		// VULKAN OBJECTS
 		Instance *		m_instance;
@@ -73,7 +81,8 @@ namespace vk {
 		ImguiPipeline *			m_imguiPipeline;
 		PostprocessPipeline *	m_postprocessPipeline;
 		ForwardPipeline *		m_forwardPipeline;
-		DebugPipeline *			m_debugPipeline;
+		DebugPipeline *			m_debugLinesPipeline;
+		DebugPipeline *			m_debugTrianglesPipeline;
 
 		VkRenderPass	m_renderPass;
 		VkRenderPass	m_renderPassPostprocess;

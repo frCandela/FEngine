@@ -97,11 +97,10 @@ namespace scene
 
 		const float size = 0.1f;
 		btVector3 offset = m_transform.GetPosition() + m_transform.Forward();
-		glm::vec3 offsetGLM(offset.x(), offset.y(), offset.z());
 
-		fan::Engine::GetEngine().GetRenderer().DebugLine(offsetGLM, offsetGLM + glm::vec3(size, 0, 0), glm::vec4(1, 0, 0, 1));
-		fan::Engine::GetEngine().GetRenderer().DebugLine(offsetGLM, offsetGLM + glm::vec3(0, size, 0), glm::vec4(0, 1, 0, 1));
-		fan::Engine::GetEngine().GetRenderer().DebugLine(offsetGLM, offsetGLM + glm::vec3(0, 0, size), glm::vec4(0, 0, 1, 1));
+		fan::Engine::GetEngine().GetRenderer().DebugLine(offset, offset + btVector3(size, 0, 0), vk::Color(1, 0, 0, 1));
+		fan::Engine::GetEngine().GetRenderer().DebugLine(offset, offset + btVector3(0, size, 0), vk::Color(0, 1, 0, 1));
+		fan::Engine::GetEngine().GetRenderer().DebugLine(offset, offset + btVector3(0, 0, size), vk::Color(0, 0, 1, 1));
 	}
 
 	//================================================================================================================================

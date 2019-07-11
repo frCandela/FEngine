@@ -195,6 +195,7 @@
     </ClCompile>
     <ClCompile Include="code\util\fanVector2.cpp" />
     <ClCompile Include="code\util\fanUtil.cpp" />
+    <ClCompile Include="code\vulkan\util\vkColor.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="code\vulkan\vkRenderer.h">
@@ -773,6 +774,9 @@
     <ClInclude Include="code\util\fanVector2.h">
       <Filter>code</Filter>
     </ClInclude>
+    <ClInclude Include="code\vulkan\util\vkColor.h">
+      <Filter>code</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="shaders\forward.frag">
@@ -793,17 +797,13 @@
     <None Include="shaders\postprocess.vert">
       <Filter>shaders</Filter>
     </None>
-    <None Include="shaders\debug.frag">
-      <Filter>shaders</Filter>
-    </None>
-    <None Include="shaders\debug.vert">
-      <Filter>shaders</Filter>
-    </None>
     <None Include="shaders\empty.frag">
       <Filter>shaders</Filter>
     </None>
     <None Include="shaders\empty.vert">
       <Filter>shaders</Filter>
     </None>
+    <None Include="shaders\debug.frag" />
+    <None Include="shaders\debug.vert" />
   </ItemGroup>
 </Project>

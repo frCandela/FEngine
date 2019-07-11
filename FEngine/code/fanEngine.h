@@ -22,7 +22,7 @@ namespace fan {
 
 		struct EditorGrid {
 			bool		isVisible;
-			glm::vec4	color;
+			vk::Color	color;
 			int			linesCount;
 			float		spacing;
 		};
