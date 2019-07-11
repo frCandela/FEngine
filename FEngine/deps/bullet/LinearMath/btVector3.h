@@ -129,7 +129,10 @@ public:
 		m_floats[1] = _y;
 		m_floats[2] = _z;
 		m_floats[3] = btScalar(0.f);
-	}
+	}	
+	static const btVector3 Right()		{ return btVector3(0.f, 0.f, 1.f);	}
+	static const btVector3 Up()			{ return btVector3(0.f, 1.f, 0.f);	}
+	static const btVector3 Forward()	{ return btVector3(1.f, 0.f, 0.f);	}
 
 #if (defined(BT_USE_SSE_IN_API) && defined(BT_USE_SSE)) || defined(BT_USE_NEON)
 	// Set Vector
@@ -1332,5 +1335,4 @@ SIMD_FORCE_INLINE void btVector3::deSerialize(const struct btVector3DoubleData& 
 	for (int i = 0; i < 4; i++)
 		m_floats[i] = (btScalar)dataIn.m_floats[i];
 }
-
 #endif  //BT_VECTOR3_H

@@ -72,15 +72,36 @@ namespace scene
 			forwardAxis -= 1.f;
 		position += _delta * realSpeed * forwardAxis * m_transform.Forward();
 
-		btVector2 mouseDelta = Mouse::GetDelta();
-		btVector2 mousePos = Mouse::GetPosition();
-
+		// Camera rotation
+		const btVector2 mouseDelta = Mouse::GetDelta();
+		const btVector2 mousePos = Mouse::GetPosition();
 		if (Mouse::IsKeyDown(Mouse::button1)) {
-			const btQuaternion rotationY(Transform::worldUp, m_xySensitivity.x() * mouseDelta.x() );
-			const btQuaternion rotationX(m_transform.Right(), m_xySensitivity.y() *mouseDelta.y() );
-			m_transform.SetRotationQuat(rotationY * rotationX * m_transform.GetRotationQuat());
+			// Rotation depending on mouse movement
+			const btQuaternion rotationY(btVector3::Up(), -m_xySensitivity.x() * mouseDelta.x() );
+			const btQuaternion rotationX(m_transform.Right(), -m_xySensitivity.y() *mouseDelta.y() );
+			m_transform.SetRotationQuat( rotationX*rotationY* m_transform.GetRotationQuat());
+
+			// Remove roll
+			const btVector3 relativeRight = m_transform.Right();
+			const btVector3 rightNoRoll(relativeRight.x(),0, relativeRight.z());
+			const btVector3 axis = relativeRight.cross(rightNoRoll);
+			const float angle = rightNoRoll.angle(relativeRight);
+			if (angle != 0) {
+
+				const btQuaternion rot(axis, angle);
+
+				m_transform.SetRotationQuat(rot * m_transform.GetRotationQuat());
+			}
 		}
 		m_transform.SetPosition(position);
+
+		const float size = 0.1f;
+		btVector3 offset = m_transform.GetPosition() + m_transform.Forward();
+		glm::vec3 offsetGLM(offset.x(), offset.y(), offset.z());
+
+		fan::Engine::GetEngine().GetRenderer().DebugLine(offsetGLM, offsetGLM + glm::vec3(size, 0, 0), glm::vec4(1, 0, 0, 1));
+		fan::Engine::GetEngine().GetRenderer().DebugLine(offsetGLM, offsetGLM + glm::vec3(0, size, 0), glm::vec4(0, 1, 0, 1));
+		fan::Engine::GetEngine().GetRenderer().DebugLine(offsetGLM, offsetGLM + glm::vec3(0, 0, size), glm::vec4(0, 0, 1, 1));
 	}
 
 	//================================================================================================================================

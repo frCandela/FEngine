@@ -33,7 +33,7 @@ namespace fan {
 		void Run();
 		void Exit();
 
-		static Engine & GetEngine() { return * ms_engine; }
+		inline static Engine & GetEngine() { return * ms_engine; }
 
 		void SetSelectedGameobject( scene::Gameobject * _selectedGameobject) { m_selectedGameobject = _selectedGameobject;	}
 		void Deselect() { m_selectedGameobject = nullptr; }

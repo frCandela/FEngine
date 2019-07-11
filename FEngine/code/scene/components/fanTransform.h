@@ -23,10 +23,6 @@ namespace scene
 		btVector3 Forward() const;
 		btVector3 Up() const;
 
-		static const btVector3 worldRight;
-		static const btVector3 worldUp;
-		static const btVector3 worldForward;
-
 		bool IsUnique() const override { return true; }
 		std::string GetName() const override { return "transform"; }
 

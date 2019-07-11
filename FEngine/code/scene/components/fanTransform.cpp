@@ -6,10 +6,6 @@
 
 namespace scene
 {
-	const btVector3 Transform::worldRight(1.f, 0.f, 0.f);
-	const btVector3 Transform::worldUp(0.f, 1.f, 0.f);
-	const btVector3 Transform::worldForward(0.f, 0.f, 1.f);
-
 	//================================================================================================================================
 	//================================================================================================================================
 	Transform::Transform(Gameobject * _gameobject) : 
@@ -46,18 +42,16 @@ namespace scene
 	//================================================================================================================================
 	void Transform::SetRotationEuler(const btVector3 _rotation)
 	{
-		m_rotation.setEuler( btRadians(_rotation.x()), btRadians(_rotation.y()), btRadians(_rotation.z()) );
-
-// 		glm::quat xQuat = glm::angleAxis(glm::radians(_rotation.x), worldRight);
-// 		glm::quat yQuat = glm::angleAxis(glm::radians(_rotation.y), worldUp);
-// 		glm::quat zQuat = glm::angleAxis(glm::radians(_rotation.z), worldForward);
-// 		m_rotation = zQuat*yQuat*xQuat;
-
-		// 		Rigidbody* rb = GetGameobject()->GetComponent<Rigidbody>();
-		// 		if (rb)	{
-		// 			rb->SetRotation(newRotation);
-		// 		}
+		m_rotation.setEulerZYX( btRadians(_rotation.z()), btRadians(_rotation.y()), btRadians(_rotation.x()) );
 		GetGameobject()->onComponentModified.Emmit(this);
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
+	btVector3 Transform::GetRotationEuler() const {
+		btVector3 euler;
+		m_rotation.getEulerZYX(euler[2], euler[1], euler[0]);
+		return btDegrees3(euler);
 	}
 
 	//================================================================================================================================
@@ -68,13 +62,6 @@ namespace scene
 
 	//================================================================================================================================
 	//================================================================================================================================
-	btVector3 Transform::GetRotationEuler() const {
-		btVector3 euler;
-		m_rotation.getEulerZYX(euler[0], euler[1], euler[2]);
-		return btDegrees3(euler);
-	}
-
-
 	glm::mat4 Transform::GetModelMatrix() const { 
 
 		glm::vec3 position(m_position[0], m_position[1], m_position[2]);
@@ -85,14 +72,20 @@ namespace scene
 	}
 	btVector3 Transform::Right() const {
 		btTransform t(m_rotation, btVector3(0, 0, 0));
-		return t * worldRight;	
+		return t * btVector3::Right();
 	}
+
+	//================================================================================================================================
+	//================================================================================================================================
 	btVector3 Transform::Forward() const {
 		btTransform t(m_rotation, btVector3(0, 0, 0));
-		return t * worldForward;
+		return t * btVector3::Forward();
 	}
+
+	//================================================================================================================================
+	//================================================================================================================================
 	btVector3 Transform::Up() const {
 		btTransform t(m_rotation, btVector3(0, 0, 0));
-		return t * worldUp;
+		return t * btVector3::Up();
 	}
 }
