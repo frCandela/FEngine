@@ -55,10 +55,10 @@ namespace vk {
 		m_postprocessPipeline->Create(m_swapchain->GetSurfaceFormat().format, m_swapchain->GetExtent());
 		
 		m_debugLinesPipeline = new DebugPipeline(m_device, m_renderPass, VK_PRIMITIVE_TOPOLOGY_LINE_LIST);
-		m_debugLinesPipeline->Create(m_swapchain->GetExtent());
+		m_debugLinesPipeline->Create(m_swapchain->GetExtent(), "shaders/debugLines.vert", "shaders/debugLines.frag");
 
 		m_debugTrianglesPipeline = new DebugPipeline(m_device, m_renderPass, VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST);
-		m_debugTrianglesPipeline->Create(m_swapchain->GetExtent());		
+		m_debugTrianglesPipeline->Create(m_swapchain->GetExtent(), "shaders/debugTriangles.vert", "shaders/debugTriangles.frag");
 		
 		m_imguiPipeline = new ImguiPipeline(m_device, m_swapchain->GetSwapchainImagesCount());
 		m_imguiPipeline->Create(m_renderPassPostprocess, m_window->GetWindow(), m_swapchain->GetExtent());
@@ -605,16 +605,19 @@ namespace vk {
 	//================================================================================================================================
 	//================================================================================================================================
 	void Renderer::DebugLine(const btVector3 _start, const btVector3 _end, const vk::Color _color) {
-		m_debugLines.push_back(vk::DebugVertex( util::ToGLM(_start), _color.ToGLM()));
-		m_debugLines.push_back(vk::DebugVertex(util::ToGLM(_end), _color.ToGLM()));
+		m_debugLines.push_back(vk::DebugVertex( util::ToGLM(_start), glm::vec3(0,0,0), _color.ToGLM()));
+		m_debugLines.push_back(vk::DebugVertex(util::ToGLM(_end), glm::vec3(0, 0, 0), _color.ToGLM()));
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
 	void Renderer::DebugTriangle(const btVector3 _v0, const btVector3 _v1, const btVector3 _v2, const vk::Color _color) {
-		m_debugTriangles.push_back(vk::DebugVertex(util::ToGLM(_v0), _color.ToGLM()));
-		m_debugTriangles.push_back(vk::DebugVertex(util::ToGLM(_v1), _color.ToGLM()));
-		m_debugTriangles.push_back(vk::DebugVertex(util::ToGLM(_v2), _color.ToGLM()));
+		const glm::vec3 normal = glm::normalize(util::ToGLM((_v1 - _v2).cross(_v0 - _v2)));
+
+
+		m_debugTriangles.push_back(vk::DebugVertex(util::ToGLM(_v0), normal, _color.ToGLM()));
+		m_debugTriangles.push_back(vk::DebugVertex(util::ToGLM(_v1), normal, _color.ToGLM()));
+		m_debugTriangles.push_back(vk::DebugVertex(util::ToGLM(_v2), normal, _color.ToGLM()));
 	}
 	
 	//================================================================================================================================
@@ -628,6 +631,21 @@ namespace vk {
 			const btVector3 v2 = _transform * square[3 * triangleIndex + 2];
 			DebugTriangle(v0, v1, v2, _color);			
 		}
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
+	void Renderer::DebugSphere(const btTransform _transform, const float _radius, const int _numSubdivisions, const vk::Color _color) {
+
+		std::vector<btVector3> sphere = GetSphere(_radius, _numSubdivisions);
+
+		for (int triangleIndex = 0; triangleIndex < sphere.size() / 3; triangleIndex++) {
+			const btVector3 vertex0 = _transform * sphere[3 * triangleIndex + 0];
+			const btVector3 vertex1 = _transform * sphere[3 * triangleIndex + 1];
+			const btVector3 vertex2 = _transform * sphere[3 * triangleIndex + 2];
+			DebugTriangle(vertex0, vertex1, vertex2, _color);
+		}
+
 	}
 
 	//================================================================================================================================

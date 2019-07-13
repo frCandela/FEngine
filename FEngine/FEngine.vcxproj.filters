@@ -196,7 +196,7 @@
     <ClCompile Include="code\util\fanVector2.cpp" />
     <ClCompile Include="code\util\fanUtil.cpp" />
     <ClCompile Include="code\vulkan\util\vkColor.cpp" />
-    <ClCompile Include="code\vulkan\util\vkShape.cpp" />
+    <ClCompile Include="code\vulkan\util\vkShape.inl" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="code\vulkan\vkRenderer.h">
@@ -807,7 +807,9 @@
     <None Include="shaders\empty.vert">
       <Filter>shaders</Filter>
     </None>
-    <None Include="shaders\debug.frag" />
-    <None Include="shaders\debug.vert" />
+    <None Include="shaders\debugTriangles.frag" />
+    <None Include="shaders\debugTriangles.vert" />
+    <None Include="shaders\debugLines.frag" />
+    <None Include="shaders\debugLines.vert" />
   </ItemGroup>
 </Project>

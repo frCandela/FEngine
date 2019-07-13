@@ -133,6 +133,8 @@ public:
 	static const btVector3 Right()		{ return btVector3(0.f, 0.f, 1.f);	}
 	static const btVector3 Up()			{ return btVector3(0.f, 1.f, 0.f);	}
 	static const btVector3 Forward()	{ return btVector3(1.f, 0.f, 0.f);	}
+	static const btVector3 Zero()		{ return btVector3(0.f, 0.f, 0.f); }
+	static const btVector3 One()		{ return btVector3(1.f, 1.f, 1.f); }
 
 #if (defined(BT_USE_SSE_IN_API) && defined(BT_USE_SSE)) || defined(BT_USE_NEON)
 	// Set Vector

@@ -19,6 +19,10 @@ namespace vk {
 		static const Color Yellow;
 		static const Color Magenta;
 		static const Color Cyan;
+		static const Color Brown;
+		static const Color Purple;
+		static const Color Pink;
+		static const Color Orange;
 	private:
 		glm::vec4 m_colorData;
 	};

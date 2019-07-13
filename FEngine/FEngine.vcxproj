@@ -127,7 +127,7 @@
     <ClCompile Include="code\vulkan\pipelines\vkImguiPipeline.cpp" />
     <ClCompile Include="code\vulkan\pipelines\vkPostprocessPipeline.cpp" />
     <ClCompile Include="code\vulkan\util\vkColor.cpp" />
-    <ClCompile Include="code\vulkan\util\vkShape.cpp" />
+    <ClCompile Include="code\vulkan\util\vkShape.inl" />
     <ClCompile Include="code\vulkan\util\vkSpirvCompiler.cpp" />
     <ClCompile Include="code\vulkan\util\vkVertex.cpp" />
     <ClCompile Include="code\vulkan\util\vkWindow.cpp" />
@@ -333,8 +333,10 @@
     <ClInclude Include="deps\glm\vector_relational.hpp" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="shaders\debug.frag" />
-    <None Include="shaders\debug.vert" />
+    <None Include="shaders\debugLines.frag" />
+    <None Include="shaders\debugLines.vert" />
+    <None Include="shaders\debugTriangles.frag" />
+    <None Include="shaders\debugTriangles.vert" />
     <None Include="shaders\empty.frag" />
     <None Include="shaders\empty.vert" />
     <None Include="shaders\forward.frag" />

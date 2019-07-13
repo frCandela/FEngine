@@ -23,7 +23,7 @@ namespace vk {
 		DebugPipeline(Device& _device, VkRenderPass& _renderPass, const VkPrimitiveTopology _primitiveTopology );
 		~DebugPipeline();
 
-		void Create( VkExtent2D _extent );
+		void Create( VkExtent2D _extent, const char * _fragShaderPath, const char * _vertShaderPath);
 		void Draw(VkCommandBuffer _commandBuffer, vk::Buffer& _vertexBuffer, const uint32_t _count );
 
 		void Resize(VkExtent2D _extent);
@@ -53,7 +53,7 @@ namespace vk {
 
 		Uniforms m_uniforms;
 
-		void CreateShaders();
+		void CreateShaders( const char * _vertShaderPath, const char * _fragShaderPath);
 		bool CreateDescriptors();
 		bool CreatePipeline(		VkExtent2D _extent );		
 

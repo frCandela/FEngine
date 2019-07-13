@@ -27,4 +27,8 @@ namespace vk {
 	const Color Color::Yellow	(	1.f,	1.f,	0.f,	1.f	);
 	const Color Color::Magenta	(	1.f,	0.f,	1.f,	1.f	);
 	const Color Color::Cyan		(	0.f,	1.f,	1.f,	1.f	);
+	const Color Color::Brown	(	0.5f,	0.25f,	0.f,	1.f	);
+	const Color Color::Purple	(	0.5f,	0.f,	1.f,	1.f	);
+	const Color Color::Pink		(	1.f,	0.5f,	0.75f,	1.f	);
+	const Color Color::Orange	(	1.f,	0.5f,	0.0f,	1.f	);
 }

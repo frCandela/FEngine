@@ -47,9 +47,12 @@ namespace vk {
 	//================================================================================================================================
 	// DebugVertex
 	//================================================================================================================================
-	DebugVertex::DebugVertex(glm::vec3 _pos, glm::vec4 _color) {
-		pos = _pos;
-		color = _color;
+	DebugVertex::DebugVertex(const glm::vec3 _pos, const glm::vec3 _normal, const glm::vec4 _color) :
+		pos(_pos)
+		,normal(_normal)
+		,color( _color)
+	{
+
 	}
 
 	//================================================================================================================================
@@ -69,7 +72,7 @@ namespace vk {
 	//================================================================================================================================
 	std::vector<VkVertexInputAttributeDescription> DebugVertex::GetAttributeDescriptions()
 	{
-		std::vector<VkVertexInputAttributeDescription> attributeDescriptions(2);
+		std::vector<VkVertexInputAttributeDescription> attributeDescriptions(3);
 
 		// Position
 		attributeDescriptions[0].binding = 0;							// Tells Vulkan from which binding the per-vertex data comes
@@ -77,11 +80,17 @@ namespace vk {
 		attributeDescriptions[0].format = VK_FORMAT_R32G32B32_SFLOAT;	// Describes the type of data for the attribute
 		attributeDescriptions[0].offset = offsetof(DebugVertex, pos);
 
-		// Color
+		// Normal
 		attributeDescriptions[1].binding = 0;
 		attributeDescriptions[1].location = 1;
-		attributeDescriptions[1].format = VK_FORMAT_R32G32B32A32_SFLOAT;
-		attributeDescriptions[1].offset = offsetof(DebugVertex, color);
+		attributeDescriptions[1].format = VK_FORMAT_R32G32B32_SFLOAT;
+		attributeDescriptions[1].offset = offsetof(DebugVertex, normal);
+
+		// Color
+		attributeDescriptions[2].binding = 0;
+		attributeDescriptions[2].location = 2;
+		attributeDescriptions[2].format = VK_FORMAT_R32G32B32A32_SFLOAT;
+		attributeDescriptions[2].offset = offsetof(DebugVertex, color);
 
 		return attributeDescriptions;
 	}

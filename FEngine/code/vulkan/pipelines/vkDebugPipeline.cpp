@@ -30,8 +30,8 @@ namespace vk {
 	
 	//================================================================================================================================
 	//================================================================================================================================
-	void DebugPipeline::Create( VkExtent2D _extent) {
-		CreateShaders();
+	void DebugPipeline::Create( VkExtent2D _extent, const char * _vertShaderPath, const char * _fragShaderPath) {
+		CreateShaders(_vertShaderPath, _fragShaderPath);
 		CreateDescriptors();
 		CreatePipeline(_extent);
 	}
@@ -78,15 +78,15 @@ namespace vk {
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void DebugPipeline::CreateShaders() {
+	void DebugPipeline::CreateShaders(const char * _vertShaderPath, const char * _fragShaderPath) {
 		delete m_fragmentShader;
 		delete m_vertexShader;
 
 		m_fragmentShader = new Shader(m_device);
-		m_fragmentShader->Create("shaders/debug.frag");
+		m_fragmentShader->Create(_fragShaderPath);
 
 		m_vertexShader = new Shader(m_device);
-		m_vertexShader->Create("shaders/debug.vert");
+		m_vertexShader->Create(_vertShaderPath);
 	}
 
 	//================================================================================================================================
