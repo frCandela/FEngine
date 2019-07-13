@@ -4,7 +4,7 @@ namespace vk {
 	class Color {
 	public:
 		Color();
-		Color(float _r, float _g, float _b, float _a);
+		Color(const float _r, const float _g, const float _b, const float _a);
 
 		glm::vec4 ToGLM() const { return m_colorData; }
 		float& operator[]	( const int _index) { return m_colorData[_index]; }

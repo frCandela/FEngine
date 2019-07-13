@@ -32,10 +32,10 @@ namespace scene
 	//================================================================================================================================
 	void FPSCamera::Update(const float _delta) {
 
-		if (Mouse::IsButtonPressed(Mouse::button1)) {
+		if (Mouse::GetButtonPressed(Mouse::button1)) {
 			Mouse::LockCursor(true);
 		}
-		if (Mouse::IsButtonReleased( Mouse::button1)) {
+		if (Mouse::GetButtonReleased( Mouse::button1)) {
 			Mouse::LockCursor(false);
 		}
 
@@ -75,7 +75,7 @@ namespace scene
 		// Camera rotation
 		const btVector2 mouseDelta = Mouse::GetDelta();
 		const btVector2 mousePos = Mouse::GetPosition();
-		if (Mouse::IsKeyDown(Mouse::button1)) {
+		if (Mouse::GetButtonDown(Mouse::button1)) {
 			// Rotation depending on mouse movement
 			const btQuaternion rotationY(btVector3::Up(), -m_xySensitivity.x() * mouseDelta.x() );
 			const btQuaternion rotationX(m_transform.Right(), -m_xySensitivity.y() *mouseDelta.y() );

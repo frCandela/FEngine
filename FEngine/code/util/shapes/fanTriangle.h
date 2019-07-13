@@ -15,7 +15,6 @@ namespace shape
 
 		// Möller–Trumbore intersection algorithm
 		virtual bool RayCast(const btVector3 _origin, const btVector3 _dir, btVector3& _outIntersection) const override;
-
 	private:
 		btVector3 m_v0;
 		btVector3 m_v1;

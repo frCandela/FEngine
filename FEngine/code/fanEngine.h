@@ -14,6 +14,7 @@ namespace scene {
 	class Scene;
 	class Gameobject;
 	class Actor;
+	class Camera;
 }
 
 namespace fan {
@@ -36,49 +37,62 @@ namespace fan {
 		inline static Engine & GetEngine() { return * ms_engine; }
 
 		void SetSelectedGameobject( scene::Gameobject * _selectedGameobject) { m_selectedGameobject = _selectedGameobject;	}
-		void Deselect() { m_selectedGameobject = nullptr; }
-		
+		void Deselect() { m_selectedGameobject = nullptr; }		
 		
 		void AddActor( scene::Actor * _actor );
 		void RemoveActor( scene::Actor * _actor );
 		void ActorStart();
 		void ActorStop();
 
-		scene::Gameobject *	const GetSelectedGameobject() const		{ return m_selectedGameobject;  }
-		editor::MainMenuBar  &	GetMainMenuBar() const				{ return * m_mainMenuBar; }
-		editor::RenderWindow &	GetRenderWindow() const				{ return * m_renderWindow; }
-		editor::SceneWindow  &	GetSceneWindow() const				{ return * m_sceneWindow; }
-		editor::InspectorWindow  &	GetInspectorWindow() const		{ return * m_inspectorWindow; }
-		editor::PreferencesWindow  & GetPreferencesWindow() const	{ return * m_preferencesWindow; }
-		scene::Scene &	GetScene() const							{ return * m_scene; }
-		vk::Renderer & GetRenderer() const							{ return * m_renderer; }
-
-
+		scene::Gameobject *	const		GetSelectedGameobject() const	{ return m_selectedGameobject;  }
+		editor::MainMenuBar  &			GetMainMenuBar() const			{ return * m_mainMenuBar; }
+		editor::RenderWindow &			GetRenderWindow() const			{ return * m_renderWindow; }
+		editor::SceneWindow  &			GetSceneWindow() const			{ return * m_sceneWindow; }
+		editor::InspectorWindow  &		GetInspectorWindow() const		{ return * m_inspectorWindow; }
+		editor::PreferencesWindow  &	GetPreferencesWindow() const	{ return * m_preferencesWindow; }
+		scene::Scene &					GetScene() const				{ return * m_scene; }
+		vk::Renderer &					GetRenderer() const				{ return * m_renderer; }
 
 		EditorGrid GetEditorGrid() const { return m_editorGrid;  }
 		void SetEditorGrid( const EditorGrid _editorGrid) { m_editorGrid =_editorGrid; }
 
+		btVector3 DrawMoveGizmo(const btTransform _transform, const size_t _uniqueID);
+
 	private:
+
+		// UI elements
 		editor::MainMenuBar *		m_mainMenuBar;
 		editor::RenderWindow *		m_renderWindow;
 		editor::SceneWindow *		m_sceneWindow;
 		editor::InspectorWindow *	m_inspectorWindow;
 		editor::PreferencesWindow *	m_preferencesWindow;
 
+		EditorGrid m_editorGrid;
+
+		// Main components
 		vk::Renderer *		m_renderer;
 		scene::Scene *		m_scene;
 		scene::Gameobject * m_selectedGameobject;
+		scene::Camera *		m_editorCamera;
 
 		std::set< scene::Actor * > m_startingActors;
 		std::set< scene::Actor * > m_activeActors;
 		std::set< scene::Actor * > m_stoppingActors;
 
+
+		struct GizmoCacheData {
+			int axisIndex;
+			bool pressed = false;
+			btVector3 offset;
+		};
+		std::map< size_t, GizmoCacheData > m_gizmoCacheData;
+
 		static Engine * ms_engine;
 		bool m_applicationShouldExit;
 
-		EditorGrid m_editorGrid;
 
+		void ManageSelection();
 		void DrawUI();
-		void DrawEditorGrid();
+		void DrawEditorGrid() const;
 	};
 }

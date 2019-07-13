@@ -11,16 +11,12 @@ namespace shape {
 	}
 
 	bool Plane::RayCast(const btVector3 _origin, const btVector3 _dir, btVector3& _outIntersection) const {
-		const float dirDotNormal = _dir.dot(m_normal);
 
-		// dir parallel to plane
-		if (dirDotNormal == 0.f) {
+		float dirDotNormal = _dir.dot(m_normal);
+		if (dirDotNormal == 0) {
 			return false;
 		}
-
-		const float distance = (m_point - _origin).dot(m_normal) / dirDotNormal;
-
-		_outIntersection = _origin + _dir.normalized() * distance;
+		_outIntersection = _origin - (_origin + m_point).dot(m_normal) / dirDotNormal * _dir;
 		return true;
 	}
 }

@@ -7,14 +7,17 @@
 //================================================================================================================================
 unsigned Input::m_count = 0;
 GLFWwindow * Input::m_window = nullptr;
-glm::ivec2  Input::m_windowSize;
+btVector2 Input::m_windowSize;
 
 //================================================================================================================================
 //================================================================================================================================
 void Input::Setup(GLFWwindow * _window)
 {
 	m_window = _window;
-	glfwGetWindowSize(_window, &(m_windowSize.x), &(m_windowSize.y));
+
+	int width, height;
+	glfwGetWindowSize(_window, &width, &(height));
+	m_windowSize = btVector2( static_cast<btScalar>(width), static_cast<btScalar>(height));
 
 	double x, y;
 	glfwGetCursorPos(m_window, &x, &y);
@@ -30,11 +33,9 @@ void Input::Setup(GLFWwindow * _window)
 
 //================================================================================================================================
 //================================================================================================================================
-void Input::WindowSizeCallback(GLFWwindow* _window, int _width, int _height)
-{
+void Input::WindowSizeCallback(GLFWwindow* _window, int _width, int _height){
+	m_windowSize = btVector2( static_cast<btScalar>( _width), static_cast<btScalar>(_height));
 	(void)_window;
-	(void)_width;
-	(void)_height;
 }
 
 //================================================================================================================================
@@ -48,8 +49,8 @@ void Input::NewFrame()
 
 	ImGuiIO& io = ImGui::GetIO();
 	io.MousePos = ImVec2(Mouse::GetPosition().x(), Mouse::GetPosition().y());
-	io.MouseDown[0] = Mouse::IsKeyDown(Mouse::button0);
-	io.MouseDown[1] = Mouse::IsKeyDown(Mouse::button1);
+	io.MouseDown[0] = Mouse::GetButtonDown(Mouse::button0);
+	io.MouseDown[1] = Mouse::GetButtonDown(Mouse::button1);
 }
 
 //================================================================================================================================
@@ -109,10 +110,12 @@ btVector2 Mouse::m_delta;
 btVector2 Mouse::m_deltaScroll;
 
 //================================================================================================================================
+// Coordinate between -1.f and 1.f
 //================================================================================================================================
-btVector2 Mouse::GetScreenSpacePosition(btVector2 _screenSize)
+btVector2 Mouse::GetScreenSpacePosition()
 {
-	btVector2 ratio = 2.f * Mouse::GetPosition() / _screenSize - btVector2(1.f, 1.f);
+	btVector2 screenSize = Input::GetWindowSize();
+	btVector2 ratio = 2.f * Mouse::GetPosition() / screenSize - btVector2(1.f, 1.f);
 	ratio.setX( std::clamp(ratio.x(), -1.f, 1.f));
 	ratio.setY( std::clamp(ratio.y(), -1.f, 1.f));
 	return ratio;
@@ -171,7 +174,6 @@ void Mouse::Update()
 	if (m_lockCursor)
 	{
 		GLFWwindow * window = Input::GetWindow();
-		glm::ivec2 size = Input::GetWindowSize();
 		glfwSetCursorPos(window, m_lockPosition.x(), m_lockPosition.y());
 
 		m_position = btVector2(static_cast<btScalar>(x), static_cast<btScalar>(y));

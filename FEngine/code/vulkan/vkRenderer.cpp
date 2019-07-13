@@ -54,10 +54,10 @@ namespace vk {
 		m_postprocessPipeline = new PostprocessPipeline(m_device, m_renderPassPostprocess);
 		m_postprocessPipeline->Create(m_swapchain->GetSurfaceFormat().format, m_swapchain->GetExtent());
 		
-		m_debugLinesPipeline = new DebugPipeline(m_device, m_renderPass, VK_PRIMITIVE_TOPOLOGY_LINE_LIST);
+		m_debugLinesPipeline = new DebugPipeline(m_device, m_renderPassPostprocess, VK_PRIMITIVE_TOPOLOGY_LINE_LIST);
 		m_debugLinesPipeline->Create(m_swapchain->GetExtent(), "shaders/debugLines.vert", "shaders/debugLines.frag");
 
-		m_debugTrianglesPipeline = new DebugPipeline(m_device, m_renderPass, VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST);
+		m_debugTrianglesPipeline = new DebugPipeline(m_device, m_renderPassPostprocess, VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST);
 		m_debugTrianglesPipeline->Create(m_swapchain->GetExtent(), "shaders/debugTriangles.vert", "shaders/debugTriangles.frag");
 		
 		m_imguiPipeline = new ImguiPipeline(m_device, m_swapchain->GetSwapchainImagesCount());
@@ -339,13 +339,13 @@ namespace vk {
 			
 			vkCmdBeginRenderPass(commandBuffer, &renderPassInfo, VK_SUBPASS_CONTENTS_SECONDARY_COMMAND_BUFFERS); {
 				vkCmdExecuteCommands(commandBuffer, 1, &m_geometryCommandBuffers[_index]);
-				if (HasNoDebugToDraw() == false) {
-					vkCmdExecuteCommands(commandBuffer, 1, &m_debugCommandBuffers[_index]);
-				}
 			} vkCmdEndRenderPass(commandBuffer);
 			
 			vkCmdBeginRenderPass(commandBuffer, &renderPassInfoPostprocess, VK_SUBPASS_CONTENTS_SECONDARY_COMMAND_BUFFERS); {
 				vkCmdExecuteCommands( commandBuffer, 1, &m_postprocessCommandBuffers[_index]	);
+				if (HasNoDebugToDraw() == false) {
+					vkCmdExecuteCommands(commandBuffer, 1, &m_debugCommandBuffers[_index]);
+				}
 				vkCmdExecuteCommands( commandBuffer, 1, &m_imguiCommandBuffers[_index]			);
 			} vkCmdEndRenderPass(commandBuffer);
 			
@@ -441,9 +441,9 @@ namespace vk {
 			VkCommandBufferInheritanceInfo commandBufferInheritanceInfo = {};
 			commandBufferInheritanceInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_INHERITANCE_INFO;
 			commandBufferInheritanceInfo.pNext = nullptr;
-			commandBufferInheritanceInfo.renderPass = m_renderPass;
+			commandBufferInheritanceInfo.renderPass = m_renderPassPostprocess;
 			commandBufferInheritanceInfo.subpass = 0;
-			commandBufferInheritanceInfo.framebuffer = m_forwardFrameBuffers[_index]->GetFrameBuffer();
+			commandBufferInheritanceInfo.framebuffer = m_swapchainFramebuffers[_index]->GetFrameBuffer();
 			commandBufferInheritanceInfo.occlusionQueryEnable = VK_FALSE;
 			//commandBufferInheritanceInfo.queryFlags				=;
 			//commandBufferInheritanceInfo.pipelineStatistics		=;
@@ -604,6 +604,15 @@ namespace vk {
 
 	//================================================================================================================================
 	//================================================================================================================================
+	void Renderer::DebugPoint(const btVector3 _pos, const vk::Color _color) {
+		const float size = 0.2f;
+		DebugLine(_pos - size * btVector3::Up(), _pos + size * btVector3::Up(), _color);
+		DebugLine(_pos - size * btVector3::Right(), _pos + size * btVector3::Right(), _color);
+		DebugLine(_pos - size * btVector3::Forward(), _pos + size * btVector3::Forward(), _color);
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
 	void Renderer::DebugLine(const btVector3 _start, const btVector3 _end, const vk::Color _color) {
 		m_debugLines.push_back(vk::DebugVertex( util::ToGLM(_start), glm::vec3(0,0,0), _color.ToGLM()));
 		m_debugLines.push_back(vk::DebugVertex(util::ToGLM(_end), glm::vec3(0, 0, 0), _color.ToGLM()));
@@ -614,52 +623,59 @@ namespace vk {
 	void Renderer::DebugTriangle(const btVector3 _v0, const btVector3 _v1, const btVector3 _v2, const vk::Color _color) {
 		const glm::vec3 normal = glm::normalize(util::ToGLM((_v1 - _v2).cross(_v0 - _v2)));
 
-
 		m_debugTriangles.push_back(vk::DebugVertex(util::ToGLM(_v0), normal, _color.ToGLM()));
 		m_debugTriangles.push_back(vk::DebugVertex(util::ToGLM(_v1), normal, _color.ToGLM()));
 		m_debugTriangles.push_back(vk::DebugVertex(util::ToGLM(_v2), normal, _color.ToGLM()));
 	}
-	
+
 	//================================================================================================================================
 	//================================================================================================================================
-	void Renderer::DebugCube(const btTransform _transform, const float _halfSize, const vk::Color _color) {
-		const std::array< btVector3, 36 > square = vk::GetCube(_halfSize);
-		const glm::vec4 color = _color.ToGLM();
-		for (int triangleIndex = 0; triangleIndex < square.size() / 3; triangleIndex++) {
-			const btVector3 v0 = _transform * square[3 * triangleIndex + 0];
-			const btVector3 v1 = _transform * square[3 * triangleIndex + 1];
-			const btVector3 v2 = _transform * square[3 * triangleIndex + 2];
-			DebugTriangle(v0, v1, v2, _color);			
+	std::vector< btVector3> Renderer::DebugCube(const btTransform _transform, const float _halfSize, const vk::Color _color) {
+		std::vector< btVector3 > square = vk::GetCube(_halfSize);		
+
+		for (int vertIndex = 0; vertIndex < square.size(); vertIndex++)	{
+			square[vertIndex] = _transform * square[vertIndex];
 		}
+
+		for (int triangleIndex = 0; triangleIndex < square.size() / 3; triangleIndex++) {
+			DebugTriangle(square[3 * triangleIndex + 0], square[3 * triangleIndex + 1], square[3 * triangleIndex + 2], _color);
+		}
+
+		return square;
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void Renderer::DebugSphere(const btTransform _transform, const float _radius, const int _numSubdivisions, const vk::Color _color) {
-
+	std::vector< btVector3> Renderer::DebugSphere(const btTransform _transform, const float _radius, const int _numSubdivisions, const vk::Color _color) {
 		std::vector<btVector3> sphere = GetSphere(_radius, _numSubdivisions);
 
-		for (int triangleIndex = 0; triangleIndex < sphere.size() / 3; triangleIndex++) {
-			const btVector3 vertex0 = _transform * sphere[3 * triangleIndex + 0];
-			const btVector3 vertex1 = _transform * sphere[3 * triangleIndex + 1];
-			const btVector3 vertex2 = _transform * sphere[3 * triangleIndex + 2];
-			DebugTriangle(vertex0, vertex1, vertex2, _color);
+		for (int vertIndex = 0; vertIndex < sphere.size(); vertIndex++) {
+			sphere[vertIndex] = _transform * sphere[vertIndex];
 		}
 
+		for (int triangleIndex = 0; triangleIndex < sphere.size() / 3; triangleIndex++) {
+			DebugTriangle(sphere[3 * triangleIndex + 0], sphere[3 * triangleIndex + 1], sphere[3 * triangleIndex + 2], _color);
+		}
+
+		return sphere;
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void Renderer::DebugCone(const btTransform _transform, const float _radius, const float _height, const int _numSubdivisions, const vk::Color _color) {
-		std::vector<btVector3> sphere = GetCone(_radius, _height, _numSubdivisions);
+	std::vector< btVector3> Renderer::DebugCone(const btTransform _transform, const float _radius, const float _height, const int _numSubdivisions, const vk::Color _color) {
+		std::vector<btVector3> cone = GetCone(_radius, _height, _numSubdivisions);
 
-		for (int triangleIndex = 0; triangleIndex < sphere.size() / 3; triangleIndex++) {
-			const btVector3 vertex0 = _transform * sphere[3 * triangleIndex + 0];
-			const btVector3 vertex1 = _transform * sphere[3 * triangleIndex + 1];
-			const btVector3 vertex2 = _transform * sphere[3 * triangleIndex + 2];
-			DebugTriangle(vertex0, vertex1, vertex2, _color);
+		for (int vertIndex = 0; vertIndex < cone.size(); vertIndex++) {
+			cone[vertIndex] = _transform * cone[vertIndex];
 		}
+
+		for (int triangleIndex = 0; triangleIndex < cone.size() / 3; triangleIndex++) {
+			DebugTriangle(cone[3 * triangleIndex + 0], cone[3 * triangleIndex + 1], cone[3 * triangleIndex + 2], _color);
+		}
+
+		return cone;
 	}
+	
 	//================================================================================================================================
 	//================================================================================================================================
 	void Renderer::RemoveMesh(scene::Mesh * _mesh) {

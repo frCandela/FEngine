@@ -13,7 +13,7 @@ namespace scene
 
 		glm::mat4 GetView() const;
 		glm::mat4 GetProjection() const;
-		shape::Ray ScreenPosToRay(btVector3 _screenSpacePosition); // Returns a ray going from camera through a screen point ( with screenSpacePosition between {-1.f,-1.f} and {1.f,1.f} ).
+		shape::Ray ScreenPosToRay(btVector2 _screenSpacePosition); // Returns a ray going from camera through a screen point ( with screenSpacePosition between {-1.f,-1.f} and {1.f,1.f} ).
 	
 		float GetFov() const			{ return m_fov; };
 		float GetNearDistance() const	{ return m_nearDistance; };

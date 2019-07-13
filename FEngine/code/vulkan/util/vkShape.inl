@@ -3,7 +3,7 @@
 namespace vk {
 	//================================================================================================================================
 	//================================================================================================================================
-	inline std::array< btVector3, 36 > GetCube(const float _halfSize) {
+	inline std::vector< btVector3 > GetCube(const float _halfSize) {
 		const btVector3 v0(+_halfSize, +_halfSize, +_halfSize);
 		const btVector3 v1(+_halfSize, +_halfSize, -_halfSize);
 		const btVector3 v2(-_halfSize, +_halfSize, +_halfSize);

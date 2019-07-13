@@ -3,8 +3,11 @@
 #include "fanEngine.h"
 #include "vulkan/vkRenderer.h"
 #include "vulkan/pipelines/vkDebugPipeline.h"
+#include "vulkan/util/vkShape.h"
 #include "util/fanTime.h"
 #include "util/fanInput.h"
+#include "util/shapes/fanTriangle.h"
+#include "util/shapes/fanPlane.h"
 #include "util/fbx/fanFbxImporter.h"
 #include "editor/fanMainMenuBar.h"
 #include "editor/windows/fanRenderWindow.h"	
@@ -18,6 +21,7 @@
 #include "scene/components/fanTransform.h"
 #include "scene/components/fanMesh.h"
 #include "scene/components/fanActor.h"
+
 
 #include "bullet/BulletCollision/CollisionShapes/btCapsuleShape.h"
 
@@ -49,9 +53,9 @@ namespace fan {
 		cameraGameobject->SetRemovable(false);
 		scene::Transform * camTrans = cameraGameobject->AddComponent<scene::Transform>();
 		camTrans->SetPosition(btVector3(0, 0, -2));
-		scene::Camera * cameraComponent = cameraGameobject->AddComponent<scene::Camera>();
-		cameraComponent->SetRemovable(false);
-		m_renderer->SetMainCamera(cameraComponent);
+		m_editorCamera = cameraGameobject->AddComponent<scene::Camera>();
+		m_editorCamera->SetRemovable(false);
+		m_renderer->SetMainCamera(m_editorCamera);
 		scene::FPSCamera * editorCamera = cameraGameobject->AddComponent<scene::FPSCamera>();
 		editorCamera->SetRemovable(false);
 
@@ -115,6 +119,7 @@ namespace fan {
 					actor->Update(updateDelta);
 				}
 
+				ManageSelection();
 				DrawUI();
 				DrawEditorGrid();
 
@@ -169,7 +174,7 @@ namespace fan {
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void Engine::DrawEditorGrid() {
+	void Engine::DrawEditorGrid() const{
 		if (m_editorGrid.isVisible == true) {
 			const float size = m_editorGrid.spacing;
 			const int count = m_editorGrid.linesCount;
@@ -183,25 +188,99 @@ namespace fan {
 
 	//================================================================================================================================
 	//================================================================================================================================
+	void Engine::ManageSelection() {
+		// Translation gizmo on selected gameobject
+		if (m_selectedGameobject != nullptr && m_selectedGameobject != m_editorCamera->GetGameobject() ) {
+			scene::Transform * transform = m_selectedGameobject->GetComponent< scene::Transform >();
+			const btVector3 newPosition = DrawMoveGizmo( btTransform( btQuaternion(0,0,0), transform->GetPosition()), (size_t)this);
+			transform->SetPosition(newPosition);
+		}
+	}
+
+
+	//================================================================================================================================
+	//================================================================================================================================
 	void Engine::DrawUI() {
 		m_mainMenuBar->Draw();
 		m_renderWindow->Draw();
 		m_sceneWindow->Draw();	
 		m_inspectorWindow->Draw();
 		m_preferencesWindow->Draw();
+	}
 
-		// tmp
-		static btVector3 pos(0,0,0);
-		static btVector3 rot(0, 0, 0);
-		static float size = 0.5;
+	//================================================================================================================================
+	// Returns the new position of the move gizmo
+	// Caller must provide a unique ID to allow proper caching of the user input data
+	//================================================================================================================================
+	btVector3 Engine::DrawMoveGizmo(const btTransform _transform, const size_t _uniqueID ) {
+		
+		GizmoCacheData & cacheData = m_gizmoCacheData[_uniqueID];
+		const btVector3 origin = _transform.getOrigin();
+		const btTransform rotation(_transform.getRotation());
+		const float size = 0.1f;
+		const btVector3 axisDirection[3] = { btVector3(1, 0, 0), btVector3(0, 1, 0),  btVector3(0, 0, 1) };
+		const btTransform coneRotation[3] = {
+			btTransform(btQuaternion(0, 0, btRadians(-90)), axisDirection[0])
+			,btTransform(btQuaternion::getIdentity(),  axisDirection[1])
+			,btTransform(btQuaternion(0, btRadians(90), 0),  axisDirection[2])
+		};		
 
-		ImGui::DragFloat3("pos", &pos[0]);
-		ImGui::DragFloat3("rot", &rot[0]);
-		ImGui::DragFloat("size", &size);
+		btVector3 newPosition = _transform.getOrigin();
+		for (int axisIndex = 0; axisIndex < 3 ; axisIndex++) 	{
+			const vk::Color opaqueColor(axisDirection[axisIndex].x(), axisDirection[axisIndex].y(), axisDirection[axisIndex].z(), 1.f);
+			
+			// Generates a cone shape
+			std::vector<btVector3> coneTris = vk::GetCone(size, 4.f*size, 10);
+			btTransform transform = _transform * coneRotation[axisIndex];
+			for (int vertIndex = 0; vertIndex < coneTris.size(); vertIndex++) {
+				coneTris[vertIndex] = transform * coneTris[vertIndex];
+			}
 
-		btQuaternion quat;
-		quat.setEulerZYX(rot.x(), rot.y(), rot.z());
-		m_renderer->DebugCone(btTransform(quat, pos), 0.1f*size, 0.2f*size, 20, vk::Color(1,0,0,1.0f));
+			if (Mouse::GetButtonReleased(Mouse::button0)) {
+				cacheData.pressed = false;
+				cacheData.axisIndex = -1;
+			}
+
+
+			// Raycast on the gizmo shape to determine if the mouse is hovering it
+			vk::Color clickedColor = opaqueColor;
+			const shape::Ray ray = m_editorCamera->ScreenPosToRay(Mouse::GetScreenSpacePosition());
+			for (int triIndex = 0; triIndex < coneTris.size() / 3; triIndex++) {
+				shape::Triangle triangle(coneTris[3 * triIndex + 0], coneTris[3 * triIndex + 1], coneTris[3 * triIndex + 2]);
+				btVector3 intersection;
+				if (triangle.RayCast(ray.origin, ray.direction, intersection)) {
+					clickedColor[3] = 0.5f;
+					if (Mouse::GetButtonPressed(Mouse::button0)) {
+						cacheData.pressed = true;
+						cacheData.axisIndex = axisIndex;
+					}
+					break;
+				}
+			}
+
+			// Draw the gizmo cone & lines
+			m_renderer->DebugLine(origin, _transform *  axisDirection[axisIndex], opaqueColor);
+			for (int triangleIndex = 0; triangleIndex < coneTris.size() / 3; triangleIndex++) {
+				m_renderer->DebugTriangle(coneTris[3 * triangleIndex + 0], coneTris[3 * triangleIndex + 1], coneTris[3 * triangleIndex + 2], clickedColor);
+			}
+
+			// Calculate closest point between the mouse ray and the axis selected
+			if (cacheData.pressed == true && cacheData.axisIndex == axisIndex ) {
+				btVector3 axis = rotation * axisDirection[axisIndex];
+
+				 const shape::Ray screenRay = m_editorCamera->ScreenPosToRay(Mouse::GetScreenSpacePosition()); 	
+				 const shape::Ray axisRay = { origin , axis };				 
+				 btVector3 trash, projectionOnAxis;
+				 screenRay.RayClosestPoints(axisRay, trash, projectionOnAxis);
+
+				if (Mouse::GetButtonPressed(Mouse::button0)) {
+					cacheData.offset = projectionOnAxis - _transform.getOrigin();
+				}
+
+				newPosition = projectionOnAxis - cacheData.offset;
+			}
+		}
+		return newPosition;
 	}
 
 }

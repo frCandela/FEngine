@@ -56,11 +56,13 @@ namespace vk {
 
 		void AddMesh		( scene::Mesh * _mesh);
 		void RemoveMesh		( scene::Mesh * _mesh);
-		void DebugLine		( const btVector3 _start, const btVector3 _end, const vk::Color _color);
-		void DebugTriangle	( const btVector3 _v0, const btVector3 _v1, const btVector3 _v2, const vk::Color _color);
-		void DebugCube		( const btTransform _transform, const float _halfSize,	const vk::Color _color);
-		void DebugSphere	( const btTransform _transform,  const float _radius, const int _numSubdivisions, const vk::Color _color);
-		void DebugCone	(const btTransform _transform, const float _radius, const float _height, const int _numSubdivisions, const vk::Color _color);
+
+		void					DebugPoint		( const btVector3 _pos, const vk::Color _color);
+		void					DebugLine		( const btVector3 _start, const btVector3 _end, const vk::Color _color);
+		void					DebugTriangle	( const btVector3 _v0, const btVector3 _v1, const btVector3 _v2, const vk::Color _color);		
+		std::vector< btVector3> DebugCube		( const btTransform _transform, const float _halfSize,	const vk::Color _color);
+		std::vector< btVector3> DebugSphere		( const btTransform _transform,  const float _radius, const int _numSubdivisions, const vk::Color _color);
+		std::vector< btVector3> DebugCone		( const btTransform _transform, const float _radius, const float _height, const int _numSubdivisions, const vk::Color _color);
 
 	private:
 		//SCENE REFERENCES
