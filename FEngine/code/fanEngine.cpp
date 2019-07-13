@@ -190,7 +190,19 @@ namespace fan {
 		m_inspectorWindow->Draw();
 		m_preferencesWindow->Draw();
 
-		m_renderer->DebugTriangle({ 0.f,0.f,0.f }, { 10.f,0.f,0.f }, { 10.f,0.f,10.f }, { 1.f,0.f, 0.f,0.5f });
+		// tmp
+		static btVector3 pos(0,0,0);
+		static btVector3 rot(0, 0, 0);
+		static float size = 0.5;
+
+		ImGui::DragFloat3("pos", &pos[0]);
+		ImGui::DragFloat3("rot", &rot[0]);
+		ImGui::DragFloat("size", &size);
+
+		btQuaternion quat;
+		quat.setEulerZYX(rot.x(), rot.y(), rot.z());
+		m_renderer->DebugCube(btTransform(quat, pos), size, vk::Color::Red);
+
 	}
 
 }

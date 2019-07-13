@@ -127,6 +127,7 @@
     <ClCompile Include="code\vulkan\pipelines\vkImguiPipeline.cpp" />
     <ClCompile Include="code\vulkan\pipelines\vkPostprocessPipeline.cpp" />
     <ClCompile Include="code\vulkan\util\vkColor.cpp" />
+    <ClCompile Include="code\vulkan\util\vkShape.cpp" />
     <ClCompile Include="code\vulkan\util\vkSpirvCompiler.cpp" />
     <ClCompile Include="code\vulkan\util\vkVertex.cpp" />
     <ClCompile Include="code\vulkan\util\vkWindow.cpp" />
@@ -180,6 +181,7 @@
     <ClInclude Include="code\vulkan\pipelines\vkImguiPipeline.h" />
     <ClInclude Include="code\vulkan\pipelines\vkPostprocessPipeline.h" />
     <ClInclude Include="code\vulkan\util\vkColor.h" />
+    <ClInclude Include="code\vulkan\util\vkShape.h" />
     <ClInclude Include="code\vulkan\util\vkSpirvCompiler.h" />
     <ClInclude Include="code\vulkan\util\vkVertex.h" />
     <ClInclude Include="code\vulkan\util\vkWindow.h" />

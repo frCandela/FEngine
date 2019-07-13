@@ -196,6 +196,7 @@
     <ClCompile Include="code\util\fanVector2.cpp" />
     <ClCompile Include="code\util\fanUtil.cpp" />
     <ClCompile Include="code\vulkan\util\vkColor.cpp" />
+    <ClCompile Include="code\vulkan\util\vkShape.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="code\vulkan\vkRenderer.h">
@@ -775,6 +776,9 @@
       <Filter>code</Filter>
     </ClInclude>
     <ClInclude Include="code\vulkan\util\vkColor.h">
+      <Filter>code</Filter>
+    </ClInclude>
+    <ClInclude Include="code\vulkan\util\vkShape.h">
       <Filter>code</Filter>
     </ClInclude>
   </ItemGroup>

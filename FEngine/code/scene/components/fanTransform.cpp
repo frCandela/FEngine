@@ -70,6 +70,9 @@ namespace scene
 
 		return glm::translate(glm::mat4(1.f), position) * glm::mat4_cast(rotation) * glm::scale(glm::mat4(1.f), scale);
 	}
+
+	//================================================================================================================================
+	//================================================================================================================================
 	btVector3 Transform::Right() const {
 		btTransform t(m_rotation, btVector3(0, 0, 0));
 		return t * btVector3::Right();

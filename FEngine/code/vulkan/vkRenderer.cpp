@@ -23,7 +23,7 @@
 #include "vulkan/util/vkVertex.h"
 #include "vulkan/util/vkWindow.h"
 #include "vulkan/util/vkColor.h"
-
+#include "vulkan/util/vkShape.h"
 
 namespace vk {
 
@@ -611,10 +611,23 @@ namespace vk {
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void Renderer::DebugTriangle(const btVector3 _v0, const btVector3 _v1, const btVector3 _v2, const vk::Color color) {
-		m_debugTriangles.push_back(vk::DebugVertex(util::ToGLM(_v0), color.ToGLM()));
-		m_debugTriangles.push_back(vk::DebugVertex(util::ToGLM(_v1), color.ToGLM()));
-		m_debugTriangles.push_back(vk::DebugVertex(util::ToGLM(_v2), color.ToGLM()));
+	void Renderer::DebugTriangle(const btVector3 _v0, const btVector3 _v1, const btVector3 _v2, const vk::Color _color) {
+		m_debugTriangles.push_back(vk::DebugVertex(util::ToGLM(_v0), _color.ToGLM()));
+		m_debugTriangles.push_back(vk::DebugVertex(util::ToGLM(_v1), _color.ToGLM()));
+		m_debugTriangles.push_back(vk::DebugVertex(util::ToGLM(_v2), _color.ToGLM()));
+	}
+	
+	//================================================================================================================================
+	//================================================================================================================================
+	void Renderer::DebugCube(const btTransform _transform, const float _halfSize, const vk::Color _color) {
+		const std::array< btVector3, 36 > square = vk::GetCube(_halfSize);
+		const glm::vec4 color = _color.ToGLM();
+		for (int triangleIndex = 0; triangleIndex < square.size() / 3; triangleIndex++) {
+			const btVector3 v0 = _transform * square[3 * triangleIndex + 0];
+			const btVector3 v1 = _transform * square[3 * triangleIndex + 1];
+			const btVector3 v2 = _transform * square[3 * triangleIndex + 2];
+			DebugTriangle(v0, v1, v2, _color);			
+		}
 	}
 
 	//================================================================================================================================
@@ -657,14 +670,6 @@ namespace vk {
 		}	
 
 		{
-			/*std::vector<int> indices = { //cube
-				 0,1,2	,1,3,2	// top
-				,6,5,4	,7,5,6	// bot
-				,7,6,2	,7,2,3
-				,6,4,0	,6,0,2
-				,4,5,0	,5,1,0
-				,7,1,5	,7,3,1
-			};*/
 			std::vector<uint32_t> & indices = meshData->mesh->GetIndices();
 			const VkDeviceSize size = sizeof(indices[0]) * indices.size();
 			meshData->indexBuffer->Create(
@@ -684,18 +689,6 @@ namespace vk {
 			Renderer::GetRenderer().EndSingleTimeCommands(cmd);
 		}
 		{
-
-			/*glm::vec3 color(0.f, 0.2, 0.f);
-
-			Vertex v0 = { { +0.5,+0.5,+0.5},	color,{} };
-			Vertex v1 = { { +0.5,+0.5,-0.5},	color,{} };
-			Vertex v2 = { { -0.5,+0.5,+0.5},	color,{} };
-			Vertex v3 = { { -0.5,+0.5,-0.5},	color,{} };
-			Vertex v4 = { { +0.5,-0.5,+0.5},	color,{} };
-			Vertex v5 = { { +0.5,-0.5,-0.5},	color,{} };
-			Vertex v6 = { { -0.5,-0.5,+0.5},	color,{} };
-			Vertex v7 = { { -0.5,-0.5,-0.5},	color,{} };
-			std::vector<vk::Vertex> vertices = { v0, v1 ,v2 ,v3 ,v4 ,v5 ,v6 ,v7 };*/
 			std::vector<vk::Vertex> & vertices = meshData->mesh->GetVertices();
 			const VkDeviceSize size = sizeof(vertices[0]) * vertices.size();
 			meshData->vertexBuffer->Create(

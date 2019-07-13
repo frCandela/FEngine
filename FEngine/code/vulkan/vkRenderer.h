@@ -48,10 +48,7 @@ namespace vk {
 		ForwardPipeline *		GetForwardPipeline()		{ return m_forwardPipeline; }
 		glm::vec4				GetClearColor() const		{ return m_clearColor;  }
 
-		void ClearDebug() { 
-			m_debugLines.clear(); 
-			m_debugTriangles.clear();
-		}
+
 		void SetClearColor(glm::vec4 _color) { m_clearColor = _color; }
 		void SetMainCamera( scene::Camera * _camera) { m_mainCamera = _camera; }
 
@@ -61,6 +58,8 @@ namespace vk {
 		void RemoveMesh		( scene::Mesh * _mesh);
 		void DebugLine		( const btVector3 _start, const btVector3 _end, const vk::Color _color);
 		void DebugTriangle	( const btVector3 _v0, const btVector3 _v1, const btVector3 _v2, const vk::Color _color);
+		void DebugCube		( const btTransform _transform, const float _halfSize, const vk::Color _color);
+
 	private:
 		//SCENE REFERENCES
 		scene::Camera * m_mainCamera;
@@ -107,6 +106,11 @@ namespace vk {
 		bool ResetCommandPool();
 		void UpdateUniformBuffer();		
 		bool SubmitCommandBuffers();
+
+		void ClearDebug() {
+			m_debugLines.clear();
+			m_debugTriangles.clear();
+		}
 
 		void RecordCommandBufferPostProcess	( const int _index);
 		void RecordCommandBufferImgui		( const int _index);
