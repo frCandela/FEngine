@@ -172,17 +172,17 @@ namespace editor {
 			_camera.SetFov(fov);
 		}	
 
-		// fov
+		// nearDistance
 		if (ImGui::Button("##nearDistance")) {
-			_camera.SetNearDistance(0.1f);
+			_camera.SetNearDistance(0.01f);
 		}
 		ImGui::SameLine();
 		float near = _camera.GetNearDistance();
-		if (ImGui::DragFloat("near distance", &near, 0.01f, 0.01f, 10.f)) {
+		if (ImGui::DragFloat("near distance", &near, 0.001f, 0.01f, 10.f)) {
 			_camera.SetNearDistance(near);
 		}		
 		
-		// fov
+		// far distance
 		if (ImGui::Button("##fardistance")) {
 			_camera.SetFarDistance(1000.f);
 		}

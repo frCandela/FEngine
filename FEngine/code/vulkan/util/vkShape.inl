@@ -95,6 +95,32 @@ namespace vk {
 		return currentIcosahedron;
 	}
 	
+	//================================================================================================================================
+	//================================================================================================================================
+	inline std::vector<btVector3> GetCone(const float _radius, const float _height, const int _numSubdivisions) {
+		btVector3 center(0, 0, 0);
+		btVector3 top(0, _height, 0);
 
+		std::vector<btVector3> baseVertices;
+		baseVertices.reserve(_numSubdivisions);
+		for (int subdivisionIndex = 0; subdivisionIndex < _numSubdivisions; subdivisionIndex++) {
+			float angle = 2.f * subdivisionIndex * SIMD_PI / _numSubdivisions;
+			btVector3 point(std::cosf(angle), 0, std::sinf(angle));
+			baseVertices.push_back(_radius * point);
+		}
+
+		std::vector<btVector3> vertices;
+		for (int subdivisionIndex = 0; subdivisionIndex < _numSubdivisions; subdivisionIndex++) {
+
+			vertices.push_back(baseVertices[subdivisionIndex]);
+			vertices.push_back(baseVertices[(subdivisionIndex + 1) % _numSubdivisions]);
+			vertices.push_back(center);
+
+			vertices.push_back(baseVertices[subdivisionIndex]);
+			vertices.push_back(top);
+			vertices.push_back(baseVertices[(subdivisionIndex + 1) % _numSubdivisions]);
+		}
+		return vertices;
+	}
 }
 

@@ -11,7 +11,7 @@ namespace scene
 		Component(_gameobject)
 		, m_fov(110.f)
 		, m_aspectRatio(1.f)
-		, m_nearDistance(0.1f)
+		, m_nearDistance(0.01f)
 		, m_farDistance(1000.f) {
 	}
 

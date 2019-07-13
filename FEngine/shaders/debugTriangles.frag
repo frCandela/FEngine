@@ -7,7 +7,7 @@ layout (location = 1) in vec3 normal;
 layout (location = 2) in vec3 fragPos;
 
 void main() {  
-	vec3 lightPos = vec3(0,1000,0);
+	vec3 lightPos = vec3(1000,1000,500);
 	vec3 lightDir = normalize(lightPos - fragPos);
 	float diffuse = 0.6+0.4*max(dot(normal, lightDir),-dot(normal, lightDir));
 

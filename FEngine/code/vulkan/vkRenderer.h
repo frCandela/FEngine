@@ -60,6 +60,7 @@ namespace vk {
 		void DebugTriangle	( const btVector3 _v0, const btVector3 _v1, const btVector3 _v2, const vk::Color _color);
 		void DebugCube		( const btTransform _transform, const float _halfSize,	const vk::Color _color);
 		void DebugSphere	( const btTransform _transform,  const float _radius, const int _numSubdivisions, const vk::Color _color);
+		void DebugCone	(const btTransform _transform, const float _radius, const float _height, const int _numSubdivisions, const vk::Color _color);
 
 	private:
 		//SCENE REFERENCES

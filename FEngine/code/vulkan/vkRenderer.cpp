@@ -650,6 +650,18 @@ namespace vk {
 
 	//================================================================================================================================
 	//================================================================================================================================
+	void Renderer::DebugCone(const btTransform _transform, const float _radius, const float _height, const int _numSubdivisions, const vk::Color _color) {
+		std::vector<btVector3> sphere = GetCone(_radius, _height, _numSubdivisions);
+
+		for (int triangleIndex = 0; triangleIndex < sphere.size() / 3; triangleIndex++) {
+			const btVector3 vertex0 = _transform * sphere[3 * triangleIndex + 0];
+			const btVector3 vertex1 = _transform * sphere[3 * triangleIndex + 1];
+			const btVector3 vertex2 = _transform * sphere[3 * triangleIndex + 2];
+			DebugTriangle(vertex0, vertex1, vertex2, _color);
+		}
+	}
+	//================================================================================================================================
+	//================================================================================================================================
 	void Renderer::RemoveMesh(scene::Mesh * _mesh) {
 		vkDeviceWaitIdle(m_device.vkDevice);
 

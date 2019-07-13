@@ -201,7 +201,7 @@ namespace fan {
 
 		btQuaternion quat;
 		quat.setEulerZYX(rot.x(), rot.y(), rot.z());
-		m_renderer->DebugSphere(btTransform(quat, pos), size, 2, vk::Color(1,0,0,1.0f));
+		m_renderer->DebugCone(btTransform(quat, pos), 0.1f*size, 0.2f*size, 20, vk::Color(1,0,0,1.0f));
 	}
 
 }
