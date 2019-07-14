@@ -136,6 +136,8 @@ namespace util {
 
 
 		const fbxsdk::FbxAMatrix & globalTransform = mesh->GetNode()->EvaluateGlobalTransform();
+		fbxsdk::FbxAMatrix globalRotation = globalTransform;
+		globalRotation.SetT(fbxsdk::FbxVector4(0, 0, 0));
 
 		const FbxVector4* const  controlPoints = mesh->GetControlPoints();
 		const int controlPointsCount = mesh->GetControlPointsCount();
@@ -165,7 +167,10 @@ namespace util {
 			vertices[vertexIndex].pos = glm::vec3(point[0], point[1], point[2]);
 
 			// Normal
+			fbxsdk::FbxQuaternion quat;
+			globalTransform.MultQ(quat);
 			fbxsdk::FbxVector4 normal = normalsArray[vertexIndex];
+			normal = globalRotation.MultT(normal);
 			vertices[vertexIndex].normal = glm::vec3(normal[0], normal[1], normal[2]);
 		}
 

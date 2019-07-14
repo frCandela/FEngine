@@ -13,12 +13,13 @@ void main() {
 	const float ambiant = 0.2f; 
 	const float diffusePower = 1.f -  ambiant;
 
+	vec3 goodNormal = normalize(inNormal);
 
 	// Diffuse light
 	vec3 lightDir = lightPos - inFragPos;
 	const float distance = length( lightDir );
 	lightDir /= distance;
-	const float NdotL = dot( inNormal, lightDir );
+	const float NdotL = dot( goodNormal, lightDir );
 	const float intensity = clamp(NdotL,0.f,1.f);
 	const float diffuse = intensity * diffusePower / distance;
 

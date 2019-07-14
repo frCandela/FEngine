@@ -20,6 +20,7 @@ namespace scene
 		btQuaternion	GetRotationQuat() const		{ return m_rotation; }
 		btVector3		GetRotationEuler() const;
 		glm::mat4		GetModelMatrix() const;
+		glm::mat4		GetRotationMat() const;
 
 		btVector3 Right() const;
 		btVector3 Forward() const;

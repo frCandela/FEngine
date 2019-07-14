@@ -264,7 +264,9 @@ namespace vk {
 
 		std::vector < ForwardPipeline::DynamicUniforms > dynamicUniforms( m_meshList.size() );
 		for (int meshIndex = 0; meshIndex < m_meshList.size(); meshIndex++) {
-			dynamicUniforms[meshIndex].models = m_meshList[meshIndex].transform->GetModelMatrix();
+			dynamicUniforms[meshIndex].modelMat = m_meshList[meshIndex].transform->GetModelMatrix();
+			dynamicUniforms[meshIndex].rotationMat = m_meshList[meshIndex].transform->GetRotationMat();
+
 		}
 		m_forwardPipeline->SetDynamicUniforms(dynamicUniforms);
 

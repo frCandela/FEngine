@@ -33,7 +33,8 @@ namespace vk {
 		};
 		struct DynamicUniforms
 		{
-			glm::mat4 models;
+			glm::mat4 modelMat;
+			glm::mat4 rotationMat;
 		};
 
 
