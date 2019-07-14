@@ -92,6 +92,13 @@ namespace util {
 	//================================================================================================================================
 	//================================================================================================================================
 	bool FBXImporter::GetMesh(scene::Mesh & _mesh) {
+		
+		fbxsdk::FbxAxisSystem axisSystem( 
+			fbxsdk::FbxAxisSystem::EUpVector::eYAxis, 
+			(fbxsdk::FbxAxisSystem::EFrontVector)-2, 
+			fbxsdk::FbxAxisSystem::ECoordSystem::eLeftHanded
+		);
+		axisSystem.ConvertScene(m_scene);
 
 		std::queue< fbxsdk::FbxNode*> nodesQueue;
 		nodesQueue.push(m_scene->GetRootNode());
@@ -124,23 +131,43 @@ namespace util {
 		_mesh.SetPath(m_path);
 		_mesh.GetGameobject()->onComponentModified.Emmit(&_mesh);
 
-		// Get vertices 
-		std::vector<vk::Vertex> & vertices = _mesh.GetVertices();
-		FbxVector4*  controlPoints = mesh->GetControlPoints();
-		vertices.resize(mesh->GetControlPointsCount());
-		for (int ctrlPointIndex = 0; ctrlPointIndex < vertices.size(); ctrlPointIndex++) {
-			FbxVector4 point = controlPoints[ctrlPointIndex];
-			vertices[ctrlPointIndex].pos = glm::vec3(point[0], point[1], point[2]);
-		}
+		std::vector<uint32_t>	& indices	= _mesh.GetIndices();
+		std::vector<vk::Vertex> & vertices	= _mesh.GetVertices();
 
-		// Get indices
-		std::vector<uint32_t> & indices = _mesh.GetIndices();
-		const int* fbxIndices = mesh->GetPolygonVertices();
-		indices.resize(mesh->GetPolygonVertexCount());
-		for (int vertexIndex = 0; vertexIndex < indices.size(); vertexIndex++) {
-			indices[vertexIndex] = fbxIndices[vertexIndex];
-		}
 
+		const fbxsdk::FbxAMatrix & globalTransform = mesh->GetNode()->EvaluateGlobalTransform();
+
+		const FbxVector4* const  controlPoints = mesh->GetControlPoints();
+		const int controlPointsCount = mesh->GetControlPointsCount();
+		const int* const fbxIndices = mesh->GetPolygonVertices();
+		const int polygonVertexCount = mesh->GetPolygonVertexCount();
+
+		// Get normals
+		const fbxsdk::FbxGeometryElementNormal * elementNormal = mesh->GetElementNormal();
+		if (elementNormal->GetMappingMode() != fbxsdk::FbxLayerElement::eByPolygonVertex
+			|| elementNormal->GetReferenceMode() != fbxsdk::FbxLayerElement::eDirect) {
+			std::cout << "error : invalid mapping/reference mode for normals" << std::endl;
+			return false;
+		}
+		const fbxsdk::FbxLayerElementArrayTemplate< fbxsdk::FbxVector4 > & normalsArray = elementNormal->GetDirectArray();
+		
+		indices.resize(polygonVertexCount);
+		vertices.resize(polygonVertexCount);
+		for (int vertexIndex = 0; vertexIndex < polygonVertexCount; vertexIndex++) {
+
+			// Fake index
+			indices[vertexIndex] = vertexIndex;
+
+			// Vertex
+			const int fbxIndex = fbxIndices[vertexIndex];
+			FbxVector4 point = controlPoints[fbxIndex];
+			point = globalTransform.MultT(point);
+			vertices[vertexIndex].pos = glm::vec3(point[0], point[1], point[2]);
+
+			// Normal
+			fbxsdk::FbxVector4 normal = normalsArray[vertexIndex];
+			vertices[vertexIndex].normal = glm::vec3(normal[0], normal[1], normal[2]);
+		}
 
 		return true;
 	}

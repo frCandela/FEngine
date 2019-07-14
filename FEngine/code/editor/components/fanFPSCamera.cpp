@@ -3,6 +3,7 @@
 #include "editor/components/fanFPSCamera.h"
 #include "scene/components/fanTransform.h"
 #include "scene/fanGameobject.h"
+#include "scene/components/fanCamera.h"
 #include "util/fanSignal.h"
 #include "util/fanInput.h"
 #include "fanEngine.h"
@@ -15,6 +16,7 @@ namespace scene
 	FPSCamera::FPSCamera(Gameobject * _gameobject) :
 		Actor(_gameobject)
 		, m_transform(*GetGameobject()->GetComponent<scene::Transform>())
+		, m_camera(*GetGameobject()->GetComponent<scene::Camera>())
 		, m_speed( 10.f)
 		, m_speedMultiplier( 3.f)
 		, m_xySensitivity ( btVector2(0.005f, 0.005f) ){
@@ -95,8 +97,9 @@ namespace scene
 		}
 		m_transform.SetPosition(position);
 
-		const float size = 0.1f;
-		btVector3 offset = m_transform.GetPosition() + m_transform.Forward();
+		const shape::Ray ray =  m_camera.ScreenPosToRay(btVector2(0.9f, 0.9f));
+		const float size = 0.002f;
+		btVector3 offset = ray.origin + 0.1f*ray.direction;
 
 		fan::Engine::GetEngine().GetRenderer().DebugLine(offset, offset + btVector3(size, 0, 0), vk::Color(1, 0, 0, 1));
 		fan::Engine::GetEngine().GetRenderer().DebugLine(offset, offset + btVector3(0, size, 0), vk::Color(0, 1, 0, 1));

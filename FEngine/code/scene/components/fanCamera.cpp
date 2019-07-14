@@ -31,7 +31,8 @@ namespace scene
 	//================================================================================================================================
 	glm::mat4 Camera::GetProjection() const
 	{
-		glm::mat4 proj = glm::perspective(glm::radians(m_fov), m_aspectRatio, m_nearDistance, m_farDistance);
+		const float fov = glm::radians(m_fov);
+		glm::mat4 proj = glm::perspective(fov, m_aspectRatio, m_nearDistance, m_farDistance);
 		return proj;
 	}
 

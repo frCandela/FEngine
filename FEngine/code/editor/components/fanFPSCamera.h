@@ -5,6 +5,7 @@
 namespace scene
 {
 	class Transform;
+	class Camera;
 
 	class FPSCamera : public Actor
 	{
@@ -32,5 +33,6 @@ namespace scene
 		btVector2 m_xySensitivity;
 
 		scene::Transform & m_transform;
+		scene::Camera & m_camera;
 	};
 }
