@@ -3,3 +3,5 @@ no_submit
 x64
 imgui.ini
 FEngine.vcxproj.user
+lib/debug/libfbxsdk-mt.lib
+lib/release/libfbxsdk-mt.lib
