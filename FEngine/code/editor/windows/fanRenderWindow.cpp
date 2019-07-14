@@ -2,6 +2,7 @@
 
 #include "editor/windows/fanRenderWindow.h"
 #include "vulkan/pipelines/vkPostprocessPipeline.h"
+#include "vulkan/pipelines/vkForwardPipeline.h"
 #include "vulkan/vkRenderer.h"
 #include "util/fanTime.h"
 #include "util/fanImguiUtil.h"
@@ -31,6 +32,25 @@ namespace editor {
 
 						vk::Renderer::GetRenderer().GetPostprocessPipeline()->SetUniforms(uniforms);
 					}
+				}
+
+				if (ImGui::CollapsingHeader("Forward rendering")) {
+					vk::ForwardPipeline::FragUniforms uniforms = vk::Renderer::GetRenderer().GetForwardPipeline()->GetFragUniforms();
+					bool uniformsModified = false;
+					if (ImGui::SliderFloat("Ambiant light", &uniforms.ambiantIntensity, 0.f, 1.f)) {
+						uniformsModified = true;
+					}
+					if (ImGui::SliderInt("specular hardness", &uniforms.specularHardness, 0, 128)) {
+						uniformsModified = true;
+					}
+					if (ImGui::SliderFloat3("lightColor", &uniforms.lightColor.x, 0.f, 1.f)) {
+						uniformsModified = true;
+					}
+
+					if (uniformsModified == true) {
+						vk::Renderer::GetRenderer().GetForwardPipeline()->SetFragUniforms(uniforms);
+					}
+
 				}
 
 				if (ImGui::CollapsingHeader("Global")) {

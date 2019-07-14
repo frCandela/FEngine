@@ -39,7 +39,7 @@ namespace vk {
 		, m_mainCamera(nullptr)
 	{
 		ms_globalRenderer = this;
-		m_clearColor = glm::vec4(0.781f, 0.776f, 1.0f, 1.f);
+		m_clearColor = glm::vec4(0.f, 0.f, 0.f, 1.f);
 
 		m_swapchain->Create(m_window->GetSurface(), _size);
 		Input::Setup(m_window->GetWindow());
@@ -116,6 +116,13 @@ namespace vk {
 	//================================================================================================================================	
 	bool Renderer::WindowIsOpen() { 
 		return ! glfwWindowShouldClose(m_window->GetWindow()); 
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================	
+	void Renderer::SetMainCamera(scene::Camera * _camera) {
+		m_mainCamera = _camera;
+		m_mainCameraTransform = m_mainCamera->GetGameobject()->GetComponent < scene::Transform>();
 	}
 
 	//================================================================================================================================
@@ -251,7 +258,7 @@ namespace vk {
 	void Renderer::UpdateUniformBuffer()
 	{
 
-		ForwardPipeline::Uniforms ubo = {};
+		ForwardPipeline::VertUniforms ubo = m_forwardPipeline->GetVertUniforms();
 		assert(m_mainCamera != nullptr);
 		if ( m_mainCamera->IsModified()) {
 			m_mainCamera->SetAspectRatio(static_cast<float>(m_swapchain->GetExtent().width) /m_swapchain->GetExtent().height);
@@ -260,7 +267,14 @@ namespace vk {
 			ubo.proj[1][1] *= -1;
 		}
 
-		m_forwardPipeline->SetUniforms(ubo);
+		m_forwardPipeline->SetVertUniforms(ubo);
+
+
+		ForwardPipeline::FragUniforms fragUniforms = m_forwardPipeline->GetFragUniforms();
+		fragUniforms.cameraPosition = util::ToGLM( m_mainCameraTransform->GetPosition());
+		m_forwardPipeline->SetFragUniforms(fragUniforms);
+
+
 
 		std::vector < ForwardPipeline::DynamicUniforms > dynamicUniforms( m_meshList.size() );
 		for (int meshIndex = 0; meshIndex < m_meshList.size(); meshIndex++) {

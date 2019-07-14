@@ -71,6 +71,8 @@ namespace scene
 		return glm::translate(glm::mat4(1.f), position) * glm::mat4_cast(rotation) * glm::scale(glm::mat4(1.f), scale);
 	}
 
+	//================================================================================================================================
+	//================================================================================================================================
 	glm::mat4 Transform::GetRotationMat() const {
 		glm::quat rotation(m_rotation.getX(), m_rotation.getY(), m_rotation.getZ(), m_rotation.getW());
 		return glm::mat4_cast(rotation);

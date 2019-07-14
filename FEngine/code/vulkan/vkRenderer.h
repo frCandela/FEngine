@@ -5,6 +5,7 @@
 namespace scene {
 	class Camera;
 	class Mesh;
+	class Transform;
 }
 
 namespace vk {
@@ -50,7 +51,7 @@ namespace vk {
 
 
 		void SetClearColor(glm::vec4 _color) { m_clearColor = _color; }
-		void SetMainCamera( scene::Camera * _camera) { m_mainCamera = _camera; }
+		void SetMainCamera(scene::Camera * _camera);
 
 		bool HasNoDebugToDraw() const { return m_debugLines.empty() && m_debugTriangles.empty(); }
 
@@ -67,6 +68,7 @@ namespace vk {
 	private:
 		//SCENE REFERENCES
 		scene::Camera * m_mainCamera;
+		scene::Transform * m_mainCameraTransform;
 		std::vector <MeshData> m_meshList;
 
 		// DEBUG DATA

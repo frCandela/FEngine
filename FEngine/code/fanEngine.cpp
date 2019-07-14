@@ -35,7 +35,7 @@ namespace fan {
 
 		m_editorGrid.isVisible = true;
 		m_editorGrid.color = vk::Color(0.161f, 0.290f, 0.8f, 0.478f);
-		m_editorGrid.linesCount = 100;
+		m_editorGrid.linesCount = 10;
 		m_editorGrid.spacing = 1.f;		
 
 		ms_engine = this;

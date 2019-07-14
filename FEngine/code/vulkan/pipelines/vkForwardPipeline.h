@@ -26,10 +26,17 @@ namespace vk {
 	class ForwardPipeline {
 	public:
 
-		struct Uniforms
+		struct VertUniforms
 		{
 			glm::mat4 view;
 			glm::mat4 proj;
+		};
+		struct FragUniforms
+		{
+			glm::vec3 cameraPosition;
+			float ambiantIntensity;
+			glm::vec3 lightColor;
+			glm::int32 specularHardness;
 		};
 		struct DynamicUniforms
 		{
@@ -46,8 +53,10 @@ namespace vk {
 		void Resize(VkExtent2D _extent);
 		void ReloadShaders();
 
-		Uniforms GetUniforms() const { return m_uniforms; }
-		void SetUniforms(const Uniforms _uniforms);
+		VertUniforms GetVertUniforms() const { return m_vertUniforms; }
+		void SetVertUniforms(const VertUniforms _uniforms);
+		FragUniforms GetFragUniforms() const { return m_fragUniforms; }
+		void SetFragUniforms(const FragUniforms _fragUniforms);
 		void SetDynamicUniforms( const std::vector<DynamicUniforms> & _dynamicUniforms );
 
 		VkPipeline		GetPipeline() { return m_pipeline; }
@@ -71,11 +80,14 @@ namespace vk {
 		Shader * m_vertexShader = nullptr;
 
 		Buffer * m_dynamicUniformBuffer;
-		Buffer * m_uniformBuffer;
+		Buffer * m_vertUniformBuffer;
+		Buffer * m_fragUniformBuffer;
+
 		Buffer * m_indexBuffer;
 		Buffer * m_vertexBuffer;
 
-		Uniforms m_uniforms;
+		VertUniforms m_vertUniforms;
+		FragUniforms m_fragUniforms;
 		util::AlignedMemory<DynamicUniforms> m_dynamicUniformsArray;
 		size_t m_dynamicAlignment;
 
