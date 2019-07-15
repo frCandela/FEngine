@@ -20,15 +20,15 @@ namespace vk {
 		// Calculate required alignment based on minimum device offset alignment
 		size_t minUboAlignment = _device.GetDeviceProperties().limits.minUniformBufferOffsetAlignment;
 		if (minUboAlignment > 0) {
-			m_dynamicAlignment = (sizeof(DynamicUniforms) + minUboAlignment - 1) & ~(minUboAlignment - 1);
+			m_dynamicAlignment = 2*((sizeof(DynamicUniforms) + minUboAlignment - 1) & ~(minUboAlignment - 1));
 		}
 		
-		m_dynamicUniformsArray.Resize(128, m_dynamicAlignment);
+		m_dynamicUniformsArray.Resize(128, 256);
 
 		m_fragUniforms.ambiantIntensity = 0.2f;
  		m_fragUniforms.lightColor = glm::vec3(1,1,1);
  		m_fragUniforms.specularHardness = 32;
-		m_fragUniforms.lightColor = glm::vec3(1, 1, 1);
+		m_fragUniforms.lightPos = glm::vec3(0, 2, 0);
 	}
 
 	//================================================================================================================================

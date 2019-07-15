@@ -46,6 +46,9 @@ namespace editor {
 					if (ImGui::SliderFloat3("lightColor", &uniforms.lightColor.x, 0.f, 1.f)) {
 						uniformsModified = true;
 					}
+					if (ImGui::DragFloat3("lightPos", &uniforms.lightPos.x)) {
+						uniformsModified = true;
+					}
 
 					if (uniformsModified == true) {
 						vk::Renderer::GetRenderer().GetForwardPipeline()->SetFragUniforms(uniforms);
