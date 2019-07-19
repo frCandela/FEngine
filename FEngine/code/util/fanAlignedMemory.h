@@ -18,15 +18,15 @@ namespace util {
 		}
 
 		void Resize(size_t _size, size_t _alignment) {
-			assert(_alignment > sizeof(T));
+			assert(_alignment >= sizeof(T));
 
 			AlignedFree(m_data);
 			m_data = nullptr;
-
 			m_size = _size;
 			m_alignment = _alignment;
+
 			m_ratio = m_alignment / sizeof(uint32_t);
-			m_data = AlignedAlloc(_size*_alignment, _alignment);
+			m_data = AlignedAlloc(_size, _alignment);
 		}
 		size_t GetSize() const		{ return m_size; }
 		size_t GetAlignment() const { return m_alignment; }
