@@ -263,7 +263,6 @@ namespace fan {
 				cacheData.axisIndex = -1;
 			}
 
-
 			// Raycast on the gizmo shape to determine if the mouse is hovering it
 			vk::Color clickedColor = opaqueColor;
 			const shape::Ray ray = m_editorCamera->ScreenPosToRay(Mouse::GetScreenSpacePosition());
@@ -278,6 +277,24 @@ namespace fan {
 					}
 					break;
 				}
+			}
+
+			if( axisIndex == 0) {
+				scene::Camera * camera = m_editorCamera->GetGameobject()->GetComponent<scene::Camera>();
+				btVector3 btPos = _transform *  axisDirection[axisIndex];
+				glm::vec4 pos(btPos[0],btPos[1],btPos[2],1.f);
+				m_renderer->DebugPoint(btPos, vk::Color::Magenta);
+				glm::vec4  proj = camera->GetProjection() * camera->GetView() * pos;
+				glm::vec2 screenSize ( static_cast<float>( m_renderer->GetWindow()->GetExtent().width),static_cast<float>( m_renderer->GetWindow()->GetExtent().height));
+
+				proj /= proj.z;
+				proj.x =  (proj.x + 1.f) / 2.f;
+				proj.y = (proj.y + 1.f) / 2.f;
+
+				ImGui::SetNextWindowPos({proj.x *screenSize.x , (1.f - proj.y)*screenSize.y});
+				ImGui::Begin("X");
+				ImGui::DragFloat4("pos", &proj.x);
+				ImGui::End();
 			}
 
 			// Draw the gizmo cone & lines
