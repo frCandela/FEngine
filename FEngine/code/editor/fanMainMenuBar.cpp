@@ -5,6 +5,7 @@
 #include "editor/windows/fanSceneWindow.h"
 #include "editor/windows/fanInspectorWindow.h"
 #include "editor/windows/fanPreferencesWindow.h"
+#include "util/fanSerializedValues.h"
 
 #include "vulkan/vkRenderer.h"
 #include "fanEngine.h"
@@ -14,8 +15,46 @@ namespace editor {
 	//================================================================================================================================
 	//================================================================================================================================
 	MainMenuBar::MainMenuBar() :
-		  m_showImguiDemoWindow		( true ){
+		m_showImguiDemoWindow( true ){
+	}
 
+	//================================================================================================================================
+	//================================================================================================================================
+	void MainMenuBar::Initialize() {
+		fan::Engine & engine = fan::Engine::GetEngine();
+		fan::SerializedValues & editorValues = engine.GetEditorValues();
+		bool tmpValue;
+
+		editorValues.Get("mainMenuBar_show_imguidemo", m_showImguiDemoWindow);
+
+		if (editorValues.Get("mainMenuBar_show_postprocess", tmpValue) == true) {
+			engine.GetRenderWindow().SetVisible(tmpValue);
+		}
+
+		if (editorValues.Get("mainMenuBar_show_scene", tmpValue) == true) {
+			engine.GetSceneWindow().SetVisible(tmpValue);
+		}
+
+		if (editorValues.Get("mainMenuBar_show_inspector", tmpValue) == true) {
+			engine.GetInspectorWindow().SetVisible(tmpValue);
+		}
+
+		if (editorValues.Get("mainMenuBar_show_preferences", tmpValue) == true) {
+			engine.GetPreferencesWindow().SetVisible(tmpValue);
+		}
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
+	MainMenuBar::~MainMenuBar() {
+		fan::Engine & engine = fan::Engine::GetEngine();
+		fan::SerializedValues & editorValues = engine.GetEditorValues();
+
+		editorValues.Set("mainMenuBar_show_imguidemo", m_showImguiDemoWindow);
+		editorValues.Set("mainMenuBar_show_postprocess", engine.GetRenderWindow().IsVisible());
+		editorValues.Set("mainMenuBar_show_scene", engine.GetSceneWindow().IsVisible());
+		editorValues.Set("mainMenuBar_show_inspector", engine.GetInspectorWindow().IsVisible());
+		editorValues.Set("mainMenuBar_show_preferences", engine.GetPreferencesWindow().IsVisible());
 	}
 
 	//================================================================================================================================

@@ -1,5 +1,7 @@
 #pragma once
 
+#include "util/fanSerializedValues.h"
+
 namespace vk {
 	class Renderer;
 }
@@ -18,6 +20,7 @@ namespace scene {
 }
 
 namespace fan {
+
 	class Engine {
 	public:
 
@@ -53,10 +56,12 @@ namespace fan {
 		scene::Scene &					GetScene() const				{ return * m_scene; }
 		vk::Renderer &					GetRenderer() const				{ return * m_renderer; }
 
+		fan::SerializedValues & GetEditorValues() { return m_editorValues; }
 		EditorGrid GetEditorGrid() const { return m_editorGrid;  }
 		void SetEditorGrid( const EditorGrid _editorGrid) { m_editorGrid =_editorGrid; }
 
 		btVector3 DrawMoveGizmo(const btTransform _transform, const size_t _uniqueID);
+
 
 	private:
 
@@ -68,6 +73,7 @@ namespace fan {
 		editor::PreferencesWindow *	m_preferencesWindow;
 
 		EditorGrid m_editorGrid;
+		fan::SerializedValues m_editorValues;
 
 		// Main components
 		vk::Renderer *		m_renderer;

@@ -10,6 +10,8 @@
 #include "glm/gtc/quaternion.hpp"
 #include "bullet/btBulletDynamicsCommon.h"
 
+#include "nlohmann_json.h"
+
 #define GLFW_INCLUDE_VULKAN
 #include "glfw/glfw3.h"
 #include "imgui/imgui.h"

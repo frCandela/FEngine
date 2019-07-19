@@ -31,9 +31,9 @@ namespace vk {
 
 	//================================================================================================================================
 	//================================================================================================================================
-	Renderer::Renderer(const VkExtent2D _size) :
+	Renderer::Renderer(const VkExtent2D _size, const glm::ivec2 _position) :
 		m_instance(new Instance())
-		, m_window(new Window("Vulkan", _size, m_instance->vkInstance))
+		, m_window(new Window("Vulkan", _size, _position, m_instance->vkInstance))
 		, m_device( * new Device(m_instance, m_window->GetSurface()))
 		, m_swapchain(new SwapChain(m_device))
 		, m_mainCamera(nullptr)

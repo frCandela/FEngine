@@ -4,6 +4,7 @@
 #include "vulkan/vkRenderer.h"
 #include "vulkan/pipelines/vkDebugPipeline.h"
 #include "vulkan/util/vkShape.h"
+#include "vulkan/util/vkWindow.h"
 #include "util/fanTime.h"
 #include "util/fanInput.h"
 #include "util/shapes/fanTriangle.h"
@@ -31,7 +32,16 @@ namespace fan {
 	//================================================================================================================================
 	//================================================================================================================================
 	Engine::Engine() :
-		m_applicationShouldExit(false) {
+		m_applicationShouldExit(false),
+		m_editorValues("editorValues.json"){
+
+		VkExtent2D windowSize = { 1280,720 };
+		m_editorValues.Get("renderer_extent_width", windowSize.width);
+		m_editorValues.Get("renderer_extent_height", windowSize.height);
+
+		glm::ivec2 windowPosition = { 0,0 };
+		m_editorValues.Get("renderer_position_x", windowPosition.x);
+		m_editorValues.Get("renderer_position_y", windowPosition.y);
 
 		m_editorGrid.isVisible = true;
 		m_editorGrid.color = vk::Color(0.161f, 0.290f, 0.8f, 0.478f);
@@ -46,7 +56,7 @@ namespace fan {
 		m_inspectorWindow = new editor::InspectorWindow();
 		m_preferencesWindow = new editor::PreferencesWindow();
 
-		m_renderer = new vk::Renderer({ 1280,720 });
+		m_renderer = new vk::Renderer(windowSize, windowPosition);
 		m_scene = new scene::Scene("mainScene");
 
 		scene::Gameobject * cameraGameobject = m_scene->CreateGameobject("editor_camera");
@@ -70,11 +80,24 @@ namespace fan {
 		}
 
 		cube->GetComponent<scene::Transform>();		
+
+
+		m_mainMenuBar->Initialize();
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
 	Engine::~Engine() {
+		const vk::Window * window = m_renderer->GetWindow();
+
+		const VkExtent2D rendererSize = window->GetExtent();
+		m_editorValues.Set("renderer_extent_width", rendererSize.width);
+		m_editorValues.Set("renderer_extent_height", rendererSize.height);
+
+		const glm::ivec2 windowPosition = window->GetPosition();
+		m_editorValues.Set("renderer_position_x", windowPosition.x);
+		m_editorValues.Set("renderer_position_y", windowPosition.y);
+
 		delete m_mainMenuBar;
 		delete m_renderWindow;
 		delete m_sceneWindow;
@@ -196,7 +219,6 @@ namespace fan {
 			transform->SetPosition(newPosition);
 		}
 	}
-
 
 	//================================================================================================================================
 	//================================================================================================================================

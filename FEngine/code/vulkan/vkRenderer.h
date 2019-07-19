@@ -30,7 +30,7 @@ namespace vk {
 
 	class Renderer {
 	public:
-		Renderer(const VkExtent2D _size);
+		Renderer(const VkExtent2D _size, const glm::ivec2 _position);
 		~Renderer();
 
 		bool WindowIsOpen();
@@ -44,6 +44,7 @@ namespace vk {
 		VkCommandBuffer BeginSingleTimeCommands();
 		void EndSingleTimeCommands(VkCommandBuffer commandBuffer);
 
+		Window *				GetWindow()					{ return m_window; }
 		ImguiPipeline *			GetImguiPipeline()			{ return m_imguiPipeline; }
 		PostprocessPipeline *	GetPostprocessPipeline()	{ return m_postprocessPipeline; }
 		ForwardPipeline *		GetForwardPipeline()		{ return m_forwardPipeline; }
