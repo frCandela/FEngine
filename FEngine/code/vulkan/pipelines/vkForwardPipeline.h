@@ -37,6 +37,7 @@ namespace vk {
 			float ambiantIntensity;
 			glm::vec3 lightColor;
 			glm::int32 specularHardness;
+			glm::vec3 lightPos;
 		};
 		struct DynamicUniforms
 		{

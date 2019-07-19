@@ -12,16 +12,15 @@ layout(binding = 2) uniform FragUniforms {
 	float ambiantIntensity;
 	vec3 lightColor;
 	int specularHardness;
+	vec3 lightPos;
 } uniforms;
 
 void main() {  
-	// External data
-	const vec3 lightPos = vec3(0.f,2.f,0.f);
 
 	//Needed data
 	const float diffusePower = 1.f -  uniforms.ambiantIntensity;
 	vec3 goodNormal = normalize(inNormal);
-	vec3 lightDir = lightPos - inFragPos;
+	vec3 lightDir = uniforms.lightPos - inFragPos;
 	const float distance = length( lightDir );
 	lightDir /= distance;
 	const vec3 viewDir = normalize(uniforms.cameraPosition - inFragPos);
