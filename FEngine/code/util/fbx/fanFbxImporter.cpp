@@ -173,7 +173,7 @@ namespace util {
 			normal = globalRotation.MultT(normal);
 			vertices[vertexIndex].normal = glm::vec3(normal[0], normal[1], normal[2]);
 		}
-
+		_mesh.SetModified(true);
 		return true;
 	}
 }

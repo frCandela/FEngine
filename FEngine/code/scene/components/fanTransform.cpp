@@ -18,32 +18,36 @@ namespace scene
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void Transform::SetPosition(btVector3 _newPosition)
-	{
-		m_position = _newPosition;
+	void Transform::SetPosition(btVector3 _newPosition) {
+		if (m_position != _newPosition) {
+			m_position = _newPosition;
 
-// 		Rigidbody* rb = GetGameobject()->GetComponent<Rigidbody>();
-// 		if (rb)	{
-// 			rb->SetPosition(newPosition);
-// 		}
+			// 		Rigidbody* rb = GetGameobject()->GetComponent<Rigidbody>();
+			// 		if (rb)	{
+			// 			rb->SetPosition(newPosition);
+			// 		}
 
-		GetGameobject()->onComponentModified.Emmit(this);
+			SetModified(true);
+		}
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
 	void Transform::SetScale(btVector3 _newScale)
 	{
-		m_scale = _newScale;
-		GetGameobject()->onComponentModified.Emmit(this);
+		if (m_scale != _newScale) {
+			m_scale = _newScale;
+			SetModified(true);
+		}
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
 	void Transform::SetRotationEuler(const btVector3 _rotation)
 	{
-		m_rotation.setEulerZYX( btRadians(_rotation.z()), btRadians(_rotation.y()), btRadians(_rotation.x()) );
-		GetGameobject()->onComponentModified.Emmit(this);
+		btQuaternion quat;
+		quat.setEulerZYX( btRadians(_rotation.z()), btRadians(_rotation.y()), btRadians(_rotation.x()) );
+		SetRotationQuat(quat);
 	}
 
 	//================================================================================================================================
@@ -57,7 +61,10 @@ namespace scene
 	//================================================================================================================================
 	//================================================================================================================================
 	void Transform::SetRotationQuat(const btQuaternion _rotation) {
-		m_rotation = _rotation;
+		if (m_rotation != _rotation) {
+			m_rotation = _rotation;
+			SetModified(true);
+		}
 	}
 
 	//================================================================================================================================

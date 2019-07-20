@@ -38,7 +38,7 @@ namespace scene
 
 	//================================================================================================================================
 	//================================================================================================================================
-	shape::Ray Camera::ScreenPosToRay(btVector2 _position)
+	shape::Ray Camera::ScreenPosToRay(const btVector2& _position)
 	{
 		assert(_position.x() >= -1.f  && _position.x() <= 1.f);
 		assert(_position.y() >= -1.f && _position.y() <= 1.f);
@@ -60,6 +60,15 @@ namespace scene
 		ray.direction = (100.f * (ray.origin - pos)).normalized();
 
 		return ray;
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
+	btVector2 Camera::WorldPosToScreen(const btVector3& worldPosition) {
+		const glm::vec4 pos(worldPosition[0], worldPosition[1], worldPosition[2], 1.f);
+		glm::vec4  proj = GetProjection() * GetView() * pos;
+		proj /= proj.z;
+		return btVector2(proj.x, proj.y);
 	}
 
 	//================================================================================================================================

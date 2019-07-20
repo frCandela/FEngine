@@ -29,6 +29,7 @@ namespace shape
 	}
 
 	//================================================================================================================================
+	// Möller–Trumbore intersection algorithm
 	//================================================================================================================================
 	bool Triangle::RayCast(const btVector3 _origin, const btVector3 _dir, btVector3& _outIntersection) const
 	{

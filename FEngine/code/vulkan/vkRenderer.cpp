@@ -691,6 +691,27 @@ namespace vk {
 
 		return cone;
 	}
+
+	//================================================================================================================================
+	//================================================================================================================================
+	void Renderer::DebugAABB(const shape::AABB & _aabb, const vk::Color _color) {
+		std::vector< btVector3 > corners = _aabb.GetCorners();
+		// Top
+		DebugLine(corners[0], corners[1], _color);
+		DebugLine(corners[1], corners[2], _color);
+		DebugLine(corners[2], corners[3], _color);
+		DebugLine(corners[3], corners[0], _color);
+		// Bot
+		DebugLine(corners[4], corners[5], _color);
+		DebugLine(corners[5], corners[6], _color);
+		DebugLine(corners[6], corners[7], _color);
+		DebugLine(corners[7], corners[4], _color);
+		//Vertical sides
+		DebugLine(corners[0], corners[4], _color);
+		DebugLine(corners[1], corners[5], _color);
+		DebugLine(corners[2], corners[6], _color);
+		DebugLine(corners[3], corners[7], _color);
+	}
 	
 	//================================================================================================================================
 	//================================================================================================================================

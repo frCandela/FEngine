@@ -2,6 +2,8 @@
 
 #include "scene/fanGameobject.h"
 #include "scene/components/fanComponent.h"
+#include "scene/components/fanMesh.h"
+#include "scene/components/fanTransform.h"
 #include "util/fanSignal.h"
 
 namespace scene
@@ -12,7 +14,8 @@ namespace scene
 		m_name( _name )
 		, m_isRemovable(true)
 	{
-
+		onComponentModified.Connect(&Gameobject::OnComponentModified, this);
+		onComponentDeleted.Connect(&Gameobject::OnComponentDeleted, this);
 	}
 
 	//================================================================================================================================
@@ -33,6 +36,7 @@ namespace scene
 			if (m_components[componentIndex] == component)
 			{
 				// Deletes it
+				m_components[componentIndex]->m_isBeingDeleted = true;
 				onComponentDeleted.Emmit( m_components[componentIndex] );
 				m_components[componentIndex]->Delete();
 				m_components.erase(m_components.begin() + componentIndex);
@@ -40,5 +44,35 @@ namespace scene
 			}
 		}
 		return false;
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
+	void Gameobject::ComputeAABB() {
+
+		const scene::Mesh * mesh = GetComponent< scene::Mesh >();
+		if ( mesh != nullptr && mesh->IsBeingDeleted() == false && mesh->GetIndices().size() > 0) {
+			m_aabb = mesh->ComputeAABB();
+		} else {
+			const btVector3 origin = GetComponent< scene::Transform >()->GetPosition();
+			const float size = 0.05f;
+			m_aabb = shape::AABB( origin - size * btVector3::One(), origin + size * btVector3::One() );
+		}
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
+	void Gameobject::OnComponentModified(scene::Component * _component) {	
+		if (_component->IsType<scene::Transform>() == true || _component->IsType<scene::Mesh>()) {
+			ComputeAABB();
+		}		
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
+	void Gameobject::OnComponentDeleted(scene::Component * _component) {
+		if ( _component->IsType<scene::Mesh>()) {
+			ComputeAABB();
+		}
 	}
 }

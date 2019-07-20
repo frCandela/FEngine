@@ -2,6 +2,7 @@
 
 #include "fanEngine.h"
 #include "vulkan/vkRenderer.h"
+#include "vulkan/pipelines/vkForwardPipeline.h"
 #include "vulkan/pipelines/vkDebugPipeline.h"
 #include "vulkan/util/vkShape.h"
 #include "vulkan/util/vkWindow.h"
@@ -9,6 +10,7 @@
 #include "util/fanInput.h"
 #include "util/shapes/fanTriangle.h"
 #include "util/shapes/fanPlane.h"
+#include "util/shapes/fanAABB.h"
 #include "util/fbx/fanFbxImporter.h"
 #include "editor/fanMainMenuBar.h"
 #include "editor/windows/fanRenderWindow.h"	
@@ -22,6 +24,7 @@
 #include "scene/components/fanTransform.h"
 #include "scene/components/fanMesh.h"
 #include "scene/components/fanActor.h"
+#include "scene/components/fanMesh.h"
 
 
 #include "bullet/BulletCollision/CollisionShapes/btCapsuleShape.h"
@@ -146,6 +149,14 @@ namespace fan {
 				DrawUI();
 				DrawEditorGrid();
 
+				if (m_mainMenuBar->ShowWireframe()) {
+					DrawWireframe();
+				}
+				if (m_mainMenuBar->ShowAABB()) {
+					DrawAABB();
+				}
+
+
 				m_renderer->DrawFrame();
 				m_scene->EndFrame();
 
@@ -211,12 +222,48 @@ namespace fan {
 
 	//================================================================================================================================
 	//================================================================================================================================
+	void Engine::DrawAABB() const {
+		const std::vector< scene::Gameobject *>  & gameobjects = m_scene->GetGameObjects();
+		for (int gameobjectIndex = 0; gameobjectIndex < gameobjects.size(); gameobjectIndex++) {
+			const scene::Gameobject * gameobject = gameobjects[gameobjectIndex];
+			if (gameobject != m_editorCamera->GetGameobject()) {
+				shape::AABB aabb = gameobject->GetAABB();
+				m_renderer->DebugAABB(aabb, vk::Color::Red);
+			}
+		}
+	}
+	
+	//================================================================================================================================
+	//================================================================================================================================
+	void Engine::DrawWireframe() const {
+		const std::vector < vk::MeshData> & meshList = m_renderer->GetMeshList();
+		for (int meshIndex = 0; meshIndex < meshList.size(); meshIndex++) {
+			const scene::Mesh * const mesh = meshList[meshIndex].mesh;
+			const glm::mat4  modelMat = meshList[meshIndex].transform->GetModelMatrix();
+
+			const std::vector<uint32_t> & indices = mesh->GetIndices();
+			const std::vector<vk::Vertex> & vertices = mesh->GetVertices();
+
+			for (int index = 0; index < indices.size() / 3; index++) {
+				const btVector3 v0 = util::ToBullet( modelMat * glm::vec4( vertices[3*index+0].pos, 1.f ) );
+				const btVector3 v1 = util::ToBullet( modelMat * glm::vec4( vertices[3 * index + 1].pos, 1.f));
+				const btVector3 v2 = util::ToBullet( modelMat * glm::vec4( vertices[3 * index + 2].pos, 1.f));
+				m_renderer->DebugLine(v0, v1, vk::Color::Yellow);
+				m_renderer->DebugLine(v1, v2, vk::Color::Yellow);
+				m_renderer->DebugLine(v2, v0, vk::Color::Yellow);
+			}
+		}
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
 	void Engine::ManageSelection() {
 		// Translation gizmo on selected gameobject
 		if (m_selectedGameobject != nullptr && m_selectedGameobject != m_editorCamera->GetGameobject() ) {
 			scene::Transform * transform = m_selectedGameobject->GetComponent< scene::Transform >();
 			const btVector3 newPosition = DrawMoveGizmo( btTransform( btQuaternion(0,0,0), transform->GetPosition()), (size_t)this);
 			transform->SetPosition(newPosition);
+			
 		}
 	}
 
@@ -239,20 +286,21 @@ namespace fan {
 		GizmoCacheData & cacheData = m_gizmoCacheData[_uniqueID];
 		const btVector3 origin = _transform.getOrigin();
 		const btTransform rotation(_transform.getRotation());
-		const float size = 0.1f;
 		const btVector3 axisDirection[3] = { btVector3(1, 0, 0), btVector3(0, 1, 0),  btVector3(0, 0, 1) };
+		const btVector3 cameraPosition = m_editorCamera->GetGameobject()->GetComponent<scene::Transform>()->GetPosition();
+		const float size = 0.2f * origin.distance(cameraPosition);
 		const btTransform coneRotation[3] = {
-			btTransform(btQuaternion(0, 0, btRadians(-90)), axisDirection[0])
-			,btTransform(btQuaternion::getIdentity(),  axisDirection[1])
-			,btTransform(btQuaternion(0, btRadians(90), 0),  axisDirection[2])
-		};		
+		btTransform(btQuaternion(0, 0, btRadians(-90)), size*axisDirection[0])
+		,btTransform(btQuaternion::getIdentity(),		size*axisDirection[1])
+		,btTransform(btQuaternion(0, btRadians(90), 0), size*axisDirection[2])
+		};
 
 		btVector3 newPosition = _transform.getOrigin();
 		for (int axisIndex = 0; axisIndex < 3 ; axisIndex++) 	{
 			const vk::Color opaqueColor(axisDirection[axisIndex].x(), axisDirection[axisIndex].y(), axisDirection[axisIndex].z(), 1.f);
 			
 			// Generates a cone shape
-			std::vector<btVector3> coneTris = vk::GetCone(size, 4.f*size, 10);
+			std::vector<btVector3> coneTris = vk::GetCone(0.1f*size, 0.5f*size, 10);
 			btTransform transform = _transform * coneRotation[axisIndex];
 			for (int vertIndex = 0; vertIndex < coneTris.size(); vertIndex++) {
 				coneTris[vertIndex] = transform * coneTris[vertIndex];
@@ -279,26 +327,8 @@ namespace fan {
 				}
 			}
 
-			if( axisIndex == 0) {
-				scene::Camera * camera = m_editorCamera->GetGameobject()->GetComponent<scene::Camera>();
-				btVector3 btPos = _transform *  axisDirection[axisIndex];
-				glm::vec4 pos(btPos[0],btPos[1],btPos[2],1.f);
-				m_renderer->DebugPoint(btPos, vk::Color::Magenta);
-				glm::vec4  proj = camera->GetProjection() * camera->GetView() * pos;
-				glm::vec2 screenSize ( static_cast<float>( m_renderer->GetWindow()->GetExtent().width),static_cast<float>( m_renderer->GetWindow()->GetExtent().height));
-
-				proj /= proj.z;
-				proj.x =  (proj.x + 1.f) / 2.f;
-				proj.y = (proj.y + 1.f) / 2.f;
-
-				ImGui::SetNextWindowPos({proj.x *screenSize.x , (1.f - proj.y)*screenSize.y});
-				ImGui::Begin("X");
-				ImGui::DragFloat4("pos", &proj.x);
-				ImGui::End();
-			}
-
 			// Draw the gizmo cone & lines
-			m_renderer->DebugLine(origin, _transform *  axisDirection[axisIndex], opaqueColor);
+			m_renderer->DebugLine(origin, origin + size*( _transform *  axisDirection[axisIndex] - origin ), opaqueColor);
 			for (int triangleIndex = 0; triangleIndex < coneTris.size() / 3; triangleIndex++) {
 				m_renderer->DebugTriangle(coneTris[3 * triangleIndex + 0], coneTris[3 * triangleIndex + 1], coneTris[3 * triangleIndex + 2], clickedColor);
 			}

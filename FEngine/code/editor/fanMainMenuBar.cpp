@@ -15,7 +15,9 @@ namespace editor {
 	//================================================================================================================================
 	//================================================================================================================================
 	MainMenuBar::MainMenuBar() :
-		m_showImguiDemoWindow( true ){
+		m_showImguiDemoWindow( true )
+		, m_showAABB(false)
+		, m_showWireframe(false) {
 	}
 
 	//================================================================================================================================
@@ -106,6 +108,14 @@ namespace editor {
 				ImGui::Separator();
 				ImGui::Checkbox("Imgui demo", &m_showImguiDemoWindow);
 
+				ImGui::EndMenu();
+			}
+
+			// EDITOR
+			if (ImGui::BeginMenu("Editor"))
+			{
+				if (ImGui::Checkbox("show AABB", &m_showAABB)) {}
+				if (ImGui::Checkbox("show Wireframe", &m_showWireframe)) {}
 				ImGui::EndMenu();
 			}
 

@@ -108,6 +108,7 @@
     <ClCompile Include="code\util\fanUtil.cpp" />
     <ClCompile Include="code\util\fanVector2.cpp" />
     <ClCompile Include="code\util\fbx\fanFbxImporter.cpp" />
+    <ClCompile Include="code\util\shapes\fanAABB.cpp" />
     <ClCompile Include="code\util\shapes\fanCube.cpp" />
     <ClCompile Include="code\util\shapes\fanPlane.cpp" />
     <ClCompile Include="code\util\shapes\fanRay.cpp" />
@@ -163,6 +164,7 @@
     <ClInclude Include="code\util\fanUtil.h" />
     <ClInclude Include="code\util\fanVector2.h" />
     <ClInclude Include="code\util\fbx\fanFbxImporter.h" />
+    <ClInclude Include="code\util\shapes\fanAABB.h" />
     <ClInclude Include="code\util\shapes\fanCube.h" />
     <ClInclude Include="code\util\shapes\fanPlane.h" />
     <ClInclude Include="code\util\shapes\fanRay.h" />

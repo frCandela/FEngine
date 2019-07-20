@@ -62,7 +62,6 @@ namespace fan {
 
 		btVector3 DrawMoveGizmo(const btTransform _transform, const size_t _uniqueID);
 
-
 	private:
 
 		// UI elements
@@ -85,7 +84,6 @@ namespace fan {
 		std::set< scene::Actor * > m_activeActors;
 		std::set< scene::Actor * > m_stoppingActors;
 
-
 		struct GizmoCacheData {
 			int axisIndex;
 			bool pressed = false;
@@ -96,9 +94,10 @@ namespace fan {
 		static Engine * ms_engine;
 		bool m_applicationShouldExit;
 
-
 		void ManageSelection();
 		void DrawUI();
 		void DrawEditorGrid() const;
+		void DrawWireframe() const;
+		void DrawAABB() const;
 	};
 }

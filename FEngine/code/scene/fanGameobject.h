@@ -1,6 +1,7 @@
 #pragma once
 
 #include "util/fanSignal.h"
+#include "util/shapes/fanAABB.h"
 
 namespace scene
 {
@@ -35,13 +36,23 @@ namespace scene
 
 		//Getters
 		std::string GetName() { return m_name; }
+		const shape::AABB & GetAABB() const { return m_aabb; }
+		void ComputeAABB();
 
 		bool IsRemovable() const { return m_isRemovable; }
 		void SetRemovable(const bool _isRemovable) { m_isRemovable = _isRemovable; }
+	
 	private:
 		std::string m_name;
 		bool m_isRemovable;
+
+		shape::AABB m_aabb;
+
 		std::vector<Component*> m_components;
+
+		void OnComponentModified( scene::Component * _component );
+		void OnComponentDeleted( scene::Component * _component);
+
 	};
 
 
@@ -63,6 +74,7 @@ namespace scene
 
 		onComponentCreated.Emmit(componentType);
 		onComponentModified.Emmit(componentType);
+
 
 		return componentType;
 	}

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "vulkan/util/vkVertex.h"
+#include "util/shapes/fanAABB.h"
 
 namespace scene {
 	class Camera;
@@ -49,7 +50,7 @@ namespace vk {
 		PostprocessPipeline *	GetPostprocessPipeline()	{ return m_postprocessPipeline; }
 		ForwardPipeline *		GetForwardPipeline()		{ return m_forwardPipeline; }
 		glm::vec4				GetClearColor() const		{ return m_clearColor;  }
-
+		const std::vector <MeshData> & GetMeshList() const	{ return m_meshList; }
 
 		void SetClearColor(glm::vec4 _color) { m_clearColor = _color; }
 		void SetMainCamera(scene::Camera * _camera);
@@ -65,6 +66,7 @@ namespace vk {
 		std::vector< btVector3> DebugCube		( const btTransform _transform, const float _halfSize,	const vk::Color _color);
 		std::vector< btVector3> DebugSphere		( const btTransform _transform,  const float _radius, const int _numSubdivisions, const vk::Color _color);
 		std::vector< btVector3> DebugCone		( const btTransform _transform, const float _radius, const float _height, const int _numSubdivisions, const vk::Color _color);
+		void					DebugAABB		(const shape::AABB & _aabb, const vk::Color _color);
 
 	private:
 		//SCENE REFERENCES
