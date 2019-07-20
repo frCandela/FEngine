@@ -35,6 +35,7 @@ namespace fan {
 	//================================================================================================================================
 	//================================================================================================================================
 	Engine::Engine() :
+		// Get serialized editor values
 		m_applicationShouldExit(false),
 		m_editorValues("editorValues.json"){
 
@@ -46,22 +47,23 @@ namespace fan {
 		m_editorValues.Get("renderer_position_x", windowPosition.x);
 		m_editorValues.Get("renderer_position_y", windowPosition.y);
 
+		// Set some values
 		m_editorGrid.isVisible = true;
 		m_editorGrid.color = vk::Color(0.161f, 0.290f, 0.8f, 0.478f);
 		m_editorGrid.linesCount = 10;
 		m_editorGrid.spacing = 1.f;		
 
+		// Initialize editor components
 		ms_engine = this;
+		m_mainMenuBar =			new editor::MainMenuBar();
+		m_renderWindow =		new editor::RenderWindow();
+		m_sceneWindow =			new editor::SceneWindow();
+		m_inspectorWindow =		new editor::InspectorWindow();
+		m_preferencesWindow =	new editor::PreferencesWindow();
+		m_renderer =			new vk::Renderer(windowSize, windowPosition);
+		m_scene =				new scene::Scene("mainScene");
 
-		m_mainMenuBar = new editor::MainMenuBar();
-		m_renderWindow = new editor::RenderWindow();
-		m_sceneWindow = new editor::SceneWindow();
-		m_inspectorWindow = new editor::InspectorWindow();
-		m_preferencesWindow = new editor::PreferencesWindow();
-
-		m_renderer = new vk::Renderer(windowSize, windowPosition);
-		m_scene = new scene::Scene("mainScene");
-
+		// Editor Camera
 		scene::Gameobject * cameraGameobject = m_scene->CreateGameobject("editor_camera");
 		cameraGameobject->SetRemovable(false);
 		scene::Transform * camTrans = cameraGameobject->AddComponent<scene::Transform>();
@@ -72,16 +74,15 @@ namespace fan {
 		scene::FPSCamera * editorCamera = cameraGameobject->AddComponent<scene::FPSCamera>();
 		editorCamera->SetRemovable(false);
 
+		// Sample cube
 		scene::Gameobject * cube = m_scene->CreateGameobject("cube");
 		cube->AddComponent<scene::Transform>();
 		scene::Mesh * mesh = cube->AddComponent<scene::Mesh>();
-
 		util::FBXImporter importer;
 		importer.LoadScene("content/models/test/cube.fbx");
 		if (importer.GetMesh(*mesh) == true) {
 			m_renderer->AddMesh(mesh);
 		}
-
 		cube->GetComponent<scene::Transform>();		
 
 
@@ -258,13 +259,50 @@ namespace fan {
 	//================================================================================================================================
 	//================================================================================================================================
 	void Engine::ManageSelection() {
+		bool mouseCaptured = ImGui::GetIO().WantCaptureMouse;;
+
+
 		// Translation gizmo on selected gameobject
-		if (m_selectedGameobject != nullptr && m_selectedGameobject != m_editorCamera->GetGameobject() ) {
+		if ( m_selectedGameobject != nullptr && m_selectedGameobject != m_editorCamera->GetGameobject()) {
 			scene::Transform * transform = m_selectedGameobject->GetComponent< scene::Transform >();
-			const btVector3 newPosition = DrawMoveGizmo( btTransform( btQuaternion(0,0,0), transform->GetPosition()), (size_t)this);
-			transform->SetPosition(newPosition);
-			
+			btVector3 newPosition;
+			if ( DrawMoveGizmo(btTransform(btQuaternion(0, 0, 0), transform->GetPosition()), (size_t)this, newPosition) ) {
+				transform->SetPosition(newPosition);
+				mouseCaptured = true;
+			} 
 		}
+
+		// Mouse selection
+		if (mouseCaptured == false && Mouse::GetButtonPressed(Mouse::button0)) {
+
+			const btVector3 cameraOrigin	= m_editorCamera->GetGameobject()->GetComponent<scene::Transform>()->GetPosition();;
+			const shape::Ray ray			= m_editorCamera->ScreenPosToRay(Mouse::GetScreenSpacePosition());
+			const std::vector<scene::Gameobject *>  & gameobjects	= m_scene->GetGameObjects();
+
+			// Raycast on all the gameobjects
+			scene::Gameobject * closestGameobject = nullptr;
+			float closestDistance2 = std::numeric_limits<float>::max();
+			for (int gameobjectIndex = 0; gameobjectIndex < gameobjects.size(); gameobjectIndex++) {
+				scene::Gameobject * gameobject = gameobjects[gameobjectIndex];
+
+				if (gameobject == m_editorCamera->GetGameobject()) {
+					continue;
+				}
+
+				const shape::AABB & aabb = gameobject->GetAABB();
+				btVector3 intersection;
+				if (aabb.RayCast(ray.origin, ray.direction, intersection) == true) {
+					const float distance2 = intersection.distance2(cameraOrigin);
+					if (distance2 < closestDistance2) {
+						closestDistance2 = distance2;
+						closestGameobject = gameobject;
+					}
+				}
+			}
+			SetSelectedGameobject(closestGameobject);
+		}
+
+
 	}
 
 	//================================================================================================================================
@@ -281,7 +319,7 @@ namespace fan {
 	// Returns the new position of the move gizmo
 	// Caller must provide a unique ID to allow proper caching of the user input data
 	//================================================================================================================================
-	btVector3 Engine::DrawMoveGizmo(const btTransform _transform, const size_t _uniqueID ) {
+	bool Engine::DrawMoveGizmo(const btTransform _transform, const size_t _uniqueID, btVector3& _newPosition){
 		
 		GizmoCacheData & cacheData = m_gizmoCacheData[_uniqueID];
 		const btVector3 origin = _transform.getOrigin();
@@ -295,7 +333,7 @@ namespace fan {
 		,btTransform(btQuaternion(0, btRadians(90), 0), size*axisDirection[2])
 		};
 
-		btVector3 newPosition = _transform.getOrigin();
+		_newPosition = _transform.getOrigin();
 		for (int axisIndex = 0; axisIndex < 3 ; axisIndex++) 	{
 			const vk::Color opaqueColor(axisDirection[axisIndex].x(), axisDirection[axisIndex].y(), axisDirection[axisIndex].z(), 1.f);
 			
@@ -346,10 +384,10 @@ namespace fan {
 					cacheData.offset = projectionOnAxis - _transform.getOrigin();
 				}
 
-				newPosition = projectionOnAxis - cacheData.offset;
+				_newPosition = projectionOnAxis - cacheData.offset;
 			}
 		}
-		return newPosition;
+		return cacheData.pressed;
 	}
 
 }
