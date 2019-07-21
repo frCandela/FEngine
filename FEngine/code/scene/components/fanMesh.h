@@ -14,6 +14,7 @@ namespace scene
 	class Mesh : public Component
 	{
 	public:
+		Mesh();
 		Mesh(Gameobject * _gameobject);
 		~Mesh();
 		

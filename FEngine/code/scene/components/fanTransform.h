@@ -7,6 +7,7 @@ namespace scene
 	class Transform : public Component
 	{
 	public:
+		Transform();
 		Transform(Gameobject * _gameobject);
 
 		void SetPosition(btVector3 _newPosition);
@@ -30,7 +31,6 @@ namespace scene
 		const char *	GetName() const			override { return s_name; }
 		uint32_t		GetType()	  const		override { return s_type; }
 		Component *		NewInstance(Gameobject * _gameobject) const override { return new Transform(_gameobject); }
-
 
 		// ISerializable
 		void Load(std::istream& _in) override;

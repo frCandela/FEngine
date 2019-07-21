@@ -9,6 +9,7 @@ namespace scene
 	class Camera : public Component
 	{
 	public:
+		Camera();
 		Camera::Camera(Gameobject * _gameobject);
 
 		glm::mat4 GetView() const;

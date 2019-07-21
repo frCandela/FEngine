@@ -10,7 +10,6 @@ namespace scene
 	public:
 		friend class Gameobject;
 
-		Component(Gameobject * _gameobject);
 		virtual ~Component() {}
 		virtual bool			IsActor()								const { return false; }
 		virtual bool			IsUnique()								const = 0;		// Returns true if there is only one instance of this type of component per GameObject, false otherwise
@@ -31,7 +30,7 @@ namespace scene
 		template<typename ComponentType >
 		static uint32_t Register(const uint32_t _id) {
 			assert(Components().find(_id) == Components().end()); // Component id already defined
-			Components()[_id] = new ComponentType(nullptr);
+			Components()[_id] = new ComponentType();
 			return _id;
 		}
 
@@ -52,5 +51,10 @@ namespace scene
 		template<typename ComponentType >
 		static const ComponentType * GetSample() { return static_cast< const ComponentType*>(Components()[ComponentType::s_type]); }
 		static std::map<uint32_t, const Component * > & Components();
+
+	protected:
+		// Friend class Gameobject is the factory of components
+		Component();	
+		Component(Gameobject * _gameobject);
 	};
 }

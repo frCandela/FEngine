@@ -10,6 +10,7 @@ namespace scene
 	class FPSCamera : public Actor
 	{
 	public:
+		FPSCamera();
 		FPSCamera(Gameobject * _gameobject);
 		virtual ~FPSCamera();
 
