@@ -29,7 +29,7 @@ namespace scene
 		bool			IsUnique()		const override { return true; }
 		const char *	GetName()		const override { return s_name; }
 		uint32_t		GetType()		const override { return s_type; }
-		Component *		NewInstance(Gameobject * _gameobject) const override { return new Camera(_gameobject); }
+
 
 		// ISerializable
 		void Load(std::istream& _in) override;
@@ -42,5 +42,8 @@ namespace scene
 		float m_aspectRatio;
 		float m_nearDistance;
 		float m_farDistance;
+
+	protected:
+		Component *		NewInstance(Gameobject * _gameobject) const override { return new Camera(_gameobject); }
 	};
 }

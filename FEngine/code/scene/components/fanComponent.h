@@ -14,7 +14,6 @@ namespace scene
 		virtual bool			IsActor()								const { return false; }
 		virtual bool			IsUnique()								const = 0;		// Returns true if there is only one instance of this type of component per GameObject, false otherwise
 		virtual const char *	GetName()								const = 0;
-		virtual Component *		NewInstance( Gameobject * _gameobject )	const = 0;
 		virtual uint32_t		GetType()								const = 0;
 
 		virtual void Delete() { delete this; };
@@ -45,7 +44,7 @@ namespace scene
 		bool m_isBeingDeleted;
 		bool m_isRemovable;
 
-		static Component * NewInstance(const uint32_t _id, Gameobject * _gameobject) {
+		static Component * NewInstanceFromID(const uint32_t _id, Gameobject * _gameobject) {
 			return Components()[_id]->NewInstance(_gameobject);
 		}
 		template<typename ComponentType >
@@ -56,5 +55,6 @@ namespace scene
 		// Friend class Gameobject is the factory of components
 		Component();	
 		Component(Gameobject * _gameobject);
+		virtual Component *		NewInstance(Gameobject * _gameobject)	const = 0;
 	};
 }

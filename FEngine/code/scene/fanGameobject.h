@@ -61,6 +61,7 @@ namespace scene
 
 		std::vector<Component*> m_components;
 
+		void AddComponent( scene::Component * _component );
 		void OnComponentModified( scene::Component * _component );
 		void OnComponentDeleted( scene::Component * _component);
 
@@ -81,12 +82,8 @@ namespace scene
 		if (sample->IsUnique() && GetComponent<ComponentType>() != nullptr) {
 			return nullptr;
 		}
-
 		ComponentType* componentType = new ComponentType(this);
-
-		m_components.push_back(componentType);
-		onComponentCreated.Emmit(componentType);
-		onComponentModified.Emmit(componentType);
+		AddComponent(componentType);
 
 		return componentType;
 	}

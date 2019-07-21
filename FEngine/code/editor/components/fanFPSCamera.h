@@ -17,7 +17,6 @@ namespace scene
 		bool			IsUnique() const	override { return true; }
 		const char *	GetName() const		override { return s_name; }
 		uint32_t		GetType()	  const	override { return s_type; }
-		Component *		NewInstance(Gameobject * _gameobject) const override { return new FPSCamera(_gameobject); }
 
 		void Start() override;
 		void Update( const float _delta ) override;
@@ -43,5 +42,8 @@ namespace scene
 
 		scene::Transform * m_transform;
 		scene::Camera * m_camera;
+
+	protected:
+		Component *		NewInstance(Gameobject * _gameobject) const override { return new FPSCamera(_gameobject); }
 	};
 }

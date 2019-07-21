@@ -1,15 +1,144 @@
 gameobject cube
-	transform
+	transform 3677561414
 		3.578 11.123 11.758
 		0.0551513 0.0464972 0.049692 0.996156
-		1 1 1
-	end
-	mesh
+		1 2 3
+	mesh 53839703
 		content\models\test\the_beauty.fbx
-	end
-	camera
+	camera 2400549075
 		68
 		0.012
 		2350
-	end
+end
+gameobject toto
+	transform 3677561414
+		1.4 3.2 2
+		0.0330907 0.014099 0.00389757 0.999345
+		-1.8 0.6 10.4
+	mesh 53839703
+		.\content\models\test\cone.fbx
+	camera 2400549075
+		110
+		0.01
+		1000
+end
+gameobject toto
+	transform 3677561414
+		1.4 3.2 2
+		0.0330907 0.014099 0.00389757 0.999345
+		-1.8 0.6 10.4
+	mesh 53839703
+		.\content\models\test\cone.fbx
+	camera 2400549075
+		110
+		0.01
+		1000
+end
+gameobject toto
+	transform 3677561414
+		1.4 3.2 2
+		0.0330907 0.014099 0.00389757 0.999345
+		-1.8 0.6 10.4
+	mesh 53839703
+		.\content\models\test\cone.fbx
+	camera 2400549075
+		110
+		0.01
+		1000
+end
+gameobject toto
+	transform 3677561414
+		1.4 3.2 2
+		0.0330907 0.014099 0.00389757 0.999345
+		-1.8 0.6 10.4
+	mesh 53839703
+		.\content\models\test\cone.fbx
+	camera 2400549075
+		110
+		0.01
+		1000
+end
+gameobject toto
+	transform 3677561414
+		1.4 3.2 2
+		0.0330907 0.014099 0.00389757 0.999345
+		-1.8 0.6 10.4
+	mesh 53839703
+		.\content\models\test\cone.fbx
+	camera 2400549075
+		110
+		0.01
+		1000
+end
+gameobject toto
+	transform 3677561414
+		1.4 3.2 2
+		0.0330907 0.014099 0.00389757 0.999345
+		-1.8 0.6 10.4
+	mesh 53839703
+		.\content\models\test\cone.fbx
+	camera 2400549075
+		110
+		0.01
+		1000
+end
+gameobject toto
+	transform 3677561414
+		1.4 3.2 2
+		0.0330907 0.014099 0.00389757 0.999345
+		-1.8 0.6 10.4
+	mesh 53839703
+		.\content\models\test\cone.fbx
+	camera 2400549075
+		110
+		0.01
+		1000
+end
+gameobject toto
+	transform 3677561414
+		1.4 3.2 2
+		0.0330907 0.014099 0.00389757 0.999345
+		-1.8 0.6 10.4
+	mesh 53839703
+		.\content\models\test\cone.fbx
+	camera 2400549075
+		110
+		0.01
+		1000
+end
+gameobject toto
+	transform 3677561414
+		1.4 3.2 2
+		0.0330907 0.014099 0.00389757 0.999345
+		-1.8 0.6 10.4
+	mesh 53839703
+		.\content\models\test\cone.fbx
+	camera 2400549075
+		110
+		0.01
+		1000
+end
+gameobject toto
+	transform 3677561414
+		1.4 3.2 2
+		0.0330907 0.014099 0.00389757 0.999345
+		-1.8 0.6 10.4
+	mesh 53839703
+		.\content\models\test\cone.fbx
+	camera 2400549075
+		110
+		0.01
+		1000
+end
+gameobject toto
+	transform 3677561414
+		1.4 3.2 2
+		0.0330907 0.014099 0.00389757 0.999345
+		-1.8 0.6 10.4
+	mesh 53839703
+		.\content\models\test\cone.fbx
+	camera 2400549075
+		110
+		0.01
+		1000
 end

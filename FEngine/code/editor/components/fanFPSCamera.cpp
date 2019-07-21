@@ -129,10 +129,8 @@ namespace scene
 	//================================================================================================================================
 	//================================================================================================================================
 	void FPSCamera::Save(std::ostream& _out) {
-		_out << '\t' << GetName() << std::endl;
 		_out << "\t\t" << m_xySensitivity[0] << " " << m_xySensitivity[1] << std::endl;
 		_out << "\t\t" << m_speed << std::endl;
 		_out << "\t\t" << m_speedMultiplier << std::endl;
-		_out << "\tend" << std::endl;
 	}
 }

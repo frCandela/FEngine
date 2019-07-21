@@ -90,20 +90,7 @@ namespace scene {
 		m_gameObjectstoDelete.clear();
 	}
 
-	//================================================================================================================================
-	//================================================================================================================================
-	void Scene::SaveTo(const std::string _path) const {
-		std::cout << "saving scene: " << m_name << std::endl;
-		std::ofstream outStream(_path);
-		for (int gameobjectIndex = 0; gameobjectIndex < m_gameObjects.size(); gameobjectIndex++) {
-			scene::Gameobject * gameobject = m_gameObjects[gameobjectIndex];
-			if (gameobject->HasFlag(scene::Gameobject::NOT_SAVED) == false ){
-				gameobject->Save(outStream);
-			}
-		}
-		outStream.close();
-	}
-	
+
 	//================================================================================================================================
 	//================================================================================================================================
 	void Scene::OnComponentCreated( scene::Component * _component) {
@@ -132,6 +119,20 @@ namespace scene {
 
 	//================================================================================================================================
 	//================================================================================================================================
+	void Scene::SaveTo(const std::string _path) const {
+		std::cout << "saving scene: " << m_name << std::endl;
+		std::ofstream outStream(_path);
+		for (int gameobjectIndex = 0; gameobjectIndex < m_gameObjects.size(); gameobjectIndex++) {
+			scene::Gameobject * gameobject = m_gameObjects[gameobjectIndex];
+			if (gameobject->HasFlag(scene::Gameobject::NOT_SAVED) == false) {
+				gameobject->Save(outStream);
+			}
+		}
+		outStream.close();
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
 	void Scene::LoadFrom(const std::string _path) {
 		std::cout << "loading scene: " << _path << std::endl;
 		std::ifstream inStream(_path);
@@ -140,30 +141,9 @@ namespace scene {
 		while (inStream.eof() == false) {
 			if (inputString == "gameobject") {
 				inStream >> inputString; // Gameobject name
-				scene::Gameobject * gameobject = CreateGameobject(inputString);
-				inStream >> inputString;
-				while (inputString != "end") { // Go through components						
-					if (inputString == scene::Transform::s_name) {
-						scene::Transform * transform = gameobject->AddComponent<scene::Transform>();
-						transform->Load(inStream);
-					}
-					else if (inputString == scene::Mesh::s_name) {
-						scene::Mesh * mesh = gameobject->AddComponent<scene::Mesh>();
-						mesh->Load(inStream);
-					}
-					else if (inputString == scene::Camera::s_name) {
-						scene::Camera * camera = gameobject->AddComponent<scene::Camera>();
-						camera->Load(inStream);
-					}
-					else {
-						std::cout << "component not found: " << inputString << std::endl;
-						while (inputString != "end") {
-							inStream >> inputString;
-							std::cout << "unknown " << inputString << std::endl;
-						}
-					}
-					inStream >> inputString;
-				}
+				scene::Gameobject * gameobject = CreateGameobject(inputString);	
+				std::cout << "Gameobject: " << inputString << std::endl;
+				gameobject->Load(inStream);
 			}
 			else {
 				std::cout << "fail " << inputString << std::endl;

@@ -45,6 +45,14 @@ namespace scene
 		}
 		return false;
 	}
+	
+	//================================================================================================================================
+	//================================================================================================================================
+	void Gameobject::AddComponent(scene::Component * _component) {
+		m_components.push_back(_component);
+		onComponentCreated.Emmit(_component);
+		onComponentModified.Emmit(_component);
+	}
 
 	//================================================================================================================================
 	//================================================================================================================================
@@ -79,7 +87,22 @@ namespace scene
 	//================================================================================================================================
 	//================================================================================================================================
 	void Gameobject::Load(std::istream& _in) {
-		(void)_in;
+		std::string buffer;
+		_in >> buffer;
+		while (buffer != "end") {			
+
+			// Get component id
+			uint32_t componentID;
+			_in >> componentID;
+
+			std::cout << "\tComponent: " << buffer << std::endl;
+
+			// instanciate component
+			scene::Component * component = Component::NewInstanceFromID(componentID, this);
+			component->Load(_in);
+			AddComponent(component);
+			_in >> buffer; // skip component name
+		}
 	}
 
 	//================================================================================================================================
@@ -87,6 +110,8 @@ namespace scene
 	void Gameobject::Save(std::ostream& _out) {
 		_out << "gameobject " << m_name << std::endl;
 		for (int componentIndex = 0; componentIndex < m_components.size() ; componentIndex++) {
+			_out << "\t" << m_components[componentIndex]->GetName() << " ";
+			_out << m_components[componentIndex]->GetType() << std::endl;
 			m_components[componentIndex]->Save(_out);
 		}
 		_out << "end" << std::endl;

@@ -30,10 +30,6 @@ namespace scene
 		bool			IsUnique()	const override { return true; }
 		const char *	GetName()	const override { return s_name; }
 		uint32_t		GetType()	const override { return s_type; }
-		Component *		NewInstance(Gameobject * _gameobject) const override { return new Mesh(_gameobject); }
-
-
-
 
 		// ISerializable
 		void Load(std::istream& _in) override;
@@ -41,9 +37,13 @@ namespace scene
 
 		const static char * s_name;
 		static const uint32_t s_type;
+
 	private:
 		std::string m_path;
 		std::vector<vk::Vertex> m_vertices;
 		std::vector<uint32_t> m_indices;
+
+	protected:
+		Component *		NewInstance(Gameobject * _gameobject) const override { return new Mesh(_gameobject); }
 	};
 }
