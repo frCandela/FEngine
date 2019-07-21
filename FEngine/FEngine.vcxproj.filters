@@ -203,6 +203,9 @@
     <ClCompile Include="code\util\shapes\fanAABB.cpp">
       <Filter>code\util\shapes</Filter>
     </ClCompile>
+    <ClCompile Include="code\util\fanISerializable.cpp">
+      <Filter>code\util</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="code\vulkan\vkRenderer.h">
@@ -792,6 +795,15 @@
     </ClInclude>
     <ClInclude Include="code\util\shapes\fanAABB.h">
       <Filter>code\util\shapes</Filter>
+    </ClInclude>
+    <ClInclude Include="code\util\fanISerializable.h">
+      <Filter>code\util</Filter>
+    </ClInclude>
+    <ClInclude Include="deps\nlohmann_json.h">
+      <Filter>code\deps</Filter>
+    </ClInclude>
+    <ClInclude Include="code\util\fanHash.h">
+      <Filter>code\util</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

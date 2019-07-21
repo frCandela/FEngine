@@ -36,6 +36,7 @@ namespace vk {
 
 		bool WindowIsOpen();
 		void DrawFrame();
+		void WaitIdle();
 
 		static Renderer & GetRenderer() {	return * ms_globalRenderer; }
 

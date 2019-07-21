@@ -108,6 +108,7 @@
     <ClCompile Include="code\util\fanUtil.cpp" />
     <ClCompile Include="code\util\fanVector2.cpp" />
     <ClCompile Include="code\util\fbx\fanFbxImporter.cpp" />
+    <ClCompile Include="code\util\fanISerializable.cpp" />
     <ClCompile Include="code\util\shapes\fanAABB.cpp" />
     <ClCompile Include="code\util\shapes\fanCube.cpp" />
     <ClCompile Include="code\util\shapes\fanPlane.cpp" />
@@ -155,6 +156,7 @@
     <ClInclude Include="code\scene\components\fanTransform.h" />
     <ClInclude Include="code\scene\fanGameobject.h" />
     <ClInclude Include="code\scene\fanScene.h" />
+    <ClInclude Include="code\util\fanHash.h" />
     <ClInclude Include="code\util\fanImguiUtil.h" />
     <ClInclude Include="code\util\fanSerializedValues.h" />
     <ClInclude Include="code\util\fanSignal.h" />
@@ -164,6 +166,7 @@
     <ClInclude Include="code\util\fanUtil.h" />
     <ClInclude Include="code\util\fanVector2.h" />
     <ClInclude Include="code\util\fbx\fanFbxImporter.h" />
+    <ClInclude Include="code\util\fanISerializable.h" />
     <ClInclude Include="code\util\shapes\fanAABB.h" />
     <ClInclude Include="code\util\shapes\fanCube.h" />
     <ClInclude Include="code\util\shapes\fanPlane.h" />
@@ -335,6 +338,7 @@
     <ClInclude Include="deps\glm\vec3.hpp" />
     <ClInclude Include="deps\glm\vec4.hpp" />
     <ClInclude Include="deps\glm\vector_relational.hpp" />
+    <ClInclude Include="deps\nlohmann_json.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="shaders\debugLines.frag" />

@@ -2,6 +2,11 @@
 
 #include "scene/fanScene.h"
 #include "scene/fanGameobject.h"
+#include "scene/components/fanComponent.h"
+#include "scene/components/fanTransform.h"
+#include "scene/components/fanCamera.h"
+#include "scene/components/fanMesh.h"
+#include "scene/components/fanActor.h"
 #include "util/fanSignal.h"
 #include "fanEngine.h"
 
@@ -17,8 +22,19 @@ namespace scene {
 
 	//================================================================================================================================
 	//================================================================================================================================
+	Scene::~Scene() {
+		for (int gameobjectIndex = 0; gameobjectIndex < m_gameObjects.size() ; gameobjectIndex++) {
+			delete m_gameObjects[gameobjectIndex];
+		}
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
 	Gameobject *	Scene::CreateGameobject(const std::string _name) {
 		Gameobject* gameObject = new Gameobject(_name);
+
+		gameObject->onComponentCreated.Connect(&Scene::OnComponentCreated, this);
+		gameObject->onComponentDeleted.Connect(&Scene::OnComponentDeleted, this);
 
 		m_gameObjects.push_back(gameObject);
 		onGameobjectCreated.Emmit(gameObject);
@@ -32,6 +48,24 @@ namespace scene {
 		m_gameObjectstoDelete.push_back(_gameobject);
 	}
 	
+	//================================================================================================================================
+	//================================================================================================================================
+	void Scene::BeginFrame() {
+		for (scene::Actor *  actor : m_startingActors) {
+			actor->Start();
+			m_activeActors.insert(actor);
+		}
+		m_startingActors.clear();
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
+	void Scene::Update(const float _delta) {
+		for (scene::Actor * actor : m_activeActors) {
+			actor->Update(_delta);
+		}
+	}
+
 	//================================================================================================================================
 	//================================================================================================================================
 	void Scene::EndFrame() {
@@ -54,6 +88,89 @@ namespace scene {
 			}
 		}
 		m_gameObjectstoDelete.clear();
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
+	void Scene::SaveTo(const std::string _path) const {
+		std::cout << "saving scene: " << m_name << std::endl;
+		std::ofstream outStream(_path);
+		for (int gameobjectIndex = 0; gameobjectIndex < m_gameObjects.size(); gameobjectIndex++) {
+			scene::Gameobject * gameobject = m_gameObjects[gameobjectIndex];
+			if (gameobject->HasFlag(scene::Gameobject::NOT_SAVED) == false ){
+				gameobject->Save(outStream);
+			}
+		}
+		outStream.close();
+	}
+	
+	//================================================================================================================================
+	//================================================================================================================================
+	void Scene::OnComponentCreated( scene::Component * _component) {
+
+		if (_component->IsActor()) {
+			scene::Actor * actor = static_cast<scene::Actor*>(_component);
+
+			assert(m_activeActors.find(actor) == m_activeActors.end());
+			assert(m_startingActors.find(actor) == m_startingActors.end());
+
+			m_startingActors.insert(actor);			
+		}
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
+	void Scene::OnComponentDeleted(scene::Component * _component) {
+		if (_component->IsActor()) {
+			scene::Actor * actor = static_cast<scene::Actor*>(_component);
+			auto it = m_activeActors.find(actor);
+			assert(it != m_activeActors.end());
+
+			m_activeActors.erase(actor);
+		}
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
+	void Scene::LoadFrom(const std::string _path) {
+		std::cout << "loading scene: " << _path << std::endl;
+		std::ifstream inStream(_path);
+		std::string inputString = "";
+		inStream >> inputString;
+		while (inStream.eof() == false) {
+			if (inputString == "gameobject") {
+				inStream >> inputString; // Gameobject name
+				scene::Gameobject * gameobject = CreateGameobject(inputString);
+				inStream >> inputString;
+				while (inputString != "end") { // Go through components						
+					if (inputString == scene::Transform::s_name) {
+						scene::Transform * transform = gameobject->AddComponent<scene::Transform>();
+						transform->Load(inStream);
+					}
+					else if (inputString == scene::Mesh::s_name) {
+						scene::Mesh * mesh = gameobject->AddComponent<scene::Mesh>();
+						mesh->Load(inStream);
+					}
+					else if (inputString == scene::Camera::s_name) {
+						scene::Camera * camera = gameobject->AddComponent<scene::Camera>();
+						camera->Load(inStream);
+					}
+					else {
+						std::cout << "component not found: " << inputString << std::endl;
+						while (inputString != "end") {
+							inStream >> inputString;
+							std::cout << "unknown " << inputString << std::endl;
+						}
+					}
+					inStream >> inputString;
+				}
+			}
+			else {
+				std::cout << "fail " << inputString << std::endl;
+			}
+			inStream >> inputString;
+		}
+		inStream.close();
 	}
 
 }

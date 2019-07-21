@@ -11,23 +11,33 @@
 
 namespace scene
 {
+	const char * FPSCamera::s_name = "fps_camera";
+	const uint32_t FPSCamera::s_type = Component::Register<FPSCamera>(SSID("fps_camera"));
+
 	//================================================================================================================================
 	//================================================================================================================================
 	FPSCamera::FPSCamera(Gameobject * _gameobject) :
 		Actor(_gameobject)
-		, m_transform(*GetGameobject()->GetComponent<scene::Transform>())
-		, m_camera(*GetGameobject()->GetComponent<scene::Camera>())
-		, m_speed( 10.f)
-		, m_speedMultiplier( 3.f)
-		, m_xySensitivity ( btVector2(0.005f, 0.005f) ){
+	{
+		m_speed = 10.f;
+		m_speedMultiplier = 3.f;
+		m_xySensitivity = btVector2(0.005f, 0.005f);
+		if (_gameobject) {
+			m_transform = GetGameobject()->GetComponent<scene::Transform>();
+			m_camera = GetGameobject()->GetComponent<scene::Camera>();
+		}
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
+	FPSCamera::~FPSCamera() {
 
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
 	void FPSCamera::Start() {
-		std::cout << "Start" << std::endl;		
-		
+		std::cout << "Start" << std::endl;				
 	}
 	
 	//================================================================================================================================
@@ -41,7 +51,7 @@ namespace scene
 			Mouse::LockCursor(false);
 		}
 
-		btVector3 position = m_transform.GetPosition();
+		btVector3 position = m_transform->GetPosition();
 		
 		// Calculates speed
 		float realSpeed = m_speed;
@@ -55,7 +65,7 @@ namespace scene
 			rightAxis += 1.f;
 		else if (Keyboard::IsKeyDown(GLFW_KEY_A))
 			rightAxis -= 1.f;
-		position += _delta * realSpeed * rightAxis * m_transform.Right();
+		position += _delta * realSpeed * rightAxis * m_transform->Right();
 
 
 		// Camera goes up
@@ -64,7 +74,7 @@ namespace scene
 			upAxis += 1.f;
 		else if (Keyboard::IsKeyDown(GLFW_KEY_Q))
 			upAxis -= 1.f;
-		position += _delta * realSpeed * upAxis * m_transform.Up();
+		position += _delta * realSpeed * upAxis * m_transform->Up();
 
 		// Camera goes forward
 		float forwardAxis = 0.f;
@@ -72,7 +82,7 @@ namespace scene
 			forwardAxis += 1.f;
 		else if (Keyboard::IsKeyDown(GLFW_KEY_S))
 			forwardAxis -= 1.f;
-		position += _delta * realSpeed * forwardAxis * m_transform.Forward();
+		position += _delta * realSpeed * forwardAxis * m_transform->Forward();
 
 		// Camera rotation
 		const btVector2 mouseDelta = Mouse::GetDelta();
@@ -80,11 +90,11 @@ namespace scene
 		if (Mouse::GetButtonDown(Mouse::button1)) {
 			// Rotation depending on mouse movement
 			const btQuaternion rotationY(btVector3::Up(), -m_xySensitivity.x() * mouseDelta.x() );
-			const btQuaternion rotationX(m_transform.Right(), -m_xySensitivity.y() *mouseDelta.y() );
-			m_transform.SetRotationQuat( rotationX*rotationY* m_transform.GetRotationQuat());
+			const btQuaternion rotationX(m_transform->Right(), -m_xySensitivity.y() *mouseDelta.y() );
+			m_transform->SetRotationQuat( rotationX*rotationY* m_transform->GetRotationQuat());
 
 			// Remove roll
-			const btVector3 relativeRight = m_transform.Right();
+			const btVector3 relativeRight = m_transform->Right();
 			const btVector3 rightNoRoll(relativeRight.x(),0, relativeRight.z());
 			const btVector3 axis = relativeRight.cross(rightNoRoll);
 			const float angle = rightNoRoll.angle(relativeRight);
@@ -92,12 +102,12 @@ namespace scene
 
 				const btQuaternion rot(axis, angle);
 
-				m_transform.SetRotationQuat(rot * m_transform.GetRotationQuat());
+				m_transform->SetRotationQuat(rot * m_transform->GetRotationQuat());
 			}
 		}
-		m_transform.SetPosition(position);
+		m_transform->SetPosition(position);
 
-		const shape::Ray ray =  m_camera.ScreenPosToRay(btVector2(0.9f, 0.9f));
+		const shape::Ray ray =  m_camera->ScreenPosToRay(btVector2(0.9f, 0.9f));
 		const float size = 0.002f;
 		btVector3 offset = ray.origin + 0.1f*ray.direction;
 
@@ -108,7 +118,17 @@ namespace scene
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void FPSCamera::Stop() {
-		std::cout << "Stop" << std::endl;
+	void FPSCamera::Load(std::istream& _in) {
+		(void)_in;
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
+	void FPSCamera::Save(std::ostream& _out) {
+		_out << '\t' << GetName() << std::endl;
+		_out << "\t\t" << m_xySensitivity[0] << " " << m_xySensitivity[1] << std::endl;
+		_out << "\t\t" << m_speed << std::endl;
+		_out << "\t\t" << m_speedMultiplier << std::endl;
+		_out << "\tend" << std::endl;
 	}
 }

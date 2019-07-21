@@ -11,13 +11,15 @@ namespace scene
 	{
 	public:
 		FPSCamera(Gameobject * _gameobject);
+		virtual ~FPSCamera();
 
-		bool IsUnique() const override { return true; }
-		std::string GetName() const override { return "fps camera"; }
+		bool			IsUnique() const	override { return true; }
+		const char *	GetName() const		override { return s_name; }
+		uint32_t		GetType()	  const	override { return s_type; }
+		Component *		NewInstance(Gameobject * _gameobject) const override { return new FPSCamera(_gameobject); }
 
 		void Start() override;
 		void Update( const float _delta ) override;
-		void Stop() override;
 
 		// Getters
 		float GetSpeed() const				{ return m_speed; }
@@ -27,12 +29,18 @@ namespace scene
 		void SetSpeedMultiplier( const float _speedMultiplier)  { m_speedMultiplier= _speedMultiplier; }
 		void SetXYSensitivity( const btVector2 _sensitivity)		{ m_xySensitivity= _sensitivity; }
 
+		// ISerializable
+		void Load(std::istream& _in) override;
+		void Save(std::ostream& _out) override;
+
+		const static char * s_name;
+		static const uint32_t s_type;
 	private:
 		float m_speed;
 		float m_speedMultiplier;
 		btVector2 m_xySensitivity;
 
-		scene::Transform & m_transform;
-		scene::Camera & m_camera;
+		scene::Transform * m_transform;
+		scene::Camera * m_camera;
 	};
 }

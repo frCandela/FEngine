@@ -1,18 +1,24 @@
 #include "fanIncludes.h"
 
 #include "scene/components/fanTransform.h"
+#include "scene/components/fanComponent.h"
 #include "scene/fanGameobject.h"
 #include "util/fanSignal.h"
 
 namespace scene
 {
+	const char * Transform::s_name = "transform";
+	const uint32_t Transform::s_type = Component::Register<Transform>(SSID("transform"));
+
 	//================================================================================================================================
 	//================================================================================================================================
 	Transform::Transform(Gameobject * _gameobject) : 
-		Component(_gameobject)
-		, m_rotation( btQuaternion::getIdentity())
-		, m_position( btVector3(0, 0, 0))
-		, m_scale	( btVector3(1, 1, 1)) {
+		Component(_gameobject) 
+	{
+		m_rotation	= btQuaternion::getIdentity();
+		m_position	= btVector3(0, 0, 0);
+		m_scale		= btVector3(1, 1, 1);
+
 		SetRemovable(false);
 	}
 
@@ -104,5 +110,25 @@ namespace scene
 	btVector3 Transform::Up() const {
 		btTransform t(m_rotation, btVector3(0, 0, 0));
 		return t * btVector3::Up();
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
+	void Transform::Load(std::istream& _in) {
+		std::string end;
+		_in >> m_position[0];		_in >> m_position[1];		_in >> m_position[2];
+		_in >> m_rotation[0];		_in >> m_rotation[1];		_in >> m_rotation[2];	_in >> m_rotation[3];
+		_in >> m_scale[0];			_in >> m_scale[1];			_in >> m_scale[2];
+		_in >> end;
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
+	void Transform::Save(std::ostream& _out) {
+		_out << '\t' << GetName() << std::endl;
+		_out << "\t\t" << m_position[0] << " " << m_position[1] << " " << m_position[2] << std::endl;
+		_out << "\t\t" << m_rotation[0] << " " << m_rotation[1] << " " << m_rotation[2] << " " << m_rotation[3] << std::endl;
+		_out << "\t\t" << m_scale[0] << " " << m_scale[1] << " " << m_scale[2] << std::endl;
+		_out << "\tend" << std::endl;
 	}
 }

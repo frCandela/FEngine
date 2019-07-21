@@ -8,7 +8,6 @@
 #include "scene/components/fanMesh.h"
 #include "editor/components/fanFPSCamera.h"
 #include "util/fanUtil.h"
-#include "util/fbx/fanFbxImporter.h"
 #include "util/fanImguiUtil.h"
 #include "util/fanSignal.h"
 #include "vulkan/vkRenderer.h"
@@ -140,18 +139,15 @@ namespace editor {
 	//================================================================================================================================
 	//================================================================================================================================
 	void InspectorWindow::DrawComponent(scene::Component & _component) {
-		const std::type_info& typeInfo = typeid(_component);
-
-		if( typeInfo == typeid(scene::Transform)){
+		if(_component.IsType<scene::Transform>()){
 			DrawTransform(static_cast<scene::Transform &>(_component));
-		} else if (typeInfo == typeid(scene::Camera)) {
+		} else if (_component.IsType < scene::Camera>()) {
 			DrawCamera(static_cast<scene::Camera &>(_component));
-		} else if (typeInfo == typeid(scene::Mesh)) {
+		} else if (_component.IsType < scene::Mesh > ()) {
 			DrawMesh(static_cast<scene::Mesh &>(_component));
-		} else if (typeInfo == typeid(scene::FPSCamera)) {
+		} else if (_component.IsType < scene::FPSCamera>()) {
 			DrawFPSCamera(static_cast<scene::FPSCamera &>(_component));
-		}
-		else {
+		} else {
 			ImGui::Text( (std::string("Component not supported: ") + std::string(_component.GetName())).c_str());
 		}
 	}
@@ -159,7 +155,7 @@ namespace editor {
 	//================================================================================================================================
 	//================================================================================================================================
 	void InspectorWindow::DrawCamera(scene::Camera & _camera) {
-		ImGui::Text(_camera.GetName().c_str());
+		ImGui::Text(_camera.GetName());
 
 
 		// fov
@@ -196,7 +192,7 @@ namespace editor {
 	//================================================================================================================================
 	//================================================================================================================================
 	void InspectorWindow::DrawTransform(scene::Transform & _transform) {
-		ImGui::Text(_transform.GetName().c_str());
+		ImGui::Text(_transform.GetName());
 
 		// Position
 		if (ImGui::Button("##TransPos")) {
@@ -230,7 +226,7 @@ namespace editor {
 	//================================================================================================================================
 	//================================================================================================================================
 	void InspectorWindow::DrawMesh(scene::Mesh & _mesh) {
-		ImGui::Text(_mesh.GetName().c_str());
+		ImGui::Text(_mesh.GetName());
 
 		// Set path popup
 		bool openSetPathPopup = false;
@@ -258,13 +254,8 @@ namespace editor {
 			else if (std::experimental::filesystem::is_regular_file(newEntry))
 			{
 				const std::string path = newEntry.path().string();
+				_mesh.SetPath(path);
 
-				util::FBXImporter importer;
-				if (importer.LoadScene(path) == true ) {
-					if (importer.GetMesh(_mesh)) {
-						fan::Engine::GetEngine().GetRenderer().AddMesh(&_mesh);
-					}
-				}
 				ImGui::CloseCurrentPopup();
 			}
 
@@ -275,7 +266,7 @@ namespace editor {
 	//================================================================================================================================
 	//================================================================================================================================
 	void InspectorWindow::DrawFPSCamera(scene::FPSCamera & _fpsCamera) {
-		ImGui::Text(_fpsCamera.GetName().c_str());
+		ImGui::Text(_fpsCamera.GetName());
 
 
 

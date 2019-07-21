@@ -14,7 +14,7 @@ namespace editor {
 	//================================================================================================================================
 	//================================================================================================================================
 	SceneWindow::SceneWindow() :
-		m_textBuffer({ "new gameobject" }) {
+		m_textBuffer({ "new_gameobject" }) {
 
 	}
 
@@ -58,7 +58,7 @@ namespace editor {
 
 					if (popupOneTime && ImGui::BeginPopupContextItem(scene.GetName().c_str()))
 					{
-						if ( gameobject->IsRemovable() && ImGui::Selectable("Delete")) {	
+						if ( gameobject->HasFlag(scene::Gameobject::NO_DELETE) == false && ImGui::Selectable("Delete")) {
 							scene.DeleteGameobject(gameobject);
 						}
 						ImGui::EndPopup();

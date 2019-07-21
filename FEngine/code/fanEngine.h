@@ -40,12 +40,7 @@ namespace fan {
 		inline static Engine & GetEngine() { return * ms_engine; }
 
 		void SetSelectedGameobject( scene::Gameobject * _selectedGameobject) { m_selectedGameobject = _selectedGameobject;	}
-		void Deselect() { m_selectedGameobject = nullptr; }		
-		
-		void AddActor( scene::Actor * _actor );
-		void RemoveActor( scene::Actor * _actor );
-		void ActorStart();
-		void ActorStop();
+		void Deselect() { m_selectedGameobject = nullptr; }
 
 		scene::Gameobject *	const		GetSelectedGameobject() const	{ return m_selectedGameobject;  }
 		editor::MainMenuBar  &			GetMainMenuBar() const			{ return * m_mainMenuBar; }
@@ -80,10 +75,6 @@ namespace fan {
 		scene::Gameobject * m_selectedGameobject;
 		scene::Camera *		m_editorCamera;
 
-		std::set< scene::Actor * > m_startingActors;
-		std::set< scene::Actor * > m_activeActors;
-		std::set< scene::Actor * > m_stoppingActors;
-
 		struct GizmoCacheData {
 			int axisIndex;
 			bool pressed = false;
@@ -94,11 +85,13 @@ namespace fan {
 		static Engine * ms_engine;
 		bool m_applicationShouldExit;
 
+		void SetEditorScene( scene::Scene * _scene );
 		void ManageSelection();
 
 		void DrawUI();
 		void DrawEditorGrid() const;
 		void DrawWireframe() const;
 		void DrawAABB() const;
+
 	};
 }

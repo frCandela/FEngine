@@ -26,9 +26,18 @@ namespace scene
 		btVector3 Forward() const;
 		btVector3 Up() const;
 
-		bool IsUnique() const override { return true; }
-		std::string GetName() const override { return "transform"; }
+		bool			IsUnique() const		override { return true; }
+		const char *	GetName() const			override { return s_name; }
+		uint32_t		GetType()	  const		override { return s_type; }
+		Component *		NewInstance(Gameobject * _gameobject) const override { return new Transform(_gameobject); }
 
+
+		// ISerializable
+		void Load(std::istream& _in) override;
+		void Save(std::ostream& _out) override;
+
+		static const char * s_name;
+		static const uint32_t s_type;
 	private:
 		btQuaternion m_rotation;
 		btVector3 m_position;

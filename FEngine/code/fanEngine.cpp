@@ -17,9 +17,10 @@
 #include "editor/windows/fanSceneWindow.h"	
 #include "editor/windows/fanInspectorWindow.h"	
 #include "editor/windows/fanPreferencesWindow.h"	
-#include "editor/components/fanFPSCamera.h"		
 #include "scene/fanScene.h"
 #include "scene/fanGameobject.h"
+#include "scene/components/fanComponent.h"
+#include "editor/components/fanFPSCamera.h"		
 #include "scene/components/fanCamera.h"
 #include "scene/components/fanTransform.h"
 #include "scene/components/fanMesh.h"
@@ -61,31 +62,18 @@ namespace fan {
 		m_inspectorWindow =		new editor::InspectorWindow();
 		m_preferencesWindow =	new editor::PreferencesWindow();
 		m_renderer =			new vk::Renderer(windowSize, windowPosition);
-		m_scene =				new scene::Scene("mainScene");
+		m_scene = nullptr;
 
-		// Editor Camera
-		scene::Gameobject * cameraGameobject = m_scene->CreateGameobject("editor_camera");
-		cameraGameobject->SetRemovable(false);
-		scene::Transform * camTrans = cameraGameobject->AddComponent<scene::Transform>();
-		camTrans->SetPosition(btVector3(0, 0, -2));
-		m_editorCamera = cameraGameobject->AddComponent<scene::Camera>();
-		m_editorCamera->SetRemovable(false);
-		m_renderer->SetMainCamera(m_editorCamera);
-		scene::FPSCamera * editorCamera = cameraGameobject->AddComponent<scene::FPSCamera>();
-		editorCamera->SetRemovable(false);
+		SetEditorScene(new scene::Scene("mainScene"));
 
 		// Sample cube
 		scene::Gameobject * cube = m_scene->CreateGameobject("cube");
 		cube->AddComponent<scene::Transform>();
 		scene::Mesh * mesh = cube->AddComponent<scene::Mesh>();
-		util::FBXImporter importer;
-		importer.LoadScene("content/models/test/cube.fbx");
-		if (importer.GetMesh(*mesh) == true) {
-			m_renderer->AddMesh(mesh);
-		}
+
+		mesh->SetPath("content/models/test/cube.fbx");
+
 		cube->GetComponent<scene::Transform>();		
-
-
 		m_mainMenuBar->Initialize();
 	}
 
@@ -105,22 +93,14 @@ namespace fan {
 		delete m_mainMenuBar;
 		delete m_renderWindow;
 		delete m_sceneWindow;
-
-		delete m_renderer;
 		delete m_scene;
+		delete m_renderer;
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-
 	void Engine::Exit() {
 		m_applicationShouldExit = true;
-		std::cout << "Exit application" << std::endl;
-
-		for (auto actor : m_startingActors) { m_stoppingActors.insert(actor); }
-		m_startingActors.clear();
-		for (auto actor : m_activeActors)	{ m_stoppingActors.insert(actor); }
-		m_activeActors.clear();
 	}
 
 	//================================================================================================================================
@@ -128,11 +108,8 @@ namespace fan {
 	void Engine::Run()
 	{
 		float lastUpdateTime = Time::ElapsedSinceStartup();
-		while ( m_applicationShouldExit == false)
+		while ( m_applicationShouldExit == false && m_renderer->WindowIsOpen() == true)
 		{
-			if (m_renderer->WindowIsOpen() == false) {
-				Exit();
-			}
 
 			const float time = Time::ElapsedSinceStartup();
 			const float updateDelta = time - lastUpdateTime;
@@ -140,11 +117,9 @@ namespace fan {
 			if (updateDelta > 1.f / Time::GetFPS()) {
 				lastUpdateTime = time;
 
-				ActorStart();
+				m_scene->BeginFrame();
 
-				for( scene::Actor * actor : m_activeActors ) {
-					actor->Update(updateDelta);
-				}
+				m_scene->Update(updateDelta);
 
 				ManageSelection();
 				DrawUI();
@@ -157,54 +132,35 @@ namespace fan {
 					DrawAABB();
 				}
 
-
 				m_renderer->DrawFrame();
 				m_scene->EndFrame();
-
-				ActorStop();
 			}
 		}
+
+		// Exit sequence
+		std::cout << "Exit application" << std::endl;
+
 	}
+	
+	//================================================================================================================================
+	//================================================================================================================================
+	void Engine::SetEditorScene(scene::Scene * _scene ) {
+		m_renderer->WaitIdle();
+		delete m_scene;
+		m_scene = _scene;
 
-	//================================================================================================================================
-	//================================================================================================================================
-	void Engine::AddActor(scene::Actor * _actor) {
+		m_selectedGameobject = nullptr;
 
-		if (m_startingActors.find(_actor) == m_startingActors.end()
-			&& m_activeActors.find(_actor) == m_activeActors.end()
-			&& m_stoppingActors.find(_actor) == m_stoppingActors.end()) {
-			m_startingActors.insert(_actor);
-		}
-	}
-
-	//================================================================================================================================
-	//================================================================================================================================
-	void Engine::RemoveActor(scene::Actor * _actor) {
-		auto it = m_activeActors.find(_actor);
-		if (it != m_activeActors.end()) {
-			m_activeActors.erase(_actor);
-			m_stoppingActors.insert(_actor);
-		}
-	}
-
-	//================================================================================================================================
-	//================================================================================================================================
-	void Engine::ActorStart() {
-		for ( auto actor : m_startingActors ) {
-			actor->Start();	
-			m_activeActors.insert(actor);
-		}
-		m_startingActors.clear();
-	}
-
-	//================================================================================================================================
-	//================================================================================================================================
-	void Engine::ActorStop() {
-		for (auto actor : m_stoppingActors) {
-			actor->Stop();
-			delete actor;
-		}
-		m_stoppingActors.clear();
+		// Editor Camera
+		scene::Gameobject * cameraGameobject = m_scene->CreateGameobject("editor_camera");
+		cameraGameobject->SetFlags(scene::Gameobject::NO_DELETE | scene::Gameobject::NOT_SAVED);
+		scene::Transform * camTrans = cameraGameobject->AddComponent<scene::Transform>();
+		camTrans->SetPosition(btVector3(0, 0, -2));
+		m_editorCamera = cameraGameobject->AddComponent<scene::Camera>();
+		m_editorCamera->SetRemovable(false);
+		m_renderer->SetMainCamera(m_editorCamera);
+		scene::FPSCamera * editorCamera = cameraGameobject->AddComponent<scene::FPSCamera>();
+		editorCamera->SetRemovable(false);
 	}
 
 	//================================================================================================================================
@@ -242,17 +198,17 @@ namespace fan {
 			const scene::Mesh * const mesh = meshList[meshIndex].mesh;
 			const glm::mat4  modelMat = meshList[meshIndex].transform->GetModelMatrix();
 
-			const std::vector<uint32_t> & indices = mesh->GetIndices();
-			const std::vector<vk::Vertex> & vertices = mesh->GetVertices();
+const std::vector<uint32_t> & indices = mesh->GetIndices();
+const std::vector<vk::Vertex> & vertices = mesh->GetVertices();
 
-			for (int index = 0; index < indices.size() / 3; index++) {
-				const btVector3 v0 = util::ToBullet( modelMat * glm::vec4( vertices[3*index+0].pos, 1.f ) );
-				const btVector3 v1 = util::ToBullet( modelMat * glm::vec4( vertices[3 * index + 1].pos, 1.f));
-				const btVector3 v2 = util::ToBullet( modelMat * glm::vec4( vertices[3 * index + 2].pos, 1.f));
-				m_renderer->DebugLine(v0, v1, vk::Color::Yellow);
-				m_renderer->DebugLine(v1, v2, vk::Color::Yellow);
-				m_renderer->DebugLine(v2, v0, vk::Color::Yellow);
-			}
+for (int index = 0; index < indices.size() / 3; index++) {
+	const btVector3 v0 = util::ToBullet(modelMat * glm::vec4(vertices[3 * index + 0].pos, 1.f));
+	const btVector3 v1 = util::ToBullet(modelMat * glm::vec4(vertices[3 * index + 1].pos, 1.f));
+	const btVector3 v2 = util::ToBullet(modelMat * glm::vec4(vertices[3 * index + 2].pos, 1.f));
+	m_renderer->DebugLine(v0, v1, vk::Color::Yellow);
+	m_renderer->DebugLine(v1, v2, vk::Color::Yellow);
+	m_renderer->DebugLine(v2, v0, vk::Color::Yellow);
+}
 		}
 	}
 
@@ -263,21 +219,21 @@ namespace fan {
 
 
 		// Translation gizmo on selected gameobject
-		if ( m_selectedGameobject != nullptr && m_selectedGameobject != m_editorCamera->GetGameobject()) {
+		if (m_selectedGameobject != nullptr && m_selectedGameobject != m_editorCamera->GetGameobject()) {
 			scene::Transform * transform = m_selectedGameobject->GetComponent< scene::Transform >();
 			btVector3 newPosition;
-			if ( DrawMoveGizmo(btTransform(btQuaternion(0, 0, 0), transform->GetPosition()), (size_t)this, newPosition) ) {
+			if (DrawMoveGizmo(btTransform(btQuaternion(0, 0, 0), transform->GetPosition()), (size_t)this, newPosition)) {
 				transform->SetPosition(newPosition);
 				mouseCaptured = true;
-			} 
+			}
 		}
 
 		// Mouse selection
 		if (mouseCaptured == false && Mouse::GetButtonPressed(Mouse::button0)) {
 
-			const btVector3 cameraOrigin	= m_editorCamera->GetGameobject()->GetComponent<scene::Transform>()->GetPosition();;
-			const shape::Ray ray			= m_editorCamera->ScreenPosToRay(Mouse::GetScreenSpacePosition());
-			const std::vector<scene::Gameobject *>  & gameobjects	= m_scene->GetGameObjects();
+			const btVector3 cameraOrigin = m_editorCamera->GetGameobject()->GetComponent<scene::Transform>()->GetPosition();;
+			const shape::Ray ray = m_editorCamera->ScreenPosToRay(Mouse::GetScreenSpacePosition());
+			const std::vector<scene::Gameobject *>  & gameobjects = m_scene->GetGameObjects();
 
 			// Raycast on all the gameobjects
 			scene::Gameobject * closestGameobject = nullptr;
@@ -310,9 +266,19 @@ namespace fan {
 	void Engine::DrawUI() {
 		m_mainMenuBar->Draw();
 		m_renderWindow->Draw();
-		m_sceneWindow->Draw();	
+		m_sceneWindow->Draw();
 		m_inspectorWindow->Draw();
 		m_preferencesWindow->Draw();
+
+		if (Mouse::GetButtonPressed(Mouse::button3)) {
+			m_scene->SaveTo("couille.scene");
+		}
+
+		if (Mouse::GetButtonPressed(Mouse::button4)) {
+			scene::Scene * scene = new scene::Scene("couille");
+			SetEditorScene(scene);
+			scene->LoadFrom("couille.scene");
+		}
 	}
 
 	//================================================================================================================================

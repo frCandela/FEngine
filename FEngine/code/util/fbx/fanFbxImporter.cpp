@@ -128,7 +128,6 @@ namespace util {
 			return false;
 		}
 
-		_mesh.SetPath(m_path);
 		_mesh.GetGameobject()->onComponentModified.Emmit(&_mesh);
 
 		std::vector<uint32_t>	& indices	= _mesh.GetIndices();

@@ -100,7 +100,7 @@ void Keyboard::CharCallback(GLFWwindow* _window, unsigned int _c)
 //================================================================================================================================
 // MOUSE
 //================================================================================================================================
-std::array< unsigned, 11 > Mouse::m_buttonsPressed;
+std::array< unsigned, 11 > Mouse::m_buttonsPressed = {(unsigned)-1,(unsigned)-1,(unsigned)-1 ,(unsigned)-1 ,(unsigned)-1 ,(unsigned)-1 ,(unsigned)-1 ,(unsigned)-1 ,(unsigned)-1 ,(unsigned)-1 ,(unsigned)-1 };
 std::array< unsigned, 11 > Mouse::m_buttonsReleased;
 btVector2 Mouse::m_lockPosition;
 bool Mouse::m_lockCursor = false;

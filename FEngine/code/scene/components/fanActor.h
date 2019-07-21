@@ -9,14 +9,12 @@ namespace scene
 	public:
 		Actor(Gameobject * _gameobject);
 
-		bool IsUnique() const override { return false; }
-		std::string GetName() const override { return "Actor"; }
+		bool IsActor()	const final		{ return true; }
+		bool IsUnique() const override	{ return false; }
 
-		virtual void Start()=0;
-		virtual void Update( const float _delta ) = 0;
-		virtual void Stop() = 0;
+		virtual void Start()						= 0;
+		virtual void Update( const float _delta )	= 0;
 
-		virtual void Delete();
 	protected:
 	};
 }

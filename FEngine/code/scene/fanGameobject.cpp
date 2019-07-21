@@ -11,8 +11,8 @@ namespace scene
 	//================================================================================================================================
 	//================================================================================================================================
 	Gameobject::Gameobject(const std::string _name) :
-		m_name( _name )
-		, m_isRemovable(true)
+		m_name(_name)
+		, m_flags( Flag::NONE )
 	{
 		onComponentModified.Connect(&Gameobject::OnComponentModified, this);
 		onComponentDeleted.Connect(&Gameobject::OnComponentDeleted, this);
@@ -74,5 +74,21 @@ namespace scene
 		if ( _component->IsType<scene::Mesh>()) {
 			ComputeAABB();
 		}
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
+	void Gameobject::Load(std::istream& _in) {
+		(void)_in;
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
+	void Gameobject::Save(std::ostream& _out) {
+		_out << "gameobject " << m_name << std::endl;
+		for (int componentIndex = 0; componentIndex < m_components.size() ; componentIndex++) {
+			m_components[componentIndex]->Save(_out);
+		}
+		_out << "end" << std::endl;
 	}
 }

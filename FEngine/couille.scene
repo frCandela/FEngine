@@ -1,0 +1,39 @@
+gameobject cube
+	transform
+		1.80944 4.2 0.5
+		0.0195404 0.0300059 0.0168459 0.999217
+		2.3 1.4 2.6
+	end
+	mesh
+		content\models\test\cube.fbx
+	end
+end
+gameobject new_gameobject
+	transform
+		9.61777 0.408437 3.95724
+		0 0 0 1
+		16.5 1 11.4
+	end
+	mesh
+		.\content\models\test\cone.fbx
+	end
+	camera
+		110
+		0.01
+		1050
+	end
+end
+gameobject new_gameobject
+	transform
+		9.61777 0.408437 3.95724
+		0 0 0 1
+	end
+	mesh
+		.\content\models\test\cone.fbx
+	end
+	camera
+		110
+		0.01
+		1050
+	end
+end
