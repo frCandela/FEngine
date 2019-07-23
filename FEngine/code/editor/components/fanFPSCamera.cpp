@@ -11,20 +11,11 @@
 
 namespace scene
 {
-	const char * FPSCamera::s_name = "fps_camera";
-	const uint32_t FPSCamera::s_type = Component::Register<FPSCamera>(SSID("fps_camera"));
+	REGISTER_TYPE_INFO(FPSCamera)
 
 	//================================================================================================================================
 	//================================================================================================================================
-	FPSCamera::FPSCamera() {
-	
-	}
-
-	//================================================================================================================================
-	//================================================================================================================================
-	FPSCamera::FPSCamera(Gameobject * _gameobject) :
-		Actor(_gameobject)
-	{
+	void FPSCamera::Initialize()	{
 		m_speed = 10.f;
 		m_speedMultiplier = 3.f;
 		m_xySensitivity = btVector2(0.005f, 0.005f);

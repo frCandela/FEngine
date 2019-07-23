@@ -14,8 +14,6 @@ namespace scene
 	class Mesh : public Component
 	{
 	public:
-		Mesh();
-		Mesh(Gameobject * _gameobject);
 		~Mesh();
 		
 		void SetPath(const std::string _path);
@@ -28,22 +26,17 @@ namespace scene
 		shape::AABB ComputeAABB() const;
 
 		bool			IsUnique()	const override { return true; }
-		const char *	GetName()	const override { return s_name; }
-		uint32_t		GetType()	const override { return s_type; }
 
 		// ISerializable
 		void Load(std::istream& _in) override;
 		void Save(std::ostream& _out) override;
 
-		const static char * s_name;
-		static const uint32_t s_type;
-
+		DECLARE_TYPE_INFO(Mesh);
 	private:
+		void Initialize() override;
+
 		std::string m_path;
 		std::vector<vk::Vertex> m_vertices;
 		std::vector<uint32_t> m_indices;
-
-	protected:
-		Component *		NewInstance(Gameobject * _gameobject) const override { return new Mesh(_gameobject); }
 	};
 }

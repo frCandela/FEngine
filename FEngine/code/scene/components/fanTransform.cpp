@@ -7,18 +7,11 @@
 
 namespace scene
 {
-	const char * Transform::s_name = "transform";
-	const uint32_t Transform::s_type = Component::Register<Transform>(SSID("transform"));
+	REGISTER_TYPE_INFO(Transform)
 
 	//================================================================================================================================
 	//================================================================================================================================
-	Transform::Transform() {}
-
-	//================================================================================================================================
-	//================================================================================================================================
-	Transform::Transform(Gameobject * _gameobject) : 
-		Component(_gameobject) 
-	{
+	void Transform::Initialize() {
 		m_rotation	= btQuaternion::getIdentity();
 		m_position	= btVector3(0, 0, 0);
 		m_scale		= btVector3(1, 1, 1);

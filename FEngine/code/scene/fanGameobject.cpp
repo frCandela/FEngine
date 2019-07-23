@@ -49,6 +49,8 @@ namespace scene
 	//================================================================================================================================
 	//================================================================================================================================
 	void Gameobject::AddComponent(scene::Component * _component) {
+		_component->m_gameobject = this;
+		_component->Initialize();
 		m_components.push_back(_component);
 		onComponentCreated.Emmit(_component);
 		onComponentModified.Emmit(_component);
@@ -98,9 +100,9 @@ namespace scene
 			std::cout << "\tComponent: " << buffer << std::endl;
 
 			// instanciate component
-			scene::Component * component = Component::NewInstanceFromID(componentID, this);
-			component->Load(_in);
+			scene::Component * component = TypeInfo::Instantiate<Component>(componentID);
 			AddComponent(component);
+			component->Load(_in);
 			_in >> buffer; // skip component name
 		}
 	}

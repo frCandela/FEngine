@@ -7,9 +7,6 @@ namespace scene
 	class Actor : public Component
 	{
 	public:
-		Actor();
-		Actor(Gameobject * _gameobject);
-
 		bool IsActor()	const final		{ return true; }
 		bool IsUnique() const override	{ return false; }
 

@@ -10,13 +10,9 @@ namespace scene
 	class FPSCamera : public Actor
 	{
 	public:
-		FPSCamera();
-		FPSCamera(Gameobject * _gameobject);
 		virtual ~FPSCamera();
 
 		bool			IsUnique() const	override { return true; }
-		const char *	GetName() const		override { return s_name; }
-		uint32_t		GetType()	  const	override { return s_type; }
 
 		void Start() override;
 		void Update( const float _delta ) override;
@@ -33,17 +29,15 @@ namespace scene
 		void Load(std::istream& _in) override;
 		void Save(std::ostream& _out) override;
 
-		const static char * s_name;
-		static const uint32_t s_type;
+		DECLARE_TYPE_INFO(FPSCamera);
 	private:
+		void Initialize() override;
+
 		float m_speed;
 		float m_speedMultiplier;
 		btVector2 m_xySensitivity;
 
 		scene::Transform * m_transform;
 		scene::Camera * m_camera;
-
-	protected:
-		Component *		NewInstance(Gameobject * _gameobject) const override { return new FPSCamera(_gameobject); }
 	};
 }

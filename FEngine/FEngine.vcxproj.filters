@@ -206,6 +206,9 @@
     <ClCompile Include="code\util\fanISerializable.cpp">
       <Filter>code\util</Filter>
     </ClCompile>
+    <ClCompile Include="code\util\fanTypeInfo.cpp">
+      <Filter>code\util</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="code\vulkan\vkRenderer.h">
@@ -803,6 +806,9 @@
       <Filter>code\deps</Filter>
     </ClInclude>
     <ClInclude Include="code\util\fanHash.h">
+      <Filter>code\util</Filter>
+    </ClInclude>
+    <ClInclude Include="code\util\fanTypeInfo.h">
       <Filter>code\util</Filter>
     </ClInclude>
   </ItemGroup>

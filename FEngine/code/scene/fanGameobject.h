@@ -49,7 +49,7 @@ namespace scene
 		void Load(std::istream& _in) override;
 		void Save(std::ostream& _out) override;
 
-		bool HasFlag(const Flag _flag) { return m_flags & _flag; }
+		bool HasFlag(const Flag _flag) const { return m_flags & _flag; }
 		uint32_t GetFlags() const {	return m_flags;	}
 		void SetFlags( const uint32_t _flags) { m_flags = _flags; }
 
@@ -76,16 +76,15 @@ namespace scene
 		// Checks if ComponentType derivates from Component
 		static_assert((std::is_base_of<Component, ComponentType>::value));
 
-		const ComponentType * sample = Component::GetSample<ComponentType>(); // this is probably very bad
-
-		// Checks if ComponentType is unique and doesn't isn't already added to the GameObject	
-		if (sample->IsUnique() && GetComponent<ComponentType>() != nullptr) {
+		ComponentType* component = new ComponentType();
+		if( component->IsUnique() && GetComponent< ComponentType >() != nullptr ){
+			delete(component);
 			return nullptr;
 		}
-		ComponentType* componentType = new ComponentType(this);
-		AddComponent(componentType);
 
-		return componentType;
+		AddComponent(component);
+
+		return component;
 	}
 
 	//================================================================================================================================
