@@ -15,7 +15,7 @@
 
 namespace editor {
 	InspectorWindow::InspectorWindow() : 
-		m_cachePathMesh(".") 
+		m_cachePathMeshDir(".") 
 		,m_meshExtensionFilter({".fbx"}) {
 	}
 
@@ -238,29 +238,34 @@ namespace editor {
 		// Set path  popup on double click
 		if (openSetPathPopup || ImGui::IsItemHovered() && ImGui::IsMouseClicked(0)) {
 			if (_mesh.GetPath().empty() == false) {
-				m_cachePathMesh = std::experimental::filesystem::path(_mesh.GetPath()).parent_path();
+				m_cachePathMeshDir = std::experimental::filesystem::path(_mesh.GetPath()).parent_path();
 			} else {
-				m_cachePathMesh = "./";
+				m_cachePathMeshDir = "./";
 			}
 			ImGui::OpenPopup("set_path");
+			m_cachePathMeshFile = "";
 		}
 
-		if (ImGui::BeginPopup("set_path"))
-		{
-			std::experimental::filesystem::directory_entry newEntry = util::Imgui::FilesSelector(m_cachePathMesh, m_meshExtensionFilter);
-			if (std::experimental::filesystem::is_directory(newEntry)) {
-				m_cachePathMesh = newEntry.path();
-			}
-			else if (std::experimental::filesystem::is_regular_file(newEntry))
-			{
-				const std::string path = newEntry.path().string();
-				_mesh.SetPath(path);
-
-				ImGui::CloseCurrentPopup();
-			}
-
-			ImGui::EndPopup();
+		if( util::Imgui::LoadFileModal("set_path", m_cachePathMeshDir, m_cachePathMeshFile, m_meshExtensionFilter ) ){
+			_mesh.SetPath(m_cachePathMeshFile.string());
 		}
+
+// 		if (ImGui::BeginPopup("set_path"))
+// 		{
+// 			std::experimental::filesystem::directory_entry newEntry = util::Imgui::FilesSelector(m_cachePathMesh, m_meshExtensionFilter);
+// 			if (std::experimental::filesystem::is_directory(newEntry)) {
+// 				m_cachePathMesh = newEntry.path();
+// 			}
+// 			else if (std::experimental::filesystem::is_regular_file(newEntry))
+// 			{
+// 				const std::string path = newEntry.path().string();
+// 				_mesh.SetPath(path);
+// 
+// 				ImGui::CloseCurrentPopup();
+// 			}
+// 
+// 			ImGui::EndPopup();
+// 		}
 	}
 
 	//================================================================================================================================

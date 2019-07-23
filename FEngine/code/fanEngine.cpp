@@ -12,6 +12,7 @@
 #include "util/shapes/fanPlane.h"
 #include "util/shapes/fanAABB.h"
 #include "util/fbx/fanFbxImporter.h"
+#include "util/fanImguiUtil.h"
 #include "editor/fanMainMenuBar.h"
 #include "editor/windows/fanRenderWindow.h"	
 #include "editor/windows/fanSceneWindow.h"	
@@ -64,7 +65,7 @@ namespace fan {
 		m_renderer =			new vk::Renderer(windowSize, windowPosition);
 		m_scene = nullptr;
 
-		SetEditorScene(new scene::Scene("mainScene"));
+		SetSceneForEditor(new scene::Scene("mainScene"));
 
 		// Sample cube
 		scene::Gameobject * cube = m_scene->CreateGameobject("cube");
@@ -144,7 +145,7 @@ namespace fan {
 	
 	//================================================================================================================================
 	//================================================================================================================================
-	void Engine::SetEditorScene(scene::Scene * _scene ) {
+	void Engine::SetSceneForEditor(scene::Scene * _scene ) {
 		m_renderer->WaitIdle();
 		delete m_scene;
 		m_scene = _scene;
@@ -270,14 +271,15 @@ for (int index = 0; index < indices.size() / 3; index++) {
 		m_inspectorWindow->Draw();
 		m_preferencesWindow->Draw();
 
-		if (Mouse::GetButtonPressed(Mouse::button3)) {
-			m_scene->SaveTo("couille.scene");
+
+		static std::experimental::filesystem::path tmpPath = ".";
+		if( Keyboard::IsKeyPressed( GLFW_KEY_F)){
+			ImGui::OpenPopup("Save scene");
+			tmpPath = ".";
 		}
 
-		if (Mouse::GetButtonPressed(Mouse::button4)) {
-			scene::Scene * scene = new scene::Scene("couille");
-			SetEditorScene(scene);
-			scene->LoadFrom("couille.scene");
+		if( util::Imgui::SaveFileModal("Save scene", tmpPath, {".scene", ".caca"} ) ){
+			//m_scene->SaveTo("couille.scene");
 		}
 	}
 

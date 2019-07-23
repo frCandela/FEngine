@@ -15,5 +15,9 @@ namespace editor {
 		bool m_showImguiDemoWindow;
 		bool m_showAABB;
 		bool m_showWireframe;
+
+		std::experimental::filesystem::path m_cachePathSceneDir;
+		std::experimental::filesystem::path m_cachePathSceneFile;
+		std::set < std::string > m_sceneExtensionFilter;
 	};
 }

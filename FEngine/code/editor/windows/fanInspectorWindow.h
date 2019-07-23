@@ -26,7 +26,8 @@ namespace editor {
 		void DrawFPSCamera(scene::FPSCamera & _fpsCamera);
 
 
-		std::experimental::filesystem::path m_cachePathMesh;
+		std::experimental::filesystem::path m_cachePathMeshDir;
+		std::experimental::filesystem::path m_cachePathMeshFile;
 		std::set < std::string > m_meshExtensionFilter;
 	};
 }

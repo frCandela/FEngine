@@ -6,6 +6,9 @@
 #include "editor/windows/fanInspectorWindow.h"
 #include "editor/windows/fanPreferencesWindow.h"
 #include "util/fanSerializedValues.h"
+#include "util/fanInput.h"
+#include "util/fanImguiUtil.h"
+#include "scene/fanScene.h"
 
 #include "vulkan/vkRenderer.h"
 #include "fanEngine.h"
@@ -17,7 +20,8 @@ namespace editor {
 	MainMenuBar::MainMenuBar() :
 		m_showImguiDemoWindow( true )
 		, m_showAABB(false)
-		, m_showWireframe(false) {
+		, m_showWireframe(false)
+		, m_sceneExtensionFilter({".scene"}) {
 	}
 
 	//================================================================================================================================
@@ -68,12 +72,21 @@ namespace editor {
 		if (m_showImguiDemoWindow) {
 			ImGui::ShowDemoWindow(&m_showImguiDemoWindow);
 		}
-		
+		bool openLoadScenePopup = false;
 		if (ImGui::BeginMainMenuBar())
 		{
 			// FILE
 			if (ImGui::BeginMenu("File"))
 			{
+				if (ImGui::MenuItem("Load")) {
+					openLoadScenePopup = true;
+				}
+				if (ImGui::MenuItem("Save")) {
+
+				}
+				if (ImGui::MenuItem("Save as")) {
+
+				}
 				if (ImGui::MenuItem("Reload shaders")) {
 					renderer.ReloadShaders();
 				}
@@ -121,9 +134,19 @@ namespace editor {
 
 			/////////////////////
 			ImGui::EndMainMenuBar();
+
+			// Open load scene popup
+			if (openLoadScenePopup == true ) {
+				ImGui::OpenPopup("Load scene");
+				m_cachePathSceneDir = "./content/scenes/";
+				m_cachePathSceneFile= ".";
+			}
+
+			if( util::Imgui::LoadFileModal("Load scene", m_cachePathSceneDir, m_cachePathSceneFile, m_sceneExtensionFilter ) ){
+				scene::Scene * scene = new scene::Scene("couille");
+				fan::Engine::GetEngine().SetSceneForEditor(scene);
+				scene->LoadFrom(m_cachePathSceneFile.string());
+			}
 		} 
-
-
-
 	}
 }
