@@ -150,6 +150,7 @@
     <ClInclude Include="code\editor\windows\fanWindow.h" />
     <ClInclude Include="code\fanEngine.h" />
     <ClInclude Include="code\fanIncludes.h" />
+    <ClInclude Include="code\fanUsing.h" />
     <ClInclude Include="code\scene\components\fanActor.h" />
     <ClInclude Include="code\scene\components\fanCamera.h" />
     <ClInclude Include="code\scene\components\fanComponent.h" />

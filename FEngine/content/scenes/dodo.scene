@@ -1,0 +1,8 @@
+gameobject cube
+	Transform 1269105190
+		0 0 0
+		0 0 0 1
+		1 1 1
+	Mesh 52689719
+		content/models/test/cube.fbx
+end

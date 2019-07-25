@@ -72,20 +72,22 @@ namespace editor {
 		if (m_showImguiDemoWindow) {
 			ImGui::ShowDemoWindow(&m_showImguiDemoWindow);
 		}
-		bool openLoadScenePopup = false;
+
+		bool openLoadScenePopupLater = false;
+		bool openSaveScenePopupLater = false;
 		if (ImGui::BeginMainMenuBar())
 		{
 			// FILE
 			if (ImGui::BeginMenu("File"))
 			{
-				if (ImGui::MenuItem("Load")) {
-					openLoadScenePopup = true;
+				if (ImGui::MenuItem("Open")) {
+					openLoadScenePopupLater = true;
 				}
 				if (ImGui::MenuItem("Save")) {
 
 				}
 				if (ImGui::MenuItem("Save as")) {
-
+					openSaveScenePopupLater = true;					
 				}
 				if (ImGui::MenuItem("Reload shaders")) {
 					renderer.ReloadShaders();
@@ -136,16 +138,25 @@ namespace editor {
 			ImGui::EndMainMenuBar();
 
 			// Open load scene popup
-			if (openLoadScenePopup == true ) {
-				ImGui::OpenPopup("Load scene");
-				m_cachePathSceneDir = "./content/scenes/";
-				m_cachePathSceneFile= ".";
+			if (openLoadScenePopupLater == true ||
+				(Keyboard::IsKeyDown(GLFW_KEY_LEFT_CONTROL) && Keyboard::IsKeyPressed(GLFW_KEY_O))) {
+				m_pathBuffer = "./content/scenes/";
+				ImGui::OpenPopup("Open scene");
+			}
+			if (util::Imgui::LoadFileModal("Open scene", m_sceneExtensionFilter, m_pathBuffer) ){
+				scene::Scene * scene = new scene::Scene("tmp");
+				fan::Engine::GetEngine().SetSceneForEditor(scene);
+				scene->LoadFrom(m_pathBuffer.string());
 			}
 
-			if( util::Imgui::LoadFileModal("Load scene", m_cachePathSceneDir, m_cachePathSceneFile, m_sceneExtensionFilter ) ){
-				scene::Scene * scene = new scene::Scene("couille");
-				fan::Engine::GetEngine().SetSceneForEditor(scene);
-				scene->LoadFrom(m_cachePathSceneFile.string());
+			if (	openSaveScenePopupLater == true || 
+				(	Keyboard::IsKeyDown(GLFW_KEY_LEFT_CONTROL) && Keyboard::IsKeyPressed(GLFW_KEY_S) )) {
+				m_pathBuffer = "./content/scenes/";
+				m_extensionIndexBuffer = 0;
+				ImGui::OpenPopup("Save scene");
+			}
+			if (util::Imgui::SaveFileModal("Save scene", { ".scene" }, m_pathBuffer, m_extensionIndexBuffer)) {
+				engine.GetScene().SaveTo(m_pathBuffer.string());
 			}
 		} 
 	}

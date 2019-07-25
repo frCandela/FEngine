@@ -1,5 +1,13 @@
 #pragma once
 
+namespace std {
+	namespace experimental {
+		namespace filesystem {
+			static string file_name(const path& _path);
+		}
+	}
+}
+
 namespace util {
 	class Imgui {
 	public:
@@ -8,22 +16,23 @@ namespace util {
 		static void ShowHelpMarker(const char* _desc);
 
 		static bool SaveFileModal( 
-			const char * _popupName,
-			std::experimental::filesystem::path & _currentPath,
-			const std::set<std::string>& _extensionWhiteList
-		);		
+			const char * _popupName,	
+			const std::set<std::string>& _extensionWhiteList,
+			std::fs::path & _currentPath,
+			int & _extensionIndex
+			);		
 
-		static bool LoadFileModal( 		
-			const char * _popupName,
-			std::experimental::filesystem::path & _currentPath,
-			std::experimental::filesystem::path & _currentFile,
-			std::set<std::string>& _extensionWhiteList 
+		static bool LoadFileModal(
+			const char * _popupName, 
+			const std::set<std::string>& _extensionWhiteList,
+			std::fs::path & _path			
 		);
 
 	private:
-		static std::experimental::filesystem::directory_entry FilesSelector(
-			const std::experimental::filesystem::path _currentPath,
-			const std::set<std::string>& _extensionWhiteList);
+		static bool FilesSelector(
+			const std::set<std::string>& _extensionWhiteList,
+			std::fs::path & _path
+		);
 
 	};
 }

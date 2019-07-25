@@ -14,9 +14,7 @@
 #include "fanEngine.h"
 
 namespace editor {
-	InspectorWindow::InspectorWindow() : 
-		m_cachePathMeshDir(".") 
-		,m_meshExtensionFilter({".fbx"}) {
+	InspectorWindow::InspectorWindow() {
 	}
 
 	//================================================================================================================================
@@ -24,7 +22,6 @@ namespace editor {
 	void InspectorWindow::Draw() {
 		if (IsVisible() == true) {
 			fan::Engine & engine = fan::Engine::GetEngine();
-			//scene::Scene & scene = engine.GetScene();
 			scene::Gameobject * const selection = engine.GetSelectedGameobject();
 
 			bool visible = IsVisible();
@@ -238,34 +235,17 @@ namespace editor {
 		// Set path  popup on double click
 		if (openSetPathPopup || ImGui::IsItemHovered() && ImGui::IsMouseClicked(0)) {
 			if (_mesh.GetPath().empty() == false) {
-				m_cachePathMeshDir = std::experimental::filesystem::path(_mesh.GetPath()).parent_path();
+				m_pathBuffer = std::fs::path(_mesh.GetPath()).parent_path();
 			} else {
-				m_cachePathMeshDir = "./";
+				m_pathBuffer = "./";
 			}
 			ImGui::OpenPopup("set_path");
-			m_cachePathMeshFile = "";
+			m_pathBuffer = "content/models";
 		}
 
-		if( util::Imgui::LoadFileModal("set_path", m_cachePathMeshDir, m_cachePathMeshFile, m_meshExtensionFilter ) ){
-			_mesh.SetPath(m_cachePathMeshFile.string());
+		if( util::Imgui::LoadFileModal("set_path", {".fbx"}, m_pathBuffer ) ){
+			_mesh.SetPath(m_pathBuffer.string());
 		}
-
-// 		if (ImGui::BeginPopup("set_path"))
-// 		{
-// 			std::experimental::filesystem::directory_entry newEntry = util::Imgui::FilesSelector(m_cachePathMesh, m_meshExtensionFilter);
-// 			if (std::experimental::filesystem::is_directory(newEntry)) {
-// 				m_cachePathMesh = newEntry.path();
-// 			}
-// 			else if (std::experimental::filesystem::is_regular_file(newEntry))
-// 			{
-// 				const std::string path = newEntry.path().string();
-// 				_mesh.SetPath(path);
-// 
-// 				ImGui::CloseCurrentPopup();
-// 			}
-// 
-// 			ImGui::EndPopup();
-// 		}
 	}
 
 	//================================================================================================================================

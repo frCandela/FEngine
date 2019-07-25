@@ -811,6 +811,9 @@
     <ClInclude Include="code\util\fanTypeInfo.h">
       <Filter>code\util</Filter>
     </ClInclude>
+    <ClInclude Include="code\fanUsing.h">
+      <Filter>code</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="shaders\forward.frag">

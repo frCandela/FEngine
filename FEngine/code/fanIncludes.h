@@ -31,6 +31,8 @@
 #include <cassert>
 #include <filesystem>
 
+#include "fanUsing.h"
+
 #include "util/fanVector2.h"
 #include "util/fanUtil.h"
 #include "util/fanHash.h"

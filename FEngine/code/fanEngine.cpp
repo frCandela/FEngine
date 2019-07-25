@@ -270,17 +270,6 @@ for (int index = 0; index < indices.size() / 3; index++) {
 		m_sceneWindow->Draw();
 		m_inspectorWindow->Draw();
 		m_preferencesWindow->Draw();
-
-
-		static std::experimental::filesystem::path tmpPath = ".";
-		if( Keyboard::IsKeyPressed( GLFW_KEY_F)){
-			ImGui::OpenPopup("Save scene");
-			tmpPath = ".";
-		}
-
-		if( util::Imgui::SaveFileModal("Save scene", tmpPath, {".scene", ".caca"} ) ){
-			//m_scene->SaveTo("couille.scene");
-		}
 	}
 
 	//================================================================================================================================

@@ -16,8 +16,9 @@ namespace editor {
 		bool m_showAABB;
 		bool m_showWireframe;
 
-		std::experimental::filesystem::path m_cachePathSceneDir;
-		std::experimental::filesystem::path m_cachePathSceneFile;
+		// Temporary buffers
+		std::fs::path m_pathBuffer;
+		int m_extensionIndexBuffer;
 		std::set < std::string > m_sceneExtensionFilter;
 	};
 }
