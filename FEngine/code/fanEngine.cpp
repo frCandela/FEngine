@@ -63,18 +63,11 @@ namespace fan {
 		m_inspectorWindow =		new editor::InspectorWindow();
 		m_preferencesWindow =	new editor::PreferencesWindow();
 		m_renderer =			new vk::Renderer(windowSize, windowPosition);
-		m_scene = nullptr;
+		m_scene =				new scene::Scene("mainScene");
 
-		SetSceneForEditor(new scene::Scene("mainScene"));
+		m_scene->onSceneLoad.Connect(&Engine::OnSceneLoad, this);
+		OnSceneLoad(m_scene);
 
-		// Sample cube
-		scene::Gameobject * cube = m_scene->CreateGameobject("cube");
-		cube->AddComponent<scene::Transform>();
-		scene::Mesh * mesh = cube->AddComponent<scene::Mesh>();
-
-		mesh->SetPath("content/models/test/cube.fbx");
-
-		cube->GetComponent<scene::Transform>();		
 		m_mainMenuBar->Initialize();
 	}
 
@@ -145,10 +138,8 @@ namespace fan {
 	
 	//================================================================================================================================
 	//================================================================================================================================
-	void Engine::SetSceneForEditor(scene::Scene * _scene ) {
-		m_renderer->WaitIdle();
-		delete m_scene;
-		m_scene = _scene;
+	void Engine::OnSceneLoad(scene::Scene * _scene) {
+		assert(_scene == m_scene);
 
 		m_selectedGameobject = nullptr;
 
@@ -199,17 +190,17 @@ namespace fan {
 			const scene::Mesh * const mesh = meshList[meshIndex].mesh;
 			const glm::mat4  modelMat = meshList[meshIndex].transform->GetModelMatrix();
 
-const std::vector<uint32_t> & indices = mesh->GetIndices();
-const std::vector<vk::Vertex> & vertices = mesh->GetVertices();
+			const std::vector<uint32_t> & indices = mesh->GetIndices();
+			const std::vector<vk::Vertex> & vertices = mesh->GetVertices();
 
-for (int index = 0; index < indices.size() / 3; index++) {
-	const btVector3 v0 = util::ToBullet(modelMat * glm::vec4(vertices[3 * index + 0].pos, 1.f));
-	const btVector3 v1 = util::ToBullet(modelMat * glm::vec4(vertices[3 * index + 1].pos, 1.f));
-	const btVector3 v2 = util::ToBullet(modelMat * glm::vec4(vertices[3 * index + 2].pos, 1.f));
-	m_renderer->DebugLine(v0, v1, vk::Color::Yellow);
-	m_renderer->DebugLine(v1, v2, vk::Color::Yellow);
-	m_renderer->DebugLine(v2, v0, vk::Color::Yellow);
-}
+			for (int index = 0; index < indices.size() / 3; index++) {
+				const btVector3 v0 = util::ToBullet(modelMat * glm::vec4(vertices[3 * index + 0].pos, 1.f));
+				const btVector3 v1 = util::ToBullet(modelMat * glm::vec4(vertices[3 * index + 1].pos, 1.f));
+				const btVector3 v2 = util::ToBullet(modelMat * glm::vec4(vertices[3 * index + 2].pos, 1.f));
+				m_renderer->DebugLine(v0, v1, vk::Color::Yellow);
+				m_renderer->DebugLine(v1, v2, vk::Color::Yellow);
+				m_renderer->DebugLine(v2, v0, vk::Color::Yellow);
+			}
 		}
 	}
 

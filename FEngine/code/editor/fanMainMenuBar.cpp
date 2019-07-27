@@ -137,18 +137,22 @@ namespace editor {
 			/////////////////////
 			ImGui::EndMainMenuBar();
 
-			// Open load scene popup
+			// Open scene popup
 			if (openLoadScenePopupLater == true ||
 				(Keyboard::IsKeyDown(GLFW_KEY_LEFT_CONTROL) && Keyboard::IsKeyPressed(GLFW_KEY_O))) {
 				m_pathBuffer = "./content/scenes/";
 				ImGui::OpenPopup("Open scene");
 			}
 			if (util::Imgui::LoadFileModal("Open scene", m_sceneExtensionFilter, m_pathBuffer) ){
-				scene::Scene * scene = new scene::Scene("tmp");
-				fan::Engine::GetEngine().SetSceneForEditor(scene);
-				scene->LoadFrom(m_pathBuffer.string());
+// 				scene::Scene * scene = new scene::Scene("tmp");
+// 				fan::Engine::GetEngine().SetSceneForEditor(scene);
+// 				scene->LoadFrom(m_pathBuffer.string());
+
+				scene::Scene & scene = engine.GetScene();
+				scene.LoadFrom(m_pathBuffer.string());
 			}
 
+			// Save scene popup
 			if (	openSaveScenePopupLater == true || 
 				(	Keyboard::IsKeyDown(GLFW_KEY_LEFT_CONTROL) && Keyboard::IsKeyPressed(GLFW_KEY_S) )) {
 				m_pathBuffer = "./content/scenes/";

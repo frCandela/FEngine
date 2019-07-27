@@ -12,6 +12,7 @@ namespace scene
 	{
 	public:
 		util::Signal<Gameobject*> onGameobjectCreated;
+		util::Signal<Scene*> onSceneLoad;
 
 		Scene(const std::string _name);
 		~Scene();
@@ -23,6 +24,7 @@ namespace scene
 		void	Update(const float _delta);
 		void	EndFrame();
 
+		void Clear();
 		void SaveTo(const std::string _path) const ;
 		void LoadFrom(const std::string _path);
 

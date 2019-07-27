@@ -23,9 +23,7 @@ namespace scene {
 	//================================================================================================================================
 	//================================================================================================================================
 	Scene::~Scene() {
-		for (int gameobjectIndex = 0; gameobjectIndex < m_gameObjects.size() ; gameobjectIndex++) {
-			delete m_gameObjects[gameobjectIndex];
-		}
+		Clear();
 	}
 
 	//================================================================================================================================
@@ -118,6 +116,17 @@ namespace scene {
 
 	//================================================================================================================================
 	//================================================================================================================================
+	void Scene::Clear() {
+		for (int gameobjectIndex = 0; gameobjectIndex < m_gameObjects.size(); gameobjectIndex++) {
+			delete m_gameObjects[gameobjectIndex];
+		} m_gameObjects.clear();
+		m_startingActors.clear();
+		m_activeActors.clear();
+		m_gameObjectstoDelete.clear();
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
 	void Scene::SaveTo(const std::string _path) const {
 		std::cout << "saving scene: " << m_name << std::endl;
 		std::ofstream outStream(_path);
@@ -133,6 +142,8 @@ namespace scene {
 	//================================================================================================================================
 	//================================================================================================================================
 	void Scene::LoadFrom(const std::string _path) {
+		Clear();
+
 		std::cout << "loading scene: " << _path << std::endl;
 		std::ifstream inStream(_path);
 		std::string inputString = "";
@@ -150,6 +161,8 @@ namespace scene {
 			inStream >> inputString;
 		}
 		inStream.close();
+
+		onSceneLoad.Emmit(this);
 	}
 
 }

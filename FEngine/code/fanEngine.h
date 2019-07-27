@@ -54,7 +54,6 @@ namespace fan {
 		fan::SerializedValues & GetEditorValues() { return m_editorValues; }
 		EditorGrid GetEditorGrid() const { return m_editorGrid;  }
 		void SetEditorGrid( const EditorGrid _editorGrid) { m_editorGrid =_editorGrid; }
-		void SetSceneForEditor( scene::Scene * _scene );
 		bool DrawMoveGizmo(const btTransform _transform, const size_t _uniqueID, btVector3& _newPosition);
 
 	private:
@@ -86,7 +85,7 @@ namespace fan {
 		bool m_applicationShouldExit;
 
 		void ManageSelection();
-
+		void OnSceneLoad(scene::Scene * _scene);
 		void DrawUI();
 		void DrawEditorGrid() const;
 		void DrawWireframe() const;
