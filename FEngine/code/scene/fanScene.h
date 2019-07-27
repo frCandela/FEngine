@@ -24,14 +24,20 @@ namespace scene
 		void	Update(const float _delta);
 		void	EndFrame();
 
-		void Clear();
-		void SaveTo(const std::string _path) const ;
+		
+		void New();
+		void Save() const ;
 		void LoadFrom(const std::string _path);
 
 		const std::vector<Gameobject *>  & GetGameObjects() const	{ return m_gameObjects; }
 		inline std::string GetName() const							{ return m_name; }
+		bool HasPath() const										{ return m_path.empty() == false; }
+		inline std::string GetPath() const							{ return m_path; }
+		void SetPath( const std::string _path )						{ m_path = _path; }
+
 	private:
 		std::string m_name;
+		std::string m_path;
 
 		std::vector <Gameobject*> m_gameObjectstoDelete;
 		std::vector<Gameobject *> m_gameObjects;
@@ -41,5 +47,6 @@ namespace scene
 
 		void OnComponentCreated(scene::Component * _component );
 		void OnComponentDeleted(scene::Component * _component);
+		void Clear();
 	};
 }

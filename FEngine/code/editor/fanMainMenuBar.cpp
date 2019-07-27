@@ -73,32 +73,38 @@ namespace editor {
 			ImGui::ShowDemoWindow(&m_showImguiDemoWindow);
 		}
 
-		bool openLoadScenePopupLater = false;
-		bool openSaveScenePopupLater = false;
 		if (ImGui::BeginMainMenuBar())
 		{
 			// FILE
 			if (ImGui::BeginMenu("File"))
 			{
-				if (ImGui::MenuItem("Open")) {
-					openLoadScenePopupLater = true;
+				if (ImGui::MenuItem("New")) {
+					New();
 				}
-				if (ImGui::MenuItem("Save")) {
-
+				if (ImGui::MenuItem("Open", "Ctrl+O")) {
+					Open();
+				}
+				if (ImGui::MenuItem("Save", "Ctrl+S")) {
+					Save();
 				}
 				if (ImGui::MenuItem("Save as")) {
-					openSaveScenePopupLater = true;					
+					SaveAs();
 				}
+
+				ImGui::Separator();
+
 				if (ImGui::MenuItem("Reload shaders")) {
 					renderer.ReloadShaders();
 				}
+
 				ImGui::Separator();
-				if (ImGui::MenuItem("Exit")){
+
+				if (ImGui::MenuItem("Exit")) {
 					engine.Exit();
 				}
 
-				ImGui::EndMenu();			
-			} 
+				ImGui::EndMenu();
+			}
 
 			// View
 			if (ImGui::BeginMenu("View"))
@@ -135,33 +141,100 @@ namespace editor {
 			}
 
 			/////////////////////
-			ImGui::EndMainMenuBar();
+		} ImGui::EndMainMenuBar();
+
+			ProcessKeyboardShortcuts();
+			
+			// Open scene popup
+			if (m_openNewScenePopupLater == true) {
+				m_openNewScenePopupLater = false;
+					ImGui::OpenPopup("New scene");
+			}
 
 			// Open scene popup
-			if (openLoadScenePopupLater == true ||
-				(Keyboard::IsKeyDown(GLFW_KEY_LEFT_CONTROL) && Keyboard::IsKeyPressed(GLFW_KEY_O))) {
-				m_pathBuffer = "./content/scenes/";
+			if (m_openLoadScenePopupLater == true ) {
+				m_openLoadScenePopupLater = false;
 				ImGui::OpenPopup("Open scene");
-			}
-			if (util::Imgui::LoadFileModal("Open scene", m_sceneExtensionFilter, m_pathBuffer) ){
-// 				scene::Scene * scene = new scene::Scene("tmp");
-// 				fan::Engine::GetEngine().SetSceneForEditor(scene);
-// 				scene->LoadFrom(m_pathBuffer.string());
-
-				scene::Scene & scene = engine.GetScene();
-				scene.LoadFrom(m_pathBuffer.string());
 			}
 
 			// Save scene popup
-			if (	openSaveScenePopupLater == true || 
-				(	Keyboard::IsKeyDown(GLFW_KEY_LEFT_CONTROL) && Keyboard::IsKeyPressed(GLFW_KEY_S) )) {
-				m_pathBuffer = "./content/scenes/";
-				m_extensionIndexBuffer = 0;
+			if ( m_openSaveScenePopupLater == true ) {
+				m_openSaveScenePopupLater = false;
 				ImGui::OpenPopup("Save scene");
 			}
-			if (util::Imgui::SaveFileModal("Save scene", { ".scene" }, m_pathBuffer, m_extensionIndexBuffer)) {
-				engine.GetScene().SaveTo(m_pathBuffer.string());
-			}
-		} 
+
+			DrawModals();		
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
+	void MainMenuBar::ProcessKeyboardShortcuts() {
+
+		if (Keyboard::IsKeyDown(GLFW_KEY_LEFT_CONTROL) && Keyboard::IsKeyPressed(GLFW_KEY_O) ) {
+			Open();
+		}
+
+		if (Keyboard::IsKeyDown(GLFW_KEY_LEFT_CONTROL) && Keyboard::IsKeyPressed(GLFW_KEY_S)) {
+			Save();
+		}
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
+	void MainMenuBar::DrawModals() {
+		fan::Engine &	engine = fan::Engine::GetEngine();
+
+		// New scene
+		if (util::Imgui::SaveFileModal("New scene", {".scene"}, m_pathBuffer, m_extensionIndexBuffer)) {
+			scene::Scene & scene = engine.GetScene();
+			scene.New();
+			scene.SetPath(m_pathBuffer.string());
+		}
+
+		// Open scene
+		if (util::Imgui::LoadFileModal("Open scene", m_sceneExtensionFilter, m_pathBuffer)) {
+			scene::Scene & scene = engine.GetScene();
+			scene.LoadFrom(m_pathBuffer.string());
+		}
+
+		// Save scene
+		if (util::Imgui::SaveFileModal("Save scene", { ".scene" }, m_pathBuffer, m_extensionIndexBuffer)) {
+			engine.GetScene().SetPath(m_pathBuffer.string());
+			engine.GetScene().Save();
+		}
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
+	void MainMenuBar::New() {
+		m_extensionIndexBuffer = 0;
+		m_pathBuffer = "./content/scenes/";
+		m_openNewScenePopupLater = true;
+	}
+	
+	//================================================================================================================================
+	//================================================================================================================================
+	void MainMenuBar::Open() {
+		m_pathBuffer = "./content/scenes/";
+		m_openLoadScenePopupLater = true;
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
+	void MainMenuBar::Save() {
+		scene::Scene & scene = fan::Engine::GetEngine().GetScene();
+		if (scene.HasPath()) {
+			scene.Save();
+		} else {
+			SaveAs();
+		}
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
+	void MainMenuBar::SaveAs() {
+		m_pathBuffer = "./content/scenes/";
+		m_extensionIndexBuffer = 0;
+		m_openSaveScenePopupLater = true;
 	}
 }

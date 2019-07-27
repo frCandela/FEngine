@@ -1,0 +1,8 @@
+gameobject cube
+	Transform 1269105190
+		0 3.78115 2.01768
+		0 0 0 1
+		1 1 1
+	Mesh 52689719
+		content\models\test\the_beauty.fbx
+end

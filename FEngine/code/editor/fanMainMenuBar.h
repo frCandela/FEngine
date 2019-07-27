@@ -16,6 +16,17 @@ namespace editor {
 		bool m_showAABB;
 		bool m_showWireframe;
 
+		void ProcessKeyboardShortcuts();
+		void DrawModals();
+		void New();
+		void Open();
+		void Save();
+		void SaveAs();
+
+		bool m_openNewScenePopupLater = false;
+		bool m_openLoadScenePopupLater = false;
+		bool m_openSaveScenePopupLater = false;
+
 		// Temporary buffers
 		std::fs::path m_pathBuffer;
 		int m_extensionIndexBuffer;

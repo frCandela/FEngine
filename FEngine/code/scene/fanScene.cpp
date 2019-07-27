@@ -16,7 +16,8 @@ namespace scene {
 	//================================================================================================================================
 	//================================================================================================================================
 	Scene::Scene(const std::string _name) :
-		m_name( _name ){
+		m_name( _name )
+		, m_path("")	{
 
 	}
 
@@ -117,26 +118,39 @@ namespace scene {
 	//================================================================================================================================
 	//================================================================================================================================
 	void Scene::Clear() {
+		m_path = "";
+
 		for (int gameobjectIndex = 0; gameobjectIndex < m_gameObjects.size(); gameobjectIndex++) {
 			delete m_gameObjects[gameobjectIndex];
-		} m_gameObjects.clear();
+		} 
+		m_gameObjects.clear();
 		m_startingActors.clear();
 		m_activeActors.clear();
 		m_gameObjectstoDelete.clear();
 	}
 
+
 	//================================================================================================================================
 	//================================================================================================================================
-	void Scene::SaveTo(const std::string _path) const {
+	void Scene::New() {
+		Clear();
+		onSceneLoad.Emmit(this);
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
+	void Scene::Save() const {
 		std::cout << "saving scene: " << m_name << std::endl;
-		std::ofstream outStream(_path);
-		for (int gameobjectIndex = 0; gameobjectIndex < m_gameObjects.size(); gameobjectIndex++) {
-			scene::Gameobject * gameobject = m_gameObjects[gameobjectIndex];
-			if (gameobject->HasFlag(scene::Gameobject::NOT_SAVED) == false) {
-				gameobject->Save(outStream);
+		std::ofstream outStream(m_path);
+		if (outStream.is_open()) {
+			for (int gameobjectIndex = 0; gameobjectIndex < m_gameObjects.size(); gameobjectIndex++) {
+				scene::Gameobject * gameobject = m_gameObjects[gameobjectIndex];
+				if (gameobject->HasFlag(scene::Gameobject::NOT_SAVED) == false) {
+					gameobject->Save(outStream);
+				}
 			}
+			outStream.close();
 		}
-		outStream.close();
 	}
 
 	//================================================================================================================================
@@ -146,23 +160,29 @@ namespace scene {
 
 		std::cout << "loading scene: " << _path << std::endl;
 		std::ifstream inStream(_path);
-		std::string inputString = "";
-		inStream >> inputString;
-		while (inStream.eof() == false) {
-			if (inputString == "gameobject") {
-				inStream >> inputString; // Gameobject name
-				scene::Gameobject * gameobject = CreateGameobject(inputString);	
-				std::cout << "Gameobject: " << inputString << std::endl;
-				gameobject->Load(inStream);
-			}
-			else {
-				std::cout << "fail " << inputString << std::endl;
-			}
-			inStream >> inputString;
-		}
-		inStream.close();
+		if (inStream.is_open()) {
+			m_path = _path;
 
-		onSceneLoad.Emmit(this);
+			std::string inputString = "";
+			inStream >> inputString;
+			while (inStream.eof() == false) {
+				if (inputString == "gameobject") {
+					inStream >> inputString; // Gameobject name
+					scene::Gameobject * gameobject = CreateGameobject(inputString);
+					std::cout << "Gameobject: " << inputString << std::endl;
+					gameobject->Load(inStream);
+				}
+				else {
+					std::cout << "fail " << inputString << std::endl;
+				}
+				inStream >> inputString;
+			}
+			inStream.close();
+
+			onSceneLoad.Emmit(this);
+		} else {
+			std::cout << "failed to open file " << _path << std::endl;
+		}
 	}
 
 }
