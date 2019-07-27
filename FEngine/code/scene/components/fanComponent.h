@@ -1,7 +1,7 @@
 #pragma once
 
-#include "util/fanISerializable.h"
-#include "util/fanTypeInfo.h"
+#include "core/fanISerializable.h"
+#include "core/fanTypeInfo.h"
 
 namespace scene
 {

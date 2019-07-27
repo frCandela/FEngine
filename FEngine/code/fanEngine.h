@@ -1,6 +1,6 @@
 #pragma once
 
-#include "util/fanSerializedValues.h"
+#include "core/files/fanSerializedValues.h"
 
 namespace vk {
 	class Renderer;

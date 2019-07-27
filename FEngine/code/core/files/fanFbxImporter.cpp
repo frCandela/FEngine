@@ -1,6 +1,6 @@
 #include "fanIncludes.h"
 
-#include "util/fbx/fanFbxImporter.h"
+#include "core/files/fanFbxImporter.h"
 #include "scene/components/fanMesh.h"
 #include "scene/fanGameobject.h"
 #include "fbxsdk.h"

@@ -3,7 +3,7 @@
 #include "scene/components/fanTransform.h"
 #include "scene/components/fanComponent.h"
 #include "scene/fanGameobject.h"
-#include "util/fanSignal.h"
+#include "core/fanSignal.h"
 
 namespace scene
 {

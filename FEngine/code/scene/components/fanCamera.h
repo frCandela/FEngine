@@ -1,7 +1,7 @@
 #pragma once
 
 #include "scene/components/fanComponent.h"
-#include "util/shapes/fanRay.h"
+#include "core/math/shapes/fanRay.h"
 
 namespace shape { class ray; }
 namespace scene

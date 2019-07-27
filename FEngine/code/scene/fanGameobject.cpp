@@ -4,7 +4,7 @@
 #include "scene/components/fanComponent.h"
 #include "scene/components/fanMesh.h"
 #include "scene/components/fanTransform.h"
-#include "util/fanSignal.h"
+#include "core/fanSignal.h"
 
 namespace scene
 {

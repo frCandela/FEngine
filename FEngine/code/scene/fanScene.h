@@ -1,6 +1,6 @@
 #pragma once
 
-#include "util/fanSignal.h"
+#include "core/fanSignal.h"
 
 namespace scene
 {

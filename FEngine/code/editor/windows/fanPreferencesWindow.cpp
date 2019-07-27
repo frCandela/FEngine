@@ -2,7 +2,7 @@
 
 #include "editor/windows/fanPreferencesWindow.h"
 #include "fanEngine.h"
-#include "util/fanImguiUtil.h"
+#include "editor/fanModals.h"
 
 namespace editor {
 

@@ -5,7 +5,7 @@
 #include "scene/fanScene.h"
 #include "scene/fanGameobject.h"
 #include "scene/components/fanTransform.h"
-#include "util/fanInput.h"
+#include "core/fanInput.h"
 
 #include "fanEngine.h"
 

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "util/fanAlignedMemory.h"
+#include "core/memory/fanAlignedMemory.h"
 
 namespace scene { 
 	class Mesh;  

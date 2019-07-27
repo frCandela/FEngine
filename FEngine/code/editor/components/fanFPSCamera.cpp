@@ -4,8 +4,8 @@
 #include "scene/components/fanTransform.h"
 #include "scene/fanGameobject.h"
 #include "scene/components/fanCamera.h"
-#include "util/fanSignal.h"
-#include "util/fanInput.h"
+#include "core/fanSignal.h"
+#include "core/fanInput.h"
 #include "fanEngine.h"
 #include "vulkan/vkRenderer.h"
 

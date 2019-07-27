@@ -1,6 +1,6 @@
 #include "fanIncludes.h"
 
-#include "util/shapes/fanTriangle.h"
+#include "core/math/shapes/fanTriangle.h"
 
 namespace shape
 {

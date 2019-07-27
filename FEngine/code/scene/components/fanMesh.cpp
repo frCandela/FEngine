@@ -4,9 +4,9 @@
 #include "scene/components/fanTransform.h"
 #include "scene/fanGameobject.h"
 #include "fanEngine.h"
-#include "util/shapes/fanAABB.h"
+#include "core/math/shapes/fanAABB.h"
 #include "vulkan/vkRenderer.h"
-#include "util/fbx/fanFbxImporter.h"
+#include "core/files/fanFbxImporter.h"
 
 namespace scene
 {

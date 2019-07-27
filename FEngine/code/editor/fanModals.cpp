@@ -1,7 +1,7 @@
 #include "fanIncludes.h"
 
-#include "util/fanImguiUtil.h"
-#include "util/fanInput.h"
+#include "editor/fanModals.h"
+#include "core/fanInput.h"
 
 
 

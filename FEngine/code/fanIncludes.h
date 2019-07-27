@@ -31,11 +31,11 @@
 #include <cassert>
 #include <filesystem>
 
-#include "fanUsing.h"
+#include "fanGlobalUsing.h"
 
-#include "util/fanVector2.h"
-#include "util/fanUtil.h"
-#include "util/fanHash.h"
+#include "core/math/fanMathUtils.h"
+#include "core/math/fanVector2.h"
+#include "core/fanHash.h"
 #include "vulkan/util/vkColor.h"
 
 #pragma warning( pop )

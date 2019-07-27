@@ -1,7 +1,7 @@
 #pragma once
 
 #include "vulkan/util/vkVertex.h"
-#include "util/shapes/fanAABB.h"
+#include "core/math/shapes/fanAABB.h"
 
 namespace scene {
 	class Camera;

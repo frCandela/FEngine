@@ -1,7 +1,7 @@
 #include "fanIncludes.h"
 
-#include "util/shapes/fanAABB.h"
-#include "util/shapes/fanPlane.h"
+#include "core/math/shapes/fanAABB.h"
+#include "core/math/shapes/fanPlane.h"
 
 namespace shape
 {

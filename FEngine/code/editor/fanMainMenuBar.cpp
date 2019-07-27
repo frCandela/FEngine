@@ -5,9 +5,9 @@
 #include "editor/windows/fanSceneWindow.h"
 #include "editor/windows/fanInspectorWindow.h"
 #include "editor/windows/fanPreferencesWindow.h"
-#include "util/fanSerializedValues.h"
-#include "util/fanInput.h"
-#include "util/fanImguiUtil.h"
+#include "core/files/fanSerializedValues.h"
+#include "core/fanInput.h"
+#include "editor/fanModals.h"
 #include "scene/fanScene.h"
 
 #include "vulkan/vkRenderer.h"

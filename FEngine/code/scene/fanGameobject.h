@@ -1,8 +1,8 @@
 #pragma once
 
-#include "util/fanSignal.h"
-#include "util/shapes/fanAABB.h"
-#include "util/fanISerializable.h"
+#include "core/fanSignal.h"
+#include "core/math/shapes/fanAABB.h"
+#include "core/fanISerializable.h"
 
 namespace scene
 {

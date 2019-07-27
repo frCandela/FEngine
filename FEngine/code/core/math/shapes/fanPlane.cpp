@@ -1,6 +1,6 @@
 #include "fanIncludes.h"
 
-#include "util/shapes/fanPlane.h"
+#include "core/math/shapes/fanPlane.h"
 
 namespace shape {
 	Plane::Plane(const btVector3 _point, const btVector3 _normal) :

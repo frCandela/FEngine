@@ -4,8 +4,8 @@
 #include "vulkan/pipelines/vkPostprocessPipeline.h"
 #include "vulkan/pipelines/vkForwardPipeline.h"
 #include "vulkan/vkRenderer.h"
-#include "util/fanTime.h"
-#include "util/fanImguiUtil.h"
+#include "core/fanTime.h"
+#include "editor/fanModals.h"
 
 namespace editor {
 

@@ -7,9 +7,8 @@
 #include "scene/components/fanCamera.h"
 #include "scene/components/fanMesh.h"
 #include "editor/components/fanFPSCamera.h"
-#include "util/fanUtil.h"
-#include "util/fanImguiUtil.h"
-#include "util/fanSignal.h"
+#include "editor/fanModals.h"
+#include "core/fanSignal.h"
 #include "vulkan/vkRenderer.h"
 #include "fanEngine.h"
 

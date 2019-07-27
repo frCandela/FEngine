@@ -1,4 +1,4 @@
-#include "util/fanVector2.h"
+#include "core/math/fanVector2.h"
 
 btVector2 operator+(const btVector2& _v1, const btVector2& _v2) {
 	btVector2 tmp(_v1);

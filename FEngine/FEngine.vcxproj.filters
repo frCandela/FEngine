@@ -23,9 +23,6 @@
     <Filter Include="code\deps">
       <UniqueIdentifier>{438721f2-b2df-4736-b550-620897169813}</UniqueIdentifier>
     </Filter>
-    <Filter Include="code\util">
-      <UniqueIdentifier>{26735d92-fe63-4ca4-a659-b6baa31d270a}</UniqueIdentifier>
-    </Filter>
     <Filter Include="code\editor">
       <UniqueIdentifier>{8d39c302-6e12-4a9c-8a2c-7f32301265c6}</UniqueIdentifier>
     </Filter>
@@ -35,12 +32,6 @@
     <Filter Include="code\scene\components">
       <UniqueIdentifier>{c32148bd-658b-4850-9756-15c541e7a217}</UniqueIdentifier>
     </Filter>
-    <Filter Include="code\util\shapes">
-      <UniqueIdentifier>{1ffc6200-2603-4fae-ad52-1a8ca1662e37}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="code\util\fbx">
-      <UniqueIdentifier>{62c1088f-34f5-45b1-8362-82d150b5b663}</UniqueIdentifier>
-    </Filter>
     <Filter Include="code\editor\components">
       <UniqueIdentifier>{2daa2b21-aa9c-492f-81be-6a2aa4ffd41e}</UniqueIdentifier>
     </Filter>
@@ -49,6 +40,21 @@
     </Filter>
     <Filter Include="code\deps\glm">
       <UniqueIdentifier>{a2b8d3f7-050c-4b9d-9815-c0641c2ff41d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="code\core">
+      <UniqueIdentifier>{3d0967e0-471a-4094-a367-05eace9ced35}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="code\core\files">
+      <UniqueIdentifier>{62de4e38-3d4f-45f0-96ed-e04124d546f5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="code\core\math">
+      <UniqueIdentifier>{9bf90aa5-f912-4699-b60e-e1e76d000c60}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="code\core\memory">
+      <UniqueIdentifier>{6a451d89-e9ca-4c65-a88f-0a58aca3146e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="code\core\math\shapes">
+      <UniqueIdentifier>{e25c3209-309f-4a10-a7a4-bb6f05aaa4f8}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -115,20 +121,11 @@
     <ClCompile Include="code\editor\fanMainMenuBar.cpp">
       <Filter>code\editor</Filter>
     </ClCompile>
-    <ClCompile Include="code\util\fanInput.cpp">
-      <Filter>code\util</Filter>
-    </ClCompile>
-    <ClCompile Include="code\util\fanTime.cpp">
-      <Filter>code\util</Filter>
-    </ClCompile>
     <ClCompile Include="code\fanEngine.cpp">
       <Filter>code</Filter>
     </ClCompile>
     <ClCompile Include="code\fanMain.cpp">
       <Filter>code</Filter>
-    </ClCompile>
-    <ClCompile Include="code\util\fanImguiUtil.cpp">
-      <Filter>code\util</Filter>
     </ClCompile>
     <ClCompile Include="code\vulkan\pipelines\vkDebugPipeline.cpp">
       <Filter>code\vulkan\pipelines</Filter>
@@ -148,17 +145,8 @@
     <ClCompile Include="code\scene\components\fanCamera.cpp">
       <Filter>code\scene\components</Filter>
     </ClCompile>
-    <ClCompile Include="code\util\shapes\fanRay.cpp">
-      <Filter>code\util\shapes</Filter>
-    </ClCompile>
     <ClCompile Include="code\scene\components\fanMesh.cpp">
       <Filter>code\scene\components</Filter>
-    </ClCompile>
-    <ClCompile Include="code\util\fbx\fanFbxImporter.cpp">
-      <Filter>code\util\fbx</Filter>
-    </ClCompile>
-    <ClCompile Include="code\util\fanUniqueID.cpp">
-      <Filter>code\util</Filter>
     </ClCompile>
     <ClCompile Include="code\scene\components\fanActor.cpp">
       <Filter>code\scene\components</Filter>
@@ -181,33 +169,57 @@
     <ClCompile Include="code\editor\components\fanFPSCamera.cpp">
       <Filter>code\editor\components</Filter>
     </ClCompile>
-    <ClCompile Include="code\util\shapes\fanPlane.cpp">
-      <Filter>code\util\shapes</Filter>
-    </ClCompile>
-    <ClCompile Include="code\util\shapes\fanShape.cpp">
-      <Filter>code\util\shapes</Filter>
-    </ClCompile>
-    <ClCompile Include="code\util\shapes\fanTriangle.cpp">
-      <Filter>code\util\shapes</Filter>
-    </ClCompile>
-    <ClCompile Include="code\util\shapes\fanCube.cpp">
-      <Filter>code\util\shapes</Filter>
-    </ClCompile>
-    <ClCompile Include="code\util\fanVector2.cpp" />
-    <ClCompile Include="code\util\fanUtil.cpp" />
-    <ClCompile Include="code\vulkan\util\vkColor.cpp" />
     <ClCompile Include="code\vulkan\util\vkShape.inl" />
-    <ClCompile Include="code\util\fanSerializedValues.cpp">
-      <Filter>code\util</Filter>
+    <ClCompile Include="code\vulkan\util\vkColor.cpp">
+      <Filter>code\vulkan\util</Filter>
     </ClCompile>
-    <ClCompile Include="code\util\shapes\fanAABB.cpp">
-      <Filter>code\util\shapes</Filter>
+    <ClCompile Include="code\core\fanInput.cpp">
+      <Filter>code\core</Filter>
     </ClCompile>
-    <ClCompile Include="code\util\fanISerializable.cpp">
-      <Filter>code\util</Filter>
+    <ClCompile Include="code\core\fanISerializable.cpp">
+      <Filter>code\core</Filter>
     </ClCompile>
-    <ClCompile Include="code\util\fanTypeInfo.cpp">
-      <Filter>code\util</Filter>
+    <ClCompile Include="code\core\fanTime.cpp">
+      <Filter>code\core</Filter>
+    </ClCompile>
+    <ClCompile Include="code\core\fanTypeInfo.cpp">
+      <Filter>code\core</Filter>
+    </ClCompile>
+    <ClCompile Include="code\core\fanUniqueID.cpp">
+      <Filter>code\core</Filter>
+    </ClCompile>
+    <ClCompile Include="code\core\files\fanFbxImporter.cpp">
+      <Filter>code\core\files</Filter>
+    </ClCompile>
+    <ClCompile Include="code\core\math\fanMathUtils.cpp">
+      <Filter>code\core\math</Filter>
+    </ClCompile>
+    <ClCompile Include="code\core\math\fanVector2.cpp">
+      <Filter>code\core\math</Filter>
+    </ClCompile>
+    <ClCompile Include="code\core\math\shapes\fanCube.cpp">
+      <Filter>code\core\math\shapes</Filter>
+    </ClCompile>
+    <ClCompile Include="code\core\math\shapes\fanPlane.cpp">
+      <Filter>code\core\math\shapes</Filter>
+    </ClCompile>
+    <ClCompile Include="code\core\math\shapes\fanRay.cpp">
+      <Filter>code\core\math\shapes</Filter>
+    </ClCompile>
+    <ClCompile Include="code\core\math\shapes\fanShape.cpp">
+      <Filter>code\core\math\shapes</Filter>
+    </ClCompile>
+    <ClCompile Include="code\core\math\shapes\fanTriangle.cpp">
+      <Filter>code\core\math\shapes</Filter>
+    </ClCompile>
+    <ClCompile Include="code\core\math\shapes\fanAABB.cpp">
+      <Filter>code\core\math\shapes</Filter>
+    </ClCompile>
+    <ClCompile Include="code\core\files\fanSerializedValues.cpp">
+      <Filter>code\core\files</Filter>
+    </ClCompile>
+    <ClCompile Include="code\editor\fanModals.cpp">
+      <Filter>code\editor</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -265,23 +277,11 @@
     <ClInclude Include="code\editor\fanMainMenuBar.h">
       <Filter>code\editor</Filter>
     </ClInclude>
-    <ClInclude Include="code\util\fanSignal.h">
-      <Filter>code\util</Filter>
-    </ClInclude>
-    <ClInclude Include="code\util\fanInput.h">
-      <Filter>code\util</Filter>
-    </ClInclude>
-    <ClInclude Include="code\util\fanTime.h">
-      <Filter>code\util</Filter>
-    </ClInclude>
     <ClInclude Include="code\fanEngine.h">
       <Filter>code</Filter>
     </ClInclude>
     <ClInclude Include="code\fanIncludes.h">
       <Filter>code</Filter>
-    </ClInclude>
-    <ClInclude Include="code\util\fanImguiUtil.h">
-      <Filter>code\util</Filter>
     </ClInclude>
     <ClInclude Include="code\vulkan\pipelines\vkDebugPipeline.h">
       <Filter>code\vulkan\pipelines</Filter>
@@ -298,23 +298,11 @@
     <ClInclude Include="code\scene\components\fanComponent.h">
       <Filter>code\scene\components</Filter>
     </ClInclude>
-    <ClInclude Include="code\util\fanUtil.h">
-      <Filter>code\vulkan\util</Filter>
-    </ClInclude>
     <ClInclude Include="code\scene\components\fanCamera.h">
       <Filter>code\scene\components</Filter>
     </ClInclude>
-    <ClInclude Include="code\util\shapes\fanRay.h">
-      <Filter>code\util\shapes</Filter>
-    </ClInclude>
     <ClInclude Include="code\scene\components\fanMesh.h">
       <Filter>code\scene\components</Filter>
-    </ClInclude>
-    <ClInclude Include="code\util\fbx\fanFbxImporter.h">
-      <Filter>code\util\fbx</Filter>
-    </ClInclude>
-    <ClInclude Include="code\util\fanUniqueID.h">
-      <Filter>code\util</Filter>
     </ClInclude>
     <ClInclude Include="code\scene\components\fanActor.h">
       <Filter>code\scene\components</Filter>
@@ -772,47 +760,71 @@
     <ClInclude Include="code\editor\components\fanFPSCamera.h">
       <Filter>code\editor\components</Filter>
     </ClInclude>
-    <ClInclude Include="code\util\shapes\fanPlane.h">
-      <Filter>code\util\shapes</Filter>
-    </ClInclude>
-    <ClInclude Include="code\util\shapes\fanShape.h">
-      <Filter>code\util\shapes</Filter>
-    </ClInclude>
-    <ClInclude Include="code\util\shapes\fanTriangle.h">
-      <Filter>code\util\shapes</Filter>
-    </ClInclude>
-    <ClInclude Include="code\util\shapes\fanCube.h">
-      <Filter>code\util\shapes</Filter>
-    </ClInclude>
-    <ClInclude Include="code\util\fanVector2.h">
-      <Filter>code</Filter>
-    </ClInclude>
-    <ClInclude Include="code\vulkan\util\vkColor.h">
-      <Filter>code</Filter>
-    </ClInclude>
-    <ClInclude Include="code\vulkan\util\vkShape.h">
-      <Filter>code</Filter>
-    </ClInclude>
-    <ClInclude Include="code\util\fanSerializedValues.h">
-      <Filter>code\util</Filter>
-    </ClInclude>
-    <ClInclude Include="code\util\shapes\fanAABB.h">
-      <Filter>code\util\shapes</Filter>
-    </ClInclude>
-    <ClInclude Include="code\util\fanISerializable.h">
-      <Filter>code\util</Filter>
-    </ClInclude>
     <ClInclude Include="deps\nlohmann_json.h">
       <Filter>code\deps</Filter>
     </ClInclude>
-    <ClInclude Include="code\util\fanHash.h">
-      <Filter>code\util</Filter>
+    <ClInclude Include="code\vulkan\util\vkColor.h">
+      <Filter>code\vulkan\util</Filter>
     </ClInclude>
-    <ClInclude Include="code\util\fanTypeInfo.h">
-      <Filter>code\util</Filter>
-    </ClInclude>
-    <ClInclude Include="code\fanUsing.h">
+    <ClInclude Include="code\fanGlobalUsing.h">
       <Filter>code</Filter>
+    </ClInclude>
+    <ClInclude Include="code\core\fanHash.h">
+      <Filter>code\core</Filter>
+    </ClInclude>
+    <ClInclude Include="code\core\fanInput.h">
+      <Filter>code\core</Filter>
+    </ClInclude>
+    <ClInclude Include="code\core\fanISerializable.h">
+      <Filter>code\core</Filter>
+    </ClInclude>
+    <ClInclude Include="code\core\fanSignal.h">
+      <Filter>code\core</Filter>
+    </ClInclude>
+    <ClInclude Include="code\core\fanTime.h">
+      <Filter>code\core</Filter>
+    </ClInclude>
+    <ClInclude Include="code\core\fanTypeInfo.h">
+      <Filter>code\core</Filter>
+    </ClInclude>
+    <ClInclude Include="code\core\fanUniqueID.h">
+      <Filter>code\core</Filter>
+    </ClInclude>
+    <ClInclude Include="code\core\files\fanFbxImporter.h">
+      <Filter>code\core\files</Filter>
+    </ClInclude>
+    <ClInclude Include="code\core\files\fanSerializedValues.h">
+      <Filter>code\core\files</Filter>
+    </ClInclude>
+    <ClInclude Include="code\core\math\fanMathUtils.h">
+      <Filter>code\core\math</Filter>
+    </ClInclude>
+    <ClInclude Include="code\core\math\fanVector2.h">
+      <Filter>code\core\math</Filter>
+    </ClInclude>
+    <ClInclude Include="code\core\math\shapes\fanCube.h">
+      <Filter>code\core\math\shapes</Filter>
+    </ClInclude>
+    <ClInclude Include="code\core\math\shapes\fanPlane.h">
+      <Filter>code\core\math\shapes</Filter>
+    </ClInclude>
+    <ClInclude Include="code\core\math\shapes\fanRay.h">
+      <Filter>code\core\math\shapes</Filter>
+    </ClInclude>
+    <ClInclude Include="code\core\math\shapes\fanShape.h">
+      <Filter>code\core\math\shapes</Filter>
+    </ClInclude>
+    <ClInclude Include="code\core\math\shapes\fanTriangle.h">
+      <Filter>code\core\math\shapes</Filter>
+    </ClInclude>
+    <ClInclude Include="code\core\math\shapes\fanAABB.h">
+      <Filter>code\core\math\shapes</Filter>
+    </ClInclude>
+    <ClInclude Include="code\core\memory\fanAlignedMemory.h">
+      <Filter>code\core\memory</Filter>
+    </ClInclude>
+    <ClInclude Include="code\editor\fanModals.h">
+      <Filter>code\editor</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
