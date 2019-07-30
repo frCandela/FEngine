@@ -5,7 +5,7 @@
 
 namespace scene {
 	class Camera;
-	class Mesh;
+	class Model;
 	class Transform;
 }
 
@@ -27,7 +27,7 @@ namespace vk {
 	class DebugPipeline;
 	class Color;
 
-	struct MeshData;
+	struct ModelData;
 
 	class Renderer {
 	public:
@@ -51,15 +51,15 @@ namespace vk {
 		PostprocessPipeline *	GetPostprocessPipeline()	{ return m_postprocessPipeline; }
 		ForwardPipeline *		GetForwardPipeline()		{ return m_forwardPipeline; }
 		glm::vec4				GetClearColor() const		{ return m_clearColor;  }
-		const std::vector <MeshData> & GetMeshList() const	{ return m_meshList; }
+		const std::vector <ModelData> & GetMeshList() const	{ return m_modelList; }
 
 		void SetClearColor(glm::vec4 _color) { m_clearColor = _color; }
 		void SetMainCamera(scene::Camera * _camera);
 
 		bool HasNoDebugToDraw() const { return m_debugLines.empty() && m_debugTriangles.empty(); }
 
-		void AddMesh		( scene::Mesh * _mesh);
-		void RemoveMesh		( scene::Mesh * _mesh);
+		void AddModel		( scene::Model * _model);
+		void RemoveModel	( scene::Model * _model);
 
 		void					DebugPoint		( const btVector3 _pos, const vk::Color _color);
 		void					DebugLine		( const btVector3 _start, const btVector3 _end, const vk::Color _color);
@@ -73,7 +73,7 @@ namespace vk {
 		//SCENE REFERENCES
 		scene::Camera * m_mainCamera;
 		scene::Transform * m_mainCameraTransform;
-		std::vector <MeshData> m_meshList;
+		std::vector <ModelData> m_modelList;
 
 		// DEBUG DATA
 		std::vector<DebugVertex> m_debugLines;

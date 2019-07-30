@@ -1,7 +1,7 @@
 #include "fanIncludes.h"
 
 #include "core/files/fanFbxImporter.h"
-#include "scene/components/fanMesh.h"
+#include "core/ressources/fanMesh.h"
 #include "scene/fanGameobject.h"
 #include "fbxsdk.h"
 
@@ -91,7 +91,7 @@ namespace util {
 
 	//================================================================================================================================
 	//================================================================================================================================
-	bool FBXImporter::GetMesh(scene::Mesh & _mesh) {
+	bool FBXImporter::GetMesh( ressource::Mesh & _mesh) {
 		
 		fbxsdk::FbxAxisSystem axisSystem( 
 			fbxsdk::FbxAxisSystem::EUpVector::eYAxis, 
@@ -128,7 +128,7 @@ namespace util {
 			return false;
 		}
 
-		_mesh.GetGameobject()->onComponentModified.Emmit(&_mesh);
+		//_mesh.GetGameobject()->onComponentModified.Emmit(&_mesh);
 
 		std::vector<uint32_t>	& indices	= _mesh.GetIndices();
 		std::vector<vk::Vertex> & vertices	= _mesh.GetVertices();
@@ -171,7 +171,7 @@ namespace util {
 			normal = globalRotation.MultT(normal);
 			vertices[vertexIndex].normal = glm::vec3(normal[0], normal[1], normal[2]);
 		}
-		_mesh.SetModified(true);
+		//_mesh.SetModified(true);
 		return true;
 	}
 }

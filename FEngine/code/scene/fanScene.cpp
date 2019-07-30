@@ -5,7 +5,7 @@
 #include "scene/components/fanComponent.h"
 #include "scene/components/fanTransform.h"
 #include "scene/components/fanCamera.h"
-#include "scene/components/fanMesh.h"
+#include "scene/components/fanModel.h"
 #include "scene/components/fanActor.h"
 #include "core/fanSignal.h"
 #include "fanEngine.h"

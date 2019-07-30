@@ -2,8 +2,9 @@
 
 #include "scene/fanGameobject.h"
 #include "scene/components/fanComponent.h"
-#include "scene/components/fanMesh.h"
+#include "scene/components/fanModel.h"
 #include "scene/components/fanTransform.h"
+#include "core/ressources/fanMesh.h"
 #include "core/fanSignal.h"
 
 namespace scene
@@ -60,9 +61,9 @@ namespace scene
 	//================================================================================================================================
 	void Gameobject::ComputeAABB() {
 
-		const scene::Mesh * mesh = GetComponent< scene::Mesh >();
-		if ( mesh != nullptr && mesh->IsBeingDeleted() == false && mesh->GetIndices().size() > 0) {
-			m_aabb = mesh->ComputeAABB();
+		const scene::Model * model = GetComponent< scene::Model >();
+		if ( model != nullptr && model->IsBeingDeleted() == false && model->mesh.Get()->GetIndices().size() > 0) {
+			m_aabb = model->ComputeAABB();
 		} else {
 			const btVector3 origin = GetComponent< scene::Transform >()->GetPosition();
 			const float size = 0.05f;
@@ -73,7 +74,7 @@ namespace scene
 	//================================================================================================================================
 	//================================================================================================================================
 	void Gameobject::OnComponentModified(scene::Component * _component) {	
-		if (_component->IsType<scene::Transform>() == true || _component->IsType<scene::Mesh>()) {
+		if (_component->IsType<scene::Transform>() == true || _component->IsType<scene::Model>()) {
 			ComputeAABB();
 		}		
 	}
@@ -81,7 +82,7 @@ namespace scene
 	//================================================================================================================================
 	//================================================================================================================================
 	void Gameobject::OnComponentDeleted(scene::Component * _component) {
-		if ( _component->IsType<scene::Mesh>()) {
+		if ( _component->IsType<scene::Model>()) {
 			ComputeAABB();
 		}
 	}

@@ -3,7 +3,7 @@
 #include "core/memory/fanAlignedMemory.h"
 
 namespace scene { 
-	class Mesh;  
+	class Model;  
 	class Transform;
 }
 
@@ -16,8 +16,8 @@ namespace vk {
 	class Buffer;
 
 
-	struct MeshData {
-		scene::Mesh * mesh;
+	struct ModelData {
+		scene::Model * model;
 		scene::Transform * transform;
 		vk::Buffer * indexBuffer;
 		vk::Buffer * vertexBuffer;
@@ -50,7 +50,7 @@ namespace vk {
 		~ForwardPipeline();
 
 		void Create( VkExtent2D _extent );
-		void Draw(VkCommandBuffer _commandBuffer, const std::vector<MeshData>& _meshData );
+		void Draw(VkCommandBuffer _commandBuffer, const std::vector<ModelData>& _meshData );
 		void Resize(VkExtent2D _extent);
 		void ReloadShaders();
 

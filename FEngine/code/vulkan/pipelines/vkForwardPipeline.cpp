@@ -8,7 +8,8 @@
 #include "vulkan/core/vkBuffer.h"
 #include "vulkan/vkRenderer.h"
 #include "vulkan/util/vkVertex.h"
-#include "scene/components/fanMesh.h"
+#include "scene/components/fanModel.h"
+#include "core/ressources/fanMesh.h"
 
 namespace vk {
 	//================================================================================================================================
@@ -106,14 +107,14 @@ namespace vk {
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void ForwardPipeline::Draw(VkCommandBuffer _commandBuffer, const std::vector<MeshData>& _meshData) {
+	void ForwardPipeline::Draw(VkCommandBuffer _commandBuffer, const std::vector<ModelData>& _meshData) {
 		vkCmdBindPipeline(_commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, m_pipeline);
 
 		
 		VkDeviceSize offsets[] = { 0 };
 
 		for (int meshIndex = 0; meshIndex < _meshData.size(); meshIndex++){
-			const MeshData& mesh = _meshData[meshIndex];
+			const ModelData& mesh = _meshData[meshIndex];
 			VkBuffer vertexBuffers[] = { mesh.vertexBuffer->GetBuffer() };
 			vkCmdBindVertexBuffers(_commandBuffer, 0, 1, vertexBuffers, offsets);
 			vkCmdBindIndexBuffer(_commandBuffer, mesh.indexBuffer->GetBuffer(), 0, VK_INDEX_TYPE_UINT32);
@@ -128,7 +129,7 @@ namespace vk {
 				1,
 				&dynamicOffset
 			);
-			vkCmdDrawIndexed(_commandBuffer, static_cast<uint32_t>(mesh.mesh->GetIndices().size()), 1, 0, 0, 0);
+			vkCmdDrawIndexed(_commandBuffer, static_cast<uint32_t>(mesh.model->mesh.Get()->GetIndices().size()), 1, 0, 0, 0);
 		}
 	}
 

@@ -2,9 +2,8 @@
 
 #include "core/files/fanSerializedValues.h"
 
-namespace vk {
-	class Renderer;
-}
+namespace vk { class Renderer; }
+namespace ressource { class RessourceManager; }
 namespace editor {
 	class MainMenuBar;
 	class RenderWindow;

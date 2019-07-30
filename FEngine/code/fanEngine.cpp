@@ -12,6 +12,8 @@
 #include "core/math/shapes/fanPlane.h"
 #include "core/math/shapes/fanAABB.h"
 #include "core/files/fanFbxImporter.h"
+#include "core/ressources/fanMesh.h"
+#include "core/ressources/fanRessourceManager.h"
 #include "editor/fanModals.h"
 #include "editor/fanMainMenuBar.h"
 #include "editor/windows/fanRenderWindow.h"	
@@ -24,9 +26,8 @@
 #include "editor/components/fanFPSCamera.h"		
 #include "scene/components/fanCamera.h"
 #include "scene/components/fanTransform.h"
-#include "scene/components/fanMesh.h"
+#include "scene/components/fanModel.h"
 #include "scene/components/fanActor.h"
-#include "scene/components/fanMesh.h"
 
 
 #include "bullet/BulletCollision/CollisionShapes/btCapsuleShape.h"
@@ -101,10 +102,11 @@ namespace fan {
 	//================================================================================================================================
 	void Engine::Run()
 	{
+		ressource::RessourceManager::RegisterRessource<ressource::Mesh>("content/_default/default.fbx");
+
 		float lastUpdateTime = Time::ElapsedSinceStartup();
 		while ( m_applicationShouldExit == false && m_renderer->WindowIsOpen() == true)
 		{
-
 			const float time = Time::ElapsedSinceStartup();
 			const float updateDelta = time - lastUpdateTime;
 
@@ -185,9 +187,9 @@ namespace fan {
 	//================================================================================================================================
 	//================================================================================================================================
 	void Engine::DrawWireframe() const {
-		const std::vector < vk::MeshData> & meshList = m_renderer->GetMeshList();
+		const std::vector < vk::ModelData> & meshList = m_renderer->GetMeshList();
 		for (int meshIndex = 0; meshIndex < meshList.size(); meshIndex++) {
-			const scene::Mesh * const mesh = meshList[meshIndex].mesh;
+			const ressource::Mesh* mesh = meshList[meshIndex].model->mesh.Get();
 			const glm::mat4  modelMat = meshList[meshIndex].transform->GetModelMatrix();
 
 			const std::vector<uint32_t> & indices = mesh->GetIndices();
@@ -207,8 +209,7 @@ namespace fan {
 	//================================================================================================================================
 	//================================================================================================================================
 	void Engine::ManageSelection() {
-		bool mouseCaptured = ImGui::GetIO().WantCaptureMouse;;
-
+		bool mouseCaptured = ImGui::GetIO().WantCaptureMouse;
 
 		// Translation gizmo on selected gameobject
 		if (m_selectedGameobject != nullptr && m_selectedGameobject != m_editorCamera->GetGameobject()) {
@@ -261,6 +262,8 @@ namespace fan {
 		m_sceneWindow->Draw();
 		m_inspectorWindow->Draw();
 		m_preferencesWindow->Draw();
+
+		ressource::RessourceManager::DrawUI();
 	}
 
 	//================================================================================================================================

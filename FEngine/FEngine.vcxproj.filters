@@ -56,6 +56,9 @@
     <Filter Include="code\core\math\shapes">
       <UniqueIdentifier>{e25c3209-309f-4a10-a7a4-bb6f05aaa4f8}</UniqueIdentifier>
     </Filter>
+    <Filter Include="code\core\ressources">
+      <UniqueIdentifier>{14795265-53e0-4a53-be28-fe0c65a03c14}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="deps\imgui\imgui.cpp">
@@ -145,9 +148,6 @@
     <ClCompile Include="code\scene\components\fanCamera.cpp">
       <Filter>code\scene\components</Filter>
     </ClCompile>
-    <ClCompile Include="code\scene\components\fanMesh.cpp">
-      <Filter>code\scene\components</Filter>
-    </ClCompile>
     <ClCompile Include="code\scene\components\fanActor.cpp">
       <Filter>code\scene\components</Filter>
     </ClCompile>
@@ -220,6 +220,18 @@
     </ClCompile>
     <ClCompile Include="code\editor\fanModals.cpp">
       <Filter>code\editor</Filter>
+    </ClCompile>
+    <ClCompile Include="code\core\ressources\fanRessourceManager.cpp">
+      <Filter>code\core\ressources</Filter>
+    </ClCompile>
+    <ClCompile Include="code\core\ressources\fanRessource.cpp">
+      <Filter>code\core\ressources</Filter>
+    </ClCompile>
+    <ClCompile Include="code\core\ressources\fanMesh.cpp">
+      <Filter>code\core\ressources</Filter>
+    </ClCompile>
+    <ClCompile Include="code\scene\components\fanModel.cpp">
+      <Filter>code\scene\components</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -299,9 +311,6 @@
       <Filter>code\scene\components</Filter>
     </ClInclude>
     <ClInclude Include="code\scene\components\fanCamera.h">
-      <Filter>code\scene\components</Filter>
-    </ClInclude>
-    <ClInclude Include="code\scene\components\fanMesh.h">
       <Filter>code\scene\components</Filter>
     </ClInclude>
     <ClInclude Include="code\scene\components\fanActor.h">
@@ -825,6 +834,18 @@
     </ClInclude>
     <ClInclude Include="code\editor\fanModals.h">
       <Filter>code\editor</Filter>
+    </ClInclude>
+    <ClInclude Include="code\core\ressources\fanRessourceManager.h">
+      <Filter>code\core\ressources</Filter>
+    </ClInclude>
+    <ClInclude Include="code\core\ressources\fanRessource.h">
+      <Filter>code\core\ressources</Filter>
+    </ClInclude>
+    <ClInclude Include="code\core\ressources\fanMesh.h">
+      <Filter>code\core\ressources</Filter>
+    </ClInclude>
+    <ClInclude Include="code\scene\components\fanModel.h">
+      <Filter>code\scene\components</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

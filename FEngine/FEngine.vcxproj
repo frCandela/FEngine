@@ -99,6 +99,9 @@
     <ClCompile Include="code\core\math\shapes\fanRay.cpp" />
     <ClCompile Include="code\core\math\shapes\fanShape.cpp" />
     <ClCompile Include="code\core\math\shapes\fanTriangle.cpp" />
+    <ClCompile Include="code\core\ressources\fanMesh.cpp" />
+    <ClCompile Include="code\core\ressources\fanRessource.cpp" />
+    <ClCompile Include="code\core\ressources\fanRessourceManager.cpp" />
     <ClCompile Include="code\editor\components\fanFPSCamera.cpp" />
     <ClCompile Include="code\editor\fanMainMenuBar.cpp" />
     <ClCompile Include="code\editor\fanModals.cpp" />
@@ -112,7 +115,7 @@
     <ClCompile Include="code\scene\components\fanActor.cpp" />
     <ClCompile Include="code\scene\components\fanCamera.cpp" />
     <ClCompile Include="code\scene\components\fanComponent.cpp" />
-    <ClCompile Include="code\scene\components\fanMesh.cpp" />
+    <ClCompile Include="code\scene\components\fanModel.cpp" />
     <ClCompile Include="code\scene\components\fanTransform.cpp" />
     <ClCompile Include="code\scene\fanGameobject.cpp" />
     <ClCompile Include="code\scene\fanScene.cpp" />
@@ -159,6 +162,9 @@
     <ClInclude Include="code\core\math\shapes\fanShape.h" />
     <ClInclude Include="code\core\math\shapes\fanTriangle.h" />
     <ClInclude Include="code\core\memory\fanAlignedMemory.h" />
+    <ClInclude Include="code\core\ressources\fanMesh.h" />
+    <ClInclude Include="code\core\ressources\fanRessource.h" />
+    <ClInclude Include="code\core\ressources\fanRessourceManager.h" />
     <ClInclude Include="code\editor\components\fanFPSCamera.h" />
     <ClInclude Include="code\editor\fanMainMenuBar.h" />
     <ClInclude Include="code\editor\fanModals.h" />
@@ -173,7 +179,7 @@
     <ClInclude Include="code\scene\components\fanActor.h" />
     <ClInclude Include="code\scene\components\fanCamera.h" />
     <ClInclude Include="code\scene\components\fanComponent.h" />
-    <ClInclude Include="code\scene\components\fanMesh.h" />
+    <ClInclude Include="code\scene\components\fanModel.h" />
     <ClInclude Include="code\scene\components\fanTransform.h" />
     <ClInclude Include="code\scene\fanGameobject.h" />
     <ClInclude Include="code\scene\fanScene.h" />

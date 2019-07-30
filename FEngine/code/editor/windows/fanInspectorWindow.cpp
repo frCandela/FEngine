@@ -5,10 +5,13 @@
 #include "scene/components/fanComponent.h"
 #include "scene/components/fanTransform.h"
 #include "scene/components/fanCamera.h"
-#include "scene/components/fanMesh.h"
+#include "scene/components/fanModel.h"
 #include "editor/components/fanFPSCamera.h"
 #include "editor/fanModals.h"
+#include "core/ressources/fanMesh.h"
+#include "core/ressources/fanRessourceManager.h"
 #include "core/fanSignal.h"
+
 #include "vulkan/vkRenderer.h"
 #include "fanEngine.h"
 
@@ -99,8 +102,8 @@ namespace editor {
 			scene::Gameobject * const selection = engine.GetSelectedGameobject();
 
 			// Mesh
-			if (ImGui::MenuItem("Mesh")){
-				selection->AddComponent<scene::Mesh>();
+			if (ImGui::MenuItem("Model")){
+				selection->AddComponent<scene::Model>();
 				ImGui::CloseCurrentPopup();
 			}
 
@@ -139,8 +142,8 @@ namespace editor {
 			DrawTransform(static_cast<scene::Transform &>(_component));
 		} else if (_component.IsType < scene::Camera>()) {
 			DrawCamera(static_cast<scene::Camera &>(_component));
-		} else if (_component.IsType < scene::Mesh > ()) {
-			DrawMesh(static_cast<scene::Mesh &>(_component));
+		} else if (_component.IsType < scene::Model > ()) {
+			DrawModel(static_cast<scene::Model &>(_component));
 		} else if (_component.IsType < scene::FPSCamera>()) {
 			DrawFPSCamera(static_cast<scene::FPSCamera &>(_component));
 		} else {
@@ -221,29 +224,37 @@ namespace editor {
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void InspectorWindow::DrawMesh(scene::Mesh & _mesh) {
-		ImGui::Text(_mesh.GetName());
-
-		// Set path popup
-		bool openSetPathPopup = false;
-		if (ImGui::Button("##setPath")) {
-			openSetPathPopup = true;
-		}
-		ImGui::SameLine();
-		ImGui::Text("path: %s", _mesh.GetPath().c_str());
-		// Set path  popup on double click
-		if (openSetPathPopup || ImGui::IsItemHovered() && ImGui::IsMouseClicked(0)) {
-			if (_mesh.GetPath().empty() == false) {
-				m_pathBuffer = std::fs::path(_mesh.GetPath()).parent_path();
-			} else {
-				m_pathBuffer = "./";
+	void InspectorWindow::DrawModel(scene::Model & _model) {
+		ImGui::Text(_model.GetName());
+		if (_model.mesh.IsLoaded()) {
+			// Set path popup
+			bool openSetPathPopup = false;
+			if (ImGui::Button("##setPath")) {
+				openSetPathPopup = true;
 			}
-			ImGui::OpenPopup("set_path");
-			m_pathBuffer = "content/models";
+			ImGui::SameLine();
+			ImGui::Text("path: %s", _model.mesh.Get()->GetPath().c_str());
+			// Set path  popup on double click
+			if (openSetPathPopup || ImGui::IsItemHovered() && ImGui::IsMouseClicked(0)) {
+				if (_model.mesh.Get()->GetPath().empty() == false) {
+					m_pathBuffer = std::fs::path(_model.mesh.Get()->GetPath()).parent_path();
+				}
+				else {
+					m_pathBuffer = "./";
+				}
+				ImGui::OpenPopup("set_path");
+				m_pathBuffer = "content/models";
+			}
+		} else {
+			ImGui::Text("Loading...");
+			ImGui::SameLine();
+			if (ImGui::SmallButton("force load")) {
+				_model.mesh.ForceLoad();
+			}
 		}
 
 		if( util::Imgui::LoadFileModal("set_path", {".fbx"}, m_pathBuffer ) ){
-			_mesh.SetPath(m_pathBuffer.string());
+			_model.mesh = ressource::RessourceManager::GetRessource<ressource::Mesh>(m_pathBuffer.string());
 		}
 	}
 

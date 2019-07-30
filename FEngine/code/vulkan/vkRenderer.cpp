@@ -3,10 +3,11 @@
 #include "vkRenderer.h"
 #include "scene/fanGameobject.h"
 #include "scene/components/fanCamera.h"
-#include "scene/components/fanMesh.h"
+#include "scene/components/fanModel.h"
 #include "scene/components/fanTransform.h"
 #include "core/fanTime.h"
 #include "core/fanInput.h"
+#include "core/ressources/fanMesh.h"
 #include "vulkan/core/vkInstance.h"
 #include "vulkan/core/vkDevice.h"
 #include "vulkan/core/vkSwapChain.h"
@@ -85,9 +86,9 @@ namespace vk {
 		delete m_debugLinesPipeline;
 		delete m_debugTrianglesPipeline;
 
-		for (int meshIndex = 0; meshIndex < m_meshList.size() ; meshIndex++){
-			delete m_meshList[meshIndex].indexBuffer;
-			delete m_meshList[meshIndex].vertexBuffer;
+		for (int meshIndex = 0; meshIndex < m_modelList.size() ; meshIndex++){
+			delete m_modelList[meshIndex].indexBuffer;
+			delete m_modelList[meshIndex].vertexBuffer;
 		}
 
 		for (int bufferIndex = 0; bufferIndex < m_debugLinesvertexBuffers.size(); bufferIndex++) {
@@ -165,8 +166,8 @@ namespace vk {
 			{
 				ImGui::Begin("Debug");
 
-				for (int meshIndex = 0; meshIndex < m_meshList.size(); meshIndex++)	{
-					ImGui::Text(m_meshList[meshIndex].mesh->GetPath().c_str());
+				for (int meshIndex = 0; meshIndex < m_modelList.size(); meshIndex++)	{
+					ImGui::Text(m_modelList[meshIndex].model->mesh.Get()->GetPath().c_str());
 					
 				}
 
@@ -281,10 +282,10 @@ namespace vk {
 
 
 
-		std::vector < ForwardPipeline::DynamicUniforms > dynamicUniforms( m_meshList.size() );
-		for (int meshIndex = 0; meshIndex < m_meshList.size(); meshIndex++) {
-			dynamicUniforms[meshIndex].modelMat = m_meshList[meshIndex].transform->GetModelMatrix();
-			dynamicUniforms[meshIndex].rotationMat = m_meshList[meshIndex].transform->GetRotationMat();
+		std::vector < ForwardPipeline::DynamicUniforms > dynamicUniforms( m_modelList.size() );
+		for (int meshIndex = 0; meshIndex < m_modelList.size(); meshIndex++) {
+			dynamicUniforms[meshIndex].modelMat = m_modelList[meshIndex].transform->GetModelMatrix();
+			dynamicUniforms[meshIndex].rotationMat = m_modelList[meshIndex].transform->GetRotationMat();
 
 		}
 		m_forwardPipeline->SetDynamicUniforms(dynamicUniforms);
@@ -511,7 +512,7 @@ namespace vk {
 		commandBufferBeginInfo.pInheritanceInfo = &commandBufferInheritanceInfo;
 
 		if (vkBeginCommandBuffer(commandBuffer, &commandBufferBeginInfo) == VK_SUCCESS) {
-			m_forwardPipeline->Draw(commandBuffer, m_meshList);
+			m_forwardPipeline->Draw(commandBuffer, m_modelList);
 			if (vkEndCommandBuffer(commandBuffer) != VK_SUCCESS) {
 				std::cout << "Could not record command buffer " << _index << "." << std::endl;
 			}
@@ -720,28 +721,29 @@ namespace vk {
 	
 	//================================================================================================================================
 	//================================================================================================================================
-	void Renderer::RemoveMesh(scene::Mesh * _mesh) {
+	void Renderer::RemoveModel(scene::Model * _model) {
 		vkDeviceWaitIdle(m_device.vkDevice);
 
-		for (int meshIndex = 0; meshIndex < m_meshList.size(); meshIndex++) {
-			if (m_meshList[meshIndex].mesh == _mesh) {
-				MeshData & meshData = m_meshList[meshIndex];
+		for (int meshIndex = 0; meshIndex < m_modelList.size(); meshIndex++) {
+			if (m_modelList[meshIndex].model == _model) {
+				ModelData & meshData = m_modelList[meshIndex];
 				delete meshData.indexBuffer;
 				delete meshData.vertexBuffer;
-				m_meshList.erase(m_meshList.begin() + meshIndex);
+				m_modelList.erase(m_modelList.begin() + meshIndex);
 			}
 		}
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void Renderer::AddMesh(scene::Mesh * _mesh) {
-		vkDeviceWaitIdle(m_device.vkDevice);
+	void Renderer::AddModel(scene::Model * _model) {
+		
 
-		MeshData * meshData = nullptr;
-		for (int meshIndex = 0; meshIndex < m_meshList.size(); meshIndex++) {
-			if (m_meshList[meshIndex].mesh == _mesh) {
-				meshData = &m_meshList[meshIndex];
+		ModelData * meshData = nullptr;
+		for (int meshIndex = 0; meshIndex < m_modelList.size(); meshIndex++) {
+			if (m_modelList[meshIndex].model == _model) {
+				vkDeviceWaitIdle(m_device.vkDevice);
+				meshData = &m_modelList[meshIndex];
 				meshData->indexBuffer->Destroy();
 				meshData->vertexBuffer->Destroy();
 				break;
@@ -749,16 +751,16 @@ namespace vk {
 		}
 
 		if (meshData == nullptr) {
-			m_meshList.push_back(MeshData());
-			meshData = & m_meshList[m_meshList.size() - 1];
-			meshData->mesh = _mesh;
-			meshData->transform = _mesh->GetGameobject()->GetComponent<scene::Transform>();
+			m_modelList.push_back(ModelData());
+			meshData = & m_modelList[m_modelList.size() - 1];
+			meshData->model = _model;
+			meshData->transform = _model->GetGameobject()->GetComponent<scene::Transform>();
 			meshData->indexBuffer = new Buffer(m_device);
 			meshData->vertexBuffer = new Buffer(m_device);
 		}	
 
 		{
-			std::vector<uint32_t> & indices = meshData->mesh->GetIndices();
+			std::vector<uint32_t> & indices = meshData->model->mesh.Get()->GetIndices();
 			const VkDeviceSize size = sizeof(indices[0]) * indices.size();
 			meshData->indexBuffer->Create(
 				size,
@@ -777,7 +779,7 @@ namespace vk {
 			Renderer::GetRenderer().EndSingleTimeCommands(cmd);
 		}
 		{
-			std::vector<vk::Vertex> & vertices = meshData->mesh->GetVertices();
+			std::vector<vk::Vertex> & vertices = meshData->model->mesh.Get()->GetVertices();
 			const VkDeviceSize size = sizeof(vertices[0]) * vertices.size();
 			meshData->vertexBuffer->Create(
 				size,

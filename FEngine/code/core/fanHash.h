@@ -38,7 +38,7 @@ namespace hash_str
 
 /// \example DSID
 ///
-/// DSID is the dymanic or run-time version of SSID
+/// DSID is the dynamic or run-time version of SSID
 /// It takes in parameter a const char *
 /// Example : U32 goID_1 = DSID(go.c_str());
 ///           U32 goID_2 = DSID("BossDoor");

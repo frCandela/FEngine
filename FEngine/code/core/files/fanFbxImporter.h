@@ -1,6 +1,6 @@
 #pragma once
 
-namespace scene { class Mesh; }
+namespace ressource { class Mesh; }
 namespace fbxsdk { 
 	class FbxManager;
 	class FbxScene;
@@ -16,7 +16,7 @@ namespace util {
 		FBXImporter();
 		~FBXImporter();
 		bool LoadScene( const std::string _path );
-		bool GetMesh( scene::Mesh & _mesh );
+		bool GetMesh( ressource::Mesh  & _mesh );
 
 	private:
 		std::string m_path;
