@@ -5,6 +5,7 @@
 #include "editor/windows/fanSceneWindow.h"
 #include "editor/windows/fanInspectorWindow.h"
 #include "editor/windows/fanPreferencesWindow.h"
+#include "editor/windows/fanConsoleWindow.h"	
 #include "core/files/fanSerializedValues.h"
 #include "core/fanInput.h"
 #include "editor/fanModals.h"
@@ -48,6 +49,10 @@ namespace editor {
 		if (editorValues.Get("mainMenuBar_show_preferences", tmpValue) == true) {
 			engine.GetPreferencesWindow().SetVisible(tmpValue);
 		}
+
+		if (editorValues.Get("mainMenuBar_show_console", tmpValue) == true) {
+			engine.GetConsoleWindow().SetVisible(tmpValue);
+		}
 	}
 
 	//================================================================================================================================
@@ -61,6 +66,8 @@ namespace editor {
 		editorValues.Set("mainMenuBar_show_scene", engine.GetSceneWindow().IsVisible());
 		editorValues.Set("mainMenuBar_show_inspector", engine.GetInspectorWindow().IsVisible());
 		editorValues.Set("mainMenuBar_show_preferences", engine.GetPreferencesWindow().IsVisible());
+		editorValues.Set("mainMenuBar_show_console", engine.GetConsoleWindow().IsVisible());
+
 	}
 
 	//================================================================================================================================
@@ -124,6 +131,10 @@ namespace editor {
 				bool showPreferences = engine.GetPreferencesWindow().IsVisible();
 				if (ImGui::Checkbox("Preferences", &showPreferences)) {
 					engine.GetPreferencesWindow().SetVisible(showPreferences);
+				}
+				bool showConsole = engine.GetConsoleWindow().IsVisible();
+				if (ImGui::Checkbox("Console", &showConsole)) {
+					engine.GetConsoleWindow().SetVisible(showConsole);
 				}
 
 				ImGui::Separator();

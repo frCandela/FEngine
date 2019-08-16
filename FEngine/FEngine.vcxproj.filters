@@ -233,6 +233,9 @@
     <ClCompile Include="code\core\ressources\fanRessourcePtr.cpp">
       <Filter>code\core\ressources</Filter>
     </ClCompile>
+    <ClCompile Include="code\editor\windows\fanConsoleWindow.cpp">
+      <Filter>code\editor\windows</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="code\vulkan\vkRenderer.h">
@@ -846,6 +849,9 @@
     </ClInclude>
     <ClInclude Include="code\core\ressources\fanRessourcePtr.h">
       <Filter>code\core\ressources</Filter>
+    </ClInclude>
+    <ClInclude Include="code\editor\windows\fanConsoleWindow.h">
+      <Filter>code\editor\windows</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

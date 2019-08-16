@@ -105,6 +105,7 @@
     <ClCompile Include="code\editor\components\fanFPSCamera.cpp" />
     <ClCompile Include="code\editor\fanMainMenuBar.cpp" />
     <ClCompile Include="code\editor\fanModals.cpp" />
+    <ClCompile Include="code\editor\windows\fanConsoleWindow.cpp" />
     <ClCompile Include="code\editor\windows\fanInspectorWindow.cpp" />
     <ClCompile Include="code\editor\windows\fanPreferencesWindow.cpp" />
     <ClCompile Include="code\editor\windows\fanRenderWindow.cpp" />
@@ -168,6 +169,7 @@
     <ClInclude Include="code\editor\components\fanFPSCamera.h" />
     <ClInclude Include="code\editor\fanMainMenuBar.h" />
     <ClInclude Include="code\editor\fanModals.h" />
+    <ClInclude Include="code\editor\windows\fanConsoleWindow.h" />
     <ClInclude Include="code\editor\windows\fanInspectorWindow.h" />
     <ClInclude Include="code\editor\windows\fanPreferencesWindow.h" />
     <ClInclude Include="code\editor\windows\fanRenderWindow.h" />

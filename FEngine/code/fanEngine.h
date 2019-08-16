@@ -9,6 +9,7 @@ namespace editor {
 	class SceneWindow;
 	class InspectorWindow;
 	class PreferencesWindow;
+	class ConsoleWindow;
 }
 namespace scene {
 	class Scene;
@@ -46,8 +47,10 @@ namespace fan {
 		editor::SceneWindow  &			GetSceneWindow() const			{ return * m_sceneWindow; }
 		editor::InspectorWindow  &		GetInspectorWindow() const		{ return * m_inspectorWindow; }
 		editor::PreferencesWindow  &	GetPreferencesWindow() const	{ return * m_preferencesWindow; }
+		editor::ConsoleWindow  &		GetConsoleWindow() const		{ return * m_consoleWindow; }
 		scene::Scene &					GetScene() const				{ return * m_scene; }
 		vk::Renderer &					GetRenderer() const				{ return * m_renderer; }
+
 
 		fan::SerializedValues & GetEditorValues() { return m_editorValues; }
 		EditorGrid GetEditorGrid() const { return m_editorGrid;  }
@@ -62,6 +65,7 @@ namespace fan {
 		editor::SceneWindow *		m_sceneWindow;
 		editor::InspectorWindow *	m_inspectorWindow;
 		editor::PreferencesWindow *	m_preferencesWindow;
+		editor::ConsoleWindow *		m_consoleWindow;
 
 		EditorGrid m_editorGrid;
 		fan::SerializedValues m_editorValues;

@@ -19,6 +19,7 @@
 #include "editor/windows/fanSceneWindow.h"	
 #include "editor/windows/fanInspectorWindow.h"	
 #include "editor/windows/fanPreferencesWindow.h"	
+#include "editor/windows/fanConsoleWindow.h"	
 #include "scene/fanScene.h"
 #include "scene/fanGameobject.h"
 #include "scene/components/fanComponent.h"
@@ -62,6 +63,7 @@ namespace fan {
 		m_sceneWindow =			new editor::SceneWindow();
 		m_inspectorWindow =		new editor::InspectorWindow();
 		m_preferencesWindow =	new editor::PreferencesWindow();
+		m_consoleWindow =		new editor::ConsoleWindow();
 		m_renderer =			new vk::Renderer(windowSize, windowPosition);
 		m_scene =				new scene::Scene("mainScene");
 
@@ -267,6 +269,7 @@ namespace fan {
 		m_sceneWindow->Draw();
 		m_inspectorWindow->Draw();
 		m_preferencesWindow->Draw();
+		m_consoleWindow->Draw();
 	}
 
 	//================================================================================================================================
