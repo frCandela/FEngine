@@ -86,9 +86,9 @@ namespace vk {
 		delete m_debugLinesPipeline;
 		delete m_debugTrianglesPipeline;
 
-		for (int meshIndex = 0; meshIndex < m_modelList.size() ; meshIndex++){
-			delete m_modelList[meshIndex].indexBuffer;
-			delete m_modelList[meshIndex].vertexBuffer;
+		for( auto meshData : m_meshList ) {
+			delete meshData.second.indexBuffer;
+			delete meshData.second.vertexBuffer;
 		}
 
 		for (int bufferIndex = 0; bufferIndex < m_debugLinesvertexBuffers.size(); bufferIndex++) {
@@ -166,9 +166,8 @@ namespace vk {
 			{
 				ImGui::Begin("Debug");
 
-				for (int meshIndex = 0; meshIndex < m_modelList.size(); meshIndex++)	{
-					ImGui::Text(m_modelList[meshIndex].model->mesh.Get()->GetPath().c_str());
-					
+				for (auto meshData : m_meshList) {
+					ImGui::Text( meshData.second.mesh->GetPath().c_str());					
 				}
 
 
@@ -281,12 +280,11 @@ namespace vk {
 		m_forwardPipeline->SetFragUniforms(fragUniforms);
 
 
-
-		std::vector < ForwardPipeline::DynamicUniforms > dynamicUniforms( m_modelList.size() );
-		for (int meshIndex = 0; meshIndex < m_modelList.size(); meshIndex++) {
-			dynamicUniforms[meshIndex].modelMat = m_modelList[meshIndex].transform->GetModelMatrix();
-			dynamicUniforms[meshIndex].rotationMat = m_modelList[meshIndex].transform->GetRotationMat();
-
+		std::vector < ForwardPipeline::DynamicUniforms > dynamicUniforms( m_drawData.size() );
+		for (int modelIndex = 0; modelIndex < m_drawData.size(); modelIndex++) {
+			const scene::Transform * transform = m_drawData[modelIndex].model->GetGameobject()->GetComponent<scene::Transform>();
+			dynamicUniforms[modelIndex].modelMat = transform->GetModelMatrix();
+			dynamicUniforms[modelIndex].rotationMat = transform->GetRotationMat();
 		}
 		m_forwardPipeline->SetDynamicUniforms(dynamicUniforms);
 
@@ -512,7 +510,8 @@ namespace vk {
 		commandBufferBeginInfo.pInheritanceInfo = &commandBufferInheritanceInfo;
 
 		if (vkBeginCommandBuffer(commandBuffer, &commandBufferBeginInfo) == VK_SUCCESS) {
-			m_forwardPipeline->Draw(commandBuffer, m_modelList);
+
+			m_forwardPipeline->Draw(commandBuffer, m_drawData );
 			if (vkEndCommandBuffer(commandBuffer) != VK_SUCCESS) {
 				std::cout << "Could not record command buffer " << _index << "." << std::endl;
 			}
@@ -718,51 +717,36 @@ namespace vk {
 		DebugLine(corners[2], corners[6], _color);
 		DebugLine(corners[3], corners[7], _color);
 	}
-	
-	//================================================================================================================================
-	//================================================================================================================================
-	void Renderer::RemoveModel(scene::Model * _model) {
-		vkDeviceWaitIdle(m_device.vkDevice);
 
-		for (int meshIndex = 0; meshIndex < m_modelList.size(); meshIndex++) {
-			if (m_modelList[meshIndex].model == _model) {
-				ModelData & meshData = m_modelList[meshIndex];
-				delete meshData.indexBuffer;
-				delete meshData.vertexBuffer;
-				m_modelList.erase(m_modelList.begin() + meshIndex);
-			}
+	//================================================================================================================================
+	//================================================================================================================================
+	ressource::Mesh * Renderer::FindMesh(const uint32_t _id) {
+		const std::map<uint32_t, MeshData>::iterator it = m_meshList.find(_id );
+		if ( it != m_meshList.end() ) {
+			return it->second.mesh;
 		}
+		return nullptr;
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void Renderer::AddModel(scene::Model * _model) {
-		
-
-		ModelData * meshData = nullptr;
-		for (int meshIndex = 0; meshIndex < m_modelList.size(); meshIndex++) {
-			if (m_modelList[meshIndex].model == _model) {
-				vkDeviceWaitIdle(m_device.vkDevice);
-				meshData = &m_modelList[meshIndex];
-				meshData->indexBuffer->Destroy();
-				meshData->vertexBuffer->Destroy();
-				break;
-			}
+	void  Renderer::AddMesh( ressource::Mesh * _mesh) {
+		if (m_meshList.find(_mesh->GetRessourceID()) != m_meshList.end()) {
+			std::cout << "Renderer::AddMesh error : Mesh already registered: " << _mesh->GetPath() << std::endl;
+			return;
 		}
 
-		if (meshData == nullptr) {
-			m_modelList.push_back(ModelData());
-			meshData = & m_modelList[m_modelList.size() - 1];
-			meshData->model = _model;
-			meshData->transform = _model->GetGameobject()->GetComponent<scene::Transform>();
-			meshData->indexBuffer = new Buffer(m_device);
-			meshData->vertexBuffer = new Buffer(m_device);
-		}	
+		const std::map<uint32_t, MeshData>::iterator it = m_meshList.insert(std::pair<uint32_t, MeshData>(_mesh->GetRessourceID(), {})).first;
+		MeshData & meshData = it->second;
+
+		meshData.mesh = _mesh;
+		meshData.indexBuffer = new Buffer(m_device);
+		meshData.vertexBuffer = new Buffer(m_device);
 
 		{
-			std::vector<uint32_t> & indices = meshData->model->mesh.Get()->GetIndices();
+			const std::vector<uint32_t> & indices = _mesh->GetIndices();
 			const VkDeviceSize size = sizeof(indices[0]) * indices.size();
-			meshData->indexBuffer->Create(
+			meshData.indexBuffer->Create(
 				size,
 				VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_INDEX_BUFFER_BIT,
 				VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT
@@ -775,13 +759,13 @@ namespace vk {
 			);
 			stagingBuffer.SetData(indices.data(), size);
 			VkCommandBuffer cmd = Renderer::GetRenderer().BeginSingleTimeCommands();
-			stagingBuffer.CopyBufferTo(cmd, meshData->indexBuffer->GetBuffer(), size);
+			stagingBuffer.CopyBufferTo(cmd, meshData.indexBuffer->GetBuffer(), size);
 			Renderer::GetRenderer().EndSingleTimeCommands(cmd);
 		}
 		{
-			std::vector<vk::Vertex> & vertices = meshData->model->mesh.Get()->GetVertices();
+			const std::vector<vk::Vertex> & vertices = _mesh->GetVertices();
 			const VkDeviceSize size = sizeof(vertices[0]) * vertices.size();
-			meshData->vertexBuffer->Create(
+			meshData.vertexBuffer->Create(
 				size,
 				VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_VERTEX_BUFFER_BIT,
 				VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT
@@ -794,9 +778,52 @@ namespace vk {
 			);
 			stagingBuffer2.SetData(vertices.data(), size);
 			VkCommandBuffer cmd2 = Renderer::GetRenderer().BeginSingleTimeCommands();
-			stagingBuffer2.CopyBufferTo(cmd2, meshData->vertexBuffer->GetBuffer(), size);
+			stagingBuffer2.CopyBufferTo(cmd2, meshData.vertexBuffer->GetBuffer(), size);
 			Renderer::GetRenderer().EndSingleTimeCommands(cmd2);
+		}	
+	}
+	
+	//================================================================================================================================
+	//================================================================================================================================
+	void Renderer::RemoveModel( scene::Model * _model) {
+		vkDeviceWaitIdle(m_device.vkDevice);
+
+		for (int modelIndex = 0; modelIndex < m_drawData.size(); modelIndex++) {
+			if (m_drawData[modelIndex].model == _model) {
+				m_drawData.erase(m_drawData.begin() + modelIndex);
+			}
 		}
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
+	void Renderer::AddModel( scene::Model * _model) {		
+		
+		vk::DrawData * drawData = nullptr;
+
+		// Looks for the model
+		for (int modelIndex = 0; modelIndex < m_drawData.size() ; modelIndex++){
+			if (m_drawData[modelIndex].model == _model) {
+				drawData = &m_drawData[modelIndex];
+			}
+		}
+
+		// no model found -> creates it
+		if (drawData == nullptr) {
+			m_drawData.push_back({});
+			drawData = & m_drawData[m_drawData.size() - 1];
+		}
+
+		drawData->model = _model;
+
+		// Looks for the mesh, if not found defaults it
+		std::map< uint32_t, MeshData >::iterator it = m_meshList.find(_model->GetMesh()->GetRessourceID());
+		if ( it == m_meshList.end() ) {
+			std::cout << "Mesh not found for model: " << _model->GetGameobject()->GetName() << std::endl;
+			drawData->meshData = & m_meshList.find(m_defaultMesh->GetRessourceID())->second;
+		} else {
+			drawData->meshData = & it->second;
+		}		
 
 		for (int boolIndex = 0; boolIndex < m_reloadGeometryCommandBuffers.size(); boolIndex++) {
 			m_reloadGeometryCommandBuffers[boolIndex] = true;

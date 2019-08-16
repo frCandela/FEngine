@@ -13,7 +13,6 @@
 #include "core/math/shapes/fanAABB.h"
 #include "core/files/fanFbxImporter.h"
 #include "core/ressources/fanMesh.h"
-#include "core/ressources/fanRessourceManager.h"
 #include "editor/fanModals.h"
 #include "editor/fanMainMenuBar.h"
 #include "editor/windows/fanRenderWindow.h"	
@@ -66,10 +65,16 @@ namespace fan {
 		m_renderer =			new vk::Renderer(windowSize, windowPosition);
 		m_scene =				new scene::Scene("mainScene");
 
+		ressource::Mesh::onMeshLoad.Connect(&vk::Renderer::AddMesh, m_renderer);
+		scene::Model::onRegisterModel.Connect(&vk::Renderer::AddModel, m_renderer);
 		m_scene->onSceneLoad.Connect(&Engine::OnSceneLoad, this);
 		OnSceneLoad(m_scene);
 
 		m_mainMenuBar->Initialize();
+
+		ressource::Mesh * defaultMesh = new ressource::Mesh(ressource::Mesh::defaultMeshPath);
+		defaultMesh->Load();
+		m_renderer->SetDefaultMesh( defaultMesh );
 	}
 
 	//================================================================================================================================
@@ -102,8 +107,6 @@ namespace fan {
 	//================================================================================================================================
 	void Engine::Run()
 	{
-		ressource::RessourceManager::RegisterRessource<ressource::Mesh>("content/_default/default.fbx");
-
 		float lastUpdateTime = Time::ElapsedSinceStartup();
 		while ( m_applicationShouldExit == false && m_renderer->WindowIsOpen() == true)
 		{
@@ -187,10 +190,12 @@ namespace fan {
 	//================================================================================================================================
 	//================================================================================================================================
 	void Engine::DrawWireframe() const {
-		const std::vector < vk::ModelData> & meshList = m_renderer->GetMeshList();
-		for (int meshIndex = 0; meshIndex < meshList.size(); meshIndex++) {
-			const ressource::Mesh* mesh = meshList[meshIndex].model->mesh.Get();
-			const glm::mat4  modelMat = meshList[meshIndex].transform->GetModelMatrix();
+		const std::vector < vk::DrawData> & modelList = m_renderer->GetDrawData();
+		for (int meshIndex = 0; meshIndex < modelList.size(); meshIndex++) {
+			const ressource::Mesh* mesh = modelList[meshIndex].model->GetMesh();
+			const scene::Model * model = modelList[meshIndex].model;
+
+			const glm::mat4  modelMat = model->GetGameobject()->GetComponent<scene::Transform>()->GetModelMatrix();
 
 			const std::vector<uint32_t> & indices = mesh->GetIndices();
 			const std::vector<vk::Vertex> & vertices = mesh->GetVertices();
@@ -262,8 +267,6 @@ namespace fan {
 		m_sceneWindow->Draw();
 		m_inspectorWindow->Draw();
 		m_preferencesWindow->Draw();
-
-		ressource::RessourceManager::DrawUI();
 	}
 
 	//================================================================================================================================

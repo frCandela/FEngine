@@ -4,7 +4,9 @@
 #include "core/files/fanFbxImporter.h"
 
 namespace ressource {
-	REGISTER_ABSTRACT_TYPE_INFO(Mesh)
+	REGISTER_TYPE_INFO(Mesh)
+	util::Signal< Mesh * > Mesh::onMeshLoad;
+	const char * Mesh::defaultMeshPath = "content/_default/default.fbx";
 
 	//================================================================================================================================
 	//================================================================================================================================
@@ -17,18 +19,14 @@ namespace ressource {
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void Mesh::Load() {
-		// 		fan::Engine::GetEngine().GetRenderer().RemoveMesh(this);
-
-		
-
+	void Mesh::Load( ) {	
+		SetRessourceID(DSID(m_path.c_str()));
  		util::FBXImporter importer;
  		if (importer.LoadScene(m_path) == true) {
 			if (importer.GetMesh(*this)) {
-				//fan::Engine::GetEngine().GetRenderer().AddMesh(this);
+				onMeshLoad.Emmit(this);
  			}
 		}
-
 		Ressource::Load();
 	}
 

@@ -3,6 +3,8 @@
 #include "vulkan/util/vkVertex.h"
 #include "core/math/shapes/fanAABB.h"
 
+namespace ressource { class Mesh; }
+
 namespace scene {
 	class Camera;
 	class Model;
@@ -27,7 +29,8 @@ namespace vk {
 	class DebugPipeline;
 	class Color;
 
-	struct ModelData;
+	struct MeshData;
+	struct DrawData;
 
 	class Renderer {
 	public:
@@ -51,13 +54,20 @@ namespace vk {
 		PostprocessPipeline *	GetPostprocessPipeline()	{ return m_postprocessPipeline; }
 		ForwardPipeline *		GetForwardPipeline()		{ return m_forwardPipeline; }
 		glm::vec4				GetClearColor() const		{ return m_clearColor;  }
-		const std::vector <ModelData> & GetMeshList() const	{ return m_modelList; }
+
 
 		void SetClearColor(glm::vec4 _color) { m_clearColor = _color; }
 		void SetMainCamera(scene::Camera * _camera);
 
 		bool HasNoDebugToDraw() const { return m_debugLines.empty() && m_debugTriangles.empty(); }
 
+		const std::vector < DrawData > & GetDrawData() const { return m_drawData; }
+
+		ressource::Mesh *	FindMesh ( const uint32_t _id );
+		void				AddMesh	 ( ressource::Mesh * _mesh );
+		void				SetDefaultMesh(const ressource::Mesh * _defaultMesh) { m_defaultMesh = _defaultMesh; }
+
+		//void RemoveMesh		( const ressource::Mesh * _mesh );
 		void AddModel		( scene::Model * _model);
 		void RemoveModel	( scene::Model * _model);
 
@@ -73,7 +83,10 @@ namespace vk {
 		//SCENE REFERENCES
 		scene::Camera * m_mainCamera;
 		scene::Transform * m_mainCameraTransform;
-		std::vector <ModelData> m_modelList;
+
+		std::map< uint32_t, MeshData > m_meshList;
+		std::vector < DrawData > m_drawData;
+		const ressource::Mesh * m_defaultMesh = nullptr;
 
 		// DEBUG DATA
 		std::vector<DebugVertex> m_debugLines;

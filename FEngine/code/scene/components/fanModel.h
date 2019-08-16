@@ -2,7 +2,7 @@
 
 #include "scene/components/fanComponent.h"
 #include "core/ressources/fanMesh.h"
-
+#include "core/ressources/fanRessourcePtr.h"
 
 namespace shape {class AABB;}
 namespace ressource { class Mesh;  }
@@ -14,21 +14,30 @@ namespace scene
 	class Model : public Component
 	{
 	public:
-		friend class RessourceManager;
+
 		Model();
 		~Model();
 
 		shape::AABB ComputeAABB() const;
-		bool			IsUnique()	const override { return true; }
+		bool		IsUnique()	const override { return true; }
 
 		// ISerializable
 		void Load(std::istream& _in) override;
 		void Save(std::ostream& _out) override;
+		void				SetMesh(ressource::Mesh * _mesh) {
+			m_mesh = _mesh; 
+			m_mesh->Load();
+			onRegisterModel.Emmit(this);
+		}
+		ressource::Mesh *	GetMesh() { return m_mesh; }
+		const ressource::Mesh *	GetMesh() const  { return m_mesh; }
 
-		ressource::RessourcePtr< ressource::Mesh > mesh;
+		static util::Signal< Model * > onRegisterModel;
 
-		DECLARE_ABSTRACT_TYPE_INFO(Model);
+		DECLARE_TYPE_INFO(Model);
 	private:
 		void Initialize() override;
+
+		ressource::Mesh * m_mesh;
 	};
 }

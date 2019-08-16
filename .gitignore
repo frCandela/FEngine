@@ -9,4 +9,4 @@ FEngine/lib/debug/libfbxsdk-mt\.lib
 FEngine/lib/release/libfbxsdk-mt\.lib
 *.temp.obj
 *.lib
-editorValues.json
+FEngine/editorValues.json

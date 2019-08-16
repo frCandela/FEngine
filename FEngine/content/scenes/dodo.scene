@@ -1,0 +1,8 @@
+gameobject new_gameobject
+	Transform 1269105190
+		0 1.2 0
+		0 0.24869 0 0.968583
+		1 1 1
+	Model 1739103771
+		content\models\test\the_beauty.fbx
+end

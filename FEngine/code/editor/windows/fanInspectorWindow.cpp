@@ -9,7 +9,6 @@
 #include "editor/components/fanFPSCamera.h"
 #include "editor/fanModals.h"
 #include "core/ressources/fanMesh.h"
-#include "core/ressources/fanRessourceManager.h"
 #include "core/fanSignal.h"
 
 #include "vulkan/vkRenderer.h"
@@ -226,35 +225,37 @@ namespace editor {
 	//================================================================================================================================
 	void InspectorWindow::DrawModel(scene::Model & _model) {
 		ImGui::Text(_model.GetName());
-		if (_model.mesh.IsLoaded()) {
-			// Set path popup
-			bool openSetPathPopup = false;
-			if (ImGui::Button("##setPath")) {
-				openSetPathPopup = true;
+		// Set path popup
+		bool openSetPathPopup = false;
+		if (ImGui::Button("##setPath")) {
+			openSetPathPopup = true;
+		}
+		ImGui::SameLine();
+		const std::string meshPath = _model.GetMesh() != nullptr ? _model.GetMesh()->GetPath() : "not set";
+		ImGui::Text("path: %s", meshPath.c_str());
+		// Set path  popup on double click
+		if (openSetPathPopup || ImGui::IsItemHovered() && ImGui::IsMouseClicked(0)) {
+			if (_model.GetMesh() != nullptr && _model.GetMesh()->GetPath().empty() == false) {
+				m_pathBuffer = std::fs::path(_model.GetMesh()->GetPath()).parent_path();
 			}
-			ImGui::SameLine();
-			ImGui::Text("path: %s", _model.mesh.Get()->GetPath().c_str());
-			// Set path  popup on double click
-			if (openSetPathPopup || ImGui::IsItemHovered() && ImGui::IsMouseClicked(0)) {
-				if (_model.mesh.Get()->GetPath().empty() == false) {
-					m_pathBuffer = std::fs::path(_model.mesh.Get()->GetPath()).parent_path();
-				}
-				else {
-					m_pathBuffer = "./";
-				}
-				ImGui::OpenPopup("set_path");
-				m_pathBuffer = "content/models";
+			else {
+				m_pathBuffer = "./";
 			}
-		} else {
-			ImGui::Text("Loading...");
-			ImGui::SameLine();
-			if (ImGui::SmallButton("force load")) {
-				_model.mesh.ForceLoad();
-			}
+			ImGui::OpenPopup("set_path");
+			m_pathBuffer = "content/models";
 		}
 
-		if( util::Imgui::LoadFileModal("set_path", {".fbx"}, m_pathBuffer ) ){
-			_model.mesh = ressource::RessourceManager::GetRessource<ressource::Mesh>(m_pathBuffer.string());
+		if (util::Imgui::LoadFileModal("set_path", { ".fbx" }, m_pathBuffer)) {
+
+			ressource::Mesh * mesh = vk::Renderer::GetRenderer().FindMesh(DSID(m_pathBuffer.string().c_str()));			
+			if (mesh == nullptr) {
+				mesh = new ressource::Mesh(m_pathBuffer.string());
+				mesh->Load();
+				_model.SetMesh(mesh);
+				
+			} else {
+				_model.SetMesh(mesh);
+			}
 		}
 	}
 

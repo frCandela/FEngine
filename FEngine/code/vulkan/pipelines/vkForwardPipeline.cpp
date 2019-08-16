@@ -107,18 +107,17 @@ namespace vk {
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void ForwardPipeline::Draw(VkCommandBuffer _commandBuffer, const std::vector<ModelData>& _meshData) {
+	void ForwardPipeline::Draw(VkCommandBuffer _commandBuffer, const std::vector< DrawData >& _drawData) {
 		vkCmdBindPipeline(_commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, m_pipeline);
-
 		
 		VkDeviceSize offsets[] = { 0 };
 
-		for (int meshIndex = 0; meshIndex < _meshData.size(); meshIndex++){
-			const ModelData& mesh = _meshData[meshIndex];
-			VkBuffer vertexBuffers[] = { mesh.vertexBuffer->GetBuffer() };
+		for (int drawDataIndex = 0; drawDataIndex < _drawData.size(); drawDataIndex++){
+			const DrawData&  drawData = _drawData[drawDataIndex];
+			VkBuffer vertexBuffers[] = { drawData.meshData->vertexBuffer->GetBuffer() };
 			vkCmdBindVertexBuffers(_commandBuffer, 0, 1, vertexBuffers, offsets);
-			vkCmdBindIndexBuffer(_commandBuffer, mesh.indexBuffer->GetBuffer(), 0, VK_INDEX_TYPE_UINT32);
-			uint32_t dynamicOffset = meshIndex  * static_cast<uint32_t>(m_dynamicAlignment);
+			vkCmdBindIndexBuffer(_commandBuffer, drawData.meshData->indexBuffer->GetBuffer(), 0, VK_INDEX_TYPE_UINT32);
+			uint32_t dynamicOffset = drawDataIndex  * static_cast<uint32_t>(m_dynamicAlignment);
 			vkCmdBindDescriptorSets(
 				_commandBuffer,
 				VK_PIPELINE_BIND_POINT_GRAPHICS,
@@ -129,7 +128,7 @@ namespace vk {
 				1,
 				&dynamicOffset
 			);
-			vkCmdDrawIndexed(_commandBuffer, static_cast<uint32_t>(mesh.model->mesh.Get()->GetIndices().size()), 1, 0, 0, 0);
+			vkCmdDrawIndexed(_commandBuffer, static_cast<uint32_t>(drawData.meshData->mesh->GetIndices().size()), 1, 0, 0, 0);
 		}
 	}
 

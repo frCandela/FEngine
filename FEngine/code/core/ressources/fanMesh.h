@@ -4,9 +4,10 @@
 #include "vulkan/util/vkVertex.h"
 
 namespace ressource {
+	//================================================================================================================================
+	//================================================================================================================================
 	class Mesh : public Ressource {
 	public:
-		friend class RessourceManager;
 
 		Mesh(const std::string& _path = "");
 
@@ -20,7 +21,11 @@ namespace ressource {
 
 		void Load() override;
 
-		DECLARE_ABSTRACT_TYPE_INFO(Mesh)
+		static util::Signal< Mesh * > onMeshLoad;
+
+		static const char * defaultMeshPath;
+
+		DECLARE_TYPE_INFO(Mesh)
 	private:
 		std::string m_path;
 		std::vector<vk::Vertex> m_vertices;

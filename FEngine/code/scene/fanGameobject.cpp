@@ -62,7 +62,7 @@ namespace scene
 	void Gameobject::ComputeAABB() {
 
 		const scene::Model * model = GetComponent< scene::Model >();
-		if ( model != nullptr && model->IsBeingDeleted() == false && model->mesh.Get()->GetIndices().size() > 0) {
+		if ( model != nullptr && model->IsBeingDeleted() == false && model->GetMesh() != nullptr && model->GetMesh()->GetIndices().size() > 0) {
 			m_aabb = model->ComputeAABB();
 		} else {
 			const btVector3 origin = GetComponent< scene::Transform >()->GetPosition();
@@ -74,7 +74,7 @@ namespace scene
 	//================================================================================================================================
 	//================================================================================================================================
 	void Gameobject::OnComponentModified(scene::Component * _component) {	
-		if (_component->IsType<scene::Transform>() == true || _component->IsType<scene::Model>()) {
+		if (_component->IsType<scene::Transform>() || _component->IsType<scene::Model>()) {
 			ComputeAABB();
 		}		
 	}

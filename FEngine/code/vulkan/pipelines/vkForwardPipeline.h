@@ -2,6 +2,8 @@
 
 #include "core/memory/fanAlignedMemory.h"
 
+namespace ressource { class Mesh; }
+
 namespace scene { 
 	class Model;  
 	class Transform;
@@ -15,12 +17,15 @@ namespace vk {
 	class ImageView;
 	class Buffer;
 
-
-	struct ModelData {
-		scene::Model * model;
-		scene::Transform * transform;
+	struct MeshData {
+		ressource::Mesh * mesh;
 		vk::Buffer * indexBuffer;
 		vk::Buffer * vertexBuffer;
+	};
+
+	struct DrawData {
+		MeshData *		meshData;
+		scene::Model *	model;
 	};
 
 	class ForwardPipeline {
@@ -45,12 +50,11 @@ namespace vk {
 			glm::mat4 rotationMat;
 		};
 
-
 		ForwardPipeline(Device& _device, VkRenderPass& _renderPass);
 		~ForwardPipeline();
 
 		void Create( VkExtent2D _extent );
-		void Draw(VkCommandBuffer _commandBuffer, const std::vector<ModelData>& _meshData );
+		void Draw(VkCommandBuffer _commandBuffer, const std::vector< DrawData >& _drawData );
 		void Resize(VkExtent2D _extent);
 		void ReloadShaders();
 

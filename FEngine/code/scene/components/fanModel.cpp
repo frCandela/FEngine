@@ -10,17 +10,17 @@
 #include "core/files/fanFbxImporter.h"
 
 #include "core/ressources/fanMesh.h"
-#include "core/ressources/fanRessourceManager.h"
+
 
 namespace scene
 {
-	REGISTER_ABSTRACT_TYPE_INFO(Model)
+	REGISTER_TYPE_INFO(Model)
+	util::Signal< Model * > Model::onRegisterModel;
 
 	//================================================================================================================================
 	//================================================================================================================================
-	Model::Model() : 
-		mesh( ressource::RessourceManager::GetRessource<ressource::Mesh>("") ) {
-
+	Model::Model( ) :
+		m_mesh( nullptr ) {
 	}
 
 	//================================================================================================================================
@@ -41,8 +41,8 @@ namespace scene
 		const scene::Transform * transform = GetGameobject()->GetComponent<scene::Transform>();
 		const glm::mat4 modelMatrix = transform->GetModelMatrix();
 
-		const std::vector<uint32_t> & indices = mesh.Get()->GetIndices();
-		const std::vector<vk::Vertex> &  vertices = mesh.Get()->GetVertices();
+		const std::vector<uint32_t> & indices = m_mesh->GetIndices();
+		const std::vector<vk::Vertex> &  vertices = m_mesh->GetVertices();
 
 		if (indices.size() > 0) {
 			glm::vec3 high(std::numeric_limits<float>::lowest(), std::numeric_limits<float>::lowest(), std::numeric_limits<float>::lowest());
@@ -67,16 +67,16 @@ namespace scene
 	//================================================================================================================================
 	//================================================================================================================================
 	void Model::Load(std::istream& _in) {
-		(void)_in;
-// 		_in >> m_path;
-// 		SetPath(m_path);
+		std::string path;
+ 		_in >> path;
+		SetMesh(new ressource::Mesh(path));
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
 	void Model::Save(std::ostream& _out) {
 		(void)_out;
-/*		_out << "\t\t" << m_path << std::endl;*/
+		_out << "\t\t" << m_mesh->GetPath() << std::endl;
 	}
 
 }
