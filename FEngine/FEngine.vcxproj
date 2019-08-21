@@ -84,6 +84,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="code\core\fanDebug.cpp" />
     <ClCompile Include="code\core\fanInput.cpp" />
     <ClCompile Include="code\core\fanISerializable.cpp" />
     <ClCompile Include="code\core\fanTime.cpp" />
@@ -145,10 +146,12 @@
     <ClCompile Include="deps\imgui\imgui_draw.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="code\core\fanDebug.h" />
     <ClInclude Include="code\core\fanHash.h" />
     <ClInclude Include="code\core\fanInput.h" />
     <ClInclude Include="code\core\fanISerializable.h" />
     <ClInclude Include="code\core\fanSignal.h" />
+    <ClInclude Include="code\core\fanSingleton.h" />
     <ClInclude Include="code\core\fanTime.h" />
     <ClInclude Include="code\core\fanTypeInfo.h" />
     <ClInclude Include="code\core\fanUniqueID.h" />

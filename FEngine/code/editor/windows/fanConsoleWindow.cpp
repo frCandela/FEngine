@@ -15,10 +15,11 @@ namespace editor {
 				const float height = ImGui::GetWindowHeight();
 				if (height > 60) {
 					ImGui::BeginChild("scrolling", ImVec2(0, height -60), true, ImGuiWindowFlags_AlwaysVerticalScrollbar);
-					for (int logIndex = 0; logIndex < m_logBuffer.size(); logIndex++) {
-						const LogItem & item = m_logBuffer[logIndex];
+					const std::vector<  fan::Debug::LogItem >& logBuffer = fan::Debug::GetInstance().GetLogBuffer();
+					for (int logIndex = 0; logIndex < logBuffer.size(); logIndex++) {
+						const fan::Debug::LogItem & item = logBuffer[logIndex];
 
-						if (item.severity == Severity::log) {
+						if (item.severity == fan::Debug::Severity::log) {
 							ImGui::Text(item.message.c_str());
 						} else {
 							ImGui::TextColored(GetSeverityColor(item.severity),  item.message.c_str());
@@ -37,12 +38,11 @@ namespace editor {
 					const std::string message = m_inputBuffer;
 					if (message.size() > 0) {
 						if (message != "clear") {
-							Log( std::string("Unknown command: ") + message, Severity::log);
+							fan::Debug::Log( std::string("Unknown command: ") + message, fan::Debug::Severity::log);
 						}
 						else {
-							Clear();
-						}
-						
+							fan::Debug::Clear();
+						}						
 						m_inputBuffer[0] = '\0';			
 						m_scrollDown = true;
 					}
@@ -55,37 +55,19 @@ namespace editor {
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void ConsoleWindow::Log(const std::string _message, const Severity & _severity) {
-		std::cout << _message << std::endl;
-		m_logBuffer.push_back({});
-
-		LogItem & item = m_logBuffer[m_logBuffer.size() - 1];
-		item.message = _message;
-		item.severity = _severity;		
-	}
-
-	//================================================================================================================================
-	//================================================================================================================================
-	void ConsoleWindow::Clear() {
-		m_logBuffer.clear();
-		Log("clear", Severity::highlight);
-	}
-
-	//================================================================================================================================
-	//================================================================================================================================
-	ImVec4 ConsoleWindow::GetSeverityColor(const Severity & _severity) {
+	ImVec4 ConsoleWindow::GetSeverityColor(const fan::Debug::Severity & _severity) {
 		switch (_severity)
 		{
-		case Severity::log: {
+		case fan::Debug::Severity::log: {
 			return { 1,1,1,1 };		// White
 		} break;
-		case Severity::highlight: {
+		case fan::Debug::Severity::highlight: {
 			return { 0,1,0,1 };		// Green
 		} break;
-		case Severity::warning: {
+		case fan::Debug::Severity::warning: {
 			return { 1,1,0,1 };		// Yellow
 		} break;
-		case Severity::error: {
+		case fan::Debug::Severity::error: {
 			return { 1,0,0,1 };		// Red
 		} break;
 		default:

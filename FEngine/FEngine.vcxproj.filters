@@ -236,6 +236,9 @@
     <ClCompile Include="code\editor\windows\fanConsoleWindow.cpp">
       <Filter>code\editor\windows</Filter>
     </ClCompile>
+    <ClCompile Include="code\core\fanDebug.cpp">
+      <Filter>code\core</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="code\vulkan\vkRenderer.h">
@@ -852,6 +855,12 @@
     </ClInclude>
     <ClInclude Include="code\editor\windows\fanConsoleWindow.h">
       <Filter>code\editor\windows</Filter>
+    </ClInclude>
+    <ClInclude Include="code\core\fanDebug.h">
+      <Filter>code\core</Filter>
+    </ClInclude>
+    <ClInclude Include="code\core\fanSingleton.h">
+      <Filter>code\core</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
