@@ -15,7 +15,7 @@ namespace editor {
 				const float height = ImGui::GetWindowHeight();
 				if (height > 60) {
 					ImGui::BeginChild("scrolling", ImVec2(0, height -60), true, ImGuiWindowFlags_AlwaysVerticalScrollbar);
-					const std::vector<  fan::Debug::LogItem >& logBuffer = fan::Debug::GetInstance().GetLogBuffer();
+					const std::vector<  fan::Debug::LogItem >& logBuffer = fan::Debug::Get().GetLogBuffer();
 					for (int logIndex = 0; logIndex < logBuffer.size(); logIndex++) {
 						const fan::Debug::LogItem & item = logBuffer[logIndex];
 

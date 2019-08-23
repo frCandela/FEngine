@@ -2,11 +2,14 @@
  
 namespace fan {
 	//================================================================================================================================
+	// Classes inheriting from singleton cannot have a constructor
+	// Override Init to initialize a class inheriting from singleton
 	//================================================================================================================================
 	template < typename TypeName > 
 	class Singleton {
-	public:
-		static TypeName& GetInstance() { 
+	public:		
+		virtual void Init() {};
+		static TypeName& Get() { 
 			static TypeName instance;
 			return instance;
 		};
@@ -15,7 +18,7 @@ namespace fan {
 		Singleton< TypeName> (const Singleton< TypeName>&) = delete;
 
 	protected:
- 		Singleton(){}
+		Singleton() { Init(); }
  		~Singleton(){};
 	};
 }

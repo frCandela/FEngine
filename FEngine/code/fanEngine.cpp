@@ -165,6 +165,13 @@ namespace fan {
 	//================================================================================================================================
 	//================================================================================================================================
 	void Engine::DrawEditorGrid() const{
+
+		ImGui::Begin("couille");
+		if (ImGui::Button("zob")) {
+			Debug::Log("toto", Debug::Severity::highlight);
+		}
+		ImGui::End();
+
 		if (m_editorGrid.isVisible == true) {
 			const float size = m_editorGrid.spacing;
 			const int count = m_editorGrid.linesCount;
