@@ -349,14 +349,14 @@ namespace vk {
 			uint32_t imageSize = size.x * size.y * 4;
 
 			VkBufferImageCopy bufferCopyRegion = {};
-			bufferCopyRegion.imageSubresource.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
-			bufferCopyRegion.imageSubresource.mipLevel = 0;
-			bufferCopyRegion.imageSubresource.baseArrayLayer = layer;
-			bufferCopyRegion.imageSubresource.layerCount = 1;
-			bufferCopyRegion.imageExtent.width = size.x;
-			bufferCopyRegion.imageExtent.height = size.y;
-			bufferCopyRegion.imageExtent.depth = 1;
-			bufferCopyRegion.bufferOffset = offset;
+			bufferCopyRegion.imageSubresource.aspectMask		= VK_IMAGE_ASPECT_COLOR_BIT;
+			bufferCopyRegion.imageSubresource.mipLevel			= 0;
+			bufferCopyRegion.imageSubresource.baseArrayLayer	= layer;
+			bufferCopyRegion.imageSubresource.layerCount		= 1;
+			bufferCopyRegion.imageExtent.width					= size.x;
+			bufferCopyRegion.imageExtent.height					= size.y;
+			bufferCopyRegion.imageExtent.depth					= 1;
+			bufferCopyRegion.bufferOffset						= offset;
 
 			bufferCopyRegions.push_back(bufferCopyRegion);
 
@@ -367,17 +367,17 @@ namespace vk {
 		// Create optimal tiled target image
 		glm::ivec3 size = sizes[0];
 		VkImageCreateInfo imageCreateInfo{};
-		imageCreateInfo.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
-		imageCreateInfo.imageType = VK_IMAGE_TYPE_2D;
-		imageCreateInfo.format = VK_FORMAT_R8G8B8A8_UNORM;
-		imageCreateInfo.mipLevels = 1;
-		imageCreateInfo.samples = VK_SAMPLE_COUNT_1_BIT;
-		imageCreateInfo.tiling = VK_IMAGE_TILING_OPTIMAL;
-		imageCreateInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
-		imageCreateInfo.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
-		imageCreateInfo.extent = { static_cast<uint32_t>(size.x),  static_cast<uint32_t>(size.y), 1 };
-		imageCreateInfo.usage = VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT;
-		imageCreateInfo.arrayLayers = m_layerCount;
+		imageCreateInfo.sType			= VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
+		imageCreateInfo.imageType		= VK_IMAGE_TYPE_2D;
+		imageCreateInfo.format			= VK_FORMAT_R8G8B8A8_UNORM;
+		imageCreateInfo.mipLevels		= 1;
+		imageCreateInfo.samples			= VK_SAMPLE_COUNT_1_BIT;
+		imageCreateInfo.tiling			= VK_IMAGE_TILING_OPTIMAL;
+		imageCreateInfo.sharingMode		= VK_SHARING_MODE_EXCLUSIVE;
+		imageCreateInfo.initialLayout	= VK_IMAGE_LAYOUT_UNDEFINED;
+		imageCreateInfo.extent			= { static_cast<uint32_t>(size.x),  static_cast<uint32_t>(size.y), 1 };
+		imageCreateInfo.usage			= VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT;
+		imageCreateInfo.arrayLayers		= m_layerCount;
 
 		if (vkCreateImage(m_device.vkDevice, &imageCreateInfo, nullptr, &m_image) != VK_SUCCESS)
 			throw std::runtime_error("failed to vkCreateImage!");
@@ -386,19 +386,21 @@ namespace vk {
 		vkGetImageMemoryRequirements(m_device.vkDevice, m_image, &memReqs);
 
 		VkMemoryAllocateInfo memAllocInfo{};
-		memAllocInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
-		memAllocInfo.allocationSize = memReqs.size;
-		memAllocInfo.memoryTypeIndex = m_device.FindMemoryType(memReqs.memoryTypeBits, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
+		memAllocInfo.sType				= VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
+		memAllocInfo.allocationSize		= memReqs.size;
+		memAllocInfo.memoryTypeIndex	= m_device.FindMemoryType(memReqs.memoryTypeBits, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
 
-		if (vkAllocateMemory(m_device.vkDevice, &memAllocInfo, nullptr, &m_deviceMemory) != VK_SUCCESS)
+		if (vkAllocateMemory(m_device.vkDevice, &memAllocInfo, nullptr, &m_deviceMemory) != VK_SUCCESS) {
 			throw std::runtime_error("failed to create vkAllocateMemory!");
-		if (vkBindImageMemory(m_device.vkDevice, m_image, m_deviceMemory, 0) != VK_SUCCESS)
+		}
+		if (vkBindImageMemory(m_device.vkDevice, m_image, m_deviceMemory, 0) != VK_SUCCESS) {
 			throw std::runtime_error("failed to create vkBindImageMemory!");
+		}
 
 		// Image barrier for optimal image (target)
 		// Set initial layout for all array layers (faces) of the optimal (target) tiled texture
 		VkImageSubresourceRange subresourceRange = { VK_IMAGE_ASPECT_COLOR_BIT , 0, 1, 0, m_layerCount };
-		TransitionImageLayout(_commandBuffer, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, subresourceRange);
+		TransitionImageLayout( _commandBuffer, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, subresourceRange);
 
 		// Copy the cube map faces from the staging buffer to the optimal tiled image
 		vkCmdCopyBufferToImage(
@@ -410,10 +412,9 @@ namespace vk {
 			bufferCopyRegions.data()
 		);
 
-		TransitionImageLayout(_commandBuffer, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, subresourceRange);
+		TransitionImageLayout( _commandBuffer, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, subresourceRange);
 
 		/////////////////////////////////// image view ///////////////////////////////////
-
 		CreateImageView(VK_FORMAT_R8G8B8A8_UNORM, VK_IMAGE_VIEW_TYPE_2D_ARRAY, { VK_IMAGE_ASPECT_COLOR_BIT, 0,1,0,m_layerCount });
 
 		return true;
@@ -421,7 +422,7 @@ namespace vk {
 
 	//================================================================================================================================
 	//================================================================================================================================
-	bool Texture::LoadTexture(std::string _path) {
+	bool Texture::LoadTexture( const std::string _path) {
 		m_path = _path;
 
 		// Load image from disk
@@ -443,8 +444,10 @@ namespace vk {
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void Texture::Load(void* _data, int _width, int _height, uint32_t _mipLevels) {
+	void Texture::Load( const void* _data, const uint32_t _width, const uint32_t _height, const uint32_t _mipLevels) {
 		m_mipLevels = _mipLevels;
+		m_width		= _width;
+		m_height	= _height;
 		VkDeviceSize imageSize = _width * _height * 4 * sizeof(char);
 
 		// Create a buffer in host visible memory
@@ -453,7 +456,7 @@ namespace vk {
 		stagingBuffer.SetData(_data, imageSize);
 
 		// Create the image in Vulkan
-		VkExtent2D extent = { static_cast<uint32_t>(_width), static_cast<uint32_t>(_height) };
+		VkExtent2D extent = { _width, _height };
 		CreateImage(extent, m_mipLevels, VK_FORMAT_R8G8B8A8_UNORM, VK_IMAGE_TILING_OPTIMAL, VK_IMAGE_USAGE_TRANSFER_SRC_BIT | VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
 
 		// Transitioned to VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL while generating mipmaps
