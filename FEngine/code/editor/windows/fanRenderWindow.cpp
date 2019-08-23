@@ -57,9 +57,9 @@ namespace editor {
 				}
 
 				if (ImGui::CollapsingHeader("Global")) {
-					float tmpFps = Time::GetFPS();
-					if (ImGui::DragFloat("Framerate", &tmpFps, 1.f, Time::minFps, 144.f)) {
-						Time::SetFPS(tmpFps);
+					float tmpFps = fan::Time::GetFPS();
+					if (ImGui::DragFloat("Framerate", &tmpFps, 1.f, fan::Time::minFps, 144.f)) {
+						fan::Time::SetFPS(tmpFps);
 					}
 
 					// Clear color
