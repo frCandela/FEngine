@@ -140,7 +140,7 @@ namespace scene {
 	//================================================================================================================================
 	//================================================================================================================================
 	void Scene::Save() const {
-		std::cout << "saving scene: " << m_name << std::endl;
+		fan::Debug::Get() << fan::Debug::Severity::log << "saving scene: " << m_name << std::endl;
 		std::ofstream outStream(m_path);
 		if (outStream.is_open()) {
 			for (int gameobjectIndex = 0; gameobjectIndex < m_gameObjects.size(); gameobjectIndex++) {
@@ -158,7 +158,7 @@ namespace scene {
 	void Scene::LoadFrom(const std::string _path) {
 		Clear();
 
-		std::cout << "loading scene: " << _path << std::endl;
+		fan::Debug::Get() << fan::Debug::Severity::log << "loading scene: " << _path << std::endl;
 		std::ifstream inStream(_path);
 		if (inStream.is_open()) {
 			m_path = _path;
@@ -169,11 +169,11 @@ namespace scene {
 				if (inputString == "gameobject") {
 					inStream >> inputString; // Gameobject name
 					scene::Gameobject * gameobject = CreateGameobject(inputString);
-					std::cout << "Gameobject: " << inputString << std::endl;
+					fan::Debug::Get() << fan::Debug::Severity::log << "Gameobject: " << inputString << std::endl;
 					gameobject->Load(inStream);
 				}
 				else {
-					std::cout << "fail " << inputString << std::endl;
+					fan::Debug::Get() << fan::Debug::Severity::error << "fail " << inputString << std::endl;
 				}
 				inStream >> inputString;
 			}
@@ -181,7 +181,7 @@ namespace scene {
 
 			onSceneLoad.Emmit(this);
 		} else {
-			std::cout << "failed to open file " << _path << std::endl;
+			fan::Debug::Get() << fan::Debug::Severity::error << "failed to open file " << _path << std::endl;
 		}
 	}
 

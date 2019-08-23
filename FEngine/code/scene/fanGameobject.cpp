@@ -98,9 +98,9 @@ namespace scene
 			uint32_t componentID;
 			_in >> componentID;
 
-			std::cout << "\tComponent: " << buffer << std::endl;
+			fan::Debug::Get() << fan::Debug::Severity::log << "\tComponent: " << buffer << std::endl;
 
-			// instanciate component
+			// Instanciate component
 			scene::Component * component = TypeInfo::Instantiate<Component>(componentID);
 			AddComponent(component);
 			component->Load(_in);

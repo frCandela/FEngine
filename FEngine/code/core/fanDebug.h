@@ -15,7 +15,10 @@ namespace fan {
 			double time;
 		};
 
-		static void Log(const std::string _message, const Severity & _severity = Severity::log );
+		static void Log		( const std::string _message, const Severity & _severity );
+		static void Log		( const std::string _message );
+		static void Warning	( const std::string _message );
+		static void Error	( const std::string _message );
 		static void Clear();
 		static const std::vector< LogItem >& GetLogBuffer() { return Get().m_logBuffer;  }
 
@@ -41,7 +44,7 @@ namespace fan {
 			return _logger;
 		}
 		//================================================================================================================================
-		friend Debug& operator<<(Debug& _logger, std::ostream&(*_pManip)(std::ostream&)){	// Usage : Debug::Get() << std::endl flushe
+		friend Debug& operator<<(Debug& _logger, std::ostream&(*_pManip)(std::ostream&)){	// Special case of Debug::Get() << std::endl 
 			assert(_pManip == std::endl);
 			_logger.Flush();
 			return _logger;

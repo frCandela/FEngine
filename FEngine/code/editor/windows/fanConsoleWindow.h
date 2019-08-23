@@ -1,7 +1,6 @@
 #pragma once
 
 #include "editor/windows/fanWindow.h"
-#include "core/fanDebug.h"
 
 namespace editor {
 	//================================================================================================================================

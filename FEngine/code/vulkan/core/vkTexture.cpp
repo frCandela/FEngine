@@ -192,7 +192,7 @@ namespace vk {
 		if (vkCreateImage(m_device.vkDevice, &imageInfo, nullptr, &m_image) != VK_SUCCESS)
 			throw std::runtime_error("failed to create image!");
 
-		std::cout << std::hex << "VkImage \t\t" << m_image << std::dec << std::endl;
+		fan::Debug::Get() << fan::Debug::Severity::log << std::hex << "VkImage \t\t" << m_image << std::dec << std::endl;
 
 		// Allocate memory for the image
 		VkMemoryRequirements memRequirements;
@@ -205,7 +205,7 @@ namespace vk {
 
 		if (vkAllocateMemory(m_device.vkDevice, &allocInfo, nullptr, &m_deviceMemory) != VK_SUCCESS)
 			throw std::runtime_error("failed to allocate image memory!");
-		std::cout << std::hex << "VkDeviceMemory \t\t" << m_deviceMemory << std::dec << std::endl;
+		fan::Debug::Get() << fan::Debug::Severity::log << std::hex << "VkDeviceMemory \t\t" << m_deviceMemory << std::dec << std::endl;
 
 		vkBindImageMemory(m_device.vkDevice, m_image, m_deviceMemory, 0);
 	}
@@ -224,7 +224,7 @@ namespace vk {
 		if (vkCreateImageView(m_device.vkDevice, &viewInfo, nullptr, &m_imageView) != VK_SUCCESS)
 			throw std::runtime_error("failed to create texture image view!");
 
-		std::cout << std::hex << "VkImageView \t\t" << m_imageView << std::dec << std::endl;
+		fan::Debug::Get() << fan::Debug::Severity::log << std::hex << "VkImageView \t\t" << m_imageView << std::dec << std::endl;
 
 	}
 

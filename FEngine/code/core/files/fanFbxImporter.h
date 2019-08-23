@@ -8,7 +8,7 @@ namespace fbxsdk {
 }
 
 
-namespace util {
+namespace fan {
 	
 	class FBXImporter
 	{

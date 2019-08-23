@@ -35,10 +35,10 @@ namespace vk {
 		framebufferCreateInfo.layers = 1;
 
 		if (vkCreateFramebuffer(m_device.vkDevice, &framebufferCreateInfo, nullptr, &m_framebuffer) != VK_SUCCESS) {
-			std::cout << "Could not create framebuffer" << std::endl;
+			fan::Debug::Error( "Could not create framebuffer" );
 			return false;
 		}
-		std::cout << std::hex << "VkFramebuffer\t\t" << m_framebuffer << std::dec << std::endl;
+		fan::Debug::Get() << fan::Debug::Severity::log << std::hex << "VkFramebuffer\t\t" << m_framebuffer << std::dec << std::endl;
 		return true;
 	}
 }

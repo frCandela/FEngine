@@ -17,7 +17,7 @@ namespace vk {
 		}
 		std::ifstream file(_filename);
 		if (!file.is_open()) {
-			std::cout << "SpirvCompiler: Failed to load shader: " << _filename << std::endl;
+			fan::Debug::Get() << fan::Debug::Severity::error << "SpirvCompiler: Failed to load shader: " << _filename << std::endl;
 			return {};
 		}
 		std::string		InputGLSL((std::istreambuf_iterator< char >(file)), std::istreambuf_iterator< char >());
@@ -151,18 +151,18 @@ namespace vk {
 		std::string PreprocessedGLSL;
 
 		if (!Shader.preprocess(&Resources, DefaultVersion, ENoProfile, false, false, messages, &PreprocessedGLSL, Includer)) {
-			std::cout << "GLSL Preprocessing Failed for: " << _filename << std::endl;
-			std::cout << Shader.getInfoLog() << std::endl;
-			std::cout << Shader.getInfoDebugLog() << std::endl;
+			fan::Debug::Get() << fan::Debug::Severity::error << "GLSL Preprocessing Failed for: " << _filename << std::endl;
+			fan::Debug::Error( Shader.getInfoLog() );
+			fan::Debug::Error( Shader.getInfoDebugLog() );
 		}
 
 		const char * PreprocessedCStr = PreprocessedGLSL.c_str();
 		Shader.setStrings(&PreprocessedCStr, 1);
 
 		if (!Shader.parse(&Resources, 100, false, messages)) {
-			std::cout << "GLSL Parsing Failed for: " << _filename << std::endl;
-			std::cout << Shader.getInfoLog() << std::endl;
-			std::cout << Shader.getInfoDebugLog() << std::endl;
+			fan::Debug::Get() << fan::Debug::Severity::error << "GLSL Parsing Failed for: " << _filename << std::endl;
+			fan::Debug::Error( Shader.getInfoLog() );
+			fan::Debug::Error( Shader.getInfoDebugLog() );
 			return {};
 		}
 
@@ -170,9 +170,9 @@ namespace vk {
 		Program.addShader(&Shader);
 
 		if (!Program.link(messages)) {
-			std::cout << "GLSL Linking Failed for: " << _filename << std::endl;
-			std::cout << Shader.getInfoLog() << std::endl;
-			std::cout << Shader.getInfoDebugLog() << std::endl;
+			fan::Debug::Get() << fan::Debug::Severity::error << "GLSL Linking Failed for: " << _filename << std::endl;
+			fan::Debug::Error( Shader.getInfoLog() );
+			fan::Debug::Error( Shader.getInfoDebugLog() );
 			return {};
 		}
 

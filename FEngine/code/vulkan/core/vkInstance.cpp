@@ -55,7 +55,7 @@ namespace vk {
 		instanceCreateInfo.ppEnabledExtensionNames = m_extensions.size() > 0 ? m_extensions.data() : nullptr;
 
 		if (vkCreateInstance(&instanceCreateInfo, nullptr, &vkInstance) != VK_SUCCESS || vkInstance == VK_NULL_HANDLE) {
-			std::cout << "ouch, this is going to be messy" << std::endl;
+			fan::Debug::Error( "ouch, this is going to be messy" );
 		}
 		SetupDebugCallback();
 	}
@@ -138,7 +138,7 @@ namespace vk {
 
 		auto func = (PFN_vkCreateDebugReportCallbackEXT)vkGetInstanceProcAddr(vkInstance, "vkCreateDebugReportCallbackEXT");
 		if (func != nullptr && func(vkInstance, &createInfo, nullptr, &m_callback) == VK_SUCCESS) {
-			std::cout << std::hex << "VkDebugCallback\t\t" << m_callback << std::dec << std::endl;
+			fan::Debug::Get() << fan::Debug::Severity::log << std::hex << "VkDebugCallback\t\t" << m_callback << std::dec << std::endl;
 			return true;
 		}
 

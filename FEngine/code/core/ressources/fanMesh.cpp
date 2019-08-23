@@ -21,7 +21,7 @@ namespace ressource {
 	//================================================================================================================================
 	void Mesh::Load( ) {	
 		SetRessourceID(DSID(m_path.c_str()));
- 		util::FBXImporter importer;
+ 		fan::FBXImporter importer;
  		if (importer.LoadScene(m_path) == true) {
 			if (importer.GetMesh(*this)) {
 				onMeshLoad.Emmit(this);

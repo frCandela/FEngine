@@ -17,7 +17,6 @@ namespace util {
 	public:
 		UniqueId() {
 			m_uniqueId = m_globalId++;
-			std::cout << m_uniqueId << std::endl;
 		}
 		const size_t GetID() const override { return m_uniqueId; }
 	private:

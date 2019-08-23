@@ -44,10 +44,10 @@ namespace vk {
 		//bufferCreateInfo.queueFamilyIndexCount = 0;
 		//bufferCreateInfo.pQueueFamilyIndices = nullptr;
 		if (vkCreateBuffer(m_device.vkDevice, &bufferCreateInfo, nullptr, &m_buffer) != VK_SUCCESS) {
-			std::cout << "Could not create buffer" << std::endl;
+			fan::Debug::Error( "Could not create buffer" );
 			return false;
 		}
-		//std::cout << std::hex << "VkBuffer\t\t" << m_buffer << std::dec << std::endl;
+		//fan::Debug::Get() << fan::Debug::Severity::log << std::hex << "VkBuffer\t\t" << m_buffer << std::dec << std::endl;
 
 		VkMemoryRequirements memoryRequirements;
 		vkGetBufferMemoryRequirements(m_device.vkDevice, m_buffer, &memoryRequirements);
@@ -59,10 +59,10 @@ namespace vk {
 		bufferMemoryAllocateInfo.memoryTypeIndex = m_device.FindMemoryType(memoryRequirements.memoryTypeBits, _memoryProperties);
 
 		if (vkAllocateMemory(m_device.vkDevice, &bufferMemoryAllocateInfo, nullptr, &m_memory) != VK_SUCCESS) {
-			std::cout << "Could not allocate buffer" << std::endl;
+			fan::Debug::Error( "Could not allocate buffer" );
 			return false;
 		}
-		//std::cout << std::hex << "VkDeviceMemory\t\t" << m_memory << std::dec << std::endl;
+		//fan::Debug::Get() << fan::Debug::Severity::log << std::hex << "VkDeviceMemory\t\t" << m_memory << std::dec << std::endl;
 
 		Bind();
 
@@ -83,7 +83,7 @@ namespace vk {
 	{
 		VkResult result = vkBindBufferMemory(m_device.vkDevice, m_buffer, m_memory, _offset);
 		if (result != VK_SUCCESS) {
-			std::cout << "Could not bind memory to buffer" << std::endl;
+			fan::Debug::Error( "Could not bind memory to buffer" );
 		}
 		return result;
 	}

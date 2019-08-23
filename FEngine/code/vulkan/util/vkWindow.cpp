@@ -12,7 +12,7 @@ namespace vk {
 		glfwWindowHint(GLFW_RESIZABLE, GLFW_TRUE);
 		m_window = glfwCreateWindow(_size.width, _size.height, _name, nullptr/* fullscreen monitor */, nullptr);
 		glfwCreateWindowSurface(_vkInstance, m_window, nullptr, &m_surface);
-		std::cout << std::hex << "VkSurfaceKHR\t\t" << m_surface << std::dec << std::endl;
+		fan::Debug::Get() << fan::Debug::Severity::log << std::hex << "VkSurfaceKHR\t\t" << m_surface << std::dec << std::endl;
 
 		glfwSetWindowPos(m_window, _position.x, _position.y);
 	}

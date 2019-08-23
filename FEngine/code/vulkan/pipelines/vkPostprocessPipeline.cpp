@@ -134,10 +134,10 @@ namespace vk {
 		descriptorSetLayoutCreateInfo.pBindings = layoutBindings.data();
 
 		if (vkCreateDescriptorSetLayout(m_device.vkDevice, &descriptorSetLayoutCreateInfo, nullptr, &m_descriptorSetLayout) != VK_SUCCESS) {
-			std::cout << "Could not allocate descriptor set layout." << std::endl;
+			fan::Debug::Error( "Could not allocate descriptor set layout." );
 			return false;
 		}
-		std::cout << std::hex << "VkDescriptorSetLayout\t" << m_descriptorSetLayout << std::dec << std::endl;
+		fan::Debug::Get() << fan::Debug::Severity::log << std::hex << "VkDescriptorSetLayout\t" << m_descriptorSetLayout << std::dec << std::endl;
 
 		std::vector< VkDescriptorPoolSize > poolSizes(2);
 		poolSizes[0].type = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
@@ -154,10 +154,10 @@ namespace vk {
 		descriptorPoolCreateInfo.pPoolSizes = poolSizes.data();
 
 		if (vkCreateDescriptorPool(m_device.vkDevice, &descriptorPoolCreateInfo, nullptr, &m_descriptorPool) != VK_SUCCESS) {
-			std::cout << "Could not allocate descriptor pool." << std::endl;
+			fan::Debug::Error( "Could not allocate descriptor pool." );
 			return false;
 		}
-		std::cout << std::hex << "VkDescriptorPoolpp\t" << m_descriptorPool << std::dec << std::endl;
+		fan::Debug::Get() << fan::Debug::Severity::log << std::hex << "VkDescriptorPoolpp\t" << m_descriptorPool << std::dec << std::endl;
 
 		std::vector< VkDescriptorSetLayout > descriptorSetLayouts = {
 			m_descriptorSetLayout
@@ -172,11 +172,11 @@ namespace vk {
 
 		std::vector<VkDescriptorSet> descriptorSets(descriptorSetLayouts.size());
 		if (vkAllocateDescriptorSets(m_device.vkDevice, &descriptorSetAllocateInfo, descriptorSets.data()) != VK_SUCCESS) {
-			std::cout << "Could not allocate descriptor set." << std::endl;
+			fan::Debug::Error( "Could not allocate descriptor set." );
 			return false;
 		}
 		m_descriptorSet = descriptorSets[0];
-		std::cout << std::hex << "VkDescriptorSet\t\t" << m_descriptorSet << std::dec << std::endl;
+		fan::Debug::Get() << fan::Debug::Severity::log << std::hex << "VkDescriptorSet\t\t" << m_descriptorSet << std::dec << std::endl;
 
 		VkDescriptorImageInfo descriptorImageInfo = {};
 		descriptorImageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
@@ -390,10 +390,10 @@ namespace vk {
 		pipelineLayoutCreateInfo.pPushConstantRanges = pushConstantRanges.data();
 
 		if (vkCreatePipelineLayout(m_device.vkDevice, &pipelineLayoutCreateInfo, nullptr, &m_pipelineLayout) != VK_SUCCESS) {
-			std::cout << "Could not allocate command pool." << std::endl;
+			fan::Debug::Error( "Could not allocate command pool." );
 			return false;
 		}
-		std::cout << std::hex << "VkPipelineLayout\t" << m_pipelineLayout << std::dec << std::endl;
+		fan::Debug::Get() << fan::Debug::Severity::log << std::hex << "VkPipelineLayout\t" << m_pipelineLayout << std::dec << std::endl;
 
 		VkGraphicsPipelineCreateInfo graphicsPipelineCreateInfo = {};
 		graphicsPipelineCreateInfo.sType = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO;
@@ -430,14 +430,14 @@ namespace vk {
 			nullptr,
 			graphicsPipelines.data()
 		) != VK_SUCCESS) {
-			std::cout << "Could not allocate graphicsPipelines." << std::endl;
+			fan::Debug::Error( "Could not allocate graphicsPipelines." );
 			return false;
 		}
 
 		m_pipeline = graphicsPipelines[0];
 
 		for (int pipelineIndex = 0; pipelineIndex < graphicsPipelines.size(); pipelineIndex++) {
-			std::cout << std::hex << "VkPipeline\t\t" << graphicsPipelines[pipelineIndex] << std::dec << std::endl;
+			fan::Debug::Get() << fan::Debug::Severity::log << std::hex << "VkPipeline\t\t" << graphicsPipelines[pipelineIndex] << std::dec << std::endl;
 		}
 		return true;
 	}

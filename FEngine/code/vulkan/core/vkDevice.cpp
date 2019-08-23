@@ -31,7 +31,7 @@ namespace vk {
 				return propertyIndex;
 			}
 		}
-		std::cout << "Failed to find suitable memory type " << _typeFilter << " " << _properties << std::endl;
+		fan::Debug::Get() << fan::Debug::Severity::error << "Failed to find suitable memory type " << _typeFilter << " " << _properties << std::endl;
 		return ~0u;
 	}
 
@@ -99,7 +99,7 @@ namespace vk {
 		if (vkCreateDevice(vkPhysicalDevice, &deviceCreateInfo, nullptr, &vkDevice) != VK_SUCCESS) {
 			return false;
 		}
-		std::cout << std::hex << "vkDevice:\t\t" << m_deviceProperties.deviceName << std::dec << std::endl;
+		fan::Debug::Get() << fan::Debug::Severity::log << std::hex << "vkDevice:\t\t" << m_deviceProperties.deviceName << std::dec << std::endl;
 
 		vkGetDeviceQueue(vkDevice, m_graphicsQueueFamilyIndex, 0, &m_graphicsQueue);
 		vkGetDeviceQueue(vkDevice, m_computeQueueFamilyIndex, 0, &m_computeQueue);

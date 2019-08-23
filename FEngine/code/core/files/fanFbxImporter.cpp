@@ -6,7 +6,7 @@
 #include "fbxsdk.h"
 
 
-namespace util {
+namespace fan {
 	//================================================================================================================================
 	//================================================================================================================================
 	FBXImporter::FBXImporter() {
@@ -14,9 +14,9 @@ namespace util {
 		//The first thing to do is to create the FBX Manager which is the object allocator for almost all the classes in the SDK
 		m_sdkManager = FbxManager::Create();
 		if (m_sdkManager == nullptr ) {
-			std::cout << "Error: Unable to create FBX Manager!\n" << std::endl;
+			Debug::Error( "Error: Unable to create FBX Manager!\n" );
 		} else {
-			//std::cout << "Autodesk FBX SDK version" << m_sdkManager->GetVersion() << std::endl;
+			Debug::Get() << Debug::Severity::log << "Autodesk FBX SDK version" << m_sdkManager->GetVersion() << std::endl;
 		}
 
 		// fbx manager
@@ -28,7 +28,7 @@ namespace util {
 		// fbx scene
 		m_scene = FbxScene::Create(m_sdkManager, "fbx scene");
 		if (m_scene == nullptr ) {
-			std::cout << "Error: Unable to create FBX scene!\n" << std::endl;
+			Debug::Error( "Error: Unable to create FBX scene!\n" );
 		}
 
 		FbxManager::GetFileFormatVersion(m_SDKMajor, m_SDKMinor, m_SDKRevision);
@@ -56,32 +56,32 @@ namespace util {
 		if ( importStatus == false )
 		{
 			fbxsdk::FbxString error = m_importer->GetStatus().GetErrorString();
-			std::cout << "Call to FbxImporter::Initialize() failed." << std::endl;
-			std::cout << "Error returned: " <<  error.Buffer()  << " " << m_path << std::endl;
+			Debug::Error( "Call to FbxImporter::Initialize() failed." );
+			Debug::Get() << Debug::Severity::error << "Error returned: " <<  error.Buffer()  << " " << m_path << std::endl;
 
 			if (m_importer->GetStatus().GetCode() == fbxsdk::FbxStatus::eInvalidFileVersion)
 			{
-				std::cout << "FBX file format version for this FBX SDK is " << m_SDKMajor << "." << m_SDKMinor << "." << m_SDKRevision << std::endl;
-				std::cout << "FBX file format version for file " << m_path << " is " << fileMajor << "." << fileMinor << "." << fileRevision << std::endl;
+				Debug::Get() << Debug::Severity::log << "FBX file format version for this FBX SDK is " << m_SDKMajor << "." << m_SDKMinor << "." << m_SDKRevision << std::endl;
+				Debug::Get() << Debug::Severity::log << "FBX file format version for file " << m_path << " is " << fileMajor << "." << fileMinor << "." << fileRevision << std::endl;
 			}
 			return false;
 		}
 
 		if (m_importer->IsFBX() == false) {
-			std::cout << "Error: File is not an fbx" << std::endl;
+			Debug::Warning( "Error: File is not an fbx" );
 			return false;
 		}
 
 		bool status = m_importer->Import( m_scene );
 		if (status == false ) {
 			if (m_importer->GetStatus().GetCode() == fbxsdk::FbxStatus::ePasswordError) {
-				std::cout << "password is wrong" << std::endl;
+				Debug::Warning( "password is wrong" );
 			}
-			std::cout << "import failed" << std::endl;
+			Debug::Error( "import failed" );
 			return false;
 		}
 
-		std::cout << "successfully imported " << m_path << std::endl;		
+		Debug::Get() << Debug::Severity::log << "successfully imported " << m_path << std::endl;		
 
 		fbxsdk::FbxGeometryConverter geometryConverter( m_sdkManager );
 		geometryConverter.Triangulate(m_scene, true);
@@ -124,7 +124,7 @@ namespace util {
 
 		// No mesh
 		if (mesh == nullptr || mesh->GetControlPointsCount() == 0) {
-			std::cout << "no mesh found " << m_path << std::endl;
+			Debug::Get() << Debug::Severity::error << "no mesh found in" << m_path << std::endl;
 			return false;
 		}
 
@@ -146,7 +146,7 @@ namespace util {
 		const fbxsdk::FbxGeometryElementNormal * elementNormal = mesh->GetElementNormal();
 		if (elementNormal->GetMappingMode() != fbxsdk::FbxLayerElement::eByPolygonVertex
 			|| elementNormal->GetReferenceMode() != fbxsdk::FbxLayerElement::eDirect) {
-			std::cout << "error : invalid mapping/reference mode for normals" << std::endl;
+			Debug::Get() << Debug::Severity::error << "invalid mapping/reference mode for normals" << std::endl;
 			return false;
 		}
 		const fbxsdk::FbxLayerElementArrayTemplate< fbxsdk::FbxVector4 > & normalsArray = elementNormal->GetDirectArray();

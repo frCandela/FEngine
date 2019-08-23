@@ -33,7 +33,7 @@
 
 #include "fanGlobalUsing.h"
 
-//#include "core/fanDebug.h"
+#include "core/fanDebug.h"
 #include "core/math/fanMathUtils.h"
 #include "core/math/fanVector2.h"
 #include "core/fanHash.h"

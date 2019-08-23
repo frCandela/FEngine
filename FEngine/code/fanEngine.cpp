@@ -139,7 +139,7 @@ namespace fan {
 		}
 
 		// Exit sequence
-		std::cout << "Exit application" << std::endl;
+		fan::Debug::Log( "Exit application" );
 
 	}
 	

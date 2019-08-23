@@ -80,7 +80,7 @@ namespace vk {
 		presentInfo.pResults = nullptr;
 
 		if (vkQueuePresentKHR(m_device.GetGraphicsQueue(), &presentInfo) != VK_SUCCESS) {
-			std::cout << "Could not present image to graphics queue" << std::endl;
+			fan::Debug::Error( "Could not present image to graphics queue" );
 			return false;
 		}
 		return true;
@@ -199,7 +199,7 @@ namespace vk {
 		swapchainCreateInfo.oldSwapchain = oldSwapchain;
 
 		vkCreateSwapchainKHR(m_device.vkDevice, &swapchainCreateInfo, nullptr, &m_swapchain);
-		std::cout << std::hex << "VkSwapchainKHR\t\t" << m_swapchain << std::dec << std::endl;
+		fan::Debug::Get() << fan::Debug::Severity::log << std::hex << "VkSwapchainKHR\t\t" << m_swapchain << std::dec << std::endl;
 
 		if (oldSwapchain != VK_NULL_HANDLE) {
 			vkDestroySwapchainKHR(m_device.vkDevice, oldSwapchain, nullptr);
@@ -212,7 +212,7 @@ namespace vk {
 		vkGetSwapchainImagesKHR(m_device.vkDevice, m_swapchain, &imagesCount, m_images.data());
 
 		for (uint32_t imageIndex = 0; imageIndex < imagesCount; imageIndex++) {
-			std::cout << std::hex << "Swap VkImage\t\t" << m_images[imageIndex] << std::dec << std::endl;
+			fan::Debug::Get() << fan::Debug::Severity::log << std::hex << "Swap VkImage\t\t" << m_images[imageIndex] << std::dec << std::endl;
 		}
 	}
 
@@ -239,9 +239,9 @@ namespace vk {
 			vkCreateSemaphore(m_device.vkDevice, &semaphoreCreateInfo, nullptr, &m_renderFinishedSemaphores[semaphoreIndex]);
 			vkCreateFence(m_device.vkDevice, &fenceCreateInfo, nullptr, &m_inFlightFences[semaphoreIndex]);
 
-			std::cout << std::hex << "VkSemaphore\t\t" << m_imagesAvailableSemaphores[semaphoreIndex] << std::dec << std::endl;
-			std::cout << std::hex << "VkSemaphore\t\t" << m_renderFinishedSemaphores[semaphoreIndex] << std::dec << std::endl;
-			std::cout << std::hex << "VkFence\t\t\t" << m_inFlightFences[semaphoreIndex] << std::dec << std::endl;
+			fan::Debug::Get() << fan::Debug::Severity::log << std::hex << "VkSemaphore\t\t" << m_imagesAvailableSemaphores[semaphoreIndex] << std::dec << std::endl;
+			fan::Debug::Get() << fan::Debug::Severity::log << std::hex << "VkSemaphore\t\t" << m_renderFinishedSemaphores[semaphoreIndex] << std::dec << std::endl;
+			fan::Debug::Get() << fan::Debug::Severity::log << std::hex << "VkFence\t\t\t" << m_inFlightFences[semaphoreIndex] << std::dec << std::endl;
 		}
 	}
 
