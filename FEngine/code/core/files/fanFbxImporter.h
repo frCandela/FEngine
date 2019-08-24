@@ -5,6 +5,8 @@ namespace fbxsdk {
 	class FbxManager;
 	class FbxScene;
 	class FbxImporter;
+	class FbxVector4;
+	class FbxMesh;
 }
 
 
@@ -24,6 +26,8 @@ namespace fan {
 		fbxsdk::FbxManager* m_sdkManager;
 		fbxsdk::FbxImporter * m_importer;
 		fbxsdk::FbxScene* m_scene;
+
+		std::vector< fbxsdk::FbxVector4 > GetNormals( const fbxsdk::FbxMesh * _mesh );
 
 		int m_SDKMajor;
 		int m_SDKMinor;

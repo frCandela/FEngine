@@ -22,6 +22,7 @@ namespace editor {
 		m_showImguiDemoWindow( true )
 		, m_showAABB(false)
 		, m_showWireframe(false)
+		, m_showNormals(false)
 		, m_sceneExtensionFilter({".scene"}) {
 	}
 
@@ -148,6 +149,7 @@ namespace editor {
 			{
 				if (ImGui::Checkbox("show AABB", &m_showAABB)) {}
 				if (ImGui::Checkbox("show Wireframe", &m_showWireframe)) {}
+				if (ImGui::Checkbox("show Normals", &m_showNormals)) {}
 				ImGui::EndMenu();
 			}
 

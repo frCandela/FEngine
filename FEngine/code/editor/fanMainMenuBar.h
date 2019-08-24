@@ -11,10 +11,12 @@ namespace editor {
 
 		bool ShowAABB() const { return m_showAABB; }
 		bool ShowWireframe() const { return m_showWireframe; }
+		bool ShowNormals() const { return m_showNormals; }
 	private:
 		bool m_showImguiDemoWindow;
 		bool m_showAABB;
 		bool m_showWireframe;
+		bool m_showNormals;
 
 		void ProcessKeyboardShortcuts();
 		void DrawModals();

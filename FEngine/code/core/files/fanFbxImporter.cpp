@@ -16,7 +16,7 @@ namespace fan {
 		if (m_sdkManager == nullptr ) {
 			Debug::Error( "Error: Unable to create FBX Manager!\n" );
 		} else {
-			Debug::Get() << Debug::Severity::log << "Autodesk FBX SDK version" << m_sdkManager->GetVersion() << std::endl;
+			//Debug::Get() << Debug::Severity::log << "Autodesk FBX SDK version" << m_sdkManager->GetVersion() << std::endl;
 		}
 
 		// fbx manager
@@ -83,8 +83,8 @@ namespace fan {
 
 		Debug::Get() << Debug::Severity::log << "successfully imported " << m_path << std::endl;		
 
-		fbxsdk::FbxGeometryConverter geometryConverter( m_sdkManager );
-		geometryConverter.Triangulate(m_scene, true);
+ 		fbxsdk::FbxGeometryConverter geometryConverter( m_sdkManager );
+ 		geometryConverter.Triangulate(m_scene, true);
 
 		return true;
 	}
@@ -128,8 +128,6 @@ namespace fan {
 			return false;
 		}
 
-		//_mesh.GetGameobject()->onComponentModified.Emmit(&_mesh);
-
 		std::vector<uint32_t>	& indices	= _mesh.GetIndices();
 		std::vector<vk::Vertex> & vertices	= _mesh.GetVertices();
 
@@ -138,40 +136,72 @@ namespace fan {
 		globalRotation.SetT(fbxsdk::FbxVector4(0, 0, 0));
 
 		const FbxVector4* const  controlPoints = mesh->GetControlPoints();
-		const int controlPointsCount = mesh->GetControlPointsCount();
-		const int* const fbxIndices = mesh->GetPolygonVertices();
-		const int polygonVertexCount = mesh->GetPolygonVertexCount();
+		const int polygonCount = mesh->GetPolygonCount();
 
-		// Get normals
-		const fbxsdk::FbxGeometryElementNormal * elementNormal = mesh->GetElementNormal();
-		if (elementNormal->GetMappingMode() != fbxsdk::FbxLayerElement::eByPolygonVertex
-			|| elementNormal->GetReferenceMode() != fbxsdk::FbxLayerElement::eDirect) {
-			Debug::Get() << Debug::Severity::error << "invalid mapping/reference mode for normals" << std::endl;
-			return false;
+		const std::vector< fbxsdk::FbxVector4 > normals = GetNormals( mesh );
+		if (normals.size() == 0) { return false; }
+
+		indices.resize(3*polygonCount);
+		vertices.resize(3*polygonCount);
+		for (int polyIndex = 0; polyIndex < polygonCount; polyIndex++) {
+			for (int inPolyIndex = 0; inPolyIndex < 3; inPolyIndex++) {
+				const int vertexIndex = 3 * polyIndex + inPolyIndex;
+				const int controlPointIndex = mesh->GetPolygonVertex(polyIndex, inPolyIndex);
+
+				// Fake index
+				indices[vertexIndex] = vertexIndex;
+
+				// Vertex
+				FbxVector4 point = controlPoints[controlPointIndex];
+				point = globalTransform.MultT(point);
+				vertices[vertexIndex].pos = glm::vec3(point[0], point[1], point[2]);
+
+				// Normal
+				fbxsdk::FbxQuaternion quat;
+				globalTransform.MultQ(quat);
+				fbxsdk::FbxVector4 normal = normals[vertexIndex];
+				normal = globalRotation.MultT(normal);
+				vertices[vertexIndex].normal = glm::vec3(normal[0], normal[1], normal[2]);
+			}
 		}
-		const fbxsdk::FbxLayerElementArrayTemplate< fbxsdk::FbxVector4 > & normalsArray = elementNormal->GetDirectArray();
-		
-		indices.resize(polygonVertexCount);
-		vertices.resize(polygonVertexCount);
-		for (int vertexIndex = 0; vertexIndex < polygonVertexCount; vertexIndex++) {
-
-			// Fake index
-			indices[vertexIndex] = vertexIndex;
-
-			// Vertex
-			const int fbxIndex = fbxIndices[vertexIndex];
-			FbxVector4 point = controlPoints[fbxIndex];
-			point = globalTransform.MultT(point);
-			vertices[vertexIndex].pos = glm::vec3(point[0], point[1], point[2]);
-
-			// Normal
-			fbxsdk::FbxQuaternion quat;
-			globalTransform.MultQ(quat);
-			fbxsdk::FbxVector4 normal = normalsArray[vertexIndex];
-			normal = globalRotation.MultT(normal);
-			vertices[vertexIndex].normal = glm::vec3(normal[0], normal[1], normal[2]);
-		}
-		//_mesh.SetModified(true);
 		return true;
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
+	std::vector< fbxsdk::FbxVector4 > FBXImporter::GetNormals(const fbxsdk::FbxMesh * _mesh) {
+		const fbxsdk::FbxGeometryElementNormal * elementNormal = _mesh->GetElementNormal();
+		const fbxsdk::FbxLayerElement::EMappingMode mappingMode = elementNormal->GetMappingMode();
+		const fbxsdk::FbxLayerElement::EReferenceMode referenceMode = elementNormal->GetReferenceMode();
+		const int vertexCount = _mesh->GetPolygonVertexCount();
+
+		std::vector< fbxsdk::FbxVector4 > normals;
+		normals.reserve(vertexCount);
+
+		const fbxsdk::FbxLayerElementArrayTemplate< fbxsdk::FbxVector4 > & normalsArray = elementNormal->GetDirectArray();
+		if ( mappingMode == fbxsdk::FbxLayerElement::eByPolygonVertex) {
+			if ( referenceMode == fbxsdk::FbxLayerElement::eDirect ) {						
+				for (int vertexIndex = 0; vertexIndex < vertexCount; vertexIndex++) {
+					normals.push_back(normalsArray[vertexIndex]);
+				}
+			} else {
+				Debug::Error( "unknown reference mode for normals" );
+			}
+		} else if( mappingMode == fbxsdk::FbxLayerElement::eByControlPoint ){
+			if (referenceMode == fbxsdk::FbxLayerElement::eDirect) {
+				const int* const fbxIndices = _mesh->GetPolygonVertices();
+				for (int vertexIndex = 0; vertexIndex < vertexCount; vertexIndex++) {
+					normals.push_back(normalsArray.GetAt(fbxIndices[vertexIndex]));
+				}
+			}
+			else {
+				Debug::Error("unknown reference mode for normals");
+			}
+		} else {
+			Debug::Error( "unknown mapping mode for normals");
+		}
+
+		return normals;
+
 	}
 }

@@ -732,7 +732,7 @@ namespace vk {
 	//================================================================================================================================
 	void  Renderer::AddMesh( ressource::Mesh * _mesh) {
 		if (m_meshList.find(_mesh->GetRessourceID()) != m_meshList.end()) {
-			fan::Debug::Get() << fan::Debug::Severity::warning << "Renderer::AddMesh error : Mesh already registered: " << _mesh->GetPath() << std::endl;
+			fan::Debug::Get() << fan::Debug::Severity::warning << "Renderer::AddMesh : Mesh already registered: " << _mesh->GetPath() << std::endl;
 			return;
 		}
 

@@ -129,6 +129,9 @@ namespace fan {
 				if (m_mainMenuBar->ShowWireframe()) {
 					DrawWireframe();
 				}
+				if (m_mainMenuBar->ShowNormals()) {
+					DrawNormals();
+				}
 				if (m_mainMenuBar->ShowAABB()) {
 					DrawAABB();
 				}
@@ -209,6 +212,27 @@ namespace fan {
 				m_renderer->DebugLine(v0, v1, vk::Color::Yellow);
 				m_renderer->DebugLine(v1, v2, vk::Color::Yellow);
 				m_renderer->DebugLine(v2, v0, vk::Color::Yellow);
+			}
+		}
+	}
+	//================================================================================================================================
+	//================================================================================================================================
+	void Engine::DrawNormals() const {
+		const std::vector < vk::DrawData> & modelList = m_renderer->GetDrawData();
+		for (int meshIndex = 0; meshIndex < modelList.size(); meshIndex++) {
+			const ressource::Mesh* mesh = modelList[meshIndex].model->GetMesh();
+			const scene::Model * model = modelList[meshIndex].model;
+
+			const glm::mat4  modelMat = model->GetGameobject()->GetComponent<scene::Transform>()->GetModelMatrix();
+			const glm::mat4  rotationMat = model->GetGameobject()->GetComponent<scene::Transform>()->GetRotationMat();
+
+			const std::vector<uint32_t> & indices = mesh->GetIndices();
+			const std::vector<vk::Vertex> & vertices = mesh->GetVertices();
+
+			for (int index = 0; index < indices.size(); index++) {
+				const btVector3 vertex = util::ToBullet( modelMat * glm::vec4(vertices[index].pos, 1.f));
+				const btVector3 normal = util::ToBullet(rotationMat * glm::vec4(vertices[index].normal, 1.f));
+				m_renderer->DebugLine(vertex, vertex + 0.1f * normal, vk::Color::Red);
 			}
 		}
 	}

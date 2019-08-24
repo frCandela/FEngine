@@ -22,13 +22,9 @@ namespace scene
 		bool		IsUnique()	const override { return true; }
 
 		// ISerializable
-		void Load(std::istream& _in) override;
-		void Save(std::ostream& _out) override;
-		void				SetMesh(ressource::Mesh * _mesh) {
-			m_mesh = _mesh; 
-			m_mesh->Load();
-			onRegisterModel.Emmit(this);
-		}
+		void				Load(std::istream& _in) override;
+		void				Save(std::ostream& _out) override;
+		void				SetMesh(ressource::Mesh * _mesh);
 		ressource::Mesh *	GetMesh() { return m_mesh; }
 		const ressource::Mesh *	GetMesh() const  { return m_mesh; }
 

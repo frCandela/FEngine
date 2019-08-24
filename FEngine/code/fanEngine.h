@@ -91,6 +91,7 @@ namespace fan {
 		void DrawUI();
 		void DrawEditorGrid() const;
 		void DrawWireframe() const;
+		void DrawNormals() const;
 		void DrawAABB() const;
 
 	};
