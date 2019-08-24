@@ -8,10 +8,12 @@ namespace editor {
 	class ConsoleWindow : public editor::Window {
 
 	public:
+		ConsoleWindow();
 		void Draw() override;
 
 	private:
-		ImVec4 GetSeverityColor(const fan::Debug::Severity & _severity);
+		ImVec4	GetSeverityColor(const fan::Debug::Severity & _severity);
+		void	OnNewLog() { m_scrollDown = true; }
 
 		static const uint32_t s_inputBufferSize = 256;
 		

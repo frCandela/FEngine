@@ -44,6 +44,7 @@ namespace fan {
 		std::cout << " " << m_stringstream.str() << std::endl;
 		m_stringstream.str(""); // clear
 		m_currentSeverity = Severity::log;
+		onNewLog.Emmit();
 	}
 
 	//================================================================================================================================

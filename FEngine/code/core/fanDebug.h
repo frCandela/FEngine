@@ -1,6 +1,7 @@
 #pragma once
 
 #include "core/fanSingleton.h"
+#include "core/fanSignal.h"
 
 namespace fan {
 	//================================================================================================================================
@@ -14,6 +15,7 @@ namespace fan {
 			std::string message;
 			double time;
 		};
+		util::Signal<> onNewLog;
 
 		static void Log		( const std::string _message, const Severity & _severity );
 		static void Log		( const std::string _message );

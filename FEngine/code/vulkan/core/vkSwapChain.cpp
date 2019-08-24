@@ -80,7 +80,7 @@ namespace vk {
 		presentInfo.pResults = nullptr;
 
 		if (vkQueuePresentKHR(m_device.GetGraphicsQueue(), &presentInfo) != VK_SUCCESS) {
-			fan::Debug::Error( "Could not present image to graphics queue" );
+			fan::Debug::Warning( "Could not present image to graphics queue" );
 			return false;
 		}
 		return true;
