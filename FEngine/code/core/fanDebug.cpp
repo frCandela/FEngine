@@ -19,10 +19,9 @@ namespace fan {
 		item.severity = m_currentSeverity;
 		item.time = Time::ElapsedSinceStartup();
 		m_logBuffer.push_back( item );
-
-		std::cout << Time::SecondsToString(item.time);
-
+		
 		// stdio
+		std::cout << Time::SecondsToString(item.time);
 		switch (m_currentSeverity)
 		{
 		case Severity::log: {

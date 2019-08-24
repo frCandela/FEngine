@@ -39,7 +39,7 @@ namespace vk {
 		, m_mainCamera(nullptr)
 	{
 		ms_globalRenderer = this;
-		m_clearColor = glm::vec4(0.f, 0.f, 0.f, 1.f);
+		m_clearColor = glm::vec4(0.f, 0.f, 0.2f, 1.f);
 
 		m_swapchain->Create(m_window->GetSurface(), _size);
 		Input::Setup(m_window->GetWindow());

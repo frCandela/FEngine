@@ -138,6 +138,7 @@ namespace fan {
 		const FbxVector4* const  controlPoints = mesh->GetControlPoints();
 		const int polygonCount = mesh->GetPolygonCount();
 
+		const std::vector< fbxsdk::FbxVector2 > uvs = GetUVs(mesh);
 		const std::vector< fbxsdk::FbxVector4 > normals = GetNormals( mesh );
 		if (normals.size() == 0) { return false; }
 
@@ -162,7 +163,12 @@ namespace fan {
 				fbxsdk::FbxVector4 normal = normals[vertexIndex];
 				normal = globalRotation.MultT(normal);
 				vertices[vertexIndex].normal = glm::vec3(normal[0], normal[1], normal[2]);
+
+				// Uv
+				const fbxsdk::FbxVector2& uv = uvs[vertexIndex];
+				vertices[vertexIndex].uv = glm::vec2(uv[0], uv[1]);
 			}
+
 		}
 		return true;
 	}
@@ -203,5 +209,43 @@ namespace fan {
 
 		return normals;
 
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
+	std::vector< fbxsdk::FbxVector2 > FBXImporter::GetUVs(const fbxsdk::FbxMesh * _mesh) {
+		const fbxsdk::FbxGeometryElementUV * elementUV = _mesh->GetElementUV();
+		const fbxsdk::FbxLayerElementArrayTemplate<fbxsdk::FbxVector2> & uvsArray = elementUV->GetDirectArray();
+		const fbxsdk::FbxLayerElement::EMappingMode mappingMode = elementUV->GetMappingMode();
+		const fbxsdk::FbxLayerElement::EReferenceMode referenceMode = elementUV->GetReferenceMode();
+
+		const int polygonCount = _mesh->GetPolygonCount();
+		const int vertexCount = _mesh->GetPolygonVertexCount();
+		std::vector< fbxsdk::FbxVector2 > uvs;
+		uvs.reserve(vertexCount);
+
+		switch ( mappingMode ) {
+			case fbxsdk::FbxLayerElement::eByPolygonVertex: {
+				switch (referenceMode)
+				{
+					case FbxGeometryElement::eDirect:
+					case FbxGeometryElement::eIndexToDirect: {
+						for (int polyIndex = 0; polyIndex < polygonCount; polyIndex++) {
+							for (int inPolyIndex = 0; inPolyIndex < 3; inPolyIndex++) {
+								const int uvIndex = const_cast<fbxsdk::FbxMesh *>(_mesh)->GetTextureUVIndex(polyIndex, inPolyIndex); // Fbx sdk's fault :3
+								uvs.push_back(uvsArray.GetAt(uvIndex));
+							}
+						}
+					} break;
+					default: {
+						Debug::Error("unknown reference mode for uvs");
+					} break;
+				}
+			} break;
+			default: {
+				Debug::Error("unknown mapping mode for uvs");
+			} break;
+		}
+		return uvs;
 	}
 }

@@ -6,7 +6,7 @@ namespace vk {
 		glm::vec3 pos;
 		glm::vec3 normal;
 		glm::vec3 color;
-		glm::vec2 texCoord;
+		glm::vec2 uv;
 
 		static std::vector <VkVertexInputBindingDescription>	GetBindingDescription();
 		static std::vector<VkVertexInputAttributeDescription>	GetAttributeDescriptions();

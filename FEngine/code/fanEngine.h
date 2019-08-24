@@ -19,7 +19,8 @@ namespace scene {
 }
 
 namespace fan {
-
+	//================================================================================================================================
+	//================================================================================================================================	
 	class Engine {
 	public:
 
@@ -51,14 +52,12 @@ namespace fan {
 		scene::Scene &					GetScene() const				{ return * m_scene; }
 		vk::Renderer &					GetRenderer() const				{ return * m_renderer; }
 
-
 		fan::SerializedValues & GetEditorValues() { return m_editorValues; }
 		EditorGrid GetEditorGrid() const { return m_editorGrid;  }
 		void SetEditorGrid( const EditorGrid _editorGrid) { m_editorGrid =_editorGrid; }
 		bool DrawMoveGizmo(const btTransform _transform, const size_t _uniqueID, btVector3& _newPosition);
 
 	private:
-
 		// UI elements
 		editor::MainMenuBar *		m_mainMenuBar;
 		editor::RenderWindow *		m_renderWindow;

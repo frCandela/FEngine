@@ -6,6 +6,8 @@
 #include "vulkan/core/vkImage.h"
 #include "vulkan/core/vkImageView.h" 
 #include "vulkan/core/vkBuffer.h"
+#include "vulkan/core/vkTexture.h"
+#include "vulkan/core/vkSampler.h"
 #include "vulkan/vkRenderer.h"
 #include "vulkan/util/vkVertex.h"
 #include "scene/components/fanModel.h"
@@ -17,6 +19,11 @@ namespace vk {
 	ForwardPipeline::ForwardPipeline(Device& _device, VkRenderPass& _renderPass) :
 		m_device(_device)
 		, m_renderPass(_renderPass) {
+
+		m_texture = new Texture(m_device);
+		m_texture->LoadTexture("content/textures/texture1.jpg");
+		m_sampler = new Sampler(_device);
+		m_sampler->CreateSampler(0, 8);
 
 		// Calculate required alignment based on minimum device offset alignment
 		size_t minUboAlignment = _device.GetDeviceProperties().limits.minUniformBufferOffsetAlignment;
@@ -148,7 +155,6 @@ namespace vk {
 	//================================================================================================================================
 	//================================================================================================================================
 	bool ForwardPipeline::CreateDescriptors() {
-		//================================================================
 		// LAYOUTS
 		VkDescriptorSetLayoutBinding uboLayoutBinding;
 		uboLayoutBinding.binding = 0;
@@ -171,10 +177,18 @@ namespace vk {
 		fragLayoutBinding.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT;
 		fragLayoutBinding.pImmutableSamplers = nullptr;
 
+		VkDescriptorSetLayoutBinding samplerLayoutBinding = {};
+		samplerLayoutBinding.binding			= 3;
+		samplerLayoutBinding.descriptorCount	= 1;
+		samplerLayoutBinding.descriptorType		= VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+		samplerLayoutBinding.pImmutableSamplers = nullptr;
+		samplerLayoutBinding.stageFlags			= VK_SHADER_STAGE_FRAGMENT_BIT;
+
 		std::vector< VkDescriptorSetLayoutBinding > layoutBindings = {
-			uboLayoutBinding
-			,dynamicLayoutBinding
-			,fragLayoutBinding
+			  uboLayoutBinding
+			, dynamicLayoutBinding
+			, fragLayoutBinding
+			, samplerLayoutBinding
 		};
 
 		VkDescriptorSetLayoutCreateInfo descriptorSetLayoutCreateInfo = {};
@@ -190,15 +204,17 @@ namespace vk {
 		}
 		fan::Debug::Get() << fan::Debug::Severity::log << std::hex << "VkDescriptorSetLayout\t" << m_descriptorSetLayout << std::dec << std::endl;
 
-		//================================================================
 		// Pool
-		std::vector< VkDescriptorPoolSize > poolSizes(3);
+		std::vector< VkDescriptorPoolSize > poolSizes(4);
 		poolSizes[0].type = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
 		poolSizes[0].descriptorCount = 1;
 		poolSizes[1].type = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC;
 		poolSizes[1].descriptorCount = 1;
 		poolSizes[2].type = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
 		poolSizes[2].descriptorCount = 1;
+		poolSizes[3].type = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+		poolSizes[3].descriptorCount = 1;
+
 
 		VkDescriptorPoolCreateInfo descriptorPoolCreateInfo = {};
 		descriptorPoolCreateInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
@@ -289,6 +305,24 @@ namespace vk {
 		fragWriteDescriptorSet.pBufferInfo = &fragDescriptorBufferInfo;
 		//uboWriteDescriptorSet.pTexelBufferView = nullptr;
 
+		// Texture
+		VkDescriptorImageInfo imageInfo = {};
+		imageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+		imageInfo.imageView = m_texture->GetImageView();
+		imageInfo.sampler = m_sampler->GetSampler();
+
+		VkWriteDescriptorSet textureWriteDescriptorSet = {};
+		textureWriteDescriptorSet.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+		textureWriteDescriptorSet.pNext = nullptr;
+		textureWriteDescriptorSet.dstSet = m_descriptorSet;
+		textureWriteDescriptorSet.dstBinding = 3;
+		textureWriteDescriptorSet.dstArrayElement = 0;
+		textureWriteDescriptorSet.descriptorCount = 1;
+		textureWriteDescriptorSet.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+		textureWriteDescriptorSet.pImageInfo = &imageInfo;
+		textureWriteDescriptorSet.pBufferInfo = nullptr;
+		textureWriteDescriptorSet.pTexelBufferView = nullptr;
+
 		// Dynamic
 		m_dynamicUniformBuffer = new Buffer(m_device);
 		m_dynamicUniformBuffer->Create(
@@ -318,9 +352,10 @@ namespace vk {
 		//================================================================
 		// Update DescriptorSets
 		std::vector<VkWriteDescriptorSet> writeDescriptors = { 
-			uboWriteDescriptorSet, 
-			dynamicWriteDescriptorSet ,
-			fragWriteDescriptorSet
+			  uboWriteDescriptorSet
+			, dynamicWriteDescriptorSet 
+			, fragWriteDescriptorSet
+			, textureWriteDescriptorSet
 		};
 
 		vkUpdateDescriptorSets(

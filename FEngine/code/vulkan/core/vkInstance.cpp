@@ -164,8 +164,7 @@ namespace vk {
 		(void)_code;
 		(void)_layerPrefix;
 		(void)_userData;
-
-		std::cerr << "validation layer: " << _msg << std::endl;
+		fan::Debug::Get() << fan::Debug::Severity::error << "Vulkan  Error:  " << _msg << std::endl;
 		return VK_FALSE;
 	}
 }

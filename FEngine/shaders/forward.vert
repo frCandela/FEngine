@@ -18,6 +18,7 @@ layout (location = 3) in vec2 inTexCoord;
 layout (location = 0) out vec3 outColor;
 layout (location = 1) out vec3 outFragPos;
 layout (location = 2) out vec3 outNormal;
+layout (location = 3) out vec2 outTexCoord;
 
 void main() {
 	const vec4 worldPos = dynamicUbo.modelMat * vec4(inPosition, 1.0);
@@ -26,4 +27,5 @@ void main() {
 	outColor = inColor;
 	outFragPos = worldPos.xyz;
 	outNormal =  (dynamicUbo.rotationMat * vec4(inNormal,1)).xyz;
+	outTexCoord = inTexCoord;
 }

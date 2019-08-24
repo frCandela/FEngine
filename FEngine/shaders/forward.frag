@@ -5,6 +5,7 @@ layout( location = 0 ) out vec4 outColor;
 layout (location = 0) in vec3 inColor;
 layout (location = 1) in vec3 inFragPos;
 layout (location = 2) in vec3 inNormal;
+layout (location = 3) in vec2 inTexCoord;
 
 layout(binding = 2) uniform FragUniforms {
 
@@ -14,6 +15,8 @@ layout(binding = 2) uniform FragUniforms {
 	int specularHardness;
 	vec3 lightPos;
 } uniforms;
+
+layout(binding = 3) uniform sampler2D texSampler;
 
 void main() {  
 
@@ -38,5 +41,6 @@ void main() {
 	outColor = vec4( totalIntensity * uniforms.lightColor, 1.f );
 	
 	//outColor = vec4( totalIntensity * vec3(1,1,1), 1.f );
-
+	outColor = vec4(inTexCoord,0,1);
+	outColor = texture(texSampler, inTexCoord);
 }

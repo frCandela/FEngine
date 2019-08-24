@@ -430,10 +430,12 @@ namespace vk {
 		stbi_uc* pixels = stbi_load(_path.c_str(), &texWidth, &texHeight, &texChannels, STBI_rgb_alpha);
 
 		if (pixels == nullptr) {
+			fan::Debug::Get() << fan::Debug::Severity::error << "Unable to load texture: " << _path << std::endl;
 			return false;
 		}
 
 		m_mipLevels = static_cast<uint32_t>(std::floor(std::log2(std::max(texWidth, texHeight)))) + 1;
+		m_mipLevels = 1;
 
 		Load(pixels, texWidth, texHeight, m_mipLevels);
 
