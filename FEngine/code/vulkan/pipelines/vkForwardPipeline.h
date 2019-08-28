@@ -81,11 +81,17 @@ namespace vk {
 		VkPipelineLayout	m_pipelineLayout;
 		VkPipeline			m_pipeline;
 
-		VkDescriptorSetLayout	m_descriptorSetLayout;
-		VkDescriptorPool		m_descriptorPool;
-		VkDescriptorSet			m_descriptorSet;
+		VkDescriptorSetLayout	m_descriptorSetLayoutScene;
+		VkDescriptorPool		m_descriptorPoolScene;
+		VkDescriptorSet			m_descriptorSetScene;
 
-		Texture *		m_texture;
+		VkDescriptorSetLayout	m_descriptorSetLayoutTextures;
+		VkDescriptorPool		m_descriptorPoolTextures;
+		VkDescriptorSet			m_descriptorSetTextures;
+		
+		Texture *		m_texture1;
+		Texture *		m_texture2;
+		Texture *		m_texture3;
 		Sampler *		m_sampler;
 		Image *			m_depthImage;
 		ImageView  *	m_depthImageView;
@@ -97,9 +103,6 @@ namespace vk {
 		Buffer * m_vertUniformBuffer;
 		Buffer * m_fragUniformBuffer;
 
-		Buffer * m_indexBuffer;
-		Buffer * m_vertexBuffer;
-
 		VertUniforms m_vertUniforms;
 		FragUniforms m_fragUniforms;
 		util::AlignedMemory<DynamicUniforms> m_dynamicUniformsArray;
@@ -107,6 +110,8 @@ namespace vk {
 
 		void CreateShaders();
 		bool CreateDescriptors();
+		bool CreateDescriptorsScene();
+		bool CreateDescriptorsTextures();
 		bool CreateDepthRessources(	VkExtent2D _extent);
 		bool CreatePipeline(		VkExtent2D _extent );
 

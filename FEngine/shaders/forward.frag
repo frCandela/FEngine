@@ -16,7 +16,8 @@ layout(binding = 2) uniform FragUniforms {
 	vec3 lightPos;
 } uniforms;
 
-layout(binding = 3) uniform sampler2D texSampler;
+//layout(binding = 3) uniform sampler2D texSampler;
+layout(set = 1, binding = 0) uniform sampler2D texSampler[3];
 
 void main() {  
 
@@ -42,5 +43,5 @@ void main() {
 	
 	//outColor = vec4( totalIntensity * vec3(1,1,1), 1.f );
 	outColor = vec4(inTexCoord,0,1);
-	outColor = texture(texSampler, inTexCoord);
+	outColor = texture(texSampler[2], inTexCoord);
 }
