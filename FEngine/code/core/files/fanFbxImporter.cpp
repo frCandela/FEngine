@@ -190,7 +190,13 @@ namespace fan {
 				for (int vertexIndex = 0; vertexIndex < vertexCount; vertexIndex++) {
 					normals.push_back(normalsArray[vertexIndex]);
 				}
-			} else {
+			} else if ( referenceMode == fbxsdk::FbxLayerElement::eIndexToDirect ) {
+				const fbxsdk::FbxLayerElementArrayTemplate<int>& normalsIndexes = elementNormal->GetIndexArray();
+				for (int vertexIndex = 0; vertexIndex < vertexCount; vertexIndex++) {
+					const int index = normalsIndexes.GetAt(vertexIndex);
+					normals.push_back(normalsArray.GetAt(index));
+				}
+			} else  {
 				Debug::Error( "unknown reference mode for normals" );
 			}
 		} else if( mappingMode == fbxsdk::FbxLayerElement::eByControlPoint ){
