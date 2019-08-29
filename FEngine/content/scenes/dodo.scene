@@ -4,7 +4,7 @@ gameobject fff
 		0 0 0 1
 		0.01 0.01 0.01
 	Model 1739103771
-		content\models\pickup_truck_02.fbx
+		content\models\imfired\pickup_truck_02.fbx
 end
 gameobject fff
 	Transform 1269105190
@@ -12,7 +12,7 @@ gameobject fff
 		0 0 0 1
 		0.01 0.01 0.01
 	Model 1739103771
-		content\models\expandable_crate_01_closed_a.fbx
+		content\models\imfired\expandable_crate_01_closed_a.fbx
 end
 gameobject cube
 	Transform 1269105190

@@ -6,6 +6,7 @@
 #include "vulkan/pipelines/vkDebugPipeline.h"
 #include "vulkan/util/vkShape.h"
 #include "vulkan/util/vkWindow.h"
+#include "vulkan/fanTexturesManager.h"
 #include "core/fanTime.h"
 #include "core/fanInput.h"
 #include "core/math/shapes/fanTriangle.h"
@@ -215,6 +216,7 @@ namespace fan {
 			}
 		}
 	}
+	
 	//================================================================================================================================
 	//================================================================================================================================
 	void Engine::DrawNormals() const {

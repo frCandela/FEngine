@@ -6,7 +6,7 @@
 namespace ressource {
 	REGISTER_TYPE_INFO(Mesh)
 	util::Signal< Mesh * > Mesh::onMeshLoad;
-	const char * Mesh::defaultMeshPath = "content/_default/default.fbx";
+	const char * Mesh::defaultMeshPath = "content/_default/mesh.fbx";
 
 	//================================================================================================================================
 	//================================================================================================================================

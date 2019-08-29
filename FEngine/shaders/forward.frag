@@ -28,6 +28,7 @@ void main() {
 	const float distance = length( lightDir );
 	lightDir /= distance;
 	const vec3 viewDir = normalize(uniforms.cameraPosition - inFragPos);
+	const vec4 textureColor = texture(texSampler[0], inTexCoord);
 
 	// Diffuse light
 	const float NdotL = dot( goodNormal, lightDir );
@@ -39,9 +40,7 @@ void main() {
 	float specularIntensity = pow( clamp(NdotH ,0.f,1.f), uniforms.specularHardness );
 
 	float totalIntensity = specularIntensity + uniforms.ambiantIntensity + diffuseIntensity;
-	outColor = vec4( totalIntensity * uniforms.lightColor, 1.f );
+	outColor = vec4( totalIntensity * uniforms.lightColor, 1.f );	
 	
-	//outColor = vec4( totalIntensity * vec3(1,1,1), 1.f );
-	outColor = vec4(inTexCoord,0,1);
-	outColor = texture(texSampler[1], inTexCoord);
+	outColor = vec4( textureColor.xyz * totalIntensity * vec3(1,1,1), 1.f );
 }

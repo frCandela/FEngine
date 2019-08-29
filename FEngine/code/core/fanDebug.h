@@ -47,8 +47,12 @@ namespace fan {
 		}
 		//================================================================================================================================
 		friend Debug& operator<<(Debug& _logger, std::ostream&(*_pManip)(std::ostream&)){	// Special case of Debug::Get() << std::endl 
-			assert(_pManip == std::endl);
-			_logger.Flush();
+			if (_pManip != std::endl) {
+				std::cout << "[ERROR] LOGGER FAILED TO READ EXPRESSION: " << _pManip << std::endl;
+			} else {
+				_logger.Flush();
+			}
+			
 			return _logger;
 		}
 	};

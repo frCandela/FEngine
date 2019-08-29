@@ -44,11 +44,11 @@ namespace vk {
 
 		struct FragUniforms
 		{
-			glm::vec3 cameraPosition;
-			float ambiantIntensity;
-			glm::vec3 lightColor;
-			glm::int32 specularHardness;
-			glm::vec3 lightPos;
+			glm::vec3	cameraPosition;
+			float		ambiantIntensity;
+			glm::vec3	lightColor;
+			glm::int32	specularHardness;
+			glm::vec3	lightPos;
 		};
 
 		struct DynamicUniforms
@@ -75,11 +75,11 @@ namespace vk {
 		VkImageView		GetDepthImageView();
 
 	private:
-		Device& m_device;
-		VkRenderPass& m_renderPass;
+		Device&					m_device;
+		VkRenderPass&			m_renderPass;
 
-		VkPipelineLayout	m_pipelineLayout;
-		VkPipeline			m_pipeline;
+		VkPipelineLayout		m_pipelineLayout;
+		VkPipeline				m_pipeline;
 
 		VkDescriptorSetLayout	m_descriptorSetLayoutScene;
 		VkDescriptorPool		m_descriptorPoolScene;
@@ -89,19 +89,16 @@ namespace vk {
 		VkDescriptorPool		m_descriptorPoolTextures;
 		VkDescriptorSet			m_descriptorSetTextures;
 		
-// 		Texture *		m_texture1;
-// 		Texture *		m_texture2;
-// 		Texture *		m_texture3;
-		Sampler *		m_sampler;
-		Image *			m_depthImage;
-		ImageView  *	m_depthImageView;
+		Sampler *	m_sampler;
+		Image *		m_depthImage;
+		ImageView *	m_depthImageView;
 
-		Shader * m_fragmentShader = nullptr;
-		Shader * m_vertexShader = nullptr;
+		Shader *	m_fragmentShader = nullptr;
+		Shader *	m_vertexShader = nullptr;
 
-		Buffer * m_dynamicUniformBuffer;
-		Buffer * m_vertUniformBuffer;
-		Buffer * m_fragUniformBuffer;
+		Buffer *	m_dynamicUniformBuffer;
+		Buffer *	m_vertUniformBuffer;
+		Buffer *	m_fragUniformBuffer;
 
 		VertUniforms m_vertUniforms;
 		FragUniforms m_fragUniforms;

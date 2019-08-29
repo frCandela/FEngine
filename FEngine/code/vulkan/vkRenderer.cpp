@@ -14,6 +14,7 @@
 #include "vulkan/core/vkSwapChain.h"
 #include "vulkan/core/vkBuffer.h"
 #include "vulkan/core/vkImage.h"
+#include "vulkan/core/vkTexture.h"
 #include "vulkan/core/vkImageView.h"
 #include "vulkan/core/vkShader.h"
 #include "vulkan/core/vkFrameBuffer.h"
@@ -171,17 +172,25 @@ namespace vk {
 			
 			ImGui::GetIO().DisplaySize = ImVec2(static_cast<float>(m_swapchain->GetExtent().width), static_cast<float>(m_swapchain->GetExtent().height));
 			{
-				ImGui::Begin("Debug");
+				ImGui::Begin("RendererDebugTmp"); {
+					// Display mesh list
+					if (ImGui::CollapsingHeader("Loaded meshes : ")) {
+						for (auto meshData : m_meshList) {
+							ImGui::Text(meshData.second.mesh->GetPath().c_str());
+						}
+					}
+					// display textures list
+					const std::vector< vk::Texture * > & textures = m_texturesManager->GetTextures();
+					if (ImGui::CollapsingHeader("Loaded textures : ")) {
+						for (int textureIndex = 0; textureIndex < textures.size(); textureIndex++) {
+							const vk::Texture * texture = textures[textureIndex];
+							std::stringstream ss;
+							ss << texture->GetSize().x << " " << texture->GetSize().x << "\t" << texture->GetPath();
+							ImGui::Text( ss.str().c_str() );
+						}						
+					}
 
-				for (auto meshData : m_meshList) {
-					ImGui::Text( meshData.second.mesh->GetPath().c_str());					
 				}
-
-
-				/*std::stringstream ssFramerate;
-				ssFramerate << 1.f / updateDelta;
-				ImGui::Text(ssFramerate.str().c_str());*/
-				//ImGui::Text("ARKANEUUUUH!");
 				UpdateUniformBuffer();
 				ImGui::End();
 			}
