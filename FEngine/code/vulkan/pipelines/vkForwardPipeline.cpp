@@ -1,6 +1,7 @@
 #include "fanIncludes.h"
 
 #include "vulkan/pipelines/vkForwardPipeline.h"
+#include "vulkan/fanTexturesManager.h"
 #include "vulkan/core/vkDevice.h"
 #include "vulkan/core/vkShader.h"
 #include "vulkan/core/vkImage.h"
@@ -20,12 +21,12 @@ namespace vk {
 		m_device(_device)
 		, m_renderPass(_renderPass) {
 
-		m_texture1 = new Texture(m_device);
-		m_texture1->LoadTexture("content/models/test/textures/texture1.jpg");
-		m_texture2 = new Texture(m_device);
-		m_texture2->LoadTexture("content/models/test/textures/texture2.jpg");
-		m_texture3 = new Texture(m_device);
-		m_texture3->LoadTexture("content/models/test/textures/texture3.png");
+// 		m_texture1 = new Texture(m_device);
+// 		m_texture1->LoadTexture("content/models/test/textures/texture1.jpg");
+// 		m_texture2 = new Texture(m_device);
+// 		m_texture2->LoadTexture("content/models/test/textures/texture2.jpg");
+// 		m_texture3 = new Texture(m_device);
+// 		m_texture3->LoadTexture("content/models/test/textures/texture3.png");
 
 		m_sampler = new Sampler(_device);
 		m_sampler->CreateSampler(0, 8);
@@ -54,9 +55,6 @@ namespace vk {
 		delete m_fragmentShader;
 		delete m_vertexShader;
 		delete m_sampler;
-		delete m_texture1;
-		delete m_texture2;
-		delete m_texture3;
 	}
 	
 	//================================================================================================================================
@@ -175,12 +173,12 @@ namespace vk {
 	//================================================================================================================================
 	//================================================================================================================================
 	bool ForwardPipeline::CreateDescriptorsTextures() {
-		const uint32_t numTexture = 3;
+		std::vector< vk::Texture * > & textures = vk::Renderer::GetRenderer().GetTexturesManager()->GetTextures();
 
 		// LAYOUTS
 		VkDescriptorSetLayoutBinding samplerLayoutBinding = {};
 		samplerLayoutBinding.binding = 0;
-		samplerLayoutBinding.descriptorCount = numTexture;
+		samplerLayoutBinding.descriptorCount = static_cast<uint32_t>(textures.size());
 		samplerLayoutBinding.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
 		samplerLayoutBinding.pImmutableSamplers = nullptr;
 		samplerLayoutBinding.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT;
@@ -205,7 +203,7 @@ namespace vk {
 		// Pool
 		std::vector< VkDescriptorPoolSize > poolSizes(1);
 		poolSizes[0].type = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
-		poolSizes[0].descriptorCount = numTexture;
+		poolSizes[0].descriptorCount = static_cast<uint32_t>( textures.size() );
 
 		VkDescriptorPoolCreateInfo descriptorPoolCreateInfo = {};
 		descriptorPoolCreateInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
@@ -244,30 +242,16 @@ namespace vk {
 
 
 		//================================================================
-		// Textures
-		std::vector<VkDescriptorImageInfo> imageInfo = {};
-
-		VkDescriptorImageInfo imageInfo1;
-		imageInfo1.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
-		imageInfo1.imageView = m_texture1->GetImageView();
-		imageInfo1.sampler = m_sampler->GetSampler();
-
-		VkDescriptorImageInfo imageInfo2;
-		imageInfo2.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
-		imageInfo2.imageView = m_texture2->GetImageView();
-		imageInfo2.sampler = m_sampler->GetSampler();
-
-		VkDescriptorImageInfo imageInfo3;
-		imageInfo3.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
-		imageInfo3.imageView = m_texture3->GetImageView();
-		imageInfo3.sampler = m_sampler->GetSampler();
-
-		std::vector<VkDescriptorImageInfo> imageInfoArray = {
-			imageInfo1
-			, imageInfo2
-			, imageInfo3
-		};
-		assert(imageInfoArray.size() == numTexture);
+		// Textures		
+		std::vector<VkDescriptorImageInfo> imageInfoArray;
+		imageInfoArray.reserve(textures.size());
+		for (int textureIndex = 0; textureIndex < textures.size() ; textureIndex++) {
+			VkDescriptorImageInfo imageInfo;
+			imageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+			imageInfo.imageView = textures[textureIndex]->GetImageView();
+			imageInfo.sampler = m_sampler->GetSampler();
+			imageInfoArray.push_back(imageInfo);
+		}
 
 		VkWriteDescriptorSet textureWriteDescriptorSet = {};
 		textureWriteDescriptorSet.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;

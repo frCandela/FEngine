@@ -89,9 +89,9 @@ namespace vk {
 		VkDescriptorPool		m_descriptorPoolTextures;
 		VkDescriptorSet			m_descriptorSetTextures;
 		
-		Texture *		m_texture1;
-		Texture *		m_texture2;
-		Texture *		m_texture3;
+// 		Texture *		m_texture1;
+// 		Texture *		m_texture2;
+// 		Texture *		m_texture3;
 		Sampler *		m_sampler;
 		Image *			m_depthImage;
 		ImageView  *	m_depthImageView;

@@ -239,6 +239,9 @@
     <ClCompile Include="code\core\fanDebug.cpp">
       <Filter>code\core</Filter>
     </ClCompile>
+    <ClCompile Include="code\vulkan\fanTexturesManager.cpp">
+      <Filter>code\vulkan</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="code\vulkan\vkRenderer.h">
@@ -861,6 +864,9 @@
     </ClInclude>
     <ClInclude Include="code\core\fanSingleton.h">
       <Filter>code\core</Filter>
+    </ClInclude>
+    <ClInclude Include="code\vulkan\fanTexturesManager.h">
+      <Filter>code\vulkan</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

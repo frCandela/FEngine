@@ -131,6 +131,7 @@
     <ClCompile Include="code\vulkan\core\vkShader.cpp" />
     <ClCompile Include="code\vulkan\core\vkSwapChain.cpp" />
     <ClCompile Include="code\vulkan\core\vkTexture.cpp" />
+    <ClCompile Include="code\vulkan\fanTexturesManager.cpp" />
     <ClCompile Include="code\vulkan\pipelines\vkDebugPipeline.cpp" />
     <ClCompile Include="code\vulkan\pipelines\vkForwardPipeline.cpp" />
     <ClCompile Include="code\vulkan\pipelines\vkImguiPipeline.cpp" />
@@ -198,6 +199,7 @@
     <ClInclude Include="code\vulkan\core\vkShader.h" />
     <ClInclude Include="code\vulkan\core\vkSwapChain.h" />
     <ClInclude Include="code\vulkan\core\vkTexture.h" />
+    <ClInclude Include="code\vulkan\fanTexturesManager.h" />
     <ClInclude Include="code\vulkan\pipelines\vkDebugPipeline.h" />
     <ClInclude Include="code\vulkan\pipelines\vkForwardPipeline.h" />
     <ClInclude Include="code\vulkan\pipelines\vkImguiPipeline.h" />

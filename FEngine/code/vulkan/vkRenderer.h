@@ -28,10 +28,13 @@ namespace vk {
 	class ForwardPipeline;
 	class DebugPipeline;
 	class Color;
+	class TexturesManager;
 
 	struct MeshData;
 	struct DrawData;
 
+	//================================================================================================================================
+	//================================================================================================================================
 	class Renderer {
 	public:
 		Renderer(const VkExtent2D _size, const glm::ivec2 _position);
@@ -49,12 +52,12 @@ namespace vk {
 		VkCommandBuffer BeginSingleTimeCommands();
 		void EndSingleTimeCommands(VkCommandBuffer commandBuffer);
 
-		Window *				GetWindow()					{ return m_window; }
-		ImguiPipeline *			GetImguiPipeline()			{ return m_imguiPipeline; }
+		Window *				GetWindow()					{ return m_window;				}
+		ImguiPipeline *			GetImguiPipeline()			{ return m_imguiPipeline;		}
 		PostprocessPipeline *	GetPostprocessPipeline()	{ return m_postprocessPipeline; }
-		ForwardPipeline *		GetForwardPipeline()		{ return m_forwardPipeline; }
-		glm::vec4				GetClearColor() const		{ return m_clearColor;  }
-
+		ForwardPipeline *		GetForwardPipeline()		{ return m_forwardPipeline;		}
+		glm::vec4				GetClearColor() const		{ return m_clearColor;			}
+		vk::TexturesManager *	GetTexturesManager() const	{ return m_texturesManager;		}
 
 		void SetClearColor(glm::vec4 _color) { m_clearColor = _color; }
 		void SetMainCamera(scene::Camera * _camera);
@@ -87,6 +90,7 @@ namespace vk {
 		std::map< uint32_t, MeshData > m_meshList;
 		std::vector < DrawData > m_drawData;
 		const ressource::Mesh * m_defaultMesh = nullptr;
+		vk::TexturesManager *  m_texturesManager;
 
 		// DEBUG DATA
 		std::vector<DebugVertex> m_debugLines;

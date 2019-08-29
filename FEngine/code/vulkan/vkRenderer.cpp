@@ -8,6 +8,7 @@
 #include "core/fanTime.h"
 #include "core/fanInput.h"
 #include "core/ressources/fanMesh.h"
+#include "vulkan/fanTexturesManager.h"
 #include "vulkan/core/vkInstance.h"
 #include "vulkan/core/vkDevice.h"
 #include "vulkan/core/vkSwapChain.h"
@@ -36,7 +37,7 @@ namespace vk {
 		, m_window(new Window("Vulkan", _size, _position, m_instance->vkInstance))
 		, m_device( * new Device(m_instance, m_window->GetSurface()))
 		, m_swapchain(new SwapChain(m_device))
-		, m_mainCamera(nullptr)
+		, m_mainCamera(nullptr)		
 	{
 		ms_globalRenderer = this;
 		m_clearColor = glm::vec4(0.f, 0.f, 0.2f, 1.f);
@@ -47,6 +48,11 @@ namespace vk {
 		CreateCommandPool();
 		CreateRenderPass();
 		CreateRenderPassPostprocess();
+
+		m_texturesManager =  new TexturesManager( m_device );
+		m_texturesManager->AddTexture("content/models/test/textures/texture1.jpg" );
+		m_texturesManager->AddTexture("content/models/test/textures/texture2.jpg" );
+		m_texturesManager->AddTexture("content/models/test/textures/texture3.jpg" );
 
 		m_forwardPipeline = new ForwardPipeline(m_device, m_renderPass);
 		m_forwardPipeline->Create( m_swapchain->GetExtent());
@@ -85,6 +91,7 @@ namespace vk {
 		delete m_forwardPipeline;
 		delete m_debugLinesPipeline;
 		delete m_debugTrianglesPipeline;
+		delete m_texturesManager;
 
 		for( auto meshData : m_meshList ) {
 			delete meshData.second.indexBuffer;
