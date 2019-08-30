@@ -22,12 +22,12 @@ namespace editor {
 
 	private:		
 		void NewComponentPopup	();
-		void DrawComponent		( scene::Component & _component	);
-		void DrawTransform		( scene::Transform & _transform	);
-		void DrawCamera			( scene::Camera & _camera		);
-		void DrawModel			( scene::Model & _model			);
-		void DrawFPSCamera		( scene::FPSCamera & _fpsCamera	);
-		void DrawMaterial		( scene::Material & _material	);
+		void DrawComponent		( scene::Component &	 _component	);
+		void DrawTransform		( scene::Transform &	_transform	);
+		void DrawCamera			( scene::Camera &		_camera		);
+		void DrawModel			( scene::Model &		_model		);
+		void DrawFPSCamera		( scene::FPSCamera &	_fpsCamera	);
+		void DrawMaterial		( scene::Material &		_material	);
 
 		std::experimental::filesystem::path m_pathBuffer;
 	};

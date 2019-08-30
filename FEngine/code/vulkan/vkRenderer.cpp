@@ -5,6 +5,7 @@
 #include "scene/components/fanCamera.h"
 #include "scene/components/fanModel.h"
 #include "scene/components/fanTransform.h"
+#include "scene/components/fanMaterial.h"
 #include "core/fanTime.h"
 #include "core/fanInput.h"
 #include "core/ressources/fanMesh.h"
@@ -51,9 +52,9 @@ namespace vk {
 		CreateRenderPassPostprocess();
 
 		m_texturesManager =  new TexturesManager( m_device );
-		m_texturesManager->AddTexture("content/models/test/textures/texture1.jpg" );
-		m_texturesManager->AddTexture("content/models/test/textures/texture2.jpg" );
-		m_texturesManager->AddTexture("content/models/test/textures/texture3.jpg" );
+		m_texturesManager->LoadTexture("content/models/test/textures/texture1.jpg" );
+		m_texturesManager->LoadTexture("content/models/test/textures/texture2.jpg" );
+		m_texturesManager->LoadTexture("content/models/test/textures/texture3.jpg" );
 
 		m_forwardPipeline = new ForwardPipeline(m_device, m_renderPass);
 		m_forwardPipeline->Create( m_swapchain->GetExtent());
@@ -289,18 +290,21 @@ namespace vk {
 
 		m_forwardPipeline->SetVertUniforms(ubo);
 
-
 		ForwardPipeline::FragUniforms fragUniforms = m_forwardPipeline->GetFragUniforms();
 		fragUniforms.cameraPosition = util::ToGLM( m_mainCameraTransform->GetPosition());
-		fragUniforms.textureIndex = 2;
 		m_forwardPipeline->SetFragUniforms(fragUniforms);
 
-
+		
 		std::vector < ForwardPipeline::DynamicUniforms > dynamicUniforms( m_drawData.size() );
 		for (int modelIndex = 0; modelIndex < m_drawData.size(); modelIndex++) {
 			const scene::Transform * transform = m_drawData[modelIndex].model->GetGameobject()->GetComponent<scene::Transform>();
 			dynamicUniforms[modelIndex].modelMat = transform->GetModelMatrix();
-			dynamicUniforms[modelIndex].rotationMat = transform->GetRotationMat();
+			dynamicUniforms[modelIndex].rotationMat = transform->GetRotationMat();			
+
+			const scene::Material * material = m_drawData[modelIndex].model->GetGameobject()->GetComponent<scene::Material>();
+			if (material) {
+				dynamicUniforms[modelIndex].TMPtextureIndex = m_texturesManager->FindTextureIndex(material->GetTexture());
+			}
 		}
 		m_forwardPipeline->SetDynamicUniforms(dynamicUniforms);
 
@@ -809,6 +813,12 @@ namespace vk {
 				m_drawData.erase(m_drawData.begin() + modelIndex);
 			}
 		}
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
+	void Renderer::UpdateMaterialOfModel(scene::Model * /*_material*/) {
+		// This will be used when we have a proper descriptor for materials
 	}
 
 	//================================================================================================================================

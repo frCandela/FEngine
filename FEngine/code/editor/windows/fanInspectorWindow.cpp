@@ -13,6 +13,8 @@
 #include "core/fanSignal.h"
 #include "vulkan/core/vkTexture.h"
 #include "vulkan/vkRenderer.h"
+#include "vulkan/core/vkTexture.h"
+#include "vulkan/fanTexturesManager.h"
 #include "fanEngine.h"
 
 namespace editor {
@@ -305,7 +307,7 @@ namespace editor {
 		ImGui::Text(_material.GetName());
 
 		bool openSetPathPopup = false;
-		if (ImGui::Button("##setPath")) {
+		if (ImGui::Button("##setPathTex")) {
 			openSetPathPopup = true;
 		}
 		ImGui::SameLine();
@@ -319,21 +321,17 @@ namespace editor {
 			else {
 				m_pathBuffer = "./";
 			}
-			ImGui::OpenPopup("set_path");
+			ImGui::OpenPopup("set_path_texture");
 			m_pathBuffer = "content/models";
 		}
 
-		if (util::Imgui::LoadFileModal("set_path", { ".png" }, m_pathBuffer)) {
-			fan::Debug::Highlight("load not implemented " + m_pathBuffer.string());
-//			ressource::Mesh * mesh = vk::Renderer::GetRenderer().FindMesh(DSID(m_pathBuffer.string().c_str()));			
-// 			if (mesh == nullptr) {
-// 				mesh = new ressource::Mesh(m_pathBuffer.string());
-// 				mesh->Load();
-// 				_material.SetTexture(mesh);
-// 				
-// 			} else {
-// 				_model.SetMesh(mesh);
-// 			}
+		if (util::Imgui::LoadFileModal("set_path_texture", { ".png" }, m_pathBuffer)) {
+			vk::TexturesManager * texturesManager = vk::Renderer::GetRenderer().GetTexturesManager();
+			vk::Texture * texture = texturesManager->FindTexture(m_pathBuffer.string());
+			if (texture == nullptr) {
+				texture = texturesManager->LoadTexture( m_pathBuffer.string() );
+			} 
+			_material.SetTexture(texture);
 		}
 	
 	}

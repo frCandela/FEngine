@@ -48,14 +48,14 @@ namespace vk {
 			float		ambiantIntensity;
 			glm::vec3	lightColor;
 			glm::int32	specularHardness;
-			glm::vec3	lightPos;
-			glm::int32	textureIndex;
+			glm::vec3	lightPos;			
 		};
 
 		struct DynamicUniforms
 		{
 			glm::mat4 modelMat;
 			glm::mat4 rotationMat;
+			glm::int32	TMPtextureIndex; // TODO put that in a separate dynamic frag buffer
 		};
 
 		ForwardPipeline(Device& _device, VkRenderPass& _renderPass);

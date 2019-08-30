@@ -36,7 +36,6 @@ namespace vk {
  		m_fragUniforms.lightColor = glm::vec3(1,1,1);
  		m_fragUniforms.specularHardness = 32;
 		m_fragUniforms.lightPos = glm::vec3(0, 2, 0);
-		m_fragUniforms.textureIndex = 0;
 	}
 
 	//================================================================================================================================

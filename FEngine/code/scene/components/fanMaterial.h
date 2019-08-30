@@ -2,24 +2,29 @@
 
 #include "scene/components/fanComponent.h"
 
-namespace vk{ class Texture; }
+namespace vk {
+	class Texture;
+}
 
-namespace scene
-{
+namespace scene {
+	class Model;
+
 	//================================================================================================================================
 	//================================================================================================================================
 	class Material : public Component
 	{
 	public:
 
+		static util::Signal< scene::Model * > onMaterialUpdated; // Passes the associated model if not null
+
 		bool			IsUnique()		const override { return true; }
+		void Load(std::istream& _in)	override;
+		void Save(std::ostream& _out)	override;
 
-		void			SetTexture( const vk::Texture * m_texture);
-		void			SetTexture( const std::string _path);
+
+		void SetTexture(vk::Texture * _texture);
 		vk::Texture *	GetTexture() { return m_texture; }
-
-		void Load(std::istream& _in) override;
-		void Save(std::ostream& _out) override;
+		const vk::Texture *	GetTexture() const { return m_texture; }
 
 		DECLARE_TYPE_INFO(Material);
 	private:

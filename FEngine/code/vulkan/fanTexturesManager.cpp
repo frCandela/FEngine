@@ -13,7 +13,7 @@ namespace vk {
 		m_device(_device ) {
 		m_textures.reserve(64);
 
-		AddTexture(s_defaultTexture);
+		LoadTexture(s_defaultTexture);
 	}
 
 	//================================================================================================================================
@@ -26,14 +26,11 @@ namespace vk {
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void TexturesManager::AddTexture( const std::string _path ) {
+	vk::Texture * TexturesManager::LoadTexture( const std::string _path ) {
 		// Dont add the texture if it already exists
-		for (int textureIndex = 0; textureIndex < m_textures.size(); textureIndex++) {
-			const vk::Texture * texture = m_textures[textureIndex];
-			if (texture->GetPath() == _path) {
-				fan::Debug::Get() << fan::Debug::Severity::warning << "Texture already added: " << _path << std::endl;
-				return;
-			}
+		if (FindTexture(_path) != nullptr) {
+			fan::Debug::Get() << fan::Debug::Severity::warning << "Texture already added: " << _path << std::endl;
+			return nullptr;
 		}
 
 		// Add
@@ -41,5 +38,30 @@ namespace vk {
 		if( texture->LoadTexture(_path) == true ) {
 			m_textures.push_back(texture);
 		}
+
+		return texture;
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
+	uint32_t TexturesManager::FindTextureIndex(const vk::Texture * _texture) {
+		for (int textureIndex = 0; textureIndex < m_textures.size(); textureIndex++) {
+			if (m_textures[textureIndex] == _texture) {
+				return textureIndex;
+			}
+		}
+		return 0;
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
+	vk::Texture * TexturesManager::FindTexture( const std::string _path ) {
+		for (int textureIndex = 0; textureIndex < m_textures.size(); textureIndex++) {
+			const vk::Texture * texture = m_textures[textureIndex];
+			if (texture->GetPath() == _path) {				
+				return m_textures[textureIndex];
+			}
+		}
+		return nullptr;
 	}
 }

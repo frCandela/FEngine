@@ -9,6 +9,7 @@ namespace scene {
 	class Camera;
 	class Model;
 	class Transform;
+	class Material;
 }
 
 namespace vk {
@@ -71,8 +72,9 @@ namespace vk {
 		void				SetDefaultMesh(const ressource::Mesh * _defaultMesh) { m_defaultMesh = _defaultMesh; }
 
 		//void RemoveMesh		( const ressource::Mesh * _mesh );
-		void AddModel		( scene::Model * _model);
-		void RemoveModel	( scene::Model * _model);
+		void UpdateMaterialOfModel	( scene::Model * _model);
+		void AddModel				( scene::Model * _model);
+		void RemoveModel			( scene::Model * _model);
 
 		void					DebugPoint		( const btVector3 _pos, const vk::Color _color);
 		void					DebugLine		( const btVector3 _start, const btVector3 _end, const vk::Color _color);

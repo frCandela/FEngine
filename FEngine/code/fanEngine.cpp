@@ -69,8 +69,9 @@ namespace fan {
 		m_renderer =			new vk::Renderer(windowSize, windowPosition);
 		m_scene =				new scene::Scene("mainScene");
 
-		ressource::Mesh::onMeshLoad.Connect(&vk::Renderer::AddMesh, m_renderer);
-		scene::Model::onRegisterModel.Connect(&vk::Renderer::AddModel, m_renderer);
+		scene::Material::onMaterialUpdated.Connect( &vk::Renderer::UpdateMaterialOfModel, m_renderer);
+		ressource::Mesh::onMeshLoad.Connect(	&vk::Renderer::AddMesh,		m_renderer);	// TODO One of these signals needs to go
+		scene::Model::onRegisterModel.Connect(	&vk::Renderer::AddModel,	m_renderer);	// TODO One of these signals needs to go
 		m_scene->onSceneLoad.Connect(&Engine::OnSceneLoad, this);
 		OnSceneLoad(m_scene);
 
