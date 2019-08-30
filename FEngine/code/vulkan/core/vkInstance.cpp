@@ -14,7 +14,11 @@ namespace vk {
 		int res = glfwVulkanSupported() == GLFW_TRUE;
 		(void)res;
 		glfwExtensions = glfwGetRequiredInstanceExtensions(&glfwExtensionCount);
-		std::vector< const char * > desiredExtensions = { VK_EXT_DEBUG_REPORT_EXTENSION_NAME, VK_KHR_SURFACE_EXTENSION_NAME };
+		std::vector< const char * > desiredExtensions = { 
+			VK_EXT_DEBUG_REPORT_EXTENSION_NAME
+			, VK_KHR_SURFACE_EXTENSION_NAME 				
+		};
+
 		for (unsigned glfwExtensionIndex = 0; glfwExtensionIndex < glfwExtensionCount; glfwExtensionIndex++) {
 			desiredExtensions.push_back(glfwExtensions[glfwExtensionIndex]);
 		}

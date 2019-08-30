@@ -278,7 +278,6 @@ namespace vk {
 	//================================================================================================================================
 	void Renderer::UpdateUniformBuffer()
 	{
-
 		ForwardPipeline::VertUniforms ubo = m_forwardPipeline->GetVertUniforms();
 		assert(m_mainCamera != nullptr);
 		if ( m_mainCamera->IsModified()) {
@@ -293,6 +292,7 @@ namespace vk {
 
 		ForwardPipeline::FragUniforms fragUniforms = m_forwardPipeline->GetFragUniforms();
 		fragUniforms.cameraPosition = util::ToGLM( m_mainCameraTransform->GetPosition());
+		fragUniforms.textureIndex = 2;
 		m_forwardPipeline->SetFragUniforms(fragUniforms);
 
 

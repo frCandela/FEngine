@@ -67,7 +67,11 @@ namespace vk {
 	bool Device::Create() {
 		SelectPhysicalDevice();
 		GetQueueFamilies();
-		std::vector< const char * > existingExtensions = GetDesiredExtensions({ VK_KHR_SWAPCHAIN_EXTENSION_NAME });
+		std::vector< const char * > existingExtensions = GetDesiredExtensions(
+			{ VK_KHR_SWAPCHAIN_EXTENSION_NAME
+			, VK_EXT_DESCRIPTOR_INDEXING_EXTENSION_NAME	
+			}
+		);
 
 		float queuePriority = 1.0f;
 		std::vector <VkDeviceQueueCreateInfo> queueCreateInfos;
@@ -83,10 +87,16 @@ namespace vk {
 
 		VkPhysicalDeviceFeatures desiredFeatures = {};
 		desiredFeatures.samplerAnisotropy = m_availableFeatures.samplerAnisotropy == VK_TRUE;
+		desiredFeatures.shaderUniformBufferArrayDynamicIndexing =VK_TRUE;
+
+		VkPhysicalDeviceDescriptorIndexingFeaturesEXT indexingFeatures = {};
+		indexingFeatures.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DESCRIPTOR_INDEXING_FEATURES_EXT;
+		indexingFeatures.pNext = nullptr;
+		indexingFeatures.runtimeDescriptorArray = VK_TRUE;
 
 		VkDeviceCreateInfo deviceCreateInfo = {};
 		deviceCreateInfo.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
-		deviceCreateInfo.pNext = nullptr;
+		deviceCreateInfo.pNext = &indexingFeatures;
 		deviceCreateInfo.flags = 0;
 		deviceCreateInfo.queueCreateInfoCount = static_cast<uint32_t>(queueCreateInfos.size());
 		deviceCreateInfo.pQueueCreateInfos = queueCreateInfos.data();

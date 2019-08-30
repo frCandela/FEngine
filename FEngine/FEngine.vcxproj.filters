@@ -242,6 +242,9 @@
     <ClCompile Include="code\vulkan\fanTexturesManager.cpp">
       <Filter>code\vulkan</Filter>
     </ClCompile>
+    <ClCompile Include="code\scene\components\fanMaterial.cpp">
+      <Filter>code\scene\components</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="code\vulkan\vkRenderer.h">
@@ -867,6 +870,9 @@
     </ClInclude>
     <ClInclude Include="code\vulkan\fanTexturesManager.h">
       <Filter>code\vulkan</Filter>
+    </ClInclude>
+    <ClInclude Include="code\scene\components\fanMaterial.h">
+      <Filter>code\scene\components</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

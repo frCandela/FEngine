@@ -21,6 +21,7 @@ namespace fan {
 		static void Log		( const std::string _message );
 		static void Warning	( const std::string _message );
 		static void Error	( const std::string _message );
+		static void Highlight	( const std::string _message );
 		static void Clear();
 		static const std::vector< LogItem >& GetLogBuffer() { return Get().m_logBuffer;  }
 

@@ -12,7 +12,7 @@ namespace vk {
 		TexturesManager( Device& _device );
 		~TexturesManager();
 
-		void AddTexture( const std::string _path );		
+		void AddTexture( const std::string _path );
 
 		const std::vector< vk::Texture * > &	GetTextures() const	{ return m_textures; }
 		std::vector< vk::Texture * > &			GetTextures()		{ return m_textures; }

@@ -29,6 +29,7 @@
 #include "scene/components/fanTransform.h"
 #include "scene/components/fanModel.h"
 #include "scene/components/fanActor.h"
+#include "scene/components/fanMaterial.h"
 
 
 #include "bullet/BulletCollision/CollisionShapes/btCapsuleShape.h"
@@ -150,12 +151,11 @@ namespace fan {
 	//================================================================================================================================
 	//================================================================================================================================
 	void Engine::OnSceneLoad(scene::Scene * _scene) {
-		assert(_scene == m_scene);
 
 		m_selectedGameobject = nullptr;
 
 		// Editor Camera
-		scene::Gameobject * cameraGameobject = m_scene->CreateGameobject("editor_camera");
+		scene::Gameobject * cameraGameobject = _scene->CreateGameobject("editor_camera");
 		cameraGameobject->SetFlags(scene::Gameobject::NO_DELETE | scene::Gameobject::NOT_SAVED);
 		scene::Transform * camTrans = cameraGameobject->AddComponent<scene::Transform>();
 		camTrans->SetPosition(btVector3(0, 0, -2));
@@ -290,6 +290,15 @@ namespace fan {
 	//================================================================================================================================
 	//================================================================================================================================
 	void Engine::DrawUI() {
+		ImGui::Begin("test"); {
+			if( ImGui::Button("testoss")){
+				scene::Gameobject * go = m_scene->CreateGameobject("tessst");
+				go->AddComponent<scene::Transform>( );
+				scene::Material * mat = go->AddComponent<scene::Material>( );
+				(void)mat;
+			}
+		} ImGui::End();
+
 		m_mainMenuBar->Draw();
 		m_renderWindow->Draw();
 		m_sceneWindow->Draw();

@@ -49,6 +49,7 @@ namespace vk {
 			glm::vec3	lightColor;
 			glm::int32	specularHardness;
 			glm::vec3	lightPos;
+			glm::int32	textureIndex;
 		};
 
 		struct DynamicUniforms

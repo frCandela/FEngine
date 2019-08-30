@@ -6,11 +6,12 @@
 #include "scene/components/fanTransform.h"
 #include "scene/components/fanCamera.h"
 #include "scene/components/fanModel.h"
+#include "scene/components/fanMaterial.h"
 #include "editor/components/fanFPSCamera.h"
 #include "editor/fanModals.h"
 #include "core/ressources/fanMesh.h"
 #include "core/fanSignal.h"
-
+#include "vulkan/core/vkTexture.h"
 #include "vulkan/vkRenderer.h"
 #include "fanEngine.h"
 
@@ -147,7 +148,9 @@ namespace editor {
 			DrawModel(static_cast<scene::Model &>(_component));
 		} else if (_component.IsType < scene::FPSCamera>()) {
 			DrawFPSCamera(static_cast<scene::FPSCamera &>(_component));
-		} else {
+		} else if (_component.IsType < scene::Material>()) {
+			DrawMaterial(static_cast<scene::Material &>(_component));
+		}else {
 			ImGui::Text( (std::string("Component not supported: ") + std::string(_component.GetName())).c_str());
 		}
 	}
@@ -156,7 +159,6 @@ namespace editor {
 	//================================================================================================================================
 	void InspectorWindow::DrawCamera(scene::Camera & _camera) {
 		ImGui::Text(_camera.GetName());
-
 
 		// fov
 		if (ImGui::Button("##fov")) {
@@ -295,5 +297,44 @@ namespace editor {
 			_fpsCamera.SetSpeedMultiplier(speedMultiplier);
 		}
 
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
+	void InspectorWindow::DrawMaterial(scene::Material & _material) {
+		ImGui::Text(_material.GetName());
+
+		bool openSetPathPopup = false;
+		if (ImGui::Button("##setPath")) {
+			openSetPathPopup = true;
+		}
+		ImGui::SameLine();
+		const std::string texturePath = _material.GetTexture() != nullptr ? _material.GetTexture()->GetPath() : "not set";
+		ImGui::Text("texture : %s", texturePath.c_str());
+		// Set path  popup on double click
+		if (openSetPathPopup || ImGui::IsItemHovered() && ImGui::IsMouseClicked(0)) {
+			if (_material.GetTexture() != nullptr && _material.GetTexture()->GetPath().empty() == false) {
+				m_pathBuffer = std::fs::path(_material.GetTexture()->GetPath()).parent_path();
+			}
+			else {
+				m_pathBuffer = "./";
+			}
+			ImGui::OpenPopup("set_path");
+			m_pathBuffer = "content/models";
+		}
+
+		if (util::Imgui::LoadFileModal("set_path", { ".png" }, m_pathBuffer)) {
+			fan::Debug::Highlight("load not implemented " + m_pathBuffer.string());
+//			ressource::Mesh * mesh = vk::Renderer::GetRenderer().FindMesh(DSID(m_pathBuffer.string().c_str()));			
+// 			if (mesh == nullptr) {
+// 				mesh = new ressource::Mesh(m_pathBuffer.string());
+// 				mesh->Load();
+// 				_material.SetTexture(mesh);
+// 				
+// 			} else {
+// 				_model.SetMesh(mesh);
+// 			}
+		}
+	
 	}
 }

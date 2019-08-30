@@ -21,13 +21,6 @@ namespace vk {
 		m_device(_device)
 		, m_renderPass(_renderPass) {
 
-// 		m_texture1 = new Texture(m_device);
-// 		m_texture1->LoadTexture("content/models/test/textures/texture1.jpg");
-// 		m_texture2 = new Texture(m_device);
-// 		m_texture2->LoadTexture("content/models/test/textures/texture2.jpg");
-// 		m_texture3 = new Texture(m_device);
-// 		m_texture3->LoadTexture("content/models/test/textures/texture3.png");
-
 		m_sampler = new Sampler(_device);
 		m_sampler->CreateSampler(0, 8);
 
@@ -43,6 +36,7 @@ namespace vk {
  		m_fragUniforms.lightColor = glm::vec3(1,1,1);
  		m_fragUniforms.specularHardness = 32;
 		m_fragUniforms.lightPos = glm::vec3(0, 2, 0);
+		m_fragUniforms.textureIndex = 0;
 	}
 
 	//================================================================================================================================
