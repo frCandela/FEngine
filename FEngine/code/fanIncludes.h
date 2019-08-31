@@ -37,6 +37,6 @@
 #include "core/math/fanMathUtils.h"
 #include "core/math/fanVector2.h"
 #include "core/fanHash.h"
-#include "vulkan/util/vkColor.h"
+#include "renderer/util/vkColor.h"
 
 #pragma warning( pop )

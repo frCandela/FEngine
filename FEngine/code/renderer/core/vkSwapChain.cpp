@@ -1,10 +1,10 @@
 #include "fanIncludes.h"
 
-#include "vulkan/core/vkSwapChain.h"
-#include "vulkan/core/vkDevice.h"
-#include "vulkan/core/vkImage.h"
-#include "vulkan/core/vkImageView.h"
-#include "vulkan/core/vkFrameBuffer.h"
+#include "renderer/core/vkSwapChain.h"
+#include "renderer/core/vkDevice.h"
+#include "renderer/core/vkImage.h"
+#include "renderer/core/vkImageView.h"
+#include "renderer/core/vkFrameBuffer.h"
 
 namespace vk {
 	//================================================================================================================================

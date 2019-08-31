@@ -6,7 +6,7 @@
 #include "fanEngine.h"
 #include "core/math/shapes/fanAABB.h"
 #include "core/ressources/fanMesh.h"
-#include "vulkan/vkRenderer.h"
+#include "renderer/vkRenderer.h"
 #include "core/files/fanFbxImporter.h"
 
 #include "core/ressources/fanMesh.h"
@@ -16,6 +16,7 @@ namespace scene
 {
 	REGISTER_TYPE_INFO(Model)
 	util::Signal< Model * > Model::onRegisterModel;
+	util::Signal< Model * > Model::onUnRegisterModel;
 
 	//================================================================================================================================
 	//================================================================================================================================
@@ -30,9 +31,9 @@ namespace scene
 
 	//================================================================================================================================
 	//================================================================================================================================
-	Model::~Model() {
-		fan::Engine::GetEngine().GetRenderer().RemoveModel(this);		
-	} 
+	void Model::Delete() {
+		onUnRegisterModel.Emmit(this);
+	}
 
 	//================================================================================================================================
 	//================================================================================================================================
@@ -85,5 +86,7 @@ namespace scene
 	void Model::Save(std::ostream& _out) {
 		_out << "\t\t" << m_mesh->GetPath() << std::endl;
 	}
+
+
 
 }

@@ -1,7 +1,7 @@
 #pragma once
 
 #include "core/ressources/fanRessource.h"
-#include "vulkan/util/vkVertex.h"
+#include "renderer/util/vkVertex.h"
 
 namespace ressource {
 	//================================================================================================================================

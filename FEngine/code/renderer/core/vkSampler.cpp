@@ -1,7 +1,7 @@
 #include "fanIncludes.h"
 
-#include "vulkan/core/vkSampler.h"
-#include "vulkan/core/vkDevice.h"
+#include "renderer/core/vkSampler.h"
+#include "renderer/core/vkDevice.h"
 
 namespace vk {
 	//================================================================================================================================

@@ -3,9 +3,9 @@
 #include "scene/fanGameobject.h"
 #include "scene/components/fanMaterial.h"
 #include "scene/components/fanModel.h"
-#include "vulkan/core/vkTexture.h"
-#include "vulkan/fanTexturesManager.h"
-#include "vulkan/vkRenderer.h"
+#include "renderer/core/vkTexture.h"
+#include "renderer/fanTexturesManager.h"
+#include "renderer/vkRenderer.h"
 
 namespace scene {
 	REGISTER_TYPE_INFO(Material)

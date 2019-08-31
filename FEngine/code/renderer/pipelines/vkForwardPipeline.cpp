@@ -1,16 +1,16 @@
 #include "fanIncludes.h"
 
-#include "vulkan/pipelines/vkForwardPipeline.h"
-#include "vulkan/fanTexturesManager.h"
-#include "vulkan/core/vkDevice.h"
-#include "vulkan/core/vkShader.h"
-#include "vulkan/core/vkImage.h"
-#include "vulkan/core/vkImageView.h" 
-#include "vulkan/core/vkBuffer.h"
-#include "vulkan/core/vkTexture.h"
-#include "vulkan/core/vkSampler.h"
-#include "vulkan/vkRenderer.h"
-#include "vulkan/util/vkVertex.h"
+#include "renderer/pipelines/vkForwardPipeline.h"
+#include "renderer/fanTexturesManager.h"
+#include "renderer/core/vkDevice.h"
+#include "renderer/core/vkShader.h"
+#include "renderer/core/vkImage.h"
+#include "renderer/core/vkImageView.h" 
+#include "renderer/core/vkBuffer.h"
+#include "renderer/core/vkTexture.h"
+#include "renderer/core/vkSampler.h"
+#include "renderer/vkRenderer.h"
+#include "renderer/util/vkVertex.h"
 #include "scene/components/fanModel.h"
 #include "core/ressources/fanMesh.h"
 
@@ -160,33 +160,37 @@ namespace vk {
 		
 		VkDeviceSize offsets[] = { 0 };
 
-		for (int drawDataIndex = 0; drawDataIndex < _drawData.size(); drawDataIndex++){
+		for (int drawDataIndex = 0; drawDataIndex < _drawData.size(); drawDataIndex++) {
 			const DrawData&  drawData = _drawData[drawDataIndex];
-			VkBuffer vertexBuffers[] = { drawData.meshData->vertexBuffer->GetBuffer() };
-			vkCmdBindVertexBuffers(_commandBuffer, 0, 1, vertexBuffers, offsets);
-			vkCmdBindIndexBuffer(_commandBuffer, drawData.meshData->indexBuffer->GetBuffer(), 0, VK_INDEX_TYPE_UINT32);
-			
-			std::vector<uint32_t> dynamicOffsets = {
-				drawDataIndex  * static_cast<uint32_t>(m_dynamicAlignmentVert)
-				,	drawDataIndex  * static_cast<uint32_t>(m_dynamicAlignmentFrag)
-			};
 
-			std::vector<VkDescriptorSet> descriptors = { 
-				m_descriptorSetScene 
-				, m_descriptorSetTextures
-			};
-			
-			vkCmdBindDescriptorSets(
-				_commandBuffer,
-				VK_PIPELINE_BIND_POINT_GRAPHICS,
-				m_pipelineLayout,
-				0,
-				static_cast<uint32_t>(descriptors.size()),
-				descriptors.data(),
-				static_cast<uint32_t>(dynamicOffsets.size()),
-				dynamicOffsets.data()
-			);
-			vkCmdDrawIndexed(_commandBuffer, static_cast<uint32_t>(drawData.meshData->mesh->GetIndices().size()), 1, 0, 0, 0);
+			if (drawData.model != nullptr) {
+
+				VkBuffer vertexBuffers[] = { drawData.meshData->vertexBuffer->GetBuffer() };
+				vkCmdBindVertexBuffers(_commandBuffer, 0, 1, vertexBuffers, offsets);
+				vkCmdBindIndexBuffer(_commandBuffer, drawData.meshData->indexBuffer->GetBuffer(), 0, VK_INDEX_TYPE_UINT32);
+
+				std::vector<uint32_t> dynamicOffsets = {
+					drawDataIndex  * static_cast<uint32_t>(m_dynamicAlignmentVert)
+					,	drawDataIndex  * static_cast<uint32_t>(m_dynamicAlignmentFrag)
+				};
+
+				std::vector<VkDescriptorSet> descriptors = {
+					m_descriptorSetScene
+					, m_descriptorSetTextures
+				};
+
+				vkCmdBindDescriptorSets(
+					_commandBuffer,
+					VK_PIPELINE_BIND_POINT_GRAPHICS,
+					m_pipelineLayout,
+					0,
+					static_cast<uint32_t>(descriptors.size()),
+					descriptors.data(),
+					static_cast<uint32_t>(dynamicOffsets.size()),
+					dynamicOffsets.data()
+				);
+				vkCmdDrawIndexed(_commandBuffer, static_cast<uint32_t>(drawData.meshData->mesh->GetIndices().size()), 1, 0, 0, 0);
+			}
 		}
 	}
 

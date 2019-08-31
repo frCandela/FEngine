@@ -8,18 +8,6 @@
       <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
       <Extensions>h;hh;hpp;hxx;hm;inl;inc;xsd</Extensions>
     </Filter>
-    <Filter Include="code\vulkan">
-      <UniqueIdentifier>{6d1ab719-6179-4bc6-ac3a-bc6ff88ce93f}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="code\vulkan\pipelines">
-      <UniqueIdentifier>{5626cd8c-7763-4394-aa32-3d7e1ce08b06}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="code\vulkan\core">
-      <UniqueIdentifier>{9731fc01-1c78-441b-aa77-8365a9a60c62}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="code\vulkan\util">
-      <UniqueIdentifier>{4ff53cec-cd38-4426-be53-be2ed26a9884}</UniqueIdentifier>
-    </Filter>
     <Filter Include="code\deps">
       <UniqueIdentifier>{438721f2-b2df-4736-b550-620897169813}</UniqueIdentifier>
     </Filter>
@@ -59,6 +47,18 @@
     <Filter Include="code\core\ressources">
       <UniqueIdentifier>{14795265-53e0-4a53-be28-fe0c65a03c14}</UniqueIdentifier>
     </Filter>
+    <Filter Include="code\renderer">
+      <UniqueIdentifier>{6d1ab719-6179-4bc6-ac3a-bc6ff88ce93f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="code\renderer\pipelines">
+      <UniqueIdentifier>{5626cd8c-7763-4394-aa32-3d7e1ce08b06}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="code\renderer\core">
+      <UniqueIdentifier>{9731fc01-1c78-441b-aa77-8365a9a60c62}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="code\renderer\util">
+      <UniqueIdentifier>{4ff53cec-cd38-4426-be53-be2ed26a9884}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="deps\imgui\imgui.cpp">
@@ -70,57 +70,6 @@
     <ClCompile Include="deps\imgui\imgui_draw.cpp">
       <Filter>code\deps</Filter>
     </ClCompile>
-    <ClCompile Include="code\vulkan\vkRenderer.cpp">
-      <Filter>code\vulkan</Filter>
-    </ClCompile>
-    <ClCompile Include="code\vulkan\util\vkVertex.cpp">
-      <Filter>code\vulkan\util</Filter>
-    </ClCompile>
-    <ClCompile Include="code\vulkan\util\vkWindow.cpp">
-      <Filter>code\vulkan\util</Filter>
-    </ClCompile>
-    <ClCompile Include="code\vulkan\util\vkSpirvCompiler.cpp">
-      <Filter>code\vulkan\util</Filter>
-    </ClCompile>
-    <ClCompile Include="code\vulkan\pipelines\vkPostprocessPipeline.cpp">
-      <Filter>code\vulkan\pipelines</Filter>
-    </ClCompile>
-    <ClCompile Include="code\vulkan\pipelines\vkForwardPipeline.cpp">
-      <Filter>code\vulkan\pipelines</Filter>
-    </ClCompile>
-    <ClCompile Include="code\vulkan\pipelines\vkImguiPipeline.cpp">
-      <Filter>code\vulkan\pipelines</Filter>
-    </ClCompile>
-    <ClCompile Include="code\vulkan\core\vkSampler.cpp">
-      <Filter>code\vulkan\core</Filter>
-    </ClCompile>
-    <ClCompile Include="code\vulkan\core\vkShader.cpp">
-      <Filter>code\vulkan\core</Filter>
-    </ClCompile>
-    <ClCompile Include="code\vulkan\core\vkSwapChain.cpp">
-      <Filter>code\vulkan\core</Filter>
-    </ClCompile>
-    <ClCompile Include="code\vulkan\core\vkTexture.cpp">
-      <Filter>code\vulkan\core</Filter>
-    </ClCompile>
-    <ClCompile Include="code\vulkan\core\vkBuffer.cpp">
-      <Filter>code\vulkan\core</Filter>
-    </ClCompile>
-    <ClCompile Include="code\vulkan\core\vkDevice.cpp">
-      <Filter>code\vulkan\core</Filter>
-    </ClCompile>
-    <ClCompile Include="code\vulkan\core\vkFramebuffer.cpp">
-      <Filter>code\vulkan\core</Filter>
-    </ClCompile>
-    <ClCompile Include="code\vulkan\core\vkImage.cpp">
-      <Filter>code\vulkan\core</Filter>
-    </ClCompile>
-    <ClCompile Include="code\vulkan\core\vkImageView.cpp">
-      <Filter>code\vulkan\core</Filter>
-    </ClCompile>
-    <ClCompile Include="code\vulkan\core\vkInstance.cpp">
-      <Filter>code\vulkan\core</Filter>
-    </ClCompile>
     <ClCompile Include="code\editor\fanMainMenuBar.cpp">
       <Filter>code\editor</Filter>
     </ClCompile>
@@ -129,9 +78,6 @@
     </ClCompile>
     <ClCompile Include="code\fanMain.cpp">
       <Filter>code</Filter>
-    </ClCompile>
-    <ClCompile Include="code\vulkan\pipelines\vkDebugPipeline.cpp">
-      <Filter>code\vulkan\pipelines</Filter>
     </ClCompile>
     <ClCompile Include="code\scene\fanGameobject.cpp">
       <Filter>code\scene</Filter>
@@ -168,10 +114,6 @@
     </ClCompile>
     <ClCompile Include="code\editor\components\fanFPSCamera.cpp">
       <Filter>code\editor\components</Filter>
-    </ClCompile>
-    <ClCompile Include="code\vulkan\util\vkShape.inl" />
-    <ClCompile Include="code\vulkan\util\vkColor.cpp">
-      <Filter>code\vulkan\util</Filter>
     </ClCompile>
     <ClCompile Include="code\core\fanInput.cpp">
       <Filter>code\core</Filter>
@@ -239,65 +181,71 @@
     <ClCompile Include="code\core\fanDebug.cpp">
       <Filter>code\core</Filter>
     </ClCompile>
-    <ClCompile Include="code\vulkan\fanTexturesManager.cpp">
-      <Filter>code\vulkan</Filter>
-    </ClCompile>
     <ClCompile Include="code\scene\components\fanMaterial.cpp">
       <Filter>code\scene\components</Filter>
     </ClCompile>
+    <ClCompile Include="code\renderer\fanTexturesManager.cpp">
+      <Filter>code\renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="code\renderer\vkRenderer.cpp">
+      <Filter>code\renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="code\renderer\util\vkVertex.cpp">
+      <Filter>code\renderer\util</Filter>
+    </ClCompile>
+    <ClCompile Include="code\renderer\util\vkWindow.cpp">
+      <Filter>code\renderer\util</Filter>
+    </ClCompile>
+    <ClCompile Include="code\renderer\util\vkColor.cpp">
+      <Filter>code\renderer\util</Filter>
+    </ClCompile>
+    <ClCompile Include="code\renderer\util\vkSpirvCompiler.cpp">
+      <Filter>code\renderer\util</Filter>
+    </ClCompile>
+    <ClCompile Include="code\renderer\pipelines\vkImguiPipeline.cpp">
+      <Filter>code\renderer\pipelines</Filter>
+    </ClCompile>
+    <ClCompile Include="code\renderer\pipelines\vkPostprocessPipeline.cpp">
+      <Filter>code\renderer\pipelines</Filter>
+    </ClCompile>
+    <ClCompile Include="code\renderer\pipelines\vkDebugPipeline.cpp">
+      <Filter>code\renderer\pipelines</Filter>
+    </ClCompile>
+    <ClCompile Include="code\renderer\pipelines\vkForwardPipeline.cpp">
+      <Filter>code\renderer\pipelines</Filter>
+    </ClCompile>
+    <ClCompile Include="code\renderer\core\vkImage.cpp">
+      <Filter>code\renderer\core</Filter>
+    </ClCompile>
+    <ClCompile Include="code\renderer\core\vkImageView.cpp">
+      <Filter>code\renderer\core</Filter>
+    </ClCompile>
+    <ClCompile Include="code\renderer\core\vkInstance.cpp">
+      <Filter>code\renderer\core</Filter>
+    </ClCompile>
+    <ClCompile Include="code\renderer\core\vkSampler.cpp">
+      <Filter>code\renderer\core</Filter>
+    </ClCompile>
+    <ClCompile Include="code\renderer\core\vkShader.cpp">
+      <Filter>code\renderer\core</Filter>
+    </ClCompile>
+    <ClCompile Include="code\renderer\core\vkSwapChain.cpp">
+      <Filter>code\renderer\core</Filter>
+    </ClCompile>
+    <ClCompile Include="code\renderer\core\vkTexture.cpp">
+      <Filter>code\renderer\core</Filter>
+    </ClCompile>
+    <ClCompile Include="code\renderer\core\vkBuffer.cpp">
+      <Filter>code\renderer\core</Filter>
+    </ClCompile>
+    <ClCompile Include="code\renderer\core\vkDevice.cpp">
+      <Filter>code\renderer\core</Filter>
+    </ClCompile>
+    <ClCompile Include="code\renderer\core\vkFramebuffer.cpp">
+      <Filter>code\renderer\core</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="code\vulkan\vkRenderer.h">
-      <Filter>code\vulkan</Filter>
-    </ClInclude>
-    <ClInclude Include="code\vulkan\util\vkSpirvCompiler.h">
-      <Filter>code\vulkan\util</Filter>
-    </ClInclude>
-    <ClInclude Include="code\vulkan\util\vkVertex.h">
-      <Filter>code\vulkan\util</Filter>
-    </ClInclude>
-    <ClInclude Include="code\vulkan\util\vkWindow.h">
-      <Filter>code\vulkan\util</Filter>
-    </ClInclude>
-    <ClInclude Include="code\vulkan\pipelines\vkPostprocessPipeline.h">
-      <Filter>code\vulkan\pipelines</Filter>
-    </ClInclude>
-    <ClInclude Include="code\vulkan\pipelines\vkForwardPipeline.h">
-      <Filter>code\vulkan\pipelines</Filter>
-    </ClInclude>
-    <ClInclude Include="code\vulkan\pipelines\vkImguiPipeline.h">
-      <Filter>code\vulkan\pipelines</Filter>
-    </ClInclude>
-    <ClInclude Include="code\vulkan\core\vkSampler.h">
-      <Filter>code\vulkan\core</Filter>
-    </ClInclude>
-    <ClInclude Include="code\vulkan\core\vkShader.h">
-      <Filter>code\vulkan\core</Filter>
-    </ClInclude>
-    <ClInclude Include="code\vulkan\core\vkSwapChain.h">
-      <Filter>code\vulkan\core</Filter>
-    </ClInclude>
-    <ClInclude Include="code\vulkan\core\vkTexture.h">
-      <Filter>code\vulkan\core</Filter>
-    </ClInclude>
-    <ClInclude Include="code\vulkan\core\vkBuffer.h">
-      <Filter>code\vulkan\core</Filter>
-    </ClInclude>
-    <ClInclude Include="code\vulkan\core\vkDevice.h">
-      <Filter>code\vulkan\core</Filter>
-    </ClInclude>
-    <ClInclude Include="code\vulkan\core\vkFrameBuffer.h">
-      <Filter>code\vulkan\core</Filter>
-    </ClInclude>
-    <ClInclude Include="code\vulkan\core\vkImage.h">
-      <Filter>code\vulkan\core</Filter>
-    </ClInclude>
-    <ClInclude Include="code\vulkan\core\vkImageView.h">
-      <Filter>code\vulkan\core</Filter>
-    </ClInclude>
-    <ClInclude Include="code\vulkan\core\vkInstance.h">
-      <Filter>code\vulkan\core</Filter>
-    </ClInclude>
     <ClInclude Include="code\editor\fanMainMenuBar.h">
       <Filter>code\editor</Filter>
     </ClInclude>
@@ -306,9 +254,6 @@
     </ClInclude>
     <ClInclude Include="code\fanIncludes.h">
       <Filter>code</Filter>
-    </ClInclude>
-    <ClInclude Include="code\vulkan\pipelines\vkDebugPipeline.h">
-      <Filter>code\vulkan\pipelines</Filter>
     </ClInclude>
     <ClInclude Include="code\scene\fanGameobject.h">
       <Filter>code\scene</Filter>
@@ -784,9 +729,6 @@
     <ClInclude Include="deps\nlohmann_json.h">
       <Filter>code\deps</Filter>
     </ClInclude>
-    <ClInclude Include="code\vulkan\util\vkColor.h">
-      <Filter>code\vulkan\util</Filter>
-    </ClInclude>
     <ClInclude Include="code\fanGlobalUsing.h">
       <Filter>code</Filter>
     </ClInclude>
@@ -868,11 +810,71 @@
     <ClInclude Include="code\core\fanSingleton.h">
       <Filter>code\core</Filter>
     </ClInclude>
-    <ClInclude Include="code\vulkan\fanTexturesManager.h">
-      <Filter>code\vulkan</Filter>
-    </ClInclude>
     <ClInclude Include="code\scene\components\fanMaterial.h">
       <Filter>code\scene\components</Filter>
+    </ClInclude>
+    <ClInclude Include="code\renderer\fanTexturesManager.h">
+      <Filter>code\renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="code\renderer\vkRenderer.h">
+      <Filter>code\renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="code\renderer\util\vkSpirvCompiler.h">
+      <Filter>code\renderer\util</Filter>
+    </ClInclude>
+    <ClInclude Include="code\renderer\util\vkVertex.h">
+      <Filter>code\renderer\util</Filter>
+    </ClInclude>
+    <ClInclude Include="code\renderer\util\vkWindow.h">
+      <Filter>code\renderer\util</Filter>
+    </ClInclude>
+    <ClInclude Include="code\renderer\util\vkColor.h">
+      <Filter>code\renderer\util</Filter>
+    </ClInclude>
+    <ClInclude Include="code\renderer\util\vkShape.h">
+      <Filter>code\renderer\util</Filter>
+    </ClInclude>
+    <ClInclude Include="code\renderer\pipelines\vkForwardPipeline.h">
+      <Filter>code\renderer\pipelines</Filter>
+    </ClInclude>
+    <ClInclude Include="code\renderer\pipelines\vkImguiPipeline.h">
+      <Filter>code\renderer\pipelines</Filter>
+    </ClInclude>
+    <ClInclude Include="code\renderer\pipelines\vkPostprocessPipeline.h">
+      <Filter>code\renderer\pipelines</Filter>
+    </ClInclude>
+    <ClInclude Include="code\renderer\pipelines\vkDebugPipeline.h">
+      <Filter>code\renderer\pipelines</Filter>
+    </ClInclude>
+    <ClInclude Include="code\renderer\core\vkImage.h">
+      <Filter>code\renderer\core</Filter>
+    </ClInclude>
+    <ClInclude Include="code\renderer\core\vkImageView.h">
+      <Filter>code\renderer\core</Filter>
+    </ClInclude>
+    <ClInclude Include="code\renderer\core\vkInstance.h">
+      <Filter>code\renderer\core</Filter>
+    </ClInclude>
+    <ClInclude Include="code\renderer\core\vkSampler.h">
+      <Filter>code\renderer\core</Filter>
+    </ClInclude>
+    <ClInclude Include="code\renderer\core\vkShader.h">
+      <Filter>code\renderer\core</Filter>
+    </ClInclude>
+    <ClInclude Include="code\renderer\core\vkSwapChain.h">
+      <Filter>code\renderer\core</Filter>
+    </ClInclude>
+    <ClInclude Include="code\renderer\core\vkTexture.h">
+      <Filter>code\renderer\core</Filter>
+    </ClInclude>
+    <ClInclude Include="code\renderer\core\vkBuffer.h">
+      <Filter>code\renderer\core</Filter>
+    </ClInclude>
+    <ClInclude Include="code\renderer\core\vkDevice.h">
+      <Filter>code\renderer\core</Filter>
+    </ClInclude>
+    <ClInclude Include="code\renderer\core\vkFrameBuffer.h">
+      <Filter>code\renderer\core</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -904,5 +906,8 @@
     <None Include="shaders\debugTriangles.vert" />
     <None Include="shaders\debugLines.frag" />
     <None Include="shaders\debugLines.vert" />
+    <None Include="code\renderer\util\vkShape.inl">
+      <Filter>code\renderer\util</Filter>
+    </None>
   </ItemGroup>
 </Project>

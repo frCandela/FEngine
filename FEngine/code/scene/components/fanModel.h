@@ -15,9 +15,9 @@ namespace scene
 	{
 	public:
 		static util::Signal< Model * > onRegisterModel;
+		static util::Signal< Model * > onUnRegisterModel;
 
 		Model();
-		~Model();
 
 		shape::AABB ComputeAABB() const;
 		bool		IsUnique()	const override { return true; }
@@ -35,7 +35,7 @@ namespace scene
 		DECLARE_TYPE_INFO(Model);
 	private:
 		void Initialize() override;
-		void Delete() override {};
+		void Delete() override;
 
 		ressource::Mesh * m_mesh;
 		int m_renderID = -1;

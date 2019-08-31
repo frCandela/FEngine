@@ -1,6 +1,6 @@
 #include "fanIncludes.h"
 
-#include "vulkan/util/vkVertex.h"
+#include "renderer/util/vkVertex.h"
 
 namespace vk {
 

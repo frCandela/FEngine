@@ -1,13 +1,13 @@
 #include "fanIncludes.h"
 
-#include "vulkan/pipelines/vkDebugPipeline.h"
-#include "vulkan/core/vkDevice.h"
-#include "vulkan/core/vkShader.h"
-#include "vulkan/core/vkImage.h"
-#include "vulkan/core/vkImageView.h" 
-#include "vulkan/core/vkBuffer.h"
-#include "vulkan/vkRenderer.h"
-#include "vulkan/util/vkVertex.h"
+#include "renderer/pipelines/vkDebugPipeline.h"
+#include "renderer/core/vkDevice.h"
+#include "renderer/core/vkShader.h"
+#include "renderer/core/vkImage.h"
+#include "renderer/core/vkImageView.h" 
+#include "renderer/core/vkBuffer.h"
+#include "renderer/vkRenderer.h"
+#include "renderer/util/vkVertex.h"
 
 namespace vk {
 	//================================================================================================================================

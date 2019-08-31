@@ -1,6 +1,6 @@
 #include "fanIncludes.h"
 
-#include "vulkan/util/vkWindow.h"
+#include "renderer/util/vkWindow.h"
 
 namespace vk {
 

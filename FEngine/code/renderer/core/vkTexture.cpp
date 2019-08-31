@@ -1,9 +1,9 @@
 #include "fanIncludes.h"
 
-#include "vulkan/core/vkTexture.h"
-#include "vulkan/core/vkDevice.h"
-#include "vulkan/core/vkBuffer.h"
-#include "vulkan/vkRenderer.h"
+#include "renderer/core/vkTexture.h"
+#include "renderer/core/vkDevice.h"
+#include "renderer/core/vkBuffer.h"
+#include "renderer/vkRenderer.h"
 
 #pragma warning(push, 0)   
 #define STB_IMAGE_IMPLEMENTATION

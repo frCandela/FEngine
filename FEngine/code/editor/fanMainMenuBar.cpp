@@ -11,7 +11,7 @@
 #include "editor/fanModals.h"
 #include "scene/fanScene.h"
 
-#include "vulkan/vkRenderer.h"
+#include "renderer/vkRenderer.h"
 #include "fanEngine.h"
 
 namespace editor {	

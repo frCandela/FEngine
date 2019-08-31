@@ -1,6 +1,6 @@
 #include "fanIncludes.h"
 
-#include "vulkan/util/vkSpirvCompiler.h"
+#include "renderer/util/vkSpirvCompiler.h"
 #include "SPIRV/GlslangToSpv.h"
 #include "SPIRV/DirStackFileIncluder.h"
 

@@ -1,9 +1,9 @@
 #include "fanIncludes.h"
 
 #include "editor/windows/fanRenderWindow.h"
-#include "vulkan/pipelines/vkPostprocessPipeline.h"
-#include "vulkan/pipelines/vkForwardPipeline.h"
-#include "vulkan/vkRenderer.h"
+#include "renderer/pipelines/vkPostprocessPipeline.h"
+#include "renderer/pipelines/vkForwardPipeline.h"
+#include "renderer/vkRenderer.h"
 #include "core/fanTime.h"
 #include "editor/fanModals.h"
 

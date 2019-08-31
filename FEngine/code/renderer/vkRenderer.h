@@ -1,6 +1,6 @@
 #pragma once
 
-#include "vulkan/util/vkVertex.h"
+#include "renderer/util/vkVertex.h"
 #include "core/math/shapes/fanAABB.h"
 
 namespace ressource { class Mesh; }
@@ -70,12 +70,11 @@ namespace vk {
 		void				AddMesh	 ( ressource::Mesh * _mesh );
 		void				SetDefaultMesh(const ressource::Mesh * _defaultMesh) { m_defaultMesh = _defaultMesh; }
 
-		//void RemoveMesh		( const ressource::Mesh * _mesh );
 		void RegisterMaterial	( scene::Material * _model );
 		void UnRegisterMaterial	( scene::Material * _model);
 
-		void AddModel				( scene::Model * _model);
-		void RemoveModel			( scene::Model * _model);
+		void RegisterModel	( scene::Model * _model);
+		void UnRegisterModel( scene::Model * _model);
 
 		void					DebugPoint		( const btVector3 _pos, const vk::Color _color);
 		void					DebugLine		( const btVector3 _start, const btVector3 _end, const vk::Color _color);

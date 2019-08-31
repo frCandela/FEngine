@@ -1,12 +1,12 @@
 #include "fanIncludes.h"
 
 #include "fanEngine.h"
-#include "vulkan/vkRenderer.h"
-#include "vulkan/pipelines/vkForwardPipeline.h"
-#include "vulkan/pipelines/vkDebugPipeline.h"
-#include "vulkan/util/vkShape.h"
-#include "vulkan/util/vkWindow.h"
-#include "vulkan/fanTexturesManager.h"
+#include "renderer/vkRenderer.h"
+#include "renderer/pipelines/vkForwardPipeline.h"
+#include "renderer/pipelines/vkDebugPipeline.h"
+#include "renderer/util/vkShape.h"
+#include "renderer/util/vkWindow.h"
+#include "renderer/fanTexturesManager.h"
 #include "core/fanTime.h"
 #include "core/fanInput.h"
 #include "core/math/shapes/fanTriangle.h"
@@ -72,7 +72,10 @@ namespace fan {
 		ressource::Mesh::onMeshLoad.Connect(	&vk::Renderer::AddMesh,		m_renderer);	// TODO One of these signals needs to go
 		scene::Material::onMaterialCreated.Connect( &vk::Renderer::RegisterMaterial, m_renderer);
 		scene::Material::onMaterialDeleted.Connect(&vk::Renderer::UnRegisterMaterial, m_renderer);
-		scene::Model::onRegisterModel.Connect(	&vk::Renderer::AddModel,	m_renderer);	// TODO One of these signals needs to go
+		
+		scene::Model::onRegisterModel.Connect(	&vk::Renderer::RegisterModel, m_renderer);
+		scene::Model::onUnRegisterModel.Connect(&vk::Renderer::UnRegisterModel, m_renderer);
+
 		m_scene->onSceneLoad.Connect(&Engine::OnSceneLoad, this);
 		OnSceneLoad(m_scene);
 

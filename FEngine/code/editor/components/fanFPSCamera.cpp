@@ -7,7 +7,7 @@
 #include "core/fanSignal.h"
 #include "core/fanInput.h"
 #include "fanEngine.h"
-#include "vulkan/vkRenderer.h"
+#include "renderer/vkRenderer.h"
 
 namespace scene
 {

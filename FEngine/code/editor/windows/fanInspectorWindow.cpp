@@ -11,10 +11,10 @@
 #include "editor/fanModals.h"
 #include "core/ressources/fanMesh.h"
 #include "core/fanSignal.h"
-#include "vulkan/core/vkTexture.h"
-#include "vulkan/vkRenderer.h"
-#include "vulkan/core/vkTexture.h"
-#include "vulkan/fanTexturesManager.h"
+#include "renderer/core/vkTexture.h"
+#include "renderer/vkRenderer.h"
+#include "renderer/core/vkTexture.h"
+#include "renderer/fanTexturesManager.h"
 #include "fanEngine.h"
 
 namespace editor {
