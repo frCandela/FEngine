@@ -35,6 +35,7 @@ namespace scene
 		DECLARE_TYPE_INFO(Model);
 	private:
 		void Initialize() override;
+		void Delete() override {};
 
 		ressource::Mesh * m_mesh;
 		int m_renderID = -1;

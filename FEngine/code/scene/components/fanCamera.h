@@ -34,6 +34,7 @@ namespace scene
 		DECLARE_TYPE_INFO(Camera);
 	private:
 		void Initialize() override;
+		void Delete() override {};
 
 		float m_fov;
 		float m_aspectRatio;

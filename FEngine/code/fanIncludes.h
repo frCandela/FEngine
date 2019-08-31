@@ -30,7 +30,6 @@
 #include <type_traits>
 #include <cassert>
 #include <filesystem>
-#include <csignal>
 
 #include "fanGlobalUsing.h"
 

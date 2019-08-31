@@ -24,7 +24,11 @@ namespace scene
 	Gameobject::~Gameobject() {
 		for (int componentIndex = 0; componentIndex < m_components.size(); componentIndex++) {
 			m_components[componentIndex]->Delete();
-		} m_components.clear();
+		} 
+		for (int componentIndex = 0; componentIndex < m_components.size(); componentIndex++) {
+			delete m_components[componentIndex];
+		}
+		m_components.clear();
 	}
 
 	//================================================================================================================================

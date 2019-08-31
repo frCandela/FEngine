@@ -23,7 +23,7 @@ namespace fan {
 		static void Error	( const std::string _message );
 		static void Highlight	( const std::string _message );
 		static void Clear();
-		static void Break() { std::raise(SIGINT); }
+		static void Break() { __debugbreak(); }
 		static const std::vector< LogItem >& GetLogBuffer() { return Get().m_logBuffer;  }
 
 	private:		

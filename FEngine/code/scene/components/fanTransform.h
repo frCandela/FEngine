@@ -33,6 +33,7 @@ namespace scene
 		DECLARE_TYPE_INFO(Transform);
 	private:
 		void Initialize() override;
+		void Delete() override {};
 
 		btQuaternion m_rotation;
 		btVector3 m_position;

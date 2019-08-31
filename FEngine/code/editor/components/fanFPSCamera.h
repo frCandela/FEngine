@@ -32,6 +32,7 @@ namespace scene
 		DECLARE_TYPE_INFO(FPSCamera);
 	private:
 		void Initialize() override;
+		void Delete() override {};
 
 		float m_speed;
 		float m_speedMultiplier;

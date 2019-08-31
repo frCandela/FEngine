@@ -34,6 +34,6 @@ namespace scene
 		// Friend class Gameobject is the factory of components
 		Component();	
 		virtual void Initialize() = 0;
-		virtual void Delete() {  }; // TODO fix memory leak : components are never deleted...
+		virtual void Delete() = 0;
 	};
 }

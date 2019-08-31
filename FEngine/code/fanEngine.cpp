@@ -294,10 +294,7 @@ namespace fan {
 	void Engine::DrawUI() {
 		ImGui::Begin("test"); {
 			if( ImGui::Button("testoss")){
-				scene::Gameobject * go = m_scene->CreateGameobject("tessst");
-				go->AddComponent<scene::Transform>( );
-				scene::Material * mat = go->AddComponent<scene::Material>( );
-				(void)mat;
+				fan::Debug::Break();
 			}
 		} ImGui::End();
 
