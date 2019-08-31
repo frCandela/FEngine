@@ -79,8 +79,8 @@ namespace fan {
 
 		m_mainMenuBar->Initialize();
 
-		ressource::Mesh * defaultMesh = m_renderer->LoadMesh(ressource::Mesh::defaultMeshPath);
-		m_renderer->SetDefaultMesh( defaultMesh );
+		ressource::Mesh * defaultMesh = m_renderer->GetRessourceManager()->LoadMesh(ressource::Mesh::defaultMeshPath);
+		m_renderer->GetRessourceManager()->SetDefaultMesh( defaultMesh );
 	}
 
 	//================================================================================================================================

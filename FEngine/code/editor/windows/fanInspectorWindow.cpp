@@ -252,9 +252,10 @@ namespace editor {
 
 		if (util::Imgui::LoadFileModal("set_path", { ".fbx" }, m_pathBuffer)) {
 
-			ressource::Mesh * mesh = vk::Renderer::GetRenderer().FindMesh(m_pathBuffer.string().c_str());			
+			vk::RessourceManager * ressourceManager = vk::Renderer::GetRenderer().GetRessourceManager();
+			ressource::Mesh * mesh = ressourceManager->FindMesh(m_pathBuffer.string().c_str());
 			if (mesh == nullptr) {
-				mesh = vk::Renderer::GetRenderer().LoadMesh(m_pathBuffer.string());				
+				mesh = ressourceManager->LoadMesh(m_pathBuffer.string());
 				
 			} 
 			_model.SetMesh(mesh);			

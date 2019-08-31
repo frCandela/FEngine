@@ -2,13 +2,13 @@
 
 #include "fanEngine.h"
 #include "renderer/vkRenderer.h"
+#include "renderer/fanRessourceManager.h"
 #include "scene/components/fanModel.h"
 #include "scene/components/fanTransform.h"
 #include "scene/fanGameobject.h"
 #include "core/math/shapes/fanAABB.h"
 #include "core/ressources/fanMesh.h"
 #include "core/files/fanFbxImporter.h"
-#include "core/ressources/fanMesh.h"
 
 
 namespace scene
@@ -77,9 +77,10 @@ namespace scene
 		std::string path;
  		_in >> path;
 
-		ressource::Mesh * mesh = vk::Renderer::GetRenderer().FindMesh(path);
+		vk::RessourceManager * ressourceManager = vk::Renderer::GetRenderer().GetRessourceManager();
+		ressource::Mesh * mesh = ressourceManager->FindMesh(path);
 		if (mesh == nullptr) {
-			mesh = vk::Renderer::GetRenderer().LoadMesh(path);
+			mesh = ressourceManager->LoadMesh(path);
 		}
 		SetMesh(mesh);
 	}

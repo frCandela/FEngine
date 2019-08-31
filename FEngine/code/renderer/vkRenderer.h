@@ -66,11 +66,6 @@ namespace vk {
 
 		const std::vector < DrawData > & GetDrawData() const { return m_drawData; }
 
-		ressource::Mesh *   LoadMesh(const std::string _path);
-		ressource::Mesh *	FindMesh (const std::string _path );
-		void				AddMesh	 ( ressource::Mesh * _mesh );
-		void				SetDefaultMesh(const ressource::Mesh * _defaultMesh) { m_defaultMesh = _defaultMesh; }
-
 		void RegisterMaterial	( scene::Material * _model );
 		void UnRegisterMaterial	( scene::Material * _model);
 		void RegisterModel	( scene::Model * _model);
@@ -89,9 +84,8 @@ namespace vk {
 		scene::Camera * m_mainCamera;
 		scene::Transform * m_mainCameraTransform;
 
-		std::map< uint32_t, MeshData > m_meshList;
+
 		std::vector < DrawData > m_drawData;
-		const ressource::Mesh * m_defaultMesh = nullptr;
 		vk::RessourceManager *  m_ressourceManager;
 
 		// DEBUG DATA
