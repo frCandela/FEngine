@@ -14,7 +14,7 @@
 #include "renderer/core/vkTexture.h"
 #include "renderer/vkRenderer.h"
 #include "renderer/core/vkTexture.h"
-#include "renderer/fanTexturesManager.h"
+#include "renderer/fanRessourceManager.h"
 #include "fanEngine.h"
 
 namespace editor {
@@ -252,15 +252,12 @@ namespace editor {
 
 		if (util::Imgui::LoadFileModal("set_path", { ".fbx" }, m_pathBuffer)) {
 
-			ressource::Mesh * mesh = vk::Renderer::GetRenderer().FindMesh(DSID(m_pathBuffer.string().c_str()));			
+			ressource::Mesh * mesh = vk::Renderer::GetRenderer().FindMesh(m_pathBuffer.string().c_str());			
 			if (mesh == nullptr) {
-				mesh = new ressource::Mesh(m_pathBuffer.string());
-				mesh->Load();
-				_model.SetMesh(mesh);
+				mesh = vk::Renderer::GetRenderer().LoadMesh(m_pathBuffer.string());				
 				
-			} else {
-				_model.SetMesh(mesh);
-			}
+			} 
+			_model.SetMesh(mesh);			
 		}
 	}
 
@@ -268,8 +265,6 @@ namespace editor {
 	//================================================================================================================================
 	void InspectorWindow::DrawFPSCamera(scene::FPSCamera & _fpsCamera) {
 		ImGui::Text(_fpsCamera.GetName());
-
-
 
 		// SetSensitivity
 		if (ImGui::Button("##SetSensitivity")) {
@@ -325,7 +320,7 @@ namespace editor {
 		}
 
 		if (util::Imgui::LoadFileModal("set_path_texture", { ".png" }, m_pathBuffer)) {
-			vk::TexturesManager * texturesManager = vk::Renderer::GetRenderer().GetTexturesManager();
+			vk::RessourceManager * texturesManager = vk::Renderer::GetRenderer().GetRessourceManager();
 			vk::Texture * texture = texturesManager->FindTexture(m_pathBuffer.string());
 			if (texture == nullptr) {
 				texture = texturesManager->LoadTexture( m_pathBuffer.string() );

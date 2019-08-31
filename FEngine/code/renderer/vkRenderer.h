@@ -29,7 +29,7 @@ namespace vk {
 	class ForwardPipeline;
 	class DebugPipeline;
 	class Color;
-	class TexturesManager;
+	class RessourceManager;
 
 	struct MeshData;
 	struct DrawData;
@@ -57,7 +57,7 @@ namespace vk {
 		PostprocessPipeline *	GetPostprocessPipeline()	{ return m_postprocessPipeline; }
 		ForwardPipeline *		GetForwardPipeline()		{ return m_forwardPipeline;		}
 		glm::vec4				GetClearColor() const		{ return m_clearColor;			}
-		vk::TexturesManager *	GetTexturesManager() const	{ return m_texturesManager;		}
+		vk::RessourceManager *	GetRessourceManager() const	{ return m_ressourceManager;	}
 
 		void SetClearColor(glm::vec4 _color) { m_clearColor = _color; }
 		void SetMainCamera(scene::Camera * _camera);
@@ -66,13 +66,13 @@ namespace vk {
 
 		const std::vector < DrawData > & GetDrawData() const { return m_drawData; }
 
-		ressource::Mesh *	FindMesh ( const uint32_t _id );
+		ressource::Mesh *   LoadMesh(const std::string _path);
+		ressource::Mesh *	FindMesh (const std::string _path );
 		void				AddMesh	 ( ressource::Mesh * _mesh );
 		void				SetDefaultMesh(const ressource::Mesh * _defaultMesh) { m_defaultMesh = _defaultMesh; }
 
 		void RegisterMaterial	( scene::Material * _model );
 		void UnRegisterMaterial	( scene::Material * _model);
-
 		void RegisterModel	( scene::Model * _model);
 		void UnRegisterModel( scene::Model * _model);
 
@@ -92,7 +92,7 @@ namespace vk {
 		std::map< uint32_t, MeshData > m_meshList;
 		std::vector < DrawData > m_drawData;
 		const ressource::Mesh * m_defaultMesh = nullptr;
-		vk::TexturesManager *  m_texturesManager;
+		vk::RessourceManager *  m_ressourceManager;
 
 		// DEBUG DATA
 		std::vector<DebugVertex> m_debugLines;

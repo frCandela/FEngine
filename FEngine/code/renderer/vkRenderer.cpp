@@ -9,7 +9,7 @@
 #include "core/fanTime.h"
 #include "core/fanInput.h"
 #include "core/ressources/fanMesh.h"
-#include "renderer/fanTexturesManager.h"
+#include "renderer/fanRessourceManager.h"
 #include "renderer/core/vkInstance.h"
 #include "renderer/core/vkDevice.h"
 #include "renderer/core/vkSwapChain.h"
@@ -51,8 +51,8 @@ namespace vk {
 		CreateRenderPass();
 		CreateRenderPassPostprocess();
 
-		m_texturesManager =  new TexturesManager( m_device );
-		m_texturesManager->onTextureLoaded.Connect( &Renderer::ReloadShaders, this); // TODO Cleanely reload descriptors when a new texture is loaded
+		m_ressourceManager =  new RessourceManager( m_device );
+		m_ressourceManager->onTextureLoaded.Connect( &Renderer::ReloadShaders, this); // TODO Cleanely reload descriptors when a new texture is loaded
 
 		m_forwardPipeline = new ForwardPipeline(m_device, m_renderPass);
 		m_forwardPipeline->Create( m_swapchain->GetExtent());
@@ -91,7 +91,7 @@ namespace vk {
 		delete m_forwardPipeline;
 		delete m_debugLinesPipeline;
 		delete m_debugTrianglesPipeline;
-		delete m_texturesManager;
+		delete m_ressourceManager;
 
 		for( auto meshData : m_meshList ) {
 			delete meshData.second.indexBuffer;
@@ -180,7 +180,7 @@ namespace vk {
 						}
 					}
 					// display textures list
-					const std::vector< vk::Texture * > & textures = m_texturesManager->GetTextures();
+					const std::vector< vk::Texture * > & textures = m_ressourceManager->GetTextures();
 					if (ImGui::CollapsingHeader("Loaded textures : ")) {
 						for (int textureIndex = 0; textureIndex < textures.size(); textureIndex++) {
 							const vk::Texture * texture = textures[textureIndex];
@@ -794,8 +794,17 @@ namespace vk {
 
 	//================================================================================================================================
 	//================================================================================================================================
-	ressource::Mesh * Renderer::FindMesh(const uint32_t _id) {
-		const std::map<uint32_t, MeshData>::iterator it = m_meshList.find(_id );
+	ressource::Mesh * Renderer::LoadMesh(const std::string _path) {
+		ressource::Mesh * mesh = new ressource::Mesh(_path);
+		mesh->Load();	
+		AddMesh(mesh);
+		return mesh;
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
+	ressource::Mesh * Renderer::FindMesh( const std::string _path ) {
+		const std::map<uint32_t, MeshData>::iterator it = m_meshList.find(DSID(_path.c_str()));
 		if ( it != m_meshList.end() ) {
 			return it->second.mesh;
 		}

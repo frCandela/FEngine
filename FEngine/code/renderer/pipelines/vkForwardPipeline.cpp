@@ -1,7 +1,7 @@
 #include "fanIncludes.h"
 
 #include "renderer/pipelines/vkForwardPipeline.h"
-#include "renderer/fanTexturesManager.h"
+#include "renderer/fanRessourceManager.h"
 #include "renderer/core/vkDevice.h"
 #include "renderer/core/vkShader.h"
 #include "renderer/core/vkImage.h"
@@ -216,7 +216,7 @@ namespace vk {
 	//================================================================================================================================
 	//================================================================================================================================
 	bool ForwardPipeline::CreateDescriptorsTextures() {
-		std::vector< vk::Texture * > & textures = vk::Renderer::GetRenderer().GetTexturesManager()->GetTextures();
+		std::vector< vk::Texture * > & textures = vk::Renderer::GetRenderer().GetRessourceManager()->GetTextures();
 
 		// LAYOUTS
 		VkDescriptorSetLayoutBinding samplerLayoutBinding = {};

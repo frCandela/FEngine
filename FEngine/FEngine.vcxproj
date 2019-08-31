@@ -124,7 +124,7 @@
     <ClCompile Include="code\renderer\core\vkShader.cpp" />
     <ClCompile Include="code\renderer\core\vkSwapChain.cpp" />
     <ClCompile Include="code\renderer\core\vkTexture.cpp" />
-    <ClCompile Include="code\renderer\fanTexturesManager.cpp" />
+    <ClCompile Include="code\renderer\fanRessourceManager.cpp" />
     <ClCompile Include="code\renderer\pipelines\vkDebugPipeline.cpp" />
     <ClCompile Include="code\renderer\pipelines\vkForwardPipeline.cpp" />
     <ClCompile Include="code\renderer\pipelines\vkImguiPipeline.cpp" />
@@ -192,7 +192,7 @@
     <ClInclude Include="code\renderer\core\vkShader.h" />
     <ClInclude Include="code\renderer\core\vkSwapChain.h" />
     <ClInclude Include="code\renderer\core\vkTexture.h" />
-    <ClInclude Include="code\renderer\fanTexturesManager.h" />
+    <ClInclude Include="code\renderer\fanRessourceManager.h" />
     <ClInclude Include="code\renderer\pipelines\vkDebugPipeline.h" />
     <ClInclude Include="code\renderer\pipelines\vkForwardPipeline.h" />
     <ClInclude Include="code\renderer\pipelines\vkImguiPipeline.h" />

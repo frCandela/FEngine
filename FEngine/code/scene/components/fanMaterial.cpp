@@ -4,25 +4,25 @@
 #include "scene/components/fanMaterial.h"
 #include "scene/components/fanModel.h"
 #include "renderer/core/vkTexture.h"
-#include "renderer/fanTexturesManager.h"
+#include "renderer/fanRessourceManager.h"
 #include "renderer/vkRenderer.h"
 
 namespace scene {
 	REGISTER_TYPE_INFO(Material)
 		
-	util::Signal< Material * > Material::onMaterialCreated;
-	util::Signal< Material * > Material::onMaterialDeleted;
+	util::Signal< Material * > Material::onRegisterMaterial;
+	util::Signal< Material * > Material::onUnregisterMaterial;
 
 	//================================================================================================================================
 	//================================================================================================================================
 	void Material::Initialize() {
-		onMaterialCreated.Emmit(this);
+		onRegisterMaterial.Emmit(this);
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
 	void Material::Delete() {
-		onMaterialDeleted.Emmit(this);
+		onUnregisterMaterial.Emmit(this);
 	}
 		
 	//================================================================================================================================
@@ -32,7 +32,7 @@ namespace scene {
 		_in >> path;
 		if (path != std::string("void")) {
 			// TODO find a cleaner way to set the texture
-			vk::TexturesManager * texturesManager = vk::Renderer::GetRenderer().GetTexturesManager();
+			vk::RessourceManager * texturesManager = vk::Renderer::GetRenderer().GetRessourceManager();
 			vk::Texture * texture = texturesManager->FindTexture(path);
 			if (texture == nullptr) {
 				texture = texturesManager->LoadTexture(path);

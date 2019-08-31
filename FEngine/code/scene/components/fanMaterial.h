@@ -14,8 +14,8 @@ namespace scene {
 	class Material : public Component
 	{
 	public:
-		static util::Signal< Material * > onMaterialCreated;
-		static util::Signal< Material * > onMaterialDeleted;
+		static util::Signal< Material * > onRegisterMaterial;
+		static util::Signal< Material * > onUnregisterMaterial;
 
 		bool IsUnique()		const override { return true; }
 		void Load(std::istream& _in)	override;

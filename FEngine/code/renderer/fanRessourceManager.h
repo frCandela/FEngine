@@ -7,12 +7,12 @@ namespace vk {
 	//================================================================================================================================
 	// Loads & references all the textures of the engine
 	//================================================================================================================================
-	class TexturesManager {
+	class RessourceManager {
 	public:
 		static util::Signal<> onTextureLoaded;
 
-		TexturesManager( Device& _device );
-		~TexturesManager();
+		RessourceManager( Device& _device );
+		~RessourceManager();
 
 		vk::Texture * LoadTexture( const std::string _path );
 

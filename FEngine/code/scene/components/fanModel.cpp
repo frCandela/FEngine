@@ -1,14 +1,13 @@
 #include "fanIncludes.h"
 
+#include "fanEngine.h"
+#include "renderer/vkRenderer.h"
 #include "scene/components/fanModel.h"
 #include "scene/components/fanTransform.h"
 #include "scene/fanGameobject.h"
-#include "fanEngine.h"
 #include "core/math/shapes/fanAABB.h"
 #include "core/ressources/fanMesh.h"
-#include "renderer/vkRenderer.h"
 #include "core/files/fanFbxImporter.h"
-
 #include "core/ressources/fanMesh.h"
 
 
@@ -68,7 +67,6 @@ namespace scene
 	//================================================================================================================================
 	void Model::SetMesh(ressource::Mesh * _mesh) {
 		m_mesh = _mesh;
-		m_mesh->Load();
 		onRegisterModel.Emmit(this);
 		GetGameobject()->onComponentModified.Emmit(this);
 	}
@@ -78,7 +76,12 @@ namespace scene
 	void Model::Load(std::istream& _in) {
 		std::string path;
  		_in >> path;
-		SetMesh(new ressource::Mesh(path));
+
+		ressource::Mesh * mesh = vk::Renderer::GetRenderer().FindMesh(path);
+		if (mesh == nullptr) {
+			mesh = vk::Renderer::GetRenderer().LoadMesh(path);
+		}
+		SetMesh(mesh);
 	}
 
 	//================================================================================================================================

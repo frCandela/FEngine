@@ -6,7 +6,7 @@
 namespace ressource {
 	//================================================================================================================================
 	// Base class for ressources ( Mesh, textures etc.) 
-	// Represent somthing with an ID that needs to be loaded
+	// Represent something with an ID that needs to be loaded
 	//================================================================================================================================
 	class Ressource {
 	public:	

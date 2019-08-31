@@ -5,7 +5,6 @@
 
 namespace ressource {
 	REGISTER_TYPE_INFO(Mesh)
-	util::Signal< Mesh * > Mesh::onMeshLoad;
 	const char * Mesh::defaultMeshPath = "content/_default/mesh.fbx";
 
 	//================================================================================================================================
@@ -23,8 +22,8 @@ namespace ressource {
 		SetRessourceID(DSID(m_path.c_str()));
  		fan::FBXImporter importer;
  		if (importer.LoadScene(m_path) == true) {
-			if (importer.GetMesh(*this)) {
-				onMeshLoad.Emmit(this);
+			if (importer.GetMesh(*this) == false ) {
+				fan::Debug::Get() << "Failed to load mesh : " << m_path << std::endl;
  			}
 		}
 		Ressource::Load();

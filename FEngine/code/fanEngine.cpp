@@ -6,7 +6,7 @@
 #include "renderer/pipelines/vkDebugPipeline.h"
 #include "renderer/util/vkShape.h"
 #include "renderer/util/vkWindow.h"
-#include "renderer/fanTexturesManager.h"
+#include "renderer/fanRessourceManager.h"
 #include "core/fanTime.h"
 #include "core/fanInput.h"
 #include "core/math/shapes/fanTriangle.h"
@@ -69,20 +69,17 @@ namespace fan {
 		m_renderer =			new vk::Renderer(windowSize, windowPosition);
 		m_scene =				new scene::Scene("mainScene");
 
-		ressource::Mesh::onMeshLoad.Connect(	&vk::Renderer::AddMesh,		m_renderer);	// TODO One of these signals needs to go
-		scene::Material::onMaterialCreated.Connect( &vk::Renderer::RegisterMaterial, m_renderer);
-		scene::Material::onMaterialDeleted.Connect(&vk::Renderer::UnRegisterMaterial, m_renderer);
-		
-		scene::Model::onRegisterModel.Connect(	&vk::Renderer::RegisterModel, m_renderer);
-		scene::Model::onUnRegisterModel.Connect(&vk::Renderer::UnRegisterModel, m_renderer);
+		scene::Material::onRegisterMaterial.Connect		( &vk::Renderer::RegisterMaterial,		m_renderer );
+		scene::Material::onUnregisterMaterial.Connect	( &vk::Renderer::UnRegisterMaterial,	m_renderer );		
+		scene::Model::onRegisterModel.Connect			( &vk::Renderer::RegisterModel,			m_renderer );
+		scene::Model::onUnRegisterModel.Connect			( &vk::Renderer::UnRegisterModel,		m_renderer );
 
 		m_scene->onSceneLoad.Connect(&Engine::OnSceneLoad, this);
 		OnSceneLoad(m_scene);
 
 		m_mainMenuBar->Initialize();
 
-		ressource::Mesh * defaultMesh = new ressource::Mesh(ressource::Mesh::defaultMeshPath);
-		defaultMesh->Load();
+		ressource::Mesh * defaultMesh = m_renderer->LoadMesh(ressource::Mesh::defaultMeshPath);
 		m_renderer->SetDefaultMesh( defaultMesh );
 	}
 

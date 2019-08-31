@@ -1,17 +1,17 @@
 #include "fanIncludes.h"
 
-#include "renderer/fanTexturesManager.h"
+#include "renderer/fanRessourceManager.h"
 
 #include "renderer/core/vkTexture.h"
 #include "core/fanSignal.h"
 
 namespace vk {
-	const char * TexturesManager::s_defaultTexture = "content/_default/texture.png";
-	util::Signal<> TexturesManager::onTextureLoaded;
+	const char * RessourceManager::s_defaultTexture = "content/_default/texture.png";
+	util::Signal<> RessourceManager::onTextureLoaded;
 
 	//================================================================================================================================
 	//================================================================================================================================
-	TexturesManager::TexturesManager( Device& _device ) : 
+	RessourceManager::RessourceManager( Device& _device ) : 
 		m_device(_device ) {
 		m_textures.reserve(64);
 
@@ -20,7 +20,7 @@ namespace vk {
 
 	//================================================================================================================================
 	//================================================================================================================================
-	TexturesManager::~TexturesManager(){
+	RessourceManager::~RessourceManager(){
 		for (int textureIndex = 0; textureIndex < m_textures.size() ; textureIndex++) {
 			delete( m_textures[textureIndex]);
 		}
@@ -28,7 +28,7 @@ namespace vk {
 
 	//================================================================================================================================
 	//================================================================================================================================
-	vk::Texture * TexturesManager::LoadTexture( const std::string _path ) {
+	vk::Texture * RessourceManager::LoadTexture( const std::string _path ) {
 		// Dont add the texture if it already exists
 		if (FindTexture(_path) != nullptr) {
 			fan::Debug::Get() << fan::Debug::Severity::warning << "Texture already added: " << _path << std::endl;
@@ -48,7 +48,7 @@ namespace vk {
 
 	//================================================================================================================================
 	//================================================================================================================================
-	uint32_t TexturesManager::FindTextureIndex(const vk::Texture * _texture) {
+	uint32_t RessourceManager::FindTextureIndex(const vk::Texture * _texture) {
 		for (int textureIndex = 0; textureIndex < m_textures.size(); textureIndex++) {
 			if (m_textures[textureIndex] == _texture) {
 				return textureIndex;
@@ -59,7 +59,7 @@ namespace vk {
 
 	//================================================================================================================================
 	//================================================================================================================================
-	vk::Texture * TexturesManager::FindTexture( const std::string _path ) {
+	vk::Texture * RessourceManager::FindTexture( const std::string _path ) {
 		for (int textureIndex = 0; textureIndex < m_textures.size(); textureIndex++) {
 			const vk::Texture * texture = m_textures[textureIndex];
 			if (texture->GetPath() == _path) {				

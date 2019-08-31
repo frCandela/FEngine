@@ -8,7 +8,6 @@ namespace ressource {
 	//================================================================================================================================
 	class Mesh : public Ressource {
 	public:
-
 		Mesh(const std::string& _path = "");
 
 		void SetPath(const std::string& _path) { m_path = _path; }
@@ -21,12 +20,14 @@ namespace ressource {
 
 		void Load() override;
 
-		static util::Signal< Mesh * > onMeshLoad;
+
 
 		static const char * defaultMeshPath;
 
 		DECLARE_TYPE_INFO(Mesh)
 	private:
+
+
 		std::string m_path;
 		std::vector<vk::Vertex> m_vertices;
 		std::vector<uint32_t> m_indices;

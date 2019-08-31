@@ -184,9 +184,6 @@
     <ClCompile Include="code\scene\components\fanMaterial.cpp">
       <Filter>code\scene\components</Filter>
     </ClCompile>
-    <ClCompile Include="code\renderer\fanTexturesManager.cpp">
-      <Filter>code\renderer</Filter>
-    </ClCompile>
     <ClCompile Include="code\renderer\vkRenderer.cpp">
       <Filter>code\renderer</Filter>
     </ClCompile>
@@ -243,6 +240,9 @@
     </ClCompile>
     <ClCompile Include="code\renderer\core\vkFramebuffer.cpp">
       <Filter>code\renderer\core</Filter>
+    </ClCompile>
+    <ClCompile Include="code\renderer\fanRessourceManager.cpp">
+      <Filter>code\renderer</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -813,9 +813,6 @@
     <ClInclude Include="code\scene\components\fanMaterial.h">
       <Filter>code\scene\components</Filter>
     </ClInclude>
-    <ClInclude Include="code\renderer\fanTexturesManager.h">
-      <Filter>code\renderer</Filter>
-    </ClInclude>
     <ClInclude Include="code\renderer\vkRenderer.h">
       <Filter>code\renderer</Filter>
     </ClInclude>
@@ -875,6 +872,9 @@
     </ClInclude>
     <ClInclude Include="code\renderer\core\vkFrameBuffer.h">
       <Filter>code\renderer\core</Filter>
+    </ClInclude>
+    <ClInclude Include="code\renderer\fanRessourceManager.h">
+      <Filter>code\renderer</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
