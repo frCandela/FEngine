@@ -20,6 +20,9 @@ namespace vk
 		std::string GetPath() const { return m_path;		}
 		VkImageView GetImageView()	{ return m_imageView;	}
 
+		int		GetRenderID() const { return m_renderID; }
+		void	SetRenderID(const int _renderID) { m_renderID = _renderID; }
+
 	private:
 		Device &		m_device;
 		VkImage			m_image;
@@ -31,6 +34,8 @@ namespace vk
 		uint32_t		m_width;
 		uint32_t		m_height;
 		uint32_t		m_layerCount = 1;
+
+		int m_renderID = -1;
 
 		void Destroy();
 		void CreateImage	( VkExtent2D _extent, uint32_t _mipLevels, VkFormat _format, VkImageTiling _tiling, VkImageUsageFlags _usage, VkMemoryPropertyFlags _properties);

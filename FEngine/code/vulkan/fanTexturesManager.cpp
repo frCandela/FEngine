@@ -3,9 +3,11 @@
 #include "vulkan/fanTexturesManager.h"
 
 #include "vulkan/core/vkTexture.h"
+#include "core/fanSignal.h"
 
 namespace vk {
 	const char * TexturesManager::s_defaultTexture = "content/_default/texture.png";
+	util::Signal<> TexturesManager::onTextureLoaded;
 
 	//================================================================================================================================
 	//================================================================================================================================
@@ -36,7 +38,9 @@ namespace vk {
 		// Add
 		vk::Texture * texture = new Texture( m_device );
 		if( texture->LoadTexture(_path) == true ) {
+			texture->SetRenderID(static_cast<int>(m_textures.size()));
 			m_textures.push_back(texture);
+			onTextureLoaded.Emmit();
 		}
 
 		return texture;

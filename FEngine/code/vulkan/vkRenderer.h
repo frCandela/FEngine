@@ -46,12 +46,11 @@ namespace vk {
 		void WaitIdle();
 
 		static Renderer & GetRenderer() {	return * ms_globalRenderer; }
-
 		void ReloadShaders();
 		void UpdateDebugBuffer(const int _index);
 
 		VkCommandBuffer BeginSingleTimeCommands();
-		void EndSingleTimeCommands(VkCommandBuffer commandBuffer);
+		void			EndSingleTimeCommands(VkCommandBuffer commandBuffer);
 
 		Window *				GetWindow()					{ return m_window;				}
 		ImguiPipeline *			GetImguiPipeline()			{ return m_imguiPipeline;		}
@@ -72,7 +71,9 @@ namespace vk {
 		void				SetDefaultMesh(const ressource::Mesh * _defaultMesh) { m_defaultMesh = _defaultMesh; }
 
 		//void RemoveMesh		( const ressource::Mesh * _mesh );
-		void UpdateMaterialOfModel	( scene::Model * _model);
+		void RegisterMaterial	( scene::Material * _model );
+		void UnRegisterMaterial	( scene::Material * _model);
+
 		void AddModel				( scene::Model * _model);
 		void RemoveModel			( scene::Model * _model);
 
@@ -133,7 +134,7 @@ namespace vk {
 		static Renderer * ms_globalRenderer;
 		
 		bool ResetCommandPool();
-		void UpdateUniformBuffer();		
+		void UpdateUniformBuffer( bool _forceFullRebuild = false);		
 		bool SubmitCommandBuffers();
 
 		void ClearDebug() {

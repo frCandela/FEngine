@@ -23,6 +23,7 @@ namespace fan {
 		static void Error	( const std::string _message );
 		static void Highlight	( const std::string _message );
 		static void Clear();
+		static void Break() { std::raise(SIGINT); }
 		static const std::vector< LogItem >& GetLogBuffer() { return Get().m_logBuffer;  }
 
 	private:		
@@ -50,6 +51,7 @@ namespace fan {
 		friend Debug& operator<<(Debug& _logger, std::ostream&(*_pManip)(std::ostream&)){	// Special case of Debug::Get() << std::endl 
 			if (_pManip != std::endl) {
 				std::cout << "[ERROR] LOGGER FAILED TO READ EXPRESSION: " << _pManip << std::endl;
+				Break();
 			} else {
 				_logger.Flush();
 			}

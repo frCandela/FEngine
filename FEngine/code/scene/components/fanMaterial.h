@@ -14,10 +14,10 @@ namespace scene {
 	class Material : public Component
 	{
 	public:
+		static util::Signal< Material * > onMaterialCreated;
+		static util::Signal< Material * > onMaterialDeleted;
 
-		static util::Signal< scene::Model * > onMaterialUpdated; // Passes the associated model if not null
-
-		bool			IsUnique()		const override { return true; }
+		bool IsUnique()		const override { return true; }
 		void Load(std::istream& _in)	override;
 		void Save(std::ostream& _out)	override;
 
@@ -29,6 +29,7 @@ namespace scene {
 		DECLARE_TYPE_INFO(Material);
 	private:
 		void Initialize() override;
+		void Delete() override;
 
 		vk::Texture * m_texture = nullptr;
 	};

@@ -6,6 +6,7 @@ namespace ressource { class Mesh; }
 namespace scene { 
 	class Model;  
 	class Transform;
+	class Material;
 }
 namespace vk {
 	struct Vertex;
@@ -28,8 +29,10 @@ namespace vk {
 	//================================================================================================================================
 	//================================================================================================================================
 	struct DrawData {
-		MeshData *		meshData;
-		scene::Model *	model;
+		MeshData *			meshData	= nullptr;
+		scene::Model *		model		= nullptr;
+		scene::Transform *	transform	= nullptr;
+		scene::Material *	material	= nullptr;
 	};
 
 	//================================================================================================================================
@@ -51,11 +54,14 @@ namespace vk {
 			glm::vec3	lightPos;			
 		};
 
-		struct DynamicUniforms
+		struct DynamicUniformsFrag	{
+			glm::int32	textureIndex;
+		};
+
+		struct DynamicUniformsVert
 		{
 			glm::mat4 modelMat;
 			glm::mat4 rotationMat;
-			glm::int32	TMPtextureIndex; // TODO put that in a separate dynamic frag buffer
 		};
 
 		ForwardPipeline(Device& _device, VkRenderPass& _renderPass);
@@ -70,10 +76,18 @@ namespace vk {
 		void			SetVertUniforms(const VertUniforms _uniforms);
 		FragUniforms	GetFragUniforms() const { return m_fragUniforms; }
 		void			SetFragUniforms(const FragUniforms _fragUniforms);
-		void			SetDynamicUniforms( const std::vector<DynamicUniforms> & _dynamicUniforms );
+
+// 		void			SetDynamicUniformsVert(	const std::vector<DynamicUniformsVert> & _dynamicUniforms );
+// 		void			SetDynamicUniformsFrag(	const std::vector<DynamicUniformsFrag> & _dynamicUniforms );
+		void	SetDynamicUniformVert( const DynamicUniformsVert& _dynamicUniform, const uint32_t _index);
+		void	SetDynamicUniformFrag( const DynamicUniformsFrag& _dynamicUniform, const uint32_t _index);
+		void	UpdateDynamicUniformVert();
+		void	UpdateDynamicUniformFrag();
 
 		VkPipeline		GetPipeline() { return m_pipeline; }
 		VkImageView		GetDepthImageView();
+
+		static const uint32_t s_maximumNumModels = 128;
 
 	private:
 		Device&					m_device;
@@ -97,14 +111,21 @@ namespace vk {
 		Shader *	m_fragmentShader = nullptr;
 		Shader *	m_vertexShader = nullptr;
 
-		Buffer *	m_dynamicUniformBuffer;
+
 		Buffer *	m_vertUniformBuffer;
 		Buffer *	m_fragUniformBuffer;
 
 		VertUniforms m_vertUniforms;
 		FragUniforms m_fragUniforms;
-		util::AlignedMemory<DynamicUniforms> m_dynamicUniformsArray;
-		size_t m_dynamicAlignment;
+
+		Buffer *	m_dynamicUniformBufferVert;
+		Buffer *	m_dynamicUniformBufferFrag;
+
+		util::AlignedMemory<DynamicUniformsVert> m_dynamicUniformsVert;
+		util::AlignedMemory<DynamicUniformsFrag> m_dynamicUniformsFrag;
+
+		size_t m_dynamicAlignmentVert;
+		size_t m_dynamicAlignmentFrag;
 
 		void CreateShaders();
 		bool CreateDescriptors();

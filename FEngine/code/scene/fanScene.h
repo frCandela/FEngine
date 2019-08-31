@@ -23,7 +23,6 @@ namespace scene
 		void	BeginFrame();
 		void	Update(const float _delta);
 		void	EndFrame();
-
 		
 		void New();
 		void Save() const ;
@@ -39,8 +38,8 @@ namespace scene
 		std::string m_name;
 		std::string m_path;
 
-		std::vector <Gameobject*> m_gameObjectstoDelete;
-		std::vector<Gameobject *> m_gameObjects;
+		std::vector < Gameobject * > m_gameObjectstoDelete;
+		std::vector < Gameobject * > m_gameObjects;
 
 		std::set< scene::Actor * > m_startingActors;
 		std::set< scene::Actor * > m_activeActors;

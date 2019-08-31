@@ -9,6 +9,8 @@ namespace vk {
 	//================================================================================================================================
 	class TexturesManager {
 	public:
+		static util::Signal<> onTextureLoaded;
+
 		TexturesManager( Device& _device );
 		~TexturesManager();
 

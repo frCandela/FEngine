@@ -14,7 +14,7 @@ namespace vk {
 		void Destroy();
 		bool Create(VkDeviceSize _size, VkBufferUsageFlags _usage, VkMemoryPropertyFlags _memoryProperties);
 		
-		void		SetData(const void * _data, VkDeviceSize _size);
+		void		SetData(const void * _data, VkDeviceSize _size, VkDeviceSize _offset = 0);
 		VkResult	Bind(VkDeviceSize _offset = 0);
 		VkResult	Map(VkDeviceSize _size = VK_WHOLE_SIZE, VkDeviceSize _offset = 0);
 		void		Unmap();

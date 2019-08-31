@@ -5,6 +5,8 @@ gameobject fff
 		0.01 0.01 0.01
 	Model 1739103771
 		content\models\imfired\pickup_truck_02.fbx
+	Material 1828911513
+		content\models\test\textures\kiwi.png
 end
 gameobject fff
 	Transform 1269105190

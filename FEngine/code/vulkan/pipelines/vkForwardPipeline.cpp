@@ -26,11 +26,18 @@ namespace vk {
 
 		// Calculate required alignment based on minimum device offset alignment
 		size_t minUboAlignment = _device.GetDeviceProperties().limits.minUniformBufferOffsetAlignment;
+		m_dynamicAlignmentVert = sizeof(DynamicUniformsVert);
+		m_dynamicAlignmentFrag = sizeof(DynamicUniformsFrag);
 		if (minUboAlignment > 0) {
-			m_dynamicAlignment = ((sizeof(DynamicUniforms) + minUboAlignment - 1) & ~(minUboAlignment - 1));
+			m_dynamicAlignmentVert = ((sizeof(DynamicUniformsVert) + minUboAlignment - 1) & ~(minUboAlignment - 1));
+			m_dynamicAlignmentFrag = ((sizeof(DynamicUniformsFrag) + minUboAlignment - 1) & ~(minUboAlignment - 1));
+		} 
+		m_dynamicUniformsVert.Resize(	s_maximumNumModels * m_dynamicAlignmentVert, m_dynamicAlignmentVert);
+		m_dynamicUniformsFrag.Resize(	s_maximumNumModels * m_dynamicAlignmentFrag, m_dynamicAlignmentFrag);
+
+		for (int uniformIndex = 0; uniformIndex < s_maximumNumModels; uniformIndex++){
+			m_dynamicUniformsFrag[uniformIndex].textureIndex = 0;
 		}
-		
-		m_dynamicUniformsArray.Resize(128*m_dynamicAlignment, m_dynamicAlignment);
 
 		m_fragUniforms.ambiantIntensity = 0.2f;
  		m_fragUniforms.lightColor = glm::vec3(1,1,1);
@@ -72,7 +79,7 @@ namespace vk {
 
 		SetVertUniforms(m_vertUniforms);
 		SetFragUniforms(m_fragUniforms);
-		SetDynamicUniforms({ {glm::mat4(1.0)},{glm::mat4(1.0)} });
+		//SetDynamicUniformsVert({ {glm::mat4(1.0)},{glm::mat4(1.0)} });
 	}
 
 	//================================================================================================================================
@@ -102,13 +109,48 @@ namespace vk {
 		m_fragUniformBuffer->SetData(&m_fragUniforms, sizeof(FragUniforms));
 	}
 	
+// 	//================================================================================================================================
+// 	//================================================================================================================================
+// 	void ForwardPipeline::SetDynamicUniformsVert( const std::vector<DynamicUniformsVert> & _dynamicUniforms ) {
+// 		for (int dynamicUniformIndex = 0; dynamicUniformIndex < _dynamicUniforms.size(); dynamicUniformIndex++) {
+// 			m_dynamicUniformVert[dynamicUniformIndex] = _dynamicUniforms[dynamicUniformIndex];
+// 		}
+// 		m_dynamicUniformBufferVert->SetData(&m_dynamicUniformVert[0], m_dynamicUniformVert.GetSize());
+// 	}
+// 
+// 	//================================================================================================================================
+// 	//================================================================================================================================
+// 	void ForwardPipeline::SetDynamicUniformsFrag(const std::vector<DynamicUniformsFrag> & _dynamicUniforms) {
+// 		for (int dynamicUniformIndex = 0; dynamicUniformIndex < _dynamicUniforms.size(); dynamicUniformIndex++) {
+// 			m_dynamicUniformsFrag[dynamicUniformIndex] = _dynamicUniforms[dynamicUniformIndex];
+// 		}
+// 		m_dynamicUniformBufferFrag->SetData(&m_dynamicUniformsFrag[0], m_dynamicUniformsFrag.GetSize());
+// 	}
+
 	//================================================================================================================================
 	//================================================================================================================================
-	void ForwardPipeline::SetDynamicUniforms( const std::vector<DynamicUniforms> & _dynamicUniforms ) {
-		for (int dynamicUniformIndex = 0; dynamicUniformIndex < _dynamicUniforms.size(); dynamicUniformIndex++) {
-			m_dynamicUniformsArray[dynamicUniformIndex] = _dynamicUniforms[dynamicUniformIndex];
-		}
-		m_dynamicUniformBuffer->SetData(&m_dynamicUniformsArray[0], m_dynamicUniformsArray.GetSize());
+	void ForwardPipeline::SetDynamicUniformVert(const DynamicUniformsVert& _dynamicUniform, const uint32_t _index) {
+		assert(_index < s_maximumNumModels);
+		m_dynamicUniformsVert[_index] = _dynamicUniform;
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
+	void ForwardPipeline::SetDynamicUniformFrag(const DynamicUniformsFrag& _dynamicUniform, const uint32_t _index) {
+		assert(_index < s_maximumNumModels);
+		m_dynamicUniformsFrag[_index] = _dynamicUniform;
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
+	void ForwardPipeline::UpdateDynamicUniformVert() {
+		m_dynamicUniformBufferVert->SetData(&m_dynamicUniformsVert[0], m_dynamicUniformsVert.GetSize());
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
+	void ForwardPipeline::UpdateDynamicUniformFrag() {
+		m_dynamicUniformBufferFrag->SetData(&m_dynamicUniformsFrag[0], m_dynamicUniformsFrag.GetSize());
 	}
 
 	//================================================================================================================================
@@ -123,8 +165,12 @@ namespace vk {
 			VkBuffer vertexBuffers[] = { drawData.meshData->vertexBuffer->GetBuffer() };
 			vkCmdBindVertexBuffers(_commandBuffer, 0, 1, vertexBuffers, offsets);
 			vkCmdBindIndexBuffer(_commandBuffer, drawData.meshData->indexBuffer->GetBuffer(), 0, VK_INDEX_TYPE_UINT32);
-			uint32_t dynamicOffset = drawDataIndex  * static_cast<uint32_t>(m_dynamicAlignment);
 			
+			std::vector<uint32_t> dynamicOffsets = {
+				drawDataIndex  * static_cast<uint32_t>(m_dynamicAlignmentVert)
+				,	drawDataIndex  * static_cast<uint32_t>(m_dynamicAlignmentFrag)
+			};
+
 			std::vector<VkDescriptorSet> descriptors = { 
 				m_descriptorSetScene 
 				, m_descriptorSetTextures
@@ -137,8 +183,8 @@ namespace vk {
 				0,
 				static_cast<uint32_t>(descriptors.size()),
 				descriptors.data(),
-				1,
-				&dynamicOffset
+				static_cast<uint32_t>(dynamicOffsets.size()),
+				dynamicOffsets.data()
 			);
 			vkCmdDrawIndexed(_commandBuffer, static_cast<uint32_t>(drawData.meshData->mesh->GetIndices().size()), 1, 0, 0, 0);
 		}
@@ -300,10 +346,18 @@ namespace vk {
 		fragLayoutBinding.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT;
 		fragLayoutBinding.pImmutableSamplers = nullptr;
 
+		VkDescriptorSetLayoutBinding dynamicLayoutBindingFrag;
+		dynamicLayoutBindingFrag.binding = 3;
+		dynamicLayoutBindingFrag.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC;
+		dynamicLayoutBindingFrag.descriptorCount = 1;
+		dynamicLayoutBindingFrag.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT;
+		dynamicLayoutBindingFrag.pImmutableSamplers = nullptr;
+
 		std::vector< VkDescriptorSetLayoutBinding > layoutBindings = {
 			  uboLayoutBinding
 			, dynamicLayoutBinding
 			, fragLayoutBinding
+			, dynamicLayoutBindingFrag
 		};
 
 		VkDescriptorSetLayoutCreateInfo descriptorSetLayoutCreateInfo = {};
@@ -320,13 +374,15 @@ namespace vk {
 		fan::Debug::Get() << fan::Debug::Severity::log << std::hex << "VkDescriptorSetLayout\t" << m_descriptorSetLayoutScene << std::dec << std::endl;
 
 		// Pool
-		std::vector< VkDescriptorPoolSize > poolSizes(3);
+		std::vector< VkDescriptorPoolSize > poolSizes(4);
 		poolSizes[0].type = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
 		poolSizes[0].descriptorCount = 1;
 		poolSizes[1].type = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC;
 		poolSizes[1].descriptorCount = 1;
 		poolSizes[2].type = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
 		poolSizes[2].descriptorCount = 1;
+		poolSizes[3].type = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC;
+		poolSizes[3].descriptorCount = 1;
 
 		VkDescriptorPoolCreateInfo descriptorPoolCreateInfo = {};
 		descriptorPoolCreateInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
@@ -368,80 +424,114 @@ namespace vk {
 		// Uniform buffers
 
 		// Vert
-		m_vertUniformBuffer = new Buffer(m_device);
-		m_vertUniformBuffer->Create(
-			sizeof(VertUniforms),
-			VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT,
-			VK_MEMORY_PROPERTY_HOST_COHERENT_BIT | VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT
-		);
-
-		VkDescriptorBufferInfo uboDescriptorBufferInfo = {};
-		uboDescriptorBufferInfo.buffer = m_vertUniformBuffer->GetBuffer();
-		uboDescriptorBufferInfo.offset = 0;
-		uboDescriptorBufferInfo.range = sizeof(VertUniforms);
-
 		VkWriteDescriptorSet uboWriteDescriptorSet = {};
-		uboWriteDescriptorSet.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-		uboWriteDescriptorSet.pNext = nullptr;
-		uboWriteDescriptorSet.dstSet = m_descriptorSetScene;
-		uboWriteDescriptorSet.dstBinding = 0;
-		uboWriteDescriptorSet.dstArrayElement = 0;
-		uboWriteDescriptorSet.descriptorCount = 1;
-		uboWriteDescriptorSet.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
-		uboWriteDescriptorSet.pImageInfo = nullptr;
-		uboWriteDescriptorSet.pBufferInfo = &uboDescriptorBufferInfo;
-		//uboWriteDescriptorSet.pTexelBufferView = nullptr;
+		{
+			m_vertUniformBuffer = new Buffer(m_device);
+			m_vertUniformBuffer->Create(
+				sizeof(VertUniforms),
+				VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT,
+				VK_MEMORY_PROPERTY_HOST_COHERENT_BIT | VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT
+			);
 
+			VkDescriptorBufferInfo uboDescriptorBufferInfo = {};
+			uboDescriptorBufferInfo.buffer = m_vertUniformBuffer->GetBuffer();
+			uboDescriptorBufferInfo.offset = 0;
+			uboDescriptorBufferInfo.range = sizeof(VertUniforms);
+
+
+			uboWriteDescriptorSet.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+			uboWriteDescriptorSet.pNext = nullptr;
+			uboWriteDescriptorSet.dstSet = m_descriptorSetScene;
+			uboWriteDescriptorSet.dstBinding = 0;
+			uboWriteDescriptorSet.dstArrayElement = 0;
+			uboWriteDescriptorSet.descriptorCount = 1;
+			uboWriteDescriptorSet.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+			uboWriteDescriptorSet.pImageInfo = nullptr;
+			uboWriteDescriptorSet.pBufferInfo = &uboDescriptorBufferInfo;
+			//uboWriteDescriptorSet.pTexelBufferView = nullptr;
+		}
+		
 		// Frag
-		m_fragUniformBuffer = new Buffer(m_device);
-		m_fragUniformBuffer->Create(
-			sizeof(FragUniforms),
-			VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT,
-			VK_MEMORY_PROPERTY_HOST_COHERENT_BIT | VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT
-		);
-
-		VkDescriptorBufferInfo fragDescriptorBufferInfo = {};
-		fragDescriptorBufferInfo.buffer = m_fragUniformBuffer->GetBuffer();
-		fragDescriptorBufferInfo.offset = 0;
-		fragDescriptorBufferInfo.range = sizeof(FragUniforms);
-
 		VkWriteDescriptorSet fragWriteDescriptorSet = {};
-		fragWriteDescriptorSet.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-		fragWriteDescriptorSet.pNext = nullptr;
-		fragWriteDescriptorSet.dstSet = m_descriptorSetScene;
-		fragWriteDescriptorSet.dstBinding = 2;
-		fragWriteDescriptorSet.dstArrayElement = 0;
-		fragWriteDescriptorSet.descriptorCount = 1;
-		fragWriteDescriptorSet.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
-		fragWriteDescriptorSet.pImageInfo = nullptr;
-		fragWriteDescriptorSet.pBufferInfo = &fragDescriptorBufferInfo;
-		//uboWriteDescriptorSet.pTexelBufferView = nullptr;
+		{
+			m_fragUniformBuffer = new Buffer(m_device);
+			m_fragUniformBuffer->Create(
+				sizeof(FragUniforms),
+				VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT,
+				VK_MEMORY_PROPERTY_HOST_COHERENT_BIT | VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT
+			);
 
-		// Dynamic
-		m_dynamicUniformBuffer = new Buffer(m_device);
-		m_dynamicUniformBuffer->Create(
-			m_dynamicUniformsArray.GetSize() * m_dynamicAlignment,
-			VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT,
-			VK_MEMORY_PROPERTY_HOST_COHERENT_BIT | VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT
-		);
+			VkDescriptorBufferInfo fragDescriptorBufferInfo = {};
+			fragDescriptorBufferInfo.buffer = m_fragUniformBuffer->GetBuffer();
+			fragDescriptorBufferInfo.offset = 0;
+			fragDescriptorBufferInfo.range = sizeof(FragUniforms);
 
-		VkDescriptorBufferInfo dynamicDescriptorBufferInfo = {};
-		dynamicDescriptorBufferInfo.buffer = m_dynamicUniformBuffer->GetBuffer();
-		dynamicDescriptorBufferInfo.offset = 0;
-		dynamicDescriptorBufferInfo.range = m_dynamicAlignment;
-
+			fragWriteDescriptorSet.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+			fragWriteDescriptorSet.pNext = nullptr;
+			fragWriteDescriptorSet.dstSet = m_descriptorSetScene;
+			fragWriteDescriptorSet.dstBinding = 2;
+			fragWriteDescriptorSet.dstArrayElement = 0;
+			fragWriteDescriptorSet.descriptorCount = 1;
+			fragWriteDescriptorSet.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+			fragWriteDescriptorSet.pImageInfo = nullptr;
+			fragWriteDescriptorSet.pBufferInfo = &fragDescriptorBufferInfo;
+			//uboWriteDescriptorSet.pTexelBufferView = nullptr;
+		}
+		
+		// Dynamic vert
 		VkWriteDescriptorSet dynamicWriteDescriptorSet = {};
-		dynamicWriteDescriptorSet.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-		dynamicWriteDescriptorSet.pNext = nullptr;
-		dynamicWriteDescriptorSet.dstSet = m_descriptorSetScene;
-		dynamicWriteDescriptorSet.dstBinding = 1;
-		dynamicWriteDescriptorSet.dstArrayElement = 0;
-		dynamicWriteDescriptorSet.descriptorCount = 1;
-		dynamicWriteDescriptorSet.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC;
-		dynamicWriteDescriptorSet.pImageInfo = nullptr;
-		dynamicWriteDescriptorSet.pBufferInfo = &dynamicDescriptorBufferInfo;
-		//uboWriteDescriptorSet.pTexelBufferView = nullptr;
+		{
+			m_dynamicUniformBufferVert = new Buffer(m_device);
+			m_dynamicUniformBufferVert->Create(
+				m_dynamicUniformsVert.GetSize() * m_dynamicAlignmentVert,
+				VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT,
+				VK_MEMORY_PROPERTY_HOST_COHERENT_BIT | VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT
+			);
 
+			VkDescriptorBufferInfo dynamicDescriptorBufferInfo = {};
+			dynamicDescriptorBufferInfo.buffer = m_dynamicUniformBufferVert->GetBuffer();
+			dynamicDescriptorBufferInfo.offset = 0;
+			dynamicDescriptorBufferInfo.range = m_dynamicAlignmentVert;
+
+
+			dynamicWriteDescriptorSet.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+			dynamicWriteDescriptorSet.pNext = nullptr;
+			dynamicWriteDescriptorSet.dstSet = m_descriptorSetScene;
+			dynamicWriteDescriptorSet.dstBinding = 1;
+			dynamicWriteDescriptorSet.dstArrayElement = 0;
+			dynamicWriteDescriptorSet.descriptorCount = 1;
+			dynamicWriteDescriptorSet.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC;
+			dynamicWriteDescriptorSet.pImageInfo = nullptr;
+			dynamicWriteDescriptorSet.pBufferInfo = &dynamicDescriptorBufferInfo;
+			//uboWriteDescriptorSet.pTexelBufferView = nullptr;
+		}
+
+		// Dynamic frag
+		VkWriteDescriptorSet dynamicFragWriteDescriptorSet = {};
+		{
+			m_dynamicUniformBufferFrag = new Buffer(m_device);
+			m_dynamicUniformBufferFrag->Create(
+				m_dynamicUniformsFrag.GetSize() * m_dynamicAlignmentFrag,
+				VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT,
+				VK_MEMORY_PROPERTY_HOST_COHERENT_BIT | VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT
+			);
+
+			VkDescriptorBufferInfo dynamicDescriptorBufferInfo = {};
+			dynamicDescriptorBufferInfo.buffer = m_dynamicUniformBufferFrag->GetBuffer();
+			dynamicDescriptorBufferInfo.offset = 0;
+			dynamicDescriptorBufferInfo.range = m_dynamicAlignmentFrag;
+
+			dynamicFragWriteDescriptorSet.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+			dynamicFragWriteDescriptorSet.pNext = nullptr;
+			dynamicFragWriteDescriptorSet.dstSet = m_descriptorSetScene;
+			dynamicFragWriteDescriptorSet.dstBinding = 3;
+			dynamicFragWriteDescriptorSet.dstArrayElement = 0;
+			dynamicFragWriteDescriptorSet.descriptorCount = 1;
+			dynamicFragWriteDescriptorSet.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC;
+			dynamicFragWriteDescriptorSet.pImageInfo = nullptr;
+			dynamicFragWriteDescriptorSet.pBufferInfo = &dynamicDescriptorBufferInfo;
+			//uboWriteDescriptorSet.pTexelBufferView = nullptr;
+		}
 
 		//================================================================
 		// Update DescriptorSets
@@ -449,6 +539,7 @@ namespace vk {
 			  uboWriteDescriptorSet
 			, dynamicWriteDescriptorSet 
 			, fragWriteDescriptorSet
+			, dynamicFragWriteDescriptorSet
 		};
 
 		vkUpdateDescriptorSets(
@@ -728,6 +819,7 @@ namespace vk {
 
 		delete m_vertUniformBuffer;
 		delete m_fragUniformBuffer;
-		delete m_dynamicUniformBuffer;
+		delete m_dynamicUniformBufferVert;
+		delete m_dynamicUniformBufferFrag;
 	}
 }

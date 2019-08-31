@@ -92,12 +92,12 @@ namespace scene
 	template<typename ComponentType>
 	ComponentType* Gameobject::GetComponent()
 	{
-		ComponentType * componentType;
-		for (Component* component : m_components)
-		{
-			componentType = dynamic_cast<ComponentType*>(component);
-			if (componentType != nullptr)
-				return componentType;
+		for (int componentIndex = 0; componentIndex < m_components.size() ; componentIndex++) {
+			Component* component = m_components[componentIndex];
+
+			if (component->IsType<ComponentType>()) {
+				return static_cast<ComponentType*>(component);
+			}
 		}
 		return nullptr;
 	}

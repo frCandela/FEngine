@@ -52,9 +52,7 @@ namespace vk {
 		CreateRenderPassPostprocess();
 
 		m_texturesManager =  new TexturesManager( m_device );
-		m_texturesManager->LoadTexture("content/models/test/textures/texture1.jpg" );
-		m_texturesManager->LoadTexture("content/models/test/textures/texture2.jpg" );
-		m_texturesManager->LoadTexture("content/models/test/textures/texture3.jpg" );
+		m_texturesManager->onTextureLoaded.Connect( &Renderer::ReloadShaders, this); // TODO Cleanely reload descriptors when a new texture is loaded
 
 		m_forwardPipeline = new ForwardPipeline(m_device, m_renderPass);
 		m_forwardPipeline->Create( m_swapchain->GetExtent());
@@ -138,7 +136,8 @@ namespace vk {
 	//================================================================================================================================	
 	void Renderer::DrawFrame( ) {
 			const VkResult result = m_swapchain->AcquireNextImage();
-			if (result == VK_ERROR_OUT_OF_DATE_KHR) {
+			if (result == VK_ERROR_OUT_OF_DATE_KHR ) {
+
 				// window minimized
 				if (m_window->GetExtent().width == 0 && m_window->GetExtent().height == 0) {
 					glfwPollEvents();
@@ -161,7 +160,7 @@ namespace vk {
 				CreateForwardFramebuffers();
 				RecordAllCommandBuffers();
 				vkResetFences(m_device.vkDevice, 1, m_swapchain->GetCurrentInFlightFence());
-				m_swapchain->AcquireNextImage();
+				m_swapchain->AcquireNextImage();				
 			}
 			else if (result != VK_SUCCESS) {
 				fan::Debug::Error( "Could not acquire next image" );
@@ -191,10 +190,20 @@ namespace vk {
 						}						
 					}
 
+					if (ImGui::CollapsingHeader("Rendered Models : ")) {
+						for (int drawDataIndex = 0; drawDataIndex < m_drawData.size(); drawDataIndex++) {
+							const DrawData & drawData = m_drawData[drawDataIndex];
+							std::stringstream ss;
+							ss << drawData.model->GetGameobject()->GetName() << " " << drawData.meshData->mesh->GetPath();
+							ImGui::Text(ss.str().c_str());
+						}
+					}
+
 				}
-				UpdateUniformBuffer();
+				
 				ImGui::End();
 			}
+			UpdateUniformBuffer();
 			ImGui::EndFrame();
 			ImGui::Render();
 
@@ -277,44 +286,71 @@ namespace vk {
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void Renderer::UpdateUniformBuffer()
+	void Renderer::UpdateUniformBuffer(bool _forceFullRebuild)
 	{
-		ForwardPipeline::VertUniforms ubo = m_forwardPipeline->GetVertUniforms();
+		// Main camera transform
 		assert(m_mainCamera != nullptr);
-		if ( m_mainCamera->IsModified()) {
+		if ( m_mainCamera->IsModified() || m_mainCameraTransform->IsModified() || _forceFullRebuild == true ) {
+			
+			ForwardPipeline::VertUniforms ubo = m_forwardPipeline->GetVertUniforms();
 			m_mainCamera->SetAspectRatio(static_cast<float>(m_swapchain->GetExtent().width) /m_swapchain->GetExtent().height);
 			ubo.view = m_mainCamera->GetView();
 			ubo.proj = m_mainCamera->GetProjection();
 			ubo.proj[1][1] *= -1;
+			m_forwardPipeline->SetVertUniforms(ubo);
+
+			ForwardPipeline::FragUniforms fragUniforms = m_forwardPipeline->GetFragUniforms();
+			fragUniforms.cameraPosition = util::ToGLM(m_mainCameraTransform->GetPosition());
+			m_forwardPipeline->SetFragUniforms(fragUniforms);
+
+			DebugPipeline::Uniforms debugUniforms;
+			debugUniforms.model = glm::mat4(1.0);
+			debugUniforms.view = ubo.view;
+			debugUniforms.proj = ubo.proj;
+			debugUniforms.color = glm::vec4(1, 1, 1, 1);
+			m_debugLinesPipeline->SetUniforms(debugUniforms);
+			m_debugTrianglesPipeline->SetUniforms(debugUniforms);
+
+			m_mainCamera->SetModified(false);
+			m_mainCameraTransform->SetModified(false);
 		}
 
-		m_forwardPipeline->SetVertUniforms(ubo);
+		// Dynamic uniforms 
+		bool mustUpdateDynamicUniformsVert = false;
+		bool mustUpdateDynamicUniformsFrag = false;
+		for (int drawDataIndex = 0; drawDataIndex < m_drawData.size() ; drawDataIndex++) {
+			DrawData & drawData = m_drawData[drawDataIndex];			
 
-		ForwardPipeline::FragUniforms fragUniforms = m_forwardPipeline->GetFragUniforms();
-		fragUniforms.cameraPosition = util::ToGLM( m_mainCameraTransform->GetPosition());
-		m_forwardPipeline->SetFragUniforms(fragUniforms);
+			// Vert
+			if (drawData.transform->IsModified() == true || _forceFullRebuild == true ) {
+				mustUpdateDynamicUniformsVert = true;
+				ForwardPipeline::DynamicUniformsVert uniform;
+				uniform.modelMat = drawData.transform->GetModelMatrix();
+				uniform.rotationMat = drawData.transform->GetRotationMat();
+				m_forwardPipeline->SetDynamicUniformVert(uniform, drawDataIndex );
+				
+				drawData.transform->SetModified(false);
+			}
 
-		
-		std::vector < ForwardPipeline::DynamicUniforms > dynamicUniforms( m_drawData.size() );
-		for (int modelIndex = 0; modelIndex < m_drawData.size(); modelIndex++) {
-			const scene::Transform * transform = m_drawData[modelIndex].model->GetGameobject()->GetComponent<scene::Transform>();
-			dynamicUniforms[modelIndex].modelMat = transform->GetModelMatrix();
-			dynamicUniforms[modelIndex].rotationMat = transform->GetRotationMat();			
-
-			const scene::Material * material = m_drawData[modelIndex].model->GetGameobject()->GetComponent<scene::Material>();
-			if (material) {
-				dynamicUniforms[modelIndex].TMPtextureIndex = m_texturesManager->FindTextureIndex(material->GetTexture());
+			// Frag
+			if (drawData.material != nullptr && (drawData.material->IsModified() || _forceFullRebuild == true) ) {
+				vk::Texture * texture = drawData.material->GetTexture();
+				if (texture != nullptr) {
+					mustUpdateDynamicUniformsFrag = true;
+					ForwardPipeline::DynamicUniformsFrag uniform;
+					uniform.textureIndex = texture->GetRenderID();
+					assert(uniform.textureIndex >= 0);
+					m_forwardPipeline->SetDynamicUniformFrag(uniform, drawDataIndex);					
+				}
+				drawData.material->SetModified(false);
 			}
 		}
-		m_forwardPipeline->SetDynamicUniforms(dynamicUniforms);
-
-		DebugPipeline::Uniforms debugUniforms;
-		debugUniforms.model = glm::mat4(1.0);
-		debugUniforms.view = ubo.view;
-		debugUniforms.proj = ubo.proj;
-		debugUniforms.color = glm::vec4(1, 1, 1, 1);
-		m_debugLinesPipeline->SetUniforms(debugUniforms);
-		m_debugTrianglesPipeline->SetUniforms(debugUniforms);
+		if (mustUpdateDynamicUniformsVert == true ) {
+			m_forwardPipeline->UpdateDynamicUniformVert();
+		}
+		if (mustUpdateDynamicUniformsFrag == true) {
+			 m_forwardPipeline->UpdateDynamicUniformFrag();
+		}
 	}
 	
 	//================================================================================================================================
@@ -589,7 +625,13 @@ namespace vk {
 
 		DeleteForwardFramebuffers();
 		CreateForwardFramebuffers();
-		RecordAllCommandBuffers();
+		RecordAllCommandBuffers();	
+
+		// Force reload of transform uniforms
+		for (int drawDataIndex = 0; drawDataIndex < m_drawData.size() ; drawDataIndex++) {
+			m_drawData[drawDataIndex].transform->SetModified(true);
+		}
+
 	}	
 
 	//================================================================================================================================
@@ -817,8 +859,20 @@ namespace vk {
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void Renderer::UpdateMaterialOfModel(scene::Model * /*_material*/) {
-		// This will be used when we have a proper descriptor for materials
+	void Renderer::RegisterMaterial(scene::Material * _material ) {
+		scene::Model * model = _material->GetGameobject()->GetComponent<scene::Model>();
+		if (model != nullptr && model->GetRenderID() >= 0 ) {
+			m_drawData[model->GetRenderID()].material = _material;
+		}
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
+	void Renderer::UnRegisterMaterial(scene::Material * _material) {
+		scene::Model * model = _material->GetGameobject()->GetComponent<scene::Model>();
+		if (model != nullptr && model->GetRenderID() >= 0) {
+			m_drawData[model->GetRenderID()].material = nullptr;
+		}
 	}
 
 	//================================================================================================================================
@@ -831,16 +885,21 @@ namespace vk {
 		for (int modelIndex = 0; modelIndex < m_drawData.size() ; modelIndex++){
 			if (m_drawData[modelIndex].model == _model) {
 				drawData = &m_drawData[modelIndex];
+				_model->SetRenderID(modelIndex);
+				break;
 			}
 		}
 
-		// no model found -> creates it
+		// no model found -> creates draw data for it
 		if (drawData == nullptr) {
 			m_drawData.push_back({});
-			drawData = & m_drawData[m_drawData.size() - 1];
+			drawData = & m_drawData[m_drawData.size() - 1];		
+			_model->SetRenderID( static_cast<int>(m_drawData.size() - 1));
 		}
 
 		drawData->model = _model;
+		drawData->transform = _model->GetGameobject()->GetComponent<scene::Transform>();
+		drawData->material = _model->GetGameobject()->GetComponent<scene::Material>();
 
 		// Looks for the mesh, if not found defaults it
 		std::map< uint32_t, MeshData >::iterator it = m_meshList.find(_model->GetMesh()->GetRessourceID());

@@ -119,13 +119,12 @@ namespace editor {
 			}
 
 			// Material
-			/*if (ImGui::MenuItem("Material"))
+			if (ImGui::MenuItem("Material"))
 			{
 				// Create new Component 
-				scene::Material* mat = m_pEditorApplication->GetSelectedGameobject()->AddComponent<editor::Material>();
-				mat->SetTextureKey(m_pEditorApplication->GetRenderer()->GetDefaultTexture());
+				selection->AddComponent<scene::Material>();
 				ImGui::CloseCurrentPopup();
-			}*/
+			}
 
 			// Material
 			/*if (ImGui::MenuItem("RigidBody"))

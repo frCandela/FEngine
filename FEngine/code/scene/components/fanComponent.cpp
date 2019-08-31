@@ -21,8 +21,5 @@ namespace scene
 	//================================================================================================================================
 	void Component::SetModified(const bool _isModified) {
 		m_isModified = _isModified;
-		if (_isModified == true) {
-			GetGameobject()->onComponentModified.Emmit(this);
-		}
 	}
 }

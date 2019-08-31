@@ -14,6 +14,7 @@ namespace scene
 	class Model : public Component
 	{
 	public:
+		static util::Signal< Model * > onRegisterModel;
 
 		Model();
 		~Model();
@@ -22,18 +23,20 @@ namespace scene
 		bool		IsUnique()	const override { return true; }
 
 		// ISerializable
-		void				Load(std::istream& _in) override;
-		void				Save(std::ostream& _out) override;
-		void				SetMesh(ressource::Mesh * _mesh);
-		ressource::Mesh *	GetMesh() { return m_mesh; }
+		void					Load(std::istream& _in) override;
+		void					Save(std::ostream& _out) override;
+		void					SetMesh(ressource::Mesh * _mesh);
+		ressource::Mesh *		GetMesh() { return m_mesh; }
 		const ressource::Mesh *	GetMesh() const  { return m_mesh; }
 
-		static util::Signal< Model * > onRegisterModel;
+		int		GetRenderID() const					{ return m_renderID; }
+		void	SetRenderID(const int _renderID)	{ m_renderID = _renderID; }
 
 		DECLARE_TYPE_INFO(Model);
 	private:
 		void Initialize() override;
 
 		ressource::Mesh * m_mesh;
+		int m_renderID = -1;
 	};
 }

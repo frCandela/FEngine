@@ -7,7 +7,6 @@ layout (location = 0) in vec3 inColor;
 layout (location = 1) in vec3 inFragPos;
 layout (location = 2) in vec3 inNormal;
 layout (location = 3) in vec2 inTexCoord;
-layout (location = 4) flat in int outTMPtextureIndexTMP;
 
 layout(binding = 2) uniform FragUniforms {
 	vec3 	cameraPosition;
@@ -17,7 +16,10 @@ layout(binding = 2) uniform FragUniforms {
 	vec3 	lightPos;
 } uniforms;
 
-//layout(binding = 3) uniform sampler2D texSampler;
+layout (binding = 3) uniform DynamicUniformBufferFrag {
+	int	textureIndex;
+} dynamicUbo;
+
 layout(set = 1, binding = 0) uniform sampler2D texSampler[];
 
 void main() {  
@@ -29,7 +31,7 @@ void main() {
 	const float distance = length( lightDir );
 	lightDir /= distance;
 	const vec3 viewDir = normalize(uniforms.cameraPosition - inFragPos);
-	const vec4 textureColor = texture(texSampler[outTMPtextureIndexTMP], inTexCoord);
+	const vec4 textureColor = texture(texSampler[dynamicUbo.textureIndex], inTexCoord);
 
 	// Diffuse light
 	const float NdotL = dot( goodNormal, lightDir );

@@ -66,9 +66,9 @@ namespace scene {
 	}
 
 	//================================================================================================================================
+	// Deletes every GameObject in the m_toDeleteLater vector
 	//================================================================================================================================
 	void Scene::EndFrame() {
-		// Deletes every GameObject in the m_toDeleteLater vector
 		for (int gameobjectToDeleteIndex = 0; gameobjectToDeleteIndex < m_gameObjectstoDelete.size(); gameobjectToDeleteIndex++) {
 			Gameobject * gameobjecttoDelete = m_gameObjectstoDelete[gameobjectToDeleteIndex];
 
