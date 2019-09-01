@@ -4,19 +4,19 @@ It uses Vulkan for Rendering, Dear ImGui for user interface and a lot of other o
 
 ## Features (non exhaustive list): 
 * Scene management
- * Scene Editor
- * Entity/Component system
- * Save/Load
- * Various component ( transform, mesh, material, actors etc.)
+	 * Scene Editor
+	 * Entity/Component system
+	 * Save/Load
+	 * Various component ( transform, mesh, material, actors etc.)
 * Rendering with vulkan
- * Mesh display
- * Simple phong illumination
- * Postprocessing
- * Debug lines/shapes
- * Shader runtime compilation
+	 * Mesh display
+	 * Simple phong illumination
+	 * Postprocessing
+	 * Debug lines/shapes
+	 * Shader runtime compilation
 * Other
- * Simple FBX mesh import
- * png textures import
+	 * Simple FBX mesh import
+	 * png textures import
 
 ## Dependencies : 	
 * 3D Models IO : [FBX SDK 2019.0](https://www.autodesk.com/developer-network/platform-technologies/fbx-sdk-2019-0)	
