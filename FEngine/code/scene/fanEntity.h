@@ -30,6 +30,7 @@ namespace fan
 			// Creates an instance of ComponentType, adds it to the entity and returns a pointer
 			template<typename ComponentType>
 			ComponentType* AddComponent();
+			Component* AddComponent(const uint32_t _componentID);
 
 			// Returns a pointer on the first instance of ComponentType in the entity, nullptr if none exists
 			template<typename ComponentType>

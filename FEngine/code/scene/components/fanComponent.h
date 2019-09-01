@@ -27,6 +27,17 @@ namespace fan
 			bool IsRemovable() const { return m_isRemovable; }
 			void SetRemovable(const bool _isRemovable) { m_isRemovable = _isRemovable; }
 
+
+			//TMP
+			static bool RegisterComponent(scene::Component * _component) {//TMP
+				GetComponents().push_back(_component);//TMP
+				return true;
+			}//TMP
+			static std::vector< scene::Component * >& GetComponents() {//TMP
+				static std::vector<scene::Component * > m_components;//TMP
+				return m_components;//TMP
+			}//TMP
+
 			DECLARE_ABSTRACT_TYPE_INFO(Component);
 		private:
 			Entity*  m_entity;
@@ -37,6 +48,7 @@ namespace fan
 		protected:
 			// Friend class entity is the factory of components
 			Component();
+
 			virtual void Initialize() = 0;
 			virtual void Delete() = 0;
 		};

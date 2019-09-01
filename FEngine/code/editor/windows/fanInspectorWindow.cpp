@@ -129,6 +129,17 @@ namespace fan
 					ImGui::CloseCurrentPopup();
 				}
 
+				std::vector<scene::Component *>& components = scene::Component::GetComponents();
+				for (int componentIndex = 0; componentIndex < components.size() ; componentIndex++)		{					
+					scene::Component * component = components[componentIndex];
+					if (ImGui::MenuItem(component->GetName())) {
+						// Create new Component 
+						selection->AddComponent(component->GetType());
+						ImGui::CloseCurrentPopup();
+					}
+				}
+
+
 				// Material
 				/*if (ImGui::MenuItem("RigidBody"))
 				{
@@ -140,7 +151,7 @@ namespace fan
 				ImGui::EndPopup();
 			}
 		}
-
+		
 		//================================================================================================================================
 		//================================================================================================================================
 		void InspectorWindow::DrawComponent(scene::Component & _component) {

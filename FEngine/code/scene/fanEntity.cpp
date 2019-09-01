@@ -55,6 +55,14 @@ namespace fan
 
 		//================================================================================================================================
 		//================================================================================================================================
+		Component* Entity::AddComponent(const uint32_t _componentID) { 
+			scene::Component * component = TypeInfo::Instantiate<Component>(_componentID);
+			AddComponent(component);
+			return component;
+		}
+
+		//================================================================================================================================
+		//================================================================================================================================
 		void Entity::AddComponent(scene::Component * _component) {
 			_component->m_entity = this;
 			_component->Initialize();
@@ -108,8 +116,8 @@ namespace fan
 				fan::Debug::Get() << fan::Debug::Severity::log << "\tComponent: " << buffer << std::endl;
 
 				// Instanciate component
-				scene::Component * component = TypeInfo::Instantiate<Component>(componentID);
-				AddComponent(component);
+
+				scene::Component * component = AddComponent(componentID);
 				component->Load(_in);
 				_in >> buffer; // skip component name
 			}

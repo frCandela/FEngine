@@ -59,6 +59,9 @@
     <Filter Include="code\shaders">
       <UniqueIdentifier>{422395bb-fb27-4fb8-82d2-d4c0e4a81912}</UniqueIdentifier>
     </Filter>
+    <Filter Include="code\core\game">
+      <UniqueIdentifier>{601b9331-5ac9-4f78-93fc-097663f76e54}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="deps\imgui\imgui.cpp">
@@ -246,6 +249,9 @@
     </ClCompile>
     <ClCompile Include="code\scene\fanEntity.cpp">
       <Filter>code\scene</Filter>
+    </ClCompile>
+    <ClCompile Include="code\game\fanPlanet.cpp">
+      <Filter>code\core\game</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -881,6 +887,9 @@
     </ClInclude>
     <ClInclude Include="code\scene\fanEntity.h">
       <Filter>code\scene</Filter>
+    </ClInclude>
+    <ClInclude Include="code\game\fanPlanet.h">
+      <Filter>code\core\game</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
