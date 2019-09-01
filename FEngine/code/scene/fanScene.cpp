@@ -1,7 +1,7 @@
 #include "fanGlobalIncludes.h"
 
 #include "scene/fanScene.h"
-#include "scene/fanGameobject.h"
+#include "scene/fanEntity.h"
 #include "scene/components/fanComponent.h"
 #include "scene/components/fanTransform.h"
 #include "scene/components/fanCamera.h"
@@ -30,22 +30,22 @@ namespace fan
 
 		//================================================================================================================================
 		//================================================================================================================================
-		Gameobject *	Scene::CreateGameobject(const std::string _name) {
-			Gameobject* gameObject = new Gameobject(_name);
+		Entity *	Scene::CreateEntity(const std::string _name) {
+			Entity* entity = new Entity(_name);
 
-			gameObject->onComponentCreated.Connect(&Scene::OnComponentCreated, this);
-			gameObject->onComponentDeleted.Connect(&Scene::OnComponentDeleted, this);
+			entity->onComponentCreated.Connect(&Scene::OnComponentCreated, this);
+			entity->onComponentDeleted.Connect(&Scene::OnComponentDeleted, this);
 
-			m_gameObjects.push_back(gameObject);
-			onGameobjectCreated.Emmit(gameObject);
+			m_entities.push_back(entity);
+			onEntityCreated.Emmit(entity);
 
-			return gameObject;
+			return entity;
 		}
 
 		//================================================================================================================================
 		//================================================================================================================================
-		void Scene::DeleteGameobject(Gameobject* _gameobject) {
-			m_gameObjectstoDelete.push_back(_gameobject);
+		void Scene::DeleteEntity(Entity* _entity) {
+			m_entitiesToDelete.push_back(_entity);
 		}
 
 		//================================================================================================================================
@@ -67,27 +67,27 @@ namespace fan
 		}
 
 		//================================================================================================================================
-		// Deletes every GameObject in the m_toDeleteLater vector
+		// Deletes every entity in the m_toDeleteLater vector
 		//================================================================================================================================
 		void Scene::EndFrame() {
-			for (int gameobjectToDeleteIndex = 0; gameobjectToDeleteIndex < m_gameObjectstoDelete.size(); gameobjectToDeleteIndex++) {
-				Gameobject * gameobjecttoDelete = m_gameObjectstoDelete[gameobjectToDeleteIndex];
+			for (int entityToDeleteIndex = 0; entityToDeleteIndex < m_entitiesToDelete.size(); entityToDeleteIndex++) {
+				Entity * entitytoDelete = m_entitiesToDelete[entityToDeleteIndex];
 
-				for (int gameobjectIndex = 0; gameobjectIndex < m_gameObjects.size(); ++gameobjectIndex) {
-					if (m_gameObjects[gameobjectIndex] == gameobjecttoDelete)
+				for (int entityIndex = 0; entityIndex < m_entities.size(); ++entityIndex) {
+					if (m_entities[entityIndex] == entitytoDelete)
 					{
-						m_gameObjects.erase(m_gameObjects.begin() + gameobjectIndex);
+						m_entities.erase(m_entities.begin() + entityIndex);
 
-						if (fan::Engine::GetEngine().GetSelectedGameobject() == gameobjecttoDelete) {
+						if (fan::Engine::GetEngine().GetSelectedentity() == entitytoDelete) {
 							fan::Engine::GetEngine().Deselect();
 						}
 
-						delete(gameobjecttoDelete);
+						delete(entitytoDelete);
 						break;
 					}
 				}
 			}
-			m_gameObjectstoDelete.clear();
+			m_entitiesToDelete.clear();
 		}
 
 		//================================================================================================================================
@@ -121,13 +121,13 @@ namespace fan
 		void Scene::Clear() {
 			m_path = "";
 
-			for (int gameobjectIndex = 0; gameobjectIndex < m_gameObjects.size(); gameobjectIndex++) {
-				delete m_gameObjects[gameobjectIndex];
+			for (int entityIndex = 0; entityIndex < m_entities.size(); entityIndex++) {
+				delete m_entities[entityIndex];
 			}
-			m_gameObjects.clear();
+			m_entities.clear();
 			m_startingActors.clear();
 			m_activeActors.clear();
-			m_gameObjectstoDelete.clear();
+			m_entitiesToDelete.clear();
 		}
 
 
@@ -144,10 +144,10 @@ namespace fan
 			fan::Debug::Get() << fan::Debug::Severity::log << "saving scene: " << m_name << std::endl;
 			std::ofstream outStream(m_path);
 			if (outStream.is_open()) {
-				for (int gameobjectIndex = 0; gameobjectIndex < m_gameObjects.size(); gameobjectIndex++) {
-					scene::Gameobject * gameobject = m_gameObjects[gameobjectIndex];
-					if (gameobject->HasFlag(scene::Gameobject::NOT_SAVED) == false) {
-						gameobject->Save(outStream);
+				for (int entityIndex = 0; entityIndex < m_entities.size(); entityIndex++) {
+					scene::Entity * entity = m_entities[entityIndex];
+					if (entity->HasFlag(scene::Entity::NOT_SAVED) == false) {
+						entity->Save(outStream);
 					}
 				}
 				outStream.close();
@@ -167,11 +167,11 @@ namespace fan
 				std::string inputString = "";
 				inStream >> inputString;
 				while (inStream.eof() == false) {
-					if (inputString == "gameobject") {
-						inStream >> inputString; // Gameobject name
-						scene::Gameobject * gameobject = CreateGameobject(inputString);
-						fan::Debug::Get() << fan::Debug::Severity::log << "Gameobject: " << inputString << std::endl;
-						gameobject->Load(inStream);
+					if (inputString == "entity") {
+						inStream >> inputString; // entity name
+						scene::Entity * entity = CreateEntity(inputString);
+						fan::Debug::Get() << fan::Debug::Severity::log << "entity: " << inputString << std::endl;
+						entity->Load(inStream);
 					}
 					else {
 						fan::Debug::Get() << fan::Debug::Severity::error << "fail " << inputString << std::endl;

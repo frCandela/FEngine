@@ -141,7 +141,7 @@
     <ClCompile Include="code\scene\components\fanMaterial.cpp" />
     <ClCompile Include="code\scene\components\fanModel.cpp" />
     <ClCompile Include="code\scene\components\fanTransform.cpp" />
-    <ClCompile Include="code\scene\fanGameobject.cpp" />
+    <ClCompile Include="code\scene\fanEntity.cpp" />
     <ClCompile Include="code\scene\fanScene.cpp" />
     <ClCompile Include="deps\imgui\imgui.cpp" />
     <ClCompile Include="deps\imgui\imgui_demo.cpp" />
@@ -211,7 +211,7 @@
     <ClInclude Include="code\scene\components\fanMaterial.h" />
     <ClInclude Include="code\scene\components\fanModel.h" />
     <ClInclude Include="code\scene\components\fanTransform.h" />
-    <ClInclude Include="code\scene\fanGameobject.h" />
+    <ClInclude Include="code\scene\fanEntity.h" />
     <ClInclude Include="code\scene\fanScene.h" />
     <ClInclude Include="deps\glm\common.hpp" />
     <ClInclude Include="deps\glm\detail\compute_vector_relational.hpp" />

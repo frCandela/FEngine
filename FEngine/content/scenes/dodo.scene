@@ -1,4 +1,4 @@
-gameobject fff
+entity fff
 	Transform 1269105190
 		1.14327 -2.40232 0
 		0 0 0 1
@@ -8,7 +8,7 @@ gameobject fff
 	Material 1828911513
 		content\models\test\textures\kiwi.png
 end
-gameobject fff
+entity fff
 	Transform 1269105190
 		-4.52742 0 -6.96454
 		0 0 0 1
@@ -18,7 +18,7 @@ gameobject fff
 	Material 1828911513
 		content\models\test\textures\texture3.png
 end
-gameobject cube
+entity cube
 	Transform 1269105190
 		0 0 -3.75778
 		0 0 0 1

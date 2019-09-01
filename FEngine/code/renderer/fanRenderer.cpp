@@ -1,7 +1,7 @@
 #include "fanGlobalIncludes.h"
 
 #include "renderer/fanRenderer.h"
-#include "scene/fanGameobject.h"
+#include "scene/fanEntity.h"
 #include "scene/components/fanCamera.h"
 #include "scene/components/fanModel.h"
 #include "scene/components/fanTransform.h"
@@ -62,10 +62,10 @@ namespace fan
 			m_postprocessPipeline->Create(m_swapchain->GetSurfaceFormat().format, m_swapchain->GetExtent());
 		
 			m_debugLinesPipeline = new vk::DebugPipeline(m_device, m_renderPassPostprocess, VK_PRIMITIVE_TOPOLOGY_LINE_LIST);
-			m_debugLinesPipeline->Create(m_swapchain->GetExtent(), "shaders/debugLines.vert", "shaders/debugLines.frag");
+			m_debugLinesPipeline->Create(m_swapchain->GetExtent(), "code/shaders/debugLines.vert", "code/shaders/debugLines.frag");
 
 			m_debugTrianglesPipeline = new vk::DebugPipeline(m_device, m_renderPassPostprocess, VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST);
-			m_debugTrianglesPipeline->Create(m_swapchain->GetExtent(), "shaders/debugTriangles.vert", "shaders/debugTriangles.frag");
+			m_debugTrianglesPipeline->Create(m_swapchain->GetExtent(), "code/shaders/debugTriangles.vert", "code/shaders/debugTriangles.frag");
 		
 			m_imguiPipeline = new vk::ImguiPipeline(m_device, m_swapchain->GetSwapchainImagesCount());
 			m_imguiPipeline->Create(m_renderPassPostprocess, m_window->GetWindow(), m_swapchain->GetExtent());
@@ -125,7 +125,7 @@ namespace fan
 		//================================================================================================================================	
 		void Renderer::SetMainCamera(scene::Camera * _camera) {
 			m_mainCamera = _camera;
-			m_mainCameraTransform = m_mainCamera->GetGameobject()->GetComponent < scene::Transform>();
+			m_mainCameraTransform = m_mainCamera->GetEntity()->GetComponent < scene::Transform>();
 		}
 
 		//================================================================================================================================
@@ -192,7 +192,7 @@ namespace fan
 								const vk::DrawData & drawData = m_drawData[drawDataIndex];
 								if (drawData.model != nullptr) {
 									std::stringstream ss;
-									ss << drawData.model->GetGameobject()->GetName() << " " << drawData.meshData->mesh->GetPath();
+									ss << drawData.model->GetEntity()->GetName() << " " << drawData.meshData->mesh->GetPath();
 									ImGui::Text(ss.str().c_str());
 								}
 								else {
@@ -794,7 +794,7 @@ namespace fan
 		//================================================================================================================================
 		//================================================================================================================================
 		void Renderer::RegisterMaterial(scene::Material * _material ) {
-			scene::Model * model = _material->GetGameobject()->GetComponent<scene::Model>();
+			scene::Model * model = _material->GetEntity()->GetComponent<scene::Model>();
 			if (model != nullptr && model->GetRenderID() >= 0 ) {
 				m_drawData[model->GetRenderID()].material = _material;
 			}
@@ -803,7 +803,7 @@ namespace fan
 		//================================================================================================================================
 		//================================================================================================================================
 		void Renderer::UnRegisterMaterial(scene::Material * _material) {
-			scene::Model * model = _material->GetGameobject()->GetComponent<scene::Model>();
+			scene::Model * model = _material->GetEntity()->GetComponent<scene::Model>();
 			if (model != nullptr && model->GetRenderID() >= 0) {
 				m_drawData[model->GetRenderID()].material = nullptr;
 			}
@@ -848,8 +848,8 @@ namespace fan
 			}
 
 			drawData->model = _model;
-			drawData->transform = _model->GetGameobject()->GetComponent<scene::Transform>();
-			drawData->material = _model->GetGameobject()->GetComponent<scene::Material>();
+			drawData->transform = _model->GetEntity()->GetComponent<scene::Transform>();
+			drawData->material = _model->GetEntity()->GetComponent<scene::Material>();
 
 			drawData->meshData = m_ressourceManager->FindMeshData(_model->GetMesh());	
 

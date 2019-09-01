@@ -2,7 +2,7 @@
 
 #include "scene/components/fanTransform.h"
 #include "scene/components/fanComponent.h"
-#include "scene/fanGameobject.h"
+#include "scene/fanEntity.h"
 #include "core/fanSignal.h"
 
 namespace fan
@@ -27,7 +27,7 @@ namespace fan
 			if (m_position != _newPosition) {
 				m_position = _newPosition;
 
-				// 		Rigidbody* rb = GetGameobject()->GetComponent<Rigidbody>();
+				// 		Rigidbody* rb = Getentity()->GetComponent<Rigidbody>();
 				// 		if (rb)	{
 				// 			rb->SetPosition(newPosition);
 				// 		}

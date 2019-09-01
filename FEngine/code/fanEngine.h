@@ -15,7 +15,7 @@ namespace fan {
 	}
 	namespace scene {
 		class Scene;
-		class Gameobject;
+		class Entity;
 		class Actor;
 		class Camera;
 	}
@@ -40,10 +40,10 @@ namespace fan {
 
 		inline static Engine & GetEngine() { return * ms_engine; }
 
-		void SetSelectedGameobject( scene::Gameobject * _selectedGameobject) { m_selectedGameobject = _selectedGameobject;	}
-		void Deselect() { m_selectedGameobject = nullptr; }
+		void SetSelectedentity( scene::Entity * _selectedentity) { m_selectedentity = _selectedentity;	}
+		void Deselect() { m_selectedentity = nullptr; }
 
-		scene::Gameobject *	const		GetSelectedGameobject() const	{ return m_selectedGameobject;  }
+		scene::Entity *	const		GetSelectedentity() const	{ return m_selectedentity;  }
 		editor::MainMenuBar  &			GetMainMenuBar() const			{ return * m_mainMenuBar; }
 		editor::RenderWindow &			GetRenderWindow() const			{ return * m_renderWindow; }
 		editor::SceneWindow  &			GetSceneWindow() const			{ return * m_sceneWindow; }
@@ -73,7 +73,7 @@ namespace fan {
 		// Main components
 		Renderer *			m_renderer;
 		scene::Scene *		m_scene;
-		scene::Gameobject * m_selectedGameobject;
+		scene::Entity * m_selectedentity;
 		scene::Camera *		m_editorCamera;
 
 		struct GizmoCacheData {

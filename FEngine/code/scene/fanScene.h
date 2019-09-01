@@ -6,7 +6,7 @@ namespace fan
 {
 	namespace scene
 	{
-		class Gameobject;
+		class Entity;
 		class Component;
 		class Actor;
 
@@ -15,14 +15,14 @@ namespace fan
 		class Scene
 		{
 		public:
-			fan::Signal<Gameobject*> onGameobjectCreated;
+			fan::Signal<Entity*> onEntityCreated;
 			fan::Signal<Scene*> onSceneLoad;
 
 			Scene(const std::string _name);
 			~Scene();
 
-			Gameobject *	CreateGameobject(const std::string _name);	// Creates a game object and adds it to the scene hierarchy
-			void			DeleteGameobject(Gameobject* _gameobject);		// Deletes a gameobject and removes it from the scene hierarchy at the end of the frame
+			Entity *	CreateEntity(const std::string _name);	// Creates a game object and adds it to the scene hierarchy
+			void		DeleteEntity(Entity* _entity);		// Deletes a entity and removes it from the scene hierarchy at the end of the frame
 
 			void	BeginFrame();
 			void	Update(const float _delta);
@@ -32,7 +32,7 @@ namespace fan
 			void Save() const;
 			void LoadFrom(const std::string _path);
 
-			const std::vector<Gameobject *>  & GetGameObjects() const { return m_gameObjects; }
+			const std::vector<Entity *>  & GetEntities() const { return m_entities; }
 			inline std::string GetName() const { return m_name; }
 			bool HasPath() const { return m_path.empty() == false; }
 			inline std::string GetPath() const { return m_path; }
@@ -42,8 +42,8 @@ namespace fan
 			std::string m_name;
 			std::string m_path;
 
-			std::vector < Gameobject * > m_gameObjectstoDelete;
-			std::vector < Gameobject * > m_gameObjects;
+			std::vector < Entity * > m_entitiesToDelete;
+			std::vector < Entity * > m_entities;
 
 			std::set< scene::Actor * > m_startingActors;
 			std::set< scene::Actor * > m_activeActors;

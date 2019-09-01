@@ -175,9 +175,9 @@ namespace fan
 			io.DisplaySize = ImVec2(static_cast<float>(_extent.width), static_cast<float>(_extent.height));
 			io.DisplayFramebufferScale = ImVec2(1.0f, 1.0f);
 			m_vertShader = new Shader(m_device);
-			m_vertShader->Create("shaders/imgui.vert");
+			m_vertShader->Create("code/shaders/imgui.vert");
 			m_fragShader = new Shader(m_device);
-			m_fragShader->Create("shaders/imgui.frag");
+			m_fragShader->Create("code/shaders/imgui.frag");
 
 			// Setup back-end capabilities flags
 			io.BackendFlags |= ImGuiBackendFlags_HasMouseCursors;         // We can honor GetMouseCursor() values (optional)

@@ -23,7 +23,7 @@
 #include "editor/windows/fanPreferencesWindow.h"	
 #include "editor/windows/fanConsoleWindow.h"	
 #include "scene/fanScene.h"
-#include "scene/fanGameobject.h"
+#include "scene/fanEntity.h"
 #include "scene/components/fanComponent.h"
 #include "editor/components/fanFPSCamera.h"		
 #include "scene/components/fanCamera.h"
@@ -155,17 +155,17 @@ namespace fan {
 	//================================================================================================================================
 	void Engine::OnSceneLoad(scene::Scene * _scene) {
 
-		m_selectedGameobject = nullptr;
+		m_selectedentity = nullptr;
 
 		// Editor Camera
-		scene::Gameobject * cameraGameobject = _scene->CreateGameobject("editor_camera");
-		cameraGameobject->SetFlags(scene::Gameobject::NO_DELETE | scene::Gameobject::NOT_SAVED);
-		scene::Transform * camTrans = cameraGameobject->AddComponent<scene::Transform>();
+		scene::Entity * cameraentity = _scene->CreateEntity("editor_camera");
+		cameraentity->SetFlags(scene::Entity::NO_DELETE | scene::Entity::NOT_SAVED);
+		scene::Transform * camTrans = cameraentity->AddComponent<scene::Transform>();
 		camTrans->SetPosition(btVector3(0, 0, -2));
-		m_editorCamera = cameraGameobject->AddComponent<scene::Camera>();
+		m_editorCamera = cameraentity->AddComponent<scene::Camera>();
 		m_editorCamera->SetRemovable(false);
 		m_renderer->SetMainCamera(m_editorCamera);
-		scene::FPSCamera * editorCamera = cameraGameobject->AddComponent<scene::FPSCamera>();
+		scene::FPSCamera * editorCamera = cameraentity->AddComponent<scene::FPSCamera>();
 		editorCamera->SetRemovable(false);
 	}
 
@@ -186,11 +186,11 @@ namespace fan {
 	//================================================================================================================================
 	//================================================================================================================================
 	void Engine::DrawAABB() const {
-		const std::vector< scene::Gameobject *>  & gameobjects = m_scene->GetGameObjects();
-		for (int gameobjectIndex = 0; gameobjectIndex < gameobjects.size(); gameobjectIndex++) {
-			const scene::Gameobject * gameobject = gameobjects[gameobjectIndex];
-			if (gameobject != m_editorCamera->GetGameobject()) {
-				shape::AABB aabb = gameobject->GetAABB();
+		const std::vector< scene::Entity *>  & entities = m_scene->GetEntities();
+		for (int entityIndex = 0; entityIndex < entities.size(); entityIndex++) {
+			const scene::Entity * entity = entities[entityIndex];
+			if (entity != m_editorCamera->GetEntity()) {
+				shape::AABB aabb = entity->GetAABB();
 				m_renderer->DebugAABB(aabb, Color::Red);
 			}
 		}
@@ -204,7 +204,7 @@ namespace fan {
 			const fan::Mesh* mesh = modelList[meshIndex].model->GetMesh();
 			const scene::Model * model = modelList[meshIndex].model;
 
-			const glm::mat4  modelMat = model->GetGameobject()->GetComponent<scene::Transform>()->GetModelMatrix();
+			const glm::mat4  modelMat = model->GetEntity()->GetComponent<scene::Transform>()->GetModelMatrix();
 
 			const std::vector<uint32_t> & indices = mesh->GetIndices();
 			const std::vector<vk::Vertex> & vertices = mesh->GetVertices();
@@ -228,8 +228,8 @@ namespace fan {
 			const fan::Mesh* mesh = modelList[meshIndex].model->GetMesh();
 			const scene::Model * model = modelList[meshIndex].model;
 
-			const glm::mat4  modelMat = model->GetGameobject()->GetComponent<scene::Transform>()->GetModelMatrix();
-			const glm::mat4  rotationMat = model->GetGameobject()->GetComponent<scene::Transform>()->GetRotationMat();
+			const glm::mat4  modelMat = model->GetEntity()->GetComponent<scene::Transform>()->GetModelMatrix();
+			const glm::mat4  rotationMat = model->GetEntity()->GetComponent<scene::Transform>()->GetRotationMat();
 
 			const std::vector<uint32_t> & indices = mesh->GetIndices();
 			const std::vector<vk::Vertex> & vertices = mesh->GetVertices();
@@ -247,9 +247,9 @@ namespace fan {
 	void Engine::ManageSelection() {
 		bool mouseCaptured = ImGui::GetIO().WantCaptureMouse;
 
-		// Translation gizmo on selected gameobject
-		if (m_selectedGameobject != nullptr && m_selectedGameobject != m_editorCamera->GetGameobject()) {
-			scene::Transform * transform = m_selectedGameobject->GetComponent< scene::Transform >();
+		// Translation gizmo on selected entity
+		if (m_selectedentity != nullptr && m_selectedentity != m_editorCamera->GetEntity()) {
+			scene::Transform * transform = m_selectedentity->GetComponent< scene::Transform >();
 			btVector3 newPosition;
 			if (DrawMoveGizmo(btTransform(btQuaternion(0, 0, 0), transform->GetPosition()), (size_t)this, newPosition)) {
 				transform->SetPosition(newPosition);
@@ -260,31 +260,31 @@ namespace fan {
 		// Mouse selection
 		if (mouseCaptured == false && Mouse::GetButtonPressed(Mouse::button0)) {
 
-			const btVector3 cameraOrigin = m_editorCamera->GetGameobject()->GetComponent<scene::Transform>()->GetPosition();;
+			const btVector3 cameraOrigin = m_editorCamera->GetEntity()->GetComponent<scene::Transform>()->GetPosition();;
 			const shape::Ray ray = m_editorCamera->ScreenPosToRay(Mouse::GetScreenSpacePosition());
-			const std::vector<scene::Gameobject *>  & gameobjects = m_scene->GetGameObjects();
+			const std::vector<scene::Entity *>  & entities = m_scene->GetEntities();
 
-			// Raycast on all the gameobjects
-			scene::Gameobject * closestGameobject = nullptr;
+			// Raycast on all the entities
+			scene::Entity * closestentity = nullptr;
 			float closestDistance2 = std::numeric_limits<float>::max();
-			for (int gameobjectIndex = 0; gameobjectIndex < gameobjects.size(); gameobjectIndex++) {
-				scene::Gameobject * gameobject = gameobjects[gameobjectIndex];
+			for (int entityIndex = 0; entityIndex < entities.size(); entityIndex++) {
+				scene::Entity * entity = entities[entityIndex];
 
-				if (gameobject == m_editorCamera->GetGameobject()) {
+				if (entity == m_editorCamera->GetEntity()) {
 					continue;
 				}
 
-				const shape::AABB & aabb = gameobject->GetAABB();
+				const shape::AABB & aabb = entity->GetAABB();
 				btVector3 intersection;
 				if (aabb.RayCast(ray.origin, ray.direction, intersection) == true) {
 					const float distance2 = intersection.distance2(cameraOrigin);
 					if (distance2 < closestDistance2) {
 						closestDistance2 = distance2;
-						closestGameobject = gameobject;
+						closestentity = entity;
 					}
 				}
 			}
-			SetSelectedGameobject(closestGameobject);
+			SetSelectedentity(closestentity);
 		}
 
 
@@ -317,7 +317,7 @@ namespace fan {
 		const btVector3 origin = _transform.getOrigin();
 		const btTransform rotation(_transform.getRotation());
 		const btVector3 axisDirection[3] = { btVector3(1, 0, 0), btVector3(0, 1, 0),  btVector3(0, 0, 1) };
-		const btVector3 cameraPosition = m_editorCamera->GetGameobject()->GetComponent<scene::Transform>()->GetPosition();
+		const btVector3 cameraPosition = m_editorCamera->GetEntity()->GetComponent<scene::Transform>()->GetPosition();
 		const float size = 0.2f * origin.distance(cameraPosition);
 		const btTransform coneRotation[3] = {
 		btTransform(btQuaternion(0, 0, btRadians(-90)), size*axisDirection[0])

@@ -7,20 +7,20 @@ namespace fan
 {
 	namespace scene
 	{
-		class Gameobject;
+		class Entity;
 
 		//================================================================================================================================
 		//================================================================================================================================
 		class Component : public fan::ISerializable {
 		public:
-			friend class Gameobject;
+			friend class Entity;
 
 			virtual ~Component() {}
 			virtual bool			IsActor()								const { return false; }
-			virtual bool			IsUnique()								const = 0;		// Returns true if there is only one instance of this type of component per GameObject, false otherwise
+			virtual bool			IsUnique()								const = 0;		// Returns true if there is only one instance of this type of component per entity, false otherwise
 
-			// Returns a reference on the Gameobject the component is bound to
-			inline Gameobject* GetGameobject() const { return m_gameobject; }
+			// Returns a reference on the entity the component is bound to
+			inline Entity* GetEntity() const { return m_entity; }
 			bool IsBeingDeleted() const { return m_isBeingDeleted; }
 			bool IsModified() const { return m_isModified; }
 			void SetModified(const bool _isModified);
@@ -29,13 +29,13 @@ namespace fan
 
 			DECLARE_ABSTRACT_TYPE_INFO(Component);
 		private:
-			Gameobject*  m_gameobject;
+			Entity*  m_entity;
 			bool m_isModified;
 			bool m_isBeingDeleted;
 			bool m_isRemovable;
 
 		protected:
-			// Friend class Gameobject is the factory of components
+			// Friend class entity is the factory of components
 			Component();
 			virtual void Initialize() = 0;
 			virtual void Delete() = 0;

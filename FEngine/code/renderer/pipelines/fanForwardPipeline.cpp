@@ -203,10 +203,10 @@ namespace fan
 			delete m_vertexShader;
 
 			m_fragmentShader = new Shader(m_device);
-			m_fragmentShader->Create("shaders/forward.frag");
+			m_fragmentShader->Create("code/shaders/forward.frag");
 
 			m_vertexShader = new Shader(m_device);
-			m_vertexShader->Create("shaders/forward.vert");
+			m_vertexShader->Create("code/shaders/forward.vert");
 		}
 
 		//================================================================================================================================

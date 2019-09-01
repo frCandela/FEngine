@@ -5,7 +5,7 @@
 #include "renderer/fanRessourceManager.h"
 #include "scene/components/fanModel.h"
 #include "scene/components/fanTransform.h"
-#include "scene/fanGameobject.h"
+#include "scene/fanEntity.h"
 #include "core/math/shapes/fanAABB.h"
 #include "renderer/fanMesh.h"
 #include "core/files/fanFbxImporter.h"
@@ -39,7 +39,7 @@ namespace fan
 		//================================================================================================================================
 		//================================================================================================================================
 		shape::AABB Model::ComputeAABB() const {
-			const scene::Transform * transform = GetGameobject()->GetComponent<scene::Transform>();
+			const scene::Transform * transform = GetEntity()->GetComponent<scene::Transform>();
 			const glm::mat4 modelMatrix = transform->GetModelMatrix();
 
 			const std::vector<uint32_t> & indices = m_mesh->GetIndices();
@@ -71,7 +71,7 @@ namespace fan
 		void Model::SetMesh(fan::Mesh * _mesh) {
 			m_mesh = _mesh;
 			onRegisterModel.Emmit(this);
-			GetGameobject()->onComponentModified.Emmit(this);
+			GetEntity()->onComponentModified.Emmit(this);
 		}
 
 		//================================================================================================================================

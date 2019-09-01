@@ -79,9 +79,6 @@
     <ClCompile Include="code\fanMain.cpp">
       <Filter>code</Filter>
     </ClCompile>
-    <ClCompile Include="code\scene\fanGameobject.cpp">
-      <Filter>code\scene</Filter>
-    </ClCompile>
     <ClCompile Include="code\scene\fanScene.cpp">
       <Filter>code\scene</Filter>
     </ClCompile>
@@ -247,6 +244,9 @@
     <ClCompile Include="code\fanGlobalValues.cpp">
       <Filter>code</Filter>
     </ClCompile>
+    <ClCompile Include="code\scene\fanEntity.cpp">
+      <Filter>code\scene</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="code\editor\fanMainMenuBar.h">
@@ -254,9 +254,6 @@
     </ClInclude>
     <ClInclude Include="code\fanEngine.h">
       <Filter>code</Filter>
-    </ClInclude>
-    <ClInclude Include="code\scene\fanGameobject.h">
-      <Filter>code\scene</Filter>
     </ClInclude>
     <ClInclude Include="code\scene\fanScene.h">
       <Filter>code\scene</Filter>
@@ -881,6 +878,9 @@
     </ClInclude>
     <ClInclude Include="code\fanGlobalIncludes.h">
       <Filter>code</Filter>
+    </ClInclude>
+    <ClInclude Include="code\scene\fanEntity.h">
+      <Filter>code\scene</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

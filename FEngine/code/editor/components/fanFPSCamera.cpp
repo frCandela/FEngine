@@ -2,7 +2,7 @@
 
 #include "editor/components/fanFPSCamera.h"
 #include "scene/components/fanTransform.h"
-#include "scene/fanGameobject.h"
+#include "scene/fanEntity.h"
 #include "scene/components/fanCamera.h"
 #include "core/fanSignal.h"
 #include "core/fanInput.h"
@@ -21,8 +21,8 @@ namespace fan
 			m_speed = 10.f;
 			m_speedMultiplier = 3.f;
 			m_xySensitivity = btVector2(0.005f, 0.005f);
-			m_transform = GetGameobject()->GetComponent<scene::Transform>();
-			m_camera = GetGameobject()->GetComponent<scene::Camera>();
+			m_transform = GetEntity()->GetComponent<scene::Transform>();
+			m_camera = GetEntity()->GetComponent<scene::Camera>();
 		}
 
 		//================================================================================================================================

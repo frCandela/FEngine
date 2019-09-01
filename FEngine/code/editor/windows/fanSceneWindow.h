@@ -12,7 +12,7 @@ namespace fan
 			SceneWindow();
 
 			void Draw() override;
-			void NewGameobjectModal();
+			void NewentityModal();
 
 		private:
 			std::array<char, 64> m_textBuffer;

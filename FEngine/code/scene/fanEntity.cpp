@@ -1,6 +1,6 @@
 #include "fanGlobalIncludes.h"
 
-#include "scene/fanGameobject.h"
+#include "scene/fanEntity.h"
 #include "scene/components/fanComponent.h"
 #include "scene/components/fanModel.h"
 #include "scene/components/fanTransform.h"
@@ -13,17 +13,17 @@ namespace fan
 	{
 		//================================================================================================================================
 		//================================================================================================================================
-		Gameobject::Gameobject(const std::string _name) :
+		Entity::Entity(const std::string _name) :
 			m_name(_name)
 			, m_flags(Flag::NONE)
 		{
-			onComponentModified.Connect(&Gameobject::OnComponentModified, this);
-			onComponentDeleted.Connect(&Gameobject::OnComponentDeleted, this);
+			onComponentModified.Connect(&Entity::OnComponentModified, this);
+			onComponentDeleted.Connect(&Entity::OnComponentDeleted, this);
 		}
 
 		//================================================================================================================================
 		//================================================================================================================================
-		Gameobject::~Gameobject() {
+		Entity::~Entity() {
 			for (int componentIndex = 0; componentIndex < m_components.size(); componentIndex++) {
 				m_components[componentIndex]->Delete();
 			}
@@ -35,7 +35,7 @@ namespace fan
 
 		//================================================================================================================================
 		//================================================================================================================================
-		bool Gameobject::DeleteComponent(const Component * component)
+		bool Entity::DeleteComponent(const Component * component)
 		{
 			// Find the component
 			for (int componentIndex = 0; componentIndex < m_components.size(); ++componentIndex)
@@ -55,8 +55,8 @@ namespace fan
 
 		//================================================================================================================================
 		//================================================================================================================================
-		void Gameobject::AddComponent(scene::Component * _component) {
-			_component->m_gameobject = this;
+		void Entity::AddComponent(scene::Component * _component) {
+			_component->m_entity = this;
 			_component->Initialize();
 			m_components.push_back(_component);
 			onComponentCreated.Emmit(_component);
@@ -65,7 +65,7 @@ namespace fan
 
 		//================================================================================================================================
 		//================================================================================================================================
-		void Gameobject::ComputeAABB() {
+		void Entity::ComputeAABB() {
 
 			const scene::Model * model = GetComponent< scene::Model >();
 			if (model != nullptr && model->IsBeingDeleted() == false && model->GetMesh() != nullptr && model->GetMesh()->GetIndices().size() > 0) {
@@ -80,7 +80,7 @@ namespace fan
 
 		//================================================================================================================================
 		//================================================================================================================================
-		void Gameobject::OnComponentModified(scene::Component * _component) {
+		void Entity::OnComponentModified(scene::Component * _component) {
 			if (_component->IsType<scene::Transform>() || _component->IsType<scene::Model>()) {
 				ComputeAABB();
 			}
@@ -88,7 +88,7 @@ namespace fan
 
 		//================================================================================================================================
 		//================================================================================================================================
-		void Gameobject::OnComponentDeleted(scene::Component * _component) {
+		void Entity::OnComponentDeleted(scene::Component * _component) {
 			if (_component->IsType<scene::Model>()) {
 				ComputeAABB();
 			}
@@ -96,7 +96,7 @@ namespace fan
 
 		//================================================================================================================================
 		//================================================================================================================================
-		void Gameobject::Load(std::istream& _in) {
+		void Entity::Load(std::istream& _in) {
 			std::string buffer;
 			_in >> buffer;
 			while (buffer != "end") {
@@ -117,8 +117,8 @@ namespace fan
 
 		//================================================================================================================================
 		//================================================================================================================================
-		void Gameobject::Save(std::ostream& _out) {
-			_out << "gameobject " << m_name << std::endl;
+		void Entity::Save(std::ostream& _out) {
+			_out << "entity " << m_name << std::endl;
 			for (int componentIndex = 0; componentIndex < m_components.size(); componentIndex++) {
 				_out << "\t" << m_components[componentIndex]->GetName() << " ";
 				_out << m_components[componentIndex]->GetType() << std::endl;

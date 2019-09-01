@@ -1,7 +1,7 @@
 #include "fanGlobalIncludes.h"
 
 #include "scene/components/fanComponent.h"
-#include "scene/fanGameobject.h"
+#include "scene/fanEntity.h"
 
 namespace fan
 {
@@ -12,7 +12,7 @@ namespace fan
 			//================================================================================================================================
 			//================================================================================================================================
 			Component::Component() :
-			m_gameobject(nullptr)
+			m_entity(nullptr)
 			, m_isModified(true)
 			, m_isRemovable(true)
 			, m_isBeingDeleted(false) {

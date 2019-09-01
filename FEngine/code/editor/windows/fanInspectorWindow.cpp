@@ -2,7 +2,7 @@
 
 #include "editor/windows/fanInspectorWindow.h"
 #include "fanGlobalValues.h"
-#include "scene/fanGameobject.h"
+#include "scene/fanEntity.h"
 #include "scene/components/fanComponent.h"
 #include "scene/components/fanTransform.h"
 #include "scene/components/fanCamera.h"
@@ -31,14 +31,14 @@ namespace fan
 		void InspectorWindow::Draw() {
 			if (IsVisible() == true) {
 				fan::Engine & engine = fan::Engine::GetEngine();
-				scene::Gameobject * const selection = engine.GetSelectedGameobject();
+				scene::Entity * const selection = engine.GetSelectedentity();
 
 				bool visible = IsVisible();
 				ImGui::Begin("Inspector", &visible);
 				if (selection != nullptr)
 				{
-					// Gameobject gui
-					ImGui::Text("GameObject : %s", selection->GetName().c_str());
+					// entity gui
+					ImGui::Text("entity : %s", selection->GetName().c_str());
 					int componentCount = 0;
 
 					const std::vector<scene::Component*> & components = selection->GetComponents();
@@ -78,7 +78,7 @@ namespace fan
 						// 					if (ImGui::MenuItem(data.second.path.c_str()))
 						// 					{
 						// 						//Create new Component 
-						// 						scene::Material* mat = m_pEditorApplication->GetSelectedGameobject()->GetComponent<scene::Material>();
+						// 						scene::Material* mat = m_pEditorApplication->GetSelectedentity()->GetComponent<scene::Material>();
 						// 						mat->SetTextureKey(data.first);
 						// 						ImGui::CloseCurrentPopup();
 						// 					}
@@ -106,7 +106,7 @@ namespace fan
 			if (ImGui::BeginPopup("New component"))
 			{
 				fan::Engine & engine = fan::Engine::GetEngine();
-				scene::Gameobject * const selection = engine.GetSelectedGameobject();
+				scene::Entity * const selection = engine.GetSelectedentity();
 
 				// Mesh
 				if (ImGui::MenuItem("Model")) {
@@ -133,7 +133,7 @@ namespace fan
 				/*if (ImGui::MenuItem("RigidBody"))
 				{
 					// Create new Component
-					m_pEditorApplication->GetSelectedGameobject()->AddComponent<editor::Rigidbody>();
+					m_pEditorApplication->GetSelectedentity()->AddComponent<editor::Rigidbody>();
 					ImGui::CloseCurrentPopup();
 				}*/
 

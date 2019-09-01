@@ -12,7 +12,7 @@ namespace fan
 
 		//================================================================================================================================
 		//================================================================================================================================
-		class Gameobject : public fan::ISerializable {
+		class Entity : public fan::ISerializable {
 		public:
 			enum Flag {
 				NONE = 0x00,
@@ -24,21 +24,21 @@ namespace fan
 			fan::Signal<Component*> onComponentDeleted;
 			fan::Signal<Component*> onComponentModified;
 
-			Gameobject(const std::string _name);
-			~Gameobject();
+			Entity(const std::string _name);
+			~Entity();
 
-			// Creates an instance of ComponentType, adds it to the GameObject and returns a pointer
+			// Creates an instance of ComponentType, adds it to the entity and returns a pointer
 			template<typename ComponentType>
 			ComponentType* AddComponent();
 
-			// Returns a pointer on the first instance of ComponentType in the GameObject, nullptr if none exists
+			// Returns a pointer on the first instance of ComponentType in the entity, nullptr if none exists
 			template<typename ComponentType>
 			ComponentType* GetComponent();
 
 			template<typename ComponentType>
 			std::vector<ComponentType*> GetComponents();
 
-			// Remove the component from the GameObject and deletes it
+			// Remove the component from the entity and deletes it
 			bool DeleteComponent(const Component * _component);
 
 			// Returns the component vector
@@ -53,9 +53,9 @@ namespace fan
 			void Load(std::istream& _in) override;
 			void Save(std::ostream& _out) override;
 
-			bool HasFlag(const Flag _flag) const { return m_flags & _flag; }
-			uint32_t GetFlags() const { return m_flags; }
-			void SetFlags(const uint32_t _flags) { m_flags = _flags; }
+			bool		HasFlag(const Flag _flag) const	{ return m_flags & _flag; }
+			uint32_t	GetFlags() const				{ return m_flags; }
+			void		SetFlags(const uint32_t _flags) { m_flags = _flags; }
 
 		private:
 			std::string m_name;
@@ -75,7 +75,7 @@ namespace fan
 		//================================================================================================================================
 		//================================================================================================================================
 		template<typename ComponentType>
-		ComponentType* Gameobject::AddComponent()
+		ComponentType* Entity::AddComponent()
 		{
 			// Checks if ComponentType derivates from Component
 			static_assert((std::is_base_of<Component, ComponentType>::value));
@@ -94,7 +94,7 @@ namespace fan
 		//================================================================================================================================
 		//================================================================================================================================
 		template<typename ComponentType>
-		ComponentType* Gameobject::GetComponent()
+		ComponentType* Entity::GetComponent()
 		{
 			for (int componentIndex = 0; componentIndex < m_components.size(); componentIndex++) {
 				Component* component = m_components[componentIndex];
@@ -109,7 +109,7 @@ namespace fan
 		//================================================================================================================================
 		//================================================================================================================================
 		template<typename ComponentType>
-		std::vector<ComponentType*> Gameobject::GetComponents()
+		std::vector<ComponentType*> Entity::GetComponents()
 		{
 			std::vector<ComponentType*> componentTypeVector;
 			for (int componentIndex = 0; componentIndex < m_components.size(); componentIndex++) {

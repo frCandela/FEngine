@@ -93,10 +93,10 @@ namespace fan
 		//================================================================================================================================
 		void PostprocessPipeline::CreateShaders() {
 			m_fragmentShader = new Shader(m_device);
-			m_fragmentShader->Create("shaders/postprocess.frag");
+			m_fragmentShader->Create("code/shaders/postprocess.frag");
 
 			m_vertexShader = new Shader(m_device);
-			m_vertexShader->Create("shaders/postprocess.vert");
+			m_vertexShader->Create("code/shaders/postprocess.vert");
 		}
 
 		//================================================================================================================================

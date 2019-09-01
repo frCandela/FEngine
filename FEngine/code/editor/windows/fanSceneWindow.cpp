@@ -3,7 +3,7 @@
 #include "editor/windows/fanSceneWindow.h"
 #include "renderer/fanRenderer.h"
 #include "scene/fanScene.h"
-#include "scene/fanGameobject.h"
+#include "scene/fanEntity.h"
 #include "scene/components/fanTransform.h"
 #include "core/fanInput.h"
 
@@ -16,7 +16,7 @@ namespace fan
 		//================================================================================================================================
 		//================================================================================================================================
 		SceneWindow::SceneWindow() :
-			m_textBuffer({ "new_gameobject" }) {
+			m_textBuffer({ "new_entity" }) {
 
 		}
 
@@ -30,38 +30,38 @@ namespace fan
 				bool isVisible = IsVisible();
 				if (ImGui::Begin("Scene", &isVisible)) {
 
-					bool newGameobject = false;
-					if (ImGui::BeginPopupContextWindow("PopupContextWindowNewGameobject"))
+					bool newentity = false;
+					if (ImGui::BeginPopupContextWindow("PopupContextWindowNewentity"))
 					{
-						if (ImGui::Selectable("New Gameobject")) {
-							newGameobject = true;
+						if (ImGui::Selectable("New entity")) {
+							newentity = true;
 						}
 						ImGui::EndPopup();
 					}
-					if (newGameobject) {
-						ImGui::OpenPopup("New Gameobject");
-					} NewGameobjectModal();
+					if (newentity) {
+						ImGui::OpenPopup("New entity");
+					} NewentityModal();
 
 					ImGui::Text(scene.GetName().c_str());
 					ImGui::Separator();
 
-					// Show gameobjects tree
+					// Show entities tree
 					bool popupOneTime = true;
-					const std::vector< scene::Gameobject * > & gameobjects = scene.GetGameObjects();
-					for (int gameobjectIndex = 0; gameobjectIndex < gameobjects.size(); gameobjectIndex++)
+					const std::vector< scene::Entity * > & entities = scene.GetEntities();
+					for (int entityIndex = 0; entityIndex < entities.size(); entityIndex++)
 					{
-						scene::Gameobject * gameobject = gameobjects[gameobjectIndex];
+						scene::Entity * entity = entities[entityIndex];
 
-						ImGuiTreeNodeFlags node_flags = ImGuiTreeNodeFlags_Leaf | (gameobject == engine.GetSelectedGameobject() ? ImGuiTreeNodeFlags_Selected : 0);
-						bool nodeOpen = ImGui::TreeNodeEx(gameobject->GetName().c_str(), node_flags);
+						ImGuiTreeNodeFlags node_flags = ImGuiTreeNodeFlags_Leaf | (entity == engine.GetSelectedentity() ? ImGuiTreeNodeFlags_Selected : 0);
+						bool nodeOpen = ImGui::TreeNodeEx(entity->GetName().c_str(), node_flags);
 						if (ImGui::IsItemClicked()) {
-							engine.SetSelectedGameobject(gameobject);
+							engine.SetSelectedentity(entity);
 						}
 
 						if (popupOneTime && ImGui::BeginPopupContextItem(scene.GetName().c_str()))
 						{
-							if (gameobject->HasFlag(scene::Gameobject::NO_DELETE) == false && ImGui::Selectable("Delete")) {
-								scene.DeleteGameobject(gameobject);
+							if (entity->HasFlag(scene::Entity::NO_DELETE) == false && ImGui::Selectable("Delete")) {
+								scene.DeleteEntity(entity);
 							}
 							ImGui::EndPopup();
 							popupOneTime = false;
@@ -77,13 +77,13 @@ namespace fan
 			}
 		}
 
-		void SceneWindow::NewGameobjectModal()
+		void SceneWindow::NewentityModal()
 		{
 			fan::Engine & engine = fan::Engine::GetEngine();
 			scene::Scene & scene = engine.GetScene();
 
 			ImGui::SetNextWindowSize(ImVec2(200, 200));
-			if (ImGui::BeginPopupModal("New Gameobject"))
+			if (ImGui::BeginPopupModal("New entity"))
 			{
 				ImGui::InputText("Name ", m_textBuffer.data(), m_textBuffer.size());
 				if (ImGui::Button("Cancel"))
@@ -91,10 +91,10 @@ namespace fan
 				ImGui::SameLine();
 				if (ImGui::Button("Ok") || Keyboard::IsKeyPressed(GLFW_KEY_ENTER))
 				{
-					//Create new gameobject 
-					scene::Gameobject* newGameobject = scene.CreateGameobject(m_textBuffer.data());
-					newGameobject->AddComponent<scene::Transform>();
-					engine.SetSelectedGameobject(newGameobject);
+					//Create new entity 
+					scene::Entity* newentity = scene.CreateEntity(m_textBuffer.data());
+					newentity->AddComponent<scene::Transform>();
+					engine.SetSelectedentity(newentity);
 					ImGui::CloseCurrentPopup();
 				}
 				ImGui::EndPopup();

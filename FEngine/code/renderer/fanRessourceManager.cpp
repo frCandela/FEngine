@@ -7,7 +7,7 @@
 #include "renderer/core/fanBuffer.h"
 #include "renderer/fanMesh.h"
 #include "core/fanSignal.h"
-#include "scene/fanGameobject.h"
+#include "scene/fanEntity.h"
 
 
 namespace fan
