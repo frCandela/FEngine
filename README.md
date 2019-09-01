@@ -1,8 +1,24 @@
 # FEngine
-FEngine is my 3D game engine on which i plan to make some cool games in the future.
-It uses vulkan for its rendering engine, Dear ImGui for all its user interface and a lot of other open libraries. 
+FEngine is my 3D game engine. I will certainly make cool games with it in the future.
+It uses Vulkan for Rendering, Dear ImGui for user interface and a lot of other open libraries for various purposes.
 
-##Dependencies : 	
+## Features (non exhaustive list): 
+* Scene management
+ * Scene Editor
+ * Entity/Component system
+ * Save/Load
+ * Various component ( transform, mesh, material, actors etc.)
+* Rendering with vulkan
+ * Mesh display
+ * Simple phong illumination
+ * Postprocessing
+ * Debug lines/shapes
+ * Shader runtime compilation
+* Other
+ * Simple FBX mesh import
+ * png textures import
+
+## Dependencies : 	
 * 3D Models IO : [FBX SDK 2019.0](https://www.autodesk.com/developer-network/platform-technologies/fbx-sdk-2019-0)	
 * Serialization : [nlohmann json](https://github.com/nlohmann/json)
 * png images : [stb_image](https://github.com/nothings/stb)
@@ -13,5 +29,5 @@ It uses vulkan for its rendering engine, Dear ImGui for all its user interface a
 * UI: [Dear ImGui <3](https://github.com/ocornut/imgui)
 * rendering : [VulkanSDK 1.1.106.0](https://vulkan.lunarg.com/sdk/home)
 	
-##Screenshots
+## Screenshots
 ![Editor preview](/FEngine/docs/screenshot.png)
