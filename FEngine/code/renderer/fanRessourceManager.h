@@ -38,8 +38,6 @@ namespace fan
 			const std::vector< vk::Texture * > &	GetTextures() const { return m_textures; }
 			std::vector< vk::Texture * > &			GetTextures() { return m_textures; }
 
-			static const char * s_defaultTexture;
-
 		private:
 			vk::Device & m_device;
 

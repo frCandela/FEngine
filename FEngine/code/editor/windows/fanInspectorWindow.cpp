@@ -1,6 +1,7 @@
-#include "fanIncludes.h"
+#include "fanGlobalIncludes.h"
 
 #include "editor/windows/fanInspectorWindow.h"
+#include "fanGlobalValues.h"
 #include "scene/fanGameobject.h"
 #include "scene/components/fanComponent.h"
 #include "scene/components/fanTransform.h"
@@ -257,7 +258,7 @@ namespace fan
 				m_pathBuffer = "content/models";
 			}
 
-			if (gui::LoadFileModal("set_path", { ".fbx" }, m_pathBuffer)) {
+			if (gui::LoadFileModal("set_path", GlobalValues::s_meshExtensions, m_pathBuffer)) {
 
 				vk::RessourceManager * ressourceManager = Renderer::GetRenderer().GetRessourceManager();
 				fan::Mesh * mesh = ressourceManager->FindMesh(m_pathBuffer.string().c_str());
@@ -327,7 +328,7 @@ namespace fan
 				m_pathBuffer = "content/models";
 			}
 
-			if (gui::LoadFileModal("set_path_texture", { ".png" }, m_pathBuffer)) {
+			if (gui::LoadFileModal("set_path_texture", GlobalValues::s_imagesExtensions, m_pathBuffer)) {
 				vk::RessourceManager * texturesManager = Renderer::GetRenderer().GetRessourceManager();
 				vk::Texture * texture = texturesManager->FindTexture(m_pathBuffer.string());
 				if (texture == nullptr) {

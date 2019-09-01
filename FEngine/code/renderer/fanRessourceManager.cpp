@@ -1,6 +1,7 @@
-#include "fanIncludes.h"
+#include "fanGlobalIncludes.h"
 
 #include "renderer/fanRessourceManager.h"
+#include "fanGlobalValues.h"
 #include "renderer/fanRenderer.h"
 #include "renderer/core/fanTexture.h"
 #include "renderer/core/fanBuffer.h"
@@ -12,7 +13,6 @@
 namespace fan
 {
 	namespace vk {
-		const char * RessourceManager::s_defaultTexture = "content/_default/texture.png";
 		fan::Signal<> RessourceManager::onTextureLoaded;
 
 		//================================================================================================================================
@@ -21,7 +21,7 @@ namespace fan
 			m_device(_device) {
 			m_textures.reserve(64);
 
-			LoadTexture(s_defaultTexture);
+			LoadTexture(GlobalValues::s_defaultTexturePath);
 		}
 
 		//================================================================================================================================

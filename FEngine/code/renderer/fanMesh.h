@@ -20,8 +20,6 @@ namespace fan {
 
 		void Load() override;
 
-		static const char * defaultMeshPath;
-
 		DECLARE_TYPE_INFO(Mesh)
 	private:
 

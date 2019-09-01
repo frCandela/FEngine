@@ -1,6 +1,7 @@
-#include "fanIncludes.h"
+#include "fanGlobalIncludes.h"
 
 #include "editor/fanMainMenuBar.h"
+#include "fanGlobalValues.h"
 #include "editor/windows/fanRenderWindow.h"
 #include "editor/windows/fanSceneWindow.h"
 #include "editor/windows/fanInspectorWindow.h"
@@ -25,7 +26,7 @@ namespace fan
 			, m_showAABB(false)
 			, m_showWireframe(false)
 			, m_showNormals(false)
-			, m_sceneExtensionFilter({ ".scene" }) {
+			, m_sceneExtensionFilter(GlobalValues::s_sceneExtensions) {
 		}
 
 		//================================================================================================================================
@@ -200,7 +201,7 @@ namespace fan
 			fan::Engine &	engine = fan::Engine::GetEngine();
 
 			// New scene
-			if (gui::SaveFileModal("New scene", { ".scene" }, m_pathBuffer, m_extensionIndexBuffer)) {
+			if (gui::SaveFileModal("New scene", GlobalValues::s_sceneExtensions, m_pathBuffer, m_extensionIndexBuffer)) {
 				scene::Scene & scene = engine.GetScene();
 				scene.New();
 				scene.SetPath(m_pathBuffer.string());
@@ -213,7 +214,7 @@ namespace fan
 			}
 
 			// Save scene
-			if (gui::SaveFileModal("Save scene", { ".scene" }, m_pathBuffer, m_extensionIndexBuffer)) {
+			if (gui::SaveFileModal("Save scene", GlobalValues::s_sceneExtensions, m_pathBuffer, m_extensionIndexBuffer)) {
 				engine.GetScene().SetPath(m_pathBuffer.string());
 				engine.GetScene().Save();
 			}

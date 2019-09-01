@@ -1,4 +1,4 @@
-#include "fanIncludes.h"
+#include "fanGlobalIncludes.h"
 
 #include "editor/components/fanFPSCamera.h"
 #include "scene/components/fanTransform.h"

@@ -1,6 +1,7 @@
-#include "fanIncludes.h"
+#include "fanGlobalIncludes.h"
 
 #include "fanEngine.h"
+#include "fanGlobalValues.h"
 #include "renderer/fanRenderer.h"
 #include "renderer/pipelines/fanForwardPipeline.h"
 #include "renderer/pipelines/fanDebugPipeline.h"
@@ -79,7 +80,7 @@ namespace fan {
 
 		m_mainMenuBar->Initialize();
 
-		fan::Mesh * defaultMesh = m_renderer->GetRessourceManager()->LoadMesh(fan::Mesh::defaultMeshPath);
+		fan::Mesh * defaultMesh = m_renderer->GetRessourceManager()->LoadMesh(GlobalValues::s_defaultMeshPath);
 		m_renderer->GetRessourceManager()->SetDefaultMesh( defaultMesh );
 	}
 

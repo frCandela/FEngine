@@ -1,4 +1,4 @@
-#include "fanIncludes.h"
+#include "fanGlobalIncludes.h"
 
 #include "editor/windows/fanSceneWindow.h"
 #include "renderer/fanRenderer.h"

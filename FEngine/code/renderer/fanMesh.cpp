@@ -1,11 +1,10 @@
-#include "fanIncludes.h"
+#include "fanGlobalIncludes.h"
 
 #include "renderer/fanMesh.h"
 #include "core/files/fanFbxImporter.h"
 
 namespace fan {
 	REGISTER_TYPE_INFO(Mesh)
-	const char * Mesh::defaultMeshPath = "content/_default/mesh.fbx";
 
 	//================================================================================================================================
 	//================================================================================================================================

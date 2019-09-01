@@ -112,6 +112,7 @@
     <ClCompile Include="code\editor\windows\fanSceneWindow.cpp" />
     <ClCompile Include="code\editor\windows\fanEditorWindow.cpp" />
     <ClCompile Include="code\fanEngine.cpp" />
+    <ClCompile Include="code\fanGlobalValues.cpp" />
     <ClCompile Include="code\fanMain.cpp" />
     <ClCompile Include="code\renderer\core\fanBuffer.cpp" />
     <ClCompile Include="code\renderer\core\fanDevice.cpp" />
@@ -179,9 +180,10 @@
     <ClInclude Include="code\editor\windows\fanRenderWindow.h" />
     <ClInclude Include="code\editor\windows\fanSceneWindow.h" />
     <ClInclude Include="code\editor\windows\fanEditorWindow.h" />
+    <ClInclude Include="code\fanGlobalValues.h" />
     <ClInclude Include="code\fanEngine.h" />
     <ClInclude Include="code\fanGlobalUsing.h" />
-    <ClInclude Include="code\fanIncludes.h" />
+    <ClInclude Include="code\fanGlobalIncludes.h" />
     <ClInclude Include="code\renderer\core\fanBuffer.h" />
     <ClInclude Include="code\renderer\core\fanDevice.h" />
     <ClInclude Include="code\renderer\core\fanFrameBuffer.h" />

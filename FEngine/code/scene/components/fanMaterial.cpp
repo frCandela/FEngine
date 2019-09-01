@@ -1,4 +1,4 @@
-#include "fanIncludes.h"
+#include "fanGlobalIncludes.h"
 
 #include "scene/fanGameobject.h"
 #include "scene/components/fanMaterial.h"
