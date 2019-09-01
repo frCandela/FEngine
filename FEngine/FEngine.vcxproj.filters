@@ -1,9 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <Filter Include="shaders">
-      <UniqueIdentifier>{422395bb-fb27-4fb8-82d2-d4c0e4a81912}</UniqueIdentifier>
-    </Filter>
     <Filter Include="code">
       <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
       <Extensions>h;hh;hpp;hxx;hm;inl;inc;xsd</Extensions>
@@ -59,6 +56,9 @@
     <Filter Include="code\renderer\util">
       <UniqueIdentifier>{4ff53cec-cd38-4426-be53-be2ed26a9884}</UniqueIdentifier>
     </Filter>
+    <Filter Include="code\shaders">
+      <UniqueIdentifier>{422395bb-fb27-4fb8-82d2-d4c0e4a81912}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="deps\imgui\imgui.cpp">
@@ -104,9 +104,6 @@
       <Filter>code\editor\windows</Filter>
     </ClCompile>
     <ClCompile Include="code\editor\windows\fanSceneWindow.cpp">
-      <Filter>code\editor\windows</Filter>
-    </ClCompile>
-    <ClCompile Include="code\editor\windows\fanWindow.cpp">
       <Filter>code\editor\windows</Filter>
     </ClCompile>
     <ClCompile Include="code\editor\windows\fanInspectorWindow.cpp">
@@ -166,9 +163,6 @@
     <ClCompile Include="code\core\ressources\fanRessource.cpp">
       <Filter>code\core\ressources</Filter>
     </ClCompile>
-    <ClCompile Include="code\core\ressources\fanMesh.cpp">
-      <Filter>code\core\ressources</Filter>
-    </ClCompile>
     <ClCompile Include="code\scene\components\fanModel.cpp">
       <Filter>code\scene\components</Filter>
     </ClCompile>
@@ -184,65 +178,71 @@
     <ClCompile Include="code\scene\components\fanMaterial.cpp">
       <Filter>code\scene\components</Filter>
     </ClCompile>
-    <ClCompile Include="code\renderer\vkRenderer.cpp">
-      <Filter>code\renderer</Filter>
-    </ClCompile>
-    <ClCompile Include="code\renderer\util\vkVertex.cpp">
-      <Filter>code\renderer\util</Filter>
-    </ClCompile>
-    <ClCompile Include="code\renderer\util\vkWindow.cpp">
-      <Filter>code\renderer\util</Filter>
-    </ClCompile>
-    <ClCompile Include="code\renderer\util\vkColor.cpp">
-      <Filter>code\renderer\util</Filter>
-    </ClCompile>
-    <ClCompile Include="code\renderer\util\vkSpirvCompiler.cpp">
-      <Filter>code\renderer\util</Filter>
-    </ClCompile>
-    <ClCompile Include="code\renderer\pipelines\vkImguiPipeline.cpp">
-      <Filter>code\renderer\pipelines</Filter>
-    </ClCompile>
-    <ClCompile Include="code\renderer\pipelines\vkPostprocessPipeline.cpp">
-      <Filter>code\renderer\pipelines</Filter>
-    </ClCompile>
-    <ClCompile Include="code\renderer\pipelines\vkDebugPipeline.cpp">
-      <Filter>code\renderer\pipelines</Filter>
-    </ClCompile>
-    <ClCompile Include="code\renderer\pipelines\vkForwardPipeline.cpp">
-      <Filter>code\renderer\pipelines</Filter>
-    </ClCompile>
-    <ClCompile Include="code\renderer\core\vkImage.cpp">
-      <Filter>code\renderer\core</Filter>
-    </ClCompile>
-    <ClCompile Include="code\renderer\core\vkImageView.cpp">
-      <Filter>code\renderer\core</Filter>
-    </ClCompile>
-    <ClCompile Include="code\renderer\core\vkInstance.cpp">
-      <Filter>code\renderer\core</Filter>
-    </ClCompile>
-    <ClCompile Include="code\renderer\core\vkSampler.cpp">
-      <Filter>code\renderer\core</Filter>
-    </ClCompile>
-    <ClCompile Include="code\renderer\core\vkShader.cpp">
-      <Filter>code\renderer\core</Filter>
-    </ClCompile>
-    <ClCompile Include="code\renderer\core\vkSwapChain.cpp">
-      <Filter>code\renderer\core</Filter>
-    </ClCompile>
-    <ClCompile Include="code\renderer\core\vkTexture.cpp">
-      <Filter>code\renderer\core</Filter>
-    </ClCompile>
-    <ClCompile Include="code\renderer\core\vkBuffer.cpp">
-      <Filter>code\renderer\core</Filter>
-    </ClCompile>
-    <ClCompile Include="code\renderer\core\vkDevice.cpp">
-      <Filter>code\renderer\core</Filter>
-    </ClCompile>
-    <ClCompile Include="code\renderer\core\vkFramebuffer.cpp">
-      <Filter>code\renderer\core</Filter>
-    </ClCompile>
     <ClCompile Include="code\renderer\fanRessourceManager.cpp">
       <Filter>code\renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="code\renderer\fanMesh.cpp">
+      <Filter>code\renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="code\renderer\fanRenderer.cpp">
+      <Filter>code\renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="code\renderer\util\fanSpirvCompiler.cpp">
+      <Filter>code\renderer\util</Filter>
+    </ClCompile>
+    <ClCompile Include="code\renderer\util\fanVertex.cpp">
+      <Filter>code\renderer\util</Filter>
+    </ClCompile>
+    <ClCompile Include="code\renderer\util\fanWindow.cpp">
+      <Filter>code\renderer\util</Filter>
+    </ClCompile>
+    <ClCompile Include="code\renderer\util\fanColor.cpp">
+      <Filter>code\renderer\util</Filter>
+    </ClCompile>
+    <ClCompile Include="code\renderer\pipelines\fanImguiPipeline.cpp">
+      <Filter>code\renderer\pipelines</Filter>
+    </ClCompile>
+    <ClCompile Include="code\renderer\pipelines\fanPostprocessPipeline.cpp">
+      <Filter>code\renderer\pipelines</Filter>
+    </ClCompile>
+    <ClCompile Include="code\renderer\pipelines\fanDebugPipeline.cpp">
+      <Filter>code\renderer\pipelines</Filter>
+    </ClCompile>
+    <ClCompile Include="code\renderer\pipelines\fanForwardPipeline.cpp">
+      <Filter>code\renderer\pipelines</Filter>
+    </ClCompile>
+    <ClCompile Include="code\renderer\core\fanFramebuffer.cpp">
+      <Filter>code\renderer\core</Filter>
+    </ClCompile>
+    <ClCompile Include="code\renderer\core\fanImage.cpp">
+      <Filter>code\renderer\core</Filter>
+    </ClCompile>
+    <ClCompile Include="code\renderer\core\fanImageView.cpp">
+      <Filter>code\renderer\core</Filter>
+    </ClCompile>
+    <ClCompile Include="code\renderer\core\fanInstance.cpp">
+      <Filter>code\renderer\core</Filter>
+    </ClCompile>
+    <ClCompile Include="code\renderer\core\fanSampler.cpp">
+      <Filter>code\renderer\core</Filter>
+    </ClCompile>
+    <ClCompile Include="code\renderer\core\fanShader.cpp">
+      <Filter>code\renderer\core</Filter>
+    </ClCompile>
+    <ClCompile Include="code\renderer\core\fanSwapChain.cpp">
+      <Filter>code\renderer\core</Filter>
+    </ClCompile>
+    <ClCompile Include="code\renderer\core\fanTexture.cpp">
+      <Filter>code\renderer\core</Filter>
+    </ClCompile>
+    <ClCompile Include="code\renderer\core\fanBuffer.cpp">
+      <Filter>code\renderer\core</Filter>
+    </ClCompile>
+    <ClCompile Include="code\renderer\core\fanDevice.cpp">
+      <Filter>code\renderer\core</Filter>
+    </ClCompile>
+    <ClCompile Include="code\editor\windows\fanEditorWindow.cpp">
+      <Filter>code\editor\windows</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -280,9 +280,6 @@
       <Filter>code\editor\windows</Filter>
     </ClInclude>
     <ClInclude Include="code\editor\windows\fanSceneWindow.h">
-      <Filter>code\editor\windows</Filter>
-    </ClInclude>
-    <ClInclude Include="code\editor\windows\fanWindow.h">
       <Filter>code\editor\windows</Filter>
     </ClInclude>
     <ClInclude Include="code\editor\windows\fanInspectorWindow.h">
@@ -792,9 +789,6 @@
     <ClInclude Include="code\core\ressources\fanRessource.h">
       <Filter>code\core\ressources</Filter>
     </ClInclude>
-    <ClInclude Include="code\core\ressources\fanMesh.h">
-      <Filter>code\core\ressources</Filter>
-    </ClInclude>
     <ClInclude Include="code\scene\components\fanModel.h">
       <Filter>code\scene\components</Filter>
     </ClInclude>
@@ -813,101 +807,115 @@
     <ClInclude Include="code\scene\components\fanMaterial.h">
       <Filter>code\scene\components</Filter>
     </ClInclude>
-    <ClInclude Include="code\renderer\vkRenderer.h">
-      <Filter>code\renderer</Filter>
-    </ClInclude>
-    <ClInclude Include="code\renderer\util\vkSpirvCompiler.h">
-      <Filter>code\renderer\util</Filter>
-    </ClInclude>
-    <ClInclude Include="code\renderer\util\vkVertex.h">
-      <Filter>code\renderer\util</Filter>
-    </ClInclude>
-    <ClInclude Include="code\renderer\util\vkWindow.h">
-      <Filter>code\renderer\util</Filter>
-    </ClInclude>
-    <ClInclude Include="code\renderer\util\vkColor.h">
-      <Filter>code\renderer\util</Filter>
-    </ClInclude>
-    <ClInclude Include="code\renderer\util\vkShape.h">
-      <Filter>code\renderer\util</Filter>
-    </ClInclude>
-    <ClInclude Include="code\renderer\pipelines\vkForwardPipeline.h">
-      <Filter>code\renderer\pipelines</Filter>
-    </ClInclude>
-    <ClInclude Include="code\renderer\pipelines\vkImguiPipeline.h">
-      <Filter>code\renderer\pipelines</Filter>
-    </ClInclude>
-    <ClInclude Include="code\renderer\pipelines\vkPostprocessPipeline.h">
-      <Filter>code\renderer\pipelines</Filter>
-    </ClInclude>
-    <ClInclude Include="code\renderer\pipelines\vkDebugPipeline.h">
-      <Filter>code\renderer\pipelines</Filter>
-    </ClInclude>
-    <ClInclude Include="code\renderer\core\vkImage.h">
-      <Filter>code\renderer\core</Filter>
-    </ClInclude>
-    <ClInclude Include="code\renderer\core\vkImageView.h">
-      <Filter>code\renderer\core</Filter>
-    </ClInclude>
-    <ClInclude Include="code\renderer\core\vkInstance.h">
-      <Filter>code\renderer\core</Filter>
-    </ClInclude>
-    <ClInclude Include="code\renderer\core\vkSampler.h">
-      <Filter>code\renderer\core</Filter>
-    </ClInclude>
-    <ClInclude Include="code\renderer\core\vkShader.h">
-      <Filter>code\renderer\core</Filter>
-    </ClInclude>
-    <ClInclude Include="code\renderer\core\vkSwapChain.h">
-      <Filter>code\renderer\core</Filter>
-    </ClInclude>
-    <ClInclude Include="code\renderer\core\vkTexture.h">
-      <Filter>code\renderer\core</Filter>
-    </ClInclude>
-    <ClInclude Include="code\renderer\core\vkBuffer.h">
-      <Filter>code\renderer\core</Filter>
-    </ClInclude>
-    <ClInclude Include="code\renderer\core\vkDevice.h">
-      <Filter>code\renderer\core</Filter>
-    </ClInclude>
-    <ClInclude Include="code\renderer\core\vkFrameBuffer.h">
-      <Filter>code\renderer\core</Filter>
-    </ClInclude>
     <ClInclude Include="code\renderer\fanRessourceManager.h">
       <Filter>code\renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="code\renderer\fanMesh.h">
+      <Filter>code\renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="code\core\math\fanBasicModels.h">
+      <Filter>code\core\math</Filter>
+    </ClInclude>
+    <ClInclude Include="code\renderer\fanRenderer.h">
+      <Filter>code\renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="code\renderer\util\fanColor.h">
+      <Filter>code\renderer\util</Filter>
+    </ClInclude>
+    <ClInclude Include="code\renderer\util\fanSpirvCompiler.h">
+      <Filter>code\renderer\util</Filter>
+    </ClInclude>
+    <ClInclude Include="code\renderer\util\fanVertex.h">
+      <Filter>code\renderer\util</Filter>
+    </ClInclude>
+    <ClInclude Include="code\renderer\util\fanWindow.h">
+      <Filter>code\renderer\util</Filter>
+    </ClInclude>
+    <ClInclude Include="code\renderer\pipelines\fanForwardPipeline.h">
+      <Filter>code\renderer\pipelines</Filter>
+    </ClInclude>
+    <ClInclude Include="code\renderer\pipelines\fanImguiPipeline.h">
+      <Filter>code\renderer\pipelines</Filter>
+    </ClInclude>
+    <ClInclude Include="code\renderer\pipelines\fanPostprocessPipeline.h">
+      <Filter>code\renderer\pipelines</Filter>
+    </ClInclude>
+    <ClInclude Include="code\renderer\pipelines\fanDebugPipeline.h">
+      <Filter>code\renderer\pipelines</Filter>
+    </ClInclude>
+    <ClInclude Include="code\renderer\core\fanDevice.h">
+      <Filter>code\renderer\core</Filter>
+    </ClInclude>
+    <ClInclude Include="code\renderer\core\fanFrameBuffer.h">
+      <Filter>code\renderer\core</Filter>
+    </ClInclude>
+    <ClInclude Include="code\renderer\core\fanImage.h">
+      <Filter>code\renderer\core</Filter>
+    </ClInclude>
+    <ClInclude Include="code\renderer\core\fanImageView.h">
+      <Filter>code\renderer\core</Filter>
+    </ClInclude>
+    <ClInclude Include="code\renderer\core\fanInstance.h">
+      <Filter>code\renderer\core</Filter>
+    </ClInclude>
+    <ClInclude Include="code\renderer\core\fanSampler.h">
+      <Filter>code\renderer\core</Filter>
+    </ClInclude>
+    <ClInclude Include="code\renderer\core\fanShader.h">
+      <Filter>code\renderer\core</Filter>
+    </ClInclude>
+    <ClInclude Include="code\renderer\core\fanSwapChain.h">
+      <Filter>code\renderer\core</Filter>
+    </ClInclude>
+    <ClInclude Include="code\renderer\core\fanTexture.h">
+      <Filter>code\renderer\core</Filter>
+    </ClInclude>
+    <ClInclude Include="code\renderer\core\fanBuffer.h">
+      <Filter>code\renderer\core</Filter>
+    </ClInclude>
+    <ClInclude Include="code\editor\windows\fanEditorWindow.h">
+      <Filter>code\editor\windows</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="shaders\forward.frag">
-      <Filter>shaders</Filter>
+      <Filter>code\shaders</Filter>
     </None>
     <None Include="shaders\forward.vert">
-      <Filter>shaders</Filter>
+      <Filter>code\shaders</Filter>
     </None>
     <None Include="shaders\imgui.frag">
-      <Filter>shaders</Filter>
+      <Filter>code\shaders</Filter>
     </None>
     <None Include="shaders\imgui.vert">
-      <Filter>shaders</Filter>
+      <Filter>code\shaders</Filter>
     </None>
     <None Include="shaders\postprocess.frag">
-      <Filter>shaders</Filter>
+      <Filter>code\shaders</Filter>
     </None>
     <None Include="shaders\postprocess.vert">
-      <Filter>shaders</Filter>
+      <Filter>code\shaders</Filter>
     </None>
     <None Include="shaders\empty.frag">
-      <Filter>shaders</Filter>
+      <Filter>code\shaders</Filter>
     </None>
     <None Include="shaders\empty.vert">
-      <Filter>shaders</Filter>
+      <Filter>code\shaders</Filter>
     </None>
-    <None Include="shaders\debugTriangles.frag" />
-    <None Include="shaders\debugTriangles.vert" />
-    <None Include="shaders\debugLines.frag" />
-    <None Include="shaders\debugLines.vert" />
-    <None Include="code\renderer\util\vkShape.inl">
-      <Filter>code\renderer\util</Filter>
+    <None Include="code\core\math\fanBasicModels.inl">
+      <Filter>code\core\math</Filter>
+    </None>
+    <None Include="shaders\debugTriangles.vert">
+      <Filter>code\shaders</Filter>
+    </None>
+    <None Include="shaders\debugLines.frag">
+      <Filter>code\shaders</Filter>
+    </None>
+    <None Include="shaders\debugLines.vert">
+      <Filter>code\shaders</Filter>
+    </None>
+    <None Include="shaders\debugTriangles.frag">
+      <Filter>code\shaders</Filter>
     </None>
   </ItemGroup>
 </Project>

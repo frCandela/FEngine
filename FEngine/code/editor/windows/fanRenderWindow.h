@@ -1,12 +1,17 @@
 #pragma once
 
-#include "editor/windows/fanWindow.h"
+#include "editor/windows/fanEditorWindow.h"
 
-namespace editor {
-	class RenderWindow : public Window {
-	public:
-		RenderWindow();
+namespace fan
+{
+	namespace editor {
+		//================================================================================================================================
+		//================================================================================================================================
+		class RenderWindow : public Window {
+		public:
+			RenderWindow();
 
-		void Draw() override;
-	};
+			void Draw() override;
+		};
+	}
 }

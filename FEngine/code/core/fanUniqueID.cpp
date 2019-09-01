@@ -2,7 +2,7 @@
 
 #include "core/fanUniqueID.h"
 
-namespace util {
+namespace fan {
 	size_t UniqueIdBase::m_globalId = 0;
 
 	//================================================================================================================================

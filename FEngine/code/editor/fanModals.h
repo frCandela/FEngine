@@ -8,24 +8,27 @@ namespace std {
 	}
 }
 
-namespace util {
-	class Imgui {
+namespace fan
+{
+	//================================================================================================================================
+	//================================================================================================================================
+	class gui {
 	public:
 		static const int colorEditFlags;
 
 		static void ShowHelpMarker(const char* _desc);
 
-		static bool SaveFileModal( 
-			const char * _popupName,	
+		static bool SaveFileModal(
+			const char * _popupName,
 			const std::set<std::string>& _extensionWhiteList,
 			std::fs::path & _currentPath,
 			int & _extensionIndex
-			);		
+		);
 
 		static bool LoadFileModal(
-			const char * _popupName, 
+			const char * _popupName,
 			const std::set<std::string>& _extensionWhiteList,
-			std::fs::path & _path			
+			std::fs::path & _path
 		);
 
 	private:

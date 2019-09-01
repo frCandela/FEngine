@@ -1,16 +1,21 @@
 #pragma once
 
-#include "editor/windows/fanWindow.h"
+#include "editor/windows/fanEditorWindow.h"
 
-namespace editor {
-	class SceneWindow : public Window {
-	public:
-		SceneWindow();
+namespace fan
+{
+	namespace editor {
+		//================================================================================================================================
+		//================================================================================================================================
+		class SceneWindow : public Window {
+		public:
+			SceneWindow();
 
-		void Draw() override;
-		void NewGameobjectModal();
+			void Draw() override;
+			void NewGameobjectModal();
 
-	private:
-		std::array<char, 64> m_textBuffer;
-	};
+		private:
+			std::array<char, 64> m_textBuffer;
+		};
+	}
 }

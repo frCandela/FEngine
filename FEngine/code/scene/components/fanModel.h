@@ -1,43 +1,47 @@
 #pragma once
 
 #include "scene/components/fanComponent.h"
-#include "core/ressources/fanMesh.h"
+#include "renderer/fanMesh.h"
 #include "core/ressources/fanRessourcePtr.h"
 
-namespace shape {class AABB;}
-namespace ressource { class Mesh;  }
-
-namespace scene
+namespace fan
 {
-	class Gameobject;
-
-	class Model : public Component
+	class Mesh;
+	namespace shape { class AABB; }
+	namespace scene
 	{
-	public:
-		static util::Signal< Model * > onRegisterModel;
-		static util::Signal< Model * > onUnRegisterModel;
+		class Gameobject;
 
-		Model();
+		//================================================================================================================================
+		//================================================================================================================================
+		class Model : public Component
+		{
+		public:
+			static fan::Signal< Model * > onRegisterModel;
+			static fan::Signal< Model * > onUnRegisterModel;
 
-		shape::AABB ComputeAABB() const;
-		bool		IsUnique()	const override { return true; }
+			Model();
 
-		// ISerializable
-		void					Load(std::istream& _in) override;
-		void					Save(std::ostream& _out) override;
-		void					SetMesh(ressource::Mesh * _mesh);
-		ressource::Mesh *		GetMesh() { return m_mesh; }
-		const ressource::Mesh *	GetMesh() const  { return m_mesh; }
+			shape::AABB ComputeAABB() const;
+			bool		IsUnique()	const override { return true; }
 
-		int		GetRenderID() const					{ return m_renderID; }
-		void	SetRenderID(const int _renderID)	{ m_renderID = _renderID; }
+			// ISerializable
+			void					Load(std::istream& _in) override;
+			void					Save(std::ostream& _out) override;
+			void					SetMesh(fan::Mesh * _mesh);
+			fan::Mesh *		GetMesh() { return m_mesh; }
+			const fan::Mesh *	GetMesh() const { return m_mesh; }
 
-		DECLARE_TYPE_INFO(Model);
-	private:
-		void Initialize() override;
-		void Delete() override;
+			int		GetRenderID() const { return m_renderID; }
+			void	SetRenderID(const int _renderID) { m_renderID = _renderID; }
 
-		ressource::Mesh * m_mesh;
-		int m_renderID = -1;
-	};
+			DECLARE_TYPE_INFO(Model);
+		private:
+			void Initialize() override;
+			void Delete() override;
+
+			fan::Mesh * m_mesh;
+			int m_renderID = -1;
+		};
+	}
 }

@@ -2,50 +2,55 @@
 
 #include "core/fanSignal.h"
 
-namespace scene
+namespace fan
 {
-	class Gameobject;
-	class Component;
-	class Actor;
-
-	class Scene
+	namespace scene
 	{
-	public:
-		util::Signal<Gameobject*> onGameobjectCreated;
-		util::Signal<Scene*> onSceneLoad;
+		class Gameobject;
+		class Component;
+		class Actor;
 
-		Scene(const std::string _name);
-		~Scene();
+		//================================================================================================================================
+		//================================================================================================================================
+		class Scene
+		{
+		public:
+			fan::Signal<Gameobject*> onGameobjectCreated;
+			fan::Signal<Scene*> onSceneLoad;
 
-		Gameobject *	CreateGameobject( const std::string _name );	// Creates a game object and adds it to the scene hierarchy
-		void			DeleteGameobject( Gameobject* _gameobject);		// Deletes a gameobject and removes it from the scene hierarchy at the end of the frame
-		
-		void	BeginFrame();
-		void	Update(const float _delta);
-		void	EndFrame();
-		
-		void New();
-		void Save() const ;
-		void LoadFrom(const std::string _path);
+			Scene(const std::string _name);
+			~Scene();
 
-		const std::vector<Gameobject *>  & GetGameObjects() const	{ return m_gameObjects; }
-		inline std::string GetName() const							{ return m_name; }
-		bool HasPath() const										{ return m_path.empty() == false; }
-		inline std::string GetPath() const							{ return m_path; }
-		void SetPath( const std::string _path )						{ m_path = _path; }
+			Gameobject *	CreateGameobject(const std::string _name);	// Creates a game object and adds it to the scene hierarchy
+			void			DeleteGameobject(Gameobject* _gameobject);		// Deletes a gameobject and removes it from the scene hierarchy at the end of the frame
 
-	private:
-		std::string m_name;
-		std::string m_path;
+			void	BeginFrame();
+			void	Update(const float _delta);
+			void	EndFrame();
 
-		std::vector < Gameobject * > m_gameObjectstoDelete;
-		std::vector < Gameobject * > m_gameObjects;
+			void New();
+			void Save() const;
+			void LoadFrom(const std::string _path);
 
-		std::set< scene::Actor * > m_startingActors;
-		std::set< scene::Actor * > m_activeActors;
+			const std::vector<Gameobject *>  & GetGameObjects() const { return m_gameObjects; }
+			inline std::string GetName() const { return m_name; }
+			bool HasPath() const { return m_path.empty() == false; }
+			inline std::string GetPath() const { return m_path; }
+			void SetPath(const std::string _path) { m_path = _path; }
 
-		void OnComponentCreated(scene::Component * _component );
-		void OnComponentDeleted(scene::Component * _component);
-		void Clear();
-	};
+		private:
+			std::string m_name;
+			std::string m_path;
+
+			std::vector < Gameobject * > m_gameObjectstoDelete;
+			std::vector < Gameobject * > m_gameObjects;
+
+			std::set< scene::Actor * > m_startingActors;
+			std::set< scene::Actor * > m_activeActors;
+
+			void OnComponentCreated(scene::Component * _component);
+			void OnComponentDeleted(scene::Component * _component);
+			void Clear();
+		};
+	}
 }

@@ -1,7 +1,7 @@
 #include "fanIncludes.h"
 
 #include "core/files/fanFbxImporter.h"
-#include "core/ressources/fanMesh.h"
+#include "renderer/fanMesh.h"
 #include "scene/fanGameobject.h"
 #include "fbxsdk.h"
 
@@ -91,7 +91,7 @@ namespace fan {
 
 	//================================================================================================================================
 	//================================================================================================================================
-	bool FBXImporter::GetMesh( ressource::Mesh & _mesh) {
+	bool FBXImporter::GetMesh( fan::Mesh & _mesh) {
 		
 		fbxsdk::FbxAxisSystem axisSystem( 
 			fbxsdk::FbxAxisSystem::EUpVector::eYAxis, 

@@ -15,7 +15,7 @@ namespace fan {
 			std::string message;
 			double time;
 		};
-		util::Signal<> onNewLog;
+		fan::Signal<> onNewLog;
 
 		static void Log		( const std::string _message, const Severity & _severity );
 		static void Log		( const std::string _message );

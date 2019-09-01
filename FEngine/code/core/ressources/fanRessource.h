@@ -3,7 +3,7 @@
 #include "core/fanTypeInfo.h"
 #include "core/fanSignal.h"
 
-namespace ressource {
+namespace fan {
 	//================================================================================================================================
 	// Base class for ressources ( Mesh, textures etc.) 
 	// Represent something with an ID that needs to be loaded

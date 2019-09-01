@@ -1,53 +1,54 @@
 #pragma once
 
-namespace ressource {
+namespace fan
+{
 	class Mesh;
-}
 
-namespace vk {
-	class Texture;
-	class Device;
-	class Buffer;
+	namespace vk {
+		class Texture;
+		class Device;
+		class Buffer;
 
-	struct MeshData {
-		ressource::Mesh * mesh;
-		vk::Buffer * indexBuffer;
-		vk::Buffer * vertexBuffer;
-	};
+		struct MeshData {
+			Mesh *		 mesh;
+			vk::Buffer * indexBuffer;
+			vk::Buffer * vertexBuffer;
+		};
 
-	//================================================================================================================================
-	// Loads & references all the textures of the engine
-	//================================================================================================================================
-	class RessourceManager {
-	public:
-		static util::Signal<> onTextureLoaded;
+		//================================================================================================================================
+		// Loads & references all the textures of the engine
+		//================================================================================================================================
+		class RessourceManager {
+		public:
+			static fan::Signal<> onTextureLoaded;
 
-		RessourceManager( Device& _device );
-		~RessourceManager();
+			RessourceManager(vk::Device& _device);
+			~RessourceManager();
 
-		// Mesh management
-		ressource::Mesh *   LoadMesh(const std::string _path);
-		ressource::Mesh *	FindMesh(const std::string _path);
-		vk::MeshData *		FindMeshData( const ressource::Mesh * _mesh );
-		void				SetDefaultMesh(const ressource::Mesh * _defaultMesh)	{ m_defaultMesh = _defaultMesh; }
-		const std::map< uint32_t, MeshData > GetMeshData() const					{ return m_meshList;  }
+			// Mesh management
+			fan::Mesh *		LoadMesh(const std::string _path);
+			fan::Mesh *		FindMesh(const std::string _path);
+			vk::MeshData *	FindMeshData(const fan::Mesh * _mesh);
+			void			SetDefaultMesh(const fan::Mesh * _defaultMesh) { m_defaultMesh = _defaultMesh; }
+			const std::map< uint32_t, MeshData > GetMeshData() const { return m_meshList; }
 
-		// Texture management
-		vk::Texture *							LoadTexture( const std::string _path );
-		vk::Texture *							FindTexture( const std::string _path );
-		const std::vector< vk::Texture * > &	GetTextures() const	{ return m_textures; }
-		std::vector< vk::Texture * > &			GetTextures()		{ return m_textures; }
-		
-		static const char * s_defaultTexture;
+			// Texture management
+			vk::Texture *							LoadTexture(const std::string _path);
+			vk::Texture *							FindTexture(const std::string _path);
+			const std::vector< vk::Texture * > &	GetTextures() const { return m_textures; }
+			std::vector< vk::Texture * > &			GetTextures() { return m_textures; }
 
-	private:
-		vk::Device & m_device;
+			static const char * s_defaultTexture;
 
-		std::map< uint32_t, MeshData > m_meshList;
-		const ressource::Mesh * m_defaultMesh = nullptr;
+		private:
+			vk::Device & m_device;
 
-		std::vector< vk::Texture * > m_textures;
+			std::map< uint32_t, MeshData > m_meshList;
+			const fan::Mesh * m_defaultMesh = nullptr;
 
-		void AddMesh(ressource::Mesh * _mesh);
-	};
+			std::vector< vk::Texture * > m_textures;
+
+			void AddMesh(fan::Mesh * _mesh);
+		};
+	}
 }

@@ -1,11 +1,11 @@
 #include "fanIncludes.h"
 
 #include "fanEngine.h"
-#include "renderer/vkRenderer.h"
-#include "renderer/pipelines/vkForwardPipeline.h"
-#include "renderer/pipelines/vkDebugPipeline.h"
-#include "renderer/util/vkShape.h"
-#include "renderer/util/vkWindow.h"
+#include "renderer/fanRenderer.h"
+#include "renderer/pipelines/fanForwardPipeline.h"
+#include "renderer/pipelines/fanDebugPipeline.h"
+#include "core/math/fanBasicModels.h"
+#include "renderer/util/fanWindow.h"
 #include "renderer/fanRessourceManager.h"
 #include "core/fanTime.h"
 #include "core/fanInput.h"
@@ -13,7 +13,7 @@
 #include "core/math/shapes/fanPlane.h"
 #include "core/math/shapes/fanAABB.h"
 #include "core/files/fanFbxImporter.h"
-#include "core/ressources/fanMesh.h"
+#include "renderer/fanMesh.h"
 #include "editor/fanModals.h"
 #include "editor/fanMainMenuBar.h"
 #include "editor/windows/fanRenderWindow.h"	
@@ -54,7 +54,7 @@ namespace fan {
 
 		// Set some values
 		m_editorGrid.isVisible = true;
-		m_editorGrid.color = vk::Color(0.161f, 0.290f, 0.8f, 0.478f);
+		m_editorGrid.color = Color(0.161f, 0.290f, 0.8f, 0.478f);
 		m_editorGrid.linesCount = 10;
 		m_editorGrid.spacing = 1.f;		
 
@@ -66,27 +66,27 @@ namespace fan {
 		m_inspectorWindow =		new editor::InspectorWindow();
 		m_preferencesWindow =	new editor::PreferencesWindow();
 		m_consoleWindow =		new editor::ConsoleWindow();
-		m_renderer =			new vk::Renderer(windowSize, windowPosition);
+		m_renderer =			new Renderer(windowSize, windowPosition);
 		m_scene =				new scene::Scene("mainScene");
 
-		scene::Material::onRegisterMaterial.Connect		( &vk::Renderer::RegisterMaterial,		m_renderer );
-		scene::Material::onUnregisterMaterial.Connect	( &vk::Renderer::UnRegisterMaterial,	m_renderer );		
-		scene::Model::onRegisterModel.Connect			( &vk::Renderer::RegisterModel,			m_renderer );
-		scene::Model::onUnRegisterModel.Connect			( &vk::Renderer::UnRegisterModel,		m_renderer );
+		scene::Material::onRegisterMaterial.Connect		( &Renderer::RegisterMaterial,		m_renderer );
+		scene::Material::onUnregisterMaterial.Connect	( &Renderer::UnRegisterMaterial,	m_renderer );		
+		scene::Model::onRegisterModel.Connect			( &Renderer::RegisterModel,			m_renderer );
+		scene::Model::onUnRegisterModel.Connect			( &Renderer::UnRegisterModel,		m_renderer );
 
 		m_scene->onSceneLoad.Connect(&Engine::OnSceneLoad, this);
 		OnSceneLoad(m_scene);
 
 		m_mainMenuBar->Initialize();
 
-		ressource::Mesh * defaultMesh = m_renderer->GetRessourceManager()->LoadMesh(ressource::Mesh::defaultMeshPath);
+		fan::Mesh * defaultMesh = m_renderer->GetRessourceManager()->LoadMesh(fan::Mesh::defaultMeshPath);
 		m_renderer->GetRessourceManager()->SetDefaultMesh( defaultMesh );
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
 	Engine::~Engine() {
-		const vk::Window * window = m_renderer->GetWindow();
+		const Window * window = m_renderer->GetWindow();
 
 		const VkExtent2D rendererSize = window->GetExtent();
 		m_editorValues.Set("renderer_extent_width", rendererSize.width);
@@ -190,7 +190,7 @@ namespace fan {
 			const scene::Gameobject * gameobject = gameobjects[gameobjectIndex];
 			if (gameobject != m_editorCamera->GetGameobject()) {
 				shape::AABB aabb = gameobject->GetAABB();
-				m_renderer->DebugAABB(aabb, vk::Color::Red);
+				m_renderer->DebugAABB(aabb, Color::Red);
 			}
 		}
 	}
@@ -200,7 +200,7 @@ namespace fan {
 	void Engine::DrawWireframe() const {
 		const std::vector < vk::DrawData> & modelList = m_renderer->GetDrawData();
 		for (int meshIndex = 0; meshIndex < modelList.size(); meshIndex++) {
-			const ressource::Mesh* mesh = modelList[meshIndex].model->GetMesh();
+			const fan::Mesh* mesh = modelList[meshIndex].model->GetMesh();
 			const scene::Model * model = modelList[meshIndex].model;
 
 			const glm::mat4  modelMat = model->GetGameobject()->GetComponent<scene::Transform>()->GetModelMatrix();
@@ -209,12 +209,12 @@ namespace fan {
 			const std::vector<vk::Vertex> & vertices = mesh->GetVertices();
 
 			for (int index = 0; index < indices.size() / 3; index++) {
-				const btVector3 v0 = util::ToBullet(modelMat * glm::vec4(vertices[3 * index + 0].pos, 1.f));
-				const btVector3 v1 = util::ToBullet(modelMat * glm::vec4(vertices[3 * index + 1].pos, 1.f));
-				const btVector3 v2 = util::ToBullet(modelMat * glm::vec4(vertices[3 * index + 2].pos, 1.f));
-				m_renderer->DebugLine(v0, v1, vk::Color::Yellow);
-				m_renderer->DebugLine(v1, v2, vk::Color::Yellow);
-				m_renderer->DebugLine(v2, v0, vk::Color::Yellow);
+				const btVector3 v0 = ToBullet(modelMat * glm::vec4(vertices[3 * index + 0].pos, 1.f));
+				const btVector3 v1 = ToBullet(modelMat * glm::vec4(vertices[3 * index + 1].pos, 1.f));
+				const btVector3 v2 = ToBullet(modelMat * glm::vec4(vertices[3 * index + 2].pos, 1.f));
+				m_renderer->DebugLine(v0, v1, Color::Yellow);
+				m_renderer->DebugLine(v1, v2, Color::Yellow);
+				m_renderer->DebugLine(v2, v0, Color::Yellow);
 			}
 		}
 	}
@@ -224,7 +224,7 @@ namespace fan {
 	void Engine::DrawNormals() const {
 		const std::vector < vk::DrawData> & modelList = m_renderer->GetDrawData();
 		for (int meshIndex = 0; meshIndex < modelList.size(); meshIndex++) {
-			const ressource::Mesh* mesh = modelList[meshIndex].model->GetMesh();
+			const fan::Mesh* mesh = modelList[meshIndex].model->GetMesh();
 			const scene::Model * model = modelList[meshIndex].model;
 
 			const glm::mat4  modelMat = model->GetGameobject()->GetComponent<scene::Transform>()->GetModelMatrix();
@@ -234,9 +234,9 @@ namespace fan {
 			const std::vector<vk::Vertex> & vertices = mesh->GetVertices();
 
 			for (int index = 0; index < indices.size(); index++) {
-				const btVector3 vertex = util::ToBullet( modelMat * glm::vec4(vertices[index].pos, 1.f));
-				const btVector3 normal = util::ToBullet(rotationMat * glm::vec4(vertices[index].normal, 1.f));
-				m_renderer->DebugLine(vertex, vertex + 0.1f * normal, vk::Color::Red);
+				const btVector3 vertex = ToBullet( modelMat * glm::vec4(vertices[index].pos, 1.f));
+				const btVector3 normal = ToBullet(rotationMat * glm::vec4(vertices[index].normal, 1.f));
+				m_renderer->DebugLine(vertex, vertex + 0.1f * normal, Color::Red);
 			}
 		}
 	}
@@ -326,10 +326,10 @@ namespace fan {
 
 		_newPosition = _transform.getOrigin();
 		for (int axisIndex = 0; axisIndex < 3 ; axisIndex++) 	{
-			const vk::Color opaqueColor(axisDirection[axisIndex].x(), axisDirection[axisIndex].y(), axisDirection[axisIndex].z(), 1.f);
+			const Color opaqueColor(axisDirection[axisIndex].x(), axisDirection[axisIndex].y(), axisDirection[axisIndex].z(), 1.f);
 			
 			// Generates a cone shape
-			std::vector<btVector3> coneTris = vk::GetCone(0.1f*size, 0.5f*size, 10);
+			std::vector<btVector3> coneTris = GetCone(0.1f*size, 0.5f*size, 10);
 			btTransform transform = _transform * coneRotation[axisIndex];
 			for (int vertIndex = 0; vertIndex < coneTris.size(); vertIndex++) {
 				coneTris[vertIndex] = transform * coneTris[vertIndex];
@@ -341,7 +341,7 @@ namespace fan {
 			}
 
 			// Raycast on the gizmo shape to determine if the mouse is hovering it
-			vk::Color clickedColor = opaqueColor;
+			Color clickedColor = opaqueColor;
 			const shape::Ray ray = m_editorCamera->ScreenPosToRay(Mouse::GetScreenSpacePosition());
 			for (int triIndex = 0; triIndex < coneTris.size() / 3; triIndex++) {
 				shape::Triangle triangle(coneTris[3 * triIndex + 0], coneTris[3 * triIndex + 1], coneTris[3 * triIndex + 2]);

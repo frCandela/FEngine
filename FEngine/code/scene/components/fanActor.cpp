@@ -6,6 +6,9 @@
 #include "core/fanSignal.h"
 #include "fanEngine.h"
 
-namespace scene
-{	
+namespace fan
+{
+	namespace scene
+	{
+	}
 }

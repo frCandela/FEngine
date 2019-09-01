@@ -2,43 +2,48 @@
 
 #include "scene/components/fanActor.h"
 
-namespace scene
+namespace fan
 {
-	class Transform;
-	class Camera;
-
-	class FPSCamera : public Actor
+	namespace scene
 	{
-	public:
-		virtual ~FPSCamera();
+		class Transform;
+		class Camera;
 
-		bool			IsUnique() const	override { return true; }
+		//================================================================================================================================
+		//================================================================================================================================
+		class FPSCamera : public Actor
+		{
+		public:
+			virtual ~FPSCamera();
 
-		void Start() override;
-		void Update( const float _delta ) override;
+			bool			IsUnique() const	override { return true; }
 
-		// Getters
-		float GetSpeed() const				{ return m_speed; }
-		float GetSpeedMultiplier() const	{ return m_speedMultiplier; }
-		btVector2 GetXYSensitivity() const	{ return m_xySensitivity; }
-		void SetSpeed( const float _speed)						{ m_speed = _speed; }
-		void SetSpeedMultiplier( const float _speedMultiplier)  { m_speedMultiplier= _speedMultiplier; }
-		void SetXYSensitivity( const btVector2 _sensitivity)		{ m_xySensitivity= _sensitivity; }
+			void Start() override;
+			void Update(const float _delta) override;
 
-		// ISerializable
-		void Load(std::istream& _in) override;
-		void Save(std::ostream& _out) override;
+			// Getters
+			float GetSpeed() const { return m_speed; }
+			float GetSpeedMultiplier() const { return m_speedMultiplier; }
+			btVector2 GetXYSensitivity() const { return m_xySensitivity; }
+			void SetSpeed(const float _speed) { m_speed = _speed; }
+			void SetSpeedMultiplier(const float _speedMultiplier) { m_speedMultiplier = _speedMultiplier; }
+			void SetXYSensitivity(const btVector2 _sensitivity) { m_xySensitivity = _sensitivity; }
 
-		DECLARE_TYPE_INFO(FPSCamera);
-	private:
-		void Initialize() override;
-		void Delete() override {};
+			// ISerializable
+			void Load(std::istream& _in) override;
+			void Save(std::ostream& _out) override;
 
-		float m_speed;
-		float m_speedMultiplier;
-		btVector2 m_xySensitivity;
+			DECLARE_TYPE_INFO(FPSCamera);
+		private:
+			void Initialize() override;
+			void Delete() override {};
 
-		scene::Transform * m_transform;
-		scene::Camera * m_camera;
-	};
+			float m_speed;
+			float m_speedMultiplier;
+			btVector2 m_xySensitivity;
+
+			scene::Transform * m_transform;
+			scene::Camera * m_camera;
+		};
+	}
 }

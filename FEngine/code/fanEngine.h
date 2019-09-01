@@ -2,23 +2,24 @@
 
 #include "core/files/fanSerializedValues.h"
 
-namespace vk { class Renderer; }
-namespace editor {
-	class MainMenuBar;
-	class RenderWindow;
-	class SceneWindow;
-	class InspectorWindow;
-	class PreferencesWindow;
-	class ConsoleWindow;
-}
-namespace scene {
-	class Scene;
-	class Gameobject;
-	class Actor;
-	class Camera;
-}
-
 namespace fan {
+	 class Renderer;
+
+	namespace editor {
+		class MainMenuBar;
+		class RenderWindow;
+		class SceneWindow;
+		class InspectorWindow;
+		class PreferencesWindow;
+		class ConsoleWindow;
+	}
+	namespace scene {
+		class Scene;
+		class Gameobject;
+		class Actor;
+		class Camera;
+	}
+
 	//================================================================================================================================
 	//================================================================================================================================	
 	class Engine {
@@ -26,7 +27,7 @@ namespace fan {
 
 		struct EditorGrid {
 			bool		isVisible;
-			vk::Color	color;
+			Color	color;
 			int			linesCount;
 			float		spacing;
 		};
@@ -50,7 +51,7 @@ namespace fan {
 		editor::PreferencesWindow  &	GetPreferencesWindow() const	{ return * m_preferencesWindow; }
 		editor::ConsoleWindow  &		GetConsoleWindow() const		{ return * m_consoleWindow; }
 		scene::Scene &					GetScene() const				{ return * m_scene; }
-		vk::Renderer &					GetRenderer() const				{ return * m_renderer; }
+		Renderer &					GetRenderer() const				{ return * m_renderer; }
 
 		fan::SerializedValues & GetEditorValues() { return m_editorValues; }
 		EditorGrid GetEditorGrid() const { return m_editorGrid;  }
@@ -70,7 +71,7 @@ namespace fan {
 		fan::SerializedValues m_editorValues;
 
 		// Main components
-		vk::Renderer *		m_renderer;
+		Renderer *			m_renderer;
 		scene::Scene *		m_scene;
 		scene::Gameobject * m_selectedGameobject;
 		scene::Camera *		m_editorCamera;

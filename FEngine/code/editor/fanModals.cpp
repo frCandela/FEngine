@@ -21,19 +21,19 @@ std::string std::fs::file_name(const std::fs::path& _path) {
 }
 
 
-namespace util {
-
+namespace fan
+{
 	//================================================================================================================================
 	// Constants
 	//================================================================================================================================
-	const int Imgui::colorEditFlags = ImGuiColorEditFlags_PickerHueWheel | ImGuiColorEditFlags_AlphaBar;
-	
+	const int gui::colorEditFlags = ImGuiColorEditFlags_PickerHueWheel | ImGuiColorEditFlags_AlphaBar;
+
 	//================================================================================================================================
 	//================================================================================================================================
-	void Imgui::ShowHelpMarker(const char* _desc)
+	void gui::ShowHelpMarker(const char* _desc)
 	{
 		ImGui::TextDisabled("(?)");
-		if (ImGui::IsItemHovered())	{
+		if (ImGui::IsItemHovered()) {
 			ImGui::BeginTooltip();
 			ImGui::PushTextWrapPos(ImGui::GetFontSize() * 35.0f);
 			ImGui::TextUnformatted(_desc);
@@ -44,9 +44,9 @@ namespace util {
 
 	//================================================================================================================================
 	//================================================================================================================================
-	bool Imgui::FilesSelector(
+	bool gui::FilesSelector(
 		const std::set< std::string >& _extensionWhiteList
-		,std::fs::path& _path )
+		, std::fs::path& _path)
 	{
 		bool returnValue = false;
 
@@ -65,18 +65,18 @@ namespace util {
 
 			// Lists all directories
 			const std::fs::path dir = std::fs::is_directory(_path) ? _path : _path.parent_path(); // iterates on a dir, bot a file
-			for (const  std::fs::path& childPath : std::fs::directory_iterator(dir)) {
+			for (const std::fs::path& childPath : std::fs::directory_iterator(dir)) {
 
-				std::string extension = childPath.extension().string();		
+				std::string extension = childPath.extension().string();
 				const bool isFile = _extensionWhiteList.find(extension) != _extensionWhiteList.end();
 				const bool isDirectory = std::fs::is_directory(childPath);
 				// Filter
-				if ( isFile || isDirectory ){
+				if (isFile || isDirectory) {
 					const std::string filename = childPath.filename().generic_string();
 
 					if (isFile) {
 						ImGui::PushStyleColor(ImGuiCol_Text, (ImVec4)(ImColor(1.0f, 0.712f, 0.0f)));
-					}					
+					}
 					if (ImGui::Selectable(filename.c_str(), false, ImGuiSelectableFlags_DontClosePopups | ImGuiSelectableFlags_AllowDoubleClick)) {
 						_path = std::fs::directory_entry(childPath);
 
@@ -89,7 +89,7 @@ namespace util {
 					}
 				}
 			}
-			
+
 			ImGui::TreePop();
 		}
 
@@ -100,23 +100,23 @@ namespace util {
 
 	//================================================================================================================================
 	//================================================================================================================================
-	bool Imgui::SaveFileModal( const char * _popupName, const std::set<std::string>& _extensionWhiteList, std::fs::path & _path, int & _extensionIndex ) {
+	bool gui::SaveFileModal(const char * _popupName, const std::set<std::string>& _extensionWhiteList, std::fs::path & _path, int & _extensionIndex) {
 		bool returnValue = false;
 
-		ImGui::SetNextWindowSize({316,410});
-		if (ImGui::BeginPopupModal(_popupName))	
+		ImGui::SetNextWindowSize({ 316,410 });
+		if (ImGui::BeginPopupModal(_popupName))
 		{
 			// Files hierarchy
 			bool itemDoubleClicked = false;
-			ImGui::BeginChild("load_scene_hierarchy", {300,300}, true);	{
-				itemDoubleClicked = util::Imgui::FilesSelector( _extensionWhiteList, _path);
+			ImGui::BeginChild("load_scene_hierarchy", { 300,300 }, true); {
+				itemDoubleClicked = gui::FilesSelector(_extensionWhiteList, _path);
 			} ImGui::EndChild();
 
 
 			// Input name
 			const int bufferSize = 32;
 			char buffer[bufferSize];
-			strcpy_s(buffer, std::fs::file_name(_path).c_str());			
+			strcpy_s(buffer, std::fs::file_name(_path).c_str());
 			ImGui::InputText("name", buffer, bufferSize);
 			std::string stringBuffer = buffer;
 
@@ -129,7 +129,8 @@ namespace util {
 			}
 			if (_extensionWhiteList.size() > 1) {
 				ImGui::Combo("format", &_extensionIndex, extensions.str().c_str());
-			} else {
+			}
+			else {
 				ImGui::TextDisabled(extensions.str().c_str());
 			}
 			ImGui::Separator();
@@ -143,8 +144,8 @@ namespace util {
 			}
 
 			// Ok Button
-			if( itemDoubleClicked == true || ImGui::Button("Ok")|| Keyboard::IsKeyPressed( GLFW_KEY_ENTER )){
-				if (std::fs::is_directory(_path) == false ) {
+			if (itemDoubleClicked == true || ImGui::Button("Ok") || Keyboard::IsKeyPressed(GLFW_KEY_ENTER)) {
+				if (std::fs::is_directory(_path) == false) {
 					ImGui::CloseCurrentPopup();
 					returnValue = true;
 				}
@@ -152,7 +153,7 @@ namespace util {
 
 			// Cancel button
 			ImGui::SameLine();
-			if( ImGui::Button("Cancel") || Keyboard::IsKeyPressed( GLFW_KEY_ESCAPE )){
+			if (ImGui::Button("Cancel") || Keyboard::IsKeyPressed(GLFW_KEY_ESCAPE)) {
 				ImGui::CloseCurrentPopup();
 			}
 			ImGui::EndPopup();
@@ -162,21 +163,22 @@ namespace util {
 
 	//================================================================================================================================
 	//================================================================================================================================
-	bool Imgui::LoadFileModal( 		
+	bool gui::LoadFileModal(
 		const char * _popupName,
 		const std::set<std::string>& _extensionWhiteList,
-		std::fs::path & _path  ){
+		std::fs::path & _path) {
 
 		bool returnValue = false;
 
-		ImGui::SetNextWindowSize({316,400});
-		if (ImGui::BeginPopupModal(_popupName))		{
-			ImGui::BeginChild("load_scene_hierarchy", {300,300}, true);
+		ImGui::SetNextWindowSize({ 316,400 });
+		if (ImGui::BeginPopupModal(_popupName)) {
+			ImGui::BeginChild("load_scene_hierarchy", { 300,300 }, true);
 			std::fs::directory_entry newEntry;
-			bool itemDoubleClicked = util::Imgui::FilesSelector(_extensionWhiteList, _path);
+			bool itemDoubleClicked = gui::FilesSelector(_extensionWhiteList, _path);
 			if (std::fs::is_directory(newEntry)) {
 				_path = newEntry;
-			} else if (std::fs::is_regular_file(newEntry)) {
+			}
+			else if (std::fs::is_regular_file(newEntry)) {
 				_path = newEntry;
 			}
 			ImGui::EndChild();
@@ -186,7 +188,7 @@ namespace util {
 			ImGui::Separator();
 
 
-			if( itemDoubleClicked == true || ImGui::Button("Ok")|| Keyboard::IsKeyPressed( GLFW_KEY_ENTER )){
+			if (itemDoubleClicked == true || ImGui::Button("Ok") || Keyboard::IsKeyPressed(GLFW_KEY_ENTER)) {
 
 				if (std::fs::is_regular_file(_path)) {
 					ImGui::CloseCurrentPopup();
@@ -194,7 +196,7 @@ namespace util {
 				}
 			}
 			ImGui::SameLine();
-			if( ImGui::Button("Cancel") || Keyboard::IsKeyPressed( GLFW_KEY_ESCAPE )){
+			if (ImGui::Button("Cancel") || Keyboard::IsKeyPressed(GLFW_KEY_ESCAPE)) {
 				ImGui::CloseCurrentPopup();
 			}
 

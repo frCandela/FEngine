@@ -2,17 +2,22 @@
 
 #include "scene/components/fanComponent.h"
 
-namespace scene
+namespace fan
 {
-	class Actor : public Component
+	namespace scene
 	{
-	public:
-		bool IsActor()	const final		{ return true; }
-		bool IsUnique() const override	{ return false; }
+		//================================================================================================================================
+		//================================================================================================================================
+		class Actor : public Component
+		{
+		public:
+			bool IsActor()	const final { return true; }
+			bool IsUnique() const override { return false; }
 
-		virtual void Start()						= 0;
-		virtual void Update( const float _delta )	= 0;
+			virtual void Start() = 0;
+			virtual void Update(const float _delta) = 0;
 
-	protected:
-	};
+		protected:
+		};
+	}
 }
