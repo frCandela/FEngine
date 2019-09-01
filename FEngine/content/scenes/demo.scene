@@ -1,0 +1,20 @@
+entity new_entity
+	Transform 1269105190
+		3.28699 2.60381 -3.19263
+		0 0 0 1
+		1 1 1
+	Model 1739103771
+		content\models\test\cube.fbx
+	Material 1828911513
+		content\models\test\textures\texture3.png
+end
+entity sphere
+	Transform 1269105190
+		0.383076 1.9992 -3.79864
+		0 0 0 1
+		1 1 1
+	Model 1739103771
+		content\models\test\sphere.fbx
+	Material 1828911513
+		content\_default\texture.png
+end
