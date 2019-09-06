@@ -62,6 +62,9 @@
     <Filter Include="code\core\game">
       <UniqueIdentifier>{601b9331-5ac9-4f78-93fc-097663f76e54}</UniqueIdentifier>
     </Filter>
+    <Filter Include="code\core\input">
+      <UniqueIdentifier>{9fd08379-d3ce-49e5-a262-db532aba4045}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="deps\imgui\imgui.cpp">
@@ -111,9 +114,6 @@
     </ClCompile>
     <ClCompile Include="code\editor\components\fanFPSCamera.cpp">
       <Filter>code\editor\components</Filter>
-    </ClCompile>
-    <ClCompile Include="code\core\fanInput.cpp">
-      <Filter>code\core</Filter>
     </ClCompile>
     <ClCompile Include="code\core\fanISerializable.cpp">
       <Filter>code\core</Filter>
@@ -252,6 +252,15 @@
     </ClCompile>
     <ClCompile Include="code\game\fanPlanet.cpp">
       <Filter>code\core\game</Filter>
+    </ClCompile>
+    <ClCompile Include="code\core\fanInput.cpp">
+      <Filter>code\core\input</Filter>
+    </ClCompile>
+    <ClCompile Include="code\core\input\fanMouse.cpp">
+      <Filter>code\core\input</Filter>
+    </ClCompile>
+    <ClCompile Include="code\core\input\fanKeyboard.cpp">
+      <Filter>code\core\input</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -735,9 +744,6 @@
     <ClInclude Include="code\core\fanHash.h">
       <Filter>code\core</Filter>
     </ClInclude>
-    <ClInclude Include="code\core\fanInput.h">
-      <Filter>code\core</Filter>
-    </ClInclude>
     <ClInclude Include="code\core\fanISerializable.h">
       <Filter>code\core</Filter>
     </ClInclude>
@@ -890,6 +896,15 @@
     </ClInclude>
     <ClInclude Include="code\game\fanPlanet.h">
       <Filter>code\core\game</Filter>
+    </ClInclude>
+    <ClInclude Include="code\core\fanInput.h">
+      <Filter>code\core\input</Filter>
+    </ClInclude>
+    <ClInclude Include="code\core\input\fanKeyboard.h">
+      <Filter>code\core\input</Filter>
+    </ClInclude>
+    <ClInclude Include="code\core\input\fanMouse.h">
+      <Filter>code\core\input</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
