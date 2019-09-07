@@ -431,6 +431,7 @@ namespace fan
 
 			// Vert
 			VkWriteDescriptorSet uboWriteDescriptorSet = {};
+			VkDescriptorBufferInfo uboDescriptorBufferInfo = {};
 			{
 				m_vertUniformBuffer = new Buffer(m_device);
 				m_vertUniformBuffer->Create(
@@ -439,7 +440,7 @@ namespace fan
 					VK_MEMORY_PROPERTY_HOST_COHERENT_BIT | VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT
 				);
 
-				VkDescriptorBufferInfo uboDescriptorBufferInfo = {};
+
 				uboDescriptorBufferInfo.buffer = m_vertUniformBuffer->GetBuffer();
 				uboDescriptorBufferInfo.offset = 0;
 				uboDescriptorBufferInfo.range = sizeof(VertUniforms);
@@ -459,6 +460,7 @@ namespace fan
 
 			// Frag
 			VkWriteDescriptorSet fragWriteDescriptorSet = {};
+			VkDescriptorBufferInfo fragDescriptorBufferInfo = {};
 			{
 				m_fragUniformBuffer = new Buffer(m_device);
 				m_fragUniformBuffer->Create(
@@ -467,7 +469,6 @@ namespace fan
 					VK_MEMORY_PROPERTY_HOST_COHERENT_BIT | VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT
 				);
 
-				VkDescriptorBufferInfo fragDescriptorBufferInfo = {};
 				fragDescriptorBufferInfo.buffer = m_fragUniformBuffer->GetBuffer();
 				fragDescriptorBufferInfo.offset = 0;
 				fragDescriptorBufferInfo.range = sizeof(FragUniforms);
@@ -486,6 +487,7 @@ namespace fan
 
 			// Dynamic vert
 			VkWriteDescriptorSet dynamicWriteDescriptorSet = {};
+			VkDescriptorBufferInfo dynamicDescriptorBufferInfo = {};
 			{
 				m_dynamicUniformBufferVert = new Buffer(m_device);
 				m_dynamicUniformBufferVert->Create(
@@ -494,11 +496,10 @@ namespace fan
 					VK_MEMORY_PROPERTY_HOST_COHERENT_BIT | VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT
 				);
 
-				VkDescriptorBufferInfo dynamicDescriptorBufferInfo = {};
+
 				dynamicDescriptorBufferInfo.buffer = m_dynamicUniformBufferVert->GetBuffer();
 				dynamicDescriptorBufferInfo.offset = 0;
 				dynamicDescriptorBufferInfo.range = m_dynamicAlignmentVert;
-
 
 				dynamicWriteDescriptorSet.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
 				dynamicWriteDescriptorSet.pNext = nullptr;
@@ -514,6 +515,7 @@ namespace fan
 
 			// Dynamic frag
 			VkWriteDescriptorSet dynamicFragWriteDescriptorSet = {};
+			VkDescriptorBufferInfo dynamicFragDescriptorBufferInfo = {};
 			{
 				m_dynamicUniformBufferFrag = new Buffer(m_device);
 				m_dynamicUniformBufferFrag->Create(
@@ -522,10 +524,9 @@ namespace fan
 					VK_MEMORY_PROPERTY_HOST_COHERENT_BIT | VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT
 				);
 
-				VkDescriptorBufferInfo dynamicDescriptorBufferInfo = {};
-				dynamicDescriptorBufferInfo.buffer = m_dynamicUniformBufferFrag->GetBuffer();
-				dynamicDescriptorBufferInfo.offset = 0;
-				dynamicDescriptorBufferInfo.range = m_dynamicAlignmentFrag;
+				dynamicFragDescriptorBufferInfo.buffer = m_dynamicUniformBufferFrag->GetBuffer();
+				dynamicFragDescriptorBufferInfo.offset = 0;
+				dynamicFragDescriptorBufferInfo.range = m_dynamicAlignmentFrag;
 
 				dynamicFragWriteDescriptorSet.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
 				dynamicFragWriteDescriptorSet.pNext = nullptr;
@@ -535,7 +536,7 @@ namespace fan
 				dynamicFragWriteDescriptorSet.descriptorCount = 1;
 				dynamicFragWriteDescriptorSet.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC;
 				dynamicFragWriteDescriptorSet.pImageInfo = nullptr;
-				dynamicFragWriteDescriptorSet.pBufferInfo = &dynamicDescriptorBufferInfo;
+				dynamicFragWriteDescriptorSet.pBufferInfo = &dynamicFragDescriptorBufferInfo;
 				//uboWriteDescriptorSet.pTexelBufferView = nullptr;
 			}
 
