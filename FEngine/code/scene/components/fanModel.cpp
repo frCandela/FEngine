@@ -80,7 +80,7 @@ namespace fan
 			std::string path;
 			_in >> path;
 
-			vk::RessourceManager * ressourceManager = Renderer::GetRenderer().GetRessourceManager();
+			vk::RessourceManager * ressourceManager = Renderer::Get().GetRessourceManager();
 			fan::Mesh * mesh = ressourceManager->FindMesh(path);
 			if (mesh == nullptr) {
 				mesh = ressourceManager->LoadMesh(path);

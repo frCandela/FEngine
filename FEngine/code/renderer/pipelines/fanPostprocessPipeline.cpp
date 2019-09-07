@@ -481,9 +481,9 @@ namespace fan
 				VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT
 			);
 			stagingBuffer.SetData(vertices.data(), size);
-			VkCommandBuffer cmd = Renderer::GetRenderer().BeginSingleTimeCommands();
+			VkCommandBuffer cmd = Renderer::Get().BeginSingleTimeCommands();
 			stagingBuffer.CopyBufferTo(cmd, m_vertexBuffer->GetBuffer(), size);
-			Renderer::GetRenderer().EndSingleTimeCommands(cmd);
+			Renderer::Get().EndSingleTimeCommands(cmd);
 		}
 
 		//================================================================================================================================

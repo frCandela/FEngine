@@ -271,7 +271,7 @@ namespace fan
 
 			if (gui::LoadFileModal("set_path", GlobalValues::s_meshExtensions, m_pathBuffer)) {
 
-				vk::RessourceManager * ressourceManager = Renderer::GetRenderer().GetRessourceManager();
+				vk::RessourceManager * ressourceManager = Renderer::Get().GetRessourceManager();
 				fan::Mesh * mesh = ressourceManager->FindMesh(m_pathBuffer.string().c_str());
 				if (mesh == nullptr) {
 					mesh = ressourceManager->LoadMesh(m_pathBuffer.string());
@@ -340,7 +340,7 @@ namespace fan
 			}
 
 			if (gui::LoadFileModal("set_path_texture", GlobalValues::s_imagesExtensions, m_pathBuffer)) {
-				vk::RessourceManager * texturesManager = Renderer::GetRenderer().GetRessourceManager();
+				vk::RessourceManager * texturesManager = Renderer::Get().GetRessourceManager();
 				vk::Texture * texture = texturesManager->FindTexture(m_pathBuffer.string());
 				if (texture == nullptr) {
 					texture = texturesManager->LoadTexture(m_pathBuffer.string());

@@ -218,7 +218,7 @@ namespace fan
 		//================================================================================================================================
 		//================================================================================================================================
 		bool ForwardPipeline::CreateDescriptorsTextures() {
-			std::vector< vk::Texture * > & textures = Renderer::GetRenderer().GetRessourceManager()->GetTextures();
+			std::vector< vk::Texture * > & textures = Renderer::Get().GetRessourceManager()->GetTextures();
 
 			// LAYOUTS
 			VkDescriptorSetLayoutBinding samplerLayoutBinding = {};
@@ -569,9 +569,9 @@ namespace fan
 			m_depthImage->Create(depthFormat, _extent, VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
 			m_depthImageView->Create(m_depthImage->GetImage(), depthFormat, VK_IMAGE_ASPECT_DEPTH_BIT, VK_IMAGE_VIEW_TYPE_2D);
 
-			VkCommandBuffer cmd = Renderer::GetRenderer().BeginSingleTimeCommands();
+			VkCommandBuffer cmd = Renderer::Get().BeginSingleTimeCommands();
 			m_depthImage->TransitionImageLayout(cmd, depthFormat, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL, 1);
-			Renderer::GetRenderer().EndSingleTimeCommands(cmd);
+			Renderer::Get().EndSingleTimeCommands(cmd);
 
 			return true;
 		}

@@ -34,7 +34,7 @@ namespace fan
 			_in >> path;
 			if (path != std::string("void")) {
 				// TODO find a cleaner way to set the texture
-				vk::RessourceManager * texturesManager = Renderer::GetRenderer().GetRessourceManager();
+				vk::RessourceManager * texturesManager = Renderer::Get().GetRessourceManager();
 				vk::Texture * texture = texturesManager->FindTexture(path);
 				if (texture == nullptr) {
 					texture = texturesManager->LoadTexture(path);

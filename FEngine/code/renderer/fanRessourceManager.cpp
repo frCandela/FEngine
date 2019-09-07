@@ -137,9 +137,9 @@ namespace fan
 					VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT
 				);
 				stagingBuffer.SetData(indices.data(), size);
-				VkCommandBuffer cmd = Renderer::GetRenderer().BeginSingleTimeCommands();
+				VkCommandBuffer cmd = Renderer::Get().BeginSingleTimeCommands();
 				stagingBuffer.CopyBufferTo(cmd, meshData.indexBuffer->GetBuffer(), size);
-				Renderer::GetRenderer().EndSingleTimeCommands(cmd);
+				Renderer::Get().EndSingleTimeCommands(cmd);
 			}
 			{
 				const std::vector<vk::Vertex> & vertices = _mesh->GetVertices();
@@ -156,9 +156,9 @@ namespace fan
 					VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT
 				);
 				stagingBuffer2.SetData(vertices.data(), size);
-				VkCommandBuffer cmd2 = Renderer::GetRenderer().BeginSingleTimeCommands();
+				VkCommandBuffer cmd2 = Renderer::Get().BeginSingleTimeCommands();
 				stagingBuffer2.CopyBufferTo(cmd2, meshData.vertexBuffer->GetBuffer(), size);
-				Renderer::GetRenderer().EndSingleTimeCommands(cmd2);
+				Renderer::Get().EndSingleTimeCommands(cmd2);
 			}
 		}
 	}

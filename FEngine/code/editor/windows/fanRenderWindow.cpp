@@ -22,22 +22,22 @@ namespace fan
 		void RenderWindow::Draw() {
 			if (IsVisible() == true) {
 
-				Renderer &	renderer = Renderer::GetRenderer();
+				Renderer &	renderer = Renderer::Get();
 
 				bool isVisible = IsVisible();
 				if (ImGui::Begin("Rendering", &isVisible)) {
 					if (ImGui::CollapsingHeader("Post-processing")) {
-						vk::PostprocessPipeline::Uniforms uniforms = Renderer::GetRenderer().GetPostprocessPipeline()->GetUniforms();
+						vk::PostprocessPipeline::Uniforms uniforms = Renderer::Get().GetPostprocessPipeline()->GetUniforms();
 
 						// Filter color
 						if (ImGui::ColorEdit3("Filter##1", &uniforms.color.r, gui::colorEditFlags)) {
 
-							Renderer::GetRenderer().GetPostprocessPipeline()->SetUniforms(uniforms);
+							Renderer::Get().GetPostprocessPipeline()->SetUniforms(uniforms);
 						}
 					}
 
 					if (ImGui::CollapsingHeader("Forward rendering")) {
-						vk::ForwardPipeline::FragUniforms uniforms = Renderer::GetRenderer().GetForwardPipeline()->GetFragUniforms();
+						vk::ForwardPipeline::FragUniforms uniforms = Renderer::Get().GetForwardPipeline()->GetFragUniforms();
 						bool uniformsModified = false;
 						if (ImGui::SliderFloat("Ambiant light", &uniforms.ambiantIntensity, 0.f, 1.f)) {
 							uniformsModified = true;
@@ -53,7 +53,7 @@ namespace fan
 						}
 
 						if (uniformsModified == true) {
-							Renderer::GetRenderer().GetForwardPipeline()->SetFragUniforms(uniforms);
+							Renderer::Get().GetForwardPipeline()->SetFragUniforms(uniforms);
 						}
 
 					}

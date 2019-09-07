@@ -69,27 +69,27 @@ namespace fan {
 		m_inspectorWindow =		new editor::InspectorWindow();
 		m_preferencesWindow =	new editor::PreferencesWindow();
 		m_consoleWindow =		new editor::ConsoleWindow();
-		m_renderer =			new Renderer(windowSize, windowPosition);
+		Renderer::Get().Initialize(windowSize, windowPosition);
 		m_scene =				new scene::Scene("mainScene");
 
-		scene::Material::onRegisterMaterial.Connect		( &Renderer::RegisterMaterial,		m_renderer );
-		scene::Material::onUnregisterMaterial.Connect	( &Renderer::UnRegisterMaterial,	m_renderer );		
-		scene::Model::onRegisterModel.Connect			( &Renderer::RegisterModel,			m_renderer );
-		scene::Model::onUnRegisterModel.Connect			( &Renderer::UnRegisterModel,		m_renderer );
+		scene::Material::onRegisterMaterial.Connect		( &Renderer::RegisterMaterial,		&Renderer::Get() );
+		scene::Material::onUnregisterMaterial.Connect	( &Renderer::UnRegisterMaterial,	&Renderer::Get());		
+		scene::Model::onRegisterModel.Connect			( &Renderer::RegisterModel,			&Renderer::Get());
+		scene::Model::onUnRegisterModel.Connect			( &Renderer::UnRegisterModel,		&Renderer::Get());
 
 		m_scene->onSceneLoad.Connect(&Engine::OnSceneLoad, this);
 		OnSceneLoad(m_scene);
 
 		m_mainMenuBar->Initialize();
 
-		fan::Mesh * defaultMesh = m_renderer->GetRessourceManager()->LoadMesh(GlobalValues::s_defaultMeshPath);
-		m_renderer->GetRessourceManager()->SetDefaultMesh( defaultMesh );
+		fan::Mesh * defaultMesh = Renderer::Get().GetRessourceManager()->LoadMesh(GlobalValues::s_defaultMeshPath);
+		Renderer::Get().GetRessourceManager()->SetDefaultMesh( defaultMesh );
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
 	Engine::~Engine() {
-		const Window * window = m_renderer->GetWindow();
+		const Window * window = Renderer::Get().GetWindow();
 
 		const VkExtent2D rendererSize = window->GetExtent();
 		m_editorValues.Set("renderer_extent_width", rendererSize.width);
@@ -103,7 +103,7 @@ namespace fan {
 		delete m_renderWindow;
 		delete m_sceneWindow;
 		delete m_scene;
-		delete m_renderer;
+		Renderer::Get().Destroy();
 	}
 
 	//================================================================================================================================
@@ -117,7 +117,7 @@ namespace fan {
 	void Engine::Run()
 	{
 		float lastUpdateTime = Time::ElapsedSinceStartup();
-		while ( m_applicationShouldExit == false && m_renderer->WindowIsOpen() == true)
+		while ( m_applicationShouldExit == false && Renderer::Get().WindowIsOpen() == true)
 		{
 			const float time = Time::ElapsedSinceStartup();
 			const float updateDelta = time - lastUpdateTime;
@@ -143,7 +143,7 @@ namespace fan {
 					DrawAABB();
 				}
 
-				m_renderer->DrawFrame();
+				Renderer::Get().DrawFrame();
 				m_scene->EndFrame();
 			}
 		}
@@ -166,7 +166,7 @@ namespace fan {
 		camTrans->SetPosition(btVector3(0, 0, -2));
 		m_editorCamera = cameraentity->AddComponent<scene::Camera>();
 		m_editorCamera->SetRemovable(false);
-		m_renderer->SetMainCamera(m_editorCamera);
+		Renderer::Get().SetMainCamera(m_editorCamera);
 		scene::FPSCamera * editorCamera = cameraentity->AddComponent<scene::FPSCamera>();
 		editorCamera->SetRemovable(false);
 	}
@@ -179,8 +179,8 @@ namespace fan {
 			const int count = m_editorGrid.linesCount;
 
 			for (int coord = -m_editorGrid.linesCount; coord <= m_editorGrid.linesCount; coord++) {
-				m_renderer->DebugLine(btVector3(-count * size, 0.f, coord*size), btVector3(count*size, 0.f, coord*size), m_editorGrid.color);
-				m_renderer->DebugLine(btVector3(coord*size, 0.f, -count * size), btVector3(coord*size, 0.f, count*size), m_editorGrid.color);
+				Renderer::Get().DebugLine(btVector3(-count * size, 0.f, coord*size), btVector3(count*size, 0.f, coord*size), m_editorGrid.color);
+				Renderer::Get().DebugLine(btVector3(coord*size, 0.f, -count * size), btVector3(coord*size, 0.f, count*size), m_editorGrid.color);
 			}
 		}
 	}
@@ -193,7 +193,7 @@ namespace fan {
 			const scene::Entity * entity = entities[entityIndex];
 			if (entity != m_editorCamera->GetEntity()) {
 				shape::AABB aabb = entity->GetAABB();
-				m_renderer->DebugAABB(aabb, Color::Red);
+				Renderer::Get().DebugAABB(aabb, Color::Red);
 			}
 		}
 	}
@@ -201,7 +201,7 @@ namespace fan {
 	//================================================================================================================================
 	//================================================================================================================================
 	void Engine::DrawWireframe() const {
-		const std::vector < vk::DrawData> & modelList = m_renderer->GetDrawData();
+		const std::vector < vk::DrawData> & modelList = Renderer::Get().GetDrawData();
 		for (int meshIndex = 0; meshIndex < modelList.size(); meshIndex++) {
 			const fan::Mesh* mesh = modelList[meshIndex].model->GetMesh();
 			const scene::Model * model = modelList[meshIndex].model;
@@ -215,9 +215,9 @@ namespace fan {
 				const btVector3 v0 = ToBullet(modelMat * glm::vec4(vertices[3 * index + 0].pos, 1.f));
 				const btVector3 v1 = ToBullet(modelMat * glm::vec4(vertices[3 * index + 1].pos, 1.f));
 				const btVector3 v2 = ToBullet(modelMat * glm::vec4(vertices[3 * index + 2].pos, 1.f));
-				m_renderer->DebugLine(v0, v1, Color::Yellow);
-				m_renderer->DebugLine(v1, v2, Color::Yellow);
-				m_renderer->DebugLine(v2, v0, Color::Yellow);
+				Renderer::Get().DebugLine(v0, v1, Color::Yellow);
+				Renderer::Get().DebugLine(v1, v2, Color::Yellow);
+				Renderer::Get().DebugLine(v2, v0, Color::Yellow);
 			}
 		}
 	}
@@ -225,7 +225,7 @@ namespace fan {
 	//================================================================================================================================
 	//================================================================================================================================
 	void Engine::DrawNormals() const {
-		const std::vector < vk::DrawData> & modelList = m_renderer->GetDrawData();
+		const std::vector < vk::DrawData> & modelList = Renderer::Get().GetDrawData();
 		for (int meshIndex = 0; meshIndex < modelList.size(); meshIndex++) {
 			const fan::Mesh* mesh = modelList[meshIndex].model->GetMesh();
 			const scene::Model * model = modelList[meshIndex].model;
@@ -239,7 +239,7 @@ namespace fan {
 			for (int index = 0; index < indices.size(); index++) {
 				const btVector3 vertex = ToBullet( modelMat * glm::vec4(vertices[index].pos, 1.f));
 				const btVector3 normal = ToBullet(rotationMat * glm::vec4(vertices[index].normal, 1.f));
-				m_renderer->DebugLine(vertex, vertex + 0.1f * normal, Color::Red);
+				Renderer::Get().DebugLine(vertex, vertex + 0.1f * normal, Color::Red);
 			}
 		}
 	}
@@ -360,9 +360,9 @@ namespace fan {
 			}
 
 			// Draw the gizmo cone & lines
-			m_renderer->DebugLine(origin, origin + size*( _transform *  axisDirection[axisIndex] - origin ), opaqueColor);
+			Renderer::Get().DebugLine(origin, origin + size*( _transform *  axisDirection[axisIndex] - origin ), opaqueColor);
 			for (int triangleIndex = 0; triangleIndex < coneTris.size() / 3; triangleIndex++) {
-				m_renderer->DebugTriangle(coneTris[3 * triangleIndex + 0], coneTris[3 * triangleIndex + 1], coneTris[3 * triangleIndex + 2], clickedColor);
+				Renderer::Get().DebugTriangle(coneTris[3 * triangleIndex + 0], coneTris[3 * triangleIndex + 1], coneTris[3 * triangleIndex + 2], clickedColor);
 			}
 
 			// Calculate closest point between the mouse ray and the axis selected

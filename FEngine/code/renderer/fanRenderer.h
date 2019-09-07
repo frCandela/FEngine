@@ -2,7 +2,7 @@
 
 #include "renderer/util/fanVertex.h"
 #include "core/math/shapes/fanAABB.h"
-
+#include "core/fanSingleton.h"
 
 
 namespace fan
@@ -35,24 +35,26 @@ namespace fan
 		class RessourceManager;
 
 		struct MeshData;
-		struct DrawData;
+
+		struct DrawData {
+			MeshData *			meshData = nullptr;
+			scene::Model *		model = nullptr;
+			scene::Transform *	transform = nullptr;
+			scene::Material *	material = nullptr;
+		};
 	}
-
-
-
-
+	   	 
 	//================================================================================================================================
 	//================================================================================================================================
-	class Renderer {
+	class Renderer : public Singleton<Renderer>{
 	public:
-		Renderer(const VkExtent2D _size, const glm::ivec2 _position);
-		~Renderer();
+		void Initialize(const VkExtent2D _size, const glm::ivec2 _position);
+		void Destroy();
 
 		bool WindowIsOpen();
 		void DrawFrame();
 		void WaitIdle();
 
-		static Renderer & GetRenderer() { return *ms_globalRenderer; }
 		void ReloadShaders();
 		void UpdateDebugBuffer(const int _index);
 
@@ -104,7 +106,7 @@ namespace fan
 		// VULKAN OBJECTS
 		vk::Instance *		m_instance;
 		Window *		m_window;
-		vk::Device &		m_device;
+		vk::Device *		m_device;
 		vk::SwapChain  *	m_swapchain;
 
 		vk::ImguiPipeline *			m_imguiPipeline;
@@ -130,8 +132,6 @@ namespace fan
 		std::vector< vk::FrameBuffer * > m_swapchainFramebuffers;
 
 		glm::vec4 m_clearColor;
-
-		static Renderer * ms_globalRenderer;
 
 		bool ResetCommandPool();
 		void UpdateUniformBuffer(bool _forceFullRebuild = false);

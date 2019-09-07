@@ -80,7 +80,7 @@ namespace fan
 		//================================================================================================================================
 		void MainMenuBar::Draw() {
 			fan::Engine &	engine = fan::Engine::GetEngine();
-			Renderer &	renderer = Renderer::GetRenderer();
+			Renderer &	renderer = Renderer::Get();
 
 			if (m_showImguiDemoWindow) {
 				ImGui::ShowDemoWindow(&m_showImguiDemoWindow);

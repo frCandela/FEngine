@@ -31,18 +31,15 @@
 
 namespace fan
 {
-	Renderer * Renderer::ms_globalRenderer = nullptr;
-
 		//================================================================================================================================
 		//================================================================================================================================
-		Renderer::Renderer(const VkExtent2D _size, const glm::ivec2 _position) :
-			m_instance(new vk::Instance())
-			, m_window(new Window("Vulkan", _size, _position, m_instance->vkInstance))
-			, m_device( * new vk::Device(m_instance, m_window->GetSurface()))
-			, m_swapchain(new vk::SwapChain(m_device))
-			, m_mainCamera(nullptr)		
-		{
-			ms_globalRenderer = this;
+		void Renderer::Initialize(const VkExtent2D _size, const glm::ivec2 _position) {
+			m_instance =	new vk::Instance();
+			m_window =		new Window("Vulkan", _size, _position, m_instance->vkInstance);
+			m_device =		new vk::Device(m_instance, m_window->GetSurface());
+			m_swapchain =	new vk::SwapChain(*m_device);
+			m_mainCamera = nullptr;
+		
 			m_clearColor = glm::vec4(0.f, 0.f, 0.2f, 1.f);
 
 			m_swapchain->Create(m_window->GetSurface(), _size);
@@ -52,22 +49,22 @@ namespace fan
 			CreateRenderPass();
 			CreateRenderPassPostprocess();
 
-			m_ressourceManager =  new vk::RessourceManager( m_device );
+			m_ressourceManager =  new vk::RessourceManager( *m_device );
 			m_ressourceManager->onTextureLoaded.Connect( &Renderer::ReloadShaders, this); // TODO Cleanely reload descriptors when a new texture is loaded
 
-			m_forwardPipeline = new vk::ForwardPipeline(m_device, m_renderPass);
+			m_forwardPipeline = new vk::ForwardPipeline(*m_device, m_renderPass);
 			m_forwardPipeline->Create( m_swapchain->GetExtent());
 
-			m_postprocessPipeline = new vk::PostprocessPipeline(m_device, m_renderPassPostprocess);
+			m_postprocessPipeline = new vk::PostprocessPipeline(*m_device, m_renderPassPostprocess);
 			m_postprocessPipeline->Create(m_swapchain->GetSurfaceFormat().format, m_swapchain->GetExtent());
 		
-			m_debugLinesPipeline = new vk::DebugPipeline(m_device, m_renderPassPostprocess, VK_PRIMITIVE_TOPOLOGY_LINE_LIST);
+			m_debugLinesPipeline = new vk::DebugPipeline(*m_device, m_renderPassPostprocess, VK_PRIMITIVE_TOPOLOGY_LINE_LIST);
 			m_debugLinesPipeline->Create(m_swapchain->GetExtent(), "code/shaders/debugLines.vert", "code/shaders/debugLines.frag");
 
-			m_debugTrianglesPipeline = new vk::DebugPipeline(m_device, m_renderPassPostprocess, VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST);
+			m_debugTrianglesPipeline = new vk::DebugPipeline(*m_device, m_renderPassPostprocess, VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST);
 			m_debugTrianglesPipeline->Create(m_swapchain->GetExtent(), "code/shaders/debugTriangles.vert", "code/shaders/debugTriangles.frag");
 		
-			m_imguiPipeline = new vk::ImguiPipeline(m_device, m_swapchain->GetSwapchainImagesCount());
+			m_imguiPipeline = new vk::ImguiPipeline(*m_device, m_swapchain->GetSwapchainImagesCount());
 			m_imguiPipeline->Create(m_renderPassPostprocess, m_window->GetWindow(), m_swapchain->GetExtent());
 
 			CreateSwapchainFramebuffers();
@@ -83,8 +80,8 @@ namespace fan
 	
 		//================================================================================================================================
 		//================================================================================================================================	
-		Renderer::~Renderer() {
-			vkDeviceWaitIdle(m_device.vkDevice);
+		void Renderer::Destroy() {
+			vkDeviceWaitIdle(m_device->vkDevice);
 
 			ImGui::EndFrame();
 
@@ -141,7 +138,7 @@ namespace fan
 					}
 
 					fan::Debug::Log( "suboptimal swapchain" );
-					vkDeviceWaitIdle(m_device.vkDevice);
+					vkDeviceWaitIdle(m_device->vkDevice);
 
 					DeleteForwardFramebuffers();
 					DeleteSwapchainFramebuffers();
@@ -155,15 +152,15 @@ namespace fan
 					CreateSwapchainFramebuffers();
 					CreateForwardFramebuffers();
 					RecordAllCommandBuffers();
-					vkResetFences(m_device.vkDevice, 1, m_swapchain->GetCurrentInFlightFence());
+					vkResetFences(m_device->vkDevice, 1, m_swapchain->GetCurrentInFlightFence());
 					m_swapchain->AcquireNextImage();				
 				}
 				else if (result != VK_SUCCESS) {
 					fan::Debug::Error( "Could not acquire next image" );
 				}
 				else {
-					vkWaitForFences(m_device.vkDevice, 1, m_swapchain->GetCurrentInFlightFence(), VK_TRUE, std::numeric_limits<uint64_t>::max());
-					vkResetFences(m_device.vkDevice, 1, m_swapchain->GetCurrentInFlightFence());
+					vkWaitForFences(m_device->vkDevice, 1, m_swapchain->GetCurrentInFlightFence(), VK_TRUE, std::numeric_limits<uint64_t>::max());
+					vkResetFences(m_device->vkDevice, 1, m_swapchain->GetCurrentInFlightFence());
 				}
 			
 				ImGui::GetIO().DisplaySize = ImVec2(static_cast<float>(m_swapchain->GetExtent().width), static_cast<float>(m_swapchain->GetExtent().height));
@@ -229,7 +226,7 @@ namespace fan
 		//================================================================================================================================
 		//================================================================================================================================
 		void Renderer::WaitIdle() { 
-			vkDeviceWaitIdle(m_device.vkDevice); 
+			vkDeviceWaitIdle(m_device->vkDevice); 
 		}
 
 		//================================================================================================================================
@@ -244,7 +241,7 @@ namespace fan
 			allocInfo.commandBufferCount = 1;
 
 			VkCommandBuffer commandBuffer;
-			vkAllocateCommandBuffers(m_device.vkDevice, &allocInfo, &commandBuffer);
+			vkAllocateCommandBuffers(m_device->vkDevice, &allocInfo, &commandBuffer);
 
 			// Start recording the command buffer
 			VkCommandBufferBeginInfo beginInfo = {};
@@ -268,11 +265,11 @@ namespace fan
 			submitInfo.commandBufferCount = 1;
 			submitInfo.pCommandBuffers = &commandBuffer;
 
-			vkQueueSubmit(m_device.GetGraphicsQueue(), 1, &submitInfo, VK_NULL_HANDLE);
-			vkQueueWaitIdle(m_device.GetGraphicsQueue());
+			vkQueueSubmit(m_device->GetGraphicsQueue(), 1, &submitInfo, VK_NULL_HANDLE);
+			vkQueueWaitIdle(m_device->GetGraphicsQueue());
 
 			// Cleaning
-			vkFreeCommandBuffers(m_device.vkDevice, m_commandPool, 1, &commandBuffer);
+			vkFreeCommandBuffers(m_device->vkDevice, m_commandPool, 1, &commandBuffer);
 		}
 
 		//================================================================================================================================
@@ -280,7 +277,7 @@ namespace fan
 		bool Renderer::ResetCommandPool() {
 			VkCommandPoolResetFlags releaseResources = VK_COMMAND_POOL_RESET_RELEASE_RESOURCES_BIT;
 
-			if (vkResetCommandPool(m_device.vkDevice, m_commandPool, releaseResources) != VK_SUCCESS) {
+			if (vkResetCommandPool(m_device->vkDevice, m_commandPool, releaseResources) != VK_SUCCESS) {
 				fan::Debug::Error( "Could not reset command pool." );
 				return false;
 			}
@@ -605,7 +602,7 @@ namespace fan
 			submitInfo.signalSemaphoreCount = 1;
 			submitInfo.pSignalSemaphores = m_swapchain->GetCurrentRenderFinishedSemaphore();
 
-			VkResult result = vkQueueSubmit(m_device.GetGraphicsQueue(), 1, &submitInfo, *m_swapchain->GetCurrentInFlightFence());
+			VkResult result = vkQueueSubmit(m_device->GetGraphicsQueue(), 1, &submitInfo, *m_swapchain->GetCurrentInFlightFence());
 			if (result != VK_SUCCESS) {
 				fan::Debug::Error( "Could not submit draw command buffer " );
 				return false;
@@ -617,7 +614,7 @@ namespace fan
 		//================================================================================================================================
 		//================================================================================================================================
 		void Renderer::ReloadShaders() {
-			vkDeviceWaitIdle(m_device.vkDevice);
+			vkDeviceWaitIdle(m_device->vkDevice);
 
 			m_postprocessPipeline->ReloadShaders();
 			m_forwardPipeline->ReloadShaders();
@@ -649,7 +646,7 @@ namespace fan
 			if( m_debugLines.size() > 0) {
 				delete m_debugLinesvertexBuffers[_index];
 				const VkDeviceSize size = sizeof(vk::DebugVertex) * m_debugLines.size();
-				m_debugLinesvertexBuffers[_index] = new vk::Buffer(m_device);
+				m_debugLinesvertexBuffers[_index] = new vk::Buffer(*m_device);
 				m_debugLinesvertexBuffers[_index]->Create(
 					size,
 					VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_VERTEX_BUFFER_BIT,
@@ -657,22 +654,22 @@ namespace fan
 				);
 
 				if (size > 0) {
-					vk::Buffer stagingBuffer(m_device);
+					vk::Buffer stagingBuffer(*m_device);
 					stagingBuffer.Create(
 						size,
 						VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
 						VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT
 					);
 					stagingBuffer.SetData(m_debugLines.data(), size);
-					VkCommandBuffer cmd = Renderer::GetRenderer().BeginSingleTimeCommands();
+					VkCommandBuffer cmd = Renderer::Get().BeginSingleTimeCommands();
 					stagingBuffer.CopyBufferTo(cmd, m_debugLinesvertexBuffers[_index]->GetBuffer(), size);
-					Renderer::GetRenderer().EndSingleTimeCommands(cmd);
+					Renderer::Get().EndSingleTimeCommands(cmd);
 				}
 			}
 			if(m_debugTriangles.size() > 0 ){
 				delete m_debugTrianglesvertexBuffers[_index];
 				const VkDeviceSize size = sizeof(vk::DebugVertex) * m_debugTriangles.size();
-				m_debugTrianglesvertexBuffers[_index] = new vk::Buffer(m_device);
+				m_debugTrianglesvertexBuffers[_index] = new vk::Buffer(*m_device);
 				m_debugTrianglesvertexBuffers[_index]->Create(
 					size,
 					VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_VERTEX_BUFFER_BIT,
@@ -680,16 +677,16 @@ namespace fan
 				);
 
 				if (size > 0) {
-					vk::Buffer stagingBuffer(m_device);
+					vk::Buffer stagingBuffer(*m_device);
 					stagingBuffer.Create(
 						size,
 						VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
 						VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT
 					);
 					stagingBuffer.SetData(m_debugTriangles.data(), size);
-					VkCommandBuffer cmd = Renderer::GetRenderer().BeginSingleTimeCommands();
+					VkCommandBuffer cmd = Renderer::Get().BeginSingleTimeCommands();
 					stagingBuffer.CopyBufferTo(cmd, m_debugTrianglesvertexBuffers[_index]->GetBuffer(), size);
-					Renderer::GetRenderer().EndSingleTimeCommands(cmd);
+					Renderer::Get().EndSingleTimeCommands(cmd);
 				}
 			}
 		}
@@ -880,7 +877,7 @@ namespace fan
 
 			m_primaryCommandBuffers.resize(m_swapchain->GetSwapchainImagesCount());
 
-			if (vkAllocateCommandBuffers(m_device.vkDevice, &commandBufferAllocateInfo, m_primaryCommandBuffers.data()) != VK_SUCCESS) {
+			if (vkAllocateCommandBuffers(m_device->vkDevice, &commandBufferAllocateInfo, m_primaryCommandBuffers.data()) != VK_SUCCESS) {
 				fan::Debug::Error( "Could not allocate command buffers." );
 				return false;
 			}
@@ -894,25 +891,25 @@ namespace fan
 
 			m_reloadGeometryCommandBuffers.resize(m_swapchain->GetSwapchainImagesCount(), false);
 			m_geometryCommandBuffers.resize(m_swapchain->GetSwapchainImagesCount());
-			if (vkAllocateCommandBuffers(m_device.vkDevice, &secondaryCommandBufferAllocateInfo, m_geometryCommandBuffers.data()) != VK_SUCCESS) {
+			if (vkAllocateCommandBuffers(m_device->vkDevice, &secondaryCommandBufferAllocateInfo, m_geometryCommandBuffers.data()) != VK_SUCCESS) {
 				fan::Debug::Error( "Could not allocate command buffers." );
 				return false;
 			}
 
 			m_debugCommandBuffers.resize(m_swapchain->GetSwapchainImagesCount());
-			if (vkAllocateCommandBuffers(m_device.vkDevice, &secondaryCommandBufferAllocateInfo, m_debugCommandBuffers.data()) != VK_SUCCESS) {
+			if (vkAllocateCommandBuffers(m_device->vkDevice, &secondaryCommandBufferAllocateInfo, m_debugCommandBuffers.data()) != VK_SUCCESS) {
 				fan::Debug::Error( "Could not allocate debug command buffers." );
 				return false;
 			}
 
 			m_imguiCommandBuffers.resize(m_swapchain->GetSwapchainImagesCount());
-			if (vkAllocateCommandBuffers(m_device.vkDevice, &secondaryCommandBufferAllocateInfo, m_imguiCommandBuffers.data()) != VK_SUCCESS) {
+			if (vkAllocateCommandBuffers(m_device->vkDevice, &secondaryCommandBufferAllocateInfo, m_imguiCommandBuffers.data()) != VK_SUCCESS) {
 				fan::Debug::Error( "Could not allocate command buffers." );
 				return false;
 			}
 
 			m_postprocessCommandBuffers.resize(m_swapchain->GetSwapchainImagesCount());
-			if (vkAllocateCommandBuffers(m_device.vkDevice, &secondaryCommandBufferAllocateInfo, m_postprocessCommandBuffers.data()) != VK_SUCCESS) {
+			if (vkAllocateCommandBuffers(m_device->vkDevice, &secondaryCommandBufferAllocateInfo, m_postprocessCommandBuffers.data()) != VK_SUCCESS) {
 				fan::Debug::Error( "Could not allocate command buffers." );
 				return false;
 			}
@@ -927,9 +924,9 @@ namespace fan
 			commandPoolCreateInfo.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
 			commandPoolCreateInfo.pNext = nullptr;
 			commandPoolCreateInfo.flags = VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT;
-			commandPoolCreateInfo.queueFamilyIndex = m_device.GetGraphicsQueueFamilyIndex();
+			commandPoolCreateInfo.queueFamilyIndex = m_device->GetGraphicsQueueFamilyIndex();
 
-			if (vkCreateCommandPool(m_device.vkDevice, &commandPoolCreateInfo, nullptr, &m_commandPool) != VK_SUCCESS) {
+			if (vkCreateCommandPool(m_device->vkDevice, &commandPoolCreateInfo, nullptr, &m_commandPool) != VK_SUCCESS) {
 				fan::Debug::Error( "Could not allocate command pool." );
 				return false;
 			}
@@ -953,7 +950,7 @@ namespace fan
 
 			VkAttachmentDescription depthAttachment;
 			depthAttachment.flags = 0;
-			depthAttachment.format = m_device.FindDepthFormat();
+			depthAttachment.format = m_device->FindDepthFormat();
 			depthAttachment.samples = VK_SAMPLE_COUNT_1_BIT;
 			depthAttachment.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
 			depthAttachment.storeOp = VK_ATTACHMENT_STORE_OP_STORE;
@@ -1010,7 +1007,7 @@ namespace fan
 			renderPassCreateInfo.dependencyCount = static_cast<uint32_t>(subpassDependencies.size());;
 			renderPassCreateInfo.pDependencies = subpassDependencies.data();
 
-			if (vkCreateRenderPass(m_device.vkDevice, &renderPassCreateInfo, nullptr, &m_renderPass) != VK_SUCCESS) {
+			if (vkCreateRenderPass(m_device->vkDevice, &renderPassCreateInfo, nullptr, &m_renderPass) != VK_SUCCESS) {
 				fan::Debug::Error( "Could not create render pass" );
 				return false;
 			}
@@ -1076,7 +1073,7 @@ namespace fan
 			renderPassCreateInfo.dependencyCount = static_cast<uint32_t>(subpassDependencies.size());;
 			renderPassCreateInfo.pDependencies = subpassDependencies.data();
 
-			if (vkCreateRenderPass(m_device.vkDevice, &renderPassCreateInfo, nullptr, &m_renderPassPostprocess) != VK_SUCCESS) {
+			if (vkCreateRenderPass(m_device->vkDevice, &renderPassCreateInfo, nullptr, &m_renderPassPostprocess) != VK_SUCCESS) {
 				fan::Debug::Error( "Could not create render pass pp" );
 				return false;
 			}
@@ -1142,7 +1139,7 @@ namespace fan
 			renderPassCreateInfo.dependencyCount = static_cast<uint32_t>(subpassDependencies.size());;
 			renderPassCreateInfo.pDependencies = subpassDependencies.data();
 
-			if (vkCreateRenderPass(m_device.vkDevice, &renderPassCreateInfo, nullptr, &m_renderPassPostprocess) != VK_SUCCESS) {
+			if (vkCreateRenderPass(m_device->vkDevice, &renderPassCreateInfo, nullptr, &m_renderPassPostprocess) != VK_SUCCESS) {
 				fan::Debug::Error( "Could not create render pass pp" );
 				return false;
 			}
@@ -1162,7 +1159,7 @@ namespace fan
 					m_forwardPipeline->GetDepthImageView()
 				};
 
-				m_forwardFrameBuffers[framebufferIndex] = new vk::FrameBuffer(m_device);
+				m_forwardFrameBuffers[framebufferIndex] = new vk::FrameBuffer(*m_device);
 				m_forwardFrameBuffers[framebufferIndex]->Create(m_renderPass, attachments, m_swapchain->GetExtent());
 			}
 		}
@@ -1178,7 +1175,7 @@ namespace fan
 					m_swapchain->GetImageView(framebufferIndex),
 				};
 
-				m_swapchainFramebuffers[framebufferIndex] = new vk::FrameBuffer(m_device);
+				m_swapchainFramebuffers[framebufferIndex] = new vk::FrameBuffer(*m_device);
 				m_swapchainFramebuffers[framebufferIndex]->Create( m_renderPassPostprocess, attachments, m_swapchain->GetExtent());
 
 			}
@@ -1196,14 +1193,14 @@ namespace fan
 		//================================================================================================================================
 		//================================================================================================================================
 		void Renderer::DeleteCommandPool() {
-			vkDestroyCommandPool(m_device.vkDevice, m_commandPool, nullptr);
+			vkDestroyCommandPool(m_device->vkDevice, m_commandPool, nullptr);
 		}
 
 		//================================================================================================================================
 		//================================================================================================================================
 		void Renderer::DeleteRenderPass() {
 			if (m_renderPass != VK_NULL_HANDLE) {
-				vkDestroyRenderPass(m_device.vkDevice, m_renderPass, nullptr);
+				vkDestroyRenderPass(m_device->vkDevice, m_renderPass, nullptr);
 				m_renderPass = VK_NULL_HANDLE;
 			}
 		}
@@ -1212,7 +1209,7 @@ namespace fan
 		//================================================================================================================================
 		void Renderer::DeleteRenderPassPostprocess() {
 			if (m_renderPassPostprocess != VK_NULL_HANDLE) {
-				vkDestroyRenderPass(m_device.vkDevice, m_renderPassPostprocess, nullptr);
+				vkDestroyRenderPass(m_device->vkDevice, m_renderPassPostprocess, nullptr);
 				m_renderPassPostprocess = VK_NULL_HANDLE;
 			}
 		}

@@ -43,7 +43,7 @@ namespace fan {
 		void SetSelectedentity( scene::Entity * _selectedentity) { m_selectedentity = _selectedentity;	}
 		void Deselect() { m_selectedentity = nullptr; }
 
-		scene::Entity *	const		GetSelectedentity() const	{ return m_selectedentity;  }
+		scene::Entity *	const			GetSelectedentity() const	{ return m_selectedentity;  }
 		editor::MainMenuBar  &			GetMainMenuBar() const			{ return * m_mainMenuBar; }
 		editor::RenderWindow &			GetRenderWindow() const			{ return * m_renderWindow; }
 		editor::SceneWindow  &			GetSceneWindow() const			{ return * m_sceneWindow; }
@@ -51,7 +51,6 @@ namespace fan {
 		editor::PreferencesWindow  &	GetPreferencesWindow() const	{ return * m_preferencesWindow; }
 		editor::ConsoleWindow  &		GetConsoleWindow() const		{ return * m_consoleWindow; }
 		scene::Scene &					GetScene() const				{ return * m_scene; }
-		Renderer &					GetRenderer() const				{ return * m_renderer; }
 
 		fan::SerializedValues & GetEditorValues() { return m_editorValues; }
 		EditorGrid GetEditorGrid() const { return m_editorGrid;  }
@@ -71,10 +70,9 @@ namespace fan {
 		fan::SerializedValues m_editorValues;
 
 		// Main components
-		Renderer *			m_renderer;
-		scene::Scene *		m_scene;
+		scene::Scene *	m_scene;
 		scene::Entity * m_selectedentity;
-		scene::Camera *		m_editorCamera;
+		scene::Camera *	m_editorCamera;
 
 		struct GizmoCacheData {
 			int axisIndex;
