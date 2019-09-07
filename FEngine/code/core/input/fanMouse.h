@@ -25,7 +25,7 @@ namespace fan {
 		static bool GetButtonReleased(int _GLFW_MOUSE_BUTTON);
 
 	private:
-		static void MouseCallback(GLFWwindow* window, double x, double y) { (void)window;	(void)x;	(void)y; }
+		static void MouseCallback(GLFWwindow* _window, double _x, double _y);
 		static void MouseButtonCallback(GLFWwindow* window, int button, int action, int mods);
 		static void ScrollCallback(GLFWwindow* window, double xoffset, double yoffset);
 
@@ -39,7 +39,7 @@ namespace fan {
 		btVector2	m_delta;
 		btVector2	m_deltaScroll;
 
-		std::array< unsigned, 11 > m_buttonsPressed;
-		std::array< unsigned, 11 > m_buttonsReleased;
+		std::array< uint64_t, 11 > m_buttonsPressed;
+		std::array< uint64_t, 11 > m_buttonsReleased;
 	};
 }

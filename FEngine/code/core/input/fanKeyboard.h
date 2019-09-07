@@ -10,9 +10,9 @@ namespace fan {
 		friend class Input;
 
 	public:
-		static int	IsKeyDown(int _GLFW_KEY);
-		static bool IsKeyPressed(int _GLFW_KEY);
-		static bool IsKeyReleased(int _GLFW_KEY);
+		static bool	IsKeyDown		(int _GLFW_KEY);
+		static bool IsKeyPressed	(int _GLFW_KEY);
+		static bool IsKeyReleased	(int _GLFW_KEY);
 
 		enum AzertyKey {
 			D = GLFW_KEY_D,
@@ -28,7 +28,7 @@ namespace fan {
 		static void CharCallback(GLFWwindow* _window, unsigned int _c);
 
 		//Events
-		std::array< unsigned, 349 > m_keysPressed;
-		std::array< unsigned, 349 > m_keysReleased;
+		std::array< uint64_t, 349 > m_keysPressed;
+		std::array< uint64_t, 349 > m_keysReleased;
 	};
 }

@@ -41,10 +41,5 @@ namespace fan {
 		glfwPollEvents();
 
 		Mouse::Get().Update();
-
-		ImGuiIO& io = ImGui::GetIO();
-		io.MousePos = ImVec2(Mouse::GetPosition().x(), Mouse::GetPosition().y());
-		io.MouseDown[0] = Mouse::GetButtonDown(Mouse::button0);
-		io.MouseDown[1] = Mouse::GetButtonDown(Mouse::button1);
 	}
 }

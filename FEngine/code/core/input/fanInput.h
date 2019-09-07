@@ -14,13 +14,13 @@ namespace fan {
 		static void			NewFrame();
 		static GLFWwindow * GetWindow()		{ return Get().m_window; }
 		static btVector2	GetWindowSize() { return Get().m_windowSize; }
-		static unsigned		GetFrameCount() { return Get().m_count; }
+		static uint64_t		GetFrameCount() { return Get().m_count; }
 
 	private:
-		 GLFWwindow * m_window;
-		 btVector2	m_windowSize;
+		 GLFWwindow *	m_window;
+		 btVector2		m_windowSize;
 		 unsigned		m_count;
 
-		 static void			WindowSizeCallback(GLFWwindow* window, int width, int height);
+		 static void		WindowSizeCallback(GLFWwindow* window, int width, int height);
 	};			
 }
