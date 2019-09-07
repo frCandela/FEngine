@@ -22,7 +22,7 @@ namespace fan
 				glm::vec4 color;
 			};
 
-			DebugPipeline(Device& _device, VkRenderPass& _renderPass, const VkPrimitiveTopology _primitiveTopology);
+			DebugPipeline(Device& _device, VkRenderPass& _renderPass, const VkPrimitiveTopology _primitiveTopology, const bool _depthTestEnable );
 			~DebugPipeline();
 
 			void Create(VkExtent2D _extent, const char * _fragShaderPath, const char * _vertShaderPath);
@@ -50,10 +50,10 @@ namespace fan
 
 			Shader * m_fragmentShader = nullptr;
 			Shader * m_vertexShader = nullptr;
-
 			Buffer * m_uniformBuffer;
-
 			Uniforms m_uniforms;
+
+			bool m_depthTestEnable;
 
 			void CreateShaders(const char * _vertShaderPath, const char * _fragShaderPath);
 			bool CreateDescriptors();

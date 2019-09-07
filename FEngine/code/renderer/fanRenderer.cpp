@@ -55,14 +55,19 @@ namespace fan
 			m_forwardPipeline = new vk::ForwardPipeline(*m_device, m_renderPass);
 			m_forwardPipeline->Create( m_swapchain->GetExtent());
 
-			m_postprocessPipeline = new vk::PostprocessPipeline(*m_device, m_renderPassPostprocess);
-			m_postprocessPipeline->Create(m_swapchain->GetSurfaceFormat().format, m_swapchain->GetExtent());
-		
-			m_debugLinesPipeline = new vk::DebugPipeline(*m_device, m_renderPassPostprocess, VK_PRIMITIVE_TOPOLOGY_LINE_LIST);
+			m_debugLinesPipeline = new vk::DebugPipeline(*m_device, m_renderPass, VK_PRIMITIVE_TOPOLOGY_LINE_LIST, true);
 			m_debugLinesPipeline->Create(m_swapchain->GetExtent(), "code/shaders/debugLines.vert", "code/shaders/debugLines.frag");
 
-			m_debugTrianglesPipeline = new vk::DebugPipeline(*m_device, m_renderPassPostprocess, VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST);
+			m_debugLinesPipelineNoDepthTest = new vk::DebugPipeline(*m_device, m_renderPass, VK_PRIMITIVE_TOPOLOGY_LINE_LIST, false);
+			m_debugLinesPipelineNoDepthTest->Create(m_swapchain->GetExtent(), "code/shaders/debugLines.vert", "code/shaders/debugLines.frag");
+			
+			m_debugTrianglesPipeline = new vk::DebugPipeline(*m_device, m_renderPass, VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST, false);
 			m_debugTrianglesPipeline->Create(m_swapchain->GetExtent(), "code/shaders/debugTriangles.vert", "code/shaders/debugTriangles.frag");
+
+			m_postprocessPipeline = new vk::PostprocessPipeline(*m_device, m_renderPassPostprocess);
+			m_postprocessPipeline->Create(m_swapchain->GetSurfaceFormat().format, m_swapchain->GetExtent());		
+
+
 		
 			m_imguiPipeline = new vk::ImguiPipeline(*m_device, m_swapchain->GetSwapchainImagesCount());
 			m_imguiPipeline->Create(m_renderPassPostprocess, m_window->GetWindow(), m_swapchain->GetExtent());
@@ -73,6 +78,7 @@ namespace fan
 			RecordAllCommandBuffers();
 
 			m_debugLinesvertexBuffers.resize(m_swapchain->GetSwapchainImagesCount());
+			m_debugLinesNoDepthTestVertexBuffers.resize(m_swapchain->GetSwapchainImagesCount());
 			m_debugTrianglesvertexBuffers.resize(m_swapchain->GetSwapchainImagesCount());
 
 			ImGui::NewFrame();
@@ -88,12 +94,17 @@ namespace fan
 			delete m_imguiPipeline;
 			delete m_forwardPipeline;
 			delete m_debugLinesPipeline;
+			delete m_debugLinesPipelineNoDepthTest;
 			delete m_debugTrianglesPipeline;
 			delete m_ressourceManager;
 
 			for (int bufferIndex = 0; bufferIndex < m_debugLinesvertexBuffers.size(); bufferIndex++) {
 				delete m_debugLinesvertexBuffers[bufferIndex];
 			} m_debugLinesvertexBuffers.clear();
+
+			for (int bufferIndex = 0; bufferIndex < m_debugLinesNoDepthTestVertexBuffers.size(); bufferIndex++) {
+				delete m_debugLinesNoDepthTestVertexBuffers[bufferIndex];
+			} m_debugLinesNoDepthTestVertexBuffers.clear();
 
 			for (int bufferIndex = 0; bufferIndex < m_debugTrianglesvertexBuffers.size(); bufferIndex++) {
 				delete m_debugTrianglesvertexBuffers[bufferIndex];
@@ -107,7 +118,7 @@ namespace fan
 
 			delete m_postprocessPipeline;
 			delete m_swapchain;
-			delete &m_device;
+			delete m_device;
 			delete m_window;
 			delete m_instance;
 		}
@@ -147,6 +158,7 @@ namespace fan
 					m_postprocessPipeline->Resize(m_window->GetExtent());
 					m_forwardPipeline->Resize(m_window->GetExtent());
 					m_debugLinesPipeline->Resize(m_window->GetExtent());
+					m_debugLinesPipelineNoDepthTest->Resize(m_window->GetExtent());
 					m_debugTrianglesPipeline->Resize(m_window->GetExtent());
 
 					CreateSwapchainFramebuffers();
@@ -309,6 +321,7 @@ namespace fan
 				debugUniforms.proj = ubo.proj;
 				debugUniforms.color = glm::vec4(1, 1, 1, 1);
 				m_debugLinesPipeline->SetUniforms(debugUniforms);
+				m_debugLinesPipelineNoDepthTest->SetUniforms(debugUniforms);
 				m_debugTrianglesPipeline->SetUniforms(debugUniforms);
 
 				m_mainCamera->SetModified(false);
@@ -418,13 +431,13 @@ namespace fan
 			
 				vkCmdBeginRenderPass(commandBuffer, &renderPassInfo, VK_SUBPASS_CONTENTS_SECONDARY_COMMAND_BUFFERS); {
 					vkCmdExecuteCommands(commandBuffer, 1, &m_geometryCommandBuffers[_index]);
+					if (HasNoDebugToDraw() == false) {
+						vkCmdExecuteCommands(commandBuffer, 1, &m_debugCommandBuffers[_index]);
+					}
 				} vkCmdEndRenderPass(commandBuffer);
 			
 				vkCmdBeginRenderPass(commandBuffer, &renderPassInfoPostprocess, VK_SUBPASS_CONTENTS_SECONDARY_COMMAND_BUFFERS); {
 					vkCmdExecuteCommands( commandBuffer, 1, &m_postprocessCommandBuffers[_index]	);
-					if (HasNoDebugToDraw() == false) {
-						vkCmdExecuteCommands(commandBuffer, 1, &m_debugCommandBuffers[_index]);
-					}
 					vkCmdExecuteCommands( commandBuffer, 1, &m_imguiCommandBuffers[_index]			);
 				} vkCmdEndRenderPass(commandBuffer);
 			
@@ -520,9 +533,9 @@ namespace fan
 				VkCommandBufferInheritanceInfo commandBufferInheritanceInfo = {};
 				commandBufferInheritanceInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_INHERITANCE_INFO;
 				commandBufferInheritanceInfo.pNext = nullptr;
-				commandBufferInheritanceInfo.renderPass = m_renderPassPostprocess;
+				commandBufferInheritanceInfo.renderPass = m_renderPass;
 				commandBufferInheritanceInfo.subpass = 0;
-				commandBufferInheritanceInfo.framebuffer = m_swapchainFramebuffers[_index]->GetFrameBuffer();
+				commandBufferInheritanceInfo.framebuffer = m_forwardFrameBuffers[_index]->GetFrameBuffer();
 				commandBufferInheritanceInfo.occlusionQueryEnable = VK_FALSE;
 				//commandBufferInheritanceInfo.queryFlags				=;
 				//commandBufferInheritanceInfo.pipelineStatistics		=;
@@ -534,8 +547,9 @@ namespace fan
 				commandBufferBeginInfo.pInheritanceInfo = &commandBufferInheritanceInfo;
 
 				if (vkBeginCommandBuffer(commandBuffer, &commandBufferBeginInfo) == VK_SUCCESS) {				
-					m_debugLinesPipeline->Draw(commandBuffer,  *m_debugLinesvertexBuffers[_index], static_cast<uint32_t>(m_debugLines.size()));				
-					m_debugTrianglesPipeline->Draw(commandBuffer, *m_debugTrianglesvertexBuffers[_index], static_cast<uint32_t>(m_debugTriangles.size()));
+					m_debugLinesPipeline->Draw(				commandBuffer, *m_debugLinesvertexBuffers[_index],				static_cast<uint32_t>(m_debugLines.size()));		
+					m_debugLinesPipelineNoDepthTest->Draw(	commandBuffer, *m_debugLinesNoDepthTestVertexBuffers[_index],	static_cast<uint32_t>(m_debugLinesNoDepthTest.size()));
+					m_debugTrianglesPipeline->Draw(			commandBuffer, *m_debugTrianglesvertexBuffers[_index],			static_cast<uint32_t>(m_debugTriangles.size()));
 					if (vkEndCommandBuffer(commandBuffer) != VK_SUCCESS) {
 						fan::Debug::Get() << fan::Debug::Severity::error << "Could not record command buffer " << _index << "." << std::endl;
 					}
@@ -619,11 +633,13 @@ namespace fan
 			m_postprocessPipeline->ReloadShaders();
 			m_forwardPipeline->ReloadShaders();
 			m_debugLinesPipeline->ReloadShaders();
+			m_debugLinesPipelineNoDepthTest->ReloadShaders();
 			m_debugTrianglesPipeline->ReloadShaders();
 
 			m_postprocessPipeline->Resize(m_swapchain->GetExtent());
 			m_forwardPipeline->Resize(m_swapchain->GetExtent());
 			m_debugLinesPipeline->Resize(m_swapchain->GetExtent());
+			m_debugLinesPipelineNoDepthTest->Resize(m_swapchain->GetExtent());
 			m_debugTrianglesPipeline->Resize(m_swapchain->GetExtent());
 
 			DeleteForwardFramebuffers();
@@ -644,7 +660,7 @@ namespace fan
 		//================================================================================================================================
 		void Renderer::UpdateDebugBuffer(const int _index) {
 			if( m_debugLines.size() > 0) {
-				delete m_debugLinesvertexBuffers[_index];
+				delete m_debugLinesvertexBuffers[_index];	// TODO update instead of delete
 				const VkDeviceSize size = sizeof(vk::DebugVertex) * m_debugLines.size();
 				m_debugLinesvertexBuffers[_index] = new vk::Buffer(*m_device);
 				m_debugLinesvertexBuffers[_index]->Create(
@@ -666,6 +682,31 @@ namespace fan
 					Renderer::Get().EndSingleTimeCommands(cmd);
 				}
 			}
+
+			if (m_debugLinesNoDepthTest.size() > 0) {
+				delete m_debugLinesNoDepthTestVertexBuffers[_index];
+				const VkDeviceSize size = sizeof(vk::DebugVertex) * m_debugLinesNoDepthTest.size();
+				m_debugLinesNoDepthTestVertexBuffers[_index] = new vk::Buffer(*m_device);
+				m_debugLinesNoDepthTestVertexBuffers[_index]->Create(
+					size,
+					VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_VERTEX_BUFFER_BIT,
+					VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT
+				);
+
+				if (size > 0) {
+					vk::Buffer stagingBuffer(*m_device);
+					stagingBuffer.Create(
+						size,
+						VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
+						VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT
+					);
+					stagingBuffer.SetData(m_debugLinesNoDepthTest.data(), size);
+					VkCommandBuffer cmd = Renderer::Get().BeginSingleTimeCommands();
+					stagingBuffer.CopyBufferTo(cmd, m_debugLinesNoDepthTestVertexBuffers[_index]->GetBuffer(), size);
+					Renderer::Get().EndSingleTimeCommands(cmd);
+				}
+			}
+
 			if(m_debugTriangles.size() > 0 ){
 				delete m_debugTrianglesvertexBuffers[_index];
 				const VkDeviceSize size = sizeof(vk::DebugVertex) * m_debugTriangles.size();
@@ -702,9 +743,15 @@ namespace fan
 
 		//================================================================================================================================
 		//================================================================================================================================
-		void Renderer::DebugLine(const btVector3 _start, const btVector3 _end, const Color _color) {
-			m_debugLines.push_back(vk::DebugVertex( ToGLM(_start), glm::vec3(0,0,0), _color.ToGLM()));
-			m_debugLines.push_back(vk::DebugVertex(ToGLM(_end), glm::vec3(0, 0, 0), _color.ToGLM()));
+		void Renderer::DebugLine(const btVector3 _start, const btVector3 _end, const Color _color, const bool _depthTestEnable) {
+			if ( _depthTestEnable ) {
+				m_debugLines.push_back(vk::DebugVertex(ToGLM(_start), glm::vec3(0, 0, 0), _color.ToGLM()));
+				m_debugLines.push_back(vk::DebugVertex(ToGLM(_end), glm::vec3(0, 0, 0), _color.ToGLM()));
+			} else {
+				m_debugLinesNoDepthTest.push_back(vk::DebugVertex(ToGLM(_start), glm::vec3(0, 0, 0), _color.ToGLM()));
+				m_debugLinesNoDepthTest.push_back(vk::DebugVertex(ToGLM(_end), glm::vec3(0, 0, 0), _color.ToGLM()));
+			}
+
 		}
 
 		//================================================================================================================================

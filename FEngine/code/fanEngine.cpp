@@ -360,7 +360,7 @@ namespace fan {
 			}
 
 			// Draw the gizmo cone & lines
-			Renderer::Get().DebugLine(origin, origin + size*( _transform *  axisDirection[axisIndex] - origin ), opaqueColor);
+			Renderer::Get().DebugLine(origin, origin + size*( _transform *  axisDirection[axisIndex] - origin ), opaqueColor, false );
 			for (int triangleIndex = 0; triangleIndex < coneTris.size() / 3; triangleIndex++) {
 				Renderer::Get().DebugTriangle(coneTris[3 * triangleIndex + 0], coneTris[3 * triangleIndex + 1], coneTris[3 * triangleIndex + 2], clickedColor);
 			}

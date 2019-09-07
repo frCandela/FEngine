@@ -71,7 +71,7 @@ namespace fan
 		void SetClearColor(glm::vec4 _color) { m_clearColor = _color; }
 		void SetMainCamera(scene::Camera * _camera);
 
-		bool HasNoDebugToDraw() const { return m_debugLines.empty() && m_debugTriangles.empty(); }
+		bool HasNoDebugToDraw() const { return m_debugLinesNoDepthTest.empty() && m_debugLines.empty() && m_debugTriangles.empty(); }
 
 		const std::vector < vk::DrawData > & GetDrawData() const { return m_drawData; }
 
@@ -81,7 +81,7 @@ namespace fan
 		void UnRegisterModel(scene::Model * _model);
 
 		void					DebugPoint(const btVector3 _pos, const Color _color);
-		void					DebugLine(const btVector3 _start, const btVector3 _end, const Color _color);
+		void					DebugLine(const btVector3 _start, const btVector3 _end, const Color _color, const bool _depthTestEnable = true );
 		void					DebugTriangle(const btVector3 _v0, const btVector3 _v1, const btVector3 _v2, const Color _color);
 		std::vector< btVector3> DebugCube(const btTransform _transform, const float _halfSize, const Color _color);
 		std::vector< btVector3> DebugSphere(const btTransform _transform, const float _radius, const int _numSubdivisions, const Color _color);
@@ -98,10 +98,12 @@ namespace fan
 		vk::RessourceManager *  m_ressourceManager;
 
 		// DEBUG DATA
-		std::vector<vk::DebugVertex> m_debugLines;
-		std::vector<vk::Buffer *> m_debugLinesvertexBuffers;
-		std::vector<vk::DebugVertex> m_debugTriangles;
-		std::vector<vk::Buffer *> m_debugTrianglesvertexBuffers;
+		std::vector<vk::DebugVertex>	m_debugLines;
+		std::vector<vk::Buffer *>		m_debugLinesvertexBuffers;
+		std::vector<vk::DebugVertex>	m_debugLinesNoDepthTest;
+		std::vector<vk::Buffer *>		m_debugLinesNoDepthTestVertexBuffers;
+		std::vector<vk::DebugVertex>	m_debugTriangles;
+		std::vector<vk::Buffer *>		m_debugTrianglesvertexBuffers;
 
 		// VULKAN OBJECTS
 		vk::Instance *		m_instance;
@@ -113,6 +115,7 @@ namespace fan
 		vk::PostprocessPipeline *	m_postprocessPipeline;
 		vk::ForwardPipeline *		m_forwardPipeline;
 		vk::DebugPipeline *			m_debugLinesPipeline;
+		vk::DebugPipeline *			m_debugLinesPipelineNoDepthTest;
 		vk::DebugPipeline *			m_debugTrianglesPipeline;
 
 		VkRenderPass	m_renderPass;
@@ -139,6 +142,7 @@ namespace fan
 
 		void ClearDebug() {
 			m_debugLines.clear();
+			m_debugLinesNoDepthTest.clear();
 			m_debugTriangles.clear();
 		}
 

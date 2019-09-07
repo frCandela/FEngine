@@ -14,10 +14,11 @@ namespace fan
 	namespace vk {
 		//================================================================================================================================
 		//================================================================================================================================
-		DebugPipeline::DebugPipeline(Device& _device, VkRenderPass& _renderPass, const VkPrimitiveTopology _primitiveTopology) :
+		DebugPipeline::DebugPipeline(Device& _device, VkRenderPass& _renderPass, const VkPrimitiveTopology _primitiveTopology, const bool _depthTestEnable) :
 			m_device(_device)
 			, m_renderPass(_renderPass)
-			, m_primitiveTopology(_primitiveTopology) {
+			, m_primitiveTopology(_primitiveTopology)
+			, m_depthTestEnable( _depthTestEnable ){
 		}
 
 		//================================================================================================================================
@@ -284,7 +285,7 @@ namespace fan
 			depthStencilStateCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_DEPTH_STENCIL_STATE_CREATE_INFO;
 			depthStencilStateCreateInfo.pNext = nullptr;
 			depthStencilStateCreateInfo.flags = 0;
-			depthStencilStateCreateInfo.depthTestEnable = VK_TRUE;
+			depthStencilStateCreateInfo.depthTestEnable = m_depthTestEnable ? VK_TRUE : VK_FALSE;
 			depthStencilStateCreateInfo.depthWriteEnable = VK_TRUE;
 			depthStencilStateCreateInfo.depthCompareOp = VK_COMPARE_OP_LESS;
 			depthStencilStateCreateInfo.depthBoundsTestEnable = VK_FALSE;
