@@ -212,10 +212,9 @@ namespace fan
 						}
 
 					}
-				
-					ImGui::End();
 				}
 				UpdateUniformBuffer();
+				ImGui::End();
 				ImGui::EndFrame();
 				ImGui::Render();
 

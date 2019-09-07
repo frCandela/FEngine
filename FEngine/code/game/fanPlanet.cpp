@@ -28,10 +28,14 @@ namespace fan {
 			scene::Transform * transform = GetEntity()->GetComponent<scene::Transform>();
 
 			btVector3 pos = transform->GetPosition();
-			pos[1] += 5.f*m_dir*(_delta < 0.1f ? _delta : 0.1f );
-			if (pos.getY() > 3 || pos.getY() < 0) {
-				m_dir = -m_dir;
+			if (pos.getY() > 3 ) {
+				m_dir = -1.f;
 			}
+			else if (pos.getY() < 0 ) {
+				m_dir = 1.f;
+			}
+			pos[1] += 5.f*m_dir*_delta;
+
 			transform->SetPosition(pos);
 
 			ImGui::Begin("planet window !"); {

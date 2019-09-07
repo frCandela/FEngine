@@ -120,14 +120,28 @@ namespace fan {
 		while ( m_applicationShouldExit == false && Renderer::Get().WindowIsOpen() == true)
 		{
 			const float time = Time::ElapsedSinceStartup();
-			const float updateDelta = time - lastUpdateTime;
+			const float delta = Time::GetDelta();
+			float updateDelta = time - lastUpdateTime;
 
-			if (updateDelta > 1.f / Time::GetFPS()) {
+			if ( updateDelta > delta ) {
 				lastUpdateTime = time;
 
-				m_scene->BeginFrame();
+				if (updateDelta > 25* delta) {
+					Debug::Get() << Debug::Severity::warning << "Lag detected, delta = " << updateDelta << "seconds." << std::endl;
+					updateDelta = 25*delta;
+				}
 
-				m_scene->Update(updateDelta);
+				while ( updateDelta > delta ) {
+					m_scene->BeginFrame();
+					m_scene->Update( delta );
+					updateDelta -= delta;
+
+					if ( updateDelta > delta ) {
+						ImGui::EndFrame();
+						ImGui::Render();
+						ImGui::NewFrame();
+					}
+				}
 
 				ManageSelection();
 				DrawUI();
