@@ -1,16 +1,18 @@
 #pragma once
 
+#include "core/fanSingleton.h"
+
 namespace fan {
 	//================================================================================================================================
 	//================================================================================================================================
-	class Keyboard
+	class Keyboard : public Singleton<Keyboard>
 	{
 		friend class Input;
 
 	public:
-		static int	IsKeyDown(int _GLFW_KEY) { return glfwGetKey(Input::GetWindow(), _GLFW_KEY) == GLFW_PRESS; }
-		static bool IsKeyPressed(int _GLFW_KEY) { return m_keysPressed[_GLFW_KEY] == Input::GetFrameCount(); }
-		static bool IsKeyReleased(int _GLFW_KEY) { return m_keysReleased[_GLFW_KEY] == Input::GetFrameCount(); }
+		static int	IsKeyDown(int _GLFW_KEY);
+		static bool IsKeyPressed(int _GLFW_KEY);
+		static bool IsKeyReleased(int _GLFW_KEY);
 
 		enum AzertyKey {
 			D = GLFW_KEY_D,
@@ -26,7 +28,7 @@ namespace fan {
 		static void CharCallback(GLFWwindow* _window, unsigned int _c);
 
 		//Events
-		static std::array< unsigned, 349 > m_keysPressed;
-		static std::array< unsigned, 349 > m_keysReleased;
+		std::array< unsigned, 349 > m_keysPressed;
+		std::array< unsigned, 349 > m_keysReleased;
 	};
 }

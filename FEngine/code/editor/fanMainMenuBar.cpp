@@ -8,7 +8,9 @@
 #include "editor/windows/fanPreferencesWindow.h"
 #include "editor/windows/fanConsoleWindow.h"	
 #include "core/files/fanSerializedValues.h"
-#include "core/fanInput.h"
+#include "core/input/fanInput.h"
+#include "core/input/fanKeyboard.h"
+#include "core/input/fanMouse.h"
 #include "editor/fanModals.h"
 #include "scene/fanScene.h"
 

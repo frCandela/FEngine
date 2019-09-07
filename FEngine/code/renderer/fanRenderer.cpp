@@ -7,7 +7,7 @@
 #include "scene/components/fanTransform.h"
 #include "scene/components/fanMaterial.h"
 #include "core/fanTime.h"
-#include "core/fanInput.h"
+#include "core/input/fanInput.h"
 #include "core/math/fanBasicModels.h"
 #include "renderer/fanMesh.h"
 #include "renderer/fanRessourceManager.h"
@@ -46,7 +46,7 @@ namespace fan
 			m_clearColor = glm::vec4(0.f, 0.f, 0.2f, 1.f);
 
 			m_swapchain->Create(m_window->GetSurface(), _size);
-			Input::Setup(m_window->GetWindow());
+			Input::Get().Setup(m_window->GetWindow());
 
 			CreateCommandPool();
 			CreateRenderPass();

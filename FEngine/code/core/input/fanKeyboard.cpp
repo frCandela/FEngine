@@ -1,11 +1,23 @@
 #include "fanGlobalIncludes.h"
 
 #include "core/input/fanKeyboard.h"
+#include "core/input/fanInput.h"
+
 
 namespace fan {
-	std::array< unsigned, 349 > Keyboard::m_keysPressed;
-	std::array< unsigned, 349 > Keyboard::m_keysReleased;
 
+	//================================================================================================================================
+	//================================================================================================================================
+	int	Keyboard::IsKeyDown(int _GLFW_KEY) { return glfwGetKey(Input::GetWindow(), _GLFW_KEY) == GLFW_PRESS; }
+	
+	//================================================================================================================================
+	//================================================================================================================================
+	bool Keyboard::IsKeyPressed(int _GLFW_KEY) { return Get().m_keysPressed[_GLFW_KEY] == Input::GetFrameCount(); }
+	
+	//================================================================================================================================
+	//================================================================================================================================
+	bool Keyboard::IsKeyReleased(int _GLFW_KEY) { return Get().m_keysReleased[_GLFW_KEY] == Input::GetFrameCount(); }
+	
 	//================================================================================================================================
 	//================================================================================================================================
 	void Keyboard::KeyCallback(GLFWwindow* _window, int _key, int _scancode, int _action, int _mods)
@@ -28,9 +40,9 @@ namespace fan {
 
 		//Keyboard
 		if (_action == GLFW_PRESS)
-			m_keysPressed[_key] = Input::GetFrameCount();
+			Get().m_keysPressed[_key] = Input::GetFrameCount();
 		else if (_action == GLFW_RELEASE)
-			m_keysReleased[_key] = Input::GetFrameCount();
+			Get().m_keysReleased[_key] = Input::GetFrameCount();
 	}
 
 	//================================================================================================================================

@@ -5,7 +5,9 @@
 #include "scene/fanEntity.h"
 #include "scene/components/fanCamera.h"
 #include "core/fanSignal.h"
-#include "core/fanInput.h"
+#include "core/input/fanInput.h"
+#include "core/input/fanKeyboard.h"
+#include "core/input/fanMouse.h"
 #include "fanEngine.h"
 #include "renderer/fanRenderer.h"
 

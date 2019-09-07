@@ -85,13 +85,13 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="code\core\fanDebug.cpp" />
-    <ClCompile Include="code\core\fanInput.cpp" />
     <ClCompile Include="code\core\fanISerializable.cpp" />
     <ClCompile Include="code\core\fanTime.cpp" />
     <ClCompile Include="code\core\fanTypeInfo.cpp" />
     <ClCompile Include="code\core\fanUniqueID.cpp" />
     <ClCompile Include="code\core\files\fanFbxImporter.cpp" />
     <ClCompile Include="code\core\files\fanSerializedValues.cpp" />
+    <ClCompile Include="code\core\input\fanInput.cpp" />
     <ClCompile Include="code\core\input\fanKeyboard.cpp" />
     <ClCompile Include="code\core\input\fanMouse.cpp" />
     <ClCompile Include="code\core\math\fanMathUtils.cpp" />
@@ -153,7 +153,6 @@
   <ItemGroup>
     <ClInclude Include="code\core\fanDebug.h" />
     <ClInclude Include="code\core\fanHash.h" />
-    <ClInclude Include="code\core\fanInput.h" />
     <ClInclude Include="code\core\fanISerializable.h" />
     <ClInclude Include="code\core\fanSignal.h" />
     <ClInclude Include="code\core\fanSingleton.h" />
@@ -162,6 +161,7 @@
     <ClInclude Include="code\core\fanUniqueID.h" />
     <ClInclude Include="code\core\files\fanFbxImporter.h" />
     <ClInclude Include="code\core\files\fanSerializedValues.h" />
+    <ClInclude Include="code\core\input\fanInput.h" />
     <ClInclude Include="code\core\input\fanKeyboard.h" />
     <ClInclude Include="code\core\input\fanMouse.h" />
     <ClInclude Include="code\core\math\fanBasicModels.h" />

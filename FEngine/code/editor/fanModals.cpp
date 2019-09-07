@@ -1,9 +1,9 @@
 #include "fanGlobalIncludes.h"
 
 #include "editor/fanModals.h"
-#include "core/fanInput.h"
-
-
+#include "core/input/fanInput.h"
+#include "core/input/fanKeyboard.h"
+#include "core/input/fanMouse.h"
 
 //================================================================================================================================
 // Extracts the file name of a path without the extension
