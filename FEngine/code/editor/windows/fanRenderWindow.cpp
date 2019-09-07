@@ -60,7 +60,7 @@ namespace fan
 
 					if (ImGui::CollapsingHeader("Global")) {
 						float tmpFps = fan::Time::GetFPS();
-						if (ImGui::DragFloat("Framerate", &tmpFps, 1.f, fan::Time::minFps, 144.f)) {
+						if (ImGui::DragFloat("Framerate", &tmpFps, 1.f, Time::GetMinFPS(), Time::GetMaxFPS())) {
 							fan::Time::SetFPS(tmpFps);
 						}
 
