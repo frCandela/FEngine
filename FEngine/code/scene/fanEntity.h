@@ -64,7 +64,7 @@ namespace fan
 
 			// ISerializable
 			void Load(std::istream& _in) override;
-			void Save(std::ostream& _out) override;
+			void Save(std::ostream& _out, const int _indentLevel) override;
 
 			bool		HasFlag(const Flag _flag) const	{ return m_flags & _flag; }
 			uint32_t	GetFlags() const				{ return m_flags; }

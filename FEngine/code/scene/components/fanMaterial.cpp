@@ -45,9 +45,9 @@ namespace fan
 
 		//================================================================================================================================
 		//================================================================================================================================
-		void Material::Save(std::ostream& _out) {
-
-			_out << "\t\t" << (m_texture != nullptr ? m_texture->GetPath() : "void") << std::endl;
+		void Material::Save(std::ostream& _out, const int _indentLevel) {
+			const std::string indentation = GetIndentation(_indentLevel);
+			_out << indentation <<  "material: " << (m_texture != nullptr ? m_texture->GetPath() : "void") << std::endl;
 		}
 
 		//================================================================================================================================

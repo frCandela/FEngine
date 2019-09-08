@@ -27,7 +27,7 @@ namespace fan
 
 			// ISerializable
 			void					Load(std::istream& _in) override;
-			void					Save(std::ostream& _out) override;
+			void					Save(std::ostream& _out, const int _indentLevel) override;
 			void					SetMesh(fan::Mesh * _mesh);
 			fan::Mesh *			GetMesh() { return m_mesh; }
 			const fan::Mesh *	GetMesh() const { return m_mesh; }

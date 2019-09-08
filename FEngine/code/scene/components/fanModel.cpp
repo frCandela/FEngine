@@ -90,8 +90,9 @@ namespace fan
 
 		//================================================================================================================================
 		//================================================================================================================================
-		void Model::Save(std::ostream& _out) {
-			_out << "\t\t" << m_mesh->GetPath() << std::endl;
+		void Model::Save(std::ostream& _out, const int _indentLevel) {
+			const std::string indentation = GetIndentation(_indentLevel);
+			_out << indentation << "path: " <<  m_mesh->GetPath() << std::endl;
 		}
 	}
 }

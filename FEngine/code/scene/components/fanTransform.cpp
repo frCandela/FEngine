@@ -121,10 +121,11 @@ namespace fan
 
 		//================================================================================================================================
 		//================================================================================================================================
-		void Transform::Save(std::ostream& _out) {
-			_out << "\t\t" << m_position[0] << " " << m_position[1] << " " << m_position[2] << std::endl;
-			_out << "\t\t" << m_rotation[0] << " " << m_rotation[1] << " " << m_rotation[2] << " " << m_rotation[3] << std::endl;
-			_out << "\t\t" << m_scale[0] << " " << m_scale[1] << " " << m_scale[2] << std::endl;
+		void Transform::Save(std::ostream& _out, const int _indentLevel) {
+			const std::string indentation = GetIndentation(_indentLevel);
+			_out << indentation << "position: " << m_position[0] << " " << m_position[1] << " " << m_position[2] << std::endl;
+			_out << indentation << "rotation: " << m_rotation[0] << " " << m_rotation[1] << " " << m_rotation[2] << " " << m_rotation[3] << std::endl;
+			_out << indentation << "scale:    " << m_scale[0] << " " << m_scale[1] << " " << m_scale[2] << std::endl;
 		}
 	}
 }

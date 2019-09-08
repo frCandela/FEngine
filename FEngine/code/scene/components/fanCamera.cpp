@@ -104,10 +104,11 @@ namespace fan
 
 		//================================================================================================================================
 		//================================================================================================================================
-		void Camera::Save(std::ostream& _out) {
-			_out << "\t\t" << m_fov << std::endl;
-			_out << "\t\t" << m_nearDistance << std::endl;
-			_out << "\t\t" << m_farDistance << std::endl;
+		void Camera::Save(std::ostream& _out, const int _indentLevel) {
+			const std::string indentation = GetIndentation(_indentLevel);
+			_out << indentation << "fov:          " << m_fov << std::endl;
+			_out << indentation << "nearDistance: " << m_nearDistance << std::endl;
+			_out << indentation << "farDistance : " << m_farDistance << std::endl;
 		}
 	}
 }

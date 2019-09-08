@@ -17,9 +17,9 @@ namespace fan
 	{
 		REGISTER_TYPE_INFO(FPSCamera)
 
-			//================================================================================================================================
-			//================================================================================================================================
-			void FPSCamera::Initialize() {
+		//================================================================================================================================
+		//================================================================================================================================
+		void FPSCamera::Initialize() {
 			m_speed = 10.f;
 			m_speedMultiplier = 3.f;
 			m_xySensitivity = btVector2(0.005f, 0.005f);
@@ -123,10 +123,11 @@ namespace fan
 
 		//================================================================================================================================
 		//================================================================================================================================
-		void FPSCamera::Save(std::ostream& _out) {
-			_out << "\t\t" << m_xySensitivity[0] << " " << m_xySensitivity[1] << std::endl;
-			_out << "\t\t" << m_speed << std::endl;
-			_out << "\t\t" << m_speedMultiplier << std::endl;
+		void FPSCamera::Save(std::ostream& _out, const int _indentLevel) {
+			const std::string indentation = GetIndentation(_indentLevel);
+			_out << indentation << "xySensitivity:   " << m_xySensitivity[0] << " " << m_xySensitivity[1] << std::endl;
+			_out << indentation << "speed:           " << m_speed << std::endl;
+			_out << indentation << "speedMultiplier: " << m_speedMultiplier << std::endl;
 		}
 	}
 }

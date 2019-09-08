@@ -170,17 +170,14 @@ namespace fan
 		//================================================================================================================================
 		//================================================================================================================================
 		void Scene::Save() const {
-// 			fan::Debug::Get() << fan::Debug::Severity::log << "saving scene: " << m_name << std::endl;
-// 			std::ofstream outStream(m_path);
-// 			if (outStream.is_open()) {
-// 				for (int entityIndex = 0; entityIndex < m_entities.size(); entityIndex++) {
-// 					scene::Entity * entity = m_entities[entityIndex];
-// 					if (entity->HasFlag(scene::Entity::NOT_SAVED) == false) {
-// 						entity->Save(outStream);
-// 					}
-// 				}
-// 				outStream.close();
-// 			}
+ 			fan::Debug::Get() << fan::Debug::Severity::log << "saving scene: " << m_name << std::endl;
+			std::ofstream outStream(m_path);
+			if (outStream.is_open()) {
+				outStream << "Entities: { \n";
+				m_root->Save(outStream, 1);	
+				outStream << '}';
+				outStream.close();
+			}
 		}
 
 		//================================================================================================================================

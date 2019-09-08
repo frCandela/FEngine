@@ -236,14 +236,30 @@ namespace fan
 
 		//================================================================================================================================
 		//================================================================================================================================
-		void Entity::Save(std::ostream& _out) {
-			_out << "entity " << m_name << std::endl;
-			for (int componentIndex = 0; componentIndex < m_components.size(); componentIndex++) {
-				_out << "\t" << m_components[componentIndex]->GetName() << " ";
-				_out << m_components[componentIndex]->GetType() << std::endl;
-				m_components[componentIndex]->Save(_out);
-			}
-			_out << "end" << std::endl;
+		void Entity::Save(std::ostream& _out, const int _indentLevel) {
+			const std::string indentation = GetIndentation(_indentLevel);
+			const std::string indentation1 = GetIndentation(_indentLevel + 1);
+			const std::string indentation2 = GetIndentation(_indentLevel + 2);
+
+			_out << indentation << "Entity: " << m_name << " {" << std::endl; { // entity
+				
+
+				_out << indentation1 << "Components: " << m_components.size() << " {" << std::endl; { // components
+					for (int componentIndex = 0; componentIndex < m_components.size(); componentIndex++) {
+						scene::Component * component = m_components[componentIndex];
+						_out << indentation2 << component->GetName() << ": " << component->GetType() << " {" << std::endl;
+						component->Save(_out, _indentLevel + 3);
+						_out << indentation2 << "}" << std::endl;
+					} _out << indentation1 << "}" << std::endl; // End components
+				}
+				
+				_out << indentation1 << "Childs: " << m_childs.size() << " {" << std::endl; { // childs
+					for (int childIndex = 0; childIndex < m_childs.size(); childIndex++) {
+						Entity * entity = m_childs[childIndex];
+						entity->Save(_out, _indentLevel + 2);
+					}
+				} _out << indentation1 << "}" << std::endl; // End childs
+			} _out << indentation << "}" << std::endl; // End entity
 		}
 	}
 }

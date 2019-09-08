@@ -21,7 +21,7 @@ namespace fan
 
 			bool IsUnique()		const override { return true; }
 			void Load(std::istream& _in)	override;
-			void Save(std::ostream& _out)	override;
+			void Save(std::ostream& _out, const int _indentLevel)	override;
 
 
 			void SetTexture(vk::Texture * _texture);
