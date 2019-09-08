@@ -23,6 +23,7 @@ namespace fan
 
 			Entity *	CreateEntity(const std::string _name, Entity * _parent = nullptr );	// Creates a game object and adds it to the scene hierarchy
 			void		DeleteEntity(Entity* _entity);		// Deletes a entity and removes it from the scene hierarchy at the end of the frame
+			std::vector < Entity * > BuildEntitiesList() const;
 
 			void	BeginFrame();
 			void	Update(const float _delta);
@@ -33,7 +34,6 @@ namespace fan
 			void LoadFrom(const std::string _path);
 
 			Entity *						GetRoot() { return m_root;  }
-			const std::vector<Entity *>  &	GetEntities() const { return m_entities; }
 			inline std::string				GetName() const { return m_name; }
 			bool							HasPath() const { return m_path.empty() == false; }
 			inline std::string				GetPath() const { return m_path; }
@@ -45,13 +45,14 @@ namespace fan
 			Entity * m_root;
 
 			std::vector < Entity * > m_entitiesToDelete;
-			std::vector < Entity * > m_entities;
 
 			std::set< scene::Actor * > m_startingActors;
 			std::set< scene::Actor * > m_activeActors;
 
 			void OnComponentCreated(scene::Component * _component);
 			void OnComponentDeleted(scene::Component * _component);
+			void R_DeleteEntity		( Entity* _entity, std::set<Entity*>&	_deletedEntitiesSet);
+			void R_BuildEntitiesList( Entity* _entity, std::vector<Entity*>& _entitiesList) const ;
 			void Clear();
 		};
 	}

@@ -40,7 +40,7 @@ namespace fan {
 
 		inline static Engine & GetEngine() { return * ms_engine; }
 
-		void SetSelectedentity( scene::Entity * _selectedentity) { m_selectedentity = _selectedentity;	}
+		void SetSelectedEntity( scene::Entity * _selectedentity) { m_selectedentity = _selectedentity;	}
 		void Deselect() { m_selectedentity = nullptr; }
 
 		scene::Entity *	const			GetSelectedentity() const	{ return m_selectedentity;  }

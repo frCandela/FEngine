@@ -41,7 +41,6 @@ namespace fan
 			entity->onComponentCreated.Connect(&Scene::OnComponentCreated, this);
 			entity->onComponentDeleted.Connect(&Scene::OnComponentDeleted, this);
 
-			m_entities.push_back(entity);
 			onEntityCreated.Emmit(entity);
 
 			return entity;
@@ -51,6 +50,24 @@ namespace fan
 		//================================================================================================================================
 		void Scene::DeleteEntity(Entity* _entity) {
 			m_entitiesToDelete.push_back(_entity);
+		}
+
+		//================================================================================================================================
+		//================================================================================================================================
+		void Scene::R_BuildEntitiesList(Entity* _entity, std::vector<Entity*>& _entitiesList) const {
+			_entitiesList.push_back(_entity);
+			const std::vector<Entity*>& childs = _entity->GetChilds();
+			for (int childIndex = 0; childIndex < childs.size(); childIndex++) {
+				R_BuildEntitiesList(childs[childIndex], _entitiesList);
+			}
+		}
+
+		//================================================================================================================================
+		//================================================================================================================================
+		std::vector < Entity * >  Scene::BuildEntitiesList() const {
+			std::vector<Entity*> entitiesList;
+			R_BuildEntitiesList(m_root, entitiesList);
+			return entitiesList;
 		}
 
 		//================================================================================================================================
@@ -72,25 +89,36 @@ namespace fan
 		}
 
 		//================================================================================================================================
+		//================================================================================================================================
+		void  Scene::R_DeleteEntity(Entity* _entity, std::set<Entity*>& _deletedEntitiesSet) {
+			if (_deletedEntitiesSet.find(_entity) == _deletedEntitiesSet.end()) {
+
+				const std::vector<Entity*> childs = _entity->GetChilds(); // copy
+				for (int childIndex = 0; childIndex < childs.size(); childIndex++) {
+					R_DeleteEntity(childs[childIndex], _deletedEntitiesSet);
+				}
+
+				if (fan::Engine::GetEngine().GetSelectedentity() == _entity) {
+					fan::Engine::GetEngine().Deselect();
+				}				
+				_deletedEntitiesSet.insert(_entity);
+				if (_entity->GetParent() != nullptr) {
+					_entity->GetParent()->RemoveChild(_entity);
+				}
+				Debug::Get() << "delete Entity: " << _entity->GetName() << std::endl;
+				delete(_entity);
+			}
+		}
+
+		//================================================================================================================================
 		// Deletes every entity in the m_toDeleteLater vector
 		//================================================================================================================================
 		void Scene::EndFrame() {
+			std::set<Entity*> deletedEntitiesSet;
+
 			for (int entityToDeleteIndex = 0; entityToDeleteIndex < m_entitiesToDelete.size(); entityToDeleteIndex++) {
 				Entity * entitytoDelete = m_entitiesToDelete[entityToDeleteIndex];
-
-				for (int entityIndex = 0; entityIndex < m_entities.size(); ++entityIndex) {
-					if (m_entities[entityIndex] == entitytoDelete)
-					{
-						m_entities.erase(m_entities.begin() + entityIndex);
-
-						if (fan::Engine::GetEngine().GetSelectedentity() == entitytoDelete) {
-							fan::Engine::GetEngine().Deselect();
-						}
-
-						delete(entitytoDelete);
-						break;
-					}
-				}
+				R_DeleteEntity(entitytoDelete, deletedEntitiesSet);
 			}
 			m_entitiesToDelete.clear();
 		}
@@ -125,16 +153,12 @@ namespace fan
 		//================================================================================================================================
 		void Scene::Clear() {
 			m_path = "";
-
-			for (int entityIndex = 0; entityIndex < m_entities.size(); entityIndex++) {
-				delete m_entities[entityIndex];
-			}
-			m_entities.clear();
+			std::set<Entity*> deletedEntitiesSet;
+			R_DeleteEntity(m_root, deletedEntitiesSet);
 			m_startingActors.clear();
 			m_activeActors.clear();
 			m_entitiesToDelete.clear();
 		}
-
 
 		//================================================================================================================================
 		//================================================================================================================================
@@ -146,17 +170,17 @@ namespace fan
 		//================================================================================================================================
 		//================================================================================================================================
 		void Scene::Save() const {
-			fan::Debug::Get() << fan::Debug::Severity::log << "saving scene: " << m_name << std::endl;
-			std::ofstream outStream(m_path);
-			if (outStream.is_open()) {
-				for (int entityIndex = 0; entityIndex < m_entities.size(); entityIndex++) {
-					scene::Entity * entity = m_entities[entityIndex];
-					if (entity->HasFlag(scene::Entity::NOT_SAVED) == false) {
-						entity->Save(outStream);
-					}
-				}
-				outStream.close();
-			}
+// 			fan::Debug::Get() << fan::Debug::Severity::log << "saving scene: " << m_name << std::endl;
+// 			std::ofstream outStream(m_path);
+// 			if (outStream.is_open()) {
+// 				for (int entityIndex = 0; entityIndex < m_entities.size(); entityIndex++) {
+// 					scene::Entity * entity = m_entities[entityIndex];
+// 					if (entity->HasFlag(scene::Entity::NOT_SAVED) == false) {
+// 						entity->Save(outStream);
+// 					}
+// 				}
+// 				outStream.close();
+// 			}
 		}
 
 		//================================================================================================================================

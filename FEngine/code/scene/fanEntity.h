@@ -46,7 +46,8 @@ namespace fan
 			const std::vector<Component*> & GetComponents() const { return m_components; }
 
 			//Getters
-			std::string GetName() { return m_name; }
+			std::string GetName() const { return m_name; }
+			void SetName(const std::string _newName) { m_name = _newName; }
 			const shape::AABB & GetAABB() const { return m_aabb; }
 			void ComputeAABB();
 

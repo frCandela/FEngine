@@ -25,56 +25,46 @@ namespace fan
 		//================================================================================================================================
 		//================================================================================================================================
 		void SceneWindow::Draw() {
-			if (IsVisible() == true) {
+			bool isVisible = IsVisible();
+			if (isVisible == true) {
 				fan::Engine & engine = fan::Engine::GetEngine();
 				scene::Scene & scene = engine.GetScene();
-
-				bool isVisible = IsVisible();
+				
 				if (ImGui::Begin("Scene", &isVisible)) {
-
-					bool newentity = false;
-					if (ImGui::BeginPopupContextWindow("PopupContextWindowNewentity"))
-					{
-						if (ImGui::Selectable("New entity")) {
-							newentity = true;
-						}
-						ImGui::EndPopup();
-					}
-					if (newentity) {
-						ImGui::OpenPopup("New entity");
-					} NewEntityModal();
-
 					ImGui::Text(scene.GetName().c_str());
 					ImGui::Separator();
 
-					R_DrawSceneTree(scene.GetRoot());
+					scene::Entity * entityRightClicked = nullptr;
+					R_DrawSceneTree(scene.GetRoot(), entityRightClicked);
 
-					// Show entities tree
-// 					bool popupOneTime = true;
-// 					const std::vector< scene::Entity * > & entities = scene.GetEntities();
-// 					for (int entityIndex = 0; entityIndex < entities.size(); entityIndex++)
-// 					{
-// 						scene::Entity * entity = entities[entityIndex];
-// 
-// 						ImGuiTreeNodeFlags node_flags = ImGuiTreeNodeFlags_Leaf | (entity == engine.GetSelectedentity() ? ImGuiTreeNodeFlags_Selected : 0);
-// 						bool nodeOpen = ImGui::TreeNodeEx(entity->GetName().c_str(), node_flags);
-// 						if (ImGui::IsItemClicked()) {
-// 							engine.SetSelectedentity(entity);
-// 						}
-// 
-// 						if (popupOneTime && ImGui::BeginPopupContextItem(scene.GetName().c_str()))
-// 						{
-// 							if (entity->HasFlag(scene::Entity::NO_DELETE) == false && ImGui::Selectable("Delete")) {
-// 								scene.DeleteEntity(entity);
-// 							}
-// 							ImGui::EndPopup();
-// 							popupOneTime = false;
-// 						}
-// 
-// 						if (nodeOpen) {
-// 							ImGui::TreePop();
-// 						}
-// 					}
+					if (entityRightClicked != nullptr) {
+						ImGui::OpenPopup("scene_window_entity_rclicked");
+						m_lastEntityRightClicked = entityRightClicked;
+					}
+
+					bool newEntityPopup = false;
+					bool renameEntityPopup = false;
+					if (ImGui::BeginPopup("scene_window_entity_rclicked")) {
+						if (ImGui::Selectable("New entity")) {
+							newEntityPopup = true;					
+						} 
+						if (ImGui::Selectable("Rename")) {
+							renameEntityPopup = true;
+						}
+						ImGui::Separator();
+						if (ImGui::Selectable("Delete")) {
+							scene.DeleteEntity(m_lastEntityRightClicked);
+						}
+						ImGui::EndPopup();
+					} 
+
+					if (newEntityPopup) {
+						ImGui::OpenPopup("New entity");
+					} NewEntityModal();
+
+					if (renameEntityPopup) {
+						ImGui::OpenPopup("Rename entity");
+					} RenameEntityModal();
 
 				} ImGui::End();
 				SetVisible(isVisible);
@@ -83,31 +73,38 @@ namespace fan
 
 		//================================================================================================================================
 		//================================================================================================================================
-		void SceneWindow::R_DrawSceneTree(scene::Entity * _entity) {
+		void SceneWindow::R_DrawSceneTree(scene::Entity * _entityDrawn, scene::Entity* & _entityRightClicked ) {
 			fan::Engine & engine = fan::Engine::GetEngine();
 
 			std::stringstream ss;
-			ss << "##" << _entity; // Unique id
+			ss << "##" << _entityDrawn; // Unique id
 
 			bool isOpen = ImGui::TreeNode(ss.str().c_str());
+
 			if (ImGui::BeginDragDropTarget())
 			{
 				if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("node_test")) {
 					assert(payload->DataSize == sizeof(scene::Entity**));
 					scene::Entity * payloadNode = *(scene::Entity**)payload->Data;
-					payloadNode->InsertBelow(_entity);
+					payloadNode->InsertBelow(_entityDrawn);
 				}
 				ImGui::EndDragDropTarget();
 			}
-
 			ImGui::SameLine();
-			bool selected = (_entity == engine.GetSelectedentity());
-			if (ImGui::Selectable(_entity->GetName().c_str(), &selected)) {
-				engine.SetSelectedentity(_entity);
+			bool selected = (_entityDrawn == engine.GetSelectedentity());
+			
+			std::stringstream ss2;
+			ss2 << _entityDrawn->GetName() <<"##" << _entityDrawn; // Unique id
+			if (ImGui::Selectable(ss2.str().c_str(), &selected)) {
+				engine.SetSelectedEntity(_entityDrawn);
 			}
+			if (ImGui::IsItemClicked(1)) {
+				_entityRightClicked = _entityDrawn;
+			}
+
 			if (ImGui::BeginDragDropSource(ImGuiDragDropFlags_None)) {
-				ImGui::SetDragDropPayload("node_test", &_entity, sizeof(scene::Entity**));
-				ImGui::Text(_entity->GetName().c_str());
+				ImGui::SetDragDropPayload("node_test", &_entityDrawn, sizeof(scene::Entity**));
+				ImGui::Text((_entityDrawn->GetName()).c_str());
 				ImGui::EndDragDropSource();
 			}
 			if (ImGui::BeginDragDropTarget())
@@ -115,15 +112,15 @@ namespace fan
 				if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("node_test")) {
 					assert(payload->DataSize == sizeof(scene::Entity**));
 					scene::Entity * payloadNode = *(scene::Entity**)payload->Data;
-					payloadNode->SetParent(_entity);
+					payloadNode->SetParent(_entityDrawn);
 				}
 				ImGui::EndDragDropTarget();
 			}
 			if (isOpen) {
-				const std::vector<scene::Entity*>& childs = _entity->GetChilds();
+				const std::vector<scene::Entity*>& childs = _entityDrawn->GetChilds();
 				for (int childIndex = 0; childIndex < childs.size(); childIndex++) {
 					scene::Entity * child = childs[childIndex];
-					R_DrawSceneTree(child);
+					R_DrawSceneTree(child, _entityRightClicked);
 				}
 
 				ImGui::TreePop();
@@ -141,15 +138,41 @@ namespace fan
 			if (ImGui::BeginPopupModal("New entity"))
 			{
 				ImGui::InputText("Name ", m_textBuffer.data(), m_textBuffer.size());
-				if (ImGui::Button("Cancel"))
+				if (ImGui::Button("Cancel")) {
+					m_lastEntityRightClicked = nullptr;
 					ImGui::CloseCurrentPopup();
+				}
 				ImGui::SameLine();
-				if (ImGui::Button("Ok") || Keyboard::IsKeyPressed(GLFW_KEY_ENTER))
+				if (ImGui::Button("Ok") || Keyboard::IsKeyPressed(GLFW_KEY_ENTER, true) || Keyboard::IsKeyPressed(GLFW_KEY_KP_ENTER, true))
 				{
 					//Create new entity 
-					scene::Entity* newentity = scene.CreateEntity(m_textBuffer.data());
+					scene::Entity* newentity = scene.CreateEntity(m_textBuffer.data(), m_lastEntityRightClicked );
 					newentity->AddComponent<scene::Transform>();
-					engine.SetSelectedentity(newentity);
+					engine.SetSelectedEntity(newentity);
+					m_lastEntityRightClicked = nullptr;
+					ImGui::CloseCurrentPopup();
+				}
+				ImGui::EndPopup();
+			}
+		}		
+		
+		//================================================================================================================================
+		//================================================================================================================================
+		void SceneWindow::RenameEntityModal()
+		{
+			ImGui::SetNextWindowSize(ImVec2(200, 200));
+			if (ImGui::BeginPopupModal("Rename entity"))
+			{
+				ImGui::InputText("New Name ", m_textBuffer.data(), m_textBuffer.size());
+				if (ImGui::Button("Cancel")) {
+					m_lastEntityRightClicked = nullptr;
+					ImGui::CloseCurrentPopup();
+				}
+				ImGui::SameLine();
+				if (ImGui::Button("Ok") || Keyboard::IsKeyPressed(GLFW_KEY_ENTER, true) || Keyboard::IsKeyPressed(GLFW_KEY_KP_ENTER, true))
+				{
+					m_lastEntityRightClicked->SetName(m_textBuffer.data());
+ 					m_lastEntityRightClicked = nullptr;
 					ImGui::CloseCurrentPopup();
 				}
 				ImGui::EndPopup();

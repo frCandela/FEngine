@@ -143,6 +143,12 @@ namespace fan {
 					}
 				}
 
+				if (Keyboard::IsKeyPressed(GLFW_KEY_DELETE)) {
+					if (m_selectedentity != nullptr) {
+						m_scene->DeleteEntity(m_selectedentity);
+					}
+				}
+
 				ManageSelection();
 				DrawUI();
 				DrawEditorGrid();
@@ -202,7 +208,7 @@ namespace fan {
 	//================================================================================================================================
 	//================================================================================================================================
 	void Engine::DrawAABB() const {
-		const std::vector< scene::Entity *>  & entities = m_scene->GetEntities();
+		const std::vector< scene::Entity *>  & entities = m_scene->BuildEntitiesList();
 		for (int entityIndex = 0; entityIndex < entities.size(); entityIndex++) {
 			const scene::Entity * entity = entities[entityIndex];
 			if (entity != m_editorCamera->GetEntity()) {
@@ -278,7 +284,7 @@ namespace fan {
 
 			const btVector3 cameraOrigin = m_editorCamera->GetEntity()->GetComponent<scene::Transform>()->GetPosition();;
 			const shape::Ray ray = m_editorCamera->ScreenPosToRay(Mouse::GetScreenSpacePosition());
-			const std::vector<scene::Entity *>  & entities = m_scene->GetEntities();
+			const std::vector<scene::Entity *>  & entities = m_scene->BuildEntitiesList();
 
 			// Raycast on all the entities
 			scene::Entity * closestentity = nullptr;
@@ -300,7 +306,7 @@ namespace fan {
 					}
 				}
 			}
-			SetSelectedentity(closestentity);
+			SetSelectedEntity(closestentity);
 		}
 	}	
 
