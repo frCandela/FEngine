@@ -18,8 +18,10 @@ namespace fan
 		//================================================================================================================================
 		Scene::Scene(const std::string _name) :
 			m_name(_name)
-			, m_path("") {
-
+			, m_path("") 
+			, m_root(nullptr) {
+			m_root = CreateEntity("root", nullptr);
+			m_root->AddComponent<scene::Transform>();
 		}
 
 		//================================================================================================================================
@@ -30,8 +32,11 @@ namespace fan
 
 		//================================================================================================================================
 		//================================================================================================================================
-		Entity *	Scene::CreateEntity(const std::string _name) {
-			Entity* entity = new Entity(_name);
+		Entity *	Scene::CreateEntity(const std::string _name, Entity * _parent) {
+			if (_parent == nullptr) {
+				_parent = m_root;
+			}
+			Entity* entity = new Entity(_name, _parent);
 
 			entity->onComponentCreated.Connect(&Scene::OnComponentCreated, this);
 			entity->onComponentDeleted.Connect(&Scene::OnComponentDeleted, this);

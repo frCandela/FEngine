@@ -24,7 +24,7 @@ namespace fan
 			fan::Signal<Component*> onComponentDeleted;
 			fan::Signal<Component*> onComponentModified;
 
-			Entity(const std::string _name);
+			Entity(const std::string _name, Entity * _parent);
 			~Entity();
 
 			// Creates an instance of ComponentType, adds it to the entity and returns a pointer
@@ -50,6 +50,17 @@ namespace fan
 			const shape::AABB & GetAABB() const { return m_aabb; }
 			void ComputeAABB();
 
+			// Hierarchy
+			Entity* GetParent() const { return m_parent; }
+			const std::vector<Entity*>& GetChilds() const { return m_childs; }
+			bool IsAncestorOf	( const Entity * _node) const;
+			void RemoveChild	( const Entity * _child);
+			bool HasChild		( const Entity * _child);
+			void AddChild		( Entity * _child);
+			void SetParent		( Entity * _parent);
+			void InsertBelow	( Entity * _brother);
+
+
 			// ISerializable
 			void Load(std::istream& _in) override;
 			void Save(std::ostream& _out) override;
@@ -59,8 +70,10 @@ namespace fan
 			void		SetFlags(const uint32_t _flags) { m_flags = _flags; }
 
 		private:
-			std::string m_name;
-			uint32_t m_flags;
+			std::string				m_name;
+			std::vector<Entity*>	m_childs;
+			Entity *				m_parent;
+			uint32_t				m_flags;
 
 			shape::AABB m_aabb;
 

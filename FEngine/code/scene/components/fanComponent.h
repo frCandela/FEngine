@@ -1,4 +1,4 @@
-#pragma once
+ #pragma once
 
 #include "core/fanISerializable.h"
 #include "core/fanTypeInfo.h"

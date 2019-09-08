@@ -302,18 +302,14 @@ namespace fan {
 			}
 			SetSelectedentity(closestentity);
 		}
-
-
-	}
+	}	
 
 	//================================================================================================================================
 	//================================================================================================================================
 	void Engine::DrawUI() {
-		ImGui::Begin("test"); {
-			if( ImGui::Button("testoss")){
-				fan::Debug::Break();
-			}
-		} ImGui::End();
+// 		ImGui::Begin("test"); {
+// 			
+// 		} ImGui::End();
 
 		m_mainMenuBar->Draw();
 		m_renderWindow->Draw();

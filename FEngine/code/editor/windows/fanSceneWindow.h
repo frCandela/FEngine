@@ -2,8 +2,9 @@
 
 #include "editor/windows/fanEditorWindow.h"
 
-namespace fan
-{
+namespace fan {
+	namespace scene { class Entity; }
+
 	namespace editor {
 		//================================================================================================================================
 		//================================================================================================================================
@@ -11,11 +12,13 @@ namespace fan
 		public:
 			SceneWindow();
 
-			void Draw() override;
-			void NewentityModal();
+			void Draw() override;			
+			void NewEntityModal();
 
 		private:
 			std::array<char, 64> m_textBuffer;
+
+			void R_DrawSceneTree(scene::Entity * _entity);
 		};
 	}
 }

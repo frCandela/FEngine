@@ -42,44 +42,97 @@ namespace fan
 					}
 					if (newentity) {
 						ImGui::OpenPopup("New entity");
-					} NewentityModal();
+					} NewEntityModal();
 
 					ImGui::Text(scene.GetName().c_str());
 					ImGui::Separator();
 
+					R_DrawSceneTree(scene.GetRoot());
+
 					// Show entities tree
-					bool popupOneTime = true;
-					const std::vector< scene::Entity * > & entities = scene.GetEntities();
-					for (int entityIndex = 0; entityIndex < entities.size(); entityIndex++)
-					{
-						scene::Entity * entity = entities[entityIndex];
-
-						ImGuiTreeNodeFlags node_flags = ImGuiTreeNodeFlags_Leaf | (entity == engine.GetSelectedentity() ? ImGuiTreeNodeFlags_Selected : 0);
-						bool nodeOpen = ImGui::TreeNodeEx(entity->GetName().c_str(), node_flags);
-						if (ImGui::IsItemClicked()) {
-							engine.SetSelectedentity(entity);
-						}
-
-						if (popupOneTime && ImGui::BeginPopupContextItem(scene.GetName().c_str()))
-						{
-							if (entity->HasFlag(scene::Entity::NO_DELETE) == false && ImGui::Selectable("Delete")) {
-								scene.DeleteEntity(entity);
-							}
-							ImGui::EndPopup();
-							popupOneTime = false;
-						}
-
-						if (nodeOpen) {
-							ImGui::TreePop();
-						}
-					}
+// 					bool popupOneTime = true;
+// 					const std::vector< scene::Entity * > & entities = scene.GetEntities();
+// 					for (int entityIndex = 0; entityIndex < entities.size(); entityIndex++)
+// 					{
+// 						scene::Entity * entity = entities[entityIndex];
+// 
+// 						ImGuiTreeNodeFlags node_flags = ImGuiTreeNodeFlags_Leaf | (entity == engine.GetSelectedentity() ? ImGuiTreeNodeFlags_Selected : 0);
+// 						bool nodeOpen = ImGui::TreeNodeEx(entity->GetName().c_str(), node_flags);
+// 						if (ImGui::IsItemClicked()) {
+// 							engine.SetSelectedentity(entity);
+// 						}
+// 
+// 						if (popupOneTime && ImGui::BeginPopupContextItem(scene.GetName().c_str()))
+// 						{
+// 							if (entity->HasFlag(scene::Entity::NO_DELETE) == false && ImGui::Selectable("Delete")) {
+// 								scene.DeleteEntity(entity);
+// 							}
+// 							ImGui::EndPopup();
+// 							popupOneTime = false;
+// 						}
+// 
+// 						if (nodeOpen) {
+// 							ImGui::TreePop();
+// 						}
+// 					}
 
 				} ImGui::End();
 				SetVisible(isVisible);
 			}
 		}
 
-		void SceneWindow::NewentityModal()
+		//================================================================================================================================
+		//================================================================================================================================
+		void SceneWindow::R_DrawSceneTree(scene::Entity * _entity) {
+			fan::Engine & engine = fan::Engine::GetEngine();
+
+			std::stringstream ss;
+			ss << "##" << _entity; // Unique id
+
+			bool isOpen = ImGui::TreeNode(ss.str().c_str());
+			if (ImGui::BeginDragDropTarget())
+			{
+				if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("node_test")) {
+					assert(payload->DataSize == sizeof(scene::Entity**));
+					scene::Entity * payloadNode = *(scene::Entity**)payload->Data;
+					payloadNode->InsertBelow(_entity);
+				}
+				ImGui::EndDragDropTarget();
+			}
+
+			ImGui::SameLine();
+			bool selected = (_entity == engine.GetSelectedentity());
+			if (ImGui::Selectable(_entity->GetName().c_str(), &selected)) {
+				engine.SetSelectedentity(_entity);
+			}
+			if (ImGui::BeginDragDropSource(ImGuiDragDropFlags_None)) {
+				ImGui::SetDragDropPayload("node_test", &_entity, sizeof(scene::Entity**));
+				ImGui::Text(_entity->GetName().c_str());
+				ImGui::EndDragDropSource();
+			}
+			if (ImGui::BeginDragDropTarget())
+			{
+				if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("node_test")) {
+					assert(payload->DataSize == sizeof(scene::Entity**));
+					scene::Entity * payloadNode = *(scene::Entity**)payload->Data;
+					payloadNode->SetParent(_entity);
+				}
+				ImGui::EndDragDropTarget();
+			}
+			if (isOpen) {
+				const std::vector<scene::Entity*>& childs = _entity->GetChilds();
+				for (int childIndex = 0; childIndex < childs.size(); childIndex++) {
+					scene::Entity * child = childs[childIndex];
+					R_DrawSceneTree(child);
+				}
+
+				ImGui::TreePop();
+			}
+		}
+
+		//================================================================================================================================
+		//================================================================================================================================
+		void SceneWindow::NewEntityModal()
 		{
 			fan::Engine & engine = fan::Engine::GetEngine();
 			scene::Scene & scene = engine.GetScene();

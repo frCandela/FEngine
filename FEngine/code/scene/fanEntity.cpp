@@ -13,10 +13,15 @@ namespace fan
 	{
 		//================================================================================================================================
 		//================================================================================================================================
-		Entity::Entity(const std::string _name) :
+		Entity::Entity(const std::string _name, Entity * _parent) :
 			m_name(_name)
 			, m_flags(Flag::NONE)
-		{
+			, m_parent(_parent) {
+
+			if (_parent != nullptr) {
+				_parent->m_childs.push_back(this);
+			}
+
 			onComponentModified.Connect(&Entity::OnComponentModified, this);
 			onComponentDeleted.Connect(&Entity::OnComponentDeleted, this);
 		}
@@ -83,6 +88,112 @@ namespace fan
 				const btVector3 origin = GetComponent< scene::Transform >()->GetPosition();
 				const float size = 0.05f;
 				m_aabb = shape::AABB(origin - size * btVector3::One(), origin + size * btVector3::One());
+			}
+		}		
+
+		//================================================================================================================================
+		//================================================================================================================================
+		bool Entity::IsAncestorOf(const Entity * _entity) const {
+			if (_entity == nullptr) {
+				fan::Debug::Log("IsAncestorOf: entity is null");
+				return false;
+			}
+
+			while (_entity->m_parent != nullptr) {
+				if (_entity->m_parent == this) {
+					return true;
+				}
+				else {
+					_entity = _entity->m_parent;
+				}
+			} return false;
+		}
+
+		//================================================================================================================================
+		//================================================================================================================================
+		void Entity::RemoveChild(const Entity * _child) {
+			for (int childIndex = 0; childIndex < m_childs.size(); childIndex++) {
+				Entity * child = m_childs[childIndex];
+				if (child == _child) {
+					m_childs.erase(m_childs.begin() + childIndex);
+					return;
+				}
+			}
+		}
+		
+		//================================================================================================================================
+		//================================================================================================================================
+		bool Entity::HasChild(const Entity * _child) {
+			for (int childIndex = 0; childIndex < m_childs.size(); childIndex++) {
+				Entity * child = m_childs[childIndex];
+				if (child == _child) {
+					return true;
+				}
+			}
+			return false;
+		}
+
+		//================================================================================================================================
+		//================================================================================================================================
+		void Entity::AddChild(Entity * _child) {
+			if (_child == nullptr) {
+				fan::Debug::Log("AddChild : child is null");
+				return;
+			}
+
+			if (_child->IsAncestorOf(this)) {
+				fan::Debug::Log("Cannot parent an object to one of its children");
+				return;
+			}
+
+			if (_child->m_parent == this) {
+				fan::Debug::Get() << fan::Debug::Severity::log << _child->m_name << " is already a child of " << m_name << std::endl;
+				return;
+			}
+
+			if (HasChild(_child) == false) {
+				if (_child->m_parent != nullptr) {
+					_child->m_parent->RemoveChild(_child);
+				}
+				m_childs.push_back(_child);
+				_child->m_parent = this;
+			}
+		}
+
+		//================================================================================================================================
+		//================================================================================================================================
+		void Entity::SetParent(Entity * _parent) {
+			if (_parent == nullptr) {
+				fan::Debug::Log("Root cannot have a brother :'(");
+				return;
+			}
+			_parent->AddChild(this);
+		}
+
+		//================================================================================================================================
+		//================================================================================================================================
+		void Entity::InsertBelow(Entity * _brother) {
+			if (_brother == nullptr) {
+				fan::Debug::Log("InsertBelow: entity is null");
+				return;
+			}
+			if (IsAncestorOf(_brother)) {
+				fan::Debug::Log("Cannot parent an object to one of its children");
+				return;
+			}
+			if (_brother->m_parent == nullptr) {
+				fan::Debug::Log("Root cannot have a brother :'(");
+				return;
+			}
+
+			m_parent->RemoveChild(this);
+
+			for (int childIndex = 0; childIndex < _brother->m_parent->m_childs.size(); childIndex++) {
+				Entity * child = _brother->m_parent->m_childs[childIndex];
+				if (child == _brother) {
+					_brother->m_parent->m_childs.insert(_brother->m_parent->m_childs.begin() + childIndex + 1, this);
+					m_parent = _brother->m_parent;
+				}
 			}
 		}
 
