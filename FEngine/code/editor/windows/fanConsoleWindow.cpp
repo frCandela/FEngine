@@ -43,11 +43,12 @@ namespace fan
 						}
 						ImGui::EndChild();
 					}
+
 					// Text input
 					ImGui::PushItemWidth(ImGui::GetWindowWidth() - 60);
 					if (ImGui::InputText("##input_console", m_inputBuffer, s_inputBufferSize)) {}
 					ImGui::SameLine();
-					if (ImGui::Button(">>") || Keyboard::IsKeyPressed(GLFW_KEY_ENTER) || Keyboard::IsKeyPressed(GLFW_KEY_KP_ENTER)) {
+					if (ImGui::Button(">>") || Keyboard::IsKeyPressed(GLFW_KEY_ENTER, true ) || Keyboard::IsKeyPressed(GLFW_KEY_KP_ENTER, true)) {
 						const std::string message = m_inputBuffer;
 						if (message.size() > 0) {
 							if (message != "clear") {

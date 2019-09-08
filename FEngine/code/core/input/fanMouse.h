@@ -20,14 +20,14 @@ namespace fan {
 		static void SetCursor(CursorState _state);
 		static void LockCursor(bool _state, btVector2  _position = Get().m_position);
 
-		static bool GetButtonDown(int  _GLFW_MOUSE_BUTTON);
-		static bool GetButtonPressed(int _GLFW_MOUSE_BUTTON);
-		static bool GetButtonReleased(int _GLFW_MOUSE_BUTTON);
+		static bool GetButtonDown		( const int _GLFW_MOUSE_BUTTON, const bool _overrideGui = false );
+		static bool GetButtonPressed	( const int _GLFW_MOUSE_BUTTON, const bool _overrideGui = false );
+		static bool GetButtonReleased	( const int _GLFW_MOUSE_BUTTON, const bool _overrideGui = false );
 
 	private:
-		static void MouseCallback(GLFWwindow* _window, double _x, double _y);
-		static void MouseButtonCallback(GLFWwindow* window, int button, int action, int mods);
-		static void ScrollCallback(GLFWwindow* window, double xoffset, double yoffset);
+		static void MouseCallback		(GLFWwindow* _window, double _x, double _y);
+		static void MouseButtonCallback	(GLFWwindow* window, int button, int action, int mods);
+		static void ScrollCallback		(GLFWwindow* window, double xoffset, double yoffset);
 
 		void Update();
 
