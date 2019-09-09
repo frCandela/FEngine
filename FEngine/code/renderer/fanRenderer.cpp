@@ -441,11 +441,11 @@ namespace fan
 				} vkCmdEndRenderPass(commandBuffer);
 			
 				if (vkEndCommandBuffer(commandBuffer) != VK_SUCCESS) {
-					fan::Debug::Get() << fan::Debug::Severity::error << "Could not record command buffer " << _index << "." << std::endl;
+					fan::Debug::Get() << fan::Debug::Severity::error << "Could not record command buffer " << _index << "." << Debug::Endl();
 				}
 			}
 			else {
-				fan::Debug::Get() << fan::Debug::Severity::error << "Could not record command buffer " << _index << "." << std::endl;
+				fan::Debug::Get() << fan::Debug::Severity::error << "Could not record command buffer " << _index << "." << Debug::Endl();
 			}
 
 		}
@@ -476,11 +476,11 @@ namespace fan
 				m_postprocessPipeline->Draw(commandBuffer);
 
 				if (vkEndCommandBuffer(commandBuffer) != VK_SUCCESS) {
-					fan::Debug::Get() << fan::Debug::Severity::error << "Could not record command buffer " << commandBuffer << "." << std::endl;
+					fan::Debug::Get() << fan::Debug::Severity::error << "Could not record command buffer " << commandBuffer << "." << Debug::Endl();
 				}
 			}
 			else {
-				fan::Debug::Get() << fan::Debug::Severity::error << "Could not record command buffer " << commandBuffer << "." << std::endl;
+				fan::Debug::Get() << fan::Debug::Severity::error << "Could not record command buffer " << commandBuffer << "." << Debug::Endl();
 			}
 
 		}
@@ -513,11 +513,11 @@ namespace fan
 				m_imguiPipeline->DrawFrame(commandBuffer, _index);
 
 				if (vkEndCommandBuffer(commandBuffer) != VK_SUCCESS) {
-					fan::Debug::Get() << fan::Debug::Severity::error << "Could not record command buffer " << _index << "." << std::endl;
+					fan::Debug::Get() << fan::Debug::Severity::error << "Could not record command buffer " << _index << "." << Debug::Endl();
 				}
 			}
 			else {
-				fan::Debug::Get() << fan::Debug::Severity::error << "Could not record command buffer " << _index << "." << std::endl;
+				fan::Debug::Get() << fan::Debug::Severity::error << "Could not record command buffer " << _index << "." << Debug::Endl();
 			}
 		}
 
@@ -550,11 +550,11 @@ namespace fan
 					m_debugLinesPipelineNoDepthTest->Draw(	commandBuffer, *m_debugLinesNoDepthTestVertexBuffers[_index],	static_cast<uint32_t>(m_debugLinesNoDepthTest.size()));
 					m_debugTrianglesPipeline->Draw(			commandBuffer, *m_debugTrianglesvertexBuffers[_index],			static_cast<uint32_t>(m_debugTriangles.size()));
 					if (vkEndCommandBuffer(commandBuffer) != VK_SUCCESS) {
-						fan::Debug::Get() << fan::Debug::Severity::error << "Could not record command buffer " << _index << "." << std::endl;
+						fan::Debug::Get() << fan::Debug::Severity::error << "Could not record command buffer " << _index << "." << Debug::Endl();
 					}
 				}
 				else {
-					fan::Debug::Get() << fan::Debug::Severity::error << "Could not record command buffer " << _index << "." << std::endl;
+					fan::Debug::Get() << fan::Debug::Severity::error << "Could not record command buffer " << _index << "." << Debug::Endl();
 				}
 			}
 		}
@@ -585,11 +585,11 @@ namespace fan
 
 				m_forwardPipeline->Draw(commandBuffer, m_drawData );
 				if (vkEndCommandBuffer(commandBuffer) != VK_SUCCESS) {
-					fan::Debug::Get() << fan::Debug::Severity::error << "Could not record command buffer " << _index << "." << std::endl;
+					fan::Debug::Get() << fan::Debug::Severity::error << "Could not record command buffer " << _index << "." << Debug::Endl();
 				}
 			}
 			else {
-				fan::Debug::Get() << fan::Debug::Severity::error << "Could not record command buffer " << _index << "." << std::endl;
+				fan::Debug::Get() << fan::Debug::Severity::error << "Could not record command buffer " << _index << "." << Debug::Endl();
 			}
 		}
 
@@ -976,7 +976,7 @@ namespace fan
 				fan::Debug::Error( "Could not allocate command pool." );
 				return false;
 			}
-			fan::Debug::Get() << fan::Debug::Severity::log << std::hex << "VkCommandPool\t\t" << m_commandPool << std::dec << std::endl;
+			fan::Debug::Get() << fan::Debug::Severity::log << std::hex << "VkCommandPool\t\t" << m_commandPool << std::dec << Debug::Endl();
 			return true;
 		}
 
@@ -1057,7 +1057,7 @@ namespace fan
 				fan::Debug::Error( "Could not create render pass" );
 				return false;
 			}
-			fan::Debug::Get() << fan::Debug::Severity::log << std::hex << "VkRenderPass\t\t" << m_renderPass << std::dec << std::endl;
+			fan::Debug::Get() << fan::Debug::Severity::log << std::hex << "VkRenderPass\t\t" << m_renderPass << std::dec << Debug::Endl();
 
 			return true;
 		}	
@@ -1123,7 +1123,7 @@ namespace fan
 				fan::Debug::Error( "Could not create render pass pp" );
 				return false;
 			}
-			fan::Debug::Get() << fan::Debug::Severity::log << std::hex << "VkRenderPass pp\t\t" << m_renderPassPostprocess << std::dec << std::endl;
+			fan::Debug::Get() << fan::Debug::Severity::log << std::hex << "VkRenderPass pp\t\t" << m_renderPassPostprocess << std::dec << Debug::Endl();
 
 			return true;
 		}
@@ -1189,7 +1189,7 @@ namespace fan
 				fan::Debug::Error( "Could not create render pass pp" );
 				return false;
 			}
-			fan::Debug::Get() << fan::Debug::Severity::log << std::hex << "VkRenderPass pp\t\t" << m_renderPassPostprocess << std::dec << std::endl;
+			fan::Debug::Get() << fan::Debug::Severity::log << std::hex << "VkRenderPass pp\t\t" << m_renderPassPostprocess << std::dec << Debug::Endl();
 
 			return true;
 		}

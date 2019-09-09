@@ -127,7 +127,7 @@ namespace fan {
 				lastUpdateTime = time;
 
 				if (updateDelta > 25* delta) {
-					Debug::Get() << Debug::Severity::warning << "Lag detected, delta = " << updateDelta << "seconds." << std::endl;
+					Debug::Get() << Debug::Severity::warning << "Lag detected, delta = " << updateDelta << "seconds." << Debug::Endl();
 					updateDelta = 25*delta;
 				}
 

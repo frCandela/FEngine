@@ -28,12 +28,12 @@ namespace fan
 
 			std::vector<unsigned int> spirvCode = SpirvCompiler::Compile(_path);
 			if (spirvCode.empty()) {
-				fan::Debug::Get() << fan::Debug::Severity::error << "Could not create shader module: " << _path << std::endl;
+				fan::Debug::Get() << fan::Debug::Severity::error << "Could not create shader module: " << _path << Debug::Endl();
 
 				std::experimental::filesystem::directory_entry path(_path);
 				std::string extension = path.path().extension().generic_string();
 				std::string tmpPath = (extension == ".frag" ? defaultFragmentShader : defaultVertexShader);
-				fan::Debug::Get() << fan::Debug::Severity::log << "loading default shader " << tmpPath << std::endl;
+				fan::Debug::Get() << fan::Debug::Severity::log << "loading default shader " << tmpPath << Debug::Endl();
 				spirvCode = SpirvCompiler::Compile(tmpPath);
 
 				if (spirvCode.empty()) {
@@ -50,10 +50,10 @@ namespace fan
 			shaderModuleCreateInfo.pCode = spirvCode.data();
 
 			if (vkCreateShaderModule(m_device.vkDevice, &shaderModuleCreateInfo, nullptr, &m_shaderModule) != VK_SUCCESS) {
-				fan::Debug::Get() << fan::Debug::Severity::error << "Could not create shader module: " << _path << std::endl;
+				fan::Debug::Get() << fan::Debug::Severity::error << "Could not create shader module: " << _path << Debug::Endl();
 				return false;
 			}
-			fan::Debug::Get() << fan::Debug::Severity::log << std::hex << "VkShaderModule\t\t" << m_shaderModule << std::dec << std::endl;
+			fan::Debug::Get() << fan::Debug::Severity::log << std::hex << "VkShaderModule\t\t" << m_shaderModule << std::dec << Debug::Endl();
 
 			return true;
 		}
@@ -71,7 +71,7 @@ namespace fan
 			std::ifstream file(_filename, std::ios::ate | std::ios::binary); //ate -> seek to the end of stream immediately after open 
 
 			if (file.is_open() == false) {
-				Debug::Get() << Debug::Severity::error << "failed to open file: " << _filename << std::endl;
+				Debug::Get() << Debug::Severity::error << "failed to open file: " << _filename << Debug::Endl();
 				return {};
 			}
 

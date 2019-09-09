@@ -22,7 +22,7 @@ namespace fan {
  		fan::FBXImporter importer;
  		if (importer.LoadScene(m_path) == true) {
 			if (importer.GetMesh(*this) == false ) {
-				fan::Debug::Get() << "Failed to load mesh : " << m_path << std::endl;
+				fan::Debug::Get() << "Failed to load mesh : " << m_path << Debug::Endl();
  			}
 		}
 		Ressource::Load();

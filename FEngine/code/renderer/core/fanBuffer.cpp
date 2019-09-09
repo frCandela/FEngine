@@ -49,7 +49,7 @@ namespace fan
 				fan::Debug::Error("Could not create buffer");
 				return false;
 			}
-			//fan::Debug::Get() << fan::Debug::Severity::log << std::hex << "VkBuffer\t\t" << m_buffer << std::dec << std::endl;
+			//fan::Debug::Get() << fan::Debug::Severity::log << std::hex << "VkBuffer\t\t" << m_buffer << std::dec << Debug::Endl();
 
 			VkMemoryRequirements memoryRequirements;
 			vkGetBufferMemoryRequirements(m_device.vkDevice, m_buffer, &memoryRequirements);
@@ -64,7 +64,7 @@ namespace fan
 				fan::Debug::Error("Could not allocate buffer");
 				return false;
 			}
-			//fan::Debug::Get() << fan::Debug::Severity::log << std::hex << "VkDeviceMemory\t\t" << m_memory << std::dec << std::endl;
+			//fan::Debug::Get() << fan::Debug::Severity::log << std::hex << "VkDeviceMemory\t\t" << m_memory << std::dec << Debug::Endl();
 
 			Bind();
 

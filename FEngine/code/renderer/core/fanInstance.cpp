@@ -144,7 +144,7 @@ namespace fan
 
 			auto func = (PFN_vkCreateDebugReportCallbackEXT)vkGetInstanceProcAddr(vkInstance, "vkCreateDebugReportCallbackEXT");
 			if (func != nullptr && func(vkInstance, &createInfo, nullptr, &m_callback) == VK_SUCCESS) {
-				fan::Debug::Get() << fan::Debug::Severity::log << std::hex << "VkDebugCallback\t\t" << m_callback << std::dec << std::endl;
+				fan::Debug::Get() << fan::Debug::Severity::log << std::hex << "VkDebugCallback\t\t" << m_callback << std::dec << Debug::Endl();
 				return true;
 			}
 
@@ -170,7 +170,7 @@ namespace fan
 			(void)_code;
 			(void)_layerPrefix;
 			(void)_userData;
-			fan::Debug::Get() << fan::Debug::Severity::error << "Vulkan  Error:  " << _msg << std::endl;
+			fan::Debug::Get() << fan::Debug::Severity::error << "Vulkan  Error:  " << _msg << Debug::Endl();
 			return VK_FALSE;
 		}
 	}

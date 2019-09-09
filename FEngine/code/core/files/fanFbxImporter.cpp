@@ -16,7 +16,7 @@ namespace fan {
 		if (m_sdkManager == nullptr ) {
 			Debug::Error( "Error: Unable to create FBX Manager!\n" );
 		} else {
-			//Debug::Get() << Debug::Severity::log << "Autodesk FBX SDK version" << m_sdkManager->GetVersion() << std::endl;
+			//Debug::Get() << Debug::Severity::log << "Autodesk FBX SDK version" << m_sdkManager->GetVersion() << Debug::Endl();
 		}
 
 		// fbx manager
@@ -57,12 +57,12 @@ namespace fan {
 		{
 			fbxsdk::FbxString error = m_importer->GetStatus().GetErrorString();
 			Debug::Error( "Call to FbxImporter::Initialize() failed." );
-			Debug::Get() << Debug::Severity::error << "Error returned: " <<  error.Buffer()  << " " << m_path << std::endl;
+			Debug::Get() << Debug::Severity::error << "Error returned: " <<  error.Buffer()  << " " << m_path << Debug::Endl();
 
 			if (m_importer->GetStatus().GetCode() == fbxsdk::FbxStatus::eInvalidFileVersion)
 			{
-				Debug::Get() << Debug::Severity::log << "FBX file format version for this FBX SDK is " << m_SDKMajor << "." << m_SDKMinor << "." << m_SDKRevision << std::endl;
-				Debug::Get() << Debug::Severity::log << "FBX file format version for file " << m_path << " is " << fileMajor << "." << fileMinor << "." << fileRevision << std::endl;
+				Debug::Get() << Debug::Severity::log << "FBX file format version for this FBX SDK is " << m_SDKMajor << "." << m_SDKMinor << "." << m_SDKRevision << Debug::Endl();
+				Debug::Get() << Debug::Severity::log << "FBX file format version for file " << m_path << " is " << fileMajor << "." << fileMinor << "." << fileRevision << Debug::Endl();
 			}
 			return false;
 		}
@@ -81,7 +81,7 @@ namespace fan {
 			return false;
 		}
 
-		Debug::Get() << Debug::Severity::log << "successfully imported " << m_path << std::endl;		
+		Debug::Get() << Debug::Severity::log << "successfully imported " << m_path << Debug::Endl();
 
  		fbxsdk::FbxGeometryConverter geometryConverter( m_sdkManager );
  		geometryConverter.Triangulate(m_scene, true);
@@ -124,7 +124,7 @@ namespace fan {
 
 		// No mesh
 		if (mesh == nullptr || mesh->GetControlPointsCount() == 0) {
-			Debug::Get() << Debug::Severity::error << "no mesh found in" << m_path << std::endl;
+			Debug::Get() << Debug::Severity::error << "no mesh found in" << m_path << Debug::Endl();
 			return false;
 		}
 

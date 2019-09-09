@@ -40,7 +40,7 @@ namespace fan
 				fan::Debug::Error("Could not create framebuffer");
 				return false;
 			}
-			fan::Debug::Get() << fan::Debug::Severity::log << std::hex << "VkFramebuffer\t\t" << m_framebuffer << std::dec << std::endl;
+			fan::Debug::Get() << fan::Debug::Severity::log << std::hex << "VkFramebuffer\t\t" << m_framebuffer << std::dec << Debug::Endl();
 			return true;
 		}
 	}

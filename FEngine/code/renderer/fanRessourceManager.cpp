@@ -43,7 +43,7 @@ namespace fan
 		vk::Texture * RessourceManager::LoadTexture(const std::string _path) {
 			// Dont add the texture if it already exists
 			if (FindTexture(_path) != nullptr) {
-				fan::Debug::Get() << fan::Debug::Severity::warning << "Texture already added: " << _path << std::endl;
+				fan::Debug::Get() << fan::Debug::Severity::warning << "Texture already added: " << _path << Debug::Endl();
 				return nullptr;
 			}
 
@@ -101,7 +101,7 @@ namespace fan
 				return &it->second;
 			}
 			else {
-				fan::Debug::Get() << fan::Debug::Severity::error << "Mesh not found : " << _mesh->GetPath() << std::endl;
+				fan::Debug::Get() << fan::Debug::Severity::error << "Mesh not found : " << _mesh->GetPath() << Debug::Endl();
 				return &m_meshList.find(m_defaultMesh->GetRessourceID())->second;
 			}
 		}
@@ -111,7 +111,7 @@ namespace fan
 		//================================================================================================================================
 		void  RessourceManager::AddMesh(fan::Mesh * _mesh) {
 			if (m_meshList.find(_mesh->GetRessourceID()) != m_meshList.end()) {
-				fan::Debug::Get() << fan::Debug::Severity::warning << "Renderer::AddMesh : Mesh already registered: " << _mesh->GetPath() << std::endl;
+				fan::Debug::Get() << fan::Debug::Severity::warning << "Renderer::AddMesh : Mesh already registered: " << _mesh->GetPath() << Debug::Endl();
 				return;
 			}
 

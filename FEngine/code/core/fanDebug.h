@@ -9,6 +9,7 @@ namespace fan {
 	class Debug : public Singleton<fan::Debug> {
 	public:
 
+		enum class Code		{ endl };
 		enum class Severity { log = 0, highlight = 1, warning = 2, error = 3 };
 		struct LogItem {
 			Severity	severity;
@@ -17,6 +18,7 @@ namespace fan {
 		};
 		fan::Signal<> onNewLog;
 
+		static Code Endl() { return Code::endl;  }
 		static void Log		( const std::string _message, const Severity & _severity );
 		static void Log		( const std::string _message );
 		static void Warning	( const std::string _message );
@@ -48,15 +50,8 @@ namespace fan {
 			return _logger;
 		}
 		//================================================================================================================================
-		friend Debug& operator<<(Debug& _logger, std::ostream&(*_pManip)(std::ostream&)){	// Special case of Debug::Get() << std::endl 
-			if (_pManip != std::endl) {	// TODO replace endl with a friendlier key world
-				std::cout << "[ERROR] LOGGER FAILED TO READ EXPRESSION: " << _pManip << std::endl;
-				_logger.Flush();
-				Break();
-			} else {
-				_logger.Flush();
-			}
-			
+		friend Debug& operator<<(Debug& _logger, Code _code ){	// Special case of Debug::Get() << std::endl 			
+			_logger.Flush();			
 			return _logger;
 		}
 	};

@@ -147,7 +147,7 @@ namespace fan
 			}
 
 			if (_child->m_parent == this) {
-				fan::Debug::Get() << fan::Debug::Severity::log << _child->m_name << " is already a child of " << m_name << std::endl;
+				fan::Debug::Get() << fan::Debug::Severity::log << _child->m_name << " is already a child of " << m_name << Debug::Endl();
 				return;
 			}
 
@@ -224,7 +224,7 @@ namespace fan
 				uint32_t componentID;
 				_in >> componentID;
 
-				fan::Debug::Get() << fan::Debug::Severity::log << "\tComponent: " << buffer << std::endl;
+				fan::Debug::Get() << fan::Debug::Severity::log << "\tComponent: " << buffer << Debug::Endl();
 
 				// Instanciate component
 
@@ -241,7 +241,7 @@ namespace fan
 			const std::string indentation1 = GetIndentation(_indentLevel + 1);
 			const std::string indentation2 = GetIndentation(_indentLevel + 2);
 
-			_out << indentation << "Entity: " << m_name << " {" << std::endl; { // entity
+			_out << indentation << "Entity: " << m_name << " {" << std::endl;; { // entity
 				
 
 				_out << indentation1 << "Components: " << m_components.size() << " {" << std::endl; { // components
@@ -259,7 +259,7 @@ namespace fan
 						entity->Save(_out, _indentLevel + 2);
 					}
 				} _out << indentation1 << "}" << std::endl; // End childs
-			} _out << indentation << "}" << std::endl; // End entity
+			} _out << indentation << "}" << std::endl;; // End entity
 		}
 	}
 }

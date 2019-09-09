@@ -105,7 +105,7 @@ namespace fan
 				if (_entity->GetParent() != nullptr) {
 					_entity->GetParent()->RemoveChild(_entity);
 				}
-				Debug::Get() << "delete Entity: " << _entity->GetName() << std::endl;
+				Debug::Get() << "delete Entity: " << _entity->GetName() << Debug::Endl();
 				delete(_entity);
 			}
 		}
@@ -170,7 +170,7 @@ namespace fan
 		//================================================================================================================================
 		//================================================================================================================================
 		void Scene::Save() const {
- 			fan::Debug::Get() << fan::Debug::Severity::log << "saving scene: " << m_name << std::endl;
+ 			fan::Debug::Get() << fan::Debug::Severity::log << "saving scene: " << m_name << Debug::Endl();
 			std::ofstream outStream(m_path);
 			if (outStream.is_open()) {
 				outStream << "Entities: { \n";
@@ -185,31 +185,30 @@ namespace fan
 		void Scene::LoadFrom(const std::string _path) {
 			Clear();
 
-			fan::Debug::Get() << fan::Debug::Severity::log << "loading scene: " << _path << std::endl;
+			Debug::Get() << Debug::Severity::log << "loading scene: " << _path << Debug::Endl();
 			std::ifstream inStream(_path);
 			if (inStream.is_open()) {
-				m_path = _path;
-
 				std::string inputString = "";
 				inStream >> inputString;
 				while (inStream.eof() == false) {
 					if (inputString == "entity") {
 						inStream >> inputString; // entity name
 						scene::Entity * entity = CreateEntity(inputString);
-						fan::Debug::Get() << fan::Debug::Severity::log << "entity: " << inputString << std::endl;
+						Debug::Get() << Debug::Severity::log << "entity: " << inputString << Debug::Endl();
 						entity->Load(inStream);
 					}
 					else {
-						fan::Debug::Get() << fan::Debug::Severity::error << "fail " << inputString << std::endl;
+						Debug::Get() << Debug::Severity::error << "fail " << inputString << Debug::Endl();
 					}
 					inStream >> inputString;
 				}
 				inStream.close();
-
+				m_path = _path;
 				onSceneLoad.Emmit(this);
 			}
+
 			else {
-				fan::Debug::Get() << fan::Debug::Severity::error << "failed to open file " << _path << std::endl;
+				fan::Debug::Get() << fan::Debug::Severity::error << "failed to open file " << _path << Debug::Endl();
 			}
 		}
 	}
