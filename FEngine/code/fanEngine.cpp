@@ -71,14 +71,13 @@ namespace fan {
 		m_consoleWindow =		new editor::ConsoleWindow();
 		Renderer::Get().Initialize(windowSize, windowPosition);
 		m_scene =				new scene::Scene("mainScene");
+		m_scene->onSceneLoad.Connect(&Engine::OnSceneLoad, this);
+		m_scene->New();
 
 		scene::Material::onRegisterMaterial.Connect		( &Renderer::RegisterMaterial,		&Renderer::Get() );
 		scene::Material::onUnregisterMaterial.Connect	( &Renderer::UnRegisterMaterial,	&Renderer::Get());		
 		scene::Model::onRegisterModel.Connect			( &Renderer::RegisterModel,			&Renderer::Get());
 		scene::Model::onUnRegisterModel.Connect			( &Renderer::UnRegisterModel,		&Renderer::Get());
-
-		m_scene->onSceneLoad.Connect(&Engine::OnSceneLoad, this);
-		OnSceneLoad(m_scene);
 
 		m_mainMenuBar->Initialize();
 

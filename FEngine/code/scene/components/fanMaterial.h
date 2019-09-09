@@ -20,8 +20,8 @@ namespace fan
 			static fan::Signal< Material * > onUnregisterMaterial;
 
 			bool IsUnique()		const override { return true; }
-			void Load(std::istream& _in)	override;
-			void Save(std::ostream& _out, const int _indentLevel)	override;
+			bool Load(std::istream& _in)	override;
+			bool Save(std::ostream& _out, const int _indentLevel) const override;
 
 
 			void SetTexture(vk::Texture * _texture);

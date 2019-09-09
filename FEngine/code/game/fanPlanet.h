@@ -11,8 +11,8 @@ namespace fan {
 
 			void Start() override;
 			void Update(const float _delta) override;
-			void Load(std::istream& /*_in*/) override {}
-			void Save(std::ostream& /*_out*/, const int /*_indentLevel*/) override {}
+			bool Load(std::istream& /*_in*/) override { return true; }
+			bool Save(std::ostream& /*_out*/, const int /*_indentLevel*/) const override { return true; }
 
 			DECLARE_TYPE_INFO(Planet);
 		protected:

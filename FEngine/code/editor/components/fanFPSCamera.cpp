@@ -117,17 +117,27 @@ namespace fan
 
 		//================================================================================================================================
 		//================================================================================================================================
-		void FPSCamera::Load(std::istream& _in) {
-			(void)_in;
+		bool FPSCamera::Load(std::istream& _in) {
+			if (!ReadSegmentHeader(_in, "xySensitivity:")) { return false; }
+			if (!ReadFloat(_in, m_xySensitivity[0])) { return false; }
+			if (!ReadFloat(_in, m_xySensitivity[1])) { return false; }
+
+			if (!ReadSegmentHeader(_in, "speed:")) { return false; }
+			if (!ReadFloat(_in, m_speed)) { return false; }
+
+			if (!ReadSegmentHeader(_in, "speedMultiplier:")) { return false; }
+			if (!ReadFloat(_in, m_speedMultiplier)) { return false; }
+			return true;
 		}
 
 		//================================================================================================================================
 		//================================================================================================================================
-		void FPSCamera::Save(std::ostream& _out, const int _indentLevel) {
+		bool FPSCamera::Save(std::ostream& _out, const int _indentLevel) const {
 			const std::string indentation = GetIndentation(_indentLevel);
 			_out << indentation << "xySensitivity:   " << m_xySensitivity[0] << " " << m_xySensitivity[1] << std::endl;
 			_out << indentation << "speed:           " << m_speed << std::endl;
 			_out << indentation << "speedMultiplier: " << m_speedMultiplier << std::endl;
+			return true;
 		}
 	}
 }

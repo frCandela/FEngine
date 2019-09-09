@@ -113,19 +113,33 @@ namespace fan
 
 		//================================================================================================================================
 		//================================================================================================================================
-		void Transform::Load(std::istream& _in) {
-			_in >> m_position[0];		_in >> m_position[1];		_in >> m_position[2];
-			_in >> m_rotation[0];		_in >> m_rotation[1];		_in >> m_rotation[2];	_in >> m_rotation[3];
-			_in >> m_scale[0];			_in >> m_scale[1];			_in >> m_scale[2];
+		bool Transform::Load(std::istream& _in) {
+			if (!ReadSegmentHeader(_in, "position:")) { return false; }
+			if (!ReadFloat(_in, m_position[0])) { return false; }
+			if (!ReadFloat(_in, m_position[1])) { return false; }
+			if (!ReadFloat(_in, m_position[2])) { return false; }
+
+			if (!ReadSegmentHeader(_in, "rotation:")) { return false; }
+			if (!ReadFloat(_in, m_rotation[0])) { return false; }
+			if (!ReadFloat(_in, m_rotation[1])) { return false; }
+			if (!ReadFloat(_in, m_rotation[2])) { return false; }
+			if (!ReadFloat(_in, m_rotation[3])) { return false; }
+
+			if (!ReadSegmentHeader(_in, "scale:")) { return false; }
+			if (!ReadFloat(_in, m_scale[0])) { return false; }
+			if (!ReadFloat(_in, m_scale[1])) { return false; }
+			if (!ReadFloat(_in, m_scale[2])) { return false; }
+			return true;
 		}
 
 		//================================================================================================================================
 		//================================================================================================================================
-		void Transform::Save(std::ostream& _out, const int _indentLevel) {
+		bool Transform::Save(std::ostream& _out, const int _indentLevel) const {
 			const std::string indentation = GetIndentation(_indentLevel);
 			_out << indentation << "position: " << m_position[0] << " " << m_position[1] << " " << m_position[2] << std::endl;
 			_out << indentation << "rotation: " << m_rotation[0] << " " << m_rotation[1] << " " << m_rotation[2] << " " << m_rotation[3] << std::endl;
 			_out << indentation << "scale:    " << m_scale[0] << " " << m_scale[1] << " " << m_scale[2] << std::endl;
+			return true;
 		}
 	}
 }

@@ -76,23 +76,26 @@ namespace fan
 
 		//================================================================================================================================
 		//================================================================================================================================
-		void Model::Load(std::istream& _in) {
-			std::string path;
-			_in >> path;
+		bool Model::Load(std::istream& _in) {
+			std::string pathBuffer;
+			if (!ReadSegmentHeader(_in, "path:")) { return false; }
+			if (!ReadString(_in, pathBuffer)) { return false; }
 
 			vk::RessourceManager * ressourceManager = Renderer::Get().GetRessourceManager();
-			fan::Mesh * mesh = ressourceManager->FindMesh(path);
+			fan::Mesh * mesh = ressourceManager->FindMesh(pathBuffer);
 			if (mesh == nullptr) {
-				mesh = ressourceManager->LoadMesh(path);
+				mesh = ressourceManager->LoadMesh(pathBuffer);
 			}
 			SetMesh(mesh);
+			return true;
 		}
 
 		//================================================================================================================================
 		//================================================================================================================================
-		void Model::Save(std::ostream& _out, const int _indentLevel) {
+		bool Model::Save(std::ostream& _out, const int _indentLevel) const {
 			const std::string indentation = GetIndentation(_indentLevel);
 			_out << indentation << "path: " <<  m_mesh->GetPath() << std::endl;
+			return true;
 		}
 	}
 }

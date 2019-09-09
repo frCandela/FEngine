@@ -30,8 +30,8 @@ namespace fan
 			void SetXYSensitivity(const btVector2 _sensitivity) { m_xySensitivity = _sensitivity; }
 
 			// ISerializable
-			void Load(std::istream& _in) override;
-			void Save(std::ostream& _out, const int _indentLevel) override;
+			bool Load(std::istream& _in) override;
+			bool Save(std::ostream& _out, const int _indentLevel) const override;
 
 			DECLARE_TYPE_INFO(FPSCamera);
 		private:

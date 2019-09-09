@@ -20,8 +20,6 @@ namespace fan
 			m_name(_name)
 			, m_path("") 
 			, m_root(nullptr) {
-			m_root = CreateEntity("root", nullptr);
-			m_root->AddComponent<scene::Transform>();
 		}
 
 		//================================================================================================================================
@@ -37,7 +35,7 @@ namespace fan
 				_parent = m_root;
 			}
 			Entity* entity = new Entity(_name, _parent);
-
+			entity->SetScene(this);
 			entity->onComponentCreated.Connect(&Scene::OnComponentCreated, this);
 			entity->onComponentDeleted.Connect(&Scene::OnComponentDeleted, this);
 
@@ -91,7 +89,7 @@ namespace fan
 		//================================================================================================================================
 		//================================================================================================================================
 		void  Scene::R_DeleteEntity(Entity* _entity, std::set<Entity*>& _deletedEntitiesSet) {
-			if (_deletedEntitiesSet.find(_entity) == _deletedEntitiesSet.end()) {
+			if (_entity != nullptr && _deletedEntitiesSet.find(_entity) == _deletedEntitiesSet.end()) {
 
 				const std::vector<Entity*> childs = _entity->GetChilds(); // copy
 				for (int childIndex = 0; childIndex < childs.size(); childIndex++) {
@@ -158,12 +156,15 @@ namespace fan
 			m_startingActors.clear();
 			m_activeActors.clear();
 			m_entitiesToDelete.clear();
+			m_root = nullptr;
 		}
 
 		//================================================================================================================================
 		//================================================================================================================================
 		void Scene::New() {
-			Clear();
+			Clear();			
+			m_root = CreateEntity("root", nullptr);
+			m_root->AddComponent<scene::Transform>();
 			onSceneLoad.Emmit(this);
 		}
 
@@ -174,7 +175,7 @@ namespace fan
 			std::ofstream outStream(m_path);
 			if (outStream.is_open()) {
 				outStream << "Entities: { \n";
-				m_root->Save(outStream, 1);	
+				Save(outStream, 0);
 				outStream << '}';
 				outStream.close();
 			}
@@ -182,33 +183,51 @@ namespace fan
 
 		//================================================================================================================================
 		//================================================================================================================================
-		void Scene::LoadFrom(const std::string _path) {
-			Clear();
+		bool Scene::Save(std::ostream& _out, const int _indentLevel) const {
+			return m_root->Save(_out, _indentLevel+1);
+		}
 
-			Debug::Get() << Debug::Severity::log << "loading scene: " << _path << Debug::Endl();
+		//================================================================================================================================
+		//================================================================================================================================
+		bool Scene::Load(std::istream & _in) {
+			if ( ! ReadSegmentHeader(_in) ) { return false; }
+			int nbEntities = 42;
+			if ( ! ReadInteger(_in,  nbEntities) || nbEntities != 1 ){ return false; }
+			if ( ! ReadStartToken(_in) ) { return false; }
+			for (int entityIndex = 0; entityIndex < nbEntities; entityIndex++) {
+				m_root = CreateEntity("root");
+				m_root->LoadEntity(_in );
+			}			
+			if ( ! ReadEndToken(_in)) { return false; }
+			return true;
+		}
+
+		//================================================================================================================================
+		//================================================================================================================================
+		bool Scene::LoadFrom(const std::string _path) {
+			Clear();
 			std::ifstream inStream(_path);
 			if (inStream.is_open()) {
-				std::string inputString = "";
-				inStream >> inputString;
-				while (inStream.eof() == false) {
-					if (inputString == "entity") {
-						inStream >> inputString; // entity name
-						scene::Entity * entity = CreateEntity(inputString);
-						Debug::Get() << Debug::Severity::log << "entity: " << inputString << Debug::Endl();
-						entity->Load(inStream);
-					}
-					else {
-						Debug::Get() << Debug::Severity::error << "fail " << inputString << Debug::Endl();
-					}
-					inStream >> inputString;
+				// Load scene
+				Debug::Get() << Debug::Severity::log << "loading scene: " << _path << Debug::Endl();
+				if (Load(inStream)) {
+					Debug::Log("Load success");
+					m_path = _path;
+					inStream.close();
+					onSceneLoad.Emmit(this);
+					return true;
+				} else {
+					Debug::Get() << Debug::Severity::error << "failed to load scene: " << _path << Debug::Endl();
+					m_path = "";					
+					inStream.close();
+					New();
+					return false;
 				}
-				inStream.close();
-				m_path = _path;
-				onSceneLoad.Emmit(this);
-			}
-
-			else {
+				
+			} else {
 				fan::Debug::Get() << fan::Debug::Severity::error << "failed to open file " << _path << Debug::Endl();
+				New();
+				return false;
 			}
 		}
 	}

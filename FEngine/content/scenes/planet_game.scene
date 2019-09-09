@@ -1,4 +1,4 @@
-Entities: { 
+Entities: 1 { 
     Entity: root {
         Components: 1 {
             Transform: 1269105190 {
@@ -18,7 +18,7 @@ Entities: {
                     Camera: 1148216499 {
                         fov:          110
                         nearDistance: 0.01
-                        farDistance : 1000
+                        farDistance: 1000
                     }
                     FPSCamera: 4040776604 {
                         xySensitivity:   0.005 0.005

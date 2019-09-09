@@ -1,6 +1,7 @@
 #pragma once
 
 #include "core/fanSignal.h"
+#include "core/fanISerializable.h"
 
 namespace fan
 {
@@ -12,7 +13,7 @@ namespace fan
 
 		//================================================================================================================================
 		//================================================================================================================================
-		class Scene
+		class Scene : public ISerializable
 		{
 		public:
 			fan::Signal<Entity*> onEntityCreated;
@@ -31,7 +32,8 @@ namespace fan
 
 			void New();
 			void Save() const;
-			void LoadFrom(const std::string _path);
+
+			bool LoadFrom(const std::string _path);
 
 			Entity *						GetRoot() { return m_root;  }
 			inline std::string				GetName() const { return m_name; }
@@ -51,9 +53,11 @@ namespace fan
 
 			void OnComponentCreated(scene::Component * _component);
 			void OnComponentDeleted(scene::Component * _component);
+			bool Load(std::istream& _in) override;
+			bool Save(std::ostream& _out, const int _indentLevel) const override;
 			void R_DeleteEntity		( Entity* _entity, std::set<Entity*>&	_deletedEntitiesSet);
 			void R_BuildEntitiesList( Entity* _entity, std::vector<Entity*>& _entitiesList) const ;
 			void Clear();
 		};
 	}
-}
+}		

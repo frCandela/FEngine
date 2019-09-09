@@ -96,19 +96,26 @@ namespace fan
 
 		//================================================================================================================================
 		//================================================================================================================================
-		void Camera::Load(std::istream& _in) {
-			_in >> m_fov;
-			_in >> m_nearDistance;
-			_in >> m_farDistance;
+		bool Camera::Load(std::istream& _in) {
+			if (!ReadSegmentHeader(_in, "fov:")) { return false; }
+			if (!ReadFloat(_in, m_fov)) { return false; }
+
+			if (!ReadSegmentHeader(_in, "nearDistance:")) { return false; }
+			if (!ReadFloat(_in, m_nearDistance)) { return false; }
+
+			if (!ReadSegmentHeader(_in, "farDistance:")) { return false; }
+			if (!ReadFloat(_in, m_farDistance)) { return false; }
+			return true;
 		}
 
 		//================================================================================================================================
 		//================================================================================================================================
-		void Camera::Save(std::ostream& _out, const int _indentLevel) {
+		bool Camera::Save(std::ostream& _out, const int _indentLevel) const  {
 			const std::string indentation = GetIndentation(_indentLevel);
 			_out << indentation << "fov:          " << m_fov << std::endl;
 			_out << indentation << "nearDistance: " << m_nearDistance << std::endl;
-			_out << indentation << "farDistance : " << m_farDistance << std::endl;
+			_out << indentation << "farDistance: " << m_farDistance << std::endl;
+			return true;
 		}
 	}
 }

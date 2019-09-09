@@ -9,6 +9,7 @@ namespace fan
 	namespace scene
 	{
 		class Component;
+		class Scene;
 
 		//================================================================================================================================
 		//================================================================================================================================
@@ -48,6 +49,9 @@ namespace fan
 			//Getters
 			std::string GetName() const { return m_name; }
 			void SetName(const std::string _newName) { m_name = _newName; }
+			scene::Scene * GetScene() const { return m_scene; }
+			void SetScene(Scene * _scene) { m_scene = _scene;  }
+
 			const shape::AABB & GetAABB() const { return m_aabb; }
 			void ComputeAABB();
 
@@ -61,10 +65,9 @@ namespace fan
 			void SetParent		( Entity * _parent);
 			void InsertBelow	( Entity * _brother);
 
-
 			// ISerializable
-			void Load(std::istream& _in) override;
-			void Save(std::ostream& _out, const int _indentLevel) override;
+			bool LoadEntity( std::istream& _in );
+			bool Save(std::ostream& _out, const int _indentLevel) const override;
 
 			bool		HasFlag(const Flag _flag) const	{ return m_flags & _flag; }
 			uint32_t	GetFlags() const				{ return m_flags; }
@@ -75,11 +78,11 @@ namespace fan
 			std::vector<Entity*>	m_childs;
 			Entity *				m_parent;
 			uint32_t				m_flags;
-
-			shape::AABB m_aabb;
-
+			shape::AABB				m_aabb;
 			std::vector<Component*> m_components;
+			scene::Scene *			m_scene;
 
+			bool Load(std::istream& _in) override;
 			void AddComponent(scene::Component * _component);
 			void OnComponentModified(scene::Component * _component);
 			void OnComponentDeleted(scene::Component * _component);

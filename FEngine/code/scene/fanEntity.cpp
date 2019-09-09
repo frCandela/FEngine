@@ -1,9 +1,11 @@
 #include "fanGlobalIncludes.h"
 
 #include "scene/fanEntity.h"
+#include "scene/fanScene.h"
 #include "scene/components/fanComponent.h"
 #include "scene/components/fanModel.h"
 #include "scene/components/fanTransform.h"
+
 #include "renderer/fanMesh.h"
 #include "core/fanSignal.h"
 
@@ -215,34 +217,62 @@ namespace fan
 
 		//================================================================================================================================
 		//================================================================================================================================
-		void Entity::Load(std::istream& _in) {
+		bool Entity::Load(std::istream& _in) {
+			if (!ReadSegmentHeader(_in, "Entity:")) { return false; }
+
 			std::string buffer;
-			_in >> buffer;
-			while (buffer != "end") {
+			if (!ReadString(_in, buffer) || buffer.empty()) { return false; } // name
+			SetName(buffer);
 
-				// Get component id
-				uint32_t componentID;
-				_in >> componentID;
+			if (!ReadStartToken(_in)) { return false; }
+			{
+				if (!ReadSegmentHeader(_in, "Components:")) { return false; }
+				int nbComponents = -1;
+				if (!ReadInteger(_in, nbComponents) || nbComponents < 0) { return false; }
+				if (!ReadStartToken(_in)) { return false; }
+				{
+					for (int componentIndex = 0; componentIndex < nbComponents; componentIndex++)
+					{
+						if (!ReadSegmentHeader(_in)) { return false; } // "componentName:"
+						uint32_t componentID = 0;
+						if (!ReadUnsigned(_in, componentID) && componentID != 0) { return false; }
+						if (!ReadStartToken(_in)) { return false; }
+						{
+							scene::Component * component = AddComponent(componentID);
+							component->Load(_in);
+						} if (!ReadEndToken(_in)) { return false; }
+					}
+				} if (!ReadEndToken(_in)) { return false; }
+				if (!ReadSegmentHeader(_in, "Childs:")) { return false; }
+				int nbChilds = -1;
+				if (!ReadInteger(_in, nbChilds) || nbChilds < 0) { return false; }
+				if (!ReadStartToken(_in)) { return false; }
+				{
+					for (int entityIndex = 0; entityIndex < nbChilds; entityIndex++)
+					{
+						Entity * child = m_scene->CreateEntity("tmp", this);
+						child->LoadEntity( _in );
+					}
+				}if (!ReadEndToken(_in)) { return false; }
+			} if (!ReadEndToken(_in)) { return false; }
 
-				fan::Debug::Get() << fan::Debug::Severity::log << "\tComponent: " << buffer << Debug::Endl();
-
-				// Instanciate component
-
-				scene::Component * component = AddComponent(componentID);
-				component->Load(_in);
-				_in >> buffer; // skip component name
-			}
+			return true;
 		}
 
 		//================================================================================================================================
 		//================================================================================================================================
-		void Entity::Save(std::ostream& _out, const int _indentLevel) {
+		bool Entity::LoadEntity(std::istream& _in) {
+			return Load(_in);
+		}
+
+		//================================================================================================================================
+		//================================================================================================================================
+		bool Entity::Save(std::ostream& _out, const int _indentLevel) const {
 			const std::string indentation = GetIndentation(_indentLevel);
 			const std::string indentation1 = GetIndentation(_indentLevel + 1);
 			const std::string indentation2 = GetIndentation(_indentLevel + 2);
 
-			_out << indentation << "Entity: " << m_name << " {" << std::endl;; { // entity
-				
+			_out << indentation << "Entity: " << m_name << " {" << std::endl;; { // entity			
 
 				_out << indentation1 << "Components: " << m_components.size() << " {" << std::endl; { // components
 					for (int componentIndex = 0; componentIndex < m_components.size(); componentIndex++) {
@@ -260,6 +290,7 @@ namespace fan
 					}
 				} _out << indentation1 << "}" << std::endl; // End childs
 			} _out << indentation << "}" << std::endl;; // End entity
-		}
+			return true;
+		}		
 	}
 }
