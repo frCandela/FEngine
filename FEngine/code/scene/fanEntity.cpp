@@ -273,8 +273,7 @@ namespace fan
 			const std::string indentation1 = GetIndentation(_indentLevel + 1);
 			const std::string indentation2 = GetIndentation(_indentLevel + 2);
 
-			_out << indentation << "Entity: " << m_name << " {" << std::endl;; { // entity			
-
+			_out << indentation << "Entity: " << m_name << " {" << std::endl;; { // entity		
 				_out << indentation1 << "Components: " << m_components.size() << " {" << std::endl; { // components
 					for (int componentIndex = 0; componentIndex < m_components.size(); componentIndex++) {
 						scene::Component * component = m_components[componentIndex];
@@ -284,10 +283,20 @@ namespace fan
 					} _out << indentation1 << "}" << std::endl; // End components
 				}
 				
-				_out << indentation1 << "Childs: " << m_childs.size() << " {" << std::endl; { // childs
+				// Count childs to save
+				int childsToSaveCount = 0;
+				for (int childIndex = 0; childIndex < m_childs.size(); childIndex++) {
+					if (m_childs[childIndex]->HasFlag(NOT_SAVED) == false) {
+						++childsToSaveCount;
+					}
+				}
+
+				_out << indentation1 << "Childs: " << childsToSaveCount << " {" << std::endl; { // childs
 					for (int childIndex = 0; childIndex < m_childs.size(); childIndex++) {
 						Entity * entity = m_childs[childIndex];
-						entity->Save(_out, _indentLevel + 2);
+						if (entity->HasFlag(NOT_SAVED) == false) {
+							entity->Save(_out, _indentLevel + 2);
+						}
 					}
 				} _out << indentation1 << "}" << std::endl; // End childs
 			} _out << indentation << "}" << std::endl;; // End entity

@@ -7,32 +7,11 @@ Entities: 1 {
                 scale:    1 1 1
             }
         }
-        Childs: 2 {
-            Entity: editor_camera {
-                Components: 3 {
-                    Transform: 1269105190 {
-                        position: -4.35527 1.87861 -3.25266
-                        rotation: 0.0245327 -0.086456 -0.270403 0.958545
-                        scale:    1 1 1
-                    }
-                    Camera: 1148216499 {
-                        fov:          110
-                        nearDistance: 0.01
-                        farDistance: 1000
-                    }
-                    FPSCamera: 4040776604 {
-                        xySensitivity:   0.005 0.005
-                        speed:           10
-                        speedMultiplier: 3
-                    }
-                }
-                Childs: 0 {
-                }
-            }
+        Childs: 1 {
             Entity: planet {
                 Components: 4 {
                     Transform: 1269105190 {
-                        position: 0 1.25 0
+                        position: 0 1.33333 0
                         rotation: 0 0 0 1
                         scale:    1 1 1
                     }
@@ -45,7 +24,18 @@ Entities: 1 {
                         material: content\models\test\textures\kiwi.png
                     }
                 }
-                Childs: 0 {
+                Childs: 1 {
+                    Entity: chou_couille {
+                        Components: 1 {
+                            Transform: 1269105190 {
+                                position: 0 0 0
+                                rotation: 0 0 0 1
+                                scale:    1 1 1
+                            }
+                        }
+                        Childs: 0 {
+                        }
+                    }
                 }
             }
         }
