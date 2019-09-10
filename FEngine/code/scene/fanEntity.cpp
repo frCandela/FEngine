@@ -24,15 +24,15 @@ namespace fan
 				_parent->m_childs.push_back(this);
 			}
 
-			onComponentModified.Connect(&Entity::OnComponentModified, this);
-			onComponentDeleted.Connect(&Entity::OnComponentDeleted, this);
+			Component::onComponentModified.Connect(&Entity::OnComponentModified, this);
+			Component::onComponentDeleted.Connect(&Entity::OnComponentDeleted, this);
 		}
 
 		//================================================================================================================================
 		//================================================================================================================================
 		Entity::~Entity() {
 			for (int componentIndex = 0; componentIndex < m_components.size(); componentIndex++) {
-				m_components[componentIndex]->Delete();
+				m_components[componentIndex]->OnDetach();				
 			}
 			for (int componentIndex = 0; componentIndex < m_components.size(); componentIndex++) {
 				delete m_components[componentIndex];
@@ -50,10 +50,10 @@ namespace fan
 				if (m_components[componentIndex] == component)
 				{
 					// Deletes it
-					m_components[componentIndex]->m_isBeingDeleted = true;
-					onComponentDeleted.Emmit(m_components[componentIndex]);
-					m_components[componentIndex]->Delete();
+					m_components[componentIndex]->m_isBeingDeleted = true;		
+					m_components[componentIndex]->OnDetach();
 					m_components.erase(m_components.begin() + componentIndex);
+					delete component;
 					return true;
 				}
 			}
@@ -72,10 +72,8 @@ namespace fan
 		//================================================================================================================================
 		void Entity::AddComponent(scene::Component * _component) {
 			_component->m_entity = this;
-			_component->Initialize();
 			m_components.push_back(_component);
-			onComponentCreated.Emmit(_component);
-			onComponentModified.Emmit(_component);
+			_component->OnAttach();
 		}
 
 		//================================================================================================================================
@@ -87,9 +85,12 @@ namespace fan
 				m_aabb = model->ComputeAABB();
 			}
 			else {
-				const btVector3 origin = GetComponent< scene::Transform >()->GetPosition();
-				const float size = 0.05f;
-				m_aabb = shape::AABB(origin - size * btVector3::One(), origin + size * btVector3::One());
+				const scene::Transform * transform = GetComponent< scene::Transform >();
+				if (transform != nullptr) {
+					const btVector3 origin = transform->GetPosition();
+					const float size = 0.05f;
+					m_aabb = shape::AABB(origin - size * btVector3::One(), origin + size * btVector3::One());
+				}
 			}
 		}		
 
@@ -201,18 +202,18 @@ namespace fan
 
 		//================================================================================================================================
 		//================================================================================================================================
-		void Entity::OnComponentModified(scene::Component * _component) {
-			if (_component->IsType<scene::Transform>() || _component->IsType<scene::Model>()) {
-				ComputeAABB();
-			}
+		void Entity::OnComponentModified(scene::Component * /*_component*/) {
+// 			if (_component->IsType<scene::Transform>() || _component->IsType<scene::Model>()) {
+// 				ComputeAABB();
+// 			}
 		}
 
 		//================================================================================================================================
 		//================================================================================================================================
-		void Entity::OnComponentDeleted(scene::Component * _component) {
-			if (_component->IsType<scene::Model>()) {
-				ComputeAABB();
-			}
+		void Entity::OnComponentDeleted(scene::Component * /*_component*/) {
+// 			if (_component->IsType<scene::Model>()) {
+// 				ComputeAABB(); 
+// 			}
 		}
 
 		//================================================================================================================================

@@ -21,10 +21,6 @@ namespace fan
 				NOT_SAVED = 0x02,
 			};
 
-			fan::Signal<Component*> onComponentCreated;
-			fan::Signal<Component*> onComponentDeleted;
-			fan::Signal<Component*> onComponentModified;
-
 			Entity(const std::string _name, Entity * _parent);
 			~Entity();
 
@@ -100,7 +96,7 @@ namespace fan
 
 			ComponentType* component = new ComponentType();
 			if (component->IsUnique() && GetComponent< ComponentType >() != nullptr) {
-				delete(component);
+				delete(  static_cast<Component*>( component ) );
 				return nullptr;
 			}
 

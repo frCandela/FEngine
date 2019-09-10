@@ -15,8 +15,10 @@ namespace fan
 		public:
 			friend class Entity;
 
-			virtual ~Component() {}
-			virtual bool			IsActor()								const { return false; }
+			static fan::Signal< Component * > onComponentCreated;
+			static fan::Signal< Component * > onComponentModified;
+			static fan::Signal< Component * > onComponentDeleted;
+			
 			virtual bool			IsUnique()								const = 0;		// Returns true if there is only one instance of this type of component per entity, false otherwise
 
 			// Returns a reference on the entity the component is bound to
@@ -26,7 +28,6 @@ namespace fan
 			void SetModified(const bool _isModified);
 			bool IsRemovable() const { return m_isRemovable; }
 			void SetRemovable(const bool _isRemovable) { m_isRemovable = _isRemovable; }
-
 
 			//TMP
 			static bool RegisterComponent(scene::Component * _component) {//TMP
@@ -39,18 +40,20 @@ namespace fan
 			}//TMP
 
 			DECLARE_ABSTRACT_TYPE_INFO(Component);
+		protected:
+			// Friend class entity is the factory of components
+			Component();
+			virtual ~Component() {}
+			virtual void OnAttach();
+			virtual void OnDetach();
+
 		private:
 			Entity*  m_entity;
 			bool m_isModified;
 			bool m_isBeingDeleted;
 			bool m_isRemovable;
 
-		protected:
-			// Friend class entity is the factory of components
-			Component();
 
-			virtual void Initialize() = 0;
-			virtual void Delete() = 0;
 		};
 	}
 }

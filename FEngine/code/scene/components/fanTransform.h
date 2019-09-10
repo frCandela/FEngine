@@ -35,10 +35,10 @@ namespace fan
 			bool Save(std::ostream& _out, const int _indentLevel) const override;
 
 			DECLARE_TYPE_INFO(Transform);
-		private:
-			void Initialize() override;
-			void Delete() override {};
+		protected:
+			void OnAttach() override;
 
+		private:
 			btQuaternion m_rotation;
 			btVector3 m_position;
 			btVector3 m_scale;

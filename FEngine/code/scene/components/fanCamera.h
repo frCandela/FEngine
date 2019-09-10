@@ -34,10 +34,10 @@ namespace fan
 			bool Save(std::ostream& _out, const int _indentLevel) const override;
 
 			DECLARE_TYPE_INFO(Camera);
-		private:
-			void Initialize() override;
-			void Delete() override {};
+		protected:
+			void OnAttach() override;
 
+		private:
 			float m_fov;
 			float m_aspectRatio;
 			float m_nearDistance;

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "scene/components/fanComponent.h"
+#include "core/fanSignal.h"
 
 namespace fan
 {
@@ -11,13 +12,18 @@ namespace fan
 		class Actor : public Component
 		{
 		public:
-			bool IsActor()	const final		{ return true; }
+			static fan::Signal< Actor * > onActorAttach;
+			static fan::Signal< Actor * > onActorDetach;
+
 			bool IsUnique() const override	{ return false; }
 
 			virtual void Start() = 0;
 			virtual void Update(const float _delta) = 0;
 
 		protected:
+			void OnAttach() override;
+			void OnDetach() override;
+
 		};
 	}
 }

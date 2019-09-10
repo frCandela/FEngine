@@ -20,6 +20,9 @@ namespace fan
 			m_name(_name)
 			, m_path("") 
 			, m_root(nullptr) {
+
+			Actor::onActorAttach.Connect(&Scene::OnActorAttach, this);
+			Actor::onActorDetach.Connect(&Scene::OnActorDetach, this);
 		}
 
 		//================================================================================================================================
@@ -36,9 +39,6 @@ namespace fan
 			}
 			Entity* entity = new Entity(_name, _parent);
 			entity->SetScene(this);
-			entity->onComponentCreated.Connect(&Scene::OnComponentCreated, this);
-			entity->onComponentDeleted.Connect(&Scene::OnComponentDeleted, this);
-
 			onEntityCreated.Emmit(entity);
 
 			return entity;
@@ -123,28 +123,19 @@ namespace fan
 
 		//================================================================================================================================
 		//================================================================================================================================
-		void Scene::OnComponentCreated(scene::Component * _component) {
+		void Scene::OnActorAttach(scene::Actor * _actor) {
+			assert(m_activeActors.find(_actor) == m_activeActors.end());
+			assert(m_startingActors.find(_actor) == m_startingActors.end());
 
-			if (_component->IsActor()) {
-				scene::Actor * actor = static_cast<scene::Actor*>(_component);
+			m_startingActors.insert(_actor);
 
-				assert(m_activeActors.find(actor) == m_activeActors.end());
-				assert(m_startingActors.find(actor) == m_startingActors.end());
-
-				m_startingActors.insert(actor);
-			}
 		}
 
 		//================================================================================================================================
 		//================================================================================================================================
-		void Scene::OnComponentDeleted(scene::Component * _component) {
-			if (_component->IsActor()) {
-				scene::Actor * actor = static_cast<scene::Actor*>(_component);
-				auto it = m_activeActors.find(actor);
-				assert(it != m_activeActors.end());
-
-				m_activeActors.erase(actor);
-			}
+		void Scene::OnActorDetach(scene::Actor * _actor) {
+			assert(m_activeActors.find(_actor) != m_activeActors.end());
+			m_activeActors.erase(_actor);
 		}
 
 		//================================================================================================================================
@@ -174,7 +165,7 @@ namespace fan
  			fan::Debug::Get() << fan::Debug::Severity::log << "saving scene: " << m_name << Debug::Endl();
 			std::ofstream outStream(m_path);
 			if (outStream.is_open()) {
-				outStream << "Entities: { \n";
+				outStream << "Entities: 1 { \n";
 				Save(outStream, 0);
 				outStream << '}';
 				outStream.close();

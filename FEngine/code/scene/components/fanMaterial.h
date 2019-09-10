@@ -29,11 +29,14 @@ namespace fan
 			const vk::Texture *	GetTexture() const { return m_texture; }
 
 			DECLARE_TYPE_INFO(Material);
-		private:
-			void Initialize() override;
-			void Delete() override;
+		protected:
+			void OnAttach() override;
+			void OnDetach() override;
 
+		private:
 			vk::Texture * m_texture = nullptr;
+
+
 		};
 	}
 }

@@ -16,10 +16,8 @@ namespace fan {
 
 			DECLARE_TYPE_INFO(Planet);
 		protected:
-			void Initialize() override;
-			void Delete() override {};
-
-			static bool m_registered;
+		private:
+			static bool ms_registered;
 
 			float m_dir = -1.f;
 		};

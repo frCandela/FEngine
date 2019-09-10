@@ -22,6 +22,7 @@ namespace fan
 
 			Model();
 
+
 			shape::AABB ComputeAABB() const;
 			bool		IsUnique()	const override { return true; }
 
@@ -36,12 +37,14 @@ namespace fan
 			void	SetRenderID(const int _renderID) { m_renderID = _renderID; }
 
 			DECLARE_TYPE_INFO(Model);
-		private:
-			void Initialize() override;
-			void Delete() override;
 
+		protected:
+			void OnDetach() override;
+
+		private:
 			fan::Mesh * m_mesh;
 			int m_renderID = -1;
+
 		};
 	}
 }

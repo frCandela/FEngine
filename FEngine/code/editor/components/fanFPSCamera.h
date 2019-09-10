@@ -34,9 +34,11 @@ namespace fan
 			bool Save(std::ostream& _out, const int _indentLevel) const override;
 
 			DECLARE_TYPE_INFO(FPSCamera);
+		protected:
+			void OnAttach() override;
+
 		private:
-			void Initialize() override;
-			void Delete() override {};
+
 
 			float m_speed;
 			float m_speedMultiplier;

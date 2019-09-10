@@ -51,8 +51,9 @@ namespace fan
 			std::set< scene::Actor * > m_startingActors;
 			std::set< scene::Actor * > m_activeActors;
 
-			void OnComponentCreated(scene::Component * _component);
-			void OnComponentDeleted(scene::Component * _component);
+			void OnActorAttach(scene::Actor * _actor);
+			void OnActorDetach(scene::Actor * _actor);
+
 			bool Load(std::istream& _in) override;
 			bool Save(std::ostream& _out, const int _indentLevel) const override;
 			void R_DeleteEntity		( Entity* _entity, std::set<Entity*>&	_deletedEntitiesSet);
