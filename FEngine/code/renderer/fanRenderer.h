@@ -96,6 +96,7 @@ namespace fan
 
 		std::vector < vk::DrawData > m_drawData;
 		vk::RessourceManager *  m_ressourceManager;
+		bool m_mustUpdateDynamicUniformsFrag = false;
 
 		// DEBUG DATA
 		std::vector<vk::DebugVertex>	m_debugLines;
@@ -137,7 +138,7 @@ namespace fan
 		glm::vec4 m_clearColor;
 
 		bool ResetCommandPool();
-		void UpdateUniformBuffer(bool _forceFullRebuild = false);
+		void UpdateUniformBuffer();
 		bool SubmitCommandBuffers();
 
 		void ClearDebug() {

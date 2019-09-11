@@ -297,11 +297,11 @@ namespace fan
 
 		//================================================================================================================================
 		//================================================================================================================================
-		void Renderer::UpdateUniformBuffer(bool _forceFullRebuild)
+		void Renderer::UpdateUniformBuffer()
 		{
 			// Main camera transform
 			assert(m_mainCamera != nullptr);
-			if ( m_mainCamera->IsModified() || m_mainCameraTransform->IsModified() || _forceFullRebuild == true ) {
+			if ( m_mainCamera->IsModified() || m_mainCameraTransform->IsModified()) {
 			
 				vk::ForwardPipeline::VertUniforms ubo = m_forwardPipeline->GetVertUniforms();
 				m_mainCamera->SetAspectRatio(static_cast<float>(m_swapchain->GetExtent().width) /m_swapchain->GetExtent().height);
@@ -329,14 +329,13 @@ namespace fan
 
 			// Dynamic uniforms 
 			bool mustUpdateDynamicUniformsVert = false;
-			bool mustUpdateDynamicUniformsFrag = false;
 			for (int drawDataIndex = 0; drawDataIndex < m_drawData.size() ; drawDataIndex++) {			
 				vk::DrawData & drawData = m_drawData[drawDataIndex];
 
 				if (drawData.model != nullptr) {
 
 					// Vert
-					if (drawData.transform->IsModified() == true || _forceFullRebuild == true) {
+					if (drawData.transform->IsModified() == true ) {
 						mustUpdateDynamicUniformsVert = true;
 						vk::ForwardPipeline::DynamicUniformsVert uniform;
 						uniform.modelMat = drawData.transform->GetModelMatrix();
@@ -347,10 +346,10 @@ namespace fan
 					}
 
 					// Frag
-					if (drawData.material != nullptr && (drawData.material->IsModified() || _forceFullRebuild == true)) {
+					if (drawData.material != nullptr && (drawData.material->IsModified())) {
 						vk::Texture * texture = drawData.material->GetTexture();
 						if (texture != nullptr) {
-							mustUpdateDynamicUniformsFrag = true;
+							m_mustUpdateDynamicUniformsFrag = true;
 							vk::ForwardPipeline::DynamicUniformsFrag uniform;
 							uniform.textureIndex = texture->GetRenderID();
 							assert(uniform.textureIndex >= 0);
@@ -363,9 +362,11 @@ namespace fan
 			if (mustUpdateDynamicUniformsVert == true ) {
 				m_forwardPipeline->UpdateDynamicUniformVert();
 			}
-			if (mustUpdateDynamicUniformsFrag == true) {
+			if (m_mustUpdateDynamicUniformsFrag == true) {
 				 m_forwardPipeline->UpdateDynamicUniformFrag();
 			}
+
+			m_mustUpdateDynamicUniformsFrag = false;
 		}
 	
 		//================================================================================================================================
@@ -848,7 +849,12 @@ namespace fan
 		void Renderer::UnRegisterMaterial(scene::Material * _material) {
 			scene::Model * model = _material->GetEntity()->GetComponent<scene::Model>();
 			if (model != nullptr && model->GetRenderID() >= 0) {
-				m_drawData[model->GetRenderID()].material = nullptr;
+				vk::DrawData & drawData = m_drawData[model->GetRenderID()];
+				drawData.material = nullptr;
+				vk::ForwardPipeline::DynamicUniformsFrag uniform;
+				uniform.textureIndex = 0;
+				m_forwardPipeline->SetDynamicUniformFrag(uniform, model->GetRenderID());
+				m_mustUpdateDynamicUniformsFrag = true;
 			}
 		}
 

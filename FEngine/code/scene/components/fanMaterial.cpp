@@ -12,21 +12,21 @@ namespace fan
 	namespace scene {
 		REGISTER_TYPE_INFO(Material)
 
-		fan::Signal< Material * > Material::onRegisterMaterial;
-		fan::Signal< Material * > Material::onUnregisterMaterial;
+		fan::Signal< Material * > Material::onMaterialAttach;
+		fan::Signal< Material * > Material::onMaterialDetach;
 
 		//================================================================================================================================
 		//================================================================================================================================
 		void Material::OnDetach() {
 			Component::OnDetach();
-			onUnregisterMaterial.Emmit(this);
+			onMaterialDetach.Emmit(this);
 		}
 
 		//================================================================================================================================
 		//================================================================================================================================
 		void Material::OnAttach() {
 			Component::OnAttach();
-			onRegisterMaterial.Emmit(this);
+			onMaterialAttach.Emmit(this);
 		}
 
 		//================================================================================================================================

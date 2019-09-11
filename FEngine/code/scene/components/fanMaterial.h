@@ -16,8 +16,8 @@ namespace fan
 		class Material : public Component
 		{
 		public:
-			static fan::Signal< Material * > onRegisterMaterial;
-			static fan::Signal< Material * > onUnregisterMaterial;
+			static fan::Signal< Material * > onMaterialAttach;
+			static fan::Signal< Material * > onMaterialDetach;
 
 			bool IsUnique()		const override { return true; }
 			bool Load(std::istream& _in)	override;

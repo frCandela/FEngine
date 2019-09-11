@@ -74,10 +74,10 @@ namespace fan {
 		m_scene->onSceneLoad.Connect(&Engine::OnSceneLoad, this);
 		m_scene->New();
 
-		scene::Material::onRegisterMaterial.Connect		( &Renderer::RegisterMaterial,		&Renderer::Get() );
-		scene::Material::onUnregisterMaterial.Connect	( &Renderer::UnRegisterMaterial,	&Renderer::Get());		
-		scene::Model::onRegisterModel.Connect			( &Renderer::RegisterModel,			&Renderer::Get());
-		scene::Model::onUnRegisterModel.Connect			( &Renderer::UnRegisterModel,		&Renderer::Get());
+		scene::Material::onMaterialAttach.Connect	( &Renderer::RegisterMaterial,		&Renderer::Get() );
+		scene::Material::onMaterialDetach.Connect	( &Renderer::UnRegisterMaterial,	&Renderer::Get());		
+		scene::Model::onRegisterModel.Connect		( &Renderer::RegisterModel,			&Renderer::Get());
+		scene::Model::onUnRegisterModel.Connect		( &Renderer::UnRegisterModel,		&Renderer::Get());
 
 		m_mainMenuBar->Initialize();
 
