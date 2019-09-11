@@ -80,7 +80,8 @@
       <OptimizeReferences>true</OptimizeReferences>
       <AdditionalDependencies>LinearMath.lib;Bullet3Common.lib;BulletCollision.lib;BulletDynamics.lib;BulletInverseDynamics.lib;BulletSoftBody.lib;libfbxsdk-mt.lib;glslang.lib;glslang-default-resource-limits.lib;HLSL.lib;OGLCompiler.lib;OSDependent.lib;SPIRV.lib;SPVRemapper.lib;glfw3.lib;vulkan-1.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>C:\VulkanSDK\1.1.106.0\Lib;lib/release</AdditionalLibraryDirectories>
-      <SubSystem>Console</SubSystem>
+      <SubSystem>Windows</SubSystem>
+      <AdditionalOptions>/ENTRY:"mainCRTStartup" %(AdditionalOptions)</AdditionalOptions>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
