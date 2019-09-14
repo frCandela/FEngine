@@ -134,6 +134,7 @@ namespace fan
 		void Renderer::SetMainCamera(scene::Camera * _camera) {
 			m_mainCamera = _camera;
 			m_mainCameraTransform = m_mainCamera->GetEntity()->GetComponent < scene::Transform>();
+			m_mainCamera->SetAspectRatio(static_cast<float>(m_swapchain->GetExtent().width) / m_swapchain->GetExtent().height);
 		}
 
 		//================================================================================================================================
@@ -165,7 +166,10 @@ namespace fan
 					CreateForwardFramebuffers();
 					RecordAllCommandBuffers();
 					vkResetFences(m_device->vkDevice, 1, m_swapchain->GetCurrentInFlightFence());
-					m_swapchain->AcquireNextImage();				
+					m_swapchain->AcquireNextImage();	
+					m_mainCamera->SetAspectRatio(static_cast<float>(m_swapchain->GetExtent().width) / m_swapchain->GetExtent().height);
+
+					UpdateSceneUniforms();
 				}
 				else if (result != VK_SUCCESS) {
 					fan::Debug::Error( "Could not acquire next image" );
@@ -297,14 +301,27 @@ namespace fan
 
 		//================================================================================================================================
 		//================================================================================================================================
+		void Renderer::UpdateSceneUniforms() {
+			// Force reload of transform uniforms
+			for (int drawDataIndex = 0; drawDataIndex < m_drawData.size(); drawDataIndex++) {
+				m_drawData[drawDataIndex].transform->SetModified();
+
+				scene::Material * material = m_drawData[drawDataIndex].material;
+				if (material != nullptr) {
+					material->SetModified();
+				}
+			}
+		}
+
+		//================================================================================================================================
+		//================================================================================================================================
 		void Renderer::UpdateUniformBuffer()
 		{
 			// Main camera transform
 			assert(m_mainCamera != nullptr);
 			if ( m_mainCamera->IsModified() || m_mainCameraTransform->IsModified()) {
 			
-				vk::ForwardPipeline::VertUniforms ubo = m_forwardPipeline->GetVertUniforms();
-				m_mainCamera->SetAspectRatio(static_cast<float>(m_swapchain->GetExtent().width) /m_swapchain->GetExtent().height);
+				vk::ForwardPipeline::VertUniforms ubo = m_forwardPipeline->GetVertUniforms();				
 				ubo.view = m_mainCamera->GetView();
 				ubo.proj = m_mainCamera->GetProjection();
 				ubo.proj[1][1] *= -1;
@@ -322,9 +339,6 @@ namespace fan
 				m_debugLinesPipeline->SetUniforms(debugUniforms);
 				m_debugLinesPipelineNoDepthTest->SetUniforms(debugUniforms);
 				m_debugTrianglesPipeline->SetUniforms(debugUniforms);
-
-				m_mainCamera->SetModified(false);
-				m_mainCameraTransform->SetModified(false);
 			}
 
 			// Dynamic uniforms 
@@ -341,8 +355,6 @@ namespace fan
 						uniform.modelMat = drawData.transform->GetModelMatrix();
 						uniform.rotationMat = drawData.transform->GetRotationMat();
 						m_forwardPipeline->SetDynamicUniformVert(uniform, drawDataIndex);
-
-						drawData.transform->SetModified(false);
 					}
 
 					// Frag
@@ -355,7 +367,6 @@ namespace fan
 							assert(uniform.textureIndex >= 0);
 							m_forwardPipeline->SetDynamicUniformFrag(uniform, drawDataIndex);
 						}
-						drawData.material->SetModified(false);
 					}
 				}
 			}
@@ -646,14 +657,7 @@ namespace fan
 			CreateForwardFramebuffers();
 			RecordAllCommandBuffers();	
 
-			// Force reload of transform uniforms
-			for (int drawDataIndex = 0; drawDataIndex < m_drawData.size() ; drawDataIndex++) {
-				scene::Transform * transform = m_drawData[drawDataIndex].transform;
-				if (transform != nullptr) {
-					transform->SetModified(true);
-				}			
-			}
-
+			UpdateSceneUniforms();
 		}	
 
 		//================================================================================================================================
@@ -898,9 +902,10 @@ namespace fan
 
 			drawData->model = _model;
 			drawData->transform = _model->GetEntity()->GetComponent<scene::Transform>();
-			drawData->material = _model->GetEntity()->GetComponent<scene::Material>();
-
+			drawData->material =  _model->GetEntity()->GetComponent<scene::Material>();
 			drawData->meshData = m_ressourceManager->FindMeshData(_model->GetMesh());	
+
+			drawData->transform->SetModified(); // Force tranform uniforms update
 
 			for (int boolIndex = 0; boolIndex < m_reloadGeometryCommandBuffers.size(); boolIndex++) {
 				m_reloadGeometryCommandBuffers[boolIndex] = true;

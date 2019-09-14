@@ -61,12 +61,12 @@ namespace fan
 		VkCommandBuffer BeginSingleTimeCommands();
 		void			EndSingleTimeCommands(VkCommandBuffer commandBuffer);
 
-		Window *				GetWindow() { return m_window; }
+		Window *					GetWindow() { return m_window; }
 		vk::ImguiPipeline *			GetImguiPipeline() { return m_imguiPipeline; }
 		vk::PostprocessPipeline *	GetPostprocessPipeline() { return m_postprocessPipeline; }
 		vk::ForwardPipeline *		GetForwardPipeline() { return m_forwardPipeline; }
-		glm::vec4				GetClearColor() const { return m_clearColor; }
-		vk::RessourceManager *	GetRessourceManager() const { return m_ressourceManager; }
+		glm::vec4					GetClearColor() const { return m_clearColor; }
+		vk::RessourceManager *		GetRessourceManager() const { return m_ressourceManager; }
 
 		void SetClearColor(glm::vec4 _color) { m_clearColor = _color; }
 		void SetMainCamera(scene::Camera * _camera);
@@ -75,10 +75,10 @@ namespace fan
 
 		const std::vector < vk::DrawData > & GetDrawData() const { return m_drawData; }
 
-		void RegisterMaterial(scene::Material * _model);
+		void RegisterMaterial(	scene::Material * _model);
 		void UnRegisterMaterial(scene::Material * _model);
-		void RegisterModel(scene::Model * _model);
-		void UnRegisterModel(scene::Model * _model);
+		void RegisterModel(		scene::Model * _model	);
+		void UnRegisterModel(	scene::Model * _model	);
 
 		void					DebugPoint(const btVector3 _pos, const Color _color);
 		void					DebugLine(const btVector3 _start, const btVector3 _end, const Color _color, const bool _depthTestEnable = true );
@@ -90,8 +90,8 @@ namespace fan
 
 	private:
 		//SCENE REFERENCES
-		scene::Camera * m_mainCamera;
-		scene::Transform * m_mainCameraTransform;
+		scene::Camera *		m_mainCamera;
+		scene::Transform *	m_mainCameraTransform;
 
 
 		std::vector < vk::DrawData > m_drawData;
@@ -108,7 +108,7 @@ namespace fan
 
 		// VULKAN OBJECTS
 		vk::Instance *		m_instance;
-		Window *		m_window;
+		Window *			m_window;
 		vk::Device *		m_device;
 		vk::SwapChain  *	m_swapchain;
 
@@ -138,6 +138,7 @@ namespace fan
 		glm::vec4 m_clearColor;
 
 		bool ResetCommandPool();
+		void UpdateSceneUniforms();
 		void UpdateUniformBuffer();
 		bool SubmitCommandBuffers();
 

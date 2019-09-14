@@ -15,19 +15,15 @@ namespace fan
 		public:
 			friend class Entity;
 
-			static fan::Signal< Component * > onComponentCreated;
-			static fan::Signal< Component * > onComponentModified;
-			static fan::Signal< Component * > onComponentDeleted;
-			
 			virtual bool			IsUnique()								const = 0;		// Returns true if there is only one instance of this type of component per entity, false otherwise
 
 			// Returns a reference on the entity the component is bound to
-			inline Entity* GetEntity() const { return m_entity; }
-			bool IsBeingDeleted() const { return m_isBeingDeleted; }
-			bool IsModified() const { return m_isModified; }
-			void SetModified(const bool _isModified);
-			bool IsRemovable() const { return m_isRemovable; }
-			void SetRemovable(const bool _isRemovable) { m_isRemovable = _isRemovable; }
+			inline Entity* GetEntity() const			{ return m_entity; }
+			bool IsBeingDeleted() const					{ return m_isBeingDeleted; }
+			bool IsModified() const;
+			void SetModified( const bool _updateAABB = false );
+			bool IsRemovable() const					{ return m_isRemovable; }
+			void SetRemovable(const bool _isRemovable)	{ m_isRemovable = _isRemovable; }
 
 			//TMP
 			static bool RegisterComponent(scene::Component * _component) {//TMP
@@ -49,9 +45,10 @@ namespace fan
 
 		private:
 			Entity*  m_entity;
-			bool m_isModified;
-			bool m_isBeingDeleted;
-			bool m_isRemovable;
+
+			uint64_t m_lastModified;	// Frame index at which it was modified
+			bool m_isBeingDeleted	: 1;
+			bool m_isRemovable		: 1;
 
 
 		};

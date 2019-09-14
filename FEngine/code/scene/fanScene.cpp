@@ -112,8 +112,13 @@ namespace fan
 		// Deletes every entity in the m_toDeleteLater vector
 		//================================================================================================================================
 		void Scene::EndFrame() {
-			std::set<Entity*> deletedEntitiesSet;
 
+			for ( Entity * entity : m_outdatedAABB ) {
+				entity->ComputeAABB();
+			} m_outdatedAABB.clear();
+
+			// Delete entities 
+			std::set<Entity*> deletedEntitiesSet;
 			for (int entityToDeleteIndex = 0; entityToDeleteIndex < m_entitiesToDelete.size(); entityToDeleteIndex++) {
 				Entity * entitytoDelete = m_entitiesToDelete[entityToDeleteIndex];
 				R_DeleteEntity(entitytoDelete, deletedEntitiesSet);

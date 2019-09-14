@@ -19,7 +19,7 @@ namespace fan {
 	private:
 		 GLFWwindow *	m_window;
 		 btVector2		m_windowSize;
-		 unsigned		m_count;
+		 uint64_t		m_count;
 
 		 static void		WindowSizeCallback(GLFWwindow* window, int width, int height);
 	};			

@@ -42,11 +42,11 @@ namespace fan
 			// Returns the component vector
 			const std::vector<Component*> & GetComponents() const { return m_components; }
 
-			//Getters
-			std::string GetName() const { return m_name; }
-			void SetName(const std::string _newName) { m_name = _newName; }
-			scene::Scene * GetScene() const { return m_scene; }
-			void SetScene(Scene * _scene) { m_scene = _scene;  }
+			// Getters
+			std::string		GetName() const { return m_name; }
+			void			SetName(const std::string _newName) { m_name = _newName; }
+			scene::Scene *	GetScene() const { return m_scene; }
+			void			SetScene(Scene * _scene) { m_scene = _scene;  }
 
 			const shape::AABB & GetAABB() const { return m_aabb; }
 			void ComputeAABB();
@@ -80,9 +80,6 @@ namespace fan
 
 			bool Load(std::istream& _in) override;
 			void AddComponent(scene::Component * _component);
-			void OnComponentModified(scene::Component * _component);
-			void OnComponentDeleted(scene::Component * _component);
-
 		};
 
 

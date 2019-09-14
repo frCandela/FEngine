@@ -123,24 +123,14 @@ namespace fan {
 			float updateDelta = time - lastUpdateTime;
 
 			if ( updateDelta > delta ) {
+				if (updateDelta > 2 * delta) {
+					Debug::Get() << Debug::Severity::warning << "Lag detected, delta = " << (int)(1000*updateDelta) << "ms." << Debug::Endl();
+				}
+				updateDelta -= delta;
 				lastUpdateTime = time;
 
-				if (updateDelta > 25* delta) {
-					Debug::Get() << Debug::Severity::warning << "Lag detected, delta = " << updateDelta << "seconds." << Debug::Endl();
-					updateDelta = 25*delta;
-				}
-
-				while ( updateDelta > delta ) {
-					m_scene->BeginFrame();
-					m_scene->Update( delta );
-					updateDelta -= delta;
-
-					if ( updateDelta > delta ) {
-						ImGui::EndFrame();
-						ImGui::Render();
-						ImGui::NewFrame();
-					}
-				}
+				m_scene->BeginFrame();
+				m_scene->Update( delta );
 
 				if (Keyboard::IsKeyPressed(GLFW_KEY_DELETE)) {
 					if (m_selectedentity != nullptr) {

@@ -23,9 +23,6 @@ namespace fan
 			if (_parent != nullptr) {
 				_parent->m_childs.push_back(this);
 			}
-
-			Component::onComponentModified.Connect(&Entity::OnComponentModified, this);
-			Component::onComponentDeleted.Connect(&Entity::OnComponentDeleted, this);
 		}
 
 		//================================================================================================================================
@@ -83,8 +80,7 @@ namespace fan
 			const scene::Model * model = GetComponent< scene::Model >();
 			if (model != nullptr && model->IsBeingDeleted() == false && model->GetMesh() != nullptr && model->GetMesh()->GetIndices().size() > 0) {
 				m_aabb = model->ComputeAABB();
-			}
-			else {
+			} else {
 				const scene::Transform * transform = GetComponent< scene::Transform >();
 				if (transform != nullptr) {
 					const btVector3 origin = transform->GetPosition();
@@ -198,22 +194,6 @@ namespace fan
 					m_parent = _brother->m_parent;
 				}
 			}
-		}
-
-		//================================================================================================================================
-		//================================================================================================================================
-		void Entity::OnComponentModified(scene::Component * /*_component*/) {
-// 			if (_component->IsType<scene::Transform>() || _component->IsType<scene::Model>()) {
-// 				ComputeAABB();
-// 			}
-		}
-
-		//================================================================================================================================
-		//================================================================================================================================
-		void Entity::OnComponentDeleted(scene::Component * /*_component*/) {
-// 			if (_component->IsType<scene::Model>()) {
-// 				ComputeAABB(); 
-// 			}
 		}
 
 		//================================================================================================================================

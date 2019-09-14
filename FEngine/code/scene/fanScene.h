@@ -35,21 +35,22 @@ namespace fan
 
 			bool LoadFrom(const std::string _path);
 
-			Entity *						GetRoot() { return m_root;  }
-			inline std::string				GetName() const { return m_name; }
-			bool							HasPath() const { return m_path.empty() == false; }
-			inline std::string				GetPath() const { return m_path; }
-			void							SetPath(const std::string _path) { m_path = _path; }
+			void				ComputeAABBEndFrame(Entity * _entity) {	m_outdatedAABB.insert(_entity);	}
+			Entity *			GetRoot() { return m_root;  }
+			inline std::string	GetName() const { return m_name; }
+			bool				HasPath() const { return m_path.empty() == false; }
+			inline std::string	GetPath() const { return m_path; }
+			void				SetPath(const std::string _path) { m_path = _path; }
 
 		private:
 			std::string m_name;
 			std::string m_path;
 			Entity * m_root;
 
-			std::vector < Entity * > m_entitiesToDelete;
-
-			std::set< scene::Actor * > m_startingActors;
-			std::set< scene::Actor * > m_activeActors;
+			std::vector < Entity * >	m_entitiesToDelete;
+			std::set< scene::Entity * >	m_outdatedAABB;
+			std::set< scene::Actor * >	m_startingActors;
+			std::set< scene::Actor * >	m_activeActors;
 
 			void OnActorAttach(scene::Actor * _actor);
 			void OnActorDetach(scene::Actor * _actor);

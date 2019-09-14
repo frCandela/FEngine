@@ -43,7 +43,7 @@ namespace fan
 		{
 			if (m_scale != _newScale) {
 				m_scale = _newScale;
-				SetModified(true);
+				SetModified( true ); 
 			}
 		}
 

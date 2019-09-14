@@ -2,21 +2,20 @@
 
 #include "scene/components/fanComponent.h"
 #include "scene/fanEntity.h"
+#include "scene/fanScene.h"
+#include "core/input/fanInput.h"
 
 namespace fan
 {
 	namespace scene
 	{
-		fan::Signal< Component * > Component::onComponentCreated;
-		fan::Signal< Component * > Component::onComponentModified;
-		fan::Signal< Component * > Component::onComponentDeleted;
 		REGISTER_ABSTRACT_TYPE_INFO(Component)
 
 		//================================================================================================================================
 		//================================================================================================================================
 		Component::Component() :
 			m_entity(nullptr)
-			, m_isModified(true)
+			, m_lastModified(0)
 			, m_isRemovable(true)
 			, m_isBeingDeleted(false) {
 
@@ -25,19 +24,26 @@ namespace fan
 		//================================================================================================================================
 		//================================================================================================================================
 		void Component::OnAttach() {
-			onComponentCreated.Emmit(this);
 		};
 
 		//================================================================================================================================
 		//================================================================================================================================
 		void Component::OnDetach() {
-			onComponentDeleted.Emmit(this);
 		}
 
 		//================================================================================================================================
 		//================================================================================================================================
-		void Component::SetModified(const bool _isModified) {
-			m_isModified = _isModified;
+		bool Component::IsModified() const {
+			return Input::GetFrameCount() == m_lastModified; 
+		}
+		
+		//================================================================================================================================
+		//================================================================================================================================
+		void Component::SetModified( const bool _updateAABB ) { 
+			m_lastModified = Input::GetFrameCount(); 
+			if (_updateAABB) {
+				m_entity->GetScene()->ComputeAABBEndFrame(m_entity);
+			}
 		}
 	}
 }
