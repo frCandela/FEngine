@@ -50,7 +50,6 @@ namespace fan
 			CreateRenderPassPostprocess();
 
 			m_ressourceManager =  new vk::RessourceManager( *m_device );
-			m_ressourceManager->onTextureLoaded.Connect( &Renderer::ReloadShaders, this); // TODO Cleanely reload descriptors when a new texture is loaded
 
 			m_forwardPipeline = new vk::ForwardPipeline(*m_device, m_renderPass);
 			m_forwardPipeline->Create( m_swapchain->GetExtent());
@@ -211,11 +210,14 @@ namespace fan
 								else {
 									ImGui::Text("Empty slot");
 								}
-
 							}
 						}
 
 					}
+				}
+				if (m_ressourceManager->IsModified()) {
+					ReloadShaders();
+					m_ressourceManager->SetUnmodified();
 				}
 				UpdateUniformBuffer();
 				ImGui::End();

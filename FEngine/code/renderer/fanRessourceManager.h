@@ -20,7 +20,6 @@ namespace fan
 		//================================================================================================================================
 		class RessourceManager {
 		public:
-			static fan::Signal<> onTextureLoaded;
 
 			RessourceManager(vk::Device& _device);
 			~RessourceManager();
@@ -35,16 +34,20 @@ namespace fan
 			// Texture management
 			vk::Texture *							LoadTexture(const std::string _path);
 			vk::Texture *							FindTexture(const std::string _path);
-			const std::vector< vk::Texture * > &	GetTextures() const { return m_textures; }
-			std::vector< vk::Texture * > &			GetTextures() { return m_textures; }
+			size_t 									GetNumTextures() const	{ return m_textures.size(); }
+			const std::vector< vk::Texture * > &	GetTextures() const		{ return m_textures;		}
+			std::vector< vk::Texture * > &			GetTextures()			{ return m_textures;		}
+
+			bool IsModified() const { return m_modified;	}
+			void SetUnmodified()	{ m_modified = false;	}
 
 		private:
 			vk::Device & m_device;
 
-			std::map< uint32_t, MeshData > m_meshList;
-			const fan::Mesh * m_defaultMesh = nullptr;
-
-			std::vector< vk::Texture * > m_textures;
+			std::map< uint32_t, MeshData >	m_meshList;
+			const fan::Mesh *				m_defaultMesh = nullptr;
+			std::vector< vk::Texture * >	m_textures;
+			bool							m_modified = false;
 
 			void AddMesh(fan::Mesh * _mesh);
 		};

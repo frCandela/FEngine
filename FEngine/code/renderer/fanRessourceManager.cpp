@@ -13,8 +13,6 @@
 namespace fan
 {
 	namespace vk {
-		fan::Signal<> RessourceManager::onTextureLoaded;
-
 		//================================================================================================================================
 		//================================================================================================================================
 		RessourceManager::RessourceManager(Device& _device) :
@@ -30,8 +28,6 @@ namespace fan
 			for (int textureIndex = 0; textureIndex < m_textures.size(); textureIndex++) {
 				delete(m_textures[textureIndex]);
 			}
-
-
 			for (auto meshData : m_meshList) {
 				delete meshData.second.indexBuffer;
 				delete meshData.second.vertexBuffer;
@@ -52,7 +48,7 @@ namespace fan
 			if (texture->LoadTexture(_path) == true) {
 				texture->SetRenderID(static_cast<int>(m_textures.size()));
 				m_textures.push_back(texture);
-				onTextureLoaded.Emmit();
+				m_modified = true;
 			}
 
 			return texture;
