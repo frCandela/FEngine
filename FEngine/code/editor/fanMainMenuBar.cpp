@@ -106,7 +106,7 @@ namespace fan
 
 					ImGui::Separator();
 
-					if (ImGui::MenuItem("Reload shaders")) {
+					if (ImGui::MenuItem("Reload shaders", "F5")) {
 						renderer.ReloadShaders();
 					}
 
@@ -194,6 +194,17 @@ namespace fan
 
 			if (Keyboard::IsKeyDown(GLFW_KEY_LEFT_CONTROL) && Keyboard::IsKeyPressed(GLFW_KEY_S)) {
 				Save();
+			}
+
+			if (Keyboard::IsKeyPressed(GLFW_KEY_DELETE)) {
+				scene::Entity * entity = Engine::GetEngine().GetSelectedentity();
+				if ( entity != nullptr ) {
+					Engine::GetEngine().GetScene().DeleteEntity(entity);
+				}
+			} 
+			
+			if (Keyboard::IsKeyPressed(GLFW_KEY_F5)) {
+				Renderer::Get().ReloadShaders();
 			}
 		}
 

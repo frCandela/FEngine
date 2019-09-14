@@ -3,11 +3,11 @@
 #include "fanEngine.h"
 #include "fanGlobalValues.h"
 #include "renderer/fanRenderer.h"
+#include "renderer/fanRessourceManager.h"
 #include "renderer/pipelines/fanForwardPipeline.h"
 #include "renderer/pipelines/fanDebugPipeline.h"
-#include "core/math/fanBasicModels.h"
+#include "renderer/fanMesh.h"
 #include "renderer/util/fanWindow.h"
-#include "renderer/fanRessourceManager.h"
 #include "core/fanTime.h"
 #include "core/input/fanInput.h"
 #include "core/input/fanKeyboard.h"
@@ -15,8 +15,8 @@
 #include "core/math/shapes/fanTriangle.h"
 #include "core/math/shapes/fanPlane.h"
 #include "core/math/shapes/fanAABB.h"
+#include "core/math/fanBasicModels.h"
 #include "core/files/fanFbxImporter.h"
-#include "renderer/fanMesh.h"
 #include "editor/fanModals.h"
 #include "editor/fanMainMenuBar.h"
 #include "editor/windows/fanRenderWindow.h"	
@@ -24,18 +24,15 @@
 #include "editor/windows/fanInspectorWindow.h"	
 #include "editor/windows/fanPreferencesWindow.h"	
 #include "editor/windows/fanConsoleWindow.h"	
+#include "editor/components/fanFPSCamera.h"		
 #include "scene/fanScene.h"
 #include "scene/fanEntity.h"
 #include "scene/components/fanComponent.h"
-#include "editor/components/fanFPSCamera.h"		
 #include "scene/components/fanCamera.h"
 #include "scene/components/fanTransform.h"
 #include "scene/components/fanModel.h"
 #include "scene/components/fanActor.h"
 #include "scene/components/fanMaterial.h"
-
-
-#include "bullet/BulletCollision/CollisionShapes/btCapsuleShape.h"
 
 namespace fan {
 	Engine * Engine::ms_engine = nullptr;
@@ -131,12 +128,6 @@ namespace fan {
 
 				m_scene->BeginFrame();
 				m_scene->Update( delta );
-
-				if (Keyboard::IsKeyPressed(GLFW_KEY_DELETE)) {
-					if (m_selectedentity != nullptr) {
-						m_scene->DeleteEntity(m_selectedentity);
-					}
-				}
 
 				ManageSelection();
 				DrawUI();

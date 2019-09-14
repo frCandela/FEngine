@@ -639,6 +639,8 @@ namespace fan
 		//================================================================================================================================
 		//================================================================================================================================
 		void Renderer::ReloadShaders() {
+			Debug::Highlight("Reloading shaders");
+
 			vkDeviceWaitIdle(m_device->vkDevice);
 
 			m_postprocessPipeline->ReloadShaders();
