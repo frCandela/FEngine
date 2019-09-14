@@ -16,8 +16,6 @@ namespace fan
 		public:
 			virtual ~FPSCamera();
 
-			bool			IsUnique() const	override { return true; }
-
 			void Start() override;
 			void Update(const float _delta) override;
 
@@ -33,13 +31,15 @@ namespace fan
 			bool Load(std::istream& _in) override;
 			bool Save(std::ostream& _out, const int _indentLevel) const override;
 
+			void OnGui() override;
+			bool IsUnique() const	override { return true; }
+
+			DECLARE_EDITOR_COMPONENT(FPSCamera);
 			DECLARE_TYPE_INFO(FPSCamera);
 		protected:
 			void OnAttach() override;
 
 		private:
-
-
 			float m_speed;
 			float m_speedMultiplier;
 			btVector2 m_xySensitivity;

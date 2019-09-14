@@ -32,6 +32,7 @@
 #include <filesystem>
 
 #include "fanGlobalUsing.h"
+#include "fanGlobalValues.h"
 
 #include "core/fanDebug.h"
 #include "core/math/fanMathUtils.h"

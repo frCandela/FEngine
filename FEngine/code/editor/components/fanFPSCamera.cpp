@@ -15,6 +15,7 @@ namespace fan
 {
 	namespace scene
 	{
+		REGISTER_EDITOR_COMPONENT(FPSCamera);
 		REGISTER_TYPE_INFO(FPSCamera)
 
 		//================================================================================================================================
@@ -114,6 +115,39 @@ namespace fan
 			Renderer::Get().DebugLine(offset, offset + btVector3(size, 0, 0), Color(1, 0, 0, 1));
 			Renderer::Get().DebugLine(offset, offset + btVector3(0, size, 0), Color(0, 1, 0, 1));
 			Renderer::Get().DebugLine(offset, offset + btVector3(0, 0, size), Color(0, 0, 1, 1));
+		}
+
+		//================================================================================================================================
+		//================================================================================================================================
+		void FPSCamera::OnGui() {
+			Actor::OnGui();
+
+			// SetSensitivity
+			if (ImGui::Button("##SetSensitivity")) {
+				SetXYSensitivity(btVector2(0.005f, 0.005f));
+			} ImGui::SameLine();
+			btVector2 xySensitivity = GetXYSensitivity();
+			if (ImGui::DragFloat2("XY sensitivity", &xySensitivity[0], 1.f)) {
+				SetXYSensitivity(xySensitivity);
+			}
+
+			// SetSpeed
+			if (ImGui::Button("##SetSpeed")) {
+				SetSpeed(10.f);
+			} ImGui::SameLine();
+			float speed = GetSpeed();
+			if (ImGui::DragFloat("speed", &speed, 1.f)) {
+				SetSpeed(speed);
+			}
+
+			// SetSpeedMultiplier
+			if (ImGui::Button("##SetSpeedMultiplier")) {
+				SetSpeedMultiplier(3.f);
+			} ImGui::SameLine();
+			float speedMultiplier = GetSpeedMultiplier();
+			if (ImGui::DragFloat("speed multiplier", &speedMultiplier, 1.f)) {
+				SetSpeedMultiplier(speedMultiplier);
+			}
 		}
 
 		//================================================================================================================================

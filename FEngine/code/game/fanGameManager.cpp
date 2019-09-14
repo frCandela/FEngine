@@ -14,8 +14,7 @@
 namespace fan {
 	namespace game {
 
-		bool GameManager::ms_registered = Component::RegisterComponent(new GameManager());
-
+		REGISTER_EDITOR_COMPONENT(GameManager);
 		REGISTER_TYPE_INFO(GameManager)
 		
 		//================================================================================================================================
@@ -39,12 +38,17 @@ namespace fan {
 
 					if (currentCamera == editorCamera) {
 						Renderer::Get().SetMainCamera(m_camera);
-					}
-					else {
+					} else {
 						Renderer::Get().SetMainCamera(editorCamera);
 					}
 				}
 			} ImGui::End();
+		}
+
+		//================================================================================================================================
+		//================================================================================================================================
+		void GameManager::OnGui() {
+			Actor::OnGui();
 		}
 
 		//================================================================================================================================

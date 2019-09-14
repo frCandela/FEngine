@@ -105,6 +105,7 @@
     <ClCompile Include="code\core\math\shapes\fanTriangle.cpp" />
     <ClCompile Include="code\core\ressources\fanRessource.cpp" />
     <ClCompile Include="code\core\ressources\fanRessourcePtr.cpp" />
+    <ClCompile Include="code\editor\components\ComponentsRegister.cpp" />
     <ClCompile Include="code\editor\components\fanFPSCamera.cpp" />
     <ClCompile Include="code\editor\fanMainMenuBar.cpp" />
     <ClCompile Include="code\editor\fanModals.cpp" />
@@ -179,6 +180,7 @@
     <ClInclude Include="code\core\memory\fanAlignedMemory.h" />
     <ClInclude Include="code\core\ressources\fanRessource.h" />
     <ClInclude Include="code\core\ressources\fanRessourcePtr.h" />
+    <ClInclude Include="code\editor\components\ComponentsRegister.h" />
     <ClInclude Include="code\editor\components\fanFPSCamera.h" />
     <ClInclude Include="code\editor\fanMainMenuBar.h" />
     <ClInclude Include="code\editor\fanModals.h" />

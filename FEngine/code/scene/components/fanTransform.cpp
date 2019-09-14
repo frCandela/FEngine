@@ -114,6 +114,40 @@ namespace fan
 
 		//================================================================================================================================
 		//================================================================================================================================
+		void Transform::OnGui() {
+			Component::OnGui(); 
+
+			// Position
+			if (ImGui::Button("##TransPos")) {
+				SetPosition(btVector3(0, 0, 0));
+			} ImGui::SameLine();
+			float posBuffer[3] = { GetPosition().x(), GetPosition().y(), GetPosition().z() };
+			if (ImGui::DragFloat3("position", posBuffer, 0.1f)) {
+				SetPosition(btVector3(posBuffer[0], posBuffer[1], posBuffer[2]));
+			}
+
+			// rotation
+			if (ImGui::Button("##TransRot")) {
+				SetRotationEuler(btVector3(0, 0, 0));
+			} ImGui::SameLine();
+			const btVector3 rot = GetRotationEuler();
+			float bufferAngles[3] = { rot.x(),rot.y(),rot.z() };
+			if (ImGui::DragFloat3("rotation", bufferAngles, 0.1f)) {
+				SetRotationEuler(btVector3(bufferAngles[0], bufferAngles[1], bufferAngles[2]));
+			}
+
+			// Scale
+			if (ImGui::Button("##TransScale")) {
+				SetScale(btVector3(1, 1, 1));
+			} ImGui::SameLine();
+			btVector3 scale = GetScale();
+			if (ImGui::DragFloat3("scale", &scale[0], 0.1f)) {
+				SetScale(scale);
+			}
+		}
+
+		//================================================================================================================================
+		//================================================================================================================================
 		bool Transform::Load(std::istream& _in) {
 			if (!ReadSegmentHeader(_in, "position:")) { return false; }
 			if (!ReadFloat(_in, m_position[0])) { return false; }

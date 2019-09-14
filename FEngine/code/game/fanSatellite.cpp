@@ -9,8 +9,7 @@
 namespace fan {
 	namespace game {
 
-		bool Satellite::ms_registered = Component::RegisterComponent(new Satellite());
-
+		REGISTER_EDITOR_COMPONENT(Satellite)
 		REGISTER_TYPE_INFO(Satellite)
 		
 		//================================================================================================================================
@@ -22,6 +21,7 @@ namespace fan {
 		//================================================================================================================================
 		//================================================================================================================================
 		void Satellite::Update(const float /*_delta*/) {
+			Actor::OnGui();
 
 			scene::Transform * parentTransform = GetEntity()->GetParent()->GetComponent<scene::Transform>();
 
@@ -31,14 +31,13 @@ namespace fan {
 
 			scene::Transform * transform = GetEntity()->GetComponent<scene::Transform>();
 			transform->SetPosition( parentPosition + m_radius * position );
+		}
 
-			ImGui::Begin("satellite window !"); {
-				ImGui::SliderFloat("radius", &m_radius, 0.f, 100.f );
-				ImGui::SliderFloat("speed", &m_speed, 0.f, 10.f);
-				if ( ImGui::Button("Button2") ) {
-
-				}
-			} ImGui::End();
+		//================================================================================================================================
+		//================================================================================================================================
+		void Satellite::OnGui() {
+			ImGui::SliderFloat("radius", &m_radius, 0.f, 100.f);
+			ImGui::SliderFloat("speed", &m_speed, 0.f, 10.f);
 		}
 
 		//================================================================================================================================

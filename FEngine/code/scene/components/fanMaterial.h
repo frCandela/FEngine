@@ -19,15 +19,18 @@ namespace fan
 			static fan::Signal< Material * > onMaterialAttach;
 			static fan::Signal< Material * > onMaterialDetach;
 
-			bool IsUnique()		const override { return true; }
+
 			bool Load(std::istream& _in)	override;
 			bool Save(std::ostream& _out, const int _indentLevel) const override;
 
-
-			void SetTexture(vk::Texture * _texture);
-			vk::Texture *	GetTexture() { return m_texture; }
+			void				SetTexture(vk::Texture * _texture);
+			vk::Texture *		GetTexture() { return m_texture; }
 			const vk::Texture *	GetTexture() const { return m_texture; }
 
+			void OnGui() override;
+			bool IsUnique()	const override { return true; }
+
+			DECLARE_EDITOR_COMPONENT(Material)
 			DECLARE_TYPE_INFO(Material);
 		protected:
 			void OnAttach() override;
@@ -36,7 +39,8 @@ namespace fan
 		private:
 			vk::Texture * m_texture = nullptr;
 
-
+			// Editor
+			std::experimental::filesystem::path m_pathBuffer;
 		};
 	}
 }

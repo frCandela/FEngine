@@ -5,19 +5,22 @@
 
 namespace fan {
 	namespace game {
+		//================================================================================================================================
+		//================================================================================================================================
 		class Satellite : public scene::Actor {
 		public:
-			bool IsUnique() const override { return true; }
-
 			void Start() override;
 			void Update(const float _delta) override;
 			bool Load(std::istream& _in) override;
 			bool Save(std::ostream& _out, const int _indentLevel) const override;
 
+			void OnGui() override;
+			bool IsUnique() const override { return true; }
+
+			DECLARE_EDITOR_COMPONENT(Satellite)
 			DECLARE_TYPE_INFO(Satellite);
 		protected:
 		private:
-			static bool ms_registered;
 
 			float m_speed  = 1.f;
 			float m_radius = 1.f;

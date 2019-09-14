@@ -10,12 +10,16 @@
 #include "renderer/fanMesh.h"
 #include "core/files/fanFbxImporter.h"
 
+// Editor
+#include "editor/fanModals.h"
 
 namespace fan
 {
 	namespace scene
 	{
+		REGISTER_EDITOR_COMPONENT(Model);
 		REGISTER_TYPE_INFO(Model)
+
 		fan::Signal< Model * > Model::onRegisterModel;
 		fan::Signal< Model * > Model::onUnRegisterModel;
 
@@ -68,6 +72,42 @@ namespace fan
 			m_mesh = _mesh;
 			onRegisterModel.Emmit(this);
 			SetModified(true);
+		}
+
+		//================================================================================================================================
+		//================================================================================================================================
+		void Model::OnGui() {
+			Component::OnGui();
+			// Set path popup
+			bool openSetPathPopup = false;
+			if (ImGui::Button("##setPath")) {
+				openSetPathPopup = true;
+			}
+			ImGui::SameLine();
+			const std::string meshPath = GetMesh() != nullptr ? GetMesh()->GetPath() : "not set";
+			ImGui::Text("path: %s", meshPath.c_str());
+			// Set path  popup on double click
+			if (openSetPathPopup || ImGui::IsItemHovered() && ImGui::IsMouseClicked(0)) {
+				if (GetMesh() != nullptr && GetMesh()->GetPath().empty() == false) {
+					m_pathBuffer = std::fs::path(GetMesh()->GetPath()).parent_path();
+				}
+				else {
+					m_pathBuffer = "./";
+				}
+				ImGui::OpenPopup("set_path");
+				m_pathBuffer = "content/models";
+			}
+
+			if (gui::LoadFileModal("set_path", GlobalValues::s_meshExtensions, m_pathBuffer)) {
+
+				vk::RessourceManager * ressourceManager = Renderer::Get().GetRessourceManager();
+				fan::Mesh * mesh = ressourceManager->FindMesh(m_pathBuffer.string().c_str());
+				if (mesh == nullptr) {
+					mesh = ressourceManager->LoadMesh(m_pathBuffer.string());
+
+				}
+				SetMesh(mesh);
+			}
 		}
 
 		//================================================================================================================================

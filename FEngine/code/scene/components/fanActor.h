@@ -15,10 +15,11 @@ namespace fan
 			static fan::Signal< Actor * > onActorAttach;
 			static fan::Signal< Actor * > onActorDetach;
 
-			bool IsUnique() const override	{ return false; }
-
 			virtual void Start() = 0;
 			virtual void Update(const float _delta) = 0;
+
+			bool IsUnique() const override { return false; }
+			void OnGui() override;
 
 		protected:
 			void OnAttach() override;

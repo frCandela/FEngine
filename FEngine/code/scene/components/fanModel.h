@@ -22,20 +22,22 @@ namespace fan
 
 			Model();
 
-
 			shape::AABB ComputeAABB() const;
-			bool		IsUnique()	const override { return true; }
 
 			// ISerializable
-			bool					Load(std::istream& _in) override;
-			bool					Save(std::ostream& _out, const int _indentLevel) const override;
-			void					SetMesh(fan::Mesh * _mesh);
+			bool				Load(std::istream& _in) override;
+			bool				Save(std::ostream& _out, const int _indentLevel) const override;
+			void				SetMesh(fan::Mesh * _mesh);
 			fan::Mesh *			GetMesh() { return m_mesh; }
 			const fan::Mesh *	GetMesh() const { return m_mesh; }
 
 			int		GetRenderID() const { return m_renderID; }
 			void	SetRenderID(const int _renderID) { m_renderID = _renderID; }
 
+			void OnGui() override;
+			bool IsUnique()	const override { return true; }
+
+			DECLARE_EDITOR_COMPONENT(Model)
 			DECLARE_TYPE_INFO(Model);
 
 		protected:
@@ -44,6 +46,9 @@ namespace fan
 		private:
 			fan::Mesh * m_mesh;
 			int m_renderID = -1;
+
+			// Editor
+			std::experimental::filesystem::path m_pathBuffer;
 
 		};
 	}

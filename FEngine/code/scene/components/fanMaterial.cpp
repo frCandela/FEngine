@@ -7,9 +7,13 @@
 #include "renderer/fanRessourceManager.h"
 #include "renderer/fanRenderer.h"
 
+// Editor
+#include "editor/fanModals.h"
+
 namespace fan
 {
 	namespace scene {
+		REGISTER_EDITOR_COMPONENT(Material);
 		REGISTER_TYPE_INFO(Material)
 
 		fan::Signal< Material * > Material::onMaterialAttach;
@@ -46,6 +50,40 @@ namespace fan
 				SetTexture(texture);
 			}
 			return true;
+		}
+
+		//================================================================================================================================
+		//================================================================================================================================
+		void Material::OnGui() {
+			Component::OnGui();
+
+			bool openSetPathPopup = false;
+			if (ImGui::Button("##setPathTex")) {
+				openSetPathPopup = true;
+			}
+			ImGui::SameLine();
+			const std::string texturePath = GetTexture() != nullptr ? GetTexture()->GetPath() : "not set";
+			ImGui::Text("texture : %s", texturePath.c_str());
+			// Set path  popup on double click
+			if (openSetPathPopup || ImGui::IsItemHovered() && ImGui::IsMouseClicked(0)) {
+				if (GetTexture() != nullptr && GetTexture()->GetPath().empty() == false) {
+					m_pathBuffer = std::fs::path(GetTexture()->GetPath()).parent_path();
+				}
+				else {
+					m_pathBuffer = "./";
+				}
+				ImGui::OpenPopup("set_path_texture");
+				m_pathBuffer = "content/models";
+			}
+
+			if (gui::LoadFileModal("set_path_texture", GlobalValues::s_imagesExtensions, m_pathBuffer)) {
+				vk::RessourceManager * texturesManager = Renderer::Get().GetRessourceManager();
+				vk::Texture * texture = texturesManager->FindTexture(m_pathBuffer.string());
+				if (texture == nullptr) {
+					texture = texturesManager->LoadTexture(m_pathBuffer.string());
+				}
+				SetTexture(texture);
+			}
 		}
 
 		//================================================================================================================================

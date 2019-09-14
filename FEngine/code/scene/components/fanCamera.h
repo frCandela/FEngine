@@ -28,11 +28,13 @@ namespace fan
 			void SetAspectRatio(float _aspectRatio);
 
 			bool IsUnique()		const override { return true; }
+			void OnGui() override;
 
 			// ISerializable
 			bool Load(std::istream& _in) override;
 			bool Save(std::ostream& _out, const int _indentLevel) const override;
 
+			DECLARE_EDITOR_COMPONENT(Camera)
 			DECLARE_TYPE_INFO(Camera);
 		protected:
 			void OnAttach() override;

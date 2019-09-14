@@ -8,6 +8,7 @@ namespace fan
 {
 	namespace scene
 	{
+		REGISTER_EDITOR_COMPONENT(Camera);
 		REGISTER_TYPE_INFO(Camera)
 
 		//================================================================================================================================
@@ -93,6 +94,42 @@ namespace fan
 			m_aspectRatio = _aspectRatio;
 			SetModified();
 		};
+
+		//================================================================================================================================
+		//================================================================================================================================
+		void Camera::OnGui() {
+			Component::OnGui();
+
+			// fov
+			if (ImGui::Button("##fov")) {
+				SetFov(110.f);
+			}
+			ImGui::SameLine();
+			float fov = GetFov();
+			if (ImGui::DragFloat("fov", &fov, 1.f, 1.f, 179.f)) {
+				SetFov(fov);
+			}
+
+			// nearDistance
+			if (ImGui::Button("##nearDistance")) {
+				SetNearDistance(0.01f);
+			}
+			ImGui::SameLine();
+			float near = GetNearDistance();
+			if (ImGui::DragFloat("near distance", &near, 0.001f, 0.01f, 10.f)) {
+				SetNearDistance(near);
+			}
+
+			// far distance
+			if (ImGui::Button("##fardistance")) {
+				SetFarDistance(1000.f);
+			}
+			ImGui::SameLine();
+			float far = GetFarDistance();
+			if (ImGui::DragFloat("far distance", &far, 10.f, 0.05f, 10000.f)) {
+				SetFarDistance(far);
+			}
+		}
 
 		//================================================================================================================================
 		//================================================================================================================================

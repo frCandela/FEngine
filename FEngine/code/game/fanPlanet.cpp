@@ -9,8 +9,7 @@
 namespace fan {
 	namespace game {
 
-		bool Planet::ms_registered = Component::RegisterComponent(new Planet());
-
+		REGISTER_EDITOR_COMPONENT(Planet);
 		REGISTER_TYPE_INFO(Planet)
 		
 		//================================================================================================================================
@@ -28,14 +27,15 @@ namespace fan {
 			btVector3 position( std::cosf(time), 0, std::sinf(time));
 
 			transform->SetPosition( m_radius * position );
-					   
-			ImGui::Begin("planet window !"); {
-				ImGui::Text(GetEntity()->GetName().c_str());
-				ImGui::PushID(static_cast<int>(reinterpret_cast<intptr_t>(this)));
-				ImGui::SliderFloat("radius", &m_radius, 0.f, 100.f );
-				ImGui::PopID();
-				ImGui::SliderFloat("speed", &m_speed, 0.f, 10.f);
-			} ImGui::End();
+		}
+
+		//================================================================================================================================
+		//================================================================================================================================
+		void Planet::OnGui() {
+			Component::OnGui();
+			ImGui::Text(GetEntity()->GetName().c_str());
+			ImGui::SliderFloat("radius", &m_radius, 0.f, 100.f);
+			ImGui::SliderFloat("speed", &m_speed, 0.f, 10.f);
 		}
 
 		//================================================================================================================================
