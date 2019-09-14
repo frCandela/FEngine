@@ -1,5 +1,5 @@
 #include "fanGlobalIncludes.h"
-#include "game/fanPlanet.h"
+#include "game/fanSatellite.h"
 
 #include "core/fanTime.h"
 #include "editor/windows/fanInspectorWindow.h"
@@ -9,38 +9,41 @@
 namespace fan {
 	namespace game {
 
-		bool Planet::ms_registered = Component::RegisterComponent(new Planet());
+		bool Satellite::ms_registered = Component::RegisterComponent(new Satellite());
 
-		REGISTER_TYPE_INFO(Planet)
+		REGISTER_TYPE_INFO(Satellite)
 		
 		//================================================================================================================================
 		//================================================================================================================================
-		void Planet::Start() {
-			Debug::Log("Start planet");
+		void Satellite::Start() {
+			Debug::Log("Start satellite");
 		}
 
 		//================================================================================================================================
 		//================================================================================================================================
-		void Planet::Update(const float /*_delta*/) {
-			scene::Transform * transform = GetEntity()->GetComponent<scene::Transform>();
+		void Satellite::Update(const float /*_delta*/) {
 
-			float time = m_speed * Time::ElapsedSinceStartup();
+			scene::Transform * parentTransform = GetEntity()->GetParent()->GetComponent<scene::Transform>();
+
+			float time = - m_speed * Time::ElapsedSinceStartup();
 			btVector3 position( std::cosf(time), 0, std::sinf(time));
+			btVector3 parentPosition = parentTransform->GetPosition();			
 
-			transform->SetPosition( m_radius * position );
-					   
-			ImGui::Begin("planet window !"); {
-				ImGui::Text(GetEntity()->GetName().c_str());
-				ImGui::PushID(static_cast<int>(reinterpret_cast<intptr_t>(this)));
+			scene::Transform * transform = GetEntity()->GetComponent<scene::Transform>();
+			transform->SetPosition( parentPosition + m_radius * position );
+
+			ImGui::Begin("satellite window !"); {
 				ImGui::SliderFloat("radius", &m_radius, 0.f, 100.f );
-				ImGui::PopID();
 				ImGui::SliderFloat("speed", &m_speed, 0.f, 10.f);
+				if ( ImGui::Button("Button2") ) {
+
+				}
 			} ImGui::End();
 		}
 
 		//================================================================================================================================
 		//================================================================================================================================
-		bool Planet::Load(std::istream& _in) { 
+		bool Satellite::Load(std::istream& _in) {
 			if (!ReadSegmentHeader(_in, "radius:")) { return false; }
 			if (!ReadFloat(_in, m_radius)) { return false; }
 
@@ -51,7 +54,7 @@ namespace fan {
 
 		//================================================================================================================================
 		//================================================================================================================================
-		bool Planet::Save(std::ostream& _out, const int _indentLevel) const { 
+		bool Satellite::Save(std::ostream& _out, const int _indentLevel) const {
 			const std::string indentation = GetIndentation(_indentLevel);
 			_out << indentation << "radius: " << m_radius << std::endl;
 			_out << indentation << "speed:  " << m_speed  << std::endl;

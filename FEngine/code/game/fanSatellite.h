@@ -5,7 +5,7 @@
 
 namespace fan {
 	namespace game {
-		class Planet : public scene::Actor {
+		class Satellite : public scene::Actor {
 		public:
 			bool IsUnique() const override { return true; }
 
@@ -14,7 +14,7 @@ namespace fan {
 			bool Load(std::istream& _in) override;
 			bool Save(std::ostream& _out, const int _indentLevel) const override;
 
-			DECLARE_TYPE_INFO(Planet);
+			DECLARE_TYPE_INFO(Satellite);
 		protected:
 		private:
 			static bool ms_registered;

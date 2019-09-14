@@ -43,7 +43,8 @@ namespace fan {
 		void SetSelectedEntity( scene::Entity * _selectedentity) { m_selectedentity = _selectedentity;	}
 		void Deselect() { m_selectedentity = nullptr; }
 
-		scene::Entity *	const			GetSelectedentity() const	{ return m_selectedentity;  }
+		scene::Entity *	const			GetSelectedentity() const		{ return m_selectedentity;  }
+		scene::Camera *					GetEditorCamera() const			{ return m_editorCamera; }
 		editor::MainMenuBar  &			GetMainMenuBar() const			{ return * m_mainMenuBar; }
 		editor::RenderWindow &			GetRenderWindow() const			{ return * m_renderWindow; }
 		editor::SceneWindow  &			GetSceneWindow() const			{ return * m_sceneWindow; }

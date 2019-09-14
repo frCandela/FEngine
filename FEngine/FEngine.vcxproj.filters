@@ -59,11 +59,11 @@
     <Filter Include="code\shaders">
       <UniqueIdentifier>{422395bb-fb27-4fb8-82d2-d4c0e4a81912}</UniqueIdentifier>
     </Filter>
-    <Filter Include="code\core\game">
-      <UniqueIdentifier>{601b9331-5ac9-4f78-93fc-097663f76e54}</UniqueIdentifier>
-    </Filter>
     <Filter Include="code\core\input">
       <UniqueIdentifier>{9fd08379-d3ce-49e5-a262-db532aba4045}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="code\game">
+      <UniqueIdentifier>{601b9331-5ac9-4f78-93fc-097663f76e54}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -251,7 +251,7 @@
       <Filter>code\scene</Filter>
     </ClCompile>
     <ClCompile Include="code\game\fanPlanet.cpp">
-      <Filter>code\core\game</Filter>
+      <Filter>code\game</Filter>
     </ClCompile>
     <ClCompile Include="code\core\input\fanMouse.cpp">
       <Filter>code\core\input</Filter>
@@ -261,6 +261,12 @@
     </ClCompile>
     <ClCompile Include="code\core\input\fanInput.cpp">
       <Filter>code\core\input</Filter>
+    </ClCompile>
+    <ClCompile Include="code\game\fanSatellite.cpp">
+      <Filter>code\game</Filter>
+    </ClCompile>
+    <ClCompile Include="code\game\fanGameManager.cpp">
+      <Filter>code\game</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -895,7 +901,7 @@
       <Filter>code\scene</Filter>
     </ClInclude>
     <ClInclude Include="code\game\fanPlanet.h">
-      <Filter>code\core\game</Filter>
+      <Filter>code\game</Filter>
     </ClInclude>
     <ClInclude Include="code\core\input\fanKeyboard.h">
       <Filter>code\core\input</Filter>
@@ -905,6 +911,12 @@
     </ClInclude>
     <ClInclude Include="code\core\input\fanInput.h">
       <Filter>code\core\input</Filter>
+    </ClInclude>
+    <ClInclude Include="code\game\fanSatellite.h">
+      <Filter>code\game</Filter>
+    </ClInclude>
+    <ClInclude Include="code\game\fanGameManager.h">
+      <Filter>code\game</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

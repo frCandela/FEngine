@@ -70,6 +70,7 @@ namespace fan
 
 		void SetClearColor(glm::vec4 _color) { m_clearColor = _color; }
 		void SetMainCamera(scene::Camera * _camera);
+		scene::Camera * GetMainCamera() const {	return m_mainCamera; }
 
 		bool HasNoDebugToDraw() const { return m_debugLinesNoDepthTest.empty() && m_debugLines.empty() && m_debugTriangles.empty(); }
 
