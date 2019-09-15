@@ -76,4 +76,16 @@ namespace fan {
 		_in >> _outStr;
 		return true;
 	}
+
+	//================================================================================================================================
+	//================================================================================================================================
+	bool ISerializable::ReadBool(std::istream& _in, bool & _outBool) {
+		if (_in.eof()) { return false; }
+		std::string str;
+		_in >> str;
+		if (str == "true") {_outBool = true;}
+		else if (str == "false") { _outBool = false; }
+		else { return false; }
+		return true;
+	}
 }

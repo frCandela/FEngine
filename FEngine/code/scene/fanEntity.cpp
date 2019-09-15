@@ -39,6 +39,13 @@ namespace fan
 
 		//================================================================================================================================
 		//================================================================================================================================
+		void Entity::OnGui() {
+			ImGui::Text("entity : %s", GetName().c_str());
+			ImGui::Checkbox("ComputeAABB", &m_computeAABB);
+		}
+
+		//================================================================================================================================
+		//================================================================================================================================
 		bool Entity::DeleteComponent(const Component * component)
 		{
 			// Find the component
@@ -76,16 +83,18 @@ namespace fan
 		//================================================================================================================================
 		//================================================================================================================================
 		void Entity::ComputeAABB() {
-
-			const scene::Model * model = GetComponent< scene::Model >();
-			if (model != nullptr && model->IsBeingDeleted() == false && model->GetMesh() != nullptr && model->GetMesh()->GetIndices().size() > 0) {
-				m_aabb = model->ComputeAABB();
-			} else {
-				const scene::Transform * transform = GetComponent< scene::Transform >();
-				if (transform != nullptr) {
-					const btVector3 origin = transform->GetPosition();
-					const float size = 0.05f;
-					m_aabb = shape::AABB(origin - size * btVector3::One(), origin + size * btVector3::One());
+			if (m_computeAABB) {
+				const scene::Model * model = GetComponent< scene::Model >();
+				if (model != nullptr && model->IsBeingDeleted() == false && model->GetMesh() != nullptr && model->GetMesh()->GetIndices().size() > 0) {
+					m_aabb = model->ComputeAABB();
+				}
+				else {
+					const scene::Transform * transform = GetComponent< scene::Transform >();
+					if (transform != nullptr) {
+						const btVector3 origin = transform->GetPosition();
+						const float size = 0.05f;
+						m_aabb = shape::AABB(origin - size * btVector3::One(), origin + size * btVector3::One());
+					}
 				}
 			}
 		}		
@@ -202,11 +211,13 @@ namespace fan
 			if (!ReadSegmentHeader(_in, "Entity:")) { return false; }
 
 			std::string buffer;
-			if (!ReadString(_in, buffer) || buffer.empty()) { return false; } // name
+			if (!ReadString(_in, buffer) || buffer.empty()) { return false; } // Entity name
 			SetName(buffer);
-
 			if (!ReadStartToken(_in)) { return false; }
 			{
+				if (!ReadSegmentHeader(_in, "computeAABB:")) { return false; } // ComputeAABB
+				if (!ReadBool(_in, m_computeAABB)) { return false; }
+
 				if (!ReadSegmentHeader(_in, "Components:")) { return false; }
 				int nbComponents = -1;
 				if (!ReadInteger(_in, nbComponents) || nbComponents < 0) { return false; }
@@ -253,7 +264,10 @@ namespace fan
 			const std::string indentation1 = GetIndentation(_indentLevel + 1);
 			const std::string indentation2 = GetIndentation(_indentLevel + 2);
 
-			_out << indentation << "Entity: " << m_name << " {" << std::endl;; { // entity		
+			_out << indentation << "Entity: " << m_name << " {" << std::endl; { // entity	
+
+				_out << indentation1 << "computeAABB: " << BoolToSting(m_computeAABB) << std::endl; // m_computeAABB	
+
 				_out << indentation1 << "Components: " << m_components.size() << " {" << std::endl; { // components
 					for (int componentIndex = 0; componentIndex < m_components.size(); componentIndex++) {
 						scene::Component * component = m_components[componentIndex];

@@ -24,23 +24,17 @@ namespace fan
 			Entity(const std::string _name, Entity * _parent);
 			~Entity();
 
-			// Creates an instance of ComponentType, adds it to the entity and returns a pointer
+			void OnGui();
+			
 			template<typename ComponentType>
-			ComponentType* AddComponent();
-			Component* AddComponent(const uint32_t _componentID);
-
-			// Returns a pointer on the first instance of ComponentType in the entity, nullptr if none exists
+			ComponentType* AddComponent();// Creates an instance of ComponentType, adds it to the entity and returns a pointer
+			Component* AddComponent(const uint32_t _componentID);			
 			template<typename ComponentType>
-			ComponentType* GetComponent();
-
+			ComponentType* GetComponent();// Returns a pointer on the first instance of ComponentType in the entity, nullptr if none exists
 			template<typename ComponentType>
-			std::vector<ComponentType*> GetComponents();
-
-			// Remove the component from the entity and deletes it
-			bool DeleteComponent(const Component * _component);
-
-			// Returns the component vector
-			const std::vector<Component*> & GetComponents() const { return m_components; }
+			std::vector<ComponentType*> GetComponents();			
+			bool DeleteComponent(const Component * _component);// Remove the component from the entity and deletes it			
+			const std::vector<Component*> & GetComponents() const { return m_components; }// Returns the component vector
 
 			// Getters
 			std::string		GetName() const { return m_name; }
@@ -77,6 +71,8 @@ namespace fan
 			shape::AABB				m_aabb;
 			std::vector<Component*> m_components;
 			scene::Scene *			m_scene;
+
+			bool m_computeAABB = true;
 
 			bool Load(std::istream& _in) override;
 			void AddComponent(scene::Component * _component);

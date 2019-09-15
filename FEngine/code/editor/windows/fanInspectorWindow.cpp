@@ -37,7 +37,7 @@ namespace fan
 				if (selection != nullptr)
 				{
 					// entity gui
-					ImGui::Text("entity : %s", selection->GetName().c_str());
+					selection->OnGui();
 					int componentCount = 0;
 
 					const std::vector<scene::Component*> & components = selection->GetComponents();
