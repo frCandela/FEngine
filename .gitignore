@@ -10,3 +10,5 @@ FEngine/lib/release/libfbxsdk-mt\.lib
 *.temp.obj
 *.lib
 FEngine/editorValues.json
+
+FEngine/build/
