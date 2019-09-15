@@ -18,7 +18,7 @@ namespace fan
 		//================================================================================================================================
 		Scene::Scene(const std::string _name) :
 			m_name(_name)
-			, m_path("") 
+			, m_path("")
 			, m_root(nullptr) {
 
 			Actor::onActorAttach.Connect(&Scene::OnActorAttach, this);
@@ -58,6 +58,30 @@ namespace fan
 			for (int childIndex = 0; childIndex < childs.size(); childIndex++) {
 				R_BuildEntitiesList(childs[childIndex], _entitiesList);
 			}
+		}
+
+		//================================================================================================================================
+		//================================================================================================================================
+		scene::Component *	Scene::R_FindComponentOfType(Entity * _entity, const uint32_t _typeID) const {
+
+			// Search in components
+			const std::vector<Component*> & components = _entity->GetComponents();
+			for (int componentIndex = 0; componentIndex < components.size(); componentIndex++) {
+				Component* component = components[componentIndex];
+				if (component->GetType() == _typeID) {
+					return component;
+				}
+			}
+
+			// Recursive call to child entities
+			const std::vector<Entity*> & childEntities = _entity->GetChilds();
+			for (int childIndex = 0; childIndex < childEntities.size(); childIndex++) {
+				Component* component = R_FindComponentOfType(childEntities[childIndex], _typeID);
+				if (component != nullptr) {
+					return component;
+				}
+			}
+			return nullptr;
 		}
 
 		//================================================================================================================================
