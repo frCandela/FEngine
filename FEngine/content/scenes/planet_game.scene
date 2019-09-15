@@ -26,7 +26,7 @@ Entities: 1 {
                     Entity: planet {
                         Components: 4 {
                             Transform: 1269105190 {
-                                position: 9.96386 0 -7.47486
+                                position: -8.87296 0 -8.742
                                 rotation: 0 0 0 1
                                 scale:    1 1 1
                             }
@@ -45,7 +45,7 @@ Entities: 1 {
                             Entity: satellite {
                                 Components: 4 {
                                     Transform: 1269105190 {
-                                        position: 12.7759 0 -7.09922
+                                        position: -7.51073 0 -6.25344
                                         rotation: 0 0 0 1
                                         scale:    0.5 0.5 0.5
                                     }
@@ -68,7 +68,7 @@ Entities: 1 {
                     Entity: mercury {
                         Components: 4 {
                             Transform: 1269105190 {
-                                position: 3.70059 0 -2.77588
+                                position: -3.2953 0 -3.24667
                                 rotation: 0 0 0 1
                                 scale:    0.5 0.5 0.5
                             }
@@ -92,7 +92,7 @@ Entities: 1 {
                 Components: 3 {
                     Transform: 1269105190 {
                         position: 0 13.423 0
-                        rotation: 0 0 -0.707107 0.707107
+                        rotation: 0.707107 0 0 0.707107
                         scale:    1 1 1
                     }
                     Camera: 1148216499 {

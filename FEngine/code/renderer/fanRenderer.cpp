@@ -745,7 +745,7 @@ namespace fan
 		void Renderer::DebugPoint(const btVector3 _pos, const Color _color) {
 			const float size = 0.2f;
 			DebugLine(_pos - size * btVector3::Up(), _pos + size * btVector3::Up(), _color);
-			DebugLine(_pos - size * btVector3::Right(), _pos + size * btVector3::Right(), _color);
+			DebugLine(_pos - size * btVector3::Left(), _pos + size * btVector3::Left(), _color);
 			DebugLine(_pos - size * btVector3::Forward(), _pos + size * btVector3::Forward(), _color);
 		}
 

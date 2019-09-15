@@ -24,7 +24,7 @@ namespace fan
 			glm::mat4		GetModelMatrix() const;
 			glm::mat4		GetRotationMat() const;
 
-			btVector3 Right() const;
+			btVector3 Left() const;
 			btVector3 Forward() const;
 			btVector3 Up() const;
 

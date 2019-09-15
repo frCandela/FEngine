@@ -60,29 +60,35 @@ namespace fan
 				realSpeed *= m_speedMultiplier;
 			}
 
-			// Camera goes right
+			// Camera goes left
 			float rightAxis = 0.f;
-			if (Keyboard::IsKeyDown(GLFW_KEY_D))
-				rightAxis += 1.f;
-			else if (Keyboard::IsKeyDown(GLFW_KEY_A))
+			if (Keyboard::IsKeyDown(GLFW_KEY_D)) {
 				rightAxis -= 1.f;
-			position += _delta * realSpeed * rightAxis * m_transform->Right();
+			}
+			else if (Keyboard::IsKeyDown(GLFW_KEY_A)) {
+				rightAxis += 1.f;
+			}
+			position += _delta * realSpeed * rightAxis * m_transform->Left();
 
 
 			// Camera goes up
 			float upAxis = 0.f;
-			if (Keyboard::IsKeyDown(GLFW_KEY_E))
+			if (Keyboard::IsKeyDown(GLFW_KEY_E)){
 				upAxis += 1.f;
-			else if (Keyboard::IsKeyDown(GLFW_KEY_Q))
+			}
+			else if (Keyboard::IsKeyDown(GLFW_KEY_Q)) {
 				upAxis -= 1.f;
+			}
 			position += _delta * realSpeed * upAxis * m_transform->Up();
 
 			// Camera goes forward
 			float forwardAxis = 0.f;
-			if (Keyboard::IsKeyDown(GLFW_KEY_W))
+			if (Keyboard::IsKeyDown(GLFW_KEY_W)) {
 				forwardAxis += 1.f;
-			else if (Keyboard::IsKeyDown(GLFW_KEY_S))
+			}
+			else if (Keyboard::IsKeyDown(GLFW_KEY_S)) {
 				forwardAxis -= 1.f;
+			}
 			position += _delta * realSpeed * forwardAxis * m_transform->Forward();
 
 			// Camera rotation
@@ -90,15 +96,16 @@ namespace fan
 			const btVector2 mousePos = Mouse::GetPosition();
 			if (Mouse::GetButtonDown(Mouse::button1)) {
 				// Rotation depending on mouse movement
+				const float invertAxis = -1;
 				const btQuaternion rotationY(btVector3::Up(), -m_xySensitivity.x() * mouseDelta.x());
-				const btQuaternion rotationX(m_transform->Right(), -m_xySensitivity.y() *mouseDelta.y());
-				m_transform->SetRotationQuat(rotationX*rotationY* m_transform->GetRotationQuat());
+				const btQuaternion rotationX( invertAxis *m_transform->Left(), -m_xySensitivity.y() *mouseDelta.y());
+				m_transform->SetRotationQuat( rotationX* rotationY* m_transform->GetRotationQuat());
 
 				// Remove roll
-				const btVector3 relativeRight = m_transform->Right();
-				const btVector3 rightNoRoll(relativeRight.x(), 0, relativeRight.z());
-				const btVector3 axis = relativeRight.cross(rightNoRoll);
-				const float angle = rightNoRoll.angle(relativeRight);
+				const btVector3 relativeLeft = m_transform->Left();
+				const btVector3 leftNoRoll(relativeLeft.x(), 0, relativeLeft.z());
+				const btVector3 axis = relativeLeft.cross(leftNoRoll);
+				const float angle = leftNoRoll.angle(relativeLeft);
 				if (angle != 0) {
 
 					const btQuaternion rot(axis, angle);

@@ -50,9 +50,9 @@ namespace fan
 
 			Transform* transform = GetEntity()->GetComponent<Transform>();
 
-			const btVector3	 pos = transform->GetPosition();
+			const btVector3	pos = transform->GetPosition();
 			const btVector3 upVec = transform->Up();
-			const btVector3 right = transform->Right();
+			const btVector3 left = transform->Left();
 			const btVector3 forward = transform->Forward();
 
 			btVector3 nearMiddle = pos + m_nearDistance * forward;
@@ -61,7 +61,7 @@ namespace fan
 			float nearWidth = m_aspectRatio * nearHeight;
 
 			shape::Ray ray;
-			ray.origin = nearMiddle + _position.x() * nearWidth * right - _position.y() * nearHeight * upVec;
+			ray.origin = nearMiddle - _position.x() * nearWidth * left - _position.y() * nearHeight * upVec;
 			ray.direction = (100.f * (ray.origin - pos)).normalized();
 
 			return ray;
