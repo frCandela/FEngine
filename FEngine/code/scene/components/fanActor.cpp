@@ -30,5 +30,23 @@ namespace fan
 		void Actor::OnGui() {
 			Component::OnGui();
 		}
+
+		//================================================================================================================================
+		//================================================================================================================================
+		bool Actor::Load(std::istream& _in) {
+ 			if (!ReadSegmentHeader(_in, "isEnabled:")) { return false; }
+			if (!ReadBool(_in, m_isEnabled)) { return false; }
+			return true;
+		}
+
+
+		//================================================================================================================================
+		//================================================================================================================================
+		bool Actor::Save(std::ostream& _out, const int _indentLevel) const {
+			const std::string indentation = GetIndentation(_indentLevel);
+			_out << indentation << "isEnabled: " << BoolToSting(m_isEnabled) << std::endl;
+			return true;
+		}
+
 	}
 }

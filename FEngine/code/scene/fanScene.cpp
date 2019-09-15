@@ -108,7 +108,9 @@ namespace fan
 		//================================================================================================================================
 		void Scene::Update(const float _delta) {
 			for (scene::Actor * actor : m_activeActors) {
-				actor->Update(_delta);
+				if (actor->IsEnabled()) {
+					actor->Update(_delta);
+				}
 			}
 		}
 

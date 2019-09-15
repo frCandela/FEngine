@@ -166,6 +166,8 @@ namespace fan
 		//================================================================================================================================
 		//================================================================================================================================
 		bool FPSCamera::Load(std::istream& _in) {
+			Actor::Load(_in);
+
 			if (!ReadSegmentHeader(_in, "xySensitivity:")) { return false; }
 			if (!ReadFloat(_in, m_xySensitivity[0])) { return false; }
 			if (!ReadFloat(_in, m_xySensitivity[1])) { return false; }
@@ -181,6 +183,7 @@ namespace fan
 		//================================================================================================================================
 		//================================================================================================================================
 		bool FPSCamera::Save(std::ostream& _out, const int _indentLevel) const {
+			Actor::Save(_out, _indentLevel);
 			const std::string indentation = GetIndentation(_indentLevel);
 			_out << indentation << "xySensitivity:   " << m_xySensitivity[0] << " " << m_xySensitivity[1] << std::endl;
 			_out << indentation << "speed:           " << m_speed << std::endl;

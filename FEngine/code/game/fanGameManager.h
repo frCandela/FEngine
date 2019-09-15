@@ -4,9 +4,14 @@
 #include "editor/windows/fanInspectorWindow.h"
 
 namespace fan {
-	namespace scene { class Camera; }
+	namespace scene { 
+		class Camera; 
+		class FPSCamera;
+	}
 
 	namespace game {
+		class SpaceShip;
+
 		//================================================================================================================================
 		//================================================================================================================================	
 		class GameManager : public scene::Actor {
@@ -24,6 +29,8 @@ namespace fan {
 		protected:
 		private:
 			scene::Camera * m_camera;
+			SpaceShip * m_spaceShip;
+			scene::FPSCamera * m_editorCameraController;
 
 			void SwitchCameras();
 		};

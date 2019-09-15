@@ -58,6 +58,8 @@ namespace fan {
 		//================================================================================================================================
 		//================================================================================================================================
 		void SpaceShip::OnGui() {
+			Actor::OnGui();
+
 			ImGui::DragFloat("speed", &m_speed, 0.01f, 0.f, 10.f );
 			ImGui::DragFloat("rotation_speed", &m_rotationSpeed, 0.01f, 0.f, 10.f);
 		}
@@ -65,6 +67,8 @@ namespace fan {
 		//================================================================================================================================
 		//================================================================================================================================
 		bool SpaceShip::Load(std::istream& _in) {
+			Actor::Load(_in);
+
  			if (!ReadSegmentHeader(_in, "speed:")) { return false; }
  			if (!ReadFloat(_in, m_speed)) { return false; }
 
@@ -77,6 +81,7 @@ namespace fan {
 		//================================================================================================================================
 		//================================================================================================================================
 		bool SpaceShip::Save(std::ostream& _out, const int _indentLevel) const {
+			Actor::Save(_out, _indentLevel);
 			const std::string indentation = GetIndentation(_indentLevel);
 			_out << indentation << "speed:          " << m_speed		 << std::endl;
 			_out << indentation << "rotation_speed: " << m_rotationSpeed << std::endl;

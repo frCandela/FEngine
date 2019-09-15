@@ -5,9 +5,12 @@
 #include "core/fanTime.h"
 #include "core/input/fanKeyboard.h"
 #include "editor/windows/fanInspectorWindow.h"
+#include "scene/fanScene.h"
 #include "scene/components/fanTransform.h"
 #include "scene/fanEntity.h"
 #include "scene/components/fanCamera.h"
+#include "editor/components/fanFPSCamera.h"
+#include "game/fanSpaceShip.h"	
 #include "renderer/fanRenderer.h"
 
 
@@ -24,6 +27,21 @@ namespace fan {
 			m_camera = GetEntity()->GetComponent<scene::Camera>();
 			if (m_camera == nullptr) {
 				Debug::Warning("Game manager has no camera attached");
+				SetEnabled(false);
+			}
+
+			m_spaceShip = GetEntity()->GetScene()->FindComponentOfType<SpaceShip>();
+			if (m_spaceShip == nullptr) {
+				Debug::Warning("GameManager::Start : No spaceShip found");
+				SetEnabled(false);
+			} else {
+				m_spaceShip->SetEnabled(false);
+			}
+
+			m_editorCameraController = GetEntity()->GetScene()->FindComponentOfType<scene::FPSCamera>();
+			if (m_editorCameraController == nullptr) {
+				Debug::Warning("GameManager::Start : No editor CameraController found");
+				SetEnabled(false);
 			}
 		}
 
@@ -36,9 +54,13 @@ namespace fan {
 
 			if (currentCamera == editorCamera) {
 				Renderer::Get().SetMainCamera(m_camera);
+				m_spaceShip->SetEnabled(true);
+				m_editorCameraController->SetEnabled(false);
 			}
 			else {
 				Renderer::Get().SetMainCamera(editorCamera);
+				m_spaceShip->SetEnabled(false);
+				m_editorCameraController->SetEnabled(true);
 			}
 		}
 
@@ -54,14 +76,14 @@ namespace fan {
 		//================================================================================================================================
 		void GameManager::OnGui() {
 			Actor::OnGui();
-			if (ImGui::Button("Switch cameras (tab)")) {
-				SwitchCameras();
-			}
+			ImGui::Text("Press tab to switch cameras");
 		}
 
 		//================================================================================================================================
 		//================================================================================================================================
-		bool GameManager::Load(std::istream& /*_in*/) {
+		bool GameManager::Load(std::istream& _in) {
+			Actor::Load(_in);
+
 // 			if (!ReadSegmentHeader(_in, "radius:")) { return false; }
 // 			if (!ReadFloat(_in, m_radius)) { return false; }
 			return true; 
@@ -69,7 +91,8 @@ namespace fan {
 
 		//================================================================================================================================
 		//================================================================================================================================
-		bool GameManager::Save(std::ostream& /*_out*/, const int /*_indentLevel*/) const {
+		bool GameManager::Save(std::ostream& _out, const int _indentLevel) const {
+			Actor::Save(_out, _indentLevel);
 // 			const std::string indentation = GetIndentation(_indentLevel);
 // 			_out << indentation << "radius: " << m_radius << std::endl;
 			return true; 

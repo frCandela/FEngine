@@ -58,6 +58,8 @@ namespace fan {
 		//================================================================================================================================
 		//================================================================================================================================
 		bool CameraController::Load(std::istream& _in) {
+			Actor::Load(_in);
+
  			if (!ReadSegmentHeader(_in, "heightFromTarget:")) { return false; }
  			if (!ReadFloat(_in, m_heightFromTarget)) { return false; }
 			return true; 
@@ -66,6 +68,7 @@ namespace fan {
 		//================================================================================================================================
 		//================================================================================================================================
 		bool CameraController::Save(std::ostream& _out, const int _indentLevel) const {
+			Actor::Save(_out, _indentLevel);
  			const std::string indentation = GetIndentation(_indentLevel);
  			_out << indentation << "heightFromTarget: " << m_heightFromTarget << std::endl;
 			return true; 

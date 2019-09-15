@@ -46,18 +46,29 @@ namespace fan
 
 						ImGui::Separator();
 
-						// Delete button
+						if (component->IsActor()) {	// TODO : use type info when type info deals with inheritance
+							ImGui::PushID((int*)component);
+							scene::Actor * actor = static_cast<scene::Actor*>(component);
+							bool enabled = actor->IsEnabled();
+							if (ImGui::Checkbox("", &enabled)) {
+								actor->SetEnabled(enabled);
+							}
+							ImGui::SameLine();
+							ImGui::PopID();
+						}
 
+						// Delete button
+						ImGui::Text(component->GetName());
 						if (component->IsRemovable()) {
 							std::stringstream ss;
 							ss << "X" << "##" << component->GetName() << componentCount++;	// make unique id
+							ImGui::SameLine(ImGui::GetWindowWidth() - 40);
 							if (ImGui::Button(ss.str().c_str())) {
 								selection->DeleteComponent(component);
 								component = nullptr;
-							} ImGui::SameLine();
+							}
 						}
 						if (component != nullptr) {
-							ImGui::Text(component->GetName());
 							component->OnGui();
 						}
 					}

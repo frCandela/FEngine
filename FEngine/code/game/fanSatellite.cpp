@@ -43,6 +43,8 @@ namespace fan {
 		//================================================================================================================================
 		//================================================================================================================================
 		bool Satellite::Load(std::istream& _in) {
+			Actor::Load(_in);
+
 			if (!ReadSegmentHeader(_in, "radius:")) { return false; }
 			if (!ReadFloat(_in, m_radius)) { return false; }
 
@@ -54,6 +56,7 @@ namespace fan {
 		//================================================================================================================================
 		//================================================================================================================================
 		bool Satellite::Save(std::ostream& _out, const int _indentLevel) const {
+			Actor::Save(_out, _indentLevel);
 			const std::string indentation = GetIndentation(_indentLevel);
 			_out << indentation << "radius: " << m_radius << std::endl;
 			_out << indentation << "speed:  " << m_speed  << std::endl;

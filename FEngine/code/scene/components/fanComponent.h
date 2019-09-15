@@ -26,6 +26,7 @@ namespace fan
 			bool IsRemovable() const					{ return m_isRemovable; }
 			void SetRemovable(const bool _isRemovable)	{ m_isRemovable = _isRemovable; }
 
+			virtual bool IsActor() const { return false; }
 			virtual bool IsUnique()	const = 0;		// Returns true if there is only one instance of this type of component per entity, false otherwise
 			virtual void OnGui();
 
