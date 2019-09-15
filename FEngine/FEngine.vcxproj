@@ -118,9 +118,11 @@
     <ClCompile Include="code\fanEngine.cpp" />
     <ClCompile Include="code\fanGlobalValues.cpp" />
     <ClCompile Include="code\fanMain.cpp" />
+    <ClCompile Include="code\game\fanCameraController.cpp" />
     <ClCompile Include="code\game\fanGameManager.cpp" />
     <ClCompile Include="code\game\fanPlanet.cpp" />
     <ClCompile Include="code\game\fanSatellite.cpp" />
+    <ClCompile Include="code\game\fanSpaceShip.cpp" />
     <ClCompile Include="code\renderer\core\fanBuffer.cpp" />
     <ClCompile Include="code\renderer\core\fanDevice.cpp" />
     <ClCompile Include="code\renderer\core\fanFramebuffer.cpp" />
@@ -194,9 +196,11 @@
     <ClInclude Include="code\fanEngine.h" />
     <ClInclude Include="code\fanGlobalUsing.h" />
     <ClInclude Include="code\fanGlobalIncludes.h" />
+    <ClInclude Include="code\game\fanCameraController.h" />
     <ClInclude Include="code\game\fanGameManager.h" />
     <ClInclude Include="code\game\fanPlanet.h" />
     <ClInclude Include="code\game\fanSatellite.h" />
+    <ClInclude Include="code\game\fanSpaceShip.h" />
     <ClInclude Include="code\renderer\core\fanBuffer.h" />
     <ClInclude Include="code\renderer\core\fanDevice.h" />
     <ClInclude Include="code\renderer\core\fanFrameBuffer.h" />

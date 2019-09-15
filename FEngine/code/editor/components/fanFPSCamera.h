@@ -38,6 +38,7 @@ namespace fan
 			DECLARE_TYPE_INFO(FPSCamera);
 		protected:
 			void OnAttach() override;
+			void OnDetach() override;
 
 		private:
 			float m_speed;

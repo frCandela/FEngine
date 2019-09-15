@@ -1,31 +1,27 @@
 #pragma once
 
 #include "scene/components/fanActor.h"
-#include "editor/windows/fanInspectorWindow.h"
 
 namespace fan {
-	namespace scene { class Camera; }
-
 	namespace game {
 		//================================================================================================================================
-		//================================================================================================================================	
-		class GameManager : public scene::Actor {
+		//================================================================================================================================
+		class SpaceShip : public scene::Actor {
 		public:
 			void Start() override;
 			void Update(const float _delta) override;
 			bool Load(std::istream& _in) override;
 			bool Save(std::ostream& _out, const int _indentLevel) const override;
 
-			bool IsUnique() const override { return true; }
 			void OnGui() override;
+			bool IsUnique() const override { return true; }
 
-			DECLARE_EDITOR_COMPONENT(GameManager)
-			DECLARE_TYPE_INFO(GameManager);
+			DECLARE_EDITOR_COMPONENT(SpaceShip)
+			DECLARE_TYPE_INFO(SpaceShip);
 		protected:
 		private:
-			scene::Camera * m_camera;
-
-			void SwitchCameras();
+			float m_speed = 1.f;
+			float m_rotationSpeed = 1.f;
 		};
 	}
 }

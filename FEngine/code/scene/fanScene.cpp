@@ -14,6 +14,8 @@ namespace fan
 {
 	namespace scene {
 
+		fan::Signal<> Scene::onSceneClear;
+
 		//================================================================================================================================
 		//================================================================================================================================
 		Scene::Scene(const std::string _name) :
@@ -136,7 +138,6 @@ namespace fan
 		// Deletes every entity in the m_toDeleteLater vector
 		//================================================================================================================================
 		void Scene::EndFrame() {
-
 			for ( Entity * entity : m_outdatedAABB ) {
 				entity->ComputeAABB();
 			} m_outdatedAABB.clear();
@@ -148,6 +149,18 @@ namespace fan
 				R_DeleteEntity(entitytoDelete, deletedEntitiesSet);
 			}
 			m_entitiesToDelete.clear();
+		}
+
+		//================================================================================================================================
+		// Deletes every entity in the m_toDeleteLater vector
+		//================================================================================================================================
+		void Scene::OnGui() {
+			int nb = (int)m_activeActors.size();
+			ImGui::DragInt("nb", &nb);
+			for (scene::Actor * actor : m_activeActors)
+			{
+				ImGui::Text(actor->GetName());
+			}			
 		}
 
 		//================================================================================================================================
@@ -163,8 +176,10 @@ namespace fan
 		//================================================================================================================================
 		//================================================================================================================================
 		void Scene::OnActorDetach(scene::Actor * _actor) {
-			assert(m_activeActors.find(_actor) != m_activeActors.end());
-			m_activeActors.erase(_actor);
+			const size_t size = m_activeActors.erase(_actor);
+			if (size == 0) {
+				Debug::Get() << Debug::Severity::warning << " Scene::OnActorDetach Actor not active : " << _actor->GetName() << Debug::Endl();
+			}
 		}
 
 		//================================================================================================================================
@@ -176,7 +191,10 @@ namespace fan
 			m_startingActors.clear();
 			m_activeActors.clear();
 			m_entitiesToDelete.clear();
+			m_outdatedAABB.clear();
 			m_root = nullptr;
+
+			onSceneClear.Emmit();
 		}
 
 		//================================================================================================================================

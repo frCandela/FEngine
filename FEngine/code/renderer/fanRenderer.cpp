@@ -306,7 +306,9 @@ namespace fan
 		void Renderer::UpdateSceneUniforms() {
 			// Force reload of transform uniforms
 			for (int drawDataIndex = 0; drawDataIndex < m_drawData.size(); drawDataIndex++) {
+				if (m_drawData[drawDataIndex].transform != nullptr ) {
 				m_drawData[drawDataIndex].transform->SetModified();
+			}
 
 				scene::Material * material = m_drawData[drawDataIndex].material;
 				if (material != nullptr) {
@@ -923,6 +925,14 @@ namespace fan
 				if (m_drawData[modelIndex].model == _model) {
 					m_drawData[modelIndex] = {};
 				}
+			}
+		}
+
+		//================================================================================================================================
+		//================================================================================================================================
+		void Renderer::Clear() {
+			for (int modelIndex = 0; modelIndex < m_drawData.size(); modelIndex++) {
+				m_drawData[modelIndex] = {};				
 			}
 		}
 

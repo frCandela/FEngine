@@ -271,6 +271,12 @@
     <ClCompile Include="code\editor\components\ComponentsRegister.cpp">
       <Filter>code\editor\components</Filter>
     </ClCompile>
+    <ClCompile Include="code\game\fanSpaceShip.cpp">
+      <Filter>code\game</Filter>
+    </ClCompile>
+    <ClCompile Include="code\game\fanCameraController.cpp">
+      <Filter>code\game</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="code\editor\fanMainMenuBar.h">
@@ -923,6 +929,12 @@
     </ClInclude>
     <ClInclude Include="code\editor\components\ComponentsRegister.h">
       <Filter>code\editor\components</Filter>
+    </ClInclude>
+    <ClInclude Include="code\game\fanSpaceShip.h">
+      <Filter>code\game</Filter>
+    </ClInclude>
+    <ClInclude Include="code\game\fanCameraController.h">
+      <Filter>code\game</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

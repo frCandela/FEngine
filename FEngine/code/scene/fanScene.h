@@ -18,13 +18,14 @@ namespace fan
 		public:
 			fan::Signal<Entity*> onEntityCreated;
 			fan::Signal<Scene*> onSceneLoad;
+			static fan::Signal<> onSceneClear;
 
 			Scene(const std::string _name);
 			~Scene();
 
-			Entity *	CreateEntity(const std::string _name, Entity * _parent = nullptr );	// Creates a game object and adds it to the scene hierarchy
-			void		DeleteEntity(Entity* _entity);										// Deletes a entity and removes it from the scene hierarchy at the end of the frame
-			std::vector < Entity * > BuildEntitiesList() const;
+			Entity *					CreateEntity(const std::string _name, Entity * _parent = nullptr );	// Creates a game object and adds it to the scene hierarchy
+			void						DeleteEntity(Entity* _entity);										// Deletes a entity and removes it from the scene hierarchy at the end of the frame
+			std::vector < Entity * >	BuildEntitiesList() const;
 
 			template<typename ComponentType>
 			ComponentType * FindComponentOfType() const;
@@ -32,6 +33,7 @@ namespace fan
 			void BeginFrame();
 			void Update(const float _delta);
 			void EndFrame();
+			void OnGui();
 
 			void New();
 			void Save() const;

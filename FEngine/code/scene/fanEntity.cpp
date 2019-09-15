@@ -231,7 +231,13 @@ namespace fan
 						if (!ReadStartToken(_in)) { return false; }
 						{
 							scene::Component * component = AddComponent(componentID);
-							component->Load(_in);
+							const bool result = component->Load(_in);
+							if (result == false) {
+								fan::Debug::Get() << Debug::Severity::error << "Failed loading component: " << component->GetName() << Debug::Endl();
+							}	
+							if (result == false) {
+								return false;
+							}
 						} if (!ReadEndToken(_in)) { return false; }
 					}
 				} if (!ReadEndToken(_in)) { return false; }
@@ -254,7 +260,11 @@ namespace fan
 		//================================================================================================================================
 		//================================================================================================================================
 		bool Entity::LoadEntity(std::istream& _in) {
-			return Load(_in);
+			const bool result = Load(_in);
+			if (result == false) {
+				fan::Debug::Get() << Debug::Severity::error << "Failed loading Entity: " << GetName() << Debug::Endl();
+			}
+			return result;
 		}
 
 		//================================================================================================================================

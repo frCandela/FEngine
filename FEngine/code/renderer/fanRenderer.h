@@ -77,9 +77,10 @@ namespace fan
 		const std::vector < vk::DrawData > & GetDrawData() const { return m_drawData; }
 
 		void RegisterMaterial(	scene::Material * _model);
-		void UnRegisterMaterial(scene::Material * _model);
+		void UnRegisterMaterial(scene::Material * _model);		
 		void RegisterModel(		scene::Model * _model	);
 		void UnRegisterModel(	scene::Model * _model	);
+		void Clear();
 
 		void					DebugPoint(const btVector3 _pos, const Color _color);
 		void					DebugLine(const btVector3 _start, const btVector3 _end, const Color _color, const bool _depthTestEnable = true );

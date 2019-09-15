@@ -1,7 +1,6 @@
 #pragma once
 
 #include "scene/components/fanActor.h"
-#include "editor/windows/fanInspectorWindow.h"
 
 namespace fan {
 	namespace game {

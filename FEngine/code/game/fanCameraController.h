@@ -4,12 +4,15 @@
 #include "editor/windows/fanInspectorWindow.h"
 
 namespace fan {
-	namespace scene { class Camera; }
+	namespace scene { 
+		class Camera; 
+		class Transform;
+	}
 
 	namespace game {
 		//================================================================================================================================
 		//================================================================================================================================	
-		class GameManager : public scene::Actor {
+		class CameraController : public scene::Actor {
 		public:
 			void Start() override;
 			void Update(const float _delta) override;
@@ -18,14 +21,17 @@ namespace fan {
 
 			bool IsUnique() const override { return true; }
 			void OnGui() override;
+			void OnDetach() override;
 
-			DECLARE_EDITOR_COMPONENT(GameManager)
-			DECLARE_TYPE_INFO(GameManager);
+			DECLARE_EDITOR_COMPONENT(CameraController)
+			DECLARE_TYPE_INFO(CameraController);
 		protected:
 		private:
-			scene::Camera * m_camera;
+			scene::Camera *		m_camera;
+			scene::Transform *	m_transform;
+			scene::Transform *	m_target;
 
-			void SwitchCameras();
+			float m_heightFromTarget;
 		};
 	}
 }
