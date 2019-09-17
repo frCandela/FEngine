@@ -23,6 +23,7 @@ It uses Vulkan for Rendering, Dear ImGui for user interface and a lot of other o
 * Serialization : [nlohmann json](https://github.com/nlohmann/json)
 * png images : [stb_image](https://github.com/nothings/stb)
 * physics : [bullet physics](https://github.com/bulletphysics/bullet3/blob/master/LICENSE.txt)
+* convex hull : [Antti Kuukka - QuickHull ](https://github.com/akuukka/quickhull)
 * window & input : [glfw](https://github.com/glfw/glfw)
 * shader math : [glm](https://github.com/g-truc/glm)
 * spirv compilation: [glslang](https://github.com/KhronosGroup/glslang)

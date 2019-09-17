@@ -65,6 +65,9 @@
     <Filter Include="code\game">
       <UniqueIdentifier>{601b9331-5ac9-4f78-93fc-097663f76e54}</UniqueIdentifier>
     </Filter>
+    <Filter Include="code\deps\quickhull">
+      <UniqueIdentifier>{44acb24b-72dd-4b2d-8cd3-41c926ff8f80}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="deps\imgui\imgui.cpp">
@@ -276,6 +279,12 @@
     </ClCompile>
     <ClCompile Include="code\game\fanCameraController.cpp">
       <Filter>code\game</Filter>
+    </ClCompile>
+    <ClCompile Include="code\core\math\shapes\fanConvexHull.cpp">
+      <Filter>code\core\math\shapes</Filter>
+    </ClCompile>
+    <ClCompile Include="deps\quickhull\QuickHull.cpp">
+      <Filter>code\deps\quickhull</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -935,6 +944,42 @@
     </ClInclude>
     <ClInclude Include="code\game\fanCameraController.h">
       <Filter>code\game</Filter>
+    </ClInclude>
+    <ClInclude Include="code\core\math\shapes\fanConvexHull.h">
+      <Filter>code\core\math\shapes</Filter>
+    </ClInclude>
+    <ClInclude Include="deps\quickhull\ConvexHull.hpp">
+      <Filter>code\deps\quickhull</Filter>
+    </ClInclude>
+    <ClInclude Include="deps\quickhull\HalfEdgeMesh.hpp">
+      <Filter>code\deps\quickhull</Filter>
+    </ClInclude>
+    <ClInclude Include="deps\quickhull\MathUtils.hpp">
+      <Filter>code\deps\quickhull</Filter>
+    </ClInclude>
+    <ClInclude Include="deps\quickhull\QuickHull.hpp">
+      <Filter>code\deps\quickhull</Filter>
+    </ClInclude>
+    <ClInclude Include="deps\quickhull\Structs\Mesh.hpp">
+      <Filter>code\deps\quickhull</Filter>
+    </ClInclude>
+    <ClInclude Include="deps\quickhull\Structs\Plane.hpp">
+      <Filter>code\deps\quickhull</Filter>
+    </ClInclude>
+    <ClInclude Include="deps\quickhull\Structs\Pool.hpp">
+      <Filter>code\deps\quickhull</Filter>
+    </ClInclude>
+    <ClInclude Include="deps\quickhull\Structs\Ray.hpp">
+      <Filter>code\deps\quickhull</Filter>
+    </ClInclude>
+    <ClInclude Include="deps\quickhull\Structs\Vector3.hpp">
+      <Filter>code\deps\quickhull</Filter>
+    </ClInclude>
+    <ClInclude Include="deps\quickhull\Structs\VertexDataSource.hpp">
+      <Filter>code\deps\quickhull</Filter>
+    </ClInclude>
+    <ClInclude Include="deps\quickhull\Types.hpp">
+      <Filter>code\deps\quickhull</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -1,0 +1,29 @@
+Entities: 1 { 
+    Entity: root {
+        computeAABB: true
+        Components: 1 {
+            Transform: 1269105190 {
+                position: 0 0 0
+                rotation: 0 0 0 1
+                scale:    1 1 1
+            }
+        }
+        Childs: 1 {
+            Entity: new_entity {
+                computeAABB: true
+                Components: 2 {
+                    Transform: 1269105190 {
+                        position: 0 0 0
+                        rotation: 0 0 0 1
+                        scale:    1 1 1
+                    }
+                    Model: 1739103771 {
+                        path: content\models\spaceship.fbx
+                    }
+                }
+                Childs: 0 {
+                }
+            }
+        }
+    }
+}

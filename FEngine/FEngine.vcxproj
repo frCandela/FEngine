@@ -49,7 +49,7 @@
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>false</ConformanceMode>
-      <AdditionalIncludeDirectories>deps;code;C:\VulkanSDK\1.1.106.0\Include;bullet</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>deps;code;C:\VulkanSDK\1.1.106.0\Include</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <TreatWarningAsError>true</TreatWarningAsError>
       <PreprocessorDefinitions>_MBCS;%(PreprocessorDefinitions);</PreprocessorDefinitions>
@@ -69,7 +69,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>false</ConformanceMode>
-      <AdditionalIncludeDirectories>deps;code;C:\VulkanSDK\1.1.106.0\Include;deps/bullet</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>deps;code;C:\VulkanSDK\1.1.106.0\Include;</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>_MBCS;%(PreprocessorDefinitions);NDEBUG</PreprocessorDefinitions>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <TreatWarningAsError>true</TreatWarningAsError>
@@ -98,6 +98,7 @@
     <ClCompile Include="code\core\math\fanMathUtils.cpp" />
     <ClCompile Include="code\core\math\fanVector2.cpp" />
     <ClCompile Include="code\core\math\shapes\fanAABB.cpp" />
+    <ClCompile Include="code\core\math\shapes\fanConvexHull.cpp" />
     <ClCompile Include="code\core\math\shapes\fanCube.cpp" />
     <ClCompile Include="code\core\math\shapes\fanPlane.cpp" />
     <ClCompile Include="code\core\math\shapes\fanRay.cpp" />
@@ -155,6 +156,7 @@
     <ClCompile Include="deps\imgui\imgui.cpp" />
     <ClCompile Include="deps\imgui\imgui_demo.cpp" />
     <ClCompile Include="deps\imgui\imgui_draw.cpp" />
+    <ClCompile Include="deps\quickhull\QuickHull.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="code\core\fanDebug.h" />
@@ -174,6 +176,7 @@
     <ClInclude Include="code\core\math\fanMathUtils.h" />
     <ClInclude Include="code\core\math\fanVector2.h" />
     <ClInclude Include="code\core\math\shapes\fanAABB.h" />
+    <ClInclude Include="code\core\math\shapes\fanConvexHull.h" />
     <ClInclude Include="code\core\math\shapes\fanCube.h" />
     <ClInclude Include="code\core\math\shapes\fanPlane.h" />
     <ClInclude Include="code\core\math\shapes\fanRay.h" />
@@ -376,6 +379,17 @@
     <ClInclude Include="deps\glm\vec4.hpp" />
     <ClInclude Include="deps\glm\vector_relational.hpp" />
     <ClInclude Include="deps\nlohmann_json.h" />
+    <ClInclude Include="deps\quickhull\ConvexHull.hpp" />
+    <ClInclude Include="deps\quickhull\HalfEdgeMesh.hpp" />
+    <ClInclude Include="deps\quickhull\MathUtils.hpp" />
+    <ClInclude Include="deps\quickhull\QuickHull.hpp" />
+    <ClInclude Include="deps\quickhull\Structs\Mesh.hpp" />
+    <ClInclude Include="deps\quickhull\Structs\Plane.hpp" />
+    <ClInclude Include="deps\quickhull\Structs\Pool.hpp" />
+    <ClInclude Include="deps\quickhull\Structs\Ray.hpp" />
+    <ClInclude Include="deps\quickhull\Structs\Vector3.hpp" />
+    <ClInclude Include="deps\quickhull\Structs\VertexDataSource.hpp" />
+    <ClInclude Include="deps\quickhull\Types.hpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="code\core\math\fanBasicModels.inl" />

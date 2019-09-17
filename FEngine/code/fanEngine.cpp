@@ -34,6 +34,8 @@
 #include "scene/components/fanActor.h"
 #include "scene/components/fanMaterial.h"
 
+#include "core/math/shapes/fanConvexHull.h"
+
 namespace fan {
 	Engine * Engine::ms_engine = nullptr;
 
@@ -294,9 +296,96 @@ namespace fan {
 	//================================================================================================================================
 	//================================================================================================================================
 	void Engine::DrawUI() {
-// 		ImGui::Begin("test"); {
-// 			
-// 		} ImGui::End();
+
+		//***************************************************************************************MYLITTLESPACE
+
+
+		ImGui::Begin("test"); {
+			static scene::Model * model = nullptr;
+			static shape::ConvexHull hull;
+
+			if (ImGui::Button("Find")) {
+				model = GetScene().FindComponentOfType<scene::Model>();
+			}
+
+			const bool computeFast = ImGui::Button("computeFast");
+			const bool computeBullet = ImGui::Button("computeBullet");
+
+			if (computeFast || computeBullet) {
+				if (model != nullptr) {
+					hull.Clear();
+					std::vector<vk::Vertex> & vertices = model->GetMesh()->GetVertices();
+					std::vector < btVector3> pointCloud;
+					for (int point = 0; point < vertices.size(); point++) {
+						vk::Vertex & vertex = vertices[point];
+						pointCloud.push_back(btVector3(vertex.pos.x, vertex.pos.y, vertex.pos.z));
+					}
+
+					if (computeFast) {
+						hull.ComputeQuickHull(pointCloud);
+					}
+					else {
+						hull.ComputeBulletHull(pointCloud);
+					}
+				}
+			}
+
+
+			if (model != nullptr)
+			{
+				ImGui::Text(model->GetMesh()->GetPath().c_str());
+				int countModel = (int)model->GetMesh()->GetVertices().size();
+				ImGui::DragInt("model vertices size", &countModel);
+			}
+
+			const std::vector<btVector3> & vertices = hull.GetVertices();
+			const std::vector<uint32_t> & indices = hull.GetIndices();
+			if (!vertices.empty()) {
+
+				int counthull = (int)vertices.size();
+				ImGui::DragInt("hull vertices size", &counthull);
+				int countidxhull = (int)indices.size();
+				ImGui::DragInt("hull indices size", &countidxhull);
+
+				for (unsigned polyIndex = 0; polyIndex < indices.size() / 3; polyIndex++) {
+					const int index0 = indices[3 * polyIndex + 0];
+					const int index1 = indices[3 * polyIndex + 1];
+					const int index2 = indices[3 * polyIndex + 2];
+					const btVector3 vec0 = vertices[index0];
+					const btVector3 vec1 = vertices[index1];
+					const btVector3 vec2 = vertices[index2];
+					Renderer::Get().DebugTriangle(
+						btVector3(vec0[0], vec0[1], vec0[2]),
+						btVector3(vec1[0], vec1[1], vec1[2]),
+						btVector3(vec2[0], vec2[1], vec2[2]),
+						Color::Red
+					);
+				}
+			}
+
+		} ImGui::End();
+
+		//***************************************************************************************END_MYLITTLESPACE
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 		m_mainMenuBar->Draw();
 		m_renderWindow->Draw();
