@@ -13,7 +13,7 @@ Entities: 1 {
                 computeAABB: true
                 Components: 4 {
                     Transform: 1269105190 {
-                        position: 0.0236626 5.25 5.46051
+                        position: 8.64909 5.25 -4.68411
                         rotation: 0.707107 0 0 0.707107
                         scale:    1 1 1
                     }
@@ -53,7 +53,7 @@ Entities: 1 {
                         computeAABB: true
                         Components: 4 {
                             Transform: 1269105190 {
-                                position: -3.78472 0 -11.8671
+                                position: 12.4549 0 -0.163921
                                 rotation: 0 0 0 1
                                 scale:    1 1 1
                             }
@@ -74,7 +74,7 @@ Entities: 1 {
                                 computeAABB: true
                                 Components: 4 {
                                     Transform: 1269105190 {
-                                        position: -6.30499 0 -13.1697
+                                        position: 10.6572 0 1.93594
                                         rotation: 0 0 0 1
                                         scale:    0.5 0.5 0.5
                                     }
@@ -99,7 +99,7 @@ Entities: 1 {
                         computeAABB: true
                         Components: 4 {
                             Transform: 1269105190 {
-                                position: -1.4056 0 -4.40729
+                                position: 4.6256 0 -0.0609136
                                 rotation: 0 0 0 1
                                 scale:    0.5 0.5 0.5
                             }
@@ -121,11 +121,11 @@ Entities: 1 {
                 }
             }
             Entity: space_ship {
-                computeAABB: false
+                computeAABB: true
                 Components: 4 {
                     Transform: 1269105190 {
-                        position: 0.0236626 0 5.46051
-                        rotation: 0 -0.604087 0 0.796696
+                        position: 8.64887 0 -4.81744
+                        rotation: 0 0.000798637 0 0.999772
                         scale:    0.1 0.1 0.1
                     }
                     Model: 1739103771 {
@@ -135,7 +135,7 @@ Entities: 1 {
                         material: content\models\test\textures\texture3.png
                     }
                     SpaceShip: 3824437066 {
-                        isEnabled: false
+                        isEnabled: true
                         speed:          8
                         rotation_speed: 3
                     }

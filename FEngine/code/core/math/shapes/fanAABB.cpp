@@ -15,6 +15,28 @@ namespace fan {
 		}
 
 		//================================================================================================================================
+		// Computes the AABB of a a transformed points cloud
+		//================================================================================================================================
+		AABB::AABB(const std::vector<btVector3> _pointCloud, const glm::mat4 _modelMatrix ) {
+
+			glm::vec3 high(std::numeric_limits<float>::lowest(), std::numeric_limits<float>::lowest(), std::numeric_limits<float>::lowest());
+			glm::vec3 low(std::numeric_limits<float>::max(), std::numeric_limits<float>::max(), std::numeric_limits<float>::max());
+
+			for (int index = 0; index < _pointCloud.size(); index++) {
+				const glm::vec4 vertex = _modelMatrix * glm::vec4(_pointCloud[index][0], _pointCloud[index][1], _pointCloud[index][2], 1.f);
+				if (vertex.x < low.x) { low.x = vertex.x; }
+				if (vertex.y < low.y) { low.y = vertex.y; }
+				if (vertex.z < low.z) { low.z = vertex.z; }
+				if (vertex.x > high.x) { high.x = vertex.x; }
+				if (vertex.y > high.y) { high.y = vertex.y; }
+				if (vertex.z > high.z) { high.z = vertex.z; }
+			}
+			m_low = ToBullet(low);
+			m_high = ToBullet(high);
+			assert(m_low[0] <= m_high[0] && m_low[1] <= m_high[1] && m_low[2] <= m_high[2]);
+		}
+
+		//================================================================================================================================
 		//================================================================================================================================
 		std::vector< btVector3 > AABB::GetCorners() const {
 			return {

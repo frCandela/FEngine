@@ -2,12 +2,13 @@
 
 #include "fanEngine.h"
 #include "renderer/fanRenderer.h"
+#include "renderer/fanMesh.h"
 #include "renderer/fanRessourceManager.h"
 #include "scene/components/fanModel.h"
 #include "scene/components/fanTransform.h"
 #include "scene/fanEntity.h"
 #include "core/math/shapes/fanAABB.h"
-#include "renderer/fanMesh.h"
+#include "core/math/shapes/fanConvexHull.h"
 #include "core/files/fanFbxImporter.h"
 
 // Editor
@@ -39,30 +40,19 @@ namespace fan
 		//================================================================================================================================
 		//================================================================================================================================
 		shape::AABB Model::ComputeAABB() const {
-			const scene::Transform * transform = GetEntity()->GetComponent<scene::Transform>();
-			const glm::mat4 modelMatrix = transform->GetModelMatrix();
-
-			const std::vector<uint32_t> & indices = m_mesh->GetIndices();
+			const glm::mat4 modelMatrix = GetEntity()->GetComponent<scene::Transform>()->GetModelMatrix();
 			const std::vector<vk::Vertex> &  vertices = m_mesh->GetVertices();
 
-			if (indices.size() > 0) {
-				glm::vec3 high(std::numeric_limits<float>::lowest(), std::numeric_limits<float>::lowest(), std::numeric_limits<float>::lowest());
-				glm::vec3 low(std::numeric_limits<float>::max(), std::numeric_limits<float>::max(), std::numeric_limits<float>::max());
-
-				for (int index = 0; index < indices.size(); index++) {
-					const glm::vec4 vertex = modelMatrix * glm::vec4(vertices[index].pos, 1.f);
-					if (vertex.x < low.x) { low.x = vertex.x; }
-					if (vertex.y < low.y) { low.y = vertex.y; }
-					if (vertex.z < low.z) { low.z = vertex.z; }
-					if (vertex.x > high.x) { high.x = vertex.x; }
-					if (vertex.y > high.y) { high.y = vertex.y; }
-					if (vertex.z > high.z) { high.z = vertex.z; }
+			const shape::ConvexHull * hull = m_mesh->GetConvexHull();
+			if (hull != nullptr) {
+				return shape::AABB(hull->GetVertices(), modelMatrix);
+			} else {
+				std::vector<btVector3> btVertices;
+				btVertices.reserve(vertices.size());
+				for (int vertIndex = 0; vertIndex < vertices.size(); vertIndex++) {
+					btVertices.push_back(ToBullet(vertices[vertIndex].pos));
 				}
-				return shape::AABB(ToBullet(low), ToBullet(high));
-
-			}
-			else {
-				return shape::AABB();
+				return shape::AABB(btVertices, modelMatrix);
 			}
 		}
 
