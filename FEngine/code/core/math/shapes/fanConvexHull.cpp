@@ -1,8 +1,9 @@
 #include "fanGlobalIncludes.h"
 #include "core/math/shapes/fanConvexHull.h"
-
+#include "core/math/shapes/fanTriangle.h"
 #include "quickhull/QuickHull.hpp"
 #include "bullet/LinearMath/btConvexHull.h"
+
 
 namespace fan {
 	namespace shape
@@ -73,10 +74,37 @@ namespace fan {
 			}
 		}
 
+		//================================================================================================================================
+		//================================================================================================================================
 		void ConvexHull::Clear() {
 			m_vertices.clear();
 			m_indices.clear();
 		}
+		
+		//================================================================================================================================
+		// Naive raycast on all triangles of the convex hull
+		//================================================================================================================================
+		bool ConvexHull::RayCast(const btVector3 _origin, const btVector3 _direction, btVector3& _outIntersection) const {
+			btVector3 intersection;
+			float closestDistance = std::numeric_limits<float>::max();
+			for (int triIndex = 0; triIndex < m_indices.size() / 3; triIndex++)	{
+				const btVector3 v0 = m_vertices[m_indices[3 * triIndex] + 0];
+				const btVector3 v1 = m_vertices[m_indices[3 * triIndex] + 1];
+				const btVector3 v2 = m_vertices[m_indices[3 * triIndex] + 2];
+				const Triangle triangle(v0, v1, v2);
+				
+				if (triangle.RayCast(_origin, _direction, intersection))
+				{
+					float distance = intersection.distance(_origin);
+					if (distance < closestDistance)
+					{
+						closestDistance = distance;
+						_outIntersection = intersection;
+					}
+				}
+			}
+			return closestDistance != std::numeric_limits<float>::max();
+		}			
 	}
 
 }

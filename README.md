@@ -1,6 +1,5 @@
 # FEngine
-FEngine is my 3D game engine. I will certainly make cool games with it in the future.
-It uses Vulkan for Rendering, Dear ImGui for user interface and a lot of other open libraries for various purposes.
+FEngine is my 3D game engine. It uses Vulkan for Rendering, Dear ImGui for user interface and a lot of other open libraries for various purposes.
 
 ## Features (non exhaustive list): 
 * Scene management

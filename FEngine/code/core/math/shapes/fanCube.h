@@ -13,9 +13,9 @@ namespace fan {
 
 			void SetPosition(const btVector3 _pos);
 
-			const std::array< Triangle, 12 >& GetTriangles() const { return m_triangles; }
-			float GetHalfSize() const { return m_halfSize; }
-			btVector3 GetPosition() const { return m_position; }
+			const		std::array< Triangle, 12 >& GetTriangles() const { return m_triangles; }
+			float		GetHalfSize() const { return m_halfSize; }
+			btVector3	GetPosition() const { return m_position; }
 
 			virtual bool RayCast(const btVector3 _origin, const btVector3 _direction, btVector3& outIntersection) const override;
 
