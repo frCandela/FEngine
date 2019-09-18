@@ -79,15 +79,20 @@ namespace fan
 
 			glm::vec3 position(m_position[0], m_position[1], m_position[2]);
 			glm::vec3 scale(m_scale[0], m_scale[1], m_scale[2]);
-			glm::quat rotation(m_rotation.getX(), m_rotation.getY(), m_rotation.getZ(), m_rotation.getW());
+			glm::quat rotation;
+			rotation.x = m_rotation[0];
+			rotation.y = m_rotation[1];
+			rotation.z = m_rotation[2];
+			rotation.w = m_rotation[3]; 			
 
-			return glm::translate(glm::mat4(1.f), position) * glm::mat4_cast(rotation) * glm::scale(glm::mat4(1.f), scale);
+ 			return glm::translate(glm::mat4(1.f), position) * glm::mat4_cast(rotation) * glm::scale(glm::mat4(1.f), scale);
 		}
 
 		//================================================================================================================================
 		//================================================================================================================================
 		glm::mat4 Transform::GetRotationMat() const {
 			glm::quat rotation(m_rotation.getX(), m_rotation.getY(), m_rotation.getZ(), m_rotation.getW());
+
 			return glm::mat4_cast(rotation);
 		}
 
@@ -128,7 +133,7 @@ namespace fan
 
 			// rotation
 			if (ImGui::Button("##TransRot")) {
-				SetRotationEuler(btVector3(0, 0, 0));
+				SetRotationQuat( btQuaternion::getIdentity());
 			} ImGui::SameLine();
 			const btVector3 rot = GetRotationEuler();
 			float bufferAngles[3] = { rot.x(),rot.y(),rot.z() };

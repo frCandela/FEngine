@@ -983,43 +983,43 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <None Include="shaders\forward.frag">
-      <Filter>code\shaders</Filter>
-    </None>
-    <None Include="shaders\forward.vert">
-      <Filter>code\shaders</Filter>
-    </None>
-    <None Include="shaders\imgui.frag">
-      <Filter>code\shaders</Filter>
-    </None>
-    <None Include="shaders\imgui.vert">
-      <Filter>code\shaders</Filter>
-    </None>
-    <None Include="shaders\postprocess.frag">
-      <Filter>code\shaders</Filter>
-    </None>
-    <None Include="shaders\postprocess.vert">
-      <Filter>code\shaders</Filter>
-    </None>
-    <None Include="shaders\empty.frag">
-      <Filter>code\shaders</Filter>
-    </None>
-    <None Include="shaders\empty.vert">
-      <Filter>code\shaders</Filter>
-    </None>
     <None Include="code\core\math\fanBasicModels.inl">
       <Filter>code\core\math</Filter>
     </None>
-    <None Include="shaders\debugTriangles.vert">
+    <None Include="code\shaders\forward.vert">
       <Filter>code\shaders</Filter>
     </None>
-    <None Include="shaders\debugLines.frag">
+    <None Include="code\shaders\imgui.frag">
       <Filter>code\shaders</Filter>
     </None>
-    <None Include="shaders\debugLines.vert">
+    <None Include="code\shaders\imgui.vert">
       <Filter>code\shaders</Filter>
     </None>
-    <None Include="shaders\debugTriangles.frag">
+    <None Include="code\shaders\postprocess.frag">
+      <Filter>code\shaders</Filter>
+    </None>
+    <None Include="code\shaders\postprocess.vert">
+      <Filter>code\shaders</Filter>
+    </None>
+    <None Include="code\shaders\debugLines.frag">
+      <Filter>code\shaders</Filter>
+    </None>
+    <None Include="code\shaders\debugLines.vert">
+      <Filter>code\shaders</Filter>
+    </None>
+    <None Include="code\shaders\debugTriangles.frag">
+      <Filter>code\shaders</Filter>
+    </None>
+    <None Include="code\shaders\debugTriangles.vert">
+      <Filter>code\shaders</Filter>
+    </None>
+    <None Include="code\shaders\empty.frag">
+      <Filter>code\shaders</Filter>
+    </None>
+    <None Include="code\shaders\empty.vert">
+      <Filter>code\shaders</Filter>
+    </None>
+    <None Include="code\shaders\forward.frag">
       <Filter>code\shaders</Filter>
     </None>
   </ItemGroup>

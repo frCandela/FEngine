@@ -393,18 +393,18 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="code\core\math\fanBasicModels.inl" />
-    <None Include="shaders\debugLines.frag" />
-    <None Include="shaders\debugLines.vert" />
-    <None Include="shaders\debugTriangles.frag" />
-    <None Include="shaders\debugTriangles.vert" />
-    <None Include="shaders\empty.frag" />
-    <None Include="shaders\empty.vert" />
-    <None Include="shaders\forward.frag" />
-    <None Include="shaders\forward.vert" />
-    <None Include="shaders\imgui.frag" />
-    <None Include="shaders\imgui.vert" />
-    <None Include="shaders\postprocess.frag" />
-    <None Include="shaders\postprocess.vert" />
+    <None Include="code\shaders\debugLines.frag" />
+    <None Include="code\shaders\debugLines.vert" />
+    <None Include="code\shaders\debugTriangles.frag" />
+    <None Include="code\shaders\debugTriangles.vert" />
+    <None Include="code\shaders\empty.frag" />
+    <None Include="code\shaders\empty.vert" />
+    <None Include="code\shaders\forward.frag" />
+    <None Include="code\shaders\forward.vert" />
+    <None Include="code\shaders\imgui.frag" />
+    <None Include="code\shaders\imgui.vert" />
+    <None Include="code\shaders\postprocess.frag" />
+    <None Include="code\shaders\postprocess.vert" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
