@@ -208,9 +208,12 @@ namespace fan {
 					hull = mesh->GetConvexHull();
 				}
 				if (hull != nullptr) {
+					
+
 					const std::vector<btVector3> & vertices = hull->GetVertices();
 					const std::vector<uint32_t> & indices = hull->GetIndices();
 					if (!vertices.empty()) {
+						const glm::mat4  modelMat = model->GetEntity()->GetComponent<scene::Transform>()->GetModelMatrix();
 
 						int counthull = (int)vertices.size();
 						ImGui::DragInt("hull vertices size", &counthull);
@@ -225,10 +228,13 @@ namespace fan {
 							const btVector3 vec0 = vertices[index0];
 							const btVector3 vec1 = vertices[index1];
 							const btVector3 vec2 = vertices[index2];
+							const btVector3 worldVec0 = ToBullet(modelMat * glm::vec4(vec0[0], vec0[1], vec0[2], 1.f));
+							const btVector3 worldVec1 = ToBullet(modelMat * glm::vec4(vec1[0], vec1[1], vec1[2], 1.f));
+							const btVector3 worldVec2 = ToBullet(modelMat * glm::vec4(vec2[0], vec2[1], vec2[2], 1.f));
 							
-							Renderer::Get().DebugLine(vec0, vec1, color);
-							Renderer::Get().DebugLine(vec1, vec2, color);
-							Renderer::Get().DebugLine(vec2, vec0, color);
+							Renderer::Get().DebugLine(worldVec0, worldVec1, color);
+							Renderer::Get().DebugLine(worldVec1, worldVec2, color);
+							Renderer::Get().DebugLine(worldVec2, worldVec0, color);
 		
 						}
 					}
