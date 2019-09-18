@@ -13,11 +13,13 @@ namespace fan
 			void Initialize();
 			void Draw();
 
-			bool ShowAABB() const { return m_showAABB; }
-			bool ShowWireframe() const { return m_showWireframe; }
-			bool ShowNormals() const { return m_showNormals; }
+			bool ShowHull() const		{ return m_showHull; }
+			bool ShowAABB() const		{ return m_showAABB; }
+			bool ShowWireframe() const	{ return m_showWireframe; }
+			bool ShowNormals() const	{ return m_showNormals; }
 		private:
 			bool m_showImguiDemoWindow;
+			bool m_showHull;
 			bool m_showAABB;
 			bool m_showWireframe;
 			bool m_showNormals;

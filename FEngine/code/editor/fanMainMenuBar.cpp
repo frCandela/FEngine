@@ -26,6 +26,7 @@ namespace fan
 		MainMenuBar::MainMenuBar() :
 			m_showImguiDemoWindow(true)
 			, m_showAABB(false)
+			, m_showHull(false)
 			, m_showWireframe(false)
 			, m_showNormals(false)
 			, m_sceneExtensionFilter(GlobalValues::s_sceneExtensions) {
@@ -152,6 +153,7 @@ namespace fan
 				// EDITOR
 				if (ImGui::BeginMenu("Editor"))
 				{
+					if (ImGui::Checkbox("show hull", &m_showHull)) {}
 					if (ImGui::Checkbox("show AABB", &m_showAABB)) {}
 					if (ImGui::Checkbox("show Wireframe", &m_showWireframe)) {}
 					if (ImGui::Checkbox("show Normals", &m_showNormals)) {}

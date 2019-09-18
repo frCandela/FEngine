@@ -136,15 +136,10 @@ namespace fan {
 				DrawUI();
 				DrawEditorGrid();
 
-				if (m_mainMenuBar->ShowWireframe()) {
-					DrawWireframe();
-				}
-				if (m_mainMenuBar->ShowNormals()) {
-					DrawNormals();
-				}
-				if (m_mainMenuBar->ShowAABB()) {
-					DrawAABB();
-				}
+				if (m_mainMenuBar->ShowWireframe()) { DrawWireframe();	}
+				if (m_mainMenuBar->ShowNormals())	{ DrawNormals();	}
+				if (m_mainMenuBar->ShowAABB())		{ DrawAABB();		}
+				if (m_mainMenuBar->ShowHull())		{ DrawHull();		}
 
 				Renderer::Get().DrawFrame();
 				m_scene->EndFrame();
@@ -197,6 +192,47 @@ namespace fan {
 			if (entity != m_editorCamera->GetEntity()) {
 				shape::AABB aabb = entity->GetAABB();
 				Renderer::Get().DebugAABB(aabb, Color::Red);
+			}
+		}
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
+	void Engine::DrawHull() const	{
+		if (m_selectedentity != nullptr) {
+			scene::Model * model = m_selectedentity->GetComponent<scene::Model>();
+			if (model != nullptr) {
+				const shape::ConvexHull * hull = nullptr;
+				Mesh * mesh = model->GetMesh();
+				if (mesh != nullptr) {
+					hull = mesh->GetConvexHull();
+				}
+				if (hull != nullptr) {
+					const std::vector<btVector3> & vertices = hull->GetVertices();
+					const std::vector<uint32_t> & indices = hull->GetIndices();
+					if (!vertices.empty()) {
+
+						int counthull = (int)vertices.size();
+						ImGui::DragInt("hull vertices size", &counthull);
+						int countidxhull = (int)indices.size();
+						ImGui::DragInt("hull indices size", &countidxhull);
+
+						Color color(1, 0, 0, 1);
+						for (unsigned polyIndex = 0; polyIndex < indices.size() / 3; polyIndex++) {
+							const int index0 = indices[3 * polyIndex + 0];
+							const int index1 = indices[3 * polyIndex + 1];
+							const int index2 = indices[3 * polyIndex + 2];
+							const btVector3 vec0 = vertices[index0];
+							const btVector3 vec1 = vertices[index1];
+							const btVector3 vec2 = vertices[index2];
+							
+							Renderer::Get().DebugLine(vec0, vec1, color);
+							Renderer::Get().DebugLine(vec1, vec2, color);
+							Renderer::Get().DebugLine(vec2, vec0, color);
+		
+						}
+					}
+				}
 			}
 		}
 	}
@@ -301,91 +337,10 @@ namespace fan {
 
 
 		ImGui::Begin("test"); {
-			static scene::Model * model = nullptr;
-			static shape::ConvexHull hull;
-
-			if (ImGui::Button("Find")) {
-				model = GetScene().FindComponentOfType<scene::Model>();
-			}
-
-			const bool computeFast = ImGui::Button("computeFast");
-			const bool computeBullet = ImGui::Button("computeBullet");
-
-			if (computeFast || computeBullet) {
-				if (model != nullptr) {
-					hull.Clear();
-					std::vector<vk::Vertex> & vertices = model->GetMesh()->GetVertices();
-					std::vector < btVector3> pointCloud;
-					for (int point = 0; point < vertices.size(); point++) {
-						vk::Vertex & vertex = vertices[point];
-						pointCloud.push_back(btVector3(vertex.pos.x, vertex.pos.y, vertex.pos.z));
-					}
-
-					if (computeFast) {
-						hull.ComputeQuickHull(pointCloud);
-					}
-					else {
-						hull.ComputeBulletHull(pointCloud);
-					}
-				}
-			}
-
-
-			if (model != nullptr)
-			{
-				ImGui::Text(model->GetMesh()->GetPath().c_str());
-				int countModel = (int)model->GetMesh()->GetVertices().size();
-				ImGui::DragInt("model vertices size", &countModel);
-			}
-
-			const std::vector<btVector3> & vertices = hull.GetVertices();
-			const std::vector<uint32_t> & indices = hull.GetIndices();
-			if (!vertices.empty()) {
-
-				int counthull = (int)vertices.size();
-				ImGui::DragInt("hull vertices size", &counthull);
-				int countidxhull = (int)indices.size();
-				ImGui::DragInt("hull indices size", &countidxhull);
-
-				for (unsigned polyIndex = 0; polyIndex < indices.size() / 3; polyIndex++) {
-					const int index0 = indices[3 * polyIndex + 0];
-					const int index1 = indices[3 * polyIndex + 1];
-					const int index2 = indices[3 * polyIndex + 2];
-					const btVector3 vec0 = vertices[index0];
-					const btVector3 vec1 = vertices[index1];
-					const btVector3 vec2 = vertices[index2];
-					Renderer::Get().DebugTriangle(
-						btVector3(vec0[0], vec0[1], vec0[2]),
-						btVector3(vec1[0], vec1[1], vec1[2]),
-						btVector3(vec2[0], vec2[1], vec2[2]),
-						Color::Red
-					);
-				}
-			}
 
 		} ImGui::End();
 
 		//***************************************************************************************END_MYLITTLESPACE
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 		m_mainMenuBar->Draw();
 		m_renderWindow->Draw();

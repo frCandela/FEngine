@@ -92,6 +92,7 @@ namespace fan {
 		void DrawWireframe() const;
 		void DrawNormals() const;
 		void DrawAABB() const;
+		void DrawHull() const;
 
 	};
 }
