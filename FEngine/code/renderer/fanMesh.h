@@ -31,6 +31,7 @@ namespace fan {
 
 		shape::ConvexHull * m_convexHull = nullptr;
 
+		void OptimizeVertices();
 		void GenerateConvexHull();
 	};
 }

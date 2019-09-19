@@ -27,10 +27,35 @@ namespace fan {
 				fan::Debug::Get() << "Failed to load mesh : " << m_path << Debug::Endl();
 			}
 			else {
+				OptimizeVertices();
 				GenerateConvexHull();
 			}
 		}
 	}
+	//================================================================================================================================
+	// Removes duplicates vertices & generates a corresponding index buffer
+	//================================================================================================================================
+	void Mesh::OptimizeVertices() {
+
+		std::unordered_map<vk::Vertex, uint32_t> verticesMap = {};
+
+		std::vector<vk::Vertex> uniqueVertices;
+		std::vector<uint32_t>	uniqueIndices;
+
+		for (int indexIndex = 0; indexIndex < m_indices.size(); indexIndex++) {
+			vk::Vertex vertex = m_vertices[m_indices[indexIndex]];
+			auto it = verticesMap.find(vertex);
+			if (it == verticesMap.end()) {
+				verticesMap[vertex] = static_cast<uint32_t>(uniqueVertices.size());
+				uniqueIndices.push_back(static_cast<uint32_t>(uniqueVertices.size()));
+				uniqueVertices.push_back(vertex);				
+			} else {
+				uniqueIndices.push_back(it->second);
+			}
+		}
+		m_vertices = uniqueVertices;
+		m_indices = uniqueIndices;
+	} 
 
 	//================================================================================================================================
 	//================================================================================================================================
@@ -48,7 +73,6 @@ namespace fan {
 		}
 
 		m_convexHull->ComputeQuickHull(pointCloud);
-
 	}
 
 }

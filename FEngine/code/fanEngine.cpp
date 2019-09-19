@@ -208,17 +208,10 @@ namespace fan {
 					hull = mesh->GetConvexHull();
 				}
 				if (hull != nullptr) {
-					
-
 					const std::vector<btVector3> & vertices = hull->GetVertices();
 					const std::vector<uint32_t> & indices = hull->GetIndices();
 					if (!vertices.empty()) {
 						const glm::mat4  modelMat = model->GetEntity()->GetComponent<scene::Transform>()->GetModelMatrix();
-
-						int counthull = (int)vertices.size();
-						ImGui::DragInt("hull vertices size", &counthull);
-						int countidxhull = (int)indices.size();
-						ImGui::DragInt("hull indices size", &countidxhull);
 
 						Color color(1, 0, 0, 1);
 						for (unsigned polyIndex = 0; polyIndex < indices.size() / 3; polyIndex++) {
@@ -246,23 +239,24 @@ namespace fan {
 	//================================================================================================================================
 	//================================================================================================================================
 	void Engine::DrawWireframe() const {
-		const std::vector < vk::DrawData> & modelList = Renderer::Get().GetDrawData();
-		for (int meshIndex = 0; meshIndex < modelList.size(); meshIndex++) {
-			const fan::Mesh* mesh = modelList[meshIndex].model->GetMesh();
-			const scene::Model * model = modelList[meshIndex].model;
+		if (m_selectedentity != nullptr) {
+			scene::Model * model = m_selectedentity->GetComponent<scene::Model>();
+			if (model != nullptr) {
+				Mesh * mesh = model->GetMesh();
+				if (mesh != nullptr) {
+					const glm::mat4  modelMat = model->GetEntity()->GetComponent<scene::Transform>()->GetModelMatrix();
+					const std::vector<uint32_t> & indices = mesh->GetIndices();
+					const std::vector<vk::Vertex> & vertices = mesh->GetVertices();
 
-			const glm::mat4  modelMat = model->GetEntity()->GetComponent<scene::Transform>()->GetModelMatrix();
-
-			const std::vector<uint32_t> & indices = mesh->GetIndices();
-			const std::vector<vk::Vertex> & vertices = mesh->GetVertices();
-
-			for (int index = 0; index < indices.size() / 3; index++) {
-				const btVector3 v0 = ToBullet(modelMat * glm::vec4(vertices[3 * index + 0].pos, 1.f));
-				const btVector3 v1 = ToBullet(modelMat * glm::vec4(vertices[3 * index + 1].pos, 1.f));
-				const btVector3 v2 = ToBullet(modelMat * glm::vec4(vertices[3 * index + 2].pos, 1.f));
-				Renderer::Get().DebugLine(v0, v1, Color::Yellow);
-				Renderer::Get().DebugLine(v1, v2, Color::Yellow);
-				Renderer::Get().DebugLine(v2, v0, Color::Yellow);
+					for (int index = 0; index < indices.size() / 3; index++) {
+						const btVector3 v0 = ToBullet(modelMat * glm::vec4(vertices[indices[3 * index + 0]].pos, 1.f));
+						const btVector3 v1 = ToBullet(modelMat * glm::vec4(vertices[indices[3 * index + 1]].pos, 1.f));
+						const btVector3 v2 = ToBullet(modelMat * glm::vec4(vertices[indices[3 * index + 2]].pos, 1.f));
+						Renderer::Get().DebugLine(v0, v1, Color::Yellow);
+						Renderer::Get().DebugLine(v1, v2, Color::Yellow);
+						Renderer::Get().DebugLine(v2, v0, Color::Yellow);
+					}
+				}
 			}
 		}
 	}
@@ -270,23 +264,28 @@ namespace fan {
 	//================================================================================================================================
 	//================================================================================================================================
 	void Engine::DrawNormals() const {
-		const std::vector < vk::DrawData> & modelList = Renderer::Get().GetDrawData();
-		for (int meshIndex = 0; meshIndex < modelList.size(); meshIndex++) {
-			const fan::Mesh* mesh = modelList[meshIndex].model->GetMesh();
-			const scene::Model * model = modelList[meshIndex].model;
 
-			const glm::mat4  modelMat = model->GetEntity()->GetComponent<scene::Transform>()->GetModelMatrix();
-			const glm::mat4  rotationMat = model->GetEntity()->GetComponent<scene::Transform>()->GetRotationMat();
+		if (m_selectedentity != nullptr) {
+			scene::Model * model = m_selectedentity->GetComponent<scene::Model>();
+			if (model != nullptr) {
+				Mesh * mesh = model->GetMesh();
+				if (mesh != nullptr) {
+					const glm::mat4  modelMat = model->GetEntity()->GetComponent<scene::Transform>()->GetModelMatrix();
+					const glm::mat4  rotationMat = model->GetEntity()->GetComponent<scene::Transform>()->GetRotationMat();
+					const std::vector<uint32_t> & indices = mesh->GetIndices();
+					const std::vector<vk::Vertex> & vertices = mesh->GetVertices();
 
-			const std::vector<uint32_t> & indices = mesh->GetIndices();
-			const std::vector<vk::Vertex> & vertices = mesh->GetVertices();
-
-			for (int index = 0; index < indices.size(); index++) {
-				const btVector3 vertex = ToBullet( modelMat * glm::vec4(vertices[index].pos, 1.f));
-				const btVector3 normal = ToBullet(rotationMat * glm::vec4(vertices[index].normal, 1.f));
-				Renderer::Get().DebugLine(vertex, vertex + 0.1f * normal, Color::Red);
+					for (int index = 0; index < indices.size(); index++) {
+						const vk::Vertex& vertex = vertices[indices[index]];
+						const btVector3 position = ToBullet(modelMat * glm::vec4(vertex.pos, 1.f));
+						const btVector3 normal = ToBullet(rotationMat * glm::vec4(vertex.normal, 1.f));
+						Renderer::Get().DebugLine(position, position + 0.1f * normal, Color::Green);
+					}
+				}
 			}
 		}
+
+
 	}
 
 	//================================================================================================================================
@@ -340,12 +339,9 @@ namespace fan {
 	void Engine::DrawUI() {
 
 		//***************************************************************************************MYLITTLESPACE
-
-
 		ImGui::Begin("test"); {
 
 		} ImGui::End();
-
 		//***************************************************************************************END_MYLITTLESPACE
 
 		m_mainMenuBar->Draw();
