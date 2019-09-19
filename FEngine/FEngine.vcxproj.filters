@@ -286,6 +286,9 @@
     <ClCompile Include="deps\quickhull\QuickHull.cpp">
       <Filter>code\deps\quickhull</Filter>
     </ClCompile>
+    <ClCompile Include="code\scene\components\fanPointLight.cpp">
+      <Filter>code\scene\components</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="code\editor\fanMainMenuBar.h">
@@ -980,6 +983,9 @@
     </ClInclude>
     <ClInclude Include="deps\quickhull\Types.hpp">
       <Filter>code\deps\quickhull</Filter>
+    </ClInclude>
+    <ClInclude Include="code\scene\components\fanPointLight.h">
+      <Filter>code\scene\components</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
