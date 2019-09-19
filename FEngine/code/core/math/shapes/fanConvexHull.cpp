@@ -88,9 +88,9 @@ namespace fan {
 			btVector3 intersection;
 			float closestDistance = std::numeric_limits<float>::max();
 			for (int triIndex = 0; triIndex < m_indices.size() / 3; triIndex++)	{
-				const btVector3 v0 = m_vertices[m_indices[3 * triIndex] + 0];
-				const btVector3 v1 = m_vertices[m_indices[3 * triIndex] + 1];
-				const btVector3 v2 = m_vertices[m_indices[3 * triIndex] + 2];
+				const btVector3 v0 = m_vertices[m_indices[3 * triIndex + 0]];
+				const btVector3 v1 = m_vertices[m_indices[3 * triIndex + 1]];
+				const btVector3 v2 = m_vertices[m_indices[3 * triIndex + 2]];
 				const Triangle triangle(v0, v1, v2);
 				
 				if (triangle.RayCast(_origin, _direction, intersection))

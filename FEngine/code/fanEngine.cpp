@@ -323,6 +323,12 @@ namespace fan {
 				const shape::AABB & aabb = entity->GetAABB();
 				btVector3 intersection;
 				if (aabb.RayCast(ray.origin, ray.direction, intersection) == true) {
+					scene::Model * model = entity->GetComponent<scene::Model>();
+					if (model != nullptr && model->GetMesh() != nullptr && model->GetMesh()->GetConvexHull() != nullptr) {
+						if (model->GetMesh()->GetConvexHull()->RayCast(ray.origin, ray.direction, intersection) == false) {
+							continue;
+						}
+					}
 					const float distance2 = intersection.distance2(cameraOrigin);
 					if (distance2 < closestDistance2) {
 						closestDistance2 = distance2;
