@@ -73,8 +73,8 @@ namespace fan
 				fan::Debug::Error("Could not bind memory to image");
 				return false;
 			}
-			fan::Debug::Get() << fan::Debug::Severity::log << std::hex << "VkImage\t\t\t" << m_image << std::dec << Debug::Endl();
-			fan::Debug::Get() << fan::Debug::Severity::log << "VkDeviceMemory\t\t" << m_imageMemory << std::dec << Debug::Endl();
+			fan::Debug::Get() << fan::Debug::Severity::log << std::hex << "VkImage               " << m_image << std::dec << Debug::Endl();
+			fan::Debug::Get() << fan::Debug::Severity::log << "VkDeviceMemory        " << m_imageMemory << std::dec << Debug::Endl();
 
 			return true;
 		}

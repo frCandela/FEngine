@@ -53,7 +53,7 @@ namespace fan
 				fan::Debug::Get() << fan::Debug::Severity::error << "Could not create shader module: " << _path << Debug::Endl();
 				return false;
 			}
-			fan::Debug::Get() << fan::Debug::Severity::log << std::hex << "VkShaderModule\t\t" << m_shaderModule << std::dec << Debug::Endl();
+			fan::Debug::Get() << fan::Debug::Severity::log << std::hex << "VkShaderModule        " << m_shaderModule << std::dec << Debug::Endl();
 
 			return true;
 		}

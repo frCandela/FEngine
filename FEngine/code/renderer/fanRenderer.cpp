@@ -1065,7 +1065,7 @@ namespace fan
 				fan::Debug::Error( "Could not allocate command pool." );
 				return false;
 			}
-			fan::Debug::Get() << fan::Debug::Severity::log << std::hex << "VkCommandPool\t\t" << m_commandPool << std::dec << Debug::Endl();
+			fan::Debug::Get() << fan::Debug::Severity::log << std::hex << "VkCommandPool         " << m_commandPool << std::dec << Debug::Endl();
 			return true;
 		}
 
@@ -1146,7 +1146,7 @@ namespace fan
 				fan::Debug::Error( "Could not create render pass" );
 				return false;
 			}
-			fan::Debug::Get() << fan::Debug::Severity::log << std::hex << "VkRenderPass\t\t" << m_renderPass << std::dec << Debug::Endl();
+			fan::Debug::Get() << fan::Debug::Severity::log << std::hex << "VkRenderPass          " << m_renderPass << std::dec << Debug::Endl();
 
 			return true;
 		}	
@@ -1212,7 +1212,7 @@ namespace fan
 				fan::Debug::Error( "Could not create render pass pp" );
 				return false;
 			}
-			fan::Debug::Get() << fan::Debug::Severity::log << std::hex << "VkRenderPass pp\t\t" << m_renderPassPostprocess << std::dec << Debug::Endl();
+			fan::Debug::Get() << fan::Debug::Severity::log << std::hex << "VkRenderPass pp       " << m_renderPassPostprocess << std::dec << Debug::Endl();
 
 			return true;
 		}
@@ -1278,7 +1278,7 @@ namespace fan
 				fan::Debug::Error( "Could not create render pass pp" );
 				return false;
 			}
-			fan::Debug::Get() << fan::Debug::Severity::log << std::hex << "VkRenderPass pp\t\t" << m_renderPassPostprocess << std::dec << Debug::Endl();
+			fan::Debug::Get() << fan::Debug::Severity::log << std::hex << "VkRenderPass pp       " << m_renderPassPostprocess << std::dec << Debug::Endl();
 
 			return true;
 		}

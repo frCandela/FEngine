@@ -111,7 +111,7 @@ namespace fan
 			if (vkCreateDevice(vkPhysicalDevice, &deviceCreateInfo, nullptr, &vkDevice) != VK_SUCCESS) {
 				return false;
 			}
-			fan::Debug::Get() << fan::Debug::Severity::log << std::hex << "vkDevice:        " << m_deviceProperties.deviceName << std::dec << Debug::Endl();
+			fan::Debug::Get() << fan::Debug::Severity::log << std::hex << "vkDevice:             " << m_deviceProperties.deviceName << std::dec << Debug::Endl();
 
 			vkGetDeviceQueue(vkDevice, m_graphicsQueueFamilyIndex, 0, &m_graphicsQueue);
 			vkGetDeviceQueue(vkDevice, m_computeQueueFamilyIndex, 0, &m_computeQueue);
