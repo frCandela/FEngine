@@ -9,18 +9,31 @@ namespace fan
 		//================================================================================================================================
 		class ConsoleWindow : public editor::Window {
 
+		private:
+			// Fast drawing version
+			struct LogItem {
+				LogItem( const Debug::LogItem& _logItem );
+				Debug::Severity	severity;
+				Debug::Type		logType;
+				std::string		logMessage;
+				ImVec4			color;
+			};
+
 		public:
 			ConsoleWindow();
 			void Draw() override;
 
 		private:
-			ImVec4	GetSeverityColor(const fan::Debug::Severity & _severity);
-			void	OnNewLog() { m_scrollDown = true; }
-
 			static const uint32_t s_inputBufferSize = 256;
 
-			char						m_inputBuffer[s_inputBufferSize];
-			bool						m_scrollDown;
+			std::vector<LogItem> m_logBuffer;
+			int		m_maxSizeLogBuffers;					// Number of logs kept in memory		
+			int		m_firstLogIndex;						// m_logBuffer is used as a circular array
+			char	m_inputBuffer[s_inputBufferSize];
+			bool	m_scrollDown;
+
+			static ImVec4	GetSeverityColor(const Debug::Severity & _severity);
+			void			OnNewLog( Debug::LogItem _item );
 		};
 	}
 }

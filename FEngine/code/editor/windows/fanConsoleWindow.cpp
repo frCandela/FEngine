@@ -10,10 +10,37 @@ namespace fan
 {
 	namespace editor {
 		//================================================================================================================================
+		// ConsoleWindow::LogItem nested constructor
 		//================================================================================================================================
-		ConsoleWindow::ConsoleWindow() {
+		ConsoleWindow::LogItem::LogItem( const Debug::LogItem& _logItem ) {
+			severity = _logItem.severity;
+			logType = _logItem.type;
+			logMessage = fan::Time::SecondsToString(_logItem.time).c_str() + std::string(" ") + _logItem.message;
+			color = GetSeverityColor(_logItem.severity);
+		}
+
+		//================================================================================================================================
+		//================================================================================================================================
+		ConsoleWindow::ConsoleWindow() :
+			m_maxSizeLogBuffers(64),
+			m_firstLogIndex(0){			
 			m_inputBuffer[0] = '\0';
+			m_logBuffer.reserve(m_maxSizeLogBuffers);
 			fan::Debug::Get().onNewLog.Connect(&ConsoleWindow::OnNewLog, this);
+		}
+
+		//================================================================================================================================
+		//================================================================================================================================
+		void ConsoleWindow::OnNewLog( Debug::LogItem _item ) { 
+			m_scrollDown = true; 
+
+			if( m_logBuffer.size() < m_maxSizeLogBuffers ) {
+				m_logBuffer.push_back(LogItem(_item));
+			}
+			else {
+				m_logBuffer[m_firstLogIndex] = LogItem(_item);
+			}
+			m_firstLogIndex = (m_firstLogIndex + 1 ) % m_maxSizeLogBuffers;
 		}
 
 		//================================================================================================================================
@@ -28,14 +55,9 @@ namespace fan
 					const float height = ImGui::GetWindowHeight();
 					if (height > 60) {
 						ImGui::BeginChild("scrolling", ImVec2(0, height - 60), true, ImGuiWindowFlags_AlwaysVerticalScrollbar);
-						const std::vector<  fan::Debug::LogItem >& logBuffer = fan::Debug::Get().GetLogBuffer();
-						for (int logIndex = 0; logIndex < logBuffer.size(); logIndex++) {
-							const fan::Debug::LogItem & item = logBuffer[logIndex];
-							const ImVec4 color = GetSeverityColor(item.severity);
-
-							ImGui::TextColored(color, fan::Time::SecondsToString(item.time).c_str());	// Time
-							ImGui::SameLine();
-							ImGui::TextColored(color, item.message.c_str());			// Log				
+						for (int logIndex = m_firstLogIndex; logIndex < m_firstLogIndex + m_logBuffer.size(); logIndex++) {
+							const LogItem & item = m_logBuffer[logIndex % m_maxSizeLogBuffers];
+							ImGui::TextColored(item.color, item.logMessage.c_str() );	// Time			
 						}
 						if (m_scrollDown) {
 							ImGui::SetScrollHere(1.0f);

@@ -11,12 +11,14 @@ namespace fan {
 
 		enum class Code		{ endl };
 		enum class Severity { log = 0, highlight = 1, warning = 2, error = 3 };
+		enum class Type { render, scene, game, other };
 		struct LogItem {
 			Severity	severity;
+			Type		type;
 			std::string message;
 			double time;
 		};
-		fan::Signal<> onNewLog;
+		fan::Signal<LogItem> onNewLog;
 
 		static Code Endl() { return Code::endl;  }
 		static void Log		( const std::string _message, const Severity & _severity );
@@ -30,6 +32,7 @@ namespace fan {
 
 	private:		
 		Severity				m_currentSeverity;
+		Type					m_currentType;
 		std::stringstream		m_stringstream;
 		std::vector< LogItem >	m_logBuffer;
 
@@ -40,6 +43,11 @@ namespace fan {
 		//================================================================================================================================
 		friend Debug& operator<<(Debug& _logger, Severity _severity){	// Set the severity of the current log
 			_logger.m_currentSeverity = _severity;
+			return _logger;
+		}
+
+		friend Debug& operator<<(Debug& _logger, Type _type){	// Set the type of the current log
+			_logger.m_currentType = _type;
 			return _logger;
 		}
 

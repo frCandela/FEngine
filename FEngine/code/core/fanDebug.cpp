@@ -8,6 +8,7 @@ namespace fan {
 	//================================================================================================================================
 	void Debug::Init() {
 		m_currentSeverity = Severity::log;
+		m_currentType = Type::other;
 	}
 
 	//================================================================================================================================
@@ -17,6 +18,7 @@ namespace fan {
 		LogItem item;
 		item.message = m_stringstream.str();
 		item.severity = m_currentSeverity;
+		item.type = m_currentType;
 		item.time = Time::ElapsedSinceStartup();
 		m_logBuffer.push_back( item );
 		
@@ -43,7 +45,8 @@ namespace fan {
 		std::cout << " " << m_stringstream.str().c_str() << std::endl;
 		m_stringstream.str(""); // clear
 		m_currentSeverity = Severity::log;
-		onNewLog.Emmit();
+		m_currentType = Type::other;
+		onNewLog.Emmit(item);
 	}
 
 	//================================================================================================================================
