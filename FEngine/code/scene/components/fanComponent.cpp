@@ -35,7 +35,7 @@ namespace fan
 		
 		//================================================================================================================================
 		//================================================================================================================================
-		void Component::SetModified( const bool _updateAABB ) { 
+		void Component::MarkModified( const bool _updateAABB ) { 
 			m_lastModified = Input::GetFrameCount(); 
 			if (_updateAABB) {
 				m_entity->GetScene()->ComputeAABBEndFrame(m_entity);

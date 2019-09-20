@@ -33,7 +33,7 @@ namespace fan
 				// 			rb->SetPosition(newPosition);
 				// 		}
 
-				SetModified(true);
+				MarkModified(true);
 			}
 		}
 
@@ -43,7 +43,7 @@ namespace fan
 		{
 			if (m_scale != _newScale) {
 				m_scale = _newScale;
-				SetModified( true ); 
+				MarkModified( true ); 
 			}
 		}
 
@@ -69,7 +69,7 @@ namespace fan
 		void Transform::SetRotationQuat(const btQuaternion _rotation) {
 			if (m_rotation != _rotation) {
 				m_rotation = _rotation;
-				SetModified(true);
+				MarkModified(true);
 			}
 		}
 

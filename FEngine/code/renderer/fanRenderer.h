@@ -15,6 +15,7 @@ namespace fan
 		class Model;
 		class Transform;
 		class Material;
+		class PointLight;
 	}
 
 	namespace vk {
@@ -42,6 +43,12 @@ namespace fan
 			scene::Transform *	transform = nullptr;
 			scene::Material *	material = nullptr;
 		};
+		struct PointLightData {
+			const scene::PointLight *	pointLight = nullptr;
+			const scene::Transform *	transform = nullptr;
+			int							indexUniform = -1;
+		};
+
 	}
 	   	 
 	//================================================================================================================================
@@ -76,10 +83,12 @@ namespace fan
 
 		const std::vector < vk::DrawData > & GetDrawData() const { return m_drawData; }
 
-		void RegisterMaterial(	scene::Material * _model);
-		void UnRegisterMaterial(scene::Material * _model);		
-		void RegisterModel(		scene::Model * _model	);
-		void UnRegisterModel(	scene::Model * _model	);
+		void RegisterMaterial		( scene::Material *		_material);
+		void UnRegisterMaterial		( scene::Material *		_material);		
+		void RegisterModel			( scene::Model *		_model	);
+		void UnRegisterModel		( scene::Model *		_model	);
+		void RegisterPointLight		( scene::PointLight *	_pointLight	);
+		void UnRegisterPointLight	( scene::PointLight *	_pointLight	);
 		void Clear();
 
 		void					DebugPoint(const btVector3 _pos, const Color _color);
@@ -95,6 +104,7 @@ namespace fan
 		scene::Camera *		m_mainCamera;
 		scene::Transform *	m_mainCameraTransform;
 
+		std::vector < vk::PointLightData > m_pointLights;
 		std::vector < vk::DrawData > m_drawData;
 		vk::RessourceManager *  m_ressourceManager;
 		bool m_mustUpdateDynamicUniformsFrag = false;

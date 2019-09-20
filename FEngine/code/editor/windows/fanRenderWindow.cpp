@@ -49,32 +49,6 @@ namespace fan
 							Renderer::Get().GetForwardPipeline()->SetFragUniforms(uniforms);
 						}
 					}
-					if (ImGui::CollapsingHeader("Lights")) {
-						vk::ForwardPipeline::LightsUniforms lights = Renderer::Get().GetForwardPipeline()->GetPointLightUniforms();
-						bool uniformsModified = false;
-						
-						if (ImGui::SliderInt("index light", &lights.lightIndex, 0, 16)) {
-							uniformsModified = true;
-						}
-						ImGui::Separator();
-						for (int lightIndex = 0; lightIndex < 16 ; lightIndex++)
-						{
-							ImGui::PushID(&lights.lights[lightIndex]);
-							if (ImGui::SliderFloat3("lightColor", & lights.lights[lightIndex].color.x, 0.f, 1.f)) {
-								uniformsModified = true;
-							}
-							if (ImGui::DragFloat3("lightPos", & lights.lights[lightIndex].position.x)) {
-								uniformsModified = true;
-							}
-							ImGui::PopID();
-							ImGui::Separator();
-						}
-
-
-						if (uniformsModified == true) {
-							Renderer::Get().GetForwardPipeline()->SetPointLightUniforms(lights);
-						}
-					}
 
 					if (ImGui::CollapsingHeader("Global")) {
 						float tmpFps = fan::Time::GetFPS();

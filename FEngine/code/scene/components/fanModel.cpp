@@ -61,7 +61,7 @@ namespace fan
 		void Model::SetMesh(fan::Mesh * _mesh) {
 			m_mesh = _mesh;
 			onRegisterModel.Emmit(this);
-			SetModified(true);
+			MarkModified(true);
 		}
 
 		//================================================================================================================================

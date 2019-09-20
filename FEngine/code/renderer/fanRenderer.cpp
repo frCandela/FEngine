@@ -6,6 +6,7 @@
 #include "scene/components/fanModel.h"
 #include "scene/components/fanTransform.h"
 #include "scene/components/fanMaterial.h"
+#include "scene/components/fanPointLight.h"
 #include "core/fanTime.h"
 #include "core/input/fanInput.h"
 #include "core/math/fanBasicModels.h"
@@ -213,18 +214,26 @@ namespace fan
 							}
 						}
 
+						if (ImGui::CollapsingHeader("Point lights : ")) {
+							for (int lightIndex = 0; lightIndex < m_pointLights.size(); lightIndex++) {
+								const vk::PointLightData & lightData = m_pointLights[lightIndex];		
+								ImGui::Text(lightData.pointLight->GetEntity()->GetName().c_str());	
+							}
+						}
 					}
 				}
 				if (m_ressourceManager->IsModified()) {
 					ReloadShaders();
 					m_ressourceManager->SetUnmodified();
 				}
-				UpdateUniformBuffer();
+
 				ImGui::End();
 				ImGui::EndFrame();
 				ImGui::Render();
 
 				const uint32_t currentFrame = m_swapchain->GetCurrentFrame();
+				UpdateUniformBuffer();
+				m_forwardPipeline->UpdateUniformBuffers();
 				if (m_reloadGeometryCommandBuffers[currentFrame] == true) {
 					RecordCommandBufferGeometry(currentFrame);
 				}
@@ -307,12 +316,12 @@ namespace fan
 			// Force reload of transform uniforms
 			for (int drawDataIndex = 0; drawDataIndex < m_drawData.size(); drawDataIndex++) {
 				if (m_drawData[drawDataIndex].transform != nullptr ) {
-				m_drawData[drawDataIndex].transform->SetModified();
+				m_drawData[drawDataIndex].transform->MarkModified();
 			}
 
 				scene::Material * material = m_drawData[drawDataIndex].material;
 				if (material != nullptr) {
-					material->SetModified();
+					material->MarkModified();
 				}
 			}
 		}
@@ -321,6 +330,17 @@ namespace fan
 		//================================================================================================================================
 		void Renderer::UpdateUniformBuffer()
 		{
+			// Lights
+			vk::ForwardPipeline::LightsUniforms uniforms = m_forwardPipeline->GetPointLightUniforms();
+			for (int lightIndex = 0; lightIndex < m_pointLights.size() ; lightIndex++){
+				const vk::PointLightData & data = m_pointLights[lightIndex];
+				uniforms.lights[data.indexUniform].color = data.pointLight->GetColor().ToGLM();
+				uniforms.lights[data.indexUniform].position = ToGLM(data.transform->GetPosition());			
+			}
+			uniforms.lightNum = static_cast<uint32_t>( m_pointLights.size() );
+			m_forwardPipeline->SetPointLightUniforms(uniforms);
+			
+
 			// Main camera transform
 			assert(m_mainCamera != nullptr);
 			if ( m_mainCamera->IsModified() || m_mainCameraTransform->IsModified()) {
@@ -373,12 +393,6 @@ namespace fan
 						}
 					}
 				}
-			}
-			if (mustUpdateDynamicUniformsVert == true ) {
-				m_forwardPipeline->UpdateDynamicUniformVert();
-			}
-			if (m_mustUpdateDynamicUniformsFrag == true) {
-				 m_forwardPipeline->UpdateDynamicUniformFrag();
 			}
 
 			m_mustUpdateDynamicUniformsFrag = false;
@@ -911,7 +925,7 @@ namespace fan
 			drawData->material =  _model->GetEntity()->GetComponent<scene::Material>();
 			drawData->meshData = m_ressourceManager->FindMeshData(_model->GetMesh());	
 
-			drawData->transform->SetModified(); // Force tranform uniforms update
+			drawData->transform->MarkModified(); // Force tranform uniforms update
 
 			for (int boolIndex = 0; boolIndex < m_reloadGeometryCommandBuffers.size(); boolIndex++) {
 				m_reloadGeometryCommandBuffers[boolIndex] = true;
@@ -926,6 +940,56 @@ namespace fan
 					m_drawData[modelIndex] = {};
 				}
 			}
+		}
+
+		//================================================================================================================================
+		//================================================================================================================================
+		void Renderer::RegisterPointLight	( scene::PointLight * _pointLight	) {
+			
+			// Looks for the _pointLight
+			for (int lightIndex = 0; lightIndex < m_pointLights.size() ; lightIndex++){
+				if (m_pointLights[lightIndex].pointLight == _pointLight ) {
+					Debug::Get() << Debug::Severity::warning << "Renderer::RegisterPointLight: Light already registered in entity : " << _pointLight->GetEntity()->GetName() << Debug::Endl();
+					return;
+				}
+			}
+
+			// Adds light data
+			vk::PointLightData pointLightData;
+			pointLightData.indexUniform = static_cast<int>(m_pointLights.size());
+			pointLightData.pointLight = _pointLight;
+			pointLightData.transform = _pointLight->GetEntity()->GetComponent<scene::Transform>();
+			m_pointLights.push_back(pointLightData);
+
+			// Check num lights
+			if( pointLightData.indexUniform >= vk::ForwardPipeline::s_maximumNumLights ) {
+				Debug::Get() << Debug::Severity::warning << "Too much lights in the scene, maximum is " << vk::ForwardPipeline::s_maximumNumLights << Debug::Endl();
+			}
+		}
+
+		//================================================================================================================================
+		//================================================================================================================================
+		void Renderer::UnRegisterPointLight	( scene::PointLight *	_pointLight	) {
+
+			const size_t num = m_pointLights.size();
+
+			// Removes the light
+			for (int lightIndex = 0; lightIndex < m_pointLights.size() ; lightIndex++){
+				if (m_pointLights[lightIndex].pointLight == _pointLight ) {
+					m_pointLights.erase( m_pointLights.begin() + lightIndex );
+				}
+			}
+
+			// Light not removed
+			if( m_pointLights.size() == num ) {
+				Debug::Get() << Debug::Severity::warning << "Trying to remove a non registered light entity=" << _pointLight->GetEntity()->GetName() << Debug::Endl();
+				return;
+			}
+
+			// Re-indexing
+			for (int lightIndex = 0; lightIndex < m_pointLights.size() ; lightIndex++){
+				m_pointLights[lightIndex].indexUniform = lightIndex;
+			}			
 		}
 
 		//================================================================================================================================

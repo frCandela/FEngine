@@ -33,6 +33,7 @@
 #include "scene/components/fanModel.h"
 #include "scene/components/fanActor.h"
 #include "scene/components/fanMaterial.h"
+#include "scene/components/fanPointLight.h"
 
 #include "core/math/shapes/fanConvexHull.h"
 
@@ -73,11 +74,13 @@ namespace fan {
 		m_scene->onSceneLoad.Connect(&Engine::OnSceneLoad, this);
 		m_scene->New();
 
-		scene::Scene::onSceneClear.Connect			( &Renderer::Clear,					&Renderer::Get());
-		scene::Material::onMaterialAttach.Connect	( &Renderer::RegisterMaterial,		&Renderer::Get() );
-		scene::Material::onMaterialDetach.Connect	( &Renderer::UnRegisterMaterial,	&Renderer::Get());		
-		scene::Model::onRegisterModel.Connect		( &Renderer::RegisterModel,			&Renderer::Get());
-		scene::Model::onUnRegisterModel.Connect		( &Renderer::UnRegisterModel,		&Renderer::Get());
+		scene::Scene::onSceneClear.Connect				( &Renderer::Clear,					&Renderer::Get());
+		scene::Material::onMaterialAttach.Connect		( &Renderer::RegisterMaterial,		&Renderer::Get() );
+		scene::Material::onMaterialDetach.Connect		( &Renderer::UnRegisterMaterial,	&Renderer::Get());		
+		scene::Model::onRegisterModel.Connect			( &Renderer::RegisterModel,			&Renderer::Get());
+		scene::Model::onUnRegisterModel.Connect			( &Renderer::UnRegisterModel,		&Renderer::Get());
+		scene::PointLight::onPointLightAttach.Connect	( &Renderer::RegisterPointLight,	&Renderer::Get());	
+		scene::PointLight::onPointLightDetach.Connect	( &Renderer::UnRegisterPointLight,	&Renderer::Get());	
 
 		m_mainMenuBar->Initialize();
 

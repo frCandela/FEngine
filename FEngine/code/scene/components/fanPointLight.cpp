@@ -1,5 +1,6 @@
 #include "fanGlobalIncludes.h"
 #include "scene/components/fanPointLight.h"
+#include "editor/fanModals.h"
 
 namespace fan
 {
@@ -9,6 +10,13 @@ namespace fan
 
 		fan::Signal< PointLight * > PointLight::onPointLightAttach;
 		fan::Signal< PointLight * > PointLight::onPointLightDetach;
+		
+		//================================================================================================================================
+		//================================================================================================================================
+		void PointLight::SetColor( const Color _color ) {
+			m_color = _color;
+			MarkModified();
+		}
 
 		//================================================================================================================================
 		//================================================================================================================================
@@ -28,21 +36,27 @@ namespace fan
 		//================================================================================================================================
 		void PointLight::OnGui() {
 			Component::OnGui();
+			// Filter color
+			if (ImGui::ColorEdit3("Color##1", m_color.Data(), gui::colorEditFlags)) {
+				MarkModified();
+			}
 		}
 
 		//================================================================================================================================
 		//================================================================================================================================
-		bool PointLight::Load(std::istream& /*_in*/) {
-// 			if (!ReadSegmentHeader(_in, "material:")) { return false; }
-// 			if (!ReadString(_in, path)) { return false; }
+		bool PointLight::Load(std::istream& _in) {
+ 			if (!ReadSegmentHeader(_in, "color:")) { return false; }
+			if (!ReadFloat(_in, m_color[0])) { return false; }
+			if (!ReadFloat(_in, m_color[1])) { return false; }
+			if (!ReadFloat(_in, m_color[2])) { return false; }
 			return true;
 		}
 
 		//================================================================================================================================
 		//================================================================================================================================
-		bool PointLight::Save(std::ostream& /*_out*/, const int /*_indentLevel*/) const {
-// 			const std::string indentation = GetIndentation(_indentLevel);
-// 			_out << indentation << "material: " << (m_texture != nullptr ? m_texture->GetPath() : "void") << std::endl;
+		bool PointLight::Save(std::ostream& _out, const int _indentLevel) const {
+ 			const std::string indentation = GetIndentation(_indentLevel);
+			_out << indentation << "color: " << m_color[0] << " " << m_color[1] << " " << m_color[2] << std::endl;
 			return true;
 		}
 	}

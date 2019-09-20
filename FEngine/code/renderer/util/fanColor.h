@@ -9,6 +9,7 @@ namespace fan
 		Color();
 		Color(const float _r, const float _g, const float _b, const float _a);
 
+		float * Data() { return &m_colorData.x; }
 		glm::vec4 ToGLM() const { return m_colorData; }
 		float& operator[]	(const int _index) { return m_colorData[_index]; }
 		float operator[]	(const int _index) const { return m_colorData[_index]; }

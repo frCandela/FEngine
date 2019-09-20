@@ -22,7 +22,7 @@ namespace fan
 			inline Entity* GetEntity() const			{ return m_entity; }
 			bool IsBeingDeleted() const					{ return m_isBeingDeleted; }
 			bool IsModified() const;
-			void SetModified( const bool _updateAABB = false );
+			void MarkModified( const bool _updateAABB = false );
 			bool IsRemovable() const					{ return m_isRemovable; }
 			void SetRemovable(const bool _isRemovable)	{ m_isRemovable = _isRemovable; }
 

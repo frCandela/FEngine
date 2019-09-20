@@ -98,7 +98,7 @@ namespace fan
 		//================================================================================================================================
 		void Material::SetTexture(vk::Texture * _texture) {
 			m_texture = _texture;
-			SetModified();			
+			MarkModified();			
 		}
 	}
 }

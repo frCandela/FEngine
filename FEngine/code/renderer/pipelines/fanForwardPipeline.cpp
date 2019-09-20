@@ -94,6 +94,16 @@ namespace fan
 
 		//================================================================================================================================
 		//================================================================================================================================
+		void ForwardPipeline::UpdateUniformBuffers() {
+			m_dynamicUniformBufferVert->SetData(&m_dynamicUniformsVert[0], m_dynamicUniformsVert.GetSize());
+			m_dynamicUniformBufferFrag->SetData(&m_dynamicUniformsFrag[0], m_dynamicUniformsFrag.GetSize());
+			m_vertUniformBuffer->SetData(&m_vertUniforms, sizeof(VertUniforms));
+			m_fragUniformBuffer->SetData(&m_fragUniforms, sizeof(FragUniforms));
+			m_pointLightUniformBuffer->SetData(&m_pointLightUniform, sizeof(LightsUniforms));
+		}
+
+		//================================================================================================================================
+		//================================================================================================================================
 		VkImageView	ForwardPipeline::GetDepthImageView() {
 			return m_depthImageView->GetImageView();
 		}
@@ -102,44 +112,22 @@ namespace fan
 		//================================================================================================================================
 		void ForwardPipeline::SetVertUniforms(const VertUniforms _vertUniforms) {
 			m_vertUniforms = _vertUniforms;
-			m_vertUniformBuffer->SetData(&m_vertUniforms, sizeof(VertUniforms));
 		}
 
 		//================================================================================================================================
 		//================================================================================================================================
 		void ForwardPipeline::SetFragUniforms(const FragUniforms _fragUniforms) {
 			m_fragUniforms = _fragUniforms;
-			m_fragUniformBuffer->SetData(&m_fragUniforms, sizeof(FragUniforms));
 		}
 
 		//================================================================================================================================
 		//================================================================================================================================
 		void ForwardPipeline::SetPointLightUniforms(const LightsUniforms & _light) {
 			m_pointLightUniform = _light;
-			m_pointLightUniformBuffer->SetData(&m_pointLightUniform, sizeof(LightsUniforms));
 		}
-		
 
-		// 	//================================================================================================================================
-		// 	//================================================================================================================================
-		// 	void ForwardPipeline::SetDynamicUniformsVert( const std::vector<DynamicUniformsVert> & _dynamicUniforms ) {
-		// 		for (int dynamicUniformIndex = 0; dynamicUniformIndex < _dynamicUniforms.size(); dynamicUniformIndex++) {
-		// 			m_dynamicUniformVert[dynamicUniformIndex] = _dynamicUniforms[dynamicUniformIndex];
-		// 		}
-		// 		m_dynamicUniformBufferVert->SetData(&m_dynamicUniformVert[0], m_dynamicUniformVert.GetSize());
-		// 	}
-		// 
-		// 	//================================================================================================================================
-		// 	//================================================================================================================================
-		// 	void ForwardPipeline::SetDynamicUniformsFrag(const std::vector<DynamicUniformsFrag> & _dynamicUniforms) {
-		// 		for (int dynamicUniformIndex = 0; dynamicUniformIndex < _dynamicUniforms.size(); dynamicUniformIndex++) {
-		// 			m_dynamicUniformsFrag[dynamicUniformIndex] = _dynamicUniforms[dynamicUniformIndex];
-		// 		}
-		// 		m_dynamicUniformBufferFrag->SetData(&m_dynamicUniformsFrag[0], m_dynamicUniformsFrag.GetSize());
-		// 	}
-
-			//================================================================================================================================
-			//================================================================================================================================
+		//================================================================================================================================
+		//================================================================================================================================
 		void ForwardPipeline::SetDynamicUniformVert(const DynamicUniformsVert& _dynamicUniform, const uint32_t _index) {
 			assert(_index < s_maximumNumModels);
 			m_dynamicUniformsVert[_index] = _dynamicUniform;
@@ -150,18 +138,6 @@ namespace fan
 		void ForwardPipeline::SetDynamicUniformFrag(const DynamicUniformsFrag& _dynamicUniform, const uint32_t _index) {
 			assert(_index < s_maximumNumModels);
 			m_dynamicUniformsFrag[_index] = _dynamicUniform;
-		}
-
-		//================================================================================================================================
-		//================================================================================================================================
-		void ForwardPipeline::UpdateDynamicUniformVert() {
-			m_dynamicUniformBufferVert->SetData(&m_dynamicUniformsVert[0], m_dynamicUniformsVert.GetSize());
-		}
-
-		//================================================================================================================================
-		//================================================================================================================================
-		void ForwardPipeline::UpdateDynamicUniformFrag() {
-			m_dynamicUniformBufferFrag->SetData(&m_dynamicUniformsFrag[0], m_dynamicUniformsFrag.GetSize());
 		}
 
 		//================================================================================================================================
@@ -224,6 +200,7 @@ namespace fan
 			return 		CreateDescriptorsScene()
 				&& CreateDescriptorsTextures();
 		}
+		
 		//================================================================================================================================
 		//================================================================================================================================
 		bool ForwardPipeline::CreateDescriptorsTextures() {

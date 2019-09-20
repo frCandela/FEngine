@@ -27,6 +27,9 @@ namespace fan
 		//================================================================================================================================
 		class ForwardPipeline {
 		public:
+			static const uint32_t s_maximumNumModels = 128;
+			static const uint32_t s_maximumNumLights = 16;
+
 			struct VertUniforms
 			{
 				glm::mat4 view;
@@ -35,14 +38,14 @@ namespace fan
 
 			struct PointLight {
 				glm::vec3	position;
-				glm::float32 padding;
+				glm::float32 padding; //TODO use alignas(X) instead
 				glm::vec3	color;
 				glm::float32 padding2;
 			};
 
 			struct LightsUniforms {
-				PointLight lights[16];
-				int lightIndex;
+				PointLight lights[ForwardPipeline::s_maximumNumLights];
+				uint32_t lightNum;
 			};
 
 			struct FragUniforms
@@ -78,17 +81,13 @@ namespace fan
 			LightsUniforms	GetPointLightUniforms() const { return m_pointLightUniform; }
 			void			SetPointLightUniforms( const LightsUniforms& _lights);
 
-			// 		void			SetDynamicUniformsVert(	const std::vector<DynamicUniformsVert> & _dynamicUniforms );
-			// 		void			SetDynamicUniformsFrag(	const std::vector<DynamicUniformsFrag> & _dynamicUniforms );
 			void	SetDynamicUniformVert(const DynamicUniformsVert& _dynamicUniform, const uint32_t _index);
 			void	SetDynamicUniformFrag(const DynamicUniformsFrag& _dynamicUniform, const uint32_t _index);
-			void	UpdateDynamicUniformVert();
-			void	UpdateDynamicUniformFrag();
+
+			void UpdateUniformBuffers();
 
 			VkPipeline		GetPipeline() { return m_pipeline; }
 			VkImageView		GetDepthImageView();
-
-			static const uint32_t s_maximumNumModels = 128;
 
 		private:
 			Device&					m_device;
@@ -112,17 +111,16 @@ namespace fan
 			Shader *	m_fragmentShader = nullptr;
 			Shader *	m_vertexShader = nullptr;
 
-
 			Buffer *	m_vertUniformBuffer;
 			Buffer *	m_fragUniformBuffer;
 			Buffer *	m_pointLightUniformBuffer;
+			Buffer *	m_dynamicUniformBufferVert;
+			Buffer *	m_dynamicUniformBufferFrag;
 
 			VertUniforms m_vertUniforms;
 			FragUniforms m_fragUniforms;
 			LightsUniforms m_pointLightUniform;
 
-			Buffer *	m_dynamicUniformBufferVert;
-			Buffer *	m_dynamicUniformBufferFrag;
 
 			AlignedMemory<DynamicUniformsVert> m_dynamicUniformsVert;
 			AlignedMemory<DynamicUniformsFrag> m_dynamicUniformsFrag;

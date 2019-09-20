@@ -80,19 +80,19 @@ namespace fan
 		//================================================================================================================================
 		void Camera::SetFov(float _fov) {
 			m_fov = _fov;
-			SetModified();
+			MarkModified();
 		};
 		void Camera::SetNearDistance(float _nearDistance) {
 			m_nearDistance = _nearDistance;
-			SetModified();
+			MarkModified();
 		};
 		void Camera::SetFarDistance(float _farDistance) {
 			m_farDistance = _farDistance;
-			SetModified();
+			MarkModified();
 		};
 		void Camera::SetAspectRatio(float _aspectRatio) {
 			m_aspectRatio = _aspectRatio;
-			SetModified();
+			MarkModified();
 		};
 
 		//================================================================================================================================
