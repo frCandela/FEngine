@@ -33,13 +33,23 @@ namespace fan
 				glm::mat4 proj;
 			};
 
+			struct PointLight {
+				glm::vec3	position;
+				glm::float32 padding;
+				glm::vec3	color;
+				glm::float32 padding2;
+			};
+
+			struct LightsUniforms {
+				PointLight lights[16];
+				int lightIndex;
+			};
+
 			struct FragUniforms
 			{
 				glm::vec3	cameraPosition;
-				float		ambiantIntensity;
-				glm::vec3	lightColor;
 				glm::int32	specularHardness;
-				glm::vec3	lightPos;
+				float		ambiantIntensity;
 			};
 
 			struct DynamicUniformsFrag {
@@ -64,6 +74,9 @@ namespace fan
 			void			SetVertUniforms(const VertUniforms _uniforms);
 			FragUniforms	GetFragUniforms() const { return m_fragUniforms; }
 			void			SetFragUniforms(const FragUniforms _fragUniforms);
+
+			LightsUniforms	GetPointLightUniforms() const { return m_pointLightUniform; }
+			void			SetPointLightUniforms( const LightsUniforms& _lights);
 
 			// 		void			SetDynamicUniformsVert(	const std::vector<DynamicUniformsVert> & _dynamicUniforms );
 			// 		void			SetDynamicUniformsFrag(	const std::vector<DynamicUniformsFrag> & _dynamicUniforms );
@@ -102,9 +115,11 @@ namespace fan
 
 			Buffer *	m_vertUniformBuffer;
 			Buffer *	m_fragUniformBuffer;
+			Buffer *	m_pointLightUniformBuffer;
 
 			VertUniforms m_vertUniforms;
 			FragUniforms m_fragUniforms;
+			LightsUniforms m_pointLightUniform;
 
 			Buffer *	m_dynamicUniformBufferVert;
 			Buffer *	m_dynamicUniformBufferFrag;

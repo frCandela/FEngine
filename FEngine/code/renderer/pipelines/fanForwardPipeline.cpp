@@ -42,9 +42,7 @@ namespace fan
 			}
 
 			m_fragUniforms.ambiantIntensity = 0.2f;
-			m_fragUniforms.lightColor = glm::vec3(1, 1, 1);
 			m_fragUniforms.specularHardness = 32;
-			m_fragUniforms.lightPos = glm::vec3(0, 2, 0);
 		}
 
 		//================================================================================================================================
@@ -66,6 +64,8 @@ namespace fan
 			CreateDepthRessources(_extent);
 			CreateDescriptors();
 			CreatePipeline(_extent);
+		
+			SetPointLightUniforms(m_pointLightUniform);
 		}
 
 		//================================================================================================================================
@@ -81,6 +81,7 @@ namespace fan
 
 			SetVertUniforms(m_vertUniforms);
 			SetFragUniforms(m_fragUniforms);
+			SetPointLightUniforms(m_pointLightUniform);
 			//SetDynamicUniformsVert({ {glm::mat4(1.0)},{glm::mat4(1.0)} });
 		}
 
@@ -110,6 +111,14 @@ namespace fan
 			m_fragUniforms = _fragUniforms;
 			m_fragUniformBuffer->SetData(&m_fragUniforms, sizeof(FragUniforms));
 		}
+
+		//================================================================================================================================
+		//================================================================================================================================
+		void ForwardPipeline::SetPointLightUniforms(const LightsUniforms & _light) {
+			m_pointLightUniform = _light;
+			m_pointLightUniformBuffer->SetData(&m_pointLightUniform, sizeof(LightsUniforms));
+		}
+		
 
 		// 	//================================================================================================================================
 		// 	//================================================================================================================================
@@ -359,11 +368,19 @@ namespace fan
 			dynamicLayoutBindingFrag.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT;
 			dynamicLayoutBindingFrag.pImmutableSamplers = nullptr;
 
+			VkDescriptorSetLayoutBinding lightLayoutBinding;
+			lightLayoutBinding.binding = 4;
+			lightLayoutBinding.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+			lightLayoutBinding.descriptorCount = 1;
+			lightLayoutBinding.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT;
+			lightLayoutBinding.pImmutableSamplers = nullptr;
+
 			std::vector< VkDescriptorSetLayoutBinding > layoutBindings = {
 				  uboLayoutBinding
 				, dynamicLayoutBinding
 				, fragLayoutBinding
 				, dynamicLayoutBindingFrag
+				, lightLayoutBinding
 			};
 
 			VkDescriptorSetLayoutCreateInfo descriptorSetLayoutCreateInfo = {};
@@ -380,7 +397,7 @@ namespace fan
 			fan::Debug::Get() << fan::Debug::Severity::log << std::hex << "VkDescriptorSetLayout\t" << m_descriptorSetLayoutScene << std::dec << Debug::Endl();
 
 			// Pool
-			std::vector< VkDescriptorPoolSize > poolSizes(4);
+			std::vector< VkDescriptorPoolSize > poolSizes(5);
 			poolSizes[0].type = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
 			poolSizes[0].descriptorCount = 1;
 			poolSizes[1].type = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC;
@@ -389,6 +406,8 @@ namespace fan
 			poolSizes[2].descriptorCount = 1;
 			poolSizes[3].type = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC;
 			poolSizes[3].descriptorCount = 1;
+			poolSizes[4].type = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+			poolSizes[4].descriptorCount = 1;
 
 			VkDescriptorPoolCreateInfo descriptorPoolCreateInfo = {};
 			descriptorPoolCreateInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
@@ -423,7 +442,7 @@ namespace fan
 				return false;
 			}
 			m_descriptorSetScene = descriptorSets[0];
-			fan::Debug::Get() << fan::Debug::Severity::log << std::hex << "VkDescriptorSet\t\t" << m_descriptorSetScene << std::dec << Debug::Endl();
+			fan::Debug::Get() << fan::Debug::Severity::log << std::hex << "VkDescriptorSet        " << m_descriptorSetScene << std::dec << Debug::Endl();
 
 
 			//================================================================
@@ -540,6 +559,33 @@ namespace fan
 				//uboWriteDescriptorSet.pTexelBufferView = nullptr;
 			}
 
+			// Light
+			VkWriteDescriptorSet lightWriteDescriptorSet = {};
+			VkDescriptorBufferInfo lightDescriptorBufferInfo = {};
+			{
+				m_pointLightUniformBuffer = new Buffer(m_device);
+				m_pointLightUniformBuffer->Create(
+					sizeof(LightsUniforms),
+					VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT,
+					VK_MEMORY_PROPERTY_HOST_COHERENT_BIT | VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT
+				);
+
+				lightDescriptorBufferInfo.buffer = m_pointLightUniformBuffer->GetBuffer();
+				lightDescriptorBufferInfo.offset = 0;
+				lightDescriptorBufferInfo.range = sizeof(LightsUniforms);
+
+				lightWriteDescriptorSet.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+				lightWriteDescriptorSet.pNext = nullptr;
+				lightWriteDescriptorSet.dstSet = m_descriptorSetScene;
+				lightWriteDescriptorSet.dstBinding = 4;
+				lightWriteDescriptorSet.dstArrayElement = 0;
+				lightWriteDescriptorSet.descriptorCount = 1;
+				lightWriteDescriptorSet.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+				lightWriteDescriptorSet.pImageInfo = nullptr;
+				lightWriteDescriptorSet.pBufferInfo = &lightDescriptorBufferInfo;
+				//uboWriteDescriptorSet.pTexelBufferView = nullptr;
+			}
+
 			//================================================================
 			// Update DescriptorSets
 			std::vector<VkWriteDescriptorSet> writeDescriptors = {
@@ -547,6 +593,7 @@ namespace fan
 				, dynamicWriteDescriptorSet
 				, fragWriteDescriptorSet
 				, dynamicFragWriteDescriptorSet
+				, lightWriteDescriptorSet
 			};
 
 			vkUpdateDescriptorSets(

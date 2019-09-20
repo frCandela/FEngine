@@ -95,7 +95,6 @@ namespace fan
 		scene::Camera *		m_mainCamera;
 		scene::Transform *	m_mainCameraTransform;
 
-
 		std::vector < vk::DrawData > m_drawData;
 		vk::RessourceManager *  m_ressourceManager;
 		bool m_mustUpdateDynamicUniformsFrag = false;
