@@ -1,11 +1,11 @@
 #include "fanGlobalIncludes.h"
 
 #include "editor/windows/fanRenderWindow.h"
+#include "editor/fanModals.h"
 #include "renderer/pipelines/fanPostprocessPipeline.h"
 #include "renderer/pipelines/fanForwardPipeline.h"
 #include "renderer/fanRenderer.h"
 #include "core/fanTime.h"
-#include "editor/fanModals.h"
 
 namespace fan
 {
@@ -13,8 +13,9 @@ namespace fan
 
 		//================================================================================================================================
 		//================================================================================================================================
-		RenderWindow::RenderWindow() {
-
+		RenderWindow::RenderWindow() : 
+			Window("render") 
+		{
 		}
 
 		//================================================================================================================================

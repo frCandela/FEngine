@@ -35,46 +35,13 @@ namespace fan
 		//================================================================================================================================
 		//================================================================================================================================
 		void MainMenuBar::Initialize() {
-			fan::Engine & engine = fan::Engine::GetEngine();
-			fan::SerializedValues & editorValues = engine.GetEditorValues();
-			bool tmpValue;
-
-			editorValues.Get("mainMenuBar_show_imguidemo", m_showImguiDemoWindow);
-
-			if (editorValues.Get("mainMenuBar_show_postprocess", tmpValue) == true) {
-				engine.GetRenderWindow().SetVisible(tmpValue);
-			}
-
-			if (editorValues.Get("mainMenuBar_show_scene", tmpValue) == true) {
-				engine.GetSceneWindow().SetVisible(tmpValue);
-			}
-
-			if (editorValues.Get("mainMenuBar_show_inspector", tmpValue) == true) {
-				engine.GetInspectorWindow().SetVisible(tmpValue);
-			}
-
-			if (editorValues.Get("mainMenuBar_show_preferences", tmpValue) == true) {
-				engine.GetPreferencesWindow().SetVisible(tmpValue);
-			}
-
-			if (editorValues.Get("mainMenuBar_show_console", tmpValue) == true) {
-				engine.GetConsoleWindow().SetVisible(tmpValue);
-			}
+			SerializedValues::Get().GetValue("show_imguidemo", m_showImguiDemoWindow);
 		}
 
 		//================================================================================================================================
 		//================================================================================================================================
 		MainMenuBar::~MainMenuBar() {
-			fan::Engine & engine = fan::Engine::GetEngine();
-			fan::SerializedValues & editorValues = engine.GetEditorValues();
-
-			editorValues.Set("mainMenuBar_show_imguidemo", m_showImguiDemoWindow);
-			editorValues.Set("mainMenuBar_show_postprocess", engine.GetRenderWindow().IsVisible());
-			editorValues.Set("mainMenuBar_show_scene", engine.GetSceneWindow().IsVisible());
-			editorValues.Set("mainMenuBar_show_inspector", engine.GetInspectorWindow().IsVisible());
-			editorValues.Set("mainMenuBar_show_preferences", engine.GetPreferencesWindow().IsVisible());
-			editorValues.Set("mainMenuBar_show_console", engine.GetConsoleWindow().IsVisible());
-
+			SerializedValues::Get().SetValue("show_imguidemo", m_showImguiDemoWindow);
 		}
 
 		//================================================================================================================================

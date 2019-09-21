@@ -15,18 +15,26 @@ namespace fan
 		ConsoleWindow::LogItem::LogItem( const Debug::LogItem& _logItem ) {
 			severity = _logItem.severity;
 			logType = _logItem.type;
-			logMessage = fan::Time::SecondsToString(_logItem.time).c_str() + std::string(" ") + _logItem.message;
+			logMessage = Time::SecondsToString(_logItem.time).c_str() + std::string(" ") + _logItem.message;
 			color = GetSeverityColor(_logItem.severity);
 		}
 
 		//================================================================================================================================
 		//================================================================================================================================
-		ConsoleWindow::ConsoleWindow() :
+		ConsoleWindow::ConsoleWindow() : 
+			Window("console") ,
 			m_maxSizeLogBuffers(64),
-			m_firstLogIndex(0){			
+			m_firstLogIndex(0) 
+		{			
 			m_inputBuffer[0] = '\0';
 			m_logBuffer.reserve(m_maxSizeLogBuffers);
-			fan::Debug::Get().onNewLog.Connect(&ConsoleWindow::OnNewLog, this);
+			Debug::Get().onNewLog.Connect(&ConsoleWindow::OnNewLog, this);
+		}
+
+		//================================================================================================================================
+		//================================================================================================================================
+		ConsoleWindow::~ConsoleWindow() {
+			Debug::Get().onNewLog.Disconnect(&ConsoleWindow::OnNewLog, this);
 		}
 
 		//================================================================================================================================
@@ -74,10 +82,10 @@ namespace fan
 						const std::string message = m_inputBuffer;
 						if (message.size() > 0) {
 							if (message != "clear") {
-								fan::Debug::Get().Log(std::string("Unknown command: ") + message, fan::Debug::Severity::log);
+								Debug::Get().Log(std::string("Unknown command: ") + message, Debug::Severity::log);
 							}
 							else {
-								fan::Debug::Get().Clear();
+								Debug::Get().Clear();
 							}
 							m_inputBuffer[0] = '\0';
 							m_scrollDown = true;
@@ -91,18 +99,18 @@ namespace fan
 
 		//================================================================================================================================
 		//================================================================================================================================
-		ImVec4 ConsoleWindow::GetSeverityColor(const fan::Debug::Severity & _severity) {
+		ImVec4 ConsoleWindow::GetSeverityColor(const Debug::Severity & _severity) {
 			switch (_severity) {
-			case fan::Debug::Severity::log: {
+			case Debug::Severity::log: {
 				return { 1,1,1,1 };		// White
 			} break;
-			case fan::Debug::Severity::highlight: {
+			case Debug::Severity::highlight: {
 				return { 0,1,0,1 };		// Green
 			} break;
-			case fan::Debug::Severity::warning: {
+			case Debug::Severity::warning: {
 				return { 1,1,0,1 };		// Yellow
 			} break;
-			case fan::Debug::Severity::error: {
+			case Debug::Severity::error: {
 				return { 1,0,0,1 };		// Red
 			} break;
 			default:

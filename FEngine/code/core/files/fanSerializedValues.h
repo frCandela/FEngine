@@ -1,18 +1,19 @@
 #pragma once
 
+#include "core/fanSingleton.h"
+
 namespace fan {
 	//================================================================================================================================
 	//================================================================================================================================
-	class SerializedValues {
+	class SerializedValues : public Singleton<SerializedValues>{
 	public:
-		SerializedValues( const std::string & _jsonPath );
-		~SerializedValues();
+		friend class Singleton<SerializedValues>;
 
 		template <typename T>
-		void Set(const std::string & _key, const T& _value) { m_json[_key] = _value; }
+		void SetValue(const std::string & _key, const T& _value) { m_json[_key] = _value; }
 
 		template <typename T>
-		bool Get(const std::string & _key, T& value) const {
+		bool GetValue(const std::string & _key, T& value) const {
 			auto it = m_json.find(_key);
 			if (it != m_json.end()) {
 				value = m_json[_key];
@@ -22,9 +23,12 @@ namespace fan {
 				return false;
 			}
 		}
+		void SetValue(const std::string & _key, const btVector3& _value);
+		bool GetValue(const std::string & _key, btVector3& value) const;
+		void SaveValuesToDisk();
 
-		void Set(const std::string & _key, const btVector3& _value);
-		bool Get(const std::string & _key, btVector3& value) const;
+	protected:
+		SerializedValues();
 
 	private:
 		std::string m_jsonPath;

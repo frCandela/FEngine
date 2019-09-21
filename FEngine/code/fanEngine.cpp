@@ -44,16 +44,15 @@ namespace fan {
 	//================================================================================================================================
 	Engine::Engine() :
 		// Get serialized editor values
-		m_applicationShouldExit(false),
-		m_editorValues("editorValues.json"){
+		m_applicationShouldExit(false){
 
 		VkExtent2D windowSize = { 1280,720 };
-		m_editorValues.Get("renderer_extent_width", windowSize.width);
-		m_editorValues.Get("renderer_extent_height", windowSize.height);
+		SerializedValues::Get().GetValue("renderer_extent_width", windowSize.width);
+		SerializedValues::Get().GetValue("renderer_extent_height", windowSize.height);
 
-		glm::ivec2 windowPosition = { 0,0 };
-		m_editorValues.Get("renderer_position_x", windowPosition.x);
-		m_editorValues.Get("renderer_position_y", windowPosition.y);
+		glm::ivec2 windowPosition = { 0,23 };
+		SerializedValues::Get().GetValue("renderer_position_x", windowPosition.x);
+		SerializedValues::Get().GetValue("renderer_position_y", windowPosition.y);
 
 		// Set some values
 		m_editorGrid.isVisible = true;
@@ -91,20 +90,26 @@ namespace fan {
 	//================================================================================================================================
 	//================================================================================================================================
 	Engine::~Engine() {
-		const Window * window = Renderer::Get().GetWindow();
-
-		const VkExtent2D rendererSize = window->GetExtent();
-		m_editorValues.Set("renderer_extent_width", rendererSize.width);
-		m_editorValues.Set("renderer_extent_height", rendererSize.height);
-
-		const glm::ivec2 windowPosition = window->GetPosition();
-		m_editorValues.Set("renderer_position_x", windowPosition.x);
-		m_editorValues.Set("renderer_position_y", windowPosition.y);
-
+		// Deletes ui
 		delete m_mainMenuBar;
 		delete m_renderWindow;
 		delete m_sceneWindow;
+		delete m_inspectorWindow;
+		delete m_preferencesWindow;
+		delete m_consoleWindow;
 		delete m_scene;
+
+		// Serialize editor positions
+		const Window * window = Renderer::Get().GetWindow();
+		const VkExtent2D rendererSize = window->GetExtent();
+		const glm::ivec2 windowPosition = window->GetPosition();
+		SerializedValues::Get().SetValue("renderer_extent_width", rendererSize.width);
+		SerializedValues::Get().SetValue("renderer_extent_height", rendererSize.height);
+		SerializedValues::Get().SetValue("renderer_position_x", windowPosition.x);
+		SerializedValues::Get().SetValue("renderer_position_y", windowPosition.y);
+		SerializedValues::Get().SaveValuesToDisk();
+
+
 		Renderer::Get().Destroy();
 	}
 

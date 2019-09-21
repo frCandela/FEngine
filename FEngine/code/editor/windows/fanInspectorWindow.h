@@ -19,7 +19,6 @@ namespace fan
 		class InspectorWindow : public editor::Window {
 		public:
 			InspectorWindow();
-
 			void Draw() override;
 
 		private:

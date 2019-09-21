@@ -21,6 +21,8 @@ namespace fan
 
 		public:
 			ConsoleWindow();
+			~ConsoleWindow() override;
+
 			void Draw() override;
 
 		private:
