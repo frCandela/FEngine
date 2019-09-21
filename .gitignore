@@ -12,3 +12,4 @@ FEngine/lib/release/libfbxsdk-mt\.lib
 FEngine/editorValues.json
 
 FEngine/build/
+FEngine/fanTestNoSubmit.h

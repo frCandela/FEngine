@@ -7,6 +7,8 @@ namespace fan {
 	//================================================================================================================================
 	class Time : public Singleton<Time>
 	{
+		friend class Singleton<Time>;
+
 	public:
 		static float ElapsedSinceStartup() { return static_cast<float>(glfwGetTime()); }
 		static double ElapsedSinceStartupDouble() { return glfwGetTime(); }

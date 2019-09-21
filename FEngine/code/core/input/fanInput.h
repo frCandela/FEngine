@@ -7,9 +7,9 @@ namespace fan {
 	//================================================================================================================================
 	class Input : public Singleton<Input>
 	{
-	public:
-		friend class Renderer;
+		friend class Singleton < Input>;
 
+	public:
 		void				Setup(GLFWwindow * _window);
 		static void			NewFrame();
 		static GLFWwindow * GetWindow()		{ return Get().m_window; }

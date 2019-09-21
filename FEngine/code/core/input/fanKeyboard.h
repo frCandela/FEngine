@@ -7,6 +7,7 @@ namespace fan {
 	//================================================================================================================================
 	class Keyboard : public Singleton<Keyboard>
 	{
+		friend class Singleton < Keyboard >;
 		friend class Input;
 
 	public:

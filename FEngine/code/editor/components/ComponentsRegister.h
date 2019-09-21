@@ -12,6 +12,7 @@ namespace fan
 		// Holds a list of inactive components. Allows editor to access the list of available components in the game
 		//================================================================================================================================
 		class ComponentsRegister : public Singleton< ComponentsRegister> {
+			friend class Singleton<ComponentsRegister>;
 		public:			
 			static bool	RegisterComponent( scene::Component * _component );
 			static std::vector< scene::Component * >&	GetComponents() {	return Get().m_components; }

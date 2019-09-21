@@ -7,6 +7,7 @@ namespace fan {
 //================================================================================================================================
 	class Mouse : public Singleton<Mouse>
 	{
+		friend class Singleton<Mouse>;
 		friend class Input;
 	public:
 		enum CursorState { disabled = GLFW_CURSOR_DISABLED, hidden = GLFW_CURSOR_HIDDEN, normal = GLFW_CURSOR_NORMAL };

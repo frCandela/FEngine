@@ -6,9 +6,10 @@
 namespace fan {
 	//================================================================================================================================
 	//================================================================================================================================
-	class Debug : public Singleton<fan::Debug> {
+	class Debug : public Singleton<Debug> {
+		friend class Singleton<Debug>;
+	
 	public:
-
 		enum class Code		{ endl };
 		enum class Severity { log = 0, highlight = 1, warning = 2, error = 3 };
 		enum class Type { render, scene, game, other };
@@ -18,6 +19,7 @@ namespace fan {
 			std::string message;
 			double time;
 		};
+
 		fan::Signal<LogItem> onNewLog;
 
 		static Code Endl() { return Code::endl;  }
@@ -28,15 +30,16 @@ namespace fan {
 		static void Highlight	( const std::string _message );
 		static void Clear();
 		static void Break() { __debugbreak(); }
-		static const std::vector< LogItem >& GetLogBuffer() { return Get().m_logBuffer;  }
+		const std::vector< LogItem >& GetLogBuffer() { return m_logBuffer;  }
+
+	protected:
+		Debug();
 
 	private:		
 		Severity				m_currentSeverity;
 		Type					m_currentType;
 		std::stringstream		m_stringstream;
 		std::vector< LogItem >	m_logBuffer;
-
-		void Init() override;
 		void Flush();
 
 	public:
