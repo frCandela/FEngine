@@ -11,9 +11,9 @@ namespace fan {
 		friend class Input;
 
 	public:
-		static bool	IsKeyDown		(const int _GLFW_KEY, const bool _overrideGui = false );
-		static bool IsKeyPressed	(const int _GLFW_KEY, const bool _overrideGui = false );
-		static bool IsKeyReleased	(const int _GLFW_KEY, const bool _overrideGui = false );
+		static bool	IsKeyDown		(const int _GLFW_KEY );
+		static bool IsKeyPressed	(const int _GLFW_KEY );
+		static bool IsKeyReleased	(const int _GLFW_KEY );
 
 		enum AzertyKey {
 			D = GLFW_KEY_D,

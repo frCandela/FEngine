@@ -186,7 +186,7 @@ namespace fan
 					ImGui::CloseCurrentPopup();
 				}
 				ImGui::SameLine();
-				if (ImGui::Button("Ok") || Keyboard::IsKeyPressed(GLFW_KEY_ENTER, true) || enterPressed)
+				if (ImGui::Button("Ok") || ImGui::IsKeyPressed(GLFW_KEY_ENTER, false) || enterPressed)
 				{
 					m_lastEntityRightClicked->SetName(m_textBuffer.data());
  					m_lastEntityRightClicked = nullptr;

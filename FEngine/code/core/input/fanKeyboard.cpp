@@ -8,8 +8,8 @@ namespace fan {
 
 	//================================================================================================================================
 	//================================================================================================================================
-	bool Keyboard::IsKeyDown( const int _GLFW_KEY, const bool _overrideGui ) {
-		if ( !_overrideGui && ImGui::GetIO().WantCaptureKeyboard ) {
+	bool Keyboard::IsKeyDown( const int _GLFW_KEY) {
+		if (ImGui::GetIO().WantCaptureKeyboard ) {
 			return false;
 		} else {
 			return glfwGetKey(Input::GetWindow(), _GLFW_KEY) == GLFW_PRESS;
@@ -19,8 +19,8 @@ namespace fan {
 	//================================================================================================================================
 	//================================================================================================================================
 
-	bool Keyboard::IsKeyPressed(const int _GLFW_KEY, const bool _overrideGui) {
-		if (!_overrideGui && ImGui::GetIO().WantCaptureKeyboard) {
+	bool Keyboard::IsKeyPressed(const int _GLFW_KEY) {
+		if ( ImGui::GetIO().WantCaptureKeyboard) {
 			return false;
 		}
 		else {
@@ -30,8 +30,8 @@ namespace fan {
 	
 	//================================================================================================================================
 	//================================================================================================================================
-	bool Keyboard::IsKeyReleased(const int _GLFW_KEY, const bool _overrideGui) {
-		if (!_overrideGui && ImGui::GetIO().WantCaptureKeyboard) {
+	bool Keyboard::IsKeyReleased(const int _GLFW_KEY) {
+		if ( ImGui::GetIO().WantCaptureKeyboard) {
 			return false;
 		}
 		else {
