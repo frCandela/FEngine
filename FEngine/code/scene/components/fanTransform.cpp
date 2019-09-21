@@ -85,11 +85,48 @@ namespace fan
 		}
 
 		//================================================================================================================================
+		// TODO rotation mat is used to set normals in vertex shader but the scale is not taken into account
 		//================================================================================================================================
 		glm::mat4 Transform::GetRotationMat() const {
 			glm::quat rotation = ToGLM(m_rotation);
 
 			return glm::mat4_cast(rotation);
+		}
+
+		//================================================================================================================================
+		//================================================================================================================================
+		btVector3 Transform::TransformPoint(const btVector3 _point) const {
+			const btTransform transform(m_rotation, m_position);
+			btVector3 transformedPoint = transform * (m_scale * _point);
+			return transformedPoint;
+		}
+
+		//================================================================================================================================
+		//================================================================================================================================
+		btVector3 Transform::InverseTransformPoint(const btVector3 _point) const {
+			const btVector3 invertScale(1.f / m_scale[0], 1.f / m_scale[1], 1.f / m_scale[2]);
+			const btTransform transform(m_rotation, m_position);
+			btVector3 transformedPoint = invertScale * (transform.inverse()*_point);
+			return transformedPoint;
+		}
+
+		//================================================================================================================================
+		// No translation applied
+		//================================================================================================================================
+		btVector3 Transform::TransformDirection(const btVector3 _point) const {
+			const btTransform transform(m_rotation);
+			btVector3 transformedPoint = transform * (m_scale * _point);
+			return transformedPoint;
+		}
+
+		//================================================================================================================================
+		// No translation applied
+		//================================================================================================================================
+		btVector3 Transform::InverseTransformDirection(const btVector3 _point) const {
+			const btVector3 invertScale(1.f / m_scale[0], 1.f / m_scale[1], 1.f / m_scale[2]);
+			const btTransform transform(m_rotation);
+			btVector3 transformedPoint = invertScale * (transform.inverse()*_point);
+			return transformedPoint;
 		}
 
 		//================================================================================================================================
@@ -101,9 +138,8 @@ namespace fan
 
 		//================================================================================================================================
 		//================================================================================================================================
-		btVector3 Transform::Forward() const {
-			btTransform t(m_rotation, btVector3(0, 0, 0));
-			return t * btVector3::Forward();
+		btVector3 Transform::Forward() const {			
+			return btTransform(m_rotation) * btVector3::Forward();
 		}
 
 		//================================================================================================================================

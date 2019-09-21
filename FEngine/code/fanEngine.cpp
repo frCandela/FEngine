@@ -340,7 +340,9 @@ namespace fan {
 				if (aabb.RayCast(ray.origin, ray.direction, intersection) == true) {
 					scene::Model * model = entity->GetComponent<scene::Model>();
 					if (model != nullptr && model->GetMesh() != nullptr && model->GetMesh()->GetConvexHull() != nullptr) {
-						if (model->GetMesh()->GetConvexHull()->RayCast(ray.origin, ray.direction, intersection) == false) {
+						scene::Transform * transform = entity->GetComponent<scene::Transform>();
+						const shape::Ray transformedRay(transform->InverseTransformPoint(ray.origin), transform->InverseTransformDirection(ray.direction));
+						if (model->GetMesh()->GetConvexHull()->RayCast(transformedRay.origin, transformedRay.direction, intersection) == false) {
 							continue;
 						}
 					}

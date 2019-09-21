@@ -24,6 +24,11 @@ namespace fan
 			glm::mat4		GetModelMatrix() const;
 			glm::mat4		GetRotationMat() const;
 
+			btVector3		TransformPoint(const btVector3 _point) const;
+			btVector3		TransformDirection(const btVector3 _point) const;
+			btVector3		InverseTransformPoint(const btVector3 _point) const;
+			btVector3		InverseTransformDirection(const btVector3 _point) const;
+
 			btVector3 Left() const;
 			btVector3 Forward() const;
 			btVector3 Up() const;
