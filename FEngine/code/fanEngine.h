@@ -12,6 +12,7 @@ namespace fan {
 		class InspectorWindow;
 		class PreferencesWindow;
 		class ConsoleWindow;
+		class Window;
 	}
 	namespace scene {
 		class Scene;
@@ -58,13 +59,16 @@ namespace fan {
 		bool DrawMoveGizmo(const btTransform _transform, const size_t _uniqueID, btVector3& _newPosition);
 
 	private:
+
 		// UI elements
 		editor::MainMenuBar *		m_mainMenuBar;
+
 		editor::RenderWindow *		m_renderWindow;
 		editor::SceneWindow *		m_sceneWindow;
 		editor::InspectorWindow *	m_inspectorWindow;
 		editor::PreferencesWindow *	m_preferencesWindow;
 		editor::ConsoleWindow *		m_consoleWindow;
+		std::vector< editor::Window * > m_editorWindows;
 
 		EditorGrid m_editorGrid;
 

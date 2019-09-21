@@ -53,49 +53,40 @@ namespace fan
 
 		//================================================================================================================================
 		//================================================================================================================================
-		void ConsoleWindow::Draw() {
-			bool visible = IsVisible();
-			if (visible == true) {
-
-				ImGui::SetNextWindowSizeConstraints({ 120,60 }, { 10000,10000 });
-				ImGui::Begin("Console", &visible); {
-					// List the logs
-					const float height = ImGui::GetWindowHeight();
-					if (height > 60) {
-						ImGui::BeginChild("scrolling", ImVec2(0, height - 60), true, ImGuiWindowFlags_AlwaysVerticalScrollbar);
-						for (int logIndex = m_firstLogIndex; logIndex < m_firstLogIndex + m_logBuffer.size(); logIndex++) {
-							const LogItem & item = m_logBuffer[logIndex % m_maxSizeLogBuffers];
-							ImGui::TextColored(item.color, item.logMessage.c_str() );	// Time			
-						}
-						if (m_scrollDown) {
-							ImGui::SetScrollHere(1.0f);
-							m_scrollDown = false;
-						}
-						ImGui::EndChild();
-					}
-
-					// Text input
-					ImGui::PushItemWidth(ImGui::GetWindowWidth() - 60);
-					if (ImGui::InputText("##input_console", m_inputBuffer, s_inputBufferSize)) {}
-					ImGui::SameLine();
-					if (ImGui::Button(">>") || Keyboard::IsKeyPressed(GLFW_KEY_ENTER, true ) || Keyboard::IsKeyPressed(GLFW_KEY_KP_ENTER, true)) {
-						const std::string message = m_inputBuffer;
-						if (message.size() > 0) {
-							if (message != "clear") {
-								Debug::Get().Log(std::string("Unknown command: ") + message, Debug::Severity::log);
-							}
-							else {
-								Debug::Get().Clear();
-							}
-							m_inputBuffer[0] = '\0';
-							m_scrollDown = true;
-						}
-					}
-
-				} ImGui::End();
-				SetVisible(visible);
+		void ConsoleWindow::OnGui() {
+			// List the logs
+			const float height = ImGui::GetWindowHeight();
+			if (height > 60) {
+				ImGui::BeginChild("scrolling", ImVec2(0, height - 60), true, ImGuiWindowFlags_AlwaysVerticalScrollbar);
+				for (int logIndex = m_firstLogIndex; logIndex < m_firstLogIndex + m_logBuffer.size(); logIndex++) {
+					const LogItem & item = m_logBuffer[logIndex % m_maxSizeLogBuffers];
+					ImGui::TextColored(item.color, item.logMessage.c_str());	// Time			
+				}
+				if (m_scrollDown) {
+					ImGui::SetScrollHere(1.0f);
+					m_scrollDown = false;
+				}
+				ImGui::EndChild();
 			}
-		}
+
+			// Text input
+			ImGui::PushItemWidth(ImGui::GetWindowWidth() - 60);
+			if (ImGui::InputText("##input_console", m_inputBuffer, s_inputBufferSize)) {}
+			ImGui::SameLine();
+			if (ImGui::Button(">>") || Keyboard::IsKeyPressed(GLFW_KEY_ENTER, true) || Keyboard::IsKeyPressed(GLFW_KEY_KP_ENTER, true)) {
+				const std::string message = m_inputBuffer;
+				if (message.size() > 0) {
+					if (message != "clear") {
+						Debug::Get().Log(std::string("Unknown command: ") + message, Debug::Severity::log);
+					}
+					else {
+						Debug::Get().Clear();
+					}
+					m_inputBuffer[0] = '\0';
+					m_scrollDown = true;
+				}
+			}
+		}		
 
 		//================================================================================================================================
 		//================================================================================================================================

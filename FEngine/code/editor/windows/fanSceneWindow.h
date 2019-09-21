@@ -11,10 +11,12 @@ namespace fan {
 		class SceneWindow : public Window {
 		public:
 			SceneWindow();
-
-			void Draw() override;			
+	
 			void NewEntityModal();
 			void RenameEntityModal();
+
+		protected:
+			void OnGui() override;
 
 		private:
 			std::array<char, 64> m_textBuffer;

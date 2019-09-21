@@ -23,7 +23,8 @@ namespace fan
 			ConsoleWindow();
 			~ConsoleWindow() override;
 
-			void Draw() override;
+		protected:
+			void OnGui() override;
 
 		private:
 			static const uint32_t s_inputBufferSize = 256;

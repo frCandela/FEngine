@@ -29,61 +29,55 @@ namespace fan
 
 		//================================================================================================================================
 		//================================================================================================================================
-		void InspectorWindow::Draw() {
-			if (IsVisible() == true) {
-				fan::Engine & engine = fan::Engine::GetEngine();
-				scene::Entity * const selection = engine.GetSelectedentity();
+		void InspectorWindow::OnGui() {
+			fan::Engine & engine = fan::Engine::GetEngine();
+			scene::Entity * const selection = engine.GetSelectedentity();
 
-				bool visible = IsVisible();
-				ImGui::Begin("Inspector", &visible);
-				if (selection != nullptr)
-				{
-					// entity gui
-					selection->OnGui();
-					int componentCount = 0;
+			if (selection != nullptr)
+			{
+				// entity gui
+				selection->OnGui();
+				int componentCount = 0;
 
-					const std::vector<scene::Component*> & components = selection->GetComponents();
-					for (int componentIndex = 0; componentIndex < components.size(); componentIndex++) {
-						scene::Component * component = components[componentIndex];
+				const std::vector<scene::Component*> & components = selection->GetComponents();
+				for (int componentIndex = 0; componentIndex < components.size(); componentIndex++) {
+					scene::Component * component = components[componentIndex];
 
-						ImGui::Separator();
+					ImGui::Separator();
 
-						if (component->IsActor()) {	// TODO : use type info when type info deals with inheritance
-							ImGui::PushID((int*)component);
-							scene::Actor * actor = static_cast<scene::Actor*>(component);
-							bool enabled = actor->IsEnabled();
-							if (ImGui::Checkbox("", &enabled)) {
-								actor->SetEnabled(enabled);
-							}
-							ImGui::SameLine();
-							ImGui::PopID();
+					if (component->IsActor()) {	// TODO : use type info when type info deals with inheritance
+						ImGui::PushID((int*)component);
+						scene::Actor * actor = static_cast<scene::Actor*>(component);
+						bool enabled = actor->IsEnabled();
+						if (ImGui::Checkbox("", &enabled)) {
+							actor->SetEnabled(enabled);
 						}
+						ImGui::SameLine();
+						ImGui::PopID();
+					}
 
-						// Delete button
-						ImGui::Text(component->GetName());
-						if (component->IsRemovable()) {
-							std::stringstream ss;
-							ss << "X" << "##" << component->GetName() << componentCount++;	// make unique id
-							ImGui::SameLine(ImGui::GetWindowWidth() - 40);
-							if (ImGui::Button(ss.str().c_str())) {
-								selection->DeleteComponent(component);
-								component = nullptr;
-							}
-						}
-						if (component != nullptr) {
-							component->OnGui();
+					// Delete button
+					ImGui::Text(component->GetName());
+					if (component->IsRemovable()) {
+						std::stringstream ss;
+						ss << "X" << "##" << component->GetName() << componentCount++;	// make unique id
+						ImGui::SameLine(ImGui::GetWindowWidth() - 40);
+						if (ImGui::Button(ss.str().c_str())) {
+							selection->DeleteComponent(component);
+							component = nullptr;
 						}
 					}
-					ImGui::Separator();
-					ImGui::SameLine();
-					//Add component button
-					if (ImGui::Button("Add component"))
-						ImGui::OpenPopup("New component");
+					if (component != nullptr) {
+						component->OnGui();
+					}
+				}
+				ImGui::Separator();
+				ImGui::SameLine();
+				//Add component button
+				if (ImGui::Button("Add component"))
+					ImGui::OpenPopup("New component");
 
-					NewComponentPopup();
-
-				} ImGui::End();
-				SetVisible(visible);
+				NewComponentPopup();
 			}
 		}
 

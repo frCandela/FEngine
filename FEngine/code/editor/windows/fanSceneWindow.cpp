@@ -25,51 +25,44 @@ namespace fan
 
 		//================================================================================================================================
 		//================================================================================================================================
-		void SceneWindow::Draw() {
-			bool isVisible = IsVisible();
-			if (isVisible == true) {
-				fan::Engine & engine = fan::Engine::GetEngine();
-				scene::Scene & scene = engine.GetScene();
-				
-				if (ImGui::Begin("Scene", &isVisible)) {
-					ImGui::Text(scene.GetName().c_str());
-					ImGui::Separator();
+		void SceneWindow::OnGui() {
+			fan::Engine & engine = fan::Engine::GetEngine();
+			scene::Scene & scene = engine.GetScene();
 
-					scene::Entity * entityRightClicked = nullptr;
-					R_DrawSceneTree(scene.GetRoot(), entityRightClicked);
+			ImGui::Text(scene.GetName().c_str());
+			ImGui::Separator();
 
-					if (entityRightClicked != nullptr) {
-						ImGui::OpenPopup("scene_window_entity_rclicked");
-						m_lastEntityRightClicked = entityRightClicked;
-					}
+			scene::Entity * entityRightClicked = nullptr;
+			R_DrawSceneTree(scene.GetRoot(), entityRightClicked);
 
-					bool newEntityPopup = false;
-					bool renameEntityPopup = false;
-					if (ImGui::BeginPopup("scene_window_entity_rclicked")) {
-						if (ImGui::Selectable("New entity")) {
-							newEntityPopup = true;					
-						} 
-						if (ImGui::Selectable("Rename")) {
-							renameEntityPopup = true;
-						}
-						ImGui::Separator();
-						if (ImGui::Selectable("Delete")) {
-							scene.DeleteEntity(m_lastEntityRightClicked);
-						}
-						ImGui::EndPopup();
-					} 
-
-					if (newEntityPopup) {
-						ImGui::OpenPopup("New entity");
-					} NewEntityModal();
-
-					if (renameEntityPopup) {
-						ImGui::OpenPopup("Rename entity");
-					} RenameEntityModal();
-
-				} ImGui::End();
-				SetVisible(isVisible);
+			if (entityRightClicked != nullptr) {
+				ImGui::OpenPopup("scene_window_entity_rclicked");
+				m_lastEntityRightClicked = entityRightClicked;
 			}
+
+			bool newEntityPopup = false;
+			bool renameEntityPopup = false;
+			if (ImGui::BeginPopup("scene_window_entity_rclicked")) {
+				if (ImGui::Selectable("New entity")) {
+					newEntityPopup = true;
+				}
+				if (ImGui::Selectable("Rename")) {
+					renameEntityPopup = true;
+				}
+				ImGui::Separator();
+				if (ImGui::Selectable("Delete")) {
+					scene.DeleteEntity(m_lastEntityRightClicked);
+				}
+				ImGui::EndPopup();
+			}
+
+			if (newEntityPopup) {
+				ImGui::OpenPopup("New entity");
+			} NewEntityModal();
+
+			if (renameEntityPopup) {
+				ImGui::OpenPopup("Rename entity");
+			} RenameEntityModal();
 		}
 
 		//================================================================================================================================

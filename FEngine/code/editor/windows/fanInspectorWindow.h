@@ -19,7 +19,9 @@ namespace fan
 		class InspectorWindow : public editor::Window {
 		public:
 			InspectorWindow();
-			void Draw() override;
+
+		protected:
+			void OnGui() override;
 
 		private:
 			void NewComponentPopup();

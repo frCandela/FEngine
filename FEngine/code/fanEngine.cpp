@@ -68,6 +68,13 @@ namespace fan {
 		m_inspectorWindow =		new editor::InspectorWindow();
 		m_preferencesWindow =	new editor::PreferencesWindow();
 		m_consoleWindow =		new editor::ConsoleWindow();
+
+		m_editorWindows.push_back(m_renderWindow);
+		m_editorWindows.push_back(m_sceneWindow);
+		m_editorWindows.push_back(m_inspectorWindow);
+		m_editorWindows.push_back(m_preferencesWindow);
+		m_editorWindows.push_back(m_consoleWindow);
+
 		Renderer::Get().Initialize(windowSize, windowPosition);
 		m_scene =				new scene::Scene("mainScene");
 		m_scene->onSceneLoad.Connect(&Engine::OnSceneLoad, this);
@@ -359,11 +366,9 @@ namespace fan {
 		//***************************************************************************************END_MYLITTLESPACE
 
 		m_mainMenuBar->Draw();
-		m_renderWindow->Draw();
-		m_sceneWindow->Draw();
-		m_inspectorWindow->Draw();
-		m_preferencesWindow->Draw();
-		m_consoleWindow->Draw();
+		for (int windowIndex = 0; windowIndex < m_editorWindows.size() ; windowIndex++)	{
+			m_editorWindows[windowIndex]->Draw();
+		}
 	}
 
 	//================================================================================================================================

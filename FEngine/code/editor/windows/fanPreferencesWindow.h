@@ -11,7 +11,8 @@ namespace fan
 		public:
 			PreferencesWindow();
 
-			void Draw() override;
+		protected:
+			void OnGui() override;
 		};
 	}
 }
