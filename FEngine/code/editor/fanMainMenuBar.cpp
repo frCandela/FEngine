@@ -117,7 +117,7 @@ namespace fan
 					ImGui::EndMenu();
 				}
 
-				// EDITOR
+				// Editor
 				if (ImGui::BeginMenu("Editor"))
 				{
 					if (ImGui::Checkbox("show hull", &m_showHull)) {}
