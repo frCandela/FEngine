@@ -16,9 +16,8 @@ namespace fan
 		class Scene : public ISerializable
 		{
 		public:
-			fan::Signal<Entity*> onEntityCreated;
-			fan::Signal<Scene*> onSceneLoad;
-			static fan::Signal<> onSceneClear;
+			static Signal<Scene*>	s_onSceneLoad;
+			static Signal<>			s_onSceneClear;
 
 			Scene(const std::string _name);
 			~Scene();

@@ -47,13 +47,12 @@ namespace fan
 		//================================================================================================================================
 		//================================================================================================================================
 		void MainMenuBar::Draw() {
-			fan::Engine &	engine = fan::Engine::GetEngine();
+			Engine &	engine = Engine::GetEngine();
 			Renderer &	renderer = Renderer::Get();
 
 			if (m_showImguiDemoWindow) {
 				ImGui::ShowDemoWindow(&m_showImguiDemoWindow);
 			}
-
 			if (ImGui::BeginMainMenuBar())
 			{
 				// FILE
@@ -127,6 +126,28 @@ namespace fan
 					ImGui::EndMenu();
 				}
 
+				// Editor
+				if (ImGui::BeginMenu("Grid"))
+				{
+					Engine::EditorGrid  gridData = engine.GetEditorGrid();
+					if (ImGui::Checkbox("is visible", &gridData.isVisible)) {
+						engine.SetEditorGrid(gridData);
+					}
+
+					if (ImGui::DragFloat("spacing", &gridData.spacing, 0.25f, 0.f, 100.f)) {
+						engine.SetEditorGrid(gridData);
+					}
+
+					if (ImGui::DragInt("lines count", &gridData.linesCount, 1.f, 0, 1000)) {
+						engine.SetEditorGrid(gridData);
+					}
+
+					if (ImGui::ColorEdit3("color", &gridData.color[0], gui::colorEditFlags)) {
+						engine.SetEditorGrid(gridData);
+					}
+					ImGui::EndMenu();
+				}
+
 				/////////////////////
 			} ImGui::EndMainMenuBar();
 
@@ -180,7 +201,7 @@ namespace fan
 		//================================================================================================================================
 		//================================================================================================================================
 		void MainMenuBar::DrawModals() {
-			fan::Engine &	engine = fan::Engine::GetEngine();
+			Engine &	engine = Engine::GetEngine();
 
 			// New scene
 			if (gui::SaveFileModal("New scene", GlobalValues::s_sceneExtensions, m_pathBuffer, m_extensionIndexBuffer)) {
@@ -220,7 +241,7 @@ namespace fan
 		//================================================================================================================================
 		//================================================================================================================================
 		void MainMenuBar::Save() {
-			scene::Scene & scene = fan::Engine::GetEngine().GetScene();
+			scene::Scene & scene = Engine::GetEngine().GetScene();
 			if (scene.HasPath()) {
 				scene.Save();
 			}

@@ -44,13 +44,18 @@ namespace fan {
 	//================================================================================================================================
 	void Keyboard::KeyCallback(GLFWwindow* /*_window*/, int _key, int /*_scancode*/, int _action, int /*_mods*/)
 	{
-		//Imgui
 		ImGuiIO& io = ImGui::GetIO();
+
+		// Dirty hack so that pressing KP_ENTER is considered by IMGUI
+		if (_key == GLFW_KEY_KP_ENTER) {
+			_key = GLFW_KEY_ENTER;
+		}
+
+		//Imgui
 		if (_action == GLFW_PRESS)
 			io.KeysDown[_key] = true;
 		if (_action == GLFW_RELEASE)
 			io.KeysDown[_key] = false;
-
 
 		io.KeyCtrl =	io.KeysDown[GLFW_KEY_LEFT_CONTROL] ||	io.KeysDown[GLFW_KEY_RIGHT_CONTROL];
 		io.KeyShift =	io.KeysDown[GLFW_KEY_LEFT_SHIFT] ||		io.KeysDown[GLFW_KEY_RIGHT_SHIFT];

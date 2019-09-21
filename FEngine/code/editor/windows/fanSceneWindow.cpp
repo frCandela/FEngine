@@ -21,12 +21,19 @@ namespace fan
 			Window("scene"),
 			m_textBuffer({ "new_entity" })
 		{
+			scene::Scene::s_onSceneLoad.Connect(&SceneWindow::OnSceneLoad, this);
+		}
+
+		//================================================================================================================================
+		//================================================================================================================================
+		SceneWindow::~SceneWindow() {
+			scene::Scene::s_onSceneLoad.Disconnect(&SceneWindow::OnSceneLoad, this);
 		}
 
 		//================================================================================================================================
 		//================================================================================================================================
 		void SceneWindow::OnGui() {
-			fan::Engine & engine = fan::Engine::GetEngine();
+			Engine & engine = Engine::GetEngine();
 			scene::Scene & scene = engine.GetScene();
 
 			ImGui::Text(scene.GetName().c_str());
@@ -34,6 +41,7 @@ namespace fan
 
 			scene::Entity * entityRightClicked = nullptr;
 			R_DrawSceneTree(scene.GetRoot(), entityRightClicked);
+			m_expandSceneHierarchy = false;
 
 			if (entityRightClicked != nullptr) {
 				ImGui::OpenPopup("scene_window_entity_rclicked");
@@ -68,11 +76,14 @@ namespace fan
 		//================================================================================================================================
 		//================================================================================================================================
 		void SceneWindow::R_DrawSceneTree(scene::Entity * _entityDrawn, scene::Entity* & _entityRightClicked ) {
-			fan::Engine & engine = fan::Engine::GetEngine();
+			Engine & engine = Engine::GetEngine();
 
 			std::stringstream ss;
 			ss << "##" << _entityDrawn; // Unique id
 
+			if (ImGui::IsWindowAppearing() || m_expandSceneHierarchy == true) {
+				ImGui::SetNextTreeNodeOpen(true);
+			}
 			bool isOpen = ImGui::TreeNode(ss.str().c_str());
 
 			if (ImGui::BeginDragDropTarget())
@@ -125,19 +136,25 @@ namespace fan
 		//================================================================================================================================
 		void SceneWindow::NewEntityModal()
 		{
-			fan::Engine & engine = fan::Engine::GetEngine();
+			Engine & engine = Engine::GetEngine();
 			scene::Scene & scene = engine.GetScene();
 
 			ImGui::SetNextWindowSize(ImVec2(200, 200));
 			if (ImGui::BeginPopupModal("New entity"))
 			{
-				ImGui::InputText("Name ", m_textBuffer.data(), m_textBuffer.size());
-				if (ImGui::Button("Cancel")) {
+				if (ImGui::IsWindowAppearing()) {
+					ImGui::SetKeyboardFocusHere();
+				}
+				bool enterPressed = false;
+				if( ImGui::InputText("Name ", m_textBuffer.data(), IM_ARRAYSIZE(m_textBuffer.data()), ImGuiInputTextFlags_EnterReturnsTrue)){
+					enterPressed = true;
+				}
+				if (ImGui::Button("Cancel") || ImGui::IsKeyPressed(GLFW_KEY_ESCAPE, false)) {
 					m_lastEntityRightClicked = nullptr;
 					ImGui::CloseCurrentPopup();
 				}
 				ImGui::SameLine();
-				if (ImGui::Button("Ok") || Keyboard::IsKeyPressed(GLFW_KEY_ENTER, true) || Keyboard::IsKeyPressed(GLFW_KEY_KP_ENTER, true))
+				if (ImGui::Button("Ok") || enterPressed )
 				{
 					//Create new entity 
 					scene::Entity* newentity = scene.CreateEntity(m_textBuffer.data(), m_lastEntityRightClicked );
@@ -157,13 +174,19 @@ namespace fan
 			ImGui::SetNextWindowSize(ImVec2(200, 200));
 			if (ImGui::BeginPopupModal("Rename entity"))
 			{
-				ImGui::InputText("New Name ", m_textBuffer.data(), m_textBuffer.size());
-				if (ImGui::Button("Cancel")) {
+				if (ImGui::IsWindowAppearing()) {
+					ImGui::SetKeyboardFocusHere();
+				}
+				bool enterPressed = false;
+				if (ImGui::InputText("New Name ", m_textBuffer.data(), IM_ARRAYSIZE(m_textBuffer.data()), ImGuiInputTextFlags_EnterReturnsTrue)) {
+					enterPressed = true;
+				}
+				if (ImGui::Button("Cancel") || ImGui::IsKeyPressed(GLFW_KEY_ESCAPE, false)) {
 					m_lastEntityRightClicked = nullptr;
 					ImGui::CloseCurrentPopup();
 				}
 				ImGui::SameLine();
-				if (ImGui::Button("Ok") || Keyboard::IsKeyPressed(GLFW_KEY_ENTER, true) || Keyboard::IsKeyPressed(GLFW_KEY_KP_ENTER, true))
+				if (ImGui::Button("Ok") || Keyboard::IsKeyPressed(GLFW_KEY_ENTER, true) || enterPressed)
 				{
 					m_lastEntityRightClicked->SetName(m_textBuffer.data());
  					m_lastEntityRightClicked = nullptr;

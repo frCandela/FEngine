@@ -24,7 +24,8 @@ namespace fan
 		ConsoleWindow::ConsoleWindow() : 
 			Window("console") ,
 			m_maxSizeLogBuffers(64),
-			m_firstLogIndex(0) 
+			m_firstLogIndex(0),
+			m_grabFocus(false)
 		{			
 			m_inputBuffer[0] = '\0';
 			m_logBuffer.reserve(m_maxSizeLogBuffers);
@@ -47,8 +48,8 @@ namespace fan
 			}
 			else {
 				m_logBuffer[m_firstLogIndex] = LogItem(_item);
+				m_firstLogIndex = (m_firstLogIndex + 1) % m_maxSizeLogBuffers;
 			}
-			m_firstLogIndex = (m_firstLogIndex + 1 ) % m_maxSizeLogBuffers;
 		}
 
 		//================================================================================================================================
@@ -70,23 +71,34 @@ namespace fan
 			}
 
 			// Text input
-			ImGui::PushItemWidth(ImGui::GetWindowWidth() - 60);
-			if (ImGui::InputText("##input_console", m_inputBuffer, s_inputBufferSize)) {}
+			ImGui::PushItemWidth(ImGui::GetWindowWidth() - 60); 
+			if (m_grabFocus) {
+				ImGui::SetKeyboardFocusHere();
+				m_grabFocus = false;
+			}
+			bool pressed = false;
+			if (ImGui::InputText("##input_console", m_inputBuffer, IM_ARRAYSIZE(m_inputBuffer), ImGuiInputTextFlags_EnterReturnsTrue)) {
+				pressed = true;
+			}
 			ImGui::SameLine();
-			if (ImGui::Button(">>") || Keyboard::IsKeyPressed(GLFW_KEY_ENTER, true) || Keyboard::IsKeyPressed(GLFW_KEY_KP_ENTER, true)) {
+			if (ImGui::Button(">>")) {
+				pressed = true;
+			}
+			if( pressed  == true ) {
 				const std::string message = m_inputBuffer;
 				if (message.size() > 0) {
 					if (message != "clear") {
-						Debug::Get().Log(std::string("Unknown command: ") + message, Debug::Severity::log);
+						Debug::Get() << "Unknown command: " << message << Debug::Endl();
 					}
 					else {
 						Debug::Get().Clear();
 					}
 					m_inputBuffer[0] = '\0';
 					m_scrollDown = true;
+					m_grabFocus = true;
 				}
 			}
-		}		
+		}
 
 		//================================================================================================================================
 		//================================================================================================================================

@@ -20,10 +20,9 @@ namespace fan {
 			double time;
 		};
 
-		fan::Signal<LogItem> onNewLog;
+		Signal<LogItem> onNewLog;
 
 		static Code Endl() { return Code::endl;  }
-		static void Log		( const std::string _message, const Severity & _severity );
 		static void Log		( const std::string _message );
 		static void Warning	( const std::string _message );
 		static void Error	( const std::string _message );

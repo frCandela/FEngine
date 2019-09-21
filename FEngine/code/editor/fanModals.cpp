@@ -117,9 +117,17 @@ namespace fan
 			const int bufferSize = 32;
 			char buffer[bufferSize];
 			strcpy_s(buffer, std::fs::file_name(_path).c_str());
-			ImGui::InputText("name", buffer, bufferSize);
-			std::string stringBuffer = buffer;
 
+			if (ImGui::IsWindowAppearing()) {
+				ImGui::SetKeyboardFocusHere();
+			}
+			bool enterPressed = false;
+			if (ImGui::InputText("name", buffer, IM_ARRAYSIZE(buffer), ImGuiInputTextFlags_EnterReturnsTrue)) {
+				enterPressed = true;
+			}
+			ImGui::SetItemDefaultFocus();
+			std::string stringBuffer = buffer;
+			
 			// Format selection
 			std::stringstream extensions;
 			std::vector<std::string> tmpExtensions;
@@ -144,7 +152,10 @@ namespace fan
 			}
 
 			// Ok Button
-			if (itemDoubleClicked == true || ImGui::Button("Ok") || Keyboard::IsKeyPressed(GLFW_KEY_ENTER)) {
+			if (itemDoubleClicked == true || 
+				ImGui::Button("Ok") || 
+				enterPressed)
+			{
 				if (std::fs::is_directory(_path) == false) {
 					ImGui::CloseCurrentPopup();
 					returnValue = true;
@@ -153,7 +164,7 @@ namespace fan
 
 			// Cancel button
 			ImGui::SameLine();
-			if (ImGui::Button("Cancel") || Keyboard::IsKeyPressed(GLFW_KEY_ESCAPE)) {
+			if (ImGui::Button("Cancel") || ImGui::IsKeyPressed(GLFW_KEY_ESCAPE, false)) {
 				ImGui::CloseCurrentPopup();
 			}
 			ImGui::EndPopup();
@@ -188,15 +199,14 @@ namespace fan
 			ImGui::Separator();
 
 
-			if (itemDoubleClicked == true || ImGui::Button("Ok") || Keyboard::IsKeyPressed(GLFW_KEY_ENTER)) {
-
+			if (itemDoubleClicked == true || ImGui::Button("Ok") || ImGui::IsKeyPressed(GLFW_KEY_ENTER, false)) {
 				if (std::fs::is_regular_file(_path)) {
 					ImGui::CloseCurrentPopup();
 					returnValue = true;
 				}
 			}
 			ImGui::SameLine();
-			if (ImGui::Button("Cancel") || Keyboard::IsKeyPressed(GLFW_KEY_ESCAPE)) {
+			if (ImGui::Button("Cancel") || ImGui::IsKeyPressed(GLFW_KEY_ESCAPE, false)) {
 				ImGui::CloseCurrentPopup();
 			}
 

@@ -14,7 +14,8 @@ namespace fan
 {
 	namespace scene {
 
-		fan::Signal<> Scene::onSceneClear;
+		Signal<>		Scene::s_onSceneClear;
+		Signal<Scene*>	Scene::s_onSceneLoad;
 
 		//================================================================================================================================
 		//================================================================================================================================
@@ -41,7 +42,6 @@ namespace fan
 			}
 			Entity* entity = new Entity(_name, _parent);
 			entity->SetScene(this);
-			onEntityCreated.Emmit(entity);
 
 			return entity;
 		}
@@ -124,8 +124,8 @@ namespace fan
 					R_DeleteEntity(childs[childIndex], _deletedEntitiesSet);
 				}
 
-				if (fan::Engine::GetEngine().GetSelectedentity() == _entity) {
-					fan::Engine::GetEngine().Deselect();
+				if (Engine::GetEngine().GetSelectedentity() == _entity) {
+					Engine::GetEngine().Deselect();
 				}				
 				_deletedEntitiesSet.insert(_entity);
 				if (_entity->GetParent() != nullptr) {
@@ -196,7 +196,7 @@ namespace fan
 			m_outdatedAABB.clear();
 			m_root = nullptr;
 
-			onSceneClear.Emmit();
+			s_onSceneClear.Emmit();
 		}
 
 		//================================================================================================================================
@@ -205,13 +205,13 @@ namespace fan
 			Clear();			
 			m_root = CreateEntity("root", nullptr);
 			m_root->AddComponent<scene::Transform>();
-			onSceneLoad.Emmit(this);
+			s_onSceneLoad.Emmit(this);
 		}
 
 		//================================================================================================================================
 		//================================================================================================================================
 		void Scene::Save() const {
- 			fan::Debug::Get() << fan::Debug::Severity::log << "saving scene: " << m_name << Debug::Endl();
+ 			Debug::Get() << Debug::Severity::log << "saving scene: " << m_name << Debug::Endl();
 			std::ofstream outStream(m_path);
 			if (outStream.is_open()) {
 				outStream << "Entities: 1 { \n";
@@ -254,7 +254,7 @@ namespace fan
 					Debug::Log("Load success");
 					m_path = _path;
 					inStream.close();
-					onSceneLoad.Emmit(this);
+					s_onSceneLoad.Emmit(this);
 					return true;
 				} else {
 					Debug::Get() << Debug::Severity::error << "failed to load scene: " << _path << Debug::Endl();
@@ -265,7 +265,7 @@ namespace fan
 				}
 				
 			} else {
-				fan::Debug::Get() << fan::Debug::Severity::error << "failed to open file " << _path << Debug::Endl();
+				Debug::Get() << Debug::Severity::error << "failed to open file " << _path << Debug::Endl();
 				New();
 				return false;
 			}

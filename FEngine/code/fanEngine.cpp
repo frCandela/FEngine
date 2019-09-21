@@ -77,10 +77,10 @@ namespace fan {
 
 		Renderer::Get().Initialize(windowSize, windowPosition);
 		m_scene =				new scene::Scene("mainScene");
-		m_scene->onSceneLoad.Connect(&Engine::OnSceneLoad, this);
+		m_scene->s_onSceneLoad.Connect(&Engine::OnSceneLoad, this);
 		m_scene->New();
 
-		scene::Scene::onSceneClear.Connect				( &Renderer::Clear,					&Renderer::Get());
+		scene::Scene::s_onSceneClear.Connect				( &Renderer::Clear,					&Renderer::Get());
 		scene::Material::onMaterialAttach.Connect		( &Renderer::RegisterMaterial,		&Renderer::Get() );
 		scene::Material::onMaterialDetach.Connect		( &Renderer::UnRegisterMaterial,	&Renderer::Get());		
 		scene::Model::onRegisterModel.Connect			( &Renderer::RegisterModel,			&Renderer::Get());
@@ -90,7 +90,7 @@ namespace fan {
 
 		m_mainMenuBar->Initialize();
 
-		fan::Mesh * defaultMesh = Renderer::Get().GetRessourceManager()->LoadMesh(GlobalValues::s_defaultMeshPath);
+		Mesh * defaultMesh = Renderer::Get().GetRessourceManager()->LoadMesh(GlobalValues::s_defaultMeshPath);
 		Renderer::Get().GetRessourceManager()->SetDefaultMesh( defaultMesh );
 	}
 
@@ -162,7 +162,7 @@ namespace fan {
 		}
 
 		// Exit sequence
-		fan::Debug::Log( "Exit application" );
+		Debug::Log( "Exit application" );
 
 	}
 	
@@ -173,14 +173,14 @@ namespace fan {
 		m_selectedentity = nullptr;
 
 		// Editor Camera
-		scene::Entity * cameraentity = _scene->CreateEntity("editor_camera");
-		cameraentity->SetFlags(scene::Entity::NO_DELETE | scene::Entity::NOT_SAVED);
-		scene::Transform * camTrans = cameraentity->AddComponent<scene::Transform>();
+		scene::Entity * cameraEntity = _scene->CreateEntity("editor_camera");
+		cameraEntity->SetFlags(scene::Entity::NO_DELETE | scene::Entity::NOT_SAVED);
+		scene::Transform * camTrans = cameraEntity->AddComponent<scene::Transform>();
 		camTrans->SetPosition(btVector3(0, 0, -2));
-		m_editorCamera = cameraentity->AddComponent<scene::Camera>();
+		m_editorCamera = cameraEntity->AddComponent<scene::Camera>();
 		m_editorCamera->SetRemovable(false);
 		Renderer::Get().SetMainCamera(m_editorCamera);
-		scene::FPSCamera * editorCamera = cameraentity->AddComponent<scene::FPSCamera>();
+		scene::FPSCamera * editorCamera = cameraEntity->AddComponent<scene::FPSCamera>();
 		editorCamera->SetRemovable(false);
 	}
 
@@ -360,7 +360,6 @@ namespace fan {
 	//================================================================================================================================
 	//================================================================================================================================
 	void Engine::DrawUI() {
-
 		//***************************************************************************************MYLITTLESPACE
 // 		ImGui::Begin("test"); {
 // 

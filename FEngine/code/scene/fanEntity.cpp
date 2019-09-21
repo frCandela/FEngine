@@ -13,6 +13,7 @@ namespace fan
 {
 	namespace scene
 	{
+
 		//================================================================================================================================
 		//================================================================================================================================
 		Entity::Entity(const std::string _name, Entity * _parent) :
@@ -106,7 +107,7 @@ namespace fan
 		//================================================================================================================================
 		bool Entity::IsAncestorOf(const Entity * _entity) const {
 			if (_entity == nullptr) {
-				fan::Debug::Log("IsAncestorOf: entity is null");
+				Debug::Log("IsAncestorOf: entity is null");
 				return false;
 			}
 
@@ -148,17 +149,17 @@ namespace fan
 		//================================================================================================================================
 		void Entity::AddChild(Entity * _child) {
 			if (_child == nullptr) {
-				fan::Debug::Log("AddChild : child is null");
+				Debug::Log("AddChild : child is null");
 				return;
 			}
 
 			if (_child->IsAncestorOf(this)) {
-				fan::Debug::Log("Cannot parent an object to one of its children");
+				Debug::Log("Cannot parent an object to one of its children");
 				return;
 			}
 
 			if (_child->m_parent == this) {
-				fan::Debug::Get() << fan::Debug::Severity::log << _child->m_name << " is already a child of " << m_name << Debug::Endl();
+				Debug::Get() << Debug::Severity::log << _child->m_name << " is already a child of " << m_name << Debug::Endl();
 				return;
 			}
 
@@ -175,7 +176,7 @@ namespace fan
 		//================================================================================================================================
 		void Entity::SetParent(Entity * _parent) {
 			if (_parent == nullptr) {
-				fan::Debug::Log("Root cannot have a brother :'(");
+				Debug::Log("Root cannot have a brother :'(");
 				return;
 			}
 			_parent->AddChild(this);
@@ -185,15 +186,15 @@ namespace fan
 		//================================================================================================================================
 		void Entity::InsertBelow(Entity * _brother) {
 			if (_brother == nullptr) {
-				fan::Debug::Log("InsertBelow: entity is null");
+				Debug::Log("InsertBelow: entity is null");
 				return;
 			}
 			if (IsAncestorOf(_brother)) {
-				fan::Debug::Log("Cannot parent an object to one of its children");
+				Debug::Log("Cannot parent an object to one of its children");
 				return;
 			}
 			if (_brother->m_parent == nullptr) {
-				fan::Debug::Log("Root cannot have a brother :'(");
+				Debug::Log("Root cannot have a brother :'(");
 				return;
 			}
 
@@ -236,7 +237,7 @@ namespace fan
 							scene::Component * component = AddComponent(componentID);
 							const bool result = component->Load(_in);
 							if (result == false) {
-								fan::Debug::Get() << Debug::Severity::error << "Failed loading component: " << component->GetName() << Debug::Endl();
+								Debug::Get() << Debug::Severity::error << "Failed loading component: " << component->GetName() << Debug::Endl();
 							}	
 							if (result == false) {
 								return false;
@@ -265,7 +266,7 @@ namespace fan
 		bool Entity::LoadEntity(std::istream& _in) {
 			const bool result = Load(_in);
 			if (result == false) {
-				fan::Debug::Get() << Debug::Severity::error << "Failed loading Entity: " << GetName() << Debug::Endl();
+				Debug::Get() << Debug::Severity::error << "Failed loading Entity: " << GetName() << Debug::Endl();
 			}
 			return result;
 		}

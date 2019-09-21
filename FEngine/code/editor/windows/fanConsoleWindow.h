@@ -34,6 +34,7 @@ namespace fan
 			int		m_firstLogIndex;						// m_logBuffer is used as a circular array
 			char	m_inputBuffer[s_inputBufferSize];
 			bool	m_scrollDown;
+			bool	m_grabFocus;
 
 			static ImVec4	GetSeverityColor(const Debug::Severity & _severity);
 			void			OnNewLog( Debug::LogItem _item );
