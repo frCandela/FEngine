@@ -61,7 +61,7 @@ namespace fan
 			instanceCreateInfo.ppEnabledExtensionNames = m_extensions.size() > 0 ? m_extensions.data() : nullptr;
 
 			if (vkCreateInstance(&instanceCreateInfo, nullptr, &vkInstance) != VK_SUCCESS || vkInstance == VK_NULL_HANDLE) {
-				fan::Debug::Error("ouch, this is going to be messy");
+				Debug::Error("ouch, this is going to be messy");
 			}
 			SetupDebugCallback();
 		}
@@ -144,7 +144,7 @@ namespace fan
 
 			auto func = (PFN_vkCreateDebugReportCallbackEXT)vkGetInstanceProcAddr(vkInstance, "vkCreateDebugReportCallbackEXT");
 			if (func != nullptr && func(vkInstance, &createInfo, nullptr, &m_callback) == VK_SUCCESS) {
-				fan::Debug::Get() << fan::Debug::Severity::log << std::hex << "VkDebugCallback       " << m_callback << std::dec << Debug::Endl();
+				Debug::Get() << Debug::Severity::log << std::hex << "VkDebugCallback       " << m_callback << std::dec << Debug::Endl();
 				return true;
 			}
 
@@ -162,15 +162,9 @@ namespace fan
 
 		//================================================================================================================================
 		//================================================================================================================================
-		VKAPI_ATTR VkBool32 VKAPI_CALL Instance::DebugCallback(VkDebugReportFlagsEXT _flags, VkDebugReportObjectTypeEXT _objType, uint64_t _obj, size_t _location, int32_t _code, const char* _layerPrefix, const char* _msg, void* _userData) {
-			(void)_flags;
-			(void)_objType;
-			(void)_obj;
-			(void)_location;
-			(void)_code;
-			(void)_layerPrefix;
-			(void)_userData;
-			fan::Debug::Get() << fan::Debug::Severity::error << "Vulkan  Error:  " << _msg << Debug::Endl();
+		VKAPI_ATTR VkBool32 VKAPI_CALL Instance::DebugCallback(VkDebugReportFlagsEXT /*_flags*/, VkDebugReportObjectTypeEXT /*_objType*/, uint64_t /*_obj*/, size_t /*_location*/, int32_t /*_code*/, const char* /*_layerPrefix*/, const char* _msg, void* /*_userData*/) {
+
+			Debug::Get() << Debug::Severity::error << "Vulkan  Error:  " << _msg << Debug::Endl();
 			return VK_FALSE;
 		}
 	}

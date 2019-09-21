@@ -28,12 +28,12 @@ namespace fan
 
 			std::vector<unsigned int> spirvCode = SpirvCompiler::Compile(_path);
 			if (spirvCode.empty()) {
-				fan::Debug::Get() << fan::Debug::Severity::error << "Could not create shader module: " << _path << Debug::Endl();
+				Debug::Get() << Debug::Severity::error << "Could not create shader module: " << _path << Debug::Endl();
 
 				std::experimental::filesystem::directory_entry path(_path);
 				std::string extension = path.path().extension().generic_string();
 				std::string tmpPath = (extension == ".frag" ? defaultFragmentShader : defaultVertexShader);
-				fan::Debug::Get() << fan::Debug::Severity::log << "loading default shader " << tmpPath << Debug::Endl();
+				Debug::Get() << Debug::Severity::log << "loading default shader " << tmpPath << Debug::Endl();
 				spirvCode = SpirvCompiler::Compile(tmpPath);
 
 				if (spirvCode.empty()) {
@@ -50,10 +50,10 @@ namespace fan
 			shaderModuleCreateInfo.pCode = spirvCode.data();
 
 			if (vkCreateShaderModule(m_device.vkDevice, &shaderModuleCreateInfo, nullptr, &m_shaderModule) != VK_SUCCESS) {
-				fan::Debug::Get() << fan::Debug::Severity::error << "Could not create shader module: " << _path << Debug::Endl();
+				Debug::Get() << Debug::Severity::error << "Could not create shader module: " << _path << Debug::Endl();
 				return false;
 			}
-			fan::Debug::Get() << fan::Debug::Severity::log << std::hex << "VkShaderModule        " << m_shaderModule << std::dec << Debug::Endl();
+			Debug::Get() << Debug::Severity::log << std::hex << "VkShaderModule        " << m_shaderModule << std::dec << Debug::Endl();
 
 			return true;
 		}

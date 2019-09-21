@@ -8,8 +8,8 @@ namespace fan
 		REGISTER_EDITOR_COMPONENT(PointLight);
 		REGISTER_TYPE_INFO(PointLight)
 
-		fan::Signal< PointLight * > PointLight::onPointLightAttach;
-		fan::Signal< PointLight * > PointLight::onPointLightDetach;
+		Signal< PointLight * > PointLight::onPointLightAttach;
+		Signal< PointLight * > PointLight::onPointLightDetach;
 		
 		//================================================================================================================================
 		//================================================================================================================================

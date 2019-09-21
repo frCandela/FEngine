@@ -10,8 +10,8 @@ namespace fan
 {
 	namespace scene
 	{	
-		fan::Signal< Actor * > Actor::onActorAttach;
-		fan::Signal< Actor * > Actor::onActorDetach;
+		Signal< Actor * > Actor::onActorAttach;
+		Signal< Actor * > Actor::onActorDetach;
 
 		//================================================================================================================================
 		//================================================================================================================================

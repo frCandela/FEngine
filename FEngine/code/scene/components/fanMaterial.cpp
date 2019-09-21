@@ -16,8 +16,8 @@ namespace fan
 		REGISTER_EDITOR_COMPONENT(Material);
 		REGISTER_TYPE_INFO(Material)
 
-		fan::Signal< Material * > Material::onMaterialAttach;
-		fan::Signal< Material * > Material::onMaterialDetach;
+		Signal< Material * > Material::onMaterialAttach;
+		Signal< Material * > Material::onMaterialDetach;
 
 		//================================================================================================================================
 		//================================================================================================================================

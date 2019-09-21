@@ -48,9 +48,9 @@ namespace fan
 			}
 
 			if (ImGui::CollapsingHeader("Global")) {
-				float tmpFps = fan::Time::GetFPS();
+				float tmpFps = Time::GetFPS();
 				if (ImGui::DragFloat("Framerate", &tmpFps, 1.f, Time::GetMinFPS(), Time::GetMaxFPS())) {
-					fan::Time::SetFPS(tmpFps);
+					Time::SetFPS(tmpFps);
 				}
 
 				// Clear color

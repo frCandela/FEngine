@@ -10,8 +10,8 @@ namespace fan
 		class PointLight : public Component
 		{
 		public:
-			static fan::Signal< PointLight * > onPointLightAttach;
-			static fan::Signal< PointLight * > onPointLightDetach;
+			static Signal< PointLight * > onPointLightAttach;
+			static Signal< PointLight * > onPointLightDetach;
 
 			bool Load(std::istream& _in)  override;
 			bool Save(std::ostream& _out, const int _indentLevel) const override;

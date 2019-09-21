@@ -52,7 +52,7 @@ namespace fan
 			imageCreateInfo.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
 
 			if (vkCreateImage(m_device.vkDevice, &imageCreateInfo, nullptr, &m_image) != VK_SUCCESS) {
-				fan::Debug::Error("Could not allocate image");
+				Debug::Error("Could not allocate image");
 				return false;
 			}
 			VkMemoryRequirements memoryRequirements;
@@ -65,16 +65,16 @@ namespace fan
 			bufferMemoryAllocateInfo.memoryTypeIndex = m_device.FindMemoryType(memoryRequirements.memoryTypeBits, _memoryProperties);
 
 			if (vkAllocateMemory(m_device.vkDevice, &bufferMemoryAllocateInfo, nullptr, &m_imageMemory) != VK_SUCCESS) {
-				fan::Debug::Error("Could not allocate buffer");
+				Debug::Error("Could not allocate buffer");
 				return false;
 			}
 
 			if (vkBindImageMemory(m_device.vkDevice, m_image, m_imageMemory, 0) != VK_SUCCESS) {
-				fan::Debug::Error("Could not bind memory to image");
+				Debug::Error("Could not bind memory to image");
 				return false;
 			}
-			fan::Debug::Get() << fan::Debug::Severity::log << std::hex << "VkImage               " << m_image << std::dec << Debug::Endl();
-			fan::Debug::Get() << fan::Debug::Severity::log << "VkDeviceMemory        " << m_imageMemory << std::dec << Debug::Endl();
+			Debug::Get() << Debug::Severity::log << std::hex << "VkImage               " << m_image << std::dec << Debug::Endl();
+			Debug::Get() << Debug::Severity::log << "VkDeviceMemory        " << m_imageMemory << std::dec << Debug::Endl();
 
 			return true;
 		}

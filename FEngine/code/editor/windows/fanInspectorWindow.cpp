@@ -30,7 +30,7 @@ namespace fan
 		//================================================================================================================================
 		//================================================================================================================================
 		void InspectorWindow::OnGui() {
-			fan::Engine & engine = fan::Engine::GetEngine();
+			Engine & engine = Engine::GetEngine();
 			scene::Entity * const selection = engine.GetSelectedentity();
 
 			if (selection != nullptr)
@@ -87,7 +87,7 @@ namespace fan
 
 			if (ImGui::BeginPopup("New component"))
 			{
-				fan::Engine & engine = fan::Engine::GetEngine();
+				Engine & engine = Engine::GetEngine();
 				scene::Entity * const selection = engine.GetSelectedentity();
 				
 				std::vector<scene::Component *>& components = ComponentsRegister::GetComponents();

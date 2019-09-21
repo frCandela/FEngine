@@ -25,10 +25,10 @@ namespace fan
 			~RessourceManager();
 
 			// Mesh management
-			fan::Mesh *		LoadMesh(const std::string _path);
-			fan::Mesh *		FindMesh(const std::string _path);
-			vk::MeshData *	FindMeshData(const fan::Mesh * _mesh);
-			void			SetDefaultMesh(const fan::Mesh * _defaultMesh) { m_defaultMesh = _defaultMesh; }
+			Mesh *		LoadMesh(const std::string _path);
+			Mesh *		FindMesh(const std::string _path);
+			vk::MeshData *	FindMeshData(const Mesh * _mesh);
+			void			SetDefaultMesh(const Mesh * _defaultMesh) { m_defaultMesh = _defaultMesh; }
 			const std::map< uint32_t, MeshData > GetMeshData() const { return m_meshList; }
 
 			// Texture management
@@ -45,11 +45,11 @@ namespace fan
 			vk::Device & m_device;
 
 			std::map< uint32_t, MeshData >	m_meshList;
-			const fan::Mesh *				m_defaultMesh = nullptr;
+			const Mesh *				m_defaultMesh = nullptr;
 			std::vector< vk::Texture * >	m_textures;
 			bool							m_modified = false;
 
-			void AddMesh(fan::Mesh * _mesh);
+			void AddMesh(Mesh * _mesh);
 		};
 	}
 }

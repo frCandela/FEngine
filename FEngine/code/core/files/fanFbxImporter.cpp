@@ -91,7 +91,7 @@ namespace fan {
 
 	//================================================================================================================================
 	//================================================================================================================================
-	bool FBXImporter::GetMesh( fan::Mesh & _mesh) {
+	bool FBXImporter::GetMesh( Mesh & _mesh) {
 		
 		fbxsdk::FbxAxisSystem axisSystem( 
 			fbxsdk::FbxAxisSystem::EUpVector::eYAxis, 

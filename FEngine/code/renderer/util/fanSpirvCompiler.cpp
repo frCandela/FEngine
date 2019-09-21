@@ -17,7 +17,7 @@ namespace fan
 		}
 		std::ifstream file(_filename);
 		if (!file.is_open()) {
-			fan::Debug::Get() << fan::Debug::Severity::error << "SpirvCompiler: Failed to load shader: " << _filename << Debug::Endl();
+			Debug::Get() << Debug::Severity::error << "SpirvCompiler: Failed to load shader: " << _filename << Debug::Endl();
 			return {};
 		}
 		std::string		InputGLSL((std::istreambuf_iterator< char >(file)), std::istreambuf_iterator< char >());
@@ -151,18 +151,18 @@ namespace fan
 		std::string PreprocessedGLSL;
 
 		if (!Shader.preprocess(&Resources, DefaultVersion, ENoProfile, false, false, messages, &PreprocessedGLSL, Includer)) {
-			fan::Debug::Get() << fan::Debug::Severity::error << "GLSL Preprocessing Failed for: " << _filename << Debug::Endl();
-			fan::Debug::Error(Shader.getInfoLog());
-			fan::Debug::Error(Shader.getInfoDebugLog());
+			Debug::Get() << Debug::Severity::error << "GLSL Preprocessing Failed for: " << _filename << Debug::Endl();
+			Debug::Error(Shader.getInfoLog());
+			Debug::Error(Shader.getInfoDebugLog());
 		}
 
 		const char * PreprocessedCStr = PreprocessedGLSL.c_str();
 		Shader.setStrings(&PreprocessedCStr, 1);
 
 		if (!Shader.parse(&Resources, 100, false, messages)) {
-			fan::Debug::Get() << fan::Debug::Severity::error << "GLSL Parsing Failed for: " << _filename << Debug::Endl();
-			fan::Debug::Error(Shader.getInfoLog());
-			fan::Debug::Error(Shader.getInfoDebugLog());
+			Debug::Get() << Debug::Severity::error << "GLSL Parsing Failed for: " << _filename << Debug::Endl();
+			Debug::Error(Shader.getInfoLog());
+			Debug::Error(Shader.getInfoDebugLog());
 			return {};
 		}
 
@@ -170,9 +170,9 @@ namespace fan
 		Program.addShader(&Shader);
 
 		if (!Program.link(messages)) {
-			fan::Debug::Get() << fan::Debug::Severity::error << "GLSL Linking Failed for: " << _filename << Debug::Endl();
-			fan::Debug::Error(Shader.getInfoLog());
-			fan::Debug::Error(Shader.getInfoDebugLog());
+			Debug::Get() << Debug::Severity::error << "GLSL Linking Failed for: " << _filename << Debug::Endl();
+			Debug::Error(Shader.getInfoLog());
+			Debug::Error(Shader.getInfoDebugLog());
 			return {};
 		}
 

@@ -39,7 +39,7 @@ namespace fan
 		vk::Texture * RessourceManager::LoadTexture(const std::string _path) {
 			// Dont add the texture if it already exists
 			if (FindTexture(_path) != nullptr) {
-				fan::Debug::Get() << fan::Debug::Severity::warning << "Texture already added: " << _path << Debug::Endl();
+				Debug::Get() << Debug::Severity::warning << "Texture already added: " << _path << Debug::Endl();
 				return nullptr;
 			}
 
@@ -68,8 +68,8 @@ namespace fan
 
 		//================================================================================================================================
 		//================================================================================================================================
-		fan::Mesh * RessourceManager::LoadMesh(const std::string _path) {
-			fan::Mesh * mesh = new fan::Mesh(_path);
+		Mesh * RessourceManager::LoadMesh(const std::string _path) {
+			Mesh * mesh = new Mesh(_path);
 			mesh->Load();
 			AddMesh(mesh);
 			return mesh;
@@ -77,7 +77,7 @@ namespace fan
 
 		//================================================================================================================================
 		//================================================================================================================================
-		fan::Mesh * RessourceManager::FindMesh(const std::string _path) {
+		Mesh * RessourceManager::FindMesh(const std::string _path) {
 			const std::map<uint32_t, MeshData>::iterator it = m_meshList.find(DSID(_path.c_str()));
 			if (it == m_meshList.end()) {
 				return nullptr;
@@ -91,13 +91,13 @@ namespace fan
 		// Return the mesh data associated with a mesh
 		// Return a default cube if no mesh found
 		//================================================================================================================================
-		vk::MeshData * RessourceManager::FindMeshData(const fan::Mesh * _mesh) {
+		vk::MeshData * RessourceManager::FindMeshData(const Mesh * _mesh) {
 			const std::map<uint32_t, MeshData>::iterator it = m_meshList.find(_mesh->GetRessourceID());
 			if (it != m_meshList.end()) {
 				return &it->second;
 			}
 			else {
-				fan::Debug::Get() << fan::Debug::Severity::error << "Mesh not found : " << _mesh->GetPath() << Debug::Endl();
+				Debug::Get() << Debug::Severity::error << "Mesh not found : " << _mesh->GetPath() << Debug::Endl();
 				return &m_meshList.find(m_defaultMesh->GetRessourceID())->second;
 			}
 		}
@@ -105,9 +105,9 @@ namespace fan
 
 		//================================================================================================================================
 		//================================================================================================================================
-		void  RessourceManager::AddMesh(fan::Mesh * _mesh) {
+		void  RessourceManager::AddMesh(Mesh * _mesh) {
 			if (m_meshList.find(_mesh->GetRessourceID()) != m_meshList.end()) {
-				fan::Debug::Get() << fan::Debug::Severity::warning << "Renderer::AddMesh : Mesh already registered: " << _mesh->GetPath() << Debug::Endl();
+				Debug::Get() << Debug::Severity::warning << "Renderer::AddMesh : Mesh already registered: " << _mesh->GetPath() << Debug::Endl();
 				return;
 			}
 

@@ -12,8 +12,8 @@ namespace fan
 		class Actor : public Component
 		{
 		public:
-			static fan::Signal< Actor * > onActorAttach;
-			static fan::Signal< Actor * > onActorDetach;
+			static Signal< Actor * > onActorAttach;
+			static Signal< Actor * > onActorDetach;
 
 			virtual void Start() = 0;
 			virtual void Update(const float _delta) = 0;

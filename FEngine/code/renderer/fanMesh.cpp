@@ -21,10 +21,10 @@ namespace fan {
 	void Mesh::Load( ) {	
 		Ressource::Load();
 		SetRessourceID(DSID(m_path.c_str()));
- 		fan::FBXImporter importer;
+ 		FBXImporter importer;
  		if (importer.LoadScene(m_path) == true) {
 			if (importer.GetMesh(*this) == false ) {
-				fan::Debug::Get() << "Failed to load mesh : " << m_path << Debug::Endl();
+				Debug::Get() << "Failed to load mesh : " << m_path << Debug::Endl();
 			}
 			else {
 				OptimizeVertices();

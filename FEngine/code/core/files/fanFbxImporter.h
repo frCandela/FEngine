@@ -21,7 +21,7 @@ namespace fan {
 		FBXImporter();
 		~FBXImporter();
 		bool LoadScene( const std::string _path );
-		bool GetMesh( fan::Mesh  & _mesh );
+		bool GetMesh( Mesh  & _mesh );
 
 	private:
 		std::string m_path;
