@@ -17,9 +17,9 @@ namespace fan
 	//================================================================================================================================
 	//================================================================================================================================
 	SceneWindow::SceneWindow() :
-		EditorWindow("scene"),
-		m_textBuffer({ "new_entity" })
+		EditorWindow("scene")
 	{
+		m_textBuffer[0] = '\0';
 		Scene::s_onSceneLoad.Connect(&SceneWindow::OnSceneLoad, this);
 	}
 
@@ -145,7 +145,7 @@ namespace fan
 				ImGui::SetKeyboardFocusHere();
 			}
 			bool enterPressed = false;
-			if (ImGui::InputText("Name ", m_textBuffer.data(), IM_ARRAYSIZE(m_textBuffer.data()), ImGuiInputTextFlags_EnterReturnsTrue)) {
+			if (ImGui::InputText("Name ", m_textBuffer, IM_ARRAYSIZE(m_textBuffer), ImGuiInputTextFlags_EnterReturnsTrue)) {
 				enterPressed = true;
 			}
 			if (ImGui::Button("Cancel") || ImGui::IsKeyPressed(GLFW_KEY_ESCAPE, false)) {
@@ -156,7 +156,7 @@ namespace fan
 			if (ImGui::Button("Ok") || enterPressed)
 			{
 				//Create new entity 
-				Entity* newentity = scene.CreateEntity(m_textBuffer.data(), m_lastEntityRightClicked);
+				Entity* newentity = scene.CreateEntity(m_textBuffer, m_lastEntityRightClicked);
 				newentity->AddComponent<Transform>();
 				engine.SetSelectedEntity(newentity);
 				m_lastEntityRightClicked = nullptr;
@@ -177,7 +177,7 @@ namespace fan
 				ImGui::SetKeyboardFocusHere();
 			}
 			bool enterPressed = false;
-			if (ImGui::InputText("New Name ", m_textBuffer.data(), IM_ARRAYSIZE(m_textBuffer.data()), ImGuiInputTextFlags_EnterReturnsTrue)) {
+			if (ImGui::InputText("New Name ", m_textBuffer, IM_ARRAYSIZE(m_textBuffer), ImGuiInputTextFlags_EnterReturnsTrue)) {
 				enterPressed = true;
 			}
 			if (ImGui::Button("Cancel") || ImGui::IsKeyPressed(GLFW_KEY_ESCAPE, false)) {
@@ -187,7 +187,7 @@ namespace fan
 			ImGui::SameLine();
 			if (ImGui::Button("Ok") || ImGui::IsKeyPressed(GLFW_KEY_ENTER, false) || enterPressed)
 			{
-				m_lastEntityRightClicked->SetName(m_textBuffer.data());
+				m_lastEntityRightClicked->SetName(m_textBuffer);
 				m_lastEntityRightClicked = nullptr;
 				ImGui::CloseCurrentPopup();
 			}

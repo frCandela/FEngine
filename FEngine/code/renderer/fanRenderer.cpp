@@ -330,14 +330,17 @@ namespace fan
 		void Renderer::UpdateUniformBuffer()
 		{
 			// Lights
-			ForwardPipeline::LightsUniforms uniforms = m_forwardPipeline->GetPointLightUniforms();
+			ForwardPipeline::LightsUniforms uniforms = m_forwardPipeline->GetLightUniforms();
 			for (int lightIndex = 0; lightIndex < m_pointLights.size() ; lightIndex++){
 				const PointLightData & data = m_pointLights[lightIndex];
 				uniforms.lights[data.indexUniform].color = data.pointLight->GetColor().ToGLM();
-				uniforms.lights[data.indexUniform].position = ToGLM(data.transform->GetPosition());			
+				uniforms.lights[data.indexUniform].position = ToGLM(data.transform->GetPosition());	
+				uniforms.lights[data.indexUniform].constant = data.pointLight->GetAttenuation(PointLight::CONSTANT); 
+				uniforms.lights[data.indexUniform].linear = data.pointLight->GetAttenuation(PointLight::LINEAR);
+				uniforms.lights[data.indexUniform].quadratic = data.pointLight->GetAttenuation(PointLight::QUADRATIC);
 			}
 			uniforms.lightNum = static_cast<uint32_t>( m_pointLights.size() );
-			m_forwardPipeline->SetPointLightUniforms(uniforms);
+			m_forwardPipeline->SetLightUniforms(uniforms);
 			
 
 			// Main camera transform
@@ -806,6 +809,11 @@ namespace fan
 		//================================================================================================================================
 		//================================================================================================================================
 		std::vector< btVector3> Renderer::DebugSphere(const btTransform _transform, const float _radius, const int _numSubdivisions, const Color _color) {
+			if (_radius <= 0) {
+				Debug::Warning("Debug sphere radius cannot be zero or negative");
+				return {};
+			}
+			
 			std::vector<btVector3> sphere = GetSphere(_radius, _numSubdivisions);
 
 			for (int vertIndex = 0; vertIndex < sphere.size(); vertIndex++) {
@@ -813,7 +821,12 @@ namespace fan
 			}
 
 			for (int triangleIndex = 0; triangleIndex < sphere.size() / 3; triangleIndex++) {
-				DebugTriangle(sphere[3 * triangleIndex + 0], sphere[3 * triangleIndex + 1], sphere[3 * triangleIndex + 2], _color);
+				const btVector3 v0 = sphere[3 * triangleIndex + 0];
+				const btVector3 v1 = sphere[3 * triangleIndex + 1];
+				const btVector3 v2 = sphere[3 * triangleIndex + 2];
+				DebugLine(v0, v1, _color);
+				DebugLine(v1, v2, _color);
+				DebugLine(v2, v0, _color);
 			}
 
 			return sphere;

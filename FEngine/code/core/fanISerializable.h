@@ -16,6 +16,7 @@ namespace fan {
 		static bool ReadSegmentHeader	( std::istream& _in, const std::string& _expectedHeader );
 		
 		static bool ReadFloat			( std::istream& _in, float & _outValue);
+		static bool ReadFloat3			( std::istream& _in, float * _outFloat3);
 		static bool ReadInteger			( std::istream& _in, int & _outValue);
 		static bool ReadUnsigned		( std::istream& _in, uint32_t & _outValue);
 		static bool ReadString			( std::istream& _in, std::string & _outStr );

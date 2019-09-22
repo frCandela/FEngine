@@ -64,7 +64,7 @@ namespace fan
 		CreateDescriptors();
 		CreatePipeline(_extent);
 
-		SetPointLightUniforms(m_pointLightUniform);
+		SetLightUniforms(m_pointLightUniform);
 	}
 
 	//================================================================================================================================
@@ -80,7 +80,7 @@ namespace fan
 
 		SetVertUniforms(m_vertUniforms);
 		SetFragUniforms(m_fragUniforms);
-		SetPointLightUniforms(m_pointLightUniform);
+		SetLightUniforms(m_pointLightUniform);
 		//SetDynamicUniformsVert({ {glm::mat4(1.0)},{glm::mat4(1.0)} });
 	}
 
@@ -121,7 +121,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void ForwardPipeline::SetPointLightUniforms(const LightsUniforms & _light) {
+	void ForwardPipeline::SetLightUniforms(const LightsUniforms & _light) {
 		m_pointLightUniform = _light;
 	}
 

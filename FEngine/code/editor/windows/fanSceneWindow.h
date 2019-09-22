@@ -20,7 +20,7 @@ namespace fan {
 		void OnGui() override;
 
 	private:
-		std::array<char, 64> m_textBuffer;
+		char m_textBuffer[32];
 		Entity * m_lastEntityRightClicked = nullptr;
 		bool m_expandSceneHierarchy = false;
 

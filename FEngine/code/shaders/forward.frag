@@ -20,7 +20,10 @@ layout (binding = 3) uniform DynamicUniformBufferFrag {
 
 struct PointLight {
 	vec3  position;
+	float constant;
 	vec3  color;
+	float linear;
+	float quadratic;
 };
 
 layout(binding = 4) uniform LightUniform {
@@ -41,7 +44,7 @@ vec3 CalcPointLight(const PointLight light, const vec3 normal, const vec3 fragPo
     float spec = pow(max(dot(viewDir, reflectDir), 0.0), uniforms.specularHardness);
     // attenuation
     float distance    = length(light.position - fragPos);
-    float attenuation = 1.0 / distance;//(light.constant) + light.linear * distance + light.quadratic * (distance * distance));    
+    float attenuation = 1.0 / (light.constant + light.linear * distance + light.quadratic * (distance * distance));    
     // combine results
     vec3 ambient  = vec3(uniforms.ambiantIntensity)  * vec3(texture(texSampler[dynamicUbo.textureIndex], inTexCoord));
     vec3 diffuse  = light.color  * vec3(diff);// * vec3(texture(material.diffuse, TexCoords));

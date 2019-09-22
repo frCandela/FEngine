@@ -33,15 +33,16 @@ namespace fan
 		};
 
 		struct PointLight {
-			glm::vec3	position;
-			glm::float32 padding; //TODO use alignas(X) instead
-			glm::vec3	color;
-			glm::float32 padding2;
+			alignas(16) glm::vec3		position;
+			alignas(4)  glm::float32	constant; //TODO use alignas(X) instead
+			alignas(16) glm::vec3		color;
+			alignas(4)  glm::float32	linear;
+			alignas(4)  glm::float32	quadratic;
 		};
 
 		struct LightsUniforms {
-			PointLight lights[ForwardPipeline::s_maximumNumLights];
-			uint32_t lightNum;
+			alignas(16) PointLight lights[ForwardPipeline::s_maximumNumLights];
+			alignas(4)  uint32_t lightNum;
 		};
 
 		struct FragUniforms
@@ -74,8 +75,8 @@ namespace fan
 		FragUniforms	GetFragUniforms() const { return m_fragUniforms; }
 		void			SetFragUniforms(const FragUniforms _fragUniforms);
 
-		LightsUniforms	GetPointLightUniforms() const { return m_pointLightUniform; }
-		void			SetPointLightUniforms(const LightsUniforms& _lights);
+		LightsUniforms	GetLightUniforms() const { return m_pointLightUniform; }
+		void			SetLightUniforms(const LightsUniforms& _lights);
 
 		void	SetDynamicUniformVert(const DynamicUniformsVert& _dynamicUniform, const uint32_t _index);
 		void	SetDynamicUniformFrag(const DynamicUniformsFrag& _dynamicUniform, const uint32_t _index);

@@ -36,14 +36,13 @@ namespace fan
 		{
 			// entity gui
 			selection->OnGui();
-			int componentCount = 0;
-
+			int componentCount = 0;			
 			const std::vector<Component*> & components = selection->GetComponents();
 			for (int componentIndex = 0; componentIndex < components.size(); componentIndex++) {
 				Component * component = components[componentIndex];
 
 				ImGui::Separator();
-
+				// Actor "enable" checkbox
 				if (component->IsActor()) {	// TODO : use type info when type info deals with inheritance
 					ImGui::PushID((int*)component);
 					Actor * actor = static_cast<Actor*>(component);
@@ -56,7 +55,7 @@ namespace fan
 				}
 
 				// Delete button
-				ImGui::Text(component->GetName());
+				ImGui::Text( component->GetName());
 				if (component->IsRemovable()) {
 					std::stringstream ss;
 					ss << "X" << "##" << component->GetName() << componentCount++;	// make unique id
@@ -66,12 +65,13 @@ namespace fan
 						component = nullptr;
 					}
 				}
+				
+				// Draw component
 				if (component != nullptr) {
 					component->OnGui();
 				}
-			}
+			}			
 			ImGui::Separator();
-			ImGui::SameLine();
 			//Add component button
 			if (ImGui::Button("Add component"))
 				ImGui::OpenPopup("New component");

@@ -86,13 +86,13 @@ namespace fan
 		void UnRegisterPointLight(PointLight *	_pointLight);
 		void Clear();
 
-		void					DebugPoint(const btVector3 _pos, const Color _color);
-		void					DebugLine(const btVector3 _start, const btVector3 _end, const Color _color, const bool _depthTestEnable = true);
-		void					DebugTriangle(const btVector3 _v0, const btVector3 _v1, const btVector3 _v2, const Color _color);
-		std::vector< btVector3> DebugCube(const btTransform _transform, const float _halfSize, const Color _color);
-		std::vector< btVector3> DebugSphere(const btTransform _transform, const float _radius, const int _numSubdivisions, const Color _color);
-		std::vector< btVector3> DebugCone(const btTransform _transform, const float _radius, const float _height, const int _numSubdivisions, const Color _color);
-		void					DebugAABB(const AABB & _aabb, const Color _color);
+		void					DebugPoint	  ( const btVector3 _pos, const Color _color);
+		void					DebugLine	  ( const btVector3 _start, const btVector3 _end, const Color _color, const bool _depthTestEnable = true);
+		void					DebugTriangle ( const btVector3 _v0, const btVector3 _v1, const btVector3 _v2, const Color _color);
+		std::vector< btVector3> DebugCube	  ( const btTransform _transform, const float _halfSize, const Color _color);
+		std::vector< btVector3> DebugSphere	  ( const btTransform _transform, const float _radius, const int _numSubdivisions, const Color _color);
+		std::vector< btVector3> DebugCone	  ( const btTransform _transform, const float _radius, const float _height, const int _numSubdivisions, const Color _color);
+		void					DebugAABB	  ( const AABB & _aabb, const Color _color);
 
 	private:
 		//SCENE REFERENCES

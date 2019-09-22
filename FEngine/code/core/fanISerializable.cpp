@@ -42,6 +42,9 @@ namespace fan {
 	bool ISerializable::ReadSegmentHeader(std::istream& _in, const std::string& _expectedHeader) {
 		std::string buffer;
 		_in >> buffer;
+		if (buffer == "") {
+			return false;
+		}
 		return buffer[buffer.size() - 1] == ':' && buffer == _expectedHeader;
 	}	
 
@@ -53,6 +56,16 @@ namespace fan {
 		return true;
 	}
 
+	//================================================================================================================================
+	//================================================================================================================================
+	bool ISerializable::ReadFloat3(std::istream& _in, float * _outFloat3) {
+		if (!ReadFloat(_in, _outFloat3[0])) { return false; }
+		if (!ReadFloat(_in, _outFloat3[1])) { return false; }
+		if (!ReadFloat(_in, _outFloat3[2])) { return false; }
+		return true;
+	}
+
+	static bool ReadFloat3(std::istream& _in, float * _outValue);
 	//================================================================================================================================
 	//================================================================================================================================
 	bool ISerializable::ReadInteger(std::istream& _in, int & _outValue) {
