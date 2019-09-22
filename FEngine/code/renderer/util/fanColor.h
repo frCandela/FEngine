@@ -7,7 +7,8 @@ namespace fan
 	class Color {
 	public:
 		Color();
-		Color(const float _r, const float _g, const float _b, const float _a);
+		Color(const float _rgb);
+		Color(const float _r, const float _g, const float _b, const float _a = 1.f);
 
 		float * Data() { return &m_colorData.x; }
 		glm::vec4 ToGLM() const { return m_colorData; }

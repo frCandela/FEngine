@@ -39,6 +39,7 @@ namespace fan
 			alignas(4)  glm::float32	linear;
 			alignas(16) glm::vec3		specular;
 			alignas(4)  glm::float32	quadratic;
+			alignas(16) glm::vec3		ambiant;
 		};
 
 		struct LightsUniforms {

@@ -13,7 +13,7 @@ Entities: 1 {
                 computeAABB: true
                 Components: 4 {
                     Transform: 1269105190 {
-                        position: 8.64887 5.25 -4.81744
+                        position: 4.38211 5.25 -0.223709
                         rotation: 0.707107 0 0 0.707107
                         scale:    1 1 1
                     }
@@ -48,9 +48,10 @@ Entities: 1 {
                         material: content\models\sun.png
                     }
                     PointLight: 3039791276 {
-                        diffuse: 1 0.488828 0
-                        specular: 1 0.297287 0
-                        attenuation: 0 0.2 0
+                        ambiant: 1 0.380952 0
+                        diffuse: 1 0.380952 0
+                        specular: 1 0.380952 0
+                        attenuation: 0 0 0.1
                     }
                 }
                 Childs: 2 {
@@ -58,7 +59,7 @@ Entities: 1 {
                         computeAABB: true
                         Components: 4 {
                             Transform: 1269105190 {
-                                position: 9.30239 0 8.28357
+                                position: -8.20039 0 9.3758
                                 rotation: 0 0 0 1
                                 scale:    1 1 1
                             }
@@ -79,7 +80,7 @@ Entities: 1 {
                                 computeAABB: true
                                 Components: 4 {
                                     Transform: 1269105190 {
-                                        position: 10.0941 0 5.46934
+                                        position: -8.83873 0 6.69245
                                         rotation: 0 0 0 1
                                         scale:    0.5 0.5 0.5
                                     }
@@ -104,7 +105,7 @@ Entities: 1 {
                         computeAABB: true
                         Components: 4 {
                             Transform: 1269105190 {
-                                position: 3.45479 0 3.07641
+                                position: -3.04552 0 3.48205
                                 rotation: 0 0 0 1
                                 scale:    0.5 0.5 0.5
                             }
@@ -129,8 +130,8 @@ Entities: 1 {
                 computeAABB: true
                 Components: 4 {
                     Transform: 1269105190 {
-                        position: 8.64887 0 -4.81744
-                        rotation: 0 0.000798637 0 0.999772
+                        position: 4.37977 0 -0.357022
+                        rotation: 0 -0.00875826 0 -0.999717
                         scale:    0.1 0.1 0.1
                     }
                     Model: 1739103771 {
@@ -140,7 +141,7 @@ Entities: 1 {
                         material: content\models\test\textures\texture3.png
                     }
                     SpaceShip: 3824437066 {
-                        isEnabled: false
+                        isEnabled: true
                         speed:          8
                         rotation_speed: 3
                     }

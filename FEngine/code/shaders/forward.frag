@@ -25,6 +25,7 @@ struct PointLight {
 	float	linear;
 	vec3	specular;
 	float	quadratic;
+	vec3	ambiant;
 };
 
 layout(binding = 4) uniform LightUniform {
@@ -47,8 +48,8 @@ vec3 CalcPointLight(const PointLight light, const vec3 normal, const vec3 fragPo
     float distance    = length(light.position - fragPos);
     float attenuation = 1.0 / (light.constant + light.linear * distance + light.quadratic * (distance * distance));    
     // combine results
-    vec3 ambient  = vec3(uniforms.ambiantIntensity)  * vec3(texture(texSampler[dynamicUbo.textureIndex], inTexCoord));
-    vec3 diffuse  = light.diffuse  * vec3(diff);// * vec3(texture(material.diffuse, TexCoords));
+    vec3 ambient  = light.ambiant  * vec3(texture(texSampler[dynamicUbo.textureIndex], inTexCoord));
+    vec3 diffuse  = light.diffuse  * vec3(diff) * vec3(texture(texSampler[dynamicUbo.textureIndex], inTexCoord));
     vec3 specular = light.specular * vec3(spec);// * vec3(texture(material.specular, TexCoords));
     ambient  *= attenuation;
     diffuse  *= attenuation;

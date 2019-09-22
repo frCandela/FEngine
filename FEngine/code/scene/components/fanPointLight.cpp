@@ -15,7 +15,11 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	PointLight::PointLight() {
+	PointLight::PointLight() : 
+		m_ambiant  ( Color(0.2f) ),
+		m_diffuse  ( Color::White),
+		m_specular ( Color::White) 
+	{
 		m_attenuation[Attenuation::CONSTANT] = 0;
 		m_attenuation[Attenuation::LINEAR] = 2;
 		m_attenuation[Attenuation::QUADRATIC] = 1;
@@ -23,8 +27,15 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void PointLight::SetDiffuse(const Color _ambiant) {
-		m_diffuse = _ambiant;
+	void PointLight::SetAmbiant(const Color _ambiant) {
+		m_ambiant = _ambiant;
+		MarkModified();
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
+	void PointLight::SetDiffuse(const Color _diffuse) {
+		m_diffuse = _diffuse;
 		MarkModified();
 	}	
 	
@@ -66,6 +77,8 @@ namespace fan
 	void PointLight::OnGui() {
 		Component::OnGui();
 		// Filter color
+		if (ImGui::Button("##ambiant")) { SetAmbiant(Color(0.2f)); } ImGui::SameLine();
+		if (ImGui::ColorEdit3("ambiant", m_ambiant.Data(), gui::colorEditFlags)) { MarkModified(); }
 		if (ImGui::Button("##diffuse")) { SetDiffuse(Color::White); } ImGui::SameLine();
 		if (ImGui::ColorEdit3("diffuse", m_diffuse.Data(), gui::colorEditFlags)) { MarkModified(); }
 		if (ImGui::Button("##specular")) { SetSpecular(Color::White); } ImGui::SameLine();
@@ -73,6 +86,12 @@ namespace fan
 		// Attenuation
 		
 		ImGui::Text("attenuation :");  
+		ImGui::SameLine();  
+		gui::ShowHelpMarker(
+			"Light intensity fades out with distance \n"
+			"Fadings follows the following formula : \n"
+			"constant + linear * d + quadratic * d*d  \n"
+			"(d=distance)");
 		if (ImGui::Button("##constant attenuation")) { SetAttenuation(Attenuation::CONSTANT, 0.f ); }	ImGui::SameLine();
 		if (ImGui::DragFloat("constant",  &m_attenuation[Attenuation::CONSTANT],0.25f, 0.f, 100.f)) { MarkModified(); }		
 		if (ImGui::Button("##linear attenuation")) { SetAttenuation(Attenuation::LINEAR, 2.f); }	ImGui::SameLine();
@@ -84,7 +103,7 @@ namespace fan
 		float lightRange = GetLightRange();
 		if (lightRange > 0 ) {
 			const btTransform transform = GetEntity()->GetComponent<Transform>()->GetBtTransform();
-			Renderer::Get().DebugSphere(transform, lightRange, 3, m_diffuse);
+			Renderer::Get().DebugSphere(transform, lightRange, 2, m_diffuse);
 		}
 	}
 
@@ -108,6 +127,8 @@ namespace fan
 	//================================================================================================================================
 	//================================================================================================================================
 	bool PointLight::Load(std::istream& _in) {
+		if (!ReadSegmentHeader(_in, "ambiant:")) { return false; }
+		if (!ReadFloat3(_in, &m_ambiant[0])) { return false; }
 		if (!ReadSegmentHeader(_in, "diffuse:")) { return false; }
 		if (!ReadFloat3(_in, &m_diffuse[0])) { return false; }
 		if (!ReadSegmentHeader(_in, "specular:")) { return false; }
@@ -121,6 +142,7 @@ namespace fan
 	//================================================================================================================================
 	bool PointLight::Save(std::ostream& _out, const int _indentLevel) const {
 		const std::string indentation = GetIndentation(_indentLevel);
+		_out << indentation << "ambiant: " << m_ambiant[0] << " " << m_ambiant[1] << " " << m_ambiant[2] << std::endl;
 		_out << indentation << "diffuse: " << m_diffuse[0] << " " << m_diffuse[1] << " " << m_diffuse[2] << std::endl;
 		_out << indentation << "specular: " << m_specular[0] << " " << m_specular[1] << " " << m_specular[2] << std::endl;
 		_out << indentation << "attenuation: " << m_attenuation[0] << " " << m_attenuation[1] << " " << m_attenuation[2] << std::endl;

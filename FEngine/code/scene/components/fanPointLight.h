@@ -19,10 +19,13 @@ namespace fan
 		void OnGui() override;
 		bool IsUnique()	const override { return true; }
 
+		Color GetAmbiant() const { return m_ambiant; }
+		void  SetAmbiant(const Color _ambiant);
 		Color GetDiffuse() const { return m_diffuse; }
 		void  SetDiffuse(const Color _diffuse);
 		Color GetSpecular() const { return m_specular; }
 		void  SetSpecular(const Color m_specular);
+
 		float GetAttenuation( const Attenuation _attenuation ) const { return m_attenuation[_attenuation]; }
 		void  SetAttenuation( const Attenuation _attenuation, const float _value );
 
@@ -34,6 +37,7 @@ namespace fan
 		void OnDetach() override;
 
 	private:
+		Color m_ambiant;
 		Color m_diffuse;
 		Color m_specular;
 		float m_attenuation[3];

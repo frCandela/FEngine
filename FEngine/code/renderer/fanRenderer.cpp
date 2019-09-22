@@ -335,6 +335,7 @@ namespace fan
 				const PointLightData & data = m_pointLights[lightIndex];
 				uniforms.lights[data.indexUniform].diffuse = data.pointLight->GetDiffuse().ToGLM();
 				uniforms.lights[data.indexUniform].specular = data.pointLight->GetSpecular().ToGLM();
+				uniforms.lights[data.indexUniform].ambiant = data.pointLight->GetAmbiant().ToGLM();
 				uniforms.lights[data.indexUniform].position = ToGLM(data.transform->GetPosition());	
 				uniforms.lights[data.indexUniform].constant = data.pointLight->GetAttenuation(PointLight::CONSTANT); 
 				uniforms.lights[data.indexUniform].linear = data.pointLight->GetAttenuation(PointLight::LINEAR);
