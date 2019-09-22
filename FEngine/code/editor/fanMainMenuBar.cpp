@@ -19,243 +19,240 @@
 
 namespace fan
 {
-	namespace editor {
+	//================================================================================================================================
+	//================================================================================================================================
+	MainMenuBar::MainMenuBar() :
+		m_showImguiDemoWindow(true)
+		, m_showAABB(false)
+		, m_showHull(false)
+		, m_showWireframe(false)
+		, m_showNormals(false)
+		, m_sceneExtensionFilter(GlobalValues::s_sceneExtensions) {
+	}
 
-		//================================================================================================================================
-		//================================================================================================================================
-		MainMenuBar::MainMenuBar() :
-			m_showImguiDemoWindow(true)
-			, m_showAABB(false)
-			, m_showHull(false)
-			, m_showWireframe(false)
-			, m_showNormals(false)
-			, m_sceneExtensionFilter(GlobalValues::s_sceneExtensions) {
+	//================================================================================================================================
+	//================================================================================================================================
+	void MainMenuBar::Initialize() {
+		SerializedValues::Get().GetValue("show_imguidemo", m_showImguiDemoWindow);
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
+	MainMenuBar::~MainMenuBar() {
+		SerializedValues::Get().SetValue("show_imguidemo", m_showImguiDemoWindow);
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
+	void MainMenuBar::Draw() {
+		Engine &	engine = Engine::GetEngine();
+		Renderer &	renderer = Renderer::Get();
+
+		if (m_showImguiDemoWindow) {
+			ImGui::ShowDemoWindow(&m_showImguiDemoWindow);
 		}
-
-		//================================================================================================================================
-		//================================================================================================================================
-		void MainMenuBar::Initialize() {
-			SerializedValues::Get().GetValue("show_imguidemo", m_showImguiDemoWindow);
-		}
-
-		//================================================================================================================================
-		//================================================================================================================================
-		MainMenuBar::~MainMenuBar() {
-			SerializedValues::Get().SetValue("show_imguidemo", m_showImguiDemoWindow);
-		}
-
-		//================================================================================================================================
-		//================================================================================================================================
-		void MainMenuBar::Draw() {
-			Engine &	engine = Engine::GetEngine();
-			Renderer &	renderer = Renderer::Get();
-
-			if (m_showImguiDemoWindow) {
-				ImGui::ShowDemoWindow(&m_showImguiDemoWindow);
-			}
-			if (ImGui::BeginMainMenuBar())
+		if (ImGui::BeginMainMenuBar())
+		{
+			// FILE
+			if (ImGui::BeginMenu("File"))
 			{
-				// FILE
-				if (ImGui::BeginMenu("File"))
-				{
-					if (ImGui::MenuItem("New")) {
-						New();
-					}
-					if (ImGui::MenuItem("Open", "Ctrl+O")) {
-						Open();
-					}
-					if (ImGui::MenuItem("Save", "Ctrl+S")) {
-						Save();
-					}
-					if (ImGui::MenuItem("Save as")) {
-						SaveAs();
-					}
-
-					ImGui::Separator();
-
-					if (ImGui::MenuItem("Reload shaders", "F5")) {
-						renderer.ReloadShaders();
-					}
-
-					ImGui::Separator();
-
-					if (ImGui::MenuItem("Exit")) {
-						engine.Exit();
-					}
-
-					ImGui::EndMenu();
+				if (ImGui::MenuItem("New")) {
+					New();
+				}
+				if (ImGui::MenuItem("Open", "Ctrl+O")) {
+					Open();
+				}
+				if (ImGui::MenuItem("Save", "Ctrl+S")) {
+					Save();
+				}
+				if (ImGui::MenuItem("Save as")) {
+					SaveAs();
 				}
 
-				// View
-				if (ImGui::BeginMenu("View"))
-				{
-					bool showPostprocessWindow = engine.GetRenderWindow().IsVisible();
-					if (ImGui::Checkbox("Rendering", &showPostprocessWindow)) {
-						engine.GetRenderWindow().SetVisible(showPostprocessWindow);
-					}
-					bool showSceneWindow = engine.GetSceneWindow().IsVisible();
-					if (ImGui::Checkbox("Scene", &showSceneWindow)) {
-						engine.GetSceneWindow().SetVisible(showSceneWindow);
-					}
-					bool showInspector = engine.GetInspectorWindow().IsVisible();
-					if (ImGui::Checkbox("Inspector", &showInspector)) {
-						engine.GetInspectorWindow().SetVisible(showInspector);
-					}
-					bool showPreferences = engine.GetPreferencesWindow().IsVisible();
-					if (ImGui::Checkbox("Preferences", &showPreferences)) {
-						engine.GetPreferencesWindow().SetVisible(showPreferences);
-					}
-					bool showConsole = engine.GetConsoleWindow().IsVisible();
-					if (ImGui::Checkbox("Console", &showConsole)) {
-						engine.GetConsoleWindow().SetVisible(showConsole);
-					}
+				ImGui::Separator();
 
-					ImGui::Separator();
-					ImGui::Checkbox("Imgui demo", &m_showImguiDemoWindow);
-
-					ImGui::EndMenu();
+				if (ImGui::MenuItem("Reload shaders", "F5")) {
+					renderer.ReloadShaders();
 				}
 
-				// Editor
-				if (ImGui::BeginMenu("Editor"))
-				{
-					if (ImGui::Checkbox("show hull", &m_showHull)) {}
-					if (ImGui::Checkbox("show AABB", &m_showAABB)) {}
-					if (ImGui::Checkbox("show Wireframe", &m_showWireframe)) {}
-					if (ImGui::Checkbox("show Normals", &m_showNormals)) {}
-					ImGui::EndMenu();
+				ImGui::Separator();
+
+				if (ImGui::MenuItem("Exit")) {
+					engine.Exit();
 				}
 
-				// Editor
-				if (ImGui::BeginMenu("Grid"))
-				{
-					Engine::EditorGrid  gridData = engine.GetEditorGrid();
-					if (ImGui::Checkbox("is visible", &gridData.isVisible)) {
-						engine.SetEditorGrid(gridData);
-					}
+				ImGui::EndMenu();
+			}
 
-					if (ImGui::DragFloat("spacing", &gridData.spacing, 0.25f, 0.f, 100.f)) {
-						engine.SetEditorGrid(gridData);
-					}
-
-					if (ImGui::DragInt("lines count", &gridData.linesCount, 1.f, 0, 1000)) {
-						engine.SetEditorGrid(gridData);
-					}
-
-					if (ImGui::ColorEdit3("color", &gridData.color[0], gui::colorEditFlags)) {
-						engine.SetEditorGrid(gridData);
-					}
-					ImGui::EndMenu();
+			// View
+			if (ImGui::BeginMenu("View"))
+			{
+				bool showPostprocessWindow = engine.GetRenderWindow().IsVisible();
+				if (ImGui::Checkbox("Rendering", &showPostprocessWindow)) {
+					engine.GetRenderWindow().SetVisible(showPostprocessWindow);
+				}
+				bool showSceneWindow = engine.GetSceneWindow().IsVisible();
+				if (ImGui::Checkbox("Scene", &showSceneWindow)) {
+					engine.GetSceneWindow().SetVisible(showSceneWindow);
+				}
+				bool showInspector = engine.GetInspectorWindow().IsVisible();
+				if (ImGui::Checkbox("Inspector", &showInspector)) {
+					engine.GetInspectorWindow().SetVisible(showInspector);
+				}
+				bool showPreferences = engine.GetPreferencesWindow().IsVisible();
+				if (ImGui::Checkbox("Preferences", &showPreferences)) {
+					engine.GetPreferencesWindow().SetVisible(showPreferences);
+				}
+				bool showConsole = engine.GetConsoleWindow().IsVisible();
+				if (ImGui::Checkbox("Console", &showConsole)) {
+					engine.GetConsoleWindow().SetVisible(showConsole);
 				}
 
-				/////////////////////
-			} ImGui::EndMainMenuBar();
+				ImGui::Separator();
+				ImGui::Checkbox("Imgui demo", &m_showImguiDemoWindow);
 
-			ProcessKeyboardShortcuts();
-
-			// Open scene popup
-			if (m_openNewScenePopupLater == true) {
-				m_openNewScenePopupLater = false;
-				ImGui::OpenPopup("New scene");
+				ImGui::EndMenu();
 			}
 
-			// Open scene popup
-			if (m_openLoadScenePopupLater == true) {
-				m_openLoadScenePopupLater = false;
-				ImGui::OpenPopup("Open scene");
+			// Editor
+			if (ImGui::BeginMenu("Editor"))
+			{
+				if (ImGui::Checkbox("show hull", &m_showHull)) {}
+				if (ImGui::Checkbox("show AABB", &m_showAABB)) {}
+				if (ImGui::Checkbox("show Wireframe", &m_showWireframe)) {}
+				if (ImGui::Checkbox("show Normals", &m_showNormals)) {}
+				ImGui::EndMenu();
 			}
 
-			// Save scene popup
-			if (m_openSaveScenePopupLater == true) {
-				m_openSaveScenePopupLater = false;
-				ImGui::OpenPopup("Save scene");
-			}
-
-			DrawModals();
-		}
-
-		//================================================================================================================================
-		//================================================================================================================================
-		void MainMenuBar::ProcessKeyboardShortcuts() {
-
-			if (Keyboard::IsKeyDown(GLFW_KEY_LEFT_CONTROL) && Keyboard::IsKeyPressed(GLFW_KEY_O)) {
-				Open();
-			}
-
-			if (Keyboard::IsKeyDown(GLFW_KEY_LEFT_CONTROL) && Keyboard::IsKeyPressed(GLFW_KEY_S)) {
-				Save();
-			}
-
-			if (Keyboard::IsKeyPressed(GLFW_KEY_DELETE)) {
-				scene::Entity * entity = Engine::GetEngine().GetSelectedentity();
-				if ( entity != nullptr ) {
-					Engine::GetEngine().GetScene().DeleteEntity(entity);
+			// Editor
+			if (ImGui::BeginMenu("Grid"))
+			{
+				Engine::EditorGrid  gridData = engine.GetEditorGrid();
+				if (ImGui::Checkbox("is visible", &gridData.isVisible)) {
+					engine.SetEditorGrid(gridData);
 				}
-			} 
-			
-			if (Keyboard::IsKeyPressed(GLFW_KEY_F5)) {
-				Renderer::Get().ReloadShaders();
+
+				if (ImGui::DragFloat("spacing", &gridData.spacing, 0.25f, 0.f, 100.f)) {
+					engine.SetEditorGrid(gridData);
+				}
+
+				if (ImGui::DragInt("lines count", &gridData.linesCount, 1.f, 0, 1000)) {
+					engine.SetEditorGrid(gridData);
+				}
+
+				if (ImGui::ColorEdit3("color", &gridData.color[0], gui::colorEditFlags)) {
+					engine.SetEditorGrid(gridData);
+				}
+				ImGui::EndMenu();
+			}
+
+			/////////////////////
+		} ImGui::EndMainMenuBar();
+
+		ProcessKeyboardShortcuts();
+
+		// Open scene popup
+		if (m_openNewScenePopupLater == true) {
+			m_openNewScenePopupLater = false;
+			ImGui::OpenPopup("New scene");
+		}
+
+		// Open scene popup
+		if (m_openLoadScenePopupLater == true) {
+			m_openLoadScenePopupLater = false;
+			ImGui::OpenPopup("Open scene");
+		}
+
+		// Save scene popup
+		if (m_openSaveScenePopupLater == true) {
+			m_openSaveScenePopupLater = false;
+			ImGui::OpenPopup("Save scene");
+		}
+
+		DrawModals();
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
+	void MainMenuBar::ProcessKeyboardShortcuts() {
+
+		if (Keyboard::IsKeyDown(GLFW_KEY_LEFT_CONTROL) && Keyboard::IsKeyPressed(GLFW_KEY_O)) {
+			Open();
+		}
+
+		if (Keyboard::IsKeyDown(GLFW_KEY_LEFT_CONTROL) && Keyboard::IsKeyPressed(GLFW_KEY_S)) {
+			Save();
+		}
+
+		if (Keyboard::IsKeyPressed(GLFW_KEY_DELETE)) {
+			Entity * entity = Engine::GetEngine().GetSelectedentity();
+			if (entity != nullptr) {
+				Engine::GetEngine().GetScene().DeleteEntity(entity);
 			}
 		}
 
-		//================================================================================================================================
-		//================================================================================================================================
-		void MainMenuBar::DrawModals() {
-			Engine &	engine = Engine::GetEngine();
+		if (Keyboard::IsKeyPressed(GLFW_KEY_F5)) {
+			Renderer::Get().ReloadShaders();
+		}
+	}
 
-			// New scene
-			if (gui::SaveFileModal("New scene", GlobalValues::s_sceneExtensions, m_pathBuffer, m_extensionIndexBuffer)) {
-				scene::Scene & scene = engine.GetScene();
-				scene.New();
-				scene.SetPath(m_pathBuffer.string());
-			}
+	//================================================================================================================================
+	//================================================================================================================================
+	void MainMenuBar::DrawModals() {
+		Engine &	engine = Engine::GetEngine();
 
-			// Open scene
-			if (gui::LoadFileModal("Open scene", m_sceneExtensionFilter, m_pathBuffer)) {
-				scene::Scene & scene = engine.GetScene();
-				scene.LoadFrom(m_pathBuffer.string());
-			}
-
-			// Save scene
-			if (gui::SaveFileModal("Save scene", GlobalValues::s_sceneExtensions, m_pathBuffer, m_extensionIndexBuffer)) {
-				engine.GetScene().SetPath(m_pathBuffer.string());
-				engine.GetScene().Save();
-			}
+		// New scene
+		if (gui::SaveFileModal("New scene", GlobalValues::s_sceneExtensions, m_pathBuffer, m_extensionIndexBuffer)) {
+			Scene & scene = engine.GetScene();
+			scene.New();
+			scene.SetPath(m_pathBuffer.string());
 		}
 
-		//================================================================================================================================
-		//================================================================================================================================
-		void MainMenuBar::New() {
-			m_extensionIndexBuffer = 0;
-			m_pathBuffer = "./content/scenes/";
-			m_openNewScenePopupLater = true;
+		// Open scene
+		if (gui::LoadFileModal("Open scene", m_sceneExtensionFilter, m_pathBuffer)) {
+			Scene & scene = engine.GetScene();
+			scene.LoadFrom(m_pathBuffer.string());
 		}
 
-		//================================================================================================================================
-		//================================================================================================================================
-		void MainMenuBar::Open() {
-			m_pathBuffer = "./content/scenes/";
-			m_openLoadScenePopupLater = true;
+		// Save scene
+		if (gui::SaveFileModal("Save scene", GlobalValues::s_sceneExtensions, m_pathBuffer, m_extensionIndexBuffer)) {
+			engine.GetScene().SetPath(m_pathBuffer.string());
+			engine.GetScene().Save();
 		}
+	}
 
-		//================================================================================================================================
-		//================================================================================================================================
-		void MainMenuBar::Save() {
-			scene::Scene & scene = Engine::GetEngine().GetScene();
-			if (scene.HasPath()) {
-				scene.Save();
-			}
-			else {
-				SaveAs();
-			}
-		}
+	//================================================================================================================================
+	//================================================================================================================================
+	void MainMenuBar::New() {
+		m_extensionIndexBuffer = 0;
+		m_pathBuffer = "./content/scenes/";
+		m_openNewScenePopupLater = true;
+	}
 
-		//================================================================================================================================
-		//================================================================================================================================
-		void MainMenuBar::SaveAs() {
-			m_pathBuffer = "./content/scenes/";
-			m_extensionIndexBuffer = 0;
-			m_openSaveScenePopupLater = true;
+	//================================================================================================================================
+	//================================================================================================================================
+	void MainMenuBar::Open() {
+		m_pathBuffer = "./content/scenes/";
+		m_openLoadScenePopupLater = true;
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
+	void MainMenuBar::Save() {
+		Scene & scene = Engine::GetEngine().GetScene();
+		if (scene.HasPath()) {
+			scene.Save();
 		}
+		else {
+			SaveAs();
+		}
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
+	void MainMenuBar::SaveAs() {
+		m_pathBuffer = "./content/scenes/";
+		m_extensionIndexBuffer = 0;
+		m_openSaveScenePopupLater = true;
 	}
 }

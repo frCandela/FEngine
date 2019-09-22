@@ -2,25 +2,24 @@
 
 namespace fan
 {
-	namespace editor {
-		//================================================================================================================================
-		//================================================================================================================================
-		class Window {
-		public:
-			Window( const std::string _name );
-			virtual ~Window();
+	//================================================================================================================================
+	//================================================================================================================================
+	class EditorWindow {
+	public:
+		EditorWindow(const std::string _name);
+		virtual ~EditorWindow();
 
-			void Draw();
-			void SetVisible(bool _value) { m_isVisible = _value; }
-			bool IsVisible() const { return  m_isVisible; }
+		void Draw();
+		void SetVisible(bool _value) { m_isVisible = _value; }
+		bool IsVisible() const { return  m_isVisible; }
 
-		protected:
-			virtual void OnGui() = 0;
+	protected:
+		virtual void OnGui() = 0;
 
-		private:
-			bool m_isVisible;
-			std::string m_name;
-			std::string m_jsonShowWindowKey;
-		};
-	}
+	private:
+		bool m_isVisible;
+		std::string m_name;
+		std::string m_jsonShowWindowKey;
+	};
 }
+

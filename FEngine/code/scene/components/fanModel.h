@@ -7,49 +7,46 @@
 namespace fan
 {
 	class Mesh;
-	namespace shape { class AABB; }
-	namespace scene
+	class AABB;
+	class Entity;
+
+	//================================================================================================================================
+	//================================================================================================================================
+	class Model : public Component
 	{
-		class Entity;
+	public:
+		static Signal< Model * > onRegisterModel;
+		static Signal< Model * > onUnRegisterModel;
 
-		//================================================================================================================================
-		//================================================================================================================================
-		class Model : public Component
-		{
-		public:
-			static Signal< Model * > onRegisterModel;
-			static Signal< Model * > onUnRegisterModel;
+		Model();
 
-			Model();
+		AABB ComputeAABB() const;
 
-			shape::AABB ComputeAABB() const;
+		// ISerializable
+		bool				Load(std::istream& _in) override;
+		bool				Save(std::ostream& _out, const int _indentLevel) const override;
+		void				SetMesh(Mesh * _mesh);
+		Mesh *			GetMesh() { return m_mesh; }
+		const Mesh *	GetMesh() const { return m_mesh; }
 
-			// ISerializable
-			bool				Load(std::istream& _in) override;
-			bool				Save(std::ostream& _out, const int _indentLevel) const override;
-			void				SetMesh(Mesh * _mesh);
-			Mesh *			GetMesh() { return m_mesh; }
-			const Mesh *	GetMesh() const { return m_mesh; }
+		int		GetRenderID() const { return m_renderID; }
+		void	SetRenderID(const int _renderID) { m_renderID = _renderID; }
 
-			int		GetRenderID() const { return m_renderID; }
-			void	SetRenderID(const int _renderID) { m_renderID = _renderID; }
+		void OnGui() override;
+		bool IsUnique()	const override { return true; }
 
-			void OnGui() override;
-			bool IsUnique()	const override { return true; }
+		DECLARE_EDITOR_COMPONENT(Model)
+		DECLARE_TYPE_INFO(Model);
 
-			DECLARE_EDITOR_COMPONENT(Model)
-			DECLARE_TYPE_INFO(Model);
+	protected:
+		void OnDetach() override;
 
-		protected:
-			void OnDetach() override;
+	private:
+		Mesh * m_mesh;
+		int m_renderID = -1;
 
-		private:
-			Mesh * m_mesh;
-			int m_renderID = -1;
+		// Editor
+		std::experimental::filesystem::path m_pathBuffer;
 
-			// Editor
-			std::experimental::filesystem::path m_pathBuffer;
-
-		};
-	}
+	};
 }

@@ -2,27 +2,24 @@
 
 namespace fan
 {
-	namespace vk
+	class Device;
+
+	//================================================================================================================================
+	//================================================================================================================================
+	class Sampler
 	{
-		class Device;
+	public:
+		Sampler(Device & _device);
+		~Sampler();
 
-		//================================================================================================================================
-		//================================================================================================================================
-		class Sampler
-		{
-		public:
-			Sampler(Device & _device);
-			~Sampler();
+		// Create a Sampler
+		void CreateSampler(float _maxLod, float _maxAnisotropy);
 
-			// Create a Sampler
-			void CreateSampler(float _maxLod, float _maxAnisotropy);
+		VkSampler GetSampler() { return m_sampler; }
 
-			VkSampler GetSampler() { return m_sampler; }
+	private:
+		Device & m_device;
 
-		private:
-			Device & m_device;
-
-			VkSampler m_sampler;
-		};
-	}
+		VkSampler m_sampler;
+	};
 }

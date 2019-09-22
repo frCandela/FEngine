@@ -62,31 +62,31 @@ namespace fan {
 
 		// Initialize editor components
 		ms_engine = this;
-		m_mainMenuBar =			new editor::MainMenuBar();
-		m_renderWindow =		new editor::RenderWindow();
-		m_sceneWindow =			new editor::SceneWindow();
-		m_inspectorWindow =		new editor::InspectorWindow();
-		m_preferencesWindow =	new editor::PreferencesWindow();
-		m_consoleWindow =		new editor::ConsoleWindow();
+		m_mainMenuBar =			new MainMenuBar();
+		m_renderWindow =		new RenderWindow();
+		m_sceneWindow =			new SceneWindow();
+		m_inspectorWindow =		new InspectorWindow();
+		m_preferencesWindow =	new PreferencesWindow();
+		m_consoleWindow =		new ConsoleWindow();
 
-		m_editorWindows.push_back(m_renderWindow);
+		m_editorWindows.push_back(m_renderWindow);              
 		m_editorWindows.push_back(m_sceneWindow);
 		m_editorWindows.push_back(m_inspectorWindow);
 		m_editorWindows.push_back(m_preferencesWindow);
 		m_editorWindows.push_back(m_consoleWindow);
 
 		Renderer::Get().Initialize(windowSize, windowPosition);
-		m_scene =				new scene::Scene("mainScene");
+		m_scene =				new Scene("mainScene");
 		m_scene->s_onSceneLoad.Connect(&Engine::OnSceneLoad, this);
 		m_scene->New();
 
-		scene::Scene::s_onSceneClear.Connect				( &Renderer::Clear,					&Renderer::Get());
-		scene::Material::onMaterialAttach.Connect		( &Renderer::RegisterMaterial,		&Renderer::Get() );
-		scene::Material::onMaterialDetach.Connect		( &Renderer::UnRegisterMaterial,	&Renderer::Get());		
-		scene::Model::onRegisterModel.Connect			( &Renderer::RegisterModel,			&Renderer::Get());
-		scene::Model::onUnRegisterModel.Connect			( &Renderer::UnRegisterModel,		&Renderer::Get());
-		scene::PointLight::onPointLightAttach.Connect	( &Renderer::RegisterPointLight,	&Renderer::Get());	
-		scene::PointLight::onPointLightDetach.Connect	( &Renderer::UnRegisterPointLight,	&Renderer::Get());	
+		Scene::s_onSceneClear.Connect				( &Renderer::Clear,					&Renderer::Get());
+		Material::onMaterialAttach.Connect		( &Renderer::RegisterMaterial,		&Renderer::Get() );
+		Material::onMaterialDetach.Connect		( &Renderer::UnRegisterMaterial,	&Renderer::Get());		
+		Model::onRegisterModel.Connect			( &Renderer::RegisterModel,			&Renderer::Get());
+		Model::onUnRegisterModel.Connect			( &Renderer::UnRegisterModel,		&Renderer::Get());
+		PointLight::onPointLightAttach.Connect	( &Renderer::RegisterPointLight,	&Renderer::Get());	
+		PointLight::onPointLightDetach.Connect	( &Renderer::UnRegisterPointLight,	&Renderer::Get());	
 
 		m_mainMenuBar->Initialize();
 
@@ -168,19 +168,19 @@ namespace fan {
 	
 	//================================================================================================================================
 	//================================================================================================================================
-	void Engine::OnSceneLoad(scene::Scene * _scene) {
+	void Engine::OnSceneLoad(Scene * _scene) {
 
 		m_selectedentity = nullptr;
 
 		// Editor Camera
-		scene::Entity * cameraEntity = _scene->CreateEntity("editor_camera");
-		cameraEntity->SetFlags(scene::Entity::NO_DELETE | scene::Entity::NOT_SAVED);
-		scene::Transform * camTrans = cameraEntity->AddComponent<scene::Transform>();
+		Entity * cameraEntity = _scene->CreateEntity("editor_camera");
+		cameraEntity->SetFlags(Entity::NO_DELETE | Entity::NOT_SAVED);
+		Transform * camTrans = cameraEntity->AddComponent<Transform>();
 		camTrans->SetPosition(btVector3(0, 0, -2));
-		m_editorCamera = cameraEntity->AddComponent<scene::Camera>();
+		m_editorCamera = cameraEntity->AddComponent<Camera>();
 		m_editorCamera->SetRemovable(false);
 		Renderer::Get().SetMainCamera(m_editorCamera);
-		scene::FPSCamera * editorCamera = cameraEntity->AddComponent<scene::FPSCamera>();
+		FPSCamera * editorCamera = cameraEntity->AddComponent<FPSCamera>();
 		editorCamera->SetRemovable(false);
 	}
 
@@ -201,11 +201,11 @@ namespace fan {
 	//================================================================================================================================
 	//================================================================================================================================
 	void Engine::DrawAABB() const {
-		const std::vector< scene::Entity *>  & entities = m_scene->BuildEntitiesList();
+		const std::vector< Entity *>  & entities = m_scene->BuildEntitiesList();
 		for (int entityIndex = 0; entityIndex < entities.size(); entityIndex++) {
-			const scene::Entity * entity = entities[entityIndex];
+			const Entity * entity = entities[entityIndex];
 			if (entity != m_editorCamera->GetEntity()) {
-				shape::AABB aabb = entity->GetAABB();
+				AABB aabb = entity->GetAABB();
 				Renderer::Get().DebugAABB(aabb, Color::Red);
 			}
 		}
@@ -215,9 +215,9 @@ namespace fan {
 	//================================================================================================================================
 	void Engine::DrawHull() const	{
 		if (m_selectedentity != nullptr) {
-			scene::Model * model = m_selectedentity->GetComponent<scene::Model>();
+			Model * model = m_selectedentity->GetComponent<Model>();
 			if (model != nullptr) {
-				const shape::ConvexHull * hull = nullptr;
+				const ConvexHull * hull = nullptr;
 				Mesh * mesh = model->GetMesh();
 				if (mesh != nullptr) {
 					hull = mesh->GetConvexHull();
@@ -226,7 +226,7 @@ namespace fan {
 					const std::vector<btVector3> & vertices = hull->GetVertices();
 					const std::vector<uint32_t> & indices = hull->GetIndices();
 					if (!vertices.empty()) {
-						const glm::mat4  modelMat = model->GetEntity()->GetComponent<scene::Transform>()->GetModelMatrix();
+						const glm::mat4  modelMat = model->GetEntity()->GetComponent<Transform>()->GetModelMatrix();
 
 						Color color(1, 0, 0, 1);
 						for (unsigned polyIndex = 0; polyIndex < indices.size() / 3; polyIndex++) {
@@ -255,13 +255,13 @@ namespace fan {
 	//================================================================================================================================
 	void Engine::DrawWireframe() const {
 		if (m_selectedentity != nullptr) {
-			scene::Model * model = m_selectedentity->GetComponent<scene::Model>();
+			Model * model = m_selectedentity->GetComponent<Model>();
 			if (model != nullptr) {
 				Mesh * mesh = model->GetMesh();
 				if (mesh != nullptr) {
-					const glm::mat4  modelMat = model->GetEntity()->GetComponent<scene::Transform>()->GetModelMatrix();
+					const glm::mat4  modelMat = model->GetEntity()->GetComponent<Transform>()->GetModelMatrix();
 					const std::vector<uint32_t> & indices = mesh->GetIndices();
-					const std::vector<vk::Vertex> & vertices = mesh->GetVertices();
+					const std::vector<Vertex> & vertices = mesh->GetVertices();
 
 					for (int index = 0; index < indices.size() / 3; index++) {
 						const btVector3 v0 = ToBullet(modelMat * glm::vec4(vertices[indices[3 * index + 0]].pos, 1.f));
@@ -281,17 +281,17 @@ namespace fan {
 	void Engine::DrawNormals() const {
 
 		if (m_selectedentity != nullptr) {
-			scene::Model * model = m_selectedentity->GetComponent<scene::Model>();
+			Model * model = m_selectedentity->GetComponent<Model>();
 			if (model != nullptr) {
 				Mesh * mesh = model->GetMesh();
 				if (mesh != nullptr) {
-					const glm::mat4  modelMat = model->GetEntity()->GetComponent<scene::Transform>()->GetModelMatrix();
-					const glm::mat4  rotationMat = model->GetEntity()->GetComponent<scene::Transform>()->GetRotationMat();
+					const glm::mat4  modelMat = model->GetEntity()->GetComponent<Transform>()->GetModelMatrix();
+					const glm::mat4  rotationMat = model->GetEntity()->GetComponent<Transform>()->GetRotationMat();
 					const std::vector<uint32_t> & indices = mesh->GetIndices();
-					const std::vector<vk::Vertex> & vertices = mesh->GetVertices();
+					const std::vector<Vertex> & vertices = mesh->GetVertices();
 
 					for (int index = 0; index < indices.size(); index++) {
-						const vk::Vertex& vertex = vertices[indices[index]];
+						const Vertex& vertex = vertices[indices[index]];
 						const btVector3 position = ToBullet(modelMat * glm::vec4(vertex.pos, 1.f));
 						const btVector3 normal = ToBullet(rotationMat * glm::vec4(vertex.normal, 1.f));
 						Renderer::Get().DebugLine(position, position + 0.1f * normal, Color::Green);
@@ -310,7 +310,7 @@ namespace fan {
 
 		// Translation gizmo on selected entity
 		if (m_selectedentity != nullptr && m_selectedentity != m_editorCamera->GetEntity()) {
-			scene::Transform * transform = m_selectedentity->GetComponent< scene::Transform >();
+			Transform * transform = m_selectedentity->GetComponent< Transform >();
 			btVector3 newPosition;
 			if (DrawMoveGizmo(btTransform(btQuaternion(0, 0, 0), transform->GetPosition()), (size_t)this, newPosition)) {
 				transform->SetPosition(newPosition);
@@ -321,27 +321,27 @@ namespace fan {
 		// Mouse selection
 		if (mouseCaptured == false && Mouse::GetButtonPressed(Mouse::button0)) {
 
-			const btVector3 cameraOrigin = m_editorCamera->GetEntity()->GetComponent<scene::Transform>()->GetPosition();;
-			const shape::Ray ray = m_editorCamera->ScreenPosToRay(Mouse::GetScreenSpacePosition());
-			const std::vector<scene::Entity *>  & entities = m_scene->BuildEntitiesList();
+			const btVector3 cameraOrigin = m_editorCamera->GetEntity()->GetComponent<Transform>()->GetPosition();;
+			const Ray ray = m_editorCamera->ScreenPosToRay(Mouse::GetScreenSpacePosition());
+			const std::vector<Entity *>  & entities = m_scene->BuildEntitiesList();
 
 			// Raycast on all the entities
-			scene::Entity * closestentity = nullptr;
+			Entity * closestentity = nullptr;
 			float closestDistance2 = std::numeric_limits<float>::max();
 			for (int entityIndex = 0; entityIndex < entities.size(); entityIndex++) {
-				scene::Entity * entity = entities[entityIndex];
+				Entity * entity = entities[entityIndex];
 
 				if (entity == m_editorCamera->GetEntity()) {
 					continue;
 				}
 
-				const shape::AABB & aabb = entity->GetAABB();
+				const AABB & aabb = entity->GetAABB();
 				btVector3 intersection;
 				if (aabb.RayCast(ray.origin, ray.direction, intersection) == true) {
-					scene::Model * model = entity->GetComponent<scene::Model>();
+					Model * model = entity->GetComponent<Model>();
 					if (model != nullptr && model->GetMesh() != nullptr && model->GetMesh()->GetConvexHull() != nullptr) {
-						scene::Transform * transform = entity->GetComponent<scene::Transform>();
-						const shape::Ray transformedRay(transform->InverseTransformPoint(ray.origin), transform->InverseTransformDirection(ray.direction));
+						Transform * transform = entity->GetComponent<Transform>();
+						const Ray transformedRay(transform->InverseTransformPoint(ray.origin), transform->InverseTransformDirection(ray.direction));
 						if (model->GetMesh()->GetConvexHull()->RayCast(transformedRay.origin, transformedRay.direction, intersection) == false) {
 							continue;
 						}
@@ -382,7 +382,7 @@ namespace fan {
 		const btVector3 origin = _transform.getOrigin();
 		const btTransform rotation(_transform.getRotation());
 		const btVector3 axisDirection[3] = { btVector3(1, 0, 0), btVector3(0, 1, 0),  btVector3(0, 0, 1) };
-		const btVector3 cameraPosition = m_editorCamera->GetEntity()->GetComponent<scene::Transform>()->GetPosition();
+		const btVector3 cameraPosition = m_editorCamera->GetEntity()->GetComponent<Transform>()->GetPosition();
 		const float size = 0.2f * origin.distance(cameraPosition);
 		const btTransform coneRotation[3] = {
 		btTransform(btQuaternion(0, 0, btRadians(-90)), size*axisDirection[0])
@@ -408,9 +408,9 @@ namespace fan {
 
 			// Raycast on the gizmo shape to determine if the mouse is hovering it
 			Color clickedColor = opaqueColor;
-			const shape::Ray ray = m_editorCamera->ScreenPosToRay(Mouse::GetScreenSpacePosition());
+			const Ray ray = m_editorCamera->ScreenPosToRay(Mouse::GetScreenSpacePosition());
 			for (int triIndex = 0; triIndex < coneTris.size() / 3; triIndex++) {
-				shape::Triangle triangle(coneTris[3 * triIndex + 0], coneTris[3 * triIndex + 1], coneTris[3 * triIndex + 2]);
+				Triangle triangle(coneTris[3 * triIndex + 0], coneTris[3 * triIndex + 1], coneTris[3 * triIndex + 2]);
 				btVector3 intersection;
 				if (triangle.RayCast(ray.origin, ray.direction, intersection)) {
 					clickedColor[3] = 0.5f;
@@ -432,8 +432,8 @@ namespace fan {
 			if (cacheData.pressed == true && cacheData.axisIndex == axisIndex ) {
 				btVector3 axis = rotation * axisDirection[axisIndex];
 
-				 const shape::Ray screenRay = m_editorCamera->ScreenPosToRay(Mouse::GetScreenSpacePosition()); 	
-				 const shape::Ray axisRay = { origin , axis };				 
+				 const Ray screenRay = m_editorCamera->ScreenPosToRay(Mouse::GetScreenSpacePosition()); 	
+				 const Ray axisRay = { origin , axis };				 
 				 btVector3 trash, projectionOnAxis;
 				 screenRay.RayClosestPoints(axisRay, trash, projectionOnAxis);
 

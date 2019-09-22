@@ -4,27 +4,23 @@
 
 namespace fan
 {
-	namespace scene {
-		class Transform;
-		class Component;
-		class Camera;
-		class Model;
-		class FPSCamera;
-		class Material;
-	}
+	class Transform;
+	class Component;
+	class Camera;
+	class Model;
+	class FPSCamera;
+	class Material;
 
-	namespace editor {
-		//================================================================================================================================
-		//================================================================================================================================
-		class InspectorWindow : public editor::Window {
-		public:
-			InspectorWindow();
+	//================================================================================================================================
+	//================================================================================================================================
+	class InspectorWindow : public EditorWindow {
+	public:
+		InspectorWindow();
 
-		protected:
-			void OnGui() override;
+	protected:
+		void OnGui() override;
 
-		private:
-			void NewComponentPopup();
-		};
-	}
+	private:
+		void NewComponentPopup();
+	};
 }

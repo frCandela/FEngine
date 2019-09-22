@@ -27,7 +27,6 @@
 #include "renderer/pipelines/fanDebugPipeline.h"
 #include "renderer/util/fanVertex.h"
 #include "renderer/util/fanWindow.h"
-#include "renderer/util/fanColor.h"
 
 
 namespace fan
@@ -35,10 +34,10 @@ namespace fan
 		//================================================================================================================================
 		//================================================================================================================================
 		void Renderer::Initialize(const VkExtent2D _size, const glm::ivec2 _position) {
-			m_instance =	new vk::Instance();
+			m_instance =	new Instance();
 			m_window =		new Window("Vulkan", _size, _position, m_instance->vkInstance);
-			m_device =		new vk::Device(m_instance, m_window->GetSurface());
-			m_swapchain =	new vk::SwapChain(*m_device);
+			m_device =		new Device(m_instance, m_window->GetSurface());
+			m_swapchain =	new SwapChain(*m_device);
 			m_mainCamera = nullptr;
 		
 			m_clearColor = glm::vec4(0.f, 0.f, 0.2f, 1.f);
@@ -50,26 +49,26 @@ namespace fan
 			CreateRenderPass();
 			CreateRenderPassPostprocess();
 
-			m_ressourceManager =  new vk::RessourceManager( *m_device );
+			m_ressourceManager =  new RessourceManager( *m_device );
 
-			m_forwardPipeline = new vk::ForwardPipeline(*m_device, m_renderPass);
+			m_forwardPipeline = new ForwardPipeline(*m_device, m_renderPass);
 			m_forwardPipeline->Create( m_swapchain->GetExtent());
 
-			m_debugLinesPipeline = new vk::DebugPipeline(*m_device, m_renderPass, VK_PRIMITIVE_TOPOLOGY_LINE_LIST, true);
+			m_debugLinesPipeline = new DebugPipeline(*m_device, m_renderPass, VK_PRIMITIVE_TOPOLOGY_LINE_LIST, true);
 			m_debugLinesPipeline->Create(m_swapchain->GetExtent(), "code/shaders/debugLines.vert", "code/shaders/debugLines.frag");
 
-			m_debugLinesPipelineNoDepthTest = new vk::DebugPipeline(*m_device, m_renderPass, VK_PRIMITIVE_TOPOLOGY_LINE_LIST, false);
+			m_debugLinesPipelineNoDepthTest = new DebugPipeline(*m_device, m_renderPass, VK_PRIMITIVE_TOPOLOGY_LINE_LIST, false);
 			m_debugLinesPipelineNoDepthTest->Create(m_swapchain->GetExtent(), "code/shaders/debugLines.vert", "code/shaders/debugLines.frag");
 			
-			m_debugTrianglesPipeline = new vk::DebugPipeline(*m_device, m_renderPass, VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST, false);
+			m_debugTrianglesPipeline = new DebugPipeline(*m_device, m_renderPass, VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST, false);
 			m_debugTrianglesPipeline->Create(m_swapchain->GetExtent(), "code/shaders/debugTriangles.vert", "code/shaders/debugTriangles.frag");
 
-			m_postprocessPipeline = new vk::PostprocessPipeline(*m_device, m_renderPassPostprocess);
+			m_postprocessPipeline = new PostprocessPipeline(*m_device, m_renderPassPostprocess);
 			m_postprocessPipeline->Create(m_swapchain->GetSurfaceFormat().format, m_swapchain->GetExtent());		
 
 
 		
-			m_imguiPipeline = new vk::ImguiPipeline(*m_device, m_swapchain->GetSwapchainImagesCount());
+			m_imguiPipeline = new ImguiPipeline(*m_device, m_swapchain->GetSwapchainImagesCount());
 			m_imguiPipeline->Create(m_renderPassPostprocess, m_window->GetWindow(), m_swapchain->GetExtent());
 
 			CreateSwapchainFramebuffers();
@@ -131,9 +130,9 @@ namespace fan
 
 		//================================================================================================================================
 		//================================================================================================================================	
-		void Renderer::SetMainCamera(scene::Camera * _camera) {
+		void Renderer::SetMainCamera(Camera * _camera) {
 			m_mainCamera = _camera;
-			m_mainCameraTransform = m_mainCamera->GetEntity()->GetComponent < scene::Transform>();
+			m_mainCameraTransform = m_mainCamera->GetEntity()->GetComponent < Transform>();
 			m_mainCamera->SetAspectRatio(static_cast<float>(m_swapchain->GetExtent().width) / m_swapchain->GetExtent().height);
 		}
 
@@ -190,10 +189,10 @@ namespace fan
 							}
 						}
 						// display textures list
-						const std::vector< vk::Texture * > & textures = m_ressourceManager->GetTextures();
+						const std::vector< Texture * > & textures = m_ressourceManager->GetTextures();
 						if (ImGui::CollapsingHeader("Loaded textures : ")) {
 							for (int textureIndex = 0; textureIndex < textures.size(); textureIndex++) {
-								const vk::Texture * texture = textures[textureIndex];
+								const Texture * texture = textures[textureIndex];
 								std::stringstream ss;
 								ss << texture->GetSize().x << " " << texture->GetSize().x << "\t" << texture->GetPath();
 								ImGui::Text( ss.str().c_str() );
@@ -202,7 +201,7 @@ namespace fan
 
 						if (ImGui::CollapsingHeader("Rendered Models : ")) {
 							for (int drawDataIndex = 0; drawDataIndex < m_drawData.size(); drawDataIndex++) {
-								const vk::DrawData & drawData = m_drawData[drawDataIndex];
+								const DrawData & drawData = m_drawData[drawDataIndex];
 								if (drawData.model != nullptr) {
 									std::stringstream ss;
 									ss << drawData.model->GetEntity()->GetName() << " " << drawData.meshData->mesh->GetPath();
@@ -216,7 +215,7 @@ namespace fan
 
 						if (ImGui::CollapsingHeader("Point lights : ")) {
 							for (int lightIndex = 0; lightIndex < m_pointLights.size(); lightIndex++) {
-								const vk::PointLightData & lightData = m_pointLights[lightIndex];		
+								const PointLightData & lightData = m_pointLights[lightIndex];		
 								ImGui::Text(lightData.pointLight->GetEntity()->GetName().c_str());	
 							}
 						}
@@ -319,7 +318,7 @@ namespace fan
 				m_drawData[drawDataIndex].transform->MarkModified();
 			}
 
-				scene::Material * material = m_drawData[drawDataIndex].material;
+				Material * material = m_drawData[drawDataIndex].material;
 				if (material != nullptr) {
 					material->MarkModified();
 				}
@@ -331,9 +330,9 @@ namespace fan
 		void Renderer::UpdateUniformBuffer()
 		{
 			// Lights
-			vk::ForwardPipeline::LightsUniforms uniforms = m_forwardPipeline->GetPointLightUniforms();
+			ForwardPipeline::LightsUniforms uniforms = m_forwardPipeline->GetPointLightUniforms();
 			for (int lightIndex = 0; lightIndex < m_pointLights.size() ; lightIndex++){
-				const vk::PointLightData & data = m_pointLights[lightIndex];
+				const PointLightData & data = m_pointLights[lightIndex];
 				uniforms.lights[data.indexUniform].color = data.pointLight->GetColor().ToGLM();
 				uniforms.lights[data.indexUniform].position = ToGLM(data.transform->GetPosition());			
 			}
@@ -345,17 +344,17 @@ namespace fan
 			assert(m_mainCamera != nullptr);
 			if ( m_mainCamera->IsModified() || m_mainCameraTransform->IsModified()) {
 			
-				vk::ForwardPipeline::VertUniforms ubo = m_forwardPipeline->GetVertUniforms();				
+				ForwardPipeline::VertUniforms ubo = m_forwardPipeline->GetVertUniforms();				
 				ubo.view = m_mainCamera->GetView();
 				ubo.proj = m_mainCamera->GetProjection();
 				ubo.proj[1][1] *= -1;
 				m_forwardPipeline->SetVertUniforms(ubo);
 
-				vk::ForwardPipeline::FragUniforms fragUniforms = m_forwardPipeline->GetFragUniforms();
+				ForwardPipeline::FragUniforms fragUniforms = m_forwardPipeline->GetFragUniforms();
 				fragUniforms.cameraPosition = ToGLM(m_mainCameraTransform->GetPosition());
 				m_forwardPipeline->SetFragUniforms(fragUniforms);
 
-				vk::DebugPipeline::Uniforms debugUniforms;
+				DebugPipeline::Uniforms debugUniforms;
 				debugUniforms.model = glm::mat4(1.0);
 				debugUniforms.view = ubo.view;
 				debugUniforms.proj = ubo.proj;
@@ -368,14 +367,14 @@ namespace fan
 			// Dynamic uniforms 
 			bool mustUpdateDynamicUniformsVert = false;
 			for (int drawDataIndex = 0; drawDataIndex < m_drawData.size() ; drawDataIndex++) {			
-				vk::DrawData & drawData = m_drawData[drawDataIndex];
+				DrawData & drawData = m_drawData[drawDataIndex];
 
 				if (drawData.model != nullptr) {
 
 					// Vert
 					if (drawData.transform->IsModified() == true ) {
 						mustUpdateDynamicUniformsVert = true;
-						vk::ForwardPipeline::DynamicUniformsVert uniform;
+						ForwardPipeline::DynamicUniformsVert uniform;
 						uniform.modelMat = drawData.transform->GetModelMatrix();
 						uniform.rotationMat = drawData.transform->GetRotationMat();
 						m_forwardPipeline->SetDynamicUniformVert(uniform, drawDataIndex);
@@ -383,10 +382,10 @@ namespace fan
 
 					// Frag
 					if (drawData.material != nullptr && (drawData.material->IsModified())) {
-						vk::Texture * texture = drawData.material->GetTexture();
+						Texture * texture = drawData.material->GetTexture();
 						if (texture != nullptr) {
 							m_mustUpdateDynamicUniformsFrag = true;
-							vk::ForwardPipeline::DynamicUniformsFrag uniform;
+							ForwardPipeline::DynamicUniformsFrag uniform;
 							uniform.textureIndex = texture->GetRenderID();
 							assert(uniform.textureIndex >= 0);
 							m_forwardPipeline->SetDynamicUniformFrag(uniform, drawDataIndex);
@@ -685,8 +684,8 @@ namespace fan
 		void Renderer::UpdateDebugBuffer(const int _index) {
 			if( m_debugLines.size() > 0) {
 				delete m_debugLinesvertexBuffers[_index];	// TODO update instead of delete
-				const VkDeviceSize size = sizeof(vk::DebugVertex) * m_debugLines.size();
-				m_debugLinesvertexBuffers[_index] = new vk::Buffer(*m_device);
+				const VkDeviceSize size = sizeof(DebugVertex) * m_debugLines.size();
+				m_debugLinesvertexBuffers[_index] = new Buffer(*m_device);
 				m_debugLinesvertexBuffers[_index]->Create(
 					size,
 					VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_VERTEX_BUFFER_BIT,
@@ -694,7 +693,7 @@ namespace fan
 				);
 
 				if (size > 0) {
-					vk::Buffer stagingBuffer(*m_device);
+					Buffer stagingBuffer(*m_device);
 					stagingBuffer.Create(
 						size,
 						VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
@@ -709,8 +708,8 @@ namespace fan
 
 			if (m_debugLinesNoDepthTest.size() > 0) {
 				delete m_debugLinesNoDepthTestVertexBuffers[_index];
-				const VkDeviceSize size = sizeof(vk::DebugVertex) * m_debugLinesNoDepthTest.size();
-				m_debugLinesNoDepthTestVertexBuffers[_index] = new vk::Buffer(*m_device);
+				const VkDeviceSize size = sizeof(DebugVertex) * m_debugLinesNoDepthTest.size();
+				m_debugLinesNoDepthTestVertexBuffers[_index] = new Buffer(*m_device);
 				m_debugLinesNoDepthTestVertexBuffers[_index]->Create(
 					size,
 					VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_VERTEX_BUFFER_BIT,
@@ -718,7 +717,7 @@ namespace fan
 				);
 
 				if (size > 0) {
-					vk::Buffer stagingBuffer(*m_device);
+					Buffer stagingBuffer(*m_device);
 					stagingBuffer.Create(
 						size,
 						VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
@@ -733,8 +732,8 @@ namespace fan
 
 			if(m_debugTriangles.size() > 0 ){
 				delete m_debugTrianglesvertexBuffers[_index];
-				const VkDeviceSize size = sizeof(vk::DebugVertex) * m_debugTriangles.size();
-				m_debugTrianglesvertexBuffers[_index] = new vk::Buffer(*m_device);
+				const VkDeviceSize size = sizeof(DebugVertex) * m_debugTriangles.size();
+				m_debugTrianglesvertexBuffers[_index] = new Buffer(*m_device);
 				m_debugTrianglesvertexBuffers[_index]->Create(
 					size,
 					VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_VERTEX_BUFFER_BIT,
@@ -742,7 +741,7 @@ namespace fan
 				);
 
 				if (size > 0) {
-					vk::Buffer stagingBuffer(*m_device);
+					Buffer stagingBuffer(*m_device);
 					stagingBuffer.Create(
 						size,
 						VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
@@ -769,11 +768,11 @@ namespace fan
 		//================================================================================================================================
 		void Renderer::DebugLine(const btVector3 _start, const btVector3 _end, const Color _color, const bool _depthTestEnable) {
 			if ( _depthTestEnable ) {
-				m_debugLines.push_back(vk::DebugVertex(ToGLM(_start), glm::vec3(0, 0, 0), _color.ToGLM()));
-				m_debugLines.push_back(vk::DebugVertex(ToGLM(_end), glm::vec3(0, 0, 0), _color.ToGLM()));
+				m_debugLines.push_back(DebugVertex(ToGLM(_start), glm::vec3(0, 0, 0), _color.ToGLM()));
+				m_debugLines.push_back(DebugVertex(ToGLM(_end), glm::vec3(0, 0, 0), _color.ToGLM()));
 			} else {
-				m_debugLinesNoDepthTest.push_back(vk::DebugVertex(ToGLM(_start), glm::vec3(0, 0, 0), _color.ToGLM()));
-				m_debugLinesNoDepthTest.push_back(vk::DebugVertex(ToGLM(_end), glm::vec3(0, 0, 0), _color.ToGLM()));
+				m_debugLinesNoDepthTest.push_back(DebugVertex(ToGLM(_start), glm::vec3(0, 0, 0), _color.ToGLM()));
+				m_debugLinesNoDepthTest.push_back(DebugVertex(ToGLM(_end), glm::vec3(0, 0, 0), _color.ToGLM()));
 			}
 
 		}
@@ -783,9 +782,9 @@ namespace fan
 		void Renderer::DebugTriangle(const btVector3 _v0, const btVector3 _v1, const btVector3 _v2, const Color _color) {
 			const glm::vec3 normal = glm::normalize(ToGLM((_v1 - _v2).cross(_v0 - _v2)));
 
-			m_debugTriangles.push_back(vk::DebugVertex(ToGLM(_v0), normal, _color.ToGLM()));
-			m_debugTriangles.push_back(vk::DebugVertex(ToGLM(_v1), normal, _color.ToGLM()));
-			m_debugTriangles.push_back(vk::DebugVertex(ToGLM(_v2), normal, _color.ToGLM()));
+			m_debugTriangles.push_back(DebugVertex(ToGLM(_v0), normal, _color.ToGLM()));
+			m_debugTriangles.push_back(DebugVertex(ToGLM(_v1), normal, _color.ToGLM()));
+			m_debugTriangles.push_back(DebugVertex(ToGLM(_v2), normal, _color.ToGLM()));
 		}
 
 		//================================================================================================================================
@@ -838,7 +837,7 @@ namespace fan
 
 		//================================================================================================================================
 		//================================================================================================================================
-		void Renderer::DebugAABB(const shape::AABB & _aabb, const Color _color) {
+		void Renderer::DebugAABB(const AABB & _aabb, const Color _color) {
 			std::vector< btVector3 > corners = _aabb.GetCorners();
 			// Top
 			DebugLine(corners[0], corners[1], _color);
@@ -861,8 +860,8 @@ namespace fan
 
 		//================================================================================================================================
 		//================================================================================================================================
-		void Renderer::RegisterMaterial(scene::Material * _material ) {
-			scene::Model * model = _material->GetEntity()->GetComponent<scene::Model>();
+		void Renderer::RegisterMaterial(Material * _material ) {
+			Model * model = _material->GetEntity()->GetComponent<Model>();
 			if (model != nullptr && model->GetRenderID() >= 0 ) {
 				m_drawData[model->GetRenderID()].material = _material;
 			}
@@ -870,12 +869,12 @@ namespace fan
 
 		//================================================================================================================================
 		//================================================================================================================================
-		void Renderer::UnRegisterMaterial(scene::Material * _material) {
-			scene::Model * model = _material->GetEntity()->GetComponent<scene::Model>();
+		void Renderer::UnRegisterMaterial(Material * _material) {
+			Model * model = _material->GetEntity()->GetComponent<Model>();
 			if (model != nullptr && model->GetRenderID() >= 0) {
-				vk::DrawData & drawData = m_drawData[model->GetRenderID()];
+				DrawData & drawData = m_drawData[model->GetRenderID()];
 				drawData.material = nullptr;
-				vk::ForwardPipeline::DynamicUniformsFrag uniform;
+				ForwardPipeline::DynamicUniformsFrag uniform;
 				uniform.textureIndex = 0;
 				m_forwardPipeline->SetDynamicUniformFrag(uniform, model->GetRenderID());
 				m_mustUpdateDynamicUniformsFrag = true;
@@ -884,9 +883,9 @@ namespace fan
 
 		//================================================================================================================================
 		//================================================================================================================================
-		void Renderer::RegisterModel( scene::Model * _model) {		
+		void Renderer::RegisterModel( Model * _model) {		
 		
-			vk::DrawData * drawData = nullptr;
+			DrawData * drawData = nullptr;
 
 			// Looks for the model
 			for (int modelIndex = 0; modelIndex < m_drawData.size() ; modelIndex++){
@@ -921,8 +920,8 @@ namespace fan
 			}
 
 			drawData->model = _model;
-			drawData->transform = _model->GetEntity()->GetComponent<scene::Transform>();
-			drawData->material =  _model->GetEntity()->GetComponent<scene::Material>();
+			drawData->transform = _model->GetEntity()->GetComponent<Transform>();
+			drawData->material =  _model->GetEntity()->GetComponent<Material>();
 			drawData->meshData = m_ressourceManager->FindMeshData(_model->GetMesh());	
 
 			drawData->transform->MarkModified(); // Force tranform uniforms update
@@ -934,7 +933,7 @@ namespace fan
 
 		//================================================================================================================================
 		//================================================================================================================================
-		void Renderer::UnRegisterModel(scene::Model * _model) {
+		void Renderer::UnRegisterModel(Model * _model) {
 			for (int modelIndex = 0; modelIndex < m_drawData.size(); modelIndex++) {
 				if (m_drawData[modelIndex].model == _model) {
 					m_drawData[modelIndex] = {};
@@ -944,7 +943,7 @@ namespace fan
 
 		//================================================================================================================================
 		//================================================================================================================================
-		void Renderer::RegisterPointLight	( scene::PointLight * _pointLight	) {
+		void Renderer::RegisterPointLight	( PointLight * _pointLight	) {
 			
 			// Looks for the _pointLight
 			for (int lightIndex = 0; lightIndex < m_pointLights.size() ; lightIndex++){
@@ -955,21 +954,21 @@ namespace fan
 			}
 
 			// Adds light data
-			vk::PointLightData pointLightData;
+			PointLightData pointLightData;
 			pointLightData.indexUniform = static_cast<int>(m_pointLights.size());
 			pointLightData.pointLight = _pointLight;
-			pointLightData.transform = _pointLight->GetEntity()->GetComponent<scene::Transform>();
+			pointLightData.transform = _pointLight->GetEntity()->GetComponent<Transform>();
 			m_pointLights.push_back(pointLightData);
 
 			// Check num lights
-			if( pointLightData.indexUniform >= vk::ForwardPipeline::s_maximumNumLights ) {
-				Debug::Get() << Debug::Severity::warning << "Too much lights in the scene, maximum is " << vk::ForwardPipeline::s_maximumNumLights << Debug::Endl();
+			if( pointLightData.indexUniform >= ForwardPipeline::s_maximumNumLights ) {
+				Debug::Get() << Debug::Severity::warning << "Too much lights in the scene, maximum is " << ForwardPipeline::s_maximumNumLights << Debug::Endl();
 			}
 		}
 
 		//================================================================================================================================
 		//================================================================================================================================
-		void Renderer::UnRegisterPointLight	( scene::PointLight *	_pointLight	) {
+		void Renderer::UnRegisterPointLight	( PointLight *	_pointLight	) {
 
 			const size_t num = m_pointLights.size();
 
@@ -1294,7 +1293,7 @@ namespace fan
 					m_forwardPipeline->GetDepthImageView()
 				};
 
-				m_forwardFrameBuffers[framebufferIndex] = new vk::FrameBuffer(*m_device);
+				m_forwardFrameBuffers[framebufferIndex] = new FrameBuffer(*m_device);
 				m_forwardFrameBuffers[framebufferIndex]->Create(m_renderPass, attachments, m_swapchain->GetExtent());
 			}
 		}
@@ -1310,7 +1309,7 @@ namespace fan
 					m_swapchain->GetImageView(framebufferIndex),
 				};
 
-				m_swapchainFramebuffers[framebufferIndex] = new vk::FrameBuffer(*m_device);
+				m_swapchainFramebuffers[framebufferIndex] = new FrameBuffer(*m_device);
 				m_swapchainFramebuffers[framebufferIndex]->Create( m_renderPassPostprocess, attachments, m_swapchain->GetExtent());
 
 			}

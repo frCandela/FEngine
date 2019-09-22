@@ -4,42 +4,37 @@
 
 namespace fan
 {
-	namespace vk {
-		class Texture;
-	}
+	class Texture;
+	class Model;
 
-	namespace scene {
-		class Model;
+	//================================================================================================================================
+	//================================================================================================================================
+	class Material : public Component
+	{
+	public:
+		static Signal< Material * > onMaterialAttach;
+		static Signal< Material * > onMaterialDetach;
 
-		//================================================================================================================================
-		//================================================================================================================================
-		class Material : public Component
-		{
-		public:
-			static Signal< Material * > onMaterialAttach;
-			static Signal< Material * > onMaterialDetach;
+		bool Load(std::istream& _in)	override;
+		bool Save(std::ostream& _out, const int _indentLevel) const override;
 
-			bool Load(std::istream& _in)	override;
-			bool Save(std::ostream& _out, const int _indentLevel) const override;
+		void				SetTexture(Texture * _texture);
+		Texture *		GetTexture() { return m_texture; }
+		const Texture *	GetTexture() const { return m_texture; }
 
-			void				SetTexture(vk::Texture * _texture);
-			vk::Texture *		GetTexture() { return m_texture; }
-			const vk::Texture *	GetTexture() const { return m_texture; }
+		void OnGui() override;
+		bool IsUnique()	const override { return true; }
 
-			void OnGui() override;
-			bool IsUnique()	const override { return true; }
+		DECLARE_EDITOR_COMPONENT(Material)
+		DECLARE_TYPE_INFO(Material);
+	protected:
+		void OnAttach() override;
+		void OnDetach() override;
 
-			DECLARE_EDITOR_COMPONENT(Material)
-			DECLARE_TYPE_INFO(Material);
-		protected:
-			void OnAttach() override;
-			void OnDetach() override;
+	private:
+		Texture * m_texture = nullptr;
 
-		private:
-			vk::Texture * m_texture = nullptr;
-
-			// Editor
-			std::experimental::filesystem::path m_pathBuffer;
-		};
-	}
+		// Editor
+		std::experimental::filesystem::path m_pathBuffer;
+	};
 }

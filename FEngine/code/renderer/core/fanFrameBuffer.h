@@ -2,24 +2,21 @@
 
 namespace fan
 {
-	namespace vk {
+	class Device;
 
-		class Device;
+	//================================================================================================================================
+	//================================================================================================================================
+	class FrameBuffer {
+	public:
+		FrameBuffer(Device & _device);
+		~FrameBuffer();
 
-		//================================================================================================================================
-		//================================================================================================================================
-		class FrameBuffer {
-		public:
-			FrameBuffer(Device & _device);
-			~FrameBuffer();
+		bool Create(VkRenderPass _renderPass, std::vector<VkImageView> & _attachments, VkExtent2D _size);
 
-			bool Create(VkRenderPass _renderPass, std::vector<VkImageView> & _attachments, VkExtent2D _size);
+		VkFramebuffer GetFrameBuffer() { return m_framebuffer; }
 
-			VkFramebuffer GetFrameBuffer() { return m_framebuffer; }
-
-		private:
-			Device & m_device;
-			VkFramebuffer m_framebuffer;
-		};
-	}
+	private:
+		Device & m_device;
+		VkFramebuffer m_framebuffer;
+	};
 }

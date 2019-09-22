@@ -33,13 +33,15 @@
 #include <cassert>
 #include <filesystem>
 
-#include "fanGlobalUsing.h"
+#include "core/fanHash.h"
+#include "renderer/util/fanColor.h"
 #include "fanGlobalValues.h"
-
 #include "core/fanDebug.h"
 #include "core/math/fanMathUtils.h"
 #include "core/math/fanVector2.h"
-#include "core/fanHash.h"
-#include "renderer/util/fanColor.h"
+
+namespace std {
+	namespace fs = experimental::filesystem;
+}
 
 #pragma warning( pop )

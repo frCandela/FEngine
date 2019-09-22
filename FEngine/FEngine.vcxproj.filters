@@ -765,9 +765,6 @@
     <ClInclude Include="deps\nlohmann_json.h">
       <Filter>code\deps</Filter>
     </ClInclude>
-    <ClInclude Include="code\fanGlobalUsing.h">
-      <Filter>code</Filter>
-    </ClInclude>
     <ClInclude Include="code\core\fanHash.h">
       <Filter>code\core</Filter>
     </ClInclude>

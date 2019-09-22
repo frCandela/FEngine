@@ -3,23 +3,18 @@
 #include "core/files/fanSerializedValues.h"
 
 namespace fan {
-	 class Renderer;
-
-	namespace editor {
-		class MainMenuBar;
-		class RenderWindow;
-		class SceneWindow;
-		class InspectorWindow;
-		class PreferencesWindow;
-		class ConsoleWindow;
-		class Window;
-	}
-	namespace scene {
-		class Scene;
-		class Entity;
-		class Actor;
-		class Camera;
-	}
+	class MainMenuBar;
+	class RenderWindow;
+	class SceneWindow;
+	class InspectorWindow;
+	class PreferencesWindow;
+	class ConsoleWindow;
+	class EditorWindow;
+	class Renderer;
+	class Scene;
+	class Entity;
+	class Actor;
+	class Camera;	
 
 	//================================================================================================================================
 	//================================================================================================================================	
@@ -28,7 +23,7 @@ namespace fan {
 
 		struct EditorGrid {
 			bool		isVisible;
-			Color	color;
+			Color		color;
 			int			linesCount;
 			float		spacing;
 		};
@@ -41,18 +36,18 @@ namespace fan {
 
 		inline static Engine & GetEngine() { return * ms_engine; }
 
-		void SetSelectedEntity( scene::Entity * _selectedentity) { m_selectedentity = _selectedentity;	}
+		void SetSelectedEntity( Entity * _selectedentity) { m_selectedentity = _selectedentity;	}
 		void Deselect() { m_selectedentity = nullptr; }
 
-		scene::Entity *	const			GetSelectedentity() const		{ return m_selectedentity;  }
-		scene::Camera *					GetEditorCamera() const			{ return m_editorCamera; }
-		editor::MainMenuBar  &			GetMainMenuBar() const			{ return * m_mainMenuBar; }
-		editor::RenderWindow &			GetRenderWindow() const			{ return * m_renderWindow; }
-		editor::SceneWindow  &			GetSceneWindow() const			{ return * m_sceneWindow; }
-		editor::InspectorWindow  &		GetInspectorWindow() const		{ return * m_inspectorWindow; }
-		editor::PreferencesWindow  &	GetPreferencesWindow() const	{ return * m_preferencesWindow; }
-		editor::ConsoleWindow  &		GetConsoleWindow() const		{ return * m_consoleWindow; }
-		scene::Scene &					GetScene() const				{ return * m_scene; }
+		Entity *	const		GetSelectedentity() const		{ return m_selectedentity;  }
+		Camera *				GetEditorCamera() const			{ return m_editorCamera; }
+		MainMenuBar  &			GetMainMenuBar() const			{ return * m_mainMenuBar; }
+		RenderWindow &			GetRenderWindow() const			{ return * m_renderWindow; }
+		SceneWindow  &			GetSceneWindow() const			{ return * m_sceneWindow; }
+		InspectorWindow  &		GetInspectorWindow() const		{ return * m_inspectorWindow; }
+		PreferencesWindow  &	GetPreferencesWindow() const	{ return * m_preferencesWindow; }
+		ConsoleWindow  &		GetConsoleWindow() const		{ return * m_consoleWindow; }
+		Scene &					GetScene() const				{ return * m_scene; }
 
 		EditorGrid GetEditorGrid() const { return m_editorGrid;  }
 		void SetEditorGrid( const EditorGrid _editorGrid) { m_editorGrid =_editorGrid; }
@@ -61,21 +56,21 @@ namespace fan {
 	private:
 
 		// UI elements
-		editor::MainMenuBar *		m_mainMenuBar;
+		MainMenuBar *		m_mainMenuBar;
 
-		editor::RenderWindow *		m_renderWindow;
-		editor::SceneWindow *		m_sceneWindow;
-		editor::InspectorWindow *	m_inspectorWindow;
-		editor::PreferencesWindow *	m_preferencesWindow;
-		editor::ConsoleWindow *		m_consoleWindow;
-		std::vector< editor::Window * > m_editorWindows;
+		RenderWindow *		m_renderWindow;
+		SceneWindow *		m_sceneWindow;
+		InspectorWindow *	m_inspectorWindow;
+		PreferencesWindow *	m_preferencesWindow;
+		ConsoleWindow *		m_consoleWindow;
+		std::vector< EditorWindow * > m_editorWindows;
 
 		EditorGrid m_editorGrid;
 
 		// Main components
-		scene::Scene *	m_scene;
-		scene::Entity * m_selectedentity;
-		scene::Camera *	m_editorCamera;
+		Scene *	m_scene;
+		Entity * m_selectedentity;
+		Camera *	m_editorCamera;
 
 		struct GizmoCacheData {
 			int axisIndex;
@@ -88,7 +83,7 @@ namespace fan {
 		bool m_applicationShouldExit;
 
 		void ManageSelection();
-		void OnSceneLoad(scene::Scene * _scene);
+		void OnSceneLoad(Scene * _scene);
 		void DrawUI();
 		void DrawEditorGrid() const;
 		void DrawWireframe() const;

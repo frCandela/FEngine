@@ -19,88 +19,86 @@
 
 namespace fan
 {
-	namespace editor {
-		//================================================================================================================================
-		//================================================================================================================================
-		InspectorWindow::InspectorWindow() : 
-			Window("inspector") 
-		{		
-		}
+	//================================================================================================================================
+	//================================================================================================================================
+	InspectorWindow::InspectorWindow() :
+		EditorWindow("inspector")
+	{
+	}
 
-		//================================================================================================================================
-		//================================================================================================================================
-		void InspectorWindow::OnGui() {
-			Engine & engine = Engine::GetEngine();
-			scene::Entity * const selection = engine.GetSelectedentity();
+	//================================================================================================================================
+	//================================================================================================================================
+	void InspectorWindow::OnGui() {
+		Engine & engine = Engine::GetEngine();
+		Entity * const selection = engine.GetSelectedentity();
 
-			if (selection != nullptr)
-			{
-				// entity gui
-				selection->OnGui();
-				int componentCount = 0;
+		if (selection != nullptr)
+		{
+			// entity gui
+			selection->OnGui();
+			int componentCount = 0;
 
-				const std::vector<scene::Component*> & components = selection->GetComponents();
-				for (int componentIndex = 0; componentIndex < components.size(); componentIndex++) {
-					scene::Component * component = components[componentIndex];
+			const std::vector<Component*> & components = selection->GetComponents();
+			for (int componentIndex = 0; componentIndex < components.size(); componentIndex++) {
+				Component * component = components[componentIndex];
 
-					ImGui::Separator();
-
-					if (component->IsActor()) {	// TODO : use type info when type info deals with inheritance
-						ImGui::PushID((int*)component);
-						scene::Actor * actor = static_cast<scene::Actor*>(component);
-						bool enabled = actor->IsEnabled();
-						if (ImGui::Checkbox("", &enabled)) {
-							actor->SetEnabled(enabled);
-						}
-						ImGui::SameLine();
-						ImGui::PopID();
-					}
-
-					// Delete button
-					ImGui::Text(component->GetName());
-					if (component->IsRemovable()) {
-						std::stringstream ss;
-						ss << "X" << "##" << component->GetName() << componentCount++;	// make unique id
-						ImGui::SameLine(ImGui::GetWindowWidth() - 40);
-						if (ImGui::Button(ss.str().c_str())) {
-							selection->DeleteComponent(component);
-							component = nullptr;
-						}
-					}
-					if (component != nullptr) {
-						component->OnGui();
-					}
-				}
 				ImGui::Separator();
-				ImGui::SameLine();
-				//Add component button
-				if (ImGui::Button("Add component"))
-					ImGui::OpenPopup("New component");
 
-				NewComponentPopup();
-			}
-		}
+				if (component->IsActor()) {	// TODO : use type info when type info deals with inheritance
+					ImGui::PushID((int*)component);
+					Actor * actor = static_cast<Actor*>(component);
+					bool enabled = actor->IsEnabled();
+					if (ImGui::Checkbox("", &enabled)) {
+						actor->SetEnabled(enabled);
+					}
+					ImGui::SameLine();
+					ImGui::PopID();
+				}
 
-		//================================================================================================================================
-		//================================================================================================================================
-		void InspectorWindow::NewComponentPopup() {
-
-			if (ImGui::BeginPopup("New component"))
-			{
-				Engine & engine = Engine::GetEngine();
-				scene::Entity * const selection = engine.GetSelectedentity();
-				
-				std::vector<scene::Component *>& components = ComponentsRegister::GetComponents();
-				for (int componentIndex = 0; componentIndex < components.size() ; componentIndex++)		{					
-					scene::Component * component = components[componentIndex];
-					if (ImGui::MenuItem(component->GetName())) {
-						// Create new Component 
-						selection->AddComponent(component->GetType());
-						ImGui::CloseCurrentPopup();
+				// Delete button
+				ImGui::Text(component->GetName());
+				if (component->IsRemovable()) {
+					std::stringstream ss;
+					ss << "X" << "##" << component->GetName() << componentCount++;	// make unique id
+					ImGui::SameLine(ImGui::GetWindowWidth() - 40);
+					if (ImGui::Button(ss.str().c_str())) {
+						selection->DeleteComponent(component);
+						component = nullptr;
 					}
 				}
-				ImGui::EndPopup();
+				if (component != nullptr) {
+					component->OnGui();
+				}
 			}
+			ImGui::Separator();
+			ImGui::SameLine();
+			//Add component button
+			if (ImGui::Button("Add component"))
+				ImGui::OpenPopup("New component");
+
+			NewComponentPopup();
+		}
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
+	void InspectorWindow::NewComponentPopup() {
+
+		if (ImGui::BeginPopup("New component"))
+		{
+			Engine & engine = Engine::GetEngine();
+			Entity * const selection = engine.GetSelectedentity();
+
+			std::vector<Component *>& components = ComponentsRegister::GetComponents();
+			for (int componentIndex = 0; componentIndex < components.size(); componentIndex++) {
+				Component * component = components[componentIndex];
+				if (ImGui::MenuItem(component->GetName())) {
+					// Create new Component 
+					selection->AddComponent(component->GetType());
+					ImGui::CloseCurrentPopup();
+				}
+			}
+			ImGui::EndPopup();
 		}
 	}
 }

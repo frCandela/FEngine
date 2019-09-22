@@ -129,7 +129,7 @@ namespace fan {
 		}
 
 		std::vector<uint32_t>	& indices	= _mesh.GetIndices();
-		std::vector<vk::Vertex> & vertices	= _mesh.GetVertices();
+		std::vector<Vertex> & vertices	= _mesh.GetVertices();
 
 		const fbxsdk::FbxAMatrix & globalTransform = mesh->GetNode()->EvaluateGlobalTransform();
 		fbxsdk::FbxAMatrix globalRotation = globalTransform;

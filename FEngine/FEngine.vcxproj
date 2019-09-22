@@ -198,7 +198,6 @@
     <ClInclude Include="code\editor\windows\fanEditorWindow.h" />
     <ClInclude Include="code\fanGlobalValues.h" />
     <ClInclude Include="code\fanEngine.h" />
-    <ClInclude Include="code\fanGlobalUsing.h" />
     <ClInclude Include="code\fanGlobalIncludes.h" />
     <ClInclude Include="code\game\fanCameraController.h" />
     <ClInclude Include="code\game\fanGameManager.h" />

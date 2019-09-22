@@ -5,35 +5,32 @@
 
 namespace fan
 {
-	namespace scene
+	//================================================================================================================================
+	//================================================================================================================================
+	class Actor : public Component
 	{
-		//================================================================================================================================
-		//================================================================================================================================
-		class Actor : public Component
-		{
-		public:
-			static Signal< Actor * > onActorAttach;
-			static Signal< Actor * > onActorDetach;
+	public:
+		static Signal< Actor * > onActorAttach;
+		static Signal< Actor * > onActorDetach;
 
-			virtual void Start() = 0;
-			virtual void Update(const float _delta) = 0;
+		virtual void Start() = 0;
+		virtual void Update(const float _delta) = 0;
 
-			bool IsActor() const override { return true; }
-			bool IsUnique() const override { return false; }
-			void OnGui() override;
-			bool Load(std::istream& _in) override;
-			bool Save(std::ostream& _out, const int _indentLevel) const override;
+		bool IsActor() const override { return true; }
+		bool IsUnique() const override { return false; }
+		void OnGui() override;
+		bool Load(std::istream& _in) override;
+		bool Save(std::ostream& _out, const int _indentLevel) const override;
 
-			bool IsEnabled() const { return m_isEnabled; }
-			void SetEnabled(const bool _enabled) { m_isEnabled = _enabled; }
+		bool IsEnabled() const { return m_isEnabled; }
+		void SetEnabled(const bool _enabled) { m_isEnabled = _enabled; }
 
-		protected:
-			void OnAttach() override;
-			void OnDetach() override;
+	protected:
+		void OnAttach() override;
+		void OnDetach() override;
 
-		private:
-			bool m_isEnabled = true;
+	private:
+		bool m_isEnabled = true;
 
-		};
-	}
+	};
 }
