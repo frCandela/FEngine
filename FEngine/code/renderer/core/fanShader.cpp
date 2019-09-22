@@ -28,7 +28,7 @@ namespace fan
 		if (spirvCode.empty()) {
 			Debug::Get() << Debug::Severity::error << "Could not create shader module: " << _path << Debug::Endl();
 
-			std::experimental::filesystem::directory_entry path(_path);
+			std::fs::directory_entry path(_path);
 			std::string extension = path.path().extension().generic_string();
 			std::string tmpPath = (extension == ".frag" ? defaultFragmentShader : defaultVertexShader);
 			Debug::Get() << Debug::Severity::log << "loading default shader " << tmpPath << Debug::Endl();

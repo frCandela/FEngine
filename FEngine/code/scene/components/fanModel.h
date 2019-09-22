@@ -46,7 +46,7 @@ namespace fan
 		int m_renderID = -1;
 
 		// Editor
-		std::experimental::filesystem::path m_pathBuffer;
+		std::fs::path m_pathBuffer;
 
 	};
 }

@@ -35,6 +35,6 @@ namespace fan
 		Texture * m_texture = nullptr;
 
 		// Editor
-		std::experimental::filesystem::path m_pathBuffer;
+		std::fs::path m_pathBuffer;
 	};
 }
