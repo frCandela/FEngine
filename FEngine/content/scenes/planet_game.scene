@@ -48,7 +48,9 @@ Entities: 1 {
                         material: content\models\sun.png
                     }
                     PointLight: 3039791276 {
-                        color: 1 0.720238 0
+                        diffuse: 1 0.488828 0
+                        specular: 1 0.297287 0
+                        attenuation: 0 0.2 0
                     }
                 }
                 Childs: 2 {
@@ -56,7 +58,7 @@ Entities: 1 {
                         computeAABB: true
                         Components: 4 {
                             Transform: 1269105190 {
-                                position: 4.38643 0 11.6581
+                                position: 9.30239 0 8.28357
                                 rotation: 0 0 0 1
                                 scale:    1 1 1
                             }
@@ -77,7 +79,7 @@ Entities: 1 {
                                 computeAABB: true
                                 Components: 4 {
                                     Transform: 1269105190 {
-                                        position: 1.68471 0 10.7925
+                                        position: 10.0941 0 5.46934
                                         rotation: 0 0 0 1
                                         scale:    0.5 0.5 0.5
                                     }
@@ -102,7 +104,7 @@ Entities: 1 {
                         computeAABB: true
                         Components: 4 {
                             Transform: 1269105190 {
-                                position: 1.62906 0 4.32967
+                                position: 3.45479 0 3.07641
                                 rotation: 0 0 0 1
                                 scale:    0.5 0.5 0.5
                             }

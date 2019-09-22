@@ -36,7 +36,8 @@ Entities: 1 {
                         scale:    1 1 1
                     }
                     PointLight: 3039791276 {
-                        color: 1 1 1
+                        diffuse: 1 1 1
+                        specular: 1 1 1
                         attenuation: 0 2 1
                     }
                 }
@@ -47,12 +48,13 @@ Entities: 1 {
                 computeAABB: true
                 Components: 2 {
                     Transform: 1269105190 {
-                        position: 0.395062 1.06122 2.02424
+                        position: 0 1.27915 2.58726
                         rotation: 0 0 0 1
                         scale:    1 1 1
                     }
                     PointLight: 3039791276 {
-                        color: 1 0 0
+                        diffuse: 1 0 0.146151
+                        specular: 0.563687 0.21508 0.818039
                         attenuation: 0 2 1
                     }
                 }
@@ -63,12 +65,13 @@ Entities: 1 {
                 computeAABB: true
                 Components: 2 {
                     Transform: 1269105190 {
-                        position: 0 2.34353 -2.67411
+                        position: 0 2.31096 -2.74628
                         rotation: 0 0 0 1
                         scale:    1 1 1
                     }
                     PointLight: 3039791276 {
-                        color: 0 1.71661e-05 1
+                        diffuse: 0.0357008 0 1
+                        specular: 0.960082 0.188233 0.837229
                         attenuation: 0 2 1
                     }
                 }

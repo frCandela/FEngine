@@ -34,9 +34,10 @@ namespace fan
 
 		struct PointLight {
 			alignas(16) glm::vec3		position;
-			alignas(4)  glm::float32	constant; //TODO use alignas(X) instead
-			alignas(16) glm::vec3		color;
+			alignas(4)  glm::float32	constant;
+			alignas(16) glm::vec3		diffuse;
 			alignas(4)  glm::float32	linear;
+			alignas(16) glm::vec3		specular;
 			alignas(4)  glm::float32	quadratic;
 		};
 

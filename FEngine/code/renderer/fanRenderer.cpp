@@ -333,15 +333,15 @@ namespace fan
 			ForwardPipeline::LightsUniforms uniforms = m_forwardPipeline->GetLightUniforms();
 			for (int lightIndex = 0; lightIndex < m_pointLights.size() ; lightIndex++){
 				const PointLightData & data = m_pointLights[lightIndex];
-				uniforms.lights[data.indexUniform].color = data.pointLight->GetColor().ToGLM();
+				uniforms.lights[data.indexUniform].diffuse = data.pointLight->GetDiffuse().ToGLM();
+				uniforms.lights[data.indexUniform].specular = data.pointLight->GetSpecular().ToGLM();
 				uniforms.lights[data.indexUniform].position = ToGLM(data.transform->GetPosition());	
 				uniforms.lights[data.indexUniform].constant = data.pointLight->GetAttenuation(PointLight::CONSTANT); 
 				uniforms.lights[data.indexUniform].linear = data.pointLight->GetAttenuation(PointLight::LINEAR);
 				uniforms.lights[data.indexUniform].quadratic = data.pointLight->GetAttenuation(PointLight::QUADRATIC);
 			}
 			uniforms.lightNum = static_cast<uint32_t>( m_pointLights.size() );
-			m_forwardPipeline->SetLightUniforms(uniforms);
-			
+			m_forwardPipeline->SetLightUniforms(uniforms);			
 
 			// Main camera transform
 			assert(m_mainCamera != nullptr);

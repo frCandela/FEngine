@@ -23,8 +23,15 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void PointLight::SetColor(const Color _color) {
-		m_color = _color;
+	void PointLight::SetDiffuse(const Color _ambiant) {
+		m_diffuse = _ambiant;
+		MarkModified();
+	}	
+	
+	//================================================================================================================================
+	//================================================================================================================================
+	void PointLight::SetSpecular(const Color _specular) {
+		m_specular = _specular;
 		MarkModified();
 	}
 
@@ -59,10 +66,10 @@ namespace fan
 	void PointLight::OnGui() {
 		Component::OnGui();
 		// Filter color
-		if (ImGui::Button("##ColorLight")) { SetColor(Color::White); } 
-		ImGui::SameLine();
-		if (ImGui::ColorEdit3("Color##1", m_color.Data(), gui::colorEditFlags)) { MarkModified(); }
-
+		if (ImGui::Button("##diffuse")) { SetDiffuse(Color::White); } ImGui::SameLine();
+		if (ImGui::ColorEdit3("diffuse", m_diffuse.Data(), gui::colorEditFlags)) { MarkModified(); }
+		if (ImGui::Button("##specular")) { SetSpecular(Color::White); } ImGui::SameLine();
+		if (ImGui::ColorEdit3("specular", m_specular.Data(), gui::colorEditFlags)) { MarkModified(); }
 		// Attenuation
 		
 		ImGui::Text("attenuation :");  
@@ -72,17 +79,12 @@ namespace fan
 		if (ImGui::DragFloat("linear",	  &m_attenuation[Attenuation::LINEAR], 0.25f, 0.f, 100.f)) { MarkModified(); }
 		if (ImGui::Button("##quadratic attenuation")) { SetAttenuation(Attenuation::QUADRATIC, 1.f); }	ImGui::SameLine();
 		if (ImGui::DragFloat("quadratic", &m_attenuation[Attenuation::QUADRATIC], 0.25f, 0.f, 100.f)) { MarkModified(); }
-		ImGui::Unindent();
-
-
-
-
 		
  		// Sphere gizmo
 		float lightRange = GetLightRange();
 		if (lightRange > 0 ) {
 			const btTransform transform = GetEntity()->GetComponent<Transform>()->GetBtTransform();
-			Renderer::Get().DebugSphere(transform, lightRange, 3, m_color);
+			Renderer::Get().DebugSphere(transform, lightRange, 3, m_diffuse);
 		}
 	}
 
@@ -106,8 +108,10 @@ namespace fan
 	//================================================================================================================================
 	//================================================================================================================================
 	bool PointLight::Load(std::istream& _in) {
-		if (!ReadSegmentHeader(_in, "color:")) { return false; }
-		if (!ReadFloat3(_in, &m_color[0])) { return false; }
+		if (!ReadSegmentHeader(_in, "diffuse:")) { return false; }
+		if (!ReadFloat3(_in, &m_diffuse[0])) { return false; }
+		if (!ReadSegmentHeader(_in, "specular:")) { return false; }
+		if (!ReadFloat3(_in, &m_specular[0])) { return false; }
 		if (!ReadSegmentHeader(_in, "attenuation:")) { return false; }
 		if (!ReadFloat3(_in, &m_attenuation[0])) { return false; }
 		return true;
@@ -117,7 +121,8 @@ namespace fan
 	//================================================================================================================================
 	bool PointLight::Save(std::ostream& _out, const int _indentLevel) const {
 		const std::string indentation = GetIndentation(_indentLevel);
-		_out << indentation << "color: " << m_color[0] << " " << m_color[1] << " " << m_color[2] << std::endl;
+		_out << indentation << "diffuse: " << m_diffuse[0] << " " << m_diffuse[1] << " " << m_diffuse[2] << std::endl;
+		_out << indentation << "specular: " << m_specular[0] << " " << m_specular[1] << " " << m_specular[2] << std::endl;
 		_out << indentation << "attenuation: " << m_attenuation[0] << " " << m_attenuation[1] << " " << m_attenuation[2] << std::endl;
 		return true;
 	}
