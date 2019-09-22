@@ -8,11 +8,11 @@
 
 namespace fan {
 	REGISTER_EDITOR_COMPONENT(Satellite)
-		REGISTER_TYPE_INFO(Satellite)
+	REGISTER_TYPE_INFO(Satellite)
 
-		//================================================================================================================================
-		//================================================================================================================================
-		void Satellite::Start() {
+	//================================================================================================================================
+	//================================================================================================================================
+	void Satellite::Start() {
 		Debug::Log("Start satellite");
 	}
 
@@ -24,7 +24,7 @@ namespace fan {
 		Transform * parentTransform = GetEntity()->GetParent()->GetComponent<Transform>();
 
 		float time = -m_speed * Time::ElapsedSinceStartup();
-		btVector3 position(std::cosf(time), 0, std::sinf(time));
+		btVector3 position(std::cosf(time + m_phase), 0, std::sinf(time + m_phase));
 		btVector3 parentPosition = parentTransform->GetPosition();
 
 		Transform * transform = GetEntity()->GetComponent<Transform>();
@@ -34,8 +34,20 @@ namespace fan {
 	//================================================================================================================================
 	//================================================================================================================================
 	void Satellite::OnGui() {
-		ImGui::SliderFloat("radius", &m_radius, 0.f, 100.f);
-		ImGui::SliderFloat("speed", &m_speed, 0.f, 10.f);
+		ImGui::DragFloat("radius", &m_radius, 0.1f, 0.f, 100.f);
+		ImGui::DragFloat("speed", &m_speed,   0.1f, 0.f, 10.f);
+		ImGui::DragFloat("phase", &m_phase, PI/3, 0.f, 2 * PI);
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
+	bool Satellite::Save(std::ostream& _out, const int _indentLevel) const {
+		Actor::Save(_out, _indentLevel);
+		const std::string indentation = GetIndentation(_indentLevel);
+		_out << indentation << "radius: " << m_radius << std::endl;
+		_out << indentation << "speed:  " << m_speed << std::endl;
+		_out << indentation << "phase:  " << m_phase << std::endl;
+		return true;
 	}
 
 	//================================================================================================================================
@@ -48,16 +60,9 @@ namespace fan {
 
 		if (!ReadSegmentHeader(_in, "speed:")) { return false; }
 		if (!ReadFloat(_in, m_speed)) { return false; }
-		return true;
-	}
 
-	//================================================================================================================================
-	//================================================================================================================================
-	bool Satellite::Save(std::ostream& _out, const int _indentLevel) const {
-		Actor::Save(_out, _indentLevel);
-		const std::string indentation = GetIndentation(_indentLevel);
-		_out << indentation << "radius: " << m_radius << std::endl;
-		_out << indentation << "speed:  " << m_speed << std::endl;
+		if (!ReadSegmentHeader(_in, "phase:")) { return false; }
+		if (!ReadFloat(_in, m_phase)) { return false; }
 		return true;
 	}
 }

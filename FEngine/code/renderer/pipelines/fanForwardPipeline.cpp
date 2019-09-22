@@ -28,16 +28,17 @@ namespace fan
 		// Calculate required alignment based on minimum device offset alignment
 		size_t minUboAlignment = _device.GetDeviceProperties().limits.minUniformBufferOffsetAlignment;
 		m_dynamicAlignmentVert = sizeof(DynamicUniformsVert);
-		m_dynamicAlignmentFrag = sizeof(DynamicUniformsFrag);
+		m_dynamicAlignmentFrag = sizeof(DynamicUniformsMaterial);
 		if (minUboAlignment > 0) {
 			m_dynamicAlignmentVert = ((sizeof(DynamicUniformsVert) + minUboAlignment - 1) & ~(minUboAlignment - 1));
-			m_dynamicAlignmentFrag = ((sizeof(DynamicUniformsFrag) + minUboAlignment - 1) & ~(minUboAlignment - 1));
+			m_dynamicAlignmentFrag = ((sizeof(DynamicUniformsMaterial) + minUboAlignment - 1) & ~(minUboAlignment - 1));
 		}
 		m_dynamicUniformsVert.Resize(s_maximumNumModels * m_dynamicAlignmentVert, m_dynamicAlignmentVert);
 		m_dynamicUniformsFrag.Resize(s_maximumNumModels * m_dynamicAlignmentFrag, m_dynamicAlignmentFrag);
 
 		for (int uniformIndex = 0; uniformIndex < s_maximumNumModels; uniformIndex++) {
 			m_dynamicUniformsFrag[uniformIndex].textureIndex = 0;
+			m_dynamicUniformsFrag[uniformIndex].shininess = 1;
 		}
 
 		m_fragUniforms.ambiantIntensity = 0.2f;
@@ -134,7 +135,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void ForwardPipeline::SetDynamicUniformFrag(const DynamicUniformsFrag& _dynamicUniform, const uint32_t _index) {
+	void ForwardPipeline::SetDynamicUniformFrag(const DynamicUniformsMaterial& _dynamicUniform, const uint32_t _index) {
 		assert(_index < s_maximumNumModels);
 		m_dynamicUniformsFrag[_index] = _dynamicUniform;
 	}

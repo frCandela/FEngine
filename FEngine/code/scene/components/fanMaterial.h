@@ -18,9 +18,11 @@ namespace fan
 		bool Load(std::istream& _in)	override;
 		bool Save(std::ostream& _out, const int _indentLevel) const override;
 
-		void				SetTexture(Texture * _texture);
+		void			SetTexture( Texture * const _texture);
 		Texture *		GetTexture() { return m_texture; }
 		const Texture *	GetTexture() const { return m_texture; }
+		void			SetShininess(const int _shininess);
+		const int		GetShininess() const { return m_shininess; }
 
 		void OnGui() override;
 		bool IsUnique()	const override { return true; }
@@ -33,6 +35,8 @@ namespace fan
 
 	private:
 		Texture * m_texture = nullptr;
+		int  m_shininess = 1;
+
 
 		// Editor
 		std::fs::path m_pathBuffer;

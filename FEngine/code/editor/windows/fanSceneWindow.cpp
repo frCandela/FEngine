@@ -155,12 +155,14 @@ namespace fan
 			ImGui::SameLine();
 			if (ImGui::Button("Ok") || enterPressed)
 			{
-				//Create new entity 
-				Entity* newentity = scene.CreateEntity(m_textBuffer, m_lastEntityRightClicked);
-				newentity->AddComponent<Transform>();
-				engine.SetSelectedEntity(newentity);
-				m_lastEntityRightClicked = nullptr;
-				ImGui::CloseCurrentPopup();
+				if (std::string(m_textBuffer) != "") {
+					//Create new entity 
+					Entity* newentity = scene.CreateEntity(m_textBuffer, m_lastEntityRightClicked);
+					newentity->AddComponent<Transform>();
+					engine.SetSelectedEntity(newentity);
+					m_lastEntityRightClicked = nullptr;
+					ImGui::CloseCurrentPopup();
+				}
 			}
 			ImGui::EndPopup();
 		}
@@ -174,6 +176,7 @@ namespace fan
 		if (ImGui::BeginPopupModal("Rename entity"))
 		{
 			if (ImGui::IsWindowAppearing()) {
+				strcpy_s(m_textBuffer, 32, m_lastEntityRightClicked->GetName().c_str());
 				ImGui::SetKeyboardFocusHere();
 			}
 			bool enterPressed = false;
@@ -187,9 +190,11 @@ namespace fan
 			ImGui::SameLine();
 			if (ImGui::Button("Ok") || ImGui::IsKeyPressed(GLFW_KEY_ENTER, false) || enterPressed)
 			{
-				m_lastEntityRightClicked->SetName(m_textBuffer);
-				m_lastEntityRightClicked = nullptr;
-				ImGui::CloseCurrentPopup();
+				if (std::string(m_textBuffer) != "") {
+					m_lastEntityRightClicked->SetName(m_textBuffer);
+					m_lastEntityRightClicked = nullptr;
+					ImGui::CloseCurrentPopup();
+				}
 			}
 			ImGui::EndPopup();
 		}

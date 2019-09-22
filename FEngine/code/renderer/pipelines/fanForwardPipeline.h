@@ -49,13 +49,14 @@ namespace fan
 
 		struct FragUniforms
 		{
-			glm::vec3	cameraPosition;
-			glm::int32	specularHardness;
-			float		ambiantIntensity;
+			glm::vec3	cameraPosition = glm::vec3(0,0,0);
+			glm::int32	specularHardness = 1;
+			float		ambiantIntensity = 0.2f;
 		};
 
-		struct DynamicUniformsFrag {
-			glm::int32	textureIndex;
+		struct DynamicUniformsMaterial {
+			glm::int32 shininess;
+			glm::int32 textureIndex;
 		};
 
 		struct DynamicUniformsVert
@@ -81,7 +82,7 @@ namespace fan
 		void			SetLightUniforms(const LightsUniforms& _lights);
 
 		void	SetDynamicUniformVert(const DynamicUniformsVert& _dynamicUniform, const uint32_t _index);
-		void	SetDynamicUniformFrag(const DynamicUniformsFrag& _dynamicUniform, const uint32_t _index);
+		void	SetDynamicUniformFrag(const DynamicUniformsMaterial& _dynamicUniform, const uint32_t _index);
 
 		void UpdateUniformBuffers();
 
@@ -122,7 +123,7 @@ namespace fan
 
 
 		AlignedMemory<DynamicUniformsVert> m_dynamicUniformsVert;
-		AlignedMemory<DynamicUniformsFrag> m_dynamicUniformsFrag;
+		AlignedMemory<DynamicUniformsMaterial> m_dynamicUniformsFrag;
 
 		size_t m_dynamicAlignmentVert;
 		size_t m_dynamicAlignmentFrag;

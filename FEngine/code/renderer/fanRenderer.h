@@ -63,11 +63,11 @@ namespace fan
 		VkCommandBuffer BeginSingleTimeCommands();
 		void			EndSingleTimeCommands(VkCommandBuffer commandBuffer);
 
-		Window *					GetWindow() { return m_window; }
+		Window *				GetWindow() { return m_window; }
 		ImguiPipeline *			GetImguiPipeline() { return m_imguiPipeline; }
 		PostprocessPipeline *	GetPostprocessPipeline() { return m_postprocessPipeline; }
 		ForwardPipeline *		GetForwardPipeline() { return m_forwardPipeline; }
-		glm::vec4					GetClearColor() const { return m_clearColor; }
+		glm::vec4				GetClearColor() const { return m_clearColor; }
 		RessourceManager *		GetRessourceManager() const { return m_ressourceManager; }
 
 		void SetClearColor(glm::vec4 _color) { m_clearColor = _color; }

@@ -22,5 +22,6 @@ namespace fan {
 
 		float m_speed = 1.f;
 		float m_radius = 1.f;
+		float m_phase = 0.f;
 	};
 }

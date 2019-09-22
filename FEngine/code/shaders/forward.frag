@@ -15,8 +15,9 @@ layout(binding = 2) uniform FragUniforms {
 } uniforms;
 
 layout (binding = 3) uniform DynamicUniformBufferFrag {
+	int shininess;
 	int	textureIndex;
-} dynamicUbo;
+} material;
 
 struct PointLight {
 	vec3	position;
@@ -31,9 +32,9 @@ struct PointLight {
 layout(binding = 4) uniform LightUniform {
 	PointLight pointLights[16];
 	int lightNum;
-} uniformLight;
+} lights;
 
-layout(set = 1, binding = 0) uniform sampler2D texSampler[];
+layout(set = 1, binding = 0) uniform sampler2D diffuseTexture[];
 
 //https://learnopengl.com/Lighting/Multiple-lights
 vec3 CalcPointLight(const PointLight light, const vec3 normal, const vec3 fragPos,  vec3 viewDir)
@@ -43,13 +44,13 @@ vec3 CalcPointLight(const PointLight light, const vec3 normal, const vec3 fragPo
     float diff = max(dot(normal, lightDir), 0.0);
     // specular shading
     vec3 reflectDir = reflect(-lightDir, normal);
-    float spec = pow(max(dot(viewDir, reflectDir), 0.0), uniforms.specularHardness);
+    float spec = pow(max(dot(viewDir, reflectDir), 0.0), material.shininess);
     // attenuation
     float distance    = length(light.position - fragPos);
     float attenuation = 1.0 / (light.constant + light.linear * distance + light.quadratic * (distance * distance));    
     // combine results
-    vec3 ambient  = light.ambiant  * vec3(texture(texSampler[dynamicUbo.textureIndex], inTexCoord));
-    vec3 diffuse  = light.diffuse  * vec3(diff) * vec3(texture(texSampler[dynamicUbo.textureIndex], inTexCoord));
+    vec3 ambient  = light.ambiant  * vec3(texture(diffuseTexture[material.textureIndex], inTexCoord));
+    vec3 diffuse  = light.diffuse  * vec3(diff) * vec3(texture(diffuseTexture[material.textureIndex], inTexCoord));
     vec3 specular = light.specular * vec3(spec);// * vec3(texture(material.specular, TexCoords));
     ambient  *= attenuation;
     diffuse  *= attenuation;
@@ -61,18 +62,20 @@ void main() {
 	//Needed data
 	const float diffusePower = 1.f -  uniforms.ambiantIntensity;
 	vec3 goodNormal = normalize(inNormal);
-	vec3 lightDir = uniformLight.pointLights[uniformLight.lightNum].position - inFragPos;
+	vec3 lightDir = lights.pointLights[lights.lightNum].position - inFragPos;
 	const float distance = length( lightDir );
 	lightDir /= distance;
 	const vec3 viewDir = normalize(uniforms.cameraPosition - inFragPos);
-	const vec4 textureColor = texture(texSampler[dynamicUbo.textureIndex], inTexCoord);
+	const vec4 textureColor = texture(diffuseTexture[material.textureIndex], inTexCoord);
 
 	vec3 lightColor = vec3(0,0,0);
-	for(int lightIndex = 0; lightIndex < uniformLight.lightNum; lightIndex++) {
-		lightColor += CalcPointLight( uniformLight.pointLights[lightIndex], goodNormal, inFragPos, viewDir );
+	for(int lightIndex = 0; lightIndex < lights.lightNum; lightIndex++) {
+		lightColor += CalcPointLight( lights.pointLights[lightIndex], goodNormal, inFragPos, viewDir );
 	}
+	
 
 	outColor = vec4(lightColor,1);
+
 }
 
 

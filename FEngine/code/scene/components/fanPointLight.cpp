@@ -93,11 +93,11 @@ namespace fan
 			"constant + linear * d + quadratic * d*d  \n"
 			"(d=distance)");
 		if (ImGui::Button("##constant attenuation")) { SetAttenuation(Attenuation::CONSTANT, 0.f ); }	ImGui::SameLine();
-		if (ImGui::DragFloat("constant",  &m_attenuation[Attenuation::CONSTANT],0.25f, 0.f, 100.f)) { MarkModified(); }		
+		if (ImGui::DragFloat("constant",  &m_attenuation[Attenuation::CONSTANT],0.05f, 0.f, 100.f)) { MarkModified(); }		
 		if (ImGui::Button("##linear attenuation")) { SetAttenuation(Attenuation::LINEAR, 2.f); }	ImGui::SameLine();
-		if (ImGui::DragFloat("linear",	  &m_attenuation[Attenuation::LINEAR], 0.25f, 0.f, 100.f)) { MarkModified(); }
+		if (ImGui::DragFloat("linear",	  &m_attenuation[Attenuation::LINEAR], 0.05f, 0.f, 100.f)) { MarkModified(); }
 		if (ImGui::Button("##quadratic attenuation")) { SetAttenuation(Attenuation::QUADRATIC, 1.f); }	ImGui::SameLine();
-		if (ImGui::DragFloat("quadratic", &m_attenuation[Attenuation::QUADRATIC], 0.25f, 0.f, 100.f)) { MarkModified(); }
+		if (ImGui::DragFloat("quadratic", &m_attenuation[Attenuation::QUADRATIC], 0.05f, 0.f, 100.f)) { MarkModified(); }
 		
  		// Sphere gizmo
 		float lightRange = GetLightRange();

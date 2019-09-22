@@ -389,8 +389,9 @@ namespace fan
 						Texture * texture = drawData.material->GetTexture();
 						if (texture != nullptr) {
 							m_mustUpdateDynamicUniformsFrag = true;
-							ForwardPipeline::DynamicUniformsFrag uniform;
+							ForwardPipeline::DynamicUniformsMaterial uniform;
 							uniform.textureIndex = texture->GetRenderID();
+							uniform.shininess =    static_cast<uint32_t>(drawData.material->GetShininess());
 							assert(uniform.textureIndex >= 0);
 							m_forwardPipeline->SetDynamicUniformFrag(uniform, drawDataIndex);
 						}
@@ -870,8 +871,6 @@ namespace fan
 			DebugLine(corners[3], corners[7], _color);
 		}
 
-
-
 		//================================================================================================================================
 		//================================================================================================================================
 		void Renderer::RegisterMaterial(Material * _material ) {
@@ -888,7 +887,7 @@ namespace fan
 			if (model != nullptr && model->GetRenderID() >= 0) {
 				DrawData & drawData = m_drawData[model->GetRenderID()];
 				drawData.material = nullptr;
-				ForwardPipeline::DynamicUniformsFrag uniform;
+				ForwardPipeline::DynamicUniformsMaterial uniform;
 				uniform.textureIndex = 0;
 				m_forwardPipeline->SetDynamicUniformFrag(uniform, model->GetRenderID());
 				m_mustUpdateDynamicUniformsFrag = true;
@@ -930,14 +929,12 @@ namespace fan
 					drawData = &m_drawData[emptyIndex];
 					_model->SetRenderID(static_cast<int>(emptyIndex));
 				}
-
 			}
 
 			drawData->model = _model;
 			drawData->transform = _model->GetEntity()->GetComponent<Transform>();
 			drawData->material =  _model->GetEntity()->GetComponent<Material>();
-			drawData->meshData = m_ressourceManager->FindMeshData(_model->GetMesh());	
-
+			drawData->meshData = m_ressourceManager->FindMeshData(_model->GetMesh());
 			drawData->transform->MarkModified(); // Force tranform uniforms update
 
 			for (int boolIndex = 0; boolIndex < m_reloadGeometryCommandBuffers.size(); boolIndex++) {

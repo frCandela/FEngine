@@ -1,0 +1,219 @@
+Entities: 1 { 
+    Entity: root {
+        computeAABB: true
+        Components: 1 {
+            Transform: 1269105190 {
+                position: 0 0 0
+                rotation: 0 0 0 1
+                scale:    1 1 1
+            }
+        }
+        Childs: 1 {
+            Entity: sphere {
+                computeAABB: true
+                Components: 3 {
+                    Transform: 1269105190 {
+                        position: 0 0 0
+                        rotation: 0 0 0 1
+                        scale:    1 1 1
+                    }
+                    Model: 1739103771 {
+                        path: content\models\test\sphere.fbx
+                    }
+                    Material: 1828911513 {
+                        material: content\models\white.png
+                        shininess: 256
+                    }
+                }
+                Childs: 6 {
+                    Entity: light_green {
+                        computeAABB: true
+                        Components: 5 {
+                            Transform: 1269105190 {
+                                position: -1.47925 0 -1.34604
+                                rotation: 0 0 0 1
+                                scale:    0.1 0.1 0.1
+                            }
+                            PointLight: 3039791276 {
+                                ambiant: 9.999e-05 0.0001 9.999e-05
+                                diffuse: 0 0.9999 0
+                                specular: 0 0.9999 0
+                                attenuation: 0 0 0.3
+                            }
+                            Model: 1739103771 {
+                                path: content\models\test\sphere.fbx
+                            }
+                            Material: 1828911513 {
+                                material: content\models\white.png
+                                shininess: 1
+                            }
+                            Satellite: 3353479249 {
+                                isEnabled: true
+                                radius: 2
+                                speed:  0.5
+                                phase:  2.094
+                            }
+                        }
+                        Childs: 0 {
+                        }
+                    }
+                    Entity: light_blue {
+                        computeAABB: true
+                        Components: 5 {
+                            Transform: 1269105190 {
+                                position: 1.9057 0 -0.606887
+                                rotation: 0 0 0 1
+                                scale:    0.1 0.1 0.1
+                            }
+                            PointLight: 3039791276 {
+                                ambiant: 0 0 0
+                                diffuse: 0 0 1
+                                specular: 0 0 1
+                                attenuation: 0 0 0.3
+                            }
+                            Model: 1739103771 {
+                                path: content\models\test\sphere.fbx
+                            }
+                            Material: 1828911513 {
+                                material: content\models\white.png
+                                shininess: 1
+                            }
+                            Satellite: 3353479249 {
+                                isEnabled: true
+                                radius: 2
+                                speed:  0.5
+                                phase:  4.189
+                            }
+                        }
+                        Childs: 0 {
+                        }
+                    }
+                    Entity: light_red {
+                        computeAABB: true
+                        Components: 5 {
+                            Transform: 1269105190 {
+                                position: -0.426869 0 1.95391
+                                rotation: 0 0 0 1
+                                scale:    0.1 0.1 0.1
+                            }
+                            PointLight: 3039791276 {
+                                ambiant: 0 0 0
+                                diffuse: 1 0 0
+                                specular: 1 0 0
+                                attenuation: 0 0 0.3
+                            }
+                            Model: 1739103771 {
+                                path: content\models\test\sphere.fbx
+                            }
+                            Material: 1828911513 {
+                                material: content\models\white.png
+                                shininess: 1
+                            }
+                            Satellite: 3353479249 {
+                                isEnabled: true
+                                radius: 2
+                                speed:  0.5
+                                phase:  0
+                            }
+                        }
+                        Childs: 0 {
+                        }
+                    }
+                    Entity: light_green_-1 {
+                        computeAABB: true
+                        Components: 5 {
+                            Transform: 1269105190 {
+                                position: 1.90582 0 0.606514
+                                rotation: 0 0 0 1
+                                scale:    0.1 0.1 0.1
+                            }
+                            PointLight: 3039791276 {
+                                ambiant: 9.999e-05 0.0001 9.999e-05
+                                diffuse: 0 0.9999 0
+                                specular: 0 0.9999 0
+                                attenuation: 0 0 0.3
+                            }
+                            Model: 1739103771 {
+                                path: content\models\test\sphere.fbx
+                            }
+                            Material: 1828911513 {
+                                material: content\models\white.png
+                                shininess: 1
+                            }
+                            Satellite: 3353479249 {
+                                isEnabled: true
+                                radius: 2
+                                speed:  -0.5
+                                phase:  2.094
+                            }
+                        }
+                        Childs: 0 {
+                        }
+                    }
+                    Entity: light_blue_-1 {
+                        computeAABB: true
+                        Components: 5 {
+                            Transform: 1269105190 {
+                                position: -1.47898 0 1.34633
+                                rotation: 0 0 0 1
+                                scale:    0.1 0.1 0.1
+                            }
+                            PointLight: 3039791276 {
+                                ambiant: 0 0 0
+                                diffuse: 0 0 1
+                                specular: 0 0 1
+                                attenuation: 0 0 0.3
+                            }
+                            Model: 1739103771 {
+                                path: content\models\test\sphere.fbx
+                            }
+                            Material: 1828911513 {
+                                material: content\models\white.png
+                                shininess: 1
+                            }
+                            Satellite: 3353479249 {
+                                isEnabled: true
+                                radius: 2
+                                speed:  -0.5
+                                phase:  4.189
+                            }
+                        }
+                        Childs: 0 {
+                        }
+                    }
+                    Entity: light_red_-1 {
+                        computeAABB: true
+                        Components: 5 {
+                            Transform: 1269105190 {
+                                position: -0.426869 0 -1.95391
+                                rotation: 0 0 0 1
+                                scale:    0.1 0.1 0.1
+                            }
+                            PointLight: 3039791276 {
+                                ambiant: 0 0 0
+                                diffuse: 1 0 0
+                                specular: 1 0 0
+                                attenuation: 0 0 0.3
+                            }
+                            Model: 1739103771 {
+                                path: content\models\test\sphere.fbx
+                            }
+                            Material: 1828911513 {
+                                material: content\models\white.png
+                                shininess: 1
+                            }
+                            Satellite: 3353479249 {
+                                isEnabled: true
+                                radius: 2
+                                speed:  -0.5
+                                phase:  0
+                            }
+                        }
+                        Childs: 0 {
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
