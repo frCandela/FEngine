@@ -48,9 +48,21 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
+	void Material::SetColor( const Color _color ) {
+		m_color = _color;
+		MarkModified();
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
 	void Material::OnGui() {
 		Component::OnGui();
 
+		// Filter color
+		if ( ImGui::Button( "##color" ) ) { SetColor( Color::White ); } ImGui::SameLine();
+		if ( ImGui::ColorEdit3( "color", m_color.Data(), gui::colorEditFlags ) ) { MarkModified(); }
+
+		if ( ImGui::Button( "##shininess" ) ) { SetShininess( 1 ); } ImGui::SameLine();
 		if( ImGui::DragInt("shininess", &m_shininess, 1, 1, 256 )) { MarkModified(); }
 		ImGui::SameLine(); gui ::ShowHelpMarker("sharpness of the specular reflection");
 
@@ -85,30 +97,33 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	bool Material::Save(std::ostream& _out, const int _indentLevel) const {
-		const std::string indentation = GetIndentation(_indentLevel);
-		_out << indentation << "material: " << (m_texture != nullptr ? m_texture->GetPath() : "void") << std::endl;
+	bool Material::Save( std::ostream& _out, const int _indentLevel ) const {
+		const std::string indentation = GetIndentation( _indentLevel );
+		_out << indentation << "material: " << ( m_texture != nullptr ? m_texture->GetPath() : "void" ) << std::endl;
 		_out << indentation << "shininess: " << m_shininess << std::endl;
+		_out << indentation << "color: " << m_color[0] << " " << m_color[1] << " " << m_color[2] << std::endl;
 		return true;
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	bool Material::Load(std::istream& _in) {
+	bool Material::Load( std::istream& _in ) {
 		std::string path;
-		if (!ReadSegmentHeader(_in, "material:")) { return false; }
-		if (!ReadString(_in, path)) { return false; }
-		if (!ReadSegmentHeader(_in, "shininess:")) { return false; }
-		if (!ReadInteger(_in, m_shininess)) { return false; }
+		if ( !ReadSegmentHeader( _in, "material:" ) ) { return false; }
+		if ( !ReadString( _in, path ) ) { return false; }
+		if ( !ReadSegmentHeader( _in, "shininess:" ) ) { return false; }
+		if ( !ReadInteger( _in, m_shininess ) ) { return false; }
+		if ( !ReadSegmentHeader( _in, "color:" ) ) { return false; }
+		if ( !ReadFloat3( _in, &m_color[0] ) ) { return false; }
 
-		if (path != std::string("void")) {
+		if ( path != std::string( "void" ) ) {
 			// TODO find a cleaner way to set the texture
 			RessourceManager * texturesManager = Renderer::Get().GetRessourceManager();
-			Texture * texture = texturesManager->FindTexture(path);
-			if (texture == nullptr) {
-				texture = texturesManager->LoadTexture(path);
+			Texture * texture = texturesManager->FindTexture( path );
+			if ( texture == nullptr ) {
+				texture = texturesManager->LoadTexture( path );
 			}
-			SetTexture(texture);
+			SetTexture( texture );
 		}
 		return true;
 	}

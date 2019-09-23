@@ -31,20 +31,6 @@ namespace fan
 			}
 		}
 
-		if (ImGui::CollapsingHeader("Forward rendering")) {
-			ForwardPipeline::FragUniforms uniforms = Renderer::Get().GetForwardPipeline()->GetFragUniforms();
-			bool uniformsModified = false;
-			if (ImGui::SliderFloat("Ambiant light", &uniforms.ambiantIntensity, 0.f, 1.f)) {
-				uniformsModified = true;
-			}
-			if (ImGui::SliderInt("specular hardness", &uniforms.specularHardness, 0, 128)) {
-				uniformsModified = true;
-			}
-			if (uniformsModified == true) {
-				Renderer::Get().GetForwardPipeline()->SetFragUniforms(uniforms);
-			}
-		}
-
 		if (ImGui::CollapsingHeader("Global")) {
 			float tmpFps = Time::GetFPS();
 			if (ImGui::DragFloat("Framerate", &tmpFps, 1.f, Time::GetMinFPS(), Time::GetMaxFPS())) {

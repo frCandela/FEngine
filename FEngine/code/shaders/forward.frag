@@ -9,12 +9,11 @@ layout (location = 2) in vec3 inNormal;
 layout (location = 3) in vec2 inTexCoord;
 
 layout(binding = 2) uniform FragUniforms {
-	vec3	cameraPosition;
-	int		specularHardness;
-	float	ambiantIntensity;		
+	vec3	cameraPosition;	
 } uniforms;
 
 layout (binding = 3) uniform DynamicUniformBufferFrag {
+	vec3 color;
 	int shininess;
 	int	textureIndex;
 } material;
@@ -40,17 +39,22 @@ layout(set = 1, binding = 0) uniform sampler2D diffuseTexture[];
 vec3 CalcPointLight(const PointLight light, const vec3 normal, const vec3 fragPos,  vec3 viewDir)
 {
     vec3 lightDir = normalize(light.position - fragPos);
-    // diffuse shading
+    
+	// diffuse shading
     float diff = max(dot(normal, lightDir), 0.0);
-    // specular shading
-    vec3 reflectDir = reflect(-lightDir, normal);
-    float spec = pow(max(dot(viewDir, reflectDir), 0.0), material.shininess);
-    // attenuation
+    
+	// specular shading	(blinn-phong)
+	vec3 halfwayDir = normalize(lightDir + viewDir);  
+    float spec = pow(max(dot(normal, halfwayDir), 0.0), material.shininess);
+    
+	// attenuation
     float distance    = length(light.position - fragPos);
     float attenuation = 1.0 / (light.constant + light.linear * distance + light.quadratic * (distance * distance));    
-    // combine results
-    vec3 ambient  = light.ambiant  * vec3(texture(diffuseTexture[material.textureIndex], inTexCoord));
-    vec3 diffuse  = light.diffuse  * vec3(diff) * vec3(texture(diffuseTexture[material.textureIndex], inTexCoord));
+    
+	// combine results
+	vec3 textureColor = material.color * vec3(texture(diffuseTexture[material.textureIndex], inTexCoord));
+    vec3 ambient  = light.ambiant  * textureColor;
+    vec3 diffuse  = light.diffuse  * vec3(diff) * textureColor;
     vec3 specular = light.specular * vec3(spec);// * vec3(texture(material.specular, TexCoords));
     ambient  *= attenuation;
     diffuse  *= attenuation;
@@ -60,13 +64,8 @@ vec3 CalcPointLight(const PointLight light, const vec3 normal, const vec3 fragPo
 
 void main() {  
 	//Needed data
-	const float diffusePower = 1.f -  uniforms.ambiantIntensity;
 	vec3 goodNormal = normalize(inNormal);
-	vec3 lightDir = lights.pointLights[lights.lightNum].position - inFragPos;
-	const float distance = length( lightDir );
-	lightDir /= distance;
 	const vec3 viewDir = normalize(uniforms.cameraPosition - inFragPos);
-	const vec4 textureColor = texture(diffuseTexture[material.textureIndex], inTexCoord);
 
 	vec3 lightColor = vec3(0,0,0);
 	for(int lightIndex = 0; lightIndex < lights.lightNum; lightIndex++) {

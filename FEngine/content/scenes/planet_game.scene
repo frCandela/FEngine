@@ -13,7 +13,7 @@ Entities: 1 {
                 computeAABB: true
                 Components: 4 {
                     Transform: 1269105190 {
-                        position: 0.422536 5.25 -6.60204
+                        position: 0.553346 5.25 -6.57622
                         rotation: 0.707107 0 0 0.707107
                         scale:    1 1 1
                     }
@@ -47,6 +47,7 @@ Entities: 1 {
                     Material: 1828911513 {
                         material: content\models\sun.png
                         shininess: 1
+                        color: 1 1 1
                     }
                     PointLight: 3039791276 {
                         ambiant: 1 0.380952 0
@@ -60,7 +61,7 @@ Entities: 1 {
                         computeAABB: true
                         Components: 4 {
                             Transform: 1269105190 {
-                                position: 0.0800169 0 -12.4557
+                                position: 4.83117 0 11.4809
                                 rotation: 0 0 0 1
                                 scale:    1 1 1
                             }
@@ -75,6 +76,7 @@ Entities: 1 {
                             Material: 1828911513 {
                                 material: content\models\planet.png
                                 shininess: 1
+                                color: 1 1 1
                             }
                         }
                         Childs: 1 {
@@ -82,7 +84,7 @@ Entities: 1 {
                                 computeAABB: true
                                 Components: 4 {
                                     Transform: 1269105190 {
-                                        position: -1.74976 0 -10.2877
+                                        position: 5.89466 0 14.1075
                                         rotation: 0 0 0 1
                                         scale:    0.5 0.5 0.5
                                     }
@@ -92,6 +94,7 @@ Entities: 1 {
                                     Material: 1828911513 {
                                         material: content\models\satellite.png
                                         shininess: 1
+                                        color: 1 1 1
                                     }
                                     Satellite: 3353479249 {
                                         isEnabled: true
@@ -109,7 +112,7 @@ Entities: 1 {
                         computeAABB: true
                         Components: 4 {
                             Transform: 1269105190 {
-                                position: 0.0297261 0 -4.6259
+                                position: 1.79423 0 4.26387
                                 rotation: 0 0 0 1
                                 scale:    0.5 0.5 0.5
                             }
@@ -119,6 +122,7 @@ Entities: 1 {
                             Material: 1828911513 {
                                 material: content\models\satellite.png
                                 shininess: 1
+                                color: 1 1 1
                             }
                             Planet: 1669599886 {
                                 isEnabled: true
@@ -145,9 +149,10 @@ Entities: 1 {
                     Material: 1828911513 {
                         material: content\models\test\textures\texture3.png
                         shininess: 256
+                        color: 1 1 1
                     }
                     SpaceShip: 3824437066 {
-                        isEnabled: true
+                        isEnabled: false
                         speed:          8
                         rotation_speed: 3
                     }

@@ -36,13 +36,11 @@ namespace fan
 		m_dynamicUniformsVert.Resize(s_maximumNumModels * m_dynamicAlignmentVert, m_dynamicAlignmentVert);
 		m_dynamicUniformsFrag.Resize(s_maximumNumModels * m_dynamicAlignmentFrag, m_dynamicAlignmentFrag);
 
-		for (int uniformIndex = 0; uniformIndex < s_maximumNumModels; uniformIndex++) {
-			m_dynamicUniformsFrag[uniformIndex].textureIndex = 0;
-			m_dynamicUniformsFrag[uniformIndex].shininess = 1;
+		for ( int uniformIndex = 0; uniformIndex < s_maximumNumModels; uniformIndex++ ) {
+			m_dynamicUniformsFrag [uniformIndex].color = glm::vec3(1);
+			m_dynamicUniformsFrag [uniformIndex].textureIndex = 0;
+			m_dynamicUniformsFrag [uniformIndex].shininess = 1;
 		}
-
-		m_fragUniforms.ambiantIntensity = 0.2f;
-		m_fragUniforms.specularHardness = 32;
 	}
 
 	//================================================================================================================================

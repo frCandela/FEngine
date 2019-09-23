@@ -22,7 +22,9 @@ namespace fan
 		Texture *		GetTexture() { return m_texture; }
 		const Texture *	GetTexture() const { return m_texture; }
 		void			SetShininess(const int _shininess);
-		const int		GetShininess() const { return m_shininess; }
+		const int		GetShininess() const { return m_shininess;  }
+		Color			GetColor() const	 {	return m_color;		}
+		void			SetColor( const Color _color );
 
 		void OnGui() override;
 		bool IsUnique()	const override { return true; }
@@ -36,7 +38,7 @@ namespace fan
 	private:
 		Texture * m_texture = nullptr;
 		int  m_shininess = 1;
-
+		Color m_color = Color::White;
 
 		// Editor
 		std::fs::path m_pathBuffer;

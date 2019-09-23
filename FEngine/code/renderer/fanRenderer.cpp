@@ -390,6 +390,7 @@ namespace fan
 						if (texture != nullptr) {
 							m_mustUpdateDynamicUniformsFrag = true;
 							ForwardPipeline::DynamicUniformsMaterial uniform;
+							uniform.color = drawData.material->GetColor().ToGLM();
 							uniform.textureIndex = texture->GetRenderID();
 							uniform.shininess =    static_cast<uint32_t>(drawData.material->GetShininess());
 							assert(uniform.textureIndex >= 0);

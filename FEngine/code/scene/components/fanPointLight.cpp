@@ -21,8 +21,8 @@ namespace fan
 		m_specular ( Color::White) 
 	{
 		m_attenuation[Attenuation::CONSTANT] = 0;
-		m_attenuation[Attenuation::LINEAR] = 2;
-		m_attenuation[Attenuation::QUADRATIC] = 1;
+		m_attenuation[Attenuation::LINEAR] = 0;
+		m_attenuation[Attenuation::QUADRATIC] = 0.1f;
 	}
 
 	//================================================================================================================================
@@ -77,7 +77,7 @@ namespace fan
 	void PointLight::OnGui() {
 		Component::OnGui();
 		// Filter color
-		if (ImGui::Button("##ambiant")) { SetAmbiant(Color(0.2f)); } ImGui::SameLine();
+		if (ImGui::Button("##ambiant")) { SetAmbiant(Color(0.0f)); } ImGui::SameLine();
 		if (ImGui::ColorEdit3("ambiant", m_ambiant.Data(), gui::colorEditFlags)) { MarkModified(); }
 		if (ImGui::Button("##diffuse")) { SetDiffuse(Color::White); } ImGui::SameLine();
 		if (ImGui::ColorEdit3("diffuse", m_diffuse.Data(), gui::colorEditFlags)) { MarkModified(); }
@@ -94,9 +94,9 @@ namespace fan
 			"(d=distance)");
 		if (ImGui::Button("##constant attenuation")) { SetAttenuation(Attenuation::CONSTANT, 0.f ); }	ImGui::SameLine();
 		if (ImGui::DragFloat("constant",  &m_attenuation[Attenuation::CONSTANT],0.05f, 0.f, 100.f)) { MarkModified(); }		
-		if (ImGui::Button("##linear attenuation")) { SetAttenuation(Attenuation::LINEAR, 2.f); }	ImGui::SameLine();
+		if (ImGui::Button("##linear attenuation")) { SetAttenuation(Attenuation::LINEAR, 0.f); }	ImGui::SameLine();
 		if (ImGui::DragFloat("linear",	  &m_attenuation[Attenuation::LINEAR], 0.05f, 0.f, 100.f)) { MarkModified(); }
-		if (ImGui::Button("##quadratic attenuation")) { SetAttenuation(Attenuation::QUADRATIC, 1.f); }	ImGui::SameLine();
+		if (ImGui::Button("##quadratic attenuation")) { SetAttenuation(Attenuation::QUADRATIC, 0.f); }	ImGui::SameLine();
 		if (ImGui::DragFloat("quadratic", &m_attenuation[Attenuation::QUADRATIC], 0.05f, 0.f, 100.f)) { MarkModified(); }
 		
  		// Sphere gizmo
@@ -110,7 +110,7 @@ namespace fan
 	//================================================================================================================================
 	//================================================================================================================================
 	float PointLight::GetLightRange() const {
-		const float epsilon = 0.015f;	// Value at which we consider the light value null
+		const float epsilon = 0.1f;	// Value at which we consider the light value null
 		const float q = m_attenuation[2];
 		const float s = m_attenuation[0];
 		const float L = m_attenuation[1];

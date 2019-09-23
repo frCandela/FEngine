@@ -50,11 +50,10 @@ namespace fan
 		struct FragUniforms
 		{
 			glm::vec3	cameraPosition = glm::vec3(0,0,0);
-			glm::int32	specularHardness = 1;
-			float		ambiantIntensity = 0.2f;
 		};
 
 		struct DynamicUniformsMaterial {
+			glm::vec3  color = glm::vec3(1);
 			glm::int32 shininess;
 			glm::int32 textureIndex;
 		};
