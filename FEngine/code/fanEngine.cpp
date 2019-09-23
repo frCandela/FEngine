@@ -401,7 +401,7 @@ namespace fan {
 				coneTris[vertIndex] = transform * coneTris[vertIndex];
 			}
 
-			if (Mouse::GetButtonReleased(Mouse::button0)) {
+			if ( ImGui::IsMouseReleased(0)) {
 				cacheData.pressed = false;
 				cacheData.axisIndex = -1;
 			}
@@ -414,7 +414,7 @@ namespace fan {
 				btVector3 intersection;
 				if (triangle.RayCast(ray.origin, ray.direction, intersection)) {
 					clickedColor[3] = 0.5f;
-					if (Mouse::GetButtonPressed(Mouse::button0)) {
+					if (ImGui::IsMouseClicked(0, false)) {
 						cacheData.pressed = true;
 						cacheData.axisIndex = axisIndex;
 					}
@@ -437,7 +437,7 @@ namespace fan {
 				 btVector3 trash, projectionOnAxis;
 				 screenRay.RayClosestPoints(axisRay, trash, projectionOnAxis);
 
-				if (Mouse::GetButtonPressed(Mouse::button0)) {
+				if (ImGui::IsMouseClicked(0, false)) {
 					cacheData.offset = projectionOnAxis - _transform.getOrigin();
 				}
 
