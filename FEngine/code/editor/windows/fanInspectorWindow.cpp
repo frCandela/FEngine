@@ -1,7 +1,6 @@
 #include "fanGlobalIncludes.h"
 
 #include "editor/windows/fanInspectorWindow.h"
-#include "fanGlobalValues.h"
 #include "scene/fanEntity.h"
 #include "scene/components/fanComponent.h"
 #include "scene/components/fanTransform.h"

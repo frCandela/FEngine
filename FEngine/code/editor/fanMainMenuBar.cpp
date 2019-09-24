@@ -1,7 +1,6 @@
 #include "fanGlobalIncludes.h"
 
 #include "editor/fanMainMenuBar.h"
-#include "fanGlobalValues.h"
 #include "editor/windows/fanRenderWindow.h"
 #include "editor/windows/fanSceneWindow.h"
 #include "editor/windows/fanInspectorWindow.h"

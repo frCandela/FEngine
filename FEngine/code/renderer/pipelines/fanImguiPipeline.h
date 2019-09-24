@@ -1,7 +1,5 @@
 #pragma once
 
-#include "fanGlobalIncludes.h"
-
 namespace fan
 {
 	class Device;

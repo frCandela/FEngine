@@ -1,3 +1,4 @@
+#include "fanGlobalIncludes.h"
 #include "core/math/fanVector2.h"
 
 namespace fan {
