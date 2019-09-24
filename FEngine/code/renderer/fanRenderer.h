@@ -14,6 +14,7 @@ namespace fan
 	class Transform;
 	class Material;
 	class PointLight;
+	class DirectionalLight;
 
 	class Instance;
 	class Device;
@@ -40,9 +41,14 @@ namespace fan
 		Material *	material = nullptr;
 	};
 	struct PointLightData {
-		const PointLight *	pointLight = nullptr;
+		const PointLight *	light = nullptr;
 		const Transform *	transform = nullptr;
-		int							indexUniform = -1;
+		int					indexUniform = -1;
+	};
+	struct DirectionalLightData {
+		const DirectionalLight * light = nullptr;
+		const Transform *		 transform = nullptr;
+		int						 indexUniform = -1;
 	};
 
 	//================================================================================================================================
@@ -78,12 +84,14 @@ namespace fan
 
 		const std::vector < DrawData > & GetDrawData() const { return m_drawData; }
 
-		void RegisterMaterial(Material *		_material);
-		void UnRegisterMaterial(Material *		_material);
-		void RegisterModel(Model *		_model);
-		void UnRegisterModel(Model *		_model);
-		void RegisterPointLight(PointLight *	_pointLight);
-		void UnRegisterPointLight(PointLight *	_pointLight);
+		void RegisterMaterial			( Material *		 _material );
+		void UnRegisterMaterial			( Material *		 _material );
+		void RegisterModel				( Model *			 _model );
+		void UnRegisterModel			( Model *			 _model );
+		void RegisterPointLight			( PointLight *		 _pointLight );
+		void UnRegisterPointLight		( PointLight *		 _pointLight );
+		void RegisterDirectionalLight	( DirectionalLight * _pointLight );
+		void UnRegisterDirectionalLight	( DirectionalLight * _pointLight );
 		void Clear();
 
 		void					DebugPoint	  ( const btVector3 _pos, const Color _color);
@@ -96,11 +104,12 @@ namespace fan
 
 	private:
 		//SCENE REFERENCES
-		Camera *		m_mainCamera;
+		Camera *	m_mainCamera;
 		Transform *	m_mainCameraTransform;
 
-		std::vector < PointLightData > m_pointLights;
-		std::vector < DrawData > m_drawData;
+		std::vector < PointLightData >		 m_pointLights;
+		std::vector < DirectionalLightData > m_directionalLights;
+		std::vector < DrawData >			 m_drawData;
 		RessourceManager *  m_ressourceManager;
 		bool m_mustUpdateDynamicUniformsFrag = false;
 

@@ -19,26 +19,74 @@ layout (binding = 3) uniform DynamicUniformBufferFrag {
 } material;
 
 struct PointLight {
-	vec3	position;
+	vec4	position;
+	vec4	diffuse;
+	vec4	specular;
+	vec4	ambiant;
 	float	constant;
-	vec3	diffuse;
 	float	linear;
-	vec3	specular;
 	float	quadratic;
-	vec3	ambiant;
+	float   _0;
 };
 
-layout(binding = 4) uniform LightUniform {
-	PointLight pointLights[16];
-	int lightNum;
+struct DirectionalLight {
+	vec4 direction; 
+	vec4 ambiant;	
+	vec4 diffuse;	
+	vec4 specular;	
+};
+
+#define MAX_NUM_DIRECTIONNAL_LIGHTS 4  
+#define MAX_NUM_POINT_LIGHTS 		16  
+layout(binding = 4) uniform LightUniform {	
+	DirectionalLight dirLights[MAX_NUM_DIRECTIONNAL_LIGHTS];
+	PointLight pointLights[MAX_NUM_POINT_LIGHTS];
+	int dirLightsNum;
+	int pointLightNum;
 } lights;
 
 layout(set = 1, binding = 0) uniform sampler2D diffuseTexture[];
 
-//https://learnopengl.com/Lighting/Multiple-lights
+vec3 CalcPointLight( const PointLight light, const vec3 normal, const vec3 fragPos,  vec3 viewDir);
+vec3 CalcDirLight  ( const DirectionalLight light, const vec3 normal, const vec3 viewDir); 
+
+//reference: https://learnopengl.com/Lighting/Multiple-lights
+void main() {  
+	//Needed data
+	vec3 goodNormal = normalize(inNormal);
+	const vec3 viewDir = normalize(uniforms.cameraPosition - inFragPos);
+
+	vec3 lightColor = vec3(0,0,0);
+	for(int lightIndex = 0; lightIndex < lights.dirLightsNum; lightIndex++) {
+		lightColor += CalcDirLight( lights.dirLights[lightIndex], goodNormal, viewDir );
+	}
+	for(int lightIndex = 0; lightIndex < lights.pointLightNum; lightIndex++) {
+		lightColor += CalcPointLight( lights.pointLights[lightIndex], goodNormal, inFragPos, viewDir );
+	}
+	outColor = vec4(lightColor,1);
+}
+
+
+vec3 CalcDirLight  ( const DirectionalLight light, const vec3 normal, const vec3 viewDir) {
+    vec3 lightDir = normalize(-light.direction.xyz);
+	
+    // diffuse shading
+    float diff = max(dot(normal, lightDir), 0.0);
+	
+    // specular shading
+    vec3 reflectDir = reflect(-lightDir, normal);
+    float spec = pow(max(dot(viewDir, reflectDir), 0.0), material.shininess);
+    // combine results
+	vec3 textureColor = material.color * vec3(texture(diffuseTexture[material.textureIndex], inTexCoord));
+    vec3 ambient  = light.ambiant.xyz  * textureColor;
+    vec3 diffuse  = light.diffuse.xyz  * diff * textureColor;
+    vec3 specular = light.specular.xyz * spec ;//* vec3(texture(material.specular, TexCoords));
+    return (ambient + diffuse + specular);
+}
+
 vec3 CalcPointLight(const PointLight light, const vec3 normal, const vec3 fragPos,  vec3 viewDir)
 {
-    vec3 lightDir = normalize(light.position - fragPos);
+    vec3 lightDir = normalize(light.position.xyz - fragPos);
     
 	// diffuse shading
     float diff = max(dot(normal, lightDir), 0.0);
@@ -48,34 +96,19 @@ vec3 CalcPointLight(const PointLight light, const vec3 normal, const vec3 fragPo
     float spec = pow(max(dot(normal, halfwayDir), 0.0), material.shininess);
     
 	// attenuation
-    float distance    = length(light.position - fragPos);
+    float distance    = length(light.position.xyz - fragPos);
     float attenuation = 1.0 / (light.constant + light.linear * distance + light.quadratic * (distance * distance));    
     
 	// combine results
 	vec3 textureColor = material.color * vec3(texture(diffuseTexture[material.textureIndex], inTexCoord));
-    vec3 ambient  = light.ambiant  * textureColor;
-    vec3 diffuse  = light.diffuse  * vec3(diff) * textureColor;
-    vec3 specular = light.specular * vec3(spec);// * vec3(texture(material.specular, TexCoords));
+    vec3 ambient  = light.ambiant.xyz  * textureColor;
+    vec3 diffuse  = light.diffuse.xyz  * vec3(diff) * textureColor;
+    vec3 specular = light.specular.xyz * vec3(spec);// * vec3(texture(material.specular.xyz, TexCoords));
     ambient  *= attenuation;
     diffuse  *= attenuation;
     specular *= attenuation;
     return (ambient + diffuse + specular);
 } 
-
-void main() {  
-	//Needed data
-	vec3 goodNormal = normalize(inNormal);
-	const vec3 viewDir = normalize(uniforms.cameraPosition - inFragPos);
-
-	vec3 lightColor = vec3(0,0,0);
-	for(int lightIndex = 0; lightIndex < lights.lightNum; lightIndex++) {
-		lightColor += CalcPointLight( lights.pointLights[lightIndex], goodNormal, inFragPos, viewDir );
-	}
-	
-
-	outColor = vec4(lightColor,1);
-
-}
 
 
 

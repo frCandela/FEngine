@@ -34,6 +34,7 @@
 #include "scene/components/fanActor.h"
 #include "scene/components/fanMaterial.h"
 #include "scene/components/fanPointLight.h"
+#include "scene/components/fanDirectionalLight.h"
 
 #include "core/math/shapes/fanConvexHull.h"
 
@@ -80,13 +81,15 @@ namespace fan {
 		m_scene->s_onSceneLoad.Connect(&Engine::OnSceneLoad, this);
 		m_scene->New();
 
-		Scene::s_onSceneClear.Connect				( &Renderer::Clear,					&Renderer::Get());
+		Scene::s_onSceneClear.Connect			( &Renderer::Clear,					&Renderer::Get());
 		Material::onMaterialAttach.Connect		( &Renderer::RegisterMaterial,		&Renderer::Get() );
 		Material::onMaterialDetach.Connect		( &Renderer::UnRegisterMaterial,	&Renderer::Get());		
 		Model::onRegisterModel.Connect			( &Renderer::RegisterModel,			&Renderer::Get());
-		Model::onUnRegisterModel.Connect			( &Renderer::UnRegisterModel,		&Renderer::Get());
+		Model::onUnRegisterModel.Connect		( &Renderer::UnRegisterModel,		&Renderer::Get());
 		PointLight::onPointLightAttach.Connect	( &Renderer::RegisterPointLight,	&Renderer::Get());	
 		PointLight::onPointLightDetach.Connect	( &Renderer::UnRegisterPointLight,	&Renderer::Get());	
+		DirectionalLight::onDirectionalLightAttach.Connect	( &Renderer::RegisterDirectionalLight,   &Renderer::Get() );
+		DirectionalLight::onDirectionalLightDetach.Connect	( &Renderer::UnRegisterDirectionalLight, &Renderer::Get() );
 
 		m_mainMenuBar->Initialize();
 
@@ -115,7 +118,6 @@ namespace fan {
 		SerializedValues::Get().SetValue("renderer_position_x", windowPosition.x);
 		SerializedValues::Get().SetValue("renderer_position_y", windowPosition.y);
 		SerializedValues::Get().SaveValuesToDisk();
-
 
 		Renderer::Get().Destroy();
 	}
@@ -299,8 +301,6 @@ namespace fan {
 				}
 			}
 		}
-
-
 	}
 
 	//================================================================================================================================

@@ -34,6 +34,7 @@ namespace fan
 	//================================================================================================================================
 	//================================================================================================================================
 	bool Buffer::Create(VkDeviceSize _size, VkBufferUsageFlags _usage, VkMemoryPropertyFlags _memoryProperties) {
+		m_size = _size;
 
 		VkBufferCreateInfo bufferCreateInfo = {};
 		bufferCreateInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;

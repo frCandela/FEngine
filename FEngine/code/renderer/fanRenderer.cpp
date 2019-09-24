@@ -7,6 +7,7 @@
 #include "scene/components/fanTransform.h"
 #include "scene/components/fanMaterial.h"
 #include "scene/components/fanPointLight.h"
+#include "scene/components/fanDirectionalLight.h"
 #include "core/fanTime.h"
 #include "core/input/fanInput.h"
 #include "core/math/fanBasicModels.h"
@@ -216,7 +217,13 @@ namespace fan
 						if (ImGui::CollapsingHeader("Point lights : ")) {
 							for (int lightIndex = 0; lightIndex < m_pointLights.size(); lightIndex++) {
 								const PointLightData & lightData = m_pointLights[lightIndex];		
-								ImGui::Text(lightData.pointLight->GetEntity()->GetName().c_str());	
+								ImGui::Text(lightData.light->GetEntity()->GetName().c_str());	
+							}
+						}
+						if ( ImGui::CollapsingHeader( "Directional lights : " ) ) {
+							for ( int lightIndex = 0; lightIndex < m_directionalLights.size(); lightIndex++ ) {
+								const DirectionalLightData & lightData = m_directionalLights[lightIndex];
+								ImGui::Text( lightData.light->GetEntity()->GetName().c_str() );
 							}
 						}
 					}
@@ -331,17 +338,28 @@ namespace fan
 		{
 			// Lights
 			ForwardPipeline::LightsUniforms uniforms = m_forwardPipeline->GetLightUniforms();
+			
+			// Point lights
 			for (int lightIndex = 0; lightIndex < m_pointLights.size() ; lightIndex++){
 				const PointLightData & data = m_pointLights[lightIndex];
-				uniforms.lights[data.indexUniform].diffuse = data.pointLight->GetDiffuse().ToGLM();
-				uniforms.lights[data.indexUniform].specular = data.pointLight->GetSpecular().ToGLM();
-				uniforms.lights[data.indexUniform].ambiant = data.pointLight->GetAmbiant().ToGLM();
-				uniforms.lights[data.indexUniform].position = ToGLM(data.transform->GetPosition());	
-				uniforms.lights[data.indexUniform].constant = data.pointLight->GetAttenuation(PointLight::CONSTANT); 
-				uniforms.lights[data.indexUniform].linear = data.pointLight->GetAttenuation(PointLight::LINEAR);
-				uniforms.lights[data.indexUniform].quadratic = data.pointLight->GetAttenuation(PointLight::QUADRATIC);
-			}
-			uniforms.lightNum = static_cast<uint32_t>( m_pointLights.size() );
+				uniforms.pointlights[data.indexUniform].diffuse =	data.light->GetDiffuse().ToGLM();
+				uniforms.pointlights[data.indexUniform].specular =	data.light->GetSpecular().ToGLM();
+				uniforms.pointlights[data.indexUniform].ambiant =	data.light->GetAmbiant().ToGLM();
+				uniforms.pointlights[data.indexUniform].position =	glm::vec4(ToGLM(data.transform->GetPosition()),1);	
+				uniforms.pointlights[data.indexUniform].constant =	data.light->GetAttenuation(PointLight::CONSTANT); 
+				uniforms.pointlights[data.indexUniform].linear =	data.light->GetAttenuation(PointLight::LINEAR);
+				uniforms.pointlights[data.indexUniform].quadratic =	data.light->GetAttenuation(PointLight::QUADRATIC);
+			}	uniforms.pointLightNum = static_cast<uint32_t>( m_pointLights.size() );
+			
+			// Directional lights
+			for ( int lightIndex = 0; lightIndex < m_directionalLights.size(); lightIndex++ ) {
+				const DirectionalLightData & data = m_directionalLights[lightIndex];
+				uniforms.dirLights[data.indexUniform].direction =	glm::vec4( ToGLM( data.transform->Forward() ), 1 );
+				uniforms.dirLights[data.indexUniform].diffuse =		data.light->GetDiffuse().ToGLM();
+				uniforms.dirLights[data.indexUniform].specular =	data.light->GetSpecular().ToGLM();
+				uniforms.dirLights[data.indexUniform].ambiant =		data.light->GetAmbiant().ToGLM();
+			}	uniforms.dirLightsNum = static_cast<uint32_t>( m_directionalLights.size() );
+			
 			m_forwardPipeline->SetLightUniforms(uniforms);			
 
 			// Main camera transform
@@ -959,8 +977,8 @@ namespace fan
 			
 			// Looks for the _pointLight
 			for (int lightIndex = 0; lightIndex < m_pointLights.size() ; lightIndex++){
-				if (m_pointLights[lightIndex].pointLight == _pointLight ) {
-					Debug::Get() << Debug::Severity::warning << "Renderer::RegisterPointLight: Light already registered in entity : " << _pointLight->GetEntity()->GetName() << Debug::Endl();
+				if (m_pointLights[lightIndex].light == _pointLight ) {
+					Debug::Get() << Debug::Severity::warning << "PointLight already registered in entity : " << _pointLight->GetEntity()->GetName() << Debug::Endl();
 					return;
 				}
 			}
@@ -968,13 +986,13 @@ namespace fan
 			// Adds light data
 			PointLightData pointLightData;
 			pointLightData.indexUniform = static_cast<int>(m_pointLights.size());
-			pointLightData.pointLight = _pointLight;
+			pointLightData.light = _pointLight;
 			pointLightData.transform = _pointLight->GetEntity()->GetComponent<Transform>();
 			m_pointLights.push_back(pointLightData);
 
 			// Check num lights
-			if( pointLightData.indexUniform >= ForwardPipeline::s_maximumNumLights ) {
-				Debug::Get() << Debug::Severity::warning << "Too much lights in the scene, maximum is " << ForwardPipeline::s_maximumNumLights << Debug::Endl();
+			if( pointLightData.indexUniform >= ForwardPipeline::s_maximumNumPointLights ) {
+				Debug::Get() << Debug::Severity::warning << "Too much lights in the scene, maximum is " << ForwardPipeline::s_maximumNumPointLights << Debug::Endl();
 			}
 		}
 
@@ -986,14 +1004,14 @@ namespace fan
 
 			// Removes the light
 			for (int lightIndex = 0; lightIndex < m_pointLights.size() ; lightIndex++){
-				if (m_pointLights[lightIndex].pointLight == _pointLight ) {
+				if (m_pointLights[lightIndex].light == _pointLight ) {
 					m_pointLights.erase( m_pointLights.begin() + lightIndex );
 				}
 			}
 
 			// Light not removed
 			if( m_pointLights.size() == num ) {
-				Debug::Get() << Debug::Severity::warning << "Trying to remove a non registered light entity=" << _pointLight->GetEntity()->GetName() << Debug::Endl();
+				Debug::Get() << Debug::Severity::warning << "Trying to remove a non registered point light! entity=" << _pointLight->GetEntity()->GetName() << Debug::Endl();
 				return;
 			}
 
@@ -1001,6 +1019,56 @@ namespace fan
 			for (int lightIndex = 0; lightIndex < m_pointLights.size() ; lightIndex++){
 				m_pointLights[lightIndex].indexUniform = lightIndex;
 			}			
+		}
+
+		//================================================================================================================================
+		//================================================================================================================================
+		void Renderer::RegisterDirectionalLight( DirectionalLight * _directionalLight ) {
+
+			// Looks for the _direcitonalLight
+			for ( int lightIndex = 0; lightIndex < m_directionalLights.size(); lightIndex++ ) {
+				if ( m_directionalLights[lightIndex].light == _directionalLight ) {
+					Debug::Get() << Debug::Severity::warning << "Directional Light already registered in entity : " << _directionalLight->GetEntity()->GetName() << Debug::Endl();
+					return;
+				}
+			}
+
+			// Adds light data
+			DirectionalLightData directionalLightData;
+			directionalLightData.indexUniform = static_cast<int>( m_directionalLights.size() );
+			directionalLightData.light = _directionalLight;
+			directionalLightData.transform = _directionalLight->GetEntity()->GetComponent<Transform>();
+			m_directionalLights.push_back( directionalLightData );
+
+			// Check num lights
+			if ( directionalLightData.indexUniform >= ForwardPipeline::s_maximumNumDirectionalLights ) {
+				Debug::Get() << Debug::Severity::warning << "Too much lights in the scene, maximum is " << ForwardPipeline::s_maximumNumDirectionalLights << Debug::Endl();
+			}
+		}
+
+		//================================================================================================================================
+		//================================================================================================================================
+		void Renderer::UnRegisterDirectionalLight	( DirectionalLight *	_directionalLight ) {
+
+			const size_t num = m_directionalLights.size();
+
+			// Removes the light
+			for ( int lightIndex = 0; lightIndex < m_directionalLights.size(); lightIndex++ ) {
+				if ( m_directionalLights[lightIndex].light == _directionalLight ) {
+					m_directionalLights.erase( m_directionalLights.begin() + lightIndex );
+				}
+			}
+
+			// Light not removed
+			if ( m_directionalLights.size() == num ) {
+				Debug::Get() << Debug::Severity::warning << "Trying to remove a non registered directional light! entity=" << _directionalLight->GetEntity()->GetName() << Debug::Endl();
+				return;
+			}
+
+			// Re-indexing
+			for ( int lightIndex = 0; lightIndex < m_directionalLights.size(); lightIndex++ ) {
+				m_directionalLights[lightIndex].indexUniform = lightIndex;
+			}
 		}
 
 		//================================================================================================================================

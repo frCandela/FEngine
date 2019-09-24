@@ -1,0 +1,51 @@
+Entities: 1 { 
+    Entity: root {
+        computeAABB: true
+        Components: 1 {
+            Transform: 1269105190 {
+                position: 0 0 0
+                rotation: 0 0 0 1
+                scale:    1 1 1
+            }
+        }
+        Childs: 2 {
+            Entity: couille {
+                computeAABB: true
+                Components: 2 {
+                    Transform: 1269105190 {
+                        position: -0.165123 3.87945 -5.84627
+                        rotation: 0.443853 0 0 0.896099
+                        scale:    -3.5 1 1
+                    }
+                    DirectionalLight: 944608624 {
+                        ambiant: 1 0 0
+                        diffuse: 1 0 0
+                        specular: 1 0 0
+                    }
+                }
+                Childs: 0 {
+                }
+            }
+            Entity: couilledd {
+                computeAABB: true
+                Components: 3 {
+                    Transform: 1269105190 {
+                        position: 0 0 0
+                        rotation: 0 0 0 1
+                        scale:    1 1 1
+                    }
+                    Model: 1739103771 {
+                        path: content\models\sun.fbx
+                    }
+                    Material: 1828911513 {
+                        material: content\models\white.png
+                        shininess: 255
+                        color: 1 1 1
+                    }
+                }
+                Childs: 0 {
+                }
+            }
+        }
+    }
+}
