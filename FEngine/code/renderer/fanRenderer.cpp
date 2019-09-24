@@ -2,7 +2,6 @@
 
 #include "renderer/fanRenderer.h"
 #include "scene/fanEntity.h"
-#include "scene/components/fanCamera.h"
 #include "scene/components/fanModel.h"
 #include "scene/components/fanTransform.h"
 #include "scene/components/fanMaterial.h"
@@ -29,7 +28,6 @@
 #include "renderer/util/fanVertex.h"
 #include "renderer/util/fanWindow.h"
 
-
 namespace fan
 {
 		//================================================================================================================================
@@ -39,7 +37,6 @@ namespace fan
 			m_window =		new Window("Vulkan", _size, _position, m_instance->vkInstance);
 			m_device =		new Device(m_instance, m_window->GetSurface());
 			m_swapchain =	new SwapChain(*m_device);
-			m_mainCamera = nullptr;
 		
 			m_clearColor = glm::vec4(0.f, 0.f, 0.2f, 1.f);
 
@@ -66,8 +63,6 @@ namespace fan
 
 			m_postprocessPipeline = new PostprocessPipeline(*m_device, m_renderPassPostprocess);
 			m_postprocessPipeline->Create(m_swapchain->GetSurfaceFormat().format, m_swapchain->GetExtent());		
-
-
 		
 			m_imguiPipeline = new ImguiPipeline(*m_device, m_swapchain->GetSwapchainImagesCount());
 			m_imguiPipeline->Create(m_renderPassPostprocess, m_window->GetWindow(), m_swapchain->GetExtent());
@@ -131,14 +126,6 @@ namespace fan
 
 		//================================================================================================================================
 		//================================================================================================================================	
-		void Renderer::SetMainCamera(Camera * _camera) {
-			m_mainCamera = _camera;
-			m_mainCameraTransform = m_mainCamera->GetEntity()->GetComponent < Transform>();
-			m_mainCamera->SetAspectRatio(static_cast<float>(m_swapchain->GetExtent().width) / m_swapchain->GetExtent().height);
-		}
-
-		//================================================================================================================================
-		//================================================================================================================================	
 		void Renderer::DrawFrame( ) {
 				const VkResult result = m_swapchain->AcquireNextImage();
 				if (result == VK_ERROR_OUT_OF_DATE_KHR ) {
@@ -167,8 +154,6 @@ namespace fan
 					RecordAllCommandBuffers();
 					vkResetFences(m_device->vkDevice, 1, m_swapchain->GetCurrentInFlightFence());
 					m_swapchain->AcquireNextImage();	
-					m_mainCamera->SetAspectRatio(static_cast<float>(m_swapchain->GetExtent().width) / m_swapchain->GetExtent().height);
-
 					UpdateSceneUniforms();
 				}
 				else if (result != VK_SUCCESS) {
@@ -331,6 +316,19 @@ namespace fan
 				}
 			}
 		}
+		//================================================================================================================================
+		//================================================================================================================================
+		float  Renderer::GetWindowAspectRatio() const { 
+			return static_cast<float>( m_swapchain->GetExtent().width ) / m_swapchain->GetExtent().height ;
+		}
+
+		//================================================================================================================================
+		//================================================================================================================================
+		void Renderer::SetMainCamera( const glm::mat4 _projection, const glm::mat4 _view, const glm::vec3 _position ) {
+			m_camera.projection = _projection;
+			m_camera.view		= _view;
+			m_camera.position	= _position;
+		}
 
 		//================================================================================================================================
 		//================================================================================================================================
@@ -363,17 +361,16 @@ namespace fan
 			m_forwardPipeline->SetLightUniforms(uniforms);			
 
 			// Main camera transform
-			assert(m_mainCamera != nullptr);
-			if ( m_mainCamera->IsModified() || m_mainCameraTransform->IsModified()) {
+			{
 			
-				ForwardPipeline::VertUniforms ubo = m_forwardPipeline->GetVertUniforms();				
-				ubo.view = m_mainCamera->GetView();
-				ubo.proj = m_mainCamera->GetProjection();
+				ForwardPipeline::VertUniforms ubo = m_forwardPipeline->GetVertUniforms();
+				ubo.view = m_camera.view;
+				ubo.proj = m_camera.projection;
 				ubo.proj[1][1] *= -1;
 				m_forwardPipeline->SetVertUniforms(ubo);
 
 				ForwardPipeline::FragUniforms fragUniforms = m_forwardPipeline->GetFragUniforms();
-				fragUniforms.cameraPosition = ToGLM(m_mainCameraTransform->GetPosition());
+				fragUniforms.cameraPosition = m_camera.position;
 				m_forwardPipeline->SetFragUniforms(fragUniforms);
 
 				DebugPipeline::Uniforms debugUniforms;

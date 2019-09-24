@@ -43,9 +43,11 @@ namespace fan {
 	//================================================================================================================================
 	//================================================================================================================================
 	Engine::Engine() :
-		// Get serialized editor values
-		m_applicationShouldExit(false){
+		m_applicationShouldExit(false),
+		m_mainCamera(nullptr)
+	{
 
+		// Get serialized editor values
 		VkExtent2D windowSize = { 1280,720 };
 		SerializedValues::Get().GetValue("renderer_extent_width", windowSize.width);
 		SerializedValues::Get().GetValue("renderer_extent_height", windowSize.height);
@@ -157,6 +159,7 @@ namespace fan {
 				if (m_mainMenuBar->ShowAABB())		{ DrawAABB();		}
 				if (m_mainMenuBar->ShowHull())		{ DrawHull();		}
 
+				UpdateRenderer();
 				Renderer::Get().DrawFrame();
 				m_scene->EndFrame();
 			}
@@ -180,7 +183,7 @@ namespace fan {
 		camTrans->SetPosition(btVector3(0, 0, -2));
 		m_editorCamera = cameraEntity->AddComponent<Camera>();
 		m_editorCamera->SetRemovable(false);
-		Renderer::Get().SetMainCamera(m_editorCamera);
+		SetMainCamera(m_editorCamera);
 		FPSCamera * editorCamera = cameraEntity->AddComponent<FPSCamera>();
 		editorCamera->SetRemovable(false);
 	}
@@ -299,6 +302,26 @@ namespace fan {
 					}
 				}
 			}
+		}
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
+	void Engine::SetMainCamera( Camera * _mainCamera ) { 
+		m_mainCamera = _mainCamera; 
+		m_mainCamera->MarkModified();
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
+	void Engine::UpdateRenderer() {
+		Renderer& renderer = Renderer::Get();
+
+		// Update renderer camera
+		Transform * cameraTransform = m_mainCamera->GetEntity()->GetComponent<Transform>();
+		if ( m_mainCamera->IsModified() || cameraTransform->IsModified() ) {
+			m_mainCamera->SetAspectRatio( renderer.GetWindowAspectRatio() ); 
+			renderer.SetMainCamera( m_mainCamera->GetProjection(), m_mainCamera->GetView(), ToGLM(cameraTransform->GetPosition()));
 		}
 	}
 

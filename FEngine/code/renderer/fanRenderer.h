@@ -4,18 +4,16 @@
 #include "core/math/shapes/fanAABB.h"
 #include "core/fanSingleton.h"
 
-
 namespace fan
 {
-	class Mesh;
-	class Window;
-	class Camera;
 	class Model;
 	class Transform;
 	class Material;
 	class PointLight;
 	class DirectionalLight;
 
+	class Window;
+	class Mesh;
 	class Instance;
 	class Device;
 	class SwapChain;
@@ -33,6 +31,8 @@ namespace fan
 	class RessourceManager;
 
 	struct MeshData;
+
+
 
 	struct DrawData {
 		MeshData *			meshData = nullptr;
@@ -55,6 +55,13 @@ namespace fan
 	// TODO Renderer should not be a singleton
 	//================================================================================================================================
 	class Renderer : public Singleton<Renderer> {
+	private:
+		struct Camera {
+			glm::vec3 position;
+			glm::mat4 projection;
+			glm::mat4 view;
+		};
+
 	public:
 		void Initialize(const VkExtent2D _size, const glm::ivec2 _position);
 		void Destroy();
@@ -76,11 +83,10 @@ namespace fan
 		glm::vec4				GetClearColor() const { return m_clearColor; }
 		RessourceManager *		GetRessourceManager() const { return m_ressourceManager; }
 
-		void SetClearColor(glm::vec4 _color) { m_clearColor = _color; }
-		void SetMainCamera(Camera * _camera);
-		Camera * GetMainCamera() const { return m_mainCamera; }
-
-		bool HasNoDebugToDraw() const { return m_debugLinesNoDepthTest.empty() && m_debugLines.empty() && m_debugTriangles.empty(); }
+		void  SetClearColor(glm::vec4 _color) { m_clearColor = _color; }
+		void  SetMainCamera( const glm::mat4 _projection, const glm::mat4 _view, const glm::vec3 _position );
+		float GetWindowAspectRatio() const;
+		bool  HasNoDebugToDraw() const { return m_debugLinesNoDepthTest.empty() && m_debugLines.empty() && m_debugTriangles.empty(); }
 
 		const std::vector < DrawData > & GetDrawData() const { return m_drawData; }
 
@@ -103,9 +109,7 @@ namespace fan
 		void					DebugAABB	  ( const AABB & _aabb, const Color _color);
 
 	private:
-		//SCENE REFERENCES
-		Camera *	m_mainCamera;
-		Transform *	m_mainCameraTransform;
+		Camera m_camera;
 
 		std::vector < PointLightData >		 m_pointLights;
 		std::vector < DirectionalLightData > m_directionalLights;

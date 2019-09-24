@@ -36,11 +36,13 @@ namespace fan {
 
 		inline static Engine & GetEngine() { return * ms_engine; }
 
+		void SetMainCamera( Camera * _mainCamera );
 		void SetSelectedEntity( Entity * _selectedentity) { m_selectedentity = _selectedentity;	}
 		void Deselect() { m_selectedentity = nullptr; }
 
 		Entity *	const		GetSelectedentity() const		{ return m_selectedentity;  }
 		Camera *				GetEditorCamera() const			{ return m_editorCamera; }
+		Camera *				GetMainCamera() const			{ return m_mainCamera; }
 		MainMenuBar  &			GetMainMenuBar() const			{ return * m_mainMenuBar; }
 		RenderWindow &			GetRenderWindow() const			{ return * m_renderWindow; }
 		SceneWindow  &			GetSceneWindow() const			{ return * m_sceneWindow; }
@@ -68,9 +70,10 @@ namespace fan {
 		EditorGrid m_editorGrid;
 
 		// Main components
-		Scene *	m_scene;
+		Scene *	 m_scene;
 		Entity * m_selectedentity;
-		Camera *	m_editorCamera;
+		Camera * m_editorCamera;
+		Camera * m_mainCamera;
 
 		struct GizmoCacheData {
 			int axisIndex;
@@ -83,6 +86,7 @@ namespace fan {
 		bool m_applicationShouldExit;
 
 		void ManageSelection();
+		void UpdateRenderer();
 		void OnSceneLoad(Scene * _scene);
 		void DrawUI();
 		void DrawEditorGrid() const;

@@ -49,15 +49,15 @@ namespace fan {
 	void GameManager::SwitchCameras() {
 		Debug::Log("switching camera");
 		Camera * editorCamera = Engine::GetEngine().GetEditorCamera();
-		Camera * currentCamera = Renderer::Get().GetMainCamera();
+		Camera * currentCamera = Engine::GetEngine().GetMainCamera();
 
 		if (currentCamera == editorCamera) {
-			Renderer::Get().SetMainCamera(m_camera);
+			Engine::GetEngine().SetMainCamera(m_camera);
 			m_spaceShip->SetEnabled(true);
 			m_editorCameraController->SetEnabled(false);
 		}
 		else {
-			Renderer::Get().SetMainCamera(editorCamera);
+			Engine::GetEngine().SetMainCamera(editorCamera);
 			m_spaceShip->SetEnabled(false);
 			m_editorCameraController->SetEnabled(true);
 		}
