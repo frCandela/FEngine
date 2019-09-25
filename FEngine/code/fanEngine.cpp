@@ -317,33 +317,33 @@ namespace fan {
 	void Engine::UpdateRenderer() {
 		Renderer& renderer = Renderer::Get();
 
-		// Update renderer camera
+		// Camera
 		Transform * cameraTransform = m_mainCamera->GetEntity()->GetComponent<Transform>();
 		if ( m_mainCamera->IsModified() || cameraTransform->IsModified() ) {
 			m_mainCamera->SetAspectRatio( renderer.GetWindowAspectRatio() ); 
 			renderer.SetMainCamera( m_mainCamera->GetProjection(), m_mainCamera->GetView(), ToGLM(cameraTransform->GetPosition()));
 		}
 
-		// Lights
-		/*LightsUniforms uniforms = m_forwardPipeline->GetLightUniforms();
-
 		// Point lights
+		Renderer::Get().SetNumPointLights( static_cast<uint32_t>( m_pointLights.size() ) );
 		for ( int lightIndex = 0; lightIndex < m_pointLights.size(); lightIndex++ ) {
-			const PointLightData & data = m_pointLights[lightIndex];
-			uniforms.pointlights[data.indexUniform].diffuse = data.light->GetDiffuse().ToGLM();
-			uniforms.pointlights[data.indexUniform].specular = data.light->GetSpecular().ToGLM();
-			uniforms.pointlights[data.indexUniform].ambiant = data.light->GetAmbiant().ToGLM();
-			uniforms.pointlights[data.indexUniform].position = glm::vec4( ToGLM( data.transform->GetPosition() ), 1 );
-			uniforms.pointlights[data.indexUniform].constant = data.light->GetAttenuation( PointLight::CONSTANT );
-			uniforms.pointlights[data.indexUniform].linear = data.light->GetAttenuation( PointLight::LINEAR );
-			uniforms.pointlights[data.indexUniform].quadratic = data.light->GetAttenuation( PointLight::QUADRATIC );
-		}	uniforms.pointLightNum = static_cast<uint32_t>( m_pointLights.size() );
-		*/
+			const PointLight * light = m_pointLights[lightIndex];
+			const Transform *  lightTransform = light->GetEntity()->GetComponent<Transform>();
+			Renderer::Get().SetPointLight(
+				lightIndex,
+				ToGLM( lightTransform->GetPosition() ),
+				light->GetDiffuse().ToGLM(),
+				light->GetSpecular().ToGLM(),
+				light->GetAmbiant().ToGLM(),
+				light->GetAttenuation()
+			);
+		}	
+		
 		// Directional lights
 		Renderer::Get().SetNumDirectionalLights( static_cast<uint32_t>( m_directionalLights.size() ));
 		for ( int lightIndex = 0; lightIndex < m_directionalLights.size(); lightIndex++ ) {
-			DirectionalLight * light = m_directionalLights[lightIndex];
-			Transform * lightTransform = light->GetEntity()->GetComponent<Transform>();
+			const DirectionalLight * light			= m_directionalLights[lightIndex];
+			const Transform *		 lightTransform = light->GetEntity()->GetComponent<Transform>();
 			Renderer::Get().SetDirectionalLight( 
 				lightIndex
 				,glm::vec4( ToGLM( lightTransform->Forward() ), 1 )

@@ -5,7 +5,6 @@
 #include "scene/components/fanModel.h"
 #include "scene/components/fanTransform.h"
 #include "scene/components/fanMaterial.h"
-#include "scene/components/fanPointLight.h"
 #include "core/fanTime.h"
 #include "core/input/fanInput.h"
 #include "core/math/fanBasicModels.h"
@@ -333,6 +332,26 @@ namespace fan
 		void  Renderer::SetNumDirectionalLights( const uint32_t _num ) {
 			assert( _num < s_maximumNumDirectionalLights );
 			m_lightsUniform.dirLightsNum = _num;
+		}
+
+		//================================================================================================================================
+		//================================================================================================================================
+		void Renderer::SetPointLight( const int _index, const glm::vec3 _position, const glm::vec3 _diffuse, const glm::vec3 _specular, const glm::vec3 _ambiant, const glm::vec3 _constantLinearQuadratic ) {
+			assert( _index < s_maximumNumPointLights );
+			m_lightsUniform.pointlights[_index].position	= glm::vec4(_position,1);
+			m_lightsUniform.pointlights[_index].diffuse		= glm::vec4( _diffuse, 1 );
+			m_lightsUniform.pointlights[_index].specular	= glm::vec4( _specular, 1 );
+			m_lightsUniform.pointlights[_index].ambiant		= glm::vec4( _ambiant, 1 );
+			m_lightsUniform.pointlights[_index].constant	= _constantLinearQuadratic[0];
+			m_lightsUniform.pointlights[_index].linear		= _constantLinearQuadratic[1];
+			m_lightsUniform.pointlights[_index].quadratic	= _constantLinearQuadratic[2];
+		}
+
+		//================================================================================================================================
+		//================================================================================================================================
+		void  Renderer::SetNumPointLights( const uint32_t _num ) {
+			assert( _num < s_maximumNumPointLights );
+			m_lightsUniform.pointLightNum = _num;
 		}
 
 		//================================================================================================================================

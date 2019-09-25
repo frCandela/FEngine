@@ -33,8 +33,8 @@ Entities: 1 {
                 computeAABB: true
                 Components: 2 {
                     Transform: 1269105190 {
-                        position: 0 2.57486 5.98293
-                        rotation: 0.000506052 -0.956303 -0.292371 -0.00165211
+                        position: 0 -1.06322 -1.9816
+                        rotation: -0.1982 0.650566 0.213658 0.701307
                         scale:    1 1 1
                     }
                     DirectionalLight: 944608624 {

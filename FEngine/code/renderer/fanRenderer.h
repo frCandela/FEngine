@@ -10,7 +10,6 @@ namespace fan
 	class Model;
 	class Transform;
 	class Material;
-	class PointLight;
 
 	class Window;
 	class Mesh;
@@ -75,6 +74,8 @@ namespace fan
 		void  SetMainCamera( const glm::mat4 _projection, const glm::mat4 _view, const glm::vec3 _position );
 		void  SetDirectionalLight( const int _index, const glm::vec4 _direction, const glm::vec4 _ambiant, const glm::vec4 _diffuse, const glm::vec4 _specular );
 		void  SetNumDirectionalLights( const uint32_t _num );
+		void  SetPointLight( const int _index, const glm::vec3 _position, const glm::vec3 _diffuse, const glm::vec3 _specular, const glm::vec3 _ambiant, const glm::vec3 _constantLinearQuadratic );
+		void  SetNumPointLights( const uint32_t _num );
 
 		float GetWindowAspectRatio() const;
 		bool  HasNoDebugToDraw() const { return m_debugLinesNoDepthTest.empty() && m_debugLines.empty() && m_debugTriangles.empty(); }
@@ -85,10 +86,6 @@ namespace fan
 		void UnRegisterMaterial			( Material *		 _material );
 		void RegisterModel				( Model *			 _model );
 		void UnRegisterModel			( Model *			 _model );
-
-
-		//LightsUniforms	GetLightUniforms() const { return m_pointLightUniform; }
-		//void			SetLightUniforms( const LightsUniforms& _lights );
 
 		void Clear();
 

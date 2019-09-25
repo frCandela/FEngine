@@ -26,8 +26,9 @@ namespace fan
 		Color GetSpecular() const { return m_specular; }
 		void  SetSpecular(const Color m_specular);
 
-		float GetAttenuation( const Attenuation _attenuation ) const { return m_attenuation[_attenuation]; }
-		void  SetAttenuation( const Attenuation _attenuation, const float _value );
+		glm::vec3	GetAttenuation() const { return glm::vec3( m_attenuation[0] , m_attenuation[1] , m_attenuation[2] ); }
+		float		GetAttenuation( const Attenuation _attenuation ) const { return m_attenuation[_attenuation]; }
+		void		SetAttenuation( const Attenuation _attenuation, const float _value );
 
 		DECLARE_EDITOR_COMPONENT(PointLight)
 		DECLARE_TYPE_INFO(PointLight);
