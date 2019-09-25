@@ -87,10 +87,10 @@ namespace fan {
 		Material::onMaterialDetach.Connect		( &Renderer::UnRegisterMaterial,	&Renderer::Get());		
 		Model::onRegisterModel.Connect			( &Renderer::RegisterModel,			&Renderer::Get());
 		Model::onUnRegisterModel.Connect		( &Renderer::UnRegisterModel,		&Renderer::Get());
-		PointLight::onPointLightAttach.Connect	( &Renderer::RegisterPointLight,	&Renderer::Get());	
-		PointLight::onPointLightDetach.Connect	( &Renderer::UnRegisterPointLight,	&Renderer::Get());	
-		DirectionalLight::onDirectionalLightAttach.Connect	( &Renderer::RegisterDirectionalLight,   &Renderer::Get() );
-		DirectionalLight::onDirectionalLightDetach.Connect	( &Renderer::UnRegisterDirectionalLight, &Renderer::Get() );
+		PointLight::onPointLightAttach.Connect	( &Engine::RegisterPointLight,	 this );
+		PointLight::onPointLightDetach.Connect	( &Engine::UnRegisterPointLight, this );
+		DirectionalLight::onDirectionalLightAttach.Connect	( &Engine::RegisterDirectionalLight,   this );
+		DirectionalLight::onDirectionalLightDetach.Connect	( &Engine::UnRegisterDirectionalLight, this );
 
 		m_mainMenuBar->Initialize();
 
@@ -323,6 +323,36 @@ namespace fan {
 			m_mainCamera->SetAspectRatio( renderer.GetWindowAspectRatio() ); 
 			renderer.SetMainCamera( m_mainCamera->GetProjection(), m_mainCamera->GetView(), ToGLM(cameraTransform->GetPosition()));
 		}
+
+		// Lights
+		/*LightsUniforms uniforms = m_forwardPipeline->GetLightUniforms();
+
+		// Point lights
+		for ( int lightIndex = 0; lightIndex < m_pointLights.size(); lightIndex++ ) {
+			const PointLightData & data = m_pointLights[lightIndex];
+			uniforms.pointlights[data.indexUniform].diffuse = data.light->GetDiffuse().ToGLM();
+			uniforms.pointlights[data.indexUniform].specular = data.light->GetSpecular().ToGLM();
+			uniforms.pointlights[data.indexUniform].ambiant = data.light->GetAmbiant().ToGLM();
+			uniforms.pointlights[data.indexUniform].position = glm::vec4( ToGLM( data.transform->GetPosition() ), 1 );
+			uniforms.pointlights[data.indexUniform].constant = data.light->GetAttenuation( PointLight::CONSTANT );
+			uniforms.pointlights[data.indexUniform].linear = data.light->GetAttenuation( PointLight::LINEAR );
+			uniforms.pointlights[data.indexUniform].quadratic = data.light->GetAttenuation( PointLight::QUADRATIC );
+		}	uniforms.pointLightNum = static_cast<uint32_t>( m_pointLights.size() );
+		*/
+		// Directional lights
+		Renderer::Get().SetNumDirectionalLights( static_cast<uint32_t>( m_directionalLights.size() ));
+		for ( int lightIndex = 0; lightIndex < m_directionalLights.size(); lightIndex++ ) {
+			DirectionalLight * light = m_directionalLights[lightIndex];
+			Transform * lightTransform = light->GetEntity()->GetComponent<Transform>();
+			Renderer::Get().SetDirectionalLight( 
+				lightIndex
+				,glm::vec4( ToGLM( lightTransform->Forward() ), 1 )
+				,light->GetAmbiant().ToGLM()
+				,light->GetDiffuse().ToGLM()
+				,light->GetSpecular().ToGLM()
+			);
+		}
+
 	}
 
 	//================================================================================================================================
@@ -382,6 +412,19 @@ namespace fan {
 	//================================================================================================================================
 	//================================================================================================================================
 	void Engine::DrawUI() {
+		ImGui::Begin( "Lights" ); {
+			if ( ImGui::CollapsingHeader( "Directional lights : " ) ) {
+				for ( int lightIndex = 0; lightIndex < m_directionalLights.size(); lightIndex++ ) {
+					ImGui::Text( m_directionalLights[lightIndex]->GetEntity()->GetName().c_str() );
+				}
+			}
+
+			if ( ImGui::CollapsingHeader( "Point lights : " ) ) {
+				for ( int lightIndex = 0; lightIndex < m_pointLights.size(); lightIndex++ ) {
+					ImGui::Text( m_pointLights[lightIndex]->GetEntity()->GetName().c_str() );
+				}
+			}
+		} ImGui::End();
 		//***************************************************************************************MYLITTLESPACE
 // 		ImGui::Begin("test"); {
 // 
@@ -469,4 +512,83 @@ namespace fan {
 		return cacheData.pressed;
 	}
 
+	//================================================================================================================================
+	//================================================================================================================================
+	void Engine::RegisterDirectionalLight( DirectionalLight * _directionalLight ) {
+
+		// Looks for the _directionalLight
+		for ( int lightIndex = 0; lightIndex < m_directionalLights.size(); lightIndex++ ) {
+			if ( m_directionalLights[lightIndex] == _directionalLight ) {
+				Debug::Get() << Debug::Severity::warning << "Directional Light already registered in entity : " << _directionalLight->GetEntity()->GetName() << Debug::Endl();
+				return;
+			}
+		}
+
+		// Check num lights
+		if ( m_directionalLights.size() >= s_maximumNumDirectionalLights ) {
+			Debug::Get() << Debug::Severity::warning << "Too much lights in the scene, maximum is " << s_maximumNumDirectionalLights << Debug::Endl();
+		} else {
+			m_directionalLights.push_back( _directionalLight );
+		}
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
+	void Engine::UnRegisterDirectionalLight	( DirectionalLight *	_directionalLight ) {
+
+		const size_t num = m_directionalLights.size();
+
+		// Removes the light
+		for ( int lightIndex = 0; lightIndex < m_directionalLights.size(); lightIndex++ ) {
+			if ( m_directionalLights[lightIndex] == _directionalLight ) {
+				m_directionalLights.erase( m_directionalLights.begin() + lightIndex );
+			}
+		}
+
+		// Light not removed
+		if ( m_directionalLights.size() == num ) {
+			Debug::Get() << Debug::Severity::warning << "Trying to remove a non registered directional light! entity=" << _directionalLight->GetEntity()->GetName() << Debug::Endl();
+			return;
+		}
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
+	void Engine::RegisterPointLight	( PointLight * _pointLight ) {
+
+		// Looks for the _pointLight
+		for ( int lightIndex = 0; lightIndex < m_pointLights.size(); lightIndex++ ) {
+			if ( m_pointLights[lightIndex] == _pointLight ) {
+				Debug::Get() << Debug::Severity::warning << "PointLight already registered in entity : " << _pointLight->GetEntity()->GetName() << Debug::Endl();
+				return;
+			}
+		}		
+
+		// Check num lights
+		if ( m_pointLights.size() >= s_maximumNumPointLights ) {
+			Debug::Get() << Debug::Severity::warning << "Too much lights in the scene, maximum is " << s_maximumNumPointLights << Debug::Endl();
+		} else {
+			m_pointLights.push_back( _pointLight );
+		}
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
+	void Engine::UnRegisterPointLight	( PointLight *	_pointLight ) {
+
+		const size_t num = m_pointLights.size();
+
+		// Removes the light
+		for ( int lightIndex = 0; lightIndex < m_pointLights.size(); lightIndex++ ) {
+			if ( m_pointLights[lightIndex] == _pointLight ) {
+				m_pointLights.erase( m_pointLights.begin() + lightIndex );
+			}
+		}
+
+		// Light not removed
+		if ( m_pointLights.size() == num ) {
+			Debug::Get() << Debug::Severity::warning << "Trying to remove a non registered point light! entity=" << _pointLight->GetEntity()->GetName() << Debug::Endl();
+			return;
+		}
+	}
 }

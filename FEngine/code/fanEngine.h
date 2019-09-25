@@ -15,6 +15,8 @@ namespace fan {
 	class Entity;
 	class Actor;
 	class Camera;	
+	class DirectionalLight;
+	class PointLight;
 
 	//================================================================================================================================
 	//================================================================================================================================	
@@ -39,6 +41,10 @@ namespace fan {
 		void SetMainCamera( Camera * _mainCamera );
 		void SetSelectedEntity( Entity * _selectedentity) { m_selectedentity = _selectedentity;	}
 		void Deselect() { m_selectedentity = nullptr; }
+		void RegisterDirectionalLight	( DirectionalLight * _pointLight );
+		void UnRegisterDirectionalLight	( DirectionalLight * _pointLight );
+		void RegisterPointLight			( PointLight *		 _pointLight );
+		void UnRegisterPointLight		( PointLight *		 _pointLight );
 
 		Entity *	const		GetSelectedentity() const		{ return m_selectedentity;  }
 		Camera *				GetEditorCamera() const			{ return m_editorCamera; }
@@ -74,6 +80,8 @@ namespace fan {
 		Entity * m_selectedentity;
 		Camera * m_editorCamera;
 		Camera * m_mainCamera;
+		std::vector < DirectionalLight* >	m_directionalLights;
+		std::vector < PointLight* >			m_pointLights;
 
 		struct GizmoCacheData {
 			int axisIndex;

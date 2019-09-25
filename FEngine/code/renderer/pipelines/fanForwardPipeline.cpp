@@ -62,8 +62,6 @@ namespace fan
 		CreateDepthRessources(_extent);
 		CreateDescriptors();
 		CreatePipeline(_extent);
-
-		SetLightUniforms(m_pointLightUniform);
 	}
 
 	//================================================================================================================================
@@ -79,8 +77,6 @@ namespace fan
 
 		SetVertUniforms(m_vertUniforms);
 		SetFragUniforms(m_fragUniforms);
-		SetLightUniforms(m_pointLightUniform);
-		//SetDynamicUniformsVert({ {glm::mat4(1.0)},{glm::mat4(1.0)} });
 	}
 
 	//================================================================================================================================
@@ -92,12 +88,12 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void ForwardPipeline::UpdateUniformBuffers() {
+	void ForwardPipeline::UpdateUniformBuffers( const LightsUniforms _lightUniforms ) {
 		m_dynamicUniformBufferVert->SetData(&m_dynamicUniformsVert[0], m_dynamicUniformsVert.GetSize());
 		m_dynamicUniformBufferFrag->SetData(&m_dynamicUniformsFrag[0], m_dynamicUniformsFrag.GetSize());
 		m_vertUniformBuffer->SetData(&m_vertUniforms, sizeof(VertUniforms));
 		m_fragUniformBuffer->SetData(&m_fragUniforms, sizeof(FragUniforms));
-		m_pointLightUniformBuffer->SetData(&m_pointLightUniform, sizeof(LightsUniforms));
+		m_pointLightUniformBuffer->SetData(&_lightUniforms, sizeof(LightsUniforms));
 	}
 
 	//================================================================================================================================
@@ -116,12 +112,6 @@ namespace fan
 	//================================================================================================================================
 	void ForwardPipeline::SetFragUniforms(const FragUniforms _fragUniforms) {
 		m_fragUniforms = _fragUniforms;
-	}
-
-	//================================================================================================================================
-	//================================================================================================================================
-	void ForwardPipeline::SetLightUniforms(const LightsUniforms & _light) {
-		m_pointLightUniform = _light;
 	}
 
 	//================================================================================================================================

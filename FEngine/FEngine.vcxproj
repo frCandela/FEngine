@@ -137,6 +137,7 @@
     <ClCompile Include="code\renderer\fanMesh.cpp" />
     <ClCompile Include="code\renderer\fanRenderer.cpp" />
     <ClCompile Include="code\renderer\fanRessourceManager.cpp" />
+    <ClCompile Include="code\renderer\fanUniforms.cpp" />
     <ClCompile Include="code\renderer\pipelines\fanDebugPipeline.cpp" />
     <ClCompile Include="code\renderer\pipelines\fanForwardPipeline.cpp" />
     <ClCompile Include="code\renderer\pipelines\fanImguiPipeline.cpp" />
@@ -218,6 +219,7 @@
     <ClInclude Include="code\renderer\fanMesh.h" />
     <ClInclude Include="code\renderer\fanRenderer.h" />
     <ClInclude Include="code\renderer\fanRessourceManager.h" />
+    <ClInclude Include="code\renderer\fanUniforms.h" />
     <ClInclude Include="code\renderer\pipelines\fanDebugPipeline.h" />
     <ClInclude Include="code\renderer\pipelines\fanForwardPipeline.h" />
     <ClInclude Include="code\renderer\pipelines\fanImguiPipeline.h" />

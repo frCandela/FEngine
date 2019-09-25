@@ -1,5 +1,4 @@
 #include "fanGlobalIncludes.h"
-
 #include "fanGlobalValues.h"
 
 namespace fan {

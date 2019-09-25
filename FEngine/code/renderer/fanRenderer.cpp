@@ -6,7 +6,6 @@
 #include "scene/components/fanTransform.h"
 #include "scene/components/fanMaterial.h"
 #include "scene/components/fanPointLight.h"
-#include "scene/components/fanDirectionalLight.h"
 #include "core/fanTime.h"
 #include "core/input/fanInput.h"
 #include "core/math/fanBasicModels.h"
@@ -29,6 +28,7 @@
 #include "renderer/util/fanWindow.h"
 
 namespace fan
+
 {
 		//================================================================================================================================
 		//================================================================================================================================
@@ -198,19 +198,6 @@ namespace fan
 								}
 							}
 						}
-
-						if (ImGui::CollapsingHeader("Point lights : ")) {
-							for (int lightIndex = 0; lightIndex < m_pointLights.size(); lightIndex++) {
-								const PointLightData & lightData = m_pointLights[lightIndex];		
-								ImGui::Text(lightData.light->GetEntity()->GetName().c_str());	
-							}
-						}
-						if ( ImGui::CollapsingHeader( "Directional lights : " ) ) {
-							for ( int lightIndex = 0; lightIndex < m_directionalLights.size(); lightIndex++ ) {
-								const DirectionalLightData & lightData = m_directionalLights[lightIndex];
-								ImGui::Text( lightData.light->GetEntity()->GetName().c_str() );
-							}
-						}
 					}
 				}
 				if (m_ressourceManager->IsModified()) {
@@ -224,7 +211,7 @@ namespace fan
 
 				const uint32_t currentFrame = m_swapchain->GetCurrentFrame();
 				UpdateUniformBuffer();
-				m_forwardPipeline->UpdateUniformBuffers();
+				m_forwardPipeline->UpdateUniformBuffers( m_lightsUniform );
 				if (m_reloadGeometryCommandBuffers[currentFrame] == true) {
 					RecordCommandBufferGeometry(currentFrame);
 				}
@@ -332,37 +319,28 @@ namespace fan
 
 		//================================================================================================================================
 		//================================================================================================================================
+		void Renderer::SetDirectionalLight( const int _index, const glm::vec4 _direction, const glm::vec4 _ambiant, const glm::vec4 _diffuse, const glm::vec4 _specular ) {
+			assert( _index  < s_maximumNumDirectionalLights );
+			m_lightsUniform.dirLights[_index].direction = _direction;
+			m_lightsUniform.dirLights[_index].ambiant = _ambiant;
+			m_lightsUniform.dirLights[_index].diffuse = _diffuse;
+			m_lightsUniform.dirLights[_index].specular = _specular;
+			
+		}
+
+		//================================================================================================================================
+		//================================================================================================================================
+		void  Renderer::SetNumDirectionalLights( const uint32_t _num ) {
+			assert( _num < s_maximumNumDirectionalLights );
+			m_lightsUniform.dirLightsNum = _num;
+		}
+
+		//================================================================================================================================
+		//================================================================================================================================
 		void Renderer::UpdateUniformBuffer()
 		{
-			// Lights
-			ForwardPipeline::LightsUniforms uniforms = m_forwardPipeline->GetLightUniforms();
-			
-			// Point lights
-			for (int lightIndex = 0; lightIndex < m_pointLights.size() ; lightIndex++){
-				const PointLightData & data = m_pointLights[lightIndex];
-				uniforms.pointlights[data.indexUniform].diffuse =	data.light->GetDiffuse().ToGLM();
-				uniforms.pointlights[data.indexUniform].specular =	data.light->GetSpecular().ToGLM();
-				uniforms.pointlights[data.indexUniform].ambiant =	data.light->GetAmbiant().ToGLM();
-				uniforms.pointlights[data.indexUniform].position =	glm::vec4(ToGLM(data.transform->GetPosition()),1);	
-				uniforms.pointlights[data.indexUniform].constant =	data.light->GetAttenuation(PointLight::CONSTANT); 
-				uniforms.pointlights[data.indexUniform].linear =	data.light->GetAttenuation(PointLight::LINEAR);
-				uniforms.pointlights[data.indexUniform].quadratic =	data.light->GetAttenuation(PointLight::QUADRATIC);
-			}	uniforms.pointLightNum = static_cast<uint32_t>( m_pointLights.size() );
-			
-			// Directional lights
-			for ( int lightIndex = 0; lightIndex < m_directionalLights.size(); lightIndex++ ) {
-				const DirectionalLightData & data = m_directionalLights[lightIndex];
-				uniforms.dirLights[data.indexUniform].direction =	glm::vec4( ToGLM( data.transform->Forward() ), 1 );
-				uniforms.dirLights[data.indexUniform].diffuse =		data.light->GetDiffuse().ToGLM();
-				uniforms.dirLights[data.indexUniform].specular =	data.light->GetSpecular().ToGLM();
-				uniforms.dirLights[data.indexUniform].ambiant =		data.light->GetAmbiant().ToGLM();
-			}	uniforms.dirLightsNum = static_cast<uint32_t>( m_directionalLights.size() );
-			
-			m_forwardPipeline->SetLightUniforms(uniforms);			
-
 			// Main camera transform
-			{
-			
+			{			
 				ForwardPipeline::VertUniforms ubo = m_forwardPipeline->GetVertUniforms();
 				ubo.view = m_camera.view;
 				ubo.proj = m_camera.projection;
@@ -965,106 +943,6 @@ namespace fan
 				if (m_drawData[modelIndex].model == _model) {
 					m_drawData[modelIndex] = {};
 				}
-			}
-		}
-
-		//================================================================================================================================
-		//================================================================================================================================
-		void Renderer::RegisterPointLight	( PointLight * _pointLight	) {
-			
-			// Looks for the _pointLight
-			for (int lightIndex = 0; lightIndex < m_pointLights.size() ; lightIndex++){
-				if (m_pointLights[lightIndex].light == _pointLight ) {
-					Debug::Get() << Debug::Severity::warning << "PointLight already registered in entity : " << _pointLight->GetEntity()->GetName() << Debug::Endl();
-					return;
-				}
-			}
-
-			// Adds light data
-			PointLightData pointLightData;
-			pointLightData.indexUniform = static_cast<int>(m_pointLights.size());
-			pointLightData.light = _pointLight;
-			pointLightData.transform = _pointLight->GetEntity()->GetComponent<Transform>();
-			m_pointLights.push_back(pointLightData);
-
-			// Check num lights
-			if( pointLightData.indexUniform >= ForwardPipeline::s_maximumNumPointLights ) {
-				Debug::Get() << Debug::Severity::warning << "Too much lights in the scene, maximum is " << ForwardPipeline::s_maximumNumPointLights << Debug::Endl();
-			}
-		}
-
-		//================================================================================================================================
-		//================================================================================================================================
-		void Renderer::UnRegisterPointLight	( PointLight *	_pointLight	) {
-
-			const size_t num = m_pointLights.size();
-
-			// Removes the light
-			for (int lightIndex = 0; lightIndex < m_pointLights.size() ; lightIndex++){
-				if (m_pointLights[lightIndex].light == _pointLight ) {
-					m_pointLights.erase( m_pointLights.begin() + lightIndex );
-				}
-			}
-
-			// Light not removed
-			if( m_pointLights.size() == num ) {
-				Debug::Get() << Debug::Severity::warning << "Trying to remove a non registered point light! entity=" << _pointLight->GetEntity()->GetName() << Debug::Endl();
-				return;
-			}
-
-			// Re-indexing
-			for (int lightIndex = 0; lightIndex < m_pointLights.size() ; lightIndex++){
-				m_pointLights[lightIndex].indexUniform = lightIndex;
-			}			
-		}
-
-		//================================================================================================================================
-		//================================================================================================================================
-		void Renderer::RegisterDirectionalLight( DirectionalLight * _directionalLight ) {
-
-			// Looks for the _direcitonalLight
-			for ( int lightIndex = 0; lightIndex < m_directionalLights.size(); lightIndex++ ) {
-				if ( m_directionalLights[lightIndex].light == _directionalLight ) {
-					Debug::Get() << Debug::Severity::warning << "Directional Light already registered in entity : " << _directionalLight->GetEntity()->GetName() << Debug::Endl();
-					return;
-				}
-			}
-
-			// Adds light data
-			DirectionalLightData directionalLightData;
-			directionalLightData.indexUniform = static_cast<int>( m_directionalLights.size() );
-			directionalLightData.light = _directionalLight;
-			directionalLightData.transform = _directionalLight->GetEntity()->GetComponent<Transform>();
-			m_directionalLights.push_back( directionalLightData );
-
-			// Check num lights
-			if ( directionalLightData.indexUniform >= ForwardPipeline::s_maximumNumDirectionalLights ) {
-				Debug::Get() << Debug::Severity::warning << "Too much lights in the scene, maximum is " << ForwardPipeline::s_maximumNumDirectionalLights << Debug::Endl();
-			}
-		}
-
-		//================================================================================================================================
-		//================================================================================================================================
-		void Renderer::UnRegisterDirectionalLight	( DirectionalLight *	_directionalLight ) {
-
-			const size_t num = m_directionalLights.size();
-
-			// Removes the light
-			for ( int lightIndex = 0; lightIndex < m_directionalLights.size(); lightIndex++ ) {
-				if ( m_directionalLights[lightIndex].light == _directionalLight ) {
-					m_directionalLights.erase( m_directionalLights.begin() + lightIndex );
-				}
-			}
-
-			// Light not removed
-			if ( m_directionalLights.size() == num ) {
-				Debug::Get() << Debug::Severity::warning << "Trying to remove a non registered directional light! entity=" << _directionalLight->GetEntity()->GetName() << Debug::Endl();
-				return;
-			}
-
-			// Re-indexing
-			for ( int lightIndex = 0; lightIndex < m_directionalLights.size(); lightIndex++ ) {
-				m_directionalLights[lightIndex].indexUniform = lightIndex;
 			}
 		}
 

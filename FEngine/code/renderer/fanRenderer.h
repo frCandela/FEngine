@@ -1,5 +1,6 @@
 #pragma once
 
+#include "renderer/fanUniforms.h"
 #include "renderer/util/fanVertex.h"
 #include "core/math/shapes/fanAABB.h"
 #include "core/fanSingleton.h"
@@ -10,7 +11,6 @@ namespace fan
 	class Transform;
 	class Material;
 	class PointLight;
-	class DirectionalLight;
 
 	class Window;
 	class Mesh;
@@ -32,23 +32,11 @@ namespace fan
 
 	struct MeshData;
 
-
-
 	struct DrawData {
 		MeshData *			meshData = nullptr;
 		Model *		model = nullptr;
 		Transform *	transform = nullptr;
 		Material *	material = nullptr;
-	};
-	struct PointLightData {
-		const PointLight *	light = nullptr;
-		const Transform *	transform = nullptr;
-		int					indexUniform = -1;
-	};
-	struct DirectionalLightData {
-		const DirectionalLight * light = nullptr;
-		const Transform *		 transform = nullptr;
-		int						 indexUniform = -1;
 	};
 
 	//================================================================================================================================
@@ -85,6 +73,9 @@ namespace fan
 
 		void  SetClearColor(glm::vec4 _color) { m_clearColor = _color; }
 		void  SetMainCamera( const glm::mat4 _projection, const glm::mat4 _view, const glm::vec3 _position );
+		void  SetDirectionalLight( const int _index, const glm::vec4 _direction, const glm::vec4 _ambiant, const glm::vec4 _diffuse, const glm::vec4 _specular );
+		void  SetNumDirectionalLights( const uint32_t _num );
+
 		float GetWindowAspectRatio() const;
 		bool  HasNoDebugToDraw() const { return m_debugLinesNoDepthTest.empty() && m_debugLines.empty() && m_debugTriangles.empty(); }
 
@@ -94,10 +85,11 @@ namespace fan
 		void UnRegisterMaterial			( Material *		 _material );
 		void RegisterModel				( Model *			 _model );
 		void UnRegisterModel			( Model *			 _model );
-		void RegisterPointLight			( PointLight *		 _pointLight );
-		void UnRegisterPointLight		( PointLight *		 _pointLight );
-		void RegisterDirectionalLight	( DirectionalLight * _pointLight );
-		void UnRegisterDirectionalLight	( DirectionalLight * _pointLight );
+
+
+		//LightsUniforms	GetLightUniforms() const { return m_pointLightUniform; }
+		//void			SetLightUniforms( const LightsUniforms& _lights );
+
 		void Clear();
 
 		void					DebugPoint	  ( const btVector3 _pos, const Color _color);
@@ -110,9 +102,8 @@ namespace fan
 
 	private:
 		Camera m_camera;
+		LightsUniforms m_lightsUniform;
 
-		std::vector < PointLightData >		 m_pointLights;
-		std::vector < DirectionalLightData > m_directionalLights;
 		std::vector < DrawData >			 m_drawData;
 		RessourceManager *  m_ressourceManager;
 		bool m_mustUpdateDynamicUniformsFrag = false;
@@ -127,7 +118,7 @@ namespace fan
 
 		// VULKAN OBJECTS
 		Instance *		m_instance;
-		Window *			m_window;
+		Window *		m_window;
 		Device *		m_device;
 		SwapChain  *	m_swapchain;
 

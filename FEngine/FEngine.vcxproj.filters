@@ -292,6 +292,9 @@
     <ClCompile Include="code\scene\components\fanDirectionalLight.cpp">
       <Filter>code\scene\components</Filter>
     </ClCompile>
+    <ClCompile Include="code\renderer\fanUniforms.cpp">
+      <Filter>code\renderer</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="code\editor\fanMainMenuBar.h">
@@ -989,6 +992,9 @@
     </ClInclude>
     <ClInclude Include="code\scene\components\fanDirectionalLight.h">
       <Filter>code\scene\components</Filter>
+    </ClInclude>
+    <ClInclude Include="code\renderer\fanUniforms.h">
+      <Filter>code\renderer</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

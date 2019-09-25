@@ -1,6 +1,7 @@
 #pragma once
 
 #include "core/memory/fanAlignedMemory.h"
+#include "renderer/fanUniforms.h"
 
 namespace fan
 {
@@ -23,39 +24,10 @@ namespace fan
 	//================================================================================================================================
 	class ForwardPipeline {
 	public:
-		static const uint32_t s_maximumNumModels = 128;
-		static const uint32_t s_maximumNumPointLights = 16; 
-		static const uint32_t s_maximumNumDirectionalLights= 4;
-
 		struct VertUniforms
 		{
 			glm::mat4 view;
 			glm::mat4 proj;
-		};
-
-		struct PointLight {
-			alignas( 16 ) glm::vec4		position;
-			alignas( 16 ) glm::vec4		diffuse;
-			alignas( 16 ) glm::vec4		specular;
-			alignas( 16 ) glm::vec4		ambiant;
-			alignas( 4 ) glm::float32	constant;
-			alignas( 4 ) glm::float32	linear;
-			alignas( 4 ) glm::float32	quadratic;
-			alignas( 4 ) glm::float32	_0;
-		};
-
-		struct DirectionalLight {
-			alignas( 16 ) glm::vec4 direction;
-			alignas( 16 ) glm::vec4 ambiant;
-			alignas( 16 ) glm::vec4 diffuse;
-			alignas( 16 ) glm::vec4 specular;
-		};
-
-		struct LightsUniforms {
-			DirectionalLight dirLights[ForwardPipeline::s_maximumNumDirectionalLights];
- 			PointLight pointlights[ForwardPipeline::s_maximumNumPointLights];
-			uint32_t   dirLightsNum;
-			uint32_t   pointLightNum;
 		};
 
 		struct FragUniforms
@@ -88,13 +60,10 @@ namespace fan
 		FragUniforms	GetFragUniforms() const { return m_fragUniforms; }
 		void			SetFragUniforms(const FragUniforms _fragUniforms);
 
-		LightsUniforms	GetLightUniforms() const { return m_pointLightUniform; }
-		void			SetLightUniforms(const LightsUniforms& _lights);
-
 		void	SetDynamicUniformVert(const DynamicUniformsVert& _dynamicUniform, const uint32_t _index);
 		void	SetDynamicUniformFrag(const DynamicUniformsMaterial& _dynamicUniform, const uint32_t _index);
 
-		void UpdateUniformBuffers();
+		void UpdateUniformBuffers( const LightsUniforms  _lightUniforms );
 
 		VkPipeline		GetPipeline() { return m_pipeline; }
 		VkImageView		GetDepthImageView();
@@ -129,8 +98,6 @@ namespace fan
 
 		VertUniforms m_vertUniforms;
 		FragUniforms m_fragUniforms;
-		LightsUniforms m_pointLightUniform;
-
 
 		AlignedMemory<DynamicUniformsVert> m_dynamicUniformsVert;
 		AlignedMemory<DynamicUniformsMaterial> m_dynamicUniformsFrag;
