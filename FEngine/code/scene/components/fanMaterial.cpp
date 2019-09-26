@@ -41,7 +41,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void Material::SetShininess(const int _shininess) {
+	void Material::SetShininess(const uint32_t _shininess) {
 		m_shininess = _shininess;
 		MarkModified();
 	}
@@ -63,7 +63,7 @@ namespace fan
 		if ( ImGui::ColorEdit3( "color", m_color.Data(), gui::colorEditFlags ) ) { MarkModified(); }
 
 		if ( ImGui::Button( "##shininess" ) ) { SetShininess( 1 ); } ImGui::SameLine();
-		if( ImGui::DragInt("shininess", &m_shininess, 1, 1, 256 )) { MarkModified(); }
+		if( ImGui::DragInt("shininess", (int*)&m_shininess, 1, 1, 256 )) { MarkModified(); }
 		ImGui::SameLine(); gui ::ShowHelpMarker("sharpness of the specular reflection");
 
 		bool openSetPathPopup = false;
@@ -112,7 +112,7 @@ namespace fan
 		if ( !ReadSegmentHeader( _in, "material:" ) ) { return false; }
 		if ( !ReadString( _in, path ) ) { return false; }
 		if ( !ReadSegmentHeader( _in, "shininess:" ) ) { return false; }
-		if ( !ReadInteger( _in, m_shininess ) ) { return false; }
+		if ( !ReadUnsigned( _in, m_shininess ) ) { return false; }
 		if ( !ReadSegmentHeader( _in, "color:" ) ) { return false; }
 		if ( !ReadFloat3( _in, &m_color[0] ) ) { return false; }
 

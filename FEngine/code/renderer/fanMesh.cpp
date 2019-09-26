@@ -3,6 +3,9 @@
 #include "renderer/fanMesh.h"
 #include "core/files/fanFbxImporter.h"
 #include "core/math/shapes/fanConvexHull.h"
+#include "renderer/core/fanDevice.h"
+#include "renderer/core/fanBuffer.h"
+#include "renderer/fanRenderer.h"
 
 namespace fan {
 	REGISTER_TYPE_INFO(Mesh)
@@ -12,8 +15,17 @@ namespace fan {
 	Mesh::Mesh(const std::string& _path) :
 	m_path ( _path )
 	,m_vertices(0)
-	,m_indices(0){
+	,m_indices(0)
+	,m_vertexBuffer(nullptr)
+	,m_indexBuffer(nullptr) {
 
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
+	Mesh::~Mesh() {
+		delete m_indexBuffer;
+		delete m_vertexBuffer;
 	}
 
 	//================================================================================================================================
@@ -32,6 +44,7 @@ namespace fan {
 			}
 		}
 	}
+	
 	//================================================================================================================================
 	// Removes duplicates vertices & generates a corresponding index buffer
 	//================================================================================================================================
@@ -74,5 +87,51 @@ namespace fan {
 
 		m_convexHull->ComputeQuickHull(pointCloud);
 	}
+	
+	//================================================================================================================================
+	//================================================================================================================================
+	void Mesh::GenerateBuffers( Device & _device ) {
 
+		delete(m_indexBuffer );
+		delete( m_vertexBuffer );
+		m_indexBuffer = new Buffer( _device );
+		m_vertexBuffer = new Buffer( _device );
+
+		{
+			const VkDeviceSize size = sizeof( m_indices[0] ) * m_indices.size();
+			m_indexBuffer->Create(
+				size,
+				VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_INDEX_BUFFER_BIT,
+				VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT
+			);
+			Buffer stagingBuffer( _device );
+			stagingBuffer.Create(
+				size,
+				VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
+				VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT
+			);
+			stagingBuffer.SetData( m_indices.data(), size );
+			VkCommandBuffer cmd = Renderer::Get().BeginSingleTimeCommands();
+			stagingBuffer.CopyBufferTo( cmd, m_indexBuffer->GetBuffer(), size );
+			Renderer::Get().EndSingleTimeCommands( cmd );
+		}
+		{
+			const VkDeviceSize size = sizeof( m_vertices[0] ) * m_vertices.size();
+			m_vertexBuffer->Create(
+				size,
+				VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_VERTEX_BUFFER_BIT,
+				VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT
+			);
+			Buffer stagingBuffer2( _device );
+			stagingBuffer2.Create(
+				size,
+				VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
+				VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT
+			);
+			stagingBuffer2.SetData( m_vertices.data(), size );
+			VkCommandBuffer cmd2 = Renderer::Get().BeginSingleTimeCommands();
+			stagingBuffer2.CopyBufferTo( cmd2, m_vertexBuffer->GetBuffer(), size );
+			Renderer::Get().EndSingleTimeCommands( cmd2 );
+		}
+	}
 }

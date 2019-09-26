@@ -4,13 +4,10 @@
 #include "renderer/util/fanVertex.h"
 #include "core/math/shapes/fanAABB.h"
 #include "core/fanSingleton.h"
+#include "core/memory/fanAlignedMemory.h"
 
 namespace fan
 {
-	class Model;
-	class Transform;
-	class Material;
-
 	class Window;
 	class Mesh;
 	class Instance;
@@ -29,26 +26,10 @@ namespace fan
 	class Color;
 	class RessourceManager;
 
-	struct MeshData;
-
-	struct DrawData {
-		MeshData *			meshData = nullptr;
-		Model *		model = nullptr;
-		Transform *	transform = nullptr;
-		Material *	material = nullptr;
-	};
-
 	//================================================================================================================================
 	// TODO Renderer should not be a singleton
 	//================================================================================================================================
 	class Renderer : public Singleton<Renderer> {
-	private:
-		struct Camera {
-			glm::vec3 position;
-			glm::mat4 projection;
-			glm::mat4 view;
-		};
-
 	public:
 		void Initialize(const VkExtent2D _size, const glm::ivec2 _position);
 		void Destroy();
@@ -70,22 +51,21 @@ namespace fan
 		glm::vec4				GetClearColor() const { return m_clearColor; }
 		RessourceManager *		GetRessourceManager() const { return m_ressourceManager; }
 
-		void  SetClearColor(glm::vec4 _color) { m_clearColor = _color; }
-		void  SetMainCamera( const glm::mat4 _projection, const glm::mat4 _view, const glm::vec3 _position );
-		void  SetDirectionalLight( const int _index, const glm::vec4 _direction, const glm::vec4 _ambiant, const glm::vec4 _diffuse, const glm::vec4 _specular );
-		void  SetNumDirectionalLights( const uint32_t _num );
-		void  SetPointLight( const int _index, const glm::vec3 _position, const glm::vec3 _diffuse, const glm::vec3 _specular, const glm::vec3 _ambiant, const glm::vec3 _constantLinearQuadratic );
-		void  SetNumPointLights( const uint32_t _num );
+		void SetClearColor(glm::vec4 _color) { m_clearColor = _color; }
+		void SetMainCamera( const glm::mat4 _projection, const glm::mat4 _view, const glm::vec3 _position );
+		void SetDirectionalLight( const int _index, const glm::vec4 _direction, const glm::vec4 _ambiant, const glm::vec4 _diffuse, const glm::vec4 _specular );
+		void SetNumDirectionalLights( const uint32_t _num );
+		void SetPointLight( const int _index, const glm::vec3 _position, const glm::vec3 _diffuse, const glm::vec3 _specular, const glm::vec3 _ambiant, const glm::vec3 _constantLinearQuadratic );
+		void SetNumPointLights( const uint32_t _num );
+		void SetDynamicUniformVert( const DynamicUniformsVert& _dynamicUniform, const uint32_t _index );
+		void SetDynamicUniformFrag( const DynamicUniformsMaterial& _dynamicUniform, const uint32_t _index );
+		void SetMeshAt( const uint32_t _index, Mesh * _mesh );
+		void SetNumMesh( const uint32_t _num );
+		void SetTransformAt( const uint32_t _index, glm::mat4 _modelMatrix,	glm::mat4 _normalMatrix );
+		void SetMaterialAt( const uint32_t _index, const glm::vec3 _color, const uint32_t _shininess, const uint32_t _textureIndex );
 
 		float GetWindowAspectRatio() const;
 		bool  HasNoDebugToDraw() const { return m_debugLinesNoDepthTest.empty() && m_debugLines.empty() && m_debugTriangles.empty(); }
-
-		const std::vector < DrawData > & GetDrawData() const { return m_drawData; }
-
-		void RegisterMaterial			( Material *		 _material );
-		void UnRegisterMaterial			( Material *		 _material );
-		void RegisterModel				( Model *			 _model );
-		void UnRegisterModel			( Model *			 _model );
 
 		void Clear();
 
@@ -98,12 +78,17 @@ namespace fan
 		void					DebugAABB	  ( const AABB & _aabb, const Color _color);
 
 	private:
-		Camera m_camera;
-		LightsUniforms m_lightsUniform;
+		LightsUniforms							m_lightsUniforms;
+		AlignedMemory<DynamicUniformsVert>		m_dynamicUniformsVert;
+		AlignedMemory<DynamicUniformsMaterial>	m_dynamicUniformsFrag;
+		VertUniforms							m_vertUniforms;
+		FragUniforms							m_fragUniforms;
+		DebugUniforms							m_debugUniforms;
 
-		std::vector < DrawData >			 m_drawData;
+		std::array< Mesh *, s_maximumNumModels > m_meshDrawArray;
+		uint32_t								 m_numMesh;
+
 		RessourceManager *  m_ressourceManager;
-		bool m_mustUpdateDynamicUniformsFrag = false;
 
 		// DEBUG DATA
 		std::vector<DebugVertex>	m_debugLines;
@@ -136,17 +121,13 @@ namespace fan
 		std::vector<VkCommandBuffer> m_imguiCommandBuffers;
 		std::vector<VkCommandBuffer> m_debugCommandBuffers;
 		std::vector<VkCommandBuffer> m_postprocessCommandBuffers;
-
-		std::vector<bool> m_reloadGeometryCommandBuffers;
-
 		std::vector< FrameBuffer * > m_forwardFrameBuffers;
 		std::vector< FrameBuffer * > m_swapchainFramebuffers;
 
 		glm::vec4 m_clearColor;
 
+		void UpdateUniformBuffers();
 		bool ResetCommandPool();
-		void UpdateSceneUniforms();
-		void UpdateUniformBuffer();
 		bool SubmitCommandBuffers();
 
 		void ClearDebug() {

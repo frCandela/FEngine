@@ -25,10 +25,9 @@ namespace fan
 		for (int textureIndex = 0; textureIndex < m_textures.size(); textureIndex++) {
 			delete(m_textures[textureIndex]);
 		}
-		for (auto meshData : m_meshList) {
-			delete meshData.second.indexBuffer;
-			delete meshData.second.vertexBuffer;
-		}
+		for (std::pair<const uint32_t, Mesh *> meshPair : m_meshList) {
+			delete meshPair.second;
+		} m_meshList.clear();
 	}
 
 	//================================================================================================================================
@@ -75,12 +74,12 @@ namespace fan
 	//================================================================================================================================
 	//================================================================================================================================
 	Mesh * RessourceManager::FindMesh(const std::string _path) {
-		const std::map<uint32_t, MeshData>::iterator it = m_meshList.find(DSID(_path.c_str()));
+		const std::map<uint32_t, Mesh*>::iterator it = m_meshList.find(DSID(_path.c_str()));
 		if (it == m_meshList.end()) {
 			return nullptr;
 		}
 		else {
-			return it->second.mesh;
+			return it->second;
 		}
 	}
 
@@ -88,14 +87,14 @@ namespace fan
 	// Return the mesh data associated with a mesh
 	// Return a default cube if no mesh found
 	//================================================================================================================================
-	MeshData * RessourceManager::FindMeshData(const Mesh * _mesh) {
-		const std::map<uint32_t, MeshData>::iterator it = m_meshList.find(_mesh->GetRessourceID());
+	Mesh * RessourceManager::FindMesh(const Mesh * _mesh) {
+		const std::map<uint32_t, Mesh*>::iterator it = m_meshList.find(_mesh->GetRessourceID());
 		if (it != m_meshList.end()) {
-			return &it->second;
+			return it->second;
 		}
 		else {
 			Debug::Get() << Debug::Severity::error << "Mesh not found : " << _mesh->GetPath() << Debug::Endl();
-			return &m_meshList.find(m_defaultMesh->GetRessourceID())->second;
+			return m_meshList.find(m_defaultMesh->GetRessourceID())->second;
 		}
 	}
 
@@ -107,51 +106,7 @@ namespace fan
 			Debug::Get() << Debug::Severity::warning << "Renderer::AddMesh : Mesh already registered: " << _mesh->GetPath() << Debug::Endl();
 			return;
 		}
-
-		const std::map<uint32_t, MeshData>::iterator it = m_meshList.insert(std::pair<uint32_t, MeshData>(_mesh->GetRessourceID(), {})).first;
-		MeshData & meshData = it->second;
-
-		meshData.mesh = _mesh;
-		meshData.indexBuffer = new Buffer(m_device);
-		meshData.vertexBuffer = new Buffer(m_device);
-
-		{
-			const std::vector<uint32_t> & indices = _mesh->GetIndices();
-			const VkDeviceSize size = sizeof(indices[0]) * indices.size();
-			meshData.indexBuffer->Create(
-				size,
-				VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_INDEX_BUFFER_BIT,
-				VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT
-			);
-			Buffer stagingBuffer(m_device);
-			stagingBuffer.Create(
-				size,
-				VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
-				VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT
-			);
-			stagingBuffer.SetData(indices.data(), size);
-			VkCommandBuffer cmd = Renderer::Get().BeginSingleTimeCommands();
-			stagingBuffer.CopyBufferTo(cmd, meshData.indexBuffer->GetBuffer(), size);
-			Renderer::Get().EndSingleTimeCommands(cmd);
-		}
-		{
-			const std::vector<Vertex> & vertices = _mesh->GetVertices();
-			const VkDeviceSize size = sizeof(vertices[0]) * vertices.size();
-			meshData.vertexBuffer->Create(
-				size,
-				VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_VERTEX_BUFFER_BIT,
-				VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT
-			);
-			Buffer stagingBuffer2(m_device);
-			stagingBuffer2.Create(
-				size,
-				VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
-				VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT
-			);
-			stagingBuffer2.SetData(vertices.data(), size);
-			VkCommandBuffer cmd2 = Renderer::Get().BeginSingleTimeCommands();
-			stagingBuffer2.CopyBufferTo(cmd2, meshData.vertexBuffer->GetBuffer(), size);
-			Renderer::Get().EndSingleTimeCommands(cmd2);
-		}
+		m_meshList.insert(std::pair<uint32_t, Mesh*>(_mesh->GetRessourceID(), _mesh ));
+		_mesh->GenerateBuffers( m_device);
 	}
 }

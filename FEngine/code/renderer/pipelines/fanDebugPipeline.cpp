@@ -8,6 +8,7 @@
 #include "renderer/core/fanBuffer.h"
 #include "renderer/fanRenderer.h"
 #include "renderer/util/fanVertex.h"
+#include "renderer/fanUniforms.h"
 
 namespace fan
 {
@@ -45,8 +46,6 @@ namespace fan
 		DeletePipeline();
 		CreateDescriptors();
 		CreatePipeline(_extent);
-
-		SetUniforms(m_uniforms);
 	}
 
 	//================================================================================================================================
@@ -58,9 +57,14 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void DebugPipeline::SetUniforms(const Uniforms _uniforms) {
-		m_uniforms = _uniforms;
-		m_uniformBuffer->SetData(&m_uniforms, sizeof(m_uniforms));
+	void DebugPipeline::SetUniformPointers( DebugUniforms * _debugUniforms ) {
+		m_debugUniforms = _debugUniforms;
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
+	void DebugPipeline::UpdateUniformBuffers() {
+		m_uniformBuffer->SetData( &(*m_debugUniforms), sizeof( DebugUniforms ) );
 	}
 
 	//================================================================================================================================
@@ -157,7 +161,7 @@ namespace fan
 
 		m_uniformBuffer = new Buffer(m_device);
 		m_uniformBuffer->Create(
-			sizeof(m_uniforms),
+			sizeof(DebugUniforms),
 			VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT,
 			VK_MEMORY_PROPERTY_HOST_COHERENT_BIT | VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT
 		);
@@ -165,7 +169,7 @@ namespace fan
 		VkDescriptorBufferInfo uboDescriptorBufferInfo = {};
 		uboDescriptorBufferInfo.buffer = m_uniformBuffer->GetBuffer();
 		uboDescriptorBufferInfo.offset = 0;
-		uboDescriptorBufferInfo.range = sizeof(m_uniforms);
+		uboDescriptorBufferInfo.range = sizeof(DebugUniforms);
 
 		VkWriteDescriptorSet uboWriteDescriptorSet = {};
 		uboWriteDescriptorSet.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;

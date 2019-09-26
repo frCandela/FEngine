@@ -1,10 +1,6 @@
 #include "fanGlobalIncludes.h"
-
 #include "renderer/fanRenderer.h"
-#include "scene/fanEntity.h"
-#include "scene/components/fanModel.h"
-#include "scene/components/fanTransform.h"
-#include "scene/components/fanMaterial.h"
+
 #include "core/fanTime.h"
 #include "core/input/fanInput.h"
 #include "core/math/fanBasicModels.h"
@@ -27,7 +23,6 @@
 #include "renderer/util/fanWindow.h"
 
 namespace fan
-
 {
 		//================================================================================================================================
 		//================================================================================================================================
@@ -38,9 +33,27 @@ namespace fan
 			m_swapchain =	new SwapChain(*m_device);
 		
 			m_clearColor = glm::vec4(0.f, 0.f, 0.2f, 1.f);
+			m_numMesh = 0;
 
 			m_swapchain->Create(m_window->GetSurface(), _size);
 			Input::Get().Setup(m_window->GetWindow());
+
+			// Calculate required alignment based on minimum device offset alignment
+			size_t minUboAlignment = m_device->GetDeviceProperties().limits.minUniformBufferOffsetAlignment;
+			size_t dynamicAlignmentVert = sizeof( DynamicUniformsVert );
+			size_t dynamicAlignmentFrag = sizeof( DynamicUniformsMaterial );
+			if ( minUboAlignment > 0 ) {
+				dynamicAlignmentVert = ( ( sizeof( DynamicUniformsVert ) + minUboAlignment - 1 ) & ~( minUboAlignment - 1 ) );
+				dynamicAlignmentFrag = ( ( sizeof( DynamicUniformsMaterial ) + minUboAlignment - 1 ) & ~( minUboAlignment - 1 ) );
+			}
+			m_dynamicUniformsVert.Resize( s_maximumNumModels * dynamicAlignmentVert, dynamicAlignmentVert );
+			m_dynamicUniformsFrag.Resize( s_maximumNumModels * dynamicAlignmentFrag, dynamicAlignmentFrag );
+
+			for ( int uniformIndex = 0; uniformIndex < s_maximumNumModels; uniformIndex++ ) {
+				m_dynamicUniformsFrag[uniformIndex].color = glm::vec3( 1 );
+				m_dynamicUniformsFrag[uniformIndex].textureIndex = 0;
+				m_dynamicUniformsFrag[uniformIndex].shininess = 1;
+			}
 
 			CreateCommandPool();
 			CreateRenderPass();
@@ -49,15 +62,19 @@ namespace fan
 			m_ressourceManager =  new RessourceManager( *m_device );
 
 			m_forwardPipeline = new ForwardPipeline(*m_device, m_renderPass);
+			m_forwardPipeline->SetUniformPointers( &m_lightsUniforms, &m_dynamicUniformsVert, &m_dynamicUniformsFrag, &m_vertUniforms, &m_fragUniforms );
 			m_forwardPipeline->Create( m_swapchain->GetExtent());
 
 			m_debugLinesPipeline = new DebugPipeline(*m_device, m_renderPass, VK_PRIMITIVE_TOPOLOGY_LINE_LIST, true);
+			m_debugLinesPipeline->SetUniformPointers( & m_debugUniforms );
 			m_debugLinesPipeline->Create(m_swapchain->GetExtent(), "code/shaders/debugLines.vert", "code/shaders/debugLines.frag");
 
 			m_debugLinesPipelineNoDepthTest = new DebugPipeline(*m_device, m_renderPass, VK_PRIMITIVE_TOPOLOGY_LINE_LIST, false);
+			m_debugLinesPipelineNoDepthTest->SetUniformPointers( &m_debugUniforms );
 			m_debugLinesPipelineNoDepthTest->Create(m_swapchain->GetExtent(), "code/shaders/debugLines.vert", "code/shaders/debugLines.frag");
 			
 			m_debugTrianglesPipeline = new DebugPipeline(*m_device, m_renderPass, VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST, false);
+			m_debugTrianglesPipeline->SetUniformPointers( &m_debugUniforms );
 			m_debugTrianglesPipeline->Create(m_swapchain->GetExtent(), "code/shaders/debugTriangles.vert", "code/shaders/debugTriangles.frag");
 
 			m_postprocessPipeline = new PostprocessPipeline(*m_device, m_renderPassPostprocess);
@@ -152,8 +169,7 @@ namespace fan
 					CreateForwardFramebuffers();
 					RecordAllCommandBuffers();
 					vkResetFences(m_device->vkDevice, 1, m_swapchain->GetCurrentInFlightFence());
-					m_swapchain->AcquireNextImage();	
-					UpdateSceneUniforms();
+					m_swapchain->AcquireNextImage();
 				}
 				else if (result != VK_SUCCESS) {
 					Debug::Error( "Could not acquire next image" );
@@ -167,10 +183,9 @@ namespace fan
 				{
 					ImGui::Begin("RendererDebugTmp"); {
 						// Display mesh list
-						if (ImGui::CollapsingHeader("Loaded meshes : ")) {
-						
+						if (ImGui::CollapsingHeader("Loaded meshes : ")) {						
 							for (auto meshData : m_ressourceManager->GetMeshData()) {
-								ImGui::Text(meshData.second.mesh->GetPath().c_str());
+								ImGui::Text(meshData.second->GetPath().c_str());
 							}
 						}
 						// display textures list
@@ -185,13 +200,11 @@ namespace fan
 						}
 
 						if (ImGui::CollapsingHeader("Rendered Models : ")) {
-							for (int drawDataIndex = 0; drawDataIndex < m_drawData.size(); drawDataIndex++) {
-								const DrawData & drawData = m_drawData[drawDataIndex];
-								if (drawData.model != nullptr) {
-									std::stringstream ss;
-									ss << drawData.model->GetEntity()->GetName() << " " << drawData.meshData->mesh->GetPath();
-									ImGui::Text(ss.str().c_str());
-								}
+							for (uint32_t meshIndex = 0; meshIndex < m_numMesh; meshIndex++) {
+								const Mesh * mesh = m_meshDrawArray[meshIndex];
+								if( mesh != nullptr ){
+									ImGui::Text( mesh->GetPath().c_str());
+								}	
 								else {
 									ImGui::Text("Empty slot");
 								}
@@ -209,11 +222,8 @@ namespace fan
 				ImGui::Render();
 
 				const uint32_t currentFrame = m_swapchain->GetCurrentFrame();
-				UpdateUniformBuffer();
-				m_forwardPipeline->UpdateUniformBuffers( m_lightsUniform );
-				if (m_reloadGeometryCommandBuffers[currentFrame] == true) {
-					RecordCommandBufferGeometry(currentFrame);
-				}
+				UpdateUniformBuffers();
+				RecordCommandBufferGeometry(currentFrame);
 				RecordCommandBufferDebug(currentFrame);
 				RecordCommandBufferImgui(currentFrame);
 				RecordPrimaryCommandBuffer(currentFrame);
@@ -224,6 +234,15 @@ namespace fan
 				Input::NewFrame();
 				ImGui::NewFrame();
 				ClearDebug();
+		}
+
+		//================================================================================================================================
+		//================================================================================================================================
+		void Renderer::UpdateUniformBuffers() {
+			m_forwardPipeline->UpdateUniformBuffers();
+			m_debugLinesPipeline->UpdateUniformBuffers();
+			m_debugLinesPipelineNoDepthTest->UpdateUniformBuffers();
+			m_debugTrianglesPipeline->UpdateUniformBuffers();
 		}
 
 		//================================================================================================================================
@@ -289,21 +308,6 @@ namespace fan
 
 		//================================================================================================================================
 		//================================================================================================================================
-		void Renderer::UpdateSceneUniforms() {
-			// Force reload of transform uniforms
-			for (int drawDataIndex = 0; drawDataIndex < m_drawData.size(); drawDataIndex++) {
-				if (m_drawData[drawDataIndex].transform != nullptr ) {
-				m_drawData[drawDataIndex].transform->MarkModified();
-			}
-
-				Material * material = m_drawData[drawDataIndex].material;
-				if (material != nullptr) {
-					material->MarkModified();
-				}
-			}
-		}
-		//================================================================================================================================
-		//================================================================================================================================
 		float  Renderer::GetWindowAspectRatio() const { 
 			return static_cast<float>( m_swapchain->GetExtent().width ) / m_swapchain->GetExtent().height ;
 		}
@@ -311,108 +315,99 @@ namespace fan
 		//================================================================================================================================
 		//================================================================================================================================
 		void Renderer::SetMainCamera( const glm::mat4 _projection, const glm::mat4 _view, const glm::vec3 _position ) {
-			m_camera.projection = _projection;
-			m_camera.view		= _view;
-			m_camera.position	= _position;
+			m_vertUniforms.view = _view;
+			m_vertUniforms.proj = _projection;
+			m_vertUniforms.proj[1][1] *= -1;
+
+			m_fragUniforms.cameraPosition = _position;
+
+			m_debugUniforms.model = glm::mat4( 1.0 );
+			m_debugUniforms.view = m_vertUniforms.view;
+			m_debugUniforms.proj = m_vertUniforms.proj;
+			m_debugUniforms.color = glm::vec4( 1, 1, 1, 1 );
 		}
 
 		//================================================================================================================================
 		//================================================================================================================================
 		void Renderer::SetDirectionalLight( const int _index, const glm::vec4 _direction, const glm::vec4 _ambiant, const glm::vec4 _diffuse, const glm::vec4 _specular ) {
 			assert( _index  < s_maximumNumDirectionalLights );
-			m_lightsUniform.dirLights[_index].direction = _direction;
-			m_lightsUniform.dirLights[_index].ambiant = _ambiant;
-			m_lightsUniform.dirLights[_index].diffuse = _diffuse;
-			m_lightsUniform.dirLights[_index].specular = _specular;
-			
+			m_lightsUniforms.dirLights[_index].direction = _direction;
+			m_lightsUniforms.dirLights[_index].ambiant = _ambiant;
+			m_lightsUniforms.dirLights[_index].diffuse = _diffuse;
+			m_lightsUniforms.dirLights[_index].specular = _specular;			
 		}
 
 		//================================================================================================================================
 		//================================================================================================================================
 		void  Renderer::SetNumDirectionalLights( const uint32_t _num ) {
 			assert( _num < s_maximumNumDirectionalLights );
-			m_lightsUniform.dirLightsNum = _num;
+			m_lightsUniforms.dirLightsNum = _num;
 		}
 
 		//================================================================================================================================
 		//================================================================================================================================
 		void Renderer::SetPointLight( const int _index, const glm::vec3 _position, const glm::vec3 _diffuse, const glm::vec3 _specular, const glm::vec3 _ambiant, const glm::vec3 _constantLinearQuadratic ) {
 			assert( _index < s_maximumNumPointLights );
-			m_lightsUniform.pointlights[_index].position	= glm::vec4(_position,1);
-			m_lightsUniform.pointlights[_index].diffuse		= glm::vec4( _diffuse, 1 );
-			m_lightsUniform.pointlights[_index].specular	= glm::vec4( _specular, 1 );
-			m_lightsUniform.pointlights[_index].ambiant		= glm::vec4( _ambiant, 1 );
-			m_lightsUniform.pointlights[_index].constant	= _constantLinearQuadratic[0];
-			m_lightsUniform.pointlights[_index].linear		= _constantLinearQuadratic[1];
-			m_lightsUniform.pointlights[_index].quadratic	= _constantLinearQuadratic[2];
+			m_lightsUniforms.pointlights[_index].position	= glm::vec4(_position,1);
+			m_lightsUniforms.pointlights[_index].diffuse		= glm::vec4( _diffuse, 1 );
+			m_lightsUniforms.pointlights[_index].specular	= glm::vec4( _specular, 1 );
+			m_lightsUniforms.pointlights[_index].ambiant		= glm::vec4( _ambiant, 1 );
+			m_lightsUniforms.pointlights[_index].constant	= _constantLinearQuadratic[0];
+			m_lightsUniforms.pointlights[_index].linear		= _constantLinearQuadratic[1];
+			m_lightsUniforms.pointlights[_index].quadratic	= _constantLinearQuadratic[2];
 		}
 
 		//================================================================================================================================
 		//================================================================================================================================
 		void  Renderer::SetNumPointLights( const uint32_t _num ) {
 			assert( _num < s_maximumNumPointLights );
-			m_lightsUniform.pointLightNum = _num;
+			m_lightsUniforms.pointLightNum = _num;
 		}
 
 		//================================================================================================================================
 		//================================================================================================================================
-		void Renderer::UpdateUniformBuffer()
-		{
-			// Main camera transform
-			{			
-				ForwardPipeline::VertUniforms ubo = m_forwardPipeline->GetVertUniforms();
-				ubo.view = m_camera.view;
-				ubo.proj = m_camera.projection;
-				ubo.proj[1][1] *= -1;
-				m_forwardPipeline->SetVertUniforms(ubo);
+		void Renderer::SetDynamicUniformVert( const DynamicUniformsVert& _dynamicUniform, const uint32_t _index ) {
+			assert( _index < s_maximumNumModels );
+			m_dynamicUniformsVert[_index] = _dynamicUniform;
+		}
 
-				ForwardPipeline::FragUniforms fragUniforms = m_forwardPipeline->GetFragUniforms();
-				fragUniforms.cameraPosition = m_camera.position;
-				m_forwardPipeline->SetFragUniforms(fragUniforms);
+		//================================================================================================================================
+		//================================================================================================================================
+		void Renderer::SetDynamicUniformFrag( const DynamicUniformsMaterial& _dynamicUniform, const uint32_t _index ) {
+			assert( _index < s_maximumNumModels );
+			m_dynamicUniformsFrag[_index] = _dynamicUniform;
+		}
 
-				DebugPipeline::Uniforms debugUniforms;
-				debugUniforms.model = glm::mat4(1.0);
-				debugUniforms.view = ubo.view;
-				debugUniforms.proj = ubo.proj;
-				debugUniforms.color = glm::vec4(1, 1, 1, 1);
-				m_debugLinesPipeline->SetUniforms(debugUniforms);
-				m_debugLinesPipelineNoDepthTest->SetUniforms(debugUniforms);
-				m_debugTrianglesPipeline->SetUniforms(debugUniforms);
-			}
 
-			// Dynamic uniforms 
-			bool mustUpdateDynamicUniformsVert = false;
-			for (int drawDataIndex = 0; drawDataIndex < m_drawData.size() ; drawDataIndex++) {			
-				DrawData & drawData = m_drawData[drawDataIndex];
+		//================================================================================================================================
+		//================================================================================================================================
+		void Renderer::SetMeshAt( const uint32_t _index, Mesh * _mesh ) {
+			assert( _index < s_maximumNumModels );
+			m_meshDrawArray[_index] = _mesh;
+		}
 
-				if (drawData.model != nullptr) {
+		//================================================================================================================================
+		//================================================================================================================================
+		void Renderer::SetNumMesh( const uint32_t _num ) {
+			assert( _num < s_maximumNumModels );
+			m_numMesh = _num;
+		}
 
-					// Vert
-					if (drawData.transform->IsModified() == true ) {
-						mustUpdateDynamicUniformsVert = true;
-						ForwardPipeline::DynamicUniformsVert uniform;
-						uniform.modelMat = drawData.transform->GetModelMatrix();
-						uniform.rotationMat = drawData.transform->GetRotationMat();
-						m_forwardPipeline->SetDynamicUniformVert(uniform, drawDataIndex);
-					}
+		//================================================================================================================================
+		//================================================================================================================================
+		void Renderer::SetTransformAt( const uint32_t _index, glm::mat4 _modelMatrix, glm::mat4 _normalMatrix ) {
+			assert( _index < s_maximumNumModels );
+			m_dynamicUniformsVert[_index].modelMat	  = _modelMatrix;
+			m_dynamicUniformsVert[_index].rotationMat = _normalMatrix;
+		}
 
-					// Frag
-					if (drawData.material != nullptr && (drawData.material->IsModified())) {
-						Texture * texture = drawData.material->GetTexture();
-						if (texture != nullptr) {
-							m_mustUpdateDynamicUniformsFrag = true;
-							ForwardPipeline::DynamicUniformsMaterial uniform;
-							uniform.color = drawData.material->GetColor().ToGLM();
-							uniform.textureIndex = texture->GetRenderID();
-							uniform.shininess =    static_cast<uint32_t>(drawData.material->GetShininess());
-							assert(uniform.textureIndex >= 0);
-							m_forwardPipeline->SetDynamicUniformFrag(uniform, drawDataIndex);
-						}
-					}
-				}
-			}
-
-			m_mustUpdateDynamicUniformsFrag = false;
+		//================================================================================================================================
+		//================================================================================================================================
+		void Renderer::SetMaterialAt( const uint32_t _index, const glm::vec3 _color, const uint32_t _shininess, const uint32_t _textureIndex ) {
+			assert( _index < s_maximumNumModels );
+			m_dynamicUniformsFrag[_index].color = _color;
+			m_dynamicUniformsFrag[_index].shininess = _shininess;
+			m_dynamicUniformsFrag[_index].textureIndex = _textureIndex;
 		}
 	
 		//================================================================================================================================
@@ -629,8 +624,7 @@ namespace fan
 			commandBufferBeginInfo.pInheritanceInfo = &commandBufferInheritanceInfo;
 
 			if (vkBeginCommandBuffer(commandBuffer, &commandBufferBeginInfo) == VK_SUCCESS) {
-
-				m_forwardPipeline->Draw(commandBuffer, m_drawData );
+				m_forwardPipeline->Draw(commandBuffer, m_meshDrawArray, m_numMesh );
 				if (vkEndCommandBuffer(commandBuffer) != VK_SUCCESS) {
 					Debug::Get() << Debug::Severity::error << "Could not record command buffer " << _index << "." << Debug::Endl();
 				}
@@ -693,8 +687,6 @@ namespace fan
 			DeleteForwardFramebuffers();
 			CreateForwardFramebuffers();
 			RecordAllCommandBuffers();	
-
-			UpdateSceneUniforms();
 		}	
 
 		//================================================================================================================================
@@ -886,91 +878,8 @@ namespace fan
 
 		//================================================================================================================================
 		//================================================================================================================================
-		void Renderer::RegisterMaterial(Material * _material ) {
-			Model * model = _material->GetEntity()->GetComponent<Model>();
-			if (model != nullptr && model->GetRenderID() >= 0 ) {
-				m_drawData[model->GetRenderID()].material = _material;
-			}
-		}
-
-		//================================================================================================================================
-		//================================================================================================================================
-		void Renderer::UnRegisterMaterial(Material * _material) {
-			Model * model = _material->GetEntity()->GetComponent<Model>();
-			if (model != nullptr && model->GetRenderID() >= 0) {
-				DrawData & drawData = m_drawData[model->GetRenderID()];
-				drawData.material = nullptr;
-				ForwardPipeline::DynamicUniformsMaterial uniform;
-				uniform.textureIndex = 0;
-				m_forwardPipeline->SetDynamicUniformFrag(uniform, model->GetRenderID());
-				m_mustUpdateDynamicUniformsFrag = true;
-			}
-		}
-
-		//================================================================================================================================
-		//================================================================================================================================
-		void Renderer::RegisterModel( Model * _model) {		
-		
-			DrawData * drawData = nullptr;
-
-			// Looks for the model
-			for (int modelIndex = 0; modelIndex < m_drawData.size() ; modelIndex++){
-				if (m_drawData[modelIndex].model == _model) {
-					drawData = &m_drawData[modelIndex];
-					_model->SetRenderID(modelIndex);
-					break;
-				}
-			}
-
-			// no model found -> creates draw data for it
-			if (drawData == nullptr) {
-				// Looks for an empty index
-				int emptyIndex = -1;
-				for (int modelIndex = 0; modelIndex < m_drawData.size(); modelIndex++) {
-					if (m_drawData[modelIndex].model == nullptr) {
-						emptyIndex = modelIndex;
-						break;
-					}
-				}
-
-				// Fills in new data
-				if (emptyIndex < 0) {
-					m_drawData.push_back({});
-					drawData = &m_drawData[m_drawData.size() - 1];
-					_model->SetRenderID(static_cast<int>(m_drawData.size() - 1));
-				} else {
-					drawData = &m_drawData[emptyIndex];
-					_model->SetRenderID(static_cast<int>(emptyIndex));
-				}
-			}
-
-			drawData->model = _model;
-			drawData->transform = _model->GetEntity()->GetComponent<Transform>();
-			drawData->material =  _model->GetEntity()->GetComponent<Material>();
-			drawData->meshData = m_ressourceManager->FindMeshData(_model->GetMesh());
-			drawData->transform->MarkModified(); // Force tranform uniforms update
-
-			for (int boolIndex = 0; boolIndex < m_reloadGeometryCommandBuffers.size(); boolIndex++) {
-				m_reloadGeometryCommandBuffers[boolIndex] = true;
-			}
-		}
-
-		//================================================================================================================================
-		//================================================================================================================================
-		void Renderer::UnRegisterModel(Model * _model) {
-			for (int modelIndex = 0; modelIndex < m_drawData.size(); modelIndex++) {
-				if (m_drawData[modelIndex].model == _model) {
-					m_drawData[modelIndex] = {};
-				}
-			}
-		}
-
-		//================================================================================================================================
-		//================================================================================================================================
 		void Renderer::Clear() {
-			for (int modelIndex = 0; modelIndex < m_drawData.size(); modelIndex++) {
-				m_drawData[modelIndex] = {};				
-			}
+			m_numMesh = 0;
 		}
 
 		//================================================================================================================================
@@ -997,7 +906,6 @@ namespace fan
 			secondaryCommandBufferAllocateInfo.level = VK_COMMAND_BUFFER_LEVEL_SECONDARY;
 			secondaryCommandBufferAllocateInfo.commandBufferCount = m_swapchain->GetSwapchainImagesCount();
 
-			m_reloadGeometryCommandBuffers.resize(m_swapchain->GetSwapchainImagesCount(), false);
 			m_geometryCommandBuffers.resize(m_swapchain->GetSwapchainImagesCount());
 			if (vkAllocateCommandBuffers(m_device->vkDevice, &secondaryCommandBufferAllocateInfo, m_geometryCommandBuffers.data()) != VK_SUCCESS) {
 				Debug::Error( "Could not allocate command buffers." );

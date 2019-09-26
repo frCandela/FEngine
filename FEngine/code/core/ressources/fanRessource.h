@@ -17,7 +17,8 @@ namespace fan {
 		DECLARE_ABSTRACT_TYPE_INFO(Ressource)
 	protected:
 
-		Ressource() {}		
+		Ressource() {}	
+		virtual ~Ressource(){}
 		void SetRessourceID(const uint32_t _ressourceID) { m_ressourceID = _ressourceID; }
 
 	private:

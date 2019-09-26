@@ -1,14 +1,11 @@
 #pragma once
 
-#include "core/memory/fanAlignedMemory.h"
 #include "renderer/fanUniforms.h"
+#include "core/memory/fanAlignedMemory.h"
 
 namespace fan
 {
 	class Mesh;
-	class Model;
-	class Transform;
-	class Material;
 	struct Vertex;
 	struct MeshData;
 	class Device;
@@ -24,46 +21,21 @@ namespace fan
 	//================================================================================================================================
 	class ForwardPipeline {
 	public:
-		struct VertUniforms
-		{
-			glm::mat4 view;
-			glm::mat4 proj;
-		};
-
-		struct FragUniforms
-		{
-			glm::vec3	cameraPosition = glm::vec3(0,0,0);
-		};
-
-		struct DynamicUniformsMaterial {
-			glm::vec3  color = glm::vec3(1);
-			glm::int32 shininess;
-			glm::int32 textureIndex;
-		};
-
-		struct DynamicUniformsVert
-		{
-			glm::mat4 modelMat;
-			glm::mat4 rotationMat;
-		};
-
 		ForwardPipeline(Device& _device, VkRenderPass& _renderPass);
 		~ForwardPipeline();
 
 		void Create(VkExtent2D _extent);
-		void Draw(VkCommandBuffer _commandBuffer, const std::vector< DrawData >& _drawData);
+		void Draw(VkCommandBuffer _commandBuffer, const std::array< Mesh *, s_maximumNumModels > _meshArray, const uint32_t _num );
 		void Resize(VkExtent2D _extent);
 		void ReloadShaders();
-
-		VertUniforms	GetVertUniforms() const { return m_vertUniforms; }
-		void			SetVertUniforms(const VertUniforms _uniforms);
-		FragUniforms	GetFragUniforms() const { return m_fragUniforms; }
-		void			SetFragUniforms(const FragUniforms _fragUniforms);
-
-		void	SetDynamicUniformVert(const DynamicUniformsVert& _dynamicUniform, const uint32_t _index);
-		void	SetDynamicUniformFrag(const DynamicUniformsMaterial& _dynamicUniform, const uint32_t _index);
-
-		void UpdateUniformBuffers( const LightsUniforms  _lightUniforms );
+		void UpdateUniformBuffers();
+		void SetUniformPointers( 
+			LightsUniforms * _lightUniforms, 
+			AlignedMemory<DynamicUniformsVert>* _dynamicUniformsVert, 
+			AlignedMemory<DynamicUniformsMaterial>* _dynamicUniformsFrag ,
+			VertUniforms * _vertUniforms,
+			FragUniforms * _fragUniforms
+		);
 
 		VkPipeline		GetPipeline() { return m_pipeline; }
 		VkImageView		GetDepthImageView();
@@ -96,18 +68,16 @@ namespace fan
 		Buffer *	m_dynamicUniformBufferVert;
 		Buffer *	m_dynamicUniformBufferFrag;
 
-		VertUniforms m_vertUniforms;
-		FragUniforms m_fragUniforms;
+		// Pointer to the uniforms data
+		AlignedMemory<DynamicUniformsVert>*		m_dynamicUniformsVert;
+		AlignedMemory<DynamicUniformsMaterial>* m_dynamicUniformsFrag;
+		LightsUniforms * m_lightUniforms;
+		VertUniforms * m_vertUniforms;
+		FragUniforms * m_fragUniforms;
 
-		AlignedMemory<DynamicUniformsVert> m_dynamicUniformsVert;
-		AlignedMemory<DynamicUniformsMaterial> m_dynamicUniformsFrag;
-
-		size_t m_dynamicAlignmentVert;
-		size_t m_dynamicAlignmentFrag;
-
-		void CreateShaders();
+		void CreateShaders(); 
 		bool CreateDescriptors();
-		bool CreateDescriptorsScene();
+		bool CreateDescriptorsScene(  );
 		bool CreateDescriptorsTextures();
 		bool CreateDepthRessources(VkExtent2D _extent);
 		bool CreatePipeline(VkExtent2D _extent);

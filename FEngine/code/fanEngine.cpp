@@ -7,6 +7,7 @@
 #include "renderer/pipelines/fanDebugPipeline.h"
 #include "renderer/fanMesh.h"
 #include "renderer/util/fanWindow.h"
+#include "renderer/core/fanTexture.h"
 #include "core/fanTime.h"
 #include "core/input/fanInput.h"
 #include "core/input/fanKeyboard.h"
@@ -82,11 +83,9 @@ namespace fan {
 		m_scene->s_onSceneLoad.Connect(&Engine::OnSceneLoad, this);
 		m_scene->New();
 
-		Scene::s_onSceneClear.Connect			( &Renderer::Clear,					&Renderer::Get());
-		Material::onMaterialAttach.Connect		( &Renderer::RegisterMaterial,		&Renderer::Get() );
-		Material::onMaterialDetach.Connect		( &Renderer::UnRegisterMaterial,	&Renderer::Get());		
-		Model::onRegisterModel.Connect			( &Renderer::RegisterModel,			&Renderer::Get());
-		Model::onUnRegisterModel.Connect		( &Renderer::UnRegisterModel,		&Renderer::Get());
+		Scene::s_onSceneClear.Connect			( &Renderer::Clear,				&Renderer::Get());
+		Model::onRegisterModel.Connect			( &Engine::RegisterModel,		 this );
+		Model::onUnRegisterModel.Connect		( &Engine::UnRegisterModel,		 this );
 		PointLight::onPointLightAttach.Connect	( &Engine::RegisterPointLight,	 this );
 		PointLight::onPointLightDetach.Connect	( &Engine::UnRegisterPointLight, this );
 		DirectionalLight::onDirectionalLightAttach.Connect	( &Engine::RegisterDirectionalLight,   this );
@@ -324,8 +323,7 @@ namespace fan {
 			renderer.SetMainCamera( m_mainCamera->GetProjection(), m_mainCamera->GetView(), ToGLM(cameraTransform->GetPosition()));
 		}
 
-		// Point lights
-		Renderer::Get().SetNumPointLights( static_cast<uint32_t>( m_pointLights.size() ) );
+		// Point lights		
 		for ( int lightIndex = 0; lightIndex < m_pointLights.size(); lightIndex++ ) {
 			const PointLight * light = m_pointLights[lightIndex];
 			const Transform *  lightTransform = light->GetEntity()->GetComponent<Transform>();
@@ -337,10 +335,9 @@ namespace fan {
 				light->GetAmbiant().ToGLM(),
 				light->GetAttenuation()
 			);
-		}	
+		}	Renderer::Get().SetNumPointLights( static_cast<uint32_t>( m_pointLights.size() ) );
 		
-		// Directional lights
-		Renderer::Get().SetNumDirectionalLights( static_cast<uint32_t>( m_directionalLights.size() ));
+		// Directional lights		
 		for ( int lightIndex = 0; lightIndex < m_directionalLights.size(); lightIndex++ ) {
 			const DirectionalLight * light			= m_directionalLights[lightIndex];
 			const Transform *		 lightTransform = light->GetEntity()->GetComponent<Transform>();
@@ -351,7 +348,25 @@ namespace fan {
 				,light->GetDiffuse().ToGLM()
 				,light->GetSpecular().ToGLM()
 			);
-		}
+		} Renderer::Get().SetNumDirectionalLights( static_cast<uint32_t>( m_directionalLights.size() ) );
+
+		// Transforms, mesh, materials
+		for (int modelIndex = 0; modelIndex < m_models.size() ; modelIndex++) {
+			Model * model = m_models[modelIndex];
+			Transform * transform = model->GetEntity()->GetComponent<Transform>();
+			Material * material = model->GetEntity()->GetComponent<Material>();
+
+			Renderer::Get().SetMeshAt( modelIndex, model->GetMesh() );
+			Renderer::Get().SetTransformAt( modelIndex, transform->GetModelMatrix(), transform->GetRotationMat() );
+			if ( material != nullptr ) {
+				Renderer::Get().SetMaterialAt( modelIndex, material->GetColor().ToGLM(), material->GetShininess(), material->GetTexture()->GetRenderID() );
+			} else {
+				Renderer::Get().SetMaterialAt( modelIndex, Color::White.ToGLM(), 1, 0 );
+			}
+
+		} Renderer::Get().SetNumMesh( static_cast<uint32_t>( m_models.size() ) );
+
+		// Materials
 
 	}
 
@@ -589,6 +604,29 @@ namespace fan {
 		if ( m_pointLights.size() == num ) {
 			Debug::Get() << Debug::Severity::warning << "Trying to remove a non registered point light! entity=" << _pointLight->GetEntity()->GetName() << Debug::Endl();
 			return;
+		}
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
+	void Engine::RegisterModel( Model * _model ) {
+		// Looks for the model
+		for ( int modelIndex = 0; modelIndex < m_models.size(); modelIndex++ ) {
+			if ( m_models[modelIndex] == _model ) {
+				Debug::Get() << Debug::Severity::warning << "Model already registered : " << _model->GetEntity()->GetName() << Debug::Endl();
+				return;
+			}
+		}
+		m_models.push_back( _model );
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
+	void Engine::UnRegisterModel( Model * _model ) {
+		for ( int modelIndex = 0; modelIndex < m_models.size(); modelIndex++ ) {
+			if ( m_models[modelIndex] == _model ) {
+				m_models.erase( m_models.begin() + modelIndex );
+			}
 		}
 	}
 }

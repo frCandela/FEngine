@@ -11,7 +11,6 @@
 #include "renderer/core/fanSampler.h"
 #include "renderer/fanRenderer.h"
 #include "renderer/util/fanVertex.h"
-#include "scene/components/fanModel.h"
 #include "renderer/fanMesh.h"
 
 namespace fan
@@ -24,23 +23,6 @@ namespace fan
 
 		m_sampler = new Sampler(_device);
 		m_sampler->CreateSampler(0, 8);
-
-		// Calculate required alignment based on minimum device offset alignment
-		size_t minUboAlignment = _device.GetDeviceProperties().limits.minUniformBufferOffsetAlignment;
-		m_dynamicAlignmentVert = sizeof(DynamicUniformsVert);
-		m_dynamicAlignmentFrag = sizeof(DynamicUniformsMaterial);
-		if (minUboAlignment > 0) {
-			m_dynamicAlignmentVert = ((sizeof(DynamicUniformsVert) + minUboAlignment - 1) & ~(minUboAlignment - 1));
-			m_dynamicAlignmentFrag = ((sizeof(DynamicUniformsMaterial) + minUboAlignment - 1) & ~(minUboAlignment - 1));
-		}
-		m_dynamicUniformsVert.Resize(s_maximumNumModels * m_dynamicAlignmentVert, m_dynamicAlignmentVert);
-		m_dynamicUniformsFrag.Resize(s_maximumNumModels * m_dynamicAlignmentFrag, m_dynamicAlignmentFrag);
-
-		for ( int uniformIndex = 0; uniformIndex < s_maximumNumModels; uniformIndex++ ) {
-			m_dynamicUniformsFrag [uniformIndex].color = glm::vec3(1);
-			m_dynamicUniformsFrag [uniformIndex].textureIndex = 0;
-			m_dynamicUniformsFrag [uniformIndex].shininess = 1;
-		}
 	}
 
 	//================================================================================================================================
@@ -74,9 +56,6 @@ namespace fan
 		CreateDepthRessources(_extent);
 		CreateDescriptors();
 		CreatePipeline(_extent);
-
-		SetVertUniforms(m_vertUniforms);
-		SetFragUniforms(m_fragUniforms);
 	}
 
 	//================================================================================================================================
@@ -88,12 +67,28 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void ForwardPipeline::UpdateUniformBuffers( const LightsUniforms _lightUniforms ) {
-		m_dynamicUniformBufferVert->SetData(&m_dynamicUniformsVert[0], m_dynamicUniformsVert.GetSize());
-		m_dynamicUniformBufferFrag->SetData(&m_dynamicUniformsFrag[0], m_dynamicUniformsFrag.GetSize());
-		m_vertUniformBuffer->SetData(&m_vertUniforms, sizeof(VertUniforms));
-		m_fragUniformBuffer->SetData(&m_fragUniforms, sizeof(FragUniforms));
-		m_pointLightUniformBuffer->SetData(&_lightUniforms, sizeof(LightsUniforms));
+	void ForwardPipeline::SetUniformPointers( 
+		LightsUniforms * _lightUniforms,
+		AlignedMemory<DynamicUniformsVert>* _dynamicUniformsVert, 
+		AlignedMemory<DynamicUniformsMaterial>* _dynamicUniformsFrag,
+		VertUniforms * _vertUniforms,
+		FragUniforms * _fragUniforms )
+	{
+		m_lightUniforms		  = _lightUniforms;
+		m_dynamicUniformsVert = _dynamicUniformsVert;
+		m_dynamicUniformsFrag = _dynamicUniformsFrag;
+		m_vertUniforms = _vertUniforms;
+		m_fragUniforms = _fragUniforms;
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
+	void ForwardPipeline::UpdateUniformBuffers() {
+		m_dynamicUniformBufferVert->SetData(&(*m_dynamicUniformsVert)[0], m_dynamicUniformsVert->GetSize());
+		m_dynamicUniformBufferFrag->SetData(&(*m_dynamicUniformsFrag)[0], m_dynamicUniformsFrag->GetSize());
+		m_vertUniformBuffer->SetData(&(*m_vertUniforms), sizeof(VertUniforms));
+		m_fragUniformBuffer->SetData(&(*m_fragUniforms), sizeof(FragUniforms));
+		m_pointLightUniformBuffer->SetData( m_lightUniforms, sizeof(LightsUniforms));
 	}
 
 	//================================================================================================================================
@@ -104,49 +99,24 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void ForwardPipeline::SetVertUniforms(const VertUniforms _vertUniforms) {
-		m_vertUniforms = _vertUniforms;
-	}
-
-	//================================================================================================================================
-	//================================================================================================================================
-	void ForwardPipeline::SetFragUniforms(const FragUniforms _fragUniforms) {
-		m_fragUniforms = _fragUniforms;
-	}
-
-	//================================================================================================================================
-	//================================================================================================================================
-	void ForwardPipeline::SetDynamicUniformVert(const DynamicUniformsVert& _dynamicUniform, const uint32_t _index) {
-		assert(_index < s_maximumNumModels);
-		m_dynamicUniformsVert[_index] = _dynamicUniform;
-	}
-
-	//================================================================================================================================
-	//================================================================================================================================
-	void ForwardPipeline::SetDynamicUniformFrag(const DynamicUniformsMaterial& _dynamicUniform, const uint32_t _index) {
-		assert(_index < s_maximumNumModels);
-		m_dynamicUniformsFrag[_index] = _dynamicUniform;
-	}
-
-	//================================================================================================================================
-	//================================================================================================================================
-	void ForwardPipeline::Draw(VkCommandBuffer _commandBuffer, const std::vector< DrawData >& _drawData) {
+	void ForwardPipeline::Draw(VkCommandBuffer _commandBuffer, const std::array< Mesh *, s_maximumNumModels > _meshArray, const uint32_t _num ) {
 		vkCmdBindPipeline(_commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, m_pipeline);
 
 		VkDeviceSize offsets[] = { 0 };
 
-		for (int drawDataIndex = 0; drawDataIndex < _drawData.size(); drawDataIndex++) {
-			const DrawData&  drawData = _drawData[drawDataIndex];
+		for (uint32_t meshIndex = 0; meshIndex < _num; meshIndex++) {
+			Mesh * mesh = _meshArray[meshIndex];
 
-			if (drawData.model != nullptr) {
-
-				VkBuffer vertexBuffers[] = { drawData.meshData->vertexBuffer->GetBuffer() };
+			if (mesh != nullptr) {
+				assert( mesh->GetVertexBuffer() != nullptr );
+				assert( mesh->GetIndexBuffer() != nullptr );
+				VkBuffer vertexBuffers[] = { mesh->GetVertexBuffer()->GetBuffer() };
 				vkCmdBindVertexBuffers(_commandBuffer, 0, 1, vertexBuffers, offsets);
-				vkCmdBindIndexBuffer(_commandBuffer, drawData.meshData->indexBuffer->GetBuffer(), 0, VK_INDEX_TYPE_UINT32);
+				vkCmdBindIndexBuffer(_commandBuffer, mesh->GetIndexBuffer()->GetBuffer(), 0, VK_INDEX_TYPE_UINT32);
 
 				std::vector<uint32_t> dynamicOffsets = {
-					drawDataIndex  * static_cast<uint32_t>(m_dynamicAlignmentVert)
-					,	drawDataIndex  * static_cast<uint32_t>(m_dynamicAlignmentFrag)
+					meshIndex  * static_cast<uint32_t>( m_dynamicUniformsVert->GetAlignment())
+					,meshIndex  * static_cast<uint32_t>( m_dynamicUniformsFrag->GetAlignment() )
 				};
 
 				std::vector<VkDescriptorSet> descriptors = {
@@ -164,7 +134,7 @@ namespace fan
 					static_cast<uint32_t>(dynamicOffsets.size()),
 					dynamicOffsets.data()
 				);
-				vkCmdDrawIndexed(_commandBuffer, static_cast<uint32_t>(drawData.meshData->mesh->GetIndices().size()), 1, 0, 0, 0);
+				vkCmdDrawIndexed(_commandBuffer, static_cast<uint32_t>(mesh->GetIndices().size()), 1, 0, 0, 0);
 			}
 		}
 	}
@@ -185,7 +155,7 @@ namespace fan
 	//================================================================================================================================
 	//================================================================================================================================
 	bool ForwardPipeline::CreateDescriptors() {
-		return 		CreateDescriptorsScene()
+		return CreateDescriptorsScene()
 			&& CreateDescriptorsTextures();
 	}
 
@@ -303,7 +273,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	bool ForwardPipeline::CreateDescriptorsScene() {
+	bool ForwardPipeline::CreateDescriptorsScene( ) {
 		// LAYOUTS
 		VkDescriptorSetLayoutBinding uboLayoutBinding;
 		uboLayoutBinding.binding = 0;
@@ -475,7 +445,7 @@ namespace fan
 		{
 			m_dynamicUniformBufferVert = new Buffer(m_device);
 			m_dynamicUniformBufferVert->Create(
-				m_dynamicUniformsVert.GetSize() * m_dynamicAlignmentVert,
+				m_dynamicUniformsVert->GetSize() * m_dynamicUniformsVert->GetAlignment(),
 				VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT,
 				VK_MEMORY_PROPERTY_HOST_COHERENT_BIT | VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT
 			);
@@ -483,7 +453,7 @@ namespace fan
 
 			dynamicDescriptorBufferInfo.buffer = m_dynamicUniformBufferVert->GetBuffer();
 			dynamicDescriptorBufferInfo.offset = 0;
-			dynamicDescriptorBufferInfo.range = m_dynamicAlignmentVert;
+			dynamicDescriptorBufferInfo.range = m_dynamicUniformsVert->GetAlignment();
 
 			dynamicWriteDescriptorSet.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
 			dynamicWriteDescriptorSet.pNext = nullptr;
@@ -503,14 +473,14 @@ namespace fan
 		{
 			m_dynamicUniformBufferFrag = new Buffer(m_device);
 			m_dynamicUniformBufferFrag->Create(
-				m_dynamicUniformsFrag.GetSize() * m_dynamicAlignmentFrag,
+				m_dynamicUniformsFrag->GetSize() * m_dynamicUniformsFrag->GetAlignment(),
 				VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT,
 				VK_MEMORY_PROPERTY_HOST_COHERENT_BIT | VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT
 			);
 
 			dynamicFragDescriptorBufferInfo.buffer = m_dynamicUniformBufferFrag->GetBuffer();
 			dynamicFragDescriptorBufferInfo.offset = 0;
-			dynamicFragDescriptorBufferInfo.range = m_dynamicAlignmentFrag;
+			dynamicFragDescriptorBufferInfo.range = m_dynamicUniformsFrag->GetAlignment();
 
 			dynamicFragWriteDescriptorSet.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
 			dynamicFragWriteDescriptorSet.pNext = nullptr;

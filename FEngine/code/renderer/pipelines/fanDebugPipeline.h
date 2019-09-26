@@ -7,32 +7,21 @@ namespace fan
 	class Image;
 	class ImageView;
 	class Buffer;
+	struct DebugUniforms;
 
 	//================================================================================================================================
 	//================================================================================================================================
 	class DebugPipeline {
 	public:
-
-		struct Uniforms
-		{
-			glm::mat4 model;
-			glm::mat4 view;
-			glm::mat4 proj;
-			glm::vec4 color;
-		};
-
 		DebugPipeline(Device& _device, VkRenderPass& _renderPass, const VkPrimitiveTopology _primitiveTopology, const bool _depthTestEnable);
 		~DebugPipeline();
 
 		void Create(VkExtent2D _extent, const char * _fragShaderPath, const char * _vertShaderPath);
 		void Draw(VkCommandBuffer _commandBuffer, Buffer& _vertexBuffer, const uint32_t _count);
-
 		void Resize(VkExtent2D _extent);
 		void ReloadShaders();
-
-		Uniforms	GetUniforms() const { return m_uniforms; }
-		void		SetUniforms(const Uniforms _uniforms);
-
+		void SetUniformPointers( DebugUniforms * _debugUniforms	);
+		void UpdateUniformBuffers();
 		VkPipeline		GetPipeline() { return m_pipeline; }
 
 	private:
@@ -50,7 +39,7 @@ namespace fan
 		Shader * m_fragmentShader = nullptr;
 		Shader * m_vertexShader = nullptr;
 		Buffer * m_uniformBuffer;
-		Uniforms m_uniforms;
+		DebugUniforms  * m_debugUniforms;
 
 		bool m_depthTestEnable;
 

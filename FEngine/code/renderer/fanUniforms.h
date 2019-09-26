@@ -23,10 +23,38 @@ namespace fan {
 		alignas( 4 ) glm::float32	_0;
 	};
 
+	struct DynamicUniformsMaterial {
+		glm::vec3  color = glm::vec3( 1 );
+		glm::int32 shininess;
+		glm::int32 textureIndex;
+	};
+
+	struct DynamicUniformsVert {
+		glm::mat4 modelMat;
+		glm::mat4 rotationMat;
+	};
+
 	struct LightsUniforms {
-		DirectionalLightUniform dirLights[s_maximumNumDirectionalLights];
-		PointLightUniform		pointlights[s_maximumNumPointLights];
-		uint32_t   dirLightsNum;
-		uint32_t   pointLightNum;
+ 		DirectionalLightUniform dirLights[s_maximumNumDirectionalLights];
+ 		PointLightUniform		pointlights[s_maximumNumPointLights];
+		uint32_t				dirLightsNum;
+		uint32_t				pointLightNum;
+	};
+
+	struct VertUniforms {
+		glm::mat4 view;
+		glm::mat4 proj;
+	};
+
+	struct FragUniforms {
+		glm::vec3	cameraPosition = glm::vec3( 0, 0, 0 );
+	};
+
+
+	struct DebugUniforms {
+		glm::mat4 model;
+		glm::mat4 view;
+		glm::mat4 proj;
+		glm::vec4 color;
 	};
 }

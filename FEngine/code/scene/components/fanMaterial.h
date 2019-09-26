@@ -21,8 +21,8 @@ namespace fan
 		void			SetTexture( Texture * const _texture);
 		Texture *		GetTexture() { return m_texture; }
 		const Texture *	GetTexture() const { return m_texture; }
-		void			SetShininess(const int _shininess);
-		const int		GetShininess() const { return m_shininess;  }
+		void			SetShininess(const uint32_t _shininess );
+		const uint32_t	GetShininess() const { return m_shininess;  }
 		Color			GetColor() const	 {	return m_color;		}
 		void			SetColor( const Color _color );
 
@@ -37,7 +37,7 @@ namespace fan
 
 	private:
 		Texture * m_texture = nullptr;
-		int  m_shininess = 1;
+		uint32_t  m_shininess = 1;
 		Color m_color = Color::White;
 
 		// Editor
