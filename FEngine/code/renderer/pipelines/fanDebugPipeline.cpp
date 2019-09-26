@@ -6,9 +6,11 @@
 #include "renderer/core/fanImage.h"
 #include "renderer/core/fanImageView.h" 
 #include "renderer/core/fanBuffer.h"
+#include "renderer/core/fanDescriptor.h"
 #include "renderer/fanRenderer.h"
 #include "renderer/util/fanVertex.h"
 #include "renderer/fanUniforms.h"
+
 
 namespace fan
 {
@@ -18,15 +20,16 @@ namespace fan
 		m_device(_device)
 		, m_renderPass(_renderPass)
 		, m_primitiveTopology(_primitiveTopology)
-		, m_depthTestEnable(_depthTestEnable) {
+		, m_depthTestEnable(_depthTestEnable)
+	{
+
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
 	DebugPipeline::~DebugPipeline() {
 		DeletePipeline();
-		DeleteDescriptors();
-
+		delete m_descriptor;
 		delete m_fragmentShader;
 		delete m_vertexShader;
 	}
@@ -35,16 +38,20 @@ namespace fan
 	//================================================================================================================================
 	void DebugPipeline::Create(VkExtent2D _extent, const char * _vertShaderPath, const char * _fragShaderPath) {
 		CreateShaders(_vertShaderPath, _fragShaderPath);
-		CreateDescriptors();
+		m_descriptor = new Descriptor( m_device );
+		m_descriptor->AddBinding( VK_SHADER_STAGE_VERTEX_BIT, sizeof( DebugUniforms ) );
+		m_descriptor->Create();
 		CreatePipeline(_extent);
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
 	void DebugPipeline::Resize(VkExtent2D _extent) {
-		DeleteDescriptors();
+		delete m_descriptor;
 		DeletePipeline();
-		CreateDescriptors();
+		m_descriptor = new Descriptor( m_device );
+		m_descriptor->AddBinding( VK_SHADER_STAGE_VERTEX_BIT, sizeof( DebugUniforms ) );
+		m_descriptor->Create();
 		CreatePipeline(_extent);
 	}
 
@@ -64,7 +71,7 @@ namespace fan
 	//================================================================================================================================
 	//================================================================================================================================
 	void DebugPipeline::UpdateUniformBuffers() {
-		m_uniformBuffer->SetData( &(*m_debugUniforms), sizeof( DebugUniforms ) );
+		m_descriptor->SetBinding( 0, &( *m_debugUniforms ), sizeof( DebugUniforms ) );
 	}
 
 	//================================================================================================================================
@@ -77,7 +84,7 @@ namespace fan
 
 			VkDeviceSize offsets[] = { 0 };
 			vkCmdBindVertexBuffers(_commandBuffer, 0, 1, vertexBuffers, offsets);
-			vkCmdBindDescriptorSets(_commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, m_pipelineLayout, 0, 1, &m_descriptorSet, 0, nullptr);
+			m_descriptor->Bind(0, _commandBuffer, m_pipelineLayout );
 			vkCmdDraw(_commandBuffer, static_cast<uint32_t>(_count), 1, 0, 0);
 		}
 	}
@@ -93,107 +100,6 @@ namespace fan
 
 		m_vertexShader = new Shader(m_device);
 		m_vertexShader->Create(_vertShaderPath);
-	}
-
-	//================================================================================================================================
-	//================================================================================================================================
-	bool DebugPipeline::CreateDescriptors() {
-		VkDescriptorSetLayoutBinding uboLayoutBinding;
-		uboLayoutBinding.binding = 0;
-		uboLayoutBinding.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
-		uboLayoutBinding.descriptorCount = 1;
-		uboLayoutBinding.stageFlags = VK_SHADER_STAGE_VERTEX_BIT;
-		uboLayoutBinding.pImmutableSamplers = nullptr;
-
-		std::vector< VkDescriptorSetLayoutBinding > layoutBindings = {
-			uboLayoutBinding
-		};
-
-		VkDescriptorSetLayoutCreateInfo descriptorSetLayoutCreateInfo = {};
-		descriptorSetLayoutCreateInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
-		descriptorSetLayoutCreateInfo.pNext = nullptr;
-		descriptorSetLayoutCreateInfo.flags = 0;
-		descriptorSetLayoutCreateInfo.bindingCount = static_cast<uint32_t>(layoutBindings.size());
-		descriptorSetLayoutCreateInfo.pBindings = layoutBindings.data();
-
-		if (vkCreateDescriptorSetLayout(m_device.vkDevice, &descriptorSetLayoutCreateInfo, nullptr, &m_descriptorSetLayout) != VK_SUCCESS) {
-			Debug::Error("Could not allocate descriptor set layout.");
-			return false;
-		}
-		Debug::Get() << Debug::Severity::log << std::hex << "VkDescriptorSetLayout " << m_descriptorSetLayout << std::dec << Debug::Endl();
-
-		std::vector< VkDescriptorPoolSize > poolSizes(1);
-		poolSizes[0].type = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
-		poolSizes[0].descriptorCount = 1;
-
-		VkDescriptorPoolCreateInfo descriptorPoolCreateInfo = {};
-		descriptorPoolCreateInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
-		descriptorPoolCreateInfo.pNext = nullptr;
-		descriptorPoolCreateInfo.flags = 0;
-		descriptorPoolCreateInfo.maxSets = 1;
-		descriptorPoolCreateInfo.poolSizeCount = static_cast<uint32_t>(poolSizes.size());
-		descriptorPoolCreateInfo.pPoolSizes = poolSizes.data();
-
-		if (vkCreateDescriptorPool(m_device.vkDevice, &descriptorPoolCreateInfo, nullptr, &m_descriptorPool) != VK_SUCCESS) {
-			Debug::Error("Could not allocate descriptor pool.");
-			return false;
-		}
-		Debug::Get() << Debug::Severity::log << std::hex << "VkDescriptorPool      " << m_descriptorPool << std::dec << Debug::Endl();
-
-		std::vector< VkDescriptorSetLayout > descriptorSetLayouts = {
-			m_descriptorSetLayout
-		};
-
-		VkDescriptorSetAllocateInfo descriptorSetAllocateInfo;
-		descriptorSetAllocateInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
-		descriptorSetAllocateInfo.pNext = nullptr;
-		descriptorSetAllocateInfo.descriptorPool = m_descriptorPool;
-		descriptorSetAllocateInfo.descriptorSetCount = static_cast<uint32_t>(descriptorSetLayouts.size());
-		descriptorSetAllocateInfo.pSetLayouts = descriptorSetLayouts.data();
-
-		std::vector<VkDescriptorSet> descriptorSets(descriptorSetLayouts.size());
-		if (vkAllocateDescriptorSets(m_device.vkDevice, &descriptorSetAllocateInfo, descriptorSets.data()) != VK_SUCCESS) {
-			Debug::Error("Could not allocate descriptor set.");
-			return false;
-		}
-		m_descriptorSet = descriptorSets[0];
-		Debug::Get() << Debug::Severity::log << std::hex << "VkDescriptorSet       " << m_descriptorSet << std::dec << Debug::Endl();
-
-		m_uniformBuffer = new Buffer(m_device);
-		m_uniformBuffer->Create(
-			sizeof(DebugUniforms),
-			VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT,
-			VK_MEMORY_PROPERTY_HOST_COHERENT_BIT | VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT
-		);
-
-		VkDescriptorBufferInfo uboDescriptorBufferInfo = {};
-		uboDescriptorBufferInfo.buffer = m_uniformBuffer->GetBuffer();
-		uboDescriptorBufferInfo.offset = 0;
-		uboDescriptorBufferInfo.range = sizeof(DebugUniforms);
-
-		VkWriteDescriptorSet uboWriteDescriptorSet = {};
-		uboWriteDescriptorSet.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-		uboWriteDescriptorSet.pNext = nullptr;
-		uboWriteDescriptorSet.dstSet = m_descriptorSet;
-		uboWriteDescriptorSet.dstBinding = 0;
-		uboWriteDescriptorSet.dstArrayElement = 0;
-		uboWriteDescriptorSet.descriptorCount = 1;
-		uboWriteDescriptorSet.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
-		uboWriteDescriptorSet.pImageInfo = nullptr;
-		uboWriteDescriptorSet.pBufferInfo = &uboDescriptorBufferInfo;
-		//uboWriteDescriptorSet.pTexelBufferView = nullptr;
-
-		std::vector<VkWriteDescriptorSet> writeDescriptors = { uboWriteDescriptorSet };
-
-		vkUpdateDescriptorSets(
-			m_device.vkDevice,
-			static_cast<uint32_t>(writeDescriptors.size()),
-			writeDescriptors.data(),
-			0,
-			nullptr
-		);
-
-		return true;
 	}
 
 	//================================================================================================================================
@@ -332,7 +238,8 @@ namespace fan
 		dynamicStateCreateInfo.pDynamicStates = dynamicStates.data();
 
 		std::vector<VkDescriptorSetLayout> descriptorSetLayouts = {
-			m_descriptorSetLayout
+			//m_descriptorSetLayout
+			m_descriptor->GetLayout()
 		};
 		std::vector<VkPushConstantRange> pushConstantRanges(0);
 
@@ -410,21 +317,5 @@ namespace fan
 			vkDestroyPipeline(m_device.vkDevice, m_pipeline, nullptr);
 			m_pipeline = VK_NULL_HANDLE;
 		}
-	}
-
-	//================================================================================================================================
-	//================================================================================================================================
-	void DebugPipeline::DeleteDescriptors() {
-
-		if (m_descriptorPool != VK_NULL_HANDLE) {
-			vkDestroyDescriptorPool(m_device.vkDevice, m_descriptorPool, nullptr);
-			m_descriptorPool = VK_NULL_HANDLE;
-		}
-
-		if (m_descriptorSetLayout != VK_NULL_HANDLE) {
-			vkDestroyDescriptorSetLayout(m_device.vkDevice, m_descriptorSetLayout, nullptr);
-			m_descriptorSetLayout = VK_NULL_HANDLE;
-		}
-		delete m_uniformBuffer;
 	}
 }

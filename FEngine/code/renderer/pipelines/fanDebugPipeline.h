@@ -7,7 +7,9 @@ namespace fan
 	class Image;
 	class ImageView;
 	class Buffer;
+	class Descriptor;
 	struct DebugUniforms;
+
 
 	//================================================================================================================================
 	//================================================================================================================================
@@ -22,32 +24,25 @@ namespace fan
 		void ReloadShaders();
 		void SetUniformPointers( DebugUniforms * _debugUniforms	);
 		void UpdateUniformBuffers();
-		VkPipeline		GetPipeline() { return m_pipeline; }
+		VkPipeline	GetPipeline() { return m_pipeline; }
 
 	private:
 		Device& m_device;
-		VkRenderPass& m_renderPass;
-		VkPrimitiveTopology m_primitiveTopology;
 
+		VkRenderPass&		m_renderPass;
 		VkPipelineLayout	m_pipelineLayout;
 		VkPipeline			m_pipeline;
 
-		VkDescriptorSetLayout	m_descriptorSetLayout;
-		VkDescriptorPool		m_descriptorPool;
-		VkDescriptorSet			m_descriptorSet;
-
-		Shader * m_fragmentShader = nullptr;
-		Shader * m_vertexShader = nullptr;
-		Buffer * m_uniformBuffer;
 		DebugUniforms  * m_debugUniforms;
+		Descriptor *	 m_descriptor;
+		Shader *		 m_fragmentShader = nullptr;
+		Shader *		 m_vertexShader = nullptr;
 
-		bool m_depthTestEnable;
+		VkPrimitiveTopology m_primitiveTopology;
+		bool				m_depthTestEnable;
 
 		void CreateShaders(const char * _vertShaderPath, const char * _fragShaderPath);
-		bool CreateDescriptors();
 		bool CreatePipeline(VkExtent2D _extent);
-
 		void DeletePipeline();
-		void DeleteDescriptors();
 	};
 }

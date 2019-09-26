@@ -24,6 +24,7 @@ namespace fan
 		VkBuffer		GetBuffer() { return m_buffer; }
 		VkDeviceMemory	GetMemory() { return m_memory; }
 		void *			GetMappedData() { return m_mappedData; }
+		VkDeviceSize	GetSize()	{ return m_size;}
 
 	private:
 		Device & m_device;
