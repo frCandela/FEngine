@@ -84,7 +84,7 @@ namespace fan
 	}
 
 	//================================================================================================================================
-//================================================================================================================================
+	//================================================================================================================================
 	bool ForwardPipeline::CreateDescriptors() {
 		delete m_sceneDescriptor;
 		m_sceneDescriptor = new Descriptor( m_device );
@@ -96,7 +96,12 @@ namespace fan
 
 		delete m_texturesDescriptor;
 		m_texturesDescriptor = new  Descriptor( m_device );
-		m_texturesDescriptor->AddImageSamplerBinding( VK_SHADER_STAGE_FRAGMENT_BIT, Renderer::Get().GetRessourceManager()->GetTextures(), m_sampler );
+		std::vector< Texture * > & textures = Renderer::Get().GetRessourceManager()->GetTextures();
+		std::vector< VkImageView > imageViews( textures .size());
+		for (int textureIndex = 0; textureIndex < textures.size(); textureIndex++) {
+			imageViews[textureIndex] = textures[textureIndex]->GetImageView();
+		}
+		m_texturesDescriptor->AddImageSamplerBinding( VK_SHADER_STAGE_FRAGMENT_BIT, imageViews, m_sampler->GetSampler() );
 
 		return m_sceneDescriptor->Create() && m_texturesDescriptor->Create();
 	}

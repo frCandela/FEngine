@@ -3,8 +3,6 @@
 
 #include "renderer/core/fanDevice.h"
 #include "renderer/core/fanBuffer.h"
-#include "renderer/core/fanTexture.h"
-#include "renderer/core/fanSampler.h"
 
 namespace fan {
 	//================================================================================================================================
@@ -52,10 +50,10 @@ namespace fan {
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void Descriptor::AddImageSamplerBinding( VkShaderStageFlags  _stage, std::vector< Texture * > & _textures, Sampler * _sampler ) {
+	void Descriptor::AddImageSamplerBinding( VkShaderStageFlags  _stage, std::vector< VkImageView > & _imageViews, VkSampler _sampler ) {
 		BindingData bindingData;
-		bindingData.SetImagesSampler( _textures, _sampler );
-		bindingData.UpdateLayoutBinding( m_bindingData.size(), _stage, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, _textures.size() );
+		bindingData.SetImagesSampler( _imageViews, _sampler );
+		bindingData.UpdateLayoutBinding( m_bindingData.size(), _stage, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, _imageViews.size() );
 		m_bindingData.push_back( bindingData );
 	}
 
@@ -178,14 +176,14 @@ namespace fan {
 	//================================================================================================================================
 	// Descriptor::BindingData
 	//================================================================================================================================
-	void Descriptor::BindingData::SetImagesSampler( std::vector< Texture * > & _textures, Sampler * _sampler ) {
+	void Descriptor::BindingData::SetImagesSampler( std::vector< VkImageView > & _imageViews, VkSampler _sampler ) {
 		assert( descriptorsImageInfo.empty() );
-		descriptorsImageInfo.reserve( _textures.size() );
-		for ( int textureIndex = 0; textureIndex < _textures.size(); textureIndex++ ) {
+		descriptorsImageInfo.reserve( _imageViews.size() );
+		for ( int viewIndex = 0; viewIndex < _imageViews.size(); viewIndex++ ) {
 			VkDescriptorImageInfo imageInfo;
 			imageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
-			imageInfo.imageView = _textures[textureIndex]->GetImageView();
-			imageInfo.sampler = _sampler->GetSampler();
+			imageInfo.imageView = _imageViews[viewIndex];
+			imageInfo.sampler = _sampler;
 			descriptorsImageInfo.push_back( imageInfo );
 		}
 	}

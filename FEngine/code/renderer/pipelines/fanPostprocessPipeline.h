@@ -8,6 +8,7 @@ namespace fan
 	class Image;
 	class ImageView;
 	class Buffer;
+	class Descriptor;
 
 	//================================================================================================================================
 	//================================================================================================================================
@@ -46,24 +47,18 @@ namespace fan
 		VkRenderPass& m_renderPass;
 		VkFormat m_format;
 
-
 		VkPipelineLayout	m_pipelineLayout;
 		VkPipeline			m_pipeline;
 
 		Shader * m_fragmentShader = nullptr;
 		Shader * m_vertexShader = nullptr;
 
+		Descriptor *	m_descriptor = nullptr;
 		Sampler *		m_sampler;
 		Image *			m_image;
 		ImageView *		m_imageView;
 
-		VkDescriptorSetLayout	m_descriptorSetLayout;
-		VkDescriptorPool		m_descriptorPool;
-		VkDescriptorSet			m_descriptorSet;
-
-		Buffer * m_uniformBuffer;
 		Buffer * m_vertexBuffer;
-
 		Uniforms m_uniforms;
 	};
 }
