@@ -12,7 +12,7 @@ namespace fan
 		~Buffer();
 
 		void Destroy();
-		bool Create(VkDeviceSize _size, VkBufferUsageFlags _usage, VkMemoryPropertyFlags _memoryProperties);
+		bool Create(VkDeviceSize _size, VkBufferUsageFlags _usage, VkMemoryPropertyFlags _memoryProperties, VkDeviceSize  _alignement = 1 );
 
 		void		SetData(const void * _data, VkDeviceSize _size, VkDeviceSize _offset = 0);
 		VkResult	Bind(VkDeviceSize _offset = 0);
@@ -25,6 +25,7 @@ namespace fan
 		VkDeviceMemory	GetMemory() { return m_memory; }
 		void *			GetMappedData() { return m_mappedData; }
 		VkDeviceSize	GetSize()	{ return m_size;}
+		VkDeviceSize	GetAlignment() { return m_alignment; }
 
 	private:
 		Device & m_device;

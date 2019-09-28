@@ -39,7 +39,7 @@ namespace fan
 	void DebugPipeline::Create(VkExtent2D _extent, const char * _vertShaderPath, const char * _fragShaderPath) {
 		CreateShaders(_vertShaderPath, _fragShaderPath);
 		m_descriptor = new Descriptor( m_device );
-		m_descriptor->AddBinding( VK_SHADER_STAGE_VERTEX_BIT, sizeof( DebugUniforms ) );
+		m_descriptor->AddUniformBinding( VK_SHADER_STAGE_VERTEX_BIT, sizeof( DebugUniforms ) );
 		m_descriptor->Create();
 		CreatePipeline(_extent);
 	}
@@ -50,7 +50,7 @@ namespace fan
 		delete m_descriptor;
 		DeletePipeline();
 		m_descriptor = new Descriptor( m_device );
-		m_descriptor->AddBinding( VK_SHADER_STAGE_VERTEX_BIT, sizeof( DebugUniforms ) );
+		m_descriptor->AddUniformBinding( VK_SHADER_STAGE_VERTEX_BIT, sizeof( DebugUniforms ) );
 		m_descriptor->Create();
 		CreatePipeline(_extent);
 	}
@@ -84,7 +84,7 @@ namespace fan
 
 			VkDeviceSize offsets[] = { 0 };
 			vkCmdBindVertexBuffers(_commandBuffer, 0, 1, vertexBuffers, offsets);
-			m_descriptor->Bind(0, _commandBuffer, m_pipelineLayout );
+			m_descriptor->Bind( _commandBuffer, m_pipelineLayout );
 			vkCmdDraw(_commandBuffer, static_cast<uint32_t>(_count), 1, 0, 0);
 		}
 	}

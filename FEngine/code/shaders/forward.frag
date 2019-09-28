@@ -7,7 +7,7 @@ layout (location = 0) in vec3 inColor;
 layout (location = 1) in vec3 inFragPos;
 layout (location = 2) in vec3 inNormal;
 layout (location = 3) in vec2 inTexCoord;
-
+/*
 layout(binding = 2) uniform FragUniforms {
 	vec3	cameraPosition;	
 } uniforms;
@@ -49,11 +49,11 @@ layout(set = 1, binding = 0) uniform sampler2D diffuseTexture[];
 
 vec3 CalcPointLight( const PointLight light, const vec3 normal, const vec3 fragPos,  vec3 viewDir);
 vec3 CalcDirLight  ( const DirectionalLight light, const vec3 normal, const vec3 viewDir); 
-
+*/
 //reference: https://learnopengl.com/Lighting/Multiple-lights
 void main() {  
 	//Needed data
-	vec3 goodNormal = normalize(inNormal);
+	/*vec3 goodNormal = normalize(inNormal);
 	const vec3 viewDir = normalize(uniforms.cameraPosition - inFragPos);
 
 	vec3 lightColor = vec3(0,0,0);
@@ -63,10 +63,11 @@ void main() {
 	for(int lightIndex = 0; lightIndex < lights.pointLightNum; lightIndex++) {
 		lightColor += CalcPointLight( lights.pointLights[lightIndex], goodNormal, inFragPos, viewDir );
 	}
-	outColor = vec4(lightColor,1);
+	outColor = vec4(lightColor,1);*/
+	outColor = vec4(1,0,0,1);
 }
 
-
+/*
 vec3 CalcDirLight  ( const DirectionalLight light, const vec3 normal, const vec3 viewDir) {
     vec3 lightDir = normalize(-light.direction.xyz);
 	
@@ -110,7 +111,7 @@ vec3 CalcPointLight(const PointLight light, const vec3 normal, const vec3 fragPo
     return (ambient + diffuse + specular);
 } 
 
-
+*/
 
 
 

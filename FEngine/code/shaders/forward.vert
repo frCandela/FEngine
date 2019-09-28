@@ -26,6 +26,6 @@ void main() {
 
 	outColor = inColor;
 	outFragPos = worldPos.xyz;
-	outNormal =  (dynamicUbo.rotationMat * vec4(inNormal,1)).xyz;
+	//outNormal =  (dynamicUbo.rotationMat * vec4(inNormal,1)).xyz;
 	outTexCoord = inTexCoord;
 }

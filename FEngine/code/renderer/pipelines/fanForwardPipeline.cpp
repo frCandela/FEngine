@@ -9,6 +9,7 @@
 #include "renderer/core/fanBuffer.h"
 #include "renderer/core/fanTexture.h"
 #include "renderer/core/fanSampler.h"
+#include "renderer/core/fanDescriptor.h"
 #include "renderer/fanRenderer.h"
 #include "renderer/util/fanVertex.h"
 #include "renderer/fanMesh.h"
@@ -68,27 +69,30 @@ namespace fan
 	//================================================================================================================================
 	//================================================================================================================================
 	void ForwardPipeline::SetUniformPointers( 
-		LightsUniforms * _lightUniforms,
+		LightsUniforms * /*_lightUniforms*/,
 		AlignedMemory<DynamicUniformsVert>* _dynamicUniformsVert, 
-		AlignedMemory<DynamicUniformsMaterial>* _dynamicUniformsFrag,
+		AlignedMemory<DynamicUniformsMaterial>* /*_dynamicUniformsFrag*/,
 		VertUniforms * _vertUniforms,
-		FragUniforms * _fragUniforms )
+		FragUniforms * /*_fragUniforms*/ )
 	{
-		m_lightUniforms		  = _lightUniforms;
-		m_dynamicUniformsVert = _dynamicUniformsVert;
-		m_dynamicUniformsFrag = _dynamicUniformsFrag;
 		m_vertUniforms = _vertUniforms;
-		m_fragUniforms = _fragUniforms;
+		m_dynamicUniformsVert = _dynamicUniformsVert;
+// 		m_dynamicUniformsFrag = _dynamicUniformsFrag;
+// 		m_fragUniforms = _fragUniforms;
+// 		m_lightUniforms = _lightUniforms;
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
 	void ForwardPipeline::UpdateUniformBuffers() {
-		m_dynamicUniformBufferVert->SetData(&(*m_dynamicUniformsVert)[0], m_dynamicUniformsVert->GetSize());
-		m_dynamicUniformBufferFrag->SetData(&(*m_dynamicUniformsFrag)[0], m_dynamicUniformsFrag->GetSize());
-		m_vertUniformBuffer->SetData(&(*m_vertUniforms), sizeof(VertUniforms));
-		m_fragUniformBuffer->SetData(&(*m_fragUniforms), sizeof(FragUniforms));
-		m_pointLightUniformBuffer->SetData( m_lightUniforms, sizeof(LightsUniforms));
+		m_descriptors->SetBinding( 0, &( *m_vertUniforms ), sizeof( VertUniforms ) );
+		m_descriptors->SetBinding( 1, &( *m_dynamicUniformsVert )[0], m_dynamicUniformsVert->GetTotalSize() );
+// 		m_vertUniformBuffer->SetData( &( *m_vertUniforms ), sizeof( VertUniforms ) );
+// 		m_dynamicUniformBufferVert->SetData(&(*m_dynamicUniformsVert)[0], m_dynamicUniformsVert->GetSize());
+		//m_dynamicUniformBufferFrag->SetData(&(*m_dynamicUniformsFrag)[0], m_dynamicUniformsFrag->GetSize());
+		
+		//m_fragUniformBuffer->SetData(&(*m_fragUniforms), sizeof(FragUniforms));
+		//m_pointLightUniformBuffer->SetData( m_lightUniforms, sizeof(LightsUniforms));
 	}
 
 	//================================================================================================================================
@@ -116,12 +120,13 @@ namespace fan
 
 				std::vector<uint32_t> dynamicOffsets = {
 					meshIndex  * static_cast<uint32_t>( m_dynamicUniformsVert->GetAlignment())
-					,meshIndex  * static_cast<uint32_t>( m_dynamicUniformsFrag->GetAlignment() )
+					//,meshIndex  * static_cast<uint32_t>( m_dynamicUniformsFrag->GetAlignment() )
 				};
 
 				std::vector<VkDescriptorSet> descriptors = {
-					m_descriptorSetScene
-					, m_descriptorSetTextures
+					m_descriptors->GetSet()
+					//m_descriptorSetScene
+					//, m_descriptorSetTextures
 				};
 
 				vkCmdBindDescriptorSets(
@@ -155,10 +160,15 @@ namespace fan
 	//================================================================================================================================
 	//================================================================================================================================
 	bool ForwardPipeline::CreateDescriptors() {
-		return CreateDescriptorsScene()
-			&& CreateDescriptorsTextures();
+		m_descriptors = new Descriptor( m_device );
+		m_descriptors = new Descriptor( m_device );
+		m_descriptors->AddUniformBinding( VK_SHADER_STAGE_VERTEX_BIT, sizeof( VertUniforms ) );
+		m_descriptors->AddDynamicUniformBinding( VK_SHADER_STAGE_VERTEX_BIT, m_dynamicUniformsVert->GetTotalSize(), m_dynamicUniformsVert->GetAlignment() );
+		return m_descriptors->Create();
+		//return CreateDescriptorsScene();
+			//&& CreateDescriptorsTextures();
 	}
-
+	/*
 	//================================================================================================================================
 	//================================================================================================================================
 	bool ForwardPipeline::CreateDescriptorsTextures() {
@@ -269,8 +279,8 @@ namespace fan
 		);
 
 		return true;
-	}
-
+	}*/
+/*
 	//================================================================================================================================
 	//================================================================================================================================
 	bool ForwardPipeline::CreateDescriptorsScene( ) {
@@ -289,7 +299,7 @@ namespace fan
 		dynamicLayoutBinding.stageFlags = VK_SHADER_STAGE_VERTEX_BIT;
 		dynamicLayoutBinding.pImmutableSamplers = nullptr;
 
-		VkDescriptorSetLayoutBinding fragLayoutBinding;
+		/*VkDescriptorSetLayoutBinding fragLayoutBinding;
 		fragLayoutBinding.binding = 2;
 		fragLayoutBinding.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
 		fragLayoutBinding.descriptorCount = 1;
@@ -325,14 +335,14 @@ namespace fan
 		descriptorSetLayoutCreateInfo.bindingCount = static_cast<uint32_t>(layoutBindings.size());
 		descriptorSetLayoutCreateInfo.pBindings = layoutBindings.data();
 
-		if (vkCreateDescriptorSetLayout(m_device.vkDevice, &descriptorSetLayoutCreateInfo, nullptr, &m_descriptorSetLayoutScene) != VK_SUCCESS) {
+		if (vkCreateDescriptorSetLayout(m_device.vkDevice, &descriptorSetLayoutCreateInfo, nullptr, &m_descriptor) != VK_SUCCESS) {
 			Debug::Error("Could not allocate descriptor set layout.");
 			return false;
 		}
 		Debug::Get() << Debug::Severity::log << std::hex << "VkDescriptorSetLayout " << m_descriptorSetLayoutScene << std::dec << Debug::Endl();
 
 		// Pool
-		std::vector< VkDescriptorPoolSize > poolSizes(5);
+		std::vector< VkDescriptorPoolSize > poolSizes(2);
 		poolSizes[0].type = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
 		poolSizes[0].descriptorCount = 1;
 		poolSizes[1].type = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC;
@@ -412,33 +422,6 @@ namespace fan
 			//uboWriteDescriptorSet.pTexelBufferView = nullptr;
 		}
 
-		// Frag
-		VkWriteDescriptorSet fragWriteDescriptorSet = {};
-		VkDescriptorBufferInfo fragDescriptorBufferInfo = {};
-		{
-			m_fragUniformBuffer = new Buffer(m_device);
-			m_fragUniformBuffer->Create(
-				sizeof(FragUniforms),
-				VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT,
-				VK_MEMORY_PROPERTY_HOST_COHERENT_BIT | VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT
-			);
-
-			fragDescriptorBufferInfo.buffer = m_fragUniformBuffer->GetBuffer();
-			fragDescriptorBufferInfo.offset = 0;
-			fragDescriptorBufferInfo.range = sizeof(FragUniforms);
-
-			fragWriteDescriptorSet.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-			fragWriteDescriptorSet.pNext = nullptr;
-			fragWriteDescriptorSet.dstSet = m_descriptorSetScene;
-			fragWriteDescriptorSet.dstBinding = 2;
-			fragWriteDescriptorSet.dstArrayElement = 0;
-			fragWriteDescriptorSet.descriptorCount = 1;
-			fragWriteDescriptorSet.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
-			fragWriteDescriptorSet.pImageInfo = nullptr;
-			fragWriteDescriptorSet.pBufferInfo = &fragDescriptorBufferInfo;
-			//uboWriteDescriptorSet.pTexelBufferView = nullptr;
-		}
-
 		// Dynamic vert
 		VkWriteDescriptorSet dynamicWriteDescriptorSet = {};
 		VkDescriptorBufferInfo dynamicDescriptorBufferInfo = {};
@@ -464,6 +447,33 @@ namespace fan
 			dynamicWriteDescriptorSet.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC;
 			dynamicWriteDescriptorSet.pImageInfo = nullptr;
 			dynamicWriteDescriptorSet.pBufferInfo = &dynamicDescriptorBufferInfo;
+			//uboWriteDescriptorSet.pTexelBufferView = nullptr;
+		}
+
+		// Frag
+		/*VkWriteDescriptorSet fragWriteDescriptorSet = {};
+		VkDescriptorBufferInfo fragDescriptorBufferInfo = {};
+		{
+			m_fragUniformBuffer = new Buffer( m_device );
+			m_fragUniformBuffer->Create(
+				sizeof( FragUniforms ),
+				VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT,
+				VK_MEMORY_PROPERTY_HOST_COHERENT_BIT | VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT
+			);
+
+			fragDescriptorBufferInfo.buffer = m_fragUniformBuffer->GetBuffer();
+			fragDescriptorBufferInfo.offset = 0;
+			fragDescriptorBufferInfo.range = sizeof( FragUniforms );
+
+			fragWriteDescriptorSet.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+			fragWriteDescriptorSet.pNext = nullptr;
+			fragWriteDescriptorSet.dstSet = m_descriptorSetScene;
+			fragWriteDescriptorSet.dstBinding = 2;
+			fragWriteDescriptorSet.dstArrayElement = 0;
+			fragWriteDescriptorSet.descriptorCount = 1;
+			fragWriteDescriptorSet.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+			fragWriteDescriptorSet.pImageInfo = nullptr;
+			fragWriteDescriptorSet.pBufferInfo = &fragDescriptorBufferInfo;
 			//uboWriteDescriptorSet.pTexelBufferView = nullptr;
 		}
 
@@ -540,7 +550,7 @@ namespace fan
 		);
 
 		return true;
-	}
+	}*/
 
 	//================================================================================================================================
 	//================================================================================================================================
@@ -694,8 +704,8 @@ namespace fan
 		dynamicStateCreateInfo.pDynamicStates = dynamicStates.data();
 
 		std::vector<VkDescriptorSetLayout> descriptorSetLayouts = {
-			m_descriptorSetLayoutScene
-			, m_descriptorSetLayoutTextures
+			m_descriptors->GetLayout()
+			//, m_descriptorSetLayoutTextures
 		};
 		std::vector<VkPushConstantRange> pushConstantRanges(0);
 
@@ -786,17 +796,17 @@ namespace fan
 	//================================================================================================================================
 	void ForwardPipeline::DeleteDescriptors() {
 
-		if (m_descriptorPoolScene != VK_NULL_HANDLE) {
-			vkDestroyDescriptorPool(m_device.vkDevice, m_descriptorPoolScene, nullptr);
-			m_descriptorPoolScene = VK_NULL_HANDLE;
-		}
+// 		if (m_descriptorPoolScene != VK_NULL_HANDLE) {
+// 			vkDestroyDescriptorPool(m_device.vkDevice, m_descriptorPoolScene, nullptr);
+// 			m_descriptorPoolScene = VK_NULL_HANDLE;
+// 		}
+// 
+// 		if (m_descriptorSetLayoutScene != VK_NULL_HANDLE) {
+// 			vkDestroyDescriptorSetLayout(m_device.vkDevice, m_descriptorSetLayoutScene, nullptr);
+// 			m_descriptorSetLayoutScene = VK_NULL_HANDLE;
+// 		}
 
-		if (m_descriptorSetLayoutScene != VK_NULL_HANDLE) {
-			vkDestroyDescriptorSetLayout(m_device.vkDevice, m_descriptorSetLayoutScene, nullptr);
-			m_descriptorSetLayoutScene = VK_NULL_HANDLE;
-		}
-
-		if (m_descriptorPoolTextures != VK_NULL_HANDLE) {
+		/*if (m_descriptorPoolTextures != VK_NULL_HANDLE) {
 			vkDestroyDescriptorPool(m_device.vkDevice, m_descriptorPoolTextures, nullptr);
 			m_descriptorPoolTextures = VK_NULL_HANDLE;
 		}
@@ -804,12 +814,13 @@ namespace fan
 		if (m_descriptorSetLayoutTextures != VK_NULL_HANDLE) {
 			vkDestroyDescriptorSetLayout(m_device.vkDevice, m_descriptorSetLayoutTextures, nullptr);
 			m_descriptorSetLayoutTextures = VK_NULL_HANDLE;
-		}
+		}*/
 
-		delete m_vertUniformBuffer;
-		delete m_fragUniformBuffer;
-		delete m_pointLightUniformBuffer;
-		delete m_dynamicUniformBufferVert;
-		delete m_dynamicUniformBufferFrag;
+// 		delete m_vertUniformBuffer;
+// 		delete m_fragUniformBuffer;
+// 		delete m_pointLightUniformBuffer;
+// 		delete m_dynamicUniformBufferVert;
+// 		delete m_dynamicUniformBufferFrag;
+		delete m_descriptors;
 	}
 }

@@ -9,7 +9,7 @@ namespace fan {
 	public:
 		AlignedMemory() : 
 			m_data( nullptr )
-			,m_size(0)
+			,m_totalSize(0)
 			,m_alignment(0)
 			,m_ratio(0){
 		}
@@ -24,13 +24,13 @@ namespace fan {
 
 			AlignedFree(m_data);
 			m_data = nullptr;
-			m_size = _size;
+			m_totalSize = _size;
 			m_alignment = _alignment;
 
 			m_ratio = m_alignment / sizeof(uint32_t);
 			m_data = AlignedAlloc(_size, _alignment);
 		}
-		size_t GetSize() const		{ return m_size; }
+		size_t GetTotalSize() const	{ return m_totalSize; }
 		size_t GetAlignment() const { return m_alignment; }
 
 		T& operator[](const int& _pos) {
@@ -41,7 +41,7 @@ namespace fan {
 
 	private:
 		void * m_data;
-		size_t m_size; 
+		size_t m_totalSize; 
 		size_t m_alignment;
 		size_t m_ratio;
 

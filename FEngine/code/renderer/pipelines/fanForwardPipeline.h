@@ -15,6 +15,7 @@ namespace fan
 	class Buffer;
 	class Texture;
 	class Sampler;
+	class Descriptor;
 	struct DrawData;
 
 	//================================================================================================================================
@@ -47,13 +48,15 @@ namespace fan
 		VkPipelineLayout		m_pipelineLayout;
 		VkPipeline				m_pipeline;
 
-		VkDescriptorSetLayout	m_descriptorSetLayoutScene;
-		VkDescriptorPool		m_descriptorPoolScene;
-		VkDescriptorSet			m_descriptorSetScene;
+		Descriptor * m_descriptors;
 
-		VkDescriptorSetLayout	m_descriptorSetLayoutTextures;
+		/*VkDescriptorSetLayout	m_descriptorSetLayoutScene;
+		VkDescriptorPool		m_descriptorPoolScene;
+		VkDescriptorSet			m_descriptorSetScene;*/
+
+		/*VkDescriptorSetLayout	m_descriptorSetLayoutTextures;
 		VkDescriptorPool		m_descriptorPoolTextures;
-		VkDescriptorSet			m_descriptorSetTextures;
+		VkDescriptorSet			m_descriptorSetTextures;*/
 
 		Sampler *	m_sampler;
 		Image *		m_depthImage;
@@ -62,23 +65,22 @@ namespace fan
 		Shader *	m_fragmentShader = nullptr;
 		Shader *	m_vertexShader = nullptr;
 
-		Buffer *	m_vertUniformBuffer;
-		Buffer *	m_fragUniformBuffer;
-		Buffer *	m_pointLightUniformBuffer;
-		Buffer *	m_dynamicUniformBufferVert;
-		Buffer *	m_dynamicUniformBufferFrag;
+
+// 		Buffer *	m_fragUniformBuffer;
+// 		Buffer *	m_pointLightUniformBuffer;
+// 		Buffer *	m_dynamicUniformBufferFrag;
 
 		// Pointer to the uniforms data
 		AlignedMemory<DynamicUniformsVert>*		m_dynamicUniformsVert;
-		AlignedMemory<DynamicUniformsMaterial>* m_dynamicUniformsFrag;
-		LightsUniforms * m_lightUniforms;
 		VertUniforms * m_vertUniforms;
-		FragUniforms * m_fragUniforms;
+// 		AlignedMemory<DynamicUniformsMaterial>* m_dynamicUniformsFrag;
+// 		LightsUniforms * m_lightUniforms;
+// 		FragUniforms * m_fragUniforms;
 
 		void CreateShaders(); 
 		bool CreateDescriptors();
-		bool CreateDescriptorsScene(  );
-		bool CreateDescriptorsTextures();
+		//bool CreateDescriptorsScene(  );
+		//bool CreateDescriptorsTextures();
 		bool CreateDepthRessources(VkExtent2D _extent);
 		bool CreatePipeline(VkExtent2D _extent);
 
