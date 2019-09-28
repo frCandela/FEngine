@@ -359,7 +359,8 @@ namespace fan {
 			Renderer::Get().SetMeshAt( modelIndex, model->GetMesh() );
 			Renderer::Get().SetTransformAt( modelIndex, transform->GetModelMatrix(), transform->GetRotationMat() );
 			if ( material != nullptr ) {
-				Renderer::Get().SetMaterialAt( modelIndex, material->GetColor().ToGLM(), material->GetShininess(), material->GetTexture()->GetRenderID() );
+				const uint32_t textureIndex = material->GetTexture() != nullptr ? material->GetTexture()->GetRenderID() : 0;
+				Renderer::Get().SetMaterialAt( modelIndex, material->GetColor().ToGLM(), material->GetShininess(), textureIndex );
 			} else {
 				Renderer::Get().SetMaterialAt( modelIndex, Color::White.ToGLM(), 1, 0 );
 			}

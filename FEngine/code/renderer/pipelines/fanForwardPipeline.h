@@ -7,7 +7,6 @@ namespace fan
 {
 	class Mesh;
 	struct Vertex;
-	struct MeshData;
 	class Device;
 	class Shader;
 	class Image;
@@ -16,7 +15,6 @@ namespace fan
 	class Texture;
 	class Sampler;
 	class Descriptor;
-	struct DrawData;
 
 	//================================================================================================================================
 	//================================================================================================================================
@@ -33,7 +31,7 @@ namespace fan
 		void SetUniformPointers( 
 			LightsUniforms * _lightUniforms, 
 			AlignedMemory<DynamicUniformsVert>* _dynamicUniformsVert, 
-			AlignedMemory<DynamicUniformsMaterial>* _dynamicUniformsFrag ,
+			AlignedMemory<DynamicUniformsMaterial>* _dynamicUniformsMaterial,
 			VertUniforms * _vertUniforms,
 			FragUniforms * _fragUniforms
 		);
@@ -48,15 +46,8 @@ namespace fan
 		VkPipelineLayout		m_pipelineLayout;
 		VkPipeline				m_pipeline;
 
-		Descriptor * m_descriptors;
-
-		/*VkDescriptorSetLayout	m_descriptorSetLayoutScene;
-		VkDescriptorPool		m_descriptorPoolScene;
-		VkDescriptorSet			m_descriptorSetScene;*/
-
-		/*VkDescriptorSetLayout	m_descriptorSetLayoutTextures;
-		VkDescriptorPool		m_descriptorPoolTextures;
-		VkDescriptorSet			m_descriptorSetTextures;*/
+		Descriptor * m_sceneDescriptor;
+		Descriptor * m_texturesDescriptor;
 
 		Sampler *	m_sampler;
 		Image *		m_depthImage;
@@ -65,22 +56,15 @@ namespace fan
 		Shader *	m_fragmentShader = nullptr;
 		Shader *	m_vertexShader = nullptr;
 
-
-// 		Buffer *	m_fragUniformBuffer;
-// 		Buffer *	m_pointLightUniformBuffer;
-// 		Buffer *	m_dynamicUniformBufferFrag;
-
 		// Pointer to the uniforms data
 		AlignedMemory<DynamicUniformsVert>*		m_dynamicUniformsVert;
 		VertUniforms * m_vertUniforms;
-// 		AlignedMemory<DynamicUniformsMaterial>* m_dynamicUniformsFrag;
-// 		LightsUniforms * m_lightUniforms;
-// 		FragUniforms * m_fragUniforms;
+ 		AlignedMemory<DynamicUniformsMaterial>* m_dynamicUniformsMaterial;
+ 		LightsUniforms * m_lightUniforms;
+ 		FragUniforms * m_fragUniforms;
 
 		void CreateShaders(); 
 		bool CreateDescriptors();
-		//bool CreateDescriptorsScene(  );
-		//bool CreateDescriptorsTextures();
 		bool CreateDepthRessources(VkExtent2D _extent);
 		bool CreatePipeline(VkExtent2D _extent);
 

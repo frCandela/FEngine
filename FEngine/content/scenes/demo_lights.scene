@@ -26,12 +26,12 @@ Entities: 1 {
                         color: 1 1 1
                     }
                 }
-                Childs: 6 {
+                Childs: 7 {
                     Entity: light_green {
                         computeAABB: true
                         Components: 5 {
                             Transform: 1269105190 {
-                                position: 1.27299 1.27505 -1.54256
+                                position: -1.91681 1.27505 -0.57082
                                 rotation: 0 0 0 1
                                 scale:    0.1 0.1 0.1
                             }
@@ -63,7 +63,7 @@ Entities: 1 {
                         computeAABB: true
                         Components: 5 {
                             Transform: 1269105190 {
-                                position: 0.698214 1.27505 1.87417
+                                position: 1.45358 1.27505 -1.37372
                                 rotation: 0 0 0 1
                                 scale:    0.1 0.1 0.1
                             }
@@ -95,7 +95,7 @@ Entities: 1 {
                         computeAABB: true
                         Components: 5 {
                             Transform: 1269105190 {
-                                position: -1.97226 1.27505 -0.331947
+                                position: 0.463292 1.27505 1.9456
                                 rotation: 0 0 0 1
                                 scale:    0.1 0.1 0.1
                             }
@@ -127,7 +127,7 @@ Entities: 1 {
                         computeAABB: true
                         Components: 5 {
                             Transform: 1269105190 {
-                                position: 0.697904 1.27505 -1.87428
+                                position: 1.45384 1.27505 1.37345
                                 rotation: 0 0 0 1
                                 scale:    0.1 0.1 0.1
                             }
@@ -159,7 +159,7 @@ Entities: 1 {
                         computeAABB: true
                         Components: 5 {
                             Transform: 1269105190 {
-                                position: 1.27324 1.27505 1.54235
+                                position: -1.91671 1.27505 0.57117
                                 rotation: 0 0 0 1
                                 scale:    0.1 0.1 0.1
                             }
@@ -191,7 +191,7 @@ Entities: 1 {
                         computeAABB: true
                         Components: 5 {
                             Transform: 1269105190 {
-                                position: -1.97226 1.27505 0.331947
+                                position: 0.463284 1.27505 -1.9456
                                 rotation: 0 0 0 1
                                 scale:    0.1 0.1 0.1
                             }
@@ -214,6 +214,23 @@ Entities: 1 {
                                 radius: 2
                                 speed:  -0.5
                                 phase:  0
+                            }
+                        }
+                        Childs: 0 {
+                        }
+                    }
+                    Entity: light_directional {
+                        computeAABB: true
+                        Components: 2 {
+                            Transform: 1269105190 {
+                                position: 3.29943 0 0
+                                rotation: 0 0 0 1
+                                scale:    1 1 1
+                            }
+                            DirectionalLight: 944608624 {
+                                ambiant: 0 0 0
+                                diffuse: 1 1 1
+                                specular: 1 1 1
                             }
                         }
                         Childs: 0 {

@@ -5,9 +5,10 @@
 
 namespace fan {
 	class Device;
-	class Shader;
 	class Buffer;
-
+	class Texture;
+	class Sampler;
+	 
 	//================================================================================================================================
 	//================================================================================================================================
 	class Descriptor {
@@ -20,12 +21,11 @@ namespace fan {
 		void Bind( VkCommandBuffer _commandBuffer, VkPipelineLayout _pipelineLayout );
 		
 		void AddUniformBinding( VkShaderStageFlags  _stage, VkDeviceSize _bufferSize );
-		void AddDynamicUniformBinding( VkShaderStageFlags  _stage, VkDeviceSize _bufferSize, VkDeviceSize _alignment );
+		void AddDynamicUniformBinding( VkShaderStageFlags  _stage, VkDeviceSize _bufferSize, VkDeviceSize _alignment );		
+		void AddImageSamplerBinding( VkShaderStageFlags  _stage, std::vector< Texture * > & _textures, Sampler * _sampler );
+
 		VkDescriptorSetLayout GetLayout() { return m_descriptorSetLayout; }
 		VkDescriptorSet		  GetSet() { return m_descriptorSet; }
-
-// 		Buffer *	m_vertUniformBuffer;
-// 		Buffer *	m_dynamicUniformBufferVert;
 
 	private:
 		Device& m_device;
@@ -34,13 +34,20 @@ namespace fan {
 		VkDescriptorPool		m_descriptorPool;
 		VkDescriptorSet			m_descriptorSet;
 
-		Shader * m_fragmentShader = nullptr;
-		Shader * m_vertexShader = nullptr;
-
-		std::vector< Buffer * > m_uniformBuffers;
-		std::vector< VkDescriptorSetLayoutBinding > m_layoutBindings;
-
-		void AddBinding( VkShaderStageFlags _stage, VkDescriptorType _descriptorType, uint32_t _descriptorCount, VkDeviceSize _bufferSize, VkDeviceSize _alignment = 1 );
+		struct BindingData {
+			VkDescriptorSetLayoutBinding layoutBinding;
+			Buffer * buffer = nullptr;
+			VkDescriptorBufferInfo descriptorBufferInfo;
+			std::vector< VkDescriptorImageInfo >  descriptorsImageInfo;
+			VkWriteDescriptorSet   writeDescriptorSet;
+			
+			void SetImagesSampler( std::vector< Texture * > & _textures, Sampler * _sampler );
+			void SetBuffer( Device& _device, VkDeviceSize _sizeBuffer, VkDeviceSize _alignment = 1 ) ;
+			void UpdateLayoutBinding( const size_t _index, const VkShaderStageFlags _stage, const VkDescriptorType _descriptorType, const size_t _descriptorCount );
+			void UpdateWriteDescriptorSet( const size_t _dstBinding, VkDescriptorSet _descriptorSet );
+		};
+		std::vector< BindingData > m_bindingData;
+		std::vector < VkDescriptorSetLayoutBinding > GetLayoutBindingsArray();
 
 	};
 }
