@@ -65,17 +65,20 @@ namespace fan
 			m_forwardPipeline->SetUniformPointers( &m_lightsUniforms, &m_dynamicUniformsVert, &m_dynamicUniformsFrag, &m_vertUniforms, &m_fragUniforms );
 			m_forwardPipeline->Create( m_swapchain->GetExtent());
 
-			m_debugLinesPipeline = new DebugPipeline(*m_device, m_renderPass, VK_PRIMITIVE_TOPOLOGY_LINE_LIST, true);
+			m_debugLinesPipeline = new DebugPipeline(*m_device, VK_PRIMITIVE_TOPOLOGY_LINE_LIST, true);
+			m_debugLinesPipeline->Init( m_renderPass, m_swapchain->GetExtent(), "code/shaders/debugLines.vert", "code/shaders/debugLines.frag" );
 			m_debugLinesPipeline->SetUniformPointers( & m_debugUniforms );
-			m_debugLinesPipeline->Create(m_swapchain->GetExtent(), "code/shaders/debugLines.vert", "code/shaders/debugLines.frag");
+			m_debugLinesPipeline->Create();
 
-			m_debugLinesPipelineNoDepthTest = new DebugPipeline(*m_device, m_renderPass, VK_PRIMITIVE_TOPOLOGY_LINE_LIST, false);
+			m_debugLinesPipelineNoDepthTest = new DebugPipeline(*m_device, VK_PRIMITIVE_TOPOLOGY_LINE_LIST, false);
+			m_debugLinesPipelineNoDepthTest->Init( m_renderPass, m_swapchain->GetExtent(), "code/shaders/debugLines.vert", "code/shaders/debugLines.frag" );
 			m_debugLinesPipelineNoDepthTest->SetUniformPointers( &m_debugUniforms );
-			m_debugLinesPipelineNoDepthTest->Create(m_swapchain->GetExtent(), "code/shaders/debugLines.vert", "code/shaders/debugLines.frag");
+			m_debugLinesPipelineNoDepthTest->Create();
 			
-			m_debugTrianglesPipeline = new DebugPipeline(*m_device, m_renderPass, VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST, false);
+			m_debugTrianglesPipeline = new DebugPipeline(*m_device, VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST, false);
+			m_debugTrianglesPipeline->Init( m_renderPass, m_swapchain->GetExtent(), "code/shaders/debugTriangles.vert", "code/shaders/debugTriangles.frag" );
 			m_debugTrianglesPipeline->SetUniformPointers( &m_debugUniforms );
-			m_debugTrianglesPipeline->Create(m_swapchain->GetExtent(), "code/shaders/debugTriangles.vert", "code/shaders/debugTriangles.frag");
+			m_debugTrianglesPipeline->Create();
 
 			m_postprocessPipeline = new PostprocessPipeline(*m_device, m_renderPassPostprocess);
 			m_postprocessPipeline->Create(m_swapchain->GetSurfaceFormat().format, m_swapchain->GetExtent());		
@@ -161,9 +164,9 @@ namespace fan
 					m_swapchain->Resize(m_window->GetExtent());
 					m_postprocessPipeline->Resize(m_window->GetExtent());
 					m_forwardPipeline->Resize(m_window->GetExtent());
-					m_debugLinesPipeline->Resize(m_window->GetExtent());
-					m_debugLinesPipelineNoDepthTest->Resize(m_window->GetExtent());
-					m_debugTrianglesPipeline->Resize(m_window->GetExtent());
+ 					m_debugLinesPipeline->Resize(m_window->GetExtent());
+ 					m_debugLinesPipelineNoDepthTest->Resize(m_window->GetExtent());
+ 					m_debugTrianglesPipeline->Resize(m_window->GetExtent());
 
 					CreateSwapchainFramebuffers();
 					CreateForwardFramebuffers();
@@ -587,10 +590,29 @@ namespace fan
 				commandBufferBeginInfo.flags = VK_COMMAND_BUFFER_USAGE_SIMULTANEOUS_USE_BIT | VK_COMMAND_BUFFER_USAGE_RENDER_PASS_CONTINUE_BIT;
 				commandBufferBeginInfo.pInheritanceInfo = &commandBufferInheritanceInfo;
 
-				if (vkBeginCommandBuffer(commandBuffer, &commandBufferBeginInfo) == VK_SUCCESS) {				
-					m_debugLinesPipeline->Draw(				commandBuffer, *m_debugLinesvertexBuffers[_index],				static_cast<uint32_t>(m_debugLines.size()));		
-					m_debugLinesPipelineNoDepthTest->Draw(	commandBuffer, *m_debugLinesNoDepthTestVertexBuffers[_index],	static_cast<uint32_t>(m_debugLinesNoDepthTest.size()));
-					m_debugTrianglesPipeline->Draw(			commandBuffer, *m_debugTrianglesvertexBuffers[_index],			static_cast<uint32_t>(m_debugTriangles.size()));
+				if (vkBeginCommandBuffer(commandBuffer, &commandBufferBeginInfo) == VK_SUCCESS) {	
+					VkDeviceSize offsets[] = { 0 }; 
+					if( m_debugLines.size() > 0 ) {
+						m_debugLinesPipeline->Bind( commandBuffer );
+						VkBuffer vertexBuffers[] = { m_debugLinesvertexBuffers[_index]->GetBuffer() };
+						vkCmdBindVertexBuffers( commandBuffer, 0, 1, vertexBuffers, offsets );
+						vkCmdDraw( commandBuffer, static_cast<uint32_t>( m_debugLines.size() ), 1, 0, 0 );
+					}
+					if ( m_debugLinesNoDepthTest.size() > 0 ) {
+						m_debugLinesPipelineNoDepthTest->Bind( commandBuffer );
+						VkBuffer vertexBuffers[] = { m_debugLinesNoDepthTestVertexBuffers[_index]->GetBuffer() };
+						vkCmdBindVertexBuffers( commandBuffer, 0, 1, vertexBuffers, offsets );
+						vkCmdDraw( commandBuffer, static_cast<uint32_t>( m_debugLinesNoDepthTest.size() ), 1, 0, 0 );
+					}
+					if ( m_debugTriangles.size() > 0 ) {
+						m_debugTrianglesPipeline->Bind( commandBuffer );
+						VkBuffer vertexBuffers[] = { m_debugTrianglesvertexBuffers[_index]->GetBuffer() };
+						vkCmdBindVertexBuffers( commandBuffer, 0, 1, vertexBuffers, offsets );
+						vkCmdDraw( commandBuffer, static_cast<uint32_t>( m_debugTriangles.size() ), 1, 0, 0 );
+					}
+					//m_debugLinesPipeline->Draw(				commandBuffer, *m_debugLinesvertexBuffers[_index],				static_cast<uint32_t>(m_debugLines.size()));		
+					//m_debugLinesPipelineNoDepthTest->Draw(	commandBuffer, *m_debugLinesNoDepthTestVertexBuffers[_index],	static_cast<uint32_t>(m_debugLinesNoDepthTest.size()));
+					//m_debugTrianglesPipeline->Draw(			commandBuffer, *m_debugTrianglesvertexBuffers[_index],			static_cast<uint32_t>(m_debugTriangles.size()));
 					if (vkEndCommandBuffer(commandBuffer) != VK_SUCCESS) {
 						Debug::Get() << Debug::Severity::error << "Could not record command buffer " << _index << "." << Debug::Endl();
 					}
@@ -600,6 +622,7 @@ namespace fan
 				}
 			}
 		}
+	
 
 		//================================================================================================================================
 		//================================================================================================================================
@@ -680,9 +703,6 @@ namespace fan
 
 			m_postprocessPipeline->Resize(m_swapchain->GetExtent());
 			m_forwardPipeline->Resize(m_swapchain->GetExtent());
-			m_debugLinesPipeline->Resize(m_swapchain->GetExtent());
-			m_debugLinesPipelineNoDepthTest->Resize(m_swapchain->GetExtent());
-			m_debugTrianglesPipeline->Resize(m_swapchain->GetExtent());
 
 			DeleteForwardFramebuffers();
 			CreateForwardFramebuffers();

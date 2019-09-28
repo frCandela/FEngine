@@ -64,7 +64,6 @@ void main() {
 		lightColor += CalcPointLight( lights.pointLights[lightIndex], goodNormal, inFragPos, viewDir );
 	}
 	outColor = vec4(lightColor,1);
-	//outColor = vec4(material.color,1);
 }
 
 

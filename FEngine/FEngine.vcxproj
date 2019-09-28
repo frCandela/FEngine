@@ -131,6 +131,7 @@
     <ClCompile Include="code\renderer\core\fanImage.cpp" />
     <ClCompile Include="code\renderer\core\fanImageView.cpp" />
     <ClCompile Include="code\renderer\core\fanInstance.cpp" />
+    <ClCompile Include="code\renderer\core\fanPipeline.cpp" />
     <ClCompile Include="code\renderer\core\fanSampler.cpp" />
     <ClCompile Include="code\renderer\core\fanShader.cpp" />
     <ClCompile Include="code\renderer\core\fanSwapChain.cpp" />
@@ -214,6 +215,7 @@
     <ClInclude Include="code\renderer\core\fanImage.h" />
     <ClInclude Include="code\renderer\core\fanImageView.h" />
     <ClInclude Include="code\renderer\core\fanInstance.h" />
+    <ClInclude Include="code\renderer\core\fanPipeline.h" />
     <ClInclude Include="code\renderer\core\fanSampler.h" />
     <ClInclude Include="code\renderer\core\fanShader.h" />
     <ClInclude Include="code\renderer\core\fanSwapChain.h" />

@@ -298,6 +298,9 @@
     <ClCompile Include="code\renderer\core\fanDescriptor.cpp">
       <Filter>code\renderer\core</Filter>
     </ClCompile>
+    <ClCompile Include="code\renderer\core\fanPipeline.cpp">
+      <Filter>code\renderer</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="code\editor\fanMainMenuBar.h">
@@ -1000,6 +1003,9 @@
       <Filter>code\renderer</Filter>
     </ClInclude>
     <ClInclude Include="code\renderer\core\fanDescriptor.h">
+      <Filter>code\renderer\core</Filter>
+    </ClInclude>
+    <ClInclude Include="code\renderer\core\fanPipeline.h">
       <Filter>code\renderer\core</Filter>
     </ClInclude>
   </ItemGroup>

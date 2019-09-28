@@ -1,5 +1,7 @@
 #pragma once
 
+#include "renderer/core/fanPipeline.h"
+
 namespace fan
 {
 	class Device;
@@ -10,39 +12,24 @@ namespace fan
 	class Descriptor;
 	struct DebugUniforms;
 
-
 	//================================================================================================================================
 	//================================================================================================================================
-	class DebugPipeline {
+	class DebugPipeline : public Pipeline {
 	public:
-		DebugPipeline(Device& _device, VkRenderPass& _renderPass, const VkPrimitiveTopology _primitiveTopology, const bool _depthTestEnable);
-		~DebugPipeline();
+		DebugPipeline(Device& _device, const VkPrimitiveTopology _primitiveTopology, const bool _depthTestEnable);
+		virtual ~DebugPipeline();
 
-		void Create(VkExtent2D _extent, const char * _fragShaderPath, const char * _vertShaderPath);
-		void Draw(VkCommandBuffer _commandBuffer, Buffer& _vertexBuffer, const uint32_t _count);
-		void Resize(VkExtent2D _extent);
-		void ReloadShaders();
+		void Bind( VkCommandBuffer _commandBuffer ) override;
 		void SetUniformPointers( DebugUniforms * _debugUniforms	);
 		void UpdateUniformBuffers();
-		VkPipeline	GetPipeline() { return m_pipeline; }
+
+	protected:
+		void ConfigurePipeline() override;
 
 	private:
-		Device& m_device;
-
-		VkRenderPass&		m_renderPass;
-		VkPipelineLayout	m_pipelineLayout;
-		VkPipeline			m_pipeline;
-
-		DebugUniforms  * m_debugUniforms;
-		Descriptor *	 m_descriptor;
-		Shader *		 m_fragmentShader = nullptr;
-		Shader *		 m_vertexShader = nullptr;
-
+		DebugUniforms  *	m_debugUniforms;
+		Descriptor *		m_descriptor;
 		VkPrimitiveTopology m_primitiveTopology;
 		bool				m_depthTestEnable;
-
-		void CreateShaders(const char * _vertShaderPath, const char * _fragShaderPath);
-		bool CreatePipeline(VkExtent2D _extent);
-		void DeletePipeline();
 	};
 }
