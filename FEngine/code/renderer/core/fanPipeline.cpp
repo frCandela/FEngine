@@ -168,8 +168,8 @@ namespace fan {
 		m_viewports[0].maxDepth = 1.0f;
 
 		m_scissors.resize( 1 );
-		m_scissors[0].offset = { 0, 0 };
-		m_scissors[0].extent = m_extent;
+ 		m_scissors[0].offset = { 0, 0 };
+ 		m_scissors[0].extent = m_extent;
 
 		m_rasterizationStateCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_RASTERIZATION_STATE_CREATE_INFO;
 		m_rasterizationStateCreateInfo.pNext = nullptr;
@@ -230,7 +230,7 @@ namespace fan {
 		m_colorBlendStateCreateInfo.blendConstants[2] = 0.0f;
 		m_colorBlendStateCreateInfo.blendConstants[3] = 0.0f;
 
-		m_dynamicStates = { VK_DYNAMIC_STATE_VIEWPORT };
+		m_dynamicStates = { VK_DYNAMIC_STATE_VIEWPORT, VK_DYNAMIC_STATE_SCISSOR };
 		m_descriptorSetLayouts.clear();
 		m_pushConstantRanges.clear();
 	}
@@ -253,7 +253,18 @@ namespace fan {
 	//================================================================================================================================
 	//================================================================================================================================
 	void Pipeline::Bind( VkCommandBuffer _commandBuffer ) {
+		m_viewports[0].x = 0.f;
+		m_viewports[0].y = 0.f;
+		m_viewports[0].width = static_cast<float> ( m_extent.width );
+		m_viewports[0].height = static_cast<float> ( m_extent.height );
+		m_viewports[0].minDepth = 0.0f;
+		m_viewports[0].maxDepth = 1.0f;
+
+		m_scissors[0].offset = { 0, 0 };
+		m_scissors[0].extent = m_extent;
+
 		vkCmdBindPipeline( _commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, m_pipeline );
+		vkCmdSetScissor( _commandBuffer, 0, static_cast<uint32_t>( m_scissors.size() ), m_scissors.data() );
 		vkCmdSetViewport( _commandBuffer, 0, static_cast<uint32_t>( m_viewports.size()), m_viewports.data() );
 	}
 

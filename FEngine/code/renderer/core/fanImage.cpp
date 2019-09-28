@@ -29,6 +29,7 @@ namespace fan
 	//================================================================================================================================
 	//================================================================================================================================
 	bool Image::Create(VkFormat _format, VkExtent2D _size, VkImageUsageFlags _usage, VkMemoryPropertyFlags _memoryProperties) {
+		m_size = _size;
 
 		VkImageCreateInfo imageCreateInfo;
 		imageCreateInfo.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;

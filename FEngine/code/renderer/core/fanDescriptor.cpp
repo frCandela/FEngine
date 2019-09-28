@@ -32,7 +32,7 @@ namespace fan {
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void Descriptor::AddUniformBinding( VkShaderStageFlags  _stage, VkDeviceSize _bufferSize ) {
+	void Descriptor::AddUniformBinding( VkShaderStageFlags  _stage, VkDeviceSize _bufferSize, const int /*_index*/ ) {
 		BindingData bindingData;
 		bindingData.SetBuffer( m_device, _bufferSize );
 		bindingData.UpdateLayoutBinding( m_bindingData.size(), _stage, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 1 );
@@ -41,7 +41,7 @@ namespace fan {
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void Descriptor::AddDynamicUniformBinding( VkShaderStageFlags  _stage, VkDeviceSize _bufferSize, VkDeviceSize _alignment ) {
+	void Descriptor::AddDynamicUniformBinding( VkShaderStageFlags  _stage, VkDeviceSize _bufferSize, VkDeviceSize _alignment, const int /*_index*/ ) {
 		BindingData bindingData;
 		bindingData.SetBuffer( m_device, _bufferSize, _alignment );
 		bindingData.UpdateLayoutBinding(  m_bindingData.size(), _stage, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC, 1 );
@@ -49,12 +49,21 @@ namespace fan {
 	}
 
 	//================================================================================================================================
+	// Adds a COMBINED_IMAGE_SAMPLER binding 
+	// If '_index' is -1 appends it to the bindings list
+	// If '_index' > 0 updates the corresponding binding
 	//================================================================================================================================
-	void Descriptor::AddImageSamplerBinding( VkShaderStageFlags  _stage, std::vector< VkImageView > & _imageViews, VkSampler _sampler ) {
-		BindingData bindingData;
-		bindingData.SetImagesSampler( _imageViews, _sampler );
-		bindingData.UpdateLayoutBinding( m_bindingData.size(), _stage, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, _imageViews.size() );
-		m_bindingData.push_back( bindingData );
+	void Descriptor::AddImageSamplerBinding( VkShaderStageFlags  _stage, std::vector< VkImageView > & _imageViews, VkSampler _sampler, const int _index ) {
+		if ( _index < 0 ) {
+			BindingData bindingData;
+			bindingData.SetImagesSampler( _imageViews, _sampler );
+			bindingData.UpdateLayoutBinding( m_bindingData.size(), _stage, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, _imageViews.size() );
+			m_bindingData.push_back( bindingData );
+		} else {
+			assert( _index < m_bindingData.size() );
+			m_bindingData[_index].SetImagesSampler( _imageViews, _sampler );
+			m_bindingData[_index].UpdateLayoutBinding( m_bindingData.size(), _stage, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, _imageViews.size() );
+		}
 	}
 
 	//================================================================================================================================
@@ -138,23 +147,25 @@ namespace fan {
 			Debug::Get() << Debug::Severity::log << std::hex << "VkDescriptorSet       " << m_descriptorSet << std::dec << Debug::Endl();
 		}
 
-		// Update DescriptorSets
-		{
-			std::vector<VkWriteDescriptorSet>	writeDescriptors;
-			for ( int descriptorIndex = 0; descriptorIndex < m_bindingData.size(); descriptorIndex++ ) {
-				m_bindingData[descriptorIndex].UpdateWriteDescriptorSet( descriptorIndex, m_descriptorSet );
-				writeDescriptors.push_back( m_bindingData[descriptorIndex].writeDescriptorSet );
-			}
+		Update();
 
-			vkUpdateDescriptorSets(
-				m_device.vkDevice,
-				static_cast<uint32_t>( writeDescriptors.size() ),
-				writeDescriptors.data(),
-				0,
-				nullptr
-			);
-		}
 		return true;
+	}
+
+	void Descriptor::Update() {
+		std::vector<VkWriteDescriptorSet>	writeDescriptors;
+		for ( int descriptorIndex = 0; descriptorIndex < m_bindingData.size(); descriptorIndex++ ) {
+			m_bindingData[descriptorIndex].UpdateWriteDescriptorSet( descriptorIndex, m_descriptorSet );
+			writeDescriptors.push_back( m_bindingData[descriptorIndex].writeDescriptorSet );
+		}
+
+		vkUpdateDescriptorSets(
+			m_device.vkDevice,
+			static_cast<uint32_t>( writeDescriptors.size() ),
+			writeDescriptors.data(),
+			0,
+			nullptr
+		);
 	}
 
 	//================================================================================================================================
@@ -177,7 +188,7 @@ namespace fan {
 	// Descriptor::BindingData
 	//================================================================================================================================
 	void Descriptor::BindingData::SetImagesSampler( std::vector< VkImageView > & _imageViews, VkSampler _sampler ) {
-		assert( descriptorsImageInfo.empty() );
+		descriptorsImageInfo.clear();
 		descriptorsImageInfo.reserve( _imageViews.size() );
 		for ( int viewIndex = 0; viewIndex < _imageViews.size(); viewIndex++ ) {
 			VkDescriptorImageInfo imageInfo;

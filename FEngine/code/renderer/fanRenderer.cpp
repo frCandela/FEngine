@@ -80,8 +80,9 @@ namespace fan
 			m_debugTrianglesPipeline->SetUniformPointers( &m_debugUniforms );
 			m_debugTrianglesPipeline->Create();
 
-			m_postprocessPipeline = new PostprocessPipeline(*m_device, m_renderPassPostprocess);
-			m_postprocessPipeline->Create(m_swapchain->GetSurfaceFormat().format, m_swapchain->GetExtent());		
+			m_postprocessPipeline = new PostprocessPipeline(*m_device, m_swapchain->GetSurfaceFormat().format, m_swapchain->GetExtent() );
+			m_postprocessPipeline->Init( m_renderPassPostprocess, m_swapchain->GetExtent(), "code/shaders/postprocess.vert", "code/shaders/postprocess.frag" );
+			m_postprocessPipeline->Create();
 		
 			m_imguiPipeline = new ImguiPipeline(*m_device, m_swapchain->GetSwapchainImagesCount());
 			m_imguiPipeline->Create(m_renderPassPostprocess, m_window->GetWindow(), m_swapchain->GetExtent());
@@ -518,7 +519,7 @@ namespace fan
 			commandBufferBeginInfo.pInheritanceInfo = &commandBufferInheritanceInfo;
 
 			if (vkBeginCommandBuffer(commandBuffer, &commandBufferBeginInfo) == VK_SUCCESS) {
-				m_postprocessPipeline->Draw(commandBuffer);
+				m_postprocessPipeline->Bind(commandBuffer);
 
 				if (vkEndCommandBuffer(commandBuffer) != VK_SUCCESS) {
 					Debug::Get() << Debug::Severity::error << "Could not record command buffer " << commandBuffer << "." << Debug::Endl();
@@ -701,7 +702,6 @@ namespace fan
 			m_debugLinesPipelineNoDepthTest->ReloadShaders();
 			m_debugTrianglesPipeline->ReloadShaders();
 
-			m_postprocessPipeline->Resize(m_swapchain->GetExtent());
 			m_forwardPipeline->Resize(m_swapchain->GetExtent());
 
 			DeleteForwardFramebuffers();

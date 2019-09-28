@@ -1,9 +1,9 @@
 #pragma once
 
+#include "renderer/core/fanPipeline.h"
+
 namespace fan
 {
-	class Device;
-	class Shader;
 	class Sampler;
 	class Image;
 	class ImageView;
@@ -12,46 +12,31 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	class PostprocessPipeline {
+	class PostprocessPipeline : public Pipeline {
 	public:
-		PostprocessPipeline(Device& _device, VkRenderPass& _renderPass);
-		~PostprocessPipeline();
+		PostprocessPipeline( Device& _device, const VkFormat _format, const VkExtent2D _extent );
+		~PostprocessPipeline() override;
 
 		struct Uniforms {
 			glm::vec4 color;
 		};
 
-		bool Create(const VkFormat _format, VkExtent2D _extent);
-		void Draw(VkCommandBuffer _commandBuffer);
-		void Resize(VkExtent2D _extent);
-		void ReloadShaders();
+		void Resize( const VkExtent2D _extent ) override;
+		void Bind( VkCommandBuffer _commandBuffer ) override;
 
 		Uniforms GetUniforms() const { return m_uniforms; }
 		void SetUniforms(const Uniforms _uniforms);
-
-		VkPipeline		GetPipeline() { return m_pipeline; }
 		VkImageView		GetImageView();
 
+	protected:
+		void ConfigurePipeline() override;
+
 	private:
-		void CreateShaders();
 		bool CreateDescriptors();
-		bool CreatePipeline(VkExtent2D _extent);
 		void CreateImagesAndViews(VkExtent2D _extent);
 		void CreateVertexBuffer();
 
-		void DeleteImages();
-		void DeletePipeline();
-		void DeleteDescriptors();
-
-		Device& m_device;
-		VkRenderPass& m_renderPass;
 		VkFormat m_format;
-
-		VkPipelineLayout	m_pipelineLayout;
-		VkPipeline			m_pipeline;
-
-		Shader * m_fragmentShader = nullptr;
-		Shader * m_vertexShader = nullptr;
 
 		Descriptor *	m_descriptor = nullptr;
 		Sampler *		m_sampler;

@@ -15,9 +15,11 @@ namespace fan
 		void TransitionImageLayout(VkCommandBuffer _commandBuffer, VkFormat _format, VkImageLayout _oldLayout, VkImageLayout _newLayout, uint32_t _mipLevels);
 
 		VkImage GetImage() { return m_image; }
+		VkExtent2D GetSize() const { return m_size; }
 	private:
 		Device &		m_device;
 
+		VkExtent2D		m_size;
 		VkImage			m_image;
 		VkDeviceMemory	m_imageMemory;
 

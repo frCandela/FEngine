@@ -4,8 +4,6 @@
 
 namespace fan
 {
-	class Device;
-	class Shader;
 	class Image;
 	class ImageView;
 	class Buffer;
@@ -17,7 +15,7 @@ namespace fan
 	class DebugPipeline : public Pipeline {
 	public:
 		DebugPipeline(Device& _device, const VkPrimitiveTopology _primitiveTopology, const bool _depthTestEnable);
-		virtual ~DebugPipeline();
+		virtual ~DebugPipeline() override;
 
 		void Bind( VkCommandBuffer _commandBuffer ) override;
 		void SetUniformPointers( DebugUniforms * _debugUniforms	);

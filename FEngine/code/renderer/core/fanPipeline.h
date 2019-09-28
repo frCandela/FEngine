@@ -13,8 +13,8 @@ namespace fan {
 
 		void Init( VkRenderPass _renderPass, const VkExtent2D _extent, const std::string _vertShaderPath, const std::string _fragShaderPath );
 		void Create();
-		void Resize( const VkExtent2D _extent );
-		void ReloadShaders();
+		virtual void Resize( const VkExtent2D _extent );
+		virtual void ReloadShaders();
 		virtual void Bind( VkCommandBuffer _commandBuffer );
 
 		VkPipeline	GetPipeline() { return m_pipeline; }
@@ -40,6 +40,8 @@ namespace fan {
 		std::vector<VkRect2D>							 m_scissors;
 
 		virtual void ConfigurePipeline() = 0;
+		bool CreatePipeline();
+		void DeletePipeline();
 
 	private:
 		VkPipeline	 m_pipeline;
@@ -54,7 +56,6 @@ namespace fan {
 
 		void CreateShaders();
 		void PreConfigurePipeline();
-		bool CreatePipeline();
-		void DeletePipeline();
+
 	};
 }
