@@ -22,7 +22,7 @@ namespace fan
 	//================================================================================================================================
 	ConsoleWindow::ConsoleWindow() :
 		EditorWindow("console"),
-		m_maxSizeLogBuffers(64),
+		m_maxSizeLogBuffers(256),
 		m_firstLogIndex(0),
 		m_grabFocus(false)
 	{
