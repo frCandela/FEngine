@@ -34,14 +34,14 @@ namespace fan {
 	//================================================================================================================================
 	void Pipeline::Create() {
 		CreateShaders();
-		PreConfigurePipeline();
-		ConfigurePipeline();
 		CreatePipeline();
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
 	bool Pipeline::CreatePipeline() {
+		PreConfigurePipeline();
+		ConfigurePipeline();
 
 		assert( m_bindingDescription.size() > 0 );
 		assert( m_attributeDescriptions.size() > 0 );

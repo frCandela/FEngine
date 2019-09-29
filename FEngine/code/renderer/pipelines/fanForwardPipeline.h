@@ -3,6 +3,8 @@
 #include "renderer/fanUniforms.h"
 #include "core/memory/fanAlignedMemory.h"
 
+#include "renderer/core/fanPipeline.h"
+
 namespace fan
 {
 	class Mesh;
@@ -18,59 +20,40 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	class ForwardPipeline {
+	class ForwardPipeline : public Pipeline {
 	public:
-		ForwardPipeline(Device& _device, VkRenderPass& _renderPass);
-		~ForwardPipeline();
+		ForwardPipeline( Device& _device, const VkExtent2D _extent );
+		~ForwardPipeline() override;
 
-		void Create(VkExtent2D _extent);
-		void Draw(VkCommandBuffer _commandBuffer, const std::array< Mesh *, s_maximumNumModels > _meshArray, const uint32_t _num );
-		void Resize(VkExtent2D _extent);
-		void ReloadShaders();
+		void Resize( const VkExtent2D _extent ) override;
+		void Bind( VkCommandBuffer _commandBuffer ) override;
+		void BindDescriptors( VkCommandBuffer _commandBuffer, const uint32_t _indexOffset );
 		void UpdateUniformBuffers();
-		void SetUniformPointers( 
-			LightsUniforms * _lightUniforms, 
-			AlignedMemory<DynamicUniformsVert>* _dynamicUniformsVert, 
-			AlignedMemory<DynamicUniformsMaterial>* _dynamicUniformsMaterial,
-			VertUniforms * _vertUniforms,
-			FragUniforms * _fragUniforms
-		);
 
-		VkPipeline		GetPipeline() { return m_pipeline; }
 		VkImageView		GetDepthImageView();
 
+		VertUniforms  vertUniforms;
+		AlignedMemory<DynamicUniformsVert> dynamicUniformsVert;
+		FragUniforms  fragUniforms;		
+		AlignedMemory<DynamicUniformsMaterial> dynamicUniformsMaterial;
+		LightsUniforms  lightUniforms;
+
+	protected:
+		void ConfigurePipeline() override;
+
 	private:
-		Device&					m_device;
-		VkRenderPass&			m_renderPass;
-
-		VkPipelineLayout		m_pipelineLayout;
-		VkPipeline				m_pipeline;
-
 		Descriptor * m_sceneDescriptor;
 		Descriptor * m_texturesDescriptor;
 
 		Sampler *	m_sampler;
 		Image *		m_depthImage;
 		ImageView *	m_depthImageView;
+		
+		bool CreateSceneDescriptor();
+		bool CreateTextureDescriptor();
 
-		Shader *	m_fragmentShader = nullptr;
-		Shader *	m_vertexShader = nullptr;
-
-		// Pointer to the uniforms data
-		AlignedMemory<DynamicUniformsVert>*		m_dynamicUniformsVert;
-		VertUniforms * m_vertUniforms;
- 		AlignedMemory<DynamicUniformsMaterial>* m_dynamicUniformsMaterial;
- 		LightsUniforms * m_lightUniforms;
- 		FragUniforms * m_fragUniforms;
-
-		void CreateShaders(); 
-		bool CreateDescriptors();
 		bool CreateDepthRessources(VkExtent2D _extent);
-		bool CreatePipeline(VkExtent2D _extent);
-
 		void DeleteDepthRessources();
-		void DeletePipeline();
-		void DeleteDescriptors();
 
 	};
 }

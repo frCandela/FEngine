@@ -63,7 +63,6 @@ namespace fan
 		void SetNumMesh( const uint32_t _num );
 		void SetTransformAt( const uint32_t _index, glm::mat4 _modelMatrix,	glm::mat4 _normalMatrix );
 		void SetMaterialAt( const uint32_t _index, const glm::vec3 _color, const uint32_t _shininess, const uint32_t _textureIndex );
-		void SetPostProcess( const glm::vec3 _color );
 
 		float GetWindowAspectRatio() const;
 		bool  HasNoDebugToDraw() const { return m_debugLinesNoDepthTest.empty() && m_debugLines.empty() && m_debugTriangles.empty(); }
@@ -79,12 +78,6 @@ namespace fan
 		void					DebugAABB	  ( const AABB & _aabb, const Color _color);
 
 	private:
-		LightsUniforms							m_lightsUniforms;
-		AlignedMemory<DynamicUniformsVert>		m_dynamicUniformsVert;
-		AlignedMemory<DynamicUniformsMaterial>	m_dynamicUniformsFrag;
-		VertUniforms							m_vertUniforms;
-		FragUniforms							m_fragUniforms;
-
 		std::array< Mesh *, s_maximumNumModels > m_meshDrawArray;
 		uint32_t								 m_numMesh;
 

@@ -37,23 +37,6 @@ namespace fan
 
 			m_swapchain->Create(m_window->GetSurface(), _size);
 			Input::Get().Setup(m_window->GetWindow());
-
-			// Calculate required alignment based on minimum device offset alignment
-			size_t minUboAlignment = m_device->GetDeviceProperties().limits.minUniformBufferOffsetAlignment;
-			size_t dynamicAlignmentVert = sizeof( DynamicUniformsVert );
-			size_t dynamicAlignmentFrag = sizeof( DynamicUniformsMaterial );
-			if ( minUboAlignment > 0 ) {
-				dynamicAlignmentVert = ( ( sizeof( DynamicUniformsVert ) + minUboAlignment - 1 ) & ~( minUboAlignment - 1 ) );
-				dynamicAlignmentFrag = ( ( sizeof( DynamicUniformsMaterial ) + minUboAlignment - 1 ) & ~( minUboAlignment - 1 ) );
-			}
-			m_dynamicUniformsVert.Resize( s_maximumNumModels * dynamicAlignmentVert, dynamicAlignmentVert );
-			m_dynamicUniformsFrag.Resize( s_maximumNumModels * dynamicAlignmentFrag, dynamicAlignmentFrag );
-
-			for ( int uniformIndex = 0; uniformIndex < s_maximumNumModels; uniformIndex++ ) {
-				m_dynamicUniformsFrag[uniformIndex].color = glm::vec3( 1 );
-				m_dynamicUniformsFrag[uniformIndex].textureIndex = 0;
-				m_dynamicUniformsFrag[uniformIndex].shininess = 1;
-			}
 			
 			CreateCommandPool();
 			CreateRenderPass();
@@ -62,9 +45,9 @@ namespace fan
 
 			m_ressourceManager =  new RessourceManager( *m_device );
 
-			m_forwardPipeline = new ForwardPipeline(*m_device, m_renderPass);
-			m_forwardPipeline->SetUniformPointers( &m_lightsUniforms, &m_dynamicUniformsVert, &m_dynamicUniformsFrag, &m_vertUniforms, &m_fragUniforms );
-			m_forwardPipeline->Create( m_swapchain->GetExtent());
+			m_forwardPipeline = new ForwardPipeline(*m_device, m_swapchain->GetExtent());
+			m_forwardPipeline->Init( m_renderPass, m_swapchain->GetExtent(), "code/shaders/forward.vert", "code/shaders/forward.frag" );
+			m_forwardPipeline->Create();
 
 			m_debugLinesPipeline = new DebugPipeline(*m_device, VK_PRIMITIVE_TOPOLOGY_LINE_LIST, true);
 			m_debugLinesPipeline->Init( m_renderPass, m_swapchain->GetExtent(), "code/shaders/debugLines.vert", "code/shaders/debugLines.frag" );
@@ -319,17 +302,17 @@ namespace fan
 		//================================================================================================================================
 		//================================================================================================================================
 		void Renderer::SetMainCamera( const glm::mat4 _projection, const glm::mat4 _view, const glm::vec3 _position ) {
-			m_vertUniforms.view = _view;
-			m_vertUniforms.proj = _projection;
-			m_vertUniforms.proj[1][1] *= -1;
+			m_forwardPipeline->vertUniforms.view = _view;
+			m_forwardPipeline->vertUniforms.proj = _projection;
+			m_forwardPipeline->vertUniforms.proj[1][1] *= -1;
 
-			m_fragUniforms.cameraPosition = _position;
+			m_forwardPipeline->fragUniforms.cameraPosition = _position;
 
 			std::array< DebugPipeline *, 3 > debugLinesPipelines  = { m_debugLinesPipeline, m_debugLinesPipelineNoDepthTest, m_debugTrianglesPipeline };
 			for (int pipelingIndex = 0; pipelingIndex < debugLinesPipelines.size(); pipelingIndex++){
 				debugLinesPipelines[pipelingIndex]->debugUniforms.model = glm::mat4( 1.0 );
-				debugLinesPipelines[pipelingIndex]->debugUniforms.view = m_vertUniforms.view;
-				debugLinesPipelines[pipelingIndex]->debugUniforms.proj = m_vertUniforms.proj;
+				debugLinesPipelines[pipelingIndex]->debugUniforms.view = m_forwardPipeline->vertUniforms.view;
+				debugLinesPipelines[pipelingIndex]->debugUniforms.proj = m_forwardPipeline->vertUniforms.proj;
 				debugLinesPipelines[pipelingIndex]->debugUniforms.color = glm::vec4( 1, 1, 1, 1 );
 			}
 		}
@@ -338,51 +321,51 @@ namespace fan
 		//================================================================================================================================
 		void Renderer::SetDirectionalLight( const int _index, const glm::vec4 _direction, const glm::vec4 _ambiant, const glm::vec4 _diffuse, const glm::vec4 _specular ) {
 			assert( _index  < s_maximumNumDirectionalLights );
-			m_lightsUniforms.dirLights[_index].direction = _direction;
-			m_lightsUniforms.dirLights[_index].ambiant = _ambiant;
-			m_lightsUniforms.dirLights[_index].diffuse = _diffuse;
-			m_lightsUniforms.dirLights[_index].specular = _specular;			
+			m_forwardPipeline->lightUniforms.dirLights[_index].direction = _direction;
+			m_forwardPipeline->lightUniforms.dirLights[_index].ambiant = _ambiant;
+			m_forwardPipeline->lightUniforms.dirLights[_index].diffuse = _diffuse;
+			m_forwardPipeline->lightUniforms.dirLights[_index].specular = _specular;			
 		}
 
 		//================================================================================================================================
 		//================================================================================================================================
 		void  Renderer::SetNumDirectionalLights( const uint32_t _num ) {
 			assert( _num < s_maximumNumDirectionalLights );
-			m_lightsUniforms.dirLightsNum = _num;
+			m_forwardPipeline->lightUniforms.dirLightsNum = _num;
 		}
 
 		//================================================================================================================================
 		//================================================================================================================================
 		void Renderer::SetPointLight( const int _index, const glm::vec3 _position, const glm::vec3 _diffuse, const glm::vec3 _specular, const glm::vec3 _ambiant, const glm::vec3 _constantLinearQuadratic ) {
 			assert( _index < s_maximumNumPointLights );
-			m_lightsUniforms.pointlights[_index].position	= glm::vec4(_position,1);
-			m_lightsUniforms.pointlights[_index].diffuse		= glm::vec4( _diffuse, 1 );
-			m_lightsUniforms.pointlights[_index].specular	= glm::vec4( _specular, 1 );
-			m_lightsUniforms.pointlights[_index].ambiant		= glm::vec4( _ambiant, 1 );
-			m_lightsUniforms.pointlights[_index].constant	= _constantLinearQuadratic[0];
-			m_lightsUniforms.pointlights[_index].linear		= _constantLinearQuadratic[1];
-			m_lightsUniforms.pointlights[_index].quadratic	= _constantLinearQuadratic[2];
+			m_forwardPipeline->lightUniforms.pointlights[_index].position	= glm::vec4(_position,1);
+			m_forwardPipeline->lightUniforms.pointlights[_index].diffuse		= glm::vec4( _diffuse, 1 );
+			m_forwardPipeline->lightUniforms.pointlights[_index].specular	= glm::vec4( _specular, 1 );
+			m_forwardPipeline->lightUniforms.pointlights[_index].ambiant		= glm::vec4( _ambiant, 1 );
+			m_forwardPipeline->lightUniforms.pointlights[_index].constant	= _constantLinearQuadratic[0];
+			m_forwardPipeline->lightUniforms.pointlights[_index].linear		= _constantLinearQuadratic[1];
+			m_forwardPipeline->lightUniforms.pointlights[_index].quadratic	= _constantLinearQuadratic[2];
 		}
 
 		//================================================================================================================================
 		//================================================================================================================================
 		void  Renderer::SetNumPointLights( const uint32_t _num ) {
 			assert( _num < s_maximumNumPointLights );
-			m_lightsUniforms.pointLightNum = _num;
+			m_forwardPipeline->lightUniforms.pointLightNum = _num;
 		}
 
 		//================================================================================================================================
 		//================================================================================================================================
 		void Renderer::SetDynamicUniformVert( const DynamicUniformsVert& _dynamicUniform, const uint32_t _index ) {
 			assert( _index < s_maximumNumModels );
-			m_dynamicUniformsVert[_index] = _dynamicUniform;
+			m_forwardPipeline->dynamicUniformsVert[_index] = _dynamicUniform;
 		}
 
 		//================================================================================================================================
 		//================================================================================================================================
 		void Renderer::SetDynamicUniformFrag( const DynamicUniformsMaterial& _dynamicUniform, const uint32_t _index ) {
 			assert( _index < s_maximumNumModels );
-			m_dynamicUniformsFrag[_index] = _dynamicUniform;
+			m_forwardPipeline->dynamicUniformsMaterial[_index] = _dynamicUniform;
 		}
 
 
@@ -404,17 +387,17 @@ namespace fan
 		//================================================================================================================================
 		void Renderer::SetTransformAt( const uint32_t _index, glm::mat4 _modelMatrix, glm::mat4 _normalMatrix ) {
 			assert( _index < s_maximumNumModels );
-			m_dynamicUniformsVert[_index].modelMat	  = _modelMatrix;
-			m_dynamicUniformsVert[_index].rotationMat = _normalMatrix;
+			m_forwardPipeline->dynamicUniformsVert[_index].modelMat	  = _modelMatrix;
+			m_forwardPipeline->dynamicUniformsVert[_index].rotationMat = _normalMatrix;
 		}
 
 		//================================================================================================================================
 		//================================================================================================================================
 		void Renderer::SetMaterialAt( const uint32_t _index, const glm::vec3 _color, const uint32_t _shininess, const uint32_t _textureIndex ) {
 			assert( _index < s_maximumNumModels );
-			m_dynamicUniformsFrag[_index].color = _color;
-			m_dynamicUniformsFrag[_index].shininess = _shininess;
-			m_dynamicUniformsFrag[_index].textureIndex = _textureIndex;
+			m_forwardPipeline->dynamicUniformsMaterial[_index].color = _color;
+			m_forwardPipeline->dynamicUniformsMaterial[_index].shininess = _shininess;
+			m_forwardPipeline->dynamicUniformsMaterial[_index].textureIndex = _textureIndex;
 		}
 	
 		//================================================================================================================================
@@ -654,7 +637,28 @@ namespace fan
 			commandBufferBeginInfo.pInheritanceInfo = &commandBufferInheritanceInfo;
 
 			if (vkBeginCommandBuffer(commandBuffer, &commandBufferBeginInfo) == VK_SUCCESS) {
-				m_forwardPipeline->Draw(commandBuffer, m_meshDrawArray, m_numMesh );
+				m_forwardPipeline->Bind( commandBuffer);
+
+				for ( uint32_t meshIndex = 0; meshIndex < m_numMesh; meshIndex++ ) {
+					Mesh * mesh = m_meshDrawArray[meshIndex];
+
+					if ( mesh != nullptr ) {
+						assert( mesh->GetVertexBuffer() != nullptr );
+						assert( mesh->GetIndexBuffer() != nullptr );
+
+						m_forwardPipeline->BindDescriptors( commandBuffer, meshIndex );
+						VkDeviceSize offsets[] = { 0 };
+						VkBuffer vertexBuffers[] = { mesh->GetVertexBuffer()->GetBuffer() };
+						vkCmdBindVertexBuffers( commandBuffer, 0, 1, vertexBuffers, offsets );
+						vkCmdBindIndexBuffer( commandBuffer, mesh->GetIndexBuffer()->GetBuffer(), 0, VK_INDEX_TYPE_UINT32 );
+						vkCmdDrawIndexed( commandBuffer, static_cast<uint32_t>( mesh->GetIndices().size() ), 1, 0, 0, 0 );
+					}
+				}
+
+
+
+
+
 				if (vkEndCommandBuffer(commandBuffer) != VK_SUCCESS) {
 					Debug::Get() << Debug::Severity::error << "Could not record command buffer " << _index << "." << Debug::Endl();
 				}
