@@ -56,7 +56,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void ImguiPipeline::UpdateBuffer(const int _index) {
+	void ImguiPipeline::UpdateBuffer(const size_t _index) {
 		ImDrawData* imDrawData = ImGui::GetDrawData();
 
 		// Update buffers only if the imgui command list is not empty
@@ -108,7 +108,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void ImguiPipeline::DrawFrame(VkCommandBuffer _commandBuffer, const int _index) {
+	void ImguiPipeline::DrawFrame(VkCommandBuffer _commandBuffer, const size_t _index) {
 		ImDrawData* imDrawData = ImGui::GetDrawData();
 		if (imDrawData &&  imDrawData->CmdListsCount > 0)
 		{

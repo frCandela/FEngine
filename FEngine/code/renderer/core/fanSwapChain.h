@@ -30,7 +30,7 @@ namespace fan
 		VkSwapchainKHR		GetVkSwapChain() { return m_swapchain; }
 		VkSurfaceFormatKHR	GetSurfaceFormat() const { return m_surfaceFormat; }
 		VkExtent2D			GetExtent() const { return m_size; }
-		VkImageView			GetImageView(int index);
+		std::vector< VkImageView >	GetImageViews();
 
 		const int MAX_FRAMES_IN_FLIGHT = 3;
 	private:

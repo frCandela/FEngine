@@ -27,7 +27,7 @@ namespace fan
 		virtual ~DebugPipeline() override;
 
 		void Bind( VkCommandBuffer _commandBuffer ) override;
-		void UpdateUniformBuffers();
+		void UpdateUniformBuffers() override;
 
 	protected:
 		void ConfigurePipeline() override;

@@ -3,9 +3,6 @@
 #include "renderer/pipelines/fanPostprocessPipeline.h"
 #include "renderer/core/fanDevice.h"
 #include "renderer/core/fanShader.h"
-#include "renderer/core/fanSampler.h"
-#include "renderer/core/fanImage.h"
-#include "renderer/core/fanImageView.h" 
 #include "renderer/core/fanBuffer.h"
 #include "renderer/core/fanDescriptor.h"
 #include "renderer/fanRenderer.h"
@@ -14,42 +11,25 @@ namespace fan
 {
 	//================================================================================================================================
 	//================================================================================================================================
-	PostprocessPipeline::PostprocessPipeline(Device& _device, const VkFormat _format, const VkExtent2D _extent ) :
+	PostprocessPipeline::PostprocessPipeline( Device& _device ) :
 		Pipeline(_device)		 
 	{
 		uniforms.color = glm::vec4(1, 1, 1, 1);
-		m_format = _format;
-		//Sampler
-		m_sampler = new Sampler(m_device);
-		m_sampler->CreateSampler(0, 1.f);
-
-		CreateImagesAndViews( _extent );
-		CreateDescriptors();
-
-		uniforms.color = glm::vec4( 1, 1, 1, 1 );
-		UpdateUniformBuffers();
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
 	PostprocessPipeline::~PostprocessPipeline() {
 		delete m_descriptor;
-		delete m_imageView;
-		delete m_image;
-		delete m_sampler;
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
 	void PostprocessPipeline::Resize( const VkExtent2D _extent ) {
 		Pipeline::Resize(_extent);
-		delete m_imageView;
-		delete m_image;
-		CreateImagesAndViews(_extent);
-		std::vector<VkImageView> views = { m_imageView->GetImageView() };
-		m_descriptor->AddImageSamplerBinding( VK_SHADER_STAGE_FRAGMENT_BIT, views, m_sampler->GetSampler(), 0 );
+		std::vector<VkImageView> views = { m_imageView };
+		m_descriptor->SetImageSamplerBinding( VK_SHADER_STAGE_FRAGMENT_BIT, views, m_sampler, 0 );
 		m_descriptor->Update();
-		Debug::Get() << Debug::Severity::warning << m_image->GetSize().width << " " << m_image->GetSize().height << Debug::Endl();
 	}
 
 	//================================================================================================================================
@@ -61,23 +41,29 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
+	void PostprocessPipeline::ReloadShaders( ) {
+		Pipeline::ReloadShaders( );
+		std::vector<VkImageView> views = { m_imageView };
+		m_descriptor->SetImageSamplerBinding( VK_SHADER_STAGE_FRAGMENT_BIT, views, m_sampler, 0 );
+		m_descriptor->Update();
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
 	void PostprocessPipeline::UpdateUniformBuffers() {
 		m_descriptor->SetBinding(1, &uniforms, sizeof( Uniforms ) );
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	VkImageView PostprocessPipeline::GetImageView() { return m_imageView->GetImageView(); }
-
-	//================================================================================================================================
-	//================================================================================================================================
-	bool PostprocessPipeline::CreateDescriptors() {
+	void PostprocessPipeline::CreateDescriptors() {
 		delete m_descriptor;
 		m_descriptor = new Descriptor( m_device );
-		std::vector<VkImageView> views = { m_imageView->GetImageView() };
-		m_descriptor->AddImageSamplerBinding( VK_SHADER_STAGE_FRAGMENT_BIT , views, m_sampler->GetSampler() );
-		m_descriptor->AddUniformBinding( VK_SHADER_STAGE_FRAGMENT_BIT, sizeof( Uniforms ) );
-		return m_descriptor->Create();		
+		std::vector<VkImageView> views = { m_imageView };
+		m_descriptor->SetImageSamplerBinding( VK_SHADER_STAGE_FRAGMENT_BIT , views, m_sampler );
+		m_descriptor->SetUniformBinding( VK_SHADER_STAGE_FRAGMENT_BIT, sizeof( Uniforms ) );
+		m_descriptor->Create();		
+		UpdateUniformBuffers();
 	}
 
 	//================================================================================================================================
@@ -103,18 +89,8 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void PostprocessPipeline::CreateImagesAndViews(VkExtent2D _extent) {
-
-		m_image = new Image(m_device);
-		m_image->Create(
-			m_format,
-			_extent,
-			VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT | VK_IMAGE_USAGE_STORAGE_BIT | VK_IMAGE_USAGE_INPUT_ATTACHMENT_BIT | VK_IMAGE_USAGE_SAMPLED_BIT,
-			VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT
-		);
-		m_imageView = new ImageView(m_device);
-		m_imageView->Create(m_image->GetImage(), m_format, VK_IMAGE_ASPECT_COLOR_BIT, VK_IMAGE_VIEW_TYPE_2D);
+	void PostprocessPipeline::SetImageAndView( VkImageView _imageView, VkSampler _sampler ) { 
+		m_sampler = _sampler;
+		m_imageView = _imageView;
 	}
-
-
 }

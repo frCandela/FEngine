@@ -59,7 +59,13 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	VkImageView SwapChain::GetImageView(int index) { return m_imageViews[index]->GetImageView(); }
+	std::vector< VkImageView > SwapChain::GetImageViews() {
+		std::vector< VkImageView > views;
+		for (size_t imageIndex = 0; imageIndex < m_imagesCount; imageIndex++) {
+			views.push_back( m_imageViews[imageIndex]->GetImageView() );
+		}
+		return views;
+	}
 
 	//================================================================================================================================
 	//================================================================================================================================

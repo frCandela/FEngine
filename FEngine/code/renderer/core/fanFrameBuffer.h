@@ -3,6 +3,9 @@
 namespace fan
 {
 	class Device;
+	class Sampler;
+	class Image;
+	class ImageView;
 
 	//================================================================================================================================
 	//================================================================================================================================
@@ -11,12 +14,39 @@ namespace fan
 		FrameBuffer(Device & _device);
 		~FrameBuffer();
 
-		bool Create(VkRenderPass _renderPass, std::vector<VkImageView> & _attachments, VkExtent2D _size);
+		void AddDepthAttachment( const VkExtent2D _extent );
+		void AddColorAttachment( const VkExtent2D _extent, const VkFormat _format );
+		void SetExternalAttachment( const std::vector< VkImageView > _perFramebufferViews );
+		bool Create( const size_t _count, VkRenderPass _renderPass, const VkExtent2D _extent );
+		void Resize( const VkExtent2D _extent );
 
-		VkFramebuffer GetFrameBuffer() { return m_framebuffer; }
+		VkFramebuffer GetFrameBuffer( const size_t _index ) { return m_frameBuffers[_index]; }
+		VkSampler	  GetColorAttachmentSampler();
+		VkImageView   GetColorAttachmentImageView();
 
 	private:
-		Device & m_device;
-		VkFramebuffer m_framebuffer;
+		Device &	m_device;
+
+		std::vector<VkFramebuffer> m_frameBuffers;
+		VkRenderPass m_renderPass;
+		size_t m_count;
+
+		// External attachment
+		std::vector< VkImageView > m_externalAttachments;
+
+		// Depth attachment
+		Image *		m_depthImage	 = nullptr;
+		ImageView *	m_depthImageView = nullptr;
+
+		// Color attachment
+		VkFormat	m_colorFormat;
+		VkExtent2D	m_colorExtend;
+		Sampler *	m_colorSampler	 = nullptr;
+		Image *		m_colorImage	 = nullptr;
+		ImageView *	m_colorImageView = nullptr;
+
+		void CreateColorRessources( const VkExtent2D _extent, const VkFormat _format );
+		bool CreateDepthRessources( const VkExtent2D _extent );
+		void DestroyFrameBuffers();
 	};
 }

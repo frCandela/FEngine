@@ -17,8 +17,8 @@ namespace fan
 		~ImguiPipeline();
 
 		void Create(VkRenderPass _renderPass, GLFWwindow* _window, VkExtent2D _extent);
-		void UpdateBuffer(const int _index);
-		void DrawFrame(VkCommandBuffer commandBuffer, const int _index);
+		void UpdateBuffer(const size_t _index);
+		void DrawFrame(VkCommandBuffer commandBuffer, const size_t _index);
 
 	private:
 		Device & m_device;

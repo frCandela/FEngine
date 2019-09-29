@@ -16,6 +16,7 @@ namespace fan {
 		virtual void Resize( const VkExtent2D _extent );
 		virtual void ReloadShaders();
 		virtual void Bind( VkCommandBuffer _commandBuffer );
+		virtual void UpdateUniformBuffers() = 0;
 
 		VkPipeline	GetPipeline() { return m_pipeline; }
 

@@ -22,15 +22,13 @@ namespace fan
 	//================================================================================================================================
 	class ForwardPipeline : public Pipeline {
 	public:
-		ForwardPipeline( Device& _device, const VkExtent2D _extent );
+		ForwardPipeline( Device& _device );
 		~ForwardPipeline() override;
 
 		void Resize( const VkExtent2D _extent ) override;
 		void Bind( VkCommandBuffer _commandBuffer ) override;
 		void BindDescriptors( VkCommandBuffer _commandBuffer, const uint32_t _indexOffset );
-		void UpdateUniformBuffers();
-
-		VkImageView		GetDepthImageView();
+		void UpdateUniformBuffers() override;
 
 		VertUniforms  vertUniforms;
 		AlignedMemory<DynamicUniformsVert> dynamicUniformsVert;
@@ -43,17 +41,11 @@ namespace fan
 
 	private:
 		Descriptor * m_sceneDescriptor;
-		Descriptor * m_texturesDescriptor;
+		Descriptor * m_texturesDescriptor;		
 
-		Sampler *	m_sampler;
-		Image *		m_depthImage;
-		ImageView *	m_depthImageView;
-		
+		Sampler *	m_sampler = nullptr;
+
 		bool CreateSceneDescriptor();
 		bool CreateTextureDescriptor();
-
-		bool CreateDepthRessources(VkExtent2D _extent);
-		void DeleteDepthRessources();
-
 	};
 }

@@ -39,7 +39,7 @@ namespace fan
 		void WaitIdle();
 
 		void ReloadShaders();
-		void UpdateDebugBuffer(const int _index);
+		void UpdateDebugBuffer(const size_t _index);
 
 		VkCommandBuffer BeginSingleTimeCommands();
 		void			EndSingleTimeCommands(VkCommandBuffer commandBuffer);
@@ -114,8 +114,9 @@ namespace fan
 		std::vector<VkCommandBuffer> m_imguiCommandBuffers;
 		std::vector<VkCommandBuffer> m_debugCommandBuffers;
 		std::vector<VkCommandBuffer> m_postprocessCommandBuffers;
-		std::vector< FrameBuffer * > m_forwardFrameBuffers;
-		std::vector< FrameBuffer * > m_swapchainFramebuffers;
+
+		FrameBuffer * m_forwardFrameBuffers;
+		FrameBuffer * m_swapchainFramebuffers;
 
 		Buffer * m_quadVertexBuffer;
 		glm::vec4 m_clearColor;
@@ -131,11 +132,11 @@ namespace fan
 			m_debugTriangles.clear();
 		}
 
-		void RecordCommandBufferPostProcess(const int _index);
-		void RecordCommandBufferImgui(const int _index);
-		void RecordCommandBufferDebug(const int _index);
-		void RecordCommandBufferGeometry(const int _index);
-		void RecordPrimaryCommandBuffer(const int _index);
+		void RecordCommandBufferPostProcess(const size_t _index);
+		void RecordCommandBufferImgui(const size_t _index);
+		void RecordCommandBufferDebug(const size_t _index);
+		void RecordCommandBufferGeometry(const size_t _index);
+		void RecordPrimaryCommandBuffer(const size_t _index);
 		void RecordAllCommandBuffers();
 
 		bool CreateCommandBuffers();
@@ -150,7 +151,5 @@ namespace fan
 		void DeleteCommandPool();
 		void DeleteRenderPass();
 		void DeleteRenderPassPostprocess();
-		void DeleteForwardFramebuffers();
-		void DeleteSwapchainFramebuffers();
 	};
 }

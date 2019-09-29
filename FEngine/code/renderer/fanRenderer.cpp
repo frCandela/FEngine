@@ -42,10 +42,12 @@ namespace fan
 			CreateRenderPass();
 			CreateRenderPassPostprocess();
 			CreateQuadVertexBuffer();
+			CreateSwapchainFramebuffers();
+			CreateForwardFramebuffers();
 
 			m_ressourceManager =  new RessourceManager( *m_device );
 
-			m_forwardPipeline = new ForwardPipeline(*m_device, m_swapchain->GetExtent());
+			m_forwardPipeline = new ForwardPipeline(*m_device);
 			m_forwardPipeline->Init( m_renderPass, m_swapchain->GetExtent(), "code/shaders/forward.vert", "code/shaders/forward.frag" );
 			m_forwardPipeline->Create();
 
@@ -61,15 +63,15 @@ namespace fan
 			m_debugTrianglesPipeline->Init( m_renderPass, m_swapchain->GetExtent(), "code/shaders/debugTriangles.vert", "code/shaders/debugTriangles.frag" );
 			m_debugTrianglesPipeline->Create();
 
-			m_postprocessPipeline = new PostprocessPipeline(*m_device, m_swapchain->GetSurfaceFormat().format, m_swapchain->GetExtent() );
+			m_postprocessPipeline = new PostprocessPipeline(*m_device);
+			m_postprocessPipeline->SetImageAndView( m_forwardFrameBuffers->GetColorAttachmentImageView(), m_forwardFrameBuffers->GetColorAttachmentSampler() );
+			m_postprocessPipeline->CreateDescriptors();
 			m_postprocessPipeline->Init( m_renderPassPostprocess, m_swapchain->GetExtent(), "code/shaders/postprocess.vert", "code/shaders/postprocess.frag" );
 			m_postprocessPipeline->Create();
 		
 			m_imguiPipeline = new ImguiPipeline(*m_device, m_swapchain->GetSwapchainImagesCount());
 			m_imguiPipeline->Create(m_renderPassPostprocess, m_window->GetWindow(), m_swapchain->GetExtent());
 
-			CreateSwapchainFramebuffers();
-			CreateForwardFramebuffers();
 			CreateCommandBuffers();
 			RecordAllCommandBuffers();
 
@@ -108,11 +110,11 @@ namespace fan
 				delete m_debugTrianglesvertexBuffers[bufferIndex];
 			} m_debugTrianglesvertexBuffers.clear();
 
-			DeleteForwardFramebuffers();
+			delete m_forwardFrameBuffers;
 			DeleteRenderPass();
 			DeleteRenderPassPostprocess();
 			DeleteCommandPool();
-			DeleteSwapchainFramebuffers();
+			delete m_swapchainFramebuffers;
 
 			delete m_postprocessPipeline;
 			delete m_swapchain;
@@ -142,18 +144,19 @@ namespace fan
 					Debug::Log( "suboptimal swapchain" );
 					vkDeviceWaitIdle(m_device->vkDevice);
 
-					DeleteForwardFramebuffers();
-					DeleteSwapchainFramebuffers();
+					m_swapchain->Resize( m_window->GetExtent() );
+					m_swapchainFramebuffers->SetExternalAttachment( m_swapchain->GetImageViews() );
+					m_swapchainFramebuffers->Resize( m_window->GetExtent() );
 
-					m_swapchain->Resize(m_window->GetExtent());
+					m_forwardFrameBuffers->Resize( m_window->GetExtent() );
+					m_postprocessPipeline->SetImageAndView( m_forwardFrameBuffers->GetColorAttachmentImageView(), m_forwardFrameBuffers->GetColorAttachmentSampler() );
 					m_postprocessPipeline->Resize(m_window->GetExtent());
 					m_forwardPipeline->Resize(m_window->GetExtent());
  					m_debugLinesPipeline->Resize(m_window->GetExtent());
  					m_debugLinesPipelineNoDepthTest->Resize(m_window->GetExtent());
  					m_debugTrianglesPipeline->Resize(m_window->GetExtent());
 
-					CreateSwapchainFramebuffers();
-					CreateForwardFramebuffers();
+
 					RecordAllCommandBuffers();
 					vkResetFences(m_device->vkDevice, 1, m_swapchain->GetCurrentInFlightFence());
 					m_swapchain->AcquireNextImage();
@@ -403,27 +406,27 @@ namespace fan
 		//================================================================================================================================
 		//================================================================================================================================
 		void Renderer::RecordAllCommandBuffers() {
-			for (int cmdBufferIndex = 0; cmdBufferIndex < m_imguiCommandBuffers.size(); cmdBufferIndex++) {
+			for ( size_t cmdBufferIndex = 0; cmdBufferIndex < m_imguiCommandBuffers.size(); cmdBufferIndex++) {
 				RecordCommandBufferImgui(cmdBufferIndex);
 			}
-			for (int cmdBufferIndex = 0; cmdBufferIndex < m_geometryCommandBuffers.size(); cmdBufferIndex++) {
+			for ( size_t cmdBufferIndex = 0; cmdBufferIndex < m_geometryCommandBuffers.size(); cmdBufferIndex++) {
 				RecordCommandBufferGeometry(cmdBufferIndex);
 			}
-			for (int cmdBufferIndex = 0; cmdBufferIndex < m_debugCommandBuffers.size(); cmdBufferIndex++) {
+			for ( size_t cmdBufferIndex = 0; cmdBufferIndex < m_debugCommandBuffers.size(); cmdBufferIndex++) {
 				RecordCommandBufferDebug(cmdBufferIndex);
 			}
-			for (int cmdBufferIndex = 0; cmdBufferIndex < m_swapchainFramebuffers.size(); cmdBufferIndex++) {
+			for ( size_t cmdBufferIndex = 0; cmdBufferIndex < m_swapchain->GetSwapchainImagesCount(); cmdBufferIndex++) {
 				RecordCommandBufferPostProcess( cmdBufferIndex );
 			}
 
-			for (int cmdBufferIndex = 0; cmdBufferIndex < m_primaryCommandBuffers.size(); cmdBufferIndex++) {
+			for ( size_t cmdBufferIndex = 0; cmdBufferIndex < m_primaryCommandBuffers.size(); cmdBufferIndex++) {
 				RecordPrimaryCommandBuffer(cmdBufferIndex);
 			}
 		}
 
 		//================================================================================================================================
 		//================================================================================================================================
-		void Renderer::RecordPrimaryCommandBuffer(const int _index) {
+		void Renderer::RecordPrimaryCommandBuffer(const size_t _index) {
 			VkCommandBuffer commandBuffer = m_primaryCommandBuffers[_index];
 
 			VkCommandBufferBeginInfo commandBufferBeginInfo;
@@ -440,7 +443,7 @@ namespace fan
 			renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
 			renderPassInfo.pNext = nullptr;
 			renderPassInfo.renderPass = m_renderPass;
-			renderPassInfo.framebuffer = m_forwardFrameBuffers[_index]->GetFrameBuffer();
+			renderPassInfo.framebuffer = m_forwardFrameBuffers->GetFrameBuffer( _index );
 			renderPassInfo.renderArea.offset = { 0,0 };
 			renderPassInfo.renderArea.extent.width = m_swapchain->GetExtent().width;
 			renderPassInfo.renderArea.extent.height = m_swapchain->GetExtent().height;
@@ -451,7 +454,7 @@ namespace fan
 			renderPassInfoPostprocess.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
 			renderPassInfoPostprocess.pNext = nullptr;
 			renderPassInfoPostprocess.renderPass = m_renderPassPostprocess;
-			renderPassInfoPostprocess.framebuffer = m_swapchainFramebuffers[_index]->GetFrameBuffer();
+			renderPassInfoPostprocess.framebuffer = m_swapchainFramebuffers->GetFrameBuffer( _index );
 			renderPassInfoPostprocess.renderArea.offset = { 0,0 };
 			renderPassInfoPostprocess.renderArea.extent.width = m_swapchain->GetExtent().width;
 			renderPassInfoPostprocess.renderArea.extent.height = m_swapchain->GetExtent().height;
@@ -484,7 +487,7 @@ namespace fan
 	
 		//================================================================================================================================
 		//================================================================================================================================
-		void Renderer::RecordCommandBufferPostProcess( const int _index ) {
+		void Renderer::RecordCommandBufferPostProcess( const size_t _index ) {
 
 			VkCommandBuffer commandBuffer = m_postprocessCommandBuffers[_index];
 
@@ -493,7 +496,7 @@ namespace fan
 			commandBufferInheritanceInfo.pNext = nullptr;
 			commandBufferInheritanceInfo.renderPass = m_renderPassPostprocess;
 			commandBufferInheritanceInfo.subpass = 0;
-			commandBufferInheritanceInfo.framebuffer = m_swapchainFramebuffers[_index]->GetFrameBuffer();
+			commandBufferInheritanceInfo.framebuffer = m_swapchainFramebuffers->GetFrameBuffer( _index );
 			commandBufferInheritanceInfo.occlusionQueryEnable = VK_FALSE;
 			//commandBufferInheritanceInfo.queryFlags				=;
 			//commandBufferInheritanceInfo.pipelineStatistics		=;
@@ -522,7 +525,7 @@ namespace fan
 
 		//================================================================================================================================
 		//================================================================================================================================
-		void Renderer::RecordCommandBufferImgui(const int _index) {
+		void Renderer::RecordCommandBufferImgui(const size_t _index) {
 
 			m_imguiPipeline->UpdateBuffer(_index);
 
@@ -533,7 +536,7 @@ namespace fan
 			commandBufferInheritanceInfo.pNext = nullptr;
 			commandBufferInheritanceInfo.renderPass = m_renderPassPostprocess;
 			commandBufferInheritanceInfo.subpass = 0;
-			commandBufferInheritanceInfo.framebuffer = m_swapchainFramebuffers[_index]->GetFrameBuffer();
+			commandBufferInheritanceInfo.framebuffer = m_swapchainFramebuffers->GetFrameBuffer( _index );
 			commandBufferInheritanceInfo.occlusionQueryEnable = VK_FALSE;
 			//commandBufferInheritanceInfo.queryFlags				=;
 			//commandBufferInheritanceInfo.pipelineStatistics		=;
@@ -558,7 +561,7 @@ namespace fan
 
 		//================================================================================================================================
 		//================================================================================================================================
-		void Renderer::RecordCommandBufferDebug(const int _index) {
+		void Renderer::RecordCommandBufferDebug(const size_t _index) {
 			if (HasNoDebugToDraw() == false) {
 				UpdateDebugBuffer(_index);
 
@@ -569,7 +572,7 @@ namespace fan
 				commandBufferInheritanceInfo.pNext = nullptr;
 				commandBufferInheritanceInfo.renderPass = m_renderPass;
 				commandBufferInheritanceInfo.subpass = 0;
-				commandBufferInheritanceInfo.framebuffer = m_forwardFrameBuffers[_index]->GetFrameBuffer();
+				commandBufferInheritanceInfo.framebuffer = m_forwardFrameBuffers->GetFrameBuffer( _index );
 				commandBufferInheritanceInfo.occlusionQueryEnable = VK_FALSE;
 				//commandBufferInheritanceInfo.queryFlags				=;
 				//commandBufferInheritanceInfo.pipelineStatistics		=;
@@ -616,7 +619,7 @@ namespace fan
 
 		//================================================================================================================================
 		//================================================================================================================================
-		void Renderer::RecordCommandBufferGeometry(const int _index) {
+		void Renderer::RecordCommandBufferGeometry(const size_t _index) {
 
 			VkCommandBuffer commandBuffer = m_geometryCommandBuffers[_index];
 
@@ -625,7 +628,7 @@ namespace fan
 			commandBufferInheritanceInfo.pNext = nullptr;
 			commandBufferInheritanceInfo.renderPass = m_renderPass;
 			commandBufferInheritanceInfo.subpass = 0;
-			commandBufferInheritanceInfo.framebuffer = m_forwardFrameBuffers[_index]->GetFrameBuffer();
+			commandBufferInheritanceInfo.framebuffer = m_forwardFrameBuffers->GetFrameBuffer( _index );
 			commandBufferInheritanceInfo.occlusionQueryEnable = VK_FALSE;
 			//commandBufferInheritanceInfo.queryFlags				=;
 			//commandBufferInheritanceInfo.pipelineStatistics		=;
@@ -706,7 +709,14 @@ namespace fan
 
 			vkDeviceWaitIdle(m_device->vkDevice);
 
+			delete m_forwardFrameBuffers;
+			m_forwardFrameBuffers = nullptr;
+			CreateForwardFramebuffers();
+
+			m_postprocessPipeline->SetImageAndView( m_forwardFrameBuffers->GetColorAttachmentImageView(), m_forwardFrameBuffers->GetColorAttachmentSampler() );
 			m_postprocessPipeline->ReloadShaders();
+
+			
 			m_forwardPipeline->ReloadShaders();
 			m_debugLinesPipeline->ReloadShaders();
 			m_debugLinesPipelineNoDepthTest->ReloadShaders();
@@ -714,14 +724,12 @@ namespace fan
 
 			m_forwardPipeline->Resize(m_swapchain->GetExtent());
 
-			DeleteForwardFramebuffers();
-			CreateForwardFramebuffers();
 			RecordAllCommandBuffers();	
 		}	
 
 		//================================================================================================================================
 		//================================================================================================================================
-		void Renderer::UpdateDebugBuffer(const int _index) {
+		void Renderer::UpdateDebugBuffer(const size_t _index) {
 			if( m_debugLines.size() > 0) {
 				delete m_debugLinesvertexBuffers[_index];	// TODO update instead of delete
 				const VkDeviceSize size = sizeof(DebugVertex) * m_debugLines.size();
@@ -1197,45 +1205,20 @@ namespace fan
 		//================================================================================================================================
 		//================================================================================================================================
 		void Renderer::CreateForwardFramebuffers() {
-			m_forwardFrameBuffers.resize(m_swapchain->GetSwapchainImagesCount());
-			for (int framebufferIndex = 0; framebufferIndex < m_forwardFrameBuffers.size(); framebufferIndex++) {
-				std::vector<VkImageView> attachments =
-				{
-					m_postprocessPipeline->GetImageView(),			
-					m_forwardPipeline->GetDepthImageView()
-				};
-
-				m_forwardFrameBuffers[framebufferIndex] = new FrameBuffer(*m_device);
-				m_forwardFrameBuffers[framebufferIndex]->Create(m_renderPass, attachments, m_swapchain->GetExtent());
-			}
+			m_forwardFrameBuffers = new FrameBuffer( *m_device );
+			m_forwardFrameBuffers->AddColorAttachment( m_swapchain->GetExtent(), m_swapchain->GetSurfaceFormat().format );
+			m_forwardFrameBuffers->AddDepthAttachment( m_swapchain->GetExtent() );
+			m_forwardFrameBuffers->Create( m_swapchain->GetSwapchainImagesCount() , m_renderPass, m_swapchain->GetExtent() );
 		}
 
 		//================================================================================================================================
 		//================================================================================================================================
-		void Renderer::CreateSwapchainFramebuffers() {		
-
-			m_swapchainFramebuffers.resize(m_swapchain->GetSwapchainImagesCount());
-			for (int framebufferIndex = 0; framebufferIndex < m_swapchainFramebuffers.size(); framebufferIndex++) {
-				std::vector<VkImageView> attachments =
-				{
-					m_swapchain->GetImageView(framebufferIndex),
-				};
-
-				m_swapchainFramebuffers[framebufferIndex] = new FrameBuffer(*m_device);
-				m_swapchainFramebuffers[framebufferIndex]->Create( m_renderPassPostprocess, attachments, m_swapchain->GetExtent());
-
-			}
+		void Renderer::CreateSwapchainFramebuffers() {	
+			m_swapchainFramebuffers = new FrameBuffer( *m_device );
+			m_swapchainFramebuffers->SetExternalAttachment( m_swapchain->GetImageViews() );
+			m_swapchainFramebuffers->Create( m_swapchain->GetSwapchainImagesCount(), m_renderPassPostprocess, m_swapchain->GetExtent() );
 		}
 
-		//================================================================================================================================
-		//================================================================================================================================
-		void Renderer::DeleteSwapchainFramebuffers() {
-			for (int framebufferIndex = 0; framebufferIndex < m_swapchainFramebuffers.size(); framebufferIndex++) {
-				delete m_swapchainFramebuffers[framebufferIndex];
-			}
-			m_swapchainFramebuffers.clear();
-		}	
-	   	
 		//================================================================================================================================
 		//================================================================================================================================
 		void Renderer::DeleteCommandPool() {
@@ -1259,15 +1242,6 @@ namespace fan
 				m_renderPassPostprocess = VK_NULL_HANDLE;
 			}
 		}
-
-		//================================================================================================================================
-		//================================================================================================================================
-		void Renderer::DeleteForwardFramebuffers() {
-			for (int framebufferIndex = 0; framebufferIndex < m_forwardFrameBuffers.size(); framebufferIndex++) {
-				delete m_forwardFrameBuffers[framebufferIndex];
-			}
-			m_forwardFrameBuffers.clear();
-		}	
 
 		//================================================================================================================================
 		// Used for postprocess

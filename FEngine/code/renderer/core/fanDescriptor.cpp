@@ -32,7 +32,7 @@ namespace fan {
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void Descriptor::AddUniformBinding( VkShaderStageFlags  _stage, VkDeviceSize _bufferSize, const int /*_index*/ ) {
+	void Descriptor::SetUniformBinding( VkShaderStageFlags  _stage, VkDeviceSize _bufferSize, const int /*_index*/ ) {
 		BindingData bindingData;
 		bindingData.SetBuffer( m_device, _bufferSize );
 		bindingData.UpdateLayoutBinding( m_bindingData.size(), _stage, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 1 );
@@ -41,7 +41,7 @@ namespace fan {
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void Descriptor::AddDynamicUniformBinding( VkShaderStageFlags  _stage, VkDeviceSize _bufferSize, VkDeviceSize _alignment, const int /*_index*/ ) {
+	void Descriptor::SetDynamicUniformBinding( VkShaderStageFlags  _stage, VkDeviceSize _bufferSize, VkDeviceSize _alignment, const int /*_index*/ ) {
 		BindingData bindingData;
 		bindingData.SetBuffer( m_device, _bufferSize, _alignment );
 		bindingData.UpdateLayoutBinding(  m_bindingData.size(), _stage, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC, 1 );
@@ -53,7 +53,7 @@ namespace fan {
 	// If '_index' is -1 appends it to the bindings list
 	// If '_index' > 0 updates the corresponding binding
 	//================================================================================================================================
-	void Descriptor::AddImageSamplerBinding( VkShaderStageFlags  _stage, std::vector< VkImageView > & _imageViews, VkSampler _sampler, const int _index ) {
+	void Descriptor::SetImageSamplerBinding( VkShaderStageFlags  _stage, std::vector< VkImageView > & _imageViews, VkSampler _sampler, const int _index ) {
 		if ( _index < 0 ) {
 			BindingData bindingData;
 			bindingData.SetImagesSampler( _imageViews, _sampler );

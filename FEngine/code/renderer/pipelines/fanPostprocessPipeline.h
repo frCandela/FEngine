@@ -20,27 +20,23 @@ namespace fan
 			glm::vec4 color;
 		} uniforms;
 
-		PostprocessPipeline( Device& _device, const VkFormat _format, const VkExtent2D _extent );
+		PostprocessPipeline( Device& _device );
 		~PostprocessPipeline() override;
 
+		void SetImageAndView( VkImageView _imageView, VkSampler _sampler );
+		void CreateDescriptors();
 		void Resize( const VkExtent2D _extent ) override;
 		void Bind( VkCommandBuffer _commandBuffer ) override;
-
-		void			UpdateUniformBuffers();
-		VkImageView		GetImageView();
+		void ReloadShaders() override;
+		void UpdateUniformBuffers() override;
 
 	protected:
 		void ConfigurePipeline() override;
 
-	private:
-		bool CreateDescriptors();
-		void CreateImagesAndViews(VkExtent2D _extent);
-
-		VkFormat m_format;
+	private:		
 
 		Descriptor *	m_descriptor = nullptr;
-		Sampler *		m_sampler;
-		Image *			m_image;
-		ImageView *		m_imageView;
+		VkImageView		m_imageView;
+		VkSampler		m_sampler;
 	};
 }

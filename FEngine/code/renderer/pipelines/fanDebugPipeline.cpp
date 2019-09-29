@@ -21,7 +21,7 @@ namespace fan
 		, m_depthTestEnable(_depthTestEnable)
 	{
 		m_descriptor = new Descriptor( m_device );
-		m_descriptor->AddUniformBinding( VK_SHADER_STAGE_VERTEX_BIT, sizeof( DebugUniforms ) );
+		m_descriptor->SetUniformBinding( VK_SHADER_STAGE_VERTEX_BIT, sizeof( DebugUniforms ) );
 		m_descriptor->Create();
 	}
 
@@ -51,6 +51,6 @@ namespace fan
 		m_attributeDescriptions = DebugVertex::GetAttributeDescriptions();
 		m_inputAssemblyStateCreateInfo.topology = m_primitiveTopology;
 		m_depthStencilStateCreateInfo.depthTestEnable = m_depthTestEnable ? VK_TRUE : VK_FALSE;
-		m_descriptorSetLayouts.push_back( m_descriptor->GetLayout() );		
+		m_descriptorSetLayouts= { m_descriptor->GetLayout() };		
 	}
 }

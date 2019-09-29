@@ -37,9 +37,9 @@ namespace fan {
 		void Update();
 		void Bind( VkCommandBuffer _commandBuffer, VkPipelineLayout _pipelineLayout );
 		
-		void AddUniformBinding( VkShaderStageFlags  _stage, VkDeviceSize _bufferSize, const int _index = -1 );
-		void AddDynamicUniformBinding( VkShaderStageFlags  _stage, VkDeviceSize _bufferSize, VkDeviceSize _alignment, const int _index = -1 );
-		void AddImageSamplerBinding( VkShaderStageFlags  _stage, std::vector< VkImageView > & _textures, VkSampler _sampler, const int _index = -1 );
+		void SetUniformBinding( VkShaderStageFlags  _stage, VkDeviceSize _bufferSize, const int _index = -1 );
+		void SetDynamicUniformBinding( VkShaderStageFlags  _stage, VkDeviceSize _bufferSize, VkDeviceSize _alignment, const int _index = -1 );
+		void SetImageSamplerBinding( VkShaderStageFlags  _stage, std::vector< VkImageView > & _textures, VkSampler _sampler, const int _index = -1 );
 
 		VkDescriptorSetLayout GetLayout() { return m_descriptorSetLayout; }
 		VkDescriptorSet		  GetSet() { return m_descriptorSet; }

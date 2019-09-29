@@ -18,13 +18,12 @@ namespace fan
 {
 	//================================================================================================================================
 	//================================================================================================================================
-	ForwardPipeline::ForwardPipeline(Device& _device, const VkExtent2D _extent ) :
+	ForwardPipeline::ForwardPipeline(Device& _device ) :
 		Pipeline(_device)
 		, m_sceneDescriptor(nullptr){
 
-		m_sampler = new Sampler(_device);
-		m_sampler->CreateSampler(0, 8);
-		CreateDepthRessources( _extent );
+		m_sampler = new Sampler( m_device );
+		m_sampler->CreateSampler( 0, 8 );
 
 		// Calculate required alignment based on minimum device offset alignment
 		size_t minUboAlignment = m_device.GetDeviceProperties().limits.minUniformBufferOffsetAlignment;
@@ -50,7 +49,6 @@ namespace fan
 	//================================================================================================================================
 	//================================================================================================================================
 	ForwardPipeline::~ForwardPipeline() {
-		DeleteDepthRessources();
 		delete m_texturesDescriptor;
 		delete m_sceneDescriptor;
 		delete m_sampler;
@@ -60,9 +58,6 @@ namespace fan
 	//================================================================================================================================
 	void ForwardPipeline::Resize( const VkExtent2D _extent) {
 		Pipeline::Resize(_extent);
-
- 		DeleteDepthRessources();
-		CreateDepthRessources( _extent );
 
 		delete m_texturesDescriptor;
 		m_texturesDescriptor = nullptr;
@@ -76,11 +71,11 @@ namespace fan
 	bool ForwardPipeline::CreateSceneDescriptor() {
 		delete m_sceneDescriptor;
 		m_sceneDescriptor = new Descriptor( m_device );
-		m_sceneDescriptor->AddUniformBinding( VK_SHADER_STAGE_VERTEX_BIT, sizeof( VertUniforms ) );
-		m_sceneDescriptor->AddDynamicUniformBinding( VK_SHADER_STAGE_VERTEX_BIT, dynamicUniformsVert.GetTotalSize(), dynamicUniformsVert.GetAlignment() );
-		m_sceneDescriptor->AddUniformBinding( VK_SHADER_STAGE_FRAGMENT_BIT, sizeof( FragUniforms ) );
-		m_sceneDescriptor->AddDynamicUniformBinding( VK_SHADER_STAGE_FRAGMENT_BIT, dynamicUniformsMaterial.GetTotalSize(), dynamicUniformsMaterial.GetAlignment() );
-		m_sceneDescriptor->AddUniformBinding( VK_SHADER_STAGE_FRAGMENT_BIT, sizeof( LightsUniforms ) );
+		m_sceneDescriptor->SetUniformBinding( VK_SHADER_STAGE_VERTEX_BIT, sizeof( VertUniforms ) );
+		m_sceneDescriptor->SetDynamicUniformBinding( VK_SHADER_STAGE_VERTEX_BIT, dynamicUniformsVert.GetTotalSize(), dynamicUniformsVert.GetAlignment() );
+		m_sceneDescriptor->SetUniformBinding( VK_SHADER_STAGE_FRAGMENT_BIT, sizeof( FragUniforms ) );
+		m_sceneDescriptor->SetDynamicUniformBinding( VK_SHADER_STAGE_FRAGMENT_BIT, dynamicUniformsMaterial.GetTotalSize(), dynamicUniformsMaterial.GetAlignment() );
+		m_sceneDescriptor->SetUniformBinding( VK_SHADER_STAGE_FRAGMENT_BIT, sizeof( LightsUniforms ) );
 		return m_sceneDescriptor->Create();
 	}
 
@@ -94,7 +89,7 @@ namespace fan
 		for (int textureIndex = 0; textureIndex < textures.size(); textureIndex++) {
 			imageViews[textureIndex] = textures[textureIndex]->GetImageView();
 		}
-		m_texturesDescriptor->AddImageSamplerBinding( VK_SHADER_STAGE_FRAGMENT_BIT, imageViews, m_sampler->GetSampler() );
+		m_texturesDescriptor->SetImageSamplerBinding( VK_SHADER_STAGE_FRAGMENT_BIT, imageViews, m_sampler->GetSampler() );
 
 		return m_texturesDescriptor->Create();
 	}
@@ -107,12 +102,6 @@ namespace fan
 		m_sceneDescriptor->SetBinding( 2,  &fragUniforms, sizeof( FragUniforms ) );
 		m_sceneDescriptor->SetBinding( 3, &dynamicUniformsMaterial[0], dynamicUniformsMaterial.GetTotalSize() );
 		m_sceneDescriptor->SetBinding( 4, &lightUniforms, sizeof( LightsUniforms ) );
-	}
-
-	//================================================================================================================================
-	//================================================================================================================================
-	VkImageView	ForwardPipeline::GetDepthImageView() {
-		return m_depthImageView->GetImageView();
 	}
 
 	//================================================================================================================================
@@ -147,22 +136,6 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	bool ForwardPipeline::CreateDepthRessources(VkExtent2D _extent) {
-		VkFormat depthFormat = m_device.FindDepthFormat();
-		m_depthImage = new Image(m_device);
-		m_depthImageView = new ImageView(m_device);
-		m_depthImage->Create(depthFormat, _extent, VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
-		m_depthImageView->Create(m_depthImage->GetImage(), depthFormat, VK_IMAGE_ASPECT_DEPTH_BIT, VK_IMAGE_VIEW_TYPE_2D);
-
-		VkCommandBuffer cmd = Renderer::Get().BeginSingleTimeCommands();
-		m_depthImage->TransitionImageLayout(cmd, depthFormat, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL, 1);
-		Renderer::Get().EndSingleTimeCommands(cmd);
-
-		return true;
-	}
-
-	//================================================================================================================================
-	//================================================================================================================================
 	void ForwardPipeline::ConfigurePipeline() {
 		m_bindingDescription = Vertex::GetBindingDescription();
 		m_attributeDescriptions = Vertex::GetAttributeDescriptions();
@@ -170,12 +143,5 @@ namespace fan
 			m_sceneDescriptor->GetLayout()
 			, m_texturesDescriptor->GetLayout()
 		};
-	}
-
-	//================================================================================================================================
-	//================================================================================================================================
-	void ForwardPipeline::DeleteDepthRessources() {
-		delete m_depthImageView;
-		delete m_depthImage;
 	}
 }
