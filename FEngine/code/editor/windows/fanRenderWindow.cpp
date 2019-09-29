@@ -22,12 +22,10 @@ namespace fan
 		Renderer &	renderer = Renderer::Get();
 
 		if (ImGui::CollapsingHeader("Post-processing")) {
-			PostprocessPipeline::Uniforms uniforms = Renderer::Get().GetPostprocessPipeline()->GetUniforms();
-
 			// Filter color
-			if (ImGui::ColorEdit3("Filter##1", &uniforms.color.r, gui::colorEditFlags)) {
-
-				Renderer::Get().GetPostprocessPipeline()->SetUniforms(uniforms);
+			glm::vec4& color = Renderer::Get().GetPostprocessPipeline()->uniforms.color;
+			if (ImGui::ColorEdit3("Filter##1", &color[0], gui::colorEditFlags)) {
+				Renderer::Get().GetPostprocessPipeline()->UpdateUniformBuffers();
 			}
 		}
 

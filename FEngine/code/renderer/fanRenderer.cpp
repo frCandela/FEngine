@@ -54,10 +54,11 @@ namespace fan
 				m_dynamicUniformsFrag[uniformIndex].textureIndex = 0;
 				m_dynamicUniformsFrag[uniformIndex].shininess = 1;
 			}
-
+			
 			CreateCommandPool();
 			CreateRenderPass();
 			CreateRenderPassPostprocess();
+			CreateQuadVertexBuffer();
 
 			m_ressourceManager =  new RessourceManager( *m_device );
 
@@ -67,17 +68,14 @@ namespace fan
 
 			m_debugLinesPipeline = new DebugPipeline(*m_device, VK_PRIMITIVE_TOPOLOGY_LINE_LIST, true);
 			m_debugLinesPipeline->Init( m_renderPass, m_swapchain->GetExtent(), "code/shaders/debugLines.vert", "code/shaders/debugLines.frag" );
-			m_debugLinesPipeline->SetUniformPointers( & m_debugUniforms );
 			m_debugLinesPipeline->Create();
 
 			m_debugLinesPipelineNoDepthTest = new DebugPipeline(*m_device, VK_PRIMITIVE_TOPOLOGY_LINE_LIST, false);
 			m_debugLinesPipelineNoDepthTest->Init( m_renderPass, m_swapchain->GetExtent(), "code/shaders/debugLines.vert", "code/shaders/debugLines.frag" );
-			m_debugLinesPipelineNoDepthTest->SetUniformPointers( &m_debugUniforms );
 			m_debugLinesPipelineNoDepthTest->Create();
 			
 			m_debugTrianglesPipeline = new DebugPipeline(*m_device, VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST, false);
 			m_debugTrianglesPipeline->Init( m_renderPass, m_swapchain->GetExtent(), "code/shaders/debugTriangles.vert", "code/shaders/debugTriangles.frag" );
-			m_debugTrianglesPipeline->SetUniformPointers( &m_debugUniforms );
 			m_debugTrianglesPipeline->Create();
 
 			m_postprocessPipeline = new PostprocessPipeline(*m_device, m_swapchain->GetSurfaceFormat().format, m_swapchain->GetExtent() );
@@ -112,6 +110,8 @@ namespace fan
 			delete m_debugLinesPipelineNoDepthTest;
 			delete m_debugTrianglesPipeline;
 			delete m_ressourceManager;
+
+			delete m_quadVertexBuffer;
 
 			for (int bufferIndex = 0; bufferIndex < m_debugLinesvertexBuffers.size(); bufferIndex++) {
 				delete m_debugLinesvertexBuffers[bufferIndex];
@@ -325,10 +325,13 @@ namespace fan
 
 			m_fragUniforms.cameraPosition = _position;
 
-			m_debugUniforms.model = glm::mat4( 1.0 );
-			m_debugUniforms.view = m_vertUniforms.view;
-			m_debugUniforms.proj = m_vertUniforms.proj;
-			m_debugUniforms.color = glm::vec4( 1, 1, 1, 1 );
+			std::array< DebugPipeline *, 3 > debugLinesPipelines  = { m_debugLinesPipeline, m_debugLinesPipelineNoDepthTest, m_debugTrianglesPipeline };
+			for (int pipelingIndex = 0; pipelingIndex < debugLinesPipelines.size(); pipelingIndex++){
+				debugLinesPipelines[pipelingIndex]->debugUniforms.model = glm::mat4( 1.0 );
+				debugLinesPipelines[pipelingIndex]->debugUniforms.view = m_vertUniforms.view;
+				debugLinesPipelines[pipelingIndex]->debugUniforms.proj = m_vertUniforms.proj;
+				debugLinesPipelines[pipelingIndex]->debugUniforms.color = glm::vec4( 1, 1, 1, 1 );
+			}
 		}
 
 		//================================================================================================================================
@@ -520,7 +523,10 @@ namespace fan
 
 			if (vkBeginCommandBuffer(commandBuffer, &commandBufferBeginInfo) == VK_SUCCESS) {
 				m_postprocessPipeline->Bind(commandBuffer);
-
+				VkBuffer vertexBuffers[] = { m_quadVertexBuffer->GetBuffer() };
+				VkDeviceSize offsets[] = { 0 };
+				vkCmdBindVertexBuffers( commandBuffer, 0, 1, vertexBuffers, offsets );
+				vkCmdDraw( commandBuffer, static_cast<uint32_t>( 4 ), 1, 0, 0 );
 				if (vkEndCommandBuffer(commandBuffer) != VK_SUCCESS) {
 					Debug::Get() << Debug::Severity::error << "Could not record command buffer " << commandBuffer << "." << Debug::Endl();
 				}
@@ -1258,4 +1264,34 @@ namespace fan
 			}
 			m_forwardFrameBuffers.clear();
 		}	
+
+		//================================================================================================================================
+		// Used for postprocess
+		//================================================================================================================================
+		void Renderer::CreateQuadVertexBuffer() {
+			// Vertex quad
+			glm::vec3 v0 = { -1.0f, -1.0f, 0.0f };
+			glm::vec3 v1 = { -1.0f, 1.0f, 0.0f };
+			glm::vec3 v2 = { 1.0f, -1.0f, 0.0f };
+			glm::vec3 v3 = { 1.0f, 1.0f, 0.0f };
+			std::vector<glm::vec3> vertices = { v0, v1 ,v2 ,v3 };
+
+			const VkDeviceSize size = sizeof( vertices[0] ) * vertices.size();
+			m_quadVertexBuffer = new Buffer( *m_device );
+			m_quadVertexBuffer->Create(
+				size,
+				VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_VERTEX_BUFFER_BIT,
+				VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT
+			);
+			Buffer stagingBuffer(*m_device );
+			stagingBuffer.Create(
+				size,
+				VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
+				VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT
+			);
+			stagingBuffer.SetData( vertices.data(), size );
+			VkCommandBuffer cmd = Renderer::Get().BeginSingleTimeCommands();
+			stagingBuffer.CopyBufferTo( cmd, m_quadVertexBuffer->GetBuffer(), size );
+			Renderer::Get().EndSingleTimeCommands( cmd );
+		}
 }

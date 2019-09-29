@@ -17,19 +17,17 @@ namespace fan
 	PostprocessPipeline::PostprocessPipeline(Device& _device, const VkFormat _format, const VkExtent2D _extent ) :
 		Pipeline(_device)		 
 	{
-		m_uniforms.color = glm::vec4(1, 1, 1, 1);
+		uniforms.color = glm::vec4(1, 1, 1, 1);
 		m_format = _format;
 		//Sampler
 		m_sampler = new Sampler(m_device);
 		m_sampler->CreateSampler(0, 1.f);
 
-		CreateVertexBuffer();
 		CreateImagesAndViews( _extent );
 		CreateDescriptors();
 
-		Uniforms uniforms;
 		uniforms.color = glm::vec4( 1, 1, 1, 1 );
-		SetUniforms( uniforms );
+		UpdateUniformBuffers();
 	}
 
 	//================================================================================================================================
@@ -38,7 +36,6 @@ namespace fan
 		delete m_descriptor;
 		delete m_imageView;
 		delete m_image;
-		delete m_vertexBuffer;
 		delete m_sampler;
 	}
 
@@ -59,19 +56,15 @@ namespace fan
 	//================================================================================================================================
 	void PostprocessPipeline::Bind( VkCommandBuffer _commandBuffer ) {
 		Pipeline::Bind(_commandBuffer);
-		VkBuffer vertexBuffers[] = { m_vertexBuffer->GetBuffer() };
-		VkDeviceSize offsets[] = { 0 };
-		vkCmdBindVertexBuffers(_commandBuffer, 0, 1, vertexBuffers, offsets);
-		m_descriptor->Bind( _commandBuffer , m_pipelineLayout );
-		vkCmdDraw(_commandBuffer, static_cast<uint32_t>(4), 1, 0, 0);
+		m_descriptor->Bind( _commandBuffer, m_pipelineLayout );
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void PostprocessPipeline::SetUniforms(const Uniforms _uniforms) {
-		m_uniforms = _uniforms;
-		m_descriptor->SetBinding(1, &m_uniforms, sizeof( m_uniforms ) );
+	void PostprocessPipeline::UpdateUniformBuffers() {
+		m_descriptor->SetBinding(1, &uniforms, sizeof( Uniforms ) );
 	}
+
 	//================================================================================================================================
 	//================================================================================================================================
 	VkImageView PostprocessPipeline::GetImageView() { return m_imageView->GetImageView(); }
@@ -123,32 +116,5 @@ namespace fan
 		m_imageView->Create(m_image->GetImage(), m_format, VK_IMAGE_ASPECT_COLOR_BIT, VK_IMAGE_VIEW_TYPE_2D);
 	}
 
-	//================================================================================================================================
-	//================================================================================================================================
-	void PostprocessPipeline::CreateVertexBuffer() {
-		// Vertex quad
-		glm::vec3 v0 = { -1.0f, -1.0f, 0.0f };
-		glm::vec3 v1 = { -1.0f, 1.0f, 0.0f };
-		glm::vec3 v2 = { 1.0f, -1.0f, 0.0f };
-		glm::vec3 v3 = { 1.0f, 1.0f, 0.0f };
-		std::vector<glm::vec3> vertices = { v0, v1 ,v2 ,v3 };
 
-		const VkDeviceSize size = sizeof(vertices[0]) * vertices.size();
-		m_vertexBuffer = new Buffer(m_device);
-		m_vertexBuffer->Create(
-			size,
-			VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_VERTEX_BUFFER_BIT,
-			VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT
-		);
-		Buffer stagingBuffer(m_device);
-		stagingBuffer.Create(
-			size,
-			VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
-			VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT
-		);
-		stagingBuffer.SetData(vertices.data(), size);
-		VkCommandBuffer cmd = Renderer::Get().BeginSingleTimeCommands();
-		stagingBuffer.CopyBufferTo(cmd, m_vertexBuffer->GetBuffer(), size);
-		Renderer::Get().EndSingleTimeCommands(cmd);
-	}
 }

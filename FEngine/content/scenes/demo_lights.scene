@@ -21,7 +21,7 @@ Entities: 1 {
                         path: content\models\test\sphere.fbx
                     }
                     Material: 1828911513 {
-                        material: content\models\white.png
+                        material: content\models\colors\white.png
                         shininess: 1
                         color: 1 1 1
                     }
@@ -31,7 +31,7 @@ Entities: 1 {
                         computeAABB: true
                         Components: 5 {
                             Transform: 1269105190 {
-                                position: -1.91681 1.27505 -0.57082
+                                position: -0.961581 1.27505 -1.75367
                                 rotation: 0 0 0 1
                                 scale:    0.1 0.1 0.1
                             }
@@ -45,7 +45,7 @@ Entities: 1 {
                                 path: content\models\test\sphere.fbx
                             }
                             Material: 1828911513 {
-                                material: content\models\white.png
+                                material: content\models\colors\white.png
                                 shininess: 1
                                 color: 1 1 1
                             }
@@ -63,7 +63,7 @@ Entities: 1 {
                         computeAABB: true
                         Components: 5 {
                             Transform: 1269105190 {
-                                position: 1.45358 1.27505 -1.37372
+                                position: 1.99949 1.27505 0.0453018
                                 rotation: 0 0 0 1
                                 scale:    0.1 0.1 0.1
                             }
@@ -77,7 +77,7 @@ Entities: 1 {
                                 path: content\models\test\sphere.fbx
                             }
                             Material: 1828911513 {
-                                material: content\models\white.png
+                                material: content\models\colors\white.png
                                 shininess: 1
                                 color: 1 1 1
                             }
@@ -95,7 +95,7 @@ Entities: 1 {
                         computeAABB: true
                         Components: 5 {
                             Transform: 1269105190 {
-                                position: 0.463292 1.27505 1.9456
+                                position: -1.03861 1.27505 1.70918
                                 rotation: 0 0 0 1
                                 scale:    0.1 0.1 0.1
                             }
@@ -109,7 +109,7 @@ Entities: 1 {
                                 path: content\models\test\sphere.fbx
                             }
                             Material: 1828911513 {
-                                material: content\models\white.png
+                                material: content\models\colors\white.png
                                 shininess: 1
                                 color: 1 1 1
                             }
@@ -127,7 +127,7 @@ Entities: 1 {
                         computeAABB: true
                         Components: 5 {
                             Transform: 1269105190 {
-                                position: 1.45384 1.27505 1.37345
+                                position: 1.99948 1.27505 -0.0456552
                                 rotation: 0 0 0 1
                                 scale:    0.1 0.1 0.1
                             }
@@ -141,7 +141,7 @@ Entities: 1 {
                                 path: content\models\test\sphere.fbx
                             }
                             Material: 1828911513 {
-                                material: content\models\white.png
+                                material: content\models\colors\white.png
                                 shininess: 1
                                 color: 1 1 1
                             }
@@ -159,7 +159,7 @@ Entities: 1 {
                         computeAABB: true
                         Components: 5 {
                             Transform: 1269105190 {
-                                position: -1.91671 1.27505 0.57117
+                                position: -0.961244 1.27505 1.75386
                                 rotation: 0 0 0 1
                                 scale:    0.1 0.1 0.1
                             }
@@ -173,7 +173,7 @@ Entities: 1 {
                                 path: content\models\test\sphere.fbx
                             }
                             Material: 1828911513 {
-                                material: content\models\white.png
+                                material: content\models\colors\white.png
                                 shininess: 1
                                 color: 1 1 1
                             }
@@ -191,7 +191,7 @@ Entities: 1 {
                         computeAABB: true
                         Components: 5 {
                             Transform: 1269105190 {
-                                position: 0.463284 1.27505 -1.9456
+                                position: -1.03861 1.27505 -1.70918
                                 rotation: 0 0 0 1
                                 scale:    0.1 0.1 0.1
                             }
@@ -205,7 +205,7 @@ Entities: 1 {
                                 path: content\models\test\sphere.fbx
                             }
                             Material: 1828911513 {
-                                material: content\models\white.png
+                                material: content\models\colors\white.png
                                 shininess: 1
                                 color: 1 1 1
                             }

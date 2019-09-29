@@ -21,7 +21,7 @@ Entities: 1 {
                         path: content\models\sun.fbx
                     }
                     Material: 1828911513 {
-                        material: content\models\white.png
+                        material: content\models\colors\white.png
                         shininess: 255
                         color: 1 1 1
                     }

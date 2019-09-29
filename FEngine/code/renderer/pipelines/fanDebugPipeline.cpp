@@ -11,7 +11,6 @@
 #include "renderer/util/fanVertex.h"
 #include "renderer/fanUniforms.h"
 
-
 namespace fan
 {
 	//================================================================================================================================
@@ -34,14 +33,8 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void DebugPipeline::SetUniformPointers( DebugUniforms * _debugUniforms ) {
-		m_debugUniforms = _debugUniforms;
-	}
-
-	//================================================================================================================================
-	//================================================================================================================================
 	void DebugPipeline::UpdateUniformBuffers() {
-		m_descriptor->SetBinding( 0, &( *m_debugUniforms ), sizeof( DebugUniforms ) );
+		m_descriptor->SetBinding( 0, &debugUniforms, sizeof( DebugUniforms ) );
 	}
 
 	//================================================================================================================================
@@ -58,7 +51,6 @@ namespace fan
 		m_attributeDescriptions = DebugVertex::GetAttributeDescriptions();
 		m_inputAssemblyStateCreateInfo.topology = m_primitiveTopology;
 		m_depthStencilStateCreateInfo.depthTestEnable = m_depthTestEnable ? VK_TRUE : VK_FALSE;
-		m_descriptorSetLayouts.push_back( m_descriptor->GetLayout() );
-		
+		m_descriptorSetLayouts.push_back( m_descriptor->GetLayout() );		
 	}
 }

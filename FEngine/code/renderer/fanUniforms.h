@@ -49,12 +49,4 @@ namespace fan {
 	struct FragUniforms {
 		glm::vec3	cameraPosition = glm::vec3( 0, 0, 0 );
 	};
-
-
-	struct DebugUniforms {
-		glm::mat4 model;
-		glm::mat4 view;
-		glm::mat4 proj;
-		glm::vec4 color;
-	};
 }
