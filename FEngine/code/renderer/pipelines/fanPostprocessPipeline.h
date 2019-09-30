@@ -24,10 +24,9 @@ namespace fan
 		~PostprocessPipeline() override;
 
 		void SetImageAndView( ImageView * _imageView, Sampler * _sampler );
-		void CreateDescriptors( const size_t _numSwapchainImages );
+		void CreateDescriptors( const size_t _numSwapchainImages ) override;
 		void Resize( const VkExtent2D _extent ) override;
 		void Bind( VkCommandBuffer _commandBuffer, const size_t _index ) override;
-		void ReloadShaders() override;
 		void UpdateUniformBuffers( const size_t _index = 0 ) override;
 
 	protected:

@@ -7,8 +7,9 @@
 namespace fan {
 	//================================================================================================================================
 	//================================================================================================================================
-	Descriptor::Descriptor( Device& _device ) :
-		m_device( _device ) {
+	Descriptor::Descriptor( Device& _device, const size_t _count ) :
+		m_device( _device )
+		, m_numDescriptors( _count ){
 
 	}
 
@@ -73,7 +74,7 @@ namespace fan {
 	//================================================================================================================================
 	// For uniform buffers only, update buffer data of the binding at _index
 	//================================================================================================================================
-	void Descriptor::SetBinding( const int _indexBinding, const void * _data, VkDeviceSize _size, VkDeviceSize _offset, const int _indexBuffer  ) {
+	void Descriptor::SetBinding( const size_t _indexBinding, const size_t _indexBuffer, const void * _data, VkDeviceSize _size, VkDeviceSize _offset ) {
 		assert( _indexBinding  >= 0 && _indexBinding < m_bindingData .size() );	
 		assert( _indexBuffer < m_bindingData[_indexBinding].buffers.size() );
 		m_bindingData[_indexBinding].buffers[_indexBuffer]->SetData( _data, _size, _offset );

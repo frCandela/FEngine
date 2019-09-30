@@ -19,11 +19,7 @@ namespace fan
 		Pipeline( _device )
 		, m_primitiveTopology(_primitiveTopology)
 		, m_depthTestEnable(_depthTestEnable)
-	{
-		m_descriptor = new Descriptor( m_device );
-		m_descriptor->SetUniformBinding( VK_SHADER_STAGE_VERTEX_BIT, sizeof( DebugUniforms ) );
-		m_descriptor->Create();
-	}
+	{}
 
 	//================================================================================================================================
 	//================================================================================================================================
@@ -33,15 +29,23 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void DebugPipeline::UpdateUniformBuffers( const size_t /*_index*/ ) {
-		m_descriptor->SetBinding( 0, &debugUniforms, sizeof( DebugUniforms ) );
+	void DebugPipeline::CreateDescriptors( const size_t _numSwapchainImages ) {
+		m_descriptor = new Descriptor( m_device, _numSwapchainImages );
+		m_descriptor->SetUniformBinding( VK_SHADER_STAGE_VERTEX_BIT, sizeof( DebugUniforms ) );
+		m_descriptor->Create();
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void DebugPipeline::Bind( VkCommandBuffer _commandBuffer, const size_t /*_index*/ ) {
-		Pipeline::Bind(		_commandBuffer );
-		m_descriptor->Bind( _commandBuffer, m_pipelineLayout );
+	void DebugPipeline::UpdateUniformBuffers( const size_t _index ) {
+		m_descriptor->SetBinding( 0, _index, &debugUniforms, sizeof( DebugUniforms ), 0 );
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
+	void DebugPipeline::Bind( VkCommandBuffer _commandBuffer, const size_t _index ) {
+		Pipeline::Bind(	_commandBuffer, _index );
+		m_descriptor->Bind( _commandBuffer, m_pipelineLayout, _index );
 	}
 
 	//================================================================================================================================

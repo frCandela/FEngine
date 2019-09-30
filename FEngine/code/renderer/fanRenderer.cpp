@@ -49,18 +49,22 @@ namespace fan
 
 			m_forwardPipeline = new ForwardPipeline(*m_device);
 			m_forwardPipeline->Init( m_renderPass, m_swapchain->GetExtent(), "code/shaders/forward.vert", "code/shaders/forward.frag" );
+			m_forwardPipeline->CreateDescriptors( m_swapchain->GetSwapchainImagesCount() );
 			m_forwardPipeline->Create();
 
 			m_debugLinesPipeline = new DebugPipeline(*m_device, VK_PRIMITIVE_TOPOLOGY_LINE_LIST, true);
 			m_debugLinesPipeline->Init( m_renderPass, m_swapchain->GetExtent(), "code/shaders/debugLines.vert", "code/shaders/debugLines.frag" );
+			m_debugLinesPipeline->CreateDescriptors( m_swapchain->GetSwapchainImagesCount() );
 			m_debugLinesPipeline->Create();
 
 			m_debugLinesPipelineNoDepthTest = new DebugPipeline(*m_device, VK_PRIMITIVE_TOPOLOGY_LINE_LIST, false);
 			m_debugLinesPipelineNoDepthTest->Init( m_renderPass, m_swapchain->GetExtent(), "code/shaders/debugLines.vert", "code/shaders/debugLines.frag" );
+			m_debugLinesPipelineNoDepthTest->CreateDescriptors( m_swapchain->GetSwapchainImagesCount() );
 			m_debugLinesPipelineNoDepthTest->Create();
 			
 			m_debugTrianglesPipeline = new DebugPipeline(*m_device, VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST, false);
 			m_debugTrianglesPipeline->Init( m_renderPass, m_swapchain->GetExtent(), "code/shaders/debugTriangles.vert", "code/shaders/debugTriangles.frag" );
+			m_debugTrianglesPipeline->CreateDescriptors( m_swapchain->GetSwapchainImagesCount() );
 			m_debugTrianglesPipeline->Create();
 
 			m_postprocessPipeline = new PostprocessPipeline(*m_device);
@@ -371,7 +375,6 @@ namespace fan
 			m_forwardPipeline->dynamicUniformsMaterial[_index] = _dynamicUniform;
 		}
 
-
 		//================================================================================================================================
 		//================================================================================================================================
 		void Renderer::SetMeshAt( const uint32_t _index, Mesh * _mesh ) {
@@ -418,7 +421,6 @@ namespace fan
 			for ( size_t cmdBufferIndex = 0; cmdBufferIndex < m_swapchain->GetSwapchainImagesCount(); cmdBufferIndex++) {
 				RecordCommandBufferPostProcess( cmdBufferIndex );
 			}
-
 			for ( size_t cmdBufferIndex = 0; cmdBufferIndex < m_primaryCommandBuffers.size(); cmdBufferIndex++) {
 				RecordPrimaryCommandBuffer(cmdBufferIndex);
 			}
@@ -603,9 +605,6 @@ namespace fan
 						vkCmdBindVertexBuffers( commandBuffer, 0, 1, vertexBuffers, offsets );
 						vkCmdDraw( commandBuffer, static_cast<uint32_t>( m_debugTriangles.size() ), 1, 0, 0 );
 					}
-					//m_debugLinesPipeline->Draw(				commandBuffer, *m_debugLinesvertexBuffers[_index],				static_cast<uint32_t>(m_debugLines.size()));		
-					//m_debugLinesPipelineNoDepthTest->Draw(	commandBuffer, *m_debugLinesNoDepthTestVertexBuffers[_index],	static_cast<uint32_t>(m_debugLinesNoDepthTest.size()));
-					//m_debugTrianglesPipeline->Draw(			commandBuffer, *m_debugTrianglesvertexBuffers[_index],			static_cast<uint32_t>(m_debugTriangles.size()));
 					if (vkEndCommandBuffer(commandBuffer) != VK_SUCCESS) {
 						Debug::Get() << Debug::Severity::error << "Could not record command buffer " << _index << "." << Debug::Endl();
 					}
@@ -640,7 +639,7 @@ namespace fan
 			commandBufferBeginInfo.pInheritanceInfo = &commandBufferInheritanceInfo;
 
 			if (vkBeginCommandBuffer(commandBuffer, &commandBufferBeginInfo) == VK_SUCCESS) {
-				m_forwardPipeline->Bind( commandBuffer);
+				m_forwardPipeline->Bind( commandBuffer, _index );
 
 				for ( uint32_t meshIndex = 0; meshIndex < m_numMesh; meshIndex++ ) {
 					Mesh * mesh = m_meshDrawArray[meshIndex];

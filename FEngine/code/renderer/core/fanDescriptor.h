@@ -16,12 +16,9 @@ namespace fan {
 		//================================================================
 		// Contain the information for a descriptor binding
 		//================================================================
-		struct BindingData {
-			std::vector< VkDescriptorImageInfo > descriptorsImageInfo;
-			
-			
+		struct BindingData {			
 			VkDescriptorSetLayoutBinding		 layoutBinding;
-
+			std::vector< VkDescriptorImageInfo > descriptorsImageInfo;
 			std::vector < VkWriteDescriptorSet>	 writeDescriptorSets;
 			std::vector<VkDescriptorBufferInfo>  descriptorBufferInfos;
 			std::vector<Buffer * >				 buffers;
@@ -33,15 +30,14 @@ namespace fan {
 		};
 
 	public:
-		Descriptor( Device& _device );
+		Descriptor( Device& _device, const size_t _count );
 		~Descriptor();
 
 		bool Create(  );
-		void SetBinding( const int _indexBinding, const void * _data, VkDeviceSize _size, VkDeviceSize _offset = 0, const int _indexBuffer = 0 );
+		void SetBinding( const size_t _indexBinding, const size_t _indexBuffer, const void * _data, VkDeviceSize _size, VkDeviceSize _offset );
 		void Update();
 		void Bind( VkCommandBuffer _commandBuffer, VkPipelineLayout _pipelineLayout, const size_t _index = 0 );
 		
-		void SetNumDescriptor( const size_t _count ){ m_numDescriptors = _count; }
 		void SetUniformBinding( const VkShaderStageFlags  _stage, const VkDeviceSize _bufferSize );
 		void SetDynamicUniformBinding( VkShaderStageFlags  _stage, VkDeviceSize _bufferSize, VkDeviceSize _alignment );
 		void SetImageSamplerBinding( VkShaderStageFlags  _stage, std::vector< VkImageView > & _textures, VkSampler _sampler, const int _index = -1 );

@@ -28,6 +28,7 @@ namespace fan
 
 		void Bind( VkCommandBuffer _commandBuffer, const size_t _index ) override;
 		void UpdateUniformBuffers( const size_t _index ) override;
+		void CreateDescriptors( const size_t _numSwapchainImages );
 
 	protected:
 		void ConfigurePipeline() override;
