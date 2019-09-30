@@ -21,7 +21,7 @@ namespace fan
 			glm::mat4 view;
 			glm::mat4 proj;
 			glm::vec4 color;
-		} debugUniforms;
+		} m_debugUniforms;
 
 		DebugPipeline(Device& _device, const VkPrimitiveTopology _primitiveTopology, const bool _depthTestEnable);
 		virtual ~DebugPipeline() override;

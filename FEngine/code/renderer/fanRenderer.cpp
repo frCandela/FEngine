@@ -202,8 +202,6 @@ namespace fan
 					}
 				}
 				if (m_ressourceManager->IsModified()) {
-// 					ReloadShaders();
-// 					m_ressourceManager->SetUnmodified();
 					WaitIdle();
 					m_forwardPipeline->Resize(m_swapchain->GetExtent());
 					m_ressourceManager->SetUnmodified();
@@ -309,101 +307,103 @@ namespace fan
 		//================================================================================================================================
 		//================================================================================================================================
 		void Renderer::SetMainCamera( const glm::mat4 _projection, const glm::mat4 _view, const glm::vec3 _position ) {
-			m_forwardPipeline->vertUniforms.view = _view;
-			m_forwardPipeline->vertUniforms.proj = _projection;
-			m_forwardPipeline->vertUniforms.proj[1][1] *= -1;
+			m_forwardPipeline->m_vertUniforms.view = _view;
+			m_forwardPipeline->m_vertUniforms.proj = _projection;
+			m_forwardPipeline->m_vertUniforms.proj[1][1] *= -1;
 
-			m_forwardPipeline->fragUniforms.cameraPosition = _position;
+			m_forwardPipeline->m_fragUniforms.cameraPosition = _position;
 
 			std::array< DebugPipeline *, 3 > debugLinesPipelines  = { m_debugLinesPipeline, m_debugLinesPipelineNoDepthTest, m_debugTrianglesPipeline };
 			for (int pipelingIndex = 0; pipelingIndex < debugLinesPipelines.size(); pipelingIndex++){
-				debugLinesPipelines[pipelingIndex]->debugUniforms.model = glm::mat4( 1.0 );
-				debugLinesPipelines[pipelingIndex]->debugUniforms.view = m_forwardPipeline->vertUniforms.view;
-				debugLinesPipelines[pipelingIndex]->debugUniforms.proj = m_forwardPipeline->vertUniforms.proj;
-				debugLinesPipelines[pipelingIndex]->debugUniforms.color = glm::vec4( 1, 1, 1, 1 );
+				debugLinesPipelines[pipelingIndex]->m_debugUniforms.model = glm::mat4( 1.0 );
+				debugLinesPipelines[pipelingIndex]->m_debugUniforms.view = m_forwardPipeline->m_vertUniforms.view;
+				debugLinesPipelines[pipelingIndex]->m_debugUniforms.proj = m_forwardPipeline->m_vertUniforms.proj;
+				debugLinesPipelines[pipelingIndex]->m_debugUniforms.color = glm::vec4( 1, 1, 1, 1 );
 			}
 		}
 
 		//================================================================================================================================
 		//================================================================================================================================
 		void Renderer::SetDirectionalLight( const int _index, const glm::vec4 _direction, const glm::vec4 _ambiant, const glm::vec4 _diffuse, const glm::vec4 _specular ) {
-			assert( _index  < s_maximumNumDirectionalLights );
-			m_forwardPipeline->lightUniforms.dirLights[_index].direction = _direction;
-			m_forwardPipeline->lightUniforms.dirLights[_index].ambiant = _ambiant;
-			m_forwardPipeline->lightUniforms.dirLights[_index].diffuse = _diffuse;
-			m_forwardPipeline->lightUniforms.dirLights[_index].specular = _specular;			
+			assert( _index  < GlobalValues::s_maximumNumDirectionalLight );
+			m_forwardPipeline->m_lightUniforms.dirLights[_index].direction = _direction;
+			m_forwardPipeline->m_lightUniforms.dirLights[_index].ambiant = _ambiant;
+			m_forwardPipeline->m_lightUniforms.dirLights[_index].diffuse = _diffuse;
+			m_forwardPipeline->m_lightUniforms.dirLights[_index].specular = _specular;			
 		}
 
 		//================================================================================================================================
 		//================================================================================================================================
 		void  Renderer::SetNumDirectionalLights( const uint32_t _num ) {
-			assert( _num < s_maximumNumDirectionalLights );
-			m_forwardPipeline->lightUniforms.dirLightsNum = _num;
+			assert( _num < GlobalValues::s_maximumNumDirectionalLight );
+			m_forwardPipeline->m_lightUniforms.dirLightsNum = _num;
 		}
 
 		//================================================================================================================================
 		//================================================================================================================================
 		void Renderer::SetPointLight( const int _index, const glm::vec3 _position, const glm::vec3 _diffuse, const glm::vec3 _specular, const glm::vec3 _ambiant, const glm::vec3 _constantLinearQuadratic ) {
-			assert( _index < s_maximumNumPointLights );
-			m_forwardPipeline->lightUniforms.pointlights[_index].position	= glm::vec4(_position,1);
-			m_forwardPipeline->lightUniforms.pointlights[_index].diffuse		= glm::vec4( _diffuse, 1 );
-			m_forwardPipeline->lightUniforms.pointlights[_index].specular	= glm::vec4( _specular, 1 );
-			m_forwardPipeline->lightUniforms.pointlights[_index].ambiant		= glm::vec4( _ambiant, 1 );
-			m_forwardPipeline->lightUniforms.pointlights[_index].constant	= _constantLinearQuadratic[0];
-			m_forwardPipeline->lightUniforms.pointlights[_index].linear		= _constantLinearQuadratic[1];
-			m_forwardPipeline->lightUniforms.pointlights[_index].quadratic	= _constantLinearQuadratic[2];
+			assert( _index < GlobalValues::s_maximumNumPointLights );
+			m_forwardPipeline->m_lightUniforms.pointlights[_index].position	= glm::vec4(_position,1);
+			m_forwardPipeline->m_lightUniforms.pointlights[_index].diffuse		= glm::vec4( _diffuse, 1 );
+			m_forwardPipeline->m_lightUniforms.pointlights[_index].specular	= glm::vec4( _specular, 1 );
+			m_forwardPipeline->m_lightUniforms.pointlights[_index].ambiant		= glm::vec4( _ambiant, 1 );
+			m_forwardPipeline->m_lightUniforms.pointlights[_index].constant	= _constantLinearQuadratic[0];
+			m_forwardPipeline->m_lightUniforms.pointlights[_index].linear		= _constantLinearQuadratic[1];
+			m_forwardPipeline->m_lightUniforms.pointlights[_index].quadratic	= _constantLinearQuadratic[2];
 		}
 
 		//================================================================================================================================
 		//================================================================================================================================
 		void  Renderer::SetNumPointLights( const uint32_t _num ) {
-			assert( _num < s_maximumNumPointLights );
-			m_forwardPipeline->lightUniforms.pointLightNum = _num;
+			assert( _num < GlobalValues::s_maximumNumPointLights );
+			m_forwardPipeline->m_lightUniforms.pointLightNum = _num;
 		}
 
 		//================================================================================================================================
 		//================================================================================================================================
-		void Renderer::SetDynamicUniformVert( const DynamicUniformsVert& _dynamicUniform, const uint32_t _index ) {
-			assert( _index < s_maximumNumModels );
-			m_forwardPipeline->dynamicUniformsVert[_index] = _dynamicUniform;
+		void Renderer::SetDynamicUniformVert( const glm::mat4 _modelMat, const glm::mat4 _rotationMat, const uint32_t _index ) {
+			assert( _index < GlobalValues::s_maximumNumModels );
+			m_forwardPipeline->m_dynamicUniformsVert[_index].modelMat = _modelMat;
+			m_forwardPipeline->m_dynamicUniformsVert[_index].rotationMat = _rotationMat;
 		}
-
 		//================================================================================================================================
 		//================================================================================================================================
-		void Renderer::SetDynamicUniformFrag( const DynamicUniformsMaterial& _dynamicUniform, const uint32_t _index ) {
-			assert( _index < s_maximumNumModels );
-			m_forwardPipeline->dynamicUniformsMaterial[_index] = _dynamicUniform;
+		void Renderer::SetDynamicUniformFrag( const glm::vec3  _color, const glm::int32 _shininess, const glm::int32 _textureIndex, const uint32_t _index ) {
+			assert( _index < GlobalValues::s_maximumNumModels );
+			m_forwardPipeline->m_dynamicUniformsMaterial[_index].color = _color;
+			m_forwardPipeline->m_dynamicUniformsMaterial[_index].shininess = _shininess;
+			m_forwardPipeline->m_dynamicUniformsMaterial[_index].textureIndex = _textureIndex;
 		}
 
 		//================================================================================================================================
 		//================================================================================================================================
 		void Renderer::SetMeshAt( const uint32_t _index, Mesh * _mesh ) {
-			assert( _index < s_maximumNumModels );
+			assert( _index < GlobalValues::s_maximumNumModels );
 			m_meshDrawArray[_index] = _mesh;
 		}
 
 		//================================================================================================================================
 		//================================================================================================================================
 		void Renderer::SetNumMesh( const uint32_t _num ) {
-			assert( _num < s_maximumNumModels );
+			assert( _num < GlobalValues::s_maximumNumModels );
 			m_numMesh = _num;
 		}
 
 		//================================================================================================================================
 		//================================================================================================================================
 		void Renderer::SetTransformAt( const uint32_t _index, glm::mat4 _modelMatrix, glm::mat4 _normalMatrix ) {
-			assert( _index < s_maximumNumModels );
-			m_forwardPipeline->dynamicUniformsVert[_index].modelMat	  = _modelMatrix;
-			m_forwardPipeline->dynamicUniformsVert[_index].rotationMat = _normalMatrix;
+			assert( _index < GlobalValues::s_maximumNumModels );
+			m_forwardPipeline->m_dynamicUniformsVert[_index].modelMat	  = _modelMatrix;
+			m_forwardPipeline->m_dynamicUniformsVert[_index].rotationMat = _normalMatrix;
 		}
 
 		//================================================================================================================================
 		//================================================================================================================================
 		void Renderer::SetMaterialAt( const uint32_t _index, const glm::vec3 _color, const uint32_t _shininess, const uint32_t _textureIndex ) {
-			assert( _index < s_maximumNumModels );
-			m_forwardPipeline->dynamicUniformsMaterial[_index].color = _color;
-			m_forwardPipeline->dynamicUniformsMaterial[_index].shininess = _shininess;
-			m_forwardPipeline->dynamicUniformsMaterial[_index].textureIndex = _textureIndex;
+			assert( _index < GlobalValues::s_maximumNumModels );
+			m_forwardPipeline->m_dynamicUniformsMaterial[_index].color = _color;
+			m_forwardPipeline->m_dynamicUniformsMaterial[_index].shininess = _shininess;
+			m_forwardPipeline->m_dynamicUniformsMaterial[_index].textureIndex = _textureIndex;
 		}
 	
 		//================================================================================================================================
@@ -613,8 +613,7 @@ namespace fan
 					Debug::Get() << Debug::Severity::error << "Could not record command buffer " << _index << "." << Debug::Endl();
 				}
 			}
-		}
-	
+		}	
 
 		//================================================================================================================================
 		//================================================================================================================================
@@ -648,7 +647,7 @@ namespace fan
 						assert( mesh->GetVertexBuffer() != nullptr );
 						assert( mesh->GetIndexBuffer() != nullptr );
 
-						m_forwardPipeline->BindDescriptors( commandBuffer, meshIndex );
+						m_forwardPipeline->BindDescriptors( commandBuffer, _index, meshIndex );
 						VkDeviceSize offsets[] = { 0 };
 						VkBuffer vertexBuffers[] = { mesh->GetVertexBuffer()->GetBuffer() };
 						vkCmdBindVertexBuffers( commandBuffer, 0, 1, vertexBuffers, offsets );
@@ -656,10 +655,6 @@ namespace fan
 						vkCmdDrawIndexed( commandBuffer, static_cast<uint32_t>( mesh->GetIndices().size() ), 1, 0, 0, 0 );
 					}
 				}
-
-
-
-
 
 				if (vkEndCommandBuffer(commandBuffer) != VK_SUCCESS) {
 					Debug::Get() << Debug::Severity::error << "Could not record command buffer " << _index << "." << Debug::Endl();

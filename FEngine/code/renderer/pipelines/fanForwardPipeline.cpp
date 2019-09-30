@@ -33,13 +33,13 @@ namespace fan
 			dynamicAlignmentVert = ( ( sizeof( DynamicUniformsVert ) + minUboAlignment - 1 ) & ~( minUboAlignment - 1 ) );
 			dynamicAlignmentFrag = ( ( sizeof( DynamicUniformsMaterial ) + minUboAlignment - 1 ) & ~( minUboAlignment - 1 ) );
 		}
-		dynamicUniformsVert.Resize( s_maximumNumModels * dynamicAlignmentVert, dynamicAlignmentVert );
-		dynamicUniformsMaterial.Resize( s_maximumNumModels * dynamicAlignmentFrag, dynamicAlignmentFrag );
+		m_dynamicUniformsVert.Resize( GlobalValues::s_maximumNumModels * dynamicAlignmentVert, dynamicAlignmentVert );
+		m_dynamicUniformsMaterial.Resize( GlobalValues::s_maximumNumModels * dynamicAlignmentFrag, dynamicAlignmentFrag );
 
-		for ( int uniformIndex = 0; uniformIndex < s_maximumNumModels; uniformIndex++ ) {
-			dynamicUniformsMaterial[uniformIndex].color = glm::vec3( 1 );
-			dynamicUniformsMaterial[uniformIndex].textureIndex = 0;
-			dynamicUniformsMaterial[uniformIndex].shininess = 1;
+		for ( int uniformIndex = 0; uniformIndex < GlobalValues::s_maximumNumModels; uniformIndex++ ) {
+			m_dynamicUniformsMaterial[uniformIndex].color = glm::vec3( 1 );
+			m_dynamicUniformsMaterial[uniformIndex].textureIndex = 0;
+			m_dynamicUniformsMaterial[uniformIndex].shininess = 1;
 		}
 	}
 
@@ -65,13 +65,13 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void ForwardPipeline::CreateDescriptors( const size_t /*_numSwapchainImages*/ ) {
-		m_sceneDescriptor = new Descriptor( m_device, 1 );
-		m_sceneDescriptor->SetUniformBinding( VK_SHADER_STAGE_VERTEX_BIT, sizeof( VertUniforms ) );
-		m_sceneDescriptor->SetDynamicUniformBinding( VK_SHADER_STAGE_VERTEX_BIT, dynamicUniformsVert.GetTotalSize(), dynamicUniformsVert.GetAlignment() );
-		m_sceneDescriptor->SetUniformBinding( VK_SHADER_STAGE_FRAGMENT_BIT, sizeof( FragUniforms ) );
-		m_sceneDescriptor->SetDynamicUniformBinding( VK_SHADER_STAGE_FRAGMENT_BIT, dynamicUniformsMaterial.GetTotalSize(), dynamicUniformsMaterial.GetAlignment() );
-		m_sceneDescriptor->SetUniformBinding( VK_SHADER_STAGE_FRAGMENT_BIT, sizeof( LightsUniforms ) );
+	void ForwardPipeline::CreateDescriptors( const size_t _numSwapchainImages ) {
+		m_sceneDescriptor = new Descriptor( m_device, _numSwapchainImages );
+		m_sceneDescriptor->SetUniformBinding		( VK_SHADER_STAGE_VERTEX_BIT,	sizeof( VertUniforms ) );
+		m_sceneDescriptor->SetDynamicUniformBinding ( VK_SHADER_STAGE_VERTEX_BIT,	m_dynamicUniformsVert.GetTotalSize(), m_dynamicUniformsVert.GetAlignment() );
+		m_sceneDescriptor->SetUniformBinding		( VK_SHADER_STAGE_FRAGMENT_BIT, sizeof( FragUniforms ) );
+		m_sceneDescriptor->SetDynamicUniformBinding ( VK_SHADER_STAGE_FRAGMENT_BIT, m_dynamicUniformsMaterial.GetTotalSize(), m_dynamicUniformsMaterial.GetAlignment() );
+		m_sceneDescriptor->SetUniformBinding		( VK_SHADER_STAGE_FRAGMENT_BIT, sizeof( LightsUniforms ) );
 		m_sceneDescriptor->Create();
 
 		CreateTextureDescriptor();
@@ -107,25 +107,25 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void ForwardPipeline::UpdateUniformBuffers( const size_t /*_index*/ ) {
-		m_sceneDescriptor->SetBinding( 0, 0, &vertUniforms,					sizeof( VertUniforms ),					0 );
-		m_sceneDescriptor->SetBinding( 1, 0, &dynamicUniformsVert[0],		dynamicUniformsVert.GetTotalSize(),		0 );
-		m_sceneDescriptor->SetBinding( 2, 0, &fragUniforms,					sizeof( FragUniforms ),					0 );
-		m_sceneDescriptor->SetBinding( 3, 0, &dynamicUniformsMaterial[0],	dynamicUniformsMaterial.GetTotalSize(), 0 );
-		m_sceneDescriptor->SetBinding( 4, 0, &lightUniforms,				sizeof( LightsUniforms ),				0 );
+	void ForwardPipeline::UpdateUniformBuffers( const size_t _index ) {
+		m_sceneDescriptor->SetBinding( 0, _index, &m_vertUniforms,				sizeof( VertUniforms ),					0 );
+		m_sceneDescriptor->SetBinding( 1, _index, &m_dynamicUniformsVert[0],		m_dynamicUniformsVert.GetTotalSize(),		0 );
+		m_sceneDescriptor->SetBinding( 2, _index, &m_fragUniforms,				sizeof( FragUniforms ),					0 );
+		m_sceneDescriptor->SetBinding( 3, _index, &m_dynamicUniformsMaterial[0],	m_dynamicUniformsMaterial.GetTotalSize(), 0 );
+		m_sceneDescriptor->SetBinding( 4, _index, &m_lightUniforms,				sizeof( LightsUniforms ),				0 );
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void ForwardPipeline::BindDescriptors( VkCommandBuffer _commandBuffer, const uint32_t _indexOffset ) {
+	void ForwardPipeline::BindDescriptors( VkCommandBuffer _commandBuffer, const size_t _indexFrame, const uint32_t _indexOffset ) {
 		
 		std::vector<VkDescriptorSet> descriptors = {
-			m_sceneDescriptor->GetSet()
+			m_sceneDescriptor->GetSet( _indexFrame )
 			, m_texturesDescriptor->GetSet()
 		}; 
 		std::vector<uint32_t> dynamicOffsets = {
-			 _indexOffset  * static_cast<uint32_t>( dynamicUniformsVert.GetAlignment() )
-			,_indexOffset  * static_cast<uint32_t>( dynamicUniformsMaterial.GetAlignment() )
+			 _indexOffset  * static_cast<uint32_t>( m_dynamicUniformsVert.GetAlignment() )
+			,_indexOffset  * static_cast<uint32_t>( m_dynamicUniformsMaterial.GetAlignment() )
 		};
 		vkCmdBindDescriptorSets(
 			_commandBuffer,

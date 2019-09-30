@@ -1,7 +1,6 @@
 #pragma once
 
 #include "core/memory/fanAlignedMemory.h"
-#include "renderer/fanUniforms.h"
 
 namespace fan {
 	class Device;

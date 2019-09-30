@@ -9,7 +9,6 @@
 #include "renderer/core/fanDescriptor.h"
 #include "renderer/fanRenderer.h"
 #include "renderer/util/fanVertex.h"
-#include "renderer/fanUniforms.h"
 
 namespace fan
 {
@@ -38,7 +37,7 @@ namespace fan
 	//================================================================================================================================
 	//================================================================================================================================
 	void DebugPipeline::UpdateUniformBuffers( const size_t _index ) {
-		m_descriptor->SetBinding( 0, _index, &debugUniforms, sizeof( DebugUniforms ), 0 );
+		m_descriptor->SetBinding( 0, _index, &m_debugUniforms, sizeof( DebugUniforms ), 0 );
 	}
 
 	//================================================================================================================================

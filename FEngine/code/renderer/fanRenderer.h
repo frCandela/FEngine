@@ -1,6 +1,5 @@
 #pragma once
 
-#include "renderer/fanUniforms.h"
 #include "renderer/util/fanVertex.h"
 #include "core/math/shapes/fanAABB.h"
 #include "core/fanSingleton.h"
@@ -57,8 +56,8 @@ namespace fan
 		void SetNumDirectionalLights( const uint32_t _num );
 		void SetPointLight( const int _index, const glm::vec3 _position, const glm::vec3 _diffuse, const glm::vec3 _specular, const glm::vec3 _ambiant, const glm::vec3 _constantLinearQuadratic );
 		void SetNumPointLights( const uint32_t _num );
-		void SetDynamicUniformVert( const DynamicUniformsVert& _dynamicUniform, const uint32_t _index );
-		void SetDynamicUniformFrag( const DynamicUniformsMaterial& _dynamicUniform, const uint32_t _index );
+		void SetDynamicUniformVert( const glm::mat4 _modelMat, const glm::mat4 _rotationMat, const uint32_t _index );
+		void SetDynamicUniformFrag( const glm::vec3  _color, const glm::int32 _shininess, const glm::int32 _textureIndex, const uint32_t _index );
 		void SetMeshAt( const uint32_t _index, Mesh * _mesh );
 		void SetNumMesh( const uint32_t _num );
 		void SetTransformAt( const uint32_t _index, glm::mat4 _modelMatrix,	glm::mat4 _normalMatrix );
@@ -78,7 +77,7 @@ namespace fan
 		void					DebugAABB	  ( const AABB & _aabb, const Color _color);
 
 	private:
-		std::array< Mesh *, s_maximumNumModels > m_meshDrawArray;
+		std::array< Mesh *, GlobalValues::s_maximumNumModels > m_meshDrawArray;
 		uint32_t								 m_numMesh;
 
 		RessourceManager *  m_ressourceManager;

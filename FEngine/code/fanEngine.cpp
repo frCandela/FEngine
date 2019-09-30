@@ -541,8 +541,8 @@ namespace fan {
 		}
 
 		// Check num lights
-		if ( m_directionalLights.size() >= s_maximumNumDirectionalLights ) {
-			Debug::Get() << Debug::Severity::warning << "Too much lights in the scene, maximum is " << s_maximumNumDirectionalLights << Debug::Endl();
+		if ( m_directionalLights.size() >= GlobalValues::s_maximumNumDirectionalLight ) {
+			Debug::Get() << Debug::Severity::warning << "Too much lights in the scene, maximum is " << GlobalValues::s_maximumNumDirectionalLight << Debug::Endl();
 		} else {
 			m_directionalLights.push_back( _directionalLight );
 		}
@@ -581,8 +581,8 @@ namespace fan {
 		}		
 
 		// Check num lights
-		if ( m_pointLights.size() >= s_maximumNumPointLights ) {
-			Debug::Get() << Debug::Severity::warning << "Too much lights in the scene, maximum is " << s_maximumNumPointLights << Debug::Endl();
+		if ( m_pointLights.size() >= GlobalValues::s_maximumNumPointLights ) {
+			Debug::Get() << Debug::Severity::warning << "Too much lights in the scene, maximum is " << GlobalValues::s_maximumNumPointLights << Debug::Endl();
 		} else {
 			m_pointLights.push_back( _pointLight );
 		}

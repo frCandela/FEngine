@@ -48,7 +48,7 @@ namespace fan {
 	//================================================================================================================================
 	void Descriptor::SetDynamicUniformBinding( VkShaderStageFlags  _stage, VkDeviceSize _bufferSize, VkDeviceSize _alignment ) {
 		BindingData bindingData;
-		bindingData.SetBuffers( m_device, 1, _bufferSize, _alignment );
+		bindingData.SetBuffers( m_device, m_numDescriptors, _bufferSize, _alignment );
 		bindingData.UpdateLayoutBinding(  m_bindingData.size(), _stage, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC, 1 );
 		m_bindingData.push_back( bindingData );
 	}
