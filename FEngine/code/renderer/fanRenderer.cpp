@@ -65,7 +65,7 @@ namespace fan
 
 			m_postprocessPipeline = new PostprocessPipeline(*m_device);
 			m_postprocessPipeline->SetImageAndView( m_forwardFrameBuffers->GetColorAttachmentImageView(), m_forwardFrameBuffers->GetColorAttachmentSampler() );
-			m_postprocessPipeline->CreateDescriptors();
+			m_postprocessPipeline->CreateDescriptors( m_swapchain->GetSwapchainImagesCount() );
 			m_postprocessPipeline->Init( m_renderPassPostprocess, m_swapchain->GetExtent(), "code/shaders/postprocess.vert", "code/shaders/postprocess.frag" );
 			m_postprocessPipeline->Create();
 		
@@ -210,7 +210,7 @@ namespace fan
 				ImGui::Render();
 
 				const uint32_t currentFrame = m_swapchain->GetCurrentFrame();
-				UpdateUniformBuffers();
+				UpdateUniformBuffers( currentFrame );
 				RecordCommandBufferGeometry(currentFrame);
 				RecordCommandBufferDebug(currentFrame);
 				RecordCommandBufferImgui(currentFrame);
@@ -226,11 +226,12 @@ namespace fan
 
 		//================================================================================================================================
 		//================================================================================================================================
-		void Renderer::UpdateUniformBuffers() {
-			m_forwardPipeline->UpdateUniformBuffers();
-			m_debugLinesPipeline->UpdateUniformBuffers();
-			m_debugLinesPipelineNoDepthTest->UpdateUniformBuffers();
-			m_debugTrianglesPipeline->UpdateUniformBuffers();
+		void Renderer::UpdateUniformBuffers( const size_t _index ) {
+			m_postprocessPipeline->UpdateUniformBuffers( _index );
+			m_forwardPipeline->UpdateUniformBuffers( _index );
+			m_debugLinesPipeline->UpdateUniformBuffers( _index );
+			m_debugLinesPipelineNoDepthTest->UpdateUniformBuffers( _index );
+			m_debugTrianglesPipeline->UpdateUniformBuffers( _index );
 		}
 
 		//================================================================================================================================
@@ -507,7 +508,7 @@ namespace fan
 			commandBufferBeginInfo.pInheritanceInfo = &commandBufferInheritanceInfo;
 
 			if (vkBeginCommandBuffer(commandBuffer, &commandBufferBeginInfo) == VK_SUCCESS) {
-				m_postprocessPipeline->Bind(commandBuffer);
+				m_postprocessPipeline->Bind(commandBuffer, _index );
 				VkBuffer vertexBuffers[] = { m_quadVertexBuffer->GetBuffer() };
 				VkDeviceSize offsets[] = { 0 };
 				vkCmdBindVertexBuffers( commandBuffer, 0, 1, vertexBuffers, offsets );
@@ -585,19 +586,19 @@ namespace fan
 				if (vkBeginCommandBuffer(commandBuffer, &commandBufferBeginInfo) == VK_SUCCESS) {	
 					VkDeviceSize offsets[] = { 0 }; 
 					if( m_debugLines.size() > 0 ) {
-						m_debugLinesPipeline->Bind( commandBuffer );
+						m_debugLinesPipeline->Bind( commandBuffer, _index );
 						VkBuffer vertexBuffers[] = { m_debugLinesvertexBuffers[_index]->GetBuffer() };
 						vkCmdBindVertexBuffers( commandBuffer, 0, 1, vertexBuffers, offsets );
 						vkCmdDraw( commandBuffer, static_cast<uint32_t>( m_debugLines.size() ), 1, 0, 0 );
 					}
 					if ( m_debugLinesNoDepthTest.size() > 0 ) {
-						m_debugLinesPipelineNoDepthTest->Bind( commandBuffer );
+						m_debugLinesPipelineNoDepthTest->Bind( commandBuffer, _index );
 						VkBuffer vertexBuffers[] = { m_debugLinesNoDepthTestVertexBuffers[_index]->GetBuffer() };
 						vkCmdBindVertexBuffers( commandBuffer, 0, 1, vertexBuffers, offsets );
 						vkCmdDraw( commandBuffer, static_cast<uint32_t>( m_debugLinesNoDepthTest.size() ), 1, 0, 0 );
 					}
 					if ( m_debugTriangles.size() > 0 ) {
-						m_debugTrianglesPipeline->Bind( commandBuffer );
+						m_debugTrianglesPipeline->Bind( commandBuffer, _index );
 						VkBuffer vertexBuffers[] = { m_debugTrianglesvertexBuffers[_index]->GetBuffer() };
 						vkCmdBindVertexBuffers( commandBuffer, 0, 1, vertexBuffers, offsets );
 						vkCmdDraw( commandBuffer, static_cast<uint32_t>( m_debugTriangles.size() ), 1, 0, 0 );

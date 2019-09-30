@@ -21,7 +21,7 @@ namespace fan {
 
 		static std::string SecondsToString( const double _seconds );	// Returns a hours:minuts:seconds ex: 3661s = 01:01:01
 	private:
-		float m_minFps = 10.f;
+		float m_minFps = 1.f;
 		float m_maxFps = 144.f;
 		float m_delta = 1/60.f;
 	};

@@ -252,7 +252,7 @@ namespace fan {
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void Pipeline::Bind( VkCommandBuffer _commandBuffer ) {
+	void Pipeline::Bind( VkCommandBuffer _commandBuffer, const size_t /*_index*/ ) {
 		m_viewports[0].x = 0.f;
 		m_viewports[0].y = 0.f;
 		m_viewports[0].width = static_cast<float> ( m_extent.width );

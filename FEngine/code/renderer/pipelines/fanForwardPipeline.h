@@ -26,9 +26,8 @@ namespace fan
 		~ForwardPipeline() override;
 
 		void Resize( const VkExtent2D _extent ) override;
-		void Bind( VkCommandBuffer _commandBuffer ) override;
 		void BindDescriptors( VkCommandBuffer _commandBuffer, const uint32_t _indexOffset );
-		void UpdateUniformBuffers() override;
+		void UpdateUniformBuffers( const size_t _index = 0 ) override;
 		void ReloadShaders() override;
 
 		VertUniforms  vertUniforms;

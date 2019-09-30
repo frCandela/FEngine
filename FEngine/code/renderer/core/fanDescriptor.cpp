@@ -26,40 +26,44 @@ namespace fan {
 		}
 
 		for (int bindingIndex = 0; bindingIndex < m_bindingData.size() ; bindingIndex++) {
-			delete m_bindingData[bindingIndex].buffer;
+			for (int bufferIndex = 0; bufferIndex < m_bindingData[bindingIndex].buffers.size(); bufferIndex++) {
+				delete m_bindingData[bindingIndex].buffers[bufferIndex];
+			}
 		}
 	}
 
 	//================================================================================================================================
+	// Adds a dynamic uniform buffer binding
 	//================================================================================================================================
-	void Descriptor::SetUniformBinding( VkShaderStageFlags  _stage, VkDeviceSize _bufferSize, const int /*_index*/ ) {
+	void Descriptor::SetUniformBinding( const VkShaderStageFlags  _stage, const VkDeviceSize _bufferSize ) {
 		BindingData bindingData;
-		bindingData.SetBuffer( m_device, _bufferSize );
+		bindingData.SetBuffers( m_device, m_numDescriptors, _bufferSize );
 		bindingData.UpdateLayoutBinding( m_bindingData.size(), _stage, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 1 );
 		m_bindingData.push_back(bindingData);
 	}	
 
 	//================================================================================================================================
+	// Adds a uniform buffer binding
 	//================================================================================================================================
-	void Descriptor::SetDynamicUniformBinding( VkShaderStageFlags  _stage, VkDeviceSize _bufferSize, VkDeviceSize _alignment, const int /*_index*/ ) {
+	void Descriptor::SetDynamicUniformBinding( VkShaderStageFlags  _stage, VkDeviceSize _bufferSize, VkDeviceSize _alignment ) {
 		BindingData bindingData;
-		bindingData.SetBuffer( m_device, _bufferSize, _alignment );
+		bindingData.SetBuffers( m_device, 1, _bufferSize, _alignment );
 		bindingData.UpdateLayoutBinding(  m_bindingData.size(), _stage, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC, 1 );
 		m_bindingData.push_back( bindingData );
 	}
 
 	//================================================================================================================================
 	// Adds a COMBINED_IMAGE_SAMPLER binding 
-	// If '_index' is -1 appends it to the bindings list
+	// If '_index' is -1, appends a new BindingData to the bindings list and updates it
 	// If '_index' > 0 updates the corresponding binding
 	//================================================================================================================================
 	void Descriptor::SetImageSamplerBinding( VkShaderStageFlags  _stage, std::vector< VkImageView > & _imageViews, VkSampler _sampler, const int _index ) {
-		if ( _index < 0 ) {
+		if ( _index < 0 ) { // Creation & update
 			BindingData bindingData;
 			bindingData.SetImagesSampler( _imageViews, _sampler );
 			bindingData.UpdateLayoutBinding( m_bindingData.size(), _stage, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, _imageViews.size() );
 			m_bindingData.push_back( bindingData );
-		} else {
+		} else { // Update
 			assert( _index < m_bindingData.size() );
 			m_bindingData[_index].SetImagesSampler( _imageViews, _sampler );
 			m_bindingData[_index].UpdateLayoutBinding( m_bindingData.size(), _stage, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, _imageViews.size() );
@@ -67,17 +71,19 @@ namespace fan {
 	}
 
 	//================================================================================================================================
+	// For uniform buffers only, update buffer data of the binding at _index
 	//================================================================================================================================
-	void Descriptor::SetBinding( const int _index, const void * _data, VkDeviceSize _size, VkDeviceSize _offset ) {
-		assert( _index  >= 0 && _index < m_bindingData .size() );	
-		assert( m_bindingData[_index].buffer != nullptr );
-		m_bindingData[_index].buffer->SetData( _data, _size, _offset );
+	void Descriptor::SetBinding( const int _indexBinding, const void * _data, VkDeviceSize _size, VkDeviceSize _offset, const int _indexBuffer  ) {
+		assert( _indexBinding  >= 0 && _indexBinding < m_bindingData .size() );	
+		assert( _indexBuffer < m_bindingData[_indexBinding].buffers.size() );
+		m_bindingData[_indexBinding].buffers[_indexBuffer]->SetData( _data, _size, _offset );
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void Descriptor::Bind( VkCommandBuffer _commandBuffer, VkPipelineLayout _pipelineLayout ) {
-		vkCmdBindDescriptorSets( _commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, _pipelineLayout, 0, 1, &m_descriptorSet, 0, nullptr );
+	void Descriptor::Bind( VkCommandBuffer _commandBuffer, VkPipelineLayout _pipelineLayout, const size_t _index ) {
+		assert( _index < m_numDescriptors );
+		vkCmdBindDescriptorSets( _commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, _pipelineLayout, 0, 1, &m_descriptorSets[ _index ], 0, nullptr );
 	}
 
 	//================================================================================================================================
@@ -121,7 +127,7 @@ namespace fan {
 			descriptorPoolCreateInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
 			descriptorPoolCreateInfo.pNext = nullptr;
 			descriptorPoolCreateInfo.flags = 0;
-			descriptorPoolCreateInfo.maxSets = 1;
+			descriptorPoolCreateInfo.maxSets = static_cast<uint32_t>( m_numDescriptors );
 			descriptorPoolCreateInfo.poolSizeCount = static_cast<uint32_t>( poolSizes.size() );
 			descriptorPoolCreateInfo.pPoolSizes = poolSizes.data();
 			if ( vkCreateDescriptorPool( m_device.vkDevice, &descriptorPoolCreateInfo, nullptr, &m_descriptorPool ) != VK_SUCCESS ) {
@@ -132,19 +138,25 @@ namespace fan {
 		
 		// Create descriptor set
 		{
-			std::vector< VkDescriptorSetLayout > descriptorSetLayouts = { m_descriptorSetLayout };
+			std::vector< VkDescriptorSetLayout > descriptorSetLayouts;
+			for (int layoutIndex = 0; layoutIndex < m_numDescriptors; layoutIndex++) {
+				descriptorSetLayouts.push_back( m_descriptorSetLayout );
+			}
 			VkDescriptorSetAllocateInfo descriptorSetAllocateInfo;
 			descriptorSetAllocateInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
 			descriptorSetAllocateInfo.pNext = nullptr;
 			descriptorSetAllocateInfo.descriptorPool = m_descriptorPool;
-			descriptorSetAllocateInfo.descriptorSetCount = static_cast<uint32_t>( descriptorSetLayouts.size() );
+			descriptorSetAllocateInfo.descriptorSetCount = static_cast<uint32_t>( m_numDescriptors );
 			descriptorSetAllocateInfo.pSetLayouts = descriptorSetLayouts.data();
 
-			if ( vkAllocateDescriptorSets( m_device.vkDevice, &descriptorSetAllocateInfo, &m_descriptorSet ) != VK_SUCCESS ) {
+			m_descriptorSets.resize( m_numDescriptors );
+			if ( vkAllocateDescriptorSets( m_device.vkDevice, &descriptorSetAllocateInfo, m_descriptorSets.data() ) != VK_SUCCESS ) {
 				Debug::Error( "Could not allocate descriptor set." );
 				return false;
 			}
-			Debug::Get() << Debug::Severity::log << std::hex << "VkDescriptorSet       " << m_descriptorSet << std::dec << Debug::Endl();
+			for (int setIndex = 0; setIndex < m_numDescriptors ; setIndex++) {
+				Debug::Get() << Debug::Severity::log << std::hex << "VkDescriptorSet       " << m_descriptorSets[setIndex] << std::dec << Debug::Endl();
+			}			
 		}
 
 		Update();
@@ -152,11 +164,18 @@ namespace fan {
 		return true;
 	}
 
+	//================================================================================================================================
+	// Update the descriptors sets using the old WriteDescriptor sets
+	//================================================================================================================================
 	void Descriptor::Update() {
 		std::vector<VkWriteDescriptorSet>	writeDescriptors;
-		for ( int descriptorIndex = 0; descriptorIndex < m_bindingData.size(); descriptorIndex++ ) {
-			m_bindingData[descriptorIndex].UpdateWriteDescriptorSet( descriptorIndex, m_descriptorSet );
-			writeDescriptors.push_back( m_bindingData[descriptorIndex].writeDescriptorSet );
+
+		for ( int bindingIndex = 0; bindingIndex < m_bindingData.size(); bindingIndex++ ) {
+			BindingData& bindingData = m_bindingData[bindingIndex];			
+			for ( int descriptorIndex = 0; descriptorIndex < m_numDescriptors; descriptorIndex++ ) {
+				bindingData.UpdateWriteDescriptorSet( bindingIndex, descriptorIndex, m_descriptorSets[descriptorIndex] );
+				writeDescriptors.push_back( bindingData.writeDescriptorSets[descriptorIndex] );
+			}
 		}
 
 		vkUpdateDescriptorSets(
@@ -170,26 +189,35 @@ namespace fan {
 
 	//================================================================================================================================
 	// Descriptor::BindingData
+	// Adds a single uniform buffer
+	// If alignement != 1 the buffer is considered dynamic and it's offset can be set at binding time
 	//================================================================================================================================
-	void Descriptor::BindingData::SetBuffer( Device& _device, VkDeviceSize _sizeBuffer, VkDeviceSize _alignment ) {
-		buffer = new Buffer( _device );
-		buffer->Create(   
-			_sizeBuffer,
-			VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT,
-			VK_MEMORY_PROPERTY_HOST_COHERENT_BIT | VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT,
-			_alignment
-		);
-		descriptorBufferInfo.buffer = buffer->GetBuffer();
-		descriptorBufferInfo.offset = 0;
-		descriptorBufferInfo.range = buffer->GetAlignment() > 1 ? buffer->GetAlignment() : buffer->GetSize();
+	void Descriptor::BindingData::SetBuffers( Device& _device, const size_t _count, VkDeviceSize _sizeBuffer, VkDeviceSize _alignment ) {
+		buffers.resize( _count );
+		descriptorBufferInfos.resize( _count );
+		writeDescriptorSets.resize( _count );
+		for (int bufferIndex = 0; bufferIndex < _count; bufferIndex++) {
+			buffers[ bufferIndex ] = new Buffer( _device );
+			buffers[bufferIndex]->Create(
+				_sizeBuffer,
+				VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT,
+				VK_MEMORY_PROPERTY_HOST_COHERENT_BIT | VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT,
+				_alignment
+			);
+			descriptorBufferInfos[bufferIndex].buffer = buffers[bufferIndex]->GetBuffer();
+			descriptorBufferInfos[bufferIndex].offset = 0;
+			descriptorBufferInfos[bufferIndex].range = buffers[bufferIndex]->GetAlignment() > 1 ? buffers[bufferIndex]->GetAlignment() : buffers[bufferIndex]->GetSize();
+		}
 	}
 
 	//================================================================================================================================
 	// Descriptor::BindingData
+	// Adds array texture binding ( multiple texture descriptors that can vary in size )
 	//================================================================================================================================
 	void Descriptor::BindingData::SetImagesSampler( std::vector< VkImageView > & _imageViews, VkSampler _sampler ) {
 		descriptorsImageInfo.clear();
 		descriptorsImageInfo.reserve( _imageViews.size() );
+		writeDescriptorSets.resize( 1 );
 		for ( int viewIndex = 0; viewIndex < _imageViews.size(); viewIndex++ ) {
 			VkDescriptorImageInfo imageInfo;
 			imageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
@@ -212,16 +240,18 @@ namespace fan {
 	//================================================================================================================================
 	// Descriptor::BindingData
 	//================================================================================================================================
-	void  Descriptor::BindingData::UpdateWriteDescriptorSet( const size_t _dstBinding, VkDescriptorSet _descriptorSet ) {
-		writeDescriptorSet.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-		writeDescriptorSet.pNext = nullptr;
-		writeDescriptorSet.dstSet = _descriptorSet;
-		writeDescriptorSet.dstBinding = static_cast<uint32_t>(_dstBinding );
-		writeDescriptorSet.dstArrayElement = 0;
-		writeDescriptorSet.descriptorCount = layoutBinding.descriptorCount;
-		writeDescriptorSet.descriptorType = layoutBinding.descriptorType;
-		writeDescriptorSet.pImageInfo = descriptorsImageInfo.empty() ? nullptr : descriptorsImageInfo.data();
-		writeDescriptorSet.pBufferInfo = buffer != nullptr ? &descriptorBufferInfo : nullptr ;
-		//uboWriteDescriptorSet.pTexelBufferView = nullptr;
+	void  Descriptor::BindingData::UpdateWriteDescriptorSet( const size_t _dstBinding, const size_t _setIndex, VkDescriptorSet _descriptorSet ) {
+		writeDescriptorSets.resize( buffers.empty() ? 1 : buffers.size() );
+
+		writeDescriptorSets[_setIndex].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+		writeDescriptorSets[_setIndex].pNext = nullptr;
+		writeDescriptorSets[_setIndex].dstSet = _descriptorSet;
+		writeDescriptorSets[_setIndex].dstBinding = static_cast<uint32_t>( _dstBinding );
+		writeDescriptorSets[_setIndex].dstArrayElement = 0;
+		writeDescriptorSets[_setIndex].descriptorCount = layoutBinding.descriptorCount;
+		writeDescriptorSets[_setIndex].descriptorType = layoutBinding.descriptorType;
+		writeDescriptorSets[_setIndex].pImageInfo = descriptorsImageInfo.empty() ? nullptr : descriptorsImageInfo.data();
+		writeDescriptorSets[_setIndex].pBufferInfo = buffers.empty() ? nullptr : &descriptorBufferInfos[_setIndex];
+		//uboWriteDescriptorSet.pTexelBufferView = nullptr;		
 	}
 }

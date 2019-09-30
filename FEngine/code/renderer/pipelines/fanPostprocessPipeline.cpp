@@ -22,7 +22,8 @@ namespace fan
 	//================================================================================================================================
 	//================================================================================================================================
 	PostprocessPipeline::~PostprocessPipeline() {
-		delete m_descriptor;
+		delete m_descriptorImageSampler;
+		delete m_descriptorUniforms;
 	}
 
 	//================================================================================================================================
@@ -30,42 +31,60 @@ namespace fan
 	void PostprocessPipeline::Resize( const VkExtent2D _extent ) {
 		Pipeline::Resize(_extent);
 		std::vector<VkImageView> views = { m_imageView->GetImageView() };
-		m_descriptor->SetImageSamplerBinding( VK_SHADER_STAGE_FRAGMENT_BIT, views, m_sampler->GetSampler(), 0 );
-		m_descriptor->Update();
+		m_descriptorImageSampler->SetImageSamplerBinding( VK_SHADER_STAGE_FRAGMENT_BIT, views, m_sampler->GetSampler(), 0 );
+		m_descriptorImageSampler->Update();
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void PostprocessPipeline::Bind( VkCommandBuffer _commandBuffer ) {
+	void PostprocessPipeline::Bind( VkCommandBuffer _commandBuffer, const size_t _index ) {
 		Pipeline::Bind(_commandBuffer);
-		m_descriptor->Bind( _commandBuffer, m_pipelineLayout );
+		std::vector<VkDescriptorSet> descriptors = {
+			m_descriptorImageSampler->GetSet()
+			, m_descriptorUniforms->GetSet( _index )
+		};
+		vkCmdBindDescriptorSets(
+			_commandBuffer,
+			VK_PIPELINE_BIND_POINT_GRAPHICS,
+			m_pipelineLayout,
+			0,
+			static_cast<uint32_t>( descriptors.size() ),
+			descriptors.data(),
+			0,
+			nullptr
+		);
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
 	void PostprocessPipeline::ReloadShaders( ) {
 		Pipeline::ReloadShaders( );
-		std::vector<VkImageView> views = { m_imageView->GetImageView() };
-		m_descriptor->SetImageSamplerBinding( VK_SHADER_STAGE_FRAGMENT_BIT, views, m_sampler->GetSampler(), 0 );
-		m_descriptor->Update();
+// 		std::vector<VkImageView> views = { m_imageView->GetImageView() };
+// 		m_descriptor->SetImageSamplerBinding( VK_SHADER_STAGE_FRAGMENT_BIT, views, m_sampler->GetSampler(), 0 );
+// 		m_descriptor->Update();
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void PostprocessPipeline::UpdateUniformBuffers() {
-		m_descriptor->SetBinding(1, &uniforms, sizeof( Uniforms ) );
+	void PostprocessPipeline::UpdateUniformBuffers( const size_t _index ) {
+		m_descriptorUniforms->SetBinding( 0, &uniforms, sizeof( Uniforms ), 0, static_cast<int>(_index) );		
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void PostprocessPipeline::CreateDescriptors() {
-		delete m_descriptor;
-		m_descriptor = new Descriptor( m_device );
-		std::vector<VkImageView> views = { m_imageView->GetImageView() };
-		m_descriptor->SetImageSamplerBinding( VK_SHADER_STAGE_FRAGMENT_BIT , views, m_sampler->GetSampler() );
-		m_descriptor->SetUniformBinding( VK_SHADER_STAGE_FRAGMENT_BIT, sizeof( Uniforms ) );
-		m_descriptor->Create();		
+	void PostprocessPipeline::CreateDescriptors( const size_t _numSwapchainImages ) {
+		delete m_descriptorUniforms;
+		m_descriptorUniforms = new Descriptor( m_device );
+		m_descriptorUniforms->SetNumDescriptor( _numSwapchainImages );
+		m_descriptorUniforms->SetUniformBinding( VK_SHADER_STAGE_FRAGMENT_BIT, sizeof( Uniforms ) );		
+		m_descriptorUniforms->Create();
 		UpdateUniformBuffers();
+
+		delete m_descriptorImageSampler;
+		m_descriptorImageSampler = new Descriptor( m_device );
+		std::vector<VkImageView> views = { m_imageView->GetImageView() };
+		m_descriptorImageSampler->SetImageSamplerBinding( VK_SHADER_STAGE_FRAGMENT_BIT , views, m_sampler->GetSampler() );		
+		m_descriptorImageSampler->Create();
 	}
 
 	//================================================================================================================================
@@ -86,7 +105,7 @@ namespace fan
 		m_rasterizationStateCreateInfo.cullMode = VK_CULL_MODE_NONE;
 		m_attachmentBlendStates[0].srcColorBlendFactor = VK_BLEND_FACTOR_ONE;
 		m_attachmentBlendStates[0].dstColorBlendFactor = VK_BLEND_FACTOR_ZERO;
-		m_descriptorSetLayouts = { m_descriptor->GetLayout()	};
+		m_descriptorSetLayouts = { m_descriptorImageSampler->GetLayout(), m_descriptorUniforms->GetLayout()	};
 	}
 
 	//================================================================================================================================

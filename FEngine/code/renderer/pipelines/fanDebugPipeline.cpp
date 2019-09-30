@@ -33,13 +33,13 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void DebugPipeline::UpdateUniformBuffers() {
+	void DebugPipeline::UpdateUniformBuffers( const size_t /*_index*/ ) {
 		m_descriptor->SetBinding( 0, &debugUniforms, sizeof( DebugUniforms ) );
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void DebugPipeline::Bind( VkCommandBuffer _commandBuffer ) {
+	void DebugPipeline::Bind( VkCommandBuffer _commandBuffer, const size_t /*_index*/ ) {
 		Pipeline::Bind(		_commandBuffer );
 		m_descriptor->Bind( _commandBuffer, m_pipelineLayout );
 	}

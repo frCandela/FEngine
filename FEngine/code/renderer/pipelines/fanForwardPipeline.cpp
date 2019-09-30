@@ -109,18 +109,12 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void ForwardPipeline::UpdateUniformBuffers() {
+	void ForwardPipeline::UpdateUniformBuffers( const size_t /*_index*/ ) {
 		m_sceneDescriptor->SetBinding( 0, &vertUniforms, sizeof( VertUniforms ) );
 		m_sceneDescriptor->SetBinding( 1, &dynamicUniformsVert[0], dynamicUniformsVert.GetTotalSize() );
 		m_sceneDescriptor->SetBinding( 2,  &fragUniforms, sizeof( FragUniforms ) );
 		m_sceneDescriptor->SetBinding( 3, &dynamicUniformsMaterial[0], dynamicUniformsMaterial.GetTotalSize() );
 		m_sceneDescriptor->SetBinding( 4, &lightUniforms, sizeof( LightsUniforms ) );
-	}
-
-	//================================================================================================================================
-	//================================================================================================================================
-	void ForwardPipeline::Bind( VkCommandBuffer _commandBuffer ) {
-		Pipeline::Bind( _commandBuffer );
 	}
 
 	//================================================================================================================================

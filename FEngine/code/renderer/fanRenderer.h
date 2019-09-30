@@ -121,7 +121,7 @@ namespace fan
 		Buffer * m_quadVertexBuffer;
 		glm::vec4 m_clearColor;
 
-		void UpdateUniformBuffers();
+		void UpdateUniformBuffers( const size_t _index );
 		bool ResetCommandPool();
 		bool SubmitCommandBuffers();
 		void CreateQuadVertexBuffer();

@@ -26,8 +26,8 @@ namespace fan
 		DebugPipeline(Device& _device, const VkPrimitiveTopology _primitiveTopology, const bool _depthTestEnable);
 		virtual ~DebugPipeline() override;
 
-		void Bind( VkCommandBuffer _commandBuffer ) override;
-		void UpdateUniformBuffers() override;
+		void Bind( VkCommandBuffer _commandBuffer, const size_t _index ) override;
+		void UpdateUniformBuffers( const size_t _index ) override;
 
 	protected:
 		void ConfigurePipeline() override;
