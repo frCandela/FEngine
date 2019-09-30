@@ -8,6 +8,17 @@ namespace fan {
 
 	//================================================================================================================================
 	//================================================================================================================================
+	Keyboard::Keyboard() {
+		assert( m_keysPressed.size() == m_keysReleased.size() );
+		const uint64_t max = std::numeric_limits<uint64_t>::max();
+		for ( int buttonIndex = 0; buttonIndex < m_keysPressed.size(); buttonIndex++ ) {
+			m_keysPressed[buttonIndex] = max;
+			m_keysReleased[buttonIndex] = max;
+		}
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
 	bool Keyboard::IsKeyDown( const int _GLFW_KEY) {
 		if (ImGui::GetIO().WantCaptureKeyboard ) {
 			return false;

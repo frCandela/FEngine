@@ -24,6 +24,8 @@ namespace fan {
 		static bool GetButtonDown		( const int _GLFW_MOUSE_BUTTON );
 		static bool GetButtonPressed	( const int _GLFW_MOUSE_BUTTON );
 		static bool GetButtonReleased	( const int _GLFW_MOUSE_BUTTON );
+	protected:
+		Mouse();
 
 	private:
 		static void MouseCallback		(GLFWwindow* _window, double _x, double _y);

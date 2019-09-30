@@ -24,6 +24,9 @@ namespace fan {
 			E = GLFW_KEY_E
 		};
 
+	protected:
+		Keyboard();
+
 	private:
 		static void KeyCallback(GLFWwindow* _window, int _key, int _scancode, int _action, int _mods);
 		static void CharCallback(GLFWwindow* _window, unsigned int _c);

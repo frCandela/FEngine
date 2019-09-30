@@ -6,6 +6,17 @@
 namespace fan {
 	//================================================================================================================================
 	//================================================================================================================================
+	Mouse::Mouse() {
+		assert( m_buttonsPressed.size() == m_buttonsReleased.size() );
+		const uint64_t max = std::numeric_limits<uint64_t>::max();
+		for (int buttonIndex = 0; buttonIndex < m_buttonsPressed.size(); buttonIndex++) {
+			m_buttonsPressed[buttonIndex]  = max;
+			m_buttonsReleased[buttonIndex] = max;
+		}
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
 	void Mouse::SetCursor(CursorState _state)				{ 
 		glfwSetInputMode(Input::GetWindow(), GLFW_CURSOR, _state); 
 	}
