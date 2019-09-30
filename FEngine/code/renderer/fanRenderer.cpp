@@ -140,22 +140,17 @@ namespace fan
 						glfwPollEvents();
 						return;
 					}
-
-					Debug::Log( "suboptimal swapchain" );
 					vkDeviceWaitIdle(m_device->vkDevice);
-
-					m_swapchain->Resize( m_window->GetExtent() );
-					m_swapchainFramebuffers->SetExternalAttachment( m_swapchain->GetImageViews() );
-					m_swapchainFramebuffers->Resize( m_window->GetExtent() );
-
-					m_forwardFrameBuffers->Resize( m_window->GetExtent() );
-					m_postprocessPipeline->SetImageAndView( m_forwardFrameBuffers->GetColorAttachmentImageView(), m_forwardFrameBuffers->GetColorAttachmentSampler() );
-					m_postprocessPipeline->Resize(m_window->GetExtent());
-					m_forwardPipeline->Resize(m_window->GetExtent());
- 					m_debugLinesPipeline->Resize(m_window->GetExtent());
- 					m_debugLinesPipelineNoDepthTest->Resize(m_window->GetExtent());
- 					m_debugTrianglesPipeline->Resize(m_window->GetExtent());
-
+					const VkExtent2D extent = m_window->GetExtent();
+					Debug::Get() << Debug::Severity::highlight << "Resize renderer: " << extent.width << "x" << extent.height << Debug::Endl();
+					m_swapchain->Resize( extent );
+					m_swapchainFramebuffers->Resize( extent );
+					m_forwardFrameBuffers->Resize( extent );
+					m_postprocessPipeline->Resize( extent );
+					m_forwardPipeline->Resize( extent );
+ 					m_debugLinesPipeline->Resize( extent );
+ 					m_debugLinesPipelineNoDepthTest->Resize( extent );
+ 					m_debugTrianglesPipeline->Resize( extent );
 
 					RecordAllCommandBuffers();
 					vkResetFences(m_device->vkDevice, 1, m_swapchain->GetCurrentInFlightFence());
@@ -203,7 +198,10 @@ namespace fan
 					}
 				}
 				if (m_ressourceManager->IsModified()) {
-					ReloadShaders();
+// 					ReloadShaders();
+// 					m_ressourceManager->SetUnmodified();
+					WaitIdle();
+					m_forwardPipeline->Resize(m_swapchain->GetExtent());
 					m_ressourceManager->SetUnmodified();
 				}
 
@@ -239,6 +237,7 @@ namespace fan
 		//================================================================================================================================
 		void Renderer::WaitIdle() { 
 			vkDeviceWaitIdle(m_device->vkDevice); 
+			Debug::Highlight("Renderer idle");
 		}
 
 		//================================================================================================================================
@@ -709,20 +708,11 @@ namespace fan
 
 			vkDeviceWaitIdle(m_device->vkDevice);
 
-			delete m_forwardFrameBuffers;
-			m_forwardFrameBuffers = nullptr;
-			CreateForwardFramebuffers();
-
-			m_postprocessPipeline->SetImageAndView( m_forwardFrameBuffers->GetColorAttachmentImageView(), m_forwardFrameBuffers->GetColorAttachmentSampler() );
-			m_postprocessPipeline->ReloadShaders();
-
-			
+			m_postprocessPipeline->ReloadShaders();			
 			m_forwardPipeline->ReloadShaders();
 			m_debugLinesPipeline->ReloadShaders();
 			m_debugLinesPipelineNoDepthTest->ReloadShaders();
 			m_debugTrianglesPipeline->ReloadShaders();
-
-			m_forwardPipeline->Resize(m_swapchain->GetExtent());
 
 			RecordAllCommandBuffers();	
 		}	
@@ -1241,6 +1231,15 @@ namespace fan
 				vkDestroyRenderPass(m_device->vkDevice, m_renderPassPostprocess, nullptr);
 				m_renderPassPostprocess = VK_NULL_HANDLE;
 			}
+		}
+
+		//================================================================================================================================
+		//================================================================================================================================
+		void Renderer::ClearDebug()
+		{
+			m_debugLines.clear();
+			m_debugLinesNoDepthTest.clear();
+			m_debugTriangles.clear();
 		}
 
 		//================================================================================================================================

@@ -23,7 +23,7 @@ namespace fan
 		PostprocessPipeline( Device& _device );
 		~PostprocessPipeline() override;
 
-		void SetImageAndView( VkImageView _imageView, VkSampler _sampler );
+		void SetImageAndView( ImageView * _imageView, Sampler * _sampler );
 		void CreateDescriptors();
 		void Resize( const VkExtent2D _extent ) override;
 		void Bind( VkCommandBuffer _commandBuffer ) override;
@@ -36,7 +36,7 @@ namespace fan
 	private:		
 
 		Descriptor *	m_descriptor = nullptr;
-		VkImageView		m_imageView;
-		VkSampler		m_sampler;
+		ImageView *		m_imageView;
+		Sampler *		m_sampler;
 	};
 }

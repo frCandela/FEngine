@@ -13,23 +13,39 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	Image::~Image() {
-		if (m_image != VK_NULL_HANDLE) {
-			vkDestroyImage(m_device.vkDevice, m_image, nullptr);
+	void Image::DestroyImage() {
+		if ( m_image != VK_NULL_HANDLE ) {
+			vkDestroyImage( m_device.vkDevice, m_image, nullptr );
 			m_image = VK_NULL_HANDLE;
 
 		}
 
-		if (m_imageMemory != VK_NULL_HANDLE) {
-			vkFreeMemory(m_device.vkDevice, m_imageMemory, nullptr);
+		if ( m_imageMemory != VK_NULL_HANDLE ) {
+			vkFreeMemory( m_device.vkDevice, m_imageMemory, nullptr );
 			m_imageMemory = VK_NULL_HANDLE;
 		}
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	bool Image::Create(VkFormat _format, VkExtent2D _size, VkImageUsageFlags _usage, VkMemoryPropertyFlags _memoryProperties) {
+	Image::~Image() {
+		DestroyImage();
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
+	void Image::Resize( const VkExtent2D _size ) {
+		DestroyImage();
+		Create( m_format, _size, m_usage, m_memoryProperties);
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
+	bool Image::Create( const VkFormat _format, const VkExtent2D _size, const VkImageUsageFlags _usage, const VkMemoryPropertyFlags _memoryProperties) {
 		m_size = _size;
+		m_format = _format;
+		m_usage = _usage;
+		m_memoryProperties = _memoryProperties;
 
 		VkImageCreateInfo imageCreateInfo;
 		imageCreateInfo.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;

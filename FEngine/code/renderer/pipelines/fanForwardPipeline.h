@@ -29,6 +29,7 @@ namespace fan
 		void Bind( VkCommandBuffer _commandBuffer ) override;
 		void BindDescriptors( VkCommandBuffer _commandBuffer, const uint32_t _indexOffset );
 		void UpdateUniformBuffers() override;
+		void ReloadShaders() override;
 
 		VertUniforms  vertUniforms;
 		AlignedMemory<DynamicUniformsVert> dynamicUniformsVert;
@@ -47,5 +48,6 @@ namespace fan
 
 		bool CreateSceneDescriptor();
 		bool CreateTextureDescriptor();
+		void SetTextureDescriptor( const int _index = -1 );
 	};
 }

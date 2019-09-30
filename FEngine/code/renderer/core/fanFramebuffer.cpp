@@ -31,6 +31,8 @@ namespace fan
 		DestroyFrameBuffers();
 	}
 
+	//================================================================================================================================
+	//================================================================================================================================
 	void FrameBuffer::DestroyFrameBuffers() {
 		for ( int framebufferIndex = 0; framebufferIndex < m_frameBuffers.size(); framebufferIndex++ ) {
 			vkDestroyFramebuffer( m_device.vkDevice, m_frameBuffers[framebufferIndex], nullptr );
@@ -43,7 +45,6 @@ namespace fan
 		m_count = _count;
 		m_renderPass = _renderPass;
 
-
 		std::vector<VkImageView> commonAttachments;
 		if( m_colorImageView != nullptr ) { commonAttachments.push_back( m_colorImageView->GetImageView() ); }
 		if( m_depthImageView != nullptr ) { commonAttachments.push_back( m_depthImageView->GetImageView() ); }
@@ -54,7 +55,7 @@ namespace fan
 			std::vector<VkImageView> attachments = commonAttachments;
 			if( ! m_externalAttachments.empty() ) {
 				assert( m_externalAttachments.size() == _count );
-				attachments.push_back( m_externalAttachments[frameIndex]);
+				attachments.push_back( m_externalAttachments[frameIndex]->GetImageView());
 			}			 
 
 			VkFramebufferCreateInfo framebufferCreateInfo;
@@ -81,35 +82,23 @@ namespace fan
 	void FrameBuffer::Resize( const VkExtent2D _extent ) {		
 		// Rebuild color attachment
 		if( m_colorImageView != nullptr ) {
-			delete m_colorImage;
-			delete m_colorImageView;
-			m_colorImage = nullptr;
-			m_colorImageView = nullptr;
-			CreateColorRessources( _extent, m_colorFormat );
+			m_colorImage->Resize( _extent );
+			m_colorImageView->SetImage( m_colorImage->GetImage() );
 		}
 
 		// Rebuild depth attachment
 		if ( m_depthImageView != nullptr ) {
-			delete m_depthImage;
-			delete m_depthImageView;
-			m_depthImage = nullptr;
-			m_depthImageView = nullptr;
 			CreateDepthRessources( _extent );
 		}
 
 		DestroyFrameBuffers();
-		Create( m_count, m_renderPass, _extent );
+		Create(m_count, m_renderPass, _extent );
 	}
-
-	//================================================================================================================================
-	//================================================================================================================================
-	VkSampler	  FrameBuffer::GetColorAttachmentSampler()   { return m_colorSampler->GetSampler(); }
-	VkImageView   FrameBuffer::GetColorAttachmentImageView() { return m_colorImageView->GetImageView(); }
 
 	//================================================================================================================================
 	// Only one color attachment needed for all swapchain images
 	//================================================================================================================================
-	void FrameBuffer::SetExternalAttachment( std::vector< VkImageView > _perFramebufferViews ) { 
+	void FrameBuffer::SetExternalAttachment( std::vector< ImageView * > _perFramebufferViews ) { 
 		m_externalAttachments = _perFramebufferViews; 
 	}
 
@@ -159,10 +148,15 @@ namespace fan
 	//================================================================================================================================
 	bool FrameBuffer::CreateDepthRessources( const VkExtent2D _extent ) {
 		VkFormat depthFormat = m_device.FindDepthFormat();
-		m_depthImage = new Image( m_device );
-		m_depthImageView = new ImageView( m_device );
-		m_depthImage->Create( depthFormat, _extent, VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT );
-		m_depthImageView->Create( m_depthImage->GetImage(), depthFormat, VK_IMAGE_ASPECT_DEPTH_BIT, VK_IMAGE_VIEW_TYPE_2D );
+		if ( m_depthImage == nullptr ) {			
+			m_depthImage = new Image( m_device );
+			m_depthImageView = new ImageView( m_device );
+			m_depthImage->Create( depthFormat, _extent, VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT );
+			m_depthImageView->Create( m_depthImage->GetImage(), depthFormat, VK_IMAGE_ASPECT_DEPTH_BIT, VK_IMAGE_VIEW_TYPE_2D );
+		} else {
+			m_depthImage->Resize( _extent );
+			m_depthImageView->SetImage( m_depthImage->GetImage() );
+		}
 
 		VkCommandBuffer cmd = Renderer::Get().BeginSingleTimeCommands();
 		m_depthImage->TransitionImageLayout( cmd, depthFormat, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL, 1 );

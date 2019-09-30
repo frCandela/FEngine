@@ -17,6 +17,7 @@ namespace fan
 		m_textures.reserve(64);
 
 		LoadTexture(GlobalValues::s_defaultTexturePath);
+		SetUnmodified();
 	}
 
 	//================================================================================================================================

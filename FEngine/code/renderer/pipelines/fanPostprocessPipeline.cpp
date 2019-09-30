@@ -5,6 +5,8 @@
 #include "renderer/core/fanShader.h"
 #include "renderer/core/fanBuffer.h"
 #include "renderer/core/fanDescriptor.h"
+#include "renderer/core/fanImageView.h"
+#include "renderer/core/fanSampler.h"
 #include "renderer/fanRenderer.h"
 
 namespace fan
@@ -27,8 +29,8 @@ namespace fan
 	//================================================================================================================================
 	void PostprocessPipeline::Resize( const VkExtent2D _extent ) {
 		Pipeline::Resize(_extent);
-		std::vector<VkImageView> views = { m_imageView };
-		m_descriptor->SetImageSamplerBinding( VK_SHADER_STAGE_FRAGMENT_BIT, views, m_sampler, 0 );
+		std::vector<VkImageView> views = { m_imageView->GetImageView() };
+		m_descriptor->SetImageSamplerBinding( VK_SHADER_STAGE_FRAGMENT_BIT, views, m_sampler->GetSampler(), 0 );
 		m_descriptor->Update();
 	}
 
@@ -43,8 +45,8 @@ namespace fan
 	//================================================================================================================================
 	void PostprocessPipeline::ReloadShaders( ) {
 		Pipeline::ReloadShaders( );
-		std::vector<VkImageView> views = { m_imageView };
-		m_descriptor->SetImageSamplerBinding( VK_SHADER_STAGE_FRAGMENT_BIT, views, m_sampler, 0 );
+		std::vector<VkImageView> views = { m_imageView->GetImageView() };
+		m_descriptor->SetImageSamplerBinding( VK_SHADER_STAGE_FRAGMENT_BIT, views, m_sampler->GetSampler(), 0 );
 		m_descriptor->Update();
 	}
 
@@ -59,8 +61,8 @@ namespace fan
 	void PostprocessPipeline::CreateDescriptors() {
 		delete m_descriptor;
 		m_descriptor = new Descriptor( m_device );
-		std::vector<VkImageView> views = { m_imageView };
-		m_descriptor->SetImageSamplerBinding( VK_SHADER_STAGE_FRAGMENT_BIT , views, m_sampler );
+		std::vector<VkImageView> views = { m_imageView->GetImageView() };
+		m_descriptor->SetImageSamplerBinding( VK_SHADER_STAGE_FRAGMENT_BIT , views, m_sampler->GetSampler() );
 		m_descriptor->SetUniformBinding( VK_SHADER_STAGE_FRAGMENT_BIT, sizeof( Uniforms ) );
 		m_descriptor->Create();		
 		UpdateUniformBuffers();
@@ -89,7 +91,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void PostprocessPipeline::SetImageAndView( VkImageView _imageView, VkSampler _sampler ) { 
+	void PostprocessPipeline::SetImageAndView( ImageView* _imageView, Sampler* _sampler ) { 
 		m_sampler = _sampler;
 		m_imageView = _imageView;
 	}

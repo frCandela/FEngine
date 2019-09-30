@@ -14,15 +14,31 @@ namespace fan
 	//================================================================================================================================
 	//================================================================================================================================
 	ImageView::~ImageView() {
-		if (m_imageView != VK_NULL_HANDLE) {
-			vkDestroyImageView(m_device.vkDevice, m_imageView, nullptr);
+		Destroy();
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
+	void ImageView::Destroy() {
+		if ( m_imageView != VK_NULL_HANDLE ) {
+			vkDestroyImageView( m_device.vkDevice, m_imageView, nullptr );
 			m_imageView = VK_NULL_HANDLE;
 		}
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	bool ImageView::Create(VkImage _image, VkFormat _format, VkImageAspectFlags _aspectFlags, VkImageViewType _viewType) {
+	void ImageView::SetImage( VkImage _image ) {
+		Destroy();
+		Create(_image, m_format, m_aspectFlags, m_viewType );
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
+	bool ImageView::Create(VkImage _image, const VkFormat _format, const VkImageAspectFlags _aspectFlags, const VkImageViewType _viewType) {
+		m_format = _format;
+		m_aspectFlags = _aspectFlags;
+		m_viewType = _viewType;
 
 		VkImageViewCreateInfo imageViewCreateInfo;
 		imageViewCreateInfo.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;

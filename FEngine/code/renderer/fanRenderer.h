@@ -125,12 +125,7 @@ namespace fan
 		bool ResetCommandPool();
 		bool SubmitCommandBuffers();
 		void CreateQuadVertexBuffer();
-
-		void ClearDebug() {
-			m_debugLines.clear();
-			m_debugLinesNoDepthTest.clear();
-			m_debugTriangles.clear();
-		}
+		void ClearDebug();
 
 		void RecordCommandBufferPostProcess(const size_t _index);
 		void RecordCommandBufferImgui(const size_t _index);

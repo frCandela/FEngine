@@ -16,13 +16,13 @@ namespace fan
 
 		void AddDepthAttachment( const VkExtent2D _extent );
 		void AddColorAttachment( const VkExtent2D _extent, const VkFormat _format );
-		void SetExternalAttachment( const std::vector< VkImageView > _perFramebufferViews );
+		void SetExternalAttachment( const std::vector< ImageView * > _perFramebufferViews );
 		bool Create( const size_t _count, VkRenderPass _renderPass, const VkExtent2D _extent );
 		void Resize( const VkExtent2D _extent );
 
 		VkFramebuffer GetFrameBuffer( const size_t _index ) { return m_frameBuffers[_index]; }
-		VkSampler	  GetColorAttachmentSampler();
-		VkImageView   GetColorAttachmentImageView();
+		Sampler*	  GetColorAttachmentSampler() { return m_colorSampler; }
+		ImageView*   GetColorAttachmentImageView() { return m_colorImageView; }
 
 	private:
 		Device &	m_device;
@@ -32,7 +32,7 @@ namespace fan
 		size_t m_count;
 
 		// External attachment
-		std::vector< VkImageView > m_externalAttachments;
+		std::vector< ImageView * > m_externalAttachments;
 
 		// Depth attachment
 		Image *		m_depthImage	 = nullptr;

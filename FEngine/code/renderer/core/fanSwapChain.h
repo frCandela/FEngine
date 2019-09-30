@@ -21,16 +21,16 @@ namespace fan
 		VkResult	AcquireNextImage();
 		bool		PresentImage();
 
-		uint32_t			GetCurrentFrame() const { return m_currentFrame; }
-		uint32_t			GetSwapchainImagesCount() const { return m_imagesCount; }
-		uint32_t			GetCurrentImageIndex() const { return m_currentImageIndex; }
+		uint32_t			GetCurrentFrame() const				{ return m_currentFrame; }
+		uint32_t			GetSwapchainImagesCount() const		{ return m_imagesCount; }
+		uint32_t			GetCurrentImageIndex() const		{ return m_currentImageIndex; }
 		VkSemaphore *		GetCurrentImageAvailableSemaphore() { return &m_imagesAvailableSemaphores[m_currentFrame]; }
 		VkSemaphore *		GetCurrentRenderFinishedSemaphore() { return &m_renderFinishedSemaphores[m_currentFrame]; }
-		VkFence *			GetCurrentInFlightFence() { return &m_inFlightFences[m_currentFrame]; }
-		VkSwapchainKHR		GetVkSwapChain() { return m_swapchain; }
-		VkSurfaceFormatKHR	GetSurfaceFormat() const { return m_surfaceFormat; }
-		VkExtent2D			GetExtent() const { return m_size; }
-		std::vector< VkImageView >	GetImageViews();
+		VkFence *			GetCurrentInFlightFence()			{ return &m_inFlightFences[m_currentFrame]; }
+		VkSwapchainKHR		GetVkSwapChain()					{ return m_swapchain; }
+		VkSurfaceFormatKHR	GetSurfaceFormat() const			{ return m_surfaceFormat; }
+		VkExtent2D			GetExtent() const					{ return m_size; }
+		std::vector< ImageView * >	GetImageViews();
 
 		const int MAX_FRAMES_IN_FLIGHT = 3;
 	private:

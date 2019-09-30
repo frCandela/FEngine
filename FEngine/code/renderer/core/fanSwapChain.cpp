@@ -34,11 +34,12 @@ namespace fan
 	void SwapChain::Resize(VkExtent2D _desiredSize) {
 		m_currentFrame = 0;
 
-		DestroyImageViews();
 		SetNumberOfImages();
 		SetImagesSize(_desiredSize);
 		CreateSwapChain();
-		CreateImageViews();
+		for ( int imageIndex = 0; imageIndex < m_imageViews.size(); imageIndex++ ) {
+			m_imageViews[imageIndex]->SetImage( m_images[imageIndex] );
+		}
 	}
 
 	//================================================================================================================================
@@ -59,12 +60,8 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	std::vector< VkImageView > SwapChain::GetImageViews() {
-		std::vector< VkImageView > views;
-		for (size_t imageIndex = 0; imageIndex < m_imagesCount; imageIndex++) {
-			views.push_back( m_imageViews[imageIndex]->GetImageView() );
-		}
-		return views;
+	std::vector< ImageView * > SwapChain::GetImageViews() {
+		return m_imageViews;
 	}
 
 	//================================================================================================================================
@@ -211,8 +208,7 @@ namespace fan
 		if (oldSwapchain != VK_NULL_HANDLE) {
 			vkDestroySwapchainKHR(m_device.vkDevice, oldSwapchain, nullptr);
 		}
-
-
+		
 		uint32_t imagesCount;
 		vkGetSwapchainImagesKHR(m_device.vkDevice, m_swapchain, &imagesCount, nullptr);
 		m_images.resize(imagesCount);
