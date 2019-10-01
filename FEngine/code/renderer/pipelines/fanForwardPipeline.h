@@ -56,7 +56,7 @@ namespace fan
 		//================================================================
 		struct DynamicUniformsVert {
 			glm::mat4 modelMat;
-			glm::mat4 rotationMat;
+			glm::mat4 normalMat;
 		};	AlignedMemory<DynamicUniformsVert> m_dynamicUniformsVert;
 
 		//================================================================

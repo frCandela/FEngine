@@ -308,7 +308,7 @@ namespace fan
 	void Renderer::SetDynamicUniformVert( const glm::mat4 _modelMat, const glm::mat4 _rotationMat, const uint32_t _index ) {
 		assert( _index < GlobalValues::s_maximumNumModels );
 		m_forwardPipeline->m_dynamicUniformsVert[_index].modelMat = _modelMat;
-		m_forwardPipeline->m_dynamicUniformsVert[_index].rotationMat = _rotationMat;
+		m_forwardPipeline->m_dynamicUniformsVert[_index].normalMat = _rotationMat;
 	}
 	//================================================================================================================================
 	//================================================================================================================================
@@ -338,7 +338,7 @@ namespace fan
 	void Renderer::SetTransformAt( const uint32_t _index, glm::mat4 _modelMatrix, glm::mat4 _normalMatrix ) {
 		assert( _index < GlobalValues::s_maximumNumModels );
 		m_forwardPipeline->m_dynamicUniformsVert[_index].modelMat	  = _modelMatrix;
-		m_forwardPipeline->m_dynamicUniformsVert[_index].rotationMat = _normalMatrix;
+		m_forwardPipeline->m_dynamicUniformsVert[_index].normalMat = _normalMatrix;
 	}
 
 	//================================================================================================================================

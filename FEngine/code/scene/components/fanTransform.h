@@ -20,7 +20,7 @@ namespace fan
 		btQuaternion	GetRotationQuat() const { return m_rotation; }
 		btVector3		GetRotationEuler() const;
 		glm::mat4		GetModelMatrix() const;
-		glm::mat4		GetRotationMat() const;
+		glm::mat4		GetNormalMatrix() const;
 
 		btVector3		TransformPoint(const btVector3 _point) const;
 		btVector3		TransformDirection(const btVector3 _point) const;

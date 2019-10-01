@@ -83,12 +83,9 @@ namespace fan
 	}
 
 	//================================================================================================================================
-	// TODO rotation mat is used to set normals in vertex shader but the scale is not taken into account
 	//================================================================================================================================
-	glm::mat4 Transform::GetRotationMat() const {
-		glm::quat rotation = ToGLM(m_rotation);
-
-		return glm::mat4_cast(rotation);
+	glm::mat4 Transform::GetNormalMatrix() const {
+		return glm::transpose( glm::inverse( GetModelMatrix() ) );
 	}
 
 	//================================================================================================================================

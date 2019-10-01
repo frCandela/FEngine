@@ -31,11 +31,6 @@ namespace fan
 		}
 
 		if (ImGui::CollapsingHeader("Global")) {
-			float tmpFps = Time::GetFPS();
-			if (ImGui::DragFloat("Framerate", &tmpFps, 1.f, Time::GetMinFPS(), Time::GetMaxFPS())) {
-				Time::SetFPS(tmpFps);
-			}
-
 			// Clear color
 			glm::vec4 clearColor = renderer.GetClearColor();
 			if (ImGui::ColorEdit3("Clear color", &clearColor.r, gui::colorEditFlags)) {

@@ -134,18 +134,16 @@ namespace fan {
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void Engine::Run()
-	{
+	void Engine::Run() {
 		float lastUpdateTime = Time::ElapsedSinceStartup();
-		while ( m_applicationShouldExit == false && m_renderer->WindowIsOpen() == true)
-		{
+		while ( m_applicationShouldExit == false && m_renderer->WindowIsOpen() == true ) {
 			const float time = Time::ElapsedSinceStartup();
-			const float delta = Time::GetDelta();
+			const float delta = Time::Get().GetDelta();
 			float updateDelta = time - lastUpdateTime;
 
 			if ( updateDelta > delta ) {
-				if (updateDelta > 2 * delta) {
-					Debug::Get() << Debug::Severity::warning << "Lag detected, delta = " << (int)(1000*updateDelta) << "ms." << Debug::Endl();
+				if ( updateDelta > 2 * delta ) {
+					Debug::Get() << Debug::Severity::warning << "Lag detected, delta = " << (int)( 1000 * updateDelta ) << "ms." << Debug::Endl();
 				}
 				updateDelta -= delta;
 				lastUpdateTime = time;
@@ -157,10 +155,10 @@ namespace fan {
 				DrawUI();
 				DrawEditorGrid();
 
-				if (m_mainMenuBar->ShowWireframe()) { DrawWireframe();	}
-				if (m_mainMenuBar->ShowNormals())	{ DrawNormals();	}
-				if (m_mainMenuBar->ShowAABB())		{ DrawAABB();		}
-				if (m_mainMenuBar->ShowHull())		{ DrawHull();		}
+				if ( m_mainMenuBar->ShowWireframe() ) { DrawWireframe(); }
+				if ( m_mainMenuBar->ShowNormals() ) { DrawNormals(); }
+				if ( m_mainMenuBar->ShowAABB() ) { DrawAABB(); }
+				if ( m_mainMenuBar->ShowHull() ) { DrawHull(); }
 
 				UpdateRenderer();
 				m_renderer->DrawFrame();
@@ -293,14 +291,14 @@ namespace fan {
 				Mesh * mesh = model->GetMesh();
 				if (mesh != nullptr) {
 					const glm::mat4  modelMat = model->GetEntity()->GetComponent<Transform>()->GetModelMatrix();
-					const glm::mat4  rotationMat = model->GetEntity()->GetComponent<Transform>()->GetRotationMat();
+					const glm::mat4  normalMat = model->GetEntity()->GetComponent<Transform>()->GetNormalMatrix();
 					const std::vector<uint32_t> & indices = mesh->GetIndices();
 					const std::vector<Vertex> & vertices = mesh->GetVertices();
 
 					for (int index = 0; index < indices.size(); index++) {
 						const Vertex& vertex = vertices[indices[index]];
 						const btVector3 position = ToBullet(modelMat * glm::vec4(vertex.pos, 1.f));
-						const btVector3 normal = ToBullet(rotationMat * glm::vec4(vertex.normal, 1.f));
+						const btVector3 normal = ToBullet(normalMat * glm::vec4(vertex.normal, 1.f));
 						Debug::Render().DebugLine(position, position + 0.1f * normal, Color::Green);
 					}
 				}
@@ -359,7 +357,7 @@ namespace fan {
 			Material * material = model->GetEntity()->GetComponent<Material>();
 
 			m_renderer->SetMeshAt( modelIndex, model->GetMesh() );
-			m_renderer->SetTransformAt( modelIndex, transform->GetModelMatrix(), transform->GetRotationMat() );
+			m_renderer->SetTransformAt( modelIndex, transform->GetModelMatrix(), transform->GetNormalMatrix() );
 			if ( material != nullptr ) {
 				const uint32_t textureIndex = material->GetTexture() != nullptr ? material->GetTexture()->GetRenderID() : 0;
 				m_renderer->SetMaterialAt( modelIndex, material->GetColor().ToGLM(), material->GetShininess(), textureIndex );

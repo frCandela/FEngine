@@ -7,7 +7,7 @@ layout(binding = 0) uniform UniformBufferObject {
 
 layout (binding = 1) uniform DynamicUniformBufferObject {
 	mat4 modelMat;
-	mat4 rotationMat;
+	mat4 normalMat;
 } dynamicUbo;
 
 layout (location = 0) in vec3 inPosition;
@@ -26,6 +26,6 @@ void main() {
 
 	outColor = inColor;
 	outFragPos = worldPos.xyz;
-	outNormal =  (dynamicUbo.rotationMat * vec4(inNormal,1)).xyz;
+	outNormal =  (dynamicUbo.normalMat * vec4(inNormal,1)).xyz;
 	outTexCoord = inTexCoord;
 }
