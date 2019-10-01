@@ -158,9 +158,9 @@ namespace fan
 			m_depthImageView->SetImage( m_depthImage->GetImage() );
 		}
 
-		VkCommandBuffer cmd = Renderer::Get().BeginSingleTimeCommands();
+		VkCommandBuffer cmd = m_device.BeginSingleTimeCommands();
 		m_depthImage->TransitionImageLayout( cmd, depthFormat, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL, 1 );
-		Renderer::Get().EndSingleTimeCommands( cmd );
+		m_device.EndSingleTimeCommands( cmd );
 
 		return true;
 	}

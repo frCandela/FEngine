@@ -18,7 +18,6 @@ namespace fan {
 		virtual void ReloadShaders();
 		virtual void Bind( VkCommandBuffer _commandBuffer, const size_t _index );
 		virtual void UpdateUniformBuffers( const size_t _index ) = 0;
-		virtual void CreateDescriptors( const size_t _numSwapchainImages ) = 0;
 
 		VkPipeline	GetPipeline() { return m_pipeline; }
 

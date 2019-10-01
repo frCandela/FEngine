@@ -4,6 +4,8 @@
 #include "core/fanSignal.h"
 
 namespace fan {
+	class Renderer;
+
 	//================================================================================================================================
 	//================================================================================================================================
 	class Debug : public Singleton<Debug> {
@@ -31,6 +33,9 @@ namespace fan {
 		static void Break() { __debugbreak(); }
 		const std::vector< LogItem >& GetLogBuffer() { return m_logBuffer;  }
 
+		static Renderer & Render() { return * Get().m_renderer; };
+		void SetRenderer( Renderer * _renderer ) { m_renderer = _renderer;}
+
 	protected:
 		Debug();
 
@@ -39,6 +44,9 @@ namespace fan {
 		Type					m_currentType;
 		std::stringstream		m_stringstream;
 		std::vector< LogItem >	m_logBuffer;
+
+		Renderer * m_renderer;
+
 		void Flush();
 
 	public:

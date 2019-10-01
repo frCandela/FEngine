@@ -12,8 +12,9 @@ namespace fan
 	class Material : public Component
 	{
 	public:
-		static Signal< Material * > onMaterialAttach;
-		static Signal< Material * > onMaterialDetach;
+		static Signal< Material *>					onMaterialAttach;
+		static Signal< Material * >					onMaterialDetach;
+		static Signal< Material *, std::string  >	onMaterialSetPath;
 
 		bool Load(std::istream& _in)	override;
 		bool Save(std::ostream& _out, const int _indentLevel) const override;

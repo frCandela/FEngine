@@ -79,9 +79,9 @@ namespace fan {
 		btVector3 offsets[5] = { btVector3::Zero(), radius * up ,-radius * up, radius * left ,-radius * left };
 		for (int offsetIndex = 0; offsetIndex < 5 ; offsetIndex++) {
 			const btVector3 offset = offsets[offsetIndex];
-			Renderer::Get().DebugLine( pos + offset, pos + offset + length * dir, color );
+			Debug::Render().DebugLine( pos + offset, pos + offset + length * dir, color );
 		}
-		Renderer::Get().DebugSphere( transform->GetBtTransform(), radius,0, color );
+		Debug::Render().DebugSphere( transform->GetBtTransform(), radius,0, color );
 	}
 
 	//================================================================================================================================

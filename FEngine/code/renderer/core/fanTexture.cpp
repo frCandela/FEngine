@@ -465,7 +465,7 @@ namespace fan
 
 		VkImageSubresourceRange subresourceRange = { VK_IMAGE_ASPECT_COLOR_BIT , 0, m_mipLevels, 0, 1 };
 
-		VkCommandBuffer cmd = Renderer::Get().BeginSingleTimeCommands();
+		VkCommandBuffer cmd = m_device.BeginSingleTimeCommands();
 		TransitionImageLayout(cmd, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, subresourceRange);
 		CopyBufferToImage(cmd, stagingBuffer.GetBuffer(), static_cast<uint32_t>(_width), static_cast<uint32_t>(_height));
 
@@ -479,6 +479,6 @@ namespace fan
 		// Creates the image View
 		CreateImageView(VK_FORMAT_R8G8B8A8_UNORM, VK_IMAGE_VIEW_TYPE_2D, { VK_IMAGE_ASPECT_COLOR_BIT, 0, m_mipLevels, 0, 1 });
 
-		Renderer::Get().EndSingleTimeCommands(cmd);
+		m_device.EndSingleTimeCommands(cmd);
 	}
 }

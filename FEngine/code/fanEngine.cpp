@@ -78,12 +78,16 @@ namespace fan {
 		m_editorWindows.push_back(m_preferencesWindow);
 		m_editorWindows.push_back(m_consoleWindow);
 
-		Renderer::Get().Initialize(windowSize, windowPosition);
-		m_scene =				new Scene("mainScene");
+		m_renderer = new Renderer( windowSize, windowPosition );
+		Debug::Get().SetRenderer(m_renderer);
+
+		m_scene = new Scene("mainScene");
 		m_scene->s_onSceneLoad.Connect(&Engine::OnSceneLoad, this);
 		m_scene->New();
 
-		Scene::s_onSceneClear.Connect			( &Renderer::Clear,				&Renderer::Get());
+		Scene::s_onSceneClear.Connect			( &Renderer::Clear,				 m_renderer );
+		Material::onMaterialSetPath.Connect		( &Engine::OnMaterialSetTexture, this );
+		Model::onModelSetPath.Connect			( &Engine::OnModelSetPath,		 this );
 		Model::onRegisterModel.Connect			( &Engine::RegisterModel,		 this );
 		Model::onUnRegisterModel.Connect		( &Engine::UnRegisterModel,		 this );
 		PointLight::onPointLightAttach.Connect	( &Engine::RegisterPointLight,	 this );
@@ -93,8 +97,8 @@ namespace fan {
 
 		m_mainMenuBar->Initialize();
 
-		Mesh * defaultMesh = Renderer::Get().GetRessourceManager()->LoadMesh(GlobalValues::s_defaultMeshPath);
-		Renderer::Get().GetRessourceManager()->SetDefaultMesh( defaultMesh );
+		Mesh * defaultMesh = m_renderer->GetRessourceManager()->LoadMesh(GlobalValues::s_defaultMeshPath);
+		m_renderer->GetRessourceManager()->SetDefaultMesh( defaultMesh );
 	}
 
 	//================================================================================================================================
@@ -110,7 +114,7 @@ namespace fan {
 		delete m_scene;
 
 		// Serialize editor positions
-		const Window * window = Renderer::Get().GetWindow();
+		const Window * window = m_renderer->GetWindow();
 		const VkExtent2D rendererSize = window->GetExtent();
 		const glm::ivec2 windowPosition = window->GetPosition();
 		SerializedValues::Get().SetValue("renderer_extent_width", rendererSize.width);
@@ -119,7 +123,7 @@ namespace fan {
 		SerializedValues::Get().SetValue("renderer_position_y", windowPosition.y);
 		SerializedValues::Get().SaveValuesToDisk();
 
-		Renderer::Get().Destroy();
+		delete ( m_renderer );
 	}
 
 	//================================================================================================================================
@@ -133,7 +137,7 @@ namespace fan {
 	void Engine::Run()
 	{
 		float lastUpdateTime = Time::ElapsedSinceStartup();
-		while ( m_applicationShouldExit == false && Renderer::Get().WindowIsOpen() == true)
+		while ( m_applicationShouldExit == false && m_renderer->WindowIsOpen() == true)
 		{
 			const float time = Time::ElapsedSinceStartup();
 			const float delta = Time::GetDelta();
@@ -159,7 +163,7 @@ namespace fan {
 				if (m_mainMenuBar->ShowHull())		{ DrawHull();		}
 
 				UpdateRenderer();
-				Renderer::Get().DrawFrame();
+				m_renderer->DrawFrame();
 				m_scene->EndFrame();
 			}
 		}
@@ -195,8 +199,8 @@ namespace fan {
 			const int count = m_editorGrid.linesCount;
 
 			for (int coord = -m_editorGrid.linesCount; coord <= m_editorGrid.linesCount; coord++) {
-				Renderer::Get().DebugLine(btVector3(-count * size, 0.f, coord*size), btVector3(count*size, 0.f, coord*size), m_editorGrid.color);
-				Renderer::Get().DebugLine(btVector3(coord*size, 0.f, -count * size), btVector3(coord*size, 0.f, count*size), m_editorGrid.color);
+				Debug::Render().DebugLine(btVector3(-count * size, 0.f, coord*size), btVector3(count*size, 0.f, coord*size), m_editorGrid.color);
+				Debug::Render().DebugLine(btVector3(coord*size, 0.f, -count * size), btVector3(coord*size, 0.f, count*size), m_editorGrid.color);
 			}
 		}
 	}
@@ -209,7 +213,7 @@ namespace fan {
 			const Entity * entity = entities[entityIndex];
 			if (entity != m_editorCamera->GetEntity()) {
 				AABB aabb = entity->GetAABB();
-				Renderer::Get().DebugAABB(aabb, Color::Red);
+				m_renderer->DebugAABB(aabb, Color::Red);
 			}
 		}
 	}
@@ -243,9 +247,9 @@ namespace fan {
 							const btVector3 worldVec1 = ToBullet(modelMat * glm::vec4(vec1[0], vec1[1], vec1[2], 1.f));
 							const btVector3 worldVec2 = ToBullet(modelMat * glm::vec4(vec2[0], vec2[1], vec2[2], 1.f));
 							
-							Renderer::Get().DebugLine(worldVec0, worldVec1, color);
-							Renderer::Get().DebugLine(worldVec1, worldVec2, color);
-							Renderer::Get().DebugLine(worldVec2, worldVec0, color);
+							Debug::Render().DebugLine(worldVec0, worldVec1, color);
+							Debug::Render().DebugLine(worldVec1, worldVec2, color);
+							Debug::Render().DebugLine(worldVec2, worldVec0, color);
 		
 						}
 					}
@@ -270,9 +274,9 @@ namespace fan {
 						const btVector3 v0 = ToBullet(modelMat * glm::vec4(vertices[indices[3 * index + 0]].pos, 1.f));
 						const btVector3 v1 = ToBullet(modelMat * glm::vec4(vertices[indices[3 * index + 1]].pos, 1.f));
 						const btVector3 v2 = ToBullet(modelMat * glm::vec4(vertices[indices[3 * index + 2]].pos, 1.f));
-						Renderer::Get().DebugLine(v0, v1, Color::Yellow);
-						Renderer::Get().DebugLine(v1, v2, Color::Yellow);
-						Renderer::Get().DebugLine(v2, v0, Color::Yellow);
+						Debug::Render().DebugLine(v0, v1, Color::Yellow);
+						Debug::Render().DebugLine(v1, v2, Color::Yellow);
+						Debug::Render().DebugLine(v2, v0, Color::Yellow);
 					}
 				}
 			}
@@ -297,7 +301,7 @@ namespace fan {
 						const Vertex& vertex = vertices[indices[index]];
 						const btVector3 position = ToBullet(modelMat * glm::vec4(vertex.pos, 1.f));
 						const btVector3 normal = ToBullet(rotationMat * glm::vec4(vertex.normal, 1.f));
-						Renderer::Get().DebugLine(position, position + 0.1f * normal, Color::Green);
+						Debug::Render().DebugLine(position, position + 0.1f * normal, Color::Green);
 					}
 				}
 			}
@@ -314,20 +318,18 @@ namespace fan {
 	//================================================================================================================================
 	//================================================================================================================================
 	void Engine::UpdateRenderer() {
-		Renderer& renderer = Renderer::Get();
-
 		// Camera
 		Transform * cameraTransform = m_mainCamera->GetEntity()->GetComponent<Transform>();
 		if ( m_mainCamera->IsModified() || cameraTransform->IsModified() ) {
-			m_mainCamera->SetAspectRatio( renderer.GetWindowAspectRatio() ); 
-			renderer.SetMainCamera( m_mainCamera->GetProjection(), m_mainCamera->GetView(), ToGLM(cameraTransform->GetPosition()));
+			m_mainCamera->SetAspectRatio( m_renderer->GetWindowAspectRatio() );
+			m_renderer->SetMainCamera( m_mainCamera->GetProjection(), m_mainCamera->GetView(), ToGLM(cameraTransform->GetPosition()));
 		}
 
 		// Point lights		
 		for ( int lightIndex = 0; lightIndex < m_pointLights.size(); lightIndex++ ) {
 			const PointLight * light = m_pointLights[lightIndex];
 			const Transform *  lightTransform = light->GetEntity()->GetComponent<Transform>();
-			Renderer::Get().SetPointLight(
+			m_renderer->SetPointLight(
 				lightIndex,
 				ToGLM( lightTransform->GetPosition() ),
 				light->GetDiffuse().ToGLM(),
@@ -335,20 +337,20 @@ namespace fan {
 				light->GetAmbiant().ToGLM(),
 				light->GetAttenuation()
 			);
-		}	Renderer::Get().SetNumPointLights( static_cast<uint32_t>( m_pointLights.size() ) );
+		}	m_renderer->SetNumPointLights( static_cast<uint32_t>( m_pointLights.size() ) );
 		
 		// Directional lights		
 		for ( int lightIndex = 0; lightIndex < m_directionalLights.size(); lightIndex++ ) {
 			const DirectionalLight * light			= m_directionalLights[lightIndex];
 			const Transform *		 lightTransform = light->GetEntity()->GetComponent<Transform>();
-			Renderer::Get().SetDirectionalLight( 
+			m_renderer->SetDirectionalLight( 
 				lightIndex
 				,glm::vec4( ToGLM( lightTransform->Forward() ), 1 )
 				,light->GetAmbiant().ToGLM()
 				,light->GetDiffuse().ToGLM()
 				,light->GetSpecular().ToGLM()
 			);
-		} Renderer::Get().SetNumDirectionalLights( static_cast<uint32_t>( m_directionalLights.size() ) );
+		} m_renderer->SetNumDirectionalLights( static_cast<uint32_t>( m_directionalLights.size() ) );
 
 		// Transforms, mesh, materials
 		for (int modelIndex = 0; modelIndex < m_models.size() ; modelIndex++) {
@@ -356,16 +358,16 @@ namespace fan {
 			Transform * transform = model->GetEntity()->GetComponent<Transform>();
 			Material * material = model->GetEntity()->GetComponent<Material>();
 
-			Renderer::Get().SetMeshAt( modelIndex, model->GetMesh() );
-			Renderer::Get().SetTransformAt( modelIndex, transform->GetModelMatrix(), transform->GetRotationMat() );
+			m_renderer->SetMeshAt( modelIndex, model->GetMesh() );
+			m_renderer->SetTransformAt( modelIndex, transform->GetModelMatrix(), transform->GetRotationMat() );
 			if ( material != nullptr ) {
 				const uint32_t textureIndex = material->GetTexture() != nullptr ? material->GetTexture()->GetRenderID() : 0;
-				Renderer::Get().SetMaterialAt( modelIndex, material->GetColor().ToGLM(), material->GetShininess(), textureIndex );
+				m_renderer->SetMaterialAt( modelIndex, material->GetColor().ToGLM(), material->GetShininess(), textureIndex );
 			} else {
-				Renderer::Get().SetMaterialAt( modelIndex, Color::White.ToGLM(), 1, 0 );
+				m_renderer->SetMaterialAt( modelIndex, Color::White.ToGLM(), 1, 0 );
 			}
 
-		} Renderer::Get().SetNumMesh( static_cast<uint32_t>( m_models.size() ) );
+		} m_renderer->SetNumMesh( static_cast<uint32_t>( m_models.size() ) );
 
 		// Materials
 
@@ -504,9 +506,9 @@ namespace fan {
 			}
 
 			// Draw the gizmo cone & lines
-			Renderer::Get().DebugLine(origin, origin + size*( _transform *  axisDirection[axisIndex] - origin ), opaqueColor, false );
+			Debug::Render().DebugLine(origin, origin + size*( _transform *  axisDirection[axisIndex] - origin ), opaqueColor, false );
 			for (int triangleIndex = 0; triangleIndex < coneTris.size() / 3; triangleIndex++) {
-				Renderer::Get().DebugTriangle(coneTris[3 * triangleIndex + 0], coneTris[3 * triangleIndex + 1], coneTris[3 * triangleIndex + 2], clickedColor);
+				m_renderer->DebugTriangle(coneTris[3 * triangleIndex + 0], coneTris[3 * triangleIndex + 1], coneTris[3 * triangleIndex + 2], clickedColor);
 			}
 
 			// Calculate closest point between the mouse ray and the axis selected
@@ -630,4 +632,27 @@ namespace fan {
 			}
 		}
 	}
+
+	//================================================================================================================================
+	//================================================================================================================================
+	void Engine::OnMaterialSetTexture( Material * _material, std::string _path ) {
+		RessourceManager * texturesManager = m_renderer->GetRessourceManager();
+		Texture * texture = texturesManager->FindTexture( _path );
+		if ( texture == nullptr ) {
+			texture = texturesManager->LoadTexture( _path );
+		}
+		_material->SetTexture( texture );
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
+	void Engine::OnModelSetPath( Model * _model, std::string _path ) {
+		RessourceManager * ressourceManager = m_renderer->GetRessourceManager();
+		Mesh * mesh = ressourceManager->FindMesh( _path );
+		if ( mesh == nullptr ) {
+			mesh = ressourceManager->LoadMesh( _path );
+		}
+		_model->SetMesh( mesh );
+	}
+
 }

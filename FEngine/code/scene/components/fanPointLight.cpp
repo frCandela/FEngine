@@ -103,7 +103,7 @@ namespace fan
 		float lightRange = GetLightRange();
 		if (lightRange > 0 ) {
 			const btTransform transform = GetEntity()->GetComponent<Transform>()->GetBtTransform();
-			Renderer::Get().DebugSphere(transform, lightRange, 2, m_diffuse);
+			Debug::Render().DebugSphere(transform, lightRange, 2, m_diffuse);
 		}
 	}
 

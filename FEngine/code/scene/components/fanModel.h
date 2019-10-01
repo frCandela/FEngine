@@ -15,17 +15,18 @@ namespace fan
 	class Model : public Component
 	{
 	public:
-		static Signal< Model * > onRegisterModel;
-		static Signal< Model * > onUnRegisterModel;
+		static Signal< Model * >				onRegisterModel;
+		static Signal< Model * >				onUnRegisterModel;
+		static Signal< Model *, std::string  >	onModelSetPath;
 
 		Model();
 
 		AABB ComputeAABB() const;
 
 		// ISerializable
-		bool				Load(std::istream& _in) override;
-		bool				Save(std::ostream& _out, const int _indentLevel) const override;
-		void				SetMesh(Mesh * _mesh);
+		bool			Load(std::istream& _in) override;
+		bool			Save(std::ostream& _out, const int _indentLevel) const override;
+		void			SetMesh(Mesh * _mesh);
 		Mesh *			GetMesh() { return m_mesh; }
 		const Mesh *	GetMesh() const { return m_mesh; }
 

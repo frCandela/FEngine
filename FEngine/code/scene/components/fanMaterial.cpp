@@ -4,8 +4,6 @@
 #include "scene/fanEntity.h"
 #include "scene/components/fanModel.h"
 #include "renderer/core/fanTexture.h"
-#include "renderer/fanRessourceManager.h"
-#include "renderer/fanRenderer.h"
 
 // Editor
 #include "editor/fanModals.h"
@@ -15,8 +13,9 @@ namespace fan
 	REGISTER_EDITOR_COMPONENT(Material);
 	REGISTER_TYPE_INFO(Material)
 
-		Signal< Material * > Material::onMaterialAttach;
+	Signal< Material * > Material::onMaterialAttach;
 	Signal< Material * > Material::onMaterialDetach;
+	Signal< Material *, std::string  > Material::onMaterialSetPath;
 
 	//================================================================================================================================
 	//================================================================================================================================
@@ -86,12 +85,7 @@ namespace fan
 		}
 
 		if (gui::LoadFileModal("set_path_texture", GlobalValues::s_imagesExtensions, m_pathBuffer)) {
-			RessourceManager * texturesManager = Renderer::Get().GetRessourceManager();
-			Texture * texture = texturesManager->FindTexture(m_pathBuffer.string());
-			if (texture == nullptr) {
-				texture = texturesManager->LoadTexture(m_pathBuffer.string());
-			}
-			SetTexture(texture);
+			onMaterialSetPath.Emmit( this, m_pathBuffer.string() );
 		}
 	}
 
@@ -117,13 +111,7 @@ namespace fan
 		if ( !ReadFloat3( _in, &m_color[0] ) ) { return false; }
 
 		if ( path != std::string( "void" ) ) {
-			// TODO find a cleaner way to set the texture
-			RessourceManager * texturesManager = Renderer::Get().GetRessourceManager();
-			Texture * texture = texturesManager->FindTexture( path );
-			if ( texture == nullptr ) {
-				texture = texturesManager->LoadTexture( path );
-			}
-			SetTexture( texture );
+			onMaterialSetPath.Emmit( this, path );
 		}
 		return true;
 	}

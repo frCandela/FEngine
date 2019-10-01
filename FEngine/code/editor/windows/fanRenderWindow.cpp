@@ -2,6 +2,7 @@
 
 #include "editor/windows/fanRenderWindow.h"
 #include "editor/fanModals.h"
+#include "fanEngine.h"
 #include "renderer/pipelines/fanPostprocessPipeline.h"
 #include "renderer/pipelines/fanForwardPipeline.h"
 #include "renderer/fanRenderer.h"
@@ -19,13 +20,13 @@ namespace fan
 	//================================================================================================================================
 	//================================================================================================================================
 	void RenderWindow::OnGui() {
-		Renderer &	renderer = Renderer::Get();
+		Renderer &	renderer = Engine::GetEngine().GetRenderer();
 
 		if (ImGui::CollapsingHeader("Post-processing")) {
 			// Filter color
-			glm::vec4& color = Renderer::Get().GetPostprocessPipeline()->uniforms.color;
+			glm::vec4& color = renderer.GetPostprocessPipeline()->uniforms.color;
 			if (ImGui::ColorEdit3("Filter##1", &color[0], gui::colorEditFlags)) {
-				Renderer::Get().GetPostprocessPipeline()->UpdateUniformBuffers();
+				renderer.GetPostprocessPipeline()->UpdateUniformBuffers();
 			}
 		}
 

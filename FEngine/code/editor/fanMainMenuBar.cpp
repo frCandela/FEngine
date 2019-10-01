@@ -45,7 +45,7 @@ namespace fan
 	//================================================================================================================================
 	void MainMenuBar::Draw() {
 		Engine &	engine = Engine::GetEngine();
-		Renderer &	renderer = Renderer::Get();
+		Renderer &	renderer = engine.GetRenderer();
 
 		if (m_showImguiDemoWindow) {
 			ImGui::ShowDemoWindow(&m_showImguiDemoWindow);
@@ -191,7 +191,7 @@ namespace fan
 		}
 
 		if (Keyboard::IsKeyPressed(GLFW_KEY_F5)) {
-			Renderer::Get().ReloadShaders();
+			Engine::GetEngine().GetRenderer().ReloadShaders();
 		}
 	}
 

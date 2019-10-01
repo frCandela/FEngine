@@ -65,7 +65,9 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void ForwardPipeline::CreateDescriptors( const size_t _numSwapchainImages ) {
+	void ForwardPipeline::CreateDescriptors( const size_t _numSwapchainImages,  RessourceManager * const _ressourceManager ) {
+		m_ressourceManager = _ressourceManager;
+		
 		m_sceneDescriptor = new Descriptor( m_device, _numSwapchainImages );
 		m_sceneDescriptor->SetUniformBinding		( VK_SHADER_STAGE_VERTEX_BIT,	sizeof( VertUniforms ) );
 		m_sceneDescriptor->SetDynamicUniformBinding ( VK_SHADER_STAGE_VERTEX_BIT,	m_dynamicUniformsVert.GetTotalSize(), m_dynamicUniformsVert.GetAlignment() );
@@ -75,6 +77,7 @@ namespace fan
 		m_sceneDescriptor->Create();
 
 		CreateTextureDescriptor();
+
 	}
 
 	//================================================================================================================================
@@ -97,10 +100,11 @@ namespace fan
 	//================================================================================================================================
 	//================================================================================================================================
 	void ForwardPipeline::SetTextureDescriptor( const int _index ) {
-		std::vector< Texture * > & textures = Renderer::Get().GetRessourceManager()->GetTextures();
-		std::vector< VkImageView > imageViews( textures.size() );
-		for ( int textureIndex = 0; textureIndex < textures.size(); textureIndex++ ) {
-			imageViews[textureIndex] = textures[textureIndex]->GetImageView();
+		const std::vector< Texture * > & texture = m_ressourceManager->GetTextures();
+
+		std::vector< VkImageView > imageViews( texture.size() );
+		for ( int textureIndex = 0; textureIndex < texture.size(); textureIndex++ ) {
+			imageViews[textureIndex] = texture[textureIndex]->GetImageView();
 		}
 		m_texturesDescriptor->SetImageSamplerBinding( VK_SHADER_STAGE_FRAGMENT_BIT, imageViews, m_sampler->GetSampler(), _index );
 	}

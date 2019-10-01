@@ -11,13 +11,86 @@ namespace fan
 		m_instance(_instance),
 		m_surface(_surface) {
 		Create();
+		CreateCommandPool();
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
 	Device::~Device() {
+		vkDestroyCommandPool( vkDevice, m_commandPool, nullptr );
+
 		vkDestroyDevice(vkDevice, nullptr);
 		vkDevice = VK_NULL_HANDLE;
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
+	VkCommandBuffer Device::BeginSingleTimeCommands() {
+		// Allocate a temporary command buffer for memory transfer operations
+		VkCommandBufferAllocateInfo allocInfo = {};
+		allocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
+		allocInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
+		allocInfo.commandPool = m_commandPool;
+		allocInfo.commandBufferCount = 1;
+
+		VkCommandBuffer commandBuffer;
+		vkAllocateCommandBuffers( vkDevice, &allocInfo, &commandBuffer );
+
+		// Start recording the command buffer
+		VkCommandBufferBeginInfo beginInfo = {};
+		beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
+		beginInfo.flags = VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT;
+
+		vkBeginCommandBuffer( commandBuffer, &beginInfo );
+
+		return commandBuffer;
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
+	void Device::EndSingleTimeCommands( VkCommandBuffer _commandBuffer ) {
+		vkEndCommandBuffer( _commandBuffer );
+
+		// Execute the command buffer to complete the transfer
+		VkSubmitInfo submitInfo = {};
+		submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
+		submitInfo.commandBufferCount = 1;
+		submitInfo.pCommandBuffers = &_commandBuffer;
+
+		vkQueueSubmit( GetGraphicsQueue(), 1, &submitInfo, VK_NULL_HANDLE );
+		vkQueueWaitIdle( GetGraphicsQueue() );
+
+		// Cleaning
+		vkFreeCommandBuffers( vkDevice, m_commandPool, 1, &_commandBuffer );
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
+	bool Device::ResetCommandPool() {
+		VkCommandPoolResetFlags releaseResources = VK_COMMAND_POOL_RESET_RELEASE_RESOURCES_BIT;
+
+		if ( vkResetCommandPool( vkDevice, m_commandPool, releaseResources ) != VK_SUCCESS ) {
+			Debug::Error( "Could not reset command pool." );
+			return false;
+		}
+		return true;
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
+	bool Device::CreateCommandPool() {
+		VkCommandPoolCreateInfo commandPoolCreateInfo;
+		commandPoolCreateInfo.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
+		commandPoolCreateInfo.pNext = nullptr;
+		commandPoolCreateInfo.flags = VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT;
+		commandPoolCreateInfo.queueFamilyIndex = GetGraphicsQueueFamilyIndex();
+
+		if ( vkCreateCommandPool( vkDevice, &commandPoolCreateInfo, nullptr, &m_commandPool ) != VK_SUCCESS ) {
+			Debug::Error( "Could not allocate command pool." );
+			return false;
+		}
+		Debug::Get() << Debug::Severity::log << std::hex << "VkCommandPool         " << m_commandPool << std::dec << Debug::Endl();
+		return true;
 	}
 
 	//================================================================================================================================

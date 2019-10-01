@@ -111,9 +111,9 @@ namespace fan {
 				VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT
 			);
 			stagingBuffer.SetData( m_indices.data(), size );
-			VkCommandBuffer cmd = Renderer::Get().BeginSingleTimeCommands();
+			VkCommandBuffer cmd = _device.BeginSingleTimeCommands();
 			stagingBuffer.CopyBufferTo( cmd, m_indexBuffer->GetBuffer(), size );
-			Renderer::Get().EndSingleTimeCommands( cmd );
+			_device.EndSingleTimeCommands( cmd );
 		}
 		{
 			const VkDeviceSize size = sizeof( m_vertices[0] ) * m_vertices.size();
@@ -129,9 +129,9 @@ namespace fan {
 				VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT
 			);
 			stagingBuffer2.SetData( m_vertices.data(), size );
-			VkCommandBuffer cmd2 = Renderer::Get().BeginSingleTimeCommands();
+			VkCommandBuffer cmd2 = _device.BeginSingleTimeCommands();
 			stagingBuffer2.CopyBufferTo( cmd2, m_vertexBuffer->GetBuffer(), size );
-			Renderer::Get().EndSingleTimeCommands( cmd2 );
+			_device.EndSingleTimeCommands( cmd2 );
 		}
 	}
 }

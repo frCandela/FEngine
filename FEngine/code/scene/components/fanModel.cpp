@@ -3,7 +3,6 @@
 #include "fanEngine.h"
 #include "renderer/fanRenderer.h"
 #include "renderer/fanMesh.h"
-#include "renderer/fanRessourceManager.h"
 #include "scene/components/fanModel.h"
 #include "scene/components/fanTransform.h"
 #include "scene/fanEntity.h"
@@ -19,8 +18,9 @@ namespace fan
 	REGISTER_EDITOR_COMPONENT(Model);
 	REGISTER_TYPE_INFO(Model)
 
-		Signal< Model * > Model::onRegisterModel;
+	Signal< Model * > Model::onRegisterModel;
 	Signal< Model * > Model::onUnRegisterModel;
+	Signal< Model *, std::string  >	Model::onModelSetPath;
 
 	//================================================================================================================================
 	//================================================================================================================================
@@ -88,14 +88,7 @@ namespace fan
 		}
 
 		if (gui::LoadFileModal("set_path", GlobalValues::s_meshExtensions, m_pathBuffer)) {
-
-			RessourceManager * ressourceManager = Renderer::Get().GetRessourceManager();
-			Mesh * mesh = ressourceManager->FindMesh(m_pathBuffer.string().c_str());
-			if (mesh == nullptr) {
-				mesh = ressourceManager->LoadMesh(m_pathBuffer.string());
-
-			}
-			SetMesh(mesh);
+			onModelSetPath.Emmit( this, m_pathBuffer.string() );
 		}
 	}
 
@@ -106,12 +99,8 @@ namespace fan
 		if (!ReadSegmentHeader(_in, "path:")) { return false; }
 		if (!ReadString(_in, pathBuffer)) { return false; }
 
-		RessourceManager * ressourceManager = Renderer::Get().GetRessourceManager();
-		Mesh * mesh = ressourceManager->FindMesh(pathBuffer);
-		if (mesh == nullptr) {
-			mesh = ressourceManager->LoadMesh(pathBuffer);
-		}
-		SetMesh(mesh);
+		onModelSetPath.Emmit(this, pathBuffer );
+
 		return true;
 	}
 

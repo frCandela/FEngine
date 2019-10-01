@@ -2,7 +2,6 @@
 
 #include "renderer/util/fanVertex.h"
 #include "core/math/shapes/fanAABB.h"
-#include "core/fanSingleton.h"
 #include "core/memory/fanAlignedMemory.h"
 
 namespace fan
@@ -26,12 +25,11 @@ namespace fan
 	class RessourceManager;
 
 	//================================================================================================================================
-	// TODO Renderer should not be a singleton
 	//================================================================================================================================
-	class Renderer : public Singleton<Renderer> {
+	class Renderer {
 	public:
-		void Initialize(const VkExtent2D _size, const glm::ivec2 _position);
-		void Destroy();
+		Renderer(const VkExtent2D _size, const glm::ivec2 _position);
+		~Renderer();
 
 		bool WindowIsOpen();
 		void DrawFrame();
@@ -39,9 +37,6 @@ namespace fan
 
 		void ReloadShaders();
 		void UpdateDebugBuffer(const size_t _index);
-
-		VkCommandBuffer BeginSingleTimeCommands();
-		void			EndSingleTimeCommands(VkCommandBuffer commandBuffer);
 
 		Window *				GetWindow() { return m_window; }
 		ImguiPipeline *			GetImguiPipeline() { return m_imguiPipeline; }
@@ -65,8 +60,7 @@ namespace fan
 
 		float GetWindowAspectRatio() const;
 		bool  HasNoDebugToDraw() const { return m_debugLinesNoDepthTest.empty() && m_debugLines.empty() && m_debugTriangles.empty(); }
-
-		void Clear();
+		void Clear() { m_numMesh = 0; }
 
 		void					DebugPoint	  ( const btVector3 _pos, const Color _color);
 		void					DebugLine	  ( const btVector3 _start, const btVector3 _end, const Color _color, const bool _depthTestEnable = true);
@@ -107,7 +101,7 @@ namespace fan
 		VkRenderPass	m_renderPassPostprocess;
 		VkRenderPass	m_renderPassUI;
 
-		VkCommandPool	m_commandPool;
+
 		std::vector<VkCommandBuffer> m_primaryCommandBuffers;
 		std::vector<VkCommandBuffer> m_geometryCommandBuffers;
 		std::vector<VkCommandBuffer> m_imguiCommandBuffers;
@@ -121,7 +115,7 @@ namespace fan
 		glm::vec4 m_clearColor;
 
 		void UpdateUniformBuffers( const size_t _index );
-		bool ResetCommandPool();
+		
 		bool SubmitCommandBuffers();
 		void CreateQuadVertexBuffer();
 		void ClearDebug();
@@ -134,7 +128,6 @@ namespace fan
 		void RecordAllCommandBuffers();
 
 		bool CreateCommandBuffers();
-		bool CreateCommandPool();
 		void CreateForwardFramebuffers();
 		void CreateSwapchainFramebuffers();
 
@@ -142,7 +135,6 @@ namespace fan
 		bool CreateRenderPassPostprocess();
 		bool CreateRenderPassUI();
 
-		void DeleteCommandPool();
 		void DeleteRenderPass();
 		void DeleteRenderPassPostprocess();
 	};

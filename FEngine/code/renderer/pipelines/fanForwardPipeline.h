@@ -16,6 +16,7 @@ namespace fan
 	class Texture;
 	class Sampler;
 	class Descriptor;
+	class RessourceManager;
 
 	//================================================================================================================================
 	//================================================================================================================================
@@ -86,7 +87,7 @@ namespace fan
 		void Resize( const VkExtent2D _extent ) override;
 		void BindDescriptors( VkCommandBuffer _commandBuffer, const size_t _indexFrame, const uint32_t _indexOffset );
 		void UpdateUniformBuffers( const size_t _index = 0 ) override;
-		void CreateDescriptors( const size_t _numSwapchainImages ) override;
+		void CreateDescriptors( const size_t _numSwapchainImages, RessourceManager * const _ressourceManager );
 		void ReloadShaders() override;
 
 	protected:
@@ -96,7 +97,8 @@ namespace fan
 		Descriptor * m_sceneDescriptor;
 		Descriptor * m_texturesDescriptor;		
 
-		Sampler *	m_sampler = nullptr;
+		Sampler *			m_sampler = nullptr;
+		RessourceManager *	m_ressourceManager = nullptr;
 
 		bool CreateTextureDescriptor();
 		void SetTextureDescriptor( const int _index = -1 );

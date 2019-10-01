@@ -54,6 +54,7 @@ namespace fan {
 		Entity *	const		GetSelectedentity() const		{ return m_selectedentity;  }
 		Camera *				GetEditorCamera() const			{ return m_editorCamera; }
 		Camera *				GetMainCamera() const			{ return m_mainCamera; }
+		Renderer &				GetRenderer() const				{ return * m_renderer; }
 		MainMenuBar  &			GetMainMenuBar() const			{ return * m_mainMenuBar; }
 		RenderWindow &			GetRenderWindow() const			{ return * m_renderWindow; }
 		SceneWindow  &			GetSceneWindow() const			{ return * m_sceneWindow; }
@@ -80,7 +81,8 @@ namespace fan {
 
 		EditorGrid m_editorGrid;
 
-		// Main components
+		// Main objects
+		Renderer * m_renderer;
 		Scene *	 m_scene;
 		Entity * m_selectedentity;
 		Camera * m_editorCamera;
@@ -103,6 +105,9 @@ namespace fan {
 		void ManageSelection();
 		void UpdateRenderer();
 		void OnSceneLoad(Scene * _scene);
+		void OnMaterialSetTexture( Material * _material, std::string _path );
+		void OnModelSetPath( Model * _model, std::string _path );
+
 		void DrawUI();
 		void DrawEditorGrid() const;
 		void DrawWireframe() const;
