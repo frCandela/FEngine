@@ -5,6 +5,15 @@ namespace fan
 	//================================================================================================================================
 	//================================================================================================================================
 	class MainMenuBar {
+	private:
+		//================================================================
+		//================================================================
+		struct FPSCounter {
+			int count = 0;
+			float sum = 0.f;
+			float fps = 0.f;
+		};
+
 	public:
 		MainMenuBar();
 		~MainMenuBar();
@@ -33,6 +42,8 @@ namespace fan
 		bool m_openNewScenePopupLater = false;
 		bool m_openLoadScenePopupLater = false;
 		bool m_openSaveScenePopupLater = false;
+
+		FPSCounter m_fpsCounter;
 
 		// Temporary buffers
 		std::fs::path m_pathBuffer;

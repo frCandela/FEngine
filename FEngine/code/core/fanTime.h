@@ -13,19 +13,14 @@ namespace fan {
 		static float ElapsedSinceStartup() { return static_cast<float>(glfwGetTime()); }
 		static double ElapsedSinceStartupDouble() { return glfwGetTime(); }
 
-		float	GetMinFPS() { return m_minFps; }
-		float	GetMaxFPS() { return m_maxFps; }
 		float	GetDelta()	{ return m_delta;	 }
-		float	GetFPS()	{ return 1.f / m_delta; }
-		void	SetFPS(const float _fps) { m_delta =  1.f / std::clamp(_fps, m_minFps, m_maxFps);	}
-		bool	GetCapFPS() { return m_capFPS ;}
-		void	SetCapFPS( const bool _capFPS ) { m_capFPS = _capFPS; }
+		void	SetDelta( const float _delta ) { m_delta = _delta; }
+		void	UpdateFrameTime( const float _frameTime )	{ m_frameTime = _frameTime ;}
+		float	GetFrameTime( )								{ return m_frameTime; }
 
-		static std::string SecondsToString( const double _seconds );	// Returns a hours:minuts:seconds ex: 3661s = 01:01:01
+		static std::string SecondsToString( const double _seconds );	// Returns a hours:minuts:seconds ex: 3783s = 01:02:03
 	private:
-		float m_minFps = 1.f;
-		float m_maxFps = 144.f;
 		float m_delta = 1/60.f;
-		bool  m_capFPS = true;
+		float m_frameTime = 0.f;
 	};
 }

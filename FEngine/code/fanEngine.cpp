@@ -141,12 +141,10 @@ namespace fan {
 			const float delta = Time::Get().GetDelta();
 			float updateDelta = time - lastUpdateTime;
 
-			if ( updateDelta > delta ) {
-				if ( updateDelta > 2 * delta ) {
-					Debug::Get() << Debug::Severity::warning << "Lag detected, delta = " << (int)( 1000 * updateDelta ) << "ms." << Debug::Endl();
-				}
-				updateDelta -= delta;
+			if ( updateDelta > delta ) {			
 				lastUpdateTime = time;
+				Time::Get().UpdateFrameTime( updateDelta );
+				updateDelta = 0;
 
 				m_scene->BeginFrame();
 				m_scene->Update( delta );
