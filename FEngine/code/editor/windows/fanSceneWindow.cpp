@@ -85,18 +85,22 @@ namespace fan
 		}
 		bool isOpen = ImGui::TreeNode(ss.str().c_str());
 
+		// Entity dragndrop target empty selectable -> place dragged below
 		if (ImGui::BeginDragDropTarget())
 		{
 			if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("node_test")) {
 				assert(payload->DataSize == sizeof(Entity**));
 				Entity * payloadNode = *(Entity**)payload->Data;
-				payloadNode->InsertBelow(_entityDrawn);
+				if( payloadNode != _entityDrawn ) {
+					payloadNode->InsertBelow(_entityDrawn);
+				}
 			}
 			ImGui::EndDragDropTarget();
 		}
 		ImGui::SameLine();
 		bool selected = (_entityDrawn == engine.GetSelectedentity());
 
+		// Draw entity empty selectable to display a hierarchy
 		std::stringstream ss2;
 		ss2 << _entityDrawn->GetName() << "##" << _entityDrawn; // Unique id
 		if (ImGui::Selectable(ss2.str().c_str(), &selected)) {
@@ -106,11 +110,14 @@ namespace fan
 			_entityRightClicked = _entityDrawn;
 		}
 
+		// Entity dragndrop source = selectable -^
 		if (ImGui::BeginDragDropSource(ImGuiDragDropFlags_None)) {
 			ImGui::SetDragDropPayload("node_test", &_entityDrawn, sizeof(Entity**));
 			ImGui::Text((_entityDrawn->GetName()).c_str());
 			ImGui::EndDragDropSource();
 		}
+
+		// Entity dragndrop target entity name -> place as child
 		if (ImGui::BeginDragDropTarget())
 		{
 			if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("node_test")) {
