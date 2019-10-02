@@ -19,7 +19,10 @@ namespace fan {
 		DECLARE_TYPE_INFO(SpaceShip);
 	protected:
 	private:
-		float m_speed = 1.f;
-		float m_rotationSpeed = 1.f;
+		float m_velocity = 8.f;
+		float m_rotationSpeed = 3.f;
+		float m_drag = 0.99f;
+
+		btVector3 m_speed;
 	};
 }

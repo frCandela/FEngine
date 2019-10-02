@@ -9,11 +9,12 @@
 
 namespace fan {
 	REGISTER_EDITOR_COMPONENT(SpaceShip)
-		REGISTER_TYPE_INFO(SpaceShip)
+	REGISTER_TYPE_INFO(SpaceShip)
 
-		//================================================================================================================================
-		//================================================================================================================================
-		void SpaceShip::Start() {
+	//================================================================================================================================
+	//================================================================================================================================
+	void SpaceShip::Start() {
+		m_speed = btVector3(0.f,0.f,0.f);
 	}
 
 	//================================================================================================================================
@@ -41,9 +42,11 @@ namespace fan {
 		// Translation
 		Transform * transform = GetEntity()->GetComponent<Transform>();
 		if (forward != 0.f) {
-			forward *= m_speed * _delta;
-			transform->SetPosition(transform->GetPosition() + forward * transform->Forward());
-		}
+			forward *= m_velocity * _delta;
+			m_speed += _delta * forward * transform->Forward(); // increases velocity			
+		} 
+		transform->SetPosition( transform->GetPosition() + m_speed );
+		m_speed *= m_drag;
 
 		// Rotation
 		if (leftRotation != 0.f) {
@@ -59,7 +62,9 @@ namespace fan {
 	void SpaceShip::OnGui() {
 		Actor::OnGui();
 
-		ImGui::DragFloat("speed", &m_speed, 0.01f, 0.f, 10.f);
+		ImGui::DragFloat3("speed", &m_speed[0], 0.01f, 0.f, 10.f );
+		ImGui::DragFloat("velocity", &m_velocity, 0.01f, 0.f, 10.f);
+		ImGui::DragFloat( "drag", &m_drag, 0.01f, 0.f, 1.f );
 		ImGui::DragFloat("rotation_speed", &m_rotationSpeed, 0.01f, 0.f, 10.f);
 	}
 
@@ -69,7 +74,7 @@ namespace fan {
 		Actor::Load(_in);
 
 		if (!ReadSegmentHeader(_in, "speed:")) { return false; }
-		if (!ReadFloat(_in, m_speed)) { return false; }
+		if (!ReadFloat(_in, m_velocity)) { return false; }
 
 		if (!ReadSegmentHeader(_in, "rotation_speed:")) { return false; }
 		if (!ReadFloat(_in, m_rotationSpeed)) { return false; }
@@ -82,7 +87,7 @@ namespace fan {
 	bool SpaceShip::Save(std::ostream& _out, const int _indentLevel) const {
 		Actor::Save(_out, _indentLevel);
 		const std::string indentation = GetIndentation(_indentLevel);
-		_out << indentation << "speed:          " << m_speed << std::endl;
+		_out << indentation << "speed:          " << m_velocity << std::endl;
 		_out << indentation << "rotation_speed: " << m_rotationSpeed << std::endl;
 		return true;
 	}
