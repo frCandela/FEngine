@@ -6,6 +6,7 @@
 #include "editor/windows/fanInspectorWindow.h"
 #include "editor/windows/fanPreferencesWindow.h"
 #include "editor/windows/fanConsoleWindow.h"	
+#include "editor/fanEditorGrid.h"
 #include "core/files/fanSerializedValues.h"
 #include "core/input/fanInput.h"
 #include "core/input/fanKeyboard.h"
@@ -14,15 +15,14 @@
 #include "scene/fanScene.h"
 #include "core/fanTime.h"
 
-#include "renderer/fanRenderer.h"
-#include "fanEngine.h"
-
 namespace fan
 {
 	//================================================================================================================================
 	//================================================================================================================================
-	MainMenuBar::MainMenuBar() :
-		m_showImguiDemoWindow(true)
+	MainMenuBar::MainMenuBar( Scene & _scene, EditorGrid & _editorGrid ) :
+		m_scene( _scene )
+		,m_editorGrid( _editorGrid )
+		,m_showImguiDemoWindow(true)
 		, m_showAABB(false)
 		, m_showHull(false)
 		, m_showWireframe(false)
@@ -43,11 +43,24 @@ namespace fan
 	}
 
 	//================================================================================================================================
+	// TODO Replace this with a vector
+	//================================================================================================================================
+	void MainMenuBar::SetWindows( EditorWindow * _renderWindow,
+								  EditorWindow * _sceneWindow,
+								  EditorWindow * _inspector,
+								  EditorWindow * _preferences,
+								  EditorWindow * _console )
+	{
+		m_renderWindow = _renderWindow;
+		m_sceneWindow = _sceneWindow;
+		m_inspector = _inspector;
+		m_preferences= _preferences;
+		m_console = _console;
+	}
+
+	//================================================================================================================================
 	//================================================================================================================================
 	void MainMenuBar::Draw() {
-		Engine &	engine = Engine::GetEngine();
-		Renderer &	renderer = engine.GetRenderer();
-
 		if (m_showImguiDemoWindow) {
 			ImGui::ShowDemoWindow(&m_showImguiDemoWindow);
 		}
@@ -72,13 +85,13 @@ namespace fan
 				ImGui::Separator();
 
 				if (ImGui::MenuItem("Reload shaders", "F5")) {
-					renderer.ReloadShaders();
+					onReloadShaders.Emmit();
 				}
 
 				ImGui::Separator();
 
 				if (ImGui::MenuItem("Exit")) {
-					engine.Exit();
+					onExit.Emmit();
 				}
 
 				ImGui::EndMenu();
@@ -87,25 +100,25 @@ namespace fan
 			// View
 			if (ImGui::BeginMenu("View"))
 			{
-				bool showPostprocessWindow = engine.GetRenderWindow().IsVisible();
+				bool showPostprocessWindow = m_renderWindow->IsVisible();
 				if (ImGui::Checkbox("Rendering", &showPostprocessWindow)) {
-					engine.GetRenderWindow().SetVisible(showPostprocessWindow);
+					m_renderWindow->SetVisible(showPostprocessWindow);
 				}
-				bool showSceneWindow = engine.GetSceneWindow().IsVisible();
+				bool showSceneWindow = m_sceneWindow->IsVisible();
 				if (ImGui::Checkbox("Scene", &showSceneWindow)) {
-					engine.GetSceneWindow().SetVisible(showSceneWindow);
+					m_sceneWindow->SetVisible(showSceneWindow);
 				}
-				bool showInspector = engine.GetInspectorWindow().IsVisible();
+				bool showInspector = m_inspector->IsVisible();
 				if (ImGui::Checkbox("Inspector", &showInspector)) {
-					engine.GetInspectorWindow().SetVisible(showInspector);
+					m_inspector->SetVisible(showInspector);
 				}
-				bool showPreferences = engine.GetPreferencesWindow().IsVisible();
+				bool showPreferences = m_preferences->IsVisible();
 				if (ImGui::Checkbox("Preferences", &showPreferences)) {
-					engine.GetPreferencesWindow().SetVisible(showPreferences);
+					m_preferences->SetVisible(showPreferences);
 				}
-				bool showConsole = engine.GetConsoleWindow().IsVisible();
+				bool showConsole = m_console->IsVisible();
 				if (ImGui::Checkbox("Console", &showConsole)) {
-					engine.GetConsoleWindow().SetVisible(showConsole);
+					m_console->SetVisible(showConsole);
 				}
 
 				ImGui::Separator();
@@ -125,24 +138,11 @@ namespace fan
 			}
 
 			// Editor
-			if (ImGui::BeginMenu("Grid"))
-			{
-				Engine::EditorGrid  gridData = engine.GetEditorGrid();
-				if (ImGui::Checkbox("is visible", &gridData.isVisible)) {
-					engine.SetEditorGrid(gridData);
-				}
-
-				if (ImGui::DragFloat("spacing", &gridData.spacing, 0.25f, 0.f, 100.f)) {
-					engine.SetEditorGrid(gridData);
-				}
-
-				if (ImGui::DragInt("lines count", &gridData.linesCount, 1.f, 0, 1000)) {
-					engine.SetEditorGrid(gridData);
-				}
-
-				if (ImGui::ColorEdit3("color", &gridData.color[0], gui::colorEditFlags)) {
-					engine.SetEditorGrid(gridData);
-				}
+			if (ImGui::BeginMenu("Grid"))			{
+				ImGui::Checkbox("is visible", &m_editorGrid.isVisible);
+				ImGui::DragFloat("spacing", &m_editorGrid.spacing, 0.25f, 0.f, 100.f);
+				ImGui::DragInt("lines count", &m_editorGrid.linesCount, 1.f, 0, 1000);
+				ImGui::ColorEdit3("color", &m_editorGrid.color[0], gui::colorEditFlags);
 				ImGui::EndMenu();
 			}
 
@@ -214,40 +214,26 @@ namespace fan
 			Save();
 		}
 
-		if (Keyboard::IsKeyPressed(GLFW_KEY_DELETE)) {
-			Entity * entity = Engine::GetEngine().GetSelectedentity();
-			if (entity != nullptr) {
-				Engine::GetEngine().GetScene().DeleteEntity(entity);
-			}
-		}
-
-		if (Keyboard::IsKeyPressed(GLFW_KEY_F5)) {
-			Engine::GetEngine().GetRenderer().ReloadShaders();
-		}
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
 	void MainMenuBar::DrawModals() {
-		Engine &	engine = Engine::GetEngine();
-
 		// New scene
 		if (gui::SaveFileModal("New scene", GlobalValues::s_sceneExtensions, m_pathBuffer, m_extensionIndexBuffer)) {
-			Scene & scene = engine.GetScene();
-			scene.New();
-			scene.SetPath(m_pathBuffer.string());
+			m_scene.New();
+			m_scene.SetPath(m_pathBuffer.string());
 		}
 
 		// Open scene
 		if (gui::LoadFileModal("Open scene", m_sceneExtensionFilter, m_pathBuffer)) {
-			Scene & scene = engine.GetScene();
-			scene.LoadFrom(m_pathBuffer.string());
+			m_scene.LoadFrom(m_pathBuffer.string());
 		}
 
 		// Save scene
 		if (gui::SaveFileModal("Save scene", GlobalValues::s_sceneExtensions, m_pathBuffer, m_extensionIndexBuffer)) {
-			engine.GetScene().SetPath(m_pathBuffer.string());
-			engine.GetScene().Save();
+			m_scene.SetPath(m_pathBuffer.string());
+			m_scene.Save();
 		}
 	}
 
@@ -268,10 +254,9 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void MainMenuBar::Save() {
-		Scene & scene = Engine::GetEngine().GetScene();
-		if (scene.HasPath()) {
-			scene.Save();
+	void MainMenuBar::Save() {		
+		if ( m_scene.HasPath() ) {
+			m_scene.Save();
 		}
 		else {
 			SaveAs();

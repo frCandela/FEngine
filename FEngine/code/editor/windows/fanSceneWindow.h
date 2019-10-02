@@ -15,9 +15,10 @@ namespace fan {
 		SceneWindow( Scene * _scene );
 		~SceneWindow();
 
-		// Calbacks
+		// Callbacks
 		void OnEntitySelected( Entity* _entity ) { m_entitySelected = _entity; }
-	
+		void OnSceneLoad( Scene * /*_scene*/ ) { m_expandSceneHierarchy = true; }
+
 	protected:
 		void OnGui() override;
 
@@ -31,7 +32,6 @@ namespace fan {
 
 		void NewEntityModal();
 		void RenameEntityModal();
-		void OnSceneLoad(Scene * /*_scene*/) { m_expandSceneHierarchy = true; }
 		void R_DrawSceneTree(Entity * _entity, Entity*& _entityRightClicked);
 	};
 }

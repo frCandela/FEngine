@@ -1,6 +1,7 @@
 #pragma once
 
 #include "core/files/fanSerializedValues.h"
+#include "editor/fanEditorGrid.h"
 
 namespace fan {
 	class MainMenuBar;
@@ -19,19 +20,14 @@ namespace fan {
 	class PointLight;
 	class Model;
 	class Material;
+	class Camera;
 
 	//================================================================================================================================
 	//================================================================================================================================	
 	class Engine {
 	public:
-		Signal<Entity*> onEntitySelected;
-
-		struct EditorGrid {
-			bool		isVisible;
-			Color		color;
-			int			linesCount;
-			float		spacing;
-		};
+		static Signal<Entity*> onEntitySelected;
+		static Signal<Camera*> onSetCamera;
 
 		Engine();
 		~Engine();
@@ -39,11 +35,9 @@ namespace fan {
 		void Run();
 		void Exit();
 
-		inline static Engine & GetEngine() { return * ms_engine; }
-
 		void SetMainCamera( Camera * _mainCamera );
 		void SetSelectedEntity( Entity * _selectedentity);
-		void Deselect() { m_selectedentity = nullptr; }
+		void Deselect();
 		
 		void RegisterDirectionalLight	( DirectionalLight * _pointLight );
 		void UnRegisterDirectionalLight	( DirectionalLight * _pointLight );
@@ -86,8 +80,8 @@ namespace fan {
 		Renderer * m_renderer;
 		Scene *	 m_scene;
 		Entity * m_selectedentity;
-		Camera * m_editorCamera;
-		Camera * m_mainCamera;
+		Camera * m_editorCamera = nullptr;
+		Camera * m_mainCamera = nullptr;
 
 		std::vector < DirectionalLight* >	m_directionalLights;
 		std::vector < PointLight* >			m_pointLights;
@@ -100,14 +94,15 @@ namespace fan {
 		};
 		std::map< size_t, GizmoCacheData > m_gizmoCacheData;
 
-		static Engine * ms_engine;
 		bool m_applicationShouldExit;
 
+		void ManageKeyShortcuts();
 		void ManageSelection();
 		void UpdateRenderer();
 		void OnSceneLoad(Scene * _scene);
 		void OnMaterialSetTexture( Material * _material, std::string _path );
 		void OnModelSetPath( Model * _model, std::string _path );
+		void OnEntityDeleted( Entity * _entity );
 
 		void DrawUI();
 		void DrawEditorGrid() const;

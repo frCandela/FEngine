@@ -1,7 +1,6 @@
 #include "fanGlobalIncludes.h"
 #include "game/fanCameraController.h"
 
-#include "fanEngine.h"
 #include "game/fanSpaceShip.h"
 #include "core/fanTime.h"
 #include "core/input/fanKeyboard.h"

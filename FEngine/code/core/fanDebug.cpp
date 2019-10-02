@@ -78,4 +78,22 @@ namespace fan {
 	void Debug::Clear() {
 		Get().m_logBuffer.clear();		
 	}
+
+
+	//================================================================================================================================
+	// WARNING : this method is not available in retail
+	//================================================================================================================================
+	void Debug::SetDebug( Renderer * _renderer, Camera * _editorCamera, Camera * _mainCamera ) {
+		m_renderer = _renderer; 
+		m_editorCamera = _editorCamera;
+		m_mainCamera = _mainCamera;
+	}
+
+	//================================================================================================================================
+	// WARNING : this method is not available in retail
+	//================================================================================================================================
+	void Debug::SetMainCamera( Camera * _camera ) {
+		m_mainCamera = _camera; 
+		onSetMainCamera.Emmit( _camera );
+	}
 }

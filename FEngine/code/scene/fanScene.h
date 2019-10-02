@@ -14,8 +14,9 @@ namespace fan
 	class Scene : public ISerializable
 	{
 	public:
-		static Signal<Scene*>	s_onSceneLoad;
-		static Signal<>			s_onSceneClear;
+		Signal<Scene*>	onSceneLoad;
+		Signal<>		onSceneClear;
+		Signal< Entity *>		onDeleteEntity;
 
 		Scene(const std::string _name);
 		~Scene();
@@ -60,8 +61,8 @@ namespace fan
 		bool Save(std::ostream& _out, const int _indentLevel) const override;
 		void Clear();
 
-		void				R_DeleteEntity(Entity* _entity, std::set<Entity*>&	_deletedEntitiesSet);
-		void				R_BuildEntitiesList(Entity* _entity, std::vector<Entity*>& _entitiesList) const;
+		void		R_DeleteEntity(Entity* _entity, std::set<Entity*>&	_deletedEntitiesSet);
+		void		R_BuildEntitiesList(Entity* _entity, std::vector<Entity*>& _entitiesList) const;
 		Component *	R_FindComponentOfType(Entity * _entity, const uint32_t _typeID) const;
 	};
 

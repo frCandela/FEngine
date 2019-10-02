@@ -298,6 +298,9 @@
     <ClCompile Include="code\scene\fanComponentsRegister.cpp">
       <Filter>code\scene</Filter>
     </ClCompile>
+    <ClCompile Include="code\editor\fanEditorGrid.cpp">
+      <Filter>code\editor</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="code\editor\fanMainMenuBar.h">
@@ -1001,6 +1004,9 @@
     </ClInclude>
     <ClInclude Include="code\scene\fanComponentsRegister.h">
       <Filter>code\scene</Filter>
+    </ClInclude>
+    <ClInclude Include="code\editor\fanEditorGrid.h">
+      <Filter>code\editor</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -14,7 +14,6 @@
 #include "renderer/fanRenderer.h"
 #include "renderer/core/fanTexture.h"
 #include "renderer/fanRessourceManager.h"
-#include "fanEngine.h"
 
 namespace fan
 {
@@ -28,15 +27,13 @@ namespace fan
 	//================================================================================================================================
 	//================================================================================================================================
 	void InspectorWindow::OnGui() {
-		Engine & engine = Engine::GetEngine();
-		Entity * const selection = engine.GetSelectedentity();
 
-		if (selection != nullptr)
+		if ( m_entitySelected != nullptr)
 		{
 			// entity gui
-			selection->OnGui();
+			m_entitySelected->OnGui();
 			int componentCount = 0;			
-			const std::vector<Component*> & components = selection->GetComponents();
+			const std::vector<Component*> & components = m_entitySelected->GetComponents();
 			for (int componentIndex = 0; componentIndex < components.size(); componentIndex++) {
 				Component * component = components[componentIndex];
 
@@ -60,7 +57,7 @@ namespace fan
 					ss << "X" << "##" << component->GetName() << componentCount++;	// make unique id
 					ImGui::SameLine(ImGui::GetWindowWidth() - 40);
 					if (ImGui::Button(ss.str().c_str())) {
-						selection->DeleteComponent(component);
+						m_entitySelected->DeleteComponent(component);
 						component = nullptr;
 					}
 				}
@@ -85,15 +82,12 @@ namespace fan
 
 		if (ImGui::BeginPopup("New component"))
 		{
-			Engine & engine = Engine::GetEngine();
-			Entity * const selection = engine.GetSelectedentity();
-
 			std::vector<Component *>& components = ComponentsRegister::GetComponents();
 			for (int componentIndex = 0; componentIndex < components.size(); componentIndex++) {
 				Component * component = components[componentIndex];
 				if (ImGui::MenuItem(component->GetName())) {
 					// Create new Component 
-					selection->AddComponent(component->GetType());
+					m_entitySelected->AddComponent(component->GetType());
 					ImGui::CloseCurrentPopup();
 				}
 			}

@@ -1,6 +1,5 @@
 #include "fanGlobalIncludes.h"
 
-#include "fanEngine.h"
 #include "renderer/fanRenderer.h"
 #include "renderer/fanMesh.h"
 #include "scene/components/fanModel.h"

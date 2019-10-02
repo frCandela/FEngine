@@ -4,12 +4,7 @@
 
 namespace fan
 {
-	class Transform;
-	class Component;
-	class Camera;
-	class Model;
-	class FPSCamera;
-	class Material;
+	class Entity;
 
 	//================================================================================================================================
 	//================================================================================================================================
@@ -17,10 +12,16 @@ namespace fan
 	public:
 		InspectorWindow();
 
+
+		// Callbacks
+		void OnEntitySelected( Entity* _entity ) { m_entitySelected = _entity; }
+
 	protected:
 		void OnGui() override;
 
 	private:
+		Entity * m_entitySelected;
+
 		void NewComponentPopup();
 	};
 }

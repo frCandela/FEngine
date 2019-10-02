@@ -23,11 +23,13 @@ namespace fan
 		bool Save(std::ostream& _out, const int _indentLevel) const override;
 
 		bool IsEnabled() const { return m_isEnabled; }
-		void SetEnabled(const bool _enabled) { m_isEnabled = _enabled; }
+		void SetEnabled(const bool _enabled);
 
 	protected:
 		void OnAttach() override;
 		void OnDetach() override;
+		virtual void OnEnable() {};
+		virtual void OnDisable(){};
 
 	private:
 		bool m_isEnabled = true;

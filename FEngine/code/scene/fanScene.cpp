@@ -8,12 +8,9 @@
 #include "scene/components/fanModel.h"
 #include "scene/components/fanActor.h"
 #include "core/fanSignal.h"
-#include "fanEngine.h"
 
 namespace fan
 {
-	Signal<>		Scene::s_onSceneClear;
-	Signal<Scene*>	Scene::s_onSceneLoad;
 
 	//================================================================================================================================
 	//================================================================================================================================
@@ -122,9 +119,7 @@ namespace fan
 				R_DeleteEntity(childs[childIndex], _deletedEntitiesSet);
 			}
 
-			if (Engine::GetEngine().GetSelectedentity() == _entity) {
-				Engine::GetEngine().Deselect();
-			}
+			onDeleteEntity.Emmit( _entity );
 			_deletedEntitiesSet.insert(_entity);
 			if (_entity->GetParent() != nullptr) {
 				_entity->GetParent()->RemoveChild(_entity);
@@ -194,7 +189,7 @@ namespace fan
 		m_outdatedAABB.clear();
 		m_root = nullptr;
 
-		s_onSceneClear.Emmit();
+		onSceneClear.Emmit();
 	}
 
 	//================================================================================================================================
@@ -203,7 +198,7 @@ namespace fan
 		Clear();
 		m_root = CreateEntity("root", nullptr);
 		m_root->AddComponent<Transform>();
-		s_onSceneLoad.Emmit(this);
+		onSceneLoad.Emmit(this);
 	}
 
 	//================================================================================================================================
@@ -252,7 +247,7 @@ namespace fan
 				Debug::Log("Load success");
 				m_path = _path;
 				inStream.close();
-				s_onSceneLoad.Emmit(this);
+				onSceneLoad.Emmit(this);
 				return true;
 			}
 			else {

@@ -1,6 +1,6 @@
 #include "fanGlobalIncludes.h"
-
 #include "fanEngine.h"
+
 #include "renderer/fanRenderer.h"
 #include "renderer/fanRessourceManager.h"
 #include "renderer/pipelines/fanForwardPipeline.h"
@@ -39,7 +39,8 @@
 #include "core/math/shapes/fanConvexHull.h"
 
 namespace fan {
-	Engine * Engine::ms_engine = nullptr;
+	Signal<Entity*> Engine::onEntitySelected;
+	Signal<Camera*> Engine::onSetCamera;
 
 	//================================================================================================================================
 	//================================================================================================================================
@@ -64,20 +65,16 @@ namespace fan {
 		m_editorGrid.spacing = 1.f;		
 
 		m_renderer = new Renderer( windowSize, windowPosition );
-		Debug::Get().SetRenderer(m_renderer);
-
 		m_scene = new Scene("mainScene");
-		m_scene->s_onSceneLoad.Connect(&Engine::OnSceneLoad, this);
-		m_scene->New();
 
 		// Initialize editor components
-		ms_engine = this;
-		m_mainMenuBar		= new MainMenuBar();
 		m_renderWindow		= new RenderWindow( m_renderer );
 		m_sceneWindow		= new SceneWindow( m_scene );
 		m_inspectorWindow	= new InspectorWindow();
 		m_preferencesWindow = new PreferencesWindow();
 		m_consoleWindow		= new ConsoleWindow();
+		m_mainMenuBar		= new MainMenuBar( *m_scene, m_editorGrid );
+		m_mainMenuBar->SetWindows( m_renderWindow , m_sceneWindow , m_inspectorWindow , m_preferencesWindow, m_consoleWindow );
 
 		m_editorWindows.push_back( m_renderWindow );
 		m_editorWindows.push_back( m_sceneWindow );
@@ -85,10 +82,21 @@ namespace fan {
 		m_editorWindows.push_back( m_preferencesWindow );
 		m_editorWindows.push_back( m_consoleWindow );
 
+		// Instance messages
+		Debug::Get().onSetMainCamera.Connect( &Engine::SetMainCamera, this );
+		Debug::Get().SetDebug( m_renderer, m_editorCamera, m_mainCamera );
 		m_sceneWindow->onSelectEntity.Connect( &Engine::SetSelectedEntity, this );
+		m_mainMenuBar->onReloadShaders.Connect(&Renderer::ReloadShaders, m_renderer );
+		m_mainMenuBar->onExit.Connect( &Engine::Exit, this );
 		onEntitySelected.Connect( &SceneWindow::OnEntitySelected, m_sceneWindow );
+		onEntitySelected.Connect( &InspectorWindow::OnEntitySelected, m_inspectorWindow );
 
-		Scene::s_onSceneClear.Connect			( &Renderer::Clear,				 m_renderer );
+		m_scene->onSceneLoad.Connect( &SceneWindow::OnSceneLoad, m_sceneWindow );
+		m_scene->onSceneLoad.Connect( &Engine::OnSceneLoad, this );
+		m_scene->onSceneClear.Connect  ( &Renderer::Clear, m_renderer );
+		m_scene->onDeleteEntity.Connect( &Engine::OnEntityDeleted, this );
+
+		// Static messages		
 		Material::onMaterialSetPath.Connect		( &Engine::OnMaterialSetTexture, this );
 		Model::onModelSetPath.Connect			( &Engine::OnModelSetPath,		 this );
 		Model::onRegisterModel.Connect			( &Engine::RegisterModel,		 this );
@@ -98,8 +106,9 @@ namespace fan {
 		DirectionalLight::onDirectionalLightAttach.Connect	( &Engine::RegisterDirectionalLight,   this );
 		DirectionalLight::onDirectionalLightDetach.Connect	( &Engine::UnRegisterDirectionalLight, this );
 
-		m_mainMenuBar->Initialize();
 
+		m_mainMenuBar->Initialize();
+		m_scene->New();
 		Mesh * defaultMesh = m_renderer->GetRessourceManager()->LoadMesh(GlobalValues::s_defaultMeshPath);
 		m_renderer->GetRessourceManager()->SetDefaultMesh( defaultMesh );
 	}
@@ -152,6 +161,7 @@ namespace fan {
 				m_scene->BeginFrame();
 				m_scene->Update( delta );
 
+				ManageKeyShortcuts();
 				ManageSelection();
 				DrawUI();
 				DrawEditorGrid();
@@ -188,6 +198,8 @@ namespace fan {
 		SetMainCamera(m_editorCamera);
 		FPSCamera * editorCamera = cameraEntity->AddComponent<FPSCamera>();
 		editorCamera->SetRemovable(false);
+
+		Debug::Get().SetDebug( m_renderer, m_editorCamera, m_mainCamera );
 	}
 
 	//================================================================================================================================
@@ -311,13 +323,21 @@ namespace fan {
 	//================================================================================================================================
 	void Engine::SetMainCamera( Camera * _mainCamera ) { 
 		m_mainCamera = _mainCamera; 
-		m_mainCamera->MarkModified();
+		m_mainCamera->MarkModified();		
+		Debug::Get().SetDebug( m_renderer, m_editorCamera, _mainCamera );
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
 	void Engine::SetSelectedEntity( Entity * _selectedentity ) {
 		m_selectedentity = _selectedentity; 
+		onEntitySelected.Emmit( m_selectedentity );
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
+	void Engine::Deselect() { 
+		m_selectedentity = nullptr; 
 		onEntitySelected.Emmit( m_selectedentity );
 	}
 
@@ -377,6 +397,20 @@ namespace fan {
 
 		// Materials
 
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
+	void Engine::ManageKeyShortcuts() {
+		if ( Keyboard::IsKeyPressed( GLFW_KEY_DELETE ) ) {
+			if ( m_selectedentity != nullptr ) {
+				m_scene->DeleteEntity( m_selectedentity );
+			}
+		}
+
+		if ( Keyboard::IsKeyPressed( GLFW_KEY_F5 ) ) {
+			m_renderer->ReloadShaders();
+		}
 	}
 
 	//================================================================================================================================
@@ -659,6 +693,14 @@ namespace fan {
 			mesh = ressourceManager->LoadMesh( _path );
 		}
 		_model->SetMesh( mesh );
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
+	void Engine::OnEntityDeleted( Entity * _entity ) {
+		if ( _entity == m_selectedentity ) {
+			Deselect();
+		}
 	}
 
 }

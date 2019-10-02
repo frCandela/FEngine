@@ -1,5 +1,5 @@
 Entities: 1 { 
-    Entity: root {
+    Entity: groot {
         computeAABB: true
         Components: 1 {
             Transform: 1269105190 {
@@ -8,73 +8,51 @@ Entities: 1 {
                 scale:    1 1 1
             }
         }
-        Childs: 4 {
-            Entity: sphere {
+        Childs: 2 {
+            Entity: game_camera {
                 computeAABB: true
-                Components: 3 {
+                Components: 4 {
                     Transform: 1269105190 {
-                        position: 0 0 0
-                        rotation: 0 0 0 1
+                        position: -3.8435 5.25 -3.77525
+                        rotation: 0.707107 0 0 0.707107
                         scale:    1 1 1
+                    }
+                    Camera: 1148216499 {
+                        fov:          110
+                        nearDistance: 0.01
+                        farDistance: 1000
+                    }
+                    GameManager: 1830802815 {
+                        isEnabled: true
+                    }
+                    CameraController: 259515671 {
+                        isEnabled: true
+                        heightFromTarget: 5.25
+                    }
+                }
+                Childs: 0 {
+                }
+            }
+            Entity: space_ship {
+                computeAABB: true
+                Components: 4 {
+                    Transform: 1269105190 {
+                        position: -3.8435 0 -3.77525
+                        rotation: 0 -0.997757 0 0.0629064
+                        scale:    0.1 0.1 0.1
                     }
                     Model: 1739103771 {
-                        path: content\models\sun.fbx
+                        path: content\models\spaceship.fbx
                     }
                     Material: 1828911513 {
-                        material: content\models\colors\white.png
-                        shininess: 255
+                        material: content\models\test\textures\texture3.png
+                        shininess: 256
                         color: 1 1 1
                     }
-                }
-                Childs: 0 {
-                }
-            }
-            Entity: green {
-                computeAABB: true
-                Components: 2 {
-                    Transform: 1269105190 {
-                        position: 0 -1.06322 -1.9816
-                        rotation: -0.1982 0.650566 0.213658 0.701307
-                        scale:    1 1 1
-                    }
-                    DirectionalLight: 944608624 {
-                        ambiant: 0 0 0
-                        diffuse: 0 1 0.0178571
-                        specular: 1 1 1
-                    }
-                }
-                Childs: 0 {
-                }
-            }
-            Entity: red {
-                computeAABB: true
-                Components: 2 {
-                    Transform: 1269105190 {
-                        position: -0.165123 3.87945 -5.84627
-                        rotation: 0.443853 0 0 0.896099
-                        scale:    -3.5 1 1
-                    }
-                    DirectionalLight: 944608624 {
-                        ambiant: 0.0001 9.999e-05 9.999e-05
-                        diffuse: 1 0 0
-                        specular: 1 0 0
-                    }
-                }
-                Childs: 0 {
-                }
-            }
-            Entity: blue {
-                computeAABB: true
-                Components: 2 {
-                    Transform: 1269105190 {
-                        position: 2.76479 0 0
-                        rotation: 7.04883e-07 -0.638096 8.50545e-07 0.769957
-                        scale:    1 1 1
-                    }
-                    DirectionalLight: 944608624 {
-                        ambiant: 0 0 0
-                        diffuse: 0.0356975 0 1
-                        specular: 1 1 1
+                    SpaceShip: 3824437066 {
+                        isEnabled: false
+                        speed:          8
+                        rotation_speed: 3
                     }
                 }
                 Childs: 0 {

@@ -1,7 +1,6 @@
 #include "fanGlobalIncludes.h"
 #include "game/fanGameManager.h"
 
-#include "fanEngine.h"
 #include "core/fanTime.h"
 #include "core/input/fanKeyboard.h"
 #include "editor/windows/fanInspectorWindow.h"
@@ -48,16 +47,15 @@ namespace fan {
 	//================================================================================================================================
 	void GameManager::SwitchCameras() {
 		Debug::Log("switching camera");
-		Camera * editorCamera = Engine::GetEngine().GetEditorCamera();
-		Camera * currentCamera = Engine::GetEngine().GetMainCamera();
+		Camera * currentCamera = & Debug::Get().MainCamera();
 
-		if (currentCamera == editorCamera) {
-			Engine::GetEngine().SetMainCamera(m_camera);
+		if ( currentCamera == & Debug::Get().EditorCamera() ) {
+			Debug::Get().SetMainCamera(m_camera);
 			m_spaceShip->SetEnabled(true);
 			m_editorCameraController->SetEnabled(false);
 		}
 		else {
-			Engine::GetEngine().SetMainCamera(editorCamera);
+			Debug::Get().SetMainCamera( &Debug::Get().EditorCamera() );
 			m_spaceShip->SetEnabled(false);
 			m_editorCameraController->SetEnabled(true);
 		}

@@ -13,6 +13,7 @@ namespace fan {
 	//================================================================================================================================	
 	class GameManager : public Actor {
 	public:
+
 		void Start() override;
 		void Update(const float _delta) override;
 		bool Load(std::istream& _in) override;
