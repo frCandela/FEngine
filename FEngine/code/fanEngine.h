@@ -24,6 +24,7 @@ namespace fan {
 	//================================================================================================================================	
 	class Engine {
 	public:
+		Signal<Entity*> onEntitySelected;
 
 		struct EditorGrid {
 			bool		isVisible;
@@ -41,7 +42,7 @@ namespace fan {
 		inline static Engine & GetEngine() { return * ms_engine; }
 
 		void SetMainCamera( Camera * _mainCamera );
-		void SetSelectedEntity( Entity * _selectedentity) { m_selectedentity = _selectedentity;	}
+		void SetSelectedEntity( Entity * _selectedentity);
 		void Deselect() { m_selectedentity = nullptr; }
 		
 		void RegisterDirectionalLight	( DirectionalLight * _pointLight );

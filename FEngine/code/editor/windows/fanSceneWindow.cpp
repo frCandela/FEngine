@@ -13,15 +13,14 @@
 #include "core/input/fanKeyboard.h"
 #include "core/input/fanMouse.h"
 
-#include "fanEngine.h"
-
 namespace fan
 {
 
 	//================================================================================================================================
 	//================================================================================================================================
-	SceneWindow::SceneWindow() :
-		EditorWindow("scene")
+	SceneWindow::SceneWindow( Scene * _scene ) :
+		EditorWindow("Scene")
+		, m_scene(_scene)
 	{
 		m_textBuffer[0] = '\0';
 		Scene::s_onSceneLoad.Connect(&SceneWindow::OnSceneLoad, this);
@@ -36,14 +35,12 @@ namespace fan
 	//================================================================================================================================
 	//================================================================================================================================
 	void SceneWindow::OnGui() {
-		Engine & engine = Engine::GetEngine();
-		Scene & scene = engine.GetScene();
 
-		ImGui::Text(scene.GetName().c_str());
+		ImGui::Text(m_scene->GetName().c_str());
 		ImGui::Separator();
 
 		Entity * entityRightClicked = nullptr;
-		R_DrawSceneTree(scene.GetRoot(), entityRightClicked);
+		R_DrawSceneTree( m_scene->GetRoot(), entityRightClicked);
 		m_expandSceneHierarchy = false;
 
 		if (entityRightClicked != nullptr) {
@@ -65,18 +62,18 @@ namespace fan
 				}
 				// Entities templates
 				if ( ImGui::MenuItem( "Model" ) ) {
-					Entity *  newIntity = scene.CreateEntity("new model", m_lastEntityRightClicked );
+					Entity *  newIntity = m_scene->CreateEntity("new model", m_lastEntityRightClicked );
 					newIntity->AddComponent<Transform>();
 					newIntity->AddComponent<Model>();
 					newIntity->AddComponent<Material>();
 				}
 				if ( ImGui::MenuItem( "Point light" ) ) {
-					Entity *  newIntity = scene.CreateEntity( "new_point_light", m_lastEntityRightClicked );
+					Entity *  newIntity = m_scene->CreateEntity( "new_point_light", m_lastEntityRightClicked );
 					newIntity->AddComponent<Transform>();
 					newIntity->AddComponent<PointLight>();
 				}
 				if ( ImGui::MenuItem( "Dir light" ) ) {
-					Entity *  newIntity = scene.CreateEntity( "new_dir_light", m_lastEntityRightClicked );
+					Entity *  newIntity = m_scene->CreateEntity( "new_dir_light", m_lastEntityRightClicked );
 					newIntity->AddComponent<Transform>();
 					newIntity->AddComponent<DirectionalLight>();
 				}
@@ -94,7 +91,7 @@ namespace fan
 			// delete
 			ImGui::Separator();
 			if (ImGui::Selectable("Delete")) {
-				scene.DeleteEntity(m_lastEntityRightClicked);
+				m_scene->DeleteEntity(m_lastEntityRightClicked);
 			}
 			ImGui::EndPopup();
 		}
@@ -112,7 +109,6 @@ namespace fan
 	//================================================================================================================================
 	//================================================================================================================================
 	void SceneWindow::R_DrawSceneTree(Entity * _entityDrawn, Entity* & _entityRightClicked) {
-		Engine & engine = Engine::GetEngine();
 
 		std::stringstream ss;
 		ss << "##" << _entityDrawn; // Unique id
@@ -135,13 +131,13 @@ namespace fan
 			ImGui::EndDragDropTarget();
 		}
 		ImGui::SameLine();
-		bool selected = (_entityDrawn == engine.GetSelectedentity());
+		bool selected = ( _entityDrawn == m_entitySelected );
 
 		// Draw entity empty selectable to display a hierarchy
 		std::stringstream ss2;
 		ss2 << _entityDrawn->GetName() << "##" << _entityDrawn; // Unique id
 		if (ImGui::Selectable(ss2.str().c_str(), &selected)) {
-			engine.SetSelectedEntity(_entityDrawn);
+			onSelectEntity.Emmit( _entityDrawn );
 		}
 		if (ImGui::IsItemClicked(1)) {
 			_entityRightClicked = _entityDrawn;
@@ -179,9 +175,6 @@ namespace fan
 	//================================================================================================================================
 	void SceneWindow::NewEntityModal()
 	{
-		Engine & engine = Engine::GetEngine();
-		Scene & scene = engine.GetScene();
-
 		ImGui::SetNextWindowSize(ImVec2(200, 200));
 		if (ImGui::BeginPopupModal("New entity"))
 		{
@@ -201,9 +194,9 @@ namespace fan
 			{
 				if (std::string(m_textBuffer) != "") {
 					//Create new entity 
-					Entity* newentity = scene.CreateEntity(m_textBuffer, m_lastEntityRightClicked);
+					Entity* newentity = m_scene->CreateEntity(m_textBuffer, m_lastEntityRightClicked);
 					newentity->AddComponent<Transform>();
-					engine.SetSelectedEntity(newentity);
+					onSelectEntity.Emmit( newentity );
 					m_lastEntityRightClicked = nullptr;
 					ImGui::CloseCurrentPopup();
 				}

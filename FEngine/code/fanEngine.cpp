@@ -72,18 +72,21 @@ namespace fan {
 
 		// Initialize editor components
 		ms_engine = this;
-		m_mainMenuBar = new MainMenuBar();
-		m_renderWindow = new RenderWindow( m_renderer );
-		m_sceneWindow = new SceneWindow();
-		m_inspectorWindow = new InspectorWindow();
+		m_mainMenuBar		= new MainMenuBar();
+		m_renderWindow		= new RenderWindow( m_renderer );
+		m_sceneWindow		= new SceneWindow( m_scene );
+		m_inspectorWindow	= new InspectorWindow();
 		m_preferencesWindow = new PreferencesWindow();
-		m_consoleWindow = new ConsoleWindow();
+		m_consoleWindow		= new ConsoleWindow();
 
 		m_editorWindows.push_back( m_renderWindow );
 		m_editorWindows.push_back( m_sceneWindow );
 		m_editorWindows.push_back( m_inspectorWindow );
 		m_editorWindows.push_back( m_preferencesWindow );
 		m_editorWindows.push_back( m_consoleWindow );
+
+		m_sceneWindow->onSelectEntity.Connect( &Engine::SetSelectedEntity, this );
+		onEntitySelected.Connect( &SceneWindow::OnEntitySelected, m_sceneWindow );
 
 		Scene::s_onSceneClear.Connect			( &Renderer::Clear,				 m_renderer );
 		Material::onMaterialSetPath.Connect		( &Engine::OnMaterialSetTexture, this );
@@ -309,6 +312,13 @@ namespace fan {
 	void Engine::SetMainCamera( Camera * _mainCamera ) { 
 		m_mainCamera = _mainCamera; 
 		m_mainCamera->MarkModified();
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
+	void Engine::SetSelectedEntity( Entity * _selectedentity ) {
+		m_selectedentity = _selectedentity; 
+		onEntitySelected.Emmit( m_selectedentity );
 	}
 
 	//================================================================================================================================
