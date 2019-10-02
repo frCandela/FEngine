@@ -63,27 +63,27 @@ namespace fan {
 		m_editorGrid.linesCount = 10;
 		m_editorGrid.spacing = 1.f;		
 
-		// Initialize editor components
-		ms_engine = this;
-		m_mainMenuBar =			new MainMenuBar();
-		m_renderWindow =		new RenderWindow();
-		m_sceneWindow =			new SceneWindow();
-		m_inspectorWindow =		new InspectorWindow();
-		m_preferencesWindow =	new PreferencesWindow();
-		m_consoleWindow =		new ConsoleWindow();
-
-		m_editorWindows.push_back(m_renderWindow);              
-		m_editorWindows.push_back(m_sceneWindow);
-		m_editorWindows.push_back(m_inspectorWindow);
-		m_editorWindows.push_back(m_preferencesWindow);
-		m_editorWindows.push_back(m_consoleWindow);
-
 		m_renderer = new Renderer( windowSize, windowPosition );
 		Debug::Get().SetRenderer(m_renderer);
 
 		m_scene = new Scene("mainScene");
 		m_scene->s_onSceneLoad.Connect(&Engine::OnSceneLoad, this);
 		m_scene->New();
+
+		// Initialize editor components
+		ms_engine = this;
+		m_mainMenuBar = new MainMenuBar();
+		m_renderWindow = new RenderWindow( m_renderer );
+		m_sceneWindow = new SceneWindow();
+		m_inspectorWindow = new InspectorWindow();
+		m_preferencesWindow = new PreferencesWindow();
+		m_consoleWindow = new ConsoleWindow();
+
+		m_editorWindows.push_back( m_renderWindow );
+		m_editorWindows.push_back( m_sceneWindow );
+		m_editorWindows.push_back( m_inspectorWindow );
+		m_editorWindows.push_back( m_preferencesWindow );
+		m_editorWindows.push_back( m_consoleWindow );
 
 		Scene::s_onSceneClear.Connect			( &Renderer::Clear,				 m_renderer );
 		Material::onMaterialSetPath.Connect		( &Engine::OnMaterialSetTexture, this );

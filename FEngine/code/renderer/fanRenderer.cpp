@@ -168,45 +168,13 @@ namespace fan
 			}
 			
 			ImGui::GetIO().DisplaySize = ImVec2(static_cast<float>(m_swapchain->GetExtent().width), static_cast<float>(m_swapchain->GetExtent().height));
-			{
-				ImGui::Begin("RendererDebugTmp"); {
-					// Display mesh list
-					if (ImGui::CollapsingHeader("Loaded meshes : ")) {						
-						for (auto meshData : m_ressourceManager->GetMeshData()) {
-							ImGui::Text(meshData.second->GetPath().c_str());
-						}
-					}
-					// display textures list
-					const std::vector< Texture * > & textures = m_ressourceManager->GetTextures();
-					if (ImGui::CollapsingHeader("Loaded textures : ")) {
-						for (int textureIndex = 0; textureIndex < textures.size(); textureIndex++) {
-							const Texture * texture = textures[textureIndex];
-							std::stringstream ss;
-							ss << texture->GetSize().x << " " << texture->GetSize().x << "\t" << texture->GetPath();
-							ImGui::Text( ss.str().c_str() );
-						}						
-					}
 
-					if (ImGui::CollapsingHeader("Rendered Models : ")) {
-						for (uint32_t meshIndex = 0; meshIndex < m_numMesh; meshIndex++) {
-							const Mesh * mesh = m_meshDrawArray[meshIndex];
-							if( mesh != nullptr ){
-								ImGui::Text( mesh->GetPath().c_str());
-							}	
-							else {
-								ImGui::Text("Empty slot");
-							}
-						}
-					}
-				}
-			}
 			if (m_ressourceManager->IsModified()) {
 				WaitIdle();
 				m_forwardPipeline->Resize(m_swapchain->GetExtent());
 				m_ressourceManager->SetUnmodified();
 			}
 
-			ImGui::End();
 			ImGui::EndFrame();
 			ImGui::Render();
 

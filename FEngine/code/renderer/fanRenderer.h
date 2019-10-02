@@ -61,6 +61,8 @@ namespace fan
 		float GetWindowAspectRatio() const;
 		bool  HasNoDebugToDraw() const { return m_debugLinesNoDepthTest.empty() && m_debugLines.empty() && m_debugTriangles.empty(); }
 		void Clear() { m_numMesh = 0; }
+		uint32_t GetNumMesh() const { return m_numMesh; }
+		const std::array< Mesh *, GlobalValues::s_maximumNumModels > & GetMeshArray() const { return m_meshDrawArray; }
 
 		void					DebugPoint	  ( const btVector3 _pos, const Color _color);
 		void					DebugLine	  ( const btVector3 _start, const btVector3 _end, const Color _color, const bool _depthTestEnable = true);
@@ -72,7 +74,7 @@ namespace fan
 
 	private:
 		std::array< Mesh *, GlobalValues::s_maximumNumModels > m_meshDrawArray;
-		uint32_t								 m_numMesh;
+		uint32_t m_numMesh;
 
 		RessourceManager *  m_ressourceManager;
 
