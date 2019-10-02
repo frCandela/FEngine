@@ -7,7 +7,7 @@ namespace fan
 	class Component;
 
 	//================================================================================================================================
-	// Holds a list of inactive components. Allows editor to access the list of available components in the game
+	// Holds a list of inactive components. Allows editor to access the properties of available components in the game
 	//================================================================================================================================
 	class ComponentsRegister : public Singleton< ComponentsRegister> {
 		friend class Singleton<ComponentsRegister>;

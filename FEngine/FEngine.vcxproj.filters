@@ -271,9 +271,6 @@
     <ClCompile Include="code\game\fanGameManager.cpp">
       <Filter>code\game</Filter>
     </ClCompile>
-    <ClCompile Include="code\editor\components\ComponentsRegister.cpp">
-      <Filter>code\editor\components</Filter>
-    </ClCompile>
     <ClCompile Include="code\game\fanSpaceShip.cpp">
       <Filter>code\game</Filter>
     </ClCompile>
@@ -297,6 +294,9 @@
     </ClCompile>
     <ClCompile Include="code\renderer\core\fanPipeline.cpp">
       <Filter>code\renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="code\scene\fanComponentsRegister.cpp">
+      <Filter>code\scene</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -945,9 +945,6 @@
     <ClInclude Include="code\game\fanGameManager.h">
       <Filter>code\game</Filter>
     </ClInclude>
-    <ClInclude Include="code\editor\components\ComponentsRegister.h">
-      <Filter>code\editor\components</Filter>
-    </ClInclude>
     <ClInclude Include="code\game\fanSpaceShip.h">
       <Filter>code\game</Filter>
     </ClInclude>
@@ -1001,6 +998,9 @@
     </ClInclude>
     <ClInclude Include="code\renderer\core\fanPipeline.h">
       <Filter>code\renderer\core</Filter>
+    </ClInclude>
+    <ClInclude Include="code\scene\fanComponentsRegister.h">
+      <Filter>code\scene</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -1,5 +1,5 @@
 #include "fanGlobalIncludes.h"
-#include "editor/components/ComponentsRegister.h"
+#include "scene/fanComponentsRegister.h"
 
 namespace fan
 {

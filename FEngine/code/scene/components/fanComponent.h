@@ -4,7 +4,7 @@
 #include "core/fanTypeInfo.h"
 
 //Editor
-#include "editor/components/ComponentsRegister.h"
+#include "scene/fanComponentsRegister.h"
 
 namespace fan
 {

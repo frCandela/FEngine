@@ -23,8 +23,8 @@ namespace fan {
 
 	//================================================================================================================================
 	//================================================================================================================================
-	bool Mouse::GetButtonDown(const int  _GLFW_MOUSE_BUTTON) {
-		if ( ImGui::GetIO().WantCaptureMouse) {
+	bool Mouse::GetButtonDown(const int  _GLFW_MOUSE_BUTTON, const bool _overrideUI ) {
+		if ( !_overrideUI && ImGui::GetIO().WantCaptureMouse) {
 			return false;
 		} else {
 			return glfwGetMouseButton(Input::GetWindow(), _GLFW_MOUSE_BUTTON) == GLFW_PRESS;
@@ -33,8 +33,8 @@ namespace fan {
 
 	//================================================================================================================================
 	//================================================================================================================================
-	bool Mouse::GetButtonPressed(const int _GLFW_MOUSE_BUTTON)	{
-		if ( ImGui::GetIO().WantCaptureMouse) {
+	bool Mouse::GetButtonPressed(const int _GLFW_MOUSE_BUTTON, const bool _overrideUI )	{
+		if ( ! _overrideUI && ImGui::GetIO().WantCaptureMouse) {
 			return false;
 		}
 		else {
@@ -44,8 +44,8 @@ namespace fan {
 
 	//================================================================================================================================
 	//================================================================================================================================
-	bool Mouse::GetButtonReleased(const int _GLFW_MOUSE_BUTTON)	{
-		if ( ImGui::GetIO().WantCaptureMouse) {
+	bool Mouse::GetButtonReleased(const int _GLFW_MOUSE_BUTTON, const bool _overrideUI )	{
+		if ( !_overrideUI && ImGui::GetIO().WantCaptureMouse) {
 			return false;
 		}
 		else {

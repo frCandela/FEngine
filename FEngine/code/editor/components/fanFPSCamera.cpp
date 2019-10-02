@@ -52,7 +52,7 @@ namespace fan
 		if (Mouse::GetButtonPressed(Mouse::button1)) {
 			Mouse::LockCursor(true);
 		}
-		if (Mouse::GetButtonDown(Mouse::button1) == false ) {
+		if (Mouse::GetButtonDown(Mouse::button1, true ) == false ) {
 			Mouse::LockCursor(false);
 		}
 

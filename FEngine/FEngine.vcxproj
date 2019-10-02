@@ -106,7 +106,6 @@
     <ClCompile Include="code\core\math\shapes\fanTriangle.cpp" />
     <ClCompile Include="code\core\ressources\fanRessource.cpp" />
     <ClCompile Include="code\core\ressources\fanRessourcePtr.cpp" />
-    <ClCompile Include="code\editor\components\ComponentsRegister.cpp" />
     <ClCompile Include="code\editor\components\fanFPSCamera.cpp" />
     <ClCompile Include="code\editor\fanMainMenuBar.cpp" />
     <ClCompile Include="code\editor\fanModals.cpp" />
@@ -155,6 +154,7 @@
     <ClCompile Include="code\scene\components\fanModel.cpp" />
     <ClCompile Include="code\scene\components\fanPointLight.cpp" />
     <ClCompile Include="code\scene\components\fanTransform.cpp" />
+    <ClCompile Include="code\scene\fanComponentsRegister.cpp" />
     <ClCompile Include="code\scene\fanEntity.cpp" />
     <ClCompile Include="code\scene\fanScene.cpp" />
     <ClCompile Include="deps\imgui\imgui.cpp" />
@@ -189,7 +189,6 @@
     <ClInclude Include="code\core\memory\fanAlignedMemory.h" />
     <ClInclude Include="code\core\ressources\fanRessource.h" />
     <ClInclude Include="code\core\ressources\fanRessourcePtr.h" />
-    <ClInclude Include="code\editor\components\ComponentsRegister.h" />
     <ClInclude Include="code\editor\components\fanFPSCamera.h" />
     <ClInclude Include="code\editor\fanMainMenuBar.h" />
     <ClInclude Include="code\editor\fanModals.h" />
@@ -238,6 +237,7 @@
     <ClInclude Include="code\scene\components\fanModel.h" />
     <ClInclude Include="code\scene\components\fanPointLight.h" />
     <ClInclude Include="code\scene\components\fanTransform.h" />
+    <ClInclude Include="code\scene\fanComponentsRegister.h" />
     <ClInclude Include="code\scene\fanEntity.h" />
     <ClInclude Include="code\scene\fanScene.h" />
     <ClInclude Include="deps\glm\common.hpp" />
