@@ -18,9 +18,11 @@ Entities: 1 {
                         scale:    1 1 1
                     }
                     Camera: 1148216499 {
+                        type:         0
+                        orthoSize:    10
                         fov:          110
                         nearDistance: 0.01
-                        farDistance: 1000
+                        farDistance:  1000
                     }
                     GameManager: 1830802815 {
                         isEnabled: true

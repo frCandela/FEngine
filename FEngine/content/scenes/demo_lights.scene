@@ -31,7 +31,7 @@ Entities: 1 {
                         computeAABB: true
                         Components: 5 {
                             Transform: 1269105190 {
-                                position: -0.961581 1.27505 -1.75367
+                                position: -1.813 1.27505 0.844401
                                 rotation: 0 0 0 1
                                 scale:    0.1 0.1 0.1
                             }
@@ -63,7 +63,7 @@ Entities: 1 {
                         computeAABB: true
                         Components: 5 {
                             Transform: 1269105190 {
-                                position: 1.99949 1.27505 0.0453018
+                                position: 0.176422 1.27505 -1.9922
                                 rotation: 0 0 0 1
                                 scale:    0.1 0.1 0.1
                             }
@@ -95,7 +95,7 @@ Entities: 1 {
                         computeAABB: true
                         Components: 5 {
                             Transform: 1269105190 {
-                                position: -1.03861 1.27505 1.70918
+                                position: 1.63733 1.27505 1.14854
                                 rotation: 0 0 0 1
                                 scale:    0.1 0.1 0.1
                             }
@@ -127,7 +127,7 @@ Entities: 1 {
                         computeAABB: true
                         Components: 5 {
                             Transform: 1269105190 {
-                                position: 1.99948 1.27505 -0.0456552
+                                position: 0.176767 1.27505 1.99217
                                 rotation: 0 0 0 1
                                 scale:    0.1 0.1 0.1
                             }
@@ -159,7 +159,7 @@ Entities: 1 {
                         computeAABB: true
                         Components: 5 {
                             Transform: 1269105190 {
-                                position: -0.961244 1.27505 1.75386
+                                position: -1.81315 1.27505 -0.844087
                                 rotation: 0 0 0 1
                                 scale:    0.1 0.1 0.1
                             }
@@ -191,7 +191,7 @@ Entities: 1 {
                         computeAABB: true
                         Components: 5 {
                             Transform: 1269105190 {
-                                position: -1.03861 1.27505 -1.70918
+                                position: 1.63733 1.27505 -1.14854
                                 rotation: 0 0 0 1
                                 scale:    0.1 0.1 0.1
                             }

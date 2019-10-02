@@ -13,14 +13,16 @@ Entities: 1 {
                 computeAABB: true
                 Components: 4 {
                     Transform: 1269105190 {
-                        position: -3.8435 5.25 -3.77525
+                        position: 5.97143 5.25 1.89506
                         rotation: 0.707107 0 0 0.707107
                         scale:    1 1 1
                     }
                     Camera: 1148216499 {
+                        type:         1
+                        orthoSize:    10
                         fov:          110
                         nearDistance: 0.01
-                        farDistance: 1000
+                        farDistance:  1000
                     }
                     GameManager: 1830802815 {
                         isEnabled: true
@@ -61,7 +63,7 @@ Entities: 1 {
                         computeAABB: true
                         Components: 4 {
                             Transform: 1269105190 {
-                                position: -4.74898 0 -11.5152
+                                position: -3.91291 0 11.8254
                                 rotation: 0 0 0 1
                                 scale:    1 1 1
                             }
@@ -84,7 +86,7 @@ Entities: 1 {
                                 computeAABB: true
                                 Components: 4 {
                                     Transform: 1269105190 {
-                                        position: -7.27865 0 -12.7994
+                                        position: -2.09034 0 9.65132
                                         rotation: 0 0 0 1
                                         scale:    0.5 0.5 0.5
                                     }
@@ -112,7 +114,7 @@ Entities: 1 {
                         computeAABB: true
                         Components: 4 {
                             Transform: 1269105190 {
-                                position: -1.76368 0 -4.2766
+                                position: -1.45321 0 4.39182
                                 rotation: 0 0 0 1
                                 scale:    0.5 0.5 0.5
                             }
@@ -139,8 +141,8 @@ Entities: 1 {
                 computeAABB: true
                 Components: 4 {
                     Transform: 1269105190 {
-                        position: -3.8435 0 -3.77525
-                        rotation: 0 -0.997757 0 0.0629064
+                        position: 5.97143 0 1.89506
+                        rotation: 0 0.396715 0 -0.917639
                         scale:    0.1 0.1 0.1
                     }
                     Model: 1739103771 {

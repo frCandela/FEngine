@@ -16,6 +16,7 @@ namespace fan
 		m_aspectRatio = 1.f;
 		m_nearDistance = 0.01f;
 		m_farDistance = 1000.f;
+		m_orthoSize = 10.f;
 	}
 
 	//================================================================================================================================
@@ -34,8 +35,14 @@ namespace fan
 	//================================================================================================================================
 	glm::mat4 Camera::GetProjection() const
 	{
-		const float fov = glm::radians(m_fov);
-		glm::mat4 proj = glm::perspective(fov, m_aspectRatio, m_nearDistance, m_farDistance);
+		glm::mat4 proj = glm::mat4(1);
+		if ( m_type == Type::ORTHOGONAL ) {
+			proj = glm::ortho(-m_orthoSize * m_aspectRatio, m_orthoSize * m_aspectRatio,-m_orthoSize, m_orthoSize,m_nearDistance, m_farDistance);
+		} 
+		else if( m_type == Type::PERSPECTIVE )  {
+			const float fov = glm::radians( m_fov );
+			proj = glm::perspective( fov, m_aspectRatio, m_nearDistance, m_farDistance );
+		}
 		return proj;
 	}
 
@@ -80,6 +87,10 @@ namespace fan
 		m_fov = _fov;
 		MarkModified();
 	};
+	void Camera::SetOrthoSize( float _orthoSize ) {
+		m_orthoSize = _orthoSize;
+		MarkModified();
+	};
 	void Camera::SetNearDistance(float _nearDistance) {
 		m_nearDistance = _nearDistance;
 		MarkModified();
@@ -92,46 +103,77 @@ namespace fan
 		m_aspectRatio = _aspectRatio;
 		MarkModified();
 	};
+	void Camera::SetProjectionType( const Type _type ) {
+		m_type = _type;
+		MarkModified();
+	}
 
 	//================================================================================================================================
 	//================================================================================================================================
 	void Camera::OnGui() {
 		Component::OnGui();
 
-		// fov
-		if (ImGui::Button("##fov")) {
-			SetFov(110.f);
+		int item = static_cast<int>(m_type);
+		if ( ImGui::Combo( "type", &item, "perspective\0orthogonal\0" ) ) {
+			SetProjectionType( Type( item ) );
 		}
-		ImGui::SameLine();
-		float fov = GetFov();
-		if (ImGui::DragFloat("fov", &fov, 1.f, 1.f, 179.f)) {
-			SetFov(fov);
+
+		ImGui::Indent();
+		if ( m_type == Type::PERSPECTIVE ) {
+			// fov
+			if (ImGui::Button("##fov")) {
+				SetFov(110.f);
+			}
+			ImGui::SameLine();
+			float fov = GetFov();
+			if (ImGui::DragFloat("fov", &fov, 1.f, 1.f, 179.f)) {
+				SetFov(fov);
+			}
+		} else if ( m_type == Type::ORTHOGONAL ) {
+			// fov
+			if ( ImGui::Button( "##size" ) ) {
+				m_orthoSize = 10.f;
+			}
+			ImGui::SameLine();
+			if ( ImGui::DragFloat( "size", &m_orthoSize, 1.f, 0.f, 100.f ) ) {
+				SetOrthoSize(m_orthoSize);
+			}
 		}
 
 		// nearDistance
-		if (ImGui::Button("##nearDistance")) {
-			SetNearDistance(0.01f);
+		if ( ImGui::Button( "##nearDistance" ) ) {
+			SetNearDistance( 0.01f );
 		}
 		ImGui::SameLine();
 		float near = GetNearDistance();
-		if (ImGui::DragFloat("near distance", &near, 0.001f, 0.01f, 10.f)) {
-			SetNearDistance(near);
+		if ( ImGui::DragFloat( "near distance", &near, 0.001f, 0.01f, 10.f ) ) {
+			SetNearDistance( near );
 		}
 
 		// far distance
-		if (ImGui::Button("##fardistance")) {
-			SetFarDistance(1000.f);
+		if ( ImGui::Button( "##fardistance" ) ) {
+			SetFarDistance( 1000.f );
 		}
 		ImGui::SameLine();
 		float far = GetFarDistance();
-		if (ImGui::DragFloat("far distance", &far, 10.f, 0.05f, 10000.f)) {
-			SetFarDistance(far);
+		if ( ImGui::DragFloat( "far distance", &far, 10.f, 0.05f, 10000.f ) ) {
+			SetFarDistance( far );
 		}
+
+		ImGui::Unindent();
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
 	bool Camera::Load(std::istream& _in) {
+		if ( !ReadSegmentHeader( _in, "type:" ) ) { return false; }
+		int type;
+		if ( !ReadInteger( _in, type ) ) { return false; }
+		m_type = Type( type );
+
+		if ( !ReadSegmentHeader( _in, "orthoSize:" ) ) { return false; }
+		if ( !ReadFloat( _in, m_orthoSize ) ) { return false; }
+
 		if (!ReadSegmentHeader(_in, "fov:")) { return false; }
 		if (!ReadFloat(_in, m_fov)) { return false; }
 
@@ -147,9 +189,11 @@ namespace fan
 	//================================================================================================================================
 	bool Camera::Save(std::ostream& _out, const int _indentLevel) const {
 		const std::string indentation = GetIndentation(_indentLevel);
+		_out << indentation << "type:         " << m_type << std::endl;
+		_out << indentation << "orthoSize:    " << m_orthoSize << std::endl;
 		_out << indentation << "fov:          " << m_fov << std::endl;
 		_out << indentation << "nearDistance: " << m_nearDistance << std::endl;
-		_out << indentation << "farDistance: " << m_farDistance << std::endl;
+		_out << indentation << "farDistance:  " << m_farDistance << std::endl;
 		return true;
 	}
 }
