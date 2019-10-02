@@ -33,7 +33,6 @@ namespace fan
 		DECLARE_EDITOR_COMPONENT(PointLight)
 		DECLARE_TYPE_INFO(PointLight);
 	protected:
-		PointLight();
 		void OnAttach() override;
 		void OnDetach() override;
 

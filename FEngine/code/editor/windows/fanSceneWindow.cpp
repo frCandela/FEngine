@@ -5,6 +5,10 @@
 #include "scene/fanScene.h"
 #include "scene/fanEntity.h"
 #include "scene/components/fanTransform.h"
+#include "scene/components/fanMaterial.h"
+#include "scene/components/fanModel.h"
+#include "scene/components/fanPointLight.h"
+#include "scene/components/fanDirectionalLight.h"
 #include "core/input/fanInput.h"
 #include "core/input/fanKeyboard.h"
 #include "core/input/fanMouse.h"
@@ -47,15 +51,47 @@ namespace fan
 			m_lastEntityRightClicked = entityRightClicked;
 		}
 
+		// Popup set entity when right clic
 		bool newEntityPopup = false;
 		bool renameEntityPopup = false;
 		if (ImGui::BeginPopup("scene_window_entity_rclicked")) {
-			if (ImGui::Selectable("New entity")) {
+
+			// New entity 
+			bool itemClicked = false;
+			if (ImGui::BeginMenu("New entity")) {
+				// Popup empty entity
+				if ( ImGui::IsItemClicked() ) {
+					itemClicked = true;
+				}
+				// Entities templates
+				if ( ImGui::MenuItem( "Model" ) ) {
+					Entity *  newIntity = scene.CreateEntity("new model", m_lastEntityRightClicked );
+					newIntity->AddComponent<Transform>();
+					newIntity->AddComponent<Model>();
+					newIntity->AddComponent<Material>();
+				}
+				if ( ImGui::MenuItem( "Point light" ) ) {
+					Entity *  newIntity = scene.CreateEntity( "new_point_light", m_lastEntityRightClicked );
+					newIntity->AddComponent<Transform>();
+					newIntity->AddComponent<PointLight>();
+				}
+				if ( ImGui::MenuItem( "Dir light" ) ) {
+					Entity *  newIntity = scene.CreateEntity( "new_dir_light", m_lastEntityRightClicked );
+					newIntity->AddComponent<Transform>();
+					newIntity->AddComponent<DirectionalLight>();
+				}
+				ImGui::EndMenu();
+			}
+			if ( ImGui::IsItemClicked() ) {
 				newEntityPopup = true;
 			}
+
+			// rename
 			if (ImGui::Selectable("Rename")) {
 				renameEntityPopup = true;
 			}
+
+			// delete
 			ImGui::Separator();
 			if (ImGui::Selectable("Delete")) {
 				scene.DeleteEntity(m_lastEntityRightClicked);
@@ -63,6 +99,7 @@ namespace fan
 			ImGui::EndPopup();
 		}
 
+		// Modals
 		if (newEntityPopup) {
 			ImGui::OpenPopup("New entity");
 		} NewEntityModal();

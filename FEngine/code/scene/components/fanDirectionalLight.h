@@ -27,7 +27,6 @@ namespace fan {
 		DECLARE_EDITOR_COMPONENT( DirectionalLight )
 		DECLARE_TYPE_INFO( DirectionalLight );
 	protected:
-		DirectionalLight();
 		void OnAttach() override;
 		void OnDetach() override;
 

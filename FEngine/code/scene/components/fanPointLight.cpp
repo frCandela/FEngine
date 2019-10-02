@@ -15,18 +15,6 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	PointLight::PointLight() : 
-		m_ambiant  ( Color::White),
-		m_diffuse  ( Color::White),
-		m_specular ( Color::White) 
-	{
-		m_attenuation[Attenuation::CONSTANT] = 0;
-		m_attenuation[Attenuation::LINEAR] = 0;
-		m_attenuation[Attenuation::QUADRATIC] = 0.1f;
-	}
-
-	//================================================================================================================================
-	//================================================================================================================================
 	void PointLight::SetAmbiant(const Color _ambiant) {
 		m_ambiant = _ambiant;
 		MarkModified();
@@ -69,6 +57,12 @@ namespace fan
 	//================================================================================================================================
 	void PointLight::OnAttach() {
 		Component::OnAttach();
+		m_ambiant  = Color::White ;
+		m_diffuse  = Color::White ;
+		m_specular = Color::White ;
+		m_attenuation[Attenuation::CONSTANT] = 0;
+		m_attenuation[Attenuation::LINEAR] = 0;
+		m_attenuation[Attenuation::QUADRATIC] = 0.1f;
 		onPointLightAttach.Emmit(this);
 	}
 
