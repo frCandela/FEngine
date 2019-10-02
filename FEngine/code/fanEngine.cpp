@@ -71,7 +71,7 @@ namespace fan {
 		m_renderWindow		= new RenderWindow( m_renderer );
 		m_sceneWindow		= new SceneWindow( m_scene );
 		m_inspectorWindow	= new InspectorWindow();
-		m_preferencesWindow = new PreferencesWindow();
+		m_preferencesWindow = new PreferencesWindow( m_renderer );
 		m_consoleWindow		= new ConsoleWindow();
 		m_mainMenuBar		= new MainMenuBar( *m_scene, m_editorGrid );
 		m_mainMenuBar->SetWindows( m_renderWindow , m_sceneWindow , m_inspectorWindow , m_preferencesWindow, m_consoleWindow );
@@ -470,19 +470,6 @@ namespace fan {
 	//================================================================================================================================
 	//================================================================================================================================
 	void Engine::DrawUI() {
-		ImGui::Begin( "Lights" ); {
-			if ( ImGui::CollapsingHeader( "Directional lights : " ) ) {
-				for ( int lightIndex = 0; lightIndex < m_directionalLights.size(); lightIndex++ ) {
-					ImGui::Text( m_directionalLights[lightIndex]->GetEntity()->GetName().c_str() );
-				}
-			}
-
-			if ( ImGui::CollapsingHeader( "Point lights : " ) ) {
-				for ( int lightIndex = 0; lightIndex < m_pointLights.size(); lightIndex++ ) {
-					ImGui::Text( m_pointLights[lightIndex]->GetEntity()->GetName().c_str() );
-				}
-			}
-		} ImGui::End();
 		//***************************************************************************************MYLITTLESPACE
 // 		ImGui::Begin("test"); {
 // 

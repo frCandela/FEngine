@@ -8,6 +8,7 @@
 #include "renderer/fanRenderer.h"
 #include "renderer/core/fanTexture.h"
 #include "renderer/fanRessourceManager.h"
+#include "renderer/pipelines/fanForwardPipeline.h"
 #include "core/fanTime.h"
 
 namespace fan
@@ -23,22 +24,6 @@ namespace fan
 	//================================================================================================================================
 	//================================================================================================================================
 	void RenderWindow::OnGui() {
-		if (ImGui::CollapsingHeader("Post-processing")) {
-			// Filter color
-			glm::vec4& color = m_renderer->GetPostprocessPipeline()->uniforms.color;
-			if (ImGui::ColorEdit3("Filter##1", &color[0], gui::colorEditFlags)) {
-				m_renderer->GetPostprocessPipeline()->UpdateUniformBuffers();
-			}
-		}
-
-		if (ImGui::CollapsingHeader("Global")) {
-			// Clear color
-			glm::vec4 clearColor = m_renderer->GetClearColor();
-			if (ImGui::ColorEdit3("Clear color", &clearColor.r, gui::colorEditFlags)) {
-				m_renderer->SetClearColor(clearColor);
-			}
-		}
-
 		RessourceManager * ressourceManager = m_renderer->GetRessourceManager();
 		// Display mesh list
 		if ( ImGui::CollapsingHeader( "Loaded meshes : " ) ) {
@@ -66,6 +51,24 @@ namespace fan
 				} else {
 					ImGui::Text( "Empty slot" );
 				}
+			}
+		}
+
+		LightsUniforms & lights = m_renderer->GetForwardPipeline()->m_lightUniforms;
+		if ( ImGui::CollapsingHeader( "Directional lights : " ) ) {
+			for ( size_t lightIndex = 0; lightIndex < lights.dirLightsNum; lightIndex++ ) {
+				DirectionalLightUniform light  = lights.dirLights[lightIndex];
+				ImGui::PushItemWidth(150); ImGui::DragFloat3("dir ", &light.direction[0] );
+				ImGui::SameLine();
+				ImGui::ColorEdit3( "diffuse", &light.diffuse[0], gui::colorEditFlags );
+			}
+		}
+		if ( ImGui::CollapsingHeader( "Point lights : " ) ) {
+			for ( size_t lightIndex = 0; lightIndex < lights.pointLightNum; lightIndex++ ) {
+				PointLightUniform& light = lights.pointlights[lightIndex];
+				ImGui::PushItemWidth( 150 ); ImGui::DragFloat3( "pos ##pos", &light.position[0] );
+				ImGui::SameLine();
+				ImGui::ColorEdit3( "diffuse", &light.diffuse[0], gui::colorEditFlags );
 			}
 		}
 	}

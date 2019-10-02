@@ -9,8 +9,6 @@
 #include "scene/fanEntity.h"
 #include "scene/components/fanTransform.h"
 #include "scene/components/fanCamera.h"
-#include "renderer/fanRenderer.h"
-
 
 namespace fan {
 	REGISTER_EDITOR_COMPONENT(CameraController);
