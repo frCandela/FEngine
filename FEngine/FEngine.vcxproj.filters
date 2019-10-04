@@ -68,6 +68,12 @@
     <Filter Include="code\deps\quickhull">
       <UniqueIdentifier>{44acb24b-72dd-4b2d-8cd3-41c926ff8f80}</UniqueIdentifier>
     </Filter>
+    <Filter Include="code\core\ecs">
+      <UniqueIdentifier>{357d54ad-d1f0-4477-b80c-1bfb8e5c08ca}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="code\core\meta">
+      <UniqueIdentifier>{14e822f4-e834-4ad6-aa6e-ec83ea9d8b56}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="deps\imgui\imgui.cpp">
@@ -1007,6 +1013,9 @@
     </ClInclude>
     <ClInclude Include="code\editor\fanEditorGrid.h">
       <Filter>code\editor</Filter>
+    </ClInclude>
+    <ClInclude Include="code\core\meta\fanTypeList.h">
+      <Filter>code\core\meta</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
