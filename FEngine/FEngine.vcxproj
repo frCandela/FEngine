@@ -188,6 +188,9 @@
     <ClInclude Include="code\core\math\shapes\fanShape.h" />
     <ClInclude Include="code\core\math\shapes\fanTriangle.h" />
     <ClInclude Include="code\core\memory\fanAlignedMemory.h" />
+    <ClInclude Include="code\core\meta\fanArrayTuple.h" />
+    <ClInclude Include="code\core\meta\fanHelpers.h" />
+    <ClInclude Include="code\core\meta\fanTuple.h" />
     <ClInclude Include="code\core\meta\fanTypeList.h" />
     <ClInclude Include="code\core\ressources\fanRessource.h" />
     <ClInclude Include="code\core\ressources\fanRessourcePtr.h" />

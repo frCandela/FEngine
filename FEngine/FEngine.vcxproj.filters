@@ -1017,6 +1017,15 @@
     <ClInclude Include="code\core\meta\fanTypeList.h">
       <Filter>code\core\meta</Filter>
     </ClInclude>
+    <ClInclude Include="code\core\meta\fanHelpers.h">
+      <Filter>code\core\meta</Filter>
+    </ClInclude>
+    <ClInclude Include="code\core\meta\fanArrayTuple.h">
+      <Filter>code\core\meta</Filter>
+    </ClInclude>
+    <ClInclude Include="code\core\meta\fanTuple.h">
+      <Filter>code\core\meta</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="code\core\math\fanBasicModels.inl">
