@@ -1020,10 +1020,10 @@
     <ClInclude Include="code\core\meta\fanHelpers.h">
       <Filter>code\core\meta</Filter>
     </ClInclude>
-    <ClInclude Include="code\core\meta\fanArrayTuple.h">
+    <ClInclude Include="code\core\meta\fanTuple.h">
       <Filter>code\core\meta</Filter>
     </ClInclude>
-    <ClInclude Include="code\core\meta\fanTuple.h">
+    <ClInclude Include="code\core\meta\fanVectorTuple.h">
       <Filter>code\core\meta</Filter>
     </ClInclude>
   </ItemGroup>

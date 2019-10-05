@@ -4,39 +4,36 @@ namespace meta {
 	//================================================================================================================================
 	// Simple id
 	//================================================================================================================================
-	template< typename _Type >
-	struct Id {
-		using type = _Type;
+	template< typename _type >
+	class Id {
+	public:
+		using type = _type;
 	};
 
 	//================================================================================================================================
 	// List of size_t args
 	//================================================================================================================================
-	template< size_t ... _Args >
-	struct SizeList : Id< SizeList< _Args... > > {};
+	template< size_t ... _args >
+	class SizeList : public Id< SizeList< _args... > > {};
+
+	//================================================================================================================================
+	// Range impl
+	//================================================================================================================================
+	namespace impl {
+		template< size_t _index, size_t... _range > struct RangeImpl;
+
+		// Specialization 
+		template< size_t... _range >
+		struct RangeImpl< 0, _range...> : SizeList<_range...> {};
+
+		// General case
+		template< size_t _index, size_t... _range >
+		struct RangeImpl : RangeImpl< _index -1, _index -1, _range...>{};
+	}
 
 	//================================================================================================================================
 	// Range
 	// given L>=0, generate sequence <0, ..., L-1>
 	//================================================================================================================================
-	template< size_t _N, size_t... _Range > struct RangeImpl;
-
-	template< size_t... _Range >
-	struct RangeImpl< 0, _Range...> : SizeList<_Range...> {};
-
-	template< size_t _N, size_t... _Range >
-	struct RangeImpl : RangeImpl< _N-1, _N-1, _Range...>{};
-
-	template< size_t _N> struct Range : RangeImpl<_N - 1, _N - 1>{};
-
-	//================================================================================================================================
-	// choose N-th element in list <T...>
-	//================================================================================================================================
-	template<size_t _N, typename ... _List > struct Choose;
-
-	template<typename _Head, typename ... _List>
-	struct Choose<0, _Head, _List... > : Id<_Head> {};
-	
-	template<size_t _N, typename _Head, typename ... _List>
-	struct Choose<_N, _Head, _List...> : Choose<_N-1, _List...> {};
+	template< size_t _index> class Range : public impl::RangeImpl<_index - 1, _index - 1>{};
 }

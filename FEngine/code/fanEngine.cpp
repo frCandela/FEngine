@@ -17,6 +17,7 @@
 #include "core/math/shapes/fanAABB.h"
 #include "core/math/fanBasicModels.h"
 #include "core/files/fanFbxImporter.h"
+#include "core/ecs/fanECSManager.h"
 #include "editor/fanModals.h"
 #include "editor/fanMainMenuBar.h"
 #include "editor/windows/fanRenderWindow.h"	
@@ -66,6 +67,7 @@ namespace fan {
 
 		m_renderer = new Renderer( windowSize, windowPosition );
 		m_scene = new Scene("mainScene");
+		//m_ECSManager = new EcsManager();
 
 		// Initialize editor components
 		m_renderWindow		= new RenderWindow( m_renderer );
