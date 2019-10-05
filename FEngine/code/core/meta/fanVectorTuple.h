@@ -6,44 +6,62 @@
 #include <bitset>
 
 namespace meta {
-	//================================================================================================================================
-	// Array Element
-	//================================================================================================================================
-// 	template < typename _Type, size_t _Index >
-// 	struct	VectorData {
-// 		std::vector<_Type>		vector;
-// 		static constexpr size_t index = 3;
-// 	};
+	namespace impl {
+		//================================================================================================================================
+		// VectorData 
+		// Contains a vector of _type and it's associated bitset
+		//================================================================================================================================
+		template < typename _type, size_t _index, size_t _count >
+		struct	VectorData {
+			std::vector<_type>		vector;
+			static constexpr std::bitset<_count> mask = std::bitset < _count>(1 << _index);
+		};
+
+		//================================================================================================================================
+		// VectorElement
+		// Defines data for a specific _type at an _index
+		// _count is the number of VectorElements of the VectorTuple
+		//================================================================================================================================
+		template < typename _type, size_t _index, size_t _count >
+		struct	VectorElement {
+			VectorData<_type, _index, _count > data;
+		};
+
+		//================================================================================================================================
+		// VectorTupleImpl
+		// Inherits multiples VectorElement of differents types
+		// Get() gives access to differents elements of the VectorTuple
+		//================================================================================================================================
+		template < typename... _types >	struct VectorTupleImpl;	
+		template < template< size_t...> typename _SizeList, size_t... _sizes, typename... _types  >
+		struct VectorTupleImpl< _SizeList<_sizes...>, _types... > : VectorElement<_types, _sizes, sizeof...( _types )>...
+		{		
+		private:
+			// returns the index of the corresponding _type
+			template < typename _type >	using indexElement = typename Find::Type< _type,  _types... >;
+
+		public:
+			// Returns the vector data of the corresponding _type
+			template < typename _type >
+			VectorData< _type, indexElement<_type>::value, sizeof...( _types )  >& Get() {
+ 				return  VectorElement< _type, indexElement<_type>::value, sizeof...( _types )  >::data;
+ 			}
+		};
+	}
 
 	//================================================================================================================================
-	// VectorTupleImpl
+	// Vector Tuple
+	// Generates a vectors & bitset for every type of _types... 
 	//================================================================================================================================
-// 	template < typename _Type >
-// 	struct VectorElement
-// 	{
-// 		VectorData <_Type, 0 > data;
-// 	};
-
-	//================================================================================================================================
-	// Array Tuple
-	// No duplicates types are allowed
-	//================================================================================================================================
-// 	template < typename... _Types >
-// 	struct	VectorTuple  : VectorElement < _Types >...
-// 	{
-// 	private:
-// 		template < typename _Type >	using index = Find< _Type, _Types...>::index;
-// 
-// 	public:
-// 		// Number of types in the tuple
-// 		static constexpr size_t size = sizeof...( _Types );
-// 
-// 		// Returns the VectorData of a _Type
-// 		template < typename _Type >
-// 		VectorData< _Type, index<_Type>::index  >& Get() {
-// 			return  VectorElement< _Type >::data;
-// 		}
-// 	};
+	template< typename..._types > class VectorTuple;
+	
+	// Tuple with a TypeList argument
+	template< template < typename... > typename TypeList, typename... _types >
+	class VectorTuple<TypeList<_types...> >  : public impl::VectorTupleImpl < typename Range< sizeof...( _types ) >::type, _types... >
+	{
+	public:
+		static constexpr size_t size = sizeof...( _types );		// Number of types in the tuple
+	};
 
 }
 
