@@ -28,6 +28,8 @@ FEngine is my 3D game engine. It uses Vulkan for Rendering, Dear ImGui for user 
 * spirv compilation: [glslang](https://github.com/KhronosGroup/glslang)
 * UI: [Dear ImGui <3](https://github.com/ocornut/imgui)
 * rendering : [VulkanSDK 1.1.106.0](https://vulkan.lunarg.com/sdk/home)
+* bitsets : [ClaasBontus - bitset2](https://github.com/ClaasBontus/bitset2)
+
 	
 ## Screenshots
 ![Editor preview](/FEngine/docs/screenshot.png)

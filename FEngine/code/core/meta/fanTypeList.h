@@ -7,8 +7,11 @@ namespace meta {
 	//================================================================================================================================
 	// List of types
 	//================================================================================================================================
-	template <typename... Types>
-	class TypeList {};
+	template <typename... _types>
+	class TypeList {
+	public:
+		static constexpr size_t count = sizeof...( _types );
+	};
 
 	//================================================================================================================================
 	// Extract N-th type in a list of types
@@ -43,12 +46,15 @@ namespace meta {
 		};
 	};
 
+	// Testing
+	namespace impl {
+		using types = meta::TypeList<std::string, int, char, float>;
+		static_assert( std::is_same < Extract::List<0, types>::value, std::string>::value );
+		static_assert( std::is_same< Extract::List<2, types>::value, char >::value );
+	}
+
 	//================================================================================================================================
 	// Finds the index of the first _Type element in a _List
-	// Example:
-	//	using types = meta::TypeList<std::string, int, char, float>;
-	//	Extract::List<1, types>::value var = Find::Type<char, std::string, int, char, float >::value;
-	//	Extract::List<1, types>::value var2 = Find::List< float, types >::value;
 	//================================================================================================================================
 	class Find {		
 		template<  typename _type, size_t _Index, typename _head, typename ... _tail > struct FindImpl;
@@ -76,4 +82,89 @@ namespace meta {
 			static constexpr size_t value = typename FindImpl<_element, 0, _types...>::Get();
 		};
 	};
+
+	// Testing
+	namespace impl {
+		using types = meta::TypeList<std::string, int, char, float>;
+		static_assert( Find::List<char, types>::value == 2 );
+		static_assert( Find::List<std::string, types>::value == 0 );
+	}
+
+	//================================================================================================================================
+	// class Concat
+	// Merges a group of typelists into one
+	//================================================================================================================================
+	template< typename... _typeLists >
+	class Concat {
+	private:
+		// Special concat for 2 elements
+		template< typename _type1, typename _type2 > struct Concat2;
+		template< template <typename...> typename TypeList, typename... _types1, typename... _types2 >
+		struct Concat2<TypeList<_types1...>, TypeList<_types2...>> {
+			using type = TypeList<_types1..., _types2...>;
+		};
+
+		// Decl
+		template< typename... _types > struct ConcatImpl;
+
+		// Specialization 
+		template< typename _type1, typename _type2 >
+		struct ConcatImpl<_type1, _type2 > {
+			using type = typename Concat2<_type1, _type2>::type;
+		};
+
+		// General case
+		template< typename _type1, typename _type2, typename... _rest >
+		struct ConcatImpl<_type1, _type2, _rest... > {
+			using type = typename ConcatImpl< typename Concat2<_type1, _type2 >::type, _rest...>::type;
+		};
+
+	public:
+		using type = typename ConcatImpl<_typeLists...>::type;
+	};
+
+	// Testing
+	namespace impl {
+		using ConcatTest = typename Concat< TypeList<int, float>, TypeList<>, TypeList<char>>::type;
+		using ConcatResult = TypeList<int, float, char>;
+		static_assert( std::is_same<ConcatTest, ConcatResult>::value );
+	}
+
+	//================================================================================================================================
+	// Creates a new typeList using the filter passed as an argument
+	//================================================================================================================================
+	template< template< typename> typename _predicate, typename... _types >
+	class Filter {
+	private:
+		// General case (true)
+		template <typename T, bool>
+		struct FilterIfResult {
+			using type = TypeList<T>;
+		};
+		// Specialization (false)
+		template < typename T >
+		struct FilterIfResult<T, false> {
+			using type = TypeList<>;
+		};
+
+		// Helper
+		template< typename _type, template< typename> typename _predicate >
+		struct FilterImpl {
+			using value = typename FilterIfResult< _type, _predicate<_type>::value >::type;
+		};
+
+	public:
+		using type = typename Concat< typename FilterImpl< _types, _predicate>::value...>::type;
+	};
+
+	// Testing
+	namespace impl {
+		class A{};
+		class B{};
+		class C{};
+		template< typename _type > struct IsClassA { static constexpr bool value = std::is_same< A, _type >::value; };
+		using testFilter = meta::Filter< IsClassA, C, A, A, B,C, B, A, B, B>::type;
+		using testFilterResult = meta::TypeList<A, A, A>;
+		static_assert( std::is_same< testFilter, testFilterResult >::value );
+	}
 }

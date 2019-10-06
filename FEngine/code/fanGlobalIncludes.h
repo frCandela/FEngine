@@ -13,6 +13,7 @@
 #include "bullet/btBulletDynamicsCommon.h"
 
 #include "nlohmann_json.h"
+#include "bitset2/bitset2.hpp"
 
 #define GLFW_INCLUDE_VULKAN
 #include "glfw/glfw3.h"

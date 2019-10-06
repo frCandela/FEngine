@@ -85,6 +85,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="code\core\ecs\fanECSManager.cpp" />
     <ClCompile Include="code\core\fanDebug.cpp" />
     <ClCompile Include="code\core\fanISerializable.cpp" />
     <ClCompile Include="code\core\fanTime.cpp" />
@@ -164,6 +165,10 @@
     <ClCompile Include="deps\quickhull\QuickHull.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="code\core\ecs\fanComponentsBitset.h" />
+    <ClInclude Include="code\core\ecs\fanComponentsTuple.h" />
+    <ClInclude Include="code\core\ecs\fanEcsConfig.h" />
+    <ClInclude Include="code\core\ecs\fanECSManager.h" />
     <ClInclude Include="code\core\fanDebug.h" />
     <ClInclude Include="code\core\fanHash.h" />
     <ClInclude Include="code\core\fanISerializable.h" />
@@ -188,7 +193,6 @@
     <ClInclude Include="code\core\math\shapes\fanShape.h" />
     <ClInclude Include="code\core\math\shapes\fanTriangle.h" />
     <ClInclude Include="code\core\memory\fanAlignedMemory.h" />
-    <ClInclude Include="code\core\meta\fanVectorTuple.h" />
     <ClInclude Include="code\core\meta\fanHelpers.h" />
     <ClInclude Include="code\core\meta\fanTuple.h" />
     <ClInclude Include="code\core\meta\fanTypeList.h" />

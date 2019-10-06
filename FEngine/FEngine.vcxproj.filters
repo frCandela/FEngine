@@ -307,6 +307,9 @@
     <ClCompile Include="code\editor\fanEditorGrid.cpp">
       <Filter>code\editor</Filter>
     </ClCompile>
+    <ClCompile Include="code\core\ecs\fanECSManager.cpp">
+      <Filter>code\core\ecs</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="code\editor\fanMainMenuBar.h">
@@ -1023,8 +1026,17 @@
     <ClInclude Include="code\core\meta\fanTuple.h">
       <Filter>code\core\meta</Filter>
     </ClInclude>
-    <ClInclude Include="code\core\meta\fanVectorTuple.h">
-      <Filter>code\core\meta</Filter>
+    <ClInclude Include="code\core\ecs\fanECSManager.h">
+      <Filter>code\core\ecs</Filter>
+    </ClInclude>
+    <ClInclude Include="code\core\ecs\fanEcsConfig.h">
+      <Filter>code\core\ecs</Filter>
+    </ClInclude>
+    <ClInclude Include="code\core\ecs\fanComponentsBitset.h">
+      <Filter>code\core\ecs</Filter>
+    </ClInclude>
+    <ClInclude Include="code\core\ecs\fanComponentsTuple.h">
+      <Filter>code\core\ecs</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
