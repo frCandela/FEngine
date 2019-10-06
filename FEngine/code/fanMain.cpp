@@ -2,15 +2,16 @@
 
 #include "fanEngine.h"
 
+void RunGame();
+
 int main()
 {	
-	{
-		fan::Engine engine;
-		engine.Run();
-	}
-	
-	int wait;
-	std::cin >> wait;
-
+	RunGame();
 	return 0;
+}
+
+// Can you guess what this function does :3
+void RunGame() {
+	fan::Engine engine;
+	engine.Run();
 }

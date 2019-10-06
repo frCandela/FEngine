@@ -1032,10 +1032,10 @@
     <ClInclude Include="code\core\ecs\fanEcsConfig.h">
       <Filter>code\core\ecs</Filter>
     </ClInclude>
-    <ClInclude Include="code\core\ecs\fanComponentsBitset.h">
+    <ClInclude Include="code\core\ecs\fanComponentsTuple.h">
       <Filter>code\core\ecs</Filter>
     </ClInclude>
-    <ClInclude Include="code\core\ecs\fanComponentsTuple.h">
+    <ClInclude Include="code\core\ecs\fanBitsetCreator.h">
       <Filter>code\core\ecs</Filter>
     </ClInclude>
   </ItemGroup>
