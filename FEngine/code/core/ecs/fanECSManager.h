@@ -2,34 +2,25 @@
 
 #include "core/ecs/fanEcsConfig.h"
 #include "core/ecs/fanComponentsTuple.h"
+#include "core/ecs/EntityData.h"
 
 namespace fan {
 	//================================================================================================================================
 	//================================================================================================================================
 	class EcsManager {
 	public:
-
- 		void OnGui();
+		EcsManager();
 	
-		CEntity CreateEntity() {
-			if ( m_deletedEntities.empty() ) {
-				return m_nextEntity++;
-			} else {
-				CEntity entity = m_deletedEntities[ m_deletedEntities.size() - 1];
-				m_deletedEntities.pop_back();
-				return entity;
-			}
-		}
+		CEntity CreateEntity();
+		void	DeleteEntity( const CEntity  _entity);
 
-		void DeleteEntity( const CEntity  _entity) {
-			m_deletedEntities.push_back( _entity );
-		}
+		void OnGui();
 
 	private:
-
 		ComponentsTuple< Components > m_components;
+		std::vector<EntityData>		  m_entitiesData;
 
-		CEntity m_nextEntity = 0;
-		std::vector< CEntity > m_deletedEntities;
+		CEntity m_lastEntity = 0;
+		CEntity m_lastActiveEntity = 0;
  	};
 }

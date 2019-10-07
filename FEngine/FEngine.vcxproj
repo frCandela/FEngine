@@ -165,6 +165,7 @@
     <ClCompile Include="deps\quickhull\QuickHull.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="code\core\ecs\EntityData.h" />
     <ClInclude Include="code\core\ecs\fanBitsetCreator.h" />
     <ClInclude Include="code\core\ecs\fanComponentsTuple.h" />
     <ClInclude Include="code\core\ecs\fanECSManager.h" />

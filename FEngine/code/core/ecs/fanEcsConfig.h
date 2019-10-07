@@ -50,7 +50,9 @@ namespace fan {
 	//================================================================================================================================
 	using CEntity = uint32_t; 
 	using Bitset = Bitset2::bitset2< 32 >;
-	static_assert( Components::count + Tags::count  <= 32 );
+	static_assert( Components::count + Tags::count <= 32 );
+
+	static constexpr uint32_t aliveBit = Components::count + Tags::count + 1;
 
 	using BitsetsComponents = BitsetCreator<Bitset, Components>;
 	using BitsetsTags		= BitsetCreator<Bitset, Tags>;
@@ -83,6 +85,7 @@ namespace fan {
 	static constexpr Bitset tot1 = SAllyShip::componentsBitset;
 	static constexpr Bitset tot2 = SAllyShip::tagsBitset;
 	static constexpr Bitset tot3 = SAllyShip::bitset;
+
 
 
 }

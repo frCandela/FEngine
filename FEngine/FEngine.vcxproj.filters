@@ -1041,6 +1041,9 @@
     <ClInclude Include="code\core\ecs\fanECSConfig.h">
       <Filter>code\core\ecs</Filter>
     </ClInclude>
+    <ClInclude Include="code\core\ecs\EntityData.h">
+      <Filter>code\core\ecs</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="code\core\math\fanBasicModels.inl">
