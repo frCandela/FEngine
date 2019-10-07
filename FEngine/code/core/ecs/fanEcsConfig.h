@@ -4,7 +4,7 @@
 #include "core/meta/fanTypeList.h"
 #include "core/ecs/fanBitsetCreator.h"
 
-namespace ecs {
+namespace fan {
 
 	//================================================================================================================================
 	// Components
@@ -48,7 +48,7 @@ namespace ecs {
 	//================================================================================================================================
 	// Bitsets & masks
 	//================================================================================================================================
-	using Entity = uint32_t; 
+	using CEntity = uint32_t; 
 	using Bitset = Bitset2::bitset2< 32 >;
 	static_assert( Components::count + Tags::count  <= 32 );
 

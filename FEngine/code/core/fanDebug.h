@@ -59,26 +59,26 @@ namespace fan {
 
 	public:
 		//================================================================================================================================
-		friend Debug& operator<<(Debug& _logger, Severity _severity){	// Set the severity of the current log
-			_logger.m_currentSeverity = _severity;
-			return _logger;
+		Debug& operator<<(Severity _severity){	// Set the severity of the current log
+			m_currentSeverity = _severity;
+			return *this;
 		}
 
-		friend Debug& operator<<(Debug& _logger, Type _type){	// Set the type of the current log
-			_logger.m_currentType = _type;
-			return _logger;
+		Debug& operator<<(Type _type){	// Set the type of the current log
+			m_currentType = _type;
+			return *this;
 		}
 
 		//================================================================================================================================
 		template <typename T>
-		friend Debug& operator<<(Debug& _logger, T _msg){	// Appends a value to the current log
-			_logger.m_stringstream << _msg;
-			return _logger;
+		Debug& operator<<(T _msg){	// Appends a value to the current log
+			m_stringstream << _msg;
+			return *this;
 		}
 		//================================================================================================================================
-		friend Debug& operator<<(Debug& _logger, Code /*_code*/ ){	// Special case of Debug::Get() << Debug::Endl()	
-			_logger.Flush();			
-			return _logger;
+		Debug& operator<<( Code /*_code*/ ){	// Special case of Debug::Get() << Debug::Endl()	
+			Flush();			
+			return *this;
 		}
 	};
 }

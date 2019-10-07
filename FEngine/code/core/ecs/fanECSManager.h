@@ -11,25 +11,25 @@ namespace fan {
 
  		void OnGui();
 	
-		ecs::Entity CreateEntity() {
+		CEntity CreateEntity() {
 			if ( m_deletedEntities.empty() ) {
 				return m_nextEntity++;
 			} else {
-				ecs::Entity entity = m_deletedEntities[ m_deletedEntities.size() - 1];
+				CEntity entity = m_deletedEntities[ m_deletedEntities.size() - 1];
 				m_deletedEntities.pop_back();
 				return entity;
 			}
 		}
 
-		void DeleteEntity( const ecs::Entity  _entity) {
+		void DeleteEntity( const CEntity  _entity) {
 			m_deletedEntities.push_back( _entity );
 		}
 
 	private:
 
-		ComponentsTuple< ecs::Components > m_components;
+		ComponentsTuple< Components > m_components;
 
-		ecs::Entity m_nextEntity = 0;
-		std::vector< ecs::Entity > m_deletedEntities;
+		CEntity m_nextEntity = 0;
+		std::vector< CEntity > m_deletedEntities;
  	};
 }
