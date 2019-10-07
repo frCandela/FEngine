@@ -21,6 +21,7 @@ namespace fan {
 	class Model;
 	class Material;
 	class Camera;
+	class EcsManager;
 
 	//================================================================================================================================
 	//================================================================================================================================	
@@ -79,6 +80,7 @@ namespace fan {
 		// Main objects
 		Renderer * m_renderer;
 		Scene *	 m_scene;
+		EcsManager * m_ecsManager;
 		Entity * m_selectedentity;
 		Camera * m_editorCamera = nullptr;
 		Camera * m_mainCamera = nullptr;

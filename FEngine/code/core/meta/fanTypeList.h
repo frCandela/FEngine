@@ -15,10 +15,6 @@ namespace meta {
 
 	//================================================================================================================================
 	// Extract N-th type in a list of types
-	// Example:
-	//	using types = TypeList<std::string, int, char, float>;
-	//	Extract::List<1, types>::value
-	//	Extract::Type<1, std::string, int, char, float>::value
 	//================================================================================================================================	
 	class Extract {
 	private:
@@ -48,8 +44,8 @@ namespace meta {
 
 	// Testing
 	namespace impl {
-		using types = meta::TypeList<std::string, int, char, float>;
-		static_assert( std::is_same < Extract::List<0, types>::value, std::string>::value );
+		using types = meta::TypeList<long, int, char, float>;
+		static_assert( std::is_same < Extract::List<0, types>::value, long>::value );
 		static_assert( std::is_same< Extract::List<2, types>::value, char >::value );
 	}
 
@@ -85,9 +81,9 @@ namespace meta {
 
 	// Testing
 	namespace impl {
-		using types = meta::TypeList<std::string, int, char, float>;
+		using types = meta::TypeList<long, int, char, float>;
 		static_assert( Find::List<char, types>::value == 2 );
-		static_assert( Find::List<std::string, types>::value == 0 );
+		static_assert( Find::List<long, types>::value == 0 );
 	}
 
 	//================================================================================================================================

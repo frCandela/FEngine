@@ -1,46 +1,48 @@
 #pragma once
 
-#include "core/meta/fanTypeList.h"
 #include "fanGlobalIncludes.h"
+#include "core/meta/fanTypeList.h"
+#include "core/ecs/fanBitsetCreator.h"
 
 namespace ecs {
+
 	//================================================================================================================================
 	// Components
 	//================================================================================================================================	
 	struct IComponent {};
 
 	//================================
-	struct Tranform : IComponent {
+	struct CTranform : IComponent {
 		btVector3		position;
 		btQuaternion	rotation;
 	};
 	//================================
-	struct Movement : IComponent {
+	struct CMovement : IComponent {
 		btVector3		speed;
 	};
 	//================================
-	struct Color : IComponent {
+	struct CColor : IComponent {
 		fan::Color		color;
 	};
 	//================================
 	//================================
 	using Components = meta::TypeList<
-		Tranform
-		, Movement
-		, Color
+		CTranform
+		, CMovement
+		, CColor
 	>;
 
 	//================================================================================================================================
 	// Tags
 	//================================================================================================================================
 	struct ITag {};
-	struct Ally : ITag {};
-	struct Ennemy : ITag {};
+	struct TAlly : ITag {};
+	struct TEnnemy : ITag {};
 	//================================
 	//================================
 	using Tags = meta::TypeList<
-		 Ally
-		,Ennemy
+		 TAlly
+		,TEnnemy
 	>;
 
 	//================================================================================================================================
@@ -49,10 +51,9 @@ namespace ecs {
 	using Entity = uint32_t; 
 	using Bitset = Bitset2::bitset2< 32 >;
 	static_assert( Components::count + Tags::count  <= 32 );
-	#include "core/ecs/fanBitsetCreator.h"
-	
-	using ComponentsBitsets = BitsetCreator<Bitset, Components>;
-	using TagsBitsets		= BitsetCreator<Bitset, Tags>;
+
+	using BitsetsComponents = BitsetCreator<Bitset, Components>;
+	using BitsetsTags		= BitsetCreator<Bitset, Tags>;
 
 	//================================================================================================================================
 	// Signature
@@ -66,21 +67,22 @@ namespace ecs {
 	public:
 		using componentsTypes = typename meta::Filter< IsComponent, ComponentsAndTags... >::type;
 		using tagsTypes		  = typename meta::Filter< IsTag,	    ComponentsAndTags... >::type;
-		static constexpr Bitset componentsBitset = ComponentsBitsets::GetList<componentsTypes>::value;
-		static constexpr Bitset tagsBitset = TagsBitsets::GetList<tagsTypes>::value;
-		static constexpr Bitset bitset = componentsBitset | (tagsBitset << Components::count);
-	};
+		static constexpr Bitset componentsBitset = BitsetsComponents::GetList<componentsTypes>::value;
+		static constexpr Bitset tagsBitset = BitsetsTags::GetList<tagsTypes>::value;
+		static constexpr Bitset bitset = componentsBitset | (Bitset(1) << Components::count ) ;
+	}; 
 	// testing
-	static_assert( std::is_same< Signature<Movement, Ally>::componentsTypes, meta::TypeList< Movement>>::value );
-	static_assert( std::is_same< Signature<Movement, Ally>::tagsTypes, meta::TypeList< Ally>>::value );
+	static_assert( std::is_same< Signature<CMovement, TAlly>::componentsTypes, meta::TypeList< CMovement>>::value );
+	static_assert( std::is_same< Signature<CMovement, TAlly>::tagsTypes, meta::TypeList< TAlly>>::value );
 	//================================	
 	//================================	
-	using Dynamic	 = Signature< Tranform, Movement >;
-	using EnnemyShip = Signature< Tranform, Movement, Ennemy >;
-	using AllyShip	 = Signature< Tranform, Movement, Ally >;
+	using SDynamic	 = Signature< CTranform, CMovement >;
+	using SEnnemyShip = Signature< CTranform, CMovement, TEnnemy >;
+	using SAllyShip	 = Signature< CTranform, CMovement, TAlly >;
 	
-	static constexpr Bitset tot1 = AllyShip::componentsBitset;
-	static constexpr Bitset tot2 = AllyShip::tagsBitset;
-	static constexpr Bitset tot3 = AllyShip::bitset;
+	static constexpr Bitset tot1 = SAllyShip::componentsBitset;
+	static constexpr Bitset tot2 = SAllyShip::tagsBitset;
+	static constexpr Bitset tot3 = SAllyShip::bitset;
+
 
 }

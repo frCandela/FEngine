@@ -36,8 +36,8 @@
 #include "scene/components/fanMaterial.h"
 #include "scene/components/fanPointLight.h"
 #include "scene/components/fanDirectionalLight.h"
-
 #include "core/math/shapes/fanConvexHull.h"
+#include "core/ecs/fanECSManager.h"
 
 namespace fan {
 	Signal<Entity*> Engine::onEntitySelected;
@@ -67,7 +67,7 @@ namespace fan {
 
 		m_renderer = new Renderer( windowSize, windowPosition );
 		m_scene = new Scene("mainScene");
-		//m_ECSManager = new EcsManager();
+		m_ecsManager = new EcsManager();
 
 		// Initialize editor components
 		m_renderWindow		= new RenderWindow( m_renderer );
@@ -162,7 +162,7 @@ namespace fan {
 
 				m_scene->BeginFrame();
 				m_scene->Update( delta );
-
+				
 				ManageKeyShortcuts();
 				ManageSelection();
 				DrawUI();
@@ -478,6 +478,7 @@ namespace fan {
 // 		} ImGui::End();
 		//***************************************************************************************END_MYLITTLESPACE
 
+		m_ecsManager->OnGui();
 		m_mainMenuBar->Draw();
 		for (int windowIndex = 0; windowIndex < m_editorWindows.size() ; windowIndex++)	{
 			m_editorWindows[windowIndex]->Draw();
@@ -691,5 +692,4 @@ namespace fan {
 			Deselect();
 		}
 	}
-
 }

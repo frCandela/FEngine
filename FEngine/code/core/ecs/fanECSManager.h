@@ -1,11 +1,7 @@
 #pragma once
 
-#include "core/meta/fanHelpers.h"
-#include "core/meta/fanTypeList.h"
-#include "core/ecs/fanComponentsTuple.h"
-#include "renderer/util/fanColor.h"
-
 #include "core/ecs/fanEcsConfig.h"
+#include "core/ecs/fanComponentsTuple.h"
 
 namespace fan {
 	//================================================================================================================================
@@ -31,9 +27,9 @@ namespace fan {
 
 	private:
 
-		ComponentsTuple< ecs::Components > _tuple;
+		ComponentsTuple< ecs::Components > m_components;
 
 		ecs::Entity m_nextEntity = 0;
 		std::vector< ecs::Entity > m_deletedEntities;
-	};
+ 	};
 }

@@ -4,7 +4,6 @@
 #include "core/meta/fanHelpers.h"
 
 //================================================================================================================================
-//<!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!DO NOT INCLUDE THIS HEADER ANYWHERE!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!>
 // BitsetCreator : Computes the bitmask of one or multiple  types
 // _referenceTypes is the list of types compared against
 // Get functions return the bitset corresponding to the given types
@@ -49,7 +48,7 @@ public:
 // Testing
 namespace impl {
 	class A{}; class B {}; class C {};
-	using TestBitsetType = Bitset2::bitset2<4>;
+	using TestBitsetType = size_t;
 	using TestBitset = BitsetCreator< TestBitsetType, meta::TypeList<A,B,C> >;
 	static_assert( TestBitset::Get<A>::value == TestBitsetType(1) );
 	static_assert( TestBitset::Get<C>::value == TestBitsetType(4) );

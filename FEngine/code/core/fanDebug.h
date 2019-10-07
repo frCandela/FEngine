@@ -76,7 +76,7 @@ namespace fan {
 			return _logger;
 		}
 		//================================================================================================================================
-		friend Debug& operator<<(Debug& _logger, Code _code ){	// Special case of Debug::Get() << std::endl 			
+		friend Debug& operator<<(Debug& _logger, Code /*_code*/ ){	// Special case of Debug::Get() << Debug::Endl()	
 			_logger.Flush();			
 			return _logger;
 		}

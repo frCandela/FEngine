@@ -167,8 +167,8 @@
   <ItemGroup>
     <ClInclude Include="code\core\ecs\fanBitsetCreator.h" />
     <ClInclude Include="code\core\ecs\fanComponentsTuple.h" />
-    <ClInclude Include="code\core\ecs\fanEcsConfig.h" />
     <ClInclude Include="code\core\ecs\fanECSManager.h" />
+    <ClInclude Include="code\core\ecs\fanECSConfig.h" />
     <ClInclude Include="code\core\fanDebug.h" />
     <ClInclude Include="code\core\fanHash.h" />
     <ClInclude Include="code\core\fanISerializable.h" />
@@ -208,6 +208,7 @@
     <ClInclude Include="code\editor\windows\fanRenderWindow.h" />
     <ClInclude Include="code\editor\windows\fanSceneWindow.h" />
     <ClInclude Include="code\editor\windows\fanEditorWindow.h" />
+    <ClInclude Include="code\fanExternalDeps.h" />
     <ClInclude Include="code\fanGlobalValues.h" />
     <ClInclude Include="code\fanEngine.h" />
     <ClInclude Include="code\fanGlobalIncludes.h" />

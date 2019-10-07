@@ -1029,13 +1029,16 @@
     <ClInclude Include="code\core\ecs\fanECSManager.h">
       <Filter>code\core\ecs</Filter>
     </ClInclude>
-    <ClInclude Include="code\core\ecs\fanEcsConfig.h">
-      <Filter>code\core\ecs</Filter>
-    </ClInclude>
     <ClInclude Include="code\core\ecs\fanComponentsTuple.h">
       <Filter>code\core\ecs</Filter>
     </ClInclude>
     <ClInclude Include="code\core\ecs\fanBitsetCreator.h">
+      <Filter>code\core\ecs</Filter>
+    </ClInclude>
+    <ClInclude Include="code\fanExternalDeps.h">
+      <Filter>code</Filter>
+    </ClInclude>
+    <ClInclude Include="code\core\ecs\fanECSConfig.h">
       <Filter>code\core\ecs</Filter>
     </ClInclude>
   </ItemGroup>
