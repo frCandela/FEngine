@@ -38,10 +38,29 @@ namespace fan {
 			return;
 		}
 
-// 		int reverseIndex = m_entitiesData.size() - 1;
-// 		while ( m_entitiesData[reverseIndex].IsDead() ) {
-// 
-// 		}
+		int64_t reverseIndex = m_entitiesData.size() - 1;
+		while ( reverseIndex >= 0 ) {
+			EntityData& data = m_entitiesData[reverseIndex];
+			if ( data.IsAlive() ) {
+				break; // We processed all dead entities
+			}
+
+			// This is ugly but there is no way to access tuple data with runtime indices... TOTO Make a macro or a variadic template struct
+			for (int componentIndex = 0; componentIndex < Components::count ; componentIndex++) {
+				if( data.bitset[componentIndex])
+				switch ( componentIndex ) {
+				case 0:	m_components.Get<0>().recycleList.push_back( componentIndex ); break;
+				case 1:	m_components.Get<1>().recycleList.push_back( componentIndex ); break;
+				case 2:	m_components.Get<2>().recycleList.push_back( componentIndex ); break;
+				default:
+					assert( false);
+					break;
+				}
+			}
+			m_entitiesData.pop_back();
+			--reverseIndex;
+		}
+
 	}
 
 	//================================================================================================================================
@@ -84,9 +103,12 @@ namespace fan {
 
 		ImGui::Separator();
 
-		ImGui::Text( TagCountSize( "CTranform:      ", m_components.Get< CTranform >().size(),	sizeof( CTranform ) ).c_str() );
-		ImGui::Text( TagCountSize( "SCMovement:     ", m_components.Get< CMovement >().size(),	sizeof( CMovement ) ).c_str() );
-		ImGui::Text( TagCountSize( "CColor:         ", m_components.Get< CColor >().size(),		sizeof( CColor ) ).c_str() );
+		auto& dataTransform = m_components.Get< CTranform >();
+		ImGui::Text( TagCountSize( "CTranform:      ", dataTransform.vector.size() - dataTransform.recycleList.size(),	sizeof( CTranform ) ).c_str() );
+		auto& dataMovement = m_components.Get< CMovement >();
+		ImGui::Text( TagCountSize( "SCMovement:     ", dataMovement.vector.size() - dataMovement.recycleList.size(),	sizeof( CMovement ) ).c_str() );
+		auto& dataColor = m_components.Get< CColor >();
+		ImGui::Text( TagCountSize( "CColor:         ", dataColor.vector.size() - dataColor.recycleList.size(),		sizeof( CColor ) ).c_str() );
 
 		ImGui::Separator();
 		ImGui::Separator();

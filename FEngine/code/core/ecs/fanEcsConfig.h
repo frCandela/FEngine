@@ -65,7 +65,7 @@ namespace fan {
 	template< typename _type > struct IsTag { static constexpr bool value = std::is_base_of< ITag, _type >::value; };
 	template< typename _type > struct IsComponent { static constexpr bool value = std::is_base_of< IComponent, _type >::value; };
 	template< typename _componentType > struct IndexOfComponent { static constexpr size_t value = meta::Find::List< _componentType, Components >::value;	};
-	template< typename _tagType >		struct IndexOfTag {		  static constexpr size_t value = meta::Find::List< _tagType, Tags >::value;	};
+	template< typename _tagType >		struct IndexOfTag {		  static constexpr size_t value = meta::Find::List< _tagType, Tags >::value + Components::count;	};
 
 	template< typename... ComponentsAndTags > 
 	class Signature { 

@@ -5,6 +5,13 @@
 
 namespace fan {
 	namespace impl {
+
+		template < size_t _index, typename _type >
+		struct	ComponentData {
+			std::vector<_type>		vector;
+			std::vector<uint32_t>	recycleList;
+		};
+
 		//================================================================================================================================
 		// ComponentElement
 		// Defines data for a specific _type at an _index
@@ -12,7 +19,7 @@ namespace fan {
 		//================================================================================================================================
 		template < size_t _index, typename _type >
 		struct	ComponentElement {
-			std::vector<_type>	vector;
+			ComponentData<_index, _type > data;
 		};
 
 		//================================================================================================================================
@@ -27,13 +34,20 @@ namespace fan {
 		private:
 			// returns the index of the corresponding _type
 			template < typename _type >	using indexElement = typename meta::Find::Type< _type,  _types... >;
+			template < size_t _index >	using elementIndex = typename meta::Extract::List<_index, Components >::value;
 
 		public:
 			// Returns the ComponentData of the corresponding _type
 			template < typename _type >
-			std::vector< _type>& Get() {
- 				return  ComponentElement< indexElement<_type>::value, _type >::vector;
+			ComponentData< indexElement<_type>::value, _type> & Get() {
+ 				return  ComponentElement< indexElement<_type>::value, _type >::data;
  			}
+
+			template < size_t _index >
+			ComponentData< _index, elementIndex<_index> > & Get() {
+				return  ComponentElement< _index, elementIndex<_index> >::data;
+			}
+
 		};
 	}
 

@@ -40,16 +40,25 @@ namespace fan {
 		static_assert( IsComponent< _componentType>::value );
 		assert( _entity  < m_entitiesData .size() );
 
-		std::vector<_componentType> & components =  m_components.Get< _componentType >();
-		EntityData&					  entityData = m_entitiesData[_entity];
+		auto &		componentData =  m_components.Get< _componentType >();
+		std::vector<_componentType>&	vector = componentData.vector;
+		std::vector<uint32_t>&			recycleList = componentData.recycleList;
+		EntityData &					entityData = m_entitiesData[_entity];
 
-		if ( components.size() + 1 >= components.capacity() ) {
-			components.reserve( 2 * components.size() );
-			Debug::Log( "realloc components" );
+		uint32_t componentIndex;
+		if ( recycleList.empty() ) {
+			if ( vector.size() + 1 >= vector.capacity() ) {
+				vector.reserve( 2 * vector.size() );
+				Debug::Log( "realloc components" );
+			}
+			componentIndex = static_cast<uint32_t>( vector.size() );
+			vector.push_back( _componentType() );
+		} else {
+			componentIndex = recycleList[ recycleList.size() - 1];
+			recycleList.pop_back();
 		}
-		components.push_back( _componentType() );
-		entityData.components[ IndexOfComponent<CTranform>::value ] =  static_cast<uint32_t>( components .size() - 1 );
-		entityData.bitset[ IndexOfComponent<CTranform>::value ] = 1;
+		entityData.components[ IndexOfComponent<_componentType>::value ] =  static_cast<uint32_t>( componentIndex );
+		entityData.bitset[ IndexOfComponent<_componentType>::value ] = 1;
 	}
 	//================================================================================================================================
 	//================================================================================================================================
