@@ -11,10 +11,11 @@ namespace fan {
 	public:
 		EcsManager();	
 
-		CEntity CreateEntity();
-		void	DeleteEntity( const CEntity  _entity);
-		template< typename _componentType > void AddComponent( const CEntity _entity );
-		template< typename _tagType >		void AddTag( const CEntity _entity );
+		ecsEntity CreateEntity();
+		void	DeleteEntity( const ecsEntity  _entity);
+
+		template< typename _componentType > void AddComponent( const ecsEntity _entity );
+		template< typename _tagType >		void AddTag( const ecsEntity _entity );
 
 		void	Refresh();
 
@@ -22,11 +23,11 @@ namespace fan {
 
 	private:
 
-		ComponentsTuple< Components > m_components;
+		ecsComponentsTuple< ecsComponents > m_components;
 		std::vector<EntityData>		  m_entitiesData;
 
-		CEntity m_firstDeadEntity = 0;
-		CEntity m_activeEntitiesCount = 0;
+		ecsEntity m_firstDeadEntity = 0;
+		ecsEntity m_activeEntitiesCount = 0;
 
 		
 		void	SortEntities();
@@ -36,7 +37,7 @@ namespace fan {
 	//================================================================================================================================
 	//================================================================================================================================
 	template< typename _componentType >
-	void EcsManager::AddComponent( const CEntity _entity ) {
+	void EcsManager::AddComponent( const ecsEntity _entity ) {
 		static_assert( IsComponent< _componentType>::value );
 		assert( _entity  < m_entitiesData .size() );
 
@@ -62,7 +63,7 @@ namespace fan {
 	}
 	//================================================================================================================================
 	//================================================================================================================================
-	template< typename _tagType > void EcsManager::AddTag( const CEntity _entity ) {
+	template< typename _tagType > void EcsManager::AddTag( const ecsEntity _entity ) {
 		static_assert( IsTag< _tagType>::value );
 		m_entitiesData[_entity].bitset[ IndexOfTag<_tagType>::value ] = 1;
 	}

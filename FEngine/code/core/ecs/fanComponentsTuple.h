@@ -34,7 +34,7 @@ namespace fan {
 		private:
 			// returns the index of the corresponding _type
 			template < typename _type >	using indexElement = typename meta::Find::Type< _type,  _types... >;
-			template < size_t _index >	using elementIndex = typename meta::Extract::List<_index, Components >::value;
+			template < size_t _index >	using elementIndex = typename meta::Extract::List<_index, ecsComponents >::value;
 
 		public:
 			// Returns the ComponentData of the corresponding _type
@@ -55,11 +55,11 @@ namespace fan {
 	// ComponentsTuple
 	// Generates a vectors & bitset for every type passed in _types
 	//================================================================================================================================
-	template< typename..._types > class ComponentsTuple;
+	template< typename..._types > class ecsComponentsTuple;
 	
 	// Tuple with a TypeList argument
 	template< template < typename... > typename TypeList, typename... _types >
-	class ComponentsTuple<TypeList<_types...> >  : public impl::ComponentsTupleImpl < typename meta::Range< sizeof...( _types ) >::type, _types... >
+	class ecsComponentsTuple<TypeList<_types...> >  : public impl::ComponentsTupleImpl < typename meta::Range< sizeof...( _types ) >::type, _types... >
 	{
 	public:
 		static constexpr size_t size = sizeof...( _types );		// Number of types in the tuple

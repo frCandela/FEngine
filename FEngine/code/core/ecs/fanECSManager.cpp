@@ -10,18 +10,18 @@ namespace fan {
 
 	//================================================================================================================================
 	//================================================================================================================================
-	CEntity EcsManager::CreateEntity() {
+	ecsEntity EcsManager::CreateEntity() {
 		if ( m_entitiesData.size() + 1 >= m_entitiesData.capacity() ) {
 			m_entitiesData.reserve( 2 * m_entitiesData.size() );
 			Debug::Log("realloc");
 		}
 		m_entitiesData.push_back( EntityData() );
-		return static_cast<CEntity> (m_entitiesData.size() - 1 );
+		return static_cast<ecsEntity> (m_entitiesData.size() - 1 );
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void EcsManager::DeleteEntity( const CEntity  _entity ) {
+	void EcsManager::DeleteEntity( const ecsEntity  _entity ) {
 		m_entitiesData[_entity].Kill();
 	}
 
@@ -46,7 +46,7 @@ namespace fan {
 			}
 
 			// This is ugly but there is no way to access tuple data with runtime indices... TOTO Make a macro or a variadic template struct
-			for (int componentIndex = 0; componentIndex < Components::count ; componentIndex++) {
+			for (int componentIndex = 0; componentIndex < ecsComponents::count ; componentIndex++) {
 				if( data.bitset[componentIndex])
 				switch ( componentIndex ) {
 				case 0:	m_components.Get<0>().recycleList.push_back( componentIndex ); break;
@@ -103,12 +103,12 @@ namespace fan {
 
 		ImGui::Separator();
 
-		auto& dataTransform = m_components.Get< CTranform >();
-		ImGui::Text( TagCountSize( "CTranform:      ", dataTransform.vector.size() - dataTransform.recycleList.size(),	sizeof( CTranform ) ).c_str() );
-		auto& dataMovement = m_components.Get< CMovement >();
-		ImGui::Text( TagCountSize( "SCMovement:     ", dataMovement.vector.size() - dataMovement.recycleList.size(),	sizeof( CMovement ) ).c_str() );
-		auto& dataColor = m_components.Get< CColor >();
-		ImGui::Text( TagCountSize( "CColor:         ", dataColor.vector.size() - dataColor.recycleList.size(),		sizeof( CColor ) ).c_str() );
+		auto& dataTransform = m_components.Get< ecsTranform >();
+		ImGui::Text( TagCountSize( "CTranform:      ", dataTransform.vector.size() - dataTransform.recycleList.size(),	sizeof( ecsTranform ) ).c_str() );
+		auto& dataMovement = m_components.Get< ecsMovement >();
+		ImGui::Text( TagCountSize( "SCMovement:     ", dataMovement.vector.size() - dataMovement.recycleList.size(),	sizeof( ecsMovement ) ).c_str() );
+		auto& dataColor = m_components.Get< ecsColor >();
+		ImGui::Text( TagCountSize( "CColor:         ", dataColor.vector.size() - dataColor.recycleList.size(),		sizeof( ecsColor ) ).c_str() );
 
 		ImGui::Separator();
 		ImGui::Separator();
@@ -126,12 +126,12 @@ namespace fan {
 
 
 			for (int i = 0; i < nb; i++) {		
-				CEntity entity = CreateEntity();
-				if ( s_transform )	AddComponent<CTranform>( entity );
-				if ( s_movement )	AddComponent<CMovement>( entity );
-				if ( s_color )		AddComponent<CColor>( entity );
-				if ( s_ally )		AddTag<TAlly>( entity );
-				if ( s_ennemy )		AddTag<TEnnemy>( entity );
+				ecsEntity entity = CreateEntity();
+				if ( s_transform )	AddComponent<ecsTranform>( entity );
+				if ( s_movement )	AddComponent<ecsMovement>( entity );
+				if ( s_color )		AddComponent<ecsColor>( entity );
+				if ( s_ally )		AddTag<ecsAlly>( entity );
+				if ( s_ennemy )		AddTag<ecsEnnemy>( entity );
 			}
 		} ImGui::SameLine (); ImGui::PushItemWidth(100);
 		ImGui::DragInt( "nb", &nb, 1, 1, 100000 );
