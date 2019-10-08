@@ -8,12 +8,12 @@
 // _referenceTypes is the list of types compared against
 // Get functions return the bitset corresponding to the given types
 //================================================================================================================================
-template < typename _bitSetType, typename _referenceTypes >
+template < typename _bitSetType, typename _referenceTypes, size_t _offset = 0 >
 class BitsetCreator {
 public:
 	// bitmask of one type
 	template < typename _singleType >
-	static constexpr _bitSetType singleTypeBitset = _bitSetType( 1 ) << meta::Find::List<_singleType, _referenceTypes>::value;
+	static constexpr _bitSetType singleTypeBitset = _bitSetType( 1 ) << (_offset + meta::Find::List<_singleType, _referenceTypes>::value );
 
 public:
 	// GetBitsetImpl declaration

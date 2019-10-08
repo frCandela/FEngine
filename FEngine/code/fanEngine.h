@@ -78,8 +78,8 @@ namespace fan {
 		EditorGrid m_editorGrid;
 
 		// Main objects
-		Renderer * m_renderer;
-		Scene *	 m_scene;
+		Renderer *	 m_renderer;
+		Scene *		 m_scene;
 		EcsManager * m_ecsManager;
 		Entity * m_selectedentity;
 		Camera * m_editorCamera = nullptr;
