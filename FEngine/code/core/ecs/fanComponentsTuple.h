@@ -34,7 +34,7 @@ namespace fan {
 		private:
 			// returns the index of the corresponding _type
 			template < typename _type >	using indexElement = typename meta::Find::Type< _type,  _types... >;
-			template < size_t _index >	using elementIndex = typename meta::Extract::List<_index, ecsComponents >::value;
+			template < size_t _index >	using elementIndex = typename meta::Extract::Type<_index, _types... >::value;
 
 		public:
 			// Returns the ComponentData of the corresponding _type

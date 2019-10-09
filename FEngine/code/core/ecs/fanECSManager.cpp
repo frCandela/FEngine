@@ -49,10 +49,33 @@ namespace fan {
 	//================================================================================================================================
 	//================================================================================================================================
 	void EcsManager::Refresh() {
-
+		if( m_enableRefresh ) {
+			SortEntities();
+			RemoveDeadEntities();
+		}
 	}
 
 	//================================================================================================================================
+	// Helper used to pass the right arguments to systems
+	//================================================================================================================================
+	template< typename _type, typename _system > struct RunSystem;
+	template< template < typename...> typename _components, typename... _types, typename _system  >
+	struct RunSystem<_components<_types...>, _system > {
+		static void Run( const float _delta, const std::vector<ecsEntityData>& _entitiesData, ecsComponentsTuple< ecsComponents > _tuple ) {
+			_system::Run( _delta, _entitiesData,  _tuple.Get<_types>().vector ... );
+		}
+	};
+
+	//================================================================================================================================
+	//================================================================================================================================
+	void EcsManager::Update( float _delta ) {
+		if ( m_enableRefresh ) {
+			RunSystem< ParticleSystem::signature::componentsTypes, ParticleSystem >::Run( _delta, m_entitiesData, m_components );
+		}
+	}
+
+	//================================================================================================================================
+	// Removes the dead entities at the end of the entity vector
 	//================================================================================================================================
 	void EcsManager::RemoveDeadEntities() {
 		if ( m_entitiesData.empty() ) {
@@ -123,6 +146,7 @@ namespace fan {
 	}
 
 	//================================================================================================================================
+	// Place the dead entities at the end of the vector
 	//================================================================================================================================
 	void EcsManager::SortEntities() {
 		const int64_t size = static_cast<int64_t>(m_entitiesData.size());
@@ -205,9 +229,10 @@ namespace fan {
 		} ImGui::SameLine();
 		ImGui::DragInt( "handleIndex", &entitySelect );
 
-		if ( ImGui::Button( "Refresh" ) ) { Refresh(); } ImGui::SameLine();
+		if ( ImGui::Button( "Update" ) ) { Update( 0.f ); } ImGui::SameLine();
 		if ( ImGui::Button( "Sort" ) ) { SortEntities();	} ImGui::SameLine();
-		if ( ImGui::Button( "RemoveDead" ) ) { RemoveDeadEntities(); }
+		if ( ImGui::Button( "RemoveDead" ) ) { RemoveDeadEntities(); }ImGui::SameLine();
+		ImGui::Checkbox("disable refresh", &m_enableRefresh );
 
 		// Entities list
 		if ( ImGui::CollapsingHeader( "Entities" ) ) {

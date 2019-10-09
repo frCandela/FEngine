@@ -162,7 +162,8 @@ namespace fan {
 
 				m_scene->BeginFrame();
 				m_scene->Update( delta );
-				
+				m_ecsManager->Update( delta );
+
 				ManageKeyShortcuts();
 				ManageSelection();
 				DrawUI();
@@ -175,7 +176,9 @@ namespace fan {
 
 				UpdateRenderer();
 				m_renderer->DrawFrame();
+
 				m_scene->EndFrame();
+				m_ecsManager->Refresh();
 			}
 		}
 

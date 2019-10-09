@@ -74,6 +74,9 @@
     <Filter Include="code\core\meta">
       <UniqueIdentifier>{14e822f4-e834-4ad6-aa6e-ec83ea9d8b56}</UniqueIdentifier>
     </Filter>
+    <Filter Include="code\core\ecs\systems">
+      <UniqueIdentifier>{e740e152-3bb3-4d1a-b7ba-427eda0407f1}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="deps\imgui\imgui.cpp">
@@ -1043,6 +1046,9 @@
     </ClInclude>
     <ClInclude Include="code\scene\fanGameobject.h">
       <Filter>code\scene</Filter>
+    </ClInclude>
+    <ClInclude Include="code\core\ecs\systems\fanECSSystems.h">
+      <Filter>code\core\ecs\systems</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

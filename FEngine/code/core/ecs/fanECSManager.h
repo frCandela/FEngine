@@ -1,8 +1,7 @@
 #pragma once
 
-#include "core/ecs/fanEcsConfig.h"
-#include "core/ecs/fanComponentsTuple.h"
-#include "core/ecs/EntityData.h"
+#include "core/ecs/systems/fanECSSystems.h"
+
 
 namespace fan {
 	//================================================================================================================================
@@ -19,7 +18,8 @@ namespace fan {
 		template< typename _componentType > void AddComponent( const ecsEntity _entity );
 		template< typename _tagType >		void AddTag( const ecsEntity _entity );
 
-		void	Refresh();
+		void Update( float _delta );
+		void Refresh();
 
 		void OnGui();
 
@@ -32,6 +32,8 @@ namespace fan {
 		ecsHandle m_nextHandle;
 		ecsEntity m_firstDeadEntity = 0;
 		ecsEntity m_activeEntitiesCount = 0;
+
+		bool m_enableRefresh = true;
 		
 		void	SwapHandlesEntities( const ecsEntity _entity1, const ecsEntity _entity2 );
 		void	SortEntities();
