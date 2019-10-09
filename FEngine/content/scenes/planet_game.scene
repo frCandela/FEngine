@@ -1,5 +1,5 @@
-Entities: 1 { 
-    Entity: groot {
+Gameobjects: 1 { 
+    Gameobject: groot {
         computeAABB: true
         Components: 1 {
             Transform: 1269105190 {
@@ -9,7 +9,7 @@ Entities: 1 {
             }
         }
         Childs: 3 {
-            Entity: game_camera {
+            Gameobject: game_camera {
                 computeAABB: true
                 Components: 4 {
                     Transform: 1269105190 {
@@ -35,7 +35,7 @@ Entities: 1 {
                 Childs: 0 {
                 }
             }
-            Entity: sun {
+            Gameobject: sun {
                 computeAABB: true
                 Components: 4 {
                     Transform: 1269105190 {
@@ -59,7 +59,7 @@ Entities: 1 {
                     }
                 }
                 Childs: 2 {
-                    Entity: planet {
+                    Gameobject: planet {
                         computeAABB: true
                         Components: 4 {
                             Transform: 1269105190 {
@@ -82,7 +82,7 @@ Entities: 1 {
                             }
                         }
                         Childs: 1 {
-                            Entity: satellite {
+                            Gameobject: satellite {
                                 computeAABB: true
                                 Components: 4 {
                                     Transform: 1269105190 {
@@ -110,7 +110,7 @@ Entities: 1 {
                             }
                         }
                     }
-                    Entity: mercury {
+                    Gameobject: mercury {
                         computeAABB: true
                         Components: 4 {
                             Transform: 1269105190 {
@@ -137,7 +137,7 @@ Entities: 1 {
                     }
                 }
             }
-            Entity: space_ship {
+            Gameobject: space_ship {
                 computeAABB: true
                 Components: 4 {
                     Transform: 1269105190 {

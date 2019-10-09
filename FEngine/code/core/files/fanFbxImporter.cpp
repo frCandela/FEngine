@@ -2,7 +2,7 @@
 
 #include "core/files/fanFbxImporter.h"
 #include "renderer/fanMesh.h"
-#include "scene/fanEntity.h"
+#include "scene/fanGameobject.h"
 #include "fbxsdk.h"
 
 

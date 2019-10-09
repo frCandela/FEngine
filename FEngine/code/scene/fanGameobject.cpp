@@ -1,6 +1,6 @@
 #include "fanGlobalIncludes.h"
 
-#include "scene/fanEntity.h"
+#include "scene/fanGameobject.h"
 #include "scene/fanScene.h"
 #include "scene/components/fanComponent.h"
 #include "scene/components/fanModel.h"
@@ -13,7 +13,7 @@ namespace fan
 {
 	//================================================================================================================================
 	//================================================================================================================================
-	Entity::Entity(const std::string _name, Entity * _parent) :
+	Gameobject::Gameobject(const std::string _name, Gameobject * _parent) :
 		m_name(_name)
 		, m_flags(Flag::NONE)
 		, m_parent(_parent) {
@@ -25,7 +25,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	Entity::~Entity() {
+	Gameobject::~Gameobject() {
 		for (int componentIndex = 0; componentIndex < m_components.size(); componentIndex++) {
 			m_components[componentIndex]->OnDetach();
 		}
@@ -37,9 +37,9 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void Entity::OnGui() {
+	void Gameobject::OnGui() {
 		std::stringstream ss;
-		ss << "Entity : " << GetName();
+		ss << "Gameobject : " << GetName();
 		if (ImGui::CollapsingHeader(ss.str().c_str())) {
 			ImGui::Checkbox("ComputeAABB", &m_computeAABB);
 		}
@@ -47,7 +47,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	bool Entity::DeleteComponent(const Component * component)
+	bool Gameobject::DeleteComponent(const Component * component)
 	{
 		// Find the component
 		for (int componentIndex = 0; componentIndex < m_components.size(); ++componentIndex)
@@ -67,7 +67,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	Component* Entity::AddComponent(const uint32_t _componentID) {
+	Component* Gameobject::AddComponent(const uint32_t _componentID) {
 		Component * component = TypeInfo::Instantiate<Component>(_componentID);
 		AddComponent(component);
 		return component;
@@ -75,15 +75,15 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void Entity::AddComponent(Component * _component) {
-		_component->m_entity = this;
+	void Gameobject::AddComponent(Component * _component) {
+		_component->m_gameobject = this;
 		m_components.push_back(_component);
 		_component->OnAttach();
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void Entity::ComputeAABB() {
+	void Gameobject::ComputeAABB() {
 		if (m_computeAABB) {
 			const Model * model = GetComponent< Model >();
 			if (model != nullptr && model->IsBeingDeleted() == false && model->GetMesh() != nullptr && model->GetMesh()->GetIndices().size() > 0) {
@@ -102,27 +102,27 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	bool Entity::IsAncestorOf(const Entity * _entity) const {
-		if (_entity == nullptr) {
-			Debug::Log("IsAncestorOf: entity is null");
+	bool Gameobject::IsAncestorOf(const Gameobject * _gameobject) const {
+		if (_gameobject == nullptr) {
+			Debug::Log("IsAncestorOf: gameobject is null");
 			return false;
 		}
 
-		while (_entity->m_parent != nullptr) {
-			if (_entity->m_parent == this) {
+		while (_gameobject->m_parent != nullptr) {
+			if (_gameobject->m_parent == this) {
 				return true;
 			}
 			else {
-				_entity = _entity->m_parent;
+				_gameobject = _gameobject->m_parent;
 			}
 		} return false;
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void Entity::RemoveChild(const Entity * _child) {
+	void Gameobject::RemoveChild(const Gameobject * _child) {
 		for (int childIndex = 0; childIndex < m_childs.size(); childIndex++) {
-			Entity * child = m_childs[childIndex];
+			Gameobject * child = m_childs[childIndex];
 			if (child == _child) {
 				m_childs.erase(m_childs.begin() + childIndex);
 				return;
@@ -132,9 +132,9 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	bool Entity::HasChild(const Entity * _child) {
+	bool Gameobject::HasChild(const Gameobject * _child) {
 		for (int childIndex = 0; childIndex < m_childs.size(); childIndex++) {
-			Entity * child = m_childs[childIndex];
+			Gameobject * child = m_childs[childIndex];
 			if (child == _child) {
 				return true;
 			}
@@ -144,7 +144,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void Entity::AddChild(Entity * _child) {
+	void Gameobject::AddChild(Gameobject * _child) {
 		if (_child == nullptr) {
 			Debug::Log("AddChild : child is null");
 			return;
@@ -171,7 +171,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void Entity::SetParent(Entity * _parent) {
+	void Gameobject::SetParent(Gameobject * _parent) {
 		if (_parent == nullptr) {
 			Debug::Log("Root cannot have a brother :'(");
 			return;
@@ -181,9 +181,9 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void Entity::InsertBelow(Entity * _brother) {
+	void Gameobject::InsertBelow(Gameobject * _brother) {
 		if (_brother == nullptr) {
-			Debug::Log("InsertBelow: entity is null");
+			Debug::Log("InsertBelow: gameobject is null");
 			return;
 		}
 		if (IsAncestorOf(_brother)) {
@@ -198,7 +198,7 @@ namespace fan
 		m_parent->RemoveChild(this);
 
 		for (int childIndex = 0; childIndex < _brother->m_parent->m_childs.size(); childIndex++) {
-			Entity * child = _brother->m_parent->m_childs[childIndex];
+			Gameobject * child = _brother->m_parent->m_childs[childIndex];
 			if (child == _brother) {
 				_brother->m_parent->m_childs.insert(_brother->m_parent->m_childs.begin() + childIndex + 1, this);
 				m_parent = _brother->m_parent;
@@ -208,11 +208,11 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	bool Entity::Load(std::istream& _in) {
-		if (!ReadSegmentHeader(_in, "Entity:")) { return false; }
+	bool Gameobject::Load(std::istream& _in) {
+		if (!ReadSegmentHeader(_in, "Gameobject:")) { return false; }
 
 		std::string buffer;
-		if (!ReadString(_in, buffer) || buffer.empty()) { return false; } // Entity name
+		if (!ReadString(_in, buffer) || buffer.empty()) { return false; } // gameobject name
 		SetName(buffer);
 		if (!ReadStartToken(_in)) { return false; }
 		{
@@ -247,10 +247,10 @@ namespace fan
 			if (!ReadInteger(_in, nbChilds) || nbChilds < 0) { return false; }
 			if (!ReadStartToken(_in)) { return false; }
 			{
-				for (int entityIndex = 0; entityIndex < nbChilds; entityIndex++)
+				for (int gameobjectIndex = 0; gameobjectIndex < nbChilds; gameobjectIndex++)
 				{
-					Entity * child = m_scene->CreateEntity("tmp", this);
-					child->LoadEntity(_in);
+					Gameobject * child = m_scene->CreateGameobject("tmp", this);
+					child->LoadGameobject(_in);
 				}
 			}if (!ReadEndToken(_in)) { return false; }
 		} if (!ReadEndToken(_in)) { return false; }
@@ -260,22 +260,22 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	bool Entity::LoadEntity(std::istream& _in) {
+	bool Gameobject::LoadGameobject(std::istream& _in) {
 		const bool result = Load(_in);
 		if (result == false) {
-			Debug::Get() << Debug::Severity::error << "Failed loading Entity: " << GetName() << Debug::Endl();
+			Debug::Get() << Debug::Severity::error << "Failed loading gameobject: " << GetName() << Debug::Endl();
 		}
 		return result;
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	bool Entity::Save(std::ostream& _out, const int _indentLevel) const {
+	bool Gameobject::Save(std::ostream& _out, const int _indentLevel) const {
 		const std::string indentation = GetIndentation(_indentLevel);
 		const std::string indentation1 = GetIndentation(_indentLevel + 1);
 		const std::string indentation2 = GetIndentation(_indentLevel + 2);
 
-		_out << indentation << "Entity: " << m_name << " {" << std::endl; { // entity	
+		_out << indentation << "Gameobject: " << m_name << " {" << std::endl; { // gameobject	
 
 			_out << indentation1 << "computeAABB: " << BoolToSting(m_computeAABB) << std::endl; // m_computeAABB	
 
@@ -298,13 +298,13 @@ namespace fan
 
 			_out << indentation1 << "Childs: " << childsToSaveCount << " {" << std::endl; { // childs
 				for (int childIndex = 0; childIndex < m_childs.size(); childIndex++) {
-					Entity * entity = m_childs[childIndex];
-					if (entity->HasFlag(NOT_SAVED) == false) {
-						entity->Save(_out, _indentLevel + 2);
+					Gameobject * gameobject = m_childs[childIndex];
+					if (gameobject->HasFlag(NOT_SAVED) == false) {
+						gameobject->Save(_out, _indentLevel + 2);
 					}
 				}
 			} _out << indentation1 << "}" << std::endl; // End childs
-		} _out << indentation << "}" << std::endl;; // End entity
+		} _out << indentation << "}" << std::endl;; // End gameobject
 		return true;
 	}
 }

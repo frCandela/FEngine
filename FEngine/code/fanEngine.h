@@ -13,7 +13,7 @@ namespace fan {
 	class EditorWindow;
 	class Renderer;
 	class Scene;
-	class Entity;
+	class Gameobject;
 	class Actor;
 	class Camera;	
 	class DirectionalLight;
@@ -27,7 +27,7 @@ namespace fan {
 	//================================================================================================================================	
 	class Engine {
 	public:
-		static Signal<Entity*> onEntitySelected;
+		static Signal<Gameobject*> onGameobjectSelected;
 		static Signal<Camera*> onSetCamera;
 
 		Engine();
@@ -37,7 +37,7 @@ namespace fan {
 		void Exit();
 
 		void SetMainCamera( Camera * _mainCamera );
-		void SetSelectedEntity( Entity * _selectedentity);
+		void SetSelectedGameobject( Gameobject * _selectedGgameobject);
 		void Deselect();
 		
 		void RegisterDirectionalLight	( DirectionalLight * _pointLight );
@@ -47,7 +47,7 @@ namespace fan {
 		void RegisterModel				( Model *			 _model );
 		void UnRegisterModel			( Model *			 _model );
 		
-		Entity *	const		GetSelectedentity() const		{ return m_selectedentity;  }
+		Gameobject *	const	GetSelectedGameobject() const		{ return m_selectedGameobject;  }
 		Camera *				GetEditorCamera() const			{ return m_editorCamera; }
 		Camera *				GetMainCamera() const			{ return m_mainCamera; }
 		Renderer &				GetRenderer() const				{ return * m_renderer; }
@@ -81,7 +81,7 @@ namespace fan {
 		Renderer *	 m_renderer;
 		Scene *		 m_scene;
 		EcsManager * m_ecsManager;
-		Entity * m_selectedentity;
+		Gameobject * m_selectedGameobject;
 		Camera * m_editorCamera = nullptr;
 		Camera * m_mainCamera = nullptr;
 
@@ -104,7 +104,7 @@ namespace fan {
 		void OnSceneLoad(Scene * _scene);
 		void OnMaterialSetTexture( Material * _material, std::string _path );
 		void OnModelSetPath( Model * _model, std::string _path );
-		void OnEntityDeleted( Entity * _entity );
+		void OnGameobjectDeleted( Gameobject * _gameobject );
 
 		void DrawUI();
 		void DrawEditorGrid() const;

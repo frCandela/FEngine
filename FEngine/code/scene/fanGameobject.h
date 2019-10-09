@@ -11,7 +11,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	class Entity : public ISerializable {
+	class Gameobject : public ISerializable {
 	public:
 		enum Flag {
 			NONE = 0x00,
@@ -19,19 +19,19 @@ namespace fan
 			NOT_SAVED = 0x02,
 		};
 
-		Entity(const std::string _name, Entity * _parent);
-		~Entity();
+		Gameobject(const std::string _name, Gameobject * _parent);
+		~Gameobject();
 
 		void OnGui();
 
 		template<typename ComponentType>
-		ComponentType* AddComponent();// Creates an instance of ComponentType, adds it to the entity and returns a pointer
+		ComponentType* AddComponent();// Creates an instance of ComponentType, adds it to the gameobject and returns a pointer
 		Component* AddComponent(const uint32_t _componentID);
 		template<typename ComponentType>
-		ComponentType* GetComponent();// Returns a pointer on the first instance of ComponentType in the entity, nullptr if none exists
+		ComponentType* GetComponent();// Returns a pointer on the first instance of ComponentType in the gameobject, nullptr if none exists
 		template<typename ComponentType>
 		std::vector<ComponentType*> GetComponents();
-		bool DeleteComponent(const Component * _component);// Remove the component from the entity and deletes it			
+		bool DeleteComponent(const Component * _component);// Remove the component from the gameobject and deletes it			
 		const std::vector<Component*> & GetComponents() const { return m_components; }// Returns the component vector
 
 		// Getters
@@ -44,17 +44,17 @@ namespace fan
 		void ComputeAABB();
 
 		// Hierarchy
-		Entity* GetParent() const { return m_parent; }
-		const std::vector<Entity*>& GetChilds() const { return m_childs; }
-		bool IsAncestorOf(const Entity * _node) const;
-		void RemoveChild(const Entity * _child);
-		bool HasChild(const Entity * _child);
-		void AddChild(Entity * _child);
-		void SetParent(Entity * _parent);
-		void InsertBelow(Entity * _brother);
+		Gameobject* GetParent() const { return m_parent; }
+		const std::vector<Gameobject*>& GetChilds() const { return m_childs; }
+		bool IsAncestorOf(const Gameobject * _node) const;
+		void RemoveChild(const Gameobject * _child);
+		bool HasChild(const Gameobject * _child);
+		void AddChild(Gameobject * _child);
+		void SetParent(Gameobject * _parent);
+		void InsertBelow(Gameobject * _brother);
 
 		// ISerializable
-		bool LoadEntity(std::istream& _in);
+		bool LoadGameobject(std::istream& _in);
 		bool Save(std::ostream& _out, const int _indentLevel) const override;
 
 		bool		HasFlag(const Flag _flag) const { return m_flags & _flag; }
@@ -63,8 +63,8 @@ namespace fan
 
 	private:
 		std::string				m_name;
-		std::vector<Entity*>	m_childs;
-		Entity *				m_parent;
+		std::vector<Gameobject*>	m_childs;
+		Gameobject *				m_parent;
 		uint32_t				m_flags;
 		AABB				m_aabb;
 		std::vector<Component*> m_components;
@@ -80,7 +80,7 @@ namespace fan
 	//================================================================================================================================
 	//================================================================================================================================
 	template<typename ComponentType>
-	ComponentType* Entity::AddComponent()
+	ComponentType* Gameobject::AddComponent()
 	{
 		// Checks if ComponentType derivates from Component
 		static_assert((std::is_base_of<Component, ComponentType>::value));
@@ -99,7 +99,7 @@ namespace fan
 	//================================================================================================================================
 	//================================================================================================================================
 	template<typename ComponentType>
-	ComponentType* Entity::GetComponent()
+	ComponentType* Gameobject::GetComponent()
 	{
 		for (int componentIndex = 0; componentIndex < m_components.size(); componentIndex++) {
 			Component* component = m_components[componentIndex];
@@ -114,7 +114,7 @@ namespace fan
 	//================================================================================================================================
 	//================================================================================================================================
 	template<typename ComponentType>
-	std::vector<ComponentType*> Entity::GetComponents()
+	std::vector<ComponentType*> Gameobject::GetComponents()
 	{
 		std::vector<ComponentType*> componentTypeVector;
 		for (int componentIndex = 0; componentIndex < m_components.size(); componentIndex++) {

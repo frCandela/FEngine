@@ -2,7 +2,7 @@
 
 #include "scene/components/fanActor.h"
 #include "scene/components/fanComponent.h"
-#include "scene/fanEntity.h"
+#include "scene/fanGameobject.h"
 #include "core/fanSignal.h"
 
 namespace fan

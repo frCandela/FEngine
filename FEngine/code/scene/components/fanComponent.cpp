@@ -1,7 +1,7 @@
 #include "fanGlobalIncludes.h"
 
 #include "scene/components/fanComponent.h"
-#include "scene/fanEntity.h"
+#include "scene/fanGameobject.h"
 #include "scene/fanScene.h"
 #include "core/input/fanInput.h"
 
@@ -12,7 +12,7 @@ namespace fan
 		//================================================================================================================================
 		//================================================================================================================================
 		Component::Component() :
-		m_entity(nullptr)
+		m_gameobject(nullptr)
 		, m_lastModified(0)
 		, m_isRemovable(true)
 		, m_isBeingDeleted(false) {
@@ -36,7 +36,7 @@ namespace fan
 	void Component::MarkModified(const bool _updateAABB) {
 		m_lastModified = Input::GetFrameCount();
 		if (_updateAABB) {
-			m_entity->GetScene()->ComputeAABBEndFrame(m_entity);
+			m_gameobject->GetScene()->ComputeAABBEndFrame(m_gameobject);
 		}
 	}
 }

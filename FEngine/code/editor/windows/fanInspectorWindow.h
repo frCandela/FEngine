@@ -4,7 +4,7 @@
 
 namespace fan
 {
-	class Entity;
+	class Gameobject;
 
 	//================================================================================================================================
 	//================================================================================================================================
@@ -14,13 +14,13 @@ namespace fan
 
 
 		// Callbacks
-		void OnEntitySelected( Entity* _entity ) { m_entitySelected = _entity; }
+		void OnGameobjectSelected( Gameobject* _gameobject ) { m_gameobjectSelected = _gameobject; }
 
 	protected:
 		void OnGui() override;
 
 	private:
-		Entity * m_entitySelected;
+		Gameobject * m_gameobjectSelected;
 
 		void NewComponentPopup();
 	};

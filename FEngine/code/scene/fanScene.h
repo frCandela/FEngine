@@ -5,7 +5,7 @@
 
 namespace fan
 {
-	class Entity;
+	class Gameobject;
 	class Component;
 	class Actor;
 
@@ -16,14 +16,14 @@ namespace fan
 	public:
 		Signal<Scene*>	onSceneLoad;
 		Signal<>		onSceneClear;
-		Signal< Entity *>		onDeleteEntity;
+		Signal< Gameobject *>		onDeleteGameobject;
 
 		Scene(const std::string _name);
 		~Scene();
 
-		Entity *					CreateEntity(const std::string _name, Entity * _parent = nullptr);	// Creates a game object and adds it to the scene hierarchy
-		void						DeleteEntity(Entity* _entity);										// Deletes a entity and removes it from the scene hierarchy at the end of the frame
-		std::vector < Entity * >	BuildEntitiesList() const;
+		Gameobject *					CreateGameobject(const std::string _name, Gameobject * _parent = nullptr);	// Creates a game object and adds it to the scene hierarchy
+		void						DeleteGameobject(Gameobject* _gameobject);										// Deletes a gameobject and removes it from the scene hierarchy at the end of the frame
+		std::vector < Gameobject * >	BuildEntitiesList() const;
 
 		template<typename ComponentType>
 		ComponentType * FindComponentOfType() const;
@@ -37,8 +37,8 @@ namespace fan
 		void Save() const;
 		bool LoadFrom(const std::string _path);
 
-		void				ComputeAABBEndFrame(Entity * _entity) { m_outdatedAABB.insert(_entity); }
-		Entity *			GetRoot() { return m_root; }
+		void				ComputeAABBEndFrame(Gameobject * _gameobject) { m_outdatedAABB.insert(_gameobject); }
+		Gameobject *			GetRoot() { return m_root; }
 		inline std::string	GetName() const { return m_name; }
 		bool				HasPath() const { return m_path.empty() == false; }
 		inline std::string	GetPath() const { return m_path; }
@@ -47,10 +47,10 @@ namespace fan
 	private:
 		std::string m_name;
 		std::string m_path;
-		Entity * m_root;
+		Gameobject * m_root;
 
-		std::vector < Entity * >	m_entitiesToDelete;
-		std::set< Entity * >	m_outdatedAABB;
+		std::vector < Gameobject * >	m_entitiesToDelete;
+		std::set< Gameobject * >	m_outdatedAABB;
 		std::set< Actor * >	m_startingActors;
 		std::set< Actor * >	m_activeActors;
 
@@ -61,9 +61,9 @@ namespace fan
 		bool Save(std::ostream& _out, const int _indentLevel) const override;
 		void Clear();
 
-		void		R_DeleteEntity(Entity* _entity, std::set<Entity*>&	_deletedEntitiesSet);
-		void		R_BuildEntitiesList(Entity* _entity, std::vector<Entity*>& _entitiesList) const;
-		Component *	R_FindComponentOfType(Entity * _entity, const uint32_t _typeID) const;
+		void		R_DeleteGameobject(Gameobject* _gameobject, std::set<Gameobject*>&	_deletedEntitiesSet);
+		void		R_BuildEntitiesList(Gameobject* _gameobject, std::vector<Gameobject*>& _entitiesList) const;
+		Component *	R_FindComponentOfType(Gameobject * _gameobject, const uint32_t _typeID) const;
 	};
 
 	//================================================================================================================================

@@ -6,7 +6,7 @@
 #include "editor/windows/fanInspectorWindow.h"
 #include "scene/fanScene.h"
 #include "scene/components/fanTransform.h"
-#include "scene/fanEntity.h"
+#include "scene/fanGameobject.h"
 #include "scene/components/fanCamera.h"
 #include "editor/components/fanFPSCamera.h"
 #include "game/fanSpaceShip.h"	
@@ -21,13 +21,13 @@ namespace fan {
 		//================================================================================================================================
 		void GameManager::Start() {
 		Debug::Log("Start satellite");
-		m_camera = GetEntity()->GetComponent<Camera>();
+		m_camera = GetGameobject()->GetComponent<Camera>();
 		if (m_camera == nullptr) {
 			Debug::Warning("Game manager has no camera attached");
 			SetEnabled(false);
 		}
 
-		m_spaceShip = GetEntity()->GetScene()->FindComponentOfType<SpaceShip>();
+		m_spaceShip = GetGameobject()->GetScene()->FindComponentOfType<SpaceShip>();
 		if (m_spaceShip == nullptr) {
 			Debug::Warning("GameManager::Start : No spaceShip found");
 			SetEnabled(false);
@@ -36,7 +36,7 @@ namespace fan {
 			m_spaceShip->SetEnabled(false);
 		}
 
-		m_editorCameraController = GetEntity()->GetScene()->FindComponentOfType<FPSCamera>();
+		m_editorCameraController = GetGameobject()->GetScene()->FindComponentOfType<FPSCamera>();
 		if (m_editorCameraController == nullptr) {
 			Debug::Warning("GameManager::Start : No editor CameraController found");
 			SetEnabled(false);

@@ -1,7 +1,7 @@
 #include "fanGlobalIncludes.h"
 
 #include "scene/components/fanCamera.h"
-#include "scene/fanEntity.h"
+#include "scene/fanGameobject.h"
 #include "scene/components/fanTransform.h"
 
 namespace fan
@@ -23,7 +23,7 @@ namespace fan
 	//================================================================================================================================
 	glm::mat4 Camera::GetView() const
 	{
-		Transform* transform = GetEntity()->GetComponent<Transform>();
+		Transform* transform = GetGameobject()->GetComponent<Transform>();
 		glm::mat4 view = glm::lookAt(
 			ToGLM(transform->GetPosition()),
 			ToGLM(transform->GetPosition() + transform->Forward()),
@@ -53,7 +53,7 @@ namespace fan
 		assert(_position.x() >= -1.f  && _position.x() <= 1.f);
 		assert(_position.y() >= -1.f && _position.y() <= 1.f);
 
-		Transform* transform = GetEntity()->GetComponent<Transform>();
+		Transform* transform = GetGameobject()->GetComponent<Transform>();
 
 		const btVector3	pos = transform->GetPosition();
 		const btVector3 upVec = transform->Up();

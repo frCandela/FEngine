@@ -4,7 +4,7 @@
 #include "core/fanTime.h"
 #include "editor/windows/fanInspectorWindow.h"
 #include "scene/components/fanTransform.h"
-#include "scene/fanEntity.h"
+#include "scene/fanGameobject.h"
 
 namespace fan {
 	REGISTER_EDITOR_COMPONENT(Planet);
@@ -19,7 +19,7 @@ namespace fan {
 	//================================================================================================================================
 	//================================================================================================================================
 	void Planet::Update(const float /*_delta*/) {
-		Transform * transform = GetEntity()->GetComponent<Transform>();
+		Transform * transform = GetGameobject()->GetComponent<Transform>();
 
 		float time = m_speed * Time::ElapsedSinceStartup();
 		btVector3 position(std::cosf(time), 0, std::sinf(time));
@@ -31,7 +31,7 @@ namespace fan {
 	//================================================================================================================================
 	void Planet::OnGui() {
 		Component::OnGui();
-		ImGui::Text(GetEntity()->GetName().c_str());
+		ImGui::Text(GetGameobject()->GetName().c_str());
 		ImGui::SliderFloat("radius", &m_radius, 0.f, 100.f);
 		ImGui::SliderFloat("speed", &m_speed, 0.f, 10.f);
 	}

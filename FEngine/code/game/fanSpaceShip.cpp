@@ -5,7 +5,7 @@
 #include "core/input/fanKeyboard.h"
 #include "editor/windows/fanInspectorWindow.h"
 #include "scene/components/fanTransform.h"
-#include "scene/fanEntity.h"
+#include "scene/fanGameobject.h"
 
 namespace fan {
 	REGISTER_EDITOR_COMPONENT(SpaceShip)
@@ -40,7 +40,7 @@ namespace fan {
 		}
 
 		// Translation
-		Transform * transform = GetEntity()->GetComponent<Transform>();
+		Transform * transform = GetGameobject()->GetComponent<Transform>();
 		if (forward != 0.f) {
 			forward *= m_velocity * _delta;
 			m_speed += _delta * forward * transform->Forward(); // increases velocity			

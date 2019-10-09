@@ -4,7 +4,7 @@
 #include "core/fanTime.h"
 #include "editor/windows/fanInspectorWindow.h"
 #include "scene/components/fanTransform.h"
-#include "scene/fanEntity.h"
+#include "scene/fanGameobject.h"
 
 namespace fan {
 	REGISTER_EDITOR_COMPONENT(Satellite)
@@ -21,13 +21,13 @@ namespace fan {
 	void Satellite::Update(const float /*_delta*/) {
 		Actor::OnGui();
 
-		Transform * parentTransform = GetEntity()->GetParent()->GetComponent<Transform>();
+		Transform * parentTransform = GetGameobject()->GetParent()->GetComponent<Transform>();
 
 		float time = -m_speed * Time::ElapsedSinceStartup();
 		btVector3 position(std::cosf(time + m_phase), 0, std::sinf(time + m_phase));
 		btVector3 parentPosition = parentTransform->GetPosition();
 
-		Transform * transform = GetEntity()->GetComponent<Transform>();
+		Transform * transform = GetGameobject()->GetComponent<Transform>();
 		transform->SetPosition(parentPosition + m_radius * position);
 	}
 

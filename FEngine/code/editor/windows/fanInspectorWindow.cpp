@@ -1,7 +1,7 @@
 #include "fanGlobalIncludes.h"
 
 #include "editor/windows/fanInspectorWindow.h"
-#include "scene/fanEntity.h"
+#include "scene/fanGameobject.h"
 #include "scene/components/fanComponent.h"
 #include "scene/components/fanTransform.h"
 #include "scene/components/fanCamera.h"
@@ -28,12 +28,12 @@ namespace fan
 	//================================================================================================================================
 	void InspectorWindow::OnGui() {
 
-		if ( m_entitySelected != nullptr)
+		if ( m_gameobjectSelected != nullptr)
 		{
-			// entity gui
-			m_entitySelected->OnGui();
+			// gameobject gui
+			m_gameobjectSelected->OnGui();
 			int componentCount = 0;			
-			const std::vector<Component*> & components = m_entitySelected->GetComponents();
+			const std::vector<Component*> & components = m_gameobjectSelected->GetComponents();
 			for (int componentIndex = 0; componentIndex < components.size(); componentIndex++) {
 				Component * component = components[componentIndex];
 
@@ -57,7 +57,7 @@ namespace fan
 					ss << "X" << "##" << component->GetName() << componentCount++;	// make unique id
 					ImGui::SameLine(ImGui::GetWindowWidth() - 40);
 					if (ImGui::Button(ss.str().c_str())) {
-						m_entitySelected->DeleteComponent(component);
+						m_gameobjectSelected->DeleteComponent(component);
 						component = nullptr;
 					}
 				}
@@ -87,7 +87,7 @@ namespace fan
 				Component * component = components[componentIndex];
 				if (ImGui::MenuItem(component->GetName())) {
 					// Create new Component 
-					m_entitySelected->AddComponent(component->GetType());
+					m_gameobjectSelected->AddComponent(component->GetType());
 					ImGui::CloseCurrentPopup();
 				}
 			}

@@ -1,7 +1,7 @@
 #include "fanGlobalIncludes.h"
 #include "scene/components/fanPointLight.h"
 #include "scene/components/fanTransform.h"	
-#include "scene/fanEntity.h"
+#include "scene/fanGameobject.h"
 #include "renderer/fanRenderer.h"
 #include "editor/fanModals.h"
 
@@ -96,7 +96,7 @@ namespace fan
  		// Sphere gizmo
 		float lightRange = GetLightRange();
 		if (lightRange > 0 ) {
-			const btTransform transform = GetEntity()->GetComponent<Transform>()->GetBtTransform();
+			const btTransform transform = GetGameobject()->GetComponent<Transform>()->GetBtTransform();
 			Debug::Render().DebugSphere(transform, lightRange, 2, m_diffuse);
 		}
 	}

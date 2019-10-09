@@ -3,7 +3,7 @@
 #include "editor/windows/fanSceneWindow.h"
 #include "renderer/fanRenderer.h"
 #include "scene/fanScene.h"
-#include "scene/fanEntity.h"
+#include "scene/fanGameobject.h"
 #include "scene/components/fanTransform.h"
 #include "scene/components/fanMaterial.h"
 #include "scene/components/fanModel.h"
@@ -36,132 +36,132 @@ namespace fan
 		ImGui::Text(m_scene->GetName().c_str());
 		ImGui::Separator();
 
-		Entity * entityRightClicked = nullptr;
-		R_DrawSceneTree( m_scene->GetRoot(), entityRightClicked);
+		Gameobject * gameobjectRightClicked = nullptr;
+		R_DrawSceneTree( m_scene->GetRoot(), gameobjectRightClicked);
 		m_expandSceneHierarchy = false;
 
-		if (entityRightClicked != nullptr) {
-			ImGui::OpenPopup("scene_window_entity_rclicked");
-			m_lastEntityRightClicked = entityRightClicked;
+		if (gameobjectRightClicked != nullptr) {
+			ImGui::OpenPopup("scene_window_gameobject_rclicked");
+			m_lastGameobjectRightClicked = gameobjectRightClicked;
 		}
 
-		// Popup set entity when right clic
-		bool newEntityPopup = false;
-		bool renameEntityPopup = false;
-		if (ImGui::BeginPopup("scene_window_entity_rclicked")) {
+		// Popup set gameobject when right clic
+		bool newGameobjectPopup = false;
+		bool renameGameobjectPopup = false;
+		if (ImGui::BeginPopup("scene_window_gameobject_rclicked")) {
 
-			// New entity 
+			// New gameobject 
 			bool itemClicked = false;
-			if (ImGui::BeginMenu("New entity")) {
-				// Popup empty entity
+			if (ImGui::BeginMenu("New gameobject")) {
+				// Popup empty gameobject
 				if ( ImGui::IsItemClicked() ) {
 					itemClicked = true;
 				}
 				// Entities templates
 				if ( ImGui::MenuItem( "Model" ) ) {
-					Entity *  newIntity = m_scene->CreateEntity("new model", m_lastEntityRightClicked );
+					Gameobject *  newIntity = m_scene->CreateGameobject("new model", m_lastGameobjectRightClicked );
 					newIntity->AddComponent<Transform>();
 					newIntity->AddComponent<Model>();
 					newIntity->AddComponent<Material>();
 				}
 				if ( ImGui::MenuItem( "Point light" ) ) {
-					Entity *  newIntity = m_scene->CreateEntity( "new_point_light", m_lastEntityRightClicked );
+					Gameobject *  newIntity = m_scene->CreateGameobject( "new_point_light", m_lastGameobjectRightClicked );
 					newIntity->AddComponent<Transform>();
 					newIntity->AddComponent<PointLight>();
 				}
 				if ( ImGui::MenuItem( "Dir light" ) ) {
-					Entity *  newIntity = m_scene->CreateEntity( "new_dir_light", m_lastEntityRightClicked );
+					Gameobject *  newIntity = m_scene->CreateGameobject( "new_dir_light", m_lastGameobjectRightClicked );
 					newIntity->AddComponent<Transform>();
 					newIntity->AddComponent<DirectionalLight>();
 				}
 				ImGui::EndMenu();
 			}
 			if ( ImGui::IsItemClicked() ) {
-				newEntityPopup = true;
+				newGameobjectPopup = true;
 			}
 
 			// rename
 			if (ImGui::Selectable("Rename")) {
-				renameEntityPopup = true;
+				renameGameobjectPopup = true;
 			}
 
 			// delete
 			ImGui::Separator();
 			if (ImGui::Selectable("Delete")) {
-				m_scene->DeleteEntity(m_lastEntityRightClicked);
+				m_scene->DeleteGameobject(m_lastGameobjectRightClicked);
 			}
 			ImGui::EndPopup();
 		}
 
 		// Modals
-		if (newEntityPopup) {
-			ImGui::OpenPopup("New entity");
-		} NewEntityModal();
+		if (newGameobjectPopup) {
+			ImGui::OpenPopup("New gameobject");
+		} NewGameobjectModal();
 
-		if (renameEntityPopup) {
-			ImGui::OpenPopup("Rename entity");
-		} RenameEntityModal();
+		if (renameGameobjectPopup) {
+			ImGui::OpenPopup("Rename gameobject");
+		} RenameGameobjectModal();
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void SceneWindow::R_DrawSceneTree(Entity * _entityDrawn, Entity* & _entityRightClicked) {
+	void SceneWindow::R_DrawSceneTree(Gameobject * _gameobjectDrawn, Gameobject* & _gameobjectRightClicked) {
 
 		std::stringstream ss;
-		ss << "##" << _entityDrawn; // Unique id
+		ss << "##" << _gameobjectDrawn; // Unique id
 
 		if (ImGui::IsWindowAppearing() || m_expandSceneHierarchy == true) {
 			ImGui::SetNextTreeNodeOpen(true);
 		}
 		bool isOpen = ImGui::TreeNode(ss.str().c_str());
 
-		// Entity dragndrop target empty selectable -> place dragged below
+		// Gameobject dragndrop target empty selectable -> place dragged below
 		if (ImGui::BeginDragDropTarget())
 		{
 			if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("node_test")) {
-				assert(payload->DataSize == sizeof(Entity**));
-				Entity * payloadNode = *(Entity**)payload->Data;
-				if( payloadNode != _entityDrawn ) {
-					payloadNode->InsertBelow(_entityDrawn);
+				assert(payload->DataSize == sizeof(Gameobject**));
+				Gameobject * payloadNode = *(Gameobject**)payload->Data;
+				if( payloadNode != _gameobjectDrawn ) {
+					payloadNode->InsertBelow(_gameobjectDrawn);
 				}
 			}
 			ImGui::EndDragDropTarget();
 		}
 		ImGui::SameLine();
-		bool selected = ( _entityDrawn == m_entitySelected );
+		bool selected = ( _gameobjectDrawn == m_gameobjectSelected );
 
-		// Draw entity empty selectable to display a hierarchy
+		// Draw gameobject empty selectable to display a hierarchy
 		std::stringstream ss2;
-		ss2 << _entityDrawn->GetName() << "##" << _entityDrawn; // Unique id
+		ss2 << _gameobjectDrawn->GetName() << "##" << _gameobjectDrawn; // Unique id
 		if (ImGui::Selectable(ss2.str().c_str(), &selected)) {
-			onSelectEntity.Emmit( _entityDrawn );
+			onSelectGameobject.Emmit( _gameobjectDrawn );
 		}
 		if (ImGui::IsItemClicked(1)) {
-			_entityRightClicked = _entityDrawn;
+			_gameobjectRightClicked = _gameobjectDrawn;
 		}
 
-		// Entity dragndrop source = selectable -^
+		// Gameobject dragndrop source = selectable -^
 		if (ImGui::BeginDragDropSource(ImGuiDragDropFlags_None)) {
-			ImGui::SetDragDropPayload("node_test", &_entityDrawn, sizeof(Entity**));
-			ImGui::Text((_entityDrawn->GetName()).c_str());
+			ImGui::SetDragDropPayload("node_test", &_gameobjectDrawn, sizeof(Gameobject**));
+			ImGui::Text((_gameobjectDrawn->GetName()).c_str());
 			ImGui::EndDragDropSource();
 		}
 
-		// Entity dragndrop target entity name -> place as child
+		// Gameobject dragndrop target gameobject name -> place as child
 		if (ImGui::BeginDragDropTarget())
 		{
 			if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("node_test")) {
-				assert(payload->DataSize == sizeof(Entity**));
-				Entity * payloadNode = *(Entity**)payload->Data;
-				payloadNode->SetParent(_entityDrawn);
+				assert(payload->DataSize == sizeof(Gameobject**));
+				Gameobject * payloadNode = *(Gameobject**)payload->Data;
+				payloadNode->SetParent(_gameobjectDrawn);
 			}
 			ImGui::EndDragDropTarget();
 		}
 		if (isOpen) {
-			const std::vector<Entity*>& childs = _entityDrawn->GetChilds();
+			const std::vector<Gameobject*>& childs = _gameobjectDrawn->GetChilds();
 			for (int childIndex = 0; childIndex < childs.size(); childIndex++) {
-				Entity * child = childs[childIndex];
-				R_DrawSceneTree(child, _entityRightClicked);
+				Gameobject * child = childs[childIndex];
+				R_DrawSceneTree(child, _gameobjectRightClicked);
 			}
 
 			ImGui::TreePop();
@@ -170,10 +170,10 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void SceneWindow::NewEntityModal()
+	void SceneWindow::NewGameobjectModal()
 	{
 		ImGui::SetNextWindowSize(ImVec2(200, 200));
-		if (ImGui::BeginPopupModal("New entity"))
+		if (ImGui::BeginPopupModal("New gameobject"))
 		{
 			if (ImGui::IsWindowAppearing()) {
 				ImGui::SetKeyboardFocusHere();
@@ -183,18 +183,18 @@ namespace fan
 				enterPressed = true;
 			}
 			if (ImGui::Button("Cancel") || ImGui::IsKeyPressed(GLFW_KEY_ESCAPE, false)) {
-				m_lastEntityRightClicked = nullptr;
+				m_lastGameobjectRightClicked = nullptr;
 				ImGui::CloseCurrentPopup();
 			}
 			ImGui::SameLine();
 			if (ImGui::Button("Ok") || enterPressed)
 			{
 				if (std::string(m_textBuffer) != "") {
-					//Create new entity 
-					Entity* newentity = m_scene->CreateEntity(m_textBuffer, m_lastEntityRightClicked);
-					newentity->AddComponent<Transform>();
-					onSelectEntity.Emmit( newentity );
-					m_lastEntityRightClicked = nullptr;
+					//Create new gameobject 
+					Gameobject* newGameobject = m_scene->CreateGameobject(m_textBuffer, m_lastGameobjectRightClicked);
+					newGameobject->AddComponent<Transform>();
+					onSelectGameobject.Emmit( newGameobject );
+					m_lastGameobjectRightClicked = nullptr;
 					ImGui::CloseCurrentPopup();
 				}
 			}
@@ -204,13 +204,13 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void SceneWindow::RenameEntityModal()
+	void SceneWindow::RenameGameobjectModal()
 	{
 		ImGui::SetNextWindowSize(ImVec2(200, 200));
-		if (ImGui::BeginPopupModal("Rename entity"))
+		if (ImGui::BeginPopupModal("Rename gameobject"))
 		{
 			if (ImGui::IsWindowAppearing()) {
-				strcpy_s(m_textBuffer, 32, m_lastEntityRightClicked->GetName().c_str());
+				strcpy_s(m_textBuffer, 32, m_lastGameobjectRightClicked->GetName().c_str());
 				ImGui::SetKeyboardFocusHere();
 			}
 			bool enterPressed = false;
@@ -218,15 +218,15 @@ namespace fan
 				enterPressed = true;
 			}
 			if (ImGui::Button("Cancel") || ImGui::IsKeyPressed(GLFW_KEY_ESCAPE, false)) {
-				m_lastEntityRightClicked = nullptr;
+				m_lastGameobjectRightClicked = nullptr;
 				ImGui::CloseCurrentPopup();
 			}
 			ImGui::SameLine();
 			if (ImGui::Button("Ok") || ImGui::IsKeyPressed(GLFW_KEY_ENTER, false) || enterPressed)
 			{
 				if (std::string(m_textBuffer) != "") {
-					m_lastEntityRightClicked->SetName(m_textBuffer);
-					m_lastEntityRightClicked = nullptr;
+					m_lastGameobjectRightClicked->SetName(m_textBuffer);
+					m_lastGameobjectRightClicked = nullptr;
 					ImGui::CloseCurrentPopup();
 				}
 			}

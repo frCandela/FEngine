@@ -6,7 +6,7 @@
 #include "core/input/fanKeyboard.h"
 #include "editor/windows/fanInspectorWindow.h"
 #include "scene/fanScene.h"
-#include "scene/fanEntity.h"
+#include "scene/fanGameobject.h"
 #include "scene/components/fanTransform.h"
 #include "scene/components/fanCamera.h"
 
@@ -17,15 +17,15 @@ namespace fan {
 		//================================================================================================================================
 		//================================================================================================================================
 		void CameraController::Start() {
-		m_transform = GetEntity()->GetComponent<Transform>();
-		m_camera = GetEntity()->GetComponent<Camera>();
+		m_transform = GetGameobject()->GetComponent<Transform>();
+		m_camera = GetGameobject()->GetComponent<Camera>();
 		if (m_camera == nullptr) {
 			Debug::Warning("Game manager has no camera attached");
 		}
 
-		SpaceShip * ss = GetEntity()->GetScene()->FindComponentOfType<SpaceShip>();
+		SpaceShip * ss = GetGameobject()->GetScene()->FindComponentOfType<SpaceShip>();
 		if (ss) {
-			m_target = ss->GetEntity()->GetComponent<Transform>();
+			m_target = ss->GetGameobject()->GetComponent<Transform>();
 		}
 	}
 

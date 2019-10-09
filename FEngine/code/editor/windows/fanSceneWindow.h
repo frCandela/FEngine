@@ -4,19 +4,19 @@
 
 namespace fan {
 	class Scene;
-	class Entity;	
+	class Gameobject;	
 
 	//================================================================================================================================
 	//================================================================================================================================
 	class SceneWindow : public EditorWindow {
 	public:
-		Signal< Entity* > onSelectEntity;
+		Signal< Gameobject* > onSelectGameobject;
 
 		SceneWindow( Scene * _scene );
 		~SceneWindow();
 
 		// Callbacks
-		void OnEntitySelected( Entity* _entity ) { m_entitySelected = _entity; }
+		void OnGameobjectSelected( Gameobject* _gameobject ) { m_gameobjectSelected = _gameobject; }
 		void OnSceneLoad( Scene * /*_scene*/ ) { m_expandSceneHierarchy = true; }
 
 	protected:
@@ -24,14 +24,14 @@ namespace fan {
 
 	private:
 		Scene * m_scene;
-		Entity* m_entitySelected;
+		Gameobject* m_gameobjectSelected;
 
 		char m_textBuffer[32];
-		Entity * m_lastEntityRightClicked = nullptr;
+		Gameobject * m_lastGameobjectRightClicked = nullptr;
 		bool m_expandSceneHierarchy = false;
 
-		void NewEntityModal();
-		void RenameEntityModal();
-		void R_DrawSceneTree(Entity * _entity, Entity*& _entityRightClicked);
+		void NewGameobjectModal();
+		void RenameGameobjectModal();
+		void R_DrawSceneTree(Gameobject * _gameobject, Gameobject*& _gameobjectRightClicked);
 	};
 }

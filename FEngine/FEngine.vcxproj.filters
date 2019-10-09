@@ -256,9 +256,6 @@
     <ClCompile Include="code\fanGlobalValues.cpp">
       <Filter>code</Filter>
     </ClCompile>
-    <ClCompile Include="code\scene\fanEntity.cpp">
-      <Filter>code\scene</Filter>
-    </ClCompile>
     <ClCompile Include="code\game\fanPlanet.cpp">
       <Filter>code\game</Filter>
     </ClCompile>
@@ -309,6 +306,9 @@
     </ClCompile>
     <ClCompile Include="code\core\ecs\fanECSManager.cpp">
       <Filter>code\core\ecs</Filter>
+    </ClCompile>
+    <ClCompile Include="code\scene\fanGameobject.cpp">
+      <Filter>code\scene</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -936,9 +936,6 @@
     <ClInclude Include="code\fanGlobalIncludes.h">
       <Filter>code</Filter>
     </ClInclude>
-    <ClInclude Include="code\scene\fanEntity.h">
-      <Filter>code\scene</Filter>
-    </ClInclude>
     <ClInclude Include="code\game\fanPlanet.h">
       <Filter>code\game</Filter>
     </ClInclude>
@@ -1043,6 +1040,9 @@
     </ClInclude>
     <ClInclude Include="code\core\ecs\EntityData.h">
       <Filter>code\core\ecs</Filter>
+    </ClInclude>
+    <ClInclude Include="code\scene\fanGameobject.h">
+      <Filter>code\scene</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

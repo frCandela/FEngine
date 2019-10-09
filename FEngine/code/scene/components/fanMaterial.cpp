@@ -1,7 +1,7 @@
 #include "fanGlobalIncludes.h"
 #include "scene/components/fanMaterial.h"
 
-#include "scene/fanEntity.h"
+#include "scene/fanGameobject.h"
 #include "scene/components/fanModel.h"
 #include "renderer/core/fanTexture.h"
 

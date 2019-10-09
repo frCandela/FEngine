@@ -2,7 +2,7 @@
 #include "scene/components/fanDirectionalLight.h"
 
 #include "scene/components/fanTransform.h"	
-#include "scene/fanEntity.h"
+#include "scene/fanGameobject.h"
 #include "renderer/fanRenderer.h"
 #include "editor/fanModals.h"
 
@@ -64,7 +64,7 @@ namespace fan {
 		if ( ImGui::ColorEdit3( "specular", m_specular.Data(), gui::colorEditFlags ) ) { MarkModified(); }
 
 
-		const Transform * transform = GetEntity()->GetComponent<Transform>();
+		const Transform * transform = GetGameobject()->GetComponent<Transform>();
 		const btVector3 pos = transform->GetPosition();
 		const btVector3 dir = transform->Forward();
 		const btVector3 up = transform->Up();

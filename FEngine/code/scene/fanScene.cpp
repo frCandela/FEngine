@@ -1,7 +1,7 @@
 #include "fanGlobalIncludes.h"
 
 #include "scene/fanScene.h"
-#include "scene/fanEntity.h"
+#include "scene/fanGameobject.h"
 #include "scene/components/fanComponent.h"
 #include "scene/components/fanTransform.h"
 #include "scene/components/fanCamera.h"
@@ -31,27 +31,27 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	Entity *	Scene::CreateEntity(const std::string _name, Entity * _parent) {
+	Gameobject *	Scene::CreateGameobject(const std::string _name, Gameobject * _parent) {
 		if (_parent == nullptr) {
 			_parent = m_root;
 		}
-		Entity* entity = new Entity(_name, _parent);
-		entity->SetScene(this);
+		Gameobject* gameobject = new Gameobject(_name, _parent);
+		gameobject->SetScene(this);
 
-		return entity;
+		return gameobject;
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void Scene::DeleteEntity(Entity* _entity) {
-		m_entitiesToDelete.push_back(_entity);
+	void Scene::DeleteGameobject(Gameobject* _gameobject ) {
+		m_entitiesToDelete.push_back(_gameobject );
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void Scene::R_BuildEntitiesList(Entity* _entity, std::vector<Entity*>& _entitiesList) const {
-		_entitiesList.push_back(_entity);
-		const std::vector<Entity*>& childs = _entity->GetChilds();
+	void Scene::R_BuildEntitiesList(Gameobject* _gameobject, std::vector<Gameobject*>& _entitiesList) const {
+		_entitiesList.push_back(_gameobject);
+		const std::vector<Gameobject*>& childs = _gameobject->GetChilds();
 		for (int childIndex = 0; childIndex < childs.size(); childIndex++) {
 			R_BuildEntitiesList(childs[childIndex], _entitiesList);
 		}
@@ -59,10 +59,10 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	Component *	Scene::R_FindComponentOfType(Entity * _entity, const uint32_t _typeID) const {
+	Component *	Scene::R_FindComponentOfType(Gameobject * _gameobject, const uint32_t _typeID) const {
 
 		// Search in components
-		const std::vector<Component*> & components = _entity->GetComponents();
+		const std::vector<Component*> & components = _gameobject->GetComponents();
 		for (int componentIndex = 0; componentIndex < components.size(); componentIndex++) {
 			Component* component = components[componentIndex];
 			if (component->GetType() == _typeID) {
@@ -71,7 +71,7 @@ namespace fan
 		}
 
 		// Recursive call to child entities
-		const std::vector<Entity*> & childEntities = _entity->GetChilds();
+		const std::vector<Gameobject*> & childEntities = _gameobject->GetChilds();
 		for (int childIndex = 0; childIndex < childEntities.size(); childIndex++) {
 			Component* component = R_FindComponentOfType(childEntities[childIndex], _typeID);
 			if (component != nullptr) {
@@ -83,8 +83,8 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	std::vector < Entity * >  Scene::BuildEntitiesList() const {
-		std::vector<Entity*> entitiesList;
+	std::vector < Gameobject * >  Scene::BuildEntitiesList() const {
+		std::vector<Gameobject*> entitiesList;
 		R_BuildEntitiesList(m_root, entitiesList);
 		return entitiesList;
 	}
@@ -111,43 +111,43 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void  Scene::R_DeleteEntity(Entity* _entity, std::set<Entity*>& _deletedEntitiesSet) {
-		if (_entity != nullptr && _deletedEntitiesSet.find(_entity) == _deletedEntitiesSet.end()) {
+	void  Scene::R_DeleteGameobject(Gameobject* _gameobject, std::set<Gameobject*>& _deletedEntitiesSet) {
+		if (_gameobject != nullptr && _deletedEntitiesSet.find(_gameobject) == _deletedEntitiesSet.end()) {
 
-			const std::vector<Entity*> childs = _entity->GetChilds(); // copy
+			const std::vector<Gameobject*> childs = _gameobject->GetChilds(); // copy
 			for (int childIndex = 0; childIndex < childs.size(); childIndex++) {
-				R_DeleteEntity(childs[childIndex], _deletedEntitiesSet);
+				R_DeleteGameobject(childs[childIndex], _deletedEntitiesSet);
 			}
 
-			onDeleteEntity.Emmit( _entity );
-			_deletedEntitiesSet.insert(_entity);
-			if (_entity->GetParent() != nullptr) {
-				_entity->GetParent()->RemoveChild(_entity);
+			onDeleteGameobject.Emmit( _gameobject );
+			_deletedEntitiesSet.insert(_gameobject);
+			if (_gameobject->GetParent() != nullptr) {
+				_gameobject->GetParent()->RemoveChild(_gameobject);
 			}
-			Debug::Get() << "delete Entity: " << _entity->GetName() << Debug::Endl();
-			delete(_entity);
+			Debug::Get() << "delete Eameobject: " << _gameobject->GetName() << Debug::Endl();
+			delete(_gameobject);
 		}
 	}
 
 	//================================================================================================================================
-	// Deletes every entity in the m_toDeleteLater vector
+	// Deletes every gameobject in the m_toDeleteLater vector
 	//================================================================================================================================
 	void Scene::EndFrame() {
-		for (Entity * entity : m_outdatedAABB) {
-			entity->ComputeAABB();
+		for (Gameobject * gameobject : m_outdatedAABB) {
+			gameobject->ComputeAABB();
 		} m_outdatedAABB.clear();
 
 		// Delete entities 
-		std::set<Entity*> deletedEntitiesSet;
-		for (int entityToDeleteIndex = 0; entityToDeleteIndex < m_entitiesToDelete.size(); entityToDeleteIndex++) {
-			Entity * entitytoDelete = m_entitiesToDelete[entityToDeleteIndex];
-			R_DeleteEntity(entitytoDelete, deletedEntitiesSet);
+		std::set<Gameobject*> deletedEntitiesSet;
+		for (int gameobjectToDeleteIndex = 0; gameobjectToDeleteIndex < m_entitiesToDelete.size(); gameobjectToDeleteIndex++) {
+			Gameobject * gameobjectDelete = m_entitiesToDelete[gameobjectToDeleteIndex];
+			R_DeleteGameobject(gameobjectDelete, deletedEntitiesSet);
 		}
 		m_entitiesToDelete.clear();
 	}
 
 	//================================================================================================================================
-	// Deletes every entity in the m_toDeleteLater vector
+	// Deletes every gameobject in the m_toDeleteLater vector
 	//================================================================================================================================
 	void Scene::OnGui() {
 		int nb = (int)m_activeActors.size();
@@ -181,8 +181,8 @@ namespace fan
 	//================================================================================================================================
 	void Scene::Clear() {
 		m_path = "";
-		std::set<Entity*> deletedEntitiesSet;
-		R_DeleteEntity(m_root, deletedEntitiesSet);
+		std::set<Gameobject*> deletedEntitiesSet;
+		R_DeleteGameobject(m_root, deletedEntitiesSet);
 		m_startingActors.clear();
 		m_activeActors.clear();
 		m_entitiesToDelete.clear();
@@ -196,7 +196,7 @@ namespace fan
 	//================================================================================================================================
 	void Scene::New() {
 		Clear();
-		m_root = CreateEntity("root", nullptr);
+		m_root = CreateGameobject("root", nullptr);
 		m_root->AddComponent<Transform>();
 		onSceneLoad.Emmit(this);
 	}
@@ -227,9 +227,9 @@ namespace fan
 		int nbEntities = 42;
 		if (!ReadInteger(_in, nbEntities) || nbEntities != 1) { return false; }
 		if (!ReadStartToken(_in)) { return false; }
-		for (int entityIndex = 0; entityIndex < nbEntities; entityIndex++) {
-			m_root = CreateEntity("root");
-			m_root->LoadEntity(_in);
+		for (int gameobjectIndex = 0; gameobjectIndex < nbEntities; gameobjectIndex++) {
+			m_root = CreateGameobject("root");
+			m_root->LoadGameobject(_in);
 		}
 		if (!ReadEndToken(_in)) { return false; }
 		return true;

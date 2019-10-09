@@ -1,5 +1,5 @@
-Entities: 1 { 
-    Entity: root {
+Gameobjects: 1 { 
+    Gameobject: root {
         computeAABB: true
         Components: 1 {
             Transform: 1269105190 {
@@ -9,7 +9,7 @@ Entities: 1 {
             }
         }
         Childs: 1 {
-            Entity: sphere {
+            Gameobject: sphere {
                 computeAABB: true
                 Components: 3 {
                     Transform: 1269105190 {
@@ -27,7 +27,7 @@ Entities: 1 {
                     }
                 }
                 Childs: 7 {
-                    Entity: light_green {
+                    Gameobject: light_green {
                         computeAABB: true
                         Components: 5 {
                             Transform: 1269105190 {
@@ -59,7 +59,7 @@ Entities: 1 {
                         Childs: 0 {
                         }
                     }
-                    Entity: light_blue {
+                    Gameobject: light_blue {
                         computeAABB: true
                         Components: 5 {
                             Transform: 1269105190 {
@@ -91,7 +91,7 @@ Entities: 1 {
                         Childs: 0 {
                         }
                     }
-                    Entity: light_red {
+                    Gameobject: light_red {
                         computeAABB: true
                         Components: 5 {
                             Transform: 1269105190 {
@@ -123,7 +123,7 @@ Entities: 1 {
                         Childs: 0 {
                         }
                     }
-                    Entity: light_green_-1 {
+                    Gameobject: light_green_-1 {
                         computeAABB: true
                         Components: 5 {
                             Transform: 1269105190 {
@@ -155,7 +155,7 @@ Entities: 1 {
                         Childs: 0 {
                         }
                     }
-                    Entity: light_blue_-1 {
+                    Gameobject: light_blue_-1 {
                         computeAABB: true
                         Components: 5 {
                             Transform: 1269105190 {
@@ -187,7 +187,7 @@ Entities: 1 {
                         Childs: 0 {
                         }
                     }
-                    Entity: light_red_-1 {
+                    Gameobject: light_red_-1 {
                         computeAABB: true
                         Components: 5 {
                             Transform: 1269105190 {
@@ -219,7 +219,7 @@ Entities: 1 {
                         Childs: 0 {
                         }
                     }
-                    Entity: light_directional {
+                    Gameobject: light_directional {
                         computeAABB: true
                         Components: 2 {
                             Transform: 1269105190 {

@@ -27,7 +27,7 @@
 #include "editor/windows/fanConsoleWindow.h"	
 #include "editor/components/fanFPSCamera.h"		
 #include "scene/fanScene.h"
-#include "scene/fanEntity.h"
+#include "scene/fanGameobject.h"
 #include "scene/components/fanComponent.h"
 #include "scene/components/fanCamera.h"
 #include "scene/components/fanTransform.h"
@@ -40,7 +40,7 @@
 #include "core/ecs/fanECSManager.h"
 
 namespace fan {
-	Signal<Entity*> Engine::onEntitySelected;
+	Signal<Gameobject*> Engine::onGameobjectSelected;
 	Signal<Camera*> Engine::onSetCamera;
 
 	//================================================================================================================================
@@ -87,16 +87,16 @@ namespace fan {
 		// Instance messages
 		Debug::Get().onSetMainCamera.Connect( &Engine::SetMainCamera, this );
 		Debug::Get().SetDebug( m_renderer, m_editorCamera, m_mainCamera );
-		m_sceneWindow->onSelectEntity.Connect( &Engine::SetSelectedEntity, this );
+		m_sceneWindow->onSelectGameobject.Connect( &Engine::SetSelectedGameobject, this );
 		m_mainMenuBar->onReloadShaders.Connect(&Renderer::ReloadShaders, m_renderer );
 		m_mainMenuBar->onExit.Connect( &Engine::Exit, this );
-		onEntitySelected.Connect( &SceneWindow::OnEntitySelected, m_sceneWindow );
-		onEntitySelected.Connect( &InspectorWindow::OnEntitySelected, m_inspectorWindow );
+		onGameobjectSelected.Connect( &SceneWindow::OnGameobjectSelected, m_sceneWindow );
+		onGameobjectSelected.Connect( &InspectorWindow::OnGameobjectSelected, m_inspectorWindow );
 
 		m_scene->onSceneLoad.Connect( &SceneWindow::OnSceneLoad, m_sceneWindow );
 		m_scene->onSceneLoad.Connect( &Engine::OnSceneLoad, this );
 		m_scene->onSceneClear.Connect  ( &Renderer::Clear, m_renderer );
-		m_scene->onDeleteEntity.Connect( &Engine::OnEntityDeleted, this );
+		m_scene->onDeleteGameobject.Connect( &Engine::OnGameobjectDeleted, this );
 
 		// Static messages		
 		Material::onMaterialSetPath.Connect		( &Engine::OnMaterialSetTexture, this );
@@ -188,17 +188,17 @@ namespace fan {
 	//================================================================================================================================
 	void Engine::OnSceneLoad(Scene * _scene) {
 
-		m_selectedentity = nullptr;
+		m_selectedGameobject = nullptr;
 
 		// Editor Camera
-		Entity * cameraEntity = _scene->CreateEntity("editor_camera");
-		cameraEntity->SetFlags(Entity::NO_DELETE | Entity::NOT_SAVED);
-		Transform * camTrans = cameraEntity->AddComponent<Transform>();
+		Gameobject * cameraGameobject = _scene->CreateGameobject("editor_camera");
+		cameraGameobject->SetFlags(Gameobject::NO_DELETE | Gameobject::NOT_SAVED);
+		Transform * camTrans = cameraGameobject->AddComponent<Transform>();
 		camTrans->SetPosition(btVector3(0, 0, -2));
-		m_editorCamera = cameraEntity->AddComponent<Camera>();
+		m_editorCamera = cameraGameobject->AddComponent<Camera>();
 		m_editorCamera->SetRemovable(false);
 		SetMainCamera(m_editorCamera);
-		FPSCamera * editorCamera = cameraEntity->AddComponent<FPSCamera>();
+		FPSCamera * editorCamera = cameraGameobject->AddComponent<FPSCamera>();
 		editorCamera->SetRemovable(false);
 
 		Debug::Get().SetDebug( m_renderer, m_editorCamera, m_mainCamera );
@@ -221,11 +221,11 @@ namespace fan {
 	//================================================================================================================================
 	//================================================================================================================================
 	void Engine::DrawAABB() const {
-		const std::vector< Entity *>  & entities = m_scene->BuildEntitiesList();
-		for (int entityIndex = 0; entityIndex < entities.size(); entityIndex++) {
-			const Entity * entity = entities[entityIndex];
-			if (entity != m_editorCamera->GetEntity()) {
-				AABB aabb = entity->GetAABB();
+		const std::vector< Gameobject *>  & entities = m_scene->BuildEntitiesList();
+		for (int gameobjectIndex = 0; gameobjectIndex < entities.size(); gameobjectIndex++) {
+			const Gameobject * gameobject = entities[gameobjectIndex];
+			if (gameobject != m_editorCamera->GetGameobject()) {
+				AABB aabb = gameobject->GetAABB();
 				m_renderer->DebugAABB(aabb, Color::Red);
 			}
 		}
@@ -234,8 +234,8 @@ namespace fan {
 	//================================================================================================================================
 	//================================================================================================================================
 	void Engine::DrawHull() const	{
-		if (m_selectedentity != nullptr) {
-			Model * model = m_selectedentity->GetComponent<Model>();
+		if (m_selectedGameobject != nullptr) {
+			Model * model = m_selectedGameobject->GetComponent<Model>();
 			if (model != nullptr) {
 				const ConvexHull * hull = nullptr;
 				Mesh * mesh = model->GetMesh();
@@ -246,7 +246,7 @@ namespace fan {
 					const std::vector<btVector3> & vertices = hull->GetVertices();
 					const std::vector<uint32_t> & indices = hull->GetIndices();
 					if (!vertices.empty()) {
-						const glm::mat4  modelMat = model->GetEntity()->GetComponent<Transform>()->GetModelMatrix();
+						const glm::mat4  modelMat = model->GetGameobject()->GetComponent<Transform>()->GetModelMatrix();
 
 						Color color(1, 0, 0, 1);
 						for (unsigned polyIndex = 0; polyIndex < indices.size() / 3; polyIndex++) {
@@ -274,12 +274,12 @@ namespace fan {
 	//================================================================================================================================
 	//================================================================================================================================
 	void Engine::DrawWireframe() const {
-		if (m_selectedentity != nullptr) {
-			Model * model = m_selectedentity->GetComponent<Model>();
+		if (m_selectedGameobject != nullptr) {
+			Model * model = m_selectedGameobject->GetComponent<Model>();
 			if (model != nullptr) {
 				Mesh * mesh = model->GetMesh();
 				if (mesh != nullptr) {
-					const glm::mat4  modelMat = model->GetEntity()->GetComponent<Transform>()->GetModelMatrix();
+					const glm::mat4  modelMat = model->GetGameobject()->GetComponent<Transform>()->GetModelMatrix();
 					const std::vector<uint32_t> & indices = mesh->GetIndices();
 					const std::vector<Vertex> & vertices = mesh->GetVertices();
 
@@ -300,13 +300,13 @@ namespace fan {
 	//================================================================================================================================
 	void Engine::DrawNormals() const {
 
-		if (m_selectedentity != nullptr) {
-			Model * model = m_selectedentity->GetComponent<Model>();
+		if (m_selectedGameobject != nullptr) {
+			Model * model = m_selectedGameobject->GetComponent<Model>();
 			if (model != nullptr) {
 				Mesh * mesh = model->GetMesh();
 				if (mesh != nullptr) {
-					const glm::mat4  modelMat = model->GetEntity()->GetComponent<Transform>()->GetModelMatrix();
-					const glm::mat4  normalMat = model->GetEntity()->GetComponent<Transform>()->GetNormalMatrix();
+					const glm::mat4  modelMat = model->GetGameobject()->GetComponent<Transform>()->GetModelMatrix();
+					const glm::mat4  normalMat = model->GetGameobject()->GetComponent<Transform>()->GetNormalMatrix();
 					const std::vector<uint32_t> & indices = mesh->GetIndices();
 					const std::vector<Vertex> & vertices = mesh->GetVertices();
 
@@ -331,23 +331,23 @@ namespace fan {
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void Engine::SetSelectedEntity( Entity * _selectedentity ) {
-		m_selectedentity = _selectedentity; 
-		onEntitySelected.Emmit( m_selectedentity );
+	void Engine::SetSelectedGameobject( Gameobject * _selectedGameobject ) {
+		m_selectedGameobject = _selectedGameobject; 
+		onGameobjectSelected.Emmit( m_selectedGameobject );
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
 	void Engine::Deselect() { 
-		m_selectedentity = nullptr; 
-		onEntitySelected.Emmit( m_selectedentity );
+		m_selectedGameobject = nullptr; 
+		onGameobjectSelected.Emmit( m_selectedGameobject );
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
 	void Engine::UpdateRenderer() {
 		// Camera
-		Transform * cameraTransform = m_mainCamera->GetEntity()->GetComponent<Transform>();
+		Transform * cameraTransform = m_mainCamera->GetGameobject()->GetComponent<Transform>();
 		if ( m_mainCamera->IsModified() || cameraTransform->IsModified() ) {
 			m_mainCamera->SetAspectRatio( m_renderer->GetWindowAspectRatio() );
 			m_renderer->SetMainCamera( m_mainCamera->GetProjection(), m_mainCamera->GetView(), ToGLM(cameraTransform->GetPosition()));
@@ -356,7 +356,7 @@ namespace fan {
 		// Point lights		
 		for ( int lightIndex = 0; lightIndex < m_pointLights.size(); lightIndex++ ) {
 			const PointLight * light = m_pointLights[lightIndex];
-			const Transform *  lightTransform = light->GetEntity()->GetComponent<Transform>();
+			const Transform *  lightTransform = light->GetGameobject()->GetComponent<Transform>();
 			m_renderer->SetPointLight(
 				lightIndex,
 				ToGLM( lightTransform->GetPosition() ),
@@ -370,7 +370,7 @@ namespace fan {
 		// Directional lights		
 		for ( int lightIndex = 0; lightIndex < m_directionalLights.size(); lightIndex++ ) {
 			const DirectionalLight * light			= m_directionalLights[lightIndex];
-			const Transform *		 lightTransform = light->GetEntity()->GetComponent<Transform>();
+			const Transform *		 lightTransform = light->GetGameobject()->GetComponent<Transform>();
 			m_renderer->SetDirectionalLight( 
 				lightIndex
 				,glm::vec4( ToGLM( lightTransform->Forward() ), 1 )
@@ -383,8 +383,8 @@ namespace fan {
 		// Transforms, mesh, materials
 		for (int modelIndex = 0; modelIndex < m_models.size() ; modelIndex++) {
 			Model * model = m_models[modelIndex];
-			Transform * transform = model->GetEntity()->GetComponent<Transform>();
-			Material * material = model->GetEntity()->GetComponent<Material>();
+			Transform * transform = model->GetGameobject()->GetComponent<Transform>();
+			Material * material = model->GetGameobject()->GetComponent<Material>();
 
 			m_renderer->SetMeshAt( modelIndex, model->GetMesh() );
 			m_renderer->SetTransformAt( modelIndex, transform->GetModelMatrix(), transform->GetNormalMatrix() );
@@ -405,8 +405,8 @@ namespace fan {
 	//================================================================================================================================
 	void Engine::ManageKeyShortcuts() {
 		if ( Keyboard::IsKeyPressed( GLFW_KEY_DELETE ) ) {
-			if ( m_selectedentity != nullptr ) {
-				m_scene->DeleteEntity( m_selectedentity );
+			if ( m_selectedGameobject != nullptr ) {
+				m_scene->DeleteGameobject( m_selectedGameobject );
 			}
 		}
 
@@ -420,9 +420,9 @@ namespace fan {
 	void Engine::ManageSelection() {
 		bool mouseCaptured = ImGui::GetIO().WantCaptureMouse;
 
-		// Translation gizmo on selected entity
-		if (m_selectedentity != nullptr && m_selectedentity != m_editorCamera->GetEntity()) {
-			Transform * transform = m_selectedentity->GetComponent< Transform >();
+		// Translation gizmo on selected gameobject
+		if (m_selectedGameobject != nullptr && m_selectedGameobject != m_editorCamera->GetGameobject()) {
+			Transform * transform = m_selectedGameobject->GetComponent< Transform >();
 			btVector3 newPosition;
 			if (DrawMoveGizmo(btTransform(btQuaternion(0, 0, 0), transform->GetPosition()), (size_t)this, newPosition)) {
 				transform->SetPosition(newPosition);
@@ -433,26 +433,26 @@ namespace fan {
 		// Mouse selection
 		if (mouseCaptured == false && Mouse::GetButtonPressed(Mouse::button0)) {
 
-			const btVector3 cameraOrigin = m_editorCamera->GetEntity()->GetComponent<Transform>()->GetPosition();;
+			const btVector3 cameraOrigin = m_editorCamera->GetGameobject()->GetComponent<Transform>()->GetPosition();;
 			const Ray ray = m_editorCamera->ScreenPosToRay(Mouse::GetScreenSpacePosition());
-			const std::vector<Entity *>  & entities = m_scene->BuildEntitiesList();
+			const std::vector<Gameobject *>  & entities = m_scene->BuildEntitiesList();
 
 			// Raycast on all the entities
-			Entity * closestentity = nullptr;
+			Gameobject * closestGameobject = nullptr;
 			float closestDistance2 = std::numeric_limits<float>::max();
-			for (int entityIndex = 0; entityIndex < entities.size(); entityIndex++) {
-				Entity * entity = entities[entityIndex];
+			for (int gameobjectIndex = 0; gameobjectIndex < entities.size(); gameobjectIndex++) {
+				Gameobject * gameobject = entities[gameobjectIndex];
 
-				if (entity == m_editorCamera->GetEntity()) {
+				if (gameobject == m_editorCamera->GetGameobject()) {
 					continue;
 				}
 
-				const AABB & aabb = entity->GetAABB();
+				const AABB & aabb = gameobject->GetAABB();
 				btVector3 intersection;
 				if (aabb.RayCast(ray.origin, ray.direction, intersection) == true) {
-					Model * model = entity->GetComponent<Model>();
+					Model * model = gameobject->GetComponent<Model>();
 					if (model != nullptr && model->GetMesh() != nullptr && model->GetMesh()->GetConvexHull() != nullptr) {
-						Transform * transform = entity->GetComponent<Transform>();
+						Transform * transform = gameobject->GetComponent<Transform>();
 						const Ray transformedRay(transform->InverseTransformPoint(ray.origin), transform->InverseTransformDirection(ray.direction));
 						if (model->GetMesh()->GetConvexHull()->RayCast(transformedRay.origin, transformedRay.direction, intersection) == false) {
 							continue;
@@ -461,11 +461,11 @@ namespace fan {
 					const float distance2 = intersection.distance2(cameraOrigin);
 					if (distance2 < closestDistance2) {
 						closestDistance2 = distance2;
-						closestentity = entity;
+						closestGameobject = gameobject;
 					}
 				}
 			}
-			SetSelectedEntity(closestentity);
+			SetSelectedGameobject(closestGameobject);
 		}
 	}	
 
@@ -495,7 +495,7 @@ namespace fan {
 		const btVector3 origin = _transform.getOrigin();
 		const btTransform rotation(_transform.getRotation());
 		const btVector3 axisDirection[3] = { btVector3(1, 0, 0), btVector3(0, 1, 0),  btVector3(0, 0, 1) };
-		const btVector3 cameraPosition = m_editorCamera->GetEntity()->GetComponent<Transform>()->GetPosition();
+		const btVector3 cameraPosition = m_editorCamera->GetGameobject()->GetComponent<Transform>()->GetPosition();
 		const float size = 0.2f * origin.distance(cameraPosition);
 		const btTransform coneRotation[3] = {
 		btTransform(btQuaternion(0, 0, btRadians(-90)), size*axisDirection[0])
@@ -567,7 +567,7 @@ namespace fan {
 		// Looks for the _directionalLight
 		for ( int lightIndex = 0; lightIndex < m_directionalLights.size(); lightIndex++ ) {
 			if ( m_directionalLights[lightIndex] == _directionalLight ) {
-				Debug::Get() << Debug::Severity::warning << "Directional Light already registered in entity : " << _directionalLight->GetEntity()->GetName() << Debug::Endl();
+				Debug::Get() << Debug::Severity::warning << "Directional Light already registered in gameobject : " << _directionalLight->GetGameobject()->GetName() << Debug::Endl();
 				return;
 			}
 		}
@@ -595,7 +595,7 @@ namespace fan {
 
 		// Light not removed
 		if ( m_directionalLights.size() == num ) {
-			Debug::Get() << Debug::Severity::warning << "Trying to remove a non registered directional light! entity=" << _directionalLight->GetEntity()->GetName() << Debug::Endl();
+			Debug::Get() << Debug::Severity::warning << "Trying to remove a non registered directional light! gameobject=" << _directionalLight->GetGameobject()->GetName() << Debug::Endl();
 			return;
 		}
 	}
@@ -607,7 +607,7 @@ namespace fan {
 		// Looks for the _pointLight
 		for ( int lightIndex = 0; lightIndex < m_pointLights.size(); lightIndex++ ) {
 			if ( m_pointLights[lightIndex] == _pointLight ) {
-				Debug::Get() << Debug::Severity::warning << "PointLight already registered in entity : " << _pointLight->GetEntity()->GetName() << Debug::Endl();
+				Debug::Get() << Debug::Severity::warning << "PointLight already registered in gameobject : " << _pointLight->GetGameobject()->GetName() << Debug::Endl();
 				return;
 			}
 		}		
@@ -635,7 +635,7 @@ namespace fan {
 
 		// Light not removed
 		if ( m_pointLights.size() == num ) {
-			Debug::Get() << Debug::Severity::warning << "Trying to remove a non registered point light! entity=" << _pointLight->GetEntity()->GetName() << Debug::Endl();
+			Debug::Get() << Debug::Severity::warning << "Trying to remove a non registered point light! gameobject=" << _pointLight->GetGameobject()->GetName() << Debug::Endl();
 			return;
 		}
 	}
@@ -646,7 +646,7 @@ namespace fan {
 		// Looks for the model
 		for ( int modelIndex = 0; modelIndex < m_models.size(); modelIndex++ ) {
 			if ( m_models[modelIndex] == _model ) {
-				Debug::Get() << Debug::Severity::warning << "Model already registered : " << _model->GetEntity()->GetName() << Debug::Endl();
+				Debug::Get() << Debug::Severity::warning << "Model already registered : " << _model->GetGameobject()->GetName() << Debug::Endl();
 				return;
 			}
 		}
@@ -687,8 +687,8 @@ namespace fan {
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void Engine::OnEntityDeleted( Entity * _entity ) {
-		if ( _entity == m_selectedentity ) {
+	void Engine::OnGameobjectDeleted( Gameobject * _gameobject ) {
+		if ( _gameobject == m_selectedGameobject ) {
 			Deselect();
 		}
 	}

@@ -4,7 +4,7 @@
 #include "renderer/fanMesh.h"
 #include "scene/components/fanModel.h"
 #include "scene/components/fanTransform.h"
-#include "scene/fanEntity.h"
+#include "scene/fanGameobject.h"
 #include "core/math/shapes/fanAABB.h"
 #include "core/math/shapes/fanConvexHull.h"
 #include "core/files/fanFbxImporter.h"
@@ -37,7 +37,7 @@ namespace fan
 	//================================================================================================================================
 	//================================================================================================================================
 	AABB Model::ComputeAABB() const {
-		const glm::mat4 modelMatrix = GetEntity()->GetComponent<Transform>()->GetModelMatrix();
+		const glm::mat4 modelMatrix = GetGameobject()->GetComponent<Transform>()->GetModelMatrix();
 		const std::vector<Vertex> &  vertices = m_mesh->GetVertices();
 
 		const ConvexHull * hull = m_mesh->GetConvexHull();
