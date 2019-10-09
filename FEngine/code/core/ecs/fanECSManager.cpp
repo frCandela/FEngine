@@ -80,6 +80,7 @@ namespace fan {
 				case 0:	m_components.Get<0>().recycleList.push_back( componentIndex ); break;
 				case 1:	m_components.Get<1>().recycleList.push_back( componentIndex ); break;
 				case 2:	m_components.Get<2>().recycleList.push_back( componentIndex ); break;
+				case 3:	m_components.Get<3>().recycleList.push_back( componentIndex ); break;
 				default:
 					assert( false);
 					break;
@@ -167,20 +168,23 @@ namespace fan {
 		auto& dataTransform = m_components.Get< ecsTranform >();
 		ImGui::Text( TagCountSize( "CTranform:      ", dataTransform.vector.size() - dataTransform.recycleList.size(),	sizeof( ecsTranform ) ).c_str() );
 		auto& dataMovement = m_components.Get< ecsMovement >();
-		ImGui::Text( TagCountSize( "SCMovement:     ", dataMovement.vector.size() - dataMovement.recycleList.size(),	sizeof( ecsMovement ) ).c_str() );
-		auto& dataColor = m_components.Get< ecsColor >();
-		ImGui::Text( TagCountSize( "CColor:         ", dataColor.vector.size() - dataColor.recycleList.size(),		sizeof( ecsColor ) ).c_str() );
+		ImGui::Text( TagCountSize( "SCMovement:     ", dataMovement.vector.size() - dataMovement.recycleList.size(), sizeof( ecsMovement ) ).c_str() );
+		auto& dataParticle = m_components.Get< ecsParticle >();
+		ImGui::Text( TagCountSize( "CParticle:         ", dataParticle.vector.size() - dataParticle.recycleList.size(),		sizeof( ecsParticle ) ).c_str() );
+		auto& dataScale = m_components.Get< ecsScaling >();
+		ImGui::Text( TagCountSize( "CScale:         ", dataScale.vector.size() - dataScale.recycleList.size(), sizeof( ecsScaling ) ).c_str() );
+
 
 		ImGui::Separator();
 		ImGui::Separator();
 
-		static bool s_transform, s_color, s_movement;		
+		static bool s_transform, s_particle, s_movement, s_scale;
 		ImGui::Checkbox("transform",&s_transform );
 		ImGui::SameLine (); ImGui::Checkbox( "movement", &s_movement );
-		ImGui::SameLine (); ImGui::Checkbox( "color", &s_color );
-		static bool s_ally, s_ennemy;
-		ImGui::Checkbox( "ally", &s_ally ); 
-		ImGui::SameLine (); ImGui::Checkbox( "ennemy", &s_ennemy );
+		ImGui::SameLine (); ImGui::Checkbox( "particle", &s_particle );
+		ImGui::SameLine (); ImGui::Checkbox( "scale", &s_scale );
+		static bool s_fakeTag;
+		ImGui::Checkbox( "fakeTag", &s_fakeTag );
 
 		static int nb = 1;
 		if ( ImGui::Button( "Create Entities") ) {
@@ -188,9 +192,9 @@ namespace fan {
 				ecsEntity entity = CreateEntity();
 				if ( s_transform )	AddComponent<ecsTranform>( entity );
 				if ( s_movement )	AddComponent<ecsMovement>( entity );
-				if ( s_color )		AddComponent<ecsColor>( entity );
-				if ( s_ally )		AddTag<ecsAlly>( entity );
-				if ( s_ennemy )		AddTag<ecsEnnemy>( entity );
+				if ( s_particle )		AddComponent<ecsParticle>( entity );
+				if ( s_scale )		AddComponent<ecsScaling>( entity );
+				if ( s_fakeTag )	AddTag<ecsFakeTag>( entity );
 			}
 		} ImGui::SameLine (); ImGui::PushItemWidth(100);
 		ImGui::DragInt( "nb", &nb, 1, 1, 100000 );

@@ -17,32 +17,37 @@ namespace fan {
 		btQuaternion	rotation;
 	};
 	//================================
+	struct ecsScaling : ecsIComponent {
+		btVector3		scale;
+	};
+	//================================
 	struct ecsMovement : ecsIComponent {
 		btVector3		speed;
 	};
 	//================================
-	struct ecsColor : ecsIComponent {
-		fan::Color		color;
+	struct ecsParticle : ecsIComponent {
+		fan::Color	color;
+		float		durationLeft;
 	};
 	//================================
 	//================================
 	using ecsComponents = meta::TypeList<
 		ecsTranform
 		, ecsMovement
-		, ecsColor
+		, ecsParticle
+		, ecsScaling
 	>;
 
 	//================================================================================================================================
 	// Tags
 	//================================================================================================================================
 	struct ecsITag {};
-	struct ecsAlly : ecsITag {};
-	struct ecsEnnemy : ecsITag {};
+	struct ecsFakeTag : ecsITag {};
+	
 	//================================
 	//================================
 	using ecsTags = meta::TypeList<
-		 ecsAlly
-		,ecsEnnemy
+		ecsFakeTag
 	>;
 
 	//================================================================================================================================
@@ -78,18 +83,36 @@ namespace fan {
 		static constexpr ecsBitset bitset = componentsBitset | tagsBitset;
 	}; 
 	// testing
-	static_assert( std::is_same< ecsSignature<ecsMovement, ecsAlly>::componentsTypes, meta::TypeList< ecsMovement>>::value );
-	static_assert( std::is_same< ecsSignature<ecsMovement, ecsAlly>::tagsTypes, meta::TypeList< ecsAlly>>::value );
-	//================================	
-	//================================	
-	using ecsDynamic	 = ecsSignature< ecsTranform, ecsMovement >;
-	using ecsEnnemyShip = ecsSignature< ecsTranform, ecsMovement, ecsEnnemy >;
-	using ecsAllyShip	 = ecsSignature< ecsTranform, ecsMovement, ecsAlly >;
+	static_assert( std::is_same< ecsSignature<ecsFakeTag, ecsMovement>::componentsTypes, meta::TypeList< ecsMovement>>::value );
+	static_assert( std::is_same< ecsSignature<ecsMovement, ecsFakeTag>::tagsTypes, meta::TypeList< ecsFakeTag>>::value );
 	
-	static constexpr ecsBitset tot1 = ecsAllyShip::componentsBitset;
-	static constexpr ecsBitset tot2 = ecsAllyShip::tagsBitset;
-	static constexpr ecsBitset tot3 = ecsAllyShip::bitset;
+	//================================	
+	// Declare your signatures here
+	//================================	
+	using ecsParticleSignature = ecsSignature< ecsTranform, ecsMovement, ecsParticle >;
+	
+	static constexpr ecsBitset tot1 = ecsParticleSignature::componentsBitset;
 
+	//================================================================================================================================
+	// System
+	// Runs logic on entities matching a specific signature
+	//================================================================================================================================
+	template < typename... _signature> class ISystem;
+	template < template <typename...> typename _typeList, typename... _args>
+	class ISystem <_typeList<_args...> >{
+		public:	
+			using signature = ecsSignature<_args...>;
+			virtual void Run( _args&... ) = 0;
+	};
 
+	//================================
+	// Declare your systems here
+	//================================
+	class MoveParticle : ISystem<  ecsParticleSignature > {
+		void Run( ecsTranform& /*_transform*/, ecsMovement& /*_movement*/, ecsParticle& /*_particle*/ ) override {
 
+		}
+	};
+
+	//using caca = MoveParticle::signature::componentsTypes;
 }
