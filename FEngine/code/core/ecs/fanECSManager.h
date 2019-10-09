@@ -11,8 +11,10 @@ namespace fan {
 	public:
 		EcsManager();	
 
-		ecsEntity CreateEntity();
-		void	DeleteEntity( const ecsEntity  _entity);
+		ecsEntity	CreateEntity();
+		void		DeleteEntity( const ecsEntity  _entity);
+		ecsHandle	CreateHandle( const ecsEntity  _referencedEntity );
+		bool		FindEntity( const ecsHandle  _handle, ecsEntity& _outEntity );
 
 		template< typename _componentType > void AddComponent( const ecsEntity _entity );
 		template< typename _tagType >		void AddTag( const ecsEntity _entity );
@@ -22,17 +24,21 @@ namespace fan {
 		void OnGui();
 
 	private:
+		ecsComponentsTuple< ecsComponents >			m_components;
+		std::vector<ecsEntityData>					m_entitiesData;
+		std::unordered_map< ecsHandle, ecsEntity >  m_handlesToEntity;
+		std::unordered_map< ecsEntity, ecsHandle >  m_entityToHandles;
 
-		ecsComponentsTuple< ecsComponents > m_components;
-		std::vector<EntityData>		  m_entitiesData;
-
+		ecsHandle m_nextHandle;
 		ecsEntity m_firstDeadEntity = 0;
 		ecsEntity m_activeEntitiesCount = 0;
-
 		
+		void	SwapHandlesEntities( const ecsEntity _entity1, const ecsEntity _entity2 );
 		void	SortEntities();
 		void	RemoveDeadEntities();
  	};
+
+
 
 	//================================================================================================================================
 	//================================================================================================================================
@@ -44,7 +50,7 @@ namespace fan {
 		auto &		componentData =  m_components.Get< _componentType >();
 		std::vector<_componentType>&	vector = componentData.vector;
 		std::vector<uint32_t>&			recycleList = componentData.recycleList;
-		EntityData &					entityData = m_entitiesData[_entity];
+		ecsEntityData &					entityData = m_entitiesData[_entity];
 
 		uint32_t componentIndex;
 		if ( recycleList.empty() ) {

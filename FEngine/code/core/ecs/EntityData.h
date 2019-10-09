@@ -3,9 +3,9 @@
 #include "core/ecs/fanECSConfig.h"
 
 namespace fan {
-	struct EntityData {
+	struct ecsEntityData {
 	public:
-		EntityData() {
+		ecsEntityData() {
 			bitset[aliveBit] = 1;
 		}
 		uint32_t components[ecsComponents::count];
@@ -15,5 +15,5 @@ namespace fan {
 		bool IsAlive() const { return   bitset[aliveBit]; }
 		bool IsDead() const { return  ! bitset[aliveBit]; }
 	};
-	static_assert( sizeof(EntityData) == sizeof( ecsBitset ) + ecsComponents::count * sizeof( uint32_t ) ); // Beware of paaaaaaading :')
+	static_assert( sizeof(ecsEntityData) == sizeof( ecsBitset ) + ecsComponents::count * sizeof( uint32_t ) ); // Beware of paaaaaaading :')
 }

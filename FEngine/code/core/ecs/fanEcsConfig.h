@@ -49,7 +49,7 @@ namespace fan {
 	// Bitsets & masks
 	//================================================================================================================================
 	using ecsEntity = uint32_t; 
-	using ecsHandle = uint32_t;
+	using ecsHandle = uint64_t;
 	using ecsBitset = Bitset2::bitset2< 32 >;
 	static_assert( ecsComponents::count + ecsTags::count <= 32 );
 
