@@ -95,8 +95,8 @@ namespace fan {
 		
 		fbxsdk::FbxAxisSystem axisSystem( 
 			fbxsdk::FbxAxisSystem::EUpVector::eYAxis, 
-			(fbxsdk::FbxAxisSystem::EFrontVector)-2, 
-			fbxsdk::FbxAxisSystem::ECoordSystem::eLeftHanded
+			(fbxsdk::FbxAxisSystem::EFrontVector)2, 
+			fbxsdk::FbxAxisSystem::ECoordSystem::eRightHanded
 		);
 		axisSystem.ConvertScene(m_scene);
 
