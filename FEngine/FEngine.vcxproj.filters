@@ -313,6 +313,9 @@
     <ClCompile Include="code\scene\fanGameobject.cpp">
       <Filter>code\scene</Filter>
     </ClCompile>
+    <ClCompile Include="code\core\ecs\fanECSSystems.cpp">
+      <Filter>code\core\ecs\systems</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="code\editor\fanMainMenuBar.h">

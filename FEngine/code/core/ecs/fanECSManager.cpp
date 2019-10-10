@@ -1,10 +1,13 @@
 #include "fanGlobalIncludes.h"
 #include "core/ecs/fanECSManager.h"
+#include "core/fanTime.h"
 
 namespace fan {
 	//================================================================================================================================
 	//================================================================================================================================
-	EcsManager::EcsManager() {
+	EcsManager::EcsManager() :	
+		m_generator()
+		,m_distribution( 0.f, 1.f ) {
 		m_entityToHandles.reserve( 512 );
 		m_entitiesData.reserve(1024);
 	}
@@ -16,8 +19,9 @@ namespace fan {
 			m_entitiesData.reserve( 2 * m_entitiesData.size() );
 			Debug::Log("realloc");
 		}
+		ecsEntity entity = static_cast<ecsEntity>( m_entitiesData.size());
 		m_entitiesData.push_back( ecsEntityData() );
-		return static_cast<ecsEntity> (m_entitiesData.size() - 1 );
+		return static_cast<ecsEntity> ( entity );
 	}
 
 	//================================================================================================================================
@@ -61,16 +65,16 @@ namespace fan {
 	template< typename _type, typename _system > struct RunSystem;
 	template< template < typename...> typename _components, typename... _types, typename _system  >
 	struct RunSystem<_components<_types...>, _system > {
-		static void Run( const float _delta, const std::vector<ecsEntityData>& _entitiesData, ecsComponentsTuple< ecsComponents > _tuple ) {
-			_system::Run( _delta, _entitiesData,  _tuple.Get<_types>().vector ... );
+		static void Run( const float _delta, const size_t _count, std::vector<ecsEntityData>& _entitiesData, ecsComponentsTuple< ecsComponents >& _tuple ) {
+			_system::Run( _delta, _count, _entitiesData,  _tuple.Get<_types>().vector ... );
 		}
 	};
 
 	//================================================================================================================================
 	//================================================================================================================================
 	void EcsManager::Update( float _delta ) {
-		if ( m_enableRefresh ) {
-			RunSystem< ParticleSystem::signature::componentsTypes, ParticleSystem >::Run( _delta, m_entitiesData, m_components );
+		if ( m_enableUpdate ) {
+			RunSystem< ParticleSystem::signature::componentsTypes, ParticleSystem >::Run( _delta, m_activeEntitiesCount, m_entitiesData, m_components );
 		}
 	}
 
@@ -100,10 +104,10 @@ namespace fan {
 			for (int componentIndex = 0; componentIndex < ecsComponents::count ; componentIndex++) {
 				if( data.bitset[componentIndex])
 				switch ( componentIndex ) {
-				case 0:	m_components.Get<0>().recycleList.push_back( componentIndex ); break;
-				case 1:	m_components.Get<1>().recycleList.push_back( componentIndex ); break;
-				case 2:	m_components.Get<2>().recycleList.push_back( componentIndex ); break;
-				case 3:	m_components.Get<3>().recycleList.push_back( componentIndex ); break;
+				case 0:	m_components.Get<0>().recycleList.push_back( data.components[componentIndex] ); break;
+				case 1:	m_components.Get<1>().recycleList.push_back( data.components[componentIndex] ); break;
+				case 2:	m_components.Get<2>().recycleList.push_back( data.components[componentIndex] ); break;
+				case 3:	m_components.Get<3>().recycleList.push_back( data.components[componentIndex] ); break;
 				default:
 					assert( false);
 					break;
@@ -112,6 +116,7 @@ namespace fan {
 			m_entitiesData.pop_back();
 			--reverseIndex;
 		}
+		m_activeEntitiesCount = static_cast<ecsEntity>( m_entitiesData.size() );
 	}
 
 	//================================================================================================================================
@@ -194,10 +199,9 @@ namespace fan {
 		auto& dataMovement = m_components.Get< ecsMovement >();
 		ImGui::Text( TagCountSize( "SCMovement:     ", dataMovement.vector.size() - dataMovement.recycleList.size(), sizeof( ecsMovement ) ).c_str() );
 		auto& dataParticle = m_components.Get< ecsParticle >();
-		ImGui::Text( TagCountSize( "CParticle:         ", dataParticle.vector.size() - dataParticle.recycleList.size(),		sizeof( ecsParticle ) ).c_str() );
+		ImGui::Text( TagCountSize( "CParticle:      ", dataParticle.vector.size() - dataParticle.recycleList.size(),		sizeof( ecsParticle ) ).c_str() );
 		auto& dataScale = m_components.Get< ecsScaling >();
 		ImGui::Text( TagCountSize( "CScale:         ", dataScale.vector.size() - dataScale.recycleList.size(), sizeof( ecsScaling ) ).c_str() );
-
 
 		ImGui::Separator();
 		ImGui::Separator();
@@ -214,9 +218,9 @@ namespace fan {
 		if ( ImGui::Button( "Create Entities") ) {
 			for (int i = 0; i < nb; i++) {		
 				ecsEntity entity = CreateEntity();
-				if ( s_transform )	AddComponent<ecsTranform>( entity );
-				if ( s_movement )	AddComponent<ecsMovement>( entity );
-				if ( s_particle )		AddComponent<ecsParticle>( entity );
+				if ( s_transform )  AddComponent<ecsTranform>( entity ); 
+				if ( s_movement ) 	AddComponent<ecsMovement>( entity ); 
+				if ( s_particle )	AddComponent<ecsParticle>( entity );
 				if ( s_scale )		AddComponent<ecsScaling>( entity );
 				if ( s_fakeTag )	AddTag<ecsFakeTag>( entity );
 			}
@@ -228,11 +232,39 @@ namespace fan {
 			CreateHandle( entitySelect );
 		} ImGui::SameLine();
 		ImGui::DragInt( "handleIndex", &entitySelect );
-
+		int tempActiveCount = (int)m_activeEntitiesCount; ImGui::DragInt( "m_activeEntitiesCount", &tempActiveCount );
 		if ( ImGui::Button( "Update" ) ) { Update( 0.f ); } ImGui::SameLine();
 		if ( ImGui::Button( "Sort" ) ) { SortEntities();	} ImGui::SameLine();
 		if ( ImGui::Button( "RemoveDead" ) ) { RemoveDeadEntities(); }ImGui::SameLine();
-		ImGui::Checkbox("disable refresh", &m_enableRefresh );
+		ImGui::Checkbox("disable refresh", &m_enableRefresh ); ImGui::SameLine();
+		ImGui::Checkbox( "disable update", &m_enableUpdate );
+		
+		// PARTICLES
+		static int particlesPerFrame = 1;
+		static float speed = 1.f;
+		static float duration = 2.f;
+		static btVector3 startPos;
+		if ( ImGui::CollapsingHeader( "Particles" ) ) {
+			ImGui::DragInt("particlesPerFrame", &particlesPerFrame, 1, 0 );
+			ImGui::DragFloat( "speed", &speed, 0.01f);
+			ImGui::DragFloat( "duration", &duration, 0.01f );
+			ImGui::DragFloat3( "start pos", &startPos[0]);
+
+			if ( particlesPerFrame > 0 ) {
+				for ( int particleIndex = 0; particleIndex < particlesPerFrame; particleIndex++ ) {
+					ecsEntity entity = CreateEntity();
+					ecsTranform& transform = m_components.Get<ecsTranform>().vector[AddComponent<ecsTranform>( entity )];
+					ecsMovement& movement = m_components.Get<ecsMovement>().vector[AddComponent<ecsMovement>( entity )];
+					ecsParticle& particle = m_components.Get<ecsParticle>().vector[AddComponent<ecsParticle>( entity )];
+					
+					movement.speed = btVector3( m_distribution( m_generator ), m_distribution( m_generator ), m_distribution( m_generator ) ) - btVector3(0.5f, 0.5f, 0.5f);
+					movement.speed.normalize();
+					movement.speed *= speed;
+					transform.position = startPos;
+					particle.durationLeft = duration;
+				}
+			}
+		}
 
 		// Entities list
 		if ( ImGui::CollapsingHeader( "Entities" ) ) {
@@ -242,7 +274,11 @@ namespace fan {
 				if( ImGui::Button("X##killentity") ) {
 					data.Kill();
 				} ImGui::SameLine();
-				ImGui::Text( data.bitset.to_string().c_str() );
+				
+				std::stringstream ss;
+				ss << data.bitset.to_string()<< " " << entityIndex << " Transform=" << data.components[IndexOfComponent<ecsTranform>::value];
+				ImGui::Text( ss.str().c_str());
+
 				ImGui::PopID();
 			}
 		}

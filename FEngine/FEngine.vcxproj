@@ -86,6 +86,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="code\core\ecs\fanECSManager.cpp" />
+    <ClCompile Include="code\core\ecs\fanECSSystems.cpp" />
     <ClCompile Include="code\core\fanDebug.cpp" />
     <ClCompile Include="code\core\fanISerializable.cpp" />
     <ClCompile Include="code\core\fanTime.cpp" />

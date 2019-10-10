@@ -149,21 +149,27 @@ namespace fan {
 	//================================================================================================================================
 	//================================================================================================================================
 	void Engine::Run() {
-		float lastUpdateTime = Time::ElapsedSinceStartup();
+
+		float lastTime = Time::ElapsedSinceStartup();
 		while ( m_applicationShouldExit == false && m_renderer->WindowIsOpen() == true ) {
-			const float time = Time::ElapsedSinceStartup();
-			const float delta = Time::Get().GetDelta();
-			float updateDelta = time - lastUpdateTime;
+ 			const float time = Time::ElapsedSinceStartup();
+			float delta = time - lastTime;
+			lastTime = time;
 
-			if ( updateDelta > delta ) {			
-				lastUpdateTime = time;
-				Time::Get().UpdateFrameTime( updateDelta );
-				updateDelta = 0;
+// 			float delta
+// 
+// 			
+// 			const float delta = Time::Get().GetDelta();
+// 			float updateDelta = time - lastUpdateTime;
 
+			//if ( updateDelta > delta ) 
+			{			
+
+				Time::Get().UpdateFrameTime( delta );
 				m_scene->BeginFrame();
 				m_scene->Update( delta );
 				m_ecsManager->Update( delta );
-
+				m_ecsManager->Refresh();
 				ManageKeyShortcuts();
 				ManageSelection();
 				DrawUI();
@@ -178,7 +184,6 @@ namespace fan {
 				m_renderer->DrawFrame();
 
 				m_scene->EndFrame();
-				m_ecsManager->Refresh();
 			}
 		}
 

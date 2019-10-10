@@ -2,6 +2,7 @@
 
 #include "core/ecs/fanECSConfig.h"
 #include "core/ecs/EntityData.h"
+#include "renderer/fanRenderer.h"
 
 namespace fan {
 	//================================================================================================================================
@@ -50,23 +51,9 @@ namespace fan {
 	//================================
 	class ParticleSystem : public ISystem<  ecsParticleSignature > {
 	public:
-		static void Run( float _delta, const std::vector< ecsEntityData >& _entitiesData,
+		static void Run( float _delta, const size_t _count, std::vector< ecsEntityData >& _entitiesData,
 			std::vector< ecsTranform > & _transforms,
 			std::vector< ecsMovement > & _movements,
-			std::vector< ecsParticle > & _particles ) 
-		{
-			for (int entity = 0; entity < _entitiesData.size(); entity++)
-			{
-				const ecsEntityData & data = _entitiesData[ entity ];
-
-				if( data.IsAlive() && (data.bitset & ParticleSystem::signature::bitset) == ParticleSystem::signature::bitset ) {
-					ecsTranform& transform = _transforms[data.components[IndexOfComponent<ecsTranform>::value]];
-					ecsMovement& movement = _movements[data.components[IndexOfComponent<ecsMovement>::value]];
-					ecsParticle& particle = _particles[data.components[IndexOfComponent<ecsParticle>::value]];
-					Debug::Warning( "test" + std::to_string(_delta) );
-					(void)_delta;(void )transform; (void)movement; (void)particle;
-				}
-			}
-		}			
+			std::vector< ecsParticle > & _particles );
 	};
 }

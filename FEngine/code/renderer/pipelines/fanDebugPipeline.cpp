@@ -55,5 +55,6 @@ namespace fan
 		m_inputAssemblyStateCreateInfo.topology = m_primitiveTopology;
 		m_depthStencilStateCreateInfo.depthTestEnable = m_depthTestEnable ? VK_TRUE : VK_FALSE;
 		m_descriptorSetLayouts= { m_descriptor->GetLayout() };		
+		m_rasterizationStateCreateInfo.cullMode = VK_CULL_MODE_NONE;
 	}
 }

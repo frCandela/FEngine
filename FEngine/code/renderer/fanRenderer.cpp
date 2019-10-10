@@ -723,10 +723,31 @@ namespace fan
 	}
 
 	//================================================================================================================================
+	// takes a list of triangle and a list of colors
+	// 3 vertices per triangle
+	// 1 color per triangle
+	//================================================================================================================================
+	void Renderer::DebugTriangles( const std::vector<btVector3>& _triangles, const std::vector<Color>& _colors ) {
+		assert(_triangles .size() % 3 == 0 );
+		assert( _colors.size() == _triangles.size() / 3 );
+
+		m_debugTriangles.reserve(m_debugTriangles.size() + _triangles.size() );		
+		for (int triangleIndex = 0; triangleIndex < _triangles.size() / 3; triangleIndex++)	{
+			btVector3 v0 = _triangles[ 3 * triangleIndex + 0 ];
+			btVector3 v1 = _triangles[ 3 * triangleIndex + 1 ];
+			btVector3 v2 = _triangles[ 3 * triangleIndex + 2 ];
+
+			const glm::vec3 normal = glm::normalize( ToGLM( ( v1 - v2 ).cross( v0 - v2 ) ) );
+			m_debugTriangles.push_back( DebugVertex( ToGLM( v0 ), normal, _colors[triangleIndex].ToGLM() ) );
+			m_debugTriangles.push_back( DebugVertex( ToGLM( v1 ), normal, _colors[triangleIndex].ToGLM() ) );
+			m_debugTriangles.push_back( DebugVertex( ToGLM( v2 ), normal, _colors[triangleIndex].ToGLM() ) );
+		}
+	}
+
+	//================================================================================================================================
 	//================================================================================================================================
 	void Renderer::DebugTriangle(const btVector3 _v0, const btVector3 _v1, const btVector3 _v2, const Color _color) {
 		const glm::vec3 normal = glm::normalize(ToGLM((_v1 - _v2).cross(_v0 - _v2)));
-
 		m_debugTriangles.push_back(DebugVertex(ToGLM(_v0), normal, _color.ToGLM()));
 		m_debugTriangles.push_back(DebugVertex(ToGLM(_v1), normal, _color.ToGLM()));
 		m_debugTriangles.push_back(DebugVertex(ToGLM(_v2), normal, _color.ToGLM()));

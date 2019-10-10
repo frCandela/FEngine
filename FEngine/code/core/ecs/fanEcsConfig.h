@@ -27,8 +27,8 @@ namespace fan {
 	};
 	//================================
 	struct ecsParticle : ecsIComponent {
-		fan::Color	color;
-		float		durationLeft;
+		fan::Color	color			= Color::Red;
+		float		durationLeft	= 3.f;
 	};
 	//================================
 	//================================

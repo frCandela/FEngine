@@ -8,7 +8,7 @@ namespace fan {
 		ecsEntityData() {
 			bitset[aliveBit] = 1;
 		}
-		uint32_t components[ecsComponents::count];
+		uint32_t	components[ecsComponents::count];
 		ecsBitset   bitset; // signature bitset
 
 		void Kill() { bitset[aliveBit] = 0; }
