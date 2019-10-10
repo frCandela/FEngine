@@ -31,4 +31,20 @@ namespace fan {
 		ss << seconds << ']';
 		return ss.str();
 	}
+
+	//================================================================================================================================
+	// Counts the frames during the last second to calculate the framerate
+	//================================================================================================================================
+	void Time::RegisterFrameDrawn() {
+		++ m_framesCounter;
+
+		const float time = ElapsedSinceStartup();
+		if ( time - m_lastLogFrameTime > 1.f ) {
+			m_realFramerateLastSecond = m_framesCounter;
+			m_framesCounter = 0;
+			m_lastLogFrameTime = time;
+		}
+	}
+
+
 }

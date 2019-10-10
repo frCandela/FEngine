@@ -82,16 +82,12 @@ namespace fan
 		m_debugLinesvertexBuffers.resize(m_swapchain->GetSwapchainImagesCount());
 		m_debugLinesNoDepthTestVertexBuffers.resize(m_swapchain->GetSwapchainImagesCount());
 		m_debugTrianglesvertexBuffers.resize(m_swapchain->GetSwapchainImagesCount());
-
-		ImGui::NewFrame();
 	}
 	
 	//================================================================================================================================
 	//================================================================================================================================	
 	Renderer::~Renderer() {
 		vkDeviceWaitIdle( m_device->vkDevice );
-
-		ImGui::EndFrame();
 
 		delete m_imguiPipeline;
 		delete m_forwardPipeline;
@@ -175,9 +171,6 @@ namespace fan
 				m_ressourceManager->SetUnmodified();
 			}
 
-			ImGui::EndFrame();
-			ImGui::Render();
-
 			const uint32_t currentFrame = m_swapchain->GetCurrentFrame();
 			UpdateUniformBuffers( currentFrame );
 			RecordCommandBufferGeometry(currentFrame);
@@ -188,9 +181,6 @@ namespace fan
 
 			m_swapchain->PresentImage();
 			m_swapchain->StartNextFrame();
-			Input::NewFrame();
-			ImGui::NewFrame();
-			ClearDebug();
 	}
 
 	//================================================================================================================================

@@ -146,21 +146,9 @@ namespace fan
 				ImGui::EndMenu();
 			}
 
-			// Calculates average fps during the last second
-			float frameTime = Time::Get().GetFrameTime();
-			m_fpsCounter.sum += frameTime;
-			++ m_fpsCounter.count;
-			if ( m_fpsCounter.sum >= 1 ) { // every 1s
-				m_fpsCounter.fps = static_cast<float>( m_fpsCounter.count) / m_fpsCounter.sum;
-				m_fpsCounter.count = 0;
-				m_fpsCounter.sum = 0.f;
-			}
-
 			// Framerate
-			std::stringstream ss;
-			ss << std::fixed  << std::setprecision(0) << m_fpsCounter.fps;
 			ImGui::SameLine(ImGui::GetWindowWidth() - 60);
-			if ( ImGui::BeginMenu( ss.str().c_str(), false ) ) {ImGui::EndMenu();}
+			if ( ImGui::BeginMenu( std::to_string(Time::Get().GetRealFramerate()).c_str(), false ) ) {ImGui::EndMenu();}
 			if ( ImGui::IsItemClicked( 1 ) ) {
 				ImGui::OpenPopup( "main_menu_bar_set_fps" );
 			}
@@ -168,14 +156,17 @@ namespace fan
 			// Framerate set popup
 			if ( ImGui::BeginPopup( "main_menu_bar_set_fps" ) ) {
 				ImGui::PushItemWidth( 80.f );
-				float maxFps = 1.f / Time::Get().GetDelta();
+				float maxFps = 1.f / Time::Get().GetRenderDelta();
 				if ( ImGui::DragFloat( "fps", &maxFps, 1.f, 1.f, 3000.f, "%.f" ) ) {
-					Time::Get().SetDelta( maxFps < 1.f ? 1.f : 1.f / maxFps );
+					Time::Get().SetRenderDelta( maxFps < 1.f ? 1.f : 1.f / maxFps );
 				}
+				float maxLogicFrequency = 1.f / Time::Get().GetLogicDelta();
+				if ( ImGui::DragFloat( "logic frequency", &maxLogicFrequency, 1.f, 1.f, 3000.f, "%.f" ) ) {
+					Time::Get().SetLogicDelta( maxLogicFrequency < 1.f ? 1.f : 1.f / maxLogicFrequency );
+				}
+
 				ImGui::EndPopup();
 			}
-
-
 
 		} ImGui::EndMainMenuBar();
 

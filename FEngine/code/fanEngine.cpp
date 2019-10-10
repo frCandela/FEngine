@@ -149,26 +149,26 @@ namespace fan {
 	//================================================================================================================================
 	//================================================================================================================================
 	void Engine::Run() {
+		float lastLogicTime = Time::ElapsedSinceStartup();
+		float lastRenderTime = Time::ElapsedSinceStartup();
 
-		float lastTime = Time::ElapsedSinceStartup();
 		while ( m_applicationShouldExit == false && m_renderer->WindowIsOpen() == true ) {
  			const float time = Time::ElapsedSinceStartup();
-			float delta = time - lastTime;
-			lastTime = time;
 
-// 			float delta
-// 
-// 			
-// 			const float delta = Time::Get().GetDelta();
-// 			float updateDelta = time - lastUpdateTime;
+			// Runs logic, renders ui
+			const float targetLogicDelta = Time::Get().GetLogicDelta();
+			const float logicDelta = time - lastLogicTime;
+			if ( logicDelta > targetLogicDelta ) {				
+				lastLogicTime += targetLogicDelta;
 
-			//if ( updateDelta > delta ) 
-			{			
+				ImGui::NewFrame();
+				ImGui::GetIO().DeltaTime = logicDelta;
+				m_renderer->ClearDebug();
+				Input::NewFrame();				
 
-				Time::Get().UpdateFrameTime( delta );
 				m_scene->BeginFrame();
-				m_scene->Update( delta );
-				m_ecsManager->Update( delta );
+				m_scene->Update( targetLogicDelta );
+				m_ecsManager->Update( targetLogicDelta );
 				m_ecsManager->Refresh();
 				ManageKeyShortcuts();
 				ManageSelection();
@@ -179,17 +179,24 @@ namespace fan {
 				if ( m_mainMenuBar->ShowNormals() ) { DrawNormals(); }
 				if ( m_mainMenuBar->ShowAABB() ) { DrawAABB(); }
 				if ( m_mainMenuBar->ShowHull() ) { DrawHull(); }
-
-				UpdateRenderer();
-				m_renderer->DrawFrame();
-
-				m_scene->EndFrame();
+				m_scene->EndFrame();		
+				ImGui::Render();
 			}
+
+			// Render world
+			const float targetRenderDelta = Time::Get().GetRenderDelta();
+			const float renderDelta = time - lastRenderTime;
+			if ( renderDelta > targetRenderDelta ) {
+				lastRenderTime += targetRenderDelta;
+				Time::Get().RegisterFrameDrawn();	
+				UpdateRenderer();
+				
+				m_renderer->DrawFrame();				
+			} 
 		}
 
 		// Exit sequence
 		Debug::Log( "Exit application" );
-
 	}
 	
 	//================================================================================================================================

@@ -33,6 +33,7 @@ namespace fan
 
 		bool WindowIsOpen();
 		void DrawFrame();
+		void ClearDebug();
 		void WaitIdle();
 
 		void ReloadShaders();
@@ -121,7 +122,6 @@ namespace fan
 		
 		bool SubmitCommandBuffers();
 		void CreateQuadVertexBuffer();
-		void ClearDebug();
 
 		void RecordCommandBufferPostProcess(const size_t _index);
 		void RecordCommandBufferImgui(const size_t _index);

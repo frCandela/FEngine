@@ -2,8 +2,6 @@
  
 namespace fan {
 	//================================================================================================================================
-	// Classes inheriting from singleton cannot have a constructor
-	// Override Init to initialize a class inheriting from singleton
 	//================================================================================================================================
 	template < typename TypeName > 
 	class Singleton {

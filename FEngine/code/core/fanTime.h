@@ -13,14 +13,21 @@ namespace fan {
 		static float ElapsedSinceStartup() { return static_cast<float>(glfwGetTime()); }
 		static double ElapsedSinceStartupDouble() { return glfwGetTime(); }
 
-		float	GetDelta()	{ return m_delta;	 }
-		void	SetDelta( const float _delta ) { m_delta = _delta; }
-		void	UpdateFrameTime( const float _frameTime )	{ m_frameTime = _frameTime ;}
-		float	GetFrameTime( )								{ return m_frameTime; }
+		float	GetLogicDelta()	const { return m_logicDelta; }
+		void	SetLogicDelta( const float _delta ) { m_logicDelta = _delta; }
+		float	GetRenderDelta( )const				{ return m_renderDelta; }
+		void	SetRenderDelta( const float _delta ){ m_renderDelta = _delta; }
+
+		void     RegisterFrameDrawn();
+		uint32_t GetRealFramerate(){ return m_realFramerateLastSecond; }
 
 		static std::string SecondsToString( const double _seconds );	// Returns a hours:minuts:seconds ex: 3783s = 01:02:03
 	private:
-		float m_delta = 1/60.f;
-		float m_frameTime = 0.f;
+		float m_renderDelta = 1.f / 144.f;
+		float m_logicDelta = 1.f / 144.f;
+
+		uint32_t m_framesCounter = 0;
+		uint32_t m_realFramerateLastSecond = 0;
+		float m_lastLogFrameTime = 0.f;
 	};
 }
