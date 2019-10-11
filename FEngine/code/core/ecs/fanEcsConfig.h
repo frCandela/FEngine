@@ -14,16 +14,16 @@ namespace fan {
 
 	//================================
 	struct ecsTranform : ecsIComponent {
-		btVector3		position;
-		btQuaternion	rotation;
+		btVector3		position = btVector3::Zero();
+		btQuaternion	rotation = btQuaternion::getIdentity();
 	};
 	//================================
 	struct ecsScaling : ecsIComponent {
-		btVector3		scale;
+		btVector3		scale = btVector3::One();
 	};
 	//================================
 	struct ecsMovement : ecsIComponent {
-		btVector3		speed;
+		btVector3		speed = btVector3::Zero();
 	};
 	//================================
 	struct ecsParticle : ecsIComponent {
@@ -55,7 +55,9 @@ namespace fan {
 	// Bitsets & masks
 	//================================================================================================================================
 	using ecsEntity = uint32_t; 
+	const ecsEntity ecsNullEntity = std::numeric_limits< ecsEntity >::max();
 	using ecsHandle = uint64_t;
+	const ecsHandle ecsNullHandle = std::numeric_limits< ecsHandle >::max();
 	using ecsBitset = Bitset2::bitset2< 32 >;
 	static_assert( ecsComponents::count + ecsTags::count <= 32 );
 

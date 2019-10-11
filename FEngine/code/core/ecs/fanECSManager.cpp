@@ -88,18 +88,18 @@ namespace fan {
 		case 1:	 m_components.Get<1>().recycleList.push_back( _componentIndex ); break;
 		case 2:	 m_components.Get<2>().recycleList.push_back( _componentIndex ); break;
 		case 3:	 m_components.Get<3>().recycleList.push_back( _componentIndex ); break;
-		case 4:	 m_components.Get<0>().recycleList.push_back( _componentIndex ); break;
-		case 5:	 m_components.Get<1>().recycleList.push_back( _componentIndex ); break;
-		case 6:	 m_components.Get<2>().recycleList.push_back( _componentIndex ); break;
-		case 7:	 m_components.Get<3>().recycleList.push_back( _componentIndex ); break;
-		case 8:	 m_components.Get<0>().recycleList.push_back( _componentIndex ); break;
-		case 9:	 m_components.Get<1>().recycleList.push_back( _componentIndex ); break;
-		case 10: m_components.Get<2>().recycleList.push_back( _componentIndex ); break;
-		case 11: m_components.Get<3>().recycleList.push_back( _componentIndex ); break;
-		case 12: m_components.Get<0>().recycleList.push_back( _componentIndex ); break;
-		case 13: m_components.Get<2>().recycleList.push_back( _componentIndex ); break;
-		case 14: m_components.Get<3>().recycleList.push_back( _componentIndex ); break;
-		case 15: m_components.Get<0>().recycleList.push_back( _componentIndex ); break;
+// 		case 4:	 m_components.Get<4>().recycleList.push_back( _componentIndex ); break;
+// 		case 5:	 m_components.Get<5>().recycleList.push_back( _componentIndex ); break;
+// 		case 6:	 m_components.Get<6>().recycleList.push_back( _componentIndex ); break;
+// 		case 7:	 m_components.Get<7>().recycleList.push_back( _componentIndex ); break;
+// 		case 8:	 m_components.Get<8>().recycleList.push_back( _componentIndex ); break;
+// 		case 9:	 m_components.Get<9>().recycleList.push_back( _componentIndex ); break;
+// 		case 10: m_components.Get<10>().recycleList.push_back( _componentIndex ); break;
+// 		case 11: m_components.Get<11>().recycleList.push_back( _componentIndex ); break;
+// 		case 12: m_components.Get<12>().recycleList.push_back( _componentIndex ); break;
+// 		case 13: m_components.Get<13>().recycleList.push_back( _componentIndex ); break;
+// 		case 14: m_components.Get<14>().recycleList.push_back( _componentIndex ); break;
+// 		case 15: m_components.Get<15>().recycleList.push_back( _componentIndex ); break;
 		default: assert( false ); break;
 		}
 	}
@@ -327,7 +327,7 @@ namespace fan {
 				} ImGui::SameLine();
 				
 				std::stringstream ss;
-				ss << data.bitset.to_string()<< " " << entityIndex << " Transform=" << data.components[IndexOfComponent<ecsTranform>::value];
+				ss << data.bitset.to_string()<< " " << entityIndex;
 				ImGui::Text( ss.str().c_str());
 
 				ImGui::PopID();

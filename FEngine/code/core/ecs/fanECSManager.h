@@ -13,7 +13,9 @@ namespace fan {
 		ecsEntity	CreateEntity();
 		void		DeleteEntity( const ecsEntity  _entity);
 		ecsHandle	CreateHandle( const ecsEntity  _referencedEntity );
+
 		bool		FindEntity( const ecsHandle  _handle, ecsEntity& _outEntity );
+		template< typename _componentType > _componentType* FindComponent( const ecsHandle  _handle );
 
 		template< typename _componentType > uint32_t AddComponent( const ecsEntity _entity );
 		template< typename _componentType > void	 RemoveComponent( const ecsEntity _entity );
@@ -87,6 +89,7 @@ namespace fan {
 
 		return componentIndex;
 	}
+	
 	//================================================================================================================================
 	//================================================================================================================================
 	template< typename _componentType > 
@@ -108,5 +111,17 @@ namespace fan {
 	void EcsManager::RemoveTag( const ecsEntity _entity ) {
 		static_assert( IsTag< _tagType>::value );
 		m_removedTags.push_back( std::make_pair( _entity, (uint32_t)IndexOfTag< _tagType  >::value ) );
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
+	template< typename _componentType > 
+	_componentType* EcsManager::FindComponent( const ecsHandle  _handle ) {
+		static_assert( IsComponent< _componentType >::value );
+		ecsEntity entity;
+		if ( FindEntity( _handle, entity ) ) {
+			return &m_components.Get< _componentType >().vector[m_entitiesData[entity].components[IndexOfComponent<_componentType>::value]];			
+		}
+		return nullptr;
 	}
 }

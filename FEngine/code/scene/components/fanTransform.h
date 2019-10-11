@@ -1,6 +1,7 @@
 #pragma once
 
 #include "scene/components/fanComponent.h"
+#include "core/ecs/fanECSConfig.h"
 
 namespace fan
 {
@@ -14,10 +15,10 @@ namespace fan
 		void SetRotationEuler(const btVector3 _rotation);
 		void SetRotationQuat(const btQuaternion _rotation);
 
-		btTransform		GetBtTransform() const { return btTransform(m_rotation, m_position); }
-		btVector3		GetPosition() const { return m_position; }
-		btVector3		GetScale() const { return m_scale; }
-		btQuaternion	GetRotationQuat() const { return m_rotation; }
+		btTransform		GetBtTransform() const;
+		btVector3		GetPosition() const;
+		btVector3		GetScale() const;
+		btQuaternion	GetRotationQuat() const ;
 		btVector3		GetRotationEuler() const;
 		glm::mat4		GetModelMatrix() const;
 		glm::mat4		GetNormalMatrix() const;
@@ -39,12 +40,12 @@ namespace fan
 		bool Save(std::ostream& _out, const int _indentLevel) const override;
 
 		DECLARE_TYPE_INFO(Transform);
+	
 	protected:
 		void OnAttach() override;
 
 	private:
-		btQuaternion m_rotation;
-		btVector3 m_position;
-		btVector3 m_scale;
+		ecsTranform* GetEcsTransform() const;
+		ecsScaling* GetEcsScale() const;
 	};
 }

@@ -7,25 +7,34 @@
 #include "scene/components/fanTransform.h"
 
 #include "renderer/fanMesh.h"
+#include "core/ecs/fanECSManager.h"
 #include "core/fanSignal.h"
+
 
 namespace fan
 {
 	//================================================================================================================================
 	//================================================================================================================================
-	Gameobject::Gameobject(const std::string _name, Gameobject * _parent) :
+	Gameobject::Gameobject(const std::string _name, Gameobject * _parent, Scene * _scene ) :
 		m_name(_name)
 		, m_flags(Flag::NONE)
-		, m_parent(_parent) {
+		, m_parent(_parent)
+		, m_scene( _scene )
+	{
 
 		if (_parent != nullptr) {
 			_parent->m_childs.push_back(this);
 		}
+
+		ecsEntity entity = m_scene->GetEcsManager()->CreateEntity();
+		m_ecsHandleEntity = m_scene->GetEcsManager()->CreateHandle( entity );
+
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
 	Gameobject::~Gameobject() {
+		// Delete components
 		for (int componentIndex = 0; componentIndex < m_components.size(); componentIndex++) {
 			m_components[componentIndex]->OnDetach();
 		}
@@ -33,6 +42,14 @@ namespace fan
 			delete m_components[componentIndex];
 		}
 		m_components.clear();
+
+		// Delete ecs entity
+		ecsEntity entity;
+		if ( m_scene->GetEcsManager()->FindEntity( m_ecsHandleEntity, entity ) ) {
+			m_scene->GetEcsManager()->DeleteEntity( entity );
+		} else {
+			Debug::Get() << Debug::Severity::warning << "Unable to destroy ecsEntity for gameobject " << m_name << Debug::Endl();
+		}
 	}
 
 	//================================================================================================================================
@@ -46,6 +63,7 @@ namespace fan
 	}
 
 	//================================================================================================================================
+	// Remove the component from the gameobject and deletes it			
 	//================================================================================================================================
 	bool Gameobject::DeleteComponent(const Component * component)
 	{
@@ -66,6 +84,7 @@ namespace fan
 	}
 
 	//================================================================================================================================
+	// Add component with id
 	//================================================================================================================================
 	Component* Gameobject::AddComponent(const uint32_t _componentID) {
 		Component * component = TypeInfo::Instantiate<Component>(_componentID);
@@ -74,6 +93,7 @@ namespace fan
 	}
 
 	//================================================================================================================================
+	// Private method used to factorize add components methods 
 	//================================================================================================================================
 	void Gameobject::AddComponent(Component * _component) {
 		_component->m_gameobject = this;

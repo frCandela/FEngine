@@ -36,11 +36,11 @@ namespace fan
 		virtual void OnAttach();
 		virtual void OnDetach();
 
-	private:
-		Gameobject*  m_gameobject;
 
+	private:
 		uint64_t m_lastModified;	// Frame index at which it was modified
 		bool m_isBeingDeleted : 1;
 		bool m_isRemovable : 1;
+		Gameobject * m_gameobject = nullptr;
 	};
 }

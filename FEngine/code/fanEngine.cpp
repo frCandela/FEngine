@@ -66,8 +66,9 @@ namespace fan {
 		m_editorGrid.spacing = 1.f;		
 
 		m_renderer = new Renderer( windowSize, windowPosition );
-		m_scene = new Scene("mainScene");
 		m_ecsManager = new EcsManager();
+		m_scene = new Scene( "mainScene" );
+		m_scene->m_ecsManager = m_ecsManager;
 
 		// Initialize editor components
 		m_renderWindow		= new RenderWindow( m_renderer );
@@ -107,7 +108,6 @@ namespace fan {
 		PointLight::onPointLightDetach.Connect	( &Engine::UnRegisterPointLight, this );
 		DirectionalLight::onDirectionalLightAttach.Connect	( &Engine::RegisterDirectionalLight,   this );
 		DirectionalLight::onDirectionalLightDetach.Connect	( &Engine::UnRegisterDirectionalLight, this );
-
 
 		m_mainMenuBar->Initialize();
 		m_scene->New();
@@ -187,7 +187,7 @@ namespace fan {
 			const float targetRenderDelta = Time::Get().GetRenderDelta();
 			const float renderDelta = time - lastRenderTime;
 			if ( renderDelta > targetRenderDelta ) {
-				lastRenderTime += targetRenderDelta;
+				lastRenderTime = time; // we don't care about being uniform
 				Time::Get().RegisterFrameDrawn();	
 				UpdateRenderer();
 				

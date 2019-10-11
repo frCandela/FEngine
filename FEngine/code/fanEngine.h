@@ -12,6 +12,7 @@ namespace fan {
 	class ConsoleWindow;
 	class EditorWindow;
 	class Renderer;
+	class Gameobject;
 	class Scene;
 	class Gameobject;
 	class Actor;

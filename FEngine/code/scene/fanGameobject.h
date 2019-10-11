@@ -3,6 +3,7 @@
 #include "core/fanSignal.h"
 #include "core/math/shapes/fanAABB.h"
 #include "core/fanISerializable.h"
+#include "core/ecs/fanECSConfig.h"	
 
 namespace fan
 {
@@ -19,31 +20,30 @@ namespace fan
 			NOT_SAVED = 0x02,
 		};
 
-		Gameobject(const std::string _name, Gameobject * _parent);
+		Gameobject(const std::string _name, Gameobject * _parent, Scene * _scene );
 		~Gameobject();
 
 		void OnGui();
+		
+		// Get/add/delete components
+		template<typename ComponentType> ComponentType*				 AddComponent();	
+		template< typename _componentType >	bool					 AddEcsComponent() const;
+		template<typename ComponentType> ComponentType*				 GetComponent();	
+		template< typename _componentType >	_componentType*			 GetEcsComponent() const;
+		template<typename ComponentType> std::vector<ComponentType*> GetComponents();	
 
-		template<typename ComponentType>
-		ComponentType* AddComponent();// Creates an instance of ComponentType, adds it to the gameobject and returns a pointer
-		Component* AddComponent(const uint32_t _componentID);
-		template<typename ComponentType>
-		ComponentType* GetComponent();// Returns a pointer on the first instance of ComponentType in the gameobject, nullptr if none exists
-		template<typename ComponentType>
-		std::vector<ComponentType*> GetComponents();
-		bool DeleteComponent(const Component * _component);// Remove the component from the gameobject and deletes it			
-		const std::vector<Component*> & GetComponents() const { return m_components; }// Returns the component vector
+		bool							DeleteComponent(const Component * _component);		
+		Component*						AddComponent( const uint32_t _componentID );
+		const std::vector<Component*> & GetComponents() const { return m_components; }
 
 		// Getters
 		std::string		GetName() const { return m_name; }
 		void			SetName(const std::string _newName) { m_name = _newName; }
-		Scene *	GetScene() const { return m_scene; }
-		void			SetScene(Scene * _scene) { m_scene = _scene; }
+		inline Scene *	GetScene() const { return m_scene; }
+		const AABB &	GetAABB() const { return m_aabb; }
+		void			ComputeAABB();
 
-		const AABB & GetAABB() const { return m_aabb; }
-		void ComputeAABB();
-
-		// Hierarchy
+		// Gameobject scene tree parenting
 		Gameobject* GetParent() const { return m_parent; }
 		const std::vector<Gameobject*>& GetChilds() const { return m_childs; }
 		bool IsAncestorOf(const Gameobject * _node) const;
@@ -57,27 +57,31 @@ namespace fan
 		bool LoadGameobject(std::istream& _in);
 		bool Save(std::ostream& _out, const int _indentLevel) const override;
 
+		// Flags
 		bool		HasFlag(const Flag _flag) const { return m_flags & _flag; }
 		uint32_t	GetFlags() const { return m_flags; }
 		void		SetFlags(const uint32_t _flags) { m_flags = _flags; }
 
 	private:
-		std::string				m_name;
-		std::vector<Gameobject*>	m_childs;
-		Gameobject *				m_parent;
-		uint32_t				m_flags;
-		AABB				m_aabb;
-		std::vector<Component*> m_components;
-		Scene *			m_scene;
+		std::string				 m_name;
+		std::vector<Gameobject*> m_childs;
+		Gameobject *			 m_parent;
+		uint32_t				 m_flags;
+		AABB					 m_aabb;
+		std::vector<Component*>  m_components;
+		Scene *	const			 m_scene = nullptr;
+		ecsHandle				 m_ecsHandleEntity = ecsNullHandle;
 
 		bool m_computeAABB = true;
 
 		bool Load(std::istream& _in) override;
+
 		void AddComponent(Component * _component);
 	};
 
 
 	//================================================================================================================================
+	// Creates an instance of ComponentType, adds it to the gameobject and returns a pointer
 	//================================================================================================================================
 	template<typename ComponentType>
 	ComponentType* Gameobject::AddComponent()
@@ -97,6 +101,7 @@ namespace fan
 	}
 
 	//================================================================================================================================
+	// Returns a pointer on the first instance of ComponentType in the gameobject, nullptr if none exists
 	//================================================================================================================================
 	template<typename ComponentType>
 	ComponentType* Gameobject::GetComponent()
@@ -112,6 +117,7 @@ namespace fan
 	}
 
 	//================================================================================================================================
+	// Gets components of a specific type
 	//================================================================================================================================
 	template<typename ComponentType>
 	std::vector<ComponentType*> Gameobject::GetComponents()
@@ -124,5 +130,31 @@ namespace fan
 			}
 		}
 		return componentTypeVector;
+	}
+
+	//================================================================================================================================
+	// Returns a component associated with the ecs entityof the gameobject
+	//================================================================================================================================
+	template< typename _componentType >
+	_componentType* Gameobject::GetEcsComponent() const {
+		static_assert( IsComponent< _componentType>::value );
+
+		_componentType* component = m_scene->GetEcsManager()->FindComponent<_componentType>( m_ecsHandleEntity );
+		assert( component  != nullptr );
+		return component;
+	}
+
+	//================================================================================================================================
+	// Adds a component to the ecs manager using the ecs entity of the gameobject
+	//================================================================================================================================
+	template< typename _componentType >	bool  Gameobject::AddEcsComponent() const {
+		static_assert( IsComponent< _componentType>::value );
+
+		ecsEntity entity;
+		if ( m_scene->GetEcsManager()->FindEntity( m_ecsHandleEntity, entity ) ) {
+			m_scene->GetEcsManager()->AddComponent<_componentType>(entity);
+			return true;
+		}
+		return false;
 	}
 }

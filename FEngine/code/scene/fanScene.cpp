@@ -35,8 +35,7 @@ namespace fan
 		if (_parent == nullptr) {
 			_parent = m_root;
 		}
-		Gameobject* gameobject = new Gameobject(_name, _parent);
-		gameobject->SetScene(this);
+		Gameobject* gameobject = new Gameobject(_name, _parent, this );
 
 		return gameobject;
 	}
@@ -124,7 +123,7 @@ namespace fan
 			if (_gameobject->GetParent() != nullptr) {
 				_gameobject->GetParent()->RemoveChild(_gameobject);
 			}
-			Debug::Get() << "delete Eameobject: " << _gameobject->GetName() << Debug::Endl();
+			Debug::Get() << "delete gameobject: " << _gameobject->GetName() << Debug::Endl();
 			delete(_gameobject);
 		}
 	}

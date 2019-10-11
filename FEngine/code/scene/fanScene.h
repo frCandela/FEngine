@@ -8,12 +8,15 @@ namespace fan
 	class Gameobject;
 	class Component;
 	class Actor;
+	class EcsManager;
 
 	//================================================================================================================================
 	//================================================================================================================================
 	class Scene : public ISerializable
 	{
 	public:
+		friend class Engine;
+
 		Signal<Scene*>	onSceneLoad;
 		Signal<>		onSceneClear;
 		Signal< Gameobject *>		onDeleteGameobject;
@@ -22,7 +25,7 @@ namespace fan
 		~Scene();
 
 		Gameobject *					CreateGameobject(const std::string _name, Gameobject * _parent = nullptr);	// Creates a game object and adds it to the scene hierarchy
-		void						DeleteGameobject(Gameobject* _gameobject);										// Deletes a gameobject and removes it from the scene hierarchy at the end of the frame
+		void							DeleteGameobject(Gameobject* _gameobject);										// Deletes a gameobject and removes it from the scene hierarchy at the end of the frame
 		std::vector < Gameobject * >	BuildEntitiesList() const;
 
 		template<typename ComponentType>
@@ -38,16 +41,18 @@ namespace fan
 		bool LoadFrom(const std::string _path);
 
 		void				ComputeAABBEndFrame(Gameobject * _gameobject) { m_outdatedAABB.insert(_gameobject); }
-		Gameobject *			GetRoot() { return m_root; }
+		Gameobject *		GetRoot() { return m_root; }
 		inline std::string	GetName() const { return m_name; }
 		bool				HasPath() const { return m_path.empty() == false; }
 		inline std::string	GetPath() const { return m_path; }
 		void				SetPath(const std::string _path) { m_path = _path; }
+		EcsManager *		GetEcsManager() const { return m_ecsManager; }
 
 	private:
 		std::string m_name;
 		std::string m_path;
 		Gameobject * m_root;
+		EcsManager * m_ecsManager = nullptr;
 
 		std::vector < Gameobject * >	m_entitiesToDelete;
 		std::set< Gameobject * >	m_outdatedAABB;
