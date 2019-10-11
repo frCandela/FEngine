@@ -16,7 +16,10 @@ namespace fan {
 		bool		FindEntity( const ecsHandle  _handle, ecsEntity& _outEntity );
 
 		template< typename _componentType > uint32_t AddComponent( const ecsEntity _entity );
-		template< typename _tagType >		void AddTag( const ecsEntity _entity );
+		template< typename _componentType > void	 RemoveComponent( const ecsEntity _entity );
+		template< typename _tagType >		void	 AddTag( const ecsEntity _entity );
+		template< typename _tagType >		void	 RemoveTag( const ecsEntity _entity );
+
 
 		void Update( float _delta );
 		void Refresh();
@@ -29,11 +32,12 @@ namespace fan {
 		std::uniform_real_distribution<float> m_distribution;
 		// TMP
 
-
 		ecsComponentsTuple< ecsComponents >			m_components;
 		std::vector<ecsEntityData>					m_entitiesData;
 		std::unordered_map< ecsHandle, ecsEntity >  m_handlesToEntity;
 		std::unordered_map< ecsEntity, ecsHandle >  m_entityToHandles;
+		std::vector< std::pair< ecsEntity, uint32_t > > m_removedComponents;
+		std::vector< std::pair< ecsEntity, uint32_t > > m_removedTags;
 
 		ecsHandle m_nextHandle;
 		ecsEntity m_firstDeadEntity = 0;
@@ -43,7 +47,9 @@ namespace fan {
 		bool m_enableUpdate = true;
 		
 		void	SwapHandlesEntities( const ecsEntity _entity1, const ecsEntity _entity2 );
+		void	RecycleComponent( const uint32_t _componentID, const uint32_t _componentIndex );
 		void	SortEntities();
+		void	RemoveDeadComponentsAndTags();
 		void	RemoveDeadEntities();
  	};
 
@@ -83,8 +89,24 @@ namespace fan {
 	}
 	//================================================================================================================================
 	//================================================================================================================================
+	template< typename _componentType > 
+	void  EcsManager::RemoveComponent( const ecsEntity _entity) {
+		static_assert( IsComponent< _componentType>::value );
+		m_removedComponents.push_back( std::make_pair( _entity, (uint32_t) IndexOfComponent< _componentType  >::value ));
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
 	template< typename _tagType > void EcsManager::AddTag( const ecsEntity _entity ) {
 		static_assert( IsTag< _tagType>::value );
 		m_entitiesData[_entity].bitset[ IndexOfTag<_tagType>::value ] = 1;
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
+	template< typename _tagType >
+	void EcsManager::RemoveTag( const ecsEntity _entity ) {
+		static_assert( IsTag< _tagType>::value );
+		m_removedTags.push_back( std::make_pair( _entity, (uint32_t)IndexOfTag< _tagType  >::value ) );
 	}
 }

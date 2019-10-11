@@ -54,6 +54,7 @@ namespace fan {
 	//================================================================================================================================
 	void EcsManager::Refresh() {
 		if( m_enableRefresh ) {
+			RemoveDeadComponentsAndTags();
 			SortEntities();
 			RemoveDeadEntities();
 		}
@@ -79,6 +80,31 @@ namespace fan {
 	}
 
 	//================================================================================================================================
+	// This is ugly but there is no way to access tuple data with runtime indices... TODO Make a macro or a variadic template struct
+	//================================================================================================================================
+	void EcsManager::RecycleComponent( const uint32_t _componentID, const uint32_t _componentIndex ) {
+		switch ( _componentID ) {
+		case 0:	 m_components.Get<0>().recycleList.push_back( _componentIndex ); break;
+		case 1:	 m_components.Get<1>().recycleList.push_back( _componentIndex ); break;
+		case 2:	 m_components.Get<2>().recycleList.push_back( _componentIndex ); break;
+		case 3:	 m_components.Get<3>().recycleList.push_back( _componentIndex ); break;
+		case 4:	 m_components.Get<0>().recycleList.push_back( _componentIndex ); break;
+		case 5:	 m_components.Get<1>().recycleList.push_back( _componentIndex ); break;
+		case 6:	 m_components.Get<2>().recycleList.push_back( _componentIndex ); break;
+		case 7:	 m_components.Get<3>().recycleList.push_back( _componentIndex ); break;
+		case 8:	 m_components.Get<0>().recycleList.push_back( _componentIndex ); break;
+		case 9:	 m_components.Get<1>().recycleList.push_back( _componentIndex ); break;
+		case 10: m_components.Get<2>().recycleList.push_back( _componentIndex ); break;
+		case 11: m_components.Get<3>().recycleList.push_back( _componentIndex ); break;
+		case 12: m_components.Get<0>().recycleList.push_back( _componentIndex ); break;
+		case 13: m_components.Get<2>().recycleList.push_back( _componentIndex ); break;
+		case 14: m_components.Get<3>().recycleList.push_back( _componentIndex ); break;
+		case 15: m_components.Get<0>().recycleList.push_back( _componentIndex ); break;
+		default: assert( false ); break;
+		}
+	}
+
+	//================================================================================================================================
 	// Removes the dead entities at the end of the entity vector
 	//================================================================================================================================
 	void EcsManager::RemoveDeadEntities() {
@@ -100,23 +126,41 @@ namespace fan {
 				m_entityToHandles.erase( (ecsEntity)reverseIndex );
 			}
 
-			// This is ugly but there is no way to access tuple data with runtime indices... TODO Make a macro or a variadic template struct
-			for (int componentIndex = 0; componentIndex < ecsComponents::count ; componentIndex++) {
-				if( data.bitset[componentIndex])
-				switch ( componentIndex ) {
-				case 0:	m_components.Get<0>().recycleList.push_back( data.components[componentIndex] ); break;
-				case 1:	m_components.Get<1>().recycleList.push_back( data.components[componentIndex] ); break;
-				case 2:	m_components.Get<2>().recycleList.push_back( data.components[componentIndex] ); break;
-				case 3:	m_components.Get<3>().recycleList.push_back( data.components[componentIndex] ); break;
-				default:
-					assert( false);
-					break;
+			// Remove the component
+			for (int componentID = 0; componentID < ecsComponents::count ; componentID++) {
+				if( data.bitset[componentID]) {
+					RecycleComponent( componentID, data.components[componentID] );
 				}
 			}
 			m_entitiesData.pop_back();
 			--reverseIndex;
 		}
 		m_activeEntitiesCount = static_cast<ecsEntity>( m_entitiesData.size() );
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
+	void  EcsManager::RemoveDeadComponentsAndTags() {
+		for ( std::pair< ecsEntity, uint32_t> & pair : m_removedComponents ) {
+			const ecsEntity entity = pair.first;
+			const  uint32_t componentIndex = pair.second;
+			if( m_entitiesData[entity].bitset[componentIndex] == 1 ) {
+				m_entitiesData[entity].bitset[componentIndex] = 0;
+				RecycleComponent( componentIndex, m_entitiesData[entity].components[componentIndex] );
+			} else {
+				Debug::Get() << Debug::Severity::warning << "Remove component failed : Entity "<< entity << " has no component " << componentIndex << Debug::Endl();
+			}
+		} m_removedComponents.clear();
+
+		for ( std::pair< ecsEntity, uint32_t> & pair : m_removedTags ) {
+			const ecsEntity entity = pair.first;
+			const  uint32_t tagIndex = pair.second;
+			if ( m_entitiesData[entity].bitset[tagIndex] == 1 ) {
+				m_entitiesData[entity].bitset[tagIndex] = 0;			
+			} else {
+				Debug::Get() << Debug::Severity::warning << "Remove tag failed : Entity " << entity << " has no component " << tagIndex << Debug::Endl();
+			}
+		} m_removedTags.clear();
 	}
 
 	//================================================================================================================================
@@ -189,11 +233,13 @@ namespace fan {
  	void EcsManager::OnGui() {
 		ImGui::Begin("ECS");
 
+		// Entities info
 		ImGui::Text( ( "Entities Count: " + std::to_string(m_entitiesData.size())).c_str() );
 		ImGui::Text( TagCountSize( "Storage size:   ", m_entitiesData.capacity(), sizeof( ecsEntityData ) ).c_str() );
 
 		ImGui::Separator();
 
+		// Components Info
 		auto& dataTransform = m_components.Get< ecsTranform >();
 		ImGui::Text( TagCountSize( "CTranform:      ", dataTransform.vector.size() - dataTransform.recycleList.size(),	sizeof( ecsTranform ) ).c_str() );
 		auto& dataMovement = m_components.Get< ecsMovement >();
@@ -206,6 +252,7 @@ namespace fan {
 		ImGui::Separator();
 		ImGui::Separator();
 
+		// Components & tags selection
 		static bool s_transform, s_particle, s_movement, s_scale;
 		ImGui::Checkbox("transform",&s_transform );
 		ImGui::SameLine (); ImGui::Checkbox( "movement", &s_movement );
@@ -214,6 +261,7 @@ namespace fan {
 		static bool s_fakeTag;
 		ImGui::Checkbox( "fakeTag", &s_fakeTag );
 
+		// Entity creation
 		static int nb = 1;
 		if ( ImGui::Button( "Create Entities") ) {
 			for (int i = 0; i < nb; i++) {		
@@ -227,11 +275,14 @@ namespace fan {
 		} ImGui::SameLine (); ImGui::PushItemWidth(100);
 		ImGui::DragInt( "nb", &nb, 1, 1, 100000 );
 
+		// Create handle
 		static int entitySelect = 0;
 		if ( ImGui::Button( "Create handle" ) ) {
 			CreateHandle( entitySelect );
 		} ImGui::SameLine();
 		ImGui::DragInt( "handleIndex", &entitySelect );
+
+		// Entity management
 		int tempActiveCount = (int)m_activeEntitiesCount; ImGui::DragInt( "m_activeEntitiesCount", &tempActiveCount );
 		if ( ImGui::Button( "Update" ) ) { Update( 0.f ); } ImGui::SameLine();
 		if ( ImGui::Button( "Sort" ) ) { SortEntities();	} ImGui::SameLine();
