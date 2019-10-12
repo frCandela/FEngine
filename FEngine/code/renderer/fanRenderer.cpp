@@ -737,7 +737,7 @@ namespace fan
 	//================================================================================================================================
 	//================================================================================================================================
 	void Renderer::DebugCircle	  ( const btVector3 _pos, const float _radius, btVector3 _axis, uint32_t _nbSegments, const Color _color ) {
-		assert( _nbSegments  > 2 && _radius > 0.f);
+		assert( _nbSegments  > 2 && _radius >= 0.f);
 
 		const btVector3 other = btVector3( -_axis[1], -_axis[2], _axis[0] );
 		btVector3 orthogonal = _radius * _axis.cross(other).normalized();	

@@ -66,6 +66,12 @@ namespace fan
 		MarkModified(true);
 	}
 
+	//================================================================================================================================
+	//================================================================================================================================
+	void Model::SetPath( std::string _path ) {
+		onModelSetPath.Emmit( this, _path );
+	}
+
 	Mesh *			Model::GetMesh() { return GetEcsModel()->mesh; }
 	const Mesh *	Model::GetMesh() const { return GetEcsModel()->mesh; }
 

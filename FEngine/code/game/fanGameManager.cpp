@@ -20,7 +20,6 @@ namespace fan {
 		//================================================================================================================================
 		//================================================================================================================================
 		void GameManager::Start() {
-		Debug::Log("Start satellite");
 		m_camera = GetGameobject()->GetComponent<Camera>();
 		if (m_camera == nullptr) {
 			Debug::Warning("Game manager has no camera attached");

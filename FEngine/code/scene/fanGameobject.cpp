@@ -29,6 +29,7 @@ namespace fan
 		ecsEntity entity = m_scene->GetEcsManager()->CreateEntity();
 		m_ecsHandleEntity = m_scene->GetEcsManager()->CreateHandle( entity );
 		AddEcsComponent<ecsAABB>();
+		m_transform = AddComponent<Transform>();
 	}
 
 	//================================================================================================================================
@@ -257,7 +258,14 @@ namespace fan
 					if (!ReadUnsigned(_in, componentID) && componentID != 0) { return false; }
 					if (!ReadStartToken(_in)) { return false; }
 					{
-						Component * component = AddComponent(componentID);
+						// Don't add a transform two times
+						Component * component = nullptr;
+						if ( componentID == Transform::s_typeID ) {
+							component = GetComponent<Transform>();
+						} else {
+							component = AddComponent( componentID );
+						}
+
 						const bool result = component->Load(_in);
 						if (result == false) {
 							Debug::Get() << Debug::Severity::error << "Failed loading component: " << component->GetName() << Debug::Endl();

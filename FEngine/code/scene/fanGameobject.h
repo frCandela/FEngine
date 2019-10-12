@@ -11,6 +11,7 @@ namespace fan
 {
 	class Component;
 	class Scene;
+	class Transform;
 
 	//================================================================================================================================
 	//================================================================================================================================
@@ -44,6 +45,7 @@ namespace fan
 		inline Scene *	GetScene() const { return m_scene; }
 		const AABB &	GetAABB() const;
 		void			ComputeAABB();
+		Transform *		GetTransform() const  { return m_transform; }
 
 		// Gameobject scene tree parenting
 		Gameobject* GetParent() const { return m_parent; }
@@ -68,6 +70,7 @@ namespace fan
 		std::string				 m_name;
 		std::vector<Gameobject*> m_childs;
 		Gameobject *			 m_parent;
+		Transform * m_transform = nullptr;
 		uint32_t				 m_flags;
 		std::vector<Component*>  m_components;
 		Scene *	const			 m_scene = nullptr;

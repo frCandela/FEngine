@@ -1,0 +1,282 @@
+Entities: 1 { 
+    Gameobject: root {
+        computeAABB: true
+        Components: 1 {
+            Transform: 1269105190 {
+                position: 0 0 0
+                rotation: 0 0 0 1
+                scale:    1 1 1
+            }
+        }
+        Childs: 4 {
+            Gameobject: game_manager {
+                computeAABB: true
+                Components: 4 {
+                    Transform: 1269105190 {
+                        position: 1.91203 8 10.1027
+                        rotation: 0.707107 2.63418e-09 -2.63418e-09 0.707107
+                        scale:    1 1 1
+                    }
+                    GameManager: 1830802815 {
+                        isEnabled: true
+                    }
+                    Camera: 1148216499 {
+                        type:         1
+                        orthoSize:    18
+                        fov:          110
+                        nearDistance: 0.019
+                        farDistance:  490
+                    }
+                    CameraController: 259515671 {
+                        isEnabled: true
+                        heightFromTarget: 8
+                    }
+                }
+                Childs: 0 {
+                }
+            }
+            Gameobject: space_ship {
+                computeAABB: true
+                Components: 4 {
+                    Transform: 1269105190 {
+                        position: 1.91203 0 10.1027
+                        rotation: 0 -0.712668 0 -0.701592
+                        scale:    0.1 0.1 0.1
+                    }
+                    Model: 1739103771 {
+                        path: content\models\spaceship.fbx
+                    }
+                    Material: 1828911513 {
+                        material: content\models\colors\white.png
+                        shininess: 1
+                        color: 1 1 1
+                    }
+                    SpaceShip: 3824437066 {
+                        isEnabled: false
+                        speed:          200
+                        rotation_speed: 4
+                    }
+                }
+                Childs: 0 {
+                }
+            }
+            Gameobject: sun_light {
+                computeAABB: true
+                Components: 2 {
+                    Transform: 1269105190 {
+                        position: 0 0 0
+                        rotation: 0 0 0 1
+                        scale:    1 1 1
+                    }
+                    PointLight: 3039791276 {
+                        ambiant: 1 0.290914 0
+                        diffuse: 1 0.290914 0
+                        specular: 1 0.290914 0
+                        attenuation: 0 0.2 0
+                    }
+                }
+                Childs: 0 {
+                }
+            }
+            Gameobject: Sun {
+                computeAABB: true
+                Components: 4 {
+                    Transform: 1269105190 {
+                        position: 0 0 0
+                        rotation: 0 0 0 1
+                        scale:    5 5 5
+                    }
+                    Model: 1739103771 {
+                        path: content\models\planet.fbx
+                    }
+                    Material: 1828911513 {
+                        material: content\models\colors\white.png
+                        shininess: 1
+                        color: 1 1 1
+                    }
+                    SolarSystem: 3235656336 {
+                        isEnabled: true
+                        max_radius:         30
+                        initial_radius:     7.055
+                        offset:             1.95
+                        randomScale:        0.62
+                        initialPlanetScale: 1.47
+                        scaleMult:          0.39
+                        minSpeed:           0.15
+                        maxSpeed:           0.36
+                    }
+                }
+                Childs: 4 {
+                    Gameobject: planet0 {
+                        computeAABB: true
+                        Components: 3 {
+                            Transform: 1269105190 {
+                                position: -5.69292 0 4.40803
+                                rotation: 0 0 0 1
+                                scale:    0.429 0.429 0.429
+                            }
+                            Model: 1739103771 {
+                                path: content/models/planet.fbx
+                            }
+                            Planet: 1669599886 {
+                                isEnabled: true
+                                radius: 7.2
+                                speed:  -0.21349
+                                phase:  0.000718678
+                            }
+                        }
+                        Childs: 1 {
+                            Gameobject: satellite0 {
+                                computeAABB: true
+                                Components: 3 {
+                                    Transform: 1269105190 {
+                                        position: -4.93847 0 4.28446
+                                        rotation: 0 0 0 1
+                                        scale:    0.10065 0.10065 0.10065
+                                    }
+                                    Model: 1739103771 {
+                                        path: content/models/planet.fbx
+                                    }
+                                    Planet: 1669599886 {
+                                        isEnabled: true
+                                        radius: 0.7645
+                                        speed:  -1.06745
+                                        phase:  6.27716
+                                    }
+                                }
+                                Childs: 0 {
+                                }
+                            }
+                        }
+                    }
+                    Gameobject: planet1 {
+                        computeAABB: true
+                        Components: 3 {
+                            Transform: 1269105190 {
+                                position: -6.93552 0 -7.76128
+                                rotation: 0 0 0 1
+                                scale:    0.625668 0.625668 0.625668
+                            }
+                            Model: 1739103771 {
+                                path: content/models/planet.fbx
+                            }
+                            Planet: 1669599886 {
+                                isEnabled: true
+                                radius: 10.4086
+                                speed:  -0.169391
+                                phase:  0.922094
+                            }
+                        }
+                        Childs: 1 {
+                            Gameobject: satellite1 {
+                                computeAABB: true
+                                Components: 3 {
+                                    Transform: 1269105190 {
+                                        position: -6.40078 0 -8.71408
+                                        rotation: 0 0 0 1
+                                        scale:    0.146791 0.146791 0.146791
+                                    }
+                                    Model: 1739103771 {
+                                        path: content/models/planet.fbx
+                                    }
+                                    Planet: 1669599886 {
+                                        isEnabled: true
+                                        radius: 1.11497
+                                        speed:  -0.846956
+                                        phase:  2.49179
+                                    }
+                                }
+                                Childs: 0 {
+                                }
+                            }
+                        }
+                    }
+                    Gameobject: planet2 {
+                        computeAABB: true
+                        Components: 3 {
+                            Transform: 1269105190 {
+                                position: 1.80322 0 -15.7286
+                                rotation: 0 0 0 1
+                                scale:    1.05749 1.05749 1.05749
+                            }
+                            Model: 1739103771 {
+                                path: content/models/planet.fbx
+                            }
+                            Planet: 1669599886 {
+                                isEnabled: true
+                                radius: 15.8316
+                                speed:  -0.222568
+                                phase:  1.17031
+                            }
+                        }
+                        Childs: 1 {
+                            Gameobject: satellite2 {
+                                computeAABB: true
+                                Components: 3 {
+                                    Transform: 1269105190 {
+                                        position: 0.147813 0 -16.6291
+                                        rotation: 0 0 0 1
+                                        scale:    0.248103 0.248103 0.248103
+                                    }
+                                    Model: 1739103771 {
+                                        path: content/models/planet.fbx
+                                    }
+                                    Planet: 1669599886 {
+                                        isEnabled: true
+                                        radius: 1.8845
+                                        speed:  -1.11284
+                                        phase:  4.20814
+                                    }
+                                }
+                                Childs: 0 {
+                                }
+                            }
+                        }
+                    }
+                    Gameobject: planet3 {
+                        computeAABB: true
+                        Components: 3 {
+                            Transform: 1269105190 {
+                                position: 22.6098 0 -2.94666
+                                rotation: 0 0 0 1
+                                scale:    1.35904 1.35904 1.35904
+                            }
+                            Model: 1739103771 {
+                                path: content/models/planet.fbx
+                            }
+                            Planet: 1669599886 {
+                                isEnabled: true
+                                radius: 22.801
+                                speed:  0.263152
+                                phase:  2.49296
+                            }
+                        }
+                        Childs: 1 {
+                            Gameobject: satellite3 {
+                                computeAABB: true
+                                Components: 3 {
+                                    Transform: 1269105190 {
+                                        position: 24.822 0 -3.93245
+                                        rotation: 0 0 0 1
+                                        scale:    0.318851 0.318851 0.318851
+                                    }
+                                    Model: 1739103771 {
+                                        path: content/models/planet.fbx
+                                    }
+                                    Planet: 1669599886 {
+                                        isEnabled: true
+                                        radius: 2.42187
+                                        speed:  -1.31576
+                                        phase:  5.31753
+                                    }
+                                }
+                                Childs: 0 {
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

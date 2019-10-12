@@ -123,7 +123,6 @@ namespace fan
 			if (_gameobject->GetParent() != nullptr) {
 				_gameobject->GetParent()->RemoveChild(_gameobject);
 			}
-			Debug::Get() << "delete gameobject: " << _gameobject->GetName() << Debug::Endl();
 			delete(_gameobject);
 		}
 	}
@@ -196,7 +195,6 @@ namespace fan
 	void Scene::New() {
 		Clear();
 		m_root = CreateGameobject("root", nullptr);
-		m_root->AddComponent<Transform>();
 		onSceneLoad.Emmit(this);
 	}
 

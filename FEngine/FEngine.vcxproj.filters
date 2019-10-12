@@ -256,9 +256,6 @@
     <ClCompile Include="code\fanGlobalValues.cpp">
       <Filter>code</Filter>
     </ClCompile>
-    <ClCompile Include="code\game\fanPlanet.cpp">
-      <Filter>code\game</Filter>
-    </ClCompile>
     <ClCompile Include="code\core\input\fanMouse.cpp">
       <Filter>code\core\input</Filter>
     </ClCompile>
@@ -267,9 +264,6 @@
     </ClCompile>
     <ClCompile Include="code\core\input\fanInput.cpp">
       <Filter>code\core\input</Filter>
-    </ClCompile>
-    <ClCompile Include="code\game\fanSatellite.cpp">
-      <Filter>code\game</Filter>
     </ClCompile>
     <ClCompile Include="code\game\fanGameManager.cpp">
       <Filter>code\game</Filter>
@@ -321,6 +315,12 @@
     </ClCompile>
     <ClCompile Include="code\editor\windows\fanEcsWindow.cpp">
       <Filter>code\editor\windows</Filter>
+    </ClCompile>
+    <ClCompile Include="code\game\fanSolarSystem.cpp">
+      <Filter>code\game</Filter>
+    </ClCompile>
+    <ClCompile Include="code\game\fanPlanet.cpp">
+      <Filter>code\game</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -948,9 +948,6 @@
     <ClInclude Include="code\fanGlobalIncludes.h">
       <Filter>code</Filter>
     </ClInclude>
-    <ClInclude Include="code\game\fanPlanet.h">
-      <Filter>code\game</Filter>
-    </ClInclude>
     <ClInclude Include="code\core\input\fanKeyboard.h">
       <Filter>code\core\input</Filter>
     </ClInclude>
@@ -959,9 +956,6 @@
     </ClInclude>
     <ClInclude Include="code\core\input\fanInput.h">
       <Filter>code\core\input</Filter>
-    </ClInclude>
-    <ClInclude Include="code\game\fanSatellite.h">
-      <Filter>code\game</Filter>
     </ClInclude>
     <ClInclude Include="code\game\fanGameManager.h">
       <Filter>code\game</Filter>
@@ -1064,6 +1058,12 @@
     </ClInclude>
     <ClInclude Include="code\editor\windows\fanEcsWindow.h">
       <Filter>code\editor\windows</Filter>
+    </ClInclude>
+    <ClInclude Include="code\game\fanSolarSystem.h">
+      <Filter>code\game</Filter>
+    </ClInclude>
+    <ClInclude Include="code\game\fanPlanet.h">
+      <Filter>code\game</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

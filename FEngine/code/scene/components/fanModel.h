@@ -24,6 +24,7 @@ namespace fan
 		// ISerializable
 		bool			Load(std::istream& _in) override;
 		bool			Save(std::ostream& _out, const int _indentLevel) const override;
+		void			SetPath( std::string _path );
 		void			SetMesh(Mesh * _mesh);
 		Mesh *			GetMesh();
 		const Mesh *	GetMesh() const;

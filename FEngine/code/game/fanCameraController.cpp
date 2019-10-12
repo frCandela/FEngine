@@ -14,13 +14,13 @@ namespace fan {
 	REGISTER_EDITOR_COMPONENT(CameraController);
 	REGISTER_TYPE_INFO(CameraController)
 
-		//================================================================================================================================
-		//================================================================================================================================
-		void CameraController::Start() {
+	//================================================================================================================================
+	//================================================================================================================================
+	void CameraController::Start() {
 		m_transform = GetGameobject()->GetComponent<Transform>();
 		m_camera = GetGameobject()->GetComponent<Camera>();
 		if (m_camera == nullptr) {
-			Debug::Warning("Game manager has no camera attached");
+			Debug::Warning("CameraController has no camera attached");
 		}
 
 		SpaceShip * ss = GetGameobject()->GetScene()->FindComponentOfType<SpaceShip>();
@@ -41,7 +41,7 @@ namespace fan {
 	//================================================================================================================================
 	void CameraController::OnGui() {
 		Actor::OnGui();
-		ImGui::DragFloat("height from target", &m_heightFromTarget, 0.25f, 0.5f, 10.f);
+		ImGui::DragFloat("height from target", &m_heightFromTarget, 0.25f, 0.5f, 30.f);
 	}
 
 	//================================================================================================================================

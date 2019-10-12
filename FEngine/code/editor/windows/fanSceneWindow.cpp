@@ -59,19 +59,16 @@ namespace fan
 				}
 				// Entities templates
 				if ( ImGui::MenuItem( "Model" ) ) {
-					Gameobject *  newIntity = m_scene->CreateGameobject("new model", m_lastGameobjectRightClicked );
-					newIntity->AddComponent<Transform>();
+					Gameobject *  newIntity = m_scene->CreateGameobject("new_model", m_lastGameobjectRightClicked );
 					newIntity->AddComponent<Model>();
 					newIntity->AddComponent<Material>();
 				}
 				if ( ImGui::MenuItem( "Point light" ) ) {
 					Gameobject *  newIntity = m_scene->CreateGameobject( "new_point_light", m_lastGameobjectRightClicked );
-					newIntity->AddComponent<Transform>();
 					newIntity->AddComponent<PointLight>();
 				}
 				if ( ImGui::MenuItem( "Dir light" ) ) {
 					Gameobject *  newIntity = m_scene->CreateGameobject( "new_dir_light", m_lastGameobjectRightClicked );
-					newIntity->AddComponent<Transform>();
 					newIntity->AddComponent<DirectionalLight>();
 				}
 				ImGui::EndMenu();
@@ -192,7 +189,6 @@ namespace fan
 				if (std::string(m_textBuffer) != "") {
 					//Create new gameobject 
 					Gameobject* newGameobject = m_scene->CreateGameobject(m_textBuffer, m_lastGameobjectRightClicked);
-					newGameobject->AddComponent<Transform>();
 					onSelectGameobject.Emmit( newGameobject );
 					m_lastGameobjectRightClicked = nullptr;
 					ImGui::CloseCurrentPopup();
