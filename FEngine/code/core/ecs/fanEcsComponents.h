@@ -6,6 +6,7 @@
 namespace fan {
 
 	class Mesh;
+	class Texture;
 
 	//================================================================================================================================
 	// Components
@@ -69,6 +70,14 @@ namespace fan {
 	};
 
 	//================================
+	struct ecsMaterial : ecsIComponent {
+		static const char * s_name;
+		Texture * texture		= nullptr;
+		uint32_t  shininess		= 1;
+		Color color				= Color::White;
+	};
+
+	//================================
 	//================================
 	using ecsComponents = meta::TypeList<
 		ecsTranform
@@ -79,6 +88,7 @@ namespace fan {
 		, ecsModel
 		, ecsPointLight
 		, ecsDirLight
+		, ecsMaterial
 	>;
 	 
 	template< typename _type > struct IsComponent { static constexpr bool value = std::is_base_of< ecsIComponent, _type >::value; };

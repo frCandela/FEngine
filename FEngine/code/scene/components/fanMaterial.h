@@ -19,13 +19,16 @@ namespace fan
 		bool Load(std::istream& _in)	override;
 		bool Save(std::ostream& _out, const int _indentLevel) const override;
 
+		// Getters
 		void			SetTexture( Texture * const _texture);
-		Texture *		GetTexture() { return m_texture; }
-		const Texture *	GetTexture() const { return m_texture; }
+		Texture *		GetTexture();
+		const Texture *	GetTexture() const;
 		void			SetShininess(const uint32_t _shininess );
-		const uint32_t	GetShininess() const { return m_shininess;  }
-		Color			GetColor() const	 {	return m_color;		}
+		const uint32_t	GetShininess() const;
+		Color			GetColor() const;
 		void			SetColor( const Color _color );
+
+
 
 		void OnGui() override;
 		bool IsUnique()	const override { return true; }
@@ -35,11 +38,9 @@ namespace fan
 	protected:
 		void OnAttach() override;
 		void OnDetach() override;
-
+		ecsMaterial* GetEcsMaterial() const;
 	private:
-		Texture * m_texture = nullptr;
-		uint32_t  m_shininess = 1;
-		Color m_color = Color::White;
+
 
 		// Editor
 		std::fs::path m_pathBuffer;
