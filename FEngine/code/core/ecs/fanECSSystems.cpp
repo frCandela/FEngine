@@ -1,7 +1,12 @@
 #include "fanGlobalIncludes.h"
-#include "core/ecs/systems/fanECSSystems.h"
+#include "core/ecs/fanEcsSystems.h"
+
+#include "renderer/fanRenderer.h"
 
 namespace fan {
+
+	//================================================================================================================================
+	//================================================================================================================================
 	void ParticleSystem::Run( float _delta, const size_t _count, std::vector< ecsEntityData >& _entitiesData,
 		std::vector< ecsTranform > & _transforms,
 		std::vector< ecsMovement > & _movements,
@@ -13,7 +18,6 @@ namespace fan {
 		colors.reserve( _entitiesData.size() );
 
 		static const float size = 0.05f;
-
 
 		for ( int entity = 0; entity < _count; entity++ ) {
 			ecsEntityData & data = _entitiesData[entity];

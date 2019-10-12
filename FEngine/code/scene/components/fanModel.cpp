@@ -8,6 +8,7 @@
 #include "core/math/shapes/fanAABB.h"
 #include "core/math/shapes/fanConvexHull.h"
 #include "core/files/fanFbxImporter.h"
+#include "core/ecs/fanECSConfig.h"
 
 // Editor
 #include "editor/fanModals.h"
@@ -23,8 +24,9 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	Model::Model() :
-		m_mesh(nullptr) {
+	void Model::OnAttach() {
+		Component::OnAttach();
+		GetGameobject()->AddEcsComponent<ecsModel>();
 	}
 
 	//================================================================================================================================
@@ -38,9 +40,11 @@ namespace fan
 	//================================================================================================================================
 	AABB Model::ComputeAABB() const {
 		const glm::mat4 modelMatrix = GetGameobject()->GetComponent<Transform>()->GetModelMatrix();
-		const std::vector<Vertex> &  vertices = m_mesh->GetVertices();
+		Mesh * mesh = GetEcsModel()->m_mesh;
 
-		const ConvexHull * hull = m_mesh->GetConvexHull();
+		const std::vector<Vertex> &  vertices = mesh->GetVertices();
+
+		const ConvexHull * hull = mesh->GetConvexHull();
 		if (hull != nullptr) {
 			return AABB(hull->GetVertices(), modelMatrix);
 		}
@@ -57,10 +61,16 @@ namespace fan
 	//================================================================================================================================
 	//================================================================================================================================
 	void Model::SetMesh(Mesh * _mesh) {
-		m_mesh = _mesh;
+		GetEcsModel()->m_mesh = _mesh;
 		onRegisterModel.Emmit(this);
 		MarkModified(true);
 	}
+
+	Mesh *			Model::GetMesh() { return GetEcsModel()->m_mesh; }
+	const Mesh *	Model::GetMesh() const { return GetEcsModel()->m_mesh; }
+
+	int		Model::GetRenderID() const { return GetEcsModel()->m_renderID; }
+	void	Model::SetRenderID( const int _renderID ) { GetEcsModel()->m_renderID = _renderID; }
 
 	//================================================================================================================================
 	//================================================================================================================================
@@ -107,7 +117,11 @@ namespace fan
 	//================================================================================================================================
 	bool Model::Save(std::ostream& _out, const int _indentLevel) const {
 		const std::string indentation = GetIndentation(_indentLevel);
-		_out << indentation << "path: " << m_mesh->GetPath() << std::endl;
+		_out << indentation << "path: " << GetEcsModel()->m_mesh->GetPath() << std::endl;
 		return true;
 	}
+
+	//================================================================================================================================
+	//================================================================================================================================
+	ecsModel* Model::GetEcsModel() const { return GetGameobject()->GetEcsComponent<ecsModel>(); }
 }

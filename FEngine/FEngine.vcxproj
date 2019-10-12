@@ -85,9 +85,10 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="code\core\ecs\fanEcsComponents.cpp" />
     <ClCompile Include="code\core\ecs\fanEcsConfig.cpp" />
-    <ClCompile Include="code\core\ecs\fanECSManager.cpp" />
-    <ClCompile Include="code\core\ecs\fanECSSystems.cpp" />
+    <ClCompile Include="code\core\ecs\fanEcsManager.cpp" />
+    <ClCompile Include="code\core\ecs\fanEcsSystems.cpp" />
     <ClCompile Include="code\core\fanDebug.cpp" />
     <ClCompile Include="code\core\fanISerializable.cpp" />
     <ClCompile Include="code\core\fanTime.cpp" />
@@ -167,12 +168,13 @@
     <ClCompile Include="deps\quickhull\QuickHull.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="code\core\ecs\EntityData.h" />
-    <ClInclude Include="code\core\ecs\fanBitsetCreator.h" />
-    <ClInclude Include="code\core\ecs\fanComponentsTuple.h" />
-    <ClInclude Include="code\core\ecs\fanECSManager.h" />
-    <ClInclude Include="code\core\ecs\fanECSConfig.h" />
-    <ClInclude Include="code\core\ecs\systems\fanECSSystems.h" />
+    <ClInclude Include="code\core\ecs\fanEcsBitsetCreator.h" />
+    <ClInclude Include="code\core\ecs\fanEcsComponents.h" />
+    <ClInclude Include="code\core\ecs\fanEcsComponentsTuple.h" />
+    <ClInclude Include="code\core\ecs\fanEcsConfig.h" />
+    <ClInclude Include="code\core\ecs\fanEcsEntityData.h" />
+    <ClInclude Include="code\core\ecs\fanEcsManager.h" />
+    <ClInclude Include="code\core\ecs\fanEcsSystems.h" />
     <ClInclude Include="code\core\fanDebug.h" />
     <ClInclude Include="code\core\fanHash.h" />
     <ClInclude Include="code\core\fanISerializable.h" />

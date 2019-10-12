@@ -1,17 +1,15 @@
 #pragma once
 
 #include "core/ecs/fanECSConfig.h"
-#include "core/ecs/EntityData.h"
-#include "renderer/fanRenderer.h"
+#include "core/ecs/fanEcsEntityData.h"
 
 namespace fan {
-	//================================================================================================================================
+//================================================================================================================================
 // Signature
 // Contains the component & tags typelists and their associated bitsets
 // 'bitset' combines component & tags in the same bitset
 //================================================================================================================================
 	template< typename _type > struct IsTag { static constexpr bool value = std::is_base_of< ecsITag, _type >::value; };
-	template< typename _type > struct IsComponent { static constexpr bool value = std::is_base_of< ecsIComponent, _type >::value; };
 	template< typename _componentType > struct IndexOfComponent { static constexpr size_t value = meta::Find::List< _componentType, ecsComponents >::value; };
 	template< typename _tagType >		struct IndexOfTag { static constexpr size_t value = meta::Find::List< _tagType, ecsTags >::value + ecsComponents::count; };
 

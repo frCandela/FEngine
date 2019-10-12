@@ -74,9 +74,6 @@
     <Filter Include="code\core\meta">
       <UniqueIdentifier>{14e822f4-e834-4ad6-aa6e-ec83ea9d8b56}</UniqueIdentifier>
     </Filter>
-    <Filter Include="code\core\ecs\systems">
-      <UniqueIdentifier>{e740e152-3bb3-4d1a-b7ba-427eda0407f1}</UniqueIdentifier>
-    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="deps\imgui\imgui.cpp">
@@ -307,16 +304,19 @@
     <ClCompile Include="code\editor\fanEditorGrid.cpp">
       <Filter>code\editor</Filter>
     </ClCompile>
-    <ClCompile Include="code\core\ecs\fanECSManager.cpp">
-      <Filter>code\core\ecs</Filter>
-    </ClCompile>
     <ClCompile Include="code\scene\fanGameobject.cpp">
       <Filter>code\scene</Filter>
     </ClCompile>
-    <ClCompile Include="code\core\ecs\fanECSSystems.cpp">
-      <Filter>code\core\ecs\systems</Filter>
+    <ClCompile Include="code\core\ecs\fanEcsSystems.cpp">
+      <Filter>code\core\ecs</Filter>
+    </ClCompile>
+    <ClCompile Include="code\core\ecs\fanEcsComponents.cpp">
+      <Filter>code\core\ecs</Filter>
     </ClCompile>
     <ClCompile Include="code\core\ecs\fanEcsConfig.cpp">
+      <Filter>code\core\ecs</Filter>
+    </ClCompile>
+    <ClCompile Include="code\core\ecs\fanEcsManager.cpp">
       <Filter>code\core\ecs</Filter>
     </ClCompile>
   </ItemGroup>
@@ -1032,29 +1032,32 @@
     <ClInclude Include="code\core\meta\fanTuple.h">
       <Filter>code\core\meta</Filter>
     </ClInclude>
-    <ClInclude Include="code\core\ecs\fanECSManager.h">
-      <Filter>code\core\ecs</Filter>
-    </ClInclude>
-    <ClInclude Include="code\core\ecs\fanComponentsTuple.h">
-      <Filter>code\core\ecs</Filter>
-    </ClInclude>
-    <ClInclude Include="code\core\ecs\fanBitsetCreator.h">
-      <Filter>code\core\ecs</Filter>
-    </ClInclude>
     <ClInclude Include="code\fanExternalDeps.h">
       <Filter>code</Filter>
-    </ClInclude>
-    <ClInclude Include="code\core\ecs\fanECSConfig.h">
-      <Filter>code\core\ecs</Filter>
-    </ClInclude>
-    <ClInclude Include="code\core\ecs\EntityData.h">
-      <Filter>code\core\ecs</Filter>
     </ClInclude>
     <ClInclude Include="code\scene\fanGameobject.h">
       <Filter>code\scene</Filter>
     </ClInclude>
-    <ClInclude Include="code\core\ecs\systems\fanECSSystems.h">
-      <Filter>code\core\ecs\systems</Filter>
+    <ClInclude Include="code\core\ecs\fanEcsConfig.h">
+      <Filter>code\core\ecs</Filter>
+    </ClInclude>
+    <ClInclude Include="code\core\ecs\fanEcsEntityData.h">
+      <Filter>code\core\ecs</Filter>
+    </ClInclude>
+    <ClInclude Include="code\core\ecs\fanEcsManager.h">
+      <Filter>code\core\ecs</Filter>
+    </ClInclude>
+    <ClInclude Include="code\core\ecs\fanEcsSystems.h">
+      <Filter>code\core\ecs</Filter>
+    </ClInclude>
+    <ClInclude Include="code\core\ecs\fanEcsBitsetCreator.h">
+      <Filter>code\core\ecs</Filter>
+    </ClInclude>
+    <ClInclude Include="code\core\ecs\fanEcsComponents.h">
+      <Filter>code\core\ecs</Filter>
+    </ClInclude>
+    <ClInclude Include="code\core\ecs\fanEcsComponentsTuple.h">
+      <Filter>code\core\ecs</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

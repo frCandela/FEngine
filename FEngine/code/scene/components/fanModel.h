@@ -1,7 +1,6 @@
 #pragma once
 
 #include "scene/components/fanComponent.h"
-#include "renderer/fanMesh.h"
 #include "core/ressources/fanRessourcePtr.h"
 
 namespace fan
@@ -9,6 +8,7 @@ namespace fan
 	class Mesh;
 	class AABB;
 	class Gameobject;
+	struct ecsModel;
 
 	//================================================================================================================================
 	//================================================================================================================================
@@ -19,19 +19,17 @@ namespace fan
 		static Signal< Model * >				onUnRegisterModel;
 		static Signal< Model *, std::string  >	onModelSetPath;
 
-		Model();
-
 		AABB ComputeAABB() const;
 
 		// ISerializable
 		bool			Load(std::istream& _in) override;
 		bool			Save(std::ostream& _out, const int _indentLevel) const override;
 		void			SetMesh(Mesh * _mesh);
-		Mesh *			GetMesh() { return m_mesh; }
-		const Mesh *	GetMesh() const { return m_mesh; }
+		Mesh *			GetMesh();
+		const Mesh *	GetMesh() const;
 
-		int		GetRenderID() const { return m_renderID; }
-		void	SetRenderID(const int _renderID) { m_renderID = _renderID; }
+		int		GetRenderID() const;
+		void	SetRenderID(const int _renderID);
 
 		void OnGui() override;
 		bool IsUnique()	const override { return true; }
@@ -40,14 +38,13 @@ namespace fan
 		DECLARE_TYPE_INFO(Model);
 
 	protected:
+		void OnAttach() override;
 		void OnDetach() override;
 
 	private:
-		Mesh * m_mesh;
-		int m_renderID = -1;
-
 		// Editor
 		std::fs::path m_pathBuffer;
 
+		ecsModel * GetEcsModel() const;
 	};
 }
