@@ -89,7 +89,7 @@ namespace fan {
 		// General case
 		template< size_t _index >
 		static void RecycleImpl( ecsComponentsTuple< ecsComponents >& _components, size_t _id, uint32_t _componentIndex ) {
-			if ( _id == _id ) {
+			if ( _index == _id ) {
 				_components.Get<_index>().recycleList.push_back( _componentIndex );
 			} else {
 				RecycleImpl< _index - 1>( _components, _id, _componentIndex );
@@ -109,8 +109,7 @@ namespace fan {
 		static void Recycle( ecsComponentsTuple< ecsComponents >& _components, size_t _id, uint32_t _componentIndex ) {
 			RecycleImpl< ecsComponents::count - 1 >( _components, _id, _componentIndex );
 		}
-	};
-	   
+	};	   
 
 	//================================================================================================================================
 	// put _componentIndex in the recycleList of component _componentID
@@ -240,9 +239,40 @@ namespace fan {
 	//================================================================
 	std::string TagCountSize( const char * _tag, const size_t _count, const size_t _size ) {
 		std::stringstream ssStorage;
-		ssStorage << _tag << _count << " (" << _count * _size / 1000 << "Ko)";
+		ssStorage << _tag<< ": " << _count << " (" << _count * _size / 1000 << "Ko)";
 		return ssStorage.str();
 	}
+
+	//================================================================================================================================
+	// Helper for OnGui
+	//================================================================================================================================
+	template <typename _componentsList > class DisplayHelper;
+	template < template <typename...> typename _componentsList, typename... _components >
+	class DisplayHelper<_componentsList<_components...> > {
+	public:
+
+		template<typename ... _list > struct DisplayImpl;
+
+		// Specialization 
+		template<> struct DisplayImpl<> {
+			static void Display( ecsComponentsTuple< ecsComponents >& /*_tuple*/ ) {}
+		};
+
+		// General case
+		template<typename _component, typename ... _list>
+		struct DisplayImpl< _component, _list...> : DisplayImpl<_list...> {
+			static_assert( IsComponent<_component>::value );
+			static void Display( ecsComponentsTuple< ecsComponents >& _tuple ) {
+				auto& dataTransform = _tuple.Get< _component >();
+				ImGui::Text( TagCountSize( _component::s_name, dataTransform.vector.size() - dataTransform.recycleList.size(), sizeof( _component ) ).c_str() );
+				DisplayImpl<_list...>::Display( _tuple  );
+			}
+		};
+
+		static void Display( ecsComponentsTuple< ecsComponents >& _tuple ) {
+			DisplayImpl<_components...>::Display( _tuple );
+		}
+	};
 
 	//================================================================================================================================
  	//================================================================================================================================
@@ -251,21 +281,12 @@ namespace fan {
 
 		// Entities info
 		ImGui::Text( ( "Entities Count: " + std::to_string(m_entitiesData.size())).c_str() );
-		ImGui::Text( TagCountSize( "Storage size:   ", m_entitiesData.capacity(), sizeof( ecsEntityData ) ).c_str() );
+		ImGui::Text( TagCountSize( "Storage size   ", m_entitiesData.capacity(), sizeof( ecsEntityData ) ).c_str() );
 
 		ImGui::Separator();
 
 		// Components Info
-		auto& dataTransform = m_components.Get< ecsTranform >();
-		ImGui::Text( TagCountSize( "CTranform:      ", dataTransform.vector.size() - dataTransform.recycleList.size(),	sizeof( ecsTranform ) ).c_str() );
-		auto& dataMovement = m_components.Get< ecsMovement >();
-		ImGui::Text( TagCountSize( "SCMovement:     ", dataMovement.vector.size() - dataMovement.recycleList.size(), sizeof( ecsMovement ) ).c_str() );
-		auto& dataParticle = m_components.Get< ecsParticle >();
-		ImGui::Text( TagCountSize( "CParticle:      ", dataParticle.vector.size() - dataParticle.recycleList.size(),		sizeof( ecsParticle ) ).c_str() );
-		auto& dataScale = m_components.Get< ecsScaling >();
-		ImGui::Text( TagCountSize( "CScale:         ", dataScale.vector.size() - dataScale.recycleList.size(), sizeof( ecsScaling ) ).c_str() );
-
-		ImGui::Separator();
+		DisplayHelper<ecsComponents>::Display( m_components );
 		ImGui::Separator();
 
 		// Components & tags selection

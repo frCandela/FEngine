@@ -85,6 +85,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="code\core\ecs\fanEcsConfig.cpp" />
     <ClCompile Include="code\core\ecs\fanECSManager.cpp" />
     <ClCompile Include="code\core\ecs\fanECSSystems.cpp" />
     <ClCompile Include="code\core\fanDebug.cpp" />

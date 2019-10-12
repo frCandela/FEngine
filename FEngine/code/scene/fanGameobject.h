@@ -40,7 +40,7 @@ namespace fan
 		std::string		GetName() const { return m_name; }
 		void			SetName(const std::string _newName) { m_name = _newName; }
 		inline Scene *	GetScene() const { return m_scene; }
-		const AABB &	GetAABB() const { return m_aabb; }
+		const AABB &	GetAABB() const;
 		void			ComputeAABB();
 
 		// Gameobject scene tree parenting
@@ -67,7 +67,6 @@ namespace fan
 		std::vector<Gameobject*> m_childs;
 		Gameobject *			 m_parent;
 		uint32_t				 m_flags;
-		AABB					 m_aabb;
 		std::vector<Component*>  m_components;
 		Scene *	const			 m_scene = nullptr;
 		ecsHandle				 m_ecsHandleEntity = ecsNullHandle;

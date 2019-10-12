@@ -28,7 +28,7 @@ namespace fan
 
 		ecsEntity entity = m_scene->GetEcsManager()->CreateEntity();
 		m_ecsHandleEntity = m_scene->GetEcsManager()->CreateHandle( entity );
-
+		AddEcsComponent<ecsAABB>();
 	}
 
 	//================================================================================================================================
@@ -103,18 +103,24 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
+	const AABB & Gameobject::GetAABB() const {
+		return GetEcsComponent<ecsAABB>()->aabb;
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
 	void Gameobject::ComputeAABB() {
 		if (m_computeAABB) {
 			const Model * model = GetComponent< Model >();
 			if (model != nullptr && model->IsBeingDeleted() == false && model->GetMesh() != nullptr && model->GetMesh()->GetIndices().size() > 0) {
-				m_aabb = model->ComputeAABB();
+				GetEcsComponent<ecsAABB>()->aabb = model->ComputeAABB();
 			}
 			else {
 				const Transform * transform = GetComponent< Transform >();
 				if (transform != nullptr) {
 					const btVector3 origin = transform->GetPosition();
 					const float size = 0.05f;
-					m_aabb = AABB(origin - size * btVector3::One(), origin + size * btVector3::One());
+					GetEcsComponent<ecsAABB>()->aabb = AABB(origin - size * btVector3::One(), origin + size * btVector3::One());
 				}
 			}
 		}

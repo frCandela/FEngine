@@ -316,6 +316,9 @@
     <ClCompile Include="code\core\ecs\fanECSSystems.cpp">
       <Filter>code\core\ecs\systems</Filter>
     </ClCompile>
+    <ClCompile Include="code\core\ecs\fanEcsConfig.cpp">
+      <Filter>code\core\ecs</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="code\editor\fanMainMenuBar.h">
