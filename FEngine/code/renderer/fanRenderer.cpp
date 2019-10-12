@@ -736,6 +736,26 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
+	void Renderer::DebugCircle	  ( const btVector3 _pos, const float _radius, btVector3 _axis, uint32_t _nbSegments, const Color _color ) {
+		assert( _nbSegments  > 2 && _radius > 0.f);
+
+		const btVector3 other = btVector3( -_axis[1], -_axis[2], _axis[0] );
+		btVector3 orthogonal = _radius * _axis.cross(other).normalized();	
+		const float angle = 2.f * PI / (float)_nbSegments;
+
+		for ( uint32_t segmentIndex = 0; segmentIndex < _nbSegments ; segmentIndex++) {
+
+			btVector3 start = _pos + orthogonal;
+			orthogonal = orthogonal.rotate( _axis, angle );
+			btVector3 end = _pos + orthogonal;			
+
+			m_debugLines.push_back( DebugVertex( ToGLM( start ), glm::vec3( 0, 0, 0 ), _color.ToGLM() ) );
+			m_debugLines.push_back( DebugVertex( ToGLM( end ),   glm::vec3( 0, 0, 0 ), _color.ToGLM() ) );
+		}
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
 	void Renderer::DebugTriangle(const btVector3 _v0, const btVector3 _v1, const btVector3 _v2, const Color _color) {
 		const glm::vec3 normal = glm::normalize(ToGLM((_v1 - _v2).cross(_v0 - _v2)));
 		m_debugTriangles.push_back(DebugVertex(ToGLM(_v0), normal, _color.ToGLM()));
