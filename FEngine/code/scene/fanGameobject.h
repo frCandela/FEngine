@@ -140,7 +140,7 @@ namespace fan
 	_componentType* Gameobject::GetEcsComponent() const {
 		static_assert( IsComponent< _componentType>::value );
 
-		_componentType* component = m_scene->GetEcsManager()->FindComponent<_componentType>( m_ecsHandleEntity );
+		_componentType* component = m_scene->GetEcsManager()->FindComponentFromHandle<_componentType>( m_ecsHandleEntity );
 		assert( component  != nullptr );
 		return component;
 	}

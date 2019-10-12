@@ -53,15 +53,18 @@ namespace fan
 	}
 
 	//================================================================================================================================
+	// Draws the main menu bar and the editor windows
 	//================================================================================================================================
 	void MainMenuBar::Draw() {
+		// Draw editor windows
 		for ( int windowIndex = 0; windowIndex < m_editorWindows.size(); windowIndex++ ) {
 			m_editorWindows[windowIndex]->Draw();
 		}
-
 		if (m_showImguiDemoWindow) {
 			ImGui::ShowDemoWindow(&m_showImguiDemoWindow);
 		}
+
+		// Draw main menu  bar
 		if (ImGui::BeginMainMenuBar())
 		{
 			// File
@@ -122,7 +125,7 @@ namespace fan
 				ImGui::EndMenu();
 			}
 
-			// Editor
+			// Grid
 			if (ImGui::BeginMenu("Grid"))			{
 				ImGui::Checkbox("is visible", &m_editorGrid.isVisible);
 				ImGui::DragFloat("spacing", &m_editorGrid.spacing, 0.25f, 0.f, 100.f);

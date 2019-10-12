@@ -42,6 +42,12 @@ namespace fan {
 			ComponentData< indexElement<_type>::value, _type> & Get() {
  				return  ComponentElement< indexElement<_type>::value, _type >::data;
  			}
+			// Const version
+			template < typename _type >
+			const ComponentData< indexElement<_type>::value, _type> & Get() const {
+				return  ComponentElement< indexElement<_type>::value, _type >::data;
+			}
+
 
 			template < size_t _index >
 			ComponentData< _index, elementIndex<_index> > & Get() {

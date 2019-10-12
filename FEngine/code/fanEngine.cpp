@@ -77,7 +77,7 @@ namespace fan {
 		m_inspectorWindow	= new InspectorWindow();
 		m_preferencesWindow = new PreferencesWindow( m_renderer );
 		m_consoleWindow		= new ConsoleWindow();
-		m_ecsWindow			= new EcsWindow();
+		m_ecsWindow			= new EcsWindow( m_ecsManager );
 		m_mainMenuBar		= new MainMenuBar( *m_scene, m_editorGrid );
 		m_mainMenuBar->SetWindows( { m_renderWindow , m_sceneWindow , m_inspectorWindow , m_preferencesWindow, m_consoleWindow, m_ecsWindow } );
 
@@ -117,6 +117,7 @@ namespace fan {
 		// Deletes ui
 		delete m_mainMenuBar;
 		delete m_scene;
+		delete m_ecsManager;
 
 		// Serialize editor positions
 		const Window * window = m_renderer->GetWindow();
@@ -481,9 +482,7 @@ namespace fan {
 // 		} ImGui::End();
 		//***************************************************************************************END_MYLITTLESPACE
 
-		m_ecsManager->OnGui();
 		m_mainMenuBar->Draw();
-
 	}
 
 	//================================================================================================================================
