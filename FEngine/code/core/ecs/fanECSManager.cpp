@@ -80,28 +80,44 @@ namespace fan {
 	}
 
 	//================================================================================================================================
-	// This is ugly but there is no way to access tuple data with runtime indices... TODO Make a macro or a variadic template struct
+	// Helper for the RecycleComponent method
+	// iterates recursively on static components indices, finds the on that matches the runtime index _id and
+	// appends _componentIndex to the corresponding recycle list
+	//================================================================================================================================
+	class RecycleHelper {
+	private:
+		// General case
+		template< size_t _index >
+		static void RecycleImpl( ecsComponentsTuple< ecsComponents >& _components, size_t _id, uint32_t _componentIndex ) {
+			if ( _id == _id ) {
+				_components.Get<_index>().recycleList.push_back( _componentIndex );
+			} else {
+				RecycleImpl< _index - 1>( _components, _id, _componentIndex );
+			}
+		}
+
+		// Specialization 
+		template< >
+		static void RecycleImpl<0>( ecsComponentsTuple< ecsComponents >& _components, size_t _id, uint32_t _componentIndex ) {
+			if ( _id == 0 ) {
+				_components.Get<0>().recycleList.push_back( _componentIndex );
+			} else {
+				assert( false ); // Out of range
+			}
+		}
+	public:
+		static void Recycle( ecsComponentsTuple< ecsComponents >& _components, size_t _id, uint32_t _componentIndex ) {
+			RecycleImpl< ecsComponents::count - 1 >( _components, _id, _componentIndex );
+		}
+	};
+	   
+
+	//================================================================================================================================
+	// put _componentIndex in the recycleList of component _componentID
 	//================================================================================================================================
 	void EcsManager::RecycleComponent( const uint32_t _componentID, const uint32_t _componentIndex ) {
-		switch ( _componentID ) {
-		case 0:	 m_components.Get<0>().recycleList.push_back( _componentIndex ); break;
-		case 1:	 m_components.Get<1>().recycleList.push_back( _componentIndex ); break;
-		case 2:	 m_components.Get<2>().recycleList.push_back( _componentIndex ); break;
-		case 3:	 m_components.Get<3>().recycleList.push_back( _componentIndex ); break;
-// 		case 4:	 m_components.Get<4>().recycleList.push_back( _componentIndex ); break;
-// 		case 5:	 m_components.Get<5>().recycleList.push_back( _componentIndex ); break;
-// 		case 6:	 m_components.Get<6>().recycleList.push_back( _componentIndex ); break;
-// 		case 7:	 m_components.Get<7>().recycleList.push_back( _componentIndex ); break;
-// 		case 8:	 m_components.Get<8>().recycleList.push_back( _componentIndex ); break;
-// 		case 9:	 m_components.Get<9>().recycleList.push_back( _componentIndex ); break;
-// 		case 10: m_components.Get<10>().recycleList.push_back( _componentIndex ); break;
-// 		case 11: m_components.Get<11>().recycleList.push_back( _componentIndex ); break;
-// 		case 12: m_components.Get<12>().recycleList.push_back( _componentIndex ); break;
-// 		case 13: m_components.Get<13>().recycleList.push_back( _componentIndex ); break;
-// 		case 14: m_components.Get<14>().recycleList.push_back( _componentIndex ); break;
-// 		case 15: m_components.Get<15>().recycleList.push_back( _componentIndex ); break;
-		default: assert( false ); break;
-		}
+		assert( _componentID  < ecsComponents::count );
+		RecycleHelper::Recycle( m_components, _componentID, _componentIndex );
 	}
 
 	//================================================================================================================================
