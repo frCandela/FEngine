@@ -46,7 +46,8 @@ namespace fan {
 			m_speed += _delta * forward * transform->Forward(); // increases velocity			
 		} 
 		transform->SetPosition( transform->GetPosition() + m_speed );
-		m_speed *= m_drag;
+		const btVector3 drag = m_drag * m_speed;
+		m_speed -= _delta * drag;
 
 		// Rotation
 		if (leftRotation != 0.f) {
