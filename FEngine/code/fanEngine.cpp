@@ -160,11 +160,10 @@ namespace fan {
 			const float logicDelta = time - lastLogicTime;
 			if ( logicDelta > targetLogicDelta ) {				
 				lastLogicTime += targetLogicDelta;
-
+				Input::NewFrame();
 				ImGui::NewFrame();
-				ImGui::GetIO().DeltaTime = logicDelta;
-				m_renderer->ClearDebug();
-				Input::NewFrame();				
+				ImGui::GetIO().DeltaTime = targetLogicDelta;
+				m_renderer->ClearDebug();							
 
 				m_scene->BeginFrame();
 				m_scene->Update( targetLogicDelta );
@@ -181,6 +180,7 @@ namespace fan {
 				if ( m_mainMenuBar->ShowHull() ) { DrawHull(); }
 				m_scene->EndFrame();		
 				ImGui::Render();
+				
 			}
 
 			// Render world
@@ -363,10 +363,8 @@ namespace fan {
 	void Engine::UpdateRenderer() {
 		// Camera
 		Transform * cameraTransform = m_mainCamera->GetGameobject()->GetComponent<Transform>();
-		if ( m_mainCamera->IsModified() || cameraTransform->IsModified() ) {
-			m_mainCamera->SetAspectRatio( m_renderer->GetWindowAspectRatio() );
-			m_renderer->SetMainCamera( m_mainCamera->GetProjection(), m_mainCamera->GetView(), ToGLM(cameraTransform->GetPosition()));
-		}
+		m_mainCamera->SetAspectRatio( m_renderer->GetWindowAspectRatio() );
+		m_renderer->SetMainCamera( m_mainCamera->GetProjection(), m_mainCamera->GetView(), ToGLM(cameraTransform->GetPosition()));		
 
 		// Point lights		
 		for ( int lightIndex = 0; lightIndex < m_pointLights.size(); lightIndex++ ) {
@@ -447,7 +445,6 @@ namespace fan {
 
 		// Mouse selection
 		if (mouseCaptured == false && Mouse::GetButtonPressed(Mouse::button0)) {
-
 			const btVector3 cameraOrigin = m_editorCamera->GetGameobject()->GetComponent<Transform>()->GetPosition();;
 			const Ray ray = m_editorCamera->ScreenPosToRay(Mouse::GetScreenSpacePosition());
 			const std::vector<Gameobject *>  & entities = m_scene->BuildEntitiesList();
