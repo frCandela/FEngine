@@ -542,7 +542,7 @@ namespace fan {
 				btVector3 intersection;
 				if (triangle.RayCast(ray.origin, ray.direction, intersection)) {
 					clickedColor[3] = 0.5f;
-					if (ImGui::IsMouseClicked(0, false)) {
+					if (Mouse::GetButtonPressed(0)) {
 						cacheData.pressed = true;
 						cacheData.axisIndex = axisIndex;
 					}
@@ -565,7 +565,7 @@ namespace fan {
 				 btVector3 trash, projectionOnAxis;
 				 screenRay.RayClosestPoints(axisRay, trash, projectionOnAxis);
 
-				if (ImGui::IsMouseClicked(0, false)) {
+				if ( Mouse::GetButtonPressed( 0 ) ) {
 					cacheData.offset = projectionOnAxis - _transform.getOrigin();
 				}
 
