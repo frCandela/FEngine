@@ -15,22 +15,28 @@ namespace fan {
 
 	//================================================================================================================================
 	//================================================================================================================================
+	Color DirectionalLight::GetAmbiant() const { return GetEcsDirLight()->ambiant; }
+	Color DirectionalLight::GetDiffuse() const { return GetEcsDirLight()->diffuse; }
+	Color DirectionalLight::GetSpecular() const { return GetEcsDirLight()->specular; }
+
+	//================================================================================================================================
+	//================================================================================================================================
 	void DirectionalLight::SetAmbiant( const Color _ambiant ) {
-		m_ambiant = _ambiant;
+		GetEcsDirLight()->ambiant = _ambiant;
 		MarkModified();
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
 	void DirectionalLight::SetDiffuse( const Color _diffuse ) {
-		m_diffuse = _diffuse;
+		GetEcsDirLight()->diffuse = _diffuse;
 		MarkModified();
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
 	void DirectionalLight::SetSpecular( const Color _specular ) {
-		m_specular = _specular;
+		GetEcsDirLight()->specular = _specular;
 		MarkModified();
 	}
 
@@ -45,9 +51,7 @@ namespace fan {
 	//================================================================================================================================
 	void DirectionalLight::OnAttach() {
 		Component::OnAttach();
-		m_ambiant  = Color::Black;
-		m_diffuse  = Color::White;
-		m_specular = Color::White;
+		GetGameobject()->AddEcsComponent<ecsDirLight>();
 		onDirectionalLightAttach.Emmit( this );
 	}
 
@@ -55,13 +59,15 @@ namespace fan {
 	//================================================================================================================================
 	void DirectionalLight::OnGui() {
 		Component::OnGui();
+		ecsDirLight * dirLight = GetEcsDirLight();
+
 		// Filter color
 		if ( ImGui::Button( "##ambiant" ) ) { SetAmbiant( Color::Black ); } ImGui::SameLine();
-		if ( ImGui::ColorEdit3( "ambiant", m_ambiant.Data(), gui::colorEditFlags ) ) { MarkModified(); }
+		if ( ImGui::ColorEdit3( "ambiant", dirLight->ambiant.Data(), gui::colorEditFlags ) ) { MarkModified(); }
 		if ( ImGui::Button( "##diffuse" ) ) { SetDiffuse( Color::Black ); } ImGui::SameLine();
-		if ( ImGui::ColorEdit3( "diffuse", m_diffuse.Data(), gui::colorEditFlags ) ) { MarkModified(); }
+		if ( ImGui::ColorEdit3( "diffuse", dirLight->diffuse.Data(), gui::colorEditFlags ) ) { MarkModified(); }
 		if ( ImGui::Button( "##specular" ) ) { SetSpecular( Color::Black ); } ImGui::SameLine();
-		if ( ImGui::ColorEdit3( "specular", m_specular.Data(), gui::colorEditFlags ) ) { MarkModified(); }
+		if ( ImGui::ColorEdit3( "specular", dirLight->specular.Data(), gui::colorEditFlags ) ) { MarkModified(); }
 
 
 		const Transform * transform = GetGameobject()->GetComponent<Transform>();
@@ -83,22 +89,29 @@ namespace fan {
 	//================================================================================================================================
 	//================================================================================================================================
 	bool DirectionalLight::Load( std::istream& _in ) {
+		ecsDirLight * dirLight = GetEcsDirLight();
+
 		if ( !ReadSegmentHeader( _in, "ambiant:" ) ) { return false; }
-		if ( !ReadFloat3( _in, &m_ambiant[0] ) ) { return false; }
+		if ( !ReadFloat3( _in, &dirLight->ambiant[0] ) ) { return false; }
 		if ( !ReadSegmentHeader( _in, "diffuse:" ) ) { return false; }
-		if ( !ReadFloat3( _in, &m_diffuse[0] ) ) { return false; }
+		if ( !ReadFloat3( _in, &dirLight->diffuse[0] ) ) { return false; }
 		if ( !ReadSegmentHeader( _in, "specular:" ) ) { return false; }
-		if ( !ReadFloat3( _in, &m_specular[0] ) ) { return false; }
+		if ( !ReadFloat3( _in, &dirLight->specular[0] ) ) { return false; }
 		return true;
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
 	bool DirectionalLight::Save( std::ostream& _out, const int _indentLevel ) const {
+		ecsDirLight * dirLight = GetEcsDirLight();
 		const std::string indentation = GetIndentation( _indentLevel );
-		_out << indentation << "ambiant: " << m_ambiant[0] << " " << m_ambiant[1] << " " << m_ambiant[2] << std::endl;
-		_out << indentation << "diffuse: " << m_diffuse[0] << " " << m_diffuse[1] << " " << m_diffuse[2] << std::endl;
-		_out << indentation << "specular: " << m_specular[0] << " " << m_specular[1] << " " << m_specular[2] << std::endl;
+		_out << indentation << "ambiant: " << dirLight->ambiant[0] << " " << dirLight->ambiant[1] << " " << dirLight->ambiant[2] << std::endl;
+		_out << indentation << "diffuse: " << dirLight->diffuse[0] << " " << dirLight->diffuse[1] << " " << dirLight->diffuse[2] << std::endl;
+		_out << indentation << "specular: " << dirLight->specular[0] << " " << dirLight->specular[1] << " " << dirLight->specular[2] << std::endl;
 		return true;
 	}
+
+	//================================================================================================================================
+	//================================================================================================================================
+	ecsDirLight* DirectionalLight::GetEcsDirLight() const { return GetGameobject()->GetEcsComponent<ecsDirLight>(); }
 }

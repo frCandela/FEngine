@@ -2,6 +2,7 @@
 
 #include "core/fanISerializable.h"
 #include "core/fanTypeInfo.h"
+#include "core/ecs/fanEcsComponents.h"
 
 //Editor
 #include "scene/fanComponentsRegister.h"

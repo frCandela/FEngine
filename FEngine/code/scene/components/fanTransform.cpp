@@ -253,6 +253,6 @@ namespace fan
 	//================================================================================================================================
 	//================================================================================================================================
 	ecsTranform* Transform::GetEcsTransform() const { return GetGameobject()->GetEcsComponent<ecsTranform>(); }
-	ecsScaling* Transform::GetEcsScale() const { return GetGameobject()->GetEcsComponent<ecsScaling>(); }
+	ecsScaling*  Transform::GetEcsScale() const		{ return GetGameobject()->GetEcsComponent<ecsScaling>();  }
 	
 }

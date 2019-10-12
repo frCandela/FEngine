@@ -40,7 +40,7 @@ namespace fan
 	//================================================================================================================================
 	AABB Model::ComputeAABB() const {
 		const glm::mat4 modelMatrix = GetGameobject()->GetComponent<Transform>()->GetModelMatrix();
-		Mesh * mesh = GetEcsModel()->m_mesh;
+		Mesh * mesh = GetEcsModel()->mesh;
 
 		const std::vector<Vertex> &  vertices = mesh->GetVertices();
 
@@ -61,16 +61,16 @@ namespace fan
 	//================================================================================================================================
 	//================================================================================================================================
 	void Model::SetMesh(Mesh * _mesh) {
-		GetEcsModel()->m_mesh = _mesh;
+		GetEcsModel()->mesh = _mesh;
 		onRegisterModel.Emmit(this);
 		MarkModified(true);
 	}
 
-	Mesh *			Model::GetMesh() { return GetEcsModel()->m_mesh; }
-	const Mesh *	Model::GetMesh() const { return GetEcsModel()->m_mesh; }
+	Mesh *			Model::GetMesh() { return GetEcsModel()->mesh; }
+	const Mesh *	Model::GetMesh() const { return GetEcsModel()->mesh; }
 
-	int		Model::GetRenderID() const { return GetEcsModel()->m_renderID; }
-	void	Model::SetRenderID( const int _renderID ) { GetEcsModel()->m_renderID = _renderID; }
+	int		Model::GetRenderID() const { return GetEcsModel()->renderID; }
+	void	Model::SetRenderID( const int _renderID ) { GetEcsModel()->renderID = _renderID; }
 
 	//================================================================================================================================
 	//================================================================================================================================
@@ -117,7 +117,7 @@ namespace fan
 	//================================================================================================================================
 	bool Model::Save(std::ostream& _out, const int _indentLevel) const {
 		const std::string indentation = GetIndentation(_indentLevel);
-		_out << indentation << "path: " << GetEcsModel()->m_mesh->GetPath() << std::endl;
+		_out << indentation << "path: " << GetEcsModel()->mesh->GetPath() << std::endl;
 		return true;
 	}
 

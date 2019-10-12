@@ -19,29 +19,25 @@ namespace fan
 		void OnGui() override;
 		bool IsUnique()	const override { return true; }
 
-		Color GetAmbiant() const { return m_ambiant; }
-		void  SetAmbiant(const Color _ambiant);
-		Color GetDiffuse() const { return m_diffuse; }
-		void  SetDiffuse(const Color _diffuse);
-		Color GetSpecular() const { return m_specular; }
-		void  SetSpecular(const Color m_specular);
-
-		glm::vec3	GetAttenuation() const { return glm::vec3( m_attenuation[0] , m_attenuation[1] , m_attenuation[2] ); }
-		float		GetAttenuation( const Attenuation _attenuation ) const { return m_attenuation[_attenuation]; }
-		void		SetAttenuation( const Attenuation _attenuation, const float _value );
+		// Getters
+		Color		GetAmbiant		(						) const;
+		void		SetAmbiant		( const Color _ambiant	);
+		Color		GetDiffuse		(						) const;
+		void		SetDiffuse		( const Color _diffuse	);
+		Color		GetSpecular		(						) const;
+		void		SetSpecular		( const Color m_specular);
+		glm::vec3	GetAttenuation	(						) const;
+		float		GetAttenuation	( const Attenuation _attenuation					 ) const;
+		void		SetAttenuation	( const Attenuation _attenuation, const float _value );
 
 		DECLARE_EDITOR_COMPONENT(PointLight)
 		DECLARE_TYPE_INFO(PointLight);
 	protected:
 		void OnAttach() override;
 		void OnDetach() override;
+		ecsPointLight*  GetEcsPointLight() const;
 
 	private:
-		Color m_ambiant;
-		Color m_diffuse;
-		Color m_specular;
-		float m_attenuation[3];
-
 		float GetLightRange() const;
 	};
 }

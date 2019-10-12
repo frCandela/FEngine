@@ -1,7 +1,6 @@
 #pragma once
 
 #include "scene/components/fanComponent.h"
-#include "core/ecs/fanEcsComponents.h"
 
 namespace fan
 {

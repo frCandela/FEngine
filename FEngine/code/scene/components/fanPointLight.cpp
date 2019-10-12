@@ -16,21 +16,21 @@ namespace fan
 	//================================================================================================================================
 	//================================================================================================================================
 	void PointLight::SetAmbiant(const Color _ambiant) {
-		m_ambiant = _ambiant;
+		GetEcsPointLight()->ambiant = _ambiant;
 		MarkModified();
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
 	void PointLight::SetDiffuse(const Color _diffuse) {
-		m_diffuse = _diffuse;
+		GetEcsPointLight()->diffuse = _diffuse;
 		MarkModified();
 	}	
 	
 	//================================================================================================================================
 	//================================================================================================================================
 	void PointLight::SetSpecular(const Color _specular) {
-		m_specular = _specular;
+		GetEcsPointLight()->specular = _specular;
 		MarkModified();
 	}
 
@@ -38,7 +38,7 @@ namespace fan
 	//================================================================================================================================
 	void PointLight::SetAttenuation(const Attenuation _attenuation, const float _value) {
 		if (_value >= 0) {
-			m_attenuation[_attenuation] = _value;
+			GetEcsPointLight()->attenuation[_attenuation] = _value;
 			MarkModified();
 		}
 		else {
@@ -57,26 +57,34 @@ namespace fan
 	//================================================================================================================================
 	void PointLight::OnAttach() {
 		Component::OnAttach();
-		m_ambiant  = Color::White ;
-		m_diffuse  = Color::White ;
-		m_specular = Color::White ;
-		m_attenuation[Attenuation::CONSTANT] = 0;
-		m_attenuation[Attenuation::LINEAR] = 0;
-		m_attenuation[Attenuation::QUADRATIC] = 0.1f;
+		GetGameobject()->AddEcsComponent<ecsPointLight>();
 		onPointLightAttach.Emmit(this);
+	}
+	
+	//================================================================================================================================
+	//================================================================================================================================
+	Color		PointLight::GetAmbiant() const {  return GetEcsPointLight()->ambiant; }
+	Color		PointLight::GetDiffuse() const {  return GetEcsPointLight()->diffuse; }
+	Color		PointLight::GetSpecular() const { return GetEcsPointLight()->specular; }
+	float		PointLight::GetAttenuation( const Attenuation _attenuation ) const { return GetEcsPointLight()->attenuation[_attenuation]; }
+	glm::vec3	PointLight::GetAttenuation() const { 
+		ecsPointLight * pointLight = GetEcsPointLight();
+		return glm::vec3( pointLight->attenuation[0], pointLight->attenuation[1], pointLight->attenuation[2] );
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
 	void PointLight::OnGui() {
 		Component::OnGui();
+		ecsPointLight * ecsLight = GetEcsPointLight();
+
 		// Filter color
 		if (ImGui::Button("##ambiant")) { SetAmbiant(Color(0.0f)); } ImGui::SameLine();
-		if (ImGui::ColorEdit3("ambiant", m_ambiant.Data(), gui::colorEditFlags)) { MarkModified(); }
+		if (ImGui::ColorEdit3("ambiant", ecsLight->ambiant.Data(), gui::colorEditFlags)) { MarkModified(); }
 		if (ImGui::Button("##diffuse")) { SetDiffuse(Color::White); } ImGui::SameLine();
-		if (ImGui::ColorEdit3("diffuse", m_diffuse.Data(), gui::colorEditFlags)) { MarkModified(); }
+		if (ImGui::ColorEdit3("diffuse", ecsLight->diffuse.Data(), gui::colorEditFlags)) { MarkModified(); }
 		if (ImGui::Button("##specular")) { SetSpecular(Color::White); } ImGui::SameLine();
-		if (ImGui::ColorEdit3("specular", m_specular.Data(), gui::colorEditFlags)) { MarkModified(); }
+		if (ImGui::ColorEdit3("specular", ecsLight->specular.Data(), gui::colorEditFlags)) { MarkModified(); }
 		// Attenuation
 		
 		ImGui::Text("attenuation :");  
@@ -87,27 +95,29 @@ namespace fan
 			"constant + linear * d + quadratic * d*d  \n"
 			"(d=distance)");
 		if (ImGui::Button("##constant attenuation")) { SetAttenuation(Attenuation::CONSTANT, 0.f ); }	ImGui::SameLine();
-		if (ImGui::DragFloat("constant",  &m_attenuation[Attenuation::CONSTANT],0.05f, 0.f, 100.f)) { MarkModified(); }		
+		if (ImGui::DragFloat("constant",  &ecsLight->attenuation[Attenuation::CONSTANT],0.05f, 0.f, 100.f)) { MarkModified(); }
 		if (ImGui::Button("##linear attenuation")) { SetAttenuation(Attenuation::LINEAR, 0.f); }	ImGui::SameLine();
-		if (ImGui::DragFloat("linear",	  &m_attenuation[Attenuation::LINEAR], 0.05f, 0.f, 100.f)) { MarkModified(); }
+		if (ImGui::DragFloat("linear",	  &ecsLight->attenuation[Attenuation::LINEAR], 0.05f, 0.f, 100.f)) { MarkModified(); }
 		if (ImGui::Button("##quadratic attenuation")) { SetAttenuation(Attenuation::QUADRATIC, 0.f); }	ImGui::SameLine();
-		if (ImGui::DragFloat("quadratic", &m_attenuation[Attenuation::QUADRATIC], 0.05f, 0.f, 100.f)) { MarkModified(); }
+		if (ImGui::DragFloat("quadratic", &ecsLight->attenuation[Attenuation::QUADRATIC], 0.05f, 0.f, 100.f)) { MarkModified(); }
 		
  		// Sphere gizmo
 		float lightRange = GetLightRange();
 		if (lightRange > 0 ) {
 			const btTransform transform = GetGameobject()->GetComponent<Transform>()->GetBtTransform();
-			Debug::Render().DebugSphere(transform, lightRange, 2, m_diffuse);
+			Debug::Render().DebugSphere(transform, lightRange, 2, ecsLight->diffuse);
 		}
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
 	float PointLight::GetLightRange() const {
+		ecsPointLight * ecsLight = GetEcsPointLight();
+
 		const float epsilon = 0.1f;	// Value at which we consider the light value null
-		const float q = m_attenuation[2];
-		const float s = m_attenuation[0];
-		const float L = m_attenuation[1];
+		const float q = ecsLight->attenuation[2];
+		const float s = ecsLight->attenuation[0];
+		const float L = ecsLight->attenuation[1];
 		if (q < epsilon) {	// first order linear differential equation
 			return ((1.f / epsilon) - s) / L;
 		}
@@ -121,25 +131,33 @@ namespace fan
 	//================================================================================================================================
 	//================================================================================================================================
 	bool PointLight::Load(std::istream& _in) {
+		ecsPointLight * ecsLight = GetEcsPointLight();
+
 		if (!ReadSegmentHeader(_in, "ambiant:")) { return false; }
-		if (!ReadFloat3(_in, &m_ambiant[0])) { return false; }
+		if (!ReadFloat3(_in, &ecsLight->ambiant[0])) { return false; }
 		if (!ReadSegmentHeader(_in, "diffuse:")) { return false; }
-		if (!ReadFloat3(_in, &m_diffuse[0])) { return false; }
+		if (!ReadFloat3(_in, &ecsLight->diffuse[0])) { return false; }
 		if (!ReadSegmentHeader(_in, "specular:")) { return false; }
-		if (!ReadFloat3(_in, &m_specular[0])) { return false; }
+		if (!ReadFloat3(_in, &ecsLight->specular[0])) { return false; }
 		if (!ReadSegmentHeader(_in, "attenuation:")) { return false; }
-		if (!ReadFloat3(_in, &m_attenuation[0])) { return false; }
+		if (!ReadFloat3(_in, &ecsLight->attenuation[0])) { return false; }
 		return true;
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
 	bool PointLight::Save(std::ostream& _out, const int _indentLevel) const {
+		ecsPointLight * ecsLight = GetEcsPointLight();
+
 		const std::string indentation = GetIndentation(_indentLevel);
-		_out << indentation << "ambiant: " << m_ambiant[0] << " " << m_ambiant[1] << " " << m_ambiant[2] << std::endl;
-		_out << indentation << "diffuse: " << m_diffuse[0] << " " << m_diffuse[1] << " " << m_diffuse[2] << std::endl;
-		_out << indentation << "specular: " << m_specular[0] << " " << m_specular[1] << " " << m_specular[2] << std::endl;
-		_out << indentation << "attenuation: " << m_attenuation[0] << " " << m_attenuation[1] << " " << m_attenuation[2] << std::endl;
+		_out << indentation << "ambiant: " << ecsLight->ambiant[0] << " " << ecsLight->ambiant[1] << " " << ecsLight->ambiant[2] << std::endl;
+		_out << indentation << "diffuse: " << ecsLight->diffuse[0] << " " << ecsLight->diffuse[1] << " " << ecsLight->diffuse[2] << std::endl;
+		_out << indentation << "specular: " << ecsLight->specular[0] << " " << ecsLight->specular[1] << " " << ecsLight->specular[2] << std::endl;
+		_out << indentation << "attenuation: " << ecsLight->attenuation[0] << " " << ecsLight->attenuation[1] << " " << ecsLight->attenuation[2] << std::endl;
 		return true;
 	}
+
+	//================================================================================================================================
+	//================================================================================================================================
+	ecsPointLight* PointLight::GetEcsPointLight() const { return GetGameobject()->GetEcsComponent<ecsPointLight>(); }
 }

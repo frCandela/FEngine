@@ -17,9 +17,9 @@ namespace fan {
 		void OnGui() override;
 		bool IsUnique()	const override { return true; }
 
-		Color GetAmbiant() const  { return m_ambiant; }
-		Color GetDiffuse() const  { return m_diffuse; }
-		Color GetSpecular() const { return m_specular; }
+		Color GetAmbiant() const ;
+		Color GetDiffuse() const ;
+		Color GetSpecular() const;
 		void  SetAmbiant(  const Color _ambiant );
 		void  SetDiffuse(  const Color _diffuse );
 		void  SetSpecular( const Color m_specular );
@@ -29,10 +29,6 @@ namespace fan {
 	protected:
 		void OnAttach() override;
 		void OnDetach() override;
-
-	private:
-		Color m_ambiant;
-		Color m_diffuse;
-		Color m_specular;
+		ecsDirLight*  GetEcsDirLight() const;
 	};
 }
