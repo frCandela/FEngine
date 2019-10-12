@@ -32,35 +32,33 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
+	MainMenuBar::~MainMenuBar() {
+		SerializedValues::Get().SetValue( "show_imguidemo", m_showImguiDemoWindow );
+		for (int windowIndex = 0; windowIndex < m_editorWindows.size() ; windowIndex++) {
+			delete m_editorWindows[windowIndex];
+		}
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
 	void MainMenuBar::Initialize() {
 		SerializedValues::Get().GetValue("show_imguidemo", m_showImguiDemoWindow);
 	}
 
 	//================================================================================================================================
+	// All editor windows are drawn & deleted with the main menubar
 	//================================================================================================================================
-	MainMenuBar::~MainMenuBar() {
-		SerializedValues::Get().SetValue("show_imguidemo", m_showImguiDemoWindow);
-	}
-
-	//================================================================================================================================
-	// TODO Replace this with a vector
-	//================================================================================================================================
-	void MainMenuBar::SetWindows( EditorWindow * _renderWindow,
-								  EditorWindow * _sceneWindow,
-								  EditorWindow * _inspector,
-								  EditorWindow * _preferences,
-								  EditorWindow * _console )
-	{
-		m_renderWindow = _renderWindow;
-		m_sceneWindow = _sceneWindow;
-		m_inspector = _inspector;
-		m_preferences= _preferences;
-		m_console = _console;
+	void MainMenuBar::SetWindows( std::vector< EditorWindow * > _editorWindows )	{
+		m_editorWindows = _editorWindows;
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
 	void MainMenuBar::Draw() {
+		for ( int windowIndex = 0; windowIndex < m_editorWindows.size(); windowIndex++ ) {
+			m_editorWindows[windowIndex]->Draw();
+		}
+
 		if (m_showImguiDemoWindow) {
 			ImGui::ShowDemoWindow(&m_showImguiDemoWindow);
 		}
@@ -100,25 +98,12 @@ namespace fan
 			// View
 			if (ImGui::BeginMenu("View"))
 			{
-				bool showPostprocessWindow = m_renderWindow->IsVisible();
-				if (ImGui::Checkbox("Rendering", &showPostprocessWindow)) {
-					m_renderWindow->SetVisible(showPostprocessWindow);
-				}
-				bool showSceneWindow = m_sceneWindow->IsVisible();
-				if (ImGui::Checkbox("Scene", &showSceneWindow)) {
-					m_sceneWindow->SetVisible(showSceneWindow);
-				}
-				bool showInspector = m_inspector->IsVisible();
-				if (ImGui::Checkbox("Inspector", &showInspector)) {
-					m_inspector->SetVisible(showInspector);
-				}
-				bool showPreferences = m_preferences->IsVisible();
-				if (ImGui::Checkbox("Preferences", &showPreferences)) {
-					m_preferences->SetVisible(showPreferences);
-				}
-				bool showConsole = m_console->IsVisible();
-				if (ImGui::Checkbox("Console", &showConsole)) {
-					m_console->SetVisible(showConsole);
+				for (size_t windowIndex = 0; windowIndex < m_editorWindows.size() ; windowIndex++) {
+					EditorWindow * window = m_editorWindows[ windowIndex ];
+					bool showWindow = window->IsVisible();
+					if ( ImGui::Checkbox( window->GetName().c_str(), &showWindow ) ) {
+						window->SetVisible( showWindow );
+					}
 				}
 
 				ImGui::Separator();

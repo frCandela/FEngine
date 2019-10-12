@@ -11,6 +11,7 @@ namespace fan {
 	class PreferencesWindow;
 	class ConsoleWindow;
 	class EditorWindow;
+	class EcsWindow;
 	class Renderer;
 	class Gameobject;
 	class Scene;
@@ -48,7 +49,7 @@ namespace fan {
 		void RegisterModel				( Model *			 _model );
 		void UnRegisterModel			( Model *			 _model );
 		
-		Gameobject *	const	GetSelectedGameobject() const		{ return m_selectedGameobject;  }
+		Gameobject *	const	GetSelectedGameobject() const	{ return m_selectedGameobject;  }
 		Camera *				GetEditorCamera() const			{ return m_editorCamera; }
 		Camera *				GetMainCamera() const			{ return m_mainCamera; }
 		Renderer &				GetRenderer() const				{ return * m_renderer; }
@@ -74,7 +75,7 @@ namespace fan {
 		InspectorWindow *	m_inspectorWindow;
 		PreferencesWindow *	m_preferencesWindow;
 		ConsoleWindow *		m_consoleWindow;
-		std::vector< EditorWindow * > m_editorWindows;
+		EcsWindow *			m_ecsWindow;
 
 		EditorGrid m_editorGrid;
 

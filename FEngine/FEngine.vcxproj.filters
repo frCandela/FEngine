@@ -319,6 +319,9 @@
     <ClCompile Include="code\core\ecs\fanEcsManager.cpp">
       <Filter>code\core\ecs</Filter>
     </ClCompile>
+    <ClCompile Include="code\editor\windows\fanEcsWindow.cpp">
+      <Filter>code\editor\windows</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="code\editor\fanMainMenuBar.h">
@@ -1058,6 +1061,9 @@
     </ClInclude>
     <ClInclude Include="code\core\ecs\fanEcsComponentsTuple.h">
       <Filter>code\core\ecs</Filter>
+    </ClInclude>
+    <ClInclude Include="code\editor\windows\fanEcsWindow.h">
+      <Filter>code\editor\windows</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

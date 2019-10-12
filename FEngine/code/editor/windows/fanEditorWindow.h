@@ -10,8 +10,11 @@ namespace fan
 		virtual ~EditorWindow();
 
 		void Draw();
+
 		void SetVisible(bool _value) { m_isVisible = _value; }
 		bool IsVisible() const { return  m_isVisible; }
+
+		std::string GetName() const { return m_name; }
 
 	protected:
 		virtual void OnGui() = 0;

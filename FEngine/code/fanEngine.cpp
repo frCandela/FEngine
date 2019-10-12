@@ -25,6 +25,7 @@
 #include "editor/windows/fanInspectorWindow.h"	
 #include "editor/windows/fanPreferencesWindow.h"	
 #include "editor/windows/fanConsoleWindow.h"	
+#include "editor/windows/fanEcsWindow.h"	
 #include "editor/components/fanFPSCamera.h"		
 #include "scene/fanScene.h"
 #include "scene/fanGameobject.h"
@@ -76,14 +77,9 @@ namespace fan {
 		m_inspectorWindow	= new InspectorWindow();
 		m_preferencesWindow = new PreferencesWindow( m_renderer );
 		m_consoleWindow		= new ConsoleWindow();
+		m_ecsWindow			= new EcsWindow();
 		m_mainMenuBar		= new MainMenuBar( *m_scene, m_editorGrid );
-		m_mainMenuBar->SetWindows( m_renderWindow , m_sceneWindow , m_inspectorWindow , m_preferencesWindow, m_consoleWindow );
-
-		m_editorWindows.push_back( m_renderWindow );
-		m_editorWindows.push_back( m_sceneWindow );
-		m_editorWindows.push_back( m_inspectorWindow );
-		m_editorWindows.push_back( m_preferencesWindow );
-		m_editorWindows.push_back( m_consoleWindow );
+		m_mainMenuBar->SetWindows( { m_renderWindow , m_sceneWindow , m_inspectorWindow , m_preferencesWindow, m_consoleWindow, m_ecsWindow } );
 
 		// Instance messages
 		Debug::Get().onSetMainCamera.Connect( &Engine::SetMainCamera, this );
@@ -120,11 +116,6 @@ namespace fan {
 	Engine::~Engine() {
 		// Deletes ui
 		delete m_mainMenuBar;
-		delete m_renderWindow;
-		delete m_sceneWindow;
-		delete m_inspectorWindow;
-		delete m_preferencesWindow;
-		delete m_consoleWindow;
 		delete m_scene;
 
 		// Serialize editor positions
@@ -492,9 +483,7 @@ namespace fan {
 
 		m_ecsManager->OnGui();
 		m_mainMenuBar->Draw();
-		for (int windowIndex = 0; windowIndex < m_editorWindows.size() ; windowIndex++)	{
-			m_editorWindows[windowIndex]->Draw();
-		}
+
 	}
 
 	//================================================================================================================================

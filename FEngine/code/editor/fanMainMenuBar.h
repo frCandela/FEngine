@@ -28,11 +28,7 @@ namespace fan
 
 		MainMenuBar( Scene & _scene, EditorGrid & _editorGrid );
 		~MainMenuBar();
-		void SetWindows( EditorWindow * _renderWindow,
-						 EditorWindow * _sceneWindow, 
-						 EditorWindow * _inspector,
-						 EditorWindow * _preferences, 
-						 EditorWindow * _console);
+		void SetWindows( std::vector< EditorWindow * > _editorWindows );
 
 		void Initialize();
 		void Draw();
@@ -46,11 +42,7 @@ namespace fan
 		Scene & m_scene;
 		EditorGrid & m_editorGrid;
 
-		EditorWindow * m_renderWindow = nullptr;
-		EditorWindow * m_sceneWindow = nullptr;
-		EditorWindow * m_inspector = nullptr;
-		EditorWindow * m_preferences = nullptr;
-		EditorWindow * m_console = nullptr;
+		std::vector< EditorWindow * > m_editorWindows;
 
 		bool m_showImguiDemoWindow;
 		bool m_showHull;
