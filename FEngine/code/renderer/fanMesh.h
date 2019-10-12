@@ -27,7 +27,7 @@ namespace fan {
 		Buffer *						GetVertexBuffer()		{ return m_vertexBuffer;	}
 		
 		void GenerateBuffers( Device & _device );
-		void Load() override;
+		bool Load() override;
 
 		DECLARE_TYPE_INFO(Mesh)
 	private:

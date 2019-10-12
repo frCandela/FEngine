@@ -117,7 +117,10 @@ namespace fan
 	//================================================================================================================================
 	bool Model::Save(std::ostream& _out, const int _indentLevel) const {
 		const std::string indentation = GetIndentation(_indentLevel);
-		_out << indentation << "path: " << GetEcsModel()->mesh->GetPath() << std::endl;
+
+		ecsModel* model = GetEcsModel();
+
+		_out << indentation << "path: " << (model->mesh != nullptr ? model->mesh->GetPath() : """" ) << std::endl;
 		return true;
 	}
 

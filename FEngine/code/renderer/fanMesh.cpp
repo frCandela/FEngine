@@ -30,19 +30,19 @@ namespace fan {
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void Mesh::Load( ) {	
+	bool Mesh::Load( ) {
 		Ressource::Load();
 		SetRessourceID(DSID(m_path.c_str()));
  		FBXImporter importer;
  		if (importer.LoadScene(m_path) == true) {
-			if (importer.GetMesh(*this) == false ) {
-				Debug::Get() << "Failed to load mesh : " << m_path << Debug::Endl();
-			}
-			else {
+			if (importer.GetMesh(*this) != false ) {
 				OptimizeVertices();
 				GenerateConvexHull();
+				return true;
 			}
 		}
+		Debug::Get() << "Failed to load mesh : " << m_path << Debug::Endl();
+		return false;
 	}
 	
 	//================================================================================================================================

@@ -67,9 +67,13 @@ namespace fan
 	//================================================================================================================================
 	Mesh * RessourceManager::LoadMesh(const std::string _path) {
 		Mesh * mesh = new Mesh(_path);
-		mesh->Load();
-		AddMesh(mesh);
-		return mesh;
+		if ( mesh->Load() ) {
+			AddMesh( mesh );
+			return mesh;
+		}		
+		delete mesh;
+		return nullptr;
+		
 	}
 
 	//================================================================================================================================
