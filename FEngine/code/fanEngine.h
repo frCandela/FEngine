@@ -24,6 +24,7 @@ namespace fan {
 	class Material;
 	class Camera;
 	class EcsManager;
+	class PhysicsManager;
 
 	//================================================================================================================================
 	//================================================================================================================================	
@@ -83,6 +84,7 @@ namespace fan {
 		Renderer *	 m_renderer;
 		Scene *		 m_scene;
 		EcsManager * m_ecsManager;
+		PhysicsManager * m_physicsManager;
 		Gameobject * m_selectedGameobject;
 		Camera * m_editorCamera = nullptr;
 		Camera * m_mainCamera = nullptr;

@@ -93,7 +93,8 @@ namespace fan
 		static_assert((std::is_base_of<Component, ComponentType>::value));
 
 		ComponentType* component = new ComponentType();
-		if (component->IsUnique() && GetComponent< ComponentType >() != nullptr) {
+		if ( GetComponent< ComponentType >() != nullptr ) {
+			Debug::Get() << Debug::Severity::warning << "Trying to add " << ComponentType::s_name << " twice on gameobject " << m_name << Debug::Endl();
 			delete(static_cast<Component*>(component));
 			return nullptr;
 		}

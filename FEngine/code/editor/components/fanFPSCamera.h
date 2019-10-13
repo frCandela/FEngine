@@ -26,7 +26,6 @@ namespace fan
 		void SetXYSensitivity(const btVector2 _sensitivity)		{ m_xySensitivity = _sensitivity; }
 
 		void OnGui() override;
-		bool IsUnique() const	override { return true; }
 
 		DECLARE_EDITOR_COMPONENT(FPSCamera);
 		DECLARE_TYPE_INFO(FPSCamera);

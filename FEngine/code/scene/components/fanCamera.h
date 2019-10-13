@@ -30,8 +30,6 @@ namespace fan
 		void SetAspectRatio(float _aspectRatio);
 		void SetProjectionType( const Type _type );
 
-
-		bool IsUnique()		const override { return true; }
 		void OnGui() override;
 
 		DECLARE_EDITOR_COMPONENT(Camera)

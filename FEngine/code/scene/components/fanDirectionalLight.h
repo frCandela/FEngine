@@ -13,7 +13,6 @@ namespace fan {
 		enum Attenuation { CONSTANT = 0, LINEAR = 1, QUADRATIC = 2 };
 
 		void OnGui() override;
-		bool IsUnique()	const override { return true; }
 
 		Color GetAmbiant() const ;
 		Color GetDiffuse() const ;

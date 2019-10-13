@@ -77,6 +77,9 @@
     <Filter Include="code\core\scope">
       <UniqueIdentifier>{d92c1cef-a6e2-4bab-9acc-41dafa031338}</UniqueIdentifier>
     </Filter>
+    <Filter Include="code\physics">
+      <UniqueIdentifier>{bf42697b-30af-4e6e-92de-8df872802887}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="deps\imgui\imgui.cpp">
@@ -327,6 +330,12 @@
     </ClCompile>
     <ClCompile Include="code\core\scope\fanScopedTimer.cpp">
       <Filter>code\core\scope</Filter>
+    </ClCompile>
+    <ClCompile Include="code\physics\fanPhysicsManager.cpp">
+      <Filter>code\physics</Filter>
+    </ClCompile>
+    <ClCompile Include="code\scene\components\fanRigidbody.cpp">
+      <Filter>code\scene\components</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -1073,6 +1082,12 @@
     </ClInclude>
     <ClInclude Include="code\core\scope\fanScopedTimer.h">
       <Filter>code\core\scope</Filter>
+    </ClInclude>
+    <ClInclude Include="code\physics\fanPhysicsManager.h">
+      <Filter>code\physics</Filter>
+    </ClInclude>
+    <ClInclude Include="code\scene\components\fanRigidbody.h">
+      <Filter>code\scene\components</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

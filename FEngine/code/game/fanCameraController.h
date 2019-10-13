@@ -15,7 +15,6 @@ namespace fan {
 		void Start() override;
 		void Update(const float _delta) override;
 
-		bool IsUnique() const override { return true; }
 		void OnGui() override;
 		void OnDetach() override;
 

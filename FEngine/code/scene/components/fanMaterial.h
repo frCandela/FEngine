@@ -28,7 +28,6 @@ namespace fan
 
 
 		void OnGui() override;
-		bool IsUnique()	const override { return true; }
 
 		DECLARE_EDITOR_COMPONENT(Material)
 		DECLARE_TYPE_INFO(Material);

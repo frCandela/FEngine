@@ -30,7 +30,6 @@ namespace fan
 		void	SetRenderID(const int _renderID);
 
 		void OnGui() override;
-		bool IsUnique()	const override { return true; }
 
 		DECLARE_EDITOR_COMPONENT(Model)
 		DECLARE_TYPE_INFO(Model);

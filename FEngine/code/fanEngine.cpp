@@ -39,6 +39,7 @@
 #include "scene/components/fanDirectionalLight.h"
 #include "core/math/shapes/fanConvexHull.h"
 #include "core/ecs/fanECSManager.h"
+#include "physics/fanPhysicsManager.h"
 
 namespace fan {
 	Signal<Gameobject*> Engine::onGameobjectSelected;
@@ -70,6 +71,8 @@ namespace fan {
 		m_ecsManager = new EcsManager();
 		m_scene = new Scene( "mainScene" );
 		m_scene->m_ecsManager = m_ecsManager;
+		m_physicsManager = new PhysicsManager( btVector3(0,-10,0) );
+		m_physicsManager->m_ecsManager = m_ecsManager;
 
 		// Initialize editor components
 		m_renderWindow		= new RenderWindow( m_renderer );
@@ -116,6 +119,7 @@ namespace fan {
 		// Deletes ui
 		delete m_mainMenuBar;
 		delete m_scene;
+		delete m_physicsManager;
 		delete m_ecsManager;
 
 		// Serialize editor positions
@@ -163,6 +167,7 @@ namespace fan {
 				ManageKeyShortcuts();
 				ManageSelection();
 				DrawUI();
+				m_physicsManager->OnGui();
 				DrawEditorGrid();
 
 				if ( m_mainMenuBar->ShowWireframe() ) { DrawWireframe(); }

@@ -31,7 +31,6 @@ namespace fan
 		btVector3 Forward() const;
 		btVector3 Up() const;
 
-		bool IsUnique() const		override { return true; }
 		void OnGui() override;
 
 		// ISerializable

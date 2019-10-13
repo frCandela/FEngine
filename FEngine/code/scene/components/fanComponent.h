@@ -26,7 +26,6 @@ namespace fan
 		void SetRemovable(const bool _isRemovable) { m_isRemovable = _isRemovable; }
 
 		virtual bool IsActor() const { return false; }
-		virtual bool IsUnique()	const = 0;		// Returns true if there is only one instance of this type of component per gameobject, false otherwise
 		virtual void OnGui();
 
 		DECLARE_ABSTRACT_TYPE_INFO(Component);

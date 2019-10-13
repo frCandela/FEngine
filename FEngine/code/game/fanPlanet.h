@@ -11,7 +11,6 @@ namespace fan {
 		void Update(const float _delta) override;
 
 		void OnGui() override;
-		bool IsUnique() const override { return true; }
 
 		void SetSpeed( const float _speed );
 		void SetRadius( const float _radius );

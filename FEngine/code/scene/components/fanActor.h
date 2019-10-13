@@ -17,7 +17,6 @@ namespace fan
 		virtual void Update(const float _delta) = 0;
 
 		bool IsActor() const override { return true; }
-		bool IsUnique() const override { return false; }
 		void OnGui() override;
 		bool IsEnabled() const { return m_isEnabled; }
 		void SetEnabled(const bool _enabled);

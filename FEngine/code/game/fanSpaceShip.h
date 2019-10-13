@@ -11,7 +11,6 @@ namespace fan {
 		void Update(const float _delta) override;
 
 		void OnGui() override;
-		bool IsUnique() const override { return true; }
 
 		DECLARE_EDITOR_COMPONENT(SpaceShip)
 		DECLARE_TYPE_INFO(SpaceShip);
