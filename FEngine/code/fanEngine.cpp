@@ -105,7 +105,6 @@ namespace fan {
 		DirectionalLight::onDirectionalLightAttach.Connect	( &Engine::RegisterDirectionalLight,   this );
 		DirectionalLight::onDirectionalLightDetach.Connect	( &Engine::UnRegisterDirectionalLight, this );
 
-		m_mainMenuBar->Initialize();
 		m_scene->New();
 		Mesh * defaultMesh = m_renderer->GetRessourceManager()->LoadMesh(GlobalValues::s_defaultMeshPath);
 		m_renderer->GetRessourceManager()->SetDefaultMesh( defaultMesh );

@@ -80,6 +80,9 @@ namespace fan {
 		if (!ReadSegmentHeader(_in, "rotation_speed:")) { return false; }
 		if (!ReadFloat(_in, m_rotationSpeed)) { return false; }
 
+		if ( !ReadSegmentHeader( _in, "drag:" ) ) { return false; }
+		if ( !ReadFloat( _in, m_drag ) ) { return false; }
+
 		return true;
 	}
 
@@ -90,6 +93,8 @@ namespace fan {
 		const std::string indentation = GetIndentation(_indentLevel);
 		_out << indentation << "speed:          " << m_velocity << std::endl;
 		_out << indentation << "rotation_speed: " << m_rotationSpeed << std::endl;
+		_out << indentation << "drag: " << m_drag << std::endl;
+		
 		return true;
 	}
 }

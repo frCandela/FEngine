@@ -30,7 +30,6 @@ namespace fan
 		~MainMenuBar();
 		void SetWindows( std::vector< EditorWindow * > _editorWindows );
 
-		void Initialize();
 		void Draw();
 
 		bool ShowHull() const { return m_showHull; }

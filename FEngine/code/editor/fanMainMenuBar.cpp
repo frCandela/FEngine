@@ -28,21 +28,29 @@ namespace fan
 		, m_showWireframe(false)
 		, m_showNormals(false)
 		, m_sceneExtensionFilter(GlobalValues::s_sceneExtensions) {
+
+		SerializedValues::Get().GetValue( "show_imguidemo", m_showImguiDemoWindow );
+		SerializedValues::Get().GetValue( "editor_grid_show", m_editorGrid.isVisible );
+		SerializedValues::Get().GetValue( "editor_grid_spacing", m_editorGrid.spacing );
+		SerializedValues::Get().GetValue( "editor_grid_linesCount", m_editorGrid.linesCount );
+		SerializedValues::Get().GetColor( "editor_grid_color", m_editorGrid.color );
+
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
 	MainMenuBar::~MainMenuBar() {
 		SerializedValues::Get().SetValue( "show_imguidemo", m_showImguiDemoWindow );
+		SerializedValues::Get().SetValue( "editor_grid_show",       m_editorGrid.isVisible );
+		SerializedValues::Get().SetValue( "editor_grid_spacing",	m_editorGrid.spacing );
+		SerializedValues::Get().SetValue( "editor_grid_linesCount", m_editorGrid.linesCount );
+		SerializedValues::Get().SetColor( "editor_grid_color",		m_editorGrid.color );
+
 		for (int windowIndex = 0; windowIndex < m_editorWindows.size() ; windowIndex++) {
 			delete m_editorWindows[windowIndex];
 		}
-	}
 
-	//================================================================================================================================
-	//================================================================================================================================
-	void MainMenuBar::Initialize() {
-		SerializedValues::Get().GetValue("show_imguidemo", m_showImguiDemoWindow);
+
 	}
 
 	//================================================================================================================================
@@ -127,10 +135,10 @@ namespace fan
 
 			// Grid
 			if (ImGui::BeginMenu("Grid"))			{
-				ImGui::Checkbox("is visible", &m_editorGrid.isVisible);
-				ImGui::DragFloat("spacing", &m_editorGrid.spacing, 0.25f, 0.f, 100.f);
-				ImGui::DragInt("lines count", &m_editorGrid.linesCount, 1.f, 0, 1000);
-				ImGui::ColorEdit3("color", &m_editorGrid.color[0], gui::colorEditFlags);
+				ImGui::Checkbox("is visible",	& m_editorGrid.isVisible);
+				ImGui::DragFloat("spacing",		& m_editorGrid.spacing, 0.25f, 0.f, 100.f);
+				ImGui::DragInt("lines count",	& m_editorGrid.linesCount, 1.f, 0, 1000);
+				ImGui::ColorEdit3("color",		& m_editorGrid.color[0], gui::colorEditFlags);
 				ImGui::EndMenu();
 			}
 

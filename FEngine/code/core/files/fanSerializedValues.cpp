@@ -26,24 +26,48 @@ namespace fan {
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void SerializedValues::SetValue(const std::string & _key, const btVector3& _value) {
-		m_json[_key + std::string("_btvector3_x")] = _value[0];
-		m_json[_key + std::string("_btvector3_y")] = _value[1];
-		m_json[_key + std::string("_btvector3_z")] = _value[2];
+	bool SerializedValues::GetVec3( const std::string & _key, btVector3 & _outVec3 ) {
+		auto  it = m_json.find( _key );
+		if ( it != m_json.end() ) {
+			_outVec3[0] = ( *it )["x"];
+			_outVec3[1] = ( *it )["y"];
+			_outVec3[2] = ( *it )["z"];
+			return true;
+		} else {
+			return false;
+		}
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	bool SerializedValues::GetValue(const std::string & _key, btVector3& value) const {
-		if (GetValue(_key + std::string("_btvector3_x"), value[0]) == false) {
-			return false;
-		}
-		if (GetValue(_key + std::string("_btvector3_y"), value[1]) == false) {
-			return false;
-		}
-		if (GetValue(_key + std::string("_btvector3_z"), value[2]) == false) {
-			return false;
-		}
-		return true;
+	void SerializedValues::SetVec3( const std::string & _key, btVector3 _vec3 ) {
+		m_json[_key]["x"] = _vec3[0];
+		m_json[_key]["y"] = _vec3[1];
+		m_json[_key]["z"] = _vec3[2];
 	}
+
+	//================================================================================================================================
+	//================================================================================================================================
+	bool SerializedValues::GetColor( const std::string & _key, Color & _outColor ) {
+		auto  it = m_json.find( _key );
+		if ( it != m_json.end() ) {
+			_outColor[0] = ( *it )["r"];
+			_outColor[1] = ( *it )["g"];
+			_outColor[2] = ( *it )["b"];
+			_outColor[3] = ( *it )["a"];
+			return true;
+		} else {
+			return false;
+		}
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
+	void SerializedValues::SetColor( const std::string & _key, Color _color ) {
+		m_json[_key]["r"] = _color[0];
+		m_json[_key]["g"] = _color[1];
+		m_json[_key]["b"] = _color[2];
+		m_json[_key]["a"] = _color[3];
+	}
+
 }

@@ -108,7 +108,7 @@ namespace fan {
 			float maxRadius = m_scaleList[scaleIndex] + maxSatelliteScale;
 
 			m_satelliteRadiusList.push_back( maxRadius );
-			m_satelliteScaleList.push_back( 0.3f * maxSatelliteScale );
+			m_satelliteScaleList.push_back( 0.5f * maxSatelliteScale );
 
 			Debug::Render().DebugCircle( ( m_radiusList[scaleIndex] + maxRadius ) * transform->Left(), maxSatelliteScale, transform->Up(), 16, Color::Grey );
 			Debug::Render().DebugCircle( (m_radiusList[scaleIndex] - maxRadius ) * transform->Left(), maxSatelliteScale, transform->Up(), 16, Color::Grey );

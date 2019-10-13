@@ -9,11 +9,11 @@ Entities: 1 {
             }
         }
         Childs: 4 {
-            Gameobject: game_manager {
+            Gameobject: game_camera {
                 computeAABB: true
                 Components: 4 {
                     Transform: 1269105190 {
-                        position: 1.91203 8 10.1027
+                        position: 27.0895 8 1.76153
                         rotation: 0.707107 2.63418e-09 -2.63418e-09 0.707107
                         scale:    1 1 1
                     }
@@ -22,7 +22,7 @@ Entities: 1 {
                     }
                     Camera: 1148216499 {
                         type:         1
-                        orthoSize:    18
+                        orthoSize:    10
                         fov:          110
                         nearDistance: 0.019
                         farDistance:  490
@@ -39,8 +39,8 @@ Entities: 1 {
                 computeAABB: true
                 Components: 4 {
                     Transform: 1269105190 {
-                        position: 1.91203 0 10.1027
-                        rotation: 0 -0.712668 0 -0.701592
+                        position: 27.0895 0 1.76153
+                        rotation: 0 -0.356717 0 -0.934327
                         scale:    0.1 0.1 0.1
                     }
                     Model: 1739103771 {
@@ -53,8 +53,9 @@ Entities: 1 {
                     }
                     SpaceShip: 3824437066 {
                         isEnabled: false
-                        speed:          200
+                        speed:          110
                         rotation_speed: 4
+                        drag: 10
                     }
                 }
                 Childs: 0 {
@@ -98,8 +99,8 @@ Entities: 1 {
                         isEnabled: true
                         max_radius:         30
                         initial_radius:     7.055
-                        offset:             1.95
-                        randomScale:        0.62
+                        offset:             0.485
+                        randomScale:        1.493
                         initialPlanetScale: 1.47
                         scaleMult:          0.39
                         minSpeed:           0.15
@@ -111,18 +112,18 @@ Entities: 1 {
                         computeAABB: true
                         Components: 3 {
                             Transform: 1269105190 {
-                                position: -5.69292 0 4.40803
+                                position: 5.45916 0 4.46884
                                 rotation: 0 0 0 1
-                                scale:    0.429 0.429 0.429
+                                scale:    0.400725 0.400725 0.400725
                             }
                             Model: 1739103771 {
                                 path: content/models/planet.fbx
                             }
                             Planet: 1669599886 {
                                 isEnabled: true
-                                radius: 7.2
-                                speed:  -0.21349
-                                phase:  0.000718678
+                                radius: 7.055
+                                speed:  -0.225923
+                                phase:  0.341574
                             }
                         }
                         Childs: 1 {
@@ -130,18 +131,18 @@ Entities: 1 {
                                 computeAABB: true
                                 Components: 3 {
                                     Transform: 1269105190 {
-                                        position: -4.93847 0 4.28446
+                                        position: 6.06557 0 4.84937
                                         rotation: 0 0 0 1
-                                        scale:    0.10065 0.10065 0.10065
+                                        scale:    0.156694 0.156694 0.156694
                                     }
                                     Model: 1739103771 {
                                         path: content/models/planet.fbx
                                     }
                                     Planet: 1669599886 {
                                         isEnabled: true
-                                        radius: 0.7645
-                                        speed:  -1.06745
-                                        phase:  6.27716
+                                        radius: 0.714112
+                                        speed:  -1.12962
+                                        phase:  5.14349
                                     }
                                 }
                                 Childs: 0 {
@@ -153,18 +154,18 @@ Entities: 1 {
                         computeAABB: true
                         Components: 3 {
                             Transform: 1269105190 {
-                                position: -6.93552 0 -7.76128
-                                rotation: 0 0 0 1
-                                scale:    0.625668 0.625668 0.625668
+                                position: 9.21879 0 3.34616
+                                rotation: 0.241285 0.0992586 -0.0247657 0.965048
+                                scale:    0.536696 0.536696 0.536696
                             }
                             Model: 1739103771 {
                                 path: content/models/planet.fbx
                             }
                             Planet: 1669599886 {
                                 isEnabled: true
-                                radius: 10.4086
-                                speed:  -0.169391
-                                phase:  0.922094
+                                radius: 9.80729
+                                speed:  0.2613
+                                phase:  1.7304
                             }
                         }
                         Childs: 1 {
@@ -172,18 +173,18 @@ Entities: 1 {
                                 computeAABB: true
                                 Components: 3 {
                                     Transform: 1269105190 {
-                                        position: -6.40078 0 -8.71408
+                                        position: 9.89555 0 4.02198
                                         rotation: 0 0 0 1
-                                        scale:    0.146791 0.146791 0.146791
+                                        scale:    0.209862 0.209862 0.209862
                                     }
                                     Model: 1739103771 {
                                         path: content/models/planet.fbx
                                     }
                                     Planet: 1669599886 {
                                         isEnabled: true
-                                        radius: 1.11497
-                                        speed:  -0.846956
-                                        phase:  2.49179
+                                        radius: 0.956419
+                                        speed:  -1.3065
+                                        phase:  0.156785
                                     }
                                 }
                                 Childs: 0 {
@@ -195,18 +196,18 @@ Entities: 1 {
                         computeAABB: true
                         Components: 3 {
                             Transform: 1269105190 {
-                                position: 1.80322 0 -15.7286
+                                position: -5.66655 0 15.1243
                                 rotation: 0 0 0 1
-                                scale:    1.05749 1.05749 1.05749
+                                scale:    0.758321 0.758321 0.758321
                             }
                             Model: 1739103771 {
                                 path: content/models/planet.fbx
                             }
                             Planet: 1669599886 {
                                 isEnabled: true
-                                radius: 15.8316
-                                speed:  -0.222568
-                                phase:  1.17031
+                                radius: 16.151
+                                speed:  0.21394
+                                phase:  1.92215
                             }
                         }
                         Childs: 1 {
@@ -214,18 +215,18 @@ Entities: 1 {
                                 computeAABB: true
                                 Components: 3 {
                                     Transform: 1269105190 {
-                                        position: 0.147813 0 -16.6291
+                                        position: -5.96749 0 13.8069
                                         rotation: 0 0 0 1
-                                        scale:    0.248103 0.248103 0.248103
+                                        scale:    0.296523 0.296523 0.296523
                                     }
                                     Model: 1739103771 {
                                         path: content/models/planet.fbx
                                     }
                                     Planet: 1669599886 {
                                         isEnabled: true
-                                        radius: 1.8845
-                                        speed:  -1.11284
-                                        phase:  4.20814
+                                        radius: 1.35137
+                                        speed:  -1.0697
+                                        phase:  4.52342
                                     }
                                 }
                                 Childs: 0 {
@@ -237,18 +238,18 @@ Entities: 1 {
                         computeAABB: true
                         Components: 3 {
                             Transform: 1269105190 {
-                                position: 22.6098 0 -2.94666
+                                position: 18.764 0 7.03607
                                 rotation: 0 0 0 1
-                                scale:    1.35904 1.35904 1.35904
+                                scale:    0.758321 0.758321 0.758321
                             }
                             Model: 1739103771 {
                                 path: content/models/planet.fbx
                             }
                             Planet: 1669599886 {
                                 isEnabled: true
-                                radius: 22.801
-                                speed:  0.263152
-                                phase:  2.49296
+                                radius: 20.0398
+                                speed:  -0.202479
+                                phase:  0.702091
                             }
                         }
                         Childs: 1 {
@@ -256,18 +257,18 @@ Entities: 1 {
                                 computeAABB: true
                                 Components: 3 {
                                     Transform: 1269105190 {
-                                        position: 24.822 0 -3.93245
+                                        position: 17.6667 0 6.24733
                                         rotation: 0 0 0 1
-                                        scale:    0.318851 0.318851 0.318851
+                                        scale:    0.296523 0.296523 0.296523
                                     }
                                     Model: 1739103771 {
                                         path: content/models/planet.fbx
                                     }
                                     Planet: 1669599886 {
                                         isEnabled: true
-                                        radius: 2.42187
-                                        speed:  -1.31576
-                                        phase:  5.31753
+                                        radius: 1.35137
+                                        speed:  -1.01239
+                                        phase:  5.48164
                                     }
                                 }
                                 Childs: 0 {
