@@ -9,7 +9,8 @@ namespace fan {
 	//================================================================================================================================
 	//================================================================================================================================
 	void ParticleSystem::Run( float _delta, const size_t _count, std::vector< ecsEntityData >& _entitiesData,
-		std::vector< ecsTranform > & _transforms,
+		std::vector< ecsPosition > & _positions,
+		std::vector< ecsRotation > & /*_rotations*/,
 		std::vector< ecsMovement > & _movements,
 		std::vector< ecsParticle > & _particles ) {
 
@@ -24,9 +25,9 @@ namespace fan {
 			ecsEntityData & data = _entitiesData[entity];
 
 			if ( data.IsAlive() && ( data.bitset & ParticleSystem::signature::bitset ) == ParticleSystem::signature::bitset ) {
-				ecsTranform& transform = _transforms[data.components[IndexOfComponent<ecsTranform>::value]];
-				ecsMovement& movement = _movements  [data.components[IndexOfComponent<ecsMovement>::value]];
-				ecsParticle& particle = _particles  [data.components[IndexOfComponent<ecsParticle>::value]];
+				btVector3& position = _positions[data.components[IndexOfComponent<ecsPosition>::value]].position;
+				ecsMovement& movement = _movements[data.components[IndexOfComponent<ecsMovement>::value]];
+				ecsParticle& particle = _particles[data.components[IndexOfComponent<ecsParticle>::value]];
 
 				(void)particle;
 
@@ -34,12 +35,12 @@ namespace fan {
 				if ( particle.durationLeft < 0 ) {
 					data.Kill();
 				}
-				transform.position += _delta * movement.speed;
+				position += _delta * movement.speed;
 
 
-				triangles.push_back( transform.position + btVector3( size, 0, 0 ) );
-				triangles.push_back( transform.position + btVector3( -size, 0, 0 ) );
-				triangles.push_back( transform.position + btVector3( 0, 2.f*size, 0 ) );
+				triangles.push_back( position + btVector3( size, 0, 0 ) );
+				triangles.push_back( position + btVector3( -size, 0, 0 ) );
+				triangles.push_back( position + btVector3( 0, 2.f*size, 0 ) );
 				colors.push_back( particle.color );
 			}
 		}
@@ -57,13 +58,14 @@ namespace fan {
 		for ( int entity = 0; entity < _count; entity++ ) {
 			ecsEntityData & data = _entitiesData[entity];
 			if ( data.IsAlive() && ( data.bitset & PlanetsSystem::signature::bitset ) == PlanetsSystem::signature::bitset ) {
-				ecsTranform& transform		= _transforms[data.components[IndexOfComponent<ecsTranform>::value]];
+				btTransform& transform		= _transforms[data.components[IndexOfComponent<ecsTranform>::value]].transform;
 				ecsPlanet& planet			= _planets[data.components[IndexOfComponent<ecsPlanet>::value]];
-				ecsTranform& parentTransform = _transforms[_entitiesData[planet.parentEntity].components[IndexOfComponent<ecsTranform>::value]];
+				btTransform& parentTransform = _transforms[_entitiesData[planet.parentEntity].components[IndexOfComponent<ecsTranform>::value]].transform;
 
 				float const time = -planet.speed * Time::ElapsedSinceStartup();
 				btVector3 position( std::cosf( time + planet.phase ), 0, std::sinf( time + planet.phase ) );
-				transform.position = parentTransform.position + planet.radius * position;
+
+				transform.setOrigin( parentTransform.getOrigin() + planet.radius * position);
 			}
 		}
 

@@ -25,14 +25,13 @@ namespace fan
 	//================================================================================================================================
 	//================================================================================================================================
 	btTransform	Transform::GetBtTransform() const { 
-		ecsTranform* transform = GetEcsTransform();
-		return btTransform( transform->rotation, transform->position );
+		return btTransform(GetEcsTransform()->transform);
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
 	btVector3 Transform::GetPosition() const { 
-		return GetEcsTransform()->position;
+		return GetEcsTransform()->transform.getOrigin();
 	}
 
 	//================================================================================================================================
@@ -44,21 +43,15 @@ namespace fan
 	//================================================================================================================================
 	//================================================================================================================================
 	btQuaternion Transform::GetRotationQuat() const {
-		return GetEcsTransform()->rotation;
+		return GetEcsTransform()->transform.getRotation();
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
 	void Transform::SetPosition(btVector3 _newPosition) {
-		ecsTranform* transform = GetEcsTransform();
-		if (transform->position != _newPosition) {
-			transform->position = _newPosition;
-
-			// 		Rigidbody* rb = GetGameobject()->GetComponent<Rigidbody>();
-			// 		if (rb)	{
-			// 			rb->SetPosition(newPosition);
-			// 		}
-
+		btTransform& transform = GetEcsTransform()->transform;
+		if (transform.getOrigin() != _newPosition) {
+			transform.setOrigin( _newPosition);
 			MarkModified(true);
  		}
 	}
@@ -84,18 +77,18 @@ namespace fan
 	//================================================================================================================================
 	//================================================================================================================================
 	btVector3 Transform::GetRotationEuler() const {
-		ecsTranform* transform = GetEcsTransform();
+		btTransform& transform = GetEcsTransform()->transform;
 		btVector3 euler;
-		transform->rotation.getEulerZYX(euler[2], euler[1], euler[0]);
+		transform.getRotation().getEulerZYX(euler[2], euler[1], euler[0]);
 		return btDegrees3(euler);
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
 	void Transform::SetRotationQuat(const btQuaternion _rotation) {
-		ecsTranform* transform = GetEcsTransform();
-		if (transform->rotation != _rotation) {
-			transform->rotation = _rotation;
+		btTransform& transform = GetEcsTransform()->transform;
+		if (transform.getRotation() != _rotation) {
+			transform.setRotation( _rotation);
 			MarkModified(true);
 		}
 	}
@@ -103,12 +96,12 @@ namespace fan
 	//================================================================================================================================
 	//================================================================================================================================
 	glm::mat4 Transform::GetModelMatrix() const {
-		ecsTranform* transform = GetEcsTransform();
-		ecsScaling* scaling = GetEcsScale();
+		btTransform& transform = GetEcsTransform()->transform;
+		btVector3& btScale = GetEcsScale()->scale;
 
-		glm::vec3 position( transform->position[0], transform->position[1], transform->position[2]);
-		glm::vec3 scale( scaling->scale[0], scaling->scale[1], scaling->scale[2]);
-		glm::quat rotation = ToGLM( transform ->rotation);
+		glm::vec3 position = ToGLM(transform.getOrigin());
+		glm::vec3 scale = ToGLM(btScale);
+		glm::quat rotation = ToGLM( transform.getRotation());
 
 		return glm::translate(glm::mat4(1.f), position) * glm::mat4_cast(rotation) * glm::scale(glm::mat4(1.f), scale);
 	}
@@ -215,12 +208,18 @@ namespace fan
 	//================================================================================================================================
 	//================================================================================================================================
 	bool Transform::Load( Json & _json ) {
-		ecsTranform* transform = GetEcsTransform();
-		ecsScaling* scaling = GetEcsScale();
+		btTransform& transform = GetEcsTransform()->transform;
+		btVector3& scale = GetEcsScale()->scale;
 
-		LoadVec3( _json, "position", transform->position );
-		LoadQuat( _json, "rotation", transform->rotation );
-		LoadVec3( _json, "scale", scaling->scale );
+		btVector3 tmpVec;
+		btQuaternion tmpQuat;
+
+		LoadVec3( _json, "position", tmpVec );
+		LoadQuat( _json, "rotation", tmpQuat );
+		LoadVec3( _json, "scale", scale );
+
+		transform.setOrigin( tmpVec );
+		transform.setRotation( tmpQuat );
 
 		return true;
 	}
@@ -228,12 +227,14 @@ namespace fan
 	//================================================================================================================================
 	//================================================================================================================================
 	bool Transform::Save( Json & _json ) const {
-		ecsTranform* transform = GetEcsTransform();
-		ecsScaling* scaling = GetEcsScale();
+		btTransform& transform = GetEcsTransform()->transform;
+		btVector3& scale = GetEcsScale()->scale;
 
-		SaveVec3( _json, "position", transform->position );
-		SaveQuat( _json, "rotation", transform->rotation );
-		SaveVec3( _json, "scale", scaling->scale );
+		SaveVec3( _json, "position", transform.getOrigin() );
+		SaveQuat( _json, "rotation", transform.getRotation() );
+		SaveVec3( _json, "scale", scale );
+
+
 		Component::Save( _json );
 				
 		return true;

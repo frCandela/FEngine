@@ -155,7 +155,8 @@ namespace fan
 		static_assert( IsComponent< _componentType>::value );
 		EcsManager * ecsManager = m_scene->GetEcsManager();
 		ecsEntity entity;
-		if ( ecsManager->FindEntity( m_ecsHandleEntity, entity ) && ecsManager->AddComponent<_componentType>( entity ) ) {			
+		if ( ecsManager->FindEntity( m_ecsHandleEntity, entity ) ) {			
+			ecsManager->AddComponent<_componentType>( entity );
 			return ecsManager->FindComponentFromEntity<_componentType>( entity );
 		}
 		return nullptr;

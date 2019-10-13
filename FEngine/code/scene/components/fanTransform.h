@@ -17,7 +17,7 @@ namespace fan
 		btTransform		GetBtTransform() const;
 		btVector3		GetPosition() const;
 		btVector3		GetScale() const;
-		btQuaternion	GetRotationQuat() const ;
+		btQuaternion	GetRotationQuat() const;
 		btVector3		GetRotationEuler() const;
 		glm::mat4		GetModelMatrix() const;
 		glm::mat4		GetNormalMatrix() const;
@@ -43,7 +43,7 @@ namespace fan
 		void OnAttach() override;
 
 	private:
-		ecsTranform* GetEcsTransform() const;
-		ecsScaling* GetEcsScale() const;
+		ecsTranform*	GetEcsTransform() const;
+		ecsScaling*		GetEcsScale() const;
 	};
 }

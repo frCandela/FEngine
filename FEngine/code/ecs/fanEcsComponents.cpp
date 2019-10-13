@@ -3,6 +3,8 @@
 
 namespace fan {
 	const char * ecsTranform::s_name	= "Tranform   ";
+	const char * ecsPosition::s_name	= "Position   ";
+	const char * ecsRotation::s_name	= "Rotation   ";
 	const char * ecsScaling::s_name		= "Scaling    ";
 	const char * ecsMovement::s_name	= "Movement   ";
 	const char * ecsParticle::s_name	= "Particle   ";
@@ -13,6 +15,5 @@ namespace fan {
 	const char * ecsMaterial::s_name	= "Material   ";
 	const char * ecsPlanet::s_name		= "Planet     ";
 	const char * ecsRigidbody::s_name	= "Rigidbody  ";
-	const char * ecsMotionState::s_name	= "MotionState";
-	
+	const char * ecsMotionState::s_name	= "MotionState";	
 }

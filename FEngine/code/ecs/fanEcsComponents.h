@@ -19,8 +19,21 @@ namespace fan {
 	//================================
 	struct ecsTranform : ecsIComponent {
 		static const char *  s_name;
-		btVector3		position	= btVector3::Zero();
-		btQuaternion	rotation	= btQuaternion::getIdentity();
+		btTransform transform;
+
+		ecsTranform() { transform.setIdentity(); }
+	};
+
+	//================================
+	struct ecsPosition : ecsIComponent {
+		static const char *  s_name;
+		btVector3		position = btVector3::Zero();
+	};
+
+	//================================
+	struct ecsRotation: ecsIComponent {
+		static const char *  s_name;
+		btQuaternion	rotation = btQuaternion::getIdentity();
 	};
 
 	//================================
@@ -118,6 +131,8 @@ namespace fan {
 	//================================
 	using ecsComponents = meta::TypeList<
 		ecsTranform
+		, ecsPosition
+		, ecsRotation
 		, ecsMovement
 		, ecsParticle
 		, ecsScaling

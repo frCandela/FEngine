@@ -122,18 +122,19 @@ namespace fan {
 			if ( particlesPerFrame > 0 ) {
 				for ( int particleIndex = 0; particleIndex < particlesPerFrame; particleIndex++ ) {
 					ecsEntity entity = m_ecsManager->CreateEntity();
-					m_ecsManager->AddComponent<ecsTranform>( entity );
+					m_ecsManager->AddComponent<ecsPosition>( entity );
+					m_ecsManager->AddComponent<ecsRotation>( entity );
 					m_ecsManager->AddComponent<ecsMovement>( entity );
 					m_ecsManager->AddComponent<ecsParticle>( entity );
 
-					ecsTranform* transform = m_ecsManager->FindComponentFromEntity<ecsTranform>( entity );
+					ecsPosition* position = m_ecsManager->FindComponentFromEntity<ecsPosition>( entity );
 					ecsMovement* movement = m_ecsManager->FindComponentFromEntity<ecsMovement>( entity );
 					ecsParticle* particle = m_ecsManager->FindComponentFromEntity<ecsParticle>( entity );
 
 					movement->speed = btVector3( m_distribution( m_generator ), m_distribution( m_generator ), m_distribution( m_generator ) ) - btVector3( 0.5f, 0.5f, 0.5f );
 					movement->speed.normalize();
 					movement->speed *= speed;
-					transform->position = startPos;
+					position->position = startPos;
 					particle->durationLeft = duration;
 				}
 			}

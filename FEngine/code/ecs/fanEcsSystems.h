@@ -29,7 +29,7 @@ namespace fan {
 	//================================	
 	// Declare your signatures here
 	//================================	
-	using ecsParticleSignature = ecsSignature< ecsTranform, ecsMovement, ecsParticle >;
+	using ecsParticleSignature = ecsSignature< ecsPosition, ecsRotation, ecsMovement, ecsParticle >;
 	using ecsPlanetSignature   = ecsSignature< ecsTranform, ecsPlanet >;
 
 	static constexpr ecsBitset tot1 = ecsParticleSignature::componentsBitset;
@@ -51,7 +51,8 @@ namespace fan {
 	class ParticleSystem : public ISystem<  ecsParticleSignature > {
 	public:
 		static void Run( float _delta, const size_t _count, std::vector< ecsEntityData >& _entitiesData,
-			std::vector< ecsTranform > & _transforms,
+			std::vector< ecsPosition > & _positions,
+			std::vector< ecsRotation > & _rotations,
 			std::vector< ecsMovement > & _movements,
 			std::vector< ecsParticle > & _particles );
 	};
