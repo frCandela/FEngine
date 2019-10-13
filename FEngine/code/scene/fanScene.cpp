@@ -15,10 +15,13 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	Scene::Scene(const std::string _name) :
+	Scene::Scene(const std::string _name, EcsManager * _ecsManager, PhysicsManager * _physicsManager ) :
 		m_name(_name)
 		, m_path("")
-		, m_root(nullptr) {
+		, m_root(nullptr) 
+		, m_ecsManager(_ecsManager)
+		, m_physicsManager( _physicsManager )
+	{
 
 		Actor::onActorAttach.Connect(&Scene::OnActorAttach, this);
 		Actor::onActorDetach.Connect(&Scene::OnActorDetach, this);

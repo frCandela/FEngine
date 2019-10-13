@@ -31,6 +31,7 @@ namespace fan {
 	//================================	
 	using ecsParticleSignature = ecsSignature< ecsPosition, ecsRotation, ecsMovement, ecsParticle >;
 	using ecsPlanetSignature   = ecsSignature< ecsTranform, ecsPlanet >;
+	using ecsRigidbodySignature = ecsSignature< ecsTranform, ecsMotionState, ecsRigidbody >;
 
 	static constexpr ecsBitset tot1 = ecsParticleSignature::componentsBitset;
 
@@ -65,5 +66,24 @@ namespace fan {
 		static void Run( float _delta, const size_t _count, std::vector< ecsEntityData >& _entitiesData,
 			std::vector< ecsTranform > & _transforms,
 			std::vector< ecsPlanet > & _planets );
+	};
+
+	//================================
+	// Rigidbody transform update
+	//================================
+	class SynchTransToRbSystem : public ISystem<  ecsRigidbodySignature > {
+	public:
+		static void Run( float _delta, const size_t _count, std::vector< ecsEntityData >& _entitiesData,
+			  std::vector< ecsTranform > & _transforms
+			, std::vector< ecsMotionState > & _motionStates
+			, std::vector< ecsRigidbody > & _rigidbodies );
+	};
+
+	class SynchRbToTransSystem : public ISystem<  ecsRigidbodySignature > {
+	public:
+		static void Run( float _delta, const size_t _count, std::vector< ecsEntityData >& _entitiesData,
+			std::vector< ecsTranform > & _transforms
+			, std::vector< ecsMotionState > & _motionStates
+			, std::vector< ecsRigidbody > & _rigidbodies );
 	};
 }

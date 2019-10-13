@@ -57,7 +57,7 @@ namespace fan {
 	{
 		for ( int entity = 0; entity < _count; entity++ ) {
 			ecsEntityData & data = _entitiesData[entity];
-			if ( data.IsAlive() && ( data.bitset & PlanetsSystem::signature::bitset ) == PlanetsSystem::signature::bitset ) {
+			if ( data.IsAlive() && ( data.bitset & signature::bitset ) == signature::bitset ) {
 				btTransform& transform		= _transforms[data.components[IndexOfComponent<ecsTranform>::value]].transform;
 				ecsPlanet& planet			= _planets[data.components[IndexOfComponent<ecsPlanet>::value]];
 				btTransform& parentTransform = _transforms[_entitiesData[planet.parentEntity].components[IndexOfComponent<ecsTranform>::value]].transform;
@@ -68,6 +68,48 @@ namespace fan {
 				transform.setOrigin( parentTransform.getOrigin() + planet.radius * position);
 			}
 		}
+	}
 
+	//================================================================================================================================
+	//================================================================================================================================
+	void SynchRbToTransSystem::Run( float /*_delta*/, const size_t _count, std::vector< ecsEntityData >& _entitiesData,
+		std::vector< ecsTranform > & _transforms
+		, std::vector< ecsMotionState > & _motionStates
+		, std::vector< ecsRigidbody > & _rigidbodies ) 
+	{
+		for ( int entity = 0; entity < _count; entity++ ) {
+			ecsEntityData & data = _entitiesData[entity];
+
+			if ( data.IsAlive() && ( data.bitset & signature::bitset ) == signature::bitset )
+			{
+				btTransform& transform = _transforms[data.components[IndexOfComponent<ecsTranform>::value]].transform;
+				ecsMotionState& motionState = _motionStates[data.components[IndexOfComponent<ecsMotionState>::value]];
+				ecsRigidbody& rigidbody = _rigidbodies[data.components[IndexOfComponent<ecsRigidbody>::value]];
+
+				rigidbody.Get().setWorldTransform( transform );
+				//motionState.Get().setWorldTransform( transform );
+				(void)motionState; (void)rigidbody; (void)transform;
+			}
+		}
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
+	void SynchTransToRbSystem::Run( float /*_delta*/, const size_t _count, std::vector< ecsEntityData >& _entitiesData,
+		std::vector< ecsTranform > & _transforms
+		, std::vector< ecsMotionState > & _motionStates
+		, std::vector< ecsRigidbody > & _rigidbodies ) {
+		for ( int entity = 0; entity < _count; entity++ ) {
+			ecsEntityData & data = _entitiesData[entity];
+
+			if ( data.IsAlive() && ( data.bitset & signature::bitset ) == signature::bitset ) {
+				btTransform& transform = _transforms[data.components[IndexOfComponent<ecsTranform>::value]].transform;
+				ecsMotionState& motionState = _motionStates[data.components[IndexOfComponent<ecsMotionState>::value]];
+				ecsRigidbody& rigidbody = _rigidbodies[data.components[IndexOfComponent<ecsRigidbody>::value]];
+
+				rigidbody.Get().getMotionState()->getWorldTransform( transform );
+				(void)motionState;(void )rigidbody;(void)transform;
+			}
+		}
 	}
 }

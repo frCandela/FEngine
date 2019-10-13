@@ -23,6 +23,7 @@ namespace fan {
 		template< typename _tagType >		void	 RemoveTag( const ecsEntity _entity );
 
 		void Update( float _delta );
+		void LateUpdate( float _delta );
 		void Refresh();
 
 		// Getters 

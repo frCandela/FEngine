@@ -6,16 +6,16 @@ namespace fan {
 	//================================================================================================================================
 	//================================================================================================================================	
 	class PhysicsManager {
-		friend class Engine;
 	public:
 		PhysicsManager( const btVector3 _gravity );
 		~PhysicsManager();
 
 		void OnGui();
 
+		void StepSimulation( const float _delta );
+		void AddRigidbody( btRigidBody * _rigidbody );
+
 	private:
-		// External references
-		EcsManager * m_ecsManager = nullptr;
 
 		// Bullet objects
 		btDefaultCollisionConfiguration*		m_collisionConfiguration;

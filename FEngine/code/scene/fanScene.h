@@ -9,19 +9,19 @@ namespace fan
 	class Component;
 	class Actor;
 	class EcsManager;
+	class PhysicsManager;
 
 	//================================================================================================================================
 	//================================================================================================================================
 	class Scene : public ISerializable
 	{
 	public:
-		friend class Engine;
 
 		Signal<Scene*>	onSceneLoad;
 		Signal<>		onSceneClear;
 		Signal< Gameobject *>		onDeleteGameobject;
 
-		Scene(const std::string _name);
+		Scene( const std::string _name, EcsManager * _ecsManager, PhysicsManager * _physicsManager );
 		~Scene();
 
 		Gameobject *					CreateGameobject(const std::string _name, Gameobject * _parent = nullptr);	// Creates a game object and adds it to the scene hierarchy
@@ -47,12 +47,14 @@ namespace fan
 		inline std::string	GetPath() const { return m_path; }
 		void				SetPath(const std::string _path) { m_path = _path; }
 		EcsManager *		GetEcsManager() const { return m_ecsManager; }
+		PhysicsManager *	GetPhysicsManager() const { return m_physicsManager; }
 
 	private:
 		std::string m_name;
 		std::string m_path;
 		Gameobject * m_root;
-		EcsManager * m_ecsManager = nullptr;
+		EcsManager * const		m_ecsManager = nullptr;
+		PhysicsManager * const  m_physicsManager = nullptr;
 
 		std::vector < Gameobject * >	m_entitiesToDelete;
 		std::set< Gameobject * >	m_outdatedAABB;

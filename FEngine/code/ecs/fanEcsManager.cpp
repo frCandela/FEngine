@@ -8,6 +8,10 @@ namespace fan {
 	EcsManager::EcsManager() {
 		m_entityToHandles.reserve( 512 );
 		m_entitiesData.reserve(1024);
+
+		m_components.Get<ecsRigidbody>().vector.reserve(1024);
+		m_components.Get<ecsMotionState>().vector.reserve( 1024 );
+		m_components.Get<ecsTranform>().vector.reserve( 1024 );
 	}
 
 	//================================================================================================================================
@@ -70,11 +74,19 @@ namespace fan {
 	};
 
 	//================================================================================================================================
-	// Runs the systems
+	// Runs the systems before the physics update
 	//================================================================================================================================
 	void EcsManager::Update( float _delta ) {
 		RunSystem< ParticleSystem::signature::componentsTypes, ParticleSystem >::Run( _delta, m_activeEntitiesCount, m_entitiesData, m_components );
 		RunSystem< PlanetsSystem::signature::componentsTypes, PlanetsSystem >::Run( _delta, m_activeEntitiesCount, m_entitiesData, m_components );
+		RunSystem< SynchRbToTransSystem::signature::componentsTypes, SynchRbToTransSystem >::Run( _delta, m_activeEntitiesCount, m_entitiesData, m_components );
+	}
+
+	//================================================================================================================================
+	// Runs the systems after the physics update
+	//================================================================================================================================
+	void EcsManager::LateUpdate( float _delta ) {
+		RunSystem< SynchTransToRbSystem::signature::componentsTypes, SynchTransToRbSystem >::Run( _delta, m_activeEntitiesCount, m_entitiesData, m_components );
 	}
 
 	//================================================================================================================================

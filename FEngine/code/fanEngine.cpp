@@ -69,10 +69,8 @@ namespace fan {
 
 		m_renderer = new Renderer( windowSize, windowPosition );
 		m_ecsManager = new EcsManager();
-		m_scene = new Scene( "mainScene" );
-		m_scene->m_ecsManager = m_ecsManager;
-		m_physicsManager = new PhysicsManager( btVector3(0,-10,0) );
-		m_physicsManager->m_ecsManager = m_ecsManager;
+		m_physicsManager = new PhysicsManager( btVector3( 0, -10, 0 ) );
+		m_scene = new Scene( "mainScene", m_ecsManager, m_physicsManager );
 
 		// Initialize editor components
 		m_renderWindow		= new RenderWindow( m_renderer );
@@ -164,6 +162,9 @@ namespace fan {
 				m_scene->Update( targetLogicDelta );
 				m_ecsManager->Update( targetLogicDelta );
 				m_ecsManager->Refresh();
+				m_physicsManager->StepSimulation(targetLogicDelta);
+				m_ecsManager->LateUpdate( targetLogicDelta );
+
 				ManageKeyShortcuts();
 				ManageSelection();
 				DrawUI();
