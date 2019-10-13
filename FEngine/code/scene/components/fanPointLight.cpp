@@ -130,30 +130,33 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	bool PointLight::Load(std::istream& _in) {
-		ecsPointLight * ecsLight = GetEcsPointLight();
+	bool PointLight::Load( Json & _json ) {
+ 		ecsPointLight * ecsLight = GetEcsPointLight();
 
-		if (!ReadSegmentHeader(_in, "ambiant:")) { return false; }
-		if (!ReadFloat3(_in, &ecsLight->ambiant[0])) { return false; }
-		if (!ReadSegmentHeader(_in, "diffuse:")) { return false; }
-		if (!ReadFloat3(_in, &ecsLight->diffuse[0])) { return false; }
-		if (!ReadSegmentHeader(_in, "specular:")) { return false; }
-		if (!ReadFloat3(_in, &ecsLight->specular[0])) { return false; }
-		if (!ReadSegmentHeader(_in, "attenuation:")) { return false; }
-		if (!ReadFloat3(_in, &ecsLight->attenuation[0])) { return false; }
+		LoadColor( _json, "ambiant", ecsLight->ambiant );
+		LoadColor( _json, "diffuse", ecsLight->diffuse );
+		LoadColor( _json, "specular", ecsLight->specular );
+
+		btVector3 tmp;
+		LoadVec3 ( _json, "attenuation", tmp );
+		ecsLight->attenuation[0] = tmp[0];
+		ecsLight->attenuation[1] = tmp[1];
+		ecsLight->attenuation[2] = tmp[2];
+
 		return true;
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	bool PointLight::Save(std::ostream& _out, const int _indentLevel) const {
+	bool PointLight::Save( Json & _json ) const {
 		ecsPointLight * ecsLight = GetEcsPointLight();
 
-		const std::string indentation = GetIndentation(_indentLevel);
-		_out << indentation << "ambiant: " << ecsLight->ambiant[0] << " " << ecsLight->ambiant[1] << " " << ecsLight->ambiant[2] << std::endl;
-		_out << indentation << "diffuse: " << ecsLight->diffuse[0] << " " << ecsLight->diffuse[1] << " " << ecsLight->diffuse[2] << std::endl;
-		_out << indentation << "specular: " << ecsLight->specular[0] << " " << ecsLight->specular[1] << " " << ecsLight->specular[2] << std::endl;
-		_out << indentation << "attenuation: " << ecsLight->attenuation[0] << " " << ecsLight->attenuation[1] << " " << ecsLight->attenuation[2] << std::endl;
+		SaveColor( _json, "ambiant", ecsLight->ambiant );
+		SaveColor( _json, "diffuse", ecsLight->diffuse );
+		SaveColor( _json, "specular", ecsLight->specular );
+		SaveVec3 ( _json, "attenuation", btVector3( ecsLight->attenuation[0], ecsLight->attenuation[1], ecsLight->attenuation[2] ) );
+		Component::Save( _json );
+		
 		return true;
 	}
 

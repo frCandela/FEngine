@@ -84,6 +84,9 @@ namespace fan
 				if (ImGui::MenuItem("Open", "Ctrl+O")) {
 					Open();
 				}
+				if ( ImGui::MenuItem( "Reload", "Ctrl+R" ) ) {
+					Reload();
+				}
 				if (ImGui::MenuItem("Save", "Ctrl+S")) {
 					Save();
 				}
@@ -201,6 +204,9 @@ namespace fan
 			Save();
 		}
 
+		if ( Keyboard::IsKeyDown( GLFW_KEY_LEFT_CONTROL ) && Keyboard::IsKeyPressed( GLFW_KEY_R ) ) {
+			Reload();
+		}
 	}
 
 	//================================================================================================================================
@@ -237,6 +243,12 @@ namespace fan
 	void MainMenuBar::Open() {
 		m_pathBuffer = "./content/scenes/";
 		m_openLoadScenePopupLater = true;
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
+	void MainMenuBar::Reload() {
+		m_scene.LoadFrom( m_scene.GetPath() );
 	}
 
 	//================================================================================================================================

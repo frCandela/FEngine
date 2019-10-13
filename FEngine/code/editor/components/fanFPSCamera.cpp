@@ -41,7 +41,6 @@ namespace fan
 	//================================================================================================================================
 	//================================================================================================================================
 	void FPSCamera::Start() {
-		Debug::Log("Start");
 	}
 
 	//================================================================================================================================
@@ -168,29 +167,22 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	bool FPSCamera::Load(std::istream& _in) {
-		Actor::Load(_in);
+	bool FPSCamera::Load( Json & _json ) {
+		Actor::Load(_json);
 
-		if (!ReadSegmentHeader(_in, "xySensitivity:")) { return false; }
-		if (!ReadFloat(_in, m_xySensitivity[0])) { return false; }
-		if (!ReadFloat(_in, m_xySensitivity[1])) { return false; }
-
-		if (!ReadSegmentHeader(_in, "speed:")) { return false; }
-		if (!ReadFloat(_in, m_speed)) { return false; }
-
-		if (!ReadSegmentHeader(_in, "speedMultiplier:")) { return false; }
-		if (!ReadFloat(_in, m_speedMultiplier)) { return false; }
-		return true;
+		LoadVec2( _json, "xySensitivity", m_xySensitivity );
+		LoadFloat( _json, "speed", m_speed );
+		LoadFloat( _json, "speedMultiplier", m_speedMultiplier );
+ 		return true;
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	bool FPSCamera::Save(std::ostream& _out, const int _indentLevel) const {
-		Actor::Save(_out, _indentLevel);
-		const std::string indentation = GetIndentation(_indentLevel);
-		_out << indentation << "xySensitivity:   " << m_xySensitivity[0] << " " << m_xySensitivity[1] << std::endl;
-		_out << indentation << "speed:           " << m_speed << std::endl;
-		_out << indentation << "speedMultiplier: " << m_speedMultiplier << std::endl;
+	bool FPSCamera::Save( Json & _json ) const {
+		SaveVec2( _json, "xySensitivity", m_xySensitivity );
+		SaveFloat(_json, "speed", m_speed );
+		SaveFloat(_json, "speedMultiplier", m_speedMultiplier );
+		Actor::Save( _json );
 		return true;
 	}
 }

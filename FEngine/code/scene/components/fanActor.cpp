@@ -43,18 +43,18 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	bool Actor::Load(std::istream& _in) {
-		if (!ReadSegmentHeader(_in, "isEnabled:")) { return false; }
-		if (!ReadBool(_in, m_isEnabled)) { return false; }
+	bool Actor::Load( Json & /*_json*/ ) {
+// 		if (!ReadSegmentHeader(_in, "isEnabled:")) { return false; }
+// 		if (!ReadBool(_in, m_isEnabled)) { return false; }
 		return true;
 	}
 
 
 	//================================================================================================================================
 	//================================================================================================================================
-	bool Actor::Save(std::ostream& _out, const int _indentLevel) const {
-		const std::string indentation = GetIndentation(_indentLevel);
-		_out << indentation << "isEnabled: " << BoolToSting(m_isEnabled) << std::endl;
+	bool Actor::Save( Json & _json ) const {
+		//SaveBool( jActor, "isEnabled", m_isEnabled );
+		Component::Save( _json );
 		return true;
 	}
 }

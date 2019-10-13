@@ -37,6 +37,7 @@ namespace fan
 		virtual void OnAttach();
 		virtual void OnDetach();
 
+		bool Save( Json & _json ) const override;
 
 	private:
 		uint64_t m_lastModified;	// Frame index at which it was modified

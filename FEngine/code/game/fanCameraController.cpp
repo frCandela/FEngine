@@ -52,20 +52,20 @@ namespace fan {
 
 	//================================================================================================================================
 	//================================================================================================================================
-	bool CameraController::Load(std::istream& _in) {
-		Actor::Load(_in);
+	bool CameraController::Load( Json & _json ) {
+		Actor::Load(_json);
+			
+		LoadFloat( _json, "height_from_target", m_heightFromTarget );
 
-		if (!ReadSegmentHeader(_in, "heightFromTarget:")) { return false; }
-		if (!ReadFloat(_in, m_heightFromTarget)) { return false; }
 		return true;
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	bool CameraController::Save(std::ostream& _out, const int _indentLevel) const {
-		Actor::Save(_out, _indentLevel);
-		const std::string indentation = GetIndentation(_indentLevel);
-		_out << indentation << "heightFromTarget: " << m_heightFromTarget << std::endl;
+	bool CameraController::Save( Json & _json ) const {
+		SaveFloat( _json, "height_from_target", m_heightFromTarget );
+		Actor::Save( _json );
+		
 		return true;
 	}
 }

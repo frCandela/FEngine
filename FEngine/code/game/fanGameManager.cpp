@@ -77,20 +77,15 @@ namespace fan {
 
 	//================================================================================================================================
 	//================================================================================================================================
-	bool GameManager::Load(std::istream& _in) {
-		Actor::Load(_in);
-
-		// 			if (!ReadSegmentHeader(_in, "radius:")) { return false; }
-		// 			if (!ReadFloat(_in, m_radius)) { return false; }
+	bool GameManager::Load( Json & _json ) {
+		Actor::Load(_json);
 		return true;
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	bool GameManager::Save(std::ostream& _out, const int _indentLevel) const {
-		Actor::Save(_out, _indentLevel);
-		// 			const std::string indentation = GetIndentation(_indentLevel);
-		// 			_out << indentation << "radius: " << m_radius << std::endl;
+	bool GameManager::Save( Json & _json ) const {		
+		Actor::Save( _json );		
 		return true;
 	}
 }

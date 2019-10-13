@@ -9,6 +9,8 @@
 #include "core/math/fanMathUtils.h"
 #include "core/math/fanVector2.h"
 
+using Json		=  nlohmann::json;
+
 namespace std {
 	namespace fs = experimental::filesystem;
 }

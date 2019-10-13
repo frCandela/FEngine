@@ -9,8 +9,6 @@ namespace fan {
 	public:
 		void Start() override;
 		void Update(const float _delta) override;
-		bool Load(std::istream& _in) override;
-		bool Save(std::ostream& _out, const int _indentLevel) const override;
 
 		void OnGui() override;
 		bool IsUnique() const override { return true; }
@@ -24,6 +22,8 @@ namespace fan {
 	protected:
 		void OnAttach() override;
 		void OnDetach() override;
+		bool Load( Json & _json ) override;
+		bool Save( Json & _json ) const override;
 
 	private:
 

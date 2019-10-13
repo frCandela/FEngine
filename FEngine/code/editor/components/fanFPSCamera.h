@@ -25,10 +25,6 @@ namespace fan
 		void SetSpeedMultiplier(const float _speedMultiplier)	{ m_speedMultiplier = _speedMultiplier; }
 		void SetXYSensitivity(const btVector2 _sensitivity)		{ m_xySensitivity = _sensitivity; }
 
-		// ISerializable
-		bool Load(std::istream& _in) override;
-		bool Save(std::ostream& _out, const int _indentLevel) const override;
-
 		void OnGui() override;
 		bool IsUnique() const	override { return true; }
 
@@ -38,6 +34,8 @@ namespace fan
 		void OnAttach() override;
 		void OnDetach() override;
 		void OnDisable() override;
+		bool Load( Json & _json ) override;
+		bool Save( Json & _json ) const override;
 
 	private:
 		float m_speed;

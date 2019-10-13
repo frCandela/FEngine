@@ -201,37 +201,65 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void Scene::Save() const {
+	void Scene::Save() const {	
+
 		Debug::Get() << Debug::Severity::log << "saving scene: " << m_name << Debug::Endl();
 		std::ofstream outStream(m_path);
 		if (outStream.is_open()) {
-			outStream << "Entities: 1 { \n";
-			Save(outStream, 0);
-			outStream << '}';
+			Json json;	
+			if ( Save( json ) ) {
+				// Out to disk
+				outStream << json;
+			}
 			outStream.close();
 		}
+		
+
+// 		Debug::Get() << Debug::Severity::log << "saving scene: " << m_name << Debug::Endl();
+// 		std::ofstream outStream(m_path);
+// 		if (outStream.is_open()) {
+// 			outStream << "Entities: 1 { \n";
+// 			Save(outStream, 0);
+// 			outStream << '}';
+// 			outStream.close();
+// 		}
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	bool Scene::Save(std::ostream& _out, const int _indentLevel) const {
-		return m_root->Save(_out, _indentLevel + 1);
-	}
-
-	//================================================================================================================================
-	//================================================================================================================================
-	bool Scene::Load(std::istream & _in) {
-		ScopedTimer timer("load scene");
-
-		if (!ReadSegmentHeader(_in)) { return false; }
-		int nbEntities = 42;
-		if (!ReadInteger(_in, nbEntities) || nbEntities != 1) { return false; }
-		if (!ReadStartToken(_in)) { return false; }
-		for (int gameobjectIndex = 0; gameobjectIndex < nbEntities; gameobjectIndex++) {
-			m_root = CreateGameobject("root");
-			m_root->LoadGameobject(_in);
+	bool Scene::Save( Json& _json ) const {
+		// Parameters
+		Json & jParameters = _json["parameters"]; {
+			jParameters["name"] = m_name;
+			jParameters["path"] = m_path;
 		}
-		if (!ReadEndToken(_in)) { return false; }
+
+		// Gameobjects
+		Json & jGameobjects = _json["gameobjects"]; {
+			if ( !m_root->Save( jGameobjects ) ) {
+				return false;
+			}
+		}
+		return true;
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
+	bool Scene::Load( Json & _json ) {
+		//ScopedTimer timer("load scene");
+
+		// Parameters
+		Json & jParameters = _json["parameters"]; {
+			LoadString( jParameters , "name" , m_name );
+			LoadString( jParameters, "path", m_path );
+		}
+
+		// Gameobjects
+		Json & jGameobjects = _json["gameobjects"]; {
+			m_root = CreateGameobject( "root" );
+			m_root->Load( jGameobjects );
+		}
+
 		return true;
 	}
 
@@ -240,12 +268,13 @@ namespace fan
 	bool Scene::LoadFrom(const std::string _path) {
 		Clear();
 		std::ifstream inStream(_path);
-		if (inStream.is_open()) {
+		if (inStream.is_open() && inStream.good()) {
 			// Load scene
 			Debug::Get() << Debug::Severity::log << "loading scene: " << _path << Debug::Endl();
 
-			if (Load(inStream)) {
-				Debug::Log("Load success");
+			Json sceneJson;
+			inStream >> sceneJson;
+			if (Load( sceneJson )) {
 				m_path = _path;
 				inStream.close();
 				onSceneLoad.Emmit(this);

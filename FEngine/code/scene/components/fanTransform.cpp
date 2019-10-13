@@ -214,38 +214,28 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	bool Transform::Load(std::istream& _in) {
+	bool Transform::Load( Json & _json ) {
 		ecsTranform* transform = GetEcsTransform();
 		ecsScaling* scaling = GetEcsScale();
 
-		if (!ReadSegmentHeader(_in, "position:")) { return false; }
-		if (!ReadFloat(_in, transform->position[0])) { return false; }
-		if (!ReadFloat(_in, transform->position[1])) { return false; }
-		if (!ReadFloat(_in, transform->position[2])) { return false; }
+		LoadVec3( _json, "position", transform->position );
+		LoadQuat( _json, "rotation", transform->rotation );
+		LoadVec3( _json, "scale", scaling->scale );
 
-		if (!ReadSegmentHeader(_in, "rotation:")) { return false; }
-		if (!ReadFloat(_in, transform->rotation[0])) { return false; }
-		if (!ReadFloat(_in, transform->rotation[1])) { return false; }
-		if (!ReadFloat(_in, transform->rotation[2])) { return false; }
-		if (!ReadFloat(_in, transform->rotation[3])) { return false; }
-
-		if (!ReadSegmentHeader(_in, "scale:")) { return false; }
-		if (!ReadFloat(_in, scaling->scale[0])) { return false; }
-		if (!ReadFloat(_in, scaling->scale[1])) { return false; }
-		if (!ReadFloat(_in, scaling->scale[2])) { return false; }
 		return true;
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	bool Transform::Save(std::ostream& _out, const int _indentLevel) const {
+	bool Transform::Save( Json & _json ) const {
 		ecsTranform* transform = GetEcsTransform();
 		ecsScaling* scaling = GetEcsScale();
 
-		const std::string indentation = GetIndentation(_indentLevel);
-		_out << indentation << "position: " << transform->position[0] << " " << transform->position[1] << " " << transform->position[2] << std::endl;
-		_out << indentation << "rotation: " << transform->rotation[0] << " " << transform->rotation[1] << " " << transform->rotation[2] << " " << transform->rotation[3] << std::endl;
-		_out << indentation << "scale:    " << scaling->scale[0] << " " << scaling->scale[1] << " " << scaling->scale[2] << std::endl;
+		SaveVec3( _json, "position", transform->position );
+		SaveQuat( _json, "rotation", transform->rotation );
+		SaveVec3( _json, "scale", scaling->scale );
+		Component::Save( _json );
+				
 		return true;
 	}
 

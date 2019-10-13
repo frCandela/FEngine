@@ -21,9 +21,6 @@ namespace fan
 
 		AABB ComputeAABB() const;
 
-		// ISerializable
-		bool			Load(std::istream& _in) override;
-		bool			Save(std::ostream& _out, const int _indentLevel) const override;
 		void			SetPath( std::string _path );
 		void			SetMesh(Mesh * _mesh);
 		Mesh *			GetMesh();
@@ -39,6 +36,8 @@ namespace fan
 		DECLARE_TYPE_INFO(Model);
 
 	protected:
+		bool Load( Json & _json ) override;
+		bool Save( Json & _json ) const override;
 		void OnAttach() override;
 		void OnDetach() override;
 

@@ -71,29 +71,23 @@ namespace fan {
 
 	//================================================================================================================================
 	//================================================================================================================================
-	bool SpaceShip::Load(std::istream& _in) {
-		Actor::Load(_in);
+	bool SpaceShip::Load( Json & _json ) {
+		Actor::Load(_json);
 
-		if (!ReadSegmentHeader(_in, "speed:")) { return false; }
-		if (!ReadFloat(_in, m_velocity)) { return false; }
-
-		if (!ReadSegmentHeader(_in, "rotation_speed:")) { return false; }
-		if (!ReadFloat(_in, m_rotationSpeed)) { return false; }
-
-		if ( !ReadSegmentHeader( _in, "drag:" ) ) { return false; }
-		if ( !ReadFloat( _in, m_drag ) ) { return false; }
+		LoadFloat( _json, "speed", m_velocity );
+		LoadFloat( _json, "rotation_speed", m_rotationSpeed );
+		LoadFloat( _json, "drag", m_drag );
 
 		return true;
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	bool SpaceShip::Save(std::ostream& _out, const int _indentLevel) const {
-		Actor::Save(_out, _indentLevel);
-		const std::string indentation = GetIndentation(_indentLevel);
-		_out << indentation << "speed:          " << m_velocity << std::endl;
-		_out << indentation << "rotation_speed: " << m_rotationSpeed << std::endl;
-		_out << indentation << "drag: " << m_drag << std::endl;
+	bool SpaceShip::Save( Json & _json ) const {
+		SaveFloat( _json, "speed", m_velocity );
+		SaveFloat( _json, "rotation_speed", m_rotationSpeed );
+		SaveFloat( _json, "drag", m_drag );
+		Actor::Save( _json );
 		
 		return true;
 	}

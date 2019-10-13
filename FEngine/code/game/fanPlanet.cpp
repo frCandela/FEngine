@@ -67,31 +67,27 @@ namespace fan {
 
 	//================================================================================================================================
 	//================================================================================================================================
-	bool Planet::Save(std::ostream& _out, const int _indentLevel) const {
-		Actor::Save(_out, _indentLevel);
-		const std::string indentation = GetIndentation(_indentLevel);
+	bool Planet::Load( Json & _json) {
+		Actor::Load(_json);
 		ecsPlanet * planet = GetEcsPlanet();
 
-		_out << indentation << "radius: " << planet->radius << std::endl;
-		_out << indentation << "speed:  " << planet->speed << std::endl;
-		_out << indentation << "phase:  " << planet->phase << std::endl;
+		LoadFloat( _json, "radius", planet->radius );
+		LoadFloat( _json, "speed", planet->speed );
+		LoadFloat( _json, "phase", planet->phase );
+
 		return true;
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	bool Planet::Load(std::istream& _in) {
-		Actor::Load(_in);
+	bool Planet::Save( Json & _json ) const {
 		ecsPlanet * planet = GetEcsPlanet();
 
-		if (!ReadSegmentHeader(_in, "radius:")) { return false; }
-		if (!ReadFloat(_in, planet->radius)) { return false; }
-
-		if (!ReadSegmentHeader(_in, "speed:")) { return false; }
-		if (!ReadFloat(_in, planet->speed)) { return false; }
-
-		if (!ReadSegmentHeader(_in, "phase:")) { return false; }
-		if (!ReadFloat(_in, planet->phase)) { return false; }
+		SaveFloat( _json, "radius", planet->radius );
+		SaveFloat( _json, "speed", planet->speed );
+		SaveFloat( _json, "phase", planet->phase );
+		Actor::Save( _json );
+		
 		return true;
 	}
 

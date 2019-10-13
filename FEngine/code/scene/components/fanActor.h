@@ -19,18 +19,17 @@ namespace fan
 		bool IsActor() const override { return true; }
 		bool IsUnique() const override { return false; }
 		void OnGui() override;
-		bool Load(std::istream& _in) override;
-		bool Save(std::ostream& _out, const int _indentLevel) const override;
-
 		bool IsEnabled() const { return m_isEnabled; }
 		void SetEnabled(const bool _enabled);
 
 	protected:
 		void OnAttach() override;
 		void OnDetach() override;
+		bool Load( Json & _json ) override;
+		bool Save( Json & _json ) const override;
+
 		virtual void OnEnable() {};
 		virtual void OnDisable(){};
-
 	private:
 		bool m_isEnabled = true;
 

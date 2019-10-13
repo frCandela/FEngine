@@ -12,8 +12,6 @@ namespace fan {
 
 		enum Attenuation { CONSTANT = 0, LINEAR = 1, QUADRATIC = 2 };
 
-		bool Load( std::istream& _in )  override;
-		bool Save( std::ostream& _out, const int _indentLevel ) const override;
 		void OnGui() override;
 		bool IsUnique()	const override { return true; }
 
@@ -27,6 +25,8 @@ namespace fan {
 		DECLARE_EDITOR_COMPONENT( DirectionalLight )
 		DECLARE_TYPE_INFO( DirectionalLight );
 	protected:
+		bool Load( Json & _json )  override;
+		bool Save( Json & _json ) const override;
 		void OnAttach() override;
 		void OnDetach() override;
 		ecsDirLight*  GetEcsDirLight() const;

@@ -10,8 +10,6 @@ namespace fan {
 
 		void Start() override;
 		void Update( const float _delta ) override;
-		bool Load( std::istream& _in ) override;
-		bool Save( std::ostream& _out, const int _indentLevel ) const override;
 
 		void OnGui() override;
 		bool IsUnique() const override { return true; }
@@ -19,6 +17,9 @@ namespace fan {
 		DECLARE_EDITOR_COMPONENT( SolarSystem )
 		DECLARE_TYPE_INFO( SolarSystem );
 	protected:
+		bool Load( Json & _json ) override;
+		bool Save( Json & _json ) const override;
+
 	private:
 		int m_seed = 1;
 

@@ -62,8 +62,8 @@ namespace fan
 		void OnActorAttach(Actor * _actor);
 		void OnActorDetach(Actor * _actor);
 
-		bool Load(std::istream& _in) override;
-		bool Save(std::ostream& _out, const int _indentLevel) const override;
+		bool Load( Json & _json ) override;
+		bool Save( Json& _json ) const override;
 		void Clear();
 
 		void		R_DeleteGameobject(Gameobject* _gameobject, std::set<Gameobject*>&	_deletedEntitiesSet);

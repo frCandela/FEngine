@@ -16,9 +16,6 @@ namespace fan
 		static Signal< Material * >					onMaterialDetach;
 		static Signal< Material *, std::string  >	onMaterialSetPath;
 
-		bool Load(std::istream& _in)	override;
-		bool Save(std::ostream& _out, const int _indentLevel) const override;
-
 		// Getters
 		void			SetTexture( Texture * const _texture);
 		Texture *		GetTexture();
@@ -36,6 +33,8 @@ namespace fan
 		DECLARE_EDITOR_COMPONENT(Material)
 		DECLARE_TYPE_INFO(Material);
 	protected:
+		bool Load( Json & _json )	override;
+		bool Save( Json & _json ) const override;
 		void OnAttach() override;
 		void OnDetach() override;
 		ecsMaterial* GetEcsMaterial() const;

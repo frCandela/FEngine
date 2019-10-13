@@ -235,110 +235,68 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	bool Gameobject::Load(std::istream& _in) {
-		if (!ReadSegmentHeader(_in, "Gameobject:")) { return false; }
+	bool Gameobject::Load( Json & _json ) {
 
-		std::string buffer;
-		if (!ReadString(_in, buffer) || buffer.empty()) { return false; } // gameobject name
-		SetName(buffer);
-		if (!ReadStartToken(_in)) { return false; }
-		{
-			if (!ReadSegmentHeader(_in, "computeAABB:")) { return false; } // ComputeAABB
-			if (!ReadBool(_in, m_computeAABB)) { return false; }
+		LoadString( _json, "name", m_name );
+		LoadBool( _json, "compute_aabb", m_computeAABB );
 
-			if (!ReadSegmentHeader(_in, "Components:")) { return false; }
-			int nbComponents = -1;
-			if (!ReadInteger(_in, nbComponents) || nbComponents < 0) { return false; }
-			if (!ReadStartToken(_in)) { return false; }
-			{
-				for (int componentIndex = 0; componentIndex < nbComponents; componentIndex++)
-				{
-					if (!ReadSegmentHeader(_in)) { return false; } // "componentName:"
-					uint32_t componentID = 0;
-					if (!ReadUnsigned(_in, componentID) && componentID != 0) { return false; }
-					if (!ReadStartToken(_in)) { return false; }
-					{
-						// Don't add a transform two times
-						Component * component = nullptr;
-						if ( componentID == Transform::s_typeID ) {
-							component = GetComponent<Transform>();
-						} else {
-							component = AddComponent( componentID );
-						}
+		Json& jComponents = _json["components"]; {
+			for ( int childIndex = 0; childIndex < jComponents.size(); childIndex++ ) {
+				Json& jComponent_i = jComponents[childIndex]; {
+					unsigned componentID = 0;
+					LoadUInt( jComponent_i, "id", componentID );
 
-						const bool result = component->Load(_in);
-						if (result == false) {
-							Debug::Get() << Debug::Severity::error << "Failed loading component: " << component->GetName() << Debug::Endl();
-						}
-						if (result == false) {
-							return false;
-						}
-					} if (!ReadEndToken(_in)) { return false; }
-				}
-			} if (!ReadEndToken(_in)) { return false; }
-			if (!ReadSegmentHeader(_in, "Childs:")) { return false; }
-			int nbChilds = -1;
-			if (!ReadInteger(_in, nbChilds) || nbChilds < 0) { return false; }
-			if (!ReadStartToken(_in)) { return false; }
-			{
-				for (int gameobjectIndex = 0; gameobjectIndex < nbChilds; gameobjectIndex++)
-				{
-					Gameobject * child = m_scene->CreateGameobject("tmp", this);
-					child->LoadGameobject(_in);
-				}
-			}if (!ReadEndToken(_in)) { return false; }
-		} if (!ReadEndToken(_in)) { return false; }
-
-		return true;
-	}
-
-	//================================================================================================================================
-	//================================================================================================================================
-	bool Gameobject::LoadGameobject(std::istream& _in) {
-		const bool result = Load(_in);
-		if (result == false) {
-			Debug::Get() << Debug::Severity::error << "Failed loading gameobject: " << GetName() << Debug::Endl();
-		}
-		return result;
-	}
-
-	//================================================================================================================================
-	//================================================================================================================================
-	bool Gameobject::Save(std::ostream& _out, const int _indentLevel) const {
-		const std::string indentation = GetIndentation(_indentLevel);
-		const std::string indentation1 = GetIndentation(_indentLevel + 1);
-		const std::string indentation2 = GetIndentation(_indentLevel + 2);
-
-		_out << indentation << "Gameobject: " << m_name << " {" << std::endl; { // gameobject	
-
-			_out << indentation1 << "computeAABB: " << BoolToSting(m_computeAABB) << std::endl; // m_computeAABB	
-
-			_out << indentation1 << "Components: " << m_components.size() << " {" << std::endl; { // components
-				for (int componentIndex = 0; componentIndex < m_components.size(); componentIndex++) {
-					Component * component = m_components[componentIndex];
-					_out << indentation2 << component->GetName() << ": " << component->GetType() << " {" << std::endl;
-					component->Save(_out, _indentLevel + 3);
-					_out << indentation2 << "}" << std::endl;
-				} _out << indentation1 << "}" << std::endl; // End components
-			}
-
-			// Count childs to save
-			int childsToSaveCount = 0;
-			for (int childIndex = 0; childIndex < m_childs.size(); childIndex++) {
-				if (m_childs[childIndex]->HasFlag(NOT_SAVED) == false) {
-					++childsToSaveCount;
-				}
-			}
-
-			_out << indentation1 << "Childs: " << childsToSaveCount << " {" << std::endl; { // childs
-				for (int childIndex = 0; childIndex < m_childs.size(); childIndex++) {
-					Gameobject * gameobject = m_childs[childIndex];
-					if (gameobject->HasFlag(NOT_SAVED) == false) {
-						gameobject->Save(_out, _indentLevel + 2);
+					// Don't add a transform two times
+					Component * component = nullptr;
+					if ( componentID == Transform::s_typeID ) {
+						component = GetComponent<Transform>();
+					} else {
+						component = AddComponent( componentID );
+					}
+					if ( ! component->Load( jComponent_i ) ) {
+						Debug::Get() << Debug::Severity::error << "Failed loading component: " << component->GetName() << Debug::Endl();
 					}
 				}
-			} _out << indentation1 << "}" << std::endl; // End childs
-		} _out << indentation << "}" << std::endl;; // End gameobject
+			}
+		}
+		Json& jchilds = _json["childs"]; {
+			for (int childIndex = 0; childIndex < jchilds.size(); childIndex++)	{
+				Json& jchild_i = jchilds[childIndex]; {
+					Gameobject * child = m_scene->CreateGameobject( "tmp", this );
+					child->Load( jchild_i );
+				}
+			}
+		}
+ 		return true;
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
+	bool Gameobject::Save( Json & _json ) const {
+		SaveString( _json, "name", m_name );
+		SaveBool( _json, "compute_aabb", m_computeAABB );
+
+		Json& jComponents = _json["components"];{
+			for ( int componentIndex = 0; componentIndex < m_components.size(); componentIndex++ ) {
+				Json& jComponent_i = jComponents[componentIndex]; {
+					Component * component = m_components[componentIndex];
+					component->Save( jComponent_i );
+				}				
+			}
+		}
+		Json& jchilds = _json["childs"]; {
+			// Count childs to save
+			unsigned childIndex = 0;				
+			for ( int gameobjectIndex = 0; gameobjectIndex < m_childs.size(); gameobjectIndex++ ) {
+				Gameobject * gameobject = m_childs[gameobjectIndex];
+				if ( gameobject->HasFlag( NOT_SAVED ) == false ) {
+					Json& jchild_i = jchilds[childIndex]; {
+						gameobject->Save( jchild_i );
+					}
+					++childIndex;
+				}
+			}
+		}
 		return true;
 	}
 }

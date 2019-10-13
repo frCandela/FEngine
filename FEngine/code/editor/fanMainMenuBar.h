@@ -64,6 +64,7 @@ namespace fan
 		void DrawModals();
 		void New();
 		void Open();
+		void Reload();
 		void Save();
 		void SaveAs();
 	};

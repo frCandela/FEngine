@@ -16,7 +16,6 @@ namespace fan {
 	//================================================================================================================================
 	//================================================================================================================================
 	void SolarSystem::Start() {
-		Debug::Log( "bwabwa" );
 	}
 
 	//================================================================================================================================
@@ -30,10 +29,6 @@ namespace fan {
 		Component::OnGui();
 
 		Transform * transform = GetGameobject()->GetComponent<Transform>();
-
-
-
-
 
 		static std::default_random_engine m_generator;
 		static std::uniform_real_distribution<float> m_distribution( 0.f, 1.f );
@@ -171,42 +166,34 @@ namespace fan {
 
 	//================================================================================================================================
 	//================================================================================================================================
-	bool SolarSystem::Load( std::istream& _in ) {
-		Actor::Load( _in );
+	bool SolarSystem::Load( Json & _json ) {
+		Actor::Load( _json );
 
-		if ( !ReadSegmentHeader( _in, "max_radius:" ) ) { return false; }
-		if ( !ReadFloat( _in, m_maxRadius ) ) { return false; }
-		if ( !ReadSegmentHeader( _in, "initial_radius:" ) ) { return false; }
-		if ( !ReadFloat( _in, m_initialRadius ) ) { return false; }
-		if ( !ReadSegmentHeader( _in, "offset:" ) ) { return false; }
-		if ( !ReadFloat( _in, m_offset ) ) { return false; }
-		if ( !ReadSegmentHeader( _in, "randomScale:" ) ) { return false; }
-		if ( !ReadFloat( _in, m_randomScale ) ) { return false; }
-		if ( !ReadSegmentHeader( _in, "initialPlanetScale:" ) ) { return false; }
-		if ( !ReadFloat( _in, m_initialPlanetScale ) ) { return false; }
-		if ( !ReadSegmentHeader( _in, "scaleMult:" ) ) { return false; }
-		if ( !ReadFloat( _in, m_scaleMult ) ) { return false; }
-		if ( !ReadSegmentHeader( _in, "minSpeed:" ) ) { return false; }
-		if ( !ReadFloat( _in, m_minSpeed ) ) { return false; }
-		if ( !ReadSegmentHeader( _in, "maxSpeed:" ) ) { return false; }
-		if ( !ReadFloat( _in, m_maxSpeed ) ) { return false; }
+		LoadFloat( _json, "max_radius", m_maxRadius );
+		LoadFloat( _json, "initial_radius", m_initialRadius );
+		LoadFloat( _json, "offset", m_offset );
+		LoadFloat( _json, "randomScale", m_randomScale );
+		LoadFloat( _json, "initialPlanetScale", m_initialPlanetScale );
+		LoadFloat( _json, "scaleMult", m_scaleMult );
+		LoadFloat( _json, "minSpeed", m_minSpeed );
+		LoadFloat( _json, "maxSpeed", m_maxSpeed );
+
 		return true;
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	bool SolarSystem::Save( std::ostream& _out, const int _indentLevel ) const {
-		Actor::Save( _out, _indentLevel );
-		const std::string indentation = GetIndentation( _indentLevel );
-
-		_out << indentation << "max_radius:         " << m_maxRadius << std::endl;
-		_out << indentation << "initial_radius:     " << m_initialRadius << std::endl;
-		_out << indentation << "offset:             " << m_offset << std::endl;
-		_out << indentation << "randomScale:        " << m_randomScale << std::endl;
-		_out << indentation << "initialPlanetScale: " << m_initialPlanetScale << std::endl;
-		_out << indentation << "scaleMult:          " << m_scaleMult << std::endl;
-		_out << indentation << "minSpeed:           " << m_minSpeed << std::endl;
-		_out << indentation << "maxSpeed:           " << m_maxSpeed << std::endl;
+	bool SolarSystem::Save( Json & _json ) const {
+		SaveFloat( _json, "max_radius", m_maxRadius );
+		SaveFloat( _json, "initial_radius", m_initialRadius );
+		SaveFloat( _json, "offset", m_offset );
+		SaveFloat( _json, "randomScale", m_randomScale );
+		SaveFloat( _json, "initialPlanetScale", m_initialPlanetScale );
+		SaveFloat( _json, "scaleMult", m_scaleMult );
+		SaveFloat( _json, "minSpeed", m_minSpeed );
+		SaveFloat( _json, "maxSpeed", m_maxSpeed );
+		Actor::Save( _json );
+		
 		return true;
 	}
 }

@@ -165,35 +165,27 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	bool Camera::Load(std::istream& _in) {
-		if ( !ReadSegmentHeader( _in, "type:" ) ) { return false; }
-		int type;
-		if ( !ReadInteger( _in, type ) ) { return false; }
-		m_type = Type( type );
-
-		if ( !ReadSegmentHeader( _in, "orthoSize:" ) ) { return false; }
-		if ( !ReadFloat( _in, m_orthoSize ) ) { return false; }
-
-		if (!ReadSegmentHeader(_in, "fov:")) { return false; }
-		if (!ReadFloat(_in, m_fov)) { return false; }
-
-		if (!ReadSegmentHeader(_in, "nearDistance:")) { return false; }
-		if (!ReadFloat(_in, m_nearDistance)) { return false; }
-
-		if (!ReadSegmentHeader(_in, "farDistance:")) { return false; }
-		if (!ReadFloat(_in, m_farDistance)) { return false; }
+	bool Camera::Load( Json & _json ) {
+		int tmp;
+		LoadInt  ( _json, "camera_type", tmp ); m_type = Type(tmp);
+		LoadFloat( _json, "orthoSize", m_orthoSize );
+		LoadFloat( _json, "fov", m_fov );
+		LoadFloat( _json, "nearDistance", m_nearDistance );
+		LoadFloat( _json, "farDistance", m_farDistance );
 		return true;
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	bool Camera::Save(std::ostream& _out, const int _indentLevel) const {
-		const std::string indentation = GetIndentation(_indentLevel);
-		_out << indentation << "type:         " << m_type << std::endl;
-		_out << indentation << "orthoSize:    " << m_orthoSize << std::endl;
-		_out << indentation << "fov:          " << m_fov << std::endl;
-		_out << indentation << "nearDistance: " << m_nearDistance << std::endl;
-		_out << indentation << "farDistance:  " << m_farDistance << std::endl;
+	bool Camera::Save( Json & _json ) const {
+
+		SaveInt  ( _json, "camera_type", m_type );
+		SaveFloat( _json, "orthoSize", m_orthoSize );
+		SaveFloat( _json, "fov", m_fov );
+		SaveFloat( _json, "nearDistance", m_nearDistance );
+		SaveFloat( _json, "farDistance", m_farDistance );
+		Component::Save( _json );
+		
 		return true;
 	}
 }

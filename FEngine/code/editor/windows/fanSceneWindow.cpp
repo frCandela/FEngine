@@ -34,6 +34,7 @@ namespace fan
 	void SceneWindow::OnGui() {
 
 		ImGui::Text(m_scene->GetName().c_str());
+		ImGui::Text( m_scene->GetPath().c_str() );
 		ImGui::Separator();
 
 		Gameobject * gameobjectRightClicked = nullptr;

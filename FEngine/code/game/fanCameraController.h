@@ -14,8 +14,6 @@ namespace fan {
 	public:
 		void Start() override;
 		void Update(const float _delta) override;
-		bool Load(std::istream& _in) override;
-		bool Save(std::ostream& _out, const int _indentLevel) const override;
 
 		bool IsUnique() const override { return true; }
 		void OnGui() override;
@@ -24,6 +22,9 @@ namespace fan {
 		DECLARE_EDITOR_COMPONENT(CameraController)
 		DECLARE_TYPE_INFO(CameraController);
 	protected:
+		bool Load( Json & _json ) override;
+		bool Save( Json & _json ) const override;
+
 	private:
 		Camera *		m_camera;
 		Transform *	m_transform;

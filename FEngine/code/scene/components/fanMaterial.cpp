@@ -101,30 +101,28 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	bool Material::Save( std::ostream& _out, const int _indentLevel ) const {
-		ecsMaterial * material = GetEcsMaterial();
-		const std::string indentation = GetIndentation( _indentLevel );
-		_out << indentation << "material: " << ( material->texture != nullptr ? material->texture->GetPath() : "void" ) << std::endl;
-		_out << indentation << "shininess: " << material->shininess << std::endl;
-		_out << indentation << "color: " << material->color[0] << " " << material->color[1] << " " << material->color[2] << std::endl;
+	bool Material::Load( Json & _json ) {
+		ecsMaterial * material = GetEcsMaterial();		
+
+		LoadUInt  ( _json, "shininess", material->shininess );
+		LoadColor ( _json, "color", material->color );
+		std::string tmpPath;
+		if ( LoadString( _json, "material", tmpPath ) && tmpPath != std::string( "void" ) ) {
+			onMaterialSetPath.Emmit( this, tmpPath );
+		}
 		return true;
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	bool Material::Load( std::istream& _in ) {
+	bool Material::Save( Json & _json ) const {
 		ecsMaterial * material = GetEcsMaterial();
-		std::string path;
-		if ( !ReadSegmentHeader( _in, "material:" ) ) { return false; }
-		if ( !ReadString( _in, path ) ) { return false; }
-		if ( !ReadSegmentHeader( _in, "shininess:" ) ) { return false; }
-		if ( !ReadUnsigned( _in, material->shininess ) ) { return false; }
-		if ( !ReadSegmentHeader( _in, "color:" ) ) { return false; }
-		if ( !ReadFloat3( _in, &material->color[0] ) ) { return false; }
 
-		if ( path != std::string( "void" ) ) {
-			onMaterialSetPath.Emmit( this, path );
-		}
+		SaveString( _json, "material", ( material->texture != nullptr ? material->texture->GetPath() : "void" ) );
+		SaveUInt  ( _json, "shininess", material->shininess );
+		SaveColor ( _json, "color", material->color );
+		Component::Save( _json );		
+
 		return true;
 	}
 

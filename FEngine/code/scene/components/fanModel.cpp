@@ -109,24 +109,22 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	bool Model::Load(std::istream& _in) {
+	bool Model::Load( Json & _json ) {
 		std::string pathBuffer;
-		if (!ReadSegmentHeader(_in, "path:")) { return false; }
-		if (!ReadString(_in, pathBuffer)) { return false; }
-
-		onModelSetPath.Emmit(this, pathBuffer );
-
+		if ( LoadString( _json, "path", pathBuffer ) ) {
+			onModelSetPath.Emmit( this, pathBuffer );
+		}
 		return true;
 	}
 
+	//==========================z======================================================================================================
 	//================================================================================================================================
-	//================================================================================================================================
-	bool Model::Save(std::ostream& _out, const int _indentLevel) const {
-		const std::string indentation = GetIndentation(_indentLevel);
-
+	bool Model::Save( Json & _json ) const {
 		ecsModel* model = GetEcsModel();
 
-		_out << indentation << "path: " << (model->mesh != nullptr ? model->mesh->GetPath() : """" ) << std::endl;
+		SaveString( _json, "path", ( model->mesh != nullptr ? model->mesh->GetPath() : "" ));
+		Component::Save( _json );
+		
 		return true;
 	}
 

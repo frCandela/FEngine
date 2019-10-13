@@ -59,8 +59,8 @@ namespace fan
 		void InsertBelow(Gameobject * _brother);
 
 		// ISerializable
-		bool LoadGameobject(std::istream& _in);
-		bool Save(std::ostream& _out, const int _indentLevel) const override;
+		bool Save( Json & _json ) const override;
+		bool Load( Json & _json ) override;
 
 		// Flags
 		bool		HasFlag(const Flag _flag) const { return m_flags & _flag; }
@@ -78,8 +78,6 @@ namespace fan
 		ecsHandle				 m_ecsHandleEntity = ecsNullHandle;
 
 		bool m_computeAABB = true;
-
-		bool Load(std::istream& _in) override;
 
 		void AddComponent(Component * _component);
 	};

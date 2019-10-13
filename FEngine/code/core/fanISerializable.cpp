@@ -15,90 +15,184 @@ namespace fan {
 
 	//================================================================================================================================
 	//================================================================================================================================
-	bool ISerializable::ReadEndToken(std::istream& _in) {
-		std::string buffer;
-		_in >> buffer;
-		return buffer == "}";
+	void ISerializable::SaveVec2 ( Json & _json, const char * _name, const btVector2&	_vec2 ) {
+		_json[_name]["x"] = _vec2[0];
+		_json[_name]["y"] = _vec2[1];
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	bool ISerializable::ReadStartToken(std::istream& _in) {
-		std::string buffer;
-		_in >> buffer;
-		return buffer == "{";
+	void ISerializable::SaveVec3 ( Json & _json, const char * _name, const btVector3&	_vec3 ){
+		_json[_name]["x"] = _vec3[0];
+		_json[_name]["y"] = _vec3[1];
+		_json[_name]["z"] = _vec3[2];
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	bool ISerializable::ReadSegmentHeader(std::istream& _in) {
-		std::string buffer;
-		_in >> buffer;
-		return buffer[buffer.size() - 1] == ':';
+	void ISerializable::SaveQuat ( Json & _json, const char * _name, const btQuaternion& _quat ) {
+		_json[_name]["x"] = _quat[0];
+		_json[_name]["y"] = _quat[1];
+		_json[_name]["z"] = _quat[2];
+		_json[_name]["w"] = _quat[3];
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	bool ISerializable::ReadSegmentHeader(std::istream& _in, const std::string& _expectedHeader) {
-		std::string buffer;
-		_in >> buffer;
-		if (buffer == "") {
-			return false;
+	void ISerializable::SaveColor( Json & _json, const char * _name, const Color&	_color ) {
+		_json[_name]["r"] = _color[0];
+		_json[_name]["g"] = _color[1];
+		_json[_name]["b"] = _color[2];
+		_json[_name]["a"] = _color[3];
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
+	void ISerializable::SaveFloat( Json & _json, const char * _name, const float&	_float ) {
+		_json[_name] = _float;
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
+	void ISerializable::SaveInt  ( Json & _json, const char * _name, const int&	_int ) {
+		_json[_name] = _int;
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
+	void ISerializable::SaveUInt ( Json & _json, const char * _name, const unsigned& _int ) {
+		_json[_name] = _int;
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
+	void ISerializable::SaveBool ( Json & _json, const char * _name, const bool& _bool ) {
+		_json[_name] = _bool;
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
+	void ISerializable::SaveString ( Json & _json, const char * _name, const std::string& _string ) {
+		_json[_name] = _string.c_str();
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
+	bool ISerializable::LoadVec2	( Json & _json, const char * _name, btVector2&		_outVec2 ) {
+		Json * token = FindToken(_json, _name );
+		if ( token != nullptr ) {
+			_outVec2[0] = ( *token )["x"];
+			_outVec2[1] = ( *token )["y"];
+			return true;
 		}
-		return buffer[buffer.size() - 1] == ':' && buffer == _expectedHeader;
-	}	
-
+		return false;
+	}
+	
 	//================================================================================================================================
 	//================================================================================================================================
-	bool ISerializable::ReadFloat(std::istream& _in, float & _outValue) {
-		if (_in.eof()) { return false; }
-		_in >> _outValue;
-		return true;
+	bool ISerializable::LoadVec3	( Json & _json, const char * _name, btVector3&		_outVec3 )	 {
+		Json * token = FindToken( _json, _name );
+		if ( token != nullptr ) {
+			_outVec3[0] = ( *token )["x"];
+			_outVec3[1] = ( *token )["y"];
+			_outVec3[2] = ( *token )["z"];
+			return true;
+		}
+		return false;
+	}
+	
+	//================================================================================================================================
+	//================================================================================================================================
+	bool ISerializable::LoadQuat	( Json & _json, const char * _name, btQuaternion&	_outQuat )	 {
+		Json * token = FindToken( _json, _name );
+		if ( token != nullptr ) {
+			_outQuat[0] = ( *token )["x"];
+			_outQuat[1] = ( *token )["y"];
+			_outQuat[2] = ( *token )["z"];
+			_outQuat[3] = ( *token )["w"];
+			return true;
+		}
+		return false;
+	}
+	
+	//================================================================================================================================
+	//================================================================================================================================
+	bool ISerializable::LoadColor	( Json & _json, const char * _name, Color&			_outColor ) {
+		Json * token = FindToken( _json, _name );
+		if ( token != nullptr ) {
+			_outColor[0] = ( *token )["r"];
+			_outColor[1] = ( *token )["g"];
+			_outColor[2] = ( *token )["b"];
+			_outColor[3] = ( *token )["a"];
+			return true;
+		}
+		return false;
+	}
+	
+	//================================================================================================================================
+	//================================================================================================================================
+	bool ISerializable::LoadFloat	( Json & _json, const char * _name, float&			_outFloat ) {
+		Json * token = FindToken( _json, _name );
+		if ( token != nullptr ) {
+			_outFloat = ( *token );
+			return true;
+		}
+		return false;
+	}
+	
+	//================================================================================================================================
+	//================================================================================================================================
+	bool ISerializable::LoadInt		( Json & _json, const char * _name, int&			_outInt )	 {
+		Json * token = FindToken( _json, _name );
+		if ( token != nullptr ) {
+			_outInt = ( *token );
+			return true;
+		}
+		return false;
+	}
+	
+	//================================================================================================================================
+	//================================================================================================================================
+	bool ISerializable::LoadUInt	( Json & _json, const char * _name, unsigned&		_outUInt ) {
+		Json * token = FindToken( _json, _name );
+		if ( token != nullptr ) {
+			_outUInt = ( *token );
+			return true;
+		}
+		return false;
+	}
+	
+	//================================================================================================================================
+	//================================================================================================================================
+	bool ISerializable::LoadBool	( Json & _json, const char * _name, bool&			_outBool )	 {
+		Json * token = FindToken( _json, _name );
+		if ( token != nullptr ) {
+			_outBool = ( *token );
+			return true;
+		}
+		return false;
+	}
+	
+	//================================================================================================================================
+	//================================================================================================================================
+	bool ISerializable::LoadString	( Json & _json, const char * _name, std::string&	_outString ){
+		Json * token = FindToken( _json, _name );
+		if ( token != nullptr ) {
+			_outString = ( *token );
+			return true;
+		}
+		return false;
 	}
 
 	//================================================================================================================================
+	// returns the json token associated with a name or nullptr if it doesn't exists
 	//================================================================================================================================
-	bool ISerializable::ReadFloat3(std::istream& _in, float * _outFloat3) {
-		if (!ReadFloat(_in, _outFloat3[0])) { return false; }
-		if (!ReadFloat(_in, _outFloat3[1])) { return false; }
-		if (!ReadFloat(_in, _outFloat3[2])) { return false; }
-		return true;
-	}
-
-	static bool ReadFloat3(std::istream& _in, float * _outValue);
-	//================================================================================================================================
-	//================================================================================================================================
-	bool ISerializable::ReadInteger(std::istream& _in, int & _outValue) {
-		if (_in.eof()) { return false; }
-		_in >> _outValue;
-		return true;
-	}
-
-	//================================================================================================================================
-	//================================================================================================================================
-	bool ISerializable::ReadUnsigned(std::istream& _in, uint32_t & _outValue) {
-		if (_in.eof()) { return false; }
-		_in >> _outValue;
-		return true;
-	}
-
-	//================================================================================================================================
-	//================================================================================================================================
-	bool ISerializable::ReadString(std::istream& _in, std::string & _outStr) {
-		if (_in.eof()) { return false; }
-		_in >> _outStr;
-		return true;
-	}
-
-	//================================================================================================================================
-	//================================================================================================================================
-	bool ISerializable::ReadBool(std::istream& _in, bool & _outBool) {
-		if (_in.eof()) { return false; }
-		std::string str;
-		_in >> str;
-		if (str == "true") {_outBool = true;}
-		else if (str == "false") { _outBool = false; }
-		else { return false; }
-		return true;
+	Json * ISerializable::FindToken	( Json & _json, const char * _name ) {
+		auto it = _json.find( _name );
+		if ( it != _json.end() ) {
+			return &(*it);
+		}
+		Debug::Get() << Debug::Severity::warning << "Failed to find token: " << _name << Debug::Endl();
+		return nullptr;
 	}
 }

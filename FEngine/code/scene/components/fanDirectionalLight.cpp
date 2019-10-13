@@ -88,26 +88,26 @@ namespace fan {
 
 	//================================================================================================================================
 	//================================================================================================================================
-	bool DirectionalLight::Load( std::istream& _in ) {
-		ecsDirLight * dirLight = GetEcsDirLight();
+	bool DirectionalLight::Load( Json & _json ) {
+ 		ecsDirLight * dirLight = GetEcsDirLight();
 
-		if ( !ReadSegmentHeader( _in, "ambiant:" ) ) { return false; }
-		if ( !ReadFloat3( _in, &dirLight->ambiant[0] ) ) { return false; }
-		if ( !ReadSegmentHeader( _in, "diffuse:" ) ) { return false; }
-		if ( !ReadFloat3( _in, &dirLight->diffuse[0] ) ) { return false; }
-		if ( !ReadSegmentHeader( _in, "specular:" ) ) { return false; }
-		if ( !ReadFloat3( _in, &dirLight->specular[0] ) ) { return false; }
+		LoadColor( _json, "ambiant", dirLight->ambiant );
+		LoadColor( _json, "diffuse", dirLight->diffuse );
+		LoadColor( _json, "specular", dirLight->specular );
+
 		return true;
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	bool DirectionalLight::Save( std::ostream& _out, const int _indentLevel ) const {
+	bool DirectionalLight::Save( Json & _json  ) const {
 		ecsDirLight * dirLight = GetEcsDirLight();
-		const std::string indentation = GetIndentation( _indentLevel );
-		_out << indentation << "ambiant: " << dirLight->ambiant[0] << " " << dirLight->ambiant[1] << " " << dirLight->ambiant[2] << std::endl;
-		_out << indentation << "diffuse: " << dirLight->diffuse[0] << " " << dirLight->diffuse[1] << " " << dirLight->diffuse[2] << std::endl;
-		_out << indentation << "specular: " << dirLight->specular[0] << " " << dirLight->specular[1] << " " << dirLight->specular[2] << std::endl;
+
+		SaveColor( _json, "ambiant", dirLight->ambiant );
+		SaveColor( _json, "diffuse", dirLight->diffuse );
+		SaveColor( _json, "specular", dirLight->specular );
+		Component::Save( _json );
+
 		return true;
 	}
 

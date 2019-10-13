@@ -36,6 +36,6 @@ namespace fan {
 
 	private:
 		std::string m_jsonPath;
-		nlohmann::json m_json;
+		Json m_json;
 	};
 }
