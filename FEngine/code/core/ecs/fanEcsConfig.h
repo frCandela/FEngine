@@ -21,8 +21,6 @@ namespace fan {
 	//================================================================================================================================
 	// Bitsets & masks
 	//================================================================================================================================
-	using ecsEntity = uint32_t; 
-	const ecsEntity ecsNullEntity = std::numeric_limits< ecsEntity >::max();
 	using ecsHandle = uint64_t;
 	const ecsHandle ecsNullHandle = std::numeric_limits< ecsHandle >::max();
 	using ecsBitset = Bitset2::bitset2< 32 >;

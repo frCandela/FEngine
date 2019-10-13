@@ -15,17 +15,18 @@ namespace fan {
 		void OnGui() override;
 		bool IsUnique() const override { return true; }
 
-		void SetSpeed( const float _speed )		{ m_speed = _speed; };
-		void SetRadius( const float _radius )	{ m_radius = _radius; };
-		void SetPhase( const float _phase )		{ m_phase = _phase; };
+		void SetSpeed( const float _speed );
+		void SetRadius( const float _radius );
+		void SetPhase( const float _phase );
 
 		DECLARE_EDITOR_COMPONENT(Planet)
 		DECLARE_TYPE_INFO(Planet);
 	protected:
+		void OnAttach() override;
+		void OnDetach() override;
+
 	private:
 
-		float m_speed = 1.f;
-		float m_radius = 1.f;
-		float m_phase = 0.f;
+		ecsPlanet* Planet::GetEcsPlanet() const;
 	};
 }

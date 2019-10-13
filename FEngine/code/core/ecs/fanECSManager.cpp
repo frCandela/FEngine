@@ -74,6 +74,7 @@ namespace fan {
 	//================================================================================================================================
 	void EcsManager::Update( float _delta ) {
 		RunSystem< ParticleSystem::signature::componentsTypes, ParticleSystem >::Run( _delta, m_activeEntitiesCount, m_entitiesData, m_components );
+		RunSystem< PlanetsSystem::signature::componentsTypes, PlanetsSystem >::Run( _delta, m_activeEntitiesCount, m_entitiesData, m_components );
 	}
 
 	//================================================================================================================================

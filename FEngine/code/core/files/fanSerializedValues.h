@@ -15,8 +15,6 @@ namespace fan {
 		bool GetVec3( const std::string & _key, btVector3 & _outVec3 );
 		void SetVec3( const std::string & _key, btVector3 _vec3 );
 
-
-
 		template <typename T>
 		void SetValue( const std::string & _key, const T& _value ) { m_json[_key] = _value; }
 

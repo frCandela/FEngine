@@ -30,6 +30,7 @@ namespace fan {
 	// Declare your signatures here
 	//================================	
 	using ecsParticleSignature = ecsSignature< ecsTranform, ecsMovement, ecsParticle >;
+	using ecsPlanetSignature   = ecsSignature< ecsTranform, ecsPlanet >;
 
 	static constexpr ecsBitset tot1 = ecsParticleSignature::componentsBitset;
 
@@ -53,5 +54,15 @@ namespace fan {
 			std::vector< ecsTranform > & _transforms,
 			std::vector< ecsMovement > & _movements,
 			std::vector< ecsParticle > & _particles );
+	};
+
+	//================================
+	// PlanetsSystem
+	//================================
+	class PlanetsSystem : public ISystem<  ecsPlanetSignature > {
+	public:
+		static void Run( float _delta, const size_t _count, std::vector< ecsEntityData >& _entitiesData,
+			std::vector< ecsTranform > & _transforms,
+			std::vector< ecsPlanet > & _planets );
 	};
 }

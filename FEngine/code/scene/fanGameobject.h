@@ -46,6 +46,7 @@ namespace fan
 		const AABB &	GetAABB() const;
 		void			ComputeAABB();
 		Transform *		GetTransform() const  { return m_transform; }
+		ecsHandle		GetEcsHandle(){ return m_ecsHandleEntity; }
 
 		// Gameobject scene tree parenting
 		Gameobject* GetParent() const { return m_parent; }

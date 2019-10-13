@@ -11,4 +11,5 @@ namespace fan {
 	const char * ecsPointLight::s_name  = "PointLight";
 	const char * ecsDirLight::s_name	= "DirLight  ";
 	const char * ecsMaterial::s_name	= "Material  ";
+	const char * ecsPlanet::s_name		= "Planet    ";
 }

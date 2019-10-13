@@ -17,25 +17,52 @@ namespace fan {
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void Planet::Update(const float /*_delta*/) {
-		Actor::OnGui();
-
-		Transform * parentTransform = GetGameobject()->GetParent()->GetComponent<Transform>();
-
-		float time = -m_speed * Time::ElapsedSinceStartup();
-		btVector3 position(std::cosf(time + m_phase), 0, std::sinf(time + m_phase));
-		btVector3 parentPosition = parentTransform->GetPosition();
-
-		Transform * transform = GetGameobject()->GetComponent<Transform>();
-		transform->SetPosition(parentPosition + m_radius * position);
+	void Planet::OnAttach() {
+		Actor::OnAttach();
+		GetGameobject()->AddEcsComponent<ecsPlanet>();
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
+	void Planet::OnDetach() {
+		Actor::OnDetach();
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
+	void Planet::Update(const float /*_delta*/) {
+		Actor::OnGui();
+
+		// Updates the parent entity
+		ecsPlanet * planet = GetEcsPlanet();
+		ecsHandle handle = GetGameobject()->GetParent()->GetEcsHandle();
+		GetGameobject()->GetScene()->GetEcsManager()->FindEntity( handle , planet->parentEntity );
+
+// 		ecsPlanet * planet = GetEcsPlanet();
+// 
+// 		Transform * parentTransform = GetGameobject()->GetParent()->GetComponent<Transform>();
+// 
+// 		float time = -planet->speed * Time::ElapsedSinceStartup();
+// 		btVector3 position(std::cosf(time + planet->phase), 0, std::sinf(time + planet->phase));
+// 		btVector3 parentPosition = parentTransform->GetPosition();
+// 
+// 		Transform * transform = GetGameobject()->GetComponent<Transform>();
+// 		transform->SetPosition(parentPosition + planet->radius * position);
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
+	void Planet::SetSpeed( const float _speed )		{ GetEcsPlanet()->speed = _speed; };
+	void Planet::SetRadius( const float _radius )	{ GetEcsPlanet()->radius = _radius; };
+	void Planet::SetPhase( const float _phase )		{ GetEcsPlanet()->phase = _phase; };
+
+	//================================================================================================================================
+	//================================================================================================================================
 	void Planet::OnGui() {
-		ImGui::DragFloat("radius", &m_radius, 0.1f, 0.f, 100.f);
-		ImGui::DragFloat("speed", &m_speed,   0.1f, 0.f, 10.f);
-		ImGui::DragFloat("phase", &m_phase, PI/3, 0.f, 2 * PI);
+		ecsPlanet * planet = GetEcsPlanet();
+		ImGui::DragFloat("radius", &planet->radius, 0.1f, 0.f, 100.f);
+		ImGui::DragFloat("speed", &planet->speed,   0.1f, 0.f, 10.f);
+		ImGui::DragFloat("phase", &planet->phase, PI/3, 0.f, 2 * PI);
 	}
 
 	//================================================================================================================================
@@ -43,9 +70,11 @@ namespace fan {
 	bool Planet::Save(std::ostream& _out, const int _indentLevel) const {
 		Actor::Save(_out, _indentLevel);
 		const std::string indentation = GetIndentation(_indentLevel);
-		_out << indentation << "radius: " << m_radius << std::endl;
-		_out << indentation << "speed:  " << m_speed << std::endl;
-		_out << indentation << "phase:  " << m_phase << std::endl;
+		ecsPlanet * planet = GetEcsPlanet();
+
+		_out << indentation << "radius: " << planet->radius << std::endl;
+		_out << indentation << "speed:  " << planet->speed << std::endl;
+		_out << indentation << "phase:  " << planet->phase << std::endl;
 		return true;
 	}
 
@@ -53,15 +82,20 @@ namespace fan {
 	//================================================================================================================================
 	bool Planet::Load(std::istream& _in) {
 		Actor::Load(_in);
+		ecsPlanet * planet = GetEcsPlanet();
 
 		if (!ReadSegmentHeader(_in, "radius:")) { return false; }
-		if (!ReadFloat(_in, m_radius)) { return false; }
+		if (!ReadFloat(_in, planet->radius)) { return false; }
 
 		if (!ReadSegmentHeader(_in, "speed:")) { return false; }
-		if (!ReadFloat(_in, m_speed)) { return false; }
+		if (!ReadFloat(_in, planet->speed)) { return false; }
 
 		if (!ReadSegmentHeader(_in, "phase:")) { return false; }
-		if (!ReadFloat(_in, m_phase)) { return false; }
+		if (!ReadFloat(_in, planet->phase)) { return false; }
 		return true;
 	}
+
+	//================================================================================================================================
+	//================================================================================================================================
+	ecsPlanet* Planet::GetEcsPlanet() const { return GetGameobject()->GetEcsComponent<ecsPlanet>(); }
 }
