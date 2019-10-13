@@ -1,5 +1,5 @@
 #include "fanGlobalIncludes.h"
-#include "core/ecs/fanEcsComponents.h"
+#include "ecs/fanECSComponents.h"
 
 namespace fan {
 	const char * ecsTranform::s_name	= "Tranform  ";

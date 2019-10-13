@@ -5,7 +5,7 @@
 #include "scene/fanGameobject.h"
 #include "scene/fanScene.h"	
 #include "core/fanSignal.h"
-#include "core/ecs/fanECSManager.h"
+#include "ecs/fanECSManager.h"
 
 namespace fan
 {

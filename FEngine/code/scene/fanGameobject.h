@@ -3,7 +3,7 @@
 #include "core/fanSignal.h"
 #include "core/math/shapes/fanAABB.h"
 #include "core/fanISerializable.h"
-#include "core/ecs/fanECSManager.h"	
+#include "ecs/fanECSManager.h"	
 #include "scene/fanScene.h"
 
 

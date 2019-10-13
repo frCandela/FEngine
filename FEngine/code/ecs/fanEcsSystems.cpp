@@ -1,5 +1,5 @@
 #include "fanGlobalIncludes.h"
-#include "core/ecs/fanEcsSystems.h"
+#include "ecs/fanECSSystems.h"
 
 #include "renderer/fanRenderer.h"
 #include "core/fanTime.h"

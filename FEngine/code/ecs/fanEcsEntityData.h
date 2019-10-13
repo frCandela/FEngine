@@ -1,6 +1,6 @@
 #pragma once
 
-#include "core/ecs/fanECSConfig.h"
+#include "ecs/fanECSConfig.h"
 
 namespace fan {
 	struct ecsEntityData {

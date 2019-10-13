@@ -68,9 +68,6 @@
     <Filter Include="code\deps\quickhull">
       <UniqueIdentifier>{44acb24b-72dd-4b2d-8cd3-41c926ff8f80}</UniqueIdentifier>
     </Filter>
-    <Filter Include="code\core\ecs">
-      <UniqueIdentifier>{357d54ad-d1f0-4477-b80c-1bfb8e5c08ca}</UniqueIdentifier>
-    </Filter>
     <Filter Include="code\core\meta">
       <UniqueIdentifier>{14e822f4-e834-4ad6-aa6e-ec83ea9d8b56}</UniqueIdentifier>
     </Filter>
@@ -79,6 +76,9 @@
     </Filter>
     <Filter Include="code\physics">
       <UniqueIdentifier>{bf42697b-30af-4e6e-92de-8df872802887}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="code\ecs">
+      <UniqueIdentifier>{357d54ad-d1f0-4477-b80c-1bfb8e5c08ca}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -307,18 +307,6 @@
     <ClCompile Include="code\scene\fanGameobject.cpp">
       <Filter>code\scene</Filter>
     </ClCompile>
-    <ClCompile Include="code\core\ecs\fanEcsSystems.cpp">
-      <Filter>code\core\ecs</Filter>
-    </ClCompile>
-    <ClCompile Include="code\core\ecs\fanEcsComponents.cpp">
-      <Filter>code\core\ecs</Filter>
-    </ClCompile>
-    <ClCompile Include="code\core\ecs\fanEcsConfig.cpp">
-      <Filter>code\core\ecs</Filter>
-    </ClCompile>
-    <ClCompile Include="code\core\ecs\fanEcsManager.cpp">
-      <Filter>code\core\ecs</Filter>
-    </ClCompile>
     <ClCompile Include="code\editor\windows\fanEcsWindow.cpp">
       <Filter>code\editor\windows</Filter>
     </ClCompile>
@@ -336,6 +324,18 @@
     </ClCompile>
     <ClCompile Include="code\scene\components\fanRigidbody.cpp">
       <Filter>code\scene\components</Filter>
+    </ClCompile>
+    <ClCompile Include="code\ecs\fanEcsConfig.cpp">
+      <Filter>code\ecs</Filter>
+    </ClCompile>
+    <ClCompile Include="code\ecs\fanEcsManager.cpp">
+      <Filter>code\ecs</Filter>
+    </ClCompile>
+    <ClCompile Include="code\ecs\fanEcsSystems.cpp">
+      <Filter>code\ecs</Filter>
+    </ClCompile>
+    <ClCompile Include="code\ecs\fanEcsComponents.cpp">
+      <Filter>code\ecs</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -1050,27 +1050,6 @@
     <ClInclude Include="code\scene\fanGameobject.h">
       <Filter>code\scene</Filter>
     </ClInclude>
-    <ClInclude Include="code\core\ecs\fanEcsConfig.h">
-      <Filter>code\core\ecs</Filter>
-    </ClInclude>
-    <ClInclude Include="code\core\ecs\fanEcsEntityData.h">
-      <Filter>code\core\ecs</Filter>
-    </ClInclude>
-    <ClInclude Include="code\core\ecs\fanEcsManager.h">
-      <Filter>code\core\ecs</Filter>
-    </ClInclude>
-    <ClInclude Include="code\core\ecs\fanEcsSystems.h">
-      <Filter>code\core\ecs</Filter>
-    </ClInclude>
-    <ClInclude Include="code\core\ecs\fanEcsBitsetCreator.h">
-      <Filter>code\core\ecs</Filter>
-    </ClInclude>
-    <ClInclude Include="code\core\ecs\fanEcsComponents.h">
-      <Filter>code\core\ecs</Filter>
-    </ClInclude>
-    <ClInclude Include="code\core\ecs\fanEcsComponentsTuple.h">
-      <Filter>code\core\ecs</Filter>
-    </ClInclude>
     <ClInclude Include="code\editor\windows\fanEcsWindow.h">
       <Filter>code\editor\windows</Filter>
     </ClInclude>
@@ -1088,6 +1067,27 @@
     </ClInclude>
     <ClInclude Include="code\scene\components\fanRigidbody.h">
       <Filter>code\scene\components</Filter>
+    </ClInclude>
+    <ClInclude Include="code\ecs\fanEcsComponentsTuple.h">
+      <Filter>code\ecs</Filter>
+    </ClInclude>
+    <ClInclude Include="code\ecs\fanEcsConfig.h">
+      <Filter>code\ecs</Filter>
+    </ClInclude>
+    <ClInclude Include="code\ecs\fanEcsEntityData.h">
+      <Filter>code\ecs</Filter>
+    </ClInclude>
+    <ClInclude Include="code\ecs\fanEcsManager.h">
+      <Filter>code\ecs</Filter>
+    </ClInclude>
+    <ClInclude Include="code\ecs\fanEcsSystems.h">
+      <Filter>code\ecs</Filter>
+    </ClInclude>
+    <ClInclude Include="code\ecs\fanEcsBitsetCreator.h">
+      <Filter>code\ecs</Filter>
+    </ClInclude>
+    <ClInclude Include="code\ecs\fanEcsComponents.h">
+      <Filter>code\ecs</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

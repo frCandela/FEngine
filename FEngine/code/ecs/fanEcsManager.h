@@ -1,6 +1,6 @@
 #pragma once
 
-#include "core/ecs/fanEcsSystems.h"
+#include "ecs/fanECSSystems.h"
 
 namespace fan {
 	//================================================================================================================================

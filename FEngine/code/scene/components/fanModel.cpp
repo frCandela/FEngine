@@ -8,7 +8,7 @@
 #include "core/math/shapes/fanAABB.h"
 #include "core/math/shapes/fanConvexHull.h"
 #include "core/files/fanFbxImporter.h"
-#include "core/ecs/fanECSConfig.h"
+#include "ecs/fanECSConfig.h"
 
 // Editor
 #include "editor/fanModals.h"

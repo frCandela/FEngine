@@ -1,5 +1,5 @@
 #include "fanGlobalIncludes.h"
-#include "core/ecs/fanECSManager.h"
+#include "ecs/fanECSManager.h"
 #include "core/fanTime.h"
 
 namespace fan {

@@ -1,8 +1,8 @@
 #pragma once
 
-#include "core/ecs/fanEcsComponents.h"
-#include "core/ecs/fanEcsComponentsTuple.h"
-#include "core/ecs/fanEcsBitsetCreator.h"
+#include "ecs/fanECSComponents.h"
+#include "ecs/fanECSComponentsTuple.h"
+#include "ecs/fanECSBitsetCreator.h"
 
 namespace fan {
 

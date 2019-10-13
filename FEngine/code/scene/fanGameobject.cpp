@@ -7,7 +7,7 @@
 #include "scene/components/fanTransform.h"
 
 #include "renderer/fanMesh.h"
-#include "core/ecs/fanECSManager.h"
+#include "ecs/fanECSManager.h"
 #include "core/fanSignal.h"
 
 

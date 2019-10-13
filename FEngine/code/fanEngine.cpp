@@ -17,7 +17,7 @@
 #include "core/math/shapes/fanAABB.h"
 #include "core/math/fanBasicModels.h"
 #include "core/files/fanFbxImporter.h"
-#include "core/ecs/fanECSManager.h"
+#include "ecs/fanECSManager.h"
 #include "editor/fanModals.h"
 #include "editor/fanMainMenuBar.h"
 #include "editor/windows/fanRenderWindow.h"	
@@ -38,7 +38,7 @@
 #include "scene/components/fanPointLight.h"
 #include "scene/components/fanDirectionalLight.h"
 #include "core/math/shapes/fanConvexHull.h"
-#include "core/ecs/fanECSManager.h"
+#include "ecs/fanECSManager.h"
 #include "physics/fanPhysicsManager.h"
 
 namespace fan {

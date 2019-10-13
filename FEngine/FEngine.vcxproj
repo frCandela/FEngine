@@ -85,10 +85,6 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="code\core\ecs\fanEcsComponents.cpp" />
-    <ClCompile Include="code\core\ecs\fanEcsConfig.cpp" />
-    <ClCompile Include="code\core\ecs\fanEcsManager.cpp" />
-    <ClCompile Include="code\core\ecs\fanEcsSystems.cpp" />
     <ClCompile Include="code\core\fanDebug.cpp" />
     <ClCompile Include="code\core\fanISerializable.cpp" />
     <ClCompile Include="code\core\fanTime.cpp" />
@@ -111,6 +107,10 @@
     <ClCompile Include="code\core\ressources\fanRessource.cpp" />
     <ClCompile Include="code\core\ressources\fanRessourcePtr.cpp" />
     <ClCompile Include="code\core\scope\fanScopedTimer.cpp" />
+    <ClCompile Include="code\ecs\fanEcsComponents.cpp" />
+    <ClCompile Include="code\ecs\fanEcsConfig.cpp" />
+    <ClCompile Include="code\ecs\fanEcsManager.cpp" />
+    <ClCompile Include="code\ecs\fanEcsSystems.cpp" />
     <ClCompile Include="code\editor\components\fanFPSCamera.cpp" />
     <ClCompile Include="code\editor\fanEditorGrid.cpp" />
     <ClCompile Include="code\editor\fanMainMenuBar.cpp" />
@@ -172,13 +172,6 @@
     <ClCompile Include="deps\quickhull\QuickHull.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="code\core\ecs\fanEcsBitsetCreator.h" />
-    <ClInclude Include="code\core\ecs\fanEcsComponents.h" />
-    <ClInclude Include="code\core\ecs\fanEcsComponentsTuple.h" />
-    <ClInclude Include="code\core\ecs\fanEcsConfig.h" />
-    <ClInclude Include="code\core\ecs\fanEcsEntityData.h" />
-    <ClInclude Include="code\core\ecs\fanEcsManager.h" />
-    <ClInclude Include="code\core\ecs\fanEcsSystems.h" />
     <ClInclude Include="code\core\fanDebug.h" />
     <ClInclude Include="code\core\fanHash.h" />
     <ClInclude Include="code\core\fanISerializable.h" />
@@ -209,6 +202,13 @@
     <ClInclude Include="code\core\ressources\fanRessource.h" />
     <ClInclude Include="code\core\ressources\fanRessourcePtr.h" />
     <ClInclude Include="code\core\scope\fanScopedTimer.h" />
+    <ClInclude Include="code\ecs\fanEcsBitsetCreator.h" />
+    <ClInclude Include="code\ecs\fanEcsComponents.h" />
+    <ClInclude Include="code\ecs\fanEcsComponentsTuple.h" />
+    <ClInclude Include="code\ecs\fanEcsConfig.h" />
+    <ClInclude Include="code\ecs\fanEcsEntityData.h" />
+    <ClInclude Include="code\ecs\fanEcsManager.h" />
+    <ClInclude Include="code\ecs\fanEcsSystems.h" />
     <ClInclude Include="code\editor\components\fanFPSCamera.h" />
     <ClInclude Include="code\editor\fanEditorGrid.h" />
     <ClInclude Include="code\editor\fanMainMenuBar.h" />
