@@ -8,6 +8,7 @@
 #include "scene/components/fanModel.h"
 #include "scene/components/fanActor.h"
 #include "core/fanSignal.h"
+#include "core/scope/fanScopedTimer.h"
 
 namespace fan
 {
@@ -220,6 +221,8 @@ namespace fan
 	//================================================================================================================================
 	//================================================================================================================================
 	bool Scene::Load(std::istream & _in) {
+		ScopedTimer timer("load scene");
+
 		if (!ReadSegmentHeader(_in)) { return false; }
 		int nbEntities = 42;
 		if (!ReadInteger(_in, nbEntities) || nbEntities != 1) { return false; }
@@ -240,6 +243,7 @@ namespace fan
 		if (inStream.is_open()) {
 			// Load scene
 			Debug::Get() << Debug::Severity::log << "loading scene: " << _path << Debug::Endl();
+
 			if (Load(inStream)) {
 				Debug::Log("Load success");
 				m_path = _path;

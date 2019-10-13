@@ -74,6 +74,9 @@
     <Filter Include="code\core\meta">
       <UniqueIdentifier>{14e822f4-e834-4ad6-aa6e-ec83ea9d8b56}</UniqueIdentifier>
     </Filter>
+    <Filter Include="code\core\scope">
+      <UniqueIdentifier>{d92c1cef-a6e2-4bab-9acc-41dafa031338}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="deps\imgui\imgui.cpp">
@@ -321,6 +324,9 @@
     </ClCompile>
     <ClCompile Include="code\game\fanPlanet.cpp">
       <Filter>code\game</Filter>
+    </ClCompile>
+    <ClCompile Include="code\core\scope\fanScopedTimer.cpp">
+      <Filter>code\core\scope</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -1064,6 +1070,9 @@
     </ClInclude>
     <ClInclude Include="code\game\fanPlanet.h">
       <Filter>code\game</Filter>
+    </ClInclude>
+    <ClInclude Include="code\core\scope\fanScopedTimer.h">
+      <Filter>code\core\scope</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
