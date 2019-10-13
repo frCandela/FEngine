@@ -30,7 +30,7 @@ namespace fan
 		
 		// Get/add/delete components
 		template<typename ComponentType> ComponentType*				 AddComponent();	
-		template< typename _componentType >	bool					 AddEcsComponent() const;
+		template< typename _componentType >	_componentType*			 AddEcsComponent() const;
 		template<typename ComponentType> ComponentType*				 GetComponent();	
 		template< typename _componentType >	_componentType*			 GetEcsComponent() const;
 		template<typename ComponentType> std::vector<ComponentType*> GetComponents();	
@@ -151,14 +151,13 @@ namespace fan
 	//================================================================================================================================
 	// Adds a component to the ecs manager using the ecs entity of the gameobject
 	//================================================================================================================================
-	template< typename _componentType >	bool  Gameobject::AddEcsComponent() const {
+	template< typename _componentType >	_componentType * Gameobject::AddEcsComponent() const {
 		static_assert( IsComponent< _componentType>::value );
-
+		EcsManager * ecsManager = m_scene->GetEcsManager();
 		ecsEntity entity;
-		if ( m_scene->GetEcsManager()->FindEntity( m_ecsHandleEntity, entity ) ) {
-			m_scene->GetEcsManager()->AddComponent<_componentType>(entity);
-			return true;
+		if ( ecsManager->FindEntity( m_ecsHandleEntity, entity ) && ecsManager->AddComponent<_componentType>( entity ) ) {			
+			return ecsManager->FindComponentFromEntity<_componentType>( entity );
 		}
-		return false;
+		return nullptr;
 	}
 }

@@ -13,11 +13,13 @@ namespace fan {
 		DECLARE_EDITOR_COMPONENT( Rigidbody )
 		DECLARE_TYPE_INFO( Rigidbody );		
 	protected:
-		virtual bool Load( Json & _json ) override;
-		virtual bool Save( Json & _json ) const override;
-		
+		bool Load( Json & _json ) override;
+		bool Save( Json & _json ) const override;
+		void OnAttach() override;
+
 	private:
-		btRigidBody * _rigidbody;
+		btRigidBody * m_rigidbody;
+		btDefaultMotionState  * m_motionState;
 	};
 
 }

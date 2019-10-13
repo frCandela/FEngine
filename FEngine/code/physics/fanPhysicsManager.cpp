@@ -28,6 +28,7 @@ namespace fan {
 	//================================================================================================================================	
 	void PhysicsManager::OnGui() {
 		ImGui::Begin( "Physics" ); {
+			ImGui::Text(std::to_string(sizeof( btRigidBody )).c_str());
 
 		} ImGui::End();
 	}

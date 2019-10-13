@@ -87,7 +87,32 @@ namespace fan {
 		float radius	= 1.f;
 		float phase		= 0.f;
 		ecsEntity parentEntity; // Updated in the component before the ecs call
-	};
+	}; 
+
+	//================================
+	struct ecsRigidbody : ecsIComponent {
+		static const char * s_name;
+		char bufferRigidbody[sizeof( btRigidBody )]; // dummy btRigidBody memory to bypass btRigidBody constructor
+		
+		btRigidBody * Init( const btRigidBody::btRigidBodyConstructionInfo& constructionInfo ) {
+			return new( bufferRigidbody ) btRigidBody( constructionInfo );
+		}
+		inline btRigidBody& Get() { return *reinterpret_cast<btRigidBody*>( bufferRigidbody ); }
+
+	}; static_assert( sizeof(ecsRigidbody) == sizeof( btRigidBody ) );
+
+	//================================
+	struct ecsMotionState : ecsIComponent {
+		static const char * s_name;
+		char bufferMotionState[sizeof( btDefaultMotionState )]; // dummy btMotionState memory to bypass btDefaultMotionState constructor
+
+		btDefaultMotionState * Init(	const btTransform &_startTrans = btTransform::getIdentity(),
+										const btTransform &_centerOfMassOffset = btTransform::getIdentity() ) {
+			return new( bufferMotionState ) btDefaultMotionState( _startTrans, _centerOfMassOffset );
+		}
+		inline btDefaultMotionState& Get() { return *reinterpret_cast<btDefaultMotionState*>( bufferMotionState ); }
+
+	}; static_assert( sizeof( ecsMotionState ) == sizeof( btDefaultMotionState ) );
 
 	//================================
 	//================================
@@ -102,6 +127,8 @@ namespace fan {
 		, ecsDirLight
 		, ecsMaterial
 		, ecsPlanet
+		, ecsRigidbody
+		, ecsMotionState
 	>;
 	 
 	template< typename _type > struct IsComponent { static constexpr bool value = std::is_base_of< ecsIComponent, _type >::value; };
