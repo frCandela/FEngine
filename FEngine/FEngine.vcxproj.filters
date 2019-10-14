@@ -337,6 +337,12 @@
     <ClCompile Include="code\ecs\fanEcsComponents.cpp">
       <Filter>code\ecs</Filter>
     </ClCompile>
+    <ClCompile Include="code\scene\components\fanSphereShape.cpp">
+      <Filter>code\scene\components</Filter>
+    </ClCompile>
+    <ClCompile Include="code\scene\components\fanBoxShape.cpp">
+      <Filter>code\scene\components</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="code\editor\fanMainMenuBar.h">
@@ -1088,6 +1094,12 @@
     </ClInclude>
     <ClInclude Include="code\ecs\fanEcsComponents.h">
       <Filter>code\ecs</Filter>
+    </ClInclude>
+    <ClInclude Include="code\scene\components\fanSphereShape.h">
+      <Filter>code\scene\components</Filter>
+    </ClInclude>
+    <ClInclude Include="code\scene\components\fanBoxShape.h">
+      <Filter>code\scene\components</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -1,59 +1,70 @@
 #include "fanGlobalIncludes.h"
-#include "scene/components/fanActor.h"
+#include "scene/components/fanBoxShape.h"
 
 #include "scene/fanGameobject.h"
-#include "core/fanSignal.h"
 
-namespace fan
-{
-	Signal< Actor * > Actor::onActorAttach;
-	Signal< Actor * > Actor::onActorDetach;
+
+namespace fan {
+
+	REGISTER_EDITOR_COMPONENT( BoxShape );
+	REGISTER_TYPE_INFO( BoxShape )
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void Actor::OnAttach() {
-		onActorAttach.Emmit(this);
+	void BoxShape::SetHalfExtent( const btVector3 _halfExtent ) {
+		GetEcsBoxShape()->Get().setLocalScaling( _halfExtent );
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void Actor::OnDetach() {
-		onActorDetach.Emmit(this);
+	void BoxShape::OnAttach() {
+		ecsBoxShape * boxShape = GetGameobject()->AddEcsComponent<ecsBoxShape>();
+		boxShape->Init( btVector3::One() );
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void Actor::SetEnabled( const bool _enabled ) { 
-		if ( m_isEnabled != _enabled ) {
-			m_isEnabled = _enabled;
-			if ( m_isEnabled ) {
-				OnEnable();
-			} else {
-				OnDisable();
-			}
+	void BoxShape::OnDetach() {
+		GetGameobject()->RemoveEcsComponent<ecsBoxShape>();
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
+	void BoxShape::OnGui() {
+		Component::OnGui();
+
+		btVector3 halfExtent = GetEcsBoxShape()->Get().getLocalScaling();
+		if ( ImGui::DragFloat3("half extent", &halfExtent[0], 0.25f, 0.f ) ) {
+			SetHalfExtent( halfExtent );
 		}
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void Actor::OnGui() {
-		Component::OnGui();
-	}
-
-	//================================================================================================================================
-	//================================================================================================================================
-	bool Actor::Load( Json & /*_json*/ ) {
-// 		if (!ReadSegmentHeader(_in, "isEnabled:")) { return false; }
-// 		if (!ReadBool(_in, m_isEnabled)) { return false; }
+	bool BoxShape::Load( Json & /*_json*/ ) {
+		// 		if (!ReadSegmentHeader(_in, "isEnabled:")) { return false; }
+		// 		if (!ReadBool(_in, m_isEnabled)) { return false; }
 		return true;
 	}
 
 
 	//================================================================================================================================
 	//================================================================================================================================
-	bool Actor::Save( Json & _json ) const {
+	bool BoxShape::Save( Json & _json ) const {
 		//SaveBool( jActor, "isEnabled", m_isEnabled );
 		Component::Save( _json );
 		return true;
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
+	ecsBoxShape*	BoxShape::GetEcsBoxShape() const {
+		return GetGameobject()->GetEcsComponent<ecsBoxShape>();
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
+	btBoxShape * BoxShape::GetBtShape() {
+		return &GetEcsBoxShape()->Get();
 	}
 }

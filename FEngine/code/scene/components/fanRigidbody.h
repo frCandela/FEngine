@@ -7,9 +7,6 @@ namespace fan {
 	//================================================================================================================================	
 	class Rigidbody : public Component {
 	public:
-		Rigidbody();
-		~Rigidbody();
-
 		btRigidBody *	GetBtBody() { return m_rigidbody; }
 		float			GetMass() const;
 		void			SetMass( const float _mass );
@@ -32,9 +29,11 @@ namespace fan {
 		void OnDetach() override;
 
 	private:
-		btRigidBody * m_rigidbody =  nullptr;
+		btRigidBody *			m_rigidbody =  nullptr;
 		btDefaultMotionState  * m_motionState = nullptr;
-		btCollisionShape* m_colShape = nullptr;
+		btCollisionShape*		m_colShape = nullptr;
+
+		void FindCollisionShape();
 	};
 
 }

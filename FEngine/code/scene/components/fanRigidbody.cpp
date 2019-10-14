@@ -1,33 +1,44 @@
 #include "fanGlobalIncludes.h"
 #include "scene/components/fanRigidbody.h"
+
 #include "scene/fanGameobject.h"
 #include "physics/fanPhysicsManager.h"
+#include "scene/components/fanSphereShape.h"
+#include "scene/components/fanBoxShape.h"
 
 namespace fan {
 	REGISTER_EDITOR_COMPONENT( Rigidbody );
 	REGISTER_TYPE_INFO( Rigidbody )
 
 	//================================================================================================================================
-	//================================================================================================================================	
-	Rigidbody::Rigidbody() {
-
-	}
-
-	//================================================================================================================================
-	//================================================================================================================================	
-	Rigidbody::~Rigidbody() {
-
-	}
-
-	//================================================================================================================================
 	// Updates the rigidbody pointers
 	// Happens when too much rigidbodies are created in the ecs and their container is resized
 	//================================================================================================================================	
-	void Rigidbody::Refresh() {		
+	void Rigidbody::Refresh() {	
+		FindCollisionShape();
 		m_motionState = & GetGameobject()->GetEcsComponent<ecsMotionState>()->Get();
 		m_rigidbody = & GetGameobject()->GetEcsComponent<ecsRigidbody>()->Get();
 		m_rigidbody->setCollisionShape( m_colShape );
 		m_rigidbody->setMotionState(m_motionState);
+	}
+
+	//================================================================================================================================
+	// TODO refacto of collision shapes
+	//================================================================================================================================	
+	void Rigidbody::FindCollisionShape() {
+		m_colShape = nullptr;
+
+		SphereShape * sphereShape = GetGameobject()->GetComponent<SphereShape>();
+		if ( sphereShape != nullptr ) {
+			m_colShape = sphereShape->GetBtShape();
+			return;
+		}
+
+		BoxShape * boxShape = GetGameobject()->GetComponent<BoxShape>();
+		if ( boxShape != nullptr ) {
+			m_colShape = boxShape->GetBtShape();
+			return;
+		}
 	}
 
 	//================================================================================================================================
@@ -41,10 +52,11 @@ namespace fan {
 
 		float startMass = 1.f;
 
-		m_colShape = new btSphereShape( btScalar( 1.f ) );
+		FindCollisionShape();
+
 		bool isDynamic = ( startMass != 0.f );
 		btVector3 localInertia( 0, 0, 0 );
-		if ( isDynamic ) {
+		if ( isDynamic && m_colShape != nullptr ) {
 			m_colShape->calculateLocalInertia( startMass, localInertia );
 		}
 
@@ -76,7 +88,7 @@ namespace fan {
 	void  Rigidbody::SetMass( const float _mass ) {
 		float mass = _mass >= 0.f ? _mass : 0.f;
 		btVector3 localInertia( 0.f, 0.f, 0.f );
-		if ( mass != 0.f ) {			
+		if ( mass != 0.f  && m_colShape ) {			
 			m_colShape->calculateLocalInertia( mass, localInertia );
 		}
 		m_rigidbody->setMassProps( mass, localInertia );
@@ -142,7 +154,7 @@ namespace fan {
 		}
 		
 		// Mass
-		if ( ImGui::Button( "##Velocity" ) ) {
+		if ( ImGui::Button( "##Mass" ) ) {
 			SetMass( 0.f );
 		} ImGui::SameLine();
 		float invMass =  m_rigidbody->getInvMass();
@@ -160,9 +172,11 @@ namespace fan {
 			SetVelocity(velocity);
 		}
 
-
-
-
+		// Test
+		if ( ImGui::Button( "test" ) ) {
+			FindCollisionShape();
+			m_rigidbody->setCollisionShape(m_colShape);
+		}
 	}
 
 	//================================================================================================================================

@@ -1,48 +1,47 @@
 #include "fanGlobalIncludes.h"
-#include "scene/components/fanActor.h"
-
+#include "scene/components/fanSphereShape.h"
 #include "scene/fanGameobject.h"
-#include "core/fanSignal.h"
+
 
 namespace fan
 {
-	Signal< Actor * > Actor::onActorAttach;
-	Signal< Actor * > Actor::onActorDetach;
+	REGISTER_EDITOR_COMPONENT( SphereShape );
+	REGISTER_TYPE_INFO( SphereShape )
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void Actor::OnAttach() {
-		onActorAttach.Emmit(this);
+	void  SphereShape::SetRadius( const float _radius ) {
+		GetEcsSphereShape()->Get().setUnscaledRadius( _radius >= 0 ? _radius : 0.f );
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void Actor::OnDetach() {
-		onActorDetach.Emmit(this);
+	void SphereShape::OnAttach() {
+		ecsSphereShape * sphereShape = GetGameobject()->AddEcsComponent<ecsSphereShape>();
+		sphereShape->Init(1.f);
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void Actor::SetEnabled( const bool _enabled ) { 
-		if ( m_isEnabled != _enabled ) {
-			m_isEnabled = _enabled;
-			if ( m_isEnabled ) {
-				OnEnable();
-			} else {
-				OnDisable();
-			}
+	void SphereShape::OnDetach() {
+		GetGameobject()->RemoveEcsComponent<ecsSphereShape>();
+	}
+
+
+	//================================================================================================================================
+	//================================================================================================================================
+	void SphereShape::OnGui() {
+		Component::OnGui();
+
+		float radius = GetEcsSphereShape()->Get().getRadius();
+		if ( ImGui::DragFloat( "radius", &radius, 0.1f, 0.f ) ) {
+			SetRadius( radius );
 		}
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void Actor::OnGui() {
-		Component::OnGui();
-	}
-
-	//================================================================================================================================
-	//================================================================================================================================
-	bool Actor::Load( Json & /*_json*/ ) {
+	bool SphereShape::Load( Json & /*_json*/ ) {
 // 		if (!ReadSegmentHeader(_in, "isEnabled:")) { return false; }
 // 		if (!ReadBool(_in, m_isEnabled)) { return false; }
 		return true;
@@ -51,9 +50,21 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	bool Actor::Save( Json & _json ) const {
+	bool SphereShape::Save( Json & _json ) const {
 		//SaveBool( jActor, "isEnabled", m_isEnabled );
 		Component::Save( _json );
 		return true;
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
+	ecsSphereShape*	SphereShape::GetEcsSphereShape() const {
+		return GetGameobject()->GetEcsComponent<ecsSphereShape>();
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
+	btSphereShape * SphereShape::GetBtShape() {
+		return &GetEcsSphereShape()->Get();
 	}
 }

@@ -128,6 +128,31 @@ namespace fan {
 	}; static_assert( sizeof( ecsMotionState ) == sizeof( btDefaultMotionState ) );
 
 	//================================
+	struct ecsSphereShape : ecsIComponent {
+		static const char * s_name;
+		char bufferSphereShape[sizeof( btSphereShape )]; // dummy btSphereShape memory to bypass btDefaultMotionState constructor
+
+		btSphereShape * Init( const float _radius ) {
+			return new( bufferSphereShape ) btSphereShape( _radius );
+		}
+		inline btSphereShape& Get() { return *reinterpret_cast<btSphereShape*>( bufferSphereShape ); }
+
+	}; static_assert( sizeof( ecsSphereShape ) == sizeof( btSphereShape ) );
+
+	//================================
+	struct ecsBoxShape : ecsIComponent {
+		static const char * s_name;
+		char bufferBoxShape[sizeof( btBoxShape )]; // dummy btBoxShape memory to bypass btDefaultMotionState constructor
+
+		btBoxShape * Init( const btVector3 _boxHalfExtents ) {
+			return new( bufferBoxShape ) 	btBoxShape( _boxHalfExtents );
+		}
+		inline 	btBoxShape& Get() { return *reinterpret_cast<btBoxShape*>( bufferBoxShape ); }
+
+	}; static_assert( sizeof( ecsBoxShape ) == sizeof( btBoxShape ) );
+	
+
+	//================================
 	//================================
 	using ecsComponents = meta::TypeList<
 		ecsTranform
@@ -144,6 +169,8 @@ namespace fan {
 		, ecsPlanet
 		, ecsRigidbody
 		, ecsMotionState
+		, ecsSphereShape
+		, ecsBoxShape
 	>;
 	 
 	template< typename _type > struct IsComponent { static constexpr bool value = std::is_base_of< ecsIComponent, _type >::value; };

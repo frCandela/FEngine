@@ -16,4 +16,6 @@ namespace fan {
 	const char * ecsPlanet::s_name		= "Planet     ";
 	const char * ecsRigidbody::s_name	= "Rigidbody  ";
 	const char * ecsMotionState::s_name	= "MotionState";	
+	const char * ecsSphereShape::s_name = "SphereShape";
+	const char * ecsBoxShape::s_name	= "BoxShape   ";
 }
