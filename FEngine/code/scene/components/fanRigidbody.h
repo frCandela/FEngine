@@ -10,7 +10,15 @@ namespace fan {
 		Rigidbody();
 		~Rigidbody();
 
-		void SetMass( const float _mass );
+		btRigidBody *	GetBtBody() { return m_rigidbody; }
+		float			GetMass() const;
+		void			SetMass( const float _mass );
+		void			SetStatic( const bool _static );
+		bool			IsStatic() const;
+		void			Activate();		
+		bool			IsActive() const;
+		btVector3		GetVelocity() const;
+		void			SetVelocity( const btVector3& _velocity );
 
 		DECLARE_EDITOR_COMPONENT( Rigidbody )
 		DECLARE_TYPE_INFO( Rigidbody );		
@@ -19,11 +27,12 @@ namespace fan {
 		bool Save( Json & _json ) const override;
 		void OnGui() override;
 		void OnAttach() override;
+		void OnDetach() override;
 
 	private:
-		btRigidBody * m_rigidbody;
-		btDefaultMotionState  * m_motionState;
-		btCollisionShape* m_colShape;
+		btRigidBody * m_rigidbody =  nullptr;
+		btDefaultMotionState  * m_motionState = nullptr;
+		btCollisionShape* m_colShape = nullptr;
 	};
 
 }
