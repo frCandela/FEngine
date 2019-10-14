@@ -28,6 +28,21 @@ namespace fan {
 
 	//================================================================================================================================
 	//================================================================================================================================	
+	void PhysicsManager::RemoveRigidbody( btRigidBody * _rigidbody ) {
+		m_dynamicsWorld->removeRigidBody(_rigidbody);
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================	
+	void PhysicsManager::Clear() {
+		for (int  bodyIndex = m_dynamicsWorld->getNumCollisionObjects() - 1; bodyIndex >= 0; bodyIndex-- ) {
+			btCollisionObject* obj = m_dynamicsWorld->getCollisionObjectArray()[bodyIndex];
+			m_dynamicsWorld->removeCollisionObject( obj );
+		}
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================	
 	PhysicsManager::~PhysicsManager() {
 		delete m_dynamicsWorld;
 		delete m_solver;
@@ -41,6 +56,9 @@ namespace fan {
 	void PhysicsManager::OnGui() {
 		ImGui::Begin( "Physics" ); {			
 			ImGui::Text( std::to_string( m_dynamicsWorld->getNumCollisionObjects() ).c_str() );
+			if ( ImGui::Button( "clear" ) ) {
+				Clear();
+			}
 
 		} ImGui::End();
 	}

@@ -21,6 +21,7 @@ namespace fan
 	//================================================================================================================================
 	void Material::OnDetach() {
 		Component::OnDetach();
+		GetGameobject()->RemoveEcsComponent<ecsMaterial>();
 		onMaterialDetach.Emmit(this);
 	}
 

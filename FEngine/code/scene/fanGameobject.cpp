@@ -66,7 +66,7 @@ namespace fan
 	//================================================================================================================================
 	// Remove the component from the gameobject and deletes it			
 	//================================================================================================================================
-	bool Gameobject::DeleteComponent(const Component * component)
+	bool Gameobject::RemoveComponent(const Component * component)
 	{
 		// Find the component
 		for (int componentIndex = 0; componentIndex < m_components.size(); ++componentIndex)

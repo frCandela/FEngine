@@ -41,6 +41,7 @@ namespace fan
 	
 	protected:
 		void OnAttach() override;
+		void OnDetach() override;
 
 	private:
 		ecsTranform*	GetEcsTransform() const;

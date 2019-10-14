@@ -50,6 +50,7 @@ namespace fan
 	//================================================================================================================================
 	void PointLight::OnDetach() {
 		Component::OnDetach();
+		GetGameobject()->RemoveEcsComponent<ecsPointLight>();
 		onPointLightDetach.Emmit(this);
 	}
 

@@ -33,6 +33,7 @@ namespace fan
 	//================================================================================================================================
 	void Model::OnDetach() {
 		Component::OnDetach();
+		GetGameobject()->RemoveEcsComponent<ecsModel>();
 		onUnRegisterModel.Emmit(this);
 	}
 

@@ -14,6 +14,8 @@ namespace fan {
 
 		void StepSimulation( const float _delta );
 		void AddRigidbody( btRigidBody * _rigidbody );
+		void RemoveRigidbody( btRigidBody * _rigidbody );
+		void Clear();
 
 	private:
 

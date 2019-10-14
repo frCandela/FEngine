@@ -34,8 +34,9 @@ namespace fan
 		template<typename ComponentType> ComponentType*				 GetComponent();	
 		template< typename _componentType >	_componentType*			 GetEcsComponent() const;
 		template<typename ComponentType> std::vector<ComponentType*> GetComponents();	
+		template< typename _componentType > void					 RemoveEcsComponent();
 
-		bool							DeleteComponent(const Component * _component);		
+		bool							RemoveComponent(const Component * _component);		
 		Component*						AddComponent( const uint32_t _componentID );
 		const std::vector<Component*> & GetComponents() const { return m_components; }
 
@@ -160,5 +161,17 @@ namespace fan
 			return ecsManager->FindComponentFromEntity<_componentType>( entity );
 		}
 		return nullptr;
+	}
+
+	//================================================================================================================================
+	// Removes a component from the ecs manager using the ecs entity of the gameobject
+	//================================================================================================================================
+	template< typename _componentType > void Gameobject::RemoveEcsComponent() {
+		static_assert( IsComponent< _componentType>::value );
+		EcsManager * ecsManager = m_scene->GetEcsManager();
+		ecsEntity entity;
+		if ( ecsManager->FindEntity( m_ecsHandleEntity, entity ) ) {
+			ecsManager->RemoveComponent<_componentType>( entity );
+		}
 	}
 }

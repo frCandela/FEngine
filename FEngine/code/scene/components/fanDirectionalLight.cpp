@@ -44,6 +44,7 @@ namespace fan {
 	//================================================================================================================================
 	void DirectionalLight::OnDetach() {
 		Component::OnDetach();
+		GetGameobject()->RemoveEcsComponent<ecsDirLight>();
 		onDirectionalLightDetach.Emmit( this );
 	}
 

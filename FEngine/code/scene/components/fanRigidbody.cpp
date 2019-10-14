@@ -22,6 +22,8 @@ namespace fan {
 	//================================================================================================================================
 	//================================================================================================================================	
 	void Rigidbody::OnAttach() {
+		Component::OnAttach();
+
 		ecsMotionState * motionState = GetGameobject()->AddEcsComponent<ecsMotionState>();
 		ecsRigidbody * rigidbody = GetGameobject()->AddEcsComponent<ecsRigidbody>();
 		ecsTranform * transform = GetGameobject()->GetEcsComponent<ecsTranform>();
@@ -45,7 +47,10 @@ namespace fan {
 	//================================================================================================================================
 	//================================================================================================================================	
 	void Rigidbody::OnDetach() {
-
+		Component::OnDetach();
+		GetGameobject()->GetScene()->GetPhysicsManager()->RemoveRigidbody( m_rigidbody );
+		GetGameobject()->RemoveEcsComponent<ecsMotionState>();
+		GetGameobject()->RemoveEcsComponent<ecsRigidbody>();
 	}
 
 	//================================================================================================================================

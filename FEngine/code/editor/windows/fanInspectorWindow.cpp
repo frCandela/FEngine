@@ -57,7 +57,7 @@ namespace fan
 					ss << "X" << "##" << component->GetName() << componentCount++;	// make unique id
 					ImGui::SameLine(ImGui::GetWindowWidth() - 40);
 					if (ImGui::Button(ss.str().c_str())) {
-						m_gameobjectSelected->DeleteComponent(component);
+						m_gameobjectSelected->RemoveComponent(component);
 						component = nullptr;
 					}
 				}
