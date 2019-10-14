@@ -2,6 +2,7 @@
 
 namespace fan {
 	class EcsManager;
+	class Rigidbody;
 
 	//================================================================================================================================
 	//================================================================================================================================	
@@ -13,11 +14,13 @@ namespace fan {
 		void OnGui();
 
 		void StepSimulation( const float _delta );
-		void AddRigidbody( btRigidBody * _rigidbody );
-		void RemoveRigidbody( btRigidBody * _rigidbody );
+		void AddRigidbody( Rigidbody * _rigidbody );
+		void RemoveRigidbody( Rigidbody * _rigidbody );		
 		void Clear();
+		void Refresh();
 
 	private:
+		std::set<Rigidbody*> m_rigidbodies;
 
 		// Bullet objects
 		btDefaultCollisionConfiguration*		m_collisionConfiguration;

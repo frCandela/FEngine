@@ -37,6 +37,7 @@
 #include "scene/components/fanMaterial.h"
 #include "scene/components/fanPointLight.h"
 #include "scene/components/fanDirectionalLight.h"
+#include "scene/components/fanRigidbody.h"
 #include "core/math/shapes/fanConvexHull.h"
 #include "ecs/fanECSManager.h"
 #include "physics/fanPhysicsManager.h"
@@ -90,7 +91,8 @@ namespace fan {
 		m_mainMenuBar->onExit.Connect( &Engine::Exit, this );
 		onGameobjectSelected.Connect( &SceneWindow::OnGameobjectSelected, m_sceneWindow );
 		onGameobjectSelected.Connect( &InspectorWindow::OnGameobjectSelected, m_inspectorWindow );
-
+		m_ecsManager->onPreReallocPhysics.Connect( &PhysicsManager::Clear, m_physicsManager );
+		m_ecsManager->onPostReallocPhysics.Connect(&PhysicsManager::Refresh, m_physicsManager);
 		m_scene->onSceneLoad.Connect( &SceneWindow::OnSceneLoad, m_sceneWindow );
 		m_scene->onSceneLoad.Connect( &Engine::OnSceneLoad, this );
 		m_scene->onSceneClear.Connect  ( &Renderer::Clear, m_renderer );
@@ -482,9 +484,15 @@ namespace fan {
 	//================================================================================================================================
 	void Engine::DrawUI() {
 		//***************************************************************************************MYLITTLESPACE
-// 		ImGui::Begin("test"); {
-// 
-// 		} ImGui::End();
+		ImGui::Begin("test"); {
+			if ( ImGui::Button( "spawn" ) ) {
+				for (int Index = 0; Index < 100 ; Index++)
+				{
+					m_scene->CreateGameobject( "tmp" )->AddComponent<Rigidbody>();
+				}
+				
+			}
+		} ImGui::End();
 		//***************************************************************************************END_MYLITTLESPACE
 
 		m_mainMenuBar->Draw();

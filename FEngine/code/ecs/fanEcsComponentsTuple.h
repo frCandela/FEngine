@@ -10,6 +10,8 @@ namespace fan {
 		struct	ComponentData {
 			std::vector<_type>		vector;
 			std::vector<uint32_t>	recycleList;
+			Signal<> onPreRealloc;
+			Signal<> onPostRealloc;
 		};
 
 		//================================================================================================================================

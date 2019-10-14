@@ -20,6 +20,8 @@ namespace fan {
 		btVector3		GetVelocity() const;
 		void			SetVelocity( const btVector3& _velocity );
 
+		void Refresh();
+
 		DECLARE_EDITOR_COMPONENT( Rigidbody )
 		DECLARE_TYPE_INFO( Rigidbody );		
 	protected:

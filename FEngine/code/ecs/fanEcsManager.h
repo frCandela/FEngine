@@ -4,9 +4,13 @@
 
 namespace fan {
 	//================================================================================================================================
+	// /!\ When adding components, always call the corresponding onRealloc callback to update the binded data  /!\
 	//================================================================================================================================
 	class EcsManager {
 	public:
+		Signal<> onPreReallocPhysics;
+		Signal<> onPostReallocPhysics;
+
 		EcsManager();	
 
 		ecsEntity	CreateEntity();
@@ -50,8 +54,6 @@ namespace fan {
 		void	RemoveDeadEntities();
  	};
 
-
-
 	//================================================================================================================================
 	//================================================================================================================================
 	template< typename _componentType >
@@ -69,8 +71,10 @@ namespace fan {
 		// Get new component index
 		uint32_t componentIndex;		
 		if ( recycleList.empty() ) { // Create new index
-			if ( vector.size() + 1 >= vector.capacity() ) {
+			if ( vector.size() == vector.capacity() ) {
+				componentData.onPreRealloc.Emmit();
 				vector.reserve( 2 * vector.size() );
+				componentData.onPostRealloc.Emmit();
 				Debug::Log( "realloc components" );
 			}
 			componentIndex = static_cast<uint32_t>( vector.size() );

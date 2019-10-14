@@ -9,17 +9,27 @@ namespace fan {
 		m_entityToHandles.reserve( 512 );
 		m_entitiesData.reserve(1024);
 
-		m_components.Get<ecsRigidbody>().vector.reserve(1024);
-		m_components.Get<ecsMotionState>().vector.reserve( 1024 );
-		m_components.Get<ecsTranform>().vector.reserve( 1024 );
+		size_t capa0 = m_components.Get<ecsRigidbody>().vector.capacity();
+		m_components.Get<ecsRigidbody>().vector.reserve(3);
+		size_t capa1 = m_components.Get<ecsRigidbody>().vector.capacity();
+		(void )capa0; (void)capa1;
+
+		m_components.Get<ecsMotionState>().vector.reserve( 2 );
+		m_components.Get<ecsTranform>().vector.reserve( 2 );
+
+		m_components.Get<ecsRigidbody>().onPreRealloc.Connect( &Signal<>::Emmit, &onPreReallocPhysics );
+		m_components.Get<ecsMotionState>().onPreRealloc.Connect( &Signal<>::Emmit, &onPreReallocPhysics );
+		m_components.Get<ecsRigidbody>().onPostRealloc.Connect( &Signal<>::Emmit, &onPostReallocPhysics );
+		m_components.Get<ecsMotionState>().onPostRealloc.Connect( &Signal<>::Emmit, &onPostReallocPhysics );
+
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
 	ecsEntity EcsManager::CreateEntity() {
-		if ( m_entitiesData.size() + 1 >= m_entitiesData.capacity() ) {
+		if ( m_entitiesData.size() == m_entitiesData.capacity() ) {
 			m_entitiesData.reserve( 2 * m_entitiesData.size() );
-			Debug::Log("realloc");
+			Debug::Log("realloc entities");
 		}
 		ecsEntity entity = static_cast<ecsEntity>( m_entitiesData.size());
 		m_entitiesData.push_back( ecsEntityData() );

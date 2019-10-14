@@ -1,5 +1,6 @@
 #include "fanGlobalIncludes.h"
 #include "physics/fanPhysicsManager.h"
+#include "scene/components/fanRigidbody.h"
 
 namespace fan {
 	//================================================================================================================================
@@ -22,14 +23,16 @@ namespace fan {
 
 	//================================================================================================================================
 	//================================================================================================================================	
-	void PhysicsManager::AddRigidbody( btRigidBody * _rigidbody ) {
-		m_dynamicsWorld->addRigidBody( _rigidbody );
+	void PhysicsManager::AddRigidbody( Rigidbody * _rigidbody ) {
+		m_rigidbodies.insert(_rigidbody);
+		m_dynamicsWorld->addRigidBody( _rigidbody->GetBtBody() );
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================	
-	void PhysicsManager::RemoveRigidbody( btRigidBody * _rigidbody ) {
-		m_dynamicsWorld->removeRigidBody(_rigidbody);
+	void PhysicsManager::RemoveRigidbody( Rigidbody * _rigidbody ) {
+		m_rigidbodies.erase( _rigidbody );
+		m_dynamicsWorld->removeRigidBody( _rigidbody->GetBtBody() );
 	}
 
 	//================================================================================================================================
@@ -38,6 +41,17 @@ namespace fan {
 		for (int  bodyIndex = m_dynamicsWorld->getNumCollisionObjects() - 1; bodyIndex >= 0; bodyIndex-- ) {
 			btCollisionObject* obj = m_dynamicsWorld->getCollisionObjectArray()[bodyIndex];
 			m_dynamicsWorld->removeCollisionObject( obj );
+		}
+	}
+	//================================================================================================================================
+	// Clears the world and add the refreshed rigidbodies
+	// Happens when too much rigidbodies are created in the ecs and their container is resized
+	//================================================================================================================================	
+	void PhysicsManager::Refresh() {
+		Debug::Warning("refresh");
+		for ( Rigidbody * rb : m_rigidbodies ){
+			rb->Refresh();
+			m_dynamicsWorld->addRigidBody( rb->GetBtBody() );
 		}
 	}
 

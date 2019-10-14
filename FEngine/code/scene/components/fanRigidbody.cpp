@@ -20,6 +20,17 @@ namespace fan {
 	}
 
 	//================================================================================================================================
+	// Updates the rigidbody pointers
+	// Happens when too much rigidbodies are created in the ecs and their container is resized
+	//================================================================================================================================	
+	void Rigidbody::Refresh() {		
+		m_motionState = & GetGameobject()->GetEcsComponent<ecsMotionState>()->Get();
+		m_rigidbody = & GetGameobject()->GetEcsComponent<ecsRigidbody>()->Get();
+		m_rigidbody->setCollisionShape( m_colShape );
+		m_rigidbody->setMotionState(m_motionState);
+	}
+
+	//================================================================================================================================
 	//================================================================================================================================	
 	void Rigidbody::OnAttach() {
 		Component::OnAttach();
@@ -41,14 +52,14 @@ namespace fan {
 		btRigidBody::btRigidBodyConstructionInfo rbInfo( 1.f, m_motionState, m_colShape );
 		m_rigidbody = rigidbody->Init( rbInfo );
 
-		GetGameobject()->GetScene()->GetPhysicsManager()->AddRigidbody( m_rigidbody );
+		GetGameobject()->GetScene()->GetPhysicsManager()->AddRigidbody( this );
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================	
 	void Rigidbody::OnDetach() {
 		Component::OnDetach();
-		GetGameobject()->GetScene()->GetPhysicsManager()->RemoveRigidbody( m_rigidbody );
+		GetGameobject()->GetScene()->GetPhysicsManager()->RemoveRigidbody( this );
 		GetGameobject()->RemoveEcsComponent<ecsMotionState>();
 		GetGameobject()->RemoveEcsComponent<ecsRigidbody>();
 	}
