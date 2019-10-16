@@ -9,75 +9,50 @@ namespace fan {
 	public:
 		AlignedMemory() : 
 			m_data( nullptr )
-			,m_totalSize(0)
+			,m_size(0)
 			,m_alignment(0)
-			,m_ratio(0){
-		}
+		{}
 
 		~AlignedMemory() {
-			AlignedFree(m_data);
-			m_data = nullptr;
+			btAlignedFree(m_data);
 		}
+		
+		size_t	Alignment() const { return m_alignment; }
+		void	SetAlignement( const size_t _alignment ) {
+			assert( std::_Is_pow_2( _alignment ) );
+			assert( _alignment > sizeof( T ) && m_alignment >> 1 < sizeof( T ) );
 
-		void Resize(size_t _size, size_t _alignment) {
-			assert(_alignment >= sizeof(T));
-
-			AlignedFree(m_data);
-			m_data = nullptr;
-			m_totalSize = _size;
 			m_alignment = _alignment;
-
-			m_ratio = m_alignment / sizeof(uint32_t);
-			m_data = AlignedAlloc(_size, _alignment);
 		}
-		size_t GetTotalSize() const	{ return m_totalSize; }
-		size_t GetAlignment() const { return m_alignment; }
+
+		size_t	Size() const { return m_size; }
+		void Resize(size_t _size) {
+			assert(m_alignment > 0 );
+
+			void * oldData = m_data;
+			
+			m_data = btAlignedAlloc(_size *m_alignment, (int)m_alignment);
+
+			if ( oldData != nullptr ) {
+				memcpy( m_data, oldData, m_size );
+				btAlignedFree( oldData );
+				oldData = nullptr;
+			}
+
+			m_size = _size;
+		}
+		
+		static constexpr size_t tmp = sizeof(void*);
 
 		T& operator[](const int& _pos) {
 			assert(m_data != nullptr);
-			void * uint32Adress = static_cast<uint32_t*>(m_data) + _pos * m_ratio;
-			return *static_cast<T*>(uint32Adress);
+			void * adress = static_cast<char*>( m_data ) + m_alignment * _pos;
+			return *static_cast<T*>( adress );
 		}
 
 	private:
 		void * m_data;
-		size_t m_totalSize; 
+		size_t m_size; 
 		size_t m_alignment;
-		size_t m_ratio;
-
-		// Wrapper functions for aligned memory allocation
-		// There is currently no standard for this in C++ that works across all platforms and vendors, so we abstract this
-		void* AlignedAlloc(size_t _size, size_t _alignment);
-		void AlignedFree(void* _data);
 	};
-
-	//================================================================================================================================
-	//================================================================================================================================
-	template<typename T>
-	void* AlignedMemory<T>::AlignedAlloc(size_t _size, size_t _alignment)
-	{
-		void *data = nullptr;
-#if defined(_MSC_VER) || defined(__MINGW32__)
-		data = _aligned_malloc(_size, _alignment);
-#else 
-		int res = posix_memalign(&data, _alignment, _size);
-		if (res != 0)
-			data = nullptr;
-#endif
-		return data;
-	}
-
-	//================================================================================================================================
-	//================================================================================================================================
-	template<typename T>
-	void AlignedMemory<T>::AlignedFree(void* _data)
-	{
-		if (_data != nullptr) {
-#if	defined(_MSC_VER) || defined(__MINGW32__)
-			_aligned_free(_data);
-#else 
-			free(_data);
-#endif
-		}
-	}
 }

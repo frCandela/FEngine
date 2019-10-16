@@ -2,7 +2,6 @@
 
 #include "renderer/util/fanVertex.h"
 #include "core/math/shapes/fanAABB.h"
-#include "core/memory/fanAlignedMemory.h"
 
 namespace fan
 {

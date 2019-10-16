@@ -82,8 +82,9 @@ namespace fan
 	class ForwardPipeline : public Pipeline {
 	public:
 		// Uniforms
-		AlignedMemory<DynamicUniformsMaterial> m_dynamicUniformsMaterial;
-		AlignedMemory<DynamicUniformsVert> m_dynamicUniformsVert;
+		AlignedMemory<DynamicUniformsMaterial>	m_dynamicUniformsMaterial;
+		AlignedMemory<DynamicUniformsVert>		m_dynamicUniformsVert;
+
 		LightsUniforms	m_lightUniforms;
 		VertUniforms	m_vertUniforms;
 		FragUniforms	m_fragUniforms;
