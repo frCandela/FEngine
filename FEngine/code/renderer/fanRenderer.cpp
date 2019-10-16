@@ -33,11 +33,9 @@ namespace fan
 
 		m_swapchain =	new SwapChain(*m_device);		
 		m_clearColor = glm::vec4(0.f, 0.f, 0.2f, 1.f);
-		m_numMesh = 0;
 
 		m_swapchain->Create(m_window->GetSurface(), _size);
-		Input::Get().Setup(m_window->GetWindow());
-            
+		Input::Get().Setup(m_window->GetWindow());            
             
 		CreateRenderPass();
 		CreateRenderPassPostprocess();
@@ -82,6 +80,11 @@ namespace fan
 		m_debugLinesvertexBuffers.resize(m_swapchain->GetSwapchainImagesCount());
 		m_debugLinesNoDepthTestVertexBuffers.resize(m_swapchain->GetSwapchainImagesCount());
 		m_debugTrianglesvertexBuffers.resize(m_swapchain->GetSwapchainImagesCount());
+
+		const size_t initialSize = 16;
+		m_meshDrawArray.reserve( initialSize );
+		m_forwardPipeline->m_dynamicUniformsVert.Resize( initialSize );
+		m_forwardPipeline->m_dynamicUniformsMaterial.Resize( initialSize );
 	}
 	
 	//================================================================================================================================
@@ -263,51 +266,33 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void Renderer::SetDynamicUniformVert( const glm::mat4 _modelMat, const glm::mat4 _rotationMat, const uint32_t _index ) {
-		assert( _index < GlobalValues::s_maximumNumModels );
-		m_forwardPipeline->m_dynamicUniformsVert[_index].modelMat = _modelMat;
-		m_forwardPipeline->m_dynamicUniformsVert[_index].normalMat = _rotationMat;
-	}
-	//================================================================================================================================
-	//================================================================================================================================
-	void Renderer::SetDynamicUniformFrag( const glm::vec3  _color, const glm::int32 _shininess, const glm::int32 _textureIndex, const uint32_t _index ) {
-		assert( _index < GlobalValues::s_maximumNumModels );
-		m_forwardPipeline->m_dynamicUniformsMaterial[_index].color = _color;
-		m_forwardPipeline->m_dynamicUniformsMaterial[_index].shininess = _shininess;
-		m_forwardPipeline->m_dynamicUniformsMaterial[_index].textureIndex = _textureIndex;
+	void Renderer::SetDrawData( const std::vector<DrawData> & _drawData ) {
+		if ( _drawData.size() > m_meshDrawArray.capacity() ) {
+			Debug::Warning("Resizing draw data arrays");
+			WaitIdle();
+			const size_t newSize = 2 * _drawData.size();
+			m_meshDrawArray.reserve( newSize );
+			m_forwardPipeline->ResizeDynamicDescriptors( newSize );
+		}
+
+		m_meshDrawArray.clear();
+		for (int dataIndex = 0; dataIndex < _drawData.size(); dataIndex++)	{
+			const DrawData& data = _drawData[dataIndex];
+
+			// Transform
+			m_forwardPipeline->m_dynamicUniformsVert[dataIndex].modelMat = data.modelMatrix;
+			m_forwardPipeline->m_dynamicUniformsVert[dataIndex].normalMat = data.normalMatrix;
+
+			// material
+			m_forwardPipeline->m_dynamicUniformsMaterial[dataIndex].color = data.color;
+			m_forwardPipeline->m_dynamicUniformsMaterial[dataIndex].shininess = data.shininess;
+			m_forwardPipeline->m_dynamicUniformsMaterial[dataIndex].textureIndex = data.textureIndex;
+
+			// Mesh
+			m_meshDrawArray.push_back( data.mesh );
+		}
 	}
 
-	//================================================================================================================================
-	//================================================================================================================================
-	void Renderer::SetMeshAt( const uint32_t _index, Mesh * _mesh ) {
-		assert( _index < GlobalValues::s_maximumNumModels );
-		m_meshDrawArray[_index] = _mesh;
-	}
-
-	//================================================================================================================================
-	//================================================================================================================================
-	void Renderer::SetNumMesh( const uint32_t _num ) {
-		assert( _num < GlobalValues::s_maximumNumModels );
-		m_numMesh = _num;
-	}
-
-	//================================================================================================================================
-	//================================================================================================================================
-	void Renderer::SetTransformAt( const uint32_t _index, glm::mat4 _modelMatrix, glm::mat4 _normalMatrix ) {
-		assert( _index < GlobalValues::s_maximumNumModels );
-		m_forwardPipeline->m_dynamicUniformsVert[_index].modelMat	  = _modelMatrix;
-		m_forwardPipeline->m_dynamicUniformsVert[_index].normalMat = _normalMatrix;
-	}
-
-	//================================================================================================================================
-	//================================================================================================================================
-	void Renderer::SetMaterialAt( const uint32_t _index, const glm::vec3 _color, const uint32_t _shininess, const uint32_t _textureIndex ) {
-		assert( _index < GlobalValues::s_maximumNumModels );
-		m_forwardPipeline->m_dynamicUniformsMaterial[_index].color = _color;
-		m_forwardPipeline->m_dynamicUniformsMaterial[_index].shininess = _shininess;
-		m_forwardPipeline->m_dynamicUniformsMaterial[_index].textureIndex = _textureIndex;
-	}
-	
 	//================================================================================================================================
 	//================================================================================================================================
 	void Renderer::RecordAllCommandBuffers() {
@@ -542,7 +527,7 @@ namespace fan
 		if (vkBeginCommandBuffer(commandBuffer, &commandBufferBeginInfo) == VK_SUCCESS) {
 			m_forwardPipeline->Bind( commandBuffer, _index );
 
-			for ( uint32_t meshIndex = 0; meshIndex < m_numMesh; meshIndex++ ) {
+			for ( uint32_t meshIndex = 0; meshIndex < m_meshDrawArray.size(); meshIndex++ ) {
 				Mesh * mesh = m_meshDrawArray[meshIndex];
 
 				if ( mesh != nullptr ) {

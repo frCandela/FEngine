@@ -359,6 +359,7 @@ namespace fan {
 	}
 
 	//================================================================================================================================
+	// TODO use an ecs system to do this
 	//================================================================================================================================
 	void Engine::UpdateRenderer() {
 		// Camera
@@ -394,24 +395,35 @@ namespace fan {
 		} m_renderer->SetNumDirectionalLights( static_cast<uint32_t>( m_directionalLights.size() ) );
 
 		// Transforms, mesh, materials
+
+		std::vector<DrawData> drawData( m_models.size() );
 		for (int modelIndex = 0; modelIndex < m_models.size() ; modelIndex++) {
+
+			DrawData& data = drawData[modelIndex];
 			Model * model = m_models[modelIndex];
-			Transform * transform = model->GetGameobject()->GetComponent<Transform>();
+			Transform * transform = model->GetGameobject()->GetTransform();
 			Material * material = model->GetGameobject()->GetComponent<Material>();
 
-			m_renderer->SetMeshAt( modelIndex, model->GetMesh() );
-			m_renderer->SetTransformAt( modelIndex, transform->GetModelMatrix(), transform->GetNormalMatrix() );
+			// Mesh
+			data.mesh = model->GetMesh();
+
+			// Transform
+			data.modelMatrix = transform->GetModelMatrix();
+			data.normalMatrix = transform->GetNormalMatrix();			
+
+			// Materials
 			if ( material != nullptr ) {
 				const uint32_t textureIndex = material->GetTexture() != nullptr ? material->GetTexture()->GetRenderID() : 0;
-				m_renderer->SetMaterialAt( modelIndex, material->GetColor().ToGLM(), material->GetShininess(), textureIndex );
+				data.color = material->GetColor().ToGLM3();
+				data.shininess = material->GetShininess();
+				data.textureIndex = textureIndex;
 			} else {
-				m_renderer->SetMaterialAt( modelIndex, Color::White.ToGLM(), 1, 0 );
+				data.color = Color::White.ToGLM3();
+				data.shininess = 1;
+				data.textureIndex = 0;
 			}
-
-		} m_renderer->SetNumMesh( static_cast<uint32_t>( m_models.size() ) );
-
-		// Materials
-
+		}
+		m_renderer->SetDrawData(drawData);
 	}
 
 	//================================================================================================================================

@@ -77,6 +77,7 @@ namespace fan
 	//================================================================================================================================
 	//================================================================================================================================
 	void Buffer::SetData(const void * _data, VkDeviceSize _size, VkDeviceSize _offset) {
+		assert( _size <= m_size);
 		vkMapMemory(m_device.vkDevice, m_memory, _offset, _size, 0, &m_mappedData);
 		memcpy(m_mappedData, _data, _size);
 		vkUnmapMemory(m_device.vkDevice, m_memory);

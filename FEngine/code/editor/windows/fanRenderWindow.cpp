@@ -43,8 +43,8 @@ namespace fan
 		}
 
 		if ( ImGui::CollapsingHeader( "Rendered Models : " ) ) {
-			const std::array< Mesh *, GlobalValues::s_maximumNumModels > & meshArray = m_renderer->GetMeshArray();
-			for ( uint32_t meshIndex = 0; meshIndex < m_renderer->GetNumMesh(); meshIndex++ ) {
+			const std::vector< Mesh *> & meshArray = m_renderer->GetMeshArray();
+			for ( uint32_t meshIndex = 0; meshIndex < meshArray.size(); meshIndex++ ) {
 				const Mesh * mesh = meshArray[meshIndex];
 				if ( mesh != nullptr ) {
 					ImGui::Text( mesh->GetPath().c_str() );

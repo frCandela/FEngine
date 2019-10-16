@@ -37,10 +37,10 @@ namespace fan
 		m_dynamicUniformsVert.SetAlignement( dynamicAlignmentVert );
 		m_dynamicUniformsMaterial.SetAlignement( dynamicAlignmentFrag );
 
-		m_dynamicUniformsVert.Resize( GlobalValues::s_maximumNumModels );
-		m_dynamicUniformsMaterial.Resize( GlobalValues::s_maximumNumModels );
+		m_dynamicUniformsVert.Resize( 256 );
+		m_dynamicUniformsMaterial.Resize( 256 );
 
-		for ( int uniformIndex = 0; uniformIndex < GlobalValues::s_maximumNumModels; uniformIndex++ ) {
+		for ( int uniformIndex = 0; uniformIndex < m_dynamicUniformsMaterial.Size(); uniformIndex++ ) {
 			m_dynamicUniformsMaterial[uniformIndex].color = glm::vec3( 1 );
 			m_dynamicUniformsMaterial[uniformIndex].textureIndex = 0;
 			m_dynamicUniformsMaterial[uniformIndex].shininess = 1;
@@ -82,6 +82,16 @@ namespace fan
 
 		CreateTextureDescriptor();
 
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
+	void ForwardPipeline::ResizeDynamicDescriptors( const size_t _newSize) {
+		m_dynamicUniformsVert.Resize( _newSize );
+		m_dynamicUniformsMaterial.Resize( _newSize );
+		m_sceneDescriptor->SetDynamicUniformBinding ( VK_SHADER_STAGE_VERTEX_BIT, m_dynamicUniformsVert.Size(), m_dynamicUniformsVert.Alignment(), 1 );
+		m_sceneDescriptor->SetDynamicUniformBinding ( VK_SHADER_STAGE_FRAGMENT_BIT, m_dynamicUniformsMaterial.Size(), m_dynamicUniformsMaterial.Alignment(), 3 );
+		m_sceneDescriptor->Update();
 	}
 
 	//================================================================================================================================

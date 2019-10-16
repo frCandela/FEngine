@@ -13,7 +13,6 @@ namespace fan {
 		static const std::set<std::string>	s_sceneExtensions;	
 
 		// rendering
-		static const uint32_t s_maximumNumModels = 128;
 		static const uint32_t s_maximumNumPointLights = 16;
 		static const uint32_t s_maximumNumDirectionalLight = 4;
 	};

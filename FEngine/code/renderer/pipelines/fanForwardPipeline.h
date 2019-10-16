@@ -96,7 +96,9 @@ namespace fan
 		void BindDescriptors( VkCommandBuffer _commandBuffer, const size_t _indexFrame, const uint32_t _indexOffset );
 		void UpdateUniformBuffers( const size_t _index = 0 ) override;
 		void CreateDescriptors( const size_t _numSwapchainImages, RessourceManager * const _ressourceManager );
+		void ResizeDynamicDescriptors ( const size_t _newSize );
 		void ReloadShaders() override;
+
 
 	protected:
 		void ConfigurePipeline() override;

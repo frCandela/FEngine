@@ -46,11 +46,19 @@ namespace fan {
 	//================================================================================================================================
 	// Adds a uniform buffer binding
 	//================================================================================================================================
-	void Descriptor::SetDynamicUniformBinding( VkShaderStageFlags  _stage, VkDeviceSize _bufferSize, VkDeviceSize _alignment ) {
-		BindingData bindingData;
-		bindingData.SetBuffers( m_device, m_numDescriptors, _bufferSize * _alignment, _alignment );
-		bindingData.UpdateLayoutBinding(  m_bindingData.size(), _stage, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC, 1 );
-		m_bindingData.push_back( bindingData );
+	void Descriptor::SetDynamicUniformBinding( VkShaderStageFlags  _stage, VkDeviceSize _bufferSize, VkDeviceSize _alignment, const int _index ) {
+		if ( _index < 0 ) {
+			BindingData bindingData;
+			bindingData.SetBuffers( m_device, m_numDescriptors, _bufferSize * _alignment, _alignment );
+			bindingData.UpdateLayoutBinding( m_bindingData.size(), _stage, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC, 1 );
+			m_bindingData.push_back( bindingData );
+		} else {
+			assert( _index < m_bindingData.size() );
+			for (int bufferIndex = 0; bufferIndex < m_bindingData[_index].buffers.size(); bufferIndex++){
+				delete m_bindingData[_index].buffers[bufferIndex];				
+			} m_bindingData[_index].buffers.clear();
+			m_bindingData[_index].SetBuffers( m_device, m_numDescriptors, _bufferSize * _alignment, _alignment );
+		}
 	}
 
 	//================================================================================================================================
