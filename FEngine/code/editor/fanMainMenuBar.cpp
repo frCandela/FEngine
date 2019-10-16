@@ -8,7 +8,7 @@
 #include "editor/windows/fanConsoleWindow.h"	
 #include "editor/fanEditorGrid.h"
 #include "core/files/fanSerializedValues.h"
-#include "core/input/fanInput.h"
+#include "core/input/fanInputManager.h"
 #include "core/input/fanKeyboard.h"
 #include "core/input/fanMouse.h"
 #include "editor/fanModals.h"
@@ -148,6 +148,10 @@ namespace fan
 			// Framerate
 			ImGui::SameLine(ImGui::GetWindowWidth() - 60);
 			if ( ImGui::BeginMenu( std::to_string(Time::Get().GetRealFramerate()).c_str(), false ) ) {ImGui::EndMenu();}
+			gui::ToolTip(" Framerate. (Right click to set)");
+
+
+
 			if ( ImGui::IsItemClicked( 1 ) ) {
 				ImGui::OpenPopup( "main_menu_bar_set_fps" );
 			}
@@ -162,6 +166,10 @@ namespace fan
 				float maxLogicFrequency = 1.f / Time::Get().GetLogicDelta();
 				if ( ImGui::DragFloat( "logic frequency", &maxLogicFrequency, 1.f, 1.f, 3000.f, "%.f" ) ) {
 					Time::Get().SetLogicDelta( maxLogicFrequency < 1.f ? 1.f : 1.f / maxLogicFrequency );
+				}
+				float maxPhysicsFrequency = 1.f / Time::Get().GetPhysicsDelta();
+				if ( ImGui::DragFloat( "physics frequency", &maxPhysicsFrequency, 1.f, 1.f, 3000.f, "%.f" ) ) {
+					Time::Get().SetPhysicsDelta( maxPhysicsFrequency < 1.f ? 1.f : 1.f / maxPhysicsFrequency );
 				}
 
 				ImGui::EndPopup();

@@ -1,7 +1,7 @@
 #include "fanGlobalIncludes.h"
 
 #include "editor/fanModals.h"
-#include "core/input/fanInput.h"
+#include "core/input/fanInputManager.h"
 #include "core/input/fanKeyboard.h"
 #include "core/input/fanMouse.h"
 
@@ -33,10 +33,16 @@ namespace fan
 	void gui::ShowHelpMarker(const char* _desc)
 	{
 		ImGui::TextDisabled("(?)");
-		if (ImGui::IsItemHovered()) {
+		ToolTip(_desc);
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
+	void gui::ToolTip( const char* _desc ) {
+		if ( ImGui::IsItemHovered() ) {
 			ImGui::BeginTooltip();
-			ImGui::PushTextWrapPos(ImGui::GetFontSize() * 35.0f);
-			ImGui::TextUnformatted(_desc);
+			ImGui::PushTextWrapPos( ImGui::GetFontSize() * 35.0f );
+			ImGui::TextUnformatted( _desc );
 			ImGui::PopTextWrapPos();
 			ImGui::EndTooltip();
 		}
