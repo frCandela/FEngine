@@ -33,7 +33,7 @@ namespace fan
 		void OnGui() override;
 
 		DECLARE_EDITOR_COMPONENT(Camera)
-		DECLARE_TYPE_INFO(Camera);
+		DECLARE_TYPE_INFO(Camera, Component );
 	protected:
 		void OnAttach() override;
 		bool Load( Json & _json ) override;

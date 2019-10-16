@@ -74,8 +74,9 @@ namespace fan {
 			if ( vector.size() == vector.capacity() ) {
 				componentData.onPreRealloc.Emmit();
 				vector.reserve( 2 * vector.size() );
-				componentData.onPostRealloc.Emmit();
 				Debug::Log( "realloc components" );
+				componentData.onPostRealloc.Emmit();
+				
 			}
 			componentIndex = static_cast<uint32_t>( vector.size() );
 			vector.push_back( _componentType() );

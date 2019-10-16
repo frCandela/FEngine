@@ -4,15 +4,15 @@ namespace fan
 {
 	//================================================================================================================================
 	//================================================================================================================================
-	inline std::vector< btVector3 > GetCube(const float _halfSize) {
-		const btVector3 v0(+_halfSize, +_halfSize, +_halfSize);
-		const btVector3 v1(+_halfSize, +_halfSize, -_halfSize);
-		const btVector3 v2(-_halfSize, +_halfSize, +_halfSize);
-		const btVector3 v3(-_halfSize, +_halfSize, -_halfSize);
-		const btVector3 v4(+_halfSize, -_halfSize, +_halfSize);
-		const btVector3 v5(+_halfSize, -_halfSize, -_halfSize);
-		const btVector3 v6(-_halfSize, -_halfSize, +_halfSize);
-		const btVector3 v7(-_halfSize, -_halfSize, -_halfSize);
+	inline std::vector< btVector3 > GetCube(const btVector3 _halfExtent ) {
+		const btVector3 v0( +_halfExtent[0], +_halfExtent[1], +_halfExtent[2] );
+		const btVector3 v1( +_halfExtent[0], +_halfExtent[1], -_halfExtent[2] );
+		const btVector3 v2( -_halfExtent[0], +_halfExtent[1], +_halfExtent[2] );
+		const btVector3 v3( -_halfExtent[0], +_halfExtent[1], -_halfExtent[2] );
+		const btVector3 v4( +_halfExtent[0], -_halfExtent[1], +_halfExtent[2] );
+		const btVector3 v5( +_halfExtent[0], -_halfExtent[1], -_halfExtent[2] );
+		const btVector3 v6( -_halfExtent[0], -_halfExtent[1], +_halfExtent[2] );
+		const btVector3 v7( -_halfExtent[0], -_halfExtent[1], -_halfExtent[2] );
 
 		return {
 			 v0,v1,v2	,v1,v3,v2	// top

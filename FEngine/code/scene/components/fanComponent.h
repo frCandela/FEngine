@@ -25,10 +25,12 @@ namespace fan
 		bool IsRemovable() const { return m_isRemovable; }
 		void SetRemovable(const bool _isRemovable) { m_isRemovable = _isRemovable; }
 
-		virtual bool IsActor() const { return false; }
+		virtual bool IsCollider()	const { return false; }
+		virtual bool IsActor()		const { return false; }
+
 		virtual void OnGui();
 
-		DECLARE_ABSTRACT_TYPE_INFO(Component);
+		DECLARE_ABSTRACT_TYPE_INFO(Component, ISerializable );
 	protected:
 		// Friend class gameobject is the factory of components
 		Component();

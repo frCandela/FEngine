@@ -13,7 +13,7 @@ namespace fan {
 		void OnGui() override;
 
 		DECLARE_EDITOR_COMPONENT(SpaceShip)
-		DECLARE_TYPE_INFO(SpaceShip);
+		DECLARE_TYPE_INFO(SpaceShip, Actor );
 	protected:
 		bool Load( Json & _json ) override;
 		bool Save( Json & _json ) const override;

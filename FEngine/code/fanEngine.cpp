@@ -38,6 +38,7 @@
 #include "scene/components/fanPointLight.h"
 #include "scene/components/fanDirectionalLight.h"
 #include "scene/components/fanRigidbody.h"
+#include "scene/components/fanSphereShape.h"
 #include "core/math/shapes/fanConvexHull.h"
 #include "ecs/fanECSManager.h"
 #include "physics/fanPhysicsManager.h"
@@ -485,12 +486,18 @@ namespace fan {
 	void Engine::DrawUI() {
 		//***************************************************************************************MYLITTLESPACE
 		ImGui::Begin("test"); {
+			static int nb = 1;
+			ImGui::DragInt("nb", &nb);
 			if ( ImGui::Button( "spawn" ) ) {
-				for (int Index = 0; Index < 100 ; Index++)
+				for (int Index = 0; Index < nb; Index++)
 				{
-					m_scene->CreateGameobject( "tmp" )->AddComponent<Rigidbody>();
-				}
-				
+					Gameobject * go =  m_scene->CreateGameobject( "tmp" );
+					go->GetTransform()->SetPosition(btVector3::Zero());
+					go->AddComponent<Rigidbody>();
+					go->AddComponent<SphereShape>();
+					Model * model = go->AddComponent<Model>();
+					model->SetPath("content/models/test/sphere.fbx");
+				}				
 			}
 		} ImGui::End();
 		//***************************************************************************************END_MYLITTLESPACE

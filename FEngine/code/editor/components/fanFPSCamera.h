@@ -28,7 +28,7 @@ namespace fan
 		void OnGui() override;
 
 		DECLARE_EDITOR_COMPONENT(FPSCamera);
-		DECLARE_TYPE_INFO(FPSCamera);
+		DECLARE_TYPE_INFO(FPSCamera, Actor );
 	protected:
 		void OnAttach() override;
 		void OnDetach() override;

@@ -98,8 +98,8 @@ namespace fan
 	//================================================================================================================================
 	void Gameobject::AddComponent(Component * _component) {
 		_component->m_gameobject = this;
-		m_components.push_back(_component);
 		_component->OnAttach();
+		m_components.push_back(_component);
 	}
 
 	//================================================================================================================================

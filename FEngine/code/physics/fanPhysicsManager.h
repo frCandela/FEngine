@@ -14,6 +14,8 @@ namespace fan {
 		void OnGui();
 
 		void StepSimulation( const float _delta );
+		void RegisterRigidbody( Rigidbody * _rigidbody );
+		void UnRegisterRigidbody( Rigidbody * _rigidbody );
 		void AddRigidbody( Rigidbody * _rigidbody );
 		void RemoveRigidbody( Rigidbody * _rigidbody );		
 		void Clear();
@@ -21,6 +23,7 @@ namespace fan {
 
 	private:
 		std::set<Rigidbody*> m_rigidbodies;
+		std::set<Rigidbody*> m_registeredRigidbodies;
 
 		// Bullet objects
 		btDefaultCollisionConfiguration*		m_collisionConfiguration;

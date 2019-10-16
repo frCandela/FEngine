@@ -14,7 +14,7 @@ namespace fan {
 		void OnGui() override;
 
 		DECLARE_EDITOR_COMPONENT( SolarSystem )
-		DECLARE_TYPE_INFO( SolarSystem );
+		DECLARE_TYPE_INFO( SolarSystem, Actor );
 	protected:
 		bool Load( Json & _json ) override;
 		bool Save( Json & _json ) const override;

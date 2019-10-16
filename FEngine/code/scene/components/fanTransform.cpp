@@ -16,8 +16,11 @@ namespace fan
 	void Transform::OnAttach() {
  		Component::OnAttach();
 
-		GetGameobject()->AddEcsComponent<ecsTranform>();
-		GetGameobject()->AddEcsComponent<ecsScaling>();
+		ecsTranform * transform = GetGameobject()->AddEcsComponent<ecsTranform>();
+		ecsScaling *  scaling = GetGameobject()->AddEcsComponent<ecsScaling>();
+
+		transform->transform =  btTransform::getIdentity();
+		scaling->scale = btVector3::One();
  
  		SetRemovable(false);
 	}

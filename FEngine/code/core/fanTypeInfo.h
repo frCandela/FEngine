@@ -39,7 +39,7 @@ namespace fan {
 
 	//================================================================================================================================
 	//================================================================================================================================
-#define DECLARE_TYPE_INFO_BASE( _name )						\
+#define DECLARE_TYPE_INFO_BASE( _name, _parentType )		\
 	public:													\
 	virtual uint32_t GetType() const{ return s_typeID; }	\
 	virtual const char * GetName() const{ return s_name; }	\
@@ -47,19 +47,20 @@ namespace fan {
 	bool IsType() {	return T::s_typeID == GetType(); }		\
 	static const char * s_name;								\
 	static const uint32_t s_typeID;							\
+	using parentType = _parentType;							\
 
 
 //================================================================================================================================
 //================================================================================================================================
-#define DECLARE_ABSTRACT_TYPE_INFO( _name )					\
-	DECLARE_TYPE_INFO_BASE( _name )							\
-	static void * NewInstance(){ return nullptr;}	
+#define DECLARE_ABSTRACT_TYPE_INFO( _name, _parentType )	\
+	DECLARE_TYPE_INFO_BASE( _name, _parentType )			\
+	static void * NewInstance(){ return nullptr;}			\
 
 //================================================================================================================================
 //================================================================================================================================
-#define DECLARE_TYPE_INFO( _name )						\
-	DECLARE_TYPE_INFO_BASE( _name )						\
-	static void * NewInstance(){ return new _name();}		
+#define DECLARE_TYPE_INFO( _name, _parentType )				\
+	DECLARE_TYPE_INFO_BASE( _name, _parentType )			\
+	static void * NewInstance(){ return new _name();}		\
 
 
 //================================================================================================================================

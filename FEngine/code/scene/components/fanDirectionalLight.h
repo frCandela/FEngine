@@ -22,7 +22,7 @@ namespace fan {
 		void  SetSpecular( const Color m_specular );
 
 		DECLARE_EDITOR_COMPONENT( DirectionalLight )
-		DECLARE_TYPE_INFO( DirectionalLight );
+		DECLARE_TYPE_INFO( DirectionalLight, Component );
 	protected:
 		bool Load( Json & _json )  override;
 		bool Save( Json & _json ) const override;

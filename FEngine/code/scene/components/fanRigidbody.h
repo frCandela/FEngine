@@ -17,10 +17,11 @@ namespace fan {
 		btVector3		GetVelocity() const;
 		void			SetVelocity( const btVector3& _velocity );
 
+		void SetCollisionShape( btCollisionShape * _collisionShape );
 		void Refresh();
 
 		DECLARE_EDITOR_COMPONENT( Rigidbody )
-		DECLARE_TYPE_INFO( Rigidbody );		
+		DECLARE_TYPE_INFO( Rigidbody, Component );
 	protected:
 		bool Load( Json & _json ) override;
 		bool Save( Json & _json ) const override;
@@ -33,7 +34,7 @@ namespace fan {
 		btDefaultMotionState  * m_motionState = nullptr;
 		btCollisionShape*		m_colShape = nullptr;
 
-		void FindCollisionShape();
+		btCollisionShape *  FindCollisionShape();
 	};
 
 }

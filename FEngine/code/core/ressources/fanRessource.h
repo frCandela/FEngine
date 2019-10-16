@@ -14,7 +14,7 @@ namespace fan {
 		virtual bool	Load() { return true; }
 		uint32_t		GetRessourceID() const { return m_ressourceID; }
 
-		DECLARE_ABSTRACT_TYPE_INFO(Ressource)
+		DECLARE_ABSTRACT_TYPE_INFO(Ressource, void )
 	protected:
 
 		Ressource() {}	

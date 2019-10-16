@@ -21,6 +21,7 @@ namespace fan
 		bool IsEnabled() const { return m_isEnabled; }
 		void SetEnabled(const bool _enabled);
 
+		DECLARE_ABSTRACT_TYPE_INFO( Actor, Component );
 	protected:
 		void OnAttach() override;
 		void OnDetach() override;

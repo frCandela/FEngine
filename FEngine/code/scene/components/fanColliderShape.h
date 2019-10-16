@@ -1,31 +1,26 @@
 #pragma once
 
-#include "scene/components/fanColliderShape.h"
+#include "scene/components/fanComponent.h"
+#include "core/fanSignal.h"
 
-namespace fan
-{
+namespace fan {
 	//================================================================================================================================
 	//================================================================================================================================
-	class SphereShape : public ColliderShape
-	{
+	class ColliderShape : public Component {
 	public:
-		void SetRadius( const float _radius );
-		float GetRadius() const;
+		bool IsCollider() const override { return true; }
 
-		btSphereShape *		GetSphereShape();
-		btCollisionShape *	GetCollisionShape() override;
+		virtual btCollisionShape * GetCollisionShape() = 0;
 
+		DECLARE_ABSTRACT_TYPE_INFO( ColliderShape, Component );
 	protected:
 		void OnAttach() override;
 		void OnDetach() override;
 		bool Load( Json & _json ) override;
 		bool Save( Json & _json ) const override;
 		void OnGui() override;
+	private:
 
-		DECLARE_EDITOR_COMPONENT( SphereShape )
-		DECLARE_TYPE_INFO( SphereShape, Component );
-	private:		
-		ecsSphereShape*	GetEcsSphereShape() const;
 
 	};
 }

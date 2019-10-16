@@ -107,7 +107,8 @@ namespace fan {
 				ecsMotionState& motionState = _motionStates[data.components[IndexOfComponent<ecsMotionState>::value]];
 				ecsRigidbody& rigidbody = _rigidbodies[data.components[IndexOfComponent<ecsRigidbody>::value]];
 
-				rigidbody.Get().getMotionState()->getWorldTransform( transform );
+				btMotionState * ms = rigidbody.Get().getMotionState();
+				ms->getWorldTransform( transform );
 				(void)motionState;(void )rigidbody;(void)transform;
 			}
 		}

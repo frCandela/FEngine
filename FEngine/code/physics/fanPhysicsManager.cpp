@@ -23,7 +23,22 @@ namespace fan {
 
 	//================================================================================================================================
 	//================================================================================================================================	
+	void PhysicsManager::RegisterRigidbody( Rigidbody * _rigidbody ) {
+		assert( m_registeredRigidbodies.find( _rigidbody ) == m_registeredRigidbodies.end() );
+		m_registeredRigidbodies.insert( _rigidbody );
+	}
+	
+	//================================================================================================================================
+	//================================================================================================================================	
+	void PhysicsManager::UnRegisterRigidbody( Rigidbody * _rigidbody ) {
+		assert( m_registeredRigidbodies.find( _rigidbody ) != m_registeredRigidbodies.end() );
+		m_registeredRigidbodies.erase( _rigidbody );
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================	
 	void PhysicsManager::AddRigidbody( Rigidbody * _rigidbody ) {
+		assert( m_rigidbodies.find(_rigidbody) == m_rigidbodies.end() );
 		m_rigidbodies.insert(_rigidbody);
 		m_dynamicsWorld->addRigidBody( _rigidbody->GetBtBody() );
 	}
@@ -38,6 +53,7 @@ namespace fan {
 	//================================================================================================================================
 	//================================================================================================================================	
 	void PhysicsManager::Clear() {
+		Debug::Warning( "clear physics" );
 		for (int  bodyIndex = m_dynamicsWorld->getNumCollisionObjects() - 1; bodyIndex >= 0; bodyIndex-- ) {
 			btCollisionObject* obj = m_dynamicsWorld->getCollisionObjectArray()[bodyIndex];
 			m_dynamicsWorld->removeCollisionObject( obj );
@@ -48,8 +64,9 @@ namespace fan {
 	// Happens when too much rigidbodies are created in the ecs and their container is resized
 	//================================================================================================================================	
 	void PhysicsManager::Refresh() {
-		Debug::Warning("refresh");
-		for ( Rigidbody * rb : m_rigidbodies ){
+		Debug::Warning("refresh physics");
+		std::set<Rigidbody*> copySet( m_registeredRigidbodies );
+		for ( Rigidbody * rb : copySet ){
 			rb->Refresh();
 			m_dynamicsWorld->addRigidBody( rb->GetBtBody() );
 		}

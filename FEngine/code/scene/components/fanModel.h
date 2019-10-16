@@ -32,7 +32,7 @@ namespace fan
 		void OnGui() override;
 
 		DECLARE_EDITOR_COMPONENT(Model)
-		DECLARE_TYPE_INFO(Model);
+		DECLARE_TYPE_INFO(Model, Component );
 
 	protected:
 		bool Load( Json & _json ) override;

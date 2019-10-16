@@ -343,6 +343,9 @@
     <ClCompile Include="code\scene\components\fanBoxShape.cpp">
       <Filter>code\scene\components</Filter>
     </ClCompile>
+    <ClCompile Include="code\scene\components\fanColliderShape.cpp">
+      <Filter>code\scene\components</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="code\editor\fanMainMenuBar.h">
@@ -1099,6 +1102,9 @@
       <Filter>code\scene\components</Filter>
     </ClInclude>
     <ClInclude Include="code\scene\components\fanBoxShape.h">
+      <Filter>code\scene\components</Filter>
+    </ClInclude>
+    <ClInclude Include="code\scene\components\fanColliderShape.h">
       <Filter>code\scene\components</Filter>
     </ClInclude>
   </ItemGroup>

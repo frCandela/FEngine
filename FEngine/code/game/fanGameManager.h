@@ -20,7 +20,7 @@ namespace fan {
 		void OnGui() override;
 
 		DECLARE_EDITOR_COMPONENT(GameManager)
-		DECLARE_TYPE_INFO(GameManager);
+		DECLARE_TYPE_INFO(GameManager, Actor );
 	protected:
 		bool Load( Json & _json ) override;
 		bool Save( Json & _json ) const override;

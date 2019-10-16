@@ -19,7 +19,7 @@ namespace fan {
 		void OnDetach() override;
 
 		DECLARE_EDITOR_COMPONENT(CameraController)
-		DECLARE_TYPE_INFO(CameraController);
+		DECLARE_TYPE_INFO(CameraController, Actor );
 	protected:
 		bool Load( Json & _json ) override;
 		bool Save( Json & _json ) const override;

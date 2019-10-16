@@ -8,6 +8,11 @@ namespace fan {
 	EcsManager::EcsManager() {
 		m_entityToHandles.reserve( 512 );
 		m_entitiesData.reserve(1024);
+		m_components.Get<ecsTranform>().vector.reserve( 512 );
+		m_components.Get<ecsScaling>().vector.reserve(	512 );
+		m_components.Get<ecsAABB>().vector.reserve(		512 );
+
+		m_components.Get<ecsSphereShape>().vector.reserve( 2 );//TMP
 
 		size_t capa0 = m_components.Get<ecsRigidbody>().vector.capacity();
 		m_components.Get<ecsRigidbody>().vector.reserve(3);
@@ -15,12 +20,17 @@ namespace fan {
 		(void )capa0; (void)capa1;
 
 		m_components.Get<ecsMotionState>().vector.reserve( 2 );
-		m_components.Get<ecsTranform>().vector.reserve( 2 );
+		
 
 		m_components.Get<ecsRigidbody>().onPreRealloc.Connect( &Signal<>::Emmit, &onPreReallocPhysics );
 		m_components.Get<ecsMotionState>().onPreRealloc.Connect( &Signal<>::Emmit, &onPreReallocPhysics );
+		m_components.Get<ecsSphereShape>().onPreRealloc.Connect( &Signal<>::Emmit, &onPreReallocPhysics );
+		m_components.Get<ecsBoxShape>().onPreRealloc.Connect( &Signal<>::Emmit, &onPreReallocPhysics );
+		
 		m_components.Get<ecsRigidbody>().onPostRealloc.Connect( &Signal<>::Emmit, &onPostReallocPhysics );
 		m_components.Get<ecsMotionState>().onPostRealloc.Connect( &Signal<>::Emmit, &onPostReallocPhysics );
+		m_components.Get<ecsSphereShape>().onPostRealloc.Connect( &Signal<>::Emmit, &onPostReallocPhysics );
+		m_components.Get<ecsBoxShape>().onPostRealloc.Connect( &Signal<>::Emmit, &onPostReallocPhysics );
 
 	}
 

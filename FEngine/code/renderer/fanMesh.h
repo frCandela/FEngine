@@ -29,7 +29,7 @@ namespace fan {
 		void GenerateBuffers( Device & _device );
 		bool Load() override;
 
-		DECLARE_TYPE_INFO(Mesh)
+		DECLARE_TYPE_INFO(Mesh, Ressource )
 	private:
 		std::string				m_path;
 		std::vector<Vertex>		m_vertices;

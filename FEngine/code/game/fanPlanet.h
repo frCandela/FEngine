@@ -17,7 +17,7 @@ namespace fan {
 		void SetPhase( const float _phase );
 
 		DECLARE_EDITOR_COMPONENT(Planet)
-		DECLARE_TYPE_INFO(Planet);
+		DECLARE_TYPE_INFO(Planet, Actor );
 	protected:
 		void OnAttach() override;
 		void OnDetach() override;

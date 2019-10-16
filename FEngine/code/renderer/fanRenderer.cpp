@@ -765,15 +765,27 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	std::vector< btVector3> Renderer::DebugCube(const btTransform _transform, const float _halfSize, const Color _color) {
-		std::vector< btVector3 > square = GetCube(_halfSize);		
+	std::vector< btVector3> Renderer::DebugCube(const btTransform _transform, const btVector3 _halfExtent, const Color _color) {
+		std::vector< btVector3 > square = GetCube(_halfExtent);		
 
 		for (int vertIndex = 0; vertIndex < square.size(); vertIndex++)	{
 			square[vertIndex] = _transform * square[vertIndex];
 		}
 
+		glm::vec4 glmColor = _color.ToGLM();
+
 		for (int triangleIndex = 0; triangleIndex < square.size() / 3; triangleIndex++) {
-			DebugTriangle(square[3 * triangleIndex + 0], square[3 * triangleIndex + 1], square[3 * triangleIndex + 2], _color);
+			const glm::vec3 & v0 = ToGLM(square[3 * triangleIndex + 0]);
+			const glm::vec3 & v1 = ToGLM(square[3 * triangleIndex + 1]);
+			const glm::vec3 & v2 = ToGLM(square[3 * triangleIndex + 2]);
+
+			m_debugLines.push_back( DebugVertex( v0, glm::vec3( 0, 0, 0 ), glmColor ) );
+			m_debugLines.push_back( DebugVertex( v1, glm::vec3( 0, 0, 0 ), glmColor ) );
+			m_debugLines.push_back( DebugVertex( v1, glm::vec3( 0, 0, 0 ), glmColor ) );
+			m_debugLines.push_back( DebugVertex( v2, glm::vec3( 0, 0, 0 ), glmColor ) );
+			m_debugLines.push_back( DebugVertex( v2, glm::vec3( 0, 0, 0 ), glmColor ) );
+			m_debugLines.push_back( DebugVertex( v0, glm::vec3( 0, 0, 0 ), glmColor ) );
+
 		}
 
 		return square;

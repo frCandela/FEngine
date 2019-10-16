@@ -37,7 +37,7 @@ namespace fan
 		bool Load( Json & _json ) override;
 		bool Save( Json & _json ) const override;
 
-		DECLARE_TYPE_INFO(Transform);
+		DECLARE_TYPE_INFO(Transform, Component );
 	
 	protected:
 		void OnAttach() override;

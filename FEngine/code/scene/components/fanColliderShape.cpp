@@ -2,58 +2,50 @@
 #include "scene/components/fanActor.h"
 
 #include "scene/fanGameobject.h"
-#include "core/fanSignal.h"
+#include "scene/components/fanColliderShape.h"
+#include "scene/components/fanRigidbody.h"
 
-namespace fan
-{
-	REGISTER_ABSTRACT_TYPE_INFO( Actor )
+namespace fan {
 
-	Signal< Actor * > Actor::onActorAttach;
-	Signal< Actor * > Actor::onActorDetach;
+	REGISTER_ABSTRACT_TYPE_INFO( ColliderShape );
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void Actor::OnAttach() {
-		onActorAttach.Emmit(this);
-	}
-
-	//================================================================================================================================
-	//================================================================================================================================
-	void Actor::OnDetach() {
-		onActorDetach.Emmit(this);
-	}
-
-	//================================================================================================================================
-	//================================================================================================================================
-	void Actor::SetEnabled( const bool _enabled ) { 
-		if ( m_isEnabled != _enabled ) {
-			m_isEnabled = _enabled;
-			if ( m_isEnabled ) {
-				OnEnable();
-			} else {
-				OnDisable();
-			}
+	void ColliderShape::OnAttach() {
+		Rigidbody * rb = GetGameobject()->GetComponent<Rigidbody>();
+		if ( rb != nullptr ) {
+			rb->SetCollisionShape( GetCollisionShape() );
 		}
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void Actor::OnGui() {
+	void ColliderShape::OnDetach() {
+		// Remove collider from rigidbody
+		Rigidbody * rb = GetGameobject()->GetComponent<Rigidbody>();
+		if ( rb != nullptr ) {
+			rb->SetCollisionShape( nullptr );
+		}
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
+	void ColliderShape::OnGui() {
 		Component::OnGui();
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	bool Actor::Load( Json & /*_json*/ ) {
-// 		if (!ReadSegmentHeader(_in, "isEnabled:")) { return false; }
-// 		if (!ReadBool(_in, m_isEnabled)) { return false; }
+	bool ColliderShape::Load( Json & /*_json*/ ) {
+		// 		if (!ReadSegmentHeader(_in, "isEnabled:")) { return false; }
+		// 		if (!ReadBool(_in, m_isEnabled)) { return false; }
 		return true;
 	}
 
 
 	//================================================================================================================================
 	//================================================================================================================================
-	bool Actor::Save( Json & _json ) const {
+	bool ColliderShape::Save( Json & _json ) const {
 		//SaveBool( jActor, "isEnabled", m_isEnabled );
 		Component::Save( _json );
 		return true;

@@ -2,7 +2,8 @@
 #include "scene/components/fanBoxShape.h"
 
 #include "scene/fanGameobject.h"
-
+#include "scene/components/fanTransform.h"
+#include "renderer/fanRenderer.h"
 
 namespace fan {
 
@@ -11,21 +12,31 @@ namespace fan {
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void BoxShape::SetHalfExtent( const btVector3 _halfExtent ) {
-		GetEcsBoxShape()->Get().setLocalScaling( _halfExtent );
+	void BoxShape::SetExtent( const btVector3 _extent ) {
+		GetEcsBoxShape()->Get().setLocalScaling( _extent );
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
+	btVector3 BoxShape::GetExtent() const {
+		return GetEcsBoxShape()->Get().getLocalScaling();
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
 	void BoxShape::OnAttach() {
 		ecsBoxShape * boxShape = GetGameobject()->AddEcsComponent<ecsBoxShape>();
-		boxShape->Init( btVector3::One() );
+		boxShape->Init( btVector3(0.5f, 0.5f, 0.5f) );
+
+		ColliderShape::OnAttach();
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
 	void BoxShape::OnDetach() {
 		GetGameobject()->RemoveEcsComponent<ecsBoxShape>();
+
+		ColliderShape::OnDetach();
 	}
 
 	//================================================================================================================================
@@ -33,17 +44,23 @@ namespace fan {
 	void BoxShape::OnGui() {
 		Component::OnGui();
 
-		btVector3 halfExtent = GetEcsBoxShape()->Get().getLocalScaling();
-		if ( ImGui::DragFloat3("half extent", &halfExtent[0], 0.25f, 0.f ) ) {
-			SetHalfExtent( halfExtent );
+		btVector3 extent = GetExtent();;
+		if ( ImGui::DragFloat3("half extent", &extent[0], 0.25f, 0.f ) ) {
+			SetExtent( extent );
 		}
+
+		Debug::Render().DebugCube( GetGameobject()->GetTransform()->GetBtTransform(), 0.5f * extent, Color::Green );
+
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	bool BoxShape::Load( Json & /*_json*/ ) {
-		// 		if (!ReadSegmentHeader(_in, "isEnabled:")) { return false; }
-		// 		if (!ReadBool(_in, m_isEnabled)) { return false; }
+	bool BoxShape::Load( Json & _json ) {
+		btVector3 extent;
+
+		LoadVec3(_json, "extent", extent );
+
+		SetExtent(extent);
 		return true;
 	}
 
@@ -51,20 +68,14 @@ namespace fan {
 	//================================================================================================================================
 	//================================================================================================================================
 	bool BoxShape::Save( Json & _json ) const {
-		//SaveBool( jActor, "isEnabled", m_isEnabled );
+		SaveVec3( _json, "extent", GetExtent() );
 		Component::Save( _json );
 		return true;
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	ecsBoxShape*	BoxShape::GetEcsBoxShape() const {
-		return GetGameobject()->GetEcsComponent<ecsBoxShape>();
-	}
-
-	//================================================================================================================================
-	//================================================================================================================================
-	btBoxShape * BoxShape::GetBtShape() {
-		return &GetEcsBoxShape()->Get();
-	}
+	ecsBoxShape*		BoxShape::GetEcsBoxShape() const	{ return GetGameobject()->GetEcsComponent<ecsBoxShape>();}
+	btBoxShape *		BoxShape::GetBoxShape()				{ return &GetEcsBoxShape()->Get();}
+	btCollisionShape *	BoxShape::GetCollisionShape()		{ return GetBoxShape(); }
 }
