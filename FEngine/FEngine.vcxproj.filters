@@ -268,9 +268,6 @@
     <ClCompile Include="code\core\input\fanKeyboard.cpp">
       <Filter>code\core\input</Filter>
     </ClCompile>
-    <ClCompile Include="code\core\input\fanInput.cpp">
-      <Filter>code\core\input</Filter>
-    </ClCompile>
     <ClCompile Include="code\game\fanGameManager.cpp">
       <Filter>code\game</Filter>
     </ClCompile>
@@ -345,6 +342,9 @@
     </ClCompile>
     <ClCompile Include="code\scene\components\fanColliderShape.cpp">
       <Filter>code\scene\components</Filter>
+    </ClCompile>
+    <ClCompile Include="code\core\input\fanInputManager.cpp">
+      <Filter>code\core\input</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -978,9 +978,6 @@
     <ClInclude Include="code\core\input\fanMouse.h">
       <Filter>code\core\input</Filter>
     </ClInclude>
-    <ClInclude Include="code\core\input\fanInput.h">
-      <Filter>code\core\input</Filter>
-    </ClInclude>
     <ClInclude Include="code\game\fanGameManager.h">
       <Filter>code\game</Filter>
     </ClInclude>
@@ -1106,6 +1103,12 @@
     </ClInclude>
     <ClInclude Include="code\scene\components\fanColliderShape.h">
       <Filter>code\scene\components</Filter>
+    </ClInclude>
+    <ClInclude Include="code\core\input\fanInputManager.h">
+      <Filter>code\core\input</Filter>
+    </ClInclude>
+    <ClInclude Include="code\core\input\fanKeyMasks.h">
+      <Filter>code\core\input</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

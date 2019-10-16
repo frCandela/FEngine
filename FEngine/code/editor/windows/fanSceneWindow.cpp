@@ -9,7 +9,7 @@
 #include "scene/components/fanModel.h"
 #include "scene/components/fanPointLight.h"
 #include "scene/components/fanDirectionalLight.h"
-#include "core/input/fanInput.h"
+#include "core/input/fanInputManager.h"
 #include "core/input/fanKeyboard.h"
 #include "core/input/fanMouse.h"
 

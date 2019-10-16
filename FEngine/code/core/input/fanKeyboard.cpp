@@ -1,7 +1,7 @@
 #include "fanGlobalIncludes.h"
 
 #include "core/input/fanKeyboard.h"
-#include "core/input/fanInput.h"
+#include "core/input/fanInputManager.h"
 
 
 namespace fan {

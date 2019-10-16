@@ -92,7 +92,7 @@
     <ClCompile Include="code\core\fanUniqueID.cpp" />
     <ClCompile Include="code\core\files\fanFbxImporter.cpp" />
     <ClCompile Include="code\core\files\fanSerializedValues.cpp" />
-    <ClCompile Include="code\core\input\fanInput.cpp" />
+    <ClCompile Include="code\core\input\fanInputManager.cpp" />
     <ClCompile Include="code\core\input\fanKeyboard.cpp" />
     <ClCompile Include="code\core\input\fanMouse.cpp" />
     <ClCompile Include="code\core\math\fanMathUtils.cpp" />
@@ -185,8 +185,9 @@
     <ClInclude Include="code\core\fanUniqueID.h" />
     <ClInclude Include="code\core\files\fanFbxImporter.h" />
     <ClInclude Include="code\core\files\fanSerializedValues.h" />
-    <ClInclude Include="code\core\input\fanInput.h" />
+    <ClInclude Include="code\core\input\fanInputManager.h" />
     <ClInclude Include="code\core\input\fanKeyboard.h" />
+    <ClInclude Include="code\core\input\fanKeyMasks.h" />
     <ClInclude Include="code\core\input\fanMouse.h" />
     <ClInclude Include="code\core\math\fanBasicModels.h" />
     <ClInclude Include="code\core\math\fanMathUtils.h" />

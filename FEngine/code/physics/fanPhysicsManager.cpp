@@ -1,6 +1,7 @@
 #include "fanGlobalIncludes.h"
 #include "physics/fanPhysicsManager.h"
 #include "scene/components/fanRigidbody.h"
+#include "core/fanTime.h"
 
 namespace fan {
 	//================================================================================================================================
@@ -18,7 +19,7 @@ namespace fan {
 	//================================================================================================================================
 	//================================================================================================================================	
 	void PhysicsManager::StepSimulation( const float _delta ) {
-		m_dynamicsWorld->stepSimulation( _delta, 10 );
+		m_dynamicsWorld->stepSimulation( _delta, 10, Time::Get().GetPhysicsDelta() );
 	}
 
 	//================================================================================================================================

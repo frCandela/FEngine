@@ -3,7 +3,7 @@
 #include "scene/components/fanComponent.h"
 #include "scene/fanGameobject.h"
 #include "scene/fanScene.h"
-#include "core/input/fanInput.h"
+#include "core/input/fanInputManager.h"
 
 namespace fan
 {

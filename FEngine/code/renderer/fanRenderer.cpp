@@ -2,7 +2,7 @@
 #include "renderer/fanRenderer.h"
 
 #include "core/fanTime.h"
-#include "core/input/fanInput.h"
+#include "core/input/fanInputManager.h"
 #include "core/math/fanBasicModels.h"
 #include "renderer/fanMesh.h"
 #include "renderer/fanRessourceManager.h"
