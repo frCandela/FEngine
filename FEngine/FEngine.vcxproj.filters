@@ -343,7 +343,10 @@
     <ClCompile Include="code\scene\components\fanColliderShape.cpp">
       <Filter>code\scene\components</Filter>
     </ClCompile>
-    <ClCompile Include="code\core\input\fanInputManager.cpp">
+    <ClCompile Include="code\core\input\fanEventManager.cpp">
+      <Filter>code\core\input</Filter>
+    </ClCompile>
+    <ClCompile Include="code\core\input\fanInput.cpp">
       <Filter>code\core\input</Filter>
     </ClCompile>
   </ItemGroup>
@@ -1104,10 +1107,13 @@
     <ClInclude Include="code\scene\components\fanColliderShape.h">
       <Filter>code\scene\components</Filter>
     </ClInclude>
-    <ClInclude Include="code\core\input\fanInputManager.h">
+    <ClInclude Include="code\core\input\fanKeyMasks.h">
       <Filter>code\core\input</Filter>
     </ClInclude>
-    <ClInclude Include="code\core\input\fanKeyMasks.h">
+    <ClInclude Include="code\core\input\fanEventManager.h">
+      <Filter>code\core\input</Filter>
+    </ClInclude>
+    <ClInclude Include="code\core\input\fanInput.h">
       <Filter>code\core\input</Filter>
     </ClInclude>
   </ItemGroup>

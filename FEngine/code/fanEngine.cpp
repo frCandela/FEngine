@@ -9,9 +9,10 @@
 #include "renderer/util/fanWindow.h"
 #include "renderer/core/fanTexture.h"
 #include "core/fanTime.h"
-#include "core/input/fanInputManager.h"
+#include "core/input/fanInput.h"
 #include "core/input/fanKeyboard.h"
 #include "core/input/fanMouse.h"
+#include "core/input/fanEventManager.h"
 #include "core/math/shapes/fanTriangle.h"
 #include "core/math/shapes/fanPlane.h"
 #include "core/math/shapes/fanAABB.h"
@@ -99,6 +100,13 @@ namespace fan {
 		m_scene->onSceneClear.Connect  ( &Renderer::Clear, m_renderer );
 		m_scene->onDeleteGameobject.Connect( &Engine::OnGameobjectDeleted, this );
 
+		Input::Get().Events().CreateKeyboardEvent( "copy", {Keyboard::LEFT_CONTROL}, Keyboard::C );
+		Input::Get().Events().CreateKeyboardEvent( "delete", {}, Keyboard::DELETE  );
+		Input::Get().Events().CreateKeyboardEvent( "test", { Keyboard::LEFT_CONTROL,  Keyboard::L }, Keyboard::G );
+
+		Input::Get().Events().FindEvent("test")->Connect( &Engine::Test, this );
+
+
 		// Static messages		
 		Material::onMaterialSetPath.Connect		( &Engine::OnMaterialSetTexture, this );
 		Model::onModelSetPath.Connect			( &Engine::OnModelSetPath,		 this );
@@ -136,6 +144,11 @@ namespace fan {
 		delete ( m_renderer );
 	}
 
+	void Engine::Test() {
+
+		Debug::Highlight("test");
+	}
+
 	//================================================================================================================================
 	//================================================================================================================================
 	void Engine::Exit() {
@@ -156,7 +169,7 @@ namespace fan {
 			const float logicDelta = time - lastLogicTime;
 			if ( logicDelta > targetLogicDelta ) {				
 				lastLogicTime += targetLogicDelta;
-				Input::NewFrame();
+				Input::Get().NewFrame();
 				ImGui::NewFrame();
 				ImGui::GetIO().DeltaTime = targetLogicDelta;
 				m_renderer->ClearDebug();							
@@ -173,6 +186,7 @@ namespace fan {
 				DrawUI();
 				m_physicsManager->OnGui();
 				DrawEditorGrid();
+				Input::Get().Events().PullEvents();
 
 				if ( m_mainMenuBar->ShowWireframe() ) { DrawWireframe(); }
 				if ( m_mainMenuBar->ShowNormals() ) { DrawNormals(); }
@@ -511,7 +525,8 @@ namespace fan {
 					model->SetPath("content/models/test/sphere.fbx");
 				}				
 			}
-		} ImGui::End();
+		} ImGui::End();		
+
 		//***************************************************************************************END_MYLITTLESPACE
 
 		m_mainMenuBar->Draw();

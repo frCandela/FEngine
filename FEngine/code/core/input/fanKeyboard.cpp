@@ -1,7 +1,7 @@
 #include "fanGlobalIncludes.h"
 
 #include "core/input/fanKeyboard.h"
-#include "core/input/fanInputManager.h"
+#include "core/input/fanInput.h"
 
 
 namespace fan {
@@ -19,34 +19,33 @@ namespace fan {
 
 	//================================================================================================================================
 	//================================================================================================================================
-	bool Keyboard::IsKeyDown( const int _GLFW_KEY) {
+	bool Keyboard::IsKeyDown( const Key _GLFW_KEY) {
 		if (ImGui::GetIO().WantCaptureKeyboard ) {
 			return false;
 		} else {
-			return glfwGetKey(Input::GetWindow(), _GLFW_KEY) == GLFW_PRESS;
+			return glfwGetKey(Input::Get().Window(), _GLFW_KEY) == GLFW_PRESS;
 		}
 	}
 	
 	//================================================================================================================================
 	//================================================================================================================================
-
-	bool Keyboard::IsKeyPressed(const int _GLFW_KEY) {
+	bool Keyboard::IsKeyPressed(const Key _GLFW_KEY) {
 		if ( ImGui::GetIO().WantCaptureKeyboard) {
 			return false;
 		}
 		else {
-			return Get().m_keysPressed[_GLFW_KEY] == Input::GetFrameCount();
+			return Get().m_keysPressed[_GLFW_KEY] == Input::Get().FrameCount();
 		}
 	}
 	
 	//================================================================================================================================
 	//================================================================================================================================
-	bool Keyboard::IsKeyReleased(const int _GLFW_KEY) {
+	bool Keyboard::IsKeyReleased(const Key _GLFW_KEY) {
 		if ( ImGui::GetIO().WantCaptureKeyboard) {
 			return false;
 		}
 		else {
-			return Get().m_keysReleased[_GLFW_KEY] == Input::GetFrameCount();
+			return Get().m_keysReleased[_GLFW_KEY] == Input::Get().FrameCount();
 		}
 	}
 	
@@ -74,9 +73,9 @@ namespace fan {
 		io.KeySuper =	io.KeysDown[GLFW_KEY_LEFT_SUPER] ||		io.KeysDown[GLFW_KEY_RIGHT_SUPER];
 
 		if (_action == GLFW_PRESS)
-			Get().m_keysPressed[_key] = Input::GetFrameCount();
+			Get().m_keysPressed[_key] = Input::Get().FrameCount();
 		else if (_action == GLFW_RELEASE)
-			Get().m_keysReleased[_key] = Input::GetFrameCount();
+			Get().m_keysReleased[_key] = Input::Get().FrameCount();
 	}
 
 	//================================================================================================================================

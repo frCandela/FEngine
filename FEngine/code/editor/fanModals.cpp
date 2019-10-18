@@ -1,7 +1,7 @@
 #include "fanGlobalIncludes.h"
 
 #include "editor/fanModals.h"
-#include "core/input/fanInputManager.h"
+#include "core/input/fanInput.h"
 #include "core/input/fanKeyboard.h"
 #include "core/input/fanMouse.h"
 

@@ -3,7 +3,7 @@
 #include "scene/components/fanComponent.h"
 #include "scene/fanGameobject.h"
 #include "scene/fanScene.h"
-#include "core/input/fanInputManager.h"
+#include "core/input/fanInput.h"
 
 namespace fan
 {
@@ -27,7 +27,7 @@ namespace fan
 	//================================================================================================================================
 	//================================================================================================================================
 	bool Component::IsModified() const {
-		return Input::GetFrameCount() == m_lastModified;
+		return Input::Get().FrameCount() == m_lastModified;
 	}
 
 	//================================================================================================================================
@@ -41,7 +41,7 @@ namespace fan
 	//================================================================================================================================
 	//================================================================================================================================
 	void Component::MarkModified(const bool _updateAABB) {
-		m_lastModified = Input::GetFrameCount();
+		m_lastModified = Input::Get().FrameCount();
 		if (_updateAABB) {
 			m_gameobject->GetScene()->ComputeAABBEndFrame(m_gameobject);
 		}

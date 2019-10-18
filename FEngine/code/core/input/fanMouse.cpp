@@ -1,7 +1,7 @@
 #include "fanGlobalIncludes.h"
 
 #include "core/input/fanMouse.h"
-#include "core/input/fanInputManager.h"
+#include "core/input/fanInput.h"
 
 namespace fan {
 	//================================================================================================================================
@@ -18,7 +18,7 @@ namespace fan {
 	//================================================================================================================================
 	//================================================================================================================================
 	void Mouse::SetCursor(CursorState _state)				{ 
-		glfwSetInputMode(Input::GetWindow(), GLFW_CURSOR, _state); 
+		glfwSetInputMode(Input::Get().Window(), GLFW_CURSOR, _state);
 	}
 
 	//================================================================================================================================
@@ -27,7 +27,7 @@ namespace fan {
 		if ( !_overrideUI && ImGui::GetIO().WantCaptureMouse) {
 			return false;
 		} else {
-			return glfwGetMouseButton(Input::GetWindow(), _GLFW_MOUSE_BUTTON) == GLFW_PRESS;
+			return glfwGetMouseButton(Input::Get().Window(), _GLFW_MOUSE_BUTTON) == GLFW_PRESS;
 		} 
 	}
 
@@ -38,7 +38,7 @@ namespace fan {
 			return false;
 		}
 		else {
-			return Get().m_buttonsPressed[_GLFW_MOUSE_BUTTON] == Input::GetFrameCount();
+			return Get().m_buttonsPressed[_GLFW_MOUSE_BUTTON] == Input::Get().FrameCount();
 		}
 	}
 
@@ -49,7 +49,7 @@ namespace fan {
 			return false;
 		}
 		else {
-			return Get().m_buttonsReleased[_GLFW_MOUSE_BUTTON] == Input::GetFrameCount();
+			return Get().m_buttonsReleased[_GLFW_MOUSE_BUTTON] == Input::Get().FrameCount();
 		}
 	}
 
@@ -58,7 +58,7 @@ namespace fan {
 	//================================================================================================================================
 	btVector2 Mouse::GetScreenSpacePosition()
 	{
-		btVector2 screenSize = Input::GetWindowSize();
+		btVector2 screenSize = Input::Get().WindowSize();
 		btVector2 ratio = 2.f * Mouse::GetPosition() / screenSize - btVector2(1.f, 1.f);
 		ratio.setX(std::clamp(ratio.x(), -1.f, 1.f));
 		ratio.setY(std::clamp(ratio.y(), -1.f, 1.f));
@@ -73,7 +73,7 @@ namespace fan {
 		{
 			Get().m_lockPosition = _position;
 			Get().m_lockCursor = _state;
-			glfwSetCursorPos(Input::GetWindow(), Get().m_lockPosition.x(), Get().m_lockPosition.y());
+			glfwSetCursorPos(Input::Get().Window(), Get().m_lockPosition.x(), Get().m_lockPosition.y());
 		}
 	}
 
@@ -110,10 +110,10 @@ namespace fan {
 		}
 
 		if (_action == GLFW_PRESS) {
-			Get().m_buttonsPressed[_button] = Input::GetFrameCount();
+			Get().m_buttonsPressed[_button] = Input::Get().FrameCount();
 		}
 		else if (_action == GLFW_RELEASE) {
-			Get().m_buttonsReleased[_button] = Input::GetFrameCount();
+			Get().m_buttonsReleased[_button] = Input::Get().FrameCount();
 		}
 	}
 
@@ -123,11 +123,11 @@ namespace fan {
 	{
 		//Mouse
 		double x, y;
-		glfwGetCursorPos(Input::GetWindow(), &x, &y);
+		glfwGetCursorPos(Input::Get().Window(), &x, &y);
 
 		if (m_lockCursor)
 		{
-			GLFWwindow * window = Input::GetWindow();
+			GLFWwindow * window = Input::Get().Window();
 			glfwSetCursorPos(window, m_lockPosition.x(), m_lockPosition.y());
 
 			m_position = btVector2(static_cast<btScalar>(x), static_cast<btScalar>(y));
