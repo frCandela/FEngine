@@ -65,19 +65,19 @@ namespace fan {
 		SerializedValues::Get().GetValue("renderer_position_y", windowPosition.y);
 
 		// Creates keyboard events
-		Input::Get().Manager().CreateKeyboardEvent( "delete",		 {},						 Keyboard::DELETE	);
-		Input::Get().Manager().CreateKeyboardEvent( "reload_shaders", {},						 Keyboard::F5		);
-		Input::Get().Manager().CreateKeyboardEvent( "open_scene",	 { Keyboard::LEFT_CONTROL }, Keyboard::O		);
-		Input::Get().Manager().CreateKeyboardEvent( "save_scene",	 { Keyboard::LEFT_CONTROL }, Keyboard::S		);
-		Input::Get().Manager().CreateKeyboardEvent( "reload_scene",	 { Keyboard::LEFT_CONTROL }, Keyboard::R		);
+		Input::Get().Manager().CreateKeyboardEvent( "delete",		  Keyboard::DELETE	);
+		Input::Get().Manager().CreateKeyboardEvent( "reload_shaders", Keyboard::F5		);
+		Input::Get().Manager().CreateKeyboardEvent( "open_scene",	  Keyboard::O, Keyboard::LEFT_CONTROL );
+		Input::Get().Manager().CreateKeyboardEvent( "save_scene",	  Keyboard::S, Keyboard::LEFT_CONTROL );
+		Input::Get().Manager().CreateKeyboardEvent( "reload_scene",	  Keyboard::R, Keyboard::LEFT_CONTROL );
 
 		// Axis
-		Input::Get().Manager().CreateAxis( "game_forward", Keyboard::W, Keyboard::S );
-		Input::Get().Manager().CreateAxis( "game_left", Keyboard::A, Keyboard::D );
-		Input::Get().Manager().CreateAxis( "editor_forward", Keyboard::W, Keyboard::S );
-		Input::Get().Manager().CreateAxis( "editor_left", Keyboard::A, Keyboard::D );
-		Input::Get().Manager().CreateAxis( "editor_up", Keyboard::E, Keyboard::Q );
-		Input::Get().Manager().CreateAxis( "editor_boost", Keyboard::LEFT_SHIFT, Keyboard::NONE );
+		Input::Get().Manager().CreateAxis( "game_forward",		Keyboard::W, Keyboard::S );
+		Input::Get().Manager().CreateAxis( "game_left",			Keyboard::A, Keyboard::D );
+		Input::Get().Manager().CreateAxis( "editor_forward",	Keyboard::W, Keyboard::S );
+		Input::Get().Manager().CreateAxis( "editor_left",		Keyboard::A, Keyboard::D );
+		Input::Get().Manager().CreateAxis( "editor_up",			Keyboard::E, Keyboard::Q );
+		Input::Get().Manager().CreateAxis( "editor_boost",		Keyboard::LEFT_SHIFT, Keyboard::NONE );
 
 		// Set some values
 		m_editorGrid.isVisible = true;
