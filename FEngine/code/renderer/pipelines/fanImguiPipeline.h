@@ -25,6 +25,7 @@ namespace fan
 
 		Sampler * m_sampler;
 		Texture * m_fontTexture;
+		Texture * m_iconsTexture;
 
 		Shader * m_fragShader;
 		Shader * m_vertShader;
@@ -39,7 +40,7 @@ namespace fan
 		VkPipeline				m_pipeline;
 		VkDescriptorPool		m_descriptorPool;
 		VkDescriptorSetLayout	m_descriptorSetLayout;
-		VkDescriptorSet			m_descriptorSet;
+		VkDescriptorSet			m_descriptorSets[2];
 
 		// UI params are set via push constants
 		struct PushConstBlock

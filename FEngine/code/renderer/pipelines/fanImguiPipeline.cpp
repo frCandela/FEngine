@@ -15,6 +15,7 @@ namespace fan
 	ImguiPipeline::ImguiPipeline(Device& _device, const int _swapchainImagesCount) :
 		m_device(_device)
 		, m_fontTexture(new Texture(_device))
+		, m_iconsTexture( new Texture( _device ) )
 		, m_sampler(new Sampler(_device))
 	{
 		m_vertexBuffers.reserve(_swapchainImagesCount);
@@ -31,6 +32,7 @@ namespace fan
 	//================================================================================================================================
 	ImguiPipeline::~ImguiPipeline() {
 		delete(m_fontTexture);
+		delete (m_iconsTexture);
 		delete(m_sampler);
 		delete(m_fragShader);
 		delete(m_vertShader);
@@ -114,9 +116,7 @@ namespace fan
 		{
 			ImGuiIO& io = ImGui::GetIO();
 
-			// Bind imgui pipeline and Descriptors sets
-			vkCmdBindDescriptorSets(_commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, m_pipelineLayout, 0, 1, &m_descriptorSet, 0, nullptr);
-			vkCmdBindPipeline(_commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, m_pipeline);
+			vkCmdBindPipeline( _commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, m_pipeline );
 
 			// Bind vertex and index buffer
 			VkDeviceSize offsets[1] = { 0 };
@@ -147,6 +147,14 @@ namespace fan
 				for (int32_t j = 0; j < cmd_list->CmdBuffer.Size; j++)
 				{
 					const ImDrawCmd* pcmd = &cmd_list->CmdBuffer[j];
+
+					// Bind imgui pipeline and Descriptors sets
+					if( pcmd->TextureId == nullptr ) {
+						vkCmdBindDescriptorSets( _commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, m_pipelineLayout, 0, 1, &m_descriptorSets[0], 0, nullptr ); // regular drawing
+					} else {
+						vkCmdBindDescriptorSets( _commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, m_pipelineLayout, 0, 1, &m_descriptorSets[1], 0, nullptr ); // Icons drawing
+					}
+
 					VkRect2D scissorRect;
 					scissorRect.offset.x = std::max((int32_t)(pcmd->ClipRect.x), 0);
 					scissorRect.offset.y = std::max((int32_t)(pcmd->ClipRect.y), 0);
@@ -155,6 +163,8 @@ namespace fan
 					vkCmdSetScissor(_commandBuffer, 0, 1, &scissorRect);
 					vkCmdDrawIndexed(_commandBuffer, pcmd->ElemCount, 1, indexOffset, vertexOffset, 0);
 					indexOffset += pcmd->ElemCount;
+
+					
 				}
 				vertexOffset += cmd_list->VtxBuffer.Size;
 			}
@@ -217,6 +227,7 @@ namespace fan
 		ImGui::GetIO().Fonts->GetTexDataAsRGBA32(&fontData, &texWidth, &texHeight);
 
 		m_fontTexture->Load(fontData, texWidth, texHeight, 1);
+		m_iconsTexture->LoadTexture("content/_default/icons.png");
 		m_sampler->CreateSampler(0, 1.f);
 	}
 
@@ -256,28 +267,42 @@ namespace fan
 		vkCreateDescriptorSetLayout(m_device.vkDevice, &descriptorSetLayoutCreateInfo, nullptr, &m_descriptorSetLayout);
 
 		// Descriptor set
+		VkDescriptorSetLayout layouts[2] = { m_descriptorSetLayout ,m_descriptorSetLayout };
 		VkDescriptorSetAllocateInfo descriptorSetAllocateInfo{};
 		descriptorSetAllocateInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
 		descriptorSetAllocateInfo.descriptorPool = m_descriptorPool;
-		descriptorSetAllocateInfo.pSetLayouts = &m_descriptorSetLayout;
-		descriptorSetAllocateInfo.descriptorSetCount = 1;
+		descriptorSetAllocateInfo.pSetLayouts = layouts;
+		descriptorSetAllocateInfo.descriptorSetCount = 2;
 
-		vkAllocateDescriptorSets(m_device.vkDevice, &descriptorSetAllocateInfo, &m_descriptorSet);
+		vkAllocateDescriptorSets(m_device.vkDevice, &descriptorSetAllocateInfo, m_descriptorSets);
 
 		VkDescriptorImageInfo fontDescriptorImageInfo{};
 		fontDescriptorImageInfo.sampler = m_sampler->GetSampler();
 		fontDescriptorImageInfo.imageView = m_fontTexture->GetImageView();
 		fontDescriptorImageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
 
+		VkDescriptorImageInfo iconsDescriptorImageInfo {};
+		iconsDescriptorImageInfo.sampler = m_sampler->GetSampler();
+		iconsDescriptorImageInfo.imageView = m_iconsTexture->GetImageView();
+		iconsDescriptorImageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+
 		VkWriteDescriptorSet writeDescriptorSet{};
 		writeDescriptorSet.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-		writeDescriptorSet.dstSet = m_descriptorSet;
+		writeDescriptorSet.dstSet = m_descriptorSets[0];
 		writeDescriptorSet.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
 		writeDescriptorSet.dstBinding = 0;
 		writeDescriptorSet.pImageInfo = &fontDescriptorImageInfo;
 		writeDescriptorSet.descriptorCount = 1;
 
-		std::vector<VkWriteDescriptorSet> writeDescriptorSets = { writeDescriptorSet };
+		VkWriteDescriptorSet writeDescriptorSetIcons {};
+		writeDescriptorSetIcons.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+		writeDescriptorSetIcons.dstSet = m_descriptorSets[1];
+		writeDescriptorSetIcons.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+		writeDescriptorSetIcons.dstBinding = 0;
+		writeDescriptorSetIcons.pImageInfo = &iconsDescriptorImageInfo;
+		writeDescriptorSetIcons.descriptorCount = 1;
+
+		std::vector<VkWriteDescriptorSet> writeDescriptorSets = { writeDescriptorSet, writeDescriptorSetIcons };
 
 		vkUpdateDescriptorSets(m_device.vkDevice, static_cast<uint32_t>(writeDescriptorSets.size()), writeDescriptorSets.data(), 0, nullptr);
 	}

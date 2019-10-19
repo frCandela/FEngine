@@ -58,9 +58,7 @@ namespace fan
 	void Gameobject::OnGui() {
 		std::stringstream ss;
 		ss << "Gameobject : " << GetName();
-		if (ImGui::CollapsingHeader(ss.str().c_str())) {
-			ImGui::Checkbox("ComputeAABB", &m_computeAABB);
-		}
+		ImGui::Text(ss.str().c_str());
 	}
 
 	//================================================================================================================================

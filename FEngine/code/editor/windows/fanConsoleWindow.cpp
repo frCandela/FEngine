@@ -21,7 +21,7 @@ namespace fan
 	//================================================================================================================================
 	//================================================================================================================================
 	ConsoleWindow::ConsoleWindow() :
-		EditorWindow("console"),
+		EditorWindow("console", ImGui::IconType::CONSOLE),
 		m_maxSizeLogBuffers(256),
 		m_firstLogIndex(0),
 		m_grabFocus(false)
@@ -70,16 +70,24 @@ namespace fan
 		}
 
 		// Text input
-		ImGui::PushItemWidth(ImGui::GetWindowWidth() - 60);
+		
 		if (m_grabFocus) {
 			ImGui::SetKeyboardFocusHere();
 			m_grabFocus = false;
 		}
+
+		// Icon
+		ImGui::Icon( GetIconType(), { 20,20 } ); ImGui::SameLine();
+
+		// Input
 		bool pressed = false;
+		ImGui::PushItemWidth( ImGui::GetWindowWidth() - 80 );
 		if (ImGui::InputText("##input_console", m_inputBuffer, IM_ARRAYSIZE(m_inputBuffer), ImGuiInputTextFlags_EnterReturnsTrue)) {
 			pressed = true;
 		}
 		ImGui::SameLine();
+
+		// Button
 		if (ImGui::Button(">>")) {
 			pressed = true;
 		}

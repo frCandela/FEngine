@@ -114,6 +114,7 @@
     <ClCompile Include="code\ecs\fanEcsSystems.cpp" />
     <ClCompile Include="code\editor\components\fanFPSCamera.cpp" />
     <ClCompile Include="code\editor\fanEditorGrid.cpp" />
+    <ClCompile Include="code\editor\fanImguiIcons.cpp" />
     <ClCompile Include="code\editor\fanMainMenuBar.cpp" />
     <ClCompile Include="code\editor\fanModals.cpp" />
     <ClCompile Include="code\editor\windows\fanConsoleWindow.cpp" />
@@ -217,6 +218,7 @@
     <ClInclude Include="code\ecs\fanEcsSystems.h" />
     <ClInclude Include="code\editor\components\fanFPSCamera.h" />
     <ClInclude Include="code\editor\fanEditorGrid.h" />
+    <ClInclude Include="code\editor\fanImguiIcons.h" />
     <ClInclude Include="code\editor\fanMainMenuBar.h" />
     <ClInclude Include="code\editor\fanModals.h" />
     <ClInclude Include="code\editor\windows\fanConsoleWindow.h" />

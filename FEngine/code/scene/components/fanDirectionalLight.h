@@ -13,6 +13,7 @@ namespace fan {
 		enum Attenuation { CONSTANT = 0, LINEAR = 1, QUADRATIC = 2 };
 
 		void OnGui() override;
+		ImGui::IconType GetIcon() const override { return ImGui::IconType::DIR_LIGHT; }
 
 		Color GetAmbiant() const ;
 		Color GetDiffuse() const ;

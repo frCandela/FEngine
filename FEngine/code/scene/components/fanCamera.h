@@ -31,6 +31,7 @@ namespace fan
 		void SetProjectionType( const Type _type );
 
 		void OnGui() override;
+		ImGui::IconType GetIcon() const override {return ImGui::IconType::CAMERA;}
 
 		DECLARE_EDITOR_COMPONENT(Camera)
 		DECLARE_TYPE_INFO(Camera, Component );

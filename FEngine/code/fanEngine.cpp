@@ -28,6 +28,7 @@
 #include "editor/windows/fanConsoleWindow.h"	
 #include "editor/windows/fanEcsWindow.h"	
 #include "editor/components/fanFPSCamera.h"		
+#include "editor/fanImguiIcons.h"
 #include "scene/fanScene.h"
 #include "scene/fanGameobject.h"
 #include "scene/components/fanComponent.h"
@@ -514,6 +515,8 @@ namespace fan {
 	void Engine::DrawUI() {
 		//***************************************************************************************MYLITTLESPACE
 		ImGui::Begin("test"); {
+			
+
 			static int nb = 1;
 			ImGui::DragInt("nb", &nb);
 			if ( ImGui::Button( "spawn" ) ) {
@@ -528,6 +531,8 @@ namespace fan {
 				}				
 			}
 		} ImGui::End();		
+
+	
 
 		//***************************************************************************************END_MYLITTLESPACE
 

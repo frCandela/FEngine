@@ -10,11 +10,12 @@ namespace fan {
 		void Start() override;
 		void Update(const float _delta) override;
 
-		void OnGui() override;
-
 		void SetSpeed( const float _speed );
 		void SetRadius( const float _radius );
 		void SetPhase( const float _phase );
+
+		void OnGui() override;
+		ImGui::IconType GetIcon() const override { return ImGui::IconType::PLANET; }
 
 		DECLARE_EDITOR_COMPONENT(Planet)
 		DECLARE_TYPE_INFO(Planet, Actor );

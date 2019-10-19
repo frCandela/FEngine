@@ -11,6 +11,7 @@ namespace fan {
 		void Update(const float _delta) override;
 
 		void OnGui() override;
+		ImGui::IconType GetIcon() const override { return ImGui::IconType::SPACE_SHIP; }
 
 		DECLARE_EDITOR_COMPONENT(SpaceShip)
 		DECLARE_TYPE_INFO(SpaceShip, Actor );

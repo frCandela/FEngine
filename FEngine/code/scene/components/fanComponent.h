@@ -6,6 +6,7 @@
 
 //Editor
 #include "scene/fanComponentsRegister.h"
+#include "editor/fanImguiIcons.h"
 
 namespace fan
 {
@@ -29,6 +30,7 @@ namespace fan
 		virtual bool IsActor()		const { return false; }
 
 		virtual void OnGui();
+		virtual ImGui::IconType GetIcon() const { return ImGui::IconType::NONE; };
 
 		DECLARE_ABSTRACT_TYPE_INFO(Component, ISerializable );
 	protected:

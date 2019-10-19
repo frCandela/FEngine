@@ -25,9 +25,8 @@ namespace fan
 		Color			GetColor() const;
 		void			SetColor( const Color _color );
 
-
-
 		void OnGui() override;
+		ImGui::IconType GetIcon() const override { return ImGui::IconType::MATERIAL; }
 
 		DECLARE_EDITOR_COMPONENT(Material)
 		DECLARE_TYPE_INFO(Material, Component );

@@ -30,6 +30,7 @@ namespace fan
 		void	SetRenderID(const int _renderID);
 
 		void OnGui() override;
+		virtual ImGui::IconType GetIcon() const { return ImGui::IconType::MODEL; };
 
 		DECLARE_EDITOR_COMPONENT(Model)
 		DECLARE_TYPE_INFO(Model, Component );

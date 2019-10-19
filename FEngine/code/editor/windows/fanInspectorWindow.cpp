@@ -20,7 +20,7 @@ namespace fan
 	//================================================================================================================================
 	//================================================================================================================================
 	InspectorWindow::InspectorWindow() :
-		EditorWindow("inspector")
+		EditorWindow("inspector", ImGui::IconType::INSPECTOR )
 	{
 	}
 
@@ -31,6 +31,7 @@ namespace fan
 		if ( m_gameobjectSelected != nullptr)
 		{
 			// gameobject gui
+			ImGui::Icon( GetIconType(), { 16,16 } ); ImGui::SameLine();
 			m_gameobjectSelected->OnGui();
 			int componentCount = 0;			
 			const std::vector<Component*> & components = m_gameobjectSelected->GetComponents();
@@ -38,6 +39,7 @@ namespace fan
 				Component * component = components[componentIndex];
 
 				ImGui::Separator();
+				ImGui::Icon( component->GetIcon(), { 19,19 } ); ImGui::SameLine();
 				// Actor "enable" checkbox
 				if (component->IsActor()) {	// TODO : use type info when type info deals with inheritance
 					ImGui::PushID((int*)component);
@@ -85,6 +87,8 @@ namespace fan
 			std::vector<Component *>& components = ComponentsRegister::GetComponents();
 			for (int componentIndex = 0; componentIndex < components.size(); componentIndex++) {
 				Component * component = components[componentIndex];
+
+				ImGui::Icon( component->GetIcon(), { 19,19 } ); ImGui::SameLine();
 				if (ImGui::MenuItem(component->GetName())) {
 					// Create new Component 
 					m_gameobjectSelected->AddComponent(component->GetType());

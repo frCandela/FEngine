@@ -19,7 +19,7 @@ namespace fan
 	//================================================================================================================================
 	//================================================================================================================================
 	SceneWindow::SceneWindow( Scene * _scene ) :
-		EditorWindow("Scene")
+		EditorWindow("scene", ImGui::IconType::SCENE )
 		, m_scene(_scene)
 	{
 		m_textBuffer[0] = '\0';
@@ -32,9 +32,8 @@ namespace fan
 	//================================================================================================================================
 	//================================================================================================================================
 	void SceneWindow::OnGui() {
-
+		ImGui::Icon( GetIconType(), {16,16}); ImGui::SameLine();
 		ImGui::Text(m_scene->GetName().c_str());
-		ImGui::Text( m_scene->GetPath().c_str() );
 		ImGui::Separator();
 
 		Gameobject * gameobjectRightClicked = nullptr;

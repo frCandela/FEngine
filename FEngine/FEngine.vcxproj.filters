@@ -349,6 +349,9 @@
     <ClCompile Include="code\core\input\fanInputManager.cpp">
       <Filter>code\core\input</Filter>
     </ClCompile>
+    <ClCompile Include="code\editor\fanImguiIcons.cpp">
+      <Filter>code\editor</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="code\editor\fanMainMenuBar.h">
@@ -1115,6 +1118,9 @@
     </ClInclude>
     <ClInclude Include="code\core\input\fanInputManager.h">
       <Filter>code\core\input</Filter>
+    </ClInclude>
+    <ClInclude Include="code\editor\fanImguiIcons.h">
+      <Filter>code\editor</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

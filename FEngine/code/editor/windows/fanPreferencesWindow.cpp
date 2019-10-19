@@ -13,17 +13,18 @@
 
 namespace fan
 {
-
 	//================================================================================================================================
 	//================================================================================================================================
 	PreferencesWindow::PreferencesWindow( Renderer * _renderer ) :
-		EditorWindow("preferences") 
+		EditorWindow("preferences", ImGui::IconType::PREFERENCES )
 		, m_renderer( _renderer ) {
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
 	void PreferencesWindow::OnGui() {
+		ImGui::Icon( GetIconType(), { 16,16 } ); ImGui::SameLine();
+		ImGui::Text( "Preferences" );
 		if ( ImGui::CollapsingHeader( "Rendering" ) ) {
 			// Filter color
 			glm::vec4& color = m_renderer->GetPostprocessPipeline()->uniforms.color;

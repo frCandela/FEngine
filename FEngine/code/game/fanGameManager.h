@@ -18,6 +18,7 @@ namespace fan {
 		void Update(const float _delta) override;
 
 		void OnGui() override;
+		ImGui::IconType GetIcon() const override { return ImGui::IconType::GAME_MANAGER; }
 
 		DECLARE_EDITOR_COMPONENT(GameManager)
 		DECLARE_TYPE_INFO(GameManager, Actor );

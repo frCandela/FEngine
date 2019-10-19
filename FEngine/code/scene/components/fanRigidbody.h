@@ -20,12 +20,15 @@ namespace fan {
 		void SetCollisionShape( btCollisionShape * _collisionShape );
 		void Refresh();
 
+		void OnGui() override;
+		ImGui::IconType GetIcon() const override { return ImGui::IconType::RIGIDBODY; }
+
 		DECLARE_EDITOR_COMPONENT( Rigidbody )
 		DECLARE_TYPE_INFO( Rigidbody, Component );
 	protected:
 		bool Load( Json & _json ) override;
 		bool Save( Json & _json ) const override;
-		void OnGui() override;
+
 		void OnAttach() override;
 		void OnDetach() override;
 

@@ -15,11 +15,15 @@ namespace fan {
 		void Start() override;
 		void Update(const float _delta) override;
 
-		void OnGui() override;
+
 		void OnDetach() override;
+
+		void OnGui() override;
+		ImGui::IconType GetIcon() const override { return ImGui::IconType::CAMERA; }
 
 		DECLARE_EDITOR_COMPONENT(CameraController)
 		DECLARE_TYPE_INFO(CameraController, Actor );
+
 	protected:
 		bool Load( Json & _json ) override;
 		bool Save( Json & _json ) const override;

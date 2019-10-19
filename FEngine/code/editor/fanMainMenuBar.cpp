@@ -116,6 +116,8 @@ namespace fan
 			{
 				for (size_t windowIndex = 0; windowIndex < m_editorWindows.size() ; windowIndex++) {
 					EditorWindow * window = m_editorWindows[ windowIndex ];
+					ImGui::Icon( window->GetIconType(), {19,19} );
+					ImGui::SameLine();
 					bool showWindow = window->IsVisible();
 					if ( ImGui::Checkbox( window->GetName().c_str(), &showWindow ) ) {
 						window->SetVisible( showWindow );

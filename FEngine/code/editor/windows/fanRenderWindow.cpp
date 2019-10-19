@@ -16,7 +16,7 @@ namespace fan
 	//================================================================================================================================
 	//================================================================================================================================
 	RenderWindow::RenderWindow( Renderer * _renderer ) :
-		EditorWindow("Renderer")
+		EditorWindow("renderer", ImGui::IconType::RENDERER )
 		, m_renderer( _renderer )
 	{
 	}
@@ -25,6 +25,10 @@ namespace fan
 	//================================================================================================================================
 	void RenderWindow::OnGui() {
 		RessourceManager * ressourceManager = m_renderer->GetRessourceManager();
+
+		ImGui::Icon( GetIconType(), { 16,16 } ); ImGui::SameLine();
+		ImGui::Text("Renderer");
+
 		// Display mesh list
 		if ( ImGui::CollapsingHeader( "Loaded meshes : " ) ) {
 			for ( auto meshData : m_renderer->GetRessourceManager()->GetMeshData() ) {

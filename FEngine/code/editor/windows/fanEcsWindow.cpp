@@ -8,7 +8,7 @@ namespace fan {
 	//================================================================================================================================
 	//================================================================================================================================
 	EcsWindow::EcsWindow( EcsManager * _ecsManager ) :
-		EditorWindow("ecs")
+		EditorWindow("ecs", ImGui::IconType::ECS )
 		, m_ecsManager( _ecsManager )		
 		,m_generator()					 // TMP
 		, m_distribution( 0.f, 1.f )	// TMP
@@ -64,7 +64,7 @@ namespace fan {
 
 
 		// Entities info
-
+		ImGui::Icon( GetIconType(), { 19,19 } ); ImGui::SameLine();
 		ImGui::Text( TagCountSize( "Entities  ", entitiesData.size(), sizeof( ecsEntityData ) ).c_str() );
 
 		ImGui::Separator();

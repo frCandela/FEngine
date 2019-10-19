@@ -12,12 +12,16 @@ namespace fan {
 
 		btBoxShape *		GetBoxShape();
 		btCollisionShape *	GetCollisionShape() override;
+
+		ImGui::IconType GetIcon() const override { return ImGui::IconType::BOX_SHAPE; };
+		void OnGui() override;
 	protected:
 		void OnAttach() override;
 		void OnDetach() override;
 		bool Load( Json & _json ) override;
 		bool Save( Json & _json ) const override;
-		void OnGui() override;
+
+
 
 		DECLARE_EDITOR_COMPONENT( BoxShape )
 		DECLARE_TYPE_INFO( BoxShape, Component );
