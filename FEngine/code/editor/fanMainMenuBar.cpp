@@ -9,8 +9,7 @@
 #include "editor/fanEditorGrid.h"
 #include "core/files/fanSerializedValues.h"
 #include "core/input/fanInput.h"
-#include "core/input/fanKeyboard.h"
-#include "core/input/fanMouse.h"
+#include "core/input/fanEventManager.h"
 #include "editor/fanModals.h"
 #include "scene/fanScene.h"
 #include "core/fanTime.h"
@@ -35,6 +34,9 @@ namespace fan
 		SerializedValues::Get().GetValue( "editor_grid_linesCount", m_editorGrid.linesCount );
 		SerializedValues::Get().GetColor( "editor_grid_color", m_editorGrid.color );
 
+		Input::Get().Events().FindEvent( "open_scene")->Connect( &MainMenuBar::Open, this );
+		Input::Get().Events().FindEvent( "save_scene" )->Connect( &MainMenuBar::Save, this );
+		Input::Get().Events().FindEvent( "reload_scene" )->Connect( &MainMenuBar::Reload, this );
 	}
 
 	//================================================================================================================================
@@ -177,7 +179,6 @@ namespace fan
 
 		} ImGui::EndMainMenuBar();
 
-		ProcessKeyboardShortcuts();
 
 		// Open scene popup
 		if (m_openNewScenePopupLater == true) {
@@ -198,23 +199,6 @@ namespace fan
 		}
 
 		DrawModals();
-	}
-
-	//================================================================================================================================
-	//================================================================================================================================
-	void MainMenuBar::ProcessKeyboardShortcuts() {
-
-		if (Keyboard::IsKeyDown(GLFW_KEY_LEFT_CONTROL) && Keyboard::IsKeyPressed(GLFW_KEY_O)) {
-			Open();
-		}
-
-		if (Keyboard::IsKeyDown(GLFW_KEY_LEFT_CONTROL) && Keyboard::IsKeyPressed(GLFW_KEY_S)) {
-			Save();
-		}
-
-		if ( Keyboard::IsKeyDown( GLFW_KEY_LEFT_CONTROL ) && Keyboard::IsKeyPressed( GLFW_KEY_R ) ) {
-			Reload();
-		}
 	}
 
 	//================================================================================================================================

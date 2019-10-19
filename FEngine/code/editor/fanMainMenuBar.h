@@ -60,7 +60,6 @@ namespace fan
 		int m_extensionIndexBuffer;
 		std::set < std::string > m_sceneExtensionFilter;
 
-		void ProcessKeyboardShortcuts();
 		void DrawModals();
 		void New();
 		void Open();

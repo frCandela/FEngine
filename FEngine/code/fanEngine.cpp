@@ -64,6 +64,13 @@ namespace fan {
 		SerializedValues::Get().GetValue("renderer_position_x", windowPosition.x);
 		SerializedValues::Get().GetValue("renderer_position_y", windowPosition.y);
 
+		// Creates keyboard events
+		Input::Get().Events().CreateKeyboardEvent( "delete",		 {},						 Keyboard::DELETE	);
+		Input::Get().Events().CreateKeyboardEvent( "reload_shaders", {},						 Keyboard::F5		);
+		Input::Get().Events().CreateKeyboardEvent( "open_scene",	 { Keyboard::LEFT_CONTROL }, Keyboard::O		);
+		Input::Get().Events().CreateKeyboardEvent( "save_scene",	 { Keyboard::LEFT_CONTROL }, Keyboard::S		);
+		Input::Get().Events().CreateKeyboardEvent( "reload_scene",	 { Keyboard::LEFT_CONTROL }, Keyboard::R		);
+
 		// Set some values
 		m_editorGrid.isVisible = true;
 		m_editorGrid.color = Color(0.161f, 0.290f, 0.8f, 0.478f);
@@ -100,12 +107,9 @@ namespace fan {
 		m_scene->onSceneClear.Connect  ( &Renderer::Clear, m_renderer );
 		m_scene->onDeleteGameobject.Connect( &Engine::OnGameobjectDeleted, this );
 
-		Input::Get().Events().CreateKeyboardEvent( "copy", {Keyboard::LEFT_CONTROL}, Keyboard::C );
-		Input::Get().Events().CreateKeyboardEvent( "delete", {}, Keyboard::DELETE  );
-		Input::Get().Events().CreateKeyboardEvent( "test", { Keyboard::LEFT_CONTROL,  Keyboard::L }, Keyboard::G );
-
-		Input::Get().Events().FindEvent("test")->Connect( &Engine::Test, this );
-
+		// Events linking
+		Input::Get().Events().FindEvent( "reload_shaders" )->Connect( &Renderer::ReloadShaders, m_renderer );
+		Input::Get().Events().FindEvent( "delete" )->Connect( &Engine::DeleteSelection, this );
 
 		// Static messages		
 		Material::onMaterialSetPath.Connect		( &Engine::OnMaterialSetTexture, this );
@@ -144,11 +148,6 @@ namespace fan {
 		delete ( m_renderer );
 	}
 
-	void Engine::Test() {
-
-		Debug::Highlight("test");
-	}
-
 	//================================================================================================================================
 	//================================================================================================================================
 	void Engine::Exit() {
@@ -181,7 +180,6 @@ namespace fan {
 				m_physicsManager->StepSimulation(targetLogicDelta);
 				m_ecsManager->LateUpdate( targetLogicDelta );
 
-				ManageKeyShortcuts();
 				ManageSelection();
 				DrawUI();
 				m_physicsManager->OnGui();
@@ -442,15 +440,11 @@ namespace fan {
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void Engine::ManageKeyShortcuts() {
+	void Engine::DeleteSelection() {
 		if ( Keyboard::IsKeyPressed( GLFW_KEY_DELETE ) ) {
 			if ( m_selectedGameobject != nullptr ) {
 				m_scene->DeleteGameobject( m_selectedGameobject );
 			}
-		}
-
-		if ( Keyboard::IsKeyPressed( GLFW_KEY_F5 ) ) {
-			m_renderer->ReloadShaders();
 		}
 	}
 

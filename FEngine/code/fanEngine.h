@@ -102,7 +102,7 @@ namespace fan {
 
 		bool m_applicationShouldExit;
 
-		void ManageKeyShortcuts();
+		void DeleteSelection();
 		void ManageSelection();
 		void UpdateRenderer();
 		void OnSceneLoad(Scene * _scene);
