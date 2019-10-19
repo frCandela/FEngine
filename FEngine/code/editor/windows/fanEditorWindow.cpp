@@ -15,16 +15,15 @@ namespace fan
 		ss << "show_window_" << _name;
 		m_jsonShowWindowKey = ss.str();
 
-		bool value;
-		if (SerializedValues::Get().GetValue(m_jsonShowWindowKey, value) == true) {
-			SetVisible(value);
-		}
+		bool value = false;
+		SerializedValues::Get().GetBool(m_jsonShowWindowKey.c_str(), value);
+		SetVisible(value);
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
 	EditorWindow::~EditorWindow() {
-		SerializedValues::Get().SetValue(m_jsonShowWindowKey, m_isVisible);
+		SerializedValues::Get().SetBool(m_jsonShowWindowKey.c_str(), m_isVisible);
 	}
 
 	//================================================================================================================================

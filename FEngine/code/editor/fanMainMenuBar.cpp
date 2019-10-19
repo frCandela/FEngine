@@ -28,10 +28,10 @@ namespace fan
 		, m_showNormals(false)
 		, m_sceneExtensionFilter(GlobalValues::s_sceneExtensions) {
 
-		SerializedValues::Get().GetValue( "show_imguidemo", m_showImguiDemoWindow );
-		SerializedValues::Get().GetValue( "editor_grid_show", m_editorGrid.isVisible );
-		SerializedValues::Get().GetValue( "editor_grid_spacing", m_editorGrid.spacing );
-		SerializedValues::Get().GetValue( "editor_grid_linesCount", m_editorGrid.linesCount );
+		SerializedValues::Get().GetBool( "show_imguidemo", m_showImguiDemoWindow );
+		SerializedValues::Get().GetBool( "editor_grid_show", m_editorGrid.isVisible );
+		SerializedValues::Get().GetFloat( "editor_grid_spacing", m_editorGrid.spacing );
+		SerializedValues::Get().GetInt( "editor_grid_linesCount", m_editorGrid.linesCount );
 		SerializedValues::Get().GetColor( "editor_grid_color", m_editorGrid.color );
 
 		Input::Get().Manager().FindEvent( "open_scene")->Connect( &MainMenuBar::Open, this );
@@ -42,10 +42,10 @@ namespace fan
 	//================================================================================================================================
 	//================================================================================================================================
 	MainMenuBar::~MainMenuBar() {
-		SerializedValues::Get().SetValue( "show_imguidemo", m_showImguiDemoWindow );
-		SerializedValues::Get().SetValue( "editor_grid_show",       m_editorGrid.isVisible );
-		SerializedValues::Get().SetValue( "editor_grid_spacing",	m_editorGrid.spacing );
-		SerializedValues::Get().SetValue( "editor_grid_linesCount", m_editorGrid.linesCount );
+		SerializedValues::Get().SetBool( "show_imguidemo",			m_showImguiDemoWindow );
+		SerializedValues::Get().SetBool( "editor_grid_show",		m_editorGrid.isVisible );
+		SerializedValues::Get().SetFloat( "editor_grid_spacing",	m_editorGrid.spacing );
+		SerializedValues::Get().SetInt( "editor_grid_linesCount",	m_editorGrid.linesCount );
 		SerializedValues::Get().SetColor( "editor_grid_color",		m_editorGrid.color );
 
 		for (int windowIndex = 0; windowIndex < m_editorWindows.size() ; windowIndex++) {

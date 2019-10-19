@@ -7,16 +7,19 @@ namespace fan {
 	//================================================================================================================================
 	//================================================================================================================================
 	Signal<>* InputManager::CreateKeyboardEvent( const std::string& _name, const Keyboard::Key _key, const Keyboard::Key _mod0, const Keyboard::Key _mod1, const  Keyboard::Key _mod2 ) {
-		assert( FindEvent( _name ) == nullptr );
+		// Already exists
+		Signal<>* keyEvent = FindEvent( _name );
+		if ( keyEvent != nullptr ) {
+			return &m_keyboardEvents[_name].onEvent;
+		}
 
-
-
-		KeyboardEvent keyEvent;
-		keyEvent.key = _key;
-		keyEvent.mod0 = _mod0;
-		keyEvent.mod1 = _mod1;
-		keyEvent.mod2 = _mod2;
-		m_keyboardEvents[_name] = keyEvent;
+		// Creates new one
+		KeyboardEvent newKeyEvent;
+		newKeyEvent.key = _key;
+		newKeyEvent.mod0 = _mod0;
+		newKeyEvent.mod1 = _mod1;
+		newKeyEvent.mod2 = _mod2;
+		m_keyboardEvents[_name] = newKeyEvent;
 
 		return & m_keyboardEvents[_name].onEvent;
 	}
@@ -24,8 +27,12 @@ namespace fan {
 	//================================================================================================================================
 	//================================================================================================================================
 	void InputManager::CreateAxis( const std::string& _name, const Keyboard::Key _keyPositive, const Keyboard::Key _keyNegative ) {
-		assert ( m_axis.find( _name ) == m_axis.end() );
+		// Already exists
+		if( m_axis.find( _name ) != m_axis.end() ) {
+			return;
+		}
 
+		// Creates new one
 		Axis axis;
 		axis.keyNegative = _keyNegative;
 		axis.keyPositive = _keyPositive;
@@ -71,46 +78,78 @@ namespace fan {
 
 	//================================================================================================================================
 	//================================================================================================================================
-	bool InputManager::Load( Json & /*_json*/ ) {
+	bool InputManager::Load( Json & _json ) {
+		{// Events
+			size_t index = 0;
+			Json& jEvents = _json["events"];
+			for ( size_t eventIndex = 0; eventIndex < jEvents.size(); ++eventIndex ) {
+				Json& jEvent_i = jEvents[index];
 
-// 		for (int eventIndex = 0; eventIndex < _json.size(); eventIndex++) {
-// 			Json& jEvent = _json[eventIndex];
-// 
-// 			std::string name;
-// 			std::vector<Keyboard::Key> modifiers;
-// 			Keyboard::Key key;
-// 
-// 			LoadString(jEvent, "name", name );
-// 			LoadInt( jEvent, "key", key );
-// 
-// 			Json& jModifiers = _json["modifiers"];
-// 			for (int keyIndex = 0; keyIndex < jModifiers.size(); keyIndex++) {
-// 				Keyboard::Key modifierKey = jModifiers[keyIndex];
-// 				modifiers.push_back( modifierKey );
-// 			}
-// 			//CreateKeyboardEvent( name, modifiers, key );
-// 		}
+				std::string name;
+				KeyboardEvent keyEvent;
+
+				LoadString( jEvent_i, "name", name );
+				LoadInt( jEvent_i, "key", keyEvent.key );
+				LoadInt( jEvent_i, "mod0", keyEvent.mod0 );
+				LoadInt( jEvent_i, "mod1", keyEvent.mod1 );
+				LoadInt( jEvent_i, "mod2", keyEvent.mod2 );
+
+				m_keyboardEvents[name] = keyEvent;
+
+				++index;
+			}
+		}
+
+		{ // Axis
+			size_t index = 0;
+			Json& jAxis = _json["axis"];
+			for ( size_t axisIndex = 0; axisIndex < jAxis.size(); ++axisIndex ) {
+				Json& jAxis_i = jAxis[index];
+				
+				std::string name;
+				Axis axis;
+
+				LoadString( jAxis_i, "name", name );
+				LoadInt( jAxis_i, "key_negative", axis.keyNegative );
+				LoadInt( jAxis_i, "key_positive", axis.keyPositive );
+
+				m_axis[name] = axis;
+
+				++index;
+			}
+		}
 
 		return true;
 	}
 		
 	//================================================================================================================================
 	//================================================================================================================================
-	bool InputManager::Save( Json & /*_json*/ ) const {
-// 		size_t index = 0;
-// 		for ( auto keyEvent : m_keyboardEvents) {
-// 			Json& jEvent = _json[index];
-// 
-// 			SaveString( jEvent, "name", keyEvent.first );
-// 			SaveUInt(	jEvent, "key", keyEvent.second.key );
-// 
-// 			Json& jModifiers = _json["modifiers"];
-// 			for ( int keyIndex = 0; keyIndex < keyEvent.second.modifiers.size(); keyIndex++ ) {
-// 				SaveUInt( jModifiers[keyIndex], "key", keyEvent.second.modifiers[keyIndex] );
-// 			}
-// 
-// 			++ index;
-// 		}
+	bool InputManager::Save( Json & _json ) const {
+		{// Events
+			size_t index = 0;
+			Json& jEvents = _json["events"];
+			for ( auto keyEvent : m_keyboardEvents ) {
+				Json& jEvent_i = jEvents[index];
+				SaveString( jEvent_i, "name", keyEvent.first );
+				SaveInt( jEvent_i, "key", keyEvent.second.key );
+				SaveInt( jEvent_i, "mod0", keyEvent.second.mod0 );
+				SaveInt( jEvent_i, "mod1", keyEvent.second.mod1 );
+				SaveInt( jEvent_i, "mod2", keyEvent.second.mod2 );
+				++index;
+			}
+		}
+
+		{ // Axis
+			size_t index = 0;
+			Json& jAxis = _json["axis"];
+			for ( auto axisPair : m_axis ) {
+				Json& jEvent_i = jAxis[index];
+				SaveString( jEvent_i, "name", axisPair.first );
+				SaveInt( jEvent_i, "key_negative", axisPair.second.keyNegative );
+				SaveInt( jEvent_i, "key_positive",axisPair.second.keyPositive );
+				++index;
+			}
+		}
 		return true;
 	}
 }

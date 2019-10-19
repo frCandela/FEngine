@@ -9,7 +9,6 @@ namespace fan {
 		virtual bool Save( Json & _json ) const = 0;
 		static const std::string GetIndentation(const int _indentLevel);
 
-	protected:
 		static void SaveVec2	( Json & _json, const char * _name, const btVector2&	_vec2 );
 		static void SaveVec3	( Json & _json, const char * _name, const btVector3&	_vec3 );
 		static void SaveQuat	( Json & _json, const char * _name, const btQuaternion& _quat );

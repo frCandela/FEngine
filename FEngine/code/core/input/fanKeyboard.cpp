@@ -19,33 +19,33 @@ namespace fan {
 
 	//================================================================================================================================
 	//================================================================================================================================
-	bool Keyboard::IsKeyDown( const Key _GLFW_KEY) {
-		if ( ImGui::GetIO().WantCaptureKeyboard ) {
+	bool Keyboard::IsKeyDown( const Key _key ) {
+		if ( _key == NONE || ImGui::GetIO().WantCaptureKeyboard ) {
 			return false;
 		} else {
-			return glfwGetKey(Input::Get().Window(), _GLFW_KEY) == GLFW_PRESS;
+			return glfwGetKey(Input::Get().Window(), _key ) == GLFW_PRESS;
 		}
 	}
 	
 	//================================================================================================================================
 	//================================================================================================================================
-	bool Keyboard::IsKeyPressed(const Key _GLFW_KEY) {
-		if ( ImGui::GetIO().WantCaptureKeyboard) {
+	bool Keyboard::IsKeyPressed(const Key _key) {
+		if ( _key == NONE || ImGui::GetIO().WantCaptureKeyboard) {
 			return false;
 		}
 		else {
-			return Get().m_keysPressed[_GLFW_KEY] == Input::Get().FrameCount();
+			return Get().m_keysPressed[_key] == Input::Get().FrameCount();
 		}
 	}
 	
 	//================================================================================================================================
 	//================================================================================================================================
-	bool Keyboard::IsKeyReleased(const Key _GLFW_KEY) {
-		if ( ImGui::GetIO().WantCaptureKeyboard) {
+	bool Keyboard::IsKeyReleased(const Key _key ) {
+		if ( _key == NONE || ImGui::GetIO().WantCaptureKeyboard) {
 			return false;
 		}
 		else {
-			return Get().m_keysReleased[_GLFW_KEY] == Input::Get().FrameCount();
+			return Get().m_keysReleased[_key] == Input::Get().FrameCount();
 		}
 	}
 

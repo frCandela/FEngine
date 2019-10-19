@@ -57,12 +57,14 @@ namespace fan {
 
 		// Get serialized editor values
 		VkExtent2D windowSize = { 1280,720 };
-		SerializedValues::Get().GetValue("renderer_extent_width", windowSize.width);
-		SerializedValues::Get().GetValue("renderer_extent_height", windowSize.height);
+		SerializedValues::Get().GetUInt("renderer_extent_width", windowSize.width);
+		SerializedValues::Get().GetUInt("renderer_extent_height", windowSize.height);
 
 		glm::ivec2 windowPosition = { 0,23 };
-		SerializedValues::Get().GetValue("renderer_position_x", windowPosition.x);
-		SerializedValues::Get().GetValue("renderer_position_y", windowPosition.y);
+		SerializedValues::Get().GetInt("renderer_position_x", windowPosition.x);
+		SerializedValues::Get().GetInt("renderer_position_y", windowPosition.y);
+
+		SerializedValues::Get().LoadKeyBindings();
 
 		// Creates keyboard events
 		Input::Get().Manager().CreateKeyboardEvent( "delete",		  Keyboard::DELETE	);
@@ -147,10 +149,10 @@ namespace fan {
 		const Window * window = m_renderer->GetWindow();
 		const VkExtent2D rendererSize = window->GetExtent();
 		const glm::ivec2 windowPosition = window->GetPosition();
-		SerializedValues::Get().SetValue("renderer_extent_width", rendererSize.width);
-		SerializedValues::Get().SetValue("renderer_extent_height", rendererSize.height);
-		SerializedValues::Get().SetValue("renderer_position_x", windowPosition.x);
-		SerializedValues::Get().SetValue("renderer_position_y", windowPosition.y);
+		SerializedValues::Get().SetUInt("renderer_extent_width", rendererSize.width);
+		SerializedValues::Get().SetUInt("renderer_extent_height", rendererSize.height);
+		SerializedValues::Get().SetInt("renderer_position_x", windowPosition.x);
+		SerializedValues::Get().SetInt("renderer_position_y", windowPosition.y);
 		SerializedValues::Get().SaveValuesToDisk();
 
 		delete ( m_renderer );

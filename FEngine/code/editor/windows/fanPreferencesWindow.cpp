@@ -8,6 +8,8 @@
 #include "core/input/fanInputManager.h"
 #include "core/input/fanInput.h"
 #include "core/input/fanKeyboard.h"
+#include "core/files/fanSerializedValues.h"
+#include "editor/fanModals.h"
 
 namespace fan
 {
@@ -42,6 +44,9 @@ namespace fan
 
 				m_uniqueKeyIndex = 0;
 				ImGui::Text( "Axis                      ____ (-) ____    ____ (+) ____" );
+				ImGui::SameLine(); ImGui::Text("        "); ImGui::SameLine(); if ( ImGui::Button( "Reset" ) ) { SerializedValues::Get().LoadKeyBindings(); }
+				ImGui::SameLine(); gui::ShowHelpMarker("Delete the file editor_data.json to reset to factory default");
+				
 				ImGui::Indent();
 				ImGui::Columns( 2 );
 				ImGui::SetColumnWidth( 0, column0_size );
@@ -64,7 +69,7 @@ namespace fan
 			{
 				std::map< std::string, InputManager::KeyboardEvent >& eventList = Input::Get().Manager().GetListKeyboardEvents();
 
-				ImGui::Text( "Shortcuts                 ____ key ____    __________________ modifiers __________________" );
+				ImGui::Text( "Shortcuts                 ____ key ____    __________________ modifiers __________________" ); 
 				ImGui::Indent();
 				ImGui::Columns( 2 );
 				ImGui::SetColumnWidth( 0, column0_size );
@@ -77,7 +82,7 @@ namespace fan
 					SetKeyButton( pair.second.mod2 );
 					ImGui::NextColumn();
 				}ImGui::Unindent();
-			}
+			}		
 		}
 
 		CaptureKeyPopup();
