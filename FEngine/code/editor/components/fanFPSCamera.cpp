@@ -7,6 +7,8 @@
 #include "core/fanSignal.h"
 #include "core/input/fanInput.h"
 #include "core/input/fanKeyboard.h"
+#include "core/input/fanInput.h"
+#include "core/input/fanInputManager.h"
 #include "core/input/fanMouse.h"
 #include "renderer/fanRenderer.h"
 
@@ -62,42 +64,20 @@ namespace fan
 
 		btVector3 position = m_transform->GetPosition();
 
+		float forwardAxis = Input::Get().Manager().GetAxis( "editor_forward" );
+		float upAxis =		Input::Get().Manager().GetAxis( "editor_up" );
+		float leftAxis =	Input::Get().Manager().GetAxis( "editor_left" );
+		float boost =		Input::Get().Manager().GetAxis( "editor_boost" );
+		
 		// Calculates speed
 		float realSpeed = m_speed;
-		if (Keyboard::IsKeyDown(GLFW_KEY_LEFT_SHIFT)) {
+		if ( boost > 0.f ) {
 			realSpeed *= m_speedMultiplier;
 		}
-
-		// Camera goes left
-		float rightAxis = 0.f;
-		if (Keyboard::IsKeyDown(GLFW_KEY_D)) {
-			rightAxis -= 1.f;
-		}
-		else if (Keyboard::IsKeyDown(GLFW_KEY_A)) {
-			rightAxis += 1.f;
-		}
-		position += _delta * realSpeed * rightAxis * m_transform->Left();
-
-
-		// Camera goes up
-		float upAxis = 0.f;
-		if (Keyboard::IsKeyDown(GLFW_KEY_E)) {
-			upAxis += 1.f;
-		}
-		else if (Keyboard::IsKeyDown(GLFW_KEY_Q)) {
-			upAxis -= 1.f;
-		}
-		position += _delta * realSpeed * upAxis * m_transform->Up();
-
-		// Camera goes forward
-		float forwardAxis = 0.f;
-		if (Keyboard::IsKeyDown(GLFW_KEY_W)) {
-			forwardAxis += 1.f;
-		}
-		else if (Keyboard::IsKeyDown(GLFW_KEY_S)) {
-			forwardAxis -= 1.f;
-		}
-		position += _delta * realSpeed * forwardAxis * m_transform->Forward();
+		
+		position += _delta * realSpeed * leftAxis * m_transform->Left();		// Camera goes left		
+		position += _delta * realSpeed * upAxis * m_transform->Up();			// Camera goes up		
+		position += _delta * realSpeed * forwardAxis * m_transform->Forward();	// Camera goes forward
 
 		// Camera rotation
 		const btVector2 mouseDelta = Mouse::GetDelta();

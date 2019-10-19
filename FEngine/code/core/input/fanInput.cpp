@@ -3,14 +3,14 @@
 
 #include "core/input/fanKeyboard.h"
 #include "core/input/fanMouse.h"
-#include "core/input/fanEventManager.h"
+#include "core/input/fanInputManager.h"
 
 namespace fan {
 
 	//================================================================================================================================
 	//================================================================================================================================
 	Input::Input() {
-		m_eventManager = new EventManager();
+		m_eventManager = new InputManager();
 	}
 
 	//================================================================================================================================

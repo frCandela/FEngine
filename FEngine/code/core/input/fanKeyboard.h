@@ -29,6 +29,7 @@ namespace fan {
 		std::array< uint64_t, GLFW_KEY_LAST > m_keysReleased;
 
 	public:		
+		static const Key NONE = -1;
 		static const Key SPACE = GLFW_KEY_SPACE;
 		static const Key APOSTROPHE = GLFW_KEY_APOSTROPHE;
 		static const Key COMMA = GLFW_KEY_COMMA;

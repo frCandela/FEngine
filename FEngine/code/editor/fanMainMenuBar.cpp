@@ -9,7 +9,7 @@
 #include "editor/fanEditorGrid.h"
 #include "core/files/fanSerializedValues.h"
 #include "core/input/fanInput.h"
-#include "core/input/fanEventManager.h"
+#include "core/input/fanInputManager.h"
 #include "editor/fanModals.h"
 #include "scene/fanScene.h"
 #include "core/fanTime.h"
@@ -34,9 +34,9 @@ namespace fan
 		SerializedValues::Get().GetValue( "editor_grid_linesCount", m_editorGrid.linesCount );
 		SerializedValues::Get().GetColor( "editor_grid_color", m_editorGrid.color );
 
-		Input::Get().Events().FindEvent( "open_scene")->Connect( &MainMenuBar::Open, this );
-		Input::Get().Events().FindEvent( "save_scene" )->Connect( &MainMenuBar::Save, this );
-		Input::Get().Events().FindEvent( "reload_scene" )->Connect( &MainMenuBar::Reload, this );
+		Input::Get().Manager().FindEvent( "open_scene")->Connect( &MainMenuBar::Open, this );
+		Input::Get().Manager().FindEvent( "save_scene" )->Connect( &MainMenuBar::Save, this );
+		Input::Get().Manager().FindEvent( "reload_scene" )->Connect( &MainMenuBar::Reload, this );
 	}
 
 	//================================================================================================================================

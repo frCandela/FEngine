@@ -12,7 +12,7 @@
 #include "core/input/fanInput.h"
 #include "core/input/fanKeyboard.h"
 #include "core/input/fanMouse.h"
-#include "core/input/fanEventManager.h"
+#include "core/input/fanInputManager.h"
 #include "core/math/shapes/fanTriangle.h"
 #include "core/math/shapes/fanPlane.h"
 #include "core/math/shapes/fanAABB.h"
@@ -65,11 +65,19 @@ namespace fan {
 		SerializedValues::Get().GetValue("renderer_position_y", windowPosition.y);
 
 		// Creates keyboard events
-		Input::Get().Events().CreateKeyboardEvent( "delete",		 {},						 Keyboard::DELETE	);
-		Input::Get().Events().CreateKeyboardEvent( "reload_shaders", {},						 Keyboard::F5		);
-		Input::Get().Events().CreateKeyboardEvent( "open_scene",	 { Keyboard::LEFT_CONTROL }, Keyboard::O		);
-		Input::Get().Events().CreateKeyboardEvent( "save_scene",	 { Keyboard::LEFT_CONTROL }, Keyboard::S		);
-		Input::Get().Events().CreateKeyboardEvent( "reload_scene",	 { Keyboard::LEFT_CONTROL }, Keyboard::R		);
+		Input::Get().Manager().CreateKeyboardEvent( "delete",		 {},						 Keyboard::DELETE	);
+		Input::Get().Manager().CreateKeyboardEvent( "reload_shaders", {},						 Keyboard::F5		);
+		Input::Get().Manager().CreateKeyboardEvent( "open_scene",	 { Keyboard::LEFT_CONTROL }, Keyboard::O		);
+		Input::Get().Manager().CreateKeyboardEvent( "save_scene",	 { Keyboard::LEFT_CONTROL }, Keyboard::S		);
+		Input::Get().Manager().CreateKeyboardEvent( "reload_scene",	 { Keyboard::LEFT_CONTROL }, Keyboard::R		);
+
+		// Axis
+		Input::Get().Manager().CreateAxis( "game_forward", Keyboard::W, Keyboard::S );
+		Input::Get().Manager().CreateAxis( "game_left", Keyboard::A, Keyboard::D );
+		Input::Get().Manager().CreateAxis( "editor_forward", Keyboard::W, Keyboard::S );
+		Input::Get().Manager().CreateAxis( "editor_left", Keyboard::A, Keyboard::D );
+		Input::Get().Manager().CreateAxis( "editor_up", Keyboard::E, Keyboard::Q );
+		Input::Get().Manager().CreateAxis( "editor_boost", Keyboard::LEFT_SHIFT, Keyboard::NONE );
 
 		// Set some values
 		m_editorGrid.isVisible = true;
@@ -108,8 +116,8 @@ namespace fan {
 		m_scene->onDeleteGameobject.Connect( &Engine::OnGameobjectDeleted, this );
 
 		// Events linking
-		Input::Get().Events().FindEvent( "reload_shaders" )->Connect( &Renderer::ReloadShaders, m_renderer );
-		Input::Get().Events().FindEvent( "delete" )->Connect( &Engine::DeleteSelection, this );
+		Input::Get().Manager().FindEvent( "reload_shaders" )->Connect( &Renderer::ReloadShaders, m_renderer );
+		Input::Get().Manager().FindEvent( "delete" )->Connect( &Engine::DeleteSelection, this );
 
 		// Static messages		
 		Material::onMaterialSetPath.Connect		( &Engine::OnMaterialSetTexture, this );
@@ -184,7 +192,7 @@ namespace fan {
 				DrawUI();
 				m_physicsManager->OnGui();
 				DrawEditorGrid();
-				Input::Get().Events().PullEvents();
+				Input::Get().Manager().PullEvents();
 
 				if ( m_mainMenuBar->ShowWireframe() ) { DrawWireframe(); }
 				if ( m_mainMenuBar->ShowNormals() ) { DrawNormals(); }
@@ -441,11 +449,9 @@ namespace fan {
 	//================================================================================================================================
 	//================================================================================================================================
 	void Engine::DeleteSelection() {
-		if ( Keyboard::IsKeyPressed( GLFW_KEY_DELETE ) ) {
-			if ( m_selectedGameobject != nullptr ) {
-				m_scene->DeleteGameobject( m_selectedGameobject );
-			}
-		}
+		if ( m_selectedGameobject != nullptr ) {
+			m_scene->DeleteGameobject( m_selectedGameobject );
+		}		
 	}
 
 	//================================================================================================================================

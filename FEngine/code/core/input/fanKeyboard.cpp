@@ -20,7 +20,7 @@ namespace fan {
 	//================================================================================================================================
 	//================================================================================================================================
 	bool Keyboard::IsKeyDown( const Key _GLFW_KEY) {
-		if (ImGui::GetIO().WantCaptureKeyboard ) {
+		if ( _GLFW_KEY < 0 || ImGui::GetIO().WantCaptureKeyboard ) {
 			return false;
 		} else {
 			return glfwGetKey(Input::Get().Window(), _GLFW_KEY) == GLFW_PRESS;

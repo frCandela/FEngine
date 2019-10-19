@@ -3,7 +3,7 @@
 #include "core/fanSingleton.h"
 
 namespace fan {
-	class EventManager;
+	class InputManager;
 
 	//================================================================================================================================
 	//================================================================================================================================
@@ -17,7 +17,7 @@ namespace fan {
 		GLFWwindow *	Window()	 { return m_window; }
 		btVector2		WindowSize() { return m_windowSize; }
 		uint64_t		FrameCount() { return m_count; }
-		EventManager&	Events() { return *m_eventManager; }
+		InputManager&	Manager() { return *m_eventManager; }
 
 	private:
 		Input();
@@ -26,7 +26,7 @@ namespace fan {
 		btVector2		m_windowSize;
 		uint64_t		m_count;
 
-		EventManager*	m_eventManager;
+		InputManager*	m_eventManager;
 
 		 static void	WindowSizeCallback(GLFWwindow* window, int width, int height);
 	};	

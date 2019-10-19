@@ -2,7 +2,8 @@
 #include "game/fanSpaceShip.h"
 
 #include "core/fanTime.h"
-#include "core/input/fanKeyboard.h"
+#include "core/input/fanInput.h"
+#include "core/input/fanInputManager.h"
 #include "editor/windows/fanInspectorWindow.h"
 #include "scene/components/fanTransform.h"
 #include "scene/fanGameobject.h"
@@ -22,22 +23,8 @@ namespace fan {
 	void SpaceShip::Update(const float _delta) {
 
 		// Go forward
-		float forward = 0.f;
-		if (Keyboard::IsKeyDown(GLFW_KEY_W)) {
-			forward = 1.f;
-		}
-		else if (Keyboard::IsKeyDown(GLFW_KEY_S)) {
-			forward = -1.f;
-		}
-
-		// Turn
-		float leftRotation = 0.f;
-		if (Keyboard::IsKeyDown(GLFW_KEY_D)) {
-			leftRotation = -1.f;
-		}
-		else if (Keyboard::IsKeyDown(GLFW_KEY_A)) {
-			leftRotation = 1.f;
-		}
+		float forward = Input::Get().Manager().GetAxis("game_forward");
+		float left = Input::Get().Manager().GetAxis( "game_left" );
 
 		// Translation
 		Transform * transform = GetGameobject()->GetComponent<Transform>();
@@ -50,10 +37,10 @@ namespace fan {
 		m_speed -= _delta * drag;
 
 		// Rotation
-		if (leftRotation != 0.f) {
-			leftRotation *= m_rotationSpeed * _delta;
+		if ( left != 0.f) {
+			left *= m_rotationSpeed * _delta;
 			btQuaternion quat = transform->GetRotationQuat();
-			btQuaternion rotationQuat(btVector3::Up(), leftRotation);
+			btQuaternion rotationQuat(btVector3::Up(), left );
 			transform->SetRotationQuat(quat * rotationQuat);
 		}
 	}
