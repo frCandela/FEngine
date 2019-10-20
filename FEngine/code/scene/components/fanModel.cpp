@@ -18,45 +18,27 @@ namespace fan
 	REGISTER_EDITOR_COMPONENT(Model);
 	REGISTER_TYPE_INFO(Model)
 
-	Signal< Model * > Model::onRegisterModel;
-	Signal< Model * > Model::onUnRegisterModel;
+	Signal< Model * >				Model::onRegisterModel;
+	Signal< Model * >				Model::onUnRegisterModel;
 	Signal< Model *, std::string  >	Model::onModelSetPath;
 
 	//================================================================================================================================
 	//================================================================================================================================
 	void Model::OnAttach() {
 		Component::OnAttach();
-		GetGameobject()->AddEcsComponent<ecsModel>();
+		m_gameobject->AddEcsComponent<ecsModel>()->Init();
+		m_gameobject->AddEcsComponent<ecsConvexHull>()->Init();
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
 	void Model::OnDetach() {
 		Component::OnDetach();
-		GetGameobject()->RemoveEcsComponent<ecsModel>();
+		m_gameobject->RemoveEcsComponent<ecsModel>();
+		m_gameobject->RemoveEcsComponent<ecsConvexHull>();
 		onUnRegisterModel.Emmit(this);
-	}
 
-	//================================================================================================================================
-	//================================================================================================================================
-	AABB Model::ComputeAABB() const {
-		const glm::mat4 modelMatrix = GetGameobject()->GetComponent<Transform>()->GetModelMatrix();
-		Mesh * mesh = GetEcsModel()->mesh;
-
-		const std::vector<Vertex> &  vertices = mesh->GetVertices();
-
-		const ConvexHull * hull = mesh->GetConvexHull();
-		if (hull != nullptr) {
-			return AABB(hull->GetVertices(), modelMatrix);
-		}
-		else {
-			std::vector<btVector3> btVertices;
-			btVertices.reserve(vertices.size());
-			for (int vertIndex = 0; vertIndex < vertices.size(); vertIndex++) {
-				btVertices.push_back(ToBullet(vertices[vertIndex].pos));
-			}
-			return AABB(btVertices, modelMatrix);
-		}
+		m_gameobject->AddFlag( Gameobject::Flag::OUTDATED_TRANSFORM );
 	}
 
 	//================================================================================================================================
@@ -64,7 +46,8 @@ namespace fan
 	void Model::SetMesh(Mesh * _mesh) {
 		GetEcsModel()->mesh = _mesh;
 		onRegisterModel.Emmit(this);
-		MarkModified(true);
+		_mesh->GenerateConvexHull( GetConvexHull() );
+		m_gameobject->AddFlag( Gameobject::Flag::OUTDATED_TRANSFORM );
 	}
 
 	//================================================================================================================================
@@ -131,5 +114,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	ecsModel* Model::GetEcsModel() const { return GetGameobject()->GetEcsComponent<ecsModel>(); }
+	ecsModel*		Model::GetEcsModel() const		{ return	m_gameobject->GetEcsComponent<ecsModel>(); }
+	ecsConvexHull * Model::GetEcsConvexHull() const { return	m_gameobject->GetEcsComponent<ecsConvexHull>(); }
+	ConvexHull&		Model::GetConvexHull() const	{ return	GetEcsConvexHull()->convexHull; }
 }

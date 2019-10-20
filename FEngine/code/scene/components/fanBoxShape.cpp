@@ -25,8 +25,7 @@ namespace fan {
 	//================================================================================================================================
 	//================================================================================================================================
 	void BoxShape::OnAttach() {
-		ecsBoxShape * boxShape = GetGameobject()->AddEcsComponent<ecsBoxShape>();
-		boxShape->Init( btVector3(0.5f, 0.5f, 0.5f) );
+		m_gameobject->AddEcsComponent<ecsBoxShape>()->Init( btVector3( 0.5f, 0.5f, 0.5f ) );
 
 		ColliderShape::OnAttach();
 	}
@@ -34,7 +33,7 @@ namespace fan {
 	//================================================================================================================================
 	//================================================================================================================================
 	void BoxShape::OnDetach() {
-		GetGameobject()->RemoveEcsComponent<ecsBoxShape>();
+		m_gameobject->RemoveEcsComponent<ecsBoxShape>();
 
 		ColliderShape::OnDetach();
 	}
@@ -45,11 +44,11 @@ namespace fan {
 		Component::OnGui();
 
 		btVector3 extent = GetExtent();;
-		if ( ImGui::DragFloat3("half extent", &extent[0], 0.25f, 0.f ) ) {
+		if ( ImGui::DragFloat3("half extent", &extent[0], 0.05f, 0.f ) ) {
 			SetExtent( extent );
 		}
 
-		Debug::Render().DebugCube( GetGameobject()->GetTransform()->GetBtTransform(), 0.5f * extent, Color::Green );
+		Debug::Render().DebugCube( m_gameobject->GetTransform()->GetBtTransform(), 0.5f * extent, Color::Green );
 
 	}
 
@@ -75,7 +74,7 @@ namespace fan {
 
 	//================================================================================================================================
 	//================================================================================================================================
-	ecsBoxShape*		BoxShape::GetEcsBoxShape() const	{ return GetGameobject()->GetEcsComponent<ecsBoxShape>();}
+	ecsBoxShape*		BoxShape::GetEcsBoxShape() const	{ return m_gameobject->GetEcsComponent<ecsBoxShape>();}
 	btBoxShape *		BoxShape::GetBoxShape()				{ return &GetEcsBoxShape()->Get();}
 	btCollisionShape *	BoxShape::GetCollisionShape()		{ return GetBoxShape(); }
 }

@@ -17,11 +17,7 @@ namespace fan
 	//================================================================================================================================
 	class Gameobject : public ISerializable {
 	public:
-		enum Flag {
-			NONE = 0x00,
-			NO_DELETE = 0x01,
-			NOT_SAVED = 0x02,
-		};
+		using Flag = ecsFlags::Flag;
 
 		Gameobject(const std::string _name, Gameobject * _parent, Scene * _scene );
 		~Gameobject();
@@ -44,8 +40,7 @@ namespace fan
 		std::string		GetName() const { return m_name; }
 		void			SetName(const std::string _newName) { m_name = _newName; }
 		inline Scene *	GetScene() const { return m_scene; }
-		const AABB &	GetAABB() const;
-		void			ComputeAABB();
+		const AABB &	GetAABB() const; 
 		Transform *		GetTransform() const  { return m_transform; }
 		ecsHandle		GetEcsHandle(){ return m_ecsHandleEntity; }
 
@@ -60,27 +55,25 @@ namespace fan
 		void InsertBelow(Gameobject * _brother);
 
 		// ISerializable
-		bool Save( Json & _json ) const override;
+		bool Save( Json & _json ) const override; 
 		bool Load( Json & _json ) override;
 
 		// Flags
-		bool		HasFlag(const Flag _flag) const { return m_flags & _flag; }
-		uint32_t	GetFlags() const { return m_flags; }
-		void		SetFlags(const uint32_t _flags) { m_flags = _flags; }
+		bool		HasFlag(const Flag _flag) const { return GetEcsFlags() & _flag; }
+		void		AddFlag( const Flag _flag )		{ GetEcsFlags() |= _flag; }
+		void		SetFlags(const uint32_t _flags) { GetEcsFlags() = _flags; }
 
 	private:
 		std::string				 m_name;
 		std::vector<Gameobject*> m_childs;
 		Gameobject *			 m_parent;
 		Transform * m_transform = nullptr;
-		uint32_t				 m_flags;
 		std::vector<Component*>  m_components;
 		Scene *	const			 m_scene = nullptr;
 		ecsHandle				 m_ecsHandleEntity = ecsNullHandle;
 
-		bool m_computeAABB = true;
-
-		void AddComponent(Component * _component);
+		void		AddComponent(Component * _component);
+		uint32_t&	GetEcsFlags() const;
 	};
 
 

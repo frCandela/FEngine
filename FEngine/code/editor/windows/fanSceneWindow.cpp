@@ -9,6 +9,8 @@
 #include "scene/components/fanModel.h"
 #include "scene/components/fanPointLight.h"
 #include "scene/components/fanDirectionalLight.h"
+#include "scene/components/fanRigidbody.h"
+#include "scene/components/fanSphereShape.h"
 #include "core/input/fanInput.h"
 #include "core/input/fanKeyboard.h"
 #include "core/input/fanMouse.h"
@@ -58,18 +60,33 @@ namespace fan
 					itemClicked = true;
 				}
 				// Entities templates
+				ImGui::Icon(ImGui::MODEL, {19,19}); ImGui::SameLine();
 				if ( ImGui::MenuItem( "Model" ) ) {
 					Gameobject *  newIntity = m_scene->CreateGameobject("new_model", m_lastGameobjectRightClicked );
 					newIntity->AddComponent<Model>();
 					newIntity->AddComponent<Material>();
 				}
+
+				ImGui::Icon( ImGui::POINT_LIGHT, { 19,19 } ); ImGui::SameLine();
 				if ( ImGui::MenuItem( "Point light" ) ) {
 					Gameobject *  newIntity = m_scene->CreateGameobject( "new_point_light", m_lastGameobjectRightClicked );
 					newIntity->AddComponent<PointLight>();
 				}
+
+				ImGui::Icon( ImGui::DIR_LIGHT, { 19,19 } ); ImGui::SameLine();
 				if ( ImGui::MenuItem( "Dir light" ) ) {
 					Gameobject *  newIntity = m_scene->CreateGameobject( "new_dir_light", m_lastGameobjectRightClicked );
 					newIntity->AddComponent<DirectionalLight>();
+				}
+
+				ImGui::Icon( ImGui::SPHERE_SHAPE, { 19,19 } ); ImGui::SameLine();
+				if ( ImGui::MenuItem( "Sphere" ) ) {
+					Gameobject *  newIntity = m_scene->CreateGameobject( "new_model", m_lastGameobjectRightClicked );
+					Model * model = newIntity->AddComponent<Model>();
+					model->SetPath("content/_default/sphere.fbx");
+					newIntity->AddComponent<Rigidbody>();
+					newIntity->AddComponent<SphereShape>();
+
 				}
 				ImGui::EndMenu();
 			}

@@ -40,7 +40,6 @@ namespace fan
 		void Save() const;
 		bool LoadFrom(const std::string _path);
 
-		void				ComputeAABBEndFrame(Gameobject * _gameobject) { m_outdatedAABB.insert(_gameobject); }
 		Gameobject *		GetRoot() { return m_root; }
 		inline std::string	GetName() const { return m_name; }
 		bool				HasPath() const { return m_path.empty() == false; }
@@ -57,7 +56,6 @@ namespace fan
 		PhysicsManager * const  m_physicsManager = nullptr;
 
 		std::vector < Gameobject * >	m_entitiesToDelete;
-		std::set< Gameobject * >	m_outdatedAABB;
 		std::set< Actor * >	m_startingActors;
 		std::set< Actor * >	m_activeActors;
 

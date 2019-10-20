@@ -20,13 +20,13 @@ namespace fan {
 		//================================================================================================================================
 		//================================================================================================================================
 		void GameManager::Start() {
-		m_camera = GetGameobject()->GetComponent<Camera>();
+		m_camera = m_gameobject->GetComponent<Camera>();
 		if (m_camera == nullptr) {
 			Debug::Warning("Game manager has no camera attached");
 			SetEnabled(false);
 		}
 
-		m_spaceShip = GetGameobject()->GetScene()->FindComponentOfType<SpaceShip>();
+		m_spaceShip = m_gameobject->GetScene()->FindComponentOfType<SpaceShip>();
 		if (m_spaceShip == nullptr) {
 			Debug::Warning("GameManager::Start : No spaceShip found");
 			SetEnabled(false);
@@ -35,7 +35,7 @@ namespace fan {
 			m_spaceShip->SetEnabled(false);
 		}
 
-		m_editorCameraController = GetGameobject()->GetScene()->FindComponentOfType<FPSCamera>();
+		m_editorCameraController = m_gameobject->GetScene()->FindComponentOfType<FPSCamera>();
 		if (m_editorCameraController == nullptr) {
 			Debug::Warning("GameManager::Start : No editor CameraController found");
 			SetEnabled(false);

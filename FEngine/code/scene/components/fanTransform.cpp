@@ -16,11 +16,8 @@ namespace fan
 	void Transform::OnAttach() {
  		Component::OnAttach();
 
-		ecsTranform * transform = GetGameobject()->AddEcsComponent<ecsTranform>();
-		ecsScaling *  scaling = GetGameobject()->AddEcsComponent<ecsScaling>();
-
-		transform->transform =  btTransform::getIdentity();
-		scaling->scale = btVector3::One();
+		m_gameobject->AddEcsComponent<ecsTranform>()->Init();
+		m_gameobject->AddEcsComponent<ecsScaling>()->Init();
  
  		SetRemovable(false);
 	}
@@ -30,8 +27,8 @@ namespace fan
 	void Transform::OnDetach() {
 		Component::OnDetach();
 
-		GetGameobject()->RemoveEcsComponent<ecsTranform>();
-		GetGameobject()->RemoveEcsComponent<ecsScaling>();
+		m_gameobject->RemoveEcsComponent<ecsTranform>();
+		m_gameobject->RemoveEcsComponent<ecsScaling>();
 	}
 
 
@@ -65,7 +62,7 @@ namespace fan
 		btTransform& transform = GetEcsTransform()->transform;
 		if (transform.getOrigin() != _newPosition) {
 			transform.setOrigin( _newPosition);
-			MarkModified(true);
+			m_gameobject->AddFlag( Gameobject::Flag::OUTDATED_TRANSFORM );
  		}
 	}
 
@@ -75,7 +72,7 @@ namespace fan
 		ecsScaling* ecsScale = GetEcsScale();
 		if (ecsScale->scale != _newScale) {
 			ecsScale->scale = _newScale;
-			MarkModified(true);
+			m_gameobject->AddFlag( Gameobject::Flag::OUTDATED_TRANSFORM );
 		}
 	}
 
@@ -102,7 +99,7 @@ namespace fan
 		btTransform& transform = GetEcsTransform()->transform;
 		if (transform.getRotation() != _rotation) {
 			transform.setRotation( _rotation);
-			MarkModified(true);
+			m_gameobject->AddFlag( Gameobject::Flag::OUTDATED_TRANSFORM );
 		}
 	}
 
@@ -112,9 +109,9 @@ namespace fan
 		btTransform& transform = GetEcsTransform()->transform;
 		btVector3& btScale = GetEcsScale()->scale;
 
-		glm::vec3 position = ToGLM(transform.getOrigin());
-		glm::vec3 scale = ToGLM(btScale);
-		glm::quat rotation = ToGLM( transform.getRotation());
+		glm::vec3 position =	ToGLM(transform.getOrigin());
+		glm::vec3 scale =		ToGLM(btScale);
+		glm::quat rotation =	ToGLM( transform.getRotation());
 
 		return glm::translate(glm::mat4(1.f), position) * glm::mat4_cast(rotation) * glm::scale(glm::mat4(1.f), scale);
 	}
@@ -256,7 +253,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	ecsTranform* Transform::GetEcsTransform() const { return GetGameobject()->GetEcsComponent<ecsTranform>(); }
-	ecsScaling*  Transform::GetEcsScale() const		{ return GetGameobject()->GetEcsComponent<ecsScaling>();  }
+	ecsTranform* Transform::GetEcsTransform() const { return m_gameobject->GetEcsComponent<ecsTranform>(); }
+	ecsScaling*  Transform::GetEcsScale() const		{ return m_gameobject->GetEcsComponent<ecsScaling>();  }
 	
 }

@@ -3,6 +3,8 @@
 
 namespace ImGui {
 
+	//================================================================================================================================
+	//================================================================================================================================
 	struct IconData {
 		ImVec2 uv0;
 		ImVec2 uv1;
@@ -11,8 +13,10 @@ namespace ImGui {
 	const float IconImpl::s_iconImageSize = 512.f;
 	const float IconImpl::s_sizeIcon = 32.f;
 
-#define DECL_ICON( _x, _y) {{ (_x) *s_sizeIcon / s_iconImageSize, (_y) * s_sizeIcon / s_iconImageSize},{ (_x+1) * s_sizeIcon /s_iconImageSize,(_y+1) * s_sizeIcon /s_iconImageSize}}
+	#define DECL_ICON( _x, _y) {{ (_x) *s_sizeIcon / s_iconImageSize, (_y) * s_sizeIcon / s_iconImageSize},{ (_x+1) * s_sizeIcon /s_iconImageSize,(_y+1) * s_sizeIcon /s_iconImageSize}}
 
+	//================================================================================================================================
+	//================================================================================================================================
 	const IconImpl::IconData IconImpl::s_iconsList[IconType::NUM_ICONS] = {
 		 DECL_ICON ( 0,0 )	// NONE
 

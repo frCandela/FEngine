@@ -794,9 +794,9 @@ namespace fan
 			const btVector3 v0 = sphere[3 * triangleIndex + 0];
 			const btVector3 v1 = sphere[3 * triangleIndex + 1];
 			const btVector3 v2 = sphere[3 * triangleIndex + 2];
-			DebugLine(v0, v1, _color);
-			DebugLine(v1, v2, _color);
-			DebugLine(v2, v0, _color);
+			DebugLine(v0, v1, _color, false);
+			DebugLine(v1, v2, _color, false );
+			DebugLine(v2, v0, _color, false );
 		}
 
 		return sphere;

@@ -96,17 +96,20 @@ namespace fan {
 	//================================================================================================================================
 	// Runs the systems before the physics update
 	//================================================================================================================================
+	#define RUN_SYSTEM( _system ) RunSystem< _system::signature::componentsTypes, _system >::Run( _delta, m_activeEntitiesCount, m_entitiesData, m_components );
 	void EcsManager::Update( float _delta ) {
-		RunSystem< ParticleSystem::signature::componentsTypes, ParticleSystem >::Run( _delta, m_activeEntitiesCount, m_entitiesData, m_components );
-		RunSystem< PlanetsSystem::signature::componentsTypes, PlanetsSystem >::Run( _delta, m_activeEntitiesCount, m_entitiesData, m_components );
-		RunSystem< SynchRbToTransSystem::signature::componentsTypes, SynchRbToTransSystem >::Run( _delta, m_activeEntitiesCount, m_entitiesData, m_components );
+		RUN_SYSTEM(ParticleSystem);
+		RUN_SYSTEM(PlanetsSystem);
+		RUN_SYSTEM(SynchRbToTransSystem);
 	}
 
 	//================================================================================================================================
 	// Runs the systems after the physics update
 	//================================================================================================================================
 	void EcsManager::LateUpdate( float _delta ) {
-		RunSystem< SynchTransToRbSystem::signature::componentsTypes, SynchTransToRbSystem >::Run( _delta, m_activeEntitiesCount, m_entitiesData, m_components );
+		RUN_SYSTEM( SynchTransToRbSystem);
+		RUN_SYSTEM( UpdateAABBFromHull);
+		RUN_SYSTEM( UpdateAABBFromTransform);
 	}
 
 	//================================================================================================================================

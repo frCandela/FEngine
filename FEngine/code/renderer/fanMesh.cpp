@@ -37,7 +37,6 @@ namespace fan {
  		if (importer.LoadScene(m_path) == true) {
 			if (importer.GetMesh(*this) != false ) {
 				OptimizeVertices();
-				GenerateConvexHull();
 				return true;
 			}
 		}
@@ -71,12 +70,9 @@ namespace fan {
 	} 
 
 	//================================================================================================================================
+	// Creates a convex hull from the mesh geometry
 	//================================================================================================================================
-	void Mesh::GenerateConvexHull() {
-		if (m_convexHull == nullptr) {
-			m_convexHull = new ConvexHull();
-		}
-
+	void  Mesh::GenerateConvexHull( ConvexHull & _outConvexHull ) {
 		// Generate points clouds from vertex list
 		std::vector < btVector3> pointCloud;
 		pointCloud.reserve(m_vertices.size());
@@ -84,8 +80,7 @@ namespace fan {
 			Vertex & vertex = m_vertices[point];
 			pointCloud.push_back(btVector3(vertex.pos.x, vertex.pos.y, vertex.pos.z));
 		}
-
-		m_convexHull->ComputeQuickHull(pointCloud);
+		_outConvexHull.ComputeQuickHull(pointCloud);
 	}
 	
 	//================================================================================================================================

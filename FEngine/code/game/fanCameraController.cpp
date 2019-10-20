@@ -17,13 +17,13 @@ namespace fan {
 	//================================================================================================================================
 	//================================================================================================================================
 	void CameraController::Start() {
-		m_transform = GetGameobject()->GetComponent<Transform>();
-		m_camera = GetGameobject()->GetComponent<Camera>();
+		m_transform = m_gameobject->GetComponent<Transform>();
+		m_camera = m_gameobject->GetComponent<Camera>();
 		if (m_camera == nullptr) {
 			Debug::Warning("CameraController has no camera attached");
 		}
 
-		SpaceShip * ss = GetGameobject()->GetScene()->FindComponentOfType<SpaceShip>();
+		SpaceShip * ss = m_gameobject->GetScene()->FindComponentOfType<SpaceShip>();
 		if (ss) {
 			m_target = ss->GetGameobject()->GetComponent<Transform>();
 		}

@@ -17,6 +17,7 @@ namespace fan {
 		void Clear();
 
 		bool RayCast(const btVector3 _origin, const btVector3 _direction, btVector3& _outIntersection) const override;
+		bool IsEmpty() const { return m_indices.size() == 0; }
 
 		const std::vector<btVector3> & GetVertices() const { return m_vertices; }
 		const std::vector<uint32_t> & GetIndices() const { return m_indices; }

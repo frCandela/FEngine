@@ -90,7 +90,7 @@ namespace fan {
 
 		m_renderer = new Renderer( windowSize, windowPosition );
 		m_ecsManager = new EcsManager();
-		m_physicsManager = new PhysicsManager( btVector3( 0, -10, 0 ) );
+		m_physicsManager = new PhysicsManager( btVector3( 0, 0, 0 ) );
 		m_scene = new Scene( "mainScene", m_ecsManager, m_physicsManager );
 
 		// Initialize editor components
@@ -230,7 +230,7 @@ namespace fan {
 
 		// Editor Camera
 		Gameobject * cameraGameobject = _scene->CreateGameobject("editor_camera");
-		cameraGameobject->SetFlags( Gameobject::NO_DELETE | Gameobject::NOT_SAVED );
+		cameraGameobject->SetFlags( Gameobject::Flag::NO_DELETE | Gameobject::Flag::NOT_SAVED );
 
 		cameraGameobject->GetTransform()->SetPosition(btVector3(0, 0, -2));
 		m_editorCamera = cameraGameobject->AddComponent<Camera>();
@@ -278,7 +278,7 @@ namespace fan {
 				const ConvexHull * hull = nullptr;
 				Mesh * mesh = model->GetMesh();
 				if (mesh != nullptr) {
-					hull = mesh->GetConvexHull();
+					hull = & model->GetConvexHull();
 				}
 				if (hull != nullptr) {
 					const std::vector<btVector3> & vertices = hull->GetVertices();
@@ -286,7 +286,7 @@ namespace fan {
 					if (!vertices.empty()) {
 						const glm::mat4  modelMat = model->GetGameobject()->GetComponent<Transform>()->GetModelMatrix();
 
-						Color color(1, 0, 0, 1);
+						Color color = Color::Cyan;
 						for (unsigned polyIndex = 0; polyIndex < indices.size() / 3; polyIndex++) {
 							const int index0 = indices[3 * polyIndex + 0];
 							const int index1 = indices[3 * polyIndex + 1];
@@ -362,8 +362,7 @@ namespace fan {
 	//================================================================================================================================
 	//================================================================================================================================
 	void Engine::SetMainCamera( Camera * _mainCamera ) { 
-		m_mainCamera = _mainCamera; 
-		m_mainCamera->MarkModified();		
+		m_mainCamera = _mainCamera; 		
 		Debug::Get().SetDebug( m_renderer, m_editorCamera, _mainCamera );
 	}
 
@@ -492,10 +491,10 @@ namespace fan {
 				btVector3 intersection;
 				if (aabb.RayCast(ray.origin, ray.direction, intersection) == true) {
 					Model * model = gameobject->GetComponent<Model>();
-					if (model != nullptr && model->GetMesh() != nullptr && model->GetMesh()->GetConvexHull() != nullptr) {
+					if (model != nullptr && model->GetMesh() != nullptr ) {
 						Transform * transform = gameobject->GetComponent<Transform>();
 						const Ray transformedRay(transform->InverseTransformPoint(ray.origin), transform->InverseTransformDirection(ray.direction));
-						if (model->GetMesh()->GetConvexHull()->RayCast(transformedRay.origin, transformedRay.direction, intersection) == false) {
+						if (model->GetConvexHull().RayCast(transformedRay.origin, transformedRay.direction, intersection) == false) {
 							continue;
 						}
 					}

@@ -29,9 +29,11 @@ namespace fan {
 	//================================	
 	// Declare your signatures here
 	//================================	
-	using ecsParticleSignature = ecsSignature< ecsPosition, ecsRotation, ecsMovement, ecsParticle >;
-	using ecsPlanetSignature   = ecsSignature< ecsTranform, ecsPlanet >;
-	using ecsRigidbodySignature = ecsSignature< ecsTranform, ecsMotionState, ecsRigidbody >;
+	using ecsParticleSignature			= ecsSignature< ecsPosition, ecsRotation, ecsMovement, ecsParticle >;
+	using ecsPlanetSignature			= ecsSignature< ecsTranform, ecsPlanet >;
+	using ecsRigidbodySignature			= ecsSignature< ecsTranform, ecsMotionState, ecsRigidbody >;
+	using ecsAABBUpdateFromHull			= ecsSignature< ecsTranform, ecsScaling, ecsAABB, ecsFlags, ecsConvexHull >;
+	using ecsAABBUpdateFromTransform	= ecsSignature< ecsTranform, ecsAABB, ecsFlags >;
 
 	static constexpr ecsBitset tot1 = ecsParticleSignature::componentsBitset;
 
@@ -79,11 +81,40 @@ namespace fan {
 			, std::vector< ecsRigidbody > & _rigidbodies );
 	};
 
+	//================================
+	// Rigidbody transform update
+	//================================
 	class SynchRbToTransSystem : public ISystem<  ecsRigidbodySignature > {
 	public:
 		static void Run( float _delta, const size_t _count, std::vector< ecsEntityData >& _entitiesData,
 			std::vector< ecsTranform > & _transforms
 			, std::vector< ecsMotionState > & _motionStates
 			, std::vector< ecsRigidbody > & _rigidbodies );
+	};
+
+	//================================
+	// Update AABB from convex hull
+	//================================
+	class UpdateAABBFromHull : public ISystem<  ecsAABBUpdateFromHull > {
+	public:
+		static void Run( float _delta, const size_t _count, std::vector< ecsEntityData >& _entitiesData,
+			std::vector< ecsTranform > &	_transforms
+			, std::vector< ecsScaling > &	_scales
+			, std::vector< ecsAABB > &		_aabbs
+			, std::vector< ecsFlags > &		_flags 
+			, std::vector< ecsConvexHull > & _hulls
+		);
+	};
+
+	//================================
+	// Update AABB from transform
+	//================================
+	class UpdateAABBFromTransform : public ISystem<  ecsAABBUpdateFromTransform > {
+	public:
+		static void Run( float _delta, const size_t _count, std::vector< ecsEntityData >& _entitiesData,
+			std::vector< ecsTranform > &	_transforms
+			, std::vector< ecsAABB > &		_aabbs
+			, std::vector< ecsFlags > &		_flags
+		);
 	};
 }

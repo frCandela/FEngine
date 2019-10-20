@@ -14,6 +14,7 @@ namespace fan {
 		AABB(const btVector3 _low, const btVector3 _high);
 		AABB(const std::vector<btVector3> _pointCloud, const glm::mat4 _modelMatrix);
 
+		void					    Clear() { m_low = btVector3::Zero(); m_high = btVector3::Zero(); }
 		btVector3					GetLow() const { return m_low; }
 		btVector3					GetHigh() const { return m_high; }
 		std::vector< btVector3 >	GetCorners() const;

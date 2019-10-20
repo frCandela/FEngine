@@ -22,7 +22,7 @@ namespace fan {
 		const std::vector<Vertex> &		GetVertices() const		{ return m_vertices;	}
 		std::vector<uint32_t> &			GetIndices()			{ return m_indices;		}
 		const std::vector<uint32_t> &	GetIndices() const		{ return m_indices;		}
-		const ConvexHull *				GetConvexHull() const	{ return m_convexHull;	}
+		void 							GenerateConvexHull( ConvexHull & _outConvexHull );
 		Buffer *						GetIndexBuffer()		{ return m_indexBuffer;	}
 		Buffer *						GetVertexBuffer()		{ return m_vertexBuffer;	}
 		
@@ -38,9 +38,7 @@ namespace fan {
 		Buffer * m_indexBuffer;
 		Buffer * m_vertexBuffer;
 
-		ConvexHull * m_convexHull = nullptr;
-
 		void OptimizeVertices();
-		void GenerateConvexHull();
+		
 	};
 }

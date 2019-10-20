@@ -2,6 +2,7 @@
 
 #include "core/meta/fanTypeList.h"
 #include "core/math/shapes/fanAABB.h"
+#include "core/math/shapes/fanConvexHull.h"
 
 namespace fan {
 
@@ -19,58 +20,84 @@ namespace fan {
 	//================================
 	struct ecsTranform : ecsIComponent {
 		static const char *  s_name;
-		btTransform transform;
+		void Init() { transform.setIdentity(); }
 
-		ecsTranform() { transform.setIdentity(); }
+		btTransform transform;
 	};
 
 	//================================
 	struct ecsPosition : ecsIComponent {
 		static const char *  s_name;
-		btVector3		position = btVector3::Zero();
+		void Init() { position = btVector3::Zero(); }
+
+		btVector3	position = btVector3::Zero();
 	};
 
 	//================================
 	struct ecsRotation: ecsIComponent {
 		static const char *  s_name;
+		void Init() { rotation = btQuaternion::getIdentity(); }
+
 		btQuaternion	rotation = btQuaternion::getIdentity();
 	};
 
 	//================================
 	struct ecsScaling : ecsIComponent {
 		static const char *  s_name;
+		void Init() { scale = btVector3::One(); }
+
 		btVector3		scale	= btVector3::One();
 	};
 
 	//================================
 	struct ecsMovement : ecsIComponent {
 		static const char *  s_name;
+		void Init() { speed = btVector3::Zero(); }
+
 		btVector3		speed	= btVector3::Zero();
 	};
 
 	//================================
 	struct ecsParticle : ecsIComponent {
 		static const char * s_name;
+		void Init() {
+			color = Color::Red; 
+			durationLeft = 1.f;
+		}
+
 		fan::Color	color			= Color::Red;
-		float		durationLeft	= 3.f;
+		float		durationLeft	= 1.f;
 	};
 
 	//================================
 	struct ecsAABB : ecsIComponent {
 		static const char * s_name;
+		void Init() {	aabb.Clear(); }
+
 		AABB aabb;
 	};
 
 	//================================
 	struct ecsModel : ecsIComponent {
 		static const char * s_name;
-		Mesh * mesh		= nullptr;
+		void Init() { 
+			mesh = nullptr; 
+			renderID = -1;
+		}
+
+		Mesh * mesh			= nullptr;
 		int renderID		= -1;
 	};
 
 	//================================
 	struct ecsDirLight : ecsIComponent {
 		static const char * s_name;
+		void Init() {
+			ambiant = Color::Black;
+			diffuse = Color::White;
+			specular = Color::White;
+		}
+
 		Color ambiant		= Color::Black;
 		Color diffuse		= Color::White;
 		Color specular		= Color::White;
@@ -79,6 +106,13 @@ namespace fan {
 	//================================
 	struct ecsPointLight : ecsIComponent {
 		static const char * s_name;
+		void Init() {
+			ambiant = Color::White;
+			diffuse = Color::White;
+			specular = Color::White;
+			attenuation[0] = 0.f; attenuation[1] = 0.f; attenuation[2] = 0.1f;
+		}
+
 		Color ambiant			= Color::White;
 		Color diffuse			= Color::White;
 		Color specular			= Color::White;
@@ -88,18 +122,31 @@ namespace fan {
 	//================================
 	struct ecsMaterial : ecsIComponent {
 		static const char * s_name;
-		Texture * texture		= nullptr;
-		uint32_t  shininess		= 1;
-		Color color				= Color::White;
+		void Init() {
+			texture = nullptr;
+			shininess = 1;
+			color = Color::White;
+		}
+
+		Texture *	texture			= nullptr;
+		uint32_t	shininess		= 1;
+		Color		color			= Color::White;
 	};
 
 	//================================
 	struct ecsPlanet : ecsIComponent {
 		static const char * s_name;
+		void Init() {
+			speed = 1.f;
+			radius = 1.f;
+			phase = 0.f;
+			parentEntity = ecsNullEntity;
+		}
+
 		float speed		= 1.f;
 		float radius	= 1.f;
 		float phase		= 0.f;
-		ecsEntity parentEntity; // Updated in the component before the ecs call
+		ecsEntity parentEntity; // Updated in the component before the ecs call TODO remove this trash
 	}; 
 
 	//================================
@@ -151,6 +198,25 @@ namespace fan {
 
 	}; static_assert( sizeof( ecsBoxShape ) == sizeof( btBoxShape ) );
 	
+	//================================
+	struct ecsFlags : ecsIComponent {
+		static const char * s_name;
+		void Init() { flags = 0; }
+
+		uint32_t flags = 0;
+
+		enum Flag {		NONE			   = 1 << 0,	NO_DELETE		  = 1 << 1,	NOT_SAVED	   = 1 << 2,
+						OUTDATED_TRANSFORM = 1 << 3,	OUTDATED_MATERIAL = 1 << 4,	OUTDATED_LIGHT = 1 << 5,
+		};
+	};
+
+	//================================
+	struct ecsConvexHull : ecsIComponent {
+		static const char * s_name;
+		void Init() { convexHull.Clear(); }
+
+		ConvexHull convexHull;
+	};
 
 	//================================
 	//================================
@@ -171,6 +237,8 @@ namespace fan {
 		, ecsMotionState
 		, ecsSphereShape
 		, ecsBoxShape
+		, ecsFlags
+		, ecsConvexHull
 	>;
 	 
 	template< typename _type > struct IsComponent { static constexpr bool value = std::is_base_of< ecsIComponent, _type >::value; };

@@ -12,7 +12,7 @@ namespace fan {
 	//================================================================================================================================
 	//================================================================================================================================
 	void ColliderShape::OnAttach() {
-		Rigidbody * rb = GetGameobject()->GetComponent<Rigidbody>();
+		Rigidbody * rb = m_gameobject->GetComponent<Rigidbody>();
 		if ( rb != nullptr ) {
 			rb->SetCollisionShape( GetCollisionShape() );
 		}
@@ -22,7 +22,7 @@ namespace fan {
 	//================================================================================================================================
 	void ColliderShape::OnDetach() {
 		// Remove collider from rigidbody
-		Rigidbody * rb = GetGameobject()->GetComponent<Rigidbody>();
+		Rigidbody * rb = m_gameobject->GetComponent<Rigidbody>();
 		if ( rb != nullptr ) {
 			rb->SetCollisionShape( nullptr );
 		}

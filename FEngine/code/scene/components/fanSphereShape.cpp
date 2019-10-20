@@ -25,16 +25,14 @@ namespace fan
 	//================================================================================================================================
 	//================================================================================================================================
 	void SphereShape::OnAttach() {
-		ecsSphereShape * sphereShape = GetGameobject()->AddEcsComponent<ecsSphereShape>();
-		sphereShape->Init(1.f);
-
+		m_gameobject->AddEcsComponent<ecsSphereShape>()->Init( 1.f );
 		ColliderShape::OnAttach();
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
 	void SphereShape::OnDetach() {
-		GetGameobject()->RemoveEcsComponent<ecsSphereShape>();
+		m_gameobject->RemoveEcsComponent<ecsSphereShape>();
 
 		ColliderShape::OnDetach();
 	}
@@ -50,7 +48,7 @@ namespace fan
 			SetRadius( radius );
 		}
 
-		Debug::Render().DebugSphere( GetGameobject()->GetTransform()->GetBtTransform(), radius, 2, Color::Green );
+		Debug::Render().DebugSphere( m_gameobject->GetTransform()->GetBtTransform(), radius, 2, Color::Green );
 	}
 
 	//================================================================================================================================
@@ -75,7 +73,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	ecsSphereShape*		SphereShape::GetEcsSphereShape() const	{ return GetGameobject()->GetEcsComponent<ecsSphereShape>(); }
-	btSphereShape *		SphereShape::GetSphereShape()			{	return &GetEcsSphereShape()->Get();	}
+	ecsSphereShape*		SphereShape::GetEcsSphereShape() const	{ return m_gameobject->GetEcsComponent<ecsSphereShape>(); }
+	btSphereShape *		SphereShape::GetSphereShape()			{ return &GetEcsSphereShape()->Get();	}
 	btCollisionShape *	SphereShape::GetCollisionShape()		{ return GetSphereShape(); }
 }

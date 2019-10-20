@@ -19,39 +19,39 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void Material::OnDetach() {
-		Component::OnDetach();
-		GetGameobject()->RemoveEcsComponent<ecsMaterial>();
-		onMaterialDetach.Emmit(this);
+	void Material::OnAttach() {
+		Component::OnAttach();
+		m_gameobject->AddEcsComponent<ecsMaterial>()->Init();
+		onMaterialAttach.Emmit(this);
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void Material::OnAttach() {
-		Component::OnAttach();
-		GetGameobject()->AddEcsComponent<ecsMaterial>();
-		onMaterialAttach.Emmit(this);
+	void Material::OnDetach() {
+		Component::OnDetach();
+		m_gameobject->RemoveEcsComponent<ecsMaterial>();
+		onMaterialDetach.Emmit( this );
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
 	void Material::SetTexture(Texture * const _texture) {
 		GetEcsMaterial()->texture = _texture;
-		MarkModified();
+		m_gameobject->AddFlag( Gameobject::Flag::OUTDATED_MATERIAL );
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
 	void Material::SetShininess(const uint32_t _shininess) {
 		GetEcsMaterial()->shininess = _shininess;
-		MarkModified();
+		m_gameobject->AddFlag( Gameobject::Flag::OUTDATED_MATERIAL );
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
 	void Material::SetColor( const Color _color ) {
 		GetEcsMaterial()->color = _color;
-		MarkModified();
+		m_gameobject->AddFlag( Gameobject::Flag::OUTDATED_MATERIAL );
 	}
 
 	//================================================================================================================================
@@ -70,10 +70,10 @@ namespace fan
 
 		// Filter color
 		if ( ImGui::Button( "##color" ) ) { SetColor( Color::White ); } ImGui::SameLine();
-		if ( ImGui::ColorEdit3( "color", material->color.Data(), gui::colorEditFlags ) ) { MarkModified(); }
+		if ( ImGui::ColorEdit3( "color", material->color.Data(), gui::colorEditFlags ) ) { m_gameobject->AddFlag( Gameobject::Flag::OUTDATED_MATERIAL ); }
 
 		if ( ImGui::Button( "##shininess" ) ) { SetShininess( 1 ); } ImGui::SameLine();
-		if( ImGui::DragInt("shininess", (int*)&material->shininess, 1, 1, 256 )) { MarkModified(); }
+		if( ImGui::DragInt("shininess", (int*)&material->shininess, 1, 1, 256 )) { m_gameobject->AddFlag( Gameobject::Flag::OUTDATED_MATERIAL ); }
 		ImGui::SameLine(); gui ::ShowHelpMarker("sharpness of the specular reflection");
 
 		bool openSetPathPopup = false;
@@ -129,5 +129,5 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	ecsMaterial* Material::GetEcsMaterial() const { return GetGameobject()->GetEcsComponent<ecsMaterial>(); }
+	ecsMaterial* Material::GetEcsMaterial() const { return m_gameobject->GetEcsComponent<ecsMaterial>(); }
 }

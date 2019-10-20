@@ -27,7 +27,7 @@ namespace fan {
 		float left = Input::Get().Manager().GetAxis( "game_left" );
 
 		// Translation
-		Transform * transform = GetGameobject()->GetComponent<Transform>();
+		Transform * transform = m_gameobject->GetComponent<Transform>();
 		if (forward != 0.f) {
 			forward *= m_velocity * _delta;
 			m_speed += _delta * forward * transform->Forward(); // increases velocity			

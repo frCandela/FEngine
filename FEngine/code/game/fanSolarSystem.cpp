@@ -6,6 +6,8 @@
 #include "scene/fanGameobject.h"
 #include "scene/components/fanModel.h"
 #include "scene/components/fanMaterial.h"
+#include "scene/components/fanRigidbody.h"
+#include "scene/components/fanSphereShape.h"
 #include "game/fanPlanet.h"
 #include "renderer/fanRenderer.h"
 
@@ -28,7 +30,7 @@ namespace fan {
 	void SolarSystem::OnGui() {
 		Component::OnGui();
 
-		Transform * transform = GetGameobject()->GetComponent<Transform>();
+		Transform * transform = m_gameobject->GetComponent<Transform>();
 
 		static std::default_random_engine m_generator;
 		static std::uniform_real_distribution<float> m_distribution( 0.f, 1.f );
@@ -114,10 +116,10 @@ namespace fan {
 
 		if ( ImGui::Button( "Populate" ))
 		{
-			Scene * scene = GetGameobject()->GetScene();
+			Scene * scene = m_gameobject->GetScene();
 
 			// Remove all childs
-			const std::vector<Gameobject*>& childs = GetGameobject()->GetChilds();
+			const std::vector<Gameobject*>& childs = m_gameobject->GetChilds();
 			for (int childIndex = 0; childIndex < childs.size(); childIndex++) {
 				scene->DeleteGameobject( childs[childIndex] );
 			}
@@ -127,7 +129,7 @@ namespace fan {
 				const float radius = m_radiusList[radiusIndex];
 				const float scale = m_scaleList[radiusIndex];
 
-				Gameobject * newPlanet = scene->CreateGameobject("planet" + std::to_string(radiusIndex), GetGameobject() );
+				Gameobject * newPlanet = scene->CreateGameobject("planet" + std::to_string(radiusIndex), m_gameobject );
 				Model * model = newPlanet->AddComponent<Model>();
 				model->SetPath("content/models/planet.fbx");
 
@@ -137,6 +139,11 @@ namespace fan {
 				Planet * planet = newPlanet->AddComponent<Planet>();
 				planet->SetRadius( radius );
 				planet->SetPhase( 2 * PI * m_distribution( m_generator ) );
+
+				/*Rigidbody * rb = */newPlanet->AddComponent<Rigidbody>();
+
+				SphereShape * shape = newPlanet->AddComponent<SphereShape>();
+				shape->SetRadius( scale );
 
 				float direction = m_distribution( m_generator ) > 0.5f ? 1.f: -1.f;
 				float planetSpeed = m_minSpeed + (m_maxSpeed - m_minSpeed) * m_distribution( m_generator );

@@ -15,8 +15,8 @@ namespace fan {
 	//================================================================================================================================	
 	void Rigidbody::Refresh() {	
 		m_colShape = FindCollisionShape();
-		m_motionState = & GetGameobject()->GetEcsComponent<ecsMotionState>()->Get();
-		m_rigidbody = & GetGameobject()->GetEcsComponent<ecsRigidbody>()->Get();
+		m_motionState = & m_gameobject->GetEcsComponent<ecsMotionState>()->Get();
+		m_rigidbody   = & m_gameobject->GetEcsComponent<ecsRigidbody>()->Get();
 		m_rigidbody->setCollisionShape( m_colShape );
 		m_rigidbody->setMotionState(m_motionState);
 	}
@@ -24,7 +24,7 @@ namespace fan {
 	//================================================================================================================================
 	//================================================================================================================================	
 	btCollisionShape * Rigidbody::FindCollisionShape() {
-		const std::vector<Component*> & components = GetGameobject()->GetComponents();
+		const std::vector<Component*> & components = m_gameobject->GetComponents();
 		for (int componentIndex = 0; componentIndex < components.size(); componentIndex++) {
 			Component* component = components[componentIndex];
 			if ( component->IsCollider() ) {
@@ -47,14 +47,14 @@ namespace fan {
 			m_rigidbody->setMassProps( mass, localInertia );
 
 			if ( m_colShape == nullptr ) {
-				GetGameobject()->GetScene()->GetPhysicsManager()->AddRigidbody( this );
+				m_gameobject->GetScene()->GetPhysicsManager()->AddRigidbody( this );
 			}
 			m_colShape = _collisionShape;
 
 		} else {
 			m_colShape = nullptr;
 			m_rigidbody->setCollisionShape(nullptr);	
-			GetGameobject()->GetScene()->GetPhysicsManager()->RemoveRigidbody( this );			
+			m_gameobject->GetScene()->GetPhysicsManager()->RemoveRigidbody( this );
 		}
 	}
 
@@ -63,9 +63,9 @@ namespace fan {
 	void Rigidbody::OnAttach() {
 		Component::OnAttach();
 
-		ecsMotionState * motionState = GetGameobject()->AddEcsComponent<ecsMotionState>();
-		ecsRigidbody * rigidbody = GetGameobject()->AddEcsComponent<ecsRigidbody>();
-		ecsTranform * transform = GetGameobject()->GetEcsComponent<ecsTranform>();
+		ecsMotionState * motionState = m_gameobject->AddEcsComponent<ecsMotionState>();
+		ecsRigidbody * rigidbody	 = m_gameobject->AddEcsComponent<ecsRigidbody>();
+		ecsTranform * transform		 = m_gameobject->GetEcsComponent<ecsTranform>();
 
 		float startMass = 0.f;
 
@@ -82,20 +82,19 @@ namespace fan {
 		m_rigidbody = rigidbody->Init( rbInfo );
 
 		if( m_colShape != nullptr ){
-			GetGameobject()->GetScene()->GetPhysicsManager()->AddRigidbody( this );
+			m_gameobject->GetScene()->GetPhysicsManager()->AddRigidbody( this );
 		}
-		GetGameobject()->GetScene()->GetPhysicsManager()->RegisterRigidbody( this );
+		m_gameobject->GetScene()->GetPhysicsManager()->RegisterRigidbody( this );
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================	
 	void Rigidbody::OnDetach() {
 		Component::OnDetach();
-		GetGameobject()->GetScene()->GetPhysicsManager()->RemoveRigidbody( this );
-		GetGameobject()->RemoveEcsComponent<ecsMotionState>();
-		GetGameobject()->RemoveEcsComponent<ecsRigidbody>();
-
-		GetGameobject()->GetScene()->GetPhysicsManager()->UnRegisterRigidbody( this );
+		m_gameobject->GetScene()->GetPhysicsManager()->RemoveRigidbody( this );
+		m_gameobject->RemoveEcsComponent<ecsMotionState>();
+		m_gameobject->RemoveEcsComponent<ecsRigidbody>();
+		m_gameobject->GetScene()->GetPhysicsManager()->UnRegisterRigidbody( this );
 	}
 
 	//================================================================================================================================
@@ -114,6 +113,7 @@ namespace fan {
 			m_colShape->calculateLocalInertia( mass, localInertia );
 		}
 		m_rigidbody->setMassProps( mass, localInertia );
+		Activate();
 	}
 
 	//================================================================================================================================
@@ -156,6 +156,7 @@ namespace fan {
 	//================================================================================================================================
 	//================================================================================================================================	
 	void Rigidbody::SetVelocity( const btVector3& _velocity ) {
+		Activate();
 		m_rigidbody->setLinearVelocity( _velocity );
 	}
 
@@ -191,7 +192,7 @@ namespace fan {
 			SetVelocity( btVector3( 0, 0, 0 ) );
 		} ImGui::SameLine();
 		btVector3 velocity = GetVelocity();
-		if ( ImGui::DragFloat3( "velocity", &velocity[0], 1.f, 0.f, 1000.f ) ) {
+		if ( ImGui::DragFloat3( "velocity", &velocity[0], 1.f, -1000.f, 1000.f ) ) {
 			SetVelocity(velocity);
 		}
 
@@ -200,7 +201,7 @@ namespace fan {
 		}
 
 		// Test
-		if ( ImGui::Button( "test" ) ) {
+		if ( ImGui::Button( "tests" ) ) {
 			Activate();
 		}
 	}

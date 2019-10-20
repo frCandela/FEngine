@@ -135,10 +135,6 @@ namespace fan
 	// Deletes every gameobject in the m_toDeleteLater vector
 	//================================================================================================================================
 	void Scene::EndFrame() {
-		for (Gameobject * gameobject : m_outdatedAABB) {
-			gameobject->ComputeAABB();
-		} m_outdatedAABB.clear();
-
 		// Delete entities 
 		std::set<Gameobject*> deletedEntitiesSet;
 		for (int gameobjectToDeleteIndex = 0; gameobjectToDeleteIndex < m_entitiesToDelete.size(); gameobjectToDeleteIndex++) {
@@ -188,7 +184,6 @@ namespace fan
 		m_startingActors.clear();
 		m_activeActors.clear();
 		m_entitiesToDelete.clear();
-		m_outdatedAABB.clear();
 		m_root = nullptr;
 
 		onSceneClear.Emmit();

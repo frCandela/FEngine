@@ -21,8 +21,6 @@ namespace fan
 		// Returns a reference on the gameobject the component is bound to
 		inline Gameobject* GetGameobject() const { return m_gameobject; }
 		bool IsBeingDeleted() const { return m_isBeingDeleted; }
-		bool IsModified() const;
-		void MarkModified(const bool _updateAABB = false);
 		bool IsRemovable() const { return m_isRemovable; }
 		void SetRemovable(const bool _isRemovable) { m_isRemovable = _isRemovable; }
 
@@ -40,12 +38,12 @@ namespace fan
 		virtual void OnAttach();
 		virtual void OnDetach();
 
+		Gameobject * const m_gameobject = nullptr;
+
 		bool Save( Json & _json ) const override;
 
 	private:
-		uint64_t m_lastModified;	// Frame index at which it was modified
 		bool m_isBeingDeleted : 1;
 		bool m_isRemovable : 1;
-		Gameobject * m_gameobject = nullptr;
 	};
 }

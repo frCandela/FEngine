@@ -24,8 +24,8 @@ namespace fan
 		m_speed = 10.f;
 		m_speedMultiplier = 3.f;
 		m_xySensitivity = btVector2(0.005f, 0.005f);
-		m_transform = GetGameobject()->GetComponent<Transform>();
-		m_camera = GetGameobject()->GetComponent<Camera>();
+		m_transform = m_gameobject->GetComponent<Transform>();
+		m_camera = m_gameobject->GetComponent<Camera>();
 	}
 
 	//================================================================================================================================

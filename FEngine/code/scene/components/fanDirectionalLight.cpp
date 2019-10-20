@@ -23,37 +23,37 @@ namespace fan {
 	//================================================================================================================================
 	void DirectionalLight::SetAmbiant( const Color _ambiant ) {
 		GetEcsDirLight()->ambiant = _ambiant;
-		MarkModified();
+		m_gameobject->AddFlag( Gameobject::Flag::OUTDATED_LIGHT );
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
 	void DirectionalLight::SetDiffuse( const Color _diffuse ) {
 		GetEcsDirLight()->diffuse = _diffuse;
-		MarkModified();
+		m_gameobject->AddFlag( Gameobject::Flag::OUTDATED_LIGHT );
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
 	void DirectionalLight::SetSpecular( const Color _specular ) {
 		GetEcsDirLight()->specular = _specular;
-		MarkModified();
-	}
-
-	//================================================================================================================================
-	//================================================================================================================================
-	void DirectionalLight::OnDetach() {
-		Component::OnDetach();
-		GetGameobject()->RemoveEcsComponent<ecsDirLight>();
-		onDirectionalLightDetach.Emmit( this );
+		m_gameobject->AddFlag( Gameobject::Flag::OUTDATED_LIGHT );
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
 	void DirectionalLight::OnAttach() {
 		Component::OnAttach();
-		GetGameobject()->AddEcsComponent<ecsDirLight>();
+		m_gameobject->AddEcsComponent<ecsDirLight>()->Init();
 		onDirectionalLightAttach.Emmit( this );
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
+	void DirectionalLight::OnDetach() {
+		Component::OnDetach();
+		m_gameobject->RemoveEcsComponent<ecsDirLight>();
+		onDirectionalLightDetach.Emmit( this );
 	}
 
 	//================================================================================================================================
@@ -64,14 +64,14 @@ namespace fan {
 
 		// Filter color
 		if ( ImGui::Button( "##ambiant" ) ) { SetAmbiant( Color::Black ); } ImGui::SameLine();
-		if ( ImGui::ColorEdit3( "ambiant", dirLight->ambiant.Data(), gui::colorEditFlags ) ) { MarkModified(); }
+		if ( ImGui::ColorEdit3( "ambiant", dirLight->ambiant.Data(), gui::colorEditFlags ) ) { m_gameobject->AddFlag( Gameobject::Flag::OUTDATED_LIGHT ); }
 		if ( ImGui::Button( "##diffuse" ) ) { SetDiffuse( Color::Black ); } ImGui::SameLine();
-		if ( ImGui::ColorEdit3( "diffuse", dirLight->diffuse.Data(), gui::colorEditFlags ) ) { MarkModified(); }
+		if ( ImGui::ColorEdit3( "diffuse", dirLight->diffuse.Data(), gui::colorEditFlags ) ) { m_gameobject->AddFlag( Gameobject::Flag::OUTDATED_LIGHT ); }
 		if ( ImGui::Button( "##specular" ) ) { SetSpecular( Color::Black ); } ImGui::SameLine();
-		if ( ImGui::ColorEdit3( "specular", dirLight->specular.Data(), gui::colorEditFlags ) ) { MarkModified(); }
+		if ( ImGui::ColorEdit3( "specular", dirLight->specular.Data(), gui::colorEditFlags ) ) { m_gameobject->AddFlag( Gameobject::Flag::OUTDATED_LIGHT ); }
 
 
-		const Transform * transform = GetGameobject()->GetComponent<Transform>();
+		const Transform * transform = m_gameobject->GetComponent<Transform>();
 		const btVector3 pos = transform->GetPosition();
 		const btVector3 dir = transform->Forward();
 		const btVector3 up = transform->Up();
@@ -114,5 +114,5 @@ namespace fan {
 
 	//================================================================================================================================
 	//================================================================================================================================
-	ecsDirLight* DirectionalLight::GetEcsDirLight() const { return GetGameobject()->GetEcsComponent<ecsDirLight>(); }
+	ecsDirLight* DirectionalLight::GetEcsDirLight() const { return m_gameobject->GetEcsComponent<ecsDirLight>(); }
 }

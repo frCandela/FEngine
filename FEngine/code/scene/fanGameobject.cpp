@@ -17,7 +17,6 @@ namespace fan
 	//================================================================================================================================
 	Gameobject::Gameobject(const std::string _name, Gameobject * _parent, Scene * _scene ) :
 		m_name(_name)
-		, m_flags(Flag::NONE)
 		, m_parent(_parent)
 		, m_scene( _scene )
 	{
@@ -28,7 +27,10 @@ namespace fan
 
 		ecsEntity entity = m_scene->GetEcsManager()->CreateEntity();
 		m_ecsHandleEntity = m_scene->GetEcsManager()->CreateHandle( entity );
-		AddEcsComponent<ecsAABB>();
+		AddEcsComponent<ecsAABB>()->Init();
+		ecsFlags * flags = AddEcsComponent<ecsFlags>();
+		flags->Init();
+		flags->flags = Flag::OUTDATED_TRANSFORM;
 		m_transform = AddComponent<Transform>();
 	}
 
@@ -95,7 +97,11 @@ namespace fan
 	// Private method used to factorize add components methods 
 	//================================================================================================================================
 	void Gameobject::AddComponent(Component * _component) {
-		_component->m_gameobject = this;
+
+		// This is hacked to keep m_gameobject as a protected const pointer 
+		Gameobject ** ref = const_cast<Gameobject **>(&_component->m_gameobject);
+		*ref = this;
+
 		_component->OnAttach();
 		m_components.push_back(_component);
 	}
@@ -104,25 +110,6 @@ namespace fan
 	//================================================================================================================================
 	const AABB & Gameobject::GetAABB() const {
 		return GetEcsComponent<ecsAABB>()->aabb;
-	}
-
-	//================================================================================================================================
-	//================================================================================================================================
-	void Gameobject::ComputeAABB() {
-		if (m_computeAABB) {
-			const Model * model = GetComponent< Model >();
-			if (model != nullptr && model->IsBeingDeleted() == false && model->GetMesh() != nullptr && model->GetMesh()->GetIndices().size() > 0) {
-				GetEcsComponent<ecsAABB>()->aabb = model->ComputeAABB();
-			}
-			else {
-				const Transform * transform = GetComponent< Transform >();
-				if (transform != nullptr) {
-					const btVector3 origin = transform->GetPosition();
-					const float size = 0.05f;
-					GetEcsComponent<ecsAABB>()->aabb = AABB(origin - size * btVector3::One(), origin + size * btVector3::One());
-				}
-			}
-		}
 	}
 
 	//================================================================================================================================
@@ -202,6 +189,12 @@ namespace fan
 			return;
 		}
 		_parent->AddChild(this);
+	} 
+
+	//================================================================================================================================
+	//================================================================================================================================
+	uint32_t&	Gameobject::GetEcsFlags() const {
+		return GetEcsComponent<ecsFlags>()->flags;
 	}
 
 	//================================================================================================================================
@@ -236,7 +229,6 @@ namespace fan
 	bool Gameobject::Load( Json & _json ) {
 
 		LoadString( _json, "name", m_name );
-		LoadBool( _json, "compute_aabb", m_computeAABB );
 
 		Json& jComponents = _json["components"]; {
 			for ( int childIndex = 0; childIndex < jComponents.size(); childIndex++ ) {
@@ -272,7 +264,6 @@ namespace fan
 	//================================================================================================================================
 	bool Gameobject::Save( Json & _json ) const {
 		SaveString( _json, "name", m_name );
-		SaveBool( _json, "compute_aabb", m_computeAABB );
 
 		Json& jComponents = _json["components"];{
 			for ( int componentIndex = 0; componentIndex < m_components.size(); componentIndex++ ) {
@@ -287,7 +278,7 @@ namespace fan
 			unsigned childIndex = 0;				
 			for ( int gameobjectIndex = 0; gameobjectIndex < m_childs.size(); gameobjectIndex++ ) {
 				Gameobject * gameobject = m_childs[gameobjectIndex];
-				if ( gameobject->HasFlag( NOT_SAVED ) == false ) {
+				if ( gameobject->HasFlag( Flag::NOT_SAVED ) == false ) {
 					Json& jchild_i = jchilds[childIndex]; {
 						gameobject->Save( jchild_i );
 					}

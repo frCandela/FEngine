@@ -19,14 +19,14 @@ namespace fan {
 	//================================================================================================================================
 	void Planet::OnAttach() {
 		Actor::OnAttach();
-		GetGameobject()->AddEcsComponent<ecsPlanet>();
+		m_gameobject->AddEcsComponent<ecsPlanet>()->Init();
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
 	void Planet::OnDetach() {
 		Actor::OnDetach();
-		GetGameobject()->RemoveEcsComponent<ecsPlanet>();
+		m_gameobject->RemoveEcsComponent<ecsPlanet>();
 	}
 
 	//================================================================================================================================
@@ -36,8 +36,9 @@ namespace fan {
 
 		// Updates the parent entity
 		ecsPlanet * planet = GetEcsPlanet();
-		ecsHandle handle = GetGameobject()->GetParent()->GetEcsHandle();
-		GetGameobject()->GetScene()->GetEcsManager()->FindEntity( handle , planet->parentEntity );
+		ecsHandle handle = m_gameobject->GetParent()->GetEcsHandle();
+		m_gameobject->GetScene()->GetEcsManager()->FindEntity( handle , planet->parentEntity );
+		m_gameobject->AddFlag(Gameobject::Flag::OUTDATED_TRANSFORM);
 
 // 		ecsPlanet * planet = GetEcsPlanet();
 // 
@@ -94,5 +95,5 @@ namespace fan {
 
 	//================================================================================================================================
 	//================================================================================================================================
-	ecsPlanet* Planet::GetEcsPlanet() const { return GetGameobject()->GetEcsComponent<ecsPlanet>(); }
+	ecsPlanet* Planet::GetEcsPlanet() const { return m_gameobject->GetEcsComponent<ecsPlanet>(); }
 }

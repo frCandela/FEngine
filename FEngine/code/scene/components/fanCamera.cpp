@@ -23,7 +23,7 @@ namespace fan
 	//================================================================================================================================
 	glm::mat4 Camera::GetView() const
 	{
-		Transform* transform = GetGameobject()->GetComponent<Transform>();
+		Transform* transform = m_gameobject->GetComponent<Transform>();
 		glm::mat4 view = glm::lookAt(
 			ToGLM(transform->GetPosition()),
 			ToGLM(transform->GetPosition() + transform->Forward()),
@@ -53,7 +53,7 @@ namespace fan
 		assert(_position.x() >= -1.f  && _position.x() <= 1.f);
 		assert(_position.y() >= -1.f && _position.y() <= 1.f);
 
-		Transform* transform = GetGameobject()->GetComponent<Transform>();
+		Transform* transform = m_gameobject->GetComponent<Transform>();
 
 		const btVector3	pos = transform->GetPosition();
 		const btVector3 upVec = transform->Up();
@@ -85,27 +85,27 @@ namespace fan
 	//================================================================================================================================
 	void Camera::SetFov(float _fov) {
 		m_fov = _fov;
-		MarkModified();
+		m_gameobject->AddFlag( Gameobject::Flag::OUTDATED_TRANSFORM );
 	};
 	void Camera::SetOrthoSize( float _orthoSize ) {
 		m_orthoSize = _orthoSize;
-		MarkModified();
+		m_gameobject->AddFlag( Gameobject::Flag::OUTDATED_TRANSFORM );
 	};
 	void Camera::SetNearDistance(float _nearDistance) {
 		m_nearDistance = _nearDistance;
-		MarkModified();
+		m_gameobject->AddFlag( Gameobject::Flag::OUTDATED_TRANSFORM );
 	};
 	void Camera::SetFarDistance(float _farDistance) {
 		m_farDistance = _farDistance;
-		MarkModified();
+		m_gameobject->AddFlag( Gameobject::Flag::OUTDATED_TRANSFORM );
 	};
 	void Camera::SetAspectRatio(float _aspectRatio) {
 		m_aspectRatio = _aspectRatio;
-		MarkModified();
+		m_gameobject->AddFlag( Gameobject::Flag::OUTDATED_TRANSFORM );
 	};
 	void Camera::SetProjectionType( const Type _type ) {
 		m_type = _type;
-		MarkModified();
+		m_gameobject->AddFlag( Gameobject::Flag::OUTDATED_TRANSFORM );
 	}
 
 	//================================================================================================================================

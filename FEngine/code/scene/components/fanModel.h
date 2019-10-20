@@ -19,12 +19,11 @@ namespace fan
 		static Signal< Model * >				onUnRegisterModel;
 		static Signal< Model *, std::string  >	onModelSetPath;
 
-		AABB ComputeAABB() const;
-
 		void			SetPath( std::string _path );
 		void			SetMesh(Mesh * _mesh);
 		Mesh *			GetMesh();
 		const Mesh *	GetMesh() const;
+		ConvexHull &	GetConvexHull() const;
 
 		int		GetRenderID() const;
 		void	SetRenderID(const int _renderID);
@@ -45,6 +44,7 @@ namespace fan
 		// Editor
 		std::fs::path m_pathBuffer;
 
-		ecsModel * GetEcsModel() const;
+		ecsModel *		GetEcsModel() const;
+		ecsConvexHull * GetEcsConvexHull() const;
 	};
 }
