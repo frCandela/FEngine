@@ -114,38 +114,39 @@ namespace fan
 			// View
 			if (ImGui::BeginMenu("View"))
 			{
+				ImGui::Icon( ImGui::IMGUI, { 19,19 } ); ImGui::SameLine();
+				ImGui::MenuItem( "Imgui demo", nullptr, &m_showImguiDemoWindow );
+
 				for (size_t windowIndex = 0; windowIndex < m_editorWindows.size() ; windowIndex++) {
 					EditorWindow * window = m_editorWindows[ windowIndex ];
-					ImGui::Icon( window->GetIconType(), {19,19} );
-					ImGui::SameLine();
+					ImGui::Icon( window->GetIconType(), {19,19} ); ImGui::SameLine();					
 					bool showWindow = window->IsVisible();
-					if ( ImGui::Checkbox( window->GetName().c_str(), &showWindow ) ) {
+					if ( ImGui::MenuItem( window->GetName().c_str(), nullptr, &showWindow ) ) {
 						window->SetVisible( showWindow );
 					}
 				}
-
-				ImGui::Separator();
-				ImGui::Checkbox("Imgui demo", &m_showImguiDemoWindow);
-
 				ImGui::EndMenu();
 			}
 
 			// Editor
 			if (ImGui::BeginMenu("Editor"))
 			{
-				if (ImGui::Checkbox("show hull", &m_showHull)) {}
-				if (ImGui::Checkbox("show AABB", &m_showAABB)) {}
-				if (ImGui::Checkbox("show Wireframe", &m_showWireframe)) {}
-				if (ImGui::Checkbox("show Normals", &m_showNormals)) {}
+				if (ImGui::MenuItem("show hull",		 nullptr, &m_showHull)) {}
+				if (ImGui::MenuItem("show AABB",		 nullptr, &m_showAABB)) {}
+				if (ImGui::MenuItem("show Wireframe", nullptr, &m_showWireframe)) {}
+				if (ImGui::MenuItem("show Normals",	 nullptr, &m_showNormals)) {}
 				ImGui::EndMenu();
 			}
 
 			// Grid
-			if (ImGui::BeginMenu("Grid"))			{
-				ImGui::Checkbox("is visible",	& m_editorGrid.isVisible);
-				ImGui::DragFloat("spacing",		& m_editorGrid.spacing, 0.25f, 0.f, 100.f);
-				ImGui::DragInt("lines count",	& m_editorGrid.linesCount, 1.f, 0, 1000);
-				ImGui::ColorEdit3("color",		& m_editorGrid.color[0], gui::colorEditFlags);
+			if ( ImGui::BeginMenu( "Grid" ) )  {
+				ImGui::PushItemWidth( 150.f ); 
+				ImGui::MenuItem( "visible", nullptr, &m_editorGrid.isVisible );
+				ImGui::DragFloat( "spacing", &m_editorGrid.spacing, 0.25f, 0.f, 100.f );
+				ImGui::DragInt( "lines count", &m_editorGrid.linesCount, 1.f, 0, 1000 );
+				ImGui::ColorEdit3( "color", &m_editorGrid.color[0], gui::colorEditFlags );
+				ImGui::PopItemWidth();
+
 				ImGui::EndMenu();
 			}
 
@@ -153,8 +154,6 @@ namespace fan
 			ImGui::SameLine(ImGui::GetWindowWidth() - 60);
 			if ( ImGui::BeginMenu( std::to_string(Time::Get().GetRealFramerate()).c_str(), false ) ) {ImGui::EndMenu();}
 			gui::ToolTip(" Framerate. (Right click to set)");
-
-
 
 			if ( ImGui::IsItemClicked( 1 ) ) {
 				ImGui::OpenPopup( "main_menu_bar_set_fps" );
@@ -175,7 +174,7 @@ namespace fan
 				if ( ImGui::DragFloat( "physics frequency", &maxPhysicsFrequency, 1.f, 1.f, 3000.f, "%.f" ) ) {
 					Time::Get().SetPhysicsDelta( maxPhysicsFrequency < 1.f ? 1.f : 1.f / maxPhysicsFrequency );
 				}
-
+				ImGui::PopItemWidth();
 				ImGui::EndPopup();
 			}
 

@@ -17,7 +17,33 @@ namespace fan
 	//================================================================================================================================
 	PreferencesWindow::PreferencesWindow( Renderer * _renderer ) :
 		EditorWindow("preferences", ImGui::IconType::PREFERENCES )
-		, m_renderer( _renderer ) {
+		, m_renderer( _renderer ) 
+	{
+		Color clearColor;
+		if( SerializedValues::Get().GetColor( "clear_color", clearColor ) ) {
+			m_renderer->SetClearColor( clearColor.ToGLM() );
+		}
+
+		ImGuiStyle& style = ImGui::GetStyle();
+		for ( int i = 0; i < ImGuiCol_COUNT; i++ ) {
+			std::string name = "imgui_" + std::string( ImGui::GetStyleColorName( i ) );
+			Color color;
+			if ( SerializedValues::Get().GetColor( name.c_str(), color ) ) {
+				style.Colors[i] = ImVec4( color[0], color[1], color[2], color[3] );
+			}
+		}
+	}
+	//================================================================================================================================
+	//================================================================================================================================
+	PreferencesWindow::~PreferencesWindow() {
+		SerializedValues::Get().SetColor( "clear_color", m_renderer->GetClearColor() );
+
+		ImGuiStyle& style = ImGui::GetStyle();
+		for ( int i = 0; i < ImGuiCol_COUNT; i++ ) {
+			std::string name = "imgui_" + std::string( ImGui::GetStyleColorName( i ) );
+			SerializedValues::Get().SetColor( name.c_str(), style.Colors[i] );
+		}
+		
 	}
 
 	//================================================================================================================================
@@ -25,10 +51,13 @@ namespace fan
 	void PreferencesWindow::OnGui() {
 		ImGui::Icon( GetIconType(), { 16,16 } ); ImGui::SameLine();
 		ImGui::Text( "Preferences" );
+
+		// RENDERING
 		if ( ImGui::CollapsingHeader( "Rendering" ) ) {
 			// Filter color
 			glm::vec4& color = m_renderer->GetPostprocessPipeline()->uniforms.color;
 			ImGui::ColorEdit3( "Filter##1", &color[0], gui::colorEditFlags );
+			
 			// Clear color
 			glm::vec4 clearColor = m_renderer->GetClearColor();
 			if ( ImGui::ColorEdit3( "Clear color", &clearColor.r, gui::colorEditFlags ) ) {
@@ -36,8 +65,20 @@ namespace fan
 			}
 		}
 
+		// IMGUI COLORS
+		if ( ImGui::CollapsingHeader( "Imgui Colors" ) ) {
+			ImGuiStyle& style = ImGui::GetStyle();
+			for ( int i = 0; i < ImGuiCol_COUNT; i++ ) {
+				const char* name = ImGui::GetStyleColorName( i );
+				ImGui::PushID( i );
+				ImGui::ColorEdit4( name, (float*)&style.Colors[i], gui::colorEditFlags );				
+				ImGui::PopID();
+			}
+		}
+
+		// INPUT
 		if ( ImGui::CollapsingHeader( "Input" ) ) {			
-			const float column0_size = 150.f;
+			const float column0_size = 150.f;		
 
 			// Axis keys
 			{
@@ -51,6 +92,7 @@ namespace fan
 				ImGui::Indent();
 				ImGui::Columns( 2 );
 				ImGui::SetColumnWidth( 0, column0_size );
+				ImGui::PushItemWidth( 10.f );
 				for ( auto& pair : axisList ) {
 
 					ImGui::Text( pair.first.c_str() );
@@ -60,6 +102,7 @@ namespace fan
 					ImGui::NextColumn();
 
 				} ImGui::Unindent();
+				ImGui::PopItemWidth();
 			}
 
 			ImGui::Columns( 1 );
@@ -83,7 +126,9 @@ namespace fan
 					SetKeyButton( pair.second.mod2 );
 					ImGui::NextColumn();
 				}ImGui::Unindent();
-			}		
+			}	
+
+			
 		}
 
 		CaptureKeyPopup();

@@ -221,7 +221,7 @@ namespace fan
 	//================================================================================================================================
 	//================================================================================================================================
 	void ImguiPipeline::CreateFontAndSampler() {
-		ImGui::GetIO().Fonts->AddFontFromFileTTF( "content/_default/Nunito-Regular.ttf", 18 );
+		ImGui::GetIO().Fonts->AddFontFromFileTTF( "content/_default/imgui_font.ttf", 15 );
 
 		// Create font texture
 		unsigned char* fontData;

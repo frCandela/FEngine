@@ -85,6 +85,7 @@ namespace fan
 		if (ImGui::InputText("##input_console", m_inputBuffer, IM_ARRAYSIZE(m_inputBuffer), ImGuiInputTextFlags_EnterReturnsTrue)) {
 			pressed = true;
 		}
+		ImGui::PopItemWidth();
 		ImGui::SameLine();
 
 		// Button

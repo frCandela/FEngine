@@ -101,7 +101,7 @@ namespace fan {
 		m_consoleWindow		= new ConsoleWindow();
 		m_ecsWindow			= new EcsWindow( m_ecsManager );
 		m_mainMenuBar		= new MainMenuBar( *m_scene, m_editorGrid );
-		m_mainMenuBar->SetWindows( { m_renderWindow , m_sceneWindow , m_inspectorWindow , m_preferencesWindow, m_consoleWindow, m_ecsWindow } );
+		m_mainMenuBar->SetWindows( { m_renderWindow , m_sceneWindow , m_inspectorWindow , m_consoleWindow, m_ecsWindow, m_preferencesWindow } );
 
 		// Instance messages
 		Debug::Get().onSetMainCamera.Connect( &Engine::SetMainCamera, this );

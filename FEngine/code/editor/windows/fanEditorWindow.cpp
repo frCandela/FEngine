@@ -18,8 +18,9 @@ namespace fan
 		m_jsonShowWindowKey = ss.str();
 
 		bool value = false;
-		SerializedValues::Get().GetBool(m_jsonShowWindowKey.c_str(), value);
-		SetVisible(value);
+		if ( SerializedValues::Get().GetBool(m_jsonShowWindowKey.c_str(), value) ) {
+			SetVisible(value);
+		}
 	}
 
 	//================================================================================================================================

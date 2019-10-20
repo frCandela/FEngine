@@ -21,15 +21,15 @@ namespace fan {
 		void SetBool	( const char * _name, const bool&			_bool );
 		void SetString	( const char * _name, const std::string&	_string );
 
-		void GetVec2	( const char * _name, btVector2&		_outVec2 );
-		void GetVec3	( const char * _name, btVector3&		_outVec3 );
-		void GetQuat	( const char * _name, btQuaternion&		_outQuat );
-		void GetColor	( const char * _name, Color&			_outColor );
-		void GetFloat	( const char * _name, float&			_outFloat );
-		void GetInt		( const char * _name, int&				_outInt );
-		void GetUInt	( const char * _name, unsigned&			_outUInt );
-		void GetBool	( const char * _name, bool&				_outBool );
-		void GetString	( const char * _name, std::string&		_outString );
+		bool GetVec2	( const char * _name, btVector2&		_outVec2 );
+		bool GetVec3	( const char * _name, btVector3&		_outVec3 );
+		bool GetQuat	( const char * _name, btQuaternion&		_outQuat );
+		bool GetColor	( const char * _name, Color&			_outColor );
+		bool GetFloat	( const char * _name, float&			_outFloat );
+		bool GetInt		( const char * _name, int&				_outInt );
+		bool GetUInt	( const char * _name, unsigned&			_outUInt );
+		bool GetBool	( const char * _name, bool&				_outBool );
+		bool GetString	( const char * _name, std::string&		_outString );
 
 	protected:
 		SerializedValues();
