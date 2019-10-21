@@ -6,7 +6,11 @@
 #include "core/input/fanInputManager.h"
 #include "editor/windows/fanInspectorWindow.h"
 #include "scene/components/fanTransform.h"
+#include "scene/components/fanCamera.h"
 #include "scene/fanGameobject.h"
+#include "core/input/fanMouse.h"
+#include "core/math/shapes/fanRay.h"
+#include "renderer/fanRenderer.h"
 
 namespace fan {
 	REGISTER_EDITOR_COMPONENT(SpaceShip)
@@ -22,12 +26,27 @@ namespace fan {
 	//================================================================================================================================
 	void SpaceShip::Update(const float _delta) {
 
+		// Get mouse world pos
+		Camera * camera			= m_gameobject->GetScene()->GetMainCamera();
+		btVector3 mouseWorldPos = camera->ScreenPosToRay( Mouse::GetScreenSpacePosition() ).origin;
+		mouseWorldPos.setY(0);
+
+		// Get mouse direction
+		Transform * transform = m_gameobject->GetComponent<Transform>();
+		btVector3 mouseDir = mouseWorldPos - m_gameobject->GetTransform()->GetPosition();
+		mouseDir.normalize();
+
+		// Set rotation TODO: create a proper LookAt method in the Transform component
+		float angle = btDegrees( btVector3::Forward().angle(mouseDir) );
+		float sign = mouseDir.dot( btVector3::Left() ) > 0.f ? 1.f : -1.f;
+		transform->SetRotationEuler( btVector3(0.f, sign * angle,0.f) );
+
 		// Go forward
 		float forward	= Input::Get().Manager().GetAxis( "game_forward");
-		float left		= Input::Get().Manager().GetAxis( "game_left" );
+		//float left		= Input::Get().Manager().GetAxis( "game_left" );
 
 		// Translation
-		Transform * transform = m_gameobject->GetComponent<Transform>();
+		
 		if (forward != 0.f) {
 			forward *= m_velocity * _delta;
 			m_speed += _delta * forward * transform->Forward(); // increases velocity			
@@ -35,14 +54,6 @@ namespace fan {
 		transform->SetPosition( transform->GetPosition() + m_speed );
 		const btVector3 drag = m_drag * m_speed;
 		m_speed -= _delta * drag;
-
-		// Rotation
-		if ( left != 0.f) {
-			left *= m_rotationSpeed * _delta;
-			btQuaternion quat = transform->GetRotationQuat();
-			btQuaternion rotationQuat(btVector3::Up(), left );
-			transform->SetRotationQuat(quat * rotationQuat);
-		}
 	}
 
 	//================================================================================================================================

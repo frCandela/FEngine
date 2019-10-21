@@ -53,23 +53,37 @@ namespace fan
 		assert(_position.x() >= -1.f  && _position.x() <= 1.f);
 		assert(_position.y() >= -1.f && _position.y() <= 1.f);
 
-		Transform* transform = m_gameobject->GetComponent<Transform>();
+		if( m_type == Type::PERSPECTIVE ) {
+			Transform* transform = m_gameobject->GetTransform();
 
-		const btVector3	pos = transform->GetPosition();
-		const btVector3 upVec = transform->Up();
-		const btVector3 left = transform->Left();
-		const btVector3 forward = transform->Forward();
+			const btVector3	pos = transform->GetPosition();
+			const btVector3 upVec = transform->Up();
+			const btVector3 left = transform->Left();
+			const btVector3 forward = transform->Forward();
 
-		btVector3 nearMiddle = pos + m_nearDistance * forward;
+			btVector3 nearMiddle = pos + m_nearDistance * forward;
 
-		float nearHeight = m_nearDistance * tan(glm::radians(m_fov / 2));
-		float nearWidth = m_aspectRatio * nearHeight;
+			float nearHeight = m_nearDistance * tan( glm::radians( m_fov / 2 ) );
+			float nearWidth = m_aspectRatio * nearHeight;
 
-		Ray ray;
-		ray.origin = nearMiddle - _position.x() * nearWidth * left - _position.y() * nearHeight * upVec;
-		ray.direction = (100.f * (ray.origin - pos)).normalized();
+			Ray ray;
+			ray.origin = nearMiddle - _position.x() * nearWidth * left - _position.y() * nearHeight * upVec;
+			ray.direction = ( 100.f * ( ray.origin - pos ) ).normalized();
 
-		return ray;
+			return ray;
+		} else { // ORTHOGONAL
+			Ray ray;
+
+			Transform * transform = m_gameobject->GetTransform();
+
+			ray.origin = transform->GetPosition();
+			ray.origin -= m_aspectRatio * m_orthoSize * transform->Left()  * _position[0];
+			ray.origin -= m_orthoSize * transform->Up()  * _position[1];
+			
+			ray.direction = transform->Forward();
+
+			return ray;
+		}
 	}
 
 	//================================================================================================================================

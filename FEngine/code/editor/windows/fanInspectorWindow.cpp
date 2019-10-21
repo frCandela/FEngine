@@ -52,7 +52,7 @@ namespace fan
 					ImGui::PopID();
 				}
 
-				// Delete button
+				// Delete button	
 				ImGui::Text( component->GetName());
 				if (component->IsRemovable()) {
 					std::stringstream ss;

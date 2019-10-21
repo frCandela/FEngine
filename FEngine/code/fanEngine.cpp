@@ -238,8 +238,9 @@ namespace fan {
 		m_editorCamera = cameraGameobject->AddComponent<Camera>();
 		m_editorCamera->SetRemovable(false);
 		SetMainCamera(m_editorCamera);
-		FPSCamera * editorCamera = cameraGameobject->AddComponent<FPSCamera>();
-		editorCamera->SetRemovable(false);
+		m_editorCameraController = cameraGameobject->AddComponent<FPSCamera>();
+		m_editorCameraController->SetRemovable(false);
+
 
 		_scene->onSetMainCamera.Connect( &Engine::SetMainCamera, this );
 
@@ -366,7 +367,10 @@ namespace fan {
 	//================================================================================================================================
 	//================================================================================================================================
 	void Engine::SetMainCamera( Camera * _mainCamera ) { 
-		m_mainCamera = _mainCamera; 
+		if ( _mainCamera != m_mainCamera ) {
+			m_mainCamera = _mainCamera;
+			m_scene->SetMainCamera(_mainCamera);
+		}
 	}
 
 	//================================================================================================================================
@@ -388,9 +392,11 @@ namespace fan {
 	void Engine::SwitchPlayPause() {
 		if ( m_scene->IsPaused() ) {
 			m_scene->Play();
+			m_editorCameraController->SetEnabled( false );
 		} else {
 			m_scene->Pause();
 			SetMainCamera( m_editorCamera );
+			m_editorCameraController->SetEnabled(true);
 		}
 	}
 

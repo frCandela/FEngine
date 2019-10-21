@@ -17,10 +17,11 @@ namespace fan
 		Ray ScreenPosToRay(const btVector2& _screenSpacePosition); // Returns a ray going from camera through a screen point ( with screenSpacePosition between {-1.f,-1.f} and {1.f,1.f} ).
 		btVector2 WorldPosToScreen(const btVector3& worldPosition);
 
-		float GetFov() const { return m_fov; };
-		float GetOrthoSize() const { return m_orthoSize; };
-		float GetNearDistance() const { return m_nearDistance; };
-		float GetFarDistance() const { return m_farDistance; };
+		float GetFov() const			{ return m_fov; };
+		float GetOrthoSize() const		{ return m_orthoSize; };
+		float GetNearDistance() const	{ return m_nearDistance; };
+		float GetFarDistance() const	{ return m_farDistance; };
+		float GetAspectRation()const	{ return m_aspectRatio; }
 		Type  GetProjectionType() const { return m_type; }
 
 		void SetFov(float _fov);

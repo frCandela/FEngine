@@ -46,13 +46,14 @@ namespace fan
 		void SetPath( const std::string _path ) { m_path = _path; }
 
 
-		Gameobject *			GetRoot()							{ return m_root; }
-		inline std::string		GetName() const						{ return m_name; }
-		bool					HasPath() const						{ return m_path.empty() == false; }
-		inline std::string		GetPath() const						{ return m_path; }
-		inline EcsManager *		GetEcsManager() const				{ return m_ecsManager; }
-		inline PhysicsManager *	GetPhysicsManager() const			{ return m_physicsManager; }		
-		bool					IsPaused() const					{ return m_isPaused; };
+		Gameobject *			GetRoot()					{ return m_root; }
+		inline std::string		GetName() const				{ return m_name; }
+		bool					HasPath() const				{ return m_path.empty() == false; }
+		inline std::string		GetPath() const				{ return m_path; }
+		inline EcsManager *		GetEcsManager() const		{ return m_ecsManager; }
+		inline PhysicsManager *	GetPhysicsManager() const	{ return m_physicsManager; }
+		bool					IsPaused() const			{ return m_isPaused; };
+		Camera *				GetMainCamera()				{ return m_mainCamera; }
 
 		void					SetMainCamera( Camera * _camera );
 
@@ -66,6 +67,7 @@ namespace fan
 		Gameobject *			m_root;
 		EcsManager * const		m_ecsManager = nullptr;
 		PhysicsManager * const  m_physicsManager = nullptr;
+		Camera *				m_mainCamera = nullptr;
 
 		// State
 		bool m_isPaused = false;

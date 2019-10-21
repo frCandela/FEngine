@@ -34,15 +34,22 @@ namespace fan {
 		else {
 			m_spaceShip->SetEnabled(false);
 		}
+	}
 
-		m_editorCameraController = m_gameobject->GetScene()->FindComponentOfType<FPSCamera>();
-		if (m_editorCameraController == nullptr) {
-			Debug::Warning("GameManager::Start : No editor CameraController found");
-			SetEnabled(false);
-		}
-
-		m_gameobject->GetScene()->onScenePlay.Connect(  &GameManager::OnScenePlay, this );
+	//================================================================================================================================
+	//================================================================================================================================
+	void GameManager::OnAttach() {
+		Actor::OnAttach();
+		m_gameobject->GetScene()->onScenePlay.Connect( &GameManager::OnScenePlay, this );
 		m_gameobject->GetScene()->onScenePause.Connect( &GameManager::OnScenePause, this );
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
+	void GameManager::OnDetach() {
+		Actor::OnDetach();
+		m_gameobject->GetScene()->onScenePlay.Disconnect( &GameManager::OnScenePlay, this );
+		m_gameobject->GetScene()->onScenePause.Disconnect( &GameManager::OnScenePause, this );
 	}
 	
 	//================================================================================================================================
@@ -50,14 +57,12 @@ namespace fan {
 	void GameManager::OnScenePlay() {
 		m_gameobject->GetScene()->SetMainCamera( m_camera );
 		m_spaceShip->SetEnabled( true );
-		m_editorCameraController->SetEnabled( false );
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
 	void GameManager::OnScenePause() {
 		m_spaceShip->SetEnabled( false );
-		m_editorCameraController->SetEnabled( true );
 	}
 
 	//================================================================================================================================

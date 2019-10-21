@@ -30,11 +30,11 @@ namespace fan {
 		bool Load( Json & _json ) override;
 		bool Save( Json & _json ) const override;
 
+		void OnAttach() override;
+		void OnDetach() override;
+
 	private:
 		Camera * m_camera;
 		SpaceShip * m_spaceShip;
-		FPSCamera * m_editorCameraController;
-
-		void SwitchCameras();
 	};
 }

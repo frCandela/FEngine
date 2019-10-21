@@ -23,6 +23,7 @@ namespace fan {
 	class Model;
 	class Material;
 	class Camera;
+	class FPSCamera;
 	class EcsManager;
 	class PhysicsManager;
 
@@ -87,6 +88,7 @@ namespace fan {
 		PhysicsManager *	m_physicsManager;
 		Gameobject *		m_selectedGameobject;
 		Camera *			m_editorCamera = nullptr;
+		FPSCamera *			m_editorCameraController = nullptr;
 		Camera *			m_mainCamera = nullptr;
 
 		std::vector < DirectionalLight* >	m_directionalLights;
