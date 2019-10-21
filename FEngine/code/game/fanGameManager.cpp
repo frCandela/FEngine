@@ -40,32 +40,30 @@ namespace fan {
 			Debug::Warning("GameManager::Start : No editor CameraController found");
 			SetEnabled(false);
 		}
+
+		m_gameobject->GetScene()->onScenePlay.Connect(  &GameManager::OnScenePlay, this );
+		m_gameobject->GetScene()->onScenePause.Connect( &GameManager::OnScenePause, this );
+	}
+	
+	//================================================================================================================================
+	//================================================================================================================================
+	void GameManager::OnScenePlay() {
+		m_gameobject->GetScene()->SetMainCamera( m_camera );
+		m_spaceShip->SetEnabled( true );
+		m_editorCameraController->SetEnabled( false );
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void GameManager::SwitchCameras() {
-		Debug::Log("switching camera");
-		Camera * currentCamera = & Debug::Get().MainCamera();
-
-		if ( currentCamera == & Debug::Get().EditorCamera() ) {
-			Debug::Get().SetMainCamera(m_camera);
-			m_spaceShip->SetEnabled(true);
-			m_editorCameraController->SetEnabled(false);
-		}
-		else {
-			Debug::Get().SetMainCamera( &Debug::Get().EditorCamera() );
-			m_spaceShip->SetEnabled(false);
-			m_editorCameraController->SetEnabled(true);
-		}
+	void GameManager::OnScenePause() {
+		m_spaceShip->SetEnabled( false );
+		m_editorCameraController->SetEnabled( true );
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
 	void GameManager::Update(const float /*_delta*/) {
-		if (Keyboard::IsKeyPressed(GLFW_KEY_TAB)) {
-			SwitchCameras();
-		}
+
 	}
 
 	//================================================================================================================================

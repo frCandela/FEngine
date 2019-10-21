@@ -83,17 +83,7 @@ namespace fan {
 	//================================================================================================================================
 	// WARNING : this method is not available in retail
 	//================================================================================================================================
-	void Debug::SetDebug( Renderer * _renderer, Camera * _editorCamera, Camera * _mainCamera ) {
+	void Debug::SetDebug( Renderer * _renderer ) {
 		m_renderer = _renderer; 
-		m_editorCamera = _editorCamera;
-		m_mainCamera = _mainCamera;
-	}
-
-	//================================================================================================================================
-	// WARNING : this method is not available in retail
-	//================================================================================================================================
-	void Debug::SetMainCamera( Camera * _camera ) {
-		m_mainCamera = _camera; 
-		onSetMainCamera.Emmit( _camera );
 	}
 }

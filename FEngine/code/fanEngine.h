@@ -42,7 +42,7 @@ namespace fan {
 		void SetMainCamera( Camera * _mainCamera );
 		void SetSelectedGameobject( Gameobject * _selectedGgameobject);
 		void Deselect();
-		
+
 		void RegisterDirectionalLight	( DirectionalLight * _pointLight );
 		void UnRegisterDirectionalLight	( DirectionalLight * _pointLight );
 		void RegisterPointLight			( PointLight *		 _pointLight );
@@ -81,13 +81,13 @@ namespace fan {
 		EditorGrid m_editorGrid;
 
 		// Main objects
-		Renderer *	 m_renderer;
-		Scene *		 m_scene;
-		EcsManager * m_ecsManager;
-		PhysicsManager * m_physicsManager;
-		Gameobject * m_selectedGameobject;
-		Camera * m_editorCamera = nullptr;
-		Camera * m_mainCamera = nullptr;
+		Renderer *			m_renderer;
+		Scene *				m_scene;
+		EcsManager *		m_ecsManager;
+		PhysicsManager *	m_physicsManager;
+		Gameobject *		m_selectedGameobject;
+		Camera *			m_editorCamera = nullptr;
+		Camera *			m_mainCamera = nullptr;
 
 		std::vector < DirectionalLight* >	m_directionalLights;
 		std::vector < PointLight* >			m_pointLights;
@@ -105,6 +105,8 @@ namespace fan {
 		void DeleteSelection();
 		void ManageSelection();
 		void UpdateRenderer();
+		void SwitchPlayPause();
+
 		void OnSceneLoad(Scene * _scene);
 		void OnMaterialSetTexture( Material * _material, std::string _path );
 		void OnModelSetPath( Model * _model, std::string _path );

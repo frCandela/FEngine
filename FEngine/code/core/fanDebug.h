@@ -22,8 +22,6 @@ namespace fan {
 			std::string message;
 			double time;
 		};
-
-		Signal<Camera*> onSetMainCamera;
 		Signal<LogItem> onNewLog;
 
 		static Code Endl() { return Code::endl;  }
@@ -35,12 +33,8 @@ namespace fan {
 		static void Break() { __debugbreak(); }
 		const std::vector< LogItem >& GetLogBuffer() { return m_logBuffer;  }
 
-		// Debug references  WARNING : these methods are not available in retail !!
 		static Renderer &	Render() { return * Get().m_renderer; };
-		Camera &			EditorCamera() { return *m_editorCamera; };
-		Camera &			MainCamera() { return *m_mainCamera; };
-		void SetDebug( Renderer * _renderer, Camera * _editorCamera, Camera * _mainCamera );
-		void SetMainCamera( Camera * _camera );
+		void SetDebug( Renderer * _renderer );	
 
 	protected:
 		Debug();
@@ -52,8 +46,6 @@ namespace fan {
 		std::vector< LogItem >	m_logBuffer;
 
 		Renderer * m_renderer;
-		Camera * m_editorCamera;
-		Camera * m_mainCamera;
 
 		void Flush();
 

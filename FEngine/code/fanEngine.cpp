@@ -73,6 +73,7 @@ namespace fan {
 		Input::Get().Manager().CreateKeyboardEvent( "open_scene",	  Keyboard::O, Keyboard::LEFT_CONTROL );
 		Input::Get().Manager().CreateKeyboardEvent( "save_scene",	  Keyboard::S, Keyboard::LEFT_CONTROL );
 		Input::Get().Manager().CreateKeyboardEvent( "reload_scene",	  Keyboard::R, Keyboard::LEFT_CONTROL );
+		Input::Get().Manager().CreateKeyboardEvent(	"play_pause",	  Keyboard::TAB );
 
 		// Axis
 		Input::Get().Manager().CreateAxis( "game_forward",		Keyboard::W, Keyboard::S );
@@ -103,9 +104,8 @@ namespace fan {
 		m_mainMenuBar		= new MainMenuBar( *m_scene, m_editorGrid );
 		m_mainMenuBar->SetWindows( { m_renderWindow , m_sceneWindow , m_inspectorWindow , m_consoleWindow, m_ecsWindow, m_preferencesWindow } );
 
-		// Instance messages
-		Debug::Get().onSetMainCamera.Connect( &Engine::SetMainCamera, this );
-		Debug::Get().SetDebug( m_renderer, m_editorCamera, m_mainCamera );
+		// Instance messages		
+		Debug::Get().SetDebug( m_renderer );
 		m_sceneWindow->onSelectGameobject.Connect( &Engine::SetSelectedGameobject, this );
 		m_mainMenuBar->onReloadShaders.Connect(&Renderer::ReloadShaders, m_renderer );
 		m_mainMenuBar->onExit.Connect( &Engine::Exit, this );
@@ -119,8 +119,9 @@ namespace fan {
 		m_scene->onDeleteGameobject.Connect( &Engine::OnGameobjectDeleted, this );
 
 		// Events linking
-		Input::Get().Manager().FindEvent( "reload_shaders" )->Connect( &Renderer::ReloadShaders, m_renderer );
-		Input::Get().Manager().FindEvent( "delete" )->Connect( &Engine::DeleteSelection, this );
+		Input::Get().Manager().FindEvent( "reload_shaders" )->Connect(	&Renderer::ReloadShaders, m_renderer );
+		Input::Get().Manager().FindEvent( "delete" )->Connect(			&Engine::DeleteSelection, this );
+		Input::Get().Manager().FindEvent( "play_pause" )->Connect(		&Engine::SwitchPlayPause, this );
 
 		// Static messages		
 		Material::onMaterialSetPath.Connect		( &Engine::OnMaterialSetTexture, this );
@@ -168,8 +169,8 @@ namespace fan {
 	//================================================================================================================================
 	//================================================================================================================================
 	void Engine::Run() {
-		float lastLogicTime = Time::ElapsedSinceStartup();
-		float lastRenderTime = Time::ElapsedSinceStartup();
+		float lastLogicTime		= Time::ElapsedSinceStartup();
+		float lastRenderTime	= Time::ElapsedSinceStartup();
 
 		while ( m_applicationShouldExit == false && m_renderer->WindowIsOpen() == true ) {
  			const float time = Time::ElapsedSinceStartup();
@@ -182,7 +183,7 @@ namespace fan {
 				Input::Get().NewFrame();
 				ImGui::NewFrame();
 				ImGui::GetIO().DeltaTime = targetLogicDelta;
-				m_renderer->ClearDebug();							
+				m_renderer->ClearDebug();	
 
 				m_scene->BeginFrame();
 				m_scene->Update( targetLogicDelta );
@@ -223,6 +224,7 @@ namespace fan {
 	}
 	
 	//================================================================================================================================
+	// Todo save camera postion depending on the scene
 	//================================================================================================================================
 	void Engine::OnSceneLoad(Scene * _scene) {
 
@@ -239,7 +241,9 @@ namespace fan {
 		FPSCamera * editorCamera = cameraGameobject->AddComponent<FPSCamera>();
 		editorCamera->SetRemovable(false);
 
-		Debug::Get().SetDebug( m_renderer, m_editorCamera, m_mainCamera );
+		_scene->onSetMainCamera.Connect( &Engine::SetMainCamera, this );
+
+		Debug::Get().SetDebug( m_renderer );
 	}
 
 	//================================================================================================================================
@@ -362,8 +366,7 @@ namespace fan {
 	//================================================================================================================================
 	//================================================================================================================================
 	void Engine::SetMainCamera( Camera * _mainCamera ) { 
-		m_mainCamera = _mainCamera; 		
-		Debug::Get().SetDebug( m_renderer, m_editorCamera, _mainCamera );
+		m_mainCamera = _mainCamera; 
 	}
 
 	//================================================================================================================================
@@ -378,6 +381,17 @@ namespace fan {
 	void Engine::Deselect() { 
 		m_selectedGameobject = nullptr; 
 		onGameobjectSelected.Emmit( m_selectedGameobject );
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
+	void Engine::SwitchPlayPause() {
+		if ( m_scene->IsPaused() ) {
+			m_scene->Play();
+		} else {
+			m_scene->Pause();
+			SetMainCamera( m_editorCamera );
+		}
 	}
 
 	//================================================================================================================================

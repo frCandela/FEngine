@@ -17,9 +17,12 @@ namespace fan
 	{
 	public:
 
-		Signal<Scene*>	onSceneLoad;
-		Signal<>		onSceneClear;
-		Signal< Gameobject *>		onDeleteGameobject;
+		Signal<Scene*>			onSceneLoad;
+		Signal<>				onSceneClear;
+		Signal< Gameobject *>	onDeleteGameobject;
+		Signal<Camera*>			onSetMainCamera;
+		Signal<>				onScenePlay;
+		Signal<>				onScenePause;
 
 		Scene( const std::string _name, EcsManager * _ecsManager, PhysicsManager * _physicsManager );
 		~Scene();
@@ -28,36 +31,49 @@ namespace fan
 		void							DeleteGameobject(Gameobject* _gameobject);										// Deletes a gameobject and removes it from the scene hierarchy at the end of the frame
 		std::vector < Gameobject * >	BuildEntitiesList() const;
 
-		template<typename ComponentType>
-		ComponentType * FindComponentOfType() const;
+		template<typename _componentType> _componentType * FindComponentOfType() const;
 
 		void BeginFrame();
 		void Update(const float _delta);
 		void EndFrame();
+		void Play()	;
+		void Pause();
 		void OnGui();
 
 		void New();
 		void Save() const;
 		bool LoadFrom(const std::string _path);
+		void SetPath( const std::string _path ) { m_path = _path; }
 
-		Gameobject *		GetRoot() { return m_root; }
-		inline std::string	GetName() const { return m_name; }
-		bool				HasPath() const { return m_path.empty() == false; }
-		inline std::string	GetPath() const { return m_path; }
-		void				SetPath(const std::string _path) { m_path = _path; }
-		EcsManager *		GetEcsManager() const { return m_ecsManager; }
-		PhysicsManager *	GetPhysicsManager() const { return m_physicsManager; }
+
+		Gameobject *			GetRoot()							{ return m_root; }
+		inline std::string		GetName() const						{ return m_name; }
+		bool					HasPath() const						{ return m_path.empty() == false; }
+		inline std::string		GetPath() const						{ return m_path; }
+		inline EcsManager *		GetEcsManager() const				{ return m_ecsManager; }
+		inline PhysicsManager *	GetPhysicsManager() const			{ return m_physicsManager; }		
+		bool					IsPaused() const					{ return m_isPaused; };
+
+		void					SetMainCamera( Camera * _camera );
+
 
 	private:
-		std::string m_name;
-		std::string m_path;
-		Gameobject * m_root;
+		// Data
+		std::string				m_name;
+		std::string				m_path;
+
+		// References
+		Gameobject *			m_root;
 		EcsManager * const		m_ecsManager = nullptr;
 		PhysicsManager * const  m_physicsManager = nullptr;
 
-		std::vector < Gameobject * >	m_entitiesToDelete;
-		std::set< Actor * >	m_startingActors;
-		std::set< Actor * >	m_activeActors;
+		// State
+		bool m_isPaused = false;
+
+		// Gameobjects
+		std::vector < Gameobject * > m_entitiesToDelete;
+		std::set< Actor * >			 m_startingActors;
+		std::set< Actor * >			 m_activeActors;
 
 		void OnActorAttach(Actor * _actor);
 		void OnActorDetach(Actor * _actor);

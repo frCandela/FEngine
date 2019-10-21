@@ -23,8 +23,8 @@ namespace fan {
 	void SpaceShip::Update(const float _delta) {
 
 		// Go forward
-		float forward = Input::Get().Manager().GetAxis("game_forward");
-		float left = Input::Get().Manager().GetAxis( "game_left" );
+		float forward	= Input::Get().Manager().GetAxis( "game_forward");
+		float left		= Input::Get().Manager().GetAxis( "game_left" );
 
 		// Translation
 		Transform * transform = m_gameobject->GetComponent<Transform>();
