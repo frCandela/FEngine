@@ -31,29 +31,31 @@ namespace fan
 		m_gameobject->RemoveEcsComponent<ecsScaling>();
 	}
 
+	//================================================================================================================================
+	// Getters
+	//================================================================================================================================
+	btTransform	Transform::GetBtTransform() const	{ return btTransform(GetEcsTransform()->transform); }
+	btVector3 Transform::GetPosition() const		{ return GetEcsTransform()->transform.getOrigin(); }
+	btVector3 Transform::GetScale() const			{ return GetEcsScale()->scale; }
+	btQuaternion Transform::GetRotationQuat() const { return GetEcsTransform()->transform.getRotation(); }
+	glm::mat4 Transform::GetNormalMatrix() const	{ return glm::transpose( glm::inverse( GetModelMatrix() ) ); }
+	btVector3 Transform::Left() const				{ return btTransform( GetRotationQuat(), btVector3( 0, 0, 0 ) ) * btVector3::Left(); }
+	btVector3 Transform::Forward() const			{ return btTransform( GetRotationQuat() ) * btVector3::Forward(); }
+	btVector3 Transform::Up() const					{ return btTransform( GetRotationQuat(), btVector3( 0, 0, 0 ) ) * btVector3::Up(); }
 
 	//================================================================================================================================
 	//================================================================================================================================
-	btTransform	Transform::GetBtTransform() const { 
-		return btTransform(GetEcsTransform()->transform);
-	}
+	void Transform::LookAt( const btVector3& _target, const btVector3& _up ) {
+		btTransform& transform = GetEcsTransform()->transform;
 
-	//================================================================================================================================
-	//================================================================================================================================
-	btVector3 Transform::GetPosition() const { 
-		return GetEcsTransform()->transform.getOrigin();
-	}
+		btVector3 forward = _target - transform.getOrigin();
+		forward.normalize();
+		btVector3 left = _up.cross( forward );
+		left.normalize();
 
-	//================================================================================================================================
-	//================================================================================================================================
-	btVector3 Transform::GetScale() const { 
-		return GetEcsScale()->scale;
-	}
-
-	//================================================================================================================================
-	//================================================================================================================================
-	btQuaternion Transform::GetRotationQuat() const {
-		return GetEcsTransform()->transform.getRotation();
+		transform.setBasis( btMatrix3x3 (	left[0], _up[0], forward[0],
+											left[1], _up[1], forward[1],
+											left[2], _up[2], forward[2] ) );
 	}
 
 	//================================================================================================================================
@@ -118,12 +120,6 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	glm::mat4 Transform::GetNormalMatrix() const {
-		return glm::transpose( glm::inverse( GetModelMatrix() ) );
-	}
-
-	//================================================================================================================================
-	//================================================================================================================================
 	btVector3 Transform::TransformPoint(const btVector3 _point) const {
 		ecsScaling* scaling = GetEcsScale();
 		const btTransform transform = GetBtTransform();
@@ -159,26 +155,6 @@ namespace fan
 		const btTransform transform( GetRotationQuat() );
 		btVector3 transformedPoint = invertScale * (transform.inverse()*_point);
 		return transformedPoint;
-	}
-
-	//================================================================================================================================
-	//================================================================================================================================
-	btVector3 Transform::Left() const {
-		btTransform t(GetRotationQuat(), btVector3(0, 0, 0));
-		return t * btVector3::Left();
-	}
-
-	//================================================================================================================================
-	//================================================================================================================================
-	btVector3 Transform::Forward() const {
-		return btTransform(GetRotationQuat()) * btVector3::Forward();
-	}
-
-	//================================================================================================================================
-	//================================================================================================================================
-	btVector3 Transform::Up() const {
-		btTransform t(GetRotationQuat(), btVector3(0, 0, 0));
-		return t * btVector3::Up();
 	}
 
 	//================================================================================================================================

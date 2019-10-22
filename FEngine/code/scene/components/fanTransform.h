@@ -13,6 +13,7 @@ namespace fan
 		void SetScale(btVector3 _newScale);
 		void SetRotationEuler(const btVector3 _rotation);
 		void SetRotationQuat(const btQuaternion _rotation);
+		void LookAt( const btVector3& _target, const btVector3& _up );
 
 		btTransform		GetBtTransform() const;
 		btVector3		GetPosition() const;
@@ -22,16 +23,16 @@ namespace fan
 		glm::mat4		GetModelMatrix() const;
 		glm::mat4		GetNormalMatrix() const;
 
-		btVector3		TransformPoint(const btVector3 _point) const;
-		btVector3		TransformDirection(const btVector3 _point) const;
-		btVector3		InverseTransformPoint(const btVector3 _point) const;
-		btVector3		InverseTransformDirection(const btVector3 _point) const;
+		btVector3 TransformPoint( const btVector3 _point ) const;
+		btVector3 TransformDirection( const btVector3 _point ) const;
+		btVector3 InverseTransformPoint( const btVector3 _point ) const;
+		btVector3 InverseTransformDirection( const btVector3 _point ) const;
 
 		btVector3 Left() const;
 		btVector3 Forward() const;
 		btVector3 Up() const;
 
-		void OnGui() override;
+		void			OnGui() override;
 		ImGui::IconType GetIcon() const override { return ImGui::IconType::TRANSFORM; }
 
 		// ISerializable

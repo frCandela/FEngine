@@ -41,6 +41,10 @@ namespace fan {
 		float sign = mouseDir.dot( btVector3::Left() ) > 0.f ? 1.f : -1.f;
 		transform->SetRotationEuler( btVector3(0.f, sign * angle,0.f) );
 
+		transform->LookAt( mouseWorldPos , btVector3::Up() );
+
+
+
 		// Go forward
 		float forward	= Input::Get().Manager().GetAxis( "game_forward");
 		//float left		= Input::Get().Manager().GetAxis( "game_left" );
