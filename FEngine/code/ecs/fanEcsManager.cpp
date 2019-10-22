@@ -97,19 +97,21 @@ namespace fan {
 	// Runs the systems before the physics update
 	//================================================================================================================================
 	#define RUN_SYSTEM( _system ) RunSystem< _system::signature::componentsTypes, _system >::Run( _delta, m_activeEntitiesCount, m_entitiesData, m_components );
-	void EcsManager::Update( float _delta ) {
-		RUN_SYSTEM(ParticleSystem);
-		RUN_SYSTEM(PlanetsSystem);
-		RUN_SYSTEM(SynchRbToTransSystem);
+	void EcsManager::Update( const float _delta, const btVector3& _cameraPosition ) {
+		ecsParticleSystem::s_cameraPosition = _cameraPosition;
+
+		RUN_SYSTEM(ecsParticleSystem);
+		RUN_SYSTEM(ecsPlanetsSystem);
+		RUN_SYSTEM(ecsSynchRbToTransSystem);
 	}
 
 	//================================================================================================================================
 	// Runs the systems after the physics update
 	//================================================================================================================================
-	void EcsManager::LateUpdate( float _delta ) {
-		RUN_SYSTEM( SynchTransToRbSystem);
-		RUN_SYSTEM( UpdateAABBFromHull);
-		RUN_SYSTEM( UpdateAABBFromTransform);
+	void EcsManager::LateUpdate( const float _delta ) {
+		RUN_SYSTEM( ecsSynchTransToRbSystem);
+		RUN_SYSTEM( ecsUpdateAABBFromHull);
+		RUN_SYSTEM( ecsUpdateAABBFromTransform);
 	}
 
 	//================================================================================================================================

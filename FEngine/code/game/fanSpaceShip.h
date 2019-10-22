@@ -1,10 +1,11 @@
 #pragma once
 
-#include "scene/components/fanActor.h"
+#include "scene/actors/fanActor.h"
 
 namespace fan {
 
 	class Rigidbody;
+	class ParticleSystem;
 
 	//================================================================================================================================
 	//================================================================================================================================
@@ -23,10 +24,11 @@ namespace fan {
 		bool Save( Json & _json ) const override;
 
 	private:
-		float m_forwardBoost = 3500.f;
-		float m_lateralBoost = 2000.f;
+		float m_forwardForce = 3500.f;
+		float m_lateralForce = 2000.f;
 		float m_drag = 0.930f;
 
 		Rigidbody * m_rigidbody;
+		ParticleSystem * m_particleSystem;
 	};
 }

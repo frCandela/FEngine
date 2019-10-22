@@ -9,11 +9,8 @@ namespace fan {
 	//================================================================================================================================
 	EcsWindow::EcsWindow( EcsManager * _ecsManager ) :
 		EditorWindow("ecs", ImGui::IconType::ECS )
-		, m_ecsManager( _ecsManager )		
-		,m_generator()					 // TMP
-		, m_distribution( 0.f, 1.f )	// TMP
-	{
-	}
+		, m_ecsManager( _ecsManager )	
+	{}
 
 	//================================================================
 	// helper function to create a formatted string like "Storage: 1024 (16Ko)"
@@ -105,39 +102,6 @@ namespace fan {
 			} ImGui::SameLine();
 			ImGui::DragInt( "handleIndex", &entitySelect );
 			ImGui::PopItemWidth();
-		}
-
-		// PARTICLES
-		if ( ImGui::CollapsingHeader( "Particles" ) ) {
-			static int particlesPerFrame = 1;
-			static float speed = 1.f;
-			static float duration = 2.f;
-			static btVector3 startPos;
-
-			ImGui::DragInt( "particlesPerFrame", &particlesPerFrame, 1, 0 );
-			ImGui::DragFloat( "speed", &speed, 0.01f );
-			ImGui::DragFloat( "duration", &duration, 0.01f );
-			ImGui::DragFloat3( "start pos", &startPos[0] );
-
-			if ( particlesPerFrame > 0 ) {
-				for ( int particleIndex = 0; particleIndex < particlesPerFrame; particleIndex++ ) {
-					ecsEntity entity = m_ecsManager->CreateEntity();
-					m_ecsManager->AddComponent<ecsPosition>( entity );
-					m_ecsManager->AddComponent<ecsRotation>( entity );
-					m_ecsManager->AddComponent<ecsMovement>( entity );
-					m_ecsManager->AddComponent<ecsParticle>( entity );
-
-					ecsPosition* position = m_ecsManager->FindComponentFromEntity<ecsPosition>( entity );
-					ecsMovement* movement = m_ecsManager->FindComponentFromEntity<ecsMovement>( entity );
-					ecsParticle* particle = m_ecsManager->FindComponentFromEntity<ecsParticle>( entity );
-
-					movement->speed = btVector3( m_distribution( m_generator ), m_distribution( m_generator ), m_distribution( m_generator ) ) - btVector3( 0.5f, 0.5f, 0.5f );
-					movement->speed.normalize();
-					movement->speed *= speed;
-					position->position = startPos;
-					particle->durationLeft = duration;
-				}
-			}
 		}
 
 		// Entities list

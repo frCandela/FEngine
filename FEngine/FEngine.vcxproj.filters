@@ -83,6 +83,9 @@
     <Filter Include="code\deps\imgui">
       <UniqueIdentifier>{df054002-8137-4ae6-b627-4913370e1a3b}</UniqueIdentifier>
     </Filter>
+    <Filter Include="code\scene\actors">
+      <UniqueIdentifier>{98bff509-eefa-49b7-95e3-a6746b4f6091}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="code\editor\fanMainMenuBar.cpp">
@@ -104,9 +107,6 @@
       <Filter>code\scene\components</Filter>
     </ClCompile>
     <ClCompile Include="code\scene\components\fanCamera.cpp">
-      <Filter>code\scene\components</Filter>
-    </ClCompile>
-    <ClCompile Include="code\scene\components\fanActor.cpp">
       <Filter>code\scene\components</Filter>
     </ClCompile>
     <ClCompile Include="code\editor\windows\fanPreferencesWindow.cpp">
@@ -355,6 +355,12 @@
     <ClCompile Include="deps\imgui\imgui_draw.cpp">
       <Filter>code\deps\imgui</Filter>
     </ClCompile>
+    <ClCompile Include="code\scene\actors\fanActor.cpp">
+      <Filter>code\scene\actors</Filter>
+    </ClCompile>
+    <ClCompile Include="code\scene\actors\fanParticleSystem.cpp">
+      <Filter>code\scene\actors</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="code\editor\fanMainMenuBar.h">
@@ -373,9 +379,6 @@
       <Filter>code\scene\components</Filter>
     </ClInclude>
     <ClInclude Include="code\scene\components\fanCamera.h">
-      <Filter>code\scene\components</Filter>
-    </ClInclude>
-    <ClInclude Include="code\scene\components\fanActor.h">
       <Filter>code\scene\components</Filter>
     </ClInclude>
     <ClInclude Include="code\editor\windows\fanPreferencesWindow.h">
@@ -1142,6 +1145,12 @@
     </ClInclude>
     <ClInclude Include="deps\imgui\imconfig.h">
       <Filter>code\deps\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="code\scene\actors\fanActor.h">
+      <Filter>code\scene\actors</Filter>
+    </ClInclude>
+    <ClInclude Include="code\scene\actors\fanParticleSystem.h">
+      <Filter>code\scene\actors</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

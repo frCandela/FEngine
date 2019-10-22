@@ -6,7 +6,7 @@
 #include "scene/components/fanTransform.h"
 #include "scene/components/fanCamera.h"
 #include "scene/components/fanModel.h"
-#include "scene/components/fanActor.h"
+#include "scene/actors/fanActor.h"
 #include "core/fanSignal.h"
 #include "core/scope/fanScopedTimer.h"
 

@@ -51,19 +51,21 @@ namespace fan {
 	//================================
 	// ParticleSystem
 	//================================
-	class ParticleSystem : public ISystem<  ecsParticleSignature > {
+	class ecsParticleSystem : public ISystem<  ecsParticleSignature > {
 	public:
 		static void Run( float _delta, const size_t _count, std::vector< ecsEntityData >& _entitiesData,
 			std::vector< ecsPosition > & _positions,
 			std::vector< ecsRotation > & _rotations,
 			std::vector< ecsMovement > & _movements,
 			std::vector< ecsParticle > & _particles );
+
+		static btVector3 s_cameraPosition;
 	};
 
 	//================================
 	// PlanetsSystem
 	//================================
-	class PlanetsSystem : public ISystem<  ecsPlanetSignature > {
+	class ecsPlanetsSystem : public ISystem<  ecsPlanetSignature > {
 	public:
 		static void Run( float _delta, const size_t _count, std::vector< ecsEntityData >& _entitiesData,
 			std::vector< ecsTranform > & _transforms,
@@ -73,7 +75,7 @@ namespace fan {
 	//================================
 	// Rigidbody transform update
 	//================================
-	class SynchTransToRbSystem : public ISystem<  ecsRigidbodySignature > {
+	class ecsSynchTransToRbSystem : public ISystem<  ecsRigidbodySignature > {
 	public:
 		static void Run( float _delta, const size_t _count, std::vector< ecsEntityData >& _entitiesData,
 			  std::vector< ecsTranform > & _transforms
@@ -84,7 +86,7 @@ namespace fan {
 	//================================
 	// Rigidbody transform update
 	//================================
-	class SynchRbToTransSystem : public ISystem<  ecsRigidbodySignature > {
+	class ecsSynchRbToTransSystem : public ISystem<  ecsRigidbodySignature > {
 	public:
 		static void Run( float _delta, const size_t _count, std::vector< ecsEntityData >& _entitiesData,
 			std::vector< ecsTranform > & _transforms
@@ -95,7 +97,7 @@ namespace fan {
 	//================================
 	// Update AABB from convex hull
 	//================================
-	class UpdateAABBFromHull : public ISystem<  ecsAABBUpdateFromHull > {
+	class ecsUpdateAABBFromHull : public ISystem<  ecsAABBUpdateFromHull > {
 	public:
 		static void Run( float _delta, const size_t _count, std::vector< ecsEntityData >& _entitiesData,
 			std::vector< ecsTranform > &	_transforms
@@ -109,7 +111,7 @@ namespace fan {
 	//================================
 	// Update AABB from transform
 	//================================
-	class UpdateAABBFromTransform : public ISystem<  ecsAABBUpdateFromTransform > {
+	class ecsUpdateAABBFromTransform : public ISystem<  ecsAABBUpdateFromTransform > {
 	public:
 		static void Run( float _delta, const size_t _count, std::vector< ecsEntityData >& _entitiesData,
 			std::vector< ecsTranform > &	_transforms

@@ -35,7 +35,7 @@
 #include "scene/components/fanCamera.h"
 #include "scene/components/fanTransform.h"
 #include "scene/components/fanModel.h"
-#include "scene/components/fanActor.h"
+#include "scene/actors/fanActor.h"
 #include "scene/components/fanMaterial.h"
 #include "scene/components/fanPointLight.h"
 #include "scene/components/fanDirectionalLight.h"
@@ -187,7 +187,7 @@ namespace fan {
 
 				m_scene->BeginFrame();
 				m_scene->Update( targetLogicDelta );
-				m_ecsManager->Update( targetLogicDelta );				
+				m_ecsManager->Update( targetLogicDelta, m_scene->GetMainCamera()->GetGameobject()->GetTransform()->GetPosition() );				
 				m_physicsManager->StepSimulation(targetLogicDelta);
 				m_ecsManager->LateUpdate( targetLogicDelta );
 
@@ -533,25 +533,23 @@ namespace fan {
 	//================================================================================================================================
 	void Engine::DrawUI() {
 		//***************************************************************************************MYLITTLESPACE
-		ImGui::Begin("test"); {
-			
-
-			static int nb = 1;
-			ImGui::DragInt("nb", &nb);
-			if ( ImGui::Button( "spawn" ) ) {
-				for (int Index = 0; Index < nb; Index++)
-				{
-					Gameobject * go =  m_scene->CreateGameobject( "tmp" );
-					go->GetTransform()->SetPosition(btVector3::Zero());
-					go->AddComponent<Rigidbody>();
-					go->AddComponent<SphereShape>();
-					Model * model = go->AddComponent<Model>();
-					model->SetPath("content/models/test/sphere.fbx");
-				}				
-			}
-		} ImGui::End();		
-
-	
+// 		ImGui::Begin("test"); {
+// 			
+// 
+// 			static int nb = 1;
+// 			ImGui::DragInt("nb", &nb);
+// 			if ( ImGui::Button( "spawn" ) ) {
+// 				for (int Index = 0; Index < nb; Index++)
+// 				{
+// 					Gameobject * go =  m_scene->CreateGameobject( "tmp" );
+// 					go->GetTransform()->SetPosition(btVector3::Zero());
+// 					go->AddComponent<Rigidbody>();
+// 					go->AddComponent<SphereShape>();
+// 					Model * model = go->AddComponent<Model>();
+// 					model->SetPath("content/models/test/sphere.fbx");
+// 				}				
+// 			}
+// 		} ImGui::End();		
 
 		//***************************************************************************************END_MYLITTLESPACE
 

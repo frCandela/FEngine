@@ -1,5 +1,5 @@
 #include "fanGlobalIncludes.h"
-#include "scene/components/fanActor.h"
+#include "scene/actors/fanActor.h"
 
 #include "scene/fanGameobject.h"
 #include "scene/components/fanColliderShape.h"

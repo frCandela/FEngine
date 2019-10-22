@@ -156,7 +156,8 @@
     <ClCompile Include="code\renderer\util\fanSpirvCompiler.cpp" />
     <ClCompile Include="code\renderer\util\fanVertex.cpp" />
     <ClCompile Include="code\renderer\util\fanWindow.cpp" />
-    <ClCompile Include="code\scene\components\fanActor.cpp" />
+    <ClCompile Include="code\scene\actors\fanActor.cpp" />
+    <ClCompile Include="code\scene\actors\fanParticleSystem.cpp" />
     <ClCompile Include="code\scene\components\fanBoxShape.cpp" />
     <ClCompile Include="code\scene\components\fanCamera.cpp" />
     <ClCompile Include="code\scene\components\fanColliderShape.cpp" />
@@ -261,7 +262,8 @@
     <ClInclude Include="code\renderer\util\fanSpirvCompiler.h" />
     <ClInclude Include="code\renderer\util\fanVertex.h" />
     <ClInclude Include="code\renderer\util\fanWindow.h" />
-    <ClInclude Include="code\scene\components\fanActor.h" />
+    <ClInclude Include="code\scene\actors\fanActor.h" />
+    <ClInclude Include="code\scene\actors\fanParticleSystem.h" />
     <ClInclude Include="code\scene\components\fanBoxShape.h" />
     <ClInclude Include="code\scene\components\fanCamera.h" />
     <ClInclude Include="code\scene\components\fanColliderShape.h" />

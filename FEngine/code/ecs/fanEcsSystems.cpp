@@ -8,7 +8,8 @@ namespace fan {
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void ParticleSystem::Run( float _delta, const size_t _count, std::vector< ecsEntityData >& _entitiesData,
+	btVector3 ecsParticleSystem::s_cameraPosition;
+	void ecsParticleSystem::Run( float _delta, const size_t _count, std::vector< ecsEntityData >& _entitiesData,
 		std::vector< ecsPosition > & _positions,
 		std::vector< ecsRotation > & /*_rotations*/,
 		std::vector< ecsMovement > & _movements,
@@ -19,12 +20,13 @@ namespace fan {
 		triangles.reserve( _entitiesData.size() );
 		colors.reserve( _entitiesData.size() );
 
+		const btVector3 up = btVector3::Left();
 		static const float size = 0.05f;
 
 		for ( int entity = 0; entity < _count; entity++ ) {
 			ecsEntityData & data = _entitiesData[entity];
 
-			if ( data.IsAlive() && ( data.bitset & ParticleSystem::signature::bitset ) == ParticleSystem::signature::bitset ) {
+			if ( data.IsAlive() && ( data.bitset & ecsParticleSystem::signature::bitset ) == ecsParticleSystem::signature::bitset ) {
 				btVector3& position = _positions[data.components[IndexOfComponent<ecsPosition>::value]].position;
 				ecsMovement& movement = _movements[data.components[IndexOfComponent<ecsMovement>::value]];
 				ecsParticle& particle = _particles[data.components[IndexOfComponent<ecsParticle>::value]];
@@ -37,10 +39,20 @@ namespace fan {
 				}
 				position += _delta * movement.speed;
 
+				
+				btVector3 forward = s_cameraPosition - position;
+				forward.normalize();
+				btVector3 left = up.cross( forward );
+				left.normalize();
 
-				triangles.push_back( position + btVector3( size, 0, 0 ) );
-				triangles.push_back( position + btVector3( -size, 0, 0 ) );
-				triangles.push_back( position + btVector3( 0, 2.f*size, 0 ) );
+				btMatrix3x3 mat ( 
+					left[0], up[0], forward[0],
+					left[1], up[1], forward[1],
+					left[2], up[2], forward[2] );			
+					
+				triangles.push_back( position + mat * btVector3( size, 0, 0 ) );
+				triangles.push_back( position + mat * btVector3( -size, 0, 0 ) );
+				triangles.push_back( position + mat * btVector3( 0, 2.f*size, 0 ) );
 				colors.push_back( particle.color );
 			}
 		}
@@ -51,7 +63,7 @@ namespace fan {
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void PlanetsSystem::Run( float /*_delta*/, const size_t _count, std::vector< ecsEntityData >& _entitiesData,
+	void ecsPlanetsSystem::Run( float /*_delta*/, const size_t _count, std::vector< ecsEntityData >& _entitiesData,
 		std::vector< ecsTranform > & _transforms,
 		std::vector< ecsPlanet > & _planets ) 	
 	{
@@ -72,7 +84,7 @@ namespace fan {
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void SynchRbToTransSystem::Run( float /*_delta*/, const size_t _count, std::vector< ecsEntityData >& _entitiesData,
+	void ecsSynchRbToTransSystem::Run( float /*_delta*/, const size_t _count, std::vector< ecsEntityData >& _entitiesData,
 		std::vector< ecsTranform > & _transforms
 		, std::vector< ecsMotionState > & _motionStates
 		, std::vector< ecsRigidbody > & _rigidbodies ) 
@@ -95,7 +107,7 @@ namespace fan {
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void SynchTransToRbSystem::Run( float /*_delta*/, const size_t _count, std::vector< ecsEntityData >& _entitiesData,
+	void ecsSynchTransToRbSystem::Run( float /*_delta*/, const size_t _count, std::vector< ecsEntityData >& _entitiesData,
 		std::vector< ecsTranform > & _transforms
 		, std::vector< ecsMotionState > & _motionStates
 		, std::vector< ecsRigidbody > & _rigidbodies ) {
@@ -116,7 +128,7 @@ namespace fan {
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void UpdateAABBFromHull::Run( float /*_delta*/, const size_t _count, std::vector< ecsEntityData >& _entitiesData,
+	void ecsUpdateAABBFromHull::Run( float /*_delta*/, const size_t _count, std::vector< ecsEntityData >& _entitiesData,
 		std::vector< ecsTranform > &	_transforms
 		, std::vector< ecsScaling > &	_scales
 		, std::vector< ecsAABB > &		_aabbs
@@ -168,7 +180,7 @@ namespace fan {
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void UpdateAABBFromTransform::Run( float /*_delta*/, const size_t _count, std::vector< ecsEntityData >& _entitiesData,
+	void ecsUpdateAABBFromTransform::Run( float /*_delta*/, const size_t _count, std::vector< ecsEntityData >& _entitiesData,
 		std::vector< ecsTranform > &	_transforms
 		, std::vector< ecsAABB > &		_aabbs
 		, std::vector< ecsFlags > &		_flags ) {

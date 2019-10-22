@@ -15,11 +15,6 @@ namespace fan {
 
 	private:
 		EcsManager * m_ecsManager = nullptr;
-
-		// TMP
-		std::default_random_engine m_generator;
-		std::uniform_real_distribution<float> m_distribution;
-		// TMP
 	};
 
 }

@@ -86,13 +86,13 @@ namespace fan {
 	//================================================================================================================================
 	//================================================================================================================================	
 	void PhysicsManager::OnGui() {
-		ImGui::Begin( "Physics" ); {			
-			ImGui::Text( std::to_string( m_dynamicsWorld->getNumCollisionObjects() ).c_str() );
-			if ( ImGui::Button( "clear" ) ) {
-				Clear();
-			}
-
-		} ImGui::End();
+// 		ImGui::Begin( "Physics" ); {			
+// 			ImGui::Text( std::to_string( m_dynamicsWorld->getNumCollisionObjects() ).c_str() );
+// 			if ( ImGui::Button( "clear" ) ) {
+// 				Clear();
+// 			}
+// 
+// 		} ImGui::End();
 	}
 
 }

@@ -39,6 +39,7 @@ namespace ImGui {
 		, DECL_ICON ( 6, 3 ) // MODEL
 		, DECL_ICON ( 7, 3 ) // RIGIDBODY
 		, DECL_ICON ( 8, 3 ) // TRANSFORM
+		, DECL_ICON ( 9, 3 ) // PARTICLES		
 
 		//GAME
 		, DECL_ICON ( 0, 5 ) // PLANET

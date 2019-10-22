@@ -8,6 +8,7 @@
 #include "scene/components/fanRigidbody.h"
 #include "scene/components/fanTransform.h"
 #include "scene/components/fanCamera.h"
+#include "scene/actors/fanParticleSystem.h"
 #include "scene/fanGameobject.h"
 #include "core/input/fanMouse.h"
 #include "core/math/shapes/fanRay.h"
@@ -21,6 +22,8 @@ namespace fan {
 	//================================================================================================================================
 	void SpaceShip::Start() {
 		m_rigidbody = GetGameobject()->GetComponent<Rigidbody>();
+		m_particleSystem = GetGameobject()->GetComponent<ParticleSystem>();
+		m_particleSystem->SetEnabled(false);
 
 		if ( m_rigidbody == nullptr ) {
 			Debug::Warning() << "SpaceShip: no rigidBody found on " << GetGameobject()->GetName() << Debug::Endl();
@@ -56,6 +59,9 @@ namespace fan {
 
 		// Drag
 		m_rigidbody->SetVelocity( m_drag * m_rigidbody->GetVelocity() );
+
+		// Particles
+		m_particleSystem->SetEnabled( forward > 0 );
 	}
 
 	//================================================================================================================================
