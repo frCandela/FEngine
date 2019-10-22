@@ -5,6 +5,7 @@
 #include "core/input/fanInput.h"
 #include "core/input/fanInputManager.h"
 #include "editor/windows/fanInspectorWindow.h"
+#include "scene/components/fanRigidbody.h"
 #include "scene/components/fanTransform.h"
 #include "scene/components/fanCamera.h"
 #include "scene/fanGameobject.h"
@@ -19,7 +20,13 @@ namespace fan {
 	//================================================================================================================================
 	//================================================================================================================================
 	void SpaceShip::Start() {
-		m_speed = btVector3(0.f,0.f,0.f);
+		m_rigidbody = GetGameobject()->GetComponent<Rigidbody>();
+
+		if ( m_rigidbody == nullptr ) {
+			Debug::Warning() << "SpaceShip: no rigidBody found on " << GetGameobject()->GetName() << Debug::Endl();
+		} else {
+			m_rigidbody->GetBtBody()->setSleepingThresholds(0.f,0.f);
+		}
 	}
 
 	//================================================================================================================================
@@ -36,28 +43,19 @@ namespace fan {
 		btVector3 mouseDir = mouseWorldPos - m_gameobject->GetTransform()->GetPosition();
 		mouseDir.normalize();
 
-		// Set rotation TODO: create a proper LookAt method in the Transform component
-		float angle = btDegrees( btVector3::Forward().angle(mouseDir) );
-		float sign = mouseDir.dot( btVector3::Left() ) > 0.f ? 1.f : -1.f;
-		transform->SetRotationEuler( btVector3(0.f, sign * angle,0.f) );
-
+		// Orientation
 		transform->LookAt( mouseWorldPos , btVector3::Up() );
 
-
+		// Lateral movement
+		float left		= Input::Get().Manager().GetAxis( "game_left" );
+		m_rigidbody->ApplyCentralForce( _delta * m_lateralForce * left * transform->Left() );
 
 		// Go forward
-		float forward	= Input::Get().Manager().GetAxis( "game_forward");
-		//float left		= Input::Get().Manager().GetAxis( "game_left" );
+		float forward = Input::Get().Manager().GetAxis( "game_forward" );		
+		m_rigidbody->ApplyCentralForce( _delta * m_forwardForce * forward * transform->Forward() );
 
-		// Translation
-		
-		if (forward != 0.f) {
-			forward *= m_velocity * _delta;
-			m_speed += _delta * forward * transform->Forward(); // increases velocity			
-		} 
-		transform->SetPosition( transform->GetPosition() + m_speed );
-		const btVector3 drag = m_drag * m_speed;
-		m_speed -= _delta * drag;
+		// Drag
+		m_rigidbody->SetVelocity( m_drag * m_rigidbody->GetVelocity() );
 	}
 
 	//================================================================================================================================
@@ -65,10 +63,10 @@ namespace fan {
 	void SpaceShip::OnGui() {
 		Actor::OnGui();
 
-		ImGui::DragFloat3("speed", &m_speed[0], 0.01f, 0.f, 10.f );
-		ImGui::DragFloat("velocity", &m_velocity, 0.01f, 0.f, 10.f);
+		ImGui::DragFloat( "forward force", &m_forwardForce, 1.f, 0.f, 100000.f);
+		ImGui::DragFloat( "lateral force", &m_lateralForce, 1.f, 0.f, 100000.f );
 		ImGui::DragFloat( "drag", &m_drag, 0.01f, 0.f, 1.f );
-		ImGui::DragFloat("rotation_speed", &m_rotationSpeed, 0.01f, 0.f, 10.f);
+
 	}
 
 	//================================================================================================================================
@@ -76,8 +74,8 @@ namespace fan {
 	bool SpaceShip::Load( Json & _json ) {
 		Actor::Load(_json);
 
-		LoadFloat( _json, "speed", m_velocity );
-		LoadFloat( _json, "rotation_speed", m_rotationSpeed );
+		LoadFloat( _json, "forward_force", m_forwardForce );
+		LoadFloat( _json, "lateral_force", m_lateralForce );
 		LoadFloat( _json, "drag", m_drag );
 
 		return true;
@@ -86,8 +84,8 @@ namespace fan {
 	//================================================================================================================================
 	//================================================================================================================================
 	bool SpaceShip::Save( Json & _json ) const {
-		SaveFloat( _json, "speed", m_velocity );
-		SaveFloat( _json, "rotation_speed", m_rotationSpeed );
+		SaveFloat( _json, "forward_force", m_forwardForce );
+		SaveFloat( _json, "lateral_force", m_lateralForce );
 		SaveFloat( _json, "drag", m_drag );
 		Actor::Save( _json );
 		

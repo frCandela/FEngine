@@ -10,13 +10,15 @@
 #include "glm/gtc/matrix_transform.hpp"
 #include "glm/gtc/quaternion.hpp"
 #include <glm/gtx/hash.hpp>
-#include "bullet/btBulletDynamicsCommon.h"
 
+#include "bullet/btBulletDynamicsCommon.h"
 #include "nlohmann_json.h"
 #include "bitset2/bitset2.hpp"
 
 #define GLFW_INCLUDE_VULKAN
 #include "glfw/glfw3.h"
+
+#define IMGUI_DISABLE_OBSOLETE_FUNCTIONS
 #include "imgui/imgui.h"
 
 #include <vector>

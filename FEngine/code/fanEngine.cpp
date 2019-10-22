@@ -187,11 +187,11 @@ namespace fan {
 
 				m_scene->BeginFrame();
 				m_scene->Update( targetLogicDelta );
-				m_ecsManager->Update( targetLogicDelta );
-				m_ecsManager->Refresh();
+				m_ecsManager->Update( targetLogicDelta );				
 				m_physicsManager->StepSimulation(targetLogicDelta);
 				m_ecsManager->LateUpdate( targetLogicDelta );
 
+				m_ecsManager->Refresh();
 				ManageSelection();
 				DrawUI();
 				m_physicsManager->OnGui();

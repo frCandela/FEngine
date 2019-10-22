@@ -3,6 +3,9 @@
 #include "scene/components/fanActor.h"
 
 namespace fan {
+
+	class Rigidbody;
+
 	//================================================================================================================================
 	//================================================================================================================================
 	class SpaceShip : public Actor {
@@ -20,10 +23,10 @@ namespace fan {
 		bool Save( Json & _json ) const override;
 
 	private:
-		float m_velocity = 8.f;
-		float m_rotationSpeed = 3.f;
-		float m_drag = 0.99f;
+		float m_forwardBoost = 3500.f;
+		float m_lateralBoost = 2000.f;
+		float m_drag = 0.930f;
 
-		btVector3 m_speed;
+		Rigidbody * m_rigidbody;
 	};
 }

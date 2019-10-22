@@ -25,10 +25,17 @@ namespace fan {
 		Signal<LogItem> onNewLog;
 
 		static Code Endl() { return Code::endl;  }
+
 		static void Log		( const std::string _message );
 		static void Warning	( const std::string _message );
 		static void Error	( const std::string _message );
 		static void Highlight	( const std::string _message );
+
+		static Debug& Log();
+		static Debug& Warning();
+		static Debug& Error();
+		static Debug& Highlight();
+
 		static void Clear();
 		static void Break() { __debugbreak(); }
 		const std::vector< LogItem >& GetLogBuffer() { return m_logBuffer;  }

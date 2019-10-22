@@ -80,17 +80,11 @@
     <Filter Include="code\ecs">
       <UniqueIdentifier>{357d54ad-d1f0-4477-b80c-1bfb8e5c08ca}</UniqueIdentifier>
     </Filter>
+    <Filter Include="code\deps\imgui">
+      <UniqueIdentifier>{df054002-8137-4ae6-b627-4913370e1a3b}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="deps\imgui\imgui.cpp">
-      <Filter>code\deps</Filter>
-    </ClCompile>
-    <ClCompile Include="deps\imgui\imgui_demo.cpp">
-      <Filter>code\deps</Filter>
-    </ClCompile>
-    <ClCompile Include="deps\imgui\imgui_draw.cpp">
-      <Filter>code\deps</Filter>
-    </ClCompile>
     <ClCompile Include="code\editor\fanMainMenuBar.cpp">
       <Filter>code\editor</Filter>
     </ClCompile>
@@ -351,6 +345,15 @@
     </ClCompile>
     <ClCompile Include="code\editor\fanImguiIcons.cpp">
       <Filter>code\editor</Filter>
+    </ClCompile>
+    <ClCompile Include="deps\imgui\imgui_demo.cpp">
+      <Filter>code\deps\imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="deps\imgui\imgui.cpp">
+      <Filter>code\deps\imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="deps\imgui\imgui_draw.cpp">
+      <Filter>code\deps\imgui</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -1121,6 +1124,24 @@
     </ClInclude>
     <ClInclude Include="code\editor\fanImguiIcons.h">
       <Filter>code\editor</Filter>
+    </ClInclude>
+    <ClInclude Include="deps\imgui\imgui.h">
+      <Filter>code\deps\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="deps\imgui\imgui_internal.h">
+      <Filter>code\deps\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="deps\imgui\stb_rect_pack.h">
+      <Filter>code\deps\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="deps\imgui\stb_textedit.h">
+      <Filter>code\deps\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="deps\imgui\stb_truetype.h">
+      <Filter>code\deps\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="deps\imgui\imconfig.h">
+      <Filter>code\deps\imgui</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -7,15 +7,19 @@ namespace fan {
 	//================================================================================================================================	
 	class Rigidbody : public Component {
 	public:
-		btRigidBody *	GetBtBody() { return m_rigidbody; }
+		btRigidBody *			GetBtBody()		{ return m_rigidbody; }
+		btDefaultMotionState *  GetBtMotion() { return m_motionState; }
+
 		float			GetMass() const;
 		void			SetMass( const float _mass );
 		void			SetStatic( const bool _static );
 		bool			IsStatic() const;
 		void			Activate();		
 		bool			IsActive() const;
+
 		btVector3		GetVelocity() const;
 		void			SetVelocity( const btVector3& _velocity );
+		inline void		ApplyCentralForce( const btVector3& _force ) { m_rigidbody->applyCentralForce( _force ); }
 
 		void SetCollisionShape( btCollisionShape * _collisionShape );
 		void Refresh();
