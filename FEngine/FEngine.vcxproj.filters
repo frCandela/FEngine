@@ -361,6 +361,12 @@
     <ClCompile Include="code\scene\actors\fanParticleSystem.cpp">
       <Filter>code\scene\actors</Filter>
     </ClCompile>
+    <ClCompile Include="code\editor\windows\fanProfilerWindow.cpp">
+      <Filter>code\editor\windows</Filter>
+    </ClCompile>
+    <ClCompile Include="code\core\scope\fanProfiler.cpp">
+      <Filter>code\core\scope</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="code\editor\fanMainMenuBar.h">
@@ -1151,6 +1157,12 @@
     </ClInclude>
     <ClInclude Include="code\scene\actors\fanParticleSystem.h">
       <Filter>code\scene\actors</Filter>
+    </ClInclude>
+    <ClInclude Include="code\editor\windows\fanProfilerWindow.h">
+      <Filter>code\editor\windows</Filter>
+    </ClInclude>
+    <ClInclude Include="code\core\scope\fanProfiler.h">
+      <Filter>code\core\scope</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

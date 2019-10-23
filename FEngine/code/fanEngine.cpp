@@ -27,6 +27,7 @@
 #include "editor/windows/fanPreferencesWindow.h"	
 #include "editor/windows/fanConsoleWindow.h"	
 #include "editor/windows/fanEcsWindow.h"	
+#include "editor/windows/fanProfilerWindow.h"	
 #include "editor/components/fanFPSCamera.h"		
 #include "editor/fanImguiIcons.h"
 #include "scene/fanScene.h"
@@ -101,8 +102,9 @@ namespace fan {
 		m_preferencesWindow = new PreferencesWindow( m_renderer );
 		m_consoleWindow		= new ConsoleWindow();
 		m_ecsWindow			= new EcsWindow( m_ecsManager );
+		m_profilerWindow	= new ProfilerWindow( );
 		m_mainMenuBar		= new MainMenuBar( *m_scene, m_editorGrid );
-		m_mainMenuBar->SetWindows( { m_renderWindow , m_sceneWindow , m_inspectorWindow , m_consoleWindow, m_ecsWindow, m_preferencesWindow } );
+		m_mainMenuBar->SetWindows( { m_renderWindow , m_sceneWindow , m_inspectorWindow , m_consoleWindow, m_ecsWindow, m_profilerWindow, m_preferencesWindow } );
 
 		// Instance messages		
 		Debug::Get().SetDebug( m_renderer );

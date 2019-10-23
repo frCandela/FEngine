@@ -28,6 +28,7 @@ namespace ImGui {
 		 ,DECL_ICON ( 4, 1 ) // CONSOLE
 		 ,DECL_ICON ( 5, 1 ) // ECS
 		 ,DECL_ICON ( 6, 1 ) // IMGUI
+		 ,DECL_ICON ( 7, 1 ) // PROFILER
 
 		// COMPONENTS
 		, DECL_ICON ( 0, 3 ) // CAMERA

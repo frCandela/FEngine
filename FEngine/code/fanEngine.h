@@ -12,6 +12,7 @@ namespace fan {
 	class ConsoleWindow;
 	class EditorWindow;
 	class EcsWindow;
+	class ProfilerWindow;
 	class Renderer;
 	class Gameobject;
 	class Scene;
@@ -78,7 +79,7 @@ namespace fan {
 		PreferencesWindow *	m_preferencesWindow;
 		ConsoleWindow *		m_consoleWindow;
 		EcsWindow *			m_ecsWindow;
-
+		ProfilerWindow*		m_profilerWindow;
 		EditorGrid m_editorGrid;
 
 		// Main objects

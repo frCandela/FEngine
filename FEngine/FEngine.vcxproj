@@ -107,6 +107,7 @@
     <ClCompile Include="code\core\math\shapes\fanTriangle.cpp" />
     <ClCompile Include="code\core\ressources\fanRessource.cpp" />
     <ClCompile Include="code\core\ressources\fanRessourcePtr.cpp" />
+    <ClCompile Include="code\core\scope\fanProfiler.cpp" />
     <ClCompile Include="code\core\scope\fanScopedTimer.cpp" />
     <ClCompile Include="code\ecs\fanEcsComponents.cpp" />
     <ClCompile Include="code\ecs\fanEcsConfig.cpp" />
@@ -121,6 +122,7 @@
     <ClCompile Include="code\editor\windows\fanEcsWindow.cpp" />
     <ClCompile Include="code\editor\windows\fanInspectorWindow.cpp" />
     <ClCompile Include="code\editor\windows\fanPreferencesWindow.cpp" />
+    <ClCompile Include="code\editor\windows\fanProfilerWindow.cpp" />
     <ClCompile Include="code\editor\windows\fanRenderWindow.cpp" />
     <ClCompile Include="code\editor\windows\fanSceneWindow.cpp" />
     <ClCompile Include="code\editor\windows\fanEditorWindow.cpp" />
@@ -209,6 +211,7 @@
     <ClInclude Include="code\core\meta\fanTypeList.h" />
     <ClInclude Include="code\core\ressources\fanRessource.h" />
     <ClInclude Include="code\core\ressources\fanRessourcePtr.h" />
+    <ClInclude Include="code\core\scope\fanProfiler.h" />
     <ClInclude Include="code\core\scope\fanScopedTimer.h" />
     <ClInclude Include="code\ecs\fanEcsBitsetCreator.h" />
     <ClInclude Include="code\ecs\fanEcsComponents.h" />
@@ -226,6 +229,7 @@
     <ClInclude Include="code\editor\windows\fanEcsWindow.h" />
     <ClInclude Include="code\editor\windows\fanInspectorWindow.h" />
     <ClInclude Include="code\editor\windows\fanPreferencesWindow.h" />
+    <ClInclude Include="code\editor\windows\fanProfilerWindow.h" />
     <ClInclude Include="code\editor\windows\fanRenderWindow.h" />
     <ClInclude Include="code\editor\windows\fanSceneWindow.h" />
     <ClInclude Include="code\editor\windows\fanEditorWindow.h" />
