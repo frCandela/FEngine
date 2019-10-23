@@ -43,6 +43,7 @@
 #include "scene/components/fanRigidbody.h"
 #include "scene/components/fanSphereShape.h"
 #include "core/math/shapes/fanConvexHull.h"
+#include "core/scope/fanProfiler.h"
 #include "ecs/fanECSManager.h"
 #include "physics/fanPhysicsManager.h"
 
@@ -174,18 +175,26 @@ namespace fan {
 		float lastLogicTime		= Time::ElapsedSinceStartup();
 		float lastRenderTime	= Time::ElapsedSinceStartup();
 
-		while ( m_applicationShouldExit == false && m_renderer->WindowIsOpen() == true ) {
+		Profiler::Get().Begin();
+
+		while ( m_applicationShouldExit == false && m_renderer->WindowIsOpen() == true ) 
+		{
  			const float time = Time::ElapsedSinceStartup();
 
 			// Runs logic, renders ui
 			const float targetLogicDelta = Time::Get().GetLogicDelta();
 			const float logicDelta = time - lastLogicTime;
-			if ( logicDelta > targetLogicDelta ) {				
-				lastLogicTime += targetLogicDelta;
-				Input::Get().NewFrame();
-				ImGui::NewFrame();
-				ImGui::GetIO().DeltaTime = targetLogicDelta;
-				m_renderer->ClearDebug();	
+			if ( logicDelta > targetLogicDelta ) {			
+				SCOPED_PROFILE(logic)
+
+				{
+					SCOPED_PROFILE( init )
+					lastLogicTime += targetLogicDelta;
+					Input::Get().NewFrame();
+					ImGui::NewFrame();
+					ImGui::GetIO().DeltaTime = targetLogicDelta;
+					m_renderer->ClearDebug();
+				}
 
 				m_scene->BeginFrame();
 				m_scene->Update( targetLogicDelta );
@@ -194,19 +203,30 @@ namespace fan {
 				m_ecsManager->LateUpdate( targetLogicDelta );
 
 				m_ecsManager->Refresh();
-				ManageSelection();
-				DrawUI();
-				m_physicsManager->OnGui();
-				DrawEditorGrid();
-				Input::Get().Manager().PullEvents();
 
-				if ( m_mainMenuBar->ShowWireframe() ) { DrawWireframe(); }
-				if ( m_mainMenuBar->ShowNormals() ) { DrawNormals(); }
-				if ( m_mainMenuBar->ShowAABB() ) { DrawAABB(); }
-				if ( m_mainMenuBar->ShowHull() ) { DrawHull(); }
-				m_scene->EndFrame();		
-				ImGui::Render();
-				
+				{
+					SCOPED_PROFILE( ui_drawing )
+					ManageSelection();
+					m_mainMenuBar->Draw();
+					m_physicsManager->OnGui();
+					DrawEditorGrid();
+					Input::Get().Manager().PullEvents();
+				}
+
+				{
+					SCOPED_PROFILE( debug_draw )
+					if ( m_mainMenuBar->ShowWireframe() ) { DrawWireframe(); }
+					if ( m_mainMenuBar->ShowNormals() ) { DrawNormals(); }
+					if ( m_mainMenuBar->ShowAABB() ) { DrawAABB(); }
+					if ( m_mainMenuBar->ShowHull() ) { DrawHull(); }
+				}
+
+				m_scene->EndFrame();	
+
+				{
+					SCOPED_PROFILE( imgui_render )
+					ImGui::Render();
+				}
 			}
 
 			// Render world
@@ -217,7 +237,9 @@ namespace fan {
 				Time::Get().RegisterFrameDrawn();	
 				UpdateRenderer();
 				
-				m_renderer->DrawFrame();				
+				m_renderer->DrawFrame();		
+				Profiler::Get().End();
+				Profiler::Get().Begin();
 			} 
 		}
 
@@ -242,7 +264,6 @@ namespace fan {
 		SetMainCamera(m_editorCamera);
 		m_editorCameraController = cameraGameobject->AddComponent<FPSCamera>();
 		m_editorCameraController->SetRemovable(false);
-
 
 		_scene->onSetMainCamera.Connect( &Engine::SetMainCamera, this );
 
@@ -406,6 +427,8 @@ namespace fan {
 	// TODO use an ecs system to do this
 	//================================================================================================================================
 	void Engine::UpdateRenderer() {
+		SCOPED_PROFILE( update_renderer )
+
 		// Camera
 		Transform * cameraTransform = m_mainCamera->GetGameobject()->GetComponent<Transform>();
 		m_mainCamera->SetAspectRatio( m_renderer->GetWindowAspectRatio() );
@@ -530,33 +553,6 @@ namespace fan {
 			SetSelectedGameobject(closestGameobject);
 		}
 	}	
-
-	//================================================================================================================================
-	//================================================================================================================================
-	void Engine::DrawUI() {
-		//***************************************************************************************MYLITTLESPACE
-// 		ImGui::Begin("test"); {
-// 			
-// 
-// 			static int nb = 1;
-// 			ImGui::DragInt("nb", &nb);
-// 			if ( ImGui::Button( "spawn" ) ) {
-// 				for (int Index = 0; Index < nb; Index++)
-// 				{
-// 					Gameobject * go =  m_scene->CreateGameobject( "tmp" );
-// 					go->GetTransform()->SetPosition(btVector3::Zero());
-// 					go->AddComponent<Rigidbody>();
-// 					go->AddComponent<SphereShape>();
-// 					Model * model = go->AddComponent<Model>();
-// 					model->SetPath("content/models/test/sphere.fbx");
-// 				}				
-// 			}
-// 		} ImGui::End();		
-
-		//***************************************************************************************END_MYLITTLESPACE
-
-		m_mainMenuBar->Draw();
-	}
 
 	//================================================================================================================================
 	// Returns the new position of the move gizmo

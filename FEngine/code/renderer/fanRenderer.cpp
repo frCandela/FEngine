@@ -4,6 +4,7 @@
 #include "core/fanTime.h"
 #include "core/input/fanInput.h"
 #include "core/math/fanBasicModels.h"
+#include "core/scope/fanProfiler.h"
 #include "renderer/fanMesh.h"
 #include "renderer/fanRessourceManager.h"
 #include "renderer/core/fanInstance.h"
@@ -134,56 +135,56 @@ namespace fan
 	//================================================================================================================================
 	//================================================================================================================================	
 	void Renderer::DrawFrame( ) {
-			const VkResult result = m_swapchain->AcquireNextImage();
-			if (result == VK_ERROR_OUT_OF_DATE_KHR ) {
+		SCOPED_PROFILE( draw_frame )
 
-				// window minimized
-				if (m_window->GetExtent().width == 0 && m_window->GetExtent().height == 0) {
-					glfwPollEvents();
-					return;
-				}
-				vkDeviceWaitIdle(m_device->vkDevice);
-				const VkExtent2D extent = m_window->GetExtent();
-				Debug::Get() << Debug::Severity::highlight << "Resize renderer: " << extent.width << "x" << extent.height << Debug::Endl();
-				m_swapchain->Resize( extent );
-				m_swapchainFramebuffers->Resize( extent );
-				m_forwardFrameBuffers->Resize( extent );
-				m_postprocessPipeline->Resize( extent );
-				m_forwardPipeline->Resize( extent );
- 				m_debugLinesPipeline->Resize( extent );
- 				m_debugLinesPipelineNoDepthTest->Resize( extent );
- 				m_debugTrianglesPipeline->Resize( extent );
+		const VkResult result = m_swapchain->AcquireNextImage();
+		if ( result == VK_ERROR_OUT_OF_DATE_KHR ) {
 
-				RecordAllCommandBuffers();
-				vkResetFences(m_device->vkDevice, 1, m_swapchain->GetCurrentInFlightFence());
-				m_swapchain->AcquireNextImage();
+			// window minimized
+			if ( m_window->GetExtent().width == 0 && m_window->GetExtent().height == 0 ) {
+				glfwPollEvents();
+				return;
 			}
-			else if (result != VK_SUCCESS) {
-				Debug::Error( "Could not acquire next image" );
-			}
-			else {
-				vkWaitForFences(m_device->vkDevice, 1, m_swapchain->GetCurrentInFlightFence(), VK_TRUE, std::numeric_limits<uint64_t>::max());
-				vkResetFences(m_device->vkDevice, 1, m_swapchain->GetCurrentInFlightFence());
-			}
-			
-			ImGui::GetIO().DisplaySize = ImVec2(static_cast<float>(m_swapchain->GetExtent().width), static_cast<float>(m_swapchain->GetExtent().height));
+			vkDeviceWaitIdle( m_device->vkDevice );
+			const VkExtent2D extent = m_window->GetExtent();
+			Debug::Get() << Debug::Severity::highlight << "Resize renderer: " << extent.width << "x" << extent.height << Debug::Endl();
+			m_swapchain->Resize( extent );
+			m_swapchainFramebuffers->Resize( extent );
+			m_forwardFrameBuffers->Resize( extent );
+			m_postprocessPipeline->Resize( extent );
+			m_forwardPipeline->Resize( extent );
+			m_debugLinesPipeline->Resize( extent );
+			m_debugLinesPipelineNoDepthTest->Resize( extent );
+			m_debugTrianglesPipeline->Resize( extent );
 
-			if (m_ressourceManager->IsModified()) {
-				WaitIdle();
-				m_forwardPipeline->Resize(m_swapchain->GetExtent());
-				m_ressourceManager->SetUnmodified();
-			}
+			RecordAllCommandBuffers();
+			vkResetFences( m_device->vkDevice, 1, m_swapchain->GetCurrentInFlightFence() );
+			m_swapchain->AcquireNextImage();
+		} else if ( result != VK_SUCCESS ) {
+			Debug::Error( "Could not acquire next image" );
+		} else {
+			vkWaitForFences( m_device->vkDevice, 1, m_swapchain->GetCurrentInFlightFence(), VK_TRUE, std::numeric_limits<uint64_t>::max() );
+			vkResetFences( m_device->vkDevice, 1, m_swapchain->GetCurrentInFlightFence() );
+		}
 
-			const uint32_t currentFrame = m_swapchain->GetCurrentFrame();
-			UpdateUniformBuffers( currentFrame );
-			RecordCommandBufferGeometry(currentFrame);
-			RecordCommandBufferDebug(currentFrame);
-			RecordCommandBufferImgui(currentFrame);
-			RecordPrimaryCommandBuffer(currentFrame);
-			SubmitCommandBuffers();
+		ImGui::GetIO().DisplaySize = ImVec2( static_cast<float>( m_swapchain->GetExtent().width ), static_cast<float>( m_swapchain->GetExtent().height ) );
 
-			m_swapchain->PresentImage();
-			m_swapchain->StartNextFrame();
+		if ( m_ressourceManager->IsModified() ) {
+			WaitIdle();
+			m_forwardPipeline->Resize( m_swapchain->GetExtent() );
+			m_ressourceManager->SetUnmodified();
+		}
+
+		const uint32_t currentFrame = m_swapchain->GetCurrentFrame();
+		UpdateUniformBuffers( currentFrame );
+		RecordCommandBufferGeometry( currentFrame );
+		RecordCommandBufferDebug( currentFrame );
+		RecordCommandBufferImgui( currentFrame );
+		RecordPrimaryCommandBuffer( currentFrame );
+		SubmitCommandBuffers();
+
+		m_swapchain->PresentImage();
+		m_swapchain->StartNextFrame();
 	}
 
 	//================================================================================================================================

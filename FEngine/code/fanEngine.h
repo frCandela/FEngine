@@ -115,7 +115,6 @@ namespace fan {
 		void OnModelSetPath( Model * _model, std::string _path );
 		void OnGameobjectDeleted( Gameobject * _gameobject );
 
-		void DrawUI();
 		void DrawEditorGrid() const;
 		void DrawWireframe() const;
 		void DrawNormals() const;

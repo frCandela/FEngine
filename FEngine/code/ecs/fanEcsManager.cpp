@@ -1,6 +1,7 @@
 #include "fanGlobalIncludes.h"
 #include "ecs/fanECSManager.h"
 #include "core/fanTime.h"
+#include "core/scope/fanProfiler.h"
 
 namespace fan {
 	//================================================================================================================================
@@ -77,6 +78,8 @@ namespace fan {
 	// Cleans, reorders and refreshes the entities, components & handles
 	//================================================================================================================================
 	void EcsManager::Refresh() {
+		SCOPED_PROFILE( ecs_refresh )
+
 		RemoveDeadComponentsAndTags();
 		SortEntities();
 		RemoveDeadEntities();		
@@ -98,8 +101,9 @@ namespace fan {
 	//================================================================================================================================
 	#define RUN_SYSTEM( _system ) RunSystem< _system::signature::componentsTypes, _system >::Run( _delta, m_activeEntitiesCount, m_entitiesData, m_components );
 	void EcsManager::Update( const float _delta, const btVector3& _cameraPosition ) {
-		ecsParticleSystem::s_cameraPosition = _cameraPosition;
+		SCOPED_PROFILE( ecs_update )
 
+		ecsParticleSystem::s_cameraPosition = _cameraPosition;
 		RUN_SYSTEM(ecsParticleSystem);
 		RUN_SYSTEM(ecsPlanetsSystem);
 		RUN_SYSTEM(ecsSynchRbToTransSystem);
@@ -109,6 +113,8 @@ namespace fan {
 	// Runs the systems after the physics update
 	//================================================================================================================================
 	void EcsManager::LateUpdate( const float _delta ) {
+		SCOPED_PROFILE( ecs_lateUpdate )
+
 		RUN_SYSTEM( ecsSynchTransToRbSystem);
 		RUN_SYSTEM( ecsUpdateAABBFromHull);
 		RUN_SYSTEM( ecsUpdateAABBFromTransform);

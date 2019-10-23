@@ -9,6 +9,7 @@
 #include "scene/actors/fanActor.h"
 #include "core/fanSignal.h"
 #include "core/scope/fanScopedTimer.h"
+#include "core/scope/fanProfiler.h"
 
 namespace fan
 {
@@ -95,6 +96,7 @@ namespace fan
 	//================================================================================================================================
 	//================================================================================================================================
 	void Scene::BeginFrame() {
+		SCOPED_PROFILE( scene_begin )
 		for (Actor * actor : m_startingActors) {
 			actor->Start();
 			m_activeActors.insert(actor);
@@ -105,6 +107,7 @@ namespace fan
 	//================================================================================================================================
 	//================================================================================================================================
 	void Scene::Update(const float _delta) {
+		SCOPED_PROFILE( scene_update )
 		for (Actor * actor : m_activeActors) {
 			if (actor->IsEnabled()) {
 				actor->Update(_delta);
@@ -158,6 +161,7 @@ namespace fan
 	// Deletes every gameobject in the m_toDeleteLater vector
 	//================================================================================================================================
 	void Scene::EndFrame() {
+		SCOPED_PROFILE( scene_endFrame )
 		// Delete entities 
 		std::set<Gameobject*> deletedEntitiesSet;
 		for (int gameobjectToDeleteIndex = 0; gameobjectToDeleteIndex < m_entitiesToDelete.size(); gameobjectToDeleteIndex++) {
