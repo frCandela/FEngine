@@ -15,9 +15,14 @@ namespace fan {
 		//================================================================
 		//================================================================
 		struct Interval {
-			double	time;
+			using TimePoint = std::chrono::time_point<std::chrono::high_resolution_clock>;
+
+			TimePoint time;
 			char	name[s_nameSize];
 			size_t  id;
+
+			bool IsOpening() const { return name[0] != '\0'; }
+			bool IsClosing() const { return name[0] == '\0'; }
 		};
 
 		size_t	OpenTimeInterval( const char _name[s_nameSize] );
@@ -28,6 +33,7 @@ namespace fan {
 		inline const std::vector<Interval>& GetIntervals() {return m_intervals; }
 
 	private:
+		std::chrono::high_resolution_clock m_clock;
 		size_t m_index = 0;
 		std::vector<Profiler::Interval> m_intervals;
 	};

@@ -9,7 +9,7 @@ namespace fan {
 	//================================================================================================================================
 	size_t Profiler::OpenTimeInterval( const char _name[s_nameSize] ) {
 		Interval interval;		
-		interval.time = Time::ElapsedSinceStartupDouble();
+		interval.time = m_clock.now();
 		interval.id = m_index ++;
 
 		strcpy_s( interval.name, _name ); // If you crash here, you probably entered a name that is more than 16 characters long
@@ -23,7 +23,7 @@ namespace fan {
 	//================================================================================================================================
 	void Profiler::CloseTimeInterval( const size_t _index ) {
 		Interval interval;
-		interval.time = Time::ElapsedSinceStartupDouble();
+		interval.time = m_clock.now();
 		interval.id = _index;
 		interval.name[0] = '\0';
 		m_intervals.push_back(interval);
@@ -35,6 +35,7 @@ namespace fan {
 	void Profiler::Begin() {
 		m_intervals.clear(); 
 		m_index	= 0;
+		m_clock = std::chrono::high_resolution_clock();
 		const size_t index = OpenTimeInterval("full_interval");
 		assert( index  == 0 );
 	}

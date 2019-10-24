@@ -16,6 +16,7 @@ namespace fan {
 
 	private:
 		std::vector<Profiler::Interval> m_intervalsCopy;
+		bool m_freezeCapture = false;
 	};
 
 }
