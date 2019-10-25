@@ -2,6 +2,7 @@
 
 #include "editor/windows/fanEditorWindow.h"
 #include "core/files/fanSerializedValues.h"
+#include "core/scope/fanProfiler.h"
 
 namespace fan
 {

@@ -10,6 +10,7 @@ namespace fan
 		Color(const float _rgb);
 		Color(const float _r, const float _g, const float _b, const float _a = 1.f);
 		Color(const glm::vec4 _rgba  );
+		Color( const glm::vec3 _rgb, const float _a );
 		Color( const ImVec4 _rgba );
 
 		float * Data() { return &m_colorData.x; }

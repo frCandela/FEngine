@@ -10,6 +10,7 @@
 #include "core/files/fanSerializedValues.h"
 #include "core/input/fanInput.h"
 #include "core/input/fanInputManager.h"
+#include "core/scope/fanProfiler.h"
 #include "editor/fanModals.h"
 #include "scene/fanScene.h"
 #include "core/fanTime.h"
@@ -66,6 +67,7 @@ namespace fan
 	// Draws the main menu bar and the editor windows
 	//================================================================================================================================
 	void MainMenuBar::Draw() {
+		SCOPED_PROFILE( main_bar )
 		// Draw editor windows
 		for ( int windowIndex = 0; windowIndex < m_editorWindows.size(); windowIndex++ ) {
 			m_editorWindows[windowIndex]->Draw();

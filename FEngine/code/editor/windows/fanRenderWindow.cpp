@@ -10,6 +10,7 @@
 #include "renderer/fanRessourceManager.h"
 #include "renderer/pipelines/fanForwardPipeline.h"
 #include "core/fanTime.h"
+#include "core/scope/fanProfiler.h"
 
 namespace fan
 {
@@ -24,6 +25,8 @@ namespace fan
 	//================================================================================================================================
 	//================================================================================================================================
 	void RenderWindow::OnGui() {
+		SCOPED_PROFILE( render )
+
 		RessourceManager * ressourceManager = m_renderer->GetRessourceManager();
 
 		ImGui::Icon( GetIconType(), { 16,16 } ); ImGui::SameLine();

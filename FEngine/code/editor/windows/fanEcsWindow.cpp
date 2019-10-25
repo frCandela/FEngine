@@ -2,6 +2,7 @@
 #include "editor/windows/fanEcsWindow.h"
 
 #include "ecs/fanECSManager.h"
+#include "core/scope/fanProfiler.h"
 
 namespace fan {
 
@@ -55,6 +56,8 @@ namespace fan {
 	//================================================================================================================================
 	//================================================================================================================================
 	void EcsWindow::OnGui() {
+		SCOPED_PROFILE( ecs )
+
 		const std::vector<ecsEntityData>& entitiesData = m_ecsManager->GetEntitiesData();
 		const ecsComponentsTuple< ecsComponents >& components = m_ecsManager->GetComponents();
 		const std::unordered_map< ecsHandle, ecsEntity > & handlesToEntity = m_ecsManager->GetHandles();

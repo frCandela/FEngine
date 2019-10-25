@@ -205,7 +205,7 @@ namespace fan {
 				m_ecsManager->Refresh();
 
 				{
-					SCOPED_PROFILE( ui_drawing )
+					SCOPED_PROFILE( draw_ui )
 					ManageSelection();
 					m_mainMenuBar->Draw();
 					m_physicsManager->OnGui();
@@ -504,6 +504,8 @@ namespace fan {
 	//================================================================================================================================
 	//================================================================================================================================
 	void Engine::ManageSelection() {
+		SCOPED_PROFILE( selection )
+
 		bool mouseCaptured = ImGui::GetIO().WantCaptureMouse;
 
 		// Translation gizmo on selected gameobject

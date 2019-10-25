@@ -11,10 +11,11 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	Color::Color()							: m_colorData(1.f, 1.f, 1.f, 1.f){ }
-	Color::Color( const float _rgb )		: m_colorData( _rgb, _rgb, _rgb, _rgb ) {}
-	Color::Color( const glm::vec4 _rgba )	: m_colorData(  _rgba.x, _rgba.y, _rgba.z, _rgba.w  ) { }
-	Color::Color( const ImVec4 _rgba )		: m_colorData( _rgba.x, _rgba.y, _rgba.z, _rgba.w ) {}
+	Color::Color()											: m_colorData(1.f, 1.f, 1.f, 1.f){ }
+	Color::Color( const float _rgb )						: m_colorData( _rgb, _rgb, _rgb, _rgb ) {}
+	Color::Color( const glm::vec4 _rgba )					: m_colorData(  _rgba.x, _rgba.y, _rgba.z, _rgba.w  ) { }
+	Color::Color( const ImVec4 _rgba )						: m_colorData( _rgba.x, _rgba.y, _rgba.z, _rgba.w ) {}
+	Color::Color( const glm::vec3 _rgb, const float _a )	: m_colorData( _rgb.x, _rgb.y, _rgb.z, _a ) {}
 
 	//================================================================================================================================
 	//================================================================================================================================

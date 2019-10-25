@@ -5,6 +5,7 @@
 #include "core/input/fanKeyboard.h"
 #include "core/input/fanMouse.h"
 #include "core/fanTime.h"
+#include "core/scope/fanProfiler.h"
 
 namespace fan
 {
@@ -54,6 +55,8 @@ namespace fan
 	//================================================================================================================================
 	//================================================================================================================================
 	void ConsoleWindow::OnGui() {
+		SCOPED_PROFILE( console )
+
 		// List the logs
 		const float height = ImGui::GetWindowHeight();
 		if (height > 60) {

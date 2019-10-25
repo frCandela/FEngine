@@ -9,7 +9,9 @@
 #include "core/input/fanInput.h"
 #include "core/input/fanKeyboard.h"
 #include "core/files/fanSerializedValues.h"
+#include "core/scope/fanProfiler.h"
 #include "editor/fanModals.h"
+
 
 namespace fan
 {
@@ -49,6 +51,8 @@ namespace fan
 	//================================================================================================================================
 	//================================================================================================================================
 	void PreferencesWindow::OnGui() {
+		SCOPED_PROFILE( preferences )
+
 		ImGui::Icon( GetIconType(), { 16,16 } ); ImGui::SameLine();
 		ImGui::Text( "Preferences" );
 

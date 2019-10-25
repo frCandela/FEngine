@@ -14,6 +14,7 @@
 #include "core/input/fanInput.h"
 #include "core/input/fanKeyboard.h"
 #include "core/input/fanMouse.h"
+#include "core/scope/fanProfiler.h"
 
 namespace fan
 {
@@ -34,6 +35,8 @@ namespace fan
 	//================================================================================================================================
 	//================================================================================================================================
 	void SceneWindow::OnGui() {
+		SCOPED_PROFILE( scene )
+
 		ImGui::Icon( GetIconType(), {16,16}); ImGui::SameLine();
 		ImGui::Text(m_scene->GetName().c_str());
 		ImGui::Separator();

@@ -177,14 +177,20 @@ namespace fan
 
 		const uint32_t currentFrame = m_swapchain->GetCurrentFrame();
 		UpdateUniformBuffers( currentFrame );
-		RecordCommandBufferGeometry( currentFrame );
-		RecordCommandBufferDebug( currentFrame );
-		RecordCommandBufferImgui( currentFrame );
-		RecordPrimaryCommandBuffer( currentFrame );
-		SubmitCommandBuffers();
+		{
+			SCOPED_PROFILE( record_cmd )
+			RecordCommandBufferGeometry( currentFrame );
+			RecordCommandBufferDebug( currentFrame );
+			RecordCommandBufferImgui( currentFrame );
+			RecordPrimaryCommandBuffer( currentFrame );
+		}
 
-		m_swapchain->PresentImage();
-		m_swapchain->StartNextFrame();
+		{
+			SCOPED_PROFILE( submit )
+			SubmitCommandBuffers();
+			m_swapchain->PresentImage();
+			m_swapchain->StartNextFrame();
+		}
 	}
 
 	//================================================================================================================================
@@ -317,6 +323,7 @@ namespace fan
 	//================================================================================================================================
 	//================================================================================================================================
 	void Renderer::RecordPrimaryCommandBuffer(const size_t _index) {
+		SCOPED_PROFILE( primary )
 		VkCommandBuffer commandBuffer = m_primaryCommandBuffers[_index];
 
 		VkCommandBufferBeginInfo commandBufferBeginInfo;
@@ -416,7 +423,7 @@ namespace fan
 	//================================================================================================================================
 	//================================================================================================================================
 	void Renderer::RecordCommandBufferImgui(const size_t _index) {
-
+		SCOPED_PROFILE( imgui )
 		m_imguiPipeline->UpdateBuffer(_index);
 
 		VkCommandBuffer commandBuffer = m_imguiCommandBuffers[_index];
@@ -452,6 +459,7 @@ namespace fan
 	//================================================================================================================================
 	//================================================================================================================================
 	void Renderer::RecordCommandBufferDebug(const size_t _index) {
+		SCOPED_PROFILE( debug )
 		if (HasNoDebugToDraw() == false) {
 			UpdateDebugBuffer(_index);
 
@@ -506,7 +514,7 @@ namespace fan
 	//================================================================================================================================
 	//================================================================================================================================
 	void Renderer::RecordCommandBufferGeometry(const size_t _index) {
-
+		SCOPED_PROFILE( geometry )
 		VkCommandBuffer commandBuffer = m_geometryCommandBuffers[_index];
 
 		VkCommandBufferInheritanceInfo commandBufferInheritanceInfo = {};
@@ -603,7 +611,9 @@ namespace fan
 	//================================================================================================================================
 	//================================================================================================================================
 	void Renderer::UpdateDebugBuffer(const size_t _index) {
+		SCOPED_PROFILE( update_buffer )
 		if( m_debugLines.size() > 0) {
+			SCOPED_PROFILE( lines )
 			delete m_debugLinesvertexBuffers[_index];	// TODO update instead of delete
 			const VkDeviceSize size = sizeof(DebugVertex) * m_debugLines.size();
 			m_debugLinesvertexBuffers[_index] = new Buffer(*m_device);
@@ -628,6 +638,7 @@ namespace fan
 		}
 
 		if (m_debugLinesNoDepthTest.size() > 0) {
+			SCOPED_PROFILE( lines_no_depth )
 			delete m_debugLinesNoDepthTestVertexBuffers[_index];
 			const VkDeviceSize size = sizeof(DebugVertex) * m_debugLinesNoDepthTest.size();
 			m_debugLinesNoDepthTestVertexBuffers[_index] = new Buffer(*m_device);
@@ -652,6 +663,7 @@ namespace fan
 		}
 
 		if(m_debugTriangles.size() > 0 ){
+			SCOPED_PROFILE( triangles )
 			delete m_debugTrianglesvertexBuffers[_index];
 			const VkDeviceSize size = sizeof(DebugVertex) * m_debugTriangles.size();
 			m_debugTrianglesvertexBuffers[_index] = new Buffer(*m_device);
