@@ -2,7 +2,7 @@
 
 #include "editor/windows/fanEditorWindow.h"
 #include "core/files/fanSerializedValues.h"
-#include "core/scope/fanProfiler.h"
+#include "core/time/fanProfiler.h"
 
 namespace fan
 {
@@ -34,7 +34,7 @@ namespace fan
 	//================================================================================================================================
 	void EditorWindow::Draw() {
 		if (m_isVisible == true) {
-			ImGui::Begin(m_name.c_str(), &m_isVisible); {
+			if( ImGui::Begin(m_name.c_str(), &m_isVisible) ) {
 				OnGui();
 			} ImGui::End();
 			SetVisible(m_isVisible);

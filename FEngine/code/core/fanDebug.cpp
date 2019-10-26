@@ -1,7 +1,7 @@
 #include "fanGlobalIncludes.h"
 
 #include "core/fanDebug.h"
-#include "core/fanTime.h"
+#include "core/time/fanTime.h"
 
 namespace fan {
 	//================================================================================================================================

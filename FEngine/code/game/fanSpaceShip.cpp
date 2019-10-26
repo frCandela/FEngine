@@ -1,7 +1,7 @@
 #include "fanGlobalIncludes.h"
 #include "game/fanSpaceShip.h"
 
-#include "core/fanTime.h"
+#include "core/time/fanTime.h"
 #include "core/input/fanInput.h"
 #include "core/input/fanInputManager.h"
 #include "editor/windows/fanInspectorWindow.h"

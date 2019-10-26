@@ -17,6 +17,8 @@ namespace fan {
 		void			Activate();		
 		bool			IsActive() const;
 
+		bool			IsDesactivationEnabled() const;
+		void			EnableDesactivation( const bool _enable );
 		btVector3		GetVelocity() const;
 		void			SetVelocity( const btVector3& _velocity );
 		inline void		ApplyCentralForce( const btVector3& _force ) { m_rigidbody->applyCentralForce( _force ); }

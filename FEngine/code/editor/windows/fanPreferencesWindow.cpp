@@ -9,7 +9,7 @@
 #include "core/input/fanInput.h"
 #include "core/input/fanKeyboard.h"
 #include "core/files/fanSerializedValues.h"
-#include "core/scope/fanProfiler.h"
+#include "core/time/fanProfiler.h"
 #include "editor/fanModals.h"
 
 

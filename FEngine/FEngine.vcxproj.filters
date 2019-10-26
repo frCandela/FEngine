@@ -71,9 +71,6 @@
     <Filter Include="code\core\meta">
       <UniqueIdentifier>{14e822f4-e834-4ad6-aa6e-ec83ea9d8b56}</UniqueIdentifier>
     </Filter>
-    <Filter Include="code\core\scope">
-      <UniqueIdentifier>{d92c1cef-a6e2-4bab-9acc-41dafa031338}</UniqueIdentifier>
-    </Filter>
     <Filter Include="code\physics">
       <UniqueIdentifier>{bf42697b-30af-4e6e-92de-8df872802887}</UniqueIdentifier>
     </Filter>
@@ -85,6 +82,9 @@
     </Filter>
     <Filter Include="code\scene\actors">
       <UniqueIdentifier>{98bff509-eefa-49b7-95e3-a6746b4f6091}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="code\core\time">
+      <UniqueIdentifier>{d9136c13-23c1-4724-abe6-63cab5368a8c}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -125,9 +125,6 @@
       <Filter>code\editor\components</Filter>
     </ClCompile>
     <ClCompile Include="code\core\fanISerializable.cpp">
-      <Filter>code\core</Filter>
-    </ClCompile>
-    <ClCompile Include="code\core\fanTime.cpp">
       <Filter>code\core</Filter>
     </ClCompile>
     <ClCompile Include="code\core\fanTypeInfo.cpp">
@@ -307,9 +304,6 @@
     <ClCompile Include="code\game\fanPlanet.cpp">
       <Filter>code\game</Filter>
     </ClCompile>
-    <ClCompile Include="code\core\scope\fanScopedTimer.cpp">
-      <Filter>code\core\scope</Filter>
-    </ClCompile>
     <ClCompile Include="code\physics\fanPhysicsManager.cpp">
       <Filter>code\physics</Filter>
     </ClCompile>
@@ -364,8 +358,17 @@
     <ClCompile Include="code\editor\windows\fanProfilerWindow.cpp">
       <Filter>code\editor\windows</Filter>
     </ClCompile>
-    <ClCompile Include="code\core\scope\fanProfiler.cpp">
-      <Filter>code\core\scope</Filter>
+    <ClCompile Include="code\core\time\fanTime.cpp">
+      <Filter>code\core\time</Filter>
+    </ClCompile>
+    <ClCompile Include="code\core\time\fanProfiler.cpp">
+      <Filter>code\core\time</Filter>
+    </ClCompile>
+    <ClCompile Include="code\core\time\fanScopedTimer.cpp">
+      <Filter>code\core\time</Filter>
+    </ClCompile>
+    <ClCompile Include="code\core\time\fanClock.cpp">
+      <Filter>code\core\time</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -849,9 +852,6 @@
     <ClInclude Include="code\core\fanSignal.h">
       <Filter>code\core</Filter>
     </ClInclude>
-    <ClInclude Include="code\core\fanTime.h">
-      <Filter>code\core</Filter>
-    </ClInclude>
     <ClInclude Include="code\core\fanTypeInfo.h">
       <Filter>code\core</Filter>
     </ClInclude>
@@ -1083,9 +1083,6 @@
     <ClInclude Include="code\game\fanPlanet.h">
       <Filter>code\game</Filter>
     </ClInclude>
-    <ClInclude Include="code\core\scope\fanScopedTimer.h">
-      <Filter>code\core\scope</Filter>
-    </ClInclude>
     <ClInclude Include="code\physics\fanPhysicsManager.h">
       <Filter>code\physics</Filter>
     </ClInclude>
@@ -1161,8 +1158,17 @@
     <ClInclude Include="code\editor\windows\fanProfilerWindow.h">
       <Filter>code\editor\windows</Filter>
     </ClInclude>
-    <ClInclude Include="code\core\scope\fanProfiler.h">
-      <Filter>code\core\scope</Filter>
+    <ClInclude Include="code\core\time\fanScopedTimer.h">
+      <Filter>code\core\time</Filter>
+    </ClInclude>
+    <ClInclude Include="code\core\time\fanTime.h">
+      <Filter>code\core\time</Filter>
+    </ClInclude>
+    <ClInclude Include="code\core\time\fanProfiler.h">
+      <Filter>code\core\time</Filter>
+    </ClInclude>
+    <ClInclude Include="code\core\time\fanClock.h">
+      <Filter>code\core\time</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

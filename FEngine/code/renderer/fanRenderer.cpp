@@ -1,10 +1,10 @@
 #include "fanGlobalIncludes.h"
 #include "renderer/fanRenderer.h"
 
-#include "core/fanTime.h"
+#include "core/time/fanTime.h"
 #include "core/input/fanInput.h"
 #include "core/math/fanBasicModels.h"
-#include "core/scope/fanProfiler.h"
+#include "core/time/fanProfiler.h"
 #include "renderer/fanMesh.h"
 #include "renderer/fanRessourceManager.h"
 #include "renderer/core/fanInstance.h"

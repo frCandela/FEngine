@@ -2,7 +2,7 @@
 #include "editor/windows/fanEcsWindow.h"
 
 #include "ecs/fanECSManager.h"
-#include "core/scope/fanProfiler.h"
+#include "core/time/fanProfiler.h"
 
 namespace fan {
 

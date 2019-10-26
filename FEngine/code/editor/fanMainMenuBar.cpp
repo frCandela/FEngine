@@ -10,10 +10,10 @@
 #include "core/files/fanSerializedValues.h"
 #include "core/input/fanInput.h"
 #include "core/input/fanInputManager.h"
-#include "core/scope/fanProfiler.h"
+#include "core/time/fanProfiler.h"
 #include "editor/fanModals.h"
 #include "scene/fanScene.h"
-#include "core/fanTime.h"
+#include "core/time/fanTime.h"
 
 namespace fan
 {

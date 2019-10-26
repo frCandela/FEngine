@@ -1,7 +1,7 @@
 #include "fanGlobalIncludes.h"
 #include "ecs/fanECSManager.h"
-#include "core/fanTime.h"
-#include "core/scope/fanProfiler.h"
+#include "core/time/fanTime.h"
+#include "core/time/fanProfiler.h"
 
 namespace fan {
 	//================================================================================================================================

@@ -10,7 +10,7 @@
 #include "editor/components/fanFPSCamera.h"
 #include "renderer/fanMesh.h"
 #include "core/fanSignal.h"
-#include "core/scope/fanProfiler.h"
+#include "core/time/fanProfiler.h"
 #include "renderer/core/fanTexture.h"
 #include "renderer/fanRenderer.h"
 #include "renderer/core/fanTexture.h"

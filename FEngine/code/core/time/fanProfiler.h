@@ -1,6 +1,7 @@
 #pragma once
 
 #include "core/fanSingleton.h"
+#include "core/time/fanClock.h"
 
 namespace fan {
 	//================================================================================================================================
@@ -15,7 +16,6 @@ namespace fan {
 		//================================================================
 		//================================================================
 		struct Interval {
-			using TimePoint = std::chrono::time_point<std::chrono::high_resolution_clock>;
 
 			TimePoint time;
 			char	name[s_nameSize];
@@ -33,7 +33,7 @@ namespace fan {
 		inline const std::vector<Interval>& GetIntervals() {return m_intervals; }
 
 	private:
-		std::chrono::high_resolution_clock m_clock;
+		Clock m_clock;
 		size_t m_index = 0;
 		std::vector<Profiler::Interval> m_intervals;
 	};

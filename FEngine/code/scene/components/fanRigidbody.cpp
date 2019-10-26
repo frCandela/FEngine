@@ -137,6 +137,18 @@ namespace fan {
 
 	//================================================================================================================================
 	//================================================================================================================================	
+	bool Rigidbody::IsDesactivationEnabled() const {
+		return  m_rigidbody->getActivationState() != DISABLE_DEACTIVATION;
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================	
+	void Rigidbody::EnableDesactivation( const bool _enable ) {
+		m_rigidbody->forceActivationState( _enable ? ACTIVE_TAG :  DISABLE_DEACTIVATION );
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================	
 	void Rigidbody::Activate() {
 		m_rigidbody->activate();
 	}
@@ -165,16 +177,22 @@ namespace fan {
 	void Rigidbody::OnGui() {
 		// Static
 		bool isStatic = IsStatic();
-		if ( ImGui::Checkbox( "static", &isStatic ) ) {
+		if ( ImGui::Checkbox( "static ", &isStatic ) ) {
 			SetStatic( isStatic );
 		} ImGui::SameLine();
 
 		// Active
 		bool isActive = IsActive();
-		if ( ImGui::Checkbox( "active", &isActive ) ) {
+		if ( ImGui::Checkbox( "active ", &isActive ) ) {
 			if ( isActive ) {
 				Activate();
 			}
+		} ImGui::SameLine();
+
+		// Desactivation
+		bool enableDesactivation =IsDesactivationEnabled();
+		if ( ImGui::Checkbox( "enable desactivation ", &enableDesactivation ) ) {
+			EnableDesactivation(enableDesactivation);
 		}
 		
 		// Mass
@@ -210,9 +228,13 @@ namespace fan {
 	//================================================================================================================================	
 	bool Rigidbody::Load( Json & _json ) {
 		float tmpMass;
+		bool tmpEnableDesactivation;
+
 		LoadFloat(_json,"mass", tmpMass );
+		LoadBool( _json, "enable_desactivation", tmpEnableDesactivation );
 
 		SetMass( tmpMass );
+		EnableDesactivation(tmpEnableDesactivation);
 
 		return true;
 	}
@@ -221,6 +243,8 @@ namespace fan {
 	//================================================================================================================================	
 	bool Rigidbody::Save( Json & _json ) const {
 		SaveFloat(_json, "mass", GetMass());
+		SaveBool( _json, "enable_desactivation", IsDesactivationEnabled() );
+
 		Component::Save( _json );
 		return true;
 	}

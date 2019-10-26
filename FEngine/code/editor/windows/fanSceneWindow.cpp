@@ -14,7 +14,7 @@
 #include "core/input/fanInput.h"
 #include "core/input/fanKeyboard.h"
 #include "core/input/fanMouse.h"
-#include "core/scope/fanProfiler.h"
+#include "core/time/fanProfiler.h"
 
 namespace fan
 {

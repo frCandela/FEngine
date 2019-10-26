@@ -87,7 +87,6 @@
   <ItemGroup>
     <ClCompile Include="code\core\fanDebug.cpp" />
     <ClCompile Include="code\core\fanISerializable.cpp" />
-    <ClCompile Include="code\core\fanTime.cpp" />
     <ClCompile Include="code\core\fanTypeInfo.cpp" />
     <ClCompile Include="code\core\fanUniqueID.cpp" />
     <ClCompile Include="code\core\files\fanFbxImporter.cpp" />
@@ -107,8 +106,10 @@
     <ClCompile Include="code\core\math\shapes\fanTriangle.cpp" />
     <ClCompile Include="code\core\ressources\fanRessource.cpp" />
     <ClCompile Include="code\core\ressources\fanRessourcePtr.cpp" />
-    <ClCompile Include="code\core\scope\fanProfiler.cpp" />
-    <ClCompile Include="code\core\scope\fanScopedTimer.cpp" />
+    <ClCompile Include="code\core\time\fanClock.cpp" />
+    <ClCompile Include="code\core\time\fanProfiler.cpp" />
+    <ClCompile Include="code\core\time\fanScopedTimer.cpp" />
+    <ClCompile Include="code\core\time\fanTime.cpp" />
     <ClCompile Include="code\ecs\fanEcsComponents.cpp" />
     <ClCompile Include="code\ecs\fanEcsConfig.cpp" />
     <ClCompile Include="code\ecs\fanEcsManager.cpp" />
@@ -185,7 +186,6 @@
     <ClInclude Include="code\core\fanISerializable.h" />
     <ClInclude Include="code\core\fanSignal.h" />
     <ClInclude Include="code\core\fanSingleton.h" />
-    <ClInclude Include="code\core\fanTime.h" />
     <ClInclude Include="code\core\fanTypeInfo.h" />
     <ClInclude Include="code\core\fanUniqueID.h" />
     <ClInclude Include="code\core\files\fanFbxImporter.h" />
@@ -211,8 +211,10 @@
     <ClInclude Include="code\core\meta\fanTypeList.h" />
     <ClInclude Include="code\core\ressources\fanRessource.h" />
     <ClInclude Include="code\core\ressources\fanRessourcePtr.h" />
-    <ClInclude Include="code\core\scope\fanProfiler.h" />
-    <ClInclude Include="code\core\scope\fanScopedTimer.h" />
+    <ClInclude Include="code\core\time\fanClock.h" />
+    <ClInclude Include="code\core\time\fanProfiler.h" />
+    <ClInclude Include="code\core\time\fanScopedTimer.h" />
+    <ClInclude Include="code\core\time\fanTime.h" />
     <ClInclude Include="code\ecs\fanEcsBitsetCreator.h" />
     <ClInclude Include="code\ecs\fanEcsComponents.h" />
     <ClInclude Include="code\ecs\fanEcsComponentsTuple.h" />

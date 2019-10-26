@@ -1,7 +1,7 @@
 #include "fanGlobalIncludes.h"
 #include "editor/windows/fanProfilerWindow.h"
 
-#include "core/scope/fanProfiler.h"
+#include "core/time/fanProfiler.h"
 #include "editor/fanModals.h"
 #include "core/input/fanInput.h"
 #include "core/input/fanInputManager.h"
@@ -49,14 +49,14 @@ namespace fan {
 		const float width = m_scale * ImGui::GetWindowWidth();		
 
 		// Draw graph in a child region
-		ImGui::SetNextWindowContentSize( ImVec2( width, 100.0f ) );
-		ImGui::BeginChild( "##ScrollingRegion", ImVec2( 0.f, 120.f ), false, ImGuiWindowFlags_HorizontalScrollbar ); {
+		ImGui::SetNextWindowContentSize( ImVec2( width, 180.f ) );
+		ImGui::BeginChild( "##ScrollingRegion", ImVec2( 0.f, 200 ), false, ImGuiWindowFlags_HorizontalScrollbar ); {
 
 			// Constants		
 			const float fontHeight = ImGui::GetFontSize();
 			const float fontWidth = 0.75f * fontHeight;
-			const float totalTime = std::chrono::duration<float> ( m_intervalsCopy[m_intervalsCopy.size() - 1].time - m_intervalsCopy[0].time ).count();
-			const Profiler::Interval::TimePoint  beginTime = m_intervalsCopy[0].time;
+			const float totalTime =  TimePoint::SecondsBetween( m_intervalsCopy[0].time,  m_intervalsCopy[m_intervalsCopy.size() - 1].time  );
+			const TimePoint  beginTime = m_intervalsCopy[0].time;
 			const ImVec2 unsclaledTL = ImGui::GetCursorScreenPos();
 			const ImVec2 tl = { unsclaledTL.x, unsclaledTL.y };
 			const ImColor colorText = Color::Black.ToImGui();
@@ -113,8 +113,8 @@ namespace fan {
 				const Profiler::Interval &  end	= m_intervalsCopy[endIndex];
 
 				// Usefull values
-				const float ratio  = std::chrono::duration<float> ( end.time - begin.time ).count() / totalTime;
-				const float offset = std::chrono::duration<float>( begin.time - beginTime ).count() / totalTime * width;
+				const float ratio  = TimePoint::SecondsBetween( begin.time, end.time ) / totalTime;
+				const float offset = TimePoint::SecondsBetween( beginTime, begin.time ) / totalTime * width;
 				const float subWidth = ratio * width;
 				const ImVec2 tli = { tl.x + offset, tl.y + ( fontHeight + 1 ) * depth };
 				const ImVec2 bri = { tli.x + subWidth, tli.y + fontHeight };
@@ -129,9 +129,9 @@ namespace fan {
 					color = m_colorHovered;
 					ImGui::BeginTooltip();
 
-					std::chrono::duration<double> delta = end.time - begin.time;
+					
 					std::stringstream ss;
-					ss << ( int )1000.f * delta.count() << " ms.";
+					ss << ( int )1000.f * TimePoint::SecondsBetween( begin.time, end.time ) << " ms.";
 					ImGui::TextUnformatted( begin.name );
 					ImGui::TextUnformatted( ss.str().c_str() );
 

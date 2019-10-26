@@ -1,6 +1,6 @@
 #include "fanGlobalIncludes.h"
-#include "core/scope/fanScopedTimer.h"
-#include "core/fanTime.h"
+#include "core/time/fanScopedTimer.h"
+#include "core/time/fanTime.h"
 
 namespace fan {
 	//================================================================================================================================

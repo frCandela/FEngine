@@ -1,7 +1,7 @@
 #pragma once
 
 #include "editor/windows/fanEditorWindow.h"
-#include "core/scope/fanProfiler.h"
+#include "core/time/fanProfiler.h"
 
 namespace fan {
 	//================================================================================================================================

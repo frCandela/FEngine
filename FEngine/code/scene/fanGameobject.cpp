@@ -229,6 +229,7 @@ namespace fan
 	bool Gameobject::Load( Json & _json ) {
 
 		LoadString( _json, "name", m_name );
+		LoadUInt( _json, "flags", GetEcsFlags() );
 
 		Json& jComponents = _json["components"]; {
 			for ( int childIndex = 0; childIndex < jComponents.size(); childIndex++ ) {
@@ -264,6 +265,7 @@ namespace fan
 	//================================================================================================================================
 	bool Gameobject::Save( Json & _json ) const {
 		SaveString( _json, "name", m_name );
+		SaveUInt( _json, "flags", GetEcsFlags() );
 
 		Json& jComponents = _json["components"];{
 			for ( int componentIndex = 0; componentIndex < m_components.size(); componentIndex++ ) {

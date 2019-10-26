@@ -24,10 +24,13 @@ namespace fan {
 		uint32_t GetRealFramerate(){ return m_realFramerateLastSecond; }
 
 		static std::string SecondsToString( const double _seconds );	// Returns a hours:minuts:seconds ex: 3783s = 01:02:03
+	protected:
+		Time();
+
 	private:
-		float m_renderDelta = 1.f / 144.f;
-		float m_logicDelta = 1.f / 144.f;
-		float m_physicsDelta = 1.f / 60.f;		
+		float m_renderDelta;
+		float m_logicDelta;
+		float m_physicsDelta;
 
 		uint32_t m_framesCounter = 0;
 		uint32_t m_realFramerateLastSecond = 0;

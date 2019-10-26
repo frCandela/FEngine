@@ -1,7 +1,7 @@
 #include "fanGlobalIncludes.h"
 #include "game/fanGameManager.h"
 
-#include "core/fanTime.h"
+#include "core/time/fanTime.h"
 #include "core/input/fanKeyboard.h"
 #include "editor/windows/fanInspectorWindow.h"
 #include "scene/fanScene.h"

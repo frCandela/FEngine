@@ -2,8 +2,8 @@
 #include "physics/fanPhysicsManager.h"
 #include "scene/components/fanRigidbody.h"
 
-#include "core/fanTime.h"
-#include "core/scope/fanProfiler.h"
+#include "core/time/fanTime.h"
+#include "core/time/fanProfiler.h"
 
 namespace fan {
 	//================================================================================================================================
@@ -89,13 +89,13 @@ namespace fan {
 	//================================================================================================================================
 	//================================================================================================================================	
 	void PhysicsManager::OnGui() {
-// 		ImGui::Begin( "Physics" ); {			
-// 			ImGui::Text( std::to_string( m_dynamicsWorld->getNumCollisionObjects() ).c_str() );
-// 			if ( ImGui::Button( "clear" ) ) {
-// 				Clear();
-// 			}
-// 
-// 		} ImGui::End();
+		ImGui::Begin( "Physics" ); {			
+			ImGui::Text( std::to_string( m_dynamicsWorld->getNumCollisionObjects() ).c_str() );
+			if ( ImGui::Button( "clear" ) ) {
+				Clear();
+			}
+
+		} ImGui::End();
 	}
 
 }

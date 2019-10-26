@@ -8,7 +8,7 @@
 #include "renderer/fanMesh.h"
 #include "renderer/util/fanWindow.h"
 #include "renderer/core/fanTexture.h"
-#include "core/fanTime.h"
+#include "core/time/fanTime.h"
 #include "core/input/fanInput.h"
 #include "core/input/fanKeyboard.h"
 #include "core/input/fanMouse.h"
@@ -43,7 +43,7 @@
 #include "scene/components/fanRigidbody.h"
 #include "scene/components/fanSphereShape.h"
 #include "core/math/shapes/fanConvexHull.h"
-#include "core/scope/fanProfiler.h"
+#include "core/time/fanProfiler.h"
 #include "ecs/fanECSManager.h"
 #include "physics/fanPhysicsManager.h"
 
@@ -173,8 +173,9 @@ namespace fan {
 	//================================================================================================================================
 	//================================================================================================================================
 	void Engine::Run() {
-		float lastLogicTime		= Time::ElapsedSinceStartup();
-		float lastRenderTime	= Time::ElapsedSinceStartup();
+
+		Clock logicClock;
+		Clock renderClock;
 
 		Profiler::Get().Begin();
 
@@ -184,13 +185,12 @@ namespace fan {
 
 			// Runs logic, renders ui
 			const float targetLogicDelta = Time::Get().GetLogicDelta();
-			const float logicDelta = time - lastLogicTime;
-			if ( logicDelta > targetLogicDelta ) {			
-				SCOPED_PROFILE(logic)
+			if ( logicClock.ElapsedSeconds() > targetLogicDelta ) {
+				logicClock.Reset();
 
+				SCOPED_PROFILE(logic)
 				{
 					SCOPED_PROFILE( init )
-					lastLogicTime += targetLogicDelta;
 					Input::Get().NewFrame();
 					ImGui::NewFrame();
 					ImGui::GetIO().DeltaTime = targetLogicDelta;
@@ -232,10 +232,9 @@ namespace fan {
 
 			// Render world
 			const float targetRenderDelta = Time::Get().GetRenderDelta();
-			const float renderDelta = time - lastRenderTime;
-			if ( renderDelta > targetRenderDelta ) {
-				lastRenderTime = time; // we don't care about being uniform
-				Time::Get().RegisterFrameDrawn();	
+			if ( renderClock.ElapsedSeconds() > targetRenderDelta ) {
+				renderClock.Reset();
+				Time::Get().RegisterFrameDrawn();	// used for stats
 				UpdateRenderer();
 				
 				m_renderer->DrawFrame();		

@@ -8,8 +8,8 @@
 #include "scene/components/fanModel.h"
 #include "scene/actors/fanActor.h"
 #include "core/fanSignal.h"
-#include "core/scope/fanScopedTimer.h"
-#include "core/scope/fanProfiler.h"
+#include "core/time/fanScopedTimer.h"
+#include "core/time/fanProfiler.h"
 
 namespace fan
 {

@@ -1,7 +1,7 @@
 #include "fanGlobalIncludes.h"
 #include "game/fanSolarSystem.h"
 
-#include "core/fanTime.h"
+#include "core/time/fanTime.h"
 #include "scene/components/fanTransform.h"
 #include "scene/fanGameobject.h"
 #include "scene/components/fanModel.h"
@@ -132,6 +132,7 @@ namespace fan {
 				Gameobject * newPlanet = scene->CreateGameobject("planet" + std::to_string(radiusIndex), m_gameobject );
 				Model * model = newPlanet->AddComponent<Model>();
 				model->SetPath("content/models/planet.fbx");
+				newPlanet->AddFlag( Gameobject::Flag::NO_AABB_UPDATE );
 
 // 				Material * material = newPlanet->AddComponent<Material>();
 // 				material->SetTexture()
@@ -139,11 +140,11 @@ namespace fan {
 				Planet * planet = newPlanet->AddComponent<Planet>();
 				planet->SetRadius( radius );
 				planet->SetPhase( 2 * PI * m_distribution( m_generator ) );
-
-				/*Rigidbody * rb = */newPlanet->AddComponent<Rigidbody>();
-
+				
 				SphereShape * shape = newPlanet->AddComponent<SphereShape>();
 				shape->SetRadius( scale );
+				Rigidbody * rb = newPlanet->AddComponent<Rigidbody>();
+				rb->EnableDesactivation( false );
 
 				float direction = m_distribution( m_generator ) > 0.5f ? 1.f: -1.f;
 				float planetSpeed = m_minSpeed + (m_maxSpeed - m_minSpeed) * m_distribution( m_generator );
@@ -154,6 +155,7 @@ namespace fan {
 
 				if ( m_satelliteRadiusList[radiusIndex] > 0 ) {
 					Gameobject * newSatellite = scene->CreateGameobject( "satellite" + std::to_string( radiusIndex ), newPlanet );
+					newSatellite->AddFlag( Gameobject::Flag::NO_AABB_UPDATE );
 					Model * modelSatellite = newSatellite->AddComponent<Model>();
 					modelSatellite->SetPath( "content/models/planet.fbx" );
 
@@ -165,10 +167,14 @@ namespace fan {
 					Transform * satelliteTransform = newSatellite->GetTransform();
 					const float satelliteScale = m_satelliteScaleList[radiusIndex];
 					satelliteTransform->SetScale( btVector3( satelliteScale, satelliteScale, satelliteScale ) );
+									   
+					SphereShape * shapeSat = newSatellite->AddComponent<SphereShape>();
+					shapeSat->SetRadius( satelliteScale );
+					Rigidbody * rbSat = newSatellite->AddComponent<Rigidbody>();
+					rbSat->EnableDesactivation( false );
 				}
 			}
-		}
-	
+		}	
 	}
 
 	//================================================================================================================================
