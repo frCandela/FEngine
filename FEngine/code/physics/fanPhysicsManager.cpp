@@ -16,6 +16,9 @@ namespace fan {
 		m_dynamicsWorld = new btDiscreteDynamicsWorld( m_dispatcher, m_overlappingPairCache, m_solver, m_collisionConfiguration );
 
 		m_dynamicsWorld->setGravity( _gravity );
+
+		// Bullet physics is broken when its internal clock is zero, this prevents it from happening when the timestep is exactly equal to the fixed timestep
+		m_dynamicsWorld->stepSimulation( 0.015f, 1, Time::Get().GetPhysicsDelta() );
 	}
 
 	//================================================================================================================================
