@@ -231,6 +231,6 @@ namespace fan {
 		,"RIGHT_ALT      "
 		,"RIGHT_SUPER    "
 		,"MENU           "/*348*/
-		,"         X     "/*349*/
+		,"               "/*349*/
 	};
 }

@@ -3,6 +3,8 @@
 
 #include "core/scope/fanProfiler.h"
 #include "editor/fanModals.h"
+#include "core/input/fanInput.h"
+#include "core/input/fanInputManager.h"
 
 namespace fan {
 
@@ -14,6 +16,7 @@ namespace fan {
 		, m_colorHovered( 0.64f, 0.96f, 0.99f )
 	{
 		Profiler::Get().onProfilingEnd.Connect( &ProfilerWindow ::OnProfilerEnd, this );
+		Input::Get().Manager().FindEvent( "freeze_capture")->Connect( &ProfilerWindow::OnToogleFreezeCapture, this );
 	}
 
 	//================================================================================================================================
@@ -32,9 +35,10 @@ namespace fan {
 
 		// UI
 		{ 
+
 			ImGui::Checkbox("freeze capture", &m_freezeCapture );
-			ImGui::SameLine();
-			ImGui::DragFloat( "speed", &m_speed, 0.01f, 0.f, 0.1f );
+			ImGui::SameLine();	gui::ShowHelpMarker("press \"END\" to toogle");
+			ImGui::SameLine();	ImGui::DragFloat( "speed", &m_speed, 0.01f, 0.f, 10.f );
 		}
 
 		// Returns if no data 

@@ -89,7 +89,7 @@ namespace fan
 				std::map< std::string, InputManager::Axis >&		  axisList = Input::Get().Manager().GetListAxis();
 
 				m_uniqueKeyIndex = 0;
-				ImGui::Text( "Axis                      ____ (-) ____    ____ (+) ____" );
+				ImGui::Text( "Axis                    ____ (-) ____    ____ (+) ____" );
 				ImGui::SameLine(); ImGui::Text("        "); ImGui::SameLine(); if ( ImGui::Button( "Reset" ) ) { SerializedValues::Get().LoadKeyBindings(); }
 				ImGui::SameLine(); gui::ShowHelpMarker("Delete the file editor_data.json to reset to factory default");
 				
@@ -117,7 +117,7 @@ namespace fan
 			{
 				std::map< std::string, InputManager::KeyboardEvent >& eventList = Input::Get().Manager().GetListKeyboardEvents();
 
-				ImGui::Text( "Shortcuts                 ____ key ____    __________________ modifiers __________________" ); 
+				ImGui::Text( "Shortcuts               ____ key ____    __________________ modifiers __________________" ); 
 				ImGui::Indent();
 				ImGui::Columns( 2 );
 				ImGui::SetColumnWidth( 0, column0_size );

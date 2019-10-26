@@ -76,6 +76,7 @@ namespace fan {
 		Input::Get().Manager().CreateKeyboardEvent( "save_scene",	  Keyboard::S, Keyboard::LEFT_CONTROL );
 		Input::Get().Manager().CreateKeyboardEvent( "reload_scene",	  Keyboard::R, Keyboard::LEFT_CONTROL );
 		Input::Get().Manager().CreateKeyboardEvent(	"play_pause",	  Keyboard::TAB );
+		Input::Get().Manager().CreateKeyboardEvent( "freeze_capture", Keyboard::END );
 
 		// Axis
 		Input::Get().Manager().CreateAxis( "game_forward",		Keyboard::W, Keyboard::S );

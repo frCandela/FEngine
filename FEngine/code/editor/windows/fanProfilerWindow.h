@@ -13,7 +13,6 @@ namespace fan {
 		void OnGui() override;
 
 		void OnProfilerEnd();
-
 	private:
 		std::vector<Profiler::Interval> m_intervalsCopy;
 		bool	m_freezeCapture = false;
@@ -24,6 +23,8 @@ namespace fan {
 		const Color m_color1;
 		const Color m_color2;
 		const Color m_colorHovered;
+
+		void OnToogleFreezeCapture() { m_freezeCapture = ! m_freezeCapture; }
 	};
 
 }
