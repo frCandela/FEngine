@@ -31,7 +31,8 @@ namespace fan
 		void							DeleteGameobject(Gameobject* _gameobject);										// Deletes a gameobject and removes it from the scene hierarchy at the end of the frame
 		std::vector < Gameobject * >	BuildEntitiesList() const;
 
-		template<typename _componentType> _componentType * FindComponentOfType() const;
+		template<typename _componentType> _componentType *				 FindComponentOfType() const;
+		template<typename _componentType> std::vector<_componentType *>  FindComponentsOfType() const;
 
 		void BeginFrame();
 		void Update(const float _delta);
@@ -87,13 +88,48 @@ namespace fan
 		void		R_DeleteGameobject(Gameobject* _gameobject, std::set<Gameobject*>&	_deletedEntitiesSet);
 		void		R_BuildEntitiesList(Gameobject* _gameobject, std::vector<Gameobject*>& _entitiesList) const;
 		Component *	R_FindComponentOfType(Gameobject * _gameobject, const uint32_t _typeID) const;
+
+		template<typename _componentType>
+		void	R_FindComponentsOfType( const Gameobject * _gameobject, std::vector<_componentType *> & _components ) const;
 	};
 
 	//================================================================================================================================
 	//================================================================================================================================
-	template<typename ComponentType>
-	ComponentType * Scene::FindComponentOfType() const {
-		static_assert((std::is_base_of<Component, ComponentType>::value));
-		return  static_cast<ComponentType*> (R_FindComponentOfType(m_root, ComponentType::s_typeID));
+	template<typename _componentType>
+	_componentType * Scene::FindComponentOfType() const {
+		static_assert((std::is_base_of<Component, _componentType>::value));
+		return  static_cast<_componentType*> (R_FindComponentOfType(m_root, _componentType::s_typeID));
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
+	template<typename _componentType>
+	std::vector<_componentType *> Scene::FindComponentsOfType() const {
+		static_assert( ( std::is_base_of<Component, _componentType>::value ) );
+		std::vector<_componentType *> vector;
+		R_FindComponentsOfType<_componentType>( m_root, vector );
+		return  vector;
+	}
+
+
+	//================================================================================================================================
+	//================================================================================================================================
+	template<typename _componentType>
+	void Scene::R_FindComponentsOfType( const Gameobject * _gameobject, std::vector<_componentType *> & _components ) const {
+
+		// Search in components
+		const std::vector<Component*> & components = _gameobject->GetComponents();
+		for ( int componentIndex = 0; componentIndex < components.size(); componentIndex++ ) {
+			Component* component = components[componentIndex];
+			if ( component->IsType< _componentType >() ) {
+				_components.push_back( static_cast<_componentType*>( component ) );
+			}
+		}
+
+		// Recursive call to child entities
+		const std::vector<Gameobject*> & childEntities = _gameobject->GetChilds();
+		for ( int childIndex = 0; childIndex < childEntities.size(); childIndex++ ) {
+			R_FindComponentsOfType<_componentType>( childEntities[childIndex], _components );
+		}
 	}
 }
