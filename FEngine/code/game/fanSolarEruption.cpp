@@ -59,7 +59,13 @@ namespace fan {
 				return false;
 			}			
 		}
+	};
 
+	struct OrientedAxis {
+		enum OpenSide { RIGHT=1, LEFT=2, BOTH = RIGHT | LEFT };
+		
+		btVector3 direction;
+		OpenSide  openSide;
 	};
 
 	//================================================================================================================================
@@ -73,8 +79,9 @@ namespace fan {
 
 		std::vector< OcclusionSegment > segments;
 		static float size = 10.f;
-
+		static float subAngle = 45.f;
 		ImGui::DragFloat("size", &size );
+		ImGui::DragFloat( "subAngle", &subAngle,1.f,1.f,180.f );
 
 		// Generates occlusion rays for each planet
 		for (int planetIndex = 0; planetIndex < planets.size() ; planetIndex++)	{
@@ -97,16 +104,9 @@ namespace fan {
 			}
 		);
 
-
-		static int numChoose = int( segments.size() - 1 );
-		if ( numChoose > segments.size() ) {
-			numChoose = int( segments.size() );
-		}
-		ImGui::DragInt( "numChoose", &numChoose, 1, 0, int( segments.size() - 1 ) );
-
 		// Remove overlapping segments
 		bool foundOverlapping = true;
-		while ( foundOverlapping && segments.size() >= 2) {
+		while ( foundOverlapping && segments.size() >= 2 ) {
 			foundOverlapping = false;
 			for ( int segmentIndex = 0; segmentIndex < segments.size(); segmentIndex++ ) {
 				int nextSegmentIndex = ( segmentIndex + 1 ) % int(segments.size());
@@ -130,10 +130,73 @@ namespace fan {
 			}
 		}
 
-		// Remove overlapping segments
+		// Draw occlusion segments
 		for ( int segmentIndex = 0; segmentIndex < segments.size(); segmentIndex++ ) {
 			OcclusionSegment & segment = segments[segmentIndex];
-			Debug::Render().DebugTriangle( thisPos, segment.directionRight, segment.directionLeft, Color( 1, 0, 0, 0.5f ) );
+			Debug::Render().DebugTriangle( thisPos, size *segment.directionRight.normalized(), size * segment.directionLeft.normalized() , Color( 0, 1, 0, 0.5f ) );
+		}
+
+		// Generates oriented axis list
+		std::vector<OrientedAxis> orientedAxises;
+		orientedAxises.reserve(2 * segments.size());
+		for ( int segmentIndex = 0; segmentIndex < segments.size(); segmentIndex++ ) {
+			OcclusionSegment & segment = segments[segmentIndex];
+			orientedAxises.push_back( { size * segment.directionRight.normalized() ,OrientedAxis::RIGHT } );
+			orientedAxises.push_back( { size * segment.directionLeft.normalized()  ,OrientedAxis::LEFT } );
+		}
+
+		// Fill 45 degrees blanks
+		float minGapRadians = btRadians( subAngle );
+		bool hasFoundBlank = true;
+		while ( hasFoundBlank ) {
+			hasFoundBlank = false;		
+			for ( int axisIndex = 0; axisIndex < orientedAxises.size(); axisIndex++ ) {
+				int nextAxisIndex = ( axisIndex + 1 ) % int( orientedAxises.size() );
+				OrientedAxis & axis = orientedAxises[axisIndex];
+				OrientedAxis & nextAxis = orientedAxises[nextAxisIndex];
+
+				
+
+				float angle = axis.direction.SignedAngle( nextAxis.direction, btVector3::Up() );
+				if ( angle > minGapRadians ) {
+
+					const int numSubdivistions = int( angle / minGapRadians ) + 1;
+					const float subdivisionAngle = angle / numSubdivistions;
+					btTransform rotate( btQuaternion( btVector3::Up(), subdivisionAngle ) );
+					btVector3 prevDirection = axis.direction;
+					for (int subAxisIndex = 0; subAxisIndex < numSubdivistions - 1; subAxisIndex++)	{
+						prevDirection = rotate * prevDirection;
+						orientedAxises.insert( orientedAxises.begin() + axisIndex + 1 + subAxisIndex, { prevDirection, OrientedAxis::BOTH } );
+					}
+
+					
+
+					
+					hasFoundBlank = true;
+					break;
+				}
+			}
+		}	
+
+
+		// Draw axises
+		for ( int axisIndex = 0; axisIndex < orientedAxises.size(); axisIndex++ ) {
+			int nextAxisIndex = ( axisIndex + 1 ) % int( orientedAxises.size() );
+			OrientedAxis & rightAxis = orientedAxises[axisIndex];
+			OrientedAxis & leftAxis = orientedAxises[nextAxisIndex];
+
+			Debug::Render().DebugLine( thisPos, rightAxis.direction, Color::Red );
+			btVector3 left = 0.1f * btVector3::Up().cross( rightAxis.direction ).normalized();
+			if ( rightAxis.openSide & OrientedAxis::LEFT ) {
+				Debug::Render().DebugLine( rightAxis.direction, rightAxis.direction + left, Color::Green );
+			}
+			if ( rightAxis.openSide & OrientedAxis::RIGHT ) {
+				Debug::Render().DebugLine( rightAxis.direction, rightAxis.direction - left, Color::Green );
+			}
+
+			if ( rightAxis.openSide & OrientedAxis::LEFT &&  leftAxis.openSide & OrientedAxis::RIGHT ) {
+				Debug::Render().DebugTriangle( thisPos, rightAxis.direction, leftAxis.direction, Color( 1, 0, 0, 0.5f ) );
+			}
 		}
 	}
 	   
