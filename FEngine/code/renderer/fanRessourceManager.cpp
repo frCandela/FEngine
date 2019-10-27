@@ -25,9 +25,10 @@ namespace fan
 	RessourceManager::~RessourceManager() {
 		for (int textureIndex = 0; textureIndex < m_textures.size(); textureIndex++) {
 			delete(m_textures[textureIndex]);
-		}
-		for (std::pair<const uint32_t, Mesh *> meshPair : m_meshList) {
-			delete meshPair.second;
+		} m_textures.clear();
+
+		for (int meshIndex = 0; meshIndex < m_meshList.size(); meshIndex++)	{
+			delete m_meshList[meshIndex];
 		} m_meshList.clear();
 	}
 
@@ -79,39 +80,18 @@ namespace fan
 	//================================================================================================================================
 	//================================================================================================================================
 	Mesh * RessourceManager::FindMesh(const std::string _path) {
-		const std::map<uint32_t, Mesh*>::iterator it = m_meshList.find(DSID(_path.c_str()));
-		if (it == m_meshList.end()) {
-			return nullptr;
+		for (int meshIndex = 0; meshIndex < m_meshList.size() ; meshIndex++) {
+			if ( m_meshList[meshIndex]->GetPath() == _path ) {
+				return m_meshList[meshIndex];
+			}
 		}
-		else {
-			return it->second;
-		}
+		return nullptr;
 	}
-
-	//================================================================================================================================
-	// Return the mesh data associated with a mesh
-	// Return a default cube if no mesh found
-	//================================================================================================================================
-	Mesh * RessourceManager::FindMesh(const Mesh * _mesh) {
-		const std::map<uint32_t, Mesh*>::iterator it = m_meshList.find(_mesh->GetRessourceID());
-		if (it != m_meshList.end()) {
-			return it->second;
-		}
-		else {
-			Debug::Get() << Debug::Severity::error << "Mesh not found : " << _mesh->GetPath() << Debug::Endl();
-			return m_meshList.find(m_defaultMesh->GetRessourceID())->second;
-		}
-	}
-
 
 	//================================================================================================================================
 	//================================================================================================================================
 	void  RessourceManager::AddMesh(Mesh * _mesh) {
-		if (m_meshList.find(_mesh->GetRessourceID()) != m_meshList.end()) {
-			Debug::Get() << Debug::Severity::warning << "Renderer::AddMesh : Mesh already registered: " << _mesh->GetPath() << Debug::Endl();
-			return;
-		}
-		m_meshList.insert(std::pair<uint32_t, Mesh*>(_mesh->GetRessourceID(), _mesh ));
+		m_meshList.push_back( _mesh );
 		_mesh->GenerateBuffers( m_device);
 	}
 }

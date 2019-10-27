@@ -10,13 +10,14 @@ namespace fan {
 
 	//================================================================================================================================
 	//================================================================================================================================
-	class Mesh : public Ressource {
+	class Mesh {
 	public:
 		Mesh(const std::string& _path = "");
 		~Mesh();
 
 		void		SetPath(const std::string& _path)			{ m_path = _path; }
 		std::string GetPath() const								{ return m_path;  }
+		void		SetData( std::vector<Vertex>&	_vertices,	std::vector<uint32_t>	_indices);
 
 		std::vector<Vertex> &			GetVertices()			{ return m_vertices;	}
 		const std::vector<Vertex> &		GetVertices() const		{ return m_vertices;	}
@@ -27,7 +28,7 @@ namespace fan {
 		Buffer *						GetVertexBuffer()		{ return m_vertexBuffer;	}
 		
 		void GenerateBuffers( Device & _device );
-		bool Load() override;
+		bool Load();
 
 		DECLARE_TYPE_INFO(Mesh, Ressource )
 	private:
