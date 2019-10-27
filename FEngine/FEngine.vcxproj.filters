@@ -370,6 +370,9 @@
     <ClCompile Include="code\core\time\fanClock.cpp">
       <Filter>code\core\time</Filter>
     </ClCompile>
+    <ClCompile Include="code\game\fanSolarEruption.cpp">
+      <Filter>code\game</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="code\editor\fanMainMenuBar.h">
@@ -1169,6 +1172,9 @@
     </ClInclude>
     <ClInclude Include="code\core\time\fanClock.h">
       <Filter>code\core\time</Filter>
+    </ClInclude>
+    <ClInclude Include="code\game\fanSolarEruption.h">
+      <Filter>code\game</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

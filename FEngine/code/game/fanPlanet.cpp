@@ -32,24 +32,11 @@ namespace fan {
 	//================================================================================================================================
 	//================================================================================================================================
 	void Planet::Update(const float /*_delta*/) {
-		Actor::OnGui();
-
 		// Updates the parent entity
 		ecsPlanet * planet = GetEcsPlanet();
 		ecsHandle handle = m_gameobject->GetParent()->GetEcsHandle();
 		m_gameobject->GetScene()->GetEcsManager()->FindEntity( handle , planet->parentEntity );
 		m_gameobject->AddFlag(Gameobject::Flag::OUTDATED_TRANSFORM);
-
-// 		ecsPlanet * planet = GetEcsPlanet();
-// 
-// 		Transform * parentTransform = GetGameobject()->GetParent()->GetComponent<Transform>();
-// 
-// 		float time = -planet->speed * Time::ElapsedSinceStartup();
-// 		btVector3 position(std::cosf(time + planet->phase), 0, std::sinf(time + planet->phase));
-// 		btVector3 parentPosition = parentTransform->GetPosition();
-// 
-// 		Transform * transform = GetGameobject()->GetComponent<Transform>();
-// 		transform->SetPosition(parentPosition + planet->radius * position);
 	}
 
 	//================================================================================================================================

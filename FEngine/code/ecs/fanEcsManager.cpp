@@ -105,7 +105,13 @@ namespace fan {
 
 		ecsParticleSystem::s_cameraPosition = _cameraPosition;
 		RUN_SYSTEM(ecsParticleSystem);
+
+		static bool freeze = false;
+		ImGui::Checkbox("freeze", &freeze);
+		if( !freeze )
 		RUN_SYSTEM(ecsPlanetsSystem);
+
+
 		RUN_SYSTEM(ecsSynchRbToTransSystem);
 	}
 
