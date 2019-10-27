@@ -132,7 +132,6 @@ namespace fan
 			SetProjectionType( Type( item ) );
 		}
 
-		ImGui::Indent();
 		if ( m_type == Type::PERSPECTIVE ) {
 			// fov
 			if (ImGui::Button("##fov")) {
@@ -173,8 +172,6 @@ namespace fan
 		if ( ImGui::DragFloat( "far distance", &far, 10.f, 0.05f, 10000.f ) ) {
 			SetFarDistance( far );
 		}
-
-		ImGui::Unindent();
 	}
 
 	//================================================================================================================================

@@ -286,17 +286,19 @@ namespace fan
 		for (int dataIndex = 0; dataIndex < _drawData.size(); dataIndex++)	{
 			const DrawData& data = _drawData[dataIndex];
 
-			// Transform
-			m_forwardPipeline->m_dynamicUniformsVert[dataIndex].modelMat = data.modelMatrix;
-			m_forwardPipeline->m_dynamicUniformsVert[dataIndex].normalMat = data.normalMatrix;
+			if ( data.mesh != nullptr && ! data.mesh->GetIndices().empty() ) {
+				// Transform
+				m_forwardPipeline->m_dynamicUniformsVert[dataIndex].modelMat = data.modelMatrix;
+				m_forwardPipeline->m_dynamicUniformsVert[dataIndex].normalMat = data.normalMatrix;
 
-			// material
-			m_forwardPipeline->m_dynamicUniformsMaterial[dataIndex].color = data.color;
-			m_forwardPipeline->m_dynamicUniformsMaterial[dataIndex].shininess = data.shininess;
-			m_forwardPipeline->m_dynamicUniformsMaterial[dataIndex].textureIndex = data.textureIndex;
+				// material
+				m_forwardPipeline->m_dynamicUniformsMaterial[dataIndex].color = data.color;
+				m_forwardPipeline->m_dynamicUniformsMaterial[dataIndex].shininess = data.shininess;
+				m_forwardPipeline->m_dynamicUniformsMaterial[dataIndex].textureIndex = data.textureIndex;
 
-			// Mesh
-			m_meshDrawArray.push_back( data.mesh );
+				// Mesh
+				m_meshDrawArray.push_back( data.mesh );
+			}
 		}
 	}
 
@@ -537,19 +539,14 @@ namespace fan
 			m_forwardPipeline->Bind( commandBuffer, _index );
 
 			for ( uint32_t meshIndex = 0; meshIndex < m_meshDrawArray.size(); meshIndex++ ) {
-				Mesh * mesh = m_meshDrawArray[meshIndex];
+				Mesh * mesh = m_meshDrawArray[meshIndex];		
 
-				if ( mesh != nullptr ) {
-					assert( mesh->GetVertexBuffer() != nullptr );
-					assert( mesh->GetIndexBuffer() != nullptr );
-
-					m_forwardPipeline->BindDescriptors( commandBuffer, _index, meshIndex );
-					VkDeviceSize offsets[] = { 0 };
-					VkBuffer vertexBuffers[] = { mesh->GetVertexBuffer()->GetBuffer() };
-					vkCmdBindVertexBuffers( commandBuffer, 0, 1, vertexBuffers, offsets );
-					vkCmdBindIndexBuffer( commandBuffer, mesh->GetIndexBuffer()->GetBuffer(), 0, VK_INDEX_TYPE_UINT32 );
-					vkCmdDrawIndexed( commandBuffer, static_cast<uint32_t>( mesh->GetIndices().size() ), 1, 0, 0, 0 );
-				}
+				m_forwardPipeline->BindDescriptors( commandBuffer, _index, meshIndex );
+				VkDeviceSize offsets[] = { 0 };
+				VkBuffer vertexBuffers[] = { mesh->GetVertexBuffer()->GetBuffer() };
+				vkCmdBindVertexBuffers( commandBuffer, 0, 1, vertexBuffers, offsets );
+				vkCmdBindIndexBuffer( commandBuffer, mesh->GetIndexBuffer()->GetBuffer(), 0, VK_INDEX_TYPE_UINT32 );
+				vkCmdDrawIndexed( commandBuffer, static_cast<uint32_t>( mesh->GetIndices().size() ), 1, 0, 0, 0 );
 			}
 
 			if (vkEndCommandBuffer(commandBuffer) != VK_SUCCESS) {

@@ -213,15 +213,6 @@ namespace fan {
 		if ( ImGui::DragFloat3( "velocity", &velocity[0], 1.f, -1000.f, 1000.f ) ) {
 			SetVelocity(velocity);
 		}
-
-		if ( m_colShape != nullptr ) {
-			ImGui::Text("linked");
-		}
-
-		// Test
-		if ( ImGui::Button( "tests" ) ) {
-			Activate();
-		}
 	}
 
 	//================================================================================================================================

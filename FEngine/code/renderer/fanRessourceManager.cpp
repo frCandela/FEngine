@@ -27,8 +27,9 @@ namespace fan
 			delete(m_textures[textureIndex]);
 		} m_textures.clear();
 
-		for (int meshIndex = 0; meshIndex < m_meshList.size(); meshIndex++)	{
-			delete m_meshList[meshIndex];
+
+		for ( Mesh * mesh : m_meshList ){
+			delete mesh;
 		} m_meshList.clear();
 	}
 
@@ -65,11 +66,12 @@ namespace fan
 	}
 
 	//================================================================================================================================
+	// Load a mesh from a path, loads it and registers it
 	//================================================================================================================================
 	Mesh * RessourceManager::LoadMesh(const std::string _path) {
 		Mesh * mesh = new Mesh(_path);
 		if ( mesh->Load() ) {
-			AddMesh( mesh );
+			RegisterMesh( mesh );
 			return mesh;
 		}		
 		delete mesh;
@@ -79,10 +81,18 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
+	void RessourceManager::OnLoadMesh( Mesh * _mesh ) {
+		_mesh->GenerateBuffers( m_device );
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
 	Mesh * RessourceManager::FindMesh(const std::string _path) {
 		for (int meshIndex = 0; meshIndex < m_meshList.size() ; meshIndex++) {
-			if ( m_meshList[meshIndex]->GetPath() == _path ) {
-				return m_meshList[meshIndex];
+			for ( Mesh* mesh : m_meshList){
+				if ( mesh->GetPath() == _path ) {
+					return mesh;
+				}
 			}
 		}
 		return nullptr;
@@ -90,8 +100,8 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void  RessourceManager::AddMesh(Mesh * _mesh) {
-		m_meshList.push_back( _mesh );
+	void  RessourceManager::RegisterMesh(Mesh * _mesh) {
+		m_meshList.insert( _mesh );
 		_mesh->GenerateBuffers( m_device);
 	}
 }

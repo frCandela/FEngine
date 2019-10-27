@@ -28,6 +28,7 @@ namespace fan
 		Component::OnAttach();
 		m_gameobject->AddEcsComponent<ecsModel>()->Init();
 		m_gameobject->AddEcsComponent<ecsConvexHull>()->Init();
+		onRegisterModel.Emmit( this );
 	}
 
 	//================================================================================================================================
@@ -45,9 +46,10 @@ namespace fan
 	//================================================================================================================================
 	void Model::SetMesh(Mesh * _mesh) {
 		GetEcsModel()->mesh = _mesh;
-		onRegisterModel.Emmit(this);
-		_mesh->GenerateConvexHull( GetConvexHull() );
-		m_gameobject->AddFlag( Gameobject::Flag::OUTDATED_TRANSFORM );
+		if( _mesh != nullptr && ! _mesh->GetIndices().empty() ) {				
+			_mesh->GenerateConvexHull( GetConvexHull() );
+			m_gameobject->AddFlag( Gameobject::Flag::OUTDATED_TRANSFORM );
+		}
 	}
 
 	//================================================================================================================================
@@ -89,6 +91,13 @@ namespace fan
 		if (gui::LoadFileModal("set_path", GlobalValues::s_meshExtensions, m_pathBuffer)) {
 			onModelSetPath.Emmit( this, m_pathBuffer.string() );
 		}
+
+		// Num triangles
+		std::stringstream ss;
+		ss << "triangles: ";
+		ss << ( GetMesh() != nullptr ?   GetMesh()->GetIndices().size() / 3  :  0 );		
+		ImGui::Text(ss.str().c_str());
+
 	}
 
 	//================================================================================================================================

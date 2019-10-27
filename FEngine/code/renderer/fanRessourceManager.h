@@ -17,10 +17,12 @@ namespace fan
 		~RessourceManager();
 
 		// Mesh management
-		Mesh *		LoadMesh( const std::string _path);
-		Mesh *		FindMesh( const std::string _path);
-		void		SetDefaultMesh(const Mesh * _defaultMesh) { m_defaultMesh = _defaultMesh; }
-		const std::vector< Mesh * >& GetMeshList() const { return m_meshList; }
+		Mesh *						LoadMesh( const std::string _path );
+		void						OnLoadMesh( Mesh * _mesh );
+		Mesh *						FindMesh( const std::string _path );
+		void						SetDefaultMesh( const Mesh * _defaultMesh ) { m_defaultMesh = _defaultMesh; }
+		const std::set< Mesh * >&	GetMeshList() const { return m_meshList; }
+		void						RegisterMesh( Mesh * _mesh );
 
 		// Texture management
 		Texture *							LoadTexture(const std::string _path);
@@ -35,11 +37,11 @@ namespace fan
 	private:
 		Device & m_device;
 
-		std::vector< Mesh * >	 m_meshList;
+		std::set< Mesh * >		m_meshList;
 		const Mesh *			 m_defaultMesh = nullptr;
 		std::vector< Texture * > m_textures;
 		bool					 m_modified = false;
 
-		void AddMesh(Mesh * _mesh);
+		
 	};
 }

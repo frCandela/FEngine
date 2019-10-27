@@ -95,7 +95,7 @@ namespace fan {
 			// Scale
 			m_scaleList.push_back( scale );
 			m_maxScaleList.push_back( maxScale );
-			Debug::Render().DebugCircle( m_radiusList[scaleIndex] * transform->Left(), m_scaleList[scaleIndex], transform->Up(), 16, Color::Cyan );
+			Debug::Render().DebugCircle( m_radiusList[scaleIndex] * transform->Left(), std::fabs( m_scaleList[scaleIndex] ), transform->Up(), 16, Color::Cyan );
 		}
 
 		// Satellite

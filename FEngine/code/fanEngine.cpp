@@ -129,6 +129,8 @@ namespace fan {
 
 		// Static messages		
 		Material::onMaterialSetPath.Connect		( &Engine::OnMaterialSetTexture, this );
+		Mesh::s_onMeshLoad.Connect				( &RessourceManager::OnLoadMesh, m_renderer->GetRessourceManager() );
+		Mesh::s_onMeshDelete.Connect			( &Renderer::WaitIdle, m_renderer );
 		Model::onModelSetPath.Connect			( &Engine::OnModelSetPath,		 this );
 		Model::onRegisterModel.Connect			( &Engine::RegisterModel,		 this );
 		Model::onUnRegisterModel.Connect		( &Engine::UnRegisterModel,		 this );
@@ -462,7 +464,6 @@ namespace fan {
 		} m_renderer->SetNumDirectionalLights( static_cast<uint32_t>( m_directionalLights.size() ) );
 
 		// Transforms, mesh, materials
-
 		std::vector<DrawData> drawData( m_models.size() );
 		for (int modelIndex = 0; modelIndex < m_models.size() ; modelIndex++) {
 

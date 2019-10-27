@@ -10,22 +10,29 @@
 namespace fan {
 	REGISTER_TYPE_INFO(Mesh)
 
+	Signal< Mesh* > Mesh::s_onMeshLoad;
+	Signal< > Mesh::s_onMeshDelete;
+
 	//================================================================================================================================
 	//================================================================================================================================
 	Mesh::Mesh(const std::string& _path) :
-	m_path ( _path )
-	,m_vertices(0)
-	,m_indices(0)
-	,m_vertexBuffer(nullptr)
-	,m_indexBuffer(nullptr) {
+		m_path ( _path )
+		, m_vertices( 0 )
+		, m_indices( 0 )
+		, m_vertexBuffer { nullptr ,nullptr ,nullptr }
+		, m_indexBuffer { nullptr ,nullptr ,nullptr }
+	{
 
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
 	Mesh::~Mesh() {
-		delete m_indexBuffer;
-		delete m_vertexBuffer;
+		s_onMeshDelete.Emmit();
+		for (int bufferIndex = 0; bufferIndex < 3 ; bufferIndex++) {
+			delete m_indexBuffer[bufferIndex];
+			delete m_vertexBuffer[bufferIndex];
+		}
 	}
 
 	//================================================================================================================================
@@ -35,12 +42,32 @@ namespace fan {
  		if (importer.LoadScene(m_path) == true) {
 			if (importer.GetMesh(*this) != false ) {
 				OptimizeVertices();
+				s_onMeshLoad.Emmit(this);
 				return true;
 			}
 		}
 		Debug::Get() << "Failed to load mesh : " << m_path << Debug::Endl();
 		return false;
 	}
+
+	//================================================================================================================================
+	//================================================================================================================================
+	bool Mesh::LoadFromVertices( const std::vector<Vertex>&	_vertices ) {
+		m_vertices = _vertices;
+
+		// Generate fake indices
+		m_indices.clear();
+		m_indices.reserve(_vertices.size());
+		for (int vertIndex = 0; vertIndex < _vertices.size(); vertIndex++) {
+			m_indices.push_back( vertIndex );
+		}
+
+		// Cleanup
+		OptimizeVertices();
+		s_onMeshLoad.Emmit( this );
+		return true;
+	}
+
 	
 	//================================================================================================================================
 	// Removes duplicates vertices & generates a corresponding index buffer
@@ -83,23 +110,22 @@ namespace fan {
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void Mesh::SetData( std::vector<Vertex>&	_vertices, std::vector<uint32_t> _indices ) {
-		m_vertices = _vertices;
-		m_indices = _indices;
-	}
-
-	//================================================================================================================================
-	//================================================================================================================================
 	void Mesh::GenerateBuffers( Device & _device ) {
 
-		delete(m_indexBuffer );
-		delete( m_vertexBuffer );
-		m_indexBuffer = new Buffer( _device );
-		m_vertexBuffer = new Buffer( _device );
+		if( m_indices.empty() ) {
+			return;
+		}
+
+		m_currentBuffer = (m_currentBuffer + 1) % 3;
+
+		delete( m_indexBuffer[m_currentBuffer] );
+		delete( m_vertexBuffer[m_currentBuffer] );
+		m_indexBuffer[m_currentBuffer] = new Buffer( _device );
+		m_vertexBuffer[m_currentBuffer] = new Buffer( _device );
 
 		{
 			const VkDeviceSize size = sizeof( m_indices[0] ) * m_indices.size();
-			m_indexBuffer->Create(
+			m_indexBuffer[m_currentBuffer]->Create(
 				size,
 				VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_INDEX_BUFFER_BIT,
 				VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT
@@ -112,12 +138,12 @@ namespace fan {
 			);
 			stagingBuffer.SetData( m_indices.data(), size );
 			VkCommandBuffer cmd = _device.BeginSingleTimeCommands();
-			stagingBuffer.CopyBufferTo( cmd, m_indexBuffer->GetBuffer(), size );
+			stagingBuffer.CopyBufferTo( cmd, m_indexBuffer[m_currentBuffer]->GetBuffer(), size );
 			_device.EndSingleTimeCommands( cmd );
 		}
 		{
 			const VkDeviceSize size = sizeof( m_vertices[0] ) * m_vertices.size();
-			m_vertexBuffer->Create(
+			m_vertexBuffer[m_currentBuffer]->Create(
 				size,
 				VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_VERTEX_BUFFER_BIT,
 				VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT
@@ -130,7 +156,7 @@ namespace fan {
 			);
 			stagingBuffer2.SetData( m_vertices.data(), size );
 			VkCommandBuffer cmd2 = _device.BeginSingleTimeCommands();
-			stagingBuffer2.CopyBufferTo( cmd2, m_vertexBuffer->GetBuffer(), size );
+			stagingBuffer2.CopyBufferTo( cmd2, m_vertexBuffer[m_currentBuffer]->GetBuffer(), size );
 			_device.EndSingleTimeCommands( cmd2 );
 		}
 	}
