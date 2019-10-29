@@ -70,7 +70,7 @@ namespace fan
 
 		// Filter color
 		if ( ImGui::Button( "##color" ) ) { SetColor( Color::White ); } ImGui::SameLine();
-		if ( ImGui::ColorEdit3( "color", material->color.Data(), gui::colorEditFlags ) ) { m_gameobject->AddFlag( Gameobject::Flag::OUTDATED_MATERIAL ); }
+		if ( ImGui::ColorEdit4( "color", material->color.Data(), gui::colorEditFlags ) ) { m_gameobject->AddFlag( Gameobject::Flag::OUTDATED_MATERIAL ); }
 
 		if ( ImGui::Button( "##shininess" ) ) { SetShininess( 1 ); } ImGui::SameLine();
 		if( ImGui::DragInt("shininess", (int*)&material->shininess, 1, 1, 256 )) { m_gameobject->AddFlag( Gameobject::Flag::OUTDATED_MATERIAL ); }
@@ -96,8 +96,14 @@ namespace fan
 		}
 
 		if (gui::LoadFileModal("set_path_texture", GlobalValues::s_imagesExtensions, m_pathBuffer)) {
-			onMaterialSetPath.Emmit( this, m_pathBuffer.string() );
+			SetTexturePath( m_pathBuffer.string() );
 		}
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
+	void Material::SetTexturePath( const std::string& _path ) {
+		onMaterialSetPath.Emmit( this, _path );
 	}
 
 	//================================================================================================================================

@@ -59,7 +59,7 @@ namespace fan
 	//================================================================
 	//================================================================
 	struct DynamicUniformsMaterial {
-		glm::vec3  color = glm::vec3( 1 );
+		glm::vec4  color = glm::vec4( 1 );
 		glm::int32 shininess;
 		glm::int32 textureIndex;
 	};

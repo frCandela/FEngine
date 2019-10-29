@@ -24,6 +24,7 @@ namespace fan
 		const uint32_t	GetShininess() const;
 		Color			GetColor() const;
 		void			SetColor( const Color _color );
+		void			SetTexturePath( const std::string& _path );
 
 		void OnGui() override;
 		ImGui::IconType GetIcon() const override { return ImGui::IconType::MATERIAL; }

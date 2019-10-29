@@ -131,11 +131,12 @@ namespace fan {
 
 				Gameobject * newPlanet = scene->CreateGameobject("planet" + std::to_string(radiusIndex), m_gameobject );
 				Model * model = newPlanet->AddComponent<Model>();
-				model->SetPath("content/models/planet.fbx");
+				model->SetPath( GlobalValues::s_meshSphere );
 				newPlanet->AddFlag( Gameobject::Flag::NO_AABB_UPDATE );
 
-// 				Material * material = newPlanet->AddComponent<Material>();
-// 				material->SetTexture()
+				Material * material = newPlanet->AddComponent<Material>();
+				material->SetTexturePath( GlobalValues::s_textureWhite );
+				material->SetColor( Color::Brown );
 
 				Planet * planet = newPlanet->AddComponent<Planet>();
 				planet->SetRadius( radius );
@@ -157,12 +158,16 @@ namespace fan {
 					Gameobject * newSatellite = scene->CreateGameobject( "satellite" + std::to_string( radiusIndex ), newPlanet );
 					newSatellite->AddFlag( Gameobject::Flag::NO_AABB_UPDATE );
 					Model * modelSatellite = newSatellite->AddComponent<Model>();
-					modelSatellite->SetPath( "content/models/planet.fbx" );
+					modelSatellite->SetPath( GlobalValues::s_meshSphere );
 
 					Planet * satellitePlanet = newSatellite->AddComponent<Planet>();
 					satellitePlanet->SetRadius( m_satelliteRadiusList[radiusIndex] );
 					satellitePlanet->SetPhase( 2 * PI * m_distribution( m_generator ) );
 					satellitePlanet->SetSpeed( - 5.f * planetSpeed );
+
+					Material * satelliteMat = newSatellite->AddComponent<Material>();					
+					satelliteMat->SetTexturePath( GlobalValues::s_textureWhite );
+					satelliteMat->SetColor( Color::Brown );
 
 					Transform * satelliteTransform = newSatellite->GetTransform();
 					const float satelliteScale = m_satelliteScaleList[radiusIndex];

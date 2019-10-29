@@ -41,7 +41,7 @@ namespace fan
 		m_dynamicUniformsMaterial.Resize( 256 );
 
 		for ( int uniformIndex = 0; uniformIndex < m_dynamicUniformsMaterial.Size(); uniformIndex++ ) {
-			m_dynamicUniformsMaterial[uniformIndex].color = glm::vec3( 1 );
+			m_dynamicUniformsMaterial[uniformIndex].color = glm::vec4( 1 );
 			m_dynamicUniformsMaterial[uniformIndex].textureIndex = 0;
 			m_dynamicUniformsMaterial[uniformIndex].shininess = 1;
 		}

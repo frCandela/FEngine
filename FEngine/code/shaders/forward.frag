@@ -13,7 +13,7 @@ layout(binding = 2) uniform FragUniforms {
 } uniforms;
 
 layout (binding = 3) uniform DynamicUniformBufferFrag {
-	vec3 color;
+	vec4 color;
 	int shininess;
 	int	textureIndex;
 } material;
@@ -63,7 +63,9 @@ void main() {
 	for(int lightIndex = 0; lightIndex < lights.pointLightNum; lightIndex++) {
 		lightColor += CalcPointLight( lights.pointLights[lightIndex], goodNormal, inFragPos, viewDir );
 	}
-	outColor = vec4(lightColor,1);
+
+	float alpha = texture( diffuseTexture[material.textureIndex], inTexCoord).a * material.color.a;
+	outColor = vec4(lightColor, alpha);
 }
 
 
@@ -77,7 +79,7 @@ vec3 CalcDirLight  ( const DirectionalLight light, const vec3 normal, const vec3
     vec3 reflectDir = reflect(-lightDir, normal);
     float spec = pow(max(dot(viewDir, reflectDir), 0.0), material.shininess);
     // combine results
-	vec3 textureColor = material.color * vec3(texture(diffuseTexture[material.textureIndex], inTexCoord));
+	vec3 textureColor = material.color.xyz * vec3(texture(diffuseTexture[material.textureIndex], inTexCoord));
     vec3 ambient  = light.ambiant.xyz  * textureColor;
     vec3 diffuse  = light.diffuse.xyz  * diff * textureColor;
     vec3 specular = light.specular.xyz * spec ;//* vec3(texture(material.specular, TexCoords));
@@ -100,7 +102,7 @@ vec3 CalcPointLight(const PointLight light, const vec3 normal, const vec3 fragPo
     float attenuation = 1.0 / (light.constant + light.linear * distance + light.quadratic * (distance * distance));    
     
 	// combine results
-	vec3 textureColor = material.color * vec3(texture(diffuseTexture[material.textureIndex], inTexCoord));
+	vec3 textureColor = material.color.xyz * vec3(texture(diffuseTexture[material.textureIndex], inTexCoord));
     vec3 ambient  = light.ambiant.xyz  * textureColor;
     vec3 diffuse  = light.diffuse.xyz  * vec3(diff) * textureColor;
     vec3 specular = light.specular.xyz * vec3(spec);// * vec3(texture(material.specular.xyz, TexCoords));

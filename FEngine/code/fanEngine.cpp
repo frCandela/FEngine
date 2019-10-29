@@ -140,7 +140,7 @@ namespace fan {
 		DirectionalLight::onDirectionalLightDetach.Connect	( &Engine::UnRegisterDirectionalLight, this );
 
 		m_scene->New();
-		Mesh * defaultMesh = m_renderer->GetRessourceManager()->LoadMesh(GlobalValues::s_defaultMeshPath);
+		Mesh * defaultMesh = m_renderer->GetRessourceManager()->LoadMesh(GlobalValues::s_defaultMesh);
 		m_renderer->GetRessourceManager()->SetDefaultMesh( defaultMesh );
 	}
 
@@ -482,11 +482,11 @@ namespace fan {
 			// Materials
 			if ( material != nullptr ) {
 				const uint32_t textureIndex = material->GetTexture() != nullptr ? material->GetTexture()->GetRenderID() : 0;
-				data.color = material->GetColor().ToGLM3();
+				data.color = material->GetColor().ToGLM();
 				data.shininess = material->GetShininess();
 				data.textureIndex = textureIndex;
 			} else {
-				data.color = Color::White.ToGLM3();
+				data.color = Color::White.ToGLM();
 				data.shininess = 1;
 				data.textureIndex = 0;
 			}

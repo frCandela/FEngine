@@ -15,6 +15,10 @@ namespace fan {
 		void OnGui() override;
 		ImGui::IconType GetIcon() const override { return ImGui::IconType::PARTICLES; }
 
+		void SetParticlesPerSecond( const int _pps )	{ m_particlesPerSecond = _pps; }
+		void SetSpeedParticles( const float _speed )	{ m_speed = _speed; }
+		void SetSpawnOffset( const btVector3 _offset )	{ m_offset = _offset; }
+
 		DECLARE_EDITOR_COMPONENT( ParticleSystem )
 		DECLARE_TYPE_INFO( ParticleSystem, Actor );
 	protected:

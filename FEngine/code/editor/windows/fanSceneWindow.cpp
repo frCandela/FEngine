@@ -86,7 +86,7 @@ namespace fan
 				if ( ImGui::MenuItem( "Sphere" ) ) {
 					Gameobject *  newIntity = m_scene->CreateGameobject( "new_model", m_lastGameobjectRightClicked );
 					Model * model = newIntity->AddComponent<Model>();
-					model->SetPath("content/_default/sphere.fbx");
+					model->SetPath( GlobalValues::s_meshSphere );
 					newIntity->AddComponent<Rigidbody>();
 					newIntity->AddComponent<SphereShape>();
 

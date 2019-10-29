@@ -27,7 +27,7 @@ namespace fan
 		Mesh * mesh;
 		glm::mat4 modelMatrix;
 		glm::mat4 normalMatrix;
-		glm::vec3 color;
+		glm::vec4 color;
 		uint32_t shininess;
 		uint32_t textureIndex;
 	};

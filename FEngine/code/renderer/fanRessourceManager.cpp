@@ -16,7 +16,7 @@ namespace fan
 		m_device(_device) {
 		m_textures.reserve(64);
 
-		LoadTexture(GlobalValues::s_defaultTexturePath);
+		LoadTexture(GlobalValues::s_defaultTexture);
 		SetUnmodified();
 	}
 

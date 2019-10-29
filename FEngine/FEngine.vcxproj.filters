@@ -1176,6 +1176,9 @@
     <ClInclude Include="code\game\fanSolarEruption.h">
       <Filter>code\game</Filter>
     </ClInclude>
+    <ClInclude Include="code\game\fanSolarEruptionUtil.h">
+      <Filter>code\game</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="code\core\math\fanBasicModels.inl">

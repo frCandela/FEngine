@@ -221,7 +221,7 @@ namespace fan
 	//================================================================================================================================
 	//================================================================================================================================
 	void ImguiPipeline::CreateFontAndSampler() {
-		ImGui::GetIO().Fonts->AddFontFromFileTTF( "content/_default/imgui_font.ttf", 15 );
+		ImGui::GetIO().Fonts->AddFontFromFileTTF( GlobalValues::s_defaultImguiFont, 15 );
 
 		// Create font texture
 		unsigned char* fontData;
@@ -229,7 +229,7 @@ namespace fan
 		ImGui::GetIO().Fonts->GetTexDataAsRGBA32(&fontData, &texWidth, &texHeight);
 
 		m_fontTexture->Load(fontData, texWidth, texHeight, 1);
-		m_iconsTexture->LoadTexture("content/_default/icons.png");
+		m_iconsTexture->LoadTexture( GlobalValues::s_defaultIcons );
 		m_sampler->CreateSampler(0, 1.f);
 	}
 
