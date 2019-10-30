@@ -44,14 +44,35 @@ namespace fan {
 			static void Display( const ecsComponentsTuple< ecsComponents >& _tuple ) {
 
 				const ComponentData<_component>& data = _tuple.Get< _component >();
+				const std::vector< Chunck<_component> * >& chuncks =  data.GetChuncks();
+
+				size_t numElements = 0;
+				for ( int chunckIndex = 0; chunckIndex < chuncks.size(); chunckIndex++ )
+				{
+					numElements += chuncks[chunckIndex]->Count();
+				}
 
 				ImGui::Text( _component::s_name );
+				if ( ImGui::IsItemHovered() )
+				{
+					ImGui::BeginTooltip();
+					ImGui::TextUnformatted( "to recycle" );
+					for ( int chunckIndex = 0; chunckIndex < chuncks.size(); chunckIndex++ )
+					{
+						ImGui::Text( std::to_string( chuncks[chunckIndex]->RecycleCount() ).c_str() );
+					}
+					ImGui::EndTooltip();
+				}
+
 				ImGui::NextColumn();
-				ImGui::Text( std::to_string( data.NumElements() ).c_str() );
+				ImGui::Text( std::to_string( numElements ).c_str() ); // num elements
+
 				ImGui::NextColumn();
-				ImGui::Text( std::to_string( data.Size() ).c_str() );
+				ImGui::Text( std::to_string( chuncks.size() ).c_str() ); // num chuncks
+
 				ImGui::NextColumn();
-				ImGui::Text( std::to_string( data.Size() * data.SizeOfChunck() / 1000 ).c_str() );
+				ImGui::Text( std::to_string( chuncks.size() * sizeof( Chunck<_component> ) / 1000 ).c_str() ); // size of a chunck in Ko
+
 				ImGui::NextColumn();
 
 				DisplayImpl<_list...>::Display( _tuple );
@@ -60,10 +81,10 @@ namespace fan {
 
 		static void Display( const ecsComponentsTuple< ecsComponents >& _tuple ) {
 			ImGui::Columns(4);
-			ImGui::SetColumnWidth( 0, 100.f);
-			ImGui::SetColumnWidth( 1, 100.f );
-			ImGui::SetColumnWidth( 2, 100.f );
-			ImGui::SetColumnWidth( 3, 100.f );
+// 			ImGui::SetColumnWidth( 0, 100.f);
+// 			ImGui::SetColumnWidth( 1, 100.f );
+// 			ImGui::SetColumnWidth( 2, 100.f );
+// 			ImGui::SetColumnWidth( 3, 100.f );
 
 			ImGui::NextColumn();
 			ImGui::Text("components");

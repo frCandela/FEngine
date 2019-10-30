@@ -7,67 +7,58 @@
 namespace fan {
 	//================================================================================================================================
 	//================================================================================================================================
-	template < typename _type >	class ComponentData 
+	template < typename _type >
+	struct Chunck
 	{
 		//================================================================
-		//================================================================
-		struct Chunck 
+		_type * Alloc( uint16_t& _outIndex )
 		{
-			//================================================================
-			_type * Alloc( uint16_t& _outIndex )
+			if ( m_count < m_data.size() )
 			{
-				if ( m_count < m_data.size() )
-				{
-					_outIndex = m_count++;
-					return & m_data[_outIndex];
-				}
-				else if ( m_countRecycleList > 0 )
-				{
-					_outIndex = m_recycleList[--m_countRecycleList];
-					return & m_data[_outIndex];
-				}
-				else
-				{
-					return nullptr;
-				}
+				_outIndex = m_count++;
+				return &m_data[_outIndex];
 			}
-
-			//================================================================
-			void Delete( const uint16_t _index )
+			else if ( m_countRecycleList > 0 )
 			{
-				assert( _index < m_count && _index < 256 );
-				m_recycleList[m_countRecycleList++] = (uint8_t)_index;
+				_outIndex = m_recycleList[--m_countRecycleList];
+				return &m_data[_outIndex];
 			}
-			
-			//================================================================
-			inline _type& operator[] ( const uint16_t& _index )	{ return m_data[_index]; }
-			inline uint16_t Count() const { return m_count - m_countRecycleList; }			
+			else{
+				return nullptr;
+			}
+		}
 
-		private:
-			std::array< _type, 256 >	m_data;					// Components data
-			std::array< uint8_t, 256>	m_recycleList;			// Unused components
-			uint16_t					m_count = 0;			// Number of components
-			uint16_t					m_countRecycleList = 0;	// Number of components
-		};
+		//================================================================
+		void Delete( const uint16_t _index )
+		{
+			assert( _index < m_count && _index < 256 );
+			m_recycleList[m_countRecycleList++] = (uint8_t)_index;
+		}
 
+		//================================================================
+		inline _type& operator[] ( const uint16_t& _index ) { return m_data[_index]; }
+		inline uint16_t Count() const { return m_count - m_countRecycleList; }
+		inline uint16_t RecycleCount() const { return m_countRecycleList; }
+
+	private:
+		std::array< _type, 256 >	m_data;					// Components data
+		std::array< uint8_t, 256>	m_recycleList;			// Unused components
+		uint16_t					m_count = 0;			// Number of components
+		uint16_t					m_countRecycleList = 0;	// Number of components
+	};
+
+	//================================================================================================================================
+	//================================================================================================================================
+	template < typename _type >	
+	class ComponentData 
+	{
 	public:
 		static constexpr size_t index = IndexOfComponent<_type>::value;
 
 		//================================================================
 		inline _type& operator[] ( const ecsComponentsKey& _entityData ) {	return Get( _entityData.chunck[index], _entityData.element[index] ); }
 		inline _type& Get ( const uint16_t _chunckIndex, const uint16_t _elementIndex )	{ return (*m_chunks[_chunckIndex])[_elementIndex];	}
-		inline size_t Size() const { return m_chunks.size(); }
-		inline size_t SizeOfChunck() const { return sizeof( Chunck ); }
-
-		//================================================================
-		inline size_t NumElements() const {
-			size_t num = 0;
-			for ( int chunckIndex = 0; chunckIndex < m_chunks.size(); chunckIndex++ )
-			{
-				num += m_chunks[chunckIndex]->Count();
-			}
-			return num;
-		}
+		inline const std::vector< Chunck<_type> * >& GetChuncks() const { return m_chunks; }
 
 		//================================================================
 		_type& Alloc( uint16_t& _outChunckIndex, uint16_t& _outElementIndex ) 
@@ -85,7 +76,7 @@ namespace fan {
 			}
 
 			// Alloc a new chunck
-			Chunck * chunck = new Chunck();
+			Chunck<_type> * chunck = new Chunck<_type>();
 			m_chunks.push_back( chunck );
 			assert( _outChunckIndex == m_chunks.size() - 1 ); // index should be correct because of the previous loop
 			return *chunck->Alloc(_outElementIndex);
@@ -99,7 +90,7 @@ namespace fan {
 		}
 
 	private:
-		std::vector< Chunck * > m_chunks;	// List of chuncks
+		std::vector< Chunck<_type> * > m_chunks;	// List of chuncks
 	};
 
 	namespace impl {
