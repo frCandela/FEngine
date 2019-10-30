@@ -13,19 +13,23 @@ namespace fan {
 	//================================================================================================================================
 	//================================================================================================================================
 	void BoxShape::SetExtent( const btVector3 _extent ) {
-		GetEcsBoxShape()->Get().setLocalScaling( _extent );
+		m_boxShape->setLocalScaling( _extent );
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
 	btVector3 BoxShape::GetExtent() const {
-		return GetEcsBoxShape()->Get().getLocalScaling();
+		return m_boxShape->getLocalScaling();
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
 	void BoxShape::OnAttach() {
-		m_gameobject->AddEcsComponent<ecsBoxShape>()->Init( btVector3( 0.5f, 0.5f, 0.5f ) );
+
+		ecsBoxShape * ecsShape = m_gameobject->AddEcsComponent<ecsBoxShape>();
+		ecsShape->Init( btVector3( 0.5f, 0.5f, 0.5f ) );
+		btBoxShape ** tmpShape = &const_cast<btBoxShape*>( m_boxShape );
+		*tmpShape = &ecsShape->Get();
 
 		ColliderShape::OnAttach();
 	}
@@ -74,7 +78,6 @@ namespace fan {
 
 	//================================================================================================================================
 	//================================================================================================================================
-	ecsBoxShape*		BoxShape::GetEcsBoxShape() const	{ return m_gameobject->GetEcsComponent<ecsBoxShape>();}
-	btBoxShape *		BoxShape::GetBoxShape()				{ return &GetEcsBoxShape()->Get();}
+	btBoxShape *		BoxShape::GetBoxShape()				{ return m_boxShape;}
 	btCollisionShape *	BoxShape::GetCollisionShape()		{ return GetBoxShape(); }
 }

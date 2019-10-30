@@ -24,7 +24,6 @@ namespace fan {
 		inline void		ApplyCentralForce( const btVector3& _force ) { m_rigidbody->applyCentralForce( _force ); }
 
 		void SetCollisionShape( btCollisionShape * _collisionShape );
-		void Refresh();
 
 		void OnGui() override;
 		ImGui::IconType GetIcon() const override { return ImGui::IconType::RIGIDBODY; }
@@ -39,9 +38,10 @@ namespace fan {
 		void OnDetach() override;
 
 	private:
-		btRigidBody *			m_rigidbody =  nullptr;
-		btDefaultMotionState  * m_motionState = nullptr;
-		btCollisionShape*		m_colShape = nullptr;
+		btRigidBody * const				m_rigidbody =  nullptr;
+		btDefaultMotionState  * const	m_motionState = nullptr;
+
+		btCollisionShape*				m_colShape = nullptr;
 
 		btCollisionShape *  FindCollisionShape();
 	};

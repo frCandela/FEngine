@@ -28,7 +28,6 @@ namespace fan
 		DECLARE_EDITOR_COMPONENT( SphereShape )
 		DECLARE_TYPE_INFO( SphereShape, Component );
 	private:		
-		ecsSphereShape*	GetEcsSphereShape() const;
-
+		btSphereShape* const	m_sphereShape = nullptr;
 	};
 }

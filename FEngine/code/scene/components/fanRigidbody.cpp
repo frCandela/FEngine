@@ -10,18 +10,6 @@ namespace fan {
 	REGISTER_TYPE_INFO( Rigidbody )
 
 	//================================================================================================================================
-	// Updates the rigidbody pointers
-	// Happens when too much rigidbodies are created in the ecs and their container is resized
-	//================================================================================================================================	
-	void Rigidbody::Refresh() {	
-		m_colShape = FindCollisionShape();
-		m_motionState = & m_gameobject->GetEcsComponent<ecsMotionState>()->Get();
-		m_rigidbody   = & m_gameobject->GetEcsComponent<ecsRigidbody>()->Get();
-		m_rigidbody->setCollisionShape( m_colShape );
-		m_rigidbody->setMotionState(m_motionState);
-	}
-
-	//================================================================================================================================
 	//================================================================================================================================	
 	btCollisionShape * Rigidbody::FindCollisionShape() {
 		const std::vector<Component*> & components = m_gameobject->GetComponents();
@@ -77,9 +65,13 @@ namespace fan {
 			m_colShape->calculateLocalInertia( startMass, localInertia );
 		}
 
-		m_motionState = motionState->Init( transform->transform );
+		btDefaultMotionState ** tmpMotionState = &const_cast<btDefaultMotionState*>( m_motionState );
+		*tmpMotionState = motionState->Init( transform->transform );
+
 		btRigidBody::btRigidBodyConstructionInfo rbInfo( 1.f, m_motionState, m_colShape, localInertia );
-		m_rigidbody = rigidbody->Init( rbInfo );
+
+		btRigidBody ** tmpRigidbody = &const_cast<btRigidBody*>( m_rigidbody );
+		*tmpRigidbody = rigidbody->Init( rbInfo );
 
 		if( m_colShape != nullptr ){
 			m_gameobject->GetScene()->GetPhysicsManager()->AddRigidbody( this );

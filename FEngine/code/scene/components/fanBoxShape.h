@@ -27,6 +27,6 @@ namespace fan {
 		DECLARE_TYPE_INFO( BoxShape, Component );
 	private:
 
-		ecsBoxShape*	GetEcsBoxShape() const;
+		btBoxShape* const m_boxShape = nullptr;
 	};
 }
