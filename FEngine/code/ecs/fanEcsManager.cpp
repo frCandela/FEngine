@@ -8,49 +8,25 @@ namespace fan {
 	//================================================================================================================================
 	EcsManager::EcsManager() {
 		m_entityToHandles.reserve( 512 );
-		m_entitiesData.reserve(1024);
-		m_components.Get<ecsTranform>().vector.reserve( 512 );
-		m_components.Get<ecsScaling>().vector.reserve(	512 );
-		m_components.Get<ecsAABB>().vector.reserve(		512 );
-
-		m_components.Get<ecsSphereShape>().vector.reserve( 2 );//TMP
-
-		size_t capa0 = m_components.Get<ecsRigidbody>().vector.capacity();
-		m_components.Get<ecsRigidbody>().vector.reserve(3);
-		size_t capa1 = m_components.Get<ecsRigidbody>().vector.capacity();
-		(void )capa0; (void)capa1;
-
-		m_components.Get<ecsMotionState>().vector.reserve( 2 );
-		
-
-		m_components.Get<ecsRigidbody>().onPreRealloc.Connect( &Signal<>::Emmit, &onPreReallocPhysics );
-		m_components.Get<ecsMotionState>().onPreRealloc.Connect( &Signal<>::Emmit, &onPreReallocPhysics );
-		m_components.Get<ecsSphereShape>().onPreRealloc.Connect( &Signal<>::Emmit, &onPreReallocPhysics );
-		m_components.Get<ecsBoxShape>().onPreRealloc.Connect( &Signal<>::Emmit, &onPreReallocPhysics );
-		
-		m_components.Get<ecsRigidbody>().onPostRealloc.Connect( &Signal<>::Emmit, &onPostReallocPhysics );
-		m_components.Get<ecsMotionState>().onPostRealloc.Connect( &Signal<>::Emmit, &onPostReallocPhysics );
-		m_components.Get<ecsSphereShape>().onPostRealloc.Connect( &Signal<>::Emmit, &onPostReallocPhysics );
-		m_components.Get<ecsBoxShape>().onPostRealloc.Connect( &Signal<>::Emmit, &onPostReallocPhysics );
-
+		m_entitiesKeys.reserve(1024);
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
 	ecsEntity EcsManager::CreateEntity() {
-		if ( m_entitiesData.size() == m_entitiesData.capacity() ) {
-			m_entitiesData.reserve( 2 * m_entitiesData.size() );
+		if ( m_entitiesKeys.size() == m_entitiesKeys.capacity() ) {
+			m_entitiesKeys.reserve( 2 * m_entitiesKeys.size() );
 			Debug::Log("realloc entities");
 		}
-		ecsEntity entity = static_cast<ecsEntity>( m_entitiesData.size());
-		m_entitiesData.push_back( ecsEntityData() );
+		ecsEntity entity = static_cast<ecsEntity>( m_entitiesKeys.size());
+		m_entitiesKeys.push_back( ecsComponentsKey() );
 		return static_cast<ecsEntity> ( entity );
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
 	void EcsManager::DeleteEntity( const ecsEntity  _entity ) {
-		m_entitiesData[_entity].Kill();
+		m_entitiesKeys[_entity].Kill();
 	}
 
 	//================================================================================================================================
@@ -91,15 +67,15 @@ namespace fan {
 	template< typename _type, typename _system > struct RunSystem;
 	template< template < typename...> typename _components, typename... _types, typename _system  >
 	struct RunSystem<_components<_types...>, _system > {
-		static void Run( const float _delta, const size_t _count, std::vector<ecsEntityData>& _entitiesData, ecsComponentsTuple< ecsComponents >& _tuple ) {
-			_system::Run( _delta, _count, _entitiesData,  _tuple.Get<_types>().vector ... );
+		static void Run( const float _delta, const size_t _count, std::vector<ecsComponentsKey>& _entitiesData, ecsComponentsTuple< ecsComponents >& _tuple ) {
+			_system::Run( _delta, _count, _entitiesData,  _tuple.Get<_types>()... );
 		}
 	};
 
 	//================================================================================================================================
 	// Runs the systems before the physics update
 	//================================================================================================================================
-	#define RUN_SYSTEM( _system ) RunSystem< _system::signature::componentsTypes, _system >::Run( _delta, m_activeEntitiesCount, m_entitiesData, m_components );
+	#define RUN_SYSTEM( _system ) RunSystem< _system::signature::componentsTypes, _system >::Run( _delta, m_activeEntitiesCount, m_entitiesKeys, m_components );
 	void EcsManager::Update( const float _delta, const btVector3& _cameraPosition ) {
 		SCOPED_PROFILE( ecs_update )
 
@@ -128,56 +104,56 @@ namespace fan {
 
 	//================================================================================================================================
 	// Helper for the RecycleComponent method
-	// iterates recursively on static components indices, finds the on that matches the runtime index _id and
-	// appends _componentIndex to the corresponding recycle list
+	// iterates recursively on static components indices, finds the on that matches the runtime index _id 
+	// and deletes it
 	//================================================================================================================================
 	class RecycleHelper {
 	private:
 		// General case
 		template< size_t _index >
-		static void RecycleImpl( ecsComponentsTuple< ecsComponents >& _components, size_t _id, uint32_t _componentIndex ) {
+		static void RecycleImpl( ecsComponentsTuple< ecsComponents >& _components, const size_t _id, const uint16_t _chunckIndex, const uint16_t _elementIndex ) {
 			if ( _index == _id ) {
-				_components.Get<_index>().recycleList.push_back( _componentIndex );
+				_components.Get<_index>().Delete( _chunckIndex, _elementIndex );
 			} else {
-				RecycleImpl< _index - 1>( _components, _id, _componentIndex );
+				RecycleImpl< _index - 1>( _components, _id, _chunckIndex, _elementIndex );
 			}
 		}
 
 		// Specialization 
 		template< >
-		static void RecycleImpl<0>( ecsComponentsTuple< ecsComponents >& _components, size_t _id, uint32_t _componentIndex ) {
+		static void RecycleImpl<0>( ecsComponentsTuple< ecsComponents >& _components, const size_t _id, const uint16_t _chunckIndex, const uint16_t _elementIndex ) {
 			if ( _id == 0 ) {
-				_components.Get<0>().recycleList.push_back( _componentIndex );
+				_components.Get<0>().Delete( _chunckIndex, _elementIndex );
 			} else {
 				assert( false ); // Out of range
 			}
 		}
 	public:
-		static void Recycle( ecsComponentsTuple< ecsComponents >& _components, size_t _id, uint32_t _componentIndex ) {
-			RecycleImpl< ecsComponents::count - 1 >( _components, _id, _componentIndex );
+		static void Recycle( ecsComponentsTuple< ecsComponents >& _components, const size_t _id, const uint16_t _chunckIndex, const uint16_t _elementIndex ) {
+			RecycleImpl< ecsComponents::count - 1 >( _components, _id, _chunckIndex, _elementIndex );
 		}
 	};	   
 
 	//================================================================================================================================
 	// put _componentIndex in the recycleList of component _componentID
 	//================================================================================================================================
-	void EcsManager::RecycleComponent( const uint32_t _componentID, const uint32_t _componentIndex ) {
+	void EcsManager::RecycleComponent( const uint32_t _componentID, const uint16_t _chunckIndex, const uint16_t _elementIndex ) {
 		assert( _componentID  < ecsComponents::count );
-		RecycleHelper::Recycle( m_components, _componentID, _componentIndex );
+		RecycleHelper::Recycle( m_components, _componentID, _chunckIndex, _elementIndex );
 	}
 
 	//================================================================================================================================
 	// Removes the dead entities at the end of the entity vector
 	//================================================================================================================================
 	void EcsManager::RemoveDeadEntities() {
-		if ( m_entitiesData.empty() ) {
+		if ( m_entitiesKeys.empty() ) {
 			return;
 		}
 
-		int64_t reverseIndex = m_entitiesData.size() - 1;
+		int64_t reverseIndex = m_entitiesKeys.size() - 1;
 		while ( reverseIndex >= 0 ) {
-			ecsEntityData& data = m_entitiesData[reverseIndex];
-			if ( data.IsAlive() ) {
+			ecsComponentsKey& key = m_entitiesKeys[reverseIndex];
+			if ( key.IsAlive() ) {
 				break; // We processed all dead entities
 			}
 
@@ -190,14 +166,14 @@ namespace fan {
 
 			// Remove the component
 			for (int componentID = 0; componentID < ecsComponents::count ; componentID++) {
-				if( data.bitset[componentID]) {
-					RecycleComponent( componentID, data.components[componentID] );
+				if( key.bitset[componentID]) {
+					RecycleComponent( componentID, key.chunck[componentID], key.element[componentID] );
 				}
 			}
-			m_entitiesData.pop_back();
+			m_entitiesKeys.pop_back();
 			--reverseIndex;
 		}
-		m_activeEntitiesCount = static_cast<ecsEntity>( m_entitiesData.size() );
+		m_activeEntitiesCount = static_cast<ecsEntity>( m_entitiesKeys.size() );
 	}
 
 	//================================================================================================================================
@@ -207,9 +183,10 @@ namespace fan {
 		for ( std::pair< ecsEntity, uint32_t> & pair : m_removedComponents ) {
 			const ecsEntity entity = pair.first;
 			const  uint32_t componentIndex = pair.second;
-			if( m_entitiesData[entity].bitset[componentIndex] == 1 ) {
-				m_entitiesData[entity].bitset[componentIndex] = 0;
-				RecycleComponent( componentIndex, m_entitiesData[entity].components[componentIndex] );
+			if( m_entitiesKeys[entity].bitset[componentIndex] == 1 ) {
+				m_entitiesKeys[entity].bitset[componentIndex] = 0;
+				ecsComponentsKey& key = m_entitiesKeys[entity];
+				RecycleComponent( componentIndex, key.chunck[componentIndex], key.element[componentIndex] );
 			} else {
 				Debug::Get() << Debug::Severity::warning << "Remove component failed : Entity "<< entity << " has no component " << componentIndex << Debug::Endl();
 			}
@@ -219,8 +196,8 @@ namespace fan {
 		for ( std::pair< ecsEntity, uint32_t> & pair : m_removedTags ) {
 			const ecsEntity entity = pair.first;
 			const  uint32_t tagIndex = pair.second;
-			if ( m_entitiesData[entity].bitset[tagIndex] == 1 ) {
-				m_entitiesData[entity].bitset[tagIndex] = 0;			
+			if ( m_entitiesKeys[entity].bitset[tagIndex] == 1 ) {
+				m_entitiesKeys[entity].bitset[tagIndex] = 0;			
 			} else {
 				Debug::Get() << Debug::Severity::warning << "Remove tag failed : Entity " << entity << " has no component " << tagIndex << Debug::Endl();
 			}
@@ -262,15 +239,15 @@ namespace fan {
 	// Place the dead entities at the end of the vector
 	//================================================================================================================================
 	void EcsManager::SortEntities() {
-		const int64_t size = static_cast<int64_t>(m_entitiesData.size());
+		const int64_t size = static_cast<int64_t>(m_entitiesKeys.size());
 		int64_t forwardIndex = 0;
-		int64_t reverseIndex = m_entitiesData.size() - 1;
+		int64_t reverseIndex = m_entitiesKeys.size() - 1;
 
 		while( true ) {
-			while ( forwardIndex < size - 1 && m_entitiesData[forwardIndex].IsAlive()  ) { ++forwardIndex; } // Finds a dead entity
+			while ( forwardIndex < size - 1 && m_entitiesKeys[forwardIndex].IsAlive()  ) { ++forwardIndex; } // Finds a dead entity
 			if( forwardIndex == size - 1 ) break;
 
-			while ( reverseIndex > 0 && m_entitiesData[reverseIndex].IsDead() )   { --reverseIndex; } // Finds a live entity
+			while ( reverseIndex > 0 && m_entitiesKeys[reverseIndex].IsDead() )   { --reverseIndex; } // Finds a live entity
 			if ( reverseIndex == 0 ) break;
 
 			if ( forwardIndex > reverseIndex  ) break;
@@ -278,7 +255,7 @@ namespace fan {
 			// updates the indices of the corresponding handle if necessary
 			SwapHandlesEntities((ecsEntity) reverseIndex ,(ecsEntity) forwardIndex );
 
-			std::swap( m_entitiesData[reverseIndex] , m_entitiesData[forwardIndex] );	
+			std::swap( m_entitiesKeys[reverseIndex] , m_entitiesKeys[forwardIndex] );	
 			++forwardIndex; --reverseIndex;
 		}
 	}

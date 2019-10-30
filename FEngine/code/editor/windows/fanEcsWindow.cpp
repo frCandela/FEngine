@@ -42,14 +42,40 @@ namespace fan {
 		struct DisplayImpl< _component, _list...> : DisplayImpl<_list...> {
 			static_assert( IsComponent<_component>::value );
 			static void Display( const ecsComponentsTuple< ecsComponents >& _tuple ) {
-				const auto& dataTransform = _tuple.Get< _component >();
-				ImGui::Text( TagCountSize( _component::s_name, dataTransform.vector.size() - dataTransform.recycleList.size(), sizeof( _component ) ).c_str() );
+
+				const ComponentData<_component>& data = _tuple.Get< _component >();
+
+				ImGui::Text( _component::s_name );
+				ImGui::NextColumn();
+				ImGui::Text( std::to_string( data.NumElements() ).c_str() );
+				ImGui::NextColumn();
+				ImGui::Text( std::to_string( data.Size() ).c_str() );
+				ImGui::NextColumn();
+				ImGui::Text( std::to_string( data.Size() * data.SizeOfChunck() / 1000 ).c_str() );
+				ImGui::NextColumn();
+
 				DisplayImpl<_list...>::Display( _tuple );
 			}
 		};
 
 		static void Display( const ecsComponentsTuple< ecsComponents >& _tuple ) {
+			ImGui::Columns(4);
+			ImGui::SetColumnWidth( 0, 100.f);
+			ImGui::SetColumnWidth( 1, 100.f );
+			ImGui::SetColumnWidth( 2, 100.f );
+			ImGui::SetColumnWidth( 3, 100.f );
+
+			ImGui::NextColumn();
+			ImGui::Text("components");
+			ImGui::NextColumn();
+			ImGui::Text( "chuncks" );
+			ImGui::NextColumn();
+			ImGui::Text( "size (Ko)" );
+			ImGui::NextColumn();
+			ImGui::Separator();
+
 			DisplayImpl<_components...>::Display( _tuple );
+			ImGui::Columns( 1 );
 		}
 	};
 
@@ -58,14 +84,14 @@ namespace fan {
 	void EcsWindow::OnGui() {
 		SCOPED_PROFILE( ecs )
 
-		const std::vector<ecsEntityData>& entitiesData = m_ecsManager->GetEntitiesData();
+		const std::vector<ecsComponentsKey>& entitiesData = m_ecsManager->GetEntitiesData();
 		const ecsComponentsTuple< ecsComponents >& components = m_ecsManager->GetComponents();
 		const std::unordered_map< ecsHandle, ecsEntity > & handlesToEntity = m_ecsManager->GetHandles();
 
 
 		// Entities info
 		ImGui::Icon( GetIconType(), { 19,19 } ); ImGui::SameLine();
-		ImGui::Text( TagCountSize( "Entities  ", entitiesData.size(), sizeof( ecsEntityData ) ).c_str() );
+		ImGui::Text( TagCountSize( "Entities  ", entitiesData.size(), sizeof( ecsComponentsKey ) ).c_str() );
 
 		ImGui::Separator();
 
@@ -110,7 +136,7 @@ namespace fan {
 		// Entities list
 		if ( ImGui::CollapsingHeader( "Entities" ) ) {
 			for ( int entityIndex = 0; entityIndex < entitiesData.size(); entityIndex++ ) {
-				const ecsEntityData & data = entitiesData[entityIndex];
+				const ecsComponentsKey & data = entitiesData[entityIndex];
 				std::stringstream ss;
 				ss << data.bitset.to_string() << " " << entityIndex;
 				ImGui::Text( ss.str().c_str() );

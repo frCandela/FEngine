@@ -8,9 +8,6 @@ namespace fan {
 	//================================================================================================================================
 	class EcsManager {
 	public:
-		Signal<> onPreReallocPhysics;
-		Signal<> onPostReallocPhysics;
-
 		EcsManager();	
 
 		ecsEntity	CreateEntity();
@@ -21,25 +18,25 @@ namespace fan {
 		template< typename _componentType > _componentType* FindComponentFromHandle( const ecsHandle  _handle );
 		template< typename _componentType > _componentType* FindComponentFromEntity( const ecsEntity  _entity );
 
-		template< typename _componentType > uint32_t AddComponent( const ecsEntity _entity );
-		template< typename _componentType > void	 RemoveComponent( const ecsEntity _entity );
-		template< typename _tagType >		void	 AddTag( const ecsEntity _entity );
-		template< typename _tagType >		void	 RemoveTag( const ecsEntity _entity );
+		template< typename _componentType > _componentType& AddComponent( const ecsEntity _entity );
+		template< typename _componentType > void			RemoveComponent( const ecsEntity _entity );
+		template< typename _tagType >		void			AddTag( const ecsEntity _entity );
+		template< typename _tagType >		void			RemoveTag( const ecsEntity _entity );
 
 		void Update( const float _delta, const btVector3& _cameraPosition );
 		void LateUpdate( const float _delta );
 		void Refresh();
 
 		// Getters 
-		const std::vector<ecsEntityData>&					GetEntitiesData() const { return m_entitiesData;	}
+		const std::vector<ecsComponentsKey>&				GetEntitiesData() const { return m_entitiesKeys;	}
 		const ecsComponentsTuple< ecsComponents >&			GetComponents() const	{ return m_components;		}
 		const std::unordered_map< ecsHandle, ecsEntity > &	GetHandles() const		{ return m_handlesToEntity; }
 		
 	private:
-		ecsComponentsTuple< ecsComponents >			m_components;
-		std::vector<ecsEntityData>					m_entitiesData;
-		std::unordered_map< ecsHandle, ecsEntity >  m_handlesToEntity;
-		std::unordered_map< ecsEntity, ecsHandle >  m_entityToHandles;
+		ecsComponentsTuple< ecsComponents >				m_components;
+		std::vector<ecsComponentsKey>					m_entitiesKeys;
+		std::unordered_map< ecsHandle, ecsEntity >		m_handlesToEntity;
+		std::unordered_map< ecsEntity, ecsHandle >		m_entityToHandles;
 		std::vector< std::pair< ecsEntity, uint32_t > > m_removedComponents;
 		std::vector< std::pair< ecsEntity, uint32_t > > m_removedTags;
 
@@ -48,7 +45,7 @@ namespace fan {
 		ecsEntity m_activeEntitiesCount = 0;
 		
 		void	SwapHandlesEntities( const ecsEntity _entity1, const ecsEntity _entity2 );
-		void	RecycleComponent( const uint32_t _componentID, const uint32_t _componentIndex );
+		void	RecycleComponent( const uint32_t _componentID, const uint16_t _chunckIndex, const uint16_t _elementIndex );
 		void	SortEntities();
 		void	RemoveDeadComponentsAndTags();
 		void	RemoveDeadEntities();
@@ -57,39 +54,23 @@ namespace fan {
 	//================================================================================================================================
 	//================================================================================================================================
 	template< typename _componentType >
-	uint32_t EcsManager::AddComponent( const ecsEntity _entity ) {
+	_componentType& EcsManager::AddComponent( const ecsEntity _entity ) {
 		static_assert( IsComponent< _componentType>::value );
-		assert( _entity  < m_entitiesData.size() );
-		assert( m_entitiesData[_entity].bitset[IndexOfComponent<_componentType>::value] == 0 ); // entity already has _componentType
 
-		// Get references
-		auto &							componentData =  m_components.Get< _componentType >();
-		std::vector<_componentType>&	vector = componentData.vector;
-		std::vector<uint32_t>&			recycleList = componentData.recycleList;
-		ecsEntityData &					entityData = m_entitiesData[_entity];
+		
+		const uint32_t componentID = (uint32_t) IndexOfComponent<_componentType>::value;
 
-		// Get new component index
-		uint32_t componentIndex;		
-		if ( recycleList.empty() ) { // Create new index
-			if ( vector.size() == vector.capacity() ) {
-				componentData.onPreRealloc.Emmit();
-				vector.reserve( 2 * vector.size() );
-				Debug::Log( "realloc components" );
-				componentData.onPostRealloc.Emmit();
-				
-			}
-			componentIndex = static_cast<uint32_t>( vector.size() );
-			vector.push_back( _componentType() );
-		} else { // Reuse old index
-			componentIndex = recycleList[ recycleList.size() - 1];
-			recycleList.pop_back();
-		}
+		assert( _entity < m_entitiesKeys.size() );
+		ecsComponentsKey & entityKey = m_entitiesKeys[_entity];
+
+		assert( entityKey.bitset[componentID] == 0 ); // entity already has _componentType
+
+		_componentType & component =  m_components.Alloc<_componentType>( entityKey.chunck[componentID], entityKey.element[componentID] );
 
 		// Init the component
-		entityData.components[ IndexOfComponent<_componentType>::value ] =  static_cast<uint32_t>( componentIndex );
-		entityData.bitset[ IndexOfComponent<_componentType>::value ] = 1;
+		entityKey.bitset    [ componentID ] = 1;
 
-		return componentIndex;
+		return component;
 	}
 	
 	//================================================================================================================================
@@ -104,7 +85,7 @@ namespace fan {
 	//================================================================================================================================
 	template< typename _tagType > void EcsManager::AddTag( const ecsEntity _entity ) {
 		static_assert( IsTag< _tagType>::value );
-		m_entitiesData[_entity].bitset[ IndexOfTag<_tagType>::value ] = 1;
+		m_entitiesKeys[_entity].bitset[ IndexOfTag<_tagType>::value ] = 1;
 	}
 
 	//================================================================================================================================
@@ -122,7 +103,7 @@ namespace fan {
 		static_assert( IsComponent< _componentType >::value );
 		ecsEntity entity;
 		if ( FindEntity( _handle, entity ) ) {
-			return &m_components.Get< _componentType >().vector[m_entitiesData[entity].components[IndexOfComponent<_componentType>::value]];			
+			return FindComponentFromEntity< _componentType >(entity);
 		}
 		return nullptr;
 	}
@@ -131,6 +112,6 @@ namespace fan {
 	//================================================================================================================================
 	template< typename _componentType > _componentType* EcsManager::FindComponentFromEntity( const ecsEntity  _entity ) {
 		static_assert( IsComponent< _componentType >::value );
-		return &m_components.Get< _componentType >().vector[m_entitiesData[_entity].components[IndexOfComponent<_componentType>::value]];
+		return &m_components.Get< _componentType >()[ m_entitiesKeys[_entity] ];
 	}
 }

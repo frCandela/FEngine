@@ -2,6 +2,7 @@
 
 #include "ecs/fanECSConfig.h"
 #include "ecs/fanECSEntityData.h"
+#include "ecs/fanEcsComponentsTuple.h"
 
 namespace fan {
 //================================================================================================================================
@@ -9,7 +10,7 @@ namespace fan {
 // Contains the component & tags typelists and their associated bitsets
 // 'bitset' combines component & tags in the same bitset
 //================================================================================================================================
-	template< typename _type > struct IsTag { static constexpr bool value = std::is_base_of< ecsITag, _type >::value; };
+	template< typename _type >			struct IsTag { static constexpr bool value = std::is_base_of< ecsITag, _type >::value; };
 	template< typename _componentType > struct IndexOfComponent { static constexpr size_t value = meta::Find::List< _componentType, ecsComponents >::value; };
 	template< typename _tagType >		struct IndexOfTag { static constexpr size_t value = meta::Find::List< _tagType, ecsTags >::value + ecsComponents::count; };
 
@@ -53,11 +54,11 @@ namespace fan {
 	//================================
 	class ecsParticleSystem : public ISystem<  ecsParticleSignature > {
 	public:
-		static void Run( float _delta, const size_t _count, std::vector< ecsEntityData >& _entitiesData,
-			std::vector< ecsPosition > & _positions,
-			std::vector< ecsRotation > & _rotations,
-			std::vector< ecsMovement > & _movements,
-			std::vector< ecsParticle > & _particles );
+		static void Run( float _delta, const size_t _count, std::vector< ecsComponentsKey >& _entitiesData,
+			ComponentData< ecsPosition > & _positions,
+			ComponentData< ecsRotation > & _rotations,
+			ComponentData< ecsMovement > & _movements,
+			ComponentData< ecsParticle > & _particles );
 
 		static btVector3 s_cameraPosition;
 	};
@@ -67,9 +68,9 @@ namespace fan {
 	//================================
 	class ecsPlanetsSystem : public ISystem<  ecsPlanetSignature > {
 	public:
-		static void Run( float _delta, const size_t _count, std::vector< ecsEntityData >& _entitiesData,
-			std::vector< ecsTranform > & _transforms,
-			std::vector< ecsPlanet > & _planets );
+		static void Run( float _delta, const size_t _count, std::vector< ecsComponentsKey >& _entitiesData,
+			ComponentData< ecsTranform > & _transforms,
+			ComponentData< ecsPlanet > & _planets );
 	};
 
 	//================================
@@ -77,10 +78,10 @@ namespace fan {
 	//================================
 	class ecsSynchTransToRbSystem : public ISystem<  ecsRigidbodySignature > {
 	public:
-		static void Run( float _delta, const size_t _count, std::vector< ecsEntityData >& _entitiesData,
-			  std::vector< ecsTranform > & _transforms
-			, std::vector< ecsMotionState > & _motionStates
-			, std::vector< ecsRigidbody > & _rigidbodies );
+		static void Run( float _delta, const size_t _count, std::vector< ecsComponentsKey >& _entitiesData,
+			 ComponentData< ecsTranform > & _transforms
+			,ComponentData< ecsMotionState > & _motionStates
+			,ComponentData< ecsRigidbody > & _rigidbodies );
 	};
 
 	//================================
@@ -88,10 +89,10 @@ namespace fan {
 	//================================
 	class ecsSynchRbToTransSystem : public ISystem<  ecsRigidbodySignature > {
 	public:
-		static void Run( float _delta, const size_t _count, std::vector< ecsEntityData >& _entitiesData,
-			std::vector< ecsTranform > & _transforms
-			, std::vector< ecsMotionState > & _motionStates
-			, std::vector< ecsRigidbody > & _rigidbodies );
+		static void Run( float _delta, const size_t _count, std::vector< ecsComponentsKey >& _entitiesData,
+			  ComponentData< ecsTranform > & _transforms
+			, ComponentData< ecsMotionState > & _motionStates
+			, ComponentData< ecsRigidbody > & _rigidbodies );
 	};
 
 	//================================
@@ -99,12 +100,12 @@ namespace fan {
 	//================================
 	class ecsUpdateAABBFromHull : public ISystem<  ecsAABBUpdateFromHull > {
 	public:
-		static void Run( float _delta, const size_t _count, std::vector< ecsEntityData >& _entitiesData,
-			std::vector< ecsTranform > &	_transforms
-			, std::vector< ecsScaling > &	_scales
-			, std::vector< ecsAABB > &		_aabbs
-			, std::vector< ecsFlags > &		_flags 
-			, std::vector< ecsConvexHull > & _hulls
+		static void Run( float _delta, const size_t _count, std::vector< ecsComponentsKey >& _entitiesData,
+			 ComponentData< ecsTranform > &	_transforms
+			,ComponentData< ecsScaling > &	_scales
+			,ComponentData< ecsAABB > &		_aabbs
+			,ComponentData< ecsFlags > &		_flags 
+			,ComponentData< ecsConvexHull > & _hulls
 		);
 	};
 
@@ -113,10 +114,10 @@ namespace fan {
 	//================================
 	class ecsUpdateAABBFromTransform : public ISystem<  ecsAABBUpdateFromTransform > {
 	public:
-		static void Run( float _delta, const size_t _count, std::vector< ecsEntityData >& _entitiesData,
-			std::vector< ecsTranform > &	_transforms
-			, std::vector< ecsAABB > &		_aabbs
-			, std::vector< ecsFlags > &		_flags
+		static void Run( float _delta, const size_t _count, std::vector< ecsComponentsKey >& _entitiesData,
+			  ComponentData< ecsTranform > &	_transforms
+			, ComponentData< ecsAABB >     &		_aabbs
+			, ComponentData< ecsFlags >    &		_flags
 		);
 	};
 }

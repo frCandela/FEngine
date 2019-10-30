@@ -9,12 +9,12 @@ namespace fan {
 	//================================================================================================================================
 	//================================================================================================================================
 	btVector3 ecsParticleSystem::s_cameraPosition;
-	void ecsParticleSystem::Run( float _delta, const size_t _count, std::vector< ecsEntityData >& _entitiesData,
-		std::vector< ecsPosition > & _positions,
-		std::vector< ecsRotation > & /*_rotations*/,
-		std::vector< ecsMovement > & _movements,
-		std::vector< ecsParticle > & _particles ) {
-
+	void ecsParticleSystem::Run( float _delta, const size_t _count, std::vector< ecsComponentsKey >& _entitiesData,
+		ComponentData< ecsPosition > & _positions,
+		ComponentData< ecsRotation > & /*_rotations*/,
+		ComponentData< ecsMovement > & _movements,
+		ComponentData< ecsParticle > & _particles ) 
+	{
 		std::vector<btVector3> triangles;
 		std::vector<Color> colors;
 		triangles.reserve( _entitiesData.size() );
@@ -24,18 +24,18 @@ namespace fan {
 		static const float size = 0.05f;
 
 		for ( int entity = 0; entity < _count; entity++ ) {
-			ecsEntityData & data = _entitiesData[entity];
+			ecsComponentsKey & key = _entitiesData[entity];
 
-			if ( data.IsAlive() && ( data.bitset & ecsParticleSystem::signature::bitset ) == ecsParticleSystem::signature::bitset ) {
-				btVector3& position = _positions[data.components[IndexOfComponent<ecsPosition>::value]].position;
-				ecsMovement& movement = _movements[data.components[IndexOfComponent<ecsMovement>::value]];
-				ecsParticle& particle = _particles[data.components[IndexOfComponent<ecsParticle>::value]];
+			if ( key.IsAlive() && ( key.bitset & ecsParticleSystem::signature::bitset ) == ecsParticleSystem::signature::bitset ) {
+				btVector3& position = _positions[key].position;
+				ecsMovement& movement = _movements[key];
+				ecsParticle& particle = _particles[key];
 
 				(void)particle;
 
 				particle.durationLeft -= _delta;
 				if ( particle.durationLeft < 0 ) {
-					data.Kill();
+					key.Kill();
 				}
 				position += _delta * movement.speed;
 
@@ -63,16 +63,16 @@ namespace fan {
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void ecsPlanetsSystem::Run( float /*_delta*/, const size_t _count, std::vector< ecsEntityData >& _entitiesData,
-		std::vector< ecsTranform > & _transforms,
-		std::vector< ecsPlanet > & _planets ) 	
+	void ecsPlanetsSystem::Run( float /*_delta*/, const size_t _count, std::vector< ecsComponentsKey >& _entitiesData
+		,ComponentData< ecsTranform > & _transforms
+		,ComponentData< ecsPlanet > & _planets ) 	
 	{
 		for ( int entity = 0; entity < _count; entity++ ) {
-			ecsEntityData & data = _entitiesData[entity];
-			if ( data.IsAlive() && ( data.bitset & signature::bitset ) == signature::bitset ) {
-				btTransform& transform		= _transforms[data.components[IndexOfComponent<ecsTranform>::value]].transform;
-				ecsPlanet& planet			= _planets[data.components[IndexOfComponent<ecsPlanet>::value]];
-				btTransform& parentTransform = _transforms[_entitiesData[planet.parentEntity].components[IndexOfComponent<ecsTranform>::value]].transform;
+			ecsComponentsKey & key = _entitiesData[entity];
+			if ( key.IsAlive() && ( key.bitset & signature::bitset ) == signature::bitset ) {
+				btTransform& transform		= _transforms	[key].transform;
+				ecsPlanet& planet			= _planets		[key];
+				btTransform& parentTransform = _transforms	[_entitiesData[planet.parentEntity]].transform;
 
 				float const time = -planet.speed * Time::ElapsedSinceStartup();
 				btVector3 position( std::cosf( time + planet.phase ), 0, std::sinf( time + planet.phase ) );
@@ -84,19 +84,19 @@ namespace fan {
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void ecsSynchRbToTransSystem::Run( float /*_delta*/, const size_t _count, std::vector< ecsEntityData >& _entitiesData,
-		std::vector< ecsTranform > & _transforms
-		, std::vector< ecsMotionState > & _motionStates
-		, std::vector< ecsRigidbody > & _rigidbodies ) 
+	void ecsSynchRbToTransSystem::Run( float /*_delta*/, const size_t _count, std::vector< ecsComponentsKey >& _entitiesData
+		,ComponentData< ecsTranform > & _transforms
+		,ComponentData< ecsMotionState > & _motionStates
+		,ComponentData< ecsRigidbody > & _rigidbodies ) 
 	{
 		for ( int entity = 0; entity < _count; entity++ ) {
-			ecsEntityData & data = _entitiesData[entity];
+			ecsComponentsKey & key = _entitiesData[entity];
 
-			if ( data.IsAlive() && ( data.bitset & signature::bitset ) == signature::bitset )
+			if ( key.IsAlive() && ( key.bitset & signature::bitset ) == signature::bitset )
 			{
-				btTransform& transform = _transforms[data.components[IndexOfComponent<ecsTranform>::value]].transform;
-				ecsMotionState& motionState = _motionStates[data.components[IndexOfComponent<ecsMotionState>::value]];
-				ecsRigidbody& rigidbody = _rigidbodies[data.components[IndexOfComponent<ecsRigidbody>::value]];
+				btTransform& transform =	_transforms		[key].transform;
+				ecsMotionState& motionState = _motionStates	[key];
+				ecsRigidbody& rigidbody = _rigidbodies		[key];
 
 				rigidbody.Get().setWorldTransform( transform );
 				//motionState.Get().setWorldTransform( transform );
@@ -107,17 +107,18 @@ namespace fan {
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void ecsSynchTransToRbSystem::Run( float /*_delta*/, const size_t _count, std::vector< ecsEntityData >& _entitiesData,
-		std::vector< ecsTranform > & _transforms
-		, std::vector< ecsMotionState > & _motionStates
-		, std::vector< ecsRigidbody > & _rigidbodies ) {
+	void ecsSynchTransToRbSystem::Run( float /*_delta*/, const size_t _count, std::vector< ecsComponentsKey >& _entitiesData
+		, ComponentData< ecsTranform > &    _transforms
+		, ComponentData< ecsMotionState > & _motionStates
+		, ComponentData< ecsRigidbody > &   _rigidbodies ) 
+	{
 		for ( int entity = 0; entity < _count; entity++ ) {
-			ecsEntityData & data = _entitiesData[entity];
+			ecsComponentsKey & key = _entitiesData[entity];
 
-			if ( data.IsAlive() && ( data.bitset & signature::bitset ) == signature::bitset ) {
-				btTransform& transform = _transforms[data.components[IndexOfComponent<ecsTranform>::value]].transform;
-				ecsMotionState& motionState = _motionStates[data.components[IndexOfComponent<ecsMotionState>::value]];
-				ecsRigidbody& rigidbody = _rigidbodies[data.components[IndexOfComponent<ecsRigidbody>::value]];
+			if ( key.IsAlive() && ( key.bitset & signature::bitset ) == signature::bitset ) {
+				btTransform& transform		= _transforms[key].transform;
+				ecsMotionState& motionState = _motionStates[key];
+				ecsRigidbody& rigidbody		= _rigidbodies[key];
 
 				btMotionState * ms = rigidbody.Get().getMotionState();
 				ms->getWorldTransform( transform );
@@ -128,23 +129,26 @@ namespace fan {
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void ecsUpdateAABBFromHull::Run( float /*_delta*/, const size_t _count, std::vector< ecsEntityData >& _entitiesData,
-		std::vector< ecsTranform > &	_transforms
-		, std::vector< ecsScaling > &	_scales
-		, std::vector< ecsAABB > &		_aabbs
-		, std::vector< ecsFlags > &		_flags
-		, std::vector< ecsConvexHull >& _hulls )
+	void ecsUpdateAABBFromHull::Run( float /*_delta*/, const size_t _count, std::vector< ecsComponentsKey >& _entitiesData
+		, ComponentData< ecsTranform > &	_transforms
+		, ComponentData< ecsScaling > &	_scales
+		, ComponentData< ecsAABB > &		_aabbs
+		, ComponentData< ecsFlags > &		_flags
+		, ComponentData< ecsConvexHull >& _hulls )
 	{
 		// Find all interesting entities
-		std::vector< ecsEntityData * > usefullData;
-		usefullData.reserve( _entitiesData.size() );
-		for ( int entity = 0; entity < _count; entity++ ) {
-			ecsEntityData & data = _entitiesData[entity];			
-			if ( data.IsAlive() && ( data.bitset & signature::bitset ) == signature::bitset ) {
-				uint32_t& flags = _flags[data.components[IndexOfComponent<ecsFlags>::value]].flags;
-				ConvexHull&		hull = _hulls[data.components[IndexOfComponent<ecsConvexHull>::value]].convexHull;
-				if( flags & ecsFlags::OUTDATED_TRANSFORM && ! hull.IsEmpty() ) {
-					usefullData.push_back( &data );
+		std::vector< ecsComponentsKey * > usefullEntitiesKeys;
+		usefullEntitiesKeys.reserve( _entitiesData.size() );
+		for ( int entity = 0; entity < _count; entity++ ) 
+		{
+			ecsComponentsKey & data = _entitiesData[entity];			
+			if ( data.IsAlive() && ( data.bitset & signature::bitset ) == signature::bitset ) 
+			{
+				uint32_t&   flags = _flags[data].flags;
+				ConvexHull&	hull  = _hulls[data].convexHull;
+				if( flags & ecsFlags::OUTDATED_TRANSFORM && ! hull.IsEmpty() ) 
+				{
+					usefullEntitiesKeys.push_back( &data );
 					flags &= ~ecsFlags::OUTDATED_TRANSFORM;
 				}
 			}
@@ -152,12 +156,12 @@ namespace fan {
 
 		// Calculates model matrices
 		std::vector< glm::mat4 > modelMatrices;
-		modelMatrices.reserve( usefullData.size() );
-		for ( int dataIndex = 0; dataIndex < usefullData.size(); dataIndex++ ) {
-			ecsEntityData & data = *usefullData[dataIndex];
+		modelMatrices.reserve( usefullEntitiesKeys.size() );
+		for ( int dataIndex = 0; dataIndex < usefullEntitiesKeys.size(); dataIndex++ ) {
+			ecsComponentsKey & key = *usefullEntitiesKeys[dataIndex];
 
-			btTransform& transform = _transforms[data.components[IndexOfComponent<ecsTranform>::value]].transform;
-			btVector3&	 btscale		= _scales[data.components[IndexOfComponent<ecsScaling>::value]].scale;
+			btTransform& transform  = _transforms[key].transform;
+			btVector3&	 btscale	= _scales[key].scale;
 
 			const glm::vec3 position	= ToGLM( transform.getOrigin() );
 			const glm::vec3 scale		= ToGLM( btscale );
@@ -169,30 +173,32 @@ namespace fan {
 		}
 
 		// Calculates the new aabb using the model matrix and the convex hull
-		for ( int dataIndex = 0; dataIndex < usefullData.size(); dataIndex++ ) {
-			ecsEntityData & data = *usefullData[dataIndex];
+		for ( int dataIndex = 0; dataIndex < usefullEntitiesKeys.size(); dataIndex++ ) {
+			ecsComponentsKey & key = *usefullEntitiesKeys[dataIndex];
 			glm::mat4&		modelMatrix = modelMatrices[dataIndex];
-			ConvexHull&		hull		= _hulls[data.components[IndexOfComponent<ecsConvexHull>::value]].convexHull;
-			AABB&			aabb		= _aabbs[data.components[IndexOfComponent<ecsAABB>::value]].aabb;
+			ConvexHull&		hull = _hulls[key].convexHull;
+			AABB&			aabb = _aabbs[key].aabb;
 			aabb = AABB( hull.GetVertices(), modelMatrix );
 		}	
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void ecsUpdateAABBFromTransform::Run( float /*_delta*/, const size_t _count, std::vector< ecsEntityData >& _entitiesData,
-		std::vector< ecsTranform > &	_transforms
-		, std::vector< ecsAABB > &		_aabbs
-		, std::vector< ecsFlags > &		_flags ) {
+	void ecsUpdateAABBFromTransform::Run( float /*_delta*/, const size_t _count, std::vector< ecsComponentsKey >& _entitiesData
+		, ComponentData< ecsTranform > &	_transforms
+		, ComponentData< ecsAABB > &		_aabbs
+		, ComponentData< ecsFlags > &		_flags ) {
 		// Find all interesting entities
-		std::vector< ecsEntityData * > usefullData;
+		std::vector< ecsComponentsKey * > usefullData;
 		usefullData.reserve( _entitiesData.size() );
-		for ( int entity = 0; entity < _count; entity++ ) {
-			ecsEntityData & data = _entitiesData[entity];
-			if ( data.IsAlive() && ( data.bitset & signature::bitset ) == signature::bitset ) {
-				uint32_t& flags = _flags[data.components[IndexOfComponent<ecsFlags>::value]].flags;
+		for ( int entity = 0; entity < _count; entity++ ) 
+		{
+			ecsComponentsKey & key = _entitiesData[entity];
+			if ( key.IsAlive() && ( key.bitset & signature::bitset ) == signature::bitset ) 
+			{
+				uint32_t& flags = _flags[key].flags;
 				if ( flags & ecsFlags::OUTDATED_TRANSFORM ) {
-					usefullData.push_back( &data );
+					usefullData.push_back( &key );
 					flags &= ~ecsFlags::OUTDATED_TRANSFORM;
 				}
 			}
@@ -202,10 +208,10 @@ namespace fan {
 		std::vector< glm::mat4 > modelMatrices;
 		modelMatrices.reserve( usefullData .size() );
 		for (int dataIndex = 0; dataIndex < usefullData.size(); dataIndex++){
-			ecsEntityData & data = *usefullData[dataIndex];
+			ecsComponentsKey & key = *usefullData[dataIndex];
 		
-			btTransform& transform	= _transforms[data.components[IndexOfComponent<ecsTranform>::value]].transform;
-			AABB& aabb				= _aabbs[data.components[IndexOfComponent<ecsAABB>::value]].aabb;
+			btTransform& transform	= _transforms[key].transform;
+			AABB& aabb				= _aabbs[key].aabb;
 			const btVector3 origin = transform.getOrigin();
 				const float size = 0.05f;
 				aabb = AABB( origin - size * btVector3::One(), origin + size * btVector3::One() );							

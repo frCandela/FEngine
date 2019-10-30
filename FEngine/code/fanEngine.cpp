@@ -115,8 +115,6 @@ namespace fan {
 		m_mainMenuBar->onExit.Connect( &Engine::Exit, this );
 		onGameobjectSelected.Connect( &SceneWindow::OnGameobjectSelected, m_sceneWindow );
 		onGameobjectSelected.Connect( &InspectorWindow::OnGameobjectSelected, m_inspectorWindow );
-		m_ecsManager->onPreReallocPhysics.Connect( &PhysicsManager::Clear, m_physicsManager );
-		m_ecsManager->onPostReallocPhysics.Connect(&PhysicsManager::Refresh, m_physicsManager);
 		m_scene->onSceneLoad.Connect( &SceneWindow::OnSceneLoad, m_sceneWindow );
 		m_scene->onSceneLoad.Connect( &Engine::OnSceneLoad, this );
 		m_scene->onSceneClear.Connect  ( &Renderer::Clear, m_renderer );
