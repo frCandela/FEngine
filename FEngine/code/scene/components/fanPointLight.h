@@ -35,9 +35,10 @@ namespace fan
 		void OnDetach() override;
 		bool Load( Json & _json )  override;
 		bool Save( Json & _json ) const override;
-		ecsPointLight*  GetEcsPointLight() const;
 
 	private:
 		float GetLightRange() const;
+
+		ecsPointLight* const m_pointLight = nullptr;
 	};
 }

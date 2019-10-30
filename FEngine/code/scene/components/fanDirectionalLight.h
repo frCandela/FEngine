@@ -29,6 +29,8 @@ namespace fan {
 		bool Save( Json & _json ) const override;
 		void OnAttach() override;
 		void OnDetach() override;
-		ecsDirLight*  GetEcsDirLight() const;
+		
+	private:
+		ecsDirLight* const m_dirLight = nullptr;
 	};
 }

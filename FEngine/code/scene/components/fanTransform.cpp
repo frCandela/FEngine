@@ -16,12 +16,12 @@ namespace fan
 	void Transform::OnAttach() {
  		Component::OnAttach();
 
-		ecsTranform** transform = &const_cast<ecsTranform*>( m_transform );
-		*transform = m_gameobject->AddEcsComponent<ecsTranform>();
+		ecsTranform** tmpTransform = &const_cast<ecsTranform*>( m_transform );
+		*tmpTransform = m_gameobject->AddEcsComponent<ecsTranform>();
 		m_transform->Init();
 
-		ecsScaling ** scaling = &const_cast<ecsScaling*>( m_scale );
-		*scaling = m_gameobject->AddEcsComponent<ecsScaling>();
+		ecsScaling ** tmpScaling = &const_cast<ecsScaling*>( m_scale );
+		*tmpScaling = m_gameobject->AddEcsComponent<ecsScaling>();
 		m_scale->Init();
  
  		SetRemovable(false);

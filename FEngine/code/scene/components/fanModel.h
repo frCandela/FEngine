@@ -8,7 +8,7 @@ namespace fan
 	class Mesh;
 	class AABB;
 	class Gameobject;
-	struct ecsModel;
+	struct ecsMesh;
 
 	//================================================================================================================================
 	//================================================================================================================================
@@ -44,7 +44,7 @@ namespace fan
 		// Editor
 		std::fs::path m_pathBuffer;
 
-		ecsModel *		GetEcsModel() const;
-		ecsConvexHull * GetEcsConvexHull() const;
+		ecsMesh *		const m_mesh = nullptr;
+		ecsConvexHull * const m_convexHull = nullptr;
 	};
 }

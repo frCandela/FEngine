@@ -26,8 +26,15 @@ namespace fan
 	//================================================================================================================================
 	void Model::OnAttach() {
 		Component::OnAttach();
-		m_gameobject->AddEcsComponent<ecsModel>()->Init();
-		m_gameobject->AddEcsComponent<ecsConvexHull>()->Init();
+
+		ecsMesh ** tmpMesh = &const_cast<ecsMesh*>( m_mesh );
+		*tmpMesh = m_gameobject->AddEcsComponent<ecsMesh>();
+		m_mesh->Init();
+
+		ecsConvexHull ** tmpHull = &const_cast<ecsConvexHull*>( m_convexHull );
+		*tmpHull = m_gameobject->AddEcsComponent<ecsConvexHull>();
+		m_convexHull->Init();
+
 		onRegisterModel.Emmit( this );
 	}
 
@@ -35,7 +42,7 @@ namespace fan
 	//================================================================================================================================
 	void Model::OnDetach() {
 		Component::OnDetach();
-		m_gameobject->RemoveEcsComponent<ecsModel>();
+		m_gameobject->RemoveEcsComponent<ecsMesh>();
 		m_gameobject->RemoveEcsComponent<ecsConvexHull>();
 		onUnRegisterModel.Emmit(this);
 
@@ -44,8 +51,9 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void Model::SetMesh(Mesh * _mesh) {
-		GetEcsModel()->mesh = _mesh;
+	void Model::SetMesh( Mesh * _mesh )
+	{
+		m_mesh->mesh = _mesh;
 		if( _mesh != nullptr && ! _mesh->GetIndices().empty() ) {				
 			_mesh->GenerateConvexHull( GetConvexHull() );
 			m_gameobject->AddFlag( Gameobject::Flag::OUTDATED_TRANSFORM );
@@ -58,11 +66,11 @@ namespace fan
 		onModelSetPath.Emmit( this, _path );
 	}
 
-	Mesh *			Model::GetMesh() { return GetEcsModel()->mesh; }
-	const Mesh *	Model::GetMesh() const { return GetEcsModel()->mesh; }
+	Mesh *			Model::GetMesh() { return m_mesh->mesh; }
+	const Mesh *	Model::GetMesh() const { return m_mesh->mesh; }
 
-	int		Model::GetRenderID() const { return GetEcsModel()->renderID; }
-	void	Model::SetRenderID( const int _renderID ) { GetEcsModel()->renderID = _renderID; }
+	int		Model::GetRenderID() const { return m_mesh->renderID; }
+	void	Model::SetRenderID( const int _renderID ) { m_mesh->renderID = _renderID; }
 
 	//================================================================================================================================
 	//================================================================================================================================
@@ -113,9 +121,7 @@ namespace fan
 	//==========================z======================================================================================================
 	//================================================================================================================================
 	bool Model::Save( Json & _json ) const {
-		ecsModel* model = GetEcsModel();
-
-		SaveString( _json, "path", ( model->mesh != nullptr ? model->mesh->GetPath() : "" ));
+		SaveString( _json, "path", ( m_mesh->mesh != nullptr ? m_mesh->mesh->GetPath() : "" ));
 		Component::Save( _json );
 		
 		return true;
@@ -123,7 +129,5 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	ecsModel*		Model::GetEcsModel() const		{ return	m_gameobject->GetEcsComponent<ecsModel>(); }
-	ecsConvexHull * Model::GetEcsConvexHull() const { return	m_gameobject->GetEcsComponent<ecsConvexHull>(); }
-	ConvexHull&		Model::GetConvexHull() const	{ return	GetEcsConvexHull()->convexHull; }
+	ConvexHull&		Model::GetConvexHull() const	{ return	m_convexHull->convexHull; }
 }

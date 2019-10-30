@@ -36,9 +36,9 @@ namespace fan
 		bool Save( Json & _json ) const override;
 		void OnAttach() override;
 		void OnDetach() override;
-		ecsMaterial* GetEcsMaterial() const;
-	private:
 
+	private:
+		ecsMaterial * const m_material = nullptr;
 
 		// Editor
 		std::fs::path m_pathBuffer;

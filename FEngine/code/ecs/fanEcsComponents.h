@@ -78,7 +78,7 @@ namespace fan {
 	};
 
 	//================================
-	struct ecsModel : ecsIComponent {
+	struct ecsMesh : ecsIComponent {
 		static const char * s_name;
 		void Init() { 
 			mesh = nullptr; 
@@ -228,7 +228,7 @@ namespace fan {
 		, ecsParticle
 		, ecsScaling
 		, ecsAABB
-		, ecsModel
+		, ecsMesh
 		, ecsPointLight
 		, ecsDirLight
 		, ecsMaterial

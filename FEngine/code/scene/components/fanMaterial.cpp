@@ -21,7 +21,11 @@ namespace fan
 	//================================================================================================================================
 	void Material::OnAttach() {
 		Component::OnAttach();
-		m_gameobject->AddEcsComponent<ecsMaterial>()->Init();
+
+		ecsMaterial ** tmpMat = &const_cast<ecsMaterial*>( m_material );
+		*tmpMat = m_gameobject->AddEcsComponent<ecsMaterial>();
+		m_material->Init();
+
 		onMaterialAttach.Emmit(this);
 	}
 
@@ -36,44 +40,42 @@ namespace fan
 	//================================================================================================================================
 	//================================================================================================================================
 	void Material::SetTexture(Texture * const _texture) {
-		GetEcsMaterial()->texture = _texture;
+		m_material->texture = _texture;
 		m_gameobject->AddFlag( Gameobject::Flag::OUTDATED_MATERIAL );
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
 	void Material::SetShininess(const uint32_t _shininess) {
-		GetEcsMaterial()->shininess = _shininess;
+		m_material->shininess = _shininess;
 		m_gameobject->AddFlag( Gameobject::Flag::OUTDATED_MATERIAL );
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
 	void Material::SetColor( const Color _color ) {
-		GetEcsMaterial()->color = _color;
+		m_material->color = _color;
 		m_gameobject->AddFlag( Gameobject::Flag::OUTDATED_MATERIAL );
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	Texture *		Material::GetTexture()			{ return GetEcsMaterial()->texture; }
-	const Texture *	Material::GetTexture() const	{ return GetEcsMaterial()->texture; }
-	const uint32_t	Material::GetShininess() const	{ return GetEcsMaterial()->shininess; }
-	Color			Material::GetColor() const		{ return GetEcsMaterial()->color; }
+	Texture *		Material::GetTexture()			{ return m_material->texture; }
+	const Texture *	Material::GetTexture() const	{ return m_material->texture; }
+	const uint32_t	Material::GetShininess() const	{ return m_material->shininess; }
+	Color			Material::GetColor() const		{ return m_material->color; }
 
 	//================================================================================================================================
 	//================================================================================================================================
 	void Material::OnGui() {
 		Component::OnGui();
 
-		ecsMaterial * material = GetEcsMaterial();
-
 		// Filter color
 		if ( ImGui::Button( "##color" ) ) { SetColor( Color::White ); } ImGui::SameLine();
-		if ( ImGui::ColorEdit4( "color", material->color.Data(), gui::colorEditFlags ) ) { m_gameobject->AddFlag( Gameobject::Flag::OUTDATED_MATERIAL ); }
+		if ( ImGui::ColorEdit4( "color", m_material->color.Data(), gui::colorEditFlags ) ) { m_gameobject->AddFlag( Gameobject::Flag::OUTDATED_MATERIAL ); }
 
 		if ( ImGui::Button( "##shininess" ) ) { SetShininess( 1 ); } ImGui::SameLine();
-		if( ImGui::DragInt("shininess", (int*)&material->shininess, 1, 1, 256 )) { m_gameobject->AddFlag( Gameobject::Flag::OUTDATED_MATERIAL ); }
+		if( ImGui::DragInt("shininess", (int*)&m_material->shininess, 1, 1, 256 )) { m_gameobject->AddFlag( Gameobject::Flag::OUTDATED_MATERIAL ); }
 		ImGui::SameLine(); gui ::ShowHelpMarker("sharpness of the specular reflection");
 
 		bool openSetPathPopup = false;
@@ -109,10 +111,8 @@ namespace fan
 	//================================================================================================================================
 	//================================================================================================================================
 	bool Material::Load( Json & _json ) {
-		ecsMaterial * material = GetEcsMaterial();		
-
-		LoadUInt  ( _json, "shininess", material->shininess );
-		LoadColor ( _json, "color", material->color );
+		LoadUInt  ( _json, "shininess", m_material->shininess );
+		LoadColor ( _json, "color", m_material->color );
 		std::string tmpPath;
 		if ( LoadString( _json, "material", tmpPath ) && tmpPath != std::string( "void" ) ) {
 			onMaterialSetPath.Emmit( this, tmpPath );
@@ -123,17 +123,12 @@ namespace fan
 	//================================================================================================================================
 	//================================================================================================================================
 	bool Material::Save( Json & _json ) const {
-		ecsMaterial * material = GetEcsMaterial();
 
-		SaveString( _json, "material", ( material->texture != nullptr ? material->texture->GetPath() : "void" ) );
-		SaveUInt  ( _json, "shininess", material->shininess );
-		SaveColor ( _json, "color", material->color );
+		SaveString( _json, "material", ( m_material->texture != nullptr ? m_material->texture->GetPath() : "void" ) );
+		SaveUInt  ( _json, "shininess", m_material->shininess );
+		SaveColor ( _json, "color", m_material->color );
 		Component::Save( _json );		
 
 		return true;
 	}
-
-	//================================================================================================================================
-	//================================================================================================================================
-	ecsMaterial* Material::GetEcsMaterial() const { return m_gameobject->GetEcsComponent<ecsMaterial>(); }
 }
