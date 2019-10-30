@@ -56,29 +56,6 @@ namespace fan {
 		m_rigidbodies.erase( _rigidbody );
 		m_dynamicsWorld->removeRigidBody( _rigidbody->GetBtBody() );
 	}
-
-	//================================================================================================================================
-	//================================================================================================================================	
-	void PhysicsManager::Clear() {
-		Debug::Warning( "clear physics" );
-		for (int  bodyIndex = m_dynamicsWorld->getNumCollisionObjects() - 1; bodyIndex >= 0; bodyIndex-- ) {
-			btCollisionObject* obj = m_dynamicsWorld->getCollisionObjectArray()[bodyIndex];
-			m_dynamicsWorld->removeCollisionObject( obj );
-		}
-	}
-	//================================================================================================================================
-	// Clears the world and add the refreshed rigidbodies
-	// Happens when too much rigidbodies are created in the ecs and their container is resized
-	//================================================================================================================================	
-	void PhysicsManager::Refresh() {
-		Debug::Warning("refresh physics");
-		std::set<Rigidbody*> copySet( m_registeredRigidbodies );
-		for ( Rigidbody * rb : copySet ){
-			rb->Refresh();
-			m_dynamicsWorld->addRigidBody( rb->GetBtBody() );
-		}
-	}
-
 	//================================================================================================================================
 	//================================================================================================================================	
 	PhysicsManager::~PhysicsManager() {
@@ -92,13 +69,9 @@ namespace fan {
 	//================================================================================================================================
 	//================================================================================================================================	
 	void PhysicsManager::OnGui() {
-		ImGui::Begin( "Physics" ); {			
-			ImGui::Text( std::to_string( m_dynamicsWorld->getNumCollisionObjects() ).c_str() );
-			if ( ImGui::Button( "clear" ) ) {
-				Clear();
-			}
-
-		} ImGui::End();
+// 		ImGui::Begin( "Physics" ); {			
+// 			ImGui::Text( std::to_string( m_dynamicsWorld->getNumCollisionObjects() ).c_str() );
+// 		} ImGui::End();
 	}
 
 }

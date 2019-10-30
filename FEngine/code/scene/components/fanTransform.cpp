@@ -16,8 +16,13 @@ namespace fan
 	void Transform::OnAttach() {
  		Component::OnAttach();
 
-		m_gameobject->AddEcsComponent<ecsTranform>()->Init();
-		m_gameobject->AddEcsComponent<ecsScaling>()->Init();
+		ecsTranform** transform = &const_cast<ecsTranform*>( m_transform );
+		*transform = m_gameobject->AddEcsComponent<ecsTranform>();
+		m_transform->Init();
+
+		ecsScaling ** scaling = &const_cast<ecsScaling*>( m_scale );
+		*scaling = m_gameobject->AddEcsComponent<ecsScaling>();
+		m_scale->Init();
  
  		SetRemovable(false);
 	}
@@ -34,10 +39,10 @@ namespace fan
 	//================================================================================================================================
 	// Getters
 	//================================================================================================================================
-	btTransform	Transform::GetBtTransform() const	{ return btTransform(GetEcsTransform()->transform); }
-	btVector3 Transform::GetPosition() const		{ return GetEcsTransform()->transform.getOrigin(); }
-	btVector3 Transform::GetScale() const			{ return GetEcsScale()->scale; }
-	btQuaternion Transform::GetRotationQuat() const { return GetEcsTransform()->transform.getRotation(); }
+	btTransform	Transform::GetBtTransform() const	{ return btTransform(m_transform->transform); }
+	btVector3 Transform::GetPosition() const		{ return m_transform->transform.getOrigin(); }
+	btVector3 Transform::GetScale() const			{ return m_scale->scale; }
+	btQuaternion Transform::GetRotationQuat() const { return m_transform->transform.getRotation(); }
 	glm::mat4 Transform::GetNormalMatrix() const	{ return glm::transpose( glm::inverse( GetModelMatrix() ) ); }
 	btVector3 Transform::Left() const				{ return btTransform( GetRotationQuat(), btVector3( 0, 0, 0 ) ) * btVector3::Left(); }
 	btVector3 Transform::Forward() const			{ return btTransform( GetRotationQuat() ) * btVector3::Forward(); }
@@ -46,24 +51,22 @@ namespace fan
 	//================================================================================================================================
 	//================================================================================================================================
 	void Transform::LookAt( const btVector3& _target, const btVector3& _up ) {
-		btTransform& transform = GetEcsTransform()->transform;
 
-		btVector3 forward = _target - transform.getOrigin();
+		btVector3 forward = _target - m_transform->transform.getOrigin();
 		forward.normalize();
 		btVector3 left = _up.cross( forward );
 		left.normalize();
 
-		transform.setBasis( btMatrix3x3 (	left[0], _up[0], forward[0],
-											left[1], _up[1], forward[1],
-											left[2], _up[2], forward[2] ) );
+		m_transform->transform.setBasis( btMatrix3x3 (	left[0], _up[0], forward[0],
+														left[1], _up[1], forward[1],
+														left[2], _up[2], forward[2] ) );
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
 	void Transform::SetPosition(btVector3 _newPosition) {
-		btTransform& transform = GetEcsTransform()->transform;
-		if (transform.getOrigin() != _newPosition) {
-			transform.setOrigin( _newPosition);
+		if ( m_transform->transform.getOrigin() != _newPosition) {
+			m_transform->transform.setOrigin( _newPosition);
 			m_gameobject->AddFlag( Gameobject::Flag::OUTDATED_TRANSFORM );
  		}
 	}
@@ -71,9 +74,8 @@ namespace fan
 	//================================================================================================================================
 	//================================================================================================================================
 	void Transform::SetScale(btVector3 _newScale) {
-		ecsScaling* ecsScale = GetEcsScale();
-		if (ecsScale->scale != _newScale) {
-			ecsScale->scale = _newScale;
+		if (m_scale->scale != _newScale) {
+			m_scale->scale = _newScale;
 			m_gameobject->AddFlag( Gameobject::Flag::OUTDATED_TRANSFORM );
 		}
 	}
@@ -89,18 +91,16 @@ namespace fan
 	//================================================================================================================================
 	//================================================================================================================================
 	btVector3 Transform::GetRotationEuler() const {
-		btTransform& transform = GetEcsTransform()->transform;
 		btVector3 euler;
-		transform.getRotation().getEulerZYX(euler[2], euler[1], euler[0]);
+		m_transform->transform.getRotation().getEulerZYX(euler[2], euler[1], euler[0]);
 		return btDegrees3(euler);
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
 	void Transform::SetRotationQuat(const btQuaternion _rotation) {
-		btTransform& transform = GetEcsTransform()->transform;
-		if (transform.getRotation() != _rotation) {
-			transform.setRotation( _rotation);
+		if ( m_transform->transform.getRotation() != _rotation) {
+			m_transform->transform.setRotation( _rotation);
 			m_gameobject->AddFlag( Gameobject::Flag::OUTDATED_TRANSFORM );
 		}
 	}
@@ -108,12 +108,9 @@ namespace fan
 	//================================================================================================================================
 	//================================================================================================================================
 	glm::mat4 Transform::GetModelMatrix() const {
-		btTransform& transform = GetEcsTransform()->transform;
-		btVector3& btScale = GetEcsScale()->scale;
-
-		glm::vec3 position =	ToGLM(transform.getOrigin());
-		glm::vec3 scale =		ToGLM(btScale);
-		glm::quat rotation =	ToGLM( transform.getRotation());
+		glm::vec3 position =	ToGLM( m_transform->transform.getOrigin());
+		glm::vec3 scale =		ToGLM( m_scale->scale );
+		glm::quat rotation =	ToGLM( m_transform->transform.getRotation());
 
 		return glm::translate(glm::mat4(1.f), position) * glm::mat4_cast(rotation) * glm::scale(glm::mat4(1.f), scale);
 	}
@@ -121,17 +118,15 @@ namespace fan
 	//================================================================================================================================
 	//================================================================================================================================
 	btVector3 Transform::TransformPoint(const btVector3 _point) const {
-		ecsScaling* scaling = GetEcsScale();
 		const btTransform transform = GetBtTransform();
-		btVector3 transformedPoint = transform * ( scaling->scale * _point);
+		btVector3 transformedPoint = transform * ( m_scale->scale * _point);
 		return transformedPoint;
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
 	btVector3 Transform::InverseTransformPoint(const btVector3 _point) const {
-		ecsScaling* scaling = GetEcsScale();
-		const btVector3 invertScale(1.f / scaling->scale[0], 1.f / scaling->scale[1], 1.f / scaling->scale[2]);
+		const btVector3 invertScale(1.f / m_scale->scale[0], 1.f / m_scale->scale[1], 1.f / m_scale->scale[2]);
 		const btTransform transform = GetBtTransform();
 		btVector3 transformedPoint = invertScale * (transform.inverse()*_point);
 		return transformedPoint;
@@ -150,8 +145,7 @@ namespace fan
 	// No translation applied
 	//================================================================================================================================
 	btVector3 Transform::InverseTransformDirection(const btVector3 _point) const {
-		ecsScaling * scaling = GetEcsScale();
-		const btVector3 invertScale(1.f / scaling->scale[0], 1.f / scaling->scale[1], 1.f / scaling->scale[2]);
+		const btVector3 invertScale(1.f / m_scale->scale[0], 1.f / m_scale->scale[1], 1.f / m_scale->scale[2]);
 		const btTransform transform( GetRotationQuat() );
 		btVector3 transformedPoint = invertScale * (transform.inverse()*_point);
 		return transformedPoint;
@@ -194,18 +188,15 @@ namespace fan
 	//================================================================================================================================
 	//================================================================================================================================
 	bool Transform::Load( Json & _json ) {
-		btTransform& transform = GetEcsTransform()->transform;
-		btVector3& scale = GetEcsScale()->scale;
-
 		btVector3 tmpVec;
 		btQuaternion tmpQuat;
 
 		LoadVec3( _json, "position", tmpVec );
 		LoadQuat( _json, "rotation", tmpQuat );
-		LoadVec3( _json, "scale", scale );
+		LoadVec3( _json, "scale", m_scale->scale );
 
-		transform.setOrigin( tmpVec );
-		transform.setRotation( tmpQuat );
+		m_transform->transform.setOrigin( tmpVec );
+		m_transform->transform.setRotation( tmpQuat );
 
 		return true;
 	}
@@ -213,23 +204,14 @@ namespace fan
 	//================================================================================================================================
 	//================================================================================================================================
 	bool Transform::Save( Json & _json ) const {
-		btTransform& transform = GetEcsTransform()->transform;
-		btVector3& scale = GetEcsScale()->scale;
 
-		SaveVec3( _json, "position", transform.getOrigin() );
-		SaveQuat( _json, "rotation", transform.getRotation() );
-		SaveVec3( _json, "scale", scale );
+		SaveVec3( _json, "position", m_transform->transform.getOrigin() );
+		SaveQuat( _json, "rotation", m_transform->transform.getRotation() );
+		SaveVec3( _json, "scale", m_scale->scale );
 
 
 		Component::Save( _json );
 				
 		return true;
-	}
-
-
-	//================================================================================================================================
-	//================================================================================================================================
-	ecsTranform* Transform::GetEcsTransform() const { return m_gameobject->GetEcsComponent<ecsTranform>(); }
-	ecsScaling*  Transform::GetEcsScale() const		{ return m_gameobject->GetEcsComponent<ecsScaling>();  }
-	
+	}	
 }

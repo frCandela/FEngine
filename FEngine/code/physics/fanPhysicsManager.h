@@ -18,8 +18,6 @@ namespace fan {
 		void UnRegisterRigidbody( Rigidbody * _rigidbody );
 		void AddRigidbody( Rigidbody * _rigidbody );
 		void RemoveRigidbody( Rigidbody * _rigidbody );		
-		void Clear();
-		void Refresh();
 
 	private:
 		std::set<Rigidbody*> m_rigidbodies;

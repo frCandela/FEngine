@@ -46,7 +46,8 @@ namespace fan
 		void OnDetach() override;
 
 	private:
-		ecsTranform*	GetEcsTransform() const;
-		ecsScaling*		GetEcsScale() const;
+		// ecs pointers are const to prevent user from accidentally breaking them
+		ecsTranform * const m_transform = nullptr;
+		ecsScaling *  const m_scale = nullptr;
 	};
 }
