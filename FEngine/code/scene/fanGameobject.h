@@ -59,9 +59,9 @@ namespace fan
 		bool Load( Json & _json ) override;
 
 		// Flags
-		bool		HasFlag(const Flag _flag) const { return GetEcsFlags() & _flag; }
-		void		AddFlag( const Flag _flag )		{ GetEcsFlags() |= _flag; }
-		void		SetFlags(const uint32_t _flags) { GetEcsFlags() = _flags; }
+		bool		HasFlag(const Flag _flag) const { return m_flags->flags & _flag; }
+		void		AddFlag( const Flag _flag )		{ m_flags->flags |= _flag; }
+		void		SetFlags(const uint32_t _flags) { m_flags->flags = _flags; }
 
 	private:
 		std::string				 m_name;
@@ -73,7 +73,9 @@ namespace fan
 		ecsHandle				 m_ecsHandleEntity = ecsNullHandle;
 
 		void		AddComponent(Component * _component);
-		uint32_t&	GetEcsFlags() const;
+
+		ecsFlags * const m_flags = nullptr;
+		ecsAABB *  const m_aabb= nullptr;
 	};
 
 

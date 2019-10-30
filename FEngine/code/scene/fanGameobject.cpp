@@ -27,10 +27,18 @@ namespace fan
 
 		ecsEntity entity = m_scene->GetEcsManager()->CreateEntity();
 		m_ecsHandleEntity = m_scene->GetEcsManager()->CreateHandle( entity );
-		AddEcsComponent<ecsAABB>()->Init();
-		ecsFlags * flags = AddEcsComponent<ecsFlags>();
-		flags->Init();
-		flags->flags = Flag::OUTDATED_TRANSFORM;
+
+
+		ecsAABB ** tmpAABB = &const_cast<ecsAABB*>( m_aabb );
+		*tmpAABB = AddEcsComponent<ecsAABB>();
+		m_aabb->Init();
+
+		ecsFlags ** tmpFlags = &const_cast<ecsFlags*>( m_flags );
+		*tmpFlags = AddEcsComponent<ecsFlags>();
+		m_flags->Init();
+
+		m_flags->Init();
+		m_flags->flags = Flag::OUTDATED_TRANSFORM;
 		m_transform = AddComponent<Transform>();
 	}
 
@@ -189,12 +197,6 @@ namespace fan
 			return;
 		}
 		_parent->AddChild(this);
-	} 
-
-	//================================================================================================================================
-	//================================================================================================================================
-	uint32_t&	Gameobject::GetEcsFlags() const {
-		return GetEcsComponent<ecsFlags>()->flags;
 	}
 
 	//================================================================================================================================
@@ -229,7 +231,7 @@ namespace fan
 	bool Gameobject::Load( Json & _json ) {
 
 		LoadString( _json, "name", m_name );
-		LoadUInt( _json, "flags", GetEcsFlags() );
+		LoadUInt( _json, "flags", m_flags->flags );
 
 		Json& jComponents = _json["components"]; {
 			for ( int childIndex = 0; childIndex < jComponents.size(); childIndex++ ) {
@@ -265,7 +267,7 @@ namespace fan
 	//================================================================================================================================
 	bool Gameobject::Save( Json & _json ) const {
 		SaveString( _json, "name", m_name );
-		SaveUInt( _json, "flags", GetEcsFlags() );
+		SaveUInt( _json, "flags", m_flags->flags );
 
 		Json& jComponents = _json["components"];{
 			for ( int componentIndex = 0; componentIndex < m_components.size(); componentIndex++ ) {

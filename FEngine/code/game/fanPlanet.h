@@ -27,6 +27,6 @@ namespace fan {
 
 	private:
 
-		ecsPlanet* Planet::GetEcsPlanet() const;
+		ecsPlanet* const m_planet = nullptr;
 	};
 }
