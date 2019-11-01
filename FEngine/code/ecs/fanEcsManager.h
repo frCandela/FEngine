@@ -45,7 +45,7 @@ namespace fan {
 		ecsEntity m_activeEntitiesCount = 0;
 		
 		void	SwapHandlesEntities( const ecsEntity _entity1, const ecsEntity _entity2 );
-		void	RecycleComponent( const uint32_t _componentID, const uint16_t _chunckIndex, const uint16_t _elementIndex );
+		void	RecycleComponent( const uint32_t _componentID, const ecsComponentIndex& _componentIndex );
 		void	SortEntities();
 		void	RemoveDeadComponentsAndTags();
 		void	RemoveDeadEntities();
@@ -65,7 +65,7 @@ namespace fan {
 
 		assert( entityKey.bitset[componentID] == 0 ); // entity already has _componentType
 
-		_componentType & component =  m_components.Alloc<_componentType>( entityKey.chunck[componentID], entityKey.element[componentID] );
+		_componentType & component =  m_components.Alloc<_componentType>( entityKey.index[componentID] );
 
 		// Init the component
 		entityKey.bitset    [ componentID ] = 1;

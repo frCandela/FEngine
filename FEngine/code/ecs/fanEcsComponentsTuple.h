@@ -11,7 +11,7 @@ namespace fan {
 	struct Chunck
 	{
 		//================================================================
-		_type * Alloc( uint16_t& _outIndex )
+		_type * Alloc( ecsComponentIndex::chunckType& _outIndex )
 		{
 			if ( m_count < m_data.size() )
 			{
@@ -29,22 +29,22 @@ namespace fan {
 		}
 
 		//================================================================
-		void Delete( const uint16_t _index )
+		void Delete( const ecsComponentIndex::chunckType _index )
 		{
 			assert( _index < m_count && _index < 256 );
 			m_recycleList[m_countRecycleList++] = (uint8_t)_index;
 		}
 
 		//================================================================
-		inline _type& operator[] ( const uint16_t& _index ) { return m_data[_index]; }
-		inline uint16_t Count() const { return m_count - m_countRecycleList; }
-		inline uint16_t RecycleCount() const { return m_countRecycleList; }
+		inline _type& operator[] ( const ecsComponentIndex::chunckType& _index ) { return m_data[_index]; }
+		inline ecsComponentIndex::chunckType Count() const { return m_count - m_countRecycleList; }
+		inline ecsComponentIndex::chunckType RecycleCount() const { return m_countRecycleList; }
 
 	private:
 		std::array< _type, 256 >	m_data;					// Components data
-		std::array< uint8_t, 256>	m_recycleList;			// Unused components
-		uint16_t					m_count = 0;			// Number of components
-		uint16_t					m_countRecycleList = 0;	// Number of components
+		std::array< ecsComponentIndex::chunckType, 256>	m_recycleList;			// Unused components
+		ecsComponentIndex::chunckType						m_count = 0;			// Number of components
+		ecsComponentIndex::chunckType						m_countRecycleList = 0;	// Number of components
 	};
 
 	//================================================================================================================================
@@ -56,19 +56,19 @@ namespace fan {
 		static constexpr size_t index = IndexOfComponent<_type>::value;
 
 		//================================================================
-		inline _type& operator[] ( const ecsComponentsKey& _entityData ) {	return Get( _entityData.chunck[index], _entityData.element[index] ); }
-		inline _type& Get ( const uint16_t _chunckIndex, const uint16_t _elementIndex )	{ return (*m_chunks[_chunckIndex])[_elementIndex];	}
+		inline _type& operator[] ( const ecsComponentsKey& _entityData ) {	return Get( _entityData.index[index] ); }
+		inline _type& Get ( const ecsComponentIndex& _componentIndex )	{ return (*m_chunks[_componentIndex.chunckIndex])[_componentIndex.componentIndex];	}
 		inline const std::vector< Chunck<_type> * >& GetChuncks() const { return m_chunks; }
 
 		//================================================================
-		_type& Alloc( uint16_t& _outChunckIndex, uint16_t& _outElementIndex ) 
+		_type& Alloc( ecsComponentIndex& _outecsComponentIndex )
 		{
 			_type * newElement = nullptr;
 			 
 			// Find a space in existing chunks
-			for ( _outChunckIndex = 0; _outChunckIndex < m_chunks.size() ; _outChunckIndex++)	
+			for ( _outecsComponentIndex.chunckIndex = 0; _outecsComponentIndex.chunckIndex < m_chunks.size() ; _outecsComponentIndex.chunckIndex++)
 			{
-				newElement = m_chunks[ _outChunckIndex ]->Alloc( _outElementIndex );
+				newElement = m_chunks[ _outecsComponentIndex.chunckIndex ]->Alloc( _outecsComponentIndex.componentIndex );
 				if ( newElement != nullptr ) 
 				{
 					return *newElement;
@@ -78,15 +78,15 @@ namespace fan {
 			// Alloc a new chunck
 			Chunck<_type> * chunck = new Chunck<_type>();
 			m_chunks.push_back( chunck );
-			assert( _outChunckIndex == m_chunks.size() - 1 ); // index should be correct because of the previous loop
-			return *chunck->Alloc(_outElementIndex);
+			assert( _outecsComponentIndex.chunckIndex == m_chunks.size() - 1 ); // index should be correct because of the previous loop
+			return *chunck->Alloc( _outecsComponentIndex.componentIndex );
 		}
 
 		//================================================================
-		void Delete( const uint16_t _chunckIndex, const uint16_t _elementIndex )
+		void Delete( const ecsComponentIndex& _componentIndex )
 		{
-			assert( _chunckIndex < m_chunks.size() );
-			m_chunks[_chunckIndex]->Delete( _elementIndex );
+			assert( _componentIndex.chunckIndex < m_chunks.size() );
+			m_chunks[_componentIndex.chunckIndex]->Delete( _componentIndex.componentIndex );
 		}
 
 	private:
@@ -137,10 +137,10 @@ namespace fan {
 
 			// Allocates a component
 			template < typename _type >
-			_type& Alloc( uint16_t& _outChunckIndex, uint16_t& _outElementIndex )
+			_type& Alloc( ecsComponentIndex& _outecsComponentIndex )
 			{
 				ComponentData< _type> & data = Get<_type>();
-				return data.Alloc(_outChunckIndex, _outElementIndex);
+				return data.Alloc( _outecsComponentIndex );
 			}
 
 			template < size_t _index >

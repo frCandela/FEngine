@@ -68,35 +68,35 @@ namespace fan
 	// O(1) if removing the last component	
 	//  ( n = ecsComponents::count )
 	//================================================================================================================================
-	void ecsComponentsKeyCompact::RemoveComponent( const uint32_t _removedComponentIndex )
+	void ecsComponentsKeyCompact::RemoveComponent( const uint32_t _removedecsComponentIndex )
 	{
 		assert( ! IsEmpty() );
-		const uint32_t lastComponentIndex = m_nextElement - 1;
-		const uint32_t removedElementIndex = GetIndex( _removedComponentIndex );
+		const uint32_t lastecsComponentIndex = m_nextElement - 1;
+		const uint32_t removedElementIndex = GetIndex( _removedecsComponentIndex );
 
 		assert( removedElementIndex != s_emptyKeyValue );
 
 		// Swap if component is not at the end
-		if ( removedElementIndex != lastComponentIndex )
+		if ( removedElementIndex != lastecsComponentIndex )
 		{
 			
 			// Finds the component index referencing the last component key
-			uint32_t swappedComponentIndex = 0;
+			uint32_t swappedecsComponentIndex = 0;
 			uint32_t swappedIndex = 0;
-			for ( swappedComponentIndex = 0; swappedComponentIndex < ecsComponents::count; ++ swappedComponentIndex) {
-				swappedIndex = GetIndex( swappedComponentIndex );
-				if ( swappedIndex == lastComponentIndex ){ break; }
+			for ( swappedecsComponentIndex = 0; swappedecsComponentIndex < ecsComponents::count; ++ swappedecsComponentIndex) {
+				swappedIndex = GetIndex( swappedecsComponentIndex );
+				if ( swappedIndex == lastecsComponentIndex ){ break; }
 			}
 
 			// Swap
 			chunck [removedElementIndex] =	chunck[swappedIndex];
 			element[removedElementIndex] =	element[swappedIndex];
-			SetIndex( swappedComponentIndex, removedElementIndex );			
+			SetIndex( swappedecsComponentIndex, removedElementIndex );			
 		} 
 
 		// Clear
 		-- m_nextElement;
-		SetIndex( _removedComponentIndex, s_emptyKeyValue );
+		SetIndex( _removedecsComponentIndex, s_emptyKeyValue );
 		chunck[m_nextElement] = 0;
 		element[m_nextElement] = 0;
 	}

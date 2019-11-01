@@ -4,20 +4,34 @@
 #include "core/meta/fanMetaMath.h"
 
 namespace fan {
+
 	//================================================================================================================================
 	//================================================================================================================================
-	struct ecsComponentsKey
+	struct ecsComponentIndex
+	{
+		using chunckType = uint16_t;
+		using componentType = uint16_t;
+
+		chunckType		chunckIndex;
+		componentType	componentIndex;
+	};
+
+	//================================================================================================================================
+	//================================================================================================================================
+	class ecsComponentsKey
 	{
 	public:
 		ecsComponentsKey() {	bitset[aliveBit] = 1; }
 
-		uint16_t	chunck[ecsComponents::count];	// chunck of each components
-		uint16_t	element[ecsComponents::count];	// index of each components
-		ecsBitset   bitset;							// signature
+		ecsComponentIndex	index[ecsComponents::count];// index of each components
+		ecsBitset		bitset;						// signature
 
 		void Kill() { bitset[aliveBit] = 0; }
 		bool IsAlive() const { return   bitset[aliveBit]; }
 		bool IsDead() const { return  ! bitset[aliveBit]; }
+
+	private:
+
 	};
 
 	//================================================================================================================================
@@ -26,7 +40,7 @@ namespace fan {
 	// Slower access time than the simple implementation 
 	// TODO measure average access time 
 	//================================================================================================================================
-	struct ecsComponentsKeyCompact
+	class ecsComponentsKeyCompact
 	{
 	public:		
 		static constexpr size_t s_indexWidth = 4;
@@ -41,7 +55,7 @@ namespace fan {
 
 
 		void AddComponent( const uint32_t _componentIndex, const uint16_t _chunckIndex, const uint16_t _elementIndex );
-		void RemoveComponent( const uint32_t _removedComponentIndex );
+		void RemoveComponent( const uint32_t _removedecsComponentIndex );
 		void Reset();
 
 		uint32_t Count() const   { return m_nextElement; }

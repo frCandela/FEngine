@@ -111,35 +111,35 @@ namespace fan {
 	private:
 		// General case
 		template< size_t _index >
-		static void RecycleImpl( ecsComponentsTuple< ecsComponents >& _components, const size_t _id, const uint16_t _chunckIndex, const uint16_t _elementIndex ) {
+		static void RecycleImpl( ecsComponentsTuple< ecsComponents >& _components, const size_t _id, const ecsComponentIndex& _componentIndex ) {
 			if ( _index == _id ) {
-				_components.Get<_index>().Delete( _chunckIndex, _elementIndex );
+				_components.Get<_index>().Delete( _componentIndex );
 			} else {
-				RecycleImpl< _index - 1>( _components, _id, _chunckIndex, _elementIndex );
+				RecycleImpl< _index - 1>( _components, _id, _componentIndex );
 			}
 		}
 
 		// Specialization 
 		template< >
-		static void RecycleImpl<0>( ecsComponentsTuple< ecsComponents >& _components, const size_t _id, const uint16_t _chunckIndex, const uint16_t _elementIndex ) {
+		static void RecycleImpl<0>( ecsComponentsTuple< ecsComponents >& _components, const size_t _id, const ecsComponentIndex& _componentIndex ) {
 			if ( _id == 0 ) {
-				_components.Get<0>().Delete( _chunckIndex, _elementIndex );
+				_components.Get<0>().Delete( _componentIndex );
 			} else {
 				assert( false ); // Out of range
 			}
 		}
 	public:
-		static void Recycle( ecsComponentsTuple< ecsComponents >& _components, const size_t _id, const uint16_t _chunckIndex, const uint16_t _elementIndex ) {
-			RecycleImpl< ecsComponents::count - 1 >( _components, _id, _chunckIndex, _elementIndex );
+		static void Recycle( ecsComponentsTuple< ecsComponents >& _components, const size_t _id, const ecsComponentIndex& _componentIndex ) {
+			RecycleImpl< ecsComponents::count - 1 >( _components, _id, _componentIndex );
 		}
 	};	   
 
 	//================================================================================================================================
 	// put _componentIndex in the recycleList of component _componentID
 	//================================================================================================================================
-	void EcsManager::RecycleComponent( const uint32_t _componentID, const uint16_t _chunckIndex, const uint16_t _elementIndex ) {
+	void EcsManager::RecycleComponent( const uint32_t _componentID, const ecsComponentIndex& _componentIndex ) {
 		assert( _componentID  < ecsComponents::count );
-		RecycleHelper::Recycle( m_components, _componentID, _chunckIndex, _elementIndex );
+		RecycleHelper::Recycle( m_components, _componentID, _componentIndex );
 	}
 
 	//================================================================================================================================
@@ -167,7 +167,7 @@ namespace fan {
 			// Remove the component
 			for (int componentID = 0; componentID < ecsComponents::count ; componentID++) {
 				if( key.bitset[componentID]) {
-					RecycleComponent( componentID, key.chunck[componentID], key.element[componentID] );
+					RecycleComponent( componentID, key.index[componentID] );
 				}
 			}
 			m_entitiesKeys.pop_back();
@@ -186,7 +186,7 @@ namespace fan {
 			if( m_entitiesKeys[entity].bitset[componentIndex] == 1 ) {
 				m_entitiesKeys[entity].bitset[componentIndex] = 0;
 				ecsComponentsKey& key = m_entitiesKeys[entity];
-				RecycleComponent( componentIndex, key.chunck[componentIndex], key.element[componentIndex] );
+				RecycleComponent( componentIndex, key.index[componentIndex] );
 			} else {
 				Debug::Get() << Debug::Severity::warning << "Remove component failed : Entity "<< entity << " has no component " << componentIndex << Debug::Endl();
 			}
