@@ -77,6 +77,15 @@ namespace fan {
 	//================================================================================================================================
 	#define RUN_SYSTEM( _system ) RunSystem< _system::signature::componentsTypes, _system >::Run( _delta, m_activeEntitiesCount, m_entitiesKeys, m_components );
 	void EcsManager::Update( const float _delta, const btVector3& _cameraPosition ) {
+
+
+		ImGui::Begin( "ecs_internal" );
+		{
+			int val = (int)m_entitiesKeys.size();
+			ImGui::DragInt("val",&val );
+		}ImGui::End();
+
+
 		SCOPED_PROFILE( ecs_update )
 
 		ecsParticleSystem::s_cameraPosition = _cameraPosition;

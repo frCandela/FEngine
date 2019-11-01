@@ -283,84 +283,8 @@ namespace fan {
 			}
 		}
 
-		if ( ImGui::Begin( "little test space " ) )
-		{
-			static ecsComponentsKeyCompact key;
-
-			if ( ImGui::Button( "reset" ) )	{	
-				key.Reset();
-			}
-
-			static int elemIndex = 0; static int chunckIndex = 0; static int componentIndex = 0;
-			ImGui::DragInt( "componentIndex", &componentIndex, 1, 0, ecsComponents::count-1 );
-			ImGui::DragInt( "elemIndex", &elemIndex ); 
-			ImGui::DragInt( "chunckIndex", &chunckIndex ); 
-			if ( ImGui::Button( "Add" ) )
-			{
-				key.AddComponent( (uint32_t)componentIndex, (uint16_t)chunckIndex, (uint16_t)elemIndex );
-			}
-			if ( ImGui::Button( "Remove" ) )
-			{
-				key.RemoveComponent( (uint32_t)componentIndex );
-			}
-
-
-
-			ImGui::Separator();
-
-			int tmpNext = key.m_nextElement;
-			ImGui::DragInt("lastElement", &tmpNext );
-
-			// KEY
-			{
-				std::stringstream ss;
-				for ( int bitIndex = int( key.m_componentsKeys.size() ) - 1; bitIndex >= 0; --bitIndex )
-				{
-					ss << key.m_componentsKeys[bitIndex];
-					if ( bitIndex % 3 == 0 )
-					{
-						ss << " ";
-					}
-				}
-				ImGui::Text( ss.str().c_str() );
-			}
-
-			// clear mask
-			{
-				ecsComponentsKeyCompact::indicesBitset clearMask = ~( ecsComponentsKeyCompact::indicesBitset( ecsComponentsKeyCompact::s_emptyKeyValue ) << ( componentIndex * ecsComponentsKeyCompact::s_indexWidth ) );
-				std::stringstream ss;
-				for ( int bitIndex = int( key.m_componentsKeys.size() ) - 1; bitIndex >= 0; --bitIndex )
-				{
-					ss << clearMask[bitIndex];
-					if ( bitIndex % 3 == 0 )
-					{
-						ss << " ";
-					}
-				}
-				ss << "clear mask";
-				ImGui::Text( ss.str().c_str() );
-			}
-
-			// Key base 10
-			{
-				std::stringstream ss;
-				for ( int i = ecsComponents::count - 1; i >= 0 ; --i )
-				{
-					ss << " " << key.GetIndex(i) << "  ";
-				}
-				ImGui::Text( ss.str().c_str() );
-			}
-
-			// ELEMENTS
-			{std::stringstream ss;
-			for ( int i = 0; i < ecsComponentsKeyCompact::s_maxComponentsPerEntity ; ++i )
-			{
-				ss << key.chunck[i] << "-" << key.element[i] << "  ";
-			}
-			ImGui::Text( ss.str().c_str() );}
-		}
-		ImGui::End();
-
+		static ecsComponentsKeyCompact key;
+		key.OnGui();
 	}
 
 	//================================================================================================================================

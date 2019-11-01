@@ -39,17 +39,18 @@ namespace fan {
 	};
 
 	//================================================================================================================================
-
 	//================================================================================================================================
-	class ecsComponentsKey : public ecsComponentsKeyCommon
+	class ecsComponentsKeyFast : public ecsComponentsKeyCommon
 	{
 	public:
  		const ecsComponentIndex& GetIndex( const uint32_t _componentID ) const { return m_indices[_componentID]; }
+		
 		void AddComponent( const uint32_t _componentID, const ecsComponentIndex& _index ){
 			assert( m_bitset[_componentID] == 0 ); // entity already has _componentType
 			m_indices[_componentID] = _index; 
 			m_bitset[_componentID] = 1;
 		}
+
 		ecsComponentIndex RemoveComponent( const uint32_t _componentID ) { 
 			m_bitset[_componentID] = 0;
 			return m_indices[_componentID]; 
@@ -67,35 +68,36 @@ namespace fan {
 	//================================================================================================================================
 	class ecsComponentsKeyCompact : public ecsComponentsKeyCommon
 	{
-	public:		
-		ecsComponentsKeyCompact();
-
+	public:
 		static constexpr size_t s_indexWidth = 4;
 		static constexpr size_t s_maxComponentsPerEntity = S_Pow( 2, s_indexWidth ) - 1;
 		static constexpr size_t s_emptyKeyValue = ( 1 << s_indexWidth ) - 1;
-		
-		uint16_t	chunck [s_maxComponentsPerEntity];	// chunck of each component
-		uint16_t	element[s_maxComponentsPerEntity];	// index of each component
-
-		void AddComponent( const uint32_t _componentIndex, const uint16_t _chunckIndex, const uint16_t _elementIndex );
-		void RemoveComponent( const uint32_t _removedecsComponentIndex );
-		void Reset();
-
-		uint32_t Count() const   { return m_nextElement; }
-		uint32_t IsEmpty() const { return m_nextElement == 0; }
-
-	//private:
 		using indicesBitset = Bitset2::bitset2< s_indexWidth * ecsComponents::count >;
 
-		indicesBitset m_componentsKeys;		// Index of the components in the element&chunck arrays
-		uint32_t	  m_nextElement = 0;	// Next available element in the element&chunck arrays
 
-		uint32_t GetIndex( const uint32_t _componentIndex ) const;
-		void	 SetIndex( const uint32_t _componentIndex, const uint32_t _value );
+		ecsComponentsKeyCompact();
 
+		const ecsComponentIndex&	GetIndex( const uint32_t _componentID ) const { return m_indices[GetSubIndex( _componentID )]; }
+		void						AddComponent( const uint32_t _componentID, const ecsComponentIndex& _index );
+		ecsComponentIndex			RemoveComponent( const uint32_t _componentID );
+
+		void OnGui();
+	private:
+		ecsComponentIndex	m_indices[s_maxComponentsPerEntity];	
+		indicesBitset		m_componentsKeys;						// Index of the components in the element&chunck arrays
+		uint32_t			m_nextElement = 0;						// Next available element in the element&chunck arrays
+
+		uint32_t					GetSubIndex( const uint32_t _componentIndex ) const;
+		void						SetSubIndex( const uint32_t _componentIndex, const uint32_t _value );
+		void						Reset();
+		const ecsComponentIndex	*	Data() const { return m_indices; }		
+		uint32_t					Count() const { return m_nextElement; }
+		uint32_t					IsEmpty() const { return m_nextElement == 0; }
 	};
 
 
-	static constexpr size_t totosize = sizeof( ecsComponentsKey );
-	static constexpr size_t totosize2 = sizeof( ecsComponentsKeyCompact );
+
+	using ecsComponentsKey = ecsComponentsKeyCompact;//ecsComponentsKeyFast;
+	//static constexpr size_t totosize = sizeof( ecsComponentsKeyFast );
+	//static constexpr size_t totosize2 = sizeof( ecsComponentsKeyCompact );
 }
