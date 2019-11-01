@@ -26,10 +26,10 @@ namespace fan {
 		for ( int entity = 0; entity < _count; entity++ ) {
 			ecsComponentsKey & key = _entitiesData[entity];
 
-			if ( key.IsAlive() && ( key.bitset & ecsParticleSystem::signature::bitset ) == ecsParticleSystem::signature::bitset ) {
-				btVector3& position = _positions[key].position;
-				ecsMovement& movement = _movements[key];
-				ecsParticle& particle = _particles[key];
+			if ( key.IsAlive() && key.MatchSignature( signature::bitset ) ) {
+				btVector3& position = _positions.At(key).position;
+				ecsMovement& movement = _movements.At( key );
+				ecsParticle& particle = _particles.At( key );
 
 				(void)particle;
 
@@ -69,10 +69,10 @@ namespace fan {
 	{
 		for ( int entity = 0; entity < _count; entity++ ) {
 			ecsComponentsKey & key = _entitiesData[entity];
-			if ( key.IsAlive() && ( key.bitset & signature::bitset ) == signature::bitset ) {
-				btTransform& transform		= _transforms	[key].transform;
-				ecsPlanet& planet			= _planets		[key];
-				btTransform& parentTransform = _transforms	[_entitiesData[planet.parentEntity]].transform;
+			if ( key.IsAlive() &&  key.MatchSignature( signature::bitset ) ) {
+				btTransform& transform		= _transforms.At(key).transform;
+				ecsPlanet& planet			= _planets.At(key);
+				btTransform& parentTransform = _transforms.At(_entitiesData[planet.parentEntity]).transform;
 
 				float const time = -planet.speed * Time::ElapsedSinceStartup();
 				btVector3 position( std::cosf( time + planet.phase ), 0, std::sinf( time + planet.phase ) );
@@ -92,11 +92,11 @@ namespace fan {
 		for ( int entity = 0; entity < _count; entity++ ) {
 			ecsComponentsKey & key = _entitiesData[entity];
 
-			if ( key.IsAlive() && ( key.bitset & signature::bitset ) == signature::bitset )
+			if ( key.IsAlive() && key.MatchSignature( signature::bitset ) )
 			{
-				btTransform& transform =	_transforms		[key].transform;
-				ecsMotionState& motionState = _motionStates	[key];
-				ecsRigidbody& rigidbody = _rigidbodies		[key];
+				btTransform& transform =	_transforms.At(key).transform;
+				ecsMotionState& motionState = _motionStates.At(key);
+				ecsRigidbody& rigidbody = _rigidbodies.At(key);
 
 				rigidbody.Get().setWorldTransform( transform );
 				//motionState.Get().setWorldTransform( transform );
@@ -115,10 +115,10 @@ namespace fan {
 		for ( int entity = 0; entity < _count; entity++ ) {
 			ecsComponentsKey & key = _entitiesData[entity];
 
-			if ( key.IsAlive() && ( key.bitset & signature::bitset ) == signature::bitset ) {
-				btTransform& transform		= _transforms[key].transform;
-				ecsMotionState& motionState = _motionStates[key];
-				ecsRigidbody& rigidbody		= _rigidbodies[key];
+			if ( key.IsAlive() && key.MatchSignature( signature::bitset ) ) {
+				btTransform& transform		= _transforms.At(key).transform;
+				ecsMotionState& motionState = _motionStates.At(key);
+				ecsRigidbody& rigidbody		= _rigidbodies.At(key);
 
 				btMotionState * ms = rigidbody.Get().getMotionState();
 				ms->getWorldTransform( transform );
@@ -141,14 +141,14 @@ namespace fan {
 		usefullEntitiesKeys.reserve( _entitiesData.size() );
 		for ( int entity = 0; entity < _count; entity++ ) 
 		{
-			ecsComponentsKey & data = _entitiesData[entity];			
-			if ( data.IsAlive() && ( data.bitset & signature::bitset ) == signature::bitset ) 
+			ecsComponentsKey & key = _entitiesData[entity];			
+			if ( key.IsAlive() && key.MatchSignature( signature::bitset ) )
 			{
-				uint32_t&   flags = _flags[data].flags;
-				ConvexHull&	hull  = _hulls[data].convexHull;
+				uint32_t&   flags = _flags.At(key).flags;
+				ConvexHull&	hull  = _hulls.At(key).convexHull;
 				if( flags & ecsFlags::OUTDATED_TRANSFORM && ! hull.IsEmpty() ) 
 				{
-					usefullEntitiesKeys.push_back( &data );
+					usefullEntitiesKeys.push_back( &key );
 					flags &= ~ecsFlags::OUTDATED_TRANSFORM;
 				}
 			}
@@ -160,8 +160,8 @@ namespace fan {
 		for ( int dataIndex = 0; dataIndex < usefullEntitiesKeys.size(); dataIndex++ ) {
 			ecsComponentsKey & key = *usefullEntitiesKeys[dataIndex];
 
-			btTransform& transform  = _transforms[key].transform;
-			btVector3&	 btscale	= _scales[key].scale;
+			btTransform& transform  = _transforms.At(key).transform;
+			btVector3&	 btscale	= _scales.At(key).scale;
 
 			const glm::vec3 position	= ToGLM( transform.getOrigin() );
 			const glm::vec3 scale		= ToGLM( btscale );
@@ -176,8 +176,8 @@ namespace fan {
 		for ( int dataIndex = 0; dataIndex < usefullEntitiesKeys.size(); dataIndex++ ) {
 			ecsComponentsKey & key = *usefullEntitiesKeys[dataIndex];
 			glm::mat4&		modelMatrix = modelMatrices[dataIndex];
-			ConvexHull&		hull = _hulls[key].convexHull;
-			AABB&			aabb = _aabbs[key].aabb;
+			ConvexHull&		hull = _hulls.At(key).convexHull;
+			AABB&			aabb = _aabbs.At(key).aabb;
 			aabb = AABB( hull.GetVertices(), modelMatrix );
 		}	
 	}
@@ -194,9 +194,9 @@ namespace fan {
 		for ( int entity = 0; entity < _count; entity++ ) 
 		{
 			ecsComponentsKey & key = _entitiesData[entity];
-			if ( key.IsAlive() && ( key.bitset & signature::bitset ) == signature::bitset ) 
+			if ( key.IsAlive() && key.MatchSignature( signature::bitset ) )
 			{
-				uint32_t& flags = _flags[key].flags;
+				uint32_t& flags = _flags.At( key ).flags;
 				if ( flags & ecsFlags::OUTDATED_TRANSFORM ) {
 					usefullData.push_back( &key );
 					flags &= ~ecsFlags::OUTDATED_TRANSFORM;
@@ -210,8 +210,8 @@ namespace fan {
 		for (int dataIndex = 0; dataIndex < usefullData.size(); dataIndex++){
 			ecsComponentsKey & key = *usefullData[dataIndex];
 		
-			btTransform& transform	= _transforms[key].transform;
-			AABB& aabb				= _aabbs[key].aabb;
+			btTransform& transform	= _transforms.At(key).transform;
+			AABB& aabb				= _aabbs.At(key).aabb;
 			const btVector3 origin = transform.getOrigin();
 				const float size = 0.05f;
 				aabb = AABB( origin - size * btVector3::One(), origin + size * btVector3::One() );							

@@ -61,14 +61,11 @@ namespace fan {
 		const uint32_t componentID = (uint32_t) IndexOfComponent<_componentType>::value;
 
 		assert( _entity < m_entitiesKeys.size() );
-		ecsComponentsKey & entityKey = m_entitiesKeys[_entity];
+		ecsComponentsKey & entityKey = m_entitiesKeys[_entity];		
 
-		assert( entityKey.bitset[componentID] == 0 ); // entity already has _componentType
-
-		_componentType & component =  m_components.Alloc<_componentType>( entityKey.index[componentID] );
-
-		// Init the component
-		entityKey.bitset    [ componentID ] = 1;
+		ecsComponentIndex newIndex;
+		_componentType & component =  m_components.Alloc<_componentType>( newIndex );
+		entityKey.AddComponent( componentID, newIndex );		
 
 		return component;
 	}
@@ -85,7 +82,7 @@ namespace fan {
 	//================================================================================================================================
 	template< typename _tagType > void EcsManager::AddTag( const ecsEntity _entity ) {
 		static_assert( IsTag< _tagType>::value );
-		m_entitiesKeys[_entity].bitset[ IndexOfTag<_tagType>::value ] = 1;
+		m_entitiesKeys[_entity].SetTag( IndexOfTag<_tagType>::value, true );
 	}
 
 	//================================================================================================================================
@@ -112,6 +109,6 @@ namespace fan {
 	//================================================================================================================================
 	template< typename _componentType > _componentType* EcsManager::FindComponentFromEntity( const ecsEntity  _entity ) {
 		static_assert( IsComponent< _componentType >::value );
-		return &m_components.Get< _componentType >()[ m_entitiesKeys[_entity] ];
+		return &m_components.Get< _componentType >().At( m_entitiesKeys[_entity] );
 	}
 }

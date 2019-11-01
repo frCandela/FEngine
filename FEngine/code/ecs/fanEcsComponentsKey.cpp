@@ -20,7 +20,7 @@ namespace fan
 			element[elemIndex] = 0;
 		}
 
-		bitset = ecsBitset( 0 );
+		m_bitset = ecsBitset( 0 );
 		m_componentsKeys = ~indicesBitset( 0 );
 		m_nextElement = 0;
 	}

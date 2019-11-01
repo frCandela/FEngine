@@ -159,7 +159,7 @@ namespace fan {
 			for ( int entityIndex = 0; entityIndex < entitiesData.size(); entityIndex++ ) {
 				const ecsComponentsKey & data = entitiesData[entityIndex];
 				std::stringstream ss;
-				ss << data.bitset.to_string() << " " << entityIndex;
+				ss << data.GetBitset().to_string() << " " << entityIndex;
 				ImGui::Text( ss.str().c_str() );
 			}
 		}

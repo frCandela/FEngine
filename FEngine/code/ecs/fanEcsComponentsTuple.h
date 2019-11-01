@@ -56,8 +56,11 @@ namespace fan {
 		static constexpr size_t index = IndexOfComponent<_type>::value;
 
 		//================================================================
-		inline _type& operator[] ( const ecsComponentsKey& _entityData ) {	return Get( _entityData.index[index] ); }
-		inline _type& Get ( const ecsComponentIndex& _componentIndex )	{ return (*m_chunks[_componentIndex.chunckIndex])[_componentIndex.componentIndex];	}
+		inline _type& At ( const ecsComponentsKey& _entityData )
+		{
+			const ecsComponentIndex& ecsIndex = _entityData.GetIndex( index );
+			return ( *m_chunks[ecsIndex.chunckIndex] )[ecsIndex.componentIndex];
+		}
 		inline const std::vector< Chunck<_type> * >& GetChuncks() const { return m_chunks; }
 
 		//================================================================
@@ -129,7 +132,7 @@ namespace fan {
 			ComponentData< _type> & Get() {
  				return  ComponentElement< indexElement<_type>::value, _type >::indexedData.data;
  			}
-			// Const version
+			// Returns the ComponentData of the corresponding _type
 			template < typename _type >
 			const ComponentData< _type> & Get() const {
 				return  ComponentElement< indexElement<_type>::value, _type >::indexedData.data;

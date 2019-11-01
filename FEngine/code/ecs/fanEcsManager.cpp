@@ -166,8 +166,9 @@ namespace fan {
 
 			// Remove the component
 			for (int componentID = 0; componentID < ecsComponents::count ; componentID++) {
-				if( key.bitset[componentID]) {
-					RecycleComponent( componentID, key.index[componentID] );
+				if( key.HasComponent(componentID) ) {
+					ecsComponentIndex ecsIndex = key.RemoveComponent( componentID );
+					RecycleComponent( componentID, ecsIndex );
 				}
 			}
 			m_entitiesKeys.pop_back();
@@ -182,25 +183,22 @@ namespace fan {
 		// Remove components
 		for ( std::pair< ecsEntity, uint32_t> & pair : m_removedComponents ) {
 			const ecsEntity entity = pair.first;
-			const  uint32_t componentIndex = pair.second;
-			if( m_entitiesKeys[entity].bitset[componentIndex] == 1 ) {
-				m_entitiesKeys[entity].bitset[componentIndex] = 0;
-				ecsComponentsKey& key = m_entitiesKeys[entity];
-				RecycleComponent( componentIndex, key.index[componentIndex] );
-			} else {
-				Debug::Get() << Debug::Severity::warning << "Remove component failed : Entity "<< entity << " has no component " << componentIndex << Debug::Endl();
-			}
+			const  uint32_t componentID = pair.second;
+			assert( m_entitiesKeys[entity].HasComponent(componentID) );			
+			ecsComponentsKey& key = m_entitiesKeys[entity];
+			ecsComponentIndex ecsIndex = key.RemoveComponent( componentID );
+			RecycleComponent( componentID, ecsIndex );
+			
 		} m_removedComponents.clear();
 
 		// Removes tags
 		for ( std::pair< ecsEntity, uint32_t> & pair : m_removedTags ) {
 			const ecsEntity entity = pair.first;
 			const  uint32_t tagIndex = pair.second;
-			if ( m_entitiesKeys[entity].bitset[tagIndex] == 1 ) {
-				m_entitiesKeys[entity].bitset[tagIndex] = 0;			
-			} else {
-				Debug::Get() << Debug::Severity::warning << "Remove tag failed : Entity " << entity << " has no component " << tagIndex << Debug::Endl();
-			}
+
+			assert( m_entitiesKeys[entity].HasTag(tagIndex) );
+			m_entitiesKeys[entity].SetTag(tagIndex,  false );			
+
 		} m_removedTags.clear();
 	}
 
