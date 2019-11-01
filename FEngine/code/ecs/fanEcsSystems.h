@@ -1,7 +1,7 @@
 #pragma once
 
 #include "ecs/fanECSConfig.h"
-#include "ecs/fanECSEntityData.h"
+#include "ecs/fanEcsComponentsKey.h"
 #include "ecs/fanEcsComponentsTuple.h"
 
 namespace fan {

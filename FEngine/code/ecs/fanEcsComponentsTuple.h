@@ -2,7 +2,7 @@
 
 #include "core/meta/fanHelpers.h"
 #include "core/meta/fanTypeList.h"
-#include "ecs/fanEcsEntityData.h"
+#include "ecs/fanEcsComponentsKey.h"
 
 namespace fan {
 	//================================================================================================================================

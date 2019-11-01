@@ -86,6 +86,9 @@
     <Filter Include="code\core\time">
       <UniqueIdentifier>{d9136c13-23c1-4724-abe6-63cab5368a8c}</UniqueIdentifier>
     </Filter>
+    <Filter Include="code\deps\bitset2">
+      <UniqueIdentifier>{8a9eca29-15d4-499e-a9c0-cbb7d44aeeb8}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="code\editor\fanMainMenuBar.cpp">
@@ -372,6 +375,9 @@
     </ClCompile>
     <ClCompile Include="code\game\fanSolarEruption.cpp">
       <Filter>code\game</Filter>
+    </ClCompile>
+    <ClCompile Include="code\ecs\fanEcsComponentsKey.cpp">
+      <Filter>code\ecs</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -1098,9 +1104,6 @@
     <ClInclude Include="code\ecs\fanEcsConfig.h">
       <Filter>code\ecs</Filter>
     </ClInclude>
-    <ClInclude Include="code\ecs\fanEcsEntityData.h">
-      <Filter>code\ecs</Filter>
-    </ClInclude>
     <ClInclude Include="code\ecs\fanEcsManager.h">
       <Filter>code\ecs</Filter>
     </ClInclude>
@@ -1178,6 +1181,66 @@
     </ClInclude>
     <ClInclude Include="code\game\fanSolarEruptionUtil.h">
       <Filter>code\game</Filter>
+    </ClInclude>
+    <ClInclude Include="code\ecs\fanEcsComponentsKey.h">
+      <Filter>code\ecs</Filter>
+    </ClInclude>
+    <ClInclude Include="code\core\meta\fanMetaMath.h">
+      <Filter>code\core\meta</Filter>
+    </ClInclude>
+    <ClInclude Include="deps\bitset2\bitset2.hpp">
+      <Filter>code\deps\bitset2</Filter>
+    </ClInclude>
+    <ClInclude Include="deps\bitset2\detail\array_ops.hpp">
+      <Filter>code\deps\bitset2</Filter>
+    </ClInclude>
+    <ClInclude Include="deps\bitset2\detail\array2array.hpp">
+      <Filter>code\deps\bitset2</Filter>
+    </ClInclude>
+    <ClInclude Include="deps\bitset2\detail\array2u_long_t.hpp">
+      <Filter>code\deps\bitset2</Filter>
+    </ClInclude>
+    <ClInclude Include="deps\bitset2\detail\bit_chars.hpp">
+      <Filter>code\deps\bitset2</Filter>
+    </ClInclude>
+    <ClInclude Include="deps\bitset2\detail\bitset2_impl.hpp">
+      <Filter>code\deps\bitset2</Filter>
+    </ClInclude>
+    <ClInclude Include="deps\bitset2\detail\count_bits.hpp">
+      <Filter>code\deps\bitset2</Filter>
+    </ClInclude>
+    <ClInclude Include="deps\bitset2\detail\h_types.hpp">
+      <Filter>code\deps\bitset2</Filter>
+    </ClInclude>
+    <ClInclude Include="deps\bitset2\detail\hash.hpp">
+      <Filter>code\deps\bitset2</Filter>
+    </ClInclude>
+    <ClInclude Include="deps\bitset2\detail\hex_params.hpp">
+      <Filter>code\deps\bitset2</Filter>
+    </ClInclude>
+    <ClInclude Include="deps\bitset2\detail\index_lsb_set.hpp">
+      <Filter>code\deps\bitset2</Filter>
+    </ClInclude>
+    <ClInclude Include="deps\bitset2\detail\reverse_bits.hpp">
+      <Filter>code\deps\bitset2</Filter>
+    </ClInclude>
+    <ClInclude Include="deps\bitset2\detail\select_base_t.hpp">
+      <Filter>code\deps\bitset2</Filter>
+    </ClInclude>
+    <ClInclude Include="deps\bitset2\detail\ullong2array.hpp">
+      <Filter>code\deps\bitset2</Filter>
+    </ClInclude>
+    <ClInclude Include="deps\bitset2\detail\array_access.hpp">
+      <Filter>code\deps\bitset2</Filter>
+    </ClInclude>
+    <ClInclude Include="deps\bitset2\detail\array_add.hpp">
+      <Filter>code\deps\bitset2</Filter>
+    </ClInclude>
+    <ClInclude Include="deps\bitset2\detail\array_complement2.hpp">
+      <Filter>code\deps\bitset2</Filter>
+    </ClInclude>
+    <ClInclude Include="deps\bitset2\detail\array_funcs.hpp">
+      <Filter>code\deps\bitset2</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
