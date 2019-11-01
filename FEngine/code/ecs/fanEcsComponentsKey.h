@@ -9,13 +9,11 @@ namespace fan {
 	struct ecsComponentsKey
 	{
 	public:
-		static constexpr size_t maxComponentsPerEntity = ecsComponents::count;
-
 		ecsComponentsKey() {	bitset[aliveBit] = 1; }
 
-		uint16_t	chunck[ecsComponents::count];		// chunck of each components
+		uint16_t	chunck[ecsComponents::count];	// chunck of each components
 		uint16_t	element[ecsComponents::count];	// index of each components
-		ecsBitset   bitset;								// signature
+		ecsBitset   bitset;							// signature
 
 		void Kill() { bitset[aliveBit] = 0; }
 		bool IsAlive() const { return   bitset[aliveBit]; }
@@ -31,20 +29,23 @@ namespace fan {
 	struct ecsComponentsKeyCompact
 	{
 	public:		
-		static constexpr size_t s_indexWidth = 3;
+		static constexpr size_t s_indexWidth = 4;
 		static constexpr size_t s_maxComponentsPerEntity = S_Pow( 2, s_indexWidth ) - 1;
-		static constexpr size_t s_clearMask = ( 1 << s_indexWidth ) - 1;
+		static constexpr size_t s_emptyKeyValue = ( 1 << s_indexWidth ) - 1;
 		
-		uint16_t									chunck [s_maxComponentsPerEntity];	// chunck of each component
-		uint16_t									element[s_maxComponentsPerEntity];	// index of each component
-		ecsBitset									bitset;								// signature
+		uint16_t	chunck [s_maxComponentsPerEntity];	// chunck of each component
+		uint16_t	element[s_maxComponentsPerEntity];	// index of each component
+		ecsBitset	bitset;								// signature
 		
 		ecsComponentsKeyCompact();
 
-		uint32_t GetIndex( const uint32_t _index ) const;
-		void	 SetKey( const uint32_t _index, const uint32_t _value );
-		void	 SetComponent( const uint32_t _index, const uint16_t _chunckIndex, const uint16_t _elementIndex );
-		void	 Reset();
+
+		void AddComponent( const uint32_t _componentIndex, const uint16_t _chunckIndex, const uint16_t _elementIndex );
+		void RemoveComponent( const uint32_t _removedComponentIndex );
+		void Reset();
+
+		uint32_t Count() const   { return m_nextElement; }
+		uint32_t IsEmpty() const { return m_nextElement == 0; }
 
 		void Kill() { bitset[aliveBit] = 0; }
 		bool IsAlive() const { return   bitset[aliveBit]; }
@@ -54,7 +55,11 @@ namespace fan {
 		using indicesBitset = Bitset2::bitset2< s_indexWidth * ecsComponents::count >;
 
 		indicesBitset m_componentsKeys;		// Index of the components in the element&chunck arrays
-		int			  m_nextElement = 0;	// Next available element in the element&chunck arrays
+		uint32_t	  m_nextElement = 0;	// Next available element in the element&chunck arrays
+
+		uint32_t GetIndex( const uint32_t _componentIndex ) const;
+		void	 SetIndex( const uint32_t _componentIndex, const uint32_t _value );
+
 	};
 
 

@@ -297,8 +297,15 @@ namespace fan {
 			ImGui::DragInt( "chunckIndex", &chunckIndex ); 
 			if ( ImGui::Button( "Add" ) )
 			{
-				key.SetComponent( (uint32_t)componentIndex, (uint16_t)chunckIndex, (uint16_t)elemIndex );
+				key.AddComponent( (uint32_t)componentIndex, (uint16_t)chunckIndex, (uint16_t)elemIndex );
 			}
+			if ( ImGui::Button( "Remove" ) )
+			{
+				key.RemoveComponent( (uint32_t)componentIndex );
+			}
+
+
+
 			ImGui::Separator();
 
 			int tmpNext = key.m_nextElement;
@@ -320,7 +327,7 @@ namespace fan {
 
 			// clear mask
 			{
-				ecsComponentsKeyCompact::indicesBitset clearMask = ~( ecsComponentsKeyCompact::indicesBitset( ecsComponentsKeyCompact::s_clearMask ) << ( componentIndex * ecsComponentsKeyCompact::s_indexWidth ) );
+				ecsComponentsKeyCompact::indicesBitset clearMask = ~( ecsComponentsKeyCompact::indicesBitset( ecsComponentsKeyCompact::s_emptyKeyValue ) << ( componentIndex * ecsComponentsKeyCompact::s_indexWidth ) );
 				std::stringstream ss;
 				for ( int bitIndex = int( key.m_componentsKeys.size() ) - 1; bitIndex >= 0; --bitIndex )
 				{
