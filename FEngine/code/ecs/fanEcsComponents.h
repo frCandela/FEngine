@@ -213,6 +213,29 @@ namespace fan {
 	};
 
 	//================================
+	struct ecsBullet : ecsIComponent
+	{
+		static const char * s_name;
+		void Init( const float _durationLeft )
+		{
+			durationLeft = _durationLeft;
+		}
+		float		durationLeft = 1.f;
+	};
+
+	//================================
+	class Gameobject;
+	struct ecsGameobject : ecsIComponent
+	{
+		static const char * s_name;
+		void Init( Gameobject* _gameobject )
+		{
+			gameobject = _gameobject;
+		}
+		Gameobject * gameobject = nullptr;
+	};
+
+	//================================
 	//================================
 	using ecsComponents = meta::TypeList<
 		ecsTranform
@@ -232,6 +255,8 @@ namespace fan {
 		, ecsSphereShape
 		, ecsBoxShape
 		, ecsFlags
+		, ecsBullet
+		, ecsGameobject
 	>;
 	 
 	template< typename _type > struct IsComponent { static constexpr bool value = std::is_base_of< ecsIComponent, _type >::value; };

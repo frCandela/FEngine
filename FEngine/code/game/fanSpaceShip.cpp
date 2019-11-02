@@ -48,7 +48,7 @@ namespace fan {
 
 		// Orientation
 		transform->LookAt( mouseWorldPos , btVector3::Up() );
-
+		 
 		// Lateral movement
 		float left		= Input::Get().Manager().GetAxis( "game_left" );
 		m_rigidbody->ApplyCentralForce( _delta * m_lateralForce * left * transform->Left() );

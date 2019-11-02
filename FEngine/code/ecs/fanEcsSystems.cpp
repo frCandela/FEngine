@@ -5,6 +5,8 @@
 #include "core/time/fanTime.h"
 #include "core/math/shapes/fanConvexHull.h"
 #include "renderer/fanMesh.h"
+#include "scene/fanScene.h"
+#include "scene/fanGameobject.h"
 
 namespace fan {
 
@@ -214,11 +216,9 @@ namespace fan {
 		}
 
 		// Update aabb
-
 		for ( int dataIndex = 0; dataIndex < outdatedAABBEntities.size(); dataIndex++ )
 		{
 			ecsComponentsKey & key = *outdatedAABBEntities[dataIndex];
-
 
 			btRigidBody& rb = _rigidbodies.At( key ).Get();
 			AABB& aabb = _aabbs.At( key ).aabb;
@@ -261,6 +261,30 @@ namespace fan {
 			const btVector3 origin = transform.getOrigin();
 				const float size = 0.05f;
 				aabb = AABB( origin - size * btVector3::One(), origin + size * btVector3::One() );							
+		}
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
+	void ecsUpdateBullet::Run( float _delta, const size_t _count, std::vector< ecsComponentsKey >& _entitiesData,
+		ComponentData< ecsGameobject > &	_gameobjects
+		, ComponentData< ecsBullet >     &	_bullets )
+	{
+		for ( int entity = 0; entity < _count; entity++ )
+		{
+			ecsComponentsKey & key = _entitiesData[entity];
+
+			if ( key.IsAlive() && key.MatchSignature( signature::bitset ) )
+			{
+				ecsBullet& bullet =		 _bullets.At( key );
+
+				bullet.durationLeft -= _delta;
+				if ( bullet.durationLeft <= 0.f )
+				{
+ 					Gameobject * gameobject = _gameobjects.At( key ).gameobject;
+					gameobject->GetScene()->DeleteGameobject( gameobject );
+				}
+			}
 		}
 	}
 }

@@ -27,6 +27,7 @@ namespace fan
 		float m_lifeTime = 1.f;
 		float m_scale = 0.2f;
 		float m_speed = 0.2f;
+		int   m_bulletsPerFrame = 1;
 		btVector3 m_offset ;
 	};
 }

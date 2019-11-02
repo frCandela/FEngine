@@ -95,6 +95,7 @@ namespace fan {
 		RUN_SYSTEM( ecsUpdateAABBFromRigidbody );
 		RUN_SYSTEM( ecsUpdateAABBFromHull);
 		RUN_SYSTEM( ecsUpdateAABBFromTransform);
+		RUN_SYSTEM( ecsUpdateBullet );
 	}
 
 	//================================================================================================================================

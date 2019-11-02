@@ -28,6 +28,7 @@ namespace fan
 		ecsEntity entity = m_scene->GetEcsManager()->CreateEntity();
 		m_ecsHandleEntity = m_scene->GetEcsManager()->CreateHandle( entity );
 
+		AddEcsComponent<ecsGameobject>()->Init(this);
 
 		ecsAABB ** tmpAABB = &const_cast<ecsAABB*>( m_aabb );
 		*tmpAABB = AddEcsComponent<ecsAABB>();
@@ -39,6 +40,7 @@ namespace fan
 
 		m_flags->Init();
 		m_flags->flags = Flag::OUTDATED_TRANSFORM | Flag::OUTDATED_AABB;
+
 		m_transform = AddComponent<Transform>();
 	}
 

@@ -13,6 +13,7 @@
 #include "core/input/fanInputManager.h"
 #include "core/input/fanMouse.h"
 #include "core/time/fanProfiler.h"
+#include "renderer/fanRenderer.h"
 
 
 namespace fan
@@ -49,6 +50,7 @@ namespace fan
 
 		const float fire = Input::Get().Manager().GetAxis( "fire" );
 		if ( fire > 0 )
+		for (int bulletIndex = 0; bulletIndex < m_bulletsPerFrame; bulletIndex++)
 		{
 
 
@@ -60,14 +62,21 @@ namespace fan
 			Transform * transform = bulletGO->GetTransform();
 
 			bulletGO->AddFlag(ecsFlags::NO_AABB_UPDATE );
+			bulletGO->AddEcsComponent<ecsBullet>()->Init(m_lifeTime);
 			model->SetPath(GlobalValues::s_meshSphere);
 			material->SetTexturePath( GlobalValues::s_textureWhite );
 			collider->SetRadius( m_scale );
 			transform->SetScale(btVector3( m_scale, m_scale, m_scale ));
 			transform->SetPosition( thisTransform->GetPosition() + thisTransform->TransformDirection( m_offset) );
-			rb->SetVelocity( m_speed * thisTransform->Forward() );
-
+			
+			rb->SetMass(0.01f); 
+			rb->SetVelocity( m_speed * thisTransform->Forward().normalized() );
+			 
+			 
 		}
+
+		//Debug::Log() << thisTransform->TransformDirection( thisTransform->Forward() ).norm() << Debug::Endl();
+		//Debug::Render().DebugLine( thisTransform->GetPosition(), thisTransform->GetPosition() + thisTransform->TransformDirection( m_offset ).normalized() , Color::Red ); 
 	}
 
 	//================================================================================================================================
@@ -77,7 +86,9 @@ namespace fan
 		ImGui::DragFloat("scale##wepoffset", &m_scale, 0.05f, 0.f, 1.f );
 		ImGui::DragFloat( "speed##wepspeed", &m_speed, 0.1f, 0.f, 100.f );
 		ImGui::DragFloat3( "offset##wepspeed", &m_offset[0]);
-		ImGui::DragFloat( "lifeTime##wepspeed", &m_lifeTime, 1.f, 0.f, 100.f );
+		ImGui::DragFloat( "life time##wepspeed", &m_lifeTime, 1.f, 0.f, 100.f );
+		ImGui::DragInt( "bulletsPerFrame##m_bulletsPerFrame", &m_bulletsPerFrame);
+		
 		
 	}
 
@@ -90,6 +101,7 @@ namespace fan
 		SaveFloat( _json, "speed", m_speed );
 		SaveVec3( _json, "offset", m_offset );
 		SaveFloat( _json, "lifeTime", m_lifeTime );
+		SaveInt( _json, "bulletsPerFrame", m_bulletsPerFrame );
 		return true;
 	}
 
@@ -102,6 +114,7 @@ namespace fan
 		LoadFloat( _json,"speed", m_speed );
 		LoadVec3( _json, "offset", m_offset );
 		LoadFloat( _json, "lifeTime", m_lifeTime );
+		LoadInt( _json, "bulletsPerFrame", m_bulletsPerFrame );
 
 		return true;
 	}
