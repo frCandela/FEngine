@@ -2,7 +2,6 @@
 #include "game/fanPlanet.h"
 
 #include "core/time/fanTime.h"
-#include "editor/windows/fanInspectorWindow.h"
 #include "scene/components/fanTransform.h"
 #include "scene/fanGameobject.h"
 

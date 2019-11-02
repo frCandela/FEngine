@@ -77,6 +77,7 @@ namespace fan {
 		Input::Get().Manager().CreateKeyboardEvent( "reload_scene",	  Keyboard::R, Keyboard::LEFT_CONTROL );
 		Input::Get().Manager().CreateKeyboardEvent(	"play_pause",	  Keyboard::TAB );
 		Input::Get().Manager().CreateKeyboardEvent( "freeze_capture", Keyboard::END );
+		
 
 		// Axis
 		Input::Get().Manager().CreateAxis( "game_forward",		Keyboard::W, Keyboard::S );
@@ -85,12 +86,14 @@ namespace fan {
 		Input::Get().Manager().CreateAxis( "editor_left",		Keyboard::A, Keyboard::D );
 		Input::Get().Manager().CreateAxis( "editor_up",			Keyboard::E, Keyboard::Q );
 		Input::Get().Manager().CreateAxis( "editor_boost",		Keyboard::LEFT_SHIFT, Keyboard::NONE );
+		Input::Get().Manager().CreateAxis( "fire",				Keyboard::SPACE, Keyboard::NONE );
 
 		// Set some values
 		m_editorGrid.isVisible = true;
 		m_editorGrid.color = Color(0.161f, 0.290f, 0.8f, 0.478f);
 		m_editorGrid.linesCount = 10;
 		m_editorGrid.spacing = 1.f;		
+		m_editorGrid.offset = btVector3::Zero();
 
 		m_renderer = new Renderer( windowSize, windowPosition );
 		m_ecsManager = new EcsManager();
@@ -278,8 +281,8 @@ namespace fan {
 			const int count = m_editorGrid.linesCount;
 
 			for (int coord = -m_editorGrid.linesCount; coord <= m_editorGrid.linesCount; coord++) {
-				Debug::Render().DebugLine(btVector3(-count * size, 0.f, coord*size), btVector3(count*size, 0.f, coord*size), m_editorGrid.color);
-				Debug::Render().DebugLine(btVector3(coord*size, 0.f, -count * size), btVector3(coord*size, 0.f, count*size), m_editorGrid.color);
+				Debug::Render().DebugLine( m_editorGrid.offset + btVector3(-count * size, 0.f, coord*size), m_editorGrid.offset + btVector3(count*size, 0.f, coord*size), m_editorGrid.color);
+				Debug::Render().DebugLine( m_editorGrid.offset + btVector3(coord*size, 0.f, -count * size), m_editorGrid.offset + btVector3(coord*size, 0.f, count*size), m_editorGrid.color);
 			}
 		}
 	}

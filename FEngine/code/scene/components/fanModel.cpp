@@ -9,6 +9,7 @@
 #include "core/math/shapes/fanConvexHull.h"
 #include "core/files/fanFbxImporter.h"
 #include "ecs/fanECSConfig.h"
+#include "core/time/fanProfiler.h"
 
 // Editor
 #include "editor/fanModals.h"
@@ -65,8 +66,8 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void Model::SetPath( std::string _path ) {
-		onModelSetPath.Emmit( this, _path );
+	void Model::SetPath( std::string _path ) {		
+ 		onModelSetPath.Emmit( this, _path );
 	}
 
 	Mesh *			Model::GetMesh() { return m_mesh->mesh; }

@@ -9,5 +9,6 @@ namespace fan {
 		Color		color;
 		int			linesCount;
 		float		spacing;
+		btVector3	offset;
 	};
 }

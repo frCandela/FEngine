@@ -382,6 +382,9 @@
     <ClCompile Include="code\renderer\core\fanDescriptorTexture.cpp">
       <Filter>code\renderer\core</Filter>
     </ClCompile>
+    <ClCompile Include="code\game\fanWeapon.cpp">
+      <Filter>code\game</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="code\editor\fanMainMenuBar.h">
@@ -1247,6 +1250,9 @@
     </ClInclude>
     <ClInclude Include="code\renderer\core\fanDescriptorTexture.h">
       <Filter>code\renderer\core</Filter>
+    </ClInclude>
+    <ClInclude Include="code\game\fanWeapon.h">
+      <Filter>code\game</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
