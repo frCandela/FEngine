@@ -3,6 +3,8 @@
 
 #include "renderer/fanRenderer.h"
 #include "core/time/fanTime.h"
+#include "core/math/shapes/fanConvexHull.h"
+#include "renderer/fanMesh.h"
 
 namespace fan {
 
@@ -135,10 +137,10 @@ namespace fan {
 	//================================================================================================================================
 	void ecsUpdateAABBFromHull::Run( float /*_delta*/, const size_t _count, std::vector< ecsComponentsKey >& _entitiesData
 		, ComponentData< ecsTranform > &	_transforms
-		, ComponentData< ecsScaling > &	_scales
+		, ComponentData< ecsScaling > &		_scales
 		, ComponentData< ecsAABB > &		_aabbs
 		, ComponentData< ecsFlags > &		_flags
-		, ComponentData< ecsConvexHull >& _hulls )
+		, ComponentData< ecsMesh >&			_mesh )
 	{
 		// Find all interesting entities
 		std::vector< ecsComponentsKey * > usefullEntitiesKeys;
@@ -148,9 +150,9 @@ namespace fan {
 			ecsComponentsKey & key = _entitiesData[entity];			
 			if ( key.IsAlive() && key.MatchSignature( signature::bitset ) )
 			{
-				uint32_t&   flags = _flags.At(key).flags;
-				ConvexHull&	hull  = _hulls.At(key).convexHull;
-				if( flags & ecsFlags::OUTDATED_AABB && ! hull.IsEmpty() ) 
+				uint32_t&			flags = _flags.At(key).flags;
+				const ConvexHull&	hull  = _mesh.At(key).mesh->GetHull();
+				if( flags & ecsFlags::OUTDATED_AABB && ! ( flags & ecsFlags::NO_AABB_UPDATE ) && ! hull.IsEmpty() )
 				{
 					usefullEntitiesKeys.push_back( &key );
 					flags &= ~ecsFlags::OUTDATED_AABB;
@@ -179,9 +181,9 @@ namespace fan {
 		// Calculates the new aabb using the model matrix and the convex hull
 		for ( int dataIndex = 0; dataIndex < usefullEntitiesKeys.size(); dataIndex++ ) {
 			ecsComponentsKey & key = *usefullEntitiesKeys[dataIndex];
-			glm::mat4&		modelMatrix = modelMatrices[dataIndex];
-			ConvexHull&		hull = _hulls.At(key).convexHull;
-			AABB&			aabb = _aabbs.At(key).aabb;
+			glm::mat4&			modelMatrix = modelMatrices[dataIndex];
+			const ConvexHull&	hull = _mesh.At( key ).mesh->GetHull();
+			AABB&				aabb = _aabbs.At(key).aabb;
 			aabb = AABB( hull.GetVertices(), modelMatrix );
 		}	
 	}
@@ -203,7 +205,7 @@ namespace fan {
 			if ( key.IsAlive() && key.MatchSignature( signature::bitset ) )
 			{
 				uint32_t& flags = _flags.At( key ).flags;
-				if ( flags & ecsFlags::OUTDATED_AABB )
+				if ( flags & ecsFlags::OUTDATED_AABB && !( flags & ecsFlags::NO_AABB_UPDATE ) )
 				{
 					outdatedAABBEntities.push_back( &key );
 					flags &= ~ecsFlags::OUTDATED_AABB;
@@ -241,7 +243,7 @@ namespace fan {
 			if ( key.IsAlive() && key.MatchSignature( signature::bitset ) )
 			{
 				uint32_t& flags = _flags.At( key ).flags;
-				if ( flags & ecsFlags::OUTDATED_AABB ) {
+				if ( flags & ecsFlags::OUTDATED_AABB && !( flags & ecsFlags::NO_AABB_UPDATE ) ) {
 					usefullData.push_back( &key );
 					flags &= ~ecsFlags::OUTDATED_AABB;
 				}

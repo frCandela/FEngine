@@ -32,10 +32,6 @@ namespace fan
 		*tmpMesh = m_gameobject->AddEcsComponent<ecsMesh>();
 		m_mesh->Init();
 
-		ecsConvexHull ** tmpHull = &const_cast<ecsConvexHull*>( m_convexHull );
-		*tmpHull = m_gameobject->AddEcsComponent<ecsConvexHull>();
-		m_convexHull->Init();
-
 		onRegisterModel.Emmit( this );
 	}
 
@@ -44,7 +40,6 @@ namespace fan
 	void Model::OnDetach() {
 		Component::OnDetach();
 		m_gameobject->RemoveEcsComponent<ecsMesh>();
-		m_gameobject->RemoveEcsComponent<ecsConvexHull>();
 		onUnRegisterModel.Emmit(this);
 
 		m_gameobject->AddFlag( Gameobject::Flag::OUTDATED_AABB );
@@ -56,10 +51,6 @@ namespace fan
 	{
 		m_mesh->mesh = _mesh;
 		if( _mesh != nullptr && ! _mesh->GetIndices().empty() ) {	
-			ConvexHull & convexHull = GetConvexHull();
-			if( m_autoUpdateHull || convexHull.IsEmpty() ) {
-				_mesh->GenerateConvexHull( convexHull );
-			}
 			m_gameobject->AddFlag( Gameobject::Flag::OUTDATED_AABB );
 		}
 	}
@@ -130,8 +121,4 @@ namespace fan
 		
 		return true;
 	}
-
-	//================================================================================================================================
-	//================================================================================================================================
-	ConvexHull&		Model::GetConvexHull() const	{ return	m_convexHull->convexHull; }
 }

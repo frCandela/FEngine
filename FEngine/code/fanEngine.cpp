@@ -309,7 +309,7 @@ namespace fan {
 				const ConvexHull * hull = nullptr;
 				Mesh * mesh = model->GetMesh();
 				if (mesh != nullptr) {
-					hull = & model->GetConvexHull();
+					hull = & model->GetMesh()->GetHull();
 				}
 				if (hull != nullptr) {
 					const std::vector<btVector3> & vertices = hull->GetVertices();
@@ -543,7 +543,7 @@ namespace fan {
 					if (model != nullptr && model->GetMesh() != nullptr ) {
 						Transform * transform = gameobject->GetComponent<Transform>();
 						const Ray transformedRay(transform->InverseTransformPoint(ray.origin), transform->InverseTransformDirection(ray.direction));
-						if (model->GetConvexHull().RayCast(transformedRay.origin, transformedRay.direction, intersection) == false) {
+						if (model->GetMesh()->GetHull().RayCast(transformedRay.origin, transformedRay.direction, intersection) == false) {
 							continue;
 						}
 					}

@@ -2,6 +2,7 @@
 #include "game/fanWeapon.h"
 
 #include "core/time/fanTime.h"
+#include "scene/fanGameobject.h"
 #include "scene/components/fanTransform.h"
 #include "scene/components/fanMaterial.h"
 #include "scene/components/fanRigidbody.h"
@@ -58,9 +59,8 @@ namespace fan
 			SphereShape * collider = bulletGO->AddComponent<SphereShape>();
 			Transform * transform = bulletGO->GetTransform();
 
+			bulletGO->AddFlag(ecsFlags::NO_AABB_UPDATE );
 			model->SetPath(GlobalValues::s_meshSphere);
-			model->SetAutoUpdateHull(false);
-
 			material->SetTexturePath( GlobalValues::s_textureWhite );
 			collider->SetRadius( m_scale );
 			transform->SetScale(btVector3( m_scale, m_scale, m_scale ));

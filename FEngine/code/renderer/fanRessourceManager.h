@@ -37,7 +37,7 @@ namespace fan
 	private:
 		Device & m_device;
 
-		std::set< Mesh * >		m_meshList;
+		std::set< Mesh * >		 m_meshList;
 		const Mesh *			 m_defaultMesh = nullptr;
 		std::vector< Texture * > m_textures;
 		bool					 m_modified = false;

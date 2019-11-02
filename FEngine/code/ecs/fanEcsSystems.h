@@ -33,7 +33,7 @@ namespace fan {
 	using ecsParticleSignature			= ecsSignature< ecsPosition, ecsRotation, ecsMovement, ecsParticle >;
 	using ecsPlanetSignature			= ecsSignature< ecsTranform, ecsPlanet, ecsFlags >;
 	using ecsRigidbodySignature			= ecsSignature< ecsTranform, ecsMotionState, ecsRigidbody >;
-	using ecsAABBUpdateFromHull			= ecsSignature< ecsTranform, ecsScaling, ecsAABB, ecsFlags, ecsConvexHull >;
+	using ecsAABBUpdateFromHull			= ecsSignature< ecsTranform, ecsScaling, ecsAABB, ecsFlags, ecsMesh >;
 	using ecsAABBUpdateFromTransform	= ecsSignature< ecsTranform, ecsAABB, ecsFlags >;
 	using ecsAABBUpdateFromRigidbody    = ecsSignature< ecsAABB, ecsRigidbody, ecsFlags >;
 
@@ -108,7 +108,7 @@ namespace fan {
 			, ComponentData< ecsScaling > &		_scales
 			, ComponentData< ecsAABB > &		_aabbs
 			, ComponentData< ecsFlags > &		_flags
-			, ComponentData< ecsConvexHull > &	_hulls
+			, ComponentData< ecsMesh >&			_mesh
 		);
 	};
 

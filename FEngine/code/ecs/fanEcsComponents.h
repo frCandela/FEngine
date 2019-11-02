@@ -207,16 +207,9 @@ namespace fan {
 
 		enum Flag {
 			NONE = 1 << 0, NO_DELETE = 1 << 1, NOT_SAVED = 1 << 2, OUTDATED_TRANSFORM = 1 << 3, 
-			OUTDATED_MATERIAL = 1 << 4, OUTDATED_LIGHT = 1 << 5, OUTDATED_AABB = 1 << 6
+			OUTDATED_MATERIAL = 1 << 4, OUTDATED_LIGHT = 1 << 5, OUTDATED_AABB = 1 << 6,
+			NO_AABB_UPDATE = 1 << 7
 		};
-	};
-
-	//================================
-	struct ecsConvexHull : ecsIComponent {
-		static const char * s_name;
-		void Init() { convexHull.Clear(); }
-
-		ConvexHull convexHull;
 	};
 
 	//================================
@@ -239,7 +232,6 @@ namespace fan {
 		, ecsSphereShape
 		, ecsBoxShape
 		, ecsFlags
-		, ecsConvexHull
 	>;
 	 
 	template< typename _type > struct IsComponent { static constexpr bool value = std::is_base_of< ecsIComponent, _type >::value; };

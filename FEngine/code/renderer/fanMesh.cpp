@@ -40,14 +40,15 @@ namespace fan {
 	bool Mesh::Load( ) {
  		FBXImporter importer;
  		if (importer.LoadScene(m_path) == true) {
-			if (importer.GetMesh(*this) != false ) {
-				OptimizeVertices();
-				s_onMeshLoad.Emmit(this);
-				return true;
-			}
+			if ( ! importer.GetMesh(*this) ) {
+				Debug::Get() << "Failed to load mesh : " << m_path << Debug::Endl();
+				return false;
+			}			
 		}
-		Debug::Get() << "Failed to load mesh : " << m_path << Debug::Endl();
-		return false;
+		OptimizeVertices();
+		GenerateConvexHull();
+		s_onMeshLoad.Emmit( this );
+		return true;
 	}
 
 	//================================================================================================================================
@@ -64,6 +65,7 @@ namespace fan {
 
 		// Cleanup
 		OptimizeVertices();
+		GenerateConvexHull();
 		s_onMeshLoad.Emmit( this );
 		return true;
 	}
@@ -99,7 +101,9 @@ namespace fan {
 	//================================================================================================================================
 	// Creates a convex hull from the mesh geometry
 	//================================================================================================================================
-	void  Mesh::GenerateConvexHull( ConvexHull & _outConvexHull ) {
+	void  Mesh::GenerateConvexHull( ) {
+		if( m_vertices.empty() || ! m_autoUpdateHull ) { return; }
+
 		// Generate points clouds from vertex list
 		std::vector < btVector3> pointCloud;
 		pointCloud.reserve(m_vertices.size());
@@ -107,7 +111,7 @@ namespace fan {
 			Vertex & vertex = m_vertices[point];
 			pointCloud.push_back(btVector3(vertex.pos.x, vertex.pos.y, vertex.pos.z));
 		}
-		_outConvexHull.ComputeQuickHull(pointCloud);
+		m_convexHull.ComputeQuickHull(pointCloud);
 	}
 
 	//================================================================================================================================

@@ -19,6 +19,5 @@ namespace fan {
 	const char * ecsSphereShape::s_name = "SphereShape";
 	const char * ecsBoxShape::s_name	= "BoxShape   ";
 	const char * ecsFlags::s_name		= "Flags      ";
-	const char * ecsConvexHull::s_name  = "ConvexHull ";
 
 }

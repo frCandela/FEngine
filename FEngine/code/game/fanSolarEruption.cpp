@@ -36,7 +36,7 @@ namespace fan {
 		}
 
 		m_model = m_gameobject->GetComponent<Model>();
-		m_model->SetAutoUpdateHull(false);
+		
 	}
 
 	//================================================================================================================================
@@ -47,6 +47,7 @@ namespace fan {
 		m_mesh = new Mesh();
 		m_mesh->SetHostVisible(true);
 		m_mesh->SetOptimizeVertices( false );
+		m_mesh->SetAutoUpdateHull( false );
 		m_mesh->SetPath("solar_eruption");
 	}
 
