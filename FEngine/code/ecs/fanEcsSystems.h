@@ -31,10 +31,11 @@ namespace fan {
 	// Declare your signatures here
 	//================================	
 	using ecsParticleSignature			= ecsSignature< ecsPosition, ecsRotation, ecsMovement, ecsParticle >;
-	using ecsPlanetSignature			= ecsSignature< ecsTranform, ecsPlanet >;
+	using ecsPlanetSignature			= ecsSignature< ecsTranform, ecsPlanet, ecsFlags >;
 	using ecsRigidbodySignature			= ecsSignature< ecsTranform, ecsMotionState, ecsRigidbody >;
 	using ecsAABBUpdateFromHull			= ecsSignature< ecsTranform, ecsScaling, ecsAABB, ecsFlags, ecsConvexHull >;
 	using ecsAABBUpdateFromTransform	= ecsSignature< ecsTranform, ecsAABB, ecsFlags >;
+	using ecsAABBUpdateFromRigidbody    = ecsSignature< ecsAABB, ecsRigidbody, ecsFlags >;
 
 	static constexpr ecsBitset tot1 = ecsParticleSignature::componentsBitset;
 
@@ -69,8 +70,9 @@ namespace fan {
 	class ecsPlanetsSystem : public ISystem<  ecsPlanetSignature > {
 	public:
 		static void Run( float _delta, const size_t _count, std::vector< ecsComponentsKey >& _entitiesData,
-			ComponentData< ecsTranform > & _transforms,
-			ComponentData< ecsPlanet > & _planets );
+			 ComponentData< ecsTranform > & _transforms
+			,ComponentData< ecsPlanet > &	_planets 
+			,ComponentData< ecsFlags > &	_flags );
 	};
 
 	//================================
@@ -90,22 +92,36 @@ namespace fan {
 	class ecsSynchRbToTransSystem : public ISystem<  ecsRigidbodySignature > {
 	public:
 		static void Run( float _delta, const size_t _count, std::vector< ecsComponentsKey >& _entitiesData,
-			  ComponentData< ecsTranform > & _transforms
+			  ComponentData< ecsTranform > &	_transforms
 			, ComponentData< ecsMotionState > & _motionStates
-			, ComponentData< ecsRigidbody > & _rigidbodies );
+			, ComponentData< ecsRigidbody > &	_rigidbodies );
 	};
 
 	//================================
 	// Update AABB from convex hull
 	//================================
-	class ecsUpdateAABBFromHull : public ISystem<  ecsAABBUpdateFromHull > {
+	class ecsUpdateAABBFromHull : public ISystem<  ecsAABBUpdateFromHull >
+	{
 	public:
 		static void Run( float _delta, const size_t _count, std::vector< ecsComponentsKey >& _entitiesData,
-			 ComponentData< ecsTranform > &	_transforms
-			,ComponentData< ecsScaling > &	_scales
-			,ComponentData< ecsAABB > &		_aabbs
-			,ComponentData< ecsFlags > &		_flags 
-			,ComponentData< ecsConvexHull > & _hulls
+			ComponentData< ecsTranform > &		_transforms
+			, ComponentData< ecsScaling > &		_scales
+			, ComponentData< ecsAABB > &		_aabbs
+			, ComponentData< ecsFlags > &		_flags
+			, ComponentData< ecsConvexHull > &	_hulls
+		);
+	};
+
+	//================================
+	// Update AABB from rigidbody
+	//================================
+	class ecsUpdateAABBFromRigidbody : public ISystem<  ecsAABBUpdateFromRigidbody > {
+	public:
+		static void Run( float _delta, const size_t _count, std::vector< ecsComponentsKey >& _entitiesData,
+
+			 ComponentData< ecsAABB > &			_aabbs
+			,ComponentData< ecsRigidbody > &	_rigidbodies
+			, ComponentData< ecsFlags >    &	_flags
 		);
 	};
 
@@ -116,8 +132,8 @@ namespace fan {
 	public:
 		static void Run( float _delta, const size_t _count, std::vector< ecsComponentsKey >& _entitiesData,
 			  ComponentData< ecsTranform > &	_transforms
-			, ComponentData< ecsAABB >     &		_aabbs
-			, ComponentData< ecsFlags >    &		_flags
+			, ComponentData< ecsAABB >     &	_aabbs
+			, ComponentData< ecsFlags >    &	_flags
 		);
 	};
 }

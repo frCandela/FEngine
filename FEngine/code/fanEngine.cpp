@@ -241,7 +241,7 @@ namespace fan {
 				Profiler::Get().End();
 				Profiler::Get().Begin();
 			} 
-		}
+		}		
 
 		// Exit sequence
 		Debug::Log( "Exit application" );

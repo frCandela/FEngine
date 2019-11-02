@@ -92,6 +92,7 @@ namespace fan {
 		SCOPED_PROFILE( ecs_lateUpdate )
 
 		RUN_SYSTEM( ecsSynchTransToRbSystem);
+		RUN_SYSTEM( ecsUpdateAABBFromRigidbody );
 		RUN_SYSTEM( ecsUpdateAABBFromHull);
 		RUN_SYSTEM( ecsUpdateAABBFromTransform);
 	}

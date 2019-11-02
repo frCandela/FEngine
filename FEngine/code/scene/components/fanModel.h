@@ -28,6 +28,8 @@ namespace fan
 		int		GetRenderID() const;
 		void	SetRenderID(const int _renderID);
 
+		void SetAutoUpdateHull( const bool _autoUpdateHull ) { m_autoUpdateHull = _autoUpdateHull; }
+
 		void OnGui() override;
 		virtual ImGui::IconType GetIcon() const { return ImGui::IconType::MODEL; };
 
@@ -43,6 +45,8 @@ namespace fan
 	private:
 		// Editor
 		std::fs::path m_pathBuffer;
+
+		bool m_autoUpdateHull = true;
 
 		ecsMesh *		const m_mesh = nullptr;
 		ecsConvexHull * const m_convexHull = nullptr;

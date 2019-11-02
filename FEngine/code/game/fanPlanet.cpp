@@ -38,7 +38,6 @@ namespace fan {
 		// Updates the parent entity
 		ecsHandle handle = m_gameobject->GetParent()->GetEcsHandle();
 		m_gameobject->GetScene()->GetEcsManager()->FindEntity( handle , m_planet->parentEntity );
-		m_gameobject->AddFlag(Gameobject::Flag::OUTDATED_TRANSFORM);
 	}
 
 	//================================================================================================================================

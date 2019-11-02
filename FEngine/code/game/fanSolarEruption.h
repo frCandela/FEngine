@@ -6,6 +6,7 @@ namespace fan {
 	class Mesh;
 	class Material;
 	class ParticleSystem;
+	class Model;
 
 	//================================================================================================================================
 	//================================================================================================================================
@@ -29,6 +30,7 @@ namespace fan {
 	private:
 		Mesh* m_mesh;
 		Material * m_material;
+		Model * m_model;
 		ParticleSystem * m_particleSystem;
 
 		// Mesh generation

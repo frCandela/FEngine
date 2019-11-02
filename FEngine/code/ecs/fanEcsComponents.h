@@ -206,7 +206,8 @@ namespace fan {
 		uint32_t flags = 0;
 
 		enum Flag {
-			NONE = 1 << 0, NO_DELETE = 1 << 1, NOT_SAVED = 1 << 2, OUTDATED_TRANSFORM = 1 << 3, OUTDATED_MATERIAL = 1 << 4, OUTDATED_LIGHT = 1 << 5, NO_AABB_UPDATE = 1 << 6
+			NONE = 1 << 0, NO_DELETE = 1 << 1, NOT_SAVED = 1 << 2, OUTDATED_TRANSFORM = 1 << 3, 
+			OUTDATED_MATERIAL = 1 << 4, OUTDATED_LIGHT = 1 << 5, OUTDATED_AABB = 1 << 6
 		};
 	};
 

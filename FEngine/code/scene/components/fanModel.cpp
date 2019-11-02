@@ -46,7 +46,7 @@ namespace fan
 		m_gameobject->RemoveEcsComponent<ecsConvexHull>();
 		onUnRegisterModel.Emmit(this);
 
-		m_gameobject->AddFlag( Gameobject::Flag::OUTDATED_TRANSFORM );
+		m_gameobject->AddFlag( Gameobject::Flag::OUTDATED_AABB );
 	}
 
 	//================================================================================================================================
@@ -54,9 +54,12 @@ namespace fan
 	void Model::SetMesh( Mesh * _mesh )
 	{
 		m_mesh->mesh = _mesh;
-		if( _mesh != nullptr && ! _mesh->GetIndices().empty() ) {				
-			_mesh->GenerateConvexHull( GetConvexHull() );
-			m_gameobject->AddFlag( Gameobject::Flag::OUTDATED_TRANSFORM );
+		if( _mesh != nullptr && ! _mesh->GetIndices().empty() ) {	
+			ConvexHull & convexHull = GetConvexHull();
+			if( m_autoUpdateHull || convexHull.IsEmpty() ) {
+				_mesh->GenerateConvexHull( convexHull );
+			}
+			m_gameobject->AddFlag( Gameobject::Flag::OUTDATED_AABB );
 		}
 	}
 

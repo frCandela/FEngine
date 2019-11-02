@@ -3,13 +3,13 @@
 
 #include "game/fanSolarEruptionUtil.h"
 #include "game/fanPlanet.h"
+#include "core/time/fanProfiler.h"
+#include "renderer/fanRenderer.h"
+#include "renderer/fanMesh.h"
 #include "scene/fanScene.h"
 #include "scene/fanGameobject.h"
 #include "scene/components/fanModel.h"
-#include "renderer/fanRenderer.h"
 #include "scene/components/fanTransform.h"
-#include "core/time/fanProfiler.h"
-#include "renderer/fanMesh.h"
 #include "scene/components/fanMaterial.h"
 #include "scene/actors/fanParticleSystem.h"
 #include "editor/fanModals.h"
@@ -35,6 +35,8 @@ namespace fan {
 			m_particleSystem->SetEnabled(false);
 		}
 
+		m_model = m_gameobject->GetComponent<Model>();
+		m_model->SetAutoUpdateHull(false);
 	}
 
 	//================================================================================================================================
@@ -43,6 +45,8 @@ namespace fan {
 		Actor::OnAttach();
 
 		m_mesh = new Mesh();
+		m_mesh->SetHostVisible(true);
+		m_mesh->SetOptimizeVertices( false );
 		m_mesh->SetPath("solar_eruption");
 	}
 
@@ -51,11 +55,7 @@ namespace fan {
 	void SolarEruption::OnDetach() {
 		Actor::OnDetach();
 		delete m_mesh;
-
-		Model * model = m_gameobject->GetComponent<Model>();
-		if ( model != nullptr ) {
-			model->SetMesh( nullptr );
-		}
+		m_model->SetMesh( nullptr );		
 	}
 
 	//================================================================================================================================
@@ -289,12 +289,8 @@ namespace fan {
 			}
 		}
 
-		m_mesh->LoadFromVertices( vertices );
-
-		Model * model = m_gameobject->GetComponent<Model>();
-		if ( model != nullptr ) {
-			model->SetMesh(m_mesh);
-		}
+		m_mesh->LoadFromVertices( vertices );		
+		m_model->SetMesh(m_mesh);		
 	}
 	   
 	//================================================================================================================================

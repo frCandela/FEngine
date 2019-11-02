@@ -65,7 +65,8 @@ namespace fan {
 	//================================================================================================================================
 	void ecsPlanetsSystem::Run( float /*_delta*/, const size_t _count, std::vector< ecsComponentsKey >& _entitiesData
 		,ComponentData< ecsTranform > & _transforms
-		,ComponentData< ecsPlanet > & _planets ) 	
+		,ComponentData< ecsPlanet > &	_planets
+		, ComponentData< ecsFlags > &	_flags )
 	{
 		for ( int entity = 0; entity < _count; entity++ ) {
 			ecsComponentsKey & key = _entitiesData[entity];
@@ -73,11 +74,14 @@ namespace fan {
 				btTransform& transform		= _transforms.At(key).transform;
 				ecsPlanet& planet			= _planets.At(key);
 				btTransform& parentTransform = _transforms.At(_entitiesData[planet.parentEntity]).transform;
+				ecsFlags& flags = _flags.At( key );
 
 				float const time = -planet.speed * Time::ElapsedSinceStartup();
 				btVector3 position( std::cosf( time + planet.phase ), 0, std::sinf( time + planet.phase ) );
 
 				transform.setOrigin( parentTransform.getOrigin() + planet.radius * position);
+
+				flags.flags |= ecsFlags::OUTDATED_AABB | ecsFlags::OUTDATED_TRANSFORM;
 			}
 		}
 	}
@@ -146,10 +150,10 @@ namespace fan {
 			{
 				uint32_t&   flags = _flags.At(key).flags;
 				ConvexHull&	hull  = _hulls.At(key).convexHull;
-				if( flags & ecsFlags::OUTDATED_TRANSFORM && ! hull.IsEmpty() ) 
+				if( flags & ecsFlags::OUTDATED_AABB && ! hull.IsEmpty() ) 
 				{
 					usefullEntitiesKeys.push_back( &key );
-					flags &= ~ecsFlags::OUTDATED_TRANSFORM;
+					flags &= ~ecsFlags::OUTDATED_AABB;
 				}
 			}
 		}
@@ -184,6 +188,46 @@ namespace fan {
 
 	//================================================================================================================================
 	//================================================================================================================================
+	void ecsUpdateAABBFromRigidbody::Run( float /*_delta*/, const size_t _count, std::vector< ecsComponentsKey >& _entitiesData,
+		  ComponentData< ecsAABB > &		_aabbs
+		, ComponentData< ecsRigidbody > &	_rigidbodies
+		, ComponentData< ecsFlags >    &	_flags
+	)
+	{
+		// Find all interesting entities
+		std::vector< ecsComponentsKey * > outdatedAABBEntities;
+		outdatedAABBEntities.reserve( _entitiesData.size() );
+		for ( int entity = 0; entity < _count; entity++ )
+		{
+			ecsComponentsKey & key = _entitiesData[entity];
+			if ( key.IsAlive() && key.MatchSignature( signature::bitset ) )
+			{
+				uint32_t& flags = _flags.At( key ).flags;
+				if ( flags & ecsFlags::OUTDATED_AABB )
+				{
+					outdatedAABBEntities.push_back( &key );
+					flags &= ~ecsFlags::OUTDATED_AABB;
+				}
+			}
+		}
+
+		// Update aabb
+
+		for ( int dataIndex = 0; dataIndex < outdatedAABBEntities.size(); dataIndex++ )
+		{
+			ecsComponentsKey & key = *outdatedAABBEntities[dataIndex];
+
+
+			btRigidBody& rb = _rigidbodies.At( key ).Get();
+			AABB& aabb = _aabbs.At( key ).aabb;
+			btVector3 low, high;
+			rb.getAabb(low, high);
+			aabb = AABB( low, high );
+		}
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
 	void ecsUpdateAABBFromTransform::Run( float /*_delta*/, const size_t _count, std::vector< ecsComponentsKey >& _entitiesData
 		, ComponentData< ecsTranform > &	_transforms
 		, ComponentData< ecsAABB > &		_aabbs
@@ -197,9 +241,9 @@ namespace fan {
 			if ( key.IsAlive() && key.MatchSignature( signature::bitset ) )
 			{
 				uint32_t& flags = _flags.At( key ).flags;
-				if ( flags & ecsFlags::OUTDATED_TRANSFORM ) {
+				if ( flags & ecsFlags::OUTDATED_AABB ) {
 					usefullData.push_back( &key );
-					flags &= ~ecsFlags::OUTDATED_TRANSFORM;
+					flags &= ~ecsFlags::OUTDATED_AABB;
 				}
 			}
 		}

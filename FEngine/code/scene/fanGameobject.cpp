@@ -38,7 +38,7 @@ namespace fan
 		m_flags->Init();
 
 		m_flags->Init();
-		m_flags->flags = Flag::OUTDATED_TRANSFORM;
+		m_flags->flags = Flag::OUTDATED_TRANSFORM | Flag::OUTDATED_AABB;
 		m_transform = AddComponent<Transform>();
 	}
 

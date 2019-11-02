@@ -132,7 +132,6 @@ namespace fan {
 				Gameobject * newPlanet = scene->CreateGameobject("planet" + std::to_string(radiusIndex), m_gameobject );
 				Model * model = newPlanet->AddComponent<Model>();
 				model->SetPath( GlobalValues::s_meshSphere );
-				newPlanet->AddFlag( Gameobject::Flag::NO_AABB_UPDATE );
 
 				Material * material = newPlanet->AddComponent<Material>();
 				material->SetTexturePath( GlobalValues::s_textureWhite );
@@ -156,7 +155,6 @@ namespace fan {
 
 				if ( m_satelliteRadiusList[radiusIndex] > 0 ) {
 					Gameobject * newSatellite = scene->CreateGameobject( "satellite" + std::to_string( radiusIndex ), newPlanet );
-					newSatellite->AddFlag( Gameobject::Flag::NO_AABB_UPDATE );
 					Model * modelSatellite = newSatellite->AddComponent<Model>();
 					modelSatellite->SetPath( GlobalValues::s_meshSphere );
 

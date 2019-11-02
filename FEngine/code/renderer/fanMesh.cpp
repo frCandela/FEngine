@@ -74,6 +74,8 @@ namespace fan {
 	//================================================================================================================================
 	void Mesh::OptimizeVertices() {
 
+		if( !m_optimizeVertices ) { return;}
+
 		std::unordered_map<Vertex, uint32_t> verticesMap = {};
 
 		std::vector<Vertex> uniqueVertices;
@@ -111,53 +113,71 @@ namespace fan {
 	//================================================================================================================================
 	//================================================================================================================================
 	void Mesh::GenerateBuffers( Device & _device ) {
+		if ( m_indices.empty() ){return;}
 
-		if( m_indices.empty() ) {
-			return;
-		}
+		m_currentBuffer = ( m_currentBuffer + 1 ) % 3;
 
-		m_currentBuffer = (m_currentBuffer + 1) % 3;
+		const VkMemoryPropertyFlags memPropertyFlags = ( m_hostVisible ? 	
+			VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT : 
+			VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT );
 
-		delete( m_indexBuffer[m_currentBuffer] );
-		delete( m_vertexBuffer[m_currentBuffer] );
-		m_indexBuffer[m_currentBuffer] = new Buffer( _device );
-		m_vertexBuffer[m_currentBuffer] = new Buffer( _device );
-
-		{
-			const VkDeviceSize size = sizeof( m_indices[0] ) * m_indices.size();
-			m_indexBuffer[m_currentBuffer]->Create(
-				size,
-				VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_INDEX_BUFFER_BIT,
-				VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT
-			);
-			Buffer stagingBuffer( _device );
-			stagingBuffer.Create(
-				size,
-				VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
-				VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT
-			);
-			stagingBuffer.SetData( m_indices.data(), size );
-			VkCommandBuffer cmd = _device.BeginSingleTimeCommands();
-			stagingBuffer.CopyBufferTo( cmd, m_indexBuffer[m_currentBuffer]->GetBuffer(), size );
-			_device.EndSingleTimeCommands( cmd );
-		}
-		{
-			const VkDeviceSize size = sizeof( m_vertices[0] ) * m_vertices.size();
+		Buffer *& vertexBuffer = m_vertexBuffer[m_currentBuffer];
+		const VkDeviceSize requiredVertexSize = sizeof( m_vertices[0] ) * m_vertices.size();
+		if ( vertexBuffer == nullptr || vertexBuffer->GetSize() < requiredVertexSize ){
+			delete vertexBuffer;
+			vertexBuffer = new Buffer( _device );
 			m_vertexBuffer[m_currentBuffer]->Create(
-				size,
+				requiredVertexSize,
 				VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_VERTEX_BUFFER_BIT,
-				VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT
+				memPropertyFlags
 			);
-			Buffer stagingBuffer2( _device );
-			stagingBuffer2.Create(
-				size,
-				VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
-				VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT
+		}
+
+		Buffer *& indexBuffer = m_indexBuffer[m_currentBuffer];
+		const VkDeviceSize requiredIndexSize = sizeof( m_indices[0] ) * m_indices.size();
+		if ( indexBuffer == nullptr || indexBuffer->GetSize() < requiredIndexSize )
+		{
+			delete indexBuffer;
+			indexBuffer = new Buffer( _device );
+			indexBuffer->Create(
+				requiredIndexSize,
+				VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_INDEX_BUFFER_BIT,
+				memPropertyFlags
 			);
-			stagingBuffer2.SetData( m_vertices.data(), size );
-			VkCommandBuffer cmd2 = _device.BeginSingleTimeCommands();
-			stagingBuffer2.CopyBufferTo( cmd2, m_vertexBuffer[m_currentBuffer]->GetBuffer(), size );
-			_device.EndSingleTimeCommands( cmd2 );
+		}
+
+		if ( m_hostVisible )
+		{
+			indexBuffer->SetData( m_indices.data(), requiredIndexSize );
+			vertexBuffer->SetData( m_vertices.data(), requiredVertexSize );
+		}
+		else {
+			{
+				Buffer stagingBuffer( _device );
+				stagingBuffer.Create(
+					requiredIndexSize,
+					VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
+					VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT
+				);
+				stagingBuffer.SetData( m_indices.data(), requiredIndexSize );
+				VkCommandBuffer cmd = _device.BeginSingleTimeCommands();
+				stagingBuffer.CopyBufferTo( cmd, indexBuffer->GetBuffer(), requiredIndexSize );
+				_device.EndSingleTimeCommands( cmd );
+			}
+			{
+
+
+				Buffer stagingBuffer2( _device );
+				stagingBuffer2.Create(
+					requiredVertexSize,
+					VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
+					VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT
+				);
+				stagingBuffer2.SetData( m_vertices.data(), requiredVertexSize );
+				VkCommandBuffer cmd2 = _device.BeginSingleTimeCommands();
+				stagingBuffer2.CopyBufferTo( cmd2, vertexBuffer->GetBuffer(), requiredVertexSize );
+				_device.EndSingleTimeCommands( cmd2 );
+			}
 		}
 	}
 }

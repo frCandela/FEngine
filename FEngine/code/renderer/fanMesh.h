@@ -15,7 +15,7 @@ namespace fan {
 		static Signal< Mesh* > s_onMeshLoad;
 		static Signal<> s_onMeshDelete;
 
-		Mesh(const std::string& _path = "");
+		Mesh(const std::string& _path = "" );
 		~Mesh();
 
 		void		SetPath(const std::string& _path)			{ m_path = _path; }
@@ -30,6 +30,11 @@ namespace fan {
 		Buffer *						GetIndexBuffer()		{ return m_indexBuffer[m_currentBuffer];	}
 		Buffer *						GetVertexBuffer()		{ return m_vertexBuffer[m_currentBuffer];	}
 		
+		// Usefull when the mesh changes very often
+		void SetHostVisible( const bool _hostVisible ){ m_hostVisible = _hostVisible; } 
+		void SetOptimizeVertices( const bool _optimizeVertices ) { m_optimizeVertices = _optimizeVertices; }
+		
+
 		void GenerateBuffers( Device & _device );
 		bool Load();
 		bool LoadFromVertices( const std::vector<Vertex>&	_vertices );
@@ -38,6 +43,9 @@ namespace fan {
 		std::string				m_path;
 		std::vector<Vertex>		m_vertices;
 		std::vector<uint32_t>	m_indices;
+
+		bool m_hostVisible = false;
+		bool m_optimizeVertices = true;		
 
 		uint32_t m_currentBuffer = 0;
 		Buffer * m_indexBuffer[3];

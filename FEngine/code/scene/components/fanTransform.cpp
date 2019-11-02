@@ -68,6 +68,7 @@ namespace fan
 		if ( m_transform->transform.getOrigin() != _newPosition) {
 			m_transform->transform.setOrigin( _newPosition);
 			m_gameobject->AddFlag( Gameobject::Flag::OUTDATED_TRANSFORM );
+			m_gameobject->AddFlag( Gameobject::Flag::OUTDATED_AABB );
  		}
 	}
 
@@ -77,6 +78,7 @@ namespace fan
 		if (m_scale->scale != _newScale) {
 			m_scale->scale = _newScale;
 			m_gameobject->AddFlag( Gameobject::Flag::OUTDATED_TRANSFORM );
+			m_gameobject->AddFlag( Gameobject::Flag::OUTDATED_AABB );
 		}
 	}
 
@@ -102,6 +104,7 @@ namespace fan
 		if ( m_transform->transform.getRotation() != _rotation) {
 			m_transform->transform.setRotation( _rotation);
 			m_gameobject->AddFlag( Gameobject::Flag::OUTDATED_TRANSFORM );
+			m_gameobject->AddFlag( Gameobject::Flag::OUTDATED_AABB );
 		}
 	}
 
