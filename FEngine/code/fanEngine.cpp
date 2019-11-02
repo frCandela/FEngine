@@ -282,9 +282,6 @@ namespace fan {
 				Debug::Render().DebugLine(btVector3(coord*size, 0.f, -count * size), btVector3(coord*size, 0.f, count*size), m_editorGrid.color);
 			}
 		}
-
-		static ecsComponentsKeyCompact key;
-		key.OnGui();
 	}
 
 	//================================================================================================================================
@@ -465,10 +462,10 @@ namespace fan {
 		} m_renderer->SetNumDirectionalLights( static_cast<uint32_t>( m_directionalLights.size() ) );
 
 		// Transforms, mesh, materials
-		std::vector<DrawData> drawData( m_models.size() );
+		std::vector<DrawMesh> drawData( m_models.size() );
 		for (int modelIndex = 0; modelIndex < m_models.size() ; modelIndex++) {
 
-			DrawData& data = drawData[modelIndex];
+			DrawMesh& data = drawData[modelIndex];
 			Model * model = m_models[modelIndex];
 			Transform * transform = model->GetGameobject()->GetTransform();
 			Material * material = model->GetGameobject()->GetComponent<Material>();

@@ -8,6 +8,7 @@ namespace fan
 	class Image;
 	class ImageView;
 	class Buffer;
+	class DescriptorTextures;
 	class Descriptor;
 
 	//================================================================================================================================
@@ -34,7 +35,7 @@ namespace fan
 
 	private:		
 
-		Descriptor *	m_descriptorImageSampler = nullptr;
+		DescriptorTextures *	m_descriptorImageSampler = nullptr;
 		Descriptor *	m_descriptorUniforms = nullptr;
 		ImageView *		m_imageView;
 		Sampler *		m_sampler;

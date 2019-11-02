@@ -16,6 +16,7 @@ namespace fan
 	class Texture;
 	class Sampler;
 	class Descriptor;
+	class DescriptorTextures;
 	class RessourceManager;
 
 	//================================================================
@@ -61,7 +62,6 @@ namespace fan
 	struct DynamicUniformsMaterial {
 		glm::vec4  color = glm::vec4( 1 );
 		glm::int32 shininess;
-		glm::int32 textureIndex;
 	};
 
 	//================================================================
@@ -94,23 +94,23 @@ namespace fan
 
 		void Resize( const VkExtent2D _extent ) override;
 		void BindDescriptors( VkCommandBuffer _commandBuffer, const size_t _indexFrame, const uint32_t _indexOffset );
+		void BindTexture( VkCommandBuffer _commandBuffer, const uint32_t _textureIndex );
 		void UpdateUniformBuffers( const size_t _index = 0 ) override;
 		void CreateDescriptors( const size_t _numSwapchainImages, RessourceManager * const _ressourceManager );
 		void ResizeDynamicDescriptors ( const size_t _newSize );
 		void ReloadShaders() override;
-
+		bool CreateTextureDescriptor();
 
 	protected:
 		void ConfigurePipeline() override;
 
 	private:
-		Descriptor * m_sceneDescriptor;
-		Descriptor * m_texturesDescriptor;		
+		Descriptor *		 m_sceneDescriptor;
+		DescriptorTextures * m_texturesDescriptor;
 
 		Sampler *			m_sampler = nullptr;
 		RessourceManager *	m_ressourceManager = nullptr;
 
-		bool CreateTextureDescriptor();
-		void SetTextureDescriptor( const int _index = -1 );
+
 	};
 }

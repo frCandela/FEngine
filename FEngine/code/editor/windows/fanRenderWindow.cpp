@@ -50,11 +50,11 @@ namespace fan
 		}
 
 		if ( ImGui::CollapsingHeader( "Rendered Models : " ) ) {
-			const std::vector< Mesh *> & meshArray = m_renderer->GetMeshArray();
+			const std::vector<DrawData> & meshArray = m_renderer->GetMeshArray();
 			for ( uint32_t meshIndex = 0; meshIndex < meshArray.size(); meshIndex++ ) {
-				const Mesh * mesh = meshArray[meshIndex];
-				if ( mesh != nullptr ) {
-					ImGui::Text( mesh->GetPath().c_str() );
+				const DrawData & drawData = meshArray[meshIndex];
+				if ( drawData.mesh != nullptr ) {
+					ImGui::Text( drawData.mesh->GetPath().c_str() );
 				} else {
 					ImGui::Text( "Empty slot" );
 				}

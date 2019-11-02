@@ -10,6 +10,7 @@
 #include "renderer/core/fanTexture.h"
 #include "renderer/core/fanSampler.h"
 #include "renderer/core/fanDescriptor.h"
+#include "renderer/core/fanDescriptorTexture.h"
 #include "renderer/fanRenderer.h"
 #include "renderer/util/fanVertex.h"
 #include "renderer/fanMesh.h"
@@ -42,7 +43,6 @@ namespace fan
 
 		for ( int uniformIndex = 0; uniformIndex < m_dynamicUniformsMaterial.Size(); uniformIndex++ ) {
 			m_dynamicUniformsMaterial[uniformIndex].color = glm::vec4( 1 );
-			m_dynamicUniformsMaterial[uniformIndex].textureIndex = 0;
 			m_dynamicUniformsMaterial[uniformIndex].shininess = 1;
 		}
 	}
@@ -59,10 +59,6 @@ namespace fan
 	//================================================================================================================================
 	void ForwardPipeline::Resize( const VkExtent2D _extent) {
 		Pipeline::Resize(_extent);
-
-		delete m_texturesDescriptor;
-		m_texturesDescriptor = nullptr;
-		CreateTextureDescriptor();
 		DeletePipeline();
 		CreatePipeline();
 	}
@@ -98,29 +94,26 @@ namespace fan
 	//================================================================================================================================
 	bool ForwardPipeline::CreateTextureDescriptor() {
 		delete m_texturesDescriptor;
-		m_texturesDescriptor = new  Descriptor( m_device, 1 );
-		SetTextureDescriptor();
 
-		return m_texturesDescriptor->Create();
+		const std::vector< Texture * > & texture = m_ressourceManager->GetTextures();
+		m_texturesDescriptor = new  DescriptorTextures( m_device, m_sampler->GetSampler(), static_cast<uint32_t>(  texture.size() ));		
+
+		std::vector< VkImageView > imageViews( texture.size() );
+		for ( int textureIndex = 0; textureIndex < texture.size(); textureIndex++ )
+		{
+			m_texturesDescriptor->Append( texture[textureIndex]->GetImageView() );
+		}
+
+		m_texturesDescriptor->UpdateRange( 0, m_texturesDescriptor->Count() - 1 );
+
+		return true;
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
 	void ForwardPipeline::ReloadShaders() {
 		Pipeline::ReloadShaders();
-		SetTextureDescriptor(0);
-	}
-
-	//================================================================================================================================
-	//================================================================================================================================
-	void ForwardPipeline::SetTextureDescriptor( const int _index ) {
-		const std::vector< Texture * > & texture = m_ressourceManager->GetTextures();
-
-		std::vector< VkImageView > imageViews( texture.size() );
-		for ( int textureIndex = 0; textureIndex < texture.size(); textureIndex++ ) {
-			imageViews[textureIndex] = texture[textureIndex]->GetImageView();
-		}
-		m_texturesDescriptor->SetImageSamplerBinding( VK_SHADER_STAGE_FRAGMENT_BIT, imageViews, m_sampler->GetSampler(), _index );
+		CreateTextureDescriptor();
 	}
 
 	//================================================================================================================================
@@ -135,11 +128,32 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
+	void ForwardPipeline::BindTexture( VkCommandBuffer _commandBuffer, const uint32_t _textureIndex )
+	{
+		assert( _textureIndex < m_texturesDescriptor->Count() );
+
+		std::vector<VkDescriptorSet> descriptors = {
+			 m_texturesDescriptor->GetSet( _textureIndex )
+		};
+
+		vkCmdBindDescriptorSets(
+			_commandBuffer,
+			VK_PIPELINE_BIND_POINT_GRAPHICS,
+			m_pipelineLayout,
+			1,
+			static_cast<uint32_t>( descriptors.size() ),
+			descriptors.data(),
+			0,
+			nullptr			
+		);
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
 	void ForwardPipeline::BindDescriptors( VkCommandBuffer _commandBuffer, const size_t _indexFrame, const uint32_t _indexOffset ) {
 		
 		std::vector<VkDescriptorSet> descriptors = {
 			m_sceneDescriptor->GetSet( _indexFrame )
-			, m_texturesDescriptor->GetSet()
 		}; 
 		std::vector<uint32_t> dynamicOffsets = {
 			 _indexOffset  * static_cast<uint32_t>( m_dynamicUniformsVert.Alignment() )

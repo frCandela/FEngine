@@ -166,7 +166,7 @@ namespace fan {
 
 				// Uv
 				const fbxsdk::FbxVector2& uv = uvs[vertexIndex];
-				vertices[vertexIndex].uv = glm::vec2(uv[0], uv[1]);
+				vertices[vertexIndex].uv = glm::vec2(1.f - uv[0], uv[1]);
 			}
 
 		}

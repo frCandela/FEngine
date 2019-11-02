@@ -1,5 +1,4 @@
 #version 450
-#extension GL_EXT_nonuniform_qualifier : require
 
 layout( location = 0 ) out vec4 outColor;
 
@@ -15,7 +14,6 @@ layout(binding = 2) uniform FragUniforms {
 layout (binding = 3) uniform DynamicUniformBufferFrag {
 	vec4 color;
 	int shininess;
-	int	textureIndex;
 } material;
 
 struct PointLight {
@@ -45,7 +43,7 @@ layout(binding = 4) uniform LightUniform {
 	int pointLightNum;
 } lights;
 
-layout(set = 1, binding = 0) uniform sampler2D diffuseTexture[];
+layout(set = 1, binding = 0) uniform sampler2D diffuseTexture;
 
 vec3 CalcPointLight( const PointLight light, const vec3 normal, const vec3 fragPos,  vec3 viewDir);
 vec3 CalcDirLight  ( const DirectionalLight light, const vec3 normal, const vec3 viewDir); 
@@ -64,7 +62,7 @@ void main() {
 		lightColor += CalcPointLight( lights.pointLights[lightIndex], goodNormal, inFragPos, viewDir );
 	}
 
-	float alpha = texture( diffuseTexture[material.textureIndex], inTexCoord).a * material.color.a;
+	float alpha = texture( diffuseTexture, inTexCoord).a * material.color.a;
 	outColor = vec4(lightColor, alpha);
 }
 
@@ -79,7 +77,7 @@ vec3 CalcDirLight  ( const DirectionalLight light, const vec3 normal, const vec3
     vec3 reflectDir = reflect(-lightDir, normal);
     float spec = pow(max(dot(viewDir, reflectDir), 0.0), material.shininess);
     // combine results
-	vec3 textureColor = material.color.xyz * vec3(texture(diffuseTexture[material.textureIndex], inTexCoord));
+	vec3 textureColor = material.color.xyz * vec3(texture(diffuseTexture, inTexCoord));
     vec3 ambient  = light.ambiant.xyz  * textureColor;
     vec3 diffuse  = light.diffuse.xyz  * diff * textureColor;
     vec3 specular = light.specular.xyz * spec ;//* vec3(texture(material.specular, TexCoords));
@@ -102,7 +100,7 @@ vec3 CalcPointLight(const PointLight light, const vec3 normal, const vec3 fragPo
     float attenuation = 1.0 / (light.constant + light.linear * distance + light.quadratic * (distance * distance));    
     
 	// combine results
-	vec3 textureColor = material.color.xyz * vec3(texture(diffuseTexture[material.textureIndex], inTexCoord));
+	vec3 textureColor = material.color.xyz * vec3(texture(diffuseTexture, inTexCoord));
     vec3 ambient  = light.ambiant.xyz  * textureColor;
     vec3 diffuse  = light.diffuse.xyz  * vec3(diff) * textureColor;
     vec3 specular = light.specular.xyz * vec3(spec);// * vec3(texture(material.specular.xyz, TexCoords));

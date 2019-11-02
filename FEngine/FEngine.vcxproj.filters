@@ -379,6 +379,9 @@
     <ClCompile Include="code\ecs\fanEcsComponentsKey.cpp">
       <Filter>code\ecs</Filter>
     </ClCompile>
+    <ClCompile Include="code\renderer\core\fanDescriptorTexture.cpp">
+      <Filter>code\renderer\core</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="code\editor\fanMainMenuBar.h">
@@ -1241,6 +1244,9 @@
     </ClInclude>
     <ClInclude Include="deps\bitset2\detail\array_funcs.hpp">
       <Filter>code\deps\bitset2</Filter>
+    </ClInclude>
+    <ClInclude Include="code\renderer\core\fanDescriptorTexture.h">
+      <Filter>code\renderer\core</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

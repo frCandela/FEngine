@@ -5,7 +5,6 @@
 namespace fan {
 	class Device;
 	class Buffer;
-	class Texture;
 	class Sampler;
 	 
 	//================================================================================================================================
@@ -17,12 +16,10 @@ namespace fan {
 		//================================================================
 		struct BindingData {			
 			VkDescriptorSetLayoutBinding		 layoutBinding;
-			std::vector< VkDescriptorImageInfo > descriptorsImageInfo;
 			std::vector < VkWriteDescriptorSet>	 writeDescriptorSets;
 			std::vector<VkDescriptorBufferInfo>  descriptorBufferInfos;
 			std::vector<Buffer * >				 buffers;
 
-			void SetImagesSampler( std::vector< VkImageView > & _imageViews, VkSampler _sampler );
 			void SetBuffers( Device& _device, const size_t _count, VkDeviceSize _sizeBuffer, VkDeviceSize _alignment = 1 );
 			void UpdateLayoutBinding( const size_t _index, const VkShaderStageFlags _stage, const VkDescriptorType _descriptorType, const size_t _descriptorCount );
 			void UpdateWriteDescriptorSet( const size_t _dstBinding, const size_t _setIndex, VkDescriptorSet _descriptorSet );
@@ -39,7 +36,6 @@ namespace fan {
 		
 		void SetUniformBinding( const VkShaderStageFlags  _stage, const VkDeviceSize _bufferSize);
 		void SetDynamicUniformBinding( VkShaderStageFlags  _stage, VkDeviceSize _bufferSize, VkDeviceSize _alignment, const int _index = -1 );
-		void SetImageSamplerBinding( VkShaderStageFlags  _stage, std::vector< VkImageView > & _textures, VkSampler _sampler, const int _index = -1 );
 
 		VkDescriptorSetLayout GetLayout() { return m_descriptorSetLayout; }
 		VkDescriptorSet		  GetSet( const size_t _index = 0 ) { return m_descriptorSets[ _index ]; }

@@ -29,7 +29,7 @@ namespace fan
 	//================================================================================================================================
 	Renderer::Renderer( const VkExtent2D _size, const glm::ivec2 _position ) {
 		m_instance =	new Instance();
-		m_window =		new Window("Vulkan", _size, _position, m_instance->vkInstance);
+		m_window =		new Window("FEngine", _size, _position, m_instance->vkInstance);
 		m_device =		new Device(m_instance, m_window->GetSurface());
 
 		m_swapchain =	new SwapChain(*m_device);		
@@ -171,7 +171,7 @@ namespace fan
 
 		if ( m_ressourceManager->IsModified() ) {
 			WaitIdle();
-			m_forwardPipeline->Resize( m_swapchain->GetExtent() );
+			m_forwardPipeline->CreateTextureDescriptor();
 			m_ressourceManager->SetUnmodified();
 		}
 
@@ -273,7 +273,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void Renderer::SetDrawData( const std::vector<DrawData> & _drawData ) {
+	void Renderer::SetDrawData( const std::vector<DrawMesh> & _drawData ) {
 		if ( _drawData.size() > m_meshDrawArray.capacity() ) {
 			Debug::Warning("Resizing draw data arrays");
 			WaitIdle();
@@ -284,7 +284,7 @@ namespace fan
 
 		m_meshDrawArray.clear();
 		for (int dataIndex = 0; dataIndex < _drawData.size(); dataIndex++)	{
-			const DrawData& data = _drawData[dataIndex];
+			const DrawMesh& data = _drawData[dataIndex];
 
 			if ( data.mesh != nullptr && ! data.mesh->GetIndices().empty() ) {
 				// Transform
@@ -294,10 +294,9 @@ namespace fan
 				// material
 				m_forwardPipeline->m_dynamicUniformsMaterial[dataIndex].color = data.color;
 				m_forwardPipeline->m_dynamicUniformsMaterial[dataIndex].shininess = data.shininess;
-				m_forwardPipeline->m_dynamicUniformsMaterial[dataIndex].textureIndex = data.textureIndex;
 
 				// Mesh
-				m_meshDrawArray.push_back( data.mesh );
+				m_meshDrawArray.push_back( {data.mesh, data.textureIndex } );
 			}
 		}
 	}
@@ -536,17 +535,17 @@ namespace fan
 		commandBufferBeginInfo.pInheritanceInfo = &commandBufferInheritanceInfo;
 
 		if (vkBeginCommandBuffer(commandBuffer, &commandBufferBeginInfo) == VK_SUCCESS) {
-			m_forwardPipeline->Bind( commandBuffer, _index );
+			m_forwardPipeline->Bind( commandBuffer, _index );			
 
 			for ( uint32_t meshIndex = 0; meshIndex < m_meshDrawArray.size(); meshIndex++ ) {
-				Mesh * mesh = m_meshDrawArray[meshIndex];		
-
+				DrawData& drawData = m_meshDrawArray[meshIndex];
+				m_forwardPipeline->BindTexture( commandBuffer, drawData.textureIndex );
 				m_forwardPipeline->BindDescriptors( commandBuffer, _index, meshIndex );
 				VkDeviceSize offsets[] = { 0 };
-				VkBuffer vertexBuffers[] = { mesh->GetVertexBuffer()->GetBuffer() };
+				VkBuffer vertexBuffers[] = { drawData.mesh->GetVertexBuffer()->GetBuffer() };
 				vkCmdBindVertexBuffers( commandBuffer, 0, 1, vertexBuffers, offsets );
-				vkCmdBindIndexBuffer( commandBuffer, mesh->GetIndexBuffer()->GetBuffer(), 0, VK_INDEX_TYPE_UINT32 );
-				vkCmdDrawIndexed( commandBuffer, static_cast<uint32_t>( mesh->GetIndices().size() ), 1, 0, 0, 0 );
+				vkCmdBindIndexBuffer( commandBuffer, drawData.mesh->GetIndexBuffer()->GetBuffer(), 0, VK_INDEX_TYPE_UINT32 );
+				vkCmdDrawIndexed( commandBuffer, static_cast<uint32_t>( drawData.mesh->GetIndices().size() ), 1, 0, 0, 0 );
 			}
 
 			if (vkEndCommandBuffer(commandBuffer) != VK_SUCCESS) {

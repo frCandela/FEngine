@@ -23,7 +23,8 @@ namespace fan
 	class Color;
 	class RessourceManager;
 
-	struct DrawData {
+	// Used to set uniforms
+	struct DrawMesh {
 		Mesh * mesh;
 		glm::mat4 modelMatrix;
 		glm::mat4 normalMatrix;
@@ -32,9 +33,19 @@ namespace fan
 		uint32_t textureIndex;
 	};
 
+	// Used to batch rendering
+	struct DrawData
+	{
+		Mesh * mesh;
+		uint32_t textureIndex;
+	};
+
 	//================================================================================================================================
 	//================================================================================================================================
 	class Renderer {
+	private:
+
+
 	public:
 		Renderer(const VkExtent2D _size, const glm::ivec2 _position);
 		~Renderer();
@@ -60,13 +71,13 @@ namespace fan
 		void SetNumDirectionalLights( const uint32_t _num );
 		void SetPointLight( const int _index, const glm::vec3 _position, const glm::vec3 _diffuse, const glm::vec3 _specular, const glm::vec3 _ambiant, const glm::vec3 _constantLinearQuadratic );
 		void SetNumPointLights( const uint32_t _num );
-		void SetDrawData( const std::vector<DrawData> & _drawData );
+		void SetDrawData( const std::vector<DrawMesh> & _drawData );
 
 		float GetWindowAspectRatio() const;
 		bool  HasNoDebugToDraw() const { return m_debugLinesNoDepthTest.empty() && m_debugLines.empty() && m_debugTriangles.empty(); }
 		void Clear() { m_meshDrawArray.clear(); }
 
-		const std::vector< Mesh *> & GetMeshArray() const { return m_meshDrawArray; }
+		const std::vector< DrawData > & GetMeshArray() const { return m_meshDrawArray; }
 
 		void					DebugPoint	  ( const btVector3 _pos, const Color _color);
 		void					DebugLine	  ( const btVector3 _start, const btVector3 _end, const Color _color, const bool _depthTestEnable = true);
@@ -79,7 +90,7 @@ namespace fan
 		void					DebugAABB	  ( const AABB & _aabb, const Color _color);
 
 	private:
-		std::vector< Mesh *> m_meshDrawArray;
+		std::vector< DrawData > m_meshDrawArray;
 
 		RessourceManager *  m_ressourceManager;
 

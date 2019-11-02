@@ -150,6 +150,7 @@
     <ClCompile Include="code\renderer\core\fanShader.cpp" />
     <ClCompile Include="code\renderer\core\fanSwapChain.cpp" />
     <ClCompile Include="code\renderer\core\fanTexture.cpp" />
+    <ClCompile Include="code\renderer\core\fanDescriptorTexture.cpp" />
     <ClCompile Include="code\renderer\fanMesh.cpp" />
     <ClCompile Include="code\renderer\fanRenderer.cpp" />
     <ClCompile Include="code\renderer\fanRessourceManager.cpp" />
@@ -262,6 +263,7 @@
     <ClInclude Include="code\renderer\core\fanShader.h" />
     <ClInclude Include="code\renderer\core\fanSwapChain.h" />
     <ClInclude Include="code\renderer\core\fanTexture.h" />
+    <ClInclude Include="code\renderer\core\fanDescriptorTexture.h" />
     <ClInclude Include="code\renderer\fanMesh.h" />
     <ClInclude Include="code\renderer\fanRenderer.h" />
     <ClInclude Include="code\renderer\fanRessourceManager.h" />

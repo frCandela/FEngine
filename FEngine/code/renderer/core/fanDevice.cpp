@@ -143,7 +143,7 @@ namespace fan
 		GetQueueFamilies();
 		std::vector< const char * > existingExtensions = GetDesiredExtensions(
 			{ VK_KHR_SWAPCHAIN_EXTENSION_NAME
-			, VK_EXT_DESCRIPTOR_INDEXING_EXTENSION_NAME
+			
 			}
 		);
 

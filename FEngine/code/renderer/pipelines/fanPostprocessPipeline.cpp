@@ -4,6 +4,7 @@
 #include "renderer/core/fanDevice.h"
 #include "renderer/core/fanShader.h"
 #include "renderer/core/fanBuffer.h"
+#include "renderer/core/fanDescriptorTexture.h"
 #include "renderer/core/fanDescriptor.h"
 #include "renderer/core/fanImageView.h"
 #include "renderer/core/fanSampler.h"
@@ -30,9 +31,13 @@ namespace fan
 	//================================================================================================================================
 	void PostprocessPipeline::Resize( const VkExtent2D _extent ) {
 		Pipeline::Resize(_extent);
-		std::vector<VkImageView> views = { m_imageView->GetImageView() };
-		m_descriptorImageSampler->SetImageSamplerBinding( VK_SHADER_STAGE_FRAGMENT_BIT, views, m_sampler->GetSampler(), 0 );
-		m_descriptorImageSampler->Update();
+		m_descriptorImageSampler->Set(0, m_imageView->GetImageView() );
+		m_descriptorImageSampler->UpdateRange(0,0);
+
+// 		std::vector<VkImageView> views = { m_imageView->GetImageView() };
+// 		m_descriptorImageSampler->
+// 		m_descriptorImageSampler->SetImageSamplerBinding( VK_SHADER_STAGE_FRAGMENT_BIT, views, m_sampler->GetSampler(), 0 );
+// 		m_descriptorImageSampler->Update();
 	}
 
 	//================================================================================================================================
@@ -40,7 +45,7 @@ namespace fan
 	void PostprocessPipeline::Bind( VkCommandBuffer _commandBuffer, const size_t _index ) {
 		Pipeline::Bind(_commandBuffer, _index );
 		std::vector<VkDescriptorSet> descriptors = {
-			m_descriptorImageSampler->GetSet()
+			m_descriptorImageSampler->GetSet(0)
 			, m_descriptorUniforms->GetSet( _index )
 		};
 		vkCmdBindDescriptorSets(
@@ -71,10 +76,9 @@ namespace fan
 		UpdateUniformBuffers();
 
 		delete m_descriptorImageSampler;
-		m_descriptorImageSampler = new Descriptor( m_device, 1 );
-		std::vector<VkImageView> views = { m_imageView->GetImageView() };
-		m_descriptorImageSampler->SetImageSamplerBinding( VK_SHADER_STAGE_FRAGMENT_BIT , views, m_sampler->GetSampler() );		
-		m_descriptorImageSampler->Create();
+		m_descriptorImageSampler = new DescriptorTextures( m_device, m_sampler->GetSampler(), 1 );
+		m_descriptorImageSampler->Append( m_imageView->GetImageView() );
+		m_descriptorImageSampler->UpdateRange(0,0);
 	}
 
 	//================================================================================================================================
