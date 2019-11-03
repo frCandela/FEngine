@@ -60,6 +60,7 @@ namespace fan
 			Model * model = bulletGO->AddComponent<Model>();
 			Material * material = bulletGO->AddComponent<Material>();
 			Rigidbody * rb = bulletGO->AddComponent<Rigidbody>();			
+			rb->onContactStarted.Connect(&Weapon::OnBulletContact, this );
 
 			SphereShape * collider = bulletGO->AddComponent<SphereShape>();
 			Transform * transform = bulletGO->GetTransform();
@@ -84,6 +85,19 @@ namespace fan
 			rb->SetVelocity( myRb->GetVelocity() + m_speed * thisTransform->Forward() );
 			  
 		}
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
+	void Weapon::OnBulletContact( Rigidbody* _other, btPersistentManifold* const& _manifold )
+	{
+		
+		Rigidbody * rb0 = static_cast<Rigidbody*> ( _manifold->getBody0()->getUserPointer() );
+ 		Rigidbody * rb1 = static_cast<Rigidbody*> ( _manifold->getBody1()->getUserPointer() );
+		Rigidbody * bulletRb = _other == rb0 ? rb1 : rb0;
+
+		m_gameobject->GetScene()->DeleteGameobject( bulletRb->GetGameobject() );
+
 	}
 
 	//================================================================================================================================

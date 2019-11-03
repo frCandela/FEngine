@@ -1,9 +1,10 @@
 #include "fanGlobalIncludes.h"
 #include "physics/fanPhysicsManager.h"
-#include "scene/components/fanRigidbody.h"
 
 #include "core/time/fanTime.h"
 #include "core/time/fanProfiler.h"
+#include "scene/fanGameobject.h"
+#include "scene/components/fanRigidbody.h"
 
 namespace fan {
 	//================================================================================================================================
@@ -14,6 +15,11 @@ namespace fan {
 		m_overlappingPairCache = new btDbvtBroadphase();
 		m_solver = new btSequentialImpulseConstraintSolver;
 		m_dynamicsWorld = new btDiscreteDynamicsWorld( m_dispatcher, m_overlappingPairCache, m_solver, m_collisionConfiguration );
+
+// 		gContactDestroyedCallback	= ContactDestroyedCallback;
+// 		gContactProcessedCallback = ContactProcessedCallback;
+		gContactStartedCallback = ContactStartedCallback;
+		gContactEndedCallback = ContactEndedCallback;
 
 		m_dynamicsWorld->setGravity( _gravity );
 
@@ -65,13 +71,58 @@ namespace fan {
 		delete m_dispatcher;
 		delete m_collisionConfiguration;		
 	}
+// 
+// 	bool PhysicsManager::ContactDestroyedCallback( void* _userPersistentData ){	return true;}
+// 	bool PhysicsManager::ContactProcessedCallback( btManifoldPoint& _cp, void* _body0, void* _body1 ) {	return true;}
+
+	//================================================================================================================================
+	//================================================================================================================================	
+	void PhysicsManager::ContactStartedCallback	( btPersistentManifold* const& _manifold )
+	{
+		if ( _manifold->getNumContacts() == 1 )	{
+			Rigidbody * rb0 = static_cast<Rigidbody*> ( _manifold->getBody0()->getUserPointer() );
+			Rigidbody * rb1 = static_cast<Rigidbody*> ( _manifold->getBody1()->getUserPointer() );
+			rb0->onContactStarted.Emmit( rb1, _manifold );
+			rb1->onContactStarted.Emmit( rb0, _manifold );
+		}
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================	
+	void PhysicsManager::ContactEndedCallback	( btPersistentManifold* const& _manifold )
+	{
+		if ( _manifold->getNumContacts() == 0 )
+		{
+			Rigidbody * rb0 = static_cast<Rigidbody*> ( _manifold->getBody0()->getUserPointer() );
+			Rigidbody * rb1 = static_cast<Rigidbody*> ( _manifold->getBody1()->getUserPointer() );
+			rb0->onContactEnded.Emmit( rb1, _manifold );
+			rb1->onContactEnded.Emmit( rb0, _manifold );
+		}
+	}
 
 	//================================================================================================================================
 	//================================================================================================================================	
 	void PhysicsManager::OnGui() {
-// 		ImGui::Begin( "Physics" ); {			
-// 			ImGui::Text( std::to_string( m_dynamicsWorld->getNumCollisionObjects() ).c_str() );
+// 		ImGui::Begin( "Physics" ); {	
+// 			int numManifolds = m_dispatcher->getNumManifolds();
+// 			for ( int i = 0; i < numManifolds; i++ )
+// 			{
+// 				btPersistentManifold* contactManifold = m_dispatcher->getManifoldByIndexInternal( i );
+// 				int numContacts = contactManifold->getNumContacts();
+// 				std::stringstream ss;
+// 
+// 				Rigidbody * rb0 = static_cast<Rigidbody*> ( contactManifold->getBody0()->getUserPointer() );
+// 				Rigidbody * rb1 = static_cast<Rigidbody*> ( contactManifold->getBody1()->getUserPointer() );
+// 
+// 				ss << rb0->GetGameobject()->GetName() << " " << rb1->GetGameobject()->GetName() << " " << numContacts << " : ";
+// 				for ( int j = 0; j < numContacts; j++ )
+// 				{
+// 					const btManifoldPoint& pt = contactManifold->getContactPoint( j );
+// 
+// 					ss << pt.getDistance() << " ";
+// 				}
+// 				ImGui::Text( ss.str().c_str() );
+// 			}
 // 		} ImGui::End();
-	}
-
+ 	}
 }

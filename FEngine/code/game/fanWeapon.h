@@ -4,6 +4,8 @@
 
 namespace fan
 {
+	class Rigidbody;
+
 	//================================================================================================================================
 	//================================================================================================================================
 	class Weapon : public Actor
@@ -30,5 +32,7 @@ namespace fan
 		float m_speed = 0.2f;
 		int   m_bulletsPerFrame = 1;
 		btVector3 m_offset ;
+
+		void OnBulletContact( Rigidbody* _other, btPersistentManifold* const& _manifold );
 	};
 }

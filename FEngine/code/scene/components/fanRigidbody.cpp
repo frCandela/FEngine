@@ -72,6 +72,7 @@ namespace fan {
 
 		btRigidBody ** tmpRigidbody = &const_cast<btRigidBody*>( m_rigidbody );
 		*tmpRigidbody = rigidbody->Init( rbInfo );
+		m_rigidbody->setUserPointer(this);
 
 		if( m_colShape != nullptr ){
 			m_gameobject->GetScene()->GetPhysicsManager()->AddRigidbody( this );

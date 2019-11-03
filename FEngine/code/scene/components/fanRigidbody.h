@@ -7,6 +7,11 @@ namespace fan {
 	//================================================================================================================================	
 	class Rigidbody : public Component {
 	public:
+		friend class PhysicsManager;
+
+		Signal<Rigidbody*, btPersistentManifold* const&> onContactStarted;
+		Signal<Rigidbody*, btPersistentManifold* const&> onContactEnded;
+
 		btRigidBody *			GetBtBody()		{ return m_rigidbody; }
 		btDefaultMotionState *  GetBtMotion() { return m_motionState; }
 
@@ -41,7 +46,6 @@ namespace fan {
 	private:
 		btRigidBody * const				m_rigidbody =  nullptr;
 		btDefaultMotionState  * const	m_motionState = nullptr;
-
 		btCollisionShape*				m_colShape = nullptr;
 
 		btCollisionShape *  FindCollisionShape();

@@ -29,5 +29,11 @@ namespace fan {
 		btBroadphaseInterface*					m_overlappingPairCache;
 		btSequentialImpulseConstraintSolver*	m_solver;
 		btDiscreteDynamicsWorld*				m_dynamicsWorld;
+
+// 		static bool ContactDestroyedCallback( void* _userPersistentData );
+// 		static bool ContactProcessedCallback( btManifoldPoint& _cp, void* _body0, void* _body1 );
+		static void ContactStartedCallback	( btPersistentManifold* const& _manifold );
+		static void ContactEndedCallback	( btPersistentManifold* const& _manifold );
+
 	};
 }
