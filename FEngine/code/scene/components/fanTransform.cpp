@@ -3,6 +3,7 @@
 #include "scene/components/fanTransform.h"
 #include "scene/components/fanComponent.h"
 #include "scene/fanGameobject.h"
+#include "scene/components/fanRigidbody.h"
 #include "scene/fanScene.h"	
 #include "core/fanSignal.h"
 #include "ecs/fanECSManager.h"
@@ -39,7 +40,7 @@ namespace fan
 	//================================================================================================================================
 	// Getters
 	//================================================================================================================================
-	btTransform	Transform::GetBtTransform() const	{ return btTransform(m_transform->transform); }
+	btTransform	Transform::GetBtTransform() const	{ return m_transform->transform; }
 	btVector3 Transform::GetPosition() const		{ return m_transform->transform.getOrigin(); }
 	btVector3 Transform::GetScale() const			{ return m_scale->scale; }
 	btQuaternion Transform::GetRotationQuat() const { return m_transform->transform.getRotation(); }
@@ -70,6 +71,12 @@ namespace fan
 			m_gameobject->AddFlag( Gameobject::Flag::OUTDATED_TRANSFORM );
 			m_gameobject->AddFlag( Gameobject::Flag::OUTDATED_AABB );
  		}
+
+		Rigidbody * rb = m_gameobject->GetComponent<Rigidbody>();
+		if ( rb )  {
+			rb->SetTransform( m_transform->transform );
+		}
+
 	}
 
 	//================================================================================================================================
@@ -106,6 +113,12 @@ namespace fan
 			m_gameobject->AddFlag( Gameobject::Flag::OUTDATED_TRANSFORM );
 			m_gameobject->AddFlag( Gameobject::Flag::OUTDATED_AABB );
 		}
+
+		Rigidbody * rb = m_gameobject->GetComponent<Rigidbody>();
+		if ( rb )
+		{
+			rb->SetTransform( m_transform->transform );
+		}
 	}
 
 	//================================================================================================================================
@@ -140,7 +153,7 @@ namespace fan
 	//================================================================================================================================
 	btVector3 Transform::TransformDirection(const btVector3 _point) const {
 		const btTransform transform( GetRotationQuat() );
-		btVector3 transformedPoint = transform * ( GetScale() * _point);
+		btVector3 transformedPoint = transform * _point;
 		return transformedPoint;
 	}
 

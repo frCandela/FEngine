@@ -57,7 +57,8 @@ namespace fan
 			Gameobject * bulletGO = m_gameobject->GetScene()->CreateGameobject("bullet", m_gameobject );
 			Model * model = bulletGO->AddComponent<Model>();
 			Material * material = bulletGO->AddComponent<Material>();
-			Rigidbody * rb = bulletGO->AddComponent<Rigidbody>();
+			Rigidbody * rb = bulletGO->AddComponent<Rigidbody>();			
+
 			SphereShape * collider = bulletGO->AddComponent<SphereShape>();
 			Transform * transform = bulletGO->GetTransform();
 
@@ -67,16 +68,20 @@ namespace fan
 			material->SetTexturePath( GlobalValues::s_textureWhite );
 			collider->SetRadius( m_scale );
 			transform->SetScale(btVector3( m_scale, m_scale, m_scale ));
-			transform->SetPosition( thisTransform->GetPosition() + thisTransform->TransformDirection( m_offset) );
+			transform->SetPosition( thisTransform->GetPosition() + thisTransform->TransformDirection(m_offset) ); 
 			
-			rb->SetMass(0.01f); 
-			rb->SetVelocity( m_speed * thisTransform->Forward().normalized() );
-			 
-			 
-		}
+			rb->SetMass(1.f); 
 
-		//Debug::Log() << thisTransform->TransformDirection( thisTransform->Forward() ).norm() << Debug::Endl();
-		//Debug::Render().DebugLine( thisTransform->GetPosition(), thisTransform->GetPosition() + thisTransform->TransformDirection( m_offset ).normalized() , Color::Red ); 
+			Rigidbody * myRb = m_gameobject->GetComponent<Rigidbody>();
+			if ( myRb )
+			{
+				rb->GetBtBody()->setIgnoreCollisionCheck( myRb->GetBtBody(), true );
+			}
+
+			
+			rb->SetVelocity( myRb->GetVelocity() + m_speed * thisTransform->Forward() );
+			  
+		}
 	}
 
 	//================================================================================================================================

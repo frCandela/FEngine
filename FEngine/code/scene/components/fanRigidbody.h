@@ -21,6 +21,7 @@ namespace fan {
 		void			EnableDesactivation( const bool _enable );
 		btVector3		GetVelocity() const;
 		void			SetVelocity( const btVector3& _velocity );
+		void			SetTransform( const btTransform& _transform ) { m_rigidbody->setWorldTransform( _transform ); }
 		inline void		ApplyCentralForce( const btVector3& _force ) { m_rigidbody->applyCentralForce( _force ); }
 
 		void SetCollisionShape( btCollisionShape * _collisionShape );
