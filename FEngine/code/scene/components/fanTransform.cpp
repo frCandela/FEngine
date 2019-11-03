@@ -53,6 +53,15 @@ namespace fan
 	//================================================================================================================================
 	void Transform::LookAt( const btVector3& _target, const btVector3& _up ) {
 
+		// Move rigidbody
+		Rigidbody * rb = m_gameobject->GetComponent<Rigidbody>();
+		if ( rb )
+		{
+			if ( rb->IsStatic() ){return;}
+			rb->SetTransform( m_transform->transform );
+		}
+
+
 		btVector3 forward = _target - m_transform->transform.getOrigin();
 		forward.normalize();
 		btVector3 left = _up.cross( forward );
@@ -63,23 +72,24 @@ namespace fan
 														left[2], _up[2], forward[2] ) );
 		m_gameobject->AddFlag( Gameobject::Flag::OUTDATED_TRANSFORM );
 		m_gameobject->AddFlag( Gameobject::Flag::OUTDATED_AABB );
-
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
 	void Transform::SetPosition(btVector3 _newPosition) {
+		// Move rigidbody
+		Rigidbody * rb = m_gameobject->GetComponent<Rigidbody>();
+		if ( rb )
+		{
+			if ( rb->IsStatic() ) { return; }
+			rb->SetTransform( m_transform->transform );
+		}
+
 		if ( m_transform->transform.getOrigin() != _newPosition) {
 			m_transform->transform.setOrigin( _newPosition);
 			m_gameobject->AddFlag( Gameobject::Flag::OUTDATED_TRANSFORM );
 			m_gameobject->AddFlag( Gameobject::Flag::OUTDATED_AABB );
  		}
-
-		Rigidbody * rb = m_gameobject->GetComponent<Rigidbody>();
-		if ( rb )  {
-			rb->SetTransform( m_transform->transform );
-		}
-
 	}
 
 	//================================================================================================================================
@@ -111,16 +121,18 @@ namespace fan
 	//================================================================================================================================
 	//================================================================================================================================
 	void Transform::SetRotationQuat(const btQuaternion _rotation) {
+		// Move rigidbody
+		Rigidbody * rb = m_gameobject->GetComponent<Rigidbody>();
+		if ( rb )
+		{
+			if ( rb->IsStatic() ) { return; }
+			rb->SetTransform( m_transform->transform );
+		}
+
 		if ( m_transform->transform.getRotation() != _rotation) {
 			m_transform->transform.setRotation( _rotation);
 			m_gameobject->AddFlag( Gameobject::Flag::OUTDATED_TRANSFORM );
 			m_gameobject->AddFlag( Gameobject::Flag::OUTDATED_AABB );
-		}
-
-		Rigidbody * rb = m_gameobject->GetComponent<Rigidbody>();
-		if ( rb )
-		{
-			rb->SetTransform( m_transform->transform );
 		}
 	}
 

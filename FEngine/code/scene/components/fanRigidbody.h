@@ -17,8 +17,10 @@ namespace fan {
 
 		float			GetMass() const;
 		void			SetMass( const float _mass );
-		void			SetStatic( const bool _static );
+		void			SetStatic();
+		void			SetKinematic();
 		bool			IsStatic() const;
+		bool			IsKinematic() const;
 		void			Activate();		
 		bool			IsActive() const;
 
@@ -49,6 +51,9 @@ namespace fan {
 		btCollisionShape*				m_colShape = nullptr;
 
 		btCollisionShape *  FindCollisionShape();
+
+		// Editor
+		enum ComboState{ DYNAMIC = 0, KINEMATIC = 1, STATIC= 2 };		
 	};
 
 }

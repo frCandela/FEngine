@@ -60,7 +60,7 @@ namespace fan
 		// List the logs
 		const float height = ImGui::GetWindowHeight();
 		if (height > 60) {
-			ImGui::BeginChild("scrolling", ImVec2(0, height - 60), true, ImGuiWindowFlags_AlwaysVerticalScrollbar);
+			ImGui::BeginChild("scrolling", ImVec2(0, height - 65), true, ImGuiWindowFlags_AlwaysVerticalScrollbar);
 			for (int logIndex = m_firstLogIndex; logIndex < m_firstLogIndex + m_logBuffer.size(); logIndex++) {
 				const LogItem & item = m_logBuffer[logIndex % m_maxSizeLogBuffers];
 				ImGui::TextColored(item.color, item.logMessage.c_str());	// Time			
@@ -84,7 +84,7 @@ namespace fan
 
 		// Input
 		bool pressed = false;
-		ImGui::PushItemWidth( ImGui::GetWindowWidth() - 80 );
+		ImGui::PushItemWidth( ImGui::GetWindowWidth() - 90 );
 		if (ImGui::InputText("##input_console", m_inputBuffer, IM_ARRAYSIZE(m_inputBuffer), ImGuiInputTextFlags_EnterReturnsTrue)) {
 			pressed = true;
 		}

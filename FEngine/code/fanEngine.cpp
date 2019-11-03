@@ -207,8 +207,7 @@ namespace fan {
 				m_scene->Update( targetLogicDelta );
 				m_ecsManager->Update( targetLogicDelta, m_scene->GetMainCamera()->GetGameobject()->GetTransform()->GetPosition() );
 				m_scene->LateUpdate( targetLogicDelta );
-				m_ecsManager->LateUpdate( targetLogicDelta );
-				
+				m_ecsManager->LateUpdate( targetLogicDelta );				
 
 				{
 					SCOPED_PROFILE( draw_ui )

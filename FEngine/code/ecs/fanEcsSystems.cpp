@@ -109,7 +109,7 @@ namespace fan {
 				ecsRigidbody& rigidbody = _rigidbodies.At(key);
 
 				rigidbody.Get().setWorldTransform( transform );
-				//motionState.Get().setWorldTransform( transform );
+				motionState.Get().setWorldTransform( transform );
 				(void)motionState; (void)rigidbody; (void)transform;
 			}
 		}
@@ -126,11 +126,14 @@ namespace fan {
 			ecsComponentsKey & key = _entitiesData[entity];
 
 			if ( key.IsAlive() && key.MatchSignature( signature::bitset ) ) {
+				btRigidBody&  rigidbody = _rigidbodies.At( key ).Get();
+				if( rigidbody.getInvMass() <= 0.f ){ continue; }
+
 				btTransform& transform		= _transforms.At(key).transform;
 				ecsMotionState& motionState = _motionStates.At(key);
-				ecsRigidbody& rigidbody		= _rigidbodies.At(key);
+				
 
-				btMotionState * ms = rigidbody.Get().getMotionState();
+				btMotionState * ms = rigidbody.getMotionState();
 				ms->getWorldTransform( transform );
 				(void)motionState;(void )rigidbody;(void)transform;
 			}

@@ -106,26 +106,36 @@ namespace fan {
 			m_colShape->calculateLocalInertia( mass, localInertia );
 		}
 		m_rigidbody->setMassProps( mass, localInertia );
-		Activate();
+
+		if ( mass > 0.f ){	m_rigidbody->setCollisionFlags( m_rigidbody->getCollisionFlags() & ~btCollisionObject::CF_KINEMATIC_OBJECT );}
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================	
 	bool Rigidbody::IsStatic() const {
-		return m_rigidbody->getInvMass() <= 0.f;
+		return  ! IsKinematic() && m_rigidbody->getInvMass() <= 0.f;
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================	
-	void Rigidbody::SetStatic( const bool _static ) {
-		if( _static ) {
-			SetMass( 0.f );
-		} else {
-			if ( m_rigidbody->getInvMass() == 0.f ) {
-				SetMass(1.f);
-			}
-			Activate();
-		}
+	bool Rigidbody::IsKinematic() const
+	{
+		return  m_rigidbody->getCollisionFlags() & btCollisionObject::CF_KINEMATIC_OBJECT;
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================	
+	void Rigidbody::SetStatic( ) {
+		SetMass( 0.f );
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================	
+	void Rigidbody::SetKinematic()
+	{
+		SetMass( 0.f );
+		m_rigidbody->setCollisionFlags( m_rigidbody->getCollisionFlags() | btCollisionObject::CF_KINEMATIC_OBJECT );
+		m_rigidbody->setActivationState( DISABLE_DEACTIVATION );
 	}
 
 	//================================================================================================================================
@@ -161,18 +171,27 @@ namespace fan {
 	//================================================================================================================================
 	//================================================================================================================================	
 	void Rigidbody::SetVelocity( const btVector3& _velocity ) {
-		Activate();
 		m_rigidbody->setLinearVelocity( _velocity );
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================	
 	void Rigidbody::OnGui() {
-		// Static
-		bool isStatic = IsStatic();
-		if ( ImGui::Checkbox( "static ", &isStatic ) ) {
-			SetStatic( isStatic );
-		} ImGui::SameLine();
+		int state = GetMass() > 0 ? DYNAMIC : ( IsKinematic() ? KINEMATIC : STATIC );
+		if ( ImGui::Combo( "state", &state, "dynamic\0kinematic\0static\0" ) )
+		{
+			switch ( state )
+			{
+				case DYNAMIC : 	if( GetMass() <= 0 ){ SetMass(1.f); } break;
+				case KINEMATIC: SetKinematic(); break;
+				case STATIC: 	SetStatic(); break;
+			default:
+				assert(false);
+				break;
+			}
+		}
+
+
 
 		// Active
 		bool isActive = IsActive();
@@ -213,13 +232,16 @@ namespace fan {
 	bool Rigidbody::Load( Json & _json ) {
 		float tmpMass;
 		bool tmpEnableDesactivation;
+		bool tmpKinematic;
 
 		LoadFloat(_json,"mass", tmpMass );
 		LoadBool( _json, "enable_desactivation", tmpEnableDesactivation );
+		LoadBool( _json, "is_kinematic", tmpKinematic );
 
 		SetMass( tmpMass );
 		EnableDesactivation(tmpEnableDesactivation);
-
+		if( tmpKinematic ) { SetKinematic();}
+		
 		return true;
 	}
 
@@ -228,6 +250,7 @@ namespace fan {
 	bool Rigidbody::Save( Json & _json ) const {
 		SaveFloat(_json, "mass", GetMass());
 		SaveBool( _json, "enable_desactivation", IsDesactivationEnabled() );
+		SaveBool( _json, "is_kinematic", IsKinematic() );
 
 		Component::Save( _json );
 		return true;

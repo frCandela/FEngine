@@ -145,6 +145,7 @@ namespace fan {
 				shape->SetRadius( scale );
 				Rigidbody * rb = newPlanet->AddComponent<Rigidbody>();
 				rb->EnableDesactivation( false );
+				rb->SetKinematic();
 
 				float direction = m_distribution( m_generator ) > 0.5f ? 1.f: -1.f;
 				float planetSpeed = m_minSpeed + (m_maxSpeed - m_minSpeed) * m_distribution( m_generator );
@@ -152,30 +153,6 @@ namespace fan {
 
 				Transform * planetTransform = newPlanet->GetTransform();
 				planetTransform->SetScale( btVector3( scale, scale, scale ));
-
-				if ( m_satelliteRadiusList[radiusIndex] > 0 ) {
-					Gameobject * newSatellite = scene->CreateGameobject( "satellite" + std::to_string( radiusIndex ), newPlanet );
-					Model * modelSatellite = newSatellite->AddComponent<Model>();
-					modelSatellite->SetPath( GlobalValues::s_meshSphere );
-
-					Planet * satellitePlanet = newSatellite->AddComponent<Planet>();
-					satellitePlanet->SetRadius( m_satelliteRadiusList[radiusIndex] );
-					satellitePlanet->SetPhase( 2 * PI * m_distribution( m_generator ) );
-					satellitePlanet->SetSpeed( - 5.f * planetSpeed );
-
-					Material * satelliteMat = newSatellite->AddComponent<Material>();					
-					satelliteMat->SetTexturePath( GlobalValues::s_textureWhite );
-					satelliteMat->SetColor( Color::Brown );
-
-					Transform * satelliteTransform = newSatellite->GetTransform();
-					const float satelliteScale = m_satelliteScaleList[radiusIndex];
-					satelliteTransform->SetScale( btVector3( satelliteScale, satelliteScale, satelliteScale ) );
-									   
-					SphereShape * shapeSat = newSatellite->AddComponent<SphereShape>();
-					shapeSat->SetRadius( satelliteScale );
-					Rigidbody * rbSat = newSatellite->AddComponent<Rigidbody>();
-					rbSat->EnableDesactivation( false );
-				}
 			}
 		}	
 	}

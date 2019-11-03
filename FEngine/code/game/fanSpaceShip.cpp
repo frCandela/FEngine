@@ -48,6 +48,9 @@ namespace fan {
 
 		// Orientation
 		transform->LookAt( mouseWorldPos , btVector3::Up() );
+		btVector3 pos = transform->GetPosition();
+		pos.setY( 0.f );
+		transform->SetPosition( pos );
 		 
 		// Lateral movement
 		float left		= Input::Get().Manager().GetAxis( "game_left" );
@@ -58,7 +61,9 @@ namespace fan {
 		m_rigidbody->ApplyCentralForce( _delta * m_forwardForce * forward * transform->Forward() );
 
 		// Drag
-		m_rigidbody->SetVelocity( m_drag * m_rigidbody->GetVelocity() );
+		btVector3 newVelocity = m_drag * m_rigidbody->GetVelocity();
+		newVelocity.setY(0.f);
+		m_rigidbody->SetVelocity( newVelocity );
 
 		// Particles
 		m_particleSystem->SetEnabled( forward > 0 );
