@@ -40,14 +40,14 @@ namespace fan
 	//================================================================================================================================
 	// Getters
 	//================================================================================================================================
-	btTransform	Transform::GetBtTransform() const	{ return m_transform->transform; }
-	btVector3 Transform::GetPosition() const		{ return m_transform->transform.getOrigin(); }
-	btVector3 Transform::GetScale() const			{ return m_scale->scale; }
-	btQuaternion Transform::GetRotationQuat() const { return m_transform->transform.getRotation(); }
-	glm::mat4 Transform::GetNormalMatrix() const	{ return glm::transpose( glm::inverse( GetModelMatrix() ) ); }
-	btVector3 Transform::Left() const				{ return btTransform( GetRotationQuat(), btVector3( 0, 0, 0 ) ) * btVector3::Left(); }
-	btVector3 Transform::Forward() const			{ return btTransform( GetRotationQuat() ) * btVector3::Forward(); }
-	btVector3 Transform::Up() const					{ return btTransform( GetRotationQuat(), btVector3( 0, 0, 0 ) ) * btVector3::Up(); }
+	const btTransform&	Transform::GetBtTransform() const	{ return m_transform->transform; }
+	btVector3			Transform::GetPosition() const		{ return m_transform->transform.getOrigin(); }
+	btVector3			Transform::GetScale() const			{ return m_scale->scale; }
+	btQuaternion		Transform::GetRotationQuat() const { return m_transform->transform.getRotation(); }
+	glm::mat4			Transform::GetNormalMatrix() const { return glm::transpose( glm::inverse( GetModelMatrix() ) ); }
+	btVector3			Transform::Left() const { return btTransform( GetRotationQuat(), btVector3( 0, 0, 0 ) ) * btVector3::Left(); }
+	btVector3			Transform::Forward() const { return btTransform( GetRotationQuat() ) * btVector3::Forward(); }
+	btVector3			Transform::Up() const { return btTransform( GetRotationQuat(), btVector3( 0, 0, 0 ) ) * btVector3::Up(); }
 
 	//================================================================================================================================
 	//================================================================================================================================
@@ -61,6 +61,9 @@ namespace fan
 		m_transform->transform.setBasis( btMatrix3x3 (	left[0], _up[0], forward[0],
 														left[1], _up[1], forward[1],
 														left[2], _up[2], forward[2] ) );
+		m_gameobject->AddFlag( Gameobject::Flag::OUTDATED_TRANSFORM );
+		m_gameobject->AddFlag( Gameobject::Flag::OUTDATED_AABB );
+
 	}
 
 	//================================================================================================================================

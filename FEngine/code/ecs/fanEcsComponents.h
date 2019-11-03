@@ -140,13 +140,11 @@ namespace fan {
 			speed = 1.f;
 			radius = 1.f;
 			phase = 0.f;
-			parentEntity = ecsNullEntity;
 		}
 
 		float speed		= 1.f;
 		float radius	= 1.f;
 		float phase		= 0.f;
-		ecsEntity parentEntity; // Updated in the component before the ecs call TODO remove this trash
 	}; 
 
 	//================================

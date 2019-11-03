@@ -7,6 +7,7 @@
 #include "renderer/fanMesh.h"
 #include "scene/fanScene.h"
 #include "scene/fanGameobject.h"
+#include "scene/components/fanTransform.h"
 
 namespace fan {
 
@@ -68,24 +69,25 @@ namespace fan {
 	//================================================================================================================================
 	//================================================================================================================================
 	void ecsPlanetsSystem::Run( float /*_delta*/, const size_t _count, std::vector< ecsComponentsKey >& _entitiesData
+		,ComponentData< ecsGameobject > & _gameobjects
 		,ComponentData< ecsTranform > & _transforms
 		,ComponentData< ecsPlanet > &	_planets
-		, ComponentData< ecsFlags > &	_flags )
+		,ComponentData< ecsFlags > &	_flags )
 	{
 		for ( int entity = 0; entity < _count; entity++ ) {
 			ecsComponentsKey & key = _entitiesData[entity];
 			if ( key.IsAlive() &&  key.MatchSignature( signature::bitset ) ) {
 				btTransform& transform		= _transforms.At(key).transform;
 				ecsPlanet& planet			= _planets.At(key);
-				btTransform& parentTransform = _transforms.At(_entitiesData[planet.parentEntity]).transform;
+				const btTransform& parentTransform = _gameobjects.At( key ).gameobject->GetParent()->GetTransform()->GetBtTransform();
 				ecsFlags& flags = _flags.At( key );
 
 				float const time = -planet.speed * Time::ElapsedSinceStartup();
 				btVector3 position( std::cosf( time + planet.phase ), 0, std::sinf( time + planet.phase ) );
 
 				transform.setOrigin( parentTransform.getOrigin() + planet.radius * position);
-
-				flags.flags |= ecsFlags::OUTDATED_AABB | ecsFlags::OUTDATED_TRANSFORM;
+				flags.flags |= ecsFlags::OUTDATED_AABB;
+				flags.flags |= ecsFlags::OUTDATED_TRANSFORM;
 			}
 		}
 	}

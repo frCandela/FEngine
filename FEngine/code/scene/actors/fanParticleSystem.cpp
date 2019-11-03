@@ -3,6 +3,7 @@
 
 #include "scene/fanGameobject.h"
 #include "scene/components/fanTransform.h"
+#include "renderer/fanRenderer.h"
 
 namespace fan {
 	REGISTER_EDITOR_COMPONENT( ParticleSystem )
@@ -39,10 +40,7 @@ namespace fan {
 
 		const btVector3 origin = m_gameobject->GetTransform()->GetPosition();
 
-		btTransform transform( m_gameobject->GetTransform()->GetRotationQuat() );
-		btVector3 transformedOffset = transform * m_offset;
-
-		// Spawn particles
+		btVector3 transformedOffset = m_gameobject->GetTransform()->TransformDirection( m_offset );
 		while ( m_timeAccumulator > particleSpawnDelta ) {
 			m_timeAccumulator -= particleSpawnDelta;
 
@@ -56,6 +54,9 @@ namespace fan {
 			ecsMovement* movement = m_ecsManager->FindComponentFromEntity<ecsMovement>( entity );
 			ecsParticle* particle = m_ecsManager->FindComponentFromEntity<ecsParticle>( entity );
 
+			
+			// Spawn particles
+			
 			movement->speed = btVector3( m_distribution( m_generator ), m_distribution( m_generator ), m_distribution( m_generator ) ) - btVector3( 0.5f, 0.5f, 0.5f );
 			movement->speed.normalize();
 			movement->speed *= m_speed;

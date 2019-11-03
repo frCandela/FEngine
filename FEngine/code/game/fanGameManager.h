@@ -16,6 +16,8 @@ namespace fan {
 
 		void Start() override;
 		void Update(const float _delta) override;
+		void LateUpdate( const float /*_delta*/ ) override {}
+
 		void OnScenePlay();
 		void OnScenePause();
 

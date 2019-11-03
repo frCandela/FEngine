@@ -9,6 +9,7 @@ namespace fan {
 	public:
 		void Start() override;
 		void Update(const float _delta) override;
+		void LateUpdate( const float /*_delta*/ ) override {}
 
 		void SetSpeed( const float _speed );
 		void SetRadius( const float _radius );

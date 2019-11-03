@@ -16,6 +16,7 @@ namespace fan
 
 		void Start() override;
 		void Update(const float _delta) override;
+		void LateUpdate( const float /*_delta*/ ) override {}
 
 		// Getters
 		float GetSpeed() const				{ return m_speed; }

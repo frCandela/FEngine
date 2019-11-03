@@ -15,6 +15,7 @@ namespace fan
 
 		virtual void Start() = 0;
 		virtual void Update(const float _delta) = 0;
+		virtual void LateUpdate( const float _delta ) = 0;
 
 		bool IsActor() const override { return true; }
 		void OnGui() override;

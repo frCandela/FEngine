@@ -80,22 +80,34 @@ namespace fan {
 		SCOPED_PROFILE( ecs_update )
 
 		ecsParticleSystem::s_cameraPosition = _cameraPosition;
-		RUN_SYSTEM(ecsParticleSystem);
-		RUN_SYSTEM(ecsPlanetsSystem);
-		RUN_SYSTEM(ecsSynchRbToTransSystem);
+		RUN_SYSTEM(ecsParticleSystem);		
 	}
 
 	//================================================================================================================================
 	// Runs the systems after the physics update
 	//================================================================================================================================
 	void EcsManager::LateUpdate( const float _delta ) {
-		SCOPED_PROFILE( ecs_lateUpdate )
-
-		RUN_SYSTEM( ecsSynchTransToRbSystem);
-		RUN_SYSTEM( ecsUpdateAABBFromRigidbody );
-		RUN_SYSTEM( ecsUpdateAABBFromHull);
-		RUN_SYSTEM( ecsUpdateAABBFromTransform);
+		SCOPED_PROFILE( ecs_lateUpdate )		
+ 		
+		RUN_SYSTEM( ecsUpdateAABBFromHull );
+		RUN_SYSTEM( ecsUpdateAABBFromTransform ); 
 		RUN_SYSTEM( ecsUpdateBullet );
+	}
+
+	//================================================================================================================================
+	//================================== ==============================================================================================
+	void EcsManager::UpdatePrePhysics( const float _delta ) { 
+		SCOPED_PROFILE( ecs_pre_phy )  
+		RUN_SYSTEM( ecsPlanetsSystem );
+		RUN_SYSTEM( ecsSynchRbToTransSystem ); 
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
+	void EcsManager::UpdatePostPhysics( const float _delta ) { 
+		SCOPED_PROFILE( ecs_post_phy ) 
+		RUN_SYSTEM( ecsSynchTransToRbSystem ); 
+		RUN_SYSTEM( ecsUpdateAABBFromRigidbody );
 	}
 
 	//================================================================================================================================

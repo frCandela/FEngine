@@ -36,6 +36,7 @@ namespace fan
 
 		void BeginFrame();
 		void Update(const float _delta);
+		void LateUpdate( const float _delta );
 		void EndFrame();
 		void Play()	;
 		void Pause();

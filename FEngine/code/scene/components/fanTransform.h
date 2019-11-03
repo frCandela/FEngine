@@ -15,13 +15,13 @@ namespace fan
 		void SetRotationQuat(const btQuaternion _rotation);
 		void LookAt( const btVector3& _target, const btVector3& _up );
 
-		btTransform		GetBtTransform() const;
-		btVector3		GetPosition() const;
-		btVector3		GetScale() const;
-		btQuaternion	GetRotationQuat() const;
-		btVector3		GetRotationEuler() const;
-		glm::mat4		GetModelMatrix() const;
-		glm::mat4		GetNormalMatrix() const;
+		const btTransform&	GetBtTransform() const;
+		btVector3			GetPosition() const;
+		btVector3			GetScale() const;
+		btQuaternion		GetRotationQuat() const;
+		btVector3			GetRotationEuler() const;
+		glm::mat4			GetModelMatrix() const;
+		glm::mat4			GetNormalMatrix() const;
 
 		btVector3 TransformPoint( const btVector3 _point ) const;
 		btVector3 TransformDirection( const btVector3 _point ) const;

@@ -200,13 +200,15 @@ namespace fan {
 					m_renderer->ClearDebug();
 				}
 
-				m_scene->BeginFrame();
+				m_scene->BeginFrame();				
+				m_ecsManager->UpdatePrePhysics( targetLogicDelta );
+				m_physicsManager->StepSimulation(targetLogicDelta);		
+				m_ecsManager->UpdatePostPhysics( targetLogicDelta );
 				m_scene->Update( targetLogicDelta );
-				m_ecsManager->Update( targetLogicDelta, m_scene->GetMainCamera()->GetGameobject()->GetTransform()->GetPosition() );				
-				m_physicsManager->StepSimulation(targetLogicDelta);
+				m_ecsManager->Update( targetLogicDelta, m_scene->GetMainCamera()->GetGameobject()->GetTransform()->GetPosition() );
+				m_scene->LateUpdate( targetLogicDelta );
 				m_ecsManager->LateUpdate( targetLogicDelta );
-
-				m_ecsManager->Refresh();
+				
 
 				{
 					SCOPED_PROFILE( draw_ui )
@@ -224,8 +226,9 @@ namespace fan {
 					if ( m_mainMenuBar->ShowAABB() ) { DrawAABB(); }
 					if ( m_mainMenuBar->ShowHull() ) { DrawHull(); }
 				}
-
+			
 				m_scene->EndFrame();	
+				m_ecsManager->Refresh();
 
 				{
 					SCOPED_PROFILE( imgui_render )

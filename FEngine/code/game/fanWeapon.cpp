@@ -43,7 +43,9 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void Weapon::Update( const float /*_delta*/ )
+	void Weapon::Update( const float /*_delta*/ ){}
+
+	void Weapon::LateUpdate( const float /*_delta*/ )  
 	{
 		SCOPED_PROFILE( weapon_update )
 		Transform * thisTransform = m_gameobject->GetTransform();

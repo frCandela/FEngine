@@ -31,7 +31,7 @@ namespace fan {
 	// Declare your signatures here
 	//================================	
 	using ecsParticleSignature			= ecsSignature< ecsPosition, ecsRotation, ecsMovement, ecsParticle >;
-	using ecsPlanetSignature			= ecsSignature< ecsTranform, ecsPlanet, ecsFlags >;
+	using ecsPlanetSignature			= ecsSignature< ecsGameobject, ecsTranform, ecsPlanet, ecsFlags >;
 	using ecsRigidbodySignature			= ecsSignature< ecsTranform, ecsMotionState, ecsRigidbody >;
 	using ecsAABBHullSignature			= ecsSignature< ecsTranform, ecsScaling, ecsAABB, ecsFlags, ecsMesh >;
 	using ecsAABBTransformSignature		= ecsSignature< ecsTranform, ecsAABB, ecsFlags >;
@@ -72,7 +72,8 @@ namespace fan {
 	class ecsPlanetsSystem : public ISystem<  ecsPlanetSignature > {
 	public:
 		static void Run( float _delta, const size_t _count, std::vector< ecsComponentsKey >& _entitiesData,
-			 ComponentData< ecsTranform > & _transforms
+			 ComponentData< ecsGameobject > & _gameobjects
+			,ComponentData< ecsTranform > & _transforms
 			,ComponentData< ecsPlanet > &	_planets 
 			,ComponentData< ecsFlags > &	_flags );
 	};

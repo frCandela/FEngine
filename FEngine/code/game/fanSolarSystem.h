@@ -10,6 +10,7 @@ namespace fan {
 
 		void Start() override;
 		void Update( const float _delta ) override;
+		void LateUpdate( const float /*_delta*/ ) override {}
 
 		void OnGui() override;
 		ImGui::IconType GetIcon() const override { return ImGui::IconType::SOLAR_SYSTEM; }
