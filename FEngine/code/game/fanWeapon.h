@@ -27,12 +27,24 @@ namespace fan
 		bool Save( Json & _json ) const override;
 
 	private:
+		// Bullets parameters
 		float m_lifeTime = 1.f;
 		float m_scale = 0.2f;
 		float m_speed = 0.2f;
 		int   m_bulletsPerFrame = 1;
+
+		// explosion parameters
+		float m_explosionTime = 0.15f;
+		float m_exposionSpeed = 2.f;
+		int m_particlesPerExplosion = 3;
+
 		btVector3 m_offset ;
 
+		// for particles
+		std::default_random_engine			  m_generator;
+		std::uniform_real_distribution<float> m_distribution;
+
 		void OnBulletContact( Rigidbody* _other, btPersistentManifold* const& _manifold );
+		void CreateExplosion( const btVector3 _point );
 	};
 }
