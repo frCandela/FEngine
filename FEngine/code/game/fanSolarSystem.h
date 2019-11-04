@@ -26,13 +26,13 @@ namespace fan {
 
 		float m_maxRadius = 30.f;
 		float m_initialRadius = 7.2f;
-		float m_offset = 1.95f;
-		float m_randomScale = 0.62f;
+		float m_scaleMult = 0.8f;
 
-		float m_initialPlanetScale = 1.47f;
-		float m_scaleMult = 0.39f;
 
-		float m_minSpeed = 0.15f;
-		float m_maxSpeed = 0.36f;
+		btVector2 m_radiusFactors	 = btVector2( 0.44f, 0.29f );
+		btVector2 m_radiusRFactors	 = btVector2( 1.f, 1.f );
+		btVector2 m_scaleMinMax		 = btVector2( 0.3f, 0.1f );
+		btVector2 m_speedFactors	 = btVector2( 0.1f, 0.012f );
+		int m_maxPlanetsPerOrbit = 3;
 	};
 }
