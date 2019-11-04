@@ -110,7 +110,14 @@ namespace fan
 		SCOPED_PROFILE( scene_update )
 		for (Actor * actor : m_activeActors) {
 			if (actor->IsEnabled()) {
-				actor->Update(_delta);
+				try	{ 
+					actor->Update( _delta ); 
+				}
+				catch (...)
+				{
+					Debug::Error() << "Update error on actor " << actor->s_name << " of gameobject " << actor->GetGameobject()->GetName() << Debug::Endl();
+					actor->SetEnabled(false);
+				}
 			}
 		}
 	}
@@ -124,7 +131,15 @@ namespace fan
 		{
 			if ( actor->IsEnabled() )
 			{
-				actor->LateUpdate( _delta );
+				try
+				{
+					actor->LateUpdate( _delta );
+				}
+				catch (...)
+				{
+					Debug::Error() << "LateUpdate error on actor " << actor->s_name << " of gameobject " << actor->GetGameobject()->GetName() << Debug::Endl();
+					actor->SetEnabled( false );
+				}
 			}
 		}
 	}
