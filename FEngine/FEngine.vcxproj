@@ -248,7 +248,6 @@
     <ClInclude Include="code\game\fanGameManager.h" />
     <ClInclude Include="code\game\fanPlanet.h" />
     <ClInclude Include="code\game\fanSolarEruption.h" />
-    <ClInclude Include="code\game\fanSolarEruptionUtil.h" />
     <ClInclude Include="code\game\fanSolarSystem.h" />
     <ClInclude Include="code\game\fanSpaceShip.h" />
     <ClInclude Include="code\game\fanWeapon.h" />

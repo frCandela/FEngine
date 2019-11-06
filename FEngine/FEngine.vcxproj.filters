@@ -1185,9 +1185,6 @@
     <ClInclude Include="code\game\fanSolarEruption.h">
       <Filter>code\game</Filter>
     </ClInclude>
-    <ClInclude Include="code\game\fanSolarEruptionUtil.h">
-      <Filter>code\game</Filter>
-    </ClInclude>
     <ClInclude Include="code\ecs\fanEcsComponentsKey.h">
       <Filter>code\ecs</Filter>
     </ClInclude>

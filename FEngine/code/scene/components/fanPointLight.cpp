@@ -96,11 +96,11 @@ namespace fan
 			"constant + linear * d + quadratic * d*d  \n"
 			"(d=distance)");
 		if (ImGui::Button("##constant attenuation")) { SetAttenuation(Attenuation::CONSTANT, 0.f ); }	ImGui::SameLine();
-		if (ImGui::DragFloat("constant",  &m_pointLight->attenuation[Attenuation::CONSTANT],0.05f, 0.f, 100.f)) { m_gameobject->AddFlag( Gameobject::Flag::OUTDATED_LIGHT ); }
+		if (ImGui::DragFloat("constant",  &m_pointLight->attenuation[Attenuation::CONSTANT],0.01f, 0.f, 100.f)) { m_gameobject->AddFlag( Gameobject::Flag::OUTDATED_LIGHT ); }
 		if (ImGui::Button("##linear attenuation")) { SetAttenuation(Attenuation::LINEAR, 0.f); }	ImGui::SameLine();
-		if (ImGui::DragFloat("linear",	  &m_pointLight->attenuation[Attenuation::LINEAR], 0.05f, 0.f, 100.f)) { m_gameobject->AddFlag( Gameobject::Flag::OUTDATED_LIGHT ); }
+		if (ImGui::DragFloat("linear",	  &m_pointLight->attenuation[Attenuation::LINEAR], 0.001f, 0.f, 100.f)) { m_gameobject->AddFlag( Gameobject::Flag::OUTDATED_LIGHT ); }
 		if (ImGui::Button("##quadratic attenuation")) { SetAttenuation(Attenuation::QUADRATIC, 0.f); }	ImGui::SameLine();
-		if (ImGui::DragFloat("quadratic", &m_pointLight->attenuation[Attenuation::QUADRATIC], 0.05f, 0.f, 100.f)) { m_gameobject->AddFlag( Gameobject::Flag::OUTDATED_LIGHT ); }
+		if (ImGui::DragFloat("quadratic", &m_pointLight->attenuation[Attenuation::QUADRATIC], 0.0001f, 0.f, 100.f)) { m_gameobject->AddFlag( Gameobject::Flag::OUTDATED_LIGHT ); }
 		
  		// Sphere gizmo
 		float lightRange = GetLightRange();
