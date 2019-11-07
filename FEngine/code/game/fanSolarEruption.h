@@ -42,17 +42,9 @@ namespace fan {
 		bool Save( Json & _json ) const override;
 
 	private:
-		Mesh* m_mesh;
 		Material * m_material;
 		Model * m_model;
 		ParticleSystem * m_particleSystem;
-
-		// TODO : should this be divided into two separate components ? one for for the mesh, one for the FX ?
-
-		// Mesh generation
-		float	m_radius = 10.f;
-		float	m_subAngle = 45.f;
-		bool	m_debugDraw = false;
 
 		// State machine
 		float   m_eruptionTime = -1.f;
@@ -74,7 +66,5 @@ namespace fan {
 		State m_state = State::NONE;
 
 		void UpdateStateMachine( const float _delta );
-		void AddSunTriangle( std::vector<Vertex>& _vertices, const btVector3& _v0, const btVector3& _v1 );
-		void GenerateMesh();
 	};
 }

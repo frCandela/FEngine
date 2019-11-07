@@ -64,6 +64,44 @@ namespace fan {
 	};
 
 	//================================
+	// PlanetsSystem
+	//================================
+	struct Vertex;
+	class Mesh;
+	class ecsSolarEruptionMeshSystem : public ISystem< ecsPlanet, ecsTranform, ecsScaling >
+	{
+	private:
+		//================================================================
+		//================================================================
+		struct OrientedSegment
+		{
+			enum OpenSide { RIGHT = 1, LEFT = 2, BOTH = RIGHT | LEFT };
+
+			btVector3 direction;
+			OpenSide  openSide;
+			float norm;
+		};
+
+	public:
+		static void Run( float _delta, const size_t _count, std::vector< ecsComponentsKey >& _entitiesData
+			, ComponentData< ecsPlanet > &	_planets
+			, ComponentData< ecsTranform > & _transforms 
+			, ComponentData< ecsScaling > & _scaling
+		);
+
+		// This should be in a "singleton component"
+		static Mesh* s_mesh;
+		static float s_subAngle;
+		static float s_radius;
+		static bool	 s_debugDraw;
+
+	private:
+		static void AddSunTriangle( std::vector<Vertex>& _vertices, const btVector3& _v0, const btVector3& _v1 );
+
+
+	};
+
+	//================================
 	// Rigidbody transform update
 	//================================
 	class ecsSynchRbSystem : public ISystem<  ecsTranform, ecsMotionState, ecsRigidbody > {

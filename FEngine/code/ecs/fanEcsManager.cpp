@@ -84,7 +84,8 @@ namespace fan {
 		SCOPED_PROFILE( ecs_update )
 
 		ecsParticleSystem::s_cameraPosition = _cameraPosition;
-		RUN_SYSTEM(ecsParticleSystem, Run );		
+		RUN_SYSTEM(ecsParticleSystem, Run );	
+		RUN_SYSTEM( ecsSolarEruptionMeshSystem, Run );
 	}
 
 	//================================================================================================================================

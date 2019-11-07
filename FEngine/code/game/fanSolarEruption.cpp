@@ -34,7 +34,16 @@ namespace fan {
 			m_particleSystem->SetEnabled(false);
 		}
 
+		// Setup the solar eruption mesh
 		m_model = m_gameobject->GetComponent<Model>();
+		if ( m_model )
+		{
+			Mesh* mesh = ecsSolarEruptionMeshSystem::s_mesh;
+			m_model->SetMesh( mesh );
+			mesh->SetHostVisible( true );
+			mesh->SetOptimizeVertices( false );
+			mesh->SetAutoUpdateHull( false );
+		}
 		
 	}
 
@@ -42,19 +51,14 @@ namespace fan {
 	//================================================================================================================================
 	void SolarEruption::OnAttach() {
 		Actor::OnAttach();
-
-		m_mesh = new Mesh();
-		m_mesh->SetHostVisible(true);
-		m_mesh->SetOptimizeVertices( false );
-		m_mesh->SetAutoUpdateHull( false );
-		m_mesh->SetPath("solar_eruption");
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
 	void SolarEruption::OnDetach() {
 		Actor::OnDetach();
-		delete m_mesh;
+
+		m_model = m_gameobject->GetComponent<Model>();
 		if( m_model != nullptr ) {
 			m_model->SetMesh( nullptr );		
 		}
@@ -65,7 +69,6 @@ namespace fan {
 	void SolarEruption::Update(const float _delta) {
 		SCOPED_PROFILE( solar_erup );
 		UpdateStateMachine( _delta );
-		GenerateMesh();
 	}
 
 	//================================================================================================================================
@@ -142,173 +145,17 @@ namespace fan {
 			}
 		}
 	}
-		
-
-	bool IsLeftOf( const btVector3& _dir, const btVector3& _otherDir )
-	{
-		float angle = _otherDir.SignedAngle( _dir, btVector3::Up() );
-		return btDegrees( angle ) < 180.f;
-	}
-
-	//================================================================================================================================
-	// Helper : Generates a triangle that represents a segment of a circle of radius m_radius
-	//================================================================================================================================
-	void SolarEruption::AddSunTriangle( std::vector<Vertex>& _vertices, const btVector3& _v0, const btVector3& _v1)
-	{
-		const glm::vec3 normal( 0.f, 1.f, 0.f );
-		const glm::vec3 color( 1.f, 1.f, 1.f );
-		const glm::vec3 center( 0.f, 0.f, 0.f );
-		const glm::vec2 centerUV( 0.5f, 0.5f );
-
-		glm::vec3 p1( _v0[0], 0.f, _v0[2] );
-		glm::vec3 p2( _v1[0], 0.f, _v1[2] );
-		glm::vec2 uv1( _v0[0], _v0[2] );
-		glm::vec2 uv2( _v1[0], _v1[2] );
-
-		uv1 = 0.5f * uv1 / m_radius + glm::vec2( 0.5f, 0.5f );
-		uv2 = 0.5f * uv2 / m_radius + glm::vec2( 0.5f, 0.5f );
-
-		_vertices.push_back( { center,	normal, color,centerUV	} );
-		_vertices.push_back( { p1,		normal, color, uv1		} );
-		_vertices.push_back( { p2,		normal, color, uv2		} );
-
-
-		if ( m_debugDraw ) {
-
-			const Color debugColor( 1.f, 1.f, 0.f, 0.3f );
-			Debug::Render().DebugTriangle( btVector3::Zero(), _v0, _v1, debugColor );
-			Debug::Render().DebugLine( btVector3::Zero(), _v0, Color::Green );
-		}
-	}
-
-	//================================================================================================================================
-	//================================================================================================================================
-	void SolarEruption::GenerateMesh() {
-		std::vector<Planet *> planets = m_gameobject->GetScene()->FindComponentsOfType<Planet>();
-
-		std::vector< OrientedSegment > segments;
-
-		// Generates occlusion rays for each planet
-		for (int planetIndex = 0; planetIndex < planets.size() ; planetIndex++)	{
-			Planet * planet = planets[planetIndex];
-			const Transform * planetTransform = planet->GetGameobject()->GetTransform();
-			const btVector3 planetPos = planetTransform->GetPosition();
-			const btVector3 dir = planetPos - btVector3::Zero();
-			const btVector3 left = btVector3::Up().cross( dir ).normalized();
-
-			btVector3 planetLeft = planetPos + planetTransform->GetScale().getX() * left;
-			btVector3 planetRight = planetPos - planetTransform->GetScale().getX() * left;
-
-			segments.push_back( { planetRight, OrientedSegment::RIGHT, planetRight.norm() } );
-			segments.push_back( { planetLeft, OrientedSegment::LEFT, planetRight.norm() } );
-		}
-
-		// Sort the segments in ascending order ( counter clockwise )
-		std::sort( std::begin( segments ), std::end( segments ),
-			[] ( OrientedSegment& _s1, OrientedSegment& _s2 )
-		{
-			return btVector3::Left().SignedAngle( _s1.direction, btVector3::Up() ) < btVector3::Left().SignedAngle( _s2.direction, btVector3::Up() );
-		} );
-
-		// Finds the starting point of mesh generation loop
-		int startIndex = 0;
-		{
-			// Finds the index of a RIGHT axis that has a minimal number of nested levels of planets	(depth)	
-			int startIndexDepth = 10000;
-			int depth = 0;	//			
-			for ( int axisIndex = 0; axisIndex < segments.size(); axisIndex++ )
-			{
-				OrientedSegment& axis = segments[axisIndex];
-				depth += axis.openSide == OrientedSegment::RIGHT ? 1 : -1;
-				if ( axis.openSide == OrientedSegment::RIGHT && depth < startIndexDepth )
-				{
-					startIndex = axisIndex;
-					startIndexDepth = depth;
-				}
-			}
-		}
-
-		// generates the mesh
-		std::vector<Vertex>	vertices;
-		vertices.reserve( 3 * planets.size() );
-		const float minGapRadians = btRadians( m_subAngle );
-		std::set<float> norms;	// Stores the nested opening segments norms
-		for ( int axisIndex = 0; axisIndex < segments.size(); axisIndex++ )
-		{
-			const int index = (axisIndex + startIndex) % segments.size();
-			const int indexNext = ( index + 1 ) % segments.size();
-			OrientedSegment& axis = segments[ index ];
-			OrientedSegment& axisNext = segments[ indexNext ];
-			
-			float length = 0.f;
-			if ( axis.openSide == OrientedSegment::RIGHT )
-			{
-				// Easy case of an opening segment
-				norms.insert( axis.norm );
-				length = *norms.begin(); // Gets the smallest norm
-			}
-			else if ( axis.openSide == OrientedSegment::LEFT ) {
-				norms.erase( axis.norm );
-				if ( ! norms.empty() )
-				{
-					length = *norms.begin(); // Easy case of a closing segment
-				}
-				else { 
-					if ( axisNext.openSide == OrientedSegment::RIGHT ){ 
-						// Empty space with no planets -> fills the space with triangles
-						float angle = axis.direction.SignedAngle( axisNext.direction, btVector3::Up() );
-						if ( angle > minGapRadians ) // gap is too large -> subdivise it
-						{
-
-							const int numSubdivistions = int( angle / minGapRadians ) + 1;
-							const float subdivisionAngle = angle / numSubdivistions;
-							btTransform rotate( btQuaternion( btVector3::Up(), subdivisionAngle ) );
-							btVector3 subAxisNext = m_radius * axis.direction / axis.norm;
-							for ( int subAxisIndex = 0; subAxisIndex < numSubdivistions; subAxisIndex++ )
-							{
-								btVector3 subAxis = subAxisNext;
-								subAxisNext = rotate * subAxisNext;
-								AddSunTriangle(vertices, subAxis , subAxisNext );	
-							}
-						}
-						else // gap size is small enougth
-						{
-							length = m_radius;
-						}
-					}
-					else
-					{
-						// I think this is a degenerate case that doesn't need to be considered #provemewrong
-						////Debug::Warning( "VIDE JURIDIQUE" );
-					} 
-				}
-			}
-
-			// Generate a light triangle based on the processed segment length
-			if( length > 0.f ) {
-				const btVector3 v0 = length * axis.direction / axis.norm;
-				const btVector3 v1 = length * axisNext.direction / axisNext.norm;
-				AddSunTriangle( vertices, v0, v1 );
-			}
-		}
-
-		// Load mesh
-		m_mesh->LoadFromVertices( vertices );
-		Model * model = m_gameobject->GetComponent<Model>();
-		if( model ) {
-			model->SetMesh( m_mesh );
-		}
-	}
-	   
+	
 	//================================================================================================================================
 	//================================================================================================================================
 	void SolarEruption::OnGui() {
 		
 		ImGui::PushItemWidth( 100.f ); {
+
 			// Mesh generation
-			ImGui::Checkbox( "debug draw", &m_debugDraw );
-			ImGui::DragFloat( "radius", &m_radius, 0.1f );
-			ImGui::DragFloat( "sub-angle", &m_subAngle, 1.f, 1.f, 180.f );
+			ImGui::Checkbox( "debug draw", &ecsSolarEruptionMeshSystem::s_debugDraw );
+			ImGui::DragFloat( "radius", &ecsSolarEruptionMeshSystem::s_radius, 0.1f );
+			ImGui::DragFloat( "sub-angle", &ecsSolarEruptionMeshSystem::s_subAngle, 1.f, 1.f, 180.f );
 			ImGui::Spacing();
 
 			// State machine		
@@ -347,8 +194,8 @@ namespace fan {
 	//================================================================================================================================
 	bool SolarEruption::Load( Json & _json) {
 		Actor::Load(_json);
-		LoadFloat( _json, "radius", m_radius );
-		LoadFloat( _json, "sub_angle", m_subAngle );
+		LoadFloat( _json, "radius", ecsSolarEruptionMeshSystem::s_radius );
+		LoadFloat( _json, "sub_angle", ecsSolarEruptionMeshSystem::s_subAngle );
 
 		// State machine		
 		LoadFloat( _json, "eruption time", m_eruptionTime );
@@ -372,8 +219,8 @@ namespace fan {
 	//================================================================================================================================
 	bool SolarEruption::Save( Json & _json ) const {
 		Actor::Save( _json );		
-		SaveFloat( _json, "radius", m_radius );
-		SaveFloat( _json, "sub_angle", m_subAngle );
+		SaveFloat( _json, "radius", ecsSolarEruptionMeshSystem::s_radius );
+		SaveFloat( _json, "sub_angle", ecsSolarEruptionMeshSystem::s_subAngle );
 
 		// State machine		
 		SaveFloat( _json, "eruption time", m_eruptionTime );
