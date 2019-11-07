@@ -94,7 +94,7 @@ namespace fan {
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void ecsSynchRbToTransSystem::Run( float /*_delta*/, const size_t _count, std::vector< ecsComponentsKey >& _entitiesData
+	void ecsSynchRbSystem::SynchRbToTransSystem( float /*_delta*/, const size_t _count, std::vector< ecsComponentsKey >& _entitiesData
 		,ComponentData< ecsTranform > & _transforms
 		,ComponentData< ecsMotionState > & _motionStates
 		,ComponentData< ecsRigidbody > & _rigidbodies ) 
@@ -117,7 +117,7 @@ namespace fan {
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void ecsSynchTransToRbSystem::Run( float /*_delta*/, const size_t _count, std::vector< ecsComponentsKey >& _entitiesData
+	void ecsSynchRbSystem::SynchTransToRbSystem( float /*_delta*/, const size_t _count, std::vector< ecsComponentsKey >& _entitiesData
 		, ComponentData< ecsTranform > &    _transforms
 		, ComponentData< ecsMotionState > & _motionStates
 		, ComponentData< ecsRigidbody > &   _rigidbodies ) 

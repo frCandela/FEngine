@@ -62,25 +62,29 @@ namespace fan {
 	}
 
 	//================================================================================================================================
-	// Helper used to pass the right arguments to systems
+	// Helper used to pass the right arguments to systems ( don't worry, my brain hurts too )
 	//================================================================================================================================
 	template< typename _type, typename _system > struct RunSystem;
 	template< template < typename...> typename _components, typename... _types, typename _system  >
 	struct RunSystem<_components<_types...>, _system > {
-		static void Run( const float _delta, const size_t _count, std::vector<ecsComponentsKey>& _entitiesData, ecsComponentsTuple< ecsComponents >& _tuple ) {
-			_system::Run( _delta, _count, _entitiesData,  _tuple.Get<_types>()... );
+		static void Run
+		( std::function<void( float, const size_t, std::vector< ecsComponentsKey >&, ComponentData<_types>&... )> _method,
+			const float _delta, const size_t _count, std::vector<ecsComponentsKey>& _entitiesData, ecsComponentsTuple< ecsComponents >& _tuple 	) 
+		{
+			_method( _delta, _count, _entitiesData,  _tuple.Get<_types>()... );
 		}
 	};
 
 	//================================================================================================================================
 	// Runs the systems before the physics update
 	//================================================================================================================================
-	#define RUN_SYSTEM( _system ) RunSystem< _system::signature::componentsTypes, _system >::Run( _delta, m_activeEntitiesCount, m_entitiesKeys, m_components );
+	//#define RUN_SYSTEM( _system, _func ) RunSystem< _system::signature::componentsTypes, _system >::Run( &_system _delta, m_activeEntitiesCount, m_entitiesKeys, m_components );
+	#define RUN_SYSTEM( _system, _func )  RunSystem< _system::signature, _system >::Run( &_system::_func, _delta, m_activeEntitiesCount, m_entitiesKeys, m_components );
 	void EcsManager::Update( const float _delta, const btVector3& _cameraPosition ) {
 		SCOPED_PROFILE( ecs_update )
 
 		ecsParticleSystem::s_cameraPosition = _cameraPosition;
-		RUN_SYSTEM(ecsParticleSystem);		
+		RUN_SYSTEM(ecsParticleSystem, Run );		
 	}
 
 	//================================================================================================================================
@@ -89,25 +93,25 @@ namespace fan {
 	void EcsManager::LateUpdate( const float _delta ) {
 		SCOPED_PROFILE( ecs_lateUpdate )		
  		
-		RUN_SYSTEM( ecsUpdateAABBFromHull );
-		RUN_SYSTEM( ecsUpdateAABBFromTransform ); 
-		RUN_SYSTEM( ecsUpdateBullet );
+		RUN_SYSTEM( ecsUpdateAABBFromHull, Run );
+		RUN_SYSTEM( ecsUpdateAABBFromTransform, Run );
+		RUN_SYSTEM( ecsUpdateBullet, Run );
 	}
 
 	//================================================================================================================================
 	//================================== ==============================================================================================
 	void EcsManager::UpdatePrePhysics( const float _delta ) { 
 		SCOPED_PROFILE( ecs_pre_phy )  
-		RUN_SYSTEM( ecsPlanetsSystem );
-		RUN_SYSTEM( ecsSynchRbToTransSystem ); 
+		RUN_SYSTEM( ecsPlanetsSystem, Run );
+		RUN_SYSTEM( ecsSynchRbSystem, SynchRbToTransSystem );
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
 	void EcsManager::UpdatePostPhysics( const float _delta ) { 
 		SCOPED_PROFILE( ecs_post_phy ) 
-		RUN_SYSTEM( ecsSynchTransToRbSystem ); 
-		RUN_SYSTEM( ecsUpdateAABBFromRigidbody );
+		RUN_SYSTEM( ecsSynchRbSystem, SynchTransToRbSystem );
+		RUN_SYSTEM( ecsUpdateAABBFromRigidbody, Run );
 	}
 
 	//================================================================================================================================

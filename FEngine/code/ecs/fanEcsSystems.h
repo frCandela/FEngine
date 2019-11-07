@@ -27,27 +27,12 @@ namespace fan {
 	static_assert( std::is_same< ecsSignature<ecsFakeTag, ecsMovement>::componentsTypes, meta::TypeList< ecsMovement>>::value );
 	static_assert( std::is_same< ecsSignature<ecsMovement, ecsFakeTag>::tagsTypes, meta::TypeList< ecsFakeTag>>::value );
 
-	//================================	
-	// Declare your signatures here
-	//================================	
-	using ecsParticleSignature			= ecsSignature< ecsPosition, ecsRotation, ecsMovement, ecsParticle >;
-	using ecsPlanetSignature			= ecsSignature< ecsGameobject, ecsTranform, ecsPlanet, ecsFlags >;
-	using ecsRigidbodySignature			= ecsSignature< ecsTranform, ecsMotionState, ecsRigidbody >;
-	using ecsAABBHullSignature			= ecsSignature< ecsTranform, ecsScaling, ecsAABB, ecsFlags, ecsMesh >;
-	using ecsAABBTransformSignature		= ecsSignature< ecsTranform, ecsAABB, ecsFlags >;
-	using ecsAABBRigidbodySignature     = ecsSignature< ecsAABB, ecsRigidbody, ecsFlags >;
-	using ecsBulletSignature			= ecsSignature< ecsGameobject, ecsBullet >;
-	
-
-	static constexpr ecsBitset tot1 = ecsParticleSignature::componentsBitset;
-
 	//================================================================================================================================
 	// System
 	// Runs logic on entities matching a specific signature
 	//================================================================================================================================
-	template < typename... _signature> class ISystem;
-	template < template <typename...> typename _typeList, typename... _args>
-	class ISystem <_typeList<_args...> > {
+	template < typename... _args>
+	class ISystem {
 	public:
 		using signature = ecsSignature<_args...>;
 	};
@@ -55,7 +40,7 @@ namespace fan {
 	//================================
 	// ParticleSystem
 	//================================
-	class ecsParticleSystem : public ISystem<  ecsParticleSignature > {
+	class ecsParticleSystem : public ISystem<  ecsPosition, ecsRotation, ecsMovement, ecsParticle > {
 	public:
 		static void Run( float _delta, const size_t _count, std::vector< ecsComponentsKey >& _entitiesData,
 			ComponentData< ecsPosition > & _positions,
@@ -69,7 +54,7 @@ namespace fan {
 	//================================
 	// PlanetsSystem
 	//================================
-	class ecsPlanetsSystem : public ISystem<  ecsPlanetSignature > {
+	class ecsPlanetsSystem : public ISystem<  ecsGameobject, ecsTranform, ecsPlanet, ecsFlags > {
 	public:
 		static void Run( float _delta, const size_t _count, std::vector< ecsComponentsKey >& _entitiesData,
 			 ComponentData< ecsGameobject > & _gameobjects
@@ -81,21 +66,15 @@ namespace fan {
 	//================================
 	// Rigidbody transform update
 	//================================
-	class ecsSynchTransToRbSystem : public ISystem<  ecsRigidbodySignature > {
+	class ecsSynchRbSystem : public ISystem<  ecsTranform, ecsMotionState, ecsRigidbody > {
 	public:
-		static void Run( float _delta, const size_t _count, std::vector< ecsComponentsKey >& _entitiesData,
+		static void SynchTransToRbSystem( float _delta, const size_t _count, std::vector< ecsComponentsKey >& _entitiesData,
 			 ComponentData< ecsTranform > & _transforms
 			,ComponentData< ecsMotionState > & _motionStates
 			,ComponentData< ecsRigidbody > & _rigidbodies );
-	};
 
-	//================================
-	// Rigidbody transform update
-	//================================
-	class ecsSynchRbToTransSystem : public ISystem<  ecsRigidbodySignature > {
-	public:
-		static void Run( float _delta, const size_t _count, std::vector< ecsComponentsKey >& _entitiesData,
-			  ComponentData< ecsTranform > &	_transforms
+		static void SynchRbToTransSystem( float _delta, const size_t _count, std::vector< ecsComponentsKey >& _entitiesData,
+			ComponentData< ecsTranform > &	_transforms
 			, ComponentData< ecsMotionState > & _motionStates
 			, ComponentData< ecsRigidbody > &	_rigidbodies );
 	};
@@ -103,7 +82,7 @@ namespace fan {
 	//================================
 	// Update AABB from convex hull
 	//================================
-	class ecsUpdateAABBFromHull : public ISystem<  ecsAABBHullSignature >
+	class ecsUpdateAABBFromHull : public ISystem<  ecsTranform, ecsScaling, ecsAABB, ecsFlags, ecsMesh >
 	{
 	public:
 		static void Run( float _delta, const size_t _count, std::vector< ecsComponentsKey >& _entitiesData,
@@ -118,7 +97,7 @@ namespace fan {
 	//================================
 	// Update AABB from rigidbody
 	//================================
-	class ecsUpdateAABBFromRigidbody : public ISystem<  ecsAABBRigidbodySignature > {
+	class ecsUpdateAABBFromRigidbody : public ISystem<  ecsAABB, ecsRigidbody, ecsFlags > {
 	public:
 		static void Run( float _delta, const size_t _count, std::vector< ecsComponentsKey >& _entitiesData,
 
@@ -131,7 +110,7 @@ namespace fan {
 	//================================
 	// Update AABB from transform
 	//================================
-	class ecsUpdateAABBFromTransform : public ISystem<  ecsAABBTransformSignature > {
+	class ecsUpdateAABBFromTransform : public ISystem<  ecsTranform, ecsAABB, ecsFlags > {
 	public:
 		static void Run( float _delta, const size_t _count, std::vector< ecsComponentsKey >& _entitiesData,
 			  ComponentData< ecsTranform > &	_transforms
@@ -143,7 +122,7 @@ namespace fan {
 	//================================
 	// Update bullet
 	//================================
-	class ecsUpdateBullet : public ISystem<  ecsBulletSignature >
+	class ecsUpdateBullet : public ISystem<  ecsGameobject, ecsBullet >
 	{
 	public:
 		static void Run( float _delta, const size_t _count, std::vector< ecsComponentsKey >& _entitiesData,
