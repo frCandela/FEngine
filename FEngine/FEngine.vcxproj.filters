@@ -388,6 +388,9 @@
     <ClCompile Include="code\game\fanWithEnergy.cpp">
       <Filter>code\game</Filter>
     </ClCompile>
+    <ClCompile Include="code\game\fanSolarPanel.cpp">
+      <Filter>code\game</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="code\editor\fanMainMenuBar.h">
@@ -1255,6 +1258,9 @@
       <Filter>code\game</Filter>
     </ClInclude>
     <ClInclude Include="code\game\fanWithEnergy.h">
+      <Filter>code\game</Filter>
+    </ClInclude>
+    <ClInclude Include="code\game\fanSolarPanel.h">
       <Filter>code\game</Filter>
     </ClInclude>
   </ItemGroup>

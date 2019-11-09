@@ -29,9 +29,9 @@ namespace fan {
 		float m_lowForwardForce		= 2000.f;
 		float m_forwardForce		= 3000.f;
 		float m_highForwardForce	= 4000.f;
-		float m_lateralForce = 2000.f;
-		float m_drag = 0.930f;
-		float energyConsumedPerUnitOfForce = 0.001f;
+		float m_lateralForce		= 2000.f;
+		float m_drag				= 0.930f;
+		float m_energyConsumedPerUnitOfForce = 0.001f;
 
 		Rigidbody * m_rigidbody;
 		ParticleSystem * m_particleSystem;

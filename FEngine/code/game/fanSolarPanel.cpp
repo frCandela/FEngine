@@ -1,89 +1,103 @@
 #include "fanGlobalIncludes.h"
-#include "game/fanWithEnergy.h"
+#include "game/fanSolarPanel.h"
 
 #include "scene/fanGameobject.h"
 #include "scene/components/fanTransform.h"
+#include "game/fanWithEnergy.h"
 
 namespace fan
 {
-	REGISTER_EDITOR_COMPONENT( WithEnergy )
-	REGISTER_TYPE_INFO( WithEnergy )
+	REGISTER_EDITOR_COMPONENT( SolarPanel )
+	REGISTER_TYPE_INFO( SolarPanel )
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void WithEnergy::Start()
-	{}
-
-	//================================================================================================================================
-	//================================================================================================================================
-	void WithEnergy::OnAttach()
+	void SolarPanel::Start()
 	{
-		Actor::OnAttach();
-
-		m_currentEnergy = 0;
+		REQUIRE_COMPONENT( WithEnergy, m_energy );
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void WithEnergy::OnDetach()
+	void SolarPanel::OnAttach()
+	{
+		Actor::OnAttach();
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
+	void SolarPanel::OnDetach()
 	{
 		Actor::OnDetach();
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void WithEnergy::Update( const float /*_delta*/ ){
-
+	void SolarPanel::Update( const float _delta ) {
+		ComputeChargingRate();		
+		m_energy->AddEnergy( _delta * m_currentChargingRate );
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void WithEnergy::LateUpdate( const float /*_delta*/ )
+	void SolarPanel::LateUpdate( const float /*_delta*/ )
 	{
-		const float ratio = m_currentEnergy / m_maxEnergy;
-
-		ImGui::SetNextWindowSize( { 300,62 } );
 		ImGui::Begin( "##player_status_bars", nullptr, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoTitleBar );
 		{
-			ImGui::PushStyleColor( ImGuiCol_PlotHistogram, Color::Yellow.ToImGui());
-			ImGui::ProgressBar( ratio );
-			ImGui::PopStyleColor();
+			ImGui::PushStyleColor( ImGuiCol_PlotHistogram, Color::Green.ToImGui() );
+			ImGui::ProgressBar( m_currentChargingRate / m_maxChargingRate );
+			ImGui::PopStyleColor();			
 		} ImGui::End();
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void WithEnergy::AddEnergy( const float _energy )
+	void SolarPanel::OnGui()
 	{
-		m_currentEnergy = std::clamp( m_currentEnergy + _energy, 0.f, m_maxEnergy );
+		ImGui::DragFloat( "min_charging_rate", &m_minChargingRate, 0.5f, 0.f, 100.f );
+		ImGui::DragFloat( "max_charging_rate", &m_maxChargingRate, 0.5f, 0.f, 100.f );
+		ImGui::DragFloat( "low_range		", &m_minRange, 0.5f, 0.f, 100.f );
+		ImGui::DragFloat( "max_range 		", &m_maxRange, 0.5f, 0.f, 100.f );
+
+
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void WithEnergy::OnGui()
+	void SolarPanel::ComputeChargingRate()
 	{
-		ImGui::DragFloat( "current energy 	   ", &m_currentEnergy );
-		ImGui::DragFloat( "max energy 		   ", &m_maxEnergy );
+		const btVector3 position = m_gameobject->GetTransform()->GetPosition();
+		const float distance = position.norm();
+		const float slope = (m_maxChargingRate - m_minChargingRate) / (m_maxRange - m_minRange);
+		const float unclampedRate = m_maxChargingRate - slope * ( distance - m_minRange );
+		m_currentChargingRate = std::clamp( unclampedRate , m_minChargingRate, m_maxChargingRate );
+
 	}
 	 
 	//================================================================================================================================
 	//================================================================================================================================
-	bool WithEnergy::Save( Json & _json ) const
+	bool SolarPanel::Save( Json & _json ) const
 	{
 		Actor::Save( _json );
-		SaveFloat( _json, "max_energy 		   ", m_maxEnergy );
+		
+		SaveFloat( _json, "min_charging_rate", m_minChargingRate );
+		SaveFloat( _json, "max_charging_rate", m_maxChargingRate );
+		SaveFloat( _json, "low_range		", m_minRange );
+		SaveFloat( _json, "max_range 		", m_maxRange );
 
 		return true;
 	}
 	 
 	//================================================================================================================================
 	//================================================================================================================================
-	bool WithEnergy::Load( Json & _json )
+	bool SolarPanel::Load( Json & _json )
 	{
 		Actor::Load( _json );
-		LoadFloat( _json, "current_energy	   ", m_currentEnergy );
-		LoadFloat( _json, "max_energy 		   ", m_maxEnergy );
 
+		LoadFloat( _json, "min_charging_rate", m_minChargingRate );
+		LoadFloat( _json, "max_charging_rate", m_maxChargingRate );
+		LoadFloat( _json, "low_range		", m_minRange );
+		LoadFloat( _json, "max_range 		", m_maxRange );
 		return true;
 	}
 

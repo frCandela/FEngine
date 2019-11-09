@@ -135,6 +135,7 @@
     <ClCompile Include="code\game\fanGameManager.cpp" />
     <ClCompile Include="code\game\fanPlanet.cpp" />
     <ClCompile Include="code\game\fanSolarEruption.cpp" />
+    <ClCompile Include="code\game\fanSolarPanel.cpp" />
     <ClCompile Include="code\game\fanSolarSystem.cpp" />
     <ClCompile Include="code\game\fanSpaceShip.cpp" />
     <ClCompile Include="code\game\fanWeapon.cpp" />
@@ -249,6 +250,7 @@
     <ClInclude Include="code\game\fanGameManager.h" />
     <ClInclude Include="code\game\fanPlanet.h" />
     <ClInclude Include="code\game\fanSolarEruption.h" />
+    <ClInclude Include="code\game\fanSolarPanel.h" />
     <ClInclude Include="code\game\fanSolarSystem.h" />
     <ClInclude Include="code\game\fanSpaceShip.h" />
     <ClInclude Include="code\game\fanWeapon.h" />

@@ -49,7 +49,7 @@ namespace fan
 }
 
 //================================================================================================================================
-// Get _componentType  from the gameobject and set _pointerToComponent. Disable the component with a warning message if the component is not found
+// Get _componentType  from the gameobject and set _pointerToComponent. Disable the component with a warning message if no component is found
 //================================================================================================================================
 #define REQUIRE_COMPONENT( _componentType, _pointerToComponent )																			\
 		_pointerToComponent = m_gameobject->GetComponent<_componentType>();																	\
