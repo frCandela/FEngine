@@ -100,7 +100,6 @@ namespace fan
 	bool WithEnergy::Load( Json & _json )
 	{
 		Actor::Load( _json );
-		LoadFloat( _json, "current_energy	   ", m_currentEnergy );
 		LoadFloat( _json, "max_energy 		   ", m_maxEnergy );
 
 		return true;

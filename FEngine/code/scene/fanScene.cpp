@@ -7,6 +7,7 @@
 #include "scene/components/fanCamera.h"
 #include "scene/components/fanModel.h"
 #include "scene/actors/fanActor.h"
+#include "scene/fanGameobjectPtr.h"
 #include "core/fanSignal.h"
 #include "core/time/fanScopedTimer.h"
 #include "core/time/fanProfiler.h"
@@ -40,7 +41,9 @@ namespace fan
 		if (_parent == nullptr) {
 			_parent = m_root;
 		}
-		Gameobject* gameobject = new Gameobject(_name, _parent, this );
+		Gameobject* gameobject = new Gameobject(_name, _parent, this, GetUniqueID() );
+		assert( m_gameobjects.find( gameobject->GetUniqueID() ) == m_gameobjects.end() );
+		m_gameobjects[gameobject->GetUniqueID()] = gameobject;
 
 		return gameobject;
 	}
@@ -182,6 +185,7 @@ namespace fan
 			if (_gameobject->GetParent() != nullptr) {
 				_gameobject->GetParent()->RemoveChild(_gameobject);
 			}
+			m_gameobjects.erase( _gameobject->GetUniqueID() );
 			delete(_gameobject);
 		}
 	}
@@ -309,12 +313,32 @@ namespace fan
 		}
 
 		// Gameobjects
+		GameobjectPtr::s_onCreateUnresolved.Connect( &Scene::OnGameobjectPtrCreate, this );
 		Json & jGameobjects = _json["gameobjects"]; {
 			m_root = CreateGameobject( "root" );
 			m_root->Load( jGameobjects );
 		}
-
+		GameobjectPtr::s_onCreateUnresolved.Disconnect( &Scene::OnGameobjectPtrCreate, this );
 		return true;
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
+	void Scene::OnGameobjectPtrCreate( GameobjectPtr * _gameobjectPtr )
+	{
+		m_unresolvedGameobjectPointers.push_back( _gameobjectPtr );
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
+	void Scene::ResolveGameobjectPointers()
+	{
+		for (int ptrIndex = 0; ptrIndex < m_unresolvedGameobjectPointers.size(); ptrIndex++)
+		{
+// 			GameobjectPtr& ptr = *m_unresolvedGameobjectPointers[ptrIndex];
+// 			ptr.Init( m_gameobjects[ ptr.GetID() ] );
+		}
+		m_unresolvedGameobjectPointers.clear();
 	}
 
 	//================================================================================================================================

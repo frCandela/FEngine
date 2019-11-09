@@ -33,12 +33,12 @@ namespace fan
 	void gui::ShowHelpMarker(const char* _desc)
 	{
 		ImGui::TextDisabled("(?)");
-		ToolTip(_desc);
+		ToolTipFast(_desc);
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void gui::ToolTip( const char* _desc ) {
+	void gui::ToolTipFast( const char* _desc ) {
 		if ( ImGui::IsItemHovered() ) {
 			ImGui::BeginTooltip();
 			ImGui::PushTextWrapPos( ImGui::GetFontSize() * 35.0f );

@@ -6,7 +6,6 @@
 #include "ecs/fanECSManager.h"	
 #include "scene/fanScene.h"
 
-
 namespace fan
 {
 	class Component;
@@ -19,7 +18,7 @@ namespace fan
 	public:
 		using Flag = ecsFlags::Flag;
 
-		Gameobject(const std::string _name, Gameobject * _parent, Scene * _scene );
+		Gameobject(const std::string _name, Gameobject * _parent, Scene * _scene, const uint64_t _uniqueID );
 		~Gameobject();
 
 		void OnGui();
@@ -43,6 +42,8 @@ namespace fan
 		const AABB &	GetAABB() const; 
 		Transform *		GetTransform() const  { return m_transform; }
 		ecsHandle		GetEcsHandle(){ return m_ecsHandleEntity; }
+		uint64_t		GetUniqueID() const { return m_uniqueID; }
+		void 			SetUniqueID( const uint64_t _id );
 
 		// Gameobject scene tree parenting
 		Gameobject* GetParent() const { return m_parent; }
@@ -65,6 +66,7 @@ namespace fan
 
 	private:
 		std::string				 m_name;
+		uint64_t				 m_uniqueID;
 		std::vector<Gameobject*> m_childs;
 		Gameobject *			 m_parent;
 		Transform * m_transform = nullptr;
@@ -72,10 +74,11 @@ namespace fan
 		Scene *	const			 m_scene = nullptr;
 		ecsHandle				 m_ecsHandleEntity = ecsNullHandle;
 
-		void		AddComponent(Component * _component);
-
 		ecsFlags * const m_flags = nullptr;
-		ecsAABB *  const m_aabb= nullptr;
+		ecsAABB *  const m_aabb = nullptr;
+
+		void		AddComponent(Component * _component);
+		
 	};
 
 
@@ -169,4 +172,11 @@ namespace fan
 			ecsManager->RemoveComponent<_componentType>( entity );
 		}
 	}
+}
+
+namespace ImGui
+{
+	void				BeginDragDropSourceGameobject( fan::Gameobject * _gameobject, ImGuiDragDropFlags _flags = ImGuiDragDropFlags_None );
+	fan::Gameobject *	BeginDragDropTargetGameobject( );
+
 }

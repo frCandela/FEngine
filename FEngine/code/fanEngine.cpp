@@ -32,6 +32,7 @@
 #include "editor/fanImguiIcons.h"
 #include "scene/fanScene.h"
 #include "scene/fanGameobject.h"
+#include "scene/fanGameobjectPtr.h"
 #include "scene/components/fanComponent.h"
 #include "scene/components/fanCamera.h"
 #include "scene/components/fanTransform.h"
@@ -140,6 +141,7 @@ namespace fan {
 		PointLight::onPointLightDetach.Connect	( &Engine::UnRegisterPointLight, this );
 		DirectionalLight::onDirectionalLightAttach.Connect	( &Engine::RegisterDirectionalLight,   this );
 		DirectionalLight::onDirectionalLightDetach.Connect	( &Engine::UnRegisterDirectionalLight, this );
+		GameobjectPtr::s_onSetFromSelection.Connect( &Engine::OnSetGameobjectPtrFromSelection, this );
 
 		m_scene->New();
 		Mesh * defaultMesh = m_renderer->GetRessourceManager()->LoadMesh(GlobalValues::s_defaultMesh);
@@ -766,6 +768,16 @@ namespace fan {
 	void Engine::OnGameobjectDeleted( Gameobject * _gameobject ) {
 		if ( _gameobject == m_selectedGameobject ) {
 			Deselect();
+		}
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
+	void Engine::OnSetGameobjectPtrFromSelection( GameobjectPtr * _ptr )
+	{
+		if ( m_selectedGameobject != nullptr )
+		{
+			(*_ptr) = GameobjectPtr( m_selectedGameobject );
 		}
 	}
 }

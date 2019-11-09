@@ -10,6 +10,7 @@ namespace fan
 	class Actor;
 	class EcsManager;
 	class PhysicsManager;
+	class GameobjectPtr;
 
 	//================================================================================================================================
 	//================================================================================================================================
@@ -47,23 +48,24 @@ namespace fan
 		bool LoadFrom(const std::string _path);
 		void SetPath( const std::string _path ) { m_path = _path; }
 
-
 		Gameobject *			GetRoot()					{ return m_root; }
 		inline std::string		GetName() const				{ return m_name; }
 		bool					HasPath() const				{ return m_path.empty() == false; }
 		inline std::string		GetPath() const				{ return m_path; }
 		inline EcsManager *		GetEcsManager() const		{ return m_ecsManager; }
-		inline PhysicsManager *	GetPhysicsManager() const	{ return m_physicsManager; }
+		inline PhysicsManager *	GetPhysicsManager() const	{ return m_physicsManager; }		
 		bool					IsPaused() const			{ return m_isPaused; };
 		Camera *				GetMainCamera()				{ return m_mainCamera; }
-
 		void					SetMainCamera( Camera * _camera );
+		uint64_t				GetUniqueID() { return m_nextUniqueID++; }
 
-
+		void					InsertID( const uint64_t _id, Gameobject * _gameobject ) { m_gameobjects[_id] = _gameobject ; }
+		void					EraseID( const uint64_t _id ) { m_gameobjects.erase( _id ); }
 	private:
 		// Data
-		std::string				m_name;
-		std::string				m_path;
+		std::string	m_name;
+		std::string	m_path;
+		uint64_t	m_nextUniqueID = 1;
 
 		// References
 		Gameobject *			m_root;
@@ -75,12 +77,16 @@ namespace fan
 		bool m_isPaused = false;
 
 		// Gameobjects
-		std::vector < Gameobject * > m_entitiesToDelete;
-		std::set< Actor * >			 m_startingActors;
-		std::set< Actor * >			 m_activeActors;
+		std::vector < Gameobject * >		m_entitiesToDelete;
+		std::vector < GameobjectPtr * >		m_unresolvedGameobjectPointers;
+		std::set< Actor * >					m_startingActors;
+		std::set< Actor * >					m_activeActors;
+		std::map< uint64_t, Gameobject * >	m_gameobjects;
 
 		void OnActorAttach(Actor * _actor);
 		void OnActorDetach(Actor * _actor);
+		void OnGameobjectPtrCreate( GameobjectPtr * _gameobjectPtr );
+		void ResolveGameobjectPointers( );
 
 		bool Load( Json & _json ) override;
 		bool Save( Json& _json ) const override;

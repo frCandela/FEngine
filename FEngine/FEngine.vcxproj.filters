@@ -394,6 +394,9 @@
     <ClCompile Include="code\game\fanSunLight.cpp">
       <Filter>code\game</Filter>
     </ClCompile>
+    <ClCompile Include="code\scene\fanGameobjectPtr.cpp">
+      <Filter>code\scene</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="code\editor\fanMainMenuBar.h">
@@ -1268,6 +1271,9 @@
     </ClInclude>
     <ClInclude Include="code\game\fanSunLight.h">
       <Filter>code\game</Filter>
+    </ClInclude>
+    <ClInclude Include="code\scene\fanGameobjectPtr.h">
+      <Filter>code\scene</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -66,8 +66,10 @@ namespace fan
 				ImGui::Icon(ImGui::MODEL, {19,19}); ImGui::SameLine();
 				if ( ImGui::MenuItem( "Model" ) ) {
 					Gameobject *  newIntity = m_scene->CreateGameobject("new_model", m_lastGameobjectRightClicked );
-					newIntity->AddComponent<Model>();
-					newIntity->AddComponent<Material>();
+					Model * model = newIntity->AddComponent<Model>();
+					model->SetPath( GlobalValues::s_meshCube );
+					Material * material =  newIntity->AddComponent<Material>();
+					material->SetTexturePath( GlobalValues::s_textureWhite );
 				}
 
 				ImGui::Icon( ImGui::POINT_LIGHT, { 19,19 } ); ImGui::SameLine();
@@ -133,17 +135,13 @@ namespace fan
 		bool isOpen = ImGui::TreeNode(ss.str().c_str());
 
 		// Gameobject dragndrop target empty selectable -> place dragged below
-		if (ImGui::BeginDragDropTarget())
+		Gameobject * gameobjectDrop1 = ImGui::BeginDragDropTargetGameobject();
+		if ( gameobjectDrop1 && gameobjectDrop1 != _gameobjectDrawn )
 		{
-			if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("node_test")) {
-				assert(payload->DataSize == sizeof(Gameobject**));
-				Gameobject * payloadNode = *(Gameobject**)payload->Data;
-				if( payloadNode != _gameobjectDrawn ) {
-					payloadNode->InsertBelow(_gameobjectDrawn);
-				}
-			}
-			ImGui::EndDragDropTarget();
+			gameobjectDrop1->InsertBelow( _gameobjectDrawn );
 		}
+
+
 		ImGui::SameLine();
 		bool selected = ( _gameobjectDrawn == m_gameobjectSelected );
 
@@ -158,22 +156,15 @@ namespace fan
 		}
 
 		// Gameobject dragndrop source = selectable -^
-		if (ImGui::BeginDragDropSource(ImGuiDragDropFlags_None)) {
-			ImGui::SetDragDropPayload("node_test", &_gameobjectDrawn, sizeof(Gameobject**));
-			ImGui::Text((_gameobjectDrawn->GetName()).c_str());
-			ImGui::EndDragDropSource();
-		}
+		ImGui::BeginDragDropSourceGameobject( _gameobjectDrawn  );
 
 		// Gameobject dragndrop target gameobject name -> place as child
-		if (ImGui::BeginDragDropTarget())
+		Gameobject * gameobjectDrop = ImGui::BeginDragDropTargetGameobject();
+		if ( gameobjectDrop )
 		{
-			if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("node_test")) {
-				assert(payload->DataSize == sizeof(Gameobject**));
-				Gameobject * payloadNode = *(Gameobject**)payload->Data;
-				payloadNode->SetParent(_gameobjectDrawn);
-			}
-			ImGui::EndDragDropTarget();
+			gameobjectDrop->SetParent( _gameobjectDrawn );
 		}
+
 		if (isOpen) {
 			const std::vector<Gameobject*>& childs = _gameobjectDrawn->GetChilds();
 			for (int childIndex = 0; childIndex < childs.size(); childIndex++) {

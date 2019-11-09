@@ -1,6 +1,7 @@
 #pragma once
 
 #include "scene/actors/fanActor.h"
+#include "scene/fanGameobjectPtr.h"
 
 namespace fan {
 
@@ -43,6 +44,6 @@ namespace fan {
 		ParticleSystem * m_particleSystem;
 		WithEnergy * m_energy;
 
-
+		GameobjectPtr m_forwardParticlesGo;
 	};
 }

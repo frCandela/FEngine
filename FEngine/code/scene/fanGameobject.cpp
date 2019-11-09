@@ -1,24 +1,23 @@
 #include "fanGlobalIncludes.h"
-
 #include "scene/fanGameobject.h"
+
 #include "scene/fanScene.h"
 #include "scene/components/fanComponent.h"
 #include "scene/components/fanModel.h"
 #include "scene/components/fanTransform.h"
-
 #include "renderer/fanMesh.h"
 #include "ecs/fanECSManager.h"
 #include "core/fanSignal.h"
-
 
 namespace fan
 {
 	//================================================================================================================================
 	//================================================================================================================================
-	Gameobject::Gameobject(const std::string _name, Gameobject * _parent, Scene * _scene ) :
+	Gameobject::Gameobject(const std::string _name, Gameobject * _parent, Scene * _scene, const uint64_t _uniqueID ) :
 		m_name(_name)
 		, m_parent(_parent)
 		, m_scene( _scene )
+		, m_uniqueID( _uniqueID )
 	{
 
 		if (_parent != nullptr) {
@@ -104,6 +103,15 @@ namespace fan
 	}
 
 	//================================================================================================================================
+	//================================================================================================================================
+	void Gameobject::SetUniqueID( const uint64_t _id )
+	{
+		m_scene->EraseID( m_uniqueID );
+		m_scene->InsertID( _id, this );
+		m_uniqueID = _id;
+	}
+
+	//============================================================== ==================================================================
 	// Private method used to factorize add components methods 
 	//================================================================================================================================
 	void Gameobject::AddComponent(Component * _component) {
@@ -234,6 +242,7 @@ namespace fan
 
 		LoadString( _json, "name", m_name );
 		LoadUInt( _json, "flags", m_flags->flags );
+		LoadUInt64( _json, "unique_id", m_uniqueID );
 
 		Json& jComponents = _json["components"]; {
 			for ( int childIndex = 0; childIndex < jComponents.size(); childIndex++ ) {
@@ -270,6 +279,7 @@ namespace fan
 	bool Gameobject::Save( Json & _json ) const {
 		SaveString( _json, "name", m_name );
 		SaveUInt( _json, "flags", m_flags->flags );
+		SaveUInt64( _json, "unique_id", m_uniqueID );
 
 		Json& jComponents = _json["components"];{
 			for ( int componentIndex = 0; componentIndex < m_components.size(); componentIndex++ ) {
@@ -293,5 +303,38 @@ namespace fan
 			}
 		}
 		return true;
+	}
+}
+
+namespace ImGui
+{
+	//================================================================================================================================
+	//================================================================================================================================
+	void BeginDragDropSourceGameobject( fan::Gameobject * _gameobject, ImGuiDragDropFlags _flags )
+	{		
+		if ( ImGui::BeginDragDropSource( _flags ) )
+		{
+			ImGui::SetDragDropPayload( "dragndrop_gameobject", &_gameobject, sizeof( fan::Gameobject** ) );
+			ImGui::Icon( ImGui::IconType::GAMEOBJECT16, { 16,16 } ); ImGui::SameLine();
+			ImGui::Text( ( _gameobject->GetName() ).c_str() );
+			ImGui::EndDragDropSource();
+		}
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
+	fan::Gameobject * BeginDragDropTargetGameobject()
+	{
+		fan::Gameobject * gameobject = nullptr;
+		if ( ImGui::BeginDragDropTarget() )
+		{
+			if ( const ImGuiPayload* payload = ImGui::AcceptDragDropPayload( "dragndrop_gameobject" ) )
+			{
+				assert( payload->DataSize == sizeof( fan::Gameobject** ) );
+				gameobject = *( fan::Gameobject** )payload->Data;
+			}
+			ImGui::EndDragDropTarget();
+		}
+		return gameobject;
 	}
 }

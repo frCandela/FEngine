@@ -32,6 +32,11 @@ namespace fan {
 	//================================================================================================================================
 	//================================================================================================================================
 	void SpaceShip::Update(const float _delta) {
+		ImGui::Begin( "test" );
+		{
+			ImGui::GameobjectPtr( "forward particles", &m_forwardParticlesGo );
+		} ImGui::End();
+
 
 		// Get mouse world pos
 		Camera * camera			= m_gameobject->GetScene()->GetMainCamera();

@@ -16,7 +16,7 @@ namespace fan {
 	class Renderer;
 	class Gameobject;
 	class Scene;
-	class Gameobject;
+	class GameobjectPtr;
 	class Actor;
 	class Camera;	
 	class DirectionalLight;
@@ -114,6 +114,7 @@ namespace fan {
 		void OnMaterialSetTexture( Material * _material, std::string _path );
 		void OnModelSetPath( Model * _model, std::string _path );
 		void OnGameobjectDeleted( Gameobject * _gameobject );
+		void OnSetGameobjectPtrFromSelection( GameobjectPtr * _ptr );
 
 		void DrawEditorGrid() const;
 		void DrawWireframe() const;
