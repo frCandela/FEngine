@@ -9,6 +9,8 @@ namespace fan {
 	EcsManager::EcsManager() {
 		m_entityToHandles.reserve( 512 );
 		m_entitiesKeys.reserve(1024);
+
+		ecsSolarEruptionMeshSystem::Init();
 	}
 
 	//================================================================================================================================

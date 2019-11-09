@@ -125,6 +125,9 @@ namespace fan {
 		}
 	}
 
+
+
+
 	//================================================================================================================================
 	//================================================================================================================================
 	float  ecsSolarEruptionMeshSystem::s_subAngle = 45.f;
@@ -132,6 +135,17 @@ namespace fan {
 	bool   ecsSolarEruptionMeshSystem::s_debugDraw = false;
 	Mesh*  ecsSolarEruptionMeshSystem::s_mesh = new Mesh();
 
+	//================================================================================================================================
+	//================================================================================================================================
+	void ecsSolarEruptionMeshSystem::Init()
+	{
+		s_mesh->SetHostVisible( true );
+		s_mesh->SetOptimizeVertices( false );
+		s_mesh->SetAutoUpdateHull( false );
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
 	void ecsSolarEruptionMeshSystem::Run( float /*_delta*/, const size_t _count, std::vector< ecsComponentsKey >& _entitiesData
 		, ComponentData< ecsPlanet > &	/*_planets*/
 		, ComponentData< ecsTranform > & _transforms 

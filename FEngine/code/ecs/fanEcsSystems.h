@@ -83,6 +83,7 @@ namespace fan {
 		};
 
 	public:
+		static void Init();
 		static void Run( float _delta, const size_t _count, std::vector< ecsComponentsKey >& _entitiesData
 			, ComponentData< ecsPlanet > &	_planets
 			, ComponentData< ecsTranform > & _transforms 

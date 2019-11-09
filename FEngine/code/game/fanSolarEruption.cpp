@@ -20,31 +20,13 @@ namespace fan {
 	//================================================================================================================================
 	//================================================================================================================================
 	void SolarEruption::Start() {
-		m_material = m_gameobject->GetComponent<Material>();
-		if ( m_material == nullptr ) {
-			Debug::Warning("no material found on Solar Eruption");
-			SetEnabled(false);
-		}
+		REQUIRE_COMPONENT( Material, m_material )
+		REQUIRE_COMPONENT( ParticleSystem, m_particleSystem )
+		REQUIRE_COMPONENT( Model, m_model )
 
-		m_particleSystem = m_gameobject->GetComponent<ParticleSystem>();
-		if ( m_particleSystem == nullptr ) {
-			Debug::Warning( "no particle system found on Solar Eruption" );
-			SetEnabled( false );
-		} else {
-			m_particleSystem->SetEnabled(false);
-		}
 
-		// Setup the solar eruption mesh
-		m_model = m_gameobject->GetComponent<Model>();
-		if ( m_model )
-		{
-			Mesh* mesh = ecsSolarEruptionMeshSystem::s_mesh;
-			m_model->SetMesh( mesh );
-			mesh->SetHostVisible( true );
-			mesh->SetOptimizeVertices( false );
-			mesh->SetAutoUpdateHull( false );
-		}
-		
+		if ( m_particleSystem )	{ m_particleSystem->SetEnabled( false ); }
+		if ( m_model )			{ m_model->SetMesh( ecsSolarEruptionMeshSystem::s_mesh );}		
 	}
 
 	//================================================================================================================================
@@ -57,11 +39,6 @@ namespace fan {
 	//================================================================================================================================
 	void SolarEruption::OnDetach() {
 		Actor::OnDetach();
-
-		m_model = m_gameobject->GetComponent<Model>();
-		if( m_model != nullptr ) {
-			m_model->SetMesh( nullptr );		
-		}
 	}
 
 	//================================================================================================================================
@@ -151,13 +128,6 @@ namespace fan {
 	void SolarEruption::OnGui() {
 		
 		ImGui::PushItemWidth( 100.f ); {
-
-			// Mesh generation
-			ImGui::Checkbox( "debug draw", &ecsSolarEruptionMeshSystem::s_debugDraw );
-			ImGui::DragFloat( "radius", &ecsSolarEruptionMeshSystem::s_radius, 0.1f );
-			ImGui::DragFloat( "sub-angle", &ecsSolarEruptionMeshSystem::s_subAngle, 1.f, 1.f, 180.f );
-			ImGui::Spacing();
-
 			// State machine		
 			ImGui::DragFloat( "eruption time", &m_eruptionTime );
 			ImGui::DragFloat( "warming time", &m_warmingTime );
@@ -194,8 +164,6 @@ namespace fan {
 	//================================================================================================================================
 	bool SolarEruption::Load( Json & _json) {
 		Actor::Load(_json);
-		LoadFloat( _json, "radius", ecsSolarEruptionMeshSystem::s_radius );
-		LoadFloat( _json, "sub_angle", ecsSolarEruptionMeshSystem::s_subAngle );
 
 		// State machine		
 		LoadFloat( _json, "eruption time", m_eruptionTime );
@@ -219,8 +187,6 @@ namespace fan {
 	//================================================================================================================================
 	bool SolarEruption::Save( Json & _json ) const {
 		Actor::Save( _json );		
-		SaveFloat( _json, "radius", ecsSolarEruptionMeshSystem::s_radius );
-		SaveFloat( _json, "sub_angle", ecsSolarEruptionMeshSystem::s_subAngle );
 
 		// State machine		
 		SaveFloat( _json, "eruption time", m_eruptionTime );

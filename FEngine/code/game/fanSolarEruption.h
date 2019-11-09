@@ -12,18 +12,6 @@ namespace fan {
 	//================================================================================================================================
 	//================================================================================================================================
 	class SolarEruption : public Actor {
-	private:
-		//================================================================
-		//================================================================
-		struct OrientedSegment
-		{
-			enum OpenSide { RIGHT = 1, LEFT = 2, BOTH = RIGHT | LEFT };
-
-			btVector3 direction;
-			OpenSide  openSide;
-			float norm;
-		};
-
 	public:
 		void Start() override;
 		void Update(const float _delta) override;
