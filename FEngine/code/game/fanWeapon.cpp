@@ -50,7 +50,7 @@ namespace fan
 		SCOPED_PROFILE( weapon_update )
 		Transform * thisTransform = m_gameobject->GetTransform();
 
-		const float fire = Input::Get().Manager().GetAxis( "fire" );
+		const float fire = Input::Get().Manager().GetAxis( "game_fire" );
 		if ( fire > 0 )
 		for (int bulletIndex = 0; bulletIndex < m_bulletsPerFrame; bulletIndex++)
 		{
@@ -80,7 +80,6 @@ namespace fan
 			{
 				rb->GetBtBody()->setIgnoreCollisionCheck( myRb->GetBtBody(), true );
 			}
-
 			
 			rb->SetVelocity( myRb->GetVelocity() + m_speed * thisTransform->Forward() );
 			  

@@ -86,7 +86,8 @@ namespace fan {
 		Input::Get().Manager().CreateAxis( "editor_left",		Keyboard::A, Keyboard::D );
 		Input::Get().Manager().CreateAxis( "editor_up",			Keyboard::E, Keyboard::Q );
 		Input::Get().Manager().CreateAxis( "editor_boost",		Keyboard::LEFT_SHIFT, Keyboard::NONE );
-		Input::Get().Manager().CreateAxis( "fire",				Keyboard::SPACE, Keyboard::NONE );
+		Input::Get().Manager().CreateAxis( "game_fire",				Keyboard::SPACE, Keyboard::NONE );
+		Input::Get().Manager().CreateAxis( "game_boost",		Keyboard::LEFT_SHIFT, Keyboard::LEFT_CONTROL );
 
 		// Set some values
 		m_editorGrid.isVisible = true;

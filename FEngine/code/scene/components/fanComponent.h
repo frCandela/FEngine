@@ -47,3 +47,14 @@ namespace fan
 		bool m_isRemovable : 1;
 	};
 }
+
+//================================================================================================================================
+// Get _componentType  from the gameobject and set _pointerToComponent. Disable the component with a warning message if the component is not found
+//================================================================================================================================
+#define REQUIRE_COMPONENT( _componentType, _pointerToComponent )																			\
+		_pointerToComponent = m_gameobject->GetComponent<_componentType>();																	\
+		if ( _pointerToComponent == nullptr ) {																								\
+			Debug::Warning() << GetName() << ": " << #_componentType << " not found on " << GetGameobject()->GetName() << Debug::Endl();	\
+			SetEnabled( false );																											\
+		}
+
