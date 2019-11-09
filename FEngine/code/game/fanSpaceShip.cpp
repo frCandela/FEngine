@@ -25,7 +25,7 @@ namespace fan {
 		REQUIRE_COMPONENT( WithEnergy, m_energy )
 		REQUIRE_COMPONENT( Rigidbody, m_rigidbody )
 		REQUIRE_COMPONENT( ParticleSystem, m_particleSystem )
-
+			
 		if( m_particleSystem ) { m_particleSystem->SetEnabled( false ); }		
 	}
 

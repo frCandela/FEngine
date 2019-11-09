@@ -80,7 +80,7 @@ namespace fan {
 	}
 
 	//================================================================================================================================
-	// Naive raycast on all triangles of the convex hull
+	// Raycast on all triangles of the convex hull
 	//================================================================================================================================
 	bool ConvexHull::RayCast(const btVector3 _origin, const btVector3 _direction, btVector3& _outIntersection) const {
 		btVector3 intersection;

@@ -184,4 +184,31 @@ namespace fan {
 			}
 		}
 	}
+
+	//================================================================================================================================
+	// Raycast on all triangles of the convex hull
+	//================================================================================================================================
+	bool Mesh::RayCast( const btVector3 _origin, const btVector3 _direction, btVector3& _outIntersection ) const
+	{
+		btVector3 intersection;
+		float closestDistance = std::numeric_limits<float>::max();
+		for ( int triIndex = 0; triIndex < m_indices.size() / 3; triIndex++ )
+		{
+			const btVector3 v0 = ToBullet( m_vertices[m_indices[3 * triIndex + 0]].pos );
+			const btVector3 v1 = ToBullet( m_vertices[m_indices[3 * triIndex + 1]].pos );
+			const btVector3 v2 = ToBullet( m_vertices[m_indices[3 * triIndex + 2]].pos );
+			const Triangle triangle( v0, v1, v2 );
+
+			if ( triangle.RayCast( _origin, _direction, intersection ) )
+			{
+				float distance = intersection.distance( _origin );
+				if ( distance < closestDistance )
+				{
+					closestDistance = distance;
+					_outIntersection = intersection;
+				}
+			}
+		}
+		return closestDistance != std::numeric_limits<float>::max();
+	}
 }

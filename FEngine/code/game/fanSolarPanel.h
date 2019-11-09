@@ -5,6 +5,7 @@
 namespace fan
 {
 	class WithEnergy;
+	class SolarEruption;
 
 	//================================================================================================================================
 	//================================================================================================================================
@@ -27,13 +28,16 @@ namespace fan
 		bool Save( Json & _json ) const override;
 
 	private:
+		bool m_isInsideSunlight = true;
 		float m_currentChargingRate = 0.f;	// Energy/s
+
 		float m_minChargingRate = 0.f;		// Energy/s
 		float m_maxChargingRate = 10.f;		// Energy/s
 		float m_minRange = 2.f;				// Distance at which the solar panel reaches maximum charging rate
 		float m_maxRange = 30.f;			// Distance at which the solar panel reaches minimum charging rate
 
 		WithEnergy * m_energy;
+		SolarEruption * m_eruption;
 
 		void ComputeChargingRate();
 	};

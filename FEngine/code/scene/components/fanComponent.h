@@ -58,3 +58,13 @@ namespace fan
 			SetEnabled( false );																											\
 		}
 
+//================================================================================================================================
+// Find _componentType  from the scene and set _pointerToComponent. Disable the component with a warning message if no component is found
+//================================================================================================================================
+#define REQUIRE_SCENE_COMPONENT( _componentType, _pointerToComponent )																		\
+		_pointerToComponent = m_gameobject->GetScene()->FindComponentOfType<_componentType>();												\
+		if ( _pointerToComponent == nullptr ) {																								\
+			Debug::Warning() << GetName() << ": " << #_componentType << " not found on " << GetGameobject()->GetName() << Debug::Endl();	\
+			SetEnabled( false );																											\
+		}
+

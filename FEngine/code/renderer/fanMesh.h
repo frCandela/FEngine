@@ -21,6 +21,7 @@ namespace fan {
 		void		SetPath(const std::string& _path)			{ m_path = _path; }
 		std::string GetPath() const								{ return m_path;  }
 	
+		bool RayCast( const btVector3 _origin, const btVector3 _direction, btVector3& _outIntersection ) const;
 
 		std::vector<Vertex> &			GetVertices()			{ return m_vertices;	}
 		const std::vector<Vertex> &		GetVertices() const		{ return m_vertices;	}

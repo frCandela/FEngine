@@ -3,7 +3,10 @@
 
 #include "scene/fanGameobject.h"
 #include "scene/components/fanTransform.h"
+#include "game/fanSolarEruption.h"
 #include "game/fanWithEnergy.h"
+#include "renderer/fanMesh.h"
+#include "renderer/fanRenderer.h"
 
 namespace fan
 {
@@ -15,6 +18,7 @@ namespace fan
 	void SolarPanel::Start()
 	{
 		REQUIRE_COMPONENT( WithEnergy, m_energy );
+		REQUIRE_SCENE_COMPONENT( SolarEruption, m_eruption );
 	}
 
 	//================================================================================================================================
@@ -44,7 +48,8 @@ namespace fan
 	{
 		ImGui::Begin( "##player_status_bars", nullptr, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoTitleBar );
 		{
-			ImGui::PushStyleColor( ImGuiCol_PlotHistogram, Color::Green.ToImGui() );
+			const Color barColor = m_isInsideSunlight ? Color::Green : Color::Red;
+			ImGui::PushStyleColor( ImGuiCol_PlotHistogram, barColor.ToImGui() );
 			ImGui::ProgressBar( m_currentChargingRate / m_maxChargingRate );
 			ImGui::PopStyleColor();			
 		} ImGui::End();
@@ -58,20 +63,29 @@ namespace fan
 		ImGui::DragFloat( "max_charging_rate", &m_maxChargingRate, 0.5f, 0.f, 100.f );
 		ImGui::DragFloat( "low_range		", &m_minRange, 0.5f, 0.f, 100.f );
 		ImGui::DragFloat( "max_range 		", &m_maxRange, 0.5f, 0.f, 100.f );
-
-
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
 	void SolarPanel::ComputeChargingRate()
 	{
-		const btVector3 position = m_gameobject->GetTransform()->GetPosition();
-		const float distance = position.norm();
-		const float slope = (m_maxChargingRate - m_minChargingRate) / (m_maxRange - m_minRange);
-		const float unclampedRate = m_maxChargingRate - slope * ( distance - m_minRange );
-		m_currentChargingRate = std::clamp( unclampedRate , m_minChargingRate, m_maxChargingRate );
+		// Sunlight mesh raycast
+		const btVector3 rayOrigin = m_gameobject->GetTransform()->GetPosition() + btVector3::Up();
+		btVector3 outIntersection;
+		m_isInsideSunlight = ecsSolarEruptionMeshSystem::s_mesh->RayCast( rayOrigin, -btVector3::Up(), outIntersection );
 
+		// Charging rate
+		if( m_isInsideSunlight ) {
+			const btVector3 position = m_gameobject->GetTransform()->GetPosition();
+			const float distance = position.norm();
+			const float slope = ( m_maxChargingRate - m_minChargingRate ) / ( m_maxRange - m_minRange );
+			const float unclampedRate = m_maxChargingRate - slope * ( distance - m_minRange );
+			m_currentChargingRate = std::clamp( unclampedRate, m_minChargingRate, m_maxChargingRate );
+		}
+		else
+		{
+			m_currentChargingRate = 0.f;
+		}
 	}
 	 
 	//================================================================================================================================
