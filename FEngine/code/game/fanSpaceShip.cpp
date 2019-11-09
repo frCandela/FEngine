@@ -51,38 +51,49 @@ namespace fan {
 		 
 		// Lateral movement
 		const float leftForce	= _delta * m_lateralForce * Input::Get().Manager().GetAxis( "game_left" );
-		m_rigidbody->ApplyCentralForce(  leftForce * transform->Left() );
+		
 
 		// Go forward
+		const float forwardAxis = _delta * Input::Get().Manager().GetAxis( "game_forward" );
 		const float boostDirection = Input::Get().Manager().GetAxis( "game_boost" );
-		const float force = boostDirection > 0 ? m_highForwardForce : ( boostDirection < 0 ? m_lowForwardForce : m_forwardForce );
-		const float forwardForce = _delta * force * Input::Get().Manager().GetAxis( "game_forward" );
-		m_rigidbody->ApplyCentralForce(  forwardForce * transform->Forward() );
-
-		// Drag
-		btVector3 newVelocity = m_drag * m_rigidbody->GetVelocity();
-		newVelocity.setY(0.f);
-		m_rigidbody->SetVelocity( newVelocity );
+		SpeedMode speedMode = forwardAxis < 0 ? SpeedMode::REVERSE : ( boostDirection > 0 ? SpeedMode::FAST : ( boostDirection < 0 ? SpeedMode::SLOW : SpeedMode::NORMAL ) );
+		
+		// Consume energy
+		float totalConsumption = m_energyConsumedPerUnitOfForce * ( std::abs( leftForce ) + std::abs( m_forwardForces[speedMode] * forwardAxis ) );
+		if ( !m_energy->TryRemoveEnergy( totalConsumption ) ) // not enought energy = go to slow speed mode
+		{
+			m_energy->TryRemoveEnergy( m_energy->GetEnergy() );
+			if( speedMode != SpeedMode::REVERSE ) {
+				speedMode = SpeedMode::SLOW;
+			}
+		}
 
 		// Particles
-		m_particleSystem->SetEnabled( forwardForce > 0 );
+		m_particleSystem->SetEnabled( forwardAxis > 0 );
 
-		// Energy consumption
-		float totalConsumption = m_energyConsumedPerUnitOfForce * ( std::abs(leftForce) + std::abs(forwardForce) );
-		m_energy->AddEnergy( -totalConsumption );
+		// Forces application		
+		m_rigidbody->ApplyCentralForce( leftForce * transform->Left() );
+		m_rigidbody->ApplyCentralForce( m_forwardForces[speedMode] * forwardAxis * transform->Forward() );
+	
+
+		// Drag
+		btVector3 newVelocity = ( totalConsumption > 0.f ? m_activeDrag : m_passiveDrag ) * m_rigidbody->GetVelocity();
+		newVelocity.setY( 0.f );
+		m_rigidbody->SetVelocity( newVelocity );
 	}
 
-	//===============================================z=================================================================================
+	//================================================================================================================================
 	void SpaceShip::OnGui() {
 		Actor::OnGui();
 
-		ImGui::DragFloat( "low forward force", &m_lowForwardForce, 1.f, 0.f, 100000.f );
-		ImGui::DragFloat( "forward force", &m_forwardForce, 1.f, 0.f, 100000.f);
-		ImGui::DragFloat( "high forward force", &m_highForwardForce, 1.f, 0.f, 100000.f );
+		ImGui::DragFloat( "reverse force", &m_forwardForces[SpeedMode::REVERSE], 1.f, 0.f, 100000.f );
+		ImGui::DragFloat( "slow forward force", &m_forwardForces[SpeedMode::SLOW], 1.f, 0.f, 100000.f );
+		ImGui::DragFloat( "normal forward force", &m_forwardForces[SpeedMode::NORMAL], 1.f, 0.f, 100000.f);
+		ImGui::DragFloat( "fast forward force", &m_forwardForces[SpeedMode::FAST], 1.f, 0.f, 100000.f );
 		ImGui::DragFloat( "lateral force", &m_lateralForce, 1.f, 0.f, 100000.f );
-		ImGui::DragFloat( "drag", &m_drag, 0.01f, 0.f, 1.f );
-		ImGui::DragFloat( "energyConsumedPerUnitOfForce", &m_energyConsumedPerUnitOfForce, 0.001f, 0.f, 1.f );
-
+		ImGui::DragFloat( "active drag", &m_activeDrag, 0.001f, 0.f, 1.f );
+		ImGui::DragFloat( "passive drag", &m_passiveDrag, 0.001f, 0.f, 1.f );
+		ImGui::DragFloat( "energyConsumedPerUnitOfForce", &m_energyConsumedPerUnitOfForce, 0.0001f, 0.f, 1.f );
 	}
 
 	//================================================================================================================================
@@ -90,11 +101,10 @@ namespace fan {
 	bool SpaceShip::Load( Json & _json ) {
 		Actor::Load(_json);
 
-		LoadFloat( _json, "low_forward_force", m_lowForwardForce );
-		LoadFloat( _json, "forward_force", m_forwardForce );
-		LoadFloat( _json, "high_forward_force", m_highForwardForce );
+		LoadVec4(  _json , "forward_forces", m_forwardForces );
 		LoadFloat( _json, "lateral_force", m_lateralForce );
-		LoadFloat( _json, "drag", m_drag );
+		LoadFloat( _json, "active_drag", m_activeDrag );
+		LoadFloat( _json, "passive_drag", m_passiveDrag );
 		LoadFloat( _json, "energy_consumed_per_unit_of_force", m_energyConsumedPerUnitOfForce );
 
 		return true;
@@ -103,11 +113,10 @@ namespace fan {
 	//================================================================================================================================
 	//================================================================================================================================
 	bool SpaceShip::Save( Json & _json ) const {
-		SaveFloat( _json, "low_forward_force", m_lowForwardForce );
-		SaveFloat( _json, "forward_force", m_forwardForce );
-		SaveFloat( _json, "high_forward_force", m_highForwardForce );
+		SaveVec4(  _json, "forward_forces", m_forwardForces );
 		SaveFloat( _json, "lateral_force", m_lateralForce );
-		SaveFloat( _json, "drag", m_drag );
+		SaveFloat( _json, "active_drag", m_activeDrag );
+		SaveFloat( _json, "passive_drag", m_passiveDrag );
 		SaveFloat( _json, "energy_consumed_per_unit_of_force", m_energyConsumedPerUnitOfForce );
 		Actor::Save( _json );
 		

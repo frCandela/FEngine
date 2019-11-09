@@ -11,6 +11,9 @@ namespace fan {
 	//================================================================================================================================
 	//================================================================================================================================
 	class SpaceShip : public Actor {
+	private:
+		enum SpeedMode{ REVERSE = 0, SLOW, NORMAL, FAST };
+
 	public:
 		void Start() override;
 		void Update(const float _delta) override;
@@ -26,15 +29,20 @@ namespace fan {
 		bool Save( Json & _json ) const override;
 
 	private:
-		float m_lowForwardForce		= 2000.f;
-		float m_forwardForce		= 3000.f;
-		float m_highForwardForce	= 4000.f;
+
+		btVector4 m_forwardForces = btVector4(1000.f,1000.f,2000.f,3500.f);
 		float m_lateralForce		= 2000.f;
-		float m_drag				= 0.930f;
+		float m_activeDrag			= 0.930f;
+		float m_passiveDrag			= 0.950f;
 		float m_energyConsumedPerUnitOfForce = 0.001f;
 
+		float m_remainingChargeEnergy = 0.f;
+
+		// References
 		Rigidbody * m_rigidbody;
 		ParticleSystem * m_particleSystem;
 		WithEnergy * m_energy;
+
+
 	};
 }

@@ -11,6 +11,7 @@ namespace fan {
 
 		static void SaveVec2	( Json & _json, const char * _name, const btVector2&	_vec2 );
 		static void SaveVec3	( Json & _json, const char * _name, const btVector3&	_vec3 );
+		static void SaveVec4	( Json & _json, const char * _name, const btVector4&	_vec4 );
 		static void SaveQuat	( Json & _json, const char * _name, const btQuaternion& _quat );
 		static void SaveColor	( Json & _json, const char * _name, const Color&		_color );
 		static void SaveFloat	( Json & _json, const char * _name, const float&		_float );
@@ -21,6 +22,7 @@ namespace fan {
 
 		static bool LoadVec2	( Json & _json, const char * _name, btVector2&		_outVec2 );
 		static bool LoadVec3	( Json & _json, const char * _name, btVector3&		_outVec3 );
+		static bool LoadVec4	( Json & _json, const char * _name, btVector4&		_outVec4 );
 		static bool LoadQuat	( Json & _json, const char * _name, btQuaternion&	_outQuat );
 		static bool LoadColor	( Json & _json, const char * _name, Color&			_outColor );
 		static bool LoadFloat	( Json & _json, const char * _name, float&			_outFloat );

@@ -52,10 +52,29 @@ namespace fan
 	}
 
 	//================================================================================================================================
+	// Try to remove energy 
+	// If there is not enough energy available, do nothing and return false
 	//================================================================================================================================
-	void WithEnergy::AddEnergy( const float _energy )
+	bool WithEnergy::TryRemoveEnergy( const float _energyConsumed )
 	{
-		m_currentEnergy = std::clamp( m_currentEnergy + _energy, 0.f, m_maxEnergy );
+		assert( _energyConsumed >= 0.f );
+
+		if( m_currentEnergy >= _energyConsumed ) {
+			m_currentEnergy -= _energyConsumed;
+			return true;
+		}
+		else
+		{
+			 return false;
+		}
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
+	void WithEnergy::AddEnergy( const float _energyAdded )
+	{
+		assert( _energyAdded >= 0.f );
+		m_currentEnergy = std::min( m_currentEnergy + _energyAdded, m_maxEnergy );		
 	}
 
 	//================================================================================================================================

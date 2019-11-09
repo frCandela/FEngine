@@ -13,7 +13,9 @@ namespace fan
 		void Update( const float _delta ) override;
 		void LateUpdate( const float _delta ) override;
 
-		void AddEnergy( const float _energy );
+		bool  TryRemoveEnergy( const float _energyConsumed );
+		void  AddEnergy( const float _energyAdded );
+		float GetEnergy( ) const { return m_currentEnergy; }
 
 		void OnGui() override;
 		ImGui::IconType GetIcon() const override { return ImGui::IconType::GAME_MANAGER; }

@@ -14,6 +14,7 @@
 #include "core/input/fanMouse.h"
 #include "core/time/fanProfiler.h"
 #include "renderer/fanRenderer.h"
+#include "game/fanWithEnergy.h"
 
 
 namespace fan
@@ -24,7 +25,9 @@ namespace fan
 	//================================================================================================================================
 	//================================================================================================================================
 	void Weapon::Start()
-	{}
+	{
+		REQUIRE_COMPONENT( WithEnergy, m_energy );
+	}
 
 	//================================================================================================================================
 	//================================================================================================================================
@@ -43,46 +46,27 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void Weapon::Update( const float /*_delta*/ ){}
+	void Weapon::LateUpdate( const float /*_delta*/ ){}
 
-	void Weapon::LateUpdate( const float /*_delta*/ )  
+	//================================================================================================================================
+	//================================================================================================================================
+	void Weapon::Update( const float _delta )
 	{
 		SCOPED_PROFILE( weapon_update )
-		Transform * thisTransform = m_gameobject->GetTransform();
+
+		m_bulletsAccumulator += _delta * m_bulletsPerSecond;
+		if ( m_bulletsAccumulator > 1.f )
+		{
+			m_bulletsAccumulator = 1.f;
+		}
 
 		const float fire = Input::Get().Manager().GetAxis( "game_fire" );
-		if ( fire > 0 )
-		for (int bulletIndex = 0; bulletIndex < m_bulletsPerFrame; bulletIndex++)
-		{
-
-
-			Gameobject * bulletGO = m_gameobject->GetScene()->CreateGameobject("bullet", m_gameobject );
-			Model * model = bulletGO->AddComponent<Model>();
-			Material * material = bulletGO->AddComponent<Material>();
-			Rigidbody * rb = bulletGO->AddComponent<Rigidbody>();			
-			rb->onContactStarted.Connect(&Weapon::OnBulletContact, this );
-
-			SphereShape * collider = bulletGO->AddComponent<SphereShape>();
-			Transform * transform = bulletGO->GetTransform();
-
-			bulletGO->AddFlag(ecsFlags::NO_AABB_UPDATE );
-			bulletGO->AddEcsComponent<ecsBullet>()->Init(m_lifeTime);
-			model->SetPath(GlobalValues::s_meshSphere);
-			material->SetTexturePath( GlobalValues::s_textureWhite );
-			collider->SetRadius( m_scale );
-			transform->SetScale(btVector3( m_scale, m_scale, m_scale ));
-			transform->SetPosition( thisTransform->GetPosition() + thisTransform->TransformDirection(m_offset) ); 
-			
-			rb->SetMass(1.f); 
-
-			Rigidbody * myRb = m_gameobject->GetComponent<Rigidbody>();
-			if ( myRb )
-			{
-				rb->GetBtBody()->setIgnoreCollisionCheck( myRb->GetBtBody(), true );
+		if ( fire > 0 && m_bulletsAccumulator >= 1.f ) {
+			-- m_bulletsAccumulator;
+			if( m_energy->TryRemoveEnergy( m_bulletEnergyCost ) ) {
+				FireBullet( );  
 			}
 			
-			rb->SetVelocity( myRb->GetVelocity() + m_speed * thisTransform->Forward() );
-			  
 		}
 	}
 
@@ -123,13 +107,47 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
+	void Weapon::FireBullet()
+	{
+		Transform * thisTransform = m_gameobject->GetTransform();
+
+		Gameobject * bulletGO = m_gameobject->GetScene()->CreateGameobject( "bullet", m_gameobject );
+		Model * model = bulletGO->AddComponent<Model>();
+		Material * material = bulletGO->AddComponent<Material>();
+		Rigidbody * rb = bulletGO->AddComponent<Rigidbody>();
+		rb->onContactStarted.Connect( &Weapon::OnBulletContact, this );
+
+		SphereShape * collider = bulletGO->AddComponent<SphereShape>();
+		Transform * transform = bulletGO->GetTransform();
+
+		bulletGO->AddFlag( ecsFlags::NO_AABB_UPDATE );
+		bulletGO->AddEcsComponent<ecsBullet>()->Init( m_lifeTime );
+		model->SetPath( GlobalValues::s_meshSphere );
+		material->SetTexturePath( GlobalValues::s_textureWhite );
+		collider->SetRadius( m_scale );
+		transform->SetScale( btVector3( m_scale, m_scale, m_scale ) );
+		transform->SetPosition( thisTransform->GetPosition() + thisTransform->TransformDirection( m_offset ) );
+
+		rb->SetMass( 1.f );
+
+		Rigidbody * myRb = m_gameobject->GetComponent<Rigidbody>();
+		if ( myRb )
+		{
+			rb->GetBtBody()->setIgnoreCollisionCheck( myRb->GetBtBody(), true );
+		}
+		rb->SetVelocity( myRb->GetVelocity() + m_speed * thisTransform->Forward() );
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
 	void Weapon::OnGui()
 	{
 		ImGui::DragFloat("scale ##wepoffset", &m_scale, 0.05f, 0.f, 1.f );
 		ImGui::DragFloat( "speed ##wepspeed", &m_speed, 0.1f, 0.f, 100.f );
 		ImGui::DragFloat3( "offset ##wepspeed", &m_offset[0]);
 		ImGui::DragFloat( "life time ##wepspeed", &m_lifeTime, 1.f, 0.f, 100.f );
-		ImGui::DragInt( "bulletsPerFrame ##wep__bulletsPerFrame", &m_bulletsPerFrame);
+		ImGui::DragFloat( "bullets per second", &m_bulletsPerSecond, 1.f, 0.f, 1000.f );
+		ImGui::DragFloat( "bullet energy cost", &m_bulletEnergyCost, 0.05f, 0.f, 10.f );
 		ImGui::Spacing();
 		ImGui::DragFloat( "explosion time ##wep_exposionTime",   &m_explosionTime, 0.05f, 0.f, 10.f );
 		ImGui::DragFloat( "explosion speed ##wep_exposionSpeed", &m_exposionSpeed, 0.5f , 0.f, 100.f );	
@@ -146,7 +164,9 @@ namespace fan
 		SaveFloat( _json, "speed", m_speed );
 		SaveVec3( _json, "offset", m_offset );
 		SaveFloat( _json, "lifeTime", m_lifeTime );
-		SaveInt( _json, "bulletsPerFrame", m_bulletsPerFrame );
+		SaveFloat( _json, "bullets_per_second", m_bulletsPerSecond );
+		SaveFloat( _json, "bullet_energy_cost", m_bulletEnergyCost );
+
 		SaveFloat( _json, "exposion_speed", m_exposionSpeed );
 		SaveFloat( _json, "explosion_time", m_explosionTime );
 		SaveInt( _json, "particlesPerExplosion", m_particlesPerExplosion );
@@ -162,7 +182,9 @@ namespace fan
 		LoadFloat( _json,"speed", m_speed );
 		LoadVec3( _json, "offset", m_offset );
 		LoadFloat( _json, "lifeTime", m_lifeTime );
-		LoadInt( _json, "bulletsPerFrame", m_bulletsPerFrame );
+		LoadFloat( _json, "bullets_per_second", m_bulletsPerSecond );
+		LoadFloat( _json, "bullet_energy_cost", m_bulletEnergyCost );
+
 		LoadFloat( _json, "exposion_speed", m_exposionSpeed );
 		LoadFloat( _json, "explosion_time", m_explosionTime );
 		LoadInt( _json, "particlesPerExplosion", m_particlesPerExplosion );

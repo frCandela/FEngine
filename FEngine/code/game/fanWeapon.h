@@ -5,6 +5,7 @@
 namespace fan
 {
 	class Rigidbody;
+	class WithEnergy;
 
 	//================================================================================================================================
 	//================================================================================================================================
@@ -27,11 +28,15 @@ namespace fan
 		bool Save( Json & _json ) const override;
 
 	private:
+		// ref
+		WithEnergy * m_energy;
+
 		// Bullets parameters
 		float m_lifeTime = 1.f;
 		float m_scale = 0.2f;
 		float m_speed = 0.2f;
-		int   m_bulletsPerFrame = 1;
+		float m_bulletsPerSecond = 10.f;
+		float m_bulletEnergyCost = 1.f;
 
 		// explosion parameters
 		float m_explosionTime = 0.15f;
@@ -40,11 +45,15 @@ namespace fan
 
 		btVector3 m_offset ;
 
+		// Accumulator
+		float m_bulletsAccumulator = 0.f;
+
 		// for particles
 		std::default_random_engine			  m_generator;
 		std::uniform_real_distribution<float> m_distribution;
 
 		void OnBulletContact( Rigidbody* _other, btPersistentManifold* const& _manifold );
 		void CreateExplosion( const btVector3 _point );
+		void FireBullet();
 	};
 }
