@@ -158,6 +158,32 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
+	Gameobject * Scene::FindGameobject( const uint64_t _id )
+	{
+		if ( _id != 0 )
+		{
+			auto it = m_gameobjects.find( _id );
+			if ( it != m_gameobjects.end() )
+			{
+				return it->second;
+			}
+		}
+		return nullptr;
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
+	void Scene::InsertID( const uint64_t _id, Gameobject * _gameobject ) { 
+		assert( m_gameobjects.find( _id ) == m_gameobjects.end() );
+		m_gameobjects[_id] = _gameobject ; 
+		if ( _id >= m_nextUniqueID )
+		{
+			m_nextUniqueID = _id + 1;
+		}
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
 	void Scene::Play() {
 		onScenePlay.Emmit(); 
 		m_isPaused = false;
@@ -244,6 +270,7 @@ namespace fan
 		m_startingActors.clear();
 		m_activeActors.clear();
 		m_entitiesToDelete.clear();
+		m_gameobjects.clear();
 		m_root = nullptr;
 
 		onSceneClear.Emmit();
@@ -271,16 +298,6 @@ namespace fan
 			}
 			outStream.close();
 		}
-		
-
-// 		Debug::Get() << Debug::Severity::log << "saving scene: " << m_name << Debug::Endl();
-// 		std::ofstream outStream(m_path);
-// 		if (outStream.is_open()) {
-// 			outStream << "Entities: 1 { \n";
-// 			Save(outStream, 0);
-// 			outStream << '}';
-// 			outStream.close();
-// 		}
 	}
 
 	//================================================================================================================================
@@ -319,6 +336,7 @@ namespace fan
 			m_root->Load( jGameobjects );
 		}
 		GameobjectPtr::s_onCreateUnresolved.Disconnect( &Scene::OnGameobjectPtrCreate, this );
+		ResolveGameobjectPointers();
 		return true;
 	}
 
@@ -335,8 +353,18 @@ namespace fan
 	{
 		for (int ptrIndex = 0; ptrIndex < m_unresolvedGameobjectPointers.size(); ptrIndex++)
 		{
-// 			GameobjectPtr& ptr = *m_unresolvedGameobjectPointers[ptrIndex];
-// 			ptr.Init( m_gameobjects[ ptr.GetID() ] );
+ 			GameobjectPtr* ptr = m_unresolvedGameobjectPointers[ptrIndex];
+			if( ptr->GetID() != 0 ) {
+				auto it = m_gameobjects.find( ptr->GetID() );
+				if ( it != m_gameobjects.end() )
+				{
+					(*ptr) = GameobjectPtr( it->second );
+				}
+				else
+				{
+					Debug::Warning() << "gameobject pointer resolution failed for id " << ptr->GetID() << Debug::Endl();
+				} 				
+			}
 		}
 		m_unresolvedGameobjectPointers.clear();
 	}

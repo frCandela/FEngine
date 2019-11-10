@@ -23,10 +23,10 @@ namespace fan
 	// This constructor requires the scene to manually set its gameobject pointer
 	// Useful at loading time
 	//================================================================================================================================
-	GameobjectPtr::GameobjectPtr( const uint64_t _id ) :
-		m_id( _id ),
-		m_gameobject( nullptr )
+	void GameobjectPtr::InitUnresolved( const uint64_t _id ) 
 	{
+		m_id = _id ;
+		m_gameobject=  nullptr ;
 		s_onCreateUnresolved.Emmit( this );	
 	}
 
@@ -38,6 +38,8 @@ namespace fan
 	{
 	}
 }
+
+
 
 namespace ImGui
 {
@@ -59,17 +61,25 @@ namespace ImGui
 		}
 
 		ImGui::SameLine();
-		ImGui::Button( name.c_str(), ImVec2(150.f, 0.f) ); ImGui::SameLine();
+		float width = 0.5f * ImGui::GetWindowWidth() - ImGui::GetCursorPosX() + 8;
+
+
+
+		ImGui::Button( name.c_str(), ImVec2( width, 0.f) ); ImGui::SameLine();
 		// dragndrop
 		ImGui::BeginDragDropSourceGameobject( gameobject );
 		fan::Gameobject * gameobjectDrop = ImGui::BeginDragDropTargetGameobject();
 		if ( gameobjectDrop ) { ( *_ptr ) = fan::GameobjectPtr( gameobjectDrop ); }
 		
+		if ( ImGui::IsItemClicked( 1 ) )
+		{
+			fan::Debug::Log("bwa");
+			(*_ptr ) = fan::GameobjectPtr();
+		}
+
+
 		ImGui::SameLine();
 		ImGui::Text( _label );
-
-
-		
 
 	}
 }

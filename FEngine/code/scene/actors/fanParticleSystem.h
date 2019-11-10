@@ -1,6 +1,7 @@
 #pragma once
 
 #include "scene/actors/fanActor.h"
+#include "scene/fanGameobjectPtr.h"
 
 namespace fan {
 	class EcsManager;
@@ -33,10 +34,12 @@ namespace fan {
 		std::default_random_engine			  m_generator;
 		std::uniform_real_distribution<float> m_distribution;
 
-		int		m_particlesPerSecond = 1;
-		float	m_speed = 1.f;
-		float	m_duration = 2.f;
-		btVector3 m_offset = btVector3::Zero();
+		int			m_particlesPerSecond = 1;
+		float		m_speed = 1.f;
+		float		m_duration = 2.f;
+		btVector3	m_offset = btVector3::Zero();
+		GameobjectPtr m_origin;
+		Color		m_color = Color::White;
 
 		float	m_timeAccumulator = 0.f;
 

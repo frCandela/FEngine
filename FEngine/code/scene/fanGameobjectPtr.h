@@ -13,18 +13,11 @@ namespace fan
 		static Signal< GameobjectPtr * > s_onCreateUnresolved;
 		static Signal< GameobjectPtr * > s_onSetFromSelection;
 
-		explicit GameobjectPtr( Gameobject * _gameobject );
-		explicit GameobjectPtr( const uint64_t _id );
+		explicit GameobjectPtr( Gameobject * _gameobject );		
 		GameobjectPtr();
 
-
-// 		GameobjectPtr& operator=( Gameobject* _gameobject ) noexcept
-// 		{
-// 			m_gameobject = _gameobject;
-// 			return *this;
-// 		}
-
-		void SetID( const uint64_t _id ){ m_id = _id; }
+		uint64_t GetID( ) const { return m_id; }
+		void	 InitUnresolved( const uint64_t _id );
 		Gameobject* operator->() const	{ return m_gameobject; }
 		Gameobject* operator*() const{ return m_gameobject; }
 

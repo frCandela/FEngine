@@ -58,8 +58,9 @@ namespace fan
 		Camera *				GetMainCamera()				{ return m_mainCamera; }
 		void					SetMainCamera( Camera * _camera );
 		uint64_t				GetUniqueID() { return m_nextUniqueID++; }
+		Gameobject *			FindGameobject( const uint64_t _id );
 
-		void					InsertID( const uint64_t _id, Gameobject * _gameobject ) { m_gameobjects[_id] = _gameobject ; }
+		void					InsertID( const uint64_t _id, Gameobject * _gameobject );
 		void					EraseID( const uint64_t _id ) { m_gameobjects.erase( _id ); }
 	private:
 		// Data

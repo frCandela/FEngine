@@ -11,6 +11,7 @@
 #include "scene/components/fanDirectionalLight.h"
 #include "scene/components/fanRigidbody.h"
 #include "scene/components/fanSphereShape.h"
+#include "scene/actors/fanParticleSystem.h"
 #include "core/input/fanInput.h"
 #include "core/input/fanKeyboard.h"
 #include "core/input/fanMouse.h"
@@ -91,8 +92,16 @@ namespace fan
 					model->SetPath( GlobalValues::s_meshSphere );
 					newIntity->AddComponent<Rigidbody>();
 					newIntity->AddComponent<SphereShape>();
-
 				}
+
+				ImGui::Icon( ImGui::PARTICLES, { 19,19 } ); ImGui::SameLine();
+				if ( ImGui::MenuItem( "FX" ) )
+				{
+					Gameobject *  newIntity = m_scene->CreateGameobject( "new_fx", m_lastGameobjectRightClicked );
+					newIntity->AddComponent<ParticleSystem>();
+				}
+
+
 				ImGui::EndMenu();
 			}
 			if ( ImGui::IsItemClicked() ) {

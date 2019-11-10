@@ -24,19 +24,24 @@ namespace fan {
 	void SpaceShip::Start() {
 		REQUIRE_COMPONENT( WithEnergy, m_energy )
 		REQUIRE_COMPONENT( Rigidbody, m_rigidbody )
-		REQUIRE_COMPONENT( ParticleSystem, m_particleSystem )
-			
-		if( m_particleSystem ) { m_particleSystem->SetEnabled( false ); }		
+
+		m_fastForwardParticles = (*m_fastForwardParticlesGo) != nullptr ? m_fastForwardParticlesGo->GetComponent<ParticleSystem>() : nullptr;
+		m_slowForwardParticles = (*m_slowForwardParticlesGo) != nullptr ? m_slowForwardParticlesGo->GetComponent<ParticleSystem>() : nullptr;
+		m_reverseParticles	   = (*m_reverseParticlesGo)	 != nullptr ? m_reverseParticlesGo	  ->GetComponent<ParticleSystem>() : nullptr;
+		m_leftParticles		   = (*m_leftParticlesGo	   ) != nullptr ? m_leftParticlesGo		  ->GetComponent<ParticleSystem>() : nullptr;
+		m_rightParticles	   = (*m_rightParticlesGo	   ) != nullptr ? m_rightParticlesGo	  ->GetComponent<ParticleSystem>() : nullptr;
+
+		 if( m_fastForwardParticles != nullptr ) { m_fastForwardParticles->SetEnabled( false ); } else{ SetEnabled( false ); }
+		 if( m_slowForwardParticles != nullptr ) { m_slowForwardParticles->SetEnabled( false ); } else{ SetEnabled( false ); }
+		 if( m_reverseParticles != nullptr )	 { m_reverseParticles->SetEnabled( false );     } else{ SetEnabled( false ); }
+		 if( m_leftParticles		!= nullptr ) { m_leftParticles		 ->SetEnabled( false ); } else{ SetEnabled( false ); } 
+		 if( m_rightParticles	   	!= nullptr ) { m_rightParticles	   	 ->SetEnabled( false ); } else{ SetEnabled( false ); }
+
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
 	void SpaceShip::Update(const float _delta) {
-		ImGui::Begin( "test" );
-		{
-			ImGui::GameobjectPtr( "forward particles", &m_forwardParticlesGo );
-		} ImGui::End();
-
 
 		// Get mouse world pos
 		Camera * camera			= m_gameobject->GetScene()->GetMainCamera();
@@ -65,7 +70,7 @@ namespace fan {
 		
 		// Consume energy
 		float totalConsumption = m_energyConsumedPerUnitOfForce * ( std::abs( leftForce ) + std::abs( m_forwardForces[speedMode] * forwardAxis ) );
-		if ( !m_energy->TryRemoveEnergy( totalConsumption ) ) // not enought energy = go to slow speed mode
+		if ( !m_energy->TryRemoveEnergy( totalConsumption ) ) // not enough energy = go to slow speed mode
 		{
 			m_energy->TryRemoveEnergy( m_energy->GetEnergy() );
 			if( speedMode != SpeedMode::REVERSE ) {
@@ -73,8 +78,20 @@ namespace fan {
 			}
 		}
 
-		// Particles
-		m_particleSystem->SetEnabled( forwardAxis > 0 );
+		// Enable particle systems
+		m_fastForwardParticles->SetEnabled( false );
+		m_slowForwardParticles->SetEnabled( false );
+		m_reverseParticles 	  ->SetEnabled( false );
+		m_leftParticles 	  ->SetEnabled( false );
+		m_rightParticles	  ->SetEnabled( false );
+
+		if( forwardAxis != 0.f  ) {
+			if ( speedMode == SpeedMode::SLOW || speedMode == SpeedMode::NORMAL ) { m_slowForwardParticles->SetEnabled( true ); }
+			else if ( speedMode == SpeedMode::FAST ) { m_fastForwardParticles->SetEnabled( true ); }
+			else if ( speedMode == SpeedMode::REVERSE ) { m_reverseParticles->SetEnabled( true ); }
+		}
+		if( leftForce > 0.f  ) { m_leftParticles->SetEnabled(true); }
+		else if( leftForce < 0.f  ) { m_rightParticles->SetEnabled(true); }
 
 		// Forces application		
 		m_rigidbody->ApplyCentralForce( leftForce * transform->Left() );
@@ -91,6 +108,9 @@ namespace fan {
 	void SpaceShip::OnGui() {
 		Actor::OnGui();
 
+		float width = ImGui::GetWindowWidth();
+		ImGui::PushItemWidth(0.5f *width );
+
 		ImGui::DragFloat( "reverse force", &m_forwardForces[SpeedMode::REVERSE], 1.f, 0.f, 100000.f );
 		ImGui::DragFloat( "slow forward force", &m_forwardForces[SpeedMode::SLOW], 1.f, 0.f, 100000.f );
 		ImGui::DragFloat( "normal forward force", &m_forwardForces[SpeedMode::NORMAL], 1.f, 0.f, 100000.f);
@@ -99,6 +119,13 @@ namespace fan {
 		ImGui::DragFloat( "active drag", &m_activeDrag, 0.001f, 0.f, 1.f );
 		ImGui::DragFloat( "passive drag", &m_passiveDrag, 0.001f, 0.f, 1.f );
 		ImGui::DragFloat( "energyConsumedPerUnitOfForce", &m_energyConsumedPerUnitOfForce, 0.0001f, 0.f, 1.f );
+		ImGui::GameobjectPtr( "fast forward particles", &m_fastForwardParticlesGo );
+		ImGui::GameobjectPtr( "slow forward particles", &m_slowForwardParticlesGo );
+		ImGui::GameobjectPtr( "reverse particles", &m_reverseParticlesGo );
+		ImGui::GameobjectPtr( "left particles", &m_leftParticlesGo );
+		ImGui::GameobjectPtr( "right particles", &m_rightParticlesGo );
+	
+		ImGui::PopItemWidth();
 	}
 
 	//================================================================================================================================
@@ -111,6 +138,11 @@ namespace fan {
 		LoadFloat( _json, "active_drag", m_activeDrag );
 		LoadFloat( _json, "passive_drag", m_passiveDrag );
 		LoadFloat( _json, "energy_consumed_per_unit_of_force", m_energyConsumedPerUnitOfForce );
+		LoadGameobjectPtr( _json, "fast_forward_particles", m_fastForwardParticlesGo );
+		LoadGameobjectPtr( _json, "slow_forward_particles", m_slowForwardParticlesGo );
+		LoadGameobjectPtr( _json, "reverse_particles", m_reverseParticlesGo );
+		LoadGameobjectPtr( _json, "left_particles", m_leftParticlesGo );
+		LoadGameobjectPtr( _json, "right_particles", m_rightParticlesGo );
 
 		return true;
 	}
@@ -123,6 +155,12 @@ namespace fan {
 		SaveFloat( _json, "active_drag", m_activeDrag );
 		SaveFloat( _json, "passive_drag", m_passiveDrag );
 		SaveFloat( _json, "energy_consumed_per_unit_of_force", m_energyConsumedPerUnitOfForce );
+		SaveGameobjectPtr( _json, "fast_forward_particles", m_fastForwardParticlesGo );
+		SaveGameobjectPtr( _json, "slow_forward_particles", m_slowForwardParticlesGo );
+		SaveGameobjectPtr( _json, "reverse_particles", m_reverseParticlesGo );
+		SaveGameobjectPtr( _json, "left_particles", m_leftParticlesGo );
+		SaveGameobjectPtr( _json, "right_particles", m_rightParticlesGo );
+
 		Actor::Save( _json );
 		
 		return true;

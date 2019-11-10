@@ -4,6 +4,7 @@
 #include "scene/fanGameobject.h"
 #include "scene/components/fanTransform.h"
 #include "renderer/fanRenderer.h"
+#include "editor/fanModals.h"
 
 namespace fan {
 	REGISTER_EDITOR_COMPONENT( ParticleSystem )
@@ -38,9 +39,11 @@ namespace fan {
 		m_timeAccumulator += _delta;
 		float particleSpawnDelta = 1.f / m_particlesPerSecond;
 
-		const btVector3 origin = m_gameobject->GetTransform()->GetPosition();
+		const Transform * transform = (*m_origin) != nullptr ? m_origin->GetTransform() : m_gameobject->GetTransform();
 
-		btVector3 transformedOffset = m_gameobject->GetTransform()->TransformDirection( m_offset );
+		const btVector3 origin =transform->GetPosition();
+		btVector3 transformedOffset = transform->TransformDirection( m_offset );
+
 		while ( m_timeAccumulator > particleSpawnDelta ) {
 			m_timeAccumulator -= particleSpawnDelta;
 
@@ -62,18 +65,27 @@ namespace fan {
 			movement->speed *= m_speed;
 			position->position = origin + transformedOffset;
 			particle->durationLeft = m_duration;
+			particle->color = m_color;
 		}	
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void ParticleSystem::OnGui() {
+	void ParticleSystem::OnGui() 
+	{
 		Actor::OnGui();
 
-		ImGui::DragInt( "particles per second", &m_particlesPerSecond, 1, 0 );
-		ImGui::DragFloat( "speed", &m_speed, 0.01f );
-		ImGui::DragFloat( "duration", &m_duration, 0.01f );
-		ImGui::DragFloat3( "offset", &m_offset[0], 0.01f );
+		ImGui::PushItemWidth( 0.5f * ImGui::GetWindowWidth() ); {
+
+			ImGui::GameobjectPtr( "origin", &m_origin );
+			ImGui::DragInt( "particles per second", &m_particlesPerSecond, 1, 0 );
+			ImGui::DragFloat( "speed", &m_speed, 0.01f );
+			ImGui::DragFloat( "duration", &m_duration, 0.01f );
+			ImGui::DragFloat3( "offset", &m_offset[0], 0.01f );	
+		    ImGui::ColorEdit4( "color", m_color.Data(), gui::colorEditFlags );
+
+		} ImGui::PopItemWidth();
+
 	}
 
 	//================================================================================================================================
@@ -81,10 +93,12 @@ namespace fan {
 	bool ParticleSystem::Load( Json & _json ) {
 		Actor::Load( _json );
 
-		LoadInt(  _json, "particles_per_second", m_particlesPerSecond );
-		LoadFloat(_json, "speed", m_speed);
-		LoadFloat(_json, "duration", m_duration );
-		LoadVec3( _json, "offset", m_offset );
+		LoadInt(   _json, "particles_per_second", m_particlesPerSecond );
+		LoadFloat( _json, "speed", m_speed);
+		LoadFloat( _json, "duration", m_duration );
+		LoadVec3(  _json, "offset", m_offset );
+		LoadGameobjectPtr(  _json, "origin", m_origin );
+		LoadColor( _json, "color", m_color );
 
 		return true;
 	}
@@ -98,6 +112,8 @@ namespace fan {
 		SaveFloat( _json, "speed", m_speed );
 		SaveFloat( _json, "duration", m_duration );
 		SaveVec3( _json, "offset", m_offset );
+		SaveGameobjectPtr(  _json, "origin", m_origin );
+		SaveColor( _json, "color", m_color );
 
 		return true;
 	}

@@ -90,7 +90,7 @@ namespace fan {
 	//================================================================================================================================
 	void ISerializable::SaveGameobjectPtr ( Json & _json, const char * _name, const GameobjectPtr& _ptr )
 	{
-		_json[_name] = _ptr->GetUniqueID();
+		_json[_name] = *_ptr != nullptr ? _ptr->GetUniqueID() : 0;
 	}
 
 	//================================================================================================================================
@@ -237,7 +237,7 @@ namespace fan {
 		Json * token = FindToken( _json, _name );
 		if ( token != nullptr )
 		{
-			_outPtr = GameobjectPtr( *token );
+			_outPtr.InitUnresolved(*token );
 			return true;
 		}
 		return false;

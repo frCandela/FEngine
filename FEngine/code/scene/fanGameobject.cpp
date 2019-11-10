@@ -68,7 +68,7 @@ namespace fan
 	//================================================================================================================================
 	void Gameobject::OnGui() {
 		std::stringstream ss;
-		ss << "Gameobject : " << GetName();
+		ss << "Gameobject : " << GetName() << "    id: " << m_uniqueID;
 		ImGui::Text(ss.str().c_str());
 	}
 
@@ -242,7 +242,10 @@ namespace fan
 
 		LoadString( _json, "name", m_name );
 		LoadUInt( _json, "flags", m_flags->flags );
-		LoadUInt64( _json, "unique_id", m_uniqueID );
+
+		uint64_t tmp ;
+		LoadUInt64( _json, "unique_id", tmp );
+		SetUniqueID(tmp);
 
 		Json& jComponents = _json["components"]; {
 			for ( int childIndex = 0; childIndex < jComponents.size(); childIndex++ ) {
@@ -312,7 +315,7 @@ namespace ImGui
 	//================================================================================================================================
 	void BeginDragDropSourceGameobject( fan::Gameobject * _gameobject, ImGuiDragDropFlags _flags )
 	{		
-		if ( ImGui::BeginDragDropSource( _flags ) )
+		if ( ImGui::BeginDragDropSource( _flags ) && _gameobject != nullptr )
 		{
 			ImGui::SetDragDropPayload( "dragndrop_gameobject", &_gameobject, sizeof( fan::Gameobject** ) );
 			ImGui::Icon( ImGui::IconType::GAMEOBJECT16, { 16,16 } ); ImGui::SameLine();
