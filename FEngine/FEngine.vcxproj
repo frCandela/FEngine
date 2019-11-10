@@ -176,7 +176,7 @@
     <ClCompile Include="code\scene\components\fanComponent.cpp" />
     <ClCompile Include="code\scene\components\fanDirectionalLight.cpp" />
     <ClCompile Include="code\scene\components\fanMaterial.cpp" />
-    <ClCompile Include="code\scene\components\fanModel.cpp" />
+    <ClCompile Include="code\scene\components\fanMeshRenderer.cpp" />
     <ClCompile Include="code\scene\components\fanPointLight.cpp" />
     <ClCompile Include="code\scene\components\fanRigidbody.cpp" />
     <ClCompile Include="code\scene\components\fanSphereShape.cpp" />
@@ -295,7 +295,7 @@
     <ClInclude Include="code\scene\components\fanComponent.h" />
     <ClInclude Include="code\scene\components\fanDirectionalLight.h" />
     <ClInclude Include="code\scene\components\fanMaterial.h" />
-    <ClInclude Include="code\scene\components\fanModel.h" />
+    <ClInclude Include="code\scene\components\fanMeshRenderer.h" />
     <ClInclude Include="code\scene\components\fanPointLight.h" />
     <ClInclude Include="code\scene\components\fanRigidbody.h" />
     <ClInclude Include="code\scene\components\fanSphereShape.h" />

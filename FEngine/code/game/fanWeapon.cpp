@@ -6,7 +6,7 @@
 #include "scene/components/fanTransform.h"
 #include "scene/components/fanMaterial.h"
 #include "scene/components/fanRigidbody.h"
-#include "scene/components/fanModel.h"
+#include "scene/components/fanMeshRenderer.h"
 #include "scene/components/fanSphereShape.h"
 #include "scene/fanGameobject.h"
 #include "core/input/fanInput.h"
@@ -112,7 +112,7 @@ namespace fan
 		Transform * thisTransform = m_gameobject->GetTransform();
 
 		Gameobject * bulletGO = m_gameobject->GetScene()->CreateGameobject( "bullet", m_gameobject );
-		Model * model = bulletGO->AddComponent<Model>();
+		MeshRenderer * meshRenderer = bulletGO->AddComponent<MeshRenderer>();
 		Material * material = bulletGO->AddComponent<Material>();
 		Rigidbody * rb = bulletGO->AddComponent<Rigidbody>();
 		rb->onContactStarted.Connect( &Weapon::OnBulletContact, this );
@@ -122,7 +122,7 @@ namespace fan
 
 		bulletGO->AddFlag( ecsFlags::NO_AABB_UPDATE );
 		bulletGO->AddEcsComponent<ecsBullet>()->Init( m_lifeTime );
-		model->SetPath( GlobalValues::s_meshSphere );
+		meshRenderer->SetPath( GlobalValues::s_meshSphere );
 		material->SetTexturePath( GlobalValues::s_textureWhite );
 		collider->SetRadius( m_scale );
 		transform->SetScale( btVector3( m_scale, m_scale, m_scale ) );

@@ -3,7 +3,7 @@
 
 #include "scene/fanScene.h"
 #include "scene/components/fanComponent.h"
-#include "scene/components/fanModel.h"
+#include "scene/components/fanMeshRenderer.h"
 #include "scene/components/fanTransform.h"
 #include "renderer/fanMesh.h"
 #include "ecs/fanECSManager.h"

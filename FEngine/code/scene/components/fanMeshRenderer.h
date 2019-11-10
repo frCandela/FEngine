@@ -12,12 +12,12 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	class Model : public Component
+	class MeshRenderer : public Component
 	{
 	public:
-		static Signal< Model * >				onRegisterModel;
-		static Signal< Model * >				onUnRegisterModel;
-		static Signal< Model *, std::string  >	onModelSetPath;
+		static Signal< MeshRenderer * >				onRegisterMeshRenderer;
+		static Signal< MeshRenderer * >				onUnRegisterMeshRenderer;
+		static Signal< MeshRenderer *, std::string  >	onMeshRendererSetPath;
 
 		void			SetPath( std::string _path );
 		void			SetMesh(Mesh * _mesh);
@@ -28,10 +28,10 @@ namespace fan
 		void	SetRenderID(const int _renderID);
 
 		void OnGui() override;
-		virtual ImGui::IconType GetIcon() const { return ImGui::IconType::MODEL; };
+		virtual ImGui::IconType GetIcon() const { return ImGui::IconType::MESH_RENDERER; };
 
-		DECLARE_EDITOR_COMPONENT(Model)
-		DECLARE_TYPE_INFO(Model, Component );
+		DECLARE_EDITOR_COMPONENT(MeshRenderer)
+		DECLARE_TYPE_INFO(MeshRenderer, Component );
 
 	protected:
 		bool Load( Json & _json ) override;

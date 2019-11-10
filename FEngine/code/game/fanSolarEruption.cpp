@@ -7,7 +7,7 @@
 #include "renderer/fanMesh.h"
 #include "scene/fanScene.h"
 #include "scene/fanGameobject.h"
-#include "scene/components/fanModel.h"
+#include "scene/components/fanMeshRenderer.h"
 #include "scene/components/fanTransform.h"
 #include "scene/components/fanMaterial.h"
 #include "scene/actors/fanParticleSystem.h"
@@ -22,11 +22,11 @@ namespace fan {
 	void SolarEruption::Start() {
 		REQUIRE_COMPONENT( Material, m_material )
 		REQUIRE_COMPONENT( ParticleSystem, m_particleSystem )
-		REQUIRE_COMPONENT( Model, m_model )
+		REQUIRE_COMPONENT( MeshRenderer, m_meshRenderer )
 
 
 		if ( m_particleSystem )	{ m_particleSystem->SetEnabled( false ); }
-		if ( m_model )			{ m_model->SetMesh( ecsSolarEruptionMeshSystem::s_mesh );}		
+		if ( m_meshRenderer )	{ m_meshRenderer->SetMesh( ecsSolarEruptionMeshSystem::s_mesh );}		
 	}
 
 	//================================================================================================================================

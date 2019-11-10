@@ -21,7 +21,7 @@ namespace fan {
 	class Camera;	
 	class DirectionalLight;
 	class PointLight;
-	class Model;
+	class MeshRenderer;
 	class Material;
 	class Camera;
 	class FPSCamera;
@@ -49,8 +49,8 @@ namespace fan {
 		void UnRegisterDirectionalLight	( DirectionalLight * _pointLight );
 		void RegisterPointLight			( PointLight *		 _pointLight );
 		void UnRegisterPointLight		( PointLight *		 _pointLight );
-		void RegisterModel				( Model *			 _model );
-		void UnRegisterModel			( Model *			 _model );
+		void RegisterMeshRenderer		( MeshRenderer *	 _meshRenderer );
+		void UnRegisterMeshRenderer		( MeshRenderer *	 _meshRenderer );
 		
 		Gameobject *	const	GetSelectedGameobject() const	{ return m_selectedGameobject;  }
 		Camera *				GetEditorCamera() const			{ return m_editorCamera; }
@@ -94,7 +94,7 @@ namespace fan {
 
 		std::vector < DirectionalLight* >	m_directionalLights;
 		std::vector < PointLight* >			m_pointLights;
-		std::vector < Model* >				m_models;
+		std::vector < MeshRenderer* >		m_meshRenderers;
 
 		struct GizmoCacheData {
 			int axisIndex;
@@ -112,7 +112,7 @@ namespace fan {
 
 		void OnSceneLoad(Scene * _scene);
 		void OnMaterialSetTexture( Material * _material, std::string _path );
-		void OnModelSetPath( Model * _model, std::string _path );
+		void OnMeshRendererSetPath( MeshRenderer * _meshRenderer, std::string _path );
 		void OnGameobjectDeleted( Gameobject * _gameobject );
 		void OnSetGameobjectPtrFromSelection( GameobjectPtr * _ptr );
 

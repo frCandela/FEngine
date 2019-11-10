@@ -6,7 +6,7 @@ namespace fan {
 	class Mesh;
 	class Material;
 	class ParticleSystem;
-	class Model;
+	class MeshRenderer;
 	struct Vertex;
 
 	//================================================================================================================================
@@ -31,7 +31,7 @@ namespace fan {
 
 	private:
 		Material * m_material;
-		Model * m_model;
+		MeshRenderer * m_meshRenderer;
 		ParticleSystem * m_particleSystem;
 
 		// State machine

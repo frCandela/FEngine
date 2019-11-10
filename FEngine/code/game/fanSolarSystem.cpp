@@ -4,7 +4,7 @@
 #include "core/time/fanTime.h"
 #include "scene/components/fanTransform.h"
 #include "scene/fanGameobject.h"
-#include "scene/components/fanModel.h"
+#include "scene/components/fanMeshRenderer.h"
 #include "scene/components/fanMaterial.h"
 #include "scene/components/fanRigidbody.h"
 #include "scene/components/fanSphereShape.h"
@@ -167,8 +167,8 @@ namespace fan {
 					const PlanetData& planetData = orbit.planets[planetIndex];
 
 					Gameobject * newPlanet = scene->CreateGameobject( "planet" + std::to_string( orbitIndex ) + "-" + std::to_string( planetIndex ), m_gameobject );
-					Model * model = newPlanet->AddComponent<Model>();
-					model->SetPath( GlobalValues::s_meshSphere );
+					MeshRenderer * meshRenderer = newPlanet->AddComponent<MeshRenderer>();
+					meshRenderer->SetPath( GlobalValues::s_meshSphere );
 
 					Material * material = newPlanet->AddComponent<Material>();
 					material->SetTexturePath( GlobalValues::s_textureWhite );

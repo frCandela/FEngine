@@ -1,8 +1,8 @@
 #include "fanGlobalIncludes.h"
+#include "scene/components/fanMeshRenderer.h"
 
 #include "renderer/fanRenderer.h"
 #include "renderer/fanMesh.h"
-#include "scene/components/fanModel.h"
 #include "scene/components/fanTransform.h"
 #include "scene/fanGameobject.h"
 #include "core/math/shapes/fanAABB.h"
@@ -16,38 +16,38 @@
 
 namespace fan
 {
-	REGISTER_EDITOR_COMPONENT(Model);
-	REGISTER_TYPE_INFO(Model)
+	REGISTER_EDITOR_COMPONENT(MeshRenderer);
+	REGISTER_TYPE_INFO(MeshRenderer)
 
-	Signal< Model * >				Model::onRegisterModel;
-	Signal< Model * >				Model::onUnRegisterModel;
-	Signal< Model *, std::string  >	Model::onModelSetPath;
+	Signal< MeshRenderer * >				MeshRenderer::onRegisterMeshRenderer;
+	Signal< MeshRenderer * >				MeshRenderer::onUnRegisterMeshRenderer;
+	Signal< MeshRenderer *, std::string  >	MeshRenderer::onMeshRendererSetPath;
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void Model::OnAttach() {
+	void MeshRenderer::OnAttach() {
 		Component::OnAttach();
 
 		ecsMesh ** tmpMesh = &const_cast<ecsMesh*>( m_mesh );
 		*tmpMesh = m_gameobject->AddEcsComponent<ecsMesh>();
 		m_mesh->Init();
 
-		onRegisterModel.Emmit( this );
+		onRegisterMeshRenderer.Emmit( this );
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void Model::OnDetach() {
+	void MeshRenderer::OnDetach() {
 		Component::OnDetach();
 		m_gameobject->RemoveEcsComponent<ecsMesh>();
-		onUnRegisterModel.Emmit(this);
+		onUnRegisterMeshRenderer.Emmit(this);
 
 		m_gameobject->AddFlag( Gameobject::Flag::OUTDATED_AABB );
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void Model::SetMesh( Mesh * _mesh )
+	void MeshRenderer::SetMesh( Mesh * _mesh )
 	{
 		m_mesh->mesh = _mesh;
 		if( _mesh != nullptr && ! _mesh->GetIndices().empty() ) {	
@@ -57,19 +57,19 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void Model::SetPath( std::string _path ) {		
- 		onModelSetPath.Emmit( this, _path );
+	void MeshRenderer::SetPath( std::string _path ) {		
+ 		onMeshRendererSetPath.Emmit( this, _path );
 	}
 
-	Mesh *			Model::GetMesh() { return m_mesh->mesh; }
-	const Mesh *	Model::GetMesh() const { return m_mesh->mesh; }
+	Mesh *			MeshRenderer::GetMesh() { return m_mesh->mesh; }
+	const Mesh *	MeshRenderer::GetMesh() const { return m_mesh->mesh; }
 
-	int		Model::GetRenderID() const { return m_mesh->renderID; }
-	void	Model::SetRenderID( const int _renderID ) { m_mesh->renderID = _renderID; }
+	int		MeshRenderer::GetRenderID() const { return m_mesh->renderID; }
+	void	MeshRenderer::SetRenderID( const int _renderID ) { m_mesh->renderID = _renderID; }
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void Model::OnGui() {
+	void MeshRenderer::OnGui() {
 		Component::OnGui();
 		// Set path popup
 		bool openSetPathPopup = false;
@@ -92,7 +92,7 @@ namespace fan
 		}
 
 		if (gui::LoadFileModal("set_path", GlobalValues::s_meshExtensions, m_pathBuffer)) {
-			onModelSetPath.Emmit( this, m_pathBuffer.string() );
+			onMeshRendererSetPath.Emmit( this, m_pathBuffer.string() );
 		}
 
 		// Num triangles
@@ -105,17 +105,17 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	bool Model::Load( Json & _json ) {
+	bool MeshRenderer::Load( Json & _json ) {
 		std::string pathBuffer;
 		if ( LoadString( _json, "path", pathBuffer ) ) {
-			onModelSetPath.Emmit( this, pathBuffer );
+			onMeshRendererSetPath.Emmit( this, pathBuffer );
 		}
 		return true;
 	}
 
 	//==========================z======================================================================================================
 	//================================================================================================================================
-	bool Model::Save( Json & _json ) const {
+	bool MeshRenderer::Save( Json & _json ) const {
 		SaveString( _json, "path", ( m_mesh->mesh != nullptr ? m_mesh->mesh->GetPath() : "" ));
 		Component::Save( _json );
 		

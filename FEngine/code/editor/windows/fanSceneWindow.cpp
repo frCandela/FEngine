@@ -6,7 +6,7 @@
 #include "scene/fanGameobject.h"
 #include "scene/components/fanTransform.h"
 #include "scene/components/fanMaterial.h"
-#include "scene/components/fanModel.h"
+#include "scene/components/fanMeshRenderer.h"
 #include "scene/components/fanPointLight.h"
 #include "scene/components/fanDirectionalLight.h"
 #include "scene/components/fanRigidbody.h"
@@ -64,11 +64,11 @@ namespace fan
 					itemClicked = true;
 				}
 				// Entities templates
-				ImGui::Icon(ImGui::MODEL, {19,19}); ImGui::SameLine();
+				ImGui::Icon(ImGui::MESH_RENDERER, {19,19}); ImGui::SameLine();
 				if ( ImGui::MenuItem( "Model" ) ) {
 					Gameobject *  newIntity = m_scene->CreateGameobject("new_model", m_lastGameobjectRightClicked );
-					Model * model = newIntity->AddComponent<Model>();
-					model->SetPath( GlobalValues::s_meshCube );
+					MeshRenderer * meshRenderer = newIntity->AddComponent<MeshRenderer>();
+					meshRenderer->SetPath( GlobalValues::s_meshCube );
 					Material * material =  newIntity->AddComponent<Material>();
 					material->SetTexturePath( GlobalValues::s_textureWhite );
 				}
@@ -88,8 +88,8 @@ namespace fan
 				ImGui::Icon( ImGui::SPHERE_SHAPE, { 19,19 } ); ImGui::SameLine();
 				if ( ImGui::MenuItem( "Sphere" ) ) {
 					Gameobject *  newIntity = m_scene->CreateGameobject( "new_model", m_lastGameobjectRightClicked );
-					Model * model = newIntity->AddComponent<Model>();
-					model->SetPath( GlobalValues::s_meshSphere );
+					MeshRenderer * meshRenderer = newIntity->AddComponent<MeshRenderer>();
+					meshRenderer->SetPath( GlobalValues::s_meshSphere );
 					newIntity->AddComponent<Rigidbody>();
 					newIntity->AddComponent<SphereShape>();
 				}

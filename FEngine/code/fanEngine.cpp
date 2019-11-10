@@ -36,7 +36,7 @@
 #include "scene/components/fanComponent.h"
 #include "scene/components/fanCamera.h"
 #include "scene/components/fanTransform.h"
-#include "scene/components/fanModel.h"
+#include "scene/components/fanMeshRenderer.h"
 #include "scene/actors/fanActor.h"
 #include "scene/components/fanMaterial.h"
 #include "scene/components/fanPointLight.h"
@@ -134,9 +134,9 @@ namespace fan {
 		Material::onMaterialSetPath.Connect		( &Engine::OnMaterialSetTexture, this );
 		Mesh::s_onMeshLoad.Connect				( &RessourceManager::OnLoadMesh, m_renderer->GetRessourceManager() );
 		Mesh::s_onMeshDelete.Connect			( &Renderer::WaitIdle, m_renderer );
-		Model::onModelSetPath.Connect			( &Engine::OnModelSetPath,		 this );
-		Model::onRegisterModel.Connect			( &Engine::RegisterModel,		 this );
-		Model::onUnRegisterModel.Connect		( &Engine::UnRegisterModel,		 this );
+		MeshRenderer::onMeshRendererSetPath.Connect			( &Engine::OnMeshRendererSetPath,		 this );
+		MeshRenderer::onRegisterMeshRenderer.Connect			( &Engine::RegisterMeshRenderer,		 this );
+		MeshRenderer::onUnRegisterMeshRenderer.Connect		( &Engine::UnRegisterMeshRenderer,		 this );
 		PointLight::onPointLightAttach.Connect	( &Engine::RegisterPointLight,	 this );
 		PointLight::onPointLightDetach.Connect	( &Engine::UnRegisterPointLight, this );
 		DirectionalLight::onDirectionalLightAttach.Connect	( &Engine::RegisterDirectionalLight,   this );
@@ -309,18 +309,18 @@ namespace fan {
 	//================================================================================================================================
 	void Engine::DrawHull() const	{
 		if (m_selectedGameobject != nullptr) {
-			Model * model = m_selectedGameobject->GetComponent<Model>();
-			if (model != nullptr) {
+			MeshRenderer * meshRenderer = m_selectedGameobject->GetComponent<MeshRenderer>();
+			if (meshRenderer != nullptr) {
 				const ConvexHull * hull = nullptr;
-				Mesh * mesh = model->GetMesh();
+				Mesh * mesh = meshRenderer->GetMesh();
 				if (mesh != nullptr) {
-					hull = & model->GetMesh()->GetHull();
+					hull = & meshRenderer->GetMesh()->GetHull();
 				}
 				if (hull != nullptr) {
 					const std::vector<btVector3> & vertices = hull->GetVertices();
 					const std::vector<uint32_t> & indices = hull->GetIndices();
 					if (!vertices.empty()) {
-						const glm::mat4  modelMat = model->GetGameobject()->GetComponent<Transform>()->GetModelMatrix();
+						const glm::mat4  modelMat = meshRenderer->GetGameobject()->GetComponent<Transform>()->GetModelMatrix();
 
 						Color color = Color::Cyan;
 						for (unsigned polyIndex = 0; polyIndex < indices.size() / 3; polyIndex++) {
@@ -349,11 +349,11 @@ namespace fan {
 	//================================================================================================================================
 	void Engine::DrawWireframe() const {
 		if (m_selectedGameobject != nullptr) {
-			Model * model = m_selectedGameobject->GetComponent<Model>();
-			if (model != nullptr) {
-				Mesh * mesh = model->GetMesh();
+			MeshRenderer * meshRenderer = m_selectedGameobject->GetComponent<MeshRenderer>();
+			if (meshRenderer != nullptr) {
+				Mesh * mesh = meshRenderer->GetMesh();
 				if (mesh != nullptr) {
-					const glm::mat4  modelMat = model->GetGameobject()->GetComponent<Transform>()->GetModelMatrix();
+					const glm::mat4  modelMat = meshRenderer->GetGameobject()->GetComponent<Transform>()->GetModelMatrix();
 					const std::vector<uint32_t> & indices = mesh->GetIndices();
 					const std::vector<Vertex> & vertices = mesh->GetVertices();
 
@@ -375,12 +375,12 @@ namespace fan {
 	void Engine::DrawNormals() const {
 
 		if (m_selectedGameobject != nullptr) {
-			Model * model = m_selectedGameobject->GetComponent<Model>();
-			if (model != nullptr) {
-				Mesh * mesh = model->GetMesh();
+			MeshRenderer * meshRenderer = m_selectedGameobject->GetComponent<MeshRenderer>();
+			if (meshRenderer != nullptr) {
+				Mesh * mesh = meshRenderer->GetMesh();
 				if (mesh != nullptr) {
-					const glm::mat4  modelMat = model->GetGameobject()->GetComponent<Transform>()->GetModelMatrix();
-					const glm::mat4  normalMat = model->GetGameobject()->GetComponent<Transform>()->GetNormalMatrix();
+					const glm::mat4  modelMat = meshRenderer->GetGameobject()->GetComponent<Transform>()->GetModelMatrix();
+					const glm::mat4  normalMat = meshRenderer->GetGameobject()->GetComponent<Transform>()->GetNormalMatrix();
 					const std::vector<uint32_t> & indices = mesh->GetIndices();
 					const std::vector<Vertex> & vertices = mesh->GetVertices();
 
@@ -470,16 +470,16 @@ namespace fan {
 		} m_renderer->SetNumDirectionalLights( static_cast<uint32_t>( m_directionalLights.size() ) );
 
 		// Transforms, mesh, materials
-		std::vector<DrawMesh> drawData( m_models.size() );
-		for (int modelIndex = 0; modelIndex < m_models.size() ; modelIndex++) {
+		std::vector<DrawMesh> drawData( m_meshRenderers.size() );
+		for (int modelIndex = 0; modelIndex < m_meshRenderers.size() ; modelIndex++) {
 
 			DrawMesh& data = drawData[modelIndex];
-			Model * model = m_models[modelIndex];
-			Transform * transform = model->GetGameobject()->GetTransform();
-			Material * material = model->GetGameobject()->GetComponent<Material>();
+			MeshRenderer * meshRenderer = m_meshRenderers[modelIndex];
+			Transform * transform = meshRenderer->GetGameobject()->GetTransform();
+			Material * material = meshRenderer->GetGameobject()->GetComponent<Material>();
 
 			// Mesh
-			data.mesh = model->GetMesh();
+			data.mesh = meshRenderer->GetMesh();
 
 			// Transform
 			data.modelMatrix = transform->GetModelMatrix();
@@ -544,11 +544,11 @@ namespace fan {
 				const AABB & aabb = gameobject->GetAABB();
 				btVector3 intersection;
 				if (aabb.RayCast(ray.origin, ray.direction, intersection) == true) {
-					Model * model = gameobject->GetComponent<Model>();
-					if (model != nullptr && model->GetMesh() != nullptr ) {
+					MeshRenderer * meshRenderer = gameobject->GetComponent<MeshRenderer>();
+					if (meshRenderer != nullptr && meshRenderer->GetMesh() != nullptr ) {
 						Transform * transform = gameobject->GetComponent<Transform>();
 						const Ray transformedRay(transform->InverseTransformPoint(ray.origin), transform->InverseTransformDirection(ray.direction));
-						if (model->GetMesh()->GetHull().RayCast(transformedRay.origin, transformedRay.direction, intersection) == false) {
+						if (meshRenderer->GetMesh()->GetHull().RayCast(transformedRay.origin, transformedRay.direction, intersection) == false) {
 							continue;
 						}
 					}
@@ -720,23 +720,23 @@ namespace fan {
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void Engine::RegisterModel( Model * _model ) {
+	void Engine::RegisterMeshRenderer( MeshRenderer * _meshRenderer ) {
 		// Looks for the model
-		for ( int modelIndex = 0; modelIndex < m_models.size(); modelIndex++ ) {
-			if ( m_models[modelIndex] == _model ) {
-				Debug::Get() << Debug::Severity::warning << "Model already registered : " << _model->GetGameobject()->GetName() << Debug::Endl();
+		for ( int modelIndex = 0; modelIndex < m_meshRenderers.size(); modelIndex++ ) {
+			if ( m_meshRenderers[modelIndex] == _meshRenderer ) {
+				Debug::Get() << Debug::Severity::warning << "MeshRenderer already registered : " << _meshRenderer->GetGameobject()->GetName() << Debug::Endl();
 				return;
 			}
 		}
-		m_models.push_back( _model );
+		m_meshRenderers.push_back( _meshRenderer );
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void Engine::UnRegisterModel( Model * _model ) {
-		for ( int modelIndex = 0; modelIndex < m_models.size(); modelIndex++ ) {
-			if ( m_models[modelIndex] == _model ) {
-				m_models.erase( m_models.begin() + modelIndex );
+	void Engine::UnRegisterMeshRenderer( MeshRenderer * _meshRenderer ) {
+		for ( int modelIndex = 0; modelIndex < m_meshRenderers.size(); modelIndex++ ) {
+			if ( m_meshRenderers[modelIndex] == _meshRenderer ) {
+				m_meshRenderers.erase( m_meshRenderers.begin() + modelIndex );
 			}
 		}
 	}
@@ -754,13 +754,13 @@ namespace fan {
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void Engine::OnModelSetPath( Model * _model, std::string _path ) {
+	void Engine::OnMeshRendererSetPath( MeshRenderer * _meshRenderer, std::string _path ) {
 		RessourceManager * ressourceManager = m_renderer->GetRessourceManager();
 		Mesh * mesh = ressourceManager->FindMesh( _path );
 		if ( mesh == nullptr ) {
 			mesh = ressourceManager->LoadMesh( _path );
 		}
-		_model->SetMesh( mesh );
+		_meshRenderer->SetMesh( mesh );
 	}
 
 	//================================================================================================================================

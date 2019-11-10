@@ -172,9 +172,6 @@
     <ClCompile Include="code\core\ressources\fanRessource.cpp">
       <Filter>code\core\ressources</Filter>
     </ClCompile>
-    <ClCompile Include="code\scene\components\fanModel.cpp">
-      <Filter>code\scene\components</Filter>
-    </ClCompile>
     <ClCompile Include="code\core\ressources\fanRessourcePtr.cpp">
       <Filter>code\core\ressources</Filter>
     </ClCompile>
@@ -402,6 +399,9 @@
     </ClCompile>
     <ClCompile Include="code\renderer\fanUIMesh.cpp">
       <Filter>code\renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="code\scene\components\fanMeshRenderer.cpp">
+      <Filter>code\scene\components</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -930,9 +930,6 @@
     <ClInclude Include="code\core\ressources\fanRessource.h">
       <Filter>code\core\ressources</Filter>
     </ClInclude>
-    <ClInclude Include="code\scene\components\fanModel.h">
-      <Filter>code\scene\components</Filter>
-    </ClInclude>
     <ClInclude Include="code\core\ressources\fanRessourcePtr.h">
       <Filter>code\core\ressources</Filter>
     </ClInclude>
@@ -1286,6 +1283,9 @@
     </ClInclude>
     <ClInclude Include="code\renderer\fanUIMesh.h">
       <Filter>code\renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="code\scene\components\fanMeshRenderer.h">
+      <Filter>code\scene\components</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
