@@ -77,7 +77,7 @@ namespace fan {
 
 		ImGui::PushItemWidth( 0.5f * ImGui::GetWindowWidth() ); {
 
-			ImGui::GameobjectPtr( "origin", &m_origin );
+			ImGui::InputGameobject( "origin", &m_origin );
 			ImGui::DragInt( "particles per second", &m_particlesPerSecond, 1, 0 );
 			ImGui::DragFloat( "speed", &m_speed, 0.01f );
 			ImGui::DragFloat( "duration", &m_duration, 0.01f );

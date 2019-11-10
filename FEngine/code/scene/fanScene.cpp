@@ -7,7 +7,7 @@
 #include "scene/components/fanCamera.h"
 #include "scene/components/fanMeshRenderer.h"
 #include "scene/actors/fanActor.h"
-#include "scene/fanGameobjectPtr.h"
+#include "scene/fanRessourcePtr.h"
 #include "core/fanSignal.h"
 #include "core/time/fanScopedTimer.h"
 #include "core/time/fanProfiler.h"
@@ -358,7 +358,7 @@ namespace fan
 				auto it = m_gameobjects.find( ptr->GetID() );
 				if ( it != m_gameobjects.end() )
 				{
-					(*ptr) = GameobjectPtr( it->second );
+					(*ptr) = GameobjectPtr( it->second, it->second->GetUniqueID() );
 				}
 				else
 				{

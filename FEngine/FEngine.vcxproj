@@ -105,7 +105,6 @@
     <ClCompile Include="code\core\math\shapes\fanShape.cpp" />
     <ClCompile Include="code\core\math\shapes\fanTriangle.cpp" />
     <ClCompile Include="code\core\ressources\fanRessource.cpp" />
-    <ClCompile Include="code\core\ressources\fanRessourcePtr.cpp" />
     <ClCompile Include="code\core\time\fanClock.cpp" />
     <ClCompile Include="code\core\time\fanProfiler.cpp" />
     <ClCompile Include="code\core\time\fanScopedTimer.cpp" />
@@ -184,7 +183,7 @@
     <ClCompile Include="code\scene\components\fanUIMeshRenderer.cpp" />
     <ClCompile Include="code\scene\fanComponentsRegister.cpp" />
     <ClCompile Include="code\scene\fanGameobject.cpp" />
-    <ClCompile Include="code\scene\fanGameobjectPtr.cpp" />
+    <ClCompile Include="code\scene\fanRessourcePtr.cpp" />
     <ClCompile Include="code\scene\fanScene.cpp" />
     <ClCompile Include="deps\imgui\imgui.cpp" />
     <ClCompile Include="deps\imgui\imgui_demo.cpp" />
@@ -222,7 +221,6 @@
     <ClInclude Include="code\core\meta\fanTypeList.h" />
     <ClInclude Include="code\core\meta\fanMetaMath.h" />
     <ClInclude Include="code\core\ressources\fanRessource.h" />
-    <ClInclude Include="code\core\ressources\fanRessourcePtr.h" />
     <ClInclude Include="code\core\time\fanClock.h" />
     <ClInclude Include="code\core\time\fanProfiler.h" />
     <ClInclude Include="code\core\time\fanScopedTimer.h" />
@@ -304,7 +302,7 @@
     <ClInclude Include="code\scene\components\fanUIMeshRenderer.h" />
     <ClInclude Include="code\scene\fanComponentsRegister.h" />
     <ClInclude Include="code\scene\fanGameobject.h" />
-    <ClInclude Include="code\scene\fanGameobjectPtr.h" />
+    <ClInclude Include="code\scene\fanRessourcePtr.h" />
     <ClInclude Include="code\scene\fanScene.h" />
     <ClInclude Include="deps\bitset2\bitset2.hpp" />
     <ClInclude Include="deps\bitset2\detail\array2array.hpp" />

@@ -1,7 +1,7 @@
 #include "fanGlobalIncludes.h"
 
 #include "fanISerializable.h"
-#include "scene/fanGameobjectPtr.h"
+#include "scene/fanRessourcePtr.h"
 #include "scene/fanGameobject.h"
 
 namespace fan {

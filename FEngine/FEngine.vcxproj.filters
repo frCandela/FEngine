@@ -172,9 +172,6 @@
     <ClCompile Include="code\core\ressources\fanRessource.cpp">
       <Filter>code\core\ressources</Filter>
     </ClCompile>
-    <ClCompile Include="code\core\ressources\fanRessourcePtr.cpp">
-      <Filter>code\core\ressources</Filter>
-    </ClCompile>
     <ClCompile Include="code\editor\windows\fanConsoleWindow.cpp">
       <Filter>code\editor\windows</Filter>
     </ClCompile>
@@ -391,9 +388,6 @@
     <ClCompile Include="code\game\fanSunLight.cpp">
       <Filter>code\game</Filter>
     </ClCompile>
-    <ClCompile Include="code\scene\fanGameobjectPtr.cpp">
-      <Filter>code\scene</Filter>
-    </ClCompile>
     <ClCompile Include="code\renderer\pipelines\fanUIPipeline.cpp">
       <Filter>code\renderer\pipelines</Filter>
     </ClCompile>
@@ -405,6 +399,9 @@
     </ClCompile>
     <ClCompile Include="code\scene\components\fanUIMeshRenderer.cpp">
       <Filter>code\scene\components</Filter>
+    </ClCompile>
+    <ClCompile Include="code\scene\fanRessourcePtr.cpp">
+      <Filter>code\scene</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -933,9 +930,6 @@
     <ClInclude Include="code\core\ressources\fanRessource.h">
       <Filter>code\core\ressources</Filter>
     </ClInclude>
-    <ClInclude Include="code\core\ressources\fanRessourcePtr.h">
-      <Filter>code\core\ressources</Filter>
-    </ClInclude>
     <ClInclude Include="code\editor\windows\fanConsoleWindow.h">
       <Filter>code\editor\windows</Filter>
     </ClInclude>
@@ -1278,9 +1272,6 @@
     <ClInclude Include="code\game\fanSunLight.h">
       <Filter>code\game</Filter>
     </ClInclude>
-    <ClInclude Include="code\scene\fanGameobjectPtr.h">
-      <Filter>code\scene</Filter>
-    </ClInclude>
     <ClInclude Include="code\renderer\pipelines\fanUIPipeline.h">
       <Filter>code\renderer\pipelines</Filter>
     </ClInclude>
@@ -1292,6 +1283,9 @@
     </ClInclude>
     <ClInclude Include="code\scene\components\fanUIMeshRenderer.h">
       <Filter>code\scene\components</Filter>
+    </ClInclude>
+    <ClInclude Include="code\scene\fanRessourcePtr.h">
+      <Filter>code\scene</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

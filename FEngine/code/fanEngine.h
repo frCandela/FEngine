@@ -16,7 +16,6 @@ namespace fan {
 	class Renderer;
 	class Gameobject;
 	class Scene;
-	class GameobjectPtr;
 	class Actor;
 	class Camera;	
 	class DirectionalLight;
@@ -27,6 +26,9 @@ namespace fan {
 	class FPSCamera;
 	class EcsManager;
 	class PhysicsManager;
+
+	template< typename _RessourceType > class RessourcePtr;
+	using GameobjectPtr = RessourcePtr<Gameobject>;
 
 	//================================================================================================================================
 	//================================================================================================================================	

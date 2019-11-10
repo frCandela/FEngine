@@ -1,7 +1,7 @@
 #pragma once
 
 #include "scene/actors/fanActor.h"
-#include "scene/fanGameobjectPtr.h"
+#include "scene/fanRessourcePtr.h"
 
 namespace fan {
 	class EcsManager;

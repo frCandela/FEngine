@@ -1,7 +1,9 @@
 #pragma once
 
 namespace fan {
-	class GameobjectPtr;
+	class Gameobject;
+	template< typename _RessourceType > class RessourcePtr;
+	using GameobjectPtr = RessourcePtr<Gameobject>;
 
 	//================================================================================================================================
 	//================================================================================================================================

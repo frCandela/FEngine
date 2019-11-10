@@ -33,7 +33,7 @@
 #include "editor/fanImguiIcons.h"
 #include "scene/fanScene.h"
 #include "scene/fanGameobject.h"
-#include "scene/fanGameobjectPtr.h"
+#include "scene/fanRessourcePtr.h"
 #include "scene/components/fanComponent.h"
 #include "scene/components/fanCamera.h"
 #include "scene/components/fanTransform.h"
@@ -803,7 +803,7 @@ namespace fan {
 	{
 		if ( m_selectedGameobject != nullptr )
 		{
-			(*_ptr) = GameobjectPtr( m_selectedGameobject );
+			(*_ptr) = GameobjectPtr( m_selectedGameobject, m_selectedGameobject->GetUniqueID() );
 		}
 	}
 }
