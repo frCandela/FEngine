@@ -37,6 +37,8 @@ namespace fan
 
 	struct DrawUIMesh {
 		UIMesh * mesh;
+		glm::vec2 position;
+		glm::vec2 scale;
 	};
 
 	// Used to batch rendering

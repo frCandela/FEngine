@@ -166,6 +166,7 @@ namespace fan
 			m_debugLinesPipeline->Resize( extent );
 			m_debugLinesPipelineNoDepthTest->Resize( extent );
 			m_debugTrianglesPipeline->Resize( extent );
+			m_uiPipeline->Resize( extent );
 
 			RecordAllCommandBuffers();
 			vkResetFences( m_device->vkDevice, 1, m_swapchain->GetCurrentInFlightFence() );
@@ -320,7 +321,12 @@ namespace fan
 		m_uiMeshDrawArray.resize( _drawData.size() );
 		for (int meshIndex = 0; meshIndex < _drawData.size() ; meshIndex++)
 		{
-			m_uiMeshDrawArray[meshIndex].mesh = _drawData[meshIndex].mesh;
+			const DrawUIMesh& uiData = _drawData[meshIndex];
+
+			m_uiMeshDrawArray[meshIndex].mesh = uiData.mesh;
+			m_uiPipeline->m_dynamicUniformsVert[meshIndex].position = uiData.position;
+			m_uiPipeline->m_dynamicUniformsVert[meshIndex].scale = uiData.scale;
+
 		}
 	}
 
@@ -482,6 +488,7 @@ namespace fan
 			for ( uint32_t meshIndex = 0; meshIndex < m_uiMeshDrawArray.size(); meshIndex++ ) {
 				UIMesh * mesh = m_uiMeshDrawArray[meshIndex].mesh;
 				VkBuffer vertexBuffers[] = { mesh->GetVertexBuffer()->GetBuffer() };
+				m_uiPipeline->BindDescriptors( commandBuffer, _index, meshIndex );
 				vkCmdBindVertexBuffers( commandBuffer, 0, 1, vertexBuffers, offsets );
 				vkCmdDraw( commandBuffer, static_cast<uint32_t>( mesh->GetVertices().size() ), 1, 0, 0 );
 			}

@@ -32,6 +32,11 @@ namespace fan
 		for ( Mesh * mesh : m_meshList ){
 			delete mesh;
 		} m_meshList.clear();
+
+		for ( UIMesh * mesh : m_uiMeshList )
+		{
+			delete mesh;
+		} m_uiMeshList.clear();
 	}
 
 	//================================================================================================================================

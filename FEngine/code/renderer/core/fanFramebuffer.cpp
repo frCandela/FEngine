@@ -131,8 +131,6 @@ namespace fan
 	//================================================================================================================================
 	void FrameBuffer::CreateColorRessources( const VkExtent2D _extent, const VkFormat _format ){
 		delete m_colorImage;
-		delete m_colorImageView;
-
 		m_colorImage = new Image( m_device );
 		m_colorImage->Create(
 			_format,
@@ -140,6 +138,8 @@ namespace fan
 			VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT | VK_IMAGE_USAGE_STORAGE_BIT | VK_IMAGE_USAGE_INPUT_ATTACHMENT_BIT | VK_IMAGE_USAGE_SAMPLED_BIT,
 			VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT
 		);
+
+		delete m_colorImageView;
 		m_colorImageView = new ImageView( m_device );
 		m_colorImageView->Create( m_colorImage->GetImage(), _format, VK_IMAGE_ASPECT_COLOR_BIT, VK_IMAGE_VIEW_TYPE_2D );
 	}

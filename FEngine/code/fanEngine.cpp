@@ -512,8 +512,12 @@ namespace fan {
 			UIMeshRenderer* meshRenderer = uiRenderers[meshIndex];
 			if ( meshRenderer->GetMesh()->GetVertices().size() > 0 )
 			{
+				Transform * transform = meshRenderer->GetGameobject()->GetTransform();
+
 				DrawUIMesh uiMesh;
 				uiMesh.mesh = meshRenderer->GetMesh();
+				uiMesh.scale = {transform->GetScale().x(), transform->GetScale().y()};
+				uiMesh.position = {transform->GetPosition().x(), transform->GetPosition().y()};
 				uiDrawData.push_back(uiMesh);
 			}
 		}
