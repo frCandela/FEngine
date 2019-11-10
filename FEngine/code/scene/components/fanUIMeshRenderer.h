@@ -1,6 +1,7 @@
 #pragma once
 
 #include "scene/components/fanComponent.h"
+#include "scene/fanRessourcePtr.h"
 
 namespace fan
 {
@@ -19,7 +20,7 @@ namespace fan
 
 		Color GetColor() const				{ return m_color; }
 		void SetColor( const Color& _color) { m_color = _color; }
-
+		Texture * GetTexture() const { return *m_texture; }
 
 		void OnGui() override;
 		virtual ImGui::IconType GetIcon() const { return ImGui::IconType::IMAGE; };
@@ -37,6 +38,6 @@ namespace fan
 
 		UIMesh * m_uiMesh;
 		Color m_color;
-		Texture * m_texture;
+		TexturePtr m_texture;
 	};
 }

@@ -335,9 +335,11 @@ namespace fan
 			const DrawUIMesh& uiData = _drawData[meshIndex];
 
 			m_uiMeshDrawArray[meshIndex].mesh = uiData.mesh;
+			m_uiMeshDrawArray[meshIndex].textureIndex = uiData.textureIndex;
 			m_uiPipeline->m_dynamicUniformsVert[meshIndex].position = uiData.position;
 			m_uiPipeline->m_dynamicUniformsVert[meshIndex].scale = uiData.scale;
 			m_uiPipeline->m_dynamicUniformsVert[meshIndex].color = uiData.color;
+
 		}
 	}
 
@@ -497,11 +499,12 @@ namespace fan
 
 
 			for ( uint32_t meshIndex = 0; meshIndex < m_uiMeshDrawArray.size(); meshIndex++ ) {
-				UIMesh * mesh = m_uiMeshDrawArray[meshIndex].mesh;
+				UIDrawData drawData = m_uiMeshDrawArray[meshIndex];
+				UIMesh * mesh = drawData.mesh;
 				VkBuffer vertexBuffers[] = { mesh->GetVertexBuffer()->GetBuffer() };
 				m_uiPipeline->BindDescriptors( commandBuffer, _index, meshIndex );
 				vkCmdBindVertexBuffers( commandBuffer, 0, 1, vertexBuffers, offsets );
-				BindTexture( commandBuffer, 0, m_uiPipeline->GetLayout() );
+				BindTexture( commandBuffer, drawData.textureIndex, m_uiPipeline->GetLayout() );
 				vkCmdDraw( commandBuffer, static_cast<uint32_t>( mesh->GetVertices().size() ), 1, 0, 0 );
 			}
 

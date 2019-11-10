@@ -26,9 +26,11 @@ namespace fan {
 	class FPSCamera;
 	class EcsManager;
 	class PhysicsManager;
+	class Texture;
 
-	template< typename _RessourceType > class RessourcePtr;
-	using GameobjectPtr = RessourcePtr<Gameobject>;
+	template< typename _RessourceType, typename _IDType > class RessourcePtr;
+	using GameobjectPtr = RessourcePtr<Gameobject, uint64_t >;
+	using TexturePtr  = RessourcePtr<Texture, std::string >;
 
 	//================================================================================================================================
 	//================================================================================================================================	
@@ -114,6 +116,7 @@ namespace fan {
 
 		void OnSceneLoad(Scene * _scene);
 		void OnMaterialSetTexture( Material * _material, std::string _path );
+		void OnResolveTexturePtr( TexturePtr * _ptr );
 		void OnMeshRendererSetPath( MeshRenderer * _meshRenderer, std::string _path );
 		void OnGameobjectDeleted( Gameobject * _gameobject );
 		void OnSetGameobjectPtrFromSelection( GameobjectPtr * _ptr );

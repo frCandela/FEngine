@@ -34,6 +34,7 @@
 #include "scene/fanScene.h"
 #include "scene/fanGameobject.h"
 #include "scene/fanRessourcePtr.h"
+#include "scene/fanRessourcePtr.h"
 #include "scene/components/fanComponent.h"
 #include "scene/components/fanCamera.h"
 #include "scene/components/fanTransform.h"
@@ -79,8 +80,7 @@ namespace fan {
 		Input::Get().Manager().CreateKeyboardEvent( "save_scene",	  Keyboard::S, Keyboard::LEFT_CONTROL );
 		Input::Get().Manager().CreateKeyboardEvent( "reload_scene",	  Keyboard::R, Keyboard::LEFT_CONTROL );
 		Input::Get().Manager().CreateKeyboardEvent(	"play_pause",	  Keyboard::TAB );
-		Input::Get().Manager().CreateKeyboardEvent( "freeze_capture", Keyboard::END );
-		
+		Input::Get().Manager().CreateKeyboardEvent( "freeze_capture", Keyboard::END );		
 
 		// Axis
 		Input::Get().Manager().CreateAxis( "game_forward",		Keyboard::W, Keyboard::S );
@@ -133,6 +133,7 @@ namespace fan {
 		Input::Get().Manager().FindEvent( "play_pause" )->Connect(		&Engine::SwitchPlayPause, this );
 
 		// Static messages		
+		TexturePtr::s_onCreateUnresolved.Connect( &Engine::OnResolveTexturePtr, this );
 		Material::onMaterialSetPath.Connect		( &Engine::OnMaterialSetTexture, this );
 		Mesh::s_onMeshLoad.Connect				( &RessourceManager::OnLoadMesh, m_renderer->GetRessourceManager() );
 		Mesh::s_onMeshDelete.Connect			( &Renderer::WaitIdle, m_renderer ); // hack
@@ -513,12 +514,14 @@ namespace fan {
 			if ( meshRenderer->GetMesh()->GetVertices().size() > 0 )
 			{
 				Transform * transform = meshRenderer->GetGameobject()->GetTransform();
+				Texture * texture= meshRenderer->GetTexture();
 
 				DrawUIMesh uiMesh;
 				uiMesh.mesh = meshRenderer->GetMesh();
 				uiMesh.scale = { transform->GetScale().x(), transform->GetScale().y() };				
 				uiMesh.position = {transform->GetPosition().x(), transform->GetPosition().y()};
 				uiMesh.color = meshRenderer->GetColor().ToGLM();
+				uiMesh.textureIndex = texture != nullptr ? texture->GetRenderID() : 0 ;
 				uiDrawData.push_back(uiMesh);
 			}
 		}
@@ -776,6 +779,17 @@ namespace fan {
 			texture = texturesManager->LoadTexture( _path );
 		}
 		_material->SetTexture( texture );
+	}
+
+	
+	//================================================================================================================================
+	//================================================================================================================================
+	void Engine::OnResolveTexturePtr( TexturePtr * _ptr )
+	{
+		RessourceManager * texturesManager = m_renderer->GetRessourceManager();
+		Texture * texture = texturesManager->FindTexture( _ptr->GetID() );
+		if ( texture == nullptr  ){	texture = texturesManager->LoadTexture( _ptr->GetID() ); }
+		if ( texture != nullptr  ){	*_ptr   = TexturePtr( texture, texture->GetPath() );	}
 	}
 
 	//================================================================================================================================

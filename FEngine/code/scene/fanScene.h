@@ -12,8 +12,8 @@ namespace fan
 	class EcsManager;
 	class PhysicsManager;
 
-	template< typename _RessourceType > class RessourcePtr;
-	using GameobjectPtr = RessourcePtr<Gameobject>;
+	template< typename _RessourceType, typename _IDType > class RessourcePtr;
+	using GameobjectPtr = RessourcePtr<Gameobject, uint64_t>;
 
 	//================================================================================================================================
 	//================================================================================================================================

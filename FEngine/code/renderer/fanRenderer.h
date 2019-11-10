@@ -41,6 +41,7 @@ namespace fan
 		glm::vec2 position;
 		glm::vec2 scale;
 		glm::vec4 color;
+		uint32_t textureIndex;
 	};
 
 	// Used to batch rendering
