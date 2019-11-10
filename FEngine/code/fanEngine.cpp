@@ -516,8 +516,9 @@ namespace fan {
 
 				DrawUIMesh uiMesh;
 				uiMesh.mesh = meshRenderer->GetMesh();
-				uiMesh.scale = {transform->GetScale().x(), transform->GetScale().y()};
+				uiMesh.scale = { transform->GetScale().x(), transform->GetScale().y() };				
 				uiMesh.position = {transform->GetPosition().x(), transform->GetPosition().y()};
+				uiMesh.color = meshRenderer->GetColor().ToGLM();
 				uiDrawData.push_back(uiMesh);
 			}
 		}

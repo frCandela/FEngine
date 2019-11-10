@@ -80,7 +80,6 @@ namespace fan {
 	//================================================================================================================================
 	// Runs the systems before the physics update
 	//================================================================================================================================
-	//#define RUN_SYSTEM( _system, _func ) RunSystem< _system::signature::componentsTypes, _system >::Run( &_system _delta, m_activeEntitiesCount, m_entitiesKeys, m_components );
 	#define RUN_SYSTEM( _system, _func )  RunSystem< _system::signature, _system >::Run( &_system::_func, _delta, m_activeEntitiesCount, m_entitiesKeys, m_components );
 	void EcsManager::Update( const float _delta, const btVector3& _cameraPosition ) {
 		SCOPED_PROFILE( ecs_update )

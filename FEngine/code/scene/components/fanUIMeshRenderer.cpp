@@ -20,13 +20,12 @@ namespace fan
 	{
 		m_uiMesh = new UIMesh();
 		std::vector<UIVertex> vertices = {
-			 UIVertex( glm::vec2( -1.f, -1.f ) )			
-			,UIVertex( glm::vec2( 1.f, 1.f ) )
-			,UIVertex( glm::vec2( 1.f, -1.f  ) )
-
-			,UIVertex( glm::vec2( -1.f, -1.f ) )
-			,UIVertex( glm::vec2( -1.f, 1.f ) )
-			,UIVertex( glm::vec2( 1.f, 1.f ) )
+			 UIVertex( glm::vec2( -1.f, -1.f), glm::vec2( +0.f, +1.f) )			
+			,UIVertex( glm::vec2( +1.f, +1.f), glm::vec2( +1.f, +0.f) )
+			,UIVertex( glm::vec2( +1.f, -1.f), glm::vec2( +1.f, +1.f) )
+			,UIVertex( glm::vec2( -1.f, -1.f), glm::vec2( +0.f, +1.f) )
+			,UIVertex( glm::vec2( -1.f, +1.f), glm::vec2( +0.f, +0.f) )
+			,UIVertex( glm::vec2( +1.f, +1.f), glm::vec2( +1.f, +0.f) )
 
 		};
 		m_uiMesh->LoadFromVertices(vertices);
@@ -48,6 +47,7 @@ namespace fan
 	void UIMeshRenderer::OnGui()
 	{
 		Component::OnGui();
+		ImGui::ColorEdit4( "color", m_color.Data(), gui::colorEditFlags );
 	}
 
 	//================================================================================================================================

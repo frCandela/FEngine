@@ -326,7 +326,7 @@ namespace fan
 			m_uiMeshDrawArray[meshIndex].mesh = uiData.mesh;
 			m_uiPipeline->m_dynamicUniformsVert[meshIndex].position = uiData.position;
 			m_uiPipeline->m_dynamicUniformsVert[meshIndex].scale = uiData.scale;
-
+			m_uiPipeline->m_dynamicUniformsVert[meshIndex].color = uiData.color;
 		}
 	}
 

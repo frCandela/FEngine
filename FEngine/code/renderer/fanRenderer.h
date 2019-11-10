@@ -39,6 +39,7 @@ namespace fan
 		UIMesh * mesh;
 		glm::vec2 position;
 		glm::vec2 scale;
+		glm::vec4 color;
 	};
 
 	// Used to batch rendering

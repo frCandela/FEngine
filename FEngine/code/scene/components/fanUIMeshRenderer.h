@@ -17,6 +17,9 @@ namespace fan
 		UIMesh *		GetMesh()		{ return m_uiMesh; }
 		const UIMesh *	GetMesh() const { return m_uiMesh; }
 
+		Color GetColor() const				{ return m_color; }
+		void SetColor( const Color& _color) { m_color = _color; }
+
 
 		void OnGui() override;
 		virtual ImGui::IconType GetIcon() const { return ImGui::IconType::IMAGE; };
@@ -33,5 +36,6 @@ namespace fan
 	private:
 
 		UIMesh * m_uiMesh;
+		Color m_color;
 	};
 }
