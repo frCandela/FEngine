@@ -32,6 +32,18 @@ namespace fan
 		static std::vector <VkVertexInputBindingDescription>	GetBindingDescription();
 		static std::vector<VkVertexInputAttributeDescription>	GetAttributeDescriptions();
 	};
+
+	//================================================================================================================================
+	//================================================================================================================================
+	struct UIVertex
+	{
+		glm::vec2 pos;
+		glm::vec4 color;
+
+		UIVertex( const glm::vec2 _pos = glm::vec2(0.f,0.f), const glm::vec4 _color = Color::White.ToGLM() );
+		static std::vector <VkVertexInputBindingDescription>	GetBindingDescription();
+		static std::vector<VkVertexInputAttributeDescription>	GetAttributeDescriptions();
+	};
 }
 
 namespace std {

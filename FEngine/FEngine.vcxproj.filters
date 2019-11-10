@@ -397,6 +397,12 @@
     <ClCompile Include="code\scene\fanGameobjectPtr.cpp">
       <Filter>code\scene</Filter>
     </ClCompile>
+    <ClCompile Include="code\renderer\pipelines\fanUIPipeline.cpp">
+      <Filter>code\renderer\pipelines</Filter>
+    </ClCompile>
+    <ClCompile Include="code\renderer\fanUIMesh.cpp">
+      <Filter>code\renderer</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="code\editor\fanMainMenuBar.h">
@@ -1275,6 +1281,12 @@
     <ClInclude Include="code\scene\fanGameobjectPtr.h">
       <Filter>code\scene</Filter>
     </ClInclude>
+    <ClInclude Include="code\renderer\pipelines\fanUIPipeline.h">
+      <Filter>code\renderer\pipelines</Filter>
+    </ClInclude>
+    <ClInclude Include="code\renderer\fanUIMesh.h">
+      <Filter>code\renderer</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="code\core\math\fanBasicModels.inl">
@@ -1314,6 +1326,12 @@
       <Filter>code\shaders</Filter>
     </None>
     <None Include="code\shaders\forward.frag">
+      <Filter>code\shaders</Filter>
+    </None>
+    <None Include="code\shaders\ui.frag">
+      <Filter>code\shaders</Filter>
+    </None>
+    <None Include="code\shaders\ui.vert">
       <Filter>code\shaders</Filter>
     </None>
   </ItemGroup>

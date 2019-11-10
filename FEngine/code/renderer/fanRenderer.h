@@ -7,6 +7,7 @@ namespace fan
 {
 	class Window;
 	class Mesh;
+	class UIMesh;
 	class Instance;
 	class Device;
 	class SwapChain;
@@ -20,6 +21,7 @@ namespace fan
 	class PostprocessPipeline;
 	class ForwardPipeline;
 	class DebugPipeline;
+	class UIPipeline;
 	class Color;
 	class RessourceManager;
 
@@ -111,20 +113,21 @@ namespace fan
 		ImguiPipeline *			m_imguiPipeline;
 		PostprocessPipeline *	m_postprocessPipeline;
 		ForwardPipeline *		m_forwardPipeline;
+		UIPipeline *			m_uiPipeline;
 		DebugPipeline *			m_debugLinesPipeline;
 		DebugPipeline *			m_debugLinesPipelineNoDepthTest;
 		DebugPipeline *			m_debugTrianglesPipeline;
 
 		VkRenderPass	m_renderPass;
 		VkRenderPass	m_renderPassPostprocess;
-		VkRenderPass	m_renderPassUI;
-
 
 		std::vector<VkCommandBuffer> m_primaryCommandBuffers;
 		std::vector<VkCommandBuffer> m_geometryCommandBuffers;
 		std::vector<VkCommandBuffer> m_imguiCommandBuffers;
+		std::vector<VkCommandBuffer> m_uiCommandBuffers;
 		std::vector<VkCommandBuffer> m_debugCommandBuffers;
 		std::vector<VkCommandBuffer> m_postprocessCommandBuffers;
+
 
 		FrameBuffer * m_forwardFrameBuffers;
 		FrameBuffer * m_swapchainFramebuffers;
@@ -139,6 +142,7 @@ namespace fan
 
 		void RecordCommandBufferPostProcess(const size_t _index);
 		void RecordCommandBufferImgui(const size_t _index);
+		void RecordCommandBufferUI(const size_t _index);
 		void RecordCommandBufferDebug(const size_t _index);
 		void RecordCommandBufferGeometry(const size_t _index);
 		void RecordPrimaryCommandBuffer(const size_t _index);
@@ -150,7 +154,6 @@ namespace fan
 
 		bool CreateRenderPass();
 		bool CreateRenderPassPostprocess();
-		bool CreateRenderPassUI();
 
 		void DeleteRenderPass();
 		void DeleteRenderPassPostprocess();

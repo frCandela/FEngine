@@ -158,10 +158,12 @@
     <ClCompile Include="code\renderer\fanMesh.cpp" />
     <ClCompile Include="code\renderer\fanRenderer.cpp" />
     <ClCompile Include="code\renderer\fanRessourceManager.cpp" />
+    <ClCompile Include="code\renderer\fanUIMesh.cpp" />
     <ClCompile Include="code\renderer\pipelines\fanDebugPipeline.cpp" />
     <ClCompile Include="code\renderer\pipelines\fanForwardPipeline.cpp" />
     <ClCompile Include="code\renderer\pipelines\fanImguiPipeline.cpp" />
     <ClCompile Include="code\renderer\pipelines\fanPostprocessPipeline.cpp" />
+    <ClCompile Include="code\renderer\pipelines\fanUIPipeline.cpp" />
     <ClCompile Include="code\renderer\util\fanColor.cpp" />
     <ClCompile Include="code\renderer\util\fanSpirvCompiler.cpp" />
     <ClCompile Include="code\renderer\util\fanVertex.cpp" />
@@ -275,10 +277,12 @@
     <ClInclude Include="code\renderer\fanMesh.h" />
     <ClInclude Include="code\renderer\fanRenderer.h" />
     <ClInclude Include="code\renderer\fanRessourceManager.h" />
+    <ClInclude Include="code\renderer\fanUIMesh.h" />
     <ClInclude Include="code\renderer\pipelines\fanDebugPipeline.h" />
     <ClInclude Include="code\renderer\pipelines\fanForwardPipeline.h" />
     <ClInclude Include="code\renderer\pipelines\fanImguiPipeline.h" />
     <ClInclude Include="code\renderer\pipelines\fanPostprocessPipeline.h" />
+    <ClInclude Include="code\renderer\pipelines\fanUIPipeline.h" />
     <ClInclude Include="code\renderer\util\fanColor.h" />
     <ClInclude Include="code\renderer\util\fanSpirvCompiler.h" />
     <ClInclude Include="code\renderer\util\fanVertex.h" />
@@ -496,6 +500,8 @@
     <None Include="code\shaders\imgui.vert" />
     <None Include="code\shaders\postprocess.frag" />
     <None Include="code\shaders\postprocess.vert" />
+    <None Include="code\shaders\ui.frag" />
+    <None Include="code\shaders\ui.vert" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -6,6 +6,7 @@
 #include "core/math/fanBasicModels.h"
 #include "core/time/fanProfiler.h"
 #include "renderer/fanMesh.h"
+#include "renderer/fanUIMesh.h"
 #include "renderer/fanRessourceManager.h"
 #include "renderer/core/fanInstance.h"
 #include "renderer/core/fanDevice.h"
@@ -20,6 +21,7 @@
 #include "renderer/pipelines/fanPostprocessPipeline.h"
 #include "renderer/pipelines/fanForwardPipeline.h"
 #include "renderer/pipelines/fanDebugPipeline.h"
+#include "renderer/pipelines/fanUIPipeline.h"
 #include "renderer/util/fanVertex.h"
 #include "renderer/util/fanWindow.h"
 
@@ -40,6 +42,7 @@ namespace fan
             
 		CreateRenderPass();
 		CreateRenderPassPostprocess();
+
 		CreateQuadVertexBuffer();
 		CreateSwapchainFramebuffers();
 		CreateForwardFramebuffers();
@@ -65,6 +68,11 @@ namespace fan
 		m_debugTrianglesPipeline->Init( m_renderPass, m_swapchain->GetExtent(), "code/shaders/debugTriangles.vert", "code/shaders/debugTriangles.frag" );
 		m_debugTrianglesPipeline->CreateDescriptors( m_swapchain->GetSwapchainImagesCount() );
 		m_debugTrianglesPipeline->Create();
+
+		m_uiPipeline = new UIPipeline( *m_device);
+		m_uiPipeline->Init( m_renderPassPostprocess, m_swapchain->GetExtent(), "code/shaders/ui.vert", "code/shaders/ui.frag" );
+		m_uiPipeline->CreateDescriptors( m_swapchain->GetSwapchainImagesCount() );
+		m_uiPipeline->Create();
 
 		m_postprocessPipeline = new PostprocessPipeline(*m_device);
 		m_postprocessPipeline->SetImageAndView( m_forwardFrameBuffers->GetColorAttachmentImageView(), m_forwardFrameBuffers->GetColorAttachmentSampler() );
@@ -98,6 +106,7 @@ namespace fan
 		delete m_debugLinesPipeline;
 		delete m_debugLinesPipelineNoDepthTest;
 		delete m_debugTrianglesPipeline;
+		delete m_uiPipeline;
 		delete m_ressourceManager;
 
 		delete m_quadVertexBuffer;
@@ -117,6 +126,7 @@ namespace fan
 		delete m_forwardFrameBuffers;
 		DeleteRenderPass();
 		DeleteRenderPassPostprocess();
+
 		delete m_swapchainFramebuffers;
 
 		delete m_postprocessPipeline;
@@ -181,6 +191,7 @@ namespace fan
 			SCOPED_PROFILE( record_cmd )
 			RecordCommandBufferGeometry( currentFrame );
 			RecordCommandBufferDebug( currentFrame );
+			RecordCommandBufferUI( currentFrame );
 			RecordCommandBufferImgui( currentFrame );
 			RecordPrimaryCommandBuffer( currentFrame );
 		}
@@ -201,6 +212,7 @@ namespace fan
 		m_debugLinesPipeline->UpdateUniformBuffers( _index );
 		m_debugLinesPipelineNoDepthTest->UpdateUniformBuffers( _index );
 		m_debugTrianglesPipeline->UpdateUniformBuffers( _index );
+		m_uiPipeline->UpdateUniformBuffers( _index );
 	}
 
 	//================================================================================================================================
@@ -316,6 +328,10 @@ namespace fan
 		for ( size_t cmdBufferIndex = 0; cmdBufferIndex < m_swapchain->GetSwapchainImagesCount(); cmdBufferIndex++) {
 			RecordCommandBufferPostProcess( cmdBufferIndex );
 		}
+		for ( size_t cmdBufferIndex = 0; cmdBufferIndex < m_uiCommandBuffers.size(); cmdBufferIndex++ )
+		{
+			RecordCommandBufferUI( cmdBufferIndex );
+		}
 		for ( size_t cmdBufferIndex = 0; cmdBufferIndex < m_primaryCommandBuffers.size(); cmdBufferIndex++) {
 			RecordPrimaryCommandBuffer(cmdBufferIndex);
 		}
@@ -370,6 +386,7 @@ namespace fan
 			
 			vkCmdBeginRenderPass(commandBuffer, &renderPassInfoPostprocess, VK_SUBPASS_CONTENTS_SECONDARY_COMMAND_BUFFERS); {
 				vkCmdExecuteCommands( commandBuffer, 1, &m_postprocessCommandBuffers[_index]	);
+				vkCmdExecuteCommands( commandBuffer, 1, &m_uiCommandBuffers[_index]	);
 				vkCmdExecuteCommands( commandBuffer, 1, &m_imguiCommandBuffers[_index]			);
 			} vkCmdEndRenderPass(commandBuffer);
 			
@@ -419,6 +436,48 @@ namespace fan
 			Debug::Get() << Debug::Severity::error << "Could not record command buffer " << commandBuffer << "." << Debug::Endl();
 		}
 
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
+	void Renderer::RecordCommandBufferUI( const size_t _index )
+	{
+		VkCommandBuffer commandBuffer = m_uiCommandBuffers[_index];
+
+		VkCommandBufferInheritanceInfo commandBufferInheritanceInfo = {};
+		commandBufferInheritanceInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_INHERITANCE_INFO;
+		commandBufferInheritanceInfo.pNext = nullptr;
+		commandBufferInheritanceInfo.renderPass = m_renderPassPostprocess;
+		commandBufferInheritanceInfo.subpass = 0;
+		commandBufferInheritanceInfo.framebuffer = m_swapchainFramebuffers->GetFrameBuffer( _index );
+		commandBufferInheritanceInfo.occlusionQueryEnable = VK_FALSE;
+		//commandBufferInheritanceInfo.queryFlags				=;
+		//commandBufferInheritanceInfo.pipelineStatistics		=;
+
+		VkCommandBufferBeginInfo commandBufferBeginInfo;
+		commandBufferBeginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
+		commandBufferBeginInfo.pNext = nullptr;
+		commandBufferBeginInfo.flags = VK_COMMAND_BUFFER_USAGE_SIMULTANEOUS_USE_BIT | VK_COMMAND_BUFFER_USAGE_RENDER_PASS_CONTINUE_BIT;
+		commandBufferBeginInfo.pInheritanceInfo = &commandBufferInheritanceInfo;
+
+		if ( vkBeginCommandBuffer( commandBuffer, &commandBufferBeginInfo ) == VK_SUCCESS )
+		{
+			m_uiPipeline->Bind( commandBuffer, _index );
+			m_uiPipeline->BindDescriptors( commandBuffer, _index, 0 );
+			VkBuffer vertexBuffers[] = { m_uiPipeline->m_testUiMesh->GetVertexBuffer()->GetBuffer() };
+			VkDeviceSize offsets[] = { 0 };
+			vkCmdBindVertexBuffers( commandBuffer, 0, 1, vertexBuffers, offsets );
+			vkCmdDraw( commandBuffer, static_cast<uint32_t>(  m_uiPipeline->m_testUiMesh->GetVertices().size() ), 1, 0, 0 );		
+
+			if ( vkEndCommandBuffer( commandBuffer ) != VK_SUCCESS )
+			{
+				Debug::Get() << Debug::Severity::error << "Could not record command buffer " << _index << "." << Debug::Endl();
+			}
+		}
+		else
+		{
+			Debug::Get() << Debug::Severity::error << "Could not record command buffer " << _index << "." << Debug::Endl();
+		}
 	}
 
 	//================================================================================================================================
@@ -600,6 +659,7 @@ namespace fan
 		m_debugLinesPipeline->ReloadShaders();
 		m_debugLinesPipelineNoDepthTest->ReloadShaders();
 		m_debugTrianglesPipeline->ReloadShaders();
+		m_uiPipeline->ReloadShaders();
 
 		RecordAllCommandBuffers();	
 	}	
@@ -890,6 +950,13 @@ namespace fan
 			return false;
 		}
 
+		m_uiCommandBuffers.resize( m_swapchain->GetSwapchainImagesCount() );
+		if ( vkAllocateCommandBuffers( m_device->vkDevice, &secondaryCommandBufferAllocateInfo, m_uiCommandBuffers.data() ) != VK_SUCCESS )
+		{
+			Debug::Error( "Could not allocate command buffers." );
+			return false;
+		}
+
 		m_postprocessCommandBuffers.resize(m_swapchain->GetSwapchainImagesCount());
 		if (vkAllocateCommandBuffers(m_device->vkDevice, &secondaryCommandBufferAllocateInfo, m_postprocessCommandBuffers.data()) != VK_SUCCESS) {
 			Debug::Error( "Could not allocate command buffers." );
@@ -984,72 +1051,6 @@ namespace fan
 	//================================================================================================================================
 	//================================================================================================================================
 	bool Renderer::CreateRenderPassPostprocess() {
-		VkAttachmentDescription colorAttachment;
-		colorAttachment.flags = 0;
-		colorAttachment.format = m_swapchain->GetSurfaceFormat().format;
-		colorAttachment.samples = VK_SAMPLE_COUNT_1_BIT;
-		colorAttachment.loadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
-		colorAttachment.storeOp = VK_ATTACHMENT_STORE_OP_STORE;
-		colorAttachment.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
-		colorAttachment.stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
-		colorAttachment.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
-		colorAttachment.finalLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR;
-
-		VkAttachmentReference colorAttachmentRef;
-		colorAttachmentRef.attachment = 0;
-		colorAttachmentRef.layout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
-
-		std::vector<VkAttachmentReference>   inputAttachments = {};
-		std::vector<VkAttachmentReference>   colorAttachments = { colorAttachmentRef };
-
-		VkSubpassDescription subpassDescription;
-		subpassDescription.flags = 0;
-		subpassDescription.pipelineBindPoint = VK_PIPELINE_BIND_POINT_GRAPHICS;
-		subpassDescription.inputAttachmentCount = static_cast<uint32_t>(inputAttachments.size());
-		subpassDescription.pInputAttachments = inputAttachments.data();
-		subpassDescription.colorAttachmentCount = static_cast<uint32_t>(colorAttachments.size());
-		subpassDescription.pColorAttachments = colorAttachments.data();
-		subpassDescription.pResolveAttachments = nullptr;
-		subpassDescription.pDepthStencilAttachment = nullptr;
-		subpassDescription.preserveAttachmentCount = 0;
-		subpassDescription.pPreserveAttachments = nullptr;
-
-		VkSubpassDependency dependency;
-		dependency.srcSubpass = 0;
-		dependency.dstSubpass = VK_SUBPASS_EXTERNAL;
-		dependency.srcStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
-		dependency.dstStageMask = VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT;
-		dependency.srcAccessMask = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
-		dependency.dstAccessMask = VK_ACCESS_SHADER_READ_BIT;
-		dependency.dependencyFlags = 0;
-
-		std::vector<VkAttachmentDescription> attachmentsDescriptions = { colorAttachment };
-		std::vector<VkSubpassDescription> subpassDescriptions = { subpassDescription };
-		std::vector<VkSubpassDependency> subpassDependencies = { dependency };
-
-		VkRenderPassCreateInfo renderPassCreateInfo;
-		renderPassCreateInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO;
-		renderPassCreateInfo.pNext = nullptr;
-		renderPassCreateInfo.flags = 0;
-		renderPassCreateInfo.attachmentCount = static_cast<uint32_t>(attachmentsDescriptions.size());
-		renderPassCreateInfo.pAttachments = attachmentsDescriptions.data();
-		renderPassCreateInfo.subpassCount = static_cast<uint32_t>(subpassDescriptions.size());;
-		renderPassCreateInfo.pSubpasses = subpassDescriptions.data();
-		renderPassCreateInfo.dependencyCount = static_cast<uint32_t>(subpassDependencies.size());;
-		renderPassCreateInfo.pDependencies = subpassDependencies.data();
-
-		if (vkCreateRenderPass(m_device->vkDevice, &renderPassCreateInfo, nullptr, &m_renderPassPostprocess) != VK_SUCCESS) {
-			Debug::Error( "Could not create render pass pp" );
-			return false;
-		}
-		Debug::Get() << Debug::Severity::log << std::hex << "VkRenderPass pp       " << m_renderPassPostprocess << std::dec << Debug::Endl();
-
-		return true;
-	}
-
-	//================================================================================================================================
-	//================================================================================================================================
-	bool Renderer::CreateRenderPassUI() {
 		VkAttachmentDescription colorAttachment;
 		colorAttachment.flags = 0;
 		colorAttachment.format = m_swapchain->GetSurfaceFormat().format;

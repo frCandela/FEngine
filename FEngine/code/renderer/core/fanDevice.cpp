@@ -166,7 +166,7 @@ namespace fan
 		VkPhysicalDeviceDescriptorIndexingFeaturesEXT indexingFeatures = {};
 		indexingFeatures.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DESCRIPTOR_INDEXING_FEATURES_EXT;
 		indexingFeatures.pNext = nullptr;
-		indexingFeatures.runtimeDescriptorArray = VK_TRUE;
+		//indexingFeatures.runtimeDescriptorArray = VK_TRUE;
 
 		VkDeviceCreateInfo deviceCreateInfo = {};
 		deviceCreateInfo.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
