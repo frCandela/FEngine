@@ -24,7 +24,7 @@ namespace fan
 	class UIPipeline : public Pipeline
 	{
 	public:
-		UIPipeline( Device& _device );
+		UIPipeline( Device& _device, DescriptorTextures*& _textures );
 		~UIPipeline() override;
 
 		void UpdateUniformBuffers( const size_t _index = 0 ) override;		
@@ -38,10 +38,8 @@ namespace fan
 		void ConfigurePipeline() override;
 
 	private:
-
-
 		Descriptor *			m_transformDescriptor = nullptr;
-		DescriptorTextures *	m_descriptorImageSampler = nullptr;
+		DescriptorTextures*&    m_textures;
 		Sampler *				m_sampler;
 	};
 }

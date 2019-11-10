@@ -10,8 +10,9 @@ namespace fan
 {
 	//================================================================================================================================
 	//================================================================================================================================
-	UIPipeline::UIPipeline( Device& _device ) :
+	UIPipeline::UIPipeline( Device& _device, DescriptorTextures*& _textures ) :
 		Pipeline( _device )
+		, m_textures( _textures )
 	{
 		m_sampler = new Sampler( m_device );
 		m_sampler->CreateSampler( 0, 8 );
@@ -33,7 +34,6 @@ namespace fan
 	{
 		delete m_sampler;
 		delete m_transformDescriptor;
-		delete m_descriptorImageSampler;
 	}
 
 	//================================================================================================================================
@@ -68,7 +68,8 @@ namespace fan
 		m_attributeDescriptions = UIVertex::GetAttributeDescriptions();
 		
 		m_descriptorSetLayouts = {
-			m_transformDescriptor->GetLayout()
+			 m_transformDescriptor->GetLayout()
+			,m_textures->GetLayout()
 		};
 	}
 
@@ -83,8 +84,6 @@ namespace fan
 	//================================================================================================================================
 	void UIPipeline::CreateDescriptors( const size_t _numSwapchainImages )
 	{
-		m_descriptorImageSampler = new DescriptorTextures( m_device, m_sampler->GetSampler(), 1 );
-
 		m_transformDescriptor = new Descriptor( m_device, _numSwapchainImages );
 		m_transformDescriptor->SetDynamicUniformBinding ( VK_SHADER_STAGE_VERTEX_BIT,	m_dynamicUniformsVert.Size(), m_dynamicUniformsVert.Alignment() );
 		m_transformDescriptor->Create();

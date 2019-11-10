@@ -19,12 +19,13 @@ namespace fan
 {
 	//================================================================================================================================
 	//================================================================================================================================
-	ForwardPipeline::ForwardPipeline(Device& _device ) :
+	ForwardPipeline::ForwardPipeline(Device& _device, DescriptorTextures*& _textures  ) :
 		Pipeline(_device)
-		, m_sceneDescriptor(nullptr){
+		, m_sceneDescriptor(nullptr)
+		, m_textures(_textures){
 
-		m_sampler = new Sampler( m_device );
-		m_sampler->CreateSampler( 0, 8 );
+
+
 
 		// Calculate required alignment based on minimum device offset alignment
 		size_t minUboAlignment = m_device.GetDeviceProperties().limits.minUniformBufferOffsetAlignment;
@@ -50,9 +51,7 @@ namespace fan
 	//================================================================================================================================
 	//================================================================================================================================
 	ForwardPipeline::~ForwardPipeline() {
-		delete m_texturesDescriptor;
 		delete m_sceneDescriptor;
-		delete m_sampler;
 	}
 
 	//================================================================================================================================
@@ -75,9 +74,6 @@ namespace fan
 		m_sceneDescriptor->SetDynamicUniformBinding ( VK_SHADER_STAGE_FRAGMENT_BIT, m_dynamicUniformsMaterial.Size(), m_dynamicUniformsMaterial.Alignment() );
 		m_sceneDescriptor->SetUniformBinding		( VK_SHADER_STAGE_FRAGMENT_BIT, sizeof( LightsUniforms ) );
 		m_sceneDescriptor->Create();
-
-		CreateTextureDescriptor();
-
 	}
 
 	//================================================================================================================================
@@ -90,30 +86,13 @@ namespace fan
 		m_sceneDescriptor->Update();
 	}
 
-	//================================================================================================================================
-	//================================================================================================================================
-	bool ForwardPipeline::CreateTextureDescriptor() {
-		delete m_texturesDescriptor;
 
-		const std::vector< Texture * > & texture = m_ressourceManager->GetTextures();
-		m_texturesDescriptor = new  DescriptorTextures( m_device, m_sampler->GetSampler(), static_cast<uint32_t>(  texture.size() ));		
-
-		std::vector< VkImageView > imageViews( texture.size() );
-		for ( int textureIndex = 0; textureIndex < texture.size(); textureIndex++ )
-		{
-			m_texturesDescriptor->Append( texture[textureIndex]->GetImageView() );
-		}
-
-		m_texturesDescriptor->UpdateRange( 0, m_texturesDescriptor->Count() - 1 );
-
-		return true;
-	}
 
 	//================================================================================================================================
 	//================================================================================================================================
 	void ForwardPipeline::ReloadShaders() {
 		Pipeline::ReloadShaders();
-		CreateTextureDescriptor();
+		
 	}
 
 	//================================================================================================================================
@@ -126,27 +105,7 @@ namespace fan
 		m_sceneDescriptor->SetBinding( 4, _index, &m_lightUniforms,				sizeof( LightsUniforms ),				0 );
 	}
 
-	//================================================================================================================================
-	//================================================================================================================================
-	void ForwardPipeline::BindTexture( VkCommandBuffer _commandBuffer, const uint32_t _textureIndex )
-	{
-		assert( _textureIndex < m_texturesDescriptor->Count() );
 
-		std::vector<VkDescriptorSet> descriptors = {
-			 m_texturesDescriptor->GetSet( _textureIndex )
-		};
-
-		vkCmdBindDescriptorSets(
-			_commandBuffer,
-			VK_PIPELINE_BIND_POINT_GRAPHICS,
-			m_pipelineLayout,
-			1,
-			static_cast<uint32_t>( descriptors.size() ),
-			descriptors.data(),
-			0,
-			nullptr			
-		);
-	}
 
 	//================================================================================================================================
 	//================================================================================================================================
@@ -178,7 +137,7 @@ namespace fan
 		m_attributeDescriptions = Vertex::GetAttributeDescriptions();
 		m_descriptorSetLayouts = {
 			m_sceneDescriptor->GetLayout()
-			, m_texturesDescriptor->GetLayout()
+			, m_textures->GetLayout()
 		};
 	}
 }

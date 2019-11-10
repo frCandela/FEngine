@@ -89,28 +89,23 @@ namespace fan
 		VertUniforms	m_vertUniforms;
 		FragUniforms	m_fragUniforms;
 
-		ForwardPipeline( Device& _device );
+		ForwardPipeline( Device& _device, DescriptorTextures*& _textures );
 		~ForwardPipeline() override;
 
 		void Resize( const VkExtent2D _extent ) override;
-		void BindDescriptors( VkCommandBuffer _commandBuffer, const size_t _indexFrame, const uint32_t _indexOffset );
-		void BindTexture( VkCommandBuffer _commandBuffer, const uint32_t _textureIndex );
+		void BindDescriptors( VkCommandBuffer _commandBuffer, const size_t _indexFrame, const uint32_t _indexOffset );		
 		void UpdateUniformBuffers( const size_t _index = 0 ) override;
 		void CreateDescriptors( const size_t _numSwapchainImages, RessourceManager * const _ressourceManager );
 		void ResizeDynamicDescriptors ( const size_t _newSize );
-		void ReloadShaders() override;
-		bool CreateTextureDescriptor();
+		void ReloadShaders() override;		
 
 	protected:
 		void ConfigurePipeline() override;
 
 	private:
 		Descriptor *		 m_sceneDescriptor;
-		DescriptorTextures * m_texturesDescriptor;
-
-		Sampler *			m_sampler = nullptr;
 		RessourceManager *	m_ressourceManager = nullptr;
 
-
+		DescriptorTextures*& m_textures;
 	};
 }

@@ -20,6 +20,7 @@ namespace fan {
 		virtual void UpdateUniformBuffers( const size_t _index ) = 0;
 
 		VkPipeline	GetPipeline() { return m_pipeline; }
+		VkPipelineLayout	GetLayout() { return m_pipelineLayout; }
 
 	protected:	
 		Device&	m_device;
