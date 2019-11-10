@@ -9,7 +9,7 @@ namespace fan {
 	const char * ecsMovement::s_name	= "Movement   ";
 	const char * ecsParticle::s_name	= "Particle   ";
 	const char * ecsAABB::s_name		= "AABB       ";
-	const char * ecsMesh::s_name		= "Model      ";
+	const char * ecsMesh::s_name		= "Mesh       ";
 	const char * ecsPointLight::s_name	= "PointLight ";
 	const char * ecsDirLight::s_name	= "DirLight   ";
 	const char * ecsMaterial::s_name	= "Material   ";

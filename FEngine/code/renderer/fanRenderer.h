@@ -35,10 +35,21 @@ namespace fan
 		uint32_t textureIndex;
 	};
 
+	struct DrawUIMesh {
+		UIMesh * mesh;
+	};
+
 	// Used to batch rendering
 	struct DrawData
 	{
 		Mesh * mesh;
+		uint32_t textureIndex;
+	};
+
+	// Used to batch rendering
+	struct UIDrawData
+	{
+		UIMesh * mesh;
 		uint32_t textureIndex;
 	};
 
@@ -74,6 +85,7 @@ namespace fan
 		void SetPointLight( const int _index, const glm::vec3 _position, const glm::vec3 _diffuse, const glm::vec3 _specular, const glm::vec3 _ambiant, const glm::vec3 _constantLinearQuadratic );
 		void SetNumPointLights( const uint32_t _num );
 		void SetDrawData( const std::vector<DrawMesh> & _drawData );
+		void SetUIDrawData( const std::vector<DrawUIMesh> & _drawData );
 
 		float GetWindowAspectRatio() const;
 		bool  HasNoDebugToDraw() const { return m_debugLinesNoDepthTest.empty() && m_debugLines.empty() && m_debugTriangles.empty(); }
@@ -93,6 +105,7 @@ namespace fan
 
 	private:
 		std::vector< DrawData > m_meshDrawArray;
+		std::vector< UIDrawData > m_uiMeshDrawArray;
 
 		RessourceManager *  m_ressourceManager;
 

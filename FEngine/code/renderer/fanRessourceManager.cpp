@@ -5,6 +5,7 @@
 #include "renderer/core/fanTexture.h"
 #include "renderer/core/fanBuffer.h"
 #include "renderer/fanMesh.h"
+#include "renderer/fanUIMesh.h"
 #include "core/fanSignal.h"
 #include "scene/fanGameobject.h"
 
@@ -85,6 +86,15 @@ namespace fan
 		_mesh->GenerateBuffers( m_device );
 	}
 
+
+
+	//================================================================================================================================
+	//================================================================================================================================
+	void RessourceManager::OnLoadUIMesh( UIMesh * _mesh )
+	{
+		_mesh->GenerateBuffers( m_device );
+	}
+
 	//================================================================================================================================
 	//================================================================================================================================
 	Mesh * RessourceManager::FindMesh(const std::string _path) {
@@ -103,5 +113,12 @@ namespace fan
 	void  RessourceManager::RegisterMesh(Mesh * _mesh) {
 		m_meshList.insert( _mesh );
 		_mesh->GenerateBuffers( m_device);
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
+	void RessourceManager::RegisterUIMesh( UIMesh * _mesh )
+	{
+		m_uiMeshList.insert( _mesh );
 	}
 }

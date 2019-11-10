@@ -13,16 +13,6 @@ namespace fan
 	{
 		m_sampler = new Sampler( m_device );
 		m_sampler->CreateSampler( 0, 8 );
-
-		m_testUiMesh = new UIMesh();
-		std::vector<UIVertex> vertices = {
-			 UIVertex(glm::vec2(0.f, -0.5f ))
-			,UIVertex(glm::vec2(0.5f, 0.5f ))
-			,UIVertex(glm::vec2(-0.5f, 0.5f ))
-		};
-
-		m_testUiMesh->LoadFromVertices(vertices);
-		m_testUiMesh->GenerateBuffers(_device);
 	}
 
 	//================================================================================================================================
@@ -31,7 +21,6 @@ namespace fan
 	{
 		delete m_sampler;
 		delete m_descriptorImageSampler;
-		delete m_testUiMesh;
 	}
 
 	//================================================================================================================================
@@ -59,8 +48,6 @@ namespace fan
 	//================================================================================================================================
 	void UIPipeline::ConfigurePipeline()
 	{
-		m_rasterizationStateCreateInfo.cullMode = VK_CULL_MODE_NONE;
-
 		m_bindingDescription = UIVertex::GetBindingDescription();
 		m_attributeDescriptions = UIVertex::GetAttributeDescriptions();
 		

@@ -49,7 +49,7 @@ namespace fan
 	{
 		if ( m_vertices.empty() ) { return; }
 
-		m_currentBuffer = 0;//( m_currentBuffer + 1 ) % 3;
+		m_currentBuffer = ( m_currentBuffer + 1 ) % 3;
 
 		const VkMemoryPropertyFlags memPropertyFlags = ( m_hostVisible ?
 			VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT :

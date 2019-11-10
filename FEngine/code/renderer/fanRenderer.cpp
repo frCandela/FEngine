@@ -315,6 +315,17 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
+	void Renderer::SetUIDrawData( const std::vector<DrawUIMesh> & _drawData )
+	{
+		m_uiMeshDrawArray.resize( _drawData.size() );
+		for (int meshIndex = 0; meshIndex < _drawData.size() ; meshIndex++)
+		{
+			m_uiMeshDrawArray[meshIndex].mesh = _drawData[meshIndex].mesh;
+		}
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
 	void Renderer::RecordAllCommandBuffers() {
 		for ( size_t cmdBufferIndex = 0; cmdBufferIndex < m_imguiCommandBuffers.size(); cmdBufferIndex++) {
 			RecordCommandBufferImgui(cmdBufferIndex);
@@ -464,10 +475,16 @@ namespace fan
 		{
 			m_uiPipeline->Bind( commandBuffer, _index );
 			m_uiPipeline->BindDescriptors( commandBuffer, _index, 0 );
-			VkBuffer vertexBuffers[] = { m_uiPipeline->m_testUiMesh->GetVertexBuffer()->GetBuffer() };
+			
 			VkDeviceSize offsets[] = { 0 };
-			vkCmdBindVertexBuffers( commandBuffer, 0, 1, vertexBuffers, offsets );
-			vkCmdDraw( commandBuffer, static_cast<uint32_t>(  m_uiPipeline->m_testUiMesh->GetVertices().size() ), 1, 0, 0 );		
+
+
+			for ( uint32_t meshIndex = 0; meshIndex < m_uiMeshDrawArray.size(); meshIndex++ ) {
+				UIMesh * mesh = m_uiMeshDrawArray[meshIndex].mesh;
+				VkBuffer vertexBuffers[] = { mesh->GetVertexBuffer()->GetBuffer() };
+				vkCmdBindVertexBuffers( commandBuffer, 0, 1, vertexBuffers, offsets );
+				vkCmdDraw( commandBuffer, static_cast<uint32_t>( mesh->GetVertices().size() ), 1, 0, 0 );
+			}
 
 			if ( vkEndCommandBuffer( commandBuffer ) != VK_SUCCESS )
 			{

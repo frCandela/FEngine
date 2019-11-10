@@ -20,9 +20,6 @@ namespace fan
 		void UpdateUniformBuffers( const size_t _index = 0 ) override;		
 		void CreateDescriptors( const size_t _numSwapchainImages );
 		void BindDescriptors( VkCommandBuffer _commandBuffer, const size_t _indexFrame, const uint32_t _indexOffset );
-
-		UIMesh * m_testUiMesh;
-
 	protected:
 		void ConfigurePipeline() override;
 

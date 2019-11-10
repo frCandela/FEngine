@@ -8,6 +8,7 @@
 #include "renderer/fanMesh.h"
 #include "renderer/util/fanWindow.h"
 #include "renderer/core/fanTexture.h"
+#include "renderer/fanUIMesh.h"
 #include "core/time/fanTime.h"
 #include "core/input/fanInput.h"
 #include "core/input/fanKeyboard.h"
@@ -43,6 +44,7 @@
 #include "scene/components/fanDirectionalLight.h"
 #include "scene/components/fanRigidbody.h"
 #include "scene/components/fanSphereShape.h"
+#include "scene/components/fanUIMeshRenderer.h"
 #include "core/math/shapes/fanConvexHull.h"
 #include "core/time/fanProfiler.h"
 #include "ecs/fanECSManager.h"
@@ -133,7 +135,9 @@ namespace fan {
 		// Static messages		
 		Material::onMaterialSetPath.Connect		( &Engine::OnMaterialSetTexture, this );
 		Mesh::s_onMeshLoad.Connect				( &RessourceManager::OnLoadMesh, m_renderer->GetRessourceManager() );
-		Mesh::s_onMeshDelete.Connect			( &Renderer::WaitIdle, m_renderer );
+		Mesh::s_onMeshDelete.Connect			( &Renderer::WaitIdle, m_renderer ); // hack
+		UIMesh::s_onMeshLoad.Connect			( &RessourceManager::OnLoadUIMesh, m_renderer->GetRessourceManager() );
+		UIMesh::s_onMeshDelete.Connect			( &Renderer::WaitIdle, m_renderer ); // hack
 		MeshRenderer::onMeshRendererSetPath.Connect			( &Engine::OnMeshRendererSetPath,		 this );
 		MeshRenderer::onRegisterMeshRenderer.Connect			( &Engine::RegisterMeshRenderer,		 this );
 		MeshRenderer::onUnRegisterMeshRenderer.Connect		( &Engine::UnRegisterMeshRenderer,		 this );
@@ -498,6 +502,23 @@ namespace fan {
 			}
 		}
 		m_renderer->SetDrawData(drawData);
+
+		// UI
+		std::vector< UIMeshRenderer* > uiRenderers = m_scene->FindComponentsOfType<UIMeshRenderer>();
+		std::vector<DrawUIMesh> uiDrawData;
+		uiDrawData.reserve( uiRenderers.size() );
+		for (int meshIndex = 0; meshIndex < uiRenderers.size() ; meshIndex++)
+		{
+			UIMeshRenderer* meshRenderer = uiRenderers[meshIndex];
+			if ( meshRenderer->GetMesh()->GetVertices().size() > 0 )
+			{
+				DrawUIMesh uiMesh;
+				uiMesh.mesh = meshRenderer->GetMesh();
+				uiDrawData.push_back(uiMesh);
+			}
+		}
+		m_renderer->SetUIDrawData(uiDrawData);
+
 	}
 
 	//================================================================================================================================

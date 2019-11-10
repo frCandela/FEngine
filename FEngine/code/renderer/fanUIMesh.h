@@ -24,13 +24,12 @@ namespace fan
 
 		std::vector<UIVertex> &			GetVertices() { return m_vertices; }
 		const std::vector<UIVertex> &	GetVertices() const { return m_vertices; }
-		Buffer *						GetVertexBuffer() { return m_vertexBuffer[0/*m_currentBuffer*/]; }
+		Buffer *						GetVertexBuffer() { return m_vertexBuffer[m_currentBuffer]; }
 
 		// Useful when the mesh changes very often
 		void SetHostVisible( const bool _hostVisible ){ m_hostVisible = _hostVisible; } 
-
 		void GenerateBuffers( Device & _device );
-		bool Load();
+		
 		bool LoadFromVertices( const std::vector<UIVertex>&	_vertices );
 		DECLARE_TYPE_INFO( UIMesh, void )
 	private:
@@ -40,5 +39,7 @@ namespace fan
 
 		uint32_t m_currentBuffer = 0;
 		Buffer * m_vertexBuffer[3];
+
+
 	};
 }

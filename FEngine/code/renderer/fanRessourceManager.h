@@ -3,6 +3,7 @@
 namespace fan
 {
 	class Mesh;
+	class UIMesh;
 	class Texture;
 	class Device;
 	class Buffer;
@@ -19,10 +20,12 @@ namespace fan
 		// Mesh management
 		Mesh *						LoadMesh( const std::string _path );
 		void						OnLoadMesh( Mesh * _mesh );
+		void						OnLoadUIMesh( UIMesh * _mesh );
 		Mesh *						FindMesh( const std::string _path );
 		void						SetDefaultMesh( const Mesh * _defaultMesh ) { m_defaultMesh = _defaultMesh; }
 		const std::set< Mesh * >&	GetMeshList() const { return m_meshList; }
 		void						RegisterMesh( Mesh * _mesh );
+		void						RegisterUIMesh( UIMesh * _mesh );
 
 		// Texture management
 		Texture *							LoadTexture(const std::string _path);
@@ -38,6 +41,7 @@ namespace fan
 		Device & m_device;
 
 		std::set< Mesh * >		 m_meshList;
+		std::set< UIMesh * >	 m_uiMeshList;
 		const Mesh *			 m_defaultMesh = nullptr;
 		std::vector< Texture * > m_textures;
 		bool					 m_modified = false;

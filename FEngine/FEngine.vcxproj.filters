@@ -403,6 +403,9 @@
     <ClCompile Include="code\scene\components\fanMeshRenderer.cpp">
       <Filter>code\scene\components</Filter>
     </ClCompile>
+    <ClCompile Include="code\scene\components\fanUIMeshRenderer.cpp">
+      <Filter>code\scene\components</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="code\editor\fanMainMenuBar.h">
@@ -1285,6 +1288,9 @@
       <Filter>code\renderer</Filter>
     </ClInclude>
     <ClInclude Include="code\scene\components\fanMeshRenderer.h">
+      <Filter>code\scene\components</Filter>
+    </ClInclude>
+    <ClInclude Include="code\scene\components\fanUIMeshRenderer.h">
       <Filter>code\scene\components</Filter>
     </ClInclude>
   </ItemGroup>
