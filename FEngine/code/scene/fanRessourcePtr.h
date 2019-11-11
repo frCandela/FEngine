@@ -6,7 +6,6 @@ namespace fan
 	class Texture;
 
 	//================================================================================================================================
-	// A gameobject pointer is used to reference a gameobject using a pointer and a id that can be serialized
 	//================================================================================================================================
 	template< typename _RessourceType, typename _IDType >
 	class RessourcePtr
@@ -67,9 +66,9 @@ namespace fan
 	using TexturePtr = RessourcePtr<Texture, std::string >;
 }
 
-
-
-
+//================================================================================================================================
+// ImGui bindings
+//================================================================================================================================
 namespace ImGui
 {
 	void InputGameobject( const char * _label, fan::GameobjectPtr * _ptr );

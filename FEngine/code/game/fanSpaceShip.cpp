@@ -108,24 +108,24 @@ namespace fan {
 	void SpaceShip::OnGui() {
 		Actor::OnGui();
 
-		float width = ImGui::GetWindowWidth();
-		ImGui::PushItemWidth(0.5f *width );
-
-		ImGui::DragFloat( "reverse force", &m_forwardForces[SpeedMode::REVERSE], 1.f, 0.f, 100000.f );
-		ImGui::DragFloat( "slow forward force", &m_forwardForces[SpeedMode::SLOW], 1.f, 0.f, 100000.f );
-		ImGui::DragFloat( "normal forward force", &m_forwardForces[SpeedMode::NORMAL], 1.f, 0.f, 100000.f);
-		ImGui::DragFloat( "fast forward force", &m_forwardForces[SpeedMode::FAST], 1.f, 0.f, 100000.f );
-		ImGui::DragFloat( "lateral force", &m_lateralForce, 1.f, 0.f, 100000.f );
-		ImGui::DragFloat( "active drag", &m_activeDrag, 0.001f, 0.f, 1.f );
-		ImGui::DragFloat( "passive drag", &m_passiveDrag, 0.001f, 0.f, 1.f );
-		ImGui::DragFloat( "energyConsumedPerUnitOfForce", &m_energyConsumedPerUnitOfForce, 0.0001f, 0.f, 1.f );
-		ImGui::InputGameobject( "fast forward particles", &m_fastForwardParticlesGo );
-		ImGui::InputGameobject( "slow forward particles", &m_slowForwardParticlesGo );
-		ImGui::InputGameobject( "reverse particles", &m_reverseParticlesGo );
-		ImGui::InputGameobject( "left particles", &m_leftParticlesGo );
-		ImGui::InputGameobject( "right particles", &m_rightParticlesGo );
-	
-		ImGui::PopItemWidth();
+		//float width = ImGui::GetWindowWidth();
+	//	ImGui::PushItemWidth(0.5f *width ); 
+		{
+			ImGui::DragFloat( "reverse force", &m_forwardForces[SpeedMode::REVERSE], 1.f, 0.f, 100000.f );
+			ImGui::DragFloat( "slow forward force", &m_forwardForces[SpeedMode::SLOW], 1.f, 0.f, 100000.f );
+			ImGui::DragFloat( "normal forward force", &m_forwardForces[SpeedMode::NORMAL], 1.f, 0.f, 100000.f );
+			ImGui::DragFloat( "fast forward force", &m_forwardForces[SpeedMode::FAST], 1.f, 0.f, 100000.f );
+			ImGui::DragFloat( "lateral force", &m_lateralForce, 1.f, 0.f, 100000.f );
+			ImGui::DragFloat( "active drag", &m_activeDrag, 0.001f, 0.f, 1.f );
+			ImGui::DragFloat( "passive drag", &m_passiveDrag, 0.001f, 0.f, 1.f );
+			ImGui::DragFloat( "energyConsumedPerUnitOfForce", &m_energyConsumedPerUnitOfForce, 0.0001f, 0.f, 1.f );
+			ImGui::InputGameobject( "fast forward particles", &m_fastForwardParticlesGo );
+			ImGui::InputGameobject( "slow forward particles", &m_slowForwardParticlesGo );
+			ImGui::InputGameobject( "reverse particles", &m_reverseParticlesGo );
+			ImGui::InputGameobject( "left particles", &m_leftParticlesGo );
+			ImGui::InputGameobject( "right particles", &m_rightParticlesGo );	
+		} 
+		//ImGui::PopItemWidth();
 	}
 
 	//================================================================================================================================

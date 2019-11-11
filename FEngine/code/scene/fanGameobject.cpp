@@ -308,36 +308,3 @@ namespace fan
 		return true;
 	}
 }
-
-namespace ImGui
-{
-	//================================================================================================================================
-	//================================================================================================================================
-	void BeginDragDropSourceGameobject( fan::Gameobject * _gameobject, ImGuiDragDropFlags _flags )
-	{		
-		if ( ImGui::BeginDragDropSource( _flags ) && _gameobject != nullptr )
-		{
-			ImGui::SetDragDropPayload( "dragndrop_gameobject", &_gameobject, sizeof( fan::Gameobject** ) );
-			ImGui::Icon( ImGui::IconType::GAMEOBJECT16, { 16,16 } ); ImGui::SameLine();
-			ImGui::Text( ( _gameobject->GetName() ).c_str() );
-			ImGui::EndDragDropSource();
-		}
-	}
-
-	//================================================================================================================================
-	//================================================================================================================================
-	fan::Gameobject * BeginDragDropTargetGameobject()
-	{
-		fan::Gameobject * gameobject = nullptr;
-		if ( ImGui::BeginDragDropTarget() )
-		{
-			if ( const ImGuiPayload* payload = ImGui::AcceptDragDropPayload( "dragndrop_gameobject" ) )
-			{
-				assert( payload->DataSize == sizeof( fan::Gameobject** ) );
-				gameobject = *( fan::Gameobject** )payload->Data;
-			}
-			ImGui::EndDragDropTarget();
-		}
-		return gameobject;
-	}
-}

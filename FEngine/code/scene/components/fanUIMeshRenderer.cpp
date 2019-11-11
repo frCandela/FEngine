@@ -54,9 +54,15 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	bool UIMeshRenderer::Load( Json & /*_json*/ )
+	bool UIMeshRenderer::Load( Json & _json )
 	{
+		LoadColor(  _json, "color",			m_color);
 
+		std::string tmpString;
+		if ( LoadString( _json, "texture_path", tmpString ) )
+		{
+			m_texture.InitUnresolved(tmpString);
+		}
 		return true;
 	}
 
@@ -66,6 +72,8 @@ namespace fan
 	{
 		Component::Save( _json );
 
+		SaveColor( _json, "color", m_color );
+		SaveString( _json, "texture_path", *m_texture != nullptr ? m_texture->GetPath() : "" );
 
 		return true;
 	}

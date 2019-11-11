@@ -173,10 +173,3 @@ namespace fan
 		}
 	}
 }
-
-namespace ImGui
-{
-	void				BeginDragDropSourceGameobject( fan::Gameobject * _gameobject, ImGuiDragDropFlags _flags = ImGuiDragDropFlags_None );
-	fan::Gameobject *	BeginDragDropTargetGameobject( );
-
-}

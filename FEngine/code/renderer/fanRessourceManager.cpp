@@ -55,6 +55,11 @@ namespace fan
 			m_textures.push_back(texture);
 			m_modified = true;
 		}
+		else
+		{
+			delete texture;
+			texture = nullptr;
+		}
 
 		return texture;
 	}
