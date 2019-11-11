@@ -8,9 +8,9 @@ namespace fan
 
 namespace ImGui
 {
-	void				BeginDragDropSourceGameobject( fan::Gameobject * _gameobject, ImGuiDragDropFlags _flags = ImGuiDragDropFlags_None );
-	fan::Gameobject *	BeginDragDropTargetGameobject();
+	void				FanBeginDragDropSourceGameobject( fan::Gameobject * _gameobject, ImGuiDragDropFlags _flags = ImGuiDragDropFlags_None );
+	fan::Gameobject *	FanBeginDragDropTargetGameobject();
 
-	void			BeginDragDropSourceTexture( fan::Texture * _texture, ImGuiDragDropFlags _flags = ImGuiDragDropFlags_None );
-	fan::Texture *	BeginDragDropTargetTexture();
+	void				FanBeginDragDropSourceTexture( fan::Texture * _texture, ImGuiDragDropFlags _flags = ImGuiDragDropFlags_None );
+	fan::Texture *		FanBeginDragDropTargetTexture();
 }

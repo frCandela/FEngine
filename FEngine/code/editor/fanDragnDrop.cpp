@@ -9,7 +9,7 @@ namespace ImGui
 {
 	//================================================================================================================================
 	//================================================================================================================================
-	void BeginDragDropSourceGameobject( fan::Gameobject * _gameobject, ImGuiDragDropFlags _flags )
+	void FanBeginDragDropSourceGameobject( fan::Gameobject * _gameobject, ImGuiDragDropFlags _flags )
 	{
 		if ( _gameobject != nullptr )
 		{
@@ -26,7 +26,7 @@ namespace ImGui
 
 	//================================================================================================================================
 	//================================================================================================================================
-	fan::Gameobject * BeginDragDropTargetGameobject()
+	fan::Gameobject * FanBeginDragDropTargetGameobject()
 	{
 		fan::Gameobject * gameobject = nullptr;
 		if ( ImGui::BeginDragDropTarget() )
@@ -43,7 +43,7 @@ namespace ImGui
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void BeginDragDropSourceTexture( fan::Texture * _texture, ImGuiDragDropFlags _flags )
+	void FanBeginDragDropSourceTexture( fan::Texture * _texture, ImGuiDragDropFlags _flags )
 	{
 		if ( _texture != nullptr )
 		{
@@ -59,7 +59,7 @@ namespace ImGui
 
 	//================================================================================================================================
 	//================================================================================================================================
-	fan::Texture * BeginDragDropTargetTexture()
+	fan::Texture * FanBeginDragDropTargetTexture()
 	{
 		fan::Texture * _texture = nullptr;
 		if ( ImGui::BeginDragDropTarget() )

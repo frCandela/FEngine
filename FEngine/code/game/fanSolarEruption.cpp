@@ -144,10 +144,10 @@ namespace fan {
 
 		// Colors
 		ImGui::Spacing();
-		if ( ImGui::ColorEdit4( "base ", m_baseColor.Data(), gui::colorEditFlags ) ) {
+		if ( ImGui::ColorEdit4( "base ", m_baseColor.Data(), ImGui::fanColorEditFlags ) ) {
 			m_material->SetColor( m_baseColor );
 		}
-		ImGui::ColorEdit4( "explositon ", m_explositonColor.Data(), gui::colorEditFlags );
+		ImGui::ColorEdit4( "explositon ", m_explositonColor.Data(), ImGui::fanColorEditFlags );
 
 		// Test
 		ImGui::Spacing();

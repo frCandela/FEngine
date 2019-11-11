@@ -71,6 +71,6 @@ namespace fan
 //================================================================================================================================
 namespace ImGui
 {
-	void InputGameobject( const char * _label, fan::GameobjectPtr * _ptr );
-	void InputTexture( const char * _label, fan::TexturePtr * _ptr );
+	void FanGameobject( const char * _label, fan::GameobjectPtr * _ptr );
+	void FanTexture( const char * _label, fan::TexturePtr * _ptr );
 }

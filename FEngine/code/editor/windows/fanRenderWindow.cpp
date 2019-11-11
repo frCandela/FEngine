@@ -68,7 +68,7 @@ namespace fan
 				DirectionalLightUniform light  = lights.dirLights[lightIndex];
 				ImGui::DragFloat3("dir ", &light.direction[0] );
 				ImGui::SameLine();
-				ImGui::ColorEdit3( "diffuse", &light.diffuse[0], gui::colorEditFlags );
+				ImGui::ColorEdit3( "diffuse", &light.diffuse[0], ImGui::fanColorEditFlags );
 			}
 			ImGui::PopItemWidth();
 		}
@@ -78,7 +78,7 @@ namespace fan
 				PointLightUniform& light = lights.pointlights[lightIndex];
 				ImGui::DragFloat3( "pos ##pos", &light.position[0] );
 				ImGui::SameLine();
-				ImGui::ColorEdit3( "diffuse", &light.diffuse[0], gui::colorEditFlags );				
+				ImGui::ColorEdit3( "diffuse", &light.diffuse[0], ImGui::fanColorEditFlags );				
 			}
 			ImGui::PopItemWidth();
 		}

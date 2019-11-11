@@ -119,11 +119,11 @@ namespace fan {
 			ImGui::DragFloat( "active drag", &m_activeDrag, 0.001f, 0.f, 1.f );
 			ImGui::DragFloat( "passive drag", &m_passiveDrag, 0.001f, 0.f, 1.f );
 			ImGui::DragFloat( "energyConsumedPerUnitOfForce", &m_energyConsumedPerUnitOfForce, 0.0001f, 0.f, 1.f );
-			ImGui::InputGameobject( "fast forward particles", &m_fastForwardParticlesGo );
-			ImGui::InputGameobject( "slow forward particles", &m_slowForwardParticlesGo );
-			ImGui::InputGameobject( "reverse particles", &m_reverseParticlesGo );
-			ImGui::InputGameobject( "left particles", &m_leftParticlesGo );
-			ImGui::InputGameobject( "right particles", &m_rightParticlesGo );	
+			ImGui::FanGameobject( "fast forward particles", &m_fastForwardParticlesGo );
+			ImGui::FanGameobject( "slow forward particles", &m_slowForwardParticlesGo );
+			ImGui::FanGameobject( "reverse particles", &m_reverseParticlesGo );
+			ImGui::FanGameobject( "left particles", &m_leftParticlesGo );
+			ImGui::FanGameobject( "right particles", &m_rightParticlesGo );	
 		} 
 		//ImGui::PopItemWidth();
 	}

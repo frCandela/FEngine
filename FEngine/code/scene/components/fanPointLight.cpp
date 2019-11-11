@@ -81,16 +81,16 @@ namespace fan
 
 		// Filter color
 		if (ImGui::Button("##ambiant")) { SetAmbiant(Color(0.0f)); } ImGui::SameLine();
-		if (ImGui::ColorEdit3("ambiant", m_pointLight->ambiant.Data(), gui::colorEditFlags)) { m_gameobject->AddFlag( Gameobject::Flag::OUTDATED_LIGHT ); }
+		if (ImGui::ColorEdit3("ambiant", m_pointLight->ambiant.Data(), ImGui::fanColorEditFlags)) { m_gameobject->AddFlag( Gameobject::Flag::OUTDATED_LIGHT ); }
 		if (ImGui::Button("##diffuse")) { SetDiffuse(Color::White); } ImGui::SameLine();
-		if (ImGui::ColorEdit3("diffuse", m_pointLight->diffuse.Data(), gui::colorEditFlags)) { m_gameobject->AddFlag( Gameobject::Flag::OUTDATED_LIGHT ); }
+		if (ImGui::ColorEdit3("diffuse", m_pointLight->diffuse.Data(), ImGui::fanColorEditFlags)) { m_gameobject->AddFlag( Gameobject::Flag::OUTDATED_LIGHT ); }
 		if (ImGui::Button("##specular")) { SetSpecular(Color::White); } ImGui::SameLine();
-		if (ImGui::ColorEdit3("specular", m_pointLight->specular.Data(), gui::colorEditFlags)) { m_gameobject->AddFlag( Gameobject::Flag::OUTDATED_LIGHT ); }
+		if (ImGui::ColorEdit3("specular", m_pointLight->specular.Data(), ImGui::fanColorEditFlags)) { m_gameobject->AddFlag( Gameobject::Flag::OUTDATED_LIGHT ); }
 		// Attenuation
 		
 		ImGui::Text("attenuation :");  
 		ImGui::SameLine();  
-		gui::ShowHelpMarker(
+		ImGui::FanShowHelpMarker(
 			"Light intensity fades out with distance \n"
 			"Fadings follows the following formula : \n"
 			"constant + linear * d + quadratic * d*d  \n"

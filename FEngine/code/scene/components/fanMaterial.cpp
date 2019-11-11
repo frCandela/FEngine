@@ -79,13 +79,13 @@ namespace fan
 
 		// Filter color
 		if ( ImGui::Button( "##color" ) ) { SetColor( Color::White ); } ImGui::SameLine();
-		if ( ImGui::ColorEdit4( "color", m_material->color.Data(), gui::colorEditFlags ) ) { m_gameobject->AddFlag( Gameobject::Flag::OUTDATED_MATERIAL ); }
+		if ( ImGui::ColorEdit4( "color", m_material->color.Data(), ImGui::fanColorEditFlags ) ) { m_gameobject->AddFlag( Gameobject::Flag::OUTDATED_MATERIAL ); }
 
 		if ( ImGui::Button( "##shininess" ) ) { SetShininess( 1 ); } ImGui::SameLine();
 		if( ImGui::DragInt("shininess", (int*)&m_material->shininess, 1, 1, 256 )) { m_gameobject->AddFlag( Gameobject::Flag::OUTDATED_MATERIAL ); }
-		ImGui::SameLine(); gui ::ShowHelpMarker("sharpness of the specular reflection");
+		ImGui::SameLine(); ImGui ::FanShowHelpMarker("sharpness of the specular reflection");
 
-		ImGui::InputTexture("mat texture",& m_material->texture);
+		ImGui::FanTexture("mat texture",& m_material->texture);
 	}
 
 	//================================================================================================================================

@@ -91,7 +91,7 @@ namespace fan
 			m_pathBuffer = "content/models";
 		}
 
-		if (gui::LoadFileModal("set_path", GlobalValues::s_meshExtensions, m_pathBuffer)) {
+		if (ImGui::FanLoadFileModal("set_path", GlobalValues::s_meshExtensions, m_pathBuffer)) {
 			onMeshRendererSetPath.Emmit( this, m_pathBuffer.string() );
 		}
 

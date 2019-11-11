@@ -145,7 +145,7 @@ namespace fan
 		bool isOpen = ImGui::TreeNode(ss.str().c_str());
 
 		// Gameobject dragndrop target empty selectable -> place dragged below
-		Gameobject * gameobjectDrop1 = ImGui::BeginDragDropTargetGameobject();
+		Gameobject * gameobjectDrop1 = ImGui::FanBeginDragDropTargetGameobject();
 		if ( gameobjectDrop1 && gameobjectDrop1 != _gameobjectDrawn )
 		{
 			gameobjectDrop1->InsertBelow( _gameobjectDrawn );
@@ -166,10 +166,10 @@ namespace fan
 		}
 
 		// Gameobject dragndrop source = selectable -^
-		ImGui::BeginDragDropSourceGameobject( _gameobjectDrawn  );
+		ImGui::FanBeginDragDropSourceGameobject( _gameobjectDrawn  );
 
 		// Gameobject dragndrop target gameobject name -> place as child
-		Gameobject * gameobjectDrop = ImGui::BeginDragDropTargetGameobject();
+		Gameobject * gameobjectDrop = ImGui::FanBeginDragDropTargetGameobject();
 		if ( gameobjectDrop )
 		{
 			gameobjectDrop->SetParent( _gameobjectDrawn );

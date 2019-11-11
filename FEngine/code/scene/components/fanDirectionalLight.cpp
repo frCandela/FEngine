@@ -67,11 +67,11 @@ namespace fan {
 
 		// Filter color
 		if ( ImGui::Button( "##ambiant" ) ) { SetAmbiant( Color::Black ); } ImGui::SameLine();
-		if ( ImGui::ColorEdit3( "ambiant", m_dirLight->ambiant.Data(), gui::colorEditFlags ) ) { m_gameobject->AddFlag( Gameobject::Flag::OUTDATED_LIGHT ); }
+		if ( ImGui::ColorEdit3( "ambiant", m_dirLight->ambiant.Data(), ImGui::fanColorEditFlags ) ) { m_gameobject->AddFlag( Gameobject::Flag::OUTDATED_LIGHT ); }
 		if ( ImGui::Button( "##diffuse" ) ) { SetDiffuse( Color::Black ); } ImGui::SameLine();
-		if ( ImGui::ColorEdit3( "diffuse", m_dirLight->diffuse.Data(), gui::colorEditFlags ) ) { m_gameobject->AddFlag( Gameobject::Flag::OUTDATED_LIGHT ); }
+		if ( ImGui::ColorEdit3( "diffuse", m_dirLight->diffuse.Data(), ImGui::fanColorEditFlags ) ) { m_gameobject->AddFlag( Gameobject::Flag::OUTDATED_LIGHT ); }
 		if ( ImGui::Button( "##specular" ) ) { SetSpecular( Color::Black ); } ImGui::SameLine();
-		if ( ImGui::ColorEdit3( "specular", m_dirLight->specular.Data(), gui::colorEditFlags ) ) { m_gameobject->AddFlag( Gameobject::Flag::OUTDATED_LIGHT ); }
+		if ( ImGui::ColorEdit3( "specular", m_dirLight->specular.Data(), ImGui::fanColorEditFlags ) ) { m_gameobject->AddFlag( Gameobject::Flag::OUTDATED_LIGHT ); }
 
 
 		const Transform * transform = m_gameobject->GetComponent<Transform>();

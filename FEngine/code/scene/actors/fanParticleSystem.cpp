@@ -77,12 +77,12 @@ namespace fan {
 
 		ImGui::PushItemWidth( 0.5f * ImGui::GetWindowWidth() ); {
 
-			ImGui::InputGameobject( "origin", &m_origin );
+			ImGui::FanGameobject( "origin", &m_origin );
 			ImGui::DragInt( "particles per second", &m_particlesPerSecond, 1, 0 );
 			ImGui::DragFloat( "speed", &m_speed, 0.01f );
 			ImGui::DragFloat( "duration", &m_duration, 0.01f );
 			ImGui::DragFloat3( "offset", &m_offset[0], 0.01f );	
-		    ImGui::ColorEdit4( "color", m_color.Data(), gui::colorEditFlags );
+		    ImGui::ColorEdit4( "color", m_color.Data(), ImGui::fanColorEditFlags );
 
 		} ImGui::PopItemWidth();
 

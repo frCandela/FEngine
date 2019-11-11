@@ -21,24 +21,19 @@ std::string std::fs::file_name(const std::fs::path& _path) {
 }
 
 
-namespace fan
+namespace ImGui
 {
 	//================================================================================================================================
-	// Constants
 	//================================================================================================================================
-	const int gui::colorEditFlags = ImGuiColorEditFlags_PickerHueWheel | ImGuiColorEditFlags_AlphaBar | ImGuiColorEditFlags_Float;
-
-	//================================================================================================================================
-	//================================================================================================================================
-	void gui::ShowHelpMarker(const char* _desc)
+	void FanShowHelpMarker(const char* _desc)
 	{
 		ImGui::TextDisabled("(?)");
-		ToolTipFast(_desc);
+		TFanoolTip(_desc);
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void gui::ToolTipFast( const char* _desc ) {
+	void TFanoolTip( const char* _desc ) {
 		if ( ImGui::IsItemHovered() ) {
 			ImGui::BeginTooltip();
 			ImGui::PushTextWrapPos( ImGui::GetFontSize() * 35.0f );
@@ -50,7 +45,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	bool gui::FilesSelector(
+	bool impl::FilesSelector(
 		const std::set< std::string >& _extensionWhiteList
 		, std::fs::path& _path)
 	{
@@ -102,11 +97,9 @@ namespace fan
 		return returnValue;
 	}
 
-
-
 	//================================================================================================================================
 	//================================================================================================================================
-	bool gui::SaveFileModal(const char * _popupName, const std::set<std::string>& _extensionWhiteList, std::fs::path & _path, int & _extensionIndex) {
+	bool FanSaveFileModal(const char * _popupName, const std::set<std::string>& _extensionWhiteList, std::fs::path & _path, int & _extensionIndex) {
 		bool returnValue = false;
 
 		ImGui::SetNextWindowSize({ 316,410 });
@@ -115,7 +108,7 @@ namespace fan
 			// Files hierarchy
 			bool itemDoubleClicked = false;
 			ImGui::BeginChild("load_scene_hierarchy", { 300,300 }, true); {
-				itemDoubleClicked = gui::FilesSelector(_extensionWhiteList, _path);
+				itemDoubleClicked = impl::FilesSelector(_extensionWhiteList, _path);
 			} ImGui::EndChild();
 
 
@@ -180,7 +173,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	bool gui::LoadFileModal(
+	bool FanLoadFileModal(
 		const char * _popupName,
 		const std::set<std::string>& _extensionWhiteList,
 		std::fs::path & _path) {
@@ -191,7 +184,7 @@ namespace fan
 		if (ImGui::BeginPopupModal(_popupName)) {
 			ImGui::BeginChild("load_scene_hierarchy", { 300,300 }, true);
 			std::fs::directory_entry newEntry;
-			bool itemDoubleClicked = gui::FilesSelector(_extensionWhiteList, _path);
+			bool itemDoubleClicked = impl::FilesSelector(_extensionWhiteList, _path);
 			if (std::fs::is_directory(newEntry)) {
 				_path = newEntry;
 			}

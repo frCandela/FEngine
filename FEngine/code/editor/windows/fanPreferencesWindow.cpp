@@ -60,11 +60,11 @@ namespace fan
 		if ( ImGui::CollapsingHeader( "Rendering" ) ) {
 			// Filter color
 			glm::vec4& color = m_renderer->GetPostprocessPipeline()->uniforms.color;
-			ImGui::ColorEdit3( "Filter##1", &color[0], gui::colorEditFlags );
+			ImGui::ColorEdit3( "Filter##1", &color[0], ImGui::fanColorEditFlags );
 			
 			// Clear color
 			glm::vec4 clearColor = m_renderer->GetClearColor();
-			if ( ImGui::ColorEdit3( "Clear color", &clearColor.r, gui::colorEditFlags ) ) {
+			if ( ImGui::ColorEdit3( "Clear color", &clearColor.r, ImGui::fanColorEditFlags ) ) {
 				m_renderer->SetClearColor( clearColor );
 			}
 		}
@@ -75,7 +75,7 @@ namespace fan
 			for ( int i = 0; i < ImGuiCol_COUNT; i++ ) {
 				const char* name = ImGui::GetStyleColorName( i );
 				ImGui::PushID( i );
-				ImGui::ColorEdit4( name, (float*)&style.Colors[i], gui::colorEditFlags );				
+				ImGui::ColorEdit4( name, (float*)&style.Colors[i], ImGui::fanColorEditFlags );				
 				ImGui::PopID();
 			}
 		}
@@ -91,7 +91,7 @@ namespace fan
 				m_uniqueKeyIndex = 0;
 				ImGui::Text( "Axis                    ____ (-) ____    ____ (+) ____" );
 				ImGui::SameLine(); ImGui::Text("        "); ImGui::SameLine(); if ( ImGui::Button( "Reset" ) ) { SerializedValues::Get().LoadKeyBindings(); }
-				ImGui::SameLine(); gui::ShowHelpMarker("Delete the file editor_data.json to reset to factory default");
+				ImGui::SameLine(); ImGui::FanShowHelpMarker("Delete the file editor_data.json to reset to factory default");
 				
 				ImGui::Indent();
 				ImGui::Columns( 2 );

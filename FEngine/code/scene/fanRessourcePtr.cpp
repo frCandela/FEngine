@@ -11,7 +11,7 @@ namespace ImGui
 {
 	//================================================================================================================================
 	//================================================================================================================================
-	void InputGameobject( const char * _label,  fan::GameobjectPtr * _ptr )
+	void FanGameobject( const char * _label,  fan::GameobjectPtr * _ptr )
 	{
 		fan::Gameobject * gameobject = **_ptr;		
 		const std::string name = gameobject != nullptr ? gameobject->GetName() : "null";
@@ -29,8 +29,8 @@ namespace ImGui
 			ImGui::SameLine();
 
 		// dragndrop
-		ImGui::BeginDragDropSourceGameobject( gameobject );
-		fan::Gameobject * gameobjectDrop = ImGui::BeginDragDropTargetGameobject();
+		ImGui::FanBeginDragDropSourceGameobject( gameobject );
+		fan::Gameobject * gameobjectDrop = ImGui::FanBeginDragDropTargetGameobject();
 		if ( gameobjectDrop )				{ ( *_ptr ) =  fan::GameobjectPtr( gameobjectDrop, gameobjectDrop->GetUniqueID() ); }		
 		if ( ImGui::IsItemClicked( 1 ) )	{ ( *_ptr ) =  fan::GameobjectPtr(); }	// Right click = clear
 
@@ -41,7 +41,7 @@ namespace ImGui
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void InputTexture( const char * _label, fan::TexturePtr * _ptr )
+	void FanTexture( const char * _label, fan::TexturePtr * _ptr )
 	{
 		
 		fan::Texture * texture = **_ptr;
@@ -67,19 +67,19 @@ namespace ImGui
 		// name button 
 		const float width = 0.5f * ImGui::GetWindowWidth() - ImGui::GetCursorPosX() + 8;
 		ImGui::Button( name.c_str(), ImVec2( width, 0.f ) ); ImGui::SameLine();
-		ImGui::BeginDragDropSourceTexture( texture );
+		ImGui::FanBeginDragDropSourceTexture( texture );
 
 		// tooltip
 		if( texture != nullptr ) {
-			fan::gui::ToolTipFast( texture->GetPath().c_str() );
+			ImGui::TFanoolTip( texture->GetPath().c_str() );
 		}
 
 		// dragndrop		
-		fan::Texture * textureDrop = ImGui::BeginDragDropTargetTexture();
+		fan::Texture * textureDrop = ImGui::FanBeginDragDropTargetTexture();
 		if ( textureDrop ) { ( *_ptr ) = fan::TexturePtr( textureDrop, textureDrop->GetPath() ); }
 		if ( ImGui::IsItemClicked( 1 ) ){( *_ptr ) = fan::TexturePtr();	}// Right click = clear
 		
-		if ( fan::gui::LoadFileModal( modalName.c_str() ,  fan::GlobalValues::s_imagesExtensions, m_pathBuffer ) )
+		if ( ImGui::FanLoadFileModal( modalName.c_str() ,  fan::GlobalValues::s_imagesExtensions, m_pathBuffer ) )
 		{
 			_ptr->InitUnresolved(m_pathBuffer.string());
 		}

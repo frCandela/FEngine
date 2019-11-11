@@ -37,7 +37,7 @@ namespace fan {
 		{ 
 
 			ImGui::Checkbox("freeze capture", &m_freezeCapture );
-			ImGui::SameLine();	gui::ShowHelpMarker("press \"END\" to toogle");
+			ImGui::SameLine();	ImGui::FanShowHelpMarker("press \"END\" to toogle");
 			ImGui::SameLine();	ImGui::DragFloat( "speed", &m_speed, 0.01f, 0.f, 10.f );
 		}
 

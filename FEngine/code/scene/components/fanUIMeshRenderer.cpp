@@ -48,8 +48,8 @@ namespace fan
 	void UIMeshRenderer::OnGui()
 	{
 		Component::OnGui();
-		ImGui::ColorEdit4( "color", m_color.Data(), gui::colorEditFlags );
-		ImGui::InputTexture( "ui texture", &m_texture );
+		ImGui::ColorEdit4( "color", m_color.Data(), ImGui::fanColorEditFlags );
+		ImGui::FanTexture( "ui texture", &m_texture );
 	}
 
 	//================================================================================================================================

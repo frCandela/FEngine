@@ -12,8 +12,8 @@ namespace fan
 	class Material : public Component
 	{
 	public:
-		static Signal< Material *>					onMaterialAttach;
-		static Signal< Material * >					onMaterialDetach;
+		static Signal< Material *>	onMaterialAttach;
+		static Signal< Material * >	onMaterialDetach;
 
 		// Getters
 		void			SetTexture( Texture * const _texture);
@@ -38,8 +38,5 @@ namespace fan
 
 	private:
 		ecsMaterial * const m_material = nullptr;
-
-		// Editor
-		std::fs::path m_pathBuffer;
 	};
 }

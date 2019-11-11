@@ -148,7 +148,7 @@ namespace fan
 				ImGui::MenuItem( "visible", nullptr, &m_editorGrid.isVisible );
 				ImGui::DragFloat( "spacing", &m_editorGrid.spacing, 0.25f, 0.f, 100.f );
 				ImGui::DragInt( "lines count", &m_editorGrid.linesCount, 1.f, 0, 1000 );
-				ImGui::ColorEdit3( "color", &m_editorGrid.color[0], gui::colorEditFlags );
+				ImGui::ColorEdit3( "color", &m_editorGrid.color[0], ImGui::fanColorEditFlags );
 				ImGui::DragFloat3( "offset", &m_editorGrid.offset[0]);
 				ImGui::PopItemWidth();
 
@@ -158,7 +158,7 @@ namespace fan
 			// Framerate
 			ImGui::SameLine(ImGui::GetWindowWidth() - 60);
 			if ( ImGui::BeginMenu( std::to_string(Time::Get().GetRealFramerate()).c_str(), false ) ) {ImGui::EndMenu();}
-			gui::ToolTipFast(" Framerate. (Right click to set)");
+			ImGui::TFanoolTip(" Framerate. (Right click to set)");
 
 			if ( ImGui::IsItemClicked( 1 ) ) {
 				ImGui::OpenPopup( "main_menu_bar_set_fps" );
@@ -211,18 +211,18 @@ namespace fan
 	//================================================================================================================================
 	void MainMenuBar::DrawModals() {
 		// New scene
-		if (gui::SaveFileModal("New scene", GlobalValues::s_sceneExtensions, m_pathBuffer, m_extensionIndexBuffer)) {
+		if (ImGui::FanSaveFileModal("New scene", GlobalValues::s_sceneExtensions, m_pathBuffer, m_extensionIndexBuffer)) {
 			m_scene.New();
 			m_scene.SetPath(m_pathBuffer.string());
 		}
 
 		// Open scene
-		if (gui::LoadFileModal("Open scene", m_sceneExtensionFilter, m_pathBuffer)) {
+		if (ImGui::FanLoadFileModal("Open scene", m_sceneExtensionFilter, m_pathBuffer)) {
 			m_scene.LoadFrom(m_pathBuffer.string());
 		}
 
 		// Save scene
-		if (gui::SaveFileModal("Save scene", GlobalValues::s_sceneExtensions, m_pathBuffer, m_extensionIndexBuffer)) {
+		if (ImGui::FanSaveFileModal("Save scene", GlobalValues::s_sceneExtensions, m_pathBuffer, m_extensionIndexBuffer)) {
 			m_scene.SetPath(m_pathBuffer.string());
 			m_scene.Save();
 		}

@@ -8,23 +8,19 @@ namespace std {
 	}
 }
 
-namespace fan
+namespace ImGui
 {
-	//================================================================================================================================
-	//================================================================================================================================
-	class gui {
-	public:
-		static const int colorEditFlags;
+	const int fanColorEditFlags = ImGuiColorEditFlags_PickerHueWheel | ImGuiColorEditFlags_AlphaBar | ImGuiColorEditFlags_Float;;
 
-		static void ShowHelpMarker(const char* _desc);
-		static void ToolTipFast( const char* _desc );
-		static bool SaveFileModal(const char * _popupName,const std::set<std::string>& _extensionWhiteList,std::fs::path & _currentPath,int & _extensionIndex);
-		static bool LoadFileModal(const char * _popupName,const std::set<std::string>& _extensionWhiteList,	std::fs::path & _path);
+	void FanShowHelpMarker(const char* _desc);
+	void TFanoolTip( const char* _desc );
+	bool FanSaveFileModal(const char * _popupName,const std::set<std::string>& _extensionWhiteList,std::fs::path & _currentPath,int & _extensionIndex);
+	bool FanLoadFileModal(const char * _popupName,const std::set<std::string>& _extensionWhiteList,	std::fs::path & _path);
 
-	private:
-		static bool FilesSelector(
+	namespace impl {
+		bool FilesSelector(
 			const std::set<std::string>& _extensionWhiteList,
 			std::fs::path & _path
 		);
-	};
+	}
 }
