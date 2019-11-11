@@ -49,20 +49,16 @@ namespace fan
 	{
 		Component::OnGui();
 		ImGui::ColorEdit4( "color", m_color.Data(), gui::colorEditFlags );
-		ImGui::InputTexture( "texture", &m_texture );
+		ImGui::InputTexture( "ui texture", &m_texture );
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
 	bool UIMeshRenderer::Load( Json & _json )
 	{
-		LoadColor(  _json, "color",			m_color);
+		LoadColor(  _json,	"color",			m_color);
+		LoadTexturePtr(_json, "texture_path", m_texture );
 
-		std::string tmpString;
-		if ( LoadString( _json, "texture_path", tmpString ) )
-		{
-			m_texture.InitUnresolved(tmpString);
-		}
 		return true;
 	}
 
@@ -73,7 +69,7 @@ namespace fan
 		Component::Save( _json );
 
 		SaveColor( _json, "color", m_color );
-		SaveString( _json, "texture_path", *m_texture != nullptr ? m_texture->GetPath() : "" );
+		SaveTexturePtr( _json, "texture_path", m_texture );
 
 		return true;
 	}

@@ -117,15 +117,15 @@ namespace fan {
 
 		// Instance messages		
 		Debug::Get().SetDebug( m_renderer );
-		m_sceneWindow->onSelectGameobject.Connect( &Engine::SetSelectedGameobject, this );
-		m_mainMenuBar->onReloadShaders.Connect(&Renderer::ReloadShaders, m_renderer );
-		m_mainMenuBar->onExit.Connect( &Engine::Exit, this );
-		onGameobjectSelected.Connect( &SceneWindow::OnGameobjectSelected, m_sceneWindow );
-		onGameobjectSelected.Connect( &InspectorWindow::OnGameobjectSelected, m_inspectorWindow );
-		m_scene->onSceneLoad.Connect( &SceneWindow::OnSceneLoad, m_sceneWindow );
-		m_scene->onSceneLoad.Connect( &Engine::OnSceneLoad, this );
-		m_scene->onSceneClear.Connect  ( &Renderer::Clear, m_renderer );
-		m_scene->onDeleteGameobject.Connect( &Engine::OnGameobjectDeleted, this );
+		m_sceneWindow->onSelectGameobject.	Connect( &Engine::SetSelectedGameobject, this );
+		m_mainMenuBar->onReloadShaders.		Connect(&Renderer::ReloadShaders, m_renderer );
+		m_mainMenuBar->onExit.				Connect( &Engine::Exit, this );
+		onGameobjectSelected.				Connect( &SceneWindow::OnGameobjectSelected, m_sceneWindow );
+		onGameobjectSelected.				Connect( &InspectorWindow::OnGameobjectSelected, m_inspectorWindow );
+		m_scene->onSceneLoad.				Connect( &SceneWindow::OnSceneLoad, m_sceneWindow );
+		m_scene->onSceneLoad.				Connect( &Engine::OnSceneLoad, this );
+		m_scene->onSceneClear.				Connect  ( &Renderer::Clear, m_renderer );
+		m_scene->onDeleteGameobject.		Connect( &Engine::OnGameobjectDeleted, this );
 
 		// Events linking
 		Input::Get().Manager().FindEvent( "reload_shaders" )->Connect(	&Renderer::ReloadShaders, m_renderer );
@@ -133,20 +133,19 @@ namespace fan {
 		Input::Get().Manager().FindEvent( "play_pause" )->Connect(		&Engine::SwitchPlayPause, this );
 
 		// Static messages		
-		TexturePtr::s_onCreateUnresolved.Connect( &Engine::OnResolveTexturePtr, this );
-		Material::onMaterialSetPath.Connect		( &Engine::OnMaterialSetTexture, this );
-		Mesh::s_onMeshLoad.Connect				( &RessourceManager::OnLoadMesh, m_renderer->GetRessourceManager() );
-		Mesh::s_onMeshDelete.Connect			( &Renderer::WaitIdle, m_renderer ); // hack
-		UIMesh::s_onMeshLoad.Connect			( &RessourceManager::OnLoadUIMesh, m_renderer->GetRessourceManager() );
-		UIMesh::s_onMeshDelete.Connect			( &Renderer::WaitIdle, m_renderer ); // hack
-		MeshRenderer::onMeshRendererSetPath.Connect			( &Engine::OnMeshRendererSetPath,		 this );
-		MeshRenderer::onRegisterMeshRenderer.Connect			( &Engine::RegisterMeshRenderer,		 this );
-		MeshRenderer::onUnRegisterMeshRenderer.Connect		( &Engine::UnRegisterMeshRenderer,		 this );
-		PointLight::onPointLightAttach.Connect	( &Engine::RegisterPointLight,	 this );
-		PointLight::onPointLightDetach.Connect	( &Engine::UnRegisterPointLight, this );
-		DirectionalLight::onDirectionalLightAttach.Connect	( &Engine::RegisterDirectionalLight,   this );
-		DirectionalLight::onDirectionalLightDetach.Connect	( &Engine::UnRegisterDirectionalLight, this );
-		GameobjectPtr::s_onSetFromSelection.Connect( &Engine::OnSetGameobjectPtrFromSelection, this );
+		TexturePtr::s_onCreateUnresolved.			Connect ( &Engine::OnResolveTexturePtr, this );
+		Mesh::s_onMeshLoad.							Connect	( &RessourceManager::OnLoadMesh, m_renderer->GetRessourceManager() );
+		Mesh::s_onMeshDelete.						Connect	( &Renderer::WaitIdle, m_renderer ); // hack
+		UIMesh::s_onMeshLoad.						Connect	( &RessourceManager::OnLoadUIMesh, m_renderer->GetRessourceManager() );
+		UIMesh::s_onMeshDelete.						Connect	( &Renderer::WaitIdle, m_renderer ); // hack
+		MeshRenderer::onMeshRendererSetPath.		Connect	( &Engine::OnMeshRendererSetPath, this );
+		MeshRenderer::onRegisterMeshRenderer.		Connect	( &Engine::RegisterMeshRenderer, this );
+		MeshRenderer::onUnRegisterMeshRenderer.		Connect	( &Engine::UnRegisterMeshRenderer, this );
+		PointLight::onPointLightAttach.				Connect	( &Engine::RegisterPointLight,	 this );
+		PointLight::onPointLightDetach.				Connect	( &Engine::UnRegisterPointLight, this );
+		DirectionalLight::onDirectionalLightAttach. Connect	( &Engine::RegisterDirectionalLight,   this );
+		DirectionalLight::onDirectionalLightDetach. Connect	( &Engine::UnRegisterDirectionalLight, this );
+		GameobjectPtr::s_onSetFromSelection.	    Connect ( &Engine::OnSetGameobjectPtrFromSelection, this );
 
 		m_scene->New();
 		Mesh * defaultMesh = m_renderer->GetRessourceManager()->LoadMesh(GlobalValues::s_defaultMesh);

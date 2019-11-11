@@ -2,8 +2,10 @@
 
 namespace fan {
 	class Gameobject;
+	class Texture;
 	template< typename _RessourceType, typename _IDType > class RessourcePtr;
 	using GameobjectPtr = RessourcePtr<Gameobject, uint64_t>;
+	using TexturePtr = RessourcePtr<Texture, std::string>;
 
 	//================================================================================================================================
 	//================================================================================================================================
@@ -24,6 +26,7 @@ namespace fan {
 		static void SaveBool			( Json & _json, const char * _name, const bool&			 _bool );
 		static void SaveString			( Json & _json, const char * _name, const std::string&	 _string );
 		static void SaveGameobjectPtr	( Json & _json, const char * _name, const GameobjectPtr& _ptr );
+		static void SaveTexturePtr	    ( Json & _json, const char * _name, const TexturePtr& _ptr );
 
 		static bool LoadVec2			( Json & _json, const char * _name, btVector2&		_outVec2 );
 		static bool LoadVec3			( Json & _json, const char * _name, btVector3&		_outVec3 );
@@ -37,6 +40,7 @@ namespace fan {
 		static bool LoadBool			( Json & _json, const char * _name, bool&			_outBool );
 		static bool LoadString			( Json & _json, const char * _name, std::string&	_outString );
 		static bool LoadGameobjectPtr	( Json & _json, const char * _name, GameobjectPtr&	_outPtr );
+		static bool LoadTexturePtr		( Json & _json, const char * _name, TexturePtr&	_outPtr );
 
 	private:
 		static Json * FindToken	( Json & _json, const char * _name );

@@ -14,7 +14,6 @@ namespace fan
 	public:
 		static Signal< Material *>					onMaterialAttach;
 		static Signal< Material * >					onMaterialDetach;
-		static Signal< Material *, std::string  >	onMaterialSetPath;
 
 		// Getters
 		void			SetTexture( Texture * const _texture);

@@ -3,6 +3,7 @@
 #include "fanISerializable.h"
 #include "scene/fanRessourcePtr.h"
 #include "scene/fanGameobject.h"
+#include "renderer/core/fanTexture.h"
 
 namespace fan {
 
@@ -91,6 +92,13 @@ namespace fan {
 	void ISerializable::SaveGameobjectPtr ( Json & _json, const char * _name, const GameobjectPtr& _ptr )
 	{
 		_json[_name] = *_ptr != nullptr ? _ptr->GetUniqueID() : 0;
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
+	void ISerializable::SaveTexturePtr ( Json & _json, const char * _name, const TexturePtr& _ptr )
+	{
+		_json[_name] = *_ptr != nullptr ? _ptr->GetPath() : "";
 	}
 
 	//================================================================================================================================
@@ -238,6 +246,19 @@ namespace fan {
 		if ( token != nullptr )
 		{
 			_outPtr.InitUnresolved(*token );
+			return true;
+		}
+		return false;
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
+	bool ISerializable::LoadTexturePtr	( Json & _json, const char * _name, TexturePtr&	_outPtr )
+	{
+		Json * token = FindToken( _json, _name );
+		if ( token != nullptr )
+		{
+			_outPtr.InitUnresolved( *token );
 			return true;
 		}
 		return false;

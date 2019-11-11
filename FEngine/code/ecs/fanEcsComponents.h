@@ -3,11 +3,11 @@
 #include "core/meta/fanTypeList.h"
 #include "core/math/shapes/fanAABB.h"
 #include "core/math/shapes/fanConvexHull.h"
+#include "scene/fanRessourcePtr.h"
 
 namespace fan {
 
 	class Mesh;
-	class Texture;
 
 	using ecsEntity = uint32_t;
 	const ecsEntity ecsNullEntity = std::numeric_limits< ecsEntity >::max();
@@ -123,12 +123,12 @@ namespace fan {
 	struct ecsMaterial : ecsIComponent {
 		static const char * s_name;
 		void Init() {
-			texture = nullptr;
+			texture = TexturePtr();
 			shininess = 1;
 			color = Color::White;
 		}
 
-		Texture *	texture			= nullptr;
+		TexturePtr 	texture;
 		uint32_t	shininess		= 1;
 		Color		color			= Color::White;
 	};
