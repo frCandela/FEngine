@@ -15,7 +15,6 @@ namespace fan
 	public:
 		static Signal< MeshRenderer * >				onRegisterMeshRenderer;
 		static Signal< MeshRenderer * >				onUnRegisterMeshRenderer;
-		static Signal< MeshRenderer *, std::string  >	onMeshRendererSetPath;
 
 		void			SetPath( std::string _path );
 		void			SetMesh(Mesh * _mesh);
@@ -26,7 +25,7 @@ namespace fan
 		void	SetRenderID(const int _renderID);
 
 		void OnGui() override;
-		virtual ImGui::IconType GetIcon() const { return ImGui::IconType::MESH_RENDERER; };
+		virtual ImGui::IconType GetIcon() const { return ImGui::IconType::MESH; };
 
 		DECLARE_EDITOR_COMPONENT(MeshRenderer)
 		DECLARE_TYPE_INFO(MeshRenderer, Component );

@@ -158,7 +158,7 @@ namespace fan
 			// Framerate
 			ImGui::SameLine(ImGui::GetWindowWidth() - 60);
 			if ( ImGui::BeginMenu( std::to_string(Time::Get().GetRealFramerate()).c_str(), false ) ) {ImGui::EndMenu();}
-			ImGui::TFanoolTip(" Framerate. (Right click to set)");
+			ImGui::FanToolTip(" Framerate. (Right click to set)");
 
 			if ( ImGui::IsItemClicked( 1 ) ) {
 				ImGui::OpenPopup( "main_menu_bar_set_fps" );

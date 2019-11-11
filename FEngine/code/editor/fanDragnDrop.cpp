@@ -4,6 +4,7 @@
 #include "fanImguiIcons.h"
 #include "scene/fanGameobject.h"
 #include "renderer/core/fanTexture.h"
+#include "renderer/fanMesh.h"
 
 namespace ImGui
 {
@@ -72,5 +73,38 @@ namespace ImGui
 			ImGui::EndDragDropTarget();
 		}
 		return _texture;
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
+	void FanBeginDragDropSourceMesh( fan::Mesh * _mesh, ImGuiDragDropFlags _flags )
+	{
+		if ( _mesh != nullptr )
+		{
+			if ( ImGui::BeginDragDropSource( _flags ) )
+			{
+				ImGui::SetDragDropPayload( "dragndrop_mesh", &_mesh, sizeof( fan::Mesh** ) );
+				ImGui::Icon( ImGui::IconType::MESH, { 16,16 } ); ImGui::SameLine();
+				ImGui::Text( ( _mesh->GetPath() ).c_str() );
+				ImGui::EndDragDropSource();
+			}
+		}
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
+	fan::Mesh * FanBeginDragDropTargetMesh()
+	{
+		fan::Mesh * _mesh = nullptr;
+		if ( ImGui::BeginDragDropTarget() )
+		{
+			if ( const ImGuiPayload* payload = ImGui::AcceptDragDropPayload( "dragndrop_mesh" ) )
+			{
+				assert( payload->DataSize == sizeof( fan::Mesh** ) );
+				_mesh = *( fan::Mesh** )payload->Data;
+			}
+			ImGui::EndDragDropTarget();
+		}
+		return _mesh;
 	}
 }

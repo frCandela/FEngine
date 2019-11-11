@@ -4,6 +4,7 @@
 #include "scene/fanRessourcePtr.h"
 #include "scene/fanGameobject.h"
 #include "renderer/core/fanTexture.h"
+#include "renderer/fanMesh.h"
 
 namespace fan {
 
@@ -97,6 +98,13 @@ namespace fan {
 	//================================================================================================================================
 	//================================================================================================================================
 	void ISerializable::SaveTexturePtr ( Json & _json, const char * _name, const TexturePtr& _ptr )
+	{
+		_json[_name] = *_ptr != nullptr ? _ptr->GetPath() : "";
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
+	void ISerializable::SaveMeshPtr ( Json & _json, const char * _name, const MeshPtr& _ptr )
 	{
 		_json[_name] = *_ptr != nullptr ? _ptr->GetPath() : "";
 	}
@@ -254,6 +262,19 @@ namespace fan {
 	//================================================================================================================================
 	//================================================================================================================================
 	bool ISerializable::LoadTexturePtr	( Json & _json, const char * _name, TexturePtr&	_outPtr )
+	{
+		Json * token = FindToken( _json, _name );
+		if ( token != nullptr )
+		{
+			_outPtr.InitUnresolved( *token );
+			return true;
+		}
+		return false;
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
+	bool ISerializable::LoadMeshPtr( Json & _json, const char * _name, MeshPtr&	_outPtr )
 	{
 		Json * token = FindToken( _json, _name );
 		if ( token != nullptr )

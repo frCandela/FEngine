@@ -39,7 +39,7 @@ namespace ImGui {
 		, DECL_ICON ( 32.f, 3, 3 ) // DIR_LIGHT
 		, DECL_ICON ( 32.f, 4, 3 ) // POINT_LIGHT
 		, DECL_ICON ( 32.f, 5, 3 ) // MATERIAL
-		, DECL_ICON ( 32.f, 6, 3 ) // MESH_RENDERER
+		, DECL_ICON ( 32.f, 6, 3 ) // MESH
 		, DECL_ICON ( 32.f, 7, 3 ) // RIGIDBODY
 		, DECL_ICON ( 32.f, 8, 3 ) // TRANSFORM
 		, DECL_ICON ( 32.f, 9, 3 ) // PARTICLES		

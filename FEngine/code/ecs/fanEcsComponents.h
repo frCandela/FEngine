@@ -81,11 +81,11 @@ namespace fan {
 	struct ecsMesh : ecsIComponent {
 		static const char * s_name;
 		void Init() { 
-			mesh = nullptr; 
+			mesh = MeshPtr(); 
 			renderID = -1;
 		}
 
-		Mesh * mesh			= nullptr;
+		MeshPtr mesh;
 		int renderID		= -1;
 	};
 

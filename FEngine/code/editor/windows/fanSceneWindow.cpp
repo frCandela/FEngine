@@ -65,7 +65,7 @@ namespace fan
 					itemClicked = true;
 				}
 				// Entities templates
-				ImGui::Icon(ImGui::MESH_RENDERER, {19,19}); ImGui::SameLine();
+				ImGui::Icon(ImGui::MESH, {19,19}); ImGui::SameLine();
 				if ( ImGui::MenuItem( "Model" ) ) {
 					Gameobject *  newIntity = m_scene->CreateGameobject("new_model", m_lastGameobjectRightClicked );
 					MeshRenderer * meshRenderer = newIntity->AddComponent<MeshRenderer>();

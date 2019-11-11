@@ -28,12 +28,12 @@ namespace ImGui
 	void FanShowHelpMarker(const char* _desc)
 	{
 		ImGui::TextDisabled("(?)");
-		TFanoolTip(_desc);
+		FanToolTip(_desc);
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void TFanoolTip( const char* _desc ) {
+	void FanToolTip( const char* _desc ) {
 		if ( ImGui::IsItemHovered() ) {
 			ImGui::BeginTooltip();
 			ImGui::PushTextWrapPos( ImGui::GetFontSize() * 35.0f );

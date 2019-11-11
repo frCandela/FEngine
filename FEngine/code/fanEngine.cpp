@@ -134,11 +134,11 @@ namespace fan {
 
 		// Static messages		
 		TexturePtr::s_onCreateUnresolved.			Connect ( &Engine::OnResolveTexturePtr, this );
+		MeshPtr::s_onCreateUnresolved.				Connect	( &Engine::OnResolveMeshPtr, this );
 		Mesh::s_onMeshLoad.							Connect	( &RessourceManager::OnLoadMesh, m_renderer->GetRessourceManager() );
 		Mesh::s_onMeshDelete.						Connect	( &Renderer::WaitIdle, m_renderer ); // hack
 		UIMesh::s_onMeshLoad.						Connect	( &RessourceManager::OnLoadUIMesh, m_renderer->GetRessourceManager() );
-		UIMesh::s_onMeshDelete.						Connect	( &Renderer::WaitIdle, m_renderer ); // hack
-		MeshRenderer::onMeshRendererSetPath.		Connect	( &Engine::OnMeshRendererSetPath, this );
+		UIMesh::s_onMeshDelete.						Connect	( &Renderer::WaitIdle, m_renderer ); // hack		
 		MeshRenderer::onRegisterMeshRenderer.		Connect	( &Engine::RegisterMeshRenderer, this );
 		MeshRenderer::onUnRegisterMeshRenderer.		Connect	( &Engine::UnRegisterMeshRenderer, this );
 		PointLight::onPointLightAttach.				Connect	( &Engine::RegisterPointLight,	 this );
@@ -793,13 +793,11 @@ namespace fan {
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void Engine::OnMeshRendererSetPath( MeshRenderer * _meshRenderer, std::string _path ) {
+	void Engine::OnResolveMeshPtr( MeshPtr * _ptr ) {
 		RessourceManager * ressourceManager = m_renderer->GetRessourceManager();
-		Mesh * mesh = ressourceManager->FindMesh( _path );
-		if ( mesh == nullptr ) {
-			mesh = ressourceManager->LoadMesh( _path );
-		}
-		_meshRenderer->SetMesh( mesh );
+		Mesh * mesh = ressourceManager->FindMesh( _ptr->GetID() );
+		if ( mesh == nullptr ) { mesh = ressourceManager->LoadMesh( _ptr->GetID() );	}
+		if ( mesh != nullptr  ){*_ptr   = MeshPtr( mesh, mesh->GetPath() ); }
 	}
 
 	//================================================================================================================================
