@@ -12,46 +12,63 @@ namespace ImGui
 {
 	//================================================================================================================================
 	//================================================================================================================================
-	void FanGameobject( const char * _label,  fan::GameobjectPtr * _ptr )
+	bool FanGameobject( const char * _label, fan::GameobjectPtr * _ptr )
 	{
-		fan::Gameobject * gameobject = **_ptr;		
+		bool returnValue = false;
+
+		fan::Gameobject * gameobject = **_ptr;
 		const std::string name = gameobject != nullptr ? gameobject->GetName() : "null";
 
-		// icon
+		// icon & set from selection
 		if ( ImGui::ButtonIcon( ImGui::IconType::GAMEOBJECT16, { 16,16 } ) )
 		{
-			 fan::GameobjectPtr::s_onSetFromSelection.Emmit( _ptr );
-		} 
-		ImGui::SameLine();		
+			fan::GameobjectPtr::s_onSetFromSelection.Emmit( _ptr );
+			returnValue = true;
+		}
+		ImGui::SameLine();
 
 		// name button 
 		float width = 0.6f * ImGui::GetWindowWidth() - ImGui::GetCursorPosX() + 8;
-		ImGui::Button( name.c_str(), ImVec2( width, 0.f) ); ImGui::SameLine();
-			ImGui::SameLine();
+		ImGui::Button( name.c_str(), ImVec2( width, 0.f ) ); ImGui::SameLine();
+		ImGui::SameLine();
 
 		// dragndrop
 		ImGui::FanBeginDragDropSourceGameobject( gameobject );
 		fan::Gameobject * gameobjectDrop = ImGui::FanBeginDragDropTargetGameobject();
-		if ( gameobjectDrop )				{ ( *_ptr ) =  fan::GameobjectPtr( gameobjectDrop, gameobjectDrop->GetUniqueID() ); }		
-		if ( ImGui::IsItemClicked( 1 ) )	{ ( *_ptr ) =  fan::GameobjectPtr(); }	// Right click = clear
+		if ( gameobjectDrop )
+		{
+			( *_ptr ) = fan::GameobjectPtr( gameobjectDrop, gameobjectDrop->GetUniqueID() );
+			returnValue = true;
+		}
+
+		// Right click = clear
+		if ( ImGui::IsItemClicked( 1 ) )
+		{
+			( *_ptr ) = fan::GameobjectPtr();
+			returnValue = true;
+		}
 
 		// label	
 		ImGui::Text( _label );
 
+		return returnValue;
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void FanTexture( const char * _label, fan::TexturePtr * _ptr )
-	{		
+	bool FanTexture( const char * _label, fan::TexturePtr * _ptr )
+	{
+		bool returnValue = false;
+
 		fan::Texture * texture = **_ptr;
-		const std::string name = texture == nullptr ? "null" : std::fs::path(texture->GetPath()).filename().string() ;
+		const std::string name = texture == nullptr ? "null" : std::fs::path( texture->GetPath() ).filename().string();
 
 		// Set button icon & modal
-		const std::string modalName = std::string("Find texture (") + _label + ")";
+		const std::string modalName = std::string( "Find texture (" ) + _label + ")";
 		static std::fs::path m_pathBuffer;
 		bool openModal = false;
-		ImGui::PushID(_label); {			
+		ImGui::PushID( _label );
+		{
 			if ( ImGui::ButtonIcon( ImGui::IconType::IMAGE, { 16,16 } ) )
 			{
 				openModal = true;
@@ -63,35 +80,66 @@ namespace ImGui
 			m_pathBuffer = "content/models";
 		}
 		ImGui::SameLine();
-		
+
 		// name button 
 		const float width = 0.6f * ImGui::GetWindowWidth() - ImGui::GetCursorPosX() + 8;
 		ImGui::Button( name.c_str(), ImVec2( width, 0.f ) ); ImGui::SameLine();
 		ImGui::FanBeginDragDropSourceTexture( texture );
 
 		// tooltip
-		if( texture != nullptr ) {
-			ImGui::FanToolTip( texture->GetPath().c_str() );
+		if ( texture != nullptr )
+		{
+			if ( ImGui::IsItemHovered() )
+			{
+				ImGui::BeginTooltip();
+
+				// path
+				ImGui::Text( texture->GetPath().c_str() );
+
+				// size
+				const glm::uvec3 size = texture->GetSize();
+				std::stringstream ss;
+				ss << size.x << " x " << size.y << " x " << size.z;
+				ImGui::Text( ss.str().c_str() );
+
+				ImGui::EndTooltip();
+			}
 		}
 
 		// dragndrop		
 		fan::Texture * textureDrop = ImGui::FanBeginDragDropTargetTexture();
-		if ( textureDrop ) { ( *_ptr ) = fan::TexturePtr( textureDrop, textureDrop->GetPath() ); }
-		if ( ImGui::IsItemClicked( 1 ) ){( *_ptr ) = fan::TexturePtr();	}// Right click = clear
-		
-		if ( ImGui::FanLoadFileModal( modalName.c_str() ,  fan::GlobalValues::s_imagesExtensions, m_pathBuffer ) )
+		if ( textureDrop )
 		{
-			_ptr->InitUnresolved(m_pathBuffer.string());
+			( *_ptr ) = fan::TexturePtr( textureDrop, textureDrop->GetPath() );
+			returnValue = true;
+		}
+
+		// Right click = clear
+		if ( ImGui::IsItemClicked( 1 ) )
+		{
+			( *_ptr ) = fan::TexturePtr();
+			returnValue = true;
+		}
+
+		// Modal set value
+		if ( ImGui::FanLoadFileModal( modalName.c_str(), fan::GlobalValues::s_imagesExtensions, m_pathBuffer ) )
+		{
+			_ptr->InitUnresolved( m_pathBuffer.string() );
+			returnValue = true;
 		}
 
 		ImGui::SameLine();
 		ImGui::Text( _label );
+
+		return returnValue;
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void FanMesh( const char * _label, fan::MeshPtr * _ptr )
+	bool FanMesh( const char * _label, fan::MeshPtr * _ptr )
 	{
+		bool returnValue = false;
+
 		fan::Mesh * mesh = **_ptr;
 		const std::string name = mesh == nullptr ? "null" : std::fs::path( mesh->GetPath() ).filename().string();
 
@@ -126,15 +174,28 @@ namespace ImGui
 
 		// dragndrop		
 		fan::Mesh * meshDrop = ImGui::FanBeginDragDropTargetMesh();
-		if ( meshDrop ) { ( *_ptr ) = fan::MeshPtr( meshDrop, meshDrop->GetPath() ); }
-		if ( ImGui::IsItemClicked( 1 ) ) { ( *_ptr ) = fan::MeshPtr(); }// Right click = clear
+		if ( meshDrop )
+		{
+			( *_ptr ) = fan::MeshPtr( meshDrop, meshDrop->GetPath() );
+			returnValue = true;
+		}
+
+		// Right click = clear
+		if ( ImGui::IsItemClicked( 1 ) )
+		{
+			( *_ptr ) = fan::MeshPtr();
+			returnValue = true;
+		}
 
 		if ( ImGui::FanLoadFileModal( modalName.c_str(), fan::GlobalValues::s_meshExtensions, m_pathBuffer ) )
 		{
 			_ptr->InitUnresolved( m_pathBuffer.string() );
+			returnValue = true;
 		}
 
 		ImGui::SameLine();
 		ImGui::Text( _label );
+
+		return returnValue;
 	}
 }
