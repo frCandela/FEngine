@@ -1,5 +1,8 @@
 #include "fanGlobalIncludes.h"
 
+#include "fanGlobals.h"
+#include "fanEngine.h"
+
 #include "editor/fanMainMenuBar.h"
 #include "editor/windows/fanRenderWindow.h"
 #include "editor/windows/fanSceneWindow.h"
@@ -11,9 +14,13 @@
 #include "core/input/fanInput.h"
 #include "core/input/fanInputManager.h"
 #include "core/time/fanProfiler.h"
+#include "core/time/fanTime.h"
 #include "editor/fanModals.h"
 #include "scene/fanScene.h"
-#include "core/time/fanTime.h"
+#include "scene/fanGameobject.h"
+#include "scene/components/fanCamera.h"
+
+
 
 namespace fan
 {
@@ -246,7 +253,19 @@ namespace fan
 	//================================================================================================================================
 	//================================================================================================================================
 	void MainMenuBar::Reload() {
+
+
+// 		Json cameraJson;
+// 		m_scene.GetMainCamera()->GetGameobject()->Save(cameraJson);
+
+		const uint64_t id = Globals::Get().engine->GetSelectedGameobject()->GetUniqueID(); // save old selection
+
 		m_scene.LoadFrom( m_scene.GetPath() );
+
+		// restaure selection
+		Gameobject* selection = m_scene.FindGameobject(id);
+		Globals::Get().engine->SetSelectedGameobject(selection);
+
 	}
 
 	//================================================================================================================================

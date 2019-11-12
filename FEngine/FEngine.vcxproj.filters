@@ -406,6 +406,9 @@
     <ClCompile Include="code\editor\fanDragnDrop.cpp">
       <Filter>code\editor</Filter>
     </ClCompile>
+    <ClCompile Include="code\fanGlobals.h">
+      <Filter>code</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="code\editor\fanMainMenuBar.h">

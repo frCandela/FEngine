@@ -1,6 +1,7 @@
 #include "fanGlobalIncludes.h"
 #include "fanEngine.h"
 
+#include "fanGlobals.h"
 #include "renderer/fanRenderer.h"
 #include "renderer/fanRessourceManager.h"
 #include "renderer/pipelines/fanForwardPipeline.h"
@@ -61,6 +62,7 @@ namespace fan {
 		m_applicationShouldExit(false),
 		m_mainCamera(nullptr)
 	{
+		Globals::Get().engine = this;
 
 		// Get serialized editor values
 		VkExtent2D windowSize = { 1280,720 };
@@ -148,6 +150,7 @@ namespace fan {
 		GameobjectPtr::s_onSetFromSelection.	    Connect ( &Engine::OnSetGameobjectPtrFromSelection, this );
 
 		m_scene->New();
+		m_scene->onSetMainCamera.Connect( &Engine::SetMainCamera, this );
 		Mesh * defaultMesh = m_renderer->GetRessourceManager()->LoadMesh(GlobalValues::s_defaultMesh);
 		m_renderer->GetRessourceManager()->SetDefaultMesh( defaultMesh );
 	}
@@ -275,9 +278,7 @@ namespace fan {
 		m_editorCamera->SetRemovable(false);
 		SetMainCamera(m_editorCamera);
 		m_editorCameraController = cameraGameobject->AddComponent<FPSCamera>();
-		m_editorCameraController->SetRemovable(false);
-
-		_scene->onSetMainCamera.Connect( &Engine::SetMainCamera, this );
+		m_editorCameraController->SetRemovable(false);		
 
 		Debug::Get().SetDebug( m_renderer );
 	}

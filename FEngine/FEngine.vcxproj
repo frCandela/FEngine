@@ -129,6 +129,7 @@
     <ClCompile Include="code\editor\windows\fanSceneWindow.cpp" />
     <ClCompile Include="code\editor\windows\fanEditorWindow.cpp" />
     <ClCompile Include="code\fanEngine.cpp" />
+    <ClCompile Include="code\fanGlobals.h" />
     <ClCompile Include="code\fanGlobalValues.cpp" />
     <ClCompile Include="code\fanMain.cpp" />
     <ClCompile Include="code\game\fanCameraController.cpp" />
