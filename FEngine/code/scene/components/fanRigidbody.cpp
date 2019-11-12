@@ -195,36 +195,46 @@ namespace fan {
 
 		// Active
 		bool isActive = IsActive();
-		if ( ImGui::Checkbox( "active ", &isActive ) ) {
-			if ( isActive ) {
+		if ( ImGui::Checkbox( "active ", &isActive ) )
+		{
+			if ( isActive )
+			{
 				Activate();
 			}
 		} ImGui::SameLine();
 
 		// Desactivation
-		bool enableDesactivation =IsDesactivationEnabled();
-		if ( ImGui::Checkbox( "enable desactivation ", &enableDesactivation ) ) {
-			EnableDesactivation(enableDesactivation);
-		}
-		
-		// Mass
-		if ( ImGui::Button( "##Mass" ) ) {
-			SetMass( 0.f );
-		} ImGui::SameLine();
-		float invMass =  m_rigidbody->getInvMass();
-		float mass = ( invMass > 0.f ? 1.f / invMass : 0.f );
-		if ( ImGui::DragFloat( "mass", &mass, 1.f, 0.f, 1000.f ) ) {
-			SetMass( mass );			
+		bool enableDesactivation = IsDesactivationEnabled();
+		if ( ImGui::Checkbox( "enable desactivation ", &enableDesactivation ) )
+		{
+			EnableDesactivation( enableDesactivation );
 		}
 
-		// Velocity
-		if ( ImGui::Button( "##Velocity" ) ) {
-			SetVelocity( btVector3( 0, 0, 0 ) );
-		} ImGui::SameLine();
-		btVector3 velocity = GetVelocity();
-		if ( ImGui::DragFloat3( "velocity", &velocity[0], 1.f, -1000.f, 1000.f ) ) {
-			SetVelocity(velocity);
-		}
+		ImGui::PushItemWidth( 0.6f * ImGui::GetWindowWidth() - 16 );
+		{
+			// Mass
+			if ( ImGui::Button( "##Mass" ) )
+			{
+				SetMass( 0.f );
+			} ImGui::SameLine();
+			float invMass = m_rigidbody->getInvMass();
+			float mass = ( invMass > 0.f ? 1.f / invMass : 0.f );
+			if ( ImGui::DragFloat( "mass", &mass, 1.f, 0.f, 1000.f ) )
+			{
+				SetMass( mass );
+			}
+
+			// Velocity
+			if ( ImGui::Button( "##Velocity" ) )
+			{
+				SetVelocity( btVector3( 0, 0, 0 ) );
+			} ImGui::SameLine();
+			btVector3 velocity = GetVelocity();
+			if ( ImGui::DragFloat3( "velocity", &velocity[0], 1.f, -1000.f, 1000.f ) )
+			{
+				SetVelocity( velocity );
+			}
+		} ImGui::PopItemWidth();
 	}
 
 	//================================================================================================================================

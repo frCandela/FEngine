@@ -40,11 +40,15 @@ namespace fan {
 	
 	//================================================================================================================================
 	//================================================================================================================================
-	void SunLight::OnGui() {
-		// Mesh generation
-		ImGui::Checkbox( "debug draw", &ecsSolarEruptionMeshSystem::s_debugDraw );
-		ImGui::DragFloat( "radius", &ecsSolarEruptionMeshSystem::s_radius, 0.1f );
-		ImGui::DragFloat( "sub-angle", &ecsSolarEruptionMeshSystem::s_subAngle, 1.f, 1.f, 180.f );
+	void SunLight::OnGui()
+	{
+		ImGui::PushItemWidth( 0.6f * ImGui::GetWindowWidth() );
+		{
+			// Mesh generation
+			ImGui::Checkbox( "debug draw", &ecsSolarEruptionMeshSystem::s_debugDraw );
+			ImGui::DragFloat( "radius", &ecsSolarEruptionMeshSystem::s_radius, 0.1f );
+			ImGui::DragFloat( "sub-angle", &ecsSolarEruptionMeshSystem::s_subAngle, 1.f, 1.f, 180.f );
+		} ImGui::PopItemWidth();
 	}
 
 	//================================================================================================================================

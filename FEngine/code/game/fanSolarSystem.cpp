@@ -43,30 +43,34 @@ namespace fan {
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void SolarSystem::OnGui() {
+	void SolarSystem::OnGui()
+	{
 		Component::OnGui();
 
 		Transform * transform = m_gameobject->GetComponent<Transform>();
 
 		static std::default_random_engine m_generator;
 		static std::uniform_real_distribution<float> m_distribution( 0.f, 1.f );
-		m_generator.seed( m_seed );		
+		m_generator.seed( m_seed );
 
-		ImGui::SliderInt( "seed", &m_seed, 0, 100 );
-		ImGui::DragInt( "max planets per orbit", &m_maxPlanetsPerOrbit );
-		ImGui::Spacing();
+		ImGui::PushItemWidth( 0.6f * ImGui::GetWindowWidth() );
+		{
 
-		ImGui::SliderFloat( "initial radius", &m_initialRadius, 0.f, 10.f );
-		ImGui::SliderFloat( "maxRadius", &m_maxRadius, 0.f, 100.f );
-		ImGui::DragFloat2( "radius factors", &m_radiusFactors[0], 0.01f, 0.001f, 10.f );
-		ImGui::DragFloat2( "random factors", &m_radiusRFactors[0], 0.01f, 0.001f, 10.f );
-		ImGui::Spacing();
+			ImGui::SliderInt( "seed", &m_seed, 0, 100 );
+			ImGui::DragInt( "max planets per orbit", &m_maxPlanetsPerOrbit );
+			ImGui::Spacing();
 
-		ImGui::SliderFloat( "scale multiplier", &m_scaleMult, 0.f, 1.f );
-		if ( ImGui::DragFloat2( "scale min max", &m_scaleMinMax[0], 0.01f, 0.f, 1.f ) ) { if ( m_scaleMinMax[0] > m_scaleMinMax[1] ) { m_scaleMinMax[0] = m_scaleMinMax[1]; } }
-		ImGui::DragFloat2( "speed factors", &m_speedFactors[0], 0.001f, 0.001f, 2.f );		
-		
+			ImGui::SliderFloat( "initial radius", &m_initialRadius, 0.f, 10.f );
+			ImGui::SliderFloat( "maxRadius", &m_maxRadius, 0.f, 100.f );
+			ImGui::DragFloat2( "radius factors", &m_radiusFactors[0], 0.01f, 0.001f, 10.f );
+			ImGui::DragFloat2( "random factors", &m_radiusRFactors[0], 0.01f, 0.001f, 10.f );
+			ImGui::Spacing();
 
+			ImGui::SliderFloat( "scale multiplier", &m_scaleMult, 0.f, 1.f );
+			if ( ImGui::DragFloat2( "scale min max", &m_scaleMinMax[0], 0.01f, 0.f, 1.f ) ) { if ( m_scaleMinMax[0] > m_scaleMinMax[1] ) { m_scaleMinMax[0] = m_scaleMinMax[1]; } }
+			ImGui::DragFloat2( "speed factors", &m_speedFactors[0], 0.001f, 0.001f, 2.f );
+
+		} ImGui::PopItemWidth();
 
 		std::vector< OrbitData > m_orbits;
 		m_orbits.clear();
@@ -76,11 +80,12 @@ namespace fan {
 		float currentRadius = m_initialRadius;
 
 		// orbits
-		while (  currentRadius < m_maxRadius ) {
-			OrbitData currentOrbit; 
-			currentOrbit.radius = currentRadius;			
-			currentRadius +=  
-				m_radiusFactors.x() + m_radiusFactors.y() * currentRadius + 
+		while ( currentRadius < m_maxRadius )
+		{
+			OrbitData currentOrbit;
+			currentOrbit.radius = currentRadius;
+			currentRadius +=
+				m_radiusFactors.x() + m_radiusFactors.y() * currentRadius +
 				m_distribution( m_generator ) * ( m_radiusRFactors.x() + m_radiusRFactors.y() * currentRadius );
 			m_orbits.push_back( currentOrbit );
 		}
@@ -101,13 +106,13 @@ namespace fan {
 		for ( int orbitIndex = 0; orbitIndex < m_orbits.size(); orbitIndex++ )
 		{
 			OrbitData& orbit = m_orbits[orbitIndex];
-			int num = 1 + int((m_distribution( m_generator ) - 0.001f) * m_maxPlanetsPerOrbit );			
+			int num = 1 + int( ( m_distribution( m_generator ) - 0.001f ) * m_maxPlanetsPerOrbit );
 			orbit.planets.resize( num );
-			
+
 			// phase
 			const float maxPhaseIncrement = 2.f * PI / num;
 			float prevPhase = 2.f * PI * m_distribution( m_generator );
-			for (int planetIndex = 0; planetIndex < num; planetIndex++)
+			for ( int planetIndex = 0; planetIndex < num; planetIndex++ )
 			{
 				PlanetData & planet = orbit.planets[planetIndex];
 				planet.phase = prevPhase;
@@ -128,12 +133,12 @@ namespace fan {
 		}
 
 		// Draw orbits
-		for (int orbitIndex = 0; orbitIndex < m_orbits.size(); orbitIndex++)
+		for ( int orbitIndex = 0; orbitIndex < m_orbits.size(); orbitIndex++ )
 		{
 			OrbitData orbit = m_orbits[orbitIndex];
-			
+
 			Debug::Render().DebugCircle( transform->GetPosition(), orbit.radius, transform->Up(), 32, Color::Cyan );
-			
+
 			float const time = -orbit.speed * Time::ElapsedSinceStartup();
 			for ( int planetIndex = 0; planetIndex < orbit.planets.size(); planetIndex++ )
 			{
@@ -142,27 +147,29 @@ namespace fan {
 
 				Debug::Render().DebugCircle( orbit.radius * position, std::fabs( orbit.maxScale ), transform->Up(), 16, Color::Cyan );
 			}
-			
+
 		}
 
 
 
 		// Moon
-		if ( ImGui::Button( "Populate" ))
+		if ( ImGui::Button( "Populate" ) )
 		{
 			Scene * scene = m_gameobject->GetScene();
 
 			// Remove all childs
 			const std::vector<Gameobject*>& childs = m_gameobject->GetChilds();
-			for (int childIndex = 0; childIndex < childs.size(); childIndex++) {
+			for ( int childIndex = 0; childIndex < childs.size(); childIndex++ )
+			{
 				scene->DeleteGameobject( childs[childIndex] );
 			}
 
 			// Generates planets
-			for ( size_t orbitIndex = 0; orbitIndex < m_orbits.size(); orbitIndex++ ) {
+			for ( size_t orbitIndex = 0; orbitIndex < m_orbits.size(); orbitIndex++ )
+			{
 				const OrbitData & orbit = m_orbits[orbitIndex];
 
-				for (int planetIndex = 0; planetIndex < orbit.planets.size(); planetIndex++)
+				for ( int planetIndex = 0; planetIndex < orbit.planets.size(); planetIndex++ )
 				{
 					const PlanetData& planetData = orbit.planets[planetIndex];
 
@@ -184,13 +191,13 @@ namespace fan {
 
 					Rigidbody * rb = newPlanet->AddComponent<Rigidbody>();
 					rb->EnableDesactivation( false );
-					rb->SetKinematic();				
+					rb->SetKinematic();
 
 					Transform * planetTransform = newPlanet->GetTransform();
 					planetTransform->SetScale( btVector3( planetData.radius, planetData.radius, planetData.radius ) );
 				}
 			}
-		}	
+		}
 	}
 
 	//================================================================================================================================

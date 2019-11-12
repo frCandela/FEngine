@@ -48,8 +48,15 @@ namespace fan
 	void UIMeshRenderer::OnGui()
 	{
 		Component::OnGui();
-		ImGui::ColorEdit4( "color", m_color.Data(), ImGui::fanColorEditFlags );
-		ImGui::FanTexture( "ui texture", &m_texture );
+		ImGui::PushItemWidth(0.6f * ImGui::GetWindowWidth() ); {
+
+			ImGui::ColorEdit4( "color", m_color.Data(), ImGui::fanColorEditFlags );
+			ImGui::FanTexture( "ui texture", &m_texture );
+
+			btVector2 pixelSize;
+			ImGui::DragFloat2( "pixel_size", &pixelSize[0] );
+
+		} ImGui::PopItemWidth();
 	}
 
 	//================================================================================================================================

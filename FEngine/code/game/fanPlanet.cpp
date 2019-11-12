@@ -45,10 +45,14 @@ namespace fan {
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void Planet::OnGui() {
-		ImGui::DragFloat("radius", &m_planet->radius, 0.1f, 0.f, 100.f);
-		ImGui::DragFloat("speed",  &m_planet->speed,   0.1f, 0.f, 10.f);
-		ImGui::DragFloat("phase",  &m_planet->phase, PI/3, 0.f, 2 * PI);
+	void Planet::OnGui()
+	{
+		ImGui::PushItemWidth( 0.6f * ImGui::GetWindowWidth() );
+		{
+			ImGui::DragFloat( "radius", &m_planet->radius, 0.1f, 0.f, 100.f );
+			ImGui::DragFloat( "speed", &m_planet->speed, 0.1f, 0.f, 10.f );
+			ImGui::DragFloat( "phase", &m_planet->phase, PI / 3, 0.f, 2 * PI );
+		}
 	}
 
 	//================================================================================================================================

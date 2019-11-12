@@ -59,10 +59,13 @@ namespace fan
 	//================================================================================================================================
 	void SolarPanel::OnGui()
 	{
-		ImGui::DragFloat( "min_charging_rate", &m_minChargingRate, 0.5f, 0.f, 100.f );
-		ImGui::DragFloat( "max_charging_rate", &m_maxChargingRate, 0.5f, 0.f, 100.f );
-		ImGui::DragFloat( "low_range		", &m_minRange, 0.5f, 0.f, 100.f );
-		ImGui::DragFloat( "max_range 		", &m_maxRange, 0.5f, 0.f, 100.f );
+		ImGui::PushItemWidth( 0.6f * ImGui::GetWindowWidth() );
+		{
+			ImGui::DragFloat( "min_charging_rate", &m_minChargingRate, 0.5f, 0.f, 100.f );
+			ImGui::DragFloat( "max_charging_rate", &m_maxChargingRate, 0.5f, 0.f, 100.f );
+			ImGui::DragFloat( "low_range		", &m_minRange, 0.5f, 0.f, 100.f );
+			ImGui::DragFloat( "max_range 		", &m_maxRange, 0.5f, 0.f, 100.f );
+		} ImGui::PopItemWidth();
 	}
 
 	//================================================================================================================================

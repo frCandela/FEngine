@@ -76,38 +76,44 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void PointLight::OnGui() {
+	void PointLight::OnGui()
+	{
 		Component::OnGui();
+		ImGui::PushItemWidth( 0.6f * ImGui::GetWindowWidth() - 16 );
+		{
 
-		// Filter color
-		if (ImGui::Button("##ambiant")) { SetAmbiant(Color(0.0f)); } ImGui::SameLine();
-		if (ImGui::ColorEdit3("ambiant", m_pointLight->ambiant.Data(), ImGui::fanColorEditFlags)) { m_gameobject->AddFlag( Gameobject::Flag::OUTDATED_LIGHT ); }
-		if (ImGui::Button("##diffuse")) { SetDiffuse(Color::White); } ImGui::SameLine();
-		if (ImGui::ColorEdit3("diffuse", m_pointLight->diffuse.Data(), ImGui::fanColorEditFlags)) { m_gameobject->AddFlag( Gameobject::Flag::OUTDATED_LIGHT ); }
-		if (ImGui::Button("##specular")) { SetSpecular(Color::White); } ImGui::SameLine();
-		if (ImGui::ColorEdit3("specular", m_pointLight->specular.Data(), ImGui::fanColorEditFlags)) { m_gameobject->AddFlag( Gameobject::Flag::OUTDATED_LIGHT ); }
-		// Attenuation
-		
-		ImGui::Text("attenuation :");  
-		ImGui::SameLine();  
-		ImGui::FanShowHelpMarker(
-			"Light intensity fades out with distance \n"
-			"Fadings follows the following formula : \n"
-			"constant + linear * d + quadratic * d*d  \n"
-			"(d=distance)");
-		if (ImGui::Button("##constant attenuation")) { SetAttenuation(Attenuation::CONSTANT, 0.f ); }	ImGui::SameLine();
-		if (ImGui::DragFloat("constant",  &m_pointLight->attenuation[Attenuation::CONSTANT],0.01f, 0.f, 100.f)) { m_gameobject->AddFlag( Gameobject::Flag::OUTDATED_LIGHT ); }
-		if (ImGui::Button("##linear attenuation")) { SetAttenuation(Attenuation::LINEAR, 0.f); }	ImGui::SameLine();
-		if (ImGui::DragFloat("linear",	  &m_pointLight->attenuation[Attenuation::LINEAR], 0.001f, 0.f, 100.f)) { m_gameobject->AddFlag( Gameobject::Flag::OUTDATED_LIGHT ); }
-		if (ImGui::Button("##quadratic attenuation")) { SetAttenuation(Attenuation::QUADRATIC, 0.f); }	ImGui::SameLine();
-		if (ImGui::DragFloat("quadratic", &m_pointLight->attenuation[Attenuation::QUADRATIC], 0.0001f, 0.f, 100.f)) { m_gameobject->AddFlag( Gameobject::Flag::OUTDATED_LIGHT ); }
-		
+			// Filter color
+			if ( ImGui::Button( "##ambiant" ) ) { SetAmbiant( Color( 0.0f ) ); } ImGui::SameLine();
+			if ( ImGui::ColorEdit3( "ambiant", m_pointLight->ambiant.Data(), ImGui::fanColorEditFlags ) ) { m_gameobject->AddFlag( Gameobject::Flag::OUTDATED_LIGHT ); }
+			if ( ImGui::Button( "##diffuse" ) ) { SetDiffuse( Color::White ); } ImGui::SameLine();
+			if ( ImGui::ColorEdit3( "diffuse", m_pointLight->diffuse.Data(), ImGui::fanColorEditFlags ) ) { m_gameobject->AddFlag( Gameobject::Flag::OUTDATED_LIGHT ); }
+			if ( ImGui::Button( "##specular" ) ) { SetSpecular( Color::White ); } ImGui::SameLine();
+			if ( ImGui::ColorEdit3( "specular", m_pointLight->specular.Data(), ImGui::fanColorEditFlags ) ) { m_gameobject->AddFlag( Gameobject::Flag::OUTDATED_LIGHT ); }
+			// Attenuation
+
+			ImGui::Text( "attenuation :" );
+			ImGui::SameLine();
+			ImGui::FanShowHelpMarker(
+				"Light intensity fades out with distance \n"
+				"Fadings follows the following formula : \n"
+				"constant + linear * d + quadratic * d*d  \n"
+				"(d=distance)" );
+			if ( ImGui::Button( "##constant attenuation" ) ) { SetAttenuation( Attenuation::CONSTANT, 0.f ); }	ImGui::SameLine();
+			if ( ImGui::DragFloat( "constant", &m_pointLight->attenuation[Attenuation::CONSTANT], 0.01f, 0.f, 100.f ) ) { m_gameobject->AddFlag( Gameobject::Flag::OUTDATED_LIGHT ); }
+			if ( ImGui::Button( "##linear attenuation" ) ) { SetAttenuation( Attenuation::LINEAR, 0.f ); }	ImGui::SameLine();
+			if ( ImGui::DragFloat( "linear", &m_pointLight->attenuation[Attenuation::LINEAR], 0.001f, 0.f, 100.f ) ) { m_gameobject->AddFlag( Gameobject::Flag::OUTDATED_LIGHT ); }
+			if ( ImGui::Button( "##quadratic attenuation" ) ) { SetAttenuation( Attenuation::QUADRATIC, 0.f ); }	ImGui::SameLine();
+			if ( ImGui::DragFloat( "quadratic", &m_pointLight->attenuation[Attenuation::QUADRATIC], 0.0001f, 0.f, 100.f ) ) { m_gameobject->AddFlag( Gameobject::Flag::OUTDATED_LIGHT ); }
+
+		} ImGui::PopItemWidth();
+
  		// Sphere gizmo
 		float lightRange = GetLightRange();
 		if (lightRange > 0 ) {
 			const btTransform transform = m_gameobject->GetComponent<Transform>()->GetBtTransform();
 			Debug::Render().DebugSphere(transform, lightRange, 2, m_pointLight->diffuse);
 		}
+
 	}
 
 	//================================================================================================================================

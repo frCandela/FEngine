@@ -45,15 +45,21 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void SphereShape::OnGui() {
+	void SphereShape::OnGui()
+	{
 		Component::OnGui();
 
-		float radius = GetRadius();
-		if ( ImGui::DragFloat( "radius", &radius, 0.1f, 0.f ) ) {
-			SetRadius( radius );
-		}
+		ImGui::PushItemWidth( 0.6f * ImGui::GetWindowWidth() );
+		{
+			float radius = GetRadius();
+			if ( ImGui::DragFloat( "radius", &radius, 0.1f, 0.f ) )
+			{
+				SetRadius( radius );
+			}
+			Debug::Render().DebugSphere( m_gameobject->GetTransform()->GetBtTransform(), radius, 2, Color::Green );
+		} ImGui::PopItemWidth();
 
-		Debug::Render().DebugSphere( m_gameobject->GetTransform()->GetBtTransform(), radius, 2, Color::Green );
+	
 	}
 
 	//================================================================================================================================

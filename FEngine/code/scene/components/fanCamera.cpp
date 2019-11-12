@@ -124,54 +124,72 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void Camera::OnGui() {
+	void Camera::OnGui()
+	{
 		Component::OnGui();
 
-		int item = static_cast<int>(m_type);
-		if ( ImGui::Combo( "type", &item, "perspective\0orthogonal\0" ) ) {
-			SetProjectionType( Type( item ) );
-		}
+		ImGui::PushItemWidth( 0.6f * ImGui::GetWindowWidth() - 16 );
+		{
 
-		if ( m_type == Type::PERSPECTIVE ) {
-			// fov
-			if (ImGui::Button("##fov")) {
-				SetFov(110.f);
+			int item = static_cast<int>( m_type );
+			if ( ImGui::Combo( "type", &item, "perspective\0orthogonal\0" ) )
+			{
+				SetProjectionType( Type( item ) );
+			}
+
+			if ( m_type == Type::PERSPECTIVE )
+			{
+				// fov
+				if ( ImGui::Button( "##fov" ) )
+				{
+					SetFov( 110.f );
+				}
+				ImGui::SameLine();
+				float fov = GetFov();
+				if ( ImGui::DragFloat( "fov", &fov, 1.f, 1.f, 179.f ) )
+				{
+					SetFov( fov );
+				}
+			}
+			else if ( m_type == Type::ORTHOGONAL )
+			{
+				// fov
+				if ( ImGui::Button( "##size" ) )
+				{
+					m_orthoSize = 10.f;
+				}
+				ImGui::SameLine();
+				if ( ImGui::DragFloat( "size", &m_orthoSize, 1.f, 0.f, 100.f ) )
+				{
+					SetOrthoSize( m_orthoSize );
+				}
+			}
+
+			// nearDistance
+			if ( ImGui::Button( "##nearDistance" ) )
+			{
+				SetNearDistance( 0.01f );
 			}
 			ImGui::SameLine();
-			float fov = GetFov();
-			if (ImGui::DragFloat("fov", &fov, 1.f, 1.f, 179.f)) {
-				SetFov(fov);
+			float near = GetNearDistance();
+			if ( ImGui::DragFloat( "near distance", &near, 0.001f, 0.01f, 10.f ) )
+			{
+				SetNearDistance( near );
 			}
-		} else if ( m_type == Type::ORTHOGONAL ) {
-			// fov
-			if ( ImGui::Button( "##size" ) ) {
-				m_orthoSize = 10.f;
+
+			// far distance
+			if ( ImGui::Button( "##fardistance" ) )
+			{
+				SetFarDistance( 1000.f );
 			}
 			ImGui::SameLine();
-			if ( ImGui::DragFloat( "size", &m_orthoSize, 1.f, 0.f, 100.f ) ) {
-				SetOrthoSize(m_orthoSize);
-			}
-		}
-
-		// nearDistance
-		if ( ImGui::Button( "##nearDistance" ) ) {
-			SetNearDistance( 0.01f );
-		}
-		ImGui::SameLine();
-		float near = GetNearDistance();
-		if ( ImGui::DragFloat( "near distance", &near, 0.001f, 0.01f, 10.f ) ) {
-			SetNearDistance( near );
-		}
-
-		// far distance
-		if ( ImGui::Button( "##fardistance" ) ) {
-			SetFarDistance( 1000.f );
-		}
-		ImGui::SameLine();
-		float far = GetFarDistance();
-		if ( ImGui::DragFloat( "far distance", &far, 10.f, 0.05f, 10000.f ) ) {
-			SetFarDistance( far );
-		}
+			float far = GetFarDistance();
+			if ( ImGui::DragFloat( "far distance", &far, 10.f, 0.05f, 10000.f ) )
+			{
+				SetFarDistance( far );
+			}			
+		} ImGui::PopItemWidth();
+	
 	}
 
 	//================================================================================================================================

@@ -125,9 +125,11 @@ namespace fan {
 	
 	//================================================================================================================================
 	//================================================================================================================================
-	void SolarEruption::OnGui() {
-		
-		ImGui::PushItemWidth( 100.f ); {
+	void SolarEruption::OnGui()
+	{
+
+		ImGui::PushItemWidth( 200.f );
+		{
 			// State machine		
 			ImGui::DragFloat( "eruption time", &m_eruptionTime );
 			ImGui::DragFloat( "warming time", &m_warmingTime );
@@ -142,22 +144,27 @@ namespace fan {
 			ImGui::Spacing();
 		} ImGui::PopItemWidth();
 
-		// Colors
-		ImGui::Spacing();
-		if ( ImGui::ColorEdit4( "base ", m_baseColor.Data(), ImGui::fanColorEditFlags ) ) {
-			m_material->SetColor( m_baseColor );
-		}
-		ImGui::ColorEdit4( "explositon ", m_explositonColor.Data(), ImGui::fanColorEditFlags );
+		ImGui::PushItemWidth( 0.6f * ImGui::GetWindowWidth() );
+		{
+			// Colors
+			ImGui::Spacing();
+			if ( ImGui::ColorEdit4( "base ", m_baseColor.Data(), ImGui::fanColorEditFlags ) )
+			{
+				m_material->SetColor( m_baseColor );
+			}
+			ImGui::ColorEdit4( "explositon ", m_explositonColor.Data(), ImGui::fanColorEditFlags );
 
-		// Test
-		ImGui::Spacing();
-		if ( ImGui::Button( "Eruption" ) ) {
-			m_state = COLLAPSING;
-			m_eruptionTime = 0.f;
-			m_particleSystem->SetEnabled( true );
-			m_material->SetColor( m_baseColor );
-			m_particleSystem->SetSpeedParticles( 1.f );
-		}
+			// Test
+			ImGui::Spacing();
+			if ( ImGui::Button( "Eruption" ) )
+			{
+				m_state = COLLAPSING;
+				m_eruptionTime = 0.f;
+				m_particleSystem->SetEnabled( true );
+				m_material->SetColor( m_baseColor );
+				m_particleSystem->SetSpeedParticles( 1.f );
+			}
+		} ImGui::PopItemWidth();
 	}
 
 	//================================================================================================================================

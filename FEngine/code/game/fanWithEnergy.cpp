@@ -81,8 +81,12 @@ namespace fan
 	//================================================================================================================================
 	void WithEnergy::OnGui()
 	{
-		ImGui::DragFloat( "current energy 	   ", &m_currentEnergy );
-		ImGui::DragFloat( "max energy 		   ", &m_maxEnergy );
+		ImGui::PushItemWidth( 0.6f * ImGui::GetWindowWidth() );
+		{
+			ImGui::DragFloat( "current energy 	   ", &m_currentEnergy );
+			ImGui::DragFloat( "max energy 		   ", &m_maxEnergy );
+
+		} ImGui::PopItemWidth();
 	}
 	 
 	//================================================================================================================================

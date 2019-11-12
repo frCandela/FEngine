@@ -44,16 +44,20 @@ namespace fan {
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void BoxShape::OnGui() {
+	void BoxShape::OnGui()
+	{
 		Component::OnGui();
 
-		btVector3 extent = GetExtent();;
-		if ( ImGui::DragFloat3("half extent", &extent[0], 0.05f, 0.f ) ) {
-			SetExtent( extent );
-		}
+		ImGui::PushItemWidth( 0.6f * ImGui::GetWindowWidth() );
+		{
+			btVector3 extent = GetExtent();
+			if ( ImGui::DragFloat3( "half extent", &extent[0], 0.05f, 0.f ) )
+			{
+				SetExtent( extent );
+			}
 
-		Debug::Render().DebugCube( m_gameobject->GetTransform()->GetBtTransform(), 0.5f * extent, Color::Green );
-
+			Debug::Render().DebugCube( m_gameobject->GetTransform()->GetBtTransform(), 0.5f * extent, Color::Green );
+		} ImGui::PopItemWidth();
 	}
 
 	//================================================================================================================================

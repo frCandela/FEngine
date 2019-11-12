@@ -117,32 +117,34 @@ namespace fan
 	void FPSCamera::OnGui() {
 		Actor::OnGui();
 
-		// SetSensitivity
-		if (ImGui::Button("##SetSensitivity")) {
-			SetXYSensitivity(btVector2(0.005f, 0.005f));
-		} ImGui::SameLine();
-		btVector2 xySensitivity = GetXYSensitivity();
-		if (ImGui::DragFloat2("XY sensitivity", &xySensitivity[0], 1.f)) {
-			SetXYSensitivity(xySensitivity);
-		}
+		ImGui::PushItemWidth( 0.6f * ImGui::GetWindowWidth() - 16 ); {
+			// SetSensitivity
+			if (ImGui::Button("##SetSensitivity")) {
+				SetXYSensitivity(btVector2(0.005f, 0.005f));
+			} ImGui::SameLine();
+			btVector2 xySensitivity = GetXYSensitivity();
+			if (ImGui::DragFloat2("XY sensitivity", &xySensitivity[0], 1.f)) {
+				SetXYSensitivity(xySensitivity);
+			}
 
-		// SetSpeed
-		if (ImGui::Button("##SetSpeed")) {
-			SetSpeed(10.f);
-		} ImGui::SameLine();
-		float speed = GetSpeed();
-		if (ImGui::DragFloat("speed", &speed, 1.f)) {
-			SetSpeed(speed);
-		}
+			// SetSpeed
+			if (ImGui::Button("##SetSpeed")) {
+				SetSpeed(10.f);
+			} ImGui::SameLine();
+			float speed = GetSpeed();
+			if (ImGui::DragFloat("speed", &speed, 1.f)) {
+				SetSpeed(speed);
+			}
 
-		// SetSpeedMultiplier
-		if (ImGui::Button("##SetSpeedMultiplier")) {
-			SetSpeedMultiplier(3.f);
-		} ImGui::SameLine();
-		float speedMultiplier = GetSpeedMultiplier();
-		if (ImGui::DragFloat("speed multiplier", &speedMultiplier, 1.f)) {
-			SetSpeedMultiplier(speedMultiplier);
-		}
+			// SetSpeedMultiplier
+			if (ImGui::Button("##SetSpeedMultiplier")) {
+				SetSpeedMultiplier(3.f);
+			} ImGui::SameLine();
+			float speedMultiplier = GetSpeedMultiplier();
+			if (ImGui::DragFloat("speed multiplier", &speedMultiplier, 1.f)) {
+				SetSpeedMultiplier(speedMultiplier);
+			}
+		} ImGui::PopItemWidth();
 	}
 
 	//================================================================================================================================

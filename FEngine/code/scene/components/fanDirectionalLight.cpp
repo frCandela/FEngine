@@ -62,32 +62,37 @@ namespace fan {
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void DirectionalLight::OnGui() {
+	void DirectionalLight::OnGui()
+	{
 		Component::OnGui();
 
-		// Filter color
-		if ( ImGui::Button( "##ambiant" ) ) { SetAmbiant( Color::Black ); } ImGui::SameLine();
-		if ( ImGui::ColorEdit3( "ambiant", m_dirLight->ambiant.Data(), ImGui::fanColorEditFlags ) ) { m_gameobject->AddFlag( Gameobject::Flag::OUTDATED_LIGHT ); }
-		if ( ImGui::Button( "##diffuse" ) ) { SetDiffuse( Color::Black ); } ImGui::SameLine();
-		if ( ImGui::ColorEdit3( "diffuse", m_dirLight->diffuse.Data(), ImGui::fanColorEditFlags ) ) { m_gameobject->AddFlag( Gameobject::Flag::OUTDATED_LIGHT ); }
-		if ( ImGui::Button( "##specular" ) ) { SetSpecular( Color::Black ); } ImGui::SameLine();
-		if ( ImGui::ColorEdit3( "specular", m_dirLight->specular.Data(), ImGui::fanColorEditFlags ) ) { m_gameobject->AddFlag( Gameobject::Flag::OUTDATED_LIGHT ); }
+		ImGui::PushItemWidth( 0.6f * ImGui::GetWindowWidth() );
+		{
+			// Filter color
+			if ( ImGui::Button( "##ambiant" ) ) { SetAmbiant( Color::Black ); } ImGui::SameLine();
+			if ( ImGui::ColorEdit3( "ambiant", m_dirLight->ambiant.Data(), ImGui::fanColorEditFlags ) ) { m_gameobject->AddFlag( Gameobject::Flag::OUTDATED_LIGHT ); }
+			if ( ImGui::Button( "##diffuse" ) ) { SetDiffuse( Color::Black ); } ImGui::SameLine();
+			if ( ImGui::ColorEdit3( "diffuse", m_dirLight->diffuse.Data(), ImGui::fanColorEditFlags ) ) { m_gameobject->AddFlag( Gameobject::Flag::OUTDATED_LIGHT ); }
+			if ( ImGui::Button( "##specular" ) ) { SetSpecular( Color::Black ); } ImGui::SameLine();
+			if ( ImGui::ColorEdit3( "specular", m_dirLight->specular.Data(), ImGui::fanColorEditFlags ) ) { m_gameobject->AddFlag( Gameobject::Flag::OUTDATED_LIGHT ); }
 
 
-		const Transform * transform = m_gameobject->GetComponent<Transform>();
-		const btVector3 pos = transform->GetPosition();
-		const btVector3 dir = transform->Forward();
-		const btVector3 up = transform->Up();
-		const btVector3 left = transform->Left();
-		const float length = 2.f;
-		const float radius = 0.5f;
-		const Color color = Color::Yellow;
-		btVector3 offsets[5] = { btVector3::Zero(), radius * up ,-radius * up, radius * left ,-radius * left };
-		for (int offsetIndex = 0; offsetIndex < 5 ; offsetIndex++) {
-			const btVector3 offset = offsets[offsetIndex];
-			Debug::Render().DebugLine( pos + offset, pos + offset + length * dir, color );
-		}
-		Debug::Render().DebugSphere( transform->GetBtTransform(), radius,0, color );
+			const Transform * transform = m_gameobject->GetComponent<Transform>();
+			const btVector3 pos = transform->GetPosition();
+			const btVector3 dir = transform->Forward();
+			const btVector3 up = transform->Up();
+			const btVector3 left = transform->Left();
+			const float length = 2.f;
+			const float radius = 0.5f;
+			const Color color = Color::Yellow;
+			btVector3 offsets[5] = { btVector3::Zero(), radius * up ,-radius * up, radius * left ,-radius * left };
+			for ( int offsetIndex = 0; offsetIndex < 5; offsetIndex++ )
+			{
+				const btVector3 offset = offsets[offsetIndex];
+				Debug::Render().DebugLine( pos + offset, pos + offset + length * dir, color );
+			}
+			Debug::Render().DebugSphere( transform->GetBtTransform(), radius, 0, color );
+		} ImGui::PopItemWidth();
 	}
 
 	//================================================================================================================================

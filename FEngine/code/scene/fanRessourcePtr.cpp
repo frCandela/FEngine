@@ -25,7 +25,7 @@ namespace ImGui
 		ImGui::SameLine();		
 
 		// name button 
-		float width = 0.5f * ImGui::GetWindowWidth() - ImGui::GetCursorPosX() + 8;
+		float width = 0.6f * ImGui::GetWindowWidth() - ImGui::GetCursorPosX() + 8;
 		ImGui::Button( name.c_str(), ImVec2( width, 0.f) ); ImGui::SameLine();
 			ImGui::SameLine();
 
@@ -65,7 +65,7 @@ namespace ImGui
 		ImGui::SameLine();
 		
 		// name button 
-		const float width = 0.5f * ImGui::GetWindowWidth() - ImGui::GetCursorPosX() + 8;
+		const float width = 0.6f * ImGui::GetWindowWidth() - ImGui::GetCursorPosX() + 8;
 		ImGui::Button( name.c_str(), ImVec2( width, 0.f ) ); ImGui::SameLine();
 		ImGui::FanBeginDragDropSourceTexture( texture );
 
@@ -114,7 +114,7 @@ namespace ImGui
 		ImGui::SameLine();
 
 		// name button 
-		const float width = 0.5f * ImGui::GetWindowWidth() - ImGui::GetCursorPosX() + 8;
+		const float width = 0.6f * ImGui::GetWindowWidth() - ImGui::GetCursorPosX() + 8;
 		ImGui::Button( name.c_str(), ImVec2( width, 0.f ) ); ImGui::SameLine();
 		ImGui::FanBeginDragDropSourceMesh( mesh );
 

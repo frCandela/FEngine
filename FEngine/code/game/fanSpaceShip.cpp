@@ -105,11 +105,12 @@ namespace fan {
 	}
 
 	//================================================================================================================================
-	void SpaceShip::OnGui() {
+	//================================================================================================================================
+	void SpaceShip::OnGui()
+	{
 		Actor::OnGui();
 
-		//float width = ImGui::GetWindowWidth();
-	//	ImGui::PushItemWidth(0.5f *width ); 
+		ImGui::PushItemWidth( 0.6f * ImGui::GetWindowWidth() );
 		{
 			ImGui::DragFloat( "reverse force", &m_forwardForces[SpeedMode::REVERSE], 1.f, 0.f, 100000.f );
 			ImGui::DragFloat( "slow forward force", &m_forwardForces[SpeedMode::SLOW], 1.f, 0.f, 100000.f );
@@ -123,9 +124,8 @@ namespace fan {
 			ImGui::FanGameobject( "slow forward particles", &m_slowForwardParticlesGo );
 			ImGui::FanGameobject( "reverse particles", &m_reverseParticlesGo );
 			ImGui::FanGameobject( "left particles", &m_leftParticlesGo );
-			ImGui::FanGameobject( "right particles", &m_rightParticlesGo );	
-		} 
-		//ImGui::PopItemWidth();
+			ImGui::FanGameobject( "right particles", &m_rightParticlesGo );
+		} ImGui::PopItemWidth();
 	}
 
 	//================================================================================================================================

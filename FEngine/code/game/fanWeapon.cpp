@@ -142,17 +142,20 @@ namespace fan
 	//================================================================================================================================
 	void Weapon::OnGui()
 	{
-		ImGui::DragFloat("scale ##wepoffset", &m_scale, 0.05f, 0.f, 1.f );
-		ImGui::DragFloat( "speed ##wepspeed", &m_speed, 0.1f, 0.f, 100.f );
-		ImGui::DragFloat3( "offset ##wepspeed", &m_offset[0]);
-		ImGui::DragFloat( "life time ##wepspeed", &m_lifeTime, 1.f, 0.f, 100.f );
-		ImGui::DragFloat( "bullets per second", &m_bulletsPerSecond, 1.f, 0.f, 1000.f );
-		ImGui::DragFloat( "bullet energy cost", &m_bulletEnergyCost, 0.05f, 0.f, 10.f );
-		ImGui::Spacing();
-		ImGui::DragFloat( "explosion time ##wep_exposionTime",   &m_explosionTime, 0.05f, 0.f, 10.f );
-		ImGui::DragFloat( "explosion speed ##wep_exposionSpeed", &m_exposionSpeed, 0.5f , 0.f, 100.f );	
-		ImGui::DragInt( "particles per explosion ##wep_particlesPerExplosion", &m_particlesPerExplosion );
-		
+		ImGui::PushItemWidth( 0.6f * ImGui::GetWindowWidth() );
+		{
+			ImGui::DragFloat( "scale ##wepoffset", &m_scale, 0.05f, 0.f, 1.f );
+			ImGui::DragFloat( "speed ##wepspeed", &m_speed, 0.1f, 0.f, 100.f );
+			ImGui::DragFloat3( "offset ##wepspeed", &m_offset[0] );
+			ImGui::DragFloat( "life time ##wepspeed", &m_lifeTime, 1.f, 0.f, 100.f );
+			ImGui::DragFloat( "bullets per second", &m_bulletsPerSecond, 1.f, 0.f, 1000.f );
+			ImGui::DragFloat( "bullet energy cost", &m_bulletEnergyCost, 0.05f, 0.f, 10.f );
+			ImGui::Spacing();
+			ImGui::DragFloat( "explosion time ##wep_exposionTime", &m_explosionTime, 0.05f, 0.f, 10.f );
+			ImGui::DragFloat( "explosion speed ##wep_exposionSpeed", &m_exposionSpeed, 0.5f, 0.f, 100.f );
+			ImGui::DragInt( "particles per explosion ##wep_particlesPerExplosion", &m_particlesPerExplosion );
+
+		} ImGui::PopItemWidth();
 	}
 	 
 	//================================================================================================================================

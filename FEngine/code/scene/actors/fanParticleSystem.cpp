@@ -75,7 +75,7 @@ namespace fan {
 	{
 		Actor::OnGui();
 
-		ImGui::PushItemWidth( 0.5f * ImGui::GetWindowWidth() ); {
+		ImGui::PushItemWidth( 0.6f * ImGui::GetWindowWidth() ); {
 
 			ImGui::FanGameobject( "origin", &m_origin );
 			ImGui::DragInt( "particles per second", &m_particlesPerSecond, 1, 0 );
