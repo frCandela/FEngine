@@ -33,6 +33,7 @@ namespace fan
 
 		bool							RemoveComponent(const Component * _component);		
 		Component*						AddComponent( const uint32_t _componentID );
+		Component*						GetComponent( const uint32_t _componentID );
 		const std::vector<Component*> & GetComponents() const { return m_components; }
 
 		// Getters
@@ -58,6 +59,7 @@ namespace fan
 		// ISerializable
 		bool Save( Json & _json ) const override; 
 		bool Load( Json & _json ) override;
+		void CopyDataFrom( Json & _json );
 
 		// Flags
 		bool		HasFlag(const Flag _flag) const { return m_flags->flags & _flag; }
@@ -109,11 +111,13 @@ namespace fan
 	template<typename ComponentType>
 	ComponentType* Gameobject::GetComponent()
 	{
-		for (int componentIndex = 0; componentIndex < m_components.size(); componentIndex++) {
+		for ( int componentIndex = 0; componentIndex < m_components.size(); componentIndex++ )
+		{
 			Component* component = m_components[componentIndex];
 
-			if (component->IsType<ComponentType>()) {
-				return static_cast<ComponentType*>(component);
+			if ( component->IsType<ComponentType>() )
+			{
+				return static_cast<ComponentType*>( component );
 			}
 		}
 		return nullptr;
@@ -125,14 +129,7 @@ namespace fan
 	template<typename ComponentType>
 	std::vector<ComponentType*> Gameobject::GetComponents()
 	{
-		std::vector<ComponentType*> componentTypeVector;
-		for (int componentIndex = 0; componentIndex < m_components.size(); componentIndex++) {
-			Component* component = m_components[componentIndex];
-			if (component->IsType<ComponentType>()) {
-				componentTypeVector.push_back(static_cast<ComponentType*>(component));
-			}
-		}
-		return componentTypeVector;
+		return static_cast<ComponentType*>( GetComponent(ComponentType::s_typeID ) );
 	}
 
 	//================================================================================================================================

@@ -94,12 +94,29 @@ namespace fan
 	}
 
 	//================================================================================================================================
-	// Add component with id
+	// Add component using a component id
 	//================================================================================================================================
 	Component* Gameobject::AddComponent(const uint32_t _componentID) {
 		Component * component = TypeInfo::Instantiate<Component>(_componentID);
 		AddComponent(component);
 		return component;
+	}
+
+	//================================================================================================================================
+	// Get component using a component id
+	//================================================================================================================================
+	Component* Gameobject::GetComponent( const uint32_t _componentID )
+	{
+		for ( int componentIndex = 0; componentIndex < m_components.size(); componentIndex++ )
+		{
+			Component* component = m_components[componentIndex];
+
+			if ( component->GetType() == _componentID )
+			{
+				return  component;
+			}
+		}
+		return nullptr;
 	}
 
 	//================================================================================================================================
@@ -237,6 +254,38 @@ namespace fan
 	}
 
 	//================================================================================================================================
+	// Copy gameobject data
+	// Copy components data if already existing
+	//================================================================================================================================
+	void Gameobject::CopyDataFrom( Json & _json )
+	{
+		// gameobject data
+		LoadString( _json, "name", m_name );
+		LoadUInt( _json, "flags", m_flags->flags );
+
+		// components data
+		Json& jComponents = _json["components"];
+		{
+			for ( int childIndex = 0; childIndex < jComponents.size(); childIndex++ )
+			{
+				Json& jComponent_i = jComponents[childIndex];
+				
+				unsigned componentID = 0;
+				LoadUInt( jComponent_i, "id", componentID );
+
+				Component * component = GetComponent( componentID );
+				if ( component )
+				{
+					if( !component->Load( jComponent_i ) ) {
+						Debug::Get() << Debug::Severity::error << "Failed loading component: " << component->GetName() << Debug::Endl();
+					}
+				}
+				
+			}
+		}
+	}
+
+	//================================================================================================================================
 	//================================================================================================================================
 	bool Gameobject::Load( Json & _json ) {
 
@@ -256,7 +305,7 @@ namespace fan
 					// Don't add a transform two times
 					Component * component = nullptr;
 					if ( componentID == Transform::s_typeID ) {
-						component = GetComponent<Transform>();
+						component = GetTransform();
 					} else {
 						component = AddComponent( componentID );
 					}
@@ -284,6 +333,7 @@ namespace fan
 		SaveUInt( _json, "flags", m_flags->flags );
 		SaveUInt64( _json, "unique_id", m_uniqueID );
 
+		// Save components
 		Json& jComponents = _json["components"];{
 			for ( int componentIndex = 0; componentIndex < m_components.size(); componentIndex++ ) {
 				Json& jComponent_i = jComponents[componentIndex]; {
@@ -292,8 +342,9 @@ namespace fan
 				}				
 			}
 		}
+
+		// Save childs gameobjects
 		Json& jchilds = _json["childs"]; {
-			// Count childs to save
 			unsigned childIndex = 0;				
 			for ( int gameobjectIndex = 0; gameobjectIndex < m_childs.size(); gameobjectIndex++ ) {
 				Gameobject * gameobject = m_childs[gameobjectIndex];
