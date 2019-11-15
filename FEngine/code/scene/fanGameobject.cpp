@@ -97,7 +97,7 @@ namespace fan
 	// Add component using a component id
 	//================================================================================================================================
 	Component* Gameobject::AddComponent(const uint32_t _componentID) {
-		Component * component = TypeInfo::Instantiate<Component>(_componentID);
+		Component * component = TypeInfo::Get().Instantiate<Component>(_componentID);
 		AddComponent(component);
 		return component;
 	}

@@ -13,6 +13,7 @@ namespace fan
 		friend class Singleton<ComponentsRegister>;
 	public:
 		static bool	RegisterComponent(Component * _component);
+		const Component* GetComponent( const uint32_t _componentID );
 		static std::vector< Component * >&	GetComponents() { return Get().m_components; }
 
 	private:

@@ -83,6 +83,7 @@ namespace fan
 		// Gameobjects
 		std::vector < Gameobject * >		m_entitiesToDelete;
 		std::vector < GameobjectPtr * >		m_unresolvedGameobjectPointers;
+		std::vector < ComponentIDPtr * >	m_unresolvedComponentPointers;
 		std::set< Actor * >					m_startingActors;
 		std::set< Actor * >					m_activeActors;
 		std::map< uint64_t, Gameobject * >	m_gameobjects;
@@ -91,6 +92,7 @@ namespace fan
 		void OnActorDetach(Actor * _actor);
 		void OnGameobjectPtrCreate( GameobjectPtr * _gameobjectPtr );
 		void ResolveGameobjectPointers( );
+		void OnResolveComponentIDPtr( ComponentIDPtr * _ptr );
 
 		bool Load( Json & _json ) override;
 		bool Save( Json& _json ) const override;

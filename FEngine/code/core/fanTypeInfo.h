@@ -1,5 +1,7 @@
 #pragma once
 
+#include "core/fanSingleton.h"
+
 namespace fan {
 	//================================================================================================================================
 	// TypeInfo class
@@ -18,22 +20,36 @@ namespace fan {
 	//		};
 	//		REGISTER_TYPE_INFO(MyClass)	// In cpp file
 	//================================================================================================================================
-	class TypeInfo {
+	class TypeInfo : public Singleton<TypeInfo> {
 	public:
+		friend class Singleton < TypeInfo>;
 
-		static uint32_t Register(const uint32_t _key, std::function<void*()> _constructor) {
-			assert(m_constructors().find(_key) == m_constructors().end());
-			m_constructors()[_key] = _constructor;
+		//================================================================
+		//================================================================
+		uint32_t Register(const uint32_t _key, std::function<void*()> _constructor) {
+			assert(m_constructors.find(_key) == m_constructors.end());
+			m_constructors[_key] = _constructor;
+			m_instances[_key] = _constructor();
 			return _key;
 		}
 
+		//================================================================
+		//================================================================
 		template<typename T >
-		static T * Instantiate(const uint32_t _id) {
-			return static_cast<T*> (m_constructors()[_id]());
-		}
+		T * Instantiate(const uint32_t _id) {return static_cast<T*> ( m_constructors[_id]());	}
+
+		//================================================================
+		//================================================================
+ 		template<typename T >
+ 		const T * GetInstance( const uint32_t _id )	{ return static_cast<T*> ( m_instances[_id] ); }
+
+	protected:
+		TypeInfo(){}
 
 	private:
-		static std::map<uint32_t, std::function<void*()>> & m_constructors();
+		
+		std::map<uint32_t, std::function<void*()>> m_constructors;
+		std::map<uint32_t, void* > m_instances;
 	};
 
 
@@ -66,7 +82,7 @@ namespace fan {
 //================================================================================================================================
 //================================================================================================================================
 #define REGISTER_TYPE_INFO( _name )															\
-	const uint32_t _name::s_typeID = TypeInfo::Register( SSID(#_name), _name::NewInstance );\
+	const uint32_t _name::s_typeID = TypeInfo::Get().Register( SSID(#_name), _name::NewInstance );\
 	const char * _name::s_name = #_name;	
 
 //================================================================================================================================

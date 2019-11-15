@@ -8,6 +8,7 @@
 #include "scene/components/fanMeshRenderer.h"
 #include "scene/components/fanMaterial.h"
 #include "editor/components/fanFPSCamera.h"
+#include "editor/fanDragnDrop.h"
 #include "renderer/fanMesh.h"
 #include "core/fanSignal.h"
 #include "core/time/fanProfiler.h"
@@ -40,7 +41,11 @@ namespace fan
 				Component * component = components[componentIndex];
 
 				ImGui::Separator();
+
+				// Icon
 				ImGui::Icon( component->GetIcon(), { 19,19 } ); ImGui::SameLine();
+				ImGui::FanBeginDragDropSourceComponent( component,  ImGuiDragDropFlags_SourceAllowNullID);
+
 				// Actor "enable" checkbox
 				if (component->IsActor()) {	// TODO : use type info when type info deals with inheritance
 					ImGui::PushID((int*)component);
@@ -55,6 +60,8 @@ namespace fan
 
 				// Delete button	
 				ImGui::Text( component->GetName());
+				ImGui::FanBeginDragDropSourceComponent( component,  ImGuiDragDropFlags_SourceAllowNullID);
+
 				if (component->IsRemovable()) {
 					std::stringstream ss;
 					ss << "X" << "##" << component->GetName() << componentCount++;	// make unique id
