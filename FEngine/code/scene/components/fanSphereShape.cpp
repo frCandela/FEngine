@@ -7,8 +7,7 @@
 
 namespace fan
 {
-	REGISTER_EDITOR_COMPONENT( SphereShape );
-	REGISTER_TYPE_INFO( SphereShape )
+	REGISTER_TYPE_INFO( SphereShape, TypeInfo::Flags::EDITOR_COMPONENT )
 
 	//================================================================================================================================
 	//================================================================================================================================

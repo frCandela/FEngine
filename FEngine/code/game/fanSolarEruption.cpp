@@ -14,8 +14,7 @@
 #include "editor/fanModals.h"
 
 namespace fan {
-	REGISTER_EDITOR_COMPONENT( SolarEruption )
-	REGISTER_TYPE_INFO( SolarEruption )
+	REGISTER_TYPE_INFO( SolarEruption, TypeInfo::Flags::EDITOR_COMPONENT )
 
 	//================================================================================================================================
 	//================================================================================================================================

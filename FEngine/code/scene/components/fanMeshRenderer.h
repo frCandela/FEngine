@@ -27,7 +27,6 @@ namespace fan
 		void OnGui() override;
 		virtual ImGui::IconType GetIcon() const { return ImGui::IconType::MESH; };
 
-		DECLARE_EDITOR_COMPONENT(MeshRenderer)
 		DECLARE_TYPE_INFO(MeshRenderer, Component );
 
 	protected:

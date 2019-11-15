@@ -6,8 +6,7 @@
 #include "scene/fanGameobject.h"
 
 namespace fan {
-	REGISTER_EDITOR_COMPONENT(Planet)
-	REGISTER_TYPE_INFO(Planet)
+	REGISTER_TYPE_INFO(Planet, TypeInfo::Flags::EDITOR_COMPONENT)
 
 	//================================================================================================================================
 	//================================================================================================================================

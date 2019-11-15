@@ -7,8 +7,7 @@
 #include "editor/fanModals.h"
 
 namespace fan {
-	REGISTER_EDITOR_COMPONENT( DirectionalLight );
-	REGISTER_TYPE_INFO( DirectionalLight )
+	REGISTER_TYPE_INFO( DirectionalLight, TypeInfo::Flags::EDITOR_COMPONENT )
 
 	Signal< DirectionalLight * > DirectionalLight::onDirectionalLightAttach;
 	Signal< DirectionalLight * > DirectionalLight::onDirectionalLightDetach;
@@ -23,21 +22,21 @@ namespace fan {
 	//================================================================================================================================
 	void DirectionalLight::SetAmbiant( const Color _ambiant ) {
 		m_dirLight->ambiant = _ambiant;
-		m_gameobject->AddFlag( Gameobject::Flag::OUTDATED_LIGHT );
+		m_gameobject->SetFlags( m_gameobject->GetFlags() & Gameobject::Flag::OUTDATED_LIGHT );
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
 	void DirectionalLight::SetDiffuse( const Color _diffuse ) {
 		m_dirLight->diffuse = _diffuse;
-		m_gameobject->AddFlag( Gameobject::Flag::OUTDATED_LIGHT );
+		m_gameobject->SetFlags( m_gameobject->GetFlags() & Gameobject::Flag::OUTDATED_LIGHT );
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
 	void DirectionalLight::SetSpecular( const Color _specular ) {
 		m_dirLight->specular = _specular;
-		m_gameobject->AddFlag( Gameobject::Flag::OUTDATED_LIGHT );
+		m_gameobject->SetFlags( m_gameobject->GetFlags() & Gameobject::Flag::OUTDATED_LIGHT );
 	}
 
 	//================================================================================================================================
@@ -70,11 +69,11 @@ namespace fan {
 		{
 			// Filter color
 			if ( ImGui::Button( "##ambiant" ) ) { SetAmbiant( Color::Black ); } ImGui::SameLine();
-			if ( ImGui::ColorEdit3( "ambiant", m_dirLight->ambiant.Data(), ImGui::fanColorEditFlags ) ) { m_gameobject->AddFlag( Gameobject::Flag::OUTDATED_LIGHT ); }
+			if ( ImGui::ColorEdit3( "ambiant", m_dirLight->ambiant.Data(), ImGui::fanColorEditFlags ) ) { m_gameobject->SetFlags( m_gameobject->GetFlags() & Gameobject::Flag::OUTDATED_LIGHT ); }
 			if ( ImGui::Button( "##diffuse" ) ) { SetDiffuse( Color::Black ); } ImGui::SameLine();
-			if ( ImGui::ColorEdit3( "diffuse", m_dirLight->diffuse.Data(), ImGui::fanColorEditFlags ) ) { m_gameobject->AddFlag( Gameobject::Flag::OUTDATED_LIGHT ); }
+			if ( ImGui::ColorEdit3( "diffuse", m_dirLight->diffuse.Data(), ImGui::fanColorEditFlags ) ) { m_gameobject->SetFlags( m_gameobject->GetFlags() & Gameobject::Flag::OUTDATED_LIGHT ); }
 			if ( ImGui::Button( "##specular" ) ) { SetSpecular( Color::Black ); } ImGui::SameLine();
-			if ( ImGui::ColorEdit3( "specular", m_dirLight->specular.Data(), ImGui::fanColorEditFlags ) ) { m_gameobject->AddFlag( Gameobject::Flag::OUTDATED_LIGHT ); }
+			if ( ImGui::ColorEdit3( "specular", m_dirLight->specular.Data(), ImGui::fanColorEditFlags ) ) { m_gameobject->SetFlags( m_gameobject->GetFlags() & Gameobject::Flag::OUTDATED_LIGHT ); }
 
 
 			const Transform * transform = m_gameobject->GetComponent<Transform>();

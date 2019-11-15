@@ -7,7 +7,7 @@
 
 namespace fan
 {
-	REGISTER_TYPE_INFO( UIMesh )
+	REGISTER_TYPE_INFO( UIMesh, TypeInfo::Flags::NONE )
 
 	Signal< UIMesh* > UIMesh::s_onMeshLoad;
 	Signal< > UIMesh::s_onMeshDelete;

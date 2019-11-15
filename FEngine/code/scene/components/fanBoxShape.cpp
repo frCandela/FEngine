@@ -6,9 +6,7 @@
 #include "renderer/fanRenderer.h"
 
 namespace fan {
-
-	REGISTER_EDITOR_COMPONENT( BoxShape );
-	REGISTER_TYPE_INFO( BoxShape )
+	REGISTER_TYPE_INFO( BoxShape, TypeInfo::Flags::EDITOR_COMPONENT )
 
 	//================================================================================================================================
 	//================================================================================================================================

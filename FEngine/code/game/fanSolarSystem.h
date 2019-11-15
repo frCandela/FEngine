@@ -15,7 +15,6 @@ namespace fan {
 		void OnGui() override;
 		ImGui::IconType GetIcon() const override { return ImGui::IconType::SOLAR_SYSTEM; }
 
-		DECLARE_EDITOR_COMPONENT( SolarSystem )
 		DECLARE_TYPE_INFO( SolarSystem, Actor );
 	protected:
 		bool Load( Json & _json ) override;

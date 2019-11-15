@@ -14,8 +14,7 @@
 
 
 namespace fan {
-	REGISTER_EDITOR_COMPONENT(GameManager);
-	REGISTER_TYPE_INFO(GameManager)
+	REGISTER_TYPE_INFO(GameManager, TypeInfo::Flags::EDITOR_COMPONENT)
 
 		//================================================================================================================================
 		//================================================================================================================================

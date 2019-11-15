@@ -10,8 +10,7 @@
 
 namespace fan
 {
-	REGISTER_EDITOR_COMPONENT(Material);
-	REGISTER_TYPE_INFO(Material)
+	REGISTER_TYPE_INFO(Material, TypeInfo::Flags::EDITOR_COMPONENT)
 
 	Signal< Material * > Material::onMaterialAttach;
 	Signal< Material * > Material::onMaterialDetach;
@@ -48,21 +47,21 @@ namespace fan
 		{
 			m_material->texture = TexturePtr(); 
 		}
-		m_gameobject->AddFlag( Gameobject::Flag::OUTDATED_MATERIAL );
+		m_gameobject->SetFlags( m_gameobject->GetFlags() & Gameobject::Flag::OUTDATED_MATERIAL );
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
 	void Material::SetShininess(const uint32_t _shininess) {
 		m_material->shininess = _shininess;
-		m_gameobject->AddFlag( Gameobject::Flag::OUTDATED_MATERIAL );
+		m_gameobject->SetFlags( m_gameobject->GetFlags() & Gameobject::Flag::OUTDATED_MATERIAL );
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
 	void Material::SetColor( const Color _color ) {
 		m_material->color = _color;
-		m_gameobject->AddFlag( Gameobject::Flag::OUTDATED_MATERIAL );
+		m_gameobject->SetFlags( m_gameobject->GetFlags() & Gameobject::Flag::OUTDATED_MATERIAL );
 	}
 
 	//================================================================================================================================
@@ -82,10 +81,10 @@ namespace fan
 		{
 			// Filter color
 			if ( ImGui::Button( "##color" ) ) { SetColor( Color::White ); } ImGui::SameLine();
-			if ( ImGui::ColorEdit4( "color", m_material->color.Data(), ImGui::fanColorEditFlags ) ) { m_gameobject->AddFlag( Gameobject::Flag::OUTDATED_MATERIAL ); }
+			if ( ImGui::ColorEdit4( "color", m_material->color.Data(), ImGui::fanColorEditFlags ) ) { m_gameobject->SetFlags( m_gameobject->GetFlags() & Gameobject::Flag::OUTDATED_MATERIAL ); }
 
 			if ( ImGui::Button( "##shininess" ) ) { SetShininess( 1 ); } ImGui::SameLine();
-			if ( ImGui::DragInt( "shininess", (int*)&m_material->shininess, 1, 1, 256 ) ) { m_gameobject->AddFlag( Gameobject::Flag::OUTDATED_MATERIAL ); }
+			if ( ImGui::DragInt( "shininess", (int*)&m_material->shininess, 1, 1, 256 ) ) { m_gameobject->SetFlags( m_gameobject->GetFlags() & Gameobject::Flag::OUTDATED_MATERIAL ); }
 			ImGui::SameLine(); ImGui::FanShowHelpMarker( "sharpness of the specular reflection" );
 		} ImGui::PopItemWidth();
 

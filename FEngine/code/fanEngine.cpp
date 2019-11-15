@@ -271,7 +271,7 @@ namespace fan {
 
 		// Editor Camera
 		Gameobject * cameraGameobject = _scene->CreateGameobject("editor_camera");
-		cameraGameobject->SetFlags( Gameobject::Flag::NO_DELETE | Gameobject::Flag::NOT_SAVED );
+		cameraGameobject->SetEditorFlags( Gameobject::EditorFlag::NO_DELETE | Gameobject::EditorFlag::NOT_SAVED );
 
 		cameraGameobject->GetTransform()->SetPosition(btVector3(0, 0, -2));
 		m_editorCamera = cameraGameobject->AddComponent<Camera>();

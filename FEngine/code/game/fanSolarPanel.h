@@ -19,7 +19,6 @@ namespace fan
 		void OnGui() override;
 		ImGui::IconType GetIcon() const override { return ImGui::IconType::GAME_MANAGER; }
 
-		DECLARE_EDITOR_COMPONENT( SolarPanel )
 		DECLARE_TYPE_INFO( SolarPanel, Actor );
 	protected:
 		void OnAttach() override;

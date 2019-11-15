@@ -8,7 +8,7 @@
 #include "renderer/fanRenderer.h"
 
 namespace fan {
-	REGISTER_TYPE_INFO(Mesh)
+	REGISTER_TYPE_INFO(Mesh, TypeInfo::Flags::NONE)
 
 	Signal< Mesh* > Mesh::s_onMeshLoad;
 	Signal< > Mesh::s_onMeshDelete;

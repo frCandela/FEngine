@@ -6,8 +6,7 @@
 
 namespace fan
 {
-	REGISTER_EDITOR_COMPONENT(Camera);
-	REGISTER_TYPE_INFO(Camera)
+	REGISTER_TYPE_INFO(Camera, TypeInfo::Flags::EDITOR_COMPONENT)
 
 	//================================================================================================================================
 	//================================================================================================================================
@@ -99,27 +98,27 @@ namespace fan
 	//================================================================================================================================
 	void Camera::SetFov(float _fov) {
 		m_fov = _fov;
-		m_gameobject->AddFlag( Gameobject::Flag::OUTDATED_TRANSFORM );
+		m_gameobject->SetFlags( m_gameobject->GetFlags() & Gameobject::Flag::OUTDATED_TRANSFORM );
 	};
 	void Camera::SetOrthoSize( float _orthoSize ) {
 		m_orthoSize = _orthoSize;
-		m_gameobject->AddFlag( Gameobject::Flag::OUTDATED_TRANSFORM );
+		m_gameobject->SetFlags( m_gameobject->GetFlags() & Gameobject::Flag::OUTDATED_TRANSFORM );
 	};
 	void Camera::SetNearDistance(float _nearDistance) {
 		m_nearDistance = _nearDistance;
-		m_gameobject->AddFlag( Gameobject::Flag::OUTDATED_TRANSFORM );
+		m_gameobject->SetFlags( m_gameobject->GetFlags() & Gameobject::Flag::OUTDATED_TRANSFORM );
 	};
 	void Camera::SetFarDistance(float _farDistance) {
 		m_farDistance = _farDistance;
-		m_gameobject->AddFlag( Gameobject::Flag::OUTDATED_TRANSFORM );
+		m_gameobject->SetFlags( m_gameobject->GetFlags() & Gameobject::Flag::OUTDATED_TRANSFORM );
 	};
 	void Camera::SetAspectRatio(float _aspectRatio) {
 		m_aspectRatio = _aspectRatio;
-		m_gameobject->AddFlag( Gameobject::Flag::OUTDATED_TRANSFORM );
+		m_gameobject->SetFlags( m_gameobject->GetFlags() & Gameobject::Flag::OUTDATED_TRANSFORM );
 	};
 	void Camera::SetProjectionType( const Type _type ) {
 		m_type = _type;
-		m_gameobject->AddFlag( Gameobject::Flag::OUTDATED_TRANSFORM );
+		m_gameobject->SetFlags( m_gameobject->GetFlags() & Gameobject::Flag::OUTDATED_TRANSFORM );
 	}
 
 	//================================================================================================================================

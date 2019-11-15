@@ -5,7 +5,6 @@
 #include "ecs/fanECSComponents.h"
 
 //Editor
-#include "scene/fanComponentsRegister.h"
 #include "editor/fanImguiIcons.h"
 
 namespace fan
@@ -24,8 +23,9 @@ namespace fan
 		bool IsRemovable() const { return m_isRemovable; }
 		void SetRemovable(const bool _isRemovable) { m_isRemovable = _isRemovable; }
 
-		virtual bool IsCollider()	const { return false; }
-		virtual bool IsActor()		const { return false; }
+		virtual bool IsCollider()			const { return false; }
+		virtual bool IsActor()				const { return false; }
+		virtual bool EditorInstantiable()	const { return true; }
 
 		virtual void OnGui();
 		virtual ImGui::IconType GetIcon() const { return ImGui::IconType::NONE; };

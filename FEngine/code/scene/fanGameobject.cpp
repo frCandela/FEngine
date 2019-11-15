@@ -36,9 +36,11 @@ namespace fan
 		ecsFlags ** tmpFlags = &const_cast<ecsFlags*>( m_flags );
 		*tmpFlags = AddEcsComponent<ecsFlags>();
 		m_flags->Init();
-
-		m_flags->Init();
 		m_flags->flags = Flag::OUTDATED_TRANSFORM | Flag::OUTDATED_AABB;
+
+		ecsEditorFlags ** tmpEditorFlags = &const_cast<ecsEditorFlags*>( m_editorFlags );
+		*tmpEditorFlags = AddEcsComponent<ecsEditorFlags>();
+		m_editorFlags->Init();
 
 		m_transform = AddComponent<Transform>();
 	}
@@ -348,7 +350,7 @@ namespace fan
 			unsigned childIndex = 0;				
 			for ( int gameobjectIndex = 0; gameobjectIndex < m_childs.size(); gameobjectIndex++ ) {
 				Gameobject * gameobject = m_childs[gameobjectIndex];
-				if ( gameobject->HasFlag( Flag::NOT_SAVED ) == false ) {
+				if ( ( gameobject->GetEditorFlags() & EditorFlag::NOT_SAVED ) == false ) {
 					Json& jchild_i = jchilds[childIndex]; {
 						gameobject->Save( jchild_i );
 					}

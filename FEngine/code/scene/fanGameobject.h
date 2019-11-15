@@ -17,6 +17,7 @@ namespace fan
 	class Gameobject : public ISerializable {
 	public:
 		using Flag = ecsFlags::Flag;
+		using EditorFlag = ecsEditorFlags::Flag;
 
 		Gameobject(const std::string _name, Gameobject * _parent, Scene * _scene, const uint64_t _uniqueID );
 		~Gameobject();
@@ -62,9 +63,10 @@ namespace fan
 		void CopyDataFrom( Json & _json );
 
 		// Flags
-		bool		HasFlag(const Flag _flag) const { return m_flags->flags & _flag; }
-		void		AddFlag( const Flag _flag )		{ m_flags->flags |= _flag; }
-		void		SetFlags(const uint32_t _flags) { m_flags->flags = _flags; }
+		uint32_t	GetFlags(  ) const						{ return m_flags->flags; }
+		void		SetFlags(const uint32_t _flags)			{ m_flags->flags = _flags; }
+		uint32_t	GetEditorFlags() const					{ return m_editorFlags->flags; }
+		void		SetEditorFlags( const uint32_t _flags ) { m_editorFlags->flags = _flags; }
 
 	private:
 		std::string				 m_name;
@@ -76,7 +78,8 @@ namespace fan
 		Scene *	const			 m_scene = nullptr;
 		ecsHandle				 m_ecsHandleEntity = ecsNullHandle;
 
-		ecsFlags * const m_flags = nullptr;
+		ecsFlags *       const m_flags       = nullptr;
+		ecsEditorFlags * const m_editorFlags = nullptr;
 		ecsAABB *  const m_aabb = nullptr;
 
 		void		AddComponent(Component * _component);

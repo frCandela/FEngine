@@ -36,7 +36,6 @@ namespace fan {
 		void OnGui() override;
 		ImGui::IconType GetIcon() const override { return ImGui::IconType::RIGIDBODY; }
 
-		DECLARE_EDITOR_COMPONENT( Rigidbody )
 		DECLARE_TYPE_INFO( Rigidbody, Component );
 	protected:
 		bool Load( Json & _json ) override;

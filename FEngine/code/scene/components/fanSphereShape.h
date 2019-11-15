@@ -24,8 +24,6 @@ namespace fan
 		bool Load( Json & _json ) override;
 		bool Save( Json & _json ) const override;
 
-
-		DECLARE_EDITOR_COMPONENT( SphereShape )
 		DECLARE_TYPE_INFO( SphereShape, Component );
 	private:		
 		btSphereShape* const	m_sphereShape = nullptr;

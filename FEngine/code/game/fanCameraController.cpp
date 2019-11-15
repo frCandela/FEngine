@@ -11,8 +11,7 @@
 #include "scene/components/fanCamera.h"
 
 namespace fan {
-	REGISTER_EDITOR_COMPONENT(CameraController);
-	REGISTER_TYPE_INFO(CameraController)
+	REGISTER_TYPE_INFO(CameraController, TypeInfo::Flags::EDITOR_COMPONENT )
 
 	//================================================================================================================================
 	//================================================================================================================================

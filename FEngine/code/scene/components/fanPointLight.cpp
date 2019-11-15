@@ -7,8 +7,7 @@
 
 namespace fan
 {
-	REGISTER_EDITOR_COMPONENT(PointLight);
-	REGISTER_TYPE_INFO(PointLight)
+	REGISTER_TYPE_INFO(PointLight, TypeInfo::Flags::EDITOR_COMPONENT)
 
 	Signal< PointLight * > PointLight::onPointLightAttach;
 	Signal< PointLight * > PointLight::onPointLightDetach;
@@ -17,21 +16,21 @@ namespace fan
 	//================================================================================================================================
 	void PointLight::SetAmbiant(const Color _ambiant) {
 		m_pointLight->ambiant = _ambiant;
-		m_gameobject->AddFlag( Gameobject::Flag::OUTDATED_LIGHT );
+		m_gameobject->SetFlags( m_gameobject->GetFlags() & Gameobject::Flag::OUTDATED_LIGHT );
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
 	void PointLight::SetDiffuse(const Color _diffuse) {
 		m_pointLight->diffuse = _diffuse;
-		m_gameobject->AddFlag( Gameobject::Flag::OUTDATED_LIGHT );
+		m_gameobject->SetFlags( m_gameobject->GetFlags() & Gameobject::Flag::OUTDATED_LIGHT );
 	}	
 	
 	//================================================================================================================================
 	//================================================================================================================================
 	void PointLight::SetSpecular(const Color _specular) {
 		m_pointLight->specular = _specular;
-		m_gameobject->AddFlag( Gameobject::Flag::OUTDATED_LIGHT );
+		m_gameobject->SetFlags( m_gameobject->GetFlags() & Gameobject::Flag::OUTDATED_LIGHT );
 	}
 
 	//================================================================================================================================
@@ -39,7 +38,7 @@ namespace fan
 	void PointLight::SetAttenuation(const Attenuation _attenuation, const float _value) {
 		if (_value >= 0) {
 			m_pointLight->attenuation[_attenuation] = _value;
-			m_gameobject->AddFlag( Gameobject::Flag::OUTDATED_LIGHT );
+			m_gameobject->SetFlags( m_gameobject->GetFlags() & Gameobject::Flag::OUTDATED_LIGHT );
 		}
 		else {
 			Debug::Warning("Light attenuation cannot be negative");
@@ -84,11 +83,11 @@ namespace fan
 
 			// Filter color
 			if ( ImGui::Button( "##ambiant" ) ) { SetAmbiant( Color( 0.0f ) ); } ImGui::SameLine();
-			if ( ImGui::ColorEdit3( "ambiant", m_pointLight->ambiant.Data(), ImGui::fanColorEditFlags ) ) { m_gameobject->AddFlag( Gameobject::Flag::OUTDATED_LIGHT ); }
+			if ( ImGui::ColorEdit3( "ambiant", m_pointLight->ambiant.Data(), ImGui::fanColorEditFlags ) ) { m_gameobject->SetFlags( m_gameobject->GetFlags() & Gameobject::Flag::OUTDATED_LIGHT ); }
 			if ( ImGui::Button( "##diffuse" ) ) { SetDiffuse( Color::White ); } ImGui::SameLine();
-			if ( ImGui::ColorEdit3( "diffuse", m_pointLight->diffuse.Data(), ImGui::fanColorEditFlags ) ) { m_gameobject->AddFlag( Gameobject::Flag::OUTDATED_LIGHT ); }
+			if ( ImGui::ColorEdit3( "diffuse", m_pointLight->diffuse.Data(), ImGui::fanColorEditFlags ) ) { m_gameobject->SetFlags( m_gameobject->GetFlags() & Gameobject::Flag::OUTDATED_LIGHT ); }
 			if ( ImGui::Button( "##specular" ) ) { SetSpecular( Color::White ); } ImGui::SameLine();
-			if ( ImGui::ColorEdit3( "specular", m_pointLight->specular.Data(), ImGui::fanColorEditFlags ) ) { m_gameobject->AddFlag( Gameobject::Flag::OUTDATED_LIGHT ); }
+			if ( ImGui::ColorEdit3( "specular", m_pointLight->specular.Data(), ImGui::fanColorEditFlags ) ) { m_gameobject->SetFlags( m_gameobject->GetFlags() & Gameobject::Flag::OUTDATED_LIGHT ); }
 			// Attenuation
 
 			ImGui::Text( "attenuation :" );
@@ -99,11 +98,11 @@ namespace fan
 				"constant + linear * d + quadratic * d*d  \n"
 				"(d=distance)" );
 			if ( ImGui::Button( "##constant attenuation" ) ) { SetAttenuation( Attenuation::CONSTANT, 0.f ); }	ImGui::SameLine();
-			if ( ImGui::DragFloat( "constant", &m_pointLight->attenuation[Attenuation::CONSTANT], 0.01f, 0.f, 100.f ) ) { m_gameobject->AddFlag( Gameobject::Flag::OUTDATED_LIGHT ); }
+			if ( ImGui::DragFloat( "constant", &m_pointLight->attenuation[Attenuation::CONSTANT], 0.01f, 0.f, 100.f ) ) { m_gameobject->SetFlags( m_gameobject->GetFlags() & Gameobject::Flag::OUTDATED_LIGHT ); }
 			if ( ImGui::Button( "##linear attenuation" ) ) { SetAttenuation( Attenuation::LINEAR, 0.f ); }	ImGui::SameLine();
-			if ( ImGui::DragFloat( "linear", &m_pointLight->attenuation[Attenuation::LINEAR], 0.001f, 0.f, 100.f ) ) { m_gameobject->AddFlag( Gameobject::Flag::OUTDATED_LIGHT ); }
+			if ( ImGui::DragFloat( "linear", &m_pointLight->attenuation[Attenuation::LINEAR], 0.001f, 0.f, 100.f ) ) { m_gameobject->SetFlags( m_gameobject->GetFlags() & Gameobject::Flag::OUTDATED_LIGHT ); }
 			if ( ImGui::Button( "##quadratic attenuation" ) ) { SetAttenuation( Attenuation::QUADRATIC, 0.f ); }	ImGui::SameLine();
-			if ( ImGui::DragFloat( "quadratic", &m_pointLight->attenuation[Attenuation::QUADRATIC], 0.0001f, 0.f, 100.f ) ) { m_gameobject->AddFlag( Gameobject::Flag::OUTDATED_LIGHT ); }
+			if ( ImGui::DragFloat( "quadratic", &m_pointLight->attenuation[Attenuation::QUADRATIC], 0.0001f, 0.f, 100.f ) ) { m_gameobject->SetFlags( m_gameobject->GetFlags() & Gameobject::Flag::OUTDATED_LIGHT ); }
 
 		} ImGui::PopItemWidth();
 

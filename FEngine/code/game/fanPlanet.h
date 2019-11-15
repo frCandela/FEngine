@@ -18,7 +18,6 @@ namespace fan {
 		void OnGui() override;
 		ImGui::IconType GetIcon() const override { return ImGui::IconType::PLANET; }
 
-		DECLARE_EDITOR_COMPONENT(Planet)
 		DECLARE_TYPE_INFO(Planet, Actor );
 	protected:
 		void OnAttach() override;

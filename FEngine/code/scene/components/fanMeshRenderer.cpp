@@ -17,8 +17,7 @@
 
 namespace fan
 {
-	REGISTER_EDITOR_COMPONENT(MeshRenderer);
-	REGISTER_TYPE_INFO(MeshRenderer)
+	REGISTER_TYPE_INFO(MeshRenderer, TypeInfo::Flags::EDITOR_COMPONENT)
 
 	Signal< MeshRenderer * >				MeshRenderer::onRegisterMeshRenderer;
 	Signal< MeshRenderer * >				MeshRenderer::onUnRegisterMeshRenderer;
@@ -42,7 +41,7 @@ namespace fan
 		m_gameobject->RemoveEcsComponent<ecsMesh>();
 		onUnRegisterMeshRenderer.Emmit(this);
 
-		m_gameobject->AddFlag( Gameobject::Flag::OUTDATED_AABB );
+		m_gameobject->SetFlags( m_gameobject->GetFlags() & Gameobject::Flag::OUTDATED_AABB );
 	}
 
 	//================================================================================================================================
@@ -51,7 +50,7 @@ namespace fan
 	{
 		m_mesh->mesh = MeshPtr( _mesh, _mesh->GetPath() );
 		if( _mesh != nullptr && ! _mesh->GetIndices().empty() ) {	
-			m_gameobject->AddFlag( Gameobject::Flag::OUTDATED_AABB );
+			m_gameobject->SetFlags( m_gameobject->GetFlags() & Gameobject::Flag::OUTDATED_AABB );
 		}
 	}
 

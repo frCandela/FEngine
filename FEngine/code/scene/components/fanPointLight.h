@@ -28,7 +28,6 @@ namespace fan
 		float		GetAttenuation	( const Attenuation _attenuation					 ) const;
 		void		SetAttenuation	( const Attenuation _attenuation, const float _value );
 
-		DECLARE_EDITOR_COMPONENT(PointLight)
 		DECLARE_TYPE_INFO(PointLight, Component );
 	protected:
 		void OnAttach() override;

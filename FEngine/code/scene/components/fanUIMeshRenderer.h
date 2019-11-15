@@ -25,7 +25,6 @@ namespace fan
 		void OnGui() override;
 		virtual ImGui::IconType GetIcon() const { return ImGui::IconType::IMAGE; };
 
-		DECLARE_EDITOR_COMPONENT( UIMeshRenderer )
 		DECLARE_TYPE_INFO( UIMeshRenderer, Component );
 
 	protected:

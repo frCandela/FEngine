@@ -20,7 +20,6 @@ namespace fan
 		void OnGui() override;
 		ImGui::IconType GetIcon() const override { return ImGui::IconType::GAME_MANAGER; }
 
-		DECLARE_EDITOR_COMPONENT( WithEnergy )
 		DECLARE_TYPE_INFO( WithEnergy, Actor );
 	protected:
 		void OnAttach() override;

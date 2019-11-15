@@ -13,8 +13,7 @@
 
 namespace fan
 {
-	REGISTER_EDITOR_COMPONENT( UIMeshRenderer );
-	REGISTER_TYPE_INFO( UIMeshRenderer )
+	REGISTER_TYPE_INFO( UIMeshRenderer, TypeInfo::Flags::EDITOR_COMPONENT )
 
 	//================================================================================================================================
 	//================================================================================================================================

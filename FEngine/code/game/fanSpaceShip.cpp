@@ -16,8 +16,7 @@
 #include "game/fanWithEnergy.h"
 
 namespace fan {
-	REGISTER_EDITOR_COMPONENT(SpaceShip)
-	REGISTER_TYPE_INFO(SpaceShip)
+	REGISTER_TYPE_INFO(SpaceShip, TypeInfo::Flags::EDITOR_COMPONENT)
 
 	//================================================================================================================================
 	//================================================================================================================================

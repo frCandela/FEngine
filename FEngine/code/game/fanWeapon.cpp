@@ -19,8 +19,7 @@
 
 namespace fan
 {
-	REGISTER_EDITOR_COMPONENT( Weapon )
-	REGISTER_TYPE_INFO( Weapon )
+	REGISTER_TYPE_INFO( Weapon, TypeInfo::Flags::EDITOR_COMPONENT )
 
 	//================================================================================================================================
 	//================================================================================================================================
@@ -120,7 +119,7 @@ namespace fan
 		SphereShape * collider = bulletGO->AddComponent<SphereShape>();
 		Transform * transform = bulletGO->GetTransform();
 
-		bulletGO->AddFlag( ecsFlags::NO_AABB_UPDATE );
+		bulletGO->SetFlags( bulletGO->GetFlags() & ecsFlags::NO_AABB_UPDATE );
 		bulletGO->AddEcsComponent<ecsBullet>()->Init( m_lifeTime );
 		meshRenderer->SetPath( GlobalValues::s_meshSphere );
 		material->SetTexturePath( GlobalValues::s_textureWhite );

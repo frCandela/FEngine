@@ -12,8 +12,7 @@
 #include "renderer/fanRenderer.h"
 
 namespace fan {
-	REGISTER_EDITOR_COMPONENT( SolarSystem );
-	REGISTER_TYPE_INFO( SolarSystem )
+	REGISTER_TYPE_INFO( SolarSystem, TypeInfo::Flags::EDITOR_COMPONENT )
 
 	//================================================================================================================================
 	//================================================================================================================================

@@ -29,7 +29,6 @@ namespace fan
 		void OnGui() override;
 		ImGui::IconType GetIcon() const override { return ImGui::IconType::CAMERA; }
 
-		DECLARE_EDITOR_COMPONENT(FPSCamera);
 		DECLARE_TYPE_INFO(FPSCamera, Actor );
 	protected:
 		void OnAttach() override;

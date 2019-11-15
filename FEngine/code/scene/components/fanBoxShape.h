@@ -21,9 +21,6 @@ namespace fan {
 		bool Load( Json & _json ) override;
 		bool Save( Json & _json ) const override;
 
-
-
-		DECLARE_EDITOR_COMPONENT( BoxShape )
 		DECLARE_TYPE_INFO( BoxShape, Component );
 	private:
 

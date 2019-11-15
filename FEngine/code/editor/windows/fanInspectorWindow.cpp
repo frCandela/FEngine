@@ -92,9 +92,9 @@ namespace fan
 
 		if (ImGui::BeginPopup("New component"))
 		{
-			std::vector<Component *>& components = ComponentsRegister::GetComponents();
+			std::vector< const void *> components = TypeInfo::Get().GetInstancesWithFlags( TypeInfo::EDITOR_COMPONENT );
 			for (int componentIndex = 0; componentIndex < components.size(); componentIndex++) {
-				Component * component = components[componentIndex];
+				const Component * component = static_cast< const Component *> ( components[componentIndex] );
 
 				ImGui::Icon( component->GetIcon(), { 19,19 } ); ImGui::SameLine();
 				if (ImGui::MenuItem(component->GetName())) {

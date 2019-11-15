@@ -15,7 +15,6 @@ namespace fan {
 		void OnGui() override;
 		ImGui::IconType GetIcon() const override { return ImGui::IconType::GAME_MANAGER; }
 
-		DECLARE_EDITOR_COMPONENT( SunLight )
 		DECLARE_TYPE_INFO( SunLight, Actor );
 	protected:
 

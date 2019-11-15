@@ -6,8 +6,7 @@
 #include "scene/components/fanColliderShape.h"
 
 namespace fan {
-	REGISTER_EDITOR_COMPONENT( Rigidbody );
-	REGISTER_TYPE_INFO( Rigidbody )
+	REGISTER_TYPE_INFO( Rigidbody, TypeInfo::Flags::EDITOR_COMPONENT )
 
 	//================================================================================================================================
 	//================================================================================================================================	

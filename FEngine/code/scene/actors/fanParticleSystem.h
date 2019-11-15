@@ -21,7 +21,6 @@ namespace fan {
 		void SetSpeedParticles( const float _speed )	{ m_speed = _speed; }
 		void SetSpawnOffset( const btVector3 _offset )	{ m_offset = _offset; }
 
-		DECLARE_EDITOR_COMPONENT( ParticleSystem )
 		DECLARE_TYPE_INFO( ParticleSystem, Actor );
 	protected:
 		void OnAttach() override;
