@@ -11,7 +11,7 @@
 #include "core/fanSignal.h"
 #include "core/time/fanScopedTimer.h"
 #include "core/time/fanProfiler.h"
-#include "editor/fanComponentPtr.h"
+#include "scene/fanComponentPtr.h"
 
 namespace fan
 {

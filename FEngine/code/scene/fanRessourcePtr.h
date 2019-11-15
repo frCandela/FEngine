@@ -18,8 +18,9 @@ namespace fan
 		RessourcePtr( _RessourceType * _ressourceType, _IDType _ressourceID );		
 		RessourcePtr();
 
-		_IDType GetID( ) const { return m_ressourceId; }
-		void	 InitUnresolved( const _IDType m_ressourceId );
+		_IDType			GetID( ) const { return m_ressourceId; }
+		_RessourceType*	GetRessource() const { return m_ressourcePtr; }
+		void			InitUnresolved( const _IDType m_ressourceId );
 		_RessourceType* operator->() const	{ return m_ressourcePtr; }
 		_RessourceType* operator*() const{ return m_ressourcePtr; }
 

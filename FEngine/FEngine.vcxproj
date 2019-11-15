@@ -115,7 +115,6 @@
     <ClCompile Include="code\ecs\fanEcsManager.cpp" />
     <ClCompile Include="code\ecs\fanEcsSystems.cpp" />
     <ClCompile Include="code\editor\components\fanFPSCamera.cpp" />
-    <ClCompile Include="code\editor\fanComponentPtr.cpp" />
     <ClCompile Include="code\editor\fanDragnDrop.cpp" />
     <ClCompile Include="code\editor\fanEditorGrid.cpp" />
     <ClCompile Include="code\editor\fanImguiIcons.cpp" />
@@ -184,6 +183,7 @@
     <ClCompile Include="code\scene\components\fanSphereShape.cpp" />
     <ClCompile Include="code\scene\components\fanTransform.cpp" />
     <ClCompile Include="code\scene\components\fanUIMeshRenderer.cpp" />
+    <ClCompile Include="code\scene\fanComponentPtr.cpp" />
     <ClCompile Include="code\scene\fanComponentsRegister.cpp" />
     <ClCompile Include="code\scene\fanGameobject.cpp" />
     <ClCompile Include="code\scene\fanRessourcePtr.cpp" />
@@ -236,7 +236,6 @@
     <ClInclude Include="code\ecs\fanEcsManager.h" />
     <ClInclude Include="code\ecs\fanEcsSystems.h" />
     <ClInclude Include="code\editor\components\fanFPSCamera.h" />
-    <ClInclude Include="code\editor\fanComponentPtr.h" />
     <ClInclude Include="code\editor\fanDragnDrop.h" />
     <ClInclude Include="code\editor\fanEditorGrid.h" />
     <ClInclude Include="code\editor\fanImguiIcons.h" />
@@ -305,6 +304,7 @@
     <ClInclude Include="code\scene\components\fanSphereShape.h" />
     <ClInclude Include="code\scene\components\fanTransform.h" />
     <ClInclude Include="code\scene\components\fanUIMeshRenderer.h" />
+    <ClInclude Include="code\scene\fanComponentPtr.h" />
     <ClInclude Include="code\scene\fanComponentsRegister.h" />
     <ClInclude Include="code\scene\fanGameobject.h" />
     <ClInclude Include="code\scene\fanRessourcePtr.h" />

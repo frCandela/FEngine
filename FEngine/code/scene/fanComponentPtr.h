@@ -23,7 +23,14 @@ namespace fan
 	// Like a ComponentIDPtr but strongly typed
 	//================================================================================================================================
 	template< typename _ComponentType >
-	using ComponentPtr = ComponentIDPtr;
+	class ComponentPtr : public ComponentIDPtr
+	{
+	public:
+		ComponentPtr( _ComponentType * _ressourceType, IDPtrData _ressourceID ) : ComponentIDPtr( _ressourceType, _ressourceID ) {}
+		ComponentPtr() : ComponentIDPtr() {}
+		_ComponentType* operator->() const { return static_cast<_ComponentType*>( GetRessource() ); }
+		_ComponentType* operator*() const { return static_cast<_ComponentType*>( GetRessource() ); }
+	};
 }
 
 //================================================================================================================================
@@ -32,7 +39,7 @@ namespace fan
 namespace ImGui
 {
 	template< typename _ComponentType >
-	bool FanComponent( const char * _label, fan::ComponentIDPtr * _ptr )
+	bool FanComponent( const char * _label, fan::ComponentPtr<_ComponentType> * _ptr )
 	{
 		static_assert( ( std::is_base_of<fan::Component, _ComponentType>::value ) );
 

@@ -5,7 +5,7 @@
 #include "scene/fanGameobject.h"
 #include "renderer/core/fanTexture.h"
 #include "renderer/fanMesh.h"
-#include "editor/fanComponentPtr.h"
+#include "scene/fanComponentPtr.h"
 #include "scene/components/fanComponent.h"
 
 namespace fan {

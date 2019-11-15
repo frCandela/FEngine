@@ -3,6 +3,8 @@
 #include "scene/actors/fanActor.h"
 #include "scene/fanRessourcePtr.h"
 
+#include "scene/fanComponentPtr.h"
+
 namespace fan {
 
 	class Rigidbody;
@@ -43,17 +45,10 @@ namespace fan {
 		Rigidbody * m_rigidbody;
 		WithEnergy * m_energy;
 
-		GameobjectPtr m_fastForwardParticlesGo;
-		GameobjectPtr m_slowForwardParticlesGo;
-		GameobjectPtr m_reverseParticlesGo;
-		GameobjectPtr m_leftParticlesGo;
-		GameobjectPtr m_rightParticlesGo;
-		 
-		ParticleSystem * m_fastForwardParticles = nullptr;
-		ParticleSystem * m_slowForwardParticles = nullptr;
-		ParticleSystem * m_reverseParticles = nullptr;
-		ParticleSystem * m_leftParticles = nullptr;
-		ParticleSystem * m_rightParticles = nullptr;
-
+		ComponentPtr<ParticleSystem> m_fastForwardParticles;
+		ComponentPtr<ParticleSystem> m_slowForwardParticles;
+		ComponentPtr<ParticleSystem> m_reverseParticles;
+		ComponentPtr<ParticleSystem> m_leftParticles;
+		ComponentPtr<ParticleSystem> m_rightParticles;
 	};
 }

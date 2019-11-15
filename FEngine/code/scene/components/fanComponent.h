@@ -49,6 +49,15 @@ namespace fan
 }
 
 //================================================================================================================================
+// Disables the component with a warning if the _expression is false
+//================================================================================================================================
+#define REQUIRE_TRUE( _expression, _message )				\
+		if ( ! (_expression) ) {							\
+			Debug::Warning() << _message << Debug::Endl();	\
+			SetEnabled( false );							\
+		}
+
+//================================================================================================================================
 // Get _componentType  from the gameobject and set _pointerToComponent. Disable the component with a warning message if no component is found
 //================================================================================================================================
 #define REQUIRE_COMPONENT( _componentType, _pointerToComponent )																			\
