@@ -2,9 +2,9 @@
 #include "renderer/pipelines/fanUIPipeline.h"
 
 #include "renderer/core/fanDevice.h"
-#include "renderer/core/fanDescriptorTexture.h"
+#include "renderer/descriptors/fanDescriptorTexture.h"
 #include "renderer/core/fanSampler.h"
-#include "renderer/core/fanDescriptor.h"
+#include "renderer/descriptors/fanDescriptor.h"
 
 namespace fan
 {

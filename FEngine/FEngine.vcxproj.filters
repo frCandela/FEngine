@@ -92,6 +92,9 @@
     <Filter Include="code\game\ui">
       <UniqueIdentifier>{5a3c73a4-8b43-448f-ae84-e276e7261ea0}</UniqueIdentifier>
     </Filter>
+    <Filter Include="code\renderer\descriptors">
+      <UniqueIdentifier>{5938aafe-5dc2-4c2b-a56b-3f5e444c8340}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="code\editor\fanMainMenuBar.cpp">
@@ -280,9 +283,6 @@
     <ClCompile Include="code\scene\components\fanDirectionalLight.cpp">
       <Filter>code\scene\components</Filter>
     </ClCompile>
-    <ClCompile Include="code\renderer\core\fanDescriptor.cpp">
-      <Filter>code\renderer\core</Filter>
-    </ClCompile>
     <ClCompile Include="code\renderer\core\fanPipeline.cpp">
       <Filter>code\renderer</Filter>
     </ClCompile>
@@ -373,9 +373,6 @@
     <ClCompile Include="code\ecs\fanEcsComponentsKey.cpp">
       <Filter>code\ecs</Filter>
     </ClCompile>
-    <ClCompile Include="code\renderer\core\fanDescriptorTexture.cpp">
-      <Filter>code\renderer\core</Filter>
-    </ClCompile>
     <ClCompile Include="code\game\fanWeapon.cpp">
       <Filter>code\game</Filter>
     </ClCompile>
@@ -414,6 +411,12 @@
     </ClCompile>
     <ClCompile Include="code\game\ui\fanProgressBar.cpp">
       <Filter>code\game\ui</Filter>
+    </ClCompile>
+    <ClCompile Include="code\renderer\descriptors\fanDescriptorTexture.cpp">
+      <Filter>code\renderer\descriptors</Filter>
+    </ClCompile>
+    <ClCompile Include="code\renderer\descriptors\fanDescriptor.cpp">
+      <Filter>code\renderer\descriptors</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -1086,9 +1089,6 @@
     <ClInclude Include="code\scene\components\fanDirectionalLight.h">
       <Filter>code\scene\components</Filter>
     </ClInclude>
-    <ClInclude Include="code\renderer\core\fanDescriptor.h">
-      <Filter>code\renderer\core</Filter>
-    </ClInclude>
     <ClInclude Include="code\renderer\core\fanPipeline.h">
       <Filter>code\renderer\core</Filter>
     </ClInclude>
@@ -1266,9 +1266,6 @@
     <ClInclude Include="deps\bitset2\detail\array_funcs.hpp">
       <Filter>code\deps\bitset2</Filter>
     </ClInclude>
-    <ClInclude Include="code\renderer\core\fanDescriptorTexture.h">
-      <Filter>code\renderer\core</Filter>
-    </ClInclude>
     <ClInclude Include="code\game\fanWeapon.h">
       <Filter>code\game</Filter>
     </ClInclude>
@@ -1304,6 +1301,12 @@
     </ClInclude>
     <ClInclude Include="code\game\ui\fanProgressBar.h">
       <Filter>code\game\ui</Filter>
+    </ClInclude>
+    <ClInclude Include="code\renderer\descriptors\fanDescriptorTexture.h">
+      <Filter>code\renderer\descriptors</Filter>
+    </ClInclude>
+    <ClInclude Include="code\renderer\descriptors\fanDescriptor.h">
+      <Filter>code\renderer\descriptors</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

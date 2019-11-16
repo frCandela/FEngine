@@ -1,5 +1,5 @@
 #include "fanGlobalIncludes.h"
-#include "renderer/core/fanDescriptor.h"
+#include "renderer/descriptors/fanDescriptor.h"
 
 #include "renderer/core/fanDevice.h"
 #include "renderer/core/fanBuffer.h"

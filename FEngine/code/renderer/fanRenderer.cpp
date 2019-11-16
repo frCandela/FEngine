@@ -24,7 +24,7 @@
 #include "renderer/pipelines/fanUIPipeline.h"
 #include "renderer/util/fanVertex.h"
 #include "renderer/util/fanWindow.h"
-#include "renderer/core/fanDescriptorTexture.h"
+#include "renderer/descriptors/fanDescriptorTexture.h"
 #include "renderer/core/fanSampler.h"
 
 namespace fan

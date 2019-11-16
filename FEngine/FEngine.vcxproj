@@ -145,7 +145,6 @@
     <ClCompile Include="code\game\ui\fanProgressBar.cpp" />
     <ClCompile Include="code\physics\fanPhysicsManager.cpp" />
     <ClCompile Include="code\renderer\core\fanBuffer.cpp" />
-    <ClCompile Include="code\renderer\core\fanDescriptor.cpp" />
     <ClCompile Include="code\renderer\core\fanDevice.cpp" />
     <ClCompile Include="code\renderer\core\fanFramebuffer.cpp" />
     <ClCompile Include="code\renderer\core\fanImage.cpp" />
@@ -156,7 +155,8 @@
     <ClCompile Include="code\renderer\core\fanShader.cpp" />
     <ClCompile Include="code\renderer\core\fanSwapChain.cpp" />
     <ClCompile Include="code\renderer\core\fanTexture.cpp" />
-    <ClCompile Include="code\renderer\core\fanDescriptorTexture.cpp" />
+    <ClCompile Include="code\renderer\descriptors\fanDescriptor.cpp" />
+    <ClCompile Include="code\renderer\descriptors\fanDescriptorTexture.cpp" />
     <ClCompile Include="code\renderer\fanMesh.cpp" />
     <ClCompile Include="code\renderer\fanRenderer.cpp" />
     <ClCompile Include="code\renderer\fanRessourceManager.cpp" />
@@ -266,7 +266,6 @@
     <ClInclude Include="code\game\ui\fanProgressBar.h" />
     <ClInclude Include="code\physics\fanPhysicsManager.h" />
     <ClInclude Include="code\renderer\core\fanBuffer.h" />
-    <ClInclude Include="code\renderer\core\fanDescriptor.h" />
     <ClInclude Include="code\renderer\core\fanDevice.h" />
     <ClInclude Include="code\renderer\core\fanFrameBuffer.h" />
     <ClInclude Include="code\renderer\core\fanImage.h" />
@@ -277,7 +276,8 @@
     <ClInclude Include="code\renderer\core\fanShader.h" />
     <ClInclude Include="code\renderer\core\fanSwapChain.h" />
     <ClInclude Include="code\renderer\core\fanTexture.h" />
-    <ClInclude Include="code\renderer\core\fanDescriptorTexture.h" />
+    <ClInclude Include="code\renderer\descriptors\fanDescriptor.h" />
+    <ClInclude Include="code\renderer\descriptors\fanDescriptorTexture.h" />
     <ClInclude Include="code\renderer\fanMesh.h" />
     <ClInclude Include="code\renderer\fanRenderer.h" />
     <ClInclude Include="code\renderer\fanRessourceManager.h" />
