@@ -1,6 +1,6 @@
 #pragma once
 
-#include "scene/actors/fanActor.h"
+#include "scene/components/fanComponent.h"
 #include "scene/fanComponentPtr.h"
 
 namespace fan
@@ -16,15 +16,20 @@ namespace fan
 		void OnGui() override;
 		ImGui::IconType GetIcon() const override { return ImGui::IconType::PROGRESS_BAR; }
 
+		void	SetProgress( const float _progress );
+		float	GetProgress() const { return m_progress; }
+
+
 		DECLARE_TYPE_INFO( ProgressBar, Component );
 	protected:
 		void OnAttach() override;
 		void OnDetach() override;
 		bool Load( Json & _json ) override;
 		bool Save( Json & _json ) const override;
-	private:
 
-		ComponentPtr<UIMeshRenderer> m_outsideImage;
-		ComponentPtr<UIMeshRenderer> m_insideImage;
+	private:
+		ComponentPtr<UIMeshRenderer> m_image;
+		float	m_progress = 1.f;
+		int		m_maxWidth = 100;
 	};
 }

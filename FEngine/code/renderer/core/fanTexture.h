@@ -16,7 +16,7 @@ namespace fan
 		void Load(const void * _data, const uint32_t _width, const uint32_t _height, const uint32_t _mipLevels);
 		bool LoadTexture(const std::string _path);
 
-		glm::uvec3	GetSize() const { return glm::uvec3(m_width, m_height, m_layerCount); }
+		glm::ivec3	GetSize() const { return glm::ivec3(m_width, m_height, m_layerCount); }
 		std::string GetPath() const { return m_path; }
 		VkImageView GetImageView() { return m_imageView; }
 

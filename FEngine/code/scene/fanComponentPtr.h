@@ -1,5 +1,6 @@
 #pragma once
 
+#include "scene/components/fanComponent.h"
 #include "scene/fanRessourcePtr.h"
 
 namespace fan
@@ -27,7 +28,9 @@ namespace fan
 	{
 	public:
 		ComponentPtr( _ComponentType * _ressourceType, IDPtrData _ressourceID ) : ComponentIDPtr( _ressourceType, _ressourceID ) {}
+		ComponentPtr( _ComponentType * _component ) : ComponentIDPtr( _component, IDPtrData(_component->GetGameobject()->GetUniqueID(), _component->GetType())  ) {}
 		ComponentPtr() : ComponentIDPtr() {}
+
 		_ComponentType* operator->() const { return static_cast<_ComponentType*>( GetRessource() ); }
 		_ComponentType* operator*() const { return static_cast<_ComponentType*>( GetRessource() ); }
 	};

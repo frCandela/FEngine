@@ -21,7 +21,7 @@ namespace fan {
 
 		int width, height;
 		glfwGetWindowSize(_window, &width, &(height));
-		m_windowSize = btVector2(static_cast<btScalar>(width), static_cast<btScalar>(height));
+		m_windowSize = glm::ivec2(width, height);
 
 		double x, y;
 		glfwGetCursorPos(_window, &x, &y);
@@ -37,7 +37,7 @@ namespace fan {
 	//================================================================================================================================
 	//================================================================================================================================
 	void Input::WindowSizeCallback(GLFWwindow* _window, int _width, int _height) {
-		Get().m_windowSize = btVector2(static_cast<btScalar>(_width), static_cast<btScalar>(_height));
+		Get().m_windowSize = glm::ivec2(_width, _height);
 		(void)_window;
 	}
 

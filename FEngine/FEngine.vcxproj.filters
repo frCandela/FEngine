@@ -89,11 +89,14 @@
     <Filter Include="code\deps\bitset2">
       <UniqueIdentifier>{8a9eca29-15d4-499e-a9c0-cbb7d44aeeb8}</UniqueIdentifier>
     </Filter>
-    <Filter Include="code\game\ui">
-      <UniqueIdentifier>{5a3c73a4-8b43-448f-ae84-e276e7261ea0}</UniqueIdentifier>
-    </Filter>
     <Filter Include="code\renderer\descriptors">
       <UniqueIdentifier>{5938aafe-5dc2-4c2b-a56b-3f5e444c8340}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="code\scene\components\ui">
+      <UniqueIdentifier>{bda54a29-e5bb-4a35-bae1-bdf45a209e8a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="code\game\ui">
+      <UniqueIdentifier>{85bac6aa-1a76-4ff2-8fee-558cb899b633}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -409,9 +412,6 @@
     <ClCompile Include="code\scene\fanComponentPtr.cpp">
       <Filter>code\scene</Filter>
     </ClCompile>
-    <ClCompile Include="code\game\ui\fanProgressBar.cpp">
-      <Filter>code\game\ui</Filter>
-    </ClCompile>
     <ClCompile Include="code\renderer\descriptors\fanDescriptorTexture.cpp">
       <Filter>code\renderer\descriptors</Filter>
     </ClCompile>
@@ -420,6 +420,12 @@
     </ClCompile>
     <ClCompile Include="code\renderer\descriptors\fanDescriptorSampler.cpp">
       <Filter>code\renderer\descriptors</Filter>
+    </ClCompile>
+    <ClCompile Include="code\scene\components\ui\fanProgressBar.cpp">
+      <Filter>code\scene\components\ui</Filter>
+    </ClCompile>
+    <ClCompile Include="code\game\ui\fanSpaceshipUI.cpp">
+      <Filter>code\game\ui</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -1302,9 +1308,6 @@
     <ClInclude Include="code\scene\fanComponentPtr.h">
       <Filter>code\scene</Filter>
     </ClInclude>
-    <ClInclude Include="code\game\ui\fanProgressBar.h">
-      <Filter>code\game\ui</Filter>
-    </ClInclude>
     <ClInclude Include="code\renderer\descriptors\fanDescriptorTexture.h">
       <Filter>code\renderer\descriptors</Filter>
     </ClInclude>
@@ -1313,6 +1316,12 @@
     </ClInclude>
     <ClInclude Include="code\renderer\descriptors\fanDescriptorSampler.h">
       <Filter>code\renderer\descriptors</Filter>
+    </ClInclude>
+    <ClInclude Include="code\scene\components\ui\fanProgressBar.h">
+      <Filter>code\scene\components\ui</Filter>
+    </ClInclude>
+    <ClInclude Include="code\game\ui\fanSpaceshipUI.h">
+      <Filter>code\game\ui</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

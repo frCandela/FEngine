@@ -142,7 +142,7 @@
     <ClCompile Include="code\game\fanSunLight.cpp" />
     <ClCompile Include="code\game\fanWeapon.cpp" />
     <ClCompile Include="code\game\fanWithEnergy.cpp" />
-    <ClCompile Include="code\game\ui\fanProgressBar.cpp" />
+    <ClCompile Include="code\game\ui\fanSpaceshipUI.cpp" />
     <ClCompile Include="code\physics\fanPhysicsManager.cpp" />
     <ClCompile Include="code\renderer\core\fanBuffer.cpp" />
     <ClCompile Include="code\renderer\core\fanDevice.cpp" />
@@ -185,6 +185,7 @@
     <ClCompile Include="code\scene\components\fanSphereShape.cpp" />
     <ClCompile Include="code\scene\components\fanTransform.cpp" />
     <ClCompile Include="code\scene\components\fanUIMeshRenderer.cpp" />
+    <ClCompile Include="code\scene\components\ui\fanProgressBar.cpp" />
     <ClCompile Include="code\scene\fanComponentPtr.cpp" />
     <ClCompile Include="code\scene\fanGameobject.cpp" />
     <ClCompile Include="code\scene\fanRessourcePtr.cpp" />
@@ -264,7 +265,7 @@
     <ClInclude Include="code\game\fanSunLight.h" />
     <ClInclude Include="code\game\fanWeapon.h" />
     <ClInclude Include="code\game\fanWithEnergy.h" />
-    <ClInclude Include="code\game\ui\fanProgressBar.h" />
+    <ClInclude Include="code\game\ui\fanSpaceshipUI.h" />
     <ClInclude Include="code\physics\fanPhysicsManager.h" />
     <ClInclude Include="code\renderer\core\fanBuffer.h" />
     <ClInclude Include="code\renderer\core\fanDevice.h" />
@@ -307,6 +308,7 @@
     <ClInclude Include="code\scene\components\fanSphereShape.h" />
     <ClInclude Include="code\scene\components\fanTransform.h" />
     <ClInclude Include="code\scene\components\fanUIMeshRenderer.h" />
+    <ClInclude Include="code\scene\components\ui\fanProgressBar.h" />
     <ClInclude Include="code\scene\fanComponentPtr.h" />
     <ClInclude Include="code\scene\fanGameobject.h" />
     <ClInclude Include="code\scene\fanRessourcePtr.h" />

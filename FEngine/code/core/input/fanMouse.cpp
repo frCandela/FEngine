@@ -58,7 +58,7 @@ namespace fan {
 	//================================================================================================================================
 	btVector2 Mouse::GetScreenSpacePosition()
 	{
-		btVector2 screenSize = Input::Get().WindowSize();
+		btVector2 screenSize = Input::Get().WindowSizeF();
 		btVector2 ratio = 2.f * Mouse::GetPosition() / screenSize - btVector2(1.f, 1.f);
 		ratio.setX(std::clamp(ratio.x(), -1.f, 1.f));
 		ratio.setY(std::clamp(ratio.y(), -1.f, 1.f));

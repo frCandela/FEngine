@@ -511,7 +511,7 @@ namespace fan {
 		for (int meshIndex = 0; meshIndex < uiRenderers.size() ; meshIndex++)
 		{
 			UIMeshRenderer* meshRenderer = uiRenderers[meshIndex];
-			if ( meshRenderer->GetMesh()->GetVertices().size() > 0 )
+			if ( meshRenderer->IsVisible() && meshRenderer->GetMesh()->GetVertices().size() > 0 )
 			{
 				Transform * transform = meshRenderer->GetGameobject()->GetTransform();
 				Texture * texture= meshRenderer->GetTexture();
@@ -545,7 +545,7 @@ namespace fan {
 		bool mouseCaptured = ImGui::GetIO().WantCaptureMouse;
 
 		// Translation gizmo on selected gameobject
-		if (m_selectedGameobject != nullptr && m_selectedGameobject != m_editorCamera->GetGameobject()) {
+		if (m_selectedGameobject != nullptr && m_selectedGameobject != m_editorCamera->GetGameobject() && m_selectedGameobject->GetComponent<UIMeshRenderer>() == nullptr ) {
 			Transform * transform = m_selectedGameobject->GetComponent< Transform >();
 			btVector3 newPosition;
 			if (DrawMoveGizmo(btTransform(btQuaternion(0, 0, 0), transform->GetPosition()), (size_t)this, newPosition)) {
