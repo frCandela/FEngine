@@ -2,20 +2,19 @@
 #include "renderer/pipelines/fanUIPipeline.h"
 
 #include "renderer/core/fanDevice.h"
-#include "renderer/descriptors/fanDescriptorTexture.h"
-#include "renderer/core/fanSampler.h"
 #include "renderer/descriptors/fanDescriptor.h"
+#include "renderer/descriptors/fanDescriptorTexture.h"
+#include "renderer/descriptors/fanDescriptorSampler.h"
 
 namespace fan
 {
 	//================================================================================================================================
 	//================================================================================================================================
-	UIPipeline::UIPipeline( Device& _device, DescriptorTextures*& _textures ) :
+	UIPipeline::UIPipeline( Device& _device, DescriptorTextures*& _textures, DescriptorSampler*& _sampler  ) :
 		Pipeline( _device )
 		, m_textures( _textures )
+		, m_sampler( _sampler )
 	{
-		m_sampler = new Sampler( m_device );
-		m_sampler->CreateSampler( 0, 1.f, VK_FILTER_NEAREST );
 
 		// Calculate required alignment based on minimum device offset alignment
 		size_t minUboAlignment = m_device.GetDeviceProperties().limits.minUniformBufferOffsetAlignment;
@@ -32,7 +31,6 @@ namespace fan
 	//================================================================================================================================
 	UIPipeline::~UIPipeline()
 	{
-		delete m_sampler;
 		delete m_transformDescriptor;
 	}
 
@@ -70,6 +68,7 @@ namespace fan
 		m_descriptorSetLayouts = {
 			 m_transformDescriptor->GetLayout()
 			,m_textures->GetLayout()
+			, m_sampler->GetLayout()
 		};
 	}
 

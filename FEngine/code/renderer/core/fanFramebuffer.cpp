@@ -122,7 +122,7 @@ namespace fan
 
 		//Sampler
 		m_colorSampler = new Sampler( m_device );
-		m_colorSampler->CreateSampler( 0, 1.f );
+		m_colorSampler->CreateSampler( 0, 1.f, VK_FILTER_LINEAR );
 
 		CreateColorRessources( _extent, _format );
 	}

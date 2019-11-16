@@ -76,7 +76,7 @@ namespace fan
 		UpdateUniformBuffers();
 
 		delete m_descriptorImageSampler;
-		m_descriptorImageSampler = new DescriptorTextures( m_device, m_sampler->GetSampler(), 1 );
+		m_descriptorImageSampler = new DescriptorTextures( m_device, 1, m_sampler->GetSampler() );
 		m_descriptorImageSampler->Append( m_imageView->GetImageView() );
 		m_descriptorImageSampler->UpdateRange(0,0);
 	}

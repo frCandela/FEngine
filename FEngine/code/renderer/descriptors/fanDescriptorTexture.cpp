@@ -8,17 +8,19 @@ namespace fan
 {
 	//================================================================================================================================
 	//================================================================================================================================
-	DescriptorTextures::DescriptorTextures( Device& _device, VkSampler _sampler, const uint32_t _maxTextures ) :
+	DescriptorTextures::DescriptorTextures( Device& _device, const uint32_t _maxTextures, VkSampler _sampler ) :
 		  m_device( _device )
 		, m_sampler( _sampler )
 		, m_maxTextures( _maxTextures )
 	{
 		m_views.reserve( m_maxTextures );
 
+		m_descriptorType = ( m_sampler == VK_NULL_HANDLE ? VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE : VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER );
+
 		// Descriptor pool
 		{
 			VkDescriptorPoolSize descriptorPoolSize = {};
-			descriptorPoolSize.type = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+			descriptorPoolSize.type = m_descriptorType;
 			descriptorPoolSize.descriptorCount = 1;
 
 			std::vector<VkDescriptorPoolSize> poolSizes = { descriptorPoolSize };
@@ -34,7 +36,7 @@ namespace fan
 		// Descriptor set layout
 		{
 			VkDescriptorSetLayoutBinding setLayoutBinding {};
-			setLayoutBinding.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+			setLayoutBinding.descriptorType = m_descriptorType;
 			setLayoutBinding.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT;
 			setLayoutBinding.binding = 0;
 			setLayoutBinding.descriptorCount = 1;
@@ -114,7 +116,7 @@ namespace fan
 
 			writeDescriptorSets[viewIndex].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
 			writeDescriptorSets[viewIndex].dstSet = m_descriptorSets[viewIndex];
-			writeDescriptorSets[viewIndex].descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+			writeDescriptorSets[viewIndex].descriptorType = m_descriptorType;
 			writeDescriptorSets[viewIndex].dstBinding = 0;
 			writeDescriptorSets[viewIndex].pImageInfo = &imageInfos[viewIndex];
 			writeDescriptorSets[viewIndex].descriptorCount = 1;

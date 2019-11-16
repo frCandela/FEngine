@@ -17,6 +17,7 @@ namespace fan
 	class Sampler;
 	class Descriptor;
 	class DescriptorTextures;
+	class DescriptorSampler;
 	class RessourceManager;
 
 	//================================================================
@@ -89,7 +90,7 @@ namespace fan
 		VertUniforms	m_vertUniforms;
 		FragUniforms	m_fragUniforms;
 
-		ForwardPipeline( Device& _device, DescriptorTextures*& _textures );
+		ForwardPipeline( Device& _device, DescriptorTextures*& _textures, DescriptorSampler*& _sampler );
 		~ForwardPipeline() override;
 
 		void Resize( const VkExtent2D _extent ) override;
@@ -107,5 +108,6 @@ namespace fan
 		RessourceManager *	m_ressourceManager = nullptr;
 
 		DescriptorTextures*& m_textures;
+		DescriptorSampler *& m_sampler;
 	};
 }

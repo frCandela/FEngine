@@ -19,6 +19,7 @@ namespace fan
 	class Buffer;
 	class Sampler;
 	class DescriptorTextures;
+	class DescriptorSampler;
 	class PostprocessPipeline;
 	class ForwardPipeline;
 	class DebugPipeline;
@@ -136,8 +137,13 @@ namespace fan
 		DebugPipeline *			m_debugLinesPipelineNoDepthTest;
 		DebugPipeline *			m_debugTrianglesPipeline;
 
-		DescriptorTextures * m_texturesDescriptor;
-		Sampler *			m_sampler = nullptr;
+		DescriptorTextures * m_imagesDescriptor = nullptr;
+
+		DescriptorSampler * m_samplerDescriptorTextures	= nullptr;
+		Sampler *			m_samplerTextures			= nullptr;
+
+		DescriptorSampler * m_samplerDescriptorUI	= nullptr;
+		Sampler *			m_samplerUI				= nullptr;
 
 		VkRenderPass	m_renderPass;
 		VkRenderPass	m_renderPassPostprocess;
@@ -177,7 +183,7 @@ namespace fan
 		bool CreateRenderPassPostprocess();
 
 		bool CreateTextureDescriptor();
-		void BindTexture( VkCommandBuffer _commandBuffer, const uint32_t _textureIndex, VkPipelineLayout _pipelineLayout );
+		void BindTexture( VkCommandBuffer _commandBuffer, const uint32_t _textureIndex, DescriptorSampler* _samplerDescriptor, VkPipelineLayout _pipelineLayout );
 
 		void DeleteRenderPass();
 		void DeleteRenderPassPostprocess();

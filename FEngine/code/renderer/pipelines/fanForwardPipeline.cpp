@@ -11,6 +11,7 @@
 #include "renderer/core/fanSampler.h"
 #include "renderer/descriptors/fanDescriptor.h"
 #include "renderer/descriptors/fanDescriptorTexture.h"
+#include "renderer/descriptors/fanDescriptorSampler.h"
 #include "renderer/fanRenderer.h"
 #include "renderer/util/fanVertex.h"
 #include "renderer/fanMesh.h"
@@ -19,14 +20,12 @@ namespace fan
 {
 	//================================================================================================================================
 	//================================================================================================================================
-	ForwardPipeline::ForwardPipeline(Device& _device, DescriptorTextures*& _textures  ) :
+	ForwardPipeline::ForwardPipeline(Device& _device, DescriptorTextures*& _textures, DescriptorSampler*& _sampler  ) :
 		Pipeline(_device)
 		, m_sceneDescriptor(nullptr)
-		, m_textures(_textures){
-
-
-
-
+		, m_textures(_textures)
+		, m_sampler( _sampler )
+	{
 		// Calculate required alignment based on minimum device offset alignment
 		size_t minUboAlignment = m_device.GetDeviceProperties().limits.minUniformBufferOffsetAlignment;
 		size_t dynamicAlignmentVert = sizeof( DynamicUniformsVert );
@@ -138,6 +137,7 @@ namespace fan
 		m_descriptorSetLayouts = {
 			m_sceneDescriptor->GetLayout()
 			, m_textures->GetLayout()
+			, m_sampler->GetLayout()
 		};
 	}
 }

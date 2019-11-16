@@ -418,6 +418,9 @@
     <ClCompile Include="code\renderer\descriptors\fanDescriptor.cpp">
       <Filter>code\renderer\descriptors</Filter>
     </ClCompile>
+    <ClCompile Include="code\renderer\descriptors\fanDescriptorSampler.cpp">
+      <Filter>code\renderer\descriptors</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="code\editor\fanMainMenuBar.h">
@@ -1306,6 +1309,9 @@
       <Filter>code\renderer\descriptors</Filter>
     </ClInclude>
     <ClInclude Include="code\renderer\descriptors\fanDescriptor.h">
+      <Filter>code\renderer\descriptors</Filter>
+    </ClInclude>
+    <ClInclude Include="code\renderer\descriptors\fanDescriptorSampler.h">
       <Filter>code\renderer\descriptors</Filter>
     </ClInclude>
   </ItemGroup>

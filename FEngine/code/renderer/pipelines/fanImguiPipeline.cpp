@@ -230,7 +230,7 @@ namespace fan
 
 		m_fontTexture->Load(fontData, texWidth, texHeight, 1);
 		m_iconsTexture->LoadTexture( GlobalValues::s_defaultIcons );
-		m_sampler->CreateSampler(0, 1.f);
+		m_sampler->CreateSampler(0, 1.f, VK_FILTER_LINEAR);
 	}
 
 	//================================================================================================================================
