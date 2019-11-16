@@ -32,6 +32,7 @@
 #include "editor/windows/fanProfilerWindow.h"	
 #include "editor/components/fanFPSCamera.h"		
 #include "editor/fanImguiIcons.h"
+#include "editor/fanCopyPaste.h"
 #include "scene/fanScene.h"
 #include "scene/fanGameobject.h"
 #include "scene/fanRessourcePtr.h"
@@ -83,6 +84,8 @@ namespace fan {
 		Input::Get().Manager().CreateKeyboardEvent( "reload_scene",	  Keyboard::R, Keyboard::LEFT_CONTROL );
 		Input::Get().Manager().CreateKeyboardEvent(	"play_pause",	  Keyboard::TAB );
 		Input::Get().Manager().CreateKeyboardEvent( "freeze_capture", Keyboard::END );		
+		Input::Get().Manager().CreateKeyboardEvent( "copy",			  Keyboard::C, Keyboard::LEFT_CONTROL );
+		Input::Get().Manager().CreateKeyboardEvent( "paste",		  Keyboard::V, Keyboard::LEFT_CONTROL );
 
 		// Axis
 		Input::Get().Manager().CreateAxis( "game_forward",		Keyboard::W, Keyboard::S );
@@ -117,6 +120,8 @@ namespace fan {
 		m_mainMenuBar		= new MainMenuBar( *m_scene, m_editorGrid );
 		m_mainMenuBar->SetWindows( { m_renderWindow , m_sceneWindow , m_inspectorWindow , m_consoleWindow, m_ecsWindow, m_profilerWindow, m_preferencesWindow } );
 
+		m_copyPaste = new CopyPaste();
+
 		// Instance messages		
 		Debug::Get().SetDebug( m_renderer );
 		m_sceneWindow->onSelectGameobject.	Connect( &Engine::SetSelectedGameobject, this );
@@ -133,6 +138,8 @@ namespace fan {
 		Input::Get().Manager().FindEvent( "reload_shaders" )->Connect(	&Renderer::ReloadShaders, m_renderer );
 		Input::Get().Manager().FindEvent( "delete" )->Connect(			&Engine::DeleteSelection, this );
 		Input::Get().Manager().FindEvent( "play_pause" )->Connect(		&Engine::SwitchPlayPause, this );
+		Input::Get().Manager().FindEvent( "copy" )->Connect(			&Engine::OnCopy, this );
+		Input::Get().Manager().FindEvent( "paste" )->Connect(			&Engine::OnPaste, this );
 
 		// Static messages		
 		TexturePtr::s_onCreateUnresolved.			Connect ( &Engine::OnResolveTexturePtr, this );
@@ -163,6 +170,7 @@ namespace fan {
 		delete m_scene;
 		delete m_physicsManager;
 		delete m_ecsManager;
+		delete m_copyPaste;
 
 		// Serialize editor positions
 		const Window * window = m_renderer->GetWindow();
@@ -818,4 +826,9 @@ namespace fan {
 			(*_ptr) = GameobjectPtr( m_selectedGameobject, m_selectedGameobject->GetUniqueID() );
 		}
 	}
+
+	//================================================================================================================================
+	//================================================================================================================================
+	void Engine::OnCopy() { m_copyPaste->Copy(m_selectedGameobject); }
+	void Engine::OnPaste(){ m_copyPaste->Paste(m_scene, m_selectedGameobject );}
 }

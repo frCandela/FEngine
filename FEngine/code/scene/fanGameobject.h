@@ -19,6 +19,8 @@ namespace fan
 		using Flag = ecsFlags::Flag;
 		using EditorFlag = ecsEditorFlags::Flag;
 
+		static Signal< uint64_t, Gameobject * > s_setIDfailed;
+
 		Gameobject(const std::string _name, Gameobject * _parent, Scene * _scene, const uint64_t _uniqueID );
 		~Gameobject();
 
@@ -45,7 +47,7 @@ namespace fan
 		Transform *		GetTransform() const  { return m_transform; }
 		ecsHandle		GetEcsHandle(){ return m_ecsHandleEntity; }
 		uint64_t		GetUniqueID() const { return m_uniqueID; }
-		void 			SetUniqueID( const uint64_t _id );
+		bool 			SetUniqueID( const uint64_t _id );
 
 		// Gameobject scene tree parenting
 		Gameobject* GetParent() const { return m_parent; }
@@ -73,7 +75,7 @@ namespace fan
 		uint64_t				 m_uniqueID;
 		std::vector<Gameobject*> m_childs;
 		Gameobject *			 m_parent;
-		Transform * m_transform = nullptr;
+		Transform *				 m_transform = nullptr;
 		std::vector<Component*>  m_components;
 		Scene *	const			 m_scene = nullptr;
 		ecsHandle				 m_ecsHandleEntity = ecsNullHandle;

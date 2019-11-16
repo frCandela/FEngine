@@ -11,6 +11,9 @@
 
 namespace fan
 {
+
+	Signal< uint64_t, Gameobject * > Gameobject::s_setIDfailed;
+
 	//================================================================================================================================
 	//================================================================================================================================
 	Gameobject::Gameobject(const std::string _name, Gameobject * _parent, Scene * _scene, const uint64_t _uniqueID ) :
@@ -123,11 +126,16 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void Gameobject::SetUniqueID( const uint64_t _id )
-	{
-		m_scene->EraseID( m_uniqueID );
-		m_scene->InsertID( _id, this );
-		m_uniqueID = _id;
+	bool Gameobject::SetUniqueID( const uint64_t _id ) {		
+		if ( m_scene->FindGameobject( _id ) ) {	
+			m_uniqueID = 0;
+			s_setIDfailed.Emmit(_id, this );
+			return false ; 
+		} else {
+			m_uniqueID = _id;
+			m_scene->InsertID( m_uniqueID, this );
+			return true;
+		}
 	}
 
 	//============================================================== ==================================================================
@@ -296,7 +304,7 @@ namespace fan
 
 		uint64_t tmp ;
 		LoadUInt64( _json, "unique_id", tmp );
-		SetUniqueID(tmp);
+		SetUniqueID( tmp );
 
 		Json& jComponents = _json["components"]; {
 			for ( int childIndex = 0; childIndex < jComponents.size(); childIndex++ ) {
@@ -320,7 +328,7 @@ namespace fan
 		Json& jchilds = _json["childs"]; {
 			for (int childIndex = 0; childIndex < jchilds.size(); childIndex++)	{
 				Json& jchild_i = jchilds[childIndex]; {
-					Gameobject * child = m_scene->CreateGameobject( "tmp", this );
+					Gameobject * child = m_scene->CreateGameobject( "tmp", this, false );
 					child->Load( jchild_i );
 				}
 			}

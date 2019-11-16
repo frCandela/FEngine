@@ -31,7 +31,7 @@ namespace fan
 		Scene( const std::string _name, EcsManager * _ecsManager, PhysicsManager * _physicsManager );
 		~Scene();
 
-		Gameobject *					CreateGameobject(const std::string _name, Gameobject * _parent = nullptr);	// Creates a game object and adds it to the scene hierarchy
+		Gameobject *					CreateGameobject(const std::string _name, Gameobject * _parent = nullptr, const bool _generateID = true );	// Creates a game object and adds it to the scene hierarchy
 		void							DeleteGameobject(Gameobject* _gameobject);										// Deletes a gameobject and removes it from the scene hierarchy at the end of the frame
 		std::vector < Gameobject * >	BuildEntitiesList() const;
 
@@ -60,7 +60,7 @@ namespace fan
 		bool					IsPaused() const			{ return m_isPaused; };
 		Camera *				GetMainCamera()				{ return m_mainCamera; }
 		void					SetMainCamera( Camera * _camera );
-		uint64_t				GetUniqueID() { return m_nextUniqueID++; }
+		uint64_t				GetUniqueID() { assert(FindGameobject(m_nextUniqueID)==nullptr);  return m_nextUniqueID++; }
 		Gameobject *			FindGameobject( const uint64_t _id );
 
 		void					InsertID( const uint64_t _id, Gameobject * _gameobject );

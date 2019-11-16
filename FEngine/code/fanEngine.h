@@ -13,6 +13,7 @@ namespace fan {
 	class EditorWindow;
 	class EcsWindow;
 	class ProfilerWindow;
+	class CopyPaste;
 	class Renderer;
 	class Gameobject;
 	class Scene;
@@ -98,6 +99,9 @@ namespace fan {
 		FPSCamera *			m_editorCameraController = nullptr;
 		Camera *			m_mainCamera = nullptr;
 
+		// Other
+		CopyPaste * m_copyPaste;
+
 		std::vector < DirectionalLight* >	m_directionalLights;
 		std::vector < PointLight* >			m_pointLights;
 		std::vector < MeshRenderer* >		m_meshRenderers;
@@ -120,7 +124,9 @@ namespace fan {
 		void OnMaterialSetTexture( Material * _material, std::string _path );
 		void OnResolveTexturePtr( TexturePtr * _ptr );
 		void OnResolveMeshPtr( MeshPtr * _ptr );
-		
+		void OnCopy();
+		void OnPaste();
+
 		void OnGameobjectDeleted( Gameobject * _gameobject );
 		void OnSetGameobjectPtrFromSelection( GameobjectPtr * _ptr );
 

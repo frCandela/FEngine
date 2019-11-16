@@ -38,12 +38,11 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	Gameobject *	Scene::CreateGameobject(const std::string _name, Gameobject * _parent) {
+	Gameobject *	Scene::CreateGameobject(const std::string _name, Gameobject * _parent, const bool _generateID) {
 		if (_parent == nullptr) {
 			_parent = m_root;
 		}
-		Gameobject* gameobject = new Gameobject(_name, _parent, this, GetUniqueID() );
-		assert( m_gameobjects.find( gameobject->GetUniqueID() ) == m_gameobjects.end() );
+		Gameobject* gameobject = new Gameobject( _name, _parent, this, _generateID ? GetUniqueID() : 0 );
 		m_gameobjects[gameobject->GetUniqueID()] = gameobject;
 
 		return gameobject;
@@ -334,7 +333,7 @@ namespace fan
 		GameobjectPtr::s_onCreateUnresolved.Connect ( &Scene::OnGameobjectPtrCreate, this );
 		ComponentIDPtr::s_onCreateUnresolved.Connect( &Scene::OnResolveComponentIDPtr, this );
 		Json & jGameobjects = _json["gameobjects"]; {
-			m_root = CreateGameobject( "root" );
+			m_root = CreateGameobject( "root", nullptr, false );
 			m_root->Load( jGameobjects );
 		}
 		GameobjectPtr::s_onCreateUnresolved. Disconnect( &Scene::OnGameobjectPtrCreate, this );
