@@ -15,6 +15,8 @@ namespace fan {
 		data.flags = _flags;
 		m_data[_key] = data;
 
+		assert( data.instance != nullptr );
+
 		return _key;
 	}
 

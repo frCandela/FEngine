@@ -49,5 +49,9 @@ namespace ImGui {
 		, DECL_ICON ( 32.f, 1, 5 ) // SOLAR_SYSTEM
 		, DECL_ICON ( 32.f, 2, 5 ) // SPACE_SHIP
 		, DECL_ICON ( 32.f, 3, 5 ) // GAME_MANAGER
+
+		// UI
+		, DECL_ICON ( 32.f, 0, 7 ) // PROGRESS_BAR
+		
 	};
 }

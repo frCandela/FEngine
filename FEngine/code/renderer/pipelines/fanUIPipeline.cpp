@@ -15,7 +15,7 @@ namespace fan
 		, m_textures( _textures )
 	{
 		m_sampler = new Sampler( m_device );
-		m_sampler->CreateSampler( 0, 8 );
+		m_sampler->CreateSampler( 0, 1.f, VK_FILTER_NEAREST );
 
 		// Calculate required alignment based on minimum device offset alignment
 		size_t minUboAlignment = m_device.GetDeviceProperties().limits.minUniformBufferOffsetAlignment;

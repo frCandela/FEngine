@@ -13,7 +13,7 @@ namespace fan
 		~Sampler();
 
 		// Create a Sampler
-		void CreateSampler(float _maxLod, float _maxAnisotropy);
+		void CreateSampler( const float _maxLod, const float _maxAnisotropy, const VkFilter _filter = VK_FILTER_LINEAR );
 
 		VkSampler GetSampler() { return m_sampler; }
 

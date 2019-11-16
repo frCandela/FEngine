@@ -89,6 +89,9 @@
     <Filter Include="code\deps\bitset2">
       <UniqueIdentifier>{8a9eca29-15d4-499e-a9c0-cbb7d44aeeb8}</UniqueIdentifier>
     </Filter>
+    <Filter Include="code\game\ui">
+      <UniqueIdentifier>{5a3c73a4-8b43-448f-ae84-e276e7261ea0}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="code\editor\fanMainMenuBar.cpp">
@@ -408,6 +411,9 @@
     </ClCompile>
     <ClCompile Include="code\scene\fanComponentPtr.cpp">
       <Filter>code\scene</Filter>
+    </ClCompile>
+    <ClCompile Include="code\game\ui\fanProgressBar.cpp">
+      <Filter>code\game\ui</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -1295,6 +1301,9 @@
     </ClInclude>
     <ClInclude Include="code\scene\fanComponentPtr.h">
       <Filter>code\scene</Filter>
+    </ClInclude>
+    <ClInclude Include="code\game\ui\fanProgressBar.h">
+      <Filter>code\game\ui</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
