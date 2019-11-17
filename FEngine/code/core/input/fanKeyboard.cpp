@@ -73,6 +73,8 @@ namespace fan {
 	//================================================================================================================================
 	void Keyboard::KeyCallback(GLFWwindow* /*_window*/, int _key, int /*_scancode*/, int _action, int /*_mods*/)
 	{
+		if( _key == GLFW_KEY_UNKNOWN ) return;
+
 		ImGuiIO& io = ImGui::GetIO();
 
 		// Dirty hack so that pressing KP_ENTER is considered by IMGUI

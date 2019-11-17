@@ -430,6 +430,9 @@
     <ClCompile Include="code\scene\components\ui\fanUIMeshRenderer.cpp">
       <Filter>code\scene\components\ui</Filter>
     </ClCompile>
+    <ClCompile Include="code\core\input\fanJoystick.cpp">
+      <Filter>code\core\input</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="code\editor\fanMainMenuBar.h">
@@ -1328,6 +1331,9 @@
     </ClInclude>
     <ClInclude Include="code\scene\components\ui\fanUIMeshRenderer.h">
       <Filter>code\scene\components\ui</Filter>
+    </ClInclude>
+    <ClInclude Include="code\core\input\fanJoystick.h">
+      <Filter>code\core\input</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

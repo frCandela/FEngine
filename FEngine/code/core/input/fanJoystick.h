@@ -1,0 +1,68 @@
+#pragma once
+
+#include "core/fanSingleton.h"
+#include "core/fanSignal.h"
+
+namespace fan
+{
+	//================================================================================================================================
+	//================================================================================================================================	
+	class Joystick : public Singleton<Joystick>
+	{
+		friend class Singleton<Joystick>;
+	public:
+		using Button = int;
+		using Axis = int;
+
+
+		bool				IsGamepad(   const int _GLFW_JOYSTICK );
+		bool				IsConnected( const int _GLFW_JOYSTICK );
+
+		// Generic input
+		std::vector<float>	GetAxes(	 const int _GLFW_JOYSTICK );
+		std::vector<bool>	GetButtons(  const int _GLFW_JOYSTICK );
+		std::vector<float>	GetHats(     const int _GLFW_JOYSTICK );
+		std::string			GetName(	 const int _GLFW_JOYSTICK );
+
+		// Gamepad input
+		std::string			GetGamepadName(	 const int _GLFW_JOYSTICK );
+		float				GetAxis( const int _GLFW_JOYSTICK, const Axis _axis );
+		bool				GetButton(  const int _GLFW_JOYSTICK, const Button _button );
+
+		Signal<int, bool> onJoystickConnect; // joystick id, connected/disconnected 
+
+	private:
+		Joystick();
+
+		static void JoystickCallback( int _jid, int _event );
+
+	public:
+
+		// Button
+		static const Button A = GLFW_GAMEPAD_BUTTON_A;
+		static const Button B = GLFW_GAMEPAD_BUTTON_B;
+		static const Button X = GLFW_GAMEPAD_BUTTON_X;
+		static const Button Y = GLFW_GAMEPAD_BUTTON_Y;
+		static const Button LEFT_BUMPER = GLFW_GAMEPAD_BUTTON_LEFT_BUMPER;
+		static const Button RIGHT_BUMPER = GLFW_GAMEPAD_BUTTON_RIGHT_BUMPER;
+		static const Button BACK = GLFW_GAMEPAD_BUTTON_BACK;
+		static const Button START = GLFW_GAMEPAD_BUTTON_START;
+		static const Button GUIDE = GLFW_GAMEPAD_BUTTON_GUIDE;
+		static const Button LEFT_THUMB = GLFW_GAMEPAD_BUTTON_LEFT_THUMB;
+		static const Button RIGHT_THUMB = GLFW_GAMEPAD_BUTTON_RIGHT_THUMB;
+		static const Button DPAD_UP = GLFW_GAMEPAD_BUTTON_DPAD_UP;
+		static const Button DPAD_RIGHT = GLFW_GAMEPAD_BUTTON_DPAD_RIGHT;
+		static const Button DPAD_DOWN = GLFW_GAMEPAD_BUTTON_DPAD_DOWN;
+		static const Button DPAD_LEFT = GLFW_GAMEPAD_BUTTON_DPAD_LEFT;	
+		static const char * s_buttonsNames[GLFW_GAMEPAD_BUTTON_LAST + 1];
+
+		// Axis
+		static const Axis LEFT_X = GLFW_GAMEPAD_AXIS_LEFT_X;       
+		static const Axis LEFT_Y = GLFW_GAMEPAD_AXIS_LEFT_Y;
+		static const Axis RIGHT_X = GLFW_GAMEPAD_AXIS_RIGHT_X;
+		static const Axis RIGHT_Y = GLFW_GAMEPAD_AXIS_RIGHT_Y;
+		static const Axis LEFT_TRIGGER = GLFW_GAMEPAD_AXIS_LEFT_TRIGGER;
+		static const Axis RIGHT_TRIGGER = GLFW_GAMEPAD_AXIS_RIGHT_TRIGGER;
+		static const char * s_axisNames[GLFW_GAMEPAD_AXIS_LAST + 1];
+	};
+}

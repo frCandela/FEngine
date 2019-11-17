@@ -15,6 +15,7 @@
 #include "core/input/fanKeyboard.h"
 #include "core/input/fanMouse.h"
 #include "core/input/fanInputManager.h"
+#include "core/input/fanJoystick.h"
 #include "core/math/shapes/fanTriangle.h"
 #include "core/math/shapes/fanPlane.h"
 #include "core/math/shapes/fanAABB.h"
@@ -95,7 +96,7 @@ namespace fan {
 		Input::Get().Manager().CreateAxis( "editor_left",		Keyboard::A, Keyboard::D );
 		Input::Get().Manager().CreateAxis( "editor_up",			Keyboard::E, Keyboard::Q );
 		Input::Get().Manager().CreateAxis( "editor_boost",		Keyboard::LEFT_SHIFT, Keyboard::NONE );
-		Input::Get().Manager().CreateAxis( "game_fire",				Keyboard::SPACE, Keyboard::NONE );
+		Input::Get().Manager().CreateAxis( "game_fire",			Keyboard::SPACE, Keyboard::NONE );
 		Input::Get().Manager().CreateAxis( "game_boost",		Keyboard::LEFT_SHIFT, Keyboard::LEFT_CONTROL );
 
 		// Set some values
@@ -554,6 +555,80 @@ namespace fan {
 	//================================================================================================================================
 	//================================================================================================================================
 	void Engine::ManageSelection() {
+
+		const std::vector< Joystick::Axis > axes = 
+		{	 Joystick::LEFT_X
+			,Joystick::LEFT_Y
+			,Joystick::RIGHT_X
+			,Joystick::RIGHT_Y
+			,Joystick::LEFT_TRIGGER
+			,Joystick::RIGHT_TRIGGER
+		};
+
+		const std::vector< Joystick::Button > buttons = 
+		{ 	 Joystick::A
+			,Joystick::B
+			,Joystick::X
+			,Joystick::Y
+			,Joystick::LEFT_BUMPER
+			,Joystick::RIGHT_BUMPER
+			,Joystick::BACK
+			,Joystick::START
+			,Joystick::GUIDE
+			,Joystick::LEFT_THUMB
+			,Joystick::RIGHT_THUMB
+			,Joystick::DPAD_UP
+			,Joystick::DPAD_RIGHT
+			,Joystick::DPAD_DOWN
+			,Joystick::DPAD_LEFT
+		};
+
+		ImGui::Begin( "input test" );
+		{
+			for ( int joystickIndex = 0; joystickIndex <= GLFW_JOYSTICK_LAST; joystickIndex++ )
+			{
+				if ( Joystick::Get().IsConnected( joystickIndex ) )
+				{
+					ImGui::Text(  Joystick::Get().GetName(joystickIndex).c_str() );
+
+					// gamepad
+					if ( Joystick::Get().IsGamepad( joystickIndex ) )
+					{
+						ImGui::Text( "Gamepad name : %s", Joystick::Get().GetGamepadName( joystickIndex ).c_str() );
+						ImGui::Indent();
+						{
+							// axes
+							for ( int axisIndex = 0; axisIndex < axes.size(); axisIndex++ )
+							{
+								float axisValue = Joystick::Get().GetAxis(joystickIndex, axes[axisIndex] );
+								ImGui::SliderFloat( Joystick::Get().s_axisNames[axisIndex], &axisValue , -1.f, 1.f );
+							}
+
+							// buttons
+							for ( int buttonindex = 0; buttonindex < buttons.size(); buttonindex++ )
+							{
+								bool buttonValue = Joystick::Get().GetButton( joystickIndex, buttons[buttonindex] );
+								ImGui::Checkbox(Joystick::Get().s_buttonsNames[buttonindex], &buttonValue );
+							}
+						} ImGui::Unindent();
+					}
+					else
+					{
+						ImGui::Text( "Unrecognized gamepad" );
+					}
+					ImGui::Separator();
+				}
+			}
+		} ImGui::End();
+
+
+
+
+
+
+
+
+
 		SCOPED_PROFILE( selection )
 
 		bool mouseCaptured = ImGui::GetIO().WantCaptureMouse;
