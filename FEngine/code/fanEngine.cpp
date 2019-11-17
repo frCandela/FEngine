@@ -90,14 +90,14 @@ namespace fan {
 		Input::Get().Manager().CreateKeyboardEvent( "show_ui",		  Keyboard::F3 );
 
 		// Axis
-		Input::Get().Manager().CreateAxis( "game_forward",		Keyboard::W, Keyboard::S );
-		Input::Get().Manager().CreateAxis( "game_left",			Keyboard::A, Keyboard::D );
-		Input::Get().Manager().CreateAxis( "editor_forward",	Keyboard::W, Keyboard::S );
-		Input::Get().Manager().CreateAxis( "editor_left",		Keyboard::A, Keyboard::D );
-		Input::Get().Manager().CreateAxis( "editor_up",			Keyboard::E, Keyboard::Q );
-		Input::Get().Manager().CreateAxis( "editor_boost",		Keyboard::LEFT_SHIFT, Keyboard::NONE );
-		Input::Get().Manager().CreateAxis( "game_fire",			Keyboard::SPACE, Keyboard::NONE );
-		Input::Get().Manager().CreateAxis( "game_boost",		Keyboard::LEFT_SHIFT, Keyboard::LEFT_CONTROL );
+		Input::Get().Manager().CreateKeyboardAxis( "game_forward",		Keyboard::W, Keyboard::S );
+		Input::Get().Manager().CreateKeyboardAxis( "game_left",			Keyboard::A, Keyboard::D );
+		Input::Get().Manager().CreateKeyboardAxis( "editor_forward",	Keyboard::W, Keyboard::S );
+		Input::Get().Manager().CreateKeyboardAxis( "editor_left",		Keyboard::A, Keyboard::D );
+		Input::Get().Manager().CreateKeyboardAxis( "editor_up",			Keyboard::E, Keyboard::Q );
+		Input::Get().Manager().CreateKeyboardAxis( "editor_boost",		Keyboard::LEFT_SHIFT, Keyboard::NONE );
+		Input::Get().Manager().CreateKeyboardAxis( "game_fire",			Keyboard::SPACE, Keyboard::NONE );
+		Input::Get().Manager().CreateKeyboardAxis( "game_boost",		Keyboard::LEFT_SHIFT, Keyboard::LEFT_CONTROL );
 
 		// Set some values
 		m_editorGrid.isVisible = true;

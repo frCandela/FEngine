@@ -26,16 +26,15 @@ namespace fan {
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void InputManager::CreateAxis( const std::string& _name, const Keyboard::Key _keyPositive, const Keyboard::Key _keyNegative ) {
+	void InputManager::CreateKeyboardAxis( const std::string& _name, const Keyboard::Key _keyPositive, const Keyboard::Key _keyNegative ) {
 		// Already exists
 		if( m_axis.find( _name ) != m_axis.end() ) {
 			return;
 		}
 
 		// Creates new one
-		Axis axis;
-		axis.keyNegative = _keyNegative;
-		axis.keyPositive = _keyPositive;
+		Axis axis( _name, Axis::KEYBOARD );
+		axis.SetKeyboardKeys(_keyPositive, _keyNegative );
 		m_axis[_name] = axis;
 	}
 
@@ -44,9 +43,8 @@ namespace fan {
 	float InputManager::GetAxis( const std::string& _name ) {
 		assert ( m_axis.find( _name ) != m_axis.end() );
 		Axis& axis = m_axis[_name];
-		return  ( Keyboard::IsKeyDown( axis.keyPositive ) ? 1.f : 0.f ) + ( Keyboard::IsKeyDown( axis.keyNegative ) ? -1.f : 0.f );
+		return  axis.GetValue();
 	}
-
 
 	//================================================================================================================================
 	//================================================================================================================================
@@ -106,14 +104,9 @@ namespace fan {
 			for ( size_t axisIndex = 0; axisIndex < jAxis.size(); ++axisIndex ) {
 				Json& jAxis_i = jAxis[index];
 				
-				std::string name;
 				Axis axis;
-
-				LoadString( jAxis_i, "name", name );
-				LoadInt( jAxis_i, "key_negative", axis.keyNegative );
-				LoadInt( jAxis_i, "key_positive", axis.keyPositive );
-
-				m_axis[name] = axis;
+				axis.Load( jAxis_i );
+				m_axis[axis.GetName()] = axis;
 
 				++index;
 			}
@@ -144,9 +137,7 @@ namespace fan {
 			Json& jAxis = _json["axis"];
 			for ( auto axisPair : m_axis ) {
 				Json& jEvent_i = jAxis[index];
-				SaveString( jEvent_i, "name", axisPair.first );
-				SaveInt( jEvent_i, "key_negative", axisPair.second.keyNegative );
-				SaveInt( jEvent_i, "key_positive",axisPair.second.keyPositive );
+				axisPair.second.Save(jEvent_i);
 				++index;
 			}
 		}

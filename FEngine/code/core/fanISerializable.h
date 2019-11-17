@@ -51,6 +51,8 @@ namespace fan {
 		static bool LoadMeshPtr			( Json & _json, const char * _name, MeshPtr&			_outPtr );
 		static bool LoadComponentPtr	( Json & _json, const char * _name, ComponentIDPtr&		_outPtr  );
 
+		static bool ContainsToken( Json & _json, const char * _name );
+
 	private:
 		static Json * FindToken	( Json & _json, const char * _name );
 	};

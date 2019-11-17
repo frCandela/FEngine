@@ -13,22 +13,23 @@ namespace fan
 	public:
 		using Button = int;
 		using Axis = int;
+		using JoystickID = int;
 
-
-		bool IsGamepad(   const int _GLFW_JOYSTICK ) const;
-		bool IsConnected( const int _GLFW_JOYSTICK ) const;
+		bool IsGamepad(   const JoystickID _GLFW_JOYSTICK ) const;
+		bool IsConnected( const JoystickID _GLFW_JOYSTICK ) const;
 		int  NumConnectedJoysticks() const;
 
 		// Generic input
-		std::vector<float>	GetAxes(	 const int _GLFW_JOYSTICK );
-		std::vector<bool>	GetButtons(  const int _GLFW_JOYSTICK );
-		std::vector<float>	GetHats(     const int _GLFW_JOYSTICK );
-		std::string			GetName(	 const int _GLFW_JOYSTICK );
+		std::vector<float>	GetAxes(	 const JoystickID _GLFW_JOYSTICK );
+		std::vector<bool>	GetButtons(  const JoystickID _GLFW_JOYSTICK );
+		std::vector<float>	GetHats(     const JoystickID _GLFW_JOYSTICK );
+		std::string			GetName(	 const JoystickID _GLFW_JOYSTICK );
 
 		// Gamepad input
-		std::string			GetGamepadName(	 const int _GLFW_JOYSTICK );
-		float				GetAxis( const int _GLFW_JOYSTICK, const Axis _axis );
-		bool				GetButton(  const int _GLFW_JOYSTICK, const Button _button );
+		std::string	 GetGamepadName( const JoystickID _GLFW_JOYSTICK );
+		float		 GetAxis(		 const JoystickID _GLFW_JOYSTICK, const Axis _axis );
+		bool		 GetButton(		 const JoystickID _GLFW_JOYSTICK, const Button _button );
+		std::string  GetAxisName(	 const Axis _key );	
 
 		Signal<int, bool> onJoystickConnect; // joystick id, connected/disconnected 
 
@@ -40,6 +41,7 @@ namespace fan
 	public:
 
 		// Button
+		static const Button BUTTON_NONE = -1;
 		static const Button A = GLFW_GAMEPAD_BUTTON_A;
 		static const Button B = GLFW_GAMEPAD_BUTTON_B;
 		static const Button X = GLFW_GAMEPAD_BUTTON_X;
@@ -58,6 +60,7 @@ namespace fan
 		static const char * s_buttonsNames[GLFW_GAMEPAD_BUTTON_LAST + 1];
 
 		// Axis
+		static const Axis AXIS_NONE = -1;
 		static const Axis LEFT_X = GLFW_GAMEPAD_AXIS_LEFT_X;       
 		static const Axis LEFT_Y = GLFW_GAMEPAD_AXIS_LEFT_Y;
 		static const Axis RIGHT_X = GLFW_GAMEPAD_AXIS_RIGHT_X;

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "editor/windows/fanEditorWindow.h"
+#include "core/input/fanInputManager.h"
 
 namespace fan
 {
@@ -21,7 +22,7 @@ namespace fan
 		void CaptureKeyPopup();
 		void DeleteKeyPopup();
 
-		void SetKeyButton( int & _button );
+		void SetKeyboardEventButton( int & _button );
 		void CaptureKeyCallback( int _key );
 		void StartCaptureKey( int & _button );
 		void StopCaptureKey();

@@ -27,8 +27,8 @@ namespace fan {
 		static void CharCallback(GLFWwindow* _window, unsigned int _c);
 
 		//Events
-		std::array< uint64_t, GLFW_KEY_LAST > m_keysPressed;
-		std::array< uint64_t, GLFW_KEY_LAST > m_keysReleased;
+		std::array< uint64_t, GLFW_KEY_LAST + 1 > m_keysPressed;
+		std::array< uint64_t, GLFW_KEY_LAST + 1 > m_keysReleased;
 
 	public:	
 		static const Key SPACE			= GLFW_KEY_SPACE;

@@ -87,10 +87,10 @@ namespace fan
 
 			// Axis keys
 			{
-				std::map< std::string, InputManager::Axis >&		  axisList = Input::Get().Manager().GetListAxis();
+				std::map< std::string, Axis >&		  axisList = Input::Get().Manager().GetListAxis();
 
 				m_uniqueKeyIndex = 0;
-				ImGui::Text( "Axis                    ____ (-) ____    ____ (+) ____" );
+				ImGui::Text( "Axis                         type           ____ (+) ____    ____ (-) ____" );
 				ImGui::SameLine(); ImGui::Text("        "); ImGui::SameLine(); if ( ImGui::Button( "Reset" ) ) { SerializedValues::Get().LoadKeyBindings(); }
 				ImGui::SameLine(); ImGui::FanShowHelpMarker(" for a reset to engine default, delete the file editor_data.json");
 				
@@ -102,8 +102,7 @@ namespace fan
 
 					ImGui::Text( pair.first.c_str() );
 					ImGui::NextColumn();
-					SetKeyButton( pair.second.keyNegative ); ImGui::SameLine();
-					SetKeyButton( pair.second.keyPositive );
+					ImGui::FanAxis("", &pair.second );
 					ImGui::NextColumn();
 
 				} ImGui::Unindent();
@@ -125,10 +124,10 @@ namespace fan
 				for ( auto& pair : eventList ) {
 					ImGui::Text( pair.first.c_str() );
 					ImGui::NextColumn();
-					SetKeyButton( pair.second.key );  ImGui::SameLine();
-					SetKeyButton( pair.second.mod0 ); ImGui::SameLine();
-					SetKeyButton( pair.second.mod1 ); ImGui::SameLine();
-					SetKeyButton( pair.second.mod2 );
+					SetKeyboardEventButton( pair.second.key );  ImGui::SameLine();
+					SetKeyboardEventButton( pair.second.mod0 ); ImGui::SameLine();
+					SetKeyboardEventButton( pair.second.mod1 ); ImGui::SameLine();
+					SetKeyboardEventButton( pair.second.mod2 );
 					ImGui::NextColumn();
 				}ImGui::Unindent();
 			}	
@@ -269,10 +268,11 @@ namespace fan
 			m_buttonDeleteDestination = nullptr;
 		}
 	}
+
 	//================================================================================================================================
 	// Display a keyboard key button and trigger the capture/deletion when clicked
 	//================================================================================================================================
-	void PreferencesWindow::SetKeyButton( int & _button ) {
+	void PreferencesWindow::SetKeyboardEventButton( int & _button ) {
 		ImGui::PushID( m_uniqueKeyIndex++ );
 		if ( ImGui::Button( Keyboard::GetKeyName( _button ).c_str() ) ) {
 			StartCaptureKey(_button);

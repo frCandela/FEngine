@@ -433,6 +433,9 @@
     <ClCompile Include="code\core\input\fanJoystick.cpp">
       <Filter>code\core\input</Filter>
     </ClCompile>
+    <ClCompile Include="code\core\input\fanAxis.cpp">
+      <Filter>code\core\input</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="code\editor\fanMainMenuBar.h">
@@ -1333,6 +1336,9 @@
       <Filter>code\scene\components\ui</Filter>
     </ClInclude>
     <ClInclude Include="code\core\input\fanJoystick.h">
+      <Filter>code\core\input</Filter>
+    </ClInclude>
+    <ClInclude Include="code\core\input\fanAxis.h">
       <Filter>code\core\input</Filter>
     </ClInclude>
   </ItemGroup>

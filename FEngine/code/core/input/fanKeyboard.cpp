@@ -54,7 +54,8 @@ namespace fan {
 	//================================================================================================================================
 	std::string Keyboard::GetKeyName	( const Key _key ) {
 		const char * glfwName = glfwGetKeyName( _key, 0 );
-		if ( glfwName == nullptr ) {
+		if ( glfwName == nullptr ) 
+		{			
 			return keyName[_key];
 		} else {
 			std::string name( glfwName );
