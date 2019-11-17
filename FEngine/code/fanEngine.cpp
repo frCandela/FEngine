@@ -47,7 +47,7 @@
 #include "scene/components/fanDirectionalLight.h"
 #include "scene/components/fanRigidbody.h"
 #include "scene/components/fanSphereShape.h"
-#include "scene/components/fanUIMeshRenderer.h"
+#include "scene/components/ui/fanUIMeshRenderer.h"
 #include "core/math/shapes/fanConvexHull.h"
 #include "core/time/fanProfiler.h"
 #include "ecs/fanECSManager.h"
@@ -86,6 +86,7 @@ namespace fan {
 		Input::Get().Manager().CreateKeyboardEvent( "freeze_capture", Keyboard::END );		
 		Input::Get().Manager().CreateKeyboardEvent( "copy",			  Keyboard::C, Keyboard::LEFT_CONTROL );
 		Input::Get().Manager().CreateKeyboardEvent( "paste",		  Keyboard::V, Keyboard::LEFT_CONTROL );
+		Input::Get().Manager().CreateKeyboardEvent( "show_ui",		  Keyboard::F3 );
 
 		// Axis
 		Input::Get().Manager().CreateAxis( "game_forward",		Keyboard::W, Keyboard::S );
@@ -140,6 +141,7 @@ namespace fan {
 		Input::Get().Manager().FindEvent( "play_pause" )->Connect(		&Engine::SwitchPlayPause, this );
 		Input::Get().Manager().FindEvent( "copy" )->Connect(			&Engine::OnCopy, this );
 		Input::Get().Manager().FindEvent( "paste" )->Connect(			&Engine::OnPaste, this );
+		Input::Get().Manager().FindEvent( "show_ui" )->Connect(			&Engine::OnToogleShowUI, this );
 
 		// Static messages		
 		TexturePtr::s_onCreateUnresolved.			Connect ( &Engine::OnResolveTexturePtr, this );
@@ -227,25 +229,29 @@ namespace fan {
 				m_scene->LateUpdate( targetLogicDelta );
 				m_ecsManager->LateUpdate( targetLogicDelta );				
 
+				if ( m_showUI )				
 				{
 					SCOPED_PROFILE( draw_ui )
 					ManageSelection();
 					m_mainMenuBar->Draw();
 					m_physicsManager->OnGui();
 					DrawEditorGrid();
-					Input::Get().Manager().PullEvents();
 				}
 
+				Input::Get().Manager().PullEvents();				
+
+				if ( m_showUI )		
 				{
 					SCOPED_PROFILE( debug_draw )
 					if ( m_mainMenuBar->ShowWireframe() ) { DrawWireframe(); }
 					if ( m_mainMenuBar->ShowNormals() ) { DrawNormals(); }
 					if ( m_mainMenuBar->ShowAABB() ) { DrawAABB(); }
 					if ( m_mainMenuBar->ShowHull() ) { DrawHull(); }
-				}
+				}				
 			
 				m_scene->EndFrame();	
 				m_ecsManager->Refresh();
+
 
 				{
 					SCOPED_PROFILE( imgui_render )

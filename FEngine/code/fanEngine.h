@@ -114,6 +114,7 @@ namespace fan {
 		std::map< size_t, GizmoCacheData > m_gizmoCacheData;
 
 		bool m_applicationShouldExit;
+		bool m_showUI = true;
 
 		void DeleteSelection();
 		void ManageSelection();
@@ -126,6 +127,7 @@ namespace fan {
 		void OnResolveMeshPtr( MeshPtr * _ptr );
 		void OnCopy();
 		void OnPaste();
+		void OnToogleShowUI() { m_showUI = ! m_showUI; }
 
 		void OnGameobjectDeleted( Gameobject * _gameobject );
 		void OnSetGameobjectPtrFromSelection( GameobjectPtr * _ptr );
