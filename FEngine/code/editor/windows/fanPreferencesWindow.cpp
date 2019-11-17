@@ -81,6 +81,9 @@ namespace fan
 			}
 		}
 
+		// Joysticks
+		DrawJoysticks();
+
 		// INPUT
 		if ( ImGui::CollapsingHeader( "Shortcuts" ) ) {			
 			const float column0_size = 150.f;		
@@ -130,12 +133,8 @@ namespace fan
 					SetKeyboardEventButton( pair.second.mod2 );
 					ImGui::NextColumn();
 				}ImGui::Unindent();
-			}	
-
-			
-		}
-
-		DrawJoysticks();
+			}
+		}		
 
 		CaptureKeyPopup();
 		DeleteKeyPopup();
@@ -145,33 +144,6 @@ namespace fan
 	//================================================================================================================================
 	void PreferencesWindow::DrawJoysticks()
 	{
-		const std::vector< Joystick::Axis > axes =
-		{ Joystick::LEFT_X
-			,Joystick::LEFT_Y
-			,Joystick::RIGHT_X
-			,Joystick::RIGHT_Y
-			,Joystick::LEFT_TRIGGER
-			,Joystick::RIGHT_TRIGGER
-		};
-
-		const std::vector< Joystick::Button > buttons =
-		{ Joystick::A
-			,Joystick::B
-			,Joystick::X
-			,Joystick::Y
-			,Joystick::LEFT_BUMPER
-			,Joystick::RIGHT_BUMPER
-			,Joystick::BACK
-			,Joystick::START
-			,Joystick::GUIDE
-			,Joystick::LEFT_THUMB
-			,Joystick::RIGHT_THUMB
-			,Joystick::DPAD_UP
-			,Joystick::DPAD_RIGHT
-			,Joystick::DPAD_DOWN
-			,Joystick::DPAD_LEFT
-		};
-
 		if( ImGui::CollapsingHeader("joysticks") )
 		{
 			// creates columns
@@ -195,6 +167,7 @@ namespace fan
 						ImGui::Text( " -  %s", Joystick::Get().GetGamepadName( joystickIndex ).c_str() );
 
 						// axes
+						const std::vector< Joystick::Axis >& axes = Joystick::Get().GetGamepadAxisList();
 						for ( int axisIndex = 0; axisIndex < axes.size(); axisIndex++ )
 						{
 							float axisValue = Joystick::Get().GetAxis( joystickIndex, axes[axisIndex] );
@@ -202,6 +175,7 @@ namespace fan
 						}
 
 						// buttons
+						const std::vector< Joystick::Button >& buttons = Joystick::Get().GetGamepadButtonsList();
 						for ( int buttonindex = 0; buttonindex < buttons.size(); buttonindex++ )
 						{
 							bool buttonValue = Joystick::Get().GetButton( joystickIndex, buttons[buttonindex] );

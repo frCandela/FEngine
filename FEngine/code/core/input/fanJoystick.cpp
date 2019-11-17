@@ -225,4 +225,31 @@ namespace fan
 		,"DPAD_LEFT      "
 	};
 
+	const std::vector< Joystick::Axis > Joystick::s_axesList =
+	{ Joystick::LEFT_X
+		,Joystick::LEFT_Y
+		,Joystick::RIGHT_X
+		,Joystick::RIGHT_Y
+		,Joystick::LEFT_TRIGGER
+		,Joystick::RIGHT_TRIGGER
+	};
+
+	const std::vector< Joystick::Button > Joystick::s_buttonsList =
+	{ Joystick::A
+		,Joystick::B
+		,Joystick::X
+		,Joystick::Y
+		,Joystick::LEFT_BUMPER
+		,Joystick::RIGHT_BUMPER
+		,Joystick::BACK
+		,Joystick::START
+		,Joystick::GUIDE
+		,Joystick::LEFT_THUMB
+		,Joystick::RIGHT_THUMB
+		,Joystick::DPAD_UP
+		,Joystick::DPAD_RIGHT
+		,Joystick::DPAD_DOWN
+		,Joystick::DPAD_LEFT
+	};
+
 }

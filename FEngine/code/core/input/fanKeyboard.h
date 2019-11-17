@@ -18,11 +18,10 @@ namespace fan {
 		static bool IsKeyPressed		( const Key _key );
 		static bool IsKeyReleased		( const Key _key );
 		static std::string GetKeyName	( const Key _key );		
-
-	protected:
-		Keyboard();
+		const std::vector<Key>& GetKeysList() const { return s_keysList; }
 
 	private:
+		Keyboard();
 		static void KeyCallback(GLFWwindow* _window, int _key, int _scancode, int _action, int _mods);
 		static void CharCallback(GLFWwindow* _window, unsigned int _c);
 
@@ -154,5 +153,6 @@ namespace fan {
 		static const Key NONE			= GLFW_KEY_MENU + 1;
 
 		static const char * keyName[NONE + 1];
+		static const std::vector<Key> s_keysList;
 	};
 }
