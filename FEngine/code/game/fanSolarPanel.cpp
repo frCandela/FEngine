@@ -45,13 +45,6 @@ namespace fan
 	//================================================================================================================================
 	void SolarPanel::LateUpdate( const float /*_delta*/ )
 	{
-		ImGui::Begin( "##player_status_bars", nullptr, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoTitleBar );
-		{
-			const Color barColor = m_isInsideSunlight ? Color::Green : Color::Red;
-			ImGui::PushStyleColor( ImGuiCol_PlotHistogram, barColor.ToImGui() );
-			ImGui::ProgressBar( m_currentChargingRate / m_maxChargingRate );
-			ImGui::PopStyleColor();			
-		} ImGui::End();
 	}
 
 	//================================================================================================================================

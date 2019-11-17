@@ -16,6 +16,10 @@ namespace fan
 		void Update( const float _delta ) override;
 		void LateUpdate( const float _delta ) override;
 
+		float GetChargingRate() const{ return m_currentChargingRate; }
+		float GetMaxChargingRate() const { return m_maxChargingRate; }
+
+
 		void OnGui() override;
 		ImGui::IconType GetIcon() const override { return ImGui::IconType::GAME_MANAGER; }
 

@@ -2,6 +2,7 @@
 
 #include "scene/actors/fanActor.h"
 #include "scene/fanComponentPtr.h"
+#include "scene/fanRessourcePtr.h"
 
 namespace fan
 {
@@ -29,8 +30,11 @@ namespace fan
 		bool Save( Json & _json ) const override;
 
 	private:
-		ComponentPtr<SpaceShip>  m_spaceShip;
+		GameobjectPtr			  m_spaceShip;
 		ComponentPtr<ProgressBar> m_healthProgress;
 		ComponentPtr<ProgressBar> m_energyProgress;
+		ComponentPtr<ProgressBar> m_signalProgress;
+
+		Color GetSignalColor( const float _ratio );
 	};
 }

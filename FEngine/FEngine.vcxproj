@@ -185,8 +185,8 @@
     <ClCompile Include="code\scene\components\fanRigidbody.cpp" />
     <ClCompile Include="code\scene\components\fanSphereShape.cpp" />
     <ClCompile Include="code\scene\components\fanTransform.cpp" />
-    <ClCompile Include="code\scene\components\fanUIMeshRenderer.cpp" />
     <ClCompile Include="code\scene\components\ui\fanProgressBar.cpp" />
+    <ClCompile Include="code\scene\components\ui\fanUIMeshRenderer.cpp" />
     <ClCompile Include="code\scene\fanComponentPtr.cpp" />
     <ClCompile Include="code\scene\fanGameobject.cpp" />
     <ClCompile Include="code\scene\fanRessourcePtr.cpp" />
@@ -309,8 +309,8 @@
     <ClInclude Include="code\scene\components\fanRigidbody.h" />
     <ClInclude Include="code\scene\components\fanSphereShape.h" />
     <ClInclude Include="code\scene\components\fanTransform.h" />
-    <ClInclude Include="code\scene\components\fanUIMeshRenderer.h" />
     <ClInclude Include="code\scene\components\ui\fanProgressBar.h" />
+    <ClInclude Include="code\scene\components\ui\fanUIMeshRenderer.h" />
     <ClInclude Include="code\scene\fanComponentPtr.h" />
     <ClInclude Include="code\scene\fanGameobject.h" />
     <ClInclude Include="code\scene\fanRessourcePtr.h" />

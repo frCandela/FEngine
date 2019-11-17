@@ -1,26 +1,24 @@
 #pragma once
 
-#include "scene/actors/fanActor.h"
+#include "scene/components/fanComponent.h"
 
 namespace fan
 {
 	//================================================================================================================================
 	//================================================================================================================================
-	class WithEnergy : public Actor
+	class WithEnergy : public Component
 	{
 	public:
-		void Start() override;
-		void Update( const float _delta ) override;
-		void LateUpdate( const float _delta ) override;
 
 		bool  TryRemoveEnergy( const float _energyConsumed );
 		void  AddEnergy( const float _energyAdded );
 		float GetEnergy( ) const { return m_currentEnergy; }
+		float GetMaxEnergy( ) const { return m_maxEnergy; }
 
 		void OnGui() override;
 		ImGui::IconType GetIcon() const override { return ImGui::IconType::GAME_MANAGER; }
 
-		DECLARE_TYPE_INFO( WithEnergy, Actor );
+		DECLARE_TYPE_INFO( WithEnergy, Component );
 	protected:
 		void OnAttach() override;
 		void OnDetach() override;

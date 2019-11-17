@@ -57,15 +57,15 @@ namespace fan
 	void  CopyPaste::ResolvePointers()
 	{
 		// Resolves gameobjects
-		for (int goPtrIndex = 0; goPtrIndex < m_newGameobjectPtr.size() ; goPtrIndex++)
+		for ( int goPtrIndex = 0; goPtrIndex < m_newGameobjectPtr.size(); goPtrIndex++ )
 		{
 			GameobjectPtr * ptr = m_newGameobjectPtr[goPtrIndex];
 
-			auto it = m_remapTable.find(ptr->GetID());
+			auto it = m_remapTable.find( ptr->GetID() );
 			const uint64_t index = ( it != m_remapTable.end() ? it->second : ptr->GetID() );
 			Gameobject * gameobject = m_scene->FindGameobject( index );
 			assert( gameobject != nullptr );
-			*ptr = GameobjectPtr( gameobject, index);
+			*ptr = GameobjectPtr( gameobject, index );
 		}
 
 		// Resolves components
@@ -78,20 +78,39 @@ namespace fan
 			Gameobject * gameobject = m_scene->FindGameobject( index );
 			assert( gameobject != nullptr );
 			Component * component = gameobject->GetComponent( ptr->GetID().componentID );
-			* ptr = ComponentIDPtr( component, IDPtrData( index, ptr->GetID().componentID ) );
+			*ptr = ComponentIDPtr( component, IDPtrData( index, ptr->GetID().componentID ) );
 		}
 	}
 
 	//================================================================================================================================
 	// Saves the duplicates ids for future remap
 	//================================================================================================================================
-	void CopyPaste::OnSetIDFailed( uint64_t _id, Gameobject * _gameobject ){
+	void CopyPaste::OnSetIDFailed( uint64_t _id, Gameobject * _gameobject )
+	{
+		assert( _id != 0 );
 		const uint64_t remapID = m_scene->GetUniqueID();
 		_gameobject->SetUniqueID( remapID );
 		m_remapTable[_id] = remapID;
-		Debug::Log() << "remapped id " << _id << " to id " << remapID << Debug::Endl(); 
+		Debug::Log() << "remapped id " << _id << " to id " << remapID << Debug::Endl();
 	}
-	
-	void CopyPaste::OnGameobjectPtrCreate( GameobjectPtr * _ptr )	{	m_newGameobjectPtr.push_back(_ptr); }
-	void CopyPaste::OnComponentIDPtrCreate( ComponentIDPtr * _ptr ) {	m_newComponentPtr.push_back(_ptr);	}
+
+	//================================================================================================================================
+	//================================================================================================================================
+	void CopyPaste::OnGameobjectPtrCreate( GameobjectPtr * _ptr )
+	{
+		if ( _ptr->GetID() != 0 )
+		{
+			m_newGameobjectPtr.push_back( _ptr );
+		}
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
+	void CopyPaste::OnComponentIDPtrCreate( ComponentIDPtr * _ptr )
+	{
+		if ( _ptr->GetID().gameobjectID != 0 )
+		{
+			m_newComponentPtr.push_back( _ptr );
+		}
+	}
 }

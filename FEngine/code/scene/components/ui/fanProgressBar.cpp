@@ -3,7 +3,7 @@
 
 #include "scene/fanGameobject.h"
 #include "scene/components/fanTransform.h"
-#include "scene/components/fanUIMeshRenderer.h"
+#include "scene/components/ui/fanUIMeshRenderer.h"
 
 namespace fan
 {

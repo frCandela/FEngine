@@ -397,9 +397,6 @@
     <ClCompile Include="code\scene\components\fanMeshRenderer.cpp">
       <Filter>code\scene\components</Filter>
     </ClCompile>
-    <ClCompile Include="code\scene\components\fanUIMeshRenderer.cpp">
-      <Filter>code\scene\components</Filter>
-    </ClCompile>
     <ClCompile Include="code\scene\fanRessourcePtr.cpp">
       <Filter>code\scene</Filter>
     </ClCompile>
@@ -429,6 +426,9 @@
     </ClCompile>
     <ClCompile Include="code\editor\fanCopyPaste.cpp">
       <Filter>code\editor</Filter>
+    </ClCompile>
+    <ClCompile Include="code\scene\components\ui\fanUIMeshRenderer.cpp">
+      <Filter>code\scene\components\ui</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -1299,9 +1299,6 @@
     <ClInclude Include="code\scene\components\fanMeshRenderer.h">
       <Filter>code\scene\components</Filter>
     </ClInclude>
-    <ClInclude Include="code\scene\components\fanUIMeshRenderer.h">
-      <Filter>code\scene\components</Filter>
-    </ClInclude>
     <ClInclude Include="code\scene\fanRessourcePtr.h">
       <Filter>code\scene</Filter>
     </ClInclude>
@@ -1328,6 +1325,9 @@
     </ClInclude>
     <ClInclude Include="code\editor\fanCopyPaste.h">
       <Filter>code\editor</Filter>
+    </ClInclude>
+    <ClInclude Include="code\scene\components\ui\fanUIMeshRenderer.h">
+      <Filter>code\scene\components\ui</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
