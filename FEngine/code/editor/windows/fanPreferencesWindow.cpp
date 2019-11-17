@@ -8,6 +8,7 @@
 #include "core/input/fanInputManager.h"
 #include "core/input/fanInput.h"
 #include "core/input/fanKeyboard.h"
+#include "core/input/fanJoystick.h"
 #include "core/files/fanSerializedValues.h"
 #include "core/time/fanProfiler.h"
 #include "editor/fanModals.h"
@@ -81,7 +82,7 @@ namespace fan
 		}
 
 		// INPUT
-		if ( ImGui::CollapsingHeader( "Input" ) ) {			
+		if ( ImGui::CollapsingHeader( "Shortcuts" ) ) {			
 			const float column0_size = 150.f;		
 
 			// Axis keys
@@ -91,7 +92,7 @@ namespace fan
 				m_uniqueKeyIndex = 0;
 				ImGui::Text( "Axis                    ____ (-) ____    ____ (+) ____" );
 				ImGui::SameLine(); ImGui::Text("        "); ImGui::SameLine(); if ( ImGui::Button( "Reset" ) ) { SerializedValues::Get().LoadKeyBindings(); }
-				ImGui::SameLine(); ImGui::FanShowHelpMarker("Delete the file editor_data.json to reset to factory default");
+				ImGui::SameLine(); ImGui::FanShowHelpMarker(" for a reset to engine default, delete the file editor_data.json");
 				
 				ImGui::Indent();
 				ImGui::Columns( 2 );
@@ -135,8 +136,89 @@ namespace fan
 			
 		}
 
+		DrawJoysticks();
+
 		CaptureKeyPopup();
 		DeleteKeyPopup();
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
+	void PreferencesWindow::DrawJoysticks()
+	{
+		const std::vector< Joystick::Axis > axes =
+		{ Joystick::LEFT_X
+			,Joystick::LEFT_Y
+			,Joystick::RIGHT_X
+			,Joystick::RIGHT_Y
+			,Joystick::LEFT_TRIGGER
+			,Joystick::RIGHT_TRIGGER
+		};
+
+		const std::vector< Joystick::Button > buttons =
+		{ Joystick::A
+			,Joystick::B
+			,Joystick::X
+			,Joystick::Y
+			,Joystick::LEFT_BUMPER
+			,Joystick::RIGHT_BUMPER
+			,Joystick::BACK
+			,Joystick::START
+			,Joystick::GUIDE
+			,Joystick::LEFT_THUMB
+			,Joystick::RIGHT_THUMB
+			,Joystick::DPAD_UP
+			,Joystick::DPAD_RIGHT
+			,Joystick::DPAD_DOWN
+			,Joystick::DPAD_LEFT
+		};
+
+		if( ImGui::CollapsingHeader("joysticks") )
+		{
+			// creates columns
+			const int numJoysticks = Joystick::Get().NumConnectedJoysticks();			
+			if( numJoysticks > 1 ){
+				ImGui::Columns( numJoysticks );
+				for ( int columnIndex = 0; columnIndex < numJoysticks; columnIndex++ ) { ImGui::SetColumnWidth( columnIndex, 400 ); }
+			}
+
+			// draw joysticks
+			for ( int joystickIndex = 0; joystickIndex <= GLFW_JOYSTICK_LAST; joystickIndex++ )
+			{
+				if ( Joystick::Get().IsConnected( joystickIndex ) )
+				{					
+					ImGui::Text( Joystick::Get().GetName( joystickIndex ).c_str() );
+
+					// gamepad
+					if ( Joystick::Get().IsGamepad( joystickIndex ) )
+					{
+						ImGui::SameLine();
+						ImGui::Text( " -  %s", Joystick::Get().GetGamepadName( joystickIndex ).c_str() );
+
+						// axes
+						for ( int axisIndex = 0; axisIndex < axes.size(); axisIndex++ )
+						{
+							float axisValue = Joystick::Get().GetAxis( joystickIndex, axes[axisIndex] );
+							ImGui::SliderFloat( Joystick::Get().s_axisNames[axisIndex], &axisValue, -1.f, 1.f );
+						}
+
+						// buttons
+						for ( int buttonindex = 0; buttonindex < buttons.size(); buttonindex++ )
+						{
+							bool buttonValue = Joystick::Get().GetButton( joystickIndex, buttons[buttonindex] );
+							ImGui::Checkbox( Joystick::Get().s_buttonsNames[buttonindex], &buttonValue );
+						}
+					}
+					else
+					{
+						ImGui::Text( "Unrecognized gamepad" );
+					}
+					ImGui::NextColumn();
+				}
+			}
+			ImGui::Columns(1);
+		}
+		
 	}
 
 	//================================================================================================================================

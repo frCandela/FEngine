@@ -15,8 +15,9 @@ namespace fan
 		using Axis = int;
 
 
-		bool				IsGamepad(   const int _GLFW_JOYSTICK );
-		bool				IsConnected( const int _GLFW_JOYSTICK );
+		bool IsGamepad(   const int _GLFW_JOYSTICK ) const;
+		bool IsConnected( const int _GLFW_JOYSTICK ) const;
+		int  NumConnectedJoysticks() const;
 
 		// Generic input
 		std::vector<float>	GetAxes(	 const int _GLFW_JOYSTICK );

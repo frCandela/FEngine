@@ -26,6 +26,7 @@ namespace fan
 		void StartCaptureKey( int & _button );
 		void StopCaptureKey();
 
+		void DrawJoysticks();
 
 		bool	m_openCaptureKeyPopup = false;
 		bool	m_openDeletePopup = false;
