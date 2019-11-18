@@ -199,30 +199,30 @@ namespace fan
 	//================================================================================================================================
 	//================================================================================================================================	
 	const char * Joystick::s_axisNames[GLFW_GAMEPAD_AXIS_LAST + 1] =
-	{    "LEFT_X        "
-		,"LEFT_Y        "
-		,"RIGHT_X       "
-		,"RIGHT_Y       "
-		,"LEFT_TRIGGER  "
-		,"RIGHT_TRIGGER "
+	{    "LEFT_X         "
+		,"LEFT_Y         "
+		,"RIGHT_X        "
+		,"RIGHT_Y        "
+		,"LEFT_TRIGGER   "
+		,"RIGHT_TRIGGER  "
 	};
 
 	const char * Joystick::s_buttonsNames[GLFW_GAMEPAD_BUTTON_LAST + 1] = 
-	{    "A              "
-		,"B              "
-		,"X              "
-		,"Y              "
-		,"LEFT_BUMPER    "
-		,"RIGHT_BUMPER   "
-		,"BACK           "
-		,"START          "
-		,"GUIDE          "
-		,"LEFT_THUMB     "
-		,"RIGHT_THUMB    "
-		,"DPAD_UP        "
-		,"DPAD_RIGHT     "
-		,"DPAD_DOWN      "
-		,"DPAD_LEFT      "
+	{    "A               "
+		,"B               "
+		,"X               "
+		,"Y               "
+		,"LEFT_BUMPER     "
+		,"RIGHT_BUMPER    "
+		,"BACK            "
+		,"START           "
+		,"GUIDE           "
+		,"LEFT_THUMB      "
+		,"RIGHT_THUMB     "
+		,"DPAD_UP         "
+		,"DPAD_RIGHT      "
+		,"DPAD_DOWN       "
+		,"DPAD_LEFT       "
 	};
 
 	const std::vector< Joystick::Axis > Joystick::s_axesList =

@@ -25,6 +25,7 @@ namespace fan {
 	//================================================================================================================================
 	void SerializedValues::SaveValuesToDisk() {
 
+		Debug::Log("Saving value to disk");
 		Input::Get().Manager().Save( m_json[m_keysBindingsName]);
 		std::ofstream outFile(m_jsonPath);
 		assert(outFile.is_open());

@@ -91,6 +91,7 @@ namespace fan {
 
 		// Axis
 		Input::Get().Manager().CreateKeyboardAxis( "game_forward",		Keyboard::W, Keyboard::S );
+		Input::Get().Manager().CreateJoystickAxis( "game_forward_alt",	0, Joystick::RIGHT_Y );
 		Input::Get().Manager().CreateKeyboardAxis( "game_left",			Keyboard::A, Keyboard::D );
 		Input::Get().Manager().CreateKeyboardAxis( "editor_forward",	Keyboard::W, Keyboard::S );
 		Input::Get().Manager().CreateKeyboardAxis( "editor_left",		Keyboard::A, Keyboard::D );

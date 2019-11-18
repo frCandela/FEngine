@@ -41,6 +41,8 @@ namespace fan
 		static void JoystickCallback( int _jid, int _event );
 
 	public:
+		//Joysticks
+		static const JoystickID JOYSTICK_ANY = GLFW_JOYSTICK_LAST + 1;
 
 		// Button
 		static const Button BUTTON_NONE = -1;

@@ -40,6 +40,23 @@ namespace fan {
 
 	//================================================================================================================================
 	//================================================================================================================================
+	void InputManager::CreateJoystickAxis( const std::string& _name, const Joystick::JoystickID _GLFW_JOYSTICK, const Joystick::Axis _axis )
+	{
+		// Already exists
+		if ( m_axis.find( _name ) != m_axis.end() )
+		{
+			Debug::Warning("Axis already exists");
+			return;
+		}
+
+		// Creates new one
+		Axis axis( _name, Axis::JOYSTICK );
+		axis.SetJoystickKeys( _GLFW_JOYSTICK, _axis );
+		m_axis[_name] = axis;
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
 	float InputManager::GetAxis( const std::string& _name ) {
 		assert ( m_axis.find( _name ) != m_axis.end() );
 		Axis& axis = m_axis[_name];

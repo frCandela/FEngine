@@ -18,9 +18,10 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	Axis::Axis(const std::string& _name, const Type _type )
+	Axis::Axis(const std::string& _name, const Type _type, const bool _invert )
 		: m_type( _type )
 		, m_name( _name )
+		, m_invert( _invert )
 		, m_keyPositive( Keyboard::NONE )
 		, m_keyNegative( Keyboard::NONE )
 		, m_joystickID( -1 )
@@ -39,6 +40,7 @@ namespace fan
 			m_type = Type( type );
 
 			LoadString( _json, "name", m_name );
+			LoadBool(_json, "invert", m_invert );
 
 			if ( m_type == JOYSTICK )
 			{
@@ -61,6 +63,7 @@ namespace fan
 	{
 		SaveInt( _json, "type", m_type );
 		SaveString( _json, "name", m_name );
+		SaveBool(_json, "invert", m_invert );
 
 		if ( m_type == JOYSTICK )
 		{
@@ -99,13 +102,14 @@ namespace fan
 	//================================================================================================================================
 	float Axis::GetValue() const
 	{
+		float invertValue = m_invert ? -1.f : 1.f;
 		if ( m_type == JOYSTICK )
 		{
-			return Joystick::Get().GetAxis( m_joystickID, m_joystickAxis );
+			return invertValue * Joystick::Get().GetAxis( m_joystickID, m_joystickAxis );
 		}
 		else if ( m_type == KEYBOARD )
 		{
-			return ( Keyboard::IsKeyDown( m_keyPositive ) ? 1.f : 0.f ) + ( Keyboard::IsKeyDown( m_keyNegative ) ? -1.f : 0.f );
+			return invertValue * ( ( Keyboard::IsKeyDown( m_keyPositive ) ? 1.f : 0.f ) + ( Keyboard::IsKeyDown( m_keyNegative ) ? -1.f : 0.f ) );
 		}
 		else
 		{
@@ -124,120 +128,130 @@ namespace ImGui
 		using namespace fan;
 
 		ImGui::PushID( _axis );
-		ImGui::PushItemWidth( 150 );
-
-		int type = _axis->GetType();
-		if ( ImGui::Combo( "", &type, "keyboard\0joystick\0" ) &&  Axis::Type(type) != _axis->GetType() )
 		{
-			*_axis = Axis(_axis->GetName(),  Axis::Type(type) );
-		}
-		ImGui::PopItemWidth();
-		ImGui::PopID();
-		ImGui::SameLine();
+			ImGui::PushItemWidth( 150 );
 
-		static Axis* s_capturingAxis = nullptr;
-		static bool s_positiveKeyCaptured = true;
+			int type = _axis->GetType();
+			if ( ImGui::Combo( "", &type, "buttons\0joystick\0" ) &&  Axis::Type(type) != _axis->GetType() )
+			{
+				*_axis = Axis(_axis->GetName(),  Axis::Type(type) );
+			}
+			ImGui::PopItemWidth();
+		
+			ImGui::SameLine();
+
+			bool invert = _axis->GetInvert();
+			if ( ImGui::Checkbox( "##invert", &invert ) )
+			{
+				_axis->SetInvert(invert);
+			}
+			ImGui::SameLine();
+
+			static Axis* s_capturingAxis = nullptr;
+			static bool s_positiveKeyCaptured = true;
 
 		
-		if ( _axis->GetType() == Axis::JOYSTICK )
-		{
-			// Joystick buttons
-			if ( ImGui::Button( Joystick::Get().GetAxisName( _axis->GetJoystickAxis() ).c_str() ) )
+			if ( _axis->GetType() == Axis::JOYSTICK )
 			{
-				ImGui::OpenPopup( "capture_joystick_axis" );
-				s_capturingAxis = _axis;
-			}			
-			// reset
-			if ( ImGui::IsItemClicked( 1 ) ){ _axis->SetJoystickKeys(  -1, Joystick::AXIS_NONE );	} 
-		}		
-		else if ( _axis->GetType() == Axis::KEYBOARD ) 
-		{
-			// keyboard button +
-			if ( ImGui::Button( Keyboard::GetKeyName( _axis->GetKeyPositive() ).c_str() ) )
+				// Joystick buttons
+				if ( ImGui::Button( Joystick::Get().GetAxisName( _axis->GetJoystickAxis() ).c_str() ) )
+				{
+					ImGui::OpenPopup( "capture_joystick_axis" );
+					s_capturingAxis = _axis;
+				}			
+				// reset
+				if ( ImGui::IsItemClicked( 1 ) ){ _axis->SetJoystickKeys(  -1, Joystick::AXIS_NONE );	} 
+			}		
+			else if ( _axis->GetType() == Axis::KEYBOARD ) 
 			{
-				ImGui::OpenPopup( "capture_keyboard_axis" );
-				s_capturingAxis = _axis;
-				s_positiveKeyCaptured = true;
-			}
-			// reset +
-			if ( ImGui::IsItemClicked( 1 ) ){ _axis->SetKeyboardKeys( Keyboard::NONE, _axis->GetKeyNegative() );	}
-
-			// keyboard button -
-			ImGui::SameLine();
-			if ( ImGui::Button( Keyboard::GetKeyName( _axis->GetKeyNegative() ).c_str() ) )
-			{
+				// keyboard button +
+				if ( ImGui::Button( Keyboard::GetKeyName( _axis->GetKeyPositive() ).c_str() ) )
 				{
 					ImGui::OpenPopup( "capture_keyboard_axis" );
 					s_capturingAxis = _axis;
-					s_positiveKeyCaptured = false;
+					s_positiveKeyCaptured = true;
 				}
-			}
-			// reset -
-			if ( ImGui::IsItemClicked( 1 ) ){ _axis->SetKeyboardKeys(  _axis->GetKeyPositive(), Keyboard::NONE );	} 
+				// reset +
+				if ( ImGui::IsItemClicked( 1 ) ) { _axis->SetKeyboardKeys( Keyboard::NONE, _axis->GetKeyNegative() ); }
 
-		}
-		else
-		{
-			assert( false );
-		}
-
-		ImGui::SameLine();
-		ImGui::Text(_label);
-
-		// Capture joystick axis popup
-		if ( ImGui::BeginPopup( "capture_joystick_axis" ) )
-		{
-			if ( s_capturingAxis == _axis )
-			{
-				ImGui::Text( "PRESS ANY KEY" );
-
-				// Look for a pressed axis
-				for ( int joystickIndex = 0; joystickIndex <= GLFW_JOYSTICK_LAST; joystickIndex++ )
+				// keyboard button -
+				ImGui::SameLine();
+				if ( ImGui::Button( Keyboard::GetKeyName( _axis->GetKeyNegative() ).c_str() ) )
 				{
-					if ( Joystick::Get().IsConnected( joystickIndex ) && Joystick::Get().IsGamepad( joystickIndex ) )
 					{
-						const std::vector< Joystick::Axis >& axes = Joystick::Get().GetGamepadAxisList();
-						for ( int axisIndex = 0; axisIndex < axes.size(); axisIndex++ )
+						ImGui::OpenPopup( "capture_keyboard_axis" );
+						s_capturingAxis = _axis;
+						s_positiveKeyCaptured = false;
+					}
+				}
+				// reset -
+				if ( ImGui::IsItemClicked( 1 ) ) { _axis->SetKeyboardKeys( _axis->GetKeyPositive(), Keyboard::NONE ); }
+
+			}
+			else
+			{
+				assert( false );
+			}
+
+			ImGui::SameLine();
+			ImGui::Text(_label);
+
+			// Capture joystick axis popup
+			if ( ImGui::BeginPopup( "capture_joystick_axis" ) )
+			{
+				if ( s_capturingAxis == _axis )
+				{
+					ImGui::Text( "PRESS ANY KEY" );
+
+					// Look for a pressed axis
+					for ( int joystickIndex = 0; joystickIndex <= GLFW_JOYSTICK_LAST; joystickIndex++ )
+					{
+						if ( Joystick::Get().IsConnected( joystickIndex ) && Joystick::Get().IsGamepad( joystickIndex ) )
 						{
-							float axisValue = Joystick::Get().GetAxis( joystickIndex, axes[axisIndex] );
-							if ( axisValue == 1.f )
+							const std::vector< Joystick::Axis >& axes = Joystick::Get().GetGamepadAxisList();
+							for ( int axisIndex = 0; axisIndex < axes.size(); axisIndex++ )
 							{
-								*s_capturingAxis = Axis( s_capturingAxis->GetName(), fan::Axis::JOYSTICK );
-								s_capturingAxis->SetJoystickKeys(joystickIndex, axisIndex);
-								s_capturingAxis = nullptr;
-								ImGui::CloseCurrentPopup();
+								float axisValue = Joystick::Get().GetAxis( joystickIndex, axes[axisIndex] );
+								if ( axisValue == 1.f )
+								{
+									*s_capturingAxis = Axis( s_capturingAxis->GetName(), fan::Axis::JOYSTICK );
+									s_capturingAxis->SetJoystickKeys(joystickIndex, axisIndex);
+									s_capturingAxis = nullptr;
+									ImGui::CloseCurrentPopup();
+								}
 							}
 						}
 					}
 				}
+				ImGui::EndPopup();
 			}
-			ImGui::EndPopup();
-		}
 
-		// Capture keyboard axis popup
-		if ( ImGui::BeginPopup( "capture_keyboard_axis" ) )
-		{
-			if ( s_capturingAxis == _axis )
+			// Capture keyboard axis popup
+			if ( ImGui::BeginPopup( "capture_keyboard_axis" ) )
 			{
-				ImGui::Text( "PRESS ANY KEY" );
-				Keyboard& toto = Keyboard::Get();
-				const std::vector<Keyboard::Key>& keysList = toto.GetKeysList();
-				for ( int keyIndex = 0; keyIndex < keysList.size(); keyIndex++ )
+				if ( s_capturingAxis == _axis )
 				{
-					if ( Keyboard::IsKeyDown( keysList[keyIndex] ) )
+					ImGui::Text( "PRESS ANY KEY" );
+					Keyboard& toto = Keyboard::Get();
+					const std::vector<Keyboard::Key>& keysList = toto.GetKeysList();
+					for ( int keyIndex = 0; keyIndex < keysList.size(); keyIndex++ )
 					{
-						Keyboard::Key positiveKey = s_positiveKeyCaptured ? keysList[keyIndex] : s_capturingAxis->GetKeyPositive();
-						Keyboard::Key negativeKey = ! s_positiveKeyCaptured ? keysList[keyIndex] : s_capturingAxis->GetKeyNegative();
-						*s_capturingAxis = Axis( s_capturingAxis->GetName(), fan::Axis::KEYBOARD );
-						s_capturingAxis->SetKeyboardKeys( positiveKey, negativeKey );
-						s_capturingAxis = nullptr;
-						ImGui::CloseCurrentPopup();
-						break;
+						if ( Keyboard::IsKeyDown( keysList[keyIndex] ) )
+						{
+							Keyboard::Key positiveKey = s_positiveKeyCaptured ? keysList[keyIndex] : s_capturingAxis->GetKeyPositive();
+							Keyboard::Key negativeKey = ! s_positiveKeyCaptured ? keysList[keyIndex] : s_capturingAxis->GetKeyNegative();
+							*s_capturingAxis = Axis( s_capturingAxis->GetName(), fan::Axis::KEYBOARD );
+							s_capturingAxis->SetKeyboardKeys( positiveKey, negativeKey );
+							s_capturingAxis = nullptr;
+							ImGui::CloseCurrentPopup();
+							break;
+						}
 					}
 				}
+				ImGui::EndPopup();
 			}
-			ImGui::EndPopup();
-		}
+
+		} ImGui::PopID();
 
 		return false;
 

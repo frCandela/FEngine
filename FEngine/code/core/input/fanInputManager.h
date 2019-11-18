@@ -23,6 +23,7 @@ namespace fan {
 		//================================================================
 		//================================================================
 		void		CreateKeyboardAxis( const std::string& _name,  const Keyboard::Key _keyPositive, const Keyboard::Key _keyNegative );
+		void		CreateJoystickAxis( const std::string& _name,  const Joystick::JoystickID _GLFW_JOYSTICK, const Joystick::Axis _axis );
 		Signal<>*	CreateKeyboardEvent( const std::string& _name, const Keyboard::Key _key, const Keyboard::Key _mod0 = Keyboard::NONE, const Keyboard::Key _mod1 = Keyboard::NONE, const  Keyboard::Key _mod2 = Keyboard::NONE );
 		Signal<>*	FindEvent( const std::string& _name );
 		float		GetAxis( const std::string& _name );

@@ -13,10 +13,13 @@ namespace fan
 	public:
 		enum Type { KEYBOARD, JOYSTICK };
 		Axis();
-		Axis( const std::string& _name, const Type _type );		
+		Axis( const std::string& _name, const Type _type, const bool _invert = false );		
+
+		void					SetInvert( const bool _invert ) { m_invert = _invert; }
 
 		std::string				GetName() const { return m_name; };
 		float					GetValue() const;
+		bool					GetInvert() const { return m_invert; };
 		Type					GetType() const { return m_type; }
 		Keyboard::Key			GetKeyPositive() const { return m_keyPositive; }
 		Keyboard::Key			GetKeyNegative() const { return m_keyNegative; }
@@ -33,7 +36,7 @@ namespace fan
 
 
 	private:
-
+		bool m_invert = false;
 		std::string m_name;
 		Type m_type;
 

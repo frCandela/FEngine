@@ -99,8 +99,17 @@ namespace fan
 			{
 				std::map< std::string, Axis >&		  axisList = Input::Get().Manager().GetListAxis();
 
-				ImGui::Text( "Axis                         type           ____ (+) ____    ____ (-) ____" );
-				ImGui::SameLine(); ImGui::Text( "        " ); ImGui::SameLine(); if ( ImGui::Button( "Reset" ) ) { SerializedValues::Get().LoadKeyBindings(); }
+				// Header
+				ImGui::Text( "Axis                         type        invert      (+)             (-)         " );
+				
+				// Reset
+				ImGui::SameLine();
+				if ( ImGui::Button( "Save" ) ) { SerializedValues::Get().SaveValuesToDisk(); }
+
+				// Reset
+				ImGui::SameLine(); 
+				if ( ImGui::Button( "Reset" ) ) { SerializedValues::Get().LoadKeyBindings(); }
+
 				ImGui::SameLine(); ImGui::FanShowHelpMarker( " for a reset to engine default, delete the file editor_data.json" );
 
 				ImGui::Indent();
@@ -125,7 +134,7 @@ namespace fan
 			{
 				std::map< std::string, InputManager::KeyboardEvent >& eventList = Input::Get().Manager().GetListKeyboardEvents();
 
-				ImGui::Text( "Shortcuts               ____ key ____    __________________ modifiers __________________" );
+				ImGui::Text( "Shortcuts                    key         __________________ modifiers __________________" );
 				ImGui::Indent();
 				ImGui::Columns( 2, "columns_keys" );
 				ImGui::SetColumnWidth( 0, column0_size );
