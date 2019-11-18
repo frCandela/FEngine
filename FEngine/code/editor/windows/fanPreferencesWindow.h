@@ -19,20 +19,7 @@ namespace fan
 	private:
 		Renderer * m_renderer;
 
-		void CaptureKeyPopup();
-		void DeleteKeyPopup();
-
-		void SetKeyboardEventButton( int & _button );
-		void CaptureKeyCallback( int _key );
-		void StartCaptureKey( int & _button );
-		void StopCaptureKey();
-
 		void DrawJoysticks();
-
-		bool	m_openCaptureKeyPopup = false;
-		bool	m_openDeletePopup = false;
-		int		m_uniqueKeyIndex = 0;					// unique ids for key buttons
-		int *	m_buttonCaptureDestination = nullptr;	// pointer on the currently modified keyboard key
-		int *	m_buttonDeleteDestination = nullptr;	// pointer on the currently deleted keyboard key
+		void DrawShortcuts();
 	};
 }

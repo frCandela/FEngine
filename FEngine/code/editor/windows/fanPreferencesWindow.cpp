@@ -81,35 +81,40 @@ namespace fan
 			}
 		}
 
-		// Joysticks
-		DrawJoysticks();
 
+		DrawJoysticks();
+		DrawShortcuts();
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
+	void PreferencesWindow::DrawShortcuts()
+	{
 		// INPUT
-		if ( ImGui::CollapsingHeader( "Shortcuts" ) ) {			
-			const float column0_size = 150.f;		
+		if ( ImGui::CollapsingHeader( "Shortcuts" ) )
+		{
+			const float column0_size = 150.f;
 
 			// Axis keys
 			{
 				std::map< std::string, Axis >&		  axisList = Input::Get().Manager().GetListAxis();
 
-				m_uniqueKeyIndex = 0;
 				ImGui::Text( "Axis                         type           ____ (+) ____    ____ (-) ____" );
-				ImGui::SameLine(); ImGui::Text("        "); ImGui::SameLine(); if ( ImGui::Button( "Reset" ) ) { SerializedValues::Get().LoadKeyBindings(); }
-				ImGui::SameLine(); ImGui::FanShowHelpMarker(" for a reset to engine default, delete the file editor_data.json");
-				
-				ImGui::Indent();
-				ImGui::Columns( 2 );
-				ImGui::SetColumnWidth( 0, column0_size );
-				ImGui::PushItemWidth( 10.f );
-				for ( auto& pair : axisList ) {
+				ImGui::SameLine(); ImGui::Text( "        " ); ImGui::SameLine(); if ( ImGui::Button( "Reset" ) ) { SerializedValues::Get().LoadKeyBindings(); }
+				ImGui::SameLine(); ImGui::FanShowHelpMarker( " for a reset to engine default, delete the file editor_data.json" );
 
-					ImGui::Text( pair.first.c_str() );
+				ImGui::Indent();
+				ImGui::Columns( 2, "columns_axis" );
+				ImGui::SetColumnWidth( 0, column0_size );
+				for ( auto& pair : axisList )
+				{
+
+					ImGui::Text( pair.first.c_str() ); // name
 					ImGui::NextColumn();
-					ImGui::FanAxis("", &pair.second );
+					ImGui::FanAxis( "", &pair.second );// axis
 					ImGui::NextColumn();
 
 				} ImGui::Unindent();
-				ImGui::PopItemWidth();
 			}
 
 			ImGui::Columns( 1 );
@@ -120,24 +125,24 @@ namespace fan
 			{
 				std::map< std::string, InputManager::KeyboardEvent >& eventList = Input::Get().Manager().GetListKeyboardEvents();
 
-				ImGui::Text( "Shortcuts               ____ key ____    __________________ modifiers __________________" ); 
+				ImGui::Text( "Shortcuts               ____ key ____    __________________ modifiers __________________" );
 				ImGui::Indent();
-				ImGui::Columns( 2 );
+				ImGui::Columns( 2, "columns_keys" );
 				ImGui::SetColumnWidth( 0, column0_size );
-				for ( auto& pair : eventList ) {
+				for ( auto& pair : eventList )
+				{
 					ImGui::Text( pair.first.c_str() );
 					ImGui::NextColumn();
-					SetKeyboardEventButton( pair.second.key );  ImGui::SameLine();
-					SetKeyboardEventButton( pair.second.mod0 ); ImGui::SameLine();
-					SetKeyboardEventButton( pair.second.mod1 ); ImGui::SameLine();
-					SetKeyboardEventButton( pair.second.mod2 );
+					ImGui::FanKeyboardKey( "", &pair.second.key );  ImGui::SameLine();
+					ImGui::FanKeyboardKey( "", &pair.second.mod0 ); ImGui::SameLine();
+					ImGui::FanKeyboardKey( "", &pair.second.mod1 ); ImGui::SameLine();
+					ImGui::FanKeyboardKey( "", &pair.second.mod2 );
 					ImGui::NextColumn();
 				}ImGui::Unindent();
 			}
-		}		
-
-		CaptureKeyPopup();
-		DeleteKeyPopup();
+			ImGui::SetColumnWidth( 0, column0_size );
+			ImGui::Columns( 1 );
+		}
 	}
 
 	//================================================================================================================================
@@ -147,10 +152,9 @@ namespace fan
 		if( ImGui::CollapsingHeader("joysticks") )
 		{
 			// creates columns
-			const int numJoysticks = Joystick::Get().NumConnectedJoysticks();			
-			if( numJoysticks > 1 ){
-				ImGui::Columns( numJoysticks );
-				for ( int columnIndex = 0; columnIndex < numJoysticks; columnIndex++ ) { ImGui::SetColumnWidth( columnIndex, 400 ); }
+			const int numJoysticks = Joystick::Get().NumConnectedJoysticks();		
+			if( numJoysticks > 1 ) {
+				ImGui::Columns( numJoysticks, "columns_joysticks" );
 			}
 
 			// draw joysticks
@@ -165,6 +169,9 @@ namespace fan
 					{
 						ImGui::SameLine();
 						ImGui::Text( " -  %s", Joystick::Get().GetGamepadName( joystickIndex ).c_str() );
+
+						if( numJoysticks > 1 ){ImGui::SetColumnWidth(-1, 400.f );}
+						else { ImGui::PushItemWidth(400.f);}
 
 						// axes
 						const std::vector< Joystick::Axis >& axes = Joystick::Get().GetGamepadAxisList();
@@ -181,107 +188,19 @@ namespace fan
 							bool buttonValue = Joystick::Get().GetButton( joystickIndex, buttons[buttonindex] );
 							ImGui::Checkbox( Joystick::Get().s_buttonsNames[buttonindex], &buttonValue );
 						}
+
+						if ( numJoysticks > 1 ) { ImGui::NextColumn(); }
+						else { ImGui::PopItemWidth(); }
+						
 					}
 					else
 					{
 						ImGui::Text( "Unrecognized gamepad" );
-					}
-					ImGui::NextColumn();
+					}					
 				}
 			}
 			ImGui::Columns(1);
 		}
 		
-	}
-
-	//================================================================================================================================
-	// Popup displayed when changing a keyboard key
-	//================================================================================================================================
-	void PreferencesWindow::CaptureKeyPopup() {
-		if ( m_openCaptureKeyPopup ) {
-			ImGui::OpenPopup( "capture_key_pref" );
-			m_openCaptureKeyPopup = false;
-		}
-
-		if ( !ImGui::IsPopupOpen( "capture_key_pref" ) && m_buttonCaptureDestination != nullptr ) {
-			StopCaptureKey();
-		}
-
-		// Capture key popup
-		if ( ImGui::BeginPopup( "capture_key_pref" ) ) {
-			ImGui::Text( "PRESS ANY KEY" );
-
-			if ( m_buttonCaptureDestination == nullptr ) {
-				ImGui::CloseCurrentPopup();
-			}
-			ImGui::EndPopup();
-		}
-	}
-
-	//================================================================================================================================
-	// Popup displayed for deleting a keyboard key
-	//================================================================================================================================
-	void PreferencesWindow::DeleteKeyPopup() {
-		// Delete key popup
-		if ( m_openDeletePopup ) {
-			ImGui::OpenPopup( "delete_key_pref" );
-			m_openDeletePopup = false;
-		}
-
-		// delete popup
-		if ( ImGui::BeginPopup( "delete_key_pref" ) ) {
-			if ( ImGui::MenuItem( "Remove" ) ) {
-				*m_buttonDeleteDestination = Keyboard::NONE;
-				m_buttonDeleteDestination = nullptr;
-				ImGui::CloseCurrentPopup();
-			}
-			ImGui::EndPopup();
-		}
-
-		if ( !ImGui::IsPopupOpen( "delete_key_pref" ) && m_buttonCaptureDestination != nullptr ) {
-			m_buttonDeleteDestination = nullptr;
-		}
-	}
-
-	//================================================================================================================================
-	// Display a keyboard key button and trigger the capture/deletion when clicked
-	//================================================================================================================================
-	void PreferencesWindow::SetKeyboardEventButton( int & _button ) {
-		ImGui::PushID( m_uniqueKeyIndex++ );
-		if ( ImGui::Button( Keyboard::GetKeyName( _button ).c_str() ) ) {
-			StartCaptureKey(_button);
-		}
-		if ( ImGui::IsItemClicked( 1 ) ) {
-			m_openDeletePopup = true;
-			m_buttonDeleteDestination = &_button;
-		}
-		ImGui::PopID();
-	}
-
-	//================================================================================================================================
-	// Called back when capturing a key
-	// _key is the key captured
-	//================================================================================================================================
-	void PreferencesWindow::CaptureKeyCallback( Keyboard::Key _key ) {
-		assert( m_buttonCaptureDestination != nullptr );
-		* m_buttonCaptureDestination = _key;
-		StopCaptureKey();
-	}
-
-	//================================================================================================================================
-	// Launch the keyboard key capture
-	//================================================================================================================================
-	void PreferencesWindow::StartCaptureKey( int & _button ) {
-		m_openCaptureKeyPopup = true;
-		m_buttonCaptureDestination = &_button;
-		Keyboard::Get().onKeyPressed.Connect( &PreferencesWindow::CaptureKeyCallback, this );
-	}
-
-	//================================================================================================================================
-	// Stops the keyboard key capture
-	//================================================================================================================================
-	void PreferencesWindow::StopCaptureKey() {
-		Keyboard::Get().onKeyPressed.Disconnect( &PreferencesWindow::CaptureKeyCallback, this );
-		m_buttonCaptureDestination = nullptr;
 	}
 }

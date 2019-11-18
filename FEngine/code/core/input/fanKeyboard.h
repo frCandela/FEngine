@@ -12,7 +12,6 @@ namespace fan {
 
 	public:		
 		using Key = int;
-		Signal < Key > onKeyPressed;
 
 		static bool	IsKeyDown			( const Key _key );
 		static bool IsKeyPressed		( const Key _key );

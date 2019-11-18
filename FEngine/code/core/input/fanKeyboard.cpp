@@ -98,8 +98,6 @@ namespace fan {
 			Get().m_keysPressed[_key] = Input::Get().FrameCount();
 		else if (_action == GLFW_RELEASE)
 			Get().m_keysReleased[_key] = Input::Get().FrameCount();
-
-		Get().onKeyPressed.Emmit( _key );
 	}
 
 	//================================================================================================================================
