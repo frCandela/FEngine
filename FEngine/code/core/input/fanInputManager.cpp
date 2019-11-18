@@ -34,7 +34,7 @@ namespace fan {
 
 		// Creates new one
 		Axis axis( _name, Axis::KEYBOARD );
-		axis.SetKeyboardKeys(_keyPositive, _keyNegative );
+		axis.SetFromKeyboardKeys(_keyPositive, _keyNegative );
 		m_axis[_name] = axis;
 	}
 
@@ -50,8 +50,8 @@ namespace fan {
 		}
 
 		// Creates new one
-		Axis axis( _name, Axis::JOYSTICK );
-		axis.SetJoystickKeys( _GLFW_JOYSTICK, _axis );
+		Axis axis( _name, Axis::JOYSTICK_AXIS );
+		axis.SetFromJoystickAxis( _GLFW_JOYSTICK, _axis );
 		m_axis[_name] = axis;
 	}
 

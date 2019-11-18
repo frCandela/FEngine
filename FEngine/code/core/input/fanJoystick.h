@@ -30,6 +30,7 @@ namespace fan
 		float		 GetAxis(		 const JoystickID _GLFW_JOYSTICK, const Axis _axis );
 		bool		 GetButton(		 const JoystickID _GLFW_JOYSTICK, const Button _button );
 		std::string  GetAxisName(	 const Axis _key );	
+		std::string  GetButtonName(	 const Button _button );	
 		const std::vector< Joystick::Button >& GetGamepadButtonsList() const { return  s_buttonsList; };
 		const std::vector< Joystick::Axis >& GetGamepadAxisList() const { return  s_axesList; };
 

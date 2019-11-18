@@ -164,7 +164,7 @@ namespace fan
 	bool Joystick::GetButton( const JoystickID _GLFW_JOYSTICK, const Button _GLFW_GAMEPAD_BUTTON )
 	{
 		GLFWgamepadstate state;
-		if ( glfwGetGamepadState( _GLFW_JOYSTICK, &state ) )
+		if ( _GLFW_JOYSTICK >= 0 && glfwGetGamepadState( _GLFW_JOYSTICK, &state ) )
 		{
 			return state.buttons[_GLFW_GAMEPAD_BUTTON];
 		}
@@ -178,14 +178,16 @@ namespace fan
 	//================================================================================================================================	
 	std::string  Joystick::GetAxisName	( const Joystick::Axis _key )
 	{
-		if ( _key >= 0 )
-		{
-			return s_axisNames[_key];
-		}
-		else
-		{
-			return "               ";
-		}		
+		if ( _key >= 0 ){ return s_axisNames[_key];	}
+		else			{ return "               ";	}		
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================	
+	std::string  Joystick::GetButtonName( const Button _button )
+	{
+		if ( _button >= 0 ) { return s_buttonsNames[_button]; }
+		else { return "               "; }
 	}
 
 	//================================================================================================================================
@@ -208,21 +210,21 @@ namespace fan
 	};
 
 	const char * Joystick::s_buttonsNames[GLFW_GAMEPAD_BUTTON_LAST + 1] = 
-	{    "A               "
-		,"B               "
-		,"X               "
-		,"Y               "
-		,"LEFT_BUMPER     "
-		,"RIGHT_BUMPER    "
-		,"BACK            "
-		,"START           "
-		,"GUIDE           "
-		,"LEFT_THUMB      "
-		,"RIGHT_THUMB     "
-		,"DPAD_UP         "
-		,"DPAD_RIGHT      "
-		,"DPAD_DOWN       "
-		,"DPAD_LEFT       "
+	{    "A              "
+		,"B              "
+		,"X              "
+		,"Y              "
+		,"LEFT_BUMPER    "
+		,"RIGHT_BUMPER   "
+		,"BACK           "
+		,"START          "
+		,"GUIDE          "
+		,"LEFT_THUMB     "
+		,"RIGHT_THUMB    "
+		,"DPAD_UP        "
+		,"DPAD_RIGHT     "
+		,"DPAD_DOWN      "
+		,"DPAD_LEFT      "
 	};
 
 	const std::vector< Joystick::Axis > Joystick::s_axesList =
