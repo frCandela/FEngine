@@ -15,7 +15,7 @@
 #include "core/time/fanProfiler.h"
 #include "renderer/fanRenderer.h"
 #include "game/fanWithEnergy.h"
-
+#include "game/fanPlayerInput.h"
 
 namespace fan
 {
@@ -26,6 +26,7 @@ namespace fan
 	void Weapon::Start()
 	{
 		REQUIRE_COMPONENT( WithEnergy, m_energy );
+		REQUIRE_COMPONENT( PlayerInput, m_input );
 	}
 
 	//================================================================================================================================
@@ -59,7 +60,7 @@ namespace fan
 			m_bulletsAccumulator = 1.f;
 		}
 
-		const float fire = Input::Get().Manager().GetAxis( "game_fire" );
+		const float fire = m_input->GetInputFire();
 		if ( fire > 0 && m_bulletsAccumulator >= 1.f ) {
 			-- m_bulletsAccumulator;
 			if( m_energy->TryRemoveEnergy( m_bulletEnergyCost ) ) {

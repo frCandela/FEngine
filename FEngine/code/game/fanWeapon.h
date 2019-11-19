@@ -6,6 +6,7 @@ namespace fan
 {
 	class Rigidbody;
 	class WithEnergy;
+	class PlayerInput;
 
 	//================================================================================================================================
 	//================================================================================================================================
@@ -29,6 +30,7 @@ namespace fan
 	private:
 		// ref
 		WithEnergy * m_energy;
+		PlayerInput * m_input;
 
 		// Bullets parameters
 		float m_lifeTime = 1.f;

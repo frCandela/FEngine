@@ -10,6 +10,7 @@ namespace fan {
 	class Rigidbody;
 	class ParticleSystem;
 	class WithEnergy;
+	class PlayerInput;
 
 	//================================================================================================================================
 	//================================================================================================================================
@@ -31,7 +32,6 @@ namespace fan {
 		bool Save( Json & _json ) const override;
 
 	private:
-
 		btVector4 m_forwardForces = btVector4(1000.f,1000.f,2000.f,3500.f);
 		float m_lateralForce		= 2000.f;
 		float m_activeDrag			= 0.930f;
@@ -43,6 +43,7 @@ namespace fan {
 		// References
 		Rigidbody * m_rigidbody;
 		WithEnergy * m_energy;
+		PlayerInput * m_input;
 
 		ComponentPtr<ParticleSystem> m_fastForwardParticles;
 		ComponentPtr<ParticleSystem> m_slowForwardParticles;

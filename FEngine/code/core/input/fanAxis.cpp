@@ -141,7 +141,7 @@ namespace fan
 		case fan::Axis::KEYBOARD:
 			return invertValue * ( ( Keyboard::IsKeyDown( m_keyPositive ) ? 1.f : 0.f ) + ( Keyboard::IsKeyDown( m_keyNegative ) ? -1.f : 0.f ) );
 		case fan::Axis::JOYSTICK_AXIS:
-			return invertValue * Joystick::Get().GetAxis( m_joystickID, m_joystickAxis );
+			return - invertValue * Joystick::Get().GetAxis( m_joystickID, m_joystickAxis );
 		case fan::Axis::JOYSTICK_BUTTONS:
 			return invertValue * ( ( Joystick::Get().GetButton(m_joystickID, m_buttonPositive ) ? 1.f : 0.f ) + ( Joystick::Get().GetButton(m_joystickID, m_buttonNegative ) ? -1.f : 0.f ) );
 		default:

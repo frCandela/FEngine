@@ -436,6 +436,9 @@
     <ClCompile Include="code\core\input\fanAxis.cpp">
       <Filter>code\core\input</Filter>
     </ClCompile>
+    <ClCompile Include="code\game\fanPlayerInput.cpp">
+      <Filter>code\game</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="code\editor\fanMainMenuBar.h">
@@ -1340,6 +1343,9 @@
     </ClInclude>
     <ClInclude Include="code\core\input\fanAxis.h">
       <Filter>code\core\input</Filter>
+    </ClInclude>
+    <ClInclude Include="code\game\fanPlayerInput.h">
+      <Filter>code\game</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

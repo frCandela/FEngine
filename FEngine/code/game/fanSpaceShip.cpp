@@ -14,6 +14,7 @@
 #include "core/math/shapes/fanRay.h"
 #include "renderer/fanRenderer.h"
 #include "game/fanWithEnergy.h"
+#include "game/fanPlayerInput.h"
 
 namespace fan {
 	REGISTER_TYPE_INFO(SpaceShip, TypeInfo::Flags::EDITOR_COMPONENT)
@@ -23,6 +24,7 @@ namespace fan {
 	void SpaceShip::Start() {
 		REQUIRE_COMPONENT( WithEnergy, m_energy )
 		REQUIRE_COMPONENT( Rigidbody, m_rigidbody )
+		REQUIRE_COMPONENT( PlayerInput, m_input );
 
 		REQUIRE_TRUE( *m_fastForwardParticles	!= nullptr , "Spaceship: missing particles reference" );
 		REQUIRE_TRUE( *m_slowForwardParticles	!= nullptr , "Spaceship: missing particles reference" );
@@ -39,39 +41,36 @@ namespace fan {
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void SpaceShip::Update(const float _delta) {
-
-		// Get mouse world pos
-		Camera * camera			= m_gameobject->GetScene()->GetMainCamera();
-		btVector3 mouseWorldPos = camera->ScreenPosToRay( Mouse::GetScreenSpacePosition() ).origin;
-		mouseWorldPos.setY(0);
-
-		// Get mouse direction
+	void SpaceShip::Update( const float _delta )
+	{
 		Transform * transform = m_gameobject->GetComponent<Transform>();
-		btVector3 mouseDir = mouseWorldPos - m_gameobject->GetTransform()->GetPosition();
-		mouseDir.normalize();
+
+		// Lateral movement
+		const btVector3 direction = m_input->GetInputDirection();
+		const float leftForce = _delta * m_lateralForce * m_input->GetInputLeft();
+		const float forwardAxis = _delta * m_input->GetInputForward();
+		const float boostDirection = m_input->GetInputBoost();		
 
 		// Orientation
-		transform->LookAt( mouseWorldPos , btVector3::Up() );
+		if( ! direction.isZero() ) 
+		{
+			transform->LookAt( transform->GetPosition() + direction, btVector3::Up() );
+		}
+
+		// constrain position
 		btVector3 pos = transform->GetPosition();
 		pos.setY( 0.f );
 		transform->SetPosition( pos );
-		 
-		// Lateral movement
-		const float leftForce	= _delta * m_lateralForce * Input::Get().Manager().GetAxis( "game_left" );
-		
 
-		// Go forward
-		const float forwardAxis = _delta * Input::Get().Manager().GetAxis( "game_forward" );
-		const float boostDirection = Input::Get().Manager().GetAxis( "game_boost" );
 		SpeedMode speedMode = forwardAxis < 0 ? SpeedMode::REVERSE : ( boostDirection > 0 ? SpeedMode::FAST : ( boostDirection < 0 ? SpeedMode::SLOW : SpeedMode::NORMAL ) );
-		
+
 		// Consume energy
 		float totalConsumption = m_energyConsumedPerUnitOfForce * ( std::abs( leftForce ) + std::abs( m_forwardForces[speedMode] * forwardAxis ) );
 		if ( !m_energy->TryRemoveEnergy( totalConsumption ) ) // not enough energy = go to slow speed mode
 		{
 			m_energy->TryRemoveEnergy( m_energy->GetEnergy() );
-			if( speedMode != SpeedMode::REVERSE ) {
+			if ( speedMode != SpeedMode::REVERSE )
+			{
 				speedMode = SpeedMode::SLOW;
 			}
 		}
@@ -79,22 +78,23 @@ namespace fan {
 		// Enable particle systems
 		m_fastForwardParticles->SetEnabled( false );
 		m_slowForwardParticles->SetEnabled( false );
-		m_reverseParticles 	  ->SetEnabled( false );
-		m_leftParticles 	  ->SetEnabled( false );
-		m_rightParticles	  ->SetEnabled( false );
+		m_reverseParticles->SetEnabled( false );
+		m_leftParticles->SetEnabled( false );
+		m_rightParticles->SetEnabled( false );
 
-		if( forwardAxis != 0.f  ) {
+		if ( forwardAxis != 0.f )
+		{
 			if ( speedMode == SpeedMode::SLOW || speedMode == SpeedMode::NORMAL ) { m_slowForwardParticles->SetEnabled( true ); }
 			else if ( speedMode == SpeedMode::FAST ) { m_fastForwardParticles->SetEnabled( true ); }
 			else if ( speedMode == SpeedMode::REVERSE ) { m_reverseParticles->SetEnabled( true ); }
 		}
-		if( leftForce > 0.f  ) { m_leftParticles->SetEnabled(true); }
-		else if( leftForce < 0.f  ) { m_rightParticles->SetEnabled(true); }
+		if ( leftForce > 0.f ) { m_leftParticles->SetEnabled( true ); }
+		else if ( leftForce < 0.f ) { m_rightParticles->SetEnabled( true ); }
 
 		// Forces application		
 		m_rigidbody->ApplyCentralForce( leftForce * transform->Left() );
 		m_rigidbody->ApplyCentralForce( m_forwardForces[speedMode] * forwardAxis * transform->Forward() );
-	
+		m_rigidbody->GetBtBody()->setAngularVelocity(btVector3::Zero());
 
 		// Drag
 		btVector3 newVelocity = ( totalConsumption > 0.f ? m_activeDrag : m_passiveDrag ) * m_rigidbody->GetVelocity();
