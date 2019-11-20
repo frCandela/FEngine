@@ -20,6 +20,7 @@ namespace fan
 		float		GetInputForward();
 		float		GetInputBoost();
 		float		GetInputFire();
+		bool		GetInputStop();
 
 		void			OnGui() override;
 		ImGui::IconType GetIcon() const override { return ImGui::IconType::GAME_MANAGER; }
@@ -36,5 +37,11 @@ namespace fan
 
 	private:
 		InputType m_inputType = KEYBOARD_MOUSE;
+
+		btVector3	m_lastDirection;
+		float		m_directionCutTreshold = 0.25f;
+
+		std::vector< glm::vec2 > m_directionBuffer;
+		glm::vec2 GetDirectionAverage() ;
 	};
 }

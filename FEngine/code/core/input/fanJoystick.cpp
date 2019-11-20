@@ -164,7 +164,7 @@ namespace fan
 	bool Joystick::GetButton( const JoystickID _GLFW_JOYSTICK, const Button _GLFW_GAMEPAD_BUTTON )
 	{
 		GLFWgamepadstate state;
-		if ( _GLFW_JOYSTICK >= 0 && glfwGetGamepadState( _GLFW_JOYSTICK, &state ) )
+		if ( _GLFW_JOYSTICK >= 0 && _GLFW_GAMEPAD_BUTTON >= 0 && glfwGetGamepadState( _GLFW_JOYSTICK, &state ) )
 		{
 			return state.buttons[_GLFW_GAMEPAD_BUTTON];
 		}

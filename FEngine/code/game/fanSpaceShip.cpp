@@ -47,9 +47,10 @@ namespace fan {
 
 		// Lateral movement
 		const btVector3 direction = m_input->GetInputDirection();
-		const float leftForce = _delta * m_lateralForce * m_input->GetInputLeft();
-		const float forwardAxis = _delta * m_input->GetInputForward();
-		const float boostDirection = m_input->GetInputBoost();		
+		const bool  stop = m_input->GetInputStop();
+		const float leftForce   = _delta * m_lateralForce * m_input->GetInputLeft();
+		const float forwardAxis = stop ? 0.f : _delta * m_input->GetInputForward();
+		const float boost = m_input->GetInputBoost();	
 
 		// Orientation
 		if( ! direction.isZero() ) 
@@ -62,7 +63,7 @@ namespace fan {
 		pos.setY( 0.f );
 		transform->SetPosition( pos );
 
-		SpeedMode speedMode = forwardAxis < 0 ? SpeedMode::REVERSE : ( boostDirection > 0 ? SpeedMode::FAST : ( boostDirection < 0 ? SpeedMode::SLOW : SpeedMode::NORMAL ) );
+		SpeedMode speedMode = forwardAxis < 0 ? SpeedMode::REVERSE : ( boost > 0 ? SpeedMode::FAST : ( boost < 0 ? SpeedMode::SLOW : SpeedMode::NORMAL ) );
 
 		// Consume energy
 		float totalConsumption = m_energyConsumedPerUnitOfForce * ( std::abs( leftForce ) + std::abs( m_forwardForces[speedMode] * forwardAxis ) );

@@ -18,6 +18,9 @@ namespace fan
 	void PlayerInput::OnAttach()
 	{
 		Component::OnAttach();
+
+		m_directionBuffer.resize(8, glm::vec2(0));
+		m_lastDirection = btVector3(0,0,1.f);
 	}
 
 	//================================================================================================================================
@@ -33,38 +36,6 @@ namespace fan
 	{
 		if ( _type == m_inputType ) { return; }
 		m_inputType = _type;
-	}
-
-	//================================================================================================================================
-	//================================================================================================================================
-	btVector3 PlayerInput::GetInputDirection()
-	{
-		switch ( m_inputType )
-		{
-
-		case fan::PlayerInput::KEYBOARD_MOUSE:
-		{
-			// Get mouse world pos
-			Camera * camera = m_gameobject->GetScene()->GetMainCamera();
-			btVector3 mouseWorldPos = camera->ScreenPosToRay( Mouse::GetScreenSpacePosition() ).origin;
-			mouseWorldPos.setY( 0 );
-
-			// Get mouse direction
-			Transform * transform = m_gameobject->GetComponent<Transform>();
-			btVector3 mouseDir = mouseWorldPos - transform->GetPosition();
-			mouseDir.normalize();
-			return mouseDir;
-		}
-		case fan::PlayerInput::JOYSTICK:
-		{
-			const float x = Input::Get().Manager().GetAxis( "gamejs_x_axis_direction" );
-			const float y = Input::Get().Manager().GetAxis( "gamejs_y_axis_direction" );
-			btVector3 dir = btVector3( x, 0.f, y );
-			return dir.length2() > 0.01f ? dir : btVector3::Zero();
-		}
-		default:
-			return btVector3::Zero();
-		}
 	}
 
 	//================================================================================================================================
@@ -134,17 +105,97 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
+	bool PlayerInput::GetInputStop()
+	{
+		switch ( m_inputType )
+		{
+		case fan::PlayerInput::KEYBOARD_MOUSE:
+			return Input::Get().Manager().GetAxis( "game_axis_stop" ) > 0.f;
+		case fan::PlayerInput::JOYSTICK:
+			return Input::Get().Manager().GetAxis( "gamejs_axis_stop" ) > 0.f;
+		default:
+			return false;
+		}
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
+	btVector3 PlayerInput::GetInputDirection()
+	{
+		switch ( m_inputType )
+		{
+
+		case fan::PlayerInput::KEYBOARD_MOUSE:
+		{
+			// Get mouse world pos
+			Camera * camera = m_gameobject->GetScene()->GetMainCamera();
+			btVector3 mouseWorldPos = camera->ScreenPosToRay( Mouse::GetScreenSpacePosition() ).origin;
+			mouseWorldPos.setY( 0 );
+
+			// Get mouse direction
+			Transform * transform = m_gameobject->GetComponent<Transform>();
+			btVector3 mouseDir = mouseWorldPos - transform->GetPosition();
+			mouseDir.normalize();
+			return mouseDir;
+		}
+		case fan::PlayerInput::JOYSTICK:
+		{
+			 glm::vec2 average =  GetDirectionAverage();
+
+			btVector3 dir = btVector3( average.x, 0.f, average.y );
+
+			if( dir.length() > m_directionCutTreshold ) { m_lastDirection = dir; }
+
+			return m_lastDirection;
+		}
+		default:
+			return btVector3::Zero();
+		}
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
+	glm::vec2 PlayerInput::GetDirectionAverage() 
+	{
+		const uint64_t index = Input::Get().FrameCount() % m_directionBuffer.size();
+		const float x = Input::Get().Manager().GetAxis( "gamejs_x_axis_direction" );
+		const float y = Input::Get().Manager().GetAxis( "gamejs_y_axis_direction" );
+		m_directionBuffer[index] = glm::vec2(x,y);
+
+		glm::vec2 average(0.f,0.f);
+		for (int dirIndex = 0; dirIndex < m_directionBuffer.size() ; dirIndex++)
+		{
+			average += m_directionBuffer[dirIndex];
+		}
+		 average /= float(m_directionBuffer.size() );
+
+		return average;
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
 	void PlayerInput::OnGui()
 	{
 		Component::OnGui();
 
 		ImGui::PushItemWidth( 0.6f * ImGui::GetWindowWidth() );
 		{
+			// Imput type
 			int type = m_inputType;
 			if ( ImGui::Combo( "input type", &type, "keyboard+mouse\0joystick\0" ) )
 			{
 				SetInputType( InputType( type ) );
 			}
+
+			// Direction buffer size
+			int sizeBuffer = (int) m_directionBuffer.size();
+			if ( ImGui::SliderInt( "direction buffer size", &sizeBuffer, 1, 64 ) )
+			{
+				m_directionBuffer.resize(sizeBuffer, glm::vec2(0));
+			}
+
+			// direction cut treshold
+			ImGui::DragFloat("direction cut treshold", &m_directionCutTreshold, 0.01f, 0.f, 1.f );
 
 		} ImGui::PopItemWidth();
 	}
@@ -155,6 +206,13 @@ namespace fan
 	{
 		Component::Load( _json );
 
+		int tmp;
+		if ( LoadInt( _json, "direction_buffer_size", tmp ))
+		{
+			m_directionBuffer.resize(tmp, glm::vec3(0.f));
+		}
+		LoadFloat(_json, "direction_cut_treshold", m_directionCutTreshold );
+
 		return true;
 	}
 
@@ -163,6 +221,8 @@ namespace fan
 	bool PlayerInput::Save( Json & _json ) const
 	{
 		Component::Save( _json );
+		SaveInt( _json, "direction_buffer_size", (int)m_directionBuffer.size() );
+		SaveFloat( _json, "direction_cut_treshold", m_directionCutTreshold );
 		return true;
 	}
 

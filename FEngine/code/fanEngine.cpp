@@ -100,14 +100,15 @@ namespace fan {
 		Input::Get().Manager().CreateKeyboardAxis( "game_left",		Keyboard::A, Keyboard::D );
 		Input::Get().Manager().CreateKeyboardAxis( "game_fire",		Keyboard::SPACE, Keyboard::NONE );
 		Input::Get().Manager().CreateKeyboardAxis( "game_boost",	Keyboard::LEFT_SHIFT, Keyboard::LEFT_CONTROL );
+		Input::Get().Manager().CreateKeyboardAxis( "game_axis_stop",Keyboard::LEFT_CONTROL, Keyboard::NONE );
 
 		Input::Get().Manager().CreateJoystickAxis(		"gamejs_x_axis_direction"	, 0, Joystick::RIGHT_X );
 		Input::Get().Manager().CreateJoystickAxis(		"gamejs_y_axis_direction"	, 0, Joystick::RIGHT_Y );
 		Input::Get().Manager().CreateJoystickAxis(		"gamejs_forward"			, 0, Joystick::LEFT_Y );
 		Input::Get().Manager().CreateJoystickAxis(		"gamejs_axis_left"			, 0, Joystick::RIGHT_Y );
 		Input::Get().Manager().CreateJoystickAxis(		"gamejs_axis_boost"			, 0, Joystick::RIGHT_Y );
-		Input::Get().Manager().CreateJoystickButtons(	"gamejs_axis_fire"			, 0, Joystick::A );
-
+		Input::Get().Manager().CreateJoystickAxis(		"gamejs_axis_fire"			, 0, Joystick::RIGHT_TRIGGER );
+		Input::Get().Manager().CreateJoystickButtons(	"gamejs_axis_stop"			, 0, Joystick::A );
 
 		// Set some values
 		m_editorGrid.isVisible = true;
