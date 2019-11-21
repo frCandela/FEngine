@@ -9,6 +9,7 @@ namespace fan {
 		static const std::set<std::string>	s_meshExtensions;
 		static const std::set<std::string>	s_imagesExtensions;
 		static const std::set<std::string>	s_sceneExtensions;
+		static const std::set<std::string>	s_prefabExtensions;
 
 		static const char *	s_defaultMesh;
 		static const char *	s_defaultTexture;

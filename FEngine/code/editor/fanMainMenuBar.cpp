@@ -218,7 +218,7 @@ namespace fan
 	//================================================================================================================================
 	void MainMenuBar::DrawModals() {
 		// New scene
-		if (ImGui::FanSaveFileModal("New scene", GlobalValues::s_sceneExtensions, m_pathBuffer, m_extensionIndexBuffer)) {
+		if (ImGui::FanSaveFileModal("New scene", GlobalValues::s_sceneExtensions, m_pathBuffer)) {
 			m_scene.New();
 			m_scene.SetPath(m_pathBuffer.string());
 		}
@@ -229,7 +229,7 @@ namespace fan
 		}
 
 		// Save scene
-		if (ImGui::FanSaveFileModal("Save scene", GlobalValues::s_sceneExtensions, m_pathBuffer, m_extensionIndexBuffer)) {
+		if (ImGui::FanSaveFileModal("Save scene", GlobalValues::s_sceneExtensions, m_pathBuffer )) {
 			m_scene.SetPath(m_pathBuffer.string());
 			m_scene.Save();
 		}
@@ -238,7 +238,6 @@ namespace fan
 	//================================================================================================================================
 	//================================================================================================================================
 	void MainMenuBar::New() {
-		m_extensionIndexBuffer = 0;
 		m_pathBuffer = "./content/scenes/";
 		m_openNewScenePopupLater = true;
 	}
@@ -290,7 +289,6 @@ namespace fan
 	//================================================================================================================================
 	void MainMenuBar::SaveAs() {
 		m_pathBuffer = "./content/scenes/";
-		m_extensionIndexBuffer = 0;
 		m_openSaveScenePopupLater = true;
 	}
 }

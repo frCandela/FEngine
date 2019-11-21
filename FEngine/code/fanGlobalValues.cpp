@@ -5,6 +5,8 @@ namespace fan {
 	const std::set<std::string>	GlobalValues::s_meshExtensions   = { ".fbx" };
 	const std::set<std::string>	GlobalValues::s_imagesExtensions = { ".png" };
 	const std::set<std::string>	GlobalValues::s_sceneExtensions  = { ".scene" };
+	const std::set<std::string>	GlobalValues::s_prefabExtensions  = { ".prefab" };
+	
 
 	const char *	GlobalValues::s_defaultMesh			= "content/_default/mesh/mesh.fbx";
 	const char *	GlobalValues::s_defaultTexture		= "content/_default/texture/texture.png";

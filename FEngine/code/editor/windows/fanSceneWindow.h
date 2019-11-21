@@ -26,12 +26,15 @@ namespace fan {
 		Scene * m_scene;
 		Gameobject* m_gameobjectSelected;
 
+		std::fs::path m_pathBuffer;
 		char m_textBuffer[32];
 		Gameobject * m_lastGameobjectRightClicked = nullptr;
 		bool m_expandSceneHierarchy = false;
 
 		void NewGameobjectModal();
 		void RenameGameobjectModal();
+		void ExportToPrefabModal();
+
 		void R_DrawSceneTree(Gameobject * _gameobject, Gameobject*& _gameobjectRightClicked);
 	};
 }

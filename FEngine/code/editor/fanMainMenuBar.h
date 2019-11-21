@@ -57,7 +57,6 @@ namespace fan
 
 		// Temporary buffers
 		std::fs::path m_pathBuffer;
-		int m_extensionIndexBuffer;
 		std::set < std::string > m_sceneExtensionFilter;
 
 		void DrawModals();

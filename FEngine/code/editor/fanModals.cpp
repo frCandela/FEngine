@@ -99,8 +99,10 @@ namespace ImGui
 
 	//================================================================================================================================
 	//================================================================================================================================
-	bool FanSaveFileModal(const char * _popupName, const std::set<std::string>& _extensionWhiteList, std::fs::path & _path, int & _extensionIndex) {
+	bool FanSaveFileModal(const char * _popupName, const std::set<std::string>& _extensionWhiteList, std::fs::path & _outCurrentPath ) {
 		bool returnValue = false;
+
+		static int extensionIndex = 0;
 
 		ImGui::SetNextWindowSize({ 316,410 });
 		if (ImGui::BeginPopupModal(_popupName))
@@ -108,17 +110,18 @@ namespace ImGui
 			// Files hierarchy
 			bool itemDoubleClicked = false;
 			ImGui::BeginChild("load_scene_hierarchy", { 300,300 }, true); {
-				itemDoubleClicked = impl::FilesSelector(_extensionWhiteList, _path);
+				itemDoubleClicked = impl::FilesSelector(_extensionWhiteList, _outCurrentPath);
 			} ImGui::EndChild();
 
 
 			// Input name
 			const int bufferSize = 32;
 			char buffer[bufferSize];
-			strcpy_s(buffer, std::fs::file_name(_path).c_str());
+			strcpy_s(buffer, std::fs::file_name(_outCurrentPath).c_str());
 
 			if (ImGui::IsWindowAppearing()) {
 				ImGui::SetKeyboardFocusHere();
+				extensionIndex = 0;
 			}
 			bool enterPressed = false;
 			if (ImGui::InputText("name", buffer, IM_ARRAYSIZE(buffer), ImGuiInputTextFlags_EnterReturnsTrue)) {
@@ -135,7 +138,7 @@ namespace ImGui
 				tmpExtensions.push_back(extension);
 			}
 			if (_extensionWhiteList.size() > 1) {
-				ImGui::Combo("format", &_extensionIndex, extensions.str().c_str());
+				ImGui::Combo("format", &extensionIndex, extensions.str().c_str());
 			}
 			else {
 				ImGui::TextDisabled(extensions.str().c_str());
@@ -143,21 +146,20 @@ namespace ImGui
 			ImGui::Separator();
 
 			// re format to path/.../filename.extension	
-			if (std::fs::is_directory(_path) == false) {
-				_path.remove_filename();
+			if ( ! std::fs::is_directory(_outCurrentPath) ) {
+				_outCurrentPath.remove_filename();
 			}
 			if (stringBuffer.length() > 0) {
-				_path.append(stringBuffer + tmpExtensions[_extensionIndex]);
+				_outCurrentPath.append(stringBuffer + tmpExtensions[extensionIndex]);
 			}
 
 			// Ok Button
-			if (itemDoubleClicked == true || 
-				ImGui::Button("Ok") || 
-				enterPressed)
+			if ( itemDoubleClicked  || ImGui::Button("Ok") || enterPressed)
 			{
-				if (std::fs::is_directory(_path) == false) {
+				if ( ! std::fs::is_directory(_outCurrentPath) ) {
 					ImGui::CloseCurrentPopup();
 					returnValue = true;
+					_outCurrentPath.make_preferred();
 				}
 			}
 

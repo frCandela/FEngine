@@ -17,6 +17,7 @@
 #include "core/input/fanKeyboard.h"
 #include "core/input/fanMouse.h"
 #include "core/time/fanProfiler.h"
+#include "editor/fanModals.h"
 
 namespace fan
 {
@@ -55,6 +56,8 @@ namespace fan
 		// Popup set gameobject when right clic
 		bool newGameobjectPopup = false;
 		bool renameGameobjectPopup = false;
+		bool exportToPrefabPopup = false;
+		
 		if (ImGui::BeginPopup("scene_window_gameobject_rclicked")) {
 
 			// New gameobject 
@@ -114,6 +117,12 @@ namespace fan
 				renameGameobjectPopup = true;
 			}
 
+			// export to prefab
+			if ( ImGui::Selectable( "Export to prefab" ) )
+			{
+				exportToPrefabPopup = true;
+			}
+
 			// delete
 			ImGui::Separator();
 			if (ImGui::Selectable("Delete")) {
@@ -122,14 +131,24 @@ namespace fan
 			ImGui::EndPopup();
 		}
 
-		// Modals
+		// new gameobject modal
 		if (newGameobjectPopup) {
 			ImGui::OpenPopup("New gameobject");
 		} NewGameobjectModal();
 
+		// rename modal
 		if (renameGameobjectPopup) {
 			ImGui::OpenPopup("Rename gameobject");
 		} RenameGameobjectModal();
+
+		// export to prefab modal
+		if ( exportToPrefabPopup )
+		{
+			m_pathBuffer = "content/prefab";
+			ImGui::OpenPopup( "Export to prefab" );
+		} ExportToPrefabModal();
+
+		
 	}
 
 	//================================================================================================================================
@@ -248,6 +267,36 @@ namespace fan
 				}
 			}
 			ImGui::EndPopup();
+		}
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
+	void SceneWindow::ExportToPrefabModal()
+	{		
+		if ( ImGui::FanSaveFileModal( "Export to prefab", GlobalValues::s_prefabExtensions, m_pathBuffer ) )
+		{
+			Debug::Log() << "Exporting prefab to "  << m_pathBuffer.string() << Debug::Endl();
+
+			std::ofstream outStream( m_pathBuffer.string() );
+			if ( outStream.is_open() )
+			{
+				Json json;
+				Json& prefabJson = json["prefab"];
+				if ( m_lastGameobjectRightClicked->Save( prefabJson ) )
+				{
+					outStream << json;
+				}
+				else
+				{
+					Debug::Warning() << "Prefab export failed for " << m_lastGameobjectRightClicked->GetName() << Debug::Endl();
+				}
+				outStream.close();				
+			}
+			else
+			{
+				Debug::Warning() << "Prefab export failed : " << m_pathBuffer.string() << Debug::Endl();
+			}
 		}
 	}
 }
