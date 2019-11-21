@@ -46,6 +46,6 @@ namespace fan
 		std::vector< Texture * > m_textures;
 		bool					 m_modified = false;
 
-		
+		std::string CleanPath( const std::string& _path );
 	};
 }

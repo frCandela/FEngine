@@ -79,15 +79,18 @@ namespace fan
 	//================================================================================================================================
 	// Load a mesh from a path, loads it and registers it
 	//================================================================================================================================
-	Mesh * RessourceManager::LoadMesh(const std::string _path) {
-		Mesh * mesh = new Mesh(_path);
-		if ( mesh->Load() ) {
+	Mesh * RessourceManager::LoadMesh( const std::string _path )
+	{
+		// Load
+		Mesh * mesh = new Mesh( CleanPath(_path) );
+		if ( mesh->Load() )
+		{
 			RegisterMesh( mesh );
 			return mesh;
-		}		
+		}
 		delete mesh;
 		return nullptr;
-		
+
 	}
 
 	//================================================================================================================================
@@ -95,8 +98,6 @@ namespace fan
 	void RessourceManager::OnLoadMesh( Mesh * _mesh ) {
 		_mesh->GenerateBuffers( m_device );
 	}
-
-
 
 	//================================================================================================================================
 	//================================================================================================================================
@@ -110,7 +111,7 @@ namespace fan
 	Mesh * RessourceManager::FindMesh(const std::string _path) {
 		for (int meshIndex = 0; meshIndex < m_meshList.size() ; meshIndex++) {
 			for ( Mesh* mesh : m_meshList){
-				if ( mesh->GetPath() == _path ) {
+				if ( mesh->GetPath() ==  CleanPath(_path) ) {
 					return mesh;
 				}
 			}
@@ -130,5 +131,15 @@ namespace fan
 	void RessourceManager::RegisterUIMesh( UIMesh * _mesh )
 	{
 		m_uiMeshList.insert( _mesh );
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
+	std::string RessourceManager::CleanPath( const std::string& _path )
+	{
+		std::fs::path path = _path;
+		path.make_preferred();
+
+		return path.string();
 	}
 }
