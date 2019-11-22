@@ -7,6 +7,7 @@ namespace fan
 {
 	class Gameobject;
 	class Scene;
+	class Prefab;
 
 	//================================================================================================================================
 	// Allow gameobject instantiation from json data (copy/paste, prefabs)
@@ -17,7 +18,8 @@ namespace fan
 	public:
 		SceneInstantiate( Scene & _scene );
 
-		void  InstanciateJson( Json& _json, Gameobject * _parent );
+		bool  InstantiateJson(	 Json& _json, Gameobject * _parent );
+		bool  InstanciatePrefab( Prefab& _prefab, Gameobject * _parent );
 
 	private:
 		Scene& m_scene;

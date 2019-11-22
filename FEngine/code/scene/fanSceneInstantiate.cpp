@@ -3,6 +3,7 @@
 
 #include "scene/fanGameobject.h"
 #include "scene/components/fanComponent.h"
+#include "scene/fanPrefab.h"
 
 namespace fan
 {
@@ -12,7 +13,22 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void  SceneInstantiate::InstanciateJson( Json& _json, Gameobject * _parent )
+	bool  SceneInstantiate::InstanciatePrefab( Prefab& _prefab, Gameobject * _parent )
+	{
+		if ( _prefab.IsEmpty() )
+		{
+			Debug::Warning() << "Failed to instantiate prefab" << Debug::Endl();
+			return false;
+		}
+		else
+		{
+			return InstantiateJson( _prefab.GetData(), _parent );
+		}
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
+	bool  SceneInstantiate::InstantiateJson( Json& _json, Gameobject * _parent )
 	{
 		m_newGameobjectPtr.clear();
 		m_newComponentPtr.clear();
@@ -31,6 +47,8 @@ namespace fan
 		ComponentIDPtr::s_onCreateUnresolved.Disconnect( &SceneInstantiate::OnComponentIDPtrCreate, this );
 
 		ResolvePointers();
+
+		return true;
 	}
 
 	//================================================================================================================================

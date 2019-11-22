@@ -1,0 +1,1 @@
+{"prefab":{"childs":null,"components":[{"id":1269105190,"position":{"x":0.0,"y":0.0,"z":0.0},"rotation":{"w":1.0,"x":0.0,"y":0.0,"z":0.0},"scale":{"x":1.0,"y":1.0,"z":1.0},"type":"Transform"},{"id":1299548564,"image":{"component_id":0,"gameobject_id":0},"max_width":100,"type":"ProgressBar"}],"flags":8,"name":"bwa","unique_id":4}}

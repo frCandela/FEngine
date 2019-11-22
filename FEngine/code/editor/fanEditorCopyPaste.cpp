@@ -36,6 +36,6 @@ namespace fan
 		Json pastedJson;
 		ss >> pastedJson;
 
-		m_engine.GetScene().Instantiate().InstanciateJson( pastedJson, m_engine.GetSelectedGameobject() );
+		m_engine.GetScene().Instantiate().InstantiateJson( pastedJson, m_engine.GetSelectedGameobject() );
 	}
 }

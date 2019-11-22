@@ -13,6 +13,8 @@
 #include "scene/components/fanRigidbody.h"
 #include "scene/components/fanSphereShape.h"
 #include "scene/actors/fanParticleSystem.h"
+#include "scene/fanSceneInstantiate.h"
+#include "scene/fanPrefab.h"
 #include "core/input/fanInput.h"
 #include "core/input/fanKeyboard.h"
 #include "core/input/fanMouse.h"
@@ -57,7 +59,8 @@ namespace fan
 		bool newGameobjectPopup = false;
 		bool renameGameobjectPopup = false;
 		bool exportToPrefabPopup = false;
-		
+		bool loadPrefabPopup = false;
+
 		if (ImGui::BeginPopup("scene_window_gameobject_rclicked")) {
 
 			// New gameobject 
@@ -105,12 +108,18 @@ namespace fan
 					newIntity->AddComponent<ParticleSystem>();
 				}
 
-
 				ImGui::EndMenu();
 			}
+
 			if ( ImGui::IsItemClicked() ) {
 				newGameobjectPopup = true;
 			}
+
+			if (ImGui::MenuItem("Import prefab")) {
+				loadPrefabPopup = true;
+			}
+
+			ImGui::Separator();
 
 			// rename
 			if (ImGui::Selectable("Rename")) {
@@ -148,7 +157,20 @@ namespace fan
 			ImGui::OpenPopup( "Export to prefab" );
 		} ExportToPrefabModal();
 
-		
+		// load prefab popup
+		if( loadPrefabPopup )
+		{
+			m_pathBuffer = "content/prefab";
+			ImGui::OpenPopup( "Load prefab" );
+		}
+		if ( ImGui::FanLoadFileModal( "Load prefab", GlobalValues::s_prefabExtensions, m_pathBuffer ) )
+		{
+			Prefab prefab;
+			if ( prefab.LoadFromFile( m_pathBuffer.string() ) )
+			{
+				m_scene->Instantiate().InstanciatePrefab( prefab, m_lastGameobjectRightClicked );
+			}
+		}		
 	}
 
 	//================================================================================================================================

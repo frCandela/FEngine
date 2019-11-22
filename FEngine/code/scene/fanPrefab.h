@@ -14,9 +14,10 @@ namespace fan
 	public:
 		Prefab();
 
-		bool LoadFromPath( const std::string& _path );
+		bool LoadFromFile( const std::string& _path );
 		void LoadFromGameobject( const Gameobject * _gameobject );
-		void LoadToGameobject( Gameobject * _gameobject );
+
+		Json& GetData() { return m_json["prefab"]; }
 
 		bool IsEmpty() { return ! m_json.contains("prefab"); }
 

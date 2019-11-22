@@ -55,6 +55,8 @@
 #include "ecs/fanECSManager.h"
 #include "physics/fanPhysicsManager.h"
 
+#include "scene/fanPrefab.h"
+
 
 namespace fan {
 	Signal<Gameobject*> Engine::onGameobjectSelected;
@@ -567,33 +569,6 @@ namespace fan {
 	//================================================================================================================================
 	//================================================================================================================================
 	void Engine::ManageSelection() {
-
-
-
-
-		ImGui::Begin( "prefab" );
-		{
-			static std::fs::path path;
-			if ( ImGui::Button( "Set" ) )
-			{
-				ImGui::OpenPopup("load prefab");
-				path = "content/prefab";
-			}
-
-			if ( ImGui::FanLoadFileModal( "load prefab", GlobalValues::s_prefabExtensions, path ) )
-			{
-				Debug::Log() << path.string() << Debug::Endl();
-			}
-			ImGui::Text(path.string().c_str());
-		} ImGui::End();
-
-
-
-
-
-
-
-
 		SCOPED_PROFILE( selection )
 
 		bool mouseCaptured = ImGui::GetIO().WantCaptureMouse;
