@@ -13,7 +13,7 @@ namespace fan {
 	class EditorWindow;
 	class EcsWindow;
 	class ProfilerWindow;
-	class CopyPaste;
+	class SceneInstantiate;
 	class Renderer;
 	class Gameobject;
 	class Scene;
@@ -29,6 +29,7 @@ namespace fan {
 	class PhysicsManager;
 	class Texture;
 	class Mesh;
+	class EditorCopyPaste;
 
 	template< typename _RessourceType, typename _IDType > class RessourcePtr;
 	using GameobjectPtr = RessourcePtr<Gameobject, uint64_t >;
@@ -90,6 +91,7 @@ namespace fan {
 		EditorGrid m_editorGrid;
 
 		// Main objects
+		EditorCopyPaste * m_copyPaste;
 		Renderer *			m_renderer;
 		Scene *				m_scene;
 		EcsManager *		m_ecsManager;
@@ -99,8 +101,6 @@ namespace fan {
 		FPSCamera *			m_editorCameraController = nullptr;
 		Camera *			m_mainCamera = nullptr;
 
-		// Other
-		CopyPaste * m_copyPaste;
 
 		std::vector < DirectionalLight* >	m_directionalLights;
 		std::vector < PointLight* >			m_pointLights;
@@ -125,8 +125,6 @@ namespace fan {
 		void OnMaterialSetTexture( Material * _material, std::string _path );
 		void OnResolveTexturePtr( TexturePtr * _ptr );
 		void OnResolveMeshPtr( MeshPtr * _ptr );
-		void OnCopy();
-		void OnPaste();
 		void OnToogleShowUI() { m_showUI = ! m_showUI; }
 
 		void OnGameobjectDeleted( Gameobject * _gameobject );

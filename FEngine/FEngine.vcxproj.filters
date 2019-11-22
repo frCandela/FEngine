@@ -424,9 +424,6 @@
     <ClCompile Include="code\game\ui\fanSpaceshipUI.cpp">
       <Filter>code\game\ui</Filter>
     </ClCompile>
-    <ClCompile Include="code\editor\fanCopyPaste.cpp">
-      <Filter>code\editor</Filter>
-    </ClCompile>
     <ClCompile Include="code\scene\components\ui\fanUIMeshRenderer.cpp">
       <Filter>code\scene\components\ui</Filter>
     </ClCompile>
@@ -438,6 +435,15 @@
     </ClCompile>
     <ClCompile Include="code\game\fanPlayerInput.cpp">
       <Filter>code\game</Filter>
+    </ClCompile>
+    <ClCompile Include="code\scene\fanPrefab.cpp">
+      <Filter>code\scene</Filter>
+    </ClCompile>
+    <ClCompile Include="code\scene\fanSceneInstantiate.cpp">
+      <Filter>code\scene</Filter>
+    </ClCompile>
+    <ClCompile Include="code\editor\fanEditorCopyPaste.cpp">
+      <Filter>code\editor</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -1332,9 +1338,6 @@
     <ClInclude Include="code\game\ui\fanSpaceshipUI.h">
       <Filter>code\game\ui</Filter>
     </ClInclude>
-    <ClInclude Include="code\editor\fanCopyPaste.h">
-      <Filter>code\editor</Filter>
-    </ClInclude>
     <ClInclude Include="code\scene\components\ui\fanUIMeshRenderer.h">
       <Filter>code\scene\components\ui</Filter>
     </ClInclude>
@@ -1346,6 +1349,15 @@
     </ClInclude>
     <ClInclude Include="code\game\fanPlayerInput.h">
       <Filter>code\game</Filter>
+    </ClInclude>
+    <ClInclude Include="code\scene\fanPrefab.h">
+      <Filter>code\scene</Filter>
+    </ClInclude>
+    <ClInclude Include="code\scene\fanSceneInstantiate.h">
+      <Filter>code\scene</Filter>
+    </ClInclude>
+    <ClInclude Include="code\editor\fanEditorCopyPaste.h">
+      <Filter>code\editor</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

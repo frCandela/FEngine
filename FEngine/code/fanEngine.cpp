@@ -33,7 +33,7 @@
 #include "editor/windows/fanProfilerWindow.h"	
 #include "editor/components/fanFPSCamera.h"		
 #include "editor/fanImguiIcons.h"
-#include "editor/fanCopyPaste.h"
+#include "editor/fanEditorCopyPaste.h"
 #include "scene/fanScene.h"
 #include "scene/fanGameobject.h"
 #include "scene/fanRessourcePtr.h"
@@ -49,10 +49,12 @@
 #include "scene/components/fanRigidbody.h"
 #include "scene/components/fanSphereShape.h"
 #include "scene/components/ui/fanUIMeshRenderer.h"
+#include "scene/fanSceneInstantiate.h"
 #include "core/math/shapes/fanConvexHull.h"
 #include "core/time/fanProfiler.h"
 #include "ecs/fanECSManager.h"
 #include "physics/fanPhysicsManager.h"
+
 
 namespace fan {
 	Signal<Gameobject*> Engine::onGameobjectSelected;
@@ -123,6 +125,7 @@ namespace fan {
 		m_scene = new Scene( "mainScene", m_ecsManager, m_physicsManager );
 
 		// Initialize editor components
+		m_copyPaste			= new EditorCopyPaste(*this);
 		m_renderWindow		= new RenderWindow( m_renderer );
 		m_sceneWindow		= new SceneWindow( m_scene );
 		m_inspectorWindow	= new InspectorWindow();
@@ -133,7 +136,6 @@ namespace fan {
 		m_mainMenuBar		= new MainMenuBar( *m_scene, m_editorGrid );
 		m_mainMenuBar->SetWindows( { m_renderWindow , m_sceneWindow , m_inspectorWindow , m_consoleWindow, m_ecsWindow, m_profilerWindow, m_preferencesWindow } );
 
-		m_copyPaste = new CopyPaste();
 
 		// Instance messages		
 		Debug::Get().SetDebug( m_renderer );
@@ -144,15 +146,15 @@ namespace fan {
 		onGameobjectSelected.				Connect( &InspectorWindow::OnGameobjectSelected, m_inspectorWindow );
 		m_scene->onSceneLoad.				Connect( &SceneWindow::OnSceneLoad, m_sceneWindow );
 		m_scene->onSceneLoad.				Connect( &Engine::OnSceneLoad, this );
-		m_scene->onSceneClear.				Connect  ( &Renderer::Clear, m_renderer );
+		m_scene->onSceneClear.				Connect( &Renderer::Clear, m_renderer );
 		m_scene->onDeleteGameobject.		Connect( &Engine::OnGameobjectDeleted, this );
 
 		// Events linking
 		Input::Get().Manager().FindEvent( "reload_shaders" )->Connect(	&Renderer::ReloadShaders, m_renderer );
 		Input::Get().Manager().FindEvent( "delete" )->Connect(			&Engine::DeleteSelection, this );
 		Input::Get().Manager().FindEvent( "play_pause" )->Connect(		&Engine::SwitchPlayPause, this );
-		Input::Get().Manager().FindEvent( "copy" )->Connect(			&Engine::OnCopy, this );
-		Input::Get().Manager().FindEvent( "paste" )->Connect(			&Engine::OnPaste, this );
+		Input::Get().Manager().FindEvent( "copy" )->Connect(			&EditorCopyPaste::OnCopy, m_copyPaste );
+		Input::Get().Manager().FindEvent( "paste" )->Connect(			&EditorCopyPaste::OnPaste, m_copyPaste );
 		Input::Get().Manager().FindEvent( "show_ui" )->Connect(			&Engine::OnToogleShowUI, this );
 
 		// Static messages		
@@ -184,7 +186,6 @@ namespace fan {
 		delete m_scene;
 		delete m_physicsManager;
 		delete m_ecsManager;
-		delete m_copyPaste;
 
 		// Serialize editor positions
 		const Window * window = m_renderer->GetWindow();
@@ -566,6 +567,33 @@ namespace fan {
 	//================================================================================================================================
 	//================================================================================================================================
 	void Engine::ManageSelection() {
+
+
+
+
+		ImGui::Begin( "prefab" );
+		{
+			static std::fs::path path;
+			if ( ImGui::Button( "Set" ) )
+			{
+				ImGui::OpenPopup("load prefab");
+				path = "content/prefab";
+			}
+
+			if ( ImGui::FanLoadFileModal( "load prefab", GlobalValues::s_prefabExtensions, path ) )
+			{
+				Debug::Log() << path.string() << Debug::Endl();
+			}
+			ImGui::Text(path.string().c_str());
+		} ImGui::End();
+
+
+
+
+
+
+
+
 		SCOPED_PROFILE( selection )
 
 		bool mouseCaptured = ImGui::GetIO().WantCaptureMouse;
@@ -845,8 +873,5 @@ namespace fan {
 		}
 	}
 
-	//================================================================================================================================
-	//================================================================================================================================
-	void Engine::OnCopy() { m_copyPaste->Copy(m_selectedGameobject); }
-	void Engine::OnPaste(){ m_copyPaste->Paste(m_scene, m_selectedGameobject );}
+
 }

@@ -3,7 +3,6 @@
 #include "core/fanSignal.h"
 #include "core/fanISerializable.h"
 
-
 namespace fan
 {
 	class Gameobject;
@@ -11,6 +10,7 @@ namespace fan
 	class Actor;
 	class EcsManager;
 	class PhysicsManager;
+	class SceneInstantiate;
 
 	template< typename _RessourceType, typename _IDType > class RessourcePtr;
 	using GameobjectPtr = RessourcePtr<Gameobject, uint64_t>;
@@ -65,11 +65,16 @@ namespace fan
 
 		void					InsertID( const uint64_t _id, Gameobject * _gameobject );
 		void					EraseID( const uint64_t _id ) { m_gameobjects.erase( _id ); }
+
+		SceneInstantiate&		Instantiate() { return *m_instantiate; };
+
 	private:
 		// Data
 		std::string	m_name;
 		std::string	m_path;
 		uint64_t	m_nextUniqueID = 1;
+
+		SceneInstantiate * m_instantiate;
 
 		// References
 		Gameobject *			m_root;

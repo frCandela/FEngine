@@ -12,6 +12,7 @@
 #include "core/time/fanScopedTimer.h"
 #include "core/time/fanProfiler.h"
 #include "scene/fanComponentPtr.h"
+#include "scene/fanSceneInstantiate.h"
 
 namespace fan
 {
@@ -24,6 +25,7 @@ namespace fan
 		, m_root(nullptr) 
 		, m_ecsManager(_ecsManager)
 		, m_physicsManager( _physicsManager )
+		, m_instantiate( new SceneInstantiate(*this))
 	{
 
 		Actor::onActorAttach.Connect(&Scene::OnActorAttach, this);

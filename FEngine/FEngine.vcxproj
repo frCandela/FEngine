@@ -117,8 +117,8 @@
     <ClCompile Include="code\ecs\fanEcsManager.cpp" />
     <ClCompile Include="code\ecs\fanEcsSystems.cpp" />
     <ClCompile Include="code\editor\components\fanFPSCamera.cpp" />
-    <ClCompile Include="code\editor\fanCopyPaste.cpp" />
     <ClCompile Include="code\editor\fanDragnDrop.cpp" />
+    <ClCompile Include="code\editor\fanEditorCopyPaste.cpp" />
     <ClCompile Include="code\editor\fanEditorGrid.cpp" />
     <ClCompile Include="code\editor\fanImguiIcons.cpp" />
     <ClCompile Include="code\editor\fanMainMenuBar.cpp" />
@@ -192,8 +192,10 @@
     <ClCompile Include="code\scene\components\ui\fanUIMeshRenderer.cpp" />
     <ClCompile Include="code\scene\fanComponentPtr.cpp" />
     <ClCompile Include="code\scene\fanGameobject.cpp" />
+    <ClCompile Include="code\scene\fanPrefab.cpp" />
     <ClCompile Include="code\scene\fanRessourcePtr.cpp" />
     <ClCompile Include="code\scene\fanScene.cpp" />
+    <ClCompile Include="code\scene\fanSceneInstantiate.cpp" />
     <ClCompile Include="deps\imgui\imgui.cpp" />
     <ClCompile Include="deps\imgui\imgui_demo.cpp" />
     <ClCompile Include="deps\imgui\imgui_draw.cpp" />
@@ -244,8 +246,8 @@
     <ClInclude Include="code\ecs\fanEcsManager.h" />
     <ClInclude Include="code\ecs\fanEcsSystems.h" />
     <ClInclude Include="code\editor\components\fanFPSCamera.h" />
-    <ClInclude Include="code\editor\fanCopyPaste.h" />
     <ClInclude Include="code\editor\fanDragnDrop.h" />
+    <ClInclude Include="code\editor\fanEditorCopyPaste.h" />
     <ClInclude Include="code\editor\fanEditorGrid.h" />
     <ClInclude Include="code\editor\fanImguiIcons.h" />
     <ClInclude Include="code\editor\fanMainMenuBar.h" />
@@ -319,8 +321,10 @@
     <ClInclude Include="code\scene\components\ui\fanUIMeshRenderer.h" />
     <ClInclude Include="code\scene\fanComponentPtr.h" />
     <ClInclude Include="code\scene\fanGameobject.h" />
+    <ClInclude Include="code\scene\fanPrefab.h" />
     <ClInclude Include="code\scene\fanRessourcePtr.h" />
     <ClInclude Include="code\scene\fanScene.h" />
+    <ClInclude Include="code\scene\fanSceneInstantiate.h" />
     <ClInclude Include="deps\bitset2\bitset2.hpp" />
     <ClInclude Include="deps\bitset2\detail\array2array.hpp" />
     <ClInclude Include="deps\bitset2\detail\array2u_long_t.hpp" />

@@ -1,5 +1,5 @@
 #include "fanGlobalIncludes.h"
-#include "editor/fanCopyPaste.h"
+#include "scene/fanSceneInstantiate.h"
 
 #include "scene/fanGameobject.h"
 #include "scene/components/fanComponent.h"
@@ -7,46 +7,28 @@
 namespace fan
 {
 	//================================================================================================================================
-	// Copy gameobject to clipboard
 	//================================================================================================================================
-	void CopyPaste::Copy( const Gameobject * _gameobject )
-	{
-		if ( _gameobject != nullptr )
-		{
-			Json objectJson;
-			_gameobject->Save( objectJson );
-
-			std::stringstream ss;
-			ss << objectJson;
-
-			ImGui::SetClipboardText( ss.str().c_str() );
-		}
-	}
+	SceneInstantiate::SceneInstantiate( Scene & _scene ) : m_scene( _scene ) {}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void CopyPaste::Paste( Scene * _scene, Gameobject * _parentGameobject )
+	void  SceneInstantiate::InstanciateJson( Json& _json, Gameobject * _parent )
 	{
 		m_newGameobjectPtr.clear();
 		m_newComponentPtr.clear();
 		m_remapTable.clear();
-		m_scene = _scene;
 
-		Gameobject::s_setIDfailed.Connect( &CopyPaste::OnSetIDFailed, this );
-		GameobjectPtr::s_onCreateUnresolved.Connect ( &CopyPaste::OnGameobjectPtrCreate, this );
-		ComponentIDPtr::s_onCreateUnresolved.Connect( &CopyPaste::OnComponentIDPtrCreate, this );
+		Gameobject::s_setIDfailed.Connect( &SceneInstantiate::OnSetIDFailed, this );
+		GameobjectPtr::s_onCreateUnresolved.Connect ( &SceneInstantiate::OnGameobjectPtrCreate, this );
+		ComponentIDPtr::s_onCreateUnresolved.Connect( &SceneInstantiate::OnComponentIDPtrCreate, this );
 
 		// Load gameobject
-		std::stringstream ss;
-		ss << ImGui::GetClipboardText();
-		Json objectJson;
-		ss >> objectJson;
-		Gameobject * gameobject = _scene->CreateGameobject( "tmp", _parentGameobject, false );
-		gameobject->Load( objectJson );
+		Gameobject * gameobject = m_scene.CreateGameobject( "tmp", _parent, false );
+		gameobject->Load( _json );
 
-		Gameobject::s_setIDfailed.Disconnect( &CopyPaste::OnSetIDFailed, this );
-		GameobjectPtr::s_onCreateUnresolved.Disconnect( &CopyPaste::OnGameobjectPtrCreate, this );
-		ComponentIDPtr::s_onCreateUnresolved.Disconnect( &CopyPaste::OnComponentIDPtrCreate, this );
+		Gameobject::s_setIDfailed.Disconnect( &SceneInstantiate::OnSetIDFailed, this );
+		GameobjectPtr::s_onCreateUnresolved.Disconnect( &SceneInstantiate::OnGameobjectPtrCreate, this );
+		ComponentIDPtr::s_onCreateUnresolved.Disconnect( &SceneInstantiate::OnComponentIDPtrCreate, this );
 
 		ResolvePointers();
 	}
@@ -54,7 +36,7 @@ namespace fan
 	//================================================================================================================================
 	// Resolves component & gameobject pointers
 	//================================================================================================================================
-	void  CopyPaste::ResolvePointers()
+	void  SceneInstantiate::ResolvePointers()
 	{
 		// Resolves gameobjects
 		for ( int goPtrIndex = 0; goPtrIndex < m_newGameobjectPtr.size(); goPtrIndex++ )
@@ -63,7 +45,7 @@ namespace fan
 
 			auto it = m_remapTable.find( ptr->GetID() );
 			const uint64_t index = ( it != m_remapTable.end() ? it->second : ptr->GetID() );
-			Gameobject * gameobject = m_scene->FindGameobject( index );
+			Gameobject * gameobject = m_scene.FindGameobject( index );
 			assert( gameobject != nullptr );
 			*ptr = GameobjectPtr( gameobject, index );
 		}
@@ -75,7 +57,7 @@ namespace fan
 
 			auto it = m_remapTable.find( ptr->GetID().gameobjectID );
 			const uint64_t index = ( it != m_remapTable.end() ? it->second : ptr->GetID().gameobjectID );
-			Gameobject * gameobject = m_scene->FindGameobject( index );
+			Gameobject * gameobject =m_scene.FindGameobject( index );
 			assert( gameobject != nullptr );
 			Component * component = gameobject->GetComponent( ptr->GetID().componentID );
 			*ptr = ComponentIDPtr( component, IDPtrData( index, ptr->GetID().componentID ) );
@@ -85,18 +67,18 @@ namespace fan
 	//================================================================================================================================
 	// Saves the duplicates ids for future remap
 	//================================================================================================================================
-	void CopyPaste::OnSetIDFailed( uint64_t _id, Gameobject * _gameobject )
+	void SceneInstantiate::OnSetIDFailed( uint64_t _id, Gameobject * _gameobject )
 	{
 		assert( _id != 0 );
-		const uint64_t remapID = m_scene->GetUniqueID();
+		const uint64_t remapID = m_scene.GetUniqueID();
 		_gameobject->SetUniqueID( remapID );
 		m_remapTable[_id] = remapID;
-		Debug::Log() << "remapped id " << _id << " to id " << remapID << Debug::Endl();
+		//Debug::Log() << "remapped id " << _id << " to id " << remapID << Debug::Endl();
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void CopyPaste::OnGameobjectPtrCreate( GameobjectPtr * _ptr )
+	void SceneInstantiate::OnGameobjectPtrCreate( GameobjectPtr * _ptr )
 	{
 		if ( _ptr->GetID() != 0 )
 		{
@@ -106,7 +88,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void CopyPaste::OnComponentIDPtrCreate( ComponentIDPtr * _ptr )
+	void SceneInstantiate::OnComponentIDPtrCreate( ComponentIDPtr * _ptr )
 	{
 		if ( _ptr->GetID().gameobjectID != 0 )
 		{
