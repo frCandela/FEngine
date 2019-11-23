@@ -99,7 +99,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	bool Material::Load( Json & _json ) {
+	bool Material::Load( const Json & _json ) {
 		LoadUInt  ( _json, "shininess", m_material->shininess );
 		LoadColor ( _json, "color", m_material->color );
 		LoadTexturePtr(_json, "material", m_material->texture );

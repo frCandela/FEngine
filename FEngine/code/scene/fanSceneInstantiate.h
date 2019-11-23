@@ -18,8 +18,8 @@ namespace fan
 	public:
 		SceneInstantiate( Scene & _scene );
 
-		bool  InstantiateJson(	 Json& _json, Gameobject * _parent );
-		bool  InstanciatePrefab( Prefab& _prefab, Gameobject * _parent );
+		Gameobject *  InstantiateJson(	 const Json& _json, Gameobject * _parent );
+		Gameobject *  InstanciatePrefab( const Prefab& _prefab, Gameobject * _parent );
 
 	private:
 		Scene& m_scene;

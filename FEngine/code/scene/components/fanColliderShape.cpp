@@ -36,7 +36,7 @@ namespace fan {
 
 	//================================================================================================================================
 	//================================================================================================================================
-	bool ColliderShape::Load( Json & /*_json*/ ) {
+	bool ColliderShape::Load( const Json & /*_json*/ ) {
 		// 		if (!ReadSegmentHeader(_in, "isEnabled:")) { return false; }
 		// 		if (!ReadBool(_in, m_isEnabled)) { return false; }
 		return true;

@@ -37,7 +37,7 @@ namespace fan
 		DECLARE_TYPE_INFO(Camera, Component );
 	protected:
 		void OnAttach() override;
-		bool Load( Json & _json ) override;
+		bool Load( const Json & _json ) override;
 		bool Save( Json & _json ) const override;
 
 	private:

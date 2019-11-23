@@ -26,7 +26,7 @@ namespace fan
 		ImGui::IconType GetIcon() const override { return ImGui::IconType::GAME_MANAGER; }
 
 		// ISerializable
-		bool Load( Json & _json ) override;
+		bool Load( const Json & _json ) override;
 		bool Save( Json & _json ) const override;
 
 		DECLARE_TYPE_INFO( PlayerInput, Component );

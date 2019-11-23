@@ -110,12 +110,12 @@ namespace fan {
 
 	//================================================================================================================================
 	//================================================================================================================================
-	bool InputManager::Load( Json & _json ) {
+	bool InputManager::Load( const Json & _json ) {
 		{// Events
 			size_t index = 0;
-			Json& jEvents = _json["events"];
+			const Json& jEvents = _json["events"];
 			for ( size_t eventIndex = 0; eventIndex < jEvents.size(); ++eventIndex ) {
-				Json& jEvent_i = jEvents[index];
+				const Json& jEvent_i = jEvents[index];
 
 				std::string name;
 				KeyboardEvent keyEvent;
@@ -134,9 +134,9 @@ namespace fan {
 
 		{ // Axis
 			size_t index = 0;
-			Json& jAxis = _json["axis"];
+			const Json& jAxis = _json["axis"];
 			for ( size_t axisIndex = 0; axisIndex < jAxis.size(); ++axisIndex ) {
-				Json& jAxis_i = jAxis[index];
+				const Json& jAxis_i = jAxis[index];
 				
 				Axis axis;
 				axis.Load( jAxis_i );

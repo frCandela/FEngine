@@ -13,12 +13,12 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	bool  SceneInstantiate::InstanciatePrefab( Prefab& _prefab, Gameobject * _parent )
+	Gameobject * SceneInstantiate::InstanciatePrefab( const Prefab& _prefab, Gameobject * _parent )
 	{
 		if ( _prefab.IsEmpty() )
 		{
 			Debug::Warning() << "Failed to instantiate prefab" << Debug::Endl();
-			return false;
+			return nullptr;
 		}
 		else
 		{
@@ -28,7 +28,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	bool  SceneInstantiate::InstantiateJson( Json& _json, Gameobject * _parent )
+	Gameobject *  SceneInstantiate::InstantiateJson( const Json& _json, Gameobject * _parent )
 	{
 		m_newGameobjectPtr.clear();
 		m_newComponentPtr.clear();
@@ -48,7 +48,7 @@ namespace fan
 
 		ResolvePointers();
 
-		return true;
+		return gameobject;
 	}
 
 	//================================================================================================================================

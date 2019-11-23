@@ -33,7 +33,7 @@ namespace fan {
 		std::map< std::string, KeyboardEvent >&	GetListKeyboardEvents() { return m_keyboardEvents; }
 
 		void PullEvents();
-		bool Load( Json & _json ) override;
+		bool Load( const Json & _json ) override;
 		bool Save( Json & _json ) const override;
 
 	private:

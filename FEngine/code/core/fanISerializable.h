@@ -19,7 +19,7 @@ namespace fan {
 	//================================================================================================================================
 	class ISerializable {
 	public:
-		virtual bool Load( Json & _json ) = 0;
+		virtual bool Load( const Json & _json ) = 0;
 		virtual bool Save( Json & _json ) const = 0;
 
 		static void SaveVec2			( Json & _json, const char * _name, const btVector2&	  _vec2 );
@@ -40,26 +40,26 @@ namespace fan {
 		static void SaveComponentPtr	( Json & _json, const char * _name, const ComponentIDPtr& _ptr );
 		
 
-		static bool LoadVec2			( Json & _json, const char * _name, btVector2&			_outVec2 );
-		static bool LoadVec3			( Json & _json, const char * _name, btVector3&			_outVec3 );
-		static bool LoadVec4			( Json & _json, const char * _name, btVector4&			_outVec4 );
-		static bool LoadQuat			( Json & _json, const char * _name, btQuaternion&		_outQuat );
-		static bool LoadColor			( Json & _json, const char * _name, Color&				_outColor );
-		static bool LoadFloat			( Json & _json, const char * _name, float&				_outFloat );
-		static bool LoadInt				( Json & _json, const char * _name, int&				_outInt );
-		static bool LoadUInt			( Json & _json, const char * _name, unsigned&			_outUInt );
-		static bool LoadUInt64			( Json & _json, const char * _name, uint64_t&			_outUInt64 );
-		static bool LoadBool			( Json & _json, const char * _name, bool&				_outBool );
-		static bool LoadString			( Json & _json, const char * _name, std::string&		_outString );
-		static bool LoadGameobjectPtr	( Json & _json, const char * _name, GameobjectPtr&		_outPtr );
-		static bool LoadTexturePtr		( Json & _json, const char * _name, TexturePtr&			_outPtr );
-		static bool LoadMeshPtr			( Json & _json, const char * _name, MeshPtr&			_outPtr );
-		static bool LoadPrefabPtr		( Json & _json, const char * _name, PrefabPtr&			_outPtr );
-		static bool LoadComponentPtr	( Json & _json, const char * _name, ComponentIDPtr&		_outPtr  );
+		static bool LoadVec2			( const Json & _json, const char * _name, btVector2&			_outVec2 );
+		static bool LoadVec3			( const Json & _json, const char * _name, btVector3&			_outVec3 );
+		static bool LoadVec4			( const Json & _json, const char * _name, btVector4&			_outVec4 );
+		static bool LoadQuat			( const Json & _json, const char * _name, btQuaternion&		_outQuat );
+		static bool LoadColor			( const Json & _json, const char * _name, Color&				_outColor );
+		static bool LoadFloat			( const Json & _json, const char * _name, float&				_outFloat );
+		static bool LoadInt				( const Json & _json, const char * _name, int&				_outInt );
+		static bool LoadUInt			( const Json & _json, const char * _name, unsigned&			_outUInt );
+		static bool LoadUInt64			( const Json & _json, const char * _name, uint64_t&			_outUInt64 );
+		static bool LoadBool			( const Json & _json, const char * _name, bool&				_outBool );
+		static bool LoadString			( const Json & _json, const char * _name, std::string&		_outString );
+		static bool LoadGameobjectPtr	( const Json & _json, const char * _name, GameobjectPtr&		_outPtr );
+		static bool LoadTexturePtr		( const Json & _json, const char * _name, TexturePtr&			_outPtr );
+		static bool LoadMeshPtr			( const Json & _json, const char * _name, MeshPtr&			_outPtr );
+		static bool LoadPrefabPtr		( const Json & _json, const char * _name, PrefabPtr&			_outPtr );
+		static bool LoadComponentPtr	( const Json & _json, const char * _name, ComponentIDPtr&		_outPtr  );
 
-		static bool ContainsToken( Json & _json, const char * _name );
+		static bool ContainsToken( const Json & _json, const char * _name );
 
 	private:
-		static Json * FindToken	( Json & _json, const char * _name );
+		static const Json * FindToken	( const Json & _json, const char * _name );
 	};
 }

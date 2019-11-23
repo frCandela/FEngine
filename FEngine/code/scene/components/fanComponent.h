@@ -41,7 +41,7 @@ namespace fan
 		Gameobject * const m_gameobject = nullptr;
 
 		bool Save( Json & _json ) const override;
-		bool Load( Json & _json ) override;
+		bool Load( const Json & _json ) override;
 
 	private:
 		bool m_isBeingDeleted : 1;

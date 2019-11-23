@@ -34,7 +34,7 @@ namespace fan
 		void OnAttach() override;
 		void OnDetach() override;
 		void OnDisable() override;
-		bool Load( Json & _json ) override;
+		bool Load( const Json & _json ) override;
 		bool Save( Json & _json ) const override;
 
 	private:

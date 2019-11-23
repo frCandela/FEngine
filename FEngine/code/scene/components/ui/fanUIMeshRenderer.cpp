@@ -133,7 +133,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	bool UIMeshRenderer::Load( Json & _json )
+	bool UIMeshRenderer::Load( const Json & _json )
 	{
 		LoadColor(		_json,"color",			m_color);
 		LoadTexturePtr(	_json, "texture_path",  m_texture );

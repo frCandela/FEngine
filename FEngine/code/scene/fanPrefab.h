@@ -20,9 +20,9 @@ namespace fan
 		void		SetPath( const std::string _path ){ m_path = _path; }
 		std::string GetPath( ) const { return m_path; }
 
-		Json& GetData() { return m_json["prefab"]; }
+		const Json& GetData() const { return m_json["prefab"]; }
 
-		bool IsEmpty() { return ! m_json.contains("prefab"); }
+		bool IsEmpty() const { return ! m_json.contains("prefab"); }
 
 	private:
 		 Json m_json;

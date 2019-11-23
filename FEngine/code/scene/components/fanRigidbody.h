@@ -38,7 +38,7 @@ namespace fan {
 
 		DECLARE_TYPE_INFO( Rigidbody, Component );
 	protected:
-		bool Load( Json & _json ) override;
+		bool Load( const Json & _json ) override;
 		bool Save( Json & _json ) const override;
 
 		void OnAttach() override;

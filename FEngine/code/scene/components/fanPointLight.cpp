@@ -134,7 +134,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	bool PointLight::Load( Json & _json ) {
+	bool PointLight::Load( const Json & _json ) {
 
 		LoadColor( _json, "ambiant", m_pointLight->ambiant );
 		LoadColor( _json, "diffuse", m_pointLight->diffuse );

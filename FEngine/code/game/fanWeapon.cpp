@@ -109,6 +109,11 @@ namespace fan
 	//================================================================================================================================
 	void Weapon::FireBullet()
 	{
+		if ( *m_bulletPrefab != nullptr )
+		{
+			Debug::Log("toto");
+		}
+
 		Transform * thisTransform = m_gameobject->GetTransform();
 
 		Gameobject * bulletGO = m_gameobject->GetScene()->CreateGameobject( "bullet", m_gameobject );
@@ -180,7 +185,7 @@ namespace fan
 	 
 	//================================================================================================================================
 	//================================================================================================================================
-	bool Weapon::Load( Json & _json )
+	bool Weapon::Load( const Json & _json )
 	{
 		Actor::Load( _json );
 		LoadPrefabPtr(	_json, "bulletPrefab", m_bulletPrefab );

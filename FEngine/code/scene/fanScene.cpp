@@ -39,6 +39,7 @@ namespace fan
 	}
 
 	//================================================================================================================================
+	// Creates a game object and adds it to the scene hierarchy
 	//================================================================================================================================
 	Gameobject *	Scene::CreateGameobject(const std::string _name, Gameobject * _parent, const bool _generateID) {
 		if (_parent == nullptr) {
@@ -50,7 +51,18 @@ namespace fan
 		return gameobject;
 	}
 
+	
 	//================================================================================================================================
+	// Creates a game object from a prefab and adds it to the scene hierarchy
+	//================================================================================================================================
+	Gameobject * Scene::CreateGameobject( const Prefab& _prefab,  Gameobject * _parent, const bool /*_generateID*/  )
+	{
+		Gameobject* gameobject = m_instantiate->InstanciatePrefab(_prefab, _parent );
+		return gameobject;
+	}
+
+	//================================================================================================================================
+	// Deletes a gameobject and removes it from the scene hierarchy at the end of the frame
 	//================================================================================================================================
 	void Scene::DeleteGameobject(Gameobject* _gameobject ) {
 		m_entitiesToDelete.push_back(_gameobject );
@@ -322,11 +334,11 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	bool Scene::Load( Json & _json ) {
+	bool Scene::Load( const Json & _json ) {
 		//ScopedTimer timer("load scene");
 
 		// Parameters
-		Json & jParameters = _json["parameters"]; {
+		const Json & jParameters = _json["parameters"]; {
 			LoadString( jParameters , "name" , m_name );
 			LoadString( jParameters, "path", m_path );
 		}
@@ -334,7 +346,7 @@ namespace fan
 		// Gameobjects
 		GameobjectPtr::s_onCreateUnresolved.Connect ( &Scene::OnGameobjectPtrCreate, this );
 		ComponentIDPtr::s_onCreateUnresolved.Connect( &Scene::OnResolveComponentIDPtr, this );
-		Json & jGameobjects = _json["gameobjects"]; {
+		const Json & jGameobjects = _json["gameobjects"]; {
 			m_root = CreateGameobject( "root", nullptr, false );
 			m_root->Load( jGameobjects );
 		}

@@ -297,7 +297,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	bool Gameobject::Load( Json & _json ) {
+	bool Gameobject::Load( const Json & _json ) {
 
 		LoadString( _json, "name", m_name );
 		LoadUInt( _json, "flags", m_flags->flags );
@@ -306,9 +306,9 @@ namespace fan
 		LoadUInt64( _json, "unique_id", tmp );
 		SetUniqueID( tmp );
 
-		Json& jComponents = _json["components"]; {
+		const Json& jComponents = _json["components"]; {
 			for ( int childIndex = 0; childIndex < jComponents.size(); childIndex++ ) {
-				Json& jComponent_i = jComponents[childIndex]; {
+				const Json& jComponent_i = jComponents[childIndex]; {
 					unsigned componentID = 0;
 					LoadUInt( jComponent_i, "id", componentID );
 
@@ -325,9 +325,9 @@ namespace fan
 				}
 			}
 		}
-		Json& jchilds = _json["childs"]; {
+		const Json& jchilds = _json["childs"]; {
 			for (int childIndex = 0; childIndex < jchilds.size(); childIndex++)	{
-				Json& jchild_i = jchilds[childIndex]; {
+				const Json& jchild_i = jchilds[childIndex]; {
 					Gameobject * child = m_scene->CreateGameobject( "tmp", this, false );
 					child->Load( jchild_i );
 				}

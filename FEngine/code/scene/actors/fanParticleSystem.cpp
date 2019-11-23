@@ -89,7 +89,7 @@ namespace fan {
 
 	//================================================================================================================================
 	//================================================================================================================================
-	bool ParticleSystem::Load( Json & _json ) {
+	bool ParticleSystem::Load( const Json & _json ) {
 		Actor::Load( _json );
 
 		LoadInt(   _json, "particles_per_second", m_particlesPerSecond );

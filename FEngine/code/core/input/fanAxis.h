@@ -30,7 +30,7 @@ namespace fan
 		std::string				GetKeyPositiveName() const;
 		std::string				GetKeyNegativeName() const;
 		
-		bool  Load( Json & _json ) override;
+		bool  Load( const Json & _json ) override;
 		bool  Save( Json & _json ) const override;
 		
 		void  SetFromKeyboardKeys( const Keyboard::Key _keyPositive, const Keyboard::Key _keyNegative );

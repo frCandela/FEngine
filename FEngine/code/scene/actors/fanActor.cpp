@@ -44,7 +44,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	bool Actor::Load( Json & /*_json*/ ) {
+	bool Actor::Load( const Json & /*_json*/ ) {
 // 		if (!ReadSegmentHeader(_in, "isEnabled:")) { return false; }
 // 		if (!ReadBool(_in, m_isEnabled)) { return false; }
 		return true;

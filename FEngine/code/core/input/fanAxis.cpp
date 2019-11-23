@@ -34,7 +34,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	bool Axis::Load( Json & _json )
+	bool Axis::Load( const Json & _json )
 	{
 		int type = -1;
 		if ( LoadInt( _json, "type", type ) && ( type == Type::JOYSTICK_AXIS || type == Type::KEYBOARD || type == Type::JOYSTICK_BUTTONS ) )

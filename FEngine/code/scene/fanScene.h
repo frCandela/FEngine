@@ -31,8 +31,9 @@ namespace fan
 		Scene( const std::string _name, EcsManager * _ecsManager, PhysicsManager * _physicsManager );
 		~Scene();
 
-		Gameobject *					CreateGameobject(const std::string _name, Gameobject * _parent = nullptr, const bool _generateID = true );	// Creates a game object and adds it to the scene hierarchy
-		void							DeleteGameobject(Gameobject* _gameobject);										// Deletes a gameobject and removes it from the scene hierarchy at the end of the frame
+		Gameobject *					CreateGameobject( const std::string _name, Gameobject * _parent = nullptr, const bool _generateID = true );	
+		Gameobject *					CreateGameobject( const Prefab& _prefab,  Gameobject * _parent = nullptr, const bool _generateID = true );	
+		void							DeleteGameobject(Gameobject* _gameobject);										
 		std::vector < Gameobject * >	BuildEntitiesList() const;
 
 		template<typename _componentType> _componentType *				 FindComponentOfType() const;
@@ -99,7 +100,7 @@ namespace fan
 		void ResolveGameobjectPointers( );
 		void OnResolveComponentIDPtr( ComponentIDPtr * _ptr );
 
-		bool Load( Json & _json ) override;
+		bool Load( const Json & _json ) override;
 		bool Save( Json& _json ) const override;
 		void Clear();
 

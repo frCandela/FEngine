@@ -36,7 +36,7 @@ namespace fan
 		ImGui::IconType GetIcon() const override { return ImGui::IconType::TRANSFORM; }
 
 		// ISerializable
-		bool Load( Json & _json ) override;
+		bool Load( const Json & _json ) override;
 		bool Save( Json & _json ) const override;
 
 		DECLARE_TYPE_INFO(Transform, Component );

@@ -61,7 +61,7 @@ namespace fan
 
 		// ISerializable
 		bool Save( Json & _json ) const override; 
-		bool Load( Json & _json ) override;
+		bool Load( const Json & _json ) override;
 		void CopyDataFrom( Json & _json );
 
 		// Flags

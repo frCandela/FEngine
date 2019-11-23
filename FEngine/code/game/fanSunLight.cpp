@@ -52,7 +52,7 @@ namespace fan {
 
 	//================================================================================================================================
 	//================================================================================================================================
-	bool SunLight::Load( Json & _json) {
+	bool SunLight::Load( const Json & _json) {
 		Actor::Load(_json);
 		LoadFloat( _json, "radius", ecsSolarEruptionMeshSystem::s_radius );
 		LoadFloat( _json, "sub_angle", ecsSolarEruptionMeshSystem::s_subAngle );

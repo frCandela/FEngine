@@ -96,7 +96,7 @@ namespace fan {
 
 	//================================================================================================================================
 	//================================================================================================================================
-	bool DirectionalLight::Load( Json & _json ) {
+	bool DirectionalLight::Load( const Json & _json ) {
 		LoadColor( _json, "ambiant", m_dirLight->ambiant );
 		LoadColor( _json, "diffuse", m_dirLight->diffuse );
 		LoadColor( _json, "specular", m_dirLight->specular );

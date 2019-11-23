@@ -63,7 +63,7 @@ namespace fan {
 
 	//================================================================================================================================
 	//================================================================================================================================
-	bool CameraController::Load( Json & _json ) {
+	bool CameraController::Load( const Json & _json ) {
 		Actor::Load(_json);
 			
 		LoadFloat( _json, "height_from_target", m_heightFromTarget );
