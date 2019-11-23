@@ -19,6 +19,7 @@
 #include "core/input/fanKeyboard.h"
 #include "core/input/fanMouse.h"
 #include "core/time/fanProfiler.h"
+#include "renderer/fanRessourceManager.h"
 #include "editor/fanModals.h"
 
 namespace fan
@@ -303,6 +304,13 @@ namespace fan
 			std::ofstream outStream( m_pathBuffer.string() );
 			if ( outStream.is_open() )
 			{
+				// Try to update the existing prefab if it exists
+				Prefab * prefab = RessourceManager::Get().FindPrefab( m_pathBuffer.string() );
+				if ( prefab != nullptr )
+				{
+					prefab->LoadFromGameobject(m_lastGameobjectRightClicked);
+				}
+
 				Json json;
 				Json& prefabJson = json["prefab"];
 				if ( m_lastGameobjectRightClicked->Save( prefabJson ) )

@@ -23,6 +23,7 @@ namespace fan
 		const Json& GetJson() const { return m_json; }
 
 		bool IsEmpty() const { return ! m_json.contains("prefab"); }
+		void Clear( ) { m_json = Json(); } 
 
 	private:
 		 Json m_json;

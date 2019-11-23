@@ -16,7 +16,7 @@ namespace fan
 	//================================================================================================================================
 	bool Prefab::LoadFromJson( const Json& _json )
 	{
-		assert( IsEmpty() );
+		Clear();
 
 		if ( _json.contains( "prefab" ) )
 		{
@@ -34,6 +34,8 @@ namespace fan
 	//================================================================================================================================
 	bool Prefab::LoadFromFile( const std::string& _path )
 	{
+		Clear();
+
 		std::ifstream inStream(_path);
 		if ( inStream.is_open() && inStream.good() )
 		{
@@ -63,7 +65,7 @@ namespace fan
 	//================================================================================================================================
 	void Prefab::LoadFromGameobject( const Gameobject * _gameobject )
 	{
-		assert( IsEmpty() );
+		Clear();
 
 		Json& prefabJson = m_json["prefab"];
 		if( ! _gameobject->Save( prefabJson ) )
