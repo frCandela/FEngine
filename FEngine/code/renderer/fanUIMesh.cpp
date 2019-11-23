@@ -10,27 +10,18 @@ namespace fan
 	REGISTER_TYPE_INFO( UIMesh, TypeInfo::Flags::NONE )
 
 	Signal< UIMesh* > UIMesh::s_onGenerateVulkanData;
-	Signal< > UIMesh::s_onMeshDelete;
+	Signal< UIMesh* > UIMesh::s_onDeleteVulkanData;
 
 	//================================================================================================================================
 	//================================================================================================================================
 	UIMesh::UIMesh(  ) :
 		m_vertices( 0 )
 		, m_vertexBuffer { nullptr ,nullptr ,nullptr }
-	{
-
-	}
+	{}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	UIMesh::~UIMesh()
-	{
-		s_onMeshDelete.Emmit();
-		for ( int bufferIndex = 0; bufferIndex < 3; bufferIndex++ )
-		{
-			delete m_vertexBuffer[bufferIndex];
-		}
-	}
+	UIMesh::~UIMesh(){ s_onDeleteVulkanData.Emmit( this ); }
 
 	//================================================================================================================================
 	//================================================================================================================================
@@ -92,6 +83,16 @@ namespace fan
 			VkCommandBuffer cmd2 = _device.BeginSingleTimeCommands();
 			stagingBuffer2.CopyBufferTo( cmd2, vertexBuffer->GetBuffer(), requiredVertexSize );
 			_device.EndSingleTimeCommands( cmd2 );			
+		}
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
+	void UIMesh::DeleteVulkanData( Device & /*_device*/ )
+	{
+		for ( int bufferIndex = 0; bufferIndex < 3; bufferIndex++ )
+		{
+			delete m_vertexBuffer[bufferIndex];
 		}
 	}
 }

@@ -14,8 +14,8 @@ namespace fan
 	//================================================================================================================================
 	ImguiPipeline::ImguiPipeline(Device& _device, const int _swapchainImagesCount) :
 		m_device(_device)
-		, m_fontTexture(new Texture(_device))
-		, m_iconsTexture( new Texture( _device ) )
+		, m_fontTexture(new Texture())
+		, m_iconsTexture( new Texture())
 		, m_sampler(new Sampler(_device))
 	{
 		m_vertexBuffers.reserve(_swapchainImagesCount);

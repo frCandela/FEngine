@@ -14,7 +14,7 @@ namespace fan {
 	class Mesh : public Ressource {
 	public:
 		static Signal< Mesh* > s_onGenerateVulkanData;
-		static Signal<> s_onMeshDelete;
+		static Signal< Mesh*>  s_onDeleteVulkanData;
 
 		Mesh();
 		~Mesh();
@@ -35,6 +35,8 @@ namespace fan {
 		void SetAutoUpdateHull( const bool _autoUpdateHull ) { m_autoUpdateHull = _autoUpdateHull; }
 
 		void GenerateVulkanData( Device & _device );
+		void DeleteVulkanData( Device & _device );
+
 		bool LoadFromFile( const std::string& _path ) override ;
 		bool LoadFromVertices( const std::vector<Vertex>&	_vertices );
 		DECLARE_TYPE_INFO(Mesh, void )

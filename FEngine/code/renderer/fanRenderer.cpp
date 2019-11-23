@@ -43,14 +43,15 @@ namespace fan
 		m_swapchain->Create(m_window->GetSurface(), _size);
 		Input::Get().Setup(m_window->GetWindow());            
             
+		RessourceManager::Get().Init( m_device );
+
 		CreateRenderPass();
 		CreateRenderPassPostprocess();
 
 		CreateQuadVertexBuffer();
 		CreateSwapchainFramebuffers();
 		CreateForwardFramebuffers();
-
-		RessourceManager::Get().Init( m_device );
+		
 		m_samplerTextures = new Sampler( *m_device );
 		m_samplerTextures->CreateSampler( 0, 8, VK_FILTER_LINEAR );
 		m_samplerDescriptorTextures = new DescriptorSampler( *m_device, m_samplerTextures->GetSampler() );

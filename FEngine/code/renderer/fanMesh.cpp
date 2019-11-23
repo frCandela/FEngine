@@ -11,7 +11,7 @@ namespace fan {
 	REGISTER_TYPE_INFO(Mesh, TypeInfo::Flags::NONE)
 
 	Signal< Mesh* > Mesh::s_onGenerateVulkanData;
-	Signal< > Mesh::s_onMeshDelete;
+	Signal< Mesh* > Mesh::s_onDeleteVulkanData;
 
 	//================================================================================================================================
 	//================================================================================================================================
@@ -20,19 +20,11 @@ namespace fan {
 		, m_indices( 0 )
 		, m_vertexBuffer { nullptr ,nullptr ,nullptr }
 		, m_indexBuffer { nullptr ,nullptr ,nullptr }
-	{
-
-	}
+	{}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	Mesh::~Mesh() {
-		s_onMeshDelete.Emmit();
-		for (int bufferIndex = 0; bufferIndex < 3 ; bufferIndex++) {
-			delete m_indexBuffer[bufferIndex];
-			delete m_vertexBuffer[bufferIndex];
-		}
-	}
+	Mesh::~Mesh() { s_onDeleteVulkanData.Emmit( this ); }
 
 	//================================================================================================================================
 	//================================================================================================================================
@@ -181,6 +173,17 @@ namespace fan {
 				stagingBuffer2.CopyBufferTo( cmd2, vertexBuffer->GetBuffer(), requiredVertexSize );
 				_device.EndSingleTimeCommands( cmd2 );
 			}
+		}
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
+	void Mesh::DeleteVulkanData( Device & /*_device*/ )
+	{
+		for ( int bufferIndex = 0; bufferIndex < 3; bufferIndex++ )
+		{
+			delete m_indexBuffer[bufferIndex];
+			delete m_vertexBuffer[bufferIndex];
 		}
 	}
 

@@ -164,17 +164,13 @@ namespace fan {
 		MeshPtr::s_onCreateUnresolved.				Connect	( &Engine::OnResolveMeshPtr, this );
 		GameobjectPtr::s_onSetFromSelection.	    Connect ( &Engine::OnSetGameobjectPtrFromSelection, this );
 		PrefabPtr::s_onCreateUnresolved.			Connect ( &Engine::OnResolvePrefabPtr, this );
-		Mesh::s_onGenerateVulkanData.							Connect	( &RessourceManager::OnLoadMesh, & RessourceManager::Get() );
-		Mesh::s_onMeshDelete.						Connect	( &Renderer::WaitIdle, m_renderer ); // hack
-		UIMesh::s_onGenerateVulkanData.						Connect	( &RessourceManager::OnLoadUIMesh, & RessourceManager::Get() );
-		UIMesh::s_onMeshDelete.						Connect	( &Renderer::WaitIdle, m_renderer ); // hack		
+	
 		MeshRenderer::onRegisterMeshRenderer.		Connect	( &Engine::RegisterMeshRenderer, this );
 		MeshRenderer::onUnRegisterMeshRenderer.		Connect	( &Engine::UnRegisterMeshRenderer, this );
 		PointLight::onPointLightAttach.				Connect	( &Engine::RegisterPointLight,	 this );
 		PointLight::onPointLightDetach.				Connect	( &Engine::UnRegisterPointLight, this );
 		DirectionalLight::onDirectionalLightAttach. Connect	( &Engine::RegisterDirectionalLight,   this );
 		DirectionalLight::onDirectionalLightDetach. Connect	( &Engine::UnRegisterDirectionalLight, this );
-		
 
 		m_scene->New();
 		m_scene->onSetMainCamera.Connect( &Engine::SetMainCamera, this );		

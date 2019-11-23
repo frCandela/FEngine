@@ -15,7 +15,7 @@ namespace fan
 	{
 	public:
 		static Signal< UIMesh* > s_onGenerateVulkanData;
-		static Signal<> s_onMeshDelete;
+		static Signal< UIMesh* > s_onDeleteVulkanData;
 
 		UIMesh();
 		~UIMesh();
@@ -29,6 +29,7 @@ namespace fan
 		bool LoadFromVertices( const std::vector<UIVertex>&	_vertices );
 		bool LoadFromFile( const std::string& _path ) override;
 		void GenerateVulkanData( Device & _device );
+		void DeleteVulkanData( Device & _device );
 
 		DECLARE_TYPE_INFO( UIMesh, void )
 	private:

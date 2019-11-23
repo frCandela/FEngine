@@ -22,21 +22,13 @@ namespace fan
 		void Init( Device* _device );
 		void Delete();
 
-		// Mesh
-		Mesh *	FindMesh( const std::string _path );
-		Mesh *	LoadMesh( const std::string _path );
-		void	OnLoadMesh( Mesh * _mesh );
+		Mesh *		FindMesh	( const std::string& _path );
+		Texture *	FindTexture	( const std::string& _path);
+		Prefab *	FindPrefab	( const std::string& _path );
 
-		// UI Mesh
-		void	OnLoadUIMesh( UIMesh * _mesh );		
-
-		// Texture
-		Texture *	FindTexture(const std::string _path);
-		Texture *	LoadTexture(const std::string _path);
-
-		// Prefab
-		Prefab *	FindPrefab( const std::string& _path );
-		Prefab *	LoadPrefab( const std::string& _path );
+		Mesh *		LoadMesh	( const std::string& _path );		
+		Texture *	LoadTexture	( const std::string& _path);
+		Prefab *	LoadPrefab	( const std::string& _path );
 
 		bool IsModified() const { return m_modified; }
 		void SetUnmodified() { m_modified = false; }
@@ -52,9 +44,20 @@ namespace fan
 		std::vector< Texture * > m_textures;
 		bool					 m_modified = false;
 
-		void		RegisterPrefab( Prefab * _prefab );
-		void		RegisterMesh(	Mesh * _mesh );
-		void		RegisterUIMesh( UIMesh * _mesh );
+		void RegisterPrefab( Prefab * _prefab );
+		void RegisterMesh( Mesh * _mesh );
+		void RegisterUIMesh( UIMesh * _mesh );
+
+		// Vulkan data generation
+		void OnGenerateUIMesh( UIMesh * _mesh );
+		void OnGenerateMesh( Mesh * _mesh );
+		void OnGenerateTexture( Texture * _texture );
+
+		// Vulkan data generation
+		void OnDeleteUIMesh( UIMesh * _mesh );
+		void OnDeleteMesh( Mesh * _mesh );
+		void OnDeleteTexture( Texture * _texture );
+
 		std::string CleanPath( const std::string& _path );
 	};
 }

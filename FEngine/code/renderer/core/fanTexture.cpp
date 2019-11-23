@@ -12,18 +12,12 @@
 
 namespace fan
 {
-	//================================================================================================================================
-	//================================================================================================================================
-	Texture::Texture(Device & _device) :
-		m_device(_device) {
-
-	}
+	Signal< Texture* >	Texture::s_onGenerateVulkanData;
+	Signal< Texture* >	Texture::s_onDeleteVulkanData;
 
 	//================================================================================================================================
 	//================================================================================================================================
-	Texture::~Texture() {
-		Destroy();
-	}
+	Texture::~Texture(){ s_onDeleteVulkanData.Emmit( this ); }
 
 	//================================================================================================================================
 	//================================================================================================================================
@@ -60,12 +54,13 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void Texture::GenerateMipmaps(VkCommandBuffer _commandBuffer, VkFormat _imageFormat, int32_t _texWidth, int32_t _texHeight, uint32_t _mipLevels) {
+	void Texture::GenerateMipmaps(Device & _device, VkCommandBuffer _commandBuffer, VkFormat _imageFormat, int32_t _texWidth, int32_t _texHeight, uint32_t _mipLevels) {
 		// Check if image format supports linear blitting
 		VkFormatProperties formatProperties;
-		vkGetPhysicalDeviceFormatProperties(m_device.vkPhysicalDevice, _imageFormat, &formatProperties);
-		if (!(formatProperties.optimalTilingFeatures & VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT))
+		vkGetPhysicalDeviceFormatProperties(_device.vkPhysicalDevice, _imageFormat, &formatProperties);
+		if (!(formatProperties.optimalTilingFeatures & VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT)){
 			throw std::runtime_error("texture image format does not support linear blitting!");
+		}
 
 		VkImageMemoryBarrier barrier = {};
 		barrier.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
@@ -150,26 +145,26 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void Texture::Destroy() {
+	void Texture::DeleteVulkanData(  Device & _device ) {
 		if (m_deviceMemory != VK_NULL_HANDLE) {
-			vkFreeMemory(m_device.vkDevice, m_deviceMemory, nullptr);
+			vkFreeMemory(_device.vkDevice, m_deviceMemory, nullptr);
 			m_deviceMemory = VK_NULL_HANDLE;
 		}
 
 		if (m_imageView != VK_NULL_HANDLE) {
-			vkDestroyImageView(m_device.vkDevice, m_imageView, nullptr);
+			vkDestroyImageView(_device.vkDevice, m_imageView, nullptr);
 			m_imageView = VK_NULL_HANDLE;
 		}
 
 		if (m_image != VK_NULL_HANDLE) {
-			vkDestroyImage(m_device.vkDevice, m_image, nullptr);
+			vkDestroyImage(_device.vkDevice, m_image, nullptr);
 			m_image = VK_NULL_HANDLE;
 		}
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void Texture::CreateImage(VkExtent2D _extent, uint32_t _mipLevels, VkFormat _format, VkImageTiling _tiling, VkImageUsageFlags _usage, VkMemoryPropertyFlags _properties)
+	void Texture::CreateImage( Device & _device, VkExtent2D _extent, uint32_t _mipLevels, VkFormat _format, VkImageTiling _tiling, VkImageUsageFlags _usage, VkMemoryPropertyFlags _properties)
 	{
 		m_mipLevels = _mipLevels;
 
@@ -189,30 +184,30 @@ namespace fan
 		imageInfo.samples = VK_SAMPLE_COUNT_1_BIT;
 		imageInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
 
-		if (vkCreateImage(m_device.vkDevice, &imageInfo, nullptr, &m_image) != VK_SUCCESS)
+		if (vkCreateImage( _device.vkDevice, &imageInfo, nullptr, &m_image) != VK_SUCCESS)
 			throw std::runtime_error("failed to create image!");
 
 		Debug::Get() << Debug::Severity::log << std::hex << "VkImage               " << m_image << std::dec << Debug::Endl();
 
 		// Allocate memory for the image
 		VkMemoryRequirements memRequirements;
-		vkGetImageMemoryRequirements(m_device.vkDevice, m_image, &memRequirements);
+		vkGetImageMemoryRequirements( _device.vkDevice, m_image, &memRequirements);
 
 		VkMemoryAllocateInfo allocInfo = {};
 		allocInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
 		allocInfo.allocationSize = memRequirements.size;
-		allocInfo.memoryTypeIndex = m_device.FindMemoryType(memRequirements.memoryTypeBits, _properties);
+		allocInfo.memoryTypeIndex = _device.FindMemoryType(memRequirements.memoryTypeBits, _properties);
 
-		if (vkAllocateMemory(m_device.vkDevice, &allocInfo, nullptr, &m_deviceMemory) != VK_SUCCESS)
+		if (vkAllocateMemory(_device.vkDevice, &allocInfo, nullptr, &m_deviceMemory) != VK_SUCCESS)
 			throw std::runtime_error("failed to allocate image memory!");
 		Debug::Get() << Debug::Severity::log << std::hex << "VkDeviceMemory        " << m_deviceMemory << std::dec << Debug::Endl();
 
-		vkBindImageMemory(m_device.vkDevice, m_image, m_deviceMemory, 0);
+		vkBindImageMemory( _device.vkDevice, m_image, m_deviceMemory, 0);
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void Texture::CreateImageView(VkFormat _format, VkImageViewType _viewType, VkImageSubresourceRange _subresourceRange)
+	void Texture::CreateImageView( Device & _device, VkFormat _format, VkImageViewType _viewType, VkImageSubresourceRange _subresourceRange)
 	{
 		VkImageViewCreateInfo viewInfo = {};
 		viewInfo.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
@@ -221,7 +216,7 @@ namespace fan
 		viewInfo.format = _format;
 		viewInfo.subresourceRange = _subresourceRange;
 
-		if (vkCreateImageView(m_device.vkDevice, &viewInfo, nullptr, &m_imageView) != VK_SUCCESS)
+		if (vkCreateImageView( _device.vkDevice, &viewInfo, nullptr, &m_imageView) != VK_SUCCESS)
 			throw std::runtime_error("failed to create texture image view!");
 
 		Debug::Get() << Debug::Severity::log << std::hex << "VkImageView           " << m_imageView << std::dec << Debug::Endl();
@@ -230,7 +225,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void Texture::TransitionImageLayout(VkCommandBuffer _commandBuffer, VkImageLayout _oldLayout, VkImageLayout _newLayout, VkImageSubresourceRange _subresourceRange)
+	void Texture::TransitionImageLayout( VkCommandBuffer _commandBuffer, VkImageLayout _oldLayout, VkImageLayout _newLayout, VkImageSubresourceRange _subresourceRange)
 	{
 		// Synchronize access to resources
 		VkImageMemoryBarrier barrier = {};
@@ -301,7 +296,7 @@ namespace fan
 		m_mipLevels = static_cast<uint32_t>(std::floor(std::log2(std::max(texWidth, texHeight)))) + 1;
 		m_mipLevels = 1;
 
-		SetData(pixels, texWidth, texHeight, m_mipLevels);
+		SetData( pixels, texWidth, texHeight, m_mipLevels);
 
 		stbi_image_free(pixels);
 
@@ -310,39 +305,47 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void Texture::SetData(const void* _data, const uint32_t _width, const uint32_t _height, const uint32_t _mipLevels) {
+	void Texture::SetData( const unsigned char * _data, const uint32_t _width, const uint32_t _height, const uint32_t _mipLevels) {
 		m_mipLevels = _mipLevels;
 		m_width = _width;
 		m_height = _height;
-		VkDeviceSize imageSize = _width * _height * 4 * sizeof(char);
+		m_data = new unsigned char[_width*_height*4];
+		memcpy( m_data, _data, _width * _height * 4 * sizeof( unsigned char) );
+		s_onGenerateVulkanData.Emmit( this );
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
+	void Texture::GenerateVulkanData( Device & _device )
+	{
+		VkDeviceSize imageSize = m_width * m_height * 4 * sizeof( unsigned char);
 
 		// Create a buffer in host visible memory
-		Buffer stagingBuffer(m_device);
+		Buffer stagingBuffer(_device);
 		stagingBuffer.Create(imageSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
-		stagingBuffer.SetData(_data, imageSize);
+		stagingBuffer.SetData(m_data, imageSize);
 
 		// Create the image in Vulkan
-		VkExtent2D extent = { _width, _height };
-		CreateImage(extent, m_mipLevels, VK_FORMAT_R8G8B8A8_UNORM, VK_IMAGE_TILING_OPTIMAL, VK_IMAGE_USAGE_TRANSFER_SRC_BIT | VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
+		VkExtent2D extent = { m_width, m_height };
+		CreateImage(_device, extent, m_mipLevels, VK_FORMAT_R8G8B8A8_UNORM, VK_IMAGE_TILING_OPTIMAL, VK_IMAGE_USAGE_TRANSFER_SRC_BIT | VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
 
 		// Transitioned to VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL while generating mipmaps
-
 		VkImageSubresourceRange subresourceRange = { VK_IMAGE_ASPECT_COLOR_BIT , 0, m_mipLevels, 0, 1 };
 
-		VkCommandBuffer cmd = m_device.BeginSingleTimeCommands();
+		VkCommandBuffer cmd = _device.BeginSingleTimeCommands();
 		TransitionImageLayout(cmd, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, subresourceRange);
-		CopyBufferToImage(cmd, stagingBuffer.GetBuffer(), static_cast<uint32_t>(_width), static_cast<uint32_t>(_height));
+		CopyBufferToImage(cmd, stagingBuffer.GetBuffer(), static_cast<uint32_t>(m_width), static_cast<uint32_t>(m_height));
 
 		if (m_mipLevels > 1) {
-			GenerateMipmaps(cmd, VK_FORMAT_R8G8B8A8_UNORM, _width, _height, m_mipLevels);
+			GenerateMipmaps(_device, cmd, VK_FORMAT_R8G8B8A8_UNORM, m_width, m_height, m_mipLevels);
 		}
 		else {
 			TransitionImageLayout(cmd, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, subresourceRange);
 		}
 
 		// Creates the image View
-		CreateImageView(VK_FORMAT_R8G8B8A8_UNORM, VK_IMAGE_VIEW_TYPE_2D, { VK_IMAGE_ASPECT_COLOR_BIT, 0, m_mipLevels, 0, 1 });
+		CreateImageView(_device, VK_FORMAT_R8G8B8A8_UNORM, VK_IMAGE_VIEW_TYPE_2D, { VK_IMAGE_ASPECT_COLOR_BIT, 0, m_mipLevels, 0, 1 });
 
-		m_device.EndSingleTimeCommands(cmd);
+		_device.EndSingleTimeCommands(cmd);
 	}
 }
