@@ -82,7 +82,6 @@ namespace fan
 		PostprocessPipeline *	GetPostprocessPipeline() { return m_postprocessPipeline; }
 		ForwardPipeline *		GetForwardPipeline() { return m_forwardPipeline; }
 		glm::vec4				GetClearColor() const { return m_clearColor; }
-		RessourceManager *		GetRessourceManager() const { return m_ressourceManager; }
 
 		void SetClearColor(glm::vec4 _color) { m_clearColor = _color; }
 		void SetMainCamera( const glm::mat4 _projection, const glm::mat4 _view, const glm::vec3 _position );
@@ -112,8 +111,6 @@ namespace fan
 	private:
 		std::vector< DrawData > m_meshDrawArray;
 		std::vector< UIDrawData > m_uiMeshDrawArray;
-
-		RessourceManager *  m_ressourceManager;
 
 		// DEBUG DATA
 		std::vector<DebugVertex>	m_debugLines;

@@ -20,17 +20,19 @@ namespace ImGui {
 		 DECL_ICON (32.f, 0,0 )	// NONE
 
 		 // EDITOR
-		 ,DECL_ICON ( 32.f, 0, 1 ) // RENDERER
-		 ,DECL_ICON ( 32.f, 1, 1 ) // IMAGE
-		 ,DECL_ICON ( 32.f, 2, 1 ) // INSPECTOR
-		 ,DECL_ICON ( 32.f, 3, 1 ) // PREFERENCES
-		 ,DECL_ICON ( 32.f, 4, 1 ) // CONSOLE
-		 ,DECL_ICON ( 32.f, 5, 1 ) // ECS
-		 ,DECL_ICON ( 32.f, 6, 1 ) // IMGUI
-		 ,DECL_ICON ( 32.f, 7, 1 ) // PROFILER
-		 ,DECL_ICON ( 32.f, 8, 1 ) // SCENE
-		 ,DECL_ICON ( 32.f, 9, 1 ) // GAMEOBJECT
-		 ,DECL_ICON ( 16.f, 0, 4 ) // GAMEOBJECT16
+		 ,DECL_ICON ( 32.f, 0,  1 )  // RENDERER
+		 ,DECL_ICON ( 32.f, 1,  1 )  // IMAGE
+		 ,DECL_ICON ( 32.f, 2,  1 )  // INSPECTOR
+		 ,DECL_ICON ( 32.f, 3,  1 )  // PREFERENCES
+		 ,DECL_ICON ( 32.f, 4,  1 )  // CONSOLE
+		 ,DECL_ICON ( 32.f, 5,  1 )  // ECS
+		 ,DECL_ICON ( 32.f, 6,  1 )  // IMGUI
+		 ,DECL_ICON ( 32.f, 7,  1 )  // PROFILER
+		 ,DECL_ICON ( 32.f, 8,  1 )  // SCENE
+		 ,DECL_ICON ( 32.f, 9,  1 )  // GAMEOBJECT
+		 ,DECL_ICON ( 16.f, 0,  4 )  // GAMEOBJECT16
+		 ,DECL_ICON ( 32.f, 10, 1 )  // PREFAB32
+		 ,DECL_ICON ( 16.f, 1,  4 )  // PREFAB16
 		
 		// COMPONENTS
 		, DECL_ICON ( 32.f, 0, 3 ) // CAMERA

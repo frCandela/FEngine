@@ -162,9 +162,11 @@ namespace fan {
 		// Static messages		
 		TexturePtr::s_onCreateUnresolved.			Connect ( &Engine::OnResolveTexturePtr, this );
 		MeshPtr::s_onCreateUnresolved.				Connect	( &Engine::OnResolveMeshPtr, this );
-		Mesh::s_onMeshLoad.							Connect	( &RessourceManager::OnLoadMesh, m_renderer->GetRessourceManager() );
+		GameobjectPtr::s_onSetFromSelection.	    Connect ( &Engine::OnSetGameobjectPtrFromSelection, this );
+		PrefabPtr::s_onCreateUnresolved.			Connect ( &Engine::OnResolvePrefabPtr, this );
+		Mesh::s_onMeshLoad.							Connect	( &RessourceManager::OnLoadMesh, & RessourceManager::Get() );
 		Mesh::s_onMeshDelete.						Connect	( &Renderer::WaitIdle, m_renderer ); // hack
-		UIMesh::s_onMeshLoad.						Connect	( &RessourceManager::OnLoadUIMesh, m_renderer->GetRessourceManager() );
+		UIMesh::s_onMeshLoad.						Connect	( &RessourceManager::OnLoadUIMesh, & RessourceManager::Get() );
 		UIMesh::s_onMeshDelete.						Connect	( &Renderer::WaitIdle, m_renderer ); // hack		
 		MeshRenderer::onRegisterMeshRenderer.		Connect	( &Engine::RegisterMeshRenderer, this );
 		MeshRenderer::onUnRegisterMeshRenderer.		Connect	( &Engine::UnRegisterMeshRenderer, this );
@@ -172,12 +174,10 @@ namespace fan {
 		PointLight::onPointLightDetach.				Connect	( &Engine::UnRegisterPointLight, this );
 		DirectionalLight::onDirectionalLightAttach. Connect	( &Engine::RegisterDirectionalLight,   this );
 		DirectionalLight::onDirectionalLightDetach. Connect	( &Engine::UnRegisterDirectionalLight, this );
-		GameobjectPtr::s_onSetFromSelection.	    Connect ( &Engine::OnSetGameobjectPtrFromSelection, this );
+		
 
 		m_scene->New();
-		m_scene->onSetMainCamera.Connect( &Engine::SetMainCamera, this );
-		Mesh * defaultMesh = m_renderer->GetRessourceManager()->LoadMesh(GlobalValues::s_defaultMesh);
-		m_renderer->GetRessourceManager()->SetDefaultMesh( defaultMesh );
+		m_scene->onSetMainCamera.Connect( &Engine::SetMainCamera, this );		
 	}
 
 	//================================================================================================================================
@@ -798,36 +798,49 @@ namespace fan {
 			}
 		}
 	}
-
-	//================================================================================================================================
-	//================================================================================================================================
-	void Engine::OnMaterialSetTexture( Material * _material, std::string _path ) {
-		RessourceManager * texturesManager = m_renderer->GetRessourceManager();
-		Texture * texture = texturesManager->FindTexture( _path );
-		if ( texture == nullptr ) {
-			texture = texturesManager->LoadTexture( _path );
-		}
-		_material->SetTexture( texture );
-	}
-
 	
 	//================================================================================================================================
 	//================================================================================================================================
 	void Engine::OnResolveTexturePtr( TexturePtr * _ptr )
 	{
-		RessourceManager * texturesManager = m_renderer->GetRessourceManager();
-		Texture * texture = texturesManager->FindTexture( _ptr->GetID() );
-		if ( texture == nullptr  ){	texture = texturesManager->LoadTexture( _ptr->GetID() ); }
-		if ( texture != nullptr  ){	*_ptr   = TexturePtr( texture, texture->GetPath() );	}
+		Texture * texture = RessourceManager::Get().FindTexture( _ptr->GetID() );
+		if ( texture == nullptr )
+		{
+			texture = RessourceManager::Get().LoadTexture( _ptr->GetID() );
+		}
+		if( texture ) {
+			*_ptr = TexturePtr( texture, texture->GetPath() );
+		}
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void Engine::OnResolveMeshPtr( MeshPtr * _ptr ) {
-		RessourceManager * ressourceManager = m_renderer->GetRessourceManager();
-		Mesh * mesh = ressourceManager->FindMesh( _ptr->GetID() );
-		if ( mesh == nullptr ) { mesh = ressourceManager->LoadMesh( _ptr->GetID() );	}
-		if ( mesh != nullptr  ){*_ptr   = MeshPtr( mesh, mesh->GetPath() ); }
+	void Engine::OnResolveMeshPtr( MeshPtr * _ptr )
+	{
+		Mesh * mesh = RessourceManager::Get().FindMesh( _ptr->GetID() );
+		if ( mesh == nullptr )
+		{
+			mesh = RessourceManager::Get().LoadMesh( _ptr->GetID() );
+		}
+		if( mesh ) {
+			*_ptr = MeshPtr( mesh, mesh->GetPath() );
+		}
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
+	void  Engine::OnResolvePrefabPtr( PrefabPtr * _ptr )
+	{
+		Prefab * prefab = RessourceManager::Get().FindPrefab( _ptr->GetID() );
+		if ( prefab == nullptr )
+		{
+			prefab = RessourceManager::Get().LoadPrefab( _ptr->GetID() );
+		}
+		if ( prefab )
+		{
+			*_ptr = PrefabPtr( prefab, prefab->GetPath() );
+		}
+		
 	}
 
 	//================================================================================================================================

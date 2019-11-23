@@ -7,6 +7,7 @@
 #include "scene/fanGameobject.h"
 #include "renderer/core/fanTexture.h"
 #include "renderer/fanMesh.h"
+#include "scene/fanPrefab.h"
 
 namespace ImGui
 {
@@ -188,6 +189,72 @@ namespace ImGui
 		}
 
 		if ( ImGui::FanLoadFileModal( modalName.c_str(), fan::GlobalValues::s_meshExtensions, m_pathBuffer ) )
+		{
+			_ptr->InitUnresolved( m_pathBuffer.string() );
+			returnValue = true;
+		}
+
+		ImGui::SameLine();
+		ImGui::Text( _label );
+
+		return returnValue;
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
+	bool FanPrefab( const char * _label, fan::PrefabPtr * _ptr )
+	{
+		bool returnValue = false;
+
+		fan::Prefab * prefab = **_ptr;
+		const std::string name = prefab == nullptr ? "null" : std::fs::path( prefab->GetPath() ).filename().string();
+
+		// Set button icon & modal
+		const std::string modalName = std::string( "Find prefab (" ) + _label + ")";
+		static std::fs::path m_pathBuffer;
+		bool openModal = false;
+		ImGui::PushID( _label );
+		{
+			if ( ImGui::ButtonIcon( ImGui::IconType::PREFAB16, { 16,16 } ) )
+			{
+
+				openModal = true;
+			}
+		} ImGui::PopID();
+		if ( openModal )
+		{
+			ImGui::OpenPopup( modalName.c_str() );
+			m_pathBuffer = "content/prefab";
+		}
+		ImGui::SameLine();
+
+		// name button 
+		const float width = 0.6f * ImGui::GetWindowWidth() - ImGui::GetCursorPosX() + 8;
+		ImGui::Button( name.c_str(), ImVec2( width, 0.f ) ); ImGui::SameLine();
+		ImGui::FanBeginDragDropSourcePrefab( prefab );
+
+		// tooltip
+		if ( prefab != nullptr )
+		{
+			ImGui::FanToolTip( prefab->GetPath().c_str() );
+		}
+
+		// dragndrop		
+		fan::Prefab * prefabDrop = ImGui::FanBeginDragDropTargetPrefab();
+		if ( prefabDrop )
+		{
+			( *_ptr ) = fan::PrefabPtr( prefabDrop, prefabDrop->GetPath() );
+			returnValue = true;
+		}
+
+		// Right click = clear
+		if ( ImGui::IsItemClicked( 1 ) )
+		{
+			( *_ptr ) = fan::PrefabPtr();
+			returnValue = true;
+		}
+
+		if ( ImGui::FanLoadFileModal( modalName.c_str(), fan::GlobalValues::s_prefabExtensions, m_pathBuffer ) )
 		{
 			_ptr->InitUnresolved( m_pathBuffer.string() );
 			returnValue = true;

@@ -63,8 +63,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void ForwardPipeline::CreateDescriptors( const size_t _numSwapchainImages,  RessourceManager * const _ressourceManager ) {
-		m_ressourceManager = _ressourceManager;
+	void ForwardPipeline::CreateDescriptors( const size_t _numSwapchainImages ) {
 		
 		m_sceneDescriptor = new Descriptor( m_device, _numSwapchainImages );
 		m_sceneDescriptor->SetUniformBinding		( VK_SHADER_STAGE_VERTEX_BIT,	sizeof( VertUniforms ) );

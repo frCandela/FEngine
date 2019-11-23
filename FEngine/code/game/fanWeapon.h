@@ -33,6 +33,7 @@ namespace fan
 		PlayerInput * m_input;
 
 		// Bullets parameters
+		PrefabPtr m_bulletPrefab;
 		float m_lifeTime = 1.f;
 		float m_scale = 0.2f;
 		float m_speed = 0.2f;

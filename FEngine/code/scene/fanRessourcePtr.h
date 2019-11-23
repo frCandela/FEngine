@@ -5,6 +5,7 @@ namespace fan
 	class Gameobject;
 	class Texture;
 	class Mesh;
+	class Prefab;
 
 	//================================================================================================================================
 	//================================================================================================================================
@@ -67,6 +68,7 @@ namespace fan
 	using GameobjectPtr = RessourcePtr<Gameobject, uint64_t>;
 	using TexturePtr = RessourcePtr<Texture, std::string >;
 	using MeshPtr = RessourcePtr<Mesh, std::string >;
+	using PrefabPtr =  RessourcePtr<Prefab, std::string >;
 }
 
 //================================================================================================================================
@@ -77,4 +79,5 @@ namespace ImGui
 	bool FanGameobject( const char * _label, fan::GameobjectPtr * _ptr );
 	bool FanTexture( const char * _label, fan::TexturePtr * _ptr );
 	bool FanMesh( const char * _label, fan::MeshPtr * _ptr );
+	bool FanPrefab( const char * _label,  fan::PrefabPtr * _ptr );
 }

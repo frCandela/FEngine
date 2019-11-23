@@ -6,6 +6,7 @@
 #include "renderer/core/fanTexture.h"
 #include "renderer/fanMesh.h"
 #include "scene/components/fanComponent.h"
+#include "scene/fanPrefab.h"
 
 namespace ImGui
 {
@@ -107,6 +108,39 @@ namespace ImGui
 			ImGui::EndDragDropTarget();
 		}
 		return _mesh;
+	}
+
+	//================================================================================================================================
+//================================================================================================================================
+	void FanBeginDragDropSourcePrefab( fan::Prefab * _prefab, ImGuiDragDropFlags _flags )
+	{
+		if ( _prefab != nullptr )
+		{
+			if ( ImGui::BeginDragDropSource( _flags ) )
+			{
+				ImGui::SetDragDropPayload( "dragndrop_prefab", &_prefab, sizeof( fan::Prefab** ) );
+				ImGui::Icon( ImGui::IconType::PREFAB16, { 16,16 } ); ImGui::SameLine();
+				ImGui::Text( ( _prefab->GetPath() ).c_str() );
+				ImGui::EndDragDropSource();
+			}
+		}
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
+	fan::Prefab * FanBeginDragDropTargetPrefab()
+	{
+		fan::Prefab * _prefab = nullptr;
+		if ( ImGui::BeginDragDropTarget() )
+		{
+			if ( const ImGuiPayload* payload = ImGui::AcceptDragDropPayload( "dragndrop_prefab" ) )
+			{
+				assert( payload->DataSize == sizeof( fan::Prefab** ) );
+				_prefab = *( fan::Prefab** )payload->Data;
+			}
+			ImGui::EndDragDropTarget();
+		}
+		return _prefab;
 	}
 
 	//================================================================================================================================

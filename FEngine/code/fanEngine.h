@@ -30,11 +30,13 @@ namespace fan {
 	class Texture;
 	class Mesh;
 	class EditorCopyPaste;
+	class Prefab;
 
 	template< typename _RessourceType, typename _IDType > class RessourcePtr;
 	using GameobjectPtr = RessourcePtr<Gameobject, uint64_t >;
 	using TexturePtr  = RessourcePtr<Texture, std::string >;
 	using MeshPtr  = RessourcePtr<Mesh, std::string >;
+	using PrefabPtr  = RessourcePtr<Prefab, std::string >;
 
 	//================================================================================================================================
 	//================================================================================================================================	
@@ -122,9 +124,9 @@ namespace fan {
 		void SwitchPlayPause();
 
 		void OnSceneLoad(Scene * _scene);
-		void OnMaterialSetTexture( Material * _material, std::string _path );
 		void OnResolveTexturePtr( TexturePtr * _ptr );
 		void OnResolveMeshPtr( MeshPtr * _ptr );
+		void OnResolvePrefabPtr( PrefabPtr * _ptr );
 		void OnToogleShowUI() { m_showUI = ! m_showUI; }
 
 		void OnGameobjectDeleted( Gameobject * _gameobject );

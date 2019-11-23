@@ -1,12 +1,13 @@
 #include "fanGlobalIncludes.h"
-
 #include "fanISerializable.h"
+
+#include "scene/components/fanComponent.h"
 #include "scene/fanRessourcePtr.h"
 #include "scene/fanGameobject.h"
+#include "scene/fanComponentPtr.h"
+#include "scene/fanPrefab.h"
 #include "renderer/core/fanTexture.h"
 #include "renderer/fanMesh.h"
-#include "scene/fanComponentPtr.h"
-#include "scene/components/fanComponent.h"
 
 namespace fan {
 
@@ -107,6 +108,13 @@ namespace fan {
 	//================================================================================================================================
 	//================================================================================================================================
 	void ISerializable::SaveMeshPtr ( Json & _json, const char * _name, const MeshPtr& _ptr )
+	{
+		_json[_name] = *_ptr != nullptr ? _ptr->GetPath() : "";
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
+	void  ISerializable::SavePrefabPtr ( Json & _json, const char * _name, const PrefabPtr&	  _ptr )
 	{
 		_json[_name] = *_ptr != nullptr ? _ptr->GetPath() : "";
 	}
@@ -291,6 +299,19 @@ namespace fan {
 	//================================================================================================================================
 	//================================================================================================================================
 	bool ISerializable::LoadMeshPtr( Json & _json, const char * _name, MeshPtr&	_outPtr )
+	{
+		Json * token = FindToken( _json, _name );
+		if ( token != nullptr )
+		{
+			_outPtr.InitUnresolved( *token );
+			return true;
+		}
+		return false;
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
+	bool ISerializable::LoadPrefabPtr( Json & _json, const char * _name, PrefabPtr&	_outPtr )
 	{
 		Json * token = FindToken( _json, _name );
 		if ( token != nullptr )

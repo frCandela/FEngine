@@ -24,10 +24,12 @@ namespace fan
 			
 			if ( m_json.contains("prefab") )
 			{
+				m_path = _path;
 				return true;
 			}
 			else
 			{
+				m_json = Json();
 				Debug::Warning()<< "file is not a prefab: " << _path << Debug::Endl();
 				return false;
 			}

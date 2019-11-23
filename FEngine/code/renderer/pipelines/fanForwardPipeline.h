@@ -96,7 +96,7 @@ namespace fan
 		void Resize( const VkExtent2D _extent ) override;
 		void BindDescriptors( VkCommandBuffer _commandBuffer, const size_t _indexFrame, const uint32_t _indexOffset );		
 		void UpdateUniformBuffers( const size_t _index = 0 ) override;
-		void CreateDescriptors( const size_t _numSwapchainImages, RessourceManager * const _ressourceManager );
+		void CreateDescriptors( const size_t _numSwapchainImages );
 		void ResizeDynamicDescriptors ( const size_t _newSize );
 		void ReloadShaders() override;		
 
@@ -105,7 +105,6 @@ namespace fan
 
 	private:
 		Descriptor *		 m_sceneDescriptor;
-		RessourceManager *	m_ressourceManager = nullptr;
 
 		DescriptorTextures*& m_textures;
 		DescriptorSampler *& m_sampler;

@@ -8,22 +8,26 @@
 #include "renderer/fanUIMesh.h"
 #include "core/fanSignal.h"
 #include "scene/fanGameobject.h"
+#include "scene/fanPrefab.h"
 
 namespace fan
 {
 	//================================================================================================================================
 	//================================================================================================================================
-	RessourceManager::RessourceManager(Device& _device) :
-		m_device(_device) {
+	void RessourceManager::Init( Device* _device ) 
+	{
+		m_device = _device;
 		m_textures.reserve(64);
 
+		LoadMesh(GlobalValues::s_defaultMesh);
 		LoadTexture(GlobalValues::s_defaultTexture);
 		SetUnmodified();
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	RessourceManager::~RessourceManager() {
+	void RessourceManager::Delete() 
+	{
 		for (int textureIndex = 0; textureIndex < m_textures.size(); textureIndex++) {
 			delete(m_textures[textureIndex]);
 		} m_textures.clear();
@@ -42,6 +46,8 @@ namespace fan
 	//================================================================================================================================
 	//================================================================================================================================
 	Texture * RessourceManager::LoadTexture(const std::string _path) {
+		if( _path.empty() ) { return nullptr; }
+
 		// Dont add the texture if it already exists
 		if (FindTexture(_path) != nullptr) {
 			Debug::Get() << Debug::Severity::warning << "Texture already added: " << _path << Debug::Endl();
@@ -49,7 +55,7 @@ namespace fan
 		}
 
 		// Add
-		Texture * texture = new Texture(m_device);
+		Texture * texture = new Texture(*m_device);
 		if (texture->LoadTexture(_path) == true) {
 			texture->SetRenderID(static_cast<int>(m_textures.size()));
 			m_textures.push_back(texture);
@@ -81,6 +87,8 @@ namespace fan
 	//================================================================================================================================
 	Mesh * RessourceManager::LoadMesh( const std::string _path )
 	{
+		if( _path.empty() ) { return nullptr; }
+
 		// Load
 		Mesh * mesh = new Mesh( CleanPath(_path) );
 		if ( mesh->Load() )
@@ -96,14 +104,14 @@ namespace fan
 	//================================================================================================================================
 	//================================================================================================================================
 	void RessourceManager::OnLoadMesh( Mesh * _mesh ) {
-		_mesh->GenerateBuffers( m_device );
+		_mesh->GenerateBuffers( *m_device );
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
 	void RessourceManager::OnLoadUIMesh( UIMesh * _mesh )
 	{
-		_mesh->GenerateBuffers( m_device );
+		_mesh->GenerateBuffers( *m_device );
 	}
 
 	//================================================================================================================================
@@ -123,7 +131,7 @@ namespace fan
 	//================================================================================================================================
 	void  RessourceManager::RegisterMesh(Mesh * _mesh) {
 		m_meshList.insert( _mesh );
-		_mesh->GenerateBuffers( m_device);
+		_mesh->GenerateBuffers( *m_device);
 	}
 
 	//================================================================================================================================
@@ -134,6 +142,42 @@ namespace fan
 	}
 
 	//================================================================================================================================
+	//================================================================================================================================
+	Prefab * RessourceManager::FindPrefab( const std::string& _path )
+	{
+		std::string path = CleanPath(_path);
+		auto it = m_prefabs.find( path );
+		return  it != m_prefabs.end() ? it->second : nullptr;
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
+	Prefab *  RessourceManager::LoadPrefab( const std::string& _path )
+	{
+		if( _path.empty() ) { return nullptr; }
+
+		// Load
+		Prefab * prefab = new Prefab();
+		if ( prefab->LoadFromFile( CleanPath( _path ) ) )
+		{
+			RegisterPrefab( prefab );
+			return prefab;
+		}
+		delete prefab;
+		return nullptr;
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
+	void RessourceManager::RegisterPrefab( Prefab * _prefab )
+	{
+		std::string path = CleanPath( _prefab->GetPath() );
+		assert( m_prefabs.find(path) == m_prefabs.end() );
+		m_prefabs[ path ] = _prefab;
+	}
+
+	//================================================================================================================================
+	// the / is dead, long live the \ 
 	//================================================================================================================================
 	std::string RessourceManager::CleanPath( const std::string& _path )
 	{

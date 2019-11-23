@@ -5,12 +5,15 @@ namespace fan {
 	class Gameobject;
 	class Texture;
 	class Mesh;
+	class Prefab;
 	struct IDPtrData;
 	template< typename _RessourceType, typename _IDType > class RessourcePtr;
 	using GameobjectPtr = RessourcePtr<Gameobject, uint64_t>;
 	using TexturePtr = RessourcePtr<Texture, std::string>;
 	using MeshPtr = RessourcePtr<Mesh, std::string>;
+	using PrefabPtr = RessourcePtr<Prefab, std::string>;
 	using ComponentIDPtr = RessourcePtr< Component, IDPtrData >;
+
 
 	//================================================================================================================================
 	//================================================================================================================================
@@ -33,7 +36,9 @@ namespace fan {
 		static void SaveGameobjectPtr	( Json & _json, const char * _name, const GameobjectPtr&  _ptr );
 		static void SaveTexturePtr	    ( Json & _json, const char * _name, const TexturePtr&	  _ptr );
 		static void SaveMeshPtr			( Json & _json, const char * _name, const MeshPtr&		  _ptr );
+		static void SavePrefabPtr		( Json & _json, const char * _name, const PrefabPtr&	  _ptr );
 		static void SaveComponentPtr	( Json & _json, const char * _name, const ComponentIDPtr& _ptr );
+		
 
 		static bool LoadVec2			( Json & _json, const char * _name, btVector2&			_outVec2 );
 		static bool LoadVec3			( Json & _json, const char * _name, btVector3&			_outVec3 );
@@ -49,6 +54,7 @@ namespace fan {
 		static bool LoadGameobjectPtr	( Json & _json, const char * _name, GameobjectPtr&		_outPtr );
 		static bool LoadTexturePtr		( Json & _json, const char * _name, TexturePtr&			_outPtr );
 		static bool LoadMeshPtr			( Json & _json, const char * _name, MeshPtr&			_outPtr );
+		static bool LoadPrefabPtr		( Json & _json, const char * _name, PrefabPtr&			_outPtr );
 		static bool LoadComponentPtr	( Json & _json, const char * _name, ComponentIDPtr&		_outPtr  );
 
 		static bool ContainsToken( Json & _json, const char * _name );

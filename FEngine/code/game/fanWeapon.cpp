@@ -144,6 +144,7 @@ namespace fan
 	{
 		ImGui::PushItemWidth( 0.6f * ImGui::GetWindowWidth() );
 		{
+			ImGui::FanPrefab("bullet prefab", &m_bulletPrefab );
 			ImGui::DragFloat( "scale ##wepoffset", &m_scale, 0.05f, 0.f, 1.f );
 			ImGui::DragFloat( "speed ##wepspeed", &m_speed, 0.1f, 0.f, 100.f );
 			ImGui::DragFloat3( "offset ##wepspeed", &m_offset[0] );
@@ -162,17 +163,18 @@ namespace fan
 	//================================================================================================================================
 	bool Weapon::Save( Json & _json ) const
 	{
-		Actor::Save( _json );
-		SaveFloat( _json, "scale", m_scale );  
-		SaveFloat( _json, "speed", m_speed );
-		SaveVec3( _json, "offset", m_offset );
-		SaveFloat( _json, "lifeTime", m_lifeTime );
-		SaveFloat( _json, "bullets_per_second", m_bulletsPerSecond );
-		SaveFloat( _json, "bullet_energy_cost", m_bulletEnergyCost );
+		Actor::Save(	_json );
 
-		SaveFloat( _json, "exposion_speed", m_exposionSpeed );
-		SaveFloat( _json, "explosion_time", m_explosionTime );
-		SaveInt( _json, "particlesPerExplosion", m_particlesPerExplosion );
+		SavePrefabPtr(	_json, "bulletPrefab", m_bulletPrefab );
+		SaveFloat(		_json, "scale", m_scale );  
+		SaveFloat(		_json, "speed", m_speed );
+		SaveVec3(		_json, "offset", m_offset );
+		SaveFloat(		_json, "lifeTime", m_lifeTime );
+		SaveFloat(		_json, "bullets_per_second", m_bulletsPerSecond );
+		SaveFloat(		_json, "bullet_energy_cost", m_bulletEnergyCost );
+		SaveFloat(		_json, "exposion_speed", m_exposionSpeed );
+		SaveFloat(		_json, "explosion_time", m_explosionTime );
+		SaveInt(		_json, "particlesPerExplosion", m_particlesPerExplosion );
 		return true;
 	}
 	 
@@ -181,6 +183,7 @@ namespace fan
 	bool Weapon::Load( Json & _json )
 	{
 		Actor::Load( _json );
+		LoadPrefabPtr(	_json, "bulletPrefab", m_bulletPrefab );
 		LoadFloat( _json,"scale", m_scale );
 		LoadFloat( _json,"speed", m_speed );
 		LoadVec3( _json, "offset", m_offset );

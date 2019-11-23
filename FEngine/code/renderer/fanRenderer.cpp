@@ -50,7 +50,7 @@ namespace fan
 		CreateSwapchainFramebuffers();
 		CreateForwardFramebuffers();
 
-		m_ressourceManager =  new RessourceManager( *m_device );
+		RessourceManager::Get().Init( m_device );
 		m_samplerTextures = new Sampler( *m_device );
 		m_samplerTextures->CreateSampler( 0, 8, VK_FILTER_LINEAR );
 		m_samplerDescriptorTextures = new DescriptorSampler( *m_device, m_samplerTextures->GetSampler() );
@@ -58,7 +58,7 @@ namespace fan
 
 		m_forwardPipeline = new ForwardPipeline(*m_device, m_imagesDescriptor, m_samplerDescriptorTextures );
 		m_forwardPipeline->Init( m_renderPass, m_swapchain->GetExtent(), "code/shaders/forward.vert", "code/shaders/forward.frag" );
-		m_forwardPipeline->CreateDescriptors( m_swapchain->GetSwapchainImagesCount(), m_ressourceManager );
+		m_forwardPipeline->CreateDescriptors( m_swapchain->GetSwapchainImagesCount() );
 		m_forwardPipeline->Create();
 
 		m_debugLinesPipeline = new DebugPipeline(*m_device, VK_PRIMITIVE_TOPOLOGY_LINE_LIST, true);
@@ -117,7 +117,8 @@ namespace fan
 		delete m_debugLinesPipelineNoDepthTest;
 		delete m_debugTrianglesPipeline;
 		delete m_uiPipeline;
-		delete m_ressourceManager;
+		
+		RessourceManager::Get().Delete();
 
 		delete m_samplerDescriptorTextures;
 		delete m_samplerDescriptorUI;
@@ -197,10 +198,10 @@ namespace fan
 
 		ImGui::GetIO().DisplaySize = ImVec2( static_cast<float>( m_swapchain->GetExtent().width ), static_cast<float>( m_swapchain->GetExtent().height ) );
 
-		if ( m_ressourceManager->IsModified() ) {
+		if ( RessourceManager::Get().IsModified() ) {
 			WaitIdle();
 			CreateTextureDescriptor();
-			m_ressourceManager->SetUnmodified();
+			RessourceManager::Get().SetUnmodified();
 		}
 
 		const uint32_t currentFrame = m_swapchain->GetCurrentFrame();
@@ -1240,7 +1241,7 @@ namespace fan
 	{
 		delete m_imagesDescriptor;
 
-		const std::vector< Texture * > & texture = m_ressourceManager->GetTextures();
+		const std::vector< Texture * > & texture = RessourceManager::Get().GetTextures();
 		m_imagesDescriptor = new  DescriptorTextures( *m_device, static_cast<uint32_t>( texture.size() ) );
 
 		std::vector< VkImageView > imageViews( texture.size() );

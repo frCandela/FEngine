@@ -27,19 +27,19 @@ namespace fan
 	void RenderWindow::OnGui() {
 		SCOPED_PROFILE( render )
 
-		RessourceManager * ressourceManager = m_renderer->GetRessourceManager();
+		RessourceManager & ressourceManager = RessourceManager::Get();
 
 		ImGui::Icon( GetIconType(), { 16,16 } ); ImGui::SameLine();
 		ImGui::Text("Renderer");
 
 		// Display mesh list
 		if ( ImGui::CollapsingHeader( "Loaded meshes : " ) ) {
-			for (Mesh * mesh : m_renderer->GetRessourceManager()->GetMeshList() ){
+			for (Mesh * mesh : ressourceManager.GetMeshList() ){
 				ImGui::Text( mesh->GetPath().c_str() );
 			}
 		}
 		// display textures list
-		const std::vector< Texture * > & textures = ressourceManager->GetTextures();
+		const std::vector< Texture * > & textures = ressourceManager.GetTextures();
 		if ( ImGui::CollapsingHeader( "Loaded textures : " ) ) {
 			for ( int textureIndex = 0; textureIndex < textures.size(); textureIndex++ ) {
 				const Texture * texture = textures[textureIndex];
