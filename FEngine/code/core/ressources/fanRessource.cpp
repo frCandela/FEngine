@@ -1,9 +1,13 @@
 #include "fanGlobalIncludes.h"
-
 #include "core/ressources/fanRessource.h"
 
-namespace fan {
-	//REGISTER_ABSTRACT_TYPE_INFO(Ressource)
+namespace fan
+{
 	//================================================================================================================================
 	//================================================================================================================================
+	bool Ressource::LoadFromFile( const std::string& _path )
+	{
+		m_path = _path; 
+		return true;
+	};
 }

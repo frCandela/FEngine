@@ -1,6 +1,7 @@
 #pragma once
 
 #include "core/ressources/fanRessource.h"
+#include "core/ressources/fanRessource.h"
 #include "renderer/util/fanVertex.h"
 #include "core/math/shapes/fanConvexHull.h"
 
@@ -10,17 +11,14 @@ namespace fan {
 
 	//================================================================================================================================
 	//================================================================================================================================
-	class Mesh {
+	class Mesh : public Ressource {
 	public:
-		static Signal< Mesh* > s_onMeshLoad;
+		static Signal< Mesh* > s_onGenerateVulkanData;
 		static Signal<> s_onMeshDelete;
 
-		Mesh(const std::string& _path = "" );
+		Mesh();
 		~Mesh();
 
-		void		SetPath(const std::string& _path)			{ m_path = _path; }
-		std::string GetPath() const								{ return m_path;  }
-	
 		bool RayCast( const btVector3 _origin, const btVector3 _direction, btVector3& _outIntersection ) const;
 
 		std::vector<Vertex> &			GetVertices()			{ return m_vertices;	}
@@ -31,17 +29,16 @@ namespace fan {
 		Buffer *						GetVertexBuffer()		{ return m_vertexBuffer[m_currentBuffer];	}
 		const ConvexHull&				GetHull()				{ return m_convexHull; }
 
-		// Usefull when the mesh changes very often
+		// Useful when the mesh changes very often
 		void SetHostVisible( const bool _hostVisible ){ m_hostVisible = _hostVisible; } 
 		void SetOptimizeVertices( const bool _optimizeVertices ) { m_optimizeVertices = _optimizeVertices; }
 		void SetAutoUpdateHull( const bool _autoUpdateHull ) { m_autoUpdateHull = _autoUpdateHull; }
 
-		void GenerateBuffers( Device & _device );
-		bool Load();
+		void GenerateVulkanData( Device & _device );
+		bool LoadFromFile( const std::string& _path ) override ;
 		bool LoadFromVertices( const std::vector<Vertex>&	_vertices );
 		DECLARE_TYPE_INFO(Mesh, void )
 	private:
-		std::string				m_path;
 		std::vector<Vertex>		m_vertices;
 		std::vector<uint32_t>	m_indices;
 

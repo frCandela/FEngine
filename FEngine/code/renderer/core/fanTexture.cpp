@@ -286,8 +286,8 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	bool Texture::LoadTexture(const std::string _path) {
-		m_path = _path;
+	bool Texture::LoadFromFile(const std::string& _path) {
+		Ressource::LoadFromFile(_path);
 
 		// Load image from disk
 		int texWidth, texHeight, texChannels;
@@ -301,7 +301,7 @@ namespace fan
 		m_mipLevels = static_cast<uint32_t>(std::floor(std::log2(std::max(texWidth, texHeight)))) + 1;
 		m_mipLevels = 1;
 
-		Load(pixels, texWidth, texHeight, m_mipLevels);
+		SetData(pixels, texWidth, texHeight, m_mipLevels);
 
 		stbi_image_free(pixels);
 
@@ -310,7 +310,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void Texture::Load(const void* _data, const uint32_t _width, const uint32_t _height, const uint32_t _mipLevels) {
+	void Texture::SetData(const void* _data, const uint32_t _width, const uint32_t _height, const uint32_t _mipLevels) {
 		m_mipLevels = _mipLevels;
 		m_width = _width;
 		m_height = _height;

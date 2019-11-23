@@ -22,7 +22,7 @@ namespace fan
 		}
 		else
 		{
-			return InstantiateJson( _prefab.GetData(), _parent );
+			return InstantiateJson( _prefab.GetJsonGameobject(), _parent );
 		}
 	}
 

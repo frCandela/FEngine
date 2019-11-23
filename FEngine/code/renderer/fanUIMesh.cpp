@@ -9,7 +9,7 @@ namespace fan
 {
 	REGISTER_TYPE_INFO( UIMesh, TypeInfo::Flags::NONE )
 
-	Signal< UIMesh* > UIMesh::s_onMeshLoad;
+	Signal< UIMesh* > UIMesh::s_onGenerateVulkanData;
 	Signal< > UIMesh::s_onMeshDelete;
 
 	//================================================================================================================================
@@ -39,13 +39,21 @@ namespace fan
 		m_vertices = _vertices;
 
 		// Cleanup
-		s_onMeshLoad.Emmit( this );
+		s_onGenerateVulkanData.Emmit( this );
  		return true;
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void UIMesh::GenerateBuffers( Device & _device )
+	bool UIMesh::LoadFromFile( const std::string& _path ) 
+	{
+		assert( false );
+		return Ressource::LoadFromFile(_path);
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
+	void UIMesh::GenerateVulkanData( Device & _device )
 	{
 		if ( m_vertices.empty() ) { return; }
 

@@ -228,8 +228,8 @@ namespace fan
 		int texWidth, texHeight;
 		ImGui::GetIO().Fonts->GetTexDataAsRGBA32(&fontData, &texWidth, &texHeight);
 
-		m_fontTexture->Load(fontData, texWidth, texHeight, 1);
-		m_iconsTexture->LoadTexture( GlobalValues::s_defaultIcons );
+		m_fontTexture->SetData(fontData, texWidth, texHeight, 1);
+		m_iconsTexture->LoadFromFile( GlobalValues::s_defaultIcons );
 		m_sampler->CreateSampler(0, 1.f, VK_FILTER_LINEAR);
 	}
 

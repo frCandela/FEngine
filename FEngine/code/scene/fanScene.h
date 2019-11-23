@@ -67,8 +67,6 @@ namespace fan
 		void					InsertID( const uint64_t _id, Gameobject * _gameobject );
 		void					EraseID( const uint64_t _id ) { m_gameobjects.erase( _id ); }
 
-		SceneInstantiate&		Instantiate() { return *m_instantiate; };
-
 	private:
 		// Data
 		std::string	m_name;

@@ -111,36 +111,23 @@ namespace fan
 	{
 		if ( *m_bulletPrefab != nullptr )
 		{
-			Debug::Log("toto");
-		}
+			Gameobject * bullet = m_gameobject->GetScene()->CreateGameobject( **m_bulletPrefab, m_gameobject );
+			bullet->AddEcsComponent<ecsBullet>()->Init( m_lifeTime );
 
-		Transform * thisTransform = m_gameobject->GetTransform();
+			Rigidbody * rb = bullet->GetComponent<Rigidbody>();
+			if ( rb != nullptr )
+			{
+				const Rigidbody * thisRb = m_gameobject->GetComponent<Rigidbody>();
+				const Transform * thisTransform = m_gameobject->GetTransform();
 
-		Gameobject * bulletGO = m_gameobject->GetScene()->CreateGameobject( "bullet", m_gameobject );
-		MeshRenderer * meshRenderer = bulletGO->AddComponent<MeshRenderer>();
-		Material * material = bulletGO->AddComponent<Material>();
-		Rigidbody * rb = bulletGO->AddComponent<Rigidbody>();
-		rb->onContactStarted.Connect( &Weapon::OnBulletContact, this );
+				rb->onContactStarted.Connect( &Weapon::OnBulletContact, this );
+				rb->SetIgnoreCollisionCheck( *thisRb, true );
+				rb->SetVelocity( thisRb->GetVelocity() + m_speed * thisTransform->Forward() );
 
-		SphereShape * collider = bulletGO->AddComponent<SphereShape>();
-		Transform * transform = bulletGO->GetTransform();
-
-		bulletGO->SetFlags( bulletGO->GetFlags() & ecsFlags::NO_AABB_UPDATE );
-		bulletGO->AddEcsComponent<ecsBullet>()->Init( m_lifeTime );
-		meshRenderer->SetPath( GlobalValues::s_meshSphere );
-		material->SetTexturePath( GlobalValues::s_textureWhite );
-		collider->SetRadius( m_scale );
-		transform->SetScale( btVector3( m_scale, m_scale, m_scale ) );
-		transform->SetPosition( thisTransform->GetPosition() + thisTransform->TransformDirection( m_offset ) );
-
-		rb->SetMass( 1.f );
-
-		Rigidbody * myRb = m_gameobject->GetComponent<Rigidbody>();
-		if ( myRb )
-		{
-			rb->GetBtBody()->setIgnoreCollisionCheck( myRb->GetBtBody(), true );
-		}
-		rb->SetVelocity( myRb->GetVelocity() + m_speed * thisTransform->Forward() );
+				Transform * transform = bullet->GetTransform();
+				transform->SetPosition( thisTransform->GetPosition() + thisTransform->TransformDirection( m_offset ) );
+			}
+		} 		
 	}
 
 	//================================================================================================================================

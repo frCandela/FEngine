@@ -164,9 +164,9 @@ namespace fan {
 		MeshPtr::s_onCreateUnresolved.				Connect	( &Engine::OnResolveMeshPtr, this );
 		GameobjectPtr::s_onSetFromSelection.	    Connect ( &Engine::OnSetGameobjectPtrFromSelection, this );
 		PrefabPtr::s_onCreateUnresolved.			Connect ( &Engine::OnResolvePrefabPtr, this );
-		Mesh::s_onMeshLoad.							Connect	( &RessourceManager::OnLoadMesh, & RessourceManager::Get() );
+		Mesh::s_onGenerateVulkanData.							Connect	( &RessourceManager::OnLoadMesh, & RessourceManager::Get() );
 		Mesh::s_onMeshDelete.						Connect	( &Renderer::WaitIdle, m_renderer ); // hack
-		UIMesh::s_onMeshLoad.						Connect	( &RessourceManager::OnLoadUIMesh, & RessourceManager::Get() );
+		UIMesh::s_onGenerateVulkanData.						Connect	( &RessourceManager::OnLoadUIMesh, & RessourceManager::Get() );
 		UIMesh::s_onMeshDelete.						Connect	( &Renderer::WaitIdle, m_renderer ); // hack		
 		MeshRenderer::onRegisterMeshRenderer.		Connect	( &Engine::RegisterMeshRenderer, this );
 		MeshRenderer::onUnRegisterMeshRenderer.		Connect	( &Engine::UnRegisterMeshRenderer, this );

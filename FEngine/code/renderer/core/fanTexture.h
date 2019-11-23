@@ -1,5 +1,7 @@
 #pragma once
 
+#include "core/ressources/fanRessource.h"
+
 namespace fan
 {
 	class Device;
@@ -7,17 +9,16 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	class Texture
+	class Texture : public Ressource
 	{
 	public:
 		Texture(Device & _device);
 		~Texture();
 
-		void Load(const void * _data, const uint32_t _width, const uint32_t _height, const uint32_t _mipLevels);
-		bool LoadTexture(const std::string _path);
+		void SetData(const void * _data, const uint32_t _width, const uint32_t _height, const uint32_t _mipLevels);
+		bool LoadFromFile( const std::string& _path ) override;
 
 		glm::ivec3	GetSize() const { return glm::ivec3(m_width, m_height, m_layerCount); }
-		std::string GetPath() const { return m_path; }
 		VkImageView GetImageView() { return m_imageView; }
 
 		int		GetRenderID() const { return m_renderID; }
@@ -29,7 +30,6 @@ namespace fan
 		VkDeviceMemory	m_deviceMemory;
 		VkImageView		m_imageView;
 
-		std::string		m_path;
 		uint32_t		m_mipLevels = 1;
 		uint32_t		m_width;
 		uint32_t		m_height;

@@ -56,7 +56,7 @@ namespace fan
 
 		// Add
 		Texture * texture = new Texture(*m_device);
-		if (texture->LoadTexture(_path) == true) {
+		if (texture->LoadFromFile(_path) == true) {
 			texture->SetRenderID(static_cast<int>(m_textures.size()));
 			m_textures.push_back(texture);
 			m_modified = true;
@@ -90,8 +90,8 @@ namespace fan
 		if( _path.empty() ) { return nullptr; }
 
 		// Load
-		Mesh * mesh = new Mesh( CleanPath(_path) );
-		if ( mesh->Load() )
+		Mesh * mesh = new Mesh();
+		if ( mesh->LoadFromFile( CleanPath( _path ) ) )
 		{
 			RegisterMesh( mesh );
 			return mesh;
@@ -104,14 +104,14 @@ namespace fan
 	//================================================================================================================================
 	//================================================================================================================================
 	void RessourceManager::OnLoadMesh( Mesh * _mesh ) {
-		_mesh->GenerateBuffers( *m_device );
+		_mesh->GenerateVulkanData( *m_device );
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
 	void RessourceManager::OnLoadUIMesh( UIMesh * _mesh )
 	{
-		_mesh->GenerateBuffers( *m_device );
+		_mesh->GenerateVulkanData( *m_device );
 	}
 
 	//================================================================================================================================
@@ -131,7 +131,7 @@ namespace fan
 	//================================================================================================================================
 	void  RessourceManager::RegisterMesh(Mesh * _mesh) {
 		m_meshList.insert( _mesh );
-		_mesh->GenerateBuffers( *m_device);
+		_mesh->GenerateVulkanData( *m_device);
 	}
 
 	//================================================================================================================================

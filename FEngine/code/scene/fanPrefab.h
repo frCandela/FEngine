@@ -1,5 +1,6 @@
 #pragma once
 
+#include "core/ressources/fanRessource.h"
 #include "core/fanISerializable.h"
 
 namespace fan
@@ -10,22 +11,20 @@ namespace fan
 	// represents a gameobjects tree
 	// stores its data in a json
 	//================================================================================================================================
-	class Prefab  {
+	class Prefab : public Ressource  {
 	public:
 		Prefab();
 
+		bool LoadFromJson( const Json& _json );
 		bool LoadFromFile( const std::string& _path );
 		void LoadFromGameobject( const Gameobject * _gameobject );
 
-		void		SetPath( const std::string _path ){ m_path = _path; }
-		std::string GetPath( ) const { return m_path; }
-
-		const Json& GetData() const { return m_json["prefab"]; }
+		const Json& GetJsonGameobject() const { return m_json["prefab"]; }
+		const Json& GetJson() const { return m_json; }
 
 		bool IsEmpty() const { return ! m_json.contains("prefab"); }
 
 	private:
 		 Json m_json;
-		 std::string m_path = "";
 	};
 }

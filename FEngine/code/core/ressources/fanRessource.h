@@ -6,22 +6,15 @@
 namespace fan {
 	//================================================================================================================================
 	// Base class for ressources ( Mesh, textures etc.) 
-	// Represent something with an ID that needs to be loaded
+	// Represent something with an path that needs to be loaded
 	//================================================================================================================================
-// 	class Ressource {
-// 	public:	
-// 
-// 		virtual bool	Load() { return true; }
-// 		uint32_t		GetRessourceID() const { return m_ressourceID; }
-// 
-// 		DECLARE_ABSTRACT_TYPE_INFO(Ressource, void )
-// 	protected:
-// 
-// 		Ressource() {}	
-// 		virtual ~Ressource(){}
-// 		void SetRessourceID(const uint32_t _ressourceID) { m_ressourceID = _ressourceID; }
-// 
-// 	private:
-// 		uint32_t	m_ressourceID;
-// 	};
+	class Ressource {
+	public:				   
+		virtual bool LoadFromFile( const std::string& _path );
+
+		std::string GetPath() const { return m_path; }
+
+	protected:
+		std::string		m_path;
+	};
 }

@@ -14,6 +14,24 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
+	bool Prefab::LoadFromJson( const Json& _json )
+	{
+		assert( IsEmpty() );
+
+		if ( _json.contains( "prefab" ) )
+		{
+			m_json = _json;
+			return true;
+		}
+		else
+		{
+			Debug::Warning() << "json is not a prefab" << Debug::Endl();
+			return false;
+		}
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
 	bool Prefab::LoadFromFile( const std::string& _path )
 	{
 		std::ifstream inStream(_path);
@@ -25,7 +43,7 @@ namespace fan
 			if ( m_json.contains("prefab") )
 			{
 				m_path = _path;
-				return true;
+				return Ressource::LoadFromFile(_path);
 			}
 			else
 			{

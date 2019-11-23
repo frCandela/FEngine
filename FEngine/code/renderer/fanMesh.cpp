@@ -10,14 +10,13 @@
 namespace fan {
 	REGISTER_TYPE_INFO(Mesh, TypeInfo::Flags::NONE)
 
-	Signal< Mesh* > Mesh::s_onMeshLoad;
+	Signal< Mesh* > Mesh::s_onGenerateVulkanData;
 	Signal< > Mesh::s_onMeshDelete;
 
 	//================================================================================================================================
 	//================================================================================================================================
-	Mesh::Mesh(const std::string& _path) :
-		m_path ( _path )
-		, m_vertices( 0 )
+	Mesh::Mesh( ) 
+		: m_vertices( 0 )
 		, m_indices( 0 )
 		, m_vertexBuffer { nullptr ,nullptr ,nullptr }
 		, m_indexBuffer { nullptr ,nullptr ,nullptr }
@@ -37,18 +36,18 @@ namespace fan {
 
 	//================================================================================================================================
 	//================================================================================================================================
-	bool Mesh::Load( ) {
+	bool Mesh::LoadFromFile( const std::string& _path ) {
  		FBXImporter importer;
- 		if (importer.LoadScene(m_path) == true) {
+ 		if (importer.LoadScene(_path) == true) {
 			if ( ! importer.GetMesh(*this) ) {
 				Debug::Get() << "Failed to load mesh : " << m_path << Debug::Endl();
 				return false;
-			}			
-		}
+			}	
+		}		
 		OptimizeVertices();
 		GenerateConvexHull();
-		s_onMeshLoad.Emmit( this );
-		return true;
+		s_onGenerateVulkanData.Emmit( this );
+		return Ressource::LoadFromFile(_path);
 	}
 
 	//================================================================================================================================
@@ -66,7 +65,7 @@ namespace fan {
 		// Cleanup
 		OptimizeVertices();
 		GenerateConvexHull();
-		s_onMeshLoad.Emmit( this );
+		s_onGenerateVulkanData.Emmit( this );
 		return true;
 	}
 
@@ -116,7 +115,7 @@ namespace fan {
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void Mesh::GenerateBuffers( Device & _device ) {
+	void Mesh::GenerateVulkanData( Device & _device ) {
 		if ( m_indices.empty() ){return;}
 
 		m_currentBuffer = ( m_currentBuffer + 1 ) % 3;

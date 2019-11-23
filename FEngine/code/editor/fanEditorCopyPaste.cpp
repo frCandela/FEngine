@@ -4,6 +4,7 @@
 #include "fanEngine.h"
 #include "scene/fanGameobject.h"
 #include "scene/fanSceneInstantiate.h"
+#include "scene/fanPrefab.h"
 
 namespace fan
 {
@@ -17,11 +18,12 @@ namespace fan
 	{
 		if ( m_engine.GetSelectedGameobject() != nullptr )
 		{
-			Json objectJson;
-			m_engine.GetSelectedGameobject()->Save( objectJson );
+
+			Prefab prefab;
+			prefab.LoadFromGameobject( m_engine.GetSelectedGameobject() );
 
 			std::stringstream ss;
-			ss << objectJson;
+			ss << prefab.GetJson();
 
 			ImGui::SetClipboardText( ss.str().c_str() );
 		}
@@ -36,6 +38,10 @@ namespace fan
 		Json pastedJson;
 		ss >> pastedJson;
 
-		m_engine.GetScene().Instantiate().InstantiateJson( pastedJson, m_engine.GetSelectedGameobject() );
+		Prefab prefab;
+		if ( prefab.LoadFromJson( pastedJson ) )
+		{
+			m_engine.GetScene().CreateGameobject( prefab, m_engine.GetSelectedGameobject() );
+		}		
 	}
 }

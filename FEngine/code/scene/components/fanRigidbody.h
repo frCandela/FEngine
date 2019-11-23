@@ -12,17 +12,18 @@ namespace fan {
 		Signal<Rigidbody*, btPersistentManifold* const&> onContactStarted;
 		Signal<Rigidbody*, btPersistentManifold* const&> onContactEnded;
 
-		btRigidBody *			GetBtBody()		{ return m_rigidbody; }
+		btRigidBody *			GetBtBody()	  { return m_rigidbody; }
 		btDefaultMotionState *  GetBtMotion() { return m_motionState; }
 
-		float			GetMass() const;
-		void			SetMass( const float _mass );
-		void			SetStatic();
-		void			SetKinematic();
-		bool			IsStatic() const;
-		bool			IsKinematic() const;
-		void			Activate();		
-		bool			IsActive() const;
+		float	GetMass() const;
+		void	SetMass( const float _mass );
+		void	SetStatic();
+		void	SetKinematic();
+		bool	IsStatic() const;
+		bool	IsKinematic() const;
+		void	Activate();		
+		bool	IsActive() const;
+		void	SetIgnoreCollisionCheck( const Rigidbody & _rb, const bool state );
 
 		bool			IsDesactivationEnabled() const;
 		void			EnableDesactivation( const bool _enable );

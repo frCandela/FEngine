@@ -168,7 +168,7 @@ namespace fan
 			Prefab prefab;
 			if ( prefab.LoadFromFile( m_pathBuffer.string() ) )
 			{
-				m_scene->Instantiate().InstanciatePrefab( prefab, m_lastGameobjectRightClicked );
+				m_scene->CreateGameobject( prefab, m_lastGameobjectRightClicked );
 			}
 		}		
 	}
