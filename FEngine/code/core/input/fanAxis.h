@@ -18,7 +18,7 @@ namespace fan
 		void					SetInvert( const bool _invert ) { m_invert = _invert; }
 
 		std::string				GetName() const { return m_name; };
-		float					GetValue() const;
+		float					GetValue( const int _joystickIDOverride = -1 ) const;
 		bool					GetInvert() const { return m_invert; };
 		Type					GetType() const { return m_type; }
 		Keyboard::Key			GetKeyPositive() const { return m_keyPositive; }

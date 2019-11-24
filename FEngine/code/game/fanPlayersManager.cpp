@@ -4,6 +4,7 @@
 #include "scene/fanScene.h"
 #include "scene/fanGameobject.h"
 #include "core/input/fanJoystick.h"
+#include "game/fanPlayerInput.h"
 
 namespace fan
 {
@@ -44,7 +45,7 @@ namespace fan
 		AddPlayer( s_mousePlayerID,  "mouse_player" );
 
 		// Spawn joystick players
-		for ( int joystickIndex = 0; joystickIndex <= GLFW_JOYSTICK_LAST; joystickIndex++ )
+		for ( int joystickIndex = 0; joystickIndex < Joystick::NUM_JOYSTICK; joystickIndex++ )
 		{
 			if ( Joystick::Get().IsConnected( joystickIndex ) )
 			{
@@ -77,10 +78,22 @@ namespace fan
 		if ( *m_playerPrefab != nullptr )
 		{
 			assert( m_players.find( _ID ) ==  m_players.end() );
-			Gameobject * mousePlayer = m_gameobject->GetScene()->CreateGameobject( **m_playerPrefab, m_gameobject );
-			mousePlayer->SetEditorFlags( mousePlayer->GetEditorFlags() | Gameobject::EditorFlag::NOT_SAVED );
-			mousePlayer->SetName( _name );
-			m_players[_ID] = mousePlayer;
+			Gameobject * player = m_gameobject->GetScene()->CreateGameobject( **m_playerPrefab, m_gameobject );
+			m_players[_ID] = player;
+
+			player->SetEditorFlags( player->GetEditorFlags() | Gameobject::EditorFlag::NOT_SAVED );
+			player->SetName( _name );
+
+			PlayerInput * playerInput = player->GetComponent<PlayerInput>();
+			if ( playerInput != nullptr )
+			{
+				playerInput->SetJoystickID(_ID);
+				playerInput->SetInputType( _ID < 0 ? PlayerInput::KEYBOARD_MOUSE : PlayerInput::JOYSTICK );
+			}
+			else
+			{
+				Debug::Warning("PlayersManager::AddPlayer : Prefab is missing a PlayerInput component.");
+			}
 		}
 	}
 
@@ -112,7 +125,7 @@ namespace fan
 		}
 	}
 
-	//================================================================================================================================
+	//=======================================================================z=========================================================
 	//================================================================================================================================
 	void PlayersManager::Update( const float /*_delta*/ )
 	{

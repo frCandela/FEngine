@@ -15,6 +15,7 @@ namespace fan
 		using Axis = int;
 		using JoystickID = int;
 
+
 		bool IsGamepad(   const JoystickID _GLFW_JOYSTICK ) const;
 		bool IsConnected( const JoystickID _GLFW_JOYSTICK ) const;
 		int  NumConnectedJoysticks() const;
@@ -44,6 +45,7 @@ namespace fan
 	public:
 		//Joysticks
 		static const JoystickID JOYSTICK_ANY = GLFW_JOYSTICK_LAST + 1;
+		static const JoystickID NUM_JOYSTICK = GLFW_JOYSTICK_LAST + 1;
 
 		// Button
 		static const Button BUTTON_NONE = -1;

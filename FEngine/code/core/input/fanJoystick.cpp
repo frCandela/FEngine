@@ -14,7 +14,7 @@ namespace fan
 	//================================================================================================================================	
 	bool Joystick::IsConnected( const JoystickID _GLFW_JOYSTICK ) const
 	{
-		assert( _GLFW_JOYSTICK <= GLFW_JOYSTICK_LAST );
+		assert( _GLFW_JOYSTICK <= NUM_JOYSTICK );
 		return glfwJoystickPresent(_GLFW_JOYSTICK) == GLFW_TRUE;
 	}
 
@@ -23,7 +23,7 @@ namespace fan
 	int  Joystick::NumConnectedJoysticks() const
 	{
 		int num = 0;
-		for ( int joystickIndex = 0; joystickIndex <= GLFW_JOYSTICK_LAST; joystickIndex++ )
+		for ( int joystickIndex = 0; joystickIndex < NUM_JOYSTICK; joystickIndex++ )
 		{
 			if ( IsConnected( joystickIndex ) )
 			{

@@ -45,9 +45,9 @@ namespace fan
 		switch ( m_inputType )
 		{
 		case fan::PlayerInput::KEYBOARD_MOUSE:
-			return Input::Get().Manager().GetAxis( "game_left" );
+			return Input::Get().Manager().GetAxis( "game_left", m_joystickID );
 		case fan::PlayerInput::JOYSTICK:{
-			float rawInput = Input::Get().Manager().GetAxis( "gamejs_axis_left" );
+			float rawInput = Input::Get().Manager().GetAxis( "gamejs_axis_left", m_joystickID );
 			return std::abs(rawInput) > 0.15f ? rawInput : 0.f;
 		}
 		default:
@@ -64,8 +64,8 @@ namespace fan
 		case fan::PlayerInput::KEYBOARD_MOUSE:
 			return Input::Get().Manager().GetAxis( "game_forward" );
 		case fan::PlayerInput::JOYSTICK: {
-			const float x = Input::Get().Manager().GetAxis( "gamejs_x_axis_direction" );
-			const float y = Input::Get().Manager().GetAxis( "gamejs_y_axis_direction" );
+			const float x = Input::Get().Manager().GetAxis( "gamejs_x_axis_direction", m_joystickID );
+			const float y = Input::Get().Manager().GetAxis( "gamejs_y_axis_direction", m_joystickID );
 			float forward = btVector3( x, 0.f, y ).length();
 			return forward > 0.2f ? forward : 0.f;
 		} default:
@@ -80,9 +80,9 @@ namespace fan
 		switch ( m_inputType )
 		{
 		case fan::PlayerInput::KEYBOARD_MOUSE:
-			return Input::Get().Manager().GetAxis( "game_boost" );
+			return Input::Get().Manager().GetAxis( "game_boost", m_joystickID );
 		case fan::PlayerInput::JOYSTICK:
-			return Input::Get().Manager().GetAxis( "gamejs_axis_boost" );
+			return Input::Get().Manager().GetAxis( "gamejs_axis_boost", m_joystickID );
 		default:
 			return 0.f;
 		}		
@@ -95,9 +95,9 @@ namespace fan
 		switch ( m_inputType )
 		{
 		case fan::PlayerInput::KEYBOARD_MOUSE:
-			return Input::Get().Manager().GetAxis( "game_fire" );
+			return Input::Get().Manager().GetAxis( "game_fire", m_joystickID );
 		case fan::PlayerInput::JOYSTICK:
-			return Input::Get().Manager().GetAxis( "gamejs_axis_fire" );
+			return Input::Get().Manager().GetAxis( "gamejs_axis_fire", m_joystickID );
 		default:
 			return 0.f;
 		}
@@ -110,9 +110,9 @@ namespace fan
 		switch ( m_inputType )
 		{
 		case fan::PlayerInput::KEYBOARD_MOUSE:
-			return Input::Get().Manager().GetAxis( "game_axis_stop" ) > 0.f;
+			return Input::Get().Manager().GetAxis( "game_axis_stop", m_joystickID ) > 0.f;
 		case fan::PlayerInput::JOYSTICK:
-			return Input::Get().Manager().GetAxis( "gamejs_axis_stop" ) > 0.f;
+			return Input::Get().Manager().GetAxis( "gamejs_axis_stop", m_joystickID ) > 0.f;
 		default:
 			return false;
 		}
@@ -158,8 +158,8 @@ namespace fan
 	glm::vec2 PlayerInput::GetDirectionAverage() 
 	{
 		const uint64_t index = Input::Get().FrameCount() % m_directionBuffer.size();
-		const float x = Input::Get().Manager().GetAxis( "gamejs_x_axis_direction" );
-		const float y = Input::Get().Manager().GetAxis( "gamejs_y_axis_direction" );
+		const float x = Input::Get().Manager().GetAxis( "gamejs_x_axis_direction", m_joystickID );
+		const float y = Input::Get().Manager().GetAxis( "gamejs_y_axis_direction", m_joystickID );
 		m_directionBuffer[index] = glm::vec2(x,y);
 
 		glm::vec2 average(0.f,0.f);
@@ -185,6 +185,11 @@ namespace fan
 			if ( ImGui::Combo( "input type", &type, "keyboard+mouse\0joystick\0" ) )
 			{
 				SetInputType( InputType( type ) );
+			}
+
+			if ( m_inputType == JOYSTICK )
+			{	
+				ImGui::SliderInt( "joystick ID", &m_joystickID, 0, Joystick::NUM_JOYSTICK - 1 );
 			}
 
 			// Direction buffer size

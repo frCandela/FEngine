@@ -132,18 +132,19 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	float Axis::GetValue() const
+	float Axis::GetValue( const int _joystickIDOverride ) const
 	{
-		float invertValue = m_invert ? -1.f : 1.f;
+		const float invertValue = m_invert ? -1.f : 1.f;
+		const int joystickID = _joystickIDOverride >= 0 ? _joystickIDOverride : m_joystickID;
 
 		switch ( m_type )
 		{
 		case fan::Axis::KEYBOARD:
 			return invertValue * ( ( Keyboard::IsKeyDown( m_keyPositive ) ? 1.f : 0.f ) + ( Keyboard::IsKeyDown( m_keyNegative ) ? -1.f : 0.f ) );
 		case fan::Axis::JOYSTICK_AXIS:
-			return - invertValue * Joystick::Get().GetAxis( m_joystickID, m_joystickAxis );
+			return -invertValue * Joystick::Get().GetAxis( joystickID, m_joystickAxis );
 		case fan::Axis::JOYSTICK_BUTTONS:
-			return invertValue * ( ( Joystick::Get().GetButton(m_joystickID, m_buttonPositive ) ? 1.f : 0.f ) + ( Joystick::Get().GetButton(m_joystickID, m_buttonNegative ) ? -1.f : 0.f ) );
+			return invertValue * ( ( Joystick::Get().GetButton( joystickID, m_buttonPositive ) ? 1.f : 0.f ) + ( Joystick::Get().GetButton( joystickID, m_buttonNegative ) ? -1.f : 0.f ) );
 		default:
 			assert( false );
 			return 0.f;
@@ -283,7 +284,7 @@ namespace ImGui
 					ImGui::Text( "PRESS ANY KEY" );
 
 					// Look for a pressed axis
-					for ( int joystickIndex = 0; joystickIndex <= GLFW_JOYSTICK_LAST; joystickIndex++ )
+					for ( int joystickIndex = 0; joystickIndex < Joystick::NUM_JOYSTICK ; joystickIndex++ )
 					{
 						if ( Joystick::Get().IsConnected( joystickIndex ) && Joystick::Get().IsGamepad( joystickIndex ) )
 						{
@@ -341,7 +342,7 @@ namespace ImGui
 					ImGui::Text( "PRESS ANY KEY" );
 
 					// Look for a pressed axis
-					for ( int joystickIndex = 0; joystickIndex <= GLFW_JOYSTICK_LAST; joystickIndex++ )
+					for ( int joystickIndex = 0; joystickIndex < Joystick::NUM_JOYSTICK ; joystickIndex++ )
 					{
 						if ( Joystick::Get().IsConnected( joystickIndex ) && Joystick::Get().IsGamepad( joystickIndex ) )
 						{

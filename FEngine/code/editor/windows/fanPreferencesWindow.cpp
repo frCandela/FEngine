@@ -168,7 +168,7 @@ namespace fan
 			}
 
 			// draw joysticks
-			for ( int joystickIndex = 0; joystickIndex <= GLFW_JOYSTICK_LAST; joystickIndex++ )
+			for ( int joystickIndex = 0; joystickIndex < Joystick::NUM_JOYSTICK; joystickIndex++ )
 			{
 				if ( Joystick::Get().IsConnected( joystickIndex ) )
 				{					

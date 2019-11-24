@@ -27,7 +27,7 @@ namespace fan {
 		void		CreateJoystickButtons(  const std::string& _name,  const Joystick::JoystickID _GLFW_JOYSTICK, const Joystick::Button _positive, const Joystick::Button _negative = Joystick::BUTTON_NONE );
 		Signal<>*	CreateKeyboardEvent( const std::string& _name, const Keyboard::Key _key, const Keyboard::Key _mod0 = Keyboard::NONE, const Keyboard::Key _mod1 = Keyboard::NONE, const  Keyboard::Key _mod2 = Keyboard::NONE );
 		Signal<>*	FindEvent( const std::string& _name );
-		float		GetAxis( const std::string& _name );
+		float		GetAxis( const std::string& _name, const int _joystickIDOverride = -1 );
 
 		std::map< std::string, Axis >&		GetListAxis()			{ return m_axis; }
 		std::map< std::string, KeyboardEvent >&	GetListKeyboardEvents() { return m_keyboardEvents; }

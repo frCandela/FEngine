@@ -12,7 +12,8 @@ namespace fan
 		enum InputType { KEYBOARD_MOUSE, JOYSTICK };
 
 		InputType	GetInputType() const { return m_inputType; }
-		void		SetInputType(const InputType _type );
+		void		SetInputType( const InputType _type );
+		void		SetJoystickID( const int _joystickID ){ m_joystickID = _joystickID; }
 		
 		// Generic input
 		btVector3	GetInputDirection();
@@ -37,6 +38,7 @@ namespace fan
 
 	private:
 		InputType m_inputType = KEYBOARD_MOUSE;
+		int m_joystickID = -1;
 
 		btVector3	m_lastDirection;
 		float		m_directionCutTreshold = 0.25f;
