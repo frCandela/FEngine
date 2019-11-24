@@ -16,22 +16,13 @@
 namespace fan {
 	REGISTER_TYPE_INFO(GameManager, TypeInfo::Flags::EDITOR_COMPONENT)
 
-		//================================================================================================================================
-		//================================================================================================================================
-		void GameManager::Start() {
-		m_camera = m_gameobject->GetComponent<Camera>();
-		if (m_camera == nullptr) {
+	//================================================================================================================================
+	//================================================================================================================================
+	void GameManager::Start() 
+	{
+		if (*m_gameCamera == nullptr) {
 			Debug::Warning("Game manager has no camera attached");
 			SetEnabled(false);
-		}
-
-		m_spaceShip = m_gameobject->GetScene()->FindComponentOfType<SpaceShip>();
-		if (m_spaceShip == nullptr) {
-			Debug::Warning("GameManager::Start : No spaceShip found");
-			SetEnabled(false);
-		}
-		else {
-			m_spaceShip->SetEnabled(false);
 		}
 	}
 
@@ -54,14 +45,13 @@ namespace fan {
 	//================================================================================================================================
 	//================================================================================================================================
 	void GameManager::OnScenePlay() {
-		m_gameobject->GetScene()->SetMainCamera( m_camera );
-		m_spaceShip->SetEnabled( true );
+		m_gameobject->GetScene()->SetMainCamera( *m_gameCamera );
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
 	void GameManager::OnScenePause() {
-		m_spaceShip->SetEnabled( false );
+		
 	}
 
 	//================================================================================================================================
@@ -74,20 +64,27 @@ namespace fan {
 	//================================================================================================================================
 	void GameManager::OnGui() {
 		Actor::OnGui();
-		ImGui::Text("Press tab to switch cameras");
+		
+		ImGui::PushItemWidth( 0.6f * ImGui::GetWindowWidth() );
+		{
+			ImGui::FanComponent( "game camera", &m_gameCamera );
+			ImGui::Text("Press tab to switch cameras");			
+		} ImGui::PopItemWidth();
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
 	bool GameManager::Load( const Json & _json ) {
 		Actor::Load(_json);
+		LoadComponentPtr( _json, "game_camera", m_gameCamera );
 		return true;
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
 	bool GameManager::Save( Json & _json ) const {		
-		Actor::Save( _json );		
+		Actor::Save( _json );	
+		SaveComponentPtr( _json, "game_camera", m_gameCamera );
 		return true;
 	}
 }

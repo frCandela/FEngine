@@ -34,7 +34,7 @@ namespace fan
 		const std::vector< Joystick::Button >& GetGamepadButtonsList() const { return  s_buttonsList; };
 		const std::vector< Joystick::Axis >& GetGamepadAxisList() const { return  s_axesList; };
 
-		Signal<int, bool> onJoystickConnect; // joystick id, connected/disconnected 
+		Signal<JoystickID, bool> onJoystickConnect; // joystick id, connected/disconnected 
 
 	private:
 		Joystick();

@@ -77,4 +77,3 @@ namespace fan
 			Debug::Warning() << GetName() << ": " << #_componentType << " not found on " << GetGameobject()->GetName() << Debug::Endl();	\
 			SetEnabled( false );																											\
 		}
-

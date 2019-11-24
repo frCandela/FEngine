@@ -1,29 +1,24 @@
 #pragma once
 
 #include "scene/actors/fanActor.h"
-#include "scene/fanComponentPtr.h"
 
-namespace fan {
-
-	class Camera;
-
+namespace fan
+{
 	//================================================================================================================================
 	//================================================================================================================================	
-	class GameManager : public Actor {
+	class PlayersManager : public Actor
+	{
 	public:
 
 		void Start() override;
-		void Update(const float _delta) override;
+		void Update( const float _delta ) override;
 		void LateUpdate( const float /*_delta*/ ) override {}
-
-		void OnScenePlay();
-		void OnScenePause();
 
 		ImGui::IconType GetIcon() const override { return ImGui::IconType::GAME_MANAGER; }
 
 		void OnGui() override;
 
-		DECLARE_TYPE_INFO(GameManager, Actor );
+		DECLARE_TYPE_INFO( PlayersManager, Actor );
 	protected:
 		bool Load( const Json & _json ) override;
 		bool Save( Json & _json ) const override;
@@ -31,7 +26,17 @@ namespace fan {
 		void OnAttach() override;
 		void OnDetach() override;
 
+		void OnScenePlay();
+		void OnScenePause();
 	private:
-		ComponentPtr<Camera> m_gameCamera;
+		PrefabPtr m_playerPrefab;
+
+		static const int s_mousePlayerID = -1;
+		std::map< int, Gameobject*> m_players;
+
+		void AddPlayer( const int _ID, const std::string& _name );
+		void RemovePlayer( const int _ID );
+
+		void OnJoystickConnect( int _joystickID, bool _connected );
 	};
 }
