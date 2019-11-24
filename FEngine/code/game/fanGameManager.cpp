@@ -3,7 +3,6 @@
 
 #include "core/time/fanTime.h"
 #include "core/input/fanKeyboard.h"
-#include "editor/windows/fanInspectorWindow.h"
 #include "scene/fanScene.h"
 #include "scene/components/fanTransform.h"
 #include "scene/fanGameobject.h"

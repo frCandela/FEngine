@@ -4,11 +4,7 @@
 #include "fanEngine.h"
 
 #include "editor/fanMainMenuBar.h"
-#include "editor/windows/fanRenderWindow.h"
-#include "editor/windows/fanSceneWindow.h"
-#include "editor/windows/fanInspectorWindow.h"
-#include "editor/windows/fanPreferencesWindow.h"
-#include "editor/windows/fanConsoleWindow.h"	
+#include "editor/windows/fanEditorWindow.h"
 #include "editor/fanEditorGrid.h"
 #include "core/files/fanSerializedValues.h"
 #include "core/input/fanInput.h"
@@ -19,8 +15,6 @@
 #include "scene/fanScene.h"
 #include "scene/fanGameobject.h"
 #include "scene/components/fanCamera.h"
-
-
 
 namespace fan
 {

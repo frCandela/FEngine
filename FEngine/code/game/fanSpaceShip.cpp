@@ -4,7 +4,6 @@
 #include "core/time/fanTime.h"
 #include "core/input/fanInput.h"
 #include "core/input/fanInputManager.h"
-#include "editor/windows/fanInspectorWindow.h"
 #include "scene/components/fanRigidbody.h"
 #include "scene/components/fanTransform.h"
 #include "scene/components/fanCamera.h"
