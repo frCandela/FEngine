@@ -40,5 +40,6 @@ namespace fan
 		void RemovePlayer( const int _ID );
 
 		void OnJoystickConnect( int _joystickID, bool _connected );
+		void OnPlayerDie( Gameobject * _gameobject );
 	};
 }

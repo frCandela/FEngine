@@ -63,7 +63,7 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
-      <WarningLevel>Level4</WarningLevel>
+      <WarningLevel>Level2</WarningLevel>
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
@@ -137,6 +137,7 @@
     <ClCompile Include="code\fanMain.cpp" />
     <ClCompile Include="code\game\fanCameraController.cpp" />
     <ClCompile Include="code\game\fanGameManager.cpp" />
+    <ClCompile Include="code\game\fanHealth.cpp" />
     <ClCompile Include="code\game\fanPlanet.cpp" />
     <ClCompile Include="code\game\fanPlayerInput.cpp" />
     <ClCompile Include="code\game\fanPlayersManager.cpp" />
@@ -269,6 +270,7 @@
     <ClInclude Include="code\fanGlobalIncludes.h" />
     <ClInclude Include="code\game\fanCameraController.h" />
     <ClInclude Include="code\game\fanGameManager.h" />
+    <ClInclude Include="code\game\fanHealth.h" />
     <ClInclude Include="code\game\fanPlanet.h" />
     <ClInclude Include="code\game\fanPlayerInput.h" />
     <ClInclude Include="code\game\fanPlayersManager.h" />

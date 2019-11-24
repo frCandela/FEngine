@@ -6,9 +6,11 @@
 #include "scene/components/ui/fanProgressBar.h"
 #include "game/fanWithEnergy.h"
 #include "game/fanSolarPanel.h"
+#include "game/fanHealth.h"
 #include "scene/components/ui/fanUIMeshRenderer.h"
 #include "scene/components/fanCamera.h"
 #include "renderer/fanRenderer.h"
+
 
 namespace fan
 {
@@ -61,7 +63,13 @@ namespace fan
 			m_signalRenderer->SetColor( GetSignalColor(ratio) );
 		}
 
-
+		// Update health progress bar
+		Health * health = m_spaceShip->GetComponent<Health>();
+		if ( health != nullptr )
+		{
+			const float ratio = health->GetHealth() / health->GetMaxHealth();
+			m_healthProgress->SetProgress( ratio );
+		}
 	}
 
 	//================================================================================================================================
@@ -71,10 +79,7 @@ namespace fan
 		// Set ui position
 		Camera * camera = m_gameobject->GetScene()->GetMainCamera();
 		btVector2 screenPos = camera->WorldPosToScreen( m_spaceShip->GetTransform()->GetPosition() );
- 		m_gameobject->GetTransform()->SetPosition( btVector3( screenPos[0], screenPos[1], 0.f ) );
-
-
-		
+ 		m_gameobject->GetTransform()->SetPosition( btVector3( screenPos[0], screenPos[1], 0.f ) );		
 	}
 
 	//================================================================================================================================

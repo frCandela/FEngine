@@ -33,6 +33,7 @@ namespace ImGui {
 		 ,DECL_ICON ( 16.f, 0,  4 )  // GAMEOBJECT16
 		 ,DECL_ICON ( 32.f, 10, 1 )  // PREFAB32
 		 ,DECL_ICON ( 16.f, 1,  4 )  // PREFAB16
+
 		
 		// COMPONENTS
 		, DECL_ICON ( 32.f, 0, 3 ) // CAMERA
@@ -51,6 +52,8 @@ namespace ImGui {
 		, DECL_ICON ( 32.f, 1, 5 ) // SOLAR_SYSTEM
 		, DECL_ICON ( 32.f, 2, 5 ) // SPACE_SHIP
 		, DECL_ICON ( 32.f, 3, 5 ) // GAME_MANAGER
+		, DECL_ICON ( 16.f, 2, 4 ) // HEART16
+		, DECL_ICON ( 16.f, 3, 4 ) // ENERGY16
 
 		// UI
 		, DECL_ICON ( 32.f, 0, 7 ) // PROGRESS_BAR

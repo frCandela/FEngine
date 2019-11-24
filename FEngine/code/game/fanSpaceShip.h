@@ -11,6 +11,7 @@ namespace fan {
 	class ParticleSystem;
 	class WithEnergy;
 	class PlayerInput;
+	class Health;
 
 	//================================================================================================================================
 	//================================================================================================================================
@@ -19,6 +20,8 @@ namespace fan {
 		enum SpeedMode{ REVERSE = 0, SLOW, NORMAL, FAST };
 
 	public:
+		static Signal<Gameobject*> s_onPlayerDie;
+
 		void Start() override;
 		void Update(const float _delta) override;
 		void LateUpdate( const float /*_delta*/ ) override {}
@@ -37,18 +40,23 @@ namespace fan {
 		float m_activeDrag			= 0.930f;
 		float m_passiveDrag			= 0.950f;
 		float m_energyConsumedPerUnitOfForce = 0.001f;
-
 		float m_remainingChargeEnergy = 0.f;
+		float m_planetDamage = 5.f;
+		float m_collisionRepulsionForce = 500.f;
 
 		// References
 		Rigidbody * m_rigidbody;
 		WithEnergy * m_energy;
 		PlayerInput * m_input;
+		Health * m_health;
 
 		ComponentPtr<ParticleSystem> m_fastForwardParticles;
 		ComponentPtr<ParticleSystem> m_slowForwardParticles;
 		ComponentPtr<ParticleSystem> m_reverseParticles;
 		ComponentPtr<ParticleSystem> m_leftParticles;
 		ComponentPtr<ParticleSystem> m_rightParticles;
+
+		void OnContactStarted( Rigidbody* _rb, btPersistentManifold* const& _manifold );
+		void Die();
 	};
 }

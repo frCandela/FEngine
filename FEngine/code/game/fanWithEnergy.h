@@ -16,7 +16,7 @@ namespace fan
 		float GetMaxEnergy( ) const { return m_maxEnergy; }
 
 		void OnGui() override;
-		ImGui::IconType GetIcon() const override { return ImGui::IconType::GAME_MANAGER; }
+		ImGui::IconType GetIcon() const override { return ImGui::IconType::ENERGY16; }
 
 		DECLARE_TYPE_INFO( WithEnergy, Component );
 	protected:

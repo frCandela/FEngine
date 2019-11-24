@@ -228,11 +228,13 @@ namespace fan {
 	struct ecsBullet : ecsIComponent
 	{
 		static const char * s_name;
-		void Init( const float _durationLeft )
+		void Init( const float _durationLeft, const float _damage )
 		{
 			durationLeft = _durationLeft;
+			damage = _damage;
 		}
-		float		durationLeft = 1.f;
+		float durationLeft = 1.f;
+		float damage = 5.f;
 	};
 
 	//================================

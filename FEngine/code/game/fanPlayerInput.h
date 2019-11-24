@@ -14,6 +14,7 @@ namespace fan
 		InputType	GetInputType() const { return m_inputType; }
 		void		SetInputType( const InputType _type );
 		void		SetJoystickID( const int _joystickID ){ m_joystickID = _joystickID; }
+		int			GetJoystickID() const { return m_joystickID; }
 		
 		// Generic input
 		btVector3	GetInputDirection();

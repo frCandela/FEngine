@@ -1,25 +1,24 @@
 #pragma once
 
 #include "scene/components/fanComponent.h"
-#include "scene/fanComponentPtr.h"
 
 namespace fan
 {
-	class UITransform;
-
 	//================================================================================================================================
 	//================================================================================================================================
-	class ProgressBar : public Component
+	class Health : public Component
 	{
 	public:
 
+		bool  TryRemoveHealth( const float _healthConsumed );
+		void  AddHealth( const float _healthAdded );
+		float GetHealth() const { return m_currentHealth; }
+		float GetMaxHealth( ) const { return m_maxHealth; }
+
 		void OnGui() override;
-		ImGui::IconType GetIcon() const override { return ImGui::IconType::PROGRESS_BAR; }
+		ImGui::IconType GetIcon() const override { return ImGui::IconType::HEART16; }
 
-		void	SetProgress( const float _progress );
-		float	GetProgress() const { return m_progress; }
-
-		DECLARE_TYPE_INFO( ProgressBar, Component );
+		DECLARE_TYPE_INFO( Health, Component );
 	protected:
 		void OnAttach() override;
 		void OnDetach() override;
@@ -27,8 +26,7 @@ namespace fan
 		bool Save( Json & _json ) const override;
 
 	private:
-		ComponentPtr<UITransform> m_targetUiTransform;
-		float	m_progress = -1.f;
-		int		m_maxWidth = 100;
+ 		float m_currentHealth = 0.f;
+ 		float m_maxHealth = 100.f;
 	};
 }

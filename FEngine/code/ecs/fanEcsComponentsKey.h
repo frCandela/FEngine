@@ -97,7 +97,7 @@ namespace fan {
 
 
 
-	using ecsComponentsKey = ecsComponentsKeyCompact;//ecsComponentsKeyFast;
+	using ecsComponentsKey = ecsComponentsKeyCompact; //ecsComponentsKeyFast;
 	//static constexpr size_t totosize = sizeof( ecsComponentsKeyFast );
 	//static constexpr size_t totosize2 = sizeof( ecsComponentsKeyCompact );
 }

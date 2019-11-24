@@ -454,6 +454,9 @@
     <ClCompile Include="code\scene\components\fanFollowTransform.cpp">
       <Filter>code\scene\components</Filter>
     </ClCompile>
+    <ClCompile Include="code\game\fanHealth.cpp">
+      <Filter>code\game</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="code\editor\fanMainMenuBar.h">
@@ -1376,6 +1379,9 @@
     </ClInclude>
     <ClInclude Include="code\scene\components\fanFollowTransform.h">
       <Filter>code\scene\components</Filter>
+    </ClInclude>
+    <ClInclude Include="code\game\fanHealth.h">
+      <Filter>code\game</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

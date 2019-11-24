@@ -14,9 +14,15 @@
 #include "renderer/fanRenderer.h"
 #include "game/fanWithEnergy.h"
 #include "game/fanPlayerInput.h"
+#include "game/fanWithEnergy.h"
+#include "game/fanHealth.h"
+#include "game/fanPlanet.h"
+#include "game/fanSolarSystem.h"
 
 namespace fan {
 	REGISTER_TYPE_INFO(SpaceShip, TypeInfo::Flags::EDITOR_COMPONENT)
+
+	Signal<Gameobject*> SpaceShip::s_onPlayerDie;
 
 	//================================================================================================================================
 	//================================================================================================================================
@@ -24,6 +30,7 @@ namespace fan {
 		REQUIRE_COMPONENT( WithEnergy, m_energy )
 		REQUIRE_COMPONENT( Rigidbody, m_rigidbody )
 		REQUIRE_COMPONENT( PlayerInput, m_input );
+		REQUIRE_COMPONENT( Health, m_health );
 
 		REQUIRE_TRUE( *m_fastForwardParticles	!= nullptr , "Spaceship: missing particles reference" );
 		REQUIRE_TRUE( *m_slowForwardParticles	!= nullptr , "Spaceship: missing particles reference" );
@@ -31,11 +38,15 @@ namespace fan {
 		REQUIRE_TRUE( *m_leftParticles			!= nullptr , "Spaceship: missing particles reference" );
 		REQUIRE_TRUE( *m_rightParticles			!= nullptr , "Spaceship: missing particles reference" );
 
-		 if( *m_fastForwardParticles	!= nullptr ) { m_fastForwardParticles->SetEnabled( false ); }
-		 if( *m_slowForwardParticles	!= nullptr ) { m_slowForwardParticles->SetEnabled( false ); }
-		 if( *m_reverseParticles		!= nullptr ) { m_reverseParticles	  ->SetEnabled( false ); }
-		 if( *m_leftParticles			!= nullptr ) { m_leftParticles		  ->SetEnabled( false ); }
-		 if( *m_rightParticles			!= nullptr ) { m_rightParticles	  ->SetEnabled( false ); }
+		if( *m_fastForwardParticles	!= nullptr ) { m_fastForwardParticles->SetEnabled( false ); }
+		if( *m_slowForwardParticles	!= nullptr ) { m_slowForwardParticles->SetEnabled( false ); }
+		if( *m_reverseParticles		!= nullptr ) { m_reverseParticles	 ->SetEnabled( false ); }
+		if( *m_leftParticles		!= nullptr ) { m_leftParticles		 ->SetEnabled( false ); }
+		if( *m_rightParticles		!= nullptr ) { m_rightParticles		 ->SetEnabled( false ); }
+
+		if( m_health ) {				m_health->AddHealth( m_health->GetMaxHealth() ); }
+		if ( m_energy ) {				m_energy->AddEnergy( m_energy->GetMaxEnergy() ); }
+		if( m_rigidbody != nullptr ) {	m_rigidbody->onContactStarted.Connect( &SpaceShip::OnContactStarted, this ); }
 	}
 
 	//================================================================================================================================
@@ -104,6 +115,77 @@ namespace fan {
 
 	//================================================================================================================================
 	//================================================================================================================================
+	void  SpaceShip::OnContactStarted( Rigidbody* _rb, btPersistentManifold* const& )
+	{
+		float damage = 0.f;
+
+		if ( ecsBullet * bullet = _rb->GetGameobject()->GetEcsComponent<ecsBullet>() )
+		{
+			Debug::Log("bullet");
+			damage = bullet->damage;
+		}
+		else if ( _rb->GetGameobject()->GetComponent<Planet>() )
+		{
+			btVector3 dir = m_gameobject->GetTransform()->GetPosition() - _rb->GetGameobject()->GetTransform()->GetPosition();
+			if ( !dir.fuzzyZero() )
+			{
+				m_rigidbody->ApplyCentralForce( m_collisionRepulsionForce * dir.normalized() );
+			}
+			
+			Debug::Log("planet");
+			damage = m_planetDamage;
+		}
+		else if ( _rb->GetGameobject()->GetComponent<SolarSystem>() )
+		{
+			Debug::Log( "sun" );
+			damage =  m_health->GetHealth() + 1.f;
+		}
+		else
+		{
+			Debug::Log("other");
+		}		
+
+		// Death
+		if ( m_health->GetHealth() > 0 && ! m_health->TryRemoveHealth( damage ) )
+		{
+			m_health->TryRemoveHealth( m_health->GetHealth() );
+			Die();
+		}
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
+	void SpaceShip::Die()
+	{
+		Debug::Log( "dead" );
+
+		std::default_random_engine			  m_generator;
+		std::uniform_real_distribution<float> m_distribution;
+
+		for ( int particleIndex = 0; particleIndex < 100000; particleIndex++ )
+		{
+			EcsManager * ecs = m_gameobject->GetScene()->GetEcsManager();
+			ecsEntity entity = ecs->CreateEntity();
+			ecsPosition & position = ecs->AddComponent<ecsPosition>( entity );
+			ecs->AddComponent<ecsRotation>( entity ).Init();
+			ecsMovement & movement = ecs->AddComponent<ecsMovement>( entity );
+			ecsParticle & particle = ecs->AddComponent<ecsParticle>( entity );
+
+			movement.speed = btVector3( m_distribution( m_generator ), m_distribution( m_generator ), m_distribution( m_generator ) ) - btVector3( 0.5f, 0.5f, 0.5f );
+			movement.speed.normalize();
+			movement.speed *= m_distribution( m_generator ) * 10.f + 10.f;
+			position.position = m_gameobject->GetTransform()->GetPosition();
+			particle.durationLeft = 3.f;
+		}
+
+
+		s_onPlayerDie.Emmit(m_gameobject);
+
+
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
 	void SpaceShip::OnGui()
 	{
 		Actor::OnGui();
@@ -117,7 +199,10 @@ namespace fan {
 			ImGui::DragFloat( "lateral force", &m_lateralForce, 1.f, 0.f, 100000.f );
 			ImGui::DragFloat( "active drag", &m_activeDrag, 0.001f, 0.f, 1.f );
 			ImGui::DragFloat( "passive drag", &m_passiveDrag, 0.001f, 0.f, 1.f );
-			ImGui::DragFloat( "energyConsumedPerUnitOfForce", &m_energyConsumedPerUnitOfForce, 0.0001f, 0.f, 1.f );
+			ImGui::DragFloat( "energyConsumedPerUnitOfForce", &m_energyConsumedPerUnitOfForce, 0.0001f, 0.f, 1.f );			
+			ImGui::DragFloat( "planet damage", &m_planetDamage);
+			ImGui::DragFloat( "collision repulsion force", &m_collisionRepulsionForce );
+
 			ImGui::FanComponent( "fast forward particles", &m_fastForwardParticles );
 			ImGui::FanComponent( "slow forward particles", &m_slowForwardParticles );
 			ImGui::FanComponent( "reverse particles", &m_reverseParticles );
@@ -136,6 +221,8 @@ namespace fan {
 		LoadFloat( _json, "active_drag", m_activeDrag );
 		LoadFloat( _json, "passive_drag", m_passiveDrag );
 		LoadFloat( _json, "energy_consumed_per_unit_of_force", m_energyConsumedPerUnitOfForce );
+		LoadFloat( _json, "planet_damage", m_planetDamage );
+		LoadFloat( _json, "collision_repulsion_force", m_collisionRepulsionForce );
 		LoadComponentPtr( _json, "fast_forward_particles", m_fastForwardParticles );
 		LoadComponentPtr( _json, "slow_forward_particles", m_slowForwardParticles );
 		LoadComponentPtr( _json, "reverse_particles", m_reverseParticles );
@@ -153,6 +240,8 @@ namespace fan {
 		SaveFloat( _json, "active_drag", m_activeDrag );
 		SaveFloat( _json, "passive_drag", m_passiveDrag );
 		SaveFloat( _json, "energy_consumed_per_unit_of_force", m_energyConsumedPerUnitOfForce );
+		SaveFloat( _json, "planet_damage", m_planetDamage );
+		SaveFloat( _json, "collision_repulsion_force", m_collisionRepulsionForce );
 		SaveComponentPtr( _json, "fast_forward_particles", m_fastForwardParticles );
 		SaveComponentPtr( _json, "slow_forward_particles", m_slowForwardParticles );
 		SaveComponentPtr( _json, "reverse_particles", m_reverseParticles );

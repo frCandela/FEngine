@@ -112,7 +112,7 @@ namespace fan
 		if ( *m_bulletPrefab != nullptr )
 		{
 			Gameobject * bullet = m_gameobject->GetScene()->CreateGameobject( **m_bulletPrefab, m_gameobject );
-			bullet->AddEcsComponent<ecsBullet>()->Init( m_lifeTime );
+			bullet->AddEcsComponent<ecsBullet>()->Init( m_lifeTime, m_bulletDamage );			
 
 			Rigidbody * rb = bullet->GetComponent<Rigidbody>();
 			if ( rb != nullptr )
@@ -143,6 +143,7 @@ namespace fan
 			ImGui::DragFloat( "life time ##wepspeed", &m_lifeTime, 1.f, 0.f, 100.f );
 			ImGui::DragFloat( "bullets per second", &m_bulletsPerSecond, 1.f, 0.f, 1000.f );
 			ImGui::DragFloat( "bullet energy cost", &m_bulletEnergyCost, 0.05f, 0.f, 10.f );
+			ImGui::DragFloat( "bullet damage", &m_bulletDamage, 1.f, 0.f, 100.f );
 			ImGui::Spacing();
 			ImGui::DragFloat( "explosion time ##wep_exposionTime", &m_explosionTime, 0.05f, 0.f, 10.f );
 			ImGui::DragFloat( "explosion speed ##wep_exposionSpeed", &m_exposionSpeed, 0.5f, 0.f, 100.f );
@@ -164,6 +165,7 @@ namespace fan
 		SaveFloat(		_json, "lifeTime", m_lifeTime );
 		SaveFloat(		_json, "bullets_per_second", m_bulletsPerSecond );
 		SaveFloat(		_json, "bullet_energy_cost", m_bulletEnergyCost );
+		SaveFloat(		_json, "bullet_damage", m_bulletDamage );
 		SaveFloat(		_json, "exposion_speed", m_exposionSpeed );
 		SaveFloat(		_json, "explosion_time", m_explosionTime );
 		SaveInt(		_json, "particlesPerExplosion", m_particlesPerExplosion );
@@ -182,6 +184,7 @@ namespace fan
 		LoadFloat( _json, "lifeTime", m_lifeTime );
 		LoadFloat( _json, "bullets_per_second", m_bulletsPerSecond );
 		LoadFloat( _json, "bullet_energy_cost", m_bulletEnergyCost );
+		LoadFloat( _json, "bullet_damage", m_bulletDamage );
 
 		LoadFloat( _json, "exposion_speed", m_exposionSpeed );
 		LoadFloat( _json, "explosion_time", m_explosionTime );

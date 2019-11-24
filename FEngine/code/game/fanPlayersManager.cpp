@@ -5,6 +5,7 @@
 #include "scene/fanGameobject.h"
 #include "core/input/fanJoystick.h"
 #include "game/fanPlayerInput.h"
+#include "game/fanSpaceShip.h"
 
 namespace fan
 {
@@ -24,6 +25,8 @@ namespace fan
 		Actor::OnAttach();
 		m_gameobject->GetScene()->onScenePlay.Connect( &PlayersManager::OnScenePlay, this );
 		m_gameobject->GetScene()->onScenePause.Connect( &PlayersManager::OnScenePause, this );
+
+		SpaceShip::s_onPlayerDie.Connect( &PlayersManager::OnPlayerDie, this );
 	}
 
 	//================================================================================================================================
@@ -33,6 +36,8 @@ namespace fan
 		Actor::OnDetach();
 		m_gameobject->GetScene()->onScenePlay.Disconnect( &PlayersManager::OnScenePlay, this );
 		m_gameobject->GetScene()->onScenePause.Disconnect( &PlayersManager::OnScenePause, this );
+
+		SpaceShip::s_onPlayerDie.Disconnect( &PlayersManager::OnPlayerDie, this );
 	}
 
 	//================================================================================================================================
@@ -94,6 +99,19 @@ namespace fan
 			{
 				Debug::Warning("PlayersManager::AddPlayer : Prefab is missing a PlayerInput component.");
 			}
+		}
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
+	void PlayersManager::OnPlayerDie( Gameobject * _gameobject )
+	{
+		// Removes dead player from the game
+		PlayerInput * input = _gameobject->GetComponent<PlayerInput>();
+		if ( input != nullptr )
+		{
+			RemovePlayer(input->GetJoystickID());
+			m_gameobject->GetScene()->DeleteGameobject( _gameobject );
 		}
 	}
 

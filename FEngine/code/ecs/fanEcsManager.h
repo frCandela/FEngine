@@ -112,6 +112,16 @@ namespace fan {
 	//================================================================================================================================
 	template< typename _componentType > _componentType* EcsManager::FindComponentFromEntity( const ecsEntity  _entity ) {
 		static_assert( IsComponent< _componentType >::value );
-		return &m_components.Get< _componentType >().At( m_entitiesKeys[_entity] );
+
+		ecsComponentsKey& key = m_entitiesKeys[_entity];
+		const uint32_t componentID = (uint32_t) IndexOfComponent<_componentType>::value;
+		if ( key.HasComponent( componentID ) )
+		{
+			return &m_components.Get< _componentType >().At( key );
+		}
+		else
+		{
+			return nullptr;
+		}		
 	}
 }

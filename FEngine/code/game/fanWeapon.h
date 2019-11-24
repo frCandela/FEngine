@@ -39,6 +39,7 @@ namespace fan
 		float m_speed = 0.2f;
 		float m_bulletsPerSecond = 10.f;
 		float m_bulletEnergyCost = 1.f;
+		float m_bulletDamage = 30.f;
 
 		// explosion parameters
 		float m_explosionTime = 0.15f;
