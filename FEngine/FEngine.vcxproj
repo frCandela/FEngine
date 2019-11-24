@@ -183,6 +183,7 @@
     <ClCompile Include="code\scene\components\fanColliderShape.cpp" />
     <ClCompile Include="code\scene\components\fanComponent.cpp" />
     <ClCompile Include="code\scene\components\fanDirectionalLight.cpp" />
+    <ClCompile Include="code\scene\components\fanFollowTransform.cpp" />
     <ClCompile Include="code\scene\components\fanMaterial.cpp" />
     <ClCompile Include="code\scene\components\fanMeshRenderer.cpp" />
     <ClCompile Include="code\scene\components\fanPointLight.cpp" />
@@ -191,6 +192,7 @@
     <ClCompile Include="code\scene\components\fanTransform.cpp" />
     <ClCompile Include="code\scene\components\ui\fanProgressBar.cpp" />
     <ClCompile Include="code\scene\components\ui\fanUIMeshRenderer.cpp" />
+    <ClCompile Include="code\scene\components\ui\fanUITransform.cpp" />
     <ClCompile Include="code\scene\fanComponentPtr.cpp" />
     <ClCompile Include="code\scene\fanGameobject.cpp" />
     <ClCompile Include="code\scene\fanPrefab.cpp" />
@@ -313,6 +315,7 @@
     <ClInclude Include="code\scene\components\fanColliderShape.h" />
     <ClInclude Include="code\scene\components\fanComponent.h" />
     <ClInclude Include="code\scene\components\fanDirectionalLight.h" />
+    <ClInclude Include="code\scene\components\fanFollowTransform.h" />
     <ClInclude Include="code\scene\components\fanMaterial.h" />
     <ClInclude Include="code\scene\components\fanMeshRenderer.h" />
     <ClInclude Include="code\scene\components\fanPointLight.h" />
@@ -321,6 +324,7 @@
     <ClInclude Include="code\scene\components\fanTransform.h" />
     <ClInclude Include="code\scene\components\ui\fanProgressBar.h" />
     <ClInclude Include="code\scene\components\ui\fanUIMeshRenderer.h" />
+    <ClInclude Include="code\scene\components\ui\fanUITransform.h" />
     <ClInclude Include="code\scene\fanComponentPtr.h" />
     <ClInclude Include="code\scene\fanGameobject.h" />
     <ClInclude Include="code\scene\fanPrefab.h" />

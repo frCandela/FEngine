@@ -87,11 +87,21 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	btVector2 Camera::WorldPosToScreen(const btVector3& worldPosition) {
-		const glm::vec4 pos(worldPosition[0], worldPosition[1], worldPosition[2], 1.f);
-		glm::vec4  proj = GetProjection() * GetView() * pos;
-		proj /= proj.z;
-		return btVector2(proj.x, proj.y);
+	btVector2 Camera::WorldPosToScreen(const btVector3& worldPosition) 
+	{
+		if( m_type == Type::PERSPECTIVE ) 
+		{
+			const glm::vec4 pos( worldPosition[0], worldPosition[1], worldPosition[2], 1.f );
+			glm::vec4  proj = GetProjection() * GetView() * pos;
+			proj /= proj.z;
+			return btVector2( proj.x, proj.y );
+		}
+		else
+		{
+			const glm::vec4 pos( worldPosition[0], worldPosition[1], worldPosition[2], 1.f );
+			glm::vec4  proj = GetProjection() * GetView() * pos;
+			return btVector2( proj.x, -proj.y );
+		}
 	}
 
 	//================================================================================================================================

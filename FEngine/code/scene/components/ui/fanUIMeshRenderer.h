@@ -18,17 +18,13 @@ namespace fan
 		UIMesh *		GetMesh()		{ return m_uiMesh; }
 		const UIMesh *	GetMesh() const { return m_uiMesh; }
 
-		glm::ivec2	GetPixelPosition() const;
-		void		SetPixelPosition( const glm::ivec2 _position );
-		glm::ivec2	GetPixelSize() const;
-		void		SetPixelSize( const glm::ivec2 _size );
 		glm::ivec2	GetTextureSize() const;
 		bool		IsVisible() const { return m_visible; }
 		void		SetVisible( const bool _visible ) { m_visible = _visible; }
 
-		Color GetColor() const				{ return m_color; }
-		void SetColor( const Color& _color) { m_color = _color; }
-		Texture * GetTexture() const { return *m_texture; }
+		Color		GetColor() const				{ return m_color; }
+		void		SetColor( const Color& _color) { m_color = _color; }
+		Texture *	GetTexture() const { return *m_texture; }
 
 		void OnGui() override;
 		virtual ImGui::IconType GetIcon() const { return ImGui::IconType::IMAGE; };
@@ -46,5 +42,8 @@ namespace fan
 		Color m_color;
 		TexturePtr m_texture;
 		bool m_visible = true;
+
+		void SetPixelPosition( const glm::ivec2 _position );
+		void SetPixelSize( const glm::ivec2 _size );
 	};
 }

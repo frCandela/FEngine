@@ -49,6 +49,7 @@
 #include "scene/components/fanRigidbody.h"
 #include "scene/components/fanSphereShape.h"
 #include "scene/components/ui/fanUIMeshRenderer.h"
+#include "scene/components/ui/fanUITransform.h"
 #include "scene/fanSceneInstantiate.h"
 #include "core/math/shapes/fanConvexHull.h"
 #include "core/time/fanProfiler.h"
@@ -570,7 +571,11 @@ namespace fan {
 		bool mouseCaptured = ImGui::GetIO().WantCaptureMouse;
 
 		// Translation gizmo on selected gameobject
-		if (m_selectedGameobject != nullptr && m_selectedGameobject != m_editorCamera->GetGameobject() && m_selectedGameobject->GetComponent<UIMeshRenderer>() == nullptr ) {
+		if (m_selectedGameobject != nullptr && m_selectedGameobject != m_editorCamera->GetGameobject()
+			&& m_selectedGameobject->GetComponent<UIMeshRenderer>() == nullptr 
+			&& m_selectedGameobject->GetComponent<UITransform>() == nullptr ) 
+
+		{
 			Transform * transform = m_selectedGameobject->GetComponent< Transform >();
 			btVector3 newPosition;
 			if (DrawMoveGizmo(btTransform(btQuaternion(0, 0, 0), transform->GetPosition()), (size_t)this, newPosition)) {

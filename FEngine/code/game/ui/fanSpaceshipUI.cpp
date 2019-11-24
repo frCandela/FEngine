@@ -4,10 +4,11 @@
 #include "scene/fanGameobject.h"
 #include "scene/components/fanTransform.h"
 #include "scene/components/ui/fanProgressBar.h"
-#include "game/fanSpaceShip.h"
 #include "game/fanWithEnergy.h"
 #include "game/fanSolarPanel.h"
 #include "scene/components/ui/fanUIMeshRenderer.h"
+#include "scene/components/fanCamera.h"
+#include "renderer/fanRenderer.h"
 
 namespace fan
 {
@@ -36,12 +37,14 @@ namespace fan
 		REQUIRE_TRUE( *m_healthProgress != nullptr,	"SpaceshipUI: missing reference" );
 		REQUIRE_TRUE( *m_energyProgress != nullptr, "SpaceshipUI: missing reference" );
 		REQUIRE_TRUE( *m_signalProgress != nullptr, "SpaceshipUI: missing reference" );
+		REQUIRE_TRUE( *m_signalRenderer != nullptr, "SpaceshipUI: missing reference" );
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
 	void SpaceShipUI::Update( const float /*_delta*/ )
 	{
+		// Update energy progress bar
  		WithEnergy * energy = m_spaceShip->GetComponent<WithEnergy>(); 
 		if ( energy != nullptr )
 		{
@@ -49,14 +52,29 @@ namespace fan
 			m_energyProgress->SetProgress(ratio);
 		}
 
+		// Update signal progress bar
 		SolarPanel * solarPanel = m_spaceShip->GetComponent<SolarPanel>();
 		if ( solarPanel != nullptr )
 		{
 			const float ratio = solarPanel->GetChargingRate() / solarPanel->GetMaxChargingRate();
 			m_signalProgress->SetProgress( ratio );
-			UIMeshRenderer * image = m_signalProgress->GetRenderer();
-			image->SetColor( GetSignalColor(ratio) );
+			m_signalRenderer->SetColor( GetSignalColor(ratio) );
 		}
+
+
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
+	void SpaceShipUI::LateUpdate( const float /*_delta*/ )  
+	{
+		// Set ui position
+		Camera * camera = m_gameobject->GetScene()->GetMainCamera();
+		btVector2 screenPos = camera->WorldPosToScreen( m_spaceShip->GetTransform()->GetPosition() );
+ 		m_gameobject->GetTransform()->SetPosition( btVector3( screenPos[0], screenPos[1], 0.f ) );
+
+
+		
 	}
 
 	//================================================================================================================================
@@ -82,12 +100,16 @@ namespace fan
 		ImGui::FanComponent("health progress", &m_healthProgress);
 		ImGui::FanComponent("energy progress", &m_energyProgress);
 		ImGui::FanComponent("signal progress", &m_signalProgress);
+		ImGui::FanComponent("signal renderer", &m_signalRenderer);
 
-		ImGui::PushItemWidth( 0.6f * ImGui::GetWindowWidth() );
+		if ( *m_spaceShip != nullptr )
 		{
+			Camera * camera = m_gameobject->GetScene()->GetMainCamera();
+			Ray toto = camera->ScreenPosToRay(m_gameobject->GetTransform()->GetPosition());
 
-		} ImGui::PopItemWidth();
 
+			Debug::Render().DebugLine(toto.origin, m_spaceShip->GetTransform()->GetPosition(), Color::Red );
+		}
 	}
 	 
 	//================================================================================================================================
@@ -99,6 +121,8 @@ namespace fan
 		SaveComponentPtr(_json, "health_progress",  m_healthProgress );
 		SaveComponentPtr(_json, "energy_progress",  m_energyProgress );
 		SaveComponentPtr(_json, "signal_progress",  m_signalProgress);
+		SaveComponentPtr( _json, "signal_renderer", m_signalRenderer );
+
 		return true;
 	}
 	 
@@ -111,6 +135,7 @@ namespace fan
 		LoadComponentPtr( _json, "health_progress", m_healthProgress );
 		LoadComponentPtr( _json, "energy_progress", m_energyProgress );
 		LoadComponentPtr( _json, "signal_progress",  m_signalProgress);
+		LoadComponentPtr( _json, "signal_renderer", m_signalRenderer );
 		return true;
 	}
 }

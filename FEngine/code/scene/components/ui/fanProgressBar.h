@@ -5,7 +5,7 @@
 
 namespace fan
 {
-	class UIMeshRenderer;
+	class UITransform;
 
 	//================================================================================================================================
 	//================================================================================================================================
@@ -19,8 +19,6 @@ namespace fan
 		void	SetProgress( const float _progress );
 		float	GetProgress() const { return m_progress; }
 
-		UIMeshRenderer* GetRenderer() const { return *m_image; }
-
 		DECLARE_TYPE_INFO( ProgressBar, Component );
 	protected:
 		void OnAttach() override;
@@ -29,7 +27,7 @@ namespace fan
 		bool Save( Json & _json ) const override;
 
 	private:
-		ComponentPtr<UIMeshRenderer> m_image;
+		ComponentPtr<UITransform> m_targetUiTransform;
 		float	m_progress = 1.f;
 		int		m_maxWidth = 100;
 	};

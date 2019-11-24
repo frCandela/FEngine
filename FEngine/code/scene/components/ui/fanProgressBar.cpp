@@ -3,7 +3,7 @@
 
 #include "scene/fanGameobject.h"
 #include "scene/components/fanTransform.h"
-#include "scene/components/ui/fanUIMeshRenderer.h"
+#include "scene/components/ui/fanUITransform.h"
 
 namespace fan
 {
@@ -15,12 +15,10 @@ namespace fan
 	void ProgressBar::OnAttach()
 	{
 		Component::OnAttach();
-
-		UIMeshRenderer * image = m_gameobject->GetComponent<UIMeshRenderer>();
-		if ( image != nullptr )
+			   
+		if ( *m_targetUiTransform != nullptr )
 		{
-			m_image = image;
-			m_maxWidth = image->GetPixelSize().x;
+			m_maxWidth = m_targetUiTransform->GetPixelSize().x;
 		}
 	}
 
@@ -38,12 +36,12 @@ namespace fan
 		if ( _progress != m_progress )
 		{
 			m_progress = _progress;
-			if ( *m_image != nullptr )
+			if ( *m_targetUiTransform != nullptr )
 			{
-				const glm::ivec2 pos = m_image->GetPixelPosition();
-				const glm::ivec2 size = m_image->GetPixelSize();
+				const glm::ivec2 pos = m_targetUiTransform->GetPixelPosition();
+				const glm::ivec2 size = m_targetUiTransform->GetPixelSize();
 
-				m_image->SetPixelSize( glm::ivec2( m_progress * m_maxWidth, size.y ) );			
+				m_targetUiTransform->SetPixelSize( glm::ivec2( m_progress * m_maxWidth, size.y ) );			
 			}
 		}		
 	}
@@ -52,7 +50,7 @@ namespace fan
 	//================================================================================================================================
 	void ProgressBar::OnGui()
 	{
-		ImGui::FanComponent("image", &m_image);
+		ImGui::FanComponent("target ui transform", &m_targetUiTransform);
 
 		ImGui::PushItemWidth( 0.6f * ImGui::GetWindowWidth() );
 		{
@@ -68,7 +66,7 @@ namespace fan
 	bool ProgressBar::Save( Json & _json ) const
 	{
 		Component::Save( _json );
-		SaveComponentPtr(_json, "image", m_image );
+		SaveComponentPtr(_json, "target_ui_transform", m_targetUiTransform );
 		SaveInt( _json, "max_width", m_maxWidth );
 		return true;
 	}
@@ -77,7 +75,7 @@ namespace fan
 	//================================================================================================================================
 	bool ProgressBar::Load( const Json & _json )
 	{
-		LoadComponentPtr(_json, "image", m_image );
+		LoadComponentPtr(_json, "target_ui_transform", m_targetUiTransform );
 		LoadInt( _json, "max_width", m_maxWidth );
 		return true;
 	}

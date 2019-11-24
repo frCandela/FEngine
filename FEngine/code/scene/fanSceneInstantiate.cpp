@@ -64,8 +64,16 @@ namespace fan
 			auto it = m_remapTable.find( ptr->GetID() );
 			const uint64_t index = ( it != m_remapTable.end() ? it->second : ptr->GetID() );
 			Gameobject * gameobject = m_scene.FindGameobject( index );
-			assert( gameobject != nullptr );
-			*ptr = GameobjectPtr( gameobject, index );
+
+			if ( gameobject != nullptr )
+			{
+				*ptr =  GameobjectPtr( gameobject, index );
+			}
+			else
+			{
+				Debug::Warning() << "Resolve gameobject failed for index " << index << Debug::Endl();
+				*ptr =  GameobjectPtr();
+			}
 		}
 
 		// Resolves components
@@ -76,9 +84,16 @@ namespace fan
 			auto it = m_remapTable.find( ptr->GetID().gameobjectID );
 			const uint64_t index = ( it != m_remapTable.end() ? it->second : ptr->GetID().gameobjectID );
 			Gameobject * gameobject =m_scene.FindGameobject( index );
-			assert( gameobject != nullptr );
-			Component * component = gameobject->GetComponent( ptr->GetID().componentID );
-			*ptr = ComponentIDPtr( component, IDPtrData( index, ptr->GetID().componentID ) );
+			if ( gameobject != nullptr )
+			{
+				Component * component = gameobject->GetComponent( ptr->GetID().componentID );
+				*ptr = ComponentIDPtr( component, IDPtrData( index, ptr->GetID().componentID ) );
+			}
+			else
+			{
+				Debug::Warning() << "Resolve component failed for gameobject index " << index << Debug::Endl();
+				*ptr = ComponentIDPtr();
+			}
 		}
 	}
 

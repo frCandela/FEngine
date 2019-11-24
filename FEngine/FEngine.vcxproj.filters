@@ -448,6 +448,12 @@
     <ClCompile Include="code\game\fanPlayersManager.cpp">
       <Filter>code\game</Filter>
     </ClCompile>
+    <ClCompile Include="code\scene\components\ui\fanUITransform.cpp">
+      <Filter>code\scene\components\ui</Filter>
+    </ClCompile>
+    <ClCompile Include="code\scene\components\fanFollowTransform.cpp">
+      <Filter>code\scene\components</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="code\editor\fanMainMenuBar.h">
@@ -1364,6 +1370,12 @@
     </ClInclude>
     <ClInclude Include="code\game\fanPlayersManager.h">
       <Filter>code\game</Filter>
+    </ClInclude>
+    <ClInclude Include="code\scene\components\ui\fanUITransform.h">
+      <Filter>code\scene\components\ui</Filter>
+    </ClInclude>
+    <ClInclude Include="code\scene\components\fanFollowTransform.h">
+      <Filter>code\scene\components</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
