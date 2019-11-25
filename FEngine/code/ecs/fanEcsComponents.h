@@ -70,6 +70,15 @@ namespace fan {
 	};
 
 	//================================
+	struct ecsSunlightParticleOcclusion : ecsIComponent
+	{
+		static const char * s_name;
+		void Init()
+		{
+		}
+	};
+
+	//================================
 	struct ecsAABB : ecsIComponent {
 		static const char * s_name;
 		void Init() {	aabb.Clear(); }
@@ -257,6 +266,7 @@ namespace fan {
 		, ecsRotation
 		, ecsMovement
 		, ecsParticle
+		, ecsSunlightParticleOcclusion
 		, ecsScaling
 		, ecsAABB
 		, ecsMesh

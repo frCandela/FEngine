@@ -32,6 +32,7 @@ namespace fan
 
 		if( m_currentHealth >= _healthConsumed ) {
 			m_currentHealth -= _healthConsumed;
+			if( m_currentHealth <= 0.f ){ onFallToZero.Emmit(); }
 			return true;
 		}
 		else

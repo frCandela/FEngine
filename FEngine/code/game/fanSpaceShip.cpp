@@ -30,7 +30,7 @@ namespace fan {
 		REQUIRE_COMPONENT( WithEnergy, m_energy )
 		REQUIRE_COMPONENT( Rigidbody, m_rigidbody )
 		REQUIRE_COMPONENT( PlayerInput, m_input );
-		REQUIRE_COMPONENT( Health, m_health );
+		REQUIRE_COMPONENT( Health, m_health );		
 
 		REQUIRE_TRUE( *m_fastForwardParticles	!= nullptr , "Spaceship: missing particles reference" );
 		REQUIRE_TRUE( *m_slowForwardParticles	!= nullptr , "Spaceship: missing particles reference" );
@@ -44,7 +44,10 @@ namespace fan {
 		if( *m_leftParticles		!= nullptr ) { m_leftParticles		 ->SetEnabled( false ); }
 		if( *m_rightParticles		!= nullptr ) { m_rightParticles		 ->SetEnabled( false ); }
 
-		if( m_health ) {				m_health->AddHealth( m_health->GetMaxHealth() ); }
+		if( m_health ) {				
+			m_health->AddHealth( m_health->GetMaxHealth() ); 
+			m_health->onFallToZero.Connect( &SpaceShip::Die, this );
+		}
 		if ( m_energy ) {				m_energy->AddEnergy( m_energy->GetMaxEnergy() ); }
 		if( m_rigidbody != nullptr ) {	m_rigidbody->onContactStarted.Connect( &SpaceShip::OnContactStarted, this ); }
 	}
@@ -149,7 +152,6 @@ namespace fan {
 		if ( m_health->GetHealth() > 0 && ! m_health->TryRemoveHealth( damage ) )
 		{
 			m_health->TryRemoveHealth( m_health->GetHealth() );
-			Die();
 		}
 	}
 
@@ -160,9 +162,9 @@ namespace fan {
 		Debug::Log( "dead" );
 
 		std::default_random_engine			  m_generator;
-		std::uniform_real_distribution<float> m_distribution;
+		std::uniform_real_distribution<float> m_distribution( 0.f, 1.f );
 
-		for ( int particleIndex = 0; particleIndex < 100000; particleIndex++ )
+		for ( int particleIndex = 0; particleIndex < 1000; particleIndex++ )
 		{
 			EcsManager * ecs = m_gameobject->GetScene()->GetEcsManager();
 			ecsEntity entity = ecs->CreateEntity();

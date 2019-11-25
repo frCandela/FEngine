@@ -17,9 +17,11 @@ namespace fan {
 		void OnGui() override;
 		ImGui::IconType GetIcon() const override { return ImGui::IconType::PARTICLES; }
 
+		void SetParticlesColor( const Color	_color)		{ m_color = _color;  }
 		void SetParticlesPerSecond( const int _pps )	{ m_particlesPerSecond = _pps; }
 		void SetSpeedParticles( const float _speed )	{ m_speed = _speed; }
 		void SetSpawnOffset( const btVector3 _offset )	{ m_offset = _offset; }
+		void SetSunlightParticleOcclusionActive( const bool _active  ){ m_sunlightParticleOcclusionActive = _active; }
 
 		DECLARE_TYPE_INFO( ParticleSystem, Actor );
 	protected:
@@ -40,7 +42,9 @@ namespace fan {
 		GameobjectPtr m_origin;
 		Color		m_color = Color::White;
 
-		float	m_timeAccumulator = 0.f;
+		bool		m_sunlightParticleOcclusionActive = false;
+
+		float		m_timeAccumulator = 0.f;
 
 	};
 }

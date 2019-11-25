@@ -51,6 +51,7 @@ namespace fan {
 			m_ecsManager->AddComponent<ecsRotation>( entity );
 			m_ecsManager->AddComponent<ecsMovement>( entity );
 			m_ecsManager->AddComponent<ecsParticle>( entity );
+			if( m_sunlightParticleOcclusionActive ) { m_ecsManager->AddComponent<ecsSunlightParticleOcclusion>( entity );}
 
 			ecsPosition* position = m_ecsManager->FindComponentFromEntity<ecsPosition>( entity );
 			ecsMovement* movement = m_ecsManager->FindComponentFromEntity<ecsMovement>( entity );
@@ -82,6 +83,7 @@ namespace fan {
 			ImGui::DragFloat( "duration", &m_duration, 0.01f );
 			ImGui::DragFloat3( "offset", &m_offset[0], 0.01f );	
 		    ImGui::ColorEdit4( "color", m_color.Data(), ImGui::fanColorEditFlags );
+			ImGui::Checkbox("sun light occlusion", &m_sunlightParticleOcclusionActive);
 
 		} ImGui::PopItemWidth();
 
@@ -98,6 +100,7 @@ namespace fan {
 		LoadVec3(  _json, "offset", m_offset );
 		LoadGameobjectPtr(  _json, "origin", m_origin );
 		LoadColor( _json, "color", m_color );
+		LoadBool( _json, "sunlight_occlusion_active", m_sunlightParticleOcclusionActive);
 
 		return true;
 	}
@@ -113,6 +116,7 @@ namespace fan {
 		SaveVec3( _json, "offset", m_offset );
 		SaveGameobjectPtr(  _json, "origin", m_origin );
 		SaveColor( _json, "color", m_color );
+		SaveBool( _json, "sunlight_occlusion_active", m_sunlightParticleOcclusionActive);
 
 		return true;
 	}

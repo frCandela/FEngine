@@ -14,12 +14,36 @@ namespace fan {
 
 	//================================================================================================================================
 	//================================================================================================================================
-	btVector3 ecsParticleSystem::s_cameraPosition;
 	void ecsParticleSystem::Run( float _delta, const size_t _count, std::vector< ecsComponentsKey >& _entitiesData,
 		ComponentData< ecsPosition > & _positions,
 		ComponentData< ecsRotation > & /*_rotations*/,
 		ComponentData< ecsMovement > & _movements,
 		ComponentData< ecsParticle > & _particles ) 
+	{
+		for ( int entity = 0; entity < _count; entity++ ) {
+			ecsComponentsKey & key = _entitiesData[entity];
+
+			if ( key.IsAlive() && key.MatchSignature( signature::bitset ) ) {
+				btVector3& position = _positions.At(key).position;
+				ecsMovement& movement = _movements.At( key );
+				ecsParticle& particle = _particles.At( key );
+
+				particle.durationLeft -= _delta;
+				if ( particle.durationLeft < 0 ) {
+					key.Kill();
+				}
+				position += _delta * movement.speed;				
+			}
+		}
+	}
+
+
+	//================================================================================================================================
+	//================================================================================================================================
+	btVector3 ecsParticlesGenerateSystem::s_cameraPosition;
+	void ecsParticlesGenerateSystem::Run( float /*_delta*/, const size_t _count, std::vector< ecsComponentsKey >& _entitiesData
+		, ComponentData< ecsPosition > & _positions
+		, ComponentData< ecsParticle > & _particles )
 	{
 		std::vector<btVector3> triangles;
 		std::vector<Color> colors;
@@ -29,33 +53,25 @@ namespace fan {
 		const btVector3 up = btVector3::Left();
 		static const float size = 0.05f;
 
-		for ( int entity = 0; entity < _count; entity++ ) {
+		for ( int entity = 0; entity < _count; entity++ )
+		{
 			ecsComponentsKey & key = _entitiesData[entity];
 
-			if ( key.IsAlive() && key.MatchSignature( signature::bitset ) ) {
-				btVector3& position = _positions.At(key).position;
-				ecsMovement& movement = _movements.At( key );
+			if ( key.IsAlive() && key.MatchSignature( signature::bitset ) )
+			{
+				btVector3& position = _positions.At( key ).position;
 				ecsParticle& particle = _particles.At( key );
 
-				(void)particle;
-
-				particle.durationLeft -= _delta;
-				if ( particle.durationLeft < 0 ) {
-					key.Kill();
-				}
-				position += _delta * movement.speed;
-
-				
 				btVector3 forward = s_cameraPosition - position;
 				forward.normalize();
 				btVector3 left = up.cross( forward );
 				left.normalize();
 
-				btMatrix3x3 mat ( 
+				btMatrix3x3 mat (
 					left[0], up[0], forward[0],
 					left[1], up[1], forward[1],
-					left[2], up[2], forward[2] );			
-					
+					left[2], up[2], forward[2] );
+
 				triangles.push_back( position + mat * btVector3( size, 0, 0 ) );
 				triangles.push_back( position + mat * btVector3( -size, 0, 0 ) );
 				triangles.push_back( position + mat * btVector3( 0, 2.f*size, 0 ) );
@@ -66,6 +82,35 @@ namespace fan {
 		Debug::Render().DebugTriangles( triangles, colors );
 	}
 
+	//================================================================================================================================
+	//================================================================================================================================
+	void ecsParticleSunlightOcclusionSystem::Run( float /*_delta*/, const size_t _count, std::vector< ecsComponentsKey >& _entitiesData
+		, ComponentData< ecsPosition > & _positions
+		, ComponentData< ecsParticle > & /*_particles*/
+		, ComponentData< ecsSunlightParticleOcclusion > & /*_occlusion*/ )
+	{
+		for ( int entity = 0; entity < _count; entity++ )
+		{
+			ecsComponentsKey & key = _entitiesData[entity];
+
+			if ( key.IsAlive() && key.MatchSignature( signature::bitset ) )
+			{
+				// get data
+				btVector3& position = _positions.At( key ).position;
+
+				// raycast on the light mesh
+				const btVector3 rayOrigin = btVector3(position[0], 1.f, position[2] );
+				btVector3 outIntersection;
+				bool isInsideSunlight = ecsSolarEruptionMeshSystem::s_mesh->RayCast( rayOrigin, -btVector3::Up(), outIntersection );
+				if ( ! isInsideSunlight )
+				{
+					key.Kill();
+				}
+			}
+		}
+
+
+	}
 
 	//================================================================================================================================
 	//================================================================================================================================

@@ -38,7 +38,7 @@ namespace fan {
 	};
 
 	//================================
-	// ParticleSystem
+	// ParticleSystem move
 	//================================
 	class ecsParticleSystem : public ISystem<  ecsPosition, ecsRotation, ecsMovement, ecsParticle > {
 	public:
@@ -46,9 +46,32 @@ namespace fan {
 			ComponentData< ecsPosition > & _positions,
 			ComponentData< ecsRotation > & _rotations,
 			ComponentData< ecsMovement > & _movements,
-			ComponentData< ecsParticle > & _particles );
+			ComponentData< ecsParticle > & _particles );		
+	};
+
+	//================================
+	// ParticleSystem generate mesh
+	//================================
+	class ecsParticlesGenerateSystem : public ISystem<  ecsPosition, ecsParticle >
+	{
+	public:
+		static void Run( float _delta, const size_t _count, std::vector< ecsComponentsKey >& _entitiesData
+			, ComponentData< ecsPosition > & _positions
+			, ComponentData< ecsParticle > & _particles );
 
 		static btVector3 s_cameraPosition;
+	};
+
+	//================================
+	// ParticleSystem
+	//================================
+	class ecsParticleSunlightOcclusionSystem : public ISystem<  ecsPosition, ecsParticle, ecsSunlightParticleOcclusion >
+	{
+	public:
+		static void Run( float _delta, const size_t _count, std::vector< ecsComponentsKey >& _entitiesData
+			,ComponentData< ecsPosition > & _positions
+			,ComponentData< ecsParticle > & _particles
+			,ComponentData< ecsSunlightParticleOcclusion > & _occlusion );
 	};
 
 	//================================

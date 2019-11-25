@@ -9,6 +9,7 @@ namespace fan
 	class Health : public Component
 	{
 	public:
+		Signal<> onFallToZero;
 
 		bool  TryRemoveHealth( const float _healthConsumed );
 		void  AddHealth( const float _healthAdded );

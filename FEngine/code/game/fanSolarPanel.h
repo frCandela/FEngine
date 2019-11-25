@@ -18,7 +18,7 @@ namespace fan
 
 		float GetChargingRate() const{ return m_currentChargingRate; }
 		float GetMaxChargingRate() const { return m_maxChargingRate; }
-
+		bool  IsInsideSunlight() const { return m_isInsideSunlight; }
 
 		void OnGui() override;
 		ImGui::IconType GetIcon() const override { return ImGui::IconType::GAME_MANAGER; }
