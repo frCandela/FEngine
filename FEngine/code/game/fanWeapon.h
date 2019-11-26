@@ -18,7 +18,7 @@ namespace fan
 		void LateUpdate( const float _delta ) override;
 
 		void OnGui() override;
-		ImGui::IconType GetIcon() const override { return ImGui::IconType::GAME_MANAGER; }
+		ImGui::IconType GetIcon() const override { return ImGui::IconType::JOYSTICK16; }
 
 		DECLARE_TYPE_INFO( Weapon, Actor );
 	protected:

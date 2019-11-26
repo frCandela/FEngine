@@ -16,7 +16,7 @@ namespace fan {
 		void SetPhase( const float _phase );
 
 		void OnGui() override;
-		ImGui::IconType GetIcon() const override { return ImGui::IconType::PLANET; }
+		ImGui::IconType GetIcon() const override { return ImGui::IconType::PLANET16; }
 
 		DECLARE_TYPE_INFO(Planet, Actor );
 	protected:

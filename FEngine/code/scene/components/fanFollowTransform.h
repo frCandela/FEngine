@@ -20,7 +20,7 @@ namespace fan
 		void LateUpdate( const float /*_delta*/ ) override {}
 
 		void OnGui() override;
-		ImGui::IconType GetIcon() const override { return ImGui::IconType::TRANSFORM; }
+		ImGui::IconType GetIcon() const override { return ImGui::IconType::FOLLOW_TRANSFORM; }
 
 		DECLARE_TYPE_INFO( FollowTransform, Actor );
 	protected:

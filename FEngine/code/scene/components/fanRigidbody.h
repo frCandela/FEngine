@@ -35,7 +35,7 @@ namespace fan {
 		void SetCollisionShape( btCollisionShape * _collisionShape );
 
 		void OnGui() override;
-		ImGui::IconType GetIcon() const override { return ImGui::IconType::RIGIDBODY; }
+		ImGui::IconType GetIcon() const override { return ImGui::IconType::RIGIDBODY16; }
 
 		DECLARE_TYPE_INFO( Rigidbody, Component );
 	protected:

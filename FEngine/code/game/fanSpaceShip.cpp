@@ -20,7 +20,7 @@
 #include "game/fanSolarSystem.h"
 
 namespace fan {
-	REGISTER_TYPE_INFO(SpaceShip, TypeInfo::Flags::EDITOR_COMPONENT)
+	REGISTER_TYPE_INFO(SpaceShip, TypeInfo::Flags::EDITOR_VISIBLE)
 
 	Signal<Gameobject*> SpaceShip::s_onPlayerDie;
 

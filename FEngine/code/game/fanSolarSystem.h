@@ -13,7 +13,7 @@ namespace fan {
 		void LateUpdate( const float /*_delta*/ ) override {}
 
 		void OnGui() override;
-		ImGui::IconType GetIcon() const override { return ImGui::IconType::SOLAR_SYSTEM; }
+		ImGui::IconType GetIcon() const override { return ImGui::IconType::SOLAR_SYSTEM16; }
 
 		DECLARE_TYPE_INFO( SolarSystem, Actor );
 	protected:

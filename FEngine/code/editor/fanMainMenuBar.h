@@ -23,6 +23,7 @@ namespace fan
 		Signal< std::string > onNewScene;
 		Signal< std::string > onOpenScene;
 		Signal<> onReloadShaders;
+		Signal<> onReloadIcons;
 		Signal<> onExit;
 
 

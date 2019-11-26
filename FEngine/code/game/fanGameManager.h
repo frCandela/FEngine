@@ -19,7 +19,7 @@ namespace fan {
 		void OnScenePlay();
 		void OnScenePause();
 
-		ImGui::IconType GetIcon() const override { return ImGui::IconType::GAME_MANAGER; }
+		ImGui::IconType GetIcon() const override { return ImGui::IconType::JOYSTICK16; }
 
 		void OnGui() override;
 

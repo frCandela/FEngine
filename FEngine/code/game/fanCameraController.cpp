@@ -10,7 +10,7 @@
 #include "renderer/fanRenderer.h"
 
 namespace fan {
-	REGISTER_TYPE_INFO(CameraController, TypeInfo::Flags::EDITOR_COMPONENT )
+	REGISTER_TYPE_INFO(CameraController, TypeInfo::Flags::EDITOR_VISIBLE )
 
 	//================================================================================================================================
 	//================================================================================================================================

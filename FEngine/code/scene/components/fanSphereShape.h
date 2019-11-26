@@ -16,7 +16,7 @@ namespace fan
 		btCollisionShape *	GetCollisionShape() override;
 
 		void OnGui() override;
-		ImGui::IconType GetIcon() const override  { return ImGui::IconType::SPHERE_SHAPE; };
+		ImGui::IconType GetIcon() const override  { return ImGui::IconType::SPHERE_SHAPE16; };
 
 	protected:
 		void OnAttach() override;

@@ -74,6 +74,7 @@ namespace fan
 		void ClearDebug();
 		void WaitIdle();
 
+		void ReloadIcons();
 		void ReloadShaders();
 		void UpdateDebugBuffer(const size_t _index);
 

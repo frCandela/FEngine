@@ -26,7 +26,7 @@ namespace fan
 		void			SetTexturePath( const std::string& _path );
 
 		void OnGui() override;
-		ImGui::IconType GetIcon() const override { return ImGui::IconType::MATERIAL; }
+		ImGui::IconType GetIcon() const override { return ImGui::IconType::MATERIAL16; }
 
 		DECLARE_TYPE_INFO(Material, Component );
 	protected:

@@ -19,11 +19,13 @@ namespace fan
 		void Create(VkRenderPass _renderPass, GLFWwindow* _window, VkExtent2D _extent);
 		void UpdateBuffer(const size_t _index);
 		void DrawFrame(VkCommandBuffer commandBuffer, const size_t _index);
+		void ReloadIcons();
 
 	private:
 		Device & m_device;
 
 		Sampler * m_sampler;
+		Sampler * m_iconsSampler;
 		Texture * m_fontTexture;
 		Texture * m_iconsTexture;
 

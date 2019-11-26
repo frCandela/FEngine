@@ -13,7 +13,7 @@ namespace fan {
 		btBoxShape *		GetBoxShape();
 		btCollisionShape *	GetCollisionShape() override;
 
-		ImGui::IconType GetIcon() const override { return ImGui::IconType::BOX_SHAPE; };
+		ImGui::IconType GetIcon() const override { return ImGui::IconType::CUBE_SHAPE16; };
 		void OnGui() override;
 	protected:
 		void OnAttach() override;

@@ -40,6 +40,7 @@ namespace fan
 		Input::Get().Manager().FindEvent( "open_scene")->Connect( &MainMenuBar::Open, this );
 		Input::Get().Manager().FindEvent( "save_scene" )->Connect( &MainMenuBar::Save, this );
 		Input::Get().Manager().FindEvent( "reload_scene" )->Connect( &MainMenuBar::Reload, this );
+		Input::Get().Manager().FindEvent( "reload_icons" )->Connect( &Signal<>::Emmit, &this->onReloadIcons );
 	}
 
 	//================================================================================================================================
@@ -107,6 +108,11 @@ namespace fan
 					onReloadShaders.Emmit();
 				}
 
+				if ( ImGui::MenuItem( "Reload icons", "F6") )
+				{
+					onReloadIcons.Emmit();
+				}
+
 				ImGui::Separator();
 
 				if (ImGui::MenuItem("Exit")) {
@@ -119,12 +125,12 @@ namespace fan
 			// View
 			if (ImGui::BeginMenu("View"))
 			{
-				ImGui::Icon( ImGui::IMGUI, { 19,19 } ); ImGui::SameLine();
+				ImGui::Icon( ImGui::IMGUI16, { 16,16 } ); ImGui::SameLine();
 				ImGui::MenuItem( "Imgui demo", nullptr, &m_showImguiDemoWindow );
 
 				for (size_t windowIndex = 0; windowIndex < m_editorWindows.size() ; windowIndex++) {
 					EditorWindow * window = m_editorWindows[ windowIndex ];
-					ImGui::Icon( window->GetIconType(), {19,19} ); ImGui::SameLine();					
+					ImGui::Icon( window->GetIconType(), {16,16} ); ImGui::SameLine();					
 					bool showWindow = window->IsVisible();
 					if ( ImGui::MenuItem( window->GetName().c_str(), nullptr, &showWindow ) ) {
 						window->SetVisible( showWindow );

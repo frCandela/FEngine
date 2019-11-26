@@ -10,7 +10,7 @@ namespace fan {
 
 	//================================================================================================================================
 	//================================================================================================================================
-	ProfilerWindow::ProfilerWindow() : EditorWindow( "profiler", ImGui::IconType::PROFILER )
+	ProfilerWindow::ProfilerWindow() : EditorWindow( "profiler", ImGui::IconType::PROFILER16 )
 		, m_color1( 0.49f, 1.f, 0.8f )
 		, m_color2( 0.29f, 0.8f, 1.f )
 		, m_colorHovered( 0.64f, 0.96f, 0.99f )

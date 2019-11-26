@@ -22,7 +22,7 @@ namespace fan
 	//================================================================================================================================
 	//================================================================================================================================
 	ConsoleWindow::ConsoleWindow() :
-		EditorWindow("console", ImGui::IconType::CONSOLE),
+		EditorWindow("console", ImGui::IconType::CONSOLE16),
 		m_maxSizeLogBuffers(256),
 		m_firstLogIndex(0),
 		m_grabFocus(false)
@@ -80,7 +80,7 @@ namespace fan
 		}
 
 		// Icon
-		ImGui::Icon( GetIconType(), { 20,20 } ); ImGui::SameLine();
+		ImGui::Icon( GetIconType(), { 16,16 } ); ImGui::SameLine();
 
 		// Input
 		bool pressed = false;

@@ -85,6 +85,7 @@ namespace fan {
 		// Creates keyboard events
 		Input::Get().Manager().CreateKeyboardEvent( "delete",		  Keyboard::DELETE	);
 		Input::Get().Manager().CreateKeyboardEvent( "reload_shaders", Keyboard::F5		);
+		Input::Get().Manager().CreateKeyboardEvent( "reload_icons",	  Keyboard::F6		);
 		Input::Get().Manager().CreateKeyboardEvent( "open_scene",	  Keyboard::O, Keyboard::LEFT_CONTROL );
 		Input::Get().Manager().CreateKeyboardEvent( "save_scene",	  Keyboard::S, Keyboard::LEFT_CONTROL );
 		Input::Get().Manager().CreateKeyboardEvent( "reload_scene",	  Keyboard::R, Keyboard::LEFT_CONTROL );
@@ -144,6 +145,7 @@ namespace fan {
 		Debug::Get().SetDebug( m_renderer );
 		m_sceneWindow->onSelectGameobject.	Connect( &Engine::SetSelectedGameobject, this );
 		m_mainMenuBar->onReloadShaders.		Connect(&Renderer::ReloadShaders, m_renderer );
+		m_mainMenuBar->onReloadIcons.		Connect(&Renderer::ReloadIcons, m_renderer );
 		m_mainMenuBar->onExit.				Connect( &Engine::Exit, this );
 		onGameobjectSelected.				Connect( &SceneWindow::OnGameobjectSelected, m_sceneWindow );
 		onGameobjectSelected.				Connect( &InspectorWindow::OnGameobjectSelected, m_inspectorWindow );

@@ -27,7 +27,7 @@ namespace fan
 		Texture *	GetTexture() const { return *m_texture; }
 
 		void OnGui() override;
-		virtual ImGui::IconType GetIcon() const { return ImGui::IconType::IMAGE; };
+		virtual ImGui::IconType GetIcon() const { return ImGui::IconType::IMAGE16; };
 
 		DECLARE_TYPE_INFO( UIMeshRenderer, Component );
 

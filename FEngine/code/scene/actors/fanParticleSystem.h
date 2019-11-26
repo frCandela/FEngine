@@ -15,7 +15,7 @@ namespace fan {
 		void LateUpdate( const float /*_delta*/ ) override {}
 
 		void OnGui() override;
-		ImGui::IconType GetIcon() const override { return ImGui::IconType::PARTICLES; }
+		ImGui::IconType GetIcon() const override { return ImGui::IconType::PARTICLES16; }
 
 		void SetParticlesColor( const Color	_color)		{ m_color = _color;  }
 		void SetParticlesPerSecond( const int _pps )	{ m_particlesPerSecond = _pps; }

@@ -17,7 +17,7 @@ namespace fan
 		void		SetPixelSize( const glm::ivec2 _size );
 
 		void OnGui() override;
-		virtual ImGui::IconType GetIcon() const { return ImGui::IconType::TRANSFORM; };
+		virtual ImGui::IconType GetIcon() const { return ImGui::IconType::UI_TRANSFORM16; };
 
 		DECLARE_TYPE_INFO( UITransform, Component );
 

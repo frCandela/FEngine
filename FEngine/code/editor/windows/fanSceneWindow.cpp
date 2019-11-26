@@ -28,7 +28,7 @@ namespace fan
 	//================================================================================================================================
 	//================================================================================================================================
 	SceneWindow::SceneWindow( Scene * _scene ) :
-		EditorWindow("scene", ImGui::IconType::SCENE )
+		EditorWindow("scene", ImGui::IconType::SCENE16 )
 		, m_scene(_scene)
 	{
 		m_textBuffer[0] = '\0';
@@ -72,7 +72,7 @@ namespace fan
 					itemClicked = true;
 				}
 				// Entities templates
-				ImGui::Icon(ImGui::MESH, {19,19}); ImGui::SameLine();
+				ImGui::Icon(ImGui::MESH_RENDERER16, {16,16}); ImGui::SameLine();
 				if ( ImGui::MenuItem( "Model" ) ) {
 					Gameobject *  newIntity = m_scene->CreateGameobject("new_model", m_lastGameobjectRightClicked );
 					MeshRenderer * meshRenderer = newIntity->AddComponent<MeshRenderer>();
@@ -81,19 +81,19 @@ namespace fan
 					material->SetTexturePath( GlobalValues::s_textureWhite );
 				}
 
-				ImGui::Icon( ImGui::POINT_LIGHT, { 19,19 } ); ImGui::SameLine();
+				ImGui::Icon( ImGui::POINT_LIGHT16, { 16,16 } ); ImGui::SameLine();
 				if ( ImGui::MenuItem( "Point light" ) ) {
 					Gameobject *  newIntity = m_scene->CreateGameobject( "new_point_light", m_lastGameobjectRightClicked );
 					newIntity->AddComponent<PointLight>();
 				}
 
-				ImGui::Icon( ImGui::DIR_LIGHT, { 19,19 } ); ImGui::SameLine();
+				ImGui::Icon( ImGui::DIR_LIGHT16, { 16,16 } ); ImGui::SameLine();
 				if ( ImGui::MenuItem( "Dir light" ) ) {
 					Gameobject *  newIntity = m_scene->CreateGameobject( "new_dir_light", m_lastGameobjectRightClicked );
 					newIntity->AddComponent<DirectionalLight>();
 				}
 
-				ImGui::Icon( ImGui::SPHERE_SHAPE, { 19,19 } ); ImGui::SameLine();
+				ImGui::Icon( ImGui::SPHERE_SHAPE16, { 16,16 } ); ImGui::SameLine();
 				if ( ImGui::MenuItem( "Sphere" ) ) {
 					Gameobject *  newIntity = m_scene->CreateGameobject( "new_model", m_lastGameobjectRightClicked );
 					MeshRenderer * meshRenderer = newIntity->AddComponent<MeshRenderer>();
@@ -102,7 +102,7 @@ namespace fan
 					newIntity->AddComponent<SphereShape>();
 				}
 
-				ImGui::Icon( ImGui::PARTICLES, { 19,19 } ); ImGui::SameLine();
+				ImGui::Icon( ImGui::PARTICLES16, { 16,16 } ); ImGui::SameLine();
 				if ( ImGui::MenuItem( "FX" ) )
 				{
 					Gameobject *  newIntity = m_scene->CreateGameobject( "new_fx", m_lastGameobjectRightClicked );

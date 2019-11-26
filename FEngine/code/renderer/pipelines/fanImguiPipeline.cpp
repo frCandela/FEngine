@@ -17,6 +17,7 @@ namespace fan
 		, m_fontTexture(new Texture())
 		, m_iconsTexture( new Texture())
 		, m_sampler(new Sampler(_device))
+		, m_iconsSampler(new Sampler(_device))
 	{
 		m_vertexBuffers.reserve(_swapchainImagesCount);
 		m_indexBuffers.reserve(_swapchainImagesCount);
@@ -34,6 +35,7 @@ namespace fan
 		delete(m_fontTexture);
 		delete (m_iconsTexture);
 		delete(m_sampler);
+		delete( m_iconsSampler );
 		delete(m_fragShader);
 		delete(m_vertShader);
 
@@ -54,6 +56,32 @@ namespace fan
 		CreateFontAndSampler();
 		CreateDescriptors();
 		CreateGraphicsPipeline(_renderPass);
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
+	void ImguiPipeline::ReloadIcons()
+	{
+		Debug::Log("reloading icons");
+
+		delete (m_iconsTexture);
+		m_iconsTexture =  new Texture();
+		m_iconsTexture->LoadFromFile( GlobalValues::s_defaultIcons );
+
+		VkDescriptorImageInfo iconsDescriptorImageInfo {};
+		iconsDescriptorImageInfo.sampler = m_iconsSampler->GetSampler();
+		iconsDescriptorImageInfo.imageView = m_iconsTexture->GetImageView();
+		iconsDescriptorImageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+
+		VkWriteDescriptorSet writeDescriptorSetIcons {};
+		writeDescriptorSetIcons.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+		writeDescriptorSetIcons.dstSet = m_descriptorSets[1];
+		writeDescriptorSetIcons.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+		writeDescriptorSetIcons.dstBinding = 0;
+		writeDescriptorSetIcons.pImageInfo = &iconsDescriptorImageInfo;
+		writeDescriptorSetIcons.descriptorCount = 1;
+
+		vkUpdateDescriptorSets( m_device.vkDevice, 1, &writeDescriptorSetIcons, 0, nullptr );
 	}
 
 	//================================================================================================================================
@@ -231,6 +259,7 @@ namespace fan
 		m_fontTexture->SetData(fontData, texWidth, texHeight, 1);
 		m_iconsTexture->LoadFromFile( GlobalValues::s_defaultIcons );
 		m_sampler->CreateSampler(0, 1.f, VK_FILTER_LINEAR);
+		m_iconsSampler->CreateSampler(0, 1.f, VK_FILTER_NEAREST);
 	}
 
 	//================================================================================================================================
@@ -284,7 +313,7 @@ namespace fan
 		fontDescriptorImageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
 
 		VkDescriptorImageInfo iconsDescriptorImageInfo {};
-		iconsDescriptorImageInfo.sampler = m_sampler->GetSampler();
+		iconsDescriptorImageInfo.sampler = m_iconsSampler->GetSampler();
 		iconsDescriptorImageInfo.imageView = m_iconsTexture->GetImageView();
 		iconsDescriptorImageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
 

@@ -14,7 +14,7 @@ namespace fan
 	public:
 
 		void OnGui() override;
-		ImGui::IconType GetIcon() const override { return ImGui::IconType::PROGRESS_BAR; }
+		ImGui::IconType GetIcon() const override { return ImGui::IconType::UI_PROGRESS_BAR16; }
 
 		void	SetProgress( const float _progress );
 		float	GetProgress() const { return m_progress; }

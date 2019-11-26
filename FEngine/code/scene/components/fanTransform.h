@@ -33,7 +33,7 @@ namespace fan
 		btVector3 Up() const;
 
 		void			OnGui() override;
-		ImGui::IconType GetIcon() const override { return ImGui::IconType::TRANSFORM; }
+		ImGui::IconType GetIcon() const override { return ImGui::IconType::TRANSFORM16; }
 
 		// ISerializable
 		bool Load( const Json & _json ) override;

@@ -7,7 +7,7 @@
 #include "editor/fanModals.h"
 
 namespace fan {
-	REGISTER_TYPE_INFO( ParticleSystem, TypeInfo::Flags::EDITOR_COMPONENT )
+	REGISTER_TYPE_INFO( ParticleSystem, TypeInfo::Flags::EDITOR_VISIBLE )
 
 	//================================================================================================================================
 	//================================================================================================================================

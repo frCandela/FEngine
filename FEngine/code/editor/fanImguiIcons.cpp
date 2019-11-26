@@ -12,51 +12,59 @@ namespace ImGui {
 
 	const float IconImpl::s_iconImageSize = 512.f;
 
-	#define DECL_ICON(_size, _x, _y) {{ (_x) * _size / s_iconImageSize, (_y) * _size / s_iconImageSize},{ (_x+1) * _size /s_iconImageSize,(_y+1) * _size /s_iconImageSize}}
+	#define DECL_ICON(_size, _x, _y) {{ (_x) * _size / s_iconImageSize, ((_y) * _size) / s_iconImageSize},{ (_x+1) * _size /s_iconImageSize,((_y+1) * _size) /s_iconImageSize}}
 
 	//================================================================================================================================
 	//================================================================================================================================
 	const IconImpl::IconData IconImpl::s_iconsList[IconType::NUM_ICONS] = {
 		 DECL_ICON (32.f, 0,0 )	// NONE
 
-		 // EDITOR
-		 ,DECL_ICON ( 32.f, 0,  1 )  // RENDERER
-		 ,DECL_ICON ( 32.f, 1,  1 )  // IMAGE
-		 ,DECL_ICON ( 32.f, 2,  1 )  // INSPECTOR
-		 ,DECL_ICON ( 32.f, 3,  1 )  // PREFERENCES
-		 ,DECL_ICON ( 32.f, 4,  1 )  // CONSOLE
-		 ,DECL_ICON ( 32.f, 5,  1 )  // ECS
-		 ,DECL_ICON ( 32.f, 6,  1 )  // IMGUI
-		 ,DECL_ICON ( 32.f, 7,  1 )  // PROFILER
-		 ,DECL_ICON ( 32.f, 8,  1 )  // SCENE
-		 ,DECL_ICON ( 32.f, 9,  1 )  // GAMEOBJECT
-		 ,DECL_ICON ( 16.f, 0,  4 )  // GAMEOBJECT16
-		 ,DECL_ICON ( 32.f, 10, 1 )  // PREFAB32
-		 ,DECL_ICON ( 16.f, 1,  4 )  // PREFAB16
+		// editor windows
+		,DECL_ICON ( 32.f, 1, 0 )  // IMGUI32,
+		,DECL_ICON ( 16.f, 1, 4 )  // IMGUI16,
+		,DECL_ICON ( 32.f, 2, 0 )  // RENDERER32,
+		,DECL_ICON ( 16.f, 2, 4 )  // RENDERER16,
+		,DECL_ICON ( 32.f, 3, 0 )  // SCENE32,
+		,DECL_ICON ( 16.f, 3, 4 )  // SCENE16,
+		,DECL_ICON ( 32.f, 4, 0 )  // INSPECTOR32,
+		,DECL_ICON ( 16.f, 4, 4 )  // INSPECTOR16,
+		,DECL_ICON ( 32.f, 5, 0 )  // CONSOLE32,
+		,DECL_ICON ( 16.f, 5, 4 )  // CONSOLE16,
+		,DECL_ICON ( 32.f, 6, 0 )  // ECS32,
+		,DECL_ICON ( 16.f, 6, 4 )  // ECS16,
+		,DECL_ICON ( 32.f, 7, 0 )  // PROFILER32,
+		,DECL_ICON ( 16.f, 7, 4 )  // PROFILER16,
+		,DECL_ICON ( 32.f, 8, 0 )  // PREFERENCES32,
+		,DECL_ICON ( 16.f, 8, 4 )  // PREFERENCES16,
 
-		
-		// COMPONENTS
-		, DECL_ICON ( 32.f, 0, 3 ) // CAMERA
-		, DECL_ICON ( 32.f, 1, 3 ) // BOX_SHAPE
-		, DECL_ICON ( 32.f, 2, 3 ) // SPHERE_SHAPE
-		, DECL_ICON ( 32.f, 3, 3 ) // DIR_LIGHT
-		, DECL_ICON ( 32.f, 4, 3 ) // POINT_LIGHT
-		, DECL_ICON ( 32.f, 5, 3 ) // MATERIAL
-		, DECL_ICON ( 32.f, 6, 3 ) // MESH
-		, DECL_ICON ( 32.f, 7, 3 ) // RIGIDBODY
-		, DECL_ICON ( 32.f, 8, 3 ) // TRANSFORM
-		, DECL_ICON ( 32.f, 9, 3 ) // PARTICLES		
-						  
-		//GAME		  	  
-		, DECL_ICON ( 32.f, 0, 5 ) // PLANET
-		, DECL_ICON ( 32.f, 1, 5 ) // SOLAR_SYSTEM
-		, DECL_ICON ( 32.f, 2, 5 ) // SPACE_SHIP
-		, DECL_ICON ( 32.f, 3, 5 ) // GAME_MANAGER
-		, DECL_ICON ( 16.f, 2, 4 ) // HEART16
-		, DECL_ICON ( 16.f, 3, 4 ) // ENERGY16
+		// scene special
+		,DECL_ICON ( 16.f, 0, 6 )  // GAMEOBJECT16,
+		,DECL_ICON ( 16.f, 1, 6 )  // PREFAB16,
 
-		// UI
-		, DECL_ICON ( 32.f, 0, 7 ) // PROGRESS_BAR
-		
+		// scene components
+		,DECL_ICON ( 16.f, 0, 8 )  // IMAGE16,
+		,DECL_ICON ( 16.f, 1, 8 )  // CAMERA16,
+		,DECL_ICON ( 16.f, 2, 8 )  // TRANSFORM16,
+		,DECL_ICON ( 16.f, 3, 8 )  // PARTICLES16,
+		,DECL_ICON ( 16.f, 4, 8 )  // DIR_LIGHT16,
+		,DECL_ICON ( 16.f, 5, 8 )  // POINT_LIGHT16,
+		,DECL_ICON ( 16.f, 6, 8 )  // MATERIAL16,
+		,DECL_ICON ( 16.f, 7, 8 )  // MESH_RENDERER16,
+		,DECL_ICON ( 16.f, 8, 8 )  // RIGIDBODY16,
+		,DECL_ICON ( 16.f, 9, 8 )  // CUBE_SHAPE16,
+		,DECL_ICON ( 16.f, 10, 8 )  // SPHERE_SHAPE16,
+		,DECL_ICON ( 16.f, 11, 8 )  // UI_MESH_RENDERER16,
+		,DECL_ICON ( 16.f, 12, 8 )  // UI_TRANSFORM16,
+		,DECL_ICON ( 16.f, 13, 8 )  // UI_PROGRESS_BAR16,
+		,DECL_ICON ( 16.f, 14, 8 )  // FOLLOW_TRANSFORM
+
+		// generics	
+		,DECL_ICON ( 16.f, 0, 10 )  // SOLAR_SYSTEM16,
+		,DECL_ICON ( 16.f, 1, 10 )  // HEART16,
+		,DECL_ICON ( 16.f, 2, 10 )  // ENERGY16,
+		,DECL_ICON ( 16.f, 3, 10 )  // JOYSTICK16,
+		,DECL_ICON ( 16.f, 4, 10 )  // SPACE_SHIP16,
+		,DECL_ICON ( 16.f, 5, 10 )  // PLANET16,
+		,DECL_ICON ( 16.f, 6, 10 )  // MESH16,
 	};
 }

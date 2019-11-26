@@ -27,7 +27,7 @@ namespace fan
 		void SetXYSensitivity(const btVector2 _sensitivity)		{ m_xySensitivity = _sensitivity; }
 
 		void OnGui() override;
-		ImGui::IconType GetIcon() const override { return ImGui::IconType::CAMERA; }
+		ImGui::IconType GetIcon() const override { return ImGui::IconType::CAMERA16; }
 
 		DECLARE_TYPE_INFO(FPSCamera, Actor );
 	protected:

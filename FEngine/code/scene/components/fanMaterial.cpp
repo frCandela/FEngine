@@ -10,7 +10,7 @@
 
 namespace fan
 {
-	REGISTER_TYPE_INFO(Material, TypeInfo::Flags::EDITOR_COMPONENT)
+	REGISTER_TYPE_INFO(Material, TypeInfo::Flags::EDITOR_VISIBLE)
 
 	Signal< Material * > Material::onMaterialAttach;
 	Signal< Material * > Material::onMaterialDetach;

@@ -21,7 +21,7 @@ namespace fan
 		bool  IsInsideSunlight() const { return m_isInsideSunlight; }
 
 		void OnGui() override;
-		ImGui::IconType GetIcon() const override { return ImGui::IconType::GAME_MANAGER; }
+		ImGui::IconType GetIcon() const override { return ImGui::IconType::JOYSTICK16; }
 
 		DECLARE_TYPE_INFO( SolarPanel, Actor );
 	protected:

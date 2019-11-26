@@ -27,7 +27,7 @@ namespace fan {
 		void LateUpdate( const float /*_delta*/ ) override {}
 
 		void OnGui() override;
-		ImGui::IconType GetIcon() const override { return ImGui::IconType::SPACE_SHIP; }
+		ImGui::IconType GetIcon() const override { return ImGui::IconType::SPACE_SHIP16; }
 
 		DECLARE_TYPE_INFO(SpaceShip, Actor );
 	protected:

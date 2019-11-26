@@ -25,7 +25,7 @@ namespace fan
 		bool		GetInputStop();
 
 		void			OnGui() override;
-		ImGui::IconType GetIcon() const override { return ImGui::IconType::GAME_MANAGER; }
+		ImGui::IconType GetIcon() const override { return ImGui::IconType::JOYSTICK16; }
 
 		// ISerializable
 		bool Load( const Json & _json ) override;

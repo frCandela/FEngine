@@ -16,7 +16,7 @@ namespace fan
 		void Update( const float _delta ) override;
 		void LateUpdate( const float /*_delta*/ ) override {}
 
-		ImGui::IconType GetIcon() const override { return ImGui::IconType::GAME_MANAGER; }
+		ImGui::IconType GetIcon() const override { return ImGui::IconType::JOYSTICK16; }
 
 		void OnGui() override;
 

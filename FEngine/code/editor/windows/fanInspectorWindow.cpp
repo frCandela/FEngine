@@ -22,7 +22,7 @@ namespace fan
 	//================================================================================================================================
 	//================================================================================================================================
 	InspectorWindow::InspectorWindow() :
-		EditorWindow("inspector", ImGui::IconType::INSPECTOR )
+		EditorWindow("inspector", ImGui::IconType::INSPECTOR16 )
 	{
 	}
 
@@ -43,7 +43,7 @@ namespace fan
 				ImGui::Separator();
 
 				// Icon
-				ImGui::Icon( component->GetIcon(), { 19,19 } ); ImGui::SameLine();
+				ImGui::Icon( component->GetIcon(), { 16,16 } ); ImGui::SameLine();
 				ImGui::FanBeginDragDropSourceComponent( component,  ImGuiDragDropFlags_SourceAllowNullID);
 
 				// Actor "enable" checkbox
@@ -92,11 +92,11 @@ namespace fan
 
 		if (ImGui::BeginPopup("New component"))
 		{
-			std::vector< const void *> components = TypeInfo::Get().GetInstancesWithFlags( TypeInfo::EDITOR_COMPONENT );
+			std::vector< const void *> components = TypeInfo::Get().GetInstancesWithFlags( TypeInfo::EDITOR_VISIBLE );
 			for (int componentIndex = 0; componentIndex < components.size(); componentIndex++) {
 				const Component * component = static_cast< const Component *> ( components[componentIndex] );
 
-				ImGui::Icon( component->GetIcon(), { 19,19 } ); ImGui::SameLine();
+				ImGui::Icon( component->GetIcon(), { 16,16 } ); ImGui::SameLine();
 				if (ImGui::MenuItem(component->GetName())) {
 					// Create new Component 
 					m_gameobjectSelected->AddComponent(component->GetType());

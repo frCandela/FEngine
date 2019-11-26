@@ -26,7 +26,7 @@ namespace fan {
 
 	public:
 		friend class Singleton < TypeInfo>;		
-		enum Flags{ NONE = 0, EDITOR_COMPONENT = 1 << 1, BLOUP = 1 << 2 };
+		enum Flags{ NONE = 0, EDITOR_VISIBLE = 1 << 1, BLOUP = 1 << 2 };
 
 		uint32_t Register(const uint32_t _key, std::function<void*()> _constructor, const uint32_t _flags = Flags::NONE );
 

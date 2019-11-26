@@ -70,7 +70,7 @@ namespace ImGui
 		bool openModal = false;
 		ImGui::PushID( _label );
 		{
-			if ( ImGui::ButtonIcon( ImGui::IconType::IMAGE, { 16,16 } ) )
+			if ( ImGui::ButtonIcon( ImGui::IconType::IMAGE16, { 16,16 } ) )
 			{
 				openModal = true;
 			}
@@ -150,7 +150,7 @@ namespace ImGui
 		bool openModal = false;
 		ImGui::PushID( _label );
 		{
-			if ( ImGui::ButtonIcon( ImGui::IconType::MESH, { 16,16 } ) )
+			if ( ImGui::ButtonIcon( ImGui::IconType::MESH16, { 16,16 } ) )
 			{
 				openModal = true;
 			}

@@ -7,7 +7,7 @@
 
 namespace fan
 {
-	REGISTER_TYPE_INFO( FollowTransform, TypeInfo::Flags::EDITOR_COMPONENT )
+	REGISTER_TYPE_INFO( FollowTransform, TypeInfo::Flags::EDITOR_VISIBLE )
 
 
 	//================================================================================================================================

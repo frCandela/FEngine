@@ -25,7 +25,7 @@ namespace fan
 		void	SetRenderID(const int _renderID);
 
 		void OnGui() override;
-		virtual ImGui::IconType GetIcon() const { return ImGui::IconType::MESH; };
+		virtual ImGui::IconType GetIcon() const { return ImGui::IconType::MESH_RENDERER16; };
 
 		DECLARE_TYPE_INFO(MeshRenderer, Component );
 

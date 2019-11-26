@@ -19,7 +19,7 @@ namespace fan
 	//================================================================================================================================
 	//================================================================================================================================
 	PreferencesWindow::PreferencesWindow( Renderer * _renderer ) :
-		EditorWindow("preferences", ImGui::IconType::PREFERENCES )
+		EditorWindow("preferences", ImGui::IconType::PREFERENCES16 )
 		, m_renderer( _renderer ) 
 	{
 		Color clearColor;
