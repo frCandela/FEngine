@@ -12,7 +12,7 @@
 #include "renderer/fanRenderer.h"
 
 namespace fan {
-	REGISTER_TYPE_INFO( SolarSystem, TypeInfo::Flags::EDITOR_VISIBLE )
+	REGISTER_TYPE_INFO( SolarSystem, TypeInfo::Flags::EDITOR_COMPONENT, "game/" )
 
 	//================================================================================================================================
 	//================================================================================================================================

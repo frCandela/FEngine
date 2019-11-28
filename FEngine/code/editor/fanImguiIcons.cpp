@@ -20,21 +20,13 @@ namespace ImGui {
 		 DECL_ICON (32.f, 0,0 )	// NONE
 
 		// editor windows
-		,DECL_ICON ( 32.f, 1, 0 )  // IMGUI32,
 		,DECL_ICON ( 16.f, 1, 4 )  // IMGUI16,
-		,DECL_ICON ( 32.f, 2, 0 )  // RENDERER32,
 		,DECL_ICON ( 16.f, 2, 4 )  // RENDERER16,
-		,DECL_ICON ( 32.f, 3, 0 )  // SCENE32,
 		,DECL_ICON ( 16.f, 3, 4 )  // SCENE16,
-		,DECL_ICON ( 32.f, 4, 0 )  // INSPECTOR32,
 		,DECL_ICON ( 16.f, 4, 4 )  // INSPECTOR16,
-		,DECL_ICON ( 32.f, 5, 0 )  // CONSOLE32,
 		,DECL_ICON ( 16.f, 5, 4 )  // CONSOLE16,
-		,DECL_ICON ( 32.f, 6, 0 )  // ECS32,
 		,DECL_ICON ( 16.f, 6, 4 )  // ECS16,
-		,DECL_ICON ( 32.f, 7, 0 )  // PROFILER32,
 		,DECL_ICON ( 16.f, 7, 4 )  // PROFILER16,
-		,DECL_ICON ( 32.f, 8, 0 )  // PREFERENCES32,
 		,DECL_ICON ( 16.f, 8, 4 )  // PREFERENCES16,
 
 		// scene special

@@ -9,7 +9,7 @@
 
 namespace fan
 {
-	REGISTER_TYPE_INFO( PlayersManager, TypeInfo::Flags::EDITOR_VISIBLE )
+	REGISTER_TYPE_INFO( PlayersManager, TypeInfo::Flags::EDITOR_COMPONENT, "game/managers/" )
 
 	//================================================================================================================================
 	//================================================================================================================================

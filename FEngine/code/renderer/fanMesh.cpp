@@ -8,7 +8,7 @@
 #include "renderer/fanRenderer.h"
 
 namespace fan {
-	REGISTER_TYPE_INFO(Mesh, TypeInfo::Flags::NONE)
+	REGISTER_TYPE_INFO(Mesh, TypeInfo::Flags::NONE, "scene/")
 
 	Signal< Mesh* > Mesh::s_onGenerateVulkanData;
 	Signal< Mesh* > Mesh::s_onDeleteVulkanData;

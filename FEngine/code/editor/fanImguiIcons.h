@@ -6,21 +6,13 @@ namespace ImGui {
 		NONE = 0,
 
 		// editor windows
-		IMGUI32,
 		IMGUI16,
-		RENDERER32, 
 		RENDERER16, 
-		SCENE32, 
 		SCENE16, 
-		INSPECTOR32, 
 		INSPECTOR16, 
-		CONSOLE32, 
 		CONSOLE16, 
-		ECS32, 
 		ECS16, 
-		PROFILER32, 
-		PROFILER16, 
-		PREFERENCES32, 
+		PROFILER16,
 		PREFERENCES16, 
 
 		// scene special

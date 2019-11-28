@@ -7,7 +7,7 @@
 #include "editor/fanModals.h"
 
 namespace fan {
-	REGISTER_TYPE_INFO( DirectionalLight, TypeInfo::Flags::EDITOR_VISIBLE )
+	REGISTER_TYPE_INFO( DirectionalLight, TypeInfo::Flags::EDITOR_COMPONENT, "light/" )
 
 	Signal< DirectionalLight * > DirectionalLight::onDirectionalLightAttach;
 	Signal< DirectionalLight * > DirectionalLight::onDirectionalLightDetach;

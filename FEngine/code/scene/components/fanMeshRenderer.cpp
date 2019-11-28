@@ -17,7 +17,7 @@
 
 namespace fan
 {
-	REGISTER_TYPE_INFO(MeshRenderer, TypeInfo::Flags::EDITOR_VISIBLE)
+	REGISTER_TYPE_INFO(MeshRenderer, TypeInfo::Flags::EDITOR_COMPONENT, "")
 
 	Signal< MeshRenderer * >				MeshRenderer::onRegisterMeshRenderer;
 	Signal< MeshRenderer * >				MeshRenderer::onUnRegisterMeshRenderer;

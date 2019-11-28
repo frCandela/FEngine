@@ -6,7 +6,7 @@
 #include "renderer/fanRenderer.h"
 
 namespace fan {
-	REGISTER_TYPE_INFO( BoxShape, TypeInfo::Flags::EDITOR_VISIBLE )
+	REGISTER_TYPE_INFO( BoxShape, TypeInfo::Flags::EDITOR_COMPONENT, "physics/" )
 
 	//================================================================================================================================
 	//================================================================================================================================

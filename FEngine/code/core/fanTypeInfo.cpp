@@ -5,7 +5,7 @@
 namespace fan {
 	//================================================================================================================================
 	//================================================================================================================================
-	uint32_t TypeInfo::Register( const uint32_t _key, std::function<void*( )> _constructor, const uint32_t _flags  )
+	uint32_t TypeInfo::Register( const uint32_t _key, std::function<void*( )> _constructor, const uint32_t _flags, const std::string& _path  )
 	{
 		assert( m_data.find( _key ) == m_data.end() );
 
@@ -13,6 +13,7 @@ namespace fan {
 		data.constructor = _constructor;
 		data.instance = _constructor();
 		data.flags = _flags;
+		data.path = _path;
 		m_data[_key] = data;
 
 		assert( data.instance != nullptr );

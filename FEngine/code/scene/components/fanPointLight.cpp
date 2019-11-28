@@ -7,7 +7,7 @@
 
 namespace fan
 {
-	REGISTER_TYPE_INFO(PointLight, TypeInfo::Flags::EDITOR_VISIBLE)
+	REGISTER_TYPE_INFO(PointLight, TypeInfo::Flags::EDITOR_COMPONENT, "light/")
 
 	Signal< PointLight * > PointLight::onPointLightAttach;
 	Signal< PointLight * > PointLight::onPointLightDetach;
