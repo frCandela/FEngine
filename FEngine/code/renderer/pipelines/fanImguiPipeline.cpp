@@ -26,7 +26,7 @@ namespace fan
 			m_indexBuffers.push_back(Buffer(_device));
 		}
 		m_vertexCount.resize(_swapchainImagesCount, 0);
-		m_indexCount.resize(_swapchainImagesCount, 0);
+		m_indexCount.resize(_swapchainImagesCount, 0);		
 	}
 
 	//================================================================================================================================
@@ -52,6 +52,9 @@ namespace fan
 	//================================================================================================================================
 	void ImguiPipeline::Create(VkRenderPass _renderPass, GLFWwindow* _window, VkExtent2D _extent) {
 		ImGui::CreateContext();
+
+		//ImGui::GetIO().ConfigFlags |= ImGuiConfigFlags_DockingEnable;
+
 		InitImgui(_window, _extent);
 		CreateFontAndSampler();
 		CreateDescriptors();

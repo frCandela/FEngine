@@ -182,7 +182,7 @@ namespace fan
 		ss << "##" << _gameobjectDrawn; // Unique id
 
 		if (ImGui::IsWindowAppearing() || m_expandSceneHierarchy == true) {
-			ImGui::SetNextTreeNodeOpen(true);
+			ImGui::SetNextItemOpen(true);
 		}
 		bool isOpen = ImGui::TreeNode(ss.str().c_str());
 

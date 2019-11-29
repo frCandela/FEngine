@@ -53,7 +53,7 @@ namespace ImGui
 
 		//std::fs::directory_entry _nextPath = std::fs::directory_entry(_path);
 
-		ImGui::SetNextTreeNodeOpen(true);
+		ImGui::SetNextItemOpen(true);
 		if (ImGui::TreeNode("File Selection")) {
 
 			// '.' Selectable to go to the parent 

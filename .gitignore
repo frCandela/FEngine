@@ -15,3 +15,5 @@ FEngine/build/
 FEngine/fanTestNoSubmit.h
 FEngine/build.zip
 FEngine/FEngine.exe
+FEngine/deps/imgui/_docking
+FEngine/deps/imgui/_old

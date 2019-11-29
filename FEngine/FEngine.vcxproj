@@ -203,6 +203,7 @@
     <ClCompile Include="deps\imgui\imgui.cpp" />
     <ClCompile Include="deps\imgui\imgui_demo.cpp" />
     <ClCompile Include="deps\imgui\imgui_draw.cpp" />
+    <ClCompile Include="deps\imgui\imgui_widgets.cpp" />
     <ClCompile Include="deps\quickhull\QuickHull.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -499,9 +500,9 @@
     <ClInclude Include="deps\imgui\imconfig.h" />
     <ClInclude Include="deps\imgui\imgui.h" />
     <ClInclude Include="deps\imgui\imgui_internal.h" />
-    <ClInclude Include="deps\imgui\stb_rect_pack.h" />
-    <ClInclude Include="deps\imgui\stb_textedit.h" />
-    <ClInclude Include="deps\imgui\stb_truetype.h" />
+    <ClInclude Include="deps\imgui\imstb_rectpack.h" />
+    <ClInclude Include="deps\imgui\imstb_textedit.h" />
+    <ClInclude Include="deps\imgui\imstb_truetype.h" />
     <ClInclude Include="deps\nlohmann_json.h" />
     <ClInclude Include="deps\quickhull\ConvexHull.hpp" />
     <ClInclude Include="deps\quickhull\HalfEdgeMesh.hpp" />

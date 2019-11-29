@@ -66,7 +66,7 @@ namespace fan
 				ImGui::TextColored(item.color, item.logMessage.c_str());	// Time			
 			}
 			if (m_scrollDown) {
-				ImGui::SetScrollHere(1.0f);
+				ImGui::SetScrollHereY(1.0f);
 				m_scrollDown = false;
 			}
 			ImGui::EndChild();
