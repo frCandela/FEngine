@@ -11,10 +11,7 @@
 #include "renderer/core/fanDevice.h"
 #include "renderer/core/fanSwapChain.h"
 #include "renderer/core/fanBuffer.h"
-#include "renderer/core/fanImage.h"
 #include "renderer/core/fanTexture.h"
-#include "renderer/core/fanImageView.h"
-#include "renderer/core/fanShader.h"
 #include "renderer/core/fanFrameBuffer.h"
 #include "renderer/pipelines/fanImguiPipeline.h"
 #include "renderer/pipelines/fanPostprocessPipeline.h"
@@ -27,6 +24,7 @@
 #include "renderer/descriptors/fanDescriptorSampler.h"
 #include "renderer/core/fanSampler.h"
 #include "renderer/fanRendererDebug.h"
+#include "renderer/core/fanRenderPass.h"
 
 namespace fan
 {
@@ -60,10 +58,10 @@ namespace fan
 		m_samplerDescriptorTextures = new DescriptorSampler( *m_device, m_samplerTextures->GetSampler() );
 		CreateTextureDescriptor();
 
-		m_rendererDebug->Create( m_gameRenderPass, m_gameFrameBuffers );
+		m_rendererDebug->Create( m_renderPassGame->GetRenderPass(), m_gameFrameBuffers );
 
 		m_forwardPipeline = new ForwardPipeline(*m_device, m_imagesDescriptor, m_samplerDescriptorTextures );
-		m_forwardPipeline->Init( m_gameRenderPass, m_swapchain->GetExtent(), "code/shaders/forward.vert", "code/shaders/forward.frag" );
+		m_forwardPipeline->Init( m_renderPassGame->GetRenderPass(), m_swapchain->GetExtent(), "code/shaders/forward.vert", "code/shaders/forward.frag" );
 		m_forwardPipeline->CreateDescriptors( m_swapchain->GetSwapchainImagesCount() );
 		m_forwardPipeline->Create();
 
@@ -71,19 +69,19 @@ namespace fan
 		m_samplerUI->CreateSampler( 0, 1, VK_FILTER_NEAREST );
 		m_samplerDescriptorUI = new DescriptorSampler( *m_device, m_samplerUI->GetSampler() );
 		m_uiPipeline = new UIPipeline( *m_device, m_imagesDescriptor, m_samplerDescriptorUI );
-		m_uiPipeline->Init( m_renderPassPostprocess, m_swapchain->GetExtent(), "code/shaders/ui.vert", "code/shaders/ui.frag" );
+		m_uiPipeline->Init( m_renderPassPostprocess->GetRenderPass(), m_swapchain->GetExtent(), "code/shaders/ui.vert", "code/shaders/ui.frag" );
 		m_uiPipeline->CreateDescriptors( m_swapchain->GetSwapchainImagesCount() );
 		m_uiPipeline->Create();
 
 		m_postprocessPipeline = new PostprocessPipeline(*m_device);
 		m_postprocessPipeline->SetImageAndView( m_gameFrameBuffers->GetColorAttachmentImageView(), m_gameFrameBuffers->GetColorAttachmentSampler() ); // for sampling
 		m_postprocessPipeline->CreateDescriptors( m_swapchain->GetSwapchainImagesCount() );
-		m_postprocessPipeline->Init( m_renderPassPostprocess, m_swapchain->GetExtent(), "code/shaders/postprocess.vert", "code/shaders/postprocess.frag" );
+		m_postprocessPipeline->Init( m_renderPassPostprocess->GetRenderPass(), m_swapchain->GetExtent(), "code/shaders/postprocess.vert", "code/shaders/postprocess.frag" );
 		m_postprocessPipeline->Create();
         
 		m_imguiPipeline = new ImguiPipeline(*m_device, m_swapchain->GetSwapchainImagesCount());
 		m_imguiPipeline->Set3DView( m_postProcessFramebuffers->GetColorAttachmentImageView() );
-		m_imguiPipeline->Create(m_renderPassImgui, m_window->GetWindow(), m_swapchain->GetExtent());
+		m_imguiPipeline->Create(m_renderPassImgui->GetRenderPass(), m_window->GetWindow(), m_swapchain->GetExtent());
 		
 		CreateCommandBuffers();
 		RecordAllCommandBuffers();
@@ -118,8 +116,9 @@ namespace fan
 
 		delete m_gameFrameBuffers;
 		delete m_postProcessFramebuffers;
-		DeleteRenderPass();
-		DeleteRenderPassPostprocess();
+		delete m_renderPassGame;
+		delete m_renderPassPostprocess;
+		delete m_renderPassImgui;
 
 		delete m_swapchainFramebuffers;
 
@@ -361,7 +360,7 @@ namespace fan
 		VkRenderPassBeginInfo renderPassInfo = {};
 		renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
 		renderPassInfo.pNext = nullptr;
-		renderPassInfo.renderPass = m_gameRenderPass;
+		renderPassInfo.renderPass = m_renderPassGame->GetRenderPass();
 		renderPassInfo.framebuffer = m_gameFrameBuffers->GetFrameBuffer( _index );
 		renderPassInfo.renderArea.offset = { 0,0 };
 		renderPassInfo.renderArea.extent.width = m_swapchain->GetExtent().width;
@@ -372,7 +371,7 @@ namespace fan
 		VkRenderPassBeginInfo renderPassInfoPostprocess = {};
 		renderPassInfoPostprocess.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
 		renderPassInfoPostprocess.pNext = nullptr;
-		renderPassInfoPostprocess.renderPass = m_renderPassPostprocess;
+		renderPassInfoPostprocess.renderPass = m_renderPassPostprocess->GetRenderPass();
 		renderPassInfoPostprocess.framebuffer = m_postProcessFramebuffers->GetFrameBuffer( _index );
 		renderPassInfoPostprocess.renderArea.offset = { 0,0 };
 		renderPassInfoPostprocess.renderArea.extent.width = m_swapchain->GetExtent().width;
@@ -383,7 +382,7 @@ namespace fan
 		VkRenderPassBeginInfo renderPassInfoImGui = {};
 		renderPassInfoImGui.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
 		renderPassInfoImGui.pNext = nullptr;
-		renderPassInfoImGui.renderPass = m_renderPassImgui;
+		renderPassInfoImGui.renderPass = m_renderPassImgui->GetRenderPass();
 		renderPassInfoImGui.framebuffer = m_swapchainFramebuffers->GetFrameBuffer( _index );
 		renderPassInfoImGui.renderArea.offset = { 0,0 };
 		renderPassInfoImGui.renderArea.extent.width = m_swapchain->GetExtent().width;
@@ -430,7 +429,7 @@ namespace fan
 		VkCommandBufferInheritanceInfo commandBufferInheritanceInfo = {};
 		commandBufferInheritanceInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_INHERITANCE_INFO;
 		commandBufferInheritanceInfo.pNext = nullptr;
-		commandBufferInheritanceInfo.renderPass = m_renderPassPostprocess;
+		commandBufferInheritanceInfo.renderPass = m_renderPassPostprocess->GetRenderPass();
 		commandBufferInheritanceInfo.subpass = 0;
 		commandBufferInheritanceInfo.framebuffer = m_postProcessFramebuffers->GetFrameBuffer( _index );
 		commandBufferInheritanceInfo.occlusionQueryEnable = VK_FALSE;
@@ -468,7 +467,7 @@ namespace fan
 		VkCommandBufferInheritanceInfo commandBufferInheritanceInfo = {};
 		commandBufferInheritanceInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_INHERITANCE_INFO;
 		commandBufferInheritanceInfo.pNext = nullptr;
-		commandBufferInheritanceInfo.renderPass = m_renderPassPostprocess;
+		commandBufferInheritanceInfo.renderPass = m_renderPassPostprocess->GetRenderPass();
 		commandBufferInheritanceInfo.subpass = 0;
 		commandBufferInheritanceInfo.framebuffer = m_postProcessFramebuffers->GetFrameBuffer( _index );
 		commandBufferInheritanceInfo.occlusionQueryEnable = VK_FALSE;
@@ -521,7 +520,7 @@ namespace fan
 		VkCommandBufferInheritanceInfo commandBufferInheritanceInfo = {};
 		commandBufferInheritanceInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_INHERITANCE_INFO;
 		commandBufferInheritanceInfo.pNext = nullptr;
-		commandBufferInheritanceInfo.renderPass = m_renderPassImgui;
+		commandBufferInheritanceInfo.renderPass = m_renderPassImgui->GetRenderPass();
 		commandBufferInheritanceInfo.subpass = 0;
 		commandBufferInheritanceInfo.framebuffer = m_swapchainFramebuffers->GetFrameBuffer( _index );
 		commandBufferInheritanceInfo.occlusionQueryEnable = VK_FALSE;
@@ -555,7 +554,7 @@ namespace fan
 		VkCommandBufferInheritanceInfo commandBufferInheritanceInfo = {};
 		commandBufferInheritanceInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_INHERITANCE_INFO;
 		commandBufferInheritanceInfo.pNext = nullptr;
-		commandBufferInheritanceInfo.renderPass = m_gameRenderPass;
+		commandBufferInheritanceInfo.renderPass = m_renderPassGame->GetRenderPass();
 		commandBufferInheritanceInfo.subpass = 0;
 		commandBufferInheritanceInfo.framebuffer = m_gameFrameBuffers->GetFrameBuffer( _index );
 		commandBufferInheritanceInfo.occlusionQueryEnable = VK_FALSE;
@@ -708,217 +707,30 @@ namespace fan
 	//================================================================================================================================
 	//================================================================================================================================
 	bool Renderer::CreateRenderPass() {
-		VkAttachmentDescription colorAttachment;
-		colorAttachment.flags = 0;
-		colorAttachment.format = m_swapchain->GetSurfaceFormat().format;
-		colorAttachment.samples = VK_SAMPLE_COUNT_1_BIT;
-		colorAttachment.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
-		colorAttachment.storeOp = VK_ATTACHMENT_STORE_OP_STORE;
-		colorAttachment.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
-		colorAttachment.stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
-		colorAttachment.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
-		colorAttachment.finalLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
-
-		VkAttachmentDescription depthAttachment;
-		depthAttachment.flags = 0;
-		depthAttachment.format = m_device->FindDepthFormat();
-		depthAttachment.samples = VK_SAMPLE_COUNT_1_BIT;
-		depthAttachment.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
-		depthAttachment.storeOp = VK_ATTACHMENT_STORE_OP_STORE;
-		depthAttachment.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
-		depthAttachment.stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
-		depthAttachment.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
-		depthAttachment.finalLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR;
-
-		VkAttachmentReference colorAttachmentRef;
-		colorAttachmentRef.attachment = 0;
-		colorAttachmentRef.layout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
-
-		VkAttachmentReference depthAttachmentRef;
-		depthAttachmentRef.attachment = 1;
-		depthAttachmentRef.layout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
-
-		std::vector<VkAttachmentReference>   inputAttachments = {};
-		std::vector<VkAttachmentReference>   colorAttachments = { colorAttachmentRef };
-
-		VkSubpassDescription subpassDescription;
-		subpassDescription.flags = 0;
-		subpassDescription.pipelineBindPoint = VK_PIPELINE_BIND_POINT_GRAPHICS;
-		subpassDescription.inputAttachmentCount = static_cast<uint32_t>(inputAttachments.size());
-		subpassDescription.pInputAttachments = inputAttachments.data();
-		subpassDescription.colorAttachmentCount = static_cast<uint32_t>(colorAttachments.size());
-		subpassDescription.pColorAttachments = colorAttachments.data();
-		subpassDescription.pResolveAttachments = nullptr;
-		subpassDescription.pDepthStencilAttachment = &depthAttachmentRef;
-		subpassDescription.preserveAttachmentCount = 0;
-		subpassDescription.pPreserveAttachments = nullptr;
-
-		VkSubpassDependency dependency;
-		dependency.srcSubpass = 0;
-		dependency.dstSubpass = VK_SUBPASS_EXTERNAL;
-		dependency.srcStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
-		dependency.dstStageMask = VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT;
-		dependency.srcAccessMask = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
-		dependency.dstAccessMask = VK_ACCESS_SHADER_READ_BIT;
-		dependency.dependencyFlags = 0;
-
-
-		std::vector<VkAttachmentDescription> attachmentsDescriptions = { colorAttachment, depthAttachment };
-		std::vector<VkSubpassDescription> subpassDescriptions = { subpassDescription };
-		std::vector<VkSubpassDependency> subpassDependencies = { dependency };
-
-		VkRenderPassCreateInfo renderPassCreateInfo;
-		renderPassCreateInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO;
-		renderPassCreateInfo.pNext = nullptr;
-		renderPassCreateInfo.flags = 0;
-		renderPassCreateInfo.attachmentCount = static_cast<uint32_t>(attachmentsDescriptions.size());
-		renderPassCreateInfo.pAttachments = attachmentsDescriptions.data();
-		renderPassCreateInfo.subpassCount = static_cast<uint32_t>(subpassDescriptions.size());;
-		renderPassCreateInfo.pSubpasses = subpassDescriptions.data();
-		renderPassCreateInfo.dependencyCount = static_cast<uint32_t>(subpassDependencies.size());;
-		renderPassCreateInfo.pDependencies = subpassDependencies.data();
-
-		if (vkCreateRenderPass(m_device->vkDevice, &renderPassCreateInfo, nullptr, &m_gameRenderPass) != VK_SUCCESS) {
-			Debug::Error( "Could not create render pass" );
-			return false;
-		}
-		Debug::Get() << Debug::Severity::log << std::hex << "VkRenderPass          " << m_gameRenderPass << std::dec << Debug::Endl();
-
-		return true;
+		m_renderPassGame = new RenderPass( *m_device );
+		m_renderPassGame->AddColorAttachment( m_swapchain->GetSurfaceFormat().format );
+		m_renderPassGame->AddDepthAttachment( m_device->FindDepthFormat() );
+		m_renderPassGame->AddDependency();
+		return m_renderPassGame->Create();
 	}	
 
 	//================================================================================================================================
 	//================================================================================================================================
 	bool Renderer::CreateRenderPassPostprocess() {
-		VkAttachmentDescription colorAttachment;
-		colorAttachment.flags = 0;
-		colorAttachment.format = m_swapchain->GetSurfaceFormat().format;
-		colorAttachment.samples = VK_SAMPLE_COUNT_1_BIT;
-		colorAttachment.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
-		colorAttachment.storeOp = VK_ATTACHMENT_STORE_OP_STORE;
-		colorAttachment.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
-		colorAttachment.stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
-		colorAttachment.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
-		colorAttachment.finalLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
-
-		VkAttachmentReference colorAttachmentRef;
-		colorAttachmentRef.attachment = 0;
-		colorAttachmentRef.layout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
-
-		std::vector<VkAttachmentReference>   inputAttachments = {};
-		std::vector<VkAttachmentReference>   colorAttachments = { colorAttachmentRef };
-
-		VkSubpassDescription subpassDescription;
-		subpassDescription.flags = 0;
-		subpassDescription.pipelineBindPoint = VK_PIPELINE_BIND_POINT_GRAPHICS;
-		subpassDescription.inputAttachmentCount = static_cast<uint32_t>(inputAttachments.size());
-		subpassDescription.pInputAttachments = inputAttachments.data();
-		subpassDescription.colorAttachmentCount = static_cast<uint32_t>(colorAttachments.size());
-		subpassDescription.pColorAttachments = colorAttachments.data();
-		subpassDescription.pResolveAttachments = nullptr;
-		subpassDescription.pDepthStencilAttachment = nullptr;
-		subpassDescription.preserveAttachmentCount = 0;
-		subpassDescription.pPreserveAttachments = nullptr;
-
-		VkSubpassDependency dependency;
-		dependency.srcSubpass = 0;
-		dependency.dstSubpass = VK_SUBPASS_EXTERNAL;
-		dependency.srcStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
-		dependency.dstStageMask = VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT;
-		dependency.srcAccessMask = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
-		dependency.dstAccessMask = VK_ACCESS_SHADER_READ_BIT;
-		dependency.dependencyFlags = 0;
-
-		std::vector<VkAttachmentDescription> attachmentsDescriptions = { colorAttachment };
-		std::vector<VkSubpassDescription> subpassDescriptions = { subpassDescription };
-		std::vector<VkSubpassDependency> subpassDependencies = { dependency };
-
-		VkRenderPassCreateInfo renderPassCreateInfo;
-		renderPassCreateInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO;
-		renderPassCreateInfo.pNext = nullptr;
-		renderPassCreateInfo.flags = 0;
-		renderPassCreateInfo.attachmentCount = static_cast<uint32_t>(attachmentsDescriptions.size());
-		renderPassCreateInfo.pAttachments = attachmentsDescriptions.data();
-		renderPassCreateInfo.subpassCount = static_cast<uint32_t>(subpassDescriptions.size());;
-		renderPassCreateInfo.pSubpasses = subpassDescriptions.data();
-		renderPassCreateInfo.dependencyCount = static_cast<uint32_t>(subpassDependencies.size());;
-		renderPassCreateInfo.pDependencies = subpassDependencies.data();
-
-		if (vkCreateRenderPass(m_device->vkDevice, &renderPassCreateInfo, nullptr, &m_renderPassPostprocess) != VK_SUCCESS) {
-			Debug::Error( "Could not create render pass pp" );
-			return false;
-		}
-		Debug::Get() << Debug::Severity::log << std::hex << "VkRenderPass pp       " << m_renderPassPostprocess << std::dec << Debug::Endl();
-
-		return true;
+		m_renderPassPostprocess = new RenderPass( *m_device );
+		m_renderPassPostprocess->AddColorAttachment( m_swapchain->GetSurfaceFormat().format );
+		m_renderPassPostprocess->AddDependency();
+		return m_renderPassPostprocess->Create();
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
 	bool Renderer::CreateRenderPassImGui()
 	{
-		VkAttachmentDescription colorAttachment;
-		colorAttachment.flags = 0;
-		colorAttachment.format = m_swapchain->GetSurfaceFormat().format;
-		colorAttachment.samples = VK_SAMPLE_COUNT_1_BIT;
-		colorAttachment.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
-		colorAttachment.storeOp = VK_ATTACHMENT_STORE_OP_STORE;
-		colorAttachment.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
-		colorAttachment.stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
-		colorAttachment.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
-		colorAttachment.finalLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR;
-
-		VkAttachmentReference colorAttachmentRef;
-		colorAttachmentRef.attachment = 0;
-		colorAttachmentRef.layout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
-
-		std::vector<VkAttachmentReference>   inputAttachments = {};
-		std::vector<VkAttachmentReference>   colorAttachments = { colorAttachmentRef };
-
-		VkSubpassDescription subpassDescription;
-		subpassDescription.flags = 0;
-		subpassDescription.pipelineBindPoint = VK_PIPELINE_BIND_POINT_GRAPHICS;
-		subpassDescription.inputAttachmentCount = static_cast<uint32_t>( inputAttachments.size() );
-		subpassDescription.pInputAttachments = inputAttachments.data();
-		subpassDescription.colorAttachmentCount = static_cast<uint32_t>( colorAttachments.size() );
-		subpassDescription.pColorAttachments = colorAttachments.data();
-		subpassDescription.pResolveAttachments = nullptr;
-		subpassDescription.pDepthStencilAttachment = nullptr;
-		subpassDescription.preserveAttachmentCount = 0;
-		subpassDescription.pPreserveAttachments = nullptr;
-
-		VkSubpassDependency dependency;
-		dependency.srcSubpass = 0;
-		dependency.dstSubpass = VK_SUBPASS_EXTERNAL;
-		dependency.srcStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
-		dependency.dstStageMask = VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT;
-		dependency.srcAccessMask = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
-		dependency.dstAccessMask = VK_ACCESS_SHADER_READ_BIT;
-		dependency.dependencyFlags = 0;
-
-		std::vector<VkAttachmentDescription> attachmentsDescriptions = { colorAttachment };
-		std::vector<VkSubpassDescription> subpassDescriptions = { subpassDescription };
-		std::vector<VkSubpassDependency> subpassDependencies = { dependency };
-
-		VkRenderPassCreateInfo renderPassCreateInfo;
-		renderPassCreateInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO;
-		renderPassCreateInfo.pNext = nullptr;
-		renderPassCreateInfo.flags = 0;
-		renderPassCreateInfo.attachmentCount = static_cast<uint32_t>( attachmentsDescriptions.size() );
-		renderPassCreateInfo.pAttachments = attachmentsDescriptions.data();
-		renderPassCreateInfo.subpassCount = static_cast<uint32_t>( subpassDescriptions.size() );;
-		renderPassCreateInfo.pSubpasses = subpassDescriptions.data();
-		renderPassCreateInfo.dependencyCount = static_cast<uint32_t>( subpassDependencies.size() );;
-		renderPassCreateInfo.pDependencies = subpassDependencies.data();
-
-		if ( vkCreateRenderPass( m_device->vkDevice, &renderPassCreateInfo, nullptr, &m_renderPassImgui ) != VK_SUCCESS )
-		{
-			Debug::Error( "Could not create render pass pp" );
-			return false;
-		}
-		Debug::Get() << Debug::Severity::log << std::hex << "VkRenderPass ImGui    " << m_renderPassImgui << std::dec << Debug::Endl();
-
-		return true;
+		m_renderPassImgui = new RenderPass( *m_device );
+		m_renderPassImgui->AddColorAttachment( m_swapchain->GetSurfaceFormat().format, VK_IMAGE_LAYOUT_PRESENT_SRC_KHR );
+		m_renderPassImgui->AddDependency();
+		return m_renderPassImgui->Create();
 	}
 
 	//================================================================================================================================
@@ -927,7 +739,7 @@ namespace fan
 		m_gameFrameBuffers = new FrameBuffer( *m_device );
 		m_gameFrameBuffers->AddColorAttachment( m_swapchain->GetExtent(), m_swapchain->GetSurfaceFormat().format );
 		m_gameFrameBuffers->AddDepthAttachment( m_swapchain->GetExtent() );
-		m_gameFrameBuffers->Create( m_swapchain->GetSwapchainImagesCount() , m_gameRenderPass, m_swapchain->GetExtent() );
+		m_gameFrameBuffers->Create( m_swapchain->GetSwapchainImagesCount() , m_renderPassGame->GetRenderPass(), m_swapchain->GetExtent() );
 	}
 
 	//================================================================================================================================
@@ -937,7 +749,7 @@ namespace fan
 		m_postProcessFramebuffers = new FrameBuffer( *m_device );
 		m_postProcessFramebuffers->AddColorAttachment( m_swapchain->GetExtent(), m_swapchain->GetSurfaceFormat().format );
 		//m_gameFramebuffers->AddDepthAttachment( m_swapchain->GetExtent() );
-		m_postProcessFramebuffers->Create( m_swapchain->GetSwapchainImagesCount(), m_renderPassPostprocess, m_swapchain->GetExtent() );
+		m_postProcessFramebuffers->Create( m_swapchain->GetSwapchainImagesCount(), m_renderPassPostprocess->GetRenderPass(), m_swapchain->GetExtent() );
 	}
 
 	//================================================================================================================================
@@ -945,36 +757,8 @@ namespace fan
 	void Renderer::CreateSwapchainFramebuffers() {	
 		m_swapchainFramebuffers = new FrameBuffer( *m_device );
 		m_swapchainFramebuffers->SetExternalAttachment( m_swapchain->GetImageViews() );
-		m_swapchainFramebuffers->Create( m_swapchain->GetSwapchainImagesCount(), m_renderPassImgui, m_swapchain->GetExtent() );
+		m_swapchainFramebuffers->Create( m_swapchain->GetSwapchainImagesCount(), m_renderPassImgui->GetRenderPass(), m_swapchain->GetExtent() );
 	}
-
-	//================================================================================================================================
-	//================================================================================================================================
-	void Renderer::DeleteRenderPass() {
-		if (m_gameRenderPass != VK_NULL_HANDLE) {
-			vkDestroyRenderPass(m_device->vkDevice, m_gameRenderPass, nullptr);
-			m_gameRenderPass = VK_NULL_HANDLE;
-		}
-	}
-
-	//================================================================================================================================
-	//================================================================================================================================
-	void Renderer::DeleteRenderPassPostprocess() {
-		if (m_renderPassPostprocess != VK_NULL_HANDLE) {
-			vkDestroyRenderPass(m_device->vkDevice, m_renderPassPostprocess, nullptr);
-			m_renderPassPostprocess = VK_NULL_HANDLE;
-		}
-
-		if ( m_renderPassImgui != VK_NULL_HANDLE )
-		{
-			vkDestroyRenderPass( m_device->vkDevice, m_renderPassImgui, nullptr );
-			m_renderPassImgui = VK_NULL_HANDLE;
-		}
-
-		
-	}
-
-
 
 	//================================================================================================================================
 	// Used for postprocess

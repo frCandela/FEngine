@@ -13,7 +13,6 @@
 #include "core/input/fanInputManager.h"
 #include "core/input/fanMouse.h"
 #include "core/time/fanProfiler.h"
-#include "renderer/fanRenderer.h"
 #include "game/fanWithEnergy.h"
 #include "game/fanPlayerInput.h"
 

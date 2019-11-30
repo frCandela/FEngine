@@ -9,7 +9,6 @@
 #include "scene/components/fanCamera.h"
 #include "editor/components/fanFPSCamera.h"
 #include "game/fanSpaceShip.h"	
-#include "renderer/fanRenderer.h"
 
 
 namespace fan {

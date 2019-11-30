@@ -6,7 +6,6 @@
 #include "game/fanSolarPanel.h"
 #include "game/fanHealth.h"
 #include "core/time/fanProfiler.h"
-#include "renderer/fanRenderer.h"
 #include "renderer/fanMesh.h"
 #include "scene/fanScene.h"
 #include "scene/fanGameobject.h"

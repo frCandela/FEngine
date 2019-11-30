@@ -1,7 +1,6 @@
 #include "fanGlobalIncludes.h"
 #include "renderer/core/fanFrameBuffer.h"
 
-#include "renderer/fanRenderer.h"
 #include "renderer/core/fanDevice.h"
 #include "renderer/core/fanSampler.h"
 #include "renderer/core/fanImage.h"

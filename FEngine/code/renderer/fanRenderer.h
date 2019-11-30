@@ -10,9 +10,6 @@ namespace fan
 	class SwapChain;
 	class ImguiPipeline;
 	class FrameBuffer;
-	class Image;
-	class ImageView;
-	class Shader;
 	class Buffer;
 	class Sampler;
 	class DescriptorTextures;
@@ -20,9 +17,8 @@ namespace fan
 	class PostprocessPipeline;
 	class ForwardPipeline;
 	class UIPipeline;
-	class Color;
-	class RessourceManager;
 	class RendererDebug;
+	class RenderPass;
 
 	// Used to set uniforms
 	struct DrawMesh {
@@ -118,16 +114,15 @@ namespace fan
 		DescriptorSampler * m_samplerDescriptorUI	= nullptr;
 		Sampler *			m_samplerUI				= nullptr;
 
-		VkRenderPass	m_gameRenderPass;
-		VkRenderPass	m_renderPassPostprocess;
-		VkRenderPass	m_renderPassImgui;
+		RenderPass *	m_renderPassGame;
+		RenderPass *	m_renderPassPostprocess;
+		RenderPass *	m_renderPassImgui;
 
 		std::vector<VkCommandBuffer> m_primaryCommandBuffers;
 		std::vector<VkCommandBuffer> m_geometryCommandBuffers;
 		std::vector<VkCommandBuffer> m_imguiCommandBuffers;
 		std::vector<VkCommandBuffer> m_uiCommandBuffers;
 		std::vector<VkCommandBuffer> m_postprocessCommandBuffers;
-
 
 		FrameBuffer * m_gameFrameBuffers;
 		FrameBuffer * m_postProcessFramebuffers;
@@ -159,8 +154,5 @@ namespace fan
 
 		bool CreateTextureDescriptor();
 		void BindTexture( VkCommandBuffer _commandBuffer, const uint32_t _textureIndex, DescriptorSampler* _samplerDescriptor, VkPipelineLayout _pipelineLayout );
-
-		void DeleteRenderPass();
-		void DeleteRenderPassPostprocess();
 	};
 }

@@ -7,7 +7,6 @@
 #include "renderer/core/fanImageView.h" 
 #include "renderer/core/fanBuffer.h"
 #include "renderer/descriptors/fanDescriptor.h"
-#include "renderer/fanRenderer.h"
 #include "renderer/util/fanVertex.h"
 
 namespace fan

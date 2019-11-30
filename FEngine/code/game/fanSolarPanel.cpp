@@ -6,7 +6,6 @@
 #include "game/fanSolarEruption.h"
 #include "game/fanWithEnergy.h"
 #include "renderer/fanMesh.h"
-#include "renderer/fanRenderer.h"
 
 namespace fan
 {

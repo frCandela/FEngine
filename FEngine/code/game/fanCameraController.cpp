@@ -7,7 +7,6 @@
 #include "scene/fanGameobject.h"
 #include "scene/components/fanTransform.h"
 #include "scene/components/fanCamera.h"
-#include "renderer/fanRenderer.h"
 
 namespace fan {
 	REGISTER_TYPE_INFO(CameraController, TypeInfo::Flags::EDITOR_COMPONENT, "game/" )

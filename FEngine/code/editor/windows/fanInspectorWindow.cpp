@@ -5,7 +5,6 @@
 #include "scene/components/fanComponent.h"
 #include "scene/components/fanTransform.h"
 #include "scene/components/fanCamera.h"
-#include "scene/components/fanMeshRenderer.h"
 #include "scene/components/fanMaterial.h"
 #include "editor/components/fanFPSCamera.h"
 #include "editor/fanDragnDrop.h"
@@ -13,7 +12,6 @@
 #include "core/fanSignal.h"
 #include "core/time/fanProfiler.h"
 #include "renderer/core/fanTexture.h"
-#include "renderer/fanRenderer.h"
 #include "renderer/core/fanTexture.h"
 #include "renderer/fanRessourceManager.h"
 

@@ -466,6 +466,9 @@
     <ClCompile Include="code\renderer\fanRendererDebug.cpp">
       <Filter>code\renderer</Filter>
     </ClCompile>
+    <ClCompile Include="code\renderer\core\fanRenderPass.cpp">
+      <Filter>code\renderer\core</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="code\editor\fanMainMenuBar.h">
@@ -1397,6 +1400,9 @@
     </ClInclude>
     <ClInclude Include="code\renderer\fanRendererDebug.h">
       <Filter>code\renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="code\renderer\core\fanRenderPass.h">
+      <Filter>code\renderer\core</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -3,7 +3,6 @@
 
 #include "renderer/core/fanDevice.h"
 #include "renderer/core/fanBuffer.h"
-#include "renderer/fanRenderer.h"
 
 namespace fan
 {

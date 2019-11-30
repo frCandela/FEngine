@@ -2,7 +2,6 @@
 #include "editor/windows/fanSceneWindow.h"
 
 #include "editor/fanDragnDrop.h"
-#include "renderer/fanRenderer.h"
 #include "scene/fanScene.h"
 #include "scene/fanGameobject.h"
 #include "scene/components/fanTransform.h"

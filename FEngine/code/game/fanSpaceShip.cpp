@@ -11,7 +11,6 @@
 #include "scene/fanGameobject.h"
 #include "core/input/fanMouse.h"
 #include "core/math/shapes/fanRay.h"
-#include "renderer/fanRenderer.h"
 #include "game/fanWithEnergy.h"
 #include "game/fanPlayerInput.h"
 #include "game/fanWithEnergy.h"

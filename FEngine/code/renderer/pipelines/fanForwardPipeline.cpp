@@ -12,7 +12,6 @@
 #include "renderer/descriptors/fanDescriptor.h"
 #include "renderer/descriptors/fanDescriptorTexture.h"
 #include "renderer/descriptors/fanDescriptorSampler.h"
-#include "renderer/fanRenderer.h"
 #include "renderer/util/fanVertex.h"
 #include "renderer/fanMesh.h"
 

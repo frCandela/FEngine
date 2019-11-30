@@ -1,7 +1,6 @@
 #include "fanGlobalIncludes.h"
 #include "scene/components/ui/fanUIMeshRenderer.h"
 
-#include "renderer/fanRenderer.h"
 #include "renderer/fanUIMesh.h"
 #include "scene/components/fanTransform.h"
 #include "scene/fanGameobject.h"

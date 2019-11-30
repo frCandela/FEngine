@@ -2,7 +2,6 @@
 #include "scene/components/fanFollowTransform.h"
 
 #include "scene/components/fanTransform.h"
-#include "renderer/fanRenderer.h"	
 #include "scene/fanGameobject.h"
 
 namespace fan

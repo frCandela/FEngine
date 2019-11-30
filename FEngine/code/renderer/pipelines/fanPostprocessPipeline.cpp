@@ -8,7 +8,6 @@
 #include "renderer/descriptors/fanDescriptor.h"
 #include "renderer/core/fanImageView.h"
 #include "renderer/core/fanSampler.h"
-#include "renderer/fanRenderer.h"
 
 namespace fan
 {

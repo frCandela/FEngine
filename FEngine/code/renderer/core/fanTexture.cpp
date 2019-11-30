@@ -3,7 +3,6 @@
 #include "renderer/core/fanTexture.h"
 #include "renderer/core/fanDevice.h"
 #include "renderer/core/fanBuffer.h"
-#include "renderer/fanRenderer.h"
 
 #pragma warning(push, 0)   
 #define STB_IMAGE_IMPLEMENTATION
