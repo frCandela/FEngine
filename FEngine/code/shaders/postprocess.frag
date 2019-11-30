@@ -14,4 +14,6 @@ layout( set = 1, binding = 0) uniform Uniforms
 
 void main() {   
 	outColor = uniforms.color * texture(forwardSampler, inUV);
+	//outColor = vec4(1.f, 0.f ,0.f, 1.f );
+	outColor.a = 1.f;
 }

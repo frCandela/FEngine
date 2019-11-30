@@ -125,6 +125,7 @@
     <ClCompile Include="code\editor\fanModals.cpp" />
     <ClCompile Include="code\editor\windows\fanConsoleWindow.cpp" />
     <ClCompile Include="code\editor\windows\fanEcsWindow.cpp" />
+    <ClCompile Include="code\editor\windows\fanGameWindow.cpp" />
     <ClCompile Include="code\editor\windows\fanInspectorWindow.cpp" />
     <ClCompile Include="code\editor\windows\fanPreferencesWindow.cpp" />
     <ClCompile Include="code\editor\windows\fanProfilerWindow.cpp" />
@@ -259,6 +260,7 @@
     <ClInclude Include="code\editor\fanModals.h" />
     <ClInclude Include="code\editor\windows\fanConsoleWindow.h" />
     <ClInclude Include="code\editor\windows\fanEcsWindow.h" />
+    <ClInclude Include="code\editor\windows\fanGameWindow.h" />
     <ClInclude Include="code\editor\windows\fanInspectorWindow.h" />
     <ClInclude Include="code\editor\windows\fanPreferencesWindow.h" />
     <ClInclude Include="code\editor\windows\fanProfilerWindow.h" />

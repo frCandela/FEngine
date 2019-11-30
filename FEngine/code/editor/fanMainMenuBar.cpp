@@ -72,16 +72,52 @@ namespace fan
 	//================================================================================================================================
 	void MainMenuBar::Draw() {
 		SCOPED_PROFILE( main_bar )
+
+
+		static ImGuiDockNodeFlags dockspace_flags = ImGuiDockNodeFlags_None;
+		ImGuiViewport* viewport = ImGui::GetMainViewport();
+		ImGui::SetNextWindowPos( viewport->Pos );
+		ImGui::SetNextWindowSize( viewport->Size );
+
+		ImGuiWindowFlags window_flags = ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_NoDocking;
+
+		//fillscreen
+		{
+			ImGui::SetNextWindowPos( viewport->Pos );
+			ImGui::SetNextWindowSize( viewport->Size );
+			ImGui::SetNextWindowViewport( viewport->ID );
+			ImGui::PushStyleVar( ImGuiStyleVar_WindowRounding, 0.0f );
+			ImGui::PushStyleVar( ImGuiStyleVar_WindowBorderSize, 0.0f );
+			window_flags |= ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove;
+			window_flags |= ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoNavFocus;
+		}
+		bool p_open = true;
+		ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
+		ImGui::Begin("DockSpace Demo", &p_open, window_flags);
+	   
+
+		
+		ImGui::PopStyleVar();
+		ImGui::PopStyleVar(2);
+
+		ImGuiID dockspace_id = ImGui::GetID( "MyDockSpace" );
+		ImGui::DockSpace( dockspace_id, ImVec2( 0.0f, 0.0f ), dockspace_flags );
+		ImGui::End();
+
 		// Draw editor windows
-		for ( int windowIndex = 0; windowIndex < m_editorWindows.size(); windowIndex++ ) {
+		for ( int windowIndex = 0; windowIndex < m_editorWindows.size(); windowIndex++ )
+		{
 			m_editorWindows[windowIndex]->Draw();
 		}
-		if (m_showImguiDemoWindow) {
-			ImGui::ShowDemoWindow(&m_showImguiDemoWindow);
-		}
 
+		// Draw imgui demo
+		if ( m_showImguiDemoWindow )
+		{
+			ImGui::ShowDemoWindow( &m_showImguiDemoWindow );
+		}
+		
 		// Draw main menu  bar
-		if (ImGui::BeginMainMenuBar())
+		if ( ImGui::BeginMainMenuBar())
 		{
 			// File
 			if (ImGui::BeginMenu("File"))
@@ -192,7 +228,7 @@ namespace fan
 
 		} ImGui::EndMainMenuBar();
 
-
+		
 		// Open scene popup
 		if (m_openNewScenePopupLater == true) {
 			m_openNewScenePopupLater = false;
@@ -212,6 +248,7 @@ namespace fan
 		}
 
 		DrawModals();
+
 	}
 
 	//================================================================================================================================

@@ -143,8 +143,9 @@ namespace fan
 		DescriptorSampler * m_samplerDescriptorUI	= nullptr;
 		Sampler *			m_samplerUI				= nullptr;
 
-		VkRenderPass	m_renderPass;
+		VkRenderPass	m_gameRenderPass;
 		VkRenderPass	m_renderPassPostprocess;
+		VkRenderPass	m_renderPassImgui;
 
 		std::vector<VkCommandBuffer> m_primaryCommandBuffers;
 		std::vector<VkCommandBuffer> m_geometryCommandBuffers;
@@ -154,7 +155,8 @@ namespace fan
 		std::vector<VkCommandBuffer> m_postprocessCommandBuffers;
 
 
-		FrameBuffer * m_forwardFrameBuffers;
+		FrameBuffer * m_gameFrameBuffers;
+		FrameBuffer * m_postProcessFramebuffers;
 		FrameBuffer * m_swapchainFramebuffers;
 
 		Buffer * m_quadVertexBuffer;
@@ -174,11 +176,13 @@ namespace fan
 		void RecordAllCommandBuffers();
 
 		bool CreateCommandBuffers();
-		void CreateForwardFramebuffers();
+		void CreateGameFramebuffers();
+		void CreatePostProcessFramebuffers();		
 		void CreateSwapchainFramebuffers();
 
 		bool CreateRenderPass();
 		bool CreateRenderPassPostprocess();
+		bool CreateRenderPassImGui();
 
 		bool CreateTextureDescriptor();
 		void BindTexture( VkCommandBuffer _commandBuffer, const uint32_t _textureIndex, DescriptorSampler* _samplerDescriptor, VkPipelineLayout _pipelineLayout );

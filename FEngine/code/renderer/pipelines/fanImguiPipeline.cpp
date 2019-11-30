@@ -7,6 +7,7 @@
 #include "renderer/core/fanBuffer.h"
 #include "renderer/core/fanSampler.h"
 #include "renderer/core/fanTexture.h"
+#include "renderer/core/fanImageView.h"
 
 namespace fan
 {
@@ -53,7 +54,7 @@ namespace fan
 	void ImguiPipeline::Create(VkRenderPass _renderPass, GLFWwindow* _window, VkExtent2D _extent) {
 		ImGui::CreateContext();
 
-		//ImGui::GetIO().ConfigFlags |= ImGuiConfigFlags_DockingEnable;
+		ImGui::GetIO().ConfigFlags |= ImGuiConfigFlags_DockingEnable;
 
 		InitImgui(_window, _extent);
 		CreateFontAndSampler();
@@ -179,11 +180,20 @@ namespace fan
 				{
 					const ImDrawCmd* pcmd = &cmd_list->CmdBuffer[j];
 
+					const size_t textureID = (size_t)(pcmd->TextureId);
+
 					// Bind imgui pipeline and Descriptors sets
-					if( pcmd->TextureId == nullptr ) {
-						vkCmdBindDescriptorSets( _commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, m_pipelineLayout, 0, 1, &m_descriptorSets[0], 0, nullptr ); // regular drawing
-					} else {
+					switch ( textureID )
+					{
+					case 42:
 						vkCmdBindDescriptorSets( _commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, m_pipelineLayout, 0, 1, &m_descriptorSets[1], 0, nullptr ); // Icons drawing
+						break;
+					case 12:
+						vkCmdBindDescriptorSets( _commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, m_pipelineLayout, 0, 1, &m_descriptorSets[2], 0, nullptr ); // game drawing
+						break;
+					default:
+						vkCmdBindDescriptorSets( _commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, m_pipelineLayout, 0, 1, &m_descriptorSets[0], 0, nullptr ); // regular drawing			
+						break;
 					}
 
 					VkRect2D scissorRect;
@@ -280,7 +290,7 @@ namespace fan
 		descriptorPoolInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
 		descriptorPoolInfo.poolSizeCount = static_cast<uint32_t>(poolSizes.size());
 		descriptorPoolInfo.pPoolSizes = poolSizes.data();
-		descriptorPoolInfo.maxSets = 2;
+		descriptorPoolInfo.maxSets = 3;
 
 		vkCreateDescriptorPool(m_device.vkDevice, &descriptorPoolInfo, nullptr, &m_descriptorPool);
 
@@ -301,12 +311,12 @@ namespace fan
 		vkCreateDescriptorSetLayout(m_device.vkDevice, &descriptorSetLayoutCreateInfo, nullptr, &m_descriptorSetLayout);
 
 		// Descriptor set
-		VkDescriptorSetLayout layouts[2] = { m_descriptorSetLayout ,m_descriptorSetLayout };
+		VkDescriptorSetLayout layouts[3] = { m_descriptorSetLayout ,m_descriptorSetLayout, m_descriptorSetLayout };
 		VkDescriptorSetAllocateInfo descriptorSetAllocateInfo{};
 		descriptorSetAllocateInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
 		descriptorSetAllocateInfo.descriptorPool = m_descriptorPool;
 		descriptorSetAllocateInfo.pSetLayouts = layouts;
-		descriptorSetAllocateInfo.descriptorSetCount = 2;
+		descriptorSetAllocateInfo.descriptorSetCount = 3;
 
 		vkAllocateDescriptorSets(m_device.vkDevice, &descriptorSetAllocateInfo, m_descriptorSets);
 
@@ -319,6 +329,11 @@ namespace fan
 		iconsDescriptorImageInfo.sampler = m_iconsSampler->GetSampler();
 		iconsDescriptorImageInfo.imageView = m_iconsTexture->GetImageView();
 		iconsDescriptorImageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+
+		VkDescriptorImageInfo view3DDescriptorImageInfo {};
+		view3DDescriptorImageInfo.sampler = m_sampler->GetSampler();
+		view3DDescriptorImageInfo.imageView = m_imageView->GetImageView();
+		view3DDescriptorImageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
 
 		VkWriteDescriptorSet writeDescriptorSet{};
 		writeDescriptorSet.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
@@ -336,7 +351,15 @@ namespace fan
 		writeDescriptorSetIcons.pImageInfo = &iconsDescriptorImageInfo;
 		writeDescriptorSetIcons.descriptorCount = 1;
 
-		std::vector<VkWriteDescriptorSet> writeDescriptorSets = { writeDescriptorSet, writeDescriptorSetIcons };
+		VkWriteDescriptorSet writeDescriptorSet3DView {};
+		writeDescriptorSet3DView.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+		writeDescriptorSet3DView.dstSet = m_descriptorSets[2];
+		writeDescriptorSet3DView.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+		writeDescriptorSet3DView.dstBinding = 0;
+		writeDescriptorSet3DView.pImageInfo = &view3DDescriptorImageInfo;
+		writeDescriptorSet3DView.descriptorCount = 1;
+
+		std::vector<VkWriteDescriptorSet> writeDescriptorSets = { writeDescriptorSet, writeDescriptorSetIcons, writeDescriptorSet3DView };
 
 		vkUpdateDescriptorSets(m_device.vkDevice, static_cast<uint32_t>(writeDescriptorSets.size()), writeDescriptorSets.data(), 0, nullptr);
 	}

@@ -7,6 +7,7 @@ namespace fan
 	class Buffer;
 	class Texture;
 	class Sampler;
+	class ImageView;
 
 	//================================================================================================================================
 	//================================================================================================================================
@@ -20,6 +21,7 @@ namespace fan
 		void UpdateBuffer(const size_t _index);
 		void DrawFrame(VkCommandBuffer commandBuffer, const size_t _index);
 		void ReloadIcons();
+		void Set3DView(  ImageView * _imageView ){ m_imageView = _imageView; }
 
 	private:
 		Device & m_device;
@@ -28,6 +30,7 @@ namespace fan
 		Sampler * m_iconsSampler;
 		Texture * m_fontTexture;
 		Texture * m_iconsTexture;
+		ImageView * m_imageView = nullptr;
 
 		Shader * m_fragShader;
 		Shader * m_vertShader;
@@ -42,7 +45,7 @@ namespace fan
 		VkPipeline				m_pipeline;
 		VkDescriptorPool		m_descriptorPool;
 		VkDescriptorSetLayout	m_descriptorSetLayout;
-		VkDescriptorSet			m_descriptorSets[2];
+		VkDescriptorSet			m_descriptorSets[3];
 
 		// UI params are set via push constants
 		struct PushConstBlock
