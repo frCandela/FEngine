@@ -3,6 +3,7 @@
 
 #include "fanGlobals.h"
 #include "renderer/fanRenderer.h"
+#include "renderer/fanRendererDebug.h"
 #include "renderer/fanRessourceManager.h"
 #include "renderer/pipelines/fanForwardPipeline.h"
 #include "renderer/pipelines/fanDebugPipeline.h"
@@ -129,6 +130,8 @@ namespace fan {
 		m_physicsManager = new PhysicsManager( btVector3( 0, 0, 0 ) );
 		m_scene = new Scene( "mainScene", m_ecsManager, m_physicsManager );
 
+		Debug::Get().SetDebug( & m_renderer->GetRendererDebug() );
+
 		// Initialize editor components
 		m_copyPaste			= new EditorCopyPaste(*this);
 		m_renderWindow		= new RenderWindow( m_renderer );
@@ -144,7 +147,6 @@ namespace fan {
 
 
 		// Instance messages		
-		Debug::Get().SetDebug( m_renderer );
 		m_sceneWindow->onSelectGameobject.	Connect( &Engine::SetSelectedGameobject, this );
 		m_mainMenuBar->onReloadShaders.		Connect(&Renderer::ReloadShaders, m_renderer );
 		m_mainMenuBar->onReloadIcons.		Connect(&Renderer::ReloadIcons, m_renderer );
@@ -233,7 +235,7 @@ namespace fan {
 					Input::Get().NewFrame();
 					ImGui::NewFrame();
 					ImGui::GetIO().DeltaTime = targetLogicDelta;
-					m_renderer->ClearDebug();
+					m_renderer->GetRendererDebug().ClearDebug();
 				}
 
 				m_scene->BeginFrame();				
@@ -310,7 +312,7 @@ namespace fan {
 		m_editorCameraController = cameraGameobject->AddComponent<FPSCamera>();
 		m_editorCameraController->SetRemovable(false);		
 
-		Debug::Get().SetDebug( m_renderer );
+		Debug::Get().SetDebug( &m_renderer->GetRendererDebug() );
 	}
 
 	//================================================================================================================================
@@ -335,7 +337,7 @@ namespace fan {
 			const Gameobject * gameobject = entities[gameobjectIndex];
 			if (gameobject != m_editorCamera->GetGameobject()) {
 				AABB aabb = gameobject->GetAABB();
-				m_renderer->DebugAABB(aabb, Color::Red);
+				Debug::Get().Render().DebugAABB(aabb, Color::Red);
 			}
 		}
 	}
@@ -679,7 +681,7 @@ namespace fan {
 			// Draw the gizmo cone & lines
 			Debug::Render().DebugLine(origin, origin + size*( _transform *  axisDirection[axisIndex] - origin ), opaqueColor, false );
 			for (int triangleIndex = 0; triangleIndex < coneTris.size() / 3; triangleIndex++) {
-				m_renderer->DebugTriangle(coneTris[3 * triangleIndex + 0], coneTris[3 * triangleIndex + 1], coneTris[3 * triangleIndex + 2], clickedColor);
+				Debug::Get().Render().DebugTriangle(coneTris[3 * triangleIndex + 0], coneTris[3 * triangleIndex + 1], coneTris[3 * triangleIndex + 2], clickedColor);
 			}
 
 			// Calculate closest point between the mouse ray and the axis selected

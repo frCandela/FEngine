@@ -9,7 +9,7 @@
 #include "game/fanHealth.h"
 #include "scene/components/ui/fanUIMeshRenderer.h"
 #include "scene/components/fanCamera.h"
-#include "renderer/fanRenderer.h"
+#include "renderer/fanRendererDebug.h"
 
 
 namespace fan

@@ -11,7 +11,7 @@ namespace fan
 	//================================================================================================================================
 	class SwapChain {
 	public:
-		SwapChain(Device & _device);
+		SwapChain(Device & _device, VkSurfaceKHR _surface, VkExtent2D _desiredSize );
 		~SwapChain();
 
 		void Create(VkSurfaceKHR _surface, VkExtent2D _desiredSize);

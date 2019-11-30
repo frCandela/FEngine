@@ -5,7 +5,7 @@
 #include "core/math/shapes/fanConvexHull.h"
 #include "renderer/core/fanDevice.h"
 #include "renderer/core/fanBuffer.h"
-#include "renderer/fanRenderer.h"
+#include "renderer/fanRendererDebug.h"
 
 namespace fan {
 	REGISTER_TYPE_INFO(Mesh, TypeInfo::Flags::NONE, "scene/")

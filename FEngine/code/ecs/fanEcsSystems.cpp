@@ -1,7 +1,7 @@
 #include "fanGlobalIncludes.h"
 #include "ecs/fanECSSystems.h"
 
-#include "renderer/fanRenderer.h"
+#include "renderer/fanRendererDebug.h"
 #include "core/time/fanTime.h"
 #include "core/time/fanProfiler.h"
 #include "core/math/shapes/fanConvexHull.h"

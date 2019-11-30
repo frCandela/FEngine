@@ -167,6 +167,7 @@
     <ClCompile Include="code\renderer\descriptors\fanDescriptorTexture.cpp" />
     <ClCompile Include="code\renderer\fanMesh.cpp" />
     <ClCompile Include="code\renderer\fanRenderer.cpp" />
+    <ClCompile Include="code\renderer\fanRendererDebug.cpp" />
     <ClCompile Include="code\renderer\fanRessourceManager.cpp" />
     <ClCompile Include="code\renderer\fanUIMesh.cpp" />
     <ClCompile Include="code\renderer\pipelines\fanDebugPipeline.cpp" />
@@ -302,6 +303,7 @@
     <ClInclude Include="code\renderer\descriptors\fanDescriptorTexture.h" />
     <ClInclude Include="code\renderer\fanMesh.h" />
     <ClInclude Include="code\renderer\fanRenderer.h" />
+    <ClInclude Include="code\renderer\fanRendererDebug.h" />
     <ClInclude Include="code\renderer\fanRessourceManager.h" />
     <ClInclude Include="code\renderer\fanUIMesh.h" />
     <ClInclude Include="code\renderer\pipelines\fanDebugPipeline.h" />

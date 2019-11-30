@@ -9,7 +9,7 @@
 #include "scene/components/fanRigidbody.h"
 #include "scene/components/fanSphereShape.h"
 #include "game/fanPlanet.h"
-#include "renderer/fanRenderer.h"
+#include "renderer/fanRendererDebug.h"
 
 namespace fan {
 	REGISTER_TYPE_INFO( SolarSystem, TypeInfo::Flags::EDITOR_COMPONENT, "game/" )

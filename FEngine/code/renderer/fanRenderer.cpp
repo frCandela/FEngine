@@ -3,7 +3,6 @@
 
 #include "core/time/fanTime.h"
 #include "core/input/fanInput.h"
-#include "core/math/fanBasicModels.h"
 #include "core/time/fanProfiler.h"
 #include "renderer/fanMesh.h"
 #include "renderer/fanUIMesh.h"
@@ -27,20 +26,22 @@
 #include "renderer/descriptors/fanDescriptorTexture.h"
 #include "renderer/descriptors/fanDescriptorSampler.h"
 #include "renderer/core/fanSampler.h"
+#include "renderer/fanRendererDebug.h"
 
 namespace fan
 {
 	//================================================================================================================================
 	//================================================================================================================================
 	Renderer::Renderer( const VkExtent2D _size, const glm::ivec2 _position ) {
-		m_instance =	new Instance();
-		m_window =		new Window("FEngine", _size, _position, m_instance->vkInstance);
-		m_device =		new Device(m_instance, m_window->GetSurface());
+		m_instance =		new Instance();
+		m_window =			new Window("FEngine", _size, _position, m_instance->vkInstance);
+		m_device =			new Device(m_instance, m_window->GetSurface());
+		m_swapchain =		new SwapChain(*m_device, m_window->GetSurface(), _size);	
+		m_rendererDebug =	new RendererDebug( *m_device, *m_swapchain );
 
-		m_swapchain =	new SwapChain(*m_device);		
 		m_clearColor = glm::vec4(0.f, 0.f, 0.2f, 1.f);
 
-		m_swapchain->Create(m_window->GetSurface(), _size);
+		
 		Input::Get().Setup(m_window->GetWindow());            
             
 		RessourceManager::Get().Init( m_device );
@@ -59,25 +60,12 @@ namespace fan
 		m_samplerDescriptorTextures = new DescriptorSampler( *m_device, m_samplerTextures->GetSampler() );
 		CreateTextureDescriptor();
 
+		m_rendererDebug->Create( m_gameRenderPass, m_gameFrameBuffers );
+
 		m_forwardPipeline = new ForwardPipeline(*m_device, m_imagesDescriptor, m_samplerDescriptorTextures );
 		m_forwardPipeline->Init( m_gameRenderPass, m_swapchain->GetExtent(), "code/shaders/forward.vert", "code/shaders/forward.frag" );
 		m_forwardPipeline->CreateDescriptors( m_swapchain->GetSwapchainImagesCount() );
 		m_forwardPipeline->Create();
-
-		m_debugLinesPipeline = new DebugPipeline(*m_device, VK_PRIMITIVE_TOPOLOGY_LINE_LIST, true);
-		m_debugLinesPipeline->Init( m_gameRenderPass, m_swapchain->GetExtent(), "code/shaders/debugLines.vert", "code/shaders/debugLines.frag" );
-		m_debugLinesPipeline->CreateDescriptors( m_swapchain->GetSwapchainImagesCount() );
-		m_debugLinesPipeline->Create();
-
-		m_debugLinesPipelineNoDepthTest = new DebugPipeline(*m_device, VK_PRIMITIVE_TOPOLOGY_LINE_LIST, false);
-		m_debugLinesPipelineNoDepthTest->Init( m_gameRenderPass, m_swapchain->GetExtent(), "code/shaders/debugLines.vert", "code/shaders/debugLines.frag" );
-		m_debugLinesPipelineNoDepthTest->CreateDescriptors( m_swapchain->GetSwapchainImagesCount() );
-		m_debugLinesPipelineNoDepthTest->Create();
-            
-		m_debugTrianglesPipeline = new DebugPipeline(*m_device, VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST, false);
-		m_debugTrianglesPipeline->Init( m_gameRenderPass, m_swapchain->GetExtent(), "code/shaders/debugTriangles.vert", "code/shaders/debugTriangles.frag" );
-		m_debugTrianglesPipeline->CreateDescriptors( m_swapchain->GetSwapchainImagesCount() );
-		m_debugTrianglesPipeline->Create();
 
 		m_samplerUI = new Sampler( *m_device );
 		m_samplerUI->CreateSampler( 0, 1, VK_FILTER_NEAREST );
@@ -100,10 +88,6 @@ namespace fan
 		CreateCommandBuffers();
 		RecordAllCommandBuffers();
 
-		m_debugLinesvertexBuffers.resize(m_swapchain->GetSwapchainImagesCount());
-		m_debugLinesNoDepthTestVertexBuffers.resize(m_swapchain->GetSwapchainImagesCount());
-		m_debugTrianglesvertexBuffers.resize(m_swapchain->GetSwapchainImagesCount());
-
 		const size_t initialSize = 16;
 		m_meshDrawArray.reserve( initialSize );
 		m_forwardPipeline->m_dynamicUniformsVert.Resize( initialSize );
@@ -117,9 +101,6 @@ namespace fan
 
 		delete m_imguiPipeline;
 		delete m_forwardPipeline;
-		delete m_debugLinesPipeline;
-		delete m_debugLinesPipelineNoDepthTest;
-		delete m_debugTrianglesPipeline;
 		delete m_uiPipeline;
 		
 		RessourceManager::Get().Delete();
@@ -133,17 +114,7 @@ namespace fan
 
 		delete m_quadVertexBuffer;
 
-		for ( int bufferIndex = 0; bufferIndex < m_debugLinesvertexBuffers.size(); bufferIndex++ ) {
-			delete m_debugLinesvertexBuffers[bufferIndex];
-		} m_debugLinesvertexBuffers.clear();
-
-		for ( int bufferIndex = 0; bufferIndex < m_debugLinesNoDepthTestVertexBuffers.size(); bufferIndex++ ) {
-			delete m_debugLinesNoDepthTestVertexBuffers[bufferIndex];
-		} m_debugLinesNoDepthTestVertexBuffers.clear();
-
-		for ( int bufferIndex = 0; bufferIndex < m_debugTrianglesvertexBuffers.size(); bufferIndex++ ) {
-			delete m_debugTrianglesvertexBuffers[bufferIndex];
-		} m_debugTrianglesvertexBuffers.clear();
+		delete m_rendererDebug;
 
 		delete m_gameFrameBuffers;
 		delete m_postProcessFramebuffers;
@@ -186,9 +157,7 @@ namespace fan
 			m_gameFrameBuffers->Resize( extent );
 			m_postprocessPipeline->Resize( extent );
 			m_forwardPipeline->Resize( extent );
-			m_debugLinesPipeline->Resize( extent );
-			m_debugLinesPipelineNoDepthTest->Resize( extent );
-			m_debugTrianglesPipeline->Resize( extent );
+			m_rendererDebug->Resize( extent );
 			m_uiPipeline->Resize( extent );
 
 			RecordAllCommandBuffers();
@@ -214,7 +183,7 @@ namespace fan
 		{
 			SCOPED_PROFILE( record_cmd )
 			RecordCommandBufferGeometry( currentFrame );
-			RecordCommandBufferDebug( currentFrame );
+			m_rendererDebug->RecordCommandBufferDebug( currentFrame );
 			RecordCommandBufferUI( currentFrame );
 			RecordCommandBufferImgui( currentFrame );
 			RecordPrimaryCommandBuffer( currentFrame );
@@ -233,9 +202,7 @@ namespace fan
 	void Renderer::UpdateUniformBuffers( const size_t _index ) {
 		m_postprocessPipeline->UpdateUniformBuffers( _index );
 		m_forwardPipeline->UpdateUniformBuffers( _index );
-		m_debugLinesPipeline->UpdateUniformBuffers( _index );
-		m_debugLinesPipelineNoDepthTest->UpdateUniformBuffers( _index );
-		m_debugTrianglesPipeline->UpdateUniformBuffers( _index );
+		m_rendererDebug->UpdateUniformBuffers(_index);
 		m_uiPipeline->UpdateUniformBuffers( _index );
 	}
 
@@ -261,13 +228,7 @@ namespace fan
 
 		m_forwardPipeline->m_fragUniforms.cameraPosition = _position;
 
-		std::array< DebugPipeline *, 3 > debugLinesPipelines  = { m_debugLinesPipeline, m_debugLinesPipelineNoDepthTest, m_debugTrianglesPipeline };
-		for (int pipelingIndex = 0; pipelingIndex < debugLinesPipelines.size(); pipelingIndex++){
-			debugLinesPipelines[pipelingIndex]->m_debugUniforms.model = glm::mat4( 1.0 );
-			debugLinesPipelines[pipelingIndex]->m_debugUniforms.view = m_forwardPipeline->m_vertUniforms.view;
-			debugLinesPipelines[pipelingIndex]->m_debugUniforms.proj = m_forwardPipeline->m_vertUniforms.proj;
-			debugLinesPipelines[pipelingIndex]->m_debugUniforms.color = glm::vec4( 1, 1, 1, 1 );
-		}
+		m_rendererDebug->SetMainCamera( m_forwardPipeline->m_vertUniforms.proj, _view );
 	}
 
 	//================================================================================================================================
@@ -358,16 +319,18 @@ namespace fan
 	//================================================================================================================================
 	//================================================================================================================================
 	void Renderer::RecordAllCommandBuffers() {
+		uint32_t imagesCount = m_swapchain->GetSwapchainImagesCount();
+
 		for ( size_t cmdBufferIndex = 0; cmdBufferIndex < m_imguiCommandBuffers.size(); cmdBufferIndex++) {
 			RecordCommandBufferImgui(cmdBufferIndex);
 		}
 		for ( size_t cmdBufferIndex = 0; cmdBufferIndex < m_geometryCommandBuffers.size(); cmdBufferIndex++) {
 			RecordCommandBufferGeometry(cmdBufferIndex);
 		}
-		for ( size_t cmdBufferIndex = 0; cmdBufferIndex < m_debugCommandBuffers.size(); cmdBufferIndex++) {
-			RecordCommandBufferDebug(cmdBufferIndex);
+		for ( size_t cmdBufferIndex = 0; cmdBufferIndex < imagesCount; cmdBufferIndex++) {
+			m_rendererDebug->RecordCommandBufferDebug(cmdBufferIndex);
 		}
-		for ( size_t cmdBufferIndex = 0; cmdBufferIndex < m_swapchain->GetSwapchainImagesCount(); cmdBufferIndex++) {
+		for ( size_t cmdBufferIndex = 0; cmdBufferIndex < imagesCount; cmdBufferIndex++) {
 			RecordCommandBufferPostProcess( cmdBufferIndex );
 		}
 		for ( size_t cmdBufferIndex = 0; cmdBufferIndex < m_uiCommandBuffers.size(); cmdBufferIndex++ )
@@ -432,8 +395,8 @@ namespace fan
 			
 			vkCmdBeginRenderPass(commandBuffer, &renderPassInfo, VK_SUBPASS_CONTENTS_SECONDARY_COMMAND_BUFFERS); {
 				vkCmdExecuteCommands(commandBuffer, 1, &m_geometryCommandBuffers[_index]);
-				if (HasNoDebugToDraw() == false) {
-					vkCmdExecuteCommands(commandBuffer, 1, &m_debugCommandBuffers[_index]);
+				if ( ! m_rendererDebug->HasNoDebugToDraw() ) {
+					vkCmdExecuteCommands(commandBuffer, 1,  m_rendererDebug->GetCommandBuffer(_index) );
 				}
 			} vkCmdEndRenderPass(commandBuffer);
 			
@@ -585,61 +548,6 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void Renderer::RecordCommandBufferDebug(const size_t _index) {
-		SCOPED_PROFILE( debug )
-		if (HasNoDebugToDraw() == false) {
-			UpdateDebugBuffer(_index);
-
-			VkCommandBuffer commandBuffer = m_debugCommandBuffers[_index];
-
-			VkCommandBufferInheritanceInfo commandBufferInheritanceInfo = {};
-			commandBufferInheritanceInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_INHERITANCE_INFO;
-			commandBufferInheritanceInfo.pNext = nullptr;
-			commandBufferInheritanceInfo.renderPass = m_gameRenderPass;
-			commandBufferInheritanceInfo.subpass = 0;
-			commandBufferInheritanceInfo.framebuffer = m_gameFrameBuffers->GetFrameBuffer( _index );
-			commandBufferInheritanceInfo.occlusionQueryEnable = VK_FALSE;
-			//commandBufferInheritanceInfo.queryFlags				=;
-			//commandBufferInheritanceInfo.pipelineStatistics		=;
-
-			VkCommandBufferBeginInfo commandBufferBeginInfo;
-			commandBufferBeginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
-			commandBufferBeginInfo.pNext = nullptr;
-			commandBufferBeginInfo.flags = VK_COMMAND_BUFFER_USAGE_SIMULTANEOUS_USE_BIT | VK_COMMAND_BUFFER_USAGE_RENDER_PASS_CONTINUE_BIT;
-			commandBufferBeginInfo.pInheritanceInfo = &commandBufferInheritanceInfo;
-
-			if (vkBeginCommandBuffer(commandBuffer, &commandBufferBeginInfo) == VK_SUCCESS) {	
-				VkDeviceSize offsets[] = { 0 }; 
-				if( m_debugLines.size() > 0 ) {
-					m_debugLinesPipeline->Bind( commandBuffer, _index );
-					VkBuffer vertexBuffers[] = { m_debugLinesvertexBuffers[_index]->GetBuffer() };
-					vkCmdBindVertexBuffers( commandBuffer, 0, 1, vertexBuffers, offsets );
-					vkCmdDraw( commandBuffer, static_cast<uint32_t>( m_debugLines.size() ), 1, 0, 0 );
-				}
-				if ( m_debugLinesNoDepthTest.size() > 0 ) {
-					m_debugLinesPipelineNoDepthTest->Bind( commandBuffer, _index );
-					VkBuffer vertexBuffers[] = { m_debugLinesNoDepthTestVertexBuffers[_index]->GetBuffer() };
-					vkCmdBindVertexBuffers( commandBuffer, 0, 1, vertexBuffers, offsets );
-					vkCmdDraw( commandBuffer, static_cast<uint32_t>( m_debugLinesNoDepthTest.size() ), 1, 0, 0 );
-				}
-				if ( m_debugTriangles.size() > 0 ) {
-					m_debugTrianglesPipeline->Bind( commandBuffer, _index );
-					VkBuffer vertexBuffers[] = { m_debugTrianglesvertexBuffers[_index]->GetBuffer() };
-					vkCmdBindVertexBuffers( commandBuffer, 0, 1, vertexBuffers, offsets );
-					vkCmdDraw( commandBuffer, static_cast<uint32_t>( m_debugTriangles.size() ), 1, 0, 0 );
-				}
-				if (vkEndCommandBuffer(commandBuffer) != VK_SUCCESS) {
-					Debug::Get() << Debug::Severity::error << "Could not record command buffer " << _index << "." << Debug::Endl();
-				}
-			}
-			else {
-				Debug::Get() << Debug::Severity::error << "Could not record command buffer " << _index << "." << Debug::Endl();
-			}
-		}
-	}	
-
-	//================================================================================================================================
-	//================================================================================================================================
 	void Renderer::RecordCommandBufferGeometry(const size_t _index) {
 		SCOPED_PROFILE( geometry )
 		VkCommandBuffer commandBuffer = m_geometryCommandBuffers[_index];
@@ -724,9 +632,7 @@ namespace fan
 		CreateTextureDescriptor();
 		m_postprocessPipeline->ReloadShaders();			
 		m_forwardPipeline->ReloadShaders();
-		m_debugLinesPipeline->ReloadShaders();
-		m_debugLinesPipelineNoDepthTest->ReloadShaders();
-		m_debugTrianglesPipeline->ReloadShaders();
+		m_rendererDebug->ReloadShaders();
 		m_uiPipeline->ReloadShaders();
 
 		RecordAllCommandBuffers();	
@@ -738,250 +644,6 @@ namespace fan
 	{
 		WaitIdle();
 		m_imguiPipeline->ReloadIcons();
-	}
-
-	//================================================================================================================================
-	//================================================================================================================================
-	void Renderer::UpdateDebugBuffer(const size_t _index) {
-		SCOPED_PROFILE( update_buffer )
-		if( m_debugLines.size() > 0) {
-			SCOPED_PROFILE( lines )
-			delete m_debugLinesvertexBuffers[_index];	// TODO update instead of delete
-			const VkDeviceSize size = sizeof(DebugVertex) * m_debugLines.size();
-			m_debugLinesvertexBuffers[_index] = new Buffer(*m_device);
-			m_debugLinesvertexBuffers[_index]->Create(
-				size,
-				VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_VERTEX_BUFFER_BIT,
-				VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT
-			);
-
-			if (size > 0) {
-				Buffer stagingBuffer(*m_device);
-				stagingBuffer.Create(
-					size,
-					VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
-					VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT
-				);
-				stagingBuffer.SetData(m_debugLines.data(), size);
-				VkCommandBuffer cmd = m_device->BeginSingleTimeCommands();
-				stagingBuffer.CopyBufferTo(cmd, m_debugLinesvertexBuffers[_index]->GetBuffer(), size);
-				m_device->EndSingleTimeCommands(cmd);
-			}
-		}
-
-		if (m_debugLinesNoDepthTest.size() > 0) {
-			SCOPED_PROFILE( lines_no_depth )
-			delete m_debugLinesNoDepthTestVertexBuffers[_index];
-			const VkDeviceSize size = sizeof(DebugVertex) * m_debugLinesNoDepthTest.size();
-			m_debugLinesNoDepthTestVertexBuffers[_index] = new Buffer(*m_device);
-			m_debugLinesNoDepthTestVertexBuffers[_index]->Create(
-				size,
-				VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_VERTEX_BUFFER_BIT,
-				VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT
-			);
-
-			if (size > 0) {
-				Buffer stagingBuffer(*m_device);
-				stagingBuffer.Create(
-					size,
-					VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
-					VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT
-				);
-				stagingBuffer.SetData(m_debugLinesNoDepthTest.data(), size);
-				VkCommandBuffer cmd = m_device->BeginSingleTimeCommands();
-				stagingBuffer.CopyBufferTo(cmd, m_debugLinesNoDepthTestVertexBuffers[_index]->GetBuffer(), size);
-				m_device->EndSingleTimeCommands(cmd);
-			}
-		}
-
-		if(m_debugTriangles.size() > 0 ){
-			SCOPED_PROFILE( triangles )
-			delete m_debugTrianglesvertexBuffers[_index];
-			const VkDeviceSize size = sizeof(DebugVertex) * m_debugTriangles.size();
-			m_debugTrianglesvertexBuffers[_index] = new Buffer(*m_device);
-			m_debugTrianglesvertexBuffers[_index]->Create(
-				size,
-				VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_VERTEX_BUFFER_BIT,
-				VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT
-			);
-
-			if (size > 0) {
-				Buffer stagingBuffer(*m_device);
-				stagingBuffer.Create(
-					size,
-					VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
-					VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT
-				);
-				stagingBuffer.SetData(m_debugTriangles.data(), size);
-				VkCommandBuffer cmd = m_device->BeginSingleTimeCommands();
-				stagingBuffer.CopyBufferTo(cmd, m_debugTrianglesvertexBuffers[_index]->GetBuffer(), size);
-				m_device->EndSingleTimeCommands(cmd);
-			}
-		}
-	}
-
-	//================================================================================================================================
-	//================================================================================================================================
-	void Renderer::DebugPoint(const btVector3 _pos, const Color _color) {
-		const float size = 0.2f;
-		DebugLine(_pos - size * btVector3::Up(), _pos + size * btVector3::Up(), _color);
-		DebugLine(_pos - size * btVector3::Left(), _pos + size * btVector3::Left(), _color);
-		DebugLine(_pos - size * btVector3::Forward(), _pos + size * btVector3::Forward(), _color);
-	}
-
-	//================================================================================================================================
-	//================================================================================================================================
-	void Renderer::DebugLine(const btVector3 _start, const btVector3 _end, const Color _color, const bool _depthTestEnable) {
-		if ( _depthTestEnable ) {
-			m_debugLines.push_back(DebugVertex(ToGLM(_start), glm::vec3(0, 0, 0), _color.ToGLM()));
-			m_debugLines.push_back(DebugVertex(ToGLM(_end), glm::vec3(0, 0, 0), _color.ToGLM()));
-		} else {
-			m_debugLinesNoDepthTest.push_back(DebugVertex(ToGLM(_start), glm::vec3(0, 0, 0), _color.ToGLM()));
-			m_debugLinesNoDepthTest.push_back(DebugVertex(ToGLM(_end), glm::vec3(0, 0, 0), _color.ToGLM()));
-		}
-
-	}
-
-	//================================================================================================================================
-	// takes a list of triangle and a list of colors
-	// 3 vertices per triangle
-	// 1 color per triangle
-	//================================================================================================================================
-	void Renderer::DebugTriangles( const std::vector<btVector3>& _triangles, const std::vector<Color>& _colors ) {
-		assert(_triangles .size() % 3 == 0 );
-		assert( _colors.size() == _triangles.size() / 3 );
-
-		m_debugTriangles.reserve(m_debugTriangles.size() + _triangles.size() );		
-		for (int triangleIndex = 0; triangleIndex < _triangles.size() / 3; triangleIndex++)	{
-			btVector3 v0 = _triangles[ 3 * triangleIndex + 0 ];
-			btVector3 v1 = _triangles[ 3 * triangleIndex + 1 ];
-			btVector3 v2 = _triangles[ 3 * triangleIndex + 2 ];
-
-			const glm::vec3 normal = glm::normalize( ToGLM( ( v1 - v2 ).cross( v0 - v2 ) ) );
-			m_debugTriangles.push_back( DebugVertex( ToGLM( v0 ), normal, _colors[triangleIndex].ToGLM() ) );
-			m_debugTriangles.push_back( DebugVertex( ToGLM( v1 ), normal, _colors[triangleIndex].ToGLM() ) );
-			m_debugTriangles.push_back( DebugVertex( ToGLM( v2 ), normal, _colors[triangleIndex].ToGLM() ) );
-		}
-	}
-
-	//================================================================================================================================
-	//================================================================================================================================
-	void Renderer::DebugCircle	  ( const btVector3 _pos, const float _radius, btVector3 _axis, uint32_t _nbSegments, const Color _color ) {
-		assert( _nbSegments  > 2 && _radius >= 0.f);
-
-		const btVector3 other = btVector3( -_axis[1], -_axis[2], _axis[0] );
-		btVector3 orthogonal = _radius * _axis.cross(other).normalized();	
-		const float angle = 2.f * PI / (float)_nbSegments;
-
-		for ( uint32_t segmentIndex = 0; segmentIndex < _nbSegments ; segmentIndex++) {
-
-			btVector3 start = _pos + orthogonal;
-			orthogonal = orthogonal.rotate( _axis, angle );
-			btVector3 end = _pos + orthogonal;			
-
-			m_debugLines.push_back( DebugVertex( ToGLM( start ), glm::vec3( 0, 0, 0 ), _color.ToGLM() ) );
-			m_debugLines.push_back( DebugVertex( ToGLM( end ),   glm::vec3( 0, 0, 0 ), _color.ToGLM() ) );
-		}
-	}
-
-	//================================================================================================================================
-	//================================================================================================================================
-	void Renderer::DebugTriangle(const btVector3 _v0, const btVector3 _v1, const btVector3 _v2, const Color _color) {
-		const glm::vec3 normal = glm::normalize(ToGLM((_v1 - _v2).cross(_v0 - _v2)));
-		m_debugTriangles.push_back(DebugVertex(ToGLM(_v0), normal, _color.ToGLM()));
-		m_debugTriangles.push_back(DebugVertex(ToGLM(_v1), normal, _color.ToGLM()));
-		m_debugTriangles.push_back(DebugVertex(ToGLM(_v2), normal, _color.ToGLM()));
-	}
-
-	//================================================================================================================================
-	//================================================================================================================================
-	std::vector< btVector3> Renderer::DebugCube(const btTransform _transform, const btVector3 _halfExtent, const Color _color) {
-		std::vector< btVector3 > square = GetCube(_halfExtent);		
-
-		for (int vertIndex = 0; vertIndex < square.size(); vertIndex++)	{
-			square[vertIndex] = _transform * square[vertIndex];
-		}
-
-		glm::vec4 glmColor = _color.ToGLM();
-
-		for (int triangleIndex = 0; triangleIndex < square.size() / 3; triangleIndex++) {
-			const glm::vec3 & v0 = ToGLM(square[3 * triangleIndex + 0]);
-			const glm::vec3 & v1 = ToGLM(square[3 * triangleIndex + 1]);
-			const glm::vec3 & v2 = ToGLM(square[3 * triangleIndex + 2]);
-
-			m_debugLines.push_back( DebugVertex( v0, glm::vec3( 0, 0, 0 ), glmColor ) );
-			m_debugLines.push_back( DebugVertex( v1, glm::vec3( 0, 0, 0 ), glmColor ) );
-			m_debugLines.push_back( DebugVertex( v1, glm::vec3( 0, 0, 0 ), glmColor ) );
-			m_debugLines.push_back( DebugVertex( v2, glm::vec3( 0, 0, 0 ), glmColor ) );
-			m_debugLines.push_back( DebugVertex( v2, glm::vec3( 0, 0, 0 ), glmColor ) );
-			m_debugLines.push_back( DebugVertex( v0, glm::vec3( 0, 0, 0 ), glmColor ) );
-
-		}
-
-		return square;
-	}
-
-	//================================================================================================================================
-	//================================================================================================================================
-	std::vector< btVector3> Renderer::DebugSphere(const btTransform _transform, const float _radius, const int _numSubdivisions, const Color _color) {
-		if (_radius <= 0) {
-			Debug::Warning("Debug sphere radius cannot be zero or negative");
-			return {};
-		}
-			
-		std::vector<btVector3> sphere = GetSphere(_radius, _numSubdivisions);
-
-		for (int vertIndex = 0; vertIndex < sphere.size(); vertIndex++) {
-			sphere[vertIndex] = _transform * sphere[vertIndex];
-		}
-
-		for (int triangleIndex = 0; triangleIndex < sphere.size() / 3; triangleIndex++) {
-			const btVector3 v0 = sphere[3 * triangleIndex + 0];
-			const btVector3 v1 = sphere[3 * triangleIndex + 1];
-			const btVector3 v2 = sphere[3 * triangleIndex + 2];
-			DebugLine(v0, v1, _color, false);
-			DebugLine(v1, v2, _color, false );
-			DebugLine(v2, v0, _color, false );
-		}
-
-		return sphere;
-	}
-
-	//================================================================================================================================
-	//================================================================================================================================
-	std::vector< btVector3> Renderer::DebugCone(const btTransform _transform, const float _radius, const float _height, const int _numSubdivisions, const Color _color) {
-		std::vector<btVector3> cone = GetCone(_radius, _height, _numSubdivisions);
-
-		for (int vertIndex = 0; vertIndex < cone.size(); vertIndex++) {
-			cone[vertIndex] = _transform * cone[vertIndex];
-		}
-
-		for (int triangleIndex = 0; triangleIndex < cone.size() / 3; triangleIndex++) {
-			DebugTriangle(cone[3 * triangleIndex + 0], cone[3 * triangleIndex + 1], cone[3 * triangleIndex + 2], _color);
-		}
-
-		return cone;
-	}
-
-	//================================================================================================================================
-	//================================================================================================================================
-	void Renderer::DebugAABB(const AABB & _aabb, const Color _color) {
-		std::vector< btVector3 > corners = _aabb.GetCorners();
-		// Top
-		DebugLine(corners[0], corners[1], _color);
-		DebugLine(corners[1], corners[2], _color);
-		DebugLine(corners[2], corners[3], _color);
-		DebugLine(corners[3], corners[0], _color);
-		// Bot
-		DebugLine(corners[4], corners[5], _color);
-		DebugLine(corners[5], corners[6], _color);
-		DebugLine(corners[6], corners[7], _color);
-		DebugLine(corners[7], corners[4], _color);
-		//Vertical sides
-		DebugLine(corners[0], corners[4], _color);
-		DebugLine(corners[1], corners[5], _color);
-		DebugLine(corners[2], corners[6], _color);
-		DebugLine(corners[3], corners[7], _color);
 	}
 
 	//================================================================================================================================
@@ -1014,8 +676,9 @@ namespace fan
 			return false;
 		}
 
-		m_debugCommandBuffers.resize(m_swapchain->GetSwapchainImagesCount());
-		if (vkAllocateCommandBuffers(m_device->vkDevice, &secondaryCommandBufferAllocateInfo, m_debugCommandBuffers.data()) != VK_SUCCESS) {
+		m_rendererDebug->GetCommandBuffers().resize( m_swapchain->GetSwapchainImagesCount() );
+		if ( vkAllocateCommandBuffers( m_device->vkDevice, &secondaryCommandBufferAllocateInfo, m_rendererDebug->GetCommandBuffers().data() ) != VK_SUCCESS )
+		{
 			Debug::Error( "Could not allocate debug command buffers." );
 			return false;
 		}
@@ -1311,14 +974,7 @@ namespace fan
 		
 	}
 
-	//================================================================================================================================
-	//================================================================================================================================
-	void Renderer::ClearDebug()
-	{
-		m_debugLines.clear();
-		m_debugLinesNoDepthTest.clear();
-		m_debugTriangles.clear();
-	}
+
 
 	//================================================================================================================================
 	// Used for postprocess

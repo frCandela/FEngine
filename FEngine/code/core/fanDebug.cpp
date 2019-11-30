@@ -73,7 +73,7 @@ namespace fan {
 	//================================================================================================================================
 	// WARNING : this method is not available in retail
 	//================================================================================================================================
-	void Debug::SetDebug( Renderer * _renderer ) {
+	void Debug::SetDebug( RendererDebug * _renderer ) {
 		m_renderer = _renderer; 
 	}
 }
