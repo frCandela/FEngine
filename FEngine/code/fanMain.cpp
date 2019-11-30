@@ -15,6 +15,7 @@ int main()
 
 // Can you guess what this function does :3
 void RunGame() {
+
 	fan::Engine engine;
 	engine.Run();
 }

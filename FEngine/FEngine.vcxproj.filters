@@ -98,6 +98,9 @@
     <Filter Include="code\game\ui">
       <UniqueIdentifier>{85bac6aa-1a76-4ff2-8fee-558cb899b633}</UniqueIdentifier>
     </Filter>
+    <Filter Include="code\deps\SFML">
+      <UniqueIdentifier>{cc248f23-4b8c-47a9-8133-1c22ddd1b3ea}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="code\editor\fanMainMenuBar.cpp">
@@ -1404,6 +1407,63 @@
     <ClInclude Include="code\renderer\core\fanRenderPass.h">
       <Filter>code\renderer\core</Filter>
     </ClInclude>
+    <ClInclude Include="deps\SFML\System\Clock.hpp">
+      <Filter>code\deps\SFML</Filter>
+    </ClInclude>
+    <ClInclude Include="deps\SFML\System\Err.hpp">
+      <Filter>code\deps\SFML</Filter>
+    </ClInclude>
+    <ClInclude Include="deps\SFML\System\Export.hpp">
+      <Filter>code\deps\SFML</Filter>
+    </ClInclude>
+    <ClInclude Include="deps\SFML\System\FileInputStream.hpp">
+      <Filter>code\deps\SFML</Filter>
+    </ClInclude>
+    <ClInclude Include="deps\SFML\System\InputStream.hpp">
+      <Filter>code\deps\SFML</Filter>
+    </ClInclude>
+    <ClInclude Include="deps\SFML\System\Lock.hpp">
+      <Filter>code\deps\SFML</Filter>
+    </ClInclude>
+    <ClInclude Include="deps\SFML\System\MemoryInputStream.hpp">
+      <Filter>code\deps\SFML</Filter>
+    </ClInclude>
+    <ClInclude Include="deps\SFML\System\Mutex.hpp">
+      <Filter>code\deps\SFML</Filter>
+    </ClInclude>
+    <ClInclude Include="deps\SFML\System\NativeActivity.hpp">
+      <Filter>code\deps\SFML</Filter>
+    </ClInclude>
+    <ClInclude Include="deps\SFML\System\NonCopyable.hpp">
+      <Filter>code\deps\SFML</Filter>
+    </ClInclude>
+    <ClInclude Include="deps\SFML\System\Sleep.hpp">
+      <Filter>code\deps\SFML</Filter>
+    </ClInclude>
+    <ClInclude Include="deps\SFML\System\String.hpp">
+      <Filter>code\deps\SFML</Filter>
+    </ClInclude>
+    <ClInclude Include="deps\SFML\System\Thread.hpp">
+      <Filter>code\deps\SFML</Filter>
+    </ClInclude>
+    <ClInclude Include="deps\SFML\System\ThreadLocal.hpp">
+      <Filter>code\deps\SFML</Filter>
+    </ClInclude>
+    <ClInclude Include="deps\SFML\System\ThreadLocalPtr.hpp">
+      <Filter>code\deps\SFML</Filter>
+    </ClInclude>
+    <ClInclude Include="deps\SFML\System\Time.hpp">
+      <Filter>code\deps\SFML</Filter>
+    </ClInclude>
+    <ClInclude Include="deps\SFML\System\Utf.hpp">
+      <Filter>code\deps\SFML</Filter>
+    </ClInclude>
+    <ClInclude Include="deps\SFML\System\Vector2.hpp">
+      <Filter>code\deps\SFML</Filter>
+    </ClInclude>
+    <ClInclude Include="deps\SFML\System\Vector3.hpp">
+      <Filter>code\deps\SFML</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="code\core\math\fanBasicModels.inl">
@@ -1450,6 +1510,24 @@
     </None>
     <None Include="code\shaders\ui.vert">
       <Filter>code\shaders</Filter>
+    </None>
+    <None Include="deps\SFML\System\String.inl">
+      <Filter>code\deps\SFML</Filter>
+    </None>
+    <None Include="deps\SFML\System\Thread.inl">
+      <Filter>code\deps\SFML</Filter>
+    </None>
+    <None Include="deps\SFML\System\ThreadLocalPtr.inl">
+      <Filter>code\deps\SFML</Filter>
+    </None>
+    <None Include="deps\SFML\System\Utf.inl">
+      <Filter>code\deps\SFML</Filter>
+    </None>
+    <None Include="deps\SFML\System\Vector2.inl">
+      <Filter>code\deps\SFML</Filter>
+    </None>
+    <None Include="deps\SFML\System\Vector3.inl">
+      <Filter>code\deps\SFML</Filter>
     </None>
   </ItemGroup>
 </Project>
