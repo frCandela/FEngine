@@ -9,9 +9,6 @@
 namespace fan {
 	REGISTER_TYPE_INFO( DirectionalLight, TypeInfo::Flags::EDITOR_COMPONENT, "light/" )
 
-	Signal< DirectionalLight * > DirectionalLight::onDirectionalLightAttach;
-	Signal< DirectionalLight * > DirectionalLight::onDirectionalLightDetach;
-
 	//================================================================================================================================
 	//================================================================================================================================
 	Color DirectionalLight::GetAmbiant() const { return  m_dirLight->ambiant; }
@@ -48,7 +45,7 @@ namespace fan {
 		*tmpLight = m_gameobject->AddEcsComponent<ecsDirLight>();
 		m_dirLight->Init();
 
-		onDirectionalLightAttach.Emmit( this );
+		m_gameobject->GetScene()->onDirectionalLightAttach.Emmit( this );
 	}
 
 	//================================================================================================================================
@@ -56,7 +53,7 @@ namespace fan {
 	void DirectionalLight::OnDetach() {
 		Component::OnDetach();
 		m_gameobject->RemoveEcsComponent<ecsDirLight>();
-		onDirectionalLightDetach.Emmit( this );
+		m_gameobject->GetScene()->onDirectionalLightDetach.Emmit( this );
 	}
 
 	//================================================================================================================================

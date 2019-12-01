@@ -9,9 +9,6 @@ namespace fan
 {
 	REGISTER_TYPE_INFO(PointLight, TypeInfo::Flags::EDITOR_COMPONENT, "light/")
 
-	Signal< PointLight * > PointLight::onPointLightAttach;
-	Signal< PointLight * > PointLight::onPointLightDetach;
-
 	//================================================================================================================================
 	//================================================================================================================================
 	void PointLight::SetAmbiant(const Color _ambiant) {
@@ -54,7 +51,7 @@ namespace fan
 		*tmpLight = m_gameobject->AddEcsComponent<ecsPointLight>();
 		m_pointLight->Init();
 
-		onPointLightAttach.Emmit( this );
+		m_gameobject->GetScene()->onPointLightAttach.Emmit( this );
 	}
 
 	//================================================================================================================================
@@ -62,7 +59,7 @@ namespace fan
 	void PointLight::OnDetach() {
 		Component::OnDetach();
 		m_gameobject->RemoveEcsComponent<ecsPointLight>();
-		onPointLightDetach.Emmit(this);
+		m_gameobject->GetScene()->onPointLightDetach.Emmit(this);
 	}
 	
 	//================================================================================================================================

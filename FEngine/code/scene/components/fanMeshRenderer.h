@@ -13,9 +13,6 @@ namespace fan
 	class MeshRenderer : public Component
 	{
 	public:
-		static Signal< MeshRenderer * >				onRegisterMeshRenderer;
-		static Signal< MeshRenderer * >				onUnRegisterMeshRenderer;
-
 		void			SetPath( std::string _path );
 		void			SetMesh(Mesh * _mesh);
 		Mesh *			GetMesh();

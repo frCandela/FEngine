@@ -44,5 +44,8 @@ namespace fan
 
 		Transform * m_transform;
 		Camera * m_camera;
+
+		void OnScenePlay ();
+		void OnScenePause();
 	};
 }

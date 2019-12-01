@@ -18,9 +18,6 @@ namespace fan
 {
 	REGISTER_TYPE_INFO(MeshRenderer, TypeInfo::Flags::EDITOR_COMPONENT, "")
 
-	Signal< MeshRenderer * >				MeshRenderer::onRegisterMeshRenderer;
-	Signal< MeshRenderer * >				MeshRenderer::onUnRegisterMeshRenderer;
-
 	//================================================================================================================================
 	//================================================================================================================================
 	void MeshRenderer::OnAttach() {
@@ -30,7 +27,7 @@ namespace fan
 		*tmpMesh = m_gameobject->AddEcsComponent<ecsMesh>();
 		m_mesh->Init();
 
-		onRegisterMeshRenderer.Emmit( this );
+		m_gameobject->GetScene()->onRegisterMeshRenderer.Emmit( this );
 	}
 
 	//================================================================================================================================
@@ -38,7 +35,7 @@ namespace fan
 	void MeshRenderer::OnDetach() {
 		Component::OnDetach();
 		m_gameobject->RemoveEcsComponent<ecsMesh>();
-		onUnRegisterMeshRenderer.Emmit(this);
+		m_gameobject->GetScene()->onUnRegisterMeshRenderer.Emmit(this);
 
 		m_gameobject->SetFlags( m_gameobject->GetFlags() & Gameobject::Flag::OUTDATED_AABB );
 	}

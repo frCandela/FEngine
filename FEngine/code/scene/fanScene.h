@@ -12,6 +12,10 @@ namespace fan
 	class PhysicsManager;
 	class SceneInstantiate;
 
+	class MeshRenderer;
+	class PointLight;
+	class DirectionalLight;
+
 	template< typename _RessourceType, typename _IDType > class RessourcePtr;
 	using GameobjectPtr = RessourcePtr<Gameobject, uint64_t>;
 
@@ -28,7 +32,12 @@ namespace fan
 		Signal<>				onScenePlay;
 		Signal<>				onScenePause;
 
-
+		Signal< MeshRenderer * > onRegisterMeshRenderer;
+		Signal< MeshRenderer * > onUnRegisterMeshRenderer;
+		Signal< PointLight * > onPointLightAttach;
+		Signal< PointLight * > onPointLightDetach;
+		Signal< DirectionalLight * > onDirectionalLightAttach;
+		Signal< DirectionalLight * > onDirectionalLightDetach;
 
 		Scene( const std::string _name );
 		~Scene();

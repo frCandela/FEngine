@@ -51,7 +51,6 @@ namespace fan {
 		void Run();
 		void Exit();
 
-		void SetMainCamera( Camera * _mainCamera );
 		void SetSelectedGameobject( Gameobject * _selectedGgameobject);
 		void Deselect();
 
@@ -63,8 +62,6 @@ namespace fan {
 		void UnRegisterMeshRenderer		( MeshRenderer *	 _meshRenderer );
 		
 		Gameobject *	const	GetSelectedGameobject() const	{ return m_selectedGameobject;  }
-		Camera *				GetEditorCamera() const			{ return m_editorCamera; }
-		Camera *				GetMainCamera() const			{ return m_mainCamera; }
 		Renderer &				GetRenderer() const				{ return * m_renderer; }
 		MainMenuBar  &			GetMainMenuBar() const			{ return * m_mainMenuBar; }
 		RenderWindow &			GetRenderWindow() const			{ return * m_renderWindow; }
@@ -95,14 +92,11 @@ namespace fan {
 		EditorGrid			m_editorGrid;
 
 		// Main objects
-		EditorCopyPaste * m_copyPaste;
+		EditorCopyPaste *	m_copyPaste;
 		Renderer *			m_renderer;
 		Scene *				m_scene;
 		Gameobject *		m_selectedGameobject;
-		Camera *			m_editorCamera = nullptr;
 		FPSCamera *			m_editorCameraController = nullptr;
-		Camera *			m_mainCamera = nullptr;
-
 
 		std::vector < DirectionalLight* >	m_directionalLights;
 		std::vector < PointLight* >			m_pointLights;
@@ -136,6 +130,5 @@ namespace fan {
 		void DrawNormals() const;
 		void DrawAABB() const;
 		void DrawHull() const;
-
 	};
 }

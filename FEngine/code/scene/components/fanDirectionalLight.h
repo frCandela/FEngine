@@ -7,9 +7,6 @@ namespace fan {
 	//================================================================================================================================
 	class DirectionalLight : public Component {
 	public:
-		static Signal< DirectionalLight * > onDirectionalLightAttach;
-		static Signal< DirectionalLight * > onDirectionalLightDetach;
-
 		enum Attenuation { CONSTANT = 0, LINEAR = 1, QUADRATIC = 2 };
 
 		void OnGui() override;

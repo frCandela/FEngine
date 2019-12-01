@@ -66,8 +66,7 @@ namespace fan {
 	//================================================================================================================================
 	//================================================================================================================================
 	Engine::Engine() :
-		m_applicationShouldExit(false),
-		m_mainCamera(nullptr)
+		m_applicationShouldExit(false)
 	{
 		Globals::Get().engine = this;
 
@@ -121,10 +120,13 @@ namespace fan {
 		m_editorGrid.color = Color(0.161f, 0.290f, 0.8f, 0.478f);
 		m_editorGrid.linesCount = 10;
 		m_editorGrid.spacing = 1.f;		
-		m_editorGrid.offset = btVector3::Zero();
+		m_editorGrid.offset = btVector3::Zero();		
 
+		// renderer
 		m_renderer	= new Renderer( windowSize, windowPosition );
-		m_scene		= new Scene( "mainScene");
+
+		// Scene
+		m_scene = new Scene( "mainScene" );
 
 		Debug::Get().SetDebug( & m_renderer->GetRendererDebug() );
 
@@ -140,22 +142,18 @@ namespace fan {
 		m_preferencesWindow = new PreferencesWindow( m_renderer );		
 		m_networkWindow		= new NetworkWindow();
 		m_mainMenuBar		= new MainMenuBar( *m_scene, m_editorGrid );
-		m_mainMenuBar->SetWindows( { m_renderWindow , m_sceneWindow , m_inspectorWindow , m_consoleWindow, m_ecsWindow, m_profilerWindow, m_gameWindow, m_networkWindow, m_preferencesWindow } );
 
+		m_mainMenuBar->SetWindows( { m_renderWindow , m_sceneWindow , m_inspectorWindow , m_consoleWindow, m_ecsWindow, m_profilerWindow, m_gameWindow, m_networkWindow, m_preferencesWindow } );
+		m_sceneWindow->onSelectGameobject.Connect( &Engine::SetSelectedGameobject, this );
 		m_gameWindow->onSizeChanged.Connect( &Renderer::ResizeGame, m_renderer );
 		Mouse::Get().Init( m_gameWindow );
 
-		// Instance messages		
-		m_sceneWindow->onSelectGameobject.	Connect( &Engine::SetSelectedGameobject, this );
+		// Instance messages				
 		m_mainMenuBar->onReloadShaders.		Connect(&Renderer::ReloadShaders, m_renderer );
 		m_mainMenuBar->onReloadIcons.		Connect(&Renderer::ReloadIcons, m_renderer );
 		m_mainMenuBar->onExit.				Connect( &Engine::Exit, this );
 		onGameobjectSelected.				Connect( &SceneWindow::OnGameobjectSelected, m_sceneWindow );
 		onGameobjectSelected.				Connect( &InspectorWindow::OnGameobjectSelected, m_inspectorWindow );
-		m_scene->onSceneLoad.				Connect( &SceneWindow::OnSceneLoad, m_sceneWindow );
-		m_scene->onSceneLoad.				Connect( &Engine::OnSceneLoad, this );
-		m_scene->onSceneClear.				Connect( &Renderer::Clear, m_renderer );
-		m_scene->onDeleteGameobject.		Connect( &Engine::OnGameobjectDeleted, this );
 
 		// Events linking
 		Input::Get().Manager().FindEvent( "reload_shaders" )->Connect(	&Renderer::ReloadShaders, m_renderer );
@@ -169,16 +167,18 @@ namespace fan {
 		TexturePtr::s_onCreateUnresolved.			Connect ( &Engine::OnResolveTexturePtr, this );
 		MeshPtr::s_onCreateUnresolved.				Connect	( &Engine::OnResolveMeshPtr, this );
 		PrefabPtr::s_onCreateUnresolved.			Connect ( &Engine::OnResolvePrefabPtr, this );
-	
-		MeshRenderer::onRegisterMeshRenderer.		Connect	( &Engine::RegisterMeshRenderer, this );
-		MeshRenderer::onUnRegisterMeshRenderer.		Connect	( &Engine::UnRegisterMeshRenderer, this );
-		PointLight::onPointLightAttach.				Connect	( &Engine::RegisterPointLight,	 this );
-		PointLight::onPointLightDetach.				Connect	( &Engine::UnRegisterPointLight, this );
-		DirectionalLight::onDirectionalLightAttach. Connect	( &Engine::RegisterDirectionalLight,   this );
-		DirectionalLight::onDirectionalLightDetach. Connect	( &Engine::UnRegisterDirectionalLight, this );
 
+		m_scene->onSceneLoad.Connect( &SceneWindow::OnSceneLoad, m_sceneWindow );
+		m_scene->onSceneLoad.Connect( &Engine::OnSceneLoad, this );
+		m_scene->onSceneClear.Connect( &Renderer::Clear, m_renderer );
+		m_scene->onDeleteGameobject.Connect( &Engine::OnGameobjectDeleted, this );
+		m_scene->onRegisterMeshRenderer.Connect	( &Engine::RegisterMeshRenderer, this );
+		m_scene->onUnRegisterMeshRenderer.Connect	( &Engine::UnRegisterMeshRenderer, this );
+		m_scene->onPointLightAttach.Connect	( &Engine::RegisterPointLight, this );
+		m_scene->onPointLightDetach.Connect	( &Engine::UnRegisterPointLight, this );
+		m_scene->onDirectionalLightAttach.Connect	( &Engine::RegisterDirectionalLight, this );
+		m_scene->onDirectionalLightDetach.Connect	( &Engine::UnRegisterDirectionalLight, this );
 		m_scene->New();
-		m_scene->onSetMainCamera.Connect( &Engine::SetMainCamera, this );		
 	}
 
 	//================================================================================================================================
@@ -237,6 +237,7 @@ namespace fan {
 
 				m_scene->BeginFrame();
 				m_scene->Update( targetLogicDelta );		
+				m_scene->EndFrame();			
 
 				if ( m_showUI )				
 				{
@@ -258,7 +259,7 @@ namespace fan {
 					if ( m_mainMenuBar->ShowHull() ) { DrawHull(); }
 				}				
 			
-				m_scene->EndFrame();			
+				
 
 				{
 					SCOPED_PROFILE( imgui_render )
@@ -284,7 +285,7 @@ namespace fan {
 	}
 	
 	//================================================================================================================================
-	// Todo save camera postion depending on the scene
+	// Todo save camera position depending on the scene
 	//================================================================================================================================
 	void Engine::OnSceneLoad(Scene * _scene) {
 
@@ -295,11 +296,12 @@ namespace fan {
 		cameraGameobject->SetEditorFlags( Gameobject::EditorFlag::NO_DELETE | Gameobject::EditorFlag::NOT_SAVED );
 
 		cameraGameobject->GetTransform()->SetPosition(btVector3(0, 0, -2));
-		m_editorCamera = cameraGameobject->AddComponent<Camera>();
-		m_editorCamera->SetRemovable(false);
-		SetMainCamera(m_editorCamera);
-		m_editorCameraController = cameraGameobject->AddComponent<FPSCamera>();
-		m_editorCameraController->SetRemovable(false);		
+		Camera* editorCamera = cameraGameobject->AddComponent<Camera>();
+		editorCamera->SetRemovable(false);
+		FPSCamera * editorCamController = cameraGameobject->AddComponent<FPSCamera>();
+		editorCamController->SetRemovable(false);		
+
+		m_scene->SetMainCamera( editorCamera );
 
 		Debug::Get().SetDebug( &m_renderer->GetRendererDebug() );
 	}
@@ -324,7 +326,7 @@ namespace fan {
 		const std::vector< Gameobject *>  & entities = m_scene->BuildEntitiesList();
 		for (int gameobjectIndex = 0; gameobjectIndex < entities.size(); gameobjectIndex++) {
 			const Gameobject * gameobject = entities[gameobjectIndex];
-			if (gameobject != m_editorCamera->GetGameobject()) {
+			if (gameobject != m_scene->GetMainCamera()->GetGameobject()) {
 				AABB aabb = gameobject->GetAABB();
 				Debug::Get().Render().DebugAABB(aabb, Color::Red);
 			}
@@ -423,15 +425,6 @@ namespace fan {
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void Engine::SetMainCamera( Camera * _mainCamera ) { 
-		if ( _mainCamera != m_mainCamera ) {
-			m_mainCamera = _mainCamera;
-			m_scene->SetMainCamera(_mainCamera);
-		}
-	}
-
-	//================================================================================================================================
-	//================================================================================================================================
 	void Engine::SetSelectedGameobject( Gameobject * _selectedGameobject ) {
 		m_selectedGameobject = _selectedGameobject; 
 		onGameobjectSelected.Emmit( m_selectedGameobject );
@@ -449,11 +442,8 @@ namespace fan {
 	void Engine::SwitchPlayPause() {
 		if ( m_scene->IsPaused() ) {
 			m_scene->Play();
-			m_editorCameraController->SetEnabled( false );
 		} else {
 			m_scene->Pause();
-			SetMainCamera( m_editorCamera );
-			m_editorCameraController->SetEnabled(true);
 		}
 	}
 
@@ -463,10 +453,12 @@ namespace fan {
 	void Engine::UpdateRenderer() {
 		SCOPED_PROFILE( update_renderer )
 
+		Camera * mainCamera = m_scene->GetMainCamera();
+
 		// Camera
-		Transform * cameraTransform = m_mainCamera->GetGameobject()->GetComponent<Transform>();
-		m_mainCamera->SetAspectRatio( m_gameWindow->GetAspectRatio() );
-		m_renderer->SetMainCamera( m_mainCamera->GetProjection(), m_mainCamera->GetView(), ToGLM(cameraTransform->GetPosition()));		
+		Transform * cameraTransform = mainCamera->GetGameobject()->GetComponent<Transform>();
+		mainCamera->SetAspectRatio( m_gameWindow->GetAspectRatio() );
+		m_renderer->SetMainCamera( mainCamera->GetProjection(), mainCamera->GetView(), ToGLM(cameraTransform->GetPosition()));		
 
 		// Point lights		
 		for ( int lightIndex = 0; lightIndex < m_pointLights.size(); lightIndex++ ) {
@@ -566,7 +558,7 @@ namespace fan {
 		bool mouseCaptured = ImGui::GetIO().WantCaptureMouse;
 
 		// Translation gizmo on selected gameobject
-		if (m_selectedGameobject != nullptr && m_selectedGameobject != m_editorCamera->GetGameobject()
+		if (m_selectedGameobject != nullptr && m_selectedGameobject != m_scene->GetMainCamera()->GetGameobject()
 			&& m_selectedGameobject->GetComponent<UIMeshRenderer>() == nullptr 
 			&& m_selectedGameobject->GetComponent<UITransform>() == nullptr ) 
 
@@ -582,8 +574,8 @@ namespace fan {
 		// Mouse selection
 		if ( m_gameWindow->IsHovered() && Mouse::Get().GetButtonPressed(Mouse::button0) ) 
 		{
-			const btVector3 cameraOrigin = m_editorCamera->GetGameobject()->GetComponent<Transform>()->GetPosition();;
-			const Ray ray = m_editorCamera->ScreenPosToRay(Mouse::Get().GetScreenSpacePosition());
+			const btVector3 cameraOrigin = m_scene->GetMainCamera()->GetGameobject()->GetComponent<Transform>()->GetPosition();;
+			const Ray ray = m_scene->GetMainCamera()->ScreenPosToRay(Mouse::Get().GetScreenSpacePosition());
 			const std::vector<Gameobject *>  & entities = m_scene->BuildEntitiesList();
 
 			// Raycast on all the entities
@@ -592,7 +584,7 @@ namespace fan {
 			for (int gameobjectIndex = 0; gameobjectIndex < entities.size(); gameobjectIndex++) {
 				Gameobject * gameobject = entities[gameobjectIndex];
 
-				if (gameobject == m_editorCamera->GetGameobject()) {
+				if (gameobject == m_scene->GetMainCamera()->GetGameobject()) {
 					continue;
 				}
 
@@ -628,7 +620,7 @@ namespace fan {
 		const btVector3 origin = _transform.getOrigin();
 		const btTransform rotation(_transform.getRotation());
 		const btVector3 axisDirection[3] = { btVector3(1, 0, 0), btVector3(0, 1, 0),  btVector3(0, 0, 1) };
-		const btVector3 cameraPosition = m_editorCamera->GetGameobject()->GetComponent<Transform>()->GetPosition();
+		const btVector3 cameraPosition = m_scene->GetMainCamera()->GetGameobject()->GetComponent<Transform>()->GetPosition();
 		const float size = 0.2f * origin.distance(cameraPosition);
 		const btTransform coneRotation[3] = {
 		btTransform(btQuaternion(0, 0, btRadians(-90)), size*axisDirection[0])
@@ -654,7 +646,7 @@ namespace fan {
 
 			// Raycast on the gizmo shape to determine if the mouse is hovering it
 			Color clickedColor = opaqueColor;
-			const Ray ray = m_editorCamera->ScreenPosToRay(Mouse::Get().GetScreenSpacePosition());
+			const Ray ray = m_scene->GetMainCamera()->ScreenPosToRay(Mouse::Get().GetScreenSpacePosition());
 			for (int triIndex = 0; triIndex < coneTris.size() / 3; triIndex++) {
 				Triangle triangle(coneTris[3 * triIndex + 0], coneTris[3 * triIndex + 1], coneTris[3 * triIndex + 2]);
 				btVector3 intersection;
@@ -678,7 +670,7 @@ namespace fan {
 			if (cacheData.pressed == true && cacheData.axisIndex == axisIndex ) {
 				btVector3 axis = rotation * axisDirection[axisIndex];
 
-				 const Ray screenRay = m_editorCamera->ScreenPosToRay(Mouse::Get().GetScreenSpacePosition()); 	
+				 const Ray screenRay = m_scene->GetMainCamera()->ScreenPosToRay(Mouse::Get().GetScreenSpacePosition()); 	
 				 const Ray axisRay = { origin , axis };				 
 				 btVector3 trash, projectionOnAxis;
 				 screenRay.RayClosestPoints(axisRay, trash, projectionOnAxis);

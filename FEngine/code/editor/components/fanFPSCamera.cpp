@@ -25,12 +25,34 @@ namespace fan
 		m_xySensitivity = btVector2(0.005f, 0.005f);
 		m_transform = m_gameobject->GetComponent<Transform>();
 		m_camera = m_gameobject->GetComponent<Camera>();
+
+		m_gameobject->GetScene()->onScenePlay.Connect( &FPSCamera::OnScenePlay, this );
+		m_gameobject->GetScene()->onScenePause.Connect( &FPSCamera::OnScenePause, this );
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
 	void FPSCamera::OnDetach() {
 		Actor::OnDetach();
+
+		m_gameobject->GetScene()->onScenePlay. Disconnect( &FPSCamera::OnScenePlay, this );
+		m_gameobject->GetScene()->onScenePause.Disconnect( &FPSCamera::OnScenePause, this );
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
+	void FPSCamera::OnScenePlay ()
+	{ 
+		SetEnabled( false ); 
+		
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
+	void FPSCamera::OnScenePause() 
+	{ 
+		SetEnabled( true ); 
+		m_gameobject->GetScene()->SetMainCamera(m_camera);
 	}
 
 	//================================================================================================================================

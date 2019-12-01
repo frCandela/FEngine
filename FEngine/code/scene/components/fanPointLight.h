@@ -9,9 +9,6 @@ namespace fan
 	class PointLight : public Component
 	{
 	public:
-		static Signal< PointLight * > onPointLightAttach;
-		static Signal< PointLight * > onPointLightDetach;
-
 		enum Attenuation{ CONSTANT=0, LINEAR=1, QUADRATIC=2 };
 
 		void OnGui() override;
