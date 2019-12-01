@@ -34,7 +34,7 @@ namespace fan
 	//================================================================================================================================
 	void EditorWindow::Draw() {
 		if (m_isVisible == true) {
-			if( ImGui::Begin(m_name.c_str(), &m_isVisible) ) {
+			if( ImGui::Begin(m_name.c_str(), &m_isVisible, m_flags ) ) {
 				OnGui();
 			} ImGui::End();
 			SetVisible(m_isVisible);

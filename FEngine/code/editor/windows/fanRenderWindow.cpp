@@ -9,6 +9,7 @@
 #include "renderer/core/fanTexture.h"
 #include "renderer/fanRessourceManager.h"
 #include "renderer/pipelines/fanForwardPipeline.h"
+#include "renderer/core/fanFrameBuffer.h"
 #include "core/time/fanTime.h"
 #include "core/time/fanProfiler.h"
 
@@ -80,6 +81,20 @@ namespace fan
 				ImGui::SameLine();
 				ImGui::ColorEdit3( "diffuse", &light.diffuse[0], ImGui::fanColorEditFlags );				
 			}
+			ImGui::PopItemWidth();
+		}
+		if ( ImGui::CollapsingHeader( "Framebuffers : " ) )
+		{
+			ImGui::PushItemWidth( 150 );
+
+			const VkExtent2D gameExtent			= m_renderer->GetGameFrameBuffers()->GetExtent();
+			const VkExtent2D postprocessExtent	= m_renderer->GetPostProcessFramebuffers()->GetExtent();
+			const VkExtent2D swapchainExtent	= m_renderer->GetSwapchainFramebuffers()->GetExtent();
+
+			ImGui::Text("%d x %d game", gameExtent.width, gameExtent.height );
+			ImGui::Text("%d x %d postprocess", postprocessExtent.width, postprocessExtent.height );
+			ImGui::Text("%d x %d swapchain", swapchainExtent.width, swapchainExtent.height );
+
 			ImGui::PopItemWidth();
 		}
 	}

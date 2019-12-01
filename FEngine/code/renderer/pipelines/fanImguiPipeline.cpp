@@ -272,7 +272,7 @@ namespace fan
 		m_fontTexture->SetData(fontData, texWidth, texHeight, 1);
 		m_iconsTexture->LoadFromFile( GlobalValues::s_defaultIcons );
 		m_sampler->CreateSampler(0, 1.f, VK_FILTER_LINEAR);
-		m_iconsSampler->CreateSampler(0, 1.f, VK_FILTER_NEAREST);
+		m_iconsSampler->CreateSampler(0, 0.f, VK_FILTER_NEAREST);
 	}
 
 	//================================================================================================================================
@@ -331,8 +331,8 @@ namespace fan
 		iconsDescriptorImageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
 
 		VkDescriptorImageInfo view3DDescriptorImageInfo {};
-		view3DDescriptorImageInfo.sampler = m_sampler->GetSampler();
-		view3DDescriptorImageInfo.imageView = m_imageView->GetImageView();
+		view3DDescriptorImageInfo.sampler = m_iconsSampler->GetSampler();
+		view3DDescriptorImageInfo.imageView = m_gameImageView->GetImageView();
 		view3DDescriptorImageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
 
 		VkWriteDescriptorSet writeDescriptorSet{};
@@ -360,6 +360,28 @@ namespace fan
 		writeDescriptorSet3DView.descriptorCount = 1;
 
 		std::vector<VkWriteDescriptorSet> writeDescriptorSets = { writeDescriptorSet, writeDescriptorSetIcons, writeDescriptorSet3DView };
+
+		vkUpdateDescriptorSets(m_device.vkDevice, static_cast<uint32_t>(writeDescriptorSets.size()), writeDescriptorSets.data(), 0, nullptr);
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
+	void ImguiPipeline::UpdateGameImageDescriptor()
+	{
+		VkDescriptorImageInfo viewGameDescriptorImageInfo {};
+		viewGameDescriptorImageInfo.sampler = m_iconsSampler->GetSampler();
+		viewGameDescriptorImageInfo.imageView = m_gameImageView->GetImageView();
+		viewGameDescriptorImageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+
+		VkWriteDescriptorSet writeDescriptorSet3DView {};
+		writeDescriptorSet3DView.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+		writeDescriptorSet3DView.dstSet = m_descriptorSets[2];
+		writeDescriptorSet3DView.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+		writeDescriptorSet3DView.dstBinding = 0;
+		writeDescriptorSet3DView.pImageInfo = &viewGameDescriptorImageInfo;
+		writeDescriptorSet3DView.descriptorCount = 1;
+
+		std::vector<VkWriteDescriptorSet> writeDescriptorSets = { writeDescriptorSet3DView };
 
 		vkUpdateDescriptorSets(m_device.vkDevice, static_cast<uint32_t>(writeDescriptorSets.size()), writeDescriptorSets.data(), 0, nullptr);
 	}

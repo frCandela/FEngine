@@ -21,7 +21,8 @@ namespace fan
 		void UpdateBuffer(const size_t _index);
 		void DrawFrame(VkCommandBuffer commandBuffer, const size_t _index);
 		void ReloadIcons();
-		void Set3DView(  ImageView * _imageView ){ m_imageView = _imageView; }
+		void SetGameView(  ImageView * _imageView ){ m_gameImageView = _imageView; }
+		void UpdateGameImageDescriptor();
 
 	private:
 		Device & m_device;
@@ -30,7 +31,7 @@ namespace fan
 		Sampler * m_iconsSampler;
 		Texture * m_fontTexture;
 		Texture * m_iconsTexture;
-		ImageView * m_imageView = nullptr;
+		ImageView * m_gameImageView = nullptr;
 
 		Shader * m_fragShader;
 		Shader * m_vertShader;

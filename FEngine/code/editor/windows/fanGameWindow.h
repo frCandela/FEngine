@@ -7,16 +7,21 @@ namespace fan {
 	//================================================================================================================================
 	class GameWindow : public EditorWindow {
 	public:
-		Signal< glm::ivec2 > onSizeChanged;
+		Signal< btVector2 > onSizeChanged;
 
 		GameWindow();
-		glm::ivec2 GetSize() const { return m_size; }
+		btVector2 GetSize()			const { return m_size; }
+		btVector2 GetPosition()		const { return m_position; }
+		float	  GetAspectRatio()	const { return (float)m_size[0] / (float)m_size[1]; }
+		bool IsHovered()			const { return m_isHovered; }
 
 	protected:
 		void OnGui() override;
 
 	private:
-		glm::ivec2 m_size = glm::ivec2(0,0);
+		btVector2	m_size = btVector2(1.f,1.f);
+		btVector2	m_position;
+		bool		m_isHovered;
 	};
 
 }

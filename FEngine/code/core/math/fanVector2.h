@@ -10,6 +10,7 @@ namespace fan {
 		btVector2() : m_vector(0, 0, 0) {}
 		btVector2(const btScalar _x, const btScalar _y) : m_vector(_x, _y, 0) {}
 
+		static btVector2 Zero() { return btVector2(0.f,0.f); }
 		btScalar x() const { return m_vector.x(); }
 		btScalar y() const { return m_vector.y(); }
 		void setX(const btScalar _x) { m_vector.setX(_x); }
@@ -40,6 +41,14 @@ namespace fan {
 		btVector2& operator/=(const btVector2& _value) {
 			m_vector = m_vector / _value.m_vector;
 			return *this;
+		}
+		bool operator!=( const btVector2  & _value ) const
+		{
+			return m_vector[0] != _value.m_vector[0] || m_vector[1] != _value.m_vector[1];
+		}
+		bool operator==( const btVector2  & _value ) const
+		{
+			return m_vector[0] == _value.m_vector[0] && m_vector[1] == _value.m_vector[1];
 		}
 
 	private:

@@ -145,6 +145,8 @@ namespace fan {
 		m_mainMenuBar		= new MainMenuBar( *m_scene, m_editorGrid );
 		m_mainMenuBar->SetWindows( { m_renderWindow , m_sceneWindow , m_inspectorWindow , m_consoleWindow, m_ecsWindow, m_profilerWindow, m_gameWindow, m_preferencesWindow } );
 
+		m_gameWindow->onSizeChanged.Connect( &Renderer::ResizeGame, m_renderer );
+		Mouse::Get().Init( m_gameWindow );
 
 		// Instance messages		
 		m_sceneWindow->onSelectGameobject.	Connect( &Engine::SetSelectedGameobject, this );
@@ -476,7 +478,7 @@ namespace fan {
 
 		// Camera
 		Transform * cameraTransform = m_mainCamera->GetGameobject()->GetComponent<Transform>();
-		m_mainCamera->SetAspectRatio( m_renderer->GetWindowAspectRatio() );
+		m_mainCamera->SetAspectRatio( m_gameWindow->GetAspectRatio() );
 		m_renderer->SetMainCamera( m_mainCamera->GetProjection(), m_mainCamera->GetView(), ToGLM(cameraTransform->GetPosition()));		
 
 		// Point lights		
@@ -591,9 +593,10 @@ namespace fan {
 		}
 
 		// Mouse selection
-		if (mouseCaptured == false && Mouse::GetButtonPressed(Mouse::button0)) {
+		if ( m_gameWindow->IsHovered() && Mouse::Get().GetButtonPressed(Mouse::button0) ) 
+		{
 			const btVector3 cameraOrigin = m_editorCamera->GetGameobject()->GetComponent<Transform>()->GetPosition();;
-			const Ray ray = m_editorCamera->ScreenPosToRay(Mouse::GetScreenSpacePosition());
+			const Ray ray = m_editorCamera->ScreenPosToRay(Mouse::Get().GetScreenSpacePosition());
 			const std::vector<Gameobject *>  & entities = m_scene->BuildEntitiesList();
 
 			// Raycast on all the entities
@@ -664,13 +667,13 @@ namespace fan {
 
 			// Raycast on the gizmo shape to determine if the mouse is hovering it
 			Color clickedColor = opaqueColor;
-			const Ray ray = m_editorCamera->ScreenPosToRay(Mouse::GetScreenSpacePosition());
+			const Ray ray = m_editorCamera->ScreenPosToRay(Mouse::Get().GetScreenSpacePosition());
 			for (int triIndex = 0; triIndex < coneTris.size() / 3; triIndex++) {
 				Triangle triangle(coneTris[3 * triIndex + 0], coneTris[3 * triIndex + 1], coneTris[3 * triIndex + 2]);
 				btVector3 intersection;
 				if (triangle.RayCast(ray.origin, ray.direction, intersection)) {
 					clickedColor[3] = 0.5f;
-					if (Mouse::GetButtonPressed(0)) {
+					if (Mouse::Get().GetButtonPressed(0)) {
 						cacheData.pressed = true;
 						cacheData.axisIndex = axisIndex;
 					}
@@ -688,12 +691,12 @@ namespace fan {
 			if (cacheData.pressed == true && cacheData.axisIndex == axisIndex ) {
 				btVector3 axis = rotation * axisDirection[axisIndex];
 
-				 const Ray screenRay = m_editorCamera->ScreenPosToRay(Mouse::GetScreenSpacePosition()); 	
+				 const Ray screenRay = m_editorCamera->ScreenPosToRay(Mouse::Get().GetScreenSpacePosition()); 	
 				 const Ray axisRay = { origin , axis };				 
 				 btVector3 trash, projectionOnAxis;
 				 screenRay.RayClosestPoints(axisRay, trash, projectionOnAxis);
 
-				if ( Mouse::GetButtonPressed( 0 ) ) {
+				if ( Mouse::Get().GetButtonPressed( 0 ) ) {
 					cacheData.offset = projectionOnAxis - _transform.getOrigin();
 				}
 

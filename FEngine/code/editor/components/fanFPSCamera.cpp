@@ -47,18 +47,18 @@ namespace fan
 	//================================================================================================================================
 	//================================================================================================================================
 	void FPSCamera::OnDisable() {
-		Mouse::LockCursor( false );
+		Mouse::Get().LockCursor( false );
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
 	void FPSCamera::Update(const float _delta) {
 
-		if (Mouse::GetButtonPressed(Mouse::button1)) {
-			Mouse::LockCursor(true);
+		if (Mouse::Get().GetButtonPressed(Mouse::button1)) {
+			Mouse::Get().LockCursor(true);
 		}
-		if (Mouse::GetButtonDown(Mouse::button1, true ) == false ) {
-			Mouse::LockCursor(false);
+		if (Mouse::Get().GetButtonDown(Mouse::button1, true ) == false ) {
+			Mouse::Get().LockCursor(false);
 		}
 
 		btVector3 position = m_transform->GetPosition();
@@ -79,9 +79,9 @@ namespace fan
 		position += _delta * realSpeed * forwardAxis * m_transform->Forward();	// Camera goes forward
 
 		// Camera rotation
-		const btVector2 mouseDelta = Mouse::GetDelta();
-		const btVector2 mousePos = Mouse::GetPosition();
-		if (Mouse::GetButtonDown(Mouse::button1)) {
+		const btVector2 mouseDelta = Mouse::Get().GetDelta();
+		const btVector2 mousePos = Mouse::Get().GetPosition();
+		if (Mouse::Get().GetButtonDown(Mouse::button1)) {
 			// Rotation depending on mouse movement
 			const float invertAxis = -1;
 			const btQuaternion rotationY(btVector3::Up(), -m_xySensitivity.x() * mouseDelta.x());

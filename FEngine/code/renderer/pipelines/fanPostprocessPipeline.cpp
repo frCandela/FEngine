@@ -17,6 +17,9 @@ namespace fan
 		Pipeline(_device)		 
 	{
 		uniforms.color = glm::vec4(1, 1, 1, 1);
+
+		m_sampler = new Sampler( _device );
+		m_sampler->CreateSampler(0, 0.f, VK_FILTER_NEAREST);
 	}
 
 	//================================================================================================================================
@@ -24,6 +27,7 @@ namespace fan
 	PostprocessPipeline::~PostprocessPipeline() {
 		delete m_descriptorImageSampler;
 		delete m_descriptorUniforms;
+		delete m_sampler;
 	}
 
 	//================================================================================================================================
@@ -103,8 +107,8 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void PostprocessPipeline::SetImageAndView( ImageView* _imageView, Sampler* _sampler ) { 
-		m_sampler = _sampler;
+	void PostprocessPipeline::SetGameImageView( ImageView* _imageView ) 
+	{ 
 		m_imageView = _imageView;
 	}
 }

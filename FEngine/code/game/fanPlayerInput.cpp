@@ -129,7 +129,7 @@ namespace fan
 		{
 			// Get mouse world pos
 			Camera * camera = m_gameobject->GetScene()->GetMainCamera();
-			btVector3 mouseWorldPos = camera->ScreenPosToRay( Mouse::GetScreenSpacePosition() ).origin;
+			btVector3 mouseWorldPos = camera->ScreenPosToRay( Mouse::Get().GetScreenSpacePosition() ).origin;
 			mouseWorldPos.setY( 0 );
 
 			// Get mouse direction

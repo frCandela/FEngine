@@ -68,13 +68,18 @@ namespace fan
 
 		void ReloadIcons();
 		void ReloadShaders();
+		void ResizeGame( btVector2 _newSize );
+		void ResizeSwapchain();
 
 		Window *				GetWindow() { return m_window; }
 		RendererDebug&			GetRendererDebug() { return *m_rendererDebug; }
 		ImguiPipeline *			GetImguiPipeline() { return m_imguiPipeline; }
 		PostprocessPipeline *	GetPostprocessPipeline() { return m_postprocessPipeline; }
 		ForwardPipeline *		GetForwardPipeline() { return m_forwardPipeline; }
-		glm::vec4				GetClearColor() const { return m_clearColor; }
+		glm::vec4				GetClearColor()					const { return m_clearColor; }
+		const FrameBuffer *		GetGameFrameBuffers()			const { return m_gameFrameBuffers; }
+		const FrameBuffer *		GetPostProcessFramebuffers()	const { return m_postProcessFramebuffers; }
+		const FrameBuffer *		GetSwapchainFramebuffers()		const { return m_swapchainFramebuffers; }
 
 		void SetClearColor(glm::vec4 _color) { m_clearColor = _color; }
 		void SetMainCamera( const glm::mat4 _projection, const glm::mat4 _view, const glm::vec3 _position );
@@ -85,12 +90,14 @@ namespace fan
 		void SetDrawData( const std::vector<DrawMesh> & _drawData );
 		void SetUIDrawData( const std::vector<DrawUIMesh> & _drawData );
 
-		float GetWindowAspectRatio() const;
-		void Clear() { m_meshDrawArray.clear(); }
+		float	GetWindowAspectRatio() const;
+		void	Clear() { m_meshDrawArray.clear(); }
 
 		const std::vector< DrawData > & GetMeshArray() const { return m_meshDrawArray; }
 	private:
 		RendererDebug * m_rendererDebug;
+
+		VkExtent2D m_gameExtent = {1,1};
 
 		std::vector< DrawData > m_meshDrawArray;
 		std::vector< UIDrawData > m_uiMeshDrawArray;
@@ -144,9 +151,7 @@ namespace fan
 		void RecordAllCommandBuffers();
 
 		bool CreateCommandBuffers();
-		void CreateGameFramebuffers();
-		void CreatePostProcessFramebuffers();		
-		void CreateSwapchainFramebuffers();
+		void CreateFramebuffers();
 
 		bool CreateRenderPass();
 		bool CreateRenderPassPostprocess();

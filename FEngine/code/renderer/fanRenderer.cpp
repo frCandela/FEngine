@@ -49,9 +49,7 @@ namespace fan
 		CreateRenderPassImGui();
 
 		CreateQuadVertexBuffer();
-		CreateSwapchainFramebuffers();
-		CreateGameFramebuffers();
-		CreatePostProcessFramebuffers();
+		CreateFramebuffers();
 		
 		m_samplerTextures = new Sampler( *m_device );
 		m_samplerTextures->CreateSampler( 0, 8, VK_FILTER_LINEAR );
@@ -74,13 +72,13 @@ namespace fan
 		m_uiPipeline->Create();
 
 		m_postprocessPipeline = new PostprocessPipeline(*m_device);
-		m_postprocessPipeline->SetImageAndView( m_gameFrameBuffers->GetColorAttachmentImageView(), m_gameFrameBuffers->GetColorAttachmentSampler() ); // for sampling
+		m_postprocessPipeline->SetGameImageView( m_gameFrameBuffers->GetColorAttachmentImageView() );
 		m_postprocessPipeline->CreateDescriptors( m_swapchain->GetSwapchainImagesCount() );
 		m_postprocessPipeline->Init( m_renderPassPostprocess->GetRenderPass(), m_swapchain->GetExtent(), "code/shaders/postprocess.vert", "code/shaders/postprocess.frag" );
 		m_postprocessPipeline->Create();
         
 		m_imguiPipeline = new ImguiPipeline(*m_device, m_swapchain->GetSwapchainImagesCount());
-		m_imguiPipeline->Set3DView( m_postProcessFramebuffers->GetColorAttachmentImageView() );
+		m_imguiPipeline->SetGameView( m_postProcessFramebuffers->GetColorAttachmentImageView() );
 		m_imguiPipeline->Create(m_renderPassImgui->GetRenderPass(), m_window->GetWindow(), m_swapchain->GetExtent());
 		
 		CreateCommandBuffers();
@@ -148,20 +146,11 @@ namespace fan
 				glfwPollEvents();
 				return;
 			}
-			vkDeviceWaitIdle( m_device->vkDevice );
-			const VkExtent2D extent = m_window->GetExtent();
-			Debug::Get() << Debug::Severity::highlight << "Resize renderer: " << extent.width << "x" << extent.height << Debug::Endl();
-			m_swapchain->Resize( extent );
-			m_swapchainFramebuffers->Resize( extent );
-			m_gameFrameBuffers->Resize( extent );
-			m_postprocessPipeline->Resize( extent );
-			m_forwardPipeline->Resize( extent );
-			m_rendererDebug->Resize( extent );
-			m_uiPipeline->Resize( extent );
-
-			RecordAllCommandBuffers();
-			vkResetFences( m_device->vkDevice, 1, m_swapchain->GetCurrentInFlightFence() );
-			m_swapchain->AcquireNextImage();
+			else
+			{
+				ResizeSwapchain();
+				return;
+			}			
 		} else if ( result != VK_SUCCESS ) {
 			Debug::Error( "Could not acquire next image" );
 		} else {
@@ -194,6 +183,41 @@ namespace fan
 			m_swapchain->PresentImage();
 			m_swapchain->StartNextFrame();
 		}
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
+	void Renderer::ResizeGame( btVector2 _newSize )
+	{
+		WaitIdle();
+		const VkExtent2D extent = { (uint32_t)_newSize[0], (uint32_t)_newSize[1] };
+		m_gameExtent = extent;
+
+		m_gameFrameBuffers->Resize( extent );
+		m_postProcessFramebuffers->Resize( extent );
+
+		m_postprocessPipeline->Resize( extent );
+		m_forwardPipeline->Resize( extent );
+		m_rendererDebug->Resize( extent );
+		m_uiPipeline->Resize( extent );
+
+		m_imguiPipeline->UpdateGameImageDescriptor();
+
+		RecordAllCommandBuffers();
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
+	void Renderer::ResizeSwapchain()
+	{
+		WaitIdle();
+		const VkExtent2D extent = m_window->GetExtent();
+		Debug::Get() << Debug::Severity::highlight << "Resize renderer: " << extent.width << "x" << extent.height << Debug::Endl();
+		m_swapchain->Resize( extent );
+		m_swapchainFramebuffers->Resize( extent );
+
+
+		RecordAllCommandBuffers();
 	}
 
 	//================================================================================================================================
@@ -363,8 +387,8 @@ namespace fan
 		renderPassInfo.renderPass = m_renderPassGame->GetRenderPass();
 		renderPassInfo.framebuffer = m_gameFrameBuffers->GetFrameBuffer( _index );
 		renderPassInfo.renderArea.offset = { 0,0 };
-		renderPassInfo.renderArea.extent.width = m_swapchain->GetExtent().width;
-		renderPassInfo.renderArea.extent.height = m_swapchain->GetExtent().height;
+		renderPassInfo.renderArea.extent.width = m_gameExtent.width;
+		renderPassInfo.renderArea.extent.height = m_gameExtent.height;
 		renderPassInfo.clearValueCount = static_cast<uint32_t>(clearValues.size());
 		renderPassInfo.pClearValues = clearValues.data();
 
@@ -374,8 +398,8 @@ namespace fan
 		renderPassInfoPostprocess.renderPass = m_renderPassPostprocess->GetRenderPass();
 		renderPassInfoPostprocess.framebuffer = m_postProcessFramebuffers->GetFrameBuffer( _index );
 		renderPassInfoPostprocess.renderArea.offset = { 0,0 };
-		renderPassInfoPostprocess.renderArea.extent.width = m_swapchain->GetExtent().width;
-		renderPassInfoPostprocess.renderArea.extent.height = m_swapchain->GetExtent().height;
+		renderPassInfoPostprocess.renderArea.extent.width = m_gameExtent.width;
+		renderPassInfoPostprocess.renderArea.extent.height = m_gameExtent.height;
 		renderPassInfoPostprocess.clearValueCount = static_cast<uint32_t>(clearValues.size());
 		renderPassInfoPostprocess.pClearValues = clearValues.data();
 
@@ -735,29 +759,19 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void Renderer::CreateGameFramebuffers() {
-		m_gameFrameBuffers = new FrameBuffer( *m_device );
-		m_gameFrameBuffers->AddColorAttachment( m_swapchain->GetExtent(), m_swapchain->GetSurfaceFormat().format );
-		m_gameFrameBuffers->AddDepthAttachment( m_swapchain->GetExtent() );
-		m_gameFrameBuffers->Create( m_swapchain->GetSwapchainImagesCount() , m_renderPassGame->GetRenderPass(), m_swapchain->GetExtent() );
-	}
+	void Renderer::CreateFramebuffers() {
+		m_gameFrameBuffers = new FrameBuffer( *m_device, m_swapchain->GetExtent() );
+		m_gameFrameBuffers->AddColorAttachment( m_swapchain->GetSurfaceFormat().format );
+		m_gameFrameBuffers->AddDepthAttachment( );
+		m_gameFrameBuffers->Create( m_swapchain->GetSwapchainImagesCount() , m_renderPassGame->GetRenderPass() );
 
-	//================================================================================================================================
-	//================================================================================================================================
-	void Renderer::CreatePostProcessFramebuffers()
-	{
-		m_postProcessFramebuffers = new FrameBuffer( *m_device );
-		m_postProcessFramebuffers->AddColorAttachment( m_swapchain->GetExtent(), m_swapchain->GetSurfaceFormat().format );
-		//m_gameFramebuffers->AddDepthAttachment( m_swapchain->GetExtent() );
-		m_postProcessFramebuffers->Create( m_swapchain->GetSwapchainImagesCount(), m_renderPassPostprocess->GetRenderPass(), m_swapchain->GetExtent() );
-	}
+		m_postProcessFramebuffers = new FrameBuffer( *m_device, m_swapchain->GetExtent()  );
+		m_postProcessFramebuffers->AddColorAttachment( m_swapchain->GetSurfaceFormat().format );
+		m_postProcessFramebuffers->Create( m_swapchain->GetSwapchainImagesCount(), m_renderPassPostprocess->GetRenderPass() );
 
-	//================================================================================================================================
-	//================================================================================================================================
-	void Renderer::CreateSwapchainFramebuffers() {	
-		m_swapchainFramebuffers = new FrameBuffer( *m_device );
+		m_swapchainFramebuffers = new FrameBuffer( *m_device, m_swapchain->GetExtent()  );
 		m_swapchainFramebuffers->SetExternalAttachment( m_swapchain->GetImageViews() );
-		m_swapchainFramebuffers->Create( m_swapchain->GetSwapchainImagesCount(), m_renderPassImgui->GetRenderPass(), m_swapchain->GetExtent() );
+		m_swapchainFramebuffers->Create( m_swapchain->GetSwapchainImagesCount(), m_renderPassImgui->GetRenderPass() );
 	}
 
 	//================================================================================================================================
