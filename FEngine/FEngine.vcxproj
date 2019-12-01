@@ -127,6 +127,7 @@
     <ClCompile Include="code\editor\windows\fanEcsWindow.cpp" />
     <ClCompile Include="code\editor\windows\fanGameWindow.cpp" />
     <ClCompile Include="code\editor\windows\fanInspectorWindow.cpp" />
+    <ClCompile Include="code\editor\windows\fanNetworkWindow.cpp" />
     <ClCompile Include="code\editor\windows\fanPreferencesWindow.cpp" />
     <ClCompile Include="code\editor\windows\fanProfilerWindow.cpp" />
     <ClCompile Include="code\editor\windows\fanRenderWindow.cpp" />
@@ -150,6 +151,8 @@
     <ClCompile Include="code\game\fanWeapon.cpp" />
     <ClCompile Include="code\game\fanWithEnergy.cpp" />
     <ClCompile Include="code\game\ui\fanSpaceshipUI.cpp" />
+    <ClCompile Include="code\network\fanClient.cpp" />
+    <ClCompile Include="code\network\fanServer.cpp" />
     <ClCompile Include="code\physics\fanPhysicsManager.cpp" />
     <ClCompile Include="code\renderer\core\fanBuffer.cpp" />
     <ClCompile Include="code\renderer\core\fanDevice.cpp" />
@@ -264,6 +267,7 @@
     <ClInclude Include="code\editor\windows\fanEcsWindow.h" />
     <ClInclude Include="code\editor\windows\fanGameWindow.h" />
     <ClInclude Include="code\editor\windows\fanInspectorWindow.h" />
+    <ClInclude Include="code\editor\windows\fanNetworkWindow.h" />
     <ClInclude Include="code\editor\windows\fanPreferencesWindow.h" />
     <ClInclude Include="code\editor\windows\fanProfilerWindow.h" />
     <ClInclude Include="code\editor\windows\fanRenderWindow.h" />
@@ -287,6 +291,12 @@
     <ClInclude Include="code\game\fanWeapon.h" />
     <ClInclude Include="code\game\fanWithEnergy.h" />
     <ClInclude Include="code\game\ui\fanSpaceshipUI.h" />
+    <ClInclude Include="code\network\fanClient.h" />
+    <ClInclude Include="code\network\fanNetworkCommon.h" />
+    <ClInclude Include="code\network\fanServer.h" />
+    <ClInclude Include="code\network\packets\fanIPacket.h" />
+    <ClInclude Include="code\network\packets\fanPacketLogin.h" />
+    <ClInclude Include="code\network\packets\fanPacketPing.h" />
     <ClInclude Include="code\physics\fanPhysicsManager.h" />
     <ClInclude Include="code\renderer\core\fanBuffer.h" />
     <ClInclude Include="code\renderer\core\fanDevice.h" />

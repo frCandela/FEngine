@@ -33,6 +33,7 @@
 #include "editor/windows/fanEcsWindow.h"	
 #include "editor/windows/fanProfilerWindow.h"	
 #include "editor/windows/fanGameWindow.h"
+#include "editor/windows/fanNetworkWindow.h"
 #include "editor/components/fanFPSCamera.h"		
 #include "editor/fanImguiIcons.h"
 #include "editor/fanEditorCopyPaste.h"
@@ -142,8 +143,9 @@ namespace fan {
 		m_profilerWindow	= new ProfilerWindow( );
 		m_gameWindow		= new GameWindow();
 		m_preferencesWindow = new PreferencesWindow( m_renderer );		
+		m_networkWindow		= new NetworkWindow();
 		m_mainMenuBar		= new MainMenuBar( *m_scene, m_editorGrid );
-		m_mainMenuBar->SetWindows( { m_renderWindow , m_sceneWindow , m_inspectorWindow , m_consoleWindow, m_ecsWindow, m_profilerWindow, m_gameWindow, m_preferencesWindow } );
+		m_mainMenuBar->SetWindows( { m_renderWindow , m_sceneWindow , m_inspectorWindow , m_consoleWindow, m_ecsWindow, m_profilerWindow, m_gameWindow, m_networkWindow, m_preferencesWindow } );
 
 		m_gameWindow->onSizeChanged.Connect( &Renderer::ResizeGame, m_renderer );
 		Mouse::Get().Init( m_gameWindow );
@@ -253,6 +255,7 @@ namespace fan {
 				{
 					SCOPED_PROFILE( draw_ui )					
 					m_mainMenuBar->Draw();
+					m_networkWindow->Update(targetLogicDelta);
 					ManageSelection();
 					m_physicsManager->OnGui();
 					DrawEditorGrid();
@@ -271,7 +274,6 @@ namespace fan {
 			
 				m_scene->EndFrame();	
 				m_ecsManager->Refresh();
-
 
 				{
 					SCOPED_PROFILE( imgui_render )

@@ -14,6 +14,7 @@ namespace fan {
 	class EcsWindow;
 	class ProfilerWindow;
 	class GameWindow;
+	class NetworkWindow;
 	class SceneInstantiate;
 	class Renderer;
 	class Gameobject;
@@ -92,6 +93,7 @@ namespace fan {
 		EcsWindow *			m_ecsWindow;
 		ProfilerWindow*		m_profilerWindow;
 		GameWindow*			m_gameWindow;
+		NetworkWindow*		m_networkWindow;
 		EditorGrid m_editorGrid;
 
 		// Main objects

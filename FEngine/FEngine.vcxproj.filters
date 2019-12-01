@@ -101,6 +101,12 @@
     <Filter Include="code\deps\SFML">
       <UniqueIdentifier>{cc248f23-4b8c-47a9-8133-1c22ddd1b3ea}</UniqueIdentifier>
     </Filter>
+    <Filter Include="code\network">
+      <UniqueIdentifier>{a1af2358-81a4-4c40-ad5a-ea3b0a72f7ae}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="code\network\packets">
+      <UniqueIdentifier>{c9057cb8-4887-49fe-94f0-b96a77907ee4}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="code\editor\fanMainMenuBar.cpp">
@@ -471,6 +477,15 @@
     </ClCompile>
     <ClCompile Include="code\renderer\core\fanRenderPass.cpp">
       <Filter>code\renderer\core</Filter>
+    </ClCompile>
+    <ClCompile Include="code\network\fanServer.cpp">
+      <Filter>code\network</Filter>
+    </ClCompile>
+    <ClCompile Include="code\network\fanClient.cpp">
+      <Filter>code\network</Filter>
+    </ClCompile>
+    <ClCompile Include="code\editor\windows\fanNetworkWindow.cpp">
+      <Filter>code\editor\windows</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -1463,6 +1478,27 @@
     </ClInclude>
     <ClInclude Include="deps\SFML\System\Vector3.hpp">
       <Filter>code\deps\SFML</Filter>
+    </ClInclude>
+    <ClInclude Include="code\network\fanServer.h">
+      <Filter>code\network</Filter>
+    </ClInclude>
+    <ClInclude Include="code\network\fanClient.h">
+      <Filter>code\network</Filter>
+    </ClInclude>
+    <ClInclude Include="code\editor\windows\fanNetworkWindow.h">
+      <Filter>code\editor\windows</Filter>
+    </ClInclude>
+    <ClInclude Include="code\network\fanNetworkCommon.h">
+      <Filter>code\network</Filter>
+    </ClInclude>
+    <ClInclude Include="code\network\packets\fanIPacket.h">
+      <Filter>code\network\packets</Filter>
+    </ClInclude>
+    <ClInclude Include="code\network\packets\fanPacketPing.h">
+      <Filter>code\network\packets</Filter>
+    </ClInclude>
+    <ClInclude Include="code\network\packets\fanPacketLogin.h">
+      <Filter>code\network\packets</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

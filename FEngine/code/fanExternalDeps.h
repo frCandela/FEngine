@@ -21,9 +21,6 @@
 #define IMGUI_DISABLE_OBSOLETE_FUNCTIONS
 #include "imgui/imgui.h"
 
-#include "SFML/System.hpp"
-#include "SFML/Network.hpp"
-
 #include <vector>
 #include <map>
 #include <set>
