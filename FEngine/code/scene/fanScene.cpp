@@ -13,18 +13,18 @@
 #include "core/time/fanProfiler.h"
 #include "scene/fanComponentPtr.h"
 #include "scene/fanSceneInstantiate.h"
+#include "physics/fanPhysicsManager.h"
 
 namespace fan
 {
-
 	//================================================================================================================================
 	//================================================================================================================================
-	Scene::Scene(const std::string _name, EcsManager * _ecsManager, PhysicsManager * _physicsManager ) :
+	Scene::Scene(const std::string _name ) :
 		m_name(_name)
 		, m_path("")
 		, m_root(nullptr) 
-		, m_ecsManager(_ecsManager)
-		, m_physicsManager( _physicsManager )
+		, m_ecsManager( new EcsManager())
+		, m_physicsManager( new PhysicsManager( btVector3::Zero() ) )
 		, m_instantiate( new SceneInstantiate(*this))
 	{
 
@@ -36,6 +36,9 @@ namespace fan
 	//================================================================================================================================
 	Scene::~Scene() {
 		Clear();
+
+		delete m_physicsManager;
+		delete m_ecsManager;
 	}
 
 	//================================================================================================================================
@@ -125,15 +128,31 @@ namespace fan
 	//================================================================================================================================
 	void Scene::Update(const float _delta) {
 		SCOPED_PROFILE( scene_update )
-		for (Actor * actor : m_activeActors) {
-			if (actor->IsEnabled()) {
-				try	{ 
-					actor->Update( _delta ); 
+
+		m_ecsManager->UpdatePrePhysics( _delta );
+		m_physicsManager->StepSimulation( _delta );
+		m_ecsManager->UpdatePostPhysics( _delta );
+		UpdateActors(_delta);
+		m_ecsManager->Update( _delta, m_mainCamera->GetGameobject()->GetTransform()->GetPosition() );
+		LateUpdate( _delta );
+		m_ecsManager->LateUpdate( _delta );
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
+	void Scene::UpdateActors(const float _delta) {
+		for ( Actor * actor : m_activeActors )
+		{
+			if ( actor->IsEnabled() )
+			{
+				try
+				{
+					actor->Update( _delta );
 				}
-				catch (...)
+				catch ( ... )
 				{
 					Debug::Error() << "Update error on actor " << actor->s_name << " of gameobject " << actor->GetGameobject()->GetName() << Debug::Endl();
-					actor->SetEnabled(false);
+					actor->SetEnabled( false );
 				}
 			}
 		}
@@ -242,6 +261,8 @@ namespace fan
 			R_DeleteGameobject(gameobjectDelete, deletedEntitiesSet);
 		}
 		m_entitiesToDelete.clear();
+
+		m_ecsManager->Refresh();
 	}
 
 	//================================================================================================================================

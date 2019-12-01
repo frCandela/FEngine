@@ -22,7 +22,6 @@
 #include "core/math/shapes/fanAABB.h"
 #include "core/math/fanBasicModels.h"
 #include "core/files/fanFbxImporter.h"
-#include "ecs/fanECSManager.h"
 #include "editor/fanModals.h"
 #include "editor/fanMainMenuBar.h"
 #include "editor/windows/fanRenderWindow.h"	
@@ -56,8 +55,6 @@
 #include "scene/fanSceneInstantiate.h"
 #include "core/math/shapes/fanConvexHull.h"
 #include "core/time/fanProfiler.h"
-#include "ecs/fanECSManager.h"
-#include "physics/fanPhysicsManager.h"
 
 #include "scene/fanPrefab.h"
 
@@ -126,10 +123,8 @@ namespace fan {
 		m_editorGrid.spacing = 1.f;		
 		m_editorGrid.offset = btVector3::Zero();
 
-		m_renderer = new Renderer( windowSize, windowPosition );
-		m_ecsManager = new EcsManager();
-		m_physicsManager = new PhysicsManager( btVector3( 0, 0, 0 ) );
-		m_scene = new Scene( "mainScene", m_ecsManager, m_physicsManager );
+		m_renderer	= new Renderer( windowSize, windowPosition );
+		m_scene		= new Scene( "mainScene");
 
 		Debug::Get().SetDebug( & m_renderer->GetRendererDebug() );
 
@@ -139,7 +134,7 @@ namespace fan {
 		m_sceneWindow		= new SceneWindow( m_scene );
 		m_inspectorWindow	= new InspectorWindow();		
 		m_consoleWindow		= new ConsoleWindow();
-		m_ecsWindow			= new EcsWindow( m_ecsManager );
+		m_ecsWindow			= new EcsWindow( m_scene->GetEcsManager() );
 		m_profilerWindow	= new ProfilerWindow( );
 		m_gameWindow		= new GameWindow();
 		m_preferencesWindow = new PreferencesWindow( m_renderer );		
@@ -173,7 +168,6 @@ namespace fan {
 		// Static messages		
 		TexturePtr::s_onCreateUnresolved.			Connect ( &Engine::OnResolveTexturePtr, this );
 		MeshPtr::s_onCreateUnresolved.				Connect	( &Engine::OnResolveMeshPtr, this );
-		GameobjectPtr::s_onSetFromSelection.	    Connect ( &Engine::OnSetGameobjectPtrFromSelection, this );
 		PrefabPtr::s_onCreateUnresolved.			Connect ( &Engine::OnResolvePrefabPtr, this );
 	
 		MeshRenderer::onRegisterMeshRenderer.		Connect	( &Engine::RegisterMeshRenderer, this );
@@ -193,8 +187,7 @@ namespace fan {
 		// Deletes ui
 		delete m_mainMenuBar;
 		delete m_scene;
-		delete m_physicsManager;
-		delete m_ecsManager;
+
 
 		// Serialize editor positions
 		const Window * window = m_renderer->GetWindow();
@@ -242,14 +235,8 @@ namespace fan {
 					m_renderer->GetRendererDebug().ClearDebug();
 				}
 
-				m_scene->BeginFrame();				
-				m_ecsManager->UpdatePrePhysics( targetLogicDelta );
-				m_physicsManager->StepSimulation(targetLogicDelta);		
-				m_ecsManager->UpdatePostPhysics( targetLogicDelta );
-				m_scene->Update( targetLogicDelta );
-				m_ecsManager->Update( targetLogicDelta, m_scene->GetMainCamera()->GetGameobject()->GetTransform()->GetPosition() );
-				m_scene->LateUpdate( targetLogicDelta );
-				m_ecsManager->LateUpdate( targetLogicDelta );				
+				m_scene->BeginFrame();
+				m_scene->Update( targetLogicDelta );		
 
 				if ( m_showUI )				
 				{
@@ -257,7 +244,6 @@ namespace fan {
 					m_mainMenuBar->Draw();
 					m_networkWindow->Update(targetLogicDelta);
 					ManageSelection();
-					m_physicsManager->OnGui();
 					DrawEditorGrid();
 				}
 
@@ -272,8 +258,7 @@ namespace fan {
 					if ( m_mainMenuBar->ShowHull() ) { DrawHull(); }
 				}				
 			
-				m_scene->EndFrame();	
-				m_ecsManager->Refresh();
+				m_scene->EndFrame();			
 
 				{
 					SCOPED_PROFILE( imgui_render )
@@ -862,16 +847,4 @@ namespace fan {
 			Deselect();
 		}
 	}
-
-	//================================================================================================================================
-	//================================================================================================================================
-	void Engine::OnSetGameobjectPtrFromSelection( GameobjectPtr * _ptr )
-	{
-		if ( m_selectedGameobject != nullptr )
-		{
-			(*_ptr) = GameobjectPtr( m_selectedGameobject, m_selectedGameobject->GetUniqueID() );
-		}
-	}
-
-
 }

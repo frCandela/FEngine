@@ -27,8 +27,6 @@ namespace fan {
 	class Material;
 	class Camera;
 	class FPSCamera;
-	class EcsManager;
-	class PhysicsManager;
 	class Texture;
 	class Mesh;
 	class EditorCopyPaste;
@@ -94,14 +92,12 @@ namespace fan {
 		ProfilerWindow*		m_profilerWindow;
 		GameWindow*			m_gameWindow;
 		NetworkWindow*		m_networkWindow;
-		EditorGrid m_editorGrid;
+		EditorGrid			m_editorGrid;
 
 		// Main objects
 		EditorCopyPaste * m_copyPaste;
 		Renderer *			m_renderer;
 		Scene *				m_scene;
-		EcsManager *		m_ecsManager;
-		PhysicsManager *	m_physicsManager;
 		Gameobject *		m_selectedGameobject;
 		Camera *			m_editorCamera = nullptr;
 		FPSCamera *			m_editorCameraController = nullptr;
@@ -134,7 +130,6 @@ namespace fan {
 		void OnToogleShowUI() { m_showUI = ! m_showUI; }
 
 		void OnGameobjectDeleted( Gameobject * _gameobject );
-		void OnSetGameobjectPtrFromSelection( GameobjectPtr * _ptr );
 
 		void DrawEditorGrid() const;
 		void DrawWireframe() const;

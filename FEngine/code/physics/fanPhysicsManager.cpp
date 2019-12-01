@@ -99,30 +99,4 @@ namespace fan {
 			rb1->onContactEnded.Emmit( rb0, _manifold );
 		}
 	}
-
-	//================================================================================================================================
-	//================================================================================================================================	
-	void PhysicsManager::OnGui() {
-// 		ImGui::Begin( "Physics" ); {	
-// 			int numManifolds = m_dispatcher->getNumManifolds();
-// 			for ( int i = 0; i < numManifolds; i++ )
-// 			{
-// 				btPersistentManifold* contactManifold = m_dispatcher->getManifoldByIndexInternal( i );
-// 				int numContacts = contactManifold->getNumContacts();
-// 				std::stringstream ss;
-// 
-// 				Rigidbody * rb0 = static_cast<Rigidbody*> ( contactManifold->getBody0()->getUserPointer() );
-// 				Rigidbody * rb1 = static_cast<Rigidbody*> ( contactManifold->getBody1()->getUserPointer() );
-// 
-// 				ss << rb0->GetGameobject()->GetName() << " " << rb1->GetGameobject()->GetName() << " " << numContacts << " : ";
-// 				for ( int j = 0; j < numContacts; j++ )
-// 				{
-// 					const btManifoldPoint& pt = contactManifold->getContactPoint( j );
-// 
-// 					ss << pt.getDistance() << " ";
-// 				}
-// 				ImGui::Text( ss.str().c_str() );
-// 			}
-// 		} ImGui::End();
- 	}
 }

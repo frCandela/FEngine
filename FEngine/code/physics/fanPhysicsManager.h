@@ -11,8 +11,6 @@ namespace fan {
 		PhysicsManager( const btVector3 _gravity );
 		~PhysicsManager();
 
-		void OnGui();
-
 		void StepSimulation( const float _delta );
 		void RegisterRigidbody( Rigidbody * _rigidbody );
 		void UnRegisterRigidbody( Rigidbody * _rigidbody );

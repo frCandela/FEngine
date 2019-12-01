@@ -23,7 +23,6 @@ namespace ImGui
 		// icon & set from selection
 		if ( ImGui::ButtonIcon( ImGui::IconType::GAMEOBJECT16, { 16,16 } ) )
 		{
-			fan::GameobjectPtr::s_onSetFromSelection.Emmit( _ptr );
 			returnValue = true;
 		}
 		ImGui::SameLine();

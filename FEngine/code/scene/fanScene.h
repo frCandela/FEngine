@@ -28,7 +28,9 @@ namespace fan
 		Signal<>				onScenePlay;
 		Signal<>				onScenePause;
 
-		Scene( const std::string _name, EcsManager * _ecsManager, PhysicsManager * _physicsManager );
+
+
+		Scene( const std::string _name );
 		~Scene();
 
 		Gameobject *					CreateGameobject( const std::string _name, Gameobject * _parent = nullptr, const bool _generateID = true );	
@@ -73,12 +75,13 @@ namespace fan
 		std::string	m_path;
 		uint64_t	m_nextUniqueID = 1;
 
-		SceneInstantiate * m_instantiate;
+		SceneInstantiate * m_instantiate = nullptr;
+		EcsManager * 	   m_ecsManager = nullptr;
+		PhysicsManager *   m_physicsManager = nullptr;
 
 		// References
 		Gameobject *			m_root;
-		EcsManager * const		m_ecsManager = nullptr;
-		PhysicsManager * const  m_physicsManager = nullptr;
+
 		Camera *				m_mainCamera = nullptr;
 
 		// State
@@ -91,6 +94,8 @@ namespace fan
 		std::set< Actor * >					m_startingActors;
 		std::set< Actor * >					m_activeActors;
 		std::map< uint64_t, Gameobject * >	m_gameobjects;
+
+		void UpdateActors(const float _delta);
 
 		void OnActorAttach(Actor * _actor);
 		void OnActorDetach(Actor * _actor);

@@ -14,7 +14,6 @@ namespace fan
 	{		
 	public:
 		static Signal< RessourcePtr * > s_onCreateUnresolved;
-		static Signal< RessourcePtr * > s_onSetFromSelection;
 
 		RessourcePtr( _RessourceType * _ressourceType, _IDType _ressourceID );		
 		RessourcePtr();
@@ -32,10 +31,6 @@ namespace fan
 
 	template< typename _RessourceType, typename _IDType >
 	Signal< RessourcePtr<_RessourceType, _IDType> * > RessourcePtr<_RessourceType, _IDType>::s_onCreateUnresolved;
-
-	template< typename _RessourceType, typename _IDType >
-	Signal< RessourcePtr<_RessourceType, _IDType> * >  RessourcePtr<_RessourceType, _IDType>::s_onSetFromSelection;
-
 
 	//================================================================================================================================
 	//================================================================================================================================
