@@ -20,11 +20,15 @@ namespace fan
 			Port			port;
 			std::string		name;
 			ClientState		state = ClientState::WAITING;
+			float ping		= -1.f;
+			float lastResponse = 0.f;
 		};
 
-		Server( const Port _listenPort );
+		Server(  );
 
+		void Create( const Port _listenPort );
 		void Update( const float _delta );
+		void UpdateClient( ClientData& _client, const float _delta );
 		bool Bind();
 		void SendPacket( const ClientData& _client,  sf::Packet _packet );
 
@@ -37,10 +41,12 @@ namespace fan
 
 		std::vector<ClientData > m_clients;
 
-		void Receive();
+		bool Receive();
 		void ProcessPacket( const sf::IpAddress _ip, const Port _port, sf::Packet& _packet );		
+
 
 		ClientData * FindClient( const sf::IpAddress _ip, const Port _port  );
 		ClientData * AddClient( const sf::IpAddress _ip, const Port _port, const PacketLogin& _loginInfo  );
+		void RemoveClient( ClientData& _client );
 	};
 }

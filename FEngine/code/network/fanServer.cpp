@@ -3,15 +3,23 @@
 
 #include "network/packets/fanPacketLogin.h"
 #include "network/packets/fanPacketPing.h"
+#include "core/time/fanTime.h"
+#include "core/input/fanInput.h"
 
 namespace fan
 {
 	//================================================================================================================================
 	//================================================================================================================================
-	Server::Server( const Port _listenPort ) :
-		m_listenPort( _listenPort )
+	Server::Server( ) 		
 	{
 		m_socket.setBlocking( false );
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
+	void Server::Create( const Port _listenPort )
+	{
+		m_listenPort = _listenPort;
 	}
 
 	//================================================================================================================================
@@ -31,11 +39,17 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void Server::Update( const float /*_delta*/ )
+	void Server::Update( const float _delta )
 	{
 		if ( m_state != State::NONE )
 		{
-			Receive();
+			while( Receive() == true ){}
+
+			for (int clientIndex = 0; clientIndex < m_clients.size() ; clientIndex++)
+			{
+				ClientData& client = m_clients[clientIndex];
+				UpdateClient( client, _delta );
+			}
 		}		
 
 		switch ( m_state )
@@ -52,6 +66,23 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
+	void Server::UpdateClient( ClientData& _client, const float _delta )
+	{
+		_client.lastResponse += _delta;
+
+		if ( _client.lastResponse > 2.f )
+		{
+			RemoveClient(_client);
+		}
+		else if ( _client.lastResponse > 1.f )
+		{
+			PacketPing ping( Time::Get().ElapsedSinceStartup() );
+			SendPacket( _client, ping.ToPacket() );
+		}
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
 	void Server::ProcessPacket( const sf::IpAddress _ip, const Port _port, sf::Packet& _packet )
 	{
 		ClientData * client = FindClient( _ip , _port );
@@ -61,20 +92,36 @@ namespace fan
 		_packet >> intType;
 		const PacketType type = PacketType( intType );
 
-		switch ( type )
+		if ( client == nullptr )
 		{
-		case PacketType::LOGIN:
-			if ( client == nullptr )
+			if ( type == PacketType::LOGIN )
 			{
 				PacketLogin packetLogin;
 				packetLogin.LoadFrom( _packet );
 				client = AddClient( _ip, _port, packetLogin );
+				SendPacket( *client, PacketAckLogin().ToPacket() );
 			}
-			SendPacket( *client, PacketAckLogin().ToPacket() );
-			break;
-		default:
-			Debug::Log() << "[SERVER] strange packet received with id:  " << intType << Debug::Endl();
-			break;
+			else
+			{
+				Debug::Log() << "[SERVER] drunk client " << Debug::Endl();
+			}
+		}
+		else
+		{
+			client->lastResponse = 0.f;
+
+			switch ( type )
+			{
+			case PacketType::PING: {
+				PacketPing packetPing;
+				packetPing.LoadFrom( _packet );
+				const float time = Time::Get().ElapsedSinceStartup();
+				client->ping = time - packetPing.GetTime();
+			} break;
+			default:
+				Debug::Log() << "[SERVER] strange packet received with id:  " << intType << Debug::Endl();
+				break;
+			}
 		}
 	}
 
@@ -90,7 +137,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void Server::Receive()
+	bool Server::Receive()
 	{
 		// Receive packet
 		sf::Packet		packet;
@@ -100,9 +147,23 @@ namespace fan
 
 		if ( status == sf::UdpSocket::Done )
 		{
-			ProcessPacket( clientIp, clientPort, packet );
+			if ( clientPort != m_listenPort )
+			{
+				ProcessPacket( clientIp, clientPort, packet );
+				return true;
+			}
+			
 		}
-		else if ( status == sf::UdpSocket::NotReady )
+		else if ( status ==  sf::UdpSocket::Disconnected )
+		{
+			ClientData * client = FindClient( clientIp , clientPort );
+			if ( client != nullptr )
+			{
+				RemoveClient(*client);
+			}
+			
+		}
+		else if ( status == sf::UdpSocket::NotReady  )
 		{
 			// do nothing
 		}
@@ -110,6 +171,7 @@ namespace fan
 		{
 			Debug::Warning() << "[SERVER] receive error" << Debug::Endl();
 		}
+		return false;
 	}
 
 	//================================================================================================================================
@@ -123,9 +185,23 @@ namespace fan
 		client.port = _port;
 		client.name = _loginInfo.GetName();
 		m_clients.push_back( client );
-		Debug::Log() << "[SERVER] logging client " << client.name << " " << client.ipAdress.toString() << "::" << client.port << Debug::Endl();
+		Debug::Log() << "[SERVER] client connected " << client.name << " " << client.ipAdress.toString() << "::" << client.port << Debug::Endl();
 
 		return &m_clients[m_clients.size() - 1];
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
+	void Server::RemoveClient( ClientData& _client )
+	{
+		for (int clientIndex = 0; clientIndex < m_clients.size() ; clientIndex++)
+		{
+			if ( &m_clients[clientIndex] == &_client )
+			{
+				Debug::Log() << "[SERVER] client disconnected " << _client.name << " " << _client.ipAdress.toString() << "::" << _client.port << Debug::Endl();
+				m_clients.erase( m_clients.begin() + clientIndex );
+			}
+		}
 	}
 
 	//================================================================================================================================

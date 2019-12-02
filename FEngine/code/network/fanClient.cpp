@@ -8,11 +8,17 @@ namespace fan
 {
 	//================================================================================================================================
 	//================================================================================================================================
-	Client::Client( const std::string& _name, const Port _listenPort ) 
-		: m_name( _name )
-		, m_listenPort( _listenPort )
+	Client::Client() 
 	{
 		m_socket.setBlocking( false );
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
+	void Client::Create( const std::string& _name, const Port _listenPort )
+	{
+		m_name = _name;
+		m_listenPort = _listenPort;
 	}
 
 	//================================================================================================================================
@@ -95,6 +101,9 @@ namespace fan
 		case PacketType::ACK_LOGIN : 
 			Debug::Log() << "[CLIENT] " << m_name << ": connected !"  << Debug::Endl();
 			m_state = State::CONNECTED;
+			break;
+		case PacketType::PING:			
+			SendToServer(_packet);
 			break;
 		default:
 			Debug::Warning() << "[CLIENT] " << m_name << ": strange packet received with id: " << intType << Debug::Endl();

@@ -150,6 +150,8 @@
     <ClCompile Include="code\game\fanSunLight.cpp" />
     <ClCompile Include="code\game\fanWeapon.cpp" />
     <ClCompile Include="code\game\fanWithEnergy.cpp" />
+    <ClCompile Include="code\game\network\fanGameServer.cpp" />
+    <ClCompile Include="code\game\network\fanPlayerNetwork.cpp" />
     <ClCompile Include="code\game\ui\fanSpaceshipUI.cpp" />
     <ClCompile Include="code\network\fanClient.cpp" />
     <ClCompile Include="code\network\fanServer.cpp" />
@@ -290,6 +292,8 @@
     <ClInclude Include="code\game\fanSunLight.h" />
     <ClInclude Include="code\game\fanWeapon.h" />
     <ClInclude Include="code\game\fanWithEnergy.h" />
+    <ClInclude Include="code\game\network\fanGameServer.h" />
+    <ClInclude Include="code\game\network\fanPlayerNetwork.h" />
     <ClInclude Include="code\game\ui\fanSpaceshipUI.h" />
     <ClInclude Include="code\network\fanClient.h" />
     <ClInclude Include="code\network\fanNetworkCommon.h" />
@@ -297,6 +301,8 @@
     <ClInclude Include="code\network\packets\fanIPacket.h" />
     <ClInclude Include="code\network\packets\fanPacketLogin.h" />
     <ClInclude Include="code\network\packets\fanPacketPing.h" />
+    <ClInclude Include="code\network\packets\fanPacketPlayerInput.h" />
+    <ClInclude Include="code\network\packets\fanPacketPlayerPosition.h" />
     <ClInclude Include="code\physics\fanPhysicsManager.h" />
     <ClInclude Include="code\renderer\core\fanBuffer.h" />
     <ClInclude Include="code\renderer\core\fanDevice.h" />

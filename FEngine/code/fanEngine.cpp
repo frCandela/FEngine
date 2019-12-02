@@ -140,7 +140,7 @@ namespace fan {
 		m_profilerWindow	= new ProfilerWindow( );
 		m_gameWindow		= new GameWindow();
 		m_preferencesWindow = new PreferencesWindow( m_renderer );		
-		m_networkWindow		= new NetworkWindow();
+		m_networkWindow		= new NetworkWindow( );
 		m_mainMenuBar		= new MainMenuBar( *m_scene, m_editorGrid );
 
 		m_mainMenuBar->SetWindows( { m_renderWindow , m_sceneWindow , m_inspectorWindow , m_consoleWindow, m_ecsWindow, m_profilerWindow, m_gameWindow, m_networkWindow, m_preferencesWindow } );
@@ -171,6 +171,8 @@ namespace fan {
 		m_scene->onSceneLoad.Connect( &SceneWindow::OnSceneLoad, m_sceneWindow );
 		m_scene->onSceneLoad.Connect( &Engine::OnSceneLoad, this );
 		m_scene->onSceneClear.Connect( &Renderer::Clear, m_renderer );
+		m_scene->onSceneLoad.Connect( &NetworkWindow::OnSceneLoad, m_networkWindow );
+		m_scene->onSceneClear.Connect( &NetworkWindow::OnSceneClear, m_networkWindow );
 		m_scene->onDeleteGameobject.Connect( &Engine::OnGameobjectDeleted, this );
 		m_scene->onRegisterMeshRenderer.Connect	( &Engine::RegisterMeshRenderer, this );
 		m_scene->onUnRegisterMeshRenderer.Connect	( &Engine::UnRegisterMeshRenderer, this );

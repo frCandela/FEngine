@@ -11,8 +11,9 @@ namespace fan
 	public:
 		enum State { NONE, CONNECTING, CONNECTED };
 
-		Client( const std::string& _name, const Port _listenPort );
+		Client( );
 		
+		void Create( const std::string& _name, const Port _listenPort );
 		void Update( const float _delta );
 		bool Bind();
 		void ConnectToServer( const Port _serverPort, const sf::IpAddress _ip );

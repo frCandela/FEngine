@@ -24,6 +24,7 @@ namespace fan
 
 		DECLARE_ABSTRACT_TYPE_INFO( Actor, Component );
 	protected:
+
 		void OnAttach() override;
 		void OnDetach() override;
 		bool Load( const Json & _json ) override;

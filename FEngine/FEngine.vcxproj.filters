@@ -107,6 +107,9 @@
     <Filter Include="code\network\packets">
       <UniqueIdentifier>{c9057cb8-4887-49fe-94f0-b96a77907ee4}</UniqueIdentifier>
     </Filter>
+    <Filter Include="code\game\network">
+      <UniqueIdentifier>{a38505df-1252-4af9-97d4-87d369da994d}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="code\editor\fanMainMenuBar.cpp">
@@ -486,6 +489,12 @@
     </ClCompile>
     <ClCompile Include="code\editor\windows\fanNetworkWindow.cpp">
       <Filter>code\editor\windows</Filter>
+    </ClCompile>
+    <ClCompile Include="code\game\network\fanGameServer.cpp">
+      <Filter>code\game\network</Filter>
+    </ClCompile>
+    <ClCompile Include="code\game\network\fanPlayerNetwork.cpp">
+      <Filter>code\game\network</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -1499,6 +1508,18 @@
     </ClInclude>
     <ClInclude Include="code\network\packets\fanPacketLogin.h">
       <Filter>code\network\packets</Filter>
+    </ClInclude>
+    <ClInclude Include="code\network\packets\fanPacketPlayerInput.h">
+      <Filter>code\network\packets</Filter>
+    </ClInclude>
+    <ClInclude Include="code\network\packets\fanPacketPlayerPosition.h">
+      <Filter>code\network\packets</Filter>
+    </ClInclude>
+    <ClInclude Include="code\game\network\fanPlayerNetwork.h">
+      <Filter>code\game\network</Filter>
+    </ClInclude>
+    <ClInclude Include="code\game\network\fanGameServer.h">
+      <Filter>code\game\network</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

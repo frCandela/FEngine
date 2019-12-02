@@ -5,21 +5,30 @@
 #include "network/fanServer.h"
 
 namespace fan {
+
+	class Scene;
+	class GameServer;
+
 	//================================================================================================================================
 	//================================================================================================================================
 	class NetworkWindow : public EditorWindow {
 	public:
 
-		NetworkWindow();
+		NetworkWindow( );
 
 		void Update( const float _delta );
 
+		void OnSceneLoad( Scene * _scene );
+		void OnSceneClear();
 	protected:
 		void OnGui() override;
 
 	private:
-		Client m_client1;
-		Server m_server;
+		Scene * m_scene = nullptr;
+		GameServer * m_gameServer = nullptr;
+
+
+
 	};
 
 }
