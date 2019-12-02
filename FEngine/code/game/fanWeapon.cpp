@@ -59,7 +59,8 @@ namespace fan
 			m_bulletsAccumulator = 1.f;
 		}
 
-		const float fire = m_input->GetInputFire();
+		m_input->RefreshInput();
+		const float fire = m_input->GetInputData().fire;
 		if ( fire > 0 && m_bulletsAccumulator >= 1.f ) {
 			-- m_bulletsAccumulator;
 			if( m_energy->TryRemoveEnergy( m_bulletEnergyCost ) ) {

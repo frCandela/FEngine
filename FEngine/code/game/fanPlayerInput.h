@@ -4,6 +4,18 @@
 
 namespace fan
 {
+	//================================================================
+	//================================================================
+	struct InputData
+	{
+		btVector3	direction;
+		float		left;
+		float		forward;
+		float		boost;
+		float		fire;
+		bool		stop;
+	};
+
 	//================================================================================================================================
 	//================================================================================================================================
 	class PlayerInput : public Component
@@ -16,13 +28,11 @@ namespace fan
 		void		SetJoystickID( const int _joystickID ){ m_joystickID = _joystickID; }
 		int			GetJoystickID() const { return m_joystickID; }
 		
-		// Generic input
-		btVector3	GetInputDirection();
-		float		GetInputLeft();
-		float		GetInputForward();
-		float		GetInputBoost();
-		float		GetInputFire();
-		bool		GetInputStop();
+		void			 SetInputData( const InputData _inputData ) { m_inputData = _inputData; }
+		const InputData& GetInputData() const { return m_inputData; }
+		void			 RefreshInput();
+		void			 SetReplicated( const bool _isReplicated )  { m_isReplicated = _isReplicated; }
+
 
 		void			OnGui() override;
 		ImGui::IconType GetIcon() const override { return ImGui::IconType::JOYSTICK16; }
@@ -38,13 +48,22 @@ namespace fan
 		void OnDetach() override;
 
 	private:
-		InputType m_inputType = KEYBOARD_MOUSE;
-		int m_joystickID = -1;
-
-		btVector3	m_lastDirection;
+		InputType	m_inputType = KEYBOARD_MOUSE;
+		int			m_joystickID = -1;
 		float		m_directionCutTreshold = 0.25f;
+		bool		m_isReplicated = false;
+
+		InputData	m_inputData;
 
 		std::vector< glm::vec2 > m_directionBuffer;
-		glm::vec2 GetDirectionAverage() ;
+		btVector3	m_direction;
+
+		glm::vec2	GetDirectionAverage() ;
+		btVector3	GetInputDirection();
+		float		GetInputLeft();
+		float		GetInputForward();
+		float		GetInputBoost();
+		float		GetInputFire();
+		bool		GetInputStop();
 	};
 }

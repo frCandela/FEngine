@@ -32,7 +32,11 @@ namespace fan
 	//================================================================================================================================
 	void PlayerNetwork::Start()
 	{
-		m_client.Bind();
+		 while( ! m_client.Bind() )
+		 {
+			 m_client.SetPort( m_client.GetPort() + 1 );
+		 }
+		
 		m_client.ConnectToServer(53000, "127.0.0.1");
 	}
 

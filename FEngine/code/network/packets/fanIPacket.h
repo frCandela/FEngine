@@ -10,6 +10,7 @@ namespace fan
 		, LOGIN
 		, LOGOUT
 		, ACK_LOGIN
+		, PLAYER_INPUT
 		, COUNT
 	};
 

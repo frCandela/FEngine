@@ -20,7 +20,7 @@ namespace fan
 		Component::OnAttach();
 
 		m_directionBuffer.resize(8, glm::vec2(0));
-		m_lastDirection = btVector3(0,0,1.f);
+		m_direction = btVector3(0,0,1.f);
 	}
 
 	//================================================================================================================================
@@ -52,6 +52,21 @@ namespace fan
 		}
 		default:
 			return 0.f;
+		}
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
+	void PlayerInput::RefreshInput() 
+	{
+		if( !m_isReplicated )
+		{
+			m_inputData.direction = GetInputDirection();
+			m_inputData.left = GetInputLeft();
+			m_inputData.forward = GetInputForward();
+			m_inputData.boost = GetInputBoost();
+			m_inputData.fire = GetInputFire();
+			m_inputData.stop = GetInputStop();
 		}
 	}
 
@@ -144,9 +159,9 @@ namespace fan
 
 			btVector3 dir = btVector3( average.x, 0.f, average.y );
 
-			if( dir.length() > m_directionCutTreshold ) { m_lastDirection = dir; }
+			if( dir.length() > m_directionCutTreshold ) { m_direction = dir; }
 
-			return m_lastDirection;
+			return m_direction;
 		}
 		default:
 			return btVector3::Zero();
@@ -180,12 +195,15 @@ namespace fan
 
 		ImGui::PushItemWidth( 0.6f * ImGui::GetWindowWidth() );
 		{
-			// Imput type
+			// Input type
 			int type = m_inputType;
 			if ( ImGui::Combo( "input type", &type, "keyboard+mouse\0joystick\0" ) )
 			{
 				SetInputType( InputType( type ) );
 			}
+			ImGui::Checkbox("replicated", &m_isReplicated );
+
+			ImGui::DragFloat("fire", &m_inputData.fire );
 
 			if ( m_inputType == JOYSTICK )
 			{	
@@ -217,6 +235,7 @@ namespace fan
 			m_directionBuffer.resize(tmp, glm::vec3(0.f));
 		}
 		LoadFloat(_json, "direction_cut_treshold", m_directionCutTreshold );
+		LoadBool( _json, "replicated", m_isReplicated );
 
 		return true;
 	}
@@ -228,6 +247,7 @@ namespace fan
 		Component::Save( _json );
 		SaveInt( _json, "direction_buffer_size", (int)m_directionBuffer.size() );
 		SaveFloat( _json, "direction_cut_treshold", m_directionCutTreshold );
+		SaveBool( _json, "replicated", m_isReplicated );
 		return true;
 	}
 

@@ -19,6 +19,9 @@ namespace fan
 		void ConnectToServer( const Port _serverPort, const sf::IpAddress _ip );
 		void SendToServer( sf::Packet _packet );
 
+		Port GetPort() const { return m_listenPort; }
+		void SetPort( const Port _port ) { m_listenPort = _port; }
+
 	private:
 		std::string		m_name;
 		Port			m_listenPort;

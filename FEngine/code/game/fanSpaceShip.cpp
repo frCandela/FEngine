@@ -57,12 +57,15 @@ namespace fan {
 	{
 		Transform * transform = m_gameobject->GetComponent<Transform>();
 
+		m_input->RefreshInput();
+		const InputData & data = m_input->GetInputData();
+
 		// Lateral movement
-		const btVector3 direction = m_input->GetInputDirection();
-		const bool  stop = m_input->GetInputStop();
-		const float leftForce   = _delta * m_lateralForce * m_input->GetInputLeft();
-		const float forwardAxis = stop ? 0.f : _delta * m_input->GetInputForward();
-		const float boost = m_input->GetInputBoost();	
+		const btVector3 direction = data.direction;
+		const bool  stop = data.stop;
+		const float leftForce   = _delta * m_lateralForce * data.left;
+		const float forwardAxis = stop ? 0.f : _delta *data.forward;
+		const float boost = data.boost;	
 
 		// Orientation
 		if( ! direction.isZero() ) 
@@ -123,7 +126,7 @@ namespace fan {
 
 		if ( ecsBullet * bullet = _rb->GetGameobject()->GetEcsComponent<ecsBullet>() )
 		{
-			Debug::Log("bullet");
+			//Debug::Log("bullet");
 			damage = bullet->damage;
 		}
 		else if ( _rb->GetGameobject()->GetComponent<Planet>() )
@@ -134,21 +137,22 @@ namespace fan {
 				m_rigidbody->ApplyCentralForce( m_collisionRepulsionForce * dir.normalized() );
 			}
 			
-			Debug::Log("planet");
+			//Debug::Log("planet");
 			damage = m_planetDamage;
 		}
 		else if ( _rb->GetGameobject()->GetComponent<SolarSystem>() )
 		{
-			Debug::Log( "sun" );
+			//Debug::Log( "sun" );
 			damage =  m_health->GetHealth() + 1.f;
 		}
 		else
 		{
-			Debug::Log("other");
+			//Debug::Log( "other" );
 		}		
 
 		// Death
 		if ( m_health->GetHealth() > 0 && ! m_health->TryRemoveHealth( damage ) )
+
 		{
 			m_health->TryRemoveHealth( m_health->GetHealth() );
 		}
