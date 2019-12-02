@@ -78,6 +78,18 @@ namespace fan
 		void					InsertID( const uint64_t _id, Gameobject * _gameobject );
 		void					EraseID( const uint64_t _id ) { m_gameobjects.erase( _id ); }
 
+		const std::vector < DirectionalLight* >	& GetDirectionalLights(){ return m_directionalLights ;}
+		const std::vector < PointLight* >		& GetPointLights()		{ return m_pointLights ;}
+		const std::vector < MeshRenderer* >		& GetMeshRenderers()	{ return m_meshRenderers ;}
+
+		void OnActorAttach( Actor * _actor );
+		void OnActorDetach( Actor * _actor );
+		void RegisterDirectionalLight	( DirectionalLight * _pointLight );
+		void UnRegisterDirectionalLight	( DirectionalLight * _pointLight );
+		void RegisterPointLight			( PointLight *		 _pointLight );
+		void UnRegisterPointLight		( PointLight *		 _pointLight );
+		void RegisterMeshRenderer		( MeshRenderer *	 _meshRenderer );
+		void UnRegisterMeshRenderer		( MeshRenderer *	 _meshRenderer );
 	private:
 		// Data
 		std::string	m_name;
@@ -104,10 +116,13 @@ namespace fan
 		std::set< Actor * >					m_activeActors;
 		std::map< uint64_t, Gameobject * >	m_gameobjects;
 
+		// registered elements
+		std::vector < DirectionalLight* >	m_directionalLights;
+		std::vector < PointLight* >			m_pointLights;
+		std::vector < MeshRenderer* >		m_meshRenderers;
+
 		void UpdateActors(const float _delta);
 
-		void OnActorAttach(Actor * _actor);
-		void OnActorDetach(Actor * _actor);
 		void OnGameobjectPtrCreate( GameobjectPtr * _gameobjectPtr );
 		void ResolveGameobjectPointers( );
 		void OnResolveComponentIDPtr( ComponentIDPtr * _ptr );

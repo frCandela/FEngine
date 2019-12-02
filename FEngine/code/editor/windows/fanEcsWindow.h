@@ -9,9 +9,13 @@ namespace fan {
 	//================================================================================================================================
 	class EcsWindow : public EditorWindow {
 	public:
-		EcsWindow( EcsManager * _ecsManager );
+		EcsWindow();
+
+		void SetEcsManager( EcsManager * _ecsManager )  { m_ecsManager = _ecsManager; }
+
 	protected:
 		void OnGui() override;
+
 
 	private:
 		EcsManager * m_ecsManager = nullptr;

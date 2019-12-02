@@ -15,19 +15,14 @@ namespace fan {
 	public:
 
 		NetworkWindow( );
+		void SetScene( Scene * _scene ) { m_scene = _scene ;}
 
 		void Update( const float _delta );
-
-		void OnSceneLoad( Scene * _scene );
-		void OnSceneClear();
 	protected:
 		void OnGui() override;
 
 	private:
-		Scene * m_scene = nullptr;
-		GameServer * m_gameServer = nullptr;
-
-
+		Scene * m_scene = nullptr;		
 
 	};
 

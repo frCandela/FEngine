@@ -17,15 +17,9 @@ namespace fan
 {
 	//================================================================================================================================
 	//================================================================================================================================
-	PreferencesWindow::PreferencesWindow( Renderer * _renderer ) :
+	PreferencesWindow::PreferencesWindow( ) :
 		EditorWindow("preferences", ImGui::IconType::PREFERENCES16 )
-		, m_renderer( _renderer ) 
 	{
-		Color clearColor;
-		if( SerializedValues::Get().GetColor( "clear_color", clearColor ) ) {
-			m_renderer->SetClearColor( clearColor.ToGLM() );
-		}
-
 		ImGuiStyle& style = ImGui::GetStyle();
 		for ( int i = 0; i < ImGuiCol_COUNT; i++ ) {
 			std::string name = "imgui_" + std::string( ImGui::GetStyleColorName( i ) );

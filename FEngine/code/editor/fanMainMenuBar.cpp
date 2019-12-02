@@ -20,10 +20,8 @@ namespace fan
 {
 	//================================================================================================================================
 	//================================================================================================================================
-	MainMenuBar::MainMenuBar( Scene & _scene, EditorGrid & _editorGrid ) :
-		m_scene( _scene )
-		,m_editorGrid( _editorGrid )
-		,m_showImguiDemoWindow(true)
+	MainMenuBar::MainMenuBar() :
+		m_showImguiDemoWindow(true)
 		, m_showAABB(false)
 		, m_showHull(false)
 		, m_showWireframe(false)
@@ -31,11 +29,6 @@ namespace fan
 		, m_sceneExtensionFilter(GlobalValues::s_sceneExtensions) {
 
 		SerializedValues::Get().GetBool( "show_imguidemo", m_showImguiDemoWindow );
-		SerializedValues::Get().GetBool( "editor_grid_show", m_editorGrid.isVisible );
-		SerializedValues::Get().GetFloat( "editor_grid_spacing", m_editorGrid.spacing );
-		SerializedValues::Get().GetInt( "editor_grid_linesCount", m_editorGrid.linesCount );
-		SerializedValues::Get().GetColor( "editor_grid_color", m_editorGrid.color );
-		SerializedValues::Get().GetVec3( "editor_grid_offset", m_editorGrid.offset );
 
 		Input::Get().Manager().FindEvent( "open_scene")->Connect( &MainMenuBar::Open, this );
 		Input::Get().Manager().FindEvent( "save_scene" )->Connect( &MainMenuBar::Save, this );
@@ -47,11 +40,11 @@ namespace fan
 	//================================================================================================================================
 	MainMenuBar::~MainMenuBar() {
 		SerializedValues::Get().SetBool( "show_imguidemo",			m_showImguiDemoWindow );
-		SerializedValues::Get().SetBool( "editor_grid_show",		m_editorGrid.isVisible );
-		SerializedValues::Get().SetFloat( "editor_grid_spacing",	m_editorGrid.spacing );
-		SerializedValues::Get().SetInt( "editor_grid_linesCount",	m_editorGrid.linesCount );
-		SerializedValues::Get().SetColor( "editor_grid_color",		m_editorGrid.color );
-		SerializedValues::Get().SetVec3( "editor_grid_offset",		m_editorGrid.offset );
+		SerializedValues::Get().SetBool( "editor_grid_show", m_editorGrid->isVisible );
+		SerializedValues::Get().SetFloat( "editor_grid_spacing", m_editorGrid->spacing );
+		SerializedValues::Get().SetInt( "editor_grid_linesCount", m_editorGrid->linesCount );
+		SerializedValues::Get().SetColor( "editor_grid_color", m_editorGrid->color );
+		SerializedValues::Get().SetVec3( "editor_grid_offset", m_editorGrid->offset );
 
 		for (int windowIndex = 0; windowIndex < m_editorWindows.size() ; windowIndex++) {
 			delete m_editorWindows[windowIndex];
@@ -188,15 +181,36 @@ namespace fan
 			// Grid
 			if ( ImGui::BeginMenu( "Grid" ) )  {
 				ImGui::PushItemWidth( 150.f ); 
-				ImGui::MenuItem( "visible", nullptr, &m_editorGrid.isVisible );
-				ImGui::DragFloat( "spacing", &m_editorGrid.spacing, 0.25f, 0.f, 100.f );
-				ImGui::DragInt( "lines count", &m_editorGrid.linesCount, 1.f, 0, 1000 );
-				ImGui::ColorEdit3( "color", &m_editorGrid.color[0], ImGui::fanColorEditFlags );
-				ImGui::DragFloat3( "offset", &m_editorGrid.offset[0]);
+				ImGui::MenuItem( "visible", nullptr,	&m_editorGrid->isVisible );
+				ImGui::DragFloat( "spacing",			&m_editorGrid->spacing, 0.25f, 0.f, 100.f );
+				ImGui::DragInt( "lines count",			&m_editorGrid->linesCount, 1.f, 0, 1000 );
+				ImGui::ColorEdit3( "color",				&m_editorGrid->color[0], ImGui::fanColorEditFlags );
+				ImGui::DragFloat3( "offset",			&m_editorGrid->offset[0]);
 				ImGui::PopItemWidth();
 
 				ImGui::EndMenu();
 			}
+
+			// scene selection combo
+			if ( ImGui::BeginMenu( "Scene" ) )  {
+				
+				bool clientScene = (m_currentScene == CurrentScene::CLIENTS);
+				if ( ImGui::MenuItem( "client", nullptr, &clientScene ) && clientScene )
+				{
+					m_currentScene = CurrentScene::CLIENTS;
+					onSetScene.Emmit( m_currentScene );
+				}
+
+				bool serverScene = (m_currentScene == CurrentScene::SERVER);
+				if ( ImGui::MenuItem( "server", nullptr, &serverScene ) && serverScene )
+				{
+					m_currentScene = CurrentScene::SERVER;
+					onSetScene.Emmit( m_currentScene );
+				}
+
+				ImGui::EndMenu();
+			}
+
 
 			// Framerate
 			ImGui::SameLine(ImGui::GetWindowWidth() - 60);
@@ -256,19 +270,19 @@ namespace fan
 	void MainMenuBar::DrawModals() {
 		// New scene
 		if (ImGui::FanSaveFileModal("New scene", GlobalValues::s_sceneExtensions, m_pathBuffer)) {
-			m_scene.New();
-			m_scene.SetPath(m_pathBuffer.string());
+			m_scene->New();
+			m_scene->SetPath( m_pathBuffer.string() );
 		}
 
 		// Open scene
 		if (ImGui::FanLoadFileModal("Open scene", m_sceneExtensionFilter, m_pathBuffer)) {
-			m_scene.LoadFrom(m_pathBuffer.string());
+			m_scene->LoadFrom(m_pathBuffer.string());
 		}
 
 		// Save scene
 		if (ImGui::FanSaveFileModal("Save scene", GlobalValues::s_sceneExtensions, m_pathBuffer )) {
-			m_scene.SetPath(m_pathBuffer.string());
-			m_scene.Save();
+			m_scene->SetPath( m_pathBuffer.string() );
+			m_scene->Save();
 		}
 	}
 
@@ -293,20 +307,20 @@ namespace fan
 
 		// Save camera data
 		Json cameraData;
-		m_scene.GetMainCamera()->GetGameobject()->Save(cameraData);
+		m_scene->GetMainCamera()->GetGameobject()->Save(cameraData);
 
 		// save old selection
 		Gameobject* prevSelection = Globals::Get().engine->GetSelectedGameobject();
 		const uint64_t id = prevSelection != nullptr ? prevSelection->GetUniqueID() : 0; 
 
-		m_scene.LoadFrom( m_scene.GetPath() );
+		m_scene->LoadFrom( m_scene->GetPath() );
 
 		// restore camera
-		m_scene.GetMainCamera()->GetGameobject()->CopyDataFrom( cameraData );
+		m_scene->GetMainCamera()->GetGameobject()->CopyDataFrom( cameraData );
 
 		// restore selection
 		if( id != 0 ) {
-			Gameobject* selection = m_scene.FindGameobject( id );
+			Gameobject* selection = m_scene->FindGameobject( id );
 			Globals::Get().engine->SetSelectedGameobject( selection );
 		}
 	}
@@ -314,8 +328,8 @@ namespace fan
 	//================================================================================================================================
 	//================================================================================================================================
 	void MainMenuBar::Save() {		
-		if ( m_scene.HasPath() ) {
-			m_scene.Save();
+		if ( m_scene->HasPath() ) {
+			m_scene->Save();
 		}
 		else {
 			SaveAs();

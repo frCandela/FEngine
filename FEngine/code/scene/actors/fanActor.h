@@ -10,9 +10,6 @@ namespace fan
 	class Actor : public Component
 	{
 	public:
-		static Signal< Actor * > onActorAttach;
-		static Signal< Actor * > onActorDetach;
-
 		virtual void Start() = 0;
 		virtual void Update(const float _delta) = 0;
 		virtual void LateUpdate( const float _delta ) = 0;

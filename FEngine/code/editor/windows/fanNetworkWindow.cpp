@@ -3,6 +3,7 @@
 
 #include "scene/fanScene.h"
 #include "game/network/fanGameServer.h"
+#include "scene/fanGameobject.h"
 
 namespace fan {
 
@@ -11,32 +12,17 @@ namespace fan {
 	NetworkWindow::NetworkWindow() 
 		: EditorWindow("network", ImGui::IconType::JOYSTICK16 )
 	{
-
-	}
-
-	//================================================================================================================================
-	//================================================================================================================================
-	void NetworkWindow::OnSceneLoad( Scene * _scene )
-	{
-		m_scene = _scene;
-		m_gameServer = _scene->FindComponentOfType<GameServer>();
-	}
-
-	//================================================================================================================================
-	//================================================================================================================================
-	void NetworkWindow::OnSceneClear()
-	{
-		m_scene = nullptr;
-		m_gameServer = nullptr;
+		
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
 	void NetworkWindow::OnGui() 
 	{
-		if ( m_gameServer != nullptr )
+		GameServer * gameServer = m_scene->FindComponentOfType<GameServer>();
+		if ( gameServer != nullptr )
 		{
-			const Server& server = m_gameServer->GetServer();
+			const Server& server = gameServer->GetServer();
 
 			ImGui::Separator();
 			const std::vector<Server::ClientData >& clientsList = server.GetClients();

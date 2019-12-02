@@ -19,6 +19,9 @@ namespace fan
 		};
 
 	public:
+		enum CurrentScene{ CLIENTS, SERVER };
+		Signal< int > onSetScene;
+
 		Signal< std::string > onSaveScene;
 		Signal< std::string > onNewScene;
 		Signal< std::string > onOpenScene;
@@ -26,9 +29,12 @@ namespace fan
 		Signal<> onReloadIcons;
 		Signal<> onExit;
 
-
-		MainMenuBar( Scene & _scene, EditorGrid & _editorGrid );
+		MainMenuBar( );
 		~MainMenuBar();
+
+		void SetScene( Scene * _scene  )			{ m_scene		= _scene;  }
+		void SetGrid(  EditorGrid * _editorGrid  )	{ m_editorGrid	= _editorGrid; }
+
 		void SetWindows( std::vector< EditorWindow * > _editorWindows );
 
 		void Draw();
@@ -39,10 +45,12 @@ namespace fan
 		bool ShowNormals() const { return m_showNormals; }
 	
 	private:
-		Scene & m_scene;
-		EditorGrid & m_editorGrid;
+		Scene * m_scene;
+		EditorGrid * m_editorGrid;
 
 		std::vector< EditorWindow * > m_editorWindows;
+
+		CurrentScene m_currentScene = CurrentScene::CLIENTS;
 
 		bool m_showImguiDemoWindow;
 		bool m_showHull;

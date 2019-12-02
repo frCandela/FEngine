@@ -17,9 +17,8 @@ namespace fan
 {
 	//================================================================================================================================
 	//================================================================================================================================
-	RenderWindow::RenderWindow( Renderer * _renderer ) :
+	RenderWindow::RenderWindow() :
 		EditorWindow("renderer", ImGui::IconType::RENDERER16 )
-		, m_renderer( _renderer )
 	{
 	}
 

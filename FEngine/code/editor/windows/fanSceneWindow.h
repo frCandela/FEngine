@@ -12,12 +12,14 @@ namespace fan {
 	public:
 		Signal< Gameobject* > onSelectGameobject;
 
-		SceneWindow( Scene * _scene );
+		SceneWindow( );
 		~SceneWindow();
+
+		void SetScene( Scene * _scene ) { m_scene = _scene; }
 
 		// Callbacks
 		void OnGameobjectSelected( Gameobject* _gameobject ) { m_gameobjectSelected = _gameobject; }
-		void OnSceneLoad( Scene * /*_scene*/ ) { m_expandSceneHierarchy = true; }
+		void OnExpandHierarchy( Scene * /*_scene*/ ) { m_expandSceneHierarchy = true; }
 
 	protected:
 		void OnGui() override;

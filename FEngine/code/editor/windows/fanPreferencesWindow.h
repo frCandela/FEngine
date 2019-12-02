@@ -11,8 +11,10 @@ namespace fan
 	//================================================================================================================================
 	class PreferencesWindow : public EditorWindow {
 	public:
-		PreferencesWindow( Renderer * _renderer );
+		PreferencesWindow();
 		~PreferencesWindow();
+
+		void SetRenderer( Renderer * _renderer ) { m_renderer = _renderer; }
 	protected:
 		void OnGui() override;
 

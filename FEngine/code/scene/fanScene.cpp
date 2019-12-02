@@ -6,6 +6,8 @@
 #include "scene/components/fanTransform.h"
 #include "scene/components/fanCamera.h"
 #include "scene/components/fanMeshRenderer.h"
+#include "scene/components/fanPointLight.h"
+#include "scene/components/fanDirectionalLight.h"
 #include "scene/actors/fanActor.h"
 #include "scene/fanRessourcePtr.h"
 #include "core/fanSignal.h"
@@ -27,9 +29,6 @@ namespace fan
 		, m_physicsManager( new PhysicsManager( btVector3::Zero() ) )
 		, m_instantiate( new SceneInstantiate(*this))
 	{
-
-		Actor::onActorAttach.Connect(&Scene::OnActorAttach, this);
-		Actor::onActorDetach.Connect(&Scene::OnActorDetach, this);
 	}
 
 	//================================================================================================================================
@@ -471,6 +470,135 @@ namespace fan
 			Debug::Get() << Debug::Severity::error << "failed to open file " << _path << Debug::Endl();
 			New();
 			return false;
+		}
+	}
+
+	//================================================================================================================================
+//================================================================================================================================
+	void Scene::RegisterDirectionalLight( DirectionalLight * _directionalLight )
+	{
+
+		// Looks for the _directionalLight
+		for ( int lightIndex = 0; lightIndex < m_directionalLights.size(); lightIndex++ )
+		{
+			if ( m_directionalLights[lightIndex] == _directionalLight )
+			{
+				Debug::Get() << Debug::Severity::warning << "Directional Light already registered in gameobject : " << _directionalLight->GetGameobject()->GetName() << Debug::Endl();
+				return;
+			}
+		}
+
+		// Check num lights
+		if ( m_directionalLights.size() >= GlobalValues::s_maximumNumDirectionalLight )
+		{
+			Debug::Get() << Debug::Severity::warning << "Too much lights in the scene, maximum is " << GlobalValues::s_maximumNumDirectionalLight << Debug::Endl();
+		}
+		else
+		{
+			m_directionalLights.push_back( _directionalLight );
+		}
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
+	void Scene::UnRegisterDirectionalLight	( DirectionalLight *	_directionalLight )
+	{
+
+		const size_t num = m_directionalLights.size();
+
+		// Removes the light
+		for ( int lightIndex = 0; lightIndex < m_directionalLights.size(); lightIndex++ )
+		{
+			if ( m_directionalLights[lightIndex] == _directionalLight )
+			{
+				m_directionalLights.erase( m_directionalLights.begin() + lightIndex );
+			}
+		}
+
+		// Light not removed
+		if ( m_directionalLights.size() == num )
+		{
+			Debug::Get() << Debug::Severity::warning << "Trying to remove a non registered directional light! gameobject=" << _directionalLight->GetGameobject()->GetName() << Debug::Endl();
+			return;
+		}
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
+	void Scene::RegisterPointLight	( PointLight * _pointLight )
+	{
+
+		// Looks for the _pointLight
+		for ( int lightIndex = 0; lightIndex < m_pointLights.size(); lightIndex++ )
+		{
+			if ( m_pointLights[lightIndex] == _pointLight )
+			{
+				Debug::Get() << Debug::Severity::warning << "PointLight already registered in gameobject : " << _pointLight->GetGameobject()->GetName() << Debug::Endl();
+				return;
+			}
+		}
+
+		// Check num lights
+		if ( m_pointLights.size() >= GlobalValues::s_maximumNumPointLights )
+		{
+			Debug::Get() << Debug::Severity::warning << "Too much lights in the scene, maximum is " << GlobalValues::s_maximumNumPointLights << Debug::Endl();
+		}
+		else
+		{
+			m_pointLights.push_back( _pointLight );
+		}
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
+	void Scene::UnRegisterPointLight	( PointLight *	_pointLight )
+	{
+
+		const size_t num = m_pointLights.size();
+
+		// Removes the light
+		for ( int lightIndex = 0; lightIndex < m_pointLights.size(); lightIndex++ )
+		{
+			if ( m_pointLights[lightIndex] == _pointLight )
+			{
+				m_pointLights.erase( m_pointLights.begin() + lightIndex );
+			}
+		}
+
+		// Light not removed
+		if ( m_pointLights.size() == num )
+		{
+			Debug::Get() << Debug::Severity::warning << "Trying to remove a non registered point light! gameobject=" << _pointLight->GetGameobject()->GetName() << Debug::Endl();
+			return;
+		}
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
+	void Scene::RegisterMeshRenderer( MeshRenderer * _meshRenderer )
+	{
+		// Looks for the model
+		for ( int modelIndex = 0; modelIndex < m_meshRenderers.size(); modelIndex++ )
+		{
+			if ( m_meshRenderers[modelIndex] == _meshRenderer )
+			{
+				Debug::Get() << Debug::Severity::warning << "MeshRenderer already registered : " << _meshRenderer->GetGameobject()->GetName() << Debug::Endl();
+				return;
+			}
+		}
+		m_meshRenderers.push_back( _meshRenderer );
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
+	void Scene::UnRegisterMeshRenderer( MeshRenderer * _meshRenderer )
+	{
+		for ( int modelIndex = 0; modelIndex < m_meshRenderers.size(); modelIndex++ )
+		{
+			if ( m_meshRenderers[modelIndex] == _meshRenderer )
+			{
+				m_meshRenderers.erase( m_meshRenderers.begin() + modelIndex );
+			}
 		}
 	}
 }

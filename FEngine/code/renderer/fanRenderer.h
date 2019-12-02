@@ -91,7 +91,6 @@ namespace fan
 		void SetUIDrawData( const std::vector<DrawUIMesh> & _drawData );
 
 		float	GetWindowAspectRatio() const;
-		void	Clear() { m_meshDrawArray.clear(); }
 
 		const std::vector< DrawData > & GetMeshArray() const { return m_meshDrawArray; }
 	private:

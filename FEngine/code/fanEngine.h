@@ -53,13 +53,6 @@ namespace fan {
 
 		void SetSelectedGameobject( Gameobject * _selectedGgameobject);
 		void Deselect();
-
-		void RegisterDirectionalLight	( DirectionalLight * _pointLight );
-		void UnRegisterDirectionalLight	( DirectionalLight * _pointLight );
-		void RegisterPointLight			( PointLight *		 _pointLight );
-		void UnRegisterPointLight		( PointLight *		 _pointLight );
-		void RegisterMeshRenderer		( MeshRenderer *	 _meshRenderer );
-		void UnRegisterMeshRenderer		( MeshRenderer *	 _meshRenderer );
 		
 		Gameobject *	const	GetSelectedGameobject() const	{ return m_selectedGameobject;  }
 		Renderer &				GetRenderer() const				{ return * m_renderer; }
@@ -69,11 +62,13 @@ namespace fan {
 		InspectorWindow  &		GetInspectorWindow() const		{ return * m_inspectorWindow; }
 		PreferencesWindow  &	GetPreferencesWindow() const	{ return * m_preferencesWindow; }
 		ConsoleWindow  &		GetConsoleWindow() const		{ return * m_consoleWindow; }
-		Scene &					GetScene() const				{ return * m_scene; }
+		Scene &					GetScene() const				{ return * m_currentScene; }
+		Scene &					GetServerScene() const			{ return * m_serverScene; }
 
 		EditorGrid GetEditorGrid() const { return m_editorGrid;  }
 		void SetEditorGrid( const EditorGrid _editorGrid) { m_editorGrid =_editorGrid; }
 		bool DrawMoveGizmo(const btTransform _transform, const size_t _uniqueID, btVector3& _newPosition);
+		void SetCurrentScene( Scene * _scene );
 
 	private:
 
@@ -94,13 +89,13 @@ namespace fan {
 		// Main objects
 		EditorCopyPaste *	m_copyPaste;
 		Renderer *			m_renderer;
-		Scene *				m_scene;
+
+		Scene * 			m_currentScene;
+		Scene *				m_clientScene;
+		Scene *				m_serverScene;
+
 		Gameobject *		m_selectedGameobject;
 		FPSCamera *			m_editorCameraController = nullptr;
-
-		std::vector < DirectionalLight* >	m_directionalLights;
-		std::vector < PointLight* >			m_pointLights;
-		std::vector < MeshRenderer* >		m_meshRenderers;
 
 		struct GizmoCacheData {
 			int axisIndex;
@@ -122,8 +117,8 @@ namespace fan {
 		void OnResolveMeshPtr( MeshPtr * _ptr );
 		void OnResolvePrefabPtr( PrefabPtr * _ptr );
 		void OnToogleShowUI() { m_showUI = ! m_showUI; }
-
 		void OnGameobjectDeleted( Gameobject * _gameobject );
+		void OnSetCurrentScene( int _scene );
 
 		void DrawEditorGrid() const;
 		void DrawWireframe() const;

@@ -79,6 +79,12 @@ namespace fan {
 		SerializedValues::Get().GetInt("renderer_position_x", windowPosition.x);
 		SerializedValues::Get().GetInt("renderer_position_y", windowPosition.y);
 
+		SerializedValues::Get().GetBool( "editor_grid_show", m_editorGrid.isVisible );
+		SerializedValues::Get().GetFloat( "editor_grid_spacing", m_editorGrid.spacing );
+		SerializedValues::Get().GetInt( "editor_grid_linesCount", m_editorGrid.linesCount );
+		SerializedValues::Get().GetColor( "editor_grid_color", m_editorGrid.color );
+		SerializedValues::Get().GetVec3( "editor_grid_offset", m_editorGrid.offset );
+
 		SerializedValues::Get().LoadKeyBindings();
 
 		// Creates keyboard events
@@ -113,35 +119,39 @@ namespace fan {
 		Input::Get().Manager().CreateJoystickAxis(		"gamejs_axis_left"			, 0, Joystick::RIGHT_Y );
 		Input::Get().Manager().CreateJoystickAxis(		"gamejs_axis_boost"			, 0, Joystick::RIGHT_Y );
 		Input::Get().Manager().CreateJoystickAxis(		"gamejs_axis_fire"			, 0, Joystick::RIGHT_TRIGGER );
-		Input::Get().Manager().CreateJoystickButtons(	"gamejs_axis_stop"			, 0, Joystick::A );
-
-		// Set some values
-		m_editorGrid.isVisible = true;
-		m_editorGrid.color = Color(0.161f, 0.290f, 0.8f, 0.478f);
-		m_editorGrid.linesCount = 10;
-		m_editorGrid.spacing = 1.f;		
-		m_editorGrid.offset = btVector3::Zero();		
+		Input::Get().Manager().CreateJoystickButtons(	"gamejs_axis_stop"			, 0, Joystick::A );	
 
 		// renderer
 		m_renderer	= new Renderer( windowSize, windowPosition );
+		Color clearColor;
+		if ( SerializedValues::Get().GetColor( "clear_color", clearColor ) )
+		{
+			m_renderer->SetClearColor( clearColor.ToGLM() );
+		}
 
 		// Scene
-		m_scene = new Scene( "mainScene" );
+		m_clientScene = new Scene( "mainScene" );
+		m_serverScene = new Scene( "serverScene" );
 
 		Debug::Get().SetDebug( & m_renderer->GetRendererDebug() );
 
 		// Initialize editor components
 		m_copyPaste			= new EditorCopyPaste(*this);
-		m_renderWindow		= new RenderWindow( m_renderer );
-		m_sceneWindow		= new SceneWindow( m_scene );
+		m_renderWindow		= new RenderWindow();
+		m_sceneWindow		= new SceneWindow();
 		m_inspectorWindow	= new InspectorWindow();		
 		m_consoleWindow		= new ConsoleWindow();
-		m_ecsWindow			= new EcsWindow( m_scene->GetEcsManager() );
+		m_ecsWindow			= new EcsWindow();
 		m_profilerWindow	= new ProfilerWindow( );
 		m_gameWindow		= new GameWindow();
-		m_preferencesWindow = new PreferencesWindow( m_renderer );		
+		m_preferencesWindow = new PreferencesWindow();		
 		m_networkWindow		= new NetworkWindow( );
-		m_mainMenuBar		= new MainMenuBar( *m_scene, m_editorGrid );
+		m_mainMenuBar		= new MainMenuBar();
+
+		m_renderWindow->SetRenderer( m_renderer );
+		m_preferencesWindow->SetRenderer( m_renderer );
+		m_mainMenuBar->SetGrid( &m_editorGrid );
+		SetCurrentScene( m_clientScene );
 
 		m_mainMenuBar->SetWindows( { m_renderWindow , m_sceneWindow , m_inspectorWindow , m_consoleWindow, m_ecsWindow, m_profilerWindow, m_gameWindow, m_networkWindow, m_preferencesWindow } );
 		m_sceneWindow->onSelectGameobject.Connect( &Engine::SetSelectedGameobject, this );
@@ -152,6 +162,7 @@ namespace fan {
 		m_mainMenuBar->onReloadShaders.		Connect(&Renderer::ReloadShaders, m_renderer );
 		m_mainMenuBar->onReloadIcons.		Connect(&Renderer::ReloadIcons, m_renderer );
 		m_mainMenuBar->onExit.				Connect( &Engine::Exit, this );
+		m_mainMenuBar->onSetScene.			Connect(&Engine::OnSetCurrentScene, this );
 		onGameobjectSelected.				Connect( &SceneWindow::OnGameobjectSelected, m_sceneWindow );
 		onGameobjectSelected.				Connect( &InspectorWindow::OnGameobjectSelected, m_inspectorWindow );
 
@@ -168,19 +179,26 @@ namespace fan {
 		MeshPtr::s_onCreateUnresolved.				Connect	( &Engine::OnResolveMeshPtr, this );
 		PrefabPtr::s_onCreateUnresolved.			Connect ( &Engine::OnResolvePrefabPtr, this );
 
-		m_scene->onSceneLoad.Connect( &SceneWindow::OnSceneLoad, m_sceneWindow );
-		m_scene->onSceneLoad.Connect( &Engine::OnSceneLoad, this );
-		m_scene->onSceneClear.Connect( &Renderer::Clear, m_renderer );
-		m_scene->onSceneLoad.Connect( &NetworkWindow::OnSceneLoad, m_networkWindow );
-		m_scene->onSceneClear.Connect( &NetworkWindow::OnSceneClear, m_networkWindow );
-		m_scene->onDeleteGameobject.Connect( &Engine::OnGameobjectDeleted, this );
-		m_scene->onRegisterMeshRenderer.Connect	( &Engine::RegisterMeshRenderer, this );
-		m_scene->onUnRegisterMeshRenderer.Connect	( &Engine::UnRegisterMeshRenderer, this );
-		m_scene->onPointLightAttach.Connect	( &Engine::RegisterPointLight, this );
-		m_scene->onPointLightDetach.Connect	( &Engine::UnRegisterPointLight, this );
-		m_scene->onDirectionalLightAttach.Connect	( &Engine::RegisterDirectionalLight, this );
-		m_scene->onDirectionalLightDetach.Connect	( &Engine::UnRegisterDirectionalLight, this );
-		m_scene->New();
+		m_clientScene->onSceneLoad.Connect( &SceneWindow::OnExpandHierarchy, m_sceneWindow );
+		m_clientScene->onSceneLoad.Connect( &Engine::OnSceneLoad, this );
+		m_clientScene->onDeleteGameobject.Connect( &Engine::OnGameobjectDeleted, this );
+		m_clientScene->onRegisterMeshRenderer.Connect	( &Scene::RegisterMeshRenderer, m_clientScene );
+		m_clientScene->onUnRegisterMeshRenderer.Connect	( &Scene::UnRegisterMeshRenderer, m_clientScene );
+		m_clientScene->onPointLightAttach.Connect		( &Scene::RegisterPointLight, m_clientScene );
+		m_clientScene->onPointLightDetach.Connect		( &Scene::UnRegisterPointLight, m_clientScene );
+		m_clientScene->onDirectionalLightAttach.Connect	( &Scene::RegisterDirectionalLight, m_clientScene );
+		m_clientScene->onDirectionalLightDetach.Connect	( &Scene::UnRegisterDirectionalLight, m_clientScene );
+		m_clientScene->New();
+
+		m_serverScene->onSceneLoad.Connect( &SceneWindow::OnExpandHierarchy, m_sceneWindow );
+		m_serverScene->onSceneLoad.Connect( &Engine::OnSceneLoad, this );
+		m_serverScene->onRegisterMeshRenderer.Connect	( &Scene::RegisterMeshRenderer, m_clientScene );
+		m_serverScene->onUnRegisterMeshRenderer.Connect	( &Scene::UnRegisterMeshRenderer, m_clientScene );
+		m_serverScene->onPointLightAttach.Connect		( &Scene::RegisterPointLight, m_clientScene );
+		m_serverScene->onPointLightDetach.Connect		( &Scene::UnRegisterPointLight, m_clientScene );
+		m_serverScene->onDirectionalLightAttach.Connect	( &Scene::RegisterDirectionalLight, m_clientScene );
+		m_serverScene->onDirectionalLightDetach.Connect	( &Scene::UnRegisterDirectionalLight, m_clientScene );
+		m_serverScene->New();
 	}
 
 	//================================================================================================================================
@@ -188,7 +206,8 @@ namespace fan {
 	Engine::~Engine() {
 		// Deletes ui
 		delete m_mainMenuBar;
-		delete m_scene;
+		delete m_clientScene;
+		delete m_serverScene;
 
 
 		// Serialize editor positions
@@ -237,9 +256,9 @@ namespace fan {
 					m_renderer->GetRendererDebug().ClearDebug();
 				}
 
-				m_scene->BeginFrame();
-				m_scene->Update( targetLogicDelta );		
-				m_scene->EndFrame();			
+				m_currentScene->BeginFrame();
+				m_currentScene->Update( targetLogicDelta );		
+				m_currentScene->EndFrame();			
 
 				if ( m_showUI )				
 				{
@@ -259,9 +278,7 @@ namespace fan {
 					if ( m_mainMenuBar->ShowNormals() ) { DrawNormals(); }
 					if ( m_mainMenuBar->ShowAABB() ) { DrawAABB(); }
 					if ( m_mainMenuBar->ShowHull() ) { DrawHull(); }
-				}				
-			
-				
+				}			
 
 				{
 					SCOPED_PROFILE( imgui_render )
@@ -287,6 +304,18 @@ namespace fan {
 	}
 	
 	//================================================================================================================================
+	//================================================================================================================================
+	void Engine::SetCurrentScene( Scene * _scene )
+	{
+		assert( _scene != nullptr );
+		m_currentScene = _scene;
+		m_sceneWindow->SetScene( m_currentScene );
+		m_mainMenuBar->SetScene( m_currentScene );
+		m_ecsWindow->SetEcsManager( m_currentScene->GetEcsManager() );
+		m_networkWindow->SetScene(m_currentScene);
+	}
+
+	//================================================================================================================================
 	// Todo save camera position depending on the scene
 	//================================================================================================================================
 	void Engine::OnSceneLoad(Scene * _scene) {
@@ -303,7 +332,7 @@ namespace fan {
 		FPSCamera * editorCamController = cameraGameobject->AddComponent<FPSCamera>();
 		editorCamController->SetRemovable(false);		
 
-		m_scene->SetMainCamera( editorCamera );
+		_scene->SetMainCamera( editorCamera );
 
 		Debug::Get().SetDebug( &m_renderer->GetRendererDebug() );
 	}
@@ -325,10 +354,10 @@ namespace fan {
 	//================================================================================================================================
 	//================================================================================================================================
 	void Engine::DrawAABB() const {
-		const std::vector< Gameobject *>  & entities = m_scene->BuildEntitiesList();
+		const std::vector< Gameobject *>  & entities = m_currentScene->BuildEntitiesList();
 		for (int gameobjectIndex = 0; gameobjectIndex < entities.size(); gameobjectIndex++) {
 			const Gameobject * gameobject = entities[gameobjectIndex];
-			if (gameobject != m_scene->GetMainCamera()->GetGameobject()) {
+			if (gameobject != m_currentScene->GetMainCamera()->GetGameobject()) {
 				AABB aabb = gameobject->GetAABB();
 				Debug::Get().Render().DebugAABB(aabb, Color::Red);
 			}
@@ -442,10 +471,10 @@ namespace fan {
 	//================================================================================================================================
 	//================================================================================================================================
 	void Engine::SwitchPlayPause() {
-		if ( m_scene->IsPaused() ) {
-			m_scene->Play();
+		if ( m_currentScene->IsPaused() ) {
+			m_currentScene->Play();
 		} else {
-			m_scene->Pause();
+			m_currentScene->Pause();
 		}
 	}
 
@@ -455,7 +484,10 @@ namespace fan {
 	void Engine::UpdateRenderer() {
 		SCOPED_PROFILE( update_renderer )
 
-		Camera * mainCamera = m_scene->GetMainCamera();
+		Camera * mainCamera = m_currentScene->GetMainCamera();
+		const std::vector < DirectionalLight* > directionalLights = m_currentScene->GetDirectionalLights();
+		const std::vector < PointLight* >		pointLights = m_currentScene->GetPointLights();
+		const std::vector < MeshRenderer* >		meshRenderers = m_currentScene->GetMeshRenderers();
 
 		// Camera
 		Transform * cameraTransform = mainCamera->GetGameobject()->GetComponent<Transform>();
@@ -463,8 +495,8 @@ namespace fan {
 		m_renderer->SetMainCamera( mainCamera->GetProjection(), mainCamera->GetView(), ToGLM(cameraTransform->GetPosition()));		
 
 		// Point lights		
-		for ( int lightIndex = 0; lightIndex < m_pointLights.size(); lightIndex++ ) {
-			const PointLight * light = m_pointLights[lightIndex];
+		for ( int lightIndex = 0; lightIndex < pointLights.size(); lightIndex++ ) {
+			const PointLight * light = pointLights[lightIndex];
 			const Transform *  lightTransform = light->GetGameobject()->GetComponent<Transform>();
 			m_renderer->SetPointLight(
 				lightIndex,
@@ -474,11 +506,11 @@ namespace fan {
 				light->GetAmbiant().ToGLM(),
 				light->GetAttenuation()
 			);
-		}	m_renderer->SetNumPointLights( static_cast<uint32_t>( m_pointLights.size() ) );
+		}	m_renderer->SetNumPointLights( static_cast<uint32_t>( pointLights.size() ) );
 		
 		// Directional lights		
-		for ( int lightIndex = 0; lightIndex < m_directionalLights.size(); lightIndex++ ) {
-			const DirectionalLight * light			= m_directionalLights[lightIndex];
+		for ( int lightIndex = 0; lightIndex < directionalLights.size(); lightIndex++ ) {
+			const DirectionalLight * light			= directionalLights[lightIndex];
 			const Transform *		 lightTransform = light->GetGameobject()->GetComponent<Transform>();
 			m_renderer->SetDirectionalLight( 
 				lightIndex
@@ -487,14 +519,14 @@ namespace fan {
 				,light->GetDiffuse().ToGLM()
 				,light->GetSpecular().ToGLM()
 			);
-		} m_renderer->SetNumDirectionalLights( static_cast<uint32_t>( m_directionalLights.size() ) );
+		} m_renderer->SetNumDirectionalLights( static_cast<uint32_t>( directionalLights.size() ) );
 
 		// Transforms, mesh, materials
-		std::vector<DrawMesh> drawData( m_meshRenderers.size() );
-		for (int modelIndex = 0; modelIndex < m_meshRenderers.size() ; modelIndex++) {
+		std::vector<DrawMesh> drawData( meshRenderers.size() );
+		for (int modelIndex = 0; modelIndex < meshRenderers.size() ; modelIndex++) {
 
 			DrawMesh& data = drawData[modelIndex];
-			MeshRenderer * meshRenderer = m_meshRenderers[modelIndex];
+			MeshRenderer * meshRenderer = meshRenderers[modelIndex];
 			Transform * transform = meshRenderer->GetGameobject()->GetTransform();
 			Material * material = meshRenderer->GetGameobject()->GetComponent<Material>();
 
@@ -520,7 +552,7 @@ namespace fan {
 		m_renderer->SetDrawData(drawData);
 
 		// UI
-		std::vector< UIMeshRenderer* > uiRenderers = m_scene->FindComponentsOfType<UIMeshRenderer>();
+		std::vector< UIMeshRenderer* > uiRenderers = m_clientScene->FindComponentsOfType<UIMeshRenderer>();
 		std::vector<DrawUIMesh> uiDrawData;
 		uiDrawData.reserve( uiRenderers.size() );
 		for (int meshIndex = 0; meshIndex < uiRenderers.size() ; meshIndex++)
@@ -548,7 +580,7 @@ namespace fan {
 	//================================================================================================================================
 	void Engine::DeleteSelection() {
 		if ( m_selectedGameobject != nullptr ) {
-			m_scene->DeleteGameobject( m_selectedGameobject );
+			m_currentScene->DeleteGameobject( m_selectedGameobject );
 		}		
 	}
 
@@ -560,7 +592,7 @@ namespace fan {
 		bool mouseCaptured = ImGui::GetIO().WantCaptureMouse;
 
 		// Translation gizmo on selected gameobject
-		if (m_selectedGameobject != nullptr && m_selectedGameobject != m_scene->GetMainCamera()->GetGameobject()
+		if (m_selectedGameobject != nullptr && m_selectedGameobject != m_currentScene->GetMainCamera()->GetGameobject()
 			&& m_selectedGameobject->GetComponent<UIMeshRenderer>() == nullptr 
 			&& m_selectedGameobject->GetComponent<UITransform>() == nullptr ) 
 
@@ -576,9 +608,9 @@ namespace fan {
 		// Mouse selection
 		if ( m_gameWindow->IsHovered() && Mouse::Get().GetButtonPressed(Mouse::button0) ) 
 		{
-			const btVector3 cameraOrigin = m_scene->GetMainCamera()->GetGameobject()->GetComponent<Transform>()->GetPosition();;
-			const Ray ray = m_scene->GetMainCamera()->ScreenPosToRay(Mouse::Get().GetScreenSpacePosition());
-			const std::vector<Gameobject *>  & entities = m_scene->BuildEntitiesList();
+			const btVector3 cameraOrigin = m_currentScene->GetMainCamera()->GetGameobject()->GetComponent<Transform>()->GetPosition();;
+			const Ray ray = m_currentScene->GetMainCamera()->ScreenPosToRay(Mouse::Get().GetScreenSpacePosition());
+			const std::vector<Gameobject *>  & entities = m_currentScene->BuildEntitiesList();
 
 			// Raycast on all the entities
 			Gameobject * closestGameobject = nullptr;
@@ -586,7 +618,7 @@ namespace fan {
 			for (int gameobjectIndex = 0; gameobjectIndex < entities.size(); gameobjectIndex++) {
 				Gameobject * gameobject = entities[gameobjectIndex];
 
-				if (gameobject == m_scene->GetMainCamera()->GetGameobject()) {
+				if (gameobject == m_currentScene->GetMainCamera()->GetGameobject()) {
 					continue;
 				}
 
@@ -622,7 +654,7 @@ namespace fan {
 		const btVector3 origin = _transform.getOrigin();
 		const btTransform rotation(_transform.getRotation());
 		const btVector3 axisDirection[3] = { btVector3(1, 0, 0), btVector3(0, 1, 0),  btVector3(0, 0, 1) };
-		const btVector3 cameraPosition = m_scene->GetMainCamera()->GetGameobject()->GetComponent<Transform>()->GetPosition();
+		const btVector3 cameraPosition = m_currentScene->GetMainCamera()->GetGameobject()->GetComponent<Transform>()->GetPosition();
 		const float size = 0.2f * origin.distance(cameraPosition);
 		const btTransform coneRotation[3] = {
 		btTransform(btQuaternion(0, 0, btRadians(-90)), size*axisDirection[0])
@@ -648,7 +680,7 @@ namespace fan {
 
 			// Raycast on the gizmo shape to determine if the mouse is hovering it
 			Color clickedColor = opaqueColor;
-			const Ray ray = m_scene->GetMainCamera()->ScreenPosToRay(Mouse::Get().GetScreenSpacePosition());
+			const Ray ray = m_currentScene->GetMainCamera()->ScreenPosToRay(Mouse::Get().GetScreenSpacePosition());
 			for (int triIndex = 0; triIndex < coneTris.size() / 3; triIndex++) {
 				Triangle triangle(coneTris[3 * triIndex + 0], coneTris[3 * triIndex + 1], coneTris[3 * triIndex + 2]);
 				btVector3 intersection;
@@ -672,7 +704,7 @@ namespace fan {
 			if (cacheData.pressed == true && cacheData.axisIndex == axisIndex ) {
 				btVector3 axis = rotation * axisDirection[axisIndex];
 
-				 const Ray screenRay = m_scene->GetMainCamera()->ScreenPosToRay(Mouse::Get().GetScreenSpacePosition()); 	
+				 const Ray screenRay = m_currentScene->GetMainCamera()->ScreenPosToRay(Mouse::Get().GetScreenSpacePosition()); 	
 				 const Ray axisRay = { origin , axis };				 
 				 btVector3 trash, projectionOnAxis;
 				 screenRay.RayClosestPoints(axisRay, trash, projectionOnAxis);
@@ -687,108 +719,7 @@ namespace fan {
 		return cacheData.pressed;
 	}
 
-	//================================================================================================================================
-	//================================================================================================================================
-	void Engine::RegisterDirectionalLight( DirectionalLight * _directionalLight ) {
 
-		// Looks for the _directionalLight
-		for ( int lightIndex = 0; lightIndex < m_directionalLights.size(); lightIndex++ ) {
-			if ( m_directionalLights[lightIndex] == _directionalLight ) {
-				Debug::Get() << Debug::Severity::warning << "Directional Light already registered in gameobject : " << _directionalLight->GetGameobject()->GetName() << Debug::Endl();
-				return;
-			}
-		}
-
-		// Check num lights
-		if ( m_directionalLights.size() >= GlobalValues::s_maximumNumDirectionalLight ) {
-			Debug::Get() << Debug::Severity::warning << "Too much lights in the scene, maximum is " << GlobalValues::s_maximumNumDirectionalLight << Debug::Endl();
-		} else {
-			m_directionalLights.push_back( _directionalLight );
-		}
-	}
-
-	//================================================================================================================================
-	//================================================================================================================================
-	void Engine::UnRegisterDirectionalLight	( DirectionalLight *	_directionalLight ) {
-
-		const size_t num = m_directionalLights.size();
-
-		// Removes the light
-		for ( int lightIndex = 0; lightIndex < m_directionalLights.size(); lightIndex++ ) {
-			if ( m_directionalLights[lightIndex] == _directionalLight ) {
-				m_directionalLights.erase( m_directionalLights.begin() + lightIndex );
-			}
-		}
-
-		// Light not removed
-		if ( m_directionalLights.size() == num ) {
-			Debug::Get() << Debug::Severity::warning << "Trying to remove a non registered directional light! gameobject=" << _directionalLight->GetGameobject()->GetName() << Debug::Endl();
-			return;
-		}
-	}
-
-	//================================================================================================================================
-	//================================================================================================================================
-	void Engine::RegisterPointLight	( PointLight * _pointLight ) {
-
-		// Looks for the _pointLight
-		for ( int lightIndex = 0; lightIndex < m_pointLights.size(); lightIndex++ ) {
-			if ( m_pointLights[lightIndex] == _pointLight ) {
-				Debug::Get() << Debug::Severity::warning << "PointLight already registered in gameobject : " << _pointLight->GetGameobject()->GetName() << Debug::Endl();
-				return;
-			}
-		}		
-
-		// Check num lights
-		if ( m_pointLights.size() >= GlobalValues::s_maximumNumPointLights ) {
-			Debug::Get() << Debug::Severity::warning << "Too much lights in the scene, maximum is " << GlobalValues::s_maximumNumPointLights << Debug::Endl();
-		} else {
-			m_pointLights.push_back( _pointLight );
-		}
-	}
-
-	//================================================================================================================================
-	//================================================================================================================================
-	void Engine::UnRegisterPointLight	( PointLight *	_pointLight ) {
-
-		const size_t num = m_pointLights.size();
-
-		// Removes the light
-		for ( int lightIndex = 0; lightIndex < m_pointLights.size(); lightIndex++ ) {
-			if ( m_pointLights[lightIndex] == _pointLight ) {
-				m_pointLights.erase( m_pointLights.begin() + lightIndex );
-			}
-		}
-
-		// Light not removed
-		if ( m_pointLights.size() == num ) {
-			Debug::Get() << Debug::Severity::warning << "Trying to remove a non registered point light! gameobject=" << _pointLight->GetGameobject()->GetName() << Debug::Endl();
-			return;
-		}
-	}
-
-	//================================================================================================================================
-	//================================================================================================================================
-	void Engine::RegisterMeshRenderer( MeshRenderer * _meshRenderer ) {
-		// Looks for the model
-		for ( int modelIndex = 0; modelIndex < m_meshRenderers.size(); modelIndex++ ) {
-			if ( m_meshRenderers[modelIndex] == _meshRenderer ) {
-				Debug::Get() << Debug::Severity::warning << "MeshRenderer already registered : " << _meshRenderer->GetGameobject()->GetName() << Debug::Endl();
-				return;
-			}
-		}
-		m_meshRenderers.push_back( _meshRenderer );
-	}
-
-	//================================================================================================================================
-	//================================================================================================================================
-	void Engine::UnRegisterMeshRenderer( MeshRenderer * _meshRenderer ) {
-		for ( int modelIndex = 0; modelIndex < m_meshRenderers.size(); modelIndex++ ) {
-			if ( m_meshRenderers[modelIndex] == _meshRenderer ) {
-				m_meshRenderers.erase( m_meshRenderers.begin() + modelIndex );
-			}
-		}
-	}
 	
 	//================================================================================================================================
 	//================================================================================================================================
@@ -839,6 +770,21 @@ namespace fan {
 	void Engine::OnGameobjectDeleted( Gameobject * _gameobject ) {
 		if ( _gameobject == m_selectedGameobject ) {
 			Deselect();
+		}
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
+	void Engine::OnSetCurrentScene( int _scene )
+	{
+		MainMenuBar::CurrentScene scene = MainMenuBar::CurrentScene(_scene);
+		if ( scene == MainMenuBar::CLIENTS )
+		{
+			SetCurrentScene(m_clientScene);
+		}
+		else if ( scene == MainMenuBar::SERVER )
+		{
+			SetCurrentScene(m_serverScene);
 		}
 	}
 }

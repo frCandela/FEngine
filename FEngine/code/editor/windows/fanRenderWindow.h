@@ -10,7 +10,8 @@ namespace fan
 	//================================================================================================================================
 	class RenderWindow : public EditorWindow {
 	public:
-		RenderWindow( Renderer * _renderer );
+		RenderWindow();
+		void SetRenderer( Renderer * _renderer ) { m_renderer = _renderer; }
 
 	protected:
 		Renderer * m_renderer;
