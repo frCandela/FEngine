@@ -17,6 +17,8 @@ namespace fan {
 	{
 		REQUIRE_COMPONENT( Camera, m_camera)
 		REQUIRE_TRUE( *m_playersManager != nullptr, "CameraController: missing reference to the PlayersManager" )
+
+		m_gameobject->GetScene()->SetMainCamera(m_camera);
 	}
 
 	//================================================================================================================================

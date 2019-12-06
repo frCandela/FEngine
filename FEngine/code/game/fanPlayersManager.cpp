@@ -16,38 +16,11 @@ namespace fan
 	void PlayersManager::Start()
 	{
 		REQUIRE_TRUE( *m_playerPrefab != nullptr, "PlayersManager : missing player prefab " )
-	}
 
-	//================================================================================================================================
-	//================================================================================================================================
-	void PlayersManager::OnAttach()
-	{
-		Actor::OnAttach();
-		m_gameobject->GetScene()->onScenePlay.Connect( &PlayersManager::OnScenePlay, this );
-		m_gameobject->GetScene()->onScenePause.Connect( &PlayersManager::OnScenePause, this );
-
-		SpaceShip::s_onPlayerDie.Connect( &PlayersManager::OnPlayerDie, this );
-	}
-
-	//================================================================================================================================
-	//================================================================================================================================
-	void PlayersManager::OnDetach()
-	{
-		Actor::OnDetach();
-		m_gameobject->GetScene()->onScenePlay.Disconnect( &PlayersManager::OnScenePlay, this );
-		m_gameobject->GetScene()->onScenePause.Disconnect( &PlayersManager::OnScenePause, this );
-
-		SpaceShip::s_onPlayerDie.Disconnect( &PlayersManager::OnPlayerDie, this );
-	}
-
-	//================================================================================================================================
-	//================================================================================================================================
-	void PlayersManager::OnScenePlay()
-	{
 		Joystick::Get().onJoystickConnect.Connect( &PlayersManager::OnJoystickConnect, this );
 
 		// Spawn mouse player
-		AddPlayer( s_mousePlayerID,  "mouse_player" );
+		AddPlayer( s_mousePlayerID, "mouse_player" );
 
 		// Spawn joystick players
 		for ( int joystickIndex = 0; joystickIndex < Joystick::NUM_JOYSTICK; joystickIndex++ )
@@ -59,20 +32,34 @@ namespace fan
 				AddPlayer( joystickIndex, ss.str() );
 			}
 		}
-		
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void PlayersManager::OnScenePause()
+	void PlayersManager::Stop()
 	{
 		Joystick::Get().onJoystickConnect.Disconnect( &PlayersManager::OnJoystickConnect, this );
 
 		// Remove all players
-		while ( ! m_players.empty() )
-		{			
+		while ( !m_players.empty() )
+		{
 			RemovePlayer( m_players.begin()->first );
 		}
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
+	void PlayersManager::OnAttach()
+	{
+		Actor::OnAttach();
+
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
+	void PlayersManager::OnDetach()
+	{
+		Actor::OnDetach();
 	}
 
 	//================================================================================================================================
@@ -89,6 +76,7 @@ namespace fan
 			player->SetEditorFlags( player->GetEditorFlags() | Gameobject::EditorFlag::NOT_SAVED );
 			player->SetName( _name );
 
+			// Set input
 			PlayerInput * playerInput = player->GetComponent<PlayerInput>();
 			if ( playerInput != nullptr )
 			{
@@ -99,6 +87,17 @@ namespace fan
 			{
 				Debug::Warning("PlayersManager::AddPlayer : Prefab is missing a PlayerInput component.");
 			}
+
+			SpaceShip * playerShip = player->GetComponent<SpaceShip>();
+			if ( playerShip != nullptr )
+			{
+				playerShip->onPlayerDie.Connect( &PlayersManager::OnPlayerDie, this );
+			}
+			else
+			{
+				Debug::Warning( "PlayersManager::AddPlayer : Prefab is missing a SpaceShip component." );
+			}
+			
 		}
 	}
 

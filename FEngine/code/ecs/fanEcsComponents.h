@@ -146,11 +146,12 @@ namespace fan {
 	struct ecsPlanet : ecsIComponent {
 		static const char * s_name;
 		void Init() {
+			time = 0.f;
 			speed = 1.f;
 			radius = 1.f;
 			phase = 0.f;
 		}
-
+		float time		= 0.f;
 		float speed		= 1.f;
 		float radius	= 1.f;
 		float phase		= 0.f;
@@ -229,7 +230,7 @@ namespace fan {
 
 		enum Flag
 		{
-			NONE = 1 << 0, NO_DELETE = 1 << 1, NOT_SAVED = 1 << 2, NOT_UI_INSTANCIABLE = 1 << 2
+			NONE = 1 << 0, NO_DELETE = 1 << 1, NOT_SAVED = 1 << 2, NOT_UI_INSTANCIABLE = 1 << 2, ALWAYS_PLAY_ACTORS = 1 << 3
 		};
 	};
 

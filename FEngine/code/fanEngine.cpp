@@ -98,7 +98,9 @@ namespace fan {
 		Input::Get().Manager().CreateKeyboardEvent( "freeze_capture", Keyboard::END );		
 		Input::Get().Manager().CreateKeyboardEvent( "copy",			  Keyboard::C, Keyboard::LEFT_CONTROL );
 		Input::Get().Manager().CreateKeyboardEvent( "paste",		  Keyboard::V, Keyboard::LEFT_CONTROL );
+		Input::Get().Manager().CreateKeyboardEvent( "toogle_view",	  Keyboard::F1 );
 		Input::Get().Manager().CreateKeyboardEvent( "show_ui",		  Keyboard::F3 );
+
 
 		//editor axis
 		Input::Get().Manager().CreateKeyboardAxis( "editor_forward", Keyboard::W, Keyboard::S );
@@ -169,10 +171,11 @@ namespace fan {
 		// Events linking
 		Input::Get().Manager().FindEvent( "reload_shaders" )->Connect(	&Renderer::ReloadShaders, m_renderer );
 		Input::Get().Manager().FindEvent( "delete" )->Connect(			&Engine::DeleteSelection, this );
-		Input::Get().Manager().FindEvent( "play_pause" )->Connect(		&Engine::SwitchPlayPause, this );
+		Input::Get().Manager().FindEvent( "play_pause" )->Connect(		&Engine::SwitchPlayStop, this );
 		Input::Get().Manager().FindEvent( "copy" )->Connect(			&EditorCopyPaste::OnCopy, m_copyPaste );
 		Input::Get().Manager().FindEvent( "paste" )->Connect(			&EditorCopyPaste::OnPaste, m_copyPaste );
 		Input::Get().Manager().FindEvent( "show_ui" )->Connect(			&Engine::OnToogleShowUI, this );
+		Input::Get().Manager().FindEvent( "toogle_view" )->Connect(		&Engine::OnToogleView, this );
 
 		// Static messages		
 		TexturePtr::s_onCreateUnresolved.			Connect ( &Engine::OnResolveTexturePtr, this );
@@ -181,6 +184,7 @@ namespace fan {
 
 		m_clientScene->onSceneLoad.Connect( &SceneWindow::OnExpandHierarchy, m_sceneWindow );
 		m_clientScene->onSceneLoad.Connect( &Engine::OnSceneLoad, this );
+		m_clientScene->onSceneStop.Connect( &Engine::OnSceneStop, this );
 		m_clientScene->onDeleteGameobject.Connect( &Engine::OnGameobjectDeleted, this );
 		m_clientScene->onRegisterMeshRenderer.Connect	( &Scene::RegisterMeshRenderer, m_clientScene );
 		m_clientScene->onUnRegisterMeshRenderer.Connect	( &Scene::UnRegisterMeshRenderer, m_clientScene );
@@ -192,12 +196,14 @@ namespace fan {
 
 		m_serverScene->onSceneLoad.Connect( &SceneWindow::OnExpandHierarchy, m_sceneWindow );
 		m_serverScene->onSceneLoad.Connect( &Engine::OnSceneLoad, this );
-		m_serverScene->onRegisterMeshRenderer.Connect	( &Scene::RegisterMeshRenderer, m_clientScene );
-		m_serverScene->onUnRegisterMeshRenderer.Connect	( &Scene::UnRegisterMeshRenderer, m_clientScene );
-		m_serverScene->onPointLightAttach.Connect		( &Scene::RegisterPointLight, m_clientScene );
-		m_serverScene->onPointLightDetach.Connect		( &Scene::UnRegisterPointLight, m_clientScene );
-		m_serverScene->onDirectionalLightAttach.Connect	( &Scene::RegisterDirectionalLight, m_clientScene );
-		m_serverScene->onDirectionalLightDetach.Connect	( &Scene::UnRegisterDirectionalLight, m_clientScene );
+		m_serverScene->onSceneStop.Connect( &Engine::OnSceneStop, this );
+		m_serverScene->onDeleteGameobject.Connect( &Engine::OnGameobjectDeleted, this );
+		m_serverScene->onRegisterMeshRenderer.Connect	( &Scene::RegisterMeshRenderer, m_serverScene );
+		m_serverScene->onUnRegisterMeshRenderer.Connect	( &Scene::UnRegisterMeshRenderer, m_serverScene );
+		m_serverScene->onPointLightAttach.Connect		( &Scene::RegisterPointLight, m_serverScene );
+		m_serverScene->onPointLightDetach.Connect		( &Scene::UnRegisterPointLight, m_serverScene );
+		m_serverScene->onDirectionalLightAttach.Connect	( &Scene::RegisterDirectionalLight, m_serverScene );
+		m_serverScene->onDirectionalLightDetach.Connect	( &Scene::UnRegisterDirectionalLight, m_serverScene );
 		m_serverScene->New();
 	}
 
@@ -255,10 +261,8 @@ namespace fan {
 					ImGui::GetIO().DeltaTime = targetLogicDelta;
 					m_renderer->GetRendererDebug().ClearDebug();
 				}
-
-				m_currentScene->BeginFrame();
+				
 				m_currentScene->Update( targetLogicDelta );		
-				m_currentScene->EndFrame();			
 
 				if ( m_showUI )				
 				{
@@ -313,6 +317,19 @@ namespace fan {
 		m_mainMenuBar->SetScene( m_currentScene );
 		m_ecsWindow->SetEcsManager( m_currentScene->GetEcsManager() );
 		m_networkWindow->SetScene(m_currentScene);
+		m_gameWindow->SetScene(m_currentScene);
+	}
+
+	//================================================================================================================================
+	// switch to editor camera
+	//================================================================================================================================
+	void Engine::OnSceneStop( Scene * _scene )
+	{			
+		FPSCamera * editorCam = _scene->FindComponentOfType<FPSCamera>();
+		if ( editorCam != nullptr )
+		{
+			_scene->SetMainCamera( editorCam->GetCamera() );
+		}
 	}
 
 	//================================================================================================================================
@@ -324,7 +341,12 @@ namespace fan {
 
 		// Editor Camera
 		Gameobject * cameraGameobject = _scene->CreateGameobject("editor_camera");
-		cameraGameobject->SetEditorFlags( Gameobject::EditorFlag::NO_DELETE | Gameobject::EditorFlag::NOT_SAVED );
+		cameraGameobject->SetEditorFlags( 
+			Gameobject::EditorFlag::NO_DELETE			| 
+			Gameobject::EditorFlag::NOT_SAVED			|  
+			Gameobject::EditorFlag::ALWAYS_PLAY_ACTORS
+		);
+
 
 		cameraGameobject->GetTransform()->SetPosition(btVector3(0, 0, -2));
 		Camera* editorCamera = cameraGameobject->AddComponent<Camera>();
@@ -470,11 +492,11 @@ namespace fan {
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void Engine::SwitchPlayPause() {
-		if ( m_currentScene->IsPaused() ) {
+	void Engine::SwitchPlayStop() {
+		if ( m_currentScene->GetState() == Scene::STOPPED ) {
 			m_currentScene->Play();
 		} else {
-			m_currentScene->Pause();
+			m_currentScene->Stop();
 		}
 	}
 
@@ -786,5 +808,12 @@ namespace fan {
 		{
 			SetCurrentScene(m_serverScene);
 		}
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
+	void Engine::OnToogleView()
+	{
+		SetCurrentScene( m_currentScene == m_serverScene ? m_clientScene : m_serverScene );
 	}
 }

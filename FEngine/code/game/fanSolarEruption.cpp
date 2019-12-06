@@ -19,17 +19,23 @@ namespace fan
 {
 	REGISTER_TYPE_INFO( SolarEruption, TypeInfo::Flags::EDITOR_COMPONENT, "game/" )
 
-		//================================================================================================================================
-		//================================================================================================================================
-		void SolarEruption::Start()
+	//================================================================================================================================
+	//================================================================================================================================
+	void SolarEruption::Start()
 	{
 		REQUIRE_COMPONENT( Material, m_material )
-			REQUIRE_COMPONENT( ParticleSystem, m_particleSystem )
-			REQUIRE_COMPONENT( MeshRenderer, m_meshRenderer )
-			REQUIRE_SCENE_COMPONENT( PlayersManager, m_players )
+		REQUIRE_COMPONENT( ParticleSystem, m_particleSystem )
+		REQUIRE_COMPONENT( MeshRenderer, m_meshRenderer )
+		REQUIRE_SCENE_COMPONENT( PlayersManager, m_players )
 
-			if ( m_particleSystem ) { m_particleSystem->SetEnabled( false ); }
-		if ( m_meshRenderer ) { m_meshRenderer->SetMesh( ecsSolarEruptionMeshSystem::s_mesh ); }
+		if ( m_particleSystem ) 
+		{ 
+			m_particleSystem->SetEnabled( false ); 
+		}
+		if ( m_meshRenderer ) 
+		{ 
+			m_meshRenderer->SetMesh( ecsSolarEruptionMeshSystem::s_mesh ); 
+		}
 
 		m_timeBeforeEruption = m_eruptionCooldown + m_distribution( m_generator ) * m_eruptionRandomCooldown;
 	}

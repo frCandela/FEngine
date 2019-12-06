@@ -4,6 +4,7 @@
 #include "core/input/fanInput.h"
 #include "core/input/fanKeyboard.h"
 #include "core/input/fanMouse.h"
+#include "imgui/imgui_internal.h"
 
 //================================================================================================================================
 // Extracts the file name of a path without the extension
@@ -214,5 +215,21 @@ namespace ImGui
 			ImGui::EndPopup();
 		}
 		return returnValue;
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
+	void PushDisable()
+	{
+		ImGui::PushItemFlag( ImGuiItemFlags_Disabled, true );
+		ImGui::PushStyleVar( ImGuiStyleVar_Alpha, ImGui::GetStyle().Alpha * 0.5f );
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
+	void PopDisable()
+	{
+		ImGui::PopItemFlag();
+		ImGui::PopStyleVar();
 	}
 }

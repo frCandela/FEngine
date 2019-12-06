@@ -114,7 +114,7 @@ namespace fan {
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void ecsPlanetsSystem::Run( float /*_delta*/, const size_t _count, std::vector< ecsComponentsKey >& _entitiesData
+	void ecsPlanetsSystem::Run( float _delta, const size_t _count, std::vector< ecsComponentsKey >& _entitiesData
 		,ComponentData< ecsGameobject > & _gameobjects
 		,ComponentData< ecsTranform > & _transforms
 		,ComponentData< ecsPlanet > &	_planets
@@ -128,7 +128,8 @@ namespace fan {
 				const btTransform& parentTransform = _gameobjects.At( key ).gameobject->GetParent()->GetTransform()->GetBtTransform();
 				ecsFlags& flags = _flags.At( key );
 
-				float const time = -planet.speed * Time::ElapsedSinceStartup();
+				planet.time += _delta;
+				float const time = -planet.speed * planet.time;
 				btVector3 position( std::cosf( time + planet.phase ), 0, std::sinf( time + planet.phase ) );
 
 				transform.setOrigin( parentTransform.getOrigin() + planet.radius * position);
@@ -169,10 +170,6 @@ namespace fan {
 			Debug::Render().DebugLine( btVector3::Zero(), _v0, Color::Green );
 		}
 	}
-
-
-
-
 	//================================================================================================================================
 	//================================================================================================================================
 	float  ecsSolarEruptionMeshSystem::s_subAngle = 45.f;

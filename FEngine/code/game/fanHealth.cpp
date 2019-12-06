@@ -30,6 +30,8 @@ namespace fan
 	{
 		assert( _healthConsumed >= 0.f );
 
+		if( m_invincible ){ return true; }
+
 		if( m_currentHealth >= _healthConsumed ) {
 			m_currentHealth -= _healthConsumed;
 			if( m_currentHealth <= 0.f ){ onFallToZero.Emmit(); }
@@ -57,6 +59,7 @@ namespace fan
 		{
 			ImGui::SliderFloat( "current health", &m_currentHealth, 0.f, m_maxHealth );
 			ImGui::DragFloat( "max health", &m_maxHealth );
+			ImGui::Checkbox("invincible", &m_invincible);
 
 		} ImGui::PopItemWidth();
 	}

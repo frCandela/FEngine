@@ -12,13 +12,13 @@ namespace fan
 	class FPSCamera : public Actor
 	{
 	public:
-		virtual ~FPSCamera();
-
 		void Start() override;
+		void Stop() override;
 		void Update(const float _delta) override;
 		void LateUpdate( const float /*_delta*/ ) override {}
 
 		// Getters
+		Camera * GetCamera() const { return m_camera; }
 		float GetSpeed() const				{ return m_speed; }
 		float GetSpeedMultiplier() const	{ return m_speedMultiplier; }
 		btVector2 GetXYSensitivity() const	{ return m_xySensitivity; }
@@ -44,8 +44,5 @@ namespace fan
 
 		Transform * m_transform;
 		Camera * m_camera;
-
-		void OnScenePlay ();
-		void OnScenePause();
 	};
 }

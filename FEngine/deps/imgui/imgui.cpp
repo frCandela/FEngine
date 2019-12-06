@@ -2818,7 +2818,7 @@ void ImGui::MarkItemEdited(ImGuiID id)
     // This marking is solely to be able to provide info for IsItemDeactivatedAfterEdit().
     // ActiveId might have been released by the time we call this (as in the typical press/release button behavior) but still need need to fill the data.
     ImGuiContext& g = *GImGui;
-    IM_ASSERT(g.ActiveId == id || g.ActiveId == 0 || g.DragDropActive);
+    //IM_ASSERT(g.ActiveId == id || g.ActiveId == 0 || g.DragDropActive);
     IM_UNUSED(id); // Avoid unused variable warnings when asserts are compiled out.
     //IM_ASSERT(g.CurrentWindow->DC.LastItemId == id);
     g.ActiveIdHasBeenEditedThisFrame = true;

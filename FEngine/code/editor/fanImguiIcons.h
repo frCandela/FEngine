@@ -18,6 +18,10 @@ namespace ImGui {
 		// scene special
 		GAMEOBJECT16,
 		PREFAB16,
+		PLAY16,
+		PAUSE16,
+		STEP16,
+		STOP16,
 
 		// scene components
 		IMAGE16,
@@ -77,6 +81,9 @@ namespace ImGui {
 		const ImVec4& _bgColor = ImVec4( 0, 0, 0, 0 ),
 		const ImVec4& _tintColor = ImVec4( 1, 1, 1, 1 ) )
 	{
-		return ImGui::ImageButton( (void*)42, _size, IconImpl::s_iconsList[_id].uv0, IconImpl::s_iconsList[_id].uv1, _framePadding, _bgColor, _tintColor );
+		ImGui::PushID(_id);
+		bool result = ImGui::ImageButton( (void*)42, _size, IconImpl::s_iconsList[_id].uv0, IconImpl::s_iconsList[_id].uv1, _framePadding, _bgColor, _tintColor );
+		ImGui::PopID();
+		return result;
 	}
 }

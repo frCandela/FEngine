@@ -20,9 +20,10 @@ namespace fan {
 		enum SpeedMode{ REVERSE = 0, SLOW, NORMAL, FAST };
 
 	public:
-		static Signal<Gameobject*> s_onPlayerDie;
+		Signal<Gameobject*> onPlayerDie;
 
 		void Start() override;
+		void Stop() override {}
 		void Update(const float _delta) override;
 		void LateUpdate( const float /*_delta*/ ) override {}
 

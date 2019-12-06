@@ -26,11 +26,10 @@ namespace fan
 	public:
 
 		Signal<Scene*>			onSceneLoad;
+		Signal<Scene*>			onSceneStop;
 		Signal<>				onSceneClear;
 		Signal< Gameobject *>	onDeleteGameobject;
 		Signal<Camera*>			onSetMainCamera;
-		Signal<>				onScenePlay;
-		Signal<>				onScenePause;
 
 		Signal< MeshRenderer * > onRegisterMeshRenderer;
 		Signal< MeshRenderer * > onUnRegisterMeshRenderer;
@@ -38,6 +37,8 @@ namespace fan
 		Signal< PointLight * > onPointLightDetach;
 		Signal< DirectionalLight * > onDirectionalLightAttach;
 		Signal< DirectionalLight * > onDirectionalLightDetach;
+
+		enum State{ STOPPED, PLAYING, PAUSED };
 
 		Scene( const std::string _name );
 		~Scene();
@@ -55,8 +56,10 @@ namespace fan
 		void LateUpdate( const float _delta );
 		void EndFrame();
 		void Play()	;
+		void Stop();
 		void Pause();
-		void OnGui();
+		void Resume();
+		void Step( const float _delta );
 
 		void New();
 		void Save() const;
@@ -69,7 +72,7 @@ namespace fan
 		inline std::string		GetPath() const				{ return m_path; }
 		inline EcsManager *		GetEcsManager() const		{ return m_ecsManager; }
 		inline PhysicsManager *	GetPhysicsManager() const	{ return m_physicsManager; }		
-		bool					IsPaused() const			{ return m_isPaused; };
+		State					GetState() const			{ return m_state; };
 		Camera *				GetMainCamera()				{ return m_mainCamera; }
 		void					SetMainCamera( Camera * _camera );
 		uint64_t				GetUniqueID() { assert(FindGameobject(m_nextUniqueID)==nullptr);  return m_nextUniqueID++; }
@@ -82,8 +85,11 @@ namespace fan
 		const std::vector < PointLight* >		& GetPointLights()		{ return m_pointLights ;}
 		const std::vector < MeshRenderer* >		& GetMeshRenderers()	{ return m_meshRenderers ;}
 
-		void OnActorAttach( Actor * _actor );
-		void OnActorDetach( Actor * _actor );
+		void Enable(  Actor * _actor );
+		void Disable(  Actor * _actor );
+
+		void RegisterActor( Actor * _actor );
+		void UnregisterActor( Actor * _actor );
 		void RegisterDirectionalLight	( DirectionalLight * _pointLight );
 		void UnRegisterDirectionalLight	( DirectionalLight * _pointLight );
 		void RegisterPointLight			( PointLight *		 _pointLight );
@@ -102,18 +108,19 @@ namespace fan
 
 		// References
 		Gameobject *			m_root;
-
 		Camera *				m_mainCamera = nullptr;
 
 		// State
-		bool m_isPaused = false;
+		State m_state = State::STOPPED;
 
 		// Gameobjects
 		std::vector < Gameobject * >		m_entitiesToDelete;
 		std::vector < GameobjectPtr * >		m_unresolvedGameobjectPointers;
 		std::vector < ComponentIDPtr * >	m_unresolvedComponentPointers;
-		std::set< Actor * >					m_startingActors;
-		std::set< Actor * >					m_activeActors;
+		std::vector< Actor * >				m_actors;
+		std::vector< Actor * >				m_startingActors;
+		std::vector< Actor * >				m_activeActors;
+		std::vector< Actor * >				m_pausedActors;
 		std::map< uint64_t, Gameobject * >	m_gameobjects;
 
 		// registered elements

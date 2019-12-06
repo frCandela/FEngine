@@ -3,6 +3,8 @@
 #include "editor/windows/fanEditorWindow.h"
 
 namespace fan {
+	class Scene;
+
 	//================================================================================================================================
 	//================================================================================================================================
 	class GameWindow : public EditorWindow {
@@ -13,7 +15,9 @@ namespace fan {
 		btVector2 GetSize()			const { return m_size; }
 		btVector2 GetPosition()		const { return m_position; }
 		float	  GetAspectRatio()	const { return (float)m_size[0] / (float)m_size[1]; }
-		bool IsHovered()			const { return m_isHovered; }
+		bool	  IsHovered()		const { return m_isHovered; }
+
+		void SetScene( Scene * _scene ) { m_scene = _scene; }  
 
 	protected:
 		void OnGui() override;
@@ -22,6 +26,8 @@ namespace fan {
 		btVector2	m_size = btVector2(1.f,1.f);
 		btVector2	m_position;
 		bool		m_isHovered;
+
+		Scene * m_scene;
 	};
 
 }

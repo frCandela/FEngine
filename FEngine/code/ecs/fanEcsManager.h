@@ -23,11 +23,10 @@ namespace fan {
 		template< typename _tagType >		void			AddTag( const ecsEntity _entity );
 		template< typename _tagType >		void			RemoveTag( const ecsEntity _entity );
 
-		void UpdatePrePhysics( const float _delta );
-		void UpdatePostPhysics( const float _delta );
-
-		void Update( const float _delta, const btVector3& _cameraPosition );
-		void LateUpdate( const float _delta );
+		void UpdatePrePhysics	( const float _delta );
+		void UpdatePostPhysics	( const float _delta);
+		void Update				( const float _delta, const btVector3& _cameraPosition);
+		void LateUpdate			( const float _delta );
 		void Refresh();
 
 		// Getters 

@@ -27,6 +27,7 @@ namespace fan
 		bool Save( Json & _json ) const override;
 
 	private:
+		bool  m_invincible = false;;
  		float m_currentHealth = 0.f;
  		float m_maxHealth = 100.f;
 	};

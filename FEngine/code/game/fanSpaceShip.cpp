@@ -21,8 +21,6 @@
 namespace fan {
 	REGISTER_TYPE_INFO(SpaceShip, TypeInfo::Flags::EDITOR_COMPONENT, "game/" )
 
-	Signal<Gameobject*> SpaceShip::s_onPlayerDie;
-
 	//================================================================================================================================
 	//================================================================================================================================
 	void SpaceShip::Start() {
@@ -184,7 +182,7 @@ namespace fan {
 		}
 
 
-		s_onPlayerDie.Emmit(m_gameobject);
+		onPlayerDie.Emmit(m_gameobject);
 
 
 	}

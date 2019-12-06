@@ -116,25 +116,63 @@ namespace fan
 	//================================================================================================================================
 	void Scene::BeginFrame() {
 		SCOPED_PROFILE( scene_begin )
-		for (Actor * actor : m_startingActors) {
-			actor->Start();
-			m_activeActors.insert(actor);
+		for ( int actorIndex = (int)m_startingActors.size() - 1 ; actorIndex >= 0 ; -- actorIndex )
+		{
+			Actor * actor = m_startingActors[actorIndex];
+			if ( actor->GetState() == Actor::STARTING )
+			{
+				m_activeActors.push_back( actor );
+				actor->Start();
+				actor->SetState( Actor::ACTIVE );
+				m_startingActors.erase( m_startingActors.begin() + actorIndex );
+			}
 		}
-		m_startingActors.clear();
+	}
+
+	//================================================================================================================================
+	// Deletes every gameobject in the m_toDeleteLater vector
+	//================================================================================================================================
+	void Scene::EndFrame()
+	{
+		SCOPED_PROFILE( scene_endFrame )
+		// Delete entities 
+		std::set<Gameobject*> deletedEntitiesSet;
+		for ( int gameobjectToDeleteIndex = 0; gameobjectToDeleteIndex < m_entitiesToDelete.size(); gameobjectToDeleteIndex++ )
+		{
+			Gameobject * gameobjectDelete = m_entitiesToDelete[gameobjectToDeleteIndex];
+			R_DeleteGameobject( gameobjectDelete, deletedEntitiesSet );
+		}
+		m_entitiesToDelete.clear();
+
+		m_ecsManager->Refresh();
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void Scene::Update(const float _delta) {
+	void Scene::Update(const float _delta) 
+	{
 		SCOPED_PROFILE( scene_update )
+		BeginFrame();
 
-		m_ecsManager->UpdatePrePhysics( _delta );
-		m_physicsManager->StepSimulation( _delta );
-		m_ecsManager->UpdatePostPhysics( _delta );
-		UpdateActors(_delta);
-		m_ecsManager->Update( _delta, m_mainCamera->GetGameobject()->GetTransform()->GetPosition() );
+		const float delta = m_state == State::PLAYING ? _delta : 0.f;
+
+		m_ecsManager->UpdatePrePhysics( delta);
+		m_physicsManager->StepSimulation( delta );
+		m_ecsManager->UpdatePostPhysics( delta);
+		UpdateActors( _delta );
+		m_ecsManager->Update( delta, m_mainCamera->GetGameobject()->GetTransform()->GetPosition() );
 		LateUpdate( _delta );
-		m_ecsManager->LateUpdate( _delta );
+		m_ecsManager->LateUpdate( delta );
+		EndFrame();
+
+		ImGui::Begin( "testoss" );
+		{
+			ImGui::Text( "m_actors         %d", m_actors.size());
+			ImGui::Text( "m_startingActors %d", m_startingActors.size() );
+			ImGui::Text( "m_activeActors   %d", m_activeActors.size() );
+			ImGui::Text( "m_pausedActors   %d", m_pausedActors.size() );
+		}ImGui::End();
+
 	}
 
 	//================================================================================================================================
@@ -142,18 +180,15 @@ namespace fan
 	void Scene::UpdateActors(const float _delta) {
 		for ( Actor * actor : m_activeActors )
 		{
-			if ( actor->IsEnabled() )
+			try
 			{
-				try
-				{
-					actor->Update( _delta );
-				}
-				catch ( ... )
-				{
-					Debug::Error() << "Update error on actor " << actor->s_name << " of gameobject " << actor->GetGameobject()->GetName() << Debug::Endl();
-					actor->SetEnabled( false );
-				}
+				actor->Update( _delta );
 			}
+			catch ( ... )
+			{
+				Debug::Error() << "Update error on actor " << actor->s_name << " of gameobject " << actor->GetGameobject()->GetName() << Debug::Endl();
+				actor->SetEnabled( false );
+			}			
 		}
 	}
 
@@ -164,18 +199,16 @@ namespace fan
 		SCOPED_PROFILE( scene_L_update )
 		for ( Actor * actor : m_activeActors )
 		{
-			if ( actor->IsEnabled() )
+			try
 			{
-				try
-				{
-					actor->LateUpdate( _delta );
-				}
-				catch (...)
-				{
-					Debug::Error() << "LateUpdate error on actor " << actor->s_name << " of gameobject " << actor->GetGameobject()->GetName() << Debug::Endl();
-					actor->SetEnabled( false );
-				}
+				actor->LateUpdate( _delta );
 			}
+			catch ( ... )
+			{
+				Debug::Error() << "LateUpdate error on actor " << actor->s_name << " of gameobject " << actor->GetGameobject()->GetName() << Debug::Endl();
+				actor->SetEnabled( false );
+			}
+			
 		}
 	}
 
@@ -216,16 +249,165 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
+	void Scene::Enable( Actor * _actor )
+	{
+		switch ( _actor->GetState() )
+		{
+		case Actor::STOPPED :
+			m_startingActors.push_back( _actor );
+			_actor->SetState( Actor::STARTING );
+			_actor->OnEnable();
+			break;
+		case Actor::STARTING:
+			Debug::Warning("Trying to enable a started actor");
+			break;
+		case Actor::ACTIVE:
+			Debug::Warning("Trying to enable an active actor");
+			break;
+		case Actor::PAUSED:
+			for ( int actorIndex = (int)m_pausedActors.size() - 1; actorIndex >= 0; --actorIndex )
+			{
+				if ( m_pausedActors[actorIndex] == _actor )
+				{
+					m_pausedActors.erase( m_pausedActors.begin() + actorIndex );
+					m_activeActors.push_back( _actor );
+					_actor->SetState( Actor::ACTIVE );
+					_actor->OnEnable();
+				}
+			}
+			assert (_actor->GetState() == Actor::ACTIVE  );
+			break;
+		default:
+			assert( false );
+			break;
+		}			
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
+	void Scene::Disable( Actor * _actor )
+	{
+		if ( _actor->GetGameobject()->GetEditorFlags() & Gameobject::EditorFlag::ALWAYS_PLAY_ACTORS  )	{ return; }
+
+		if ( _actor->GetState() != Actor::STOPPED )
+		{
+			std::vector< Actor * >& container =
+				_actor->GetState() == Actor::STARTING ? m_startingActors
+				: _actor->GetState() == Actor::ACTIVE ? m_activeActors
+				: m_pausedActors; //    Actor::PAUSED
+
+			for ( int actorIndex = (int)container.size() - 1 ; actorIndex >= 0 ; -- actorIndex )
+			{
+				if ( container[actorIndex] == _actor )
+				{
+					_actor->OnDisable();
+
+					switch ( _actor->GetState() )
+					{
+					case Actor::STARTING:
+						_actor->SetState( Actor::PAUSED );
+						break;
+					case Actor::ACTIVE:
+						m_activeActors.erase( m_activeActors.begin() + actorIndex );
+						m_pausedActors.push_back( _actor );
+						_actor->SetState( Actor::PAUSED );
+						break;
+					case Actor::PAUSED:
+						m_pausedActors.erase( m_pausedActors.begin() + actorIndex );
+						_actor->SetState( Actor::STOPPED );
+						_actor->Stop();
+						break;
+					default:
+						assert( false );
+						break;
+					}
+					return;
+				}
+			}
+			assert( false );
+		}
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
 	void Scene::Play() {
-		onScenePlay.Emmit(); 
-		m_isPaused = false;
+		if ( m_state == State::STOPPED )
+		{
+			Debug::Highlight() << m_name << ": play" << Debug::Endl();
+			for ( int actorIndex = 0; actorIndex < m_actors.size(); ++ actorIndex)
+			{
+				if ( m_actors[actorIndex]->GetState() == Actor::STOPPED )
+				{
+					Enable(m_actors[actorIndex]);	
+				}							
+			}
+			m_state = State::PLAYING;		
+		}
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
+	void  Scene::Stop()
+	{
+		if ( m_state == State::PLAYING || m_state == State::PAUSED )
+		{
+			for ( int actorIndex = (int) m_activeActors.size() - 1; actorIndex >= 0 ; --actorIndex )
+			{
+				Disable(m_activeActors[actorIndex]);
+			} 
+
+			for ( int actorIndex = (int) m_pausedActors.size() - 1; actorIndex >= 0 ; --actorIndex )
+			{
+				Disable(m_pausedActors[actorIndex]);
+			} 
+
+			Debug::Highlight() << m_name << ": stopped" << Debug::Endl();
+			m_state = State::STOPPED;
+			onSceneStop.Emmit(this);
+		}
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
 	void Scene::Pause() {
-		onScenePause.Emmit(); 
-		m_isPaused = true;
+		if ( m_state == State::PLAYING )
+		{
+			Debug::Highlight() << m_name << ": paused" << Debug::Endl();
+
+			for ( int actorIndex = (int) m_activeActors.size() - 1; actorIndex >= 0 ; --actorIndex )
+			{
+				Disable( m_activeActors[actorIndex] );
+			}
+
+			m_state = State::PAUSED;		
+		}
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
+	void Scene::Resume()
+	{
+		if ( m_state == State::PAUSED )
+		{
+			Debug::Highlight() << m_name << ": resumed" << Debug::Endl();
+			for ( int actorIndex = (int) m_pausedActors.size() - 1; actorIndex >= 0 ; --actorIndex )
+			{
+				Enable( m_pausedActors[actorIndex] );
+			} m_pausedActors.clear();
+			m_state = State::PLAYING;
+		}
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
+	void  Scene::Step( const float _delta )
+	{
+		if ( m_state == State::PAUSED )
+		{
+			Resume();
+			Update(_delta) ;
+			Pause();
+		}
 	}
 
 	//================================================================================================================================
@@ -249,50 +431,28 @@ namespace fan
 	}
 
 	//================================================================================================================================
-	// Deletes every gameobject in the m_toDeleteLater vector
 	//================================================================================================================================
-	void Scene::EndFrame() {
-		SCOPED_PROFILE( scene_endFrame )
-		// Delete entities 
-		std::set<Gameobject*> deletedEntitiesSet;
-		for (int gameobjectToDeleteIndex = 0; gameobjectToDeleteIndex < m_entitiesToDelete.size(); gameobjectToDeleteIndex++) {
-			Gameobject * gameobjectDelete = m_entitiesToDelete[gameobjectToDeleteIndex];
-			R_DeleteGameobject(gameobjectDelete, deletedEntitiesSet);
-		}
-		m_entitiesToDelete.clear();
-
-		m_ecsManager->Refresh();
-	}
-
-	//================================================================================================================================
-	// Deletes every gameobject in the m_toDeleteLater vector
-	//================================================================================================================================
-	void Scene::OnGui() {
-		int nb = (int)m_activeActors.size();
-		ImGui::DragInt("nb", &nb);
-		for (Actor * actor : m_activeActors)
+	void Scene::RegisterActor(Actor * _actor) 
+	{
+		m_actors.push_back(_actor);
+		if ( m_state == PLAYING || _actor->GetGameobject()->GetEditorFlags() & Gameobject::EditorFlag::ALWAYS_PLAY_ACTORS )
 		{
-			ImGui::Text(actor->GetName());
+			_actor->SetEnabled( true );
 		}
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void Scene::OnActorAttach(Actor * _actor) {
-		assert(m_activeActors.find(_actor) == m_activeActors.end());
-		assert(m_startingActors.find(_actor) == m_startingActors.end());
+	void Scene::UnregisterActor(Actor * _actor) 
+	{
+		std::vector< Actor * >::iterator  itGlobal	 = std::find( m_actors.begin(), m_actors.end(), _actor );
+		std::vector< Actor * >::iterator  itStarting = std::find( m_startingActors.begin(), m_startingActors.end(), _actor );
+		std::vector< Actor * >::iterator  itActive	 = std::find( m_activeActors.begin(), m_activeActors.end(), _actor );
 
-		m_startingActors.insert(_actor);
+		if( itGlobal !=  m_actors.end())   { *itGlobal = *(m_actors.end()-1); m_actors.pop_back(); }
+		if( itStarting !=  m_startingActors.end()) { *itStarting = *(m_startingActors.end()-1); m_startingActors.pop_back(); }
+		if( itActive !=  m_activeActors.end())   { *itActive = *(m_activeActors.end()-1); m_activeActors.pop_back(); }
 
-	}
-
-	//================================================================================================================================
-	//================================================================================================================================
-	void Scene::OnActorDetach(Actor * _actor) {
-		const size_t size = m_activeActors.erase(_actor);
-		if (size == 0) {
-			Debug::Get() << Debug::Severity::warning << " Scene::OnActorDetach Actor not active : " << _actor->GetName() << Debug::Endl();
-		}
 	}
 
 	//================================================================================================================================
@@ -303,6 +463,7 @@ namespace fan
 		R_DeleteGameobject(m_root, deletedEntitiesSet);
 		m_startingActors.clear();
 		m_activeActors.clear();
+		m_pausedActors.clear();
 		m_entitiesToDelete.clear();
 		m_gameobjects.clear();
 		m_root = nullptr;
@@ -338,9 +499,10 @@ namespace fan
 	//================================================================================================================================
 	bool Scene::Save( Json& _json ) const {
 		// Parameters
-		Json & jParameters = _json["parameters"]; {
-			jParameters["name"] = m_name;
-			jParameters["path"] = m_path;
+		Json & jParameters = _json["parameters"]; 
+		{
+			SaveString( jParameters, "name", m_name );
+			SaveString( jParameters, "path", m_path );	
 		}
 
 		// Gameobjects
@@ -474,7 +636,7 @@ namespace fan
 	}
 
 	//================================================================================================================================
-//================================================================================================================================
+	//================================================================================================================================
 	void Scene::RegisterDirectionalLight( DirectionalLight * _directionalLight )
 	{
 
@@ -527,7 +689,6 @@ namespace fan
 	//================================================================================================================================
 	void Scene::RegisterPointLight	( PointLight * _pointLight )
 	{
-
 		// Looks for the _pointLight
 		for ( int lightIndex = 0; lightIndex < m_pointLights.size(); lightIndex++ )
 		{
@@ -553,7 +714,6 @@ namespace fan
 	//================================================================================================================================
 	void Scene::UnRegisterPointLight	( PointLight *	_pointLight )
 	{
-
 		const size_t num = m_pointLights.size();
 
 		// Removes the light

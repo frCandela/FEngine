@@ -2,6 +2,8 @@
 #include "editor/windows/fanGameWindow.h"
 
 #include "core/input/fanMouse.h"
+#include "scene/fanScene.h"
+#include "core/time/fanTime.h"
 
 namespace fan {
 
@@ -29,6 +31,40 @@ namespace fan {
 		if ( ImGui::BeginMenuBar() )
 		{
 			ImGui::Text( "%d x %d", (int)size.x(), (int)size.y() );
+
+			if ( m_scene->GetState() == Scene::STOPPED )
+			{
+				if ( ImGui::ButtonIcon( ImGui::PLAY16, { 16,16 }, -1, ImVec4( 0, 0, 0, 0 ) ) )
+				{
+					m_scene->Play();
+				}
+			}
+			else
+			{
+				if ( ImGui::ButtonIcon( ImGui::STOP16, { 16,16 }, -1, ImVec4( 0, 0, 0, 0 ) ) )
+				{
+					m_scene->Stop();
+				}
+			}	
+
+			if ( ImGui::ButtonIcon( ImGui::PAUSE16, { 16,16 }, -1, ImVec4( 0, 0, 0, 0 ) ) )
+			{
+				Debug::Error("toto");
+				if ( m_scene->GetState() == Scene::PLAYING )
+				{
+					m_scene->Pause();
+				}
+				else if ( m_scene->GetState() == Scene::PAUSED )
+				{
+					m_scene->Resume();
+				}
+			}
+
+			if ( ImGui::ButtonIcon( ImGui::STEP16, { 16,16 }, -1, ImVec4( 0, 0, 0, 0 ) ) )
+			{
+				m_scene->Step( Time::Get().GetLogicDelta() );
+			}
+
 			ImGui::EndMenuBar();
 		}
 

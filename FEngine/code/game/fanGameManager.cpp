@@ -21,6 +21,7 @@ namespace fan {
 		if (*m_gameCamera == nullptr) {
 			Debug::Warning("Game manager has no camera attached");
 			SetEnabled(false);
+			m_gameobject->GetScene()->SetMainCamera( *m_gameCamera );
 		}
 	}
 
@@ -28,28 +29,12 @@ namespace fan {
 	//================================================================================================================================
 	void GameManager::OnAttach() {
 		Actor::OnAttach();
-		m_gameobject->GetScene()->onScenePlay.Connect( &GameManager::OnScenePlay, this );
-		m_gameobject->GetScene()->onScenePause.Connect( &GameManager::OnScenePause, this );
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
 	void GameManager::OnDetach() {
 		Actor::OnDetach();
-		m_gameobject->GetScene()->onScenePlay.Disconnect( &GameManager::OnScenePlay, this );
-		m_gameobject->GetScene()->onScenePause.Disconnect( &GameManager::OnScenePause, this );
-	}
-	
-	//================================================================================================================================
-	//================================================================================================================================
-	void GameManager::OnScenePlay() {
-		m_gameobject->GetScene()->SetMainCamera( *m_gameCamera );
-	}
-
-	//================================================================================================================================
-	//================================================================================================================================
-	void GameManager::OnScenePause() {
-		
 	}
 
 	//================================================================================================================================

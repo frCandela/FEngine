@@ -110,13 +110,16 @@ namespace fan {
 		void DeleteSelection();
 		void ManageSelection();
 		void UpdateRenderer();
-		void SwitchPlayPause();
+		void SwitchPlayStop();
 
+		void OnSceneStop( Scene * _scene );
 		void OnSceneLoad(Scene * _scene);
 		void OnResolveTexturePtr( TexturePtr * _ptr );
 		void OnResolveMeshPtr( MeshPtr * _ptr );
 		void OnResolvePrefabPtr( PrefabPtr * _ptr );
 		void OnToogleShowUI() { m_showUI = ! m_showUI; }
+		void OnToogleView();
+		
 		void OnGameobjectDeleted( Gameobject * _gameobject );
 		void OnSetCurrentScene( int _scene );
 

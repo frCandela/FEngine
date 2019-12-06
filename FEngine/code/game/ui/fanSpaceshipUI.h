@@ -16,6 +16,7 @@ namespace fan
 	public:
 
 		void Start() override;
+		void Stop() override {}
 		void Update( const float _delta ) override;
 		void LateUpdate( const float _delta ) override;
 

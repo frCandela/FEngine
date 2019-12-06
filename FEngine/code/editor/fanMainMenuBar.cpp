@@ -195,14 +195,14 @@ namespace fan
 			if ( ImGui::BeginMenu( "Scene" ) )  {
 				
 				bool clientScene = (m_currentScene == CurrentScene::CLIENTS);
-				if ( ImGui::MenuItem( "client", nullptr, &clientScene ) && clientScene )
+				if ( ImGui::MenuItem( "client", "F1", &clientScene ) && clientScene )
 				{
 					m_currentScene = CurrentScene::CLIENTS;
 					onSetScene.Emmit( m_currentScene );
 				}
 
 				bool serverScene = (m_currentScene == CurrentScene::SERVER);
-				if ( ImGui::MenuItem( "server", nullptr, &serverScene ) && serverScene )
+				if ( ImGui::MenuItem( "server", "F1", &serverScene ) && serverScene )
 				{
 					m_currentScene = CurrentScene::SERVER;
 					onSetScene.Emmit( m_currentScene );
@@ -303,25 +303,29 @@ namespace fan
 	//================================================================================================================================
 	// reload the scene
 	//================================================================================================================================
-	void MainMenuBar::Reload() {
+	void MainMenuBar::Reload() 
+	{
+		if ( m_scene->GetState() == Scene::STOPPED )
+		{
+			// Save camera data
+			Json cameraData;
+			m_scene->GetMainCamera()->GetGameobject()->Save( cameraData );
 
-		// Save camera data
-		Json cameraData;
-		m_scene->GetMainCamera()->GetGameobject()->Save(cameraData);
+			// save old selection
+			Gameobject* prevSelection = Globals::Get().engine->GetSelectedGameobject();
+			const uint64_t id = prevSelection != nullptr ? prevSelection->GetUniqueID() : 0;
 
-		// save old selection
-		Gameobject* prevSelection = Globals::Get().engine->GetSelectedGameobject();
-		const uint64_t id = prevSelection != nullptr ? prevSelection->GetUniqueID() : 0; 
+			m_scene->LoadFrom( m_scene->GetPath() );
 
-		m_scene->LoadFrom( m_scene->GetPath() );
+			// restore camera
+			m_scene->GetMainCamera()->GetGameobject()->CopyDataFrom( cameraData );
 
-		// restore camera
-		m_scene->GetMainCamera()->GetGameobject()->CopyDataFrom( cameraData );
-
-		// restore selection
-		if( id != 0 ) {
-			Gameobject* selection = m_scene->FindGameobject( id );
-			Globals::Get().engine->SetSelectedGameobject( selection );
+			// restore selection
+			if ( id != 0 )
+			{
+				Gameobject* selection = m_scene->FindGameobject( id );
+				Globals::Get().engine->SetSelectedGameobject( selection );
+			}
 		}
 	}
 
