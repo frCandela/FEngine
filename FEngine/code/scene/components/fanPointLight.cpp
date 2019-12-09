@@ -4,6 +4,7 @@
 #include "scene/fanGameobject.h"
 #include "renderer/fanRendererDebug.h"
 #include "editor/fanModals.h"
+#include "editor/fanEditorDebug.h"
 
 namespace fan
 {
@@ -107,7 +108,7 @@ namespace fan
 		float lightRange = GetLightRange();
 		if (lightRange > 0 ) {
 			const btTransform transform = m_gameobject->GetComponent<Transform>()->GetBtTransform();
-			Debug::Render().DebugSphere(transform, lightRange, 2, m_pointLight->diffuse);
+			EditorDebug::Get().Renderer().DebugSphere(transform, lightRange, 2, m_pointLight->diffuse);
 		}
 
 	}

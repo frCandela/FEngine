@@ -120,7 +120,9 @@
     <ClCompile Include="code\editor\components\fanFPSCamera.cpp" />
     <ClCompile Include="code\editor\fanDragnDrop.cpp" />
     <ClCompile Include="code\editor\fanEditorCopyPaste.cpp" />
+    <ClCompile Include="code\editor\fanEditorGizmos.cpp" />
     <ClCompile Include="code\editor\fanEditorGrid.cpp" />
+    <ClCompile Include="code\editor\fanEditorSelection.cpp" />
     <ClCompile Include="code\editor\fanImguiIcons.cpp" />
     <ClCompile Include="code\editor\fanMainMenuBar.cpp" />
     <ClCompile Include="code\editor\fanModals.cpp" />
@@ -135,7 +137,6 @@
     <ClCompile Include="code\editor\windows\fanSceneWindow.cpp" />
     <ClCompile Include="code\editor\windows\fanEditorWindow.cpp" />
     <ClCompile Include="code\fanEngine.cpp" />
-    <ClCompile Include="code\fanGlobals.h" />
     <ClCompile Include="code\fanGlobalValues.cpp" />
     <ClCompile Include="code\fanMain.cpp" />
     <ClCompile Include="code\game\fanCameraController.cpp" />
@@ -263,7 +264,10 @@
     <ClInclude Include="code\editor\components\fanFPSCamera.h" />
     <ClInclude Include="code\editor\fanDragnDrop.h" />
     <ClInclude Include="code\editor\fanEditorCopyPaste.h" />
+    <ClInclude Include="code\editor\fanEditorDebug.h" />
+    <ClInclude Include="code\editor\fanEditorGizmos.h" />
     <ClInclude Include="code\editor\fanEditorGrid.h" />
+    <ClInclude Include="code\editor\fanEditorSelection.h" />
     <ClInclude Include="code\editor\fanImguiIcons.h" />
     <ClInclude Include="code\editor\fanMainMenuBar.h" />
     <ClInclude Include="code\editor\fanModals.h" />

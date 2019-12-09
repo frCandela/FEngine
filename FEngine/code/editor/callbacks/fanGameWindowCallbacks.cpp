@@ -17,7 +17,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void EditorGameWindowCallbacks::SetupGameWindow( GameWindow& _gameWindow, Renderer& _renderer )
+	void EditorGameWindowCallbacks::ConnectCallbacks( GameWindow& _gameWindow, Renderer& _renderer )
 	{
 		_gameWindow.onSizeChanged.Connect( &Renderer::ResizeGame, &_renderer );
 

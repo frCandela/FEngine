@@ -12,6 +12,8 @@ namespace fan {
 	class ConsoleWindow;
 	class EditorWindow;
 	class EditorGameWindowCallbacks;
+	class EditorSelection;
+	class EditorGizmos;
 	class EcsWindow;
 	class ProfilerWindow;
 	class GameWindow;
@@ -43,19 +45,14 @@ namespace fan {
 	//================================================================================================================================	
 	class Engine {
 	public:
-		static Signal<Gameobject*> onGameobjectSelected;
 		static Signal<Camera*> onSetCamera;
 
 		Engine();
 		~Engine();
 
 		void Run();
-		void Exit();
+		void Exit();	
 
-		void SetSelectedGameobject( Gameobject * _selectedGgameobject);
-		void Deselect();
-		
-		Gameobject *	const	GetSelectedGameobject() const	{ return m_selectedGameobject;  }
 		Renderer &				GetRenderer() const				{ return * m_renderer; }
 		MainMenuBar  &			GetMainMenuBar() const			{ return * m_mainMenuBar; }
 		RenderWindow &			GetRenderWindow() const			{ return * m_renderWindow; }
@@ -68,7 +65,6 @@ namespace fan {
 
 		EditorGrid GetEditorGrid() const { return m_editorGrid;  }
 		void SetEditorGrid( const EditorGrid _editorGrid) { m_editorGrid =_editorGrid; }
-		bool DrawMoveGizmo(const btTransform _transform, const size_t _uniqueID, btVector3& _newPosition);
 		void SetCurrentScene( Scene * _scene );
 
 	private:
@@ -89,26 +85,18 @@ namespace fan {
 
 		// Main objects
 		EditorCopyPaste *				m_copyPaste;
-		EditorGameWindowCallbacks	*	m_callbacks;
+		EditorGameWindowCallbacks	*	m_gameCallbacks;
+		EditorSelection *				m_selection;
+		EditorGizmos *					m_gizmos;
 		Renderer *						m_renderer;
 		Scene * 			m_currentScene;
 		Scene *				m_clientScene;
 		Scene *				m_serverScene;
 
-		Gameobject *		m_selectedGameobject;
-
-		struct GizmoCacheData {
-			int axisIndex;
-			bool pressed = false;
-			btVector3 offset;
-		};
-		std::map< size_t, GizmoCacheData > m_gizmoCacheData;
-
 		bool m_applicationShouldExit;
 		bool m_showUI = true;
 
-		void DeleteSelection();
-		void ManageSelection();
+
 		void UpdateRenderer();
 		void SwitchPlayStop();
 
@@ -120,7 +108,7 @@ namespace fan {
 		void OnToogleShowUI() { m_showUI = ! m_showUI; }
 		void OnToogleView();
 		
-		void OnGameobjectDeleted( Gameobject * _gameobject );
+
 		void OnSetCurrentScene( int _scene );
 
 		void DrawEditorGrid() const;

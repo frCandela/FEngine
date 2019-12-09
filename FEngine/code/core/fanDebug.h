@@ -4,7 +4,6 @@
 #include "core/fanSignal.h"
 
 namespace fan {
-	class RendererDebug;
 	class Camera;
 
 	//================================================================================================================================
@@ -39,10 +38,6 @@ namespace fan {
 		static void Clear();
 		static void Break() { __debugbreak(); }
 		const std::vector< LogItem >& GetLogBuffer() { return m_logBuffer;  }
-
-		static RendererDebug &	Render() { return * Get().m_renderer; };
-		void SetDebug( RendererDebug * _renderer );	
-
 	protected:
 		Debug();
 
@@ -51,8 +46,6 @@ namespace fan {
 		Type					m_currentType;
 		std::stringstream		m_stringstream;
 		std::vector< LogItem >	m_logBuffer;
-
-		RendererDebug * m_renderer;
 
 		void Flush();
 

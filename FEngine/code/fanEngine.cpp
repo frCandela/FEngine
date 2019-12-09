@@ -1,7 +1,6 @@
 #include "fanGlobalIncludes.h"
 #include "fanEngine.h"
 
-#include "fanGlobals.h"
 #include "renderer/fanRenderer.h"
 #include "renderer/fanRendererDebug.h"
 #include "renderer/fanRessourceManager.h"
@@ -24,6 +23,7 @@
 #include "core/files/fanFbxImporter.h"
 #include "editor/fanModals.h"
 #include "editor/fanMainMenuBar.h"
+#include "editor/fanEditorDebug.h"
 #include "editor/windows/fanRenderWindow.h"	
 #include "editor/windows/fanSceneWindow.h"	
 #include "editor/windows/fanInspectorWindow.h"	
@@ -35,6 +35,8 @@
 #include "editor/windows/fanNetworkWindow.h"
 #include "editor/components/fanFPSCamera.h"		
 #include "editor/callbacks/fanGameWindowCallbacks.h"
+#include "editor/fanEditorSelection.h"
+#include "editor/fanEditorGizmos.h"
 #include "editor/fanImguiIcons.h"
 #include "editor/fanEditorCopyPaste.h"
 #include "scene/fanScene.h"
@@ -60,8 +62,8 @@
 #include "scene/fanPrefab.h"
 
 
-namespace fan {
-	Signal<Gameobject*> Engine::onGameobjectSelected;
+namespace fan 
+{
 	Signal<Camera*> Engine::onSetCamera;
 
 	//================================================================================================================================
@@ -69,8 +71,6 @@ namespace fan {
 	Engine::Engine() :
 		m_applicationShouldExit(false)
 	{
-		Globals::Get().engine = this;
-
 		// Get serialized editor values
 		VkExtent2D windowSize = { 1280,720 };
 		SerializedValues::Get().GetUInt("renderer_extent_width", windowSize.width);
@@ -136,11 +136,11 @@ namespace fan {
 		m_clientScene = new Scene( "mainScene" );
 		m_serverScene = new Scene( "serverScene" );
 
-		Debug::Get().SetDebug( & m_renderer->GetRendererDebug() );
-
-		// Initialize editor components
-		m_copyPaste			= new EditorCopyPaste(*this);
-		m_callbacks			= new EditorGameWindowCallbacks( *m_clientScene, *m_serverScene );
+		// Initialize editor components		
+		m_selection			= new EditorSelection( m_currentScene);
+		m_copyPaste			= new EditorCopyPaste(*m_selection);
+		m_gizmos			= new EditorGizmos( m_currentScene);
+		m_gameCallbacks		= new EditorGameWindowCallbacks( *m_clientScene, *m_serverScene );
 		m_renderWindow		= new RenderWindow();
 		m_sceneWindow		= new SceneWindow();
 		m_inspectorWindow	= new InspectorWindow();		
@@ -150,7 +150,9 @@ namespace fan {
 		m_gameWindow		= new GameWindow();
 		m_preferencesWindow = new PreferencesWindow();		
 		m_networkWindow		= new NetworkWindow( );
-		m_mainMenuBar		= new MainMenuBar();
+		m_mainMenuBar		= new MainMenuBar( *m_selection);
+
+		EditorDebug::Get().SetDebug( & m_renderer->GetRendererDebug(), m_gizmos );
 
 		m_renderWindow->SetRenderer( m_renderer );
 		m_preferencesWindow->SetRenderer( m_renderer );
@@ -158,7 +160,7 @@ namespace fan {
 		SetCurrentScene( m_clientScene );
 
 		m_mainMenuBar->SetWindows( { m_renderWindow , m_sceneWindow , m_inspectorWindow , m_consoleWindow, m_ecsWindow, m_profilerWindow, m_gameWindow, m_networkWindow, m_preferencesWindow } );
-		m_sceneWindow->onSelectGameobject.Connect( &Engine::SetSelectedGameobject, this );		
+		m_sceneWindow->onSelectGameobject.Connect( &EditorSelection::SetSelectedGameobject, m_selection );		
 		Mouse::Get().Init( m_gameWindow );
 
 		// Instance messages				
@@ -166,13 +168,12 @@ namespace fan {
 		m_mainMenuBar->onReloadIcons.		Connect(&Renderer::ReloadIcons, m_renderer );
 		m_mainMenuBar->onExit.				Connect( &Engine::Exit, this );
 		m_mainMenuBar->onSetScene.			Connect(&Engine::OnSetCurrentScene, this );
-		onGameobjectSelected.				Connect( &SceneWindow::OnGameobjectSelected, m_sceneWindow );
-		onGameobjectSelected.				Connect( &InspectorWindow::OnGameobjectSelected, m_inspectorWindow );
+		m_selection->onGameobjectSelected.	Connect( &SceneWindow::OnGameobjectSelected, m_sceneWindow );
+		m_selection->onGameobjectSelected.	Connect( &InspectorWindow::OnGameobjectSelected, m_inspectorWindow );
 
 		// Events linking
-		m_callbacks->SetupGameWindow( *m_gameWindow, *m_renderer );
+		m_gameCallbacks->ConnectCallbacks( *m_gameWindow, *m_renderer );
 		Input::Get().Manager().FindEvent( "reload_shaders" )->Connect(	&Renderer::ReloadShaders, m_renderer );
-		Input::Get().Manager().FindEvent( "delete" )->Connect(			&Engine::DeleteSelection, this );
 		Input::Get().Manager().FindEvent( "play_pause" )->Connect(		&Engine::SwitchPlayStop, this );
 		Input::Get().Manager().FindEvent( "copy" )->Connect(			&EditorCopyPaste::OnCopy, m_copyPaste );
 		Input::Get().Manager().FindEvent( "paste" )->Connect(			&EditorCopyPaste::OnPaste, m_copyPaste );
@@ -187,7 +188,7 @@ namespace fan {
 		m_clientScene->onSceneLoad.Connect( &SceneWindow::OnExpandHierarchy, m_sceneWindow );
 		m_clientScene->onSceneLoad.Connect( &Engine::OnSceneLoad, this );
 		m_clientScene->onSceneStop.Connect( &Engine::OnSceneStop, this );
-		m_clientScene->onDeleteGameobject.Connect( &Engine::OnGameobjectDeleted, this );
+
 		m_clientScene->onRegisterMeshRenderer.Connect	( &Scene::RegisterMeshRenderer, m_clientScene );
 		m_clientScene->onUnRegisterMeshRenderer.Connect	( &Scene::UnRegisterMeshRenderer, m_clientScene );
 		m_clientScene->onPointLightAttach.Connect		( &Scene::RegisterPointLight, m_clientScene );
@@ -199,7 +200,6 @@ namespace fan {
 		m_serverScene->onSceneLoad.Connect( &SceneWindow::OnExpandHierarchy, m_sceneWindow );
 		m_serverScene->onSceneLoad.Connect( &Engine::OnSceneLoad, this );
 		m_serverScene->onSceneStop.Connect( &Engine::OnSceneStop, this );
-		m_serverScene->onDeleteGameobject.Connect( &Engine::OnGameobjectDeleted, this );
 		m_serverScene->onRegisterMeshRenderer.Connect	( &Scene::RegisterMeshRenderer, m_serverScene );
 		m_serverScene->onUnRegisterMeshRenderer.Connect	( &Scene::UnRegisterMeshRenderer, m_serverScene );
 		m_serverScene->onPointLightAttach.Connect		( &Scene::RegisterPointLight, m_serverScene );
@@ -216,7 +216,6 @@ namespace fan {
 		delete m_mainMenuBar;
 		delete m_clientScene;
 		delete m_serverScene;
-
 
 		// Serialize editor positions
 		const Window * window = m_renderer->GetWindow();
@@ -271,7 +270,7 @@ namespace fan {
 					SCOPED_PROFILE( draw_ui )					
 					m_mainMenuBar->Draw();
 					m_networkWindow->Update(targetLogicDelta);
-					ManageSelection();
+					m_selection->Update( m_gameWindow->IsHovered() );
 					DrawEditorGrid();
 				}
 
@@ -339,7 +338,7 @@ namespace fan {
 	//================================================================================================================================
 	void Engine::OnSceneLoad(Scene * _scene) {
 
-		m_selectedGameobject = nullptr;
+		m_selection->Deselect();
 
 		// Editor Camera
 		Gameobject * cameraGameobject = _scene->CreateGameobject("editor_camera");
@@ -357,8 +356,6 @@ namespace fan {
 		editorCamController->SetRemovable(false);		
 
 		_scene->SetMainCamera( editorCamera );
-
-		Debug::Get().SetDebug( &m_renderer->GetRendererDebug() );
 	}
 
 	//================================================================================================================================
@@ -369,8 +366,8 @@ namespace fan {
 			const int count = m_editorGrid.linesCount;
 
 			for (int coord = -m_editorGrid.linesCount; coord <= m_editorGrid.linesCount; coord++) {
-				Debug::Render().DebugLine( m_editorGrid.offset + btVector3(-count * size, 0.f, coord*size), m_editorGrid.offset + btVector3(count*size, 0.f, coord*size), m_editorGrid.color);
-				Debug::Render().DebugLine( m_editorGrid.offset + btVector3(coord*size, 0.f, -count * size), m_editorGrid.offset + btVector3(coord*size, 0.f, count*size), m_editorGrid.color);
+				EditorDebug::Get().Renderer().DebugLine( m_editorGrid.offset + btVector3(-count * size, 0.f, coord*size), m_editorGrid.offset + btVector3(count*size, 0.f, coord*size), m_editorGrid.color);
+				EditorDebug::Get().Renderer().DebugLine( m_editorGrid.offset + btVector3(coord*size, 0.f, -count * size), m_editorGrid.offset + btVector3(coord*size, 0.f, count*size), m_editorGrid.color);
 			}
 		}
 	}
@@ -383,7 +380,7 @@ namespace fan {
 			const Gameobject * gameobject = entities[gameobjectIndex];
 			if (gameobject != m_currentScene->GetMainCamera()->GetGameobject()) {
 				AABB aabb = gameobject->GetAABB();
-				Debug::Get().Render().DebugAABB(aabb, Color::Red);
+				EditorDebug::Get().Renderer().DebugAABB(aabb, Color::Red);
 			}
 		}
 	}
@@ -391,8 +388,9 @@ namespace fan {
 	//================================================================================================================================
 	//================================================================================================================================
 	void Engine::DrawHull() const	{
-		if (m_selectedGameobject != nullptr) {
-			MeshRenderer * meshRenderer = m_selectedGameobject->GetComponent<MeshRenderer>();
+		Gameobject * selectedGameobject = m_selection->GetSelectedGameobject();
+		if (selectedGameobject != nullptr) {
+			MeshRenderer * meshRenderer = selectedGameobject->GetComponent<MeshRenderer>();
 			if (meshRenderer != nullptr) {
 				const ConvexHull * hull = nullptr;
 				Mesh * mesh = meshRenderer->GetMesh();
@@ -417,9 +415,9 @@ namespace fan {
 							const btVector3 worldVec1 = ToBullet(modelMat * glm::vec4(vec1[0], vec1[1], vec1[2], 1.f));
 							const btVector3 worldVec2 = ToBullet(modelMat * glm::vec4(vec2[0], vec2[1], vec2[2], 1.f));
 							
-							Debug::Render().DebugLine(worldVec0, worldVec1, color);
-							Debug::Render().DebugLine(worldVec1, worldVec2, color);
-							Debug::Render().DebugLine(worldVec2, worldVec0, color);
+							EditorDebug::Get().Renderer().DebugLine(worldVec0, worldVec1, color);
+							EditorDebug::Get().Renderer().DebugLine(worldVec1, worldVec2, color);
+							EditorDebug::Get().Renderer().DebugLine(worldVec2, worldVec0, color);
 		
 						}
 					}
@@ -431,8 +429,9 @@ namespace fan {
 	//================================================================================================================================
 	//================================================================================================================================
 	void Engine::DrawWireframe() const {
-		if (m_selectedGameobject != nullptr) {
-			MeshRenderer * meshRenderer = m_selectedGameobject->GetComponent<MeshRenderer>();
+		Gameobject * selectedGameobject = m_selection->GetSelectedGameobject();
+		if (selectedGameobject != nullptr) {
+			MeshRenderer * meshRenderer = selectedGameobject->GetComponent<MeshRenderer>();
 			if (meshRenderer != nullptr) {
 				Mesh * mesh = meshRenderer->GetMesh();
 				if (mesh != nullptr) {
@@ -444,9 +443,9 @@ namespace fan {
 						const btVector3 v0 = ToBullet(modelMat * glm::vec4(vertices[indices[3 * index + 0]].pos, 1.f));
 						const btVector3 v1 = ToBullet(modelMat * glm::vec4(vertices[indices[3 * index + 1]].pos, 1.f));
 						const btVector3 v2 = ToBullet(modelMat * glm::vec4(vertices[indices[3 * index + 2]].pos, 1.f));
-						Debug::Render().DebugLine(v0, v1, Color::Yellow);
-						Debug::Render().DebugLine(v1, v2, Color::Yellow);
-						Debug::Render().DebugLine(v2, v0, Color::Yellow);
+						EditorDebug::Get().Renderer().DebugLine(v0, v1, Color::Yellow);
+						EditorDebug::Get().Renderer().DebugLine(v1, v2, Color::Yellow);
+						EditorDebug::Get().Renderer().DebugLine(v2, v0, Color::Yellow);
 					}
 				}
 			}
@@ -455,10 +454,11 @@ namespace fan {
 	
 	//================================================================================================================================
 	//================================================================================================================================
-	void Engine::DrawNormals() const {
-
-		if (m_selectedGameobject != nullptr) {
-			MeshRenderer * meshRenderer = m_selectedGameobject->GetComponent<MeshRenderer>();
+	void Engine::DrawNormals() const 
+	{
+		Gameobject * selectedGameobject = m_selection->GetSelectedGameobject();
+		if ( selectedGameobject != nullptr) {
+			MeshRenderer * meshRenderer = selectedGameobject->GetComponent<MeshRenderer>();
 			if (meshRenderer != nullptr) {
 				Mesh * mesh = meshRenderer->GetMesh();
 				if (mesh != nullptr) {
@@ -471,25 +471,11 @@ namespace fan {
 						const Vertex& vertex = vertices[indices[index]];
 						const btVector3 position = ToBullet(modelMat * glm::vec4(vertex.pos, 1.f));
 						const btVector3 normal = ToBullet(normalMat * glm::vec4(vertex.normal, 1.f));
-						Debug::Render().DebugLine(position, position + 0.1f * normal, Color::Green);
+						EditorDebug::Get().Renderer().DebugLine(position, position + 0.1f * normal, Color::Green);
 					}
 				}
 			}
 		}
-	}
-
-	//================================================================================================================================
-	//================================================================================================================================
-	void Engine::SetSelectedGameobject( Gameobject * _selectedGameobject ) {
-		m_selectedGameobject = _selectedGameobject; 
-		onGameobjectSelected.Emmit( m_selectedGameobject );
-	}
-
-	//================================================================================================================================
-	//================================================================================================================================
-	void Engine::Deselect() { 
-		m_selectedGameobject = nullptr; 
-		onGameobjectSelected.Emmit( m_selectedGameobject );
 	}
 
 	//================================================================================================================================
@@ -599,151 +585,6 @@ namespace fan {
 		m_renderer->SetUIDrawData(uiDrawData);
 
 	}
-
-	//================================================================================================================================
-	//================================================================================================================================
-	void Engine::DeleteSelection() {
-		if ( m_selectedGameobject != nullptr ) {
-			m_currentScene->DeleteGameobject( m_selectedGameobject );
-		}		
-	}
-
-	//================================================================================================================================
-	//================================================================================================================================
-	void Engine::ManageSelection() {
-		SCOPED_PROFILE( selection )
-
-		bool mouseCaptured = ImGui::GetIO().WantCaptureMouse;
-
-		// Translation gizmo on selected gameobject
-		if (m_selectedGameobject != nullptr && m_selectedGameobject != m_currentScene->GetMainCamera()->GetGameobject()
-			&& m_selectedGameobject->GetComponent<UIMeshRenderer>() == nullptr 
-			&& m_selectedGameobject->GetComponent<UITransform>() == nullptr ) 
-
-		{
-			Transform * transform = m_selectedGameobject->GetComponent< Transform >();
-			btVector3 newPosition;
-			if (DrawMoveGizmo(btTransform(btQuaternion(0, 0, 0), transform->GetPosition()), (size_t)this, newPosition)) {
-				transform->SetPosition(newPosition);
-				mouseCaptured = true;
-			}
-		}
-
-		// Mouse selection
-		if ( m_gameWindow->IsHovered() && Mouse::Get().GetButtonPressed(Mouse::button0) ) 
-		{
-			const btVector3 cameraOrigin = m_currentScene->GetMainCamera()->GetGameobject()->GetComponent<Transform>()->GetPosition();;
-			const Ray ray = m_currentScene->GetMainCamera()->ScreenPosToRay(Mouse::Get().GetScreenSpacePosition());
-			const std::vector<Gameobject *>  & entities = m_currentScene->BuildEntitiesList();
-
-			// Raycast on all the entities
-			Gameobject * closestGameobject = nullptr;
-			float closestDistance2 = std::numeric_limits<float>::max();
-			for (int gameobjectIndex = 0; gameobjectIndex < entities.size(); gameobjectIndex++) {
-				Gameobject * gameobject = entities[gameobjectIndex];
-
-				if (gameobject == m_currentScene->GetMainCamera()->GetGameobject()) {
-					continue;
-				}
-
-				const AABB & aabb = gameobject->GetAABB();
-				btVector3 intersection;
-				if (aabb.RayCast(ray.origin, ray.direction, intersection) == true) {
-					MeshRenderer * meshRenderer = gameobject->GetComponent<MeshRenderer>();
-					if (meshRenderer != nullptr && meshRenderer->GetMesh() != nullptr ) {
-						Transform * transform = gameobject->GetComponent<Transform>();
-						const Ray transformedRay(transform->InverseTransformPoint(ray.origin), transform->InverseTransformDirection(ray.direction));
-						if (meshRenderer->GetMesh()->GetHull().RayCast(transformedRay.origin, transformedRay.direction, intersection) == false) {
-							continue;
-						}
-					}
-					const float distance2 = intersection.distance2(cameraOrigin);
-					if (distance2 < closestDistance2) {
-						closestDistance2 = distance2;
-						closestGameobject = gameobject;
-					}
-				}
-			}
-			SetSelectedGameobject(closestGameobject);
-		}
-	}	
-
-	//================================================================================================================================
-	// Returns the new position of the move gizmo
-	// Caller must provide a unique ID to allow proper caching of the user input data
-	//================================================================================================================================
-	bool Engine::DrawMoveGizmo(const btTransform _transform, const size_t _uniqueID, btVector3& _newPosition){
-		
-		GizmoCacheData & cacheData = m_gizmoCacheData[_uniqueID];
-		const btVector3 origin = _transform.getOrigin();
-		const btTransform rotation(_transform.getRotation());
-		const btVector3 axisDirection[3] = { btVector3(1, 0, 0), btVector3(0, 1, 0),  btVector3(0, 0, 1) };
-		const btVector3 cameraPosition = m_currentScene->GetMainCamera()->GetGameobject()->GetComponent<Transform>()->GetPosition();
-		const float size = 0.2f * origin.distance(cameraPosition);
-		const btTransform coneRotation[3] = {
-		btTransform(btQuaternion(0, 0, btRadians(-90)), size*axisDirection[0])
-		,btTransform(btQuaternion::getIdentity(),		size*axisDirection[1])
-		,btTransform(btQuaternion(0, btRadians(90), 0), size*axisDirection[2])
-		};
-
-		_newPosition = _transform.getOrigin();
-		for (int axisIndex = 0; axisIndex < 3 ; axisIndex++) 	{
-			const Color opaqueColor(axisDirection[axisIndex].x(), axisDirection[axisIndex].y(), axisDirection[axisIndex].z(), 1.f);
-			
-			// Generates a cone shape
-			std::vector<btVector3> coneTris = GetCone(0.1f*size, 0.5f*size, 10);
-			btTransform transform = _transform * coneRotation[axisIndex];
-			for (int vertIndex = 0; vertIndex < coneTris.size(); vertIndex++) {
-				coneTris[vertIndex] = transform * coneTris[vertIndex];
-			}
-
-			if ( ImGui::IsMouseReleased(0)) {
-				cacheData.pressed = false;
-				cacheData.axisIndex = -1;
-			}
-
-			// Raycast on the gizmo shape to determine if the mouse is hovering it
-			Color clickedColor = opaqueColor;
-			const Ray ray = m_currentScene->GetMainCamera()->ScreenPosToRay(Mouse::Get().GetScreenSpacePosition());
-			for (int triIndex = 0; triIndex < coneTris.size() / 3; triIndex++) {
-				Triangle triangle(coneTris[3 * triIndex + 0], coneTris[3 * triIndex + 1], coneTris[3 * triIndex + 2]);
-				btVector3 intersection;
-				if (triangle.RayCast(ray.origin, ray.direction, intersection)) {
-					clickedColor[3] = 0.5f;
-					if (Mouse::Get().GetButtonPressed(0)) {
-						cacheData.pressed = true;
-						cacheData.axisIndex = axisIndex;
-					}
-					break;
-				}
-			}
-
-			// Draw the gizmo cone & lines
-			Debug::Render().DebugLine(origin, origin + size*( _transform *  axisDirection[axisIndex] - origin ), opaqueColor, false );
-			for (int triangleIndex = 0; triangleIndex < coneTris.size() / 3; triangleIndex++) {
-				Debug::Get().Render().DebugTriangle(coneTris[3 * triangleIndex + 0], coneTris[3 * triangleIndex + 1], coneTris[3 * triangleIndex + 2], clickedColor);
-			}
-
-			// Calculate closest point between the mouse ray and the axis selected
-			if (cacheData.pressed == true && cacheData.axisIndex == axisIndex ) {
-				btVector3 axis = rotation * axisDirection[axisIndex];
-
-				 const Ray screenRay = m_currentScene->GetMainCamera()->ScreenPosToRay(Mouse::Get().GetScreenSpacePosition()); 	
-				 const Ray axisRay = { origin , axis };				 
-				 btVector3 trash, projectionOnAxis;
-				 screenRay.RayClosestPoints(axisRay, trash, projectionOnAxis);
-
-				if ( Mouse::Get().GetButtonPressed( 0 ) ) {
-					cacheData.offset = projectionOnAxis - _transform.getOrigin();
-				}
-
-				_newPosition = projectionOnAxis - cacheData.offset;
-			}
-		}
-		return cacheData.pressed;
-	}
-
-
 	
 	//================================================================================================================================
 	//================================================================================================================================
@@ -787,14 +628,6 @@ namespace fan {
 			*_ptr = PrefabPtr( prefab, prefab->GetPath() );
 		}
 		
-	}
-
-	//================================================================================================================================
-	//================================================================================================================================
-	void Engine::OnGameobjectDeleted( Gameobject * _gameobject ) {
-		if ( _gameobject == m_selectedGameobject ) {
-			Deselect();
-		}
 	}
 
 	//================================================================================================================================

@@ -4,6 +4,7 @@
 #include "scene/fanGameobject.h"
 #include "scene/components/fanTransform.h"
 #include "renderer/fanRendererDebug.h"
+#include "editor/fanEditorDebug.h"
 
 namespace fan {
 	REGISTER_TYPE_INFO( BoxShape, TypeInfo::Flags::EDITOR_COMPONENT, "physics/" )
@@ -54,7 +55,7 @@ namespace fan {
 				SetExtent( extent );
 			}
 
-			Debug::Render().DebugCube( m_gameobject->GetTransform()->GetBtTransform(), 0.5f * extent, Color::Green );
+			EditorDebug::Get().Renderer().DebugCube( m_gameobject->GetTransform()->GetBtTransform(), 0.5f * extent, Color::Green );
 		} ImGui::PopItemWidth();
 	}
 

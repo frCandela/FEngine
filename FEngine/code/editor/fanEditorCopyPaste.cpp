@@ -1,7 +1,7 @@
 #include "fanGlobalIncludes.h"
 #include "editor/fanEditorCopyPaste.h"
 
-#include "fanEngine.h"
+#include "editor/fanEditorSelection.h"
 #include "scene/fanGameobject.h"
 #include "scene/fanSceneInstantiate.h"
 #include "scene/fanPrefab.h"
@@ -10,17 +10,17 @@ namespace fan
 {
 	//================================================================================================================================
 	//================================================================================================================================
-	EditorCopyPaste::EditorCopyPaste( Engine& _engine ) : m_engine( _engine ) {}
+	EditorCopyPaste::EditorCopyPaste( EditorSelection& _selection ) : m_selection( _selection ) {}
 
 	//================================================================================================================================
 	//================================================================================================================================
 	void EditorCopyPaste::OnCopy()
 	{
-		if ( m_engine.GetSelectedGameobject() != nullptr )
+		if ( m_selection.GetSelectedGameobject() != nullptr )
 		{
 
 			Prefab prefab;
-			prefab.LoadFromGameobject( m_engine.GetSelectedGameobject() );
+			prefab.LoadFromGameobject( m_selection.GetSelectedGameobject() );
 
 			std::stringstream ss;
 			ss << prefab.GetJson();
@@ -41,7 +41,7 @@ namespace fan
 		Prefab prefab;
 		if ( prefab.LoadFromJson( pastedJson ) )
 		{
-			m_engine.GetScene().CreateGameobject( prefab, m_engine.GetSelectedGameobject() );
+			m_selection.GetSelectedScene().CreateGameobject( prefab, m_selection.GetSelectedGameobject() );
 		}		
 	}
 }

@@ -5,6 +5,7 @@ namespace fan
 	struct EditorGrid;
 	class Scene;
 	class EditorWindow;
+	class EditorSelection;
 
 	//================================================================================================================================
 	//================================================================================================================================
@@ -29,7 +30,7 @@ namespace fan
 		Signal<> onReloadIcons;
 		Signal<> onExit;
 
-		MainMenuBar( );
+		MainMenuBar( EditorSelection& _editorSelection );
 		~MainMenuBar();
 
 		void SetScene( Scene * _scene  )			{ m_scene		= _scene;  }
@@ -47,6 +48,7 @@ namespace fan
 	private:
 		Scene * m_scene;
 		EditorGrid * m_editorGrid;
+		EditorSelection& m_editorSelection;
 
 		std::vector< EditorWindow * > m_editorWindows;
 

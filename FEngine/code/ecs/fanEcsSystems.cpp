@@ -9,6 +9,7 @@
 #include "scene/fanScene.h"
 #include "scene/fanGameobject.h"
 #include "scene/components/fanTransform.h"
+#include "editor/fanEditorDebug.h"
 
 namespace fan {
 
@@ -79,7 +80,7 @@ namespace fan {
 			}
 		}
 
-		Debug::Render().DebugTriangles( triangles, colors );
+		EditorDebug::Get().Renderer().DebugTriangles( triangles, colors );
 	}
 
 	//================================================================================================================================
@@ -166,8 +167,8 @@ namespace fan {
 		{
 
 			const Color debugColor( 1.f, 1.f, 0.f, 0.3f );
-			Debug::Render().DebugTriangle( btVector3::Zero(), _v0, _v1, debugColor );
-			Debug::Render().DebugLine( btVector3::Zero(), _v0, Color::Green );
+			EditorDebug::Get().Renderer().DebugTriangle( btVector3::Zero(), _v0, _v1, debugColor );
+			EditorDebug::Get().Renderer().DebugLine( btVector3::Zero(), _v0, Color::Green );
 		}
 	}
 	//================================================================================================================================

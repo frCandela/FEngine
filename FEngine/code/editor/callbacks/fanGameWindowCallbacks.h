@@ -12,7 +12,7 @@ namespace fan
 	{
 	public:
 		EditorGameWindowCallbacks( Scene& _clientScene, Scene& _serverScene );
-		void SetupGameWindow( GameWindow& _gameWindow, Renderer& _renderer );
+		void ConnectCallbacks( GameWindow& _gameWindow, Renderer& _renderer );
 
 		void OnGamePlay();
 		void OnGamePause();

@@ -68,12 +68,4 @@ namespace fan {
 	void Debug::Clear() {
 		Get().m_logBuffer.clear();		
 	}
-
-
-	//================================================================================================================================
-	// WARNING : this method is not available in retail
-	//================================================================================================================================
-	void Debug::SetDebug( RendererDebug * _renderer ) {
-		m_renderer = _renderer; 
-	}
 }

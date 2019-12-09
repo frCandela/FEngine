@@ -2,20 +2,20 @@
 
 namespace fan
 {
-	class Engine;
+	class EditorSelection;
 
 	//================================================================================================================================
 	//================================================================================================================================
 	class EditorCopyPaste
 	{
 	public:
-		EditorCopyPaste( Engine& _engine );
+		EditorCopyPaste( EditorSelection& _engine );
 
 		// editor callbacks
 		void OnCopy();
 		void OnPaste();
 
 	private:
-		Engine& m_engine;
+		EditorSelection& m_selection;
 	};
 }

@@ -4,13 +4,13 @@
 #include "scene/fanGameobject.h"
 #include "scene/components/fanTransform.h"
 #include "scene/components/ui/fanProgressBar.h"
+#include "scene/components/ui/fanUIMeshRenderer.h"
+#include "scene/components/fanCamera.h"
 #include "game/fanWithEnergy.h"
 #include "game/fanSolarPanel.h"
 #include "game/fanHealth.h"
-#include "scene/components/ui/fanUIMeshRenderer.h"
-#include "scene/components/fanCamera.h"
 #include "renderer/fanRendererDebug.h"
-
+#include "editor/fanEditorDebug.h"
 
 namespace fan
 {
@@ -113,7 +113,7 @@ namespace fan
 			Ray toto = camera->ScreenPosToRay(m_gameobject->GetTransform()->GetPosition());
 
 
-			Debug::Render().DebugLine(toto.origin, m_spaceShip->GetTransform()->GetPosition(), Color::Red );
+			EditorDebug::Get().Renderer().DebugLine(toto.origin, m_spaceShip->GetTransform()->GetPosition(), Color::Red );
 		}
 	}
 	 

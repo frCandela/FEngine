@@ -10,6 +10,7 @@
 #include "scene/components/fanSphereShape.h"
 #include "game/fanPlanet.h"
 #include "renderer/fanRendererDebug.h"
+#include "editor/fanEditorDebug.h"
 
 namespace fan {
 	REGISTER_TYPE_INFO( SolarSystem, TypeInfo::Flags::EDITOR_COMPONENT, "game/" )
@@ -136,7 +137,7 @@ namespace fan {
 		{
 			OrbitData orbit = m_orbits[orbitIndex];
 
-			Debug::Render().DebugCircle( transform->GetPosition(), orbit.radius, transform->Up(), 32, Color::Cyan );
+			EditorDebug::Get().Renderer().DebugCircle( transform->GetPosition(), orbit.radius, transform->Up(), 32, Color::Cyan );
 
 			float const time = -orbit.speed * Time::ElapsedSinceStartup();
 			for ( int planetIndex = 0; planetIndex < orbit.planets.size(); planetIndex++ )
@@ -144,7 +145,7 @@ namespace fan {
 				PlanetData & planet = orbit.planets[planetIndex];
 				btVector3 position( std::cosf( time + planet.phase ), 0, std::sinf( time + planet.phase ) );
 
-				Debug::Render().DebugCircle( orbit.radius * position, std::fabs( orbit.maxScale ), transform->Up(), 16, Color::Cyan );
+				EditorDebug::Get().Renderer().DebugCircle( orbit.radius * position, std::fabs( orbit.maxScale ), transform->Up(), 16, Color::Cyan );
 			}
 
 		}

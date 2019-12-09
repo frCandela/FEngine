@@ -5,6 +5,7 @@
 #include "scene/fanGameobject.h"
 #include "renderer/fanRendererDebug.h"
 #include "editor/fanModals.h"
+#include "editor/fanEditorDebug.h"
 
 namespace fan {
 	REGISTER_TYPE_INFO( DirectionalLight, TypeInfo::Flags::EDITOR_COMPONENT, "light/" )
@@ -85,9 +86,9 @@ namespace fan {
 			for ( int offsetIndex = 0; offsetIndex < 5; offsetIndex++ )
 			{
 				const btVector3 offset = offsets[offsetIndex];
-				Debug::Render().DebugLine( pos + offset, pos + offset + length * dir, color );
+				EditorDebug::Get().Renderer().DebugLine( pos + offset, pos + offset + length * dir, color );
 			}
-			Debug::Render().DebugSphere( transform->GetBtTransform(), radius, 0, color );
+			EditorDebug::Get().Renderer().DebugSphere( transform->GetBtTransform(), radius, 0, color );
 		} ImGui::PopItemWidth();
 	}
 

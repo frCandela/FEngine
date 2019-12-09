@@ -4,6 +4,7 @@
 #include "scene/fanGameobject.h"
 #include "scene/components/fanTransform.h"
 #include "renderer/fanRendererDebug.h"
+#include "editor/fanEditorDebug.h"
 
 namespace fan
 {
@@ -55,7 +56,7 @@ namespace fan
 			{
 				SetRadius( radius );
 			}
-			Debug::Render().DebugSphere( m_gameobject->GetTransform()->GetBtTransform(), radius, 2, Color::Green );
+			EditorDebug::Get().Renderer().DebugSphere( m_gameobject->GetTransform()->GetBtTransform(), radius, 2, Color::Green );
 		} ImGui::PopItemWidth();
 
 	

@@ -1,17 +1,15 @@
 #include "fanGlobalIncludes.h"
-
-#include "fanGlobals.h"
-#include "fanEngine.h"
-
 #include "editor/fanMainMenuBar.h"
+
 #include "editor/windows/fanEditorWindow.h"
 #include "editor/fanEditorGrid.h"
+#include "editor/fanModals.h"
+#include "editor/fanEditorSelection.h"
 #include "core/files/fanSerializedValues.h"
 #include "core/input/fanInput.h"
 #include "core/input/fanInputManager.h"
 #include "core/time/fanProfiler.h"
 #include "core/time/fanTime.h"
-#include "editor/fanModals.h"
 #include "scene/fanScene.h"
 #include "scene/fanGameobject.h"
 #include "scene/components/fanCamera.h"
@@ -20,13 +18,15 @@ namespace fan
 {
 	//================================================================================================================================
 	//================================================================================================================================
-	MainMenuBar::MainMenuBar() :
-		m_showImguiDemoWindow(true)
+	MainMenuBar::MainMenuBar( EditorSelection& _editorSelection )
+		: m_editorSelection(_editorSelection)
+		, m_showImguiDemoWindow(true)
 		, m_showAABB(false)
 		, m_showHull(false)
 		, m_showWireframe(false)
 		, m_showNormals(false)
-		, m_sceneExtensionFilter(GlobalValues::s_sceneExtensions) {
+		, m_sceneExtensionFilter(GlobalValues::s_sceneExtensions) 
+	{
 
 		SerializedValues::Get().GetBool( "show_imguidemo", m_showImguiDemoWindow );
 
@@ -312,7 +312,7 @@ namespace fan
 			m_scene->GetMainCamera()->GetGameobject()->Save( cameraData );
 
 			// save old selection
-			Gameobject* prevSelection = Globals::Get().engine->GetSelectedGameobject();
+			Gameobject* prevSelection = m_editorSelection.GetSelectedGameobject();
 			const uint64_t id = prevSelection != nullptr ? prevSelection->GetUniqueID() : 0;
 
 			m_scene->LoadFrom( m_scene->GetPath() );
@@ -324,7 +324,7 @@ namespace fan
 			if ( id != 0 )
 			{
 				Gameobject* selection = m_scene->FindGameobject( id );
-				Globals::Get().engine->SetSelectedGameobject( selection );
+				m_editorSelection.SetSelectedGameobject( selection );
 			}
 		}
 	}
