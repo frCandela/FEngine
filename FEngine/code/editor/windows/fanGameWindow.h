@@ -10,6 +10,11 @@ namespace fan {
 	class GameWindow : public EditorWindow {
 	public:
 		Signal< btVector2 > onSizeChanged;
+		Signal<> onPlay;
+		Signal<> onPause;
+		Signal<> onResume;
+		Signal<> onStop;
+		Signal<> onStep;
 
 		GameWindow();
 		btVector2 GetSize()			const { return m_size; }

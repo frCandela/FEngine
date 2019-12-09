@@ -32,37 +32,43 @@ namespace fan {
 		{
 			ImGui::Text( "%d x %d", (int)size.x(), (int)size.y() );
 
-			if ( m_scene->GetState() == Scene::STOPPED )
+			const ImVec4 disabledColor = ImVec4( 0.3f, 0.3f, 0.3f, 0.3f );
+			const Scene::State state = m_scene->GetState();
+			
+			if ( state == Scene::STOPPED )
 			{
-				if ( ImGui::ButtonIcon( ImGui::PLAY16, { 16,16 }, -1, ImVec4( 0, 0, 0, 0 ) ) )
+				// Play
+				if ( ImGui::ButtonIcon( ImGui::PLAY16, { 16,16 }, -1, ImVec4( 0, 0, 0, 0 ) , ImVec4( 1.f, 1.f, 1.f, 1.f ) ) )
 				{
-					m_scene->Play();
+					onPlay.Emmit();
 				}
 			}
 			else
 			{
+				// Stop
 				if ( ImGui::ButtonIcon( ImGui::STOP16, { 16,16 }, -1, ImVec4( 0, 0, 0, 0 ) ) )
 				{
-					m_scene->Stop();
+					onStop.Emmit();
 				}
-			}	
+			}				
+			
+			const ImVec4 pauseTint 
+				= state == Scene::PLAYING ? ImVec4( 1.f, 1.f, 1.f, 1.f )
+				: state == Scene::PAUSED ? ImVec4( 0.9f, 0.9f, 0.9f, 1.f )
+				: disabledColor;
 
-			if ( ImGui::ButtonIcon( ImGui::PAUSE16, { 16,16 }, -1, ImVec4( 0, 0, 0, 0 ) ) )
+			// Pause
+			if ( ImGui::ButtonIcon( ImGui::PAUSE16, { 16,16 }, -1, ImVec4( 0, 0, 0, 0.f ), pauseTint ) )
 			{
-				Debug::Error("toto");
-				if ( m_scene->GetState() == Scene::PLAYING )
-				{
-					m_scene->Pause();
-				}
-				else if ( m_scene->GetState() == Scene::PAUSED )
-				{
-					m_scene->Resume();
-				}
-			}
+				if ( state == Scene::PLAYING	 ) { onPause.Emmit();  }			
+				else if ( state == Scene::PAUSED ) { onResume.Emmit(); }
+			}			
 
-			if ( ImGui::ButtonIcon( ImGui::STEP16, { 16,16 }, -1, ImVec4( 0, 0, 0, 0 ) ) )
+			// Step
+			const ImVec4 stepTint = state == Scene::PAUSED ? ImVec4( 1.f, 1.f, 1.f, 1.f ) : disabledColor;
+			if ( ImGui::ButtonIcon( ImGui::STEP16, { 16,16 }, -1, ImVec4( 0, 0, 0, 0 ), stepTint ) && state == Scene::PAUSED )
 			{
-				m_scene->Step( Time::Get().GetLogicDelta() );
+				onStep.Emmit();
 			}
 
 			ImGui::EndMenuBar();
