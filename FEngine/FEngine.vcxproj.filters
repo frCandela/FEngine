@@ -110,6 +110,9 @@
     <Filter Include="code\game\network">
       <UniqueIdentifier>{a38505df-1252-4af9-97d4-87d369da994d}</UniqueIdentifier>
     </Filter>
+    <Filter Include="code\editor\callbacks">
+      <UniqueIdentifier>{84964c9d-7cb2-491a-b301-774699b38d6f}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="code\editor\fanMainMenuBar.cpp">
@@ -495,6 +498,9 @@
     </ClCompile>
     <ClCompile Include="code\game\network\fanPlayerNetwork.cpp">
       <Filter>code\game\network</Filter>
+    </ClCompile>
+    <ClCompile Include="code\editor\callbacks\fanGameWindowCallbacks.cpp">
+      <Filter>code\editor\callbacks</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -1520,6 +1526,9 @@
     </ClInclude>
     <ClInclude Include="code\game\network\fanGameServer.h">
       <Filter>code\game\network</Filter>
+    </ClInclude>
+    <ClInclude Include="code\editor\callbacks\fanGameWindowCallbacks.h">
+      <Filter>code\editor\callbacks</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

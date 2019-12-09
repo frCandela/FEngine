@@ -116,6 +116,7 @@
     <ClCompile Include="code\ecs\fanEcsConfig.cpp" />
     <ClCompile Include="code\ecs\fanEcsManager.cpp" />
     <ClCompile Include="code\ecs\fanEcsSystems.cpp" />
+    <ClCompile Include="code\editor\callbacks\fanGameWindowCallbacks.cpp" />
     <ClCompile Include="code\editor\components\fanFPSCamera.cpp" />
     <ClCompile Include="code\editor\fanDragnDrop.cpp" />
     <ClCompile Include="code\editor\fanEditorCopyPaste.cpp" />
@@ -258,6 +259,7 @@
     <ClInclude Include="code\ecs\fanEcsComponentsKey.h" />
     <ClInclude Include="code\ecs\fanEcsManager.h" />
     <ClInclude Include="code\ecs\fanEcsSystems.h" />
+    <ClInclude Include="code\editor\callbacks\fanGameWindowCallbacks.h" />
     <ClInclude Include="code\editor\components\fanFPSCamera.h" />
     <ClInclude Include="code\editor\fanDragnDrop.h" />
     <ClInclude Include="code\editor\fanEditorCopyPaste.h" />

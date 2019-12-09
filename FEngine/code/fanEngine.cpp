@@ -34,6 +34,7 @@
 #include "editor/windows/fanGameWindow.h"
 #include "editor/windows/fanNetworkWindow.h"
 #include "editor/components/fanFPSCamera.h"		
+#include "editor/callbacks/fanGameWindowCallbacks.h"
 #include "editor/fanImguiIcons.h"
 #include "editor/fanEditorCopyPaste.h"
 #include "scene/fanScene.h"
@@ -139,6 +140,7 @@ namespace fan {
 
 		// Initialize editor components
 		m_copyPaste			= new EditorCopyPaste(*this);
+		m_callbacks			= new EditorGameWindowCallbacks( *m_clientScene, *m_serverScene );
 		m_renderWindow		= new RenderWindow();
 		m_sceneWindow		= new SceneWindow();
 		m_inspectorWindow	= new InspectorWindow();		
@@ -156,8 +158,7 @@ namespace fan {
 		SetCurrentScene( m_clientScene );
 
 		m_mainMenuBar->SetWindows( { m_renderWindow , m_sceneWindow , m_inspectorWindow , m_consoleWindow, m_ecsWindow, m_profilerWindow, m_gameWindow, m_networkWindow, m_preferencesWindow } );
-		m_sceneWindow->onSelectGameobject.Connect( &Engine::SetSelectedGameobject, this );
-		m_gameWindow->onSizeChanged.Connect( &Renderer::ResizeGame, m_renderer );
+		m_sceneWindow->onSelectGameobject.Connect( &Engine::SetSelectedGameobject, this );		
 		Mouse::Get().Init( m_gameWindow );
 
 		// Instance messages				
@@ -169,6 +170,7 @@ namespace fan {
 		onGameobjectSelected.				Connect( &InspectorWindow::OnGameobjectSelected, m_inspectorWindow );
 
 		// Events linking
+		m_callbacks->SetupGameWindow( *m_gameWindow, *m_renderer );
 		Input::Get().Manager().FindEvent( "reload_shaders" )->Connect(	&Renderer::ReloadShaders, m_renderer );
 		Input::Get().Manager().FindEvent( "delete" )->Connect(			&Engine::DeleteSelection, this );
 		Input::Get().Manager().FindEvent( "play_pause" )->Connect(		&Engine::SwitchPlayStop, this );

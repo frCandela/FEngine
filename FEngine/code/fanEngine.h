@@ -11,6 +11,7 @@ namespace fan {
 	class PreferencesWindow;
 	class ConsoleWindow;
 	class EditorWindow;
+	class EditorGameWindowCallbacks;
 	class EcsWindow;
 	class ProfilerWindow;
 	class GameWindow;
@@ -87,15 +88,14 @@ namespace fan {
 		EditorGrid			m_editorGrid;
 
 		// Main objects
-		EditorCopyPaste *	m_copyPaste;
-		Renderer *			m_renderer;
-
+		EditorCopyPaste *				m_copyPaste;
+		EditorGameWindowCallbacks	*	m_callbacks;
+		Renderer *						m_renderer;
 		Scene * 			m_currentScene;
 		Scene *				m_clientScene;
 		Scene *				m_serverScene;
 
 		Gameobject *		m_selectedGameobject;
-		FPSCamera *			m_editorCameraController = nullptr;
 
 		struct GizmoCacheData {
 			int axisIndex;
