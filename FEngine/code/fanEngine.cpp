@@ -41,8 +41,6 @@
 #include "editor/fanEditorCopyPaste.h"
 #include "scene/fanScene.h"
 #include "scene/fanGameobject.h"
-#include "scene/fanRessourcePtr.h"
-#include "scene/fanRessourcePtr.h"
 #include "scene/components/fanComponent.h"
 #include "scene/components/fanCamera.h"
 #include "scene/components/fanTransform.h"
@@ -58,7 +56,7 @@
 #include "scene/fanSceneInstantiate.h"
 #include "core/math/shapes/fanConvexHull.h"
 #include "core/time/fanProfiler.h"
-
+#include "renderer/fanRessourceManager.h"
 #include "scene/fanPrefab.h"
 
 
@@ -179,11 +177,6 @@ namespace fan
 		Input::Get().Manager().FindEvent( "paste" )->Connect(			&EditorCopyPaste::OnPaste, m_copyPaste );
 		Input::Get().Manager().FindEvent( "show_ui" )->Connect(			&Engine::OnToogleShowUI, this );
 		Input::Get().Manager().FindEvent( "toogle_view" )->Connect(		&Engine::OnToogleView, this );
-
-		// Static messages		
-		TexturePtr::s_onCreateUnresolved.			Connect ( &Engine::OnResolveTexturePtr, this );
-		MeshPtr::s_onCreateUnresolved.				Connect	( &Engine::OnResolveMeshPtr, this );
-		PrefabPtr::s_onCreateUnresolved.			Connect ( &Engine::OnResolvePrefabPtr, this );
 
 		m_clientScene->onSceneLoad.Connect( &SceneWindow::OnExpandHierarchy, m_sceneWindow );
 		m_clientScene->onSceneLoad.Connect( &Engine::OnSceneLoad, this );
@@ -586,49 +579,7 @@ namespace fan
 
 	}
 	
-	//================================================================================================================================
-	//================================================================================================================================
-	void Engine::OnResolveTexturePtr( TexturePtr * _ptr )
-	{
-		Texture * texture = RessourceManager::Get().FindTexture( _ptr->GetID() );
-		if ( texture == nullptr )
-		{
-			texture = RessourceManager::Get().LoadTexture( _ptr->GetID() );
-		}
-		if( texture ) {
-			*_ptr = TexturePtr( texture, texture->GetPath() );
-		}
-	}
 
-	//================================================================================================================================
-	//================================================================================================================================
-	void Engine::OnResolveMeshPtr( MeshPtr * _ptr )
-	{
-		Mesh * mesh = RessourceManager::Get().FindMesh( _ptr->GetID() );
-		if ( mesh == nullptr )
-		{
-			mesh = RessourceManager::Get().LoadMesh( _ptr->GetID() );
-		}
-		if( mesh ) {
-			*_ptr = MeshPtr( mesh, mesh->GetPath() );
-		}
-	}
-
-	//================================================================================================================================
-	//================================================================================================================================
-	void  Engine::OnResolvePrefabPtr( PrefabPtr * _ptr )
-	{
-		Prefab * prefab = RessourceManager::Get().FindPrefab( _ptr->GetID() );
-		if ( prefab == nullptr )
-		{
-			prefab = RessourceManager::Get().LoadPrefab( _ptr->GetID() );
-		}
-		if ( prefab )
-		{
-			*_ptr = PrefabPtr( prefab, prefab->GetPath() );
-		}
-		
-	}
 
 	//================================================================================================================================
 	//================================================================================================================================

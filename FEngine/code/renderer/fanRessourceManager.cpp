@@ -9,6 +9,7 @@
 #include "core/fanSignal.h"
 #include "scene/fanGameobject.h"
 #include "scene/fanPrefab.h"
+#include "scene/fanRessourcePtr.h"
 
 namespace fan
 {
@@ -26,6 +27,10 @@ namespace fan
 		Mesh::s_onDeleteVulkanData.Connect( &RessourceManager::OnDeleteMesh,	this );
 		UIMesh::s_onDeleteVulkanData.Connect( &RessourceManager::OnDeleteUIMesh,  this );
 		Texture::s_onDeleteVulkanData.Connect( &RessourceManager::OnDeleteTexture, this );
+
+		TexturePtr::s_onCreateUnresolved.Connect ( &RessourceManager::OnResolveTexturePtr,this );
+		MeshPtr::s_onCreateUnresolved.Connect	( &RessourceManager::OnResolveMeshPtr, this );
+		PrefabPtr::s_onCreateUnresolved.Connect ( &RessourceManager::OnResolvePrefabPtr, this);
 
 		LoadMesh(GlobalValues::s_defaultMesh);
 		LoadTexture(GlobalValues::s_defaultTexture);
@@ -232,5 +237,50 @@ namespace fan
 		path.make_preferred();
 
 		return path.string();
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
+	void RessourceManager::OnResolveTexturePtr( TexturePtr * _ptr )
+	{
+		Texture * texture = RessourceManager::Get().FindTexture( _ptr->GetID() );
+		if ( texture == nullptr )
+		{
+			texture = RessourceManager::Get().LoadTexture( _ptr->GetID() );
+		}
+		if ( texture )
+		{
+			*_ptr = TexturePtr( texture, texture->GetPath() );
+		}
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
+	void RessourceManager::OnResolveMeshPtr( MeshPtr * _ptr )
+	{
+		Mesh * mesh = RessourceManager::Get().FindMesh( _ptr->GetID() );
+		if ( mesh == nullptr )
+		{
+			mesh = RessourceManager::Get().LoadMesh( _ptr->GetID() );
+		}
+		if ( mesh )
+		{
+			*_ptr = MeshPtr( mesh, mesh->GetPath() );
+		}
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
+	void RessourceManager::OnResolvePrefabPtr( PrefabPtr * _ptr )
+	{
+		Prefab * prefab = RessourceManager::Get().FindPrefab( _ptr->GetID() );
+		if ( prefab == nullptr )
+		{
+			prefab = RessourceManager::Get().LoadPrefab( _ptr->GetID() );
+		}
+		if ( prefab )
+		{
+			*_ptr = PrefabPtr( prefab, prefab->GetPath() );
+		}
 	}
 }

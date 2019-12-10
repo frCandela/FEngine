@@ -22,24 +22,7 @@ namespace fan {
 	class Renderer;
 	class Gameobject;
 	class Scene;
-	class Actor;
-	class Camera;	
-	class DirectionalLight;
-	class PointLight;
-	class MeshRenderer;
-	class Material;
-	class Camera;
-	class FPSCamera;
-	class Texture;
-	class Mesh;
 	class EditorCopyPaste;
-	class Prefab;
-
-	template< typename _RessourceType, typename _IDType > class RessourcePtr;
-	using GameobjectPtr = RessourcePtr<Gameobject, uint64_t >;
-	using TexturePtr  = RessourcePtr<Texture, std::string >;
-	using MeshPtr  = RessourcePtr<Mesh, std::string >;
-	using PrefabPtr  = RessourcePtr<Prefab, std::string >;
 
 	//================================================================================================================================
 	//================================================================================================================================	
@@ -102,9 +85,6 @@ namespace fan {
 
 		void OnSceneStop( Scene * _scene );
 		void OnSceneLoad(Scene * _scene);
-		void OnResolveTexturePtr( TexturePtr * _ptr );
-		void OnResolveMeshPtr( MeshPtr * _ptr );
-		void OnResolvePrefabPtr( PrefabPtr * _ptr );
 		void OnToogleShowUI() { m_showUI = ! m_showUI; }
 		void OnToogleView();
 		

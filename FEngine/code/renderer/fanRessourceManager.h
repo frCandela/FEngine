@@ -4,13 +4,19 @@
 
 namespace fan
 {
-	class Mesh;
-	class UIMesh;
-	class Texture;
-	class Prefab;
-
 	class Device;
-	class Buffer;
+	class UIMesh;
+	class Component;
+	class Gameobject;
+	class Texture;
+	class Mesh;
+	class Prefab;
+	struct IDPtrData;
+	template< typename _RessourceType, typename _IDType > class RessourcePtr;
+	using GameobjectPtr = RessourcePtr<Gameobject, uint64_t>;
+	using TexturePtr = RessourcePtr<Texture, std::string>;
+	using MeshPtr = RessourcePtr<Mesh, std::string>;
+	using PrefabPtr = RessourcePtr<Prefab, std::string>;
 
 	//================================================================================================================================
 	// Loads & references all the ressources of the engine
@@ -35,6 +41,7 @@ namespace fan
 
 		const std::set< Mesh * >&			GetMeshList() const { return m_meshList; }
 		const std::vector< Texture * > &	GetTextures() const { return m_textures; }
+
 	private:
 		Device * m_device;
 
@@ -59,5 +66,10 @@ namespace fan
 		void OnDeleteTexture( Texture * _texture );
 
 		std::string CleanPath( const std::string& _path );
+
+		// Callbacks
+		void OnResolveTexturePtr( TexturePtr * _ptr );
+		void OnResolveMeshPtr( MeshPtr * _ptr );
+		void OnResolvePrefabPtr( PrefabPtr * _ptr );
 	};
 }
