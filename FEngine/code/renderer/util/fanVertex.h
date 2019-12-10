@@ -27,7 +27,7 @@ namespace fan
 		glm::vec3 pos;
 		glm::vec3 normal;
 		glm::vec4 color;
-
+		DebugVertex(){}
 		DebugVertex(const glm::vec3 _pos, const glm::vec3 _normal, const glm::vec4 _color);
 		static std::vector <VkVertexInputBindingDescription>	GetBindingDescription();
 		static std::vector<VkVertexInputAttributeDescription>	GetAttributeDescriptions();

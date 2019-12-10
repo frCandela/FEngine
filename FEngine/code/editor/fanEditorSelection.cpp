@@ -49,7 +49,7 @@ namespace fan
 	{
 		SCOPED_PROFILE( selection )
 
-			bool mouseCaptured = ImGui::GetIO().WantCaptureMouse;
+		bool mouseCaptured = false;;
 
 		// Translation gizmo on selected gameobject
 		if ( m_selectedGameobject != nullptr && m_selectedGameobject != m_currentScene->GetMainCamera()->GetGameobject()
@@ -67,7 +67,7 @@ namespace fan
 		}
 
 		// Mouse selection
-		if ( _gameWindowHovered && Mouse::Get().GetButtonPressed( Mouse::button0 ) )
+		if ( ! mouseCaptured && _gameWindowHovered && Mouse::Get().GetButtonPressed( Mouse::button0 ) )
 		{
 			const btVector3 cameraOrigin = m_currentScene->GetMainCamera()->GetGameobject()->GetComponent<Transform>()->GetPosition();
 			const Ray ray = m_currentScene->GetMainCamera()->ScreenPosToRay( Mouse::Get().GetScreenSpacePosition() );

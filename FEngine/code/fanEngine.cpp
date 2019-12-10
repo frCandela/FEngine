@@ -57,7 +57,6 @@
 #include "core/math/shapes/fanConvexHull.h"
 #include "core/time/fanProfiler.h"
 #include "renderer/fanRessourceManager.h"
-#include "scene/fanPrefab.h"
 
 
 namespace fan 

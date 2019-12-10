@@ -42,45 +42,68 @@ namespace fan {
 	//================================================================================================================================
 	//================================================================================================================================
 	btVector3 ecsParticlesGenerateSystem::s_cameraPosition;
+
 	void ecsParticlesGenerateSystem::Run( float /*_delta*/, const size_t _count, std::vector< ecsComponentsKey >& _entitiesData
 		, ComponentData< ecsPosition > & _positions
 		, ComponentData< ecsParticle > & _particles )
 	{
-		std::vector<btVector3> triangles;
-		std::vector<Color> colors;
-		triangles.reserve( _entitiesData.size() );
-		colors.reserve( _entitiesData.size() );
+		SCOPED_PROFILE( particles_gen )
+
+		// Get the interesting matching keys
+		std::vector<ecsComponentsKey*> interestingKeys;
+		interestingKeys.reserve( _entitiesData.size() );
+		for ( int entity = 0; entity < _count; entity++ )
+		{
+			ecsComponentsKey & key = _entitiesData[entity];
+			if ( key.IsAlive() && key.MatchSignature( signature::bitset ) )
+			{
+				interestingKeys.push_back( &key );
+			}
+		}
 
 		const btVector3 up = btVector3::Left();
 		static const float size = 0.05f;
 
-		for ( int entity = 0; entity < _count; entity++ )
+		std::vector<btVector3> triangles;
+		triangles.reserve( _entitiesData.size() );
+
+		// position
+		for ( int keyIndex = 0; keyIndex < interestingKeys.size(); ++keyIndex )
 		{
-			ecsComponentsKey & key = _entitiesData[entity];
+			ecsComponentsKey & key = *interestingKeys[keyIndex];
 
-			if ( key.IsAlive() && key.MatchSignature( signature::bitset ) )
-			{
-				btVector3& position = _positions.At( key ).position;
-				ecsParticle& particle = _particles.At( key );
+			const btVector3& position = _positions.At( key ).position;
+			btVector3 forward = s_cameraPosition - position;
+			forward.normalize();
+			btVector3 left = up.cross( forward );
+			left.normalize();
 
-				btVector3 forward = s_cameraPosition - position;
-				forward.normalize();
-				btVector3 left = up.cross( forward );
-				left.normalize();
+			btMatrix3x3 mat (
+				left[0], up[0], forward[0],
+				left[1], up[1], forward[1],
+				left[2], up[2], forward[2] );
 
-				btMatrix3x3 mat (
-					left[0], up[0], forward[0],
-					left[1], up[1], forward[1],
-					left[2], up[2], forward[2] );
+			triangles.push_back( position + mat * btVector3( size, 0, 0 ) );
+			triangles.push_back( position + mat * btVector3( -size, 0, 0 ) );
+			triangles.push_back( position + mat * btVector3( 0, 2.f*size, 0 ) );
 
-				triangles.push_back( position + mat * btVector3( size, 0, 0 ) );
-				triangles.push_back( position + mat * btVector3( -size, 0, 0 ) );
-				triangles.push_back( position + mat * btVector3( 0, 2.f*size, 0 ) );
-				colors.push_back( particle.color );
-			}
 		}
 
-		EditorDebug::Get().Renderer().DebugTriangles( triangles, colors );
+		// Colors
+		std::vector<Color> colors;		
+		colors.reserve( _entitiesData.size() );
+		for ( int keyIndex = 0; keyIndex < interestingKeys.size(); ++keyIndex )
+		{
+			ecsComponentsKey & key = *interestingKeys[keyIndex];
+			ecsParticle& particle = _particles.At( key );
+			colors.push_back( particle.color );			
+		}
+
+		{
+			SCOPED_PROFILE( tri )
+			EditorDebug::Get().Renderer().DebugTriangles( triangles, colors );
+		}
+		
 	}
 
 	//================================================================================================================================
@@ -109,8 +132,6 @@ namespace fan {
 				}
 			}
 		}
-
-
 	}
 
 	//================================================================================================================================
@@ -135,7 +156,6 @@ namespace fan {
 
 				transform.setOrigin( parentTransform.getOrigin() + planet.radius * position);
 				flags.flags |= ecsFlags::OUTDATED_AABB;
-				flags.flags |= ecsFlags::OUTDATED_TRANSFORM;
 			}
 		}
 	}
@@ -354,11 +374,13 @@ namespace fan {
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void ecsSynchRbSystem::SynchTransToRbSystem( float /*_delta*/, const size_t _count, std::vector< ecsComponentsKey >& _entitiesData
+	void ecsSynchRbSystem::SynchTransToRbSystem( float _delta, const size_t _count, std::vector< ecsComponentsKey >& _entitiesData
 		, ComponentData< ecsTranform > &    _transforms
 		, ComponentData< ecsMotionState > & _motionStates
 		, ComponentData< ecsRigidbody > &   _rigidbodies ) 
 	{
+		if( _delta <= 0.f  ) { return; }
+
 		for ( int entity = 0; entity < _count; entity++ ) {
 			ecsComponentsKey & key = _entitiesData[entity];
 
@@ -395,13 +417,18 @@ namespace fan {
 			if ( key.IsAlive() && key.MatchSignature( signature::bitset ) )
 			{
 				uint32_t&			flags = _flags.At(key).flags;
-				const ConvexHull&	hull  = _mesh.At(key).mesh->GetHull();
-				if( flags & ecsFlags::OUTDATED_AABB && ! ( flags & ecsFlags::NO_AABB_UPDATE ) && ! hull.IsEmpty() )
+
+				ecsMesh& mesh = _mesh.At(key);
+				if ( *mesh.mesh != nullptr )
 				{
-					usefullEntitiesKeys.push_back( &key );
-					flags &= ~ecsFlags::OUTDATED_AABB;
+					const ConvexHull&	hull = mesh.mesh->GetHull();
+					if ( flags & ecsFlags::OUTDATED_AABB && !( flags & ecsFlags::NO_AABB_UPDATE ) && !hull.IsEmpty() )
+					{
+						usefullEntitiesKeys.push_back( &key );
+						flags &= ~ecsFlags::OUTDATED_AABB;
+					}
 				}
-			}
+			}			
 		}
 
 		// Calculates model matrices

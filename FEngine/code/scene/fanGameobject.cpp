@@ -39,7 +39,7 @@ namespace fan
 		ecsFlags ** tmpFlags = &const_cast<ecsFlags*>( m_flags );
 		*tmpFlags = AddEcsComponent<ecsFlags>();
 		m_flags->Init();
-		m_flags->flags = Flag::OUTDATED_TRANSFORM | Flag::OUTDATED_AABB;
+		m_flags->flags = Flag::OUTDATED_AABB;
 
 		ecsEditorFlags ** tmpEditorFlags = &const_cast<ecsEditorFlags*>( m_editorFlags );
 		*tmpEditorFlags = AddEcsComponent<ecsEditorFlags>();
@@ -271,7 +271,6 @@ namespace fan
 	{
 		// gameobject data
 		LoadString( _json, "name", m_name );
-		LoadUInt( _json, "flags", m_flags->flags );
 
 		// components data
 		Json& jComponents = _json["components"];
@@ -300,7 +299,6 @@ namespace fan
 	bool Gameobject::Load( const Json & _json ) {
 
 		LoadString( _json, "name", m_name );
-		LoadUInt( _json, "flags", m_flags->flags );
 
 		uint64_t tmp ;
 		LoadUInt64( _json, "unique_id", tmp );
@@ -340,7 +338,6 @@ namespace fan
 	//================================================================================================================================
 	bool Gameobject::Save( Json & _json ) const {
 		SaveString( _json, "name", m_name );
-		SaveUInt( _json, "flags", m_flags->flags );
 		SaveUInt64( _json, "unique_id", m_uniqueID );
 
 		// Save components

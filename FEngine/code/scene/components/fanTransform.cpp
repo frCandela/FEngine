@@ -61,7 +61,6 @@ namespace fan
 			rb->SetTransform( m_transform->transform );
 		}
 
-
 		btVector3 forward = _target - m_transform->transform.getOrigin();
 		forward.normalize();
 		btVector3 left = _up.cross( forward );
@@ -70,8 +69,7 @@ namespace fan
 		m_transform->transform.setBasis( btMatrix3x3 (	left[0], _up[0], forward[0],
 														left[1], _up[1], forward[1],
 														left[2], _up[2], forward[2] ) );
-		m_gameobject->SetFlags( m_gameobject->GetFlags() & Gameobject::Flag::OUTDATED_TRANSFORM );
-		m_gameobject->SetFlags( m_gameobject->GetFlags() & Gameobject::Flag::OUTDATED_AABB );
+		m_gameobject->SetFlags( m_gameobject->GetFlags() | Gameobject::Flag::OUTDATED_AABB );
 	}
 
 	//================================================================================================================================
@@ -87,8 +85,7 @@ namespace fan
 
 		if ( m_transform->transform.getOrigin() != _newPosition) {
 			m_transform->transform.setOrigin( _newPosition);
-			m_gameobject->SetFlags( m_gameobject->GetFlags() & Gameobject::Flag::OUTDATED_TRANSFORM );
-			m_gameobject->SetFlags( m_gameobject->GetFlags() & Gameobject::Flag::OUTDATED_AABB );
+			m_gameobject->SetFlags( m_gameobject->GetFlags() | Gameobject::Flag::OUTDATED_AABB );
  		}
 	}
 
@@ -97,8 +94,7 @@ namespace fan
 	void Transform::SetScale(btVector3 _newScale) {
 		if (m_scale->scale != _newScale) {
 			m_scale->scale = _newScale;
-			m_gameobject->SetFlags( m_gameobject->GetFlags() & Gameobject::Flag::OUTDATED_TRANSFORM );
-			m_gameobject->SetFlags( m_gameobject->GetFlags() & Gameobject::Flag::OUTDATED_AABB );
+			m_gameobject->SetFlags( m_gameobject->GetFlags() | Gameobject::Flag::OUTDATED_AABB );
 		}
 	}
 
@@ -131,8 +127,7 @@ namespace fan
 
 		if ( m_transform->transform.getRotation() != _rotation) {
 			m_transform->transform.setRotation( _rotation);
-			m_gameobject->SetFlags( m_gameobject->GetFlags() & Gameobject::Flag::OUTDATED_TRANSFORM );
-			m_gameobject->SetFlags( m_gameobject->GetFlags() & Gameobject::Flag::OUTDATED_AABB );
+			m_gameobject->SetFlags( m_gameobject->GetFlags() | Gameobject::Flag::OUTDATED_AABB );
 		}
 	}
 
