@@ -87,7 +87,7 @@ namespace fan {
 		void OnSceneLoad(Scene * _scene);
 		void OnToogleShowUI() { m_showUI = ! m_showUI; }
 		void OnToogleView();
-		
+		void OnToogleCamera();
 
 		void OnSetCurrentScene( int _scene );
 

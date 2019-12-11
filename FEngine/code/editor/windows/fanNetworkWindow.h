@@ -14,16 +14,13 @@ namespace fan {
 	class NetworkWindow : public EditorWindow {
 	public:
 
-		NetworkWindow( );
-		void SetScene( Scene * _scene ) { m_scene = _scene ;}
-
-		void Update( const float _delta );
+		NetworkWindow( Scene * _clientScene, Scene * _serverScene);
 	protected:
 		void OnGui() override;
 
 	private:
-		Scene * m_scene = nullptr;		
-
+		Scene * m_clientScene = nullptr;
+		Scene * m_serverScene = nullptr;
 	};
 
 }

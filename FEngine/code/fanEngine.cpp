@@ -57,6 +57,7 @@
 #include "core/math/shapes/fanConvexHull.h"
 #include "core/time/fanProfiler.h"
 #include "renderer/fanRessourceManager.h"
+#include "game/fanCameraController.h"
 
 
 namespace fan 
@@ -87,18 +88,18 @@ namespace fan
 
 		// Creates keyboard events
 		Input::Get().Manager().CreateKeyboardEvent( "delete",		  Keyboard::DELETE	);
-		Input::Get().Manager().CreateKeyboardEvent( "reload_shaders", Keyboard::F5		);
-		Input::Get().Manager().CreateKeyboardEvent( "reload_icons",	  Keyboard::F6		);
 		Input::Get().Manager().CreateKeyboardEvent( "open_scene",	  Keyboard::O, Keyboard::LEFT_CONTROL );
 		Input::Get().Manager().CreateKeyboardEvent( "save_scene",	  Keyboard::S, Keyboard::LEFT_CONTROL );
 		Input::Get().Manager().CreateKeyboardEvent( "reload_scene",	  Keyboard::R, Keyboard::LEFT_CONTROL );
-		Input::Get().Manager().CreateKeyboardEvent(	"play_pause",	  Keyboard::TAB );
 		Input::Get().Manager().CreateKeyboardEvent( "freeze_capture", Keyboard::END );		
 		Input::Get().Manager().CreateKeyboardEvent( "copy",			  Keyboard::C, Keyboard::LEFT_CONTROL );
 		Input::Get().Manager().CreateKeyboardEvent( "paste",		  Keyboard::V, Keyboard::LEFT_CONTROL );
+		Input::Get().Manager().CreateKeyboardEvent( "toogle_camera",  Keyboard::TAB );
 		Input::Get().Manager().CreateKeyboardEvent( "toogle_view",	  Keyboard::F1 );
 		Input::Get().Manager().CreateKeyboardEvent( "show_ui",		  Keyboard::F3 );
-
+		Input::Get().Manager().CreateKeyboardEvent(	"play_pause",	  Keyboard::F5 );
+		Input::Get().Manager().CreateKeyboardEvent( "reload_shaders", Keyboard::F11 );
+		Input::Get().Manager().CreateKeyboardEvent( "reload_icons",   Keyboard::F12 );
 
 		//editor axis
 		Input::Get().Manager().CreateKeyboardAxis( "editor_forward", Keyboard::W, Keyboard::S );
@@ -146,11 +147,11 @@ namespace fan
 		m_profilerWindow	= new ProfilerWindow( );
 		m_gameWindow		= new GameWindow();
 		m_preferencesWindow = new PreferencesWindow();		
-		m_networkWindow		= new NetworkWindow( );
+		m_networkWindow		= new NetworkWindow( m_clientScene, m_serverScene );
 		m_mainMenuBar		= new MainMenuBar( *m_selection);
 
 		EditorDebug::Get().SetDebug( & m_renderer->GetRendererDebug(), m_gizmos );
-
+		m_selection->ConnectCallbacks( *m_clientScene, *m_serverScene );
 		m_renderWindow->SetRenderer( m_renderer );
 		m_preferencesWindow->SetRenderer( m_renderer );
 		m_mainMenuBar->SetGrid( &m_editorGrid );
@@ -176,6 +177,7 @@ namespace fan
 		Input::Get().Manager().FindEvent( "paste" )->Connect(			&EditorCopyPaste::OnPaste, m_copyPaste );
 		Input::Get().Manager().FindEvent( "show_ui" )->Connect(			&Engine::OnToogleShowUI, this );
 		Input::Get().Manager().FindEvent( "toogle_view" )->Connect(		&Engine::OnToogleView, this );
+		Input::Get().Manager().FindEvent( "toogle_camera" )->Connect(	&Engine::OnToogleCamera, this );
 
 		m_clientScene->onSceneLoad.Connect( &SceneWindow::OnExpandHierarchy, m_sceneWindow );
 		m_clientScene->onSceneLoad.Connect( &Engine::OnSceneLoad, this );
@@ -261,7 +263,6 @@ namespace fan
 				{
 					SCOPED_PROFILE( draw_ui )					
 					m_mainMenuBar->Draw();
-					m_networkWindow->Update(targetLogicDelta);
 					m_selection->Update( m_gameWindow->IsHovered() );
 					DrawEditorGrid();
 				}
@@ -309,7 +310,6 @@ namespace fan
 		m_sceneWindow->SetScene( m_currentScene );
 		m_mainMenuBar->SetScene( m_currentScene );
 		m_ecsWindow->SetEcsManager( m_currentScene->GetEcsManager() );
-		m_networkWindow->SetScene(m_currentScene);
 		m_gameWindow->SetScene(m_currentScene);
 	}
 
@@ -577,8 +577,6 @@ namespace fan
 		m_renderer->SetUIDrawData(uiDrawData);
 
 	}
-	
-
 
 	//================================================================================================================================
 	//================================================================================================================================
@@ -600,5 +598,28 @@ namespace fan
 	void Engine::OnToogleView()
 	{
 		SetCurrentScene( m_currentScene == m_serverScene ? m_clientScene : m_serverScene );
+	}
+
+	//================================================================================================================================
+	// Toogle current scene main camera between editor and game
+	//================================================================================================================================
+	void Engine::OnToogleCamera()
+	{
+		FPSCamera *			editorCameraCtrl = m_currentScene->FindComponentOfType<FPSCamera>();
+		CameraController *  gameCameraCtrl = m_currentScene->FindComponentOfType<CameraController>();
+
+		if ( editorCameraCtrl != nullptr &&  gameCameraCtrl != nullptr )
+		{
+			Camera * editorCamera = editorCameraCtrl->GetGameobject()->GetComponent<Camera>();
+			Camera * gameCamera = gameCameraCtrl->GetGameobject()->GetComponent<Camera>();
+			if ( m_currentScene->GetMainCamera() == editorCamera )
+			{
+				m_currentScene->SetMainCamera(gameCamera);
+			}
+			else
+			{
+				m_currentScene->SetMainCamera(editorCamera);
+			}			
+		}
 	}
 }

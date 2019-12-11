@@ -30,9 +30,9 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void EditorGameWindowCallbacks::OnGamePlay()  { m_clientScene.Play();									m_serverScene.Play(); }
+	void EditorGameWindowCallbacks::OnGamePlay()  { m_clientScene.Play();								m_serverScene.Play(); }
 	void EditorGameWindowCallbacks::OnGamePause() { m_clientScene.Pause();								m_serverScene.Pause();}
 	void EditorGameWindowCallbacks::OnGameResume(){ m_clientScene.Resume();								m_serverScene.Resume();}
-	void EditorGameWindowCallbacks::OnGameStop()  { m_clientScene.Stop();									m_serverScene.Stop();}
+	void EditorGameWindowCallbacks::OnGameStop()  { m_clientScene.Stop();								m_serverScene.Stop();}
 	void EditorGameWindowCallbacks::OnGameStep()  { m_clientScene.Step( Time::Get().GetLogicDelta() );	m_serverScene.Step( Time::Get().GetLogicDelta() );}
 }

@@ -15,9 +15,12 @@ namespace ImGui {
 		PROFILER16,
 		PREFERENCES16, 
 
-		// scene special
+		// special
 		GAMEOBJECT16,
 		PREFAB16,
+		MESH16,
+
+		// scene special
 		PLAY16,
 		PAUSE16,
 		STEP16,
@@ -47,7 +50,6 @@ namespace ImGui {
 		JOYSTICK16,
 		SPACE_SHIP16, 
 		PLANET16, 	
-		MESH16,
 
 		NUM_ICONS
 	};

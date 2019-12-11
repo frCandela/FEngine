@@ -154,6 +154,8 @@ namespace fan {
 				float const time = -planet.speed * planet.time;
 				btVector3 position( std::cosf( time + planet.phase ), 0, std::sinf( time + planet.phase ) );
 
+				if( std::abs(time) > SIMD_2_PI ) { planet.time -= SIMD_2_PI / std::abs(planet.speed); }
+					
 				transform.setOrigin( parentTransform.getOrigin() + planet.radius * position);
 				flags.flags |= ecsFlags::OUTDATED_AABB;
 			}

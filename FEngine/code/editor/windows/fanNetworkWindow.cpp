@@ -9,8 +9,10 @@ namespace fan {
 
 	//================================================================================================================================
 	//================================================================================================================================
-	NetworkWindow::NetworkWindow() 
+	NetworkWindow::NetworkWindow( Scene * _clientScene, Scene * _serverScene) 
 		: EditorWindow("network", ImGui::IconType::JOYSTICK16 )
+		, m_clientScene( _clientScene)
+		, m_serverScene( _serverScene )
 	{
 		
 	}
@@ -19,7 +21,9 @@ namespace fan {
 	//================================================================================================================================
 	void NetworkWindow::OnGui() 
 	{
-		GameServer * gameServer = m_scene->FindComponentOfType<GameServer>();
+
+		// Game server
+		GameServer * gameServer = m_serverScene->FindComponentOfType<GameServer>();
 		if ( gameServer != nullptr )
 		{
 			const Server& server = gameServer->GetServer();
@@ -34,13 +38,6 @@ namespace fan {
 				ImGui::Text( "last response: %.1f", client.lastResponse );
 				ImGui::Separator();
 			}
-		}	}
-
-	//================================================================================================================================
-	//================================================================================================================================
-	void NetworkWindow::Update( const float /*_delta*/ )
-	{
-// 		m_client1.Update(_delta);	
-// 		m_server.Update(_delta);	
+		}	
 	}
 }
