@@ -309,7 +309,7 @@ namespace fan
 		{
 			// Save camera data
 			Json cameraData;
-			m_scene->GetMainCamera()->GetGameobject()->Save( cameraData );
+			m_scene->GetMainCamera().GetGameobject().Save( cameraData );
 
 			// save old selection
 			Gameobject* prevSelection = m_editorSelection.GetSelectedGameobject();
@@ -318,7 +318,7 @@ namespace fan
 			m_scene->LoadFrom( m_scene->GetPath() );
 
 			// restore camera
-			m_scene->GetMainCamera()->GetGameobject()->CopyDataFrom( cameraData );
+			m_scene->GetMainCamera().GetGameobject().CopyDataFrom( cameraData );
 
 			// restore selection
 			if ( id != 0 )

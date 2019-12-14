@@ -10,6 +10,8 @@ namespace fan {
 
 	const char *	GlobalValues::s_defaultMesh			= "content/_default/mesh/mesh.fbx";
 	const char *	GlobalValues::s_defaultTexture		= "content/_default/texture/texture.png";
+	const char *	GlobalValues::s_whiteTexture		= "content/_default/texture/white32.png";
+	
 	const char *	GlobalValues::s_defaultIcons		= "content/_default/texture/icons.png";
 	const char *	GlobalValues::s_defaultImguiFont	= "content/_default/imgui_font.ttf";
 	

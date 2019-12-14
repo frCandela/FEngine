@@ -142,13 +142,13 @@ namespace fan
 		case fan::PlayerInput::KEYBOARD_MOUSE:
 		{
 			// Get mouse world pos
-			Camera * camera = m_gameobject->GetScene()->GetMainCamera();
-			btVector3 mouseWorldPos = camera->ScreenPosToRay( Mouse::Get().GetScreenSpacePosition() ).origin;
+			Camera& camera = m_gameobject->GetScene().GetMainCamera();
+			btVector3 mouseWorldPos = camera.ScreenPosToRay( Mouse::Get().GetScreenSpacePosition() ).origin;
 			mouseWorldPos.setY( 0 );
 
 			// Get mouse direction
-			Transform * transform = m_gameobject->GetComponent<Transform>();
-			btVector3 mouseDir = mouseWorldPos - transform->GetPosition();
+			Transform & transform = m_gameobject->GetTransform();
+			btVector3 mouseDir = mouseWorldPos - transform.GetPosition();
 			mouseDir.normalize();
 			return mouseDir;
 		}

@@ -76,9 +76,9 @@ namespace fan
 	void SpaceShipUI::LateUpdate( const float /*_delta*/ )  
 	{
 		// Set ui position
-		Camera * camera = m_gameobject->GetScene()->GetMainCamera();
-		btVector2 screenPos = camera->WorldPosToScreen( m_spaceShip->GetTransform()->GetPosition() );
- 		m_gameobject->GetTransform()->SetPosition( btVector3( screenPos[0], screenPos[1], 0.f ) );		
+		Camera& camera = m_gameobject->GetScene().GetMainCamera();
+		btVector2 screenPos = camera.WorldPosToScreen( m_spaceShip->GetTransform().GetPosition() );
+ 		m_gameobject->GetTransform().SetPosition( btVector3( screenPos[0], screenPos[1], 0.f ) );		
 	}
 
 	//================================================================================================================================
@@ -108,11 +108,11 @@ namespace fan
 
 		if ( *m_spaceShip != nullptr )
 		{
-			Camera * camera = m_gameobject->GetScene()->GetMainCamera();
-			Ray toto = camera->ScreenPosToRay(m_gameobject->GetTransform()->GetPosition());
+			Camera& camera = m_gameobject->GetScene().GetMainCamera();
+			Ray toto = camera.ScreenPosToRay(m_gameobject->GetTransform().GetPosition());
 
 
-			EditorDebug::Get().Renderer().DebugLine(toto.origin, m_spaceShip->GetTransform()->GetPosition(), Color::Red );
+			EditorDebug::Get().Renderer().DebugLine(toto.origin, m_spaceShip->GetTransform().GetPosition(), Color::Red );
 		}
 	}
 	 

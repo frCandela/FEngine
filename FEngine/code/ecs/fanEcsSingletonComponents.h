@@ -5,17 +5,12 @@
 
 namespace fan
 {
-	class ecsCameraPosition_s
-	{
-	public:
-		btVector3 position;
-	};
-
 	//================================
 	//================================
 	using ecsSingletonComponentsList = meta::TypeList
 		< 	ecsSunLightMesh_s
 		,	ecsCameraPosition_s
+		,	ecsParticlesMesh_s
 		>;
 
 	//================================================================================================================================

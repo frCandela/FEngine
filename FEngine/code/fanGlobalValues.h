@@ -13,6 +13,7 @@ namespace fan {
 
 		static const char *	s_defaultMesh;
 		static const char *	s_defaultTexture;
+		static const char * s_whiteTexture;
 		static const char *	s_defaultIcons;
 		static const char *	s_defaultImguiFont;
 

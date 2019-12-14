@@ -42,9 +42,9 @@ namespace fan
 		// Getters
 		std::string		GetName() const { return m_name; }
 		void			SetName(const std::string _newName) { m_name = _newName; }
-		inline Scene *	GetScene() const { return m_scene; }
+		inline Scene&	GetScene() const { return *m_scene; }
 		const AABB &	GetAABB() const; 
-		Transform *		GetTransform() const  { return m_transform; }
+		Transform&		GetTransform() const  { return *m_transform; }
 		ecsHandle		GetEcsHandle(){ return m_ecsHandleEntity; }
 		uint64_t		GetUniqueID() const { return m_uniqueID; }
 		bool 			SetUniqueID( const uint64_t _id );
@@ -143,7 +143,7 @@ namespace fan
 	template< typename _componentType >
 	_componentType* Gameobject::GetEcsComponent() const {
 		static_assert( IsComponent< _componentType>::value );
-		return m_scene->GetEcsManager()->FindComponentFromHandle<_componentType>( m_ecsHandleEntity );;
+		return m_scene->GetEcsManager().FindComponentFromHandle<_componentType>( m_ecsHandleEntity );;
 	}
 
 	//================================================================================================================================
@@ -151,11 +151,11 @@ namespace fan
 	//================================================================================================================================
 	template< typename _componentType >	_componentType * Gameobject::AddEcsComponent() const {
 		static_assert( IsComponent< _componentType>::value );
-		EcsManager * ecsManager = m_scene->GetEcsManager();
+		EcsManager& ecsManager = m_scene->GetEcsManager();
 		ecsEntity entity;
-		if ( ecsManager->FindEntity( m_ecsHandleEntity, entity ) ) {			
-			ecsManager->AddComponent<_componentType>( entity );
-			return ecsManager->FindComponentFromEntity<_componentType>( entity );
+		if ( ecsManager.FindEntity( m_ecsHandleEntity, entity ) ) {			
+			ecsManager.AddComponent<_componentType>( entity );
+			return ecsManager.FindComponentFromEntity<_componentType>( entity );
 		}
 		return nullptr;
 	}
@@ -165,10 +165,10 @@ namespace fan
 	//================================================================================================================================
 	template< typename _componentType > void Gameobject::RemoveEcsComponent() {
 		static_assert( IsComponent< _componentType>::value );
-		EcsManager * ecsManager = m_scene->GetEcsManager();
+		EcsManager& ecsManager = m_scene->GetEcsManager();
 		ecsEntity entity;
-		if ( ecsManager->FindEntity( m_ecsHandleEntity, entity ) ) {
-			ecsManager->RemoveComponent<_componentType>( entity );
+		if ( ecsManager.FindEntity( m_ecsHandleEntity, entity ) ) {
+			ecsManager.RemoveComponent<_componentType>( entity );
 		}
 	}
 }

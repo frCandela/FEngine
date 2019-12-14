@@ -69,10 +69,10 @@ namespace fan
 		inline std::string		GetName() const				{ return m_name; }
 		bool					HasPath() const				{ return m_path.empty() == false; }
 		inline std::string		GetPath() const				{ return m_path; }
-		inline EcsManager *		GetEcsManager() const		{ return m_ecsManager; }
-		inline PhysicsManager *	GetPhysicsManager() const	{ return m_physicsManager; }		
+		inline EcsManager&		GetEcsManager() const		{ return *m_ecsManager; }
+		inline PhysicsManager&	GetPhysicsManager() const	{ return *m_physicsManager; }		
 		State					GetState() const			{ return m_state; };
-		Camera *				GetMainCamera()				{ return m_mainCamera; }
+		Camera&					GetMainCamera()					{ return *m_mainCamera; }
 		void					SetMainCamera( Camera * _camera );
 		uint64_t				GetUniqueID() { assert(FindGameobject(m_nextUniqueID)==nullptr);  return m_nextUniqueID++; }
 		Gameobject *			FindGameobject( const uint64_t _id );

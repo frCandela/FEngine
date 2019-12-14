@@ -3,7 +3,6 @@
 
 #include "core/time/fanTime.h"
 #include "core/input/fanKeyboard.h"
-#include "scene/fanScene.h"
 #include "scene/components/fanTransform.h"
 #include "scene/components/fanCamera.h"
 #include "editor/components/fanFPSCamera.h"
@@ -20,7 +19,7 @@ namespace fan {
 		if (*m_gameCamera == nullptr) {
 			Debug::Warning("Game manager has no camera attached");
 			SetEnabled(false);
-			m_gameobject->GetScene()->SetMainCamera( *m_gameCamera );
+			m_gameobject->GetScene().SetMainCamera( *m_gameCamera );
 		}
 	}
 

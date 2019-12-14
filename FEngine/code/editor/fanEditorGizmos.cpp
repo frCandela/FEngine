@@ -29,7 +29,7 @@ namespace fan
 		const btVector3 origin = _transform.getOrigin();
 		const btTransform rotation( _transform.getRotation() );
 		const btVector3 axisDirection[3] = { btVector3( 1, 0, 0 ), btVector3( 0, 1, 0 ),  btVector3( 0, 0, 1 ) };
-		const btVector3 cameraPosition = m_currentScene->GetMainCamera()->GetGameobject()->GetComponent<Transform>()->GetPosition();
+		const btVector3 cameraPosition = m_currentScene->GetMainCamera().GetGameobject().GetTransform().GetPosition();
 		const float size = 0.2f * origin.distance( cameraPosition );
 		const btTransform coneRotation[3] = {
 		btTransform( btQuaternion( 0, 0, btRadians( -90 ) ), size*axisDirection[0] )
@@ -58,7 +58,7 @@ namespace fan
 
 			// Raycast on the gizmo shape to determine if the mouse is hovering it
 			Color clickedColor = opaqueColor;
-			const Ray ray = m_currentScene->GetMainCamera()->ScreenPosToRay( Mouse::Get().GetScreenSpacePosition() );
+			const Ray ray = m_currentScene->GetMainCamera().ScreenPosToRay( Mouse::Get().GetScreenSpacePosition() );
 			for ( int triIndex = 0; triIndex < coneTris.size() / 3; triIndex++ )
 			{
 				Triangle triangle( coneTris[3 * triIndex + 0], coneTris[3 * triIndex + 1], coneTris[3 * triIndex + 2] );
@@ -87,7 +87,7 @@ namespace fan
 			{
 				btVector3 axis = rotation * axisDirection[axisIndex];
 
-				const Ray screenRay = m_currentScene->GetMainCamera()->ScreenPosToRay( Mouse::Get().GetScreenSpacePosition() );
+				const Ray screenRay = m_currentScene->GetMainCamera().ScreenPosToRay( Mouse::Get().GetScreenSpacePosition() );
 				const Ray axisRay = { origin , axis };
 				btVector3 trash, projectionOnAxis;
 				screenRay.RayClosestPoints( axisRay, trash, projectionOnAxis );

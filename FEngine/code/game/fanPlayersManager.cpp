@@ -1,7 +1,6 @@
 #include "fanGlobalIncludes.h"
 #include "game/fanPlayersManager.h"
 
-#include "scene/fanScene.h"
 #include "core/input/fanJoystick.h"
 #include "game/fanPlayerInput.h"
 #include "game/fanSpaceShip.h"
@@ -69,7 +68,7 @@ namespace fan
 		if ( *m_playerPrefab != nullptr )
 		{
 			assert( m_players.find( _ID ) ==  m_players.end() );
-			Gameobject * player = m_gameobject->GetScene()->CreateGameobject( **m_playerPrefab, m_gameobject );
+			Gameobject * player = m_gameobject->GetScene().CreateGameobject( **m_playerPrefab, m_gameobject );
 			m_players[_ID] = player;
 
 			player->SetEditorFlags( player->GetEditorFlags() | Gameobject::EditorFlag::NOT_SAVED );
@@ -109,7 +108,7 @@ namespace fan
 		if ( input != nullptr )
 		{
 			RemovePlayer(input->GetJoystickID());
-			m_gameobject->GetScene()->DeleteGameobject( _gameobject );
+			m_gameobject->GetScene().DeleteGameobject( _gameobject );
 		}
 	}
 
@@ -122,7 +121,7 @@ namespace fan
 
 		Gameobject * player = m_players[_ID];
 		m_players.erase( _ID );
-		m_gameobject->GetScene()->DeleteGameobject( player );
+		m_gameobject->GetScene().DeleteGameobject( player );
 	}
 
 	//================================================================================================================================

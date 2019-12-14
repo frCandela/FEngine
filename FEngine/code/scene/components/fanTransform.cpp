@@ -3,7 +3,6 @@
 #include "scene/components/fanTransform.h"
 #include "scene/components/fanComponent.h"
 #include "scene/components/fanRigidbody.h"
-#include "scene/fanScene.h"	
 #include "core/fanSignal.h"
 #include "ecs/fanECSManager.h"
 

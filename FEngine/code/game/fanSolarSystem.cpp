@@ -46,7 +46,7 @@ namespace fan {
 	{
 		Component::OnGui();
 
-		Transform * transform = m_gameobject->GetComponent<Transform>();
+		Transform& transform = m_gameobject->GetTransform();
 
 		static std::default_random_engine m_generator;
 		static std::uniform_real_distribution<float> m_distribution( 0.f, 1.f );
@@ -90,7 +90,7 @@ namespace fan {
 		}
 
 		// planet max scale
-		const float sunRadius = transform->GetScale()[0];
+		const float sunRadius = transform.GetScale()[0];
 		for ( int orbitIndex = 0; orbitIndex < m_orbits.size(); orbitIndex++ )
 		{
 			OrbitData& orbit = m_orbits[orbitIndex];
@@ -136,7 +136,7 @@ namespace fan {
 		{
 			OrbitData orbit = m_orbits[orbitIndex];
 
-			EditorDebug::Get().Renderer().DebugCircle( transform->GetPosition(), orbit.radius, transform->Up(), 32, Color::Cyan );
+			EditorDebug::Get().Renderer().DebugCircle( transform.GetPosition(), orbit.radius, transform.Up(), 32, Color::Cyan );
 
 			float const time = -orbit.speed * Time::ElapsedSinceStartup();
 			for ( int planetIndex = 0; planetIndex < orbit.planets.size(); planetIndex++ )
@@ -144,7 +144,7 @@ namespace fan {
 				PlanetData & planet = orbit.planets[planetIndex];
 				btVector3 position( std::cosf( time + planet.phase ), 0, std::sinf( time + planet.phase ) );
 
-				EditorDebug::Get().Renderer().DebugCircle( orbit.radius * position, std::fabs( orbit.maxScale ), transform->Up(), 16, Color::Cyan );
+				EditorDebug::Get().Renderer().DebugCircle( orbit.radius * position, std::fabs( orbit.maxScale ), transform.Up(), 16, Color::Cyan );
 			}
 
 		}
@@ -154,13 +154,13 @@ namespace fan {
 		// Moon
 		if ( ImGui::Button( "Populate" ) )
 		{
-			Scene * scene = m_gameobject->GetScene();
+			Scene& scene = m_gameobject->GetScene();
 
 			// Remove all childs
 			const std::vector<Gameobject*>& childs = m_gameobject->GetChilds();
 			for ( int childIndex = 0; childIndex < childs.size(); childIndex++ )
 			{
-				scene->DeleteGameobject( childs[childIndex] );
+				scene.DeleteGameobject( childs[childIndex] );
 			}
 
 			// Generates planets
@@ -172,7 +172,7 @@ namespace fan {
 				{
 					const PlanetData& planetData = orbit.planets[planetIndex];
 
-					Gameobject * newPlanet = scene->CreateGameobject( "planet" + std::to_string( orbitIndex ) + "-" + std::to_string( planetIndex ), m_gameobject );
+					Gameobject * newPlanet = scene.CreateGameobject( "planet" + std::to_string( orbitIndex ) + "-" + std::to_string( planetIndex ), m_gameobject );
 					MeshRenderer * meshRenderer = newPlanet->AddComponent<MeshRenderer>();
 					meshRenderer->SetPath( GlobalValues::s_meshSphere );
 
@@ -192,8 +192,8 @@ namespace fan {
 					rb->EnableDesactivation( false );
 					rb->SetKinematic();
 
-					Transform * planetTransform = newPlanet->GetTransform();
-					planetTransform->SetScale( btVector3( planetData.radius, planetData.radius, planetData.radius ) );
+					Transform& planetTransform = newPlanet->GetTransform();
+					planetTransform.SetScale( btVector3( planetData.radius, planetData.radius, planetData.radius ) );
 				}
 			}
 		}

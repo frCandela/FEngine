@@ -27,7 +27,7 @@ namespace fan
 	glm::ivec2	 UITransform::GetPixelPosition() const
 	{
 
-		btVector2 pixelPos = 0.5f *( m_gameobject->GetTransform()->GetPosition() + btVector3::One() ) * Input::Get().WindowSizeF();
+		btVector2 pixelPos = 0.5f *( m_gameobject->GetTransform().GetPosition() + btVector3::One() ) * Input::Get().WindowSizeF();
 		return glm::ivec2( (int) pixelPos.x(),(int)pixelPos.y() );
 	}
 
@@ -35,16 +35,16 @@ namespace fan
 	//================================================================================================================================
 	void UITransform::SetPixelPosition( const glm::ivec2 _position )
 	{
-		Transform * transform = m_gameobject->GetTransform();
+		Transform & transform = m_gameobject->GetTransform();
 		const btVector2 newPosition = 2.f * btVector2((float)_position.x,(float)_position.y) / Input::Get().WindowSizeF() - btVector3::One();
-		transform->SetPosition( btVector3( newPosition.x(), newPosition.y(), transform->GetPosition().z() ) );		
+		transform.SetPosition( btVector3( newPosition.x(), newPosition.y(), transform.GetPosition().z() ) );		
 	}
 	
 	//================================================================================================================================
 	//================================================================================================================================
 	glm::ivec2	 UITransform::GetPixelSize() const
 	{ 
-		btVector2 pixelSize = m_gameobject->GetTransform()->GetScale() * Input::Get().WindowSizeF();
+		btVector2 pixelSize = m_gameobject->GetTransform().GetScale() * Input::Get().WindowSizeF();
 		return glm::ivec2( (int)pixelSize[0],(int)pixelSize[1] );
 	}
 	
@@ -52,9 +52,9 @@ namespace fan
 	//================================================================================================================================
 	void UITransform::SetPixelSize( const glm::ivec2 _size )
 	{
-		Transform * transform = m_gameobject->GetTransform();
+		Transform & transform = m_gameobject->GetTransform();
 		btVector2 screenSize = btVector2((float)_size.x,(float)_size.y) / Input::Get().WindowSizeF();
-		transform->SetScale( btVector3( screenSize.x(), screenSize.y(), transform->GetScale().z() ) );
+		transform.SetScale( btVector3( screenSize.x(), screenSize.y(), transform.GetScale().z() ) );
 	}
 
 	//================================================================================================================================

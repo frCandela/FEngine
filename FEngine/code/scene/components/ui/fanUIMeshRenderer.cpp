@@ -85,18 +85,18 @@ namespace fan
 	//================================================================================================================================
 	void UIMeshRenderer::SetPixelPosition( const glm::ivec2 _position )
 	{
-		Transform * transform = m_gameobject->GetTransform();
+		Transform& transform = m_gameobject->GetTransform();
 		const btVector2 newPosition = 2.f * btVector2( (float)_position.x, (float)_position.y ) / Input::Get().WindowSizeF() - btVector3::One();
-		transform->SetPosition( btVector3( newPosition.x(), newPosition.y(), transform->GetPosition().z() ) );
+		transform.SetPosition( btVector3( newPosition.x(), newPosition.y(), transform.GetPosition().z() ) );
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
 	void UIMeshRenderer::SetPixelSize( const glm::ivec2 _size )
 	{
-		Transform * transform = m_gameobject->GetTransform();
+		Transform& transform = m_gameobject->GetTransform();
 		btVector2 screenSize = btVector2( (float)_size.x, (float)_size.y ) / Input::Get().WindowSizeF();
-		transform->SetScale( btVector3( screenSize.x(), screenSize.y(), transform->GetScale().z() ) );
+		transform.SetScale( btVector3( screenSize.x(), screenSize.y(), transform.GetScale().z() ) );
 	}
 
 	//================================================================================================================================

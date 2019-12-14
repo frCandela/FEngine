@@ -64,7 +64,7 @@ void main() {
 	}
 
 	float alpha = texture( sampler2D( diffuseTexture, diffuseSampler ), inTexCoord ).a * material.color.a;
-	outColor = vec4(lightColor, alpha);
+	outColor = vec4(inColor * lightColor, alpha);
 }
 
 

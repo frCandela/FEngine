@@ -52,7 +52,7 @@ namespace fan
 		bool mouseCaptured = false;;
 
 		// Translation gizmo on selected gameobject
-		if ( m_selectedGameobject != nullptr && m_selectedGameobject != m_currentScene->GetMainCamera()->GetGameobject()
+		if ( m_selectedGameobject != nullptr && m_selectedGameobject != &m_currentScene->GetMainCamera().GetGameobject()
 			&& m_selectedGameobject->GetComponent<UIMeshRenderer>() == nullptr
 			&& m_selectedGameobject->GetComponent<UITransform>() == nullptr )
 
@@ -69,8 +69,8 @@ namespace fan
 		// Mouse selection
 		if ( ! mouseCaptured && _gameWindowHovered && Mouse::Get().GetButtonPressed( Mouse::button0 ) )
 		{
-			const btVector3 cameraOrigin = m_currentScene->GetMainCamera()->GetGameobject()->GetComponent<Transform>()->GetPosition();
-			const Ray ray = m_currentScene->GetMainCamera()->ScreenPosToRay( Mouse::Get().GetScreenSpacePosition() );
+			const btVector3 cameraOrigin = m_currentScene->GetMainCamera().GetGameobject().GetTransform().GetPosition();
+			const Ray ray = m_currentScene->GetMainCamera().ScreenPosToRay( Mouse::Get().GetScreenSpacePosition() );
 			const std::vector<Gameobject *>  & entities = m_currentScene->BuildEntitiesList();
 
 			// raycast on all the entities
@@ -80,7 +80,7 @@ namespace fan
 			{
 				Gameobject * gameobject = entities[gameobjectIndex];
 
-				if ( gameobject == m_currentScene->GetMainCamera()->GetGameobject() )
+				if ( gameobject == &m_currentScene->GetMainCamera().GetGameobject() )
 				{
 					continue;
 				}
@@ -92,8 +92,8 @@ namespace fan
 					MeshRenderer * meshRenderer = gameobject->GetComponent<MeshRenderer>();
 					if ( meshRenderer != nullptr && meshRenderer->GetMesh() != nullptr )
 					{
-						Transform * transform = gameobject->GetComponent<Transform>();
-						const Ray transformedRay( transform->InverseTransformPoint( ray.origin ), transform->InverseTransformDirection( ray.direction ) );
+						Transform& transform = gameobject->GetTransform();
+						const Ray transformedRay( transform.InverseTransformPoint( ray.origin ), transform.InverseTransformDirection( ray.direction ) );
 						if ( meshRenderer->GetMesh()->GetHull().RayCast( transformedRay.origin, transformedRay.direction, intersection ) == false )
 						{
 							continue;

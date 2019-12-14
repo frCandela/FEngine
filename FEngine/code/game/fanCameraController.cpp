@@ -3,7 +3,6 @@
 
 #include "game/fanPlayersManager.h"
 #include "core/time/fanTime.h"
-#include "scene/fanScene.h"
 #include "scene/components/fanTransform.h"
 #include "scene/components/fanCamera.h"
 
@@ -17,7 +16,7 @@ namespace fan {
 		REQUIRE_COMPONENT( Camera, m_camera)
 		REQUIRE_TRUE( *m_playersManager != nullptr, "CameraController: missing reference to the PlayersManager" )
 
-		m_gameobject->GetScene()->SetMainCamera(m_camera);
+		m_gameobject->GetScene().SetMainCamera(m_camera);
 	}
 
 	//================================================================================================================================
@@ -36,7 +35,7 @@ namespace fan {
 			btVector3 center = btVector3::Zero();
 			for ( int playerIndex = 0; playerIndex < players.size(); playerIndex++ )
 			{
-				btVector3 position =  players[playerIndex]->GetTransform()->GetPosition();
+				btVector3 position =  players[playerIndex]->GetTransform().GetPosition();
 				center += position;
 
 				// bounding box
@@ -49,7 +48,7 @@ namespace fan {
 			assert( low[0] <= high[0] && low[2] <= high[2]);
 
 
-			m_gameobject->GetTransform()->SetPosition( center + m_heightFromTarget * btVector3::Up() );
+			m_gameobject->GetTransform().SetPosition( center + m_heightFromTarget * btVector3::Up() );
 
 			if ( players.size() == 1 )
 			{

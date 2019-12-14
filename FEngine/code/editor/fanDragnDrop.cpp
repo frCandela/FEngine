@@ -155,7 +155,7 @@ namespace ImGui
 				ImGui::SetDragDropPayload( nameid.c_str(), &_component, sizeof( fan::Component** ) );
 				ImGui::Icon( _component->GetIcon(), { 16,16 } ); ImGui::SameLine();
 				ImGui::Text( (std::string(_component->GetName()) + ":").c_str() ); ImGui::SameLine();
-				ImGui::Text(  _component->GetGameobject()->GetName().c_str() );
+				ImGui::Text(  _component->GetGameobject().GetName().c_str() );
 				ImGui::EndDragDropSource();
 			}
 		}

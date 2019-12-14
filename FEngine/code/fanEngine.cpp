@@ -309,7 +309,7 @@ namespace fan
 		m_currentScene = _scene;
 		m_sceneWindow->SetScene( m_currentScene );
 		m_mainMenuBar->SetScene( m_currentScene );
-		m_ecsWindow->SetEcsManager( m_currentScene->GetEcsManager() );
+		m_ecsWindow->SetEcsManager( &m_currentScene->GetEcsManager() );
 		m_gameWindow->SetScene(m_currentScene);
 	}
 
@@ -341,7 +341,7 @@ namespace fan
 		);
 
 
-		cameraGameobject->GetTransform()->SetPosition(btVector3(0, 0, -2));
+		cameraGameobject->GetTransform().SetPosition(btVector3(0, 0, -2));
 		Camera* editorCamera = cameraGameobject->AddComponent<Camera>();
 		editorCamera->SetRemovable(false);
 		FPSCamera * editorCamController = cameraGameobject->AddComponent<FPSCamera>();
@@ -371,7 +371,7 @@ namespace fan
 		const std::vector< Gameobject *>  & entities = m_currentScene->BuildEntitiesList();
 		for (int gameobjectIndex = 0; gameobjectIndex < entities.size(); gameobjectIndex++) {
 			const Gameobject * gameobject = entities[gameobjectIndex];
-			if (gameobject != m_currentScene->GetMainCamera()->GetGameobject()) {
+			if (gameobject != &m_currentScene->GetMainCamera().GetGameobject()) {
 				AABB aabb = gameobject->GetAABB();
 				EditorDebug::Get().Renderer().DebugAABB(aabb, Color::Red);
 			}
@@ -394,7 +394,7 @@ namespace fan
 					const std::vector<btVector3> & vertices = hull->GetVertices();
 					const std::vector<uint32_t> & indices = hull->GetIndices();
 					if (!vertices.empty()) {
-						const glm::mat4  modelMat = meshRenderer->GetGameobject()->GetComponent<Transform>()->GetModelMatrix();
+						const glm::mat4  modelMat = meshRenderer->GetGameobject().GetTransform().GetModelMatrix();
 
 						Color color = Color::Cyan;
 						for (unsigned polyIndex = 0; polyIndex < indices.size() / 3; polyIndex++) {
@@ -428,7 +428,7 @@ namespace fan
 			if (meshRenderer != nullptr) {
 				Mesh * mesh = meshRenderer->GetMesh();
 				if (mesh != nullptr) {
-					const glm::mat4  modelMat = meshRenderer->GetGameobject()->GetComponent<Transform>()->GetModelMatrix();
+					const glm::mat4  modelMat = meshRenderer->GetGameobject().GetTransform().GetModelMatrix();
 					const std::vector<uint32_t> & indices = mesh->GetIndices();
 					const std::vector<Vertex> & vertices = mesh->GetVertices();
 
@@ -455,8 +455,8 @@ namespace fan
 			if (meshRenderer != nullptr) {
 				Mesh * mesh = meshRenderer->GetMesh();
 				if (mesh != nullptr) {
-					const glm::mat4  modelMat = meshRenderer->GetGameobject()->GetComponent<Transform>()->GetModelMatrix();
-					const glm::mat4  normalMat = meshRenderer->GetGameobject()->GetComponent<Transform>()->GetNormalMatrix();
+					const glm::mat4  modelMat = meshRenderer->GetGameobject().GetTransform().GetModelMatrix();
+					const glm::mat4  normalMat = meshRenderer->GetGameobject().GetTransform().GetNormalMatrix();
 					const std::vector<uint32_t> & indices = mesh->GetIndices();
 					const std::vector<Vertex> & vertices = mesh->GetVertices();
 
@@ -493,23 +493,23 @@ namespace fan
 	void Engine::UpdateRenderer() {
 		SCOPED_PROFILE( update_renderer )
 
-		Camera * mainCamera = m_currentScene->GetMainCamera();
+		Camera& mainCamera = m_currentScene->GetMainCamera();
 		const std::vector < DirectionalLight* > directionalLights = m_currentScene->GetDirectionalLights();
 		const std::vector < PointLight* >		pointLights = m_currentScene->GetPointLights();
 		const std::vector < MeshRenderer* >		meshRenderers = m_currentScene->GetMeshRenderers();
 
 		// Camera
-		Transform * cameraTransform = mainCamera->GetGameobject()->GetComponent<Transform>();
-		mainCamera->SetAspectRatio( m_gameWindow->GetAspectRatio() );
-		m_renderer->SetMainCamera( mainCamera->GetProjection(), mainCamera->GetView(), ToGLM(cameraTransform->GetPosition()));		
+		Transform& cameraTransform = mainCamera.GetGameobject().GetTransform();
+		mainCamera.SetAspectRatio( m_gameWindow->GetAspectRatio() );
+		m_renderer->SetMainCamera( mainCamera.GetProjection(), mainCamera.GetView(), ToGLM(cameraTransform.GetPosition()));		
 
 		// Point lights		
 		for ( int lightIndex = 0; lightIndex < pointLights.size(); lightIndex++ ) {
 			const PointLight * light = pointLights[lightIndex];
-			const Transform *  lightTransform = light->GetGameobject()->GetComponent<Transform>();
+			const Transform&  lightTransform = light->GetGameobject().GetTransform();
 			m_renderer->SetPointLight(
 				lightIndex,
-				ToGLM( lightTransform->GetPosition() ),
+				ToGLM( lightTransform.GetPosition() ),
 				light->GetDiffuse().ToGLM(),
 				light->GetSpecular().ToGLM(),
 				light->GetAmbiant().ToGLM(),
@@ -520,10 +520,10 @@ namespace fan
 		// Directional lights		
 		for ( int lightIndex = 0; lightIndex < directionalLights.size(); lightIndex++ ) {
 			const DirectionalLight * light			= directionalLights[lightIndex];
-			const Transform *		 lightTransform = light->GetGameobject()->GetComponent<Transform>();
+			const Transform&		 lightTransform = light->GetGameobject().GetTransform();
 			m_renderer->SetDirectionalLight( 
 				lightIndex
-				,glm::vec4( ToGLM( lightTransform->Forward() ), 1 )
+				,glm::vec4( ToGLM( lightTransform.Forward() ), 1 )
 				,light->GetAmbiant().ToGLM()
 				,light->GetDiffuse().ToGLM()
 				,light->GetSpecular().ToGLM()
@@ -531,20 +531,20 @@ namespace fan
 		} m_renderer->SetNumDirectionalLights( static_cast<uint32_t>( directionalLights.size() ) );
 
 		// Transforms, mesh, materials
-		std::vector<DrawMesh> drawData( meshRenderers.size() );
-		for (int modelIndex = 0; modelIndex < meshRenderers.size() ; modelIndex++) {
-
+		std::vector<DrawMesh> drawData( meshRenderers.size() + 1 );
+		for (int modelIndex = 0; modelIndex < meshRenderers.size() ; modelIndex++) 
+		{
 			DrawMesh& data = drawData[modelIndex];
 			MeshRenderer * meshRenderer = meshRenderers[modelIndex];
-			Transform * transform = meshRenderer->GetGameobject()->GetTransform();
-			Material * material = meshRenderer->GetGameobject()->GetComponent<Material>();
+			Transform& transform = meshRenderer->GetGameobject().GetTransform();
+			Material * material = meshRenderer->GetGameobject().GetComponent<Material>();
 
 			// Mesh
 			data.mesh = meshRenderer->GetMesh();
 
 			// Transform
-			data.modelMatrix = transform->GetModelMatrix();
-			data.normalMatrix = transform->GetNormalMatrix();			
+			data.modelMatrix = transform.GetModelMatrix();
+			data.normalMatrix = transform.GetNormalMatrix();			
 
 			// Materials
 			if ( material != nullptr ) {
@@ -555,9 +555,20 @@ namespace fan
 			} else {
 				data.color = Color::White.ToGLM();
 				data.shininess = 1;
-				data.textureIndex = 0;
+				data.textureIndex = 0; 
 			}
 		}
+
+		// particles
+		DrawMesh& particlesDrawData = drawData[drawData.size() - 1];
+		particlesDrawData.mesh = m_currentScene->GetEcsManager().GetSingletonComponents().GetComponent<ecsParticlesMesh_s>().mesh;
+		particlesDrawData.modelMatrix = glm::mat4(1.f);
+		particlesDrawData.normalMatrix = glm::mat4(1.f);
+		particlesDrawData.color = glm::vec4(1.f,1.f,1.f,1.f);
+		particlesDrawData.shininess = 1;
+		particlesDrawData.textureIndex = 1;// HACK -> 1 is white texture by default
+
+
 		m_renderer->SetDrawData(drawData);
 
 		// UI
@@ -569,13 +580,13 @@ namespace fan
 			UIMeshRenderer* meshRenderer = uiRenderers[meshIndex];
 			if ( meshRenderer->IsVisible() && meshRenderer->GetMesh()->GetVertices().size() > 0 )
 			{
-				Transform * transform = meshRenderer->GetGameobject()->GetTransform();
+				Transform& transform = meshRenderer->GetGameobject().GetTransform();
 				Texture * texture= meshRenderer->GetTexture();
 
 				DrawUIMesh uiMesh;
 				uiMesh.mesh = meshRenderer->GetMesh();
-				uiMesh.scale = { transform->GetScale().x(), transform->GetScale().y() };				
-				uiMesh.position = {transform->GetPosition().x(), transform->GetPosition().y()};
+				uiMesh.scale = { transform.GetScale().x(), transform.GetScale().y() };				
+				uiMesh.position = {transform.GetPosition().x(), transform.GetPosition().y()};
 				uiMesh.color = meshRenderer->GetColor().ToGLM();
 				uiMesh.textureIndex = texture != nullptr ? texture->GetRenderID() : 0 ;
 				uiDrawData.push_back(uiMesh);
@@ -617,9 +628,9 @@ namespace fan
 
 		if ( editorCameraCtrl != nullptr &&  gameCameraCtrl != nullptr )
 		{
-			Camera * editorCamera = editorCameraCtrl->GetGameobject()->GetComponent<Camera>();
-			Camera * gameCamera = gameCameraCtrl->GetGameobject()->GetComponent<Camera>();
-			if ( m_currentScene->GetMainCamera() == editorCamera )
+			Camera * editorCamera = editorCameraCtrl->GetGameobject().GetComponent<Camera>();
+			Camera * gameCamera = gameCameraCtrl->GetGameobject().GetComponent<Camera>();
+			if ( &m_currentScene->GetMainCamera() == editorCamera )
 			{
 				m_currentScene->SetMainCamera(gameCamera);
 			}

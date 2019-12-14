@@ -63,14 +63,14 @@ namespace fan
 	void SolarPanel::ComputeChargingRate()
 	{		
 		// Sunlight mesh raycast
-		const btVector3 rayOrigin = m_gameobject->GetTransform()->GetPosition() + btVector3::Up();
+		const btVector3 rayOrigin = m_gameobject->GetTransform().GetPosition() + btVector3::Up();
 		btVector3 outIntersection;
-		ecsSunLightMesh_s& sunLight = GetScene()->GetEcsManager()->GetSingletonComponents().GetComponent<ecsSunLightMesh_s>();			
+		ecsSunLightMesh_s& sunLight = GetScene().GetEcsManager().GetSingletonComponents().GetComponent<ecsSunLightMesh_s>();			
 		m_isInsideSunlight = sunLight.mesh->RayCast( rayOrigin, -btVector3::Up(), outIntersection );
 
 		// Charging rate
 		if( m_isInsideSunlight ) {
-			const btVector3 position = m_gameobject->GetTransform()->GetPosition();
+			const btVector3 position = m_gameobject->GetTransform().GetPosition();
 			const float distance = position.norm();
 			const float slope = ( m_maxChargingRate - m_minChargingRate ) / ( m_maxRange - m_minRange );
 			const float unclampedRate = m_maxChargingRate - slope * ( distance - m_minRange );

@@ -1,6 +1,6 @@
 #include "fanGlobalIncludes.h"
-
 #include "scene/fanScene.h"
+
 #include "scene/fanGameobject.h"
 #include "scene/components/fanComponent.h"
 #include "scene/components/fanTransform.h"
@@ -156,7 +156,7 @@ namespace fan
 
 		const float delta = m_state == State::PLAYING ? _delta : 0.f;
 
-		m_ecsManager->GetSingletonComponents().GetComponent<ecsCameraPosition_s>().position = m_mainCamera->GetGameobject()->GetTransform()->GetPosition();
+		m_ecsManager->GetSingletonComponents().GetComponent<ecsCameraPosition_s>().position = m_mainCamera->GetGameobject().GetTransform().GetPosition();
 
 
 		m_ecsManager->UpdatePrePhysics( delta);
@@ -189,7 +189,7 @@ namespace fan
 			}
 			catch ( ... )
 			{
-				Debug::Error() << "Update error on actor " << actor->s_name << " of gameobject " << actor->GetGameobject()->GetName() << Debug::Endl();
+				Debug::Error() << "Update error on actor " << actor->s_name << " of gameobject " << actor->GetGameobject().GetName() << Debug::Endl();
 				actor->SetEnabled( false );
 			}			
 		}
@@ -208,7 +208,7 @@ namespace fan
 			}
 			catch ( ... )
 			{
-				Debug::Error() << "LateUpdate error on actor " << actor->s_name << " of gameobject " << actor->GetGameobject()->GetName() << Debug::Endl();
+				Debug::Error() << "LateUpdate error on actor " << actor->s_name << " of gameobject " << actor->GetGameobject().GetName() << Debug::Endl();
 				actor->SetEnabled( false );
 			}
 			
@@ -290,7 +290,7 @@ namespace fan
 	//================================================================================================================================
 	void Scene::Disable( Actor * _actor )
 	{
-		if ( _actor->GetGameobject()->GetEditorFlags() & Gameobject::EditorFlag::ALWAYS_PLAY_ACTORS  )	{ return; }
+		if ( _actor->GetGameobject().GetEditorFlags() & Gameobject::EditorFlag::ALWAYS_PLAY_ACTORS  )	{ return; }
 
 		if ( _actor->GetState() != Actor::STOPPED )
 		{
@@ -438,7 +438,7 @@ namespace fan
 	void Scene::RegisterActor(Actor * _actor) 
 	{
 		m_actors.push_back(_actor);
-		if ( m_state == PLAYING || _actor->GetGameobject()->GetEditorFlags() & Gameobject::EditorFlag::ALWAYS_PLAY_ACTORS )
+		if ( m_state == PLAYING || _actor->GetGameobject().GetEditorFlags() & Gameobject::EditorFlag::ALWAYS_PLAY_ACTORS )
 		{
 			_actor->SetEnabled( true );
 		}
@@ -650,7 +650,7 @@ namespace fan
 		{
 			if ( m_directionalLights[lightIndex] == _directionalLight )
 			{
-				Debug::Get() << Debug::Severity::warning << "Directional Light already registered in gameobject : " << _directionalLight->GetGameobject()->GetName() << Debug::Endl();
+				Debug::Get() << Debug::Severity::warning << "Directional Light already registered in gameobject : " << _directionalLight->GetGameobject().GetName() << Debug::Endl();
 				return;
 			}
 		}
@@ -685,7 +685,7 @@ namespace fan
 		// Light not removed
 		if ( m_directionalLights.size() == num )
 		{
-			Debug::Get() << Debug::Severity::warning << "Trying to remove a non registered directional light! gameobject=" << _directionalLight->GetGameobject()->GetName() << Debug::Endl();
+			Debug::Get() << Debug::Severity::warning << "Trying to remove a non registered directional light! gameobject=" << _directionalLight->GetGameobject().GetName() << Debug::Endl();
 			return;
 		}
 	}
@@ -699,7 +699,7 @@ namespace fan
 		{
 			if ( m_pointLights[lightIndex] == _pointLight )
 			{
-				Debug::Get() << Debug::Severity::warning << "PointLight already registered in gameobject : " << _pointLight->GetGameobject()->GetName() << Debug::Endl();
+				Debug::Get() << Debug::Severity::warning << "PointLight already registered in gameobject : " << _pointLight->GetGameobject().GetName() << Debug::Endl();
 				return;
 			}
 		}
@@ -733,7 +733,7 @@ namespace fan
 		// Light not removed
 		if ( m_pointLights.size() == num )
 		{
-			Debug::Get() << Debug::Severity::warning << "Trying to remove a non registered point light! gameobject=" << _pointLight->GetGameobject()->GetName() << Debug::Endl();
+			Debug::Get() << Debug::Severity::warning << "Trying to remove a non registered point light! gameobject=" << _pointLight->GetGameobject().GetName() << Debug::Endl();
 			return;
 		}
 	}
@@ -747,7 +747,7 @@ namespace fan
 		{
 			if ( m_meshRenderers[modelIndex] == _meshRenderer )
 			{
-				Debug::Get() << Debug::Severity::warning << "MeshRenderer already registered : " << _meshRenderer->GetGameobject()->GetName() << Debug::Endl();
+				Debug::Get() << Debug::Severity::warning << "MeshRenderer already registered : " << _meshRenderer->GetGameobject().GetName() << Debug::Endl();
 				return;
 			}
 		}

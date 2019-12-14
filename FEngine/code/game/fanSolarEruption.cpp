@@ -7,7 +7,6 @@
 #include "game/fanHealth.h"
 #include "core/time/fanProfiler.h"
 #include "renderer/fanMesh.h"
-#include "scene/fanScene.h"
 #include "scene/components/fanMeshRenderer.h"
 #include "scene/components/fanTransform.h"
 #include "scene/components/fanMaterial.h"
@@ -34,7 +33,7 @@ namespace fan
 		if ( m_meshRenderer ) 
 		{ 
 			// Get singleton components 
-			ecsSunLightMesh_s& sunLight = GetScene()->GetEcsManager()->GetSingletonComponents().GetComponent<ecsSunLightMesh_s>();			
+			ecsSunLightMesh_s& sunLight = GetScene().GetEcsManager().GetSingletonComponents().GetComponent<ecsSunLightMesh_s>();			
 			m_meshRenderer->SetMesh( sunLight.mesh ); 
 		}
 
@@ -136,7 +135,7 @@ namespace fan
 				m_particleSystem->SetSpeedParticles( m_explosionParticlesSpeed );
 
 				// scale
-				m_gameobject->GetTransform()->SetScale( btVector3( scale, 1.f, scale ) );
+				m_gameobject->GetTransform().SetScale( btVector3( scale, 1.f, scale ) );
 
 				// color
 				m_material->SetColor( m_explositonColor );

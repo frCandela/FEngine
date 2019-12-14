@@ -52,7 +52,7 @@ namespace fan {
 	//================================================================================================================================
 	void SpaceShip::Update( const float _delta )
 	{
-		Transform * transform = m_gameobject->GetComponent<Transform>();
+		Transform& transform = m_gameobject->GetTransform();
 
 		m_input->RefreshInput();
 		const InputData & data = m_input->GetInputData();
@@ -67,13 +67,13 @@ namespace fan {
 		// Orientation
 		if( ! direction.isZero() ) 
 		{
-			transform->LookAt( transform->GetPosition() + direction, btVector3::Up() );
+			transform.LookAt( transform.GetPosition() + direction, btVector3::Up() );
 		}
 
 		// constrain position
-		btVector3 pos = transform->GetPosition();
+		btVector3 pos = transform.GetPosition();
 		pos.setY( 0.f );
-		transform->SetPosition( pos );
+		transform.SetPosition( pos );
 
 		SpeedMode speedMode = forwardAxis < 0 ? SpeedMode::REVERSE : ( boost > 0 ? SpeedMode::FAST : ( boost < 0 ? SpeedMode::SLOW : SpeedMode::NORMAL ) );
 
@@ -105,8 +105,8 @@ namespace fan {
 		else if ( leftForce < 0.f ) { m_rightParticles->SetEnabled( true ); }
 
 		// Forces application		
-		m_rigidbody->ApplyCentralForce( leftForce * transform->Left() );
-		m_rigidbody->ApplyCentralForce( m_forwardForces[speedMode] * forwardAxis * transform->Forward() );
+		m_rigidbody->ApplyCentralForce( leftForce * transform.Left() );
+		m_rigidbody->ApplyCentralForce( m_forwardForces[speedMode] * forwardAxis * transform.Forward() );
 		m_rigidbody->GetBtBody()->setAngularVelocity(btVector3::Zero());
 
 		// Drag
@@ -121,14 +121,14 @@ namespace fan {
 	{
 		float damage = 0.f;
 
-		if ( ecsBullet * bullet = _rb->GetGameobject()->GetEcsComponent<ecsBullet>() )
+		if ( ecsBullet * bullet = _rb->GetGameobject().GetEcsComponent<ecsBullet>() )
 		{
 			//Debug::Log("bullet");
 			damage = bullet->damage;
 		}
-		else if ( _rb->GetGameobject()->GetComponent<Planet>() )
+		else if ( _rb->GetGameobject().GetComponent<Planet>() )
 		{
-			btVector3 dir = m_gameobject->GetTransform()->GetPosition() - _rb->GetGameobject()->GetTransform()->GetPosition();
+			btVector3 dir = m_gameobject->GetTransform().GetPosition() - _rb->GetGameobject().GetTransform().GetPosition();
 			if ( !dir.fuzzyZero() )
 			{
 				m_rigidbody->ApplyCentralForce( m_collisionRepulsionForce * dir.normalized() );
@@ -137,7 +137,7 @@ namespace fan {
 			//Debug::Log("planet");
 			damage = m_planetDamage;
 		}
-		else if ( _rb->GetGameobject()->GetComponent<SolarSystem>() )
+		else if ( _rb->GetGameobject().GetComponent<SolarSystem>() )
 		{
 			//Debug::Log( "sun" );
 			damage =  m_health->GetHealth() + 1.f;
@@ -166,17 +166,17 @@ namespace fan {
 
 		for ( int particleIndex = 0; particleIndex < 1000; particleIndex++ )
 		{
-			EcsManager * ecs = m_gameobject->GetScene()->GetEcsManager();
-			ecsEntity entity = ecs->CreateEntity();
-			ecsPosition & position = ecs->AddComponent<ecsPosition>( entity );
-			ecs->AddComponent<ecsRotation>( entity ).Init();
-			ecsMovement & movement = ecs->AddComponent<ecsMovement>( entity );
-			ecsParticle & particle = ecs->AddComponent<ecsParticle>( entity );
+			EcsManager& ecs = m_gameobject->GetScene().GetEcsManager();
+			ecsEntity entity = ecs.CreateEntity();
+			ecsPosition & position = ecs.AddComponent<ecsPosition>( entity );
+			ecs.AddComponent<ecsRotation>( entity ).Init();
+			ecsMovement & movement = ecs.AddComponent<ecsMovement>( entity );
+			ecsParticle & particle = ecs.AddComponent<ecsParticle>( entity );
 
 			movement.speed = btVector3( m_distribution( m_generator ), m_distribution( m_generator ), m_distribution( m_generator ) ) - btVector3( 0.5f, 0.5f, 0.5f );
 			movement.speed.normalize();
 			movement.speed *= m_distribution( m_generator ) * 10.f + 10.f;
-			position.position = m_gameobject->GetTransform()->GetPosition();
+			position.position = m_gameobject->GetTransform().GetPosition();
 			particle.durationLeft = 3.f;
 		}
 

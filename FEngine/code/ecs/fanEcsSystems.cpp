@@ -47,8 +47,7 @@ namespace fan {
 		SCOPED_PROFILE( particles_gen )
 
 		// Get singleton components 
-		ecsCameraPosition_s& cameraPosition = _singletonComponents.GetComponent<ecsCameraPosition_s>();
-		
+		ecsParticlesMesh_s& particlesMesh = _singletonComponents.GetComponent<ecsParticlesMesh_s>();
 
 		// Get the interesting matching keys
 		std::vector<ecsComponentsKey*> interestingKeys;
@@ -62,49 +61,24 @@ namespace fan {
 			}
 		}
 
-		const btVector3 up = btVector3::Left();
-		static const float size = 0.05f;
-
-		std::vector<btVector3> triangles;
-		triangles.reserve( _entitiesData.size() );
-
-		// position
-		for ( int keyIndex = 0; keyIndex < interestingKeys.size(); ++keyIndex )
-		{
-			ecsComponentsKey & key = *interestingKeys[keyIndex];
-
-			const btVector3& position = _positions.At( key ).position;
-			btVector3 forward = cameraPosition.position - position;
-			forward.normalize();
-			btVector3 left = up.cross( forward );
-			left.normalize();
-
-			btMatrix3x3 mat (
-				left[0], up[0], forward[0],
-				left[1], up[1], forward[1],
-				left[2], up[2], forward[2] );
-
-			triangles.push_back( position + mat * btVector3( size, 0, 0 ) );
-			triangles.push_back( position + mat * btVector3( -size, 0, 0 ) );
-			triangles.push_back( position + mat * btVector3( 0, 2.f*size, 0 ) );
-
-		}
-
-		// Colors
-		std::vector<Color> colors;		
-		colors.reserve( _entitiesData.size() );
-		for ( int keyIndex = 0; keyIndex < interestingKeys.size(); ++keyIndex )
-		{
-			ecsComponentsKey & key = *interestingKeys[keyIndex];
-			ecsParticle& particle = _particles.At( key );
-			colors.push_back( particle.color );			
-		}
-
-		{
-			SCOPED_PROFILE( tri )
-			EditorDebug::Get().Renderer().DebugTriangles( triangles, colors );
-		}
+		std::vector<Vertex> vertices;
+		vertices.resize( interestingKeys.size() * 3 );
 		
+		const float size = 0.05f;
+
+		for ( int keyIndex = 0; keyIndex < interestingKeys.size(); ++keyIndex )
+		{
+			ecsComponentsKey & key = *interestingKeys[keyIndex];
+			glm::vec3 position = ToGLM( _positions.At( key ).position );
+			glm::vec3 color = _particles.At( key ).color.ToGLM3();
+
+			// pos, normal, color, uv;
+			vertices.push_back( { position + glm::vec3( -size,  0.0f, -size ), glm::vec3( 0.f, 1.f, 0.f ), color, glm::vec2( -0.5f, -0.5f ) } );			
+			vertices.push_back( { position + glm::vec3( 0, 0.0f, size ), glm::vec3( 0.f, 1.f, 0.f ), color, glm::vec2( -0.5f, -0.5f ) } );
+			vertices.push_back( { position + glm::vec3( size, 0.0f, -size ), glm::vec3( 0.f, 1.f, 0.f ), color, glm::vec2( -0.5f, -0.5f ) } );
+		}
+
+		particlesMesh.mesh->LoadFromVertices( vertices );		
 	}
 
 	//================================================================================================================================
@@ -151,7 +125,7 @@ namespace fan {
 			if ( key.IsAlive() &&  key.MatchSignature( signature::bitset ) ) {
 				btTransform& transform		= _transforms.At(key).transform;
 				ecsPlanet& planet			= _planets.At(key);
-				const btTransform& parentTransform = _gameobjects.At( key ).gameobject->GetParent()->GetTransform()->GetBtTransform();
+				const btTransform& parentTransform = _gameobjects.At( key ).gameobject->GetParent()->GetTransform().GetBtTransform();
 				ecsFlags& flags = _flags.At( key );
 
 				planet.time += _delta;
@@ -513,7 +487,7 @@ namespace fan {
 				if ( bullet.durationLeft <= 0.f )
 				{
  					Gameobject * gameobject = _gameobjects.At( key ).gameobject;
-					gameobject->GetScene()->DeleteGameobject( gameobject );
+					gameobject->GetScene().DeleteGameobject( gameobject );
 				}
 			}
 		}

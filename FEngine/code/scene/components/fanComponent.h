@@ -1,25 +1,24 @@
  #pragma once
 
+#include "scene/fanScene.h"
+#include "scene/fanGameobject.h"
 #include "core/fanISerializable.h"
 #include "core/fanTypeInfo.h"
 #include "ecs/fanECSComponents.h"
-#include "scene/fanGameobject.h"
 
 //Editor
 #include "editor/fanImguiIcons.h"
 
 namespace fan
 {
-	class Scene;
-
 	//================================================================================================================================
 	//================================================================================================================================
 	class Component : public ISerializable {
 	public:
 		friend class Gameobject;
 
-		inline Gameobject* GetGameobject() const { return m_gameobject; }
-		inline Scene *	GetScene() const { return m_gameobject->GetScene(); }
+		inline Gameobject& GetGameobject() const { return *m_gameobject; }
+		inline Scene &	GetScene() const { return m_gameobject->GetScene(); }
 
 		bool IsBeingDeleted() const { return m_isBeingDeleted; }
 		bool IsRemovable() const { return m_isRemovable; }
@@ -66,7 +65,7 @@ namespace fan
 #define REQUIRE_COMPONENT( _componentType, _pointerToComponent )																			\
 		_pointerToComponent = m_gameobject->GetComponent<_componentType>();																	\
 		if ( _pointerToComponent == nullptr ) {																								\
-			Debug::Warning() << GetName() << ": " << #_componentType << " not found on " << GetGameobject()->GetName() << Debug::Endl();	\
+			Debug::Warning() << GetName() << ": " << #_componentType << " not found on " << GetGameobject().GetName() << Debug::Endl();	\
 			SetEnabled( false );																											\
 		}
 
@@ -74,8 +73,8 @@ namespace fan
 // Find _componentType  from the scene and set _pointerToComponent. Disable the component with a warning message if no component is found
 //================================================================================================================================
 #define REQUIRE_SCENE_COMPONENT( _componentType, _pointerToComponent )																		\
-		_pointerToComponent = m_gameobject->GetScene()->FindComponentOfType<_componentType>();												\
+		_pointerToComponent = m_gameobject->GetScene().FindComponentOfType<_componentType>();												\
 		if ( _pointerToComponent == nullptr ) {																								\
-			Debug::Warning() << GetName() << ": " << #_componentType << " not found on " << GetGameobject()->GetName() << Debug::Endl();	\
+			Debug::Warning() << GetName() << ": " << #_componentType << " not found on " << GetGameobject().GetName() << Debug::Endl();	\
 			SetEnabled( false );																											\
 		}

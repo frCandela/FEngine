@@ -38,7 +38,7 @@ namespace fan {
 	void SunLight::OnGui()
 	{
 		// Get singleton components 
-		ecsSunLightMesh_s& sunLight = GetScene()->GetEcsManager()->GetSingletonComponents().GetComponent<ecsSunLightMesh_s>();
+		ecsSunLightMesh_s& sunLight = GetScene().GetEcsManager().GetSingletonComponents().GetComponent<ecsSunLightMesh_s>();
 
 		ImGui::PushItemWidth( 0.6f * ImGui::GetWindowWidth() );
 		{
@@ -53,7 +53,7 @@ namespace fan {
 	//================================================================================================================================
 	bool SunLight::Load( const Json & _json) 
 	{
-		ecsSunLightMesh_s& sunLight = GetScene()->GetEcsManager()->GetSingletonComponents().GetComponent<ecsSunLightMesh_s>();
+		ecsSunLightMesh_s& sunLight = GetScene().GetEcsManager().GetSingletonComponents().GetComponent<ecsSunLightMesh_s>();
 
 		Actor::Load(_json);
 		LoadFloat( _json, "radius",		sunLight.radius );
@@ -66,7 +66,7 @@ namespace fan {
 	//================================================================================================================================
 	bool SunLight::Save( Json & _json ) const 
 	{
-		ecsSunLightMesh_s& sunLight = GetScene()->GetEcsManager()->GetSingletonComponents().GetComponent<ecsSunLightMesh_s>();
+		ecsSunLightMesh_s& sunLight = GetScene().GetEcsManager().GetSingletonComponents().GetComponent<ecsSunLightMesh_s>();
 
 		Actor::Save( _json );		
 		SaveFloat( _json, "radius",		sunLight.radius );

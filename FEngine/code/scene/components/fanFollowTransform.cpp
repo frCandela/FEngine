@@ -30,7 +30,7 @@ namespace fan
 
 		if( *m_followedTransform != nullptr )
 		{
-			m_offset = m_followedTransform->GetPosition() - m_gameobject->GetTransform()->GetPosition();
+			m_offset = m_followedTransform->GetPosition() - m_gameobject->GetTransform().GetPosition();
 		}	
 	}
 
@@ -45,13 +45,13 @@ namespace fan
 	//================================================================================================================================
 	void FollowTransform::UpdatePosition()
 	{
-		Transform * transform = m_gameobject->GetTransform();
+		Transform & transform = m_gameobject->GetTransform();
 
-		btVector3 offset = m_followedTransform->GetPosition() - transform->GetPosition() - m_offset;
+		btVector3 offset = m_followedTransform->GetPosition() - transform.GetPosition() - m_offset;
 
 		if ( !offset.isZero() )
 		{
-			transform->SetPosition( transform->GetPosition() + offset );
+			transform.SetPosition( transform.GetPosition() + offset );
 		}
 	}
 

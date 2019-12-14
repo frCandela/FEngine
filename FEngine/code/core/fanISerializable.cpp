@@ -123,7 +123,7 @@ namespace fan {
 	//================================================================================================================================
 	void ISerializable::SaveComponentPtr	( Json & _json, const char * _name, const ComponentIDPtr& _ptr )
 	{
-		_json[_name]["gameobject_id"] = *_ptr != nullptr ? _ptr->GetGameobject()->GetUniqueID() : 0;
+		_json[_name]["gameobject_id"] = *_ptr != nullptr ? _ptr->GetGameobject().GetUniqueID() : 0;
 		_json[_name]["component_id"]  = *_ptr != nullptr ? _ptr->GetType() : 0;
 	}
 

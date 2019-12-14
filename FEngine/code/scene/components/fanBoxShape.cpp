@@ -54,7 +54,7 @@ namespace fan {
 				SetExtent( extent );
 			}
 
-			EditorDebug::Get().Renderer().DebugCube( m_gameobject->GetTransform()->GetBtTransform(), 0.5f * extent, Color::Green );
+			EditorDebug::Get().Renderer().DebugCube( m_gameobject->GetTransform().GetBtTransform(), 0.5f * extent, Color::Green );
 		} ImGui::PopItemWidth();
 	}
 

@@ -34,6 +34,7 @@ namespace fan
 
 		LoadMesh(GlobalValues::s_defaultMesh);
 		LoadTexture(GlobalValues::s_defaultTexture);
+		LoadTexture(GlobalValues::s_whiteTexture);
 		SetUnmodified();
 	}
 

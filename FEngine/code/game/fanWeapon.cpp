@@ -77,8 +77,8 @@ namespace fan
  		Rigidbody * rb1 = static_cast<Rigidbody*> ( _manifold->getBody1()->getUserPointer() );
 		Rigidbody * bulletRb = _other == rb0 ? rb1 : rb0;
 
-		m_gameobject->GetScene()->DeleteGameobject( bulletRb->GetGameobject() );
-		CreateExplosion( bulletRb->GetGameobject()->GetTransform()->GetPosition());
+		m_gameobject->GetScene().DeleteGameobject( &bulletRb->GetGameobject() );
+		CreateExplosion( bulletRb->GetGameobject().GetTransform().GetPosition());
 
 	}
 
@@ -88,12 +88,12 @@ namespace fan
 	{
 		for (int particleIndex = 0; particleIndex < m_particlesPerExplosion ; particleIndex++)
 		{		
-			EcsManager * ecs = m_gameobject->GetScene()->GetEcsManager();
-			ecsEntity entity = ecs->CreateEntity();
-			ecsPosition & position = ecs->AddComponent<ecsPosition>( entity );
-			ecs->AddComponent<ecsRotation>( entity ).Init();
-			ecsMovement & movement = ecs->AddComponent<ecsMovement>( entity );
-			ecsParticle & particle = ecs->AddComponent<ecsParticle>( entity );
+			EcsManager& ecs = m_gameobject->GetScene().GetEcsManager();
+			ecsEntity entity = ecs.CreateEntity();
+			ecsPosition & position = ecs.AddComponent<ecsPosition>( entity );
+			ecs.AddComponent<ecsRotation>( entity ).Init();
+			ecsMovement & movement = ecs.AddComponent<ecsMovement>( entity );
+			ecsParticle & particle = ecs.AddComponent<ecsParticle>( entity );
 
 			movement.speed = btVector3( m_distribution( m_generator ), m_distribution( m_generator ), m_distribution( m_generator ) ) - btVector3( 0.5f, 0.5f, 0.5f );
 			movement.speed.normalize();
@@ -109,21 +109,21 @@ namespace fan
 	{
 		if ( *m_bulletPrefab != nullptr )
 		{
-			Gameobject * bullet = m_gameobject->GetScene()->CreateGameobject( **m_bulletPrefab, m_gameobject );
+			Gameobject * bullet = m_gameobject->GetScene().CreateGameobject( **m_bulletPrefab, m_gameobject );
 			bullet->AddEcsComponent<ecsBullet>()->Init( m_lifeTime, m_bulletDamage );			
 
 			Rigidbody * rb = bullet->GetComponent<Rigidbody>();
 			if ( rb != nullptr )
 			{
 				const Rigidbody * thisRb = m_gameobject->GetComponent<Rigidbody>();
-				const Transform * thisTransform = m_gameobject->GetTransform();
+				const Transform& thisTransform = m_gameobject->GetTransform();
 
 				rb->onContactStarted.Connect( &Weapon::OnBulletContact, this );
 				rb->SetIgnoreCollisionCheck( *thisRb, true );
-				rb->SetVelocity( thisRb->GetVelocity() + m_speed * thisTransform->Forward() );
+				rb->SetVelocity( thisRb->GetVelocity() + m_speed * thisTransform.Forward() );
 
-				Transform * transform = bullet->GetTransform();
-				transform->SetPosition( thisTransform->GetPosition() + thisTransform->TransformDirection( m_offset ) );
+				Transform& transform = bullet->GetTransform();
+				transform.SetPosition( thisTransform.GetPosition() + thisTransform.TransformDirection( m_offset ) );
 			}
 		} 		
 	}

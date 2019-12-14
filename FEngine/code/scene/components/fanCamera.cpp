@@ -21,11 +21,11 @@ namespace fan
 	//================================================================================================================================
 	glm::mat4 Camera::GetView() const
 	{
-		Transform* transform = m_gameobject->GetComponent<Transform>();
+		Transform& transform = m_gameobject->GetTransform();
 		glm::mat4 view = glm::lookAt(
-			ToGLM(transform->GetPosition()),
-			ToGLM(transform->GetPosition() + transform->Forward()),
-			ToGLM(transform->Up()));
+			ToGLM(transform.GetPosition()),
+			ToGLM(transform.GetPosition() + transform.Forward()),
+			ToGLM(transform.Up()));
 		return view;
 	}
 
@@ -52,12 +52,12 @@ namespace fan
 		assert(_position.y() >= -1.f && _position.y() <= 1.f);
 
 		if( m_type == Type::PERSPECTIVE ) {
-			Transform* transform = m_gameobject->GetTransform();
+			Transform& transform = m_gameobject->GetTransform();
 
-			const btVector3	pos = transform->GetPosition();
-			const btVector3 upVec = transform->Up();
-			const btVector3 left = transform->Left();
-			const btVector3 forward = transform->Forward();
+			const btVector3	pos = transform.GetPosition();
+			const btVector3 upVec = transform.Up();
+			const btVector3 left = transform.Left();
+			const btVector3 forward = transform.Forward();
 
 			btVector3 nearMiddle = pos + m_nearDistance * forward;
 
@@ -72,13 +72,13 @@ namespace fan
 		} else { // ORTHOGONAL
 			Ray ray;
 
-			Transform * transform = m_gameobject->GetTransform();
+			Transform& transform = m_gameobject->GetTransform();
 
-			ray.origin = transform->GetPosition();
-			ray.origin -= m_aspectRatio * m_orthoSize * transform->Left()  * _position[0];
-			ray.origin -= m_orthoSize * transform->Up()  * _position[1];
+			ray.origin = transform.GetPosition();
+			ray.origin -= m_aspectRatio * m_orthoSize * transform.Left()  * _position[0];
+			ray.origin -= m_orthoSize * transform.Up()  * _position[1];
 			
-			ray.direction = transform->Forward();
+			ray.direction = transform.Forward();
 
 			return ray;
 		}

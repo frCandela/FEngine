@@ -45,7 +45,7 @@ namespace fan {
 		*tmpLight = m_gameobject->AddEcsComponent<ecsDirLight>();
 		m_dirLight->Init();
 
-		m_gameobject->GetScene()->onDirectionalLightAttach.Emmit( this );
+		m_gameobject->GetScene().onDirectionalLightAttach.Emmit( this );
 	}
 
 	//================================================================================================================================
@@ -53,7 +53,7 @@ namespace fan {
 	void DirectionalLight::OnDetach() {
 		Component::OnDetach();
 		m_gameobject->RemoveEcsComponent<ecsDirLight>();
-		m_gameobject->GetScene()->onDirectionalLightDetach.Emmit( this );
+		m_gameobject->GetScene().onDirectionalLightDetach.Emmit( this );
 	}
 
 	//================================================================================================================================
@@ -73,11 +73,11 @@ namespace fan {
 			if ( ImGui::ColorEdit3( "specular", m_dirLight->specular.Data(), ImGui::fanColorEditFlags ) ) { m_gameobject->SetFlags( m_gameobject->GetFlags() & Gameobject::Flag::OUTDATED_LIGHT ); }
 
 
-			const Transform * transform = m_gameobject->GetComponent<Transform>();
-			const btVector3 pos = transform->GetPosition();
-			const btVector3 dir = transform->Forward();
-			const btVector3 up = transform->Up();
-			const btVector3 left = transform->Left();
+			const Transform& transform = m_gameobject->GetTransform();
+			const btVector3 pos = transform.GetPosition();
+			const btVector3 dir = transform.Forward();
+			const btVector3 up = transform.Up();
+			const btVector3 left = transform.Left();
 			const float length = 2.f;
 			const float radius = 0.5f;
 			const Color color = Color::Yellow;
@@ -87,7 +87,7 @@ namespace fan {
 				const btVector3 offset = offsets[offsetIndex];
 				EditorDebug::Get().Renderer().DebugLine( pos + offset, pos + offset + length * dir, color );
 			}
-			EditorDebug::Get().Renderer().DebugSphere( transform->GetBtTransform(), radius, 0, color );
+			EditorDebug::Get().Renderer().DebugSphere( transform.GetBtTransform(), radius, 0, color );
 		} ImGui::PopItemWidth();
 	}
 

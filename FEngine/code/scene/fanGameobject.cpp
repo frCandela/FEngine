@@ -1,7 +1,6 @@
 #include "fanGlobalIncludes.h"
 #include "scene/fanGameobject.h"
 
-#include "scene/fanScene.h"
 #include "scene/components/fanComponent.h"
 #include "scene/components/fanMeshRenderer.h"
 #include "scene/components/fanTransform.h"
@@ -27,8 +26,8 @@ namespace fan
 			_parent->m_childs.push_back(this);
 		}
 
-		ecsEntity entity = m_scene->GetEcsManager()->CreateEntity();
-		m_ecsHandleEntity = m_scene->GetEcsManager()->CreateHandle( entity );
+		ecsEntity entity = m_scene->GetEcsManager().CreateEntity();
+		m_ecsHandleEntity = m_scene->GetEcsManager().CreateHandle( entity );
 
 		AddEcsComponent<ecsGameobject>()->Init(this);
 
@@ -62,8 +61,8 @@ namespace fan
 
 		// Delete ecs entity
 		ecsEntity entity;
-		if ( m_scene->GetEcsManager()->FindEntity( m_ecsHandleEntity, entity ) ) {
-			m_scene->GetEcsManager()->DeleteEntity( entity );
+		if ( m_scene->GetEcsManager().FindEntity( m_ecsHandleEntity, entity ) ) {
+			m_scene->GetEcsManager().DeleteEntity( entity );
 		} else {
 			Debug::Get() << Debug::Severity::warning << "Unable to destroy ecsEntity for gameobject " << m_name << Debug::Endl();
 		}
@@ -313,7 +312,7 @@ namespace fan
 					// Don't add a transform two times
 					Component * component = nullptr;
 					if ( componentID == Transform::s_typeID ) {
-						component = GetTransform();
+						component = &GetTransform();
 					} else {
 						component = AddComponent( componentID );
 					}

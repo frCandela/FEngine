@@ -51,7 +51,7 @@ namespace fan
 		*tmpLight = m_gameobject->AddEcsComponent<ecsPointLight>();
 		m_pointLight->Init();
 
-		m_gameobject->GetScene()->onPointLightAttach.Emmit( this );
+		m_gameobject->GetScene().onPointLightAttach.Emmit( this );
 	}
 
 	//================================================================================================================================
@@ -59,7 +59,7 @@ namespace fan
 	void PointLight::OnDetach() {
 		Component::OnDetach();
 		m_gameobject->RemoveEcsComponent<ecsPointLight>();
-		m_gameobject->GetScene()->onPointLightDetach.Emmit(this);
+		m_gameobject->GetScene().onPointLightDetach.Emmit(this);
 	}
 	
 	//================================================================================================================================
@@ -106,7 +106,7 @@ namespace fan
  		// Sphere gizmo
 		float lightRange = GetLightRange();
 		if (lightRange > 0 ) {
-			const btTransform transform = m_gameobject->GetComponent<Transform>()->GetBtTransform();
+			const btTransform transform = m_gameobject->GetTransform().GetBtTransform();
 			EditorDebug::Get().Renderer().DebugSphere(transform, lightRange, 2, m_pointLight->diffuse);
 		}
 

@@ -33,14 +33,14 @@ namespace fan {
 			m_rigidbody->setMassProps( mass, localInertia );
 
 			if ( m_colShape == nullptr ) {
-				m_gameobject->GetScene()->GetPhysicsManager()->AddRigidbody( this );
+				m_gameobject->GetScene().GetPhysicsManager().AddRigidbody( this );
 			}
 			m_colShape = _collisionShape;
 
 		} else {
 			m_colShape = nullptr;
 			m_rigidbody->setCollisionShape(nullptr);	
-			m_gameobject->GetScene()->GetPhysicsManager()->RemoveRigidbody( this );
+			m_gameobject->GetScene().GetPhysicsManager().RemoveRigidbody( this );
 		}
 	}
 
@@ -73,19 +73,19 @@ namespace fan {
 		m_rigidbody->setUserPointer(this);
 
 		if( m_colShape != nullptr ){
-			m_gameobject->GetScene()->GetPhysicsManager()->AddRigidbody( this );
+			m_gameobject->GetScene().GetPhysicsManager().AddRigidbody( this );
 		}
-		m_gameobject->GetScene()->GetPhysicsManager()->RegisterRigidbody( this );
+		m_gameobject->GetScene().GetPhysicsManager().RegisterRigidbody( this );
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================	
 	void Rigidbody::OnDetach() {
 		Component::OnDetach();
-		m_gameobject->GetScene()->GetPhysicsManager()->RemoveRigidbody( this );
+		m_gameobject->GetScene().GetPhysicsManager().RemoveRigidbody( this );
 		m_gameobject->RemoveEcsComponent<ecsMotionState>();
 		m_gameobject->RemoveEcsComponent<ecsRigidbody>();
-		m_gameobject->GetScene()->GetPhysicsManager()->UnRegisterRigidbody( this );
+		m_gameobject->GetScene().GetPhysicsManager().UnRegisterRigidbody( this );
 	}
 
 	//================================================================================================================================

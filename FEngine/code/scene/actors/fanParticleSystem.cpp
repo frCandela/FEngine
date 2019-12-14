@@ -16,7 +16,7 @@ namespace fan {
 	void ParticleSystem::OnAttach() {
 		Actor::OnAttach();
 
-		m_ecsManager = m_gameobject->GetScene()->GetEcsManager();
+		m_ecsManager = &m_gameobject->GetScene().GetEcsManager();
 		m_distribution = std::uniform_real_distribution<float> ( 0.f, 1.f );
 	}
 
@@ -36,10 +36,10 @@ namespace fan {
 		m_timeAccumulator += _delta;
 		float particleSpawnDelta = 1.f / m_particlesPerSecond;
 
-		const Transform * transform = (*m_origin) != nullptr ? m_origin->GetTransform() : m_gameobject->GetTransform();
+		const Transform & transform = (*m_origin) != nullptr ? m_origin->GetTransform() : m_gameobject->GetTransform();
 
-		const btVector3 origin =transform->GetPosition();
-		btVector3 transformedOffset = transform->TransformDirection( m_offset );
+		const btVector3 origin =transform.GetPosition();
+		btVector3 transformedOffset = transform.TransformDirection( m_offset );
 
 		while ( m_timeAccumulator > particleSpawnDelta ) {
 			m_timeAccumulator -= particleSpawnDelta;
