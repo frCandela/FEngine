@@ -95,7 +95,7 @@ namespace fan
 			ecsMovement & movement = ecs.AddComponent<ecsMovement>( entity );
 			ecsParticle & particle = ecs.AddComponent<ecsParticle>( entity );
 
-			movement.speed = btVector3( m_distribution( m_generator ), m_distribution( m_generator ), m_distribution( m_generator ) ) - btVector3( 0.5f, 0.5f, 0.5f );
+			movement.speed = btVector3( m_distribution( m_generator ), 0.f, m_distribution( m_generator ) ) - btVector3( 0.5f, 0.0f, 0.5f );
 			movement.speed.normalize();
 			movement.speed *= m_distribution( m_generator ) * m_exposionSpeed;
 			position.position = _point;

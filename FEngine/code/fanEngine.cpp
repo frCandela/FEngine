@@ -531,16 +531,21 @@ namespace fan
 		} m_renderer->SetNumDirectionalLights( static_cast<uint32_t>( directionalLights.size() ) );
 
 		// Transforms, mesh, materials
-		std::vector<DrawMesh> drawData( meshRenderers.size() + 1 );
+		std::vector<DrawMesh> drawData;
+		drawData.reserve( meshRenderers.size() + 1 );
 		for (int modelIndex = 0; modelIndex < meshRenderers.size() ; modelIndex++) 
 		{
-			DrawMesh& data = drawData[modelIndex];
+			DrawMesh data;
 			MeshRenderer * meshRenderer = meshRenderers[modelIndex];
 			Transform& transform = meshRenderer->GetGameobject().GetTransform();
 			Material * material = meshRenderer->GetGameobject().GetComponent<Material>();
 
 			// Mesh
 			data.mesh = meshRenderer->GetMesh();
+
+			if( data.mesh == nullptr ) {
+				continue;
+			}
 
 			// Transform
 			data.modelMatrix = transform.GetModelMatrix();
@@ -557,17 +562,18 @@ namespace fan
 				data.shininess = 1;
 				data.textureIndex = 0; 
 			}
+			drawData.push_back(data);
 		}
 
 		// particles
-		DrawMesh& particlesDrawData = drawData[drawData.size() - 1];
+		DrawMesh particlesDrawData;
 		particlesDrawData.mesh = m_currentScene->GetEcsManager().GetSingletonComponents().GetComponent<ecsParticlesMesh_s>().mesh;
 		particlesDrawData.modelMatrix = glm::mat4(1.f);
 		particlesDrawData.normalMatrix = glm::mat4(1.f);
 		particlesDrawData.color = glm::vec4(1.f,1.f,1.f,1.f);
 		particlesDrawData.shininess = 1;
 		particlesDrawData.textureIndex = 1;// HACK -> 1 is white texture by default
-
+		drawData.push_back(particlesDrawData);
 
 		m_renderer->SetDrawData(drawData);
 

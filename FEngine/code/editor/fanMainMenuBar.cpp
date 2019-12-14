@@ -133,11 +133,11 @@ namespace fan
 
 				ImGui::Separator();
 
-				if (ImGui::MenuItem("Reload shaders", "F5")) {
+				if (ImGui::MenuItem("Reload shaders", "F11")) {
 					onReloadShaders.Emmit();
 				}
 
-				if ( ImGui::MenuItem( "Reload icons", "F6") )
+				if ( ImGui::MenuItem( "Reload icons", "F12") )
 				{
 					onReloadIcons.Emmit();
 				}
@@ -195,14 +195,14 @@ namespace fan
 			if ( ImGui::BeginMenu( "Scene" ) )  {
 				
 				bool clientScene = (m_currentScene == CurrentScene::CLIENTS);
-				if ( ImGui::MenuItem( "client", "F1", &clientScene ) && clientScene )
+				if ( ImGui::MenuItem( "client", nullptr, &clientScene ) && clientScene )
 				{
 					m_currentScene = CurrentScene::CLIENTS;
 					onSetScene.Emmit( m_currentScene );
 				}
 
 				bool serverScene = (m_currentScene == CurrentScene::SERVER);
-				if ( ImGui::MenuItem( "server", "F1", &serverScene ) && serverScene )
+				if ( ImGui::MenuItem( "server", nullptr, &serverScene ) && serverScene )
 				{
 					m_currentScene = CurrentScene::SERVER;
 					onSetScene.Emmit( m_currentScene );
