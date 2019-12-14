@@ -13,6 +13,7 @@ namespace fan
 	{
 	public:
 		ecsSunLightMesh_s();
+		~ecsSunLightMesh_s();
 
 		Mesh* mesh;
 		float subAngle;
