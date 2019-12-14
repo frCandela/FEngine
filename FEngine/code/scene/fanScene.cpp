@@ -156,12 +156,15 @@ namespace fan
 
 		const float delta = m_state == State::PLAYING ? _delta : 0.f;
 
+		m_ecsManager->GetSingletonComponents().GetComponent<ecsCameraPosition_s>().position = m_mainCamera->GetGameobject()->GetTransform()->GetPosition();
+
+
 		m_ecsManager->UpdatePrePhysics( delta);
 		m_physicsManager->StepSimulation( delta );
 		m_ecsManager->UpdatePostPhysics( delta);
 		UpdateActors( _delta );
-		m_ecsManager->Update( delta, m_mainCamera->GetGameobject()->GetTransform()->GetPosition() );
-		LateUpdate( _delta );
+		m_ecsManager->Update( delta );
+		LateUpdateActors( _delta );
 		m_ecsManager->LateUpdate( delta );
 		EndFrame();
 
@@ -194,7 +197,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void Scene::LateUpdate( const float _delta )
+	void Scene::LateUpdateActors( const float _delta )
 	{
 		SCOPED_PROFILE( scene_L_update )
 		for ( Actor * actor : m_activeActors )

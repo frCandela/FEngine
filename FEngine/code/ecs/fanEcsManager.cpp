@@ -9,8 +9,6 @@ namespace fan {
 	EcsManager::EcsManager() {
 		m_entityToHandles.reserve( 512 );
 		m_entitiesKeys.reserve(1024);
-
-		ecsSolarEruptionMeshSystem::Init();
 	}
 
 	//================================================================================================================================
@@ -70,21 +68,19 @@ namespace fan {
 	template< template < typename...> typename _components, typename... _types, typename _system  >
 	struct RunSystem<_components<_types...>, _system > {
 		static void Run
-		( std::function<void( float, const size_t, std::vector< ecsComponentsKey >&, ComponentData<_types>&... )> _method,
-			const float _delta, const size_t _count, std::vector<ecsComponentsKey>& _entitiesData, ecsComponentsTuple< ecsComponents >& _tuple 	) 
+		( std::function<void( float, const size_t, std::vector< ecsComponentsKey >&, ecsSingletonComponents&, ComponentData<_types>&... )> _method,
+			const float _delta, const size_t _count, std::vector<ecsComponentsKey>& _entitiesData, ecsSingletonComponents& _singletonComponents, ecsComponentsTuple< ecsComponents >& _tuple ) 
 		{
-			_method( _delta, _count, _entitiesData,  _tuple.Get<_types>()... );
+			_method( _delta, _count, _entitiesData, _singletonComponents, _tuple.Get<_types>()... );
 		}
 	};
+	#define RUN_SYSTEM( _system, _func )  RunSystem< _system::signature, _system >::Run( &_system::_func, _delta, m_activeEntitiesCount, m_entitiesKeys, m_singletonComponents, m_components );
 
 	//================================================================================================================================
 	// Runs the systems before the physics update
-	//================================================================================================================================
-	#define RUN_SYSTEM( _system, _func )  RunSystem< _system::signature, _system >::Run( &_system::_func, _delta, m_activeEntitiesCount, m_entitiesKeys, m_components );
-	void EcsManager::Update( const float _delta, const btVector3& _cameraPosition ) {
+	//================================================================================================================================	
+	void EcsManager::Update( const float _delta) {
 		SCOPED_PROFILE( ecs_update )
-
-		ecsParticlesGenerateSystem::s_cameraPosition = _cameraPosition;		
 
 		RUN_SYSTEM( ecsParticleSystem, Run );
 		RUN_SYSTEM( ecsParticleSunlightOcclusionSystem, Run );

@@ -2,13 +2,11 @@
 #include "game/fanWeapon.h"
 
 #include "core/time/fanTime.h"
-#include "scene/fanGameobject.h"
 #include "scene/components/fanTransform.h"
 #include "scene/components/fanMaterial.h"
 #include "scene/components/fanRigidbody.h"
 #include "scene/components/fanMeshRenderer.h"
 #include "scene/components/fanSphereShape.h"
-#include "scene/fanGameobject.h"
 #include "core/input/fanInput.h"
 #include "core/input/fanInputManager.h"
 #include "core/input/fanMouse.h"

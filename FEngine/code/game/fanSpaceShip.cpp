@@ -8,7 +8,6 @@
 #include "scene/components/fanTransform.h"
 #include "scene/components/fanCamera.h"
 #include "scene/actors/fanParticleSystem.h"
-#include "scene/fanGameobject.h"
 #include "core/input/fanMouse.h"
 #include "core/math/shapes/fanRay.h"
 #include "game/fanWithEnergy.h"

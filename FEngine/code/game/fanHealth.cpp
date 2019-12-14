@@ -1,7 +1,6 @@
 #include "fanGlobalIncludes.h"
 #include "game/fanHealth.h"
 
-#include "scene/fanGameobject.h"
 #include "scene/components/fanTransform.h"
 
 namespace fan

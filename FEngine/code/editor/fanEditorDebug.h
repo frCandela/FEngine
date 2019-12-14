@@ -27,6 +27,5 @@ namespace fan
 	private:
 		RendererDebug * m_renderer;
 		EditorGizmos * m_gizmos;
-
 	};
 }

@@ -115,7 +115,10 @@
     <ClCompile Include="code\ecs\fanEcsComponentsKey.cpp" />
     <ClCompile Include="code\ecs\fanEcsConfig.cpp" />
     <ClCompile Include="code\ecs\fanEcsManager.cpp" />
+    <ClCompile Include="code\ecs\fanEcsSingletonComponents.cpp" />
     <ClCompile Include="code\ecs\fanEcsSystems.cpp" />
+    <ClCompile Include="code\ecs\singleton_components\fanEcsSingletonComponent.cpp" />
+    <ClCompile Include="code\ecs\singleton_components\fanECSSunLightMesh.cpp" />
     <ClCompile Include="code\editor\callbacks\fanGameWindowCallbacks.cpp" />
     <ClCompile Include="code\editor\components\fanFPSCamera.cpp" />
     <ClCompile Include="code\editor\fanDragnDrop.cpp" />
@@ -259,7 +262,10 @@
     <ClInclude Include="code\ecs\fanEcsConfig.h" />
     <ClInclude Include="code\ecs\fanEcsComponentsKey.h" />
     <ClInclude Include="code\ecs\fanEcsManager.h" />
+    <ClInclude Include="code\ecs\fanEcsSingletonComponents.h" />
     <ClInclude Include="code\ecs\fanEcsSystems.h" />
+    <ClInclude Include="code\ecs\singleton_components\fanEcsSingletonComponent.h" />
+    <ClInclude Include="code\ecs\singleton_components\fanECSSunLightMesh.h" />
     <ClInclude Include="code\editor\callbacks\fanGameWindowCallbacks.h" />
     <ClInclude Include="code\editor\components\fanFPSCamera.h" />
     <ClInclude Include="code\editor\fanDragnDrop.h" />

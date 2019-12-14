@@ -51,10 +51,9 @@ namespace fan
 		template<typename _componentType> _componentType *				 FindComponentOfType() const;
 		template<typename _componentType> std::vector<_componentType *>  FindComponentsOfType() const;
 
-		void BeginFrame();
-		void Update(const float _delta);
-		void LateUpdate( const float _delta );
-		void EndFrame();
+
+		void Update(const float _delta);	
+
 		void Play()	;
 		void Stop();
 		void Pause();
@@ -128,7 +127,10 @@ namespace fan
 		std::vector < PointLight* >			m_pointLights;
 		std::vector < MeshRenderer* >		m_meshRenderers;
 
+		void BeginFrame();
 		void UpdateActors(const float _delta);
+		void LateUpdateActors( const float _delta );
+		void EndFrame();
 
 		void OnGameobjectPtrCreate( GameobjectPtr * _gameobjectPtr );
 		void ResolveGameobjectPointers( );

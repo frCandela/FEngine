@@ -3,7 +3,6 @@
 
 #include "renderer/fanUIMesh.h"
 #include "scene/components/fanTransform.h"
-#include "scene/fanGameobject.h"
 #include "renderer/core/fanTexture.h"
 #include "core/input/fanInput.h"
 

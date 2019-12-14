@@ -5,7 +5,6 @@
 #include "core/input/fanInput.h"
 #include "core/input/fanMouse.h"
 #include "core/input/fanJoystick.h"
-#include "scene/fanGameobject.h"
 #include "scene/components/fanCamera.h"
 #include "scene/components/fanTransform.h"
 

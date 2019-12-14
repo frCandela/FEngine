@@ -3,13 +3,14 @@
 #include "core/fanISerializable.h"
 #include "core/fanTypeInfo.h"
 #include "ecs/fanECSComponents.h"
+#include "scene/fanGameobject.h"
 
 //Editor
 #include "editor/fanImguiIcons.h"
 
 namespace fan
 {
-	class Gameobject;
+	class Scene;
 
 	//================================================================================================================================
 	//================================================================================================================================
@@ -17,8 +18,9 @@ namespace fan
 	public:
 		friend class Gameobject;
 
-		// Returns a reference on the gameobject the component is bound to
 		inline Gameobject* GetGameobject() const { return m_gameobject; }
+		inline Scene *	GetScene() const { return m_gameobject->GetScene(); }
+
 		bool IsBeingDeleted() const { return m_isBeingDeleted; }
 		bool IsRemovable() const { return m_isRemovable; }
 		void SetRemovable(const bool _isRemovable) { m_isRemovable = _isRemovable; }

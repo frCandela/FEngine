@@ -113,6 +113,9 @@
     <Filter Include="code\editor\callbacks">
       <UniqueIdentifier>{84964c9d-7cb2-491a-b301-774699b38d6f}</UniqueIdentifier>
     </Filter>
+    <Filter Include="code\ecs\singletonComponents">
+      <UniqueIdentifier>{d6ffda77-799e-4c53-9711-f7da2db22680}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="code\editor\fanMainMenuBar.cpp">
@@ -504,6 +507,15 @@
     </ClCompile>
     <ClCompile Include="code\editor\fanEditorGizmos.cpp">
       <Filter>code\editor</Filter>
+    </ClCompile>
+    <ClCompile Include="code\ecs\singleton_components\fanEcsSingletonComponent.cpp">
+      <Filter>code\ecs\singletonComponents</Filter>
+    </ClCompile>
+    <ClCompile Include="code\ecs\singleton_components\fanECSSunLightMesh.cpp">
+      <Filter>code\ecs\singletonComponents</Filter>
+    </ClCompile>
+    <ClCompile Include="code\ecs\fanEcsSingletonComponents.cpp">
+      <Filter>code\ecs</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -1541,6 +1553,15 @@
     </ClInclude>
     <ClInclude Include="code\editor\fanEditorDebug.h">
       <Filter>code\editor</Filter>
+    </ClInclude>
+    <ClInclude Include="code\ecs\singleton_components\fanEcsSingletonComponent.h">
+      <Filter>code\ecs\singletonComponents</Filter>
+    </ClInclude>
+    <ClInclude Include="code\ecs\singleton_components\fanECSSunLightMesh.h">
+      <Filter>code\ecs\singletonComponents</Filter>
+    </ClInclude>
+    <ClInclude Include="code\ecs\fanEcsSingletonComponents.h">
+      <Filter>code\ecs</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

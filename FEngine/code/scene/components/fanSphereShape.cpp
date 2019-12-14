@@ -1,7 +1,6 @@
 #include "fanGlobalIncludes.h"
 #include "scene/components/fanSphereShape.h"
 
-#include "scene/fanGameobject.h"
 #include "scene/components/fanTransform.h"
 #include "renderer/fanRendererDebug.h"
 #include "editor/fanEditorDebug.h"

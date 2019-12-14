@@ -1,7 +1,6 @@
 #include "fanGlobalIncludes.h"
 #include "game/fanSolarPanel.h"
 
-#include "scene/fanGameobject.h"
 #include "scene/components/fanTransform.h"
 #include "game/fanSolarEruption.h"
 #include "game/fanWithEnergy.h"
@@ -62,11 +61,12 @@ namespace fan
 	//================================================================================================================================
 	//================================================================================================================================
 	void SolarPanel::ComputeChargingRate()
-	{
+	{		
 		// Sunlight mesh raycast
 		const btVector3 rayOrigin = m_gameobject->GetTransform()->GetPosition() + btVector3::Up();
 		btVector3 outIntersection;
-		m_isInsideSunlight = ecsSolarEruptionMeshSystem::s_mesh->RayCast( rayOrigin, -btVector3::Up(), outIntersection );
+		ecsSunLightMesh_s& sunLight = GetScene()->GetEcsManager()->GetSingletonComponents().GetComponent<ecsSunLightMesh_s>();			
+		m_isInsideSunlight = sunLight.mesh->RayCast( rayOrigin, -btVector3::Up(), outIntersection );
 
 		// Charging rate
 		if( m_isInsideSunlight ) {

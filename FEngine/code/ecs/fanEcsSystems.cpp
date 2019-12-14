@@ -15,11 +15,11 @@ namespace fan {
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void ecsParticleSystem::Run( float _delta, const size_t _count, std::vector< ecsComponentsKey >& _entitiesData,
-		ComponentData< ecsPosition > & _positions,
-		ComponentData< ecsRotation > & /*_rotations*/,
-		ComponentData< ecsMovement > & _movements,
-		ComponentData< ecsParticle > & _particles ) 
+	void ecsParticleSystem::Run( float _delta, const size_t _count, std::vector< ecsComponentsKey >& _entitiesData, ecsSingletonComponents& /*_singletonComponents*/
+		,ComponentData< ecsPosition > & _positions
+		,ComponentData< ecsRotation > & /*_rotations*/
+		,ComponentData< ecsMovement > & _movements
+		,ComponentData< ecsParticle > & _particles ) 
 	{
 		for ( int entity = 0; entity < _count; entity++ ) {
 			ecsComponentsKey & key = _entitiesData[entity];
@@ -38,16 +38,17 @@ namespace fan {
 		}
 	}
 
-
 	//================================================================================================================================
 	//================================================================================================================================
-	btVector3 ecsParticlesGenerateSystem::s_cameraPosition;
-
-	void ecsParticlesGenerateSystem::Run( float /*_delta*/, const size_t _count, std::vector< ecsComponentsKey >& _entitiesData
-		, ComponentData< ecsPosition > & _positions
-		, ComponentData< ecsParticle > & _particles )
+	void ecsParticlesGenerateSystem::Run( float /*_delta*/, const size_t _count, std::vector< ecsComponentsKey >& _entitiesData, ecsSingletonComponents& _singletonComponents
+		,ComponentData< ecsPosition > & _positions
+		,ComponentData< ecsParticle > & _particles )
 	{
 		SCOPED_PROFILE( particles_gen )
+
+		// Get singleton components 
+		ecsCameraPosition_s& cameraPosition = _singletonComponents.GetComponent<ecsCameraPosition_s>();
+		
 
 		// Get the interesting matching keys
 		std::vector<ecsComponentsKey*> interestingKeys;
@@ -73,7 +74,7 @@ namespace fan {
 			ecsComponentsKey & key = *interestingKeys[keyIndex];
 
 			const btVector3& position = _positions.At( key ).position;
-			btVector3 forward = s_cameraPosition - position;
+			btVector3 forward = cameraPosition.position - position;
 			forward.normalize();
 			btVector3 left = up.cross( forward );
 			left.normalize();
@@ -108,11 +109,14 @@ namespace fan {
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void ecsParticleSunlightOcclusionSystem::Run( float /*_delta*/, const size_t _count, std::vector< ecsComponentsKey >& _entitiesData
-		, ComponentData< ecsPosition > & _positions
-		, ComponentData< ecsParticle > & /*_particles*/
-		, ComponentData< ecsSunlightParticleOcclusion > & /*_occlusion*/ )
+	void ecsParticleSunlightOcclusionSystem::Run( float /*_delta*/, const size_t _count, std::vector< ecsComponentsKey >& _entitiesData, ecsSingletonComponents& _singletonComponents
+		,ComponentData< ecsPosition > &						_positions
+		,ComponentData< ecsParticle > &						/*_particles*/
+		,ComponentData< ecsSunlightParticleOcclusion > &	/*_occlusion*/ )
 	{
+		// Get singleton components 
+		ecsSunLightMesh_s& sunLight = _singletonComponents.GetComponent<ecsSunLightMesh_s>();
+
 		for ( int entity = 0; entity < _count; entity++ )
 		{
 			ecsComponentsKey & key = _entitiesData[entity];
@@ -125,7 +129,7 @@ namespace fan {
 				// raycast on the light mesh
 				const btVector3 rayOrigin = btVector3(position[0], 1.f, position[2] );
 				btVector3 outIntersection;
-				bool isInsideSunlight = ecsSolarEruptionMeshSystem::s_mesh->RayCast( rayOrigin, -btVector3::Up(), outIntersection );
+				bool isInsideSunlight = sunLight.mesh->RayCast( rayOrigin, -btVector3::Up(), outIntersection );
 				if ( ! isInsideSunlight )
 				{
 					key.Kill();
@@ -136,11 +140,11 @@ namespace fan {
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void ecsPlanetsSystem::Run( float _delta, const size_t _count, std::vector< ecsComponentsKey >& _entitiesData
-		,ComponentData< ecsGameobject > & _gameobjects
-		,ComponentData< ecsTranform > & _transforms
-		,ComponentData< ecsPlanet > &	_planets
-		,ComponentData< ecsFlags > &	_flags )
+	void ecsPlanetsSystem::Run( float _delta, const size_t _count, std::vector< ecsComponentsKey >& _entitiesData, ecsSingletonComponents& /*_singletonComponents*/
+		,ComponentData< ecsGameobject > &	_gameobjects
+		,ComponentData< ecsTranform > &		_transforms
+		,ComponentData< ecsPlanet > &		_planets
+		,ComponentData< ecsFlags > &		_flags )
 	{
 		for ( int entity = 0; entity < _count; entity++ ) {
 			ecsComponentsKey & key = _entitiesData[entity];
@@ -163,61 +167,17 @@ namespace fan {
 	}
 
 	//================================================================================================================================
-	// Helper : Generates a triangle that represents a segment of a circle of radius m_radius
 	//================================================================================================================================
-	void ecsSolarEruptionMeshSystem::AddSunTriangle( std::vector<Vertex>& _vertices, const btVector3& _v0, const btVector3& _v1 )
-	{
-		const glm::vec3 normal( 0.f, 1.f, 0.f );
-		const glm::vec3 color( 1.f, 1.f, 1.f );
-		const glm::vec3 center( 0.f, 0.f, 0.f );
-		const glm::vec2 centerUV( 0.5f, 0.5f );
-
-		glm::vec3 p1( _v0[0], 0.f, _v0[2] );
-		glm::vec3 p2( _v1[0], 0.f, _v1[2] );
-		glm::vec2 uv1( _v0[0], _v0[2] );
-		glm::vec2 uv2( _v1[0], _v1[2] );
-
-		uv1 = 0.5f * uv1 / s_radius + glm::vec2( 0.5f, 0.5f );
-		uv2 = 0.5f * uv2 / s_radius + glm::vec2( 0.5f, 0.5f );
-
-		_vertices.push_back( { center,	normal, color,centerUV } );
-		_vertices.push_back( { p1,		normal, color, uv1 } );
-		_vertices.push_back( { p2,		normal, color, uv2 } );
-
-
-		if ( s_debugDraw )
-		{
-
-			const Color debugColor( 1.f, 1.f, 0.f, 0.3f );
-			EditorDebug::Get().Renderer().DebugTriangle( btVector3::Zero(), _v0, _v1, debugColor );
-			EditorDebug::Get().Renderer().DebugLine( btVector3::Zero(), _v0, Color::Green );
-		}
-	}
-	//================================================================================================================================
-	//================================================================================================================================
-	float  ecsSolarEruptionMeshSystem::s_subAngle = 45.f;
-	float  ecsSolarEruptionMeshSystem::s_radius = 100.f;
-	bool   ecsSolarEruptionMeshSystem::s_debugDraw = false;
-	Mesh*  ecsSolarEruptionMeshSystem::s_mesh = new Mesh();
-
-	//================================================================================================================================
-	//================================================================================================================================
-	void ecsSolarEruptionMeshSystem::Init()
-	{
-		s_mesh->SetHostVisible( true );
-		s_mesh->SetOptimizeVertices( false );
-		s_mesh->SetAutoUpdateHull( false );
-	}
-
-	//================================================================================================================================
-	//================================================================================================================================
-	void ecsSolarEruptionMeshSystem::Run( float /*_delta*/, const size_t _count, std::vector< ecsComponentsKey >& _entitiesData
+	void ecsSolarEruptionMeshSystem::Run( float /*_delta*/, const size_t _count, std::vector< ecsComponentsKey >& _entitiesData, ecsSingletonComponents& _singletonComponents
 		, ComponentData< ecsPlanet > &	/*_planets*/
-		, ComponentData< ecsTranform > & _transforms 
+		, ComponentData< ecsTranform > & _transforms
 		, ComponentData< ecsScaling > & _scaling )
 
 	{
 		SCOPED_PROFILE( ecs_solar_erup )
+
+		// Get singleton components 
+		ecsSunLightMesh_s& sunLight = _singletonComponents.GetComponent<ecsSunLightMesh_s>();
 
 		// Get the interesting matching keys
 		std::vector<ecsComponentsKey*> interestingKeys;
@@ -281,7 +241,7 @@ namespace fan {
 		// generates the mesh
 		std::vector<Vertex>	vertices;
 		vertices.reserve( 3 * interestingKeys.size() );
-		const float minGapRadians = btRadians( s_subAngle );
+		const float minGapRadians = btRadians( sunLight.subAngle );
 		std::set<float> norms;	// Stores the nested opening segments norms
 		for ( int axisIndex = 0; axisIndex < segments.size(); axisIndex++ )
 		{
@@ -316,17 +276,17 @@ namespace fan {
 							const int numSubdivistions = int( angle / minGapRadians ) + 1;
 							const float subdivisionAngle = angle / numSubdivistions;
 							btTransform rotate( btQuaternion( btVector3::Up(), subdivisionAngle ) );
-							btVector3 subAxisNext = s_radius * axis.direction / axis.norm;
+							btVector3 subAxisNext = sunLight.radius * axis.direction / axis.norm;
 							for ( int subAxisIndex = 0; subAxisIndex < numSubdivistions; subAxisIndex++ )
 							{
 								btVector3 subAxis = subAxisNext;
 								subAxisNext = rotate * subAxisNext;
-								AddSunTriangle( vertices, subAxis, subAxisNext );
+								sunLight.AddSunTriangle( vertices, subAxis, subAxisNext );
 							}
 						}
 						else // gap size is small enough
 						{
-							length = s_radius;
+							length = sunLight.radius;
 						}
 					}
 					else
@@ -342,21 +302,21 @@ namespace fan {
 			{
 				const btVector3 v0 = length * axis.direction / axis.norm;
 				const btVector3 v1 = length * axisNext.direction / axisNext.norm;
-				AddSunTriangle( vertices, v0, v1 );
+				sunLight.AddSunTriangle( vertices, v0, v1 );
 			}
 		}
 
 		// Load mesh
-		s_mesh->LoadFromVertices( vertices );
+		sunLight.mesh->LoadFromVertices( vertices );
 	}
 
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void ecsSynchRbSystem::SynchRbToTransSystem( float /*_delta*/, const size_t _count, std::vector< ecsComponentsKey >& _entitiesData
-		,ComponentData< ecsTranform > & _transforms
-		,ComponentData< ecsMotionState > & _motionStates
-		,ComponentData< ecsRigidbody > & _rigidbodies ) 
+	void ecsSynchRbSystem::SynchRbToTransSystem( float /*_delta*/, const size_t _count, std::vector< ecsComponentsKey >& _entitiesData, ecsSingletonComponents& /*_singletonComponents*/
+		,ComponentData< ecsTranform > &		_transforms
+		,ComponentData< ecsMotionState > &	_motionStates
+		,ComponentData< ecsRigidbody > &	_rigidbodies ) 
 	{
 		for ( int entity = 0; entity < _count; entity++ ) {
 			ecsComponentsKey & key = _entitiesData[entity];
@@ -376,10 +336,10 @@ namespace fan {
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void ecsSynchRbSystem::SynchTransToRbSystem( float _delta, const size_t _count, std::vector< ecsComponentsKey >& _entitiesData
-		, ComponentData< ecsTranform > &    _transforms
-		, ComponentData< ecsMotionState > & _motionStates
-		, ComponentData< ecsRigidbody > &   _rigidbodies ) 
+	void ecsSynchRbSystem::SynchTransToRbSystem( float _delta, const size_t _count, std::vector< ecsComponentsKey >& _entitiesData, ecsSingletonComponents& /*_singletonComponents*/
+		,ComponentData< ecsTranform > &    _transforms
+		,ComponentData< ecsMotionState > & _motionStates
+		,ComponentData< ecsRigidbody > &   _rigidbodies ) 
 	{
 		if( _delta <= 0.f  ) { return; }
 
@@ -403,12 +363,12 @@ namespace fan {
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void ecsUpdateAABBFromHull::Run( float /*_delta*/, const size_t _count, std::vector< ecsComponentsKey >& _entitiesData
-		, ComponentData< ecsTranform > &	_transforms
-		, ComponentData< ecsScaling > &		_scales
-		, ComponentData< ecsAABB > &		_aabbs
-		, ComponentData< ecsFlags > &		_flags
-		, ComponentData< ecsMesh >&			_mesh )
+	void ecsUpdateAABBFromHull::Run( float /*_delta*/, const size_t _count, std::vector< ecsComponentsKey >& _entitiesData, ecsSingletonComponents& /*_singletonComponents*/
+		,ComponentData< ecsTranform > &	_transforms
+		,ComponentData< ecsScaling > &	_scales
+		,ComponentData< ecsAABB > &		_aabbs
+		,ComponentData< ecsFlags > &	_flags
+		,ComponentData< ecsMesh >&		_mesh )
 	{
 		// Find all interesting entities
 		std::vector< ecsComponentsKey * > usefullEntitiesKeys;
@@ -463,10 +423,10 @@ namespace fan {
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void ecsUpdateAABBFromRigidbody::Run( float /*_delta*/, const size_t _count, std::vector< ecsComponentsKey >& _entitiesData,
-		  ComponentData< ecsAABB > &		_aabbs
-		, ComponentData< ecsRigidbody > &	_rigidbodies
-		, ComponentData< ecsFlags >    &	_flags
+	void ecsUpdateAABBFromRigidbody::Run( float /*_delta*/, const size_t _count, std::vector< ecsComponentsKey >& _entitiesData, ecsSingletonComponents& /*_singletonComponents*/
+		,ComponentData< ecsAABB > &			_aabbs
+		,ComponentData< ecsRigidbody > &	_rigidbodies
+		,ComponentData< ecsFlags >    &		_flags
 	)
 	{
 		// Find all interesting entities
@@ -501,10 +461,10 @@ namespace fan {
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void ecsUpdateAABBFromTransform::Run( float /*_delta*/, const size_t _count, std::vector< ecsComponentsKey >& _entitiesData
-		, ComponentData< ecsTranform > &	_transforms
-		, ComponentData< ecsAABB > &		_aabbs
-		, ComponentData< ecsFlags > &		_flags ) {
+	void ecsUpdateAABBFromTransform::Run( float /*_delta*/, const size_t _count, std::vector< ecsComponentsKey >& _entitiesData, ecsSingletonComponents& /*_singletonComponents*/
+		,ComponentData< ecsTranform > &	_transforms
+		,ComponentData< ecsAABB > &		_aabbs
+		,ComponentData< ecsFlags > &	_flags ) {
 		// Find all interesting entities
 		std::vector< ecsComponentsKey * > usefullData;
 		usefullData.reserve( _entitiesData.size() );
@@ -537,9 +497,9 @@ namespace fan {
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void ecsUpdateBullet::Run( float _delta, const size_t _count, std::vector< ecsComponentsKey >& _entitiesData,
-		ComponentData< ecsGameobject > &	_gameobjects
-		, ComponentData< ecsBullet >     &	_bullets )
+	void ecsUpdateBullet::Run( float _delta, const size_t _count, std::vector< ecsComponentsKey >& _entitiesData, ecsSingletonComponents& /*_singletonComponents*/
+		,ComponentData< ecsGameobject > &	_gameobjects
+		,ComponentData< ecsBullet >     &	_bullets )
 	{
 		for ( int entity = 0; entity < _count; entity++ )
 		{

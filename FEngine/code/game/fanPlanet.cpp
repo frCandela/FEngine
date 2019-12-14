@@ -3,7 +3,6 @@
 
 #include "core/time/fanTime.h"
 #include "scene/components/fanTransform.h"
-#include "scene/fanGameobject.h"
 
 namespace fan {
 	REGISTER_TYPE_INFO(Planet, TypeInfo::Flags::EDITOR_COMPONENT, "game/")

@@ -1,7 +1,6 @@
 #include "fanGlobalIncludes.h"
 #include "scene/actors/fanParticleSystem.h"
 
-#include "scene/fanGameobject.h"
 #include "scene/components/fanTransform.h"
 #include "editor/fanModals.h"
 

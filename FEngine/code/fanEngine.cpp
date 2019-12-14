@@ -59,7 +59,6 @@
 #include "renderer/fanRessourceManager.h"
 #include "game/fanCameraController.h"
 
-
 namespace fan 
 {
 	Signal<Camera*> Engine::onSetCamera;
@@ -257,7 +256,8 @@ namespace fan
 					m_renderer->GetRendererDebug().ClearDebug();
 				}
 				
-				m_currentScene->Update( targetLogicDelta );		
+				m_clientScene->Update( targetLogicDelta );		
+				m_serverScene->Update( targetLogicDelta );		
 
 				if ( m_showUI )				
 				{
@@ -352,7 +352,8 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void Engine::DrawEditorGrid() const {
+	void Engine::DrawEditorGrid() const 
+	{
 		if (m_editorGrid.isVisible == true) {
 			const float size = m_editorGrid.spacing;
 			const int count = m_editorGrid.linesCount;
@@ -472,11 +473,17 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void Engine::SwitchPlayStop() {
-		if ( m_currentScene->GetState() == Scene::STOPPED ) {
-			m_currentScene->Play();
-		} else {
-			m_currentScene->Stop();
+	void Engine::SwitchPlayStop() 
+	{
+		assert( m_clientScene->GetState() == m_serverScene->GetState() );
+		if ( m_clientScene->GetState() == Scene::STOPPED ) 
+		{
+			m_clientScene->Play();
+			m_serverScene->Play();
+		} else 
+		{
+			m_clientScene->Stop();
+			m_serverScene->Stop();
 		}
 	}
 

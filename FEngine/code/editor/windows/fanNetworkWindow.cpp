@@ -22,6 +22,8 @@ namespace fan {
 	void NetworkWindow::OnGui() 
 	{
 
+
+
 		// Game server
 		GameServer * gameServer = m_serverScene->FindComponentOfType<GameServer>();
 		if ( gameServer != nullptr )

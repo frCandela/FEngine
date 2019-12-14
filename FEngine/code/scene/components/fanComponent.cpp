@@ -1,7 +1,6 @@
 #include "fanGlobalIncludes.h"
 
 #include "scene/components/fanComponent.h"
-#include "scene/fanGameobject.h"
 #include "scene/fanScene.h"
 #include "core/input/fanInput.h"
 

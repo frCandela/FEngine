@@ -1,7 +1,6 @@
 #include "fanGlobalIncludes.h"
 #include "game/ui/fanSpaceShipUI.h"
 
-#include "scene/fanGameobject.h"
 #include "scene/components/fanTransform.h"
 #include "scene/components/ui/fanProgressBar.h"
 #include "scene/components/ui/fanUIMeshRenderer.h"

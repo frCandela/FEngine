@@ -5,7 +5,6 @@
 #include "core/input/fanKeyboard.h"
 #include "scene/fanScene.h"
 #include "scene/components/fanTransform.h"
-#include "scene/fanGameobject.h"
 #include "scene/components/fanCamera.h"
 #include "editor/components/fanFPSCamera.h"
 #include "game/fanSpaceShip.h"	

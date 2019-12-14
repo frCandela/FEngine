@@ -3,7 +3,6 @@
 
 #include "renderer/fanMesh.h"
 #include "scene/components/fanTransform.h"
-#include "scene/fanGameobject.h"
 #include "scene/fanRessourcePtr.h"
 #include "core/math/shapes/fanAABB.h"
 #include "core/math/shapes/fanConvexHull.h"
@@ -44,8 +43,8 @@ namespace fan
 	//================================================================================================================================
 	void MeshRenderer::SetMesh( Mesh * _mesh )
 	{
-		m_mesh->mesh = MeshPtr( _mesh, _mesh->GetPath() );
-		if( _mesh != nullptr && ! _mesh->GetIndices().empty() ) {	
+		if( _mesh != nullptr ) {	
+			m_mesh->mesh = MeshPtr( _mesh, _mesh->GetPath() );		
 			m_gameobject->SetFlags( m_gameobject->GetFlags() & Gameobject::Flag::OUTDATED_AABB );
 		}
 	}

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "core/meta/fanHelpers.h"
+#include "core/meta/fanTypeList.h"
 
 namespace meta {
 	namespace impl {
@@ -25,13 +26,19 @@ namespace meta {
 		protected:
 			template <size_t _index> 
 			using ReturnType = typename Extract::Type<_index, _types...>::value;
-
+			template < typename _type >	using indexElement = typename meta::Find::Type< _type,  _types... >;
 		public:
 			static constexpr size_t size = sizeof...( _types );
 
 			template <size_t _index>
 			ReturnType<_index>& Get() {
 				return TupleElement<_index, ReturnType<_index> >::value;
+			}
+
+			template < typename _ComponentType >
+			_ComponentType& Get()
+			{
+				return TupleElement<indexElement<_ComponentType>::value, _ComponentType >::value;
 			}
 		};
 	}

@@ -1,7 +1,6 @@
 #include "fanGlobalIncludes.h"
 #include "scene/components/fanRigidbody.h"
 
-#include "scene/fanGameobject.h"
 #include "physics/fanPhysicsManager.h"
 #include "scene/components/fanColliderShape.h"
 

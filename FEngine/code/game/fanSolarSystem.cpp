@@ -3,7 +3,6 @@
 
 #include "core/time/fanTime.h"
 #include "scene/components/fanTransform.h"
-#include "scene/fanGameobject.h"
 #include "scene/components/fanMeshRenderer.h"
 #include "scene/components/fanMaterial.h"
 #include "scene/components/fanRigidbody.h"

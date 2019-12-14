@@ -4,7 +4,6 @@
 #include "game/fanPlayersManager.h"
 #include "core/time/fanTime.h"
 #include "scene/fanScene.h"
-#include "scene/fanGameobject.h"
 #include "scene/components/fanTransform.h"
 #include "scene/components/fanCamera.h"
 

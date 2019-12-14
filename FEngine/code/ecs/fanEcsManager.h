@@ -4,7 +4,6 @@
 
 namespace fan {
 	//================================================================================================================================
-	// /!\ When adding components, always call the corresponding onRealloc callback to update the binded data  /!\
 	//================================================================================================================================
 	class EcsManager {
 	public:
@@ -24,17 +23,19 @@ namespace fan {
 		template< typename _tagType >		void			RemoveTag( const ecsEntity _entity );
 
 		void UpdatePrePhysics	( const float _delta );
-		void UpdatePostPhysics	( const float _delta);
-		void Update				( const float _delta, const btVector3& _cameraPosition);
+		void UpdatePostPhysics	( const float _delta );
+		void Update				( const float _delta );
 		void LateUpdate			( const float _delta );
 		void Refresh();
 
 		// Getters 
-		const std::vector<ecsComponentsKey>&				GetEntitiesData() const { return m_entitiesKeys;	}
-		const ecsComponentsTuple< ecsComponents >&			GetComponents() const	{ return m_components;		}
-		const std::unordered_map< ecsHandle, ecsEntity > &	GetHandles() const		{ return m_handlesToEntity; }
+		const std::vector<ecsComponentsKey>&				GetEntitiesData() const { return m_entitiesKeys;		}
+		const ecsComponentsTuple< ecsComponents >&			GetComponents() const	{ return m_components;			}
+		ecsSingletonComponents&								GetSingletonComponents(){ return m_singletonComponents; }
+		const std::unordered_map< ecsHandle, ecsEntity > &	GetHandles() const		{ return m_handlesToEntity;		}
 		
 	private:
+		ecsSingletonComponents							m_singletonComponents;
 		ecsComponentsTuple< ecsComponents >				m_components;
 		std::vector<ecsComponentsKey>					m_entitiesKeys;
 		std::unordered_map< ecsHandle, ecsEntity >		m_handlesToEntity;

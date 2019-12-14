@@ -3,6 +3,7 @@
 #include "ecs/fanECSConfig.h"
 #include "ecs/fanEcsComponentsKey.h"
 #include "ecs/fanEcsComponentsTuple.h"
+#include "ecs/fanEcsSingletonComponents.h"
 
 namespace fan {
 //================================================================================================================================
@@ -42,11 +43,11 @@ namespace fan {
 	//================================
 	class ecsParticleSystem : public ISystem<  ecsPosition, ecsRotation, ecsMovement, ecsParticle > {
 	public:
-		static void Run( float _delta, const size_t _count, std::vector< ecsComponentsKey >& _entitiesData,
-			ComponentData< ecsPosition > & _positions,
-			ComponentData< ecsRotation > & _rotations,
-			ComponentData< ecsMovement > & _movements,
-			ComponentData< ecsParticle > & _particles );		
+		static void Run( float _delta, const size_t _count, std::vector< ecsComponentsKey >& _entitiesData, ecsSingletonComponents& _singletonComponents
+			,ComponentData< ecsPosition > & _positions
+			,ComponentData< ecsRotation > & _rotations
+			,ComponentData< ecsMovement > & _movements
+			,ComponentData< ecsParticle > & _particles );		
 	};
 
 	//================================
@@ -55,11 +56,9 @@ namespace fan {
 	class ecsParticlesGenerateSystem : public ISystem<  ecsPosition, ecsParticle >
 	{
 	public:
-		static void Run( float _delta, const size_t _count, std::vector< ecsComponentsKey >& _entitiesData
+		static void Run( float _delta, const size_t _count, std::vector< ecsComponentsKey >& _entitiesData, ecsSingletonComponents& _singletonComponents
 			, ComponentData< ecsPosition > & _positions
 			, ComponentData< ecsParticle > & _particles );
-
-		static btVector3 s_cameraPosition;
 	};
 
 	//================================
@@ -68,10 +67,10 @@ namespace fan {
 	class ecsParticleSunlightOcclusionSystem : public ISystem<  ecsPosition, ecsParticle, ecsSunlightParticleOcclusion >
 	{
 	public:
-		static void Run( float _delta, const size_t _count, std::vector< ecsComponentsKey >& _entitiesData
-			,ComponentData< ecsPosition > & _positions
-			,ComponentData< ecsParticle > & _particles
-			,ComponentData< ecsSunlightParticleOcclusion > & _occlusion );
+		static void Run( float _delta, const size_t _count, std::vector< ecsComponentsKey >& _entitiesData, ecsSingletonComponents& _singletonComponents
+			,ComponentData< ecsPosition > &						_positions
+			,ComponentData< ecsParticle > &						_particles
+			,ComponentData< ecsSunlightParticleOcclusion > &	_occlusion );
 	};
 
 	//================================
@@ -79,11 +78,11 @@ namespace fan {
 	//================================
 	class ecsPlanetsSystem : public ISystem<  ecsGameobject, ecsTranform, ecsPlanet, ecsFlags > {
 	public:
-		static void Run( float _delta, const size_t _count, std::vector< ecsComponentsKey >& _entitiesData,
-			 ComponentData< ecsGameobject > & _gameobjects
-			,ComponentData< ecsTranform > & _transforms
-			,ComponentData< ecsPlanet > &	_planets 
-			,ComponentData< ecsFlags > &	_flags );
+		static void Run( float _delta, const size_t _count, std::vector< ecsComponentsKey >& _entitiesData, ecsSingletonComponents& _singletonComponents
+			,ComponentData< ecsGameobject > &	_gameobjects
+			,ComponentData< ecsTranform > &		_transforms
+			,ComponentData< ecsPlanet > &		_planets 
+			,ComponentData< ecsFlags > &		_flags );
 	};
 
 	//================================
@@ -106,23 +105,11 @@ namespace fan {
 		};
 
 	public:
-		static void Init();
-		static void Run( float _delta, const size_t _count, std::vector< ecsComponentsKey >& _entitiesData
-			, ComponentData< ecsPlanet > &	_planets
-			, ComponentData< ecsTranform > & _transforms 
-			, ComponentData< ecsScaling > & _scaling
+		static void Run( float _delta, const size_t _count, std::vector< ecsComponentsKey >& _entitiesData, ecsSingletonComponents& _singletonComponents
+			, ComponentData< ecsPlanet > &		_planets
+			, ComponentData< ecsTranform > &	_transforms 
+			, ComponentData< ecsScaling > &		_scaling
 		);
-
-		// This should be in a "singleton component"
-		static Mesh* s_mesh;
-		static float s_subAngle;
-		static float s_radius;
-		static bool	 s_debugDraw;
-
-	private:
-		static void AddSunTriangle( std::vector<Vertex>& _vertices, const btVector3& _v0, const btVector3& _v1 );
-
-
 	};
 
 	//================================
@@ -130,15 +117,15 @@ namespace fan {
 	//================================
 	class ecsSynchRbSystem : public ISystem<  ecsTranform, ecsMotionState, ecsRigidbody > {
 	public:
-		static void SynchTransToRbSystem( float _delta, const size_t _count, std::vector< ecsComponentsKey >& _entitiesData,
-			 ComponentData< ecsTranform > & _transforms
-			,ComponentData< ecsMotionState > & _motionStates
-			,ComponentData< ecsRigidbody > & _rigidbodies );
+		static void SynchTransToRbSystem( float _delta, const size_t _count, std::vector< ecsComponentsKey >& _entitiesData, ecsSingletonComponents& _singletonComponents
+			,ComponentData< ecsTranform > &		_transforms
+			,ComponentData< ecsMotionState > &	_motionStates
+			,ComponentData< ecsRigidbody > &	_rigidbodies );
 
-		static void SynchRbToTransSystem( float _delta, const size_t _count, std::vector< ecsComponentsKey >& _entitiesData,
-			ComponentData< ecsTranform > &	_transforms
-			, ComponentData< ecsMotionState > & _motionStates
-			, ComponentData< ecsRigidbody > &	_rigidbodies );
+		static void SynchRbToTransSystem( float _delta, const size_t _count, std::vector< ecsComponentsKey >& _entitiesData, ecsSingletonComponents& _singletonComponents
+			,ComponentData< ecsTranform > &		_transforms
+			,ComponentData< ecsMotionState > &	_motionStates
+			,ComponentData< ecsRigidbody > &	_rigidbodies );
 	};
 
 	//================================
@@ -147,12 +134,12 @@ namespace fan {
 	class ecsUpdateAABBFromHull : public ISystem<  ecsTranform, ecsScaling, ecsAABB, ecsFlags, ecsMesh >
 	{
 	public:
-		static void Run( float _delta, const size_t _count, std::vector< ecsComponentsKey >& _entitiesData,
-			ComponentData< ecsTranform > &		_transforms
-			, ComponentData< ecsScaling > &		_scales
-			, ComponentData< ecsAABB > &		_aabbs
-			, ComponentData< ecsFlags > &		_flags
-			, ComponentData< ecsMesh >&			_mesh
+		static void Run( float _delta, const size_t _count, std::vector< ecsComponentsKey >& _entitiesData, ecsSingletonComponents& _singletonComponents
+			,ComponentData< ecsTranform > &	_transforms
+			,ComponentData< ecsScaling > &	_scales
+			,ComponentData< ecsAABB > &		_aabbs
+			,ComponentData< ecsFlags > &	_flags
+			,ComponentData< ecsMesh >&		_mesh
 		);
 	};
 
@@ -161,11 +148,10 @@ namespace fan {
 	//================================
 	class ecsUpdateAABBFromRigidbody : public ISystem<  ecsAABB, ecsRigidbody, ecsFlags > {
 	public:
-		static void Run( float _delta, const size_t _count, std::vector< ecsComponentsKey >& _entitiesData,
-
-			 ComponentData< ecsAABB > &			_aabbs
+		static void Run( float _delta, const size_t _count, std::vector< ecsComponentsKey >& _entitiesData, ecsSingletonComponents& _singletonComponents
+			,ComponentData< ecsAABB > &			_aabbs
 			,ComponentData< ecsRigidbody > &	_rigidbodies
-			, ComponentData< ecsFlags >    &	_flags
+			,ComponentData< ecsFlags >    &		_flags
 		);
 	};
 
@@ -174,10 +160,10 @@ namespace fan {
 	//================================
 	class ecsUpdateAABBFromTransform : public ISystem<  ecsTranform, ecsAABB, ecsFlags > {
 	public:
-		static void Run( float _delta, const size_t _count, std::vector< ecsComponentsKey >& _entitiesData,
-			  ComponentData< ecsTranform > &	_transforms
-			, ComponentData< ecsAABB >     &	_aabbs
-			, ComponentData< ecsFlags >    &	_flags
+		static void Run( float _delta, const size_t _count, std::vector< ecsComponentsKey >& _entitiesData, ecsSingletonComponents& _singletonComponents
+			,ComponentData< ecsTranform > &	_transforms
+			,ComponentData< ecsAABB >     &	_aabbs
+			,ComponentData< ecsFlags >    &	_flags
 		);
 	};
 
@@ -187,9 +173,9 @@ namespace fan {
 	class ecsUpdateBullet : public ISystem<  ecsGameobject, ecsBullet >
 	{
 	public:
-		static void Run( float _delta, const size_t _count, std::vector< ecsComponentsKey >& _entitiesData,
-			ComponentData< ecsGameobject > &	_gameobjects
-			, ComponentData< ecsBullet >     &	_bullets
+		static void Run( float _delta, const size_t _count, std::vector< ecsComponentsKey >& _entitiesData, ecsSingletonComponents& _singletonComponents
+			,ComponentData< ecsGameobject > &	_gameobjects
+			,ComponentData< ecsBullet >     &	_bullets
 		);
 	};
 }

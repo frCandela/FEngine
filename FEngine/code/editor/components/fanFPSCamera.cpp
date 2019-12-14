@@ -2,7 +2,6 @@
 
 #include "editor/components/fanFPSCamera.h"
 #include "scene/components/fanTransform.h"
-#include "scene/fanGameobject.h"
 #include "scene/components/fanCamera.h"
 #include "core/fanSignal.h"
 #include "core/input/fanInput.h"

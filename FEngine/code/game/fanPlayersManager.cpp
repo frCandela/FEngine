@@ -2,7 +2,6 @@
 #include "game/fanPlayersManager.h"
 
 #include "scene/fanScene.h"
-#include "scene/fanGameobject.h"
 #include "core/input/fanJoystick.h"
 #include "game/fanPlayerInput.h"
 #include "game/fanSpaceShip.h"
