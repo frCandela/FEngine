@@ -78,6 +78,7 @@ namespace fan
 			break;
 		case State::CONNECTED:
 			break;
+
 		default:
 			break;
 		}
@@ -111,6 +112,9 @@ namespace fan
 			break;
 		case PacketType::PING:			
 			SendToServer(_packet);
+			break;
+		case PacketType::START_GAME:
+			Debug::Log() << "[CLIENT] " << m_name << ": start game " << Debug::Endl();
 			break;
 		default:
 			Debug::Warning() << "[CLIENT] " << m_name << ": strange packet received with id: " << intType << Debug::Endl();

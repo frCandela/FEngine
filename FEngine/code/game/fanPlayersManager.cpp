@@ -16,21 +16,23 @@ namespace fan
 	{
 		REQUIRE_TRUE( *m_playerPrefab != nullptr, "PlayersManager : missing player prefab " )
 
-		Joystick::Get().onJoystickConnect.Connect( &PlayersManager::OnJoystickConnect, this );
-
-
-		// Spawn mouse player
-		AddPlayer( s_mousePlayerID, "mouse_player" );
-
-		// Spawn joystick players
-		for ( int joystickIndex = 0; joystickIndex < Joystick::NUM_JOYSTICK; joystickIndex++ )
+		if ( !GetScene().IsServer() )
 		{
-			if ( Joystick::Get().IsConnected( joystickIndex ) )
+			// Callback used to spawn future joystick players
+			Joystick::Get().onJoystickConnect.Connect( &PlayersManager::OnJoystickConnect, this );
+
+			// Spawn joystick players
+			for ( int joystickIndex = 0; joystickIndex < Joystick::NUM_JOYSTICK; joystickIndex++ )
 			{
-				std::stringstream ss;
-				ss << "joystick" << joystickIndex << "_player";
-				AddPlayer( joystickIndex, ss.str() );
+				if ( Joystick::Get().IsConnected( joystickIndex ) )
+				{
+					std::stringstream ss;
+					ss << "joystick" << joystickIndex << "_player";
+					AddPlayer( joystickIndex, ss.str() );
+				}
 			}
+
+			AddPlayer( s_mousePlayerID, "mouse_player" );
 		}
 	}
 
@@ -38,7 +40,10 @@ namespace fan
 	//================================================================================================================================
 	void PlayersManager::Stop()
 	{
-		Joystick::Get().onJoystickConnect.Disconnect( &PlayersManager::OnJoystickConnect, this );
+		if ( !GetScene().IsServer() )
+		{
+			Joystick::Get().onJoystickConnect.Disconnect( &PlayersManager::OnJoystickConnect, this );
+		}
 
 		// Remove all players
 		while ( !m_players.empty() )
@@ -81,39 +86,44 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void PlayersManager::SpawnSpaceShip( const int _playerID )
+	void PlayersManager::SpawnSpaceShips()
 	{
-	
-		// Get player data
-		auto it = m_players.find( _playerID );
-		assert( it !=  m_players.end() );
-		PlayerData& playerData = it->second;
+		for ( auto pair : m_players )
+		{
+			 const int playerID = pair.first;
 
-		Gameobject * player = GetScene().CreateGameobject( **m_playerPrefab, playerData.persistent );
-		player->SetEditorFlags( player->GetEditorFlags() | Gameobject::EditorFlag::NOT_SAVED );
-		player->SetName( playerData.name );
+			 // Get player data
+			 auto it = m_players.find( playerID );
+			 assert( it != m_players.end() );
+			 PlayerData& playerData = it->second;
 
-		// Set input
-		PlayerInput * playerInput = player->GetComponent<PlayerInput>();
-		if ( playerInput != nullptr )
-		{
-			playerInput->SetJoystickID( _playerID );
-			playerInput->SetInputType( _playerID < 0 ? PlayerInput::KEYBOARD_MOUSE : PlayerInput::JOYSTICK );
-		}
-		else
-		{
-			Debug::Warning( "PlayersManager::AddPlayer : Prefab is missing a PlayerInput component." );
+			 Gameobject * player = GetScene().CreateGameobject( **m_playerPrefab, playerData.persistent );
+			 player->SetEditorFlags( player->GetEditorFlags() | Gameobject::EditorFlag::NOT_SAVED );
+			 player->SetName( playerData.name );
+
+			 // Set input
+			 PlayerInput * playerInput = player->GetComponent<PlayerInput>();
+			 if ( playerInput != nullptr )
+			 {
+				 playerInput->SetJoystickID( playerID );
+				 playerInput->SetInputType( playerID < 0 ? PlayerInput::KEYBOARD_MOUSE : PlayerInput::JOYSTICK );
+			 }
+			 else
+			 {
+				 Debug::Warning( "PlayersManager::AddPlayer : Prefab is missing a PlayerInput component." );
+			 }
+
+			 SpaceShip * playerShip = player->GetComponent<SpaceShip>();
+			 if ( playerShip != nullptr )
+			 {
+				 playerShip->onPlayerDie.Connect( &PlayersManager::OnPlayerDie, this );
+			 }
+			 else
+			 {
+				 Debug::Warning( "PlayersManager::AddPlayer : Prefab is missing a SpaceShip component." );
+			 }
 		}
 
-		SpaceShip * playerShip = player->GetComponent<SpaceShip>();
-		if ( playerShip != nullptr )
-		{
-			playerShip->onPlayerDie.Connect( &PlayersManager::OnPlayerDie, this );
-		}
-		else
-		{
-			Debug::Warning( "PlayersManager::AddPlayer : Prefab is missing a SpaceShip component." );
-		}
 	}
 
 	//================================================================================================================================
@@ -150,10 +160,6 @@ namespace fan
 			std::stringstream ss;
 			ss << "joystick" << _joystickID << "_player";
 			AddPlayer(_joystickID, ss.str() );
-		}
-		else
-		{			
-			//RemovePlayer( _joystickID );
 		}
 	}
 

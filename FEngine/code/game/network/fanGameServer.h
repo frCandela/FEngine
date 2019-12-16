@@ -5,6 +5,9 @@
 
 namespace fan
 {
+	class GameManager;
+	class PlayersManager;
+
 	//================================================================================================================================
 	//================================================================================================================================
 	class GameServer : public Actor
@@ -23,6 +26,8 @@ namespace fan
 		void Stop() override;
 		void Update( const float _delta ) override;
 		void LateUpdate( const float _delta ) override;
+
+		void StartGame();
 		
 		DECLARE_TYPE_INFO( GameServer, Component );
 
@@ -32,6 +37,9 @@ namespace fan
 
 	private:
 		Server m_server;
+
+		GameManager		* m_gameManager;
+		PlayersManager  * m_playersManager;
 
 	};
 }

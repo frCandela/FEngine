@@ -14,6 +14,8 @@ namespace fan
 		enum State {		NONE, WAITING_PLAYERS };
 		enum ClientState {  WAITING, CONNECTED };
 
+		//================================================================
+		//================================================================
 		struct ClientData
 		{
 			sf::IpAddress	ipAdress;
@@ -24,6 +26,8 @@ namespace fan
 			float lastResponse = 0.f;
 		};
 
+		Signal< const int, const std::string& > onClientConnected;
+
 		Server(  );
 
 		void Create( const Port _listenPort );
@@ -32,6 +36,7 @@ namespace fan
 		bool Bind();
 		void UnBind();
 		void SendPacket( const ClientData& _client,  sf::Packet _packet );
+		void BroadcastPacket( sf::Packet _packet );
 		void ClearClients();
 		const std::vector<ClientData >& GetClients() const { return m_clients; }
 

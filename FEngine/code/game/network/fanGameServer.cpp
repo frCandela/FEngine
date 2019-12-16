@@ -5,8 +5,12 @@
 #include "core/input/fanInput.h"
 #include "core/input/fanMouse.h"
 #include "core/input/fanJoystick.h"
+#include "network/packets/fanIPacket.h"
+#include "game/fanGameManager.h"
+#include "game/fanPlayersManager.h"
 #include "scene/components/fanCamera.h"
 #include "scene/components/fanTransform.h"
+
 
 namespace fan
 {
@@ -18,6 +22,11 @@ namespace fan
 	{
 		Actor::OnAttach();
 		m_server.Create( 53000 );
+
+		if ( ! GetScene().IsServer() )
+		{
+			GetScene().DeleteComponent( this );
+		} 
 	}
 
 	//================================================================================================================================
@@ -32,14 +41,15 @@ namespace fan
 	//================================================================================================================================
 	void GameServer::Start()
 	{
-		if ( GetScene().IsServer() )
+		REQUIRE_COMPONENT( PlayersManager, m_playersManager );
+		REQUIRE_COMPONENT( GameManager, m_gameManager );
+
+		if ( m_playersManager )
 		{
-			m_server.Bind();
-		} 
-		else
-		{
-			GetScene().DeleteComponent(this);
+			m_server.onClientConnected.Connect(&PlayersManager::AddPlayer, m_playersManager);
 		}
+
+		m_server.Bind();
 	}
 
 	//================================================================================================================================
@@ -47,6 +57,7 @@ namespace fan
 	void GameServer::Stop() 
 	{
 		m_server.ClearClients();
+		m_server.onClientConnected.Disconnect(&PlayersManager::AddPlayer, m_playersManager);
 	}
 
 	//================================================================================================================================
@@ -58,10 +69,16 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void GameServer::LateUpdate( const float /*_delta*/ )
+	void GameServer::StartGame()
 	{
+		m_server.BroadcastPacket( PacketStartGame().ToPacket() );
 
+		m_playersManager->SpawnSpaceShips();
 	}
+
+	//================================================================================================================================
+	//================================================================================================================================
+	void GameServer::LateUpdate( const float /*_delta*/ ){}
 
 	//================================================================================================================================
 	//================================================================================================================================
@@ -71,7 +88,12 @@ namespace fan
 
 		ImGui::PushItemWidth( 0.6f * ImGui::GetWindowWidth() );
 		{
-		} ImGui::PopItemWidth();
+			if ( ImGui::Button( "start game " ) )
+			{
+				StartGame();
+			}
+		} 
+		ImGui::PopItemWidth();
 	}
 
 	//================================================================================================================================

@@ -11,6 +11,7 @@ namespace fan
 		, LOGOUT
 		, ACK_LOGIN
 		, PLAYER_INPUT
+		, START_GAME
 		, COUNT
 	};
 
@@ -43,4 +44,5 @@ namespace fan
 	//================================================================================================================================
 	struct PacketAckLogin  : IPacket<PacketType::ACK_LOGIN> {};
 	struct PacketAckLogout : IPacket<PacketType::LOGOUT> {};
+	struct PacketStartGame : IPacket<PacketType::START_GAME> {};
 }

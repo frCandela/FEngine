@@ -132,6 +132,18 @@ namespace fan
 		}
 	}
 
+
+	//================================================================================================================================
+	//================================================================================================================================
+	void Server::BroadcastPacket( sf::Packet _packet )
+	{
+		for (int clientIndex = 0; clientIndex < m_clients.size() ; clientIndex++)
+		{
+			ClientData& client = m_clients[clientIndex];
+			SendPacket( client, _packet );
+		}
+	}
+
 	//================================================================================================================================
 	//================================================================================================================================
 	void Server::SendPacket( const ClientData& _client, sf::Packet _packet )
@@ -192,6 +204,8 @@ namespace fan
 		client.port = _port;
 		client.name = _loginInfo.GetName();
 		m_clients.push_back( client );
+		onClientConnected.Emmit( (int)m_clients.size() - 1, client.name );
+
 		Debug::Log() << "[SERVER] client connected " << client.name << " " << client.ipAdress.toString() << "::" << client.port << Debug::Endl();
 
 		return &m_clients[m_clients.size() - 1];

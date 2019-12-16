@@ -30,6 +30,9 @@ namespace fan
 		void Update( const float _delta ) override;
 		void LateUpdate( const float /*_delta*/ ) override {}
 
+		void AddPlayer( const int _ID, const std::string& _name );
+		void SpawnSpaceShips();
+
 		ImGui::IconType GetIcon() const override { return ImGui::IconType::JOYSTICK16; }
 
 		void OnGui() override;
@@ -47,8 +50,6 @@ namespace fan
 		static const int s_mousePlayerID = -1;
 		std::map< int, PlayerData > m_players;
 
-		void AddPlayer( const int _ID, const std::string& _name );
-		void SpawnSpaceShip( const int _playerID );
 		void RemovePlayer( const int _ID );
 
 		void OnJoystickConnect( int _joystickID, bool _connected );
