@@ -135,6 +135,14 @@ namespace fan
 	void Scene::EndFrame()
 	{
 		SCOPED_PROFILE( scene_endFrame )
+
+		// Delete components 
+		for (int componentToDeleteIndex = 0; componentToDeleteIndex < m_componentsToDelete.size() ; componentToDeleteIndex++)
+		{
+			m_componentsToDelete[componentToDeleteIndex]->GetGameobject().RemoveComponent( m_componentsToDelete[componentToDeleteIndex] );
+		} 
+		m_componentsToDelete.clear();
+
 		// Delete entities 
 		std::set<Gameobject*> deletedEntitiesSet;
 		for ( int gameobjectToDeleteIndex = 0; gameobjectToDeleteIndex < m_entitiesToDelete.size(); gameobjectToDeleteIndex++ )
@@ -168,13 +176,13 @@ namespace fan
 		m_ecsManager->LateUpdate( delta );
 		EndFrame();
 
-		ImGui::Begin( "testoss" );
-		{
-			ImGui::Text( "m_actors         %d", m_actors.size());
-			ImGui::Text( "m_startingActors %d", m_startingActors.size() );
-			ImGui::Text( "m_activeActors   %d", m_activeActors.size() );
-			ImGui::Text( "m_pausedActors   %d", m_pausedActors.size() );
-		}ImGui::End();
+// 		ImGui::Begin( "testoss" );
+// 		{
+// 			ImGui::Text( "m_actors         %d", m_actors.size());
+// 			ImGui::Text( "m_startingActors %d", m_startingActors.size() );
+// 			ImGui::Text( "m_activeActors   %d", m_activeActors.size() );
+// 			ImGui::Text( "m_pausedActors   %d", m_pausedActors.size() );
+// 		}ImGui::End();
 
 	}
 

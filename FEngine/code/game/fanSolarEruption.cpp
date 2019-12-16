@@ -77,7 +77,7 @@ namespace fan
 	{
 		m_state = COLLAPSING;
 		m_eruptionTime = 0.f;
-		m_particleSystem->SetEnabled( true );
+		m_particleSystem->SetEnabled( GetScene().IsServer() == false );
 		m_material->SetColor( m_baseColor );
 		m_particleSystem->SetSpeedParticles( 1.f );
 	}

@@ -95,14 +95,17 @@ namespace fan {
 		m_leftParticles->SetEnabled( false );
 		m_rightParticles->SetEnabled( false );
 
-		if ( forwardAxis != 0.f )
+		if ( GetScene().IsServer() == false )
 		{
-			if ( speedMode == SpeedMode::SLOW || speedMode == SpeedMode::NORMAL ) { m_slowForwardParticles->SetEnabled( true ); }
-			else if ( speedMode == SpeedMode::FAST ) { m_fastForwardParticles->SetEnabled( true ); }
-			else if ( speedMode == SpeedMode::REVERSE ) { m_reverseParticles->SetEnabled( true ); }
+			if ( forwardAxis != 0.f )
+			{
+				if ( speedMode == SpeedMode::SLOW || speedMode == SpeedMode::NORMAL ) { m_slowForwardParticles->SetEnabled( true ); }
+				else if ( speedMode == SpeedMode::FAST ) { m_fastForwardParticles->SetEnabled( true ); }
+				else if ( speedMode == SpeedMode::REVERSE ) { m_reverseParticles->SetEnabled( true ); }
+			}
+			if ( leftForce > 0.f ) { m_leftParticles->SetEnabled( true ); }
+			else if ( leftForce < 0.f ) { m_rightParticles->SetEnabled( true ); }
 		}
-		if ( leftForce > 0.f ) { m_leftParticles->SetEnabled( true ); }
-		else if ( leftForce < 0.f ) { m_rightParticles->SetEnabled( true ); }
 
 		// Forces application		
 		m_rigidbody->ApplyCentralForce( leftForce * transform.Left() );
@@ -161,29 +164,29 @@ namespace fan {
 	{
 		Debug::Log( "dead" );
 
-		std::default_random_engine			  m_generator;
-		std::uniform_real_distribution<float> m_distribution( 0.f, 1.f );
-
-		for ( int particleIndex = 0; particleIndex < 1000; particleIndex++ )
+		if ( GetScene().IsServer() == false )
 		{
-			EcsManager& ecs = m_gameobject->GetScene().GetEcsManager();
-			ecsEntity entity = ecs.CreateEntity();
-			ecsPosition & position = ecs.AddComponent<ecsPosition>( entity );
-			ecs.AddComponent<ecsRotation>( entity ).Init();
-			ecsMovement & movement = ecs.AddComponent<ecsMovement>( entity );
-			ecsParticle & particle = ecs.AddComponent<ecsParticle>( entity );
+			// Explosion
+			std::default_random_engine			  m_generator;
+			std::uniform_real_distribution<float> m_distribution( 0.f, 1.f );
+			for ( int particleIndex = 0; particleIndex < 1000; particleIndex++ )
+			{
+				EcsManager& ecs = m_gameobject->GetScene().GetEcsManager();
+				ecsEntity entity = ecs.CreateEntity();
+				ecsPosition & position = ecs.AddComponent<ecsPosition>( entity );
+				ecs.AddComponent<ecsRotation>( entity ).Init();
+				ecsMovement & movement = ecs.AddComponent<ecsMovement>( entity );
+				ecsParticle & particle = ecs.AddComponent<ecsParticle>( entity );
 
-			movement.speed = btVector3( m_distribution( m_generator ), m_distribution( m_generator ), m_distribution( m_generator ) ) - btVector3( 0.5f, 0.5f, 0.5f );
-			movement.speed.normalize();
-			movement.speed *= m_distribution( m_generator ) * 10.f + 10.f;
-			position.position = m_gameobject->GetTransform().GetPosition();
-			particle.durationLeft = 3.f;
+				movement.speed = btVector3( m_distribution( m_generator ), m_distribution( m_generator ), m_distribution( m_generator ) ) - btVector3( 0.5f, 0.5f, 0.5f );
+				movement.speed.normalize();
+				movement.speed *= m_distribution( m_generator ) * 10.f + 10.f;
+				position.position = m_gameobject->GetTransform().GetPosition();
+				particle.durationLeft = 3.f;
+			}
 		}
 
-
 		onPlayerDie.Emmit(m_gameobject);
-
-
 	}
 
 	//================================================================================================================================

@@ -131,7 +131,9 @@ namespace fan
 
 		// Scene
 		m_clientScene = new Scene( "mainScene" );
+		m_clientScene->SetServer( false );
 		m_serverScene = new Scene( "serverScene" );
+		m_serverScene->SetServer( true );
 
 		// Initialize editor components		
 		m_selection			= new EditorSelection( m_currentScene);
@@ -200,6 +202,10 @@ namespace fan
 		m_serverScene->onDirectionalLightAttach.Connect	( &Scene::RegisterDirectionalLight, m_serverScene );
 		m_serverScene->onDirectionalLightDetach.Connect	( &Scene::UnRegisterDirectionalLight, m_serverScene );
 		m_serverScene->New();
+
+		// try open scenes
+		m_clientScene->LoadFrom("content/scenes/game.scene");
+		m_serverScene->LoadFrom("content/scenes/game.scene");		
 	}
 
 	//================================================================================================================================

@@ -45,7 +45,8 @@ namespace fan
 
 		Gameobject *					CreateGameobject( const std::string _name, Gameobject * _parent = nullptr, const bool _generateID = true );	
 		Gameobject *					CreateGameobject( const Prefab& _prefab,  Gameobject * _parent = nullptr, const bool _generateID = true );	
-		void							DeleteGameobject(Gameobject* _gameobject);										
+		void							DeleteGameobject(Gameobject* _gameobject);		
+		void							DeleteComponent( Component* _component) { m_componentsToDelete.push_back(_component); } // Delete at the end of the frame
 		std::vector < Gameobject * >	BuildEntitiesList() const;
 
 		template<typename _componentType> _componentType *				 FindComponentOfType() const;
@@ -67,13 +68,15 @@ namespace fan
 
 		Gameobject *			GetRoot()					{ return m_root; }
 		inline std::string		GetName() const				{ return m_name; }
+		bool					IsServer() const			{ return m_isServer; }
 		bool					HasPath() const				{ return m_path.empty() == false; }
 		inline std::string		GetPath() const				{ return m_path; }
 		inline EcsManager&		GetEcsManager() const		{ return *m_ecsManager; }
 		inline PhysicsManager&	GetPhysicsManager() const	{ return *m_physicsManager; }		
 		State					GetState() const			{ return m_state; };
-		Camera&					GetMainCamera()					{ return *m_mainCamera; }
+		Camera&					GetMainCamera()				{ return *m_mainCamera; }
 		void					SetMainCamera( Camera * _camera );
+		void					SetServer( const bool _isServer ) { m_isServer = _isServer; }
 		uint64_t				GetUniqueID() { assert(FindGameobject(m_nextUniqueID)==nullptr);  return m_nextUniqueID++; }
 		Gameobject *			FindGameobject( const uint64_t _id );
 
@@ -87,6 +90,7 @@ namespace fan
 		void Enable(  Actor * _actor );
 		void Disable(  Actor * _actor );
 
+		// Scene callbacks
 		void RegisterActor( Actor * _actor );
 		void UnregisterActor( Actor * _actor );
 		void RegisterDirectionalLight	( DirectionalLight * _pointLight );
@@ -100,6 +104,7 @@ namespace fan
 		std::string	m_name;
 		std::string	m_path;
 		uint64_t	m_nextUniqueID = 1;
+		bool		m_isServer = false;
 
 		SceneInstantiate * m_instantiate = nullptr;
 		EcsManager * 	   m_ecsManager = nullptr;
@@ -114,6 +119,7 @@ namespace fan
 
 		// Gameobjects
 		std::vector < Gameobject * >		m_entitiesToDelete;
+		std::vector < Component * >			m_componentsToDelete;
 		std::vector < GameobjectPtr * >		m_unresolvedGameobjectPointers;
 		std::vector < ComponentIDPtr * >	m_unresolvedComponentPointers;
 		std::vector< Actor * >				m_actors;

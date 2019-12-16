@@ -43,6 +43,8 @@ namespace fan
 
 		ImGui::Icon( GetIconType(), {16,16}); ImGui::SameLine();
 		ImGui::Text(m_scene->GetName().c_str());
+		ImGui::SameLine();
+		ImGui::Text( m_scene->IsServer() ? "- server" : "- client" );
 		ImGui::Separator();
 
 		Gameobject * gameobjectRightClicked = nullptr;

@@ -30,6 +30,7 @@ namespace fan
 		void Update( const float _delta );
 		void UpdateClient( ClientData& _client, const float _delta );
 		bool Bind();
+		void UnBind();
 		void SendPacket( const ClientData& _client,  sf::Packet _packet );
 
 		const std::vector<ClientData >& GetClients() const { return m_clients; }

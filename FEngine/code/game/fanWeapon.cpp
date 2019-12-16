@@ -78,8 +78,10 @@ namespace fan
 		Rigidbody * bulletRb = _other == rb0 ? rb1 : rb0;
 
 		m_gameobject->GetScene().DeleteGameobject( &bulletRb->GetGameobject() );
-		CreateExplosion( bulletRb->GetGameobject().GetTransform().GetPosition());
-
+		if ( GetScene().IsServer() == false )
+		{
+			CreateExplosion( bulletRb->GetGameobject().GetTransform().GetPosition());
+		}
 	}
 
 	//================================================================================================================================

@@ -25,18 +25,26 @@ namespace fan
 	void PlayerNetwork::OnDetach()
 	{
 		Actor::OnDetach();
+		m_client.UnBind();
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
 	void PlayerNetwork::Start()
 	{
-		 while( ! m_client.Bind() )
-		 {
-			 m_client.SetPort( m_client.GetPort() + 1 );
-		 }
-		
-		m_client.ConnectToServer(53000, "127.0.0.1");
+		if( GetScene().IsServer() )
+		{
+			GetScene().DeleteComponent(this);
+		}
+		else
+		{
+			while ( !m_client.Bind() )
+			{
+				m_client.SetPort( m_client.GetPort() + 1 );
+			}
+
+			m_client.ConnectToServer( 53000, "127.0.0.1" );
+		}
 	}
 
 	//================================================================================================================================
