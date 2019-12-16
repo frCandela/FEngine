@@ -201,13 +201,23 @@ namespace fan
 	//================================================================================================================================
 	void Server::RemoveClient( ClientData& _client )
 	{
-		for (int clientIndex = 0; clientIndex < m_clients.size() ; clientIndex++)
+		for (int clientIndex = (int)m_clients.size() - 1; clientIndex >= 0  ; --clientIndex )
 		{
 			if ( &m_clients[clientIndex] == &_client )
 			{
-				Debug::Log() << "[SERVER] client disconnected " << _client.name << " " << _client.ipAdress.toString() << "::" << _client.port << Debug::Endl();
+				Debug::Log() << "[SERVER] client disconnected: " << _client.name << " " << _client.ipAdress.toString() << "::" << _client.port << Debug::Endl();
 				m_clients.erase( m_clients.begin() + clientIndex );
 			}
+		}
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
+	void Server::ClearClients()
+	{
+		while ( m_clients.size() > 0 )
+		{
+			RemoveClient( m_clients[m_clients.size() - 1] );
 		}
 	}
 

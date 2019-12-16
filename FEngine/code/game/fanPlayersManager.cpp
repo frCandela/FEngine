@@ -4,6 +4,7 @@
 #include "core/input/fanJoystick.h"
 #include "game/fanPlayerInput.h"
 #include "game/fanSpaceShip.h"
+#include "game/network/fanPlayerNetwork.h"
 
 namespace fan
 {
@@ -16,6 +17,7 @@ namespace fan
 		REQUIRE_TRUE( *m_playerPrefab != nullptr, "PlayersManager : missing player prefab " )
 
 		Joystick::Get().onJoystickConnect.Connect( &PlayersManager::OnJoystickConnect, this );
+
 
 		// Spawn mouse player
 		AddPlayer( s_mousePlayerID, "mouse_player" );
@@ -67,35 +69,50 @@ namespace fan
 	{
 		if ( *m_playerPrefab != nullptr )
 		{
-			assert( m_players.find( _ID ) ==  m_players.end() );
-			Gameobject * player = m_gameobject->GetScene().CreateGameobject( **m_playerPrefab, m_gameobject );
-			m_players[_ID] = player;
+			// Creates a persistent gameobject for the player
+			assert( m_players.find( _ID ) ==  m_players.end() );		
+			PlayerData playerdata;
+			playerdata.persistent = GetScene().CreateGameobject(_name + std::string("_persistent"), m_gameobject );
+			playerdata.connection = playerdata.persistent->AddComponent<PlayerNetwork>();
+			m_players[_ID] = playerdata;
+			playerdata.name = _name;
+		}
+	}
 
-			player->SetEditorFlags( player->GetEditorFlags() | Gameobject::EditorFlag::NOT_SAVED );
-			player->SetName( _name );
+	//================================================================================================================================
+	//================================================================================================================================
+	void PlayersManager::SpawnSpaceShip( const int _playerID )
+	{
+	
+		// Get player data
+		auto it = m_players.find( _playerID );
+		assert( it !=  m_players.end() );
+		PlayerData& playerData = it->second;
 
-			// Set input
-			PlayerInput * playerInput = player->GetComponent<PlayerInput>();
-			if ( playerInput != nullptr )
-			{
-				playerInput->SetJoystickID(_ID);
-				playerInput->SetInputType( _ID < 0 ? PlayerInput::KEYBOARD_MOUSE : PlayerInput::JOYSTICK );
-			}
-			else
-			{
-				Debug::Warning("PlayersManager::AddPlayer : Prefab is missing a PlayerInput component.");
-			}
+		Gameobject * player = GetScene().CreateGameobject( **m_playerPrefab, playerData.persistent );
+		player->SetEditorFlags( player->GetEditorFlags() | Gameobject::EditorFlag::NOT_SAVED );
+		player->SetName( playerData.name );
 
-			SpaceShip * playerShip = player->GetComponent<SpaceShip>();
-			if ( playerShip != nullptr )
-			{
-				playerShip->onPlayerDie.Connect( &PlayersManager::OnPlayerDie, this );
-			}
-			else
-			{
-				Debug::Warning( "PlayersManager::AddPlayer : Prefab is missing a SpaceShip component." );
-			}
-			
+		// Set input
+		PlayerInput * playerInput = player->GetComponent<PlayerInput>();
+		if ( playerInput != nullptr )
+		{
+			playerInput->SetJoystickID( _playerID );
+			playerInput->SetInputType( _playerID < 0 ? PlayerInput::KEYBOARD_MOUSE : PlayerInput::JOYSTICK );
+		}
+		else
+		{
+			Debug::Warning( "PlayersManager::AddPlayer : Prefab is missing a PlayerInput component." );
+		}
+
+		SpaceShip * playerShip = player->GetComponent<SpaceShip>();
+		if ( playerShip != nullptr )
+		{
+			playerShip->onPlayerDie.Connect( &PlayersManager::OnPlayerDie, this );
+		}
+		else
+		{
+			Debug::Warning( "PlayersManager::AddPlayer : Prefab is missing a SpaceShip component." );
 		}
 	}
 
@@ -119,9 +136,9 @@ namespace fan
 	{
 		assert( m_players.find( _ID ) != m_players.end() );
 
-		Gameobject * player = m_players[_ID];
+		PlayerData playerData = m_players[_ID];
 		m_players.erase( _ID );
-		m_gameobject->GetScene().DeleteGameobject( player );
+		m_gameobject->GetScene().DeleteGameobject( playerData.persistent );
 	}
 
 	//================================================================================================================================
@@ -136,7 +153,7 @@ namespace fan
 		}
 		else
 		{			
-			RemovePlayer( _joystickID );
+			//RemovePlayer( _joystickID );
 		}
 	}
 
@@ -149,7 +166,10 @@ namespace fan
 		players.reserve( m_players.size() );
 		for ( auto& pair : m_players )
 		{
-			players.push_back( pair.second );
+			if ( pair.second.spaceship != nullptr )
+			{
+				players.push_back( pair.second.spaceship );
+			}			
 		}
 		return players;
 	}

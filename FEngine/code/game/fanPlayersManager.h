@@ -4,10 +4,23 @@
 
 namespace fan
 {
+	class PlayerNetwork;
+
 	//================================================================================================================================
 	//================================================================================================================================	
 	class PlayersManager : public Actor
 	{
+	private:
+		//================================================================	
+		//================================================================
+		struct PlayerData
+		{
+			Gameobject*		spaceship	= nullptr;
+			Gameobject*		persistent	= nullptr;
+			PlayerNetwork *	connection	= nullptr;
+			std::string		name = "";
+		};
+
 	public:
 
 		std::vector< Gameobject * > GetPlayers() const;
@@ -28,16 +41,14 @@ namespace fan
 
 		void OnAttach() override;
 		void OnDetach() override;
-
-		void OnScenePlay();
-		void OnScenePause();
 	private:
 		PrefabPtr m_playerPrefab;
 
 		static const int s_mousePlayerID = -1;
-		std::map< int, Gameobject*> m_players;
+		std::map< int, PlayerData > m_players;
 
 		void AddPlayer( const int _ID, const std::string& _name );
+		void SpawnSpaceShip( const int _playerID );
 		void RemovePlayer( const int _ID );
 
 		void OnJoystickConnect( int _joystickID, bool _connected );

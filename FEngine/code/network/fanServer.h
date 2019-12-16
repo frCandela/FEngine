@@ -32,7 +32,7 @@ namespace fan
 		bool Bind();
 		void UnBind();
 		void SendPacket( const ClientData& _client,  sf::Packet _packet );
-
+		void ClearClients();
 		const std::vector<ClientData >& GetClients() const { return m_clients; }
 
 	private:

@@ -20,7 +20,7 @@ namespace fan
 		bool Save( Json & _json ) const override;
 
 		void Start() override;
-		void Stop() override {}
+		void Stop() override;
 		void Update( const float _delta ) override;
 		void LateUpdate( const float _delta ) override;
 		
