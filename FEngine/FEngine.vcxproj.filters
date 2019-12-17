@@ -496,9 +496,6 @@
     <ClCompile Include="code\game\network\fanGameServer.cpp">
       <Filter>code\game\network</Filter>
     </ClCompile>
-    <ClCompile Include="code\game\network\fanPlayerNetwork.cpp">
-      <Filter>code\game\network</Filter>
-    </ClCompile>
     <ClCompile Include="code\editor\callbacks\fanGameWindowCallbacks.cpp">
       <Filter>code\editor\callbacks</Filter>
     </ClCompile>
@@ -516,6 +513,9 @@
     </ClCompile>
     <ClCompile Include="code\ecs\fanEcsSingletonComponents.cpp">
       <Filter>code\ecs</Filter>
+    </ClCompile>
+    <ClCompile Include="code\game\network\fanGameClient.cpp">
+      <Filter>code\game\network</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -1536,9 +1536,6 @@
     <ClInclude Include="code\network\packets\fanPacketPlayerPosition.h">
       <Filter>code\network\packets</Filter>
     </ClInclude>
-    <ClInclude Include="code\game\network\fanPlayerNetwork.h">
-      <Filter>code\game\network</Filter>
-    </ClInclude>
     <ClInclude Include="code\game\network\fanGameServer.h">
       <Filter>code\game\network</Filter>
     </ClInclude>
@@ -1562,6 +1559,9 @@
     </ClInclude>
     <ClInclude Include="code\ecs\fanEcsSingletonComponents.h">
       <Filter>code\ecs</Filter>
+    </ClInclude>
+    <ClInclude Include="code\game\network\fanGameClient.h">
+      <Filter>code\game\network</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

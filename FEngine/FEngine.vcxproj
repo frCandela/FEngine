@@ -156,7 +156,7 @@
     <ClCompile Include="code\game\fanWeapon.cpp" />
     <ClCompile Include="code\game\fanWithEnergy.cpp" />
     <ClCompile Include="code\game\network\fanGameServer.cpp" />
-    <ClCompile Include="code\game\network\fanPlayerNetwork.cpp" />
+    <ClCompile Include="code\game\network\fanGameClient.cpp" />
     <ClCompile Include="code\game\ui\fanSpaceshipUI.cpp" />
     <ClCompile Include="code\network\fanClient.cpp" />
     <ClCompile Include="code\network\fanServer.cpp" />
@@ -305,7 +305,7 @@
     <ClInclude Include="code\game\fanWeapon.h" />
     <ClInclude Include="code\game\fanWithEnergy.h" />
     <ClInclude Include="code\game\network\fanGameServer.h" />
-    <ClInclude Include="code\game\network\fanPlayerNetwork.h" />
+    <ClInclude Include="code\game\network\fanGameClient.h" />
     <ClInclude Include="code\game\ui\fanSpaceshipUI.h" />
     <ClInclude Include="code\network\fanClient.h" />
     <ClInclude Include="code\network\fanNetworkCommon.h" />

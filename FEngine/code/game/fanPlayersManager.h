@@ -4,7 +4,7 @@
 
 namespace fan
 {
-	class PlayerNetwork;
+	class GameClient;
 
 	//================================================================================================================================
 	//================================================================================================================================	
@@ -17,7 +17,6 @@ namespace fan
 		{
 			Gameobject*		spaceship	= nullptr;
 			Gameobject*		persistent	= nullptr;
-			PlayerNetwork *	connection	= nullptr;
 			std::string		name = "";
 		};
 

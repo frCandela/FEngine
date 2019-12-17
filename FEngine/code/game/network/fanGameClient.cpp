@@ -1,5 +1,5 @@
 #include "fanGlobalIncludes.h"
-#include "game/network/fanPlayerNetwork.h"
+#include "game/network/fanGameClient.h"
 
 #include "core/input/fanInputManager.h"
 #include "core/input/fanInput.h"
@@ -10,11 +10,11 @@
 
 namespace fan
 {
-	REGISTER_TYPE_INFO( PlayerNetwork, TypeInfo::Flags::EDITOR_COMPONENT, "game/net/" )
+	REGISTER_TYPE_INFO( GameClient, TypeInfo::Flags::EDITOR_COMPONENT, "game/net/" )
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void PlayerNetwork::OnAttach()
+	void GameClient::OnAttach()
 	{
 		Actor::OnAttach();
 		m_client.Create("unknown", 53001);
@@ -22,7 +22,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void PlayerNetwork::OnDetach()
+	void GameClient::OnDetach()
 	{
 		Actor::OnDetach();
 		m_client.UnBind();
@@ -30,40 +30,38 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void PlayerNetwork::Start()
+	void GameClient::Start()
 	{
-		if( GetScene().IsServer() )
+		if ( GetScene().IsServer() )
 		{
-			GetScene().DeleteComponent(this);
+			GetScene().DeleteComponent( this );
+			return;
 		}
-		else
-		{
-			while ( !m_client.Bind() )
-			{
-				m_client.SetPort( m_client.GetPort() + 1 );
-			}
 
-			m_client.ConnectToServer( 53000, "127.0.0.1" );
+		while ( !m_client.Bind() )
+		{
+			m_client.SetPort( m_client.GetPort() + 1 );
 		}
+		m_client.ConnectToServer( 53000, "127.0.0.1" );
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void PlayerNetwork::Update( const float _delta )
+	void GameClient::Update( const float _delta )
 	{
 		m_client.Update( _delta );
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void PlayerNetwork::LateUpdate( const float /*_delta*/ )
+	void GameClient::LateUpdate( const float /*_delta*/ )
 	{
 
 	}
 	
 	//================================================================================================================================
 	//================================================================================================================================
-	void PlayerNetwork::OnGui()
+	void GameClient::OnGui()
 	{
 		Actor::OnGui();
 
@@ -75,7 +73,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	bool PlayerNetwork::Load( const Json & _json )
+	bool GameClient::Load( const Json & _json )
 	{
 		Actor::Load( _json );
 		return true;
@@ -83,7 +81,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	bool PlayerNetwork::Save( Json & _json ) const
+	bool GameClient::Save( Json & _json ) const
 	{
 		Actor::Save( _json );
 		return true;

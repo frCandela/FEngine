@@ -9,7 +9,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	class PlayerNetwork : public Actor
+	class GameClient : public Actor
 	{
 	public:
 		void			OnGui() override;
@@ -24,7 +24,7 @@ namespace fan
 		void Update( const float _delta ) override;
 		void LateUpdate( const float _delta ) override;
 		
-		DECLARE_TYPE_INFO( PlayerNetwork, Component );
+		DECLARE_TYPE_INFO( GameClient, Component );
 
 	protected:
 		void OnAttach() override;

@@ -4,7 +4,7 @@
 #include "core/input/fanJoystick.h"
 #include "game/fanPlayerInput.h"
 #include "game/fanSpaceShip.h"
-#include "game/network/fanPlayerNetwork.h"
+#include "game/network/fanGameClient.h"
 
 namespace fan
 {
@@ -78,9 +78,9 @@ namespace fan
 			assert( m_players.find( _ID ) ==  m_players.end() );		
 			PlayerData playerdata;
 			playerdata.persistent = GetScene().CreateGameobject(_name + std::string("_persistent"), m_gameobject );
-			playerdata.connection = playerdata.persistent->AddComponent<PlayerNetwork>();
-			m_players[_ID] = playerdata;
 			playerdata.name = _name;
+			m_players[_ID] = playerdata;
+			
 		}
 	}
 

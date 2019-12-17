@@ -22,11 +22,6 @@ namespace fan
 	{
 		Actor::OnAttach();
 		m_server.Create( 53000 );
-
-		if ( ! GetScene().IsServer() )
-		{
-			GetScene().DeleteComponent( this );
-		} 
 	}
 
 	//================================================================================================================================
@@ -41,6 +36,12 @@ namespace fan
 	//================================================================================================================================
 	void GameServer::Start()
 	{
+		if ( !GetScene().IsServer() )
+		{
+			GetScene().DeleteComponent( this );
+			return;
+		}
+
 		REQUIRE_COMPONENT( PlayersManager, m_playersManager );
 		REQUIRE_COMPONENT( GameManager, m_gameManager );
 
