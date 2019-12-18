@@ -10,19 +10,17 @@ namespace fan
 	//================================================================================================================================	
 	class PlayersManager : public Actor
 	{
-	private:
+	public:
 		//================================================================	
 		//================================================================
 		struct PlayerData
 		{
 			Gameobject*		spaceship	= nullptr;
 			Gameobject*		persistent	= nullptr;
-			std::string		name = "";
-		};
+		};	
 
-	public:
-
-		std::vector< Gameobject * > GetPlayers() const;
+		Signal< Gameobject* > onAddPlayer;
+		std::vector< Gameobject* > GetPlayers() const;
 
 		void Start() override;
 		void Stop() override;

@@ -55,8 +55,8 @@ namespace fan
 		void OnDetach() override;
 
 	private:
-		UDPSocket m_socket;
-		ServerState			m_state = SERVER_NONE;
+		UDPSocket   m_socket;
+		ServerState	m_state = SERVER_NONE;
 
 		std::vector<ClientData > m_clients;
 

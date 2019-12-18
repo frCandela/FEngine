@@ -3,6 +3,7 @@
 
 #include "scene/fanScene.h"
 #include "game/network/fanGameServer.h"
+#include "game/network/fanGameClient.h"
 #include "scene/fanGameobject.h"
 
 namespace fan {
@@ -21,22 +22,43 @@ namespace fan {
 	//================================================================================================================================
 	void NetworkWindow::OnGui() 
 	{
-		// Game server
-		GameServer * gameServer = m_serverScene->FindComponentOfType<GameServer>();
-		if ( gameServer != nullptr )
+		if ( ImGui::CollapsingHeader( "Server" ) )
 		{
-			//const UDPSocket& socket = gameServer->GetSocket();
-
-			ImGui::Separator();
-			const std::vector<GameServer::ClientData >& clientsList = gameServer->GetClients();
-			for ( int clientIndex = 0; clientIndex < clientsList.size(); clientIndex++ )
+			// Game server
+			GameServer * gameServer = m_serverScene->FindComponentOfType<GameServer>();
+			if ( gameServer != nullptr )
 			{
-				const GameServer::ClientData& client = clientsList[clientIndex];
-				ImGui::Text( client.name.c_str() );
-				ImGui::Text( "ping: %d", (int)( 1000.f * client.ping ) );
-				ImGui::Text( "last response: %.1f", client.lastResponse );
+				//const UDPSocket& socket = gameServer->GetSocket();
+
 				ImGui::Separator();
+				const std::vector<GameServer::ClientData >& clientsList = gameServer->GetClients();
+				for ( int clientIndex = 0; clientIndex < clientsList.size(); clientIndex++ )
+				{
+					const GameServer::ClientData& client = clientsList[clientIndex];
+					ImGui::Text( client.name.c_str() );
+					ImGui::Text( "ping: %d", (int)( 1000.f * client.ping ) );
+					ImGui::Text( "last response: %.1f", client.lastResponse );
+					ImGui::Separator();
+				}
 			}
-		}	
+		}
+
+		if ( ImGui::CollapsingHeader( "Client" ) )
+		{
+			// Game client
+			GameClient * gameClient = m_clientScene->FindComponentOfType<GameClient>();
+			if ( gameClient != nullptr )
+			{
+				ImGui::Separator();
+				const std::vector<GameClient::NetPlayerData >& netPlayers = gameClient->GetNetPlayers();
+				for ( int playerIndex = 0; playerIndex < netPlayers.size(); playerIndex++ )
+				{
+					const GameClient::NetPlayerData& netPlayer = netPlayers[playerIndex];
+					ImGui::Text( netPlayer.playerPersistent->GetName().c_str() );
+					ImGui::Text( "state: %d", (int)( netPlayer.state ) );
+					ImGui::Separator();
+				}
+			}
+		}
  	}
 }

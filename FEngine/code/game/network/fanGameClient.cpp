@@ -9,6 +9,8 @@
 #include "scene/components/fanTransform.h"
 #include "network/packets/fanIPacket.h"
 #include "network/packets/fanPacketLogin.h"
+#include "game/fanPlayersManager.h"
+#include "game/fanGameManager.h"
 
 namespace fan
 {
@@ -41,11 +43,26 @@ namespace fan
 			return;
 		}
 
+		REQUIRE_COMPONENT( PlayersManager, m_playersManager );
+		REQUIRE_COMPONENT( GameManager, m_gameManager );
+
+		// Bind & Log to server
 		while ( !m_socket.Bind() )
 		{			
 			m_socket.SetPort( m_socket.GetPort() + 1 );
 		}
 		ConnectToServer( 53000, "127.0.0.1" );
+		
+		// Log players & register new players callbacks
+		if ( m_playersManager != nullptr )
+		{
+			m_playersManager->onAddPlayer.Connect( &GameClient::OnAddPlayer, this );
+			std::vector< Gameobject* > players = m_playersManager->GetPlayers();
+			for (int playerIndex = 0; playerIndex < players.size() ; playerIndex++)
+			{
+				OnAddPlayer( players[playerIndex] ); 
+			}
+		}
 	}
 
 	//================================================================================================================================
@@ -53,6 +70,9 @@ namespace fan
 	void GameClient::Stop()
 	{
 		m_socket.UnBind();
+		m_netPlayers.clear();
+
+		m_playersManager->onAddPlayer.Disconnect( &GameClient::OnAddPlayer, this );
 	}
 
 	//================================================================================================================================
@@ -65,9 +85,9 @@ namespace fan
 
 		switch ( m_state )
 		{
-		case ClientState::NONE:
+		case ClientState::CLIENT_NONE:
 			break;
-		case ClientState::CONNECTING:
+		case ClientState::CLIENT_CONNECTING:
 			if ( m_timer < 0.f )
 			{
 				Debug::Log() << m_socket.GetName() << " attempting connection to server" << Debug::Endl();
@@ -76,7 +96,7 @@ namespace fan
 				m_timer = 0.5f;
 			}
 			break;
-		case ClientState::CONNECTED:
+		case ClientState::CLIENT_CONNECTED:
 			break;
 
 		default:
@@ -88,6 +108,17 @@ namespace fan
 	//================================================================================================================================
 	//================================================================================================================================
 	void GameClient::LateUpdate( const float /*_delta*/ ){}
+
+	//================================================================================================================================
+	//================================================================================================================================
+	void GameClient::OnAddPlayer( Gameobject* _playerPersistent )
+	{
+		assert( FindNetPlayer(_playerPersistent) == nullptr );
+		NetPlayerData playerData;
+		playerData.playerPersistent = _playerPersistent;
+		playerData.state = PLAYER_CONNECTING;
+		m_netPlayers.push_back( playerData );
+	}
 
 	//================================================================================================================================
 	//================================================================================================================================
@@ -106,7 +137,7 @@ namespace fan
 			{
 			case PacketType::ACK_LOGIN:
 				Debug::Log() << m_socket.GetName() << " connected !" << Debug::Endl();
-				m_state = ClientState::CONNECTED;
+				m_state = ClientState::CLIENT_CONNECTED;
 				break;
 			case PacketType::PING:
 				m_socket.Send( packet, m_serverIp, m_serverPort  );
@@ -130,8 +161,23 @@ namespace fan
 		m_serverPort = _serverPort;
 		m_serverIp = _serverIp;
 
-		m_state = CONNECTING;
+		m_state = CLIENT_CONNECTING;
 		m_timer = 0.5f;
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
+	GameClient::NetPlayerData * GameClient::FindNetPlayer( const Gameobject * _gameobject )
+	{
+		for (int playerIndex = 0; playerIndex < m_netPlayers.size() ; playerIndex++)
+		{
+			NetPlayerData& player = m_netPlayers[playerIndex];
+			if ( player.playerPersistent == _gameobject )
+			{
+				return &player; 
+			}
+		}
+		return nullptr;
 	}
 	
 	//================================================================================================================================
@@ -161,6 +207,4 @@ namespace fan
 		Actor::Save( _json );
 		return true;
 	}
-
-
 }

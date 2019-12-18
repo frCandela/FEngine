@@ -78,9 +78,8 @@ namespace fan
 			assert( m_players.find( _ID ) ==  m_players.end() );		
 			PlayerData playerdata;
 			playerdata.persistent = GetScene().CreateGameobject(_name + std::string("_persistent"), m_gameobject );
-			playerdata.name = _name;
 			m_players[_ID] = playerdata;
-			
+			onAddPlayer.Emmit(playerdata.persistent);
 		}
 	}
 
@@ -99,7 +98,7 @@ namespace fan
 
 			 Gameobject * player = GetScene().CreateGameobject( **m_playerPrefab, playerData.persistent );
 			 player->SetEditorFlags( player->GetEditorFlags() | Gameobject::EditorFlag::NOT_SAVED );
-			 player->SetName( playerData.name );
+			 player->SetName( playerData.persistent->GetName() );
 
 			 // Set input
 			 PlayerInput * playerInput = player->GetComponent<PlayerInput>();
@@ -164,18 +163,15 @@ namespace fan
 	}
 
 	//================================================================================================================================
-	// Returns an array of connected players
+	// Returns an array of connected players data (copy)
 	//================================================================================================================================
-	std::vector< Gameobject * > PlayersManager::GetPlayers() const
+	std::vector< Gameobject* > PlayersManager::GetPlayers() const
 	{
-		std::vector< Gameobject * > players;
+		std::vector< Gameobject* > players;
 		players.reserve( m_players.size() );
 		for ( auto& pair : m_players )
 		{
-			if ( pair.second.spaceship != nullptr )
-			{
-				players.push_back( pair.second.spaceship );
-			}			
+			players.push_back( pair.second.persistent );			
 		}
 		return players;
 	}
