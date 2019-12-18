@@ -158,8 +158,7 @@
     <ClCompile Include="code\game\network\fanGameServer.cpp" />
     <ClCompile Include="code\game\network\fanGameClient.cpp" />
     <ClCompile Include="code\game\ui\fanSpaceshipUI.cpp" />
-    <ClCompile Include="code\network\fanClient.cpp" />
-    <ClCompile Include="code\network\fanServer.cpp" />
+    <ClCompile Include="code\network\fanUDPSocket.cpp" />
     <ClCompile Include="code\physics\fanPhysicsManager.cpp" />
     <ClCompile Include="code\renderer\core\fanBuffer.cpp" />
     <ClCompile Include="code\renderer\core\fanDevice.cpp" />
@@ -307,9 +306,8 @@
     <ClInclude Include="code\game\network\fanGameServer.h" />
     <ClInclude Include="code\game\network\fanGameClient.h" />
     <ClInclude Include="code\game\ui\fanSpaceshipUI.h" />
-    <ClInclude Include="code\network\fanClient.h" />
+    <ClInclude Include="code\network\fanUDPSocket.h" />
     <ClInclude Include="code\network\fanNetworkCommon.h" />
-    <ClInclude Include="code\network\fanServer.h" />
     <ClInclude Include="code\network\packets\fanIPacket.h" />
     <ClInclude Include="code\network\packets\fanPacketLogin.h" />
     <ClInclude Include="code\network\packets\fanPacketPing.h" />

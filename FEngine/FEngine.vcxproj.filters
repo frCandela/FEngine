@@ -484,12 +484,6 @@
     <ClCompile Include="code\renderer\core\fanRenderPass.cpp">
       <Filter>code\renderer\core</Filter>
     </ClCompile>
-    <ClCompile Include="code\network\fanServer.cpp">
-      <Filter>code\network</Filter>
-    </ClCompile>
-    <ClCompile Include="code\network\fanClient.cpp">
-      <Filter>code\network</Filter>
-    </ClCompile>
     <ClCompile Include="code\editor\windows\fanNetworkWindow.cpp">
       <Filter>code\editor\windows</Filter>
     </ClCompile>
@@ -516,6 +510,9 @@
     </ClCompile>
     <ClCompile Include="code\game\network\fanGameClient.cpp">
       <Filter>code\game\network</Filter>
+    </ClCompile>
+    <ClCompile Include="code\network\fanUDPSocket.cpp">
+      <Filter>code\network</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -1509,12 +1506,6 @@
     <ClInclude Include="deps\SFML\System\Vector3.hpp">
       <Filter>code\deps\SFML</Filter>
     </ClInclude>
-    <ClInclude Include="code\network\fanServer.h">
-      <Filter>code\network</Filter>
-    </ClInclude>
-    <ClInclude Include="code\network\fanClient.h">
-      <Filter>code\network</Filter>
-    </ClInclude>
     <ClInclude Include="code\editor\windows\fanNetworkWindow.h">
       <Filter>code\editor\windows</Filter>
     </ClInclude>
@@ -1562,6 +1553,9 @@
     </ClInclude>
     <ClInclude Include="code\game\network\fanGameClient.h">
       <Filter>code\game\network</Filter>
+    </ClInclude>
+    <ClInclude Include="code\network\fanUDPSocket.h">
+      <Filter>code\network</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

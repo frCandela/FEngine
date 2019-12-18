@@ -21,25 +21,22 @@ namespace fan {
 	//================================================================================================================================
 	void NetworkWindow::OnGui() 
 	{
-
-
-
 		// Game server
 		GameServer * gameServer = m_serverScene->FindComponentOfType<GameServer>();
 		if ( gameServer != nullptr )
 		{
-			const Server& server = gameServer->GetServer();
+			//const UDPSocket& socket = gameServer->GetSocket();
 
 			ImGui::Separator();
-			const std::vector<Server::ClientData >& clientsList = server.GetClients();
+			const std::vector<GameServer::ClientData >& clientsList = gameServer->GetClients();
 			for ( int clientIndex = 0; clientIndex < clientsList.size(); clientIndex++ )
 			{
-				const Server::ClientData& client = clientsList[clientIndex];
+				const GameServer::ClientData& client = clientsList[clientIndex];
 				ImGui::Text( client.name.c_str() );
 				ImGui::Text( "ping: %d", (int)( 1000.f * client.ping ) );
 				ImGui::Text( "last response: %.1f", client.lastResponse );
 				ImGui::Separator();
 			}
 		}	
-	}
+ 	}
 }

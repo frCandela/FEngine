@@ -1,13 +1,10 @@
 #pragma once
 
 #include "editor/windows/fanEditorWindow.h"
-#include "network/fanClient.h"
-#include "network/fanServer.h"
 
 namespace fan {
 
 	class Scene;
-	class GameServer;
 
 	//================================================================================================================================
 	//================================================================================================================================
@@ -22,5 +19,4 @@ namespace fan {
 		Scene * m_clientScene = nullptr;
 		Scene * m_serverScene = nullptr;
 	};
-
 }
