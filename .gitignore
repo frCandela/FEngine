@@ -17,3 +17,4 @@ FEngine/FEngine.exe
 FEngine/deps/imgui/_docking
 FEngine/deps/imgui/_old
 /.project
+out
