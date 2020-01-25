@@ -1,10 +1,8 @@
 #pragma once
 
 namespace std {
-	namespace experimental {
-		namespace filesystem {
-			static string file_name(const path& _path);
-		}
+	namespace filesystem {
+		static string file_name(const path& _path);
 	}
 }
 

@@ -144,6 +144,7 @@ namespace fan
 				break;
 			case PacketType::START_GAME:
 				Debug::Log() << m_socket.GetName() << " start game " << Debug::Endl();
+				m_playersManager->SpawnSpaceShips();
 				break;
 			default:
 				Debug::Warning() << m_socket.GetName() << " strange packet received with id: " << intType << Debug::Endl();
