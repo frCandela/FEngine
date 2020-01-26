@@ -1,6 +1,6 @@
 #pragma once
 
-#include "network/packets/fanIPacket.h"
+#include "network/packets/fanIPacket.hpp"
 
 namespace fan
 {

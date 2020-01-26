@@ -1,8 +1,6 @@
-#include "fanGlobalIncludes.h"
-#include "network/fanUDPSocket.h"
-
-#include "network/packets/fanPacketPing.h"
-#include "network/packets/fanPacketLogin.h"
+#include "network/fanUDPSocket.hpp"
+#include "network/packets/fanPacketPing.hpp"
+#include "network/packets/fanPacketLogin.hpp"
 
 namespace fan
 {

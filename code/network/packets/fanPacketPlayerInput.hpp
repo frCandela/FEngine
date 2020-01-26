@@ -1,10 +1,22 @@
 #pragma once
 
-#include "network/packets/fanIPacket.h"
-#include "game/fanPlayerInput.h"
+#include "network/packets/fanIPacket.hpp"
+//#include "game/fanPlayerInput.hpp"
 
 namespace fan
 {
+	//================================================================
+	//================================================================
+	struct InputData
+	{
+		btVector3	direction;
+		float		left;
+		float		forward;
+		float		boost;
+		float		fire;
+		bool		stop;
+	};
+
 	//================================================================================================================================
 	//================================================================================================================================
 	struct PacketPlayerInput : IPacket<PacketType::PLAYER_INPUT>

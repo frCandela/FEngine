@@ -13,6 +13,7 @@ link_directories("C:/VulkanSDK/1.1.106.0/Lib")
 
 add_subdirectory(code/core)
 add_subdirectory(code/render)
+add_subdirectory(code/network)
 add_subdirectory(deps)
 
 list(APPEND APP_SOURCES
@@ -23,14 +24,13 @@ set(APP_LIBRARIES
     imgui
     fanCore
     fanRender
+    fanNetwork
     glfw3
 )
 
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR})
 
 add_executable(${APP_NAME} ${APP_SOURCES})
-
-
 
 target_link_libraries(${APP_NAME} ${APP_LIBRARIES})
 
