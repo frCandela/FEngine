@@ -1,5 +1,4 @@
-#include "fanGlobalIncludes.h"
-#include "core/ressources/fanRessource.h"
+#include "core/ressources/fanRessource.hpp"
 
 namespace fan
 {

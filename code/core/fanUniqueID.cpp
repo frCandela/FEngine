@@ -1,6 +1,4 @@
-#include "fanGlobalIncludes.h"
-
-#include "core/fanUniqueID.h"
+#include "core/fanUniqueID.hpp"
 
 namespace fan {
 	size_t UniqueIdBase::m_globalId = 0;

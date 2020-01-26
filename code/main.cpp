@@ -4,9 +4,11 @@
 
 #include "glfw/glfw3.h"  
 #include "vulkan/vulkan.h" 
- 
+
+#include "core/fanTypeInfo.hpp" 
+
 int main(int argc, char* argv[]) 
-{ 
+{
 	glfwInit();
 
 	glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
@@ -14,7 +16,6 @@ int main(int argc, char* argv[])
 	GLFWwindow * window  = glfwCreateWindow(800, 600, "Vulkan", nullptr, nullptr);
 	while (!glfwWindowShouldClose(window)) {
 		glfwPollEvents();
-
 	}
 	glfwDestroyWindow(window);
 

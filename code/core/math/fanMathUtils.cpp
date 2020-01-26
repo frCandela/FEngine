@@ -1,6 +1,4 @@
-#include "fanGlobalIncludes.h"
-
-#include "core/math/fanMathUtils.h"
+#include "core/math/fanMathUtils.hpp"
 
 namespace fan {
 	//================================================================================================================================

@@ -1,6 +1,6 @@
-#include "fanGlobalIncludes.h"
+#include "fanCorePrecompiled.hpp"
 
-#include "core/fanTypeInfo.h"
+#include "core/fanTypeInfo.hpp"
 
 namespace fan {
 	//================================================================================================================================

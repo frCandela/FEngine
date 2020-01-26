@@ -1,5 +1,4 @@
-#include "fanGlobalIncludes.h"
-#include "core/input/fanJoystick.h"
+#include "core/input/fanJoystick.hpp"
 
 namespace fan
 {

@@ -1,6 +1,4 @@
-#include "fanGlobalIncludes.h"
-
-#include "core/math/shapes/fanCube.h"
+#include "core/math/shapes/fanCube.hpp"
 
 namespace fan {
 	//================================================================================================================================

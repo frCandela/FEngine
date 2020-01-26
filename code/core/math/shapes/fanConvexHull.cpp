@@ -1,7 +1,7 @@
-#include "fanGlobalIncludes.h"
-#include "core/math/shapes/fanConvexHull.h"
-#include "core/math/shapes/fanTriangle.h"
+#include "core/math/shapes/fanConvexHull.hpp"
+#include "core/math/shapes/fanTriangle.hpp"
 #include "quickhull/QuickHull.hpp"
+
 #include "bullet/LinearMath/btConvexHull.h"
 
 

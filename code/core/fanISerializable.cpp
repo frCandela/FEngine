@@ -1,13 +1,13 @@
-#include "fanGlobalIncludes.h"
-#include "fanISerializable.h"
+#include "fanISerializable.hpp"
 
-#include "scene/components/fanComponent.h"
-#include "scene/fanRessourcePtr.h"
-#include "scene/fanGameobject.h"
-#include "scene/fanComponentPtr.h"
-#include "scene/fanPrefab.h"
-#include "renderer/core/fanTexture.h"
-#include "renderer/fanMesh.h"
+#include "core/math/fanVector2.hpp"
+// #include "scene/components/fanComponent.hpp"
+// #include "scene/fanRessourcePtr.hpp"
+// #include "scene/fanGameobject.hpp"
+// #include "scene/fanComponentPtr.hpp"
+// #include "scene/fanPrefab.hpp"
+// #include "renderer/core/fanTexture.hpp"
+// #include "renderer/fanMesh.hpp"
 
 namespace fan {
 
@@ -90,7 +90,7 @@ namespace fan {
 	void ISerializable::SaveString ( Json & _json, const char * _name, const std::string& _string ) {
 		_json[_name] = _string.c_str();
 	}
-
+	/*
 	//================================================================================================================================
 	//================================================================================================================================
 	void ISerializable::SaveGameobjectPtr ( Json & _json, const char * _name, const GameobjectPtr& _ptr )
@@ -126,7 +126,7 @@ namespace fan {
 		_json[_name]["gameobject_id"] = *_ptr != nullptr ? _ptr->GetGameobject().GetUniqueID() : 0;
 		_json[_name]["component_id"]  = *_ptr != nullptr ? _ptr->GetType() : 0;
 	}
-
+	*/
 	//================================================================================================================================
 	//================================================================================================================================
 	// LOAD
@@ -269,7 +269,7 @@ namespace fan {
 		}
 		return false;
 	}
-
+	/*
 	//================================================================================================================================
 	//================================================================================================================================
 	bool ISerializable::LoadGameobjectPtr	( const Json & _json, const char * _name, GameobjectPtr&	_outPtr )
@@ -334,7 +334,7 @@ namespace fan {
 		}
 		return false;
 	}
-
+	*/
 	//================================================================================================================================
 	// returns true if a token exists
 	//================================================================================================================================

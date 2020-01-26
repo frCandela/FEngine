@@ -1,7 +1,5 @@
-#include "fanGlobalIncludes.h"
-#include "core/input/fanInputManager.h"
-
-#include "core/input/fanKeyboard.h"
+#include "core/input/fanInputManager.hpp"
+#include "core/input/fanKeyboard.hpp"
 
 namespace fan {
 	//================================================================================================================================
@@ -178,7 +176,7 @@ namespace fan {
 		return true;
 	}
 }
-
+/*
 namespace ImGui
 {
 	//================================================================================================================================
@@ -228,4 +226,4 @@ namespace ImGui
 		} ImGui::PopID();
 		return false;
 	}
-}
+}*/

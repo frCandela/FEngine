@@ -1,5 +1,4 @@
-#include "fanGlobalIncludes.h"
-#include "core/input/fanAxis.h"
+#include "core/input/fanAxis.hpp"
 
 namespace fan
 {
@@ -167,7 +166,7 @@ namespace fan
 		else { return Joystick::Get().GetButtonName( m_buttonNegative ); }
 	}
 }
-
+/*
 namespace ImGui
 {
 	//================================================================================================================================
@@ -370,4 +369,4 @@ namespace ImGui
 		return false;
 
 	}
-}
+}*/

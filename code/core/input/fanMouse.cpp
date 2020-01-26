@@ -1,8 +1,6 @@
-#include "fanGlobalIncludes.h"
-
-#include "core/input/fanMouse.h"
-#include "core/input/fanInput.h"
-#include "editor/windows/fanGameWindow.h"
+#include "core/input/fanMouse.hpp"
+#include "core/input/fanInput.hpp"
+//#include "editor/windows/fanGameWindow.hpp"
 
 namespace fan
 {
@@ -30,7 +28,7 @@ namespace fan
 	//================================================================================================================================
 	bool Mouse::GetButtonDown( const int  _GLFW_MOUSE_BUTTON, const bool _overrideUI )
 	{
-		if ( _overrideUI || m_gameWindow->IsHovered() )
+		if ( _overrideUI /*|| m_gameWindow->IsHovered()*/ )
 		{
 			return glfwGetMouseButton( Input::Get().Window(), _GLFW_MOUSE_BUTTON ) == GLFW_PRESS;
 		}
@@ -44,7 +42,7 @@ namespace fan
 	//================================================================================================================================
 	bool Mouse::GetButtonPressed( const int _GLFW_MOUSE_BUTTON, const bool _overrideUI )
 	{
-		if ( _overrideUI || m_gameWindow->IsHovered() )
+		if ( _overrideUI /*|| m_gameWindow->IsHovered()*/ )
 		{
 			return Get().m_buttonsPressed[_GLFW_MOUSE_BUTTON] == Input::Get().FrameCount();
 		}
@@ -58,7 +56,7 @@ namespace fan
 	//================================================================================================================================
 	bool Mouse::GetButtonReleased( const int _GLFW_MOUSE_BUTTON, const bool _overrideUI )
 	{
-		if ( _overrideUI || m_gameWindow->IsHovered() )
+		if ( _overrideUI /*|| m_gameWindow->IsHovered()*/ )
 		{
 			return Get().m_buttonsReleased[_GLFW_MOUSE_BUTTON] == Input::Get().FrameCount();
 		}
@@ -73,8 +71,8 @@ namespace fan
 	//================================================================================================================================
 	btVector2 Mouse::GetScreenSpacePosition( const bool _localToGameWindow  )
 	{
-		const btVector2 offset = _localToGameWindow ? m_gameWindow->GetPosition() : btVector2::Zero();
-		const btVector2 size =   _localToGameWindow ? m_gameWindow->GetSize() : Input::Get().WindowSizeF();
+		const btVector2 offset = /*_localToGameWindow ? m_gameWindow->GetPosition() :*/ btVector2::Zero();
+		const btVector2 size =   /*_localToGameWindow ? m_gameWindow->GetSize() :*/ Input::Get().WindowSizeF();
 
 		btVector2 ratio = 2.f * (m_position - offset )/ size - btVector2( 1.f, 1.f );
 		ratio.setX( std::clamp( ratio.x(), -1.f, 1.f ) );
@@ -86,7 +84,7 @@ namespace fan
 	//================================================================================================================================
 	btVector2	Mouse::GetPosition( const bool _localToGameWindow  )
 	{
-		const btVector2 offset = _localToGameWindow ? m_gameWindow->GetPosition() : btVector2::Zero();
+		const btVector2 offset = /*_localToGameWindow ? m_gameWindow->GetPosition() :*/ btVector2::Zero();
 		return m_position - offset;
 	}
 
