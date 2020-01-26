@@ -1,9 +1,9 @@
 #include "fanGlobalIncludes.h"
 #include "scene/components/ui/fanUIMeshRenderer.h"
 
-#include "renderer/fanUIMesh.h"
+#include "render/fanUIMesh.h"
 #include "scene/components/fanTransform.h"
-#include "renderer/core/fanTexture.h"
+#include "render/core/fanTexture.h"
 #include "core/input/fanInput.h"
 
 // Editor

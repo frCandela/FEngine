@@ -1,9 +1,9 @@
 #include "fanGlobalIncludes.h"
 #include "ecs/singleton_components/fanECSSunLightMesh.h"
 
-#include "renderer/fanMesh.h"
+#include "render/fanMesh.h"
 #include "editor/fanEditorDebug.h"
-#include "renderer/fanRendererDebug.h"
+#include "render/fanRendererDebug.h"
 
 namespace fan
 {

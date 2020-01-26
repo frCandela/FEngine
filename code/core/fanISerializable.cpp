@@ -6,8 +6,8 @@
 // #include "scene/fanGameobject.hpp"
 // #include "scene/fanComponentPtr.hpp"
 // #include "scene/fanPrefab.hpp"
-// #include "renderer/core/fanTexture.hpp"
-// #include "renderer/fanMesh.hpp"
+// #include "render/core/fanTexture.hpp"
+// #include "render/fanMesh.hpp"
 
 namespace fan {
 

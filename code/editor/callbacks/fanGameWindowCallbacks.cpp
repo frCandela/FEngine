@@ -4,7 +4,7 @@
 #include "scene/fanScene.h"
 #include "core/time/fanTime.h"
 #include "editor/windows/fanGameWindow.h"
-#include "renderer/fanRenderer.h"
+#include "render/fanRenderer.h"
 
 namespace fan
 {

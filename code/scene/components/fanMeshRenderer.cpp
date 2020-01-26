@@ -1,7 +1,7 @@
 #include "fanGlobalIncludes.h"
 #include "scene/components/fanMeshRenderer.h"
 
-#include "renderer/fanMesh.h"
+#include "render/fanMesh.h"
 #include "scene/components/fanTransform.h"
 #include "scene/fanRessourcePtr.h"
 #include "core/math/shapes/fanAABB.h"

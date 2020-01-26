@@ -9,7 +9,7 @@
 #include "core/input/fanInput.h"
 #include "core/input/fanInputManager.h"
 #include "core/input/fanMouse.h"
-#include "renderer/fanRendererDebug.h"
+#include "render/fanRendererDebug.h"
 #include "editor/fanEditorDebug.h"
 
 namespace fan

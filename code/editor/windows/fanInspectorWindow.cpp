@@ -8,12 +8,12 @@
 #include "scene/components/fanMaterial.h"
 #include "editor/components/fanFPSCamera.h"
 #include "editor/fanDragnDrop.h"
-#include "renderer/fanMesh.h"
+#include "render/fanMesh.h"
 #include "core/fanSignal.h"
 #include "core/time/fanProfiler.h"
-#include "renderer/core/fanTexture.h"
-#include "renderer/core/fanTexture.h"
-#include "renderer/fanRessourceManager.h"
+#include "render/core/fanTexture.h"
+#include "render/core/fanTexture.h"
+#include "render/fanRessourceManager.h"
 
 namespace fan
 {

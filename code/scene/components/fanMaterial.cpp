@@ -2,7 +2,7 @@
 #include "scene/components/fanMaterial.h"
 
 #include "scene/components/fanMeshRenderer.h"
-#include "renderer/core/fanTexture.h"
+#include "render/core/fanTexture.h"
 
 // Editor
 #include "editor/fanModals.h"

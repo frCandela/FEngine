@@ -8,7 +8,7 @@
 #include "scene/components/fanRigidbody.h"
 #include "scene/components/fanSphereShape.h"
 #include "game/fanPlanet.h"
-#include "renderer/fanRendererDebug.h"
+#include "render/fanRendererDebug.h"
 #include "editor/fanEditorDebug.h"
 
 namespace fan {

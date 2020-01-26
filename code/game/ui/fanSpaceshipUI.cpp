@@ -8,7 +8,7 @@
 #include "game/fanWithEnergy.h"
 #include "game/fanSolarPanel.h"
 #include "game/fanHealth.h"
-#include "renderer/fanRendererDebug.h"
+#include "render/fanRendererDebug.h"
 #include "editor/fanEditorDebug.h"
 
 namespace fan

@@ -14,7 +14,7 @@
 #include "scene/components/fanMeshRenderer.h"
 #include "scene/components/fanCamera.h"
 #include "scene/components/fanTransform.h"
-#include "renderer/fanMesh.h"
+#include "render/fanMesh.h"
 #include "editor/fanEditorGizmos.h"
 #include "editor/fanEditorDebug.h"
 

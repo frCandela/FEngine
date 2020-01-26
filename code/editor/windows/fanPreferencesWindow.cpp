@@ -2,8 +2,8 @@
 
 #include "editor/windows/fanPreferencesWindow.h"
 #include "editor/fanModals.h"
-#include "renderer/fanRenderer.h"
-#include "renderer/pipelines/fanPostprocessPipeline.h"
+#include "render/fanRenderer.h"
+#include "render/pipelines/fanPostprocessPipeline.h"
 #include "core/input/fanInputManager.h"
 #include "core/input/fanInput.h"
 #include "core/input/fanKeyboard.h"

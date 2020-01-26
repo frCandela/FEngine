@@ -19,3 +19,6 @@ FEngine/deps/imgui/_old
 /.project
 out
 build
+fengine_editor.ilk
+fengine_editor.pdb
+fengine_editor.exe

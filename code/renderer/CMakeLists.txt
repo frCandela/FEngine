@@ -1,3 +1,0 @@
-﻿SET( SRCS_FAN_RENDERER
-	
-)

@@ -1,11 +1,11 @@
 #include "fanGlobalIncludes.h"
 #include "ecs/fanECSSystems.h"
 
-#include "renderer/fanRendererDebug.h"
+#include "render/fanRendererDebug.h"
 #include "core/time/fanTime.h"
 #include "core/time/fanProfiler.h"
 #include "core/math/shapes/fanConvexHull.h"
-#include "renderer/fanMesh.h"
+#include "render/fanMesh.h"
 #include "scene/fanScene.h"
 #include "scene/fanGameobject.h"
 #include "scene/components/fanTransform.h"

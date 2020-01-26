@@ -5,8 +5,8 @@
 #include "editor/fanImguiIcons.h"
 #include "editor/fanModals.h"
 #include "scene/fanGameobject.h"
-#include "renderer/core/fanTexture.h"
-#include "renderer/fanMesh.h"
+#include "render/core/fanTexture.h"
+#include "render/fanMesh.h"
 #include "scene/fanPrefab.h"
 
 namespace ImGui

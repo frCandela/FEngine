@@ -1,7 +1,7 @@
 #include "fanGlobalIncludes.h"
 #include "ecs/singleton_components/fanEcsSingletonComponent.h"
 
-#include "renderer/fanMesh.h"
+#include "render/fanMesh.h"
 
 namespace fan
 {

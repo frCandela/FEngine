@@ -4,7 +4,7 @@
 #include "scene/components/fanTransform.h"
 #include "game/fanSolarEruption.h"
 #include "game/fanWithEnergy.h"
-#include "renderer/fanMesh.h"
+#include "render/fanMesh.h"
 
 namespace fan
 {

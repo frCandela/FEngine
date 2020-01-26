@@ -5,7 +5,7 @@
 #include "core/math/fanBasicModels.h"
 #include "core/input/fanMouse.h"
 #include "editor/fanEditorDebug.h"
-#include "renderer/fanRendererDebug.h"
+#include "render/fanRendererDebug.h"
 #include "scene/fanScene.h"
 #include "scene/fanGameobject.h"
 #include "scene/components/fanTransform.h"
