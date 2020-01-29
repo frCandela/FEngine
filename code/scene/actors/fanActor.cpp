@@ -1,7 +1,5 @@
-#include "fanGlobalIncludes.h"
-#include "scene/actors/fanActor.h"
-
-#include "core/fanSignal.h"
+#include "scene/actors/fanActor.hpp"
+#include "core/fanSignal.hpp"
 
 namespace fan
 {

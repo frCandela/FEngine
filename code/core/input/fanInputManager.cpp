@@ -118,11 +118,11 @@ namespace fan {
 				std::string name;
 				KeyboardEvent keyEvent;
 
-				LoadString( jEvent_i, "name", name );
-				LoadInt( jEvent_i, "key", keyEvent.key );
-				LoadInt( jEvent_i, "mod0", keyEvent.mod0 );
-				LoadInt( jEvent_i, "mod1", keyEvent.mod1 );
-				LoadInt( jEvent_i, "mod2", keyEvent.mod2 );
+				Serializable::LoadString( jEvent_i, "name", name );
+				Serializable::LoadInt( jEvent_i, "key", keyEvent.key );
+				Serializable::LoadInt( jEvent_i, "mod0", keyEvent.mod0 );
+				Serializable::LoadInt( jEvent_i, "mod1", keyEvent.mod1 );
+				Serializable::LoadInt( jEvent_i, "mod2", keyEvent.mod2 );
 
 				m_keyboardEvents[name] = keyEvent;
 
@@ -155,11 +155,11 @@ namespace fan {
 			Json& jEvents = _json["events"];
 			for ( auto keyEvent : m_keyboardEvents ) {
 				Json& jEvent_i = jEvents[index];
-				SaveString( jEvent_i, "name", keyEvent.first );
-				SaveInt( jEvent_i, "key", keyEvent.second.key );
-				SaveInt( jEvent_i, "mod0", keyEvent.second.mod0 );
-				SaveInt( jEvent_i, "mod1", keyEvent.second.mod1 );
-				SaveInt( jEvent_i, "mod2", keyEvent.second.mod2 );
+				Serializable::SaveString( jEvent_i, "name", keyEvent.first );
+				Serializable::SaveInt( jEvent_i, "key", keyEvent.second.key );
+				Serializable::SaveInt( jEvent_i, "mod0", keyEvent.second.mod0 );
+				Serializable::SaveInt( jEvent_i, "mod1", keyEvent.second.mod1 );
+				Serializable::SaveInt( jEvent_i, "mod2", keyEvent.second.mod2 );
 				++index;
 			}
 		}

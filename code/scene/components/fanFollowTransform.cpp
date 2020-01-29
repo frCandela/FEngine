@@ -1,7 +1,5 @@
-#include "fanGlobalIncludes.h"
-#include "scene/components/fanFollowTransform.h"
-
-#include "scene/components/fanTransform.h"
+#include "scene/components/fanFollowTransform.hpp"
+#include "scene/components/fanTransform.hpp"
 
 namespace fan
 {
@@ -67,7 +65,7 @@ namespace fan
 	bool FollowTransform::Save( Json & _json ) const
 	{
 		Actor::Save( _json );
-		SaveComponentPtr(_json, "followed_transform", m_followedTransform );
+		Serializable::SaveComponentPtr(_json, "followed_transform", m_followedTransform );
 		return true;
 	}
 	 
@@ -76,7 +74,7 @@ namespace fan
 	bool FollowTransform::Load( const Json & _json )
 	{
 		Actor::Load( _json );
-		LoadComponentPtr(_json, "followed_transform", m_followedTransform );
+		Serializable::LoadComponentPtr(_json, "followed_transform", m_followedTransform );
 		return true;
 	}
 }

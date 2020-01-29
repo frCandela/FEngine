@@ -1,5 +1,8 @@
 #pragma once
 
+
+#include "scene/fanScenePrecompiled.hpp"
+
 #include "scene/actors/fanActor.h"
 #include "network/fanUDPSocket.h"
 

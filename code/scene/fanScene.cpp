@@ -1,21 +1,19 @@
-#include "fanGlobalIncludes.h"
-#include "scene/fanScene.h"
-
-#include "scene/fanGameobject.h"
-#include "scene/components/fanComponent.h"
-#include "scene/components/fanTransform.h"
-#include "scene/components/fanCamera.h"
-#include "scene/components/fanMeshRenderer.h"
-#include "scene/components/fanPointLight.h"
-#include "scene/components/fanDirectionalLight.h"
-#include "scene/actors/fanActor.h"
-#include "scene/fanRessourcePtr.h"
-#include "core/fanSignal.h"
-#include "core/time/fanScopedTimer.h"
-#include "core/time/fanProfiler.h"
-#include "scene/fanComponentPtr.h"
-#include "scene/fanSceneInstantiate.h"
-#include "physics/fanPhysicsManager.h"
+#include "scene/fanScene.hpp"
+#include "scene/fanGameobject.hpp"
+#include "scene/components/fanComponent.hpp"
+#include "scene/components/fanTransform.hpp"
+#include "scene/components/fanCamera.hpp"
+#include "scene/components/fanMeshRenderer.hpp"
+#include "scene/components/fanPointLight.hpp"
+#include "scene/components/fanDirectionalLight.hpp"
+#include "scene/actors/fanActor.hpp"
+#include "scene/fanRessourcePtr.hpp"
+#include "scene/fanComponentPtr.hpp"
+#include "scene/fanSceneInstantiate.hpp"
+#include "scene/fanPhysicsManager.hpp"
+#include "core/fanSignal.hpp"
+#include "core/time/fanScopedTimer.hpp"
+#include "core/time/fanProfiler.hpp"
 
 namespace fan
 {
@@ -513,8 +511,8 @@ namespace fan
 		// Parameters
 		Json & jParameters = _json["parameters"]; 
 		{
-			SaveString( jParameters, "name", m_name );
-			SaveString( jParameters, "path", m_path );	
+			Serializable::SaveString( jParameters, "name", m_name );
+			Serializable::SaveString( jParameters, "path", m_path );
 		}
 
 		// Gameobjects
@@ -533,8 +531,8 @@ namespace fan
 
 		// Parameters
 		const Json & jParameters = _json["parameters"]; {
-			LoadString( jParameters , "name" , m_name );
-			LoadString( jParameters, "path", m_path );
+				Serializable::LoadString( jParameters , "name" , m_name );
+				Serializable::LoadString( jParameters, "path", m_path );
 		}
 
 		// Gameobjects
@@ -664,9 +662,9 @@ namespace fan
 		}
 
 		// Check num lights
-		if ( m_directionalLights.size() >= GlobalValues::s_maximumNumDirectionalLight )
+		if ( m_directionalLights.size() >= RenderGlobal::s_maximumNumDirectionalLight )
 		{
-			Debug::Get() << Debug::Severity::warning << "Too much lights in the scene, maximum is " << GlobalValues::s_maximumNumDirectionalLight << Debug::Endl();
+			Debug::Get() << Debug::Severity::warning << "Too much lights in the scene, maximum is " << RenderGlobal::s_maximumNumDirectionalLight << Debug::Endl();
 		}
 		else
 		{
@@ -713,9 +711,9 @@ namespace fan
 		}
 
 		// Check num lights
-		if ( m_pointLights.size() >= GlobalValues::s_maximumNumPointLights )
+		if ( m_pointLights.size() >= RenderGlobal::s_maximumNumPointLights )
 		{
-			Debug::Get() << Debug::Severity::warning << "Too much lights in the scene, maximum is " << GlobalValues::s_maximumNumPointLights << Debug::Endl();
+			Debug::Get() << Debug::Severity::warning << "Too much lights in the scene, maximum is " << RenderGlobal::s_maximumNumPointLights << Debug::Endl();
 		}
 		else
 		{

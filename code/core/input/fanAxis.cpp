@@ -36,28 +36,27 @@ namespace fan
 	bool Axis::Load( const Json & _json )
 	{
 		int type = -1;
-		if ( LoadInt( _json, "type", type ) && ( type == Type::JOYSTICK_AXIS || type == Type::KEYBOARD || type == Type::JOYSTICK_BUTTONS ) )
+		if ( 	Serializable::LoadInt( _json, "type", type ) && ( type == Type::JOYSTICK_AXIS || type == Type::KEYBOARD || type == Type::JOYSTICK_BUTTONS ) )
 		{
 			m_type = Type( type );
 
-			LoadString( _json, "name", m_name );
-			LoadBool(_json, "invert", m_invert );
-
+			Serializable::LoadString( _json, "name", m_name );
+			Serializable::LoadBool(_json, "invert", m_invert );
 
 			switch ( m_type )
 			{
 			case fan::Axis::KEYBOARD:
-				LoadInt( _json, "key_negative", m_keyNegative );
-				LoadInt( _json, "key_positive", m_keyPositive );
+				Serializable::LoadInt( _json, "key_negative", m_keyNegative );
+				Serializable::LoadInt( _json, "key_positive", m_keyPositive );
 				break;
 			case fan::Axis::JOYSTICK_AXIS:
-				LoadInt( _json, "joystick_id", m_joystickID );
-				LoadInt( _json, "joystick_axis", m_joystickAxis );
+				Serializable::LoadInt( _json, "joystick_id", m_joystickID );
+				Serializable::LoadInt( _json, "joystick_axis", m_joystickAxis );
 				break;
 			case fan::Axis::JOYSTICK_BUTTONS:
-				LoadInt( _json, "joystick_id", m_joystickID );
-				LoadInt( _json, "joystick_negative", m_buttonNegative );
-				LoadInt( _json, "joystick_positive", m_buttonPositive );
+				Serializable::LoadInt( _json, "joystick_id", m_joystickID );
+				Serializable::LoadInt( _json, "joystick_negative", m_buttonNegative );
+				Serializable::LoadInt( _json, "joystick_positive", m_buttonPositive );
 				break;
 			default:
 				Debug::Warning("Axis load: invalid axis type");
@@ -73,25 +72,24 @@ namespace fan
 	//================================================================================================================================
 	bool Axis::Save( Json & _json ) const
 	{
-		SaveInt( _json, "type", m_type );
-		SaveString( _json, "name", m_name );
-		SaveBool(_json, "invert", m_invert );
-
+		Serializable::SaveInt( _json, "type", m_type );
+		Serializable::SaveString( _json, "name", m_name );
+		Serializable::SaveBool(_json, "invert", m_invert );
 
 		switch ( m_type )
 		{
 		case fan::Axis::KEYBOARD:
-			SaveInt( _json, "key_negative", m_keyNegative );
-			SaveInt( _json, "key_positive", m_keyPositive );
+			Serializable::SaveInt( _json, "key_negative", m_keyNegative );
+			Serializable::SaveInt( _json, "key_positive", m_keyPositive );
 			break;
 		case fan::Axis::JOYSTICK_AXIS:
-			SaveInt( _json, "joystick_id", m_joystickID );
-			SaveInt( _json, "joystick_axis", m_joystickAxis );
+			Serializable::SaveInt( _json, "joystick_id", m_joystickID );
+			Serializable::SaveInt( _json, "joystick_axis", m_joystickAxis );
 			break;
 		case fan::Axis::JOYSTICK_BUTTONS:
-			SaveInt( _json, "joystick_id", m_joystickID );
-			SaveInt( _json, "joystick_negative", m_buttonNegative );
-			SaveInt( _json, "joystick_positive", m_buttonPositive );
+			Serializable::SaveInt( _json, "joystick_id", m_joystickID );
+			Serializable::SaveInt( _json, "joystick_negative", m_buttonNegative );
+			Serializable::SaveInt( _json, "joystick_positive", m_buttonPositive );
 			break;
 		default:
 			Debug::Warning("Axis save: invalid axis type");

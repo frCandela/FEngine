@@ -1,10 +1,8 @@
-#include "fanGlobalIncludes.h"
-
-#include "scene/components/fanTransform.h"
-#include "scene/components/fanComponent.h"
-#include "scene/components/fanRigidbody.h"
-#include "core/fanSignal.h"
-#include "ecs/fanECSManager.h"
+#include "scene/components/fanTransform.hpp"
+#include "scene/components/fanComponent.hpp"
+#include "scene/components/fanRigidbody.hpp"
+#include "scene/ecs/fanECSManager.hpp"
+#include "core/fanSignal.hpp"
 
 namespace fan
 {
@@ -227,9 +225,9 @@ namespace fan
 		btVector3 tmpVec;
 		btQuaternion tmpQuat;
 
-		LoadVec3( _json, "position", tmpVec );
-		LoadQuat( _json, "rotation", tmpQuat );
-		LoadVec3( _json, "scale", m_scale->scale );
+		Serializable::LoadVec3( _json, "position", tmpVec );
+		Serializable::LoadQuat( _json, "rotation", tmpQuat );
+		Serializable::LoadVec3( _json, "scale", m_scale->scale );
 
 		m_transform->transform.setOrigin( tmpVec );
 		m_transform->transform.setRotation( tmpQuat );
@@ -241,10 +239,9 @@ namespace fan
 	//================================================================================================================================
 	bool Transform::Save( Json & _json ) const {
 
-		SaveVec3( _json, "position", m_transform->transform.getOrigin() );
-		SaveQuat( _json, "rotation", m_transform->transform.getRotation() );
-		SaveVec3( _json, "scale", m_scale->scale );
-
+		Serializable::SaveVec3( _json, "position", m_transform->transform.getOrigin() );
+		Serializable::SaveQuat( _json, "rotation", m_transform->transform.getRotation() );
+		Serializable::SaveVec3( _json, "scale", m_scale->scale );
 
 		Component::Save( _json );
 				

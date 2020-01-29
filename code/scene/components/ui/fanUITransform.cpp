@@ -1,8 +1,6 @@
-#include "fanGlobalIncludes.h"
-#include "scene/components/ui/fanUITransform.h"
-
-#include "scene/components/fanTransform.h"
-#include "core/input/fanInput.h"
+#include "scene/components/ui/fanUITransform.hpp"
+#include "scene/components/fanTransform.hpp"
+#include "core/input/fanInput.hpp"
 
 namespace fan
 {

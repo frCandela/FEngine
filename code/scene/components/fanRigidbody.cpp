@@ -1,8 +1,6 @@
-#include "fanGlobalIncludes.h"
-#include "scene/components/fanRigidbody.h"
-
-#include "physics/fanPhysicsManager.h"
-#include "scene/components/fanColliderShape.h"
+#include "scene/components/fanRigidbody.hpp"
+#include "scene/components/fanColliderShape.hpp"
+#include "scene/fanPhysicsManager.hpp"
 
 namespace fan {
 	REGISTER_TYPE_INFO( Rigidbody, TypeInfo::Flags::EDITOR_COMPONENT, "physics/" )
@@ -249,9 +247,9 @@ namespace fan {
 		bool tmpEnableDesactivation;
 		bool tmpKinematic;
 
-		LoadFloat(_json,"mass", tmpMass );
-		LoadBool( _json, "enable_desactivation", tmpEnableDesactivation );
-		LoadBool( _json, "is_kinematic", tmpKinematic );
+		Serializable::LoadFloat(_json,"mass", tmpMass );
+		Serializable::LoadBool( _json, "enable_desactivation", tmpEnableDesactivation );
+		Serializable::LoadBool( _json, "is_kinematic", tmpKinematic );
 
 		SetMass( tmpMass );
 		EnableDesactivation(tmpEnableDesactivation);
@@ -263,9 +261,9 @@ namespace fan {
 	//================================================================================================================================
 	//================================================================================================================================	
 	bool Rigidbody::Save( Json & _json ) const {
-		SaveFloat(_json, "mass", GetMass());
-		SaveBool( _json, "enable_desactivation", IsDesactivationEnabled() );
-		SaveBool( _json, "is_kinematic", IsKinematic() );
+		Serializable::SaveFloat(_json, "mass", GetMass());
+		Serializable::SaveBool( _json, "enable_desactivation", IsDesactivationEnabled() );
+		Serializable::SaveBool( _json, "is_kinematic", IsKinematic() );
 
 		Component::Save( _json );
 		return true;

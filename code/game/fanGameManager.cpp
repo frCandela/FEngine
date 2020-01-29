@@ -1,12 +1,12 @@
-#include "fanGlobalIncludes.h"
-#include "game/fanGameManager.h"
+#include "game/fanGameManager.hpp"
 
-#include "core/time/fanTime.h"
-#include "core/input/fanKeyboard.h"
-#include "scene/components/fanTransform.h"
-#include "scene/components/fanCamera.h"
-#include "editor/components/fanFPSCamera.h"
-#include "game/fanSpaceShip.h"	
+#include "scene/components/fanTransform.hpp"
+#include "scene/components/fanCamera.hpp"
+#include "game/fanSpaceShip.hpp"	
+#include "core/input/fanKeyboard.hpp"
+#include "core/time/fanTime.hpp"
+
+#include "editor/components/fanFPSCamera.hpp"
 
 
 namespace fan {

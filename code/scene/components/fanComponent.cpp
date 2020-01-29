@@ -1,7 +1,5 @@
-#include "fanGlobalIncludes.h"
-
-#include "scene/components/fanComponent.h"
-#include "core/input/fanInput.h"
+#include "scene/components/fanComponent.hpp"
+#include "core/input/fanInput.hpp"
 
 namespace fan
 {
@@ -24,8 +22,8 @@ namespace fan
 	//================================================================================================================================
 	//================================================================================================================================
 	bool Component::Save( Json & _json ) const {
-		SaveUInt( _json, "id", GetType() );
-		SaveString( _json, "type", GetName() );
+		Serializable::SaveUInt( _json, "id", GetType() );
+		Serializable::SaveString( _json, "type", GetName() );
 		return true;
 	}
 

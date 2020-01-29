@@ -1,13 +1,13 @@
-#include "fanGlobalIncludes.h"
-#include "scene/fanRessourcePtr.h"
+#include "scene/fanRessourcePtr.hpp"
+#include "scene/fanGameobject.hpp"
+#include "render/fanRenderGlobal.hpp"
+#include "render/core/fanTexture.hpp"
+#include "render/fanMesh.hpp"
+#include "scene/fanPrefab.hpp"
+#include "game/imgui/fanDragnDrop.hpp"
+#include "core/imgui/fanImguiIcons.hpp"
+#include "core/imgui/fanModals.hpp"
 
-#include "editor/fanDragnDrop.h"
-#include "editor/fanImguiIcons.h"
-#include "editor/fanModals.h"
-#include "scene/fanGameobject.h"
-#include "render/core/fanTexture.h"
-#include "render/fanMesh.h"
-#include "scene/fanPrefab.h"
 
 namespace ImGui
 {
@@ -61,11 +61,11 @@ namespace ImGui
 		bool returnValue = false;
 
 		fan::Texture * texture = **_ptr;
-		const std::string name = texture == nullptr ? "null" : std::fs::path( texture->GetPath() ).filename().string();
+		const std::string name = texture == nullptr ? "null" : std::filesystem::path( texture->GetPath() ).filename().string();
 
 		// Set button icon & modal
 		const std::string modalName = std::string( "Find texture (" ) + _label + ")";
-		static std::fs::path m_pathBuffer;
+		static std::filesystem::path m_pathBuffer;
 		bool openModal = false;
 		ImGui::PushID( _label );
 		{
@@ -122,7 +122,7 @@ namespace ImGui
 		}
 
 		// Modal set value
-		if ( ImGui::FanLoadFileModal( modalName.c_str(), fan::GlobalValues::s_imagesExtensions, m_pathBuffer ) )
+		if ( ImGui::FanLoadFileModal( modalName.c_str(), fan::RenderGlobal::s_imagesExtensions, m_pathBuffer ) )
 		{
 			_ptr->InitUnresolved( m_pathBuffer.string() );
 			returnValue = true;
@@ -141,11 +141,11 @@ namespace ImGui
 		bool returnValue = false;
 
 		fan::Mesh * mesh = **_ptr;
-		const std::string name = mesh == nullptr ? "null" : std::fs::path( mesh->GetPath() ).filename().string();
+		const std::string name = mesh == nullptr ? "null" : std::filesystem::path( mesh->GetPath() ).filename().string();
 
 		// Set button icon & modal
 		const std::string modalName = std::string( "Find mesh (" ) + _label + ")";
-		static std::fs::path m_pathBuffer;
+		static std::filesystem::path m_pathBuffer;
 		bool openModal = false;
 		ImGui::PushID( _label );
 		{
@@ -187,7 +187,7 @@ namespace ImGui
 			returnValue = true;
 		}
 
-		if ( ImGui::FanLoadFileModal( modalName.c_str(), fan::GlobalValues::s_meshExtensions, m_pathBuffer ) )
+		if ( ImGui::FanLoadFileModal( modalName.c_str(), fan::RenderGlobal::s_meshExtensions, m_pathBuffer ) )
 		{
 			_ptr->InitUnresolved( m_pathBuffer.string() );
 			returnValue = true;
@@ -206,11 +206,11 @@ namespace ImGui
 		bool returnValue = false;
 
 		fan::Prefab * prefab = **_ptr;
-		const std::string name = prefab == nullptr ? "null" : std::fs::path( prefab->GetPath() ).filename().string();
+		const std::string name = prefab == nullptr ? "null" : std::filesystem::path( prefab->GetPath() ).filename().string();
 
 		// Set button icon & modal
 		const std::string modalName = std::string( "Find prefab (" ) + _label + ")";
-		static std::fs::path m_pathBuffer;
+		static std::filesystem::path m_pathBuffer;
 		bool openModal = false;
 		ImGui::PushID( _label );
 		{
@@ -253,7 +253,7 @@ namespace ImGui
 			returnValue = true;
 		}
 
-		if ( ImGui::FanLoadFileModal( modalName.c_str(), fan::GlobalValues::s_prefabExtensions, m_pathBuffer ) )
+		if ( ImGui::FanLoadFileModal( modalName.c_str(), fan::RenderGlobal::s_prefabExtensions, m_pathBuffer ) )
 		{
 			_ptr->InitUnresolved( m_pathBuffer.string() );
 			returnValue = true;

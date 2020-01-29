@@ -1,26 +1,18 @@
 #include "fanISerializable.hpp"
 
 #include "core/math/fanVector2.hpp"
-// #include "scene/components/fanComponent.hpp"
-// #include "scene/fanRessourcePtr.hpp"
-// #include "scene/fanGameobject.hpp"
-// #include "scene/fanComponentPtr.hpp"
-// #include "scene/fanPrefab.hpp"
-// #include "render/core/fanTexture.hpp"
-// #include "render/fanMesh.hpp"
 
 namespace fan {
-
 	//================================================================================================================================
 	//================================================================================================================================
-	void ISerializable::SaveVec2 ( Json & _json, const char * _name, const btVector2&	_vec2 ) {
+	void Serializable::SaveVec2(Json& _json, const char* _name, const btVector2& _vec2) {
 		_json[_name]["x"] = _vec2[0];
 		_json[_name]["y"] = _vec2[1];
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void ISerializable::SaveVec3 ( Json & _json, const char * _name, const btVector3&	_vec3 ){
+	void Serializable::SaveVec3(Json& _json, const char* _name, const btVector3& _vec3) {
 		_json[_name]["x"] = _vec3[0];
 		_json[_name]["y"] = _vec3[1];
 		_json[_name]["z"] = _vec3[2];
@@ -28,7 +20,7 @@ namespace fan {
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void ISerializable::SaveVec4 ( Json & _json, const char * _name, const btVector4&	_vec4 )
+	void Serializable::SaveVec4(Json& _json, const char* _name, const btVector4& _vec4)
 	{
 		_json[_name]["x"] = _vec4[0];
 		_json[_name]["y"] = _vec4[1];
@@ -38,7 +30,7 @@ namespace fan {
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void ISerializable::SaveQuat ( Json & _json, const char * _name, const btQuaternion& _quat ) {
+	void Serializable::SaveQuat(Json& _json, const char* _name, const btQuaternion& _quat) {
 		_json[_name]["x"] = _quat[0];
 		_json[_name]["y"] = _quat[1];
 		_json[_name]["z"] = _quat[2];
@@ -47,7 +39,7 @@ namespace fan {
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void ISerializable::SaveColor( Json & _json, const char * _name, const Color&	_color ) {
+	void Serializable::SaveColor(Json& _json, const char* _name, const Color& _color) {
 		_json[_name]["r"] = _color[0];
 		_json[_name]["g"] = _color[1];
 		_json[_name]["b"] = _color[2];
@@ -56,86 +48,47 @@ namespace fan {
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void ISerializable::SaveFloat( Json & _json, const char * _name, const float&	_float ) {
+	void Serializable::SaveFloat(Json& _json, const char* _name, const float& _float) {
 		_json[_name] = _float;
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void ISerializable::SaveInt  ( Json & _json, const char * _name, const int&	_int ) {
+	void Serializable::SaveInt(Json& _json, const char* _name, const int& _int) {
 		_json[_name] = _int;
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void ISerializable::SaveUInt ( Json & _json, const char * _name, const unsigned& _int ) {
+	void Serializable::SaveUInt(Json& _json, const char* _name, const unsigned& _int) {
 		_json[_name] = _int;
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void ISerializable::SaveUInt64 ( Json & _json, const char * _name, const uint64_t& _uint64 )
+	void Serializable::SaveUInt64(Json& _json, const char* _name, const uint64_t& _uint64)
 	{
 		_json[_name] = _uint64;
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void ISerializable::SaveBool ( Json & _json, const char * _name, const bool& _bool ) {
+	void Serializable::SaveBool(Json& _json, const char* _name, const bool& _bool) {
 		_json[_name] = _bool;
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void ISerializable::SaveString ( Json & _json, const char * _name, const std::string& _string ) {
+	void Serializable::SaveString(Json& _json, const char* _name, const std::string& _string) {
 		_json[_name] = _string.c_str();
 	}
-	/*
-	//================================================================================================================================
-	//================================================================================================================================
-	void ISerializable::SaveGameobjectPtr ( Json & _json, const char * _name, const GameobjectPtr& _ptr )
-	{
-		_json[_name] = *_ptr != nullptr ? _ptr->GetUniqueID() : 0;
-	}
 
-	//================================================================================================================================
-	//================================================================================================================================
-	void ISerializable::SaveTexturePtr ( Json & _json, const char * _name, const TexturePtr& _ptr )
-	{
-		_json[_name] = *_ptr != nullptr ? _ptr->GetPath() : "";
-	}
-
-	//================================================================================================================================
-	//================================================================================================================================
-	void ISerializable::SaveMeshPtr ( Json & _json, const char * _name, const MeshPtr& _ptr )
-	{
-		_json[_name] = *_ptr != nullptr ? _ptr->GetPath() : "";
-	}
-
-	//================================================================================================================================
-	//================================================================================================================================
-	void  ISerializable::SavePrefabPtr ( Json & _json, const char * _name, const PrefabPtr&	  _ptr )
-	{
-		_json[_name] = *_ptr != nullptr ? _ptr->GetPath() : "";
-	}
-
-	//================================================================================================================================
-	//================================================================================================================================
-	void ISerializable::SaveComponentPtr	( Json & _json, const char * _name, const ComponentIDPtr& _ptr )
-	{
-		_json[_name]["gameobject_id"] = *_ptr != nullptr ? _ptr->GetGameobject().GetUniqueID() : 0;
-		_json[_name]["component_id"]  = *_ptr != nullptr ? _ptr->GetType() : 0;
-	}
-	*/
 	//================================================================================================================================
 	//================================================================================================================================
 	// LOAD
 	//================================================================================================================================
 	//================================================================================================================================
-
-	//================================================================================================================================
-	//================================================================================================================================
-	bool ISerializable::LoadVec2	( const Json & _json, const char * _name, btVector2&		_outVec2 ) {
+	bool Serializable::LoadVec2	( const Json & _json, const char * _name, btVector2&		_outVec2 ) {
 		const Json * token = FindToken(_json, _name );
 		if ( token != nullptr ) {
 			_outVec2[0] = ( *token )["x"];
@@ -147,7 +100,7 @@ namespace fan {
 	
 	//================================================================================================================================
 	//================================================================================================================================
-	bool ISerializable::LoadVec3	( const Json & _json, const char * _name, btVector3&		_outVec3 )	 {
+	bool Serializable::LoadVec3	( const Json & _json, const char * _name, btVector3&		_outVec3 )	 {
 		const Json * token = FindToken( _json, _name );
 		if ( token != nullptr ) {
 			_outVec3[0] = ( *token )["x"];
@@ -160,7 +113,7 @@ namespace fan {
 
 	//================================================================================================================================
 	//================================================================================================================================
-	bool ISerializable::LoadVec4	( const Json & _json, const char * _name, btVector4&		_outVec4 )
+	bool Serializable::LoadVec4	( const Json & _json, const char * _name, btVector4&		_outVec4 )
 	{
 		const Json * token = FindToken( _json, _name );
 		if ( token != nullptr )
@@ -176,7 +129,7 @@ namespace fan {
 	
 	//================================================================================================================================
 	//================================================================================================================================
-	bool ISerializable::LoadQuat	( const Json & _json, const char * _name, btQuaternion&	_outQuat )	 {
+	bool Serializable::LoadQuat	( const Json & _json, const char * _name, btQuaternion&	_outQuat )	 {
 		const Json * token = FindToken( _json, _name );
 		if ( token != nullptr ) {
 			_outQuat[0] = ( *token )["x"];
@@ -190,7 +143,7 @@ namespace fan {
 	
 	//================================================================================================================================
 	//================================================================================================================================
-	bool ISerializable::LoadColor	( const Json & _json, const char * _name, Color&			_outColor ) {
+	bool Serializable::LoadColor	( const Json & _json, const char * _name, Color&			_outColor ) {
 		const Json * token = FindToken( _json, _name );
 		if ( token != nullptr ) {
 			_outColor[0] = ( *token )["r"];
@@ -204,7 +157,7 @@ namespace fan {
 	
 	//================================================================================================================================
 	//================================================================================================================================
-	bool ISerializable::LoadFloat	( const Json & _json, const char * _name, float&			_outFloat ) {
+	bool Serializable::LoadFloat	( const Json & _json, const char * _name, float&			_outFloat ) {
 		const Json * token = FindToken( _json, _name );
 		if ( token != nullptr ) {
 			_outFloat = ( *token );
@@ -215,7 +168,7 @@ namespace fan {
 	
 	//================================================================================================================================
 	//================================================================================================================================
-	bool ISerializable::LoadInt		( const Json & _json, const char * _name, int&			_outInt )	 {
+	bool Serializable::LoadInt		( const Json & _json, const char * _name, int&			_outInt )	 {
 		const Json * token = FindToken( _json, _name );
 		if ( token != nullptr ) {
 			_outInt = ( *token );
@@ -226,7 +179,7 @@ namespace fan {
 	
 	//================================================================================================================================
 	//================================================================================================================================
-	bool ISerializable::LoadUInt	( const Json & _json, const char * _name, unsigned&		_outUInt ) {
+	bool Serializable::LoadUInt	( const Json & _json, const char * _name, unsigned&		_outUInt ) {
 		const Json * token = FindToken( _json, _name );
 		if ( token != nullptr ) {
 			_outUInt = ( *token );
@@ -237,7 +190,7 @@ namespace fan {
 
 	//================================================================================================================================
 	//================================================================================================================================
-	bool ISerializable::LoadUInt64	( const Json & _json, const char * _name, uint64_t&		_outUInt64 )
+	bool Serializable::LoadUInt64	( const Json & _json, const char * _name, uint64_t&		_outUInt64 )
 	{
 		const Json * token = FindToken( _json, _name );
 		if ( token != nullptr )
@@ -250,7 +203,7 @@ namespace fan {
 	
 	//================================================================================================================================
 	//================================================================================================================================
-	bool ISerializable::LoadBool	( const Json & _json, const char * _name, bool&			_outBool )	 {
+	bool Serializable::LoadBool	( const Json & _json, const char * _name, bool&			_outBool )	 {
 		const Json * token = FindToken( _json, _name );
 		if ( token != nullptr ) {
 			_outBool = ( *token );
@@ -261,7 +214,7 @@ namespace fan {
 	
 	//================================================================================================================================
 	//================================================================================================================================
-	bool ISerializable::LoadString	( const Json & _json, const char * _name, std::string&	_outString ){
+	bool Serializable::LoadString	( const Json & _json, const char * _name, std::string&	_outString ){
 		const Json * token = FindToken( _json, _name );
 		if ( token != nullptr ) {
 			_outString = ( *token );
@@ -269,76 +222,11 @@ namespace fan {
 		}
 		return false;
 	}
-	/*
-	//================================================================================================================================
-	//================================================================================================================================
-	bool ISerializable::LoadGameobjectPtr	( const Json & _json, const char * _name, GameobjectPtr&	_outPtr )
-	{
-		const Json * token = FindToken( _json, _name );
-		if ( token != nullptr )
-		{
-			_outPtr.InitUnresolved(*token );
-			return true;
-		}
-		return false;
-	}
 
-	//================================================================================================================================
-	//================================================================================================================================
-	bool ISerializable::LoadTexturePtr	( const Json & _json, const char * _name, TexturePtr&	_outPtr )
-	{
-		const Json * token = FindToken( _json, _name );
-		if ( token != nullptr )
-		{
-			_outPtr.InitUnresolved( *token );
-			return true;
-		}
-		return false;
-	}
-
-	//================================================================================================================================
-	//================================================================================================================================
-	bool ISerializable::LoadMeshPtr( const Json & _json, const char * _name, MeshPtr&	_outPtr )
-	{
-		const Json * token = FindToken( _json, _name );
-		if ( token != nullptr )
-		{
-			_outPtr.InitUnresolved( *token );
-			return true;
-		}
-		return false;
-	}
-
-	//================================================================================================================================
-	//================================================================================================================================
-	bool ISerializable::LoadPrefabPtr( const Json & _json, const char * _name, PrefabPtr&	_outPtr )
-	{
-		const Json * token = FindToken( _json, _name );
-		if ( token != nullptr )
-		{
-			_outPtr.InitUnresolved( *token );
-			return true;
-		}
-		return false;
-	}
-
-	//================================================================================================================================
-	//================================================================================================================================
-	bool ISerializable::LoadComponentPtr	( const Json & _json, const char * _name, ComponentIDPtr&		_outPtr  )
-	{
-		const Json * token = FindToken( _json, _name );
-		if ( token != nullptr )
-		{
-			_outPtr.InitUnresolved( IDPtrData(  ( *token )["gameobject_id"],( *token )["component_id"] ) );
-			return true;
-		}
-		return false;
-	}
-	*/
 	//================================================================================================================================
 	// returns true if a token exists
 	//================================================================================================================================
-	bool ISerializable::ContainsToken( const Json & _json, const char * _name )
+	bool Serializable::ContainsToken( const Json & _json, const char * _name )
 	{
 		return _json.find( _name ) != _json.end();
 	}
@@ -346,7 +234,7 @@ namespace fan {
 	//================================================================================================================================
 	// returns the json token associated with a name or nullptr if it doesn't exists
 	//================================================================================================================================
-	const Json * ISerializable::FindToken	( const Json & _json, const char * _name ) {
+	const Json * Serializable::FindToken	( const Json & _json, const char * _name ) {
 		auto it = _json.find( _name );
 		if ( it != _json.end() ) {
 			return &(*it);

@@ -365,8 +365,8 @@ namespace fan
 			const int count = m_editorGrid.linesCount;
 
 			for (int coord = -m_editorGrid.linesCount; coord <= m_editorGrid.linesCount; coord++) {
-				EditorDebug::Get().Renderer().DebugLine( m_editorGrid.offset + btVector3(-count * size, 0.f, coord*size), m_editorGrid.offset + btVector3(count*size, 0.f, coord*size), m_editorGrid.color);
-				EditorDebug::Get().Renderer().DebugLine( m_editorGrid.offset + btVector3(coord*size, 0.f, -count * size), m_editorGrid.offset + btVector3(coord*size, 0.f, count*size), m_editorGrid.color);
+				//@migration EditorDebug::Get().Renderer().DebugLine( m_editorGrid.offset + btVector3(-count * size, 0.f, coord*size), m_editorGrid.offset + btVector3(count*size, 0.f, coord*size), m_editorGrid.color);
+				//@migration EditorDebug::Get().Renderer().DebugLine( m_editorGrid.offset + btVector3(coord*size, 0.f, -count * size), m_editorGrid.offset + btVector3(coord*size, 0.f, count*size), m_editorGrid.color);
 			}
 		}
 	}
@@ -379,7 +379,7 @@ namespace fan
 			const Gameobject * gameobject = entities[gameobjectIndex];
 			if (gameobject != &m_currentScene->GetMainCamera().GetGameobject()) {
 				AABB aabb = gameobject->GetAABB();
-				EditorDebug::Get().Renderer().DebugAABB(aabb, Color::Red);
+				//@migration EditorDebug::Get().Renderer().DebugAABB(aabb, Color::Red);
 			}
 		}
 	}
@@ -414,9 +414,9 @@ namespace fan
 							const btVector3 worldVec1 = ToBullet(modelMat * glm::vec4(vec1[0], vec1[1], vec1[2], 1.f));
 							const btVector3 worldVec2 = ToBullet(modelMat * glm::vec4(vec2[0], vec2[1], vec2[2], 1.f));
 							
-							EditorDebug::Get().Renderer().DebugLine(worldVec0, worldVec1, color);
-							EditorDebug::Get().Renderer().DebugLine(worldVec1, worldVec2, color);
-							EditorDebug::Get().Renderer().DebugLine(worldVec2, worldVec0, color);
+							//@migration EditorDebug::Get().Renderer().DebugLine(worldVec0, worldVec1, color);
+							//@migration EditorDebug::Get().Renderer().DebugLine(worldVec1, worldVec2, color);
+							//@migration EditorDebug::Get().Renderer().DebugLine(worldVec2, worldVec0, color);
 		
 						}
 					}
@@ -442,9 +442,9 @@ namespace fan
 						const btVector3 v0 = ToBullet(modelMat * glm::vec4(vertices[indices[3 * index + 0]].pos, 1.f));
 						const btVector3 v1 = ToBullet(modelMat * glm::vec4(vertices[indices[3 * index + 1]].pos, 1.f));
 						const btVector3 v2 = ToBullet(modelMat * glm::vec4(vertices[indices[3 * index + 2]].pos, 1.f));
-						EditorDebug::Get().Renderer().DebugLine(v0, v1, Color::Yellow);
-						EditorDebug::Get().Renderer().DebugLine(v1, v2, Color::Yellow);
-						EditorDebug::Get().Renderer().DebugLine(v2, v0, Color::Yellow);
+						//@migration EditorDebug::Get().Renderer().DebugLine(v0, v1, Color::Yellow);
+						//@migration EditorDebug::Get().Renderer().DebugLine(v1, v2, Color::Yellow);
+						//@migration EditorDebug::Get().Renderer().DebugLine(v2, v0, Color::Yellow);
 					}
 				}
 			}
@@ -470,7 +470,7 @@ namespace fan
 						const Vertex& vertex = vertices[indices[index]];
 						const btVector3 position = ToBullet(modelMat * glm::vec4(vertex.pos, 1.f));
 						const btVector3 normal = ToBullet(normalMat * glm::vec4(vertex.normal, 1.f));
-						EditorDebug::Get().Renderer().DebugLine(position, position + 0.1f * normal, Color::Green);
+						//@migration EditorDebug::Get().Renderer().DebugLine(position, position + 0.1f * normal, Color::Green);
 					}
 				}
 			}

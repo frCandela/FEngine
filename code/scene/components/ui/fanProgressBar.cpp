@@ -1,13 +1,11 @@
-#include "fanGlobalIncludes.h"
-#include "scene/components/ui/fanProgressBar.h"
-
-#include "scene/components/fanTransform.h"
-#include "scene/components/ui/fanUITransform.h"
+#include "scene/components/ui/fanProgressBar.hpp"
+#include "scene/components/fanTransform.hpp"
+#include "scene/components/ui/fanUITransform.hpp"
+#include "game/fanGameSerializable.hpp"
 
 namespace fan
 {
 	REGISTER_TYPE_INFO( ProgressBar, TypeInfo::Flags::EDITOR_COMPONENT, "ui/" )
-
 
 	//================================================================================================================================
 	//================================================================================================================================
@@ -65,8 +63,8 @@ namespace fan
 	bool ProgressBar::Save( Json & _json ) const
 	{
 		Component::Save( _json );
-		SaveComponentPtr(_json, "target_ui_transform", m_targetUiTransform );
-		SaveInt( _json, "max_width", m_maxWidth );
+		Serializable::SaveComponentPtr(_json, "target_ui_transform", m_targetUiTransform );
+		Serializable::SaveInt( _json, "max_width", m_maxWidth );
 		return true;
 	}
 	 
@@ -74,8 +72,8 @@ namespace fan
 	//================================================================================================================================
 	bool ProgressBar::Load( const Json & _json )
 	{
-		LoadComponentPtr(_json, "target_ui_transform", m_targetUiTransform );
-		LoadInt( _json, "max_width", m_maxWidth );
+		Serializable::LoadComponentPtr(_json, "target_ui_transform", m_targetUiTransform );
+		Serializable::LoadInt( _json, "max_width", m_maxWidth );
 		return true;
 	}
 }

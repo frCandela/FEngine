@@ -1,7 +1,5 @@
-#include "fanGlobalIncludes.h"
-#include "scene/fanPrefab.h"
-
-#include "scene/fanGameobject.h"
+#include "scene/fanPrefab.hpp"
+#include "scene/fanGameobject.hpp"
 
 namespace fan
 {

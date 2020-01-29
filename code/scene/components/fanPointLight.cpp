@@ -1,9 +1,9 @@
-#include "fanGlobalIncludes.h"
-#include "scene/components/fanPointLight.h"
-#include "scene/components/fanTransform.h"	
-#include "render/fanRendererDebug.h"
-#include "editor/fanModals.h"
-#include "editor/fanEditorDebug.h"
+#include "scene/components/fanPointLight.hpp"
+#include "scene/components/fanTransform.hpp"
+#include "render/fanRendererDebug.hpp"
+#include "core/imgui/fanModals.hpp"
+
+//#include "editor/fanEditorDebug.hpp" @migration
 
 namespace fan
 {
@@ -107,7 +107,7 @@ namespace fan
 		float lightRange = GetLightRange();
 		if (lightRange > 0 ) {
 			const btTransform transform = m_gameobject->GetTransform().GetBtTransform();
-			EditorDebug::Get().Renderer().DebugSphere(transform, lightRange, 2, m_pointLight->diffuse);
+			//@migration EditorDebug::Get().Renderer().DebugSphere(transform, lightRange, 2, m_pointLight->diffuse);
 		}
 
 	}
@@ -133,12 +133,12 @@ namespace fan
 	//================================================================================================================================
 	bool PointLight::Load( const Json & _json ) {
 
-		LoadColor( _json, "ambiant", m_pointLight->ambiant );
-		LoadColor( _json, "diffuse", m_pointLight->diffuse );
-		LoadColor( _json, "specular", m_pointLight->specular );
+		Serializable::LoadColor( _json, "ambiant", m_pointLight->ambiant );
+		Serializable::LoadColor( _json, "diffuse", m_pointLight->diffuse );
+		Serializable::LoadColor( _json, "specular", m_pointLight->specular );
 
 		btVector3 tmp;
-		LoadVec3 ( _json, "attenuation", tmp );
+		Serializable::LoadVec3 ( _json, "attenuation", tmp );
 		m_pointLight->attenuation[0] = tmp[0];
 		m_pointLight->attenuation[1] = tmp[1];
 		m_pointLight->attenuation[2] = tmp[2];
@@ -149,10 +149,10 @@ namespace fan
 	//================================================================================================================================
 	//================================================================================================================================
 	bool PointLight::Save( Json & _json ) const {
-		SaveColor( _json, "ambiant", m_pointLight->ambiant );
-		SaveColor( _json, "diffuse", m_pointLight->diffuse );
-		SaveColor( _json, "specular", m_pointLight->specular );
-		SaveVec3 ( _json, "attenuation", btVector3( m_pointLight->attenuation[0], m_pointLight->attenuation[1], m_pointLight->attenuation[2] ) );
+		Serializable::SaveColor( _json, "ambiant", m_pointLight->ambiant );
+		Serializable::SaveColor( _json, "diffuse", m_pointLight->diffuse );
+		Serializable::SaveColor( _json, "specular", m_pointLight->specular );
+		Serializable::SaveVec3 ( _json, "attenuation", btVector3( m_pointLight->attenuation[0], m_pointLight->attenuation[1], m_pointLight->attenuation[2] ) );
 		Component::Save( _json );
 		
 		return true;

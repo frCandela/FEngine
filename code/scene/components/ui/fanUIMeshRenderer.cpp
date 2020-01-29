@@ -1,13 +1,9 @@
-#include "fanGlobalIncludes.h"
-#include "scene/components/ui/fanUIMeshRenderer.h"
-
-#include "render/fanUIMesh.h"
-#include "scene/components/fanTransform.h"
-#include "render/core/fanTexture.h"
-#include "core/input/fanInput.h"
-
-// Editor
-#include "editor/fanModals.h"
+#include "scene/components/ui/fanUIMeshRenderer.hpp"
+#include "scene/components/fanTransform.hpp"
+#include "core/input/fanInput.hpp"
+#include "render/core/fanTexture.hpp"
+#include "render/fanUIMesh.hpp"
+#include "core/imgui/fanModals.hpp"
 
 namespace fan
 {
@@ -103,9 +99,9 @@ namespace fan
 	//================================================================================================================================
 	bool UIMeshRenderer::Load( const Json & _json )
 	{
-		LoadColor(		_json,"color",			m_color);
-		LoadTexturePtr(	_json, "texture_path",  m_texture );
-		LoadBool(		_json, "visible",		m_visible );
+		Serializable::LoadColor(		_json,"color",			m_color);
+		Serializable::LoadTexturePtr(	_json, "texture_path",  m_texture );
+		Serializable::LoadBool(		_json, "visible",		m_visible );
 
 		return true;
 	}
@@ -116,9 +112,9 @@ namespace fan
 	{
 		Component::Save( _json );
 
-		SaveColor(		_json, "color",			m_color );
-		SaveTexturePtr( _json, "texture_path",	m_texture );
-		SaveBool(		_json, "visible",		m_visible );
+		Serializable::SaveColor(		_json, "color",			m_color );
+		Serializable::SaveTexturePtr( _json, "texture_path",	m_texture );
+		Serializable::SaveBool(		_json, "visible",		m_visible );
 
 		return true;
 	}

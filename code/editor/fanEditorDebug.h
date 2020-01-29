@@ -1,6 +1,6 @@
 #pragma once
  
-#include "core/fanSingleton.h"
+#include "core/fanSingleton.hpp"
 
 namespace fan
 {

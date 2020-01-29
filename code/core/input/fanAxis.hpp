@@ -3,7 +3,7 @@
 #include "core/fanCorePrecompiled.hpp"
 #include "core/input/fanKeyboard.hpp"
 #include "core/input/fanJoystick.hpp"
-#include "core/fanISerializable.hpp"
+#include "game/fanGameSerializable.hpp"
 
 namespace fan
 {

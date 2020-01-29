@@ -1,10 +1,9 @@
-#include "fanGlobalIncludes.h"
-#include "scene/components/fanDirectionalLight.h"
+#include "scene/components/fanDirectionalLight.hpp"
+#include "scene/components/fanTransform.hpp"
+#include "render/fanRendererDebug.hpp"
+#include "core/imgui/fanModals.hpp"
 
-#include "scene/components/fanTransform.h"
-#include "render/fanRendererDebug.h"
-#include "editor/fanModals.h"
-#include "editor/fanEditorDebug.h"
+//#include "editor/fanEditorDebug.hpp" @migration
 
 namespace fan {
 	REGISTER_TYPE_INFO( DirectionalLight, TypeInfo::Flags::EDITOR_COMPONENT, "light/" )
@@ -85,18 +84,18 @@ namespace fan {
 			for ( int offsetIndex = 0; offsetIndex < 5; offsetIndex++ )
 			{
 				const btVector3 offset = offsets[offsetIndex];
-				EditorDebug::Get().Renderer().DebugLine( pos + offset, pos + offset + length * dir, color );
+				//@migration EditorDebug::Get().Renderer().DebugLine( pos + offset, pos + offset + length * dir, color );
 			}
-			EditorDebug::Get().Renderer().DebugSphere( transform.GetBtTransform(), radius, 0, color );
+			//@migration EditorDebug::Get().Renderer().DebugSphere( transform.GetBtTransform(), radius, 0, color );
 		} ImGui::PopItemWidth();
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
 	bool DirectionalLight::Load( const Json & _json ) {
-		LoadColor( _json, "ambiant", m_dirLight->ambiant );
-		LoadColor( _json, "diffuse", m_dirLight->diffuse );
-		LoadColor( _json, "specular", m_dirLight->specular );
+		Serializable::LoadColor( _json, "ambiant", m_dirLight->ambiant );
+		Serializable::LoadColor( _json, "diffuse", m_dirLight->diffuse );
+		Serializable::LoadColor( _json, "specular", m_dirLight->specular );
 
 		return true;
 	}
@@ -105,9 +104,9 @@ namespace fan {
 	//================================================================================================================================
 	bool DirectionalLight::Save( Json & _json  ) const {
 
-		SaveColor( _json, "ambiant", m_dirLight->ambiant );
-		SaveColor( _json, "diffuse", m_dirLight->diffuse );
-		SaveColor( _json, "specular", m_dirLight->specular );
+		Serializable::SaveColor( _json, "ambiant", m_dirLight->ambiant );
+		Serializable::SaveColor( _json, "diffuse", m_dirLight->diffuse );
+		Serializable::SaveColor( _json, "specular", m_dirLight->specular );
 		Component::Save( _json );
 
 		return true;

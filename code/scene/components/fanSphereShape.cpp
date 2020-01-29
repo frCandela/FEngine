@@ -1,9 +1,7 @@
-#include "fanGlobalIncludes.h"
-#include "scene/components/fanSphereShape.h"
-
-#include "scene/components/fanTransform.h"
-#include "render/fanRendererDebug.h"
-#include "editor/fanEditorDebug.h"
+#include "scene/components/fanSphereShape.hpp"
+#include "scene/components/fanTransform.hpp"
+#include "render/fanRendererDebug.hpp"
+// #include "editor/fanEditorDebug.hpp" @migration
 
 namespace fan
 {
@@ -55,7 +53,7 @@ namespace fan
 			{
 				SetRadius( radius );
 			}
-			EditorDebug::Get().Renderer().DebugSphere( m_gameobject->GetTransform().GetBtTransform(), radius, 2, Color::Green );
+			//@migration EditorDebug::Get().Renderer().DebugSphere( m_gameobject->GetTransform().GetBtTransform(), radius, 2, Color::Green );
 		} ImGui::PopItemWidth();
 
 	
@@ -66,7 +64,7 @@ namespace fan
 	bool SphereShape::Load( const Json & _json ) {
 
 		float radius;
-		LoadFloat(_json, "radius", radius );
+		Serializable::LoadFloat(_json, "radius", radius );
 
 		SetRadius( radius );
 		return true;
@@ -76,7 +74,7 @@ namespace fan
 	//================================================================================================================================
 	//================================================================================================================================
 	bool SphereShape::Save( Json & _json ) const {
-		SaveFloat( _json, "radius", GetRadius() );
+		Serializable::SaveFloat( _json, "radius", GetRadius() );
 		Component::Save( _json );
 		return true;
 	}

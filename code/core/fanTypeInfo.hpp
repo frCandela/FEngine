@@ -2,6 +2,7 @@
 
 #include "core/fanCorePrecompiled.hpp"
 #include "core/fanSingleton.hpp"
+#include "core/fanHash.hpp"
 
 namespace fan {
 	//================================================================================================================================
@@ -90,7 +91,7 @@ namespace fan {
 
 //================================================================================================================================
 //================================================================================================================================
-#define REGISTER_TYPE_INFO( _name, _flags, _path )															\
+#define REGISTER_TYPE_INFO( _name, _flags, _path )																\
 	const uint32_t _name::s_typeID = TypeInfo::Get().Register( SSID(#_name), _name::NewInstance, _flags, _path );\
 	const char * _name::s_name = #_name;	
 

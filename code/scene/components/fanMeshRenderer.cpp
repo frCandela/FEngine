@@ -1,17 +1,15 @@
-#include "fanGlobalIncludes.h"
-#include "scene/components/fanMeshRenderer.h"
-
-#include "render/fanMesh.h"
-#include "scene/components/fanTransform.h"
-#include "scene/fanRessourcePtr.h"
-#include "core/math/shapes/fanAABB.h"
-#include "core/math/shapes/fanConvexHull.h"
-#include "core/files/fanFbxImporter.h"
-#include "ecs/fanECSConfig.h"
-#include "core/time/fanProfiler.h"
+#include "scene/components/fanMeshRenderer.hpp"
+#include "scene/components/fanTransform.hpp"
+#include "scene/fanRessourcePtr.hpp"
+#include "core/math/shapes/fanAABB.hpp"
+#include "core/math/shapes/fanConvexHull.hpp"
+#include "core/time/fanProfiler.hpp"
+#include "scene/ecs/fanECSConfig.hpp"
+#include "render/fanFbxImporter.hpp"
+#include "render/fanMesh.hpp"
 
 // Editor
-#include "editor/fanModals.h"
+#include "core/imgui/fanModals.hpp"
 
 namespace fan
 {
@@ -80,7 +78,7 @@ namespace fan
 	bool MeshRenderer::Load( const Json & _json ) {
 		std::string pathBuffer;
 
-		LoadMeshPtr( _json, "path", m_mesh->mesh );
+		Serializable::LoadMeshPtr( _json, "path", m_mesh->mesh );
 		return true;
 	}
 
@@ -90,7 +88,7 @@ namespace fan
 		
 		Component::Save( _json );
 
-		SaveMeshPtr( _json, "path", m_mesh->mesh );
+		Serializable::SaveMeshPtr( _json, "path", m_mesh->mesh );
 		
 		return true;
 	}

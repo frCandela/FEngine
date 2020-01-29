@@ -1,7 +1,7 @@
 #include "fanGlobalIncludes.h"
 #include "editor/windows/fanEcsWindow.h"
 
-#include "ecs/fanECSManager.h"
+#include "scene/ecs/fanECSManager.h"
 #include "core/time/fanProfiler.h"
 
 namespace fan {

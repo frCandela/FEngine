@@ -1,11 +1,9 @@
-#include "fanGlobalIncludes.h"
-#include "scene/components/fanMaterial.h"
-
-#include "scene/components/fanMeshRenderer.h"
-#include "render/core/fanTexture.h"
+#include "scene/components/fanMaterial.hpp"
+#include "scene/components/fanMeshRenderer.hpp"
+#include "render/core/fanTexture.hpp"
 
 // Editor
-#include "editor/fanModals.h"
+//#include "render/editor/fanModals.hpp" @migration
 
 namespace fan
 {
@@ -99,9 +97,9 @@ namespace fan
 	//================================================================================================================================
 	//================================================================================================================================
 	bool Material::Load( const Json & _json ) {
-		LoadUInt  ( _json, "shininess", m_material->shininess );
-		LoadColor ( _json, "color", m_material->color );
-		LoadTexturePtr(_json, "material", m_material->texture );
+		Serializable::LoadUInt  ( _json, "shininess", m_material->shininess );
+		Serializable::LoadColor ( _json, "color", m_material->color );
+		Serializable::LoadTexturePtr(_json, "material", m_material->texture );
 
 		return true;
 	}
@@ -109,9 +107,9 @@ namespace fan
 	//================================================================================================================================
 	//================================================================================================================================
 	bool Material::Save( Json & _json ) const {
-				SaveUInt  ( _json, "shininess", m_material->shininess );
-		SaveColor ( _json, "color", m_material->color );
-		SaveTexturePtr(_json, "material", m_material->texture );
+		Serializable::SaveUInt  ( _json, "shininess", m_material->shininess );
+		Serializable::SaveColor ( _json, "color", m_material->color );
+		Serializable::SaveTexturePtr(_json, "material", m_material->texture );
 		Component::Save( _json );		
 
 		return true;

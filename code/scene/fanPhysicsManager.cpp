@@ -1,10 +1,8 @@
-#include "fanGlobalIncludes.h"
-#include "physics/fanPhysicsManager.h"
-
-#include "core/time/fanTime.h"
-#include "core/time/fanProfiler.h"
-#include "scene/fanGameobject.h"
-#include "scene/components/fanRigidbody.h"
+#include "scene/fanPhysicsManager.hpp"
+#include "scene/fanGameobject.hpp"
+#include "scene/components/fanRigidbody.hpp"
+#include "core/time/fanTime.hpp"
+#include "core/time/fanProfiler.hpp"
 
 namespace fan {
 	//================================================================================================================================

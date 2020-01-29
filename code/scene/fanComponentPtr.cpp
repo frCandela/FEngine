@@ -1,9 +1,9 @@
-#include "fanGlobalIncludes.h"
-#include "scene/fanComponentPtr.h"
-
-#include "scene/fanGameobject.h"
-#include "scene/components/fanComponent.h"
-#include "editor/fanDragnDrop.h"
+#include "scene/fanComponentPtr.hpp"
+#include "scene/fanRessourcePtr.hpp"
+#include "scene/fanGameobject.hpp"
+#include "scene/components/fanComponent.hpp"
+#include "game/imgui/fanDragnDrop.hpp"
+#include "game/fanGameSerializable.hpp"
 
 namespace ImGui
 {

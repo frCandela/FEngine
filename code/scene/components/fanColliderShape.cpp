@@ -1,8 +1,6 @@
-#include "fanGlobalIncludes.h"
-#include "scene/actors/fanActor.h"
-
-#include "scene/components/fanColliderShape.h"
-#include "scene/components/fanRigidbody.h"
+#include "scene/components/fanColliderShape.hpp"
+#include "scene/components/fanRigidbody.hpp"
+#include "scene/actors/fanActor.hpp"
 
 namespace fan {
 
@@ -45,7 +43,7 @@ namespace fan {
 	//================================================================================================================================
 	//================================================================================================================================
 	bool ColliderShape::Save( Json & _json ) const {
-		//SaveBool( jActor, "isEnabled", m_isEnabled );
+		//Serializable::SaveBool( jActor, "isEnabled", m_isEnabled );
 		Component::Save( _json );
 		return true;
 	}

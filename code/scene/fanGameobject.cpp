@@ -1,12 +1,10 @@
-#include "fanGlobalIncludes.h"
-#include "scene/fanGameobject.h"
-
-#include "scene/components/fanComponent.h"
-#include "scene/components/fanMeshRenderer.h"
-#include "scene/components/fanTransform.h"
-#include "render/fanMesh.h"
-#include "ecs/fanECSManager.h"
-#include "core/fanSignal.h"
+#include "scene/fanGameobject.hpp"
+#include "scene/components/fanComponent.hpp"
+#include "scene/components/fanMeshRenderer.hpp"
+#include "scene/components/fanTransform.hpp"
+#include "scene/ecs/fanECSManager.hpp"
+#include "render/fanMesh.hpp"
+#include "core/fanSignal.hpp"
 
 namespace fan
 {
@@ -269,7 +267,7 @@ namespace fan
 	void Gameobject::CopyDataFrom( Json & _json )
 	{
 		// gameobject data
-		LoadString( _json, "name", m_name );
+			Serializable::LoadString( _json, "name", m_name );
 
 		// components data
 		Json& jComponents = _json["components"];
@@ -279,7 +277,7 @@ namespace fan
 				Json& jComponent_i = jComponents[childIndex];
 				
 				unsigned componentID = 0;
-				LoadUInt( jComponent_i, "id", componentID );
+				Serializable::LoadUInt( jComponent_i, "id", componentID );
 
 				Component * component = GetComponent( componentID );
 				if ( component )
@@ -297,17 +295,17 @@ namespace fan
 	//================================================================================================================================
 	bool Gameobject::Load( const Json & _json ) {
 
-		LoadString( _json, "name", m_name );
+		Serializable::LoadString( _json, "name", m_name );
 
 		uint64_t tmp ;
-		LoadUInt64( _json, "unique_id", tmp );
+		Serializable::LoadUInt64( _json, "unique_id", tmp );
 		SetUniqueID( tmp );
 
 		const Json& jComponents = _json["components"]; {
 			for ( int childIndex = 0; childIndex < jComponents.size(); childIndex++ ) {
 				const Json& jComponent_i = jComponents[childIndex]; {
 					unsigned componentID = 0;
-					LoadUInt( jComponent_i, "id", componentID );
+					Serializable::LoadUInt( jComponent_i, "id", componentID );
 
 					// Don't add a transform two times
 					Component * component = nullptr;
@@ -336,8 +334,8 @@ namespace fan
 	//================================================================================================================================
 	//================================================================================================================================
 	bool Gameobject::Save( Json & _json ) const {
-		SaveString( _json, "name", m_name );
-		SaveUInt64( _json, "unique_id", m_uniqueID );
+		Serializable::SaveString( _json, "name", m_name );
+		Serializable::SaveUInt64( _json, "unique_id", m_uniqueID );
 
 		// Save components
 		Json& jComponents = _json["components"];{

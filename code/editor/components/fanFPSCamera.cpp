@@ -107,9 +107,9 @@ namespace fan
 		const float size = 0.002f;
 		btVector3 offset = ray.origin + 0.1f*ray.direction;
 
-		EditorDebug::Get().Renderer().DebugLine(offset, offset + btVector3(size, 0, 0), Color(1, 0, 0, 1));
-		EditorDebug::Get().Renderer().DebugLine(offset, offset + btVector3(0, size, 0), Color(0, 1, 0, 1));
-		EditorDebug::Get().Renderer().DebugLine(offset, offset + btVector3(0, 0, size), Color(0, 0, 1, 1));
+		//@migration EditorDebug::Get().Renderer().DebugLine(offset, offset + btVector3(size, 0, 0), Color(1, 0, 0, 1));
+		//@migration EditorDebug::Get().Renderer().DebugLine(offset, offset + btVector3(0, size, 0), Color(0, 1, 0, 1));
+		//@migration EditorDebug::Get().Renderer().DebugLine(offset, offset + btVector3(0, 0, size), Color(0, 0, 1, 1));
 	}
 
 	//================================================================================================================================
@@ -153,8 +153,8 @@ namespace fan
 		Actor::Load(_json);
 
 		LoadVec2( _json, "xySensitivity", m_xySensitivity );
-		LoadFloat( _json, "speed", m_speed );
-		LoadFloat( _json, "speedMultiplier", m_speedMultiplier );
+		Serializable::LoadFloat( _json, "speed", m_speed );
+		Serializable::LoadFloat( _json, "speedMultiplier", m_speedMultiplier );
  		return true;
 	}
 
@@ -162,8 +162,8 @@ namespace fan
 	//================================================================================================================================
 	bool FPSCamera::Save( Json & _json ) const {
 		SaveVec2( _json, "xySensitivity", m_xySensitivity );
-		SaveFloat(_json, "speed", m_speed );
-		SaveFloat(_json, "speedMultiplier", m_speedMultiplier );
+		Serializable::SaveFloat(_json, "speed", m_speed );
+		Serializable::SaveFloat(_json, "speedMultiplier", m_speedMultiplier );
 		Actor::Save( _json );
 		return true;
 	}

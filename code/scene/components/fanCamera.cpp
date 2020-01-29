@@ -1,7 +1,5 @@
-#include "fanGlobalIncludes.h"
-
-#include "scene/components/fanCamera.h"
-#include "scene/components/fanTransform.h"
+#include "scene/components/fanCamera.hpp"
+#include "scene/components/fanTransform.hpp"
 
 namespace fan
 {
@@ -198,11 +196,11 @@ namespace fan
 	//================================================================================================================================
 	bool Camera::Load( const Json & _json ) {
 		int tmp;
-		LoadInt  ( _json, "camera_type", tmp ); m_type = Type(tmp);
-		LoadFloat( _json, "orthoSize", m_orthoSize );
-		LoadFloat( _json, "fov", m_fov );
-		LoadFloat( _json, "nearDistance", m_nearDistance );
-		LoadFloat( _json, "farDistance", m_farDistance );
+			Serializable::LoadInt  ( _json, "camera_type", tmp ); m_type = Type(tmp);
+		Serializable::LoadFloat( _json, "orthoSize", m_orthoSize );
+		Serializable::LoadFloat( _json, "fov", m_fov );
+		Serializable::LoadFloat( _json, "nearDistance", m_nearDistance );
+		Serializable::LoadFloat( _json, "farDistance", m_farDistance );
 		return true;
 	}
 
@@ -210,11 +208,11 @@ namespace fan
 	//================================================================================================================================
 	bool Camera::Save( Json & _json ) const {
 
-		SaveInt  ( _json, "camera_type", m_type );
-		SaveFloat( _json, "orthoSize", m_orthoSize );
-		SaveFloat( _json, "fov", m_fov );
-		SaveFloat( _json, "nearDistance", m_nearDistance );
-		SaveFloat( _json, "farDistance", m_farDistance );
+		Serializable::SaveInt  ( _json, "camera_type", m_type );
+		Serializable::SaveFloat( _json, "orthoSize", m_orthoSize );
+		Serializable::SaveFloat( _json, "fov", m_fov );
+		Serializable::SaveFloat( _json, "nearDistance", m_nearDistance );
+		Serializable::SaveFloat( _json, "farDistance", m_farDistance );
 		Component::Save( _json );
 		
 		return true;

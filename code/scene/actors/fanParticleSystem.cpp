@@ -1,15 +1,14 @@
-#include "fanGlobalIncludes.h"
-#include "scene/actors/fanParticleSystem.h"
+#include "scene/actors/fanParticleSystem.hpp"
 
-#include "scene/components/fanTransform.h"
-#include "editor/fanModals.h"
+#include "scene/components/fanTransform.hpp"
+#include "core/imgui/fanModals.hpp"
 
 namespace fan {
 	REGISTER_TYPE_INFO( ParticleSystem, TypeInfo::Flags::EDITOR_COMPONENT, "" )
-
+		
 	//================================================================================================================================
 	//================================================================================================================================
-	void ParticleSystem::Start() {}
+	void ParticleSystem::Start() {  }
 
 	//================================================================================================================================
 	//================================================================================================================================
@@ -92,13 +91,13 @@ namespace fan {
 	bool ParticleSystem::Load( const Json & _json ) {
 		Actor::Load( _json );
 
-		LoadInt(   _json, "particles_per_second", m_particlesPerSecond );
-		LoadFloat( _json, "speed", m_speed);
-		LoadFloat( _json, "duration", m_duration );
-		LoadVec3(  _json, "offset", m_offset );
-		LoadGameobjectPtr(  _json, "origin", m_origin );
-		LoadColor( _json, "color", m_color );
-		LoadBool( _json, "sunlight_occlusion_active", m_sunlightParticleOcclusionActive);
+		Serializable::LoadInt(   _json, "particles_per_second", m_particlesPerSecond );
+		Serializable::LoadFloat( _json, "speed", m_speed);
+		Serializable::LoadFloat( _json, "duration", m_duration );
+		Serializable::LoadVec3(  _json, "offset", m_offset );
+		Serializable::LoadGameobjectPtr(  _json, "origin", m_origin );
+		Serializable::LoadColor( _json, "color", m_color );
+		Serializable::LoadBool( _json, "sunlight_occlusion_active", m_sunlightParticleOcclusionActive);
 
 		return true;
 	}
@@ -108,13 +107,13 @@ namespace fan {
 	bool ParticleSystem::Save( Json & _json ) const {
 		Actor::Save( _json );
 
-		SaveInt( _json, "particles_per_second", m_particlesPerSecond );
-		SaveFloat( _json, "speed", m_speed );
-		SaveFloat( _json, "duration", m_duration );
-		SaveVec3( _json, "offset", m_offset );
-		SaveGameobjectPtr(  _json, "origin", m_origin );
-		SaveColor( _json, "color", m_color );
-		SaveBool( _json, "sunlight_occlusion_active", m_sunlightParticleOcclusionActive);
+		Serializable::SaveInt( _json, "particles_per_second", m_particlesPerSecond );
+		Serializable::SaveFloat( _json, "speed", m_speed );
+		Serializable::SaveFloat( _json, "duration", m_duration );
+		Serializable::SaveVec3( _json, "offset", m_offset );
+		Serializable::SaveGameobjectPtr(  _json, "origin", m_origin );
+		Serializable::SaveColor( _json, "color", m_color );
+		Serializable::SaveBool( _json, "sunlight_occlusion_active", m_sunlightParticleOcclusionActive);
 
 		return true;
 	}

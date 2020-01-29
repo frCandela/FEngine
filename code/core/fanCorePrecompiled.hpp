@@ -11,6 +11,8 @@
 #include <array>
 #include <fstream>
 #include <iostream>
+#include <filesystem>
+#include <set>
 
 #include "bullet/btBulletDynamicsCommon.h"
 #define GLFW_INCLUDE_VULKAN

@@ -14,6 +14,7 @@ link_directories("C:/VulkanSDK/1.1.106.0/Lib")
 add_subdirectory(code/core)
 add_subdirectory(code/render)
 add_subdirectory(code/network)
+add_subdirectory(code/scene)
 add_subdirectory(deps)
 
 list(APPEND APP_SOURCES
@@ -25,6 +26,7 @@ set(APP_LIBRARIES
     fanCore
     fanRender
     fanNetwork
+    fanScene
     glfw3
 )
 

@@ -1,8 +1,6 @@
-#include "fanGlobalIncludes.h"
-#include "scene/components/fanBoxShape.h"
-
-#include "scene/components/fanTransform.h"
-#include "render/fanRendererDebug.h"
+#include "scene/components/fanBoxShape.hpp"
+#include "scene/components/fanTransform.hpp"
+#include "render/fanRendererDebug.hpp"
 #include "editor/fanEditorDebug.h"
 
 namespace fan {
@@ -54,7 +52,7 @@ namespace fan {
 				SetExtent( extent );
 			}
 
-			EditorDebug::Get().Renderer().DebugCube( m_gameobject->GetTransform().GetBtTransform(), 0.5f * extent, Color::Green );
+			//@migration EditorDebug::Get().Renderer().DebugCube( m_gameobject->GetTransform().GetBtTransform(), 0.5f * extent, Color::Green );
 		} ImGui::PopItemWidth();
 	}
 
@@ -63,7 +61,7 @@ namespace fan {
 	bool BoxShape::Load( const Json & _json ) {
 		btVector3 extent;
 
-		LoadVec3(_json, "extent", extent );
+		Serializable::LoadVec3(_json, "extent", extent );
 
 		SetExtent(extent);
 		return true;
@@ -73,7 +71,7 @@ namespace fan {
 	//================================================================================================================================
 	//================================================================================================================================
 	bool BoxShape::Save( Json & _json ) const {
-		SaveVec3( _json, "extent", GetExtent() );
+		Serializable::SaveVec3( _json, "extent", GetExtent() );
 		Component::Save( _json );
 		return true;
 	}
