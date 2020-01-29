@@ -1,9 +1,9 @@
-#include "game/fanCameraController.hpp"
+#include "game/components/fanCameraController.hpp"
 
-#include "game/fanPlayersManager.hpp"
-#include "core/time/fanTime.hpp"
+#include "game/components/fanPlayersManager.hpp"
 #include "scene/components/fanTransform.hpp"
 #include "scene/components/fanCamera.hpp"
+#include "core/time/fanTime.hpp"
 
 namespace fan {
 	REGISTER_TYPE_INFO(CameraController, TypeInfo::Flags::EDITOR_COMPONENT, "game/" )
@@ -97,10 +97,10 @@ namespace fan {
 	bool CameraController::Load( const Json & _json ) {
 		Actor::Load(_json);
 
-		LoadVec2( _json, "margin_ratio", m_marginRatio);
+		Serializable::LoadVec2( _json, "margin_ratio", m_marginRatio);
 		Serializable::LoadFloat( _json, "min_size", m_minOrthoSize);
 		Serializable::LoadFloat( _json, "height_from_target", m_heightFromTarget );
-		LoadComponentPtr(_json, "players_manager", m_playersManager );
+		Serializable::LoadComponentPtr(_json, "players_manager", m_playersManager );
 
 		return true;
 	}
@@ -110,10 +110,10 @@ namespace fan {
 	bool CameraController::Save( Json & _json ) const {
 		Actor::Save( _json );
 
-		SaveVec2( _json, "margin_ratio", m_marginRatio );
+		Serializable::SaveVec2( _json, "margin_ratio", m_marginRatio );
 		Serializable::SaveFloat( _json, "min_size", m_minOrthoSize );
 		Serializable::SaveFloat( _json, "height_from_target", m_heightFromTarget );
-		SaveComponentPtr(_json, "players_manager", m_playersManager );	
+		Serializable::SaveComponentPtr(_json, "players_manager", m_playersManager );
 		
 		return true;
 	}

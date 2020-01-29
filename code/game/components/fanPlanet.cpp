@@ -1,7 +1,7 @@
-#include "game/fanPlanet.h"
-
-#include "core/time/fanTime.hpp"
+#include "game/components/fanPlanet.hpp"
 #include "scene/components/fanTransform.hpp"
+#include "core/time/fanTime.hpp"
+
 
 namespace fan {
 	REGISTER_TYPE_INFO(Planet, TypeInfo::Flags::EDITOR_COMPONENT, "game/")

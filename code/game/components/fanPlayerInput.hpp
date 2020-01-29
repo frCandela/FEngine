@@ -1,11 +1,13 @@
 #pragma once
 
-#include "scene/fanScenePrecompiled.hpp"
+#include "game/fanGamePrecompiled.hpp"
 
 #include "scene/components/fanComponent.hpp"
+#include "network/packets/fanPacketPlayerInput.hpp"
 
 namespace fan
 {
+
 	//================================================================================================================================
 	//================================================================================================================================
 	class PlayerInput : public Component

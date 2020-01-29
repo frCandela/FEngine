@@ -1,11 +1,11 @@
-#include "game/fanWeapon.hpp"
+#include "game/components/fanWeapon.hpp"
+#include "game/components/fanWithEnergy.hpp"
+#include "game/components/fanPlayerInput.hpp"
 #include "scene/components/fanTransform.hpp"
 #include "scene/components/fanMaterial.hpp"
 #include "scene/components/fanRigidbody.hpp"
 #include "scene/components/fanMeshRenderer.hpp"
 #include "scene/components/fanSphereShape.hpp"
-#include "game/fanWithEnergy.hpp"
-#include "game/fanPlayerInput.hpp"
 #include "core/input/fanInput.hpp"
 #include "core/input/fanInputManager.hpp"
 #include "core/time/fanProfiler.hpp"
@@ -156,10 +156,10 @@ namespace fan
 	{
 		Actor::Save(	_json );
 
-		SavePrefabPtr(	_json, "bulletPrefab", m_bulletPrefab );
+		Serializable::SavePrefabPtr(	_json, "bulletPrefab", m_bulletPrefab );
 		Serializable::SaveFloat(		_json, "scale", m_scale );  
 		Serializable::SaveFloat(		_json, "speed", m_speed );
-		SaveVec3(		_json, "offset", m_offset );
+		Serializable::SaveVec3(		_json, "offset", m_offset );
 		Serializable::SaveFloat(		_json, "lifeTime", m_lifeTime );
 		Serializable::SaveFloat(		_json, "bullets_per_second", m_bulletsPerSecond );
 		Serializable::SaveFloat(		_json, "bullet_energy_cost", m_bulletEnergyCost );
@@ -175,10 +175,10 @@ namespace fan
 	bool Weapon::Load( const Json & _json )
 	{
 		Actor::Load( _json );
-		LoadPrefabPtr(	_json, "bulletPrefab", m_bulletPrefab );
+		Serializable::LoadPrefabPtr(	_json, "bulletPrefab", m_bulletPrefab );
 		Serializable::LoadFloat( _json,"scale", m_scale );
 		Serializable::LoadFloat( _json,"speed", m_speed );
-		LoadVec3( _json, "offset", m_offset );
+		Serializable::LoadVec3( _json, "offset", m_offset );
 		Serializable::LoadFloat( _json, "lifeTime", m_lifeTime );
 		Serializable::LoadFloat( _json, "bullets_per_second", m_bulletsPerSecond );
 		Serializable::LoadFloat( _json, "bullet_energy_cost", m_bulletEnergyCost );

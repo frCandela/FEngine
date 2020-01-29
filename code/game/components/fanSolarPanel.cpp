@@ -1,7 +1,7 @@
-#include "game/fanSolarPanel.hpp"
+#include "game/components/fanSolarPanel.hpp"
+#include "game/components/fanSolarEruption.hpp"
+#include "game/components/fanWithEnergy.hpp"
 #include "scene/components/fanTransform.hpp"
-#include "game/fanSolarEruption.hpp"
-#include "game/fanWithEnergy.hpp"
 #include "render/fanMesh.hpp"
 
 namespace fan

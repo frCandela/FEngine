@@ -1,6 +1,6 @@
 #pragma once
 
-#include "scene/fanScenePrecompiled.hpp"
+#include "game/fanGamePrecompiled.hpp"
 
 #include "scene/components/fanComponent.hpp"
 

@@ -1,15 +1,15 @@
-#include "scene/components/game/fanSolarEruption.hpp"
-#include "scene/components/game/fanPlanet.hpp"
-#include "scene/components/game/fanPlayersManager.hpp"
-#include "scene/components/game/fanSolarPanel.hpp"
-#include "scene/components/game/fanHealth.hpp"
-#include "core/time/fanProfiler.hpp"
-#include "render/fanMesh.hpp"
+#include "game/components/fanSolarEruption.hpp"
+#include "game/components/fanPlanet.hpp"
+#include "game/components/fanPlayersManager.hpp"
+#include "game/components/fanSolarPanel.hpp"
+#include "game/components/fanHealth.hpp"
 #include "scene/components/fanMeshRenderer.hpp"
 #include "scene/components/fanTransform.hpp"
 #include "scene/components/fanMaterial.hpp"
 #include "scene/actors/fanParticleSystem.hpp"
+#include "core/time/fanProfiler.hpp"
 #include "core/imgui/fanModals.hpp"
+#include "render/fanMesh.hpp"
 
 namespace fan
 {
@@ -252,8 +252,8 @@ namespace fan
 		Serializable::LoadFloat( _json, "explosion particles speed", m_explosionParticlesSpeed );
 
 		// colors
-		LoadColor( _json, "base ", m_baseColor );
-		LoadColor( _json, "explositon ", m_explositonColor );
+		Serializable::LoadColor( _json, "base ", m_baseColor );
+		Serializable::LoadColor( _json, "explositon ", m_explositonColor );
 		Serializable::LoadFloat( _json, "collapse_alpha", m_collapseAlpha );
 
 		return true;
@@ -282,8 +282,8 @@ namespace fan
 		Serializable::SaveFloat( _json, "explosion particles speed", m_explosionParticlesSpeed );
 
 		// Colors
-		SaveColor( _json, "base ", m_baseColor );
-		SaveColor( _json, "explositon ", m_explositonColor );
+		Serializable::SaveColor( _json, "base ", m_baseColor );
+		Serializable::SaveColor( _json, "explositon ", m_explositonColor );
 		Serializable::SaveFloat( _json, "collapse_alpha", m_collapseAlpha );
 		return true;
 	}

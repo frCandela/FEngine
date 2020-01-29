@@ -15,6 +15,7 @@ add_subdirectory(code/core)
 add_subdirectory(code/render)
 add_subdirectory(code/network)
 add_subdirectory(code/scene)
+add_subdirectory(code/game)
 add_subdirectory(deps)
 
 list(APPEND APP_SOURCES
@@ -23,11 +24,12 @@ list(APPEND APP_SOURCES
 
 set(APP_LIBRARIES 
     imgui
+    glfw3
     fanCore
     fanRender
     fanNetwork
     fanScene
-    glfw3
+    fanGame
 )
 
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR})

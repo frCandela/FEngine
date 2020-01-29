@@ -1,15 +1,13 @@
-#include "fanGlobalIncludes.h"
-#include "game/ui/fanSpaceShipUI.h"
-
-#include "scene/components/fanTransform.h"
-#include "scene/components/ui/fanProgressBar.h"
-#include "scene/components/ui/fanUIMeshRenderer.h"
-#include "scene/components/fanCamera.h"
-#include "game/fanWithEnergy.h"
-#include "game/fanSolarPanel.h"
-#include "game/fanHealth.h"
-#include "render/fanRendererDebug.h"
-#include "editor/fanEditorDebug.h"
+#include "game/ui/fanSpaceShipUI.hpp"
+#include "game/components/fanWithEnergy.hpp"
+#include "game/components/fanSolarPanel.hpp"
+#include "game/components/fanHealth.hpp"
+#include "scene/components/fanTransform.hpp"
+#include "scene/components/ui/fanProgressBar.hpp"
+#include "scene/components/ui/fanUIMeshRenderer.hpp"
+#include "scene/components/fanCamera.hpp"
+#include "render/fanRendererDebug.hpp"
+// @migration #include "editor/fanEditorDebug.hpp"
 
 namespace fan
 {
@@ -121,11 +119,11 @@ namespace fan
 	bool SpaceShipUI::Save( Json & _json ) const
 	{
 		Actor::Save( _json );
-		SaveGameobjectPtr(_json, "spaceship",		m_spaceShip );
-		SaveComponentPtr(_json, "health_progress",  m_healthProgress );
-		SaveComponentPtr(_json, "energy_progress",  m_energyProgress );
-		SaveComponentPtr(_json, "signal_progress",  m_signalProgress);
-		SaveComponentPtr( _json, "signal_renderer", m_signalRenderer );
+		Serializable::SaveGameobjectPtr(_json, "spaceship",		m_spaceShip );
+		Serializable::SaveComponentPtr(_json, "health_progress",  m_healthProgress );
+		Serializable::SaveComponentPtr(_json, "energy_progress",  m_energyProgress );
+		Serializable::SaveComponentPtr(_json, "signal_progress",  m_signalProgress);
+		Serializable::SaveComponentPtr( _json, "signal_renderer", m_signalRenderer );
 
 		return true;
 	}
@@ -135,11 +133,11 @@ namespace fan
 	bool SpaceShipUI::Load( const Json & _json )
 	{
 		Actor::Load( _json );
-		LoadGameobjectPtr(_json, "spaceship",		m_spaceShip );
-		LoadComponentPtr( _json, "health_progress", m_healthProgress );
-		LoadComponentPtr( _json, "energy_progress", m_energyProgress );
-		LoadComponentPtr( _json, "signal_progress",  m_signalProgress);
-		LoadComponentPtr( _json, "signal_renderer", m_signalRenderer );
+		Serializable::LoadGameobjectPtr(_json, "spaceship",		m_spaceShip );
+		Serializable::LoadComponentPtr( _json, "health_progress", m_healthProgress );
+		Serializable::LoadComponentPtr( _json, "energy_progress", m_energyProgress );
+		Serializable::LoadComponentPtr( _json, "signal_progress",  m_signalProgress);
+		Serializable::LoadComponentPtr( _json, "signal_renderer", m_signalRenderer );
 		return true;
 	}
 }

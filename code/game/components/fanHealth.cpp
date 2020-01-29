@@ -1,4 +1,4 @@
-#include "game/fanHealth.hpp"
+#include "game/components/fanHealth.hpp"
 #include "scene/components/fanTransform.hpp"
 
 namespace fan

@@ -1,5 +1,5 @@
-#include "game/fanDragnDrop.hpp"
-#include "fanImguiIcons.hpp"
+#include "game/imgui/fanDragnDrop.hpp"
+#include "core/imgui/fanImguiIcons.hpp"
 #include "scene/components/fanComponent.hpp"
 #include "scene/fanGameobject.hpp"
 #include "scene/fanPrefab.hpp"

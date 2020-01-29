@@ -1,16 +1,14 @@
-#include "fanGlobalIncludes.h"
-#include "game/network/fanGameClient.h"
-
-#include "core/input/fanInputManager.h"
-#include "core/input/fanInput.h"
-#include "core/input/fanMouse.h"
-#include "core/input/fanJoystick.h"
-#include "scene/components/fanCamera.h"
-#include "scene/components/fanTransform.h"
-#include "network/packets/fanIPacket.h"
-#include "network/packets/fanPacketLogin.h"
-#include "game/fanPlayersManager.h"
-#include "game/fanGameManager.h"
+#include "game/network/fanGameClient.hpp"
+#include "game/components/fanPlayersManager.hpp"
+#include "game/fanGameManager.hpp"
+#include "scene/components/fanCamera.hpp"
+#include "scene/components/fanTransform.hpp"
+#include "network/packets/fanIPacket.hpp"
+#include "network/packets/fanPacketLogin.hpp"
+#include "core/input/fanInputManager.hpp"
+#include "core/input/fanInput.hpp"
+#include "core/input/fanMouse.hpp"
+#include "core/input/fanJoystick.hpp"
 
 namespace fan
 {

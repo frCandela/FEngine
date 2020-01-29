@@ -1,6 +1,7 @@
 #pragma once
 
-#include "fanGamePrecompiled.hpp"
+#include "game/fanGamePrecompiled.hpp"
+
 #include "core/fanISerializable.hpp"
 
 namespace fan {

@@ -1,9 +1,9 @@
 #pragma once
 
-#include "scene/fanScenePrecompiled.hpp"
+#include "game/fanGamePrecompiled.hpp"
 
-#include "scene/actors/fanActor.h"
-#include "scene/fanComponentPtr.h"
+#include "scene/actors/fanActor.hpp"
+#include "scene/fanComponentPtr.hpp"
 
 namespace fan {
 

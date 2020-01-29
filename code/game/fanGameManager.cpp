@@ -1,12 +1,11 @@
 #include "game/fanGameManager.hpp"
-
+#include "game/components/fanSpaceShip.hpp"	
 #include "scene/components/fanTransform.hpp"
 #include "scene/components/fanCamera.hpp"
-#include "game/fanSpaceShip.hpp"	
 #include "core/input/fanKeyboard.hpp"
 #include "core/time/fanTime.hpp"
 
-#include "editor/components/fanFPSCamera.hpp"
+// @migration #include "editor/components/fanFPSCamera.hpp"
 
 
 namespace fan {
@@ -57,7 +56,7 @@ namespace fan {
 	//================================================================================================================================
 	bool GameManager::Load( const Json & _json ) {
 		Actor::Load(_json);
-		LoadComponentPtr( _json, "game_camera", m_gameCamera );
+		Serializable::LoadComponentPtr( _json, "game_camera", m_gameCamera );
 		return true;
 	}
 
@@ -65,7 +64,7 @@ namespace fan {
 	//================================================================================================================================
 	bool GameManager::Save( Json & _json ) const {		
 		Actor::Save( _json );	
-		SaveComponentPtr( _json, "game_camera", m_gameCamera );
+		Serializable::SaveComponentPtr( _json, "game_camera", m_gameCamera );
 		return true;
 	}
 }

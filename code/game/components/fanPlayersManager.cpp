@@ -1,8 +1,8 @@
-#include "game/fanPlayersManager.hpp"
-#include "core/input/fanJoystick.hpp"
-#include "game/fanPlayerInput.hpp"
-#include "game/fanSpaceShip.hpp"
+#include "game/components/fanPlayersManager.hpp"
+#include "game/components/fanPlayerInput.hpp"
+#include "game/components/fanSpaceShip.hpp"
 #include "game/network/fanGameClient.hpp"
+#include "core/input/fanJoystick.hpp"
 
 namespace fan
 {
@@ -197,7 +197,7 @@ namespace fan
 	bool PlayersManager::Load( const Json & _json )
 	{
 		Actor::Load( _json );
-		LoadPrefabPtr( _json, "player_prefab", m_playerPrefab );
+		Serializable::LoadPrefabPtr( _json, "player_prefab", m_playerPrefab );
 
 		return true;
 	}
@@ -207,7 +207,7 @@ namespace fan
 	bool PlayersManager::Save( Json & _json ) const
 	{
 		Actor::Save( _json );
-		SavePrefabPtr( _json, "player_prefab", m_playerPrefab );
+		Serializable::SavePrefabPtr( _json, "player_prefab", m_playerPrefab );
 		return true;
 	}
 }

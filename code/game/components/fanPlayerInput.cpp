@@ -1,4 +1,4 @@
-#include "game/fanPlayerInput.hpp"
+#include "game/components/fanPlayerInput.hpp"
 #include "core/input/fanInputManager.hpp"
 #include "core/input/fanInput.hpp"
 #include "core/input/fanMouse.hpp"

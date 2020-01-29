@@ -1,15 +1,15 @@
-#include "game/fanSpaceShip.hpp"
+#include "game/components/fanSpaceShip.hpp"
+#include "game/components/fanPlayerInput.hpp"
+#include "game/components/fanSolarSystem.hpp"
+#include "game/components/fanWithEnergy.hpp"
+#include "game/components/fanWithEnergy.hpp"
+#include "game/components/fanHealth.hpp"
+#include "game/components/fanPlanet.hpp"
 #include "scene/components/fanRigidbody.hpp"
 #include "scene/components/fanTransform.hpp"
 #include "scene/actors/fanParticleSystem.hpp"
 #include "scene/components/fanCamera.hpp"
-#include "game/fanPlayerInput.hpp"
-#include "game/fanSolarSystem.hpp"
-#include "game/fanWithEnergy.hpp"
-#include "game/fanWithEnergy.hpp"
-#include "game/fanHealth.hpp"
-#include "game/fanPlanet.hpp"
-#include "core/input/fanInputManager.hp"
+#include "core/input/fanInputManager.hpp"
 #include "core/math/shapes/fanRay.hpp"
 #include "core/input/fanInput.hpp"
 #include "core/input/fanMouse.hpp"
@@ -219,18 +219,18 @@ namespace fan {
 	bool SpaceShip::Load( const Json & _json ) {
 		Actor::Load(_json);
 
-		LoadVec4(  _json , "forward_forces", m_forwardForces );
+		Serializable::LoadVec4(  _json , "forward_forces", m_forwardForces );
 		Serializable::LoadFloat( _json, "lateral_force", m_lateralForce );
 		Serializable::LoadFloat( _json, "active_drag", m_activeDrag );
 		Serializable::LoadFloat( _json, "passive_drag", m_passiveDrag );
 		Serializable::LoadFloat( _json, "energy_consumed_per_unit_of_force", m_energyConsumedPerUnitOfForce );
 		Serializable::LoadFloat( _json, "planet_damage", m_planetDamage );
 		Serializable::LoadFloat( _json, "collision_repulsion_force", m_collisionRepulsionForce );
-		LoadComponentPtr( _json, "fast_forward_particles", m_fastForwardParticles );
-		LoadComponentPtr( _json, "slow_forward_particles", m_slowForwardParticles );
-		LoadComponentPtr( _json, "reverse_particles", m_reverseParticles );
-		LoadComponentPtr( _json, "left_particles", m_leftParticles );
-		LoadComponentPtr( _json, "right_particles", m_rightParticles );
+		Serializable::LoadComponentPtr( _json, "fast_forward_particles", m_fastForwardParticles );
+		Serializable::LoadComponentPtr( _json, "slow_forward_particles", m_slowForwardParticles );
+		Serializable::LoadComponentPtr( _json, "reverse_particles", m_reverseParticles );
+		Serializable::LoadComponentPtr( _json, "left_particles", m_leftParticles );
+		Serializable::LoadComponentPtr( _json, "right_particles", m_rightParticles );
 
 		return true;
 	}
@@ -238,18 +238,18 @@ namespace fan {
 	//================================================================================================================================
 	//================================================================================================================================
 	bool SpaceShip::Save( Json & _json ) const {
-		SaveVec4(  _json, "forward_forces", m_forwardForces );
+		Serializable::SaveVec4(  _json, "forward_forces", m_forwardForces );
 		Serializable::SaveFloat( _json, "lateral_force", m_lateralForce );
 		Serializable::SaveFloat( _json, "active_drag", m_activeDrag );
 		Serializable::SaveFloat( _json, "passive_drag", m_passiveDrag );
 		Serializable::SaveFloat( _json, "energy_consumed_per_unit_of_force", m_energyConsumedPerUnitOfForce );
 		Serializable::SaveFloat( _json, "planet_damage", m_planetDamage );
 		Serializable::SaveFloat( _json, "collision_repulsion_force", m_collisionRepulsionForce );
-		SaveComponentPtr( _json, "fast_forward_particles", m_fastForwardParticles );
-		SaveComponentPtr( _json, "slow_forward_particles", m_slowForwardParticles );
-		SaveComponentPtr( _json, "reverse_particles", m_reverseParticles );
-		SaveComponentPtr( _json, "left_particles", m_leftParticles );
-		SaveComponentPtr( _json, "right_particles", m_rightParticles );
+		Serializable::SaveComponentPtr( _json, "fast_forward_particles", m_fastForwardParticles );
+		Serializable::SaveComponentPtr( _json, "slow_forward_particles", m_slowForwardParticles );
+		Serializable::SaveComponentPtr( _json, "reverse_particles", m_reverseParticles );
+		Serializable::SaveComponentPtr( _json, "left_particles", m_leftParticles );
+		Serializable::SaveComponentPtr( _json, "right_particles", m_rightParticles );
 
 		Actor::Save( _json );
 		

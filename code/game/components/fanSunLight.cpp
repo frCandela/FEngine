@@ -1,4 +1,4 @@
-#include "game/fanSunLight.hpp"
+#include "game/components/fanSunLight.hpp"
 
 namespace fan {
 	REGISTER_TYPE_INFO( SunLight, TypeInfo::Flags::EDITOR_COMPONENT, "game/" )

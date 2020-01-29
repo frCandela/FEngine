@@ -1,13 +1,13 @@
-#include "game/fanSolarSystem.hpp"
-#include "core/time/fanTime.hpp"
+#include "game/components/fanSolarSystem.hpp"
+#include "game/components/fanPlanet.hpp"
 #include "scene/components/fanTransform.hpp"
 #include "scene/components/fanMeshRenderer.hpp"
 #include "scene/components/fanMaterial.hpp"
 #include "scene/components/fanRigidbody.hpp"
 #include "scene/components/fanSphereShape.hpp"
-#include "game/fanPlanet.hpp"
+#include "core/time/fanTime.hpp"
 #include "render/fanRendererDebug.hpp"
-#include "editor/fanEditorDebug.hpp"
+// @migration #include "editor/fanEditorDebug.hpp"
 
 namespace fan {
 	REGISTER_TYPE_INFO( SolarSystem, TypeInfo::Flags::EDITOR_COMPONENT, "game/" )
@@ -172,10 +172,10 @@ namespace fan {
 
 					Gameobject * newPlanet = scene.CreateGameobject( "planet" + std::to_string( orbitIndex ) + "-" + std::to_string( planetIndex ), m_gameobject );
 					MeshRenderer * meshRenderer = newPlanet->AddComponent<MeshRenderer>();
-					meshRenderer->SetPath( GlobalValues::s_meshSphere );
+					meshRenderer->SetPath( RenderGlobal::s_meshSphere );
 
 					Material * material = newPlanet->AddComponent<Material>();
-					material->SetTexturePath( GlobalValues::s_textureWhite );
+					material->SetTexturePath( RenderGlobal::s_textureWhite );
 					material->SetColor( Color::Brown );
 
 					Planet * planet = newPlanet->AddComponent<Planet>();
@@ -207,10 +207,10 @@ namespace fan {
 		Serializable::LoadFloat( _json, "max_radius", m_maxRadius );
 		Serializable::LoadFloat( _json, "initial_radius", m_initialRadius );
 		Serializable::LoadFloat( _json, "scaleMult", m_scaleMult );
-		LoadVec2( _json, "radiusFactors", m_radiusFactors );
-		LoadVec2( _json, "radiusRFactors", m_radiusRFactors );
-		LoadVec2( _json, "scaleMinMax", m_scaleMinMax );
-		LoadVec2( _json, "speedFactors", m_speedFactors );
+		Serializable::LoadVec2( _json, "radiusFactors", m_radiusFactors );
+		Serializable::LoadVec2( _json, "radiusRFactors", m_radiusRFactors );
+		Serializable::LoadVec2( _json, "scaleMinMax", m_scaleMinMax );
+		Serializable::LoadVec2( _json, "speedFactors", m_speedFactors );
 
 		return true;
 	}
@@ -223,10 +223,10 @@ namespace fan {
 		Serializable::SaveFloat( _json, "max_radius", m_maxRadius );
 		Serializable::SaveFloat( _json, "initial_radius", m_initialRadius );
 		Serializable::SaveFloat( _json, "scaleMult", m_scaleMult );
-		SaveVec2( _json, "radiusFactors", m_radiusFactors );
-		SaveVec2( _json, "radiusRFactors", m_radiusRFactors );
-		SaveVec2( _json, "scaleMinMax", m_scaleMinMax );
-		SaveVec2( _json, "speedFactors", m_speedFactors );
+		Serializable::SaveVec2(_json, "radiusFactors", m_radiusFactors);
+		Serializable::SaveVec2(_json, "radiusRFactors", m_radiusRFactors);
+		Serializable::SaveVec2(_json, "scaleMinMax", m_scaleMinMax);
+		Serializable::SaveVec2(_json, "speedFactors", m_speedFactors);
 		Actor::Save( _json );
 		
 		return true;
