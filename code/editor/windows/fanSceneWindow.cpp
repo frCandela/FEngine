@@ -1,25 +1,23 @@
-#include "fanGlobalIncludes.h"
-#include "editor/windows/fanSceneWindow.h"
-
-#include "editor/fanDragnDrop.h"
-#include "scene/fanScene.h"
-#include "scene/fanGameobject.h"
-#include "scene/components/fanTransform.h"
-#include "scene/components/fanMaterial.h"
-#include "scene/components/fanMeshRenderer.h"
-#include "scene/components/fanPointLight.h"
-#include "scene/components/fanDirectionalLight.h"
-#include "scene/components/fanRigidbody.h"
-#include "scene/components/fanSphereShape.h"
-#include "scene/actors/fanParticleSystem.h"
-#include "scene/fanSceneInstantiate.h"
-#include "scene/fanPrefab.h"
-#include "core/input/fanInput.h"
-#include "core/input/fanKeyboard.h"
-#include "core/input/fanMouse.h"
-#include "core/time/fanProfiler.h"
-#include "render/fanRessourceManager.h"
-#include "editor/fanModals.h"
+#include "editor/windows/fanSceneWindow.hpp"
+#include "game/imgui/fanDragnDrop.hpp"
+#include "scene/components/fanDirectionalLight.hpp"
+#include "scene/components/fanMeshRenderer.hpp"
+#include "scene/components/fanSphereShape.hpp"
+#include "scene/components/fanPointLight.hpp"
+#include "scene/actors/fanParticleSystem.hpp"
+#include "scene/components/fanTransform.hpp"
+#include "scene/components/fanRigidbody.hpp"
+#include "scene/components/fanMaterial.hpp"
+#include "scene/fanSceneInstantiate.hpp"
+#include "scene/fanGameobject.hpp"
+#include "scene/fanScene.hpp"
+#include "core/input/fanKeyboard.hpp"
+#include "core/time/fanProfiler.hpp"
+#include "core/imgui/fanModals.hpp"
+#include "core/input/fanInput.hpp"
+#include "core/input/fanMouse.hpp"
+#include "scene/fanPrefab.hpp"
+#include "render/fanRessourceManager.hpp"
 
 namespace fan
 {
@@ -76,9 +74,9 @@ namespace fan
 				if ( ImGui::MenuItem( "Model" ) ) {
 					Gameobject *  newIntity = m_scene->CreateGameobject("new_model", m_lastGameobjectRightClicked );
 					MeshRenderer * meshRenderer = newIntity->AddComponent<MeshRenderer>();
-					meshRenderer->SetPath( GlobalValues::s_meshCube );
+					meshRenderer->SetPath( RenderGlobal::s_meshCube );
 					Material * material =  newIntity->AddComponent<Material>();
-					material->SetTexturePath( GlobalValues::s_textureWhite );
+					material->SetTexturePath(RenderGlobal::s_textureWhite );
 				}
 
 				ImGui::Icon( ImGui::POINT_LIGHT16, { 16,16 } ); ImGui::SameLine();
@@ -97,7 +95,7 @@ namespace fan
 				if ( ImGui::MenuItem( "Sphere" ) ) {
 					Gameobject *  newIntity = m_scene->CreateGameobject( "new_model", m_lastGameobjectRightClicked );
 					MeshRenderer * meshRenderer = newIntity->AddComponent<MeshRenderer>();
-					meshRenderer->SetPath( GlobalValues::s_meshSphere );
+					meshRenderer->SetPath(RenderGlobal::s_meshSphere );
 					newIntity->AddComponent<Rigidbody>();
 					newIntity->AddComponent<SphereShape>();
 				}
@@ -164,7 +162,7 @@ namespace fan
 			m_pathBuffer = "content/prefab";
 			ImGui::OpenPopup( "Load prefab" );
 		}
-		if ( ImGui::FanLoadFileModal( "Load prefab", GlobalValues::s_prefabExtensions, m_pathBuffer ) )
+		if ( ImGui::FanLoadFileModal( "Load prefab", RenderGlobal::s_prefabExtensions, m_pathBuffer ) )
 		{
 			Prefab prefab;
 			if ( prefab.LoadFromFile( m_pathBuffer.string() ) )
@@ -297,7 +295,7 @@ namespace fan
 	//================================================================================================================================
 	void SceneWindow::ExportToPrefabModal()
 	{		
-		if ( ImGui::FanSaveFileModal( "Export to prefab", GlobalValues::s_prefabExtensions, m_pathBuffer ) )
+		if ( ImGui::FanSaveFileModal( "Export to prefab", RenderGlobal::s_prefabExtensions, m_pathBuffer ) )
 		{
 			Debug::Log() << "Exporting prefab to "  << m_pathBuffer.string() << Debug::Endl();
 

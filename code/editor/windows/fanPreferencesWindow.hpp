@@ -1,7 +1,8 @@
 #pragma once
 
-#include "editor/windows/fanEditorWindow.h"
-#include "core/input/fanInputManager.h"
+#include "editor/fanEditorPrecompiled.hpp"
+#include "editor/windows/fanEditorWindow.hpp"
+#include "core/input/fanInputManager.hpp"
 
 namespace fan
 {

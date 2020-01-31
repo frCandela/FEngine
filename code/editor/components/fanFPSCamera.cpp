@@ -1,16 +1,14 @@
-#include "fanGlobalIncludes.h"
-
-#include "editor/components/fanFPSCamera.h"
-#include "scene/components/fanTransform.h"
-#include "scene/components/fanCamera.h"
-#include "core/fanSignal.h"
-#include "core/input/fanInput.h"
-#include "core/input/fanKeyboard.h"
-#include "core/input/fanInput.h"
-#include "core/input/fanInputManager.h"
-#include "core/input/fanMouse.h"
-#include "render/fanRendererDebug.h"
-#include "editor/fanEditorDebug.h"
+#include "editor/components/fanFPSCamera.hpp"
+#include "core/fanSignal.hpp"
+#include "core/input/fanInput.hpp"
+#include "core/input/fanKeyboard.hpp"
+#include "core/input/fanInput.hpp"
+#include "core/input/fanInputManager.hpp"
+#include "core/input/fanMouse.hpp"
+#include "scene/components/fanTransform.hpp"
+#include "scene/components/fanCamera.hpp"
+#include "editor/fanEditorDebug.hpp"
+#include "render/fanRendererDebug.hpp"
 
 namespace fan
 {
@@ -152,7 +150,7 @@ namespace fan
 	bool FPSCamera::Load( const Json & _json ) {
 		Actor::Load(_json);
 
-		LoadVec2( _json, "xySensitivity", m_xySensitivity );
+		Serializable::LoadVec2( _json, "xySensitivity", m_xySensitivity );
 		Serializable::LoadFloat( _json, "speed", m_speed );
 		Serializable::LoadFloat( _json, "speedMultiplier", m_speedMultiplier );
  		return true;
@@ -161,7 +159,7 @@ namespace fan
 	//================================================================================================================================
 	//================================================================================================================================
 	bool FPSCamera::Save( Json & _json ) const {
-		SaveVec2( _json, "xySensitivity", m_xySensitivity );
+		Serializable::SaveVec2( _json, "xySensitivity", m_xySensitivity );
 		Serializable::SaveFloat(_json, "speed", m_speed );
 		Serializable::SaveFloat(_json, "speedMultiplier", m_speedMultiplier );
 		Actor::Save( _json );

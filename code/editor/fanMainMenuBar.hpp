@@ -1,5 +1,7 @@
 #pragma once
 
+#include "editor/fanEditorPrecompiled.hpp"
+
 namespace fan
 {
 	struct EditorGrid;
@@ -67,7 +69,7 @@ namespace fan
 		FPSCounter m_fpsCounter;
 
 		// Temporary buffers
-		std::fs::path m_pathBuffer;
+		std::filesystem::path m_pathBuffer;
 		std::set < std::string > m_sceneExtensionFilter;
 
 		void DrawModals();

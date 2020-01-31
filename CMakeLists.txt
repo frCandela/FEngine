@@ -6,6 +6,7 @@ set(CMAKE_CXX_STANDARD 17)
 set(APP_NAME fengine_editor)
 
 include_directories(deps)
+include_directories(code)
 include_directories("C:/VulkanSDK/1.1.106.0/Include")
 
 link_directories(lib/debug)
@@ -16,10 +17,13 @@ add_subdirectory(code/render)
 add_subdirectory(code/network)
 add_subdirectory(code/scene)
 add_subdirectory(code/game)
+add_subdirectory(code/editor)
 add_subdirectory(deps)
 
+add_compile_definitions(SFML_STATIC)
+
 list(APPEND APP_SOURCES
-    code/main.cpp
+    code/editor/fanMain.cpp
 ) 
 
 set(APP_LIBRARIES 
@@ -30,6 +34,7 @@ set(APP_LIBRARIES
     fanNetwork
     fanScene
     fanGame
+    fanEditor
 )
 
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR})

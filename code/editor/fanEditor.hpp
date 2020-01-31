@@ -1,7 +1,7 @@
 #pragma once
 
-#include "core/files/fanSerializedValues.h"
-#include "editor/fanEditorGrid.h"
+#include "core/fanSerializedValues.hpp"
+#include "editor/fanEditorGrid.hpp"
 
 namespace fan {
 	class MainMenuBar;

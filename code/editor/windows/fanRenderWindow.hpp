@@ -1,22 +1,22 @@
 #pragma once
 
-#include "editor/windows/fanEditorWindow.h"
+#include "editor/fanEditorPrecompiled.hpp"
+#include "editor/windows/fanEditorWindow.hpp"
 
-namespace fan {
-
-	class Scene;
+namespace fan
+{
+	class Renderer;
 
 	//================================================================================================================================
 	//================================================================================================================================
-	class NetworkWindow : public EditorWindow {
+	class RenderWindow : public EditorWindow {
 	public:
+		RenderWindow();
+		void SetRenderer( Renderer * _renderer ) { m_renderer = _renderer; }
 
-		NetworkWindow( Scene * _clientScene, Scene * _serverScene);
 	protected:
-		void OnGui() override;
+		Renderer * m_renderer;
 
-	private:
-		Scene * m_clientScene = nullptr;
-		Scene * m_serverScene = nullptr;
+		void OnGui() override;
 	};
 }

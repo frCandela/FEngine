@@ -1,10 +1,8 @@
-#include "fanGlobalIncludes.h"
-#include "editor/windows/fanProfilerWindow.h"
-
-#include "core/time/fanProfiler.h"
-#include "editor/fanModals.h"
-#include "core/input/fanInput.h"
-#include "core/input/fanInputManager.h"
+#include "editor/windows/fanProfilerWindow.hpp"
+#include "core/input/fanInputManager.hpp"
+#include "core/time/fanProfiler.hpp"
+#include "core/imgui/fanModals.hpp"
+#include "core/input/fanInput.hpp"
 
 namespace fan {
 

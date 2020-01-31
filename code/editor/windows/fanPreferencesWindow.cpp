@@ -1,17 +1,14 @@
-#include "fanGlobalIncludes.h"
-
-#include "editor/windows/fanPreferencesWindow.h"
-#include "editor/fanModals.h"
-#include "render/fanRenderer.h"
-#include "render/pipelines/fanPostprocessPipeline.h"
-#include "core/input/fanInputManager.h"
-#include "core/input/fanInput.h"
-#include "core/input/fanKeyboard.h"
-#include "core/input/fanJoystick.h"
-#include "core/files/fanSerializedValues.h"
-#include "core/time/fanProfiler.h"
-#include "editor/fanModals.h"
-
+#include "editor/windows/fanPreferencesWindow.hpp"
+#include "render/pipelines/fanPostprocessPipeline.hpp"
+#include "render/fanRenderer.hpp"
+#include "core/input/fanInputManager.hpp"
+#include "core/input/fanInput.hpp"
+#include "core/input/fanKeyboard.hpp"
+#include "core/input/fanJoystick.hpp"
+#include "core/fanSerializedValues.hpp"
+#include "core/time/fanProfiler.hpp"
+#include "core/imgui/fanModals.hpp"
+#include "core/input/fanAxis.hpp"
 
 namespace fan
 {

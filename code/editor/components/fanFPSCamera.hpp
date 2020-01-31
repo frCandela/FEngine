@@ -1,6 +1,7 @@
 #pragma once
 
-#include "scene/actors/fanActor.h"
+#include "editor/fanEditorPrecompiled.hpp"
+#include "scene/actors/fanActor.hpp"
 
 namespace fan
 {

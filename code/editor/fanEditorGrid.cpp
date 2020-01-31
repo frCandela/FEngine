@@ -1,5 +1,4 @@
-#include "fanGlobalIncludes.h"
-#include "editor/fanEditorGrid.h"
+#include "editor/fanEditorGrid.hpp"
 
 namespace fan {
 

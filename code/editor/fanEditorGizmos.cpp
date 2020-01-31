@@ -1,15 +1,13 @@
-#include "fanGlobalIncludes.h"
-#include "editor/fanEditorGizmos.h"
-
-#include "core/math/shapes/fanRay.h"
-#include "core/math/fanBasicModels.h"
-#include "core/input/fanMouse.h"
-#include "editor/fanEditorDebug.h"
-#include "render/fanRendererDebug.h"
-#include "scene/fanScene.h"
-#include "scene/fanGameobject.h"
-#include "scene/components/fanTransform.h"
-#include "scene/components/fanCamera.h"
+#include "editor/fanEditorGizmos.hpp"
+#include "editor/fanEditorDebug.hpp"
+#include "core/math/shapes/fanRay.hpp"
+#include "core/math/fanBasicModels.hpp"
+#include "core/input/fanMouse.hpp"
+#include "scene/components/fanTransform.hpp"
+#include "scene/components/fanCamera.hpp"
+#include "scene/fanGameobject.hpp"
+#include "scene/fanScene.hpp"
+#include "render/fanRendererDebug.hpp"
 
 namespace fan
 {

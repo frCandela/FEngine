@@ -1,18 +1,16 @@
-#include "fanGlobalIncludes.h"
-#include "editor/fanMainMenuBar.h"
-
-#include "editor/windows/fanEditorWindow.h"
-#include "editor/fanEditorGrid.h"
-#include "editor/fanModals.h"
-#include "editor/fanEditorSelection.h"
-#include "core/files/fanSerializedValues.h"
-#include "core/input/fanInput.h"
-#include "core/input/fanInputManager.h"
-#include "core/time/fanProfiler.h"
-#include "core/time/fanTime.h"
-#include "scene/fanScene.h"
-#include "scene/fanGameobject.h"
-#include "scene/components/fanCamera.h"
+#include "editor/fanMainMenuBar.hpp"
+#include "editor/windows/fanEditorWindow.hpp"
+#include "editor/fanEditorSelection.hpp"
+#include "editor/fanEditorGrid.hpp"
+#include "core/imgui/fanModals.hpp"
+#include "core/fanSerializedValues.hpp"
+#include "core/input/fanInput.hpp"
+#include "core/input/fanInputManager.hpp"
+#include "core/time/fanProfiler.hpp"
+#include "core/time/fanTime.hpp"
+#include "scene/fanScene.hpp"
+#include "scene/fanGameobject.hpp"
+#include "scene/components/fanCamera.hpp"
 
 namespace fan
 {
@@ -25,7 +23,7 @@ namespace fan
 		, m_showHull(false)
 		, m_showWireframe(false)
 		, m_showNormals(false)
-		, m_sceneExtensionFilter(GlobalValues::s_sceneExtensions) 
+		, m_sceneExtensionFilter(RenderGlobal::s_sceneExtensions)
 	{
 
 		SerializedValues::Get().GetBool( "show_imguidemo", m_showImguiDemoWindow );
@@ -269,7 +267,7 @@ namespace fan
 	//================================================================================================================================
 	void MainMenuBar::DrawModals() {
 		// New scene
-		if (ImGui::FanSaveFileModal("New scene", GlobalValues::s_sceneExtensions, m_pathBuffer)) {
+		if (ImGui::FanSaveFileModal("New scene", RenderGlobal::s_sceneExtensions, m_pathBuffer)) {
 			m_scene->New();
 			m_scene->SetPath( m_pathBuffer.string() );
 		}
@@ -280,7 +278,7 @@ namespace fan
 		}
 
 		// Save scene
-		if (ImGui::FanSaveFileModal("Save scene", GlobalValues::s_sceneExtensions, m_pathBuffer )) {
+		if (ImGui::FanSaveFileModal("Save scene", RenderGlobal::s_sceneExtensions, m_pathBuffer )) {
 			m_scene->SetPath( m_pathBuffer.string() );
 			m_scene->Save();
 		}

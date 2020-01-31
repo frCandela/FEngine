@@ -1,6 +1,7 @@
 #pragma once
 
-#include "editor/windows/fanEditorWindow.h"
+#include "editor/fanEditorPrecompiled.hpp"
+#include "editor/windows/fanEditorWindow.hpp"
 
 namespace fan {
 	class Scene;
@@ -28,7 +29,7 @@ namespace fan {
 		Scene * m_scene;
 		Gameobject* m_gameobjectSelected;
 
-		std::fs::path m_pathBuffer;
+		std::filesystem::path m_pathBuffer;
 		char m_textBuffer[32];
 		Gameobject * m_lastGameobjectRightClicked = nullptr;
 		bool m_expandSceneHierarchy = false;

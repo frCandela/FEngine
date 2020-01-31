@@ -1,10 +1,8 @@
-#include "fanGlobalIncludes.h"
-#include "editor/callbacks/fanGameWindowCallbacks.h"
-
-#include "scene/fanScene.h"
-#include "core/time/fanTime.h"
-#include "editor/windows/fanGameWindow.h"
-#include "render/fanRenderer.h"
+#include "editor/callbacks/fanGameWindowCallbacks.hpp"
+#include "editor/windows/fanGameWindow.hpp"
+#include "core/time/fanTime.hpp"
+#include "render/fanRenderer.hpp"
+#include "scene/fanScene.hpp"
 
 namespace fan
 {

@@ -6,13 +6,13 @@ file(GLOB_RECURSE FAN_GAME_SRC *.cpp)
 file(GLOB_RECURSE FAN_GAME_H *.hpp)
 
 set( FAN_SCENE_LIBS
-    fanCore		
+    fanCore
     fanRender
-    LinearMath_Debug 
-    BulletDynamics_Debug
-    BulletCollision_Debug
+    fanNetwork
     fanScene
 )
+
+add_compile_definitions(SFML_STATIC)
 
 add_library(fanGame STATIC ${FAN_GAME_SRC} ${FAN_GAME_H})
 

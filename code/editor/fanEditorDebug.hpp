@@ -1,5 +1,6 @@
 #pragma once
  
+#include "editor/fanEditorPrecompiled.hpp"
 #include "core/fanSingleton.hpp"
 
 namespace fan

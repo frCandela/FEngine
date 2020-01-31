@@ -1,8 +1,6 @@
-#include "fanGlobalIncludes.h"
-
-#include "editor/windows/fanEditorWindow.h"
-#include "core/files/fanSerializedValues.h"
-#include "core/time/fanProfiler.h"
+#include "editor/windows/fanEditorWindow.hpp"
+#include "core/fanSerializedValues.hpp"
+#include "core/time/fanProfiler.hpp"
 
 namespace fan
 {

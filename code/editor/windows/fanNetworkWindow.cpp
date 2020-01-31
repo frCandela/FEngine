@@ -1,10 +1,8 @@
-#include "fanGlobalIncludes.h"
-#include "editor/windows/fanNetworkWindow.h"
-
-#include "scene/fanScene.h"
-#include "game/network/fanGameServer.h"
-#include "game/network/fanGameClient.h"
-#include "scene/fanGameobject.h"
+#include "editor/windows/fanNetworkWindow.hpp"
+#include "game/network/fanGameServer.hpp"
+#include "game/network/fanGameClient.hpp"
+#include "scene/fanGameobject.hpp"
+#include "scene/fanScene.hpp"
 
 namespace fan {
 

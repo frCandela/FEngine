@@ -1,6 +1,4 @@
-#include "fanGlobalIncludes.h"
-
-#include "fanEngine.h"
+#include "editor/fanEditor.hpp"
 
 void RunGame();
 

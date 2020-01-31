@@ -1,17 +1,16 @@
-#include "game/network/fanGameServer.hpp"
 #include "game/components/fanPlayersManager.hpp"
+#include "game/network/fanGameServer.hpp"
 #include "game/fanGameManager.hpp"
 #include "scene/components/fanCamera.hpp"
 #include "scene/components/fanTransform.hpp"
-#include "network/packets/fanIPacket.hpp"
 #include "network/packets/fanPacketLogin.hpp"
 #include "network/packets/fanPacketPing.hpp"
+#include "network/packets/fanIPacket.hpp"
 #include "core/input/fanInputManager.hpp"
 #include "core/input/fanInput.hpp"
 #include "core/input/fanMouse.hpp"
 #include "core/input/fanJoystick.hpp"
 #include "core/time/fanTime.hpp"
-
 
 namespace fan
 {

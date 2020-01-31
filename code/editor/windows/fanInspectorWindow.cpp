@@ -1,19 +1,17 @@
-#include "fanGlobalIncludes.h"
-#include "editor/windows/fanInspectorWindow.h"
-
-#include "scene/fanGameobject.h"
-#include "scene/components/fanComponent.h"
-#include "scene/components/fanTransform.h"
-#include "scene/components/fanCamera.h"
-#include "scene/components/fanMaterial.h"
-#include "editor/components/fanFPSCamera.h"
-#include "editor/fanDragnDrop.h"
-#include "render/fanMesh.h"
-#include "core/fanSignal.h"
-#include "core/time/fanProfiler.h"
-#include "render/core/fanTexture.h"
-#include "render/core/fanTexture.h"
-#include "render/fanRessourceManager.h"
+#include "editor/windows/fanInspectorWindow.hpp"
+#include "editor/components/fanFPSCamera.hpp"
+#include "game/imgui/fanDragnDrop.hpp"
+#include "scene/components/fanComponent.hpp"
+#include "scene/components/fanTransform.hpp"
+#include "scene/components/fanMaterial.hpp"
+#include "scene/components/fanCamera.hpp"
+#include "scene/fanGameobject.hpp"
+#include "core/time/fanProfiler.hpp"
+#include "core/fanSignal.hpp"
+#include "render/fanRessourceManager.hpp"
+#include "render/core/fanTexture.hpp"
+#include "render/core/fanTexture.hpp"
+#include "render/fanMesh.hpp"
 
 namespace fan
 {
@@ -100,7 +98,7 @@ namespace fan
 	//================================================================================================================================
 	//================================================================================================================================
 	void InspectorWindow::NewComponentPopup() {
-		using Path = std::fs::path;
+		using Path = std::filesystem::path;
 
 		
 		if (ImGui::BeginPopup("New component"))
@@ -146,9 +144,9 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void InspectorWindow::R_NewComponentPopup( std::set< std::fs::path >& _componentsPathSet, std::set< std::fs::path >::iterator&  _current, const std::vector< const Component *>& _components, const std::vector<std::fs::path>& _componentsPath )
+	void InspectorWindow::R_NewComponentPopup( std::set< std::filesystem::path >& _componentsPathSet, std::set< std::filesystem::path >::iterator&  _current, const std::vector< const Component *>& _components, const std::vector<std::filesystem::path>& _componentsPath )
 	{
-		std::fs::path rootPath = *_current;
+		std::filesystem::path rootPath = *_current;
 
 		std::string name = rootPath.string();
 
@@ -168,7 +166,7 @@ namespace fan
 		if ( ImGui::BeginMenu( name.c_str() ) )
 		{
 			// draw next menu paths
-			std::set< std::fs::path >::iterator next = _current;
+			std::set< std::filesystem::path >::iterator next = _current;
 			next++;
 			while ( next != _componentsPathSet.end() && next->string().find( rootPath.string() ) == 0 )
 			{
@@ -191,7 +189,7 @@ namespace fan
 		else
 		{
 			// If the menu is not open, consumes all the following expressions under its path
-			std::set< std::fs::path >::iterator next = _current;
+			std::set< std::filesystem::path >::iterator next = _current;
 			++next;
 			while ( next != _componentsPathSet.end() && next->string().find( rootPath.string() ) == 0 )
 			{

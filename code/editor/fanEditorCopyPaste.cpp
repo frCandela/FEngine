@@ -1,10 +1,8 @@
-#include "fanGlobalIncludes.h"
-#include "editor/fanEditorCopyPaste.h"
-
-#include "editor/fanEditorSelection.h"
-#include "scene/fanGameobject.h"
-#include "scene/fanSceneInstantiate.h"
-#include "scene/fanPrefab.h"
+#include "editor/fanEditorCopyPaste.hpp"
+#include "editor/fanEditorSelection.hpp"
+#include "scene/fanSceneInstantiate.hpp"
+#include "scene/fanGameobject.hpp"
+#include "scene/fanPrefab.hpp"
 
 namespace fan
 {

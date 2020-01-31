@@ -1,7 +1,7 @@
 #include "scene/components/fanBoxShape.hpp"
 #include "scene/components/fanTransform.hpp"
 #include "render/fanRendererDebug.hpp"
-#include "editor/fanEditorDebug.h"
+#include "editor/fanEditorDebug.hpp"
 
 namespace fan {
 	REGISTER_TYPE_INFO( BoxShape, TypeInfo::Flags::EDITOR_COMPONENT, "physics/" )

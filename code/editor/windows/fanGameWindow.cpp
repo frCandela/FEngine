@@ -1,9 +1,7 @@
-#include "fanGlobalIncludes.h"
-#include "editor/windows/fanGameWindow.h"
-
-#include "core/input/fanMouse.h"
-#include "scene/fanScene.h"
-#include "core/time/fanTime.h"
+#include "editor/windows/fanGameWindow.hpp"
+#include "core/input/fanMouse.hpp"
+#include "core/time/fanTime.hpp"
+#include "scene/fanScene.hpp"
 
 namespace fan {
 
