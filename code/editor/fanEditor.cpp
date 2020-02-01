@@ -57,6 +57,10 @@
 #include "scene/fanScene.hpp"
 #include "game/components/fanCameraController.hpp"
 
+// @hack for generating lazy typeinfo on non referenced components. Find a compiler flag for that ?
+#include "game/components/fanSunLight.hpp"
+#include "game/components/fanSolarEruption.hpp"
+
 namespace fan 
 {
 	Signal<Camera*> Engine::onSetCamera;
@@ -204,6 +208,12 @@ namespace fan
 		// try open scenes
 		m_clientScene->LoadFrom("content/scenes/game.scene");
 		m_serverScene->LoadFrom("content/scenes/game.scene");		
+
+		// @hack for generating lazy typeinfo on non referenced components. Find a compiler flag for that ?
+		if (Time::Get().ElapsedSinceStartup() == -12.01548468f) {
+			SunLight light;
+			SolarEruption solarEruption;
+		}
 	}
 
 	//================================================================================================================================

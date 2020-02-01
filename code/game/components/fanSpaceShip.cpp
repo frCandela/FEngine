@@ -2,7 +2,6 @@
 #include "game/components/fanPlayerInput.hpp"
 #include "game/components/fanSolarSystem.hpp"
 #include "game/components/fanWithEnergy.hpp"
-#include "game/components/fanWithEnergy.hpp"
 #include "game/components/fanHealth.hpp"
 #include "game/components/fanPlanet.hpp"
 #include "scene/components/fanRigidbody.hpp"
