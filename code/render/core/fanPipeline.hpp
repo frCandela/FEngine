@@ -28,13 +28,13 @@ namespace fan {
 		Device&	m_device;
 		VkPipelineLayout	m_pipelineLayout;
 
-		VkPipelineRasterizationStateCreateInfo	m_rasterizationStateCreateInfo;
-		VkPipelineInputAssemblyStateCreateInfo	m_inputAssemblyStateCreateInfo;
-		VkPipelineDepthStencilStateCreateInfo	m_depthStencilStateCreateInfo;
-		VkPipelineMultisampleStateCreateInfo	m_multisampleStateCreateInfo;
-		VkPipelineShaderStageCreateInfo			m_vertshaderStageCreateInfos;
-		VkPipelineShaderStageCreateInfo			m_fragShaderStageCreateInfos;
-		VkPipelineColorBlendStateCreateInfo		m_colorBlendStateCreateInfo;	
+		VkPipelineRasterizationStateCreateInfo	m_rasterizationStateCreateInfo = {};
+		VkPipelineInputAssemblyStateCreateInfo	m_inputAssemblyStateCreateInfo = {};
+		VkPipelineDepthStencilStateCreateInfo	m_depthStencilStateCreateInfo = {};
+		VkPipelineMultisampleStateCreateInfo	m_multisampleStateCreateInfo = {};
+		VkPipelineShaderStageCreateInfo			m_vertshaderStageCreateInfos = {};
+		VkPipelineShaderStageCreateInfo			m_fragShaderStageCreateInfos = {};
+		VkPipelineColorBlendStateCreateInfo		m_colorBlendStateCreateInfo = {};
 		std::vector<VkVertexInputBindingDescription >	 m_bindingDescription;
 		std::vector<VkVertexInputAttributeDescription >  m_attributeDescriptions;
 		std::vector<VkPipelineColorBlendAttachmentState> m_attachmentBlendStates;

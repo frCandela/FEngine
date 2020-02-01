@@ -53,7 +53,7 @@ namespace fan
 		uint32_t m_currentImageIndex;
 		uint32_t m_currentFrame = 0;
 
-		VkSwapchainKHR				m_swapchain;
+		VkSwapchainKHR				m_swapchain = VK_NULL_HANDLE;
 		VkPresentModeKHR			m_presentMode;
 		VkSurfaceCapabilitiesKHR	m_surfaceCapabilities;
 		uint32_t					m_imagesCount;
