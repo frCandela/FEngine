@@ -1,1 +1,1453 @@
-{"gameobjects":{"childs":[{"childs":[{"childs":null,"components":[{"id":1269105190,"position":{"x":0.03338969126343727,"y":29.75,"z":-4.463437080383301},"rotation":{"w":0.7071070075035095,"x":0.7071065306663513,"y":1.452902598231276e-08,"z":1.4529036640453796e-08},"scale":{"x":1.0,"y":1.0,"z":1.0},"type":"Transform"},{"camera_type":1,"farDistance":1000.0,"fov":37.0,"id":1148216499,"nearDistance":0.009999999776482582,"orthoSize":10.0,"type":"Camera"},{"height_from_target":29.75,"id":259515671,"margin_ratio":{"x":1.0,"y":1.0},"min_size":15.0,"players_manager":{"component_id":160985157,"gameobject_id":561},"type":"CameraController"}],"name":"game_camera","unique_id":5}],"components":[{"id":1269105190,"position":{"x":0.0,"y":0.0,"z":0.0},"rotation":{"w":1.0,"x":0.0,"y":0.0,"z":0.0},"scale":{"x":1.0,"y":1.0,"z":1.0},"type":"Transform"},{"id":160985157,"player_prefab":"content\\prefab\\player.prefab","type":"PlayersManager"},{"game_camera":{"component_id":1148216499,"gameobject_id":5},"id":1830802815,"type":"GameManager"},{"id":3809265627,"type":"GameServer"},{"id":3191059139,"type":"GameClient"}],"name":"game_managers","unique_id":561},{"childs":null,"components":[{"id":1269105190,"position":{"x":-66.31199645996094,"y":-12.149999618530273,"z":0.0},"rotation":{"w":0.8921210765838623,"x":2.7598676751949824e-05,"y":-0.45179641246795654,"z":5.449657328426838e-05},"scale":{"x":1000.0,"y":1000.0,"z":1000.0},"type":"Transform"},{"id":2472396462,"path":"content\\_default\\mesh\\plane.fbx","type":"MeshRenderer"},{"color":{"a":1.0,"b":9.998999303206801e-05,"g":9.998999303206801e-05,"r":9.999999747378752e-05},"id":1828911513,"material":".\\content\\_default\\texture\\white.png","shininess":256,"type":"Material"}],"name":"background","unique_id":6},{"childs":[{"childs":null,"components":[{"id":1269105190,"position":{"x":0.0,"y":11.141216278076172,"z":0.0},"rotation":{"w":1.0,"x":0.0,"y":0.0,"z":0.0},"scale":{"x":1.0,"y":1.0,"z":1.0},"type":"Transform"},{"ambiant":{"a":1.0,"b":0.3545605540275574,"g":0.3545605540275574,"r":0.35459601879119873},"attenuation":{"x":0.0,"y":0.0,"z":0.004999999888241291},"diffuse":{"a":1.0,"b":0.5653553605079651,"g":0.5653553605079651,"r":0.5703549385070801},"id":3039791276,"specular":{"a":1.0,"b":9.998999303206801e-05,"g":9.998999303206801e-05,"r":9.999999747378752e-05},"type":"PointLight"},{"id":3931268760,"radius":500.0,"sub_angle":45.0,"type":"SunLight"}],"name":"sun_light","unique_id":8},{"childs":null,"components":[{"id":1269105190,"position":{"x":0.0,"y":-1.0,"z":0.0},"rotation":{"w":0.9999995827674866,"x":0.0,"y":0.0008726855739951134,"z":0.0},"scale":{"x":1.0,"y":1.0,"z":1.0},"type":"Transform"},{"color":{"a":1.0,"b":0.0,"g":0.5650817155838013,"r":0.565082311630249},"id":1828911513,"material":"content\\fx\\sunlight.png","shininess":256,"type":"Material"},{"base ":{"a":1.0,"b":0.0,"g":0.5650817155838013,"r":0.565082311630249},"collapse_alpha":0.4000000059604645,"eruption time":0.016663074493408203,"eruption_cooldown":10.0,"eruption_damage_per_second":50.0,"eruption_random_ooldown":10.0,"explosion fade-in time":0.10000000149011612,"explosion max particles":500.0,"explosion particles speed":50.0,"explosion time":2.0,"explositon ":{"a":0.49253731966018677,"b":0.0,"g":0.0,"r":1.0},"id":1722544033,"type":"SolarEruption","waiting max particles":100.0,"waiting time":2.0,"warming max particles":10.0,"warming time":2.0},{"color":{"a":0.49253731966018677,"b":0.0,"g":0.0,"r":1.0},"duration":2.0,"id":613294371,"offset":{"x":0.0,"y":0.0,"z":0.0},"origin":0,"particles_per_second":-33,"speed":50.0,"sunlight_occlusion_active":true,"type":"ParticleSystem"},{"id":2472396462,"path":"SolarEruptionMesh","type":"MeshRenderer"}],"name":"solar_eruption","unique_id":9},{"childs":[{"childs":null,"components":[{"id":1269105190,"position":{"x":1.4778547286987305,"y":0.0,"z":0.9686250686645508},"rotation":{"w":1.0,"x":0.0,"y":0.0,"z":0.0},"scale":{"x":0.2998969852924347,"y":0.30000001192092896,"z":0.30000001192092896},"type":"Transform"},{"id":2472396462,"path":"content\\_default\\mesh\\sphere.fbx","type":"MeshRenderer"},{"color":{"a":1.0,"b":0.0,"g":0.25,"r":0.5},"id":1828911513,"material":"content/_default/texture/white.png","shininess":1,"type":"Material"},{"id":1669599886,"phase":0.5801805257797241,"radius":1.7669999599456787,"speed":-0.10176700353622437,"type":"Planet"},{"id":3410179010,"radius":0.2998969852924347,"type":"SphereShape"},{"enable_desactivation":false,"id":3581780679,"is_kinematic":true,"mass":0.0,"type":"Rigidbody"}],"name":"planet0-0","unique_id":11},{"childs":null,"components":[{"id":1269105190,"position":{"x":-2.2093076705932617,"y":0.0,"z":1.8770872354507446},"rotation":{"w":1.0,"x":0.0,"y":0.0,"z":0.0},"scale":{"x":0.44263193011283875,"y":0.44263193011283875,"z":0.44263193011283875},"type":"Transform"},{"id":2472396462,"path":"content\\_default\\mesh\\sphere.fbx","type":"MeshRenderer"},{"color":{"a":1.0,"b":0.0,"g":0.25,"r":0.5},"id":1828911513,"material":"content/_default/texture/white.png","shininess":1,"type":"Material"},{"id":1669599886,"phase":2.4373152256011963,"radius":2.8990509510040283,"speed":0.10289905220270157,"type":"Planet"},{"id":3410179010,"radius":0.44263193011283875,"type":"SphereShape"},{"enable_desactivation":false,"id":3581780679,"is_kinematic":true,"mass":0.0,"type":"Rigidbody"}],"name":"planet1-0","unique_id":12},{"childs":null,"components":[{"id":1269105190,"position":{"x":-3.567354202270508,"y":0.0,"z":2.704209804534912},"rotation":{"w":1.0,"x":0.0,"y":0.0,"z":0.0},"scale":{"x":0.6167700886726379,"y":0.6167700886726379,"z":0.6167700886726379},"type":"Transform"},{"id":2472396462,"path":"content\\_default\\mesh\\sphere.fbx","type":"MeshRenderer"},{"color":{"a":1.0,"b":0.0,"g":0.25,"r":0.5},"id":1828911513,"material":"content/_default/texture/white.png","shininess":1,"type":"Material"},{"id":1669599886,"phase":2.4929635524749756,"radius":4.476468086242676,"speed":-0.10447646677494049,"type":"Planet"},{"id":3410179010,"radius":0.6167700886726379,"type":"SphereShape"},{"enable_desactivation":false,"id":3581780679,"is_kinematic":true,"mass":0.0,"type":"Rigidbody"}],"name":"planet2-0","unique_id":13},{"childs":null,"components":[{"id":1269105190,"position":{"x":-0.6779471635818481,"y":0.0,"z":-4.42483377456665},"rotation":{"w":1.0,"x":0.0,"y":0.0,"z":0.0},"scale":{"x":0.6167700886726379,"y":0.6167700886726379,"z":0.6167700886726379},"type":"Transform"},{"id":2472396462,"path":"content\\_default\\mesh\\sphere.fbx","type":"MeshRenderer"},{"color":{"a":1.0,"b":0.0,"g":0.25,"r":0.5},"id":1828911513,"material":"content/_default/texture/white.png","shininess":1,"type":"Material"},{"id":1669599886,"phase":4.560357093811035,"radius":4.476468086242676,"speed":-0.10447646677494049,"type":"Planet"},{"id":3410179010,"radius":0.6167700886726379,"type":"SphereShape"},{"enable_desactivation":false,"id":3581780679,"is_kinematic":true,"mass":0.0,"type":"Rigidbody"}],"name":"planet2-1","unique_id":14},{"childs":null,"components":[{"id":1269105190,"position":{"x":4.405431747436523,"y":0.0,"z":0.7943146228790283},"rotation":{"w":1.0,"x":0.0,"y":0.0,"z":0.0},"scale":{"x":0.6167700886726379,"y":0.6167700886726379,"z":0.6167700886726379},"type":"Transform"},{"id":2472396462,"path":"content\\_default\\mesh\\sphere.fbx","type":"MeshRenderer"},{"color":{"a":1.0,"b":0.0,"g":0.25,"r":0.5},"id":1828911513,"material":"content/_default/texture/white.png","shininess":1,"type":"Material"},{"id":1669599886,"phase":6.461572170257568,"radius":4.476468086242676,"speed":-0.10447646677494049,"type":"Planet"},{"id":3410179010,"radius":0.6167700886726379,"type":"SphereShape"},{"enable_desactivation":false,"id":3581780679,"is_kinematic":true,"mass":0.0,"type":"Rigidbody"}],"name":"planet2-2","unique_id":15},{"childs":null,"components":[{"id":1269105190,"position":{"x":-2.5826940536499023,"y":0.0,"z":6.150454521179199},"rotation":{"w":1.0,"x":0.0,"y":0.0,"z":0.0},"scale":{"x":0.8579493761062622,"y":0.8579493761062622,"z":0.8579493761062622},"type":"Transform"},{"id":2472396462,"path":"content\\_default\\mesh\\sphere.fbx","type":"MeshRenderer"},{"color":{"a":1.0,"b":0.0,"g":0.25,"r":0.5},"id":1828911513,"material":"content/_default/texture/white.png","shininess":1,"type":"Material"},{"id":1669599886,"phase":1.968355655670166,"radius":6.670711994171143,"speed":0.10667071491479874,"type":"Planet"},{"id":3410179010,"radius":0.8579493761062622,"type":"SphereShape"},{"enable_desactivation":false,"id":3581780679,"is_kinematic":true,"mass":0.0,"type":"Rigidbody"}],"name":"planet3-0","unique_id":16},{"childs":null,"components":[{"id":1269105190,"position":{"x":1.323805809020996,"y":0.0,"z":-6.5380377769470215},"rotation":{"w":1.0,"x":0.0,"y":0.0,"z":0.0},"scale":{"x":0.8579493761062622,"y":0.8579493761062622,"z":0.8579493761062622},"type":"Transform"},{"id":2472396462,"path":"content\\_default\\mesh\\sphere.fbx","type":"MeshRenderer"},{"color":{"a":1.0,"b":0.0,"g":0.25,"r":0.5},"id":1828911513,"material":"content/_default/texture/white.png","shininess":1,"type":"Material"},{"id":1669599886,"phase":4.912165641784668,"radius":6.670711994171143,"speed":0.10667071491479874,"type":"Planet"},{"id":3410179010,"radius":0.8579493761062622,"type":"SphereShape"},{"enable_desactivation":false,"id":3581780679,"is_kinematic":true,"mass":0.0,"type":"Rigidbody"}],"name":"planet3-1","unique_id":17},{"childs":null,"components":[{"id":1269105190,"position":{"x":-9.118656158447266,"y":0.0,"z":3.3834011554718018},"rotation":{"w":1.0,"x":0.0,"y":0.0,"z":0.0},"scale":{"x":1.19466233253479,"y":1.19466233253479,"z":1.19466233253479},"type":"Transform"},{"id":2472396462,"path":"content\\_default\\mesh\\sphere.fbx","type":"MeshRenderer"},{"color":{"a":1.0,"b":0.0,"g":0.25,"r":0.5},"id":1828911513,"material":"content/_default/texture/white.png","shininess":1,"type":"Material"},{"id":1669599886,"phase":2.786296844482422,"radius":9.726114273071289,"speed":-0.10972611606121063,"type":"Planet"},{"id":3410179010,"radius":1.19466233253479,"type":"SphereShape"},{"enable_desactivation":false,"id":3581780679,"is_kinematic":true,"mass":0.0,"type":"Rigidbody"}],"name":"planet4-0","unique_id":18},{"childs":null,"components":[{"id":1269105190,"position":{"x":13.762711524963379,"y":0.0,"z":2.391962766647339},"rotation":{"w":1.0,"x":0.0,"y":0.0,"z":0.0},"scale":{"x":1.6589787006378174,"y":1.6589787006378174,"z":1.6589787006378174},"type":"Transform"},{"id":2472396462,"path":"content\\_default\\mesh\\sphere.fbx","type":"MeshRenderer"},{"color":{"a":1.0,"b":0.0,"g":0.25,"r":0.5},"id":1828911513,"material":"content/_default/texture/white.png","shininess":1,"type":"Material"},{"id":1669599886,"phase":0.1720813512802124,"radius":13.969026565551758,"speed":0.11396902799606323,"type":"Planet"},{"id":3410179010,"radius":1.6589787006378174,"type":"SphereShape"},{"enable_desactivation":false,"id":3581780679,"is_kinematic":true,"mass":0.0,"type":"Rigidbody"}],"name":"planet5-0","unique_id":19},{"childs":null,"components":[{"id":1269105190,"position":{"x":17.039045333862305,"y":0.0,"z":-10.227436065673828},"rotation":{"w":1.0,"x":0.0,"y":0.0,"z":0.0},"scale":{"x":2.3083884716033936,"y":2.3083884716033936,"z":2.3083884716033936},"type":"Transform"},{"id":2472396462,"path":"content\\_default\\mesh\\sphere.fbx","type":"MeshRenderer"},{"color":{"a":1.0,"b":0.0,"g":0.25,"r":0.5},"id":1828911513,"material":"content/_default/texture/white.png","shininess":1,"type":"Material"},{"id":1669599886,"phase":5.742592811584473,"radius":19.872833251953125,"speed":-0.11987283825874329,"type":"Planet"},{"id":3410179010,"radius":2.3083884716033936,"type":"SphereShape"},{"enable_desactivation":false,"id":3581780679,"is_kinematic":true,"mass":0.0,"type":"Rigidbody"}],"name":"planet6-0","unique_id":20},{"childs":null,"components":[{"id":1269105190,"position":{"x":5.129509449005127,"y":0.0,"z":19.199417114257813},"rotation":{"w":1.0,"x":0.0,"y":0.0,"z":0.0},"scale":{"x":2.3083884716033936,"y":2.3083884716033936,"z":2.3083884716033936},"type":"Transform"},{"id":2472396462,"path":"content\\_default\\mesh\\sphere.fbx","type":"MeshRenderer"},{"color":{"a":1.0,"b":0.0,"g":0.25,"r":0.5},"id":1828911513,"material":"content/_default/texture/white.png","shininess":1,"type":"Material"},{"id":1669599886,"phase":7.592909336090088,"radius":19.872833251953125,"speed":-0.11987283825874329,"type":"Planet"},{"id":3410179010,"radius":2.3083884716033936,"type":"SphereShape"},{"enable_desactivation":false,"id":3581780679,"is_kinematic":true,"mass":0.0,"type":"Rigidbody"}],"name":"planet6-1","unique_id":21},{"childs":null,"components":[{"id":1269105190,"position":{"x":-19.860549926757813,"y":0.0,"z":-0.6986055970191956},"rotation":{"w":1.0,"x":0.0,"y":0.0,"z":0.0},"scale":{"x":2.3083884716033936,"y":2.3083884716033936,"z":2.3083884716033936},"type":"Transform"},{"id":2472396462,"path":"content\\_default\\mesh\\sphere.fbx","type":"MeshRenderer"},{"color":{"a":1.0,"b":0.0,"g":0.25,"r":0.5},"id":1828911513,"material":"content/_default/texture/white.png","shininess":1,"type":"Material"},{"id":1669599886,"phase":9.459939002990723,"radius":19.872833251953125,"speed":-0.11987283825874329,"type":"Planet"},{"id":3410179010,"radius":2.3083884716033936,"type":"SphereShape"},{"enable_desactivation":false,"id":3581780679,"is_kinematic":true,"mass":0.0,"type":"Rigidbody"}],"name":"planet6-2","unique_id":22},{"childs":null,"components":[{"id":1269105190,"position":{"x":17.852197647094727,"y":0.0,"z":21.686737060546875},"rotation":{"w":1.0,"x":0.0,"y":0.0,"z":0.0},"scale":{"x":3.2126855850219727,"y":3.2126855850219727,"z":3.2126855850219727},"type":"Transform"},{"id":2472396462,"path":"content\\_default\\mesh\\sphere.fbx","type":"MeshRenderer"},{"color":{"a":1.0,"b":0.0,"g":0.25,"r":0.5},"id":1828911513,"material":"content/_default/texture/white.png","shininess":1,"type":"Material"},{"id":1669599886,"phase":0.882077157497406,"radius":28.089420318603516,"speed":0.12808942794799805,"type":"Planet"},{"id":3410179010,"radius":3.2126855850219727,"type":"SphereShape"},{"enable_desactivation":false,"id":3581780679,"is_kinematic":true,"mass":0.0,"type":"Rigidbody"}],"name":"planet7-0","unique_id":23},{"childs":null,"components":[{"id":1269105190,"position":{"x":-18.668392181396484,"y":0.0,"z":-20.988250732421875},"rotation":{"w":1.0,"x":0.0,"y":0.0,"z":0.0},"scale":{"x":3.2126855850219727,"y":3.2126855850219727,"z":3.2126855850219727},"type":"Transform"},{"id":2472396462,"path":"content\\_default\\mesh\\sphere.fbx","type":"MeshRenderer"},{"color":{"a":1.0,"b":0.0,"g":0.25,"r":0.5},"id":1828911513,"material":"content/_default/texture/white.png","shininess":1,"type":"Material"},{"id":1669599886,"phase":3.9854228496551514,"radius":28.089420318603516,"speed":0.12808942794799805,"type":"Planet"},{"id":3410179010,"radius":3.2126855850219727,"type":"SphereShape"},{"enable_desactivation":false,"id":3581780679,"is_kinematic":true,"mass":0.0,"type":"Rigidbody"}],"name":"planet7-1","unique_id":24},{"childs":null,"components":[{"id":1269105190,"position":{"x":12.394779205322266,"y":0.0,"z":-37.54856872558594},"rotation":{"w":1.0,"x":0.0,"y":0.0,"z":0.0},"scale":{"x":4.47774076461792,"y":4.47774076461792,"z":4.47774076461792},"type":"Transform"},{"id":2472396462,"path":"content\\_default\\mesh\\sphere.fbx","type":"MeshRenderer"},{"color":{"a":1.0,"b":0.0,"g":0.25,"r":0.5},"id":1828911513,"material":"content/_default/texture/white.png","shininess":1,"type":"Material"},{"id":1669599886,"phase":5.031226634979248,"radius":39.54144287109375,"speed":-0.13954144716262817,"type":"Planet"},{"id":3410179010,"radius":4.47774076461792,"type":"SphereShape"},{"enable_desactivation":false,"id":3581780679,"is_kinematic":true,"mass":0.0,"type":"Rigidbody"}],"name":"planet8-0","unique_id":25},{"childs":null,"components":[{"id":1269105190,"position":{"x":29.637020111083984,"y":0.0,"z":26.175804138183594},"rotation":{"w":1.0,"x":0.0,"y":0.0,"z":0.0},"scale":{"x":4.47774076461792,"y":4.47774076461792,"z":4.47774076461792},"type":"Transform"},{"id":2472396462,"path":"content\\_default\\mesh\\sphere.fbx","type":"MeshRenderer"},{"color":{"a":1.0,"b":0.0,"g":0.25,"r":0.5},"id":1828911513,"material":"content/_default/texture/white.png","shininess":1,"type":"Material"},{"id":1669599886,"phase":7.006648063659668,"radius":39.54144287109375,"speed":-0.13954144716262817,"type":"Planet"},{"id":3410179010,"radius":4.47774076461792,"type":"SphereShape"},{"enable_desactivation":false,"id":3581780679,"is_kinematic":true,"mass":0.0,"type":"Rigidbody"}],"name":"planet8-1","unique_id":26},{"childs":null,"components":[{"id":1269105190,"position":{"x":-37.31688690185547,"y":0.0,"z":13.075766563415527},"rotation":{"w":1.0,"x":0.0,"y":0.0,"z":0.0},"scale":{"x":4.47774076461792,"y":4.47774076461792,"z":4.47774076461792},"type":"Transform"},{"id":2472396462,"path":"content\\_default\\mesh\\sphere.fbx","type":"MeshRenderer"},{"color":{"a":1.0,"b":0.0,"g":0.25,"r":0.5},"id":1828911513,"material":"content/_default/texture/white.png","shininess":1,"type":"Material"},{"id":1669599886,"phase":9.087748527526855,"radius":39.54144287109375,"speed":-0.13954144716262817,"type":"Planet"},{"id":3410179010,"radius":4.47774076461792,"type":"SphereShape"},{"enable_desactivation":false,"id":3581780679,"is_kinematic":true,"mass":0.0,"type":"Rigidbody"}],"name":"planet8-2","unique_id":27}],"components":[{"id":1269105190,"position":{"x":0.0,"y":0.0,"z":0.0},"rotation":{"w":1.0,"x":0.0,"y":0.0,"z":0.0},"scale":{"x":1.0,"y":1.0,"z":1.0},"type":"Transform"},{"color":{"a":1.0,"b":0.0,"g":0.7067548036575317,"r":1.0},"id":1828911513,"material":"content\\_default\\texture\\white.png","shininess":256,"type":"Material"},{"id":3235656336,"initial_radius":1.7669999599456787,"maxPlanetsPerOrbit":3,"max_radius":40.60200119018555,"radiusFactors":{"x":0.4399999976158142,"y":0.39100000262260437},"radiusRFactors":{"x":0.0010000000474974513,"y":0.0010000000474974513},"scaleMinMax":{"x":0.30000001192092896,"y":0.10000000149011612},"scaleMult":0.7820000052452087,"seed":1,"speedFactors":{"x":0.10000000149011612,"y":0.0010000000474974513},"type":"SolarSystem"},{"id":2472396462,"path":"content\\_default\\mesh\\sphere.fbx","type":"MeshRenderer"},{"enable_desactivation":false,"id":3581780679,"is_kinematic":true,"mass":0.0,"type":"Rigidbody"},{"id":3410179010,"radius":1.0,"type":"SphereShape"}],"name":"solar_system","unique_id":10}],"components":[{"id":1269105190,"position":{"x":0.0,"y":0.0,"z":0.0},"rotation":{"w":1.0,"x":0.0,"y":0.0,"z":0.0},"scale":{"x":1.0,"y":1.0,"z":1.0},"type":"Transform"}],"name":"sun","unique_id":7}],"components":[{"id":1269105190,"position":{"x":0.0,"y":0.0,"z":0.0},"rotation":{"w":1.0,"x":0.0,"y":0.0,"z":0.0},"scale":{"x":1.0,"y":1.0,"z":1.0},"type":"Transform"}],"name":"root","unique_id":2},"parameters":{"name":"game","path":"content/scenes/game.scene"}}
+{
+	"gameobjects": {
+		"childs": [{
+			"childs": [{
+				"childs": null,
+				"components": [{
+					"id": 1269105190,
+					"position": {
+						"x": 0.03338969126343727,
+						"y": 29.75,
+						"z": -4.463437080383301
+					},
+					"rotation": {
+						"w": 0.7071070075035095,
+						"x": 0.7071065306663513,
+						"y": 1.452902598231276e-08,
+						"z": 1.4529036640453796e-08
+					},
+					"scale": {
+						"x": 1.0,
+						"y": 1.0,
+						"z": 1.0
+					},
+					"type": "Transform"
+				},
+				{
+					"camera_type": 1,
+					"farDistance": 1000.0,
+					"fov": 37.0,
+					"id": 1148216499,
+					"nearDistance": 0.009999999776482582,
+					"orthoSize": 10.0,
+					"type": "Camera"
+				},
+				{
+					"height_from_target": 29.75,
+					"id": 259515671,
+					"margin_ratio": {
+						"x": 1.0,
+						"y": 1.0
+					},
+					"min_size": 15.0,
+					"players_manager": {
+						"component_id": 160985157,
+						"gameobject_id": 561
+					},
+					"type": "CameraController"
+				}],
+				"name": "game_camera",
+				"unique_id": 5
+			}],
+			"components": [{
+				"id": 1269105190,
+				"position": {
+					"x": 0.0,
+					"y": 0.0,
+					"z": 0.0
+				},
+				"rotation": {
+					"w": 1.0,
+					"x": 0.0,
+					"y": 0.0,
+					"z": 0.0
+				},
+				"scale": {
+					"x": 1.0,
+					"y": 1.0,
+					"z": 1.0
+				},
+				"type": "Transform"
+			},
+			{
+				"id": 160985157,
+				"player_prefab": "content\\prefab\\player.prefab",
+				"type": "PlayersManager"
+			},
+			{
+				"game_camera": {
+					"component_id": 1148216499,
+					"gameobject_id": 5
+				},
+				"id": 1830802815,
+				"type": "GameManager"
+			},
+			{
+				"id": 3809265627,
+				"type": "GameServer"
+			},
+			{
+				"id": 3191059139,
+				"type": "GameClient"
+			}],
+			"name": "game_managers",
+			"unique_id": 561
+		},
+		{
+			"childs": null,
+			"components": [{
+				"id": 1269105190,
+				"position": {
+					"x": -66.31199645996094,
+					"y": -12.149999618530273,
+					"z": 0.0
+				},
+				"rotation": {
+					"w": 0.8921210765838623,
+					"x": 2.7598676751949824e-05,
+					"y": -0.45179641246795654,
+					"z": 5.449657328426838e-05
+				},
+				"scale": {
+					"x": 1000.0,
+					"y": 1000.0,
+					"z": 1000.0
+				},
+				"type": "Transform"
+			},
+			{
+				"id": 2472396462,
+				"path": "content\\_default\\mesh\\plane.gltf",
+				"type": "MeshRenderer"
+			},
+			{
+				"color": {
+					"a": 1.0,
+					"b": 9.998999303206801e-05,
+					"g": 9.998999303206801e-05,
+					"r": 9.999999747378752e-05
+				},
+				"id": 1828911513,
+				"material": ".\\content\\_default\\texture\\white.png",
+				"shininess": 256,
+				"type": "Material"
+			}],
+			"name": "background",
+			"unique_id": 6
+		},
+		{
+			"childs": [{
+				"childs": null,
+				"components": [{
+					"id": 1269105190,
+					"position": {
+						"x": 0.0,
+						"y": 11.141216278076172,
+						"z": 0.0
+					},
+					"rotation": {
+						"w": 1.0,
+						"x": 0.0,
+						"y": 0.0,
+						"z": 0.0
+					},
+					"scale": {
+						"x": 1.0,
+						"y": 1.0,
+						"z": 1.0
+					},
+					"type": "Transform"
+				},
+				{
+					"ambiant": {
+						"a": 1.0,
+						"b": 0.3545605540275574,
+						"g": 0.3545605540275574,
+						"r": 0.35459601879119873
+					},
+					"attenuation": {
+						"x": 0.0,
+						"y": 0.0,
+						"z": 0.004999999888241291
+					},
+					"diffuse": {
+						"a": 1.0,
+						"b": 0.5653553605079651,
+						"g": 0.5653553605079651,
+						"r": 0.5703549385070801
+					},
+					"id": 3039791276,
+					"specular": {
+						"a": 1.0,
+						"b": 9.998999303206801e-05,
+						"g": 9.998999303206801e-05,
+						"r": 9.999999747378752e-05
+					},
+					"type": "PointLight"
+				},
+				{
+					"id": 3931268760,
+					"radius": 500.0,
+					"sub_angle": 45.0,
+					"type": "SunLight"
+				}],
+				"name": "sun_light",
+				"unique_id": 8
+			},
+			{
+				"childs": null,
+				"components": [{
+					"id": 1269105190,
+					"position": {
+						"x": 0.0,
+						"y": -1.0,
+						"z": 0.0
+					},
+					"rotation": {
+						"w": 0.9999995827674866,
+						"x": 0.0,
+						"y": 0.0008726855739951134,
+						"z": 0.0
+					},
+					"scale": {
+						"x": 1.0,
+						"y": 1.0,
+						"z": 1.0
+					},
+					"type": "Transform"
+				},
+				{
+					"color": {
+						"a": 1.0,
+						"b": 0.0,
+						"g": 0.5650817155838013,
+						"r": 0.565082311630249
+					},
+					"id": 1828911513,
+					"material": "content\\fx\\sunlight.png",
+					"shininess": 256,
+					"type": "Material"
+				},
+				{
+					"base ": {
+						"a": 1.0,
+						"b": 0.0,
+						"g": 0.5650817155838013,
+						"r": 0.565082311630249
+					},
+					"collapse_alpha": 0.4000000059604645,
+					"eruption time": 0.016663074493408203,
+					"eruption_cooldown": 10.0,
+					"eruption_damage_per_second": 50.0,
+					"eruption_random_ooldown": 10.0,
+					"explosion fade-in time": 0.10000000149011612,
+					"explosion max particles": 500.0,
+					"explosion particles speed": 50.0,
+					"explosion time": 2.0,
+					"explositon ": {
+						"a": 0.49253731966018677,
+						"b": 0.0,
+						"g": 0.0,
+						"r": 1.0
+					},
+					"id": 1722544033,
+					"type": "SolarEruption",
+					"waiting max particles": 100.0,
+					"waiting time": 2.0,
+					"warming max particles": 10.0,
+					"warming time": 2.0
+				},
+				{
+					"color": {
+						"a": 0.49253731966018677,
+						"b": 0.0,
+						"g": 0.0,
+						"r": 1.0
+					},
+					"duration": 2.0,
+					"id": 613294371,
+					"offset": {
+						"x": 0.0,
+						"y": 0.0,
+						"z": 0.0
+					},
+					"origin": 0,
+					"particles_per_second": -33,
+					"speed": 50.0,
+					"sunlight_occlusion_active": true,
+					"type": "ParticleSystem"
+				},
+				{
+					"id": 2472396462,
+					"path": "SolarEruptionMesh",
+					"type": "MeshRenderer"
+				}],
+				"name": "solar_eruption",
+				"unique_id": 9
+			},
+			{
+				"childs": [{
+					"childs": null,
+					"components": [{
+						"id": 1269105190,
+						"position": {
+							"x": 1.4778547286987305,
+							"y": 0.0,
+							"z": 0.9686250686645508
+						},
+						"rotation": {
+							"w": 1.0,
+							"x": 0.0,
+							"y": 0.0,
+							"z": 0.0
+						},
+						"scale": {
+							"x": 0.2998969852924347,
+							"y": 0.30000001192092896,
+							"z": 0.30000001192092896
+						},
+						"type": "Transform"
+					},
+					{
+						"id": 2472396462,
+						"path": "content\\_default\\mesh\\sphere.gltf",
+						"type": "MeshRenderer"
+					},
+					{
+						"color": {
+							"a": 1.0,
+							"b": 0.0,
+							"g": 0.25,
+							"r": 0.5
+						},
+						"id": 1828911513,
+						"material": "content/_default/texture/white.png",
+						"shininess": 1,
+						"type": "Material"
+					},
+					{
+						"id": 1669599886,
+						"phase": 0.5801805257797241,
+						"radius": 1.7669999599456787,
+						"speed": -0.10176700353622437,
+						"type": "Planet"
+					},
+					{
+						"id": 3410179010,
+						"radius": 0.2998969852924347,
+						"type": "SphereShape"
+					},
+					{
+						"enable_desactivation": false,
+						"id": 3581780679,
+						"is_kinematic": true,
+						"mass": 0.0,
+						"type": "Rigidbody"
+					}],
+					"name": "planet0-0",
+					"unique_id": 11
+				},
+				{
+					"childs": null,
+					"components": [{
+						"id": 1269105190,
+						"position": {
+							"x": -2.2093076705932617,
+							"y": 0.0,
+							"z": 1.8770872354507446
+						},
+						"rotation": {
+							"w": 1.0,
+							"x": 0.0,
+							"y": 0.0,
+							"z": 0.0
+						},
+						"scale": {
+							"x": 0.44263193011283875,
+							"y": 0.44263193011283875,
+							"z": 0.44263193011283875
+						},
+						"type": "Transform"
+					},
+					{
+						"id": 2472396462,
+						"path": "content\\_default\\mesh\\sphere.gltf",
+						"type": "MeshRenderer"
+					},
+					{
+						"color": {
+							"a": 1.0,
+							"b": 0.0,
+							"g": 0.25,
+							"r": 0.5
+						},
+						"id": 1828911513,
+						"material": "content/_default/texture/white.png",
+						"shininess": 1,
+						"type": "Material"
+					},
+					{
+						"id": 1669599886,
+						"phase": 2.4373152256011963,
+						"radius": 2.8990509510040283,
+						"speed": 0.10289905220270157,
+						"type": "Planet"
+					},
+					{
+						"id": 3410179010,
+						"radius": 0.44263193011283875,
+						"type": "SphereShape"
+					},
+					{
+						"enable_desactivation": false,
+						"id": 3581780679,
+						"is_kinematic": true,
+						"mass": 0.0,
+						"type": "Rigidbody"
+					}],
+					"name": "planet1-0",
+					"unique_id": 12
+				},
+				{
+					"childs": null,
+					"components": [{
+						"id": 1269105190,
+						"position": {
+							"x": -3.567354202270508,
+							"y": 0.0,
+							"z": 2.704209804534912
+						},
+						"rotation": {
+							"w": 1.0,
+							"x": 0.0,
+							"y": 0.0,
+							"z": 0.0
+						},
+						"scale": {
+							"x": 0.6167700886726379,
+							"y": 0.6167700886726379,
+							"z": 0.6167700886726379
+						},
+						"type": "Transform"
+					},
+					{
+						"id": 2472396462,
+						"path": "content\\_default\\mesh\\sphere.gltf",
+						"type": "MeshRenderer"
+					},
+					{
+						"color": {
+							"a": 1.0,
+							"b": 0.0,
+							"g": 0.25,
+							"r": 0.5
+						},
+						"id": 1828911513,
+						"material": "content/_default/texture/white.png",
+						"shininess": 1,
+						"type": "Material"
+					},
+					{
+						"id": 1669599886,
+						"phase": 2.4929635524749756,
+						"radius": 4.476468086242676,
+						"speed": -0.10447646677494049,
+						"type": "Planet"
+					},
+					{
+						"id": 3410179010,
+						"radius": 0.6167700886726379,
+						"type": "SphereShape"
+					},
+					{
+						"enable_desactivation": false,
+						"id": 3581780679,
+						"is_kinematic": true,
+						"mass": 0.0,
+						"type": "Rigidbody"
+					}],
+					"name": "planet2-0",
+					"unique_id": 13
+				},
+				{
+					"childs": null,
+					"components": [{
+						"id": 1269105190,
+						"position": {
+							"x": -0.6779471635818481,
+							"y": 0.0,
+							"z": -4.42483377456665
+						},
+						"rotation": {
+							"w": 1.0,
+							"x": 0.0,
+							"y": 0.0,
+							"z": 0.0
+						},
+						"scale": {
+							"x": 0.6167700886726379,
+							"y": 0.6167700886726379,
+							"z": 0.6167700886726379
+						},
+						"type": "Transform"
+					},
+					{
+						"id": 2472396462,
+						"path": "content\\_default\\mesh\\sphere.gltf",
+						"type": "MeshRenderer"
+					},
+					{
+						"color": {
+							"a": 1.0,
+							"b": 0.0,
+							"g": 0.25,
+							"r": 0.5
+						},
+						"id": 1828911513,
+						"material": "content/_default/texture/white.png",
+						"shininess": 1,
+						"type": "Material"
+					},
+					{
+						"id": 1669599886,
+						"phase": 4.560357093811035,
+						"radius": 4.476468086242676,
+						"speed": -0.10447646677494049,
+						"type": "Planet"
+					},
+					{
+						"id": 3410179010,
+						"radius": 0.6167700886726379,
+						"type": "SphereShape"
+					},
+					{
+						"enable_desactivation": false,
+						"id": 3581780679,
+						"is_kinematic": true,
+						"mass": 0.0,
+						"type": "Rigidbody"
+					}],
+					"name": "planet2-1",
+					"unique_id": 14
+				},
+				{
+					"childs": null,
+					"components": [{
+						"id": 1269105190,
+						"position": {
+							"x": 4.405431747436523,
+							"y": 0.0,
+							"z": 0.7943146228790283
+						},
+						"rotation": {
+							"w": 1.0,
+							"x": 0.0,
+							"y": 0.0,
+							"z": 0.0
+						},
+						"scale": {
+							"x": 0.6167700886726379,
+							"y": 0.6167700886726379,
+							"z": 0.6167700886726379
+						},
+						"type": "Transform"
+					},
+					{
+						"id": 2472396462,
+						"path": "content\\_default\\mesh\\sphere.gltf",
+						"type": "MeshRenderer"
+					},
+					{
+						"color": {
+							"a": 1.0,
+							"b": 0.0,
+							"g": 0.25,
+							"r": 0.5
+						},
+						"id": 1828911513,
+						"material": "content/_default/texture/white.png",
+						"shininess": 1,
+						"type": "Material"
+					},
+					{
+						"id": 1669599886,
+						"phase": 6.461572170257568,
+						"radius": 4.476468086242676,
+						"speed": -0.10447646677494049,
+						"type": "Planet"
+					},
+					{
+						"id": 3410179010,
+						"radius": 0.6167700886726379,
+						"type": "SphereShape"
+					},
+					{
+						"enable_desactivation": false,
+						"id": 3581780679,
+						"is_kinematic": true,
+						"mass": 0.0,
+						"type": "Rigidbody"
+					}],
+					"name": "planet2-2",
+					"unique_id": 15
+				},
+				{
+					"childs": null,
+					"components": [{
+						"id": 1269105190,
+						"position": {
+							"x": -2.5826940536499023,
+							"y": 0.0,
+							"z": 6.150454521179199
+						},
+						"rotation": {
+							"w": 1.0,
+							"x": 0.0,
+							"y": 0.0,
+							"z": 0.0
+						},
+						"scale": {
+							"x": 0.8579493761062622,
+							"y": 0.8579493761062622,
+							"z": 0.8579493761062622
+						},
+						"type": "Transform"
+					},
+					{
+						"id": 2472396462,
+						"path": "content\\_default\\mesh\\sphere.gltf",
+						"type": "MeshRenderer"
+					},
+					{
+						"color": {
+							"a": 1.0,
+							"b": 0.0,
+							"g": 0.25,
+							"r": 0.5
+						},
+						"id": 1828911513,
+						"material": "content/_default/texture/white.png",
+						"shininess": 1,
+						"type": "Material"
+					},
+					{
+						"id": 1669599886,
+						"phase": 1.968355655670166,
+						"radius": 6.670711994171143,
+						"speed": 0.10667071491479874,
+						"type": "Planet"
+					},
+					{
+						"id": 3410179010,
+						"radius": 0.8579493761062622,
+						"type": "SphereShape"
+					},
+					{
+						"enable_desactivation": false,
+						"id": 3581780679,
+						"is_kinematic": true,
+						"mass": 0.0,
+						"type": "Rigidbody"
+					}],
+					"name": "planet3-0",
+					"unique_id": 16
+				},
+				{
+					"childs": null,
+					"components": [{
+						"id": 1269105190,
+						"position": {
+							"x": 1.323805809020996,
+							"y": 0.0,
+							"z": -6.5380377769470215
+						},
+						"rotation": {
+							"w": 1.0,
+							"x": 0.0,
+							"y": 0.0,
+							"z": 0.0
+						},
+						"scale": {
+							"x": 0.8579493761062622,
+							"y": 0.8579493761062622,
+							"z": 0.8579493761062622
+						},
+						"type": "Transform"
+					},
+					{
+						"id": 2472396462,
+						"path": "content\\_default\\mesh\\sphere.gltf",
+						"type": "MeshRenderer"
+					},
+					{
+						"color": {
+							"a": 1.0,
+							"b": 0.0,
+							"g": 0.25,
+							"r": 0.5
+						},
+						"id": 1828911513,
+						"material": "content/_default/texture/white.png",
+						"shininess": 1,
+						"type": "Material"
+					},
+					{
+						"id": 1669599886,
+						"phase": 4.912165641784668,
+						"radius": 6.670711994171143,
+						"speed": 0.10667071491479874,
+						"type": "Planet"
+					},
+					{
+						"id": 3410179010,
+						"radius": 0.8579493761062622,
+						"type": "SphereShape"
+					},
+					{
+						"enable_desactivation": false,
+						"id": 3581780679,
+						"is_kinematic": true,
+						"mass": 0.0,
+						"type": "Rigidbody"
+					}],
+					"name": "planet3-1",
+					"unique_id": 17
+				},
+				{
+					"childs": null,
+					"components": [{
+						"id": 1269105190,
+						"position": {
+							"x": -9.118656158447266,
+							"y": 0.0,
+							"z": 3.3834011554718018
+						},
+						"rotation": {
+							"w": 1.0,
+							"x": 0.0,
+							"y": 0.0,
+							"z": 0.0
+						},
+						"scale": {
+							"x": 1.19466233253479,
+							"y": 1.19466233253479,
+							"z": 1.19466233253479
+						},
+						"type": "Transform"
+					},
+					{
+						"id": 2472396462,
+						"path": "content\\_default\\mesh\\sphere.gltf",
+						"type": "MeshRenderer"
+					},
+					{
+						"color": {
+							"a": 1.0,
+							"b": 0.0,
+							"g": 0.25,
+							"r": 0.5
+						},
+						"id": 1828911513,
+						"material": "content/_default/texture/white.png",
+						"shininess": 1,
+						"type": "Material"
+					},
+					{
+						"id": 1669599886,
+						"phase": 2.786296844482422,
+						"radius": 9.726114273071289,
+						"speed": -0.10972611606121063,
+						"type": "Planet"
+					},
+					{
+						"id": 3410179010,
+						"radius": 1.19466233253479,
+						"type": "SphereShape"
+					},
+					{
+						"enable_desactivation": false,
+						"id": 3581780679,
+						"is_kinematic": true,
+						"mass": 0.0,
+						"type": "Rigidbody"
+					}],
+					"name": "planet4-0",
+					"unique_id": 18
+				},
+				{
+					"childs": null,
+					"components": [{
+						"id": 1269105190,
+						"position": {
+							"x": 13.762711524963379,
+							"y": 0.0,
+							"z": 2.391962766647339
+						},
+						"rotation": {
+							"w": 1.0,
+							"x": 0.0,
+							"y": 0.0,
+							"z": 0.0
+						},
+						"scale": {
+							"x": 1.6589787006378174,
+							"y": 1.6589787006378174,
+							"z": 1.6589787006378174
+						},
+						"type": "Transform"
+					},
+					{
+						"id": 2472396462,
+						"path": "content\\_default\\mesh\\sphere.gltf",
+						"type": "MeshRenderer"
+					},
+					{
+						"color": {
+							"a": 1.0,
+							"b": 0.0,
+							"g": 0.25,
+							"r": 0.5
+						},
+						"id": 1828911513,
+						"material": "content/_default/texture/white.png",
+						"shininess": 1,
+						"type": "Material"
+					},
+					{
+						"id": 1669599886,
+						"phase": 0.1720813512802124,
+						"radius": 13.969026565551758,
+						"speed": 0.11396902799606323,
+						"type": "Planet"
+					},
+					{
+						"id": 3410179010,
+						"radius": 1.6589787006378174,
+						"type": "SphereShape"
+					},
+					{
+						"enable_desactivation": false,
+						"id": 3581780679,
+						"is_kinematic": true,
+						"mass": 0.0,
+						"type": "Rigidbody"
+					}],
+					"name": "planet5-0",
+					"unique_id": 19
+				},
+				{
+					"childs": null,
+					"components": [{
+						"id": 1269105190,
+						"position": {
+							"x": 17.039045333862305,
+							"y": 0.0,
+							"z": -10.227436065673828
+						},
+						"rotation": {
+							"w": 1.0,
+							"x": 0.0,
+							"y": 0.0,
+							"z": 0.0
+						},
+						"scale": {
+							"x": 2.3083884716033936,
+							"y": 2.3083884716033936,
+							"z": 2.3083884716033936
+						},
+						"type": "Transform"
+					},
+					{
+						"id": 2472396462,
+						"path": "content\\_default\\mesh\\sphere.gltf",
+						"type": "MeshRenderer"
+					},
+					{
+						"color": {
+							"a": 1.0,
+							"b": 0.0,
+							"g": 0.25,
+							"r": 0.5
+						},
+						"id": 1828911513,
+						"material": "content/_default/texture/white.png",
+						"shininess": 1,
+						"type": "Material"
+					},
+					{
+						"id": 1669599886,
+						"phase": 5.742592811584473,
+						"radius": 19.872833251953125,
+						"speed": -0.11987283825874329,
+						"type": "Planet"
+					},
+					{
+						"id": 3410179010,
+						"radius": 2.3083884716033936,
+						"type": "SphereShape"
+					},
+					{
+						"enable_desactivation": false,
+						"id": 3581780679,
+						"is_kinematic": true,
+						"mass": 0.0,
+						"type": "Rigidbody"
+					}],
+					"name": "planet6-0",
+					"unique_id": 20
+				},
+				{
+					"childs": null,
+					"components": [{
+						"id": 1269105190,
+						"position": {
+							"x": 5.129509449005127,
+							"y": 0.0,
+							"z": 19.199417114257813
+						},
+						"rotation": {
+							"w": 1.0,
+							"x": 0.0,
+							"y": 0.0,
+							"z": 0.0
+						},
+						"scale": {
+							"x": 2.3083884716033936,
+							"y": 2.3083884716033936,
+							"z": 2.3083884716033936
+						},
+						"type": "Transform"
+					},
+					{
+						"id": 2472396462,
+						"path": "content\\_default\\mesh\\sphere.gltf",
+						"type": "MeshRenderer"
+					},
+					{
+						"color": {
+							"a": 1.0,
+							"b": 0.0,
+							"g": 0.25,
+							"r": 0.5
+						},
+						"id": 1828911513,
+						"material": "content/_default/texture/white.png",
+						"shininess": 1,
+						"type": "Material"
+					},
+					{
+						"id": 1669599886,
+						"phase": 7.592909336090088,
+						"radius": 19.872833251953125,
+						"speed": -0.11987283825874329,
+						"type": "Planet"
+					},
+					{
+						"id": 3410179010,
+						"radius": 2.3083884716033936,
+						"type": "SphereShape"
+					},
+					{
+						"enable_desactivation": false,
+						"id": 3581780679,
+						"is_kinematic": true,
+						"mass": 0.0,
+						"type": "Rigidbody"
+					}],
+					"name": "planet6-1",
+					"unique_id": 21
+				},
+				{
+					"childs": null,
+					"components": [{
+						"id": 1269105190,
+						"position": {
+							"x": -19.860549926757813,
+							"y": 0.0,
+							"z": -0.6986055970191956
+						},
+						"rotation": {
+							"w": 1.0,
+							"x": 0.0,
+							"y": 0.0,
+							"z": 0.0
+						},
+						"scale": {
+							"x": 2.3083884716033936,
+							"y": 2.3083884716033936,
+							"z": 2.3083884716033936
+						},
+						"type": "Transform"
+					},
+					{
+						"id": 2472396462,
+						"path": "content\\_default\\mesh\\sphere.gltf",
+						"type": "MeshRenderer"
+					},
+					{
+						"color": {
+							"a": 1.0,
+							"b": 0.0,
+							"g": 0.25,
+							"r": 0.5
+						},
+						"id": 1828911513,
+						"material": "content/_default/texture/white.png",
+						"shininess": 1,
+						"type": "Material"
+					},
+					{
+						"id": 1669599886,
+						"phase": 9.459939002990723,
+						"radius": 19.872833251953125,
+						"speed": -0.11987283825874329,
+						"type": "Planet"
+					},
+					{
+						"id": 3410179010,
+						"radius": 2.3083884716033936,
+						"type": "SphereShape"
+					},
+					{
+						"enable_desactivation": false,
+						"id": 3581780679,
+						"is_kinematic": true,
+						"mass": 0.0,
+						"type": "Rigidbody"
+					}],
+					"name": "planet6-2",
+					"unique_id": 22
+				},
+				{
+					"childs": null,
+					"components": [{
+						"id": 1269105190,
+						"position": {
+							"x": 17.852197647094727,
+							"y": 0.0,
+							"z": 21.686737060546875
+						},
+						"rotation": {
+							"w": 1.0,
+							"x": 0.0,
+							"y": 0.0,
+							"z": 0.0
+						},
+						"scale": {
+							"x": 3.2126855850219727,
+							"y": 3.2126855850219727,
+							"z": 3.2126855850219727
+						},
+						"type": "Transform"
+					},
+					{
+						"id": 2472396462,
+						"path": "content\\_default\\mesh\\sphere.gltf",
+						"type": "MeshRenderer"
+					},
+					{
+						"color": {
+							"a": 1.0,
+							"b": 0.0,
+							"g": 0.25,
+							"r": 0.5
+						},
+						"id": 1828911513,
+						"material": "content/_default/texture/white.png",
+						"shininess": 1,
+						"type": "Material"
+					},
+					{
+						"id": 1669599886,
+						"phase": 0.882077157497406,
+						"radius": 28.089420318603516,
+						"speed": 0.12808942794799805,
+						"type": "Planet"
+					},
+					{
+						"id": 3410179010,
+						"radius": 3.2126855850219727,
+						"type": "SphereShape"
+					},
+					{
+						"enable_desactivation": false,
+						"id": 3581780679,
+						"is_kinematic": true,
+						"mass": 0.0,
+						"type": "Rigidbody"
+					}],
+					"name": "planet7-0",
+					"unique_id": 23
+				},
+				{
+					"childs": null,
+					"components": [{
+						"id": 1269105190,
+						"position": {
+							"x": -18.668392181396484,
+							"y": 0.0,
+							"z": -20.988250732421875
+						},
+						"rotation": {
+							"w": 1.0,
+							"x": 0.0,
+							"y": 0.0,
+							"z": 0.0
+						},
+						"scale": {
+							"x": 3.2126855850219727,
+							"y": 3.2126855850219727,
+							"z": 3.2126855850219727
+						},
+						"type": "Transform"
+					},
+					{
+						"id": 2472396462,
+						"path": "content\\_default\\mesh\\sphere.gltf",
+						"type": "MeshRenderer"
+					},
+					{
+						"color": {
+							"a": 1.0,
+							"b": 0.0,
+							"g": 0.25,
+							"r": 0.5
+						},
+						"id": 1828911513,
+						"material": "content/_default/texture/white.png",
+						"shininess": 1,
+						"type": "Material"
+					},
+					{
+						"id": 1669599886,
+						"phase": 3.9854228496551514,
+						"radius": 28.089420318603516,
+						"speed": 0.12808942794799805,
+						"type": "Planet"
+					},
+					{
+						"id": 3410179010,
+						"radius": 3.2126855850219727,
+						"type": "SphereShape"
+					},
+					{
+						"enable_desactivation": false,
+						"id": 3581780679,
+						"is_kinematic": true,
+						"mass": 0.0,
+						"type": "Rigidbody"
+					}],
+					"name": "planet7-1",
+					"unique_id": 24
+				},
+				{
+					"childs": null,
+					"components": [{
+						"id": 1269105190,
+						"position": {
+							"x": 12.394779205322266,
+							"y": 0.0,
+							"z": -37.54856872558594
+						},
+						"rotation": {
+							"w": 1.0,
+							"x": 0.0,
+							"y": 0.0,
+							"z": 0.0
+						},
+						"scale": {
+							"x": 4.47774076461792,
+							"y": 4.47774076461792,
+							"z": 4.47774076461792
+						},
+						"type": "Transform"
+					},
+					{
+						"id": 2472396462,
+						"path": "content\\_default\\mesh\\sphere.gltf",
+						"type": "MeshRenderer"
+					},
+					{
+						"color": {
+							"a": 1.0,
+							"b": 0.0,
+							"g": 0.25,
+							"r": 0.5
+						},
+						"id": 1828911513,
+						"material": "content/_default/texture/white.png",
+						"shininess": 1,
+						"type": "Material"
+					},
+					{
+						"id": 1669599886,
+						"phase": 5.031226634979248,
+						"radius": 39.54144287109375,
+						"speed": -0.13954144716262817,
+						"type": "Planet"
+					},
+					{
+						"id": 3410179010,
+						"radius": 4.47774076461792,
+						"type": "SphereShape"
+					},
+					{
+						"enable_desactivation": false,
+						"id": 3581780679,
+						"is_kinematic": true,
+						"mass": 0.0,
+						"type": "Rigidbody"
+					}],
+					"name": "planet8-0",
+					"unique_id": 25
+				},
+				{
+					"childs": null,
+					"components": [{
+						"id": 1269105190,
+						"position": {
+							"x": 29.637020111083984,
+							"y": 0.0,
+							"z": 26.175804138183594
+						},
+						"rotation": {
+							"w": 1.0,
+							"x": 0.0,
+							"y": 0.0,
+							"z": 0.0
+						},
+						"scale": {
+							"x": 4.47774076461792,
+							"y": 4.47774076461792,
+							"z": 4.47774076461792
+						},
+						"type": "Transform"
+					},
+					{
+						"id": 2472396462,
+						"path": "content\\_default\\mesh\\sphere.gltf",
+						"type": "MeshRenderer"
+					},
+					{
+						"color": {
+							"a": 1.0,
+							"b": 0.0,
+							"g": 0.25,
+							"r": 0.5
+						},
+						"id": 1828911513,
+						"material": "content/_default/texture/white.png",
+						"shininess": 1,
+						"type": "Material"
+					},
+					{
+						"id": 1669599886,
+						"phase": 7.006648063659668,
+						"radius": 39.54144287109375,
+						"speed": -0.13954144716262817,
+						"type": "Planet"
+					},
+					{
+						"id": 3410179010,
+						"radius": 4.47774076461792,
+						"type": "SphereShape"
+					},
+					{
+						"enable_desactivation": false,
+						"id": 3581780679,
+						"is_kinematic": true,
+						"mass": 0.0,
+						"type": "Rigidbody"
+					}],
+					"name": "planet8-1",
+					"unique_id": 26
+				},
+				{
+					"childs": null,
+					"components": [{
+						"id": 1269105190,
+						"position": {
+							"x": -37.31688690185547,
+							"y": 0.0,
+							"z": 13.075766563415527
+						},
+						"rotation": {
+							"w": 1.0,
+							"x": 0.0,
+							"y": 0.0,
+							"z": 0.0
+						},
+						"scale": {
+							"x": 4.47774076461792,
+							"y": 4.47774076461792,
+							"z": 4.47774076461792
+						},
+						"type": "Transform"
+					},
+					{
+						"id": 2472396462,
+						"path": "content\\_default\\mesh\\sphere.gltf",
+						"type": "MeshRenderer"
+					},
+					{
+						"color": {
+							"a": 1.0,
+							"b": 0.0,
+							"g": 0.25,
+							"r": 0.5
+						},
+						"id": 1828911513,
+						"material": "content/_default/texture/white.png",
+						"shininess": 1,
+						"type": "Material"
+					},
+					{
+						"id": 1669599886,
+						"phase": 9.087748527526855,
+						"radius": 39.54144287109375,
+						"speed": -0.13954144716262817,
+						"type": "Planet"
+					},
+					{
+						"id": 3410179010,
+						"radius": 4.47774076461792,
+						"type": "SphereShape"
+					},
+					{
+						"enable_desactivation": false,
+						"id": 3581780679,
+						"is_kinematic": true,
+						"mass": 0.0,
+						"type": "Rigidbody"
+					}],
+					"name": "planet8-2",
+					"unique_id": 27
+				}],
+				"components": [{
+					"id": 1269105190,
+					"position": {
+						"x": 0.0,
+						"y": 0.0,
+						"z": 0.0
+					},
+					"rotation": {
+						"w": 1.0,
+						"x": 0.0,
+						"y": 0.0,
+						"z": 0.0
+					},
+					"scale": {
+						"x": 1.0,
+						"y": 1.0,
+						"z": 1.0
+					},
+					"type": "Transform"
+				},
+				{
+					"color": {
+						"a": 1.0,
+						"b": 0.0,
+						"g": 0.7067548036575317,
+						"r": 1.0
+					},
+					"id": 1828911513,
+					"material": "content\\_default\\texture\\white.png",
+					"shininess": 256,
+					"type": "Material"
+				},
+				{
+					"id": 3235656336,
+					"initial_radius": 1.7669999599456787,
+					"maxPlanetsPerOrbit": 3,
+					"max_radius": 40.60200119018555,
+					"radiusFactors": {
+						"x": 0.4399999976158142,
+						"y": 0.39100000262260437
+					},
+					"radiusRFactors": {
+						"x": 0.0010000000474974513,
+						"y": 0.0010000000474974513
+					},
+					"scaleMinMax": {
+						"x": 0.30000001192092896,
+						"y": 0.10000000149011612
+					},
+					"scaleMult": 0.7820000052452087,
+					"seed": 1,
+					"speedFactors": {
+						"x": 0.10000000149011612,
+						"y": 0.0010000000474974513
+					},
+					"type": "SolarSystem"
+				},
+				{
+					"id": 2472396462,
+					"path": "content\\_default\\mesh\\sphere.gltf",
+					"type": "MeshRenderer"
+				},
+				{
+					"enable_desactivation": false,
+					"id": 3581780679,
+					"is_kinematic": true,
+					"mass": 0.0,
+					"type": "Rigidbody"
+				},
+				{
+					"id": 3410179010,
+					"radius": 1.0,
+					"type": "SphereShape"
+				}],
+				"name": "solar_system",
+				"unique_id": 10
+			}],
+			"components": [{
+				"id": 1269105190,
+				"position": {
+					"x": 0.0,
+					"y": 0.0,
+					"z": 0.0
+				},
+				"rotation": {
+					"w": 1.0,
+					"x": 0.0,
+					"y": 0.0,
+					"z": 0.0
+				},
+				"scale": {
+					"x": 1.0,
+					"y": 1.0,
+					"z": 1.0
+				},
+				"type": "Transform"
+			}],
+			"name": "sun",
+			"unique_id": 7
+		}],
+		"components": [{
+			"id": 1269105190,
+			"position": {
+				"x": 0.0,
+				"y": 0.0,
+				"z": 0.0
+			},
+			"rotation": {
+				"w": 1.0,
+				"x": 0.0,
+				"y": 0.0,
+				"z": 0.0
+			},
+			"scale": {
+				"x": 1.0,
+				"y": 1.0,
+				"z": 1.0
+			},
+			"type": "Transform"
+		}],
+		"name": "root",
+		"unique_id": 2
+	},
+	"parameters": {
+		"name": "game",
+		"path": "content/scenes/game.scene"
+	}
+}

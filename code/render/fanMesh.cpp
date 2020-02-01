@@ -1,5 +1,5 @@
 #include "render/fanMesh.hpp"
-#include "render/fanFbxImporter.hpp"
+#include "render/fanGLTFImporter.hpp"
 #include "core/math/shapes/fanConvexHull.hpp"
 #include "render/core/fanDevice.hpp"
 #include "render/core/fanBuffer.hpp"
@@ -27,8 +27,8 @@ namespace fan {
 	//================================================================================================================================
 	//================================================================================================================================
 	bool Mesh::LoadFromFile( const std::string& _path ) {
- 		FBXImporter importer;
- 		if (importer.LoadScene(_path) == true) {
+ 		GLTFImporter importer;
+ 		if (importer.Load(_path) == true) {
 			if ( ! importer.GetMesh(*this) ) {
 				Debug::Get() << "Failed to load mesh : " << m_path << Debug::Endl();
 				return false;

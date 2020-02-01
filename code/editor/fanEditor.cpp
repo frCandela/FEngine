@@ -5,7 +5,6 @@
 #include "render/fanRessourceManager.hpp"
 #include "render/fanRendererDebug.hpp"
 #include "render/core/fanTexture.hpp"
-#include "render/fanFbxImporter.hpp"
 #include "render/util/fanWindow.hpp"
 #include "render/fanRenderer.hpp"
 #include "render/fanUIMesh.hpp"

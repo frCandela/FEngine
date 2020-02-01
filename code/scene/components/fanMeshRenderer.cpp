@@ -5,7 +5,6 @@
 #include "core/math/shapes/fanConvexHull.hpp"
 #include "core/time/fanProfiler.hpp"
 #include "scene/ecs/fanECSConfig.hpp"
-#include "render/fanFbxImporter.hpp"
 #include "render/fanMesh.hpp"
 
 // Editor

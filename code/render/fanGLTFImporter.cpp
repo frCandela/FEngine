@@ -1,11 +1,10 @@
-#include "render/fanFbxImporter.hpp"
+#include "render/fanGLTFImporter.hpp"
 #include "render/fanMesh.hpp"
-//#include "scene/fanGameobject.hpp"
 
 namespace fan {
 	//================================================================================================================================
 	//================================================================================================================================
-	FBXImporter::FBXImporter() {
+	GLTFImporter::GLTFImporter() {
 		/*
 		//The first thing to do is to create the FBX Manager which is the object allocator for almost all the classes in the SDK
 		m_sdkManager = FbxManager::Create();
@@ -33,61 +32,41 @@ namespace fan {
 
 	//================================================================================================================================
 	//================================================================================================================================
-	FBXImporter::~FBXImporter() {
+	GLTFImporter::~GLTFImporter() {
 		/*m_importer->Destroy();
 		m_scene->Destroy();
 		m_sdkManager->Destroy();*/
 	}
 
 	//================================================================================================================================
+	// Parse and load the gltf into a json 
 	//================================================================================================================================
-	bool FBXImporter::LoadScene(const std::string _path) {
-		/*m_path = _path;
+	bool GLTFImporter::Load(const std::string _path) {
 
-		int fileMajor, fileMinor, fileRevision;
-
-		const bool importStatus = m_importer->Initialize(m_path.c_str(), -1, m_sdkManager->GetIOSettings());
-		m_importer->GetFileVersion(fileMajor, fileMinor, fileRevision);
-
-		if ( importStatus == false )
-		{
-			fbxsdk::FbxString error = m_importer->GetStatus().GetErrorString();
-			Debug::Error( "Call to FbxImporter::Initialize() failed." );
-			Debug::Get() << Debug::Severity::error << "Error returned: " <<  error.Buffer()  << " " << m_path << Debug::Endl();
-
-			if (m_importer->GetStatus().GetCode() == fbxsdk::FbxStatus::eInvalidFileVersion)
-			{
-				Debug::Get() << Debug::Severity::log << "FBX file format version for this FBX SDK is " << m_SDKMajor << "." << m_SDKMinor << "." << m_SDKRevision << Debug::Endl();
-				Debug::Get() << Debug::Severity::log << "FBX file format version for file " << m_path << " is " << fileMajor << "." << fileMinor << "." << fileRevision << Debug::Endl();
-			}
+		const std::string extension = std::filesystem::path(_path).extension().string();
+		if (extension != ".gltf") {
+			Debug::Warning() << "Loading failed, file is not a gltf: " << _path << Debug::Endl();
 			return false;
 		}
 
-		if (m_importer->IsFBX() == false) {
-			Debug::Warning( "Error: File is not an fbx" );
-			return false;
+		Debug::Log() << "Loading file : " << _path << Debug::Endl();
+		std::ifstream inFile(_path);
+		if (inFile.good() == true) {
+			m_json.clear();
+			inFile >> m_json;
+			m_path = _path;
 		}
-
-		bool status = m_importer->Import( m_scene );
-		if (status == false ) {
-			if (m_importer->GetStatus().GetCode() == fbxsdk::FbxStatus::ePasswordError) {
-				Debug::Warning( "password is wrong" );
-			}
-			Debug::Error( "import failed" );
-			return false;
+		else {
+			Debug::Warning() << "Loading failed: " << _path << Debug::Endl();
 		}
-
-		Debug::Get() << Debug::Severity::log << "successfully imported " << m_path << Debug::Endl();
-
- 		fbxsdk::FbxGeometryConverter geometryConverter( m_sdkManager );
- 		geometryConverter.Triangulate(m_scene, true);
-		*/
+		inFile.close();
 		return true;
 	}
 
 	//================================================================================================================================
+	// Converts gltf into a usable mesh
 	//================================================================================================================================
-	bool FBXImporter::GetMesh( Mesh & _mesh) {
+	bool GLTFImporter::GetMesh( Mesh & _mesh) {
 		
 		/*fbxsdk::FbxAxisSystem axisSystem( 
 			fbxsdk::FbxAxisSystem::EUpVector::eYAxis, 
