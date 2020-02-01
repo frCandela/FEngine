@@ -6,7 +6,6 @@
 
  #define GLFW_INCLUDE_VULKAN
  #include "glfw/glfw3.h"
-#include "glslang/Public/ShaderLang.h"
 #define IMGUI_DISABLE_OBSOLETE_FUNCTIONS
 #include "imgui/imgui.h"
 
