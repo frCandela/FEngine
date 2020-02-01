@@ -45,7 +45,5 @@ namespace fan {
 	{
 		++Get().m_count;
 		glfwPollEvents();
-
-		Mouse::Get().Update();
 	}
 }

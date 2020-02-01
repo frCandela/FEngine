@@ -162,7 +162,6 @@ namespace fan
 
 		m_mainMenuBar->SetWindows( { m_renderWindow , m_sceneWindow , m_inspectorWindow , m_consoleWindow, m_ecsWindow, m_profilerWindow, m_gameWindow, m_networkWindow, m_preferencesWindow } );
 		m_sceneWindow->onSelectGameobject.Connect( &EditorSelection::SetSelectedGameobject, m_selection );		
-		Mouse::Get().Init( m_gameWindow );
 
 		// Instance messages				
 		m_mainMenuBar->onReloadShaders.		Connect(&Renderer::ReloadShaders, m_renderer );
@@ -265,6 +264,7 @@ namespace fan
 				{
 					SCOPED_PROFILE( init )
 					Input::Get().NewFrame();
+					Mouse::Get().Update( m_gameWindow->GetPosition(), m_gameWindow->GetSize(), m_gameWindow->IsHovered() );
 					ImGui::NewFrame();
 					ImGui::GetIO().DeltaTime = targetLogicDelta;
 					m_renderer->GetRendererDebug().ClearDebug();
