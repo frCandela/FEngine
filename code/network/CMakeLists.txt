@@ -8,8 +8,8 @@ file(GLOB_RECURSE FAN_NETWORK_H *.hpp)
 set(FAN_NETWORK_LIBS
     fanCore
 	ws2_32
-	sfml-system-s-d
-	sfml-network-s-d		
+	sfml-system-s
+	sfml-network-s
 )
 
 add_compile_definitions(SFML_STATIC)

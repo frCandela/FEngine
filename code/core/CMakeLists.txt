@@ -8,7 +8,7 @@ file(GLOB_RECURSE FAN_CORE_H *.hpp)
 set(FAN_CORE_LIBS
 	imgui
     glfw3
-    LinearMath_Debug 
+    LinearMath
 	quickhull
 )
 

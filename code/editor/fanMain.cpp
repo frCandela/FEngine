@@ -5,7 +5,7 @@ void RunGame();
 int main()
 {	
 	RunGame();
-
+	 
 	while(true);
 
 	return 0;

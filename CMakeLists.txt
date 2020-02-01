@@ -9,9 +9,17 @@ include_directories(deps)
 include_directories(code)
 include_directories("C:/VulkanSDK/1.1.106.0/Include")
 
-link_directories(lib/debug)
+# link directories
 link_directories("C:/VulkanSDK/1.1.106.0/Lib")
+IF(${CMAKE_BUILD_TYPE} MATCHES Debug)
+    link_directories(lib/debug)
+    link_directories("C:/VulkanSDK/1.1.106.0/Lib/debug")
+ELSEIF(${CMAKE_BUILD_TYPE} MATCHES Release)
+    link_directories(lib/release)
+    link_directories("C:/VulkanSDK/1.1.106.0/Lib/release")
+ENDIF()
 
+# libs directories
 add_subdirectory(code/core)
 add_subdirectory(code/render)
 add_subdirectory(code/network)
@@ -37,7 +45,7 @@ set(APP_LIBRARIES
 
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR})
 
-add_executable(${APP_NAME} ${APP_SOURCES})
+add_executable(${APP_NAME} ${APP_SOURCES} )
 
 target_link_libraries(${APP_NAME} ${APP_LIBRARIES})
 
