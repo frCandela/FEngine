@@ -27,8 +27,6 @@ list(APPEND APP_SOURCES
 ) 
 
 set(APP_LIBRARIES 
-    imgui
-    glfw3
     fanCore
     fanRender
     fanNetwork
