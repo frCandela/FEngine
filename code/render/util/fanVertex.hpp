@@ -17,7 +17,7 @@ namespace fan
 		static std::vector<VkVertexInputAttributeDescription>	GetAttributeDescriptions();
 
 		bool operator==(const Vertex& _other) const {
-			return pos == _other.pos && normal == _other.normal && normal == _other.normal && uv == _other.uv;
+			return pos == _other.pos && normal == _other.normal && color == _other.color && uv == _other.uv;
 		}
 	};
 
