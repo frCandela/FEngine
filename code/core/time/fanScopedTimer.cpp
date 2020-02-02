@@ -15,6 +15,6 @@ namespace fan {
 	ScopedTimer::~ScopedTimer() {
 		const double stopValue = Time::ElapsedSinceStartupDouble();
 
-		Debug::Get() << Debug::Severity::highlight << "Scoped timer - " << m_label << " - took: " << stopValue - m_startValue << " seconds" << Debug::Endl();
+		Debug::Get() << Debug::Severity::highlight << "Scoped timer - " << m_label << " - took: " << (stopValue - m_startValue) * 1000 << " ms" << Debug::Endl();
 	}
 }
