@@ -1,6 +1,6 @@
 #include "scene/components/fanMeshRenderer.hpp"
 #include "scene/components/fanTransform.hpp"
-#include "scene/fanRessourcePtr.hpp"
+#include "scene/fanSceneRessourcePtr.hpp"
 #include "core/math/shapes/fanAABB.hpp"
 #include "core/math/shapes/fanConvexHull.hpp"
 #include "core/time/fanProfiler.hpp"

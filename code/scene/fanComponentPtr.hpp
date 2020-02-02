@@ -3,7 +3,7 @@
 #include "scene/fanScenePrecompiled.hpp"
 
 #include "scene/components/fanComponent.hpp"
-#include "scene/fanRessourcePtr.hpp"
+#include "scene/fanSceneRessourcePtr.hpp"
 
 namespace fan
 {

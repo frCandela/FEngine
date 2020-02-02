@@ -5,10 +5,8 @@
 #include "render/fanUIMesh.hpp"
 #include "render/core/fanDevice.hpp"
 #include "render/fanRenderGlobal.hpp"
+#include "render/fanRenderRessourcePtr.hpp"
 #include "core/fanSignal.hpp"
-// #include "scene/fanGameobject.hpp"
-// #include "scene/fanPrefab.hpp"
-// #include "scene/fanRessourcePtr.hpp"
 
 namespace fan
 {
@@ -27,9 +25,9 @@ namespace fan
 		UIMesh::s_onDeleteVulkanData.Connect( &RessourceManager::OnDeleteUIMesh,  this );
 		Texture::s_onDeleteVulkanData.Connect( &RessourceManager::OnDeleteTexture, this );
 
-// 		TexturePtr::s_onCreateUnresolved.Connect ( &RessourceManager::OnResolveTexturePtr,this );
-// 		MeshPtr::s_onCreateUnresolved.Connect	( &RessourceManager::OnResolveMeshPtr, this );
-// 		PrefabPtr::s_onCreateUnresolved.Connect ( &RessourceManager::OnResolvePrefabPtr, this);
+		TexturePtr::s_onCreateUnresolved.Connect ( &RessourceManager::OnResolveTexturePtr,this );
+		MeshPtr::s_onCreateUnresolved.Connect	( &RessourceManager::OnResolveMeshPtr, this );
+// 		PrefabPtr::s_onCreateUnresolved.Connect ( &RessourceManager::OnResolvePrefabPtr, this); @migration
 
 		LoadMesh(RenderGlobal::s_defaultMesh);
 		LoadTexture(RenderGlobal::s_defaultTexture);
@@ -129,7 +127,7 @@ namespace fan
 	//================================================================================================================================
 	Prefab *  RessourceManager::LoadPrefab( const std::string& _path )
 	{
-// 		if ( _path.empty() ) { return nullptr; }
+// 		if ( _path.empty() ) { return nullptr; }@migration
 // 
 // 		// Load
 // 		Prefab * prefab = new Prefab();
@@ -223,7 +221,7 @@ namespace fan
 	//================================================================================================================================
 	void RessourceManager::RegisterPrefab( Prefab * _prefab )
 	{
-// 		std::string path = CleanPath( _prefab->GetPath() );
+// 		std::string path = CleanPath( _prefab->GetPath() );@migration
 // 		assert( m_prefabs.find(path) == m_prefabs.end() );
 // 		m_prefabs[ path ] = _prefab;
 	}
@@ -243,37 +241,37 @@ namespace fan
 	//================================================================================================================================
 	void RessourceManager::OnResolveTexturePtr( TexturePtr * _ptr )
 	{
-// 		Texture * texture = RessourceManager::Get().FindTexture( _ptr->GetID() );
-// 		if ( texture == nullptr )
-// 		{
-// 			texture = RessourceManager::Get().LoadTexture( _ptr->GetID() );
-// 		}
-// 		if ( texture )
-// 		{
-// 			*_ptr = TexturePtr( texture, texture->GetPath() );
-// 		}
+		Texture * texture = RessourceManager::Get().FindTexture( _ptr->GetID() );
+		if ( texture == nullptr )
+		{
+			texture = RessourceManager::Get().LoadTexture( _ptr->GetID() );
+		}
+		if ( texture )
+		{
+			*_ptr = TexturePtr( texture, texture->GetPath() );
+		}
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
 	void RessourceManager::OnResolveMeshPtr( MeshPtr * _ptr )
 	{
-// 		Mesh * mesh = RessourceManager::Get().FindMesh( _ptr->GetID() );
-// 		if ( mesh == nullptr )
-// 		{
-// 			mesh = RessourceManager::Get().LoadMesh( _ptr->GetID() );
-// 		}
-// 		if ( mesh )
-// 		{
-// 			*_ptr = MeshPtr( mesh, mesh->GetPath() );
-// 		}
+		Mesh * mesh = RessourceManager::Get().FindMesh( _ptr->GetID() );
+		if ( mesh == nullptr )
+		{
+			mesh = RessourceManager::Get().LoadMesh( _ptr->GetID() );
+		}
+		if ( mesh )
+		{
+			*_ptr = MeshPtr( mesh, mesh->GetPath() );
+		}
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
 	void RessourceManager::OnResolvePrefabPtr( PrefabPtr * _ptr )
 	{
-// 		Prefab * prefab = RessourceManager::Get().FindPrefab( _ptr->GetID() );
+// 		Prefab * prefab = RessourceManager::Get().FindPrefab( _ptr->GetID() ); @migration
 // 		if ( prefab == nullptr )
 // 		{
 // 			prefab = RessourceManager::Get().LoadPrefab( _ptr->GetID() );

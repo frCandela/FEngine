@@ -4,7 +4,6 @@
 
 #include "scene/actors/fanActor.hpp"
 #include "scene/fanComponentPtr.hpp"
-#include "scene/fanRessourcePtr.hpp"
 
 namespace fan
 {

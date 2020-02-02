@@ -5,7 +5,8 @@
 #include "core/meta/fanTypeList.hpp"
 #include "core/math/shapes/fanAABB.hpp"
 #include "core/math/shapes/fanConvexHull.hpp"
-#include "scene/fanRessourcePtr.hpp"
+#include "scene/fanSceneRessourcePtr.hpp"
+#include "render/fanRenderRessourcePtr.hpp"
 
 namespace fan {
 

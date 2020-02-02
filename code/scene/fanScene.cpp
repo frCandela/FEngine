@@ -7,7 +7,7 @@
 #include "scene/components/fanPointLight.hpp"
 #include "scene/components/fanDirectionalLight.hpp"
 #include "scene/actors/fanActor.hpp"
-#include "scene/fanRessourcePtr.hpp"
+#include "scene/fanSceneRessourcePtr.hpp"
 #include "scene/fanComponentPtr.hpp"
 #include "scene/fanSceneInstantiate.hpp"
 #include "scene/fanPhysicsManager.hpp"

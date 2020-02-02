@@ -6,8 +6,6 @@ namespace fan
 {
 	class Component;
 	class Gameobject;
-	class Texture;
-	class Mesh;
 	class Prefab;
 }
 
@@ -15,12 +13,6 @@ namespace ImGui
 {
 	void				FanBeginDragDropSourceGameobject( fan::Gameobject * _gameobject, ImGuiDragDropFlags _flags = ImGuiDragDropFlags_None );
 	fan::Gameobject *	FanBeginDragDropTargetGameobject();
-
-	void				FanBeginDragDropSourceTexture( fan::Texture * _texture, ImGuiDragDropFlags _flags = ImGuiDragDropFlags_None );
-	fan::Texture *		FanBeginDragDropTargetTexture();
-
-	void				FanBeginDragDropSourceMesh( fan::Mesh * _mesh, ImGuiDragDropFlags _flags = ImGuiDragDropFlags_None );
-	fan::Mesh *			FanBeginDragDropTargetMesh();
 
 	void				FanBeginDragDropSourcePrefab( fan::Prefab * _prefab, ImGuiDragDropFlags _flags = ImGuiDragDropFlags_None );
 	fan::Prefab *		FanBeginDragDropTargetPrefab();
