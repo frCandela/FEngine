@@ -105,9 +105,9 @@ namespace fan
 		const float size = 0.002f;
 		btVector3 offset = ray.origin + 0.1f*ray.direction;
 
-		//@migration EditorDebug::Get().Renderer().DebugLine(offset, offset + btVector3(size, 0, 0), Color(1, 0, 0, 1));
-		//@migration EditorDebug::Get().Renderer().DebugLine(offset, offset + btVector3(0, size, 0), Color(0, 1, 0, 1));
-		//@migration EditorDebug::Get().Renderer().DebugLine(offset, offset + btVector3(0, 0, size), Color(0, 0, 1, 1));
+		RendererDebug::Get().DebugLine(offset, offset + btVector3(size, 0, 0), Color(1, 0, 0, 1));
+		RendererDebug::Get().DebugLine(offset, offset + btVector3(0, size, 0), Color(0, 1, 0, 1));
+		RendererDebug::Get().DebugLine(offset, offset + btVector3(0, 0, size), Color(0, 0, 1, 1));
 	}
 
 	//================================================================================================================================

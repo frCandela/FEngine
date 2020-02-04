@@ -57,7 +57,7 @@ namespace fan
 		{
 			Transform * transform = m_selectedGameobject->GetComponent< Transform >();
 			btVector3 newPosition;
-			if ( EditorDebug::Get().Gizmos().DrawMoveGizmo( btTransform( btQuaternion( 0, 0, 0 ), transform->GetPosition() ), (size_t)this, newPosition ) )
+			if (EditorGizmos::Get().DrawMoveGizmo( btTransform( btQuaternion( 0, 0, 0 ), transform->GetPosition() ), (size_t)this, newPosition ) )
 			{
 				transform->SetPosition( newPosition );
 				mouseCaptured = true;

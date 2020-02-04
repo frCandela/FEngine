@@ -134,7 +134,7 @@ namespace fan {
 		{
 			OrbitData orbit = m_orbits[orbitIndex];
 
-			//@migration EditorDebug::Get().Renderer().DebugCircle( transform.GetPosition(), orbit.radius, transform.Up(), 32, Color::Cyan );
+			RendererDebug::Get().DebugCircle( transform.GetPosition(), orbit.radius, transform.Up(), 32, Color::Cyan );
 
 			float const time = -orbit.speed * Time::ElapsedSinceStartup();
 			for ( int planetIndex = 0; planetIndex < orbit.planets.size(); planetIndex++ )
@@ -142,7 +142,7 @@ namespace fan {
 				PlanetData & planet = orbit.planets[planetIndex];
 				btVector3 position( std::cosf( time + planet.phase ), 0, std::sinf( time + planet.phase ) );
 
-				//@migration EditorDebug::Get().Renderer().DebugCircle( orbit.radius * position, std::fabs( orbit.maxScale ), transform.Up(), 16, Color::Cyan );
+				RendererDebug::Get().DebugCircle( orbit.radius * position, std::fabs( orbit.maxScale ), transform.Up(), 16, Color::Cyan );
 			}
 
 		}

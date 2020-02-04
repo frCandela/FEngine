@@ -9,6 +9,7 @@
 #include "render/fanRenderer.hpp"
 #include "render/fanUIMesh.hpp"
 #include "render/fanMesh.hpp"
+#include "render/fanRendererDebug.hpp"
 #include "core/math/shapes/fanTriangle.hpp"
 #include "core/input/fanInputManager.hpp"
 #include "core/math/shapes/fanPlane.hpp"
@@ -17,8 +18,9 @@
 #include "core/imgui/fanImguiIcons.hpp"
 #include "core/input/fanKeyboard.hpp"
 #include "core/input/fanJoystick.hpp"
-#include "core/input/fanMouse.hpp"
+#include "core/time/fanProfiler.hpp"
 #include "core/imgui/fanModals.hpp"
+#include "core/input/fanMouse.hpp"
 #include "core/input/fanInput.hpp"
 #include "core/time/fanTime.hpp"
 #include "editor/callbacks/fanGameWindowCallbacks.hpp"
@@ -51,7 +53,6 @@
 #include "scene/components/fanCamera.hpp"
 #include "scene/fanSceneInstantiate.hpp"
 #include "scene/actors/fanActor.hpp"
-#include "core/time/fanProfiler.hpp"
 #include "scene/fanGameobject.hpp"
 #include "scene/fanScene.hpp"
 #include "game/components/fanCameraController.hpp"
@@ -152,7 +153,9 @@ namespace fan
 		m_networkWindow		= new NetworkWindow( m_clientScene, m_serverScene );
 		m_mainMenuBar		= new MainMenuBar( *m_selection);
 
-		EditorDebug::Get().SetDebug( & m_renderer->GetRendererDebug(), m_gizmos );
+		RendererDebug::Init(&m_renderer->GetRendererDebug());
+		EditorGizmos::Init(m_gizmos );
+
 		m_selection->ConnectCallbacks( *m_clientScene, *m_serverScene );
 		m_renderWindow->SetRenderer( m_renderer );
 		m_preferencesWindow->SetRenderer( m_renderer );
@@ -372,8 +375,8 @@ namespace fan
 			const int count = m_editorGrid.linesCount;
 
 			for (int coord = -m_editorGrid.linesCount; coord <= m_editorGrid.linesCount; coord++) {
-				//@migration EditorDebug::Get().Renderer().DebugLine( m_editorGrid.offset + btVector3(-count * size, 0.f, coord*size), m_editorGrid.offset + btVector3(count*size, 0.f, coord*size), m_editorGrid.color);
-				//@migration EditorDebug::Get().Renderer().DebugLine( m_editorGrid.offset + btVector3(coord*size, 0.f, -count * size), m_editorGrid.offset + btVector3(coord*size, 0.f, count*size), m_editorGrid.color);
+				RendererDebug::Get().DebugLine( m_editorGrid.offset + btVector3(-count * size, 0.f, coord*size), m_editorGrid.offset + btVector3(count*size, 0.f, coord*size), m_editorGrid.color);
+				RendererDebug::Get().DebugLine( m_editorGrid.offset + btVector3(coord*size, 0.f, -count * size), m_editorGrid.offset + btVector3(coord*size, 0.f, count*size), m_editorGrid.color);
 			}
 		}
 	}
@@ -386,7 +389,7 @@ namespace fan
 			const Gameobject * gameobject = entities[gameobjectIndex];
 			if (gameobject != &m_currentScene->GetMainCamera().GetGameobject()) {
 				AABB aabb = gameobject->GetAABB();
-				//@migration EditorDebug::Get().Renderer().DebugAABB(aabb, Color::Red);
+				RendererDebug::Get().DebugAABB(aabb, Color::Red);
 			}
 		}
 	}
@@ -421,9 +424,9 @@ namespace fan
 							const btVector3 worldVec1 = ToBullet(modelMat * glm::vec4(vec1[0], vec1[1], vec1[2], 1.f));
 							const btVector3 worldVec2 = ToBullet(modelMat * glm::vec4(vec2[0], vec2[1], vec2[2], 1.f));
 							
-							//@migration EditorDebug::Get().Renderer().DebugLine(worldVec0, worldVec1, color);
-							//@migration EditorDebug::Get().Renderer().DebugLine(worldVec1, worldVec2, color);
-							//@migration EditorDebug::Get().Renderer().DebugLine(worldVec2, worldVec0, color);
+							RendererDebug::Get().DebugLine(worldVec0, worldVec1, color);
+							RendererDebug::Get().DebugLine(worldVec1, worldVec2, color);
+							RendererDebug::Get().DebugLine(worldVec2, worldVec0, color);
 		
 						}
 					}
@@ -449,9 +452,9 @@ namespace fan
 						const btVector3 v0 = ToBullet(modelMat * glm::vec4(vertices[indices[3 * index + 0]].pos, 1.f));
 						const btVector3 v1 = ToBullet(modelMat * glm::vec4(vertices[indices[3 * index + 1]].pos, 1.f));
 						const btVector3 v2 = ToBullet(modelMat * glm::vec4(vertices[indices[3 * index + 2]].pos, 1.f));
-						//@migration EditorDebug::Get().Renderer().DebugLine(v0, v1, Color::Yellow);
-						//@migration EditorDebug::Get().Renderer().DebugLine(v1, v2, Color::Yellow);
-						//@migration EditorDebug::Get().Renderer().DebugLine(v2, v0, Color::Yellow);
+						RendererDebug::Get().DebugLine(v0, v1, Color::Yellow);
+						RendererDebug::Get().DebugLine(v1, v2, Color::Yellow);
+						RendererDebug::Get().DebugLine(v2, v0, Color::Yellow);
 					}
 				}
 			}
@@ -477,7 +480,7 @@ namespace fan
 						const Vertex& vertex = vertices[indices[index]];
 						const btVector3 position = ToBullet(modelMat * glm::vec4(vertex.pos, 1.f));
 						const btVector3 normal = ToBullet(normalMat * glm::vec4(vertex.normal, 1.f));
-						//@migration EditorDebug::Get().Renderer().DebugLine(position, position + 0.1f * normal, Color::Green);
+						RendererDebug::Get().DebugLine(position, position + 0.1f * normal, Color::Green);
 					}
 				}
 			}

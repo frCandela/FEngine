@@ -43,11 +43,15 @@ namespace fan
 		std::vector< btVector3> DebugCone	  ( const btTransform _transform, const float _radius, const float _height, const int _numSubdivisions, const Color _color );
 		void					DebugAABB	  ( const AABB & _aabb, const Color _color );
 
+		static RendererDebug& Get() { return *s_rendererInstance;  }
+		static void Init(RendererDebug* const _rendererDebug) { assert(s_rendererInstance == nullptr); s_rendererInstance = _rendererDebug; }
 	private:
 		Device & m_device;
 		SwapChain& m_swapchain;
 		VkRenderPass m_renderPass = VK_NULL_HANDLE;
 		FrameBuffer* m_frameBuffer = nullptr;
+
+		static RendererDebug* s_rendererInstance; // Used for global debug draw
 
 		DebugPipeline *			m_debugLinesPipeline;
 		DebugPipeline *			m_debugLinesPipelineNoDepthTest;
@@ -64,5 +68,5 @@ namespace fan
 		std::vector<Buffer *>		m_debugLinesvertexBuffers;
 		std::vector<Buffer *>		m_debugLinesNoDepthTestVertexBuffers;
 		std::vector<Buffer *>		m_debugTrianglesvertexBuffers;
-	};
+	};		
 }

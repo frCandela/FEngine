@@ -7,9 +7,10 @@
 #include "core/math/fanBasicModels.hpp"
 #include "core/time/fanProfiler.hpp"
 
-
 namespace fan
 {
+	RendererDebug* RendererDebug::s_rendererInstance = nullptr; // Used for global debug draw
+
 	//================================================================================================================================
 	//================================================================================================================================
 	RendererDebug::RendererDebug( Device & _device, SwapChain& _swapchain ) 
@@ -19,7 +20,6 @@ namespace fan
 		m_debugLinesvertexBuffers.resize( m_swapchain.GetSwapchainImagesCount() );
 		m_debugLinesNoDepthTestVertexBuffers.resize(  m_swapchain.GetSwapchainImagesCount() );
 		m_debugTrianglesvertexBuffers.resize(  m_swapchain.GetSwapchainImagesCount() );
-
 	}
 
 	//================================================================================================================================

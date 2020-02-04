@@ -55,8 +55,8 @@ namespace fan
 		{
 
 			const Color debugColor( 1.f, 1.f, 0.f, 0.3f );
-			//@migration EditorDebug::Get().Renderer().DebugTriangle( btVector3::Zero(), _v0, _v1, debugColor );
-			//@migration EditorDebug::Get().Renderer().DebugLine( btVector3::Zero(), _v0, Color::Green );
+			RendererDebug::Get().DebugTriangle( btVector3::Zero(), _v0, _v1, debugColor );
+			RendererDebug::Get().DebugLine( btVector3::Zero(), _v0, Color::Green );
 		}
 	}
 }

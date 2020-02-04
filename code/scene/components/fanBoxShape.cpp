@@ -52,7 +52,7 @@ namespace fan {
 				SetExtent( extent );
 			}
 
-			//@migration EditorDebug::Get().Renderer().DebugCube( m_gameobject->GetTransform().GetBtTransform(), 0.5f * extent, Color::Green );
+			RendererDebug::Get().DebugCube( m_gameobject->GetTransform().GetBtTransform(), 0.5f * extent, Color::Green );
 		} ImGui::PopItemWidth();
 	}
 

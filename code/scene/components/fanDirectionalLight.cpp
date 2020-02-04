@@ -84,9 +84,9 @@ namespace fan {
 			for ( int offsetIndex = 0; offsetIndex < 5; offsetIndex++ )
 			{
 				const btVector3 offset = offsets[offsetIndex];
-				//@migration EditorDebug::Get().Renderer().DebugLine( pos + offset, pos + offset + length * dir, color );
+				RendererDebug::Get().DebugLine( pos + offset, pos + offset + length * dir, color );
 			}
-			//@migration EditorDebug::Get().Renderer().DebugSphere( transform.GetBtTransform(), radius, 0, color );
+			RendererDebug::Get().DebugSphere( transform.GetBtTransform(), radius, 0, color );
 		} ImGui::PopItemWidth();
 	}
 

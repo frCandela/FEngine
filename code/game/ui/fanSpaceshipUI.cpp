@@ -110,7 +110,7 @@ namespace fan
 			Ray toto = camera.ScreenPosToRay(m_gameobject->GetTransform().GetPosition());
 
 
-			//@migration EditorDebug::Get().Renderer().DebugLine(toto.origin, m_spaceShip->GetTransform().GetPosition(), Color::Red );
+			RendererDebug::Get().DebugLine(toto.origin, m_spaceShip->GetTransform().GetPosition(), Color::Red );
 		}
 	}
 	 

@@ -53,7 +53,7 @@ namespace fan
 			{
 				SetRadius( radius );
 			}
-			//@migration EditorDebug::Get().Renderer().DebugSphere( m_gameobject->GetTransform().GetBtTransform(), radius, 2, Color::Green );
+			RendererDebug::Get().DebugSphere( m_gameobject->GetTransform().GetBtTransform(), radius, 2, Color::Green );
 		} ImGui::PopItemWidth();
 
 	

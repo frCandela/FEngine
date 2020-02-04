@@ -107,7 +107,7 @@ namespace fan
 		float lightRange = GetLightRange();
 		if (lightRange > 0 ) {
 			const btTransform transform = m_gameobject->GetTransform().GetBtTransform();
-			//@migration EditorDebug::Get().Renderer().DebugSphere(transform, lightRange, 2, m_pointLight->diffuse);
+			RendererDebug::Get().DebugSphere(transform, lightRange, 2, m_pointLight->diffuse);
 		}
 
 	}
