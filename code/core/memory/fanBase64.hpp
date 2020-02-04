@@ -9,7 +9,7 @@ namespace fan {
 	class Base64 
 	{
 	public:
-		static std::string  Encode(const unsigned char const* _bytesToEncode, const unsigned int _lenght);
+		static std::string  Encode(const unsigned char * _bytesToEncode, const unsigned int _lenght);
 		static std::string  Decode(const std::string & _encodedString);
 	};
 }

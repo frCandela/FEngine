@@ -9,6 +9,8 @@ namespace fan {
 	//================================================================================================================================
 	// Allow import of GLTF file
 	// glTF™ is a specification for the efficient transmission and loading of 3D scenes and models by applications.
+	// It consist in a json header describing the data and binary (or base64) buffers
+	// Some nested structs are defined below to help extracting data from the json.
 	// see https://github.com/KhronosGroup/glTF
 	//================================================================================================================================
 	class GLTFImporter
@@ -24,6 +26,8 @@ namespace fan {
 		};
 
 		//================================================================		
+		// A mesh primitive has a rendering mode (point, line or triangle) and 
+		// series of attributes like positions or normals referencing accessors
 		//================================================================
 		struct GLTFPrimitive {
 			GLTFPrimitive(const Json& jPrimitive);
@@ -36,26 +40,9 @@ namespace fan {
 		};
 
 		//================================================================
-		// For now we only support one primitive per mesh
+		// An accessor defines the type and layout of the data and references a buffer view
 		//================================================================
-		struct GLTFMesh {
-			GLTFMesh(const Json& jMesh);
-			std::string name;
-			GLTFPrimitive primitive0;
-		};
-
-		//================================================================
-		//================================================================
-		struct GLTFBufferView {
-			GLTFBufferView(const Json& _jView);
-			int buffer = -1;
-			int	byteLength = -1;
-			int	byteOffset = -1;
-		};
-
-		//================================================================
-		//================================================================
-		struct GLTFAccessor 
+		struct GLTFAccessor
 		{
 			GLTFAccessor(const Json& _jAccessor);
 			int view = -1;
@@ -65,20 +52,42 @@ namespace fan {
 		};
 
 		//================================================================
+		// A  buffer view allows access to a  buffer 
+		// it defines the part of the buffer that belongs to a buffer view
+		//================================================================
+		struct GLTFBufferView {
+			GLTFBufferView(const Json& _jView);
+			int buffer = -1;
+			int	byteLength = -1;
+			int	byteOffset = -1;
+		};
+
+		//================================================================
+		// Contains data
+		// it can be binary data stored in another file or base64 encoded data embeded in the json
 		//================================================================
 		struct GLTFBuffer
 		{
-			GLTFBuffer(const Json& _jBuffer );
+			GLTFBuffer(const Json& _jBuffer);
 
 			int byteLength = -1;
 
-			static std::string GetBuffer( const GLTFBufferView& _view, const std::string& _uri );
+			std::string GetBuffer(const GLTFBufferView& _view, const std::string& _decodedBuffer) const;
+		};
+
+		//================================================================
+		// A mesh is a list of primitives
+		// For now we only support one primitive per mesh
+		//================================================================
+		struct GLTFMesh {
+			GLTFMesh(const Json& jMesh);
+			std::string name;
+			GLTFPrimitive primitive0;
 		};
 
 		std::string m_path;	// file relative path
 		Json m_json;		// gltf json data
 
-		void GetBufferFromView( std::string& _outStringBuffer);
-
+		std::string GLTFImporter::DecodeBuffer(const std::string& _uri);
 	};
 }
