@@ -7,7 +7,6 @@
 #include "scene/components/ui/fanUIMeshRenderer.hpp"
 #include "scene/components/fanCamera.hpp"
 #include "render/fanRendererDebug.hpp"
-// @migration #include "editor/fanEditorDebug.hpp"
 
 namespace fan
 {

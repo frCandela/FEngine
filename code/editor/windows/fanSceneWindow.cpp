@@ -9,6 +9,7 @@
 #include "scene/components/fanRigidbody.hpp"
 #include "scene/components/fanMaterial.hpp"
 #include "scene/fanSceneInstantiate.hpp"
+#include "scene/fanPrefabManager.h"
 #include "scene/fanGameobject.hpp"
 #include "scene/fanScene.hpp"
 #include "core/input/fanKeyboard.hpp"
@@ -303,7 +304,7 @@ namespace fan
 			if ( outStream.is_open() )
 			{
 				// Try to update the existing prefab if it exists
-				Prefab * prefab = RessourceManager::Get().FindPrefab( m_pathBuffer.string() );
+				Prefab * prefab = PrefabManager::Get().FindPrefab( m_pathBuffer.string() );
 				if ( prefab != nullptr )
 				{
 					prefab->LoadFromGameobject(m_lastGameobjectRightClicked);

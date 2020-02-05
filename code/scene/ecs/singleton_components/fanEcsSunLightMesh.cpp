@@ -2,8 +2,6 @@
 #include "render/fanRendererDebug.hpp"
 #include "render/fanMesh.hpp"
 
-// @migration #include "editor/fanEditorDebug.hpp"
-
 namespace fan
 {
 	//================================================================================================================================

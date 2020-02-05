@@ -3,8 +3,6 @@
 #include "render/fanRendererDebug.hpp"
 #include "core/imgui/fanModals.hpp"
 
-//#include "editor/fanEditorDebug.hpp" @migration
-
 namespace fan {
 	REGISTER_TYPE_INFO( DirectionalLight, TypeInfo::Flags::EDITOR_COMPONENT, "light/" )
 

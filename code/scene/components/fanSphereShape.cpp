@@ -1,7 +1,6 @@
 #include "scene/components/fanSphereShape.hpp"
 #include "scene/components/fanTransform.hpp"
 #include "render/fanRendererDebug.hpp"
-// #include "editor/fanEditorDebug.hpp" @migration
 
 namespace fan
 {

@@ -7,7 +7,6 @@
 #include "scene/components/fanSphereShape.hpp"
 #include "core/time/fanTime.hpp"
 #include "render/fanRendererDebug.hpp"
-// @migration #include "editor/fanEditorDebug.hpp"
 
 namespace fan {
 	REGISTER_TYPE_INFO( SolarSystem, TypeInfo::Flags::EDITOR_COMPONENT, "game/" )

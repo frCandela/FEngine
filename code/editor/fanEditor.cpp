@@ -60,6 +60,11 @@
 // @hack for generating lazy typeinfo on non referenced components. Find a compiler flag for that ?
 #include "game/components/fanSunLight.hpp"
 #include "game/components/fanSolarEruption.hpp"
+#include "game/components/fanWeapon.hpp"
+#include "game/ui/fanSpaceshipUI.hpp"
+#include "scene/components/fanBoxShape.hpp"
+#include "scene/components/fanFollowTransform.hpp"
+
 
 namespace fan 
 {
@@ -214,6 +219,10 @@ namespace fan
 		if (Time::Get().ElapsedSinceStartup() == -12.01548468f) {
 			SunLight light;
 			SolarEruption solarEruption;
+			BoxShape boxShape;
+			Weapon weapon;
+			SpaceShipUI ui;
+			FollowTransform ft;
 		}
 	}
 

@@ -27,7 +27,6 @@ namespace fan
 
 		TexturePtr::s_onCreateUnresolved.Connect ( &RessourceManager::OnResolveTexturePtr,this );
 		MeshPtr::s_onCreateUnresolved.Connect	( &RessourceManager::OnResolveMeshPtr, this );
-// 		PrefabPtr::s_onCreateUnresolved.Connect ( &RessourceManager::OnResolvePrefabPtr, this); @migration
 
 		LoadMesh(RenderGlobal::s_defaultMesh);
 		LoadTexture(RenderGlobal::s_defaultTexture);
@@ -74,15 +73,6 @@ namespace fan
 	}
 
 	//================================================================================================================================
-	//================================================================================================================================
-	Prefab * RessourceManager::FindPrefab( const std::string& _path )
-	{
-		std::string path = CleanPath( _path );
-		auto it = m_prefabs.find( path );
-		return  it != m_prefabs.end() ? it->second : nullptr;
-	}
-
-	//================================================================================================================================
 	// Load a mesh from a path, loads it and registers it
 	//================================================================================================================================
 	Mesh * RessourceManager::LoadMesh( const std::string& _path )
@@ -121,23 +111,6 @@ namespace fan
 		}
 
 		return texture;
-	}
-
-	//================================================================================================================================
-	//================================================================================================================================
-	Prefab *  RessourceManager::LoadPrefab( const std::string& _path )
-	{
-// 		if ( _path.empty() ) { return nullptr; }@migration
-// 
-// 		// Load
-// 		Prefab * prefab = new Prefab();
-// 		if ( prefab->LoadFromFile( CleanPath( _path ) ) )
-// 		{
-// 			RegisterPrefab( prefab );
-// 			return prefab;
-// 		}
-// 		delete prefab;
-		return nullptr;
 	}
 
 	//================================================================================================================================
@@ -218,15 +191,6 @@ namespace fan
 	}
 
 	//================================================================================================================================
-	//================================================================================================================================
-	void RessourceManager::RegisterPrefab( Prefab * _prefab )
-	{
-// 		std::string path = CleanPath( _prefab->GetPath() );@migration
-// 		assert( m_prefabs.find(path) == m_prefabs.end() );
-// 		m_prefabs[ path ] = _prefab;
-	}
-
-	//================================================================================================================================
 	// the / is dead, long live the \ 
 	//================================================================================================================================
 	std::string RessourceManager::CleanPath( const std::string& _path )
@@ -265,20 +229,5 @@ namespace fan
 		{
 			*_ptr = MeshPtr( mesh, mesh->GetPath() );
 		}
-	}
-
-	//================================================================================================================================
-	//================================================================================================================================
-	void RessourceManager::OnResolvePrefabPtr( PrefabPtr * _ptr )
-	{
-// 		Prefab * prefab = RessourceManager::Get().FindPrefab( _ptr->GetID() ); @migration
-// 		if ( prefab == nullptr )
-// 		{
-// 			prefab = RessourceManager::Get().LoadPrefab( _ptr->GetID() );
-// 		}
-// 		if ( prefab )
-// 		{
-// 			*_ptr = PrefabPtr( prefab, prefab->GetPath() );
-// 		}
 	}
 }

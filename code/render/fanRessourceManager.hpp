@@ -20,7 +20,7 @@ namespace fan
 	using PrefabPtr = RessourcePtr<Prefab, std::string>;
 
 	//================================================================================================================================
-	// Loads & references all the ressources of the engine
+	// Loads & references image and mesh the ressources of the engine
 	//================================================================================================================================
 	class RessourceManager : public Singleton<RessourceManager> {
 	public:
@@ -31,11 +31,9 @@ namespace fan
 
 		Mesh *		FindMesh	( const std::string& _path );
 		Texture *	FindTexture	( const std::string& _path);
-		Prefab *	FindPrefab	( const std::string& _path );
 
 		Mesh *		LoadMesh	( const std::string& _path );		
 		Texture *	LoadTexture	( const std::string& _path);
-		Prefab *	LoadPrefab	( const std::string& _path );
 
 		bool IsModified() const { return m_modified; }
 		void SetUnmodified() { m_modified = false; }
@@ -52,7 +50,6 @@ namespace fan
 		std::vector< Texture * > m_textures;
 		bool					 m_modified = false;
 
-		void RegisterPrefab( Prefab * _prefab );
 		void RegisterMesh( Mesh * _mesh );
 		void RegisterUIMesh( UIMesh * _mesh );
 

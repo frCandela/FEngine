@@ -2,9 +2,6 @@
 #include "scene/components/fanMeshRenderer.hpp"
 #include "render/core/fanTexture.hpp"
 
-// Editor
-//#include "render/editor/fanModals.hpp" @migration
-
 namespace fan
 {
 	REGISTER_TYPE_INFO(Material, TypeInfo::Flags::EDITOR_COMPONENT, "")

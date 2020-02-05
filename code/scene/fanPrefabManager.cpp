@@ -1,68 +1,76 @@
-#include "game/fanGameManager.hpp"
-#include "game/components/fanSpaceShip.hpp"	
-#include "scene/components/fanTransform.hpp"
-#include "scene/components/fanCamera.hpp"
-#include "core/input/fanKeyboard.hpp"
-#include "core/time/fanTime.hpp"
+#include "scene/fanPrefabManager.h"
+#include "scene/fanPrefab.hpp"
+#include "render/fanRenderRessourcePtr.hpp"
+#include "core/fanSignal.hpp"
 
-
-namespace fan {
-	REGISTER_TYPE_INFO(GameManager, TypeInfo::Flags::EDITOR_COMPONENT, "game/managers/")
-
+namespace fan
+{
 	//================================================================================================================================
 	//================================================================================================================================
-	void GameManager::Start() 
+	void PrefabManager::Init()
 	{
-		if (*m_gameCamera == nullptr) {
-			Debug::Warning("Game manager has no camera attached");
-			SetEnabled(false);
-			m_gameobject->GetScene().SetMainCamera( *m_gameCamera );
-		}
+		PrefabPtr::s_onCreateUnresolved.Connect ( &PrefabManager::OnResolvePrefabPtr, this);
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void GameManager::OnAttach() {
-		Actor::OnAttach();
+	Prefab* PrefabManager::FindPrefab(const std::string& _path)
+	{
+		std::string path = CleanPath(_path);
+		auto it = m_prefabs.find(path);
+		return  it != m_prefabs.end() ? it->second : nullptr;
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void GameManager::OnDetach() {
-		Actor::OnDetach();
-	}
+	Prefab* PrefabManager::LoadPrefab(const std::string& _path)
+	{
+		if (_path.empty()) { return nullptr; }
 
-	//================================================================================================================================
-	//================================================================================================================================
-	void GameManager::Update(const float /*_delta*/) {
-
-	}
-
-	//================================================================================================================================
-	//================================================================================================================================
-	void GameManager::OnGui() {
-		Actor::OnGui();
-		
-		ImGui::PushItemWidth( 0.6f * ImGui::GetWindowWidth() );
+			// Load
+			Prefab* prefab = new Prefab();
+		if (prefab->LoadFromFile(CleanPath(_path)))
 		{
-			ImGui::FanComponent( "game camera", &m_gameCamera );
-			ImGui::Text("Press tab to switch cameras");			
-		} ImGui::PopItemWidth();
+			RegisterPrefab(prefab);
+			return prefab;
+		}
+		delete prefab;
+		return nullptr;
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	bool GameManager::Load( const Json & _json ) {
-		Actor::Load(_json);
-		Serializable::LoadComponentPtr( _json, "game_camera", m_gameCamera );
-		return true;
+	void PrefabManager::RegisterPrefab(Prefab* _prefab)
+	{
+		std::string path = CleanPath( _prefab->GetPath() );
+		assert( m_prefabs.find(path) == m_prefabs.end() );
+		m_prefabs[ path ] = _prefab;
+	}
+
+	//================================================================================================================================
+	// the / is dead, long live the \ 
+	// @todo refacto this with other CleanPath methods (ressourcemanager)
+	//================================================================================================================================
+	std::string PrefabManager::CleanPath(const std::string& _path)
+	{
+		std::filesystem::path path = _path;
+		path.make_preferred();
+
+		return path.string();
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	bool GameManager::Save( Json & _json ) const {		
-		Actor::Save( _json );	
-		Serializable::SaveComponentPtr( _json, "game_camera", m_gameCamera );
-		return true;
+	void PrefabManager::OnResolvePrefabPtr(PrefabPtr* _ptr)
+	{
+		Prefab * prefab = FindPrefab( _ptr->GetID() );
+		if ( prefab == nullptr )
+		{
+			prefab = LoadPrefab( _ptr->GetID() );
+		}
+		if ( prefab )
+		{
+			*_ptr = PrefabPtr( prefab, prefab->GetPath() );
+		}
 	}
 }
