@@ -3,11 +3,9 @@
 project ("FEngine")
 set(CMAKE_CXX_STANDARD 17)
 
-set(APP_NAME fengine_editor)
-
-include_directories(deps)
-include_directories(code)
-include_directories("C:/VulkanSDK/1.1.106.0/Include")
+include_directories( deps )
+include_directories( code )
+include_directories( "C:/VulkanSDK/1.1.106.0/Include" )
 
 # link directories
 link_directories("C:/VulkanSDK/1.1.106.0/Lib")
@@ -45,9 +43,9 @@ set(APP_LIBRARIES
 
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR})
 
-add_executable(${APP_NAME} ${APP_SOURCES} )
+add_executable(fengine_editor ${APP_SOURCES} )
 
-target_link_libraries(${APP_NAME} ${APP_LIBRARIES})
+target_link_libraries(fengine_editor ${APP_LIBRARIES})
 
 # FORCE C++17 STANDARD
 set_target_properties(fengine_editor PROPERTIES
@@ -55,11 +53,20 @@ set_target_properties(fengine_editor PROPERTIES
     CXX_STANDARD_REQUIRED ON
 )
 
-IF(${CMAKE_BUILD_TYPE} MATCHES Debug)
-    MESSAGE(STATUS "Compilation mode  : Debug")
-ELSEIF(${CMAKE_BUILD_TYPE} MATCHES Release)
-    MESSAGE(STATUS "Compilation mode  : Release")
-ELSEIF(${CMAKE_BUILD_TYPE} MATCHES Retail)
-    #TODO
-    MESSAGE(STATUS "Compilation mode  : Retail")
-ENDIF()
+  # Force W4
+if(MSVC)
+  if(CMAKE_CXX_FLAGS MATCHES "/W[0-4]")
+    string(REGEX REPLACE "/W[0-4]" "/W4" CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
+  else()
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /W4")
+  endif()
+endif()
+
+  # Force WX (warning as error)
+target_compile_options(fanCore PRIVATE /WX)
+target_compile_options(fanRender PRIVATE /WX)
+target_compile_options(fanNetwork PRIVATE /WX)
+target_compile_options(fanScene PRIVATE /WX)
+target_compile_options(fanGame PRIVATE /WX)
+target_compile_options(fanEditor PRIVATE /WX)
+target_compile_options(fengine_editor PRIVATE /WX)

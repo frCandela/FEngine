@@ -12,7 +12,12 @@
 #include <fstream>
 #include <iostream>
 #include <filesystem>
-#include <set>
+#include <set> 
+
+#pragma warning( push )
+#pragma warning( disable : 4201 )
+#pragma warning( disable : 4127 )
+#pragma warning( disable : 4100 )
 
 #include "bullet/btBulletDynamicsCommon.h"
 #define GLFW_INCLUDE_VULKAN
@@ -27,6 +32,8 @@
 #include <glm/gtx/hash.hpp>
 #define IMGUI_DISABLE_OBSOLETE_FUNCTIONS
 #include "imgui/imgui.h"
+
+#pragma warning( pop )
 
 using Json = nlohmann::json;
 
