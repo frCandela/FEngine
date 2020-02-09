@@ -61,10 +61,9 @@ namespace fan
 
 
 	public:
-		Renderer(const VkExtent2D _size, const glm::ivec2 _position);
+		Renderer( Window & _window );
 		~Renderer();
 
-		bool WindowIsOpen();
 		void DrawFrame();
 		void WaitIdle();
 
@@ -73,7 +72,6 @@ namespace fan
 		void ResizeGame( btVector2 _newSize );
 		void ResizeSwapchain();
 
-		Window *				GetWindow() { return m_window; }
 		RendererDebug&			GetRendererDebug() { return *m_rendererDebug; }
 		ImguiPipeline *			GetImguiPipeline() { return m_imguiPipeline; }
 		PostprocessPipeline *	GetPostprocessPipeline() { return m_postprocessPipeline; }
@@ -104,10 +102,7 @@ namespace fan
 		std::vector< UIDrawData > m_uiMeshDrawArray;
 			   
 		// VULKAN OBJECTS
-		Instance *		m_instance;
-		Window *		m_window;
-		Device *		m_device;
-		SwapChain  *	m_swapchain;
+		Window&			m_window;
 
 		ImguiPipeline *			m_imguiPipeline;
 		PostprocessPipeline *	m_postprocessPipeline;

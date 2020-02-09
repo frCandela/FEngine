@@ -4,25 +4,26 @@
 #include "editor/fanEditorGrid.hpp"
 
 namespace fan {
-	class MainMenuBar;
-	class RenderWindow;
-	class SceneWindow;
-	class InspectorWindow;
-	class PreferencesWindow;
-	class ConsoleWindow;
-	class EditorWindow;
 	class EditorGameWindowCallbacks;
-	class EditorSelection;
-	class EditorGizmos;
-	class EcsWindow;
-	class ProfilerWindow;
-	class GameWindow;
-	class NetworkWindow;
+	class PreferencesWindow;
 	class SceneInstantiate;
-	class Renderer;
-	class Gameobject;
-	class Scene;
+	class InspectorWindow;
 	class EditorCopyPaste;
+	class EditorSelection;
+	class ProfilerWindow;
+	class ConsoleWindow;
+	class NetworkWindow;
+	class RenderWindow;
+	class EditorGizmos;
+	class EditorWindow;
+	class SceneWindow;
+	class MainMenuBar;
+	class Gameobject;
+	class EcsWindow;
+	class GameWindow;
+	class Renderer;
+	class Window;
+	class Scene;
 
 	//================================================================================================================================
 	//================================================================================================================================	
@@ -36,15 +37,15 @@ namespace fan {
 		void Run();
 		void Exit();	
 
-		Renderer &				GetRenderer() const				{ return * m_renderer; }
-		MainMenuBar  &			GetMainMenuBar() const			{ return * m_mainMenuBar; }
-		RenderWindow &			GetRenderWindow() const			{ return * m_renderWindow; }
-		SceneWindow  &			GetSceneWindow() const			{ return * m_sceneWindow; }
-		InspectorWindow  &		GetInspectorWindow() const		{ return * m_inspectorWindow; }
 		PreferencesWindow  &	GetPreferencesWindow() const	{ return * m_preferencesWindow; }
+		InspectorWindow  &		GetInspectorWindow() const		{ return * m_inspectorWindow; }
 		ConsoleWindow  &		GetConsoleWindow() const		{ return * m_consoleWindow; }
-		Scene &					GetScene() const				{ return * m_currentScene; }
+		RenderWindow &			GetRenderWindow() const			{ return * m_renderWindow; }
+		MainMenuBar  &			GetMainMenuBar() const			{ return * m_mainMenuBar; }
+		SceneWindow  &			GetSceneWindow() const			{ return * m_sceneWindow; }
 		Scene &					GetServerScene() const			{ return * m_serverScene; }
+		Renderer &				GetRenderer() const				{ return * m_renderer; }
+		Scene &					GetScene() const				{ return * m_currentScene; }
 
 		EditorGrid GetEditorGrid() const { return m_editorGrid;  }
 		void SetEditorGrid( const EditorGrid _editorGrid) { m_editorGrid =_editorGrid; }
@@ -55,23 +56,24 @@ namespace fan {
 		// UI elements
 		MainMenuBar *		m_mainMenuBar;
 
+		PreferencesWindow *	m_preferencesWindow;
+		InspectorWindow *	m_inspectorWindow;
+		ProfilerWindow*		m_profilerWindow;
+		NetworkWindow*		m_networkWindow;
+		ConsoleWindow *		m_consoleWindow;
 		RenderWindow *		m_renderWindow;
 		SceneWindow *		m_sceneWindow;
-		InspectorWindow *	m_inspectorWindow;
-		PreferencesWindow *	m_preferencesWindow;
-		ConsoleWindow *		m_consoleWindow;
-		EcsWindow *			m_ecsWindow;
-		ProfilerWindow*		m_profilerWindow;
 		GameWindow*			m_gameWindow;
-		NetworkWindow*		m_networkWindow;
 		EditorGrid			m_editorGrid;
+		EcsWindow *			m_ecsWindow;
 
 		// Main objects
-		EditorCopyPaste *				m_copyPaste;
 		EditorGameWindowCallbacks	*	m_gameCallbacks;
+		EditorCopyPaste *				m_copyPaste;
 		EditorSelection *				m_selection;
 		EditorGizmos *					m_gizmos;
 		Renderer *						m_renderer;
+		Window *						m_window;
 		Scene * 			m_currentScene;
 		Scene *				m_clientScene;
 		Scene *				m_serverScene;

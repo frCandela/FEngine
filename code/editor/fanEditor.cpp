@@ -10,6 +10,7 @@
 #include "render/fanUIMesh.hpp"
 #include "render/fanMesh.hpp"
 #include "render/fanRendererDebug.hpp"
+#include "core/math/shapes/fanConvexHull.hpp"
 #include "core/math/shapes/fanTriangle.hpp"
 #include "core/input/fanInputManager.hpp"
 #include "core/math/shapes/fanPlane.hpp"
@@ -45,7 +46,6 @@
 #include "scene/components/fanMeshRenderer.hpp"
 #include "scene/components/fanSphereShape.hpp"
 #include "scene/components/fanPointLight.hpp"
-#include "core/math/shapes/fanConvexHull.hpp"
 #include "scene/components/fanRigidbody.hpp"
 #include "scene/components/fanComponent.hpp"
 #include "scene/components/fanTransform.hpp"
@@ -130,7 +130,9 @@ namespace fan
 		Input::Get().Manager().CreateJoystickButtons(	"gamejs_axis_stop"			, 0, Joystick::A );	
 
 		// renderer
-		m_renderer	= new Renderer( windowSize, windowPosition );
+		m_window = new Window("FEngine", windowSize, windowPosition );
+		m_renderer	= new Renderer(*m_window);
+
 		Color clearColor;
 		if ( SerializedValues::Get().GetColor( "clear_color", clearColor ) )
 		{
@@ -237,16 +239,16 @@ namespace fan
 		delete m_serverScene;
 
 		// Serialize editor positions
-		const Window * window = m_renderer->GetWindow();
-		const VkExtent2D rendererSize = window->GetExtent();
-		const glm::ivec2 windowPosition = window->GetPosition();
+		const VkExtent2D rendererSize = m_window->GetExtent();
+		const glm::ivec2 windowPosition = m_window->GetPosition();
 		SerializedValues::Get().SetUInt("renderer_extent_width", rendererSize.width);
 		SerializedValues::Get().SetUInt("renderer_extent_height", rendererSize.height);
 		SerializedValues::Get().SetInt("renderer_position_x", windowPosition.x);
 		SerializedValues::Get().SetInt("renderer_position_y", windowPosition.y);
 		SerializedValues::Get().SaveValuesToDisk();
 
-		delete ( m_renderer );
+		delete m_renderer ;
+		delete m_window;
 	}
 
 	//================================================================================================================================
@@ -264,7 +266,7 @@ namespace fan
 
 		Profiler::Get().Begin();
 
-		while ( m_applicationShouldExit == false && m_renderer->WindowIsOpen() == true ) 
+		while ( m_applicationShouldExit == false && m_window->IsOpen() == true ) 
 		{
  			const float time = Time::ElapsedSinceStartup();
 
