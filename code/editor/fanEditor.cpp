@@ -55,6 +55,7 @@
 #include "scene/actors/fanActor.hpp"
 #include "scene/fanGameobject.hpp"
 #include "scene/fanScene.hpp"
+#include "scene/fanPrefabManager.hpp"
 #include "game/components/fanCameraController.hpp"
 
 // @hack for generating lazy typeinfo on non referenced components. Find a compiler flag for that ?
@@ -160,6 +161,7 @@ namespace fan
 
 		RendererDebug::Init(&m_renderer->GetRendererDebug());
 		EditorGizmos::Init(m_gizmos );
+		PrefabManager::Get().Init();
 
 		m_selection->ConnectCallbacks( *m_clientScene, *m_serverScene );
 		m_renderWindow->SetRenderer( m_renderer );

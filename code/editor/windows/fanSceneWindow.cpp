@@ -9,7 +9,7 @@
 #include "scene/components/fanRigidbody.hpp"
 #include "scene/components/fanMaterial.hpp"
 #include "scene/fanSceneInstantiate.hpp"
-#include "scene/fanPrefabManager.h"
+#include "scene/fanPrefabManager.hpp"
 #include "scene/fanGameobject.hpp"
 #include "scene/fanScene.hpp"
 #include "core/input/fanKeyboard.hpp"

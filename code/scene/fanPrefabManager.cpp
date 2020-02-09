@@ -1,4 +1,4 @@
-#include "scene/fanPrefabManager.h"
+#include "scene/fanPrefabManager.hpp"
 #include "scene/fanPrefab.hpp"
 #include "render/fanRenderRessourcePtr.hpp"
 #include "core/fanSignal.hpp"
