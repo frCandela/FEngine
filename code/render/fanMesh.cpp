@@ -37,7 +37,8 @@ namespace fan {
 		OptimizeVertices();
 		GenerateConvexHull();
 		s_onGenerateVulkanData.Emmit( this );
-		return Ressource::LoadFromFile(_path);
+		m_path = _path;
+		return true;
 	}
 
 	//================================================================================================================================

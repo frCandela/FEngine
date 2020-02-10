@@ -10,7 +10,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	class Texture : public Ressource
+	class Texture : public Resource
 	{
 	public:
 		static Signal< Texture* > s_onGenerateVulkanData;
@@ -19,12 +19,13 @@ namespace fan
 		~Texture();
 
 		void SetData(const unsigned char * _data, const uint32_t _width, const uint32_t _height, const uint32_t _mipLevels);
-		bool LoadFromFile( const std::string& _path ) override;
+		bool LoadFromFile( const std::string& _path );
 		void GenerateVulkanData( Device & _device );
 		void DeleteVulkanData( Device & _device );
 
+		std::string GetPath() const { return m_path; }
 		glm::ivec3	GetSize() const { return glm::ivec3(m_width, m_height, m_layerCount); }
-		VkImageView GetImageView() { return m_imageView; }
+		VkImageView GetImageView()  { return m_imageView; }
 
 		int		GetRenderID() const { return m_renderID; }
 		void	SetRenderID(const int _renderID) { m_renderID = _renderID; }
@@ -38,7 +39,9 @@ namespace fan
 		uint32_t m_width;
 		uint32_t m_height;
 		uint32_t m_layerCount = 1;
+
 		unsigned char *	 m_data;
+		std::string		 m_path;
 
 		int m_renderID = -1;
 		

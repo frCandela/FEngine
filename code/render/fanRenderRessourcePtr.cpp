@@ -79,7 +79,7 @@ namespace ImGui
 		// Modal set value
 		if ( ImGui::FanLoadFileModal( modalName.c_str(), fan::RenderGlobal::s_imagesExtensions, m_pathBuffer ) )
 		{
-			_ptr->InitUnresolved( m_pathBuffer.string() );
+			_ptr->Init( m_pathBuffer.string() );
 			returnValue = true;
 		}
 
@@ -144,7 +144,7 @@ namespace ImGui
 
 		if ( ImGui::FanLoadFileModal( modalName.c_str(), fan::RenderGlobal::s_meshExtensions, m_pathBuffer ) )
 		{
-			_ptr->InitUnresolved( m_pathBuffer.string() );
+			_ptr->Init( m_pathBuffer.string() );
 			returnValue = true;
 		}
 

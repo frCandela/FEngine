@@ -43,7 +43,7 @@ namespace fan
 			if ( m_json.contains("prefab") )
 			{
 				m_path = _path;
-				return Ressource::LoadFromFile(_path);
+				return true;
 			}
 			else
 			{

@@ -15,7 +15,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	class Gameobject : public ISerializable {
+	class Gameobject : public Resource, public ISerializable {
 	public:
 		using Flag = ecsFlags::Flag;
 		using EditorFlag = ecsEditorFlags::Flag;

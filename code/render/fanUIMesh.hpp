@@ -12,7 +12,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	class UIMesh : public Ressource
+	class UIMesh : public Resource
 	{
 	public:
 		static Signal< UIMesh* > s_onGenerateVulkanData;
@@ -21,20 +21,22 @@ namespace fan
 		UIMesh();
 		~UIMesh();
 
-		std::vector<UIVertex> &			GetVertices() { return m_vertices; }
+		std::vector<UIVertex> &			GetVertices()		{ return m_vertices; }
 		const std::vector<UIVertex> &	GetVertices() const { return m_vertices; }
-		Buffer *						GetVertexBuffer() { return m_vertexBuffer[m_currentBuffer]; }
+		Buffer *						GetVertexBuffer()	{ return m_vertexBuffer[m_currentBuffer]; }
+		std::string						GetPath() const		{ return m_path; }
 
 		void SetHostVisible( const bool _hostVisible ){ m_hostVisible = _hostVisible; } // Useful when the mesh changes very often
 		
 		bool LoadFromVertices( const std::vector<UIVertex>&	_vertices );
-		bool LoadFromFile( const std::string& _path ) override;
+		bool LoadFromFile( const std::string& _path );
 		void GenerateVulkanData( Device & _device );
 		void DeleteVulkanData( Device & _device );
 
 		//DECLARE_TYPE_INFO( UIMesh, void )
 	private:
 		std::vector<UIVertex>		m_vertices;
+		std::string		m_path;
 
 		bool m_hostVisible = false;
 

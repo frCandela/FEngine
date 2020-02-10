@@ -25,8 +25,8 @@ namespace fan
 		UIMesh::s_onDeleteVulkanData.Connect( &RessourceManager::OnDeleteUIMesh,  this );
 		Texture::s_onDeleteVulkanData.Connect( &RessourceManager::OnDeleteTexture, this );
 
-		TexturePtr::s_onCreateUnresolved.Connect ( &RessourceManager::OnResolveTexturePtr,this );
-		MeshPtr::s_onCreateUnresolved.Connect	( &RessourceManager::OnResolveMeshPtr, this );
+		TexturePtr::s_onInit.Connect ( &RessourceManager::OnResolveTexturePtr,this );
+		MeshPtr::s_onInit.Connect	( &RessourceManager::OnResolveMeshPtr, this );
 
 		LoadMesh(RenderGlobal::s_defaultMesh);
 		LoadTexture(RenderGlobal::s_defaultTexture);

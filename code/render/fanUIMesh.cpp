@@ -36,7 +36,8 @@ namespace fan
 	bool UIMesh::LoadFromFile( const std::string& _path ) 
 	{
 		assert( false );
-		return Ressource::LoadFromFile(_path);
+		m_path = _path;
+		return true;
 	}
 
 	//================================================================================================================================

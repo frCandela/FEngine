@@ -9,7 +9,7 @@ namespace fan
 	//================================================================================================================================
 	void PrefabManager::Init()
 	{
-		PrefabPtr::s_onCreateUnresolved.Connect ( &PrefabManager::OnResolvePrefabPtr, this);
+		PrefabPtr::s_onInit.Connect ( &PrefabManager::OnResolvePrefabPtr, this);
 	}
 
 	//================================================================================================================================

@@ -279,7 +279,7 @@ namespace fan
 	//================================================================================================================================
 	//================================================================================================================================
 	bool Texture::LoadFromFile(const std::string& _path) {
-		Ressource::LoadFromFile(_path);
+		m_path = _path;
 
 		// Load image from disk
 		int texWidth, texHeight, texChannels;

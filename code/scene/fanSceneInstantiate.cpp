@@ -33,16 +33,16 @@ namespace fan
 		m_remapTable.clear();
 
 		Gameobject::s_setIDfailed.Connect( &SceneInstantiate::OnSetIDFailed, this );
-		GameobjectPtr::s_onCreateUnresolved.Connect ( &SceneInstantiate::OnGameobjectPtrCreate, this );
-		ComponentIDPtr::s_onCreateUnresolved.Connect( &SceneInstantiate::OnComponentIDPtrCreate, this );
+		GameobjectPtr::s_onInit.Connect ( &SceneInstantiate::OnGameobjectPtrCreate, this );
+		ComponentIDPtr::s_onInit.Connect( &SceneInstantiate::OnComponentIDPtrCreate, this );
 
 		// Load gameobject
 		Gameobject * gameobject = m_scene.CreateGameobject( "tmp", _parent, false );
 		gameobject->Load( _json );
 
 		Gameobject::s_setIDfailed.Disconnect( &SceneInstantiate::OnSetIDFailed, this );
-		GameobjectPtr::s_onCreateUnresolved.Disconnect( &SceneInstantiate::OnGameobjectPtrCreate, this );
-		ComponentIDPtr::s_onCreateUnresolved.Disconnect( &SceneInstantiate::OnComponentIDPtrCreate, this );
+		GameobjectPtr::s_onInit.Disconnect( &SceneInstantiate::OnGameobjectPtrCreate, this );
+		ComponentIDPtr::s_onInit.Disconnect( &SceneInstantiate::OnComponentIDPtrCreate, this );
 
 		ResolvePointers();
 

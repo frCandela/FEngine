@@ -9,6 +9,11 @@
 #include "render/fanMesh.hpp"
 
 namespace fan {
+	static_assert((std::is_base_of<Resource, Mesh>::value));
+	static_assert((std::is_base_of<Resource, Texture>::value));
+	static_assert((std::is_base_of<Resource, Gameobject>::value));
+	static_assert((std::is_base_of<Resource, Component>::value));
+
 	//================================================================================================================================
 	//================================================================================================================================
 	void Serializable::SaveGameobjectPtr(Json& _json, const char* _name, const GameobjectPtr& _ptr)
@@ -55,7 +60,7 @@ namespace fan {
 		const Json* token = FindToken(_json, _name);
 		if (token != nullptr)
 		{
-			_outPtr.InitUnresolved(*token);
+			_outPtr.Init(*token);
 			return true;
 		}
 		return false;
@@ -68,7 +73,7 @@ namespace fan {
 		const Json* token = FindToken(_json, _name);
 		if (token != nullptr)
 		{
-			_outPtr.InitUnresolved(*token);
+			_outPtr.Init(*token);
 			return true;
 		}
 		return false;
@@ -81,7 +86,7 @@ namespace fan {
 		const Json* token = FindToken(_json, _name);
 		if (token != nullptr)
 		{
-			_outPtr.InitUnresolved(*token);
+			_outPtr.Init(*token);
 			return true;
 		}
 		return false;
@@ -94,7 +99,7 @@ namespace fan {
 		const Json* token = FindToken(_json, _name);
 		if (token != nullptr)
 		{
-			_outPtr.InitUnresolved(*token);
+			_outPtr.Init(*token);
 			return true;
 		}
 		return false;
@@ -107,7 +112,7 @@ namespace fan {
 		const Json* token = FindToken(_json, _name);
 		if (token != nullptr)
 		{
-			_outPtr.InitUnresolved(IDPtrData((*token)["gameobject_id"], (*token)["component_id"]));
+			_outPtr.Init(IDPtrData((*token)["gameobject_id"], (*token)["component_id"]));
 			return true;
 		}
 		return false;

@@ -9,6 +9,8 @@
 
 namespace ImGui
 {
+	static_assert((std::is_base_of<fan::Resource, fan::Gameobject>::value));
+
 	//================================================================================================================================
 	//================================================================================================================================
 	bool FanGameobject( const char * _label, fan::GameobjectPtr * _ptr )
@@ -52,6 +54,7 @@ namespace ImGui
 		return returnValue;
 	}	
 
+	static_assert((std::is_base_of<fan::Resource, fan::Prefab>::value));
 	//================================================================================================================================
 	//================================================================================================================================
 	bool FanPrefab( const char * _label, fan::PrefabPtr * _ptr )
@@ -108,7 +111,7 @@ namespace ImGui
 
 		if ( ImGui::FanLoadFileModal( modalName.c_str(), fan::RenderGlobal::s_prefabExtensions, m_pathBuffer ) )
 		{
-			_ptr->InitUnresolved( m_pathBuffer.string() );
+			_ptr->Init( m_pathBuffer.string() );
 			returnValue = true;
 		}
 

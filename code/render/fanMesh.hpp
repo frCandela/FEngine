@@ -12,7 +12,7 @@ namespace fan {
 
 	//================================================================================================================================
 	//================================================================================================================================
-	class Mesh : public Ressource {
+	class Mesh : public Resource {
 	public:
 		static Signal< Mesh* > s_onGenerateVulkanData;
 		static Signal< Mesh*>  s_onDeleteVulkanData;
@@ -29,6 +29,7 @@ namespace fan {
 		Buffer *						GetIndexBuffer()		{ return m_indexBuffer[m_currentBuffer];	}
 		Buffer *						GetVertexBuffer()		{ return m_vertexBuffer[m_currentBuffer];	}
 		const ConvexHull&				GetHull()				{ return m_convexHull; }
+		std::string						GetPath() const			{ return m_path; }
 
 		// Useful when the mesh changes very often
 		void SetHostVisible( const bool _hostVisible ){ m_hostVisible = _hostVisible; } 
@@ -38,12 +39,14 @@ namespace fan {
 		void GenerateVulkanData( Device & _device );
 		void DeleteVulkanData( Device & _device );
 
-		bool LoadFromFile( const std::string& _path ) override ;
+		bool LoadFromFile( const std::string& _path );
 		bool LoadFromVertices( const std::vector<Vertex>&	_vertices );
 		//DECLARE_TYPE_INFO(Mesh, void )
 	private:
 		std::vector<Vertex>		m_vertices;
 		std::vector<uint32_t>	m_indices;
+
+		std::string		m_path;
 
 		bool m_hostVisible = false;
 		bool m_optimizeVertices = true;		

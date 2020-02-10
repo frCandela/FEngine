@@ -33,8 +33,8 @@ namespace fan
 		ComponentPtr( _ComponentType * _component ) : ComponentIDPtr( _component, IDPtrData(_component->GetGameobject()->GetUniqueID(), _component->GetType())  ) {}
 		ComponentPtr() : ComponentIDPtr() {}
 
-		_ComponentType* operator->() const { return static_cast<_ComponentType*>( GetRessource() ); }
-		_ComponentType* operator*() const { return static_cast<_ComponentType*>( GetRessource() ); }
+		_ComponentType* operator->() const { return static_cast<_ComponentType*>(GetRessource() ); }
+		_ComponentType* operator*() const { return static_cast<_ComponentType*>(GetRessource() ); }
 	};
 }
 

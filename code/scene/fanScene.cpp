@@ -34,7 +34,7 @@ namespace fan
 	Scene::~Scene() {
 		Clear();
 
-		delete m_physicsManager;
+		//delete m_physicsManager; @hack
 		delete m_ecsManager;
 	}
 
@@ -536,14 +536,14 @@ namespace fan
 		}
 
 		// Gameobjects
-		GameobjectPtr::s_onCreateUnresolved.Connect ( &Scene::OnGameobjectPtrCreate, this );
-		ComponentIDPtr::s_onCreateUnresolved.Connect( &Scene::OnResolveComponentIDPtr, this );
+		GameobjectPtr::s_onInit.Connect ( &Scene::OnGameobjectPtrCreate, this );
+		ComponentIDPtr::s_onInit.Connect( &Scene::OnResolveComponentIDPtr, this );
 		const Json & jGameobjects = _json["gameobjects"]; {
 			m_root = CreateGameobject( "root", nullptr, false );
 			m_root->Load( jGameobjects );
 		}
-		GameobjectPtr::s_onCreateUnresolved. Disconnect( &Scene::OnGameobjectPtrCreate, this );
-		ComponentIDPtr::s_onCreateUnresolved.Disconnect( &Scene::OnResolveComponentIDPtr, this );
+		GameobjectPtr::s_onInit. Disconnect( &Scene::OnGameobjectPtrCreate, this );
+		ComponentIDPtr::s_onInit.Disconnect( &Scene::OnResolveComponentIDPtr, this );
 		ResolveGameobjectPointers();
 		return true;
 	}

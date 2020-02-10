@@ -2,6 +2,8 @@
 
 #include "core/fanCorePrecompiled.hpp"
 
+#include "core/ressources/fanRessource.hpp"
+
 namespace fan
 {
 	//================================================================================================================================
@@ -9,32 +11,34 @@ namespace fan
 	template< typename _RessourceType, typename _IDType >
 	class RessourcePtr
 	{
+		
 	public:
-		static Signal< RessourcePtr* > s_onCreateUnresolved;
+		static Signal< RessourcePtr* > s_onInit;
 
 		RessourcePtr(_RessourceType* _ressourceType, _IDType _ressourceID);
 		RessourcePtr();
 
-		_IDType			GetID() const { return m_ressourceId; }
-		_RessourceType* GetRessource() const { return m_ressourcePtr; }
-		void			InitUnresolved(const _IDType m_ressourceId);
-		_RessourceType* operator->() const { return m_ressourcePtr; }
-		_RessourceType* operator*() const { return m_ressourcePtr; }
+		_IDType			GetID() const { return m_ressourceID; }
+		_RessourceType* GetRessource() const { return m_ressource; }
 
+		void			Init(const _IDType m_ressourceId);
+
+		_RessourceType* operator->() const { return m_ressource; }
+		_RessourceType* operator*() const { return m_ressource; }
 	private:
-		_RessourceType* m_ressourcePtr = nullptr;
-		_IDType				m_ressourceId = 0;
+		_RessourceType* m_ressource = nullptr;
+		_IDType			m_ressourceID = 0;
 	};
 
 	template< typename _RessourceType, typename _IDType >
-	Signal< RessourcePtr<_RessourceType, _IDType>* > RessourcePtr<_RessourceType, _IDType>::s_onCreateUnresolved;
+	Signal< RessourcePtr<_RessourceType, _IDType>* > RessourcePtr<_RessourceType, _IDType>::s_onInit;
 
 	//================================================================================================================================
 	//================================================================================================================================
 	template< typename _RessourceType, typename _IDType >
 	RessourcePtr<_RessourceType, _IDType>::RessourcePtr(_RessourceType* _ressourceType, _IDType _ressourceID) :
-		m_ressourceId(_ressourceID),
-		m_ressourcePtr(_ressourceType)
+		m_ressourceID(_ressourceID),
+		m_ressource(_ressourceType)
 	{}
 
 	//================================================================================================================================
@@ -42,18 +46,18 @@ namespace fan
 	// Useful at loading time
 	//================================================================================================================================
 	template< typename _RessourceType, typename _IDType >
-	void RessourcePtr<_RessourceType, _IDType>::InitUnresolved(const _IDType _id)
+	void RessourcePtr<_RessourceType, _IDType>::Init(const _IDType _id)
 	{
-		m_ressourceId = _id;
-		m_ressourcePtr = nullptr;
-		s_onCreateUnresolved.Emmit(this);
+		m_ressourceID = _id;
+		m_ressource = nullptr;
+		s_onInit.Emmit(this);
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
 	template< typename _RessourceType, typename _IDType >
 	RessourcePtr<_RessourceType, _IDType>::RessourcePtr() :
-		m_ressourceId(),
-		m_ressourcePtr(nullptr)
+		m_ressourceID(),
+		m_ressource(nullptr)
 	{}
 }
