@@ -32,4 +32,4 @@ FEngine is a 3D game engine. It uses Vulkan for Rendering, Dear ImGui for user i
 * network : [SFML 2.5.1](https://www.sfml-dev.org/index.php)
 	
 ## Screenshots
-![Editor preview](/FEngine/docs/screenshot.png)
+![Editor preview](/docs/screenshot.png)
