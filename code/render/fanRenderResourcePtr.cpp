@@ -1,4 +1,4 @@
-#include "render/fanRenderRessourcePtr.hpp"
+#include "render/fanRenderResourcePtr.hpp"
 #include "render/fanRenderGlobal.hpp"
 #include "render/core/fanTexture.hpp"
 #include "render/fanMesh.hpp"
@@ -65,21 +65,21 @@ namespace ImGui
 		fan::Texture * textureDrop = ImGui::FanBeginDragDropTargetTexture();
 		if ( textureDrop )
 		{
-			( *_ptr ) = fan::TexturePtr( textureDrop, textureDrop->GetPath() );
+			( *_ptr ) = fan::TexturePtr( textureDrop );
 			returnValue = true;
 		}
 
 		// Right click = clear
 		if ( ImGui::IsItemClicked( 1 ) )
 		{
-			( *_ptr ) = fan::TexturePtr();
+			( *_ptr ) = fan::TexturePtr(nullptr);
 			returnValue = true;
 		}
 
 		// Modal set value
 		if ( ImGui::FanLoadFileModal( modalName.c_str(), fan::RenderGlobal::s_imagesExtensions, m_pathBuffer ) )
 		{
-			_ptr->Init( m_pathBuffer.string() );
+			//_ptr->Init( m_pathBuffer.string() ); @tmp
 			returnValue = true;
 		}
 
@@ -131,20 +131,20 @@ namespace ImGui
 		fan::Mesh * meshDrop = ImGui::FanBeginDragDropTargetMesh();
 		if ( meshDrop )
 		{
-			( *_ptr ) = fan::MeshPtr( meshDrop, meshDrop->GetPath() );
+			(*_ptr) = fan::MeshPtr(meshDrop);
 			returnValue = true;
 		}
 
 		// Right click = clear
 		if ( ImGui::IsItemClicked( 1 ) )
 		{
-			( *_ptr ) = fan::MeshPtr();
+			( *_ptr ) = fan::MeshPtr(nullptr);
 			returnValue = true;
 		}
 
 		if ( ImGui::FanLoadFileModal( modalName.c_str(), fan::RenderGlobal::s_meshExtensions, m_pathBuffer ) )
 		{
-			_ptr->Init( m_pathBuffer.string() );
+			//_ptr->Init( m_pathBuffer.string() ); @tmp
 			returnValue = true;
 		}
 

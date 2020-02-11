@@ -1,6 +1,6 @@
 #include "scene/components/fanMeshRenderer.hpp"
 #include "scene/components/fanTransform.hpp"
-#include "scene/fanSceneRessourcePtr.hpp"
+#include "scene/fanSceneResourcePtr.hpp"
 #include "core/math/shapes/fanAABB.hpp"
 #include "core/math/shapes/fanConvexHull.hpp"
 #include "core/time/fanProfiler.hpp"
@@ -41,15 +41,15 @@ namespace fan
 	void MeshRenderer::SetMesh( Mesh * _mesh )
 	{
 		if( _mesh != nullptr ) {	
-			m_mesh->mesh = MeshPtr( _mesh, _mesh->GetPath() );		
+			m_mesh->mesh = MeshPtr( _mesh );		
 			m_gameobject->SetFlags( m_gameobject->GetFlags() & Gameobject::Flag::OUTDATED_AABB );
 		}
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void MeshRenderer::SetPath( std::string _path ) {	
-		m_mesh->mesh.Init(_path);
+	void MeshRenderer::SetPath( std::string /*_path*/ ) {	
+		//m_mesh->mesh.Init(_path);@tmp
 	}
 
 	Mesh *			MeshRenderer::GetMesh() { return *m_mesh->mesh; }

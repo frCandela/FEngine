@@ -11,12 +11,12 @@ namespace fan {
 	class Mesh;
 	class Prefab;
 	struct IDPtrData;
-	template< typename _RessourceType, typename _IDType > class RessourcePtr;
-	using GameobjectPtr = RessourcePtr<Gameobject, uint64_t>;
-	using TexturePtr = RessourcePtr<Texture, std::string>;
-	using MeshPtr = RessourcePtr<Mesh, std::string>;
-	using PrefabPtr = RessourcePtr<Prefab, std::string>;
-	using ComponentIDPtr = RessourcePtr< Component, IDPtrData >;
+	template< typename _ResourceType > class ResourcePtr;
+	using GameobjectPtr = ResourcePtr<Gameobject>;
+	using TexturePtr = ResourcePtr<Texture>;
+	using MeshPtr = ResourcePtr<Mesh>;
+	using PrefabPtr = ResourcePtr<Prefab>;
+	using ComponentIDPtr = ResourcePtr< Component >;
 
 	namespace Serializable {
 		void SaveGameobjectPtr(Json& _json, const char* _name, const GameobjectPtr& _ptr);

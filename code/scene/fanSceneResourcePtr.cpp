@@ -1,15 +1,15 @@
-#include "scene/fanSceneRessourcePtr.hpp"
+#include "scene/fanSceneResourcePtr.hpp"
 #include "scene/fanGameobject.hpp"
-#include "render/fanRenderGlobal.hpp"
 #include "scene/fanPrefab.hpp"
 #include "game/imgui/fanDragnDrop.hpp"
 #include "core/imgui/fanImguiIcons.hpp"
 #include "core/imgui/fanModals.hpp"
+#include "render/fanRenderGlobal.hpp"
 
 
 namespace ImGui
 {
-	static_assert((std::is_base_of<fan::Resource, fan::Gameobject>::value));
+	static_assert((std::is_base_of<fan::Resource<fan::Gameobject>, fan::Gameobject>::value));
 
 	//================================================================================================================================
 	//================================================================================================================================
@@ -37,7 +37,7 @@ namespace ImGui
 		fan::Gameobject * gameobjectDrop = ImGui::FanBeginDragDropTargetGameobject();
 		if ( gameobjectDrop )
 		{
-			( *_ptr ) = fan::GameobjectPtr( gameobjectDrop, gameobjectDrop->GetUniqueID() );
+			( *_ptr ) = fan::GameobjectPtr( gameobjectDrop );
 			returnValue = true;
 		}
 
@@ -54,7 +54,7 @@ namespace ImGui
 		return returnValue;
 	}	
 
-	static_assert((std::is_base_of<fan::Resource, fan::Prefab>::value));
+	static_assert((std::is_base_of<fan::Resource<fan::Prefab>, fan::Prefab>::value));
 	//================================================================================================================================
 	//================================================================================================================================
 	bool FanPrefab( const char * _label, fan::PrefabPtr * _ptr )
@@ -98,7 +98,7 @@ namespace ImGui
 		fan::Prefab * prefabDrop = ImGui::FanBeginDragDropTargetPrefab();
 		if ( prefabDrop )
 		{
-			( *_ptr ) = fan::PrefabPtr( prefabDrop, prefabDrop->GetPath() );
+			( *_ptr ) = fan::PrefabPtr( prefabDrop );
 			returnValue = true;
 		}
 
@@ -111,7 +111,7 @@ namespace ImGui
 
 		if ( ImGui::FanLoadFileModal( modalName.c_str(), fan::RenderGlobal::s_prefabExtensions, m_pathBuffer ) )
 		{
-			_ptr->Init( m_pathBuffer.string() );
+			//_ptr->Init( m_pathBuffer.string() );@tmp
 			returnValue = true;
 		}
 

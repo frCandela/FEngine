@@ -98,7 +98,7 @@ namespace fan
 		// Rebuild depth attachment
 		if ( m_depthImageView != nullptr )
 		{
-			CreateDepthRessources();
+			CreateDepthResources();
 		}
 
 		DestroyFrameBuffers();
@@ -120,7 +120,7 @@ namespace fan
 	void FrameBuffer::AddDepthAttachment()
 	{
 		assert( m_depthImageView == nullptr );
-		CreateDepthRessources();
+		CreateDepthResources();
 	}
 
 	//================================================================================================================================
@@ -136,12 +136,12 @@ namespace fan
 		m_colorSampler = new Sampler( m_device );
 		m_colorSampler->CreateSampler( 0, 1.f, VK_FILTER_LINEAR );
 
-		CreateColorRessources( _format );
+		CreateColorResources( _format );
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void FrameBuffer::CreateColorRessources( const VkFormat _format )
+	void FrameBuffer::CreateColorResources( const VkFormat _format )
 	{
 		delete m_colorImage;
 		m_colorImage = new Image( m_device );
@@ -159,7 +159,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	bool FrameBuffer::CreateDepthRessources()
+	bool FrameBuffer::CreateDepthResources()
 	{
 		VkFormat depthFormat = m_device.FindDepthFormat();
 		if ( m_depthImage == nullptr )

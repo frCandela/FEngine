@@ -6,8 +6,8 @@
 namespace fan
 {
 	class Prefab;
-	template< typename _RessourceType, typename _IDType > class RessourcePtr;
-	using PrefabPtr = RessourcePtr<Prefab, std::string>;
+	template< typename _ResourceType > class ResourcePtr;
+	using PrefabPtr = ResourcePtr<Prefab>;
 
 	//================================================================================================================================
 	// Loads & references all the prefabs of the engine

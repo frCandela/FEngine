@@ -1,7 +1,7 @@
 #pragma once
 
 #include "render/fanRenderPrecompiled.hpp"
-#include "core/ressources/fanRessource.hpp"
+#include "core/resources/fanResource.hpp"
 
 namespace fan
 {
@@ -10,7 +10,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	class Texture : public Resource
+	class Texture : public Resource< Texture >
 	{
 	public:
 		static Signal< Texture* > s_onGenerateVulkanData;

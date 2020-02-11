@@ -7,7 +7,7 @@
 #include "scene/components/fanPointLight.hpp"
 #include "scene/components/fanDirectionalLight.hpp"
 #include "scene/actors/fanActor.hpp"
-#include "scene/fanSceneRessourcePtr.hpp"
+#include "scene/fanSceneResourcePtr.hpp"
 #include "scene/fanComponentPtr.hpp"
 #include "scene/fanSceneInstantiate.hpp"
 #include "scene/fanPhysicsManager.hpp"
@@ -536,14 +536,14 @@ namespace fan
 		}
 
 		// Gameobjects
-		GameobjectPtr::s_onInit.Connect ( &Scene::OnGameobjectPtrCreate, this );
-		ComponentIDPtr::s_onInit.Connect( &Scene::OnResolveComponentIDPtr, this );
+		//GameobjectPtr::s_onInit.Connect ( &Scene::OnGameobjectPtrCreate, this );@tmp
+		//ComponentIDPtr::s_onInit.Connect( &Scene::OnResolveComponentIDPtr, this );@tmp
 		const Json & jGameobjects = _json["gameobjects"]; {
 			m_root = CreateGameobject( "root", nullptr, false );
 			m_root->Load( jGameobjects );
 		}
-		GameobjectPtr::s_onInit. Disconnect( &Scene::OnGameobjectPtrCreate, this );
-		ComponentIDPtr::s_onInit.Disconnect( &Scene::OnResolveComponentIDPtr, this );
+		//GameobjectPtr::s_onInit. Disconnect( &Scene::OnGameobjectPtrCreate, this );@tmp
+		//ComponentIDPtr::s_onInit.Disconnect( &Scene::OnResolveComponentIDPtr, this );@tmp
 		ResolveGameobjectPointers();
 		return true;
 	}
@@ -566,50 +566,50 @@ namespace fan
 	//================================================================================================================================
 	void Scene::ResolveGameobjectPointers()
 	{
-		// Resolve gameobjects pointers
-		for (int ptrIndex = 0; ptrIndex < m_unresolvedGameobjectPointers.size(); ptrIndex++)
-		{
- 			GameobjectPtr* ptr = m_unresolvedGameobjectPointers[ptrIndex];
-			if( ptr->GetID() != 0 ) {
-				auto it = m_gameobjects.find( ptr->GetID() );
-				if ( it != m_gameobjects.end() )
-				{
-					(*ptr) = GameobjectPtr( it->second, it->second->GetUniqueID() );
-				}
-				else
-				{
-					Debug::Warning() << "gameobject pointer resolution failed for id " << ptr->GetID() << Debug::Endl();
-				} 				
-			}
-		}
-		m_unresolvedGameobjectPointers.clear();
-
-		// resolve component pointers
-		for ( int ptrIndex = 0; ptrIndex < m_unresolvedComponentPointers.size(); ptrIndex++ )
-		{
-			ComponentIDPtr* ptr = m_unresolvedComponentPointers[ptrIndex];
-			const IDPtrData& data = ptr->GetID();
-			if ( data.gameobjectID == 0 ) { continue; }
-
-			// Find gameobject
-			Gameobject * gameobject = FindGameobject( data.gameobjectID );
-			if ( !gameobject )
-			{
-				Debug::Warning() << "Component pointer resolution failed for gameobject " << data.gameobjectID << Debug::Endl();
-				continue;
-			}
-
-			// Find component
-			Component * component = gameobject->GetComponent( data.componentID );
-			if ( !gameobject )
-			{
-				Debug::Warning() << "Component pointer resolution failed for component " << data.componentID << Debug::Endl();
-				continue;
-			}
-
-			( *ptr ) = ComponentIDPtr( component, data );
-		} 
-		m_unresolvedComponentPointers.clear();
+// 		// Resolve gameobjects pointers@tmp
+// 		for (int ptrIndex = 0; ptrIndex < m_unresolvedGameobjectPointers.size(); ptrIndex++)
+// 		{
+//  			GameobjectPtr* ptr = m_unresolvedGameobjectPointers[ptrIndex];
+// 			if( ptr->GetID() != 0 ) {
+// 				auto it = m_gameobjects.find( ptr->GetID() );
+// 				if ( it != m_gameobjects.end() )
+// 				{
+// 					(*ptr) = GameobjectPtr( it->second, it->second->GetUniqueID() );
+// 				}
+// 				else
+// 				{
+// 					Debug::Warning() << "gameobject pointer resolution failed for id " << ptr->GetID() << Debug::Endl();
+// 				} 				
+// 			}
+// 		}
+// 		m_unresolvedGameobjectPointers.clear();
+// 
+// 		// resolve component pointers
+// 		for ( int ptrIndex = 0; ptrIndex < m_unresolvedComponentPointers.size(); ptrIndex++ )
+// 		{
+// 			ComponentIDPtr* ptr = m_unresolvedComponentPointers[ptrIndex];
+// 			const IDPtrData& data = ptr->GetID();
+// 			if ( data.gameobjectID == 0 ) { continue; }
+// 
+// 			// Find gameobject
+// 			Gameobject * gameobject = FindGameobject( data.gameobjectID );
+// 			if ( !gameobject )
+// 			{
+// 				Debug::Warning() << "Component pointer resolution failed for gameobject " << data.gameobjectID << Debug::Endl();
+// 				continue;
+// 			}
+// 
+// 			// Find component
+// 			Component * component = gameobject->GetComponent( data.componentID );
+// 			if ( !gameobject )
+// 			{
+// 				Debug::Warning() << "Component pointer resolution failed for component " << data.componentID << Debug::Endl();
+// 				continue;
+// 			}
+// 
+// 			( *ptr ) = ComponentIDPtr( component, data );
+// 		} 
+// 		m_unresolvedComponentPointers.clear();
 	}
 
 	//================================================================================================================================

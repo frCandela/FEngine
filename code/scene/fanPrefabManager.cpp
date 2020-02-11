@@ -1,6 +1,6 @@
 #include "scene/fanPrefabManager.hpp"
 #include "scene/fanPrefab.hpp"
-#include "render/fanRenderRessourcePtr.hpp"
+#include "render/fanRenderResourcePtr.hpp"
 #include "core/fanSignal.hpp"
 
 namespace fan
@@ -9,7 +9,7 @@ namespace fan
 	//================================================================================================================================
 	void PrefabManager::Init()
 	{
-		PrefabPtr::s_onInit.Connect ( &PrefabManager::OnResolvePrefabPtr, this);
+		// PrefabPtr::s_onInit.Connect ( &PrefabManager::OnResolvePrefabPtr, this); @tmp
 	}
 
 	//================================================================================================================================
@@ -49,7 +49,7 @@ namespace fan
 
 	//================================================================================================================================
 	// the / is dead, long live the \ 
-	// @todo refacto this with other CleanPath methods (ressourcemanager)
+	// @todo refacto this with other CleanPath methods (resourcemanager)
 	//================================================================================================================================
 	std::string PrefabManager::CleanPath(const std::string& _path)
 	{
@@ -63,14 +63,14 @@ namespace fan
 	//================================================================================================================================
 	void PrefabManager::OnResolvePrefabPtr(PrefabPtr* _ptr)
 	{
-		Prefab * prefab = FindPrefab( _ptr->GetID() );
-		if ( prefab == nullptr )
-		{
-			prefab = LoadPrefab( _ptr->GetID() );
-		}
-		if ( prefab )
-		{
-			*_ptr = PrefabPtr( prefab, prefab->GetPath() );
-		}
+// 		Prefab * prefab = FindPrefab( _ptr->GetID() );@tmp
+// 		if ( prefab == nullptr )
+// 		{
+// 			prefab = LoadPrefab( _ptr->GetID() );
+// 		}
+// 		if ( prefab )
+// 		{
+// 			*_ptr = PrefabPtr( prefab, prefab->GetPath() );
+// 		}
 	}
 }

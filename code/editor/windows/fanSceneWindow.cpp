@@ -18,7 +18,7 @@
 #include "core/input/fanInput.hpp"
 #include "core/input/fanMouse.hpp"
 #include "scene/fanPrefab.hpp"
-#include "render/fanRessourceManager.hpp"
+#include "render/fanResourceManager.hpp"
 
 namespace fan
 {

@@ -33,16 +33,16 @@ namespace fan
 		m_remapTable.clear();
 
 		Gameobject::s_setIDfailed.Connect( &SceneInstantiate::OnSetIDFailed, this );
-		GameobjectPtr::s_onInit.Connect ( &SceneInstantiate::OnGameobjectPtrCreate, this );
-		ComponentIDPtr::s_onInit.Connect( &SceneInstantiate::OnComponentIDPtrCreate, this );
+		//GameobjectPtr::s_onInit.Connect ( &SceneInstantiate::OnGameobjectPtrCreate, this );@tmp
+		//ComponentIDPtr::s_onInit.Connect( &SceneInstantiate::OnComponentIDPtrCreate, this );@tmp
 
 		// Load gameobject
 		Gameobject * gameobject = m_scene.CreateGameobject( "tmp", _parent, false );
 		gameobject->Load( _json );
 
 		Gameobject::s_setIDfailed.Disconnect( &SceneInstantiate::OnSetIDFailed, this );
-		GameobjectPtr::s_onInit.Disconnect( &SceneInstantiate::OnGameobjectPtrCreate, this );
-		ComponentIDPtr::s_onInit.Disconnect( &SceneInstantiate::OnComponentIDPtrCreate, this );
+		//GameobjectPtr::s_onInit.Disconnect( &SceneInstantiate::OnGameobjectPtrCreate, this );@tmp
+		//ComponentIDPtr::s_onInit.Disconnect( &SceneInstantiate::OnComponentIDPtrCreate, this );@tmp
 
 		ResolvePointers();
 
@@ -54,45 +54,45 @@ namespace fan
 	//================================================================================================================================
 	void  SceneInstantiate::ResolvePointers()
 	{
-		// Resolves gameobjects
-		for ( int goPtrIndex = 0; goPtrIndex < m_newGameobjectPtr.size(); goPtrIndex++ )
-		{
-			GameobjectPtr * ptr = m_newGameobjectPtr[goPtrIndex];
-
-			auto it = m_remapTable.find( ptr->GetID() );
-			const uint64_t index = ( it != m_remapTable.end() ? it->second : ptr->GetID() );
-			Gameobject * gameobject = m_scene.FindGameobject( index );
-
-			if ( gameobject != nullptr )
-			{
-				*ptr =  GameobjectPtr( gameobject, index );
-			}
-			else
-			{
-				Debug::Warning() << "Resolve gameobject failed for index " << index << Debug::Endl();
-				*ptr =  GameobjectPtr();
-			}
-		}
-
-		// Resolves components
-		for ( int componentPtrIndex = 0; componentPtrIndex < m_newComponentPtr.size(); componentPtrIndex++ )
-		{
-			ComponentIDPtr * ptr = m_newComponentPtr[componentPtrIndex];
-
-			auto it = m_remapTable.find( ptr->GetID().gameobjectID );
-			const uint64_t index = ( it != m_remapTable.end() ? it->second : ptr->GetID().gameobjectID );
-			Gameobject * gameobject =m_scene.FindGameobject( index );
-			if ( gameobject != nullptr )
-			{
-				Component * component = gameobject->GetComponent( ptr->GetID().componentID );
-				*ptr = ComponentIDPtr( component, IDPtrData( index, ptr->GetID().componentID ) );
-			}
-			else
-			{
-				Debug::Warning() << "Resolve component failed for gameobject index " << index << Debug::Endl();
-				*ptr = ComponentIDPtr();
-			}
-		}
+// 		// Resolves gameobjects@tmp
+// 		for ( int goPtrIndex = 0; goPtrIndex < m_newGameobjectPtr.size(); goPtrIndex++ )
+// 		{
+// 			GameobjectPtr * ptr = m_newGameobjectPtr[goPtrIndex];
+// 
+// 			auto it = m_remapTable.find( ptr->GetID() );
+// 			const uint64_t index = ( it != m_remapTable.end() ? it->second : ptr->GetID() );
+// 			Gameobject * gameobject = m_scene.FindGameobject( index );
+// 
+// 			if ( gameobject != nullptr )
+// 			{
+// 				*ptr =  GameobjectPtr( gameobject, index );
+// 			}
+// 			else
+// 			{
+// 				Debug::Warning() << "Resolve gameobject failed for index " << index << Debug::Endl();
+// 				*ptr =  GameobjectPtr();
+// 			}
+// 		}
+// 
+// 		// Resolves components
+// 		for ( int componentPtrIndex = 0; componentPtrIndex < m_newComponentPtr.size(); componentPtrIndex++ )
+// 		{
+// 			ComponentIDPtr * ptr = m_newComponentPtr[componentPtrIndex];
+// 
+// 			auto it = m_remapTable.find( ptr->GetID().gameobjectID );
+// 			const uint64_t index = ( it != m_remapTable.end() ? it->second : ptr->GetID().gameobjectID );
+// 			Gameobject * gameobject =m_scene.FindGameobject( index );
+// 			if ( gameobject != nullptr )
+// 			{
+// 				Component * component = gameobject->GetComponent( ptr->GetID().componentID );
+// 				*ptr = ComponentIDPtr( component, IDPtrData( index, ptr->GetID().componentID ) );
+// 			}
+// 			else
+// 			{
+// 				Debug::Warning() << "Resolve component failed for gameobject index " << index << Debug::Endl();
+// 				*ptr = ComponentIDPtr();
+// 			}
+// 		}
 	}
 
 	//================================================================================================================================
@@ -111,19 +111,19 @@ namespace fan
 	//================================================================================================================================
 	void SceneInstantiate::OnGameobjectPtrCreate( GameobjectPtr * _ptr )
 	{
-		if ( _ptr->GetID() != 0 )
-		{
-			m_newGameobjectPtr.push_back( _ptr );
-		}
+// 		if ( _ptr->GetID() != 0 )@tmp
+// 		{
+// 			m_newGameobjectPtr.push_back( _ptr );
+// 		}
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
 	void SceneInstantiate::OnComponentIDPtrCreate( ComponentIDPtr * _ptr )
 	{
-		if ( _ptr->GetID().gameobjectID != 0 )
-		{
-			m_newComponentPtr.push_back( _ptr );
-		}
+// 		if ( _ptr->GetID().gameobjectID != 0 )@tmp
+// 		{
+// 			m_newComponentPtr.push_back( _ptr );
+// 		}
 	}
 }

@@ -1,15 +1,15 @@
 #pragma once
 
 #include "scene/fanScenePrecompiled.hpp"
-#include "core/ressources/fanRessourcePtr.hpp"
+#include "core/resources/fanResourcePtr.hpp"
 
 namespace fan
 {
-	class Gameobject;
-	class Prefab;
+	class Texture;
+	class Mesh;
 
-	using GameobjectPtr = RessourcePtr<Gameobject, uint64_t>;
-	using PrefabPtr =  RessourcePtr<Prefab, std::string >;
+	using TexturePtr = ResourcePtr<Texture>;
+	using MeshPtr = ResourcePtr<Mesh >;
 }
 
 //================================================================================================================================
@@ -17,6 +17,6 @@ namespace fan
 //================================================================================================================================
 namespace ImGui
 {
-	bool FanGameobject( const char * _label, fan::GameobjectPtr * _ptr );
-	bool FanPrefab( const char * _label,  fan::PrefabPtr * _ptr );
+	bool FanTexture( const char * _label, fan::TexturePtr * _ptr );
+	bool FanMesh( const char * _label, fan::MeshPtr * _ptr );
 }

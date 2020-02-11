@@ -2,7 +2,7 @@
 
 #include "scene/fanScenePrecompiled.hpp"
 
-#include "core/ressources/fanRessource.hpp"
+#include "core/resources/fanResource.hpp"
 #include "game/fanGameSerializable.hpp"
 
 namespace fan
@@ -13,7 +13,7 @@ namespace fan
 	// represents a gameobjects tree
 	// stores its data in a json
 	//================================================================================================================================
-	class Prefab : public Resource  {
+	class Prefab : public Resource<Prefab>  {
 	public:
 		Prefab();
 

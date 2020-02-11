@@ -14,7 +14,7 @@ namespace fan
 {
 	//================================================================================================================================
 	//================================================================================================================================
-	class Component : public Resource, public ISerializable {
+	class Component : public Resource< Component >, public ISerializable {
 	public:
 		friend class Gameobject;
 

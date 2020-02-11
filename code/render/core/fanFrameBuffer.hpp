@@ -48,8 +48,8 @@ namespace fan
 		Image *		m_colorImage = nullptr;
 		ImageView *	m_colorImageView = nullptr;
 
-		void CreateColorRessources( const VkFormat _format );
-		bool CreateDepthRessources();
+		void CreateColorResources( const VkFormat _format );
+		bool CreateDepthResources();
 		void DestroyFrameBuffers();
 	};
 }

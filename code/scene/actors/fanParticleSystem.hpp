@@ -3,7 +3,7 @@
 #include "scene/fanScenePrecompiled.hpp"
 
 #include "scene/actors/fanActor.hpp"
-#include "scene/fanSceneRessourcePtr.hpp"
+#include "scene/fanSceneResourcePtr.hpp"
 
 namespace fan {
 	class EcsManager;

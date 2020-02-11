@@ -33,14 +33,7 @@ namespace fan
 	//================================================================================================================================
 	void Material::SetTexture( Texture * const _texture )
 	{
-		if ( _texture != nullptr ) 
-		{ 
-			m_material->texture = TexturePtr( _texture, _texture->GetPath() ); 
-		}
-		else
-		{
-			m_material->texture = TexturePtr(); 
-		}
+		m_material->texture = TexturePtr( _texture ); 
 		m_gameobject->SetFlags( m_gameobject->GetFlags() & Gameobject::Flag::OUTDATED_MATERIAL );
 	}
 
@@ -87,8 +80,8 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void Material::SetTexturePath( const std::string& _path ) {
-		m_material->texture.Init(_path);
+	void Material::SetTexturePath( const std::string& /*_path*/ ) {
+		//m_material->texture.Init(_path);@tmp
 	}
 
 	//================================================================================================================================

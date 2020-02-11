@@ -1,7 +1,7 @@
 #include "game/fanGameSerializable.hpp"
 
 #include "scene/components/fanComponent.hpp"
-#include "scene/fanSceneRessourcePtr.hpp"
+#include "scene/fanSceneResourcePtr.hpp"
 #include "scene/fanGameobject.hpp"
 #include "scene/fanComponentPtr.hpp"
 #include "scene/fanPrefab.hpp"
@@ -9,10 +9,10 @@
 #include "render/fanMesh.hpp"
 
 namespace fan {
-	static_assert((std::is_base_of<Resource, Mesh>::value));
-	static_assert((std::is_base_of<Resource, Texture>::value));
-	static_assert((std::is_base_of<Resource, Gameobject>::value));
-	static_assert((std::is_base_of<Resource, Component>::value));
+	static_assert((std::is_base_of<Resource<Mesh>, Mesh>::value));
+	static_assert((std::is_base_of<Resource<Texture>, Texture>::value));
+	static_assert((std::is_base_of<Resource<Gameobject>, Gameobject>::value));
+	static_assert((std::is_base_of<Resource<Component>, Component>::value));
 
 	//================================================================================================================================
 	//================================================================================================================================
@@ -60,7 +60,7 @@ namespace fan {
 		const Json* token = FindToken(_json, _name);
 		if (token != nullptr)
 		{
-			_outPtr.Init(*token);
+			//_outPtr.Init(*token);@tmp
 			return true;
 		}
 		return false;
@@ -73,7 +73,7 @@ namespace fan {
 		const Json* token = FindToken(_json, _name);
 		if (token != nullptr)
 		{
-			_outPtr.Init(*token);
+			//_outPtr.Init(*token);@tmp
 			return true;
 		}
 		return false;
@@ -86,7 +86,7 @@ namespace fan {
 		const Json* token = FindToken(_json, _name);
 		if (token != nullptr)
 		{
-			_outPtr.Init(*token);
+			//_outPtr.Init(*token);@tmp
 			return true;
 		}
 		return false;
@@ -99,7 +99,7 @@ namespace fan {
 		const Json* token = FindToken(_json, _name);
 		if (token != nullptr)
 		{
-			_outPtr.Init(*token);
+			//_outPtr.Init(*token);@tmp
 			return true;
 		}
 		return false;
@@ -112,7 +112,7 @@ namespace fan {
 		const Json* token = FindToken(_json, _name);
 		if (token != nullptr)
 		{
-			_outPtr.Init(IDPtrData((*token)["gameobject_id"], (*token)["component_id"]));
+			//_outPtr.Init(IDPtrData((*token)["gameobject_id"], (*token)["component_id"]));@tmp
 			return true;
 		}
 		return false;

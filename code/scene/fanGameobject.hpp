@@ -4,6 +4,7 @@
 
 #include "core/fanSignal.hpp"
 #include "core/math/shapes/fanAABB.hpp"
+#include "core/resources/fanResource.hpp"
 #include "game/fanGameSerializable.hpp"
 #include "scene/ecs/fanECSManager.hpp"	
 #include "scene/fanScene.hpp"
@@ -15,7 +16,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	class Gameobject : public Resource, public ISerializable {
+	class Gameobject : public Resource< Gameobject >, public ISerializable {
 	public:
 		using Flag = ecsFlags::Flag;
 		using EditorFlag = ecsEditorFlags::Flag;

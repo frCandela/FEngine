@@ -5,7 +5,7 @@
 #include "render/pipelines/fanPostprocessPipeline.hpp"
 #include "render/pipelines/fanForwardPipeline.hpp"
 #include "render/pipelines/fanForwardPipeline.hpp"
-#include "render/fanRessourceManager.hpp"
+#include "render/fanResourceManager.hpp"
 #include "render/core/fanFrameBuffer.hpp"
 #include "render/core/fanTexture.hpp"
 #include "render/fanRenderer.hpp"
@@ -25,19 +25,19 @@ namespace fan
 	void RenderWindow::OnGui() {
 		SCOPED_PROFILE( render )
 
-		RessourceManager & ressourceManager = RessourceManager::Get();
+		ResourceManager & resourceManager = ResourceManager::Get();
 
 		ImGui::Icon( GetIconType(), { 16,16 } ); ImGui::SameLine();
 		ImGui::Text("Renderer");
 
 		// Display mesh list
 		if ( ImGui::CollapsingHeader( "Loaded meshes : " ) ) {
-			for (Mesh * mesh : ressourceManager.GetMeshList() ){
+			for (Mesh * mesh : resourceManager.GetMeshList() ){
 				ImGui::Text( mesh->GetPath().c_str() );
 			}
 		}
 		// display textures list
-		const std::vector< Texture * > & textures = ressourceManager.GetTextures();
+		const std::vector< Texture * > & textures = resourceManager.GetTextures();
 		if ( ImGui::CollapsingHeader( "Loaded textures : " ) ) {
 			for ( int textureIndex = 0; textureIndex < textures.size(); textureIndex++ ) {
 				const Texture * texture = textures[textureIndex];

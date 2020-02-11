@@ -13,18 +13,18 @@ namespace fan
 	class Mesh;
 	class Prefab;
 	struct IDPtrData;
-	template< typename _RessourceType, typename _IDType > class RessourcePtr;
-	using GameobjectPtr = RessourcePtr<Gameobject, uint64_t>;
-	using TexturePtr = RessourcePtr<Texture, std::string>;
-	using MeshPtr = RessourcePtr<Mesh, std::string>;
-	using PrefabPtr = RessourcePtr<Prefab, std::string>;
+	template< typename _ResourceType > class ResourcePtr;
+	using GameobjectPtr = ResourcePtr<Gameobject>;
+	using TexturePtr = ResourcePtr<Texture>;
+	using MeshPtr = ResourcePtr<Mesh>;
+	using PrefabPtr = ResourcePtr<Prefab>;
 
 	//================================================================================================================================
-	// Loads & references image and mesh the ressources of the engine
+	// Loads & references image and mesh the resources of the engine
 	//================================================================================================================================
-	class RessourceManager : public Singleton<RessourceManager> {
+	class ResourceManager : public Singleton<ResourceManager> {
 	public:
-		friend class Singleton<RessourceManager>;
+		friend class Singleton<ResourceManager>;
 
 		void Init( Device* _device );
 		void Delete();

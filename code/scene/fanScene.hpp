@@ -19,8 +19,8 @@ namespace fan
 	class PointLight;
 	class DirectionalLight;
 
-	template< typename _RessourceType, typename _IDType > class RessourcePtr;
-	using GameobjectPtr = RessourcePtr<Gameobject, uint64_t>;
+	template< typename _ResourceType > class ResourcePtr;
+	using GameobjectPtr = ResourcePtr<Gameobject>;
 
 	//================================================================================================================================
 	//================================================================================================================================

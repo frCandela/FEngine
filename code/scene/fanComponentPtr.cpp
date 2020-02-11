@@ -1,5 +1,5 @@
 #include "scene/fanComponentPtr.hpp"
-#include "scene/fanSceneRessourcePtr.hpp"
+#include "scene/fanSceneResourcePtr.hpp"
 #include "scene/fanGameobject.hpp"
 #include "scene/components/fanComponent.hpp"
 #include "game/imgui/fanDragnDrop.hpp"
@@ -33,7 +33,7 @@ namespace ImGui
 		fan::Component * componentDrop = ImGui::FanBeginDragDropTargetComponent( _typeID );
 		if ( componentDrop )
 		{
-			( *_ptr ) = fan::ComponentIDPtr( componentDrop, fan::IDPtrData( componentDrop->GetGameobject().GetUniqueID(), componentDrop->GetType() ) );
+			( *_ptr ) = fan::ComponentIDPtr( componentDrop );
 			returnValue = true;
 		}
 

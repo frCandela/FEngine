@@ -3,11 +3,12 @@
 #include "scene/fanScenePrecompiled.hpp"
 
 #include "scene/components/fanComponent.hpp"
-#include "scene/fanSceneRessourcePtr.hpp"
+#include "scene/fanSceneResourcePtr.hpp"
 
 namespace fan
 {
 	class Component;
+	class Actor;
 
 	struct IDPtrData
 	{
@@ -18,9 +19,9 @@ namespace fan
 	};
 
 	//================================================================================================================================
-	// Component ressource pointer storing a gameobject::uniqueid and component::typeid
+	// Component resource pointer storing a gameobject::uniqueid and component::typeid
 	//================================================================================================================================
-	using ComponentIDPtr = RessourcePtr< Component, IDPtrData >;
+	using ComponentIDPtr = ResourcePtr< Component >;
 
 	//================================================================================================================================
 	// Like a ComponentIDPtr but strongly typed
@@ -29,12 +30,10 @@ namespace fan
 	class ComponentPtr : public ComponentIDPtr
 	{
 	public:
-		ComponentPtr( _ComponentType * _ressourceType, IDPtrData _ressourceID ) : ComponentIDPtr( _ressourceType, _ressourceID ) {}
-		ComponentPtr( _ComponentType * _component ) : ComponentIDPtr( _component, IDPtrData(_component->GetGameobject()->GetUniqueID(), _component->GetType())  ) {}
-		ComponentPtr() : ComponentIDPtr() {}
+		ComponentPtr(Component* _component = nullptr) : ComponentIDPtr( static_cast<Resource< Component>*>(_component)) {}
 
-		_ComponentType* operator->() const { return static_cast<_ComponentType*>(GetRessource() ); }
-		_ComponentType* operator*() const { return static_cast<_ComponentType*>(GetRessource() ); }
+		_ComponentType* operator->() const { return static_cast<_ComponentType*>(GetResource()); }
+		_ComponentType* operator*() const  { return static_cast<_ComponentType*>(GetResource()); }
 	};
 }
 

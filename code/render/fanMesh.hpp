@@ -1,8 +1,8 @@
 #pragma once
 
 #include "render/fanRenderPrecompiled.hpp"
-#include "core/ressources/fanRessource.hpp"
-#include "core/ressources/fanRessource.hpp"
+#include "core/resources/fanResource.hpp"
+#include "core/resources/fanResource.hpp"
 #include "render/util/fanVertex.hpp"
 #include "core/math/shapes/fanConvexHull.hpp"
 
@@ -12,7 +12,7 @@ namespace fan {
 
 	//================================================================================================================================
 	//================================================================================================================================
-	class Mesh : public Resource {
+	class Mesh : public Resource< Mesh > {
 	public:
 		static Signal< Mesh* > s_onGenerateVulkanData;
 		static Signal< Mesh*>  s_onDeleteVulkanData;

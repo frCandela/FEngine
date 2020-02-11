@@ -2,7 +2,7 @@
 #include "core/time/fanTime.hpp"
 #include "core/input/fanInput.hpp"
 #include "core/time/fanProfiler.hpp"
-#include "render/fanRessourceManager.hpp"
+#include "render/fanResourceManager.hpp"
 #include "render/fanRendererDebug.hpp"
 #include "render/fanRenderGlobal.hpp"
 #include "render/fanUIMesh.hpp"
@@ -34,7 +34,7 @@ namespace fan
 
 		m_clearColor = glm::vec4(0.f, 0.f, 0.2f, 1.f);        
             
-		RessourceManager::Get().Init(&m_window.GetDevice());
+		ResourceManager::Get().Init(&m_window.GetDevice());
 
 		CreateRenderPass();
 		CreateRenderPassPostprocess();
@@ -91,7 +91,7 @@ namespace fan
 		delete m_forwardPipeline;
 		delete m_uiPipeline;
 		
-		RessourceManager::Get().Delete();
+		ResourceManager::Get().Delete();
 
 		delete m_samplerDescriptorTextures;
 		delete m_samplerDescriptorUI;
@@ -144,10 +144,10 @@ namespace fan
 
 		ImGui::GetIO().DisplaySize = ImVec2( static_cast<float>( m_window.GetSwapChain().GetExtent().width ), static_cast<float>( m_window.GetSwapChain().GetExtent().height ) );
 
-		if ( RessourceManager::Get().IsModified() ) {
+		if ( ResourceManager::Get().IsModified() ) {
 			WaitIdle();
 			CreateTextureDescriptor();
-			RessourceManager::Get().SetUnmodified();
+			ResourceManager::Get().SetUnmodified();
 		}
 
 		const uint32_t currentFrame = m_window.GetSwapChain().GetCurrentFrame();
@@ -794,7 +794,7 @@ namespace fan
 	{
 		delete m_imagesDescriptor;
 
-		const std::vector< Texture * > & texture = RessourceManager::Get().GetTextures();
+		const std::vector< Texture * > & texture = ResourceManager::Get().GetTextures();
 		m_imagesDescriptor = new  DescriptorTextures( m_window.GetDevice(), static_cast<uint32_t>( texture.size() ) );
 
 		std::vector< VkImageView > imageViews( texture.size() );

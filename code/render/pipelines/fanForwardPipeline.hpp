@@ -19,7 +19,7 @@ namespace fan
 	class Descriptor;
 	class DescriptorTextures;
 	class DescriptorSampler;
-	class RessourceManager;
+	class ResourceManager;
 
 	//================================================================
 	//================================================================
