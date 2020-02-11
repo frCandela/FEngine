@@ -28,8 +28,8 @@ namespace fan
 	protected:
 		void OnAttach() override;
 		void OnDetach() override;
-		bool Load( const Json & _json ) override;
-		bool Save( Json & _json ) const override;
+		bool Load( const Json& _json ) override;
+		bool Save( Json& _json ) const override;
 
 	private:
 		GameobjectPtr			  m_spaceShip;
@@ -37,7 +37,7 @@ namespace fan
 		ComponentPtr<ProgressBar> m_energyProgress;
 		ComponentPtr<ProgressBar> m_signalProgress;
 		ComponentPtr<UIMeshRenderer> m_signalRenderer;
-		
+
 
 		Color GetSignalColor( const float _ratio );
 	};

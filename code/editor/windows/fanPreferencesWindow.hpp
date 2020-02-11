@@ -10,17 +10,18 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	class PreferencesWindow : public EditorWindow {
+	class PreferencesWindow : public EditorWindow
+	{
 	public:
 		PreferencesWindow();
 		~PreferencesWindow();
 
-		void SetRenderer( Renderer * _renderer ) { m_renderer = _renderer; }
+		void SetRenderer( Renderer* _renderer ) { m_renderer = _renderer; }
 	protected:
 		void OnGui() override;
 
 	private:
-		Renderer * m_renderer;
+		Renderer* m_renderer;
 
 		void DrawJoysticks();
 		void DrawShortcuts();

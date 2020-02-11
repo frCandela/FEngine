@@ -7,12 +7,12 @@ namespace fan
 {
 	REGISTER_TYPE_INFO( ProgressBar, TypeInfo::Flags::EDITOR_COMPONENT, "ui/" )
 
-	//================================================================================================================================
-	//================================================================================================================================
-	void ProgressBar::OnAttach()
+		//================================================================================================================================
+		//================================================================================================================================
+		void ProgressBar::OnAttach()
 	{
 		Component::OnAttach();
-			   
+
 		if ( *m_targetUiTransform != nullptr )
 		{
 			m_maxWidth = m_targetUiTransform->GetPixelSize().x;
@@ -21,7 +21,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void ProgressBar::OnDetach()		
+	void ProgressBar::OnDetach()
 	{
 		Component::OnDetach();
 	}
@@ -38,41 +38,41 @@ namespace fan
 				const glm::ivec2 pos = m_targetUiTransform->GetPixelPosition();
 				const glm::ivec2 size = m_targetUiTransform->GetPixelSize();
 
-				m_targetUiTransform->SetPixelSize( glm::ivec2( m_progress * m_maxWidth, size.y ) );			
+				m_targetUiTransform->SetPixelSize( glm::ivec2( m_progress * m_maxWidth, size.y ) );
 			}
-		}		
+		}
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
 	void ProgressBar::OnGui()
 	{
-		ImGui::FanComponent("target ui transform", &m_targetUiTransform);
+		ImGui::FanComponent( "target ui transform", &m_targetUiTransform );
 
 		ImGui::PushItemWidth( 0.6f * ImGui::GetWindowWidth() );
 		{
 			float progress = m_progress;
-			if ( ImGui::DragFloat( "progress", &progress, 0.01f, 0.f, 1.f ) ){ SetProgress(progress); }
-			ImGui::DragInt("max width", &m_maxWidth, 1.f, 0 );
+			if ( ImGui::DragFloat( "progress", &progress, 0.01f, 0.f, 1.f ) ) { SetProgress( progress ); }
+			ImGui::DragInt( "max width", &m_maxWidth, 1.f, 0 );
 		} ImGui::PopItemWidth();
 
 	}
-	 
+
 	//================================================================================================================================
 	//================================================================================================================================
-	bool ProgressBar::Save( Json & _json ) const
+	bool ProgressBar::Save( Json& _json ) const
 	{
 		Component::Save( _json );
-		Serializable::SaveComponentPtr(_json, "target_ui_transform", m_targetUiTransform );
+		Serializable::SaveComponentPtr( _json, "target_ui_transform", m_targetUiTransform );
 		Serializable::SaveInt( _json, "max_width", m_maxWidth );
 		return true;
 	}
-	 
+
 	//================================================================================================================================
 	//================================================================================================================================
-	bool ProgressBar::Load( const Json & _json )
+	bool ProgressBar::Load( const Json& _json )
 	{
-		Serializable::LoadComponentPtr(_json, "target_ui_transform", m_targetUiTransform );
+		Serializable::LoadComponentPtr( _json, "target_ui_transform", m_targetUiTransform );
 		Serializable::LoadInt( _json, "max_width", m_maxWidth );
 		return true;
 	}

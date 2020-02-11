@@ -2,8 +2,10 @@
 
 #include "core/fanCorePrecompiled.hpp"
 
-namespace fan {
-	enum KeyMask {
+namespace fan
+{
+	enum KeyMask
+	{
 		_SPACE			= 1 << GLFW_KEY_SPACE
 		, APOSTROPHE	= 1 << GLFW_KEY_APOSTROPHE
 		, COMMA			= 1 << GLFW_KEY_COMMA

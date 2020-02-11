@@ -29,10 +29,10 @@ namespace fan
 		UIPipeline( Device& _device, DescriptorTextures*& _textures, DescriptorSampler*& _sampler );
 		~UIPipeline() override;
 
-		void UpdateUniformBuffers( const size_t _index = 0 ) override;		
+		void UpdateUniformBuffers( const size_t _index = 0 ) override;
 		void CreateDescriptors( const size_t _numSwapchainImages );
 		void BindDescriptors( VkCommandBuffer _commandBuffer, const size_t _indexFrame, const uint32_t _indexOffset );
-		void ResizeDynamicDescriptors ( const size_t _newSize );
+		void ResizeDynamicDescriptors( const size_t _newSize );
 
 		AlignedMemory<DynamicUniformUIVert>		m_dynamicUniformsVert;
 
@@ -40,8 +40,8 @@ namespace fan
 		void ConfigurePipeline() override;
 
 	private:
-		Descriptor *			m_transformDescriptor = nullptr;
-		DescriptorTextures*&    m_textures;
-		DescriptorSampler*&		m_sampler;
+		Descriptor* m_transformDescriptor = nullptr;
+		DescriptorTextures*& m_textures;
+		DescriptorSampler*& m_sampler;
 	};
 }

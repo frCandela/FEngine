@@ -14,20 +14,20 @@ namespace fan
 		void SetRadius( const float _radius );
 		float GetRadius() const;
 
-		btSphereShape *		GetSphereShape();
-		btCollisionShape *	GetCollisionShape() override;
+		btSphereShape* GetSphereShape();
+		btCollisionShape* GetCollisionShape() override;
 
 		void OnGui() override;
-		ImGui::IconType GetIcon() const override  { return ImGui::IconType::SPHERE_SHAPE16; };
+		ImGui::IconType GetIcon() const override { return ImGui::IconType::SPHERE_SHAPE16; };
 
 	protected:
 		void OnAttach() override;
 		void OnDetach() override;
-		bool Load( const Json & _json ) override;
-		bool Save( Json & _json ) const override;
+		bool Load( const Json& _json ) override;
+		bool Save( Json& _json ) const override;
 
 		DECLARE_TYPE_INFO( SphereShape, Component );
-	private:		
+	private:
 		btSphereShape* const	m_sphereShape = nullptr;
 	};
 }

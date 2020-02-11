@@ -6,7 +6,7 @@ namespace fan
 {
 	class Mesh;
 
-	class EcsSingletonComponent{};
+	class EcsSingletonComponent {};
 
 	//================================================================================================================================
 	// Position of the current camera in the scene

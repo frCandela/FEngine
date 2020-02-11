@@ -2,7 +2,8 @@
 
 #include "core/fanCorePrecompiled.hpp"
 
-namespace fan {
+namespace fan
+{
 	namespace hash_str
 	{
 		constexpr const int8_t   STRING_END_BYTE = 0;
@@ -18,10 +19,10 @@ namespace fan {
 		/// \return A 32 bits hash
 		///
 		/// \note   This function is tail recursive
-		constexpr uint32_t hash_function(const char* pTail, uint32_t hash = STRING_HASH_KEY)
+		constexpr uint32_t hash_function( const char* pTail, uint32_t hash = STRING_HASH_KEY )
 		{
-			return (pTail[0] == STRING_END_BYTE) ? hash :
-				hash_function(pTail + 1, ((hash << STRING_BIT_SHIT) + hash) + (int32_t)*pTail);
+			return ( pTail[ 0 ] == STRING_END_BYTE ) ? hash :
+				hash_function( pTail + 1, ( ( hash << STRING_BIT_SHIT ) + hash ) + ( int32_t ) *pTail );
 		}
 
 		/// \brief  Binds the constexpr tail recursive function to a template parameter

@@ -1,5 +1,5 @@
 #pragma once
- 
+
 #include "editor/fanEditorPrecompiled.hpp"
 #include "core/fanSingleton.hpp"
 
@@ -16,17 +16,17 @@ namespace fan
 	public:
 		friend class Singleton<EditorDebug>;
 
-		void SetDebug( RendererDebug * _renderer, EditorGizmos * _gizmos )
+		void SetDebug( RendererDebug* _renderer, EditorGizmos* _gizmos )
 		{
 			m_renderer = _renderer;
 			m_gizmos = _gizmos;
 		}
 
-		RendererDebug &	Renderer() { return *Get().m_renderer; };
-		EditorGizmos &	Gizmos() { return *Get().m_gizmos; };
+		RendererDebug& Renderer() { return *Get().m_renderer; };
+		EditorGizmos& Gizmos() { return *Get().m_gizmos; };
 
 	private:
-		RendererDebug * m_renderer;
-		EditorGizmos * m_gizmos;
+		RendererDebug* m_renderer;
+		EditorGizmos* m_gizmos;
 	};
 }

@@ -3,28 +3,32 @@
 #include "render/fanRendererDebug.hpp"
 #include "editor/fanEditorDebug.hpp"
 
-namespace fan {
+namespace fan
+{
 	REGISTER_TYPE_INFO( BoxShape, TypeInfo::Flags::EDITOR_COMPONENT, "physics/" )
 
-	//================================================================================================================================
-	//================================================================================================================================
-	void BoxShape::SetExtent( const btVector3 _extent ) {
+		//================================================================================================================================
+		//================================================================================================================================
+		void BoxShape::SetExtent( const btVector3 _extent )
+	{
 		m_boxShape->setLocalScaling( _extent );
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	btVector3 BoxShape::GetExtent() const {
+	btVector3 BoxShape::GetExtent() const
+	{
 		return m_boxShape->getLocalScaling();
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void BoxShape::OnAttach() {
+	void BoxShape::OnAttach()
+	{
 
-		ecsBoxShape * ecsShape = m_gameobject->AddEcsComponent<ecsBoxShape>();
+		ecsBoxShape* ecsShape = m_gameobject->AddEcsComponent<ecsBoxShape>();
 		ecsShape->Init( btVector3( 0.5f, 0.5f, 0.5f ) );
-		btBoxShape ** tmpShape = &const_cast<btBoxShape*>( m_boxShape );
+		btBoxShape** tmpShape = &const_cast< btBoxShape* >( m_boxShape );
 		*tmpShape = &ecsShape->Get();
 
 		ColliderShape::OnAttach();
@@ -32,7 +36,8 @@ namespace fan {
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void BoxShape::OnDetach() {
+	void BoxShape::OnDetach()
+	{
 		m_gameobject->RemoveEcsComponent<ecsBoxShape>();
 
 		ColliderShape::OnDetach();
@@ -47,7 +52,7 @@ namespace fan {
 		ImGui::PushItemWidth( 0.6f * ImGui::GetWindowWidth() );
 		{
 			btVector3 extent = GetExtent();
-			if ( ImGui::DragFloat3( "half extent", &extent[0], 0.05f, 0.f ) )
+			if ( ImGui::DragFloat3( "half extent", &extent[ 0 ], 0.05f, 0.f ) )
 			{
 				SetExtent( extent );
 			}
@@ -58,19 +63,21 @@ namespace fan {
 
 	//================================================================================================================================
 	//================================================================================================================================
-	bool BoxShape::Load( const Json & _json ) {
+	bool BoxShape::Load( const Json& _json )
+	{
 		btVector3 extent;
 
-		Serializable::LoadVec3(_json, "extent", extent );
+		Serializable::LoadVec3( _json, "extent", extent );
 
-		SetExtent(extent);
+		SetExtent( extent );
 		return true;
 	}
 
 
 	//================================================================================================================================
 	//================================================================================================================================
-	bool BoxShape::Save( Json & _json ) const {
+	bool BoxShape::Save( Json& _json ) const
+	{
 		Serializable::SaveVec3( _json, "extent", GetExtent() );
 		Component::Save( _json );
 		return true;
@@ -78,6 +85,6 @@ namespace fan {
 
 	//================================================================================================================================
 	//================================================================================================================================
-	btBoxShape *		BoxShape::GetBoxShape()				{ return m_boxShape;}
-	btCollisionShape *	BoxShape::GetCollisionShape()		{ return GetBoxShape(); }
+	btBoxShape* BoxShape::GetBoxShape() { return m_boxShape; }
+	btCollisionShape* BoxShape::GetCollisionShape() { return GetBoxShape(); }
 }

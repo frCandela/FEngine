@@ -7,7 +7,7 @@ namespace ImGui
 {
 	//================================================================================================================================
 	//================================================================================================================================
-	void FanBeginDragDropSourceTexture( fan::Texture * _texture, ImGuiDragDropFlags _flags )
+	void FanBeginDragDropSourceTexture( fan::Texture* _texture, ImGuiDragDropFlags _flags )
 	{
 		if ( _texture != nullptr )
 		{
@@ -23,9 +23,9 @@ namespace ImGui
 
 	//================================================================================================================================
 	//================================================================================================================================
-	fan::Texture * FanBeginDragDropTargetTexture()
+	fan::Texture* FanBeginDragDropTargetTexture()
 	{
-		fan::Texture * _texture = nullptr;
+		fan::Texture* _texture = nullptr;
 		if ( ImGui::BeginDragDropTarget() )
 		{
 			if ( const ImGuiPayload* payload = ImGui::AcceptDragDropPayload( "dragndrop_texture" ) )
@@ -40,7 +40,7 @@ namespace ImGui
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void FanBeginDragDropSourceMesh( fan::Mesh * _mesh, ImGuiDragDropFlags _flags )
+	void FanBeginDragDropSourceMesh( fan::Mesh* _mesh, ImGuiDragDropFlags _flags )
 	{
 		if ( _mesh != nullptr )
 		{
@@ -56,9 +56,9 @@ namespace ImGui
 
 	//================================================================================================================================
 	//================================================================================================================================
-	fan::Mesh * FanBeginDragDropTargetMesh()
+	fan::Mesh* FanBeginDragDropTargetMesh()
 	{
-		fan::Mesh * _mesh = nullptr;
+		fan::Mesh* _mesh = nullptr;
 		if ( ImGui::BeginDragDropTarget() )
 		{
 			if ( const ImGuiPayload* payload = ImGui::AcceptDragDropPayload( "dragndrop_mesh" ) )

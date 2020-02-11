@@ -12,14 +12,15 @@
 
 namespace fan
 {
-	REGISTER_TYPE_INFO(MeshRenderer, TypeInfo::Flags::EDITOR_COMPONENT, "")
+	REGISTER_TYPE_INFO( MeshRenderer, TypeInfo::Flags::EDITOR_COMPONENT, "" )
 
-	//================================================================================================================================
-	//================================================================================================================================
-	void MeshRenderer::OnAttach() {
+		//================================================================================================================================
+		//================================================================================================================================
+		void MeshRenderer::OnAttach()
+	{
 		Component::OnAttach();
 
-		ecsMesh ** tmpMesh = &const_cast<ecsMesh*>( m_mesh );
+		ecsMesh** tmpMesh = &const_cast< ecsMesh* >( m_mesh );
 		*tmpMesh = m_gameobject->AddEcsComponent<ecsMesh>();
 		m_mesh->Init();
 
@@ -28,39 +29,43 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void MeshRenderer::OnDetach() {
+	void MeshRenderer::OnDetach()
+	{
 		Component::OnDetach();
 		m_gameobject->RemoveEcsComponent<ecsMesh>();
-		m_gameobject->GetScene().onUnRegisterMeshRenderer.Emmit(this);
+		m_gameobject->GetScene().onUnRegisterMeshRenderer.Emmit( this );
 
 		m_gameobject->SetFlags( m_gameobject->GetFlags() & Gameobject::Flag::OUTDATED_AABB );
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void MeshRenderer::SetMesh( Mesh * _mesh )
+	void MeshRenderer::SetMesh( Mesh* _mesh )
 	{
-		if( _mesh != nullptr ) {	
-			m_mesh->mesh = MeshPtr( _mesh );		
+		if ( _mesh != nullptr )
+		{
+			m_mesh->mesh = MeshPtr( _mesh );
 			m_gameobject->SetFlags( m_gameobject->GetFlags() & Gameobject::Flag::OUTDATED_AABB );
 		}
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void MeshRenderer::SetPath( std::string /*_path*/ ) {	
+	void MeshRenderer::SetPath( std::string /*_path*/ )
+	{
 		//m_mesh->mesh.Init(_path);@tmp
 	}
 
-	Mesh *			MeshRenderer::GetMesh() { return *m_mesh->mesh; }
-	const Mesh *	MeshRenderer::GetMesh() const { return *m_mesh->mesh; }
+	Mesh* MeshRenderer::GetMesh() { return *m_mesh->mesh; }
+	const Mesh* MeshRenderer::GetMesh() const { return *m_mesh->mesh; }
 
 	int		MeshRenderer::GetRenderID() const { return m_mesh->renderID; }
 	void	MeshRenderer::SetRenderID( const int _renderID ) { m_mesh->renderID = _renderID; }
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void MeshRenderer::OnGui() {
+	void MeshRenderer::OnGui()
+	{
 		Component::OnGui();
 
 		ImGui::FanMesh( "mesh", &m_mesh->mesh );
@@ -68,13 +73,14 @@ namespace fan
 		// Num triangles
 		std::stringstream ss;
 		ss << "triangles: ";
-		ss << ( GetMesh() != nullptr ?   GetMesh()->GetIndices().size() / 3  :  0 );		
-		ImGui::Text(ss.str().c_str());
+		ss << ( GetMesh() != nullptr ? GetMesh()->GetIndices().size() / 3 : 0 );
+		ImGui::Text( ss.str().c_str() );
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	bool MeshRenderer::Load( const Json & _json ) {
+	bool MeshRenderer::Load( const Json& _json )
+	{
 		std::string pathBuffer;
 
 		Serializable::LoadMeshPtr( _json, "path", m_mesh->mesh );
@@ -83,12 +89,13 @@ namespace fan
 
 	//==========================z======================================================================================================
 	//================================================================================================================================
-	bool MeshRenderer::Save( Json & _json ) const {
-		
+	bool MeshRenderer::Save( Json& _json ) const
+	{
+
 		Component::Save( _json );
 
 		Serializable::SaveMeshPtr( _json, "path", m_mesh->mesh );
-		
+
 		return true;
 	}
 }

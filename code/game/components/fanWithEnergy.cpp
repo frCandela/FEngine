@@ -5,9 +5,9 @@ namespace fan
 {
 	REGISTER_TYPE_INFO( WithEnergy, TypeInfo::Flags::EDITOR_COMPONENT, "game/" )
 
-	//================================================================================================================================
-	//================================================================================================================================
-	void WithEnergy::OnAttach()
+		//================================================================================================================================
+		//================================================================================================================================
+		void WithEnergy::OnAttach()
 	{
 		Component::OnAttach();
 
@@ -29,13 +29,14 @@ namespace fan
 	{
 		assert( _energyConsumed >= 0.f );
 
-		if( m_currentEnergy >= _energyConsumed ) {
+		if ( m_currentEnergy >= _energyConsumed )
+		{
 			m_currentEnergy -= _energyConsumed;
 			return true;
 		}
 		else
 		{
-			 return false;
+			return false;
 		}
 	}
 
@@ -44,7 +45,7 @@ namespace fan
 	void WithEnergy::AddEnergy( const float _energyAdded )
 	{
 		assert( _energyAdded >= 0.f );
-		m_currentEnergy = std::min( m_currentEnergy + _energyAdded, m_maxEnergy );		
+		m_currentEnergy = std::min( m_currentEnergy + _energyAdded, m_maxEnergy );
 	}
 
 	//================================================================================================================================
@@ -58,20 +59,20 @@ namespace fan
 
 		} ImGui::PopItemWidth();
 	}
-	 
+
 	//================================================================================================================================
 	//================================================================================================================================
-	bool WithEnergy::Save( Json & _json ) const
+	bool WithEnergy::Save( Json& _json ) const
 	{
 		Component::Save( _json );
 		Serializable::SaveFloat( _json, "max_energy 		   ", m_maxEnergy );
 
 		return true;
 	}
-	 
+
 	//================================================================================================================================
 	//================================================================================================================================
-	bool WithEnergy::Load( const Json & _json )
+	bool WithEnergy::Load( const Json& _json )
 	{
 		Serializable::LoadFloat( _json, "max_energy 		   ", m_maxEnergy );
 

@@ -11,11 +11,11 @@ namespace ImGui
 {
 	//================================================================================================================================
 	//================================================================================================================================
-	bool FanTexture( const char * _label, fan::TexturePtr * _ptr )
+	bool FanTexture( const char* _label, fan::TexturePtr* _ptr )
 	{
 		bool returnValue = false;
 
-		fan::Texture * texture = **_ptr;
+		fan::Texture* texture = **_ptr;
 		const std::string name = texture == nullptr ? "null" : std::filesystem::path( texture->GetPath() ).filename().string();
 
 		// Set button icon & modal
@@ -62,7 +62,7 @@ namespace ImGui
 		}
 
 		// dragndrop		
-		fan::Texture * textureDrop = ImGui::FanBeginDragDropTargetTexture();
+		fan::Texture* textureDrop = ImGui::FanBeginDragDropTargetTexture();
 		if ( textureDrop )
 		{
 			( *_ptr ) = fan::TexturePtr( textureDrop );
@@ -72,7 +72,7 @@ namespace ImGui
 		// Right click = clear
 		if ( ImGui::IsItemClicked( 1 ) )
 		{
-			( *_ptr ) = fan::TexturePtr(nullptr);
+			( *_ptr ) = fan::TexturePtr( nullptr );
 			returnValue = true;
 		}
 
@@ -91,11 +91,11 @@ namespace ImGui
 
 	//================================================================================================================================
 	//================================================================================================================================
-	bool FanMesh( const char * _label, fan::MeshPtr * _ptr )
+	bool FanMesh( const char* _label, fan::MeshPtr* _ptr )
 	{
 		bool returnValue = false;
 
-		fan::Mesh * mesh = **_ptr;
+		fan::Mesh* mesh = **_ptr;
 		const std::string name = mesh == nullptr ? "null" : std::filesystem::path( mesh->GetPath() ).filename().string();
 
 		// Set button icon & modal
@@ -128,17 +128,17 @@ namespace ImGui
 		}
 
 		// dragndrop		
-		fan::Mesh * meshDrop = ImGui::FanBeginDragDropTargetMesh();
+		fan::Mesh* meshDrop = ImGui::FanBeginDragDropTargetMesh();
 		if ( meshDrop )
 		{
-			(*_ptr) = fan::MeshPtr(meshDrop);
+			( *_ptr ) = fan::MeshPtr( meshDrop );
 			returnValue = true;
 		}
 
 		// Right click = clear
 		if ( ImGui::IsItemClicked( 1 ) )
 		{
-			( *_ptr ) = fan::MeshPtr(nullptr);
+			( *_ptr ) = fan::MeshPtr( nullptr );
 			returnValue = true;
 		}
 

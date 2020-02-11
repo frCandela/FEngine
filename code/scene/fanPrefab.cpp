@@ -34,13 +34,13 @@ namespace fan
 	{
 		Clear();
 
-		std::ifstream inStream(_path);
+		std::ifstream inStream( _path );
 		if ( inStream.is_open() && inStream.good() )
 		{
 			Debug::Get() << Debug::Severity::log << "loading prefab: " << _path << Debug::Endl();
 			inStream >> m_json;
-			
-			if ( m_json.contains("prefab") )
+
+			if ( m_json.contains( "prefab" ) )
 			{
 				m_path = _path;
 				return true;
@@ -48,25 +48,25 @@ namespace fan
 			else
 			{
 				m_json = Json();
-				Debug::Warning()<< "file is not a prefab: " << _path << Debug::Endl();
+				Debug::Warning() << "file is not a prefab: " << _path << Debug::Endl();
 				return false;
 			}
 		}
 		else
 		{
-			Debug::Warning()<< "Prefab failed to open file " << _path << Debug::Endl();
+			Debug::Warning() << "Prefab failed to open file " << _path << Debug::Endl();
 			return false;
 		}
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void Prefab::LoadFromGameobject( const Gameobject * _gameobject )
+	void Prefab::LoadFromGameobject( const Gameobject* _gameobject )
 	{
 		Clear();
 
-		Json& prefabJson = m_json["prefab"];
-		if( ! _gameobject->Save( prefabJson ) )
+		Json& prefabJson = m_json[ "prefab" ];
+		if ( !_gameobject->Save( prefabJson ) )
 		{
 			Debug::Warning() << "Prefab creation failed for " << _gameobject->GetName() << Debug::Endl();
 		}

@@ -2,10 +2,12 @@
 
 #include "core/fanCorePrecompiled.hpp"
 
-namespace fan {
+namespace fan
+{
 	//================================================================================================================================
 	//================================================================================================================================
-	class ScopedTimer {
+	class ScopedTimer
+	{
 	public:
 		ScopedTimer( const std::string _label );
 		~ScopedTimer();

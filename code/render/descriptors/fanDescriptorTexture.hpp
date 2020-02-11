@@ -17,11 +17,11 @@ namespace fan
 		~DescriptorTextures();
 
 		uint32_t Append( VkImageView _imageView );
-		void Set( const uint32_t _index, VkImageView _imageView );
+		void	 Set( const uint32_t _index, VkImageView _imageView );
 		void	 UpdateRange( const uint32_t _begin, const uint32_t _end );
-		uint32_t Count() { return static_cast<uint32_t>( m_views.size());}
+		uint32_t Count() { return static_cast< uint32_t >( m_views.size() ); }
 		VkDescriptorSetLayout GetLayout() { return m_descriptorSetLayout; }
-		VkDescriptorSet		  GetSet( const uint32_t _index = 0 ) { return m_descriptorSets[_index]; }
+		VkDescriptorSet		  GetSet( const uint32_t _index = 0 ) { return m_descriptorSets[ _index ]; }
 	private:
 		Device& m_device;
 

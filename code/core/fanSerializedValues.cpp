@@ -3,17 +3,18 @@
 #include "core/input/fanInput.hpp"
 #include "core/input/fanInputManager.hpp"
 
-namespace fan {
-
+namespace fan
+{
 	//================================================================================================================================
 	//================================================================================================================================
 	SerializedValues::SerializedValues() :
-		m_jsonPath ( "editor_data.json" )
-		, m_valuesName("values")
-		, m_keysBindingsName("key_bindings")
+		m_jsonPath( "editor_data.json" )
+		, m_valuesName( "values" )
+		, m_keysBindingsName( "key_bindings" )
 	{
-		std::ifstream inFile(m_jsonPath);
-		if (inFile.good() == true) {
+		std::ifstream inFile( m_jsonPath );
+		if ( inFile.good() == true )
+		{
 			inFile >> m_json;
 		}
 		inFile.close();
@@ -21,20 +22,22 @@ namespace fan {
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void SerializedValues::SaveValuesToDisk() {
+	void SerializedValues::SaveValuesToDisk()
+	{
 
-		Debug::Log("Saving value to disk");
-		Input::Get().Manager().Save( m_json[m_keysBindingsName]);
-		std::ofstream outFile(m_jsonPath);
-		assert(outFile.is_open());
+		Debug::Log( "Saving value to disk" );
+		Input::Get().Manager().Save( m_json[ m_keysBindingsName ] );
+		std::ofstream outFile( m_jsonPath );
+		assert( outFile.is_open() );
 		outFile << m_json;
 		outFile.close();
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void SerializedValues::LoadKeyBindings() {
-		Input::Get().Manager().Load( m_json[m_keysBindingsName] );
+	void SerializedValues::LoadKeyBindings()
+	{
+		Input::Get().Manager().Load( m_json[ m_keysBindingsName ] );
 	}
 
 	void SerializedValues::SetVec2	( const char * _name, const btVector2&	 _vec2 )	{ Serializable::SaveVec2( m_json[m_valuesName], _name, _vec2 ); }

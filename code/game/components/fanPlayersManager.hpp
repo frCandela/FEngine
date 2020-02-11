@@ -17,9 +17,9 @@ namespace fan
 		//================================================================
 		struct PlayerData
 		{
-			Gameobject*		spaceship	= nullptr;
-			Gameobject*		persistent	= nullptr;
-		};	
+			Gameobject* spaceship = nullptr;
+			Gameobject* persistent = nullptr;
+		};
 
 		Signal< Gameobject* > onAddPlayer;
 		std::vector< Gameobject* > GetPlayers() const;
@@ -38,8 +38,8 @@ namespace fan
 
 		DECLARE_TYPE_INFO( PlayersManager, Actor );
 	protected:
-		bool Load( const Json & _json ) override;
-		bool Save( Json & _json ) const override;
+		bool Load( const Json& _json ) override;
+		bool Save( Json& _json ) const override;
 
 		void OnAttach() override;
 		void OnDetach() override;
@@ -52,6 +52,6 @@ namespace fan
 		void RemovePlayer( const int _ID );
 
 		void OnJoystickConnect( int _joystickID, bool _connected );
-		void OnPlayerDie( Gameobject * _gameobject );
+		void OnPlayerDie( Gameobject* _gameobject );
 	};
 }

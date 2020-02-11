@@ -4,7 +4,8 @@
 
 #include "scene/actors/fanActor.hpp"
 
-namespace fan {
+namespace fan
+{
 	class Mesh;
 	class Material;
 	class ParticleSystem;
@@ -14,12 +15,12 @@ namespace fan {
 
 	//================================================================================================================================
 	//================================================================================================================================
-	class SolarEruption : public Actor 
+	class SolarEruption : public Actor
 	{
 	public:
 		void Start() override;
 		void Stop() override {}
-		void Update(const float _delta) override;
+		void Update( const float _delta ) override;
 		void LateUpdate( const float /*_delta*/ ) override {}
 
 		void OnGui() override;
@@ -29,19 +30,19 @@ namespace fan {
 	protected:
 		void OnAttach() override;
 		void OnDetach() override;
-		bool Load( const Json & _json ) override;
-		bool Save( Json & _json ) const override;
+		bool Load( const Json& _json ) override;
+		bool Save( Json& _json ) const override;
 
 	private:
-		Material * m_material;
-		MeshRenderer * m_meshRenderer;
-		ParticleSystem * m_particleSystem;
-		PlayersManager * m_players;
+		Material* m_material;
+		MeshRenderer* m_meshRenderer;
+		ParticleSystem* m_particleSystem;
+		PlayersManager* m_players;
 
 		// State machine
 		float   m_eruptionTime = -1.f;
 		float	m_eruptionCooldown = 10.f;
-		float	m_eruptionRandomCooldown = 10.f;	
+		float	m_eruptionRandomCooldown = 10.f;
 		float	m_eruptionDamagePerSecond = 10.f;
 
 		float   m_warmingTime = 2.f;
@@ -56,17 +57,17 @@ namespace fan {
 
 		float m_timeBeforeEruption = 0;
 
-		float m_collapseAlpha	= 0.8f;
-		Color m_baseColor		= Color::Yellow;
+		float m_collapseAlpha = 0.8f;
+		Color m_baseColor = Color::Yellow;
 		Color m_explositonColor = Color::Red;
 
 		std::default_random_engine			  m_generator;
 		std::uniform_real_distribution<float> m_distribution;
 
-		enum State{ NONE, COLLAPSING, WAITING, EXPODING, BACK_TO_NORMAL };
+		enum State { NONE, COLLAPSING, WAITING, EXPODING, BACK_TO_NORMAL };
 		State m_state = State::NONE;
 
-		void UpdateStateMachine( const float _delta );		
+		void UpdateStateMachine( const float _delta );
 		void StartEruption();
 	};
 }

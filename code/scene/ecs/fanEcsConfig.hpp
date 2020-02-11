@@ -5,14 +5,15 @@
 #include "scene/ecs/fanECSComponents.hpp"
 #include "scene/ecs/fanECSBitsetCreator.hpp"
 
-namespace fan {
+namespace fan
+{
 
 	//================================================================================================================================
 	// Tags
 	//================================================================================================================================
 	struct ecsITag {};
 	struct ecsFakeTag : ecsITag {};
-	
+
 	//================================
 	//================================
 	using ecsTags = meta::TypeList<
@@ -30,5 +31,5 @@ namespace fan {
 	static constexpr uint32_t aliveBit = ecsComponents::count + ecsTags::count;
 
 	using ecsBitsetsComponents = BitsetCreator<ecsBitset, ecsComponents>;
-	using ecsBitsetsTags		= BitsetCreator<ecsBitset, ecsTags, ecsComponents::count >;
+	using ecsBitsetsTags = BitsetCreator<ecsBitset, ecsTags, ecsComponents::count >;
 }

@@ -2,7 +2,8 @@
 
 #include "core/fanCorePrecompiled.hpp"
 
-namespace fan {
+namespace fan
+{
 
 	template< typename T > class ResourceList;
 	template< typename T > class ResourcePtr;
@@ -11,8 +12,9 @@ namespace fan {
 	// Base class for resources ( Mesh, textures, components, gameobjects etc.) 
 	//================================================================================================================================
 	template< typename _ResourceType >
-	class Resource {
-	public:	
+	class Resource
+	{
+	public:
 		friend class ResourceList<_ResourceType>;
 		friend class ResourcePtr<_ResourceType>;
 

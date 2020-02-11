@@ -18,68 +18,74 @@ namespace fan
 	//================================================================================================================================
 	//================================================================================================================================
 	InspectorWindow::InspectorWindow() :
-		EditorWindow("inspector", ImGui::IconType::INSPECTOR16 )
+		EditorWindow( "inspector", ImGui::IconType::INSPECTOR16 )
+	{}
+
+	//================================================================================================================================
+	//================================================================================================================================
+	void InspectorWindow::OnGui()
 	{
-	}
-
-	//================================================================================================================================
-	//================================================================================================================================
-	void InspectorWindow::OnGui() {
 		SCOPED_PROFILE( inspector )
-		if ( m_gameobjectSelected != nullptr)
-		{
-			// gameobject gui
-			ImGui::Icon( GetIconType(), { 16,16 } ); ImGui::SameLine();
-			m_gameobjectSelected->OnGui();
-			int componentCount = 0;			
-			const std::vector<Component*> & components = m_gameobjectSelected->GetComponents();
-			for (int componentIndex = 0; componentIndex < components.size(); componentIndex++) {
-				Component * component = components[componentIndex];
+			if ( m_gameobjectSelected != nullptr )
+			{
+				// gameobject gui
+				ImGui::Icon( GetIconType(), { 16,16 } ); ImGui::SameLine();
+				m_gameobjectSelected->OnGui();
+				int componentCount = 0;
+				const std::vector<Component*>& components = m_gameobjectSelected->GetComponents();
+				for ( int componentIndex = 0; componentIndex < components.size(); componentIndex++ )
+				{
+					Component* component = components[ componentIndex ];
 
+					ImGui::Separator();
+
+					// Icon
+					ImGui::Icon( component->GetIcon(), { 16,16 } ); ImGui::SameLine();
+					ImGui::FanBeginDragDropSourceComponent( component, ImGuiDragDropFlags_SourceAllowNullID );
+
+					// Actor "enable" checkbox
+					if ( component->IsActor() )
+					{	// TODO : use type info when type info deals with inheritance
+						ImGui::PushID( ( int* ) component );
+						Actor* actor = static_cast< Actor* >( component );
+						bool enabled = actor->IsEnabled();
+						if ( ImGui::Checkbox( "", &enabled ) )
+						{
+							actor->SetEnabled( enabled );
+						}
+						ImGui::SameLine();
+						ImGui::PopID();
+					}
+
+					// Delete button	
+					ImGui::Text( component->GetName() );
+					ImGui::FanBeginDragDropSourceComponent( component, ImGuiDragDropFlags_SourceAllowNullID );
+
+					if ( component->IsRemovable() )
+					{
+						std::stringstream ss;
+						ss << "X" << "##" << component->GetName() << componentCount++;	// make unique id
+						ImGui::SameLine( ImGui::GetWindowWidth() - 40 );
+						if ( ImGui::Button( ss.str().c_str() ) )
+						{
+							m_gameobjectSelected->RemoveComponent( component );
+							component = nullptr;
+						}
+					}
+
+					// Draw component
+					if ( component != nullptr )
+					{
+						component->OnGui();
+					}
+				}
 				ImGui::Separator();
+				//Add component button
+				if ( ImGui::Button( "Add component" ) )
+					ImGui::OpenPopup( "New component" );
 
-				// Icon
-				ImGui::Icon( component->GetIcon(), { 16,16 } ); ImGui::SameLine();
-				ImGui::FanBeginDragDropSourceComponent( component,  ImGuiDragDropFlags_SourceAllowNullID);
-
-				// Actor "enable" checkbox
-				if (component->IsActor()) {	// TODO : use type info when type info deals with inheritance
-					ImGui::PushID((int*)component);
-					Actor * actor = static_cast<Actor*>(component);
-					bool enabled = actor->IsEnabled();
-					if (ImGui::Checkbox("", &enabled)) {
-						actor->SetEnabled(enabled);
-					}
-					ImGui::SameLine();
-					ImGui::PopID();
-				}
-
-				// Delete button	
-				ImGui::Text( component->GetName());
-				ImGui::FanBeginDragDropSourceComponent( component,  ImGuiDragDropFlags_SourceAllowNullID);
-
-				if (component->IsRemovable()) {
-					std::stringstream ss;
-					ss << "X" << "##" << component->GetName() << componentCount++;	// make unique id
-					ImGui::SameLine(ImGui::GetWindowWidth() - 40);
-					if (ImGui::Button(ss.str().c_str())) {
-						m_gameobjectSelected->RemoveComponent(component);
-						component = nullptr;
-					}
-				}
-				
-				// Draw component
-				if (component != nullptr) {
-					component->OnGui();
-				}
-			}			
-			ImGui::Separator();
-			//Add component button
-			if (ImGui::Button("Add component"))
-				ImGui::OpenPopup("New component");
-
-			NewComponentPopup();
-		}
+				NewComponentPopup();
+			}
 	}
 
 	//================================================================================================================================
@@ -97,32 +103,34 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void InspectorWindow::NewComponentPopup() {
+	void InspectorWindow::NewComponentPopup()
+	{
 		using Path = std::filesystem::path;
 
-		
-		if (ImGui::BeginPopup("New component"))
+
+		if ( ImGui::BeginPopup( "New component" ) )
 		{
 			// Get components 
-			std::vector< const Component *> components;
-			for ( const void * component : TypeInfo::Get().GetInstancesWithFlags( TypeInfo::EDITOR_COMPONENT ) )
+			std::vector< const Component*> components;
+			for ( const void* component : TypeInfo::Get().GetInstancesWithFlags( TypeInfo::EDITOR_COMPONENT ) )
 			{
-				components.push_back( static_cast<const Component *>(component));
+				components.push_back( static_cast< const Component* >( component ) );
 			}
 
 			// Get components paths
 			std::vector<Path> componentsPath;
-			componentsPath.reserve(components.size());
-			for ( int componentIndex = 0; componentIndex < components.size(); componentIndex++ ) { 
-				componentsPath.push_back(TypeInfo::Get().GetPath( components[componentIndex]->GetType() )); 
+			componentsPath.reserve( components.size() );
+			for ( int componentIndex = 0; componentIndex < components.size(); componentIndex++ )
+			{
+				componentsPath.push_back( TypeInfo::Get().GetPath( components[ componentIndex ]->GetType() ) );
 			}
 
 			// Sort components paths
 			std::set< Path > componentsPathSet;
 			for ( int componentIndex = 0; componentIndex < components.size(); componentIndex++ )
 			{
-				componentsPathSet.insert( componentsPath[componentIndex] ); 
-			} componentsPathSet.erase("");
+				componentsPathSet.insert( componentsPath[ componentIndex ] );
+			} componentsPathSet.erase( "" );
 
 			// Draw menus recursively
 			std::set< Path >::iterator it = componentsPathSet.begin();
@@ -135,7 +143,7 @@ namespace fan
 			// Draw menu items for components at path ""
 			for ( int componentIndex = 0; componentIndex < components.size(); componentIndex++ )
 			{
-				if ( componentsPath[componentIndex] == "" )	{ NewComponentItem( components[componentIndex] );	}
+				if ( componentsPath[ componentIndex ] == "" ) { NewComponentItem( components[ componentIndex ] ); }
 			}
 
 			ImGui::EndPopup();
@@ -144,7 +152,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void InspectorWindow::R_NewComponentPopup( std::set< std::filesystem::path >& _componentsPathSet, std::set< std::filesystem::path >::iterator&  _current, const std::vector< const Component *>& _components, const std::vector<std::filesystem::path>& _componentsPath )
+	void InspectorWindow::R_NewComponentPopup( std::set< std::filesystem::path >& _componentsPathSet, std::set< std::filesystem::path >::iterator& _current, const std::vector< const Component*>& _components, const std::vector<std::filesystem::path>& _componentsPath )
 	{
 		std::filesystem::path rootPath = *_current;
 
@@ -153,10 +161,10 @@ namespace fan
 		// Replace back slashes with forward slashes
 		for ( int charIndex = 0; charIndex < name.size(); charIndex++ )
 		{
-			if ( name[charIndex] == '\\' ) { name[charIndex] = '/'; }
+			if ( name[ charIndex ] == '\\' ) { name[ charIndex ] = '/'; }
 		}
 
-		while ( name[name.size() - 1] == '/' ) { name.erase( name.end() - 1 ); } // Remove trailing slashes
+		while ( name[ name.size() - 1 ] == '/' ) { name.erase( name.end() - 1 ); } // Remove trailing slashes
 		size_t lastSlash = name.find_last_of( "/" );
 		if ( lastSlash != std::string::npos )
 		{
@@ -178,9 +186,9 @@ namespace fan
 			// draw menu items (components)
 			for ( int componentIndex = 0; componentIndex < _components.size(); componentIndex++ )
 			{
-				if ( _componentsPath[componentIndex] == rootPath.string() )
+				if ( _componentsPath[ componentIndex ] == rootPath.string() )
 				{
-					const Component * component = _components[componentIndex];
+					const Component* component = _components[ componentIndex ];
 					NewComponentItem( component );
 				}
 			}

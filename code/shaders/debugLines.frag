@@ -7,7 +7,7 @@ layout (location = 1) in vec3 normal;
 layout (location = 2) in vec3 fragPos;
 layout (location = 3) in vec4 debugColor;
 
-void main() {  
-
+void main() 
+{  
 	frag_color = debugColor * fragColor;
 }

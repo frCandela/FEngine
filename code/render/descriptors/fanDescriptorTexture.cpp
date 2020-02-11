@@ -7,7 +7,7 @@ namespace fan
 	//================================================================================================================================
 	//================================================================================================================================
 	DescriptorTextures::DescriptorTextures( Device& _device, const uint32_t _maxTextures, VkSampler _sampler ) :
-		  m_device( _device )
+		m_device( _device )
 		, m_sampler( _sampler )
 		, m_maxTextures( _maxTextures )
 	{
@@ -25,7 +25,7 @@ namespace fan
 			VkDescriptorPoolCreateInfo descriptorPoolInfo = {};
 
 			descriptorPoolInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
-			descriptorPoolInfo.poolSizeCount = static_cast<uint32_t>( poolSizes.size() );
+			descriptorPoolInfo.poolSizeCount = static_cast< uint32_t >( poolSizes.size() );
 			descriptorPoolInfo.pPoolSizes = poolSizes.data();
 			descriptorPoolInfo.maxSets = m_maxTextures;
 			vkCreateDescriptorPool( m_device.vkDevice, &descriptorPoolInfo, nullptr, &m_descriptorPool );
@@ -33,7 +33,7 @@ namespace fan
 
 		// Descriptor set layout
 		{
-			VkDescriptorSetLayoutBinding setLayoutBinding {};
+			VkDescriptorSetLayoutBinding setLayoutBinding{};
 			setLayoutBinding.descriptorType = m_descriptorType;
 			setLayoutBinding.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT;
 			setLayoutBinding.binding = 0;
@@ -44,14 +44,14 @@ namespace fan
 			VkDescriptorSetLayoutCreateInfo descriptorSetLayoutCreateInfo = {};
 			descriptorSetLayoutCreateInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
 			descriptorSetLayoutCreateInfo.pBindings = setLayoutBindings.data();
-			descriptorSetLayoutCreateInfo.bindingCount = static_cast<uint32_t>( setLayoutBindings.size() );
+			descriptorSetLayoutCreateInfo.bindingCount = static_cast< uint32_t >( setLayoutBindings.size() );
 
 			vkCreateDescriptorSetLayout( m_device.vkDevice, &descriptorSetLayoutCreateInfo, nullptr, &m_descriptorSetLayout );
 
 			// Descriptor set
 			std::vector<VkDescriptorSetLayout>  layouts( m_maxTextures, m_descriptorSetLayout );
 
-			VkDescriptorSetAllocateInfo descriptorSetAllocateInfo {};
+			VkDescriptorSetAllocateInfo descriptorSetAllocateInfo{};
 			descriptorSetAllocateInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
 			descriptorSetAllocateInfo.descriptorPool = m_descriptorPool;
 			descriptorSetAllocateInfo.pSetLayouts = layouts.data();
@@ -85,7 +85,7 @@ namespace fan
 	{
 		assert( m_views.size() <= m_maxTextures );
 		m_views.push_back( _imageView );
-		return static_cast< uint32_t> (m_views.size() ) - 1;
+		return static_cast< uint32_t > ( m_views.size() ) - 1;
 	}
 
 	//================================================================================================================================
@@ -94,7 +94,7 @@ namespace fan
 	{
 		assert( _index < m_maxTextures );
 
-		m_views[_index] = _imageView ;
+		m_views[ _index ] = _imageView;
 	}
 
 	//================================================================================================================================
@@ -108,17 +108,17 @@ namespace fan
 		std::vector<VkDescriptorImageInfo> imageInfos( m_maxTextures );
 		for ( uint32_t viewIndex = _begin; viewIndex <= _end; viewIndex++ )
 		{
-			imageInfos[viewIndex].sampler = m_sampler;
-			imageInfos[viewIndex].imageView = m_views[viewIndex];
-			imageInfos[viewIndex].imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+			imageInfos[ viewIndex ].sampler = m_sampler;
+			imageInfos[ viewIndex ].imageView = m_views[ viewIndex ];
+			imageInfos[ viewIndex ].imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
 
-			writeDescriptorSets[viewIndex].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-			writeDescriptorSets[viewIndex].dstSet = m_descriptorSets[viewIndex];
-			writeDescriptorSets[viewIndex].descriptorType = m_descriptorType;
-			writeDescriptorSets[viewIndex].dstBinding = 0;
-			writeDescriptorSets[viewIndex].pImageInfo = &imageInfos[viewIndex];
-			writeDescriptorSets[viewIndex].descriptorCount = 1;
+			writeDescriptorSets[ viewIndex ].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+			writeDescriptorSets[ viewIndex ].dstSet = m_descriptorSets[ viewIndex ];
+			writeDescriptorSets[ viewIndex ].descriptorType = m_descriptorType;
+			writeDescriptorSets[ viewIndex ].dstBinding = 0;
+			writeDescriptorSets[ viewIndex ].pImageInfo = &imageInfos[ viewIndex ];
+			writeDescriptorSets[ viewIndex ].descriptorCount = 1;
 		}
-		vkUpdateDescriptorSets( m_device.vkDevice, static_cast<uint32_t>( writeDescriptorSets.size() ), writeDescriptorSets.data(), 0, nullptr );
+		vkUpdateDescriptorSets( m_device.vkDevice, static_cast< uint32_t >( writeDescriptorSets.size() ), writeDescriptorSets.data(), 0, nullptr );
 	}
 }

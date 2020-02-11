@@ -5,47 +5,54 @@
 
 namespace fan
 {
-	REGISTER_TYPE_INFO(PointLight, TypeInfo::Flags::EDITOR_COMPONENT, "light/")
+	REGISTER_TYPE_INFO( PointLight, TypeInfo::Flags::EDITOR_COMPONENT, "light/" )
 
-	//================================================================================================================================
-	//================================================================================================================================
-	void PointLight::SetAmbiant(const Color _ambiant) {
+		//================================================================================================================================
+		//================================================================================================================================
+		void PointLight::SetAmbiant( const Color _ambiant )
+	{
 		m_pointLight->ambiant = _ambiant;
 		m_gameobject->SetFlags( m_gameobject->GetFlags() & Gameobject::Flag::OUTDATED_LIGHT );
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void PointLight::SetDiffuse(const Color _diffuse) {
+	void PointLight::SetDiffuse( const Color _diffuse )
+	{
 		m_pointLight->diffuse = _diffuse;
 		m_gameobject->SetFlags( m_gameobject->GetFlags() & Gameobject::Flag::OUTDATED_LIGHT );
-	}	
-	
+	}
+
 	//================================================================================================================================
 	//================================================================================================================================
-	void PointLight::SetSpecular(const Color _specular) {
+	void PointLight::SetSpecular( const Color _specular )
+	{
 		m_pointLight->specular = _specular;
 		m_gameobject->SetFlags( m_gameobject->GetFlags() & Gameobject::Flag::OUTDATED_LIGHT );
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void PointLight::SetAttenuation(const Attenuation _attenuation, const float _value) {
-		if (_value >= 0) {
-			m_pointLight->attenuation[_attenuation] = _value;
+	void PointLight::SetAttenuation( const Attenuation _attenuation, const float _value )
+	{
+		if ( _value >= 0 )
+		{
+			m_pointLight->attenuation[ _attenuation ] = _value;
 			m_gameobject->SetFlags( m_gameobject->GetFlags() & Gameobject::Flag::OUTDATED_LIGHT );
 		}
-		else {
-			Debug::Warning("Light attenuation cannot be negative");
+		else
+		{
+			Debug::Warning( "Light attenuation cannot be negative" );
 		}
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void PointLight::OnAttach() {
+	void PointLight::OnAttach()
+	{
 		Component::OnAttach();
 
-		ecsPointLight ** tmpLight = &const_cast<ecsPointLight*>( m_pointLight );
+		ecsPointLight** tmpLight = &const_cast< ecsPointLight* >( m_pointLight );
 		*tmpLight = m_gameobject->AddEcsComponent<ecsPointLight>();
 		m_pointLight->Init();
 
@@ -54,19 +61,20 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void PointLight::OnDetach() {
+	void PointLight::OnDetach()
+	{
 		Component::OnDetach();
 		m_gameobject->RemoveEcsComponent<ecsPointLight>();
-		m_gameobject->GetScene().onPointLightDetach.Emmit(this);
+		m_gameobject->GetScene().onPointLightDetach.Emmit( this );
 	}
-	
+
 	//================================================================================================================================
 	//================================================================================================================================
-	Color		PointLight::GetAmbiant() const {  return m_pointLight->ambiant; }
-	Color		PointLight::GetDiffuse() const {  return m_pointLight->diffuse; }
+	Color		PointLight::GetAmbiant() const { return m_pointLight->ambiant; }
+	Color		PointLight::GetDiffuse() const { return m_pointLight->diffuse; }
 	Color		PointLight::GetSpecular() const { return m_pointLight->specular; }
-	float		PointLight::GetAttenuation( const Attenuation _attenuation ) const { return m_pointLight->attenuation[_attenuation]; }
-	glm::vec3	PointLight::GetAttenuation() const { return glm::vec3( m_pointLight->attenuation[0], m_pointLight->attenuation[1], m_pointLight->attenuation[2] );	}
+	float		PointLight::GetAttenuation( const Attenuation _attenuation ) const { return m_pointLight->attenuation[ _attenuation ]; }
+	glm::vec3	PointLight::GetAttenuation() const { return glm::vec3( m_pointLight->attenuation[ 0 ], m_pointLight->attenuation[ 1 ], m_pointLight->attenuation[ 2 ] ); }
 
 	//================================================================================================================================
 	//================================================================================================================================
@@ -93,66 +101,72 @@ namespace fan
 				"constant + linear * d + quadratic * d*d  \n"
 				"(d=distance)" );
 			if ( ImGui::Button( "##constant attenuation" ) ) { SetAttenuation( Attenuation::CONSTANT, 0.f ); }	ImGui::SameLine();
-			if ( ImGui::DragFloat( "constant", &m_pointLight->attenuation[Attenuation::CONSTANT], 0.01f, 0.f, 100.f ) ) { m_gameobject->SetFlags( m_gameobject->GetFlags() & Gameobject::Flag::OUTDATED_LIGHT ); }
+			if ( ImGui::DragFloat( "constant", &m_pointLight->attenuation[ Attenuation::CONSTANT ], 0.01f, 0.f, 100.f ) ) { m_gameobject->SetFlags( m_gameobject->GetFlags() & Gameobject::Flag::OUTDATED_LIGHT ); }
 			if ( ImGui::Button( "##linear attenuation" ) ) { SetAttenuation( Attenuation::LINEAR, 0.f ); }	ImGui::SameLine();
-			if ( ImGui::DragFloat( "linear", &m_pointLight->attenuation[Attenuation::LINEAR], 0.001f, 0.f, 100.f ) ) { m_gameobject->SetFlags( m_gameobject->GetFlags() & Gameobject::Flag::OUTDATED_LIGHT ); }
+			if ( ImGui::DragFloat( "linear", &m_pointLight->attenuation[ Attenuation::LINEAR ], 0.001f, 0.f, 100.f ) ) { m_gameobject->SetFlags( m_gameobject->GetFlags() & Gameobject::Flag::OUTDATED_LIGHT ); }
 			if ( ImGui::Button( "##quadratic attenuation" ) ) { SetAttenuation( Attenuation::QUADRATIC, 0.f ); }	ImGui::SameLine();
-			if ( ImGui::DragFloat( "quadratic", &m_pointLight->attenuation[Attenuation::QUADRATIC], 0.0001f, 0.f, 100.f ) ) { m_gameobject->SetFlags( m_gameobject->GetFlags() & Gameobject::Flag::OUTDATED_LIGHT ); }
+			if ( ImGui::DragFloat( "quadratic", &m_pointLight->attenuation[ Attenuation::QUADRATIC ], 0.0001f, 0.f, 100.f ) ) { m_gameobject->SetFlags( m_gameobject->GetFlags() & Gameobject::Flag::OUTDATED_LIGHT ); }
 
 		} ImGui::PopItemWidth();
 
- 		// Sphere gizmo
+		// Sphere gizmo
 		float lightRange = GetLightRange();
-		if (lightRange > 0 ) {
+		if ( lightRange > 0 )
+		{
 			const btTransform transform = m_gameobject->GetTransform().GetBtTransform();
-			RendererDebug::Get().DebugSphere(transform, lightRange, 2, m_pointLight->diffuse);
+			RendererDebug::Get().DebugSphere( transform, lightRange, 2, m_pointLight->diffuse );
 		}
 
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	float PointLight::GetLightRange() const {
+	float PointLight::GetLightRange() const
+	{
 		const float epsilon = 0.1f;	// Value at which we consider the light value null
-		const float q = m_pointLight->attenuation[2];
-		const float s = m_pointLight->attenuation[0];
-		const float L = m_pointLight->attenuation[1];
-		if (q < epsilon) {	// first order linear differential equation
-			return ((1.f / epsilon) - s) / L;
+		const float q = m_pointLight->attenuation[ 2 ];
+		const float s = m_pointLight->attenuation[ 0 ];
+		const float L = m_pointLight->attenuation[ 1 ];
+		if ( q < epsilon )
+		{	// first order linear differential equation
+			return ( ( 1.f / epsilon ) - s ) / L;
 		}
-		else { // Second order linear differential equation
-			float delta = L * L - 4 * q*(s - 1 / epsilon);
-			float sqrtDelta = std::sqrtf(delta);
-			return (-L + sqrtDelta) / (2 * q);
+		else
+		{ // Second order linear differential equation
+			float delta = L * L - 4 * q * ( s - 1 / epsilon );
+			float sqrtDelta = std::sqrtf( delta );
+			return ( -L + sqrtDelta ) / ( 2 * q );
 		}
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	bool PointLight::Load( const Json & _json ) {
+	bool PointLight::Load( const Json& _json )
+	{
 
 		Serializable::LoadColor( _json, "ambiant", m_pointLight->ambiant );
 		Serializable::LoadColor( _json, "diffuse", m_pointLight->diffuse );
 		Serializable::LoadColor( _json, "specular", m_pointLight->specular );
 
 		btVector3 tmp;
-		Serializable::LoadVec3 ( _json, "attenuation", tmp );
-		m_pointLight->attenuation[0] = tmp[0];
-		m_pointLight->attenuation[1] = tmp[1];
-		m_pointLight->attenuation[2] = tmp[2];
+		Serializable::LoadVec3( _json, "attenuation", tmp );
+		m_pointLight->attenuation[ 0 ] = tmp[ 0 ];
+		m_pointLight->attenuation[ 1 ] = tmp[ 1 ];
+		m_pointLight->attenuation[ 2 ] = tmp[ 2 ];
 
 		return true;
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	bool PointLight::Save( Json & _json ) const {
+	bool PointLight::Save( Json& _json ) const
+	{
 		Serializable::SaveColor( _json, "ambiant", m_pointLight->ambiant );
 		Serializable::SaveColor( _json, "diffuse", m_pointLight->diffuse );
 		Serializable::SaveColor( _json, "specular", m_pointLight->specular );
-		Serializable::SaveVec3 ( _json, "attenuation", btVector3( m_pointLight->attenuation[0], m_pointLight->attenuation[1], m_pointLight->attenuation[2] ) );
+		Serializable::SaveVec3( _json, "attenuation", btVector3( m_pointLight->attenuation[ 0 ], m_pointLight->attenuation[ 1 ], m_pointLight->attenuation[ 2 ] ) );
 		Component::Save( _json );
-		
+
 		return true;
 	}
 }

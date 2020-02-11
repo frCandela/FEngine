@@ -3,7 +3,8 @@
 #include "core/fanCorePrecompiled.hpp"
 #include "core/fanSingleton.hpp"
 
-namespace fan {
+namespace fan
+{
 	//================================================================================================================================
 	//================================================================================================================================
 	class Keyboard : public Singleton<Keyboard>
@@ -11,19 +12,19 @@ namespace fan {
 		friend class Singleton < Keyboard >;
 		friend class Input;
 
-	public:		
+	public:
 		using Key = int;
 
-		static bool	IsKeyDown			( const Key _key );
-		static bool IsKeyPressed		( const Key _key );
-		static bool IsKeyReleased		( const Key _key );
-		static std::string GetKeyName	( const Key _key );		
+		static bool	IsKeyDown( const Key _key );
+		static bool IsKeyPressed( const Key _key );
+		static bool IsKeyReleased( const Key _key );
+		static std::string GetKeyName( const Key _key );
 		const std::vector<Key>& GetKeysList() const { return s_keysList; }
 
 	private:
 		Keyboard();
-		static void KeyCallback(GLFWwindow* _window, int _key, int _scancode, int _action, int _mods);
-		static void CharCallback(GLFWwindow* _window, unsigned int _c);
+		static void KeyCallback( GLFWwindow* _window, int _key, int _scancode, int _action, int _mods );
+		static void CharCallback( GLFWwindow* _window, unsigned int _c );
 
 		//Events
 		std::array< uint64_t, GLFW_KEY_LAST + 1 > m_keysPressed;
@@ -152,7 +153,7 @@ namespace fan {
 		static const Key MENU			= GLFW_KEY_MENU;
 		static const Key NONE			= GLFW_KEY_MENU + 1;
 
-		static const char * keyName[NONE + 1];
+		static const char* keyName[ NONE + 1 ];
 		static const std::vector<Key> s_keysList;
 	};
 }

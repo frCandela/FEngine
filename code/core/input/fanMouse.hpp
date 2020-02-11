@@ -3,7 +3,8 @@
 #include "core/fanCorePrecompiled.hpp"
 #include "core/fanSingleton.hpp"
 
-namespace fan {
+namespace fan
+{
 	//================================================================================================================================
 	//================================================================================================================================
 	class Mouse : public Singleton<Mouse>
@@ -16,25 +17,25 @@ namespace fan {
 
 		btVector2	GetDelta() { return m_delta; }
 		btVector2	GetDeltaScroll() { return m_deltaScroll; }
-		btVector2	GetScreenSpacePosition(const bool _localToGameWindow = true);
-		btVector2	GetPosition(const bool _localToGameWindow = true);
+		btVector2	GetScreenSpacePosition( const bool _localToGameWindow = true );
+		btVector2	GetPosition( const bool _localToGameWindow = true );
 
-		void SetCursor(const CursorState _state);
-		void LockCursor(const bool _state, const btVector2& _position = Get().m_position);
+		void SetCursor( const CursorState _state );
+		void LockCursor( const bool _state, const btVector2& _position = Get().m_position );
 
-		bool GetButtonDown(const int _GLFW_MOUSE_BUTTON, const bool _overrideUI = false);
-		bool GetButtonPressed(const int _GLFW_MOUSE_BUTTON, const bool _overrideUI = false);
-		bool GetButtonReleased(const int _GLFW_MOUSE_BUTTON, const bool _overrideUI = false);
+		bool GetButtonDown( const int _GLFW_MOUSE_BUTTON, const bool _overrideUI = false );
+		bool GetButtonPressed( const int _GLFW_MOUSE_BUTTON, const bool _overrideUI = false );
+		bool GetButtonReleased( const int _GLFW_MOUSE_BUTTON, const bool _overrideUI = false );
 
-		void Update(const btVector2& _windowOffset, const btVector2& _windowSize, const bool _windowHovered);
+		void Update( const btVector2& _windowOffset, const btVector2& _windowSize, const bool _windowHovered );
 
 	protected:
 		Mouse();
 
 	private:
-		static void MouseCallback(GLFWwindow* _window, double _x, double _y);
-		static void MouseButtonCallback(GLFWwindow* window, int button, int action, int mods);
-		static void ScrollCallback(GLFWwindow* window, double xoffset, double yoffset);
+		static void MouseCallback( GLFWwindow* _window, double _x, double _y );
+		static void MouseButtonCallback( GLFWwindow* window, int button, int action, int mods );
+		static void ScrollCallback( GLFWwindow* window, double xoffset, double yoffset );
 
 
 

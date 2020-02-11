@@ -2,16 +2,19 @@
 
 #include "core/fanCorePrecompiled.hpp"
 
-namespace fan {
+namespace fan
+{
 
 	//================================================================================================================================
 	//================================================================================================================================
-	struct TimePoint {
+	struct TimePoint
+	{
 		using TimePointImpl = std::chrono::time_point<std::chrono::high_resolution_clock>;
 
 		TimePoint( TimePointImpl _timepoint = TimePointImpl() ) : m_timePoint( _timepoint ) {}
 
-		static float SecondsBetween( const TimePoint & _t1, const TimePoint & _t2 ) {
+		static float SecondsBetween( const TimePoint& _t1, const TimePoint& _t2 )
+		{
 			return std::chrono::duration<float>( _t2.m_timePoint - _t1.m_timePoint ).count();
 		}
 
@@ -21,11 +24,12 @@ namespace fan {
 
 	//================================================================================================================================
 	//================================================================================================================================
-	class Clock {
+	class Clock
+	{
 	public:
 		Clock();
 		void		Reset();
-		TimePoint	Now() const ;
+		TimePoint	Now() const;
 		float		ElapsedSeconds() const;
 
 	private:

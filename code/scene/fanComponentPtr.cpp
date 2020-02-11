@@ -7,13 +7,13 @@
 
 namespace ImGui
 {
-	bool FanComponent( const char * _label, const uint32_t _typeID, fan::ComponentIDPtr * _ptr )
+	bool FanComponent( const char* _label, const uint32_t _typeID, fan::ComponentIDPtr* _ptr )
 	{
 		bool returnValue = false;
 
- 		fan::Component * component = **_ptr;
- 		const std::string name = component != nullptr ? ( ( std::string( component->GetName() ) + ": " ) + component->GetGameobject().GetName() ) : "null";
- 		const fan::Component * componentSample = fan::TypeInfo::Get().GetInstance<fan::Component>(_typeID );
+		fan::Component* component = **_ptr;
+		const std::string name = component != nullptr ? ( ( std::string( component->GetName() ) + ": " ) + component->GetGameobject().GetName() ) : "null";
+		const fan::Component* componentSample = fan::TypeInfo::Get().GetInstance<fan::Component>( _typeID );
 
 		// icon & set from selection
 		if ( ImGui::ButtonIcon( componentSample->GetIcon(), { 16,16 } ) )
@@ -30,7 +30,7 @@ namespace ImGui
 
 		// dragndrop
 		ImGui::FanBeginDragDropSourceComponent( component );
-		fan::Component * componentDrop = ImGui::FanBeginDragDropTargetComponent( _typeID );
+		fan::Component* componentDrop = ImGui::FanBeginDragDropTargetComponent( _typeID );
 		if ( componentDrop )
 		{
 			( *_ptr ) = fan::ComponentIDPtr( componentDrop );

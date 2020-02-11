@@ -4,18 +4,20 @@
 
 #include "scene/components/fanComponent.hpp"
 
-namespace fan {
+namespace fan
+{
 	//================================================================================================================================
 	//================================================================================================================================	
-	class Rigidbody : public Component {
+	class Rigidbody : public Component
+	{
 	public:
 		friend class PhysicsManager;
 
 		Signal<Rigidbody*, btPersistentManifold* const&> onContactStarted;
 		Signal<Rigidbody*, btPersistentManifold* const&> onContactEnded;
 
-		btRigidBody *			GetBtBody()	  { return m_rigidbody; }
-		btDefaultMotionState *  GetBtMotion() { return m_motionState; }
+		btRigidBody* GetBtBody() { return m_rigidbody; }
+		btDefaultMotionState* GetBtMotion() { return m_motionState; }
 
 		float	GetMass() const;
 		void	SetMass( const float _mass );
@@ -23,9 +25,9 @@ namespace fan {
 		void	SetKinematic();
 		bool	IsStatic() const;
 		bool	IsKinematic() const;
-		void	Activate();		
+		void	Activate();
 		bool	IsActive() const;
-		void	SetIgnoreCollisionCheck( const Rigidbody & _rb, const bool state );
+		void	SetIgnoreCollisionCheck( const Rigidbody& _rb, const bool state );
 
 		bool			IsDesactivationEnabled() const;
 		void			EnableDesactivation( const bool _enable );
@@ -34,28 +36,28 @@ namespace fan {
 		void			SetTransform( const btTransform& _transform ) { m_rigidbody->setWorldTransform( _transform ); }
 		inline void		ApplyCentralForce( const btVector3& _force ) { m_rigidbody->applyCentralForce( _force ); }
 
-		void SetCollisionShape( btCollisionShape * _collisionShape );
+		void SetCollisionShape( btCollisionShape* _collisionShape );
 
 		void OnGui() override;
 		ImGui::IconType GetIcon() const override { return ImGui::IconType::RIGIDBODY16; }
 
 		DECLARE_TYPE_INFO( Rigidbody, Component );
 	protected:
-		bool Load( const Json & _json ) override;
-		bool Save( Json & _json ) const override;
+		bool Load( const Json& _json ) override;
+		bool Save( Json& _json ) const override;
 
 		void OnAttach() override;
 		void OnDetach() override;
 
 	private:
-		btRigidBody * const				m_rigidbody =  nullptr;
-		btDefaultMotionState  * const	m_motionState = nullptr;
-		btCollisionShape*				m_colShape = nullptr;
+		btRigidBody* const				m_rigidbody = nullptr;
+		btDefaultMotionState* const	m_motionState = nullptr;
+		btCollisionShape* m_colShape = nullptr;
 
-		btCollisionShape *  FindCollisionShape();
+		btCollisionShape* FindCollisionShape();
 
 		// Editor
-		enum ComboState{ DYNAMIC = 0, KINEMATIC = 1, STATIC= 2 };		
+		enum ComboState { DYNAMIC = 0, KINEMATIC = 1, STATIC = 2 };
 	};
 
 }

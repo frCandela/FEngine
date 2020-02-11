@@ -12,7 +12,7 @@ namespace fan
 			: m_name( _name )
 		{}
 
-		void LoadFrom( sf::Packet & _packet ) override
+		void LoadFrom( sf::Packet& _packet ) override
 		{
 			_packet >> m_name;
 		}
@@ -20,7 +20,7 @@ namespace fan
 		inline const std::string& GetName() const { return m_name; }
 
 	private:
-		void ExportTo( sf::Packet & _packet ) const override
+		void ExportTo( sf::Packet& _packet ) const override
 		{
 			IPacket::ExportTo( _packet );
 			_packet << m_name;

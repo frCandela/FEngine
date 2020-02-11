@@ -17,6 +17,6 @@ namespace fan
 //================================================================================================================================
 namespace ImGui
 {
-	bool FanTexture( const char * _label, fan::TexturePtr * _ptr );
-	bool FanMesh( const char * _label, fan::MeshPtr * _ptr );
+	bool FanTexture( const char* _label, fan::TexturePtr* _ptr );
+	bool FanMesh( const char* _label, fan::MeshPtr* _ptr );
 }

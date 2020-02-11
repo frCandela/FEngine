@@ -4,7 +4,8 @@ layout (location = 0) in vec2 inPos;
 layout (location = 1) in vec2 inUV;
 layout (location = 2) in vec4 inColor;
 
-layout (push_constant) uniform PushConstants {
+layout (push_constant) uniform PushConstants 
+{
 	vec2 scale;
 	vec2 translate;
 } pushConstants;

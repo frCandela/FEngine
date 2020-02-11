@@ -6,7 +6,7 @@ namespace fan
 	//================================================================================================================================	
 	Joystick::Joystick()
 	{
-		glfwSetJoystickCallback(JoystickCallback);
+		glfwSetJoystickCallback( JoystickCallback );
 	}
 
 	//================================================================================================================================
@@ -14,7 +14,7 @@ namespace fan
 	bool Joystick::IsConnected( const JoystickID _GLFW_JOYSTICK ) const
 	{
 		assert( _GLFW_JOYSTICK <= NUM_JOYSTICK );
-		return glfwJoystickPresent(_GLFW_JOYSTICK) == GLFW_TRUE;
+		return glfwJoystickPresent( _GLFW_JOYSTICK ) == GLFW_TRUE;
 	}
 
 	//================================================================================================================================
@@ -42,15 +42,15 @@ namespace fan
 	//================================================================================================================================
 	//================================================================================================================================	
 	std::vector<float>  Joystick::GetAxes( const JoystickID _GLFW_JOYSTICK )
-	{		
+	{
 		int count;
 		const float* axes = glfwGetJoystickAxes( _GLFW_JOYSTICK, &count );
 
 		std::vector<float>  axesVec;
 		axesVec.reserve( count );
-		for (int axisIndex = 0; axisIndex < count ; axisIndex++)
+		for ( int axisIndex = 0; axisIndex < count; axisIndex++ )
 		{
-			axesVec.push_back(axes[axisIndex]);
+			axesVec.push_back( axes[ axisIndex ] );
 		}
 		return axesVec;
 	}
@@ -66,7 +66,7 @@ namespace fan
 		axesVec.reserve( count );
 		for ( int axisIndex = 0; axisIndex < count; axisIndex++ )
 		{
-			axesVec.push_back( buttons[axisIndex] == GLFW_PRESS );
+			axesVec.push_back( buttons[ axisIndex ] == GLFW_PRESS );
 		}
 		return axesVec;
 	}
@@ -83,10 +83,10 @@ namespace fan
 
 		for ( int axisIndex = 0; axisIndex < count; axisIndex++ )
 		{
-			float hatAxisX = 0.f ;
-			float hatAxisY = 0.f ;			
+			float hatAxisX = 0.f;
+			float hatAxisY = 0.f;
 
-			switch ( hats[axisIndex] )
+			switch ( hats[ axisIndex ] )
 			{
 			case GLFW_HAT_CENTERED:
 				break;
@@ -119,7 +119,7 @@ namespace fan
 				hatAxisY = -1.f;
 				break;
 			default:
-				assert(false);
+				assert( false );
 				break;
 			}
 
@@ -133,14 +133,14 @@ namespace fan
 	//================================================================================================================================	
 	std::string Joystick::GetName( const JoystickID _GLFW_JOYSTICK )
 	{
-		return glfwGetJoystickName(_GLFW_JOYSTICK);
+		return glfwGetJoystickName( _GLFW_JOYSTICK );
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================	
 	std::string Joystick::GetGamepadName( const JoystickID _GLFW_JOYSTICK )
 	{
-		return IsGamepad( _GLFW_JOYSTICK ) ? glfwGetGamepadName(_GLFW_JOYSTICK):  "";
+		return IsGamepad( _GLFW_JOYSTICK ) ? glfwGetGamepadName( _GLFW_JOYSTICK ) : "";
 	}
 
 	//================================================================================================================================
@@ -148,13 +148,13 @@ namespace fan
 	float Joystick::GetAxis( const JoystickID _GLFW_JOYSTICK, const Axis _GLFW_GAMEPAD_AXIS )
 	{
 		GLFWgamepadstate state;
-		if ( _GLFW_JOYSTICK < 0 || _GLFW_GAMEPAD_AXIS == AXIS_NONE || ! glfwGetGamepadState( _GLFW_JOYSTICK, &state ) )
+		if ( _GLFW_JOYSTICK < 0 || _GLFW_GAMEPAD_AXIS == AXIS_NONE || !glfwGetGamepadState( _GLFW_JOYSTICK, &state ) )
 		{
 			return 0.f;
 		}
 		else
 		{
-			return state.axes[_GLFW_GAMEPAD_AXIS];
+			return state.axes[ _GLFW_GAMEPAD_AXIS ];
 		}
 	}
 
@@ -165,7 +165,7 @@ namespace fan
 		GLFWgamepadstate state;
 		if ( _GLFW_JOYSTICK >= 0 && _GLFW_GAMEPAD_BUTTON >= 0 && glfwGetGamepadState( _GLFW_JOYSTICK, &state ) )
 		{
-			return state.buttons[_GLFW_GAMEPAD_BUTTON];
+			return state.buttons[ _GLFW_GAMEPAD_BUTTON ];
 		}
 		else
 		{
@@ -175,17 +175,17 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================	
-	std::string  Joystick::GetAxisName	( const Joystick::Axis _key )
+	std::string  Joystick::GetAxisName( const Joystick::Axis _key )
 	{
-		if ( _key >= 0 ){ return s_axisNames[_key];	}
-		else			{ return "               ";	}		
+		if ( _key >= 0 ) { return s_axisNames[ _key ]; }
+		else { return "               "; }
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================	
 	std::string  Joystick::GetButtonName( const Button _button )
 	{
-		if ( _button >= 0 ) { return s_buttonsNames[_button]; }
+		if ( _button >= 0 ) { return s_buttonsNames[ _button ]; }
 		else { return "               "; }
 	}
 
@@ -193,14 +193,14 @@ namespace fan
 	//================================================================================================================================	
 	void Joystick::JoystickCallback( int _jid, int _event )
 	{
-		Joystick::Get().onJoystickConnect.Emmit(_jid,  _event == GLFW_CONNECTED);
-		Debug::Log() << "Joystick " << _jid <<  (_event == GLFW_CONNECTED ? " connect" : " disconnect") << Debug::Endl();
+		Joystick::Get().onJoystickConnect.Emmit( _jid, _event == GLFW_CONNECTED );
+		Debug::Log() << "Joystick " << _jid << ( _event == GLFW_CONNECTED ? " connect" : " disconnect" ) << Debug::Endl();
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================	
-	const char * Joystick::s_axisNames[GLFW_GAMEPAD_AXIS_LAST + 1] =
-	{    "LEFT_X         "
+	const char* Joystick::s_axisNames[ GLFW_GAMEPAD_AXIS_LAST + 1 ] =
+	{ "LEFT_X         "
 		,"LEFT_Y         "
 		,"RIGHT_X        "
 		,"RIGHT_Y        "
@@ -208,8 +208,8 @@ namespace fan
 		,"RIGHT_TRIGGER  "
 	};
 
-	const char * Joystick::s_buttonsNames[GLFW_GAMEPAD_BUTTON_LAST + 1] = 
-	{    "A              "
+	const char* Joystick::s_buttonsNames[ GLFW_GAMEPAD_BUTTON_LAST + 1 ] =
+	{ "A              "
 		,"B              "
 		,"X              "
 		,"Y              "

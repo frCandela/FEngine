@@ -4,7 +4,8 @@
 #include "core/fanSingleton.hpp"
 #include "core/math/fanVector2.hpp"
 
-namespace fan {
+namespace fan
+{
 	class InputManager;
 
 	//================================================================================================================================
@@ -14,10 +15,10 @@ namespace fan {
 		friend class Singleton < Input>;
 
 	public:
-		void			Setup(GLFWwindow * _window);
+		void			Setup( GLFWwindow* _window );
 		void			NewFrame();
-		GLFWwindow *	Window()	 { return m_window; }
-		btVector2		WindowSizeF() { return btVector2((float)m_windowSize.x, (float)m_windowSize.y); }
+		GLFWwindow*		Window() { return m_window; }
+		btVector2		WindowSizeF() { return btVector2( ( float ) m_windowSize.x, ( float ) m_windowSize.y ); }
 		glm::ivec2		WindowSize() { return m_windowSize; }
 		uint64_t		FrameCount() { return m_count; }
 		InputManager&	Manager() { return *m_eventManager; }
@@ -25,12 +26,12 @@ namespace fan {
 	private:
 		Input();
 
-		GLFWwindow *	m_window;
+		GLFWwindow* m_window;
 		glm::ivec2		m_windowSize;
 		uint64_t		m_count;
 
-		InputManager*	m_eventManager;
+		InputManager* m_eventManager;
 
-		 static void	WindowSizeCallback(GLFWwindow* window, int width, int height);
-	};	
+		static void	WindowSizeCallback( GLFWwindow* window, int width, int height );
+	};
 }

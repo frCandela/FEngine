@@ -11,18 +11,20 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	class MainMenuBar {
+	class MainMenuBar
+	{
 	private:
 		//================================================================
 		//================================================================
-		struct FPSCounter {
+		struct FPSCounter
+		{
 			int count = 0;
 			float sum = 0.f;
 			float fps = 0.f;
 		};
 
 	public:
-		enum CurrentScene{ CLIENTS, SERVER };
+		enum CurrentScene { CLIENTS, SERVER };
 		Signal< int > onSetScene;
 
 		Signal< std::string > onSaveScene;
@@ -35,10 +37,10 @@ namespace fan
 		MainMenuBar( EditorSelection& _editorSelection );
 		~MainMenuBar();
 
-		void SetScene( Scene * _scene  )			{ m_scene		= _scene;  }
-		void SetGrid(  EditorGrid * _editorGrid  )	{ m_editorGrid	= _editorGrid; }
+		void SetScene( Scene* _scene ) { m_scene = _scene; }
+		void SetGrid( EditorGrid* _editorGrid ) { m_editorGrid = _editorGrid; }
 
-		void SetWindows( std::vector< EditorWindow * > _editorWindows );
+		void SetWindows( std::vector< EditorWindow* > _editorWindows );
 
 		void Draw();
 
@@ -46,13 +48,13 @@ namespace fan
 		bool ShowAABB() const { return m_showAABB; }
 		bool ShowWireframe() const { return m_showWireframe; }
 		bool ShowNormals() const { return m_showNormals; }
-	
+
 	private:
-		Scene * m_scene;
-		EditorGrid * m_editorGrid;
+		Scene* m_scene;
+		EditorGrid* m_editorGrid;
 		EditorSelection& m_editorSelection;
 
-		std::vector< EditorWindow * > m_editorWindows;
+		std::vector< EditorWindow* > m_editorWindows;
 
 		CurrentScene m_currentScene = CurrentScene::CLIENTS;
 

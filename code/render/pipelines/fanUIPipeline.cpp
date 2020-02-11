@@ -8,7 +8,7 @@ namespace fan
 {
 	//================================================================================================================
 	//================================================================================================================================
-	UIPipeline::UIPipeline( Device& _device, DescriptorTextures*& _textures, DescriptorSampler*& _sampler  ) :
+	UIPipeline::UIPipeline( Device& _device, DescriptorTextures*& _textures, DescriptorSampler*& _sampler ) :
 		Pipeline( _device )
 		, m_textures( _textures )
 		, m_sampler( _sampler )
@@ -40,7 +40,7 @@ namespace fan
 			m_transformDescriptor->GetSet( _indexFrame )
 		};
 		std::vector<uint32_t> dynamicOffsets = {
-			 _indexOffset  * static_cast<uint32_t>( m_dynamicUniformsVert.Alignment() )
+			 _indexOffset * static_cast< uint32_t >( m_dynamicUniformsVert.Alignment() )
 		};
 
 		vkCmdBindDescriptorSets(
@@ -48,9 +48,9 @@ namespace fan
 			VK_PIPELINE_BIND_POINT_GRAPHICS,
 			m_pipelineLayout,
 			0,
-			static_cast<uint32_t>( descriptors.size() ),
+			static_cast< uint32_t >( descriptors.size() ),
 			descriptors.data(),
-			static_cast<uint32_t>( dynamicOffsets.size() ),
+			static_cast< uint32_t >( dynamicOffsets.size() ),
 			dynamicOffsets.data()
 		);
 
@@ -62,7 +62,7 @@ namespace fan
 	{
 		m_bindingDescription = UIVertex::GetBindingDescription();
 		m_attributeDescriptions = UIVertex::GetAttributeDescriptions();
-		
+
 		m_descriptorSetLayouts = {
 			 m_transformDescriptor->GetLayout()
 			,m_textures->GetLayout()
@@ -74,7 +74,7 @@ namespace fan
 	//================================================================================================================================
 	void UIPipeline::UpdateUniformBuffers( const size_t _index )
 	{
-		m_transformDescriptor->SetBinding( 0, _index, &m_dynamicUniformsVert[0], m_dynamicUniformsVert.Alignment() * m_dynamicUniformsVert.Size(),		0 );
+		m_transformDescriptor->SetBinding( 0, _index, &m_dynamicUniformsVert[ 0 ], m_dynamicUniformsVert.Alignment() * m_dynamicUniformsVert.Size(), 0 );
 	}
 
 	//================================================================================================================================
@@ -82,7 +82,7 @@ namespace fan
 	void UIPipeline::CreateDescriptors( const size_t _numSwapchainImages )
 	{
 		m_transformDescriptor = new Descriptor( m_device, _numSwapchainImages );
-		m_transformDescriptor->SetDynamicUniformBinding ( VK_SHADER_STAGE_VERTEX_BIT,	m_dynamicUniformsVert.Size(), m_dynamicUniformsVert.Alignment() );
+		m_transformDescriptor->SetDynamicUniformBinding( VK_SHADER_STAGE_VERTEX_BIT, m_dynamicUniformsVert.Size(), m_dynamicUniformsVert.Alignment() );
 		m_transformDescriptor->Create();
 	}
 
@@ -91,7 +91,7 @@ namespace fan
 	void UIPipeline::ResizeDynamicDescriptors( const size_t _newSize )
 	{
 		m_dynamicUniformsVert.Resize( _newSize );
-		m_transformDescriptor->SetDynamicUniformBinding ( VK_SHADER_STAGE_VERTEX_BIT, m_dynamicUniformsVert.Size(), m_dynamicUniformsVert.Alignment(), 1 );
+		m_transformDescriptor->SetDynamicUniformBinding( VK_SHADER_STAGE_VERTEX_BIT, m_dynamicUniformsVert.Size(), m_dynamicUniformsVert.Alignment(), 1 );
 	}
 
 }

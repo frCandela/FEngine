@@ -1,6 +1,7 @@
 #include "scene/ecs/fanECSComponents.hpp"
 
-namespace fan {
+namespace fan 
+{
 	const char * ecsTranform::s_name					= "Tranform    ";
 	const char * ecsPosition::s_name					= "Position    ";
 	const char * ecsRotation::s_name					= "Rotation    ";

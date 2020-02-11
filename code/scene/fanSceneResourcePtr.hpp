@@ -9,7 +9,7 @@ namespace fan
 	class Prefab;
 
 	using GameobjectPtr = ResourcePtr<Gameobject>;
-	using PrefabPtr =  ResourcePtr<Prefab>;
+	using PrefabPtr = ResourcePtr<Prefab>;
 }
 
 //================================================================================================================================
@@ -17,6 +17,6 @@ namespace fan
 //================================================================================================================================
 namespace ImGui
 {
-	bool FanGameobject( const char * _label, fan::GameobjectPtr * _ptr );
-	bool FanPrefab( const char * _label,  fan::PrefabPtr * _ptr );
+	bool FanGameobject( const char* _label, fan::GameobjectPtr* _ptr );
+	bool FanPrefab( const char* _label, fan::PrefabPtr* _ptr );
 }

@@ -2,18 +2,20 @@
 #include "render/core/fanDevice.hpp"
 #include "render/core/fanShader.hpp"
 
-namespace fan {
+namespace fan
+{
 	//================================================================================================================================
 	//================================================================================================================================
 	Pipeline::Pipeline( Device& _device ) :
-		m_device(_device)
+		m_device( _device )
 	{
 
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	Pipeline::~Pipeline() {
+	Pipeline::~Pipeline()
+	{
 		delete m_fragmentShader;
 		delete m_vertexShader;
 		DeletePipeline();
@@ -21,7 +23,8 @@ namespace fan {
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void Pipeline::Init( VkRenderPass _renderPass, const VkExtent2D _extent, const std::string _vertShaderPath, const std::string _fragShaderPath ) {
+	void Pipeline::Init( VkRenderPass _renderPass, const VkExtent2D _extent, const std::string _vertShaderPath, const std::string _fragShaderPath )
+	{
 		m_renderPass = _renderPass;
 		m_extent = _extent;
 		m_fragShaderPath = _fragShaderPath;
@@ -30,14 +33,16 @@ namespace fan {
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void Pipeline::Create() {
+	void Pipeline::Create()
+	{
 		CreateShaders();
 		CreatePipeline();
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	bool Pipeline::CreatePipeline() {
+	bool Pipeline::CreatePipeline()
+	{
 		PreConfigurePipeline();
 		ConfigurePipeline();
 
@@ -48,40 +53,41 @@ namespace fan {
 		vertexInputStateCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
 		vertexInputStateCreateInfo.pNext = nullptr;
 		vertexInputStateCreateInfo.flags = 0;
-		vertexInputStateCreateInfo.vertexBindingDescriptionCount = static_cast<uint32_t>( m_bindingDescription.size() );
+		vertexInputStateCreateInfo.vertexBindingDescriptionCount = static_cast< uint32_t >( m_bindingDescription.size() );
 		vertexInputStateCreateInfo.pVertexBindingDescriptions = m_bindingDescription.data();
-		vertexInputStateCreateInfo.vertexAttributeDescriptionCount = static_cast<uint32_t>( m_attributeDescriptions.size() );
+		vertexInputStateCreateInfo.vertexAttributeDescriptionCount = static_cast< uint32_t >( m_attributeDescriptions.size() );
 		vertexInputStateCreateInfo.pVertexAttributeDescriptions = m_attributeDescriptions.data();
 
 		VkPipelineViewportStateCreateInfo viewportStateCreateInfo = {};
 		viewportStateCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_VIEWPORT_STATE_CREATE_INFO;
 		viewportStateCreateInfo.pNext = nullptr;
 		viewportStateCreateInfo.flags = 0;
-		viewportStateCreateInfo.viewportCount = static_cast<uint32_t> ( m_viewports.size() );
+		viewportStateCreateInfo.viewportCount = static_cast< uint32_t > ( m_viewports.size() );
 		viewportStateCreateInfo.pViewports = m_viewports.data();
-		viewportStateCreateInfo.scissorCount = static_cast<uint32_t> ( m_scissors.size() );;
+		viewportStateCreateInfo.scissorCount = static_cast< uint32_t > ( m_scissors.size() );;
 		viewportStateCreateInfo.pScissors = m_scissors.data();
 
-		m_colorBlendStateCreateInfo.attachmentCount = static_cast<uint32_t>( m_attachmentBlendStates.size() );
+		m_colorBlendStateCreateInfo.attachmentCount = static_cast< uint32_t >( m_attachmentBlendStates.size() );
 		m_colorBlendStateCreateInfo.pAttachments = m_attachmentBlendStates.data();
 
 		VkPipelineDynamicStateCreateInfo dynamicStateCreateInfo = {};
 		dynamicStateCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_DYNAMIC_STATE_CREATE_INFO;
 		dynamicStateCreateInfo.pNext = nullptr;
 		dynamicStateCreateInfo.flags = 0;
-		dynamicStateCreateInfo.dynamicStateCount = static_cast<uint32_t>( m_dynamicStates.size() );
+		dynamicStateCreateInfo.dynamicStateCount = static_cast< uint32_t >( m_dynamicStates.size() );
 		dynamicStateCreateInfo.pDynamicStates = m_dynamicStates.data();
 
 		VkPipelineLayoutCreateInfo pipelineLayoutCreateInfo = {};
 		pipelineLayoutCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
 		pipelineLayoutCreateInfo.pNext = nullptr;
 		pipelineLayoutCreateInfo.flags = 0;
-		pipelineLayoutCreateInfo.setLayoutCount = static_cast<uint32_t>( m_descriptorSetLayouts.size() );
+		pipelineLayoutCreateInfo.setLayoutCount = static_cast< uint32_t >( m_descriptorSetLayouts.size() );
 		pipelineLayoutCreateInfo.pSetLayouts = m_descriptorSetLayouts.data();
-		pipelineLayoutCreateInfo.pushConstantRangeCount = static_cast<uint32_t>( m_pushConstantRanges.size() );
+		pipelineLayoutCreateInfo.pushConstantRangeCount = static_cast< uint32_t >( m_pushConstantRanges.size() );
 		pipelineLayoutCreateInfo.pPushConstantRanges = m_pushConstantRanges.data();
 
-		if ( vkCreatePipelineLayout( m_device.vkDevice, &pipelineLayoutCreateInfo, nullptr, &m_pipelineLayout ) != VK_SUCCESS ) {
+		if ( vkCreatePipelineLayout( m_device.vkDevice, &pipelineLayoutCreateInfo, nullptr, &m_pipelineLayout ) != VK_SUCCESS )
+		{
 			Debug::Error( "Could not allocate command pool." );
 			return false;
 		}
@@ -96,7 +102,7 @@ namespace fan {
 		graphicsPipelineCreateInfo.sType = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO;
 		graphicsPipelineCreateInfo.pNext = nullptr;
 		graphicsPipelineCreateInfo.flags = 0;
-		graphicsPipelineCreateInfo.stageCount = static_cast<uint32_t>( shaderStages.size() );
+		graphicsPipelineCreateInfo.stageCount = static_cast< uint32_t >( shaderStages.size() );
 		graphicsPipelineCreateInfo.pStages = shaderStages.data();
 		graphicsPipelineCreateInfo.pVertexInputState = &vertexInputStateCreateInfo;
 		graphicsPipelineCreateInfo.pInputAssemblyState = &m_inputAssemblyStateCreateInfo;
@@ -120,7 +126,8 @@ namespace fan {
 			&graphicsPipelineCreateInfo,
 			nullptr,
 			&m_pipeline
-		) != VK_SUCCESS ) {
+			) != VK_SUCCESS )
+		{
 			Debug::Error( "Could not allocate graphicsPipelines." );
 			return false;
 		}
@@ -131,7 +138,8 @@ namespace fan {
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void Pipeline::PreConfigurePipeline() {
+	void Pipeline::PreConfigurePipeline()
+	{
 		m_vertshaderStageCreateInfos.sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
 		m_vertshaderStageCreateInfos.pNext = nullptr;
 		m_vertshaderStageCreateInfos.flags = 0;
@@ -158,16 +166,16 @@ namespace fan {
 		m_inputAssemblyStateCreateInfo.primitiveRestartEnable = VK_FALSE;
 
 		m_viewports.resize( 1 );
-		m_viewports[0].x = 0.f;
-		m_viewports[0].y = 0.f;
-		m_viewports[0].width = static_cast<float> (  m_extent.width );
-		m_viewports[0].height = static_cast<float> ( m_extent.height );
-		m_viewports[0].minDepth = 0.0f;
-		m_viewports[0].maxDepth = 1.0f;
+		m_viewports[ 0 ].x = 0.f;
+		m_viewports[ 0 ].y = 0.f;
+		m_viewports[ 0 ].width = static_cast< float > ( m_extent.width );
+		m_viewports[ 0 ].height = static_cast< float > ( m_extent.height );
+		m_viewports[ 0 ].minDepth = 0.0f;
+		m_viewports[ 0 ].maxDepth = 1.0f;
 
 		m_scissors.resize( 1 );
- 		m_scissors[0].offset = { 0, 0 };
- 		m_scissors[0].extent = m_extent;
+		m_scissors[ 0 ].offset = { 0, 0 };
+		m_scissors[ 0 ].extent = m_extent;
 
 		m_rasterizationStateCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_RASTERIZATION_STATE_CREATE_INFO;
 		m_rasterizationStateCreateInfo.pNext = nullptr;
@@ -207,26 +215,26 @@ namespace fan {
 		//depthStencilStateCreateInfo.maxDepthBounds=;
 
 		m_attachmentBlendStates.resize( 1 );
-		m_attachmentBlendStates[0].blendEnable = VK_TRUE;
-		m_attachmentBlendStates[0].srcColorBlendFactor = VK_BLEND_FACTOR_SRC_ALPHA;
-		m_attachmentBlendStates[0].dstColorBlendFactor = VK_BLEND_FACTOR_ONE_MINUS_SRC_ALPHA;
-		m_attachmentBlendStates[0].colorBlendOp = VK_BLEND_OP_ADD;
-		m_attachmentBlendStates[0].srcAlphaBlendFactor = VK_BLEND_FACTOR_ONE;
-		m_attachmentBlendStates[0].dstAlphaBlendFactor = VK_BLEND_FACTOR_ZERO;
-		m_attachmentBlendStates[0].alphaBlendOp = VK_BLEND_OP_ADD;
-		m_attachmentBlendStates[0].colorWriteMask = VK_COLOR_COMPONENT_R_BIT | VK_COLOR_COMPONENT_G_BIT | VK_COLOR_COMPONENT_B_BIT | VK_COLOR_COMPONENT_A_BIT;
+		m_attachmentBlendStates[ 0 ].blendEnable = VK_TRUE;
+		m_attachmentBlendStates[ 0 ].srcColorBlendFactor = VK_BLEND_FACTOR_SRC_ALPHA;
+		m_attachmentBlendStates[ 0 ].dstColorBlendFactor = VK_BLEND_FACTOR_ONE_MINUS_SRC_ALPHA;
+		m_attachmentBlendStates[ 0 ].colorBlendOp = VK_BLEND_OP_ADD;
+		m_attachmentBlendStates[ 0 ].srcAlphaBlendFactor = VK_BLEND_FACTOR_ONE;
+		m_attachmentBlendStates[ 0 ].dstAlphaBlendFactor = VK_BLEND_FACTOR_ZERO;
+		m_attachmentBlendStates[ 0 ].alphaBlendOp = VK_BLEND_OP_ADD;
+		m_attachmentBlendStates[ 0 ].colorWriteMask = VK_COLOR_COMPONENT_R_BIT | VK_COLOR_COMPONENT_G_BIT | VK_COLOR_COMPONENT_B_BIT | VK_COLOR_COMPONENT_A_BIT;
 
 		m_colorBlendStateCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_COLOR_BLEND_STATE_CREATE_INFO;
 		m_colorBlendStateCreateInfo.pNext = nullptr;
 		m_colorBlendStateCreateInfo.flags = 0;
 		m_colorBlendStateCreateInfo.logicOpEnable = VK_FALSE;
 		m_colorBlendStateCreateInfo.logicOp = VK_LOGIC_OP_COPY;
-		m_colorBlendStateCreateInfo.attachmentCount = static_cast<uint32_t>( m_attachmentBlendStates.size() );
+		m_colorBlendStateCreateInfo.attachmentCount = static_cast< uint32_t >( m_attachmentBlendStates.size() );
 		m_colorBlendStateCreateInfo.pAttachments = m_attachmentBlendStates.data();
-		m_colorBlendStateCreateInfo.blendConstants[0] = 0.0f;
-		m_colorBlendStateCreateInfo.blendConstants[1] = 0.0f;
-		m_colorBlendStateCreateInfo.blendConstants[2] = 0.0f;
-		m_colorBlendStateCreateInfo.blendConstants[3] = 0.0f;
+		m_colorBlendStateCreateInfo.blendConstants[ 0 ] = 0.0f;
+		m_colorBlendStateCreateInfo.blendConstants[ 1 ] = 0.0f;
+		m_colorBlendStateCreateInfo.blendConstants[ 2 ] = 0.0f;
+		m_colorBlendStateCreateInfo.blendConstants[ 3 ] = 0.0f;
 
 		m_dynamicStates = { VK_DYNAMIC_STATE_VIEWPORT, VK_DYNAMIC_STATE_SCISSOR };
 		m_descriptorSetLayouts.clear();
@@ -235,13 +243,15 @@ namespace fan {
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void Pipeline::Resize( const VkExtent2D _extent ) {
+	void Pipeline::Resize( const VkExtent2D _extent )
+	{
 		m_extent = _extent;
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void Pipeline::ReloadShaders() {
+	void Pipeline::ReloadShaders()
+	{
 		DeletePipeline();
 		m_vertexShader->Reload();
 		m_fragmentShader->Reload();
@@ -250,25 +260,27 @@ namespace fan {
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void Pipeline::Bind( VkCommandBuffer _commandBuffer, const size_t /*_index*/ ) {
-		m_viewports[0].x = 0.f;
-		m_viewports[0].y = 0.f;
-		m_viewports[0].width = static_cast<float> ( m_extent.width );
-		m_viewports[0].height = static_cast<float> ( m_extent.height );
-		m_viewports[0].minDepth = 0.0f;
-		m_viewports[0].maxDepth = 1.0f;
+	void Pipeline::Bind( VkCommandBuffer _commandBuffer, const size_t /*_index*/ )
+	{
+		m_viewports[ 0 ].x = 0.f;
+		m_viewports[ 0 ].y = 0.f;
+		m_viewports[ 0 ].width = static_cast< float > ( m_extent.width );
+		m_viewports[ 0 ].height = static_cast< float > ( m_extent.height );
+		m_viewports[ 0 ].minDepth = 0.0f;
+		m_viewports[ 0 ].maxDepth = 1.0f;
 
-		m_scissors[0].offset = { 0, 0 };
-		m_scissors[0].extent = m_extent;
+		m_scissors[ 0 ].offset = { 0, 0 };
+		m_scissors[ 0 ].extent = m_extent;
 
 		vkCmdBindPipeline( _commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, m_pipeline );
-		vkCmdSetScissor( _commandBuffer, 0, static_cast<uint32_t>( m_scissors.size() ), m_scissors.data() );
-		vkCmdSetViewport( _commandBuffer, 0, static_cast<uint32_t>( m_viewports.size()), m_viewports.data() );
+		vkCmdSetScissor( _commandBuffer, 0, static_cast< uint32_t >( m_scissors.size() ), m_scissors.data() );
+		vkCmdSetViewport( _commandBuffer, 0, static_cast< uint32_t >( m_viewports.size() ), m_viewports.data() );
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void Pipeline::CreateShaders() {
+	void Pipeline::CreateShaders()
+	{
 		assert( m_fragShaderPath != "" );
 		assert( m_vertShaderPath != "" );
 
@@ -284,13 +296,16 @@ namespace fan {
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void Pipeline::DeletePipeline() {
-		if ( m_pipelineLayout != VK_NULL_HANDLE ) {
+	void Pipeline::DeletePipeline()
+	{
+		if ( m_pipelineLayout != VK_NULL_HANDLE )
+		{
 			vkDestroyPipelineLayout( m_device.vkDevice, m_pipelineLayout, nullptr );
 			m_pipelineLayout = VK_NULL_HANDLE;
 		}
 
-		if ( m_pipeline != VK_NULL_HANDLE ) {
+		if ( m_pipeline != VK_NULL_HANDLE )
+		{
 			vkDestroyPipeline( m_device.vkDevice, m_pipeline, nullptr );
 			m_pipeline = VK_NULL_HANDLE;
 		}

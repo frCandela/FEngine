@@ -3,20 +3,21 @@
 #include "core/fanCorePrecompiled.hpp"
 #include "core/math/shapes/fanTriangle.hpp"
 
-namespace fan {
+namespace fan
+{
 	//================================================================================================================================
 	//================================================================================================================================
 	struct Cube : public Shape
 	{
-		Cube(const btVector3 _position, const float _halfSize);
+		Cube( const btVector3 _position, const float _halfSize );
 
-		void SetPosition(const btVector3 _pos);
+		void SetPosition( const btVector3 _pos );
 
 		const		std::array< Triangle, 12 >& GetTriangles() const { return m_triangles; }
 		float		GetHalfSize() const { return m_halfSize; }
 		btVector3	GetPosition() const { return m_position; }
 
-		virtual bool RayCast(const btVector3 _origin, const btVector3 _direction, btVector3& outIntersection) const override;
+		virtual bool RayCast( const btVector3 _origin, const btVector3 _direction, btVector3& outIntersection ) const override;
 
 	private:
 		std::array< Triangle, 12 > m_triangles;

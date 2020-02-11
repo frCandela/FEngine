@@ -22,52 +22,53 @@ namespace fan
 	//================================================================================================================================
 	// Loads & references image and mesh the resources of the engine
 	//================================================================================================================================
-	class ResourceManager : public Singleton<ResourceManager> {
+	class ResourceManager : public Singleton<ResourceManager>
+	{
 	public:
 		friend class Singleton<ResourceManager>;
 
 		void Init( Device* _device );
 		void Delete();
 
-		Mesh *		FindMesh	( const std::string& _path );
-		Texture *	FindTexture	( const std::string& _path);
+		Mesh* FindMesh( const std::string& _path );
+		Texture* FindTexture( const std::string& _path );
 
-		Mesh *		LoadMesh	( const std::string& _path );		
-		Texture *	LoadTexture	( const std::string& _path);
+		Mesh* LoadMesh( const std::string& _path );
+		Texture* LoadTexture( const std::string& _path );
 
 		bool IsModified() const { return m_modified; }
 		void SetUnmodified() { m_modified = false; }
 
-		const std::set< Mesh * >&			GetMeshList() const { return m_meshList; }
-		const std::vector< Texture * > &	GetTextures() const { return m_textures; }
+		const std::set< Mesh* >& GetMeshList() const { return m_meshList; }
+		const std::vector< Texture* >& GetTextures() const { return m_textures; }
 
 	private:
-		Device * m_device;
+		Device* m_device;
 
-		std::map< std::string, Prefab * > m_prefabs;
-		std::set< Mesh * >		 m_meshList;
-		std::set< UIMesh * >	 m_uiMeshList;
-		std::vector< Texture * > m_textures;
+		std::map< std::string, Prefab* > m_prefabs;
+		std::set< Mesh* >		 m_meshList;
+		std::set< UIMesh* >	 m_uiMeshList;
+		std::vector< Texture* > m_textures;
 		bool					 m_modified = false;
 
-		void RegisterMesh( Mesh * _mesh );
-		void RegisterUIMesh( UIMesh * _mesh );
+		void RegisterMesh( Mesh* _mesh );
+		void RegisterUIMesh( UIMesh* _mesh );
 
 		// Vulkan data generation
-		void OnGenerateUIMesh( UIMesh * _mesh );
-		void OnGenerateMesh( Mesh * _mesh );
-		void OnGenerateTexture( Texture * _texture );
+		void OnGenerateUIMesh( UIMesh* _mesh );
+		void OnGenerateMesh( Mesh* _mesh );
+		void OnGenerateTexture( Texture* _texture );
 
 		// Vulkan data generation
-		void OnDeleteUIMesh( UIMesh * _mesh );
-		void OnDeleteMesh( Mesh * _mesh );
-		void OnDeleteTexture( Texture * _texture );
+		void OnDeleteUIMesh( UIMesh* _mesh );
+		void OnDeleteMesh( Mesh* _mesh );
+		void OnDeleteTexture( Texture* _texture );
 
 		std::string CleanPath( const std::string& _path );
 
 		// Callbacks
-		void OnResolveTexturePtr( TexturePtr * _ptr );
-		void OnResolveMeshPtr( MeshPtr * _ptr );
-		void OnResolvePrefabPtr( PrefabPtr * _ptr );
+		void OnResolveTexturePtr( TexturePtr* _ptr );
+		void OnResolveMeshPtr( MeshPtr* _ptr );
+		void OnResolvePrefabPtr( PrefabPtr* _ptr );
 	};
 }

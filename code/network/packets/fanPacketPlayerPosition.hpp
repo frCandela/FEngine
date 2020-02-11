@@ -9,11 +9,11 @@ namespace fan
 	struct PacketPing : IPacket<PacketType::PING>
 	{
 
-		PacketPing( const float	_time = -1.f) 
+		PacketPing( const float	_time = -1.f )
 			: m_time( _time )
 		{}
 
-		void LoadFrom( sf::Packet & _packet ) override
+		void LoadFrom( sf::Packet& _packet ) override
 		{
 			_packet >> m_time;
 		}
@@ -21,7 +21,7 @@ namespace fan
 		inline float	GetTime() { return m_time; }
 
 	protected:
-		void ExportTo( sf::Packet & _packet ) const override
+		void ExportTo( sf::Packet& _packet ) const override
 		{
 			IPacket::ExportTo( _packet );
 			_packet << m_time;

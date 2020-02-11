@@ -14,24 +14,24 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	Prefab* PrefabManager::FindPrefab(const std::string& _path)
+	Prefab* PrefabManager::FindPrefab( const std::string& _path )
 	{
-		std::string path = CleanPath(_path);
-		auto it = m_prefabs.find(path);
+		std::string path = CleanPath( _path );
+		auto it = m_prefabs.find( path );
 		return  it != m_prefabs.end() ? it->second : nullptr;
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	Prefab* PrefabManager::LoadPrefab(const std::string& _path)
+	Prefab* PrefabManager::LoadPrefab( const std::string& _path )
 	{
-		if (_path.empty()) { return nullptr; }
+		if ( _path.empty() ) { return nullptr; }
 
-			// Load
-			Prefab* prefab = new Prefab();
-		if (prefab->LoadFromFile(CleanPath(_path)))
+		// Load
+		Prefab* prefab = new Prefab();
+		if ( prefab->LoadFromFile( CleanPath( _path ) ) )
 		{
-			RegisterPrefab(prefab);
+			RegisterPrefab( prefab );
 			return prefab;
 		}
 		delete prefab;
@@ -40,10 +40,10 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void PrefabManager::RegisterPrefab(Prefab* _prefab)
+	void PrefabManager::RegisterPrefab( Prefab* _prefab )
 	{
 		std::string path = CleanPath( _prefab->GetPath() );
-		assert( m_prefabs.find(path) == m_prefabs.end() );
+		assert( m_prefabs.find( path ) == m_prefabs.end() );
 		m_prefabs[ path ] = _prefab;
 	}
 
@@ -51,7 +51,7 @@ namespace fan
 	// the / is dead, long live the \ 
 	// @todo refacto this with other CleanPath methods (resourcemanager)
 	//================================================================================================================================
-	std::string PrefabManager::CleanPath(const std::string& _path)
+	std::string PrefabManager::CleanPath( const std::string& _path )
 	{
 		std::filesystem::path path = _path;
 		path.make_preferred();
@@ -61,16 +61,16 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void PrefabManager::OnResolvePrefabPtr(PrefabPtr* _ptr)
+	void PrefabManager::OnResolvePrefabPtr( PrefabPtr* _ptr )
 	{
-// 		Prefab * prefab = FindPrefab( _ptr->GetID() );@tmp
-// 		if ( prefab == nullptr )
-// 		{
-// 			prefab = LoadPrefab( _ptr->GetID() );
-// 		}
-// 		if ( prefab )
-// 		{
-// 			*_ptr = PrefabPtr( prefab, prefab->GetPath() );
-// 		}
+		// 		Prefab * prefab = FindPrefab( _ptr->GetID() );@tmp
+		// 		if ( prefab == nullptr )
+		// 		{
+		// 			prefab = LoadPrefab( _ptr->GetID() );
+		// 		}
+		// 		if ( prefab )
+		// 		{
+		// 			*_ptr = PrefabPtr( prefab, prefab->GetPath() );
+		// 		}
 	}
 }

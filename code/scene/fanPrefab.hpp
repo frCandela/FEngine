@@ -13,23 +13,24 @@ namespace fan
 	// represents a gameobjects tree
 	// stores its data in a json
 	//================================================================================================================================
-	class Prefab : public Resource<Prefab>  {
+	class Prefab : public Resource<Prefab>
+	{
 	public:
 		Prefab();
 
 		bool LoadFromJson( const Json& _json );
 		bool LoadFromFile( const std::string& _path );
-		void LoadFromGameobject( const Gameobject * _gameobject );
+		void LoadFromGameobject( const Gameobject* _gameobject );
 
-		const Json& GetJsonGameobject() const	{ return m_json["prefab"]; }
-		const Json& GetJson() const				{ return m_json; }
-		std::string GetPath() const				{ return m_path; }
+		const Json& GetJsonGameobject() const { return m_json[ "prefab" ]; }
+		const Json& GetJson() const { return m_json; }
+		std::string GetPath() const { return m_path; }
 
-		bool IsEmpty() const { return ! m_json.contains("prefab"); }
-		void Clear( ) { m_json = Json(); } 
+		bool IsEmpty() const { return !m_json.contains( "prefab" ); }
+		void Clear() { m_json = Json(); }
 
 	private:
-		 Json m_json;
-		 std::string m_path;
+		Json m_json;
+		std::string m_path;
 	};
 }

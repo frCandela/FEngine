@@ -14,12 +14,12 @@ namespace fan
 {
 	REGISTER_TYPE_INFO( GameClient, TypeInfo::Flags::EDITOR_COMPONENT, "game/net/" )
 
-	//================================================================================================================================
-	//================================================================================================================================
-	void GameClient::OnAttach()
+		//================================================================================================================================
+		//================================================================================================================================
+		void GameClient::OnAttach()
 	{
 		Actor::OnAttach();
-		m_socket.Create("[unknown]", 53001);
+		m_socket.Create( "[unknown]", 53001 );
 	}
 
 	//================================================================================================================================
@@ -46,19 +46,19 @@ namespace fan
 
 		// Bind & Log to server
 		while ( !m_socket.Bind() )
-		{			
+		{
 			m_socket.SetPort( m_socket.GetPort() + 1 );
 		}
 		ConnectToServer( 53000, "127.0.0.1" );
-		
+
 		// Log players & register new players callbacks
 		if ( m_playersManager != nullptr )
 		{
 			m_playersManager->onAddPlayer.Connect( &GameClient::OnAddPlayer, this );
 			std::vector< Gameobject* > players = m_playersManager->GetPlayers();
-			for (int playerIndex = 0; playerIndex < players.size() ; playerIndex++)
+			for ( int playerIndex = 0; playerIndex < players.size(); playerIndex++ )
 			{
-				OnAddPlayer( players[playerIndex] ); 
+				OnAddPlayer( players[ playerIndex ] );
 			}
 		}
 	}
@@ -79,7 +79,7 @@ namespace fan
 	{
 		m_timer -= _delta;
 
-		Receive();		
+		Receive();
 
 		switch ( m_state )
 		{
@@ -89,7 +89,7 @@ namespace fan
 			if ( m_timer < 0.f )
 			{
 				Debug::Log() << m_socket.GetName() << " attempting connection to server" << Debug::Endl();
-				PacketLogin packet(  m_socket.GetName() );
+				PacketLogin packet( m_socket.GetName() );
 				m_socket.Send( packet.ToPacket(), m_serverIp, m_serverPort );
 				m_timer = 0.5f;
 			}
@@ -100,18 +100,18 @@ namespace fan
 		default:
 			break;
 		}
-		
+
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void GameClient::LateUpdate( const float /*_delta*/ ){}
+	void GameClient::LateUpdate( const float /*_delta*/ ) {}
 
 	//================================================================================================================================
 	//================================================================================================================================
 	void GameClient::OnAddPlayer( Gameobject* _playerPersistent )
 	{
-		assert( FindNetPlayer(_playerPersistent) == nullptr );
+		assert( FindNetPlayer( _playerPersistent ) == nullptr );
 		NetPlayerData playerData;
 		playerData.playerPersistent = _playerPersistent;
 		playerData.state = PLAYER_CONNECTING;
@@ -120,11 +120,11 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void GameClient::Receive( )
+	void GameClient::Receive()
 	{
 		bool disconnected = false;
 		sf::Packet packet;
-		while ( m_socket.Receive( packet, disconnected) )
+		while ( m_socket.Receive( packet, disconnected ) )
 		{
 			// Process packet
 			sf::Uint16 intType;
@@ -138,7 +138,7 @@ namespace fan
 				m_state = ClientState::CLIENT_CONNECTED;
 				break;
 			case PacketType::PING:
-				m_socket.Send( packet, m_serverIp, m_serverPort  );
+				m_socket.Send( packet, m_serverIp, m_serverPort );
 				break;
 			case PacketType::START_GAME:
 				Debug::Log() << m_socket.GetName() << " start game " << Debug::Endl();
@@ -166,19 +166,19 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	GameClient::NetPlayerData * GameClient::FindNetPlayer( const Gameobject * _gameobject )
+	GameClient::NetPlayerData* GameClient::FindNetPlayer( const Gameobject* _gameobject )
 	{
-		for (int playerIndex = 0; playerIndex < m_netPlayers.size() ; playerIndex++)
+		for ( int playerIndex = 0; playerIndex < m_netPlayers.size(); playerIndex++ )
 		{
-			NetPlayerData& player = m_netPlayers[playerIndex];
+			NetPlayerData& player = m_netPlayers[ playerIndex ];
 			if ( player.playerPersistent == _gameobject )
 			{
-				return &player; 
+				return &player;
 			}
 		}
 		return nullptr;
 	}
-	
+
 	//================================================================================================================================
 	//================================================================================================================================
 	void GameClient::OnGui()
@@ -193,7 +193,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	bool GameClient::Load( const Json & _json )
+	bool GameClient::Load( const Json& _json )
 	{
 		Actor::Load( _json );
 		return true;
@@ -201,7 +201,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	bool GameClient::Save( Json & _json ) const
+	bool GameClient::Save( Json& _json ) const
 	{
 		Actor::Save( _json );
 		return true;

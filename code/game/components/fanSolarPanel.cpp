@@ -8,9 +8,9 @@ namespace fan
 {
 	REGISTER_TYPE_INFO( SolarPanel, TypeInfo::Flags::EDITOR_COMPONENT, "game/" )
 
-	//================================================================================================================================
-	//================================================================================================================================
-	void SolarPanel::Start()
+		//================================================================================================================================
+		//================================================================================================================================
+		void SolarPanel::Start()
 	{
 		REQUIRE_COMPONENT( WithEnergy, m_energy );
 		REQUIRE_SCENE_COMPONENT( SolarEruption, m_eruption );
@@ -32,16 +32,16 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void SolarPanel::Update( const float _delta ) {
-		ComputeChargingRate();		
+	void SolarPanel::Update( const float _delta )
+	{
+		ComputeChargingRate();
 		m_energy->AddEnergy( _delta * m_currentChargingRate );
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
 	void SolarPanel::LateUpdate( const float /*_delta*/ )
-	{
-	}
+	{}
 
 	//================================================================================================================================
 	//================================================================================================================================
@@ -59,15 +59,16 @@ namespace fan
 	//================================================================================================================================
 	//================================================================================================================================
 	void SolarPanel::ComputeChargingRate()
-	{		
+	{
 		// Sunlight mesh raycast
 		const btVector3 rayOrigin = m_gameobject->GetTransform().GetPosition() + btVector3::Up();
 		btVector3 outIntersection;
-		ecsSunLightMesh_s& sunLight = GetScene().GetEcsManager().GetSingletonComponents().GetComponent<ecsSunLightMesh_s>();			
+		ecsSunLightMesh_s& sunLight = GetScene().GetEcsManager().GetSingletonComponents().GetComponent<ecsSunLightMesh_s>();
 		m_isInsideSunlight = sunLight.mesh->RayCast( rayOrigin, -btVector3::Up(), outIntersection );
 
 		// Charging rate
-		if( m_isInsideSunlight ) {
+		if ( m_isInsideSunlight )
+		{
 			const btVector3 position = m_gameobject->GetTransform().GetPosition();
 			const float distance = position.norm();
 			const float slope = ( m_maxChargingRate - m_minChargingRate ) / ( m_maxRange - m_minRange );
@@ -79,13 +80,13 @@ namespace fan
 			m_currentChargingRate = 0.f;
 		}
 	}
-	 
+
 	//================================================================================================================================
 	//================================================================================================================================
-	bool SolarPanel::Save( Json & _json ) const
+	bool SolarPanel::Save( Json& _json ) const
 	{
 		Actor::Save( _json );
-		
+
 		Serializable::SaveFloat( _json, "min_charging_rate", m_minChargingRate );
 		Serializable::SaveFloat( _json, "max_charging_rate", m_maxChargingRate );
 		Serializable::SaveFloat( _json, "low_range		", m_minRange );
@@ -93,10 +94,10 @@ namespace fan
 
 		return true;
 	}
-	 
+
 	//================================================================================================================================
 	//================================================================================================================================
-	bool SolarPanel::Load( const Json & _json )
+	bool SolarPanel::Load( const Json& _json )
 	{
 		Actor::Load( _json );
 

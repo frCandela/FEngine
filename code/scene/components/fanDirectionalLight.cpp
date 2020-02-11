@@ -3,42 +3,47 @@
 #include "render/fanRendererDebug.hpp"
 #include "core/imgui/fanModals.hpp"
 
-namespace fan {
+namespace fan
+{
 	REGISTER_TYPE_INFO( DirectionalLight, TypeInfo::Flags::EDITOR_COMPONENT, "light/" )
 
-	//================================================================================================================================
-	//================================================================================================================================
-	Color DirectionalLight::GetAmbiant() const { return  m_dirLight->ambiant; }
+		//================================================================================================================================
+		//================================================================================================================================
+		Color DirectionalLight::GetAmbiant() const { return  m_dirLight->ambiant; }
 	Color DirectionalLight::GetDiffuse() const { return  m_dirLight->diffuse; }
 	Color DirectionalLight::GetSpecular() const { return m_dirLight->specular; }
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void DirectionalLight::SetAmbiant( const Color _ambiant ) {
+	void DirectionalLight::SetAmbiant( const Color _ambiant )
+	{
 		m_dirLight->ambiant = _ambiant;
 		m_gameobject->SetFlags( m_gameobject->GetFlags() & Gameobject::Flag::OUTDATED_LIGHT );
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void DirectionalLight::SetDiffuse( const Color _diffuse ) {
+	void DirectionalLight::SetDiffuse( const Color _diffuse )
+	{
 		m_dirLight->diffuse = _diffuse;
 		m_gameobject->SetFlags( m_gameobject->GetFlags() & Gameobject::Flag::OUTDATED_LIGHT );
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void DirectionalLight::SetSpecular( const Color _specular ) {
+	void DirectionalLight::SetSpecular( const Color _specular )
+	{
 		m_dirLight->specular = _specular;
 		m_gameobject->SetFlags( m_gameobject->GetFlags() & Gameobject::Flag::OUTDATED_LIGHT );
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void DirectionalLight::OnAttach() {
+	void DirectionalLight::OnAttach()
+	{
 		Component::OnAttach();
-		
-		ecsDirLight ** tmpLight = &const_cast<ecsDirLight*>( m_dirLight );
+
+		ecsDirLight** tmpLight = &const_cast< ecsDirLight* >( m_dirLight );
 		*tmpLight = m_gameobject->AddEcsComponent<ecsDirLight>();
 		m_dirLight->Init();
 
@@ -47,7 +52,8 @@ namespace fan {
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void DirectionalLight::OnDetach() {
+	void DirectionalLight::OnDetach()
+	{
 		Component::OnDetach();
 		m_gameobject->RemoveEcsComponent<ecsDirLight>();
 		m_gameobject->GetScene().onDirectionalLightDetach.Emmit( this );
@@ -78,10 +84,10 @@ namespace fan {
 			const float length = 2.f;
 			const float radius = 0.5f;
 			const Color color = Color::Yellow;
-			btVector3 offsets[5] = { btVector3::Zero(), radius * up ,-radius * up, radius * left ,-radius * left };
+			btVector3 offsets[ 5 ] = { btVector3::Zero(), radius * up ,-radius * up, radius * left ,-radius * left };
 			for ( int offsetIndex = 0; offsetIndex < 5; offsetIndex++ )
 			{
-				const btVector3 offset = offsets[offsetIndex];
+				const btVector3 offset = offsets[ offsetIndex ];
 				RendererDebug::Get().DebugLine( pos + offset, pos + offset + length * dir, color );
 			}
 			RendererDebug::Get().DebugSphere( transform.GetBtTransform(), radius, 0, color );
@@ -90,7 +96,8 @@ namespace fan {
 
 	//================================================================================================================================
 	//================================================================================================================================
-	bool DirectionalLight::Load( const Json & _json ) {
+	bool DirectionalLight::Load( const Json& _json )
+	{
 		Serializable::LoadColor( _json, "ambiant", m_dirLight->ambiant );
 		Serializable::LoadColor( _json, "diffuse", m_dirLight->diffuse );
 		Serializable::LoadColor( _json, "specular", m_dirLight->specular );
@@ -100,7 +107,8 @@ namespace fan {
 
 	//================================================================================================================================
 	//================================================================================================================================
-	bool DirectionalLight::Save( Json & _json  ) const {
+	bool DirectionalLight::Save( Json& _json ) const
+	{
 
 		Serializable::SaveColor( _json, "ambiant", m_dirLight->ambiant );
 		Serializable::SaveColor( _json, "diffuse", m_dirLight->diffuse );

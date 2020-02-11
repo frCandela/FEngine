@@ -4,7 +4,8 @@
 #include "core/fanSingleton.hpp"
 #include "core/fanHash.hpp"
 
-namespace fan {
+namespace fan
+{
 	//================================================================================================================================
 	// TypeInfo class
 	//
@@ -22,38 +23,39 @@ namespace fan {
 	//		};
 	//		REGISTER_TYPE_INFO(MyClass)	// In cpp file
 	//================================================================================================================================
-	class TypeInfo : public Singleton<TypeInfo> {
+	class TypeInfo : public Singleton<TypeInfo>
+	{
 	private:
 
 
 	public:
-		friend class Singleton < TypeInfo>;		
-		enum Flags{ NONE = 0, EDITOR_COMPONENT = 1 << 1, BLOUP = 1 << 2 };
+		friend class Singleton < TypeInfo>;
+		enum Flags { NONE = 0, EDITOR_COMPONENT = 1 << 1, BLOUP = 1 << 2 };
 
-		uint32_t Register(const uint32_t _key, std::function<void*()> _constructor, const uint32_t _flags = Flags::NONE, const std::string& _path = "" );
+		uint32_t Register( const uint32_t _key, std::function<void* ( )> _constructor, const uint32_t _flags = Flags::NONE, const std::string& _path = "" );
 
 		template<typename T >
-		T * Instantiate(const uint32_t _id) {return static_cast<T*> ( m_data[_id].constructor());	}
+		T* Instantiate( const uint32_t _id ) { return static_cast< T* > ( m_data[ _id ].constructor() ); }
 
- 		template<typename T >
- 		const T * GetInstance( const uint32_t _id )	{ return static_cast<T*> ( m_data[_id].instance ); }
+		template<typename T >
+		const T* GetInstance( const uint32_t _id ) { return static_cast< T* > ( m_data[ _id ].instance ); }
 
-		
-		uint32_t			GetFlags( const uint32_t _id ) { return m_data[_id].flags; }
-		const std::string&  GetPath( const uint32_t _id ) { return m_data[_id].path; }
 
-		template<typename _Type > uint32_t GetFlags( ) { return m_data[_Type::GetType()].flags; }
-		template<typename _Type > const std::string& GetPath( ) { return m_data[_Type::GetType()].path; }
+		uint32_t			GetFlags( const uint32_t _id ) { return m_data[ _id ].flags; }
+		const std::string& GetPath( const uint32_t _id ) { return m_data[ _id ].path; }
 
-		std::vector< const void * > GetInstancesWithFlags( const uint32_t _flags);
+		template<typename _Type > uint32_t GetFlags() { return m_data[ _Type::GetType() ].flags; }
+		template<typename _Type > const std::string& GetPath() { return m_data[ _Type::GetType() ].path; }
+
+		std::vector< const void* > GetInstancesWithFlags( const uint32_t _flags );
 
 	protected:
-		TypeInfo(){}
+		TypeInfo() {}
 
 	private:
 		struct TypeInfoData
 		{
-			std::function<void*( )> constructor;
+			std::function<void* ( )> constructor;
 			void* instance;
 			uint32_t flags;
 			std::string path;

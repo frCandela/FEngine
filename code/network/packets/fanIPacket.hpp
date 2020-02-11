@@ -20,7 +20,7 @@ namespace fan
 	template< PacketType _Type >
 	struct IPacket
 	{
-		virtual void LoadFrom( sf::Packet & /*_packet*/ ){};
+		virtual void LoadFrom( sf::Packet& /*_packet*/ ) {};
 
 		sf::Packet ToPacket()
 		{
@@ -30,7 +30,7 @@ namespace fan
 		}
 
 	protected:
-		virtual void ExportTo( sf::Packet & _packet ) const
+		virtual void ExportTo( sf::Packet& _packet ) const
 		{
 			_packet << sf::Uint16( s_type );
 		}
@@ -42,7 +42,7 @@ namespace fan
 	//================================================================================================================================
 	// Empty packets
 	//================================================================================================================================
-	struct PacketAckLogin  : IPacket<PacketType::ACK_LOGIN> {};
+	struct PacketAckLogin : IPacket<PacketType::ACK_LOGIN> {};
 	struct PacketAckLogout : IPacket<PacketType::LOGOUT> {};
 	struct PacketStartGame : IPacket<PacketType::START_GAME> {};
 }

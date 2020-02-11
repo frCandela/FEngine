@@ -9,7 +9,7 @@ namespace fan
 {
 	//================================================================================================================================
 	//================================================================================================================================
-	FrameBuffer::FrameBuffer( Device & _device, const VkExtent2D _extent )
+	FrameBuffer::FrameBuffer( Device& _device, const VkExtent2D _extent )
 		: m_device( _device )
 		, m_extent( _extent )
 	{}
@@ -36,7 +36,7 @@ namespace fan
 	{
 		for ( int framebufferIndex = 0; framebufferIndex < m_frameBuffers.size(); framebufferIndex++ )
 		{
-			vkDestroyFramebuffer( m_device.vkDevice, m_frameBuffers[framebufferIndex], nullptr );
+			vkDestroyFramebuffer( m_device.vkDevice, m_frameBuffers[ framebufferIndex ], nullptr );
 		} m_frameBuffers.clear();
 	}
 
@@ -59,7 +59,7 @@ namespace fan
 			if ( !m_externalAttachments.empty() )
 			{
 				assert( m_externalAttachments.size() == _count );
-				attachments.push_back( m_externalAttachments[frameIndex]->GetImageView() );
+				attachments.push_back( m_externalAttachments[ frameIndex ]->GetImageView() );
 			}
 
 			VkFramebufferCreateInfo framebufferCreateInfo;
@@ -67,17 +67,17 @@ namespace fan
 			framebufferCreateInfo.pNext = nullptr;
 			framebufferCreateInfo.flags = 0;
 			framebufferCreateInfo.renderPass = _renderPass;
-			framebufferCreateInfo.attachmentCount = static_cast<uint32_t>( attachments.size() );
+			framebufferCreateInfo.attachmentCount = static_cast< uint32_t >( attachments.size() );
 			framebufferCreateInfo.pAttachments = attachments.data();
 			framebufferCreateInfo.width = m_extent.width;
 			framebufferCreateInfo.height = m_extent.height;
 			framebufferCreateInfo.layers = 1;
 
-			if ( vkCreateFramebuffer( m_device.vkDevice, &framebufferCreateInfo, nullptr, &m_frameBuffers[frameIndex] ) != VK_SUCCESS )
+			if ( vkCreateFramebuffer( m_device.vkDevice, &framebufferCreateInfo, nullptr, &m_frameBuffers[ frameIndex ] ) != VK_SUCCESS )
 			{
 				Debug::Error( "Could not create framebuffer" );
 				return false;
-			} Debug::Get() << Debug::Severity::log << std::hex << "VkFramebuffer         " << m_frameBuffers[frameIndex] << std::dec << Debug::Endl();
+			} Debug::Get() << Debug::Severity::log << std::hex << "VkFramebuffer         " << m_frameBuffers[ frameIndex ] << std::dec << Debug::Endl();
 		}
 		return true;
 	}
@@ -108,7 +108,7 @@ namespace fan
 	//================================================================================================================================
 	// Only one color attachment needed for all swapchain images
 	//================================================================================================================================
-	void FrameBuffer::SetExternalAttachment( std::vector< ImageView * > _perFramebufferViews )
+	void FrameBuffer::SetExternalAttachment( std::vector< ImageView* > _perFramebufferViews )
 	{
 		m_externalAttachments = _perFramebufferViews;
 	}

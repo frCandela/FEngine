@@ -2,13 +2,15 @@
 
 #include "render/fanRenderPrecompiled.hpp"
 
-namespace fan {
+namespace fan
+{
 	class Device;
 	class Shader;
 
 	//================================================================================================================================
 	//================================================================================================================================
-	class Pipeline {
+	class Pipeline
+	{
 	public:
 		Pipeline( Device& _device );
 		virtual ~Pipeline();
@@ -24,8 +26,8 @@ namespace fan {
 		VkPipeline	GetPipeline() { return m_pipeline; }
 		VkPipelineLayout	GetLayout() { return m_pipelineLayout; }
 
-	protected:	
-		Device&	m_device;
+	protected:
+		Device& m_device;
 		VkPipelineLayout	m_pipelineLayout;
 
 		VkPipelineRasterizationStateCreateInfo	m_rasterizationStateCreateInfo = {};
@@ -41,7 +43,7 @@ namespace fan {
 		std::vector<VkDescriptorSetLayout>				 m_descriptorSetLayouts;
 		std::vector<VkPushConstantRange>				 m_pushConstantRanges;
 		std::vector<VkDynamicState>						 m_dynamicStates;
-		std::vector< VkViewport >						 m_viewports;	
+		std::vector< VkViewport >						 m_viewports;
 		std::vector<VkRect2D>							 m_scissors;
 
 		virtual void ConfigurePipeline() = 0;
@@ -56,8 +58,8 @@ namespace fan {
 		std::string m_fragShaderPath;
 		std::string m_vertShaderPath;
 
-		Shader *	m_fragmentShader = nullptr;
-		Shader *	m_vertexShader = nullptr;
+		Shader* m_fragmentShader = nullptr;
+		Shader* m_vertexShader = nullptr;
 
 		void CreateShaders();
 		void PreConfigurePipeline();

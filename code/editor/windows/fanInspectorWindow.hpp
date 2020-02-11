@@ -10,7 +10,8 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	class InspectorWindow : public EditorWindow {
+	class InspectorWindow : public EditorWindow
+	{
 	public:
 		InspectorWindow();
 
@@ -22,10 +23,10 @@ namespace fan
 		void OnGui() override;
 
 	private:
-		Gameobject * m_gameobjectSelected;
+		Gameobject* m_gameobjectSelected;
 
 		void NewComponentPopup();
-		void R_NewComponentPopup( std::set< std::filesystem::path >& _componentsPathSet, std::set< std::filesystem::path >::iterator&  _current, const std::vector< const Component *>& _components, const std::vector<std::filesystem::path>& _componentsPath );
-		void NewComponentItem( const Component* _component );	
+		void R_NewComponentPopup( std::set< std::filesystem::path >& _componentsPathSet, std::set< std::filesystem::path >::iterator& _current, const std::vector< const Component*>& _components, const std::vector<std::filesystem::path>& _componentsPath );
+		void NewComponentItem( const Component* _component );
 	};
 }

@@ -15,8 +15,8 @@ namespace fan
 	{
 		for ( int elemIndex = 0; elemIndex < s_maxComponentsPerEntity; elemIndex++ )
 		{
-			m_indices[elemIndex].chunckIndex = 0;
-			m_indices[elemIndex].componentIndex = 0;
+			m_indices[ elemIndex ].chunckIndex = 0;
+			m_indices[ elemIndex ].componentIndex = 0;
 		}
 
 		m_componentsKeys = ~indicesBitset( 0 );
@@ -28,7 +28,7 @@ namespace fan
 	//================================================================================================================================
 	uint32_t ecsComponentsKeyCompact::GetSubIndex( const uint32_t _componentIndex ) const
 	{
-		return  (uint32_t)( ( m_componentsKeys >> ( _componentIndex * s_indexWidth ) ) & indicesBitset ( s_emptyKeyValue ) ).data()[0];
+		return  ( uint32_t ) ( ( m_componentsKeys >> ( _componentIndex * s_indexWidth ) )& indicesBitset( s_emptyKeyValue ) ).data()[ 0 ];
 	}
 
 	//================================================================================================================================
@@ -51,13 +51,13 @@ namespace fan
 	{
 		assert( m_nextElement < s_maxComponentsPerEntity );
 		assert( GetSubIndex( _componentID ) == s_emptyKeyValue );
-		assert( m_bitset[_componentID] == 0 );
+		assert( m_bitset[ _componentID ] == 0 );
 
-		m_indices[m_nextElement] = _index;
+		m_indices[ m_nextElement ] = _index;
 
 		SetSubIndex( _componentID, m_nextElement );
 
-		m_bitset[_componentID] = 1;
+		m_bitset[ _componentID ] = 1;
 
 		++m_nextElement;
 	}
@@ -70,35 +70,36 @@ namespace fan
 	//================================================================================================================================
 	ecsComponentIndex ecsComponentsKeyCompact::RemoveComponent( const uint32_t _componentID )
 	{
-		assert( ! IsEmpty() );
+		assert( !IsEmpty() );
 		const uint32_t lastecsComponentIndex = m_nextElement - 1;
 		const uint32_t removedElementIndex = GetSubIndex( _componentID );
-		ecsComponentIndex removedIndexCpy = m_indices[removedElementIndex];
+		ecsComponentIndex removedIndexCpy = m_indices[ removedElementIndex ];
 
 		assert( removedElementIndex != s_emptyKeyValue );
-		m_bitset[_componentID] = 0;
+		m_bitset[ _componentID ] = 0;
 
 		// Swap if component is not at the end
 		if ( removedElementIndex != lastecsComponentIndex )
-		{			
+		{
 			// Finds the component index referencing the last component key
 			uint32_t swappedComponentIndex = 0;
 			uint32_t swappedIndex = 0;
-			for ( swappedComponentIndex = 0; swappedComponentIndex < ecsComponents::count; ++ swappedComponentIndex) {
+			for ( swappedComponentIndex = 0; swappedComponentIndex < ecsComponents::count; ++swappedComponentIndex )
+			{
 				swappedIndex = GetSubIndex( swappedComponentIndex );
-				if ( swappedIndex == lastecsComponentIndex ){ break; }
+				if ( swappedIndex == lastecsComponentIndex ) { break; }
 			}
 
 			// Swap
-			m_indices[removedElementIndex] = m_indices[swappedIndex];
-			SetSubIndex( swappedComponentIndex, removedElementIndex );			
-		} 
+			m_indices[ removedElementIndex ] = m_indices[ swappedIndex ];
+			SetSubIndex( swappedComponentIndex, removedElementIndex );
+		}
 
 		// Clear
-		-- m_nextElement;
+		--m_nextElement;
 		SetSubIndex( _componentID, s_emptyKeyValue );
-		m_indices[m_nextElement].chunckIndex = 0;
-		m_indices[m_nextElement].componentIndex = 0;
+		m_indices[ m_nextElement ].chunckIndex = 0;
+		m_indices[ m_nextElement ].componentIndex = 0;
 
 		return removedIndexCpy;
 	}
@@ -110,7 +111,7 @@ namespace fan
 	{
 		if ( ImGui::Begin( "ecsComponentsKeyCompact test" ) )
 		{
-			if ( ImGui::Button( "reset" ) )	{ Reset(); }
+			if ( ImGui::Button( "reset" ) ) { Reset(); }
 
 			static int elemIndex = 0; static int chunckIndex = 0; static int componentIndex = 0;
 			ImGui::DragInt( "componentIndex", &componentIndex, 1, 0, ecsComponents::count - 1 );
@@ -118,11 +119,11 @@ namespace fan
 			ImGui::DragInt( "chunckIndex", &chunckIndex );
 			if ( ImGui::Button( "Add" ) )
 			{
-				AddComponent( (uint32_t)componentIndex, {(uint16_t)chunckIndex, (uint16_t)elemIndex });
+				AddComponent( ( uint32_t ) componentIndex, { ( uint16_t ) chunckIndex, ( uint16_t ) elemIndex } );
 			}
 			if ( ImGui::Button( "Remove" ) )
 			{
-				RemoveComponent( (uint32_t)componentIndex );
+				RemoveComponent( ( uint32_t ) componentIndex );
 			}
 
 			ImGui::Separator();
@@ -135,7 +136,7 @@ namespace fan
 				std::stringstream ss;
 				for ( int bitIndex = int( m_componentsKeys.size() ) - 1; bitIndex >= 0; --bitIndex )
 				{
-					ss << m_componentsKeys[bitIndex];
+					ss << m_componentsKeys[ bitIndex ];
 					if ( bitIndex % s_indexWidth == 0 )
 					{
 						ss << " ";
@@ -150,7 +151,7 @@ namespace fan
 				std::stringstream ss;
 				for ( int bitIndex = int( m_componentsKeys.size() ) - 1; bitIndex >= 0; --bitIndex )
 				{
-					ss << clearMask[bitIndex];
+					ss << clearMask[ bitIndex ];
 					if ( bitIndex % s_indexWidth == 0 )
 					{
 						ss << " ";
@@ -175,8 +176,8 @@ namespace fan
 				std::stringstream ss;
 				for ( int i = 0; i < ecsComponentsKeyCompact::s_maxComponentsPerEntity; ++i )
 				{
-					
-					ss << m_indices[i].chunckIndex << "-" << m_indices[i].componentIndex << "  ";
+
+					ss << m_indices[ i ].chunckIndex << "-" << m_indices[ i ].componentIndex << "  ";
 				}
 				ImGui::Text( ss.str().c_str() );
 			}

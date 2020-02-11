@@ -6,30 +6,29 @@ namespace fan
 	//================================================================================================================================
 	//================================================================================================================================
 	RenderPass::RenderPass( Device& _device ) :
-		m_device(_device)
-	{
-	}
+		m_device( _device )
+	{}
 
 	//================================================================================================================================
 	//================================================================================================================================
 	RenderPass::~RenderPass()
 	{
-		vkDestroyRenderPass(m_device.vkDevice, m_renderPass, nullptr);
+		vkDestroyRenderPass( m_device.vkDevice, m_renderPass, nullptr );
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	VkAttachmentDescription& RenderPass::AddInputAttachment( )
+	VkAttachmentDescription& RenderPass::AddInputAttachment()
 	{
 		VkAttachmentReference inputAttachmentRef;
-		inputAttachmentRef.attachment = static_cast<uint32_t>(m_attachments.size());
+		inputAttachmentRef.attachment = static_cast< uint32_t >( m_attachments.size() );
 		inputAttachmentRef.layout = VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL;
 		m_inputAttachmentsRef.push_back( inputAttachmentRef );
-		
+
 		VkAttachmentDescription inputAttachment;
 
 		m_attachments.push_back( inputAttachment );
-		return  m_attachments[m_attachments.size() - 1];
+		return  m_attachments[ m_attachments.size() - 1 ];
 	}
 
 	//================================================================================================================================
@@ -37,7 +36,7 @@ namespace fan
 	VkAttachmentDescription& RenderPass::AddColorAttachment( const VkFormat _format, const VkImageLayout _finalLayout )
 	{
 		VkAttachmentReference colorAttachmentRef;
-		colorAttachmentRef.attachment =  static_cast<uint32_t>(m_attachments.size());
+		colorAttachmentRef.attachment = static_cast< uint32_t >( m_attachments.size() );
 		colorAttachmentRef.layout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
 		m_colorAttachmentsRef.push_back( colorAttachmentRef );
 
@@ -52,16 +51,16 @@ namespace fan
 		colorAttachment.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
 		colorAttachment.finalLayout = _finalLayout;
 
-		m_attachments.push_back(colorAttachment);
-		return  m_attachments [m_attachments.size() - 1 ];
+		m_attachments.push_back( colorAttachment );
+		return  m_attachments[ m_attachments.size() - 1 ];
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	VkAttachmentDescription& RenderPass::AddDepthAttachment(  const VkFormat _format)
+	VkAttachmentDescription& RenderPass::AddDepthAttachment( const VkFormat _format )
 	{
 		VkAttachmentReference depthAttachmentRef;
-		depthAttachmentRef.attachment =  static_cast<uint32_t>(m_attachments.size());
+		depthAttachmentRef.attachment = static_cast< uint32_t >( m_attachments.size() );
 		depthAttachmentRef.layout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
 		m_depthAttachmentsRef.push_back( depthAttachmentRef );
 
@@ -77,7 +76,7 @@ namespace fan
 		depthAttachment.finalLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR;
 
 		m_attachments.push_back( depthAttachment );
-		return  m_attachments[m_attachments.size() - 1];
+		return  m_attachments[ m_attachments.size() - 1 ];
 	}
 
 	//================================================================================================================================
@@ -94,24 +93,24 @@ namespace fan
 		dependency.dependencyFlags = 0;
 
 		m_dependencies.push_back( dependency );
-		return  m_dependencies[m_dependencies.size() - 1];
+		return  m_dependencies[ m_dependencies.size() - 1 ];
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	bool RenderPass::Create( )
+	bool RenderPass::Create()
 	{
 		assert( m_depthAttachmentsRef.size() == 0 || m_depthAttachmentsRef.size() == 1 );
 
 		VkSubpassDescription subpassDescription;
 		subpassDescription.flags = 0;
 		subpassDescription.pipelineBindPoint = VK_PIPELINE_BIND_POINT_GRAPHICS;
-		subpassDescription.inputAttachmentCount = static_cast<uint32_t>( m_inputAttachmentsRef.size() );
+		subpassDescription.inputAttachmentCount = static_cast< uint32_t >( m_inputAttachmentsRef.size() );
 		subpassDescription.pInputAttachments = m_inputAttachmentsRef.data();
-		subpassDescription.colorAttachmentCount = static_cast<uint32_t>( m_colorAttachmentsRef.size() );
+		subpassDescription.colorAttachmentCount = static_cast< uint32_t >( m_colorAttachmentsRef.size() );
 		subpassDescription.pColorAttachments = m_colorAttachmentsRef.data();
 		subpassDescription.pResolveAttachments = nullptr;
-		subpassDescription.pDepthStencilAttachment = m_depthAttachmentsRef.empty() ? nullptr :  &m_depthAttachmentsRef[0];
+		subpassDescription.pDepthStencilAttachment = m_depthAttachmentsRef.empty() ? nullptr : &m_depthAttachmentsRef[ 0 ];
 		subpassDescription.preserveAttachmentCount = 0;
 		subpassDescription.pPreserveAttachments = nullptr;
 
@@ -121,11 +120,11 @@ namespace fan
 		renderPassCreateInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO;
 		renderPassCreateInfo.pNext = nullptr;
 		renderPassCreateInfo.flags = 0;
-		renderPassCreateInfo.attachmentCount = static_cast<uint32_t>( m_attachments.size() );
+		renderPassCreateInfo.attachmentCount = static_cast< uint32_t >( m_attachments.size() );
 		renderPassCreateInfo.pAttachments = m_attachments.data();
-		renderPassCreateInfo.subpassCount = static_cast<uint32_t>( subpassDescriptions.size() );;
+		renderPassCreateInfo.subpassCount = static_cast< uint32_t >( subpassDescriptions.size() );;
 		renderPassCreateInfo.pSubpasses = subpassDescriptions.data();
-		renderPassCreateInfo.dependencyCount = static_cast<uint32_t>( m_dependencies.size() );;
+		renderPassCreateInfo.dependencyCount = static_cast< uint32_t >( m_dependencies.size() );;
 		renderPassCreateInfo.pDependencies = m_dependencies.data();
 
 		if ( vkCreateRenderPass( m_device.vkDevice, &renderPassCreateInfo, nullptr, &m_renderPass ) != VK_SUCCESS )

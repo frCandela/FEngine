@@ -1,113 +1,132 @@
 #include "core/input/fanKeyboard.hpp"
 #include "core/input/fanInput.hpp"
 
-namespace fan {
+namespace fan
+{
 
 	//================================================================================================================================
 	//================================================================================================================================
-	Keyboard::Keyboard() {
+	Keyboard::Keyboard()
+	{
 		assert( m_keysPressed.size() == m_keysReleased.size() );
 		const uint64_t max = std::numeric_limits<uint64_t>::max();
-		for ( int buttonIndex = 0; buttonIndex < m_keysPressed.size(); buttonIndex++ ) {
-			m_keysPressed[buttonIndex] = max;
-			m_keysReleased[buttonIndex] = max;
+		for ( int buttonIndex = 0; buttonIndex < m_keysPressed.size(); buttonIndex++ )
+		{
+			m_keysPressed[ buttonIndex ] = max;
+			m_keysReleased[ buttonIndex ] = max;
 		}
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	bool Keyboard::IsKeyDown( const Key _key ) {
-		if ( _key == NONE || ImGui::GetIO().WantCaptureKeyboard ) {
+	bool Keyboard::IsKeyDown( const Key _key )
+	{
+		if ( _key == NONE || ImGui::GetIO().WantCaptureKeyboard )
+		{
 			return false;
-		} else {
-			return glfwGetKey(Input::Get().Window(), _key ) == GLFW_PRESS;
+		}
+		else
+		{
+			return glfwGetKey( Input::Get().Window(), _key ) == GLFW_PRESS;
 		}
 	}
-	
+
 	//================================================================================================================================
 	//================================================================================================================================
-	bool Keyboard::IsKeyPressed(const Key _key) {
-		if ( _key == NONE || ImGui::GetIO().WantCaptureKeyboard) {
+	bool Keyboard::IsKeyPressed( const Key _key )
+	{
+		if ( _key == NONE || ImGui::GetIO().WantCaptureKeyboard )
+		{
 			return false;
 		}
-		else {
-			return Get().m_keysPressed[_key] == Input::Get().FrameCount();
+		else
+		{
+			return Get().m_keysPressed[ _key ] == Input::Get().FrameCount();
 		}
 	}
-	
+
 	//================================================================================================================================
 	//================================================================================================================================
-	bool Keyboard::IsKeyReleased(const Key _key ) {
-		if ( _key == NONE || ImGui::GetIO().WantCaptureKeyboard) {
+	bool Keyboard::IsKeyReleased( const Key _key )
+	{
+		if ( _key == NONE || ImGui::GetIO().WantCaptureKeyboard )
+		{
 			return false;
 		}
-		else {
-			return Get().m_keysReleased[_key] == Input::Get().FrameCount();
+		else
+		{
+			return Get().m_keysReleased[ _key ] == Input::Get().FrameCount();
 		}
 	}
 
 
 	//================================================================================================================================
 	//================================================================================================================================
-	std::string Keyboard::GetKeyName	( const Key _key ) {
-		const char * glfwName = glfwGetKeyName( _key, 0 );
-		if ( glfwName == nullptr ) 
-		{			
-			return keyName[_key];
-		} else {
+	std::string Keyboard::GetKeyName( const Key _key )
+	{
+		const char* glfwName = glfwGetKeyName( _key, 0 );
+		if ( glfwName == nullptr )
+		{
+			return keyName[ _key ];
+		}
+		else
+		{
 			std::string name( glfwName );
 
-			for (int charIndex = 0; charIndex < name.size(); charIndex++) {
-				name[charIndex] = (char)std::toupper( name[charIndex] );
+			for ( int charIndex = 0; charIndex < name.size(); charIndex++ )
+			{
+				name[ charIndex ] = ( char ) std::toupper( name[ charIndex ] );
 			}
-			name.resize(15, ' ');
+			name.resize( 15, ' ' );
 
 			return name;
 		}
 	}
-	
+
 	//================================================================================================================================
 	// Modifiers are not reliable across systems
 	//================================================================================================================================
-	void Keyboard::KeyCallback(GLFWwindow* /*_window*/, int _key, int /*_scancode*/, int _action, int /*_mods*/)
+	void Keyboard::KeyCallback( GLFWwindow* /*_window*/, int _key, int /*_scancode*/, int _action, int /*_mods*/ )
 	{
-		if( _key == GLFW_KEY_UNKNOWN ) return;
+		if ( _key == GLFW_KEY_UNKNOWN ) return;
 
 		ImGuiIO& io = ImGui::GetIO();
 
 		// Dirty hack so that pressing KP_ENTER is considered by IMGUI
-		if (_key == GLFW_KEY_KP_ENTER) {
+		if ( _key == GLFW_KEY_KP_ENTER )
+		{
 			_key = GLFW_KEY_ENTER;
 		}
 
 		//Imgui
-		if (_action == GLFW_PRESS)
-			io.KeysDown[_key] = true;
-		if (_action == GLFW_RELEASE)
-			io.KeysDown[_key] = false;
+		if ( _action == GLFW_PRESS )
+			io.KeysDown[ _key ] = true;
+		if ( _action == GLFW_RELEASE )
+			io.KeysDown[ _key ] = false;
 
-		io.KeyCtrl =	io.KeysDown[GLFW_KEY_LEFT_CONTROL] ||	io.KeysDown[GLFW_KEY_RIGHT_CONTROL];
-		io.KeyShift =	io.KeysDown[GLFW_KEY_LEFT_SHIFT] ||		io.KeysDown[GLFW_KEY_RIGHT_SHIFT];
-		io.KeyAlt =		io.KeysDown[GLFW_KEY_LEFT_ALT] ||		io.KeysDown[GLFW_KEY_RIGHT_ALT];
-		io.KeySuper =	io.KeysDown[GLFW_KEY_LEFT_SUPER] ||		io.KeysDown[GLFW_KEY_RIGHT_SUPER];
+		io.KeyCtrl = io.KeysDown[ GLFW_KEY_LEFT_CONTROL ] || io.KeysDown[ GLFW_KEY_RIGHT_CONTROL ];
+		io.KeyShift = io.KeysDown[ GLFW_KEY_LEFT_SHIFT ] || io.KeysDown[ GLFW_KEY_RIGHT_SHIFT ];
+		io.KeyAlt = io.KeysDown[ GLFW_KEY_LEFT_ALT ] || io.KeysDown[ GLFW_KEY_RIGHT_ALT ];
+		io.KeySuper = io.KeysDown[ GLFW_KEY_LEFT_SUPER ] || io.KeysDown[ GLFW_KEY_RIGHT_SUPER ];
 
-		if (_action == GLFW_PRESS)
-			Get().m_keysPressed[_key] = Input::Get().FrameCount();
-		else if (_action == GLFW_RELEASE)
-			Get().m_keysReleased[_key] = Input::Get().FrameCount();
+		if ( _action == GLFW_PRESS )
+			Get().m_keysPressed[ _key ] = Input::Get().FrameCount();
+		else if ( _action == GLFW_RELEASE )
+			Get().m_keysReleased[ _key ] = Input::Get().FrameCount();
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void Keyboard::CharCallback(GLFWwindow* /*_window*/, unsigned int _c)
+	void Keyboard::CharCallback( GLFWwindow* /*_window*/, unsigned int _c )
 	{
 		ImGuiIO& io = ImGui::GetIO();
-		if (_c > 0 && _c < 0x10000) {
-			io.AddInputCharacter((unsigned short)_c);
+		if ( _c > 0 && _c < 0x10000 )
+		{
+			io.AddInputCharacter( ( unsigned short ) _c );
 		}
 	}
 
-	const char * Keyboard::keyName[NONE+1] = {
+	const char* Keyboard::keyName[ NONE + 1 ] = {
 		"","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","",
 		 "SPACE          "/*32*/		,"","","","","",""
 		,"APOSTROPHE     "/*39*/		,"","","",""
@@ -232,8 +251,8 @@ namespace fan {
 		,"               "/*349*/
 	};
 
-	const std::vector<Keyboard::Key> Keyboard::s_keysList = 
-	{    SPACE
+	const std::vector<Keyboard::Key> Keyboard::s_keysList =
+	{ SPACE
 		,APOSTROPHE
 		,COMMA
 		,MINUS

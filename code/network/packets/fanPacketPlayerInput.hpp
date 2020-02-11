@@ -22,15 +22,15 @@ namespace fan
 	struct PacketPlayerInput : IPacket<PacketType::PLAYER_INPUT>
 	{
 
-		PacketPlayerInput( InputData _inputData ) 
+		PacketPlayerInput( InputData _inputData )
 			: m_inputData( _inputData )
 		{}
 
-		void LoadFrom( sf::Packet & _packet ) override
+		void LoadFrom( sf::Packet& _packet ) override
 		{
-			_packet >> m_inputData.direction[0];
-			_packet >> m_inputData.direction[1];
-			_packet >> m_inputData.direction[2];
+			_packet >> m_inputData.direction[ 0 ];
+			_packet >> m_inputData.direction[ 1 ];
+			_packet >> m_inputData.direction[ 2 ];
 			_packet >> m_inputData.left;
 			_packet >> m_inputData.forward;
 			_packet >> m_inputData.boost;
@@ -41,12 +41,12 @@ namespace fan
 		inline const InputData& GetInputData() const { return m_inputData; }
 
 	protected:
-		void ExportTo( sf::Packet & _packet ) const override
+		void ExportTo( sf::Packet& _packet ) const override
 		{
 			IPacket::ExportTo( _packet );
-			_packet << m_inputData.direction[0];
-			_packet << m_inputData.direction[1];
-			_packet << m_inputData.direction[2];
+			_packet << m_inputData.direction[ 0 ];
+			_packet << m_inputData.direction[ 1 ];
+			_packet << m_inputData.direction[ 2 ];
 			_packet << m_inputData.left;
 			_packet << m_inputData.forward;
 			_packet << m_inputData.boost;

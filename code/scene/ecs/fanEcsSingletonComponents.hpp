@@ -11,8 +11,8 @@ namespace fan
 	//================================
 	using ecsSingletonComponentsList = meta::TypeList
 		< 	ecsSunLightMesh_s
-		,	ecsCameraPosition_s
-		,	ecsParticlesMesh_s
+		, ecsCameraPosition_s
+		, ecsParticlesMesh_s
 		>;
 
 	//================================================================================================================================
@@ -23,8 +23,8 @@ namespace fan
 	class ecsSingletonComponents
 	{
 	public:
-			template < typename _ComponentType >
-			_ComponentType& GetComponent() { return m_components.Get<_ComponentType>();}
+		template < typename _ComponentType >
+		_ComponentType& GetComponent() { return m_components.Get<_ComponentType>(); }
 
 	private:
 		meta::Tuple<ecsSingletonComponentsList> m_components;

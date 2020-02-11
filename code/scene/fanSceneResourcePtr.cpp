@@ -9,15 +9,15 @@
 
 namespace ImGui
 {
-	static_assert((std::is_base_of<fan::Resource<fan::Gameobject>, fan::Gameobject>::value));
+	static_assert( ( std::is_base_of<fan::Resource<fan::Gameobject>, fan::Gameobject>::value ) );
 
 	//================================================================================================================================
 	//================================================================================================================================
-	bool FanGameobject( const char * _label, fan::GameobjectPtr * _ptr )
+	bool FanGameobject( const char* _label, fan::GameobjectPtr* _ptr )
 	{
 		bool returnValue = false;
 
-		fan::Gameobject * gameobject = **_ptr;
+		fan::Gameobject* gameobject = **_ptr;
 		const std::string name = gameobject != nullptr ? gameobject->GetName() : "null";
 
 		// icon & set from selection
@@ -34,7 +34,7 @@ namespace ImGui
 
 		// dragndrop
 		ImGui::FanBeginDragDropSourceGameobject( gameobject );
-		fan::Gameobject * gameobjectDrop = ImGui::FanBeginDragDropTargetGameobject();
+		fan::Gameobject* gameobjectDrop = ImGui::FanBeginDragDropTargetGameobject();
 		if ( gameobjectDrop )
 		{
 			( *_ptr ) = fan::GameobjectPtr( gameobjectDrop );
@@ -52,16 +52,16 @@ namespace ImGui
 		ImGui::Text( _label );
 
 		return returnValue;
-	}	
+	}
 
-	static_assert((std::is_base_of<fan::Resource<fan::Prefab>, fan::Prefab>::value));
+	static_assert( ( std::is_base_of<fan::Resource<fan::Prefab>, fan::Prefab>::value ) );
 	//================================================================================================================================
 	//================================================================================================================================
-	bool FanPrefab( const char * _label, fan::PrefabPtr * _ptr )
+	bool FanPrefab( const char* _label, fan::PrefabPtr* _ptr )
 	{
 		bool returnValue = false;
 
-		fan::Prefab * prefab = **_ptr;
+		fan::Prefab* prefab = **_ptr;
 		const std::string name = prefab == nullptr ? "null" : std::filesystem::path( prefab->GetPath() ).filename().string();
 
 		// Set button icon & modal
@@ -95,7 +95,7 @@ namespace ImGui
 		}
 
 		// dragndrop		
-		fan::Prefab * prefabDrop = ImGui::FanBeginDragDropTargetPrefab();
+		fan::Prefab* prefabDrop = ImGui::FanBeginDragDropTargetPrefab();
 		if ( prefabDrop )
 		{
 			( *_ptr ) = fan::PrefabPtr( prefabDrop );

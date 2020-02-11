@@ -11,7 +11,7 @@ namespace fan
 	class Sampler
 	{
 	public:
-		Sampler(Device & _device);
+		Sampler( Device& _device );
 		~Sampler();
 
 		// Create a Sampler
@@ -20,7 +20,7 @@ namespace fan
 		VkSampler GetSampler() { return m_sampler; }
 
 	private:
-		Device & m_device;
+		Device& m_device;
 
 		VkSampler m_sampler;
 	};

@@ -8,18 +8,19 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	class Device {
+	class Device
+	{
 	public:
-		Device(Instance * _instance, VkSurfaceKHR _surface);
+		Device( Instance* _instance, VkSurfaceKHR _surface );
 		~Device();
 
 		VkPhysicalDevice vkPhysicalDevice = VK_NULL_HANDLE;
 		VkDevice vkDevice = VK_NULL_HANDLE;
 
 		VkCommandPool	GetCommandPool() const { return m_commandPool; }
-		VkQueue &		GetGraphicsQueue() { return m_graphicsQueue; }
+		VkQueue& GetGraphicsQueue() { return m_graphicsQueue; }
 		uint32_t		GetGraphicsQueueFamilyIndex() { return m_graphicsQueueFamilyIndex; }
-		uint32_t		FindMemoryType(uint32_t _typeFilter, VkMemoryPropertyFlags _properties);
+		uint32_t		FindMemoryType( uint32_t _typeFilter, VkMemoryPropertyFlags _properties );
 		VkFormat		FindDepthFormat();
 
 		VkCommandBuffer BeginSingleTimeCommands();
@@ -28,7 +29,7 @@ namespace fan
 		const VkPhysicalDeviceProperties& GetDeviceProperties() const { return m_deviceProperties; }
 
 	private:
-		Instance *		m_instance;
+		Instance* m_instance;
 		VkSurfaceKHR	m_surface;
 		VkCommandPool	m_commandPool;
 
@@ -47,8 +48,8 @@ namespace fan
 		// Device
 		bool Create();
 		bool SelectPhysicalDevice();
-		std::vector < const char *> GetDesiredExtensions(const std::vector < const char *> _desiredExtensions);
-		bool IsExtensionAvailable(std::string _requiredExtension);
+		std::vector < const char*> GetDesiredExtensions( const std::vector < const char*> _desiredExtensions );
+		bool IsExtensionAvailable( std::string _requiredExtension );
 		void GetQueueFamilies();
 
 		// Command pool

@@ -8,7 +8,8 @@
 #include "scene/fanSceneResourcePtr.hpp"
 #include "render/fanRenderResourcePtr.hpp"
 
-namespace fan {
+namespace fan
+{
 
 	class Mesh;
 
@@ -21,203 +22,230 @@ namespace fan {
 	struct ecsIComponent {};
 
 	//================================
-	struct ecsTranform : ecsIComponent {
-		static const char *  s_name;
+	struct ecsTranform : ecsIComponent
+	{
+		static const char* s_name;
 		void Init() { transform.setIdentity(); }
 
 		btTransform transform;
 	};
 
 	//================================
-	struct ecsPosition : ecsIComponent {
-		static const char *  s_name;
+	struct ecsPosition : ecsIComponent
+	{
+		static const char* s_name;
 		void Init() { position = btVector3::Zero(); }
 
 		btVector3	position = btVector3::Zero();
 	};
 
 	//================================
-	struct ecsRotation: ecsIComponent {
-		static const char *  s_name;
+	struct ecsRotation : ecsIComponent
+	{
+		static const char* s_name;
 		void Init() { rotation = btQuaternion::getIdentity(); }
 
 		btQuaternion	rotation = btQuaternion::getIdentity();
 	};
 
 	//================================
-	struct ecsScaling : ecsIComponent {
-		static const char *  s_name;
+	struct ecsScaling : ecsIComponent
+	{
+		static const char* s_name;
 		void Init() { scale = btVector3::One(); }
 
-		btVector3		scale	= btVector3::One();
+		btVector3		scale = btVector3::One();
 	};
 
 	//================================
-	struct ecsMovement : ecsIComponent {
-		static const char *  s_name;
+	struct ecsMovement : ecsIComponent
+	{
+		static const char* s_name;
 		void Init() { speed = btVector3::Zero(); }
 
-		btVector3		speed	= btVector3::Zero();
+		btVector3		speed = btVector3::Zero();
 	};
 
 	//================================
-	struct ecsParticle : ecsIComponent {
-		static const char * s_name;
-		void Init() {
-			color = Color::Red; 
+	struct ecsParticle : ecsIComponent
+	{
+		static const char* s_name;
+		void Init()
+		{
+			color = Color::Red;
 			durationLeft = 1.f;
 		}
 
-		fan::Color	color			= Color::Red;
-		float		durationLeft	= 1.f;
+		fan::Color	color = Color::Red;
+		float		durationLeft = 1.f;
 	};
 
 	//================================
 	struct ecsSunlightParticleOcclusion : ecsIComponent
 	{
-		static const char * s_name;
+		static const char* s_name;
 		void Init()
-		{
-		}
+		{}
 	};
 
 	//================================
-	struct ecsAABB : ecsIComponent {
-		static const char * s_name;
-		void Init() {	aabb.Clear(); }
+	struct ecsAABB : ecsIComponent
+	{
+		static const char* s_name;
+		void Init() { aabb.Clear(); }
 
 		AABB aabb;
 	};
 
 	//================================
-	struct ecsMesh : ecsIComponent {
-		static const char * s_name;
-		void Init() { 
-			mesh = MeshPtr(); 
+	struct ecsMesh : ecsIComponent
+	{
+		static const char* s_name;
+		void Init()
+		{
+			mesh = MeshPtr();
 			renderID = -1;
 		}
 
 		MeshPtr mesh;
-		int renderID		= -1;
+		int renderID = -1;
 	};
 
 	//================================
-	struct ecsDirLight : ecsIComponent {
-		static const char * s_name;
-		void Init() {
+	struct ecsDirLight : ecsIComponent
+	{
+		static const char* s_name;
+		void Init()
+		{
 			ambiant = Color::Black;
 			diffuse = Color::White;
 			specular = Color::White;
 		}
 
-		Color ambiant		= Color::Black;
-		Color diffuse		= Color::White;
-		Color specular		= Color::White;
+		Color ambiant = Color::Black;
+		Color diffuse = Color::White;
+		Color specular = Color::White;
 	};
 
 	//================================
-	struct ecsPointLight : ecsIComponent {
-		static const char * s_name;
-		void Init() {
+	struct ecsPointLight : ecsIComponent
+	{
+		static const char* s_name;
+		void Init()
+		{
 			ambiant = Color::White;
 			diffuse = Color::White;
 			specular = Color::White;
-			attenuation[0] = 0.f; attenuation[1] = 0.f; attenuation[2] = 0.1f;
+			attenuation[ 0 ] = 0.f; attenuation[ 1 ] = 0.f; attenuation[ 2 ] = 0.1f;
 		}
 
-		Color ambiant			= Color::White;
-		Color diffuse			= Color::White;
-		Color specular			= Color::White;
-		float attenuation[3]	= {0.f,0.f,0.1f};
+		Color ambiant = Color::White;
+		Color diffuse = Color::White;
+		Color specular = Color::White;
+		float attenuation[ 3 ] = { 0.f,0.f,0.1f };
 	};
 
 	//================================
-	struct ecsMaterial : ecsIComponent {
-		static const char * s_name;
-		void Init() {
+	struct ecsMaterial : ecsIComponent
+	{
+		static const char* s_name;
+		void Init()
+		{
 			texture = TexturePtr();
 			shininess = 1;
 			color = Color::White;
 		}
 
 		TexturePtr 	texture;
-		uint32_t	shininess		= 1;
-		Color		color			= Color::White;
+		uint32_t	shininess = 1;
+		Color		color = Color::White;
 	};
 
 	//================================
-	struct ecsPlanet : ecsIComponent {
-		static const char * s_name;
-		void Init() {
+	struct ecsPlanet : ecsIComponent
+	{
+		static const char* s_name;
+		void Init()
+		{
 			time = 0.f;
 			speed = 1.f;
 			radius = 1.f;
 			phase = 0.f;
 		}
-		float time		= 0.f;
-		float speed		= 1.f;
-		float radius	= 1.f;
-		float phase		= 0.f;
-	}; 
+		float time = 0.f;
+		float speed = 1.f;
+		float radius = 1.f;
+		float phase = 0.f;
+	};
 
 	//================================
-	struct ecsRigidbody : ecsIComponent {
-		static const char * s_name;
-		char bufferRigidbody[sizeof( btRigidBody )]; // dummy btRigidBody memory to bypass btRigidBody constructor
-		
-		btRigidBody * Init( const btRigidBody::btRigidBodyConstructionInfo& constructionInfo ) {
+	struct ecsRigidbody : ecsIComponent
+	{
+		static const char* s_name;
+		char bufferRigidbody[ sizeof( btRigidBody ) ]; // dummy btRigidBody memory to bypass btRigidBody constructor
+
+		btRigidBody* Init( const btRigidBody::btRigidBodyConstructionInfo& constructionInfo )
+		{
 			return new( bufferRigidbody ) btRigidBody( constructionInfo );
 		}
-		inline btRigidBody& Get() { return *reinterpret_cast<btRigidBody*>( bufferRigidbody ); }
+		inline btRigidBody& Get() { return *reinterpret_cast< btRigidBody* >( bufferRigidbody ); }
 
-	}; static_assert( sizeof(ecsRigidbody) == sizeof( btRigidBody ) );
+	}; static_assert( sizeof( ecsRigidbody ) == sizeof( btRigidBody ) );
 
 	//================================
-	struct ecsMotionState : ecsIComponent {
-		static const char * s_name;
-		char bufferMotionState[sizeof( btDefaultMotionState )]; // dummy btMotionState memory to bypass btDefaultMotionState constructor
+	struct ecsMotionState : ecsIComponent
+	{
+		static const char* s_name;
+		char bufferMotionState[ sizeof( btDefaultMotionState ) ]; // dummy btMotionState memory to bypass btDefaultMotionState constructor
 
-		btDefaultMotionState * Init(	const btTransform &_startTrans = btTransform::getIdentity(),
-										const btTransform &_centerOfMassOffset = btTransform::getIdentity() ) {
+		btDefaultMotionState* Init( const btTransform& _startTrans = btTransform::getIdentity(),
+									const btTransform& _centerOfMassOffset = btTransform::getIdentity() )
+		{
 			return new( bufferMotionState ) btDefaultMotionState( _startTrans, _centerOfMassOffset );
 		}
-		inline btDefaultMotionState& Get() { return *reinterpret_cast<btDefaultMotionState*>( bufferMotionState ); }
+		inline btDefaultMotionState& Get() { return *reinterpret_cast< btDefaultMotionState* >( bufferMotionState ); }
 
 	}; static_assert( sizeof( ecsMotionState ) == sizeof( btDefaultMotionState ) );
 
 	//================================
-	struct ecsSphereShape : ecsIComponent {
-		static const char * s_name;
-		char bufferSphereShape[sizeof( btSphereShape )]; // dummy btSphereShape memory to bypass btDefaultMotionState constructor
+	struct ecsSphereShape : ecsIComponent
+	{
+		static const char* s_name;
+		char bufferSphereShape[ sizeof( btSphereShape ) ]; // dummy btSphereShape memory to bypass btDefaultMotionState constructor
 
-		btSphereShape * Init( const float _radius ) {
+		btSphereShape* Init( const float _radius )
+		{
 			return new( bufferSphereShape ) btSphereShape( _radius );
 		}
-		inline btSphereShape& Get() { return *reinterpret_cast<btSphereShape*>( bufferSphereShape ); }
+		inline btSphereShape& Get() { return *reinterpret_cast< btSphereShape* >( bufferSphereShape ); }
 
 	}; static_assert( sizeof( ecsSphereShape ) == sizeof( btSphereShape ) );
 
 	//================================
-	struct ecsBoxShape : ecsIComponent {
-		static const char * s_name;
-		char bufferBoxShape[sizeof( btBoxShape )]; // dummy btBoxShape memory to bypass btDefaultMotionState constructor
+	struct ecsBoxShape : ecsIComponent
+	{
+		static const char* s_name;
+		char bufferBoxShape[ sizeof( btBoxShape ) ]; // dummy btBoxShape memory to bypass btDefaultMotionState constructor
 
-		btBoxShape * Init( const btVector3 _boxHalfExtents ) {
+		btBoxShape* Init( const btVector3 _boxHalfExtents )
+		{
 			return new( bufferBoxShape ) 	btBoxShape( _boxHalfExtents );
 		}
-		inline 	btBoxShape& Get() { return *reinterpret_cast<btBoxShape*>( bufferBoxShape ); }
+		inline 	btBoxShape& Get() { return *reinterpret_cast< btBoxShape* >( bufferBoxShape ); }
 
 	}; static_assert( sizeof( ecsBoxShape ) == sizeof( btBoxShape ) );
-	
+
 	//================================
-	struct ecsFlags : ecsIComponent {
-		static const char * s_name;
+	struct ecsFlags : ecsIComponent
+	{
+		static const char* s_name;
 		void Init() { flags = 0; }
 
 		uint32_t flags = 0;
 
-		enum Flag {
-			NONE = 1 << 0, NO_DELETE = 1 << 1, OUTDATED_TRANSFORM = 1 << 3, 
+		enum Flag
+		{
+			NONE = 1 << 0, NO_DELETE = 1 << 1, OUTDATED_TRANSFORM = 1 << 3,
 			OUTDATED_MATERIAL = 1 << 4, OUTDATED_LIGHT = 1 << 5, OUTDATED_AABB = 1 << 6,
 			NO_AABB_UPDATE = 1 << 7
 		};
@@ -226,7 +254,7 @@ namespace fan {
 	//================================
 	struct ecsEditorFlags : ecsIComponent
 	{
-		static const char * s_name;
+		static const char* s_name;
 		void Init() { flags = 0; }
 
 		uint32_t flags = 0;
@@ -240,7 +268,7 @@ namespace fan {
 	//================================
 	struct ecsBullet : ecsIComponent
 	{
-		static const char * s_name;
+		static const char* s_name;
 		void Init( const float _durationLeft, const float _damage )
 		{
 			durationLeft = _durationLeft;
@@ -254,17 +282,17 @@ namespace fan {
 	class Gameobject;
 	struct ecsGameobject : ecsIComponent
 	{
-		static const char * s_name;
+		static const char* s_name;
 		void Init( Gameobject* _gameobject )
 		{
 			gameobject = _gameobject;
 		}
-		Gameobject * gameobject = nullptr;
+		Gameobject* gameobject = nullptr;
 	};
 
 	//================================
 	//================================
-	using ecsComponents = meta::TypeList<
+	using ecsComponents = meta::TypeList <
 		ecsTranform
 		, ecsPosition
 		, ecsRotation
@@ -286,7 +314,7 @@ namespace fan {
 		, ecsEditorFlags
 		, ecsBullet
 		, ecsGameobject
-	>;
-	 
+	> ;
+
 	template< typename _type > struct IsComponent { static constexpr bool value = std::is_base_of< ecsIComponent, _type >::value; };
 }

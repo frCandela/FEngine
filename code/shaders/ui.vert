@@ -7,13 +7,15 @@ layout (location = 2) in vec4 inColor;
 layout( location = 0 ) out vec4 outColor;
 layout (location = 1) out vec2  outTexCoord;
 
-layout (binding = 0) uniform DynamicUniformBufferObject {
+layout (binding = 0) uniform DynamicUniformBufferObject 
+{
 	vec2 position;
 	vec2 scale;
 	vec4 color;
 } transform;
 
-void main() {
+void main()
+{
 
 	vec2 transformdPos = transform.scale * inPosition + transform.position;
 

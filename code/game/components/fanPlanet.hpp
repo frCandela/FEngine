@@ -4,14 +4,16 @@
 
 #include "scene/actors/fanActor.hpp"
 
-namespace fan {
+namespace fan
+{
 	//================================================================================================================================
 	//================================================================================================================================
-	class Planet : public Actor {
+	class Planet : public Actor
+	{
 	public:
 		void Start() override;
 		void Stop() override {}
-		void Update(const float _delta) override;
+		void Update( const float _delta ) override;
 		void LateUpdate( const float /*_delta*/ ) override {}
 
 		void SetSpeed( const float _speed );
@@ -21,12 +23,12 @@ namespace fan {
 		void OnGui() override;
 		ImGui::IconType GetIcon() const override { return ImGui::IconType::PLANET16; }
 
-		DECLARE_TYPE_INFO(Planet, Actor );
+		DECLARE_TYPE_INFO( Planet, Actor );
 	protected:
 		void OnAttach() override;
 		void OnDetach() override;
-		bool Load( const Json & _json ) override;
-		bool Save( Json & _json ) const override;
+		bool Load( const Json& _json ) override;
+		bool Save( Json& _json ) const override;
 
 	private:
 

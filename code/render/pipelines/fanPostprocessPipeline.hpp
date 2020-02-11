@@ -14,18 +14,20 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	class PostprocessPipeline : public Pipeline {
+	class PostprocessPipeline : public Pipeline
+	{
 	public:
 		//================================================================
 		//================================================================
-		struct Uniforms {
+		struct Uniforms
+		{
 			glm::vec4 color;
 		} uniforms;
 
 		PostprocessPipeline( Device& _device );
 		~PostprocessPipeline() override;
 
-		void SetGameImageView( ImageView * _imageView );
+		void SetGameImageView( ImageView* _imageView );
 		void CreateDescriptors( const size_t _numSwapchainImages );
 		void Resize( const VkExtent2D _extent ) override;
 		void Bind( VkCommandBuffer _commandBuffer, const size_t _index ) override;
@@ -34,11 +36,11 @@ namespace fan
 	protected:
 		void ConfigurePipeline() override;
 
-	private:		
+	private:
 
-		DescriptorTextures *	m_descriptorImageSampler = nullptr;
-		Descriptor *	m_descriptorUniforms = nullptr;
-		ImageView *		m_imageView;
-		Sampler *		m_sampler;
+		DescriptorTextures* m_descriptorImageSampler = nullptr;
+		Descriptor* m_descriptorUniforms = nullptr;
+		ImageView* m_imageView;
+		Sampler* m_sampler;
 	};
 }

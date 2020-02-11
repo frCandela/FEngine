@@ -23,7 +23,8 @@ namespace fan
 
 	//================================================================
 	//================================================================
-	struct DirectionalLightUniform {
+	struct DirectionalLightUniform
+	{
 		alignas( 16 ) glm::vec4 direction;
 		alignas( 16 ) glm::vec4 ambiant;
 		alignas( 16 ) glm::vec4 diffuse;
@@ -32,7 +33,8 @@ namespace fan
 
 	//================================================================
 	//================================================================
-	struct PointLightUniform {
+	struct PointLightUniform
+	{
 		alignas( 16 ) glm::vec4		position;
 		alignas( 16 ) glm::vec4		diffuse;
 		alignas( 16 ) glm::vec4		specular;
@@ -45,43 +47,49 @@ namespace fan
 
 	//================================================================
 	//================================================================
-	struct LightsUniforms {
-		DirectionalLightUniform dirLights[RenderGlobal::s_maximumNumDirectionalLight];
-		PointLightUniform		pointlights[RenderGlobal::s_maximumNumPointLights];
+	struct LightsUniforms
+	{
+		DirectionalLightUniform dirLights[ RenderGlobal::s_maximumNumDirectionalLight ];
+		PointLightUniform		pointlights[ RenderGlobal::s_maximumNumPointLights ];
 		uint32_t				dirLightsNum;
 		uint32_t				pointLightNum;
 	};
 
 	//================================================================
 	//================================================================
-	struct DynamicUniformsVert {
+	struct DynamicUniformsVert
+	{
 		glm::mat4 modelMat;
 		glm::mat4 normalMat;
 	};
 
 	//================================================================
 	//================================================================
-	struct DynamicUniformsMaterial {
+	struct DynamicUniformsMaterial
+	{
 		glm::vec4  color = glm::vec4( 1 );
 		glm::int32 shininess;
 	};
 
 	//================================================================
 	//================================================================
-	struct VertUniforms {
+	struct VertUniforms
+	{
 		glm::mat4 view;
 		glm::mat4 proj;
 	};
 
 	//================================================================
 	//================================================================
-	struct FragUniforms {
+	struct FragUniforms
+	{
 		glm::vec3	cameraPosition = glm::vec3( 0, 0, 0 );
 	};
 
 	//================================================================================================================================
 	//================================================================================================================================
-	class ForwardPipeline : public Pipeline {
+	class ForwardPipeline : public Pipeline
+	{
 	public:
 		// Uniforms
 		AlignedMemory<DynamicUniformsMaterial>	m_dynamicUniformsMaterial;
@@ -95,19 +103,19 @@ namespace fan
 		~ForwardPipeline() override;
 
 		void Resize( const VkExtent2D _extent ) override;
-		void BindDescriptors( VkCommandBuffer _commandBuffer, const size_t _indexFrame, const uint32_t _indexOffset );		
+		void BindDescriptors( VkCommandBuffer _commandBuffer, const size_t _indexFrame, const uint32_t _indexOffset );
 		void UpdateUniformBuffers( const size_t _index = 0 ) override;
 		void CreateDescriptors( const size_t _numSwapchainImages );
-		void ResizeDynamicDescriptors ( const size_t _newSize );
-		void ReloadShaders() override;		
+		void ResizeDynamicDescriptors( const size_t _newSize );
+		void ReloadShaders() override;
 
 	protected:
 		void ConfigurePipeline() override;
 
 	private:
-		Descriptor *		 m_sceneDescriptor;
+		Descriptor* m_sceneDescriptor;
 
 		DescriptorTextures*& m_textures;
-		DescriptorSampler *& m_sampler;
+		DescriptorSampler*& m_sampler;
 	};
 }

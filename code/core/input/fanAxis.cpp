@@ -19,7 +19,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	Axis::Axis(const std::string& _name, const Type _type, const bool _invert )
+	Axis::Axis( const std::string& _name, const Type _type, const bool _invert )
 		: m_type( _type )
 		, m_name( _name )
 		, m_invert( _invert )
@@ -33,15 +33,15 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	bool Axis::Load( const Json & _json )
+	bool Axis::Load( const Json& _json )
 	{
 		int type = -1;
-		if ( 	Serializable::LoadInt( _json, "type", type ) && ( type == Type::JOYSTICK_AXIS || type == Type::KEYBOARD || type == Type::JOYSTICK_BUTTONS ) )
+		if ( Serializable::LoadInt( _json, "type", type ) && ( type == Type::JOYSTICK_AXIS || type == Type::KEYBOARD || type == Type::JOYSTICK_BUTTONS ) )
 		{
 			m_type = Type( type );
 
 			Serializable::LoadString( _json, "name", m_name );
-			Serializable::LoadBool(_json, "invert", m_invert );
+			Serializable::LoadBool( _json, "invert", m_invert );
 
 			switch ( m_type )
 			{
@@ -59,7 +59,7 @@ namespace fan
 				Serializable::LoadInt( _json, "joystick_positive", m_buttonPositive );
 				break;
 			default:
-				Debug::Warning("Axis load: invalid axis type");
+				Debug::Warning( "Axis load: invalid axis type" );
 				return false;
 			}
 
@@ -70,11 +70,11 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	bool Axis::Save( Json & _json ) const
+	bool Axis::Save( Json& _json ) const
 	{
 		Serializable::SaveInt( _json, "type", m_type );
 		Serializable::SaveString( _json, "name", m_name );
-		Serializable::SaveBool(_json, "invert", m_invert );
+		Serializable::SaveBool( _json, "invert", m_invert );
 
 		switch ( m_type )
 		{
@@ -92,7 +92,7 @@ namespace fan
 			Serializable::SaveInt( _json, "joystick_positive", m_buttonPositive );
 			break;
 		default:
-			Debug::Warning("Axis save: invalid axis type");
+			Debug::Warning( "Axis save: invalid axis type" );
 			return false;
 		}
 
@@ -152,8 +152,8 @@ namespace fan
 	//================================================================================================================================
 	std::string	Axis::GetKeyPositiveName() const
 	{
-		if( m_keyPositive != Keyboard::NONE ){ return Keyboard::GetKeyName(m_keyPositive); }
-		else{ return Joystick::Get().GetButtonName(m_buttonPositive); }
+		if ( m_keyPositive != Keyboard::NONE ) { return Keyboard::GetKeyName( m_keyPositive ); }
+		else { return Joystick::Get().GetButtonName( m_buttonPositive ); }
 	}
 
 	//================================================================================================================================
@@ -169,7 +169,7 @@ namespace ImGui
 {
 	//================================================================================================================================
 	//================================================================================================================================
-	bool FanAxis( const char * _label, fan::Axis* _axis )
+	bool FanAxis( const char* _label, fan::Axis* _axis )
 	{
 		using namespace fan;
 
@@ -178,18 +178,18 @@ namespace ImGui
 			ImGui::PushItemWidth( 150 );
 
 			int type = _axis->GetType();
-			if ( ImGui::Combo( "", &type, "keyboard\0joystick axis\0joystick buttons\0" ) &&  Axis::Type(type) != _axis->GetType() )
+			if ( ImGui::Combo( "", &type, "keyboard\0joystick axis\0joystick buttons\0" ) && Axis::Type( type ) != _axis->GetType() )
 			{
-				*_axis = Axis(_axis->GetName(),  Axis::Type(type) );
+				*_axis = Axis( _axis->GetName(), Axis::Type( type ) );
 			}
 			ImGui::PopItemWidth();
-		
+
 			ImGui::SameLine();
 
 			bool invert = _axis->GetInvert();
 			if ( ImGui::Checkbox( "##invert", &invert ) )
 			{
-				_axis->SetInvert(invert);
+				_axis->SetInvert( invert );
 			}
 			ImGui::SameLine();
 
@@ -197,83 +197,85 @@ namespace ImGui
 			static bool s_positiveKeyCaptured = true;
 
 
-			bool openPopup[3] = {false,false,false};
+			bool openPopup[ 3 ] = { false,false,false };
 
 			switch ( _axis->GetType() )
 			{
-				case fan::Axis::KEYBOARD: {
-					// keyboard button +
-					if ( ImGui::Button( Keyboard::GetKeyName( _axis->GetKeyPositive() ).c_str() ) )
-					{
-						openPopup[Axis::KEYBOARD] = true;
-						s_capturingAxis = _axis;
-						s_positiveKeyCaptured = true;
-					}
-					// reset +
-					if ( ImGui::IsItemClicked( 1 ) ) { _axis->SetFromKeyboardKeys( Keyboard::NONE, _axis->GetKeyNegative() ); }
-
-					// keyboard button -
-					ImGui::SameLine();
-					const std::string name_neg = Keyboard::GetKeyName( _axis->GetKeyNegative() ) + "##key_but_neg";
-					if ( ImGui::Button( name_neg.c_str() ) )
-					{
-						{
-							openPopup[Axis::KEYBOARD] = true;
-							s_capturingAxis = _axis;
-							s_positiveKeyCaptured = false;
-						}
-					}
-					// reset -
-					if ( ImGui::IsItemClicked( 1 ) ) { _axis->SetFromKeyboardKeys( _axis->GetKeyPositive(), Keyboard::NONE ); }
-				}break;
-
-				case fan::Axis::JOYSTICK_AXIS:
-					// Joystick buttons
-					if ( ImGui::Button( Joystick::Get().GetAxisName( _axis->GetJoystickAxis() ).c_str() ) )
-					{
-						openPopup[Axis::JOYSTICK_AXIS] = true;
-						s_capturingAxis = _axis;
-					}
-					// reset
-					if ( ImGui::IsItemClicked( 1 ) ) { _axis->SetFromJoystickAxis( -1, Joystick::AXIS_NONE ); }
-					break;
-
-				case fan::Axis::JOYSTICK_BUTTONS: {
-					// Joystick button +
-					ImGui::PushID("joystick_button_pos");
-					if ( ImGui::Button( Joystick::Get().GetButtonName( _axis->GetButtonPositive() ).c_str() ) )
-					{
-						openPopup[Axis::JOYSTICK_BUTTONS] = true;
-						s_capturingAxis = _axis;
-						s_positiveKeyCaptured = true;
-					} ImGui::PopID();
-					// reset +
-					if ( ImGui::IsItemClicked( 1 ) ) { _axis->SetFromJoystickButtons( _axis->GetJoystickID(),-1, _axis->GetButtonNegative() ); }
-
-					// Joystick button -
-					ImGui::SameLine();
-					const std::string name_neg = Joystick::Get().GetButtonName( _axis->GetButtonNegative() ) + "##joy_but_neg";
-					if ( ImGui::Button( name_neg.c_str() ) )
-					{						
-						openPopup[Axis::JOYSTICK_BUTTONS] = true;
-						s_capturingAxis = _axis;
-						s_positiveKeyCaptured = false;	
-					}
-					// reset
-					if ( ImGui::IsItemClicked( 1 ) ) { _axis->SetFromJoystickButtons( _axis->GetJoystickID(), _axis->GetButtonPositive(), -1 ); }
-					
-				}break;
-
-				default:
-					assert( false );
-					break;
+			case fan::Axis::KEYBOARD:
+			{
+				// keyboard button +
+				if ( ImGui::Button( Keyboard::GetKeyName( _axis->GetKeyPositive() ).c_str() ) )
+				{
+					openPopup[ Axis::KEYBOARD ] = true;
+					s_capturingAxis = _axis;
+					s_positiveKeyCaptured = true;
 				}
+				// reset +
+				if ( ImGui::IsItemClicked( 1 ) ) { _axis->SetFromKeyboardKeys( Keyboard::NONE, _axis->GetKeyNegative() ); }
+
+				// keyboard button -
+				ImGui::SameLine();
+				const std::string name_neg = Keyboard::GetKeyName( _axis->GetKeyNegative() ) + "##key_but_neg";
+				if ( ImGui::Button( name_neg.c_str() ) )
+				{
+					{
+						openPopup[ Axis::KEYBOARD ] = true;
+						s_capturingAxis = _axis;
+						s_positiveKeyCaptured = false;
+					}
+				}
+				// reset -
+				if ( ImGui::IsItemClicked( 1 ) ) { _axis->SetFromKeyboardKeys( _axis->GetKeyPositive(), Keyboard::NONE ); }
+			}break;
+
+			case fan::Axis::JOYSTICK_AXIS:
+				// Joystick buttons
+				if ( ImGui::Button( Joystick::Get().GetAxisName( _axis->GetJoystickAxis() ).c_str() ) )
+				{
+					openPopup[ Axis::JOYSTICK_AXIS ] = true;
+					s_capturingAxis = _axis;
+				}
+				// reset
+				if ( ImGui::IsItemClicked( 1 ) ) { _axis->SetFromJoystickAxis( -1, Joystick::AXIS_NONE ); }
+				break;
+
+			case fan::Axis::JOYSTICK_BUTTONS:
+			{
+				// Joystick button +
+				ImGui::PushID( "joystick_button_pos" );
+				if ( ImGui::Button( Joystick::Get().GetButtonName( _axis->GetButtonPositive() ).c_str() ) )
+				{
+					openPopup[ Axis::JOYSTICK_BUTTONS ] = true;
+					s_capturingAxis = _axis;
+					s_positiveKeyCaptured = true;
+				} ImGui::PopID();
+				// reset +
+				if ( ImGui::IsItemClicked( 1 ) ) { _axis->SetFromJoystickButtons( _axis->GetJoystickID(), -1, _axis->GetButtonNegative() ); }
+
+				// Joystick button -
+				ImGui::SameLine();
+				const std::string name_neg = Joystick::Get().GetButtonName( _axis->GetButtonNegative() ) + "##joy_but_neg";
+				if ( ImGui::Button( name_neg.c_str() ) )
+				{
+					openPopup[ Axis::JOYSTICK_BUTTONS ] = true;
+					s_capturingAxis = _axis;
+					s_positiveKeyCaptured = false;
+				}
+				// reset
+				if ( ImGui::IsItemClicked( 1 ) ) { _axis->SetFromJoystickButtons( _axis->GetJoystickID(), _axis->GetButtonPositive(), -1 ); }
+
+			}break;
+
+			default:
+				assert( false );
+				break;
+			}
 
 			ImGui::SameLine();
-			ImGui::Text(_label);
+			ImGui::Text( _label );
 
 			// Capture joystick axis popup
-			if ( openPopup[Axis::JOYSTICK_AXIS] ) { ImGui::OpenPopup( "capture_joystick_axis" ); }
+			if ( openPopup[ Axis::JOYSTICK_AXIS ] ) { ImGui::OpenPopup( "capture_joystick_axis" ); }
 			if ( ImGui::BeginPopup( "capture_joystick_axis" ) )
 			{
 				if ( s_capturingAxis == _axis )
@@ -281,18 +283,18 @@ namespace ImGui
 					ImGui::Text( "PRESS ANY KEY" );
 
 					// Look for a pressed axis
-					for ( int joystickIndex = 0; joystickIndex < Joystick::NUM_JOYSTICK ; joystickIndex++ )
+					for ( int joystickIndex = 0; joystickIndex < Joystick::NUM_JOYSTICK; joystickIndex++ )
 					{
 						if ( Joystick::Get().IsConnected( joystickIndex ) && Joystick::Get().IsGamepad( joystickIndex ) )
 						{
 							const std::vector< Joystick::Axis >& axes = Joystick::Get().GetGamepadAxisList();
 							for ( int axisIndex = 0; axisIndex < axes.size(); axisIndex++ )
 							{
-								float axisValue = Joystick::Get().GetAxis( joystickIndex, axes[axisIndex] );
+								float axisValue = Joystick::Get().GetAxis( joystickIndex, axes[ axisIndex ] );
 								if ( axisValue == 1.f )
 								{
 									*s_capturingAxis = Axis( s_capturingAxis->GetName(), fan::Axis::JOYSTICK_AXIS );
-									s_capturingAxis->SetFromJoystickAxis(joystickIndex, axisIndex);
+									s_capturingAxis->SetFromJoystickAxis( joystickIndex, axisIndex );
 									s_capturingAxis = nullptr;
 									ImGui::CloseCurrentPopup();
 									break;
@@ -305,7 +307,7 @@ namespace ImGui
 			}
 
 			// Capture keyboard axis popup
-			if ( openPopup[Axis::KEYBOARD] ) { ImGui::OpenPopup( "capture_keyboard_axis" ); }
+			if ( openPopup[ Axis::KEYBOARD ] ) { ImGui::OpenPopup( "capture_keyboard_axis" ); }
 			if ( ImGui::BeginPopup( "capture_keyboard_axis" ) )
 			{
 				if ( s_capturingAxis == _axis )
@@ -315,10 +317,10 @@ namespace ImGui
 					const std::vector<Keyboard::Key>& keysList = toto.GetKeysList();
 					for ( int keyIndex = 0; keyIndex < keysList.size(); keyIndex++ )
 					{
-						if ( Keyboard::IsKeyDown( keysList[keyIndex] ) )
+						if ( Keyboard::IsKeyDown( keysList[ keyIndex ] ) )
 						{
-							Keyboard::Key positiveKey = s_positiveKeyCaptured ? keysList[keyIndex] : s_capturingAxis->GetKeyPositive();
-							Keyboard::Key negativeKey = ! s_positiveKeyCaptured ? keysList[keyIndex] : s_capturingAxis->GetKeyNegative();
+							Keyboard::Key positiveKey = s_positiveKeyCaptured ? keysList[ keyIndex ] : s_capturingAxis->GetKeyPositive();
+							Keyboard::Key negativeKey = !s_positiveKeyCaptured ? keysList[ keyIndex ] : s_capturingAxis->GetKeyNegative();
 							*s_capturingAxis = Axis( s_capturingAxis->GetName(), fan::Axis::KEYBOARD );
 							s_capturingAxis->SetFromKeyboardKeys( positiveKey, negativeKey );
 							s_capturingAxis = nullptr;
@@ -331,7 +333,7 @@ namespace ImGui
 			}
 
 			// Capture joystick button popup
-			if ( openPopup[Axis::JOYSTICK_BUTTONS] ) { ImGui::OpenPopup( "capture_joystick_button" ); }
+			if ( openPopup[ Axis::JOYSTICK_BUTTONS ] ) { ImGui::OpenPopup( "capture_joystick_button" ); }
 			if ( ImGui::BeginPopup( "capture_joystick_button" ) )
 			{
 				if ( s_capturingAxis == _axis )
@@ -339,18 +341,18 @@ namespace ImGui
 					ImGui::Text( "PRESS ANY KEY" );
 
 					// Look for a pressed axis
-					for ( int joystickIndex = 0; joystickIndex < Joystick::NUM_JOYSTICK ; joystickIndex++ )
+					for ( int joystickIndex = 0; joystickIndex < Joystick::NUM_JOYSTICK; joystickIndex++ )
 					{
 						if ( Joystick::Get().IsConnected( joystickIndex ) && Joystick::Get().IsGamepad( joystickIndex ) )
 						{
 							const std::vector< Joystick::Button >& buttons = Joystick::Get().GetGamepadButtonsList();
 							for ( int buttonIndex = 0; buttonIndex < buttons.size(); buttonIndex++ )
-							{								
-								if ( Joystick::Get().GetButton( joystickIndex, buttons[buttonIndex] ) )
+							{
+								if ( Joystick::Get().GetButton( joystickIndex, buttons[ buttonIndex ] ) )
 								{
-									Joystick::Button positiveButton = s_positiveKeyCaptured ? buttons[buttonIndex] : s_capturingAxis->GetButtonPositive();
-									Joystick::Button negativeButton = !s_positiveKeyCaptured ? buttons[buttonIndex] : s_capturingAxis->GetButtonNegative();
-									s_capturingAxis->SetFromJoystickButtons(joystickIndex, positiveButton, negativeButton );
+									Joystick::Button positiveButton = s_positiveKeyCaptured ? buttons[ buttonIndex ] : s_capturingAxis->GetButtonPositive();
+									Joystick::Button negativeButton = !s_positiveKeyCaptured ? buttons[ buttonIndex ] : s_capturingAxis->GetButtonNegative();
+									s_capturingAxis->SetFromJoystickButtons( joystickIndex, positiveButton, negativeButton );
 									s_capturingAxis = nullptr;
 									ImGui::CloseCurrentPopup();
 									break;

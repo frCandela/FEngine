@@ -1,11 +1,13 @@
 #version 450
 
-layout(binding = 0) uniform UniformBufferObject {
+layout(binding = 0) uniform UniformBufferObject 
+{
     mat4 view;
     mat4 proj;
 } ubo;
 
-layout (binding = 1) uniform DynamicUniformBufferObject {
+layout (binding = 1) uniform DynamicUniformBufferObject 
+{
 	mat4 modelMat;
 	mat4 normalMat;
 } dynamicUbo;
@@ -20,7 +22,8 @@ layout (location = 1) out vec3 outFragPos;
 layout (location = 2) out vec3 outNormal;
 layout (location = 3) out vec2 outTexCoord;
 
-void main() {
+void main() 
+{
 	const vec4 worldPos = dynamicUbo.modelMat * vec4(inPosition, 1.0);
 	gl_Position = ubo.proj * ubo.view * worldPos;
 

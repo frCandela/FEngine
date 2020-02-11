@@ -5,7 +5,8 @@
 #include "scene/ecs/fanECSConfig.hpp"
 #include "core/meta/fanMetaMath.hpp"
 
-namespace fan {
+namespace fan
+{
 
 	//================================================================================================================================
 	// Used to access a component data inside the ecsComponentTuple
@@ -25,14 +26,14 @@ namespace fan {
 	class ecsComponentsKeyCommon
 	{
 	public:
-		ecsComponentsKeyCommon() { m_bitset[aliveBit] = 1; }
-		
-		inline void Kill() { m_bitset[aliveBit] = 0; }
-		inline bool IsAlive() const { return   m_bitset[aliveBit]; }
-		inline bool IsDead() const { return  !m_bitset[aliveBit]; }
-		inline bool HasComponent( const int _componentID ) const { return m_bitset[_componentID]; }
-		inline bool HasTag( const int _tagID ) const		 { return m_bitset[_tagID]; }
-		inline void SetTag( const int _tagID, const bool _value ) { m_bitset[_tagID] = _value; }
+		ecsComponentsKeyCommon() { m_bitset[ aliveBit ] = 1; }
+
+		inline void Kill() { m_bitset[ aliveBit ] = 0; }
+		inline bool IsAlive() const { return   m_bitset[ aliveBit ]; }
+		inline bool IsDead() const { return  !m_bitset[ aliveBit ]; }
+		inline bool HasComponent( const int _componentID ) const { return m_bitset[ _componentID ]; }
+		inline bool HasTag( const int _tagID ) const { return m_bitset[ _tagID ]; }
+		inline void SetTag( const int _tagID, const bool _value ) { m_bitset[ _tagID ] = _value; }
 		inline bool MatchSignature( const ecsBitset _bitset ) const { return  ( m_bitset & _bitset ) == _bitset; }
 		inline const ecsBitset& GetBitset() const { return m_bitset; }
 
@@ -45,21 +46,23 @@ namespace fan {
 	class ecsComponentsKeyFast : public ecsComponentsKeyCommon
 	{
 	public:
- 		const ecsComponentIndex& GetIndex( const uint32_t _componentID ) const { return m_indices[_componentID]; }
-		
-		void AddComponent( const uint32_t _componentID, const ecsComponentIndex& _index ){
-			assert( m_bitset[_componentID] == 0 ); // entity already has _componentType
-			m_indices[_componentID] = _index; 
-			m_bitset[_componentID] = 1;
+		const ecsComponentIndex& GetIndex( const uint32_t _componentID ) const { return m_indices[ _componentID ]; }
+
+		void AddComponent( const uint32_t _componentID, const ecsComponentIndex& _index )
+		{
+			assert( m_bitset[ _componentID ] == 0 ); // entity already has _componentType
+			m_indices[ _componentID ] = _index;
+			m_bitset[ _componentID ] = 1;
 		}
 
-		ecsComponentIndex RemoveComponent( const uint32_t _componentID ) { 
-			m_bitset[_componentID] = 0;
-			return m_indices[_componentID]; 
+		ecsComponentIndex RemoveComponent( const uint32_t _componentID )
+		{
+			m_bitset[ _componentID ] = 0;
+			return m_indices[ _componentID ];
 		}
 
 	private:
-		ecsComponentIndex	m_indices[ecsComponents::count];// index of each components
+		ecsComponentIndex	m_indices[ ecsComponents::count ];// index of each components
 	};
 
 	//================================================================================================================================
@@ -79,20 +82,20 @@ namespace fan {
 
 		ecsComponentsKeyCompact();
 
-		const ecsComponentIndex&	GetIndex( const uint32_t _componentID ) const { return m_indices[GetSubIndex( _componentID )]; }
+		const ecsComponentIndex&	GetIndex( const uint32_t _componentID ) const { return m_indices[ GetSubIndex( _componentID ) ]; }
 		void						AddComponent( const uint32_t _componentID, const ecsComponentIndex& _index );
 		ecsComponentIndex			RemoveComponent( const uint32_t _componentID );
 
 		void OnGui();
 	private:
-		ecsComponentIndex	m_indices[s_maxComponentsPerEntity];	
+		ecsComponentIndex	m_indices[ s_maxComponentsPerEntity ];
 		indicesBitset		m_componentsKeys;						// Index of the components in the element&chunck arrays
 		uint32_t			m_nextElement = 0;						// Next available element in the element&chunck arrays
 
 		uint32_t					GetSubIndex( const uint32_t _componentIndex ) const;
 		void						SetSubIndex( const uint32_t _componentIndex, const uint32_t _value );
 		void						Reset();
-		const ecsComponentIndex	*	Data() const { return m_indices; }		
+		const ecsComponentIndex* Data() const { return m_indices; }
 		uint32_t					Count() const { return m_nextElement; }
 		uint32_t					IsEmpty() const { return m_nextElement == 0; }
 	};

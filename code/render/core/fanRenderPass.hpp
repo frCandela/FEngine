@@ -11,20 +11,20 @@ namespace fan
 	class RenderPass
 	{
 	public:
-		RenderPass(Device& _device);
+		RenderPass( Device& _device );
 		~RenderPass();
 		bool Create();
 		VkRenderPass GetRenderPass() const { return m_renderPass; }
 
-		VkAttachmentDescription& AddInputAttachment( );
-		VkAttachmentDescription& AddColorAttachment( const VkFormat _format, const VkImageLayout _finalLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
-		VkAttachmentDescription& AddDepthAttachment( const VkFormat _format);
-		VkSubpassDependency&	 AddDependency();
+		VkAttachmentDescription& AddInputAttachment();
+		VkAttachmentDescription& AddColorAttachment( const VkFormat _format, const VkImageLayout _finalLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL );
+		VkAttachmentDescription& AddDepthAttachment( const VkFormat _format );
+		VkSubpassDependency& AddDependency();
 
 		VkRenderPassCreateInfo m_renderPassCreateInfo;
 
 	private:
-		Device&			m_device;
+		Device& m_device;
 		VkRenderPass	m_renderPass = VK_NULL_HANDLE;
 
 		std::vector<VkAttachmentDescription> m_attachments;

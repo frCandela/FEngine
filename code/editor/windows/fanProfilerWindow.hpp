@@ -4,10 +4,12 @@
 #include "editor/windows/fanEditorWindow.hpp"
 #include "core/time/fanProfiler.hpp"
 
-namespace fan {
+namespace fan
+{
 	//================================================================================================================================
 	//================================================================================================================================
-	class ProfilerWindow : public EditorWindow {
+	class ProfilerWindow : public EditorWindow
+	{
 	public:
 		ProfilerWindow();
 	protected:
@@ -25,7 +27,7 @@ namespace fan {
 		const Color m_color2;
 		const Color m_colorHovered;
 
-		void OnToogleFreezeCapture() { m_freezeCapture = ! m_freezeCapture; }
+		void OnToogleFreezeCapture() { m_freezeCapture = !m_freezeCapture; }
 	};
 
 }

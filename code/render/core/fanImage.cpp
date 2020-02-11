@@ -5,20 +5,23 @@ namespace fan
 {
 	//================================================================================================================================
 	//================================================================================================================================
-	Image::Image(Device & _device) :
-		m_device(_device) {
-	}
+	Image::Image( Device& _device ) :
+		m_device( _device )
+	{}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void Image::DestroyImage() {
-		if ( m_image != VK_NULL_HANDLE ) {
+	void Image::DestroyImage()
+	{
+		if ( m_image != VK_NULL_HANDLE )
+		{
 			vkDestroyImage( m_device.vkDevice, m_image, nullptr );
 			m_image = VK_NULL_HANDLE;
 
 		}
 
-		if ( m_imageMemory != VK_NULL_HANDLE ) {
+		if ( m_imageMemory != VK_NULL_HANDLE )
+		{
 			vkFreeMemory( m_device.vkDevice, m_imageMemory, nullptr );
 			m_imageMemory = VK_NULL_HANDLE;
 		}
@@ -26,20 +29,23 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	Image::~Image() {
+	Image::~Image()
+	{
 		DestroyImage();
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void Image::Resize( const VkExtent2D _size ) {
+	void Image::Resize( const VkExtent2D _size )
+	{
 		DestroyImage();
-		Create( m_format, _size, m_usage, m_memoryProperties);
+		Create( m_format, _size, m_usage, m_memoryProperties );
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	bool Image::Create( const VkFormat _format, const VkExtent2D _size, const VkImageUsageFlags _usage, const VkMemoryPropertyFlags _memoryProperties) {
+	bool Image::Create( const VkFormat _format, const VkExtent2D _size, const VkImageUsageFlags _usage, const VkMemoryPropertyFlags _memoryProperties )
+	{
 		m_size = _size;
 		m_format = _format;
 		m_usage = _usage;
@@ -64,26 +70,29 @@ namespace fan
 		imageCreateInfo.pQueueFamilyIndices = nullptr;
 		imageCreateInfo.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
 
-		if (vkCreateImage(m_device.vkDevice, &imageCreateInfo, nullptr, &m_image) != VK_SUCCESS) {
-			Debug::Error("Could not allocate image");
+		if ( vkCreateImage( m_device.vkDevice, &imageCreateInfo, nullptr, &m_image ) != VK_SUCCESS )
+		{
+			Debug::Error( "Could not allocate image" );
 			return false;
 		}
 		VkMemoryRequirements memoryRequirements;
-		vkGetImageMemoryRequirements(m_device.vkDevice, m_image, &memoryRequirements);
+		vkGetImageMemoryRequirements( m_device.vkDevice, m_image, &memoryRequirements );
 
 		VkMemoryAllocateInfo bufferMemoryAllocateInfo;
 		bufferMemoryAllocateInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
 		bufferMemoryAllocateInfo.pNext = nullptr;
 		bufferMemoryAllocateInfo.allocationSize = memoryRequirements.size;
-		bufferMemoryAllocateInfo.memoryTypeIndex = m_device.FindMemoryType(memoryRequirements.memoryTypeBits, _memoryProperties);
+		bufferMemoryAllocateInfo.memoryTypeIndex = m_device.FindMemoryType( memoryRequirements.memoryTypeBits, _memoryProperties );
 
-		if (vkAllocateMemory(m_device.vkDevice, &bufferMemoryAllocateInfo, nullptr, &m_imageMemory) != VK_SUCCESS) {
-			Debug::Error("Could not allocate buffer");
+		if ( vkAllocateMemory( m_device.vkDevice, &bufferMemoryAllocateInfo, nullptr, &m_imageMemory ) != VK_SUCCESS )
+		{
+			Debug::Error( "Could not allocate buffer" );
 			return false;
 		}
 
-		if (vkBindImageMemory(m_device.vkDevice, m_image, m_imageMemory, 0) != VK_SUCCESS) {
-			Debug::Error("Could not bind memory to image");
+		if ( vkBindImageMemory( m_device.vkDevice, m_image, m_imageMemory, 0 ) != VK_SUCCESS )
+		{
+			Debug::Error( "Could not bind memory to image" );
 			return false;
 		}
 		Debug::Get() << Debug::Severity::log << std::hex << "VkImage               " << m_image << std::dec << Debug::Endl();
@@ -94,7 +103,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void Image::TransitionImageLayout(VkCommandBuffer _commandBuffer, VkFormat _format, VkImageLayout _oldLayout, VkImageLayout _newLayout, uint32_t _mipLevels)
+	void Image::TransitionImageLayout( VkCommandBuffer _commandBuffer, VkFormat _format, VkImageLayout _oldLayout, VkImageLayout _newLayout, uint32_t _mipLevels )
 	{
 		// Synchronize access to resources
 		VkImageMemoryBarrier barrier = {};
@@ -106,10 +115,10 @@ namespace fan
 		barrier.image = m_image;
 
 		// Use the right subresource aspect
-		if (_newLayout == VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL)
+		if ( _newLayout == VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL )
 		{
 			barrier.subresourceRange.aspectMask = VK_IMAGE_ASPECT_DEPTH_BIT;
-			if (HasStencilComponent(_format))
+			if ( HasStencilComponent( _format ) )
 				barrier.subresourceRange.aspectMask |= VK_IMAGE_ASPECT_STENCIL_BIT;
 		}
 		else
@@ -124,7 +133,7 @@ namespace fan
 		VkPipelineStageFlags sourceStage;
 		VkPipelineStageFlags destinationStage;
 
-		if (_oldLayout == VK_IMAGE_LAYOUT_UNDEFINED && _newLayout == VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL)
+		if ( _oldLayout == VK_IMAGE_LAYOUT_UNDEFINED && _newLayout == VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL )
 		{
 			barrier.srcAccessMask = 0;
 			barrier.dstAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
@@ -132,7 +141,7 @@ namespace fan
 			sourceStage = VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT;
 			destinationStage = VK_PIPELINE_STAGE_TRANSFER_BIT;
 		}
-		else if (_oldLayout == VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL && _newLayout == VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL)
+		else if ( _oldLayout == VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL && _newLayout == VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL )
 		{
 			barrier.srcAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
 			barrier.dstAccessMask = VK_ACCESS_SHADER_READ_BIT;
@@ -140,7 +149,7 @@ namespace fan
 			sourceStage = VK_PIPELINE_STAGE_TRANSFER_BIT;
 			destinationStage = VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT;
 		}
-		else if (_oldLayout == VK_IMAGE_LAYOUT_UNDEFINED && _newLayout == VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL)
+		else if ( _oldLayout == VK_IMAGE_LAYOUT_UNDEFINED && _newLayout == VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL )
 		{
 			barrier.srcAccessMask = 0;
 			barrier.dstAccessMask = VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_READ_BIT | VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT;
@@ -149,7 +158,7 @@ namespace fan
 			destinationStage = VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT;
 		}
 		else
-			throw std::invalid_argument("unsupported layout transition!");
+			throw std::invalid_argument( "unsupported layout transition!" );
 
 
 		vkCmdPipelineBarrier(

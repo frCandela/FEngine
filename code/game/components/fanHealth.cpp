@@ -5,9 +5,9 @@ namespace fan
 {
 	REGISTER_TYPE_INFO( Health, TypeInfo::Flags::EDITOR_COMPONENT, "game/" )
 
-	//================================================================================================================================
-	//================================================================================================================================
-	void Health::OnAttach()
+		//================================================================================================================================
+		//================================================================================================================================
+		void Health::OnAttach()
 	{
 		Component::OnAttach();
 	}
@@ -27,16 +27,17 @@ namespace fan
 	{
 		assert( _healthConsumed >= 0.f );
 
-		if( m_invincible ){ return true; }
+		if ( m_invincible ) { return true; }
 
-		if( m_currentHealth >= _healthConsumed ) {
+		if ( m_currentHealth >= _healthConsumed )
+		{
 			m_currentHealth -= _healthConsumed;
-			if( m_currentHealth <= 0.f ){ onFallToZero.Emmit(); }
+			if ( m_currentHealth <= 0.f ) { onFallToZero.Emmit(); }
 			return true;
 		}
 		else
 		{
-			 return false;
+			return false;
 		}
 	}
 
@@ -45,7 +46,7 @@ namespace fan
 	void Health::AddHealth( const float _healthAdded )
 	{
 		assert( _healthAdded >= 0.f );
-		m_currentHealth = std::min( m_currentHealth + _healthAdded, m_maxHealth );		
+		m_currentHealth = std::min( m_currentHealth + _healthAdded, m_maxHealth );
 	}
 
 	//================================================================================================================================
@@ -56,24 +57,24 @@ namespace fan
 		{
 			ImGui::SliderFloat( "current health", &m_currentHealth, 0.f, m_maxHealth );
 			ImGui::DragFloat( "max health", &m_maxHealth );
-			ImGui::Checkbox("invincible", &m_invincible);
+			ImGui::Checkbox( "invincible", &m_invincible );
 
 		} ImGui::PopItemWidth();
 	}
-	 
+
 	//================================================================================================================================
 	//================================================================================================================================
-	bool Health::Save( Json & _json ) const
+	bool Health::Save( Json& _json ) const
 	{
 		Component::Save( _json );
 		Serializable::SaveFloat( _json, "max_energy", m_maxHealth );
 
 		return true;
 	}
-	 
+
 	//================================================================================================================================
 	//================================================================================================================================
-	bool Health::Load( const Json & _json )
+	bool Health::Load( const Json& _json )
 	{
 		Serializable::LoadFloat( _json, "max_energy", m_maxHealth );
 

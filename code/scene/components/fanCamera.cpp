@@ -3,11 +3,12 @@
 
 namespace fan
 {
-	REGISTER_TYPE_INFO(Camera, TypeInfo::Flags::EDITOR_COMPONENT, "")
+	REGISTER_TYPE_INFO( Camera, TypeInfo::Flags::EDITOR_COMPONENT, "" )
 
-	//================================================================================================================================
-	//================================================================================================================================
-	void Camera::OnAttach() {
+		//================================================================================================================================
+		//================================================================================================================================
+		void Camera::OnAttach()
+	{
 		m_fov = 110.f;
 		m_aspectRatio = 1.f;
 		m_nearDistance = 0.01f;
@@ -21,9 +22,9 @@ namespace fan
 	{
 		Transform& transform = m_gameobject->GetTransform();
 		glm::mat4 view = glm::lookAt(
-			ToGLM(transform.GetPosition()),
-			ToGLM(transform.GetPosition() + transform.Forward()),
-			ToGLM(transform.Up()));
+			ToGLM( transform.GetPosition() ),
+			ToGLM( transform.GetPosition() + transform.Forward() ),
+			ToGLM( transform.Up() ) );
 		return view;
 	}
 
@@ -31,11 +32,13 @@ namespace fan
 	//================================================================================================================================
 	glm::mat4 Camera::GetProjection() const
 	{
-		glm::mat4 proj = glm::mat4(1);
-		if ( m_type == Type::ORTHOGONAL ) {
-			proj = glm::ortho(-m_orthoSize * m_aspectRatio, m_orthoSize * m_aspectRatio,-m_orthoSize, m_orthoSize,m_nearDistance, m_farDistance);
-		} 
-		else if( m_type == Type::PERSPECTIVE )  {
+		glm::mat4 proj = glm::mat4( 1 );
+		if ( m_type == Type::ORTHOGONAL )
+		{
+			proj = glm::ortho( -m_orthoSize * m_aspectRatio, m_orthoSize * m_aspectRatio, -m_orthoSize, m_orthoSize, m_nearDistance, m_farDistance );
+		}
+		else if ( m_type == Type::PERSPECTIVE )
+		{
 			const float fov = glm::radians( m_fov );
 			proj = glm::perspective( fov, m_aspectRatio, m_nearDistance, m_farDistance );
 		}
@@ -44,12 +47,13 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	Ray Camera::ScreenPosToRay(const btVector2& _position)
+	Ray Camera::ScreenPosToRay( const btVector2& _position )
 	{
-		assert(_position.x() >= -1.f  && _position.x() <= 1.f);
-		assert(_position.y() >= -1.f && _position.y() <= 1.f);
+		assert( _position.x() >= -1.f && _position.x() <= 1.f );
+		assert( _position.y() >= -1.f && _position.y() <= 1.f );
 
-		if( m_type == Type::PERSPECTIVE ) {
+		if ( m_type == Type::PERSPECTIVE )
+		{
 			Transform& transform = m_gameobject->GetTransform();
 
 			const btVector3	pos = transform.GetPosition();
@@ -67,15 +71,17 @@ namespace fan
 			ray.direction = ( 100.f * ( ray.origin - pos ) ).normalized();
 
 			return ray;
-		} else { // ORTHOGONAL
+		}
+		else
+		{ // ORTHOGONAL
 			Ray ray;
 
 			Transform& transform = m_gameobject->GetTransform();
 
 			ray.origin = transform.GetPosition();
-			ray.origin -= m_aspectRatio * m_orthoSize * transform.Left()  * _position[0];
-			ray.origin -= m_orthoSize * transform.Up()  * _position[1];
-			
+			ray.origin -= m_aspectRatio * m_orthoSize * transform.Left() * _position[ 0 ];
+			ray.origin -= m_orthoSize * transform.Up() * _position[ 1 ];
+
 			ray.direction = transform.Forward();
 
 			return ray;
@@ -84,18 +90,18 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	btVector2 Camera::WorldPosToScreen(const btVector3& worldPosition) 
+	btVector2 Camera::WorldPosToScreen( const btVector3& worldPosition )
 	{
-		if( m_type == Type::PERSPECTIVE ) 
+		if ( m_type == Type::PERSPECTIVE )
 		{
-			const glm::vec4 pos( worldPosition[0], worldPosition[1], worldPosition[2], 1.f );
+			const glm::vec4 pos( worldPosition[ 0 ], worldPosition[ 1 ], worldPosition[ 2 ], 1.f );
 			glm::vec4  proj = GetProjection() * GetView() * pos;
 			proj /= proj.z;
 			return btVector2( proj.x, proj.y );
 		}
 		else
 		{
-			const glm::vec4 pos( worldPosition[0], worldPosition[1], worldPosition[2], 1.f );
+			const glm::vec4 pos( worldPosition[ 0 ], worldPosition[ 1 ], worldPosition[ 2 ], 1.f );
 			glm::vec4  proj = GetProjection() * GetView() * pos;
 			return btVector2( proj.x, -proj.y );
 		}
@@ -103,22 +109,28 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void Camera::SetFov(float _fov) {
+	void Camera::SetFov( float _fov )
+	{
 		m_fov = _fov;
 	};
-	void Camera::SetOrthoSize( float _orthoSize ) {
+	void Camera::SetOrthoSize( float _orthoSize )
+	{
 		m_orthoSize = _orthoSize;
 	};
-	void Camera::SetNearDistance(float _nearDistance) {
+	void Camera::SetNearDistance( float _nearDistance )
+	{
 		m_nearDistance = _nearDistance;
 	};
-	void Camera::SetFarDistance(float _farDistance) {
+	void Camera::SetFarDistance( float _farDistance )
+	{
 		m_farDistance = _farDistance;
 	};
-	void Camera::SetAspectRatio(float _aspectRatio) {
+	void Camera::SetAspectRatio( float _aspectRatio )
+	{
 		m_aspectRatio = _aspectRatio;
 	};
-	void Camera::SetProjectionType( const Type _type ) {
+	void Camera::SetProjectionType( const Type _type )
+	{
 		m_type = _type;
 	}
 
@@ -131,7 +143,7 @@ namespace fan
 		ImGui::PushItemWidth( 0.6f * ImGui::GetWindowWidth() - 16 );
 		{
 
-			int item = static_cast<int>( m_type );
+			int item = static_cast< int >( m_type );
 			if ( ImGui::Combo( "type", &item, "perspective\0orthogonal\0" ) )
 			{
 				SetProjectionType( Type( item ) );
@@ -187,16 +199,17 @@ namespace fan
 			if ( ImGui::DragFloat( "far distance", &far, 10.f, 0.05f, 10000.f ) )
 			{
 				SetFarDistance( far );
-			}			
+			}
 		} ImGui::PopItemWidth();
-	
+
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	bool Camera::Load( const Json & _json ) {
+	bool Camera::Load( const Json& _json )
+	{
 		int tmp;
-			Serializable::LoadInt  ( _json, "camera_type", tmp ); m_type = Type(tmp);
+		Serializable::LoadInt( _json, "camera_type", tmp ); m_type = Type( tmp );
 		Serializable::LoadFloat( _json, "orthoSize", m_orthoSize );
 		Serializable::LoadFloat( _json, "fov", m_fov );
 		Serializable::LoadFloat( _json, "nearDistance", m_nearDistance );
@@ -206,15 +219,16 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	bool Camera::Save( Json & _json ) const {
+	bool Camera::Save( Json& _json ) const
+	{
 
-		Serializable::SaveInt  ( _json, "camera_type", m_type );
+		Serializable::SaveInt( _json, "camera_type", m_type );
 		Serializable::SaveFloat( _json, "orthoSize", m_orthoSize );
 		Serializable::SaveFloat( _json, "fov", m_fov );
 		Serializable::SaveFloat( _json, "nearDistance", m_nearDistance );
 		Serializable::SaveFloat( _json, "farDistance", m_farDistance );
 		Component::Save( _json );
-		
+
 		return true;
 	}
 }

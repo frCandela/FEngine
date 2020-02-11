@@ -3,14 +3,16 @@
 #include "core/fanCorePrecompiled.hpp"
 #include "core/resources/fanResource.hpp"
 
-namespace fan {
+namespace fan
+{
 	//================================================================================================================================
 	//================================================================================================================================
 	template< typename _ResourceType >
-	class ResourceList {
-	public:	
+	class ResourceList
+	{
+	public:
 
 	private:
-		std::vector< _ResourceType * > m_resources;
+		std::vector< _ResourceType* > m_resources;
 	};
 }

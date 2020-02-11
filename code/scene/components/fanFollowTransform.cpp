@@ -6,16 +6,16 @@ namespace fan
 	REGISTER_TYPE_INFO( FollowTransform, TypeInfo::Flags::EDITOR_COMPONENT, "other/" )
 
 
-	//================================================================================================================================
-	//================================================================================================================================
-	void FollowTransform::OnAttach()
+		//================================================================================================================================
+		//================================================================================================================================
+		void FollowTransform::OnAttach()
 	{
 		Actor::OnAttach();
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void FollowTransform::OnDetach()		
+	void FollowTransform::OnDetach()
 	{
 		Actor::OnDetach();
 	}
@@ -26,24 +26,24 @@ namespace fan
 	{
 		REQUIRE_TRUE( *m_followedTransform != nullptr, "SpaceshipUI: missing reference" )
 
-		if( *m_followedTransform != nullptr )
-		{
-			m_offset = m_followedTransform->GetPosition() - m_gameobject->GetTransform().GetPosition();
-		}	
+			if ( *m_followedTransform != nullptr )
+			{
+				m_offset = m_followedTransform->GetPosition() - m_gameobject->GetTransform().GetPosition();
+			}
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
 	void FollowTransform::Update( const float /*_delta*/ )
 	{
-		UpdatePosition();			
+		UpdatePosition();
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
 	void FollowTransform::UpdatePosition()
 	{
-		Transform & transform = m_gameobject->GetTransform();
+		Transform& transform = m_gameobject->GetTransform();
 
 		btVector3 offset = m_followedTransform->GetPosition() - transform.GetPosition() - m_offset;
 
@@ -57,24 +57,24 @@ namespace fan
 	//================================================================================================================================
 	void FollowTransform::OnGui()
 	{
-		ImGui::FanComponent("followed transform", &m_followedTransform );
+		ImGui::FanComponent( "followed transform", &m_followedTransform );
 	}
-	 
+
 	//================================================================================================================================
 	//================================================================================================================================
-	bool FollowTransform::Save( Json & _json ) const
+	bool FollowTransform::Save( Json& _json ) const
 	{
 		Actor::Save( _json );
-		Serializable::SaveComponentPtr(_json, "followed_transform", m_followedTransform );
+		Serializable::SaveComponentPtr( _json, "followed_transform", m_followedTransform );
 		return true;
 	}
-	 
+
 	//================================================================================================================================
 	//================================================================================================================================
-	bool FollowTransform::Load( const Json & _json )
+	bool FollowTransform::Load( const Json& _json )
 	{
 		Actor::Load( _json );
-		Serializable::LoadComponentPtr(_json, "followed_transform", m_followedTransform );
+		Serializable::LoadComponentPtr( _json, "followed_transform", m_followedTransform );
 		return true;
 	}
 }

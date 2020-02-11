@@ -5,20 +5,23 @@ namespace fan
 {
 	//================================================================================================================================
 	//================================================================================================================================
-	ImageView::ImageView(Device & _device) :
-		m_device(_device) {
-	}
+	ImageView::ImageView( Device& _device ) :
+		m_device( _device )
+	{}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	ImageView::~ImageView() {
+	ImageView::~ImageView()
+	{
 		Destroy();
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void ImageView::Destroy() {
-		if ( m_imageView != VK_NULL_HANDLE ) {
+	void ImageView::Destroy()
+	{
+		if ( m_imageView != VK_NULL_HANDLE )
+		{
 			vkDestroyImageView( m_device.vkDevice, m_imageView, nullptr );
 			m_imageView = VK_NULL_HANDLE;
 		}
@@ -26,14 +29,16 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void ImageView::SetImage( VkImage _image ) {
+	void ImageView::SetImage( VkImage _image )
+	{
 		Destroy();
-		Create(_image, m_format, m_aspectFlags, m_viewType );
+		Create( _image, m_format, m_aspectFlags, m_viewType );
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	bool ImageView::Create(VkImage _image, const VkFormat _format, const VkImageAspectFlags _aspectFlags, const VkImageViewType _viewType) {
+	bool ImageView::Create( VkImage _image, const VkFormat _format, const VkImageAspectFlags _aspectFlags, const VkImageViewType _viewType )
+	{
 		m_format = _format;
 		m_aspectFlags = _aspectFlags;
 		m_viewType = _viewType;
@@ -55,7 +60,7 @@ namespace fan
 		imageViewCreateInfo.subresourceRange.baseArrayLayer = 0;
 		imageViewCreateInfo.subresourceRange.layerCount = VK_REMAINING_ARRAY_LAYERS;
 
-		VkResult result = vkCreateImageView(m_device.vkDevice, &imageViewCreateInfo, nullptr, &m_imageView);
+		VkResult result = vkCreateImageView( m_device.vkDevice, &imageViewCreateInfo, nullptr, &m_imageView );
 		Debug::Get() << Debug::Severity::log << std::hex << "VkImageView           " << m_imageView << std::dec << Debug::Endl();
 		return result == VK_SUCCESS;
 	}

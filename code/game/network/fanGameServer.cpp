@@ -16,9 +16,9 @@ namespace fan
 {
 	REGISTER_TYPE_INFO( GameServer, TypeInfo::Flags::EDITOR_COMPONENT, "game/net/" )
 
-	//================================================================================================================================
-	//================================================================================================================================
-	void GameServer::OnAttach()
+		//================================================================================================================================
+		//================================================================================================================================
+		void GameServer::OnAttach()
 	{
 		Actor::OnAttach();
 		m_socket.Create( "[SERVER]", 53000 );
@@ -57,7 +57,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void GameServer::Stop() 
+	void GameServer::Stop()
 	{
 		ClearClients();
 		onClientConnected.Disconnect( &PlayersManager::AddPlayer, m_playersManager );
@@ -75,7 +75,7 @@ namespace fan
 
 			for ( int clientIndex = 0; clientIndex < m_clients.size(); clientIndex++ )
 			{
-				ClientData& client = m_clients[clientIndex];
+				ClientData& client = m_clients[ clientIndex ];
 				UpdateClient( client, _delta );
 			}
 		}
@@ -87,19 +87,19 @@ namespace fan
 	{
 		sf::Packet		packet;
 		bool disconnected = false;
-		while ( m_socket.Receive( packet, disconnected ) ) 
+		while ( m_socket.Receive( packet, disconnected ) )
 		{
 			if ( disconnected )
 			{
-				ClientData * client = FindClient( m_socket.GetLastReceiveIp() , m_socket.GetLastReceivePort() );
+				ClientData* client = FindClient( m_socket.GetLastReceiveIp(), m_socket.GetLastReceivePort() );
 				if ( client != nullptr )
 				{
 					RemoveClient( *client );
 				}
 			}
-			else if( m_socket.GetLastReceivePort() != m_socket.GetPort() )
-			{	
-				ProcessPacket( m_socket.GetLastReceiveIp() , m_socket.GetLastReceivePort(), packet );								
+			else if ( m_socket.GetLastReceivePort() != m_socket.GetPort() )
+			{
+				ProcessPacket( m_socket.GetLastReceiveIp(), m_socket.GetLastReceivePort(), packet );
 			}
 		}
 	}
@@ -108,7 +108,7 @@ namespace fan
 	//================================================================================================================================
 	void GameServer::ProcessPacket( const sf::IpAddress& _ip, const Port& _port, sf::Packet& _packet )
 	{
-		ClientData * client = FindClient( _ip, _port );
+		ClientData* client = FindClient( _ip, _port );
 
 		// Process packet
 		sf::Uint16 intType;
@@ -122,7 +122,7 @@ namespace fan
 				PacketLogin packetLogin;
 				packetLogin.LoadFrom( _packet );
 				client = AddClient( _ip, _port, packetLogin );
-				Send(  PacketAckLogin().ToPacket(), *client );
+				Send( PacketAckLogin().ToPacket(), *client );
 			}
 			else
 			{
@@ -163,7 +163,7 @@ namespace fan
 	{
 		for ( int clientIndex = 0; clientIndex < m_clients.size(); clientIndex++ )
 		{
-			ClientData& client = m_clients[clientIndex];
+			ClientData& client = m_clients[ clientIndex ];
 			Send( _packet, client );
 		}
 	}
@@ -195,11 +195,11 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void GameServer::LateUpdate( const float /*_delta*/ ){}
+	void GameServer::LateUpdate( const float /*_delta*/ ) {}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	GameServer::ClientData * GameServer::AddClient( const sf::IpAddress& _ip, const Port& _port, const PacketLogin& _loginInfo )
+	GameServer::ClientData* GameServer::AddClient( const sf::IpAddress& _ip, const Port& _port, const PacketLogin& _loginInfo )
 	{
 		assert( FindClient( _ip, _port ) == nullptr );
 
@@ -208,20 +208,20 @@ namespace fan
 		client.port = _port;
 		client.name = _loginInfo.GetName();
 		m_clients.push_back( client );
-		onClientConnected.Emmit( (int)m_clients.size() - 1, client.name );
+		onClientConnected.Emmit( ( int ) m_clients.size() - 1, client.name );
 
 		Debug::Log() << "[SERVER] client connected " << client.name << " " << client.ipAdress.toString() << "::" << client.port << Debug::Endl();
 
-		return &m_clients[m_clients.size() - 1];
+		return &m_clients[ m_clients.size() - 1 ];
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
 	void GameServer::RemoveClient( ClientData& _client )
 	{
-		for ( int clientIndex = (int)m_clients.size() - 1; clientIndex >= 0; --clientIndex )
+		for ( int clientIndex = ( int ) m_clients.size() - 1; clientIndex >= 0; --clientIndex )
 		{
-			if ( &m_clients[clientIndex] == &_client )
+			if ( &m_clients[ clientIndex ] == &_client )
 			{
 				Debug::Log() << "[SERVER] client disconnected: " << _client.name << " " << _client.ipAdress.toString() << "::" << _client.port << Debug::Endl();
 				m_clients.erase( m_clients.begin() + clientIndex );
@@ -235,17 +235,17 @@ namespace fan
 	{
 		while ( m_clients.size() > 0 )
 		{
-			RemoveClient( m_clients[m_clients.size() - 1] );
+			RemoveClient( m_clients[ m_clients.size() - 1 ] );
 		}
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	GameServer::ClientData * GameServer::FindClient( const sf::IpAddress& _ip, const Port& _port )
+	GameServer::ClientData* GameServer::FindClient( const sf::IpAddress& _ip, const Port& _port )
 	{
 		for ( int clientIndex = 0; clientIndex < m_clients.size(); ++clientIndex )
 		{
-			ClientData & client = m_clients[clientIndex];
+			ClientData& client = m_clients[ clientIndex ];
 			if ( client.ipAdress == _ip && client.port == _port )
 			{
 				return &client;
@@ -266,13 +266,13 @@ namespace fan
 			{
 				StartGame();
 			}
-		} 
+		}
 		ImGui::PopItemWidth();
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	bool GameServer::Load( const Json & _json )
+	bool GameServer::Load( const Json& _json )
 	{
 		Actor::Load( _json );
 		return true;
@@ -280,7 +280,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	bool GameServer::Save( Json & _json ) const
+	bool GameServer::Save( Json& _json ) const
 	{
 		Actor::Save( _json );
 		return true;

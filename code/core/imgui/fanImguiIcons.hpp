@@ -2,20 +2,22 @@
 
 #include "core/fanCorePrecompiled.hpp"
 
-namespace ImGui {
+namespace ImGui
+{
 
-	enum IconType { 		
+	enum IconType
+	{
 		NONE = 0,
 
 		// editor windows
 		IMGUI16,
-		RENDERER16, 
-		SCENE16, 
-		INSPECTOR16, 
-		CONSOLE16, 
-		ECS16, 
+		RENDERER16,
+		SCENE16,
+		INSPECTOR16,
+		CONSOLE16,
+		ECS16,
 		PROFILER16,
-		PREFERENCES16, 
+		PREFERENCES16,
 
 		// special
 		GAMEOBJECT16,
@@ -30,36 +32,38 @@ namespace ImGui {
 
 		// scene components
 		IMAGE16,
-		CAMERA16, 
+		CAMERA16,
 		TRANSFORM16,
 		PARTICLES16,
-		DIR_LIGHT16, 
-		POINT_LIGHT16, 
+		DIR_LIGHT16,
+		POINT_LIGHT16,
 		MATERIAL16,
 		MESH_RENDERER16,
 		RIGIDBODY16,
 		CUBE_SHAPE16,
-		SPHERE_SHAPE16,	
+		SPHERE_SHAPE16,
 		UI_MESH_RENDERER16,
 		UI_TRANSFORM16,
 		UI_PROGRESS_BAR16,
 		FOLLOW_TRANSFORM,
 
 		// generics	
-		SOLAR_SYSTEM16, 			
+		SOLAR_SYSTEM16,
 		HEART16,
 		ENERGY16,
 		JOYSTICK16,
-		SPACE_SHIP16, 
-		PLANET16, 	
+		SPACE_SHIP16,
+		PLANET16,
 
 		NUM_ICONS
 	};
 
 	//================================================================================================================================
 	//================================================================================================================================
-	struct IconImpl {
-		struct IconData {
+	struct IconImpl
+	{
+		struct IconData
+		{
 			ImVec2 uv0;
 			ImVec2 uv1;
 		};
@@ -69,24 +73,24 @@ namespace ImGui {
 
 	//================================================================================================================================
 	//================================================================================================================================
-	inline void Icon(	const IconType _id, 
-						const ImVec2& _size, 
-						const ImVec4& _tintColor = ImVec4( 1, 1, 1, 1 ), 
-						const ImVec4& _borderColor = ImVec4( 0, 0, 0, 0 ) ) 
+	inline void Icon( const IconType _id,
+					  const ImVec2& _size,
+					  const ImVec4& _tintColor = ImVec4( 1, 1, 1, 1 ),
+					  const ImVec4& _borderColor = ImVec4( 0, 0, 0, 0 ) )
 	{
-		ImGui::Image( (void*)42, _size, IconImpl::s_iconsList[_id].uv0, IconImpl::s_iconsList[_id].uv1, _tintColor, _borderColor );
+		ImGui::Image( ( void* ) 42, _size, IconImpl::s_iconsList[ _id ].uv0, IconImpl::s_iconsList[ _id ].uv1, _tintColor, _borderColor );
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
 	inline bool ButtonIcon( const IconType _id,
-		const ImVec2& _size,
-		const int _framePadding = -1,
-		const ImVec4& _bgColor = ImVec4( 0, 0, 0, 0 ),
-		const ImVec4& _tintColor = ImVec4( 1, 1, 1, 1 ) )
+							const ImVec2& _size,
+							const int _framePadding = -1,
+							const ImVec4& _bgColor = ImVec4( 0, 0, 0, 0 ),
+							const ImVec4& _tintColor = ImVec4( 1, 1, 1, 1 ) )
 	{
-		ImGui::PushID(_id);
-		bool result = ImGui::ImageButton( (void*)42, _size, IconImpl::s_iconsList[_id].uv0, IconImpl::s_iconsList[_id].uv1, _framePadding, _bgColor, _tintColor );
+		ImGui::PushID( _id );
+		bool result = ImGui::ImageButton( ( void* ) 42, _size, IconImpl::s_iconsList[ _id ].uv0, IconImpl::s_iconsList[ _id ].uv1, _framePadding, _bgColor, _tintColor );
 		ImGui::PopID();
 		return result;
 	}

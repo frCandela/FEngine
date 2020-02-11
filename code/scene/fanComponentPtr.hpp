@@ -30,10 +30,10 @@ namespace fan
 	class ComponentPtr : public ComponentIDPtr
 	{
 	public:
-		ComponentPtr(Component* _component = nullptr) : ComponentIDPtr( static_cast<Resource< Component>*>(_component)) {}
+		ComponentPtr( Component* _component = nullptr ) : ComponentIDPtr( static_cast< Resource< Component>* >( _component ) ) {}
 
-		_ComponentType* operator->() const { return static_cast<_ComponentType*>(GetResource()); }
-		_ComponentType* operator*() const  { return static_cast<_ComponentType*>(GetResource()); }
+		_ComponentType* operator->() const { return static_cast< _ComponentType* >( GetResource() ); }
+		_ComponentType* operator*() const { return static_cast< _ComponentType* >( GetResource() ); }
 	};
 }
 
@@ -43,12 +43,12 @@ namespace fan
 namespace ImGui
 {
 	template< typename _ComponentType >
-	bool FanComponent( const char * _label, fan::ComponentPtr<_ComponentType> * _ptr )
+	bool FanComponent( const char* _label, fan::ComponentPtr<_ComponentType>* _ptr )
 	{
 		static_assert( ( std::is_base_of<fan::Component, _ComponentType>::value ) );
 
 		return FanComponent( _label, _ComponentType::s_typeID, _ptr );
 	}
 
-	bool FanComponent( const char * _label, const uint32_t _typeID, fan::ComponentIDPtr * _ptr );
+	bool FanComponent( const char* _label, const uint32_t _typeID, fan::ComponentIDPtr* _ptr );
 }

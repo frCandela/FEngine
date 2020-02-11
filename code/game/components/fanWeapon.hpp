@@ -27,13 +27,13 @@ namespace fan
 	protected:
 		void OnAttach() override;
 		void OnDetach() override;
-		bool Load( const Json & _json ) override;
-		bool Save( Json & _json ) const override;
+		bool Load( const Json& _json ) override;
+		bool Save( Json& _json ) const override;
 
 	private:
 		// ref
-		WithEnergy * m_energy;
-		PlayerInput * m_input;
+		WithEnergy* m_energy;
+		PlayerInput* m_input;
 
 		// Bullets parameters
 		PrefabPtr m_bulletPrefab;
@@ -49,7 +49,7 @@ namespace fan
 		float m_exposionSpeed = 2.f;
 		int m_particlesPerExplosion = 3;
 
-		btVector3 m_offset ;
+		btVector3 m_offset;
 
 		// Accumulator
 		float m_bulletsAccumulator = 0.f;

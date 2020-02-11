@@ -40,6 +40,6 @@ namespace fan
 		if ( prefab.LoadFromJson( pastedJson ) )
 		{
 			m_selection.GetSelectedScene().CreateGameobject( prefab, m_selection.GetSelectedGameobject() );
-		}		
+		}
 	}
 }

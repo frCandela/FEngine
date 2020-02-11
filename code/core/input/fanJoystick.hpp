@@ -17,22 +17,22 @@ namespace fan
 		using JoystickID = int;
 
 
-		bool IsGamepad(   const JoystickID _GLFW_JOYSTICK ) const;
+		bool IsGamepad( const JoystickID _GLFW_JOYSTICK ) const;
 		bool IsConnected( const JoystickID _GLFW_JOYSTICK ) const;
 		int  NumConnectedJoysticks() const;
 
 		// Generic input
-		std::vector<float>	GetAxes(	 const JoystickID _GLFW_JOYSTICK );
-		std::vector<bool>	GetButtons(  const JoystickID _GLFW_JOYSTICK );
-		std::vector<float>	GetHats(     const JoystickID _GLFW_JOYSTICK );
-		std::string			GetName(	 const JoystickID _GLFW_JOYSTICK );
+		std::vector<float>	GetAxes( const JoystickID _GLFW_JOYSTICK );
+		std::vector<bool>	GetButtons( const JoystickID _GLFW_JOYSTICK );
+		std::vector<float>	GetHats( const JoystickID _GLFW_JOYSTICK );
+		std::string			GetName( const JoystickID _GLFW_JOYSTICK );
 
 		// Gamepad input
 		std::string	 GetGamepadName( const JoystickID _GLFW_JOYSTICK );
-		float		 GetAxis(		 const JoystickID _GLFW_JOYSTICK, const Axis _axis );
-		bool		 GetButton(		 const JoystickID _GLFW_JOYSTICK, const Button _button );
-		std::string  GetAxisName(	 const Axis _key );	
-		std::string  GetButtonName(	 const Button _button );	
+		float		 GetAxis( const JoystickID _GLFW_JOYSTICK, const Axis _axis );
+		bool		 GetButton( const JoystickID _GLFW_JOYSTICK, const Button _button );
+		std::string  GetAxisName( const Axis _key );
+		std::string  GetButtonName( const Button _button );
 		const std::vector< Joystick::Button >& GetGamepadButtonsList() const { return  s_buttonsList; };
 		const std::vector< Joystick::Axis >& GetGamepadAxisList() const { return  s_axesList; };
 
@@ -64,19 +64,19 @@ namespace fan
 		static const Button DPAD_UP = GLFW_GAMEPAD_BUTTON_DPAD_UP;
 		static const Button DPAD_RIGHT = GLFW_GAMEPAD_BUTTON_DPAD_RIGHT;
 		static const Button DPAD_DOWN = GLFW_GAMEPAD_BUTTON_DPAD_DOWN;
-		static const Button DPAD_LEFT = GLFW_GAMEPAD_BUTTON_DPAD_LEFT;	
-		static const char * s_buttonsNames[GLFW_GAMEPAD_BUTTON_LAST + 1];
+		static const Button DPAD_LEFT = GLFW_GAMEPAD_BUTTON_DPAD_LEFT;
+		static const char* s_buttonsNames[ GLFW_GAMEPAD_BUTTON_LAST + 1 ];
 		static const std::vector< Joystick::Axis > s_axesList;
 
 		// Axis
 		static const Axis AXIS_NONE = -1;
-		static const Axis LEFT_X = GLFW_GAMEPAD_AXIS_LEFT_X;       
+		static const Axis LEFT_X = GLFW_GAMEPAD_AXIS_LEFT_X;
 		static const Axis LEFT_Y = GLFW_GAMEPAD_AXIS_LEFT_Y;
 		static const Axis RIGHT_X = GLFW_GAMEPAD_AXIS_RIGHT_X;
 		static const Axis RIGHT_Y = GLFW_GAMEPAD_AXIS_RIGHT_Y;
 		static const Axis LEFT_TRIGGER = GLFW_GAMEPAD_AXIS_LEFT_TRIGGER;
 		static const Axis RIGHT_TRIGGER = GLFW_GAMEPAD_AXIS_RIGHT_TRIGGER;
-		static const char * s_axisNames[GLFW_GAMEPAD_AXIS_LAST + 1];
+		static const char* s_axisNames[ GLFW_GAMEPAD_AXIS_LAST + 1 ];
 		static const std::vector< Joystick::Button > s_buttonsList;
 	};
 }

@@ -14,7 +14,7 @@ namespace fan
 	public:
 		enum Type { KEYBOARD, JOYSTICK_AXIS, JOYSTICK_BUTTONS };
 		Axis();
-		Axis( const std::string& _name, const Type _type, const bool _invert = false );		
+		Axis( const std::string& _name, const Type _type, const bool _invert = false );
 
 		void					SetInvert( const bool _invert ) { m_invert = _invert; }
 
@@ -30,13 +30,13 @@ namespace fan
 		Joystick::Axis			GetJoystickAxis() const { return m_joystickAxis; }
 		std::string				GetKeyPositiveName() const;
 		std::string				GetKeyNegativeName() const;
-		
-		bool  Load( const Json & _json ) override;
-		bool  Save( Json & _json ) const override;
-		
+
+		bool  Load( const Json& _json ) override;
+		bool  Save( Json& _json ) const override;
+
 		void  SetFromKeyboardKeys( const Keyboard::Key _keyPositive, const Keyboard::Key _keyNegative );
 		void  SetFromJoystickButtons( const Joystick::JoystickID _joystickID, const Joystick::Button _buttonPositive, const Joystick::Button _buttonNegative );
-		void  SetFromJoystickAxis(    const Joystick::JoystickID _joystickID, const Joystick::Axis _joystickAxis );
+		void  SetFromJoystickAxis( const Joystick::JoystickID _joystickID, const Joystick::Axis _joystickAxis );
 
 	private:
 		bool m_invert = false;
@@ -52,7 +52,7 @@ namespace fan
 
 		// JOYSTICK_BUTTONS
 		Joystick::Button m_buttonPositive = -1;
-		Joystick::Button m_buttonNegative = -1;		
+		Joystick::Button m_buttonNegative = -1;
 
 		// JOYSTICK_AXIS
 		Joystick::Axis		 m_joystickAxis = -1;
@@ -60,8 +60,8 @@ namespace fan
 }
 
 namespace ImGui
-{	
+{
 	//================================================================================================================================
 	//================================================================================================================================
-	bool FanAxis( const char * _label, fan::Axis* _axis );
+	bool FanAxis( const char* _label, fan::Axis* _axis );
 }

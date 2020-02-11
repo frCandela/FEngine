@@ -2,7 +2,8 @@
 
 #include "render/fanRenderPrecompiled.hpp"
 
-namespace fan {
+namespace fan
+{
 
 	class Mesh;
 
@@ -17,10 +18,10 @@ namespace fan {
 	{
 	public:
 		bool Load( const std::string _relativePath );
-		bool GetMesh( Mesh  & _mesh );	
+		bool GetMesh( Mesh& _mesh );
 
 	private:
-		enum ComponentTypes 
+		enum ComponentTypes
 		{
 			FLOAT = 5126, SCALAR = 5123
 		};
@@ -29,11 +30,12 @@ namespace fan {
 		// A mesh primitive has a rendering mode (point, line or triangle) and 
 		// series of attributes like positions or normals referencing accessors
 		//================================================================
-		struct GLTFPrimitive {
-			GLTFPrimitive(const Json& jPrimitive);
+		struct GLTFPrimitive
+		{
+			GLTFPrimitive( const Json& jPrimitive );
 			int	indices = -1;
 			int	positions = -1;
-			int	normal   = -1;
+			int	normal = -1;
 			int	texcoord0 = -1;
 			bool HasNormals() const { return normal >= 0; }
 			bool HasTexcoords0() const { return texcoord0 >= 0; }
@@ -44,7 +46,7 @@ namespace fan {
 		//================================================================
 		struct GLTFAccessor
 		{
-			GLTFAccessor(const Json& _jAccessor);
+			GLTFAccessor( const Json& _jAccessor );
 			int view = -1;
 			int	type = -1;
 			int	count = -1;
@@ -55,8 +57,9 @@ namespace fan {
 		// A  buffer view allows access to a  buffer 
 		// it defines the part of the buffer that belongs to a buffer view
 		//================================================================
-		struct GLTFBufferView {
-			GLTFBufferView(const Json& _jView);
+		struct GLTFBufferView
+		{
+			GLTFBufferView( const Json& _jView );
 			int buffer = -1;
 			int	byteLength = -1;
 			int	byteOffset = -1;
@@ -68,19 +71,20 @@ namespace fan {
 		//================================================================
 		struct GLTFBuffer
 		{
-			GLTFBuffer(const Json& _jBuffer);
+			GLTFBuffer( const Json& _jBuffer );
 
 			int byteLength = -1;
 
-			std::string GetBuffer(const GLTFBufferView& _view, const std::string& _decodedBuffer) const;
+			std::string GetBuffer( const GLTFBufferView& _view, const std::string& _decodedBuffer ) const;
 		};
 
 		//================================================================
 		// A mesh is a list of primitives
 		// For now we only support one primitive per mesh
 		//================================================================
-		struct GLTFMesh {
-			GLTFMesh(const Json& jMesh);
+		struct GLTFMesh
+		{
+			GLTFMesh( const Json& jMesh );
 			std::string name;
 			GLTFPrimitive primitive0;
 		};
@@ -88,6 +92,6 @@ namespace fan {
 		std::string m_path;	// file relative path
 		Json m_json;		// gltf json data
 
-		std::string GLTFImporter::DecodeBuffer(const std::string& _uri);
+		std::string GLTFImporter::DecodeBuffer( const std::string& _uri );
 	};
 }

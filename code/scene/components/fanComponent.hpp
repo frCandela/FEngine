@@ -1,4 +1,4 @@
- #pragma once
+#pragma once
 
 #include "scene/fanScenePrecompiled.hpp"
 
@@ -14,16 +14,17 @@ namespace fan
 {
 	//================================================================================================================================
 	//================================================================================================================================
-	class Component : public Resource< Component >, public ISerializable {
+	class Component : public Resource< Component >, public ISerializable
+	{
 	public:
 		friend class Gameobject;
 
 		inline Gameobject& GetGameobject() const { return *m_gameobject; }
-		inline Scene &	GetScene() const { return m_gameobject->GetScene(); }
+		inline Scene& GetScene() const { return m_gameobject->GetScene(); }
 
 		bool IsBeingDeleted() const { return m_isBeingDeleted; }
 		bool IsRemovable() const { return m_isRemovable; }
-		void SetRemovable(const bool _isRemovable) { m_isRemovable = _isRemovable; }
+		void SetRemovable( const bool _isRemovable ) { m_isRemovable = _isRemovable; }
 
 		virtual bool IsCollider()			const { return false; }
 		virtual bool IsActor()				const { return false; }
@@ -32,7 +33,7 @@ namespace fan
 		virtual void OnGui();
 		virtual ImGui::IconType GetIcon() const { return ImGui::IconType::NONE; };
 
-		DECLARE_ABSTRACT_TYPE_INFO(Component, ISerializable );
+		DECLARE_ABSTRACT_TYPE_INFO( Component, ISerializable );
 	protected:
 		// Friend class gameobject is the factory of components
 		Component();
@@ -40,10 +41,10 @@ namespace fan
 		virtual void OnAttach();
 		virtual void OnDetach();
 
-		Gameobject * const m_gameobject = nullptr;
+		Gameobject* const m_gameobject = nullptr;
 
-		bool Save( Json & _json ) const override;
-		bool Load( const Json & _json ) override;
+		bool Save( Json& _json ) const override;
+		bool Load( const Json& _json ) override;
 
 	private:
 		bool m_isBeingDeleted : 1;

@@ -7,16 +7,19 @@ layout (location = 1) in vec3 inFragPos;
 layout (location = 2) in vec3 inNormal;
 layout (location = 3) in vec2 inTexCoord;
 
-layout(binding = 2) uniform FragUniforms {
+layout(binding = 2) uniform FragUniforms 
+{
 	vec3	cameraPosition;	
 } uniforms;
 
-layout (binding = 3) uniform DynamicUniformBufferFrag {
+layout (binding = 3) uniform DynamicUniformBufferFrag 
+{
 	vec4 color;
 	int shininess;
 } material;
 
-struct PointLight {
+struct PointLight 
+{
 	vec4	position;
 	vec4	diffuse;
 	vec4	specular;
@@ -27,7 +30,8 @@ struct PointLight {
 	float   _0;
 };
 
-struct DirectionalLight {
+struct DirectionalLight 
+{
 	vec4 direction; 
 	vec4 ambiant;	
 	vec4 diffuse;	
@@ -36,7 +40,8 @@ struct DirectionalLight {
 
 #define MAX_NUM_DIRECTIONNAL_LIGHTS 4  
 #define MAX_NUM_POINT_LIGHTS 		16  
-layout(binding = 4) uniform LightUniform {	
+layout(binding = 4) uniform LightUniform 
+{	
 	DirectionalLight dirLights[MAX_NUM_DIRECTIONNAL_LIGHTS];
 	PointLight pointLights[MAX_NUM_POINT_LIGHTS];
 	int dirLightsNum;
@@ -50,7 +55,8 @@ vec3 CalcPointLight( const PointLight light, const vec3 normal, const vec3 fragP
 vec3 CalcDirLight  ( const DirectionalLight light, const vec3 normal, const vec3 viewDir); 
 
 //reference: https://learnopengl.com/Lighting/Multiple-lights
-void main() {  
+void main() 
+{  
 	//Needed data
 	vec3 goodNormal = normalize(inNormal);
 	const vec3 viewDir = normalize(uniforms.cameraPosition - inFragPos);
@@ -68,7 +74,8 @@ void main() {
 }
 
 
-vec3 CalcDirLight  ( const DirectionalLight light, const vec3 normal, const vec3 viewDir) {
+vec3 CalcDirLight  ( const DirectionalLight light, const vec3 normal, const vec3 viewDir) 
+{
     vec3 lightDir = normalize(-light.direction.xyz);
 	
     // diffuse shading

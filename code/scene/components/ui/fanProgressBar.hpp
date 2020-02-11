@@ -25,8 +25,8 @@ namespace fan
 	protected:
 		void OnAttach() override;
 		void OnDetach() override;
-		bool Load( const Json & _json ) override;
-		bool Save( Json & _json ) const override;
+		bool Load( const Json& _json ) override;
+		bool Save( Json& _json ) const override;
 
 	private:
 		ComponentPtr<UITransform> m_targetUiTransform;

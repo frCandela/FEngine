@@ -3,12 +3,14 @@
 #include "core/fanCorePrecompiled.hpp"
 #include "core/fanSingleton.hpp"
 
-namespace fan {
+namespace fan
+{
 	//================================================================================================================================
 	//================================================================================================================================
-	class SerializedValues : public Singleton<SerializedValues> {
+	class SerializedValues : public Singleton<SerializedValues>
+	{
 	public:
-		friend class Singleton<SerializedValues>;		
+		friend class Singleton<SerializedValues>;
 		void SaveValuesToDisk();
 		void LoadKeyBindings();
 
@@ -36,9 +38,9 @@ namespace fan {
 		SerializedValues();
 
 	private:
-		const char * m_jsonPath;
-		const char * m_valuesName;
-		const char * m_keysBindingsName;
+		const char* m_jsonPath;
+		const char* m_valuesName;
+		const char* m_keysBindingsName;
 		Json m_json;
 	};
 }

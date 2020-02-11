@@ -13,13 +13,13 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	RendererDebug::RendererDebug( Device & _device, SwapChain& _swapchain ) 
+	RendererDebug::RendererDebug( Device& _device, SwapChain& _swapchain )
 		: m_device( _device )
-		, m_swapchain( _swapchain)
+		, m_swapchain( _swapchain )
 	{
 		m_debugLinesvertexBuffers.resize( m_swapchain.GetSwapchainImagesCount() );
-		m_debugLinesNoDepthTestVertexBuffers.resize(  m_swapchain.GetSwapchainImagesCount() );
-		m_debugTrianglesvertexBuffers.resize(  m_swapchain.GetSwapchainImagesCount() );
+		m_debugLinesNoDepthTestVertexBuffers.resize( m_swapchain.GetSwapchainImagesCount() );
+		m_debugTrianglesvertexBuffers.resize( m_swapchain.GetSwapchainImagesCount() );
 	}
 
 	//================================================================================================================================
@@ -56,17 +56,17 @@ namespace fan
 
 		for ( int bufferIndex = 0; bufferIndex < m_debugLinesvertexBuffers.size(); bufferIndex++ )
 		{
-			delete m_debugLinesvertexBuffers[bufferIndex];
+			delete m_debugLinesvertexBuffers[ bufferIndex ];
 		} m_debugLinesvertexBuffers.clear();
 
 		for ( int bufferIndex = 0; bufferIndex < m_debugLinesNoDepthTestVertexBuffers.size(); bufferIndex++ )
 		{
-			delete m_debugLinesNoDepthTestVertexBuffers[bufferIndex];
+			delete m_debugLinesNoDepthTestVertexBuffers[ bufferIndex ];
 		} m_debugLinesNoDepthTestVertexBuffers.clear();
 
 		for ( int bufferIndex = 0; bufferIndex < m_debugTrianglesvertexBuffers.size(); bufferIndex++ )
 		{
-			delete m_debugTrianglesvertexBuffers[bufferIndex];
+			delete m_debugTrianglesvertexBuffers[ bufferIndex ];
 		} m_debugTrianglesvertexBuffers.clear();
 	}
 
@@ -92,13 +92,13 @@ namespace fan
 	//================================================================================================================================
 	void RendererDebug::SetMainCamera( const glm::mat4 _projection, const glm::mat4 _view )
 	{
-		std::array< DebugPipeline *, 3 > debugLinesPipelines = { m_debugLinesPipeline, m_debugLinesPipelineNoDepthTest, m_debugTrianglesPipeline };
+		std::array< DebugPipeline*, 3 > debugLinesPipelines = { m_debugLinesPipeline, m_debugLinesPipelineNoDepthTest, m_debugTrianglesPipeline };
 		for ( int pipelingIndex = 0; pipelingIndex < debugLinesPipelines.size(); pipelingIndex++ )
 		{
-			debugLinesPipelines[pipelingIndex]->m_debugUniforms.model = glm::mat4( 1.0 );
-			debugLinesPipelines[pipelingIndex]->m_debugUniforms.view = _view;
-			debugLinesPipelines[pipelingIndex]->m_debugUniforms.proj = _projection;
-			debugLinesPipelines[pipelingIndex]->m_debugUniforms.color = glm::vec4( 1, 1, 1, 1 );
+			debugLinesPipelines[ pipelingIndex ]->m_debugUniforms.model = glm::mat4( 1.0 );
+			debugLinesPipelines[ pipelingIndex ]->m_debugUniforms.view = _view;
+			debugLinesPipelines[ pipelingIndex ]->m_debugUniforms.proj = _projection;
+			debugLinesPipelines[ pipelingIndex ]->m_debugUniforms.color = glm::vec4( 1, 1, 1, 1 );
 		}
 	}
 
@@ -110,10 +110,10 @@ namespace fan
 			if ( m_debugLines.size() > 0 )
 			{
 				SCOPED_PROFILE( lines )
-					delete m_debugLinesvertexBuffers[_index];	// TODO update instead of delete
+					delete m_debugLinesvertexBuffers[ _index ];	// TODO update instead of delete
 				const VkDeviceSize size = sizeof( DebugVertex ) * m_debugLines.size();
-				m_debugLinesvertexBuffers[_index] = new Buffer( m_device );
-				m_debugLinesvertexBuffers[_index]->Create(
+				m_debugLinesvertexBuffers[ _index ] = new Buffer( m_device );
+				m_debugLinesvertexBuffers[ _index ]->Create(
 					size,
 					VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_VERTEX_BUFFER_BIT,
 					VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT
@@ -129,7 +129,7 @@ namespace fan
 					);
 					stagingBuffer.SetData( m_debugLines.data(), size );
 					VkCommandBuffer cmd = m_device.BeginSingleTimeCommands();
-					stagingBuffer.CopyBufferTo( cmd, m_debugLinesvertexBuffers[_index]->GetBuffer(), size );
+					stagingBuffer.CopyBufferTo( cmd, m_debugLinesvertexBuffers[ _index ]->GetBuffer(), size );
 					m_device.EndSingleTimeCommands( cmd );
 				}
 			}
@@ -137,10 +137,10 @@ namespace fan
 		if ( m_debugLinesNoDepthTest.size() > 0 )
 		{
 			SCOPED_PROFILE( lines_no_depth )
-				delete m_debugLinesNoDepthTestVertexBuffers[_index];
+				delete m_debugLinesNoDepthTestVertexBuffers[ _index ];
 			const VkDeviceSize size = sizeof( DebugVertex ) * m_debugLinesNoDepthTest.size();
-			m_debugLinesNoDepthTestVertexBuffers[_index] = new Buffer( m_device );
-			m_debugLinesNoDepthTestVertexBuffers[_index]->Create(
+			m_debugLinesNoDepthTestVertexBuffers[ _index ] = new Buffer( m_device );
+			m_debugLinesNoDepthTestVertexBuffers[ _index ]->Create(
 				size,
 				VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_VERTEX_BUFFER_BIT,
 				VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT
@@ -156,7 +156,7 @@ namespace fan
 				);
 				stagingBuffer.SetData( m_debugLinesNoDepthTest.data(), size );
 				VkCommandBuffer cmd = m_device.BeginSingleTimeCommands();
-				stagingBuffer.CopyBufferTo( cmd, m_debugLinesNoDepthTestVertexBuffers[_index]->GetBuffer(), size );
+				stagingBuffer.CopyBufferTo( cmd, m_debugLinesNoDepthTestVertexBuffers[ _index ]->GetBuffer(), size );
 				m_device.EndSingleTimeCommands( cmd );
 			}
 		}
@@ -164,10 +164,10 @@ namespace fan
 		if ( m_debugTriangles.size() > 0 )
 		{
 			SCOPED_PROFILE( triangles )
-				delete m_debugTrianglesvertexBuffers[_index];
+				delete m_debugTrianglesvertexBuffers[ _index ];
 			const VkDeviceSize size = sizeof( DebugVertex ) * m_debugTriangles.size();
-			m_debugTrianglesvertexBuffers[_index] = new Buffer( m_device );
-			m_debugTrianglesvertexBuffers[_index]->Create(
+			m_debugTrianglesvertexBuffers[ _index ] = new Buffer( m_device );
+			m_debugTrianglesvertexBuffers[ _index ]->Create(
 				size,
 				VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_VERTEX_BUFFER_BIT,
 				VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT
@@ -183,7 +183,7 @@ namespace fan
 				);
 				stagingBuffer.SetData( m_debugTriangles.data(), size );
 				VkCommandBuffer cmd = m_device.BeginSingleTimeCommands();
-				stagingBuffer.CopyBufferTo( cmd, m_debugTrianglesvertexBuffers[_index]->GetBuffer(), size );
+				stagingBuffer.CopyBufferTo( cmd, m_debugTrianglesvertexBuffers[ _index ]->GetBuffer(), size );
 				m_device.EndSingleTimeCommands( cmd );
 			}
 		}
@@ -216,7 +216,7 @@ namespace fan
 			{
 				UpdateDebugBuffer( _index );
 
-				VkCommandBuffer commandBuffer = m_debugCommandBuffers[_index];
+				VkCommandBuffer commandBuffer = m_debugCommandBuffers[ _index ];
 
 				VkCommandBufferInheritanceInfo commandBufferInheritanceInfo = {};
 				commandBufferInheritanceInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_INHERITANCE_INFO;
@@ -240,23 +240,23 @@ namespace fan
 					if ( m_debugLines.size() > 0 )
 					{
 						m_debugLinesPipeline->Bind( commandBuffer, _index );
-						VkBuffer vertexBuffers[] = { m_debugLinesvertexBuffers[_index]->GetBuffer() };
+						VkBuffer vertexBuffers[] = { m_debugLinesvertexBuffers[ _index ]->GetBuffer() };
 						vkCmdBindVertexBuffers( commandBuffer, 0, 1, vertexBuffers, offsets );
-						vkCmdDraw( commandBuffer, static_cast<uint32_t>( m_debugLines.size() ), 1, 0, 0 );
+						vkCmdDraw( commandBuffer, static_cast< uint32_t >( m_debugLines.size() ), 1, 0, 0 );
 					}
 					if ( m_debugLinesNoDepthTest.size() > 0 )
 					{
 						m_debugLinesPipelineNoDepthTest->Bind( commandBuffer, _index );
-						VkBuffer vertexBuffers[] = { m_debugLinesNoDepthTestVertexBuffers[_index]->GetBuffer() };
+						VkBuffer vertexBuffers[] = { m_debugLinesNoDepthTestVertexBuffers[ _index ]->GetBuffer() };
 						vkCmdBindVertexBuffers( commandBuffer, 0, 1, vertexBuffers, offsets );
-						vkCmdDraw( commandBuffer, static_cast<uint32_t>( m_debugLinesNoDepthTest.size() ), 1, 0, 0 );
+						vkCmdDraw( commandBuffer, static_cast< uint32_t >( m_debugLinesNoDepthTest.size() ), 1, 0, 0 );
 					}
 					if ( m_debugTriangles.size() > 0 )
 					{
 						m_debugTrianglesPipeline->Bind( commandBuffer, _index );
-						VkBuffer vertexBuffers[] = { m_debugTrianglesvertexBuffers[_index]->GetBuffer() };
+						VkBuffer vertexBuffers[] = { m_debugTrianglesvertexBuffers[ _index ]->GetBuffer() };
 						vkCmdBindVertexBuffers( commandBuffer, 0, 1, vertexBuffers, offsets );
-						vkCmdDraw( commandBuffer, static_cast<uint32_t>( m_debugTriangles.size() ), 1, 0, 0 );
+						vkCmdDraw( commandBuffer, static_cast< uint32_t >( m_debugTriangles.size() ), 1, 0, 0 );
 					}
 					if ( vkEndCommandBuffer( commandBuffer ) != VK_SUCCESS )
 					{
@@ -310,26 +310,26 @@ namespace fan
 		m_debugTriangles.resize( m_debugTriangles.size() + _triangles.size() );
 		for ( int triangleIndex = 0; triangleIndex < _triangles.size() / 3; triangleIndex++ )
 		{
-			const btVector3 v0 = _triangles[3 * triangleIndex + 0];
-			const btVector3 v1 = _triangles[3 * triangleIndex + 1];
-			const btVector3 v2 = _triangles[3 * triangleIndex + 2];
+			const btVector3 v0 = _triangles[ 3 * triangleIndex + 0 ];
+			const btVector3 v1 = _triangles[ 3 * triangleIndex + 1 ];
+			const btVector3 v2 = _triangles[ 3 * triangleIndex + 2 ];
 			const glm::vec3 normal = glm::normalize( ToGLM( ( v1 - v2 ).cross( v0 - v2 ) ) );
 
-			m_debugTriangles[3 * triangleIndex + 0] = DebugVertex( ToGLM( v0 ), normal, _colors[triangleIndex].ToGLM() ) ;
-			m_debugTriangles[3 * triangleIndex + 1] = DebugVertex( ToGLM( v1 ), normal, _colors[triangleIndex].ToGLM() );
-			m_debugTriangles[3 * triangleIndex + 2] = DebugVertex( ToGLM( v2 ), normal, _colors[triangleIndex].ToGLM() );
+			m_debugTriangles[ 3 * triangleIndex + 0 ] = DebugVertex( ToGLM( v0 ), normal, _colors[ triangleIndex ].ToGLM() );
+			m_debugTriangles[ 3 * triangleIndex + 1 ] = DebugVertex( ToGLM( v1 ), normal, _colors[ triangleIndex ].ToGLM() );
+			m_debugTriangles[ 3 * triangleIndex + 2 ] = DebugVertex( ToGLM( v2 ), normal, _colors[ triangleIndex ].ToGLM() );
 		}
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void RendererDebug::DebugCircle	  ( const btVector3 _pos, const float _radius, btVector3 _axis, uint32_t _nbSegments, const Color _color )
+	void RendererDebug::DebugCircle( const btVector3 _pos, const float _radius, btVector3 _axis, uint32_t _nbSegments, const Color _color )
 	{
 		assert( _nbSegments > 2 && _radius >= 0.f );
 
-		const btVector3 other = btVector3( -_axis[1], -_axis[2], _axis[0] );
+		const btVector3 other = btVector3( -_axis[ 1 ], -_axis[ 2 ], _axis[ 0 ] );
 		btVector3 orthogonal = _radius * _axis.cross( other ).normalized();
-		const float angle = 2.f * PI / (float)_nbSegments;
+		const float angle = 2.f * PI / ( float ) _nbSegments;
 
 		for ( uint32_t segmentIndex = 0; segmentIndex < _nbSegments; segmentIndex++ )
 		{
@@ -361,16 +361,16 @@ namespace fan
 
 		for ( int vertIndex = 0; vertIndex < square.size(); vertIndex++ )
 		{
-			square[vertIndex] = _transform * square[vertIndex];
+			square[ vertIndex ] = _transform * square[ vertIndex ];
 		}
 
 		glm::vec4 glmColor = _color.ToGLM();
 
 		for ( int triangleIndex = 0; triangleIndex < square.size() / 3; triangleIndex++ )
 		{
-			const glm::vec3 & v0 = ToGLM( square[3 * triangleIndex + 0] );
-			const glm::vec3 & v1 = ToGLM( square[3 * triangleIndex + 1] );
-			const glm::vec3 & v2 = ToGLM( square[3 * triangleIndex + 2] );
+			const glm::vec3& v0 = ToGLM( square[ 3 * triangleIndex + 0 ] );
+			const glm::vec3& v1 = ToGLM( square[ 3 * triangleIndex + 1 ] );
+			const glm::vec3& v2 = ToGLM( square[ 3 * triangleIndex + 2 ] );
 
 			m_debugLines.push_back( DebugVertex( v0, glm::vec3( 0, 0, 0 ), glmColor ) );
 			m_debugLines.push_back( DebugVertex( v1, glm::vec3( 0, 0, 0 ), glmColor ) );
@@ -398,14 +398,14 @@ namespace fan
 
 		for ( int vertIndex = 0; vertIndex < sphere.size(); vertIndex++ )
 		{
-			sphere[vertIndex] = _transform * sphere[vertIndex];
+			sphere[ vertIndex ] = _transform * sphere[ vertIndex ];
 		}
 
 		for ( int triangleIndex = 0; triangleIndex < sphere.size() / 3; triangleIndex++ )
 		{
-			const btVector3 v0 = sphere[3 * triangleIndex + 0];
-			const btVector3 v1 = sphere[3 * triangleIndex + 1];
-			const btVector3 v2 = sphere[3 * triangleIndex + 2];
+			const btVector3 v0 = sphere[ 3 * triangleIndex + 0 ];
+			const btVector3 v1 = sphere[ 3 * triangleIndex + 1 ];
+			const btVector3 v2 = sphere[ 3 * triangleIndex + 2 ];
 			DebugLine( v0, v1, _color, false );
 			DebugLine( v1, v2, _color, false );
 			DebugLine( v2, v0, _color, false );
@@ -422,12 +422,12 @@ namespace fan
 
 		for ( int vertIndex = 0; vertIndex < cone.size(); vertIndex++ )
 		{
-			cone[vertIndex] = _transform * cone[vertIndex];
+			cone[ vertIndex ] = _transform * cone[ vertIndex ];
 		}
 
 		for ( int triangleIndex = 0; triangleIndex < cone.size() / 3; triangleIndex++ )
 		{
-			DebugTriangle( cone[3 * triangleIndex + 0], cone[3 * triangleIndex + 1], cone[3 * triangleIndex + 2], _color );
+			DebugTriangle( cone[ 3 * triangleIndex + 0 ], cone[ 3 * triangleIndex + 1 ], cone[ 3 * triangleIndex + 2 ], _color );
 		}
 
 		return cone;
@@ -435,24 +435,24 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void RendererDebug::DebugAABB( const AABB & _aabb, const Color _color )
+	void RendererDebug::DebugAABB( const AABB& _aabb, const Color _color )
 	{
 		std::vector< btVector3 > corners = _aabb.GetCorners();
 		// Top
-		DebugLine( corners[0], corners[1], _color );
-		DebugLine( corners[1], corners[2], _color );
-		DebugLine( corners[2], corners[3], _color );
-		DebugLine( corners[3], corners[0], _color );
+		DebugLine( corners[ 0 ], corners[ 1 ], _color );
+		DebugLine( corners[ 1 ], corners[ 2 ], _color );
+		DebugLine( corners[ 2 ], corners[ 3 ], _color );
+		DebugLine( corners[ 3 ], corners[ 0 ], _color );
 		// Bot
-		DebugLine( corners[4], corners[5], _color );
-		DebugLine( corners[5], corners[6], _color );
-		DebugLine( corners[6], corners[7], _color );
-		DebugLine( corners[7], corners[4], _color );
+		DebugLine( corners[ 4 ], corners[ 5 ], _color );
+		DebugLine( corners[ 5 ], corners[ 6 ], _color );
+		DebugLine( corners[ 6 ], corners[ 7 ], _color );
+		DebugLine( corners[ 7 ], corners[ 4 ], _color );
 		//Vertical sides
-		DebugLine( corners[0], corners[4], _color );
-		DebugLine( corners[1], corners[5], _color );
-		DebugLine( corners[2], corners[6], _color );
-		DebugLine( corners[3], corners[7], _color );
+		DebugLine( corners[ 0 ], corners[ 4 ], _color );
+		DebugLine( corners[ 1 ], corners[ 5 ], _color );
+		DebugLine( corners[ 2 ], corners[ 6 ], _color );
+		DebugLine( corners[ 3 ], corners[ 7 ], _color );
 	}
 
 }

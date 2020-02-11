@@ -2,17 +2,19 @@
 
 #include "core/fanCorePrecompiled.hpp"
 
-namespace fan {
+namespace fan
+{
 
 	struct btVector2;
 	class Color;
 
 	//================================================================================================================================
 	//================================================================================================================================
-	class ISerializable {
+	class ISerializable
+	{
 	public:
-		virtual bool Load(const Json& _json) = 0;
-		virtual bool Save(Json& _json) const = 0;
+		virtual bool Load( const Json& _json ) = 0;
+		virtual bool Save( Json& _json ) const = 0;
 	};
 
 	namespace Serializable {

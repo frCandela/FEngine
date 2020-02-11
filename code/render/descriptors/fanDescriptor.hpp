@@ -3,23 +3,26 @@
 #include "render/fanRenderPrecompiled.hpp"
 #include "core/memory/fanAlignedMemory.hpp"
 
-namespace fan {
+namespace fan
+{
 	class Device;
 	class Buffer;
 	class Sampler;
-	 
+
 	//================================================================================================================================
 	//================================================================================================================================
-	class Descriptor {
+	class Descriptor
+	{
 	private:
 		//================================================================
 		// Contain the information for a descriptor binding
 		//================================================================
-		struct BindingData {			
+		struct BindingData
+		{
 			VkDescriptorSetLayoutBinding		 layoutBinding;
 			std::vector < VkWriteDescriptorSet>	 writeDescriptorSets;
 			std::vector<VkDescriptorBufferInfo>  descriptorBufferInfos;
-			std::vector<Buffer * >				 buffers;
+			std::vector<Buffer* >				 buffers;
 
 			void SetBuffers( Device& _device, const size_t _count, VkDeviceSize _sizeBuffer, VkDeviceSize _alignment = 1 );
 			void UpdateLayoutBinding( const size_t _index, const VkShaderStageFlags _stage, const VkDescriptorType _descriptorType, const size_t _descriptorCount );
@@ -30,12 +33,12 @@ namespace fan {
 		Descriptor( Device& _device, const size_t _count );
 		~Descriptor();
 
-		bool Create(  );
-		void SetBinding( const size_t _indexBinding, const size_t _indexBuffer, const void * _data, VkDeviceSize _size, VkDeviceSize _offset );
+		bool Create();
+		void SetBinding( const size_t _indexBinding, const size_t _indexBuffer, const void* _data, VkDeviceSize _size, VkDeviceSize _offset );
 		void Update();
 		void Bind( VkCommandBuffer _commandBuffer, VkPipelineLayout _pipelineLayout, const size_t _index = 0 );
-		
-		void SetUniformBinding( const VkShaderStageFlags  _stage, const VkDeviceSize _bufferSize);
+
+		void SetUniformBinding( const VkShaderStageFlags  _stage, const VkDeviceSize _bufferSize );
 		void SetDynamicUniformBinding( VkShaderStageFlags  _stage, VkDeviceSize _bufferSize, VkDeviceSize _alignment, const int _index = -1 );
 
 		VkDescriptorSetLayout GetLayout() { return m_descriptorSetLayout; }

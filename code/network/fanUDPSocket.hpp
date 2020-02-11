@@ -8,10 +8,10 @@ namespace fan
 	//================================================================================================================================
 	class UDPSocket
 	{
-	public:		
-		UDPSocket( );
+	public:
+		UDPSocket();
 
-		void Create( const std::string& _name, const Port _listenPort );		
+		void Create( const std::string& _name, const Port _listenPort );
 		bool Receive( sf::Packet& _packet, bool& _disconnected );
 
 		bool Bind();
@@ -20,10 +20,10 @@ namespace fan
 		void SetPort( const Port _port ) { m_listenPort = _port; }
 		inline const std::string& GetName() const { return m_name; }
 		void OnlyReceiveFrom( sf::IpAddress	_ip, Port _port ) { m_ipWhiteList = _ip; m_portWhiteList = _port; }
-		bool Send( sf::Packet _packet, const sf::IpAddress& _remoteAddress, unsigned short _remotePort);
+		bool Send( sf::Packet _packet, const sf::IpAddress& _remoteAddress, unsigned short _remotePort );
 
-		const sf::IpAddress	& GetLastReceiveIp() const	 { return m_lastReceiveIp;}
-		const Port			& GetLastReceivePort() const { return m_lastReceivePort;}
+		const sf::IpAddress& GetLastReceiveIp() const { return m_lastReceiveIp; }
+		const Port& GetLastReceivePort() const { return m_lastReceivePort; }
 
 	private:
 		std::string		m_name;

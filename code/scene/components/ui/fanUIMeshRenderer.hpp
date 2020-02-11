@@ -17,16 +17,16 @@ namespace fan
 	{
 	public:
 
-		UIMesh *		GetMesh()		{ return m_uiMesh; }
-		const UIMesh *	GetMesh() const { return m_uiMesh; }
+		UIMesh* GetMesh() { return m_uiMesh; }
+		const UIMesh* GetMesh() const { return m_uiMesh; }
 
 		glm::ivec2	GetTextureSize() const;
 		bool		IsVisible() const { return m_visible; }
 		void		SetVisible( const bool _visible ) { m_visible = _visible; }
 
-		Color		GetColor() const				{ return m_color; }
-		void		SetColor( const Color& _color) { m_color = _color; }
-		Texture *	GetTexture() const { return *m_texture; }
+		Color		GetColor() const { return m_color; }
+		void		SetColor( const Color& _color ) { m_color = _color; }
+		Texture* GetTexture() const { return *m_texture; }
 
 		void OnGui() override;
 		virtual ImGui::IconType GetIcon() const { return ImGui::IconType::IMAGE16; };
@@ -34,13 +34,13 @@ namespace fan
 		DECLARE_TYPE_INFO( UIMeshRenderer, Component );
 
 	protected:
-		bool Load( const Json & _json ) override;
-		bool Save( Json & _json ) const override;
+		bool Load( const Json& _json ) override;
+		bool Save( Json& _json ) const override;
 		void OnAttach() override;
 		void OnDetach() override;
 
 	private:
-		UIMesh * m_uiMesh;
+		UIMesh* m_uiMesh;
 		Color m_color;
 		TexturePtr m_texture;
 		bool m_visible = true;

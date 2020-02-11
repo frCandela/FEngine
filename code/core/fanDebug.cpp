@@ -1,17 +1,20 @@
 #include "core/fanDebug.hpp"
 #include "core/time/fanTime.hpp"
 
-namespace fan {
+namespace fan
+{
 	//================================================================================================================================
 	//================================================================================================================================
-	Debug::Debug() {
+	Debug::Debug()
+	{
 		m_currentSeverity = Severity::log;
-		m_currentType =		Type::other;
+		m_currentType = Type::other;
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void Debug::Flush() {
+	void Debug::Flush()
+	{
 		// Push the log into the buffer
 		LogItem item;
 		item.message = m_stringstream.str();
@@ -19,51 +22,56 @@ namespace fan {
 		item.type = m_currentType;
 		item.time = Time::ElapsedSinceStartup();
 		m_logBuffer.push_back( item );
-		
+
 		// stdio
-		std::cout << Time::SecondsToString(item.time);
-		switch (m_currentSeverity)
+		std::cout << Time::SecondsToString( item.time );
+		switch ( m_currentSeverity )
 		{
-		case Severity::log: {
+		case Severity::log:
+		{
 			std::cout << "[LOG]";
 		} break;
-		case Severity::warning: {
+		case Severity::warning:
+		{
 			std::cout << "[WARNING]";
 		} break;
-		case Severity::error: {
+		case Severity::error:
+		{
 			std::cout << "[ERROR]";
 		} break;
-		case Severity::highlight: {
+		case Severity::highlight:
+		{
 			std::cout << "[HIGH]";
 		} break;
 		default:
-			assert(false);
+			assert( false );
 			break;
 		}
 		std::cout << " " << m_stringstream.str().c_str() << std::endl;
-		m_stringstream.str(""); // clear
+		m_stringstream.str( "" ); // clear
 		m_currentSeverity = Severity::log;
 		m_currentType = Type::other;
-		onNewLog.Emmit(item);
+		onNewLog.Emmit( item );
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void  Debug::Log( const std::string _message ){	Get() << Severity::log << _message << Debug::Endl();	}
-	void  Debug::Warning( const std::string _message ){	Get() << Severity::warning << _message << Debug::Endl();}
-	void  Debug::Error( const std::string _message ){	Get() << Severity::error << _message << Debug::Endl();}
-	void  Debug::Highlight( const std::string _message ){	Get() << Severity::highlight << _message << Debug::Endl();	}
-	
-	//================================================================================================================================
-	//================================================================================================================================
-	Debug&  Debug::Log	()		{ Get() << Debug::Severity::log;		return Get();	}
-	Debug&  Debug::Warning()	{ Get() << Debug::Severity::warning;	return Get();	}
-	Debug&  Debug::Error()		{ Get() << Debug::Severity::error;		return Get();	}
-	Debug&  Debug::Highlight()	{ Get() << Debug::Severity::highlight;	return Get();	}
+	void  Debug::Log( const std::string _message ) { Get() << Severity::log << _message << Debug::Endl(); }
+	void  Debug::Warning( const std::string _message ) { Get() << Severity::warning << _message << Debug::Endl(); }
+	void  Debug::Error( const std::string _message ) { Get() << Severity::error << _message << Debug::Endl(); }
+	void  Debug::Highlight( const std::string _message ) { Get() << Severity::highlight << _message << Debug::Endl(); }
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void Debug::Clear() {
-		Get().m_logBuffer.clear();		
+	Debug& Debug::Log() { Get() << Debug::Severity::log;		return Get(); }
+	Debug& Debug::Warning() { Get() << Debug::Severity::warning;	return Get(); }
+	Debug& Debug::Error() { Get() << Debug::Severity::error;		return Get(); }
+	Debug& Debug::Highlight() { Get() << Debug::Severity::highlight;	return Get(); }
+
+	//================================================================================================================================
+	//================================================================================================================================
+	void Debug::Clear()
+	{
+		Get().m_logBuffer.clear();
 	}
 }

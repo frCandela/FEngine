@@ -5,20 +5,23 @@ namespace fan
 {
 	//================================================================================================================================
 	//================================================================================================================================
-	Sampler::Sampler(Device & _device) :
-		m_device(_device) {
+	Sampler::Sampler( Device& _device ) :
+		m_device( _device )
+	{
 
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	Sampler::~Sampler() {
-		vkDestroySampler(m_device.vkDevice, m_sampler, nullptr);
+	Sampler::~Sampler()
+	{
+		vkDestroySampler( m_device.vkDevice, m_sampler, nullptr );
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void Sampler::CreateSampler( const float _maxLod, const float _maxAnisotropy, const VkFilter _filter ) {
+	void Sampler::CreateSampler( const float _maxLod, const float _maxAnisotropy, const VkFilter _filter )
+	{
 		VkSamplerCreateInfo samplerInfo = {};
 		samplerInfo.sType = VK_STRUCTURE_TYPE_SAMPLER_CREATE_INFO;
 		samplerInfo.magFilter = _filter;
@@ -39,7 +42,7 @@ namespace fan
 		samplerInfo.maxLod = _maxLod;
 		samplerInfo.mipLodBias = 0;
 
-		if (vkCreateSampler(m_device.vkDevice, &samplerInfo, nullptr, &m_sampler) != VK_SUCCESS)
-			throw std::runtime_error("failed to create texture sampler!");
+		if ( vkCreateSampler( m_device.vkDevice, &samplerInfo, nullptr, &m_sampler ) != VK_SUCCESS )
+			throw std::runtime_error( "failed to create texture sampler!" );
 	}
 }

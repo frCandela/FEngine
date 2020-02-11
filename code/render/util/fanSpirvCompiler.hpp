@@ -8,8 +8,9 @@ namespace fan
 {
 	//================================================================================================================================
 	//================================================================================================================================
-	class SpirvCompiler {
+	class SpirvCompiler
+	{
 	public:
-		static std::vector<uint32_t> Compile(const std::string _filename);
+		static std::vector<uint32_t> Compile( const std::string _filename );
 	};
 }

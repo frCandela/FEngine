@@ -4,15 +4,17 @@
 
 #include "scene/ecs/fanECSSystems.hpp"
 
-namespace fan {
+namespace fan
+{
 	//================================================================================================================================
 	//================================================================================================================================
-	class EcsManager {
+	class EcsManager
+	{
 	public:
-		EcsManager();	
+		EcsManager();
 
 		ecsEntity	CreateEntity();
-		void		DeleteEntity( const ecsEntity  _entity);
+		void		DeleteEntity( const ecsEntity  _entity );
 		ecsHandle	CreateHandle( const ecsEntity  _referencedEntity );
 
 		bool												FindEntity( const ecsHandle  _handle, ecsEntity& _outEntity );
@@ -24,18 +26,18 @@ namespace fan {
 		template< typename _tagType >		void			AddTag( const ecsEntity _entity );
 		template< typename _tagType >		void			RemoveTag( const ecsEntity _entity );
 
-		void UpdatePrePhysics	( const float _delta );
-		void UpdatePostPhysics	( const float _delta );
-		void Update				( const float _delta );
-		void LateUpdate			( const float _delta );
+		void UpdatePrePhysics( const float _delta );
+		void UpdatePostPhysics( const float _delta );
+		void Update( const float _delta );
+		void LateUpdate( const float _delta );
 		void Refresh();
 
 		// Getters 
-		const std::vector<ecsComponentsKey>&				GetEntitiesData() const { return m_entitiesKeys;		}
-		const ecsComponentsTuple< ecsComponents >&			GetComponents() const	{ return m_components;			}
-		ecsSingletonComponents&								GetSingletonComponents(){ return m_singletonComponents; }
-		const std::unordered_map< ecsHandle, ecsEntity > &	GetHandles() const		{ return m_handlesToEntity;		}
-		
+		const std::vector<ecsComponentsKey>& GetEntitiesData() const { return m_entitiesKeys; }
+		const ecsComponentsTuple< ecsComponents >& GetComponents() const { return m_components; }
+		ecsSingletonComponents& GetSingletonComponents() { return m_singletonComponents; }
+		const std::unordered_map< ecsHandle, ecsEntity >& GetHandles() const { return m_handlesToEntity; }
+
 	private:
 		ecsSingletonComponents							m_singletonComponents;
 		ecsComponentsTuple< ecsComponents >				m_components;
@@ -48,75 +50,82 @@ namespace fan {
 		ecsHandle m_nextHandle;
 		ecsEntity m_firstDeadEntity = 0;
 		ecsEntity m_activeEntitiesCount = 0;
-		
+
 		void	SwapHandlesEntities( const ecsEntity _entity1, const ecsEntity _entity2 );
 		void	RecycleComponent( const uint32_t _componentID, const ecsComponentIndex& _componentIndex );
 		void	SortEntities();
 		void	RemoveDeadComponentsAndTags();
 		void	RemoveDeadEntities();
- 	};
+	};
 
 	//================================================================================================================================
 	//================================================================================================================================
 	template< typename _componentType >
-	_componentType& EcsManager::AddComponent( const ecsEntity _entity ) {
+	_componentType& EcsManager::AddComponent( const ecsEntity _entity )
+	{
 		static_assert( IsComponent< _componentType>::value );
 
-		
-		const uint32_t componentID = (uint32_t) IndexOfComponent<_componentType>::value;
+
+		const uint32_t componentID = ( uint32_t ) IndexOfComponent<_componentType>::value;
 
 		assert( _entity < m_entitiesKeys.size() );
-		ecsComponentsKey & entityKey = m_entitiesKeys[_entity];		
+		ecsComponentsKey& entityKey = m_entitiesKeys[ _entity ];
 
 		ecsComponentIndex newIndex;
-		_componentType & component =  m_components.Alloc<_componentType>( newIndex );
-		entityKey.AddComponent( componentID, newIndex );		
+		_componentType& component = m_components.Alloc<_componentType>( newIndex );
+		entityKey.AddComponent( componentID, newIndex );
 
 		return component;
 	}
-	
+
 	//================================================================================================================================
 	//================================================================================================================================
-	template< typename _componentType > 
-	void  EcsManager::RemoveComponent( const ecsEntity _entity) {
+	template< typename _componentType >
+	void  EcsManager::RemoveComponent( const ecsEntity _entity )
+	{
 		static_assert( IsComponent< _componentType>::value );
-		m_removedComponents.push_back( std::make_pair( _entity, (uint32_t) IndexOfComponent< _componentType  >::value ));
+		m_removedComponents.push_back( std::make_pair( _entity, ( uint32_t ) IndexOfComponent< _componentType  >::value ) );
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	template< typename _tagType > void EcsManager::AddTag( const ecsEntity _entity ) {
+	template< typename _tagType > void EcsManager::AddTag( const ecsEntity _entity )
+	{
 		static_assert( IsTag< _tagType>::value );
-		m_entitiesKeys[_entity].SetTag( IndexOfTag<_tagType>::value, true );
+		m_entitiesKeys[ _entity ].SetTag( IndexOfTag<_tagType>::value, true );
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
 	template< typename _tagType >
-	void EcsManager::RemoveTag( const ecsEntity _entity ) {
+	void EcsManager::RemoveTag( const ecsEntity _entity )
+	{
 		static_assert( IsTag< _tagType>::value );
-		m_removedTags.push_back( std::make_pair( _entity, (uint32_t)IndexOfTag< _tagType  >::value ) );
+		m_removedTags.push_back( std::make_pair( _entity, ( uint32_t ) IndexOfTag< _tagType  >::value ) );
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	template< typename _componentType > 
-	_componentType* EcsManager::FindComponentFromHandle( const ecsHandle  _handle ) {
+	template< typename _componentType >
+	_componentType* EcsManager::FindComponentFromHandle( const ecsHandle  _handle )
+	{
 		static_assert( IsComponent< _componentType >::value );
 		ecsEntity entity;
-		if ( FindEntity( _handle, entity ) ) {
-			return FindComponentFromEntity< _componentType >(entity);
+		if ( FindEntity( _handle, entity ) )
+		{
+			return FindComponentFromEntity< _componentType >( entity );
 		}
 		return nullptr;
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	template< typename _componentType > _componentType* EcsManager::FindComponentFromEntity( const ecsEntity  _entity ) {
+	template< typename _componentType > _componentType* EcsManager::FindComponentFromEntity( const ecsEntity  _entity )
+	{
 		static_assert( IsComponent< _componentType >::value );
 
-		ecsComponentsKey& key = m_entitiesKeys[_entity];
-		const uint32_t componentID = (uint32_t) IndexOfComponent<_componentType>::value;
+		ecsComponentsKey& key = m_entitiesKeys[ _entity ];
+		const uint32_t componentID = ( uint32_t ) IndexOfComponent<_componentType>::value;
 		if ( key.HasComponent( componentID ) )
 		{
 			return &m_components.Get< _componentType >().At( key );
@@ -124,6 +133,6 @@ namespace fan {
 		else
 		{
 			return nullptr;
-		}		
+		}
 	}
 }

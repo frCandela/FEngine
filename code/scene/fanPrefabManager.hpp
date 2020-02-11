@@ -12,23 +12,24 @@ namespace fan
 	//================================================================================================================================
 	// Loads & references all the prefabs of the engine
 	//================================================================================================================================
-	class PrefabManager : public Singleton<PrefabManager> {
+	class PrefabManager : public Singleton<PrefabManager>
+	{
 	public:
 		friend class Singleton<PrefabManager>;
 
 		void Init();
 
-		Prefab* FindPrefab(const std::string& _path);
-		Prefab* LoadPrefab(const std::string& _path);
+		Prefab* FindPrefab( const std::string& _path );
+		Prefab* LoadPrefab( const std::string& _path );
 
 	private:
 		std::map< std::string, Prefab* > m_prefabs;
 
-		void RegisterPrefab(Prefab* _prefab);
+		void RegisterPrefab( Prefab* _prefab );
 
-		std::string CleanPath(const std::string& _path);
+		std::string CleanPath( const std::string& _path );
 
 		// Callbacks
-		void OnResolvePrefabPtr(PrefabPtr* _ptr);
+		void OnResolvePrefabPtr( PrefabPtr* _ptr );
 	};
 }

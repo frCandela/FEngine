@@ -10,7 +10,7 @@ namespace ImGui
 {
 	//================================================================================================================================
 	//================================================================================================================================
-	void FanBeginDragDropSourceGameobject( fan::Gameobject * _gameobject, ImGuiDragDropFlags _flags )
+	void FanBeginDragDropSourceGameobject( fan::Gameobject* _gameobject, ImGuiDragDropFlags _flags )
 	{
 		if ( _gameobject != nullptr )
 		{
@@ -26,9 +26,9 @@ namespace ImGui
 
 	//================================================================================================================================
 	//================================================================================================================================
-	fan::Gameobject * FanBeginDragDropTargetGameobject()
+	fan::Gameobject* FanBeginDragDropTargetGameobject()
 	{
-		fan::Gameobject * gameobject = nullptr;
+		fan::Gameobject* gameobject = nullptr;
 		if ( ImGui::BeginDragDropTarget() )
 		{
 			if ( const ImGuiPayload* payload = ImGui::AcceptDragDropPayload( "dragndrop_gameobject" ) )
@@ -43,7 +43,7 @@ namespace ImGui
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void FanBeginDragDropSourcePrefab( fan::Prefab * _prefab, ImGuiDragDropFlags _flags )
+	void FanBeginDragDropSourcePrefab( fan::Prefab* _prefab, ImGuiDragDropFlags _flags )
 	{
 		if ( _prefab != nullptr )
 		{
@@ -59,9 +59,9 @@ namespace ImGui
 
 	//================================================================================================================================
 	//================================================================================================================================
-	fan::Prefab * FanBeginDragDropTargetPrefab()
+	fan::Prefab* FanBeginDragDropTargetPrefab()
 	{
-		fan::Prefab * _prefab = nullptr;
+		fan::Prefab* _prefab = nullptr;
 		if ( ImGui::BeginDragDropTarget() )
 		{
 			if ( const ImGuiPayload* payload = ImGui::AcceptDragDropPayload( "dragndrop_prefab" ) )
@@ -76,7 +76,7 @@ namespace ImGui
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void FanBeginDragDropSourceComponent( fan::Component * _component, ImGuiDragDropFlags _flags )
+	void FanBeginDragDropSourceComponent( fan::Component* _component, ImGuiDragDropFlags _flags )
 	{
 		if ( _component != nullptr )
 		{
@@ -85,8 +85,8 @@ namespace ImGui
 				std::string nameid = std::string( "dragndrop_" ) + _component->GetName();
 				ImGui::SetDragDropPayload( nameid.c_str(), &_component, sizeof( fan::Component** ) );
 				ImGui::Icon( _component->GetIcon(), { 16,16 } ); ImGui::SameLine();
-				ImGui::Text( (std::string(_component->GetName()) + ":").c_str() ); ImGui::SameLine();
-				ImGui::Text(  _component->GetGameobject().GetName().c_str() );
+				ImGui::Text( ( std::string( _component->GetName() ) + ":" ).c_str() ); ImGui::SameLine();
+				ImGui::Text( _component->GetGameobject().GetName().c_str() );
 				ImGui::EndDragDropSource();
 			}
 		}
@@ -95,12 +95,12 @@ namespace ImGui
 	//================================================================================================================================
 	// _typeID of the typeinfo type of the component 
 	//================================================================================================================================
-	fan::Component * FanBeginDragDropTargetComponent( const uint32_t _typeID )
+	fan::Component* FanBeginDragDropTargetComponent( const uint32_t _typeID )
 	{
-		fan::Component * component = nullptr;
+		fan::Component* component = nullptr;
 		if ( ImGui::BeginDragDropTarget() )
 		{
-			const fan::Component * sample = fan::TypeInfo::Get().GetInstance< fan::Component >(_typeID);
+			const fan::Component* sample = fan::TypeInfo::Get().GetInstance< fan::Component >( _typeID );
 
 			std::string nameid = std::string( "dragndrop_" ) + sample->GetName();
 			// Drop payload component
@@ -108,16 +108,16 @@ namespace ImGui
 			if ( payloadComponent )
 			{
 				assert( payloadComponent->DataSize == sizeof( fan::Component** ) );
-				component = *(fan::Component**)payloadComponent->Data;
+				component = *( fan::Component** )payloadComponent->Data;
 			}
 			// Drop payload gameobject
 			else
 			{
-				const ImGuiPayload* payloadGameobject = ImGui::AcceptDragDropPayload( "dragndrop_gameobject" ) ;
+				const ImGuiPayload* payloadGameobject = ImGui::AcceptDragDropPayload( "dragndrop_gameobject" );
 				if ( payloadGameobject )
 				{
 					assert( payloadGameobject->DataSize == sizeof( fan::Gameobject** ) );
-					fan::Gameobject * gameobject = *( fan::Gameobject** )payloadGameobject->Data;
+					fan::Gameobject* gameobject = *( fan::Gameobject** )payloadGameobject->Data;
 					component = gameobject->GetComponent( _typeID );
 				}
 			}

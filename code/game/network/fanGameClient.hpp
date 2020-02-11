@@ -22,7 +22,7 @@ namespace fan
 		//================================================================
 		struct NetPlayerData
 		{
-			Gameobject*		playerPersistent = nullptr;
+			Gameobject* playerPersistent = nullptr;
 			NetPlayerState  state = PLAYER_NONE;
 		};
 
@@ -31,16 +31,16 @@ namespace fan
 		ImGui::IconType GetIcon() const override { return ImGui::IconType::JOYSTICK16; }
 
 		// ISerializable
-		bool Load( const Json & _json ) override;
-		bool Save( Json & _json ) const override;
+		bool Load( const Json& _json ) override;
+		bool Save( Json& _json ) const override;
 
 		void Start() override;
 		void Stop() override;
 		void Update( const float _delta ) override;
 		void LateUpdate( const float _delta ) override;
 
-		const std::vector<NetPlayerData >& GetNetPlayers() const	{ return m_netPlayers; }
-		
+		const std::vector<NetPlayerData >& GetNetPlayers() const { return m_netPlayers; }
+
 		DECLARE_TYPE_INFO( GameClient, Component );
 	protected:
 		void OnAttach() override;
@@ -54,14 +54,14 @@ namespace fan
 
 		float			m_timer = 0.f;
 
-		GameManager		* m_gameManager;
-		PlayersManager  * m_playersManager;
+		GameManager* m_gameManager;
+		PlayersManager* m_playersManager;
 
 		std::vector< NetPlayerData > m_netPlayers;
 
 		void OnAddPlayer( Gameobject* _playerPersistent );
 		void ConnectToServer( const Port _serverPort, const sf::IpAddress _ip );
 		void Receive();
-		NetPlayerData * FindNetPlayer( const Gameobject * _gameobject );
+		NetPlayerData* FindNetPlayer( const Gameobject* _gameobject );
 	};
 }

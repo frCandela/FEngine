@@ -8,30 +8,30 @@ namespace fan
 {
 	REGISTER_TYPE_INFO( PlayersManager, TypeInfo::Flags::EDITOR_COMPONENT, "game/managers/" )
 
-	//================================================================================================================================
-	//================================================================================================================================
-	void PlayersManager::Start()
+		//================================================================================================================================
+		//================================================================================================================================
+		void PlayersManager::Start()
 	{
 		REQUIRE_TRUE( *m_playerPrefab != nullptr, "PlayersManager : missing player prefab " )
 
-		if ( !GetScene().IsServer() )
-		{
-			// Callback used to spawn future joystick players
-			Joystick::Get().onJoystickConnect.Connect( &PlayersManager::OnJoystickConnect, this );
-
-			// Spawn joystick players
-			for ( int joystickIndex = 0; joystickIndex < Joystick::NUM_JOYSTICK; joystickIndex++ )
+			if ( !GetScene().IsServer() )
 			{
-				if ( Joystick::Get().IsConnected( joystickIndex ) )
-				{
-					std::stringstream ss;
-					ss << "joystick" << joystickIndex << "_player";
-					AddPlayer( joystickIndex, ss.str() );
-				}
-			}
+				// Callback used to spawn future joystick players
+				Joystick::Get().onJoystickConnect.Connect( &PlayersManager::OnJoystickConnect, this );
 
-			AddPlayer( s_mousePlayerID, "mouse_player" );
-		}
+				// Spawn joystick players
+				for ( int joystickIndex = 0; joystickIndex < Joystick::NUM_JOYSTICK; joystickIndex++ )
+				{
+					if ( Joystick::Get().IsConnected( joystickIndex ) )
+					{
+						std::stringstream ss;
+						ss << "joystick" << joystickIndex << "_player";
+						AddPlayer( joystickIndex, ss.str() );
+					}
+				}
+
+				AddPlayer( s_mousePlayerID, "mouse_player" );
+			}
 	}
 
 	//================================================================================================================================
@@ -73,11 +73,11 @@ namespace fan
 		if ( *m_playerPrefab != nullptr )
 		{
 			// Creates a persistent gameobject for the player
-			assert( m_players.find( _ID ) ==  m_players.end() );		
+			assert( m_players.find( _ID ) == m_players.end() );
 			PlayerData playerdata;
-			playerdata.persistent = GetScene().CreateGameobject(_name + std::string("_persistent"), m_gameobject );
-			m_players[_ID] = playerdata;
-			onAddPlayer.Emmit(playerdata.persistent);
+			playerdata.persistent = GetScene().CreateGameobject( _name + std::string( "_persistent" ), m_gameobject );
+			m_players[ _ID ] = playerdata;
+			onAddPlayer.Emmit( playerdata.persistent );
 		}
 	}
 
@@ -87,51 +87,51 @@ namespace fan
 	{
 		for ( auto pair : m_players )
 		{
-			 const int playerID = pair.first;
+			const int playerID = pair.first;
 
-			 // Get player data
-			 auto it = m_players.find( playerID );
-			 assert( it != m_players.end() );
-			 PlayerData& playerData = it->second;
+			// Get player data
+			auto it = m_players.find( playerID );
+			assert( it != m_players.end() );
+			PlayerData& playerData = it->second;
 
-			 Gameobject * player = GetScene().CreateGameobject( **m_playerPrefab, playerData.persistent );
-			 player->SetEditorFlags( player->GetEditorFlags() | Gameobject::EditorFlag::NOT_SAVED );
-			 player->SetName( playerData.persistent->GetName() );
+			Gameobject* player = GetScene().CreateGameobject( **m_playerPrefab, playerData.persistent );
+			player->SetEditorFlags( player->GetEditorFlags() | Gameobject::EditorFlag::NOT_SAVED );
+			player->SetName( playerData.persistent->GetName() );
 
-			 // Set input
-			 PlayerInput * playerInput = player->GetComponent<PlayerInput>();
-			 if ( playerInput != nullptr )
-			 {
-				 playerInput->SetJoystickID( playerID );
-				 playerInput->SetInputType( playerID < 0 ? PlayerInput::KEYBOARD_MOUSE : PlayerInput::JOYSTICK );
-			 }
-			 else
-			 {
-				 Debug::Warning( "PlayersManager::AddPlayer : Prefab is missing a PlayerInput component." );
-			 }
+			// Set input
+			PlayerInput* playerInput = player->GetComponent<PlayerInput>();
+			if ( playerInput != nullptr )
+			{
+				playerInput->SetJoystickID( playerID );
+				playerInput->SetInputType( playerID < 0 ? PlayerInput::KEYBOARD_MOUSE : PlayerInput::JOYSTICK );
+			}
+			else
+			{
+				Debug::Warning( "PlayersManager::AddPlayer : Prefab is missing a PlayerInput component." );
+			}
 
-			 SpaceShip * playerShip = player->GetComponent<SpaceShip>();
-			 if ( playerShip != nullptr )
-			 {
-				 playerShip->onPlayerDie.Connect( &PlayersManager::OnPlayerDie, this );
-			 }
-			 else
-			 {
-				 Debug::Warning( "PlayersManager::AddPlayer : Prefab is missing a SpaceShip component." );
-			 }
+			SpaceShip* playerShip = player->GetComponent<SpaceShip>();
+			if ( playerShip != nullptr )
+			{
+				playerShip->onPlayerDie.Connect( &PlayersManager::OnPlayerDie, this );
+			}
+			else
+			{
+				Debug::Warning( "PlayersManager::AddPlayer : Prefab is missing a SpaceShip component." );
+			}
 		}
 
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void PlayersManager::OnPlayerDie( Gameobject * _gameobject )
+	void PlayersManager::OnPlayerDie( Gameobject* _gameobject )
 	{
 		// Removes dead player from the game
-		PlayerInput * input = _gameobject->GetComponent<PlayerInput>();
+		PlayerInput* input = _gameobject->GetComponent<PlayerInput>();
 		if ( input != nullptr )
 		{
-			RemovePlayer(input->GetJoystickID());
+			RemovePlayer( input->GetJoystickID() );
 			m_gameobject->GetScene().DeleteGameobject( _gameobject );
 		}
 	}
@@ -143,7 +143,7 @@ namespace fan
 	{
 		assert( m_players.find( _ID ) != m_players.end() );
 
-		PlayerData playerData = m_players[_ID];
+		PlayerData playerData = m_players[ _ID ];
 		m_players.erase( _ID );
 		m_gameobject->GetScene().DeleteGameobject( playerData.persistent );
 	}
@@ -156,7 +156,7 @@ namespace fan
 		{
 			std::stringstream ss;
 			ss << "joystick" << _joystickID << "_player";
-			AddPlayer(_joystickID, ss.str() );
+			AddPlayer( _joystickID, ss.str() );
 		}
 	}
 
@@ -169,7 +169,7 @@ namespace fan
 		players.reserve( m_players.size() );
 		for ( auto& pair : m_players )
 		{
-			players.push_back( pair.second.persistent );			
+			players.push_back( pair.second.persistent );
 		}
 		return players;
 	}
@@ -194,7 +194,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	bool PlayersManager::Load( const Json & _json )
+	bool PlayersManager::Load( const Json& _json )
 	{
 		Actor::Load( _json );
 		Serializable::LoadPrefabPtr( _json, "player_prefab", m_playerPrefab );
@@ -204,7 +204,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	bool PlayersManager::Save( Json & _json ) const
+	bool PlayersManager::Save( Json& _json ) const
 	{
 		Actor::Save( _json );
 		Serializable::SavePrefabPtr( _json, "player_prefab", m_playerPrefab );

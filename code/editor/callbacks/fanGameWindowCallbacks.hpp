@@ -23,7 +23,7 @@ namespace fan
 		void OnGameStep();
 
 	private:
-		Scene&	m_clientScene;
-		Scene&	m_serverScene;
+		Scene& m_clientScene;
+		Scene& m_serverScene;
 	};
 }

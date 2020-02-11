@@ -15,24 +15,24 @@ namespace fan
 {
 	REGISTER_TYPE_INFO( SolarEruption, TypeInfo::Flags::EDITOR_COMPONENT, "game/" )
 
-	//================================================================================================================================
-	//================================================================================================================================
-	void SolarEruption::Start()
+		//================================================================================================================================
+		//================================================================================================================================
+		void SolarEruption::Start()
 	{
 		REQUIRE_COMPONENT( Material, m_material )
-		REQUIRE_COMPONENT( ParticleSystem, m_particleSystem )
-		REQUIRE_COMPONENT( MeshRenderer, m_meshRenderer )
-		REQUIRE_SCENE_COMPONENT( PlayersManager, m_players )
+			REQUIRE_COMPONENT( ParticleSystem, m_particleSystem )
+			REQUIRE_COMPONENT( MeshRenderer, m_meshRenderer )
+			REQUIRE_SCENE_COMPONENT( PlayersManager, m_players )
 
-		if ( m_particleSystem ) 
-		{ 
-			m_particleSystem->SetEnabled( false ); 
-		}
-		if ( m_meshRenderer ) 
-		{ 
+			if ( m_particleSystem )
+			{
+				m_particleSystem->SetEnabled( false );
+			}
+		if ( m_meshRenderer )
+		{
 			// Get singleton components 
-			ecsSunLightMesh_s& sunLight = GetScene().GetEcsManager().GetSingletonComponents().GetComponent<ecsSunLightMesh_s>();			
-			m_meshRenderer->SetMesh( sunLight.mesh ); 
+			ecsSunLightMesh_s& sunLight = GetScene().GetEcsManager().GetSingletonComponents().GetComponent<ecsSunLightMesh_s>();
+			m_meshRenderer->SetMesh( sunLight.mesh );
 		}
 
 		m_timeBeforeEruption = m_eruptionCooldown + m_distribution( m_generator ) * m_eruptionRandomCooldown;
@@ -44,7 +44,7 @@ namespace fan
 	{
 		Actor::OnAttach();
 
-		m_distribution = std::uniform_real_distribution<float> ( 0.f, 1.f );
+		m_distribution = std::uniform_real_distribution<float>( 0.f, 1.f );
 	}
 
 	//================================================================================================================================
@@ -98,7 +98,7 @@ namespace fan
 
 				// Color
 				Color color = m_baseColor;
-				color[3] *= 1.f - ( 1.f - m_collapseAlpha ) * scale; // alpha between m_collapseAlpha / 1
+				color[ 3 ] *= 1.f - ( 1.f - m_collapseAlpha ) * scale; // alpha between m_collapseAlpha / 1
 				m_material->SetColor( color );
 				m_particleSystem->SetParticlesColor( m_baseColor );
 
@@ -126,7 +126,7 @@ namespace fan
 			} break;
 			case EXPODING:
 			{
-				const float scale = std::clamp ( m_eruptionTime / m_explosionFadeinTime, 0.f, 1.f );
+				const float scale = std::clamp( m_eruptionTime / m_explosionFadeinTime, 0.f, 1.f );
 
 				// particles
 				m_particleSystem->SetParticlesPerSecond( int( m_explosionMaxParticles ) );
@@ -140,10 +140,10 @@ namespace fan
 				m_particleSystem->SetParticlesColor( m_explositonColor );
 
 				// damage
-				for ( Gameobject * player : m_players->GetPlayers() )
+				for ( Gameobject* player : m_players->GetPlayers() )
 				{
-					Health * health = player->GetComponent<Health>();
-					SolarPanel * panel = player->GetComponent<SolarPanel>();
+					Health* health = player->GetComponent<Health>();
+					SolarPanel* panel = player->GetComponent<SolarPanel>();
 					if ( health != nullptr && panel != nullptr && panel->IsInsideSunlight() )
 					{
 						const float damage = _delta * m_eruptionDamagePerSecond;
@@ -193,7 +193,7 @@ namespace fan
 			// State machine
 			ImGui::DragFloat( "eruption cooldown", &m_eruptionCooldown );
 			ImGui::DragFloat( "eruption random cooldown", &m_eruptionRandomCooldown );
-			ImGui::DragFloat( "eruption damage per second", &m_eruptionDamagePerSecond, 1.f, 0.f, 100.f );			
+			ImGui::DragFloat( "eruption damage per second", &m_eruptionDamagePerSecond, 1.f, 0.f, 100.f );
 			ImGui::Spacing();
 
 			ImGui::DragFloat( "eruption time", &m_eruptionTime );
@@ -231,7 +231,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	bool SolarEruption::Load( const Json & _json )
+	bool SolarEruption::Load( const Json& _json )
 	{
 		Actor::Load( _json );
 
@@ -261,7 +261,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	bool SolarEruption::Save( Json & _json ) const
+	bool SolarEruption::Save( Json& _json ) const
 	{
 		Actor::Save( _json );
 

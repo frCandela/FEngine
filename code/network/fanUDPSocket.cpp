@@ -51,7 +51,7 @@ namespace fan
 		}
 		return true;
 	}
-	   
+
 	//================================================================================================================================
 	//================================================================================================================================
 	bool UDPSocket::Receive( sf::Packet& _packet, bool& _disconnected )
@@ -63,10 +63,10 @@ namespace fan
 
 		if ( status == sf::UdpSocket::Done )
 		{
-			if ( m_portWhiteList == 0 || ( m_lastReceiveIp == m_ipWhiteList && m_lastReceivePort == m_portWhiteList) )
+			if ( m_portWhiteList == 0 || ( m_lastReceiveIp == m_ipWhiteList && m_lastReceivePort == m_portWhiteList ) )
 			{
 				return true;
-			}			
+			}
 		}
 		else if ( status == sf::UdpSocket::NotReady )
 		{

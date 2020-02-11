@@ -19,7 +19,7 @@ namespace fan
 		void Update( const float _delta ) override;
 		void LateUpdate( const float _delta ) override;
 
-		float GetChargingRate() const{ return m_currentChargingRate; }
+		float GetChargingRate() const { return m_currentChargingRate; }
 		float GetMaxChargingRate() const { return m_maxChargingRate; }
 		bool  IsInsideSunlight() const { return m_isInsideSunlight; }
 
@@ -30,8 +30,8 @@ namespace fan
 	protected:
 		void OnAttach() override;
 		void OnDetach() override;
-		bool Load( const Json & _json ) override;
-		bool Save( Json & _json ) const override;
+		bool Load( const Json& _json ) override;
+		bool Save( Json& _json ) const override;
 
 	private:
 		bool m_isInsideSunlight = true;
@@ -42,8 +42,8 @@ namespace fan
 		float m_minRange = 2.f;				// Distance at which the solar panel reaches maximum charging rate
 		float m_maxRange = 30.f;			// Distance at which the solar panel reaches minimum charging rate
 
-		WithEnergy * m_energy;
-		SolarEruption * m_eruption;
+		WithEnergy* m_energy;
+		SolarEruption* m_eruption;
 
 		void ComputeChargingRate();
 	};

@@ -3,16 +3,17 @@
 void RunGame();
 
 int main()
-{	
+{
 	RunGame();
-	 
-	while(true);
+
+	while ( true );
 
 	return 0;
 }
 
 // Can you guess what this function does :3
-void RunGame() {
+void RunGame()
+{
 
 	fan::Engine engine;
 	engine.Run();

@@ -2,10 +2,12 @@
 
 #include "core/fanCorePrecompiled.hpp"
 
-namespace fan {
+namespace fan
+{
 	//================================================================================================================================
 	//================================================================================================================================
-	class UniqueIdBase {
+	class UniqueIdBase
+	{
 	public:
 		virtual const size_t GetID() const = 0;
 	protected:
@@ -15,9 +17,11 @@ namespace fan {
 	//================================================================================================================================
 	//================================================================================================================================
 	template<typename ComponentType>
-	class UniqueId : private UniqueIdBase {
+	class UniqueId : private UniqueIdBase
+	{
 	public:
-		UniqueId() {
+		UniqueId()
+		{
 			m_uniqueId = m_globalId++;
 		}
 		const size_t GetID() const override { return m_uniqueId; }

@@ -36,10 +36,10 @@ namespace fan
 		const glm::vec3 center( 0.f, 0.f, 0.f );
 		const glm::vec2 centerUV( 0.5f, 0.5f );
 
-		glm::vec3 p1( _v0[0], 0.f, _v0[2] );
-		glm::vec3 p2( _v1[0], 0.f, _v1[2] );
-		glm::vec2 uv1( _v0[0], _v0[2] );
-		glm::vec2 uv2( _v1[0], _v1[2] );
+		glm::vec3 p1( _v0[ 0 ], 0.f, _v0[ 2 ] );
+		glm::vec3 p2( _v1[ 0 ], 0.f, _v1[ 2 ] );
+		glm::vec2 uv1( _v0[ 0 ], _v0[ 2 ] );
+		glm::vec2 uv2( _v1[ 0 ], _v1[ 2 ] );
 
 		uv1 = 0.5f * uv1 / radius + glm::vec2( 0.5f, 0.5f );
 		uv2 = 0.5f * uv2 / radius + glm::vec2( 0.5f, 0.5f );
