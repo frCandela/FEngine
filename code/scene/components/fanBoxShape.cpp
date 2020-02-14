@@ -27,7 +27,7 @@ namespace fan
 	{
 
 		ecsBoxShape* ecsShape = m_gameobject->AddEcsComponent<ecsBoxShape>();
-		ecsShape->Init( btVector3( 0.5f, 0.5f, 0.5f ) );
+		ecsShape->Init();
 		btBoxShape** tmpShape = &const_cast< btBoxShape* >( m_boxShape );
 		*tmpShape = &ecsShape->Get();
 

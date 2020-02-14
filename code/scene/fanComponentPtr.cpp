@@ -33,14 +33,14 @@ namespace ImGui
 		fan::Component* componentDrop = ImGui::FanBeginDragDropTargetComponent( _typeID );
 		if ( componentDrop )
 		{
-			( *_ptr ) = fan::ComponentIDPtr( componentDrop );
+			_ptr->SetResource( *componentDrop );
 			returnValue = true;
 		}
 
 		// Right click = clear
 		if ( ImGui::IsItemClicked( 1 ) )
 		{
-			( *_ptr ) = fan::ComponentIDPtr();
+			_ptr->SetNull();
 			returnValue = true;
 		}
 

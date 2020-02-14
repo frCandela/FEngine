@@ -1,23 +1,25 @@
 #pragma once
 
 #include "render/fanRenderPrecompiled.hpp"
+
+#include "core/math/shapes/fanConvexHull.hpp"
 #include "core/resources/fanResource.hpp"
 #include "core/resources/fanResource.hpp"
 #include "render/util/fanVertex.hpp"
-#include "core/math/shapes/fanConvexHull.hpp"
+#include "render/fanMeshManager.hpp"
 
 namespace fan
 {
 	class Buffer;
 	class Device;
+	class MeshManager;
 
 	//================================================================================================================================
 	//================================================================================================================================
-	class Mesh : public Resource< Mesh >
+	class Mesh : public Resource 
 	{
 	public:
-		static Signal< Mesh* > s_onGenerateVulkanData;
-		static Signal< Mesh*>  s_onDeleteVulkanData;
+		static MeshManager	   s_resourceManager;
 
 		Mesh();
 		~Mesh();
@@ -38,8 +40,8 @@ namespace fan
 		void SetOptimizeVertices( const bool _optimizeVertices ) { m_optimizeVertices = _optimizeVertices; }
 		void SetAutoUpdateHull( const bool _autoUpdateHull ) { m_autoUpdateHull = _autoUpdateHull; }
 
-		void GenerateVulkanData( Device& _device );
-		void DeleteVulkanData( Device& _device );
+		void GenerateGpuBuffers( Device* _device );
+		void DeleteGpuBuffers( Device* _device );
 
 		bool LoadFromFile( const std::string& _path );
 		bool LoadFromVertices( const std::vector<Vertex>& _vertices );

@@ -28,6 +28,6 @@ namespace fan
 
 		DECLARE_TYPE_INFO( SphereShape, Component );
 	private:
-		btSphereShape* const	m_sphereShape = nullptr;
+		btSphereShape* m_sphereShape = nullptr;
 	};
 }

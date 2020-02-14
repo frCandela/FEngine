@@ -1,14 +1,21 @@
 #include "render/fanRenderResourcePtr.hpp"
+#include "render/imgui/fanRenderDragnDrop.hpp"
 #include "render/fanRenderGlobal.hpp"
 #include "render/core/fanTexture.hpp"
 #include "render/fanMesh.hpp"
-#include "render/imgui/fanRenderDragnDrop.hpp"
 #include "core/imgui/fanImguiIcons.hpp"
 #include "core/imgui/fanModals.hpp"
 
+namespace fan
+{
+	//================================================================================================================================
+	//================================================================================================================================
+	MeshPtr::MeshPtr( Mesh* _mesh ) : ResourcePtr<Mesh>( _mesh ) {}
+}
 
 namespace ImGui
 {
+
 	//================================================================================================================================
 	//================================================================================================================================
 	bool FanTexture( const char* _label, fan::TexturePtr* _ptr )
@@ -65,14 +72,14 @@ namespace ImGui
 		fan::Texture* textureDrop = ImGui::FanBeginDragDropTargetTexture();
 		if ( textureDrop )
 		{
-			( *_ptr ) = fan::TexturePtr( textureDrop );
+			_ptr->SetResource( *textureDrop );
 			returnValue = true;
 		}
 
 		// Right click = clear
 		if ( ImGui::IsItemClicked( 1 ) )
 		{
-			( *_ptr ) = fan::TexturePtr( nullptr );
+			_ptr->SetNull();
 			returnValue = true;
 		}
 
@@ -131,20 +138,21 @@ namespace ImGui
 		fan::Mesh* meshDrop = ImGui::FanBeginDragDropTargetMesh();
 		if ( meshDrop )
 		{
-			( *_ptr ) = fan::MeshPtr( meshDrop );
+			_ptr->SetResource( *meshDrop );
 			returnValue = true;
 		}
 
 		// Right click = clear
 		if ( ImGui::IsItemClicked( 1 ) )
 		{
-			( *_ptr ) = fan::MeshPtr( nullptr );
+			_ptr->SetNull();
 			returnValue = true;
 		}
 
 		if ( ImGui::FanLoadFileModal( modalName.c_str(), fan::RenderGlobal::s_meshExtensions, m_pathBuffer ) )
 		{
-			//_ptr->Init( m_pathBuffer.string() ); @tmp
+			_ptr->Init( m_pathBuffer.string() );
+			_ptr->Resolve();
 			returnValue = true;
 		}
 

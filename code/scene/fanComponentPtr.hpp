@@ -30,7 +30,7 @@ namespace fan
 	class ComponentPtr : public ComponentIDPtr
 	{
 	public:
-		ComponentPtr( Component* _component = nullptr ) : ComponentIDPtr( static_cast< Resource< Component>* >( _component ) ) {}
+		ComponentPtr( Component* _component = nullptr ) : ComponentIDPtr( _component ) {}
 
 		_ComponentType* operator->() const { return static_cast< _ComponentType* >( GetResource() ); }
 		_ComponentType* operator*() const { return static_cast< _ComponentType* >( GetResource() ); }

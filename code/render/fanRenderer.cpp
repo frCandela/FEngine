@@ -5,6 +5,7 @@
 #include "render/fanResourceManager.hpp"
 #include "render/fanRendererDebug.hpp"
 #include "render/fanRenderGlobal.hpp"
+#include "render/fanMeshManager.hpp"
 #include "render/fanUIMesh.hpp"
 #include "render/fanMesh.hpp"
 #include "render/core/fanFrameBuffer.hpp"
@@ -36,6 +37,7 @@ namespace fan
 		m_clearColor = glm::vec4( 0.f, 0.f, 0.2f, 1.f );
 
 		ResourceManager::Get().Init( &m_window.GetDevice() );
+		Mesh::s_resourceManager.Init( m_window.GetDevice() );
 
 		CreateRenderPass();
 		CreateRenderPassPostprocess();
@@ -94,6 +96,7 @@ namespace fan
 		delete m_uiPipeline;
 
 		ResourceManager::Get().Delete();
+		Mesh::s_resourceManager.Clear();
 
 		delete m_samplerDescriptorTextures;
 		delete m_samplerDescriptorUI;

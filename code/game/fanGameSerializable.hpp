@@ -6,16 +6,16 @@
 
 namespace fan
 {
+	class MeshPtr;
+
 	class Component;
 	class Gameobject;
 	class Texture;
-	class Mesh;
 	class Prefab;
 	struct IDPtrData;
 	template< typename _ResourceType > class ResourcePtr;
 	using GameobjectPtr = ResourcePtr<Gameobject>;
 	using TexturePtr = ResourcePtr<Texture>;
-	using MeshPtr = ResourcePtr<Mesh>;
 	using PrefabPtr = ResourcePtr<Prefab>;
 	using ComponentIDPtr = ResourcePtr< Component >;
 

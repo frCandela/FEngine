@@ -9,7 +9,19 @@ namespace fan
 	class Mesh;
 
 	using TexturePtr = ResourcePtr<Texture>;
-	using MeshPtr = ResourcePtr<Mesh >;
+
+	//================================================================================================================================
+	//================================================================================================================================
+	class MeshPtr : public ResourcePtr<Mesh>
+	{
+	public:
+		MeshPtr( Mesh* _mesh = nullptr );
+		void Init( const std::string _path ){ m_path = _path; }
+		const std::string&	GetPath() const { return m_path;  }
+
+	private:
+		std::string m_path;
+	};
 }
 
 //================================================================================================================================

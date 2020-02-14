@@ -16,7 +16,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	class Gameobject : public Resource< Gameobject >, public ISerializable
+	class Gameobject : public Resource, public ISerializable
 	{
 	public:
 		using Flag = ecsFlags::Flag;
@@ -161,8 +161,7 @@ namespace fan
 		ecsEntity entity;
 		if ( ecsManager.FindEntity( m_ecsHandleEntity, entity ) )
 		{
-			ecsManager.AddComponent<_componentType>( entity );
-			return ecsManager.FindComponentFromEntity<_componentType>( entity );
+			return &ecsManager.AddComponent<_componentType>( entity );
 		}
 		return nullptr;
 	}
@@ -177,6 +176,8 @@ namespace fan
 		ecsEntity entity;
 		if ( ecsManager.FindEntity( m_ecsHandleEntity, entity ) )
 		{
+			_componentType* component = ecsManager.FindComponentFromEntity<_componentType>( entity );
+			component->Clear();
 			ecsManager.RemoveComponent<_componentType>( entity );
 		}
 	}

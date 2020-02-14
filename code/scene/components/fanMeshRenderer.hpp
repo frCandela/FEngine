@@ -37,6 +37,6 @@ namespace fan
 	private:
 		// Editor
 		std::filesystem::path m_pathBuffer;
-		ecsMesh* const m_mesh = nullptr;
+		ecsMesh* m_mesh = nullptr;
 	};
 }

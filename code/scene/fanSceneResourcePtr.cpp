@@ -9,7 +9,7 @@
 
 namespace ImGui
 {
-	static_assert( ( std::is_base_of<fan::Resource<fan::Gameobject>, fan::Gameobject>::value ) );
+	static_assert( ( std::is_base_of<fan::Resource, fan::Gameobject>::value ) );
 
 	//================================================================================================================================
 	//================================================================================================================================
@@ -37,14 +37,14 @@ namespace ImGui
 		fan::Gameobject* gameobjectDrop = ImGui::FanBeginDragDropTargetGameobject();
 		if ( gameobjectDrop )
 		{
-			( *_ptr ) = fan::GameobjectPtr( gameobjectDrop );
+			_ptr->SetResource( *gameobjectDrop );
 			returnValue = true;
 		}
 
 		// Right click = clear
 		if ( ImGui::IsItemClicked( 1 ) )
 		{
-			( *_ptr ) = fan::GameobjectPtr();
+			_ptr->SetNull();
 			returnValue = true;
 		}
 
@@ -54,7 +54,7 @@ namespace ImGui
 		return returnValue;
 	}
 
-	static_assert( ( std::is_base_of<fan::Resource<fan::Prefab>, fan::Prefab>::value ) );
+	static_assert( ( std::is_base_of<fan::Resource, fan::Prefab>::value ) );
 	//================================================================================================================================
 	//================================================================================================================================
 	bool FanPrefab( const char* _label, fan::PrefabPtr* _ptr )
@@ -98,14 +98,14 @@ namespace ImGui
 		fan::Prefab* prefabDrop = ImGui::FanBeginDragDropTargetPrefab();
 		if ( prefabDrop )
 		{
-			( *_ptr ) = fan::PrefabPtr( prefabDrop );
+			_ptr->SetResource( *prefabDrop );
 			returnValue = true;
 		}
 
 		// Right click = clear
 		if ( ImGui::IsItemClicked( 1 ) )
 		{
-			( *_ptr ) = fan::PrefabPtr();
+			_ptr->SetNull();
 			returnValue = true;
 		}
 

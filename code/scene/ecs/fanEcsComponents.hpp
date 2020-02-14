@@ -19,13 +19,15 @@ namespace fan
 	//================================================================================================================================
 	// Components
 	//================================================================================================================================	
-	struct ecsIComponent {};
+	struct ecsIComponent {
+	};
 
 	//================================
 	struct ecsTranform : ecsIComponent
 	{
 		static const char* s_name;
 		void Init() { transform.setIdentity(); }
+		void Clear(){}
 
 		btTransform transform;
 	};
@@ -35,6 +37,7 @@ namespace fan
 	{
 		static const char* s_name;
 		void Init() { position = btVector3::Zero(); }
+		void Clear(){}
 
 		btVector3	position = btVector3::Zero();
 	};
@@ -44,6 +47,7 @@ namespace fan
 	{
 		static const char* s_name;
 		void Init() { rotation = btQuaternion::getIdentity(); }
+		void Clear(){}
 
 		btQuaternion	rotation = btQuaternion::getIdentity();
 	};
@@ -53,6 +57,7 @@ namespace fan
 	{
 		static const char* s_name;
 		void Init() { scale = btVector3::One(); }
+		void Clear(){}
 
 		btVector3		scale = btVector3::One();
 	};
@@ -62,6 +67,7 @@ namespace fan
 	{
 		static const char* s_name;
 		void Init() { speed = btVector3::Zero(); }
+		void Clear(){}
 
 		btVector3		speed = btVector3::Zero();
 	};
@@ -75,17 +81,18 @@ namespace fan
 			color = Color::Red;
 			durationLeft = 1.f;
 		}
+		void Clear(){}
 
 		fan::Color	color = Color::Red;
 		float		durationLeft = 1.f;
 	};
 
-	//================================
+	//================================ @todo make this a tag ?
 	struct ecsSunlightParticleOcclusion : ecsIComponent
 	{
 		static const char* s_name;
-		void Init()
-		{}
+		void Init()	{}
+		void Clear(){}
 	};
 
 	//================================
@@ -93,6 +100,7 @@ namespace fan
 	{
 		static const char* s_name;
 		void Init() { aabb.Clear(); }
+		void Clear(){}
 
 		AABB aabb;
 	};
@@ -103,9 +111,10 @@ namespace fan
 		static const char* s_name;
 		void Init()
 		{
-			mesh = MeshPtr();
+			static_cast< ResourcePtr<Mesh> * >( &mesh )->SetNull();
 			renderID = -1;
 		}
+		void Clear() { mesh.SetNull(); }
 
 		MeshPtr mesh;
 		int renderID = -1;
@@ -121,6 +130,7 @@ namespace fan
 			diffuse = Color::White;
 			specular = Color::White;
 		}
+		void Clear() {}
 
 		Color ambiant = Color::Black;
 		Color diffuse = Color::White;
@@ -138,6 +148,7 @@ namespace fan
 			specular = Color::White;
 			attenuation[ 0 ] = 0.f; attenuation[ 1 ] = 0.f; attenuation[ 2 ] = 0.1f;
 		}
+		void Clear(){}
 
 		Color ambiant = Color::White;
 		Color diffuse = Color::White;
@@ -151,10 +162,11 @@ namespace fan
 		static const char* s_name;
 		void Init()
 		{
-			texture = TexturePtr();
+			static_cast< ResourcePtr< Texture > * >( &texture )->SetNull();
 			shininess = 1;
 			color = Color::White;
 		}
+		void Clear() { texture.SetNull();  }
 
 		TexturePtr 	texture;
 		uint32_t	shininess = 1;
@@ -172,6 +184,8 @@ namespace fan
 			radius = 1.f;
 			phase = 0.f;
 		}
+		void Clear(){}
+
 		float time = 0.f;
 		float speed = 1.f;
 		float radius = 1.f;
@@ -188,6 +202,8 @@ namespace fan
 		{
 			return new( bufferRigidbody ) btRigidBody( constructionInfo );
 		}
+		void Clear(){}
+
 		inline btRigidBody& Get() { return *reinterpret_cast< btRigidBody* >( bufferRigidbody ); }
 
 	}; static_assert( sizeof( ecsRigidbody ) == sizeof( btRigidBody ) );
@@ -203,6 +219,8 @@ namespace fan
 		{
 			return new( bufferMotionState ) btDefaultMotionState( _startTrans, _centerOfMassOffset );
 		}
+		void Clear(){}
+
 		inline btDefaultMotionState& Get() { return *reinterpret_cast< btDefaultMotionState* >( bufferMotionState ); }
 
 	}; static_assert( sizeof( ecsMotionState ) == sizeof( btDefaultMotionState ) );
@@ -213,10 +231,12 @@ namespace fan
 		static const char* s_name;
 		char bufferSphereShape[ sizeof( btSphereShape ) ]; // dummy btSphereShape memory to bypass btDefaultMotionState constructor
 
-		btSphereShape* Init( const float _radius )
+		btSphereShape* Init( const float _radius = 1.f )
 		{
 			return new( bufferSphereShape ) btSphereShape( _radius );
 		}
+		void Clear(){}
+
 		inline btSphereShape& Get() { return *reinterpret_cast< btSphereShape* >( bufferSphereShape ); }
 
 	}; static_assert( sizeof( ecsSphereShape ) == sizeof( btSphereShape ) );
@@ -227,10 +247,12 @@ namespace fan
 		static const char* s_name;
 		char bufferBoxShape[ sizeof( btBoxShape ) ]; // dummy btBoxShape memory to bypass btDefaultMotionState constructor
 
-		btBoxShape* Init( const btVector3 _boxHalfExtents )
+		btBoxShape* Init( const btVector3 _boxHalfExtents =  btVector3( 0.5f, 0.5f, 0.5f ) )
 		{
 			return new( bufferBoxShape ) 	btBoxShape( _boxHalfExtents );
 		}
+		void Clear(){}
+
 		inline 	btBoxShape& Get() { return *reinterpret_cast< btBoxShape* >( bufferBoxShape ); }
 
 	}; static_assert( sizeof( ecsBoxShape ) == sizeof( btBoxShape ) );
@@ -240,6 +262,7 @@ namespace fan
 	{
 		static const char* s_name;
 		void Init() { flags = 0; }
+		void Clear(){}
 
 		uint32_t flags = 0;
 
@@ -256,6 +279,7 @@ namespace fan
 	{
 		static const char* s_name;
 		void Init() { flags = 0; }
+		void Clear(){}
 
 		uint32_t flags = 0;
 
@@ -274,6 +298,8 @@ namespace fan
 			durationLeft = _durationLeft;
 			damage = _damage;
 		}
+		void Clear(){}
+
 		float durationLeft = 1.f;
 		float damage = 5.f;
 	};
@@ -287,6 +313,8 @@ namespace fan
 		{
 			gameobject = _gameobject;
 		}
+		void Clear(){}
+
 		Gameobject* gameobject = nullptr;
 	};
 

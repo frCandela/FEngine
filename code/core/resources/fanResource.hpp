@@ -11,17 +11,15 @@ namespace fan
 	//================================================================================================================================
 	// Base class for resources ( Mesh, textures, components, gameobjects etc.) 
 	//================================================================================================================================
-	template< typename _ResourceType >
 	class Resource
 	{
 	public:
-		friend class ResourceList<_ResourceType>;
-		friend class ResourcePtr<_ResourceType>;
-
-		static ResourceList<_ResourceType> s_list;
-
 		bool IsReferenced() const { return m_refCount > 0; }
+
+		int  GetRefCount()		{ return m_refCount;  }
+		void IncreaseRefCount() { m_refCount ++; }
+		void DecreaseRefCount() { m_refCount --; }
 	private:
-		int m_refCount;
+		int m_refCount = 0;
 	};
 }

@@ -33,9 +33,9 @@ namespace fan
 		// Display mesh list
 		if ( ImGui::CollapsingHeader( "Loaded meshes : " ) )
 		{
-			for ( Mesh* mesh : resourceManager.GetMeshList() )
+			for ( auto pair : Mesh::s_resourceManager.GetList() )
 			{
-				ImGui::Text( mesh->GetPath().c_str() );
+				ImGui::Text("ref: %d name: %s", pair.second->GetRefCount(), pair.second->GetPath().c_str() );
 			}
 		}
 		// display textures list

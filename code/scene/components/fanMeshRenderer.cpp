@@ -20,8 +20,7 @@ namespace fan
 	{
 		Component::OnAttach();
 
-		ecsMesh** tmpMesh = &const_cast< ecsMesh* >( m_mesh );
-		*tmpMesh = m_gameobject->AddEcsComponent<ecsMesh>();
+		m_mesh = m_gameobject->AddEcsComponent<ecsMesh>();
 		m_mesh->Init();
 
 		m_gameobject->GetScene().onRegisterMeshRenderer.Emmit( this );
@@ -44,7 +43,7 @@ namespace fan
 	{
 		if ( _mesh != nullptr )
 		{
-			m_mesh->mesh = MeshPtr( _mesh );
+			m_mesh->mesh.SetResource( * _mesh );
 			m_gameobject->SetFlags( m_gameobject->GetFlags() & Gameobject::Flag::OUTDATED_AABB );
 		}
 	}
@@ -91,7 +90,6 @@ namespace fan
 	//================================================================================================================================
 	bool MeshRenderer::Save( Json& _json ) const
 	{
-
 		Component::Save( _json );
 
 		Serializable::SaveMeshPtr( _json, "path", m_mesh->mesh );

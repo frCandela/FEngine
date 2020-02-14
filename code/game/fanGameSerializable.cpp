@@ -10,10 +10,10 @@
 
 namespace fan
 {
-	static_assert( ( std::is_base_of<Resource<Mesh>, Mesh>::value ) );
-	static_assert( ( std::is_base_of<Resource<Texture>, Texture>::value ) );
-	static_assert( ( std::is_base_of<Resource<Gameobject>, Gameobject>::value ) );
-	static_assert( ( std::is_base_of<Resource<Component>, Component>::value ) );
+	static_assert( ( std::is_base_of<Resource, Mesh>::value ) );
+	static_assert( ( std::is_base_of<Resource, Texture>::value ) );
+	static_assert( ( std::is_base_of<Resource, Gameobject>::value ) );
+	static_assert( ( std::is_base_of<Resource, Component>::value ) );
 
 	//================================================================================================================================
 	//================================================================================================================================
@@ -87,7 +87,9 @@ namespace fan
 		const Json* token = FindToken( _json, _name );
 		if ( token != nullptr )
 		{
-			//_outPtr.Init(*token);@tmp
+			assert( !_outPtr.IsValid() );
+			_outPtr.Init( *token );
+			_outPtr.Resolve();
 			return true;
 		}
 		return false;

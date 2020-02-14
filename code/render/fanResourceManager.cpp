@@ -1,8 +1,8 @@
 #include "render/fanResourceManager.hpp"
 #include "render/core/fanTexture.hpp"
 #include "render/core/fanBuffer.hpp"
-#include "render/fanMesh.hpp"
 #include "render/fanUIMesh.hpp"
+#include "render/fanMesh.hpp"
 #include "render/core/fanDevice.hpp"
 #include "render/fanRenderGlobal.hpp"
 #include "render/fanRenderResourcePtr.hpp"
@@ -17,18 +17,15 @@ namespace fan
 		m_device = _device;
 		m_textures.reserve( 64 );
 
-		Mesh::s_onGenerateVulkanData.Connect( &ResourceManager::OnGenerateMesh, this );
 		UIMesh::s_onGenerateVulkanData.Connect( &ResourceManager::OnGenerateUIMesh, this );
 		Texture::s_onGenerateVulkanData.Connect( &ResourceManager::OnGenerateTexture, this );
 
-		Mesh::s_onDeleteVulkanData.Connect( &ResourceManager::OnDeleteMesh, this );
 		UIMesh::s_onDeleteVulkanData.Connect( &ResourceManager::OnDeleteUIMesh, this );
 		Texture::s_onDeleteVulkanData.Connect( &ResourceManager::OnDeleteTexture, this );
 
 		// 		TexturePtr::s_onInit.Connect ( &ResourceManager::OnResolveTexturePtr,this );
-		// 		MeshPtr::s_onInit.Connect	( &ResourceManager::OnResolveMeshPtr, this );
 
-		LoadMesh( RenderGlobal::s_defaultMesh );
+		Mesh::s_resourceManager.LoadMesh( RenderGlobal::s_defaultMesh );
 		LoadTexture( RenderGlobal::s_defaultTexture );
 		LoadTexture( RenderGlobal::s_whiteTexture );
 		SetUnmodified();
@@ -39,25 +36,7 @@ namespace fan
 	void ResourceManager::Delete()
 	{
 		while ( !m_textures.empty() ) { delete* m_textures.begin(); }
-		while ( !m_meshList.empty() ) { delete* m_meshList.begin(); }
 		while ( !m_uiMeshList.empty() ) { delete* m_uiMeshList.begin(); }
-	}
-
-	//================================================================================================================================
-	//================================================================================================================================
-	Mesh* ResourceManager::FindMesh( const std::string& _path )
-	{
-		for ( int meshIndex = 0; meshIndex < m_meshList.size(); meshIndex++ )
-		{
-			for ( Mesh* mesh : m_meshList )
-			{
-				if ( mesh->GetPath() == CleanPath( _path ) )
-				{
-					return mesh;
-				}
-			}
-		}
-		return nullptr;
 	}
 
 	//================================================================================================================================
@@ -72,24 +51,6 @@ namespace fan
 				return m_textures[ textureIndex ];
 			}
 		}
-		return nullptr;
-	}
-
-	//================================================================================================================================
-	// Load a mesh from a path, loads it and registers it
-	//================================================================================================================================
-	Mesh* ResourceManager::LoadMesh( const std::string& _path )
-	{
-		if ( _path.empty() ) { return nullptr; }
-
-		// Load
-		Mesh* mesh = new Mesh();
-		if ( mesh->LoadFromFile( CleanPath( _path ) ) )
-		{
-			RegisterMesh( mesh );
-			return mesh;
-		}
-		delete mesh;
 		return nullptr;
 	}
 
@@ -118,7 +79,6 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void ResourceManager::OnGenerateMesh( Mesh* _mesh ) { _mesh->GenerateVulkanData( *m_device ); }
 	void ResourceManager::OnGenerateUIMesh( UIMesh* _mesh ) { _mesh->GenerateVulkanData( *m_device ); }
 	void ResourceManager::OnGenerateTexture( Texture* _texture ) { _texture->GenerateVulkanData( *m_device ); }
 
@@ -131,18 +91,6 @@ namespace fan
 
 		auto it = m_uiMeshList.find( _mesh );
 		if ( it != m_uiMeshList.end() ) { m_uiMeshList.erase( it ); }
-		_mesh->DeleteVulkanData( *m_device );
-	}
-
-	//================================================================================================================================
-	//================================================================================================================================
-	void ResourceManager::OnDeleteMesh( Mesh* _mesh )
-	{
-		vkDeviceWaitIdle( m_device->vkDevice );
-		Debug::Highlight( "Renderer idle" );
-
-		auto it = m_meshList.find( _mesh );
-		if ( it != m_meshList.end() ) { m_meshList.erase( it ); }
 		_mesh->DeleteVulkanData( *m_device );
 	}
 
@@ -179,15 +127,6 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void  ResourceManager::RegisterMesh( Mesh* _mesh )
-	{
-		assert( m_meshList.find( _mesh ) == m_meshList.end() );
-		m_meshList.insert( _mesh );
-		_mesh->GenerateVulkanData( *m_device );
-	}
-
-	//================================================================================================================================
-	//================================================================================================================================
 	void ResourceManager::RegisterUIMesh( UIMesh* _mesh )
 	{
 		m_uiMeshList.insert( _mesh );
@@ -220,18 +159,5 @@ namespace fan
 		// 		}
 	}
 
-	//================================================================================================================================
-	//================================================================================================================================
-	void ResourceManager::OnResolveMeshPtr( MeshPtr* _ptr )
-	{
-		// 		Mesh * mesh = ResourceManager::Get().FindMesh( _ptr->GetID() );@tmp
-		// 		if ( mesh == nullptr )
-		// 		{
-		// 			mesh = ResourceManager::Get().LoadMesh( _ptr->GetID() );
-		// 		}
-		// 		if ( mesh )
-		// 		{
-		// 			*_ptr = MeshPtr( mesh, mesh->GetPath() );
-		// 		}
-	}
+
 }

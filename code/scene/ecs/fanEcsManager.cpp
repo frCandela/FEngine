@@ -64,7 +64,7 @@ namespace fan
 	{
 		SCOPED_PROFILE( ecs_refresh )
 
-			RemoveDeadComponentsAndTags();
+		RemoveDeadComponentsAndTags();
 		SortEntities();
 		RemoveDeadEntities();
 	}

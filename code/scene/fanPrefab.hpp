@@ -13,7 +13,7 @@ namespace fan
 	// represents a gameobjects tree
 	// stores its data in a json
 	//================================================================================================================================
-	class Prefab : public Resource<Prefab>
+	class Prefab : public Resource
 	{
 	public:
 		Prefab();

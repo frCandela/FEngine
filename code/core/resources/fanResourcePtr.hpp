@@ -2,41 +2,88 @@
 
 #include "core/fanCorePrecompiled.hpp"
 #include "core/resources/fanResource.hpp"
+#include "core/fanHash.hpp"
 
 namespace fan
 {
+
 	//================================================================================================================================
 	//================================================================================================================================
 	template< typename _ResourceType>
 	class ResourcePtr
 	{
 	public:
-		friend class ResourceList<_ResourceType>;
+		static Signal< ResourcePtr<_ResourceType>& > s_onCreate;
+		static Signal< ResourcePtr<_ResourceType>& > s_onResolve;
 
-		ResourcePtr( Resource<_ResourceType>* _resourceType = nullptr );
+		ResourcePtr( Resource* _resource = nullptr );
+		virtual ~ResourcePtr();
 
-		bool			IsValid()      const { return m_resource != nullptr; }
-		_ResourceType* GetResource() const { return static_cast< _ResourceType* >( m_resource ); }
+		void			Resolve()			  { s_onResolve.Emmit( *this );  }
+		bool			IsValid()       const { return m_resource != nullptr; }
+		_ResourceType*  GetResource()   const { return static_cast< _ResourceType* >( m_resource ); }
+		void			SetResource( Resource& _resource );
+		void			SetNull();
 
 		_ResourceType* operator->() const { return ( _ResourceType* ) ( m_resource ); }
 		_ResourceType* operator*()  const { return ( _ResourceType* ) ( m_resource ); }
-
+		ResourcePtr & operator=(const ResourcePtr&) = delete;
+		ResourcePtr(const ResourcePtr&) = delete;
 	private:
-		Resource<_ResourceType>* m_resource = nullptr;
+		Resource* m_resource = nullptr;
 	};
 
-
+	template< typename _ResourceType>
+	Signal< ResourcePtr<_ResourceType>& > ResourcePtr<_ResourceType>::s_onResolve;
+	template< typename _ResourceType>
+	Signal< ResourcePtr<_ResourceType>& > ResourcePtr<_ResourceType>::s_onCreate;
 
 	//================================================================================================================================
-	// Creates a resourcePtr referencing an already existing resource
 	//================================================================================================================================
 	template< typename _ResourceType >
-	ResourcePtr<_ResourceType>::ResourcePtr( Resource<_ResourceType>* _resourceType ) :
-		m_resource( _resourceType )
+	ResourcePtr<_ResourceType>::ResourcePtr( Resource* _resource ) :
+		m_resource( _resource )
 	{
-		if ( _resourceType != nullptr )
+		s_onCreate.Emmit( *this );
+		if ( m_resource != nullptr )
 		{
-			++_resourceType->m_refCount;
+			m_resource->IncreaseRefCount();
+		}
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
+	template< typename _ResourceType >
+	void ResourcePtr<_ResourceType>::SetResource( Resource& _resource ) 
+	{
+		if ( m_resource != nullptr )
+		{
+			m_resource->DecreaseRefCount();
+		}
+		m_resource = &_resource;
+		m_resource->IncreaseRefCount();
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
+	template< typename _ResourceType >
+	void ResourcePtr<_ResourceType>::SetNull() 
+	{
+		if ( m_resource != nullptr )
+		{
+			m_resource->DecreaseRefCount();
+		}
+		m_resource = nullptr;
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
+	template< typename _ResourceType >
+	ResourcePtr<_ResourceType>::~ResourcePtr()
+	{
+		if ( m_resource != nullptr )
+		{
+			m_resource->DecreaseRefCount();
 		}
 	}
 }

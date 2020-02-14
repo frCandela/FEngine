@@ -64,9 +64,6 @@ namespace fan
 
 	//================================================================================================================================
 	// Removes a component 
-	// O(n) if removing an arbitrary component
-	// O(1) if removing the last component	
-	//  ( n = ecsComponents::count )
 	//================================================================================================================================
 	ecsComponentIndex ecsComponentsKeyCompact::RemoveComponent( const uint32_t _componentID )
 	{

@@ -18,7 +18,7 @@ namespace fan
 		VkDevice vkDevice = VK_NULL_HANDLE;
 
 		VkCommandPool	GetCommandPool() const { return m_commandPool; }
-		VkQueue& GetGraphicsQueue() { return m_graphicsQueue; }
+		VkQueue&		GetGraphicsQueue() { return m_graphicsQueue; }
 		uint32_t		GetGraphicsQueueFamilyIndex() { return m_graphicsQueueFamilyIndex; }
 		uint32_t		FindMemoryType( uint32_t _typeFilter, VkMemoryPropertyFlags _properties );
 		VkFormat		FindDepthFormat();
@@ -29,7 +29,7 @@ namespace fan
 		const VkPhysicalDeviceProperties& GetDeviceProperties() const { return m_deviceProperties; }
 
 	private:
-		Instance* m_instance;
+		Instance*		m_instance;
 		VkSurfaceKHR	m_surface;
 		VkCommandPool	m_commandPool;
 

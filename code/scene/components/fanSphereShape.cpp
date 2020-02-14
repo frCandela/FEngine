@@ -24,11 +24,9 @@ namespace fan
 	//================================================================================================================================
 	void SphereShape::OnAttach()
 	{
-
 		ecsSphereShape* ecsShape = m_gameobject->AddEcsComponent<ecsSphereShape>();
-		ecsShape->Init( 1.f );
-		btSphereShape** shape = &const_cast< btSphereShape* >( m_sphereShape );
-		*shape = &ecsShape->Get();
+		ecsShape->Init();
+		m_sphereShape = &ecsShape->Get();
 
 		ColliderShape::OnAttach();
 	}

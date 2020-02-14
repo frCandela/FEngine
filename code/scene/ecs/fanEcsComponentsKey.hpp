@@ -95,7 +95,7 @@ namespace fan
 		uint32_t					GetSubIndex( const uint32_t _componentIndex ) const;
 		void						SetSubIndex( const uint32_t _componentIndex, const uint32_t _value );
 		void						Reset();
-		const ecsComponentIndex* Data() const { return m_indices; }
+		const ecsComponentIndex*    Data() const { return m_indices; }
 		uint32_t					Count() const { return m_nextElement; }
 		uint32_t					IsEmpty() const { return m_nextElement == 0; }
 	};

@@ -1,16 +1,16 @@
 #include "render/fanMesh.hpp"
+
+#include "render/fanRendererDebug.hpp"
 #include "render/fanGLTFImporter.hpp"
-#include "core/math/shapes/fanConvexHull.hpp"
+#include "render/fanMeshManager.hpp"
 #include "render/core/fanDevice.hpp"
 #include "render/core/fanBuffer.hpp"
-#include "render/fanRendererDebug.hpp"
+#include "core/math/shapes/fanConvexHull.hpp"
+
 
 namespace fan
 {
-	//REGISTER_TYPE_INFO(Mesh, TypeInfo::Flags::NONE, "scene/")
-
-	Signal< Mesh* > Mesh::s_onGenerateVulkanData;
-	Signal< Mesh* > Mesh::s_onDeleteVulkanData;
+	MeshManager	    Mesh::s_resourceManager;
 
 	//================================================================================================================================
 	//================================================================================================================================
@@ -23,26 +23,33 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	Mesh::~Mesh() { s_onDeleteVulkanData.Emmit( this ); }
+	Mesh::~Mesh() 
+	{ 
+		DeleteGpuBuffers( s_resourceManager.GetDevice() ); 
+	}
 
 	//================================================================================================================================
 	//================================================================================================================================
 	bool Mesh::LoadFromFile( const std::string& _path )
 	{
 		GLTFImporter importer;
-		if ( importer.Load( _path ) == true )
+		if ( importer.Load( _path ) )
 		{
 			if ( !importer.GetMesh( *this ) )
 			{
 				Debug::Get() << "Failed to load mesh : " << m_path << Debug::Endl();
 				return false;
 			}
+
+			OptimizeVertices();
+			GenerateConvexHull();
+			GenerateGpuBuffers( s_resourceManager.GetDevice() );
+
+			m_path = _path;
+			return true;
 		}
-		OptimizeVertices();
-		GenerateConvexHull();
-		s_onGenerateVulkanData.Emmit( this );
-		m_path = _path;
-		return true;
+
+		return false;
 	}
 
 	//================================================================================================================================
@@ -62,7 +69,7 @@ namespace fan
 		// Cleanup
 		OptimizeVertices();
 		GenerateConvexHull();
-		s_onGenerateVulkanData.Emmit( this );
+		GenerateGpuBuffers( s_resourceManager.GetDevice() );
 		return true;
 	}
 
@@ -119,8 +126,8 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void Mesh::GenerateVulkanData( Device& _device )
-	{
+	void Mesh::GenerateGpuBuffers( Device* _device ) {
+		if ( _device == nullptr ) { return; }
 		if ( m_indices.empty() ) { return; }
 
 		m_currentBuffer = ( m_currentBuffer + 1 ) % 3;
@@ -134,7 +141,7 @@ namespace fan
 		if ( vertexBuffer == nullptr || vertexBuffer->GetSize() < requiredVertexSize )
 		{
 			delete vertexBuffer;
-			vertexBuffer = new Buffer( _device );
+			vertexBuffer = new Buffer( *_device );
 			m_vertexBuffer[ m_currentBuffer ]->Create(
 				requiredVertexSize,
 				VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_VERTEX_BUFFER_BIT,
@@ -147,7 +154,7 @@ namespace fan
 		if ( indexBuffer == nullptr || indexBuffer->GetSize() < requiredIndexSize )
 		{
 			delete indexBuffer;
-			indexBuffer = new Buffer( _device );
+			indexBuffer = new Buffer( *_device );
 			indexBuffer->Create(
 				requiredIndexSize,
 				VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_INDEX_BUFFER_BIT,
@@ -163,38 +170,42 @@ namespace fan
 		else
 		{
 			{
-				Buffer stagingBuffer( _device );
+				Buffer stagingBuffer( *_device );
 				stagingBuffer.Create(
 					requiredIndexSize,
 					VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
 					VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT
 				);
 				stagingBuffer.SetData( m_indices.data(), requiredIndexSize );
-				VkCommandBuffer cmd = _device.BeginSingleTimeCommands();
+				VkCommandBuffer cmd = _device->BeginSingleTimeCommands();
 				stagingBuffer.CopyBufferTo( cmd, indexBuffer->GetBuffer(), requiredIndexSize );
-				_device.EndSingleTimeCommands( cmd );
+				_device->EndSingleTimeCommands( cmd );
 			}
 			{
 
 
-				Buffer stagingBuffer2( _device );
+				Buffer stagingBuffer2( *_device );
 				stagingBuffer2.Create(
 					requiredVertexSize,
 					VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
 					VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT
 				);
 				stagingBuffer2.SetData( m_vertices.data(), requiredVertexSize );
-				VkCommandBuffer cmd2 = _device.BeginSingleTimeCommands();
+				VkCommandBuffer cmd2 = _device->BeginSingleTimeCommands();
 				stagingBuffer2.CopyBufferTo( cmd2, vertexBuffer->GetBuffer(), requiredVertexSize );
-				_device.EndSingleTimeCommands( cmd2 );
+				_device->EndSingleTimeCommands( cmd2 );
 			}
 		}
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void Mesh::DeleteVulkanData( Device& /*_device*/ )
+	void Mesh::DeleteGpuBuffers( Device* _device ) 
 	{
+		if ( _device == nullptr ) return;
+
+		Debug::Highlight( "Renderer idle" );
+		vkDeviceWaitIdle( _device->vkDevice );	
 		for ( int bufferIndex = 0; bufferIndex < 3; bufferIndex++ )
 		{
 			delete m_indexBuffer[ bufferIndex ];
