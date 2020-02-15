@@ -22,15 +22,19 @@ namespace fan
 		void			Resolve()			  { s_onResolve.Emmit( *this );  }
 		bool			IsValid()       const { return m_resource != nullptr; }
 		_ResourceType*  GetResource()   const { return static_cast< _ResourceType* >( m_resource ); }
-		void			SetResource( Resource& _resource );
-		void			SetNull();
 
 		_ResourceType* operator->() const { return ( _ResourceType* ) ( m_resource ); }
 		_ResourceType* operator*()  const { return ( _ResourceType* ) ( m_resource ); }
 		ResourcePtr & operator=(const ResourcePtr&) = delete;
 		ResourcePtr(const ResourcePtr&) = delete;
+
+		void SetResource( Resource* _resource );
+	protected:
+		
+
 	private:
 		Resource* m_resource = nullptr;
+
 	};
 
 	template< typename _ResourceType>
@@ -54,26 +58,21 @@ namespace fan
 	//================================================================================================================================
 	//================================================================================================================================
 	template< typename _ResourceType >
-	void ResourcePtr<_ResourceType>::SetResource( Resource& _resource ) 
+	void ResourcePtr<_ResourceType>::SetResource( Resource * _resource ) 
 	{
-		if ( m_resource != nullptr )
-		{
-			m_resource->DecreaseRefCount();
-		}
-		m_resource = &_resource;
-		m_resource->IncreaseRefCount();
-	}
+		if ( _resource == m_resource ) { return; }
 
-	//================================================================================================================================
-	//================================================================================================================================
-	template< typename _ResourceType >
-	void ResourcePtr<_ResourceType>::SetNull() 
-	{
-		if ( m_resource != nullptr )
-		{
-			m_resource->DecreaseRefCount();
+		if ( m_resource != nullptr ) 
+		{ 
+			m_resource->DecreaseRefCount(); 
+			m_resource = nullptr;
 		}
-		m_resource = nullptr;
+
+		if ( _resource != nullptr )
+		{
+			m_resource = _resource;
+			m_resource->IncreaseRefCount();
+		}
 	}
 
 	//================================================================================================================================

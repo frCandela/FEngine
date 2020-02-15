@@ -1,28 +1,21 @@
 #include "render/fanRenderResourcePtr.hpp"
 #include "render/imgui/fanRenderDragnDrop.hpp"
 #include "render/fanRenderGlobal.hpp"
-#include "render/core/fanTexture.hpp"
-#include "render/fanMesh.hpp"
 #include "core/imgui/fanImguiIcons.hpp"
 #include "core/imgui/fanModals.hpp"
-
-namespace fan
-{
-	//================================================================================================================================
-	//================================================================================================================================
-	MeshPtr::MeshPtr( Mesh* _mesh ) : ResourcePtr<Mesh>( _mesh ) {}
-}
 
 namespace ImGui
 {
 
 	//================================================================================================================================
+	// Draws a ImGui widget for displaying a TexturePtr
+	// Returns true if the value (TexturePtr) was edited
 	//================================================================================================================================
-	bool FanTexture( const char* _label, fan::TexturePtr* _ptr )
+	bool FanTexturePtr( const char* _label, fan::TexturePtr& _ptr )
 	{
 		bool returnValue = false;
 
-		fan::Texture* texture = **_ptr;
+		fan::Texture* texture = *_ptr;
 		const std::string name = texture == nullptr ? "null" : std::filesystem::path( texture->GetPath() ).filename().string();
 
 		// Set button icon & modal
@@ -72,21 +65,22 @@ namespace ImGui
 		fan::Texture* textureDrop = ImGui::FanBeginDragDropTargetTexture();
 		if ( textureDrop )
 		{
-			_ptr->SetResource( *textureDrop );
+			_ptr = textureDrop ;
 			returnValue = true;
 		}
 
 		// Right click = clear
 		if ( ImGui::IsItemClicked( 1 ) )
 		{
-			_ptr->SetNull();
+			_ptr = nullptr;
 			returnValue = true;
 		}
 
 		// Modal set value
 		if ( ImGui::FanLoadFileModal( modalName.c_str(), fan::RenderGlobal::s_imagesExtensions, m_pathBuffer ) )
 		{
-			//_ptr->Init( m_pathBuffer.string() ); @tmp
+			_ptr.Init( m_pathBuffer.string() );
+			_ptr.Resolve();
 			returnValue = true;
 		}
 
@@ -97,12 +91,14 @@ namespace ImGui
 	}
 
 	//================================================================================================================================
+	// Draws a ImGui widget for displaying a MeshPtr
+	// Returns true if the value (MeshPtr) was edited
 	//================================================================================================================================
-	bool FanMesh( const char* _label, fan::MeshPtr* _ptr )
+	bool FanMeshPtr( const char* _label, fan::MeshPtr& _ptr )
 	{
 		bool returnValue = false;
 
-		fan::Mesh* mesh = **_ptr;
+		fan::Mesh* mesh = *_ptr;
 		const std::string name = mesh == nullptr ? "null" : std::filesystem::path( mesh->GetPath() ).filename().string();
 
 		// Set button icon & modal
@@ -138,21 +134,21 @@ namespace ImGui
 		fan::Mesh* meshDrop = ImGui::FanBeginDragDropTargetMesh();
 		if ( meshDrop )
 		{
-			_ptr->SetResource( *meshDrop );
+			_ptr = meshDrop;
 			returnValue = true;
 		}
 
 		// Right click = clear
 		if ( ImGui::IsItemClicked( 1 ) )
 		{
-			_ptr->SetNull();
+			_ptr = nullptr;
 			returnValue = true;
 		}
 
 		if ( ImGui::FanLoadFileModal( modalName.c_str(), fan::RenderGlobal::s_meshExtensions, m_pathBuffer ) )
 		{
-			_ptr->Init( m_pathBuffer.string() );
-			_ptr->Resolve();
+			_ptr.Init( m_pathBuffer.string() );
+			_ptr.Resolve();
 			returnValue = true;
 		}
 

@@ -19,7 +19,7 @@ namespace fan
 	class Mesh : public Resource 
 	{
 	public:
-		static MeshManager	   s_resourceManager;
+		static MeshManager s_resourceManager;
 
 		Mesh();
 		~Mesh();
@@ -40,8 +40,8 @@ namespace fan
 		void SetOptimizeVertices( const bool _optimizeVertices ) { m_optimizeVertices = _optimizeVertices; }
 		void SetAutoUpdateHull( const bool _autoUpdateHull ) { m_autoUpdateHull = _autoUpdateHull; }
 
-		void GenerateGpuBuffers( Device* _device );
-		void DeleteGpuBuffers( Device* _device );
+		void GenerateGpuBuffers( Device& _device );
+		void DeleteGpuBuffers( Device& _device );
 
 		bool LoadFromFile( const std::string& _path );
 		bool LoadFromVertices( const std::vector<Vertex>& _vertices );

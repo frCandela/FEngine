@@ -15,10 +15,10 @@ namespace fan
 	{
 	public:
 		bool IsReferenced() const { return m_refCount > 0; }
+		int  GetRefCount() const { return m_refCount;  }
 
-		int  GetRefCount()		{ return m_refCount;  }
-		void IncreaseRefCount() { m_refCount ++; }
-		void DecreaseRefCount() { m_refCount --; }
+		void IncreaseRefCount()  { m_refCount ++; }
+		void DecreaseRefCount()  { m_refCount --; }
 	private:
 		int m_refCount = 0;
 	};

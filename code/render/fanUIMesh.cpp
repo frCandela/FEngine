@@ -4,8 +4,6 @@
 
 namespace fan
 {
-	//REGISTER_TYPE_INFO( UIMesh, TypeInfo::Flags::NONE, "ui/" )
-
 	Signal< UIMesh* > UIMesh::s_onGenerateVulkanData;
 	Signal< UIMesh* > UIMesh::s_onDeleteVulkanData;
 

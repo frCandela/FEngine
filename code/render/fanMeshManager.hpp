@@ -10,6 +10,8 @@ namespace fan
 	class Device;
 
 	//================================================================================================================================
+	// Owns all the meshes of the engine
+	// load, find, resolve pointers, delete
 	//================================================================================================================================
 	class MeshManager
 	{
@@ -18,7 +20,7 @@ namespace fan
 		void Clear();
 
 		void	ResolvePtr( ResourcePtr< Mesh >& _resourcePtr );
-		Device* GetDevice() const { return m_device;  }
+		Device& GetDevice() const { assert( m_device != nullptr ); return *m_device;  }
 		Mesh*	LoadMesh( const std::string& _path );
 
 		const std::map< std::string, Mesh* >& GetList() const { return m_meshList; }

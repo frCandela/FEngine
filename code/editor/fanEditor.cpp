@@ -130,7 +130,7 @@ namespace fan
 
 		// renderer
 		m_window = new Window( "FEngine", windowSize, windowPosition );
-		m_renderer = new Renderer( *m_window );
+		m_renderer = new Renderer( *m_window );	
 
 		Color clearColor;
 		if ( SerializedValues::Get().GetColor( "clear_color", clearColor ) )
@@ -218,7 +218,7 @@ namespace fan
 		m_clientScene->LoadFrom( "content/scenes/game.scene" );
 		m_serverScene->LoadFrom( "content/scenes/game.scene" );
 
-		// @hack for generating lazy typeinfo on non referenced components. Find a compiler flag for that ?
+		// @hack for generating lazy type info on non referenced components. Find a compiler flag for that ?
 		if ( Time::Get().ElapsedSinceStartup() == -12.01548468f )
 		{
 			SunLight light;

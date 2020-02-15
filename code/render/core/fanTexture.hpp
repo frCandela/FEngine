@@ -1,8 +1,9 @@
 #pragma once
 
 #include "render/fanRenderPrecompiled.hpp"
-#include "core/resources/fanResource.hpp"
 
+#include "core/resources/fanResource.hpp"
+#include "render/fanTextureManager.hpp"
 namespace fan
 {
 	class Device;
@@ -13,15 +14,14 @@ namespace fan
 	class Texture : public Resource
 	{
 	public:
-		static Signal< Texture* > s_onGenerateVulkanData;
-		static Signal< Texture* > s_onDeleteVulkanData;
+		static TextureManager s_resourceManager;
 
 		~Texture();
 
 		void SetData( const unsigned char* _data, const uint32_t _width, const uint32_t _height, const uint32_t _mipLevels );
 		bool LoadFromFile( const std::string& _path );
-		void GenerateVulkanData( Device& _device );
-		void DeleteVulkanData( Device& _device );
+		void GenerateGpuData( Device& _device );
+		void DeleteGpuData( Device& _device );
 
 		std::string GetPath() const { return m_path; }
 		glm::ivec3	GetSize() const { return glm::ivec3( m_width, m_height, m_layerCount ); }
@@ -41,7 +41,7 @@ namespace fan
 		uint32_t m_layerCount = 1;
 
 		unsigned char* m_data;
-		std::string		 m_path;
+		std::string	   m_path;
 
 		int m_renderID = -1;
 

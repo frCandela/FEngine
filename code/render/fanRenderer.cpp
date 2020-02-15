@@ -38,6 +38,7 @@ namespace fan
 
 		ResourceManager::Get().Init( &m_window.GetDevice() );
 		Mesh::s_resourceManager.Init( m_window.GetDevice() );
+		Texture::s_resourceManager.Init( m_window.GetDevice() );
 
 		CreateRenderPass();
 		CreateRenderPassPostprocess();
@@ -97,6 +98,7 @@ namespace fan
 
 		ResourceManager::Get().Delete();
 		Mesh::s_resourceManager.Clear();
+		Texture::s_resourceManager.Clear();
 
 		delete m_samplerDescriptorTextures;
 		delete m_samplerDescriptorUI;
@@ -156,11 +158,11 @@ namespace fan
 
 		ImGui::GetIO().DisplaySize = ImVec2( static_cast< float >( m_window.GetSwapChain().GetExtent().width ), static_cast< float >( m_window.GetSwapChain().GetExtent().height ) );
 
-		if ( ResourceManager::Get().IsModified() )
+		if ( Texture::s_resourceManager.IsModified() )
 		{
 			WaitIdle();
 			CreateTextureDescriptor();
-			ResourceManager::Get().SetUnmodified();
+			Texture::s_resourceManager.SetUnmodified();
 		}
 
 		const uint32_t currentFrame = m_window.GetSwapChain().GetCurrentFrame();
@@ -858,7 +860,7 @@ namespace fan
 	{
 		delete m_imagesDescriptor;
 
-		const std::vector< Texture* >& texture = ResourceManager::Get().GetTextures();
+		const std::vector< Texture* >& texture = Texture::s_resourceManager.GetList();
 		m_imagesDescriptor = new  DescriptorTextures( m_window.GetDevice(), static_cast< uint32_t >( texture.size() ) );
 
 		std::vector< VkImageView > imageViews( texture.size() );

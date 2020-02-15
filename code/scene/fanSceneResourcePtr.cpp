@@ -37,14 +37,14 @@ namespace ImGui
 		fan::Gameobject* gameobjectDrop = ImGui::FanBeginDragDropTargetGameobject();
 		if ( gameobjectDrop )
 		{
-			_ptr->SetResource( *gameobjectDrop );
+			_ptr->SetResource( gameobjectDrop );
 			returnValue = true;
 		}
 
 		// Right click = clear
 		if ( ImGui::IsItemClicked( 1 ) )
 		{
-			_ptr->SetNull();
+			_ptr->SetResource( nullptr );
 			returnValue = true;
 		}
 
@@ -98,14 +98,14 @@ namespace ImGui
 		fan::Prefab* prefabDrop = ImGui::FanBeginDragDropTargetPrefab();
 		if ( prefabDrop )
 		{
-			_ptr->SetResource( *prefabDrop );
+			_ptr->SetResource( prefabDrop );
 			returnValue = true;
 		}
 
 		// Right click = clear
 		if ( ImGui::IsItemClicked( 1 ) )
 		{
-			_ptr->SetNull();
+			_ptr->SetResource( nullptr );
 			returnValue = true;
 		}
 

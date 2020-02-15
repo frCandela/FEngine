@@ -59,7 +59,7 @@ namespace fan
 
 			// color
 			ImGui::ColorEdit4( "color", m_color.Data(), ImGui::fanColorEditFlags );
-			if ( ImGui::FanTexture( "ui texture", &m_texture ) )
+			if ( ImGui::FanTexturePtr( "ui texture", m_texture ) )
 			{
 				btVector2 textureSize = *m_texture != nullptr ? btVector2( ( float ) m_texture->GetSize().x, ( float ) m_texture->GetSize().y ) : btVector3::Zero();
 				const btVector2 newScale = textureSize / windowSize;

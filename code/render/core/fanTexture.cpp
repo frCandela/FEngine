@@ -9,12 +9,14 @@
 
 namespace fan
 {
-	Signal< Texture* >	Texture::s_onGenerateVulkanData;
-	Signal< Texture* >	Texture::s_onDeleteVulkanData;
+	TextureManager Texture::s_resourceManager;
 
 	//================================================================================================================================
 	//================================================================================================================================
-	Texture::~Texture() { s_onDeleteVulkanData.Emmit( this ); }
+	Texture::~Texture() 
+	{ 
+		DeleteGpuData( s_resourceManager.GetDevice() ); 
+	}
 
 	//================================================================================================================================
 	//================================================================================================================================
@@ -54,7 +56,7 @@ namespace fan
 	//================================================================================================================================
 	void Texture::GenerateMipmaps( Device& _device, VkCommandBuffer _commandBuffer, VkFormat _imageFormat, int32_t _texWidth, int32_t _texHeight, uint32_t _mipLevels )
 	{
-		// Check if image format supports linear blitting
+		// Check if image format supports linear bitting
 		VkFormatProperties formatProperties;
 		vkGetPhysicalDeviceFormatProperties( _device.vkPhysicalDevice, _imageFormat, &formatProperties );
 		if ( !( formatProperties.optimalTilingFeatures & VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT ) )
@@ -145,8 +147,11 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void Texture::DeleteVulkanData( Device& _device )
+	void Texture::DeleteGpuData( Device& _device )
 	{
+		vkDeviceWaitIdle( _device.vkDevice );
+		Debug::Highlight( "Renderer idle" );
+
 		if ( m_deviceMemory != VK_NULL_HANDLE )
 		{
 			vkFreeMemory( _device.vkDevice, m_deviceMemory, nullptr );
@@ -318,12 +323,12 @@ namespace fan
 		m_height = _height;
 		m_data = new unsigned char[ _width * _height * 4 ];
 		memcpy( m_data, _data, _width * _height * 4 * sizeof( unsigned char ) );
-		s_onGenerateVulkanData.Emmit( this );
+		GenerateGpuData( s_resourceManager.GetDevice() );
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void Texture::GenerateVulkanData( Device& _device )
+	void Texture::GenerateGpuData( Device& _device )
 	{
 		VkDeviceSize imageSize = m_width * m_height * 4 * sizeof( unsigned char );
 

@@ -43,7 +43,7 @@ namespace fan
 	{
 		if ( _mesh != nullptr )
 		{
-			m_mesh->mesh.SetResource( * _mesh );
+			m_mesh->mesh = _mesh;
 			m_gameobject->SetFlags( m_gameobject->GetFlags() & Gameobject::Flag::OUTDATED_AABB );
 		}
 	}
@@ -67,7 +67,7 @@ namespace fan
 	{
 		Component::OnGui();
 
-		ImGui::FanMesh( "mesh", &m_mesh->mesh );
+		ImGui::FanMeshPtr( "mesh", m_mesh->mesh );
 
 		// Num triangles
 		std::stringstream ss;

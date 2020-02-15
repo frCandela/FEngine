@@ -33,21 +33,19 @@ namespace fan
 		// Display mesh list
 		if ( ImGui::CollapsingHeader( "Loaded meshes : " ) )
 		{
-			for ( auto pair : Mesh::s_resourceManager.GetList() )
+			for ( const auto pair : Mesh::s_resourceManager.GetList() )
 			{
 				ImGui::Text("ref: %d name: %s", pair.second->GetRefCount(), pair.second->GetPath().c_str() );
 			}
 		}
 		// display textures list
-		const std::vector< Texture* >& textures = resourceManager.GetTextures();
+		const std::vector< Texture* >& textures = Texture::s_resourceManager.GetList();
 		if ( ImGui::CollapsingHeader( "Loaded textures : " ) )
 		{
 			for ( int textureIndex = 0; textureIndex < textures.size(); textureIndex++ )
 			{
-				const Texture* texture = textures[ textureIndex ];
-				std::stringstream ss;
-				ss << texture->GetSize().x << " " << texture->GetSize().x << "\t" << texture->GetPath();
-				ImGui::Text( ss.str().c_str() );
+				const Texture* tex = textures[ textureIndex ];
+				ImGui::Text( "ref: %d size: %d x %d name: %s", tex->GetRefCount(), tex->GetSize().x, tex->GetSize().y, tex->GetPath().c_str() );
 			}
 		}
 

@@ -35,7 +35,7 @@ namespace fan
 	//================================================================================================================================
 	void Material::SetTexture( Texture* const _texture )
 	{
-		m_material->texture.SetResource( *_texture );
+		m_material->texture = _texture;
 		m_gameobject->SetFlags( m_gameobject->GetFlags() & Gameobject::Flag::OUTDATED_MATERIAL );
 	}
 
@@ -79,7 +79,7 @@ namespace fan
 			ImGui::SameLine(); ImGui::FanShowHelpMarker( "sharpness of the specular reflection" );
 		} ImGui::PopItemWidth();
 
-		ImGui::FanTexture( "mat texture", &m_material->texture );
+		ImGui::FanTexturePtr( "mat texture", m_material->texture );
 	}
 
 	//================================================================================================================================

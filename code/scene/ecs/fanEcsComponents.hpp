@@ -111,11 +111,10 @@ namespace fan
 		static const char* s_name;
 		void Init()
 		{
-			static_cast< ResourcePtr<Mesh> * >( &mesh )->SetNull();
+			mesh = nullptr;
 			renderID = -1;
 		}
-		void Clear() { mesh.SetNull(); }
-
+		void Clear() { mesh = nullptr; }
 		MeshPtr mesh;
 		int renderID = -1;
 	};
@@ -162,11 +161,11 @@ namespace fan
 		static const char* s_name;
 		void Init()
 		{
-			static_cast< ResourcePtr< Texture > * >( &texture )->SetNull();
+			texture = nullptr;
 			shininess = 1;
 			color = Color::White;
 		}
-		void Clear() { texture.SetNull();  }
+		void Clear() { texture = nullptr;  }
 
 		TexturePtr 	texture;
 		uint32_t	shininess = 1;

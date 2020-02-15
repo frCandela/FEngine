@@ -1,79 +1,89 @@
-#include "render/fanMeshManager.hpp"
+#include "render/fanTextureManager.hpp"
 
-#include "render/fanMesh.hpp"
+#include "render/core/fanTexture.hpp"
 #include "render/fanRenderResourcePtr.hpp"
 
 namespace fan
 {
 	//================================================================================================================================
 	//================================================================================================================================
-	void MeshManager::Init( Device& _device )
+	void TextureManager::Init( Device& _device )
 	{
 		m_device = &_device;
-		ResourcePtr< Mesh >::s_onResolve.Connect( &MeshManager::ResolvePtr, this );
-		LoadMesh( RenderGlobal::s_defaultMesh );
+		ResourcePtr< Texture >::s_onResolve.Connect( &TextureManager::ResolvePtr, this );
+		LoadTexture( RenderGlobal::s_defaultTexture );
+		LoadTexture( RenderGlobal::s_whiteTexture );
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void MeshManager::Clear()
+	void TextureManager::Clear()
 	{
-		while ( !m_meshList.empty() ) 
+		while ( !m_textureList.empty() ) 
 		{ 
-			delete m_meshList.begin()->second; 
-			m_meshList.erase( m_meshList.begin() );
+			delete m_textureList[ m_textureList.size() - 1]; 
+			m_textureList.pop_back();
 		}
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void MeshManager::ResolvePtr( ResourcePtr< Mesh >& _resourcePtr )
+	void TextureManager::ResolvePtr( ResourcePtr< Texture >& _resourcePtr )
 	{
 		assert( ! _resourcePtr.IsValid() );
 
-		MeshPtr& meshPtr = static_cast< MeshPtr& >( _resourcePtr );
-		Mesh * mesh = LoadMesh( meshPtr.GetPath() );
+		TexturePtr& texturePtr = static_cast< TexturePtr& >( _resourcePtr );
+		Texture * texture = LoadTexture( texturePtr.GetPath() );
 
-		if ( mesh )
+		if ( texture )
 		{
-			meshPtr = mesh;
+			texturePtr = texture;
 		}
 	}
 
 	//================================================================================================================================
 	// Load a mesh from a path, loads it and registers it
 	//================================================================================================================================
-	Mesh* MeshManager::LoadMesh( const std::string& _path )
+	Texture* TextureManager::LoadTexture( const std::string& _path )
 	{
 		if ( _path.empty() ) { return nullptr; }
 
 		const std::string cleanPath = std::filesystem::path( _path ).make_preferred().string();
 
-		Mesh* mesh = FindMesh( cleanPath );
-		if ( mesh != nullptr )
+		Texture* texture = FindTexture( cleanPath );
+		if ( texture != nullptr )
 		{
-			return mesh;
+			return texture;
 		}
 		else
 		{
 			// Load
-			mesh = new Mesh();			
-			if ( mesh->LoadFromFile( cleanPath ) )
+			texture = new Texture();			
+			if ( texture->LoadFromFile( cleanPath ) )
 			{	
-				m_meshList[cleanPath] = mesh;
-				return mesh;
+				texture->SetRenderID( static_cast< int >( m_textureList.size() ) );
+				m_textureList.push_back( texture );
+				m_modified = true;
+				return texture;
 			}
-			delete mesh;
+			delete texture;
 			return nullptr;
 		}
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	Mesh* MeshManager::FindMesh( const std::string& _path )
+	Texture* TextureManager::FindTexture( const std::string& _path )
 	{
 		const std::string cleanPath = std::filesystem::path( _path ).make_preferred().string();
-		auto it = m_meshList.find( cleanPath );
-		return it == m_meshList.end() ? nullptr : it->second;
+		for (int textureIndex = 0; textureIndex < m_textureList.size() ; textureIndex++)
+		{
+			Texture& texture = *m_textureList[ textureIndex ];
+			if ( texture.GetPath() == cleanPath )
+			{
+				return &texture;
+			}
+		}		
+		return nullptr;
 	}
 }
