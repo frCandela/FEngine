@@ -4,8 +4,7 @@
 
 namespace fan
 {
-	Signal< UIMesh* > UIMesh::s_onGenerateVulkanData;
-	Signal< UIMesh* > UIMesh::s_onDeleteVulkanData;
+	UIMeshManager UIMesh::s_resourceManager;
 
 	//================================================================================================================================
 	//================================================================================================================================
@@ -16,16 +15,17 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	UIMesh::~UIMesh() { s_onDeleteVulkanData.Emmit( this ); }
+	UIMesh::~UIMesh() 
+	{ 
+		DeleteGpuData( s_resourceManager.GetDevice() );
+	}
 
 	//================================================================================================================================
 	//================================================================================================================================
 	bool UIMesh::LoadFromVertices( const std::vector<UIVertex>& _vertices )
 	{
 		m_vertices = _vertices;
-
-		// Cleanup
-		s_onGenerateVulkanData.Emmit( this );
+		GenerateGpuData( s_resourceManager.GetDevice() );
 		return true;
 	}
 
@@ -40,7 +40,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void UIMesh::GenerateVulkanData( Device& _device )
+	void UIMesh::GenerateGpuData( Device& _device )
 	{
 		if ( m_vertices.empty() ) { return; }
 
@@ -84,8 +84,11 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void UIMesh::DeleteVulkanData( Device& /*_device*/ )
+	void UIMesh::DeleteGpuData( Device& _device )
 	{
+		vkDeviceWaitIdle( _device.vkDevice );
+		Debug::Highlight( "Renderer idle" );
+
 		for ( int bufferIndex = 0; bufferIndex < 3; bufferIndex++ )
 		{
 			delete m_vertexBuffer[ bufferIndex ];

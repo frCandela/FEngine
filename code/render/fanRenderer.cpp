@@ -36,9 +36,9 @@ namespace fan
 
 		m_clearColor = glm::vec4( 0.f, 0.f, 0.2f, 1.f );
 
-		ResourceManager::Get().Init( &m_window.GetDevice() );
 		Mesh::s_resourceManager.Init( m_window.GetDevice() );
 		Texture::s_resourceManager.Init( m_window.GetDevice() );
+		UIMesh::s_resourceManager.Init( m_window.GetDevice() );
 
 		CreateRenderPass();
 		CreateRenderPassPostprocess();
@@ -96,9 +96,9 @@ namespace fan
 		delete m_forwardPipeline;
 		delete m_uiPipeline;
 
-		ResourceManager::Get().Delete();
 		Mesh::s_resourceManager.Clear();
 		Texture::s_resourceManager.Clear();
+		UIMesh::s_resourceManager.Clear();
 
 		delete m_samplerDescriptorTextures;
 		delete m_samplerDescriptorUI;

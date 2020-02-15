@@ -1,9 +1,12 @@
 #pragma once
 
 #include "render/fanRenderPrecompiled.hpp"
+
 #include "render/util/fanVertex.hpp"
+#include "render/fanUIMeshManager.hpp"
 #include "core/resources/fanResource.hpp"
 #include "core/math/shapes/fanConvexHull.hpp"
+
 
 namespace fan
 {
@@ -15,8 +18,7 @@ namespace fan
 	class UIMesh : public Resource
 	{
 	public:
-		static Signal< UIMesh* > s_onGenerateVulkanData;
-		static Signal< UIMesh* > s_onDeleteVulkanData;
+		static UIMeshManager s_resourceManager;
 
 		UIMesh();
 		~UIMesh();
@@ -30,10 +32,8 @@ namespace fan
 		
 		bool LoadFromVertices( const std::vector<UIVertex>&	_vertices );
 		bool LoadFromFile( const std::string& _path );
-		void GenerateVulkanData( Device & _device );
-		void DeleteVulkanData( Device & _device );
-
-		//DECLARE_TYPE_INFO( UIMesh, void )
+		void GenerateGpuData( Device & _device );
+		void DeleteGpuData( Device & _device );
 	private:
 		std::vector<UIVertex>		m_vertices;
 		std::string		m_path;
