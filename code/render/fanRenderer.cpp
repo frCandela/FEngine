@@ -2,7 +2,6 @@
 #include "core/time/fanTime.hpp"
 #include "core/input/fanInput.hpp"
 #include "core/time/fanProfiler.hpp"
-#include "render/fanResourceManager.hpp"
 #include "render/fanRendererDebug.hpp"
 #include "render/fanRenderGlobal.hpp"
 #include "render/fanMeshManager.hpp"

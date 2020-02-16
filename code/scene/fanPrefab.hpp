@@ -4,6 +4,7 @@
 
 #include "core/resources/fanResource.hpp"
 #include "game/fanGameSerializable.hpp"
+#include "scene/fanPrefabManager.hpp"
 
 namespace fan
 {
@@ -16,11 +17,11 @@ namespace fan
 	class Prefab : public Resource
 	{
 	public:
-		Prefab();
+		static PrefabManager s_resourceManager;
 
-		bool LoadFromJson( const Json& _json );
-		bool LoadFromFile( const std::string& _path );
-		void LoadFromGameobject( const Gameobject* _gameobject );
+		bool CreateFromJson( const Json& _json );
+		bool CreateFromFile( const std::string& _path );
+		void CreateFromGameobject( const Gameobject* _gameobject );
 
 		const Json& GetJsonGameobject() const { return m_json[ "prefab" ]; }
 		const Json& GetJson() const { return m_json; }

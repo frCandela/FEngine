@@ -8,7 +8,6 @@
 #include "scene/fanGameobject.hpp"
 #include "core/time/fanProfiler.hpp"
 #include "core/fanSignal.hpp"
-#include "render/fanResourceManager.hpp"
 #include "render/core/fanTexture.hpp"
 #include "render/core/fanTexture.hpp"
 #include "render/fanMesh.hpp"

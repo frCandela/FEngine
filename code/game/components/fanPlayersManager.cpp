@@ -188,7 +188,7 @@ namespace fan
 		Actor::OnGui();
 		ImGui::PushItemWidth( 0.6f * ImGui::GetWindowWidth() );
 		{
-			ImGui::FanPrefab( "player prefab", &m_playerPrefab );
+			ImGui::FanPrefab( "player prefab", m_playerPrefab );
 		} ImGui::PopItemWidth();
 	}
 

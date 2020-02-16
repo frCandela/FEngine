@@ -50,9 +50,10 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void MeshRenderer::SetPath( std::string /*_path*/ )
+	void MeshRenderer::SetPath( std::string _path )
 	{
-		//m_mesh->mesh.Init(_path);@tmp
+		m_mesh->mesh.Init(_path);
+		m_mesh->mesh.Resolve();
 	}
 
 	Mesh* MeshRenderer::GetMesh() { return *m_mesh->mesh; }

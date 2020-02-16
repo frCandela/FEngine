@@ -34,7 +34,7 @@ namespace fan
 		MeshPtr& meshPtr = static_cast< MeshPtr& >( _resourcePtr );
 		Mesh * mesh = LoadMesh( meshPtr.GetPath() );
 
-		if ( mesh )
+		if ( mesh != nullptr )
 		{
 			meshPtr = mesh;
 		}

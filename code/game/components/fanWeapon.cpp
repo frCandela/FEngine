@@ -136,7 +136,7 @@ namespace fan
 	{
 		ImGui::PushItemWidth( 0.6f * ImGui::GetWindowWidth() );
 		{
-			ImGui::FanPrefab( "bullet prefab", &m_bulletPrefab );
+			ImGui::FanPrefab( "bullet prefab", m_bulletPrefab );
 			ImGui::DragFloat( "scale ##wepoffset", &m_scale, 0.05f, 0.f, 1.f );
 			ImGui::DragFloat( "speed ##wepspeed", &m_speed, 0.1f, 0.f, 100.f );
 			ImGui::DragFloat3( "offset ##wepspeed", &m_offset[ 0 ] );

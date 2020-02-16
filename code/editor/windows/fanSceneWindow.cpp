@@ -18,7 +18,6 @@
 #include "core/input/fanInput.hpp"
 #include "core/input/fanMouse.hpp"
 #include "scene/fanPrefab.hpp"
-#include "render/fanResourceManager.hpp"
 
 namespace fan
 {
@@ -179,11 +178,11 @@ namespace fan
 			ImGui::OpenPopup( "Load prefab" );
 		}
 		if ( ImGui::FanLoadFileModal( "Load prefab", RenderGlobal::s_prefabExtensions, m_pathBuffer ) )
-		{
-			Prefab prefab;
-			if ( prefab.LoadFromFile( m_pathBuffer.string() ) )
+		{			
+			Prefab * prefab = Prefab::s_resourceManager.LoadPrefab( m_pathBuffer.string() );
+			if ( prefab != nullptr )
 			{
-				m_scene->CreateGameobject( prefab, m_lastGameobjectRightClicked );
+				m_scene->CreateGameobject( *prefab, m_lastGameobjectRightClicked );
 			}
 		}
 	}
@@ -333,10 +332,10 @@ namespace fan
 			if ( outStream.is_open() )
 			{
 				// Try to update the existing prefab if it exists
-				Prefab* prefab = PrefabManager::Get().FindPrefab( m_pathBuffer.string() );
+				Prefab* prefab = Prefab::s_resourceManager.FindPrefab( m_pathBuffer.string() );
 				if ( prefab != nullptr )
 				{
-					prefab->LoadFromGameobject( m_lastGameobjectRightClicked );
+					prefab->CreateFromGameobject( m_lastGameobjectRightClicked );
 				}
 
 				Json json;

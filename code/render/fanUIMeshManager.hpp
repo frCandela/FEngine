@@ -8,8 +8,8 @@ namespace fan
 	class Device;
 
 	//================================================================================================================================
-	// Owns all the meshes of the engine
-	// load, find, resolve pointers, delete
+	// Owns all the ui meshes of the engine
+	// for now it's kinda useless since there is no UIMesh pointers
 	//================================================================================================================================
 	class UIMeshManager
 	{

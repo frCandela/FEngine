@@ -12,7 +12,6 @@ namespace fan
 	class ResourcePtr
 	{
 	public:
-		static Signal< ResourcePtr<_ResourceType>& > s_onCreate;
 		static Signal< ResourcePtr<_ResourceType>& > s_onResolve;
 
 		ResourcePtr( Resource* _resource = nullptr );
@@ -38,20 +37,15 @@ namespace fan
 
 	template< typename _ResourceType>
 	Signal< ResourcePtr<_ResourceType>& > ResourcePtr<_ResourceType>::s_onResolve;
-	template< typename _ResourceType>
-	Signal< ResourcePtr<_ResourceType>& > ResourcePtr<_ResourceType>::s_onCreate;
 
 	//================================================================================================================================
 	//================================================================================================================================
 	template< typename _ResourceType >
 	ResourcePtr<_ResourceType>::ResourcePtr( Resource* _resource ) :
 		m_resource( _resource )
-	{
-		s_onCreate.Emmit( *this );
-		if ( m_resource != nullptr )
-		{
-			m_resource->IncreaseRefCount();
-		}
+	{		
+		assert( m_resource == nullptr );
+		SetResource( _resource );
 	}
 
 	//================================================================================================================================

@@ -1,5 +1,4 @@
 #include "render/pipelines/fanForwardPipeline.hpp"
-#include "render/fanResourceManager.hpp"
 #include "render/core/fanDevice.hpp"
 #include "render/core/fanShader.hpp"
 #include "render/core/fanImage.hpp"

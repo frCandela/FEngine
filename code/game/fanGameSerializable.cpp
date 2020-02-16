@@ -104,7 +104,8 @@ namespace fan
 		const Json* token = FindToken( _json, _name );
 		if ( token != nullptr )
 		{
-			//_outPtr.Init(*token);@tmp
+			_outPtr.Init(*token);
+			_outPtr.Resolve();
 			return true;
 		}
 		return false;

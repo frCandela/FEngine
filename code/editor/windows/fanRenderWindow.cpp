@@ -2,10 +2,10 @@
 #include "core/time/fanProfiler.hpp"
 #include "core/imgui/fanModals.hpp"
 #include "core/time/fanTime.hpp"
+#include "scene/fanPrefab.hpp"
 #include "render/pipelines/fanPostprocessPipeline.hpp"
 #include "render/pipelines/fanForwardPipeline.hpp"
 #include "render/pipelines/fanForwardPipeline.hpp"
-#include "render/fanResourceManager.hpp"
 #include "render/core/fanFrameBuffer.hpp"
 #include "render/core/fanTexture.hpp"
 #include "render/fanRenderer.hpp"
@@ -25,8 +25,6 @@ namespace fan
 	{
 		SCOPED_PROFILE( render )
 
-			ResourceManager& resourceManager = ResourceManager::Get();
-
 		ImGui::Icon( GetIconType(), { 16,16 } ); ImGui::SameLine();
 		ImGui::Text( "Renderer" );
 
@@ -38,6 +36,7 @@ namespace fan
 				ImGui::Text("ref: %d name: %s", pair.second->GetRefCount(), pair.second->GetPath().c_str() );
 			}
 		}
+
 		// display textures list
 		const std::vector< Texture* >& textures = Texture::s_resourceManager.GetList();
 		if ( ImGui::CollapsingHeader( "Loaded textures : " ) )
@@ -46,6 +45,15 @@ namespace fan
 			{
 				const Texture* tex = textures[ textureIndex ];
 				ImGui::Text( "ref: %d size: %d x %d name: %s", tex->GetRefCount(), tex->GetSize().x, tex->GetSize().y, tex->GetPath().c_str() );
+			}
+		}
+
+		// Display mesh list
+		if ( ImGui::CollapsingHeader( "Loaded prefabs : " ) )
+		{
+			for ( const auto pair : Prefab::s_resourceManager.GetList() )
+			{
+				ImGui::Text( "ref: %d name: %s", pair.second->GetRefCount(), pair.second->GetPath().c_str() );
 			}
 		}
 

@@ -18,7 +18,7 @@ namespace fan
 		{
 
 			Prefab prefab;
-			prefab.LoadFromGameobject( m_selection.GetSelectedGameobject() );
+			prefab.CreateFromGameobject( m_selection.GetSelectedGameobject() );
 
 			std::stringstream ss;
 			ss << prefab.GetJson();
@@ -37,7 +37,7 @@ namespace fan
 		ss >> pastedJson;
 
 		Prefab prefab;
-		if ( prefab.LoadFromJson( pastedJson ) )
+		if ( prefab.CreateFromJson( pastedJson ) )
 		{
 			m_selection.GetSelectedScene().CreateGameobject( prefab, m_selection.GetSelectedGameobject() );
 		}

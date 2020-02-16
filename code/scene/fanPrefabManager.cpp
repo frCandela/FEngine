@@ -1,6 +1,7 @@
 #include "scene/fanPrefabManager.hpp"
+
+#include "scene/fanSceneResourcePtr.hpp"
 #include "scene/fanPrefab.hpp"
-#include "render/fanRenderResourcePtr.hpp"
 #include "core/fanSignal.hpp"
 
 namespace fan
@@ -9,15 +10,15 @@ namespace fan
 	//================================================================================================================================
 	void PrefabManager::Init()
 	{
-		// PrefabPtr::s_onInit.Connect ( &PrefabManager::OnResolvePrefabPtr, this); @tmp
+		ResourcePtr< Prefab >::s_onResolve.Connect ( &PrefabManager::ResolvePtr, this );
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
 	Prefab* PrefabManager::FindPrefab( const std::string& _path )
 	{
-		std::string path = CleanPath( _path );
-		auto it = m_prefabs.find( path );
+		const std::string cleanPath = std::filesystem::path( _path ).make_preferred().string();
+		auto it = m_prefabs.find( cleanPath );
 		return  it != m_prefabs.end() ? it->second : nullptr;
 	}
 
@@ -27,50 +28,60 @@ namespace fan
 	{
 		if ( _path.empty() ) { return nullptr; }
 
-		// Load
-		Prefab* prefab = new Prefab();
-		if ( prefab->LoadFromFile( CleanPath( _path ) ) )
+		const std::string cleanPath = std::filesystem::path( _path ).make_preferred().string();
+
+		Prefab* prefab = FindPrefab( cleanPath );
+		if ( prefab != nullptr )
 		{
-			RegisterPrefab( prefab );
 			return prefab;
 		}
-		delete prefab;
-		return nullptr;
+		else
+		{
+			// Load
+			prefab = new Prefab();
+			if ( prefab->CreateFromFile( cleanPath ) )
+			{
+				m_prefabs[ cleanPath ] = prefab;
+				return prefab;
+			}
+			delete prefab;
+			return nullptr;
+		}
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
 	void PrefabManager::RegisterPrefab( Prefab* _prefab )
 	{
-		std::string path = CleanPath( _prefab->GetPath() );
-		assert( m_prefabs.find( path ) == m_prefabs.end() );
-		m_prefabs[ path ] = _prefab;
-	}
-
-	//================================================================================================================================
-	// the / is dead, long live the \ 
-	// @todo refacto this with other CleanPath methods (resourcemanager)
-	//================================================================================================================================
-	std::string PrefabManager::CleanPath( const std::string& _path )
-	{
-		std::filesystem::path path = _path;
-		path.make_preferred();
-
-		return path.string();
+		const std::string cleanPath = std::filesystem::path( _prefab->GetPath() ).make_preferred().string();
+		assert( m_prefabs.find( cleanPath ) == m_prefabs.end() );
+		m_prefabs[ cleanPath ] = _prefab;
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void PrefabManager::OnResolvePrefabPtr( PrefabPtr* _ptr )
+	void PrefabManager::ResolvePtr( ResourcePtr<Prefab>& _resourcePtr )
 	{
-		// 		Prefab * prefab = FindPrefab( _ptr->GetID() );@tmp
-		// 		if ( prefab == nullptr )
-		// 		{
-		// 			prefab = LoadPrefab( _ptr->GetID() );
-		// 		}
-		// 		if ( prefab )
-		// 		{
-		// 			*_ptr = PrefabPtr( prefab, prefab->GetPath() );
-		// 		}
+		assert( !_resourcePtr.IsValid() );
+
+		PrefabPtr& prefabPtr = static_cast< PrefabPtr& >( _resourcePtr );
+		Prefab * prefab = LoadPrefab( prefabPtr.GetPath() );
+
+		if ( prefab != nullptr )
+		{
+			prefabPtr = prefab;
+		}
+	}
+
+	//================================================================================================================================
+    // Deletes all cached prefabs
+	//================================================================================================================================
+	void PrefabManager::Clear()
+	{
+		for ( auto pair : m_prefabs )
+		{
+			delete pair.second;
+		}
+		m_prefabs.clear();
 	}
 }

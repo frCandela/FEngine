@@ -1,6 +1,5 @@
 #include "scene/fanSceneResourcePtr.hpp"
 #include "scene/fanGameobject.hpp"
-#include "scene/fanPrefab.hpp"
 #include "game/imgui/fanDragnDrop.hpp"
 #include "core/imgui/fanImguiIcons.hpp"
 #include "core/imgui/fanModals.hpp"
@@ -55,13 +54,14 @@ namespace ImGui
 	}
 
 	static_assert( ( std::is_base_of<fan::Resource, fan::Prefab>::value ) );
+	
 	//================================================================================================================================
 	//================================================================================================================================
-	bool FanPrefab( const char* _label, fan::PrefabPtr* _ptr )
+	bool FanPrefab( const char* _label, fan::PrefabPtr& _ptr )
 	{
 		bool returnValue = false;
 
-		fan::Prefab* prefab = **_ptr;
+		fan::Prefab* prefab = *_ptr;
 		const std::string name = prefab == nullptr ? "null" : std::filesystem::path( prefab->GetPath() ).filename().string();
 
 		// Set button icon & modal
@@ -98,20 +98,21 @@ namespace ImGui
 		fan::Prefab* prefabDrop = ImGui::FanBeginDragDropTargetPrefab();
 		if ( prefabDrop )
 		{
-			_ptr->SetResource( prefabDrop );
+			_ptr = prefabDrop;
 			returnValue = true;
 		}
 
 		// Right click = clear
 		if ( ImGui::IsItemClicked( 1 ) )
 		{
-			_ptr->SetResource( nullptr );
+			_ptr = nullptr;
 			returnValue = true;
 		}
 
 		if ( ImGui::FanLoadFileModal( modalName.c_str(), fan::RenderGlobal::s_prefabExtensions, m_pathBuffer ) )
 		{
-			//_ptr->Init( m_pathBuffer.string() );@tmp
+			_ptr.Init( m_pathBuffer.string() );
+			_ptr.Resolve();
 			returnValue = true;
 		}
 

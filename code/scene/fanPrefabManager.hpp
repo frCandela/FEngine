@@ -1,27 +1,26 @@
 #pragma once
 
 #include "scene/fanScenePrecompiled.hpp"
-#include "core/fanSingleton.hpp"
+
+#include "core/resources/fanResourcePtr.hpp"
 
 namespace fan
 {
 	class Prefab;
-	template< typename _ResourceType > class ResourcePtr;
-	using PrefabPtr = ResourcePtr<Prefab>;
 
 	//================================================================================================================================
 	// Loads & references all the prefabs of the engine
 	//================================================================================================================================
-	class PrefabManager : public Singleton<PrefabManager>
+	class PrefabManager
 	{
 	public:
-		friend class Singleton<PrefabManager>;
-
 		void Init();
+		void Clear();
 
 		Prefab* FindPrefab( const std::string& _path );
 		Prefab* LoadPrefab( const std::string& _path );
 
+		const std::map< std::string, Prefab* >& GetList() { return m_prefabs; }
 	private:
 		std::map< std::string, Prefab* > m_prefabs;
 
@@ -30,6 +29,6 @@ namespace fan
 		std::string CleanPath( const std::string& _path );
 
 		// Callbacks
-		void OnResolvePrefabPtr( PrefabPtr* _ptr );
+		void ResolvePtr( ResourcePtr<Prefab>& _resourcePtr );
 	};
 }

@@ -1,7 +1,6 @@
 #include "fanEditor.hpp"
 #include "render/pipelines/fanForwardPipeline.hpp"
 #include "render/pipelines/fanDebugPipeline.hpp"
-#include "render/fanResourceManager.hpp"
 #include "render/fanRendererDebug.hpp"
 #include "render/core/fanTexture.hpp"
 #include "render/util/fanWindow.hpp"
@@ -162,7 +161,7 @@ namespace fan
 
 		RendererDebug::Init( &m_renderer->GetRendererDebug() );
 		EditorGizmos::Init( m_gizmos );
-		PrefabManager::Get().Init();
+		Prefab::s_resourceManager.Init();
 
 		m_selection->ConnectCallbacks( *m_clientScene, *m_serverScene );
 		m_renderWindow->SetRenderer( m_renderer );
@@ -247,6 +246,8 @@ namespace fan
 		SerializedValues::Get().SetInt( "renderer_position_x", windowPosition.x );
 		SerializedValues::Get().SetInt( "renderer_position_y", windowPosition.y );
 		SerializedValues::Get().SaveValuesToDisk();
+
+		Prefab::s_resourceManager.Clear();
 
 		delete m_renderer;
 		delete m_window;
