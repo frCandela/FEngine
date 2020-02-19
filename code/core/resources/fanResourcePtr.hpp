@@ -17,12 +17,12 @@ namespace fan
 		ResourcePtr( Resource* _resource = nullptr );
 		virtual ~ResourcePtr();
 
-		void			Resolve() { SetResource( nullptr); s_onResolve.Emmit( *this ); }
+		void			Resolve() { SetResource( nullptr ); s_onResolve.Emmit( *this ); }
 		bool			IsValid()       const { return m_resource != nullptr; }
 		_ResourceType*  GetResource()   const { return static_cast< _ResourceType* >( m_resource ); }
 
 		_ResourceType* operator->() const { return ( _ResourceType* ) ( m_resource ); }
-		_ResourceType* operator*()  const { return ( _ResourceType* ) ( m_resource ); }
+		_ResourceType* operator*()  const { return ( _ResourceType* ) ( m_resource ); } //@todo return a reference
 		ResourcePtr & operator=(const ResourcePtr&) = delete;
 		ResourcePtr(const ResourcePtr&) = delete;
 

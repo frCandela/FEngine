@@ -8,9 +8,6 @@
 
 namespace fan
 {
-
-	Signal< uint64_t, Gameobject* > Gameobject::s_setIDfailed;
-
 	//================================================================================================================================
 	//================================================================================================================================
 	Gameobject::Gameobject( const std::string _name, Gameobject* _parent, Scene* _scene, const uint64_t _uniqueID ) :
@@ -128,24 +125,6 @@ namespace fan
 			}
 		}
 		return nullptr;
-	}
-
-	//================================================================================================================================
-	//================================================================================================================================
-	bool Gameobject::SetUniqueID( const uint64_t _id )
-	{
-		if ( m_scene->FindGameobject( _id ) )
-		{
-			m_uniqueID = 0;
-			s_setIDfailed.Emmit( _id, this );
-			return false;
-		}
-		else
-		{
-			m_uniqueID = _id;
-			m_scene->InsertID( m_uniqueID, this );
-			return true;
-		}
 	}
 
 	//============================================================== ==================================================================
@@ -327,21 +306,17 @@ namespace fan
 						Debug::Get() << Debug::Severity::error << "Failed loading component: " << component->GetName() << Debug::Endl();
 					}
 				}
-
 			}
 		}
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	bool Gameobject::Load( const Json& _json )
+	bool Gameobject::Load( const Json& _json, const uint64_t _idOffset )
 	{
-
 		Serializable::LoadString( _json, "name", m_name );
 
-		uint64_t tmp;
-		Serializable::LoadUInt64( _json, "unique_id", tmp );
-		SetUniqueID( tmp );
+		assert( m_uniqueID != 0 );
 
 		const Json& jComponents = _json[ "components" ];
 		{
@@ -375,8 +350,10 @@ namespace fan
 			{
 				const Json& jchild_i = jchilds[ childIndex ];
 				{
-					Gameobject* child = m_scene->CreateGameobject( "tmp", this, false );
-					child->Load( jchild_i );
+					uint64_t id;
+					Serializable::LoadUInt64( jchild_i, "gameobject_id", id );
+					Gameobject* child = m_scene->CreateGameobject( "tmp", this, id + _idOffset );
+					child->Load( jchild_i, _idOffset );
 				}
 			}
 		}
@@ -388,7 +365,7 @@ namespace fan
 	bool Gameobject::Save( Json& _json ) const
 	{
 		Serializable::SaveString( _json, "name", m_name );
-		Serializable::SaveUInt64( _json, "unique_id", m_uniqueID );
+		Serializable::SaveUInt64( _json, "gameobject_id", m_uniqueID );
 
 		// Save components
 		Json& jComponents = _json[ "components" ];

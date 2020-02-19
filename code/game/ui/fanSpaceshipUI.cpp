@@ -97,7 +97,7 @@ namespace fan
 	//================================================================================================================================
 	void SpaceShipUI::OnGui()
 	{
-		ImGui::FanGameobject( "spaceShip", &m_spaceShip );
+		ImGui::FanGameobject( "spaceShip", m_spaceShip );
 		ImGui::FanComponent( "health progress", &m_healthProgress );
 		ImGui::FanComponent( "energy progress", &m_energyProgress );
 		ImGui::FanComponent( "signal progress", &m_signalProgress );
@@ -107,8 +107,6 @@ namespace fan
 		{
 			Camera& camera = m_gameobject->GetScene().GetMainCamera();
 			Ray toto = camera.ScreenPosToRay( m_gameobject->GetTransform().GetPosition() );
-
-
 			RendererDebug::Get().DebugLine( toto.origin, m_spaceShip->GetTransform().GetPosition(), Color::Red );
 		}
 	}
@@ -132,7 +130,7 @@ namespace fan
 	bool SpaceShipUI::Load( const Json& _json )
 	{
 		Actor::Load( _json );
-		Serializable::LoadGameobjectPtr( _json, "spaceship", m_spaceShip );
+		Serializable::LoadGameobjectPtr( _json, m_gameobject->GetScene(), "spaceship", m_spaceShip );
 		Serializable::LoadComponentPtr( _json, "health_progress", m_healthProgress );
 		Serializable::LoadComponentPtr( _json, "energy_progress", m_energyProgress );
 		Serializable::LoadComponentPtr( _json, "signal_progress", m_signalProgress );

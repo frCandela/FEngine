@@ -18,16 +18,16 @@ namespace fan
 
 		void					SetInvert( const bool _invert ) { m_invert = _invert; }
 
-		std::string				GetName() const { return m_name; };
 		float					GetValue( const int _joystickIDOverride = -1 ) const;
-		bool					GetInvert() const { return m_invert; };
-		Type					GetType() const { return m_type; }
-		Keyboard::Key			GetKeyPositive() const { return m_keyPositive; }
-		Keyboard::Key			GetKeyNegative() const { return m_keyNegative; }
-		Joystick::Button		GetButtonPositive() const { return m_buttonPositive; }
-		Joystick::Button		GetButtonNegative() const { return m_buttonNegative; }
-		Joystick::JoystickID	GetJoystickID() const { return m_joystickID; }
-		Joystick::Axis			GetJoystickAxis() const { return m_joystickAxis; }
+		std::string				GetName() const				{ return m_name; };
+		bool					GetInvert() const			{ return m_invert; };
+		Type					GetType() const				{ return m_type; }
+		Keyboard::Key			GetKeyPositive() const		{ return m_keyPositive; }
+		Keyboard::Key			GetKeyNegative() const		{ return m_keyNegative; }
+		Joystick::Button		GetButtonPositive() const	{ return m_buttonPositive; }
+		Joystick::Button		GetButtonNegative() const	{ return m_buttonNegative; }
+		Joystick::JoystickID	GetJoystickID() const		{ return m_joystickID; }
+		Joystick::Axis			GetJoystickAxis() const		{ return m_joystickAxis; }
 		std::string				GetKeyPositiveName() const;
 		std::string				GetKeyNegativeName() const;
 

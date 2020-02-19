@@ -16,13 +16,11 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	class Gameobject : public Resource, public ISerializable
+	class Gameobject : public Resource
 	{
 	public:
 		using Flag = ecsFlags::Flag;
 		using EditorFlag = ecsEditorFlags::Flag;
-
-		static Signal< uint64_t, Gameobject* > s_setIDfailed;
 
 		Gameobject( const std::string _name, Gameobject* _parent, Scene* _scene, const uint64_t _uniqueID );
 		~Gameobject();
@@ -30,27 +28,25 @@ namespace fan
 		void OnGui();
 
 		// Get/add/delete components
-		template<typename ComponentType> ComponentType* AddComponent();
-		template< typename _componentType >	_componentType* AddEcsComponent() const;
-		template<typename ComponentType> ComponentType* GetComponent();
-		template< typename _componentType >	_componentType* GetEcsComponent() const;
+		template<typename ComponentType> ComponentType*				 AddComponent();
+		template< typename _componentType >	_componentType*			 AddEcsComponent() const;
+		template<typename ComponentType> ComponentType*				 GetComponent();
+		template< typename _componentType >	_componentType*			 GetEcsComponent() const;
 		template<typename ComponentType> std::vector<ComponentType*> GetComponents();
 		template< typename _componentType > void					 RemoveEcsComponent();
-
 		bool							RemoveComponent( const Component* _component );
-		Component* AddComponent( const uint32_t _componentID );
-		Component* GetComponent( const uint32_t _componentID );
-		const std::vector<Component*>& GetComponents() const { return m_components; }
+		Component*						AddComponent( const uint32_t _componentID );
+		Component*						GetComponent( const uint32_t _componentID );
+		const std::vector<Component*>&  GetComponents() const { return m_components; }
 
 		// Getters
-		std::string		GetName() const { return m_name; }
-		void			SetName( const std::string _newName ) { m_name = _newName; }
-		inline Scene& GetScene() const { return *m_scene; }
-		const AABB& GetAABB() const;
-		Transform& GetTransform() const { return *m_transform; }
-		ecsHandle		GetEcsHandle() { return m_ecsHandleEntity; }
-		uint64_t		GetUniqueID() const { return m_uniqueID; }
-		bool 			SetUniqueID( const uint64_t _id );
+		std::string		GetName() const							{ return m_name; }
+		void			SetName( const std::string _newName )	{ m_name = _newName; }
+		inline Scene&   GetScene() const						{ return *m_scene; }
+		const AABB&		GetAABB() const;
+		Transform&		GetTransform() const	{ return *m_transform; }
+		ecsHandle		GetEcsHandle()			{ return m_ecsHandleEntity; }
+		uint64_t		GetUniqueID() const		{ return m_uniqueID; }
 
 		// Gameobject scene tree parenting
 		Gameobject* GetParent() const { return m_parent; }
@@ -62,33 +58,35 @@ namespace fan
 		void SetParent( Gameobject* _parent );
 		void InsertBelow( Gameobject* _brother );
 
-		// ISerializable
-		bool Save( Json& _json ) const override;
-		bool Load( const Json& _json ) override;
+		// Serializable
+		bool Save( Json& _json ) const;
+		bool Load( const Json& _json, const uint64_t _idOffset = 0 );
 		void CopyDataFrom( Json& _json );
 
 		// Flags
-		uint32_t	GetFlags() const { return m_flags->flags; }
-		void		SetFlags( const uint32_t _flags ) { m_flags->flags = _flags; }
-		uint32_t	GetEditorFlags() const { return m_editorFlags->flags; }
+		uint32_t	GetFlags() const						{ return m_flags->flags; }
+		void		SetFlags( const uint32_t _flags )		{ m_flags->flags = _flags; }
+		uint32_t	GetEditorFlags() const					{ return m_editorFlags->flags; }
 		void		SetEditorFlags( const uint32_t _flags ) { m_editorFlags->flags = _flags; }
 
 	private:
 		std::string				 m_name;
 		uint64_t				 m_uniqueID;
+
 		std::vector<Gameobject*> m_childs;
 		Gameobject* m_parent;
+
 		Transform* m_transform = nullptr;
 		std::vector<Component*>  m_components;
+
 		Scene* const			 m_scene = nullptr;
+
 		ecsHandle				 m_ecsHandleEntity = ecsNullHandle;
+		ecsFlags* const			 m_flags = nullptr;
+		ecsEditorFlags* const	 m_editorFlags = nullptr;
+		ecsAABB* const			 m_aabb = nullptr;
 
-		ecsFlags* const m_flags = nullptr;
-		ecsEditorFlags* const m_editorFlags = nullptr;
-		ecsAABB* const m_aabb = nullptr;
-
-		void		AddComponent( Component* _component );
-
+		void AddComponent( Component* _component );
 	};
 
 
@@ -148,7 +146,7 @@ namespace fan
 	_componentType* Gameobject::GetEcsComponent() const
 	{
 		static_assert( IsComponent< _componentType>::value );
-		return m_scene->GetEcsManager().FindComponentFromHandle<_componentType>( m_ecsHandleEntity );;
+		return m_scene->GetEcsManager().FindComponentFromHandle<_componentType>( m_ecsHandleEntity );
 	}
 
 	//================================================================================================================================

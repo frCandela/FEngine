@@ -4,11 +4,29 @@
 
 #include "core/resources/fanResourcePtr.hpp"
 #include "scene/fanPrefab.hpp"
+#include "scene/fanGameobject.hpp"
 
 namespace fan
 {
-	class Gameobject;
-	using GameobjectPtr = ResourcePtr<Gameobject>;
+	class Scene;
+
+	//================================================================================================================================
+	//================================================================================================================================
+	class GameobjectPtr : public ResourcePtr<Gameobject>
+	{
+	public:
+		GameobjectPtr(  Gameobject* _gameobject = nullptr ) : ResourcePtr<Gameobject>( _gameobject ) {}
+
+		void Init( Scene& _scene, uint64_t _id );
+
+		uint64_t GetId() const	 { return m_id; }
+
+		GameobjectPtr& operator=( Gameobject* _resource );
+
+	private:
+		uint64_t m_id = 0;
+		Scene * m_scene = nullptr;
+	};	   
 
 	//================================================================================================================================
     //================================================================================================================================
@@ -31,6 +49,6 @@ namespace fan
 //================================================================================================================================
 namespace ImGui
 {
-	bool FanGameobject( const char* _label, fan::GameobjectPtr* _ptr );
+	bool FanGameobject( const char* _label, fan::GameobjectPtr& _ptr );
 	bool FanPrefab( const char* _label, fan::PrefabPtr& _ptr );
 }

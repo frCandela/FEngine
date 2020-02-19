@@ -41,26 +41,31 @@ namespace fan
 	//================================================================================================================================
 	// Creates a game object and adds it to the scene hierarchy
 	//================================================================================================================================
-	Gameobject* Scene::CreateGameobject( const std::string _name, Gameobject* _parent, const bool _generateID )
+	Gameobject* Scene::CreateGameobject( const std::string _name, Gameobject * const _parent, const uint64_t _uniqueId )
 	{
-		if ( _parent == nullptr )
-		{
-			_parent = m_root;
-		}
-		Gameobject* gameobject = new Gameobject( _name, _parent, this, _generateID ? GetUniqueID() : 0 );
-		m_gameobjects[ gameobject->GetUniqueID() ] = gameobject;
+		assert( _uniqueId == 0 || ! FindGameobject( _uniqueId ) );
 
+		Gameobject* const parent = _parent == nullptr ? m_root : _parent;
+		const uint64_t id = _uniqueId == 0 ? NextUniqueID() : _uniqueId;
+
+		if ( id >= m_nextUniqueID )
+		{
+			m_nextUniqueID = id + 1;
+		}
+
+		Gameobject* gameobject = new Gameobject( _name, parent, this, id );
+		m_gameobjects[ gameobject->GetUniqueID() ] = gameobject;
 		return gameobject;
 	}
 
-
 	//================================================================================================================================
 	// Creates a game object from a prefab and adds it to the scene hierarchy
+	// Gameobjects ids are remapped depending on the scene next id
 	//================================================================================================================================
-	Gameobject* Scene::CreateGameobject( const Prefab& _prefab, Gameobject* _parent, const bool /*_generateID*/ )
+	Gameobject* Scene::CreateGameobject( const Prefab& _prefab, Gameobject * const _parent )
 	{
-		Gameobject* gameobject = m_instantiate->InstanciatePrefab( _prefab, _parent );
-		return gameobject;
+		Gameobject* const parent = _parent == nullptr ? m_root : _parent;
+		return m_instantiate->InstanciatePrefab( _prefab, *parent );
 	}
 
 	//================================================================================================================================
@@ -69,6 +74,24 @@ namespace fan
 	void Scene::DeleteGameobject( Gameobject* _gameobject )
 	{
 		m_entitiesToDelete.push_back( _gameobject );
+	}
+
+
+	//================================================================================================================================
+	//================================================================================================================================
+	uint64_t Scene::R_FindMaximumId( Gameobject& _gameobject )
+	{
+		uint64_t id = _gameobject.GetUniqueID();
+		const std::vector<Gameobject*>& childs = _gameobject.GetChilds();
+		for ( int childIndex = 0; childIndex < childs.size(); childIndex++ )
+		{
+			uint64_t childId = R_FindMaximumId( *childs[ childIndex ] );
+			if ( childId > id )
+			{
+				id = childId;
+			}
+		}
+		return id;
 	}
 
 	//================================================================================================================================
@@ -258,18 +281,6 @@ namespace fan
 			}
 		}
 		return nullptr;
-	}
-
-	//================================================================================================================================
-	//================================================================================================================================
-	void Scene::InsertID( const uint64_t _id, Gameobject* _gameobject )
-	{
-		assert( m_gameobjects.find( _id ) == m_gameobjects.end() );
-		m_gameobjects[ _id ] = _gameobject;
-		if ( _id >= m_nextUniqueID )
-		{
-			m_nextUniqueID = _id + 1;
-		}
 	}
 
 	//================================================================================================================================
@@ -491,6 +502,7 @@ namespace fan
 	void Scene::Clear()
 	{
 		m_path = "";
+		m_instantiate->Clear();
 		std::set<Gameobject*> deletedEntitiesSet;
 		R_DeleteGameobject( m_root, deletedEntitiesSet );
 		m_startingActors.clear();
@@ -517,14 +529,14 @@ namespace fan
 	//================================================================================================================================
 	void Scene::Save() const
 	{
-
 		Debug::Get() << Debug::Severity::log << "saving scene: " << m_name << Debug::Endl();
 		std::ofstream outStream( m_path );
 		if ( outStream.is_open() )
 		{
 			Json json;
 			if ( Save( json ) )
-			{
+			{				
+				Prefab::RemapGameobjectIndices( json );
 				// Out to disk
 				outStream << json;
 			}
@@ -568,82 +580,19 @@ namespace fan
 		}
 
 		// Gameobjects
-		//GameobjectPtr::s_onInit.Connect ( &Scene::OnGameobjectPtrCreate, this );@tmp
-		//ComponentIDPtr::s_onInit.Connect( &Scene::OnResolveComponentIDPtr, this );@tmp
 		const Json& jGameobjects = _json[ "gameobjects" ];
 		{
-			m_root = CreateGameobject( "root", nullptr, false );
+			uint64_t id;
+			Serializable::LoadUInt64( jGameobjects, "gameobject_id", id );
+			m_root = CreateGameobject( "root", nullptr, id );
 			m_root->Load( jGameobjects );
+
+			m_nextUniqueID = R_FindMaximumId( *m_root ) + 1;
 		}
-		//GameobjectPtr::s_onInit. Disconnect( &Scene::OnGameobjectPtrCreate, this );@tmp
-		//ComponentIDPtr::s_onInit.Disconnect( &Scene::OnResolveComponentIDPtr, this );@tmp
-		ResolveGameobjectPointers();
+		m_instantiate->ResolveGameobjectPtr( 0 );
+		m_instantiate->ResolveComponentPtr( 0 );
 		return true;
-	}
-
-	//================================================================================================================================
-	//================================================================================================================================
-	void Scene::OnGameobjectPtrCreate( GameobjectPtr* _gameobjectPtr )
-	{
-		m_unresolvedGameobjectPointers.push_back( _gameobjectPtr );
-	}
-
-	//================================================================================================================================
-	//================================================================================================================================
-	void Scene::OnResolveComponentIDPtr( ComponentIDPtr* _ptr )
-	{
-		m_unresolvedComponentPointers.push_back( _ptr );
-	}
-
-	//================================================================================================================================
-	//================================================================================================================================
-	void Scene::ResolveGameobjectPointers()
-	{
-		// 		// Resolve gameobjects pointers@tmp
-		// 		for (int ptrIndex = 0; ptrIndex < m_unresolvedGameobjectPointers.size(); ptrIndex++)
-		// 		{
-		//  			GameobjectPtr* ptr = m_unresolvedGameobjectPointers[ptrIndex];
-		// 			if( ptr->GetID() != 0 ) {
-		// 				auto it = m_gameobjects.find( ptr->GetID() );
-		// 				if ( it != m_gameobjects.end() )
-		// 				{
-		// 					(*ptr) = GameobjectPtr( it->second, it->second->GetUniqueID() );
-		// 				}
-		// 				else
-		// 				{
-		// 					Debug::Warning() << "gameobject pointer resolution failed for id " << ptr->GetID() << Debug::Endl();
-		// 				} 				
-		// 			}
-		// 		}
-		// 		m_unresolvedGameobjectPointers.clear();
-		// 
-		// 		// resolve component pointers
-		// 		for ( int ptrIndex = 0; ptrIndex < m_unresolvedComponentPointers.size(); ptrIndex++ )
-		// 		{
-		// 			ComponentIDPtr* ptr = m_unresolvedComponentPointers[ptrIndex];
-		// 			const IDPtrData& data = ptr->GetID();
-		// 			if ( data.gameobjectID == 0 ) { continue; }
-		// 
-		// 			// Find gameobject
-		// 			Gameobject * gameobject = FindGameobject( data.gameobjectID );
-		// 			if ( !gameobject )
-		// 			{
-		// 				Debug::Warning() << "Component pointer resolution failed for gameobject " << data.gameobjectID << Debug::Endl();
-		// 				continue;
-		// 			}
-		// 
-		// 			// Find component
-		// 			Component * component = gameobject->GetComponent( data.componentID );
-		// 			if ( !gameobject )
-		// 			{
-		// 				Debug::Warning() << "Component pointer resolution failed for component " << data.componentID << Debug::Endl();
-		// 				continue;
-		// 			}
-		// 
-		// 			( *ptr ) = ComponentIDPtr( component, data );
-		// 		} 
-		// 		m_unresolvedComponentPointers.clear();
-	}
+	}	
 
 	//================================================================================================================================
 	//================================================================================================================================

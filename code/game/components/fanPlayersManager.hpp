@@ -2,6 +2,7 @@
 
 #include "game/fanGamePrecompiled.hpp"
 
+#include "scene/fanSceneResourcePtr.hpp"
 #include "scene/actors/fanActor.hpp"
 
 namespace fan
@@ -46,7 +47,7 @@ namespace fan
 	private:
 		PrefabPtr m_playerPrefab;
 
-		static const int s_mousePlayerID = -1;
+		static const int s_mousePlayerID = -1; //@ todo aaaah
 		std::map< int, PlayerData > m_players;
 
 		void RemovePlayer( const int _ID );

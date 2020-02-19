@@ -4,6 +4,7 @@
 
 #include "scene/components/fanComponent.hpp"
 #include "scene/fanSceneResourcePtr.hpp"
+#include "render/fanRenderResourcePtr.hpp"
 
 namespace fan
 {
@@ -26,7 +27,7 @@ namespace fan
 
 		Color		GetColor() const { return m_color; }
 		void		SetColor( const Color& _color ) { m_color = _color; }
-		Texture* GetTexture() const { return *m_texture; }
+		Texture*	GetTexture() const { return *m_texture; }
 
 		void OnGui() override;
 		virtual ImGui::IconType GetIcon() const { return ImGui::IconType::IMAGE16; };

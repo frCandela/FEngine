@@ -19,25 +19,23 @@ namespace fan
 	class PointLight;
 	class DirectionalLight;
 
-	template< typename _ResourceType > class ResourcePtr;
-	using GameobjectPtr = ResourcePtr<Gameobject>;
+	class GameobjectPtr;
 
 	//================================================================================================================================
 	//================================================================================================================================
 	class Scene : public ISerializable
 	{
 	public:
-
-		Signal<Scene*>			onSceneLoad;
-		Signal<Scene*>			onSceneStop;
+		Signal< Scene* >		onSceneLoad;
+		Signal< Scene* >		onSceneStop;
 		Signal<>				onSceneClear;
-		Signal< Gameobject*>	onDeleteGameobject;
-		Signal<Camera*>			onSetMainCamera;
+		Signal< Gameobject* >	onDeleteGameobject;
+		Signal< Camera* >		onSetMainCamera;
 
-		Signal< MeshRenderer* > onRegisterMeshRenderer;
-		Signal< MeshRenderer* > onUnRegisterMeshRenderer;
-		Signal< PointLight* > onPointLightAttach;
-		Signal< PointLight* > onPointLightDetach;
+		Signal< MeshRenderer* >		onRegisterMeshRenderer;
+		Signal< MeshRenderer* >		onUnRegisterMeshRenderer;
+		Signal< PointLight* >		onPointLightAttach;
+		Signal< PointLight* >		onPointLightDetach;
 		Signal< DirectionalLight* > onDirectionalLightAttach;
 		Signal< DirectionalLight* > onDirectionalLightDetach;
 
@@ -46,13 +44,13 @@ namespace fan
 		Scene( const std::string _name );
 		~Scene();
 
-		Gameobject* CreateGameobject( const std::string _name, Gameobject* _parent = nullptr, const bool _generateID = true );
-		Gameobject* CreateGameobject( const Prefab& _prefab, Gameobject* _parent = nullptr, const bool _generateID = true );
-		void							DeleteGameobject( Gameobject* _gameobject );
-		void							DeleteComponent( Component* _component ) { m_componentsToDelete.push_back( _component ); } // Delete at the end of the frame
+		Gameobject* CreateGameobject( const std::string _name, Gameobject* const _parent, const uint64_t _uniqueId = 0 );
+		Gameobject* CreateGameobject( const Prefab& _prefab, Gameobject* const _parent );
+		void		DeleteGameobject( Gameobject* _gameobject );
+		void		DeleteComponent( Component* _component ) { m_componentsToDelete.push_back( _component ); } // Delete at the end of the frame
 		std::vector < Gameobject* >	BuildEntitiesList() const;
 
-		template<typename _componentType> _componentType* FindComponentOfType() const;
+		template<typename _componentType> _componentType*				FindComponentOfType() const;
 		template<typename _componentType> std::vector<_componentType*>  FindComponentsOfType() const;
 
 
@@ -70,25 +68,24 @@ namespace fan
 		void SetPath( const std::string _path ) { m_path = _path; }
 
 		Gameobject* GetRoot() { return m_root; }
-		inline std::string		GetName() const { return m_name; }
-		bool					IsServer() const { return m_isServer; }
-		bool					HasPath() const { return m_path.empty() == false; }
-		inline std::string		GetPath() const { return m_path; }
-		inline EcsManager& GetEcsManager() const { return *m_ecsManager; }
-		inline PhysicsManager& GetPhysicsManager() const { return *m_physicsManager; }
-		State					GetState() const { return m_state; };
-		Camera& GetMainCamera() { return *m_mainCamera; }
-		void					SetMainCamera( Camera* _camera );
-		void					SetServer( const bool _isServer ) { m_isServer = _isServer; }
-		uint64_t				GetUniqueID() { assert( FindGameobject( m_nextUniqueID ) == nullptr );  return m_nextUniqueID++; }
-		Gameobject* FindGameobject( const uint64_t _id );
+		inline std::string		 GetName() const { return m_name; }
+		bool					 IsServer() const { return m_isServer; }
+		bool					 HasPath() const { return m_path.empty() == false; }
+		inline std::string		 GetPath() const { return m_path; }
+		inline SceneInstantiate& GetInstanciator() const { return *m_instantiate;  }
+		inline EcsManager&		 GetEcsManager() const { return *m_ecsManager; }
+		inline PhysicsManager&	 GetPhysicsManager() const { return *m_physicsManager; }
+		State					 GetState() const { return m_state; };
+		Camera&					 GetMainCamera() { return *m_mainCamera; }
+		void					 SetMainCamera( Camera* _camera );
+		void					 SetServer( const bool _isServer ) { m_isServer = _isServer; }		
+		Gameobject*				 FindGameobject( const uint64_t _id );
 
-		void					InsertID( const uint64_t _id, Gameobject* _gameobject );
-		void					EraseID( const uint64_t _id ) { m_gameobjects.erase( _id ); }
+		uint64_t GetNextUniqueID() const { return m_nextUniqueID; }
 
 		const std::vector < DirectionalLight* >& GetDirectionalLights() { return m_directionalLights; }
-		const std::vector < PointLight* >& GetPointLights() { return m_pointLights; }
-		const std::vector < MeshRenderer* >& GetMeshRenderers() { return m_meshRenderers; }
+		const std::vector < PointLight* >&		 GetPointLights() { return m_pointLights; }
+		const std::vector < MeshRenderer* >&	 GetMeshRenderers() { return m_meshRenderers; }
 
 		void Enable( Actor* _actor );
 		void Disable( Actor* _actor );
@@ -102,6 +99,7 @@ namespace fan
 		void UnRegisterPointLight( PointLight* _pointLight );
 		void RegisterMeshRenderer( MeshRenderer* _meshRenderer );
 		void UnRegisterMeshRenderer( MeshRenderer* _meshRenderer );
+
 	private:
 		// Data
 		std::string	m_name;
@@ -121,10 +119,8 @@ namespace fan
 		State m_state = State::STOPPED;
 
 		// Gameobjects
-		std::vector < Gameobject* >		m_entitiesToDelete;
+		std::vector < Gameobject* >			m_entitiesToDelete;
 		std::vector < Component* >			m_componentsToDelete;
-		std::vector < GameobjectPtr* >		m_unresolvedGameobjectPointers;
-		std::vector < ComponentIDPtr* >	m_unresolvedComponentPointers;
 		std::vector< Actor* >				m_actors;
 		std::vector< Actor* >				m_startingActors;
 		std::vector< Actor* >				m_activeActors;
@@ -141,20 +137,19 @@ namespace fan
 		void LateUpdateActors( const float _delta );
 		void EndFrame();
 
-		void OnGameobjectPtrCreate( GameobjectPtr* _gameobjectPtr );
-		void ResolveGameobjectPointers();
-		void OnResolveComponentIDPtr( ComponentIDPtr* _ptr );
+		uint64_t NextUniqueID() { assert( FindGameobject( m_nextUniqueID ) == nullptr );  return m_nextUniqueID++; }
 
 		bool Load( const Json& _json ) override;
 		bool Save( Json& _json ) const override;
 		void Clear();
 
+		// @todo, place all static scene utility (below) in a separate file
+		template<typename _componentType>
+		void		R_FindComponentsOfType( const Gameobject* _gameobject, std::vector<_componentType*>& _components ) const;
 		void		R_DeleteGameobject( Gameobject* _gameobject, std::set<Gameobject*>& _deletedEntitiesSet );
 		void		R_BuildEntitiesList( Gameobject* _gameobject, std::vector<Gameobject*>& _entitiesList ) const;
-		Component* R_FindComponentOfType( Gameobject* _gameobject, const uint32_t _typeID ) const;
-
-		template<typename _componentType>
-		void	R_FindComponentsOfType( const Gameobject* _gameobject, std::vector<_componentType*>& _components ) const;
+		Component*	R_FindComponentOfType( Gameobject* _gameobject, const uint32_t _typeID ) const;
+		uint64_t	R_FindMaximumId( Gameobject& _gameobject );
 	};
 
 	//================================================================================================================================

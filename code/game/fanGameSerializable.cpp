@@ -5,6 +5,7 @@
 #include "scene/fanGameobject.hpp"
 #include "scene/fanComponentPtr.hpp"
 #include "scene/fanPrefab.hpp"
+#include "render/fanRenderResourcePtr.hpp"
 #include "render/core/fanTexture.hpp"
 #include "render/fanMesh.hpp"
 
@@ -19,7 +20,7 @@ namespace fan
 	//================================================================================================================================
 	void Serializable::SaveGameobjectPtr( Json& _json, const char* _name, const GameobjectPtr& _ptr )
 	{
-		_json[ _name ] = *_ptr != nullptr ? _ptr->GetUniqueID() : 0;
+		_json[ _name ]["gameobject_id"] = *_ptr != nullptr ? _ptr->GetUniqueID() : 0;
 	}
 
 	//================================================================================================================================
@@ -53,15 +54,15 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	//LOAD
+	// LOAD
 	//================================================================================================================================
 	//================================================================================================================================
-	bool Serializable::LoadGameobjectPtr( const Json& _json, const char* _name, GameobjectPtr& _outPtr )
+	bool Serializable::LoadGameobjectPtr( const Json& _json, Scene& _scene, const char* _name, GameobjectPtr& _outPtr )
 	{
 		const Json* token = FindToken( _json, _name );
 		if ( token != nullptr )
 		{
-			//_outPtr.Init(*token);@tmp
+			_outPtr.Init( _scene, (*token)["gameobject_id"]);
 			return true;
 		}
 		return false;

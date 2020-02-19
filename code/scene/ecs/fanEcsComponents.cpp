@@ -1,5 +1,8 @@
 #include "scene/ecs/fanECSComponents.hpp"
 
+#include "scene/fanSceneResourcePtr.hpp"
+#include "render/fanRenderResourcePtr.hpp"
+
 namespace fan 
 {
 	const char * ecsTranform::s_name					= "Tranform    ";
@@ -23,4 +26,32 @@ namespace fan
 	const char * ecsEditorFlags::s_name					= "EditorFlags ";
 	const char * ecsBullet::s_name						= "Bullet      ";
 	const char * ecsGameobject::s_name					= "Gameobject  ";
+
+
+	//================================================================================================================================
+	// @todo "mesh" shouldn't be a reference, it is that way because we don't want to include MeshPtr in this header
+	// The same problem applies to ecsMaterial and it's "texture"
+	// This will be fixed when the ecs is made dynamics and components types can be added from other libs than the core lib (game, scene )
+	//================================================================================================================================
+	ecsMesh::ecsMesh() : mesh( *new MeshPtr() ) {}
+	ecsMesh::~ecsMesh() { delete& mesh; }
+	void ecsMesh::Init()
+	{
+		mesh = nullptr;
+		renderID = -1;
+	}
+	void ecsMesh::Clear() { mesh = nullptr; }
+
+	//================================================================================================================================
+	// see ecsMesh comment
+	//================================================================================================================================
+	ecsMaterial::ecsMaterial(): texture( *new TexturePtr() ) {}
+	ecsMaterial::~ecsMaterial(){ delete& texture; }
+	void ecsMaterial::Init()
+	{
+		texture = nullptr;
+		shininess = 1;
+		color = Color::White;
+	}
+	void ecsMaterial::Clear() { texture = nullptr; }
 }

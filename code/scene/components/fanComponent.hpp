@@ -33,7 +33,7 @@ namespace fan
 		virtual void OnGui();
 		virtual ImGui::IconType GetIcon() const { return ImGui::IconType::NONE; };
 
-		DECLARE_ABSTRACT_TYPE_INFO( Component, ISerializable );
+		DECLARE_ABSTRACT_TYPE_INFO( Component, Resource );
 	protected:
 		// Friend class gameobject is the factory of components
 		Component();

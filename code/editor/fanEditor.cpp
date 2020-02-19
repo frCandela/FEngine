@@ -369,7 +369,7 @@ namespace fan
 		m_selection->Deselect();
 
 		// Editor Camera
-		Gameobject* cameraGameobject = _scene->CreateGameobject( "editor_camera" );
+		Gameobject* cameraGameobject = _scene->CreateGameobject( "editor_camera", _scene->GetRoot() );
 		cameraGameobject->SetEditorFlags(
 			Gameobject::EditorFlag::NO_DELETE |
 			Gameobject::EditorFlag::NOT_SAVED |

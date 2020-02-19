@@ -5,6 +5,7 @@
 #include "core/math/shapes/fanConvexHull.hpp"
 #include "core/time/fanProfiler.hpp"
 #include "scene/ecs/fanECSConfig.hpp"
+#include "render/fanRenderResourcePtr.hpp"
 #include "render/fanMesh.hpp"
 
 // Editor
@@ -56,11 +57,10 @@ namespace fan
 		m_mesh->mesh.Resolve();
 	}
 
-	Mesh* MeshRenderer::GetMesh() { return *m_mesh->mesh; }
-	const Mesh* MeshRenderer::GetMesh() const { return *m_mesh->mesh; }
-
-	int		MeshRenderer::GetRenderID() const { return m_mesh->renderID; }
-	void	MeshRenderer::SetRenderID( const int _renderID ) { m_mesh->renderID = _renderID; }
+	Mesh*		MeshRenderer::GetMesh()							 { return *m_mesh->mesh; }
+	const Mesh* MeshRenderer::GetMesh() const					 { return *m_mesh->mesh; }
+	int			MeshRenderer::GetRenderID() const				 { return m_mesh->renderID; }
+	void		MeshRenderer::SetRenderID( const int _renderID ) { m_mesh->renderID = _renderID; }
 
 	//================================================================================================================================
 	//================================================================================================================================

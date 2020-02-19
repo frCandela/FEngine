@@ -2,6 +2,7 @@
 
 #include "game/fanGamePrecompiled.hpp"
 
+#include "scene/fanSceneResourcePtr.hpp"
 #include "scene/actors/fanActor.hpp"
 
 namespace fan

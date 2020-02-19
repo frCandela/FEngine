@@ -18,21 +18,27 @@ namespace fan
 	class SceneInstantiate
 	{
 	public:
-		SceneInstantiate( Scene& _scene );
+		SceneInstantiate( Scene& _scene );		
+		Gameobject* InstanciatePrefab( const Prefab& _prefab, Gameobject& _parent );
 
-		Gameobject* InstantiateJson( const Json& _json, Gameobject* _parent );
-		Gameobject* InstanciatePrefab( const Prefab& _prefab, Gameobject* _parent );
+		void RegisterUnresolvedGameobjectPtr( GameobjectPtr& _gameobjectPtr );
+		void RegisterGameobjectPtr( GameobjectPtr& _gameobjectPtr );
+		void UnregisterGameobjectPtr( GameobjectPtr& _gameobjectPtr );
+
+		void ResolveGameobjectPtr( const uint64_t _idOffset );
+		void ResolveComponentPtr( const uint64_t _idOffset );
+
+		void Clear();
 
 	private:
 		Scene& m_scene;
 
-		std::vector< GameobjectPtr* >  m_newGameobjectPtr;
-		std::vector< ComponentIDPtr* > m_newComponentPtr;
-		std::map<uint64_t, uint64_t> m_remapTable;
-
-		void OnSetIDFailed( uint64_t _id, Gameobject* _gameobject );
-		void OnGameobjectPtrCreate( GameobjectPtr* _gameobjectPtr );
+		std::vector< GameobjectPtr* >   m_unresolvedGameobjectPtr;
+		std::set< GameobjectPtr* >		m_registeredGameobjectPtr;
+		std::vector< ComponentIDPtr* >  m_newComponentPtr;
+		
+		Gameobject* InstantiateJson( const Json& _json, Gameobject& _parent );
 		void OnComponentIDPtrCreate( ComponentIDPtr* _ptr );
-		void ResolvePointers();
+		
 	};
 }

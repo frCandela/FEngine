@@ -1,22 +1,64 @@
 #include "scene/fanSceneResourcePtr.hpp"
+
 #include "scene/fanGameobject.hpp"
-#include "game/imgui/fanDragnDrop.hpp"
+#include "scene/fanSceneInstantiate.hpp"
+#include "scene/fanScene.hpp"
 #include "core/imgui/fanImguiIcons.hpp"
 #include "core/imgui/fanModals.hpp"
+#include "game/imgui/fanDragnDrop.hpp"
 #include "render/fanRenderGlobal.hpp"
 
+namespace fan
+{
+	//================================================================================================================================
+	//================================================================================================================================
+	void GameobjectPtr::Init( Scene& _scene, uint64_t _id )
+	{
+		m_id = _id;
+		m_scene = &_scene;
+		if ( m_id != 0 )
+		{
+			_scene.GetInstanciator().RegisterUnresolvedGameobjectPtr( *this );
+		}		
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
+	GameobjectPtr& GameobjectPtr::operator=( Gameobject* _resource ) 
+	{ 
+		if ( _resource == GetResource() ) { return  *this; }
+
+		if ( GetResource() != nullptr ) 
+		{
+			assert( m_scene != nullptr );
+			m_scene->GetInstanciator().UnregisterGameobjectPtr( *this );
+		}
+
+		if ( _resource != nullptr )
+		{
+			m_scene = & _resource->GetScene();
+			m_scene->GetInstanciator().RegisterGameobjectPtr( *this );
+		}
+		else
+		{
+			m_scene = nullptr;
+		}
+		
+		SetResource( _resource ); 
+
+		return *this; 
+	}
+}
 
 namespace ImGui
 {
-	static_assert( ( std::is_base_of<fan::Resource, fan::Gameobject>::value ) );
-
 	//================================================================================================================================
 	//================================================================================================================================
-	bool FanGameobject( const char* _label, fan::GameobjectPtr* _ptr )
+	bool FanGameobject( const char* _label, fan::GameobjectPtr& _ptr )
 	{
 		bool returnValue = false;
 
-		fan::Gameobject* gameobject = **_ptr;
+		fan::Gameobject* gameobject = *_ptr;
 		const std::string name = gameobject != nullptr ? gameobject->GetName() : "null";
 
 		// icon & set from selection
@@ -36,14 +78,14 @@ namespace ImGui
 		fan::Gameobject* gameobjectDrop = ImGui::FanBeginDragDropTargetGameobject();
 		if ( gameobjectDrop )
 		{
-			_ptr->SetResource( gameobjectDrop );
+			_ptr = gameobjectDrop;
 			returnValue = true;
 		}
 
 		// Right click = clear
 		if ( ImGui::IsItemClicked( 1 ) )
 		{
-			_ptr->SetResource( nullptr );
+			_ptr = nullptr;
 			returnValue = true;
 		}
 
@@ -53,8 +95,6 @@ namespace ImGui
 		return returnValue;
 	}
 
-	static_assert( ( std::is_base_of<fan::Resource, fan::Prefab>::value ) );
-	
 	//================================================================================================================================
 	//================================================================================================================================
 	bool FanPrefab( const char* _label, fan::PrefabPtr& _ptr )

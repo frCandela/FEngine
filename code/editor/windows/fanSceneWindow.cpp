@@ -324,6 +324,11 @@ namespace fan
 	//================================================================================================================================
 	void SceneWindow::ExportToPrefabModal()
 	{
+		if ( m_lastGameobjectRightClicked == nullptr )
+		{
+			return;
+		}
+
 		if ( ImGui::FanSaveFileModal( "Export to prefab", RenderGlobal::s_prefabExtensions, m_pathBuffer ) )
 		{
 			Debug::Log() << "Exporting prefab to " << m_pathBuffer.string() << Debug::Endl();
@@ -335,19 +340,13 @@ namespace fan
 				Prefab* prefab = Prefab::s_resourceManager.FindPrefab( m_pathBuffer.string() );
 				if ( prefab != nullptr )
 				{
-					prefab->CreateFromGameobject( m_lastGameobjectRightClicked );
+					prefab->CreateFromGameobject( * m_lastGameobjectRightClicked );
 				}
 
-				Json json;
-				Json& prefabJson = json[ "prefab" ];
-				if ( m_lastGameobjectRightClicked->Save( prefabJson ) )
-				{
-					outStream << json;
-				}
-				else
-				{
-					Debug::Warning() << "Prefab export failed for " << m_lastGameobjectRightClicked->GetName() << Debug::Endl();
-				}
+				Prefab newprefab;
+				newprefab.CreateFromGameobject( *m_lastGameobjectRightClicked );
+				outStream << newprefab.GetJson();
+
 				outStream.close();
 			}
 			else

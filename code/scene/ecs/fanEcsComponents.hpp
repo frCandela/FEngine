@@ -5,14 +5,12 @@
 #include "core/meta/fanTypeList.hpp"
 #include "core/math/shapes/fanAABB.hpp"
 #include "core/math/shapes/fanConvexHull.hpp"
-#include "scene/fanSceneResourcePtr.hpp"
-#include "render/fanRenderResourcePtr.hpp"
 
 namespace fan
 {
-
-	class Mesh;
-
+	class MeshPtr;
+	class TexturePtr;
+	class Gameobject;
 	using ecsEntity = uint32_t;
 	const ecsEntity ecsNullEntity = std::numeric_limits< ecsEntity >::max();
 
@@ -107,15 +105,14 @@ namespace fan
 
 	//================================
 	struct ecsMesh : ecsIComponent
-	{
+	{	
+		ecsMesh();
+		~ecsMesh();
+		void Init();
+		void Clear();
+
 		static const char* s_name;
-		void Init()
-		{
-			mesh = nullptr;
-			renderID = -1;
-		}
-		void Clear() { mesh = nullptr; }
-		MeshPtr mesh;
+		MeshPtr& mesh;
 		int renderID = -1;
 	};
 
@@ -158,18 +155,16 @@ namespace fan
 	//================================
 	struct ecsMaterial : ecsIComponent
 	{
-		static const char* s_name;
-		void Init()
-		{
-			texture = nullptr;
-			shininess = 1;
-			color = Color::White;
-		}
-		void Clear() { texture = nullptr;  }
+		
+		ecsMaterial();
+		~ecsMaterial();
+		void Init();
+		void Clear();
 
-		TexturePtr 	texture;
-		uint32_t	shininess = 1;
-		Color		color = Color::White;
+		static const char* s_name;
+		TexturePtr& 	texture;
+		uint32_t		shininess = 1;
+		Color			color = Color::White;
 	};
 
 	//================================
@@ -304,7 +299,6 @@ namespace fan
 	};
 
 	//================================
-	class Gameobject;
 	struct ecsGameobject : ecsIComponent
 	{
 		static const char* s_name;

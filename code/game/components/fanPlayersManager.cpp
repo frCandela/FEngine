@@ -1,4 +1,5 @@
 #include "game/components/fanPlayersManager.hpp"
+
 #include "game/components/fanPlayerInput.hpp"
 #include "game/components/fanSpaceShip.hpp"
 #include "game/network/fanGameClient.hpp"
@@ -8,9 +9,9 @@ namespace fan
 {
 	REGISTER_TYPE_INFO( PlayersManager, TypeInfo::Flags::EDITOR_COMPONENT, "game/managers/" )
 
-		//================================================================================================================================
-		//================================================================================================================================
-		void PlayersManager::Start()
+	//================================================================================================================================
+	//================================================================================================================================
+	void PlayersManager::Start()
 	{
 		REQUIRE_TRUE( *m_playerPrefab != nullptr, "PlayersManager : missing player prefab " )
 
@@ -94,6 +95,8 @@ namespace fan
 			assert( it != m_players.end() );
 			PlayerData& playerData = it->second;
 
+
+			assert( playerData.persistent );
 			Gameobject* player = GetScene().CreateGameobject( **m_playerPrefab, playerData.persistent );
 			player->SetEditorFlags( player->GetEditorFlags() | Gameobject::EditorFlag::NOT_SAVED );
 			player->SetName( playerData.persistent->GetName() );

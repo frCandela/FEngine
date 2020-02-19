@@ -7,9 +7,9 @@ namespace fan
 {
 	REGISTER_TYPE_INFO( ParticleSystem, TypeInfo::Flags::EDITOR_COMPONENT, "" )
 
-		//================================================================================================================================
-		//================================================================================================================================
-		void ParticleSystem::Start() {}
+	//================================================================================================================================
+	//================================================================================================================================
+	void ParticleSystem::Start() {}
 
 	//================================================================================================================================
 	//================================================================================================================================
@@ -80,8 +80,7 @@ namespace fan
 
 		ImGui::PushItemWidth( 0.6f * ImGui::GetWindowWidth() );
 		{
-
-			ImGui::FanGameobject( "origin", &m_origin );
+			ImGui::FanGameobject( "origin", m_origin );
 			ImGui::DragInt( "particles per second", &m_particlesPerSecond, 1, 0 );
 			ImGui::DragFloat( "speed", &m_speed, 0.01f );
 			ImGui::DragFloat( "duration", &m_duration, 0.01f );
@@ -89,8 +88,8 @@ namespace fan
 			ImGui::ColorEdit4( "color", m_color.Data(), ImGui::fanColorEditFlags );
 			ImGui::Checkbox( "sun light occlusion", &m_sunlightParticleOcclusionActive );
 
-		} ImGui::PopItemWidth();
-
+		} 
+		ImGui::PopItemWidth();
 	}
 
 	//================================================================================================================================
@@ -103,7 +102,7 @@ namespace fan
 		Serializable::LoadFloat( _json, "speed", m_speed );
 		Serializable::LoadFloat( _json, "duration", m_duration );
 		Serializable::LoadVec3( _json, "offset", m_offset );
-		Serializable::LoadGameobjectPtr( _json, "origin", m_origin );
+		Serializable::LoadGameobjectPtr( _json, m_gameobject->GetScene(), "origin", m_origin );
 		Serializable::LoadColor( _json, "color", m_color );
 		Serializable::LoadBool( _json, "sunlight_occlusion_active", m_sunlightParticleOcclusionActive );
 

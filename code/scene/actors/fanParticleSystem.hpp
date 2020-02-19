@@ -40,12 +40,12 @@ namespace fan
 		std::default_random_engine			  m_generator;
 		std::uniform_real_distribution<float> m_distribution;
 
-		int			m_particlesPerSecond = 1;
-		float		m_speed = 1.f;
-		float		m_duration = 2.f;
-		btVector3	m_offset = btVector3::Zero();
-		GameobjectPtr m_origin;
-		Color		m_color = Color::White;
+		int				m_particlesPerSecond = 1;
+		float			m_speed = 1.f;
+		float			m_duration = 2.f;
+		btVector3		m_offset = btVector3::Zero();
+		GameobjectPtr	m_origin;
+		Color			m_color = Color::White;
 
 		bool		m_sunlightParticleOcclusionActive = false;
 

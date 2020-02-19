@@ -11,7 +11,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	Gameobject* SceneInstantiate::InstanciatePrefab( const Prefab& _prefab, Gameobject* _parent )
+	Gameobject* SceneInstantiate::InstanciatePrefab( const Prefab& _prefab, Gameobject& _parent )
 	{
 		if ( _prefab.IsEmpty() )
 		{
@@ -26,54 +26,66 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	Gameobject* SceneInstantiate::InstantiateJson( const Json& _json, Gameobject* _parent )
+	Gameobject* SceneInstantiate::InstantiateJson( const Json& _json, Gameobject& _parent )
 	{
-		m_newGameobjectPtr.clear();
-		m_newComponentPtr.clear();
-		m_remapTable.clear();
-
-		Gameobject::s_setIDfailed.Connect( &SceneInstantiate::OnSetIDFailed, this );
-		//GameobjectPtr::s_onInit.Connect ( &SceneInstantiate::OnGameobjectPtrCreate, this );@tmp
-		//ComponentIDPtr::s_onInit.Connect( &SceneInstantiate::OnComponentIDPtrCreate, this );@tmp
+		const uint64_t idOffset = m_scene.GetNextUniqueID() - 1;
 
 		// Load gameobject
-		Gameobject* gameobject = m_scene.CreateGameobject( "tmp", _parent, false );
-		gameobject->Load( _json );
+		uint64_t id;
+		Serializable::LoadUInt64( _json, "gameobject_id", id );
+		Gameobject* gameobject = m_scene.CreateGameobject( "tmp", &_parent, id + idOffset );
+		gameobject->Load( _json, idOffset );
 
-		Gameobject::s_setIDfailed.Disconnect( &SceneInstantiate::OnSetIDFailed, this );
-		//GameobjectPtr::s_onInit.Disconnect( &SceneInstantiate::OnGameobjectPtrCreate, this );@tmp
-		//ComponentIDPtr::s_onInit.Disconnect( &SceneInstantiate::OnComponentIDPtrCreate, this );@tmp
+		ResolveGameobjectPtr( idOffset );
+		ResolveComponentPtr( idOffset );
 
-		ResolvePointers();
+		m_unresolvedGameobjectPtr.clear();
+		m_newComponentPtr.clear();
 
 		return gameobject;
 	}
 
 	//================================================================================================================================
-	// Resolves component & gameobject pointers
 	//================================================================================================================================
-	void  SceneInstantiate::ResolvePointers()
+	void SceneInstantiate::Clear()
 	{
-		// 		// Resolves gameobjects@tmp
-		// 		for ( int goPtrIndex = 0; goPtrIndex < m_newGameobjectPtr.size(); goPtrIndex++ )
-		// 		{
-		// 			GameobjectPtr * ptr = m_newGameobjectPtr[goPtrIndex];
-		// 
-		// 			auto it = m_remapTable.find( ptr->GetID() );
-		// 			const uint64_t index = ( it != m_remapTable.end() ? it->second : ptr->GetID() );
-		// 			Gameobject * gameobject = m_scene.FindGameobject( index );
-		// 
-		// 			if ( gameobject != nullptr )
-		// 			{
-		// 				*ptr =  GameobjectPtr( gameobject, index );
-		// 			}
-		// 			else
-		// 			{
-		// 				Debug::Warning() << "Resolve gameobject failed for index " << index << Debug::Endl();
-		// 				*ptr =  GameobjectPtr();
-		// 			}
-		// 		}
-		// 
+		while ( ! m_registeredGameobjectPtr.empty() )
+		{
+			* ( * m_registeredGameobjectPtr.begin() ) = nullptr;
+		}
+		assert( m_registeredGameobjectPtr.empty() );
+	}
+
+	//================================================================================================================================
+	// Resolves gameobject pointers ( find by id in the scene )
+	// _idOffset adds an offset to the gameobject ids being resolved, it allow for easier instantiation of prefabs
+	//================================================================================================================================
+	void  SceneInstantiate::ResolveGameobjectPtr( const uint64_t _idOffset )
+	{
+		// Resolves gameobjects
+		for ( int goPtrIndex = 0; goPtrIndex < m_unresolvedGameobjectPtr.size(); goPtrIndex++ )
+		{			
+			GameobjectPtr& ptr = *m_unresolvedGameobjectPtr[goPtrIndex];	
+			const uint64_t id = ptr.GetId() + _idOffset;
+			Gameobject * gameobject = m_scene.FindGameobject( id );	
+			assert( ! ptr.IsValid() && ptr.GetId() != 0 );
+
+			if ( gameobject != nullptr )
+			{
+				ptr = gameobject;
+			}
+			else
+			{
+				Debug::Warning() << "Resolve gameobject failed for index " << id << Debug::Endl();
+			}
+		}
+		m_unresolvedGameobjectPtr.clear();
+	}
+
+	//================================================================================================================================
+	// Resolves gameobject pointers
+	//================================================================================================================================
+	void  SceneInstantiate::ResolveComponentPtr( const uint64_t _idOffset ) {
 		// 		// Resolves components
 		// 		for ( int componentPtrIndex = 0; componentPtrIndex < m_newComponentPtr.size(); componentPtrIndex++ )
 		// 		{
@@ -96,25 +108,28 @@ namespace fan
 	}
 
 	//================================================================================================================================
-	// Saves the duplicates ids for future remap
+	// Initialized gameobjects pointers are registered here to be resolved later when their target is fully loaded
 	//================================================================================================================================
-	void SceneInstantiate::OnSetIDFailed( uint64_t _id, Gameobject* _gameobject )
+	void SceneInstantiate::RegisterUnresolvedGameobjectPtr( GameobjectPtr& _ptr )
 	{
-		assert( _id != 0 );
-		const uint64_t remapID = m_scene.GetUniqueID();
-		_gameobject->SetUniqueID( remapID );
-		m_remapTable[ _id ] = remapID;
-		//Debug::Log() << "remapped id " << _id << " to id " << remapID << Debug::Endl();
+		assert( _ptr.GetId() > 0 );
+		m_unresolvedGameobjectPtr.push_back( &_ptr );		
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void SceneInstantiate::OnGameobjectPtrCreate( GameobjectPtr* _ptr )
+	void SceneInstantiate::RegisterGameobjectPtr( GameobjectPtr& _gameobjectPtr )
 	{
-		// 		if ( _ptr->GetID() != 0 )@tmp
-		// 		{
-		// 			m_newGameobjectPtr.push_back( _ptr );
-		// 		}
+		assert( m_registeredGameobjectPtr.find( &_gameobjectPtr ) == m_registeredGameobjectPtr.end() );
+		m_registeredGameobjectPtr.insert( &_gameobjectPtr );
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
+	void SceneInstantiate::UnregisterGameobjectPtr( GameobjectPtr& _gameobjectPtr )
+	{
+		assert( m_registeredGameobjectPtr.find( &_gameobjectPtr ) != m_registeredGameobjectPtr.end() );
+		m_registeredGameobjectPtr.erase( &_gameobjectPtr );
 	}
 
 	//================================================================================================================================

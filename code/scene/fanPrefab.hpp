@@ -21,7 +21,7 @@ namespace fan
 
 		bool CreateFromJson( const Json& _json );
 		bool CreateFromFile( const std::string& _path );
-		void CreateFromGameobject( const Gameobject* _gameobject );
+		void CreateFromGameobject( const Gameobject & _gameobject );
 
 		const Json& GetJsonGameobject() const { return m_json[ "prefab" ]; }
 		const Json& GetJson() const { return m_json; }
@@ -30,8 +30,10 @@ namespace fan
 		bool IsEmpty() const { return !m_json.contains( "prefab" ); }
 		void Clear() { m_json = Json(); }
 
+		static void RemapGameobjectIndices( Json& _json );
+
 	private:
 		Json m_json;
-		std::string m_path;
+		std::string m_path;		
 	};
 }
