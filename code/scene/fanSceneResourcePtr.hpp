@@ -16,6 +16,7 @@ namespace fan
 	{
 	public:
 		GameobjectPtr(  Gameobject* _gameobject = nullptr ) : ResourcePtr<Gameobject>( _gameobject ) {}
+		~GameobjectPtr();
 
 		void Init( Scene& _scene, uint64_t _id );
 

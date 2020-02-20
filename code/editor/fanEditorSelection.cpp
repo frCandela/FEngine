@@ -47,7 +47,7 @@ namespace fan
 	{
 		SCOPED_PROFILE( selection )
 
-			bool mouseCaptured = false;;
+		bool mouseCaptured = false;
 
 		// Translation gizmo on selected gameobject
 		if ( m_selectedGameobject != nullptr && m_selectedGameobject != &m_currentScene->GetMainCamera().GetGameobject()

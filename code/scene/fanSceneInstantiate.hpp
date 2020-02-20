@@ -21,9 +21,11 @@ namespace fan
 		SceneInstantiate( Scene& _scene );		
 		Gameobject* InstanciatePrefab( const Prefab& _prefab, Gameobject& _parent );
 
+		
 		void RegisterUnresolvedGameobjectPtr( GameobjectPtr& _gameobjectPtr );
 		void RegisterGameobjectPtr( GameobjectPtr& _gameobjectPtr );
 		void UnregisterGameobjectPtr( GameobjectPtr& _gameobjectPtr );
+		void UnregisterPointersForGameobject( const Gameobject * _gameobject );
 
 		void ResolveGameobjectPtr( const uint64_t _idOffset );
 		void ResolveComponentPtr( const uint64_t _idOffset );
