@@ -59,7 +59,11 @@ namespace fan
 	//================================================================================================================================
 	void ConsoleWindow::OnGui()
 	{
-		SCOPED_PROFILE( console )
+		SCOPED_PROFILE(console)
+
+		ImGui::Begin("toto");
+		ImGui::Text("testoss");
+		ImGui::End();
 
 			// List the logs
 			const float height = ImGui::GetWindowHeight();

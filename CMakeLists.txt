@@ -8,13 +8,19 @@ include_directories( code )
 include_directories( "C:/VulkanSDK/1.1.106.0/Include" )
 
 # link directories
+IF( ${MSVC_VERSION} GREATER_EQUAL 1910 AND ${MSVC_VERSION} LESS_EQUAL 1919 ) # v141 toolset
+	set( MSVC_LINK_DIR "2017" )
+ELSEIF( ${MSVC_VERSION} GREATER_EQUAL 1920 AND ${MSVC_VERSION} LESS_EQUAL 1929 ) # v142 toolset
+	set( MSVC_LINK_DIR "2019" )
+ENDIF()
+
 link_directories("C:/VulkanSDK/1.1.106.0/Lib")
 IF(${CMAKE_BUILD_TYPE} MATCHES Debug)
-    link_directories(lib/debug)
-    link_directories("C:/VulkanSDK/1.1.106.0/Lib/debug")
+    link_directories(lib/${MSVC_LINK_DIR}/debug)
+    link_directories("C:/VulkanSDK/1.1.106.0/Lib/${MSVC_LINK_DIR}/debug")
 ELSEIF(${CMAKE_BUILD_TYPE} MATCHES Release)
-    link_directories(lib/release)
-    link_directories("C:/VulkanSDK/1.1.106.0/Lib/release")
+    link_directories(lib/${MSVC_LINK_DIR}/release)
+    link_directories("C:/VulkanSDK/1.1.106.0/Lib/${MSVC_LINK_DIR}/release")
 ENDIF()
 
 # libs directories
@@ -63,10 +69,10 @@ if(MSVC)
 endif()
 
   # Force WX (warning as error)
-target_compile_options(fanCore PRIVATE /WX /INCREMENTAL /ZI) 
-target_compile_options(fanRender PRIVATE /WX /INCREMENTAL /ZI)
-target_compile_options(fanNetwork PRIVATE /WX /INCREMENTAL/ZI )
-target_compile_options(fanScene PRIVATE /WX /INCREMENTAL /ZI)
-target_compile_options(fanGame PRIVATE /WX /INCREMENTAL /ZI)
-target_compile_options(fanEditor PRIVATE /WX /INCREMENTAL /ZI)
-target_compile_options(fengine_editor PRIVATE /WX /INCREMENTAL /ZI)
+target_compile_options(fanCore PRIVATE /WX ) 
+target_compile_options(fanRender PRIVATE /WX )
+target_compile_options(fanNetwork PRIVATE /WX  )
+target_compile_options(fanScene PRIVATE /WX  )
+target_compile_options(fanGame PRIVATE /WX  )
+target_compile_options(fanEditor PRIVATE /WX  )
+target_compile_options(fengine_editor PRIVATE /WX  )
