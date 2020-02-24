@@ -13,3 +13,6 @@ target_link_libraries(imgui freetype28)
 file(GLOB_RECURSE QUICKHULL_SRC quickhull/*.cpp)
 file(GLOB_RECURSE QUICKHULL_H quickhull/*.hpp)
 add_library( quickhull STATIC ${QUICKHULL_SRC} ${QUICKHULL_H})
+
+target_compile_options(quickhull PRIVATE /ZI) 
+target_compile_options(imgui PRIVATE /ZI) 
