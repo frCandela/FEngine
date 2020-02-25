@@ -61,12 +61,8 @@ namespace fan
 	{
 		SCOPED_PROFILE(console)
 
-		ImGui::Begin("toto");
-		ImGui::Text("testoss");
-		ImGui::End();
-
-			// List the logs
-			const float height = ImGui::GetWindowHeight();
+		// List the logs
+		const float height = ImGui::GetWindowHeight();
 		if ( height > 60 )
 		{
 			ImGui::BeginChild( "scrolling", ImVec2( 0, height - 65 ), true, ImGuiWindowFlags_AlwaysVerticalScrollbar );

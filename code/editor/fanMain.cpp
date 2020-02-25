@@ -1,18 +1,33 @@
+#include "LivePP/API/LPP_API.h"
 #include "editor/fanEditor.hpp"
 
-void RunGame();
+class LPPMain {
+public:
+
+	LPPMain()
+	{
+		livePP = lpp::lppLoadAndRegister(L"deps/LivePP/", "AGroupName");
+		lpp::lppEnableAllCallingModulesSync(livePP);		
+		engine.onLPPSynch.Connect(&LPPMain::OnSynch, this);
+
+		engine.Run();
+
+		::FreeLibrary(livePP);
+	}
+
+	void OnSynch() {
+		lpp::lppSyncPoint(livePP);
+	}
+
+private:
+	HMODULE livePP;
+	fan::Engine engine;
+};
 
 int main()
 {
-	RunGame();
-
+	LPPMain main;
 	return 0;
 }
 
-// Can you guess what this function does :3
-void RunGame()
-{
 
-	fan::Engine engine;
-	engine.Run();
-}

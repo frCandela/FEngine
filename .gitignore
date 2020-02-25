@@ -5,3 +5,5 @@ fengine_editor.exe.manifest
 fengine_editor.ilk
 fengine_editor.pdb
 imgui.ini
+*exe.patch_*
+*pdb.patch_*

@@ -264,7 +264,6 @@ namespace fan
 	//================================================================================================================================
 	void Engine::Run()
 	{
-
 		Clock logicClock;
 		Clock renderClock;
 
@@ -282,12 +281,14 @@ namespace fan
 
 				SCOPED_PROFILE( logic )
 				{
-					SCOPED_PROFILE( init )
-						Input::Get().NewFrame();
+					SCOPED_PROFILE( init )					
+					Input::Get().NewFrame();
 					Mouse::Get().Update( m_gameWindow->GetPosition(), m_gameWindow->GetSize(), m_gameWindow->IsHovered() );
-					ImGui::NewFrame();
+					ImGui::NewFrame();					
 					ImGui::GetIO().DeltaTime = targetLogicDelta;
 					m_renderer->GetRendererDebug().ClearDebug();
+
+					onLPPSynch.Emmit();
 				}
 
 				m_clientScene->Update( targetLogicDelta );
@@ -296,7 +297,7 @@ namespace fan
 				if ( m_showUI )
 				{
 					SCOPED_PROFILE( draw_ui )
-						m_mainMenuBar->Draw();
+					m_mainMenuBar->Draw();
 					m_selection->Update( m_gameWindow->IsHovered() );
 					DrawEditorGrid();
 				}
@@ -306,7 +307,7 @@ namespace fan
 				if ( m_showUI )
 				{
 					SCOPED_PROFILE( debug_draw )
-						if ( m_mainMenuBar->ShowWireframe() ) { DrawWireframe(); }
+					if ( m_mainMenuBar->ShowWireframe() ) { DrawWireframe(); }
 					if ( m_mainMenuBar->ShowNormals() ) { DrawNormals(); }
 					if ( m_mainMenuBar->ShowAABB() ) { DrawAABB(); }
 					if ( m_mainMenuBar->ShowHull() ) { DrawHull(); }
@@ -314,7 +315,7 @@ namespace fan
 
 				{
 					SCOPED_PROFILE( imgui_render )
-						ImGui::Render();
+					ImGui::Render();
 				}
 			}
 
@@ -552,7 +553,7 @@ namespace fan
 	{
 		SCOPED_PROFILE( update_renderer )
 
-			Camera& mainCamera = m_currentScene->GetMainCamera();
+		Camera& mainCamera = m_currentScene->GetMainCamera();
 		const std::vector < DirectionalLight* > directionalLights = m_currentScene->GetDirectionalLights();
 		const std::vector < PointLight* >		pointLights = m_currentScene->GetPointLights();
 		const std::vector < MeshRenderer* >		meshRenderers = m_currentScene->GetMeshRenderers();

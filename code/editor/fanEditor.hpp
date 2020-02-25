@@ -31,7 +31,8 @@ namespace fan
 	class Engine
 	{
 	public:
-		static Signal<Camera*> onSetCamera;
+		static Signal<Camera*> onSetCamera; //@todo remove static
+		Signal <> onLPPSynch;
 
 		Engine();
 		~Engine();

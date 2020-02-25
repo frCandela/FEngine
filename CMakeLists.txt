@@ -4,6 +4,7 @@ project ("FEngine")
 set(CMAKE_CXX_STANDARD 17)
 
 include_directories( deps )
+include_directories( deps/freetype )
 include_directories( code )
 include_directories( "C:/VulkanSDK/1.1.106.0/Include" )
 
@@ -32,10 +33,14 @@ add_subdirectory(code/game)
 add_subdirectory(code/editor)
 add_subdirectory(deps)
 
+#defines
 add_compile_definitions(SFML_STATIC)
 
+# sources
+file( GLOB_RECURSE LPP_SRC deps/LivePP/*.h )
 list(APPEND APP_SOURCES
     code/editor/fanMain.cpp
+    ${LPP_SRC}    
 ) 
 
 set(APP_LIBRARIES 
@@ -69,10 +74,10 @@ if(MSVC)
 endif()
 
   # Force WX (warning as error)
-target_compile_options(fanCore PRIVATE /WX /ZI) 
-target_compile_options(fanRender PRIVATE /WX /ZI) 
-target_compile_options(fanNetwork PRIVATE /WX /ZI) 
-target_compile_options(fanScene PRIVATE /WX /ZI) 
-target_compile_options(fanGame PRIVATE /WX /ZI) 
-target_compile_options(fanEditor PRIVATE /WX /ZI) 
-target_compile_options(fengine_editor PRIVATE /WX /ZI) 
+target_compile_options(fanCore PRIVATE /WX /FUNCTIONPADMIN )
+target_compile_options(fanRender PRIVATE /WX /FUNCTIONPADMIN )
+target_compile_options(fanNetwork PRIVATE /WX /FUNCTIONPADMIN )
+target_compile_options(fanScene PRIVATE /WX /FUNCTIONPADMIN )
+target_compile_options(fanGame PRIVATE /WX /FUNCTIONPADMIN )
+target_compile_options(fanEditor PRIVATE /WX /FUNCTIONPADMIN )
+target_compile_options(fengine_editor PRIVATE /WX /FUNCTIONPADMIN )
