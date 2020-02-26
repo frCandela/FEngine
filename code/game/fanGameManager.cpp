@@ -51,7 +51,7 @@ namespace fan
 
 		ImGui::PushItemWidth( 0.6f * ImGui::GetWindowWidth() );
 		{
-			ImGui::FanComponent( "game camera", &m_gameCamera );
+			ImGui::FanComponent( "game camera", m_gameCamera );
 			ImGui::Text( "Press tab to switch cameras" );
 		} ImGui::PopItemWidth();
 	}
@@ -61,7 +61,7 @@ namespace fan
 	bool GameManager::Load( const Json& _json )
 	{
 		Actor::Load( _json );
-		Serializable::LoadComponentPtr( _json, "game_camera", m_gameCamera );
+		Serializable::LoadComponentPtr( _json, m_gameobject->GetScene(), "game_camera", m_gameCamera );
 		return true;
 	}
 

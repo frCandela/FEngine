@@ -47,7 +47,7 @@ namespace fan
 	//================================================================================================================================
 	void ProgressBar::OnGui()
 	{
-		ImGui::FanComponent( "target ui transform", &m_targetUiTransform );
+		ImGui::FanComponent( "target ui transform", m_targetUiTransform );
 
 		ImGui::PushItemWidth( 0.6f * ImGui::GetWindowWidth() );
 		{
@@ -72,7 +72,7 @@ namespace fan
 	//================================================================================================================================
 	bool ProgressBar::Load( const Json& _json )
 	{
-		Serializable::LoadComponentPtr( _json, "target_ui_transform", m_targetUiTransform );
+		Serializable::LoadComponentPtr(_json, m_gameobject->GetScene(), "target_ui_transform", m_targetUiTransform);
 		Serializable::LoadInt( _json, "max_width", m_maxWidth );
 		return true;
 	}

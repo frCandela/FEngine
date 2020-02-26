@@ -40,7 +40,7 @@ namespace fan
 		ResolveComponentPtr( idOffset );
 
 		m_unresolvedGameobjectPtr.clear();
-		m_newComponentPtr.clear();
+		m_unresolvedComponentPtr.clear();
 
 		return gameobject;
 	}
@@ -49,11 +49,19 @@ namespace fan
 	//================================================================================================================================
 	void SceneInstantiate::Clear()
 	{
+		// Clears gameobject ptr
 		while ( ! m_registeredGameobjectPtr.empty() )
 		{
 			* ( * m_registeredGameobjectPtr.begin() ) = nullptr;
 		}
 		assert( m_registeredGameobjectPtr.empty() );
+
+		// Clears component ptr
+		while (!m_registeredComponentPtr.empty())
+		{
+			*(*m_registeredComponentPtr.begin()) = nullptr;
+		}
+		assert(m_registeredComponentPtr.empty());
 	}
 
 	//================================================================================================================================
@@ -86,25 +94,28 @@ namespace fan
 	// Resolves gameobject pointers
 	//================================================================================================================================
 	void  SceneInstantiate::ResolveComponentPtr( const uint64_t _idOffset ) {
-		// 		// Resolves components
-		// 		for ( int componentPtrIndex = 0; componentPtrIndex < m_newComponentPtr.size(); componentPtrIndex++ )
-		// 		{
-		// 			ComponentIDPtr * ptr = m_newComponentPtr[componentPtrIndex];
-		// 
-		// 			auto it = m_remapTable.find( ptr->GetID().gameobjectID );
-		// 			const uint64_t index = ( it != m_remapTable.end() ? it->second : ptr->GetID().gameobjectID );
-		// 			Gameobject * gameobject =m_scene.FindGameobject( index );
-		// 			if ( gameobject != nullptr )
-		// 			{
-		// 				Component * component = gameobject->GetComponent( ptr->GetID().componentID );
-		// 				*ptr = ComponentIDPtr( component, IDPtrData( index, ptr->GetID().componentID ) );
-		// 			}
-		// 			else
-		// 			{
-		// 				Debug::Warning() << "Resolve component failed for gameobject index " << index << Debug::Endl();
-		// 				*ptr = ComponentIDPtr();
-		// 			}
-		// 		}
+
+		// Resolves components
+		for (int componentPtrIndex = 0; componentPtrIndex < m_unresolvedComponentPtr.size(); componentPtrIndex++)
+		{
+			ComponentPtrBase& ptr = *m_unresolvedComponentPtr[componentPtrIndex];
+			const uint64_t gameobjectId = ptr.GetGameobjectId() + _idOffset;
+			Gameobject* gameobject = m_scene.FindGameobject(gameobjectId);
+			assert(!ptr.IsValid() && ptr.GetGameobjectId() != 0);
+
+			if (gameobject != nullptr)
+			{
+				Component* component = gameobject->GetComponent( ptr.GetComponentId() );
+				if (component) {
+					ptr = component;
+				}				
+			}
+			else
+			{
+				Debug::Warning() << "Resolve component " << ptr.GetComponentId() << " failed for index " << gameobjectId << Debug::Endl();
+			}
+		}
+		m_unresolvedComponentPtr.clear();
 	}
 
 	//================================================================================================================================
@@ -114,6 +125,14 @@ namespace fan
 	{
 		assert( _ptr.GetId() > 0 );
 		m_unresolvedGameobjectPtr.push_back( &_ptr );		
+	}
+
+	//================================================================================================================================
+	// Initialized component pointers are registered here to be resolved later when their target is fully loaded
+	//================================================================================================================================
+	void SceneInstantiate::RegisterUnresolvedComponentPtr( ComponentPtrBase& _componentPtr ) {
+		assert( _componentPtr.GetGameobjectId() > 0 );
+		m_unresolvedComponentPtr.push_back( &_componentPtr );
 	}
 
 	//================================================================================================================================
@@ -130,6 +149,20 @@ namespace fan
 	{
 		assert( m_registeredGameobjectPtr.find( &_gameobjectPtr ) != m_registeredGameobjectPtr.end() );
 		m_registeredGameobjectPtr.erase( &_gameobjectPtr );
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
+	void SceneInstantiate::RegisterComponentPtr(ComponentPtrBase& _componentPtr) {
+		assert(m_registeredComponentPtr.find(&_componentPtr) == m_registeredComponentPtr.end());
+		m_registeredComponentPtr.insert(&_componentPtr);
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
+	void SceneInstantiate::UnRegisterComponentPtr(ComponentPtrBase& _componentPtr) {
+		assert(m_registeredComponentPtr.find(&_componentPtr) != m_registeredComponentPtr.end());
+		m_registeredComponentPtr.erase(&_componentPtr);
 	}
 
 	//================================================================================================================================
@@ -152,15 +185,5 @@ namespace fan
 		{
 			*ptr = nullptr;
 		}
-	}
-
-	//================================================================================================================================
-	//================================================================================================================================
-	void SceneInstantiate::OnComponentIDPtrCreate( ComponentIDPtr* _ptr )
-	{
-		// 		if ( _ptr->GetID().gameobjectID != 0 )@tmp
-		// 		{
-		// 			m_newComponentPtr.push_back( _ptr );
-		// 		}
 	}
 }

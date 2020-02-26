@@ -75,7 +75,7 @@ namespace fan
 	void Gameobject::OnGui()
 	{
 		std::stringstream ss;
-		ss << "Gameobject : " << GetName() << " id: " << m_uniqueID << " ref: " << GetRefCount();
+		ss << "Gameobject : " << GetName() << " (id: " << m_uniqueID << ") (ref: " << GetRefCount() << ")";
 		ImGui::Text( ss.str().c_str() );
 	}
 

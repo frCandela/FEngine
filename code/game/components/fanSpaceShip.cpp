@@ -208,11 +208,11 @@ namespace fan
 			ImGui::DragFloat( "planet damage", &m_planetDamage );
 			ImGui::DragFloat( "collision repulsion force", &m_collisionRepulsionForce );
 
-			ImGui::FanComponent( "fast forward particles", &m_fastForwardParticles );
-			ImGui::FanComponent( "slow forward particles", &m_slowForwardParticles );
-			ImGui::FanComponent( "reverse particles", &m_reverseParticles );
-			ImGui::FanComponent( "left particles", &m_leftParticles );
-			ImGui::FanComponent( "right particles", &m_rightParticles );
+			ImGui::FanComponent( "fast forward particles", m_fastForwardParticles );
+			ImGui::FanComponent( "slow forward particles", m_slowForwardParticles );
+			ImGui::FanComponent( "reverse particles", m_reverseParticles );
+			ImGui::FanComponent( "left particles", m_leftParticles );
+			ImGui::FanComponent( "right particles", m_rightParticles );
 		} ImGui::PopItemWidth();
 	}
 
@@ -229,11 +229,11 @@ namespace fan
 		Serializable::LoadFloat( _json, "energy_consumed_per_unit_of_force", m_energyConsumedPerUnitOfForce );
 		Serializable::LoadFloat( _json, "planet_damage", m_planetDamage );
 		Serializable::LoadFloat( _json, "collision_repulsion_force", m_collisionRepulsionForce );
-		Serializable::LoadComponentPtr( _json, "fast_forward_particles", m_fastForwardParticles );
-		Serializable::LoadComponentPtr( _json, "slow_forward_particles", m_slowForwardParticles );
-		Serializable::LoadComponentPtr( _json, "reverse_particles", m_reverseParticles );
-		Serializable::LoadComponentPtr( _json, "left_particles", m_leftParticles );
-		Serializable::LoadComponentPtr( _json, "right_particles", m_rightParticles );
+		Serializable::LoadComponentPtr( _json, m_gameobject->GetScene(), "fast_forward_particles", m_fastForwardParticles );
+		Serializable::LoadComponentPtr( _json, m_gameobject->GetScene(), "slow_forward_particles", m_slowForwardParticles );
+		Serializable::LoadComponentPtr( _json, m_gameobject->GetScene(), "reverse_particles", m_reverseParticles );
+		Serializable::LoadComponentPtr( _json, m_gameobject->GetScene(), "left_particles", m_leftParticles );
+		Serializable::LoadComponentPtr( _json, m_gameobject->GetScene(), "right_particles", m_rightParticles );
 
 		return true;
 	}

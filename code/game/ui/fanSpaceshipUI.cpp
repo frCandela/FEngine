@@ -98,10 +98,10 @@ namespace fan
 	void SpaceShipUI::OnGui()
 	{
 		ImGui::FanGameobject( "spaceShip", m_spaceShip );
-		ImGui::FanComponent( "health progress", &m_healthProgress );
-		ImGui::FanComponent( "energy progress", &m_energyProgress );
-		ImGui::FanComponent( "signal progress", &m_signalProgress );
-		ImGui::FanComponent( "signal renderer", &m_signalRenderer );
+		ImGui::FanComponent( "health progress", m_healthProgress );
+		ImGui::FanComponent( "energy progress", m_energyProgress );
+		ImGui::FanComponent( "signal progress", m_signalProgress );
+		ImGui::FanComponent( "signal renderer", m_signalRenderer );
 
 		if ( *m_spaceShip != nullptr )
 		{
@@ -129,12 +129,12 @@ namespace fan
 	//================================================================================================================================
 	bool SpaceShipUI::Load( const Json& _json )
 	{
-		Actor::Load( _json );
-		Serializable::LoadGameobjectPtr( _json, m_gameobject->GetScene(), "spaceship", m_spaceShip );
-		Serializable::LoadComponentPtr( _json, "health_progress", m_healthProgress );
-		Serializable::LoadComponentPtr( _json, "energy_progress", m_energyProgress );
-		Serializable::LoadComponentPtr( _json, "signal_progress", m_signalProgress );
-		Serializable::LoadComponentPtr( _json, "signal_renderer", m_signalRenderer );
+		Actor::Load(_json);
+		Serializable::LoadGameobjectPtr(_json, m_gameobject->GetScene(), "spaceship", m_spaceShip);
+		Serializable::LoadComponentPtr(_json, m_gameobject->GetScene(), "health_progress", m_healthProgress);
+		Serializable::LoadComponentPtr(_json, m_gameobject->GetScene(), "energy_progress", m_energyProgress);
+		Serializable::LoadComponentPtr(_json, m_gameobject->GetScene(), "signal_progress", m_signalProgress);
+		Serializable::LoadComponentPtr(_json, m_gameobject->GetScene(), "signal_renderer", m_signalRenderer);
 		return true;
 	}
 }

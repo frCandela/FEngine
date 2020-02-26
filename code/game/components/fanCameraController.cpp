@@ -80,9 +80,9 @@ namespace fan
 		Actor::OnGui();
 		ImGui::PushItemWidth( 0.6f * ImGui::GetWindowWidth() );
 		{
-			ImGui::FanComponent( "players manager", &m_playersManager );
+			ImGui::FanComponent( "players manager", m_playersManager );
 			ImGui::DragFloat( "height from target", &m_heightFromTarget, 0.25f, 0.5f, 30.f );
-			ImGui::DragFloat2( "margin ratio", &m_marginRatio[ 0 ], 0.1f, 0.f, 10.f );
+			ImGui::DragFloat2( "margin ratio", &m_marginRatio[0], 0.1f, 0.f, 10.f );
 			ImGui::DragFloat( "minSize", &m_minOrthoSize, 0.1f, 0.f, 100.f );
 		}
 	}
@@ -103,7 +103,7 @@ namespace fan
 		Serializable::LoadVec2( _json, "margin_ratio", m_marginRatio );
 		Serializable::LoadFloat( _json, "min_size", m_minOrthoSize );
 		Serializable::LoadFloat( _json, "height_from_target", m_heightFromTarget );
-		Serializable::LoadComponentPtr( _json, "players_manager", m_playersManager );
+		Serializable::LoadComponentPtr( _json, m_gameobject->GetScene(), "players_manager", m_playersManager );
 
 		return true;
 	}

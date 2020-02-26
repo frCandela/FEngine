@@ -8,6 +8,7 @@
 namespace fan
 {
 	class Gameobject;
+
 	class Scene;
 	class Prefab;
 
@@ -21,26 +22,31 @@ namespace fan
 		SceneInstantiate( Scene& _scene );		
 		Gameobject* InstanciatePrefab( const Prefab& _prefab, Gameobject& _parent );
 
-		
+		void RegisterUnresolvedComponentPtr( ComponentPtrBase& _componentPtr );
 		void RegisterUnresolvedGameobjectPtr( GameobjectPtr& _gameobjectPtr );
+
 		void RegisterGameobjectPtr( GameobjectPtr& _gameobjectPtr );
 		void UnregisterGameobjectPtr( GameobjectPtr& _gameobjectPtr );
-		void UnregisterPointersForGameobject( const Gameobject * _gameobject );
+		
+		void RegisterComponentPtr(ComponentPtrBase& _componentPtr);
+		void UnRegisterComponentPtr(ComponentPtrBase& _componentPtr);
 
 		void ResolveGameobjectPtr( const uint64_t _idOffset );
 		void ResolveComponentPtr( const uint64_t _idOffset );
+
+		void UnregisterPointersForGameobject(const Gameobject* _gameobject);
 
 		void Clear();
 
 	private:
 		Scene& m_scene;
 
-		std::vector< GameobjectPtr* >   m_unresolvedGameobjectPtr;
-		std::set< GameobjectPtr* >		m_registeredGameobjectPtr;
-		std::vector< ComponentIDPtr* >  m_newComponentPtr;
-		
+		std::vector< GameobjectPtr* >		m_unresolvedGameobjectPtr;
+		std::set< GameobjectPtr* >			m_registeredGameobjectPtr;
+
+		std::vector< ComponentPtrBase* >	m_unresolvedComponentPtr;
+		std::set< ComponentPtrBase* >		m_registeredComponentPtr;
+
 		Gameobject* InstantiateJson( const Json& _json, Gameobject& _parent );
-		void OnComponentIDPtrCreate( ComponentIDPtr* _ptr );
-		
 	};
 }

@@ -19,11 +19,11 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void GameobjectPtr::Init( Scene& _scene, uint64_t _id )
+	void GameobjectPtr::Init( Scene& _scene, uint64_t _gameobjectId )
 	{
-		m_id = _id;
+		m_gameobjectId = _gameobjectId;
 		m_scene = &_scene;
-		if ( m_id != 0 )
+		if ( m_gameobjectId != 0 )
 		{
 			_scene.GetInstanciator().RegisterUnresolvedGameobjectPtr( *this );
 		}		

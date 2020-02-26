@@ -25,10 +25,9 @@ namespace fan
 		_ResourceType* operator*()  const { return ( _ResourceType* ) ( m_resource ); } //@todo return a reference
 		ResourcePtr & operator=(const ResourcePtr&) = delete;
 		ResourcePtr(const ResourcePtr&) = delete;
-
-		void SetResource( Resource* _resource );
-	protected:
 		
+	protected:
+		void SetResource(Resource* _resource);
 
 	private:
 		Resource* m_resource = nullptr;

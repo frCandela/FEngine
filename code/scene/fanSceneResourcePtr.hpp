@@ -11,6 +11,8 @@ namespace fan
 	class Scene;
 
 	//================================================================================================================================
+	// holds a pointer to a gameobject of a specific  scene
+	// can be initialized with a scene and a gameobject ID to be resolved later ( loading, copy/paste )
 	//================================================================================================================================
 	class GameobjectPtr : public ResourcePtr<Gameobject>
 	{
@@ -18,19 +20,21 @@ namespace fan
 		GameobjectPtr(  Gameobject* _gameobject = nullptr ) : ResourcePtr<Gameobject>( _gameobject ) {}
 		~GameobjectPtr();
 
-		void Init( Scene& _scene, uint64_t _id );
+		void Init( Scene& _scene, uint64_t _gameobjectId );
 
-		uint64_t GetId() const	 { return m_id; }
+		uint64_t GetId() const	 { return m_gameobjectId; }
 
 		GameobjectPtr& operator=( Gameobject* _resource );
 
 	private:
-		uint64_t m_id = 0;
+		uint64_t m_gameobjectId = 0;
 		Scene * m_scene = nullptr;
 	};	   
 
 	//================================================================================================================================
-    //================================================================================================================================
+	// holds a pointer to a prefab of the prefab resource manager
+	// can be initialized with a prefab path to be resolved later
+	//================================================================================================================================
 	class PrefabPtr : public ResourcePtr<Prefab>
 	{
 	public:

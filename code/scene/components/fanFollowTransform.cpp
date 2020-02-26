@@ -5,10 +5,9 @@ namespace fan
 {
 	REGISTER_TYPE_INFO( FollowTransform, TypeInfo::Flags::EDITOR_COMPONENT, "other/" )
 
-
-		//================================================================================================================================
-		//================================================================================================================================
-		void FollowTransform::OnAttach()
+	//================================================================================================================================
+	//================================================================================================================================
+	void FollowTransform::OnAttach()
 	{
 		Actor::OnAttach();
 	}
@@ -26,10 +25,10 @@ namespace fan
 	{
 		REQUIRE_TRUE( *m_followedTransform != nullptr, "SpaceshipUI: missing reference" )
 
-			if ( *m_followedTransform != nullptr )
-			{
-				m_offset = m_followedTransform->GetPosition() - m_gameobject->GetTransform().GetPosition();
-			}
+		if ( *m_followedTransform != nullptr )
+		{
+			m_offset = m_followedTransform->GetPosition() - m_gameobject->GetTransform().GetPosition();
+		}
 	}
 
 	//================================================================================================================================
@@ -57,7 +56,7 @@ namespace fan
 	//================================================================================================================================
 	void FollowTransform::OnGui()
 	{
-		ImGui::FanComponent( "followed transform", &m_followedTransform );
+		ImGui::FanComponent( "followed transform", m_followedTransform );
 	}
 
 	//================================================================================================================================
@@ -74,7 +73,7 @@ namespace fan
 	bool FollowTransform::Load( const Json& _json )
 	{
 		Actor::Load( _json );
-		Serializable::LoadComponentPtr( _json, "followed_transform", m_followedTransform );
+		Serializable::LoadComponentPtr( _json, m_gameobject->GetScene(), "followed_transform", m_followedTransform );
 		return true;
 	}
 }

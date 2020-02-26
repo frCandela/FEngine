@@ -1,22 +1,76 @@
 #include "scene/fanComponentPtr.hpp"
-#include "scene/fanSceneResourcePtr.hpp"
-#include "scene/fanGameobject.hpp"
+
 #include "scene/components/fanComponent.hpp"
-#include "game/imgui/fanDragnDrop.hpp"
+#include "scene/fanSceneResourcePtr.hpp"
+#include "scene/fanSceneInstantiate.hpp"
+#include "scene/fanGameobject.hpp"
+#include "scene/fanScene.hpp"
 #include "game/fanGameSerializable.hpp"
+#include "game/imgui/fanDragnDrop.hpp"
+
+namespace fan {
+	//================================================================================================================================
+	//================================================================================================================================
+	ComponentPtrBase::~ComponentPtrBase()
+	{
+		(*this) = nullptr;
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
+	void ComponentPtrBase::Init( Scene& _scene, uint64_t _gameobjectId, uint32_t _componentId )
+	{
+		m_gameobjectId = _gameobjectId;
+		m_componentId = _componentId;
+		m_scene = &_scene;
+		if (m_gameobjectId != 0)
+		{
+			_scene.GetInstanciator().RegisterUnresolvedComponentPtr( *this );
+		}
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
+	ComponentPtrBase& ComponentPtrBase::operator=( Component* _resource )
+	{
+		if (_resource == GetResource()) { return  *this; }
+
+		if (GetResource() != nullptr)
+		{
+			assert( m_scene != nullptr );
+			m_scene->GetInstanciator().UnRegisterComponentPtr( *this );
+		}
+
+		if (_resource != nullptr)
+		{
+			m_scene = &_resource->GetScene();
+			m_scene->GetInstanciator().RegisterComponentPtr( *this );
+		}
+		else
+		{
+			m_scene = nullptr;
+		}
+
+		SetResource( _resource );
+
+		return *this;
+	}
+}
 
 namespace ImGui
 {
-	bool FanComponent( const char* _label, const uint32_t _typeID, fan::ComponentIDPtr* _ptr )
+	//================================================================================================================================
+	//================================================================================================================================
+	bool FanComponent( const char* _label, const uint32_t _typeID, fan::ComponentPtrBase& _ptr )
 	{
 		bool returnValue = false;
 
-		fan::Component* component = **_ptr;
-		const std::string name = component != nullptr ? ( ( std::string( component->GetName() ) + ": " ) + component->GetGameobject().GetName() ) : "null";
+		fan::Component* component = *_ptr;
+		const std::string name = component != nullptr ? ((std::string( component->GetName() ) + ": ") + component->GetGameobject().GetName()) : "null";
 		const fan::Component* componentSample = fan::TypeInfo::Get().GetInstance<fan::Component>( _typeID );
 
 		// icon & set from selection
-		if ( ImGui::ButtonIcon( componentSample->GetIcon(), { 16,16 } ) )
+		if (ImGui::ButtonIcon( componentSample->GetIcon(), { 16,16 } ))
 		{
 			returnValue = true;
 		}
@@ -31,16 +85,16 @@ namespace ImGui
 		// dragndrop
 		ImGui::FanBeginDragDropSourceComponent( component );
 		fan::Component* componentDrop = ImGui::FanBeginDragDropTargetComponent( _typeID );
-		if ( componentDrop )
+		if (componentDrop)
 		{
-			_ptr->SetResource( componentDrop );
+			_ptr = componentDrop;
 			returnValue = true;
 		}
 
 		// Right click = clear
-		if ( ImGui::IsItemClicked( 1 ) )
+		if (ImGui::IsItemClicked( 1 ))
 		{
-			_ptr->SetResource( nullptr );
+			_ptr = nullptr;
 			returnValue = true;
 		}
 

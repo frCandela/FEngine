@@ -25,6 +25,14 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
+	void Serializable::SaveComponentPtr(Json& _json, const char* _name, const ComponentPtrBase& _ptr)
+	{
+		_json[_name]["gameobject_id"] = *_ptr != nullptr ? _ptr->GetGameobject().GetUniqueID() : 0;
+		_json[_name]["component_id"] = *_ptr != nullptr ? _ptr->GetType() : 0;
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
 	void Serializable::SaveTexturePtr( Json& _json, const char* _name, const TexturePtr& _ptr )
 	{
 		_json[ _name ] = *_ptr != nullptr ? _ptr->GetPath() : "";
@@ -46,14 +54,6 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void Serializable::SaveComponentPtr( Json& _json, const char* _name, const ComponentIDPtr& _ptr )
-	{
-		_json[ _name ][ "gameobject_id" ] = *_ptr != nullptr ? _ptr->GetGameobject().GetUniqueID() : 0;
-		_json[ _name ][ "component_id" ] = *_ptr != nullptr ? _ptr->GetType() : 0;
-	}
-
-	//================================================================================================================================
-	//================================================================================================================================
 	// LOAD
 	//================================================================================================================================
 	//================================================================================================================================
@@ -63,6 +63,19 @@ namespace fan
 		if ( token != nullptr )
 		{
 			_outPtr.Init( _scene, (*token)["gameobject_id"]);
+			return true;
+		}
+		return false;
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
+	bool Serializable::LoadComponentPtr(const Json& _json, Scene& _scene, const char* _name, ComponentPtrBase& _outPtr)
+	{
+		const Json* token = FindToken(_json, _name);
+		if (token != nullptr)
+		{
+			_outPtr.Init( _scene, (*token)["gameobject_id"], (*token)["component_id"]);				
 			return true;
 		}
 		return false;
@@ -107,19 +120,6 @@ namespace fan
 		{
 			_outPtr.Init(*token);
 			_outPtr.Resolve();
-			return true;
-		}
-		return false;
-	}
-
-	//================================================================================================================================
-	//================================================================================================================================
-	bool Serializable::LoadComponentPtr( const Json& _json, const char* _name, ComponentIDPtr& _outPtr )
-	{
-		const Json* token = FindToken( _json, _name );
-		if ( token != nullptr )
-		{
-			//_outPtr.Init(IDPtrData((*token)["gameobject_id"], (*token)["component_id"]));@tmp
 			return true;
 		}
 		return false;

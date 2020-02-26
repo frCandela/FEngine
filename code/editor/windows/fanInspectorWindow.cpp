@@ -60,6 +60,9 @@ namespace fan
 					ImGui::Text( component->GetName() );
 					ImGui::FanBeginDragDropSourceComponent( component, ImGuiDragDropFlags_SourceAllowNullID );
 
+					ImGui::SameLine();
+					ImGui::Text( "  (ref: %d) ", component->GetRefCount() );
+
 					if ( component->IsRemovable() )
 					{
 						std::stringstream ss;
