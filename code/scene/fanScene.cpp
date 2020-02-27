@@ -73,10 +73,6 @@ namespace fan
 	//================================================================================================================================
 	void Scene::DeleteGameobject( Gameobject* _gameobject )
 	{
-		if ( _gameobject->IsReferenced() )
-		{
-			m_instantiate->UnregisterPointersForGameobject( _gameobject );
-		}
 		m_entitiesToDelete.push_back( _gameobject );
 	}
 

@@ -22,7 +22,6 @@ namespace fan
 		inline Gameobject& GetGameobject() const { return *m_gameobject; }
 		inline Scene& GetScene() const { return m_gameobject->GetScene(); }
 
-		bool IsBeingDeleted() const { return m_isBeingDeleted; }
 		bool IsRemovable() const { return m_isRemovable; }
 		void SetRemovable( const bool _isRemovable ) { m_isRemovable = _isRemovable; }
 
@@ -37,7 +36,7 @@ namespace fan
 	protected:
 		// Friend class gameobject is the factory of components
 		Component();
-		virtual ~Component() {}
+		virtual ~Component();
 		virtual void OnAttach();
 		virtual void OnDetach();
 
@@ -47,7 +46,6 @@ namespace fan
 		bool Load( const Json& _json ) override;
 
 	private:
-		bool m_isBeingDeleted : 1;
 		bool m_isRemovable : 1;
 	};
 }

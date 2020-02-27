@@ -8,6 +8,7 @@
 namespace fan
 {
 	class Gameobject;
+	class Component;
 
 	class Scene;
 	class Prefab;
@@ -35,6 +36,7 @@ namespace fan
 		void ResolveComponentPtr( const uint64_t _idOffset );
 
 		void UnregisterPointersForGameobject(const Gameobject* _gameobject);
+		void UnregisterPointersForComponent( const Component* _component );
 
 		void Clear();
 

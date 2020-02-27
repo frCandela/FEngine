@@ -2,6 +2,7 @@
 #include "scene/components/fanComponent.hpp"
 #include "scene/components/fanMeshRenderer.hpp"
 #include "scene/components/fanTransform.hpp"
+#include "scene/fanSceneInstantiate.hpp"
 #include "scene/ecs/fanECSManager.hpp"
 #include "render/fanMesh.hpp"
 #include "core/fanSignal.hpp"
@@ -44,9 +45,16 @@ namespace fan
 	}
 
 	//================================================================================================================================
+	// Removes gameobject pointers, component & clears ecs component
 	//================================================================================================================================
 	Gameobject::~Gameobject()
 	{
+		// Removes references
+		if( IsReferenced() )
+		{
+			m_scene->GetInstanciator().UnregisterPointersForGameobject( this );
+		}
+
 		// Delete components
 		for ( int componentIndex = 0; componentIndex < m_components.size(); componentIndex++ )
 		{
@@ -90,7 +98,6 @@ namespace fan
 			if ( m_components[ componentIndex ] == component )
 			{
 				// Deletes it
-				m_components[ componentIndex ]->m_isBeingDeleted = true;
 				m_components[ componentIndex ]->OnDetach();
 				m_components.erase( m_components.begin() + componentIndex );
 				delete component;

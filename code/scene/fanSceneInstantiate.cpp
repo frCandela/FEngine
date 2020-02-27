@@ -170,7 +170,7 @@ namespace fan
 	//================================================================================================================================
 	void SceneInstantiate::UnregisterPointersForGameobject( const Gameobject* _gameobject )
 	{
-		// Find incriminated pointers
+		// Find pointers
 		std::vector< GameobjectPtr* > pointers;
 		for ( GameobjectPtr * ptr : m_registeredGameobjectPtr )
 		{
@@ -182,6 +182,27 @@ namespace fan
 
 		// unregisters all
 		for (GameobjectPtr * ptr : pointers)
+		{
+			*ptr = nullptr;
+		}
+	}
+
+	//================================================================================================================================
+	// Unregisters all component pointers referencing a specific _component
+	//================================================================================================================================
+	void SceneInstantiate::UnregisterPointersForComponent( const Component* _component ) {
+		// Find  pointers
+		std::vector< ComponentPtrBase* > pointers;
+		for (ComponentPtrBase* ptr : m_registeredComponentPtr)
+		{
+			if (**ptr == _component)
+			{
+				pointers.push_back( ptr );
+			}
+		}
+
+		// unregisters all
+		for (ComponentPtrBase* ptr : pointers)
 		{
 			*ptr = nullptr;
 		}
