@@ -23,7 +23,7 @@ namespace fan
 		float GetOrthoSize() const { return m_orthoSize; };
 		float GetNearDistance() const { return m_nearDistance; };
 		float GetFarDistance() const { return m_farDistance; };
-		float GetAspectRation()const { return m_aspectRatio; }
+		float GetAspectRatio()const { return m_aspectRatio; }
 		Type  GetProjectionType() const { return m_type; }
 
 		void SetFov( float _fov );

@@ -33,7 +33,7 @@ namespace fan
 		bool Save( Json& _json ) const override;
 
 	private:
-		Camera* m_camera;
+		ComponentPtr < Camera >		 m_camera;
 		ComponentPtr<PlayersManager> m_playersManager;
 
 		float		m_heightFromTarget = 30.f;

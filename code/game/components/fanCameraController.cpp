@@ -9,14 +9,14 @@ namespace fan
 {
 	REGISTER_TYPE_INFO( CameraController, TypeInfo::Flags::EDITOR_COMPONENT, "game/" )
 
-		//================================================================================================================================
-		//================================================================================================================================
-		void CameraController::Start()
+	//================================================================================================================================
+	//================================================================================================================================
+	void CameraController::Start()
 	{
-		REQUIRE_COMPONENT( Camera, m_camera )
-			REQUIRE_TRUE( *m_playersManager != nullptr, "CameraController: missing reference to the PlayersManager" )
+		REQUIRE_TRUE( m_camera.IsValid(), "CameraController missing main camera reference" );
+		REQUIRE_TRUE( *m_playersManager != nullptr, "CameraController: missing reference to the PlayersManager" )
 
-			m_gameobject->GetScene().SetMainCamera( m_camera );
+		m_gameobject->GetScene().SetMainCamera( *m_camera );
 	}
 
 	//================================================================================================================================
@@ -56,7 +56,7 @@ namespace fan
 			}
 			else
 			{
-				const float aspectRatio = m_camera->GetAspectRation();
+				const float aspectRatio = m_camera->GetAspectRatio();
 				const float requiredSizeX = 0.5f * ( 1.f + m_marginRatio[ 0 ] ) * ( high[ 0 ] - low[ 0 ] ) / aspectRatio;
 				const float requiredSizeZ = ( 1.f + m_marginRatio[ 1 ] ) * ( high[ 2 ] - low[ 2 ] ) / aspectRatio;
 
@@ -81,6 +81,7 @@ namespace fan
 		ImGui::PushItemWidth( 0.6f * ImGui::GetWindowWidth() );
 		{
 			ImGui::FanComponent( "players manager", m_playersManager );
+			ImGui::FanComponent( "camera", m_camera );
 			ImGui::DragFloat( "height from target", &m_heightFromTarget, 0.25f, 0.5f, 30.f );
 			ImGui::DragFloat2( "margin ratio", &m_marginRatio[0], 0.1f, 0.f, 10.f );
 			ImGui::DragFloat( "minSize", &m_minOrthoSize, 0.1f, 0.f, 100.f );
@@ -104,6 +105,7 @@ namespace fan
 		Serializable::LoadFloat( _json, "min_size", m_minOrthoSize );
 		Serializable::LoadFloat( _json, "height_from_target", m_heightFromTarget );
 		Serializable::LoadComponentPtr( _json, m_gameobject->GetScene(), "players_manager", m_playersManager );
+		Serializable::LoadComponentPtr( _json, m_gameobject->GetScene(), "camera", m_camera );
 
 		return true;
 	}
@@ -118,6 +120,7 @@ namespace fan
 		Serializable::SaveFloat( _json, "min_size", m_minOrthoSize );
 		Serializable::SaveFloat( _json, "height_from_target", m_heightFromTarget );
 		Serializable::SaveComponentPtr( _json, "players_manager", m_playersManager );
+		Serializable::SaveComponentPtr( _json,"camera", m_camera );
 
 		return true;
 	}
