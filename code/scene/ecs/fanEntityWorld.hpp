@@ -12,6 +12,7 @@ namespace fan
 {
 	class ComponentsCollection;
 	class EntityWorld;
+	struct Entity;
 
 	static constexpr uint32_t signatureLength = 32;
 	using Signature = std::bitset<signatureLength>;
@@ -19,6 +20,7 @@ namespace fan
 	using EntityHandle = uint64_t;
 	using EntityID = uint32_t;
 	using ComponentID = uint8_t;
+	using TagID = ComponentID;
 	using SingletonComponentID = int;
 	using ChunckIndex = uint8_t;
 	using ComponentIndex = uint16_t;
@@ -29,11 +31,30 @@ namespace fan
 	static ComponentID s_typeID;			\
 	static const char* s_typeName;			\
 
+#define REGISTER_COMPONENT( _componentType, _name)	\
+	ComponentID _componentType::s_typeID = 0;		\
+	const char* _componentType::s_typeName = _name;	\
+
 #define DECLARE_SINGLETON_COMPONENT()		\
 	private:								\
 	friend class EntityWorld;				\
 	static SingletonComponentID s_typeID;	\
 	static const char* s_typeName;			\
+
+#define REGISTER_SINGLETON_COMPONENT( _componentType, _name)	\
+	SingletonComponentID _componentType::s_typeID = -1;			\
+	const char* _componentType::s_typeName = _name;				\
+
+#define DECLARE_TAG()				\
+	private:						\
+	friend class EntityWorld;		\
+	friend struct Entity;			\
+	static TagID s_typeID;			\
+	static const char* s_typeName;	\
+
+#define REGISTER_TAG( _componentType, _name)			\
+	TagID _componentType::s_typeID;						\
+	const char* _componentType::s_typeName = _name;		\
 
 	//==============================================================================================================================================================
 	// typeID is a unique id that also correspond to the index of the ComponentsCollection in the Entity world
@@ -52,9 +73,8 @@ namespace fan
 	static constexpr size_t sizeComponent = sizeof( ecComponent );
 	static_assert( sizeComponent == 4 );
 
-	//==============================================================================================================================================================
-	//==============================================================================================================================================================
 	struct SingletonComponent {};
+	struct Tag {};
 
 	//==============================================================================================================================================================
 	// id is the index of the entity in the entity array
@@ -83,12 +103,17 @@ namespace fan
 			return *(_componentType*)( 0 );
 		}
 
+		template< typename _tagType >
+		bool HasTag() const  
+		{ 
+			static_assert( std::is_base_of< Tag, _tagType>::value );
+			return signature[_tagType::s_typeID] == 1;
+		}
 		//================================
 		template< typename _componentType >
 		bool HasComponent() const { return signature[_componentType::s_typeID] == 1; }
-
 		void Kill() { signature[ecAliveBit] = 0; }
-		bool IsAlive() { return  signature[ecAliveBit] == 1; }
+		bool IsAlive() const { return  signature[ecAliveBit] == 1; }
 	};
 	static constexpr size_t sizeEntity = sizeof( Entity );
 	static_assert( sizeEntity == 128 );
@@ -122,6 +147,11 @@ namespace fan
 	{
 		DECLARE_SINGLETON_COMPONENT()
 	};
+
+	//==============================================================================================================================================================
+	//==============================================================================================================================================================
+	struct tag_editorOnly	: Tag { DECLARE_TAG()	};
+	struct tag_alwaysUpdate : Tag { DECLARE_TAG()	};	// Updates even when the scene is not playing
 
 	//==============================================================================================================================================================
 	//==============================================================================================================================================================
@@ -236,12 +266,19 @@ namespace fan
 	public:
 		EntityWorld()
 		{
+			AddSingletonComponentType<sc_sunLight>();
+
 			// Changing this order will invalidate all the save files
 			AddComponentType<PositionComponent>();
 			AddComponentType<ColorComponent>();
-			assert( m_components.size() < 1 << ( 8 * sizeof( ComponentID ) ) );
+			assert( m_components.size() < 1 << ( 8 * sizeof( ComponentID ) ) );			
 
-			AddSingletonComponentType<sc_sunLight>();
+			m_nextTagID = ( TagID)m_components.size();
+
+			AddTagType<tag_alwaysUpdate>();
+			AddTagType<tag_editorOnly>();
+
+			assert( m_nextTagID < 1 << ( 8 * sizeof( ComponentID ) ) );
 		}
 
 		//================================
@@ -284,13 +321,21 @@ namespace fan
 		}
 
 		//================================
+		template< typename _tagType >
+		void AddTag( EntityID _entityID  )
+		{
+			static_assert( std::is_base_of< Tag, _tagType>::value );
+			Entity& entity = GetEntity( _entityID );
+			entity.signature[_tagType::s_typeID] = 1;
+		}
+
+		//================================
 		template< typename _componentType >
 		_componentType& GetSingletonComponent()
 		{
 			static_assert( std::is_base_of< SingletonComponent, _componentType>::value );
 			return  * static_cast<_componentType*>(m_singletonComponents[_componentType::s_typeID]);
 		}
-
 		//================================
 		EntityID CreateEntity()
 		{
@@ -402,6 +447,16 @@ namespace fan
 			m_components.push_back( chunck );
 		}
 
+		template< typename _tagType >
+		void AddTagType()
+		{
+			static_assert( std::is_base_of< Tag, _tagType>::value );
+			if( _tagType::s_typeID == 0 )
+			{				
+				_tagType::s_typeID = m_nextTagID++;
+			}
+		}
+
 		template< typename _componentType >
 		void AddSingletonComponentType()
 		{
@@ -418,5 +473,6 @@ namespace fan
 		std::vector< ComponentsCollection > m_components;
 		std::vector< SingletonComponent* > m_singletonComponents;
 		EntityHandle m_nextHandle = 1; // 0 is a null handle
+		TagID m_nextTagID = 0;
 	};
 }

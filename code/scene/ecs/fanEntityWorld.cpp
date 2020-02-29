@@ -2,12 +2,11 @@
 
 namespace fan
 {
-	ComponentID PositionComponent::s_typeID = 0;
-	ComponentID ColorComponent::s_typeID = 0;
+	REGISTER_COMPONENT( PositionComponent, "position" );
+	REGISTER_COMPONENT( ColorComponent, "color" );
 
-	const char* PositionComponent::s_typeName = "Position";
-	const char* ColorComponent::s_typeName = "Color";
+	REGISTER_SINGLETON_COMPONENT( sc_sunLight, "sunlight" );
 
-	SingletonComponentID sc_sunLight::s_typeID = -1;
-	const char* sc_sunLight::s_typeName = "sunlight";
+	REGISTER_TAG( tag_editorOnly, "editor_only" );
+	REGISTER_TAG( tag_alwaysUpdate, "always_update" );		
 }
