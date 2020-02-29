@@ -9,13 +9,15 @@ public:
 
 	LPPMain()
 	{
-		livePP = lpp::lppLoadAndRegister(L"deps/LivePP/", "AGroupName");
-		lpp::lppEnableAllCallingModulesSync(livePP);		
-		engine.onLPPSynch.Connect(&LPPMain::OnSynch, this);
-
+#ifndef NDEBUG
+		livePP = lpp::lppLoadAndRegister( L"deps/LivePP/", "AGroupName" );
+		lpp::lppEnableAllCallingModulesSync( livePP );
+		engine.onLPPSynch.Connect( &LPPMain::OnSynch, this );
 		engine.Run();
-
-		::FreeLibrary(livePP);
+		::FreeLibrary( livePP );
+#else
+		engine.Run();
+#endif // !NDEBUG
 	}
 
 	void OnSynch() {
