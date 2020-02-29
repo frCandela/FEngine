@@ -56,6 +56,8 @@
 #include "scene/fanPrefabManager.hpp"
 #include "game/components/fanCameraController.hpp"
 
+#include "scene/ecs/fanEntityWorld.hpp"
+
 // @hack for generating lazy typeinfo on non referenced components. Find a compiler flag for that ?
 #include "game/components/fanSunLight.hpp"
 #include "game/components/fanSolarEruption.hpp"
@@ -404,6 +406,102 @@ namespace fan
 				RendererDebug::Get().DebugLine( m_editorGrid.offset + btVector3( coord * size, 0.f, -count * size ), m_editorGrid.offset + btVector3( coord * size, 0.f, count * size ), m_editorGrid.color );
 			}
 		}
+
+
+		if( ImGui::Begin( "entityWorld" ) )
+		{
+			EntityWorld& world = m_serverScene->GetEntityWorld();
+
+			static bool createHandle = false;
+			static bool useColor = true;
+			static bool usePosition = true;
+			static int num = 1;
+			
+			ImGui::Checkbox( "create handle", &createHandle );
+			ImGui::Checkbox( "position", &usePosition );
+			ImGui::Checkbox( "color", &useColor );
+			ImGui::DragInt( "num", &num, 1, 1, 100000 );
+
+			if( ImGui::Button( "Sort" ) )
+			{
+				world.SortEntities();
+			}ImGui::SameLine();
+
+			if( ImGui::Button( "RemoveDeadEntities" ) )
+			{
+				world.RemoveDeadEntities();
+			}ImGui::SameLine();
+
+			//============================
+			if( ImGui::Button( "Create" ) )
+			{
+				for( int i = 0; i < num; i++ )
+				{
+					EntityID id = world.CreateEntity();
+					if( useColor ) world.AddComponent<ColorComponent>( id );
+					if( usePosition ) world.AddComponent<PositionComponent>( id );
+					if( createHandle ) { world.GetHandle( id ); }
+				}
+			}ImGui::SameLine();
+
+			if( ImGui::Button( "Delete" ) )
+			{
+				for( int i = 0; i < num; i++ )
+				{
+					world.DeleteEntity( (EntityID)world.m_entities.size() - i - 1 );
+				}
+			}
+
+			//============================	
+			if( ImGui::CollapsingHeader( "components" ) )
+			{
+				for( int componentIndex = 0; componentIndex < world.m_components.size(); componentIndex++ )
+				{					
+					ComponentsCollection& collection = world.m_components[componentIndex];
+					ImGui::Text( "%s - count: %d - size: %d", collection.m_name.c_str(), collection.m_componentCount, collection.m_componentSize );
+					ImGui::Indent();
+					for( int chunckIndex = 0; chunckIndex < collection.m_chunks.size(); chunckIndex++ )
+					{
+						ComponentsCollection::Chunck& chunck = collection.m_chunks[chunckIndex];
+						ImGui::Text( "num: %d, recycle: %d", chunck.count, chunck.recycleList.size() );
+					}
+					ImGui::Unindent();
+				}
+			}
+
+			//============================	
+			if( ImGui::CollapsingHeader( "handles" ) )
+			{
+				for( auto handle : world.m_handles )
+				{
+					ImGui::Text( "%d -> %d", handle.first, handle.second );
+				}
+			}
+
+			//============================
+			std::string name = "entities " + std::to_string( world.m_entities.size() );
+			if( ImGui::CollapsingHeader( name.c_str() ) )
+			{
+				for (int entityIndex = 0; entityIndex < world.m_entities.size() ; entityIndex++)
+				{
+					Entity& entity = world.m_entities[entityIndex];
+					ImGui::PushID( entityIndex );
+					if( ImGui::Button( "X" ) )
+					{
+						entity.Kill();
+					} ImGui::PopID();
+					ImGui::SameLine();
+					std::stringstream ss;
+					ss << entityIndex << "\t: alive: " << entity.IsAlive() << " ";
+					
+					for (int bitIndex = 0; bitIndex < signatureLength ; bitIndex++)
+					{
+						ss << entity.signature[bitIndex];
+					}
+					ImGui::Text( ss.str().c_str() );
+				}
+			}
+		} ImGui::End();
 	}
 
 	//================================================================================================================================

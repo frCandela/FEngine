@@ -65,7 +65,7 @@ namespace fan
 		for ( int subdivisionIndex = 0; subdivisionIndex < _numSubdivisions; subdivisionIndex++ )
 		{
 			nextIcosahedron.clear();
-			for ( int triangleIndex = 0; triangleIndex < currentIcosahedron.size() / 3; triangleIndex++ )
+			for ( int triangleIndex = 0; triangleIndex < (int)currentIcosahedron.size() / 3; triangleIndex++ )
 			{
 				const btVector3 vertex0 = currentIcosahedron[ 3 * triangleIndex + 0 ];
 				const btVector3 vertex1 = currentIcosahedron[ 3 * triangleIndex + 1 ];

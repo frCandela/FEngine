@@ -12,6 +12,7 @@ namespace fan
 	class Actor;
 	class EcsManager;
 	class PhysicsManager;
+	class EntityWorld;
 	class SceneInstantiate;
 	class Prefab;
 
@@ -74,6 +75,7 @@ namespace fan
 		inline std::string		 GetPath() const { return m_path; }
 		inline SceneInstantiate& GetInstanciator() const { return *m_instantiate;  }
 		inline EcsManager&		 GetEcsManager() const { return *m_ecsManager; }
+		inline EntityWorld&		 GetEntityWorld() const { return *m_world; }
 		inline PhysicsManager&	 GetPhysicsManager() const { return *m_physicsManager; }
 		State					 GetState() const { return m_state; };
 		Camera&					 GetMainCamera() { return *m_mainCamera; }
@@ -110,6 +112,7 @@ namespace fan
 		SceneInstantiate* m_instantiate = nullptr;
 		EcsManager* m_ecsManager = nullptr;
 		PhysicsManager* m_physicsManager = nullptr;
+		EntityWorld* m_world = nullptr;
 
 		// References
 		Gameobject* m_root;

@@ -1,18 +1,20 @@
 #include "scene/fanScene.hpp"
-#include "scene/fanGameobject.hpp"
+
+#include "scene/components/fanDirectionalLight.hpp"
+#include "scene/components/fanMeshRenderer.hpp"
+#include "scene/components/fanPointLight.hpp"
 #include "scene/components/fanComponent.hpp"
 #include "scene/components/fanTransform.hpp"
 #include "scene/components/fanCamera.hpp"
-#include "scene/components/fanMeshRenderer.hpp"
-#include "scene/components/fanPointLight.hpp"
-#include "scene/components/fanDirectionalLight.hpp"
-#include "scene/actors/fanActor.hpp"
 #include "scene/fanSceneResourcePtr.hpp"
-#include "scene/fanComponentPtr.hpp"
 #include "scene/fanSceneInstantiate.hpp"
+#include "scene/ecs/fanEntityWorld.hpp"
 #include "scene/fanPhysicsManager.hpp"
-#include "core/fanSignal.hpp"
+#include "scene/actors/fanActor.hpp"
+#include "scene/fanComponentPtr.hpp"
+#include "scene/fanGameobject.hpp"
 #include "core/time/fanScopedTimer.hpp"
+#include "core/fanSignal.hpp"
 #include "core/time/fanProfiler.hpp"
 
 namespace fan
@@ -25,6 +27,7 @@ namespace fan
 		, m_root( nullptr )
 		, m_ecsManager( new EcsManager() )
 		, m_physicsManager( new PhysicsManager( btVector3::Zero() ) )
+		, m_world( new EntityWorld() )
 		, m_instantiate( new SceneInstantiate( *this ) )
 	{}
 
@@ -209,14 +212,13 @@ namespace fan
 		m_ecsManager->LateUpdate( delta );
 		EndFrame();
 
-		// 		ImGui::Begin( "testoss" );
-		// 		{
-		// 			ImGui::Text( "m_actors         %d", m_actors.size());
-		// 			ImGui::Text( "m_startingActors %d", m_startingActors.size() );
-		// 			ImGui::Text( "m_activeActors   %d", m_activeActors.size() );
-		// 			ImGui::Text( "m_pausedActors   %d", m_pausedActors.size() );
-		// 		}ImGui::End();
-
+// 		ImGui::Begin( "testoss" );
+// 		{
+// 			ImGui::Text( "m_actors         %d", m_actors.size());
+// 			ImGui::Text( "m_startingActors %d", m_startingActors.size() );
+// 			ImGui::Text( "m_activeActors   %d", m_activeActors.size() );
+// 			ImGui::Text( "m_pausedActors   %d", m_pausedActors.size() );
+// 		}ImGui::End();
 	}
 
 	//================================================================================================================================

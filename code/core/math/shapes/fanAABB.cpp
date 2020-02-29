@@ -21,7 +21,7 @@ namespace fan
 		glm::vec3 high( std::numeric_limits<float>::lowest(), std::numeric_limits<float>::lowest(), std::numeric_limits<float>::lowest() );
 		glm::vec3 low( std::numeric_limits<float>::max(), std::numeric_limits<float>::max(), std::numeric_limits<float>::max() );
 
-		for ( int index = 0; index < _pointCloud.size(); index++ )
+		for ( int index = 0; index < (int)_pointCloud.size(); index++ )
 		{
 			const glm::vec4 vertex = _modelMatrix * glm::vec4( _pointCloud[ index ][ 0 ], _pointCloud[ index ][ 1 ], _pointCloud[ index ][ 2 ], 1.f );
 			if ( vertex.x < low.x ) { low.x = vertex.x; }

@@ -50,7 +50,7 @@ namespace fan
 		// Convert data to quickhull vectices
 		std::vector<quickhull::Vector3<float>> pointCloud;
 		pointCloud.reserve( _pointCloud.size() );
-		for ( int point = 0; point < _pointCloud.size(); point++ )
+		for ( int point = 0; point < (int)_pointCloud.size(); point++ )
 		{
 			const btVector3& vertex = _pointCloud[ point ];
 			pointCloud.push_back( { vertex[ 0 ],vertex[ 1 ],vertex[ 2 ] } );
@@ -65,7 +65,7 @@ namespace fan
 		const std::vector<size_t>& indexBuffer = hull.getIndexBuffer();
 		m_indices.reserve( indexBuffer.size() );
 		assert( indexBuffer.size() % 3 == 0 );
-		for ( int indexIndex = 0; indexIndex < indexBuffer.size() / 3; indexIndex++ )
+		for ( int indexIndex = 0; indexIndex < (int)indexBuffer.size() / 3; indexIndex++ )
 		{
 			m_indices.push_back( ( uint32_t ) indexBuffer[ 3 * indexIndex + 0 ] );
 			m_indices.push_back( ( uint32_t ) indexBuffer[ 3 * indexIndex + 2 ] );
@@ -75,7 +75,7 @@ namespace fan
 		// Copy vertices
 		const quickhull::VertexDataSource<float>& vertexBuffer = hull.getVertexBuffer();
 		m_vertices.reserve( vertexBuffer.size() );
-		for ( int vertexIndex = 0; vertexIndex < vertexBuffer.size(); vertexIndex++ )
+		for ( int vertexIndex = 0; vertexIndex < (int)vertexBuffer.size(); vertexIndex++ )
 		{
 			quickhull::Vector3<float> vertex = vertexBuffer[ vertexIndex ];
 			m_vertices.push_back( btVector3( vertex.x, vertex.y, vertex.z ) );
@@ -97,7 +97,7 @@ namespace fan
 	{
 		btVector3 intersection;
 		float closestDistance = std::numeric_limits<float>::max();
-		for ( int triIndex = 0; triIndex < m_indices.size() / 3; triIndex++ )
+		for ( int triIndex = 0; triIndex < (int)m_indices.size() / 3; triIndex++ )
 		{
 			const btVector3 v0 = m_vertices[ m_indices[ 3 * triIndex + 0 ] ];
 			const btVector3 v1 = m_vertices[ m_indices[ 3 * triIndex + 1 ] ];
