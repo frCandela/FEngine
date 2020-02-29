@@ -65,7 +65,7 @@ namespace fan
 	//================================================================================================================================
 	void ForwardPipeline::CreateDescriptors( const size_t _numSwapchainImages )
 	{
-
+		Debug::Log() << "Forward pipeline : create descriptors" << Debug::Endl();
 		m_sceneDescriptor = new Descriptor( m_device, _numSwapchainImages );
 		m_sceneDescriptor->SetUniformBinding( VK_SHADER_STAGE_VERTEX_BIT, sizeof( VertUniforms ) );
 		m_sceneDescriptor->SetDynamicUniformBinding( VK_SHADER_STAGE_VERTEX_BIT, m_dynamicUniformsVert.Size(), m_dynamicUniformsVert.Alignment() );
@@ -85,8 +85,6 @@ namespace fan
 		m_sceneDescriptor->SetDynamicUniformBinding( VK_SHADER_STAGE_FRAGMENT_BIT, m_dynamicUniformsMaterial.Size(), m_dynamicUniformsMaterial.Alignment(), 3 );
 		m_sceneDescriptor->Update();
 	}
-
-
 
 	//================================================================================================================================
 	//================================================================================================================================

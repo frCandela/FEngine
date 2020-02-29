@@ -28,6 +28,8 @@ namespace fan
 	//================================================================================================================================
 	void DebugPipeline::CreateDescriptors( const size_t _numSwapchainImages )
 	{
+		Debug::Log( "Debug pipeline : create descriptors" );
+
 		m_descriptor = new Descriptor( m_device, _numSwapchainImages );
 		m_descriptor->SetUniformBinding( VK_SHADER_STAGE_VERTEX_BIT, sizeof( DebugUniforms ) );
 		m_descriptor->Create();

@@ -79,7 +79,7 @@ namespace fan
 		CreateCommandBuffers();
 		RecordAllCommandBuffers();
 
-		const size_t initialSize = 16;
+		const size_t initialSize = 256;
 		m_meshDrawArray.reserve( initialSize );
 		m_forwardPipeline->m_dynamicUniformsVert.Resize( initialSize );
 		m_forwardPipeline->m_dynamicUniformsMaterial.Resize( initialSize );
@@ -160,6 +160,7 @@ namespace fan
 		if ( Texture::s_resourceManager.IsModified() )
 		{
 			WaitIdle();
+			Debug::Log( "reload textures" );
 			CreateTextureDescriptor();
 			Texture::s_resourceManager.SetUnmodified();
 		}
@@ -856,7 +857,7 @@ namespace fan
 	//================================================================================================================================
 	//================================================================================================================================
 	bool Renderer::CreateTextureDescriptor()
-	{
+	{		
 		delete m_imagesDescriptor;
 
 		const std::vector< Texture* >& texture = Texture::s_resourceManager.GetList();

@@ -217,6 +217,8 @@ namespace fan
 		m_clientScene->LoadFrom( "content/scenes/game.scene" );
 		m_serverScene->LoadFrom( "content/scenes/game.scene" );
 
+		Debug::Log( "done initializing" );
+
 		// @hack for generating lazy type info on non referenced components. Find a compiler flag for that ?
 		if ( Time::Get().ElapsedSinceStartup() == -12.01548468f )
 		{

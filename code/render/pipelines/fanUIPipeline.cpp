@@ -81,6 +81,7 @@ namespace fan
 	//================================================================================================================================
 	void UIPipeline::CreateDescriptors( const size_t _numSwapchainImages )
 	{
+		Debug::Log() << "UI pipeline : create descriptors" << Debug::Endl();
 		m_transformDescriptor = new Descriptor( m_device, _numSwapchainImages );
 		m_transformDescriptor->SetDynamicUniformBinding( VK_SHADER_STAGE_VERTEX_BIT, m_dynamicUniformsVert.Size(), m_dynamicUniformsVert.Alignment() );
 		m_transformDescriptor->Create();

@@ -150,7 +150,7 @@ namespace fan
 	void Texture::DeleteGpuData( Device& _device )
 	{
 		vkDeviceWaitIdle( _device.vkDevice );
-		Debug::Highlight( "Renderer idle" );
+		Debug::Highlight( "Renderer idle1" );
 
 		if ( m_deviceMemory != VK_NULL_HANDLE )
 		{

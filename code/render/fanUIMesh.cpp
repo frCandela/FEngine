@@ -87,7 +87,7 @@ namespace fan
 	void UIMesh::DeleteGpuData( Device& _device )
 	{
 		vkDeviceWaitIdle( _device.vkDevice );
-		Debug::Highlight( "Renderer idle" );
+		Debug::Highlight( "Renderer idle4" );
 
 		for ( int bufferIndex = 0; bufferIndex < 3; bufferIndex++ )
 		{

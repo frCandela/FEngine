@@ -53,6 +53,7 @@ namespace fan
 	//================================================================================================================================
 	void ImguiPipeline::Create( VkRenderPass _renderPass, GLFWwindow* _window, VkExtent2D _extent )
 	{
+
 		ImGui::CreateContext();
 
 		ImGui::GetIO().ConfigFlags |= ImGuiConfigFlags_DockingEnable;
@@ -287,10 +288,11 @@ namespace fan
 	//================================================================================================================================
 	void ImguiPipeline::CreateDescriptors()
 	{
+		Debug::Log() << "ImGui pipeline : create descriptors" << Debug::Endl();
 		// Descriptor pool
 		VkDescriptorPoolSize descriptorPoolSize = {};
 		descriptorPoolSize.type = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
-		descriptorPoolSize.descriptorCount = 1;
+		descriptorPoolSize.descriptorCount = 3;
 
 		std::vector<VkDescriptorPoolSize> poolSizes = { descriptorPoolSize };
 

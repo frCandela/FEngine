@@ -75,6 +75,7 @@ namespace fan
 	//================================================================================================================================
 	void PostprocessPipeline::CreateDescriptors( const size_t _numSwapchainImages )
 	{
+		Debug::Log() << "Postprocess pipeline : create descriptors" << Debug::Endl();
 		delete m_descriptorUniforms;
 		m_descriptorUniforms = new Descriptor( m_device, _numSwapchainImages );
 		m_descriptorUniforms->SetUniformBinding( VK_SHADER_STAGE_FRAGMENT_BIT, sizeof( Uniforms ) );

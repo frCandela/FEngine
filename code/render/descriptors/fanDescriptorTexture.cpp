@@ -12,6 +12,7 @@ namespace fan
 		, m_maxTextures( _maxTextures )
 	{
 		m_views.reserve( m_maxTextures );
+		Debug::Log() << "reserve: " << m_maxTextures << Debug::Endl();
 
 		m_descriptorType = ( m_sampler == VK_NULL_HANDLE ? VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE : VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER );
 
@@ -19,7 +20,7 @@ namespace fan
 		{
 			VkDescriptorPoolSize descriptorPoolSize = {};
 			descriptorPoolSize.type = m_descriptorType;
-			descriptorPoolSize.descriptorCount = 1;
+			descriptorPoolSize.descriptorCount = m_maxTextures;
 
 			std::vector<VkDescriptorPoolSize> poolSizes = { descriptorPoolSize };
 			VkDescriptorPoolCreateInfo descriptorPoolInfo = {};
@@ -48,6 +49,7 @@ namespace fan
 
 			vkCreateDescriptorSetLayout( m_device.vkDevice, &descriptorSetLayoutCreateInfo, nullptr, &m_descriptorSetLayout );
 
+			Debug::Log() << "VkDescriptorSetAllocateInfo: " << m_maxTextures << Debug::Endl();
 			// Descriptor set
 			std::vector<VkDescriptorSetLayout>  layouts( m_maxTextures, m_descriptorSetLayout );
 
@@ -59,6 +61,8 @@ namespace fan
 
 			m_descriptorSets.resize( m_maxTextures );
 			vkAllocateDescriptorSets( m_device.vkDevice, &descriptorSetAllocateInfo, m_descriptorSets.data() );
+
+			Debug::Log() << " allocated " << m_maxTextures << Debug::Endl();
 		}
 	}
 

@@ -200,7 +200,7 @@ namespace fan
 	//================================================================================================================================
 	void Mesh::DeleteGpuBuffers( Device& _device ) 
 	{
-		Debug::Highlight( "Renderer idle" );
+		Debug::Highlight( "Renderer idle2" );
 		vkDeviceWaitIdle( _device.vkDevice );
 
 		for ( int bufferIndex = 0; bufferIndex < 3; bufferIndex++ )
