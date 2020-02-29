@@ -14,6 +14,8 @@
 #include <filesystem>
 #include <set> 
 
+#pragma warning( disable : 4018 ) // singed unsingned mismatch ><"
+
 #pragma warning( push )
 #pragma warning( disable : 4201 )
 #pragma warning( disable : 4127 )

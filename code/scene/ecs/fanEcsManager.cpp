@@ -189,7 +189,7 @@ namespace fan
 			return;
 		}
 
-		int64_t reverseIndex = m_entitiesKeys.size() - 1;
+		size_t reverseIndex = m_entitiesKeys.size() - 1;
 		while ( reverseIndex >= 0 )
 		{
 			ecsComponentsKey& key = m_entitiesKeys[ reverseIndex ];
@@ -290,9 +290,9 @@ namespace fan
 	//================================================================================================================================
 	void EcsManager::SortEntities()
 	{
-		const int64_t size = static_cast< int64_t >( m_entitiesKeys.size() );
-		int64_t forwardIndex = 0;
-		int64_t reverseIndex = m_entitiesKeys.size() - 1;
+		const int size = (int)m_entitiesKeys.size();
+		int forwardIndex = 0;
+		int reverseIndex = (int)m_entitiesKeys.size() - 1;
 
 		while ( true )
 		{

@@ -23,7 +23,7 @@ namespace fan
 		, m_sampler( _sampler )
 	{
 		// Calculate required alignment based on minimum device offset alignment
-		size_t minUboAlignment = m_device.GetDeviceProperties().limits.minUniformBufferOffsetAlignment;
+		size_t minUboAlignment = (size_t)m_device.GetDeviceProperties().limits.minUniformBufferOffsetAlignment;
 		size_t dynamicAlignmentVert = sizeof( DynamicUniformsVert );
 		size_t dynamicAlignmentFrag = sizeof( DynamicUniformsMaterial );
 		if ( minUboAlignment > 0 )

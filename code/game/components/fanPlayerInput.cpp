@@ -171,7 +171,7 @@ namespace fan
 	//================================================================================================================================
 	glm::vec2 PlayerInput::GetDirectionAverage()
 	{
-		const uint64_t index = Input::Get().FrameCount() % m_directionBuffer.size();
+		const size_t index = Input::Get().FrameCount() % m_directionBuffer.size();
 		const float x = Input::Get().Manager().GetAxis( "gamejs_x_axis_direction", m_joystickID );
 		const float y = Input::Get().Manager().GetAxis( "gamejs_y_axis_direction", m_joystickID );
 		m_directionBuffer[ index ] = glm::vec2( x, y );

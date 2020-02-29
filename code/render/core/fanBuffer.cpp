@@ -85,7 +85,7 @@ namespace fan
 	{
 		assert( _size <= m_size );
 		vkMapMemory( m_device.vkDevice, m_memory, _offset, _size, 0, &m_mappedData );
-		memcpy( m_mappedData, _data, _size );
+		memcpy( m_mappedData, _data, (size_t)_size );
 		vkUnmapMemory( m_device.vkDevice, m_memory );
 	}
 
