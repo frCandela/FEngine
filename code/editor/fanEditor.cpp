@@ -470,6 +470,12 @@ namespace fan
 			}
 
 			//============================	
+			if( ImGui::CollapsingHeader( "singleton components" ) )
+			{
+				ImGui::Text( "num components: %d", world.m_singletonComponents.size() );
+			}
+
+			//============================	
 			if( ImGui::CollapsingHeader( "handles" ) )
 			{
 				for( auto handle : world.m_handles )

@@ -10,14 +10,30 @@
 
 namespace fan
 {
+	class ComponentsCollection;
+	class EntityWorld;
+
 	static constexpr uint32_t signatureLength = 32;
 	using Signature = std::bitset<signatureLength>;
 	static constexpr uint32_t ecAliveBit = signatureLength - 1;
 	using EntityHandle = uint64_t;
 	using EntityID = uint32_t;
 	using ComponentID = uint8_t;
+	using SingletonComponentID = int;
 	using ChunckIndex = uint8_t;
 	using ComponentIndex = uint16_t;
+
+#define DECLARE_COMPONENT()					\
+	private:								\
+	friend class EntityWorld;				\
+	static ComponentID s_typeID;			\
+	static const char* s_typeName;			\
+
+#define DECLARE_SINGLETON_COMPONENT()		\
+	private:								\
+	friend class EntityWorld;				\
+	static SingletonComponentID s_typeID;	\
+	static const char* s_typeName;			\
 
 	//==============================================================================================================================================================
 	// typeID is a unique id that also correspond to the index of the ComponentsCollection in the Entity world
@@ -26,12 +42,19 @@ namespace fan
 	//==============================================================================================================================================================
 	struct ecComponent
 	{
+	private:
+		friend class ComponentsCollection; 
+		friend class EntityWorld;
 		ComponentID typeID;
 		ChunckIndex chunckIndex;
 		ComponentIndex index;
 	};
 	static constexpr size_t sizeComponent = sizeof( ecComponent );
 	static_assert( sizeComponent == 4 );
+
+	//==============================================================================================================================================================
+	//==============================================================================================================================================================
+	struct SingletonComponent {};
 
 	//==============================================================================================================================================================
 	// id is the index of the entity in the entity array
@@ -73,21 +96,19 @@ namespace fan
 	//==============================================================================================================================================================
 	//==============================================================================================================================================================
 	struct PositionComponent : public ecComponent
-	{
-		static ComponentID s_typeID;
-		static const char* s_typeName;
+	{	
+		DECLARE_COMPONENT()
 		void Init() { x = y = z = 0.f; }
 		float x;
 		float y;
-		float z;
+		float z;		
 	};
 
 	//==============================================================================================================================================================
 	//==============================================================================================================================================================
 	struct ColorComponent : public ecComponent
 	{
-		static ComponentID s_typeID;
-		static const char* s_typeName;
+		DECLARE_COMPONENT()
 		void Init() { r = g = b = a = 0; }
 		char r;
 		char g;
@@ -97,16 +118,16 @@ namespace fan
 
 	//==============================================================================================================================================================
 	//==============================================================================================================================================================
-	struct SingletonComponent
+	struct sc_sunLight : public SingletonComponent
 	{
-	public:
+		DECLARE_SINGLETON_COMPONENT()
 	};
 
 	//==============================================================================================================================================================
 	//==============================================================================================================================================================
-	class System
+	struct System
 	{
-	public:
+		
 	};
 
 	//==============================================================================================================================================================
@@ -215,9 +236,12 @@ namespace fan
 	public:
 		EntityWorld()
 		{
+			// Changing this order will invalidate all the save files
 			AddComponentType<PositionComponent>();
 			AddComponentType<ColorComponent>();
 			assert( m_components.size() < 1 << ( 8 * sizeof( ComponentID ) ) );
+
+			AddSingletonComponentType<sc_sunLight>();
 		}
 
 		//================================
@@ -257,6 +281,14 @@ namespace fan
 				}
 			}
 			assert( false ); // component not found
+		}
+
+		//================================
+		template< typename _componentType >
+		_componentType& GetSingletonComponent()
+		{
+			static_assert( std::is_base_of< SingletonComponent, _componentType>::value );
+			return  * static_cast<_componentType*>(m_singletonComponents[_componentType::s_typeID]);
 		}
 
 		//================================
@@ -356,22 +388,35 @@ namespace fan
 			}
 		}
 
-
-
 	//private:
 		template< typename _componentType >
 		void AddComponentType()
 		{
 			static_assert( std::is_base_of< ecComponent, _componentType>::value );
-			_componentType::s_typeID = (ComponentID)m_components.size();
+			if( _componentType::s_typeID == 0 )
+			{
+				_componentType::s_typeID = (ComponentID)m_components.size();
+			}			
 			ComponentsCollection chunck;
 			chunck.Init<_componentType>( _componentType::s_typeName );
 			m_components.push_back( chunck );
 		}
 
+		template< typename _componentType >
+		void AddSingletonComponentType()
+		{
+			static_assert( std::is_base_of< SingletonComponent, _componentType>::value );
+			if( _componentType::s_typeID == -1 )
+			{
+				_componentType::s_typeID = (SingletonComponentID)m_singletonComponents.size();
+			}			
+			m_singletonComponents.push_back( new _componentType() );
+		}
+
 		std::unordered_map< EntityHandle, EntityID > m_handles;
 		std::vector< Entity > m_entities;
 		std::vector< ComponentsCollection > m_components;
+		std::vector< SingletonComponent* > m_singletonComponents;
 		EntityHandle m_nextHandle = 1; // 0 is a null handle
 	};
 }
