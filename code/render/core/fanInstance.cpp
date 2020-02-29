@@ -25,20 +25,18 @@ namespace fan
 		SetDesiredExtensions( desiredExtensions );
 
 
-	#ifdef NDEBUG
-		const std::vector<const char*> validationLayers = {};
-	#else	
+	#ifndef NDEBUG
 		SetDesiredValidationLayers( {
 			 "VK_LAYER_LUNARG_standard_validation"
-			 //,"VK_LAYER_LUNARG_assistant_layer"
+			 ,"VK_LAYER_LUNARG_assistant_layer"
 			 ,"VK_LAYER_LUNARG_core_validation"
-									/*,"VK_LAYER_KHRONOS_validation"
-									,"VK_LAYER_LUNARG_monitor"
-									,"VK_LAYER_LUNARG_object_tracker"
-									,"VK_LAYER_LUNARG_screenshot"
-									,"VK_LAYER_LUNARG_standard_validation"
-									,"VK_LAYER_LUNARG_parameter_validation"*/
-									} );
+			,"VK_LAYER_KHRONOS_validation"
+			,"VK_LAYER_LUNARG_monitor"
+			,"VK_LAYER_LUNARG_object_tracker"
+			,"VK_LAYER_LUNARG_screenshot"
+			,"VK_LAYER_LUNARG_standard_validation"
+			,"VK_LAYER_LUNARG_parameter_validation"
+			} );
 	#endif
 
 		VkApplicationInfo appInfo;
