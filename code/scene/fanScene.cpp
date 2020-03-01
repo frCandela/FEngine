@@ -169,25 +169,24 @@ namespace fan
 	//================================================================================================================================
 	void Scene::EndFrame()
 	{
-		SCOPED_PROFILE( scene_endFrame )
+		SCOPED_PROFILE( scene_endFrame );
 
-			// Delete components 
-			for ( int componentToDeleteIndex = 0; componentToDeleteIndex < m_componentsToDelete.size(); componentToDeleteIndex++ )
-			{
-				m_componentsToDelete[ componentToDeleteIndex ]->GetGameobject().RemoveComponent( m_componentsToDelete[ componentToDeleteIndex ] );
-			}
-		m_componentsToDelete.clear();
+// 		// Delete components 
+// 		for( int componentToDeleteIndex = 0; componentToDeleteIndex < m_componentsToDelete.size(); componentToDeleteIndex++ )
+// 		{
+// 			m_componentsToDelete[componentToDeleteIndex]->GetGameobject().RemoveComponent( m_componentsToDelete[componentToDeleteIndex] );
+// 		}
+// 		m_componentsToDelete.clear();
+// 
+// 		// Delete entities 
+// 		std::set<Gameobject*> deletedEntitiesSet;
+// 		for( int gameobjectToDeleteIndex = 0; gameobjectToDeleteIndex < m_entitiesToDelete.size(); gameobjectToDeleteIndex++ )
+// 		{
+// 			Gameobject* gameobjectDelete = m_entitiesToDelete[gameobjectToDeleteIndex];
+// 			R_DeleteGameobject( gameobjectDelete, deletedEntitiesSet );
+// 		}
+// 		m_entitiesToDelete.clear();
 
-		// Delete entities 
-		std::set<Gameobject*> deletedEntitiesSet;
-		for ( int gameobjectToDeleteIndex = 0; gameobjectToDeleteIndex < m_entitiesToDelete.size(); gameobjectToDeleteIndex++ )
-		{
-			Gameobject* gameobjectDelete = m_entitiesToDelete[ gameobjectToDeleteIndex ];
-			R_DeleteGameobject( gameobjectDelete, deletedEntitiesSet );
-		}
-		m_entitiesToDelete.clear();
-
-		//m_ecsManager->Refresh();
 		m_world->SortEntities();
 		m_world->RemoveDeadEntities();
 	}

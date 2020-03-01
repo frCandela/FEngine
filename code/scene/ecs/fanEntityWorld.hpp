@@ -7,6 +7,7 @@
 // #include <unordered_map>
 // #include <cassert>
 #include "scene/fanScenePrecompiled.hpp"
+#include "core/fanHash.hpp"
 
 namespace fan
 {
@@ -20,55 +21,46 @@ namespace fan
 	static constexpr uint32_t ecAliveBit = signatureLength - 1;
 	using EntityHandle = uint64_t;
 	using EntityID = uint32_t;
-	using ComponentID = uint8_t;
-	using TagID = ComponentID;
+	using ComponentIndex = uint8_t;
 	using SingletonComponentID = int;
 	using ChunckIndex = uint8_t;
-	using ComponentIndex = uint16_t;
+	using ChunckComponentIndex = uint16_t;
 
 #define DECLARE_COMPONENT()													\
 	private:																\
 	friend class EntityWorld;												\
-	static ComponentID s_typeID;											\
+	static const uint32_t s_typeInfo;										\
 	static const char* s_typeName;											\
-	public:																	\
-	static Signature GetSignature() { return Signature(1) << s_typeID; }	\
 
-#define REGISTER_COMPONENT( _componentType, _name)	\
-	ComponentID _componentType::s_typeID = 0;		\
-	const char* _componentType::s_typeName = _name;	\
+#define REGISTER_COMPONENT( _componentType, _name)				\
+	const uint32_t _componentType::s_typeInfo = SSID(#_name);	\
+	const char* _componentType::s_typeName = _name;				\
 
 #define DECLARE_SINGLETON_COMPONENT()		\
 	private:								\
 	friend class EntityWorld;				\
-	static SingletonComponentID s_typeID;	\
+	static const uint32_t s_typeInfo;		\
 	static const char* s_typeName;			\
 
 #define REGISTER_SINGLETON_COMPONENT( _componentType, _name)	\
-	SingletonComponentID _componentType::s_typeID = -1;			\
+	const uint32_t _componentType::s_typeInfo = SSID(#_name);	\
 	const char* _componentType::s_typeName = _name;				\
 
-#define DECLARE_TAG()														\
-	private:																\
-	friend class EntityWorld;												\
-	friend struct Entity;													\
-	static TagID s_typeID;													\
-	static const char* s_typeName;											\
-	public:																	\
-	static Signature GetSignature() { return Signature(1) << s_typeID; }	\
+#define DECLARE_TAG()													\
+	public:																\
+	static const uint32_t s_typeInfo;									\
+	static const char* s_typeName;										\
 
-#define REGISTER_TAG( _componentType, _name)			\
-	TagID _componentType::s_typeID;						\
-	const char* _componentType::s_typeName = _name;		\
+#define REGISTER_TAG( _componentType, _name)					\
+	const uint32_t _componentType::s_typeInfo = SSID(#_name);	\
+	const char* _componentType::s_typeName = _name;				\
 
 #define DECLARE_SYSTEM()						\
 	private:									\
 	friend class EntityWorld;					\
-	static Signature s_signature;				\
 	static const char* s_typeName;				\
 
 #define REGISTER_SYSTEM( _systemType, _name)							\
-	Signature _systemType::s_signature = Signature(1) << ecAliveBit;	\
 	const char* _systemType::s_typeName = _name;						\
 
 	//==============================================================================================================================================================
@@ -77,7 +69,7 @@ namespace fan
 	//
 	// Component must call the (DECLARE/REGISTER)_COMPONENT macro and implement an Init() method.
 	// It also must be registered in the EntityWorld constructor to be assigned a unique ID
-	// - typeID is a unique id that also correspond to the index of the ComponentsCollection in the Entity world
+	// - localTypeID is a unique id that also correspond to the index of the ComponentsCollection in its specific Entity world
 	// - chunckIndex is the index of the Chunck in the ComponentsCollection
 	// - index is the index of the component inside the chunck
 	//==============================================================================================================================================================
@@ -86,9 +78,12 @@ namespace fan
 	private:
 		friend class ComponentsCollection; 
 		friend class EntityWorld;
-		ComponentID typeID;
-		ChunckIndex chunckIndex;
-		ComponentIndex index;
+		ComponentIndex		 componentIndex;
+		ChunckIndex			 chunckIndex;
+		ChunckComponentIndex chunckComponentIndex;
+
+	public:
+		Signature GetSignature() const { return Signature( 1 ) << componentIndex; }
 	};
 	static constexpr size_t sizeComponent = sizeof( ecComponent );
 	static_assert( sizeComponent == 4 );
@@ -190,6 +185,7 @@ namespace fan
 	{
 		DECLARE_SINGLETON_COMPONENT()
 	public:
+		int test = 0;
 	};
 
 	//==============================================================================================================================================================
@@ -204,17 +200,8 @@ namespace fan
 		DECLARE_SYSTEM()
 	public:
 
-		static void Init()
-		{
-			s_signature = 
-				  tag_editorOnly::GetSignature() 
-				| ColorComponent::GetSignature();
-		}
-
-		static void Run( EntityWorld& _world, const std::vector<Entity*>& _entities, const float _delta )
-		{
-
-		}
+		static Signature GetSignature( const EntityWorld& _world );
+		static void Run( EntityWorld& _world, const std::vector<Entity*>& _entities, const float _delta );
 	};
 
 	//==============================================================================================================================================================
@@ -236,7 +223,7 @@ namespace fan
 
 		//================================
 		// Returns the component _componentIndex of chunck _chunckIndex
-		void* At( const ChunckIndex _chunckIndex, const ComponentIndex _componentIndex )
+		void* At( const ChunckIndex _chunckIndex, const ChunckComponentIndex _componentIndex )
 		{
 			uint8_t* data = static_cast<uint8_t*>( m_chunks[_chunckIndex].data );
 			uint8_t* component = data + m_componentSize * (uint32_t)_componentIndex;
@@ -245,7 +232,7 @@ namespace fan
 
 		//================================
 		// Deletes a component
-		void RemoveComponent( const ChunckIndex _chunckIndex, const ComponentIndex _index )
+		void RemoveComponent( const ChunckIndex _chunckIndex, const ChunckComponentIndex _index )
 		{
 			m_chunks[_chunckIndex].recycleList.push_back( _index );
 			m_chunks[_chunckIndex].count--;
@@ -265,22 +252,22 @@ namespace fan
 				if( !chunck.recycleList.empty() )
 				{
 					// recycle index
-					const ComponentIndex index = chunck.recycleList[chunck.recycleList.size() - 1];
+					const ChunckComponentIndex index = chunck.recycleList[chunck.recycleList.size() - 1];
 					chunck.recycleList.pop_back();
 					chunck.count++;
 					ecComponent& component = *static_cast<ecComponent*>( At( chunckIndex, index ) );
 					component.chunckIndex = chunckIndex;
-					component.index = index;
+					component.chunckComponentIndex = index;
 					return component;
 				}
 				else if( chunck.count < m_componentCount )
 				{
 					// create index
-					const ComponentIndex index = chunck.count;
+					const ChunckComponentIndex index = chunck.count;
 					chunck.count++;
 					ecComponent& component = *static_cast<ecComponent*>( At( chunckIndex, index ) );
 					component.chunckIndex = chunckIndex;
-					component.index = index;
+					component.chunckComponentIndex = index;
 					return component;
 				}
 			}
@@ -289,7 +276,7 @@ namespace fan
 			Chunck& newChunck = AllocChunck();
 			ecComponent& component = *static_cast<ecComponent*>( At( (ChunckIndex)m_chunks.size() - 1, 0 ) );
 			component.chunckIndex = static_cast<ChunckIndex>( m_chunks.size() - 1 );
-			component.index = 0;
+			component.chunckComponentIndex = 0;
 			newChunck.count++;
 			return component;
 		}
@@ -301,8 +288,8 @@ namespace fan
 		struct Chunck
 		{
 			void* data = nullptr;
-			std::vector< ComponentIndex> recycleList;
-			ComponentIndex count = 0;
+			std::vector< ChunckComponentIndex> recycleList;
+			ChunckComponentIndex count = 0;
 		};
 
 		std::string m_name = "";
@@ -330,34 +317,31 @@ namespace fan
 		{
 			AddSingletonComponentType<sc_sunLight>();
 
-			// Changing this order will invalidate all the save files
 			AddComponentType<PositionComponent>();
 			AddComponentType<ColorComponent>();
-			assert( m_components.size() < 1 << ( 8 * sizeof( ComponentID ) ) );			
-
-			m_nextTagID = ( TagID)m_components.size();
 
 			AddTagType<tag_alwaysUpdate>();
 			AddTagType<tag_editorOnly>();
 
-			assert( m_nextTagID < 1 << ( 8 * sizeof( ComponentID ) ) );
+			assert( m_nextTypeIndex < 1 << ( 8 * sizeof( ComponentIndex ) ) );
 
-			AddSystemType < UpdateAABBFromRigidbodySystem >();
 		}
 
 		//================================
 		template< typename _componentType >
 		_componentType& AddComponent( EntityID _entityID )
 		{
+			static_assert( std::is_base_of< ecComponent, _componentType>::value );
+			const ComponentIndex index = m_typeIndices[_componentType::s_typeInfo ];
 			Entity& entity = GetEntity( _entityID );
-			assert( !entity.signature[_componentType::s_typeID] ); // this entity already have this component
+			assert( !entity.signature[index] ); // this entity already have this component
 			assert( entity.componentCount < Entity::s_maxComponentsPerEntity );
-			_componentType& component = (_componentType&)m_components[_componentType::s_typeID].NewComponent();
+			_componentType& component = (_componentType&)m_components[index].NewComponent();
 			component.Init();
-			component.typeID = _componentType::s_typeID;
+			component.componentIndex = index;
 			entity.components[entity.componentCount] = &component;
 			entity.componentCount++;
-			entity.signature[_componentType::s_typeID] = 1;
+			entity.signature[index] = 1;
 			return component;
 		}
 
@@ -390,7 +374,8 @@ namespace fan
 		{
 			static_assert( std::is_base_of< Tag, _tagType>::value );
 			Entity& entity = GetEntity( _entityID );
-			entity.signature[_tagType::s_typeID] = 1;
+			const ComponentIndex index = m_typeIndices[_tagType::s_typeInfo];
+			entity.signature[index] = 1;
 		}
 
 		//================================
@@ -398,7 +383,7 @@ namespace fan
 		_componentType& GetSingletonComponent()
 		{
 			static_assert( std::is_base_of< SingletonComponent, _componentType>::value );
-			return  * static_cast<_componentType*>(m_singletonComponents[_componentType::s_typeID]);
+			return  * static_cast<_componentType*>(m_singletonComponents[_componentType::s_typeInfo]);
 		}
 		//================================
 		EntityID CreateEntity()
@@ -439,12 +424,17 @@ namespace fan
 			return m_entities[_id];
 		}
 
+
+
 		//================================================================================================================================
 		// Place the dead entities at the end of the vector
 		//================================================================================================================================
 		void SortEntities()
-		{
-			const EntityID numEntities = static_cast<EntityID>( m_entities.size() );
+		{	
+			const EntityID numEntities = static_cast<EntityID>( m_entities.size() );		
+
+			if( numEntities == 0 ) { return; }
+
 			EntityID forwardIndex = 0;
 			EntityID reverseIndex = numEntities - 1;
 
@@ -490,7 +480,7 @@ namespace fan
 				for( int componentIndex = 0; componentIndex < entity.componentCount; componentIndex++ )
 				{
 					ecComponent& component = *entity.components[componentIndex];
-					m_components[component.typeID].RemoveComponent( component.chunckIndex, component.index );
+					m_components[ component.componentIndex ].RemoveComponent( component.chunckIndex, component.chunckComponentIndex );
 				}
 				m_entities.pop_back();
 				--reverseIndex;
@@ -506,7 +496,7 @@ namespace fan
 			static_assert( std::is_base_of< System, _systemType>::value );
 			std::vector<Entity*> matchEntities;
 
-			const Signature systemSignature = _systemType::s_signature;
+			const Signature systemSignature = _systemType::GetSignature(*this);
 
 			matchEntities.reserve( m_entities.size() );
 			for (int entityIndex = 0; entityIndex < m_entities.size() ; entityIndex++)
@@ -515,61 +505,52 @@ namespace fan
 				if( (entity.signature & systemSignature ) == systemSignature )
 				{
 					matchEntities.push_back( &entity );
-				}
-
-				_systemType::Run( *this, matchEntities, _delta );				
+				}						
 			}
-		}		
+			_systemType::Run( *this, matchEntities, _delta );
+		}	
 
+		template< typename _tagOrComponentType >
+		Signature GetSignature() const
+		{
+			static_assert( std::is_base_of< Tag, _tagOrComponentType>::value || std::is_base_of< ecComponent, _tagOrComponentType>::value );
+			return Signature(1) << m_typeIndices.at( _tagOrComponentType::s_typeInfo );
+		}
 	//private:
 
 
 		template< typename _componentType >
 		void AddComponentType()
 		{
-			static_assert( std::is_base_of< ecComponent, _componentType>::value );
-			if( _componentType::s_typeID == 0 )
-			{
-				_componentType::s_typeID = (ComponentID)m_components.size();
-			}			
+			static_assert( std::is_base_of< ecComponent, _componentType>::value );			
 			ComponentsCollection chunck;
 			chunck.Init<_componentType>( _componentType::s_typeName );
 			m_components.push_back( chunck );
+			m_typeIndices[_componentType::s_typeInfo] = m_nextTypeIndex++;
 		}
 
 		template< typename _tagType >
 		void AddTagType()
 		{
 			static_assert( std::is_base_of< Tag, _tagType>::value );
-			if( _tagType::s_typeID == 0 )
-			{				
-				_tagType::s_typeID = m_nextTagID++;
-			}
+			m_typeIndices[_tagType::s_typeInfo] = m_nextTypeIndex++;
 		}
 
 		template< typename _componentType >
 		void AddSingletonComponentType()
 		{
-			static_assert( std::is_base_of< SingletonComponent, _componentType>::value );
-			if( _componentType::s_typeID == -1 )
-			{
-				_componentType::s_typeID = (SingletonComponentID)m_singletonComponents.size();
-			}			
-			m_singletonComponents.push_back( new _componentType() );
+			static_assert( std::is_base_of< SingletonComponent, _componentType>::value );		
+			assert( m_singletonComponents.find( _componentType::s_typeInfo ) == m_singletonComponents.end() );
+			m_singletonComponents[_componentType::s_typeInfo] = new _componentType();
 		}
 
-		template< typename _systemType >
-		void AddSystemType()
-		{
-			static_assert( std::is_base_of< System, _systemType>::value );
-			_systemType::Init();
-		}
+		std::unordered_map< uint32_t, ComponentIndex >	m_typeIndices;
+		std::unordered_map< EntityHandle, EntityID >	m_handles;
+		std::unordered_map< uint32_t, SingletonComponent* >	m_singletonComponents;
+		ComponentIndex m_nextTypeIndex = 0;
 
-		std::unordered_map< EntityHandle, EntityID > m_handles;
 		std::vector< Entity > m_entities;
 		std::vector< ComponentsCollection > m_components;
-		std::vector< SingletonComponent* > m_singletonComponents;
 		EntityHandle m_nextHandle = 1; // 0 is a null handle
-		TagID m_nextTagID = 0;
 	};
 }

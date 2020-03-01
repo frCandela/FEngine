@@ -28,11 +28,11 @@ namespace fan
 		void OnGui();
 
 		// Get/add/delete components
-		template<typename ComponentType> ComponentType*				 AddComponent();
+		template<typename ComponentIndex> ComponentIndex*				 AddComponent();
 		template< typename _componentType >	_componentType*			 AddEcsComponent() const;
-		template<typename ComponentType> ComponentType*				 GetComponent();
+		template<typename ComponentIndex> ComponentIndex*				 GetComponent();
 		template< typename _componentType >	_componentType*			 GetEcsComponent() const;
-		template<typename ComponentType> std::vector<ComponentType*> GetComponents();
+		template<typename ComponentIndex> std::vector<ComponentIndex*> GetComponents();
 		template< typename _componentType > void					 RemoveEcsComponent();
 		bool							RemoveComponent( const Component* _component );
 		Component*						AddComponent( const uint32_t _componentID );
@@ -93,16 +93,16 @@ namespace fan
 	//================================================================================================================================
 	// Creates an instance of ComponentType, adds it to the gameobject and returns a pointer
 	//================================================================================================================================
-	template<typename ComponentType>
-	ComponentType* Gameobject::AddComponent()
+	template<typename ComponentIndex>
+	ComponentIndex* Gameobject::AddComponent()
 	{
 		// Checks if ComponentType derivates from Component
-		static_assert( ( std::is_base_of<Component, ComponentType>::value ) );
+		static_assert( ( std::is_base_of<Component, ComponentIndex>::value ) );
 
-		ComponentType* component = new ComponentType();
-		if ( GetComponent< ComponentType >() != nullptr )
+		ComponentIndex* component = new ComponentIndex();
+		if ( GetComponent< ComponentIndex >() != nullptr )
 		{
-			Debug::Get() << Debug::Severity::warning << "Trying to add " << ComponentType::s_name << " twice on gameobject " << m_name << Debug::Endl();
+			Debug::Get() << Debug::Severity::warning << "Trying to add " << ComponentIndex::s_name << " twice on gameobject " << m_name << Debug::Endl();
 			delete( static_cast< Component* >( component ) );
 			return nullptr;
 		}
@@ -115,16 +115,16 @@ namespace fan
 	//================================================================================================================================
 	// Returns a pointer on the first instance of ComponentType in the gameobject, nullptr if none exists
 	//================================================================================================================================
-	template<typename ComponentType>
-	ComponentType* Gameobject::GetComponent()
+	template<typename ComponentIndex>
+	ComponentIndex* Gameobject::GetComponent()
 	{
 		for ( int componentIndex = 0; componentIndex < m_components.size(); componentIndex++ )
 		{
 			Component* component = m_components[ componentIndex ];
 
-			if ( component->IsType<ComponentType>() )
+			if ( component->IsType<ComponentIndex>() )
 			{
-				return static_cast< ComponentType* >( component );
+				return static_cast< ComponentIndex* >( component );
 			}
 		}
 		return nullptr;
@@ -133,10 +133,10 @@ namespace fan
 	//================================================================================================================================
 	// Gets components of a specific type
 	//================================================================================================================================
-	template<typename ComponentType>
-	std::vector<ComponentType*> Gameobject::GetComponents()
+	template<typename ComponentIndex>
+	std::vector<ComponentIndex*> Gameobject::GetComponents()
 	{
-		return static_cast< ComponentType* >( GetComponent( ComponentType::s_typeID ) );
+		return static_cast< ComponentIndex* >( GetComponent( ComponentIndex::s_typeID ) );
 	}
 
 	//================================================================================================================================

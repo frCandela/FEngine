@@ -295,8 +295,8 @@ namespace fan
 					onLPPSynch.Emmit();
 				}
 
-// 				m_clientScene->Update( targetLogicDelta );
-// 				m_serverScene->Update( targetLogicDelta );
+				m_clientScene->Update( targetLogicDelta );
+				m_serverScene->Update( targetLogicDelta );
 
 				if ( m_showUI )
 				{

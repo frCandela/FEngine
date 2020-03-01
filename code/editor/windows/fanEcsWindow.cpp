@@ -140,6 +140,14 @@ namespace fan
 				ImGui::Text( ss.str().c_str() );
 			}
 		}
+
+		if( ImGui::CollapsingHeader( "components & tags" ) )
+		{
+			for ( auto& pair : world.m_typeIndices )
+			{
+				ImGui::Text( "%u -> %u ", pair.first, pair.second );
+			}			
+		}
 	}
 
 
