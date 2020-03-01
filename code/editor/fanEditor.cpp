@@ -456,7 +456,12 @@ namespace fan
 				{
 					world.DeleteEntity( (EntityID)world.m_entities.size() - i - 1 );
 				}
+			}ImGui::SameLine();
+			if( ImGui::Button( "Run" ) )
+			{
+				world.RunSystem<UpdateAABBFromRigidbodySystem>( 0.1f );
 			}
+
 
 			//============================	
 			if( ImGui::CollapsingHeader( "components" ) )

@@ -14,6 +14,7 @@ namespace fan
 	class EntityWorld;
 	struct Entity;
 
+
 	static constexpr uint32_t signatureLength = 32;
 	using Signature = std::bitset<signatureLength>;
 	static constexpr uint32_t ecAliveBit = signatureLength - 1;
@@ -25,11 +26,13 @@ namespace fan
 	using ChunckIndex = uint8_t;
 	using ComponentIndex = uint16_t;
 
-#define DECLARE_COMPONENT()					\
-	private:								\
-	friend class EntityWorld;				\
-	static ComponentID s_typeID;			\
-	static const char* s_typeName;			\
+#define DECLARE_COMPONENT()													\
+	private:																\
+	friend class EntityWorld;												\
+	static ComponentID s_typeID;											\
+	static const char* s_typeName;											\
+	public:																	\
+	static Signature GetSignature() { return Signature(1) << s_typeID; }	\
 
 #define REGISTER_COMPONENT( _componentType, _name)	\
 	ComponentID _componentType::s_typeID = 0;		\
@@ -45,21 +48,38 @@ namespace fan
 	SingletonComponentID _componentType::s_typeID = -1;			\
 	const char* _componentType::s_typeName = _name;				\
 
-#define DECLARE_TAG()				\
-	private:						\
-	friend class EntityWorld;		\
-	friend struct Entity;			\
-	static TagID s_typeID;			\
-	static const char* s_typeName;	\
+#define DECLARE_TAG()														\
+	private:																\
+	friend class EntityWorld;												\
+	friend struct Entity;													\
+	static TagID s_typeID;													\
+	static const char* s_typeName;											\
+	public:																	\
+	static Signature GetSignature() { return Signature(1) << s_typeID; }	\
 
 #define REGISTER_TAG( _componentType, _name)			\
 	TagID _componentType::s_typeID;						\
 	const char* _componentType::s_typeName = _name;		\
 
+#define DECLARE_SYSTEM()						\
+	private:									\
+	friend class EntityWorld;					\
+	static Signature s_signature;				\
+	static const char* s_typeName;				\
+
+#define REGISTER_SYSTEM( _systemType, _name)							\
+	Signature _systemType::s_signature = Signature(1) << ecAliveBit;	\
+	const char* _systemType::s_typeName = _name;						\
+
 	//==============================================================================================================================================================
-	// typeID is a unique id that also correspond to the index of the ComponentsCollection in the Entity world
-	// chunckIndex is the index of the Chunck in the ComponentsCollection
-	// index is the index of the component inside the chunck
+	// Component is a data struct that stores no logic. Components are processed through System::Run() calls
+	// If your component is unique, create a SingletonComponent instead
+	//
+	// Component must call the (DECLARE/REGISTER)_COMPONENT macro and implement an Init() method.
+	// It also must be registered in the EntityWorld constructor to be assigned a unique ID
+	// - typeID is a unique id that also correspond to the index of the ComponentsCollection in the Entity world
+	// - chunckIndex is the index of the Chunck in the ComponentsCollection
+	// - index is the index of the component inside the chunck
 	//==============================================================================================================================================================
 	struct ecComponent
 	{
@@ -73,11 +93,21 @@ namespace fan
 	static constexpr size_t sizeComponent = sizeof( ecComponent );
 	static_assert( sizeComponent == 4 );
 
+	//==============================================================================================================================================================
+	// A singleton is a unique component, it can be accessed by systems
+	//==============================================================================================================================================================
 	struct SingletonComponent {};
+
+	//==============================================================================================================================================================
+	// A Tag is a component with no data, it is used to change the signature of entities for more fine grained system calls
+	//==============================================================================================================================================================
 	struct Tag {};
 
 	//==============================================================================================================================================================
-	// id is the index of the entity in the entity array
+	// An Entity is a wrapper class for components
+	//
+	// - signature is a bitset representing the components referenced by the entity
+	// - handle is a unique key that allows access to an entity,( 0 == invalid )
 	//==============================================================================================================================================================
 	struct Entity
 	{
@@ -119,10 +149,22 @@ namespace fan
 	static_assert( sizeEntity == 128 );
 
 	//==============================================================================================================================================================
+	// A System is a static function Run() with no state that processes entites
+	//
+	// System must call the (DECLARE/REGISTER)_SYSTEM macro and implement Init() method that set its signature.
+	// It also must implement a static Run(..) method that runs its logic.
+	// It also must be registered in the EntityWorld constructor to be assigned a unique signature
+	//==============================================================================================================================================================
+	struct System 
+	{
+	};
+
+	//==============================================================================================================================================================
 	//==============================================================================================================================================================
 	struct PositionComponent : public ecComponent
 	{	
 		DECLARE_COMPONENT()
+	public:
 		void Init() { x = y = z = 0.f; }
 		float x;
 		float y;
@@ -134,6 +176,7 @@ namespace fan
 	struct ColorComponent : public ecComponent
 	{
 		DECLARE_COMPONENT()
+	public:
 		void Init() { r = g = b = a = 0; }
 		char r;
 		char g;
@@ -146,6 +189,7 @@ namespace fan
 	struct sc_sunLight : public SingletonComponent
 	{
 		DECLARE_SINGLETON_COMPONENT()
+	public:
 	};
 
 	//==============================================================================================================================================================
@@ -155,12 +199,28 @@ namespace fan
 
 	//==============================================================================================================================================================
 	//==============================================================================================================================================================
-	struct System
+	struct UpdateAABBFromRigidbodySystem : System
 	{
-		
+		DECLARE_SYSTEM()
+	public:
+
+		static void Init()
+		{
+			s_signature = 
+				  tag_editorOnly::GetSignature() 
+				| ColorComponent::GetSignature();
+		}
+
+		static void Run( EntityWorld& _world, const std::vector<Entity*>& _entities, const float _delta )
+		{
+
+		}
 	};
 
 	//==============================================================================================================================================================
+	// ComponentsCollection holds an array of chunks that store components.
+	//
+	// components size are defined in the Init, chunks maximum size is 65536 bytes
 	//==============================================================================================================================================================
 	class ComponentsCollection
 	{
@@ -260,6 +320,8 @@ namespace fan
 	};
 
 	//==============================================================================================================================================================
+	// Contains the entities, components, singleton components, type information
+	// and various utilities for processing them
 	//==============================================================================================================================================================
 	class EntityWorld
 	{
@@ -279,6 +341,8 @@ namespace fan
 			AddTagType<tag_editorOnly>();
 
 			assert( m_nextTagID < 1 << ( 8 * sizeof( ComponentID ) ) );
+
+			AddSystemType < UpdateAABBFromRigidbodySystem >();
 		}
 
 		//================================
@@ -433,7 +497,33 @@ namespace fan
 			}
 		}
 
+		//================================================================================================================================
+		// Find all entities matching the signature of the system and runs it
+		//================================================================================================================================
+		template< typename _systemType >
+		void RunSystem( const float _delta )
+		{
+			static_assert( std::is_base_of< System, _systemType>::value );
+			std::vector<Entity*> matchEntities;
+
+			const Signature systemSignature = _systemType::s_signature;
+
+			matchEntities.reserve( m_entities.size() );
+			for (int entityIndex = 0; entityIndex < m_entities.size() ; entityIndex++)
+			{
+				Entity& entity = m_entities[entityIndex];
+				if( (entity.signature & systemSignature ) == systemSignature )
+				{
+					matchEntities.push_back( &entity );
+				}
+
+				_systemType::Run( *this, matchEntities, _delta );				
+			}
+		}		
+
 	//private:
+
+
 		template< typename _componentType >
 		void AddComponentType()
 		{
@@ -466,6 +556,13 @@ namespace fan
 				_componentType::s_typeID = (SingletonComponentID)m_singletonComponents.size();
 			}			
 			m_singletonComponents.push_back( new _componentType() );
+		}
+
+		template< typename _systemType >
+		void AddSystemType()
+		{
+			static_assert( std::is_base_of< System, _systemType>::value );
+			_systemType::Init();
 		}
 
 		std::unordered_map< EntityHandle, EntityID > m_handles;
