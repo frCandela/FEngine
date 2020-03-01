@@ -5,7 +5,7 @@
 
 namespace fan
 {
-	class EcsManager;
+	class EntityWorld;
 
 	//================================================================================================================================
 	//================================================================================================================================
@@ -14,14 +14,14 @@ namespace fan
 	public:
 		EcsWindow();
 
-		void SetEcsManager( EcsManager* _ecsManager ) { m_ecsManager = _ecsManager; }
+		void SetEntityWorld( EntityWorld& _world ) { m_world = &_world; }
 
 	protected:
 		void OnGui() override;
 
 
 	private:
-		EcsManager* m_ecsManager = nullptr;
+		EntityWorld* m_world = nullptr;
 	};
 
 }
