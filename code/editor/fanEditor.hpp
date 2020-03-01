@@ -67,7 +67,7 @@ namespace fan
 		RenderWindow* m_renderWindow;
 		SceneWindow* m_sceneWindow;
 		GameWindow* m_gameWindow;
-		EditorGrid			m_editorGrid;
+		EditorGrid	m_editorGrid;
 		EcsWindow* m_ecsWindow;
 
 		// Main objects

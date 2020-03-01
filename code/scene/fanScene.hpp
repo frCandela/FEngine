@@ -74,7 +74,7 @@ namespace fan
 		bool					 HasPath() const { return m_path.empty() == false; }
 		inline std::string		 GetPath() const { return m_path; }
 		inline SceneInstantiate& GetInstanciator() const { return *m_instantiate;  }
-		inline EcsManager&		 GetEcsManager() const { return *m_ecsManager; }
+		inline EcsManager&		 GetEcsManager() const { return * ((EcsManager*)0); }//@hack
 		inline EntityWorld&		 GetEntityWorld() const { return *m_world; }
 		inline PhysicsManager&	 GetPhysicsManager() const { return *m_physicsManager; }
 		State					 GetState() const { return m_state; };
@@ -110,7 +110,6 @@ namespace fan
 		bool		m_isServer = false;
 
 		SceneInstantiate* m_instantiate = nullptr;
-		EcsManager* m_ecsManager = nullptr;
 		PhysicsManager* m_physicsManager = nullptr;
 		EntityWorld* m_world = nullptr;
 

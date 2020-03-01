@@ -27,7 +27,7 @@ namespace fan
 	SceneWindow::SceneWindow() :
 		EditorWindow( "scene", ImGui::IconType::SCENE16 )
 	{
-		m_textBuffer[ 0 ] = '\0';
+		m_textBuffer[0] = '\0';
 	}
 
 	//================================================================================================================================
@@ -38,9 +38,11 @@ namespace fan
 	//================================================================================================================================
 	void SceneWindow::OnGui()
 	{
-		SCOPED_PROFILE( scene )
+		SCOPED_PROFILE( scene );
 
-			ImGui::Icon( GetIconType(), { 16,16 } ); ImGui::SameLine();
+		return; //@hack
+
+		ImGui::Icon( GetIconType(), { 16,16 } ); ImGui::SameLine();
 		ImGui::Text( m_scene->GetName().c_str() );
 		ImGui::SameLine();
 		ImGui::Text( m_scene->IsServer() ? "- server" : "- client" );
@@ -50,7 +52,7 @@ namespace fan
 		R_DrawSceneTree( m_scene->GetRoot(), gameobjectRightClicked );
 		m_expandSceneHierarchy = false;
 
-		if ( gameobjectRightClicked != nullptr )
+		if( gameobjectRightClicked != nullptr )
 		{
 			ImGui::OpenPopup( "scene_window_gameobject_rclicked" );
 			m_lastGameobjectRightClicked = gameobjectRightClicked;
@@ -62,21 +64,21 @@ namespace fan
 		bool exportToPrefabPopup = false;
 		bool loadPrefabPopup = false;
 
-		if ( ImGui::BeginPopup( "scene_window_gameobject_rclicked" ) )
+		if( ImGui::BeginPopup( "scene_window_gameobject_rclicked" ) )
 		{
 
 			// New gameobject 
 			bool itemClicked = false;
-			if ( ImGui::BeginMenu( "New gameobject" ) )
+			if( ImGui::BeginMenu( "New gameobject" ) )
 			{
 				// Popup empty gameobject
-				if ( ImGui::IsItemClicked() )
+				if( ImGui::IsItemClicked() )
 				{
 					itemClicked = true;
 				}
 				// Entities templates
 				ImGui::Icon( ImGui::MESH_RENDERER16, { 16,16 } ); ImGui::SameLine();
-				if ( ImGui::MenuItem( "Model" ) )
+				if( ImGui::MenuItem( "Model" ) )
 				{
 					Gameobject* newIntity = m_scene->CreateGameobject( "new_model", m_lastGameobjectRightClicked );
 					MeshRenderer* meshRenderer = newIntity->AddComponent<MeshRenderer>();
@@ -86,21 +88,21 @@ namespace fan
 				}
 
 				ImGui::Icon( ImGui::POINT_LIGHT16, { 16,16 } ); ImGui::SameLine();
-				if ( ImGui::MenuItem( "Point light" ) )
+				if( ImGui::MenuItem( "Point light" ) )
 				{
 					Gameobject* newIntity = m_scene->CreateGameobject( "new_point_light", m_lastGameobjectRightClicked );
 					newIntity->AddComponent<PointLight>();
 				}
 
 				ImGui::Icon( ImGui::DIR_LIGHT16, { 16,16 } ); ImGui::SameLine();
-				if ( ImGui::MenuItem( "Dir light" ) )
+				if( ImGui::MenuItem( "Dir light" ) )
 				{
 					Gameobject* newIntity = m_scene->CreateGameobject( "new_dir_light", m_lastGameobjectRightClicked );
 					newIntity->AddComponent<DirectionalLight>();
 				}
 
 				ImGui::Icon( ImGui::SPHERE_SHAPE16, { 16,16 } ); ImGui::SameLine();
-				if ( ImGui::MenuItem( "Sphere" ) )
+				if( ImGui::MenuItem( "Sphere" ) )
 				{
 					Gameobject* newIntity = m_scene->CreateGameobject( "new_model", m_lastGameobjectRightClicked );
 					MeshRenderer* meshRenderer = newIntity->AddComponent<MeshRenderer>();
@@ -110,7 +112,7 @@ namespace fan
 				}
 
 				ImGui::Icon( ImGui::PARTICLES16, { 16,16 } ); ImGui::SameLine();
-				if ( ImGui::MenuItem( "FX" ) )
+				if( ImGui::MenuItem( "FX" ) )
 				{
 					Gameobject* newIntity = m_scene->CreateGameobject( "new_fx", m_lastGameobjectRightClicked );
 					newIntity->AddComponent<ParticleSystem>();
@@ -119,12 +121,12 @@ namespace fan
 				ImGui::EndMenu();
 			}
 
-			if ( ImGui::IsItemClicked() )
+			if( ImGui::IsItemClicked() )
 			{
 				newGameobjectPopup = true;
 			}
 
-			if ( ImGui::MenuItem( "Import prefab" ) )
+			if( ImGui::MenuItem( "Import prefab" ) )
 			{
 				loadPrefabPopup = true;
 			}
@@ -132,20 +134,20 @@ namespace fan
 			ImGui::Separator();
 
 			// rename
-			if ( ImGui::Selectable( "Rename" ) )
+			if( ImGui::Selectable( "Rename" ) )
 			{
 				renameGameobjectPopup = true;
 			}
 
 			// export to prefab
-			if ( ImGui::Selectable( "Export to prefab" ) )
+			if( ImGui::Selectable( "Export to prefab" ) )
 			{
 				exportToPrefabPopup = true;
 			}
 
 			// delete
 			ImGui::Separator();
-			if ( ImGui::Selectable( "Delete" ) )
+			if( ImGui::Selectable( "Delete" ) )
 			{
 				m_scene->DeleteGameobject( m_lastGameobjectRightClicked );
 			}
@@ -153,34 +155,34 @@ namespace fan
 		}
 
 		// new gameobject modal
-		if ( newGameobjectPopup )
+		if( newGameobjectPopup )
 		{
 			ImGui::OpenPopup( "New gameobject" );
 		} NewGameobjectModal();
 
 		// rename modal
-		if ( renameGameobjectPopup )
+		if( renameGameobjectPopup )
 		{
 			ImGui::OpenPopup( "Rename gameobject" );
 		} RenameGameobjectModal();
 
 		// export to prefab modal
-		if ( exportToPrefabPopup )
+		if( exportToPrefabPopup )
 		{
 			m_pathBuffer = "content/prefab";
 			ImGui::OpenPopup( "Export to prefab" );
 		} ExportToPrefabModal();
 
 		// load prefab popup
-		if ( loadPrefabPopup )
+		if( loadPrefabPopup )
 		{
 			m_pathBuffer = "content/prefab";
 			ImGui::OpenPopup( "Load prefab" );
 		}
-		if ( ImGui::FanLoadFileModal( "Load prefab", RenderGlobal::s_prefabExtensions, m_pathBuffer ) )
-		{			
-			Prefab * prefab = Prefab::s_resourceManager.LoadPrefab( m_pathBuffer.string() );
-			if ( prefab != nullptr )
+		if( ImGui::FanLoadFileModal( "Load prefab", RenderGlobal::s_prefabExtensions, m_pathBuffer ) )
+		{
+			Prefab* prefab = Prefab::s_resourceManager.LoadPrefab( m_pathBuffer.string() );
+			if( prefab != nullptr )
 			{
 				m_scene->CreateGameobject( *prefab, m_lastGameobjectRightClicked );
 			}
@@ -195,7 +197,7 @@ namespace fan
 		std::stringstream ss;
 		ss << "##" << _gameobjectDrawn; // Unique id
 
-		if ( ImGui::IsWindowAppearing() || m_expandSceneHierarchy == true )
+		if( ImGui::IsWindowAppearing() || m_expandSceneHierarchy == true )
 		{
 			ImGui::SetNextItemOpen( true );
 		}
@@ -203,7 +205,7 @@ namespace fan
 
 		// Gameobject dragndrop target empty selectable -> place dragged below
 		Gameobject* gameobjectDrop1 = ImGui::FanBeginDragDropTargetGameobject();
-		if ( gameobjectDrop1 && gameobjectDrop1 != _gameobjectDrawn )
+		if( gameobjectDrop1 && gameobjectDrop1 != _gameobjectDrawn )
 		{
 			gameobjectDrop1->InsertBelow( _gameobjectDrawn );
 		}
@@ -215,11 +217,11 @@ namespace fan
 		// Draw gameobject empty selectable to display a hierarchy
 		std::stringstream ss2;
 		ss2 << _gameobjectDrawn->GetName() << "##" << _gameobjectDrawn; // Unique id
-		if ( ImGui::Selectable( ss2.str().c_str(), &selected ) )
+		if( ImGui::Selectable( ss2.str().c_str(), &selected ) )
 		{
 			onSelectGameobject.Emmit( _gameobjectDrawn );
 		}
-		if ( ImGui::IsItemClicked( 1 ) )
+		if( ImGui::IsItemClicked( 1 ) )
 		{
 			_gameobjectRightClicked = _gameobjectDrawn;
 		}
@@ -229,17 +231,17 @@ namespace fan
 
 		// Gameobject dragndrop target gameobject name -> place as child
 		Gameobject* gameobjectDrop = ImGui::FanBeginDragDropTargetGameobject();
-		if ( gameobjectDrop )
+		if( gameobjectDrop )
 		{
 			gameobjectDrop->SetParent( _gameobjectDrawn );
 		}
 
-		if ( isOpen )
+		if( isOpen )
 		{
 			const std::vector<Gameobject*>& childs = _gameobjectDrawn->GetChilds();
-			for ( int childIndex = 0; childIndex < childs.size(); childIndex++ )
+			for( int childIndex = 0; childIndex < childs.size(); childIndex++ )
 			{
-				Gameobject* child = childs[ childIndex ];
+				Gameobject* child = childs[childIndex];
 				R_DrawSceneTree( child, _gameobjectRightClicked );
 			}
 
@@ -252,26 +254,26 @@ namespace fan
 	void SceneWindow::NewGameobjectModal()
 	{
 		ImGui::SetNextWindowSize( ImVec2( 200, 200 ) );
-		if ( ImGui::BeginPopupModal( "New gameobject" ) )
+		if( ImGui::BeginPopupModal( "New gameobject" ) )
 		{
-			if ( ImGui::IsWindowAppearing() )
+			if( ImGui::IsWindowAppearing() )
 			{
 				ImGui::SetKeyboardFocusHere();
 			}
 			bool enterPressed = false;
-			if ( ImGui::InputText( "Name ", m_textBuffer, IM_ARRAYSIZE( m_textBuffer ), ImGuiInputTextFlags_EnterReturnsTrue ) )
+			if( ImGui::InputText( "Name ", m_textBuffer, IM_ARRAYSIZE( m_textBuffer ), ImGuiInputTextFlags_EnterReturnsTrue ) )
 			{
 				enterPressed = true;
 			}
-			if ( ImGui::Button( "Cancel" ) || ImGui::IsKeyPressed( GLFW_KEY_ESCAPE, false ) )
+			if( ImGui::Button( "Cancel" ) || ImGui::IsKeyPressed( GLFW_KEY_ESCAPE, false ) )
 			{
 				m_lastGameobjectRightClicked = nullptr;
 				ImGui::CloseCurrentPopup();
 			}
 			ImGui::SameLine();
-			if ( ImGui::Button( "Ok" ) || enterPressed )
+			if( ImGui::Button( "Ok" ) || enterPressed )
 			{
-				if ( std::string( m_textBuffer ) != "" )
+				if( std::string( m_textBuffer ) != "" )
 				{
 					//Create new gameobject 
 					Gameobject* newGameobject = m_scene->CreateGameobject( m_textBuffer, m_lastGameobjectRightClicked );
@@ -289,27 +291,27 @@ namespace fan
 	void SceneWindow::RenameGameobjectModal()
 	{
 		ImGui::SetNextWindowSize( ImVec2( 200, 200 ) );
-		if ( ImGui::BeginPopupModal( "Rename gameobject" ) )
+		if( ImGui::BeginPopupModal( "Rename gameobject" ) )
 		{
-			if ( ImGui::IsWindowAppearing() )
+			if( ImGui::IsWindowAppearing() )
 			{
 				strcpy_s( m_textBuffer, 32, m_lastGameobjectRightClicked->GetName().c_str() );
 				ImGui::SetKeyboardFocusHere();
 			}
 			bool enterPressed = false;
-			if ( ImGui::InputText( "New Name ", m_textBuffer, IM_ARRAYSIZE( m_textBuffer ), ImGuiInputTextFlags_EnterReturnsTrue ) )
+			if( ImGui::InputText( "New Name ", m_textBuffer, IM_ARRAYSIZE( m_textBuffer ), ImGuiInputTextFlags_EnterReturnsTrue ) )
 			{
 				enterPressed = true;
 			}
-			if ( ImGui::Button( "Cancel" ) || ImGui::IsKeyPressed( GLFW_KEY_ESCAPE, false ) )
+			if( ImGui::Button( "Cancel" ) || ImGui::IsKeyPressed( GLFW_KEY_ESCAPE, false ) )
 			{
 				m_lastGameobjectRightClicked = nullptr;
 				ImGui::CloseCurrentPopup();
 			}
 			ImGui::SameLine();
-			if ( ImGui::Button( "Ok" ) || ImGui::IsKeyPressed( GLFW_KEY_ENTER, false ) || enterPressed )
+			if( ImGui::Button( "Ok" ) || ImGui::IsKeyPressed( GLFW_KEY_ENTER, false ) || enterPressed )
 			{
-				if ( std::string( m_textBuffer ) != "" )
+				if( std::string( m_textBuffer ) != "" )
 				{
 					m_lastGameobjectRightClicked->SetName( m_textBuffer );
 					m_lastGameobjectRightClicked = nullptr;
@@ -324,23 +326,23 @@ namespace fan
 	//================================================================================================================================
 	void SceneWindow::ExportToPrefabModal()
 	{
-		if ( m_lastGameobjectRightClicked == nullptr )
+		if( m_lastGameobjectRightClicked == nullptr )
 		{
 			return;
 		}
 
-		if ( ImGui::FanSaveFileModal( "Export to prefab", RenderGlobal::s_prefabExtensions, m_pathBuffer ) )
+		if( ImGui::FanSaveFileModal( "Export to prefab", RenderGlobal::s_prefabExtensions, m_pathBuffer ) )
 		{
 			Debug::Log() << "Exporting prefab to " << m_pathBuffer.string() << Debug::Endl();
 
 			std::ofstream outStream( m_pathBuffer.string() );
-			if ( outStream.is_open() )
+			if( outStream.is_open() )
 			{
 				// Try to update the existing prefab if it exists
 				Prefab* prefab = Prefab::s_resourceManager.FindPrefab( m_pathBuffer.string() );
-				if ( prefab != nullptr )
+				if( prefab != nullptr )
 				{
-					prefab->CreateFromGameobject( * m_lastGameobjectRightClicked );
+					prefab->CreateFromGameobject( *m_lastGameobjectRightClicked );
 				}
 
 				Prefab newprefab;

@@ -92,7 +92,7 @@ namespace fan
 	{
 		SCOPED_PROFILE( ecs_update )
 
-			RUN_SYSTEM( ecsParticleSystem, Run );
+		RUN_SYSTEM( ecsParticleSystem, Run );
 		RUN_SYSTEM( ecsParticleSunlightOcclusionSystem, Run );
 		RUN_SYSTEM( ecsParticlesGenerateSystem, Run );
 		RUN_SYSTEM( ecsSolarEruptionMeshSystem, Run );

@@ -25,7 +25,6 @@ namespace fan
 		m_name( _name )
 		, m_path( "" )
 		, m_root( nullptr )
-		, m_ecsManager( new EcsManager() )
 		, m_physicsManager( new PhysicsManager( btVector3::Zero() ) )
 		, m_world( new EntityWorld() )
 		, m_instantiate( new SceneInstantiate( *this ) )
@@ -38,7 +37,7 @@ namespace fan
 		Clear();
 
 		//delete m_physicsManager; @hack
-		delete m_ecsManager;
+		delete m_world;
 	}
 
 	//================================================================================================================================
@@ -188,28 +187,30 @@ namespace fan
 		}
 		m_entitiesToDelete.clear();
 
-		m_ecsManager->Refresh();
+		//m_ecsManager->Refresh();
+		m_world->SortEntities();
+		m_world->RemoveDeadEntities();
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
 	void Scene::Update( const float _delta )
 	{
-		SCOPED_PROFILE( scene_update )
-			BeginFrame();
+		SCOPED_PROFILE( scene_update );
+		BeginFrame();
 
 		const float delta = m_state == State::PLAYING ? _delta : 0.f;
 
-		m_ecsManager->GetSingletonComponents().GetComponent<ecsCameraPosition_s>().position = m_mainCamera->GetGameobject().GetTransform().GetPosition();
+		//m_ecsManager->GetSingletonComponents().GetComponent<ecsCameraPosition_s>().position = m_mainCamera->GetGameobject().GetTransform().GetPosition();
 
 
-		m_ecsManager->UpdatePrePhysics( delta );
+		//m_ecsManager->UpdatePrePhysics( delta );@hack
 		m_physicsManager->StepSimulation( delta );
-		m_ecsManager->UpdatePostPhysics( delta );
+		//m_ecsManager->UpdatePostPhysics( delta );@hack
 		UpdateActors( _delta );
-		m_ecsManager->Update( delta );
+		//m_ecsManager->Update( delta );@hack
 		LateUpdateActors( _delta );
-		m_ecsManager->LateUpdate( delta );
+		//m_ecsManager->LateUpdate( delta );@hack
 		EndFrame();
 
 // 		ImGui::Begin( "testoss" );
@@ -521,10 +522,11 @@ namespace fan
 	//================================================================================================================================
 	void Scene::New()
 	{
-		Stop();
-		Clear();
-		m_root = CreateGameobject( "root", nullptr );
-		onSceneLoad.Emmit( this );
+		//@hack
+		//Stop();
+		//Clear();
+		//m_root = CreateGameobject( "root", nullptr );
+		//onSceneLoad.Emmit( this );
 	}
 
 	//================================================================================================================================
@@ -599,40 +601,41 @@ namespace fan
 	//================================================================================================================================
 	//================================================================================================================================
 	bool Scene::LoadFrom( const std::string _path )
-	{
-		Stop();
-		Clear();
-		std::ifstream inStream( _path );
-		if ( inStream.is_open() && inStream.good() )
-		{
-			// Load scene
-			Debug::Get() << Debug::Severity::log << "loading scene: " << _path << Debug::Endl();
-
-			Json sceneJson;
-			inStream >> sceneJson;
-			if ( Load( sceneJson ) )
-			{
-				m_path = _path;
-				inStream.close();
-				onSceneLoad.Emmit( this );
-				return true;
-			}
-			else
-			{
-				Debug::Get() << Debug::Severity::error << "failed to load scene: " << _path << Debug::Endl();
-				m_path = "";
-				inStream.close();
-				New();
-				return false;
-			}
-
-		}
-		else
-		{
-			Debug::Get() << Debug::Severity::error << "failed to open file " << _path << Debug::Endl();
-			New();
-			return false;
-		}
+	{//@hack
+// 		Stop();
+// 		Clear();
+// 		std::ifstream inStream( _path );
+// 		if ( inStream.is_open() && inStream.good() )
+// 		{
+// 			// Load scene
+// 			Debug::Get() << Debug::Severity::log << "loading scene: " << _path << Debug::Endl();
+// 
+// 			Json sceneJson;
+// 			inStream >> sceneJson;
+// 			if ( Load( sceneJson ) )
+// 			{
+// 				m_path = _path;
+// 				inStream.close();
+// 				onSceneLoad.Emmit( this );
+// 				return true;
+// 			}
+// 			else
+// 			{
+// 				Debug::Get() << Debug::Severity::error << "failed to load scene: " << _path << Debug::Endl();
+// 				m_path = "";
+// 				inStream.close();
+// 				New();
+// 				return false;
+// 			}
+// 
+// 		}
+// 		else
+// 		{
+// 			Debug::Get() << Debug::Severity::error << "failed to open file " << _path << Debug::Endl();
+// 			New();
+// 			return false;
+// 		}
+		return false;
 	}
 
 	//================================================================================================================================
