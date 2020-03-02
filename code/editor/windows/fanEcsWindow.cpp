@@ -31,6 +31,65 @@ namespace fan
 
 		EntityWorld& world = *m_world;
 
+		//============================	
+		if( ImGui::CollapsingHeader( "components" ) )
+		{
+			ImGui::Columns( 4 );
+			ImGui::SetColumnWidth( 0, 100.f );
+			ImGui::SetColumnWidth( 1, 100.f );
+			ImGui::SetColumnWidth( 2, 100.f );
+			ImGui::SetColumnWidth( 3, 100.f );
+
+			ImGui::NextColumn();
+			ImGui::Text( "components" );
+			ImGui::NextColumn();
+			ImGui::Text( "chunks" );
+			ImGui::NextColumn();
+			ImGui::Text( "size (Ko)" );
+			ImGui::NextColumn();
+			ImGui::Separator();
+
+			for( int componentIndex = 0; componentIndex < world.m_components.size(); componentIndex++ )
+			{
+				ComponentsCollection& collection = world.m_components[componentIndex];
+				std::vector< ComponentsCollection::Chunck >& chunks = collection.m_chunks;
+
+				size_t numElements = 0;
+				for( int chunckIndex = 0; chunckIndex < chunks.size(); chunckIndex++ )
+				{
+					numElements += chunks[chunckIndex].count;
+				}
+
+				ImGui::Text( collection.m_name.c_str() );
+				if( ImGui::IsItemHovered() )
+				{
+					ImGui::BeginTooltip();
+					ImGui::TextUnformatted( "to recycle" );
+					for( int chunckIndex = 0; chunckIndex < chunks.size(); chunckIndex++ )
+					{
+						ImGui::Text( std::to_string( chunks[chunckIndex].recycleList.size() ).c_str() );
+					}
+					ImGui::EndTooltip();
+				}
+
+				// num elements
+				ImGui::NextColumn();
+				ImGui::Text( std::to_string( numElements ).c_str() );
+
+				// num chuncks
+				ImGui::NextColumn();
+				ImGui::Text( std::to_string( chunks.size() ).c_str() );
+
+				// size of a chunck in Ko
+				ImGui::NextColumn();
+				ImGui::Text( std::to_string( chunks.size() * collection.m_componentCount * collection.m_componentSize / 1000 ).c_str() );
+
+				ImGui::NextColumn();
+			}
+			ImGui::Columns( 1 );
+		}
+
+		//============================	
 		if( ImGui::CollapsingHeader( "Testing" ) )
 		{
 
@@ -82,23 +141,6 @@ namespace fan
 			if( ImGui::Button( "Run" ) )
 			{
 				world.RunSystem<UpdateAABBFromRigidbodySystem>( 0.1f );
-			}
-		}
-
-		//============================	
-		if( ImGui::CollapsingHeader( "components" ) )
-		{
-			for( int componentIndex = 0; componentIndex < world.m_components.size(); componentIndex++ )
-			{
-				ComponentsCollection& collection = world.m_components[componentIndex];
-				ImGui::Text( "%s - count: %d - size: %d", collection.m_name.c_str(), collection.m_componentCount, collection.m_componentSize );
-				ImGui::Indent();
-				for( int chunckIndex = 0; chunckIndex < collection.m_chunks.size(); chunckIndex++ )
-				{
-					ComponentsCollection::Chunck& chunck = collection.m_chunks[chunckIndex];
-					ImGui::Text( "num: %d, recycle: %d", chunck.count, chunck.recycleList.size() );
-				}
-				ImGui::Unindent();
 			}
 		}
 

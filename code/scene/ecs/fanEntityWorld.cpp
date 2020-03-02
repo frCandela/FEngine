@@ -1,5 +1,7 @@
 #include "fanEntityWorld.hpp"
 
+#include "scene/ecs/components/fanSceneNode.hpp"
+
 namespace fan
 {
 	REGISTER_COMPONENT( PositionComponent, "position" );
@@ -21,5 +23,21 @@ namespace fan
 	{
 		sc_sunLight& sunlight = _world.GetSingletonComponent<sc_sunLight>();
 		++sunlight.test;
+	}
+
+	EntityWorld::EntityWorld()
+	{
+
+		AddSingletonComponentType<sc_sunLight>();
+
+		AddComponentType<PositionComponent>();
+		AddComponentType<ColorComponent>();
+		AddComponentType<SceneNode>();
+
+		AddTagType<tag_alwaysUpdate>();
+		AddTagType<tag_editorOnly>();
+
+		assert( m_nextTypeIndex < 1 << ( 8 * sizeof( ComponentIndex ) ) );
+
 	}
 }
