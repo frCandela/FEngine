@@ -332,28 +332,29 @@ namespace fan
 	//================================================================================================================================
 	void MainMenuBar::Reload()
 	{
-		if ( m_scene->GetState() == Scene::STOPPED )
-		{
-			// Save camera data
-			Json cameraData;
-			m_scene->GetMainCamera().GetGameobject().Save( cameraData );
-
-			// save old selection
-			Gameobject* prevSelection = m_editorSelection.GetSelectedGameobject();
-			const uint64_t id = prevSelection != nullptr ? prevSelection->GetUniqueID() : 0;
-
-			m_scene->LoadFrom( m_scene->GetPath() );
-
-			// restore camera
-			m_scene->GetMainCamera().GetGameobject().CopyDataFrom( cameraData );
-
-			// restore selection
-			if ( id != 0 )
-			{
-				Gameobject* selection = m_scene->FindGameobject( id );
-				m_editorSelection.SetSelectedGameobject( selection );
-			}
-		}
+		// @node
+// 		if ( m_scene->GetState() == Scene::STOPPED )
+// 		{
+// 			// Save camera data
+// 			Json cameraData;
+// 			m_scene->GetMainCamera().GetGameobject().Save( cameraData );
+// 
+// 			// save old selection
+// 			Gameobject* prevSelection = m_editorSelection.GetSelectedGameobject();
+// 			const uint64_t id = prevSelection != nullptr ? prevSelection->GetUniqueID() : 0;
+// 
+// 			m_scene->LoadFrom( m_scene->GetPath() );
+// 
+// 			// restore camera
+// 			m_scene->GetMainCamera().GetGameobject().CopyDataFrom( cameraData );
+// 
+// 			// restore selection
+// 			if ( id != 0 )
+// 			{
+// 				Gameobject* selection = m_scene->FindGameobject( id );
+// 				m_editorSelection.SetSelectedGameobject( selection );
+// 			}
+// 		}
 	}
 
 	//================================================================================================================================

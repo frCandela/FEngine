@@ -6,6 +6,7 @@
 #include <vector>
 #include <random>
 #include <filesystem>
+#include <queue>
 // #include <chrono>
 // #include <cstdint>
 // #include <type_traits>

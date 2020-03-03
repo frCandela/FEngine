@@ -27,17 +27,17 @@ namespace fan
 	void EditorSelection::ConnectCallbacks( Scene& _clientScene, Scene& _serverScene )
 	{
 		Input::Get().Manager().FindEvent( "delete" )->Connect( &EditorSelection::DeleteSelection, this );
-		_clientScene.onDeleteGameobject.Connect( &EditorSelection::OnGameobjectDeleted, this );
-		_serverScene.onDeleteGameobject.Connect( &EditorSelection::OnGameobjectDeleted, this );
+// 		_clientScene.onDeleteGameobject.Connect( &EditorSelection::OnSceneNodeDeleted, this ); @node
+// 		_serverScene.onDeleteGameobject.Connect( &EditorSelection::OnSceneNodeDeleted, this );
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
 	void EditorSelection::DeleteSelection()
 	{
-		if ( m_selectedGameobject != nullptr )
+		if ( m_selectedSceneNode != nullptr )
 		{
-			m_currentScene->DeleteGameobject( m_selectedGameobject );
+			//m_currentScene->DeleteGameobject( m_selectedSceneNode ); @node
 		}
 	}
 
@@ -50,19 +50,19 @@ namespace fan
 		bool mouseCaptured = false;
 
 		// Translation gizmo on selected gameobject
-		if ( m_selectedGameobject != nullptr && m_selectedGameobject != &m_currentScene->GetMainCamera().GetGameobject()
-			 && m_selectedGameobject->GetComponent<UIMeshRenderer>() == nullptr
-			 && m_selectedGameobject->GetComponent<UITransform>() == nullptr )
-
-		{
-			Transform* transform = m_selectedGameobject->GetComponent< Transform >();
-			btVector3 newPosition;
-			if ( EditorGizmos::Get().DrawMoveGizmo( btTransform( btQuaternion( 0, 0, 0 ), transform->GetPosition() ), ( size_t ) this, newPosition ) )
-			{
-				transform->SetPosition( newPosition );
-				mouseCaptured = true;
-			}
-		}
+// 		if ( m_selectedSceneNode != nullptr && m_selectedSceneNode != &m_currentScene->GetMainCamera().GetGameobject()
+// 			 && m_selectedSceneNode->GetComponent<UIMeshRenderer>() == nullptr
+// 			 && m_selectedSceneNode->GetComponent<UITransform>() == nullptr )
+// 
+// 		{
+// 			Transform* transform = m_selectedSceneNode->GetComponent< Transform >();
+// 			btVector3 newPosition;
+// 			if ( EditorGizmos::Get().DrawMoveGizmo( btTransform( btQuaternion( 0, 0, 0 ), transform->GetPosition() ), ( size_t ) this, newPosition ) )
+// 			{
+// 				transform->SetPosition( newPosition );
+// 				mouseCaptured = true;
+// 			}
+// 		} @node
 
 		// Mouse selection
 		if ( !mouseCaptured && _gameWindowHovered && Mouse::Get().GetButtonPressed( Mouse::button0 ) )
@@ -105,31 +105,31 @@ namespace fan
 					}
 				}
 			}
-			SetSelectedGameobject( closestGameobject );
+			//SetSelectedSceneNode( closestGameobject ); @node
 		}
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void EditorSelection::SetSelectedGameobject( Gameobject* _selectedGameobject )
+	void EditorSelection::SetSelectedSceneNode( SceneNode* _node )
 	{
-		m_selectedGameobject = _selectedGameobject;
-		onGameobjectSelected.Emmit( m_selectedGameobject );
+		m_selectedSceneNode = _node;
+		onSceneNodeSelected.Emmit( m_selectedSceneNode );
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
 	void EditorSelection::Deselect()
 	{
-		m_selectedGameobject = nullptr;
-		onGameobjectSelected.Emmit( m_selectedGameobject );
+		m_selectedSceneNode = nullptr;
+		onSceneNodeSelected.Emmit( m_selectedSceneNode );
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void EditorSelection::OnGameobjectDeleted( Gameobject* _gameobject )
+	void EditorSelection::OnSceneNodeDeleted( SceneNode* _node )
 	{
-		if ( _gameobject == m_selectedGameobject )
+		if ( _node == m_selectedSceneNode )
 		{
 			Deselect();
 		}

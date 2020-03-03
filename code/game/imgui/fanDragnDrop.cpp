@@ -1,10 +1,12 @@
 #include "game/imgui/fanDragnDrop.hpp"
-#include "core/imgui/fanImguiIcons.hpp"
+
+#include "scene/ecs/components/fanSceneNode.hpp"
 #include "scene/components/fanComponent.hpp"
 #include "scene/fanGameobject.hpp"
 #include "scene/fanPrefab.hpp"
 #include "render/core/fanTexture.hpp"
 #include "render/fanMesh.hpp"
+#include "core/imgui/fanImguiIcons.hpp"
 
 namespace ImGui
 {
@@ -39,6 +41,38 @@ namespace ImGui
 			ImGui::EndDragDropTarget();
 		}
 		return gameobject;
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
+	void FanBeginDragDropSourceSceneNode( fan::SceneNode& _node, ImGuiDragDropFlags _flags  )
+	{
+		fan::SceneNode * node = &_node;
+
+		if( ImGui::BeginDragDropSource( _flags ) )
+		{
+			ImGui::SetDragDropPayload( "dragndrop_scenenode", &node, sizeof( fan::SceneNode** ) );
+			ImGui::Icon( ImGui::IconType::GAMEOBJECT16, { 16,16 } ); ImGui::SameLine();
+			ImGui::Text( node->name.c_str() );
+			ImGui::EndDragDropSource();
+		}
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
+	fan::SceneNode* FanBeginDragDropTargetSceneNode()
+	{
+		fan::SceneNode* node = nullptr;
+		if( ImGui::BeginDragDropTarget() )
+		{
+			if( const ImGuiPayload* payload = ImGui::AcceptDragDropPayload( "dragndrop_scenenode" ) )
+			{
+				assert( payload->DataSize == sizeof( fan::SceneNode** ) );
+				node = *( fan::SceneNode** )payload->Data;
+			}
+			ImGui::EndDragDropTarget();
+		}
+		return node;
 	}
 
 	//================================================================================================================================

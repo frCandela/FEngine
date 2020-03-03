@@ -172,15 +172,15 @@ namespace fan
 		SetCurrentScene( m_clientScene );
 
 		m_mainMenuBar->SetWindows( { m_renderWindow , m_sceneWindow , m_inspectorWindow , m_consoleWindow, m_ecsWindow, m_profilerWindow, m_gameWindow, m_networkWindow, m_preferencesWindow } );
-		m_sceneWindow->onSelectGameobject.Connect( &EditorSelection::SetSelectedGameobject, m_selection );
+		m_sceneWindow->onSelectSceneNode.Connect( &EditorSelection::SetSelectedSceneNode, m_selection );
 
 		// Instance messages				
 		m_mainMenuBar->onReloadShaders.Connect( &Renderer::ReloadShaders, m_renderer );
 		m_mainMenuBar->onReloadIcons.Connect( &Renderer::ReloadIcons, m_renderer );
 		m_mainMenuBar->onExit.Connect( &Engine::Exit, this );
 		m_mainMenuBar->onSetScene.Connect( &Engine::OnSetCurrentScene, this );
-		m_selection->onGameobjectSelected.Connect( &SceneWindow::OnGameobjectSelected, m_sceneWindow );
-		m_selection->onGameobjectSelected.Connect( &InspectorWindow::OnGameobjectSelected, m_inspectorWindow );
+		m_selection->onSceneNodeSelected.Connect( &SceneWindow::OnSceneNodeSelected, m_sceneWindow );
+		//m_selection->onSceneNodeSelected.Connect( &InspectorWindow::OnGameobjectSelected, m_inspectorWindow ); @node
 
 		// Events linking
 		m_gameCallbacks->ConnectCallbacks( *m_gameWindow, *m_renderer );
@@ -371,25 +371,25 @@ namespace fan
 	//================================================================================================================================
 	void Engine::OnSceneLoad( Scene* _scene )
 	{
-
-		m_selection->Deselect();
-
-		// Editor Camera
-		Gameobject* cameraGameobject = _scene->CreateGameobject( "editor_camera", _scene->GetRoot() );
-		cameraGameobject->SetEditorFlags(
-			Gameobject::EditorFlag::NO_DELETE |
-			Gameobject::EditorFlag::NOT_SAVED |
-			Gameobject::EditorFlag::ALWAYS_PLAY_ACTORS
-		);
-
-
-		cameraGameobject->GetTransform().SetPosition( btVector3( 0, 0, -2 ) );
-		Camera* editorCamera = cameraGameobject->AddComponent<Camera>();
-		editorCamera->SetRemovable( false );
-		FPSCamera* editorCamController = cameraGameobject->AddComponent<FPSCamera>();
-		editorCamController->SetRemovable( false );
-
-		_scene->SetMainCamera( editorCamera );
+		// @hack
+// 		m_selection->Deselect();
+// 
+// 		// Editor Camera
+// 		Gameobject* cameraGameobject = _scene->CreateGameobject( "editor_camera", _scene->GetRoot() );
+// 		cameraGameobject->SetEditorFlags(
+// 			Gameobject::EditorFlag::NO_DELETE |
+// 			Gameobject::EditorFlag::NOT_SAVED |
+// 			Gameobject::EditorFlag::ALWAYS_PLAY_ACTORS
+// 		);
+// 
+// 
+// 		cameraGameobject->GetTransform().SetPosition( btVector3( 0, 0, -2 ) );
+// 		Camera* editorCamera = cameraGameobject->AddComponent<Camera>();
+// 		editorCamera->SetRemovable( false );
+// 		FPSCamera* editorCamController = cameraGameobject->AddComponent<FPSCamera>();
+// 		editorCamController->SetRemovable( false );
+// 
+// 		_scene->SetMainCamera( editorCamera );
 	}
 
 	//================================================================================================================================
@@ -429,7 +429,8 @@ namespace fan
 	//================================================================================================================================
 	void Engine::DrawHull() const
 	{
-		Gameobject* selectedGameobject = m_selection->GetSelectedGameobject();
+		// @node
+		/*Gameobject* selectedGameobject = m_selection->GetSelectedSceneNode();
 		if ( selectedGameobject != nullptr )
 		{
 			MeshRenderer* meshRenderer = selectedGameobject->GetComponent<MeshRenderer>();
@@ -470,14 +471,15 @@ namespace fan
 					}
 				}
 			}
-		}
+		}*/
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
 	void Engine::DrawWireframe() const
 	{
-		Gameobject* selectedGameobject = m_selection->GetSelectedGameobject();
+		// @node
+		/*Gameobject* selectedGameobject = m_selection->GetSelectedSceneNode();
 		if ( selectedGameobject != nullptr )
 		{
 			MeshRenderer* meshRenderer = selectedGameobject->GetComponent<MeshRenderer>();
@@ -501,14 +503,15 @@ namespace fan
 					}
 				}
 			}
-		}
+		}*/
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
 	void Engine::DrawNormals() const
 	{
-		Gameobject* selectedGameobject = m_selection->GetSelectedGameobject();
+		// @node
+		/*Gameobject* selectedGameobject = m_selection->GetSelectedSceneNode();
 		if ( selectedGameobject != nullptr )
 		{
 			MeshRenderer* meshRenderer = selectedGameobject->GetComponent<MeshRenderer>();
@@ -531,7 +534,7 @@ namespace fan
 					}
 				}
 			}
-		}
+		}*/
 	}
 
 	//================================================================================================================================

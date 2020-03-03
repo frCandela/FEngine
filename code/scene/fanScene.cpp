@@ -1,6 +1,7 @@
 #include "scene/fanScene.hpp"
 
 #include "scene/components/fanDirectionalLight.hpp"
+#include "scene/ecs/components/fanSceneNode.hpp"
 #include "scene/components/fanMeshRenderer.hpp"
 #include "scene/components/fanPointLight.hpp"
 #include "scene/components/fanComponent.hpp"
@@ -14,8 +15,8 @@
 #include "scene/fanComponentPtr.hpp"
 #include "scene/fanGameobject.hpp"
 #include "core/time/fanScopedTimer.hpp"
-#include "core/fanSignal.hpp"
 #include "core/time/fanProfiler.hpp"
+#include "core/fanSignal.hpp"
 
 namespace fan
 {
@@ -58,6 +59,25 @@ namespace fan
 		Gameobject* gameobject = new Gameobject( _name, parent, this, id );
 		m_gameobjects[ gameobject->GetUniqueID() ] = gameobject;
 		return gameobject;
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
+	SceneNode& Scene::CreateSceneNode( const std::string _name, SceneNode* const _parentNode, const uint64_t _uniqueId )
+	{
+		//assert( _uniqueId == 0 || !FindGameobject( _uniqueId ) );
+		SceneNode* const parent = _parentNode == nullptr ? m_rootNode : _parentNode;
+		const uint64_t id = _uniqueId == 0 ? NextUniqueID() : _uniqueId; 
+		if( id >= m_nextUniqueID )
+		{
+			m_nextUniqueID = id + 1;
+		}
+		EntityID entityID = m_world->CreateEntity();
+		EntityHandle handle = m_world->CreateHandle( entityID );
+		SceneNode& sceneNode = m_world->AddComponent<SceneNode>( entityID );
+		sceneNode.Build( _name, *this, handle, parent );
+
+		return sceneNode;
 	}
 
 	//================================================================================================================================
@@ -521,11 +541,11 @@ namespace fan
 	//================================================================================================================================
 	void Scene::New()
 	{
-		//@hack
-		//Stop();
-		//Clear();
-		//m_root = CreateGameobject( "root", nullptr );
-		//onSceneLoad.Emmit( this );
+		Stop();
+		Clear();
+		/*m_root = CreateGameobject( "root", nullptr );*/
+		m_rootNode = & CreateSceneNode( "root", nullptr );
+		onSceneLoad.Emmit( this );
 	}
 
 	//================================================================================================================================

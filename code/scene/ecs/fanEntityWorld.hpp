@@ -24,12 +24,24 @@ namespace fan {
 			Entity& entity = GetEntity( _entityID );
 			assert( !entity.signature[index] ); // this entity already have this component
 			assert( entity.componentCount < Entity::s_maxComponentsPerEntity );
-			_componentType& component = (_componentType&)m_components[index].NewComponent();
-			component.Init();
+
+			// alloc data
+			ecComponent&		 componentBase = m_components[index].NewComponent();
+			ChunckIndex			 chunckIndex = componentBase.chunckIndex;
+			ChunckComponentIndex chunckComponentIndex = componentBase.chunckComponentIndex;
+			_componentType& component = * new( &componentBase ) _componentType();
+
+			// set component
+			component.Clear();
 			component.componentIndex = index;
+			component.chunckIndex = chunckIndex;
+			component.chunckComponentIndex = chunckComponentIndex;
+
+			// set entity
 			entity.components[entity.componentCount] = &component;
 			entity.componentCount++;
 			entity.signature[index] = 1;
+
 			return component;
 		}
 
@@ -90,7 +102,7 @@ namespace fan {
 		}
 
 		//================================
-		EntityHandle GetHandle( EntityID _entityID )
+		EntityHandle CreateHandle( EntityID _entityID )
 		{
 			Entity& entity = m_entities[_entityID];
 			if( entity.handle != 0 )

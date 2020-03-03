@@ -61,7 +61,7 @@ namespace fan
 	// Component is a data struct that stores no logic. Components are processed through System::Run() calls
 	// If your component is unique, create a SingletonComponent instead
 	//
-	// Component must call the (DECLARE/REGISTER)_COMPONENT macro and implement an Init() method.
+	// Component must call the (DECLARE/REGISTER)_COMPONENT macro and implement an Clear() method.
 	// It also must be registered in the EntityWorld constructor to be assigned a unique ID
 	// - localTypeID is a unique id that also correspond to the index of the ComponentsCollection in its specific Entity world
 	// - chunckIndex is the index of the Chunck in the ComponentsCollection
@@ -140,7 +140,7 @@ namespace fan
 	//==============================================================================================================================================================
 	// A System is a static function Run() with no state that processes entites
 	//
-	// System must call the (DECLARE/REGISTER)_SYSTEM macro and implement Init() method that set its signature.
+	// System must call the (DECLARE/REGISTER)_SYSTEM macro and implement Clear() method that set its signature.
 	// It also must implement a static Run(..) method that runs its logic.
 	// It also must be registered in the EntityWorld constructor to be assigned a unique signature
 	//==============================================================================================================================================================
@@ -153,7 +153,7 @@ namespace fan
 	{
 		DECLARE_COMPONENT()
 	public:
-		void Init() { x = y = z = 0.f; }
+		void Clear() { x = y = z = 0.f; }
 		float x;
 		float y;
 		float z;
@@ -165,7 +165,7 @@ namespace fan
 	{
 		DECLARE_COMPONENT()
 	public:
-		void Init() { r = g = b = a = 0; }
+		void Clear() { r = g = b = a = 0; }
 		char r;
 		char g;
 		char b;

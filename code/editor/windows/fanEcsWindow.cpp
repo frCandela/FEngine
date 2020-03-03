@@ -64,6 +64,7 @@ namespace fan
 				if( ImGui::IsItemHovered() )
 				{
 					ImGui::BeginTooltip();
+					ImGui::Text( "chunk length: %u", collection.m_componentCount );
 					ImGui::TextUnformatted( "to recycle" );
 					for( int chunckIndex = 0; chunckIndex < chunks.size(); chunckIndex++ )
 					{
@@ -127,7 +128,7 @@ namespace fan
 					if( usePosition ) world.AddComponent<PositionComponent>( id );
 					if( useTag_alwaysUpdate ) world.AddTag<tag_alwaysUpdate>( id );
 					if( useTag_editorOnly ) world.AddTag < tag_editorOnly>( id );
-					if( createHandle ) { world.GetHandle( id ); }
+					if( createHandle ) { world.CreateHandle( id ); }
 				}
 			}ImGui::SameLine();
 

@@ -19,6 +19,8 @@
 #include "core/input/fanMouse.hpp"
 #include "scene/fanPrefab.hpp"
 
+#include "scene/ecs/components/fanSceneNode.hpp"
+
 namespace fan
 {
 
@@ -40,36 +42,55 @@ namespace fan
 	{
 		SCOPED_PROFILE( scene );
 
-		return; //@hack
-
 		ImGui::Icon( GetIconType(), { 16,16 } ); ImGui::SameLine();
 		ImGui::Text( m_scene->GetName().c_str() );
-		ImGui::SameLine();
-		ImGui::Text( m_scene->IsServer() ? "- server" : "- client" );
-		ImGui::Separator();
+ 		ImGui::SameLine();
+ 		ImGui::Text( m_scene->IsServer() ? "- server" : "- client" );
+ 		ImGui::Separator();
 
-		Gameobject* gameobjectRightClicked = nullptr;
-		R_DrawSceneTree( m_scene->GetRoot(), gameobjectRightClicked );
-		m_expandSceneHierarchy = false;
+		// Draws all scene nodes
+		SceneNode* nodeRightClicked = nullptr;
+		R_DrawSceneTree( m_scene->GetRootNode(), nodeRightClicked );
 
-		if( gameobjectRightClicked != nullptr )
+ 		m_expandSceneHierarchy = false;
+ 
+		if( nodeRightClicked != nullptr )
 		{
-			ImGui::OpenPopup( "scene_window_gameobject_rclicked" );
-			m_lastGameobjectRightClicked = gameobjectRightClicked;
-		}
+			ImGui::OpenPopup( "scene_window_node_rclicked" );
+			m_lastSceneNodeRightClicked = nodeRightClicked;
+ 		}
+ 
+		PopupRightClick();
+// 
+// 		// load prefab popup
+// 		if( loadPrefabPopup )
+// 		{
+// 			m_pathBuffer = "content/prefab";
+// 			ImGui::OpenPopup( "Load prefab" );
+// 		}
+// 		if( ImGui::FanLoadFileModal( "Load prefab", RenderGlobal::s_prefabExtensions, m_pathBuffer ) )
+// 		{
+// 			Prefab* prefab = Prefab::s_resourceManager.LoadPrefab( m_pathBuffer.string() );
+// 			if( prefab != nullptr )
+// 			{
+// 				m_scene->CreateGameobject( *prefab, m_lastGameobjectRightClicked );
+// 			}
+// 		}
+	}
 
-		// Popup set gameobject when right clic
-		bool newGameobjectPopup = false;
-		bool renameGameobjectPopup = false;
+	void SceneWindow::PopupRightClick()
+	{
+		// Popup set gameobject when right click
+		bool newNodePopup = false;
+		bool renameNodePopup = false;
 		bool exportToPrefabPopup = false;
 		bool loadPrefabPopup = false;
 
-		if( ImGui::BeginPopup( "scene_window_gameobject_rclicked" ) )
+		if( ImGui::BeginPopup( "scene_window_node_rclicked" ) )
 		{
-
-			// New gameobject 
+			// New scene node 
 			bool itemClicked = false;
-			if( ImGui::BeginMenu( "New gameobject" ) )
+			if( ImGui::BeginMenu( "New node" ) )
 			{
 				// Popup empty gameobject
 				if( ImGui::IsItemClicked() )
@@ -80,42 +101,42 @@ namespace fan
 				ImGui::Icon( ImGui::MESH_RENDERER16, { 16,16 } ); ImGui::SameLine();
 				if( ImGui::MenuItem( "Model" ) )
 				{
-					Gameobject* newIntity = m_scene->CreateGameobject( "new_model", m_lastGameobjectRightClicked );
-					MeshRenderer* meshRenderer = newIntity->AddComponent<MeshRenderer>();
-					meshRenderer->SetPath( RenderGlobal::s_meshCube );
-					Material* material = newIntity->AddComponent<Material>();
-					material->SetTexturePath( RenderGlobal::s_textureWhite );
+// 					Gameobject* newIntity = m_scene->CreateGameobject( "new_model", m_lastGameobjectRightClicked );
+// 					MeshRenderer* meshRenderer = newIntity->AddComponent<MeshRenderer>();
+// 					meshRenderer->SetPath( RenderGlobal::s_meshCube );
+// 					Material* material = newIntity->AddComponent<Material>();
+// 					material->SetTexturePath( RenderGlobal::s_textureWhite );
 				}
 
 				ImGui::Icon( ImGui::POINT_LIGHT16, { 16,16 } ); ImGui::SameLine();
 				if( ImGui::MenuItem( "Point light" ) )
 				{
-					Gameobject* newIntity = m_scene->CreateGameobject( "new_point_light", m_lastGameobjectRightClicked );
-					newIntity->AddComponent<PointLight>();
+// 					Gameobject* newIntity = m_scene->CreateGameobject( "new_point_light", m_lastGameobjectRightClicked );
+// 					newIntity->AddComponent<PointLight>();
 				}
 
 				ImGui::Icon( ImGui::DIR_LIGHT16, { 16,16 } ); ImGui::SameLine();
 				if( ImGui::MenuItem( "Dir light" ) )
 				{
-					Gameobject* newIntity = m_scene->CreateGameobject( "new_dir_light", m_lastGameobjectRightClicked );
-					newIntity->AddComponent<DirectionalLight>();
+// 					Gameobject* newIntity = m_scene->CreateGameobject( "new_dir_light", m_lastGameobjectRightClicked );
+// 					newIntity->AddComponent<DirectionalLight>();
 				}
 
 				ImGui::Icon( ImGui::SPHERE_SHAPE16, { 16,16 } ); ImGui::SameLine();
 				if( ImGui::MenuItem( "Sphere" ) )
 				{
-					Gameobject* newIntity = m_scene->CreateGameobject( "new_model", m_lastGameobjectRightClicked );
-					MeshRenderer* meshRenderer = newIntity->AddComponent<MeshRenderer>();
-					meshRenderer->SetPath( RenderGlobal::s_meshSphere );
-					newIntity->AddComponent<Rigidbody>();
-					newIntity->AddComponent<SphereShape>();
+// 					Gameobject* newIntity = m_scene->CreateGameobject( "new_model", m_lastGameobjectRightClicked );
+// 					MeshRenderer* meshRenderer = newIntity->AddComponent<MeshRenderer>();
+// 					meshRenderer->SetPath( RenderGlobal::s_meshSphere );
+// 					newIntity->AddComponent<Rigidbody>();
+// 					newIntity->AddComponent<SphereShape>();
 				}
 
 				ImGui::Icon( ImGui::PARTICLES16, { 16,16 } ); ImGui::SameLine();
 				if( ImGui::MenuItem( "FX" ) )
 				{
-					Gameobject* newIntity = m_scene->CreateGameobject( "new_fx", m_lastGameobjectRightClicked );
-					newIntity->AddComponent<ParticleSystem>();
+// 					Gameobject* newIntity = m_scene->CreateGameobject( "new_fx", m_lastGameobjectRightClicked );
+// 					newIntity->AddComponent<ParticleSystem>();
 				}
 
 				ImGui::EndMenu();
@@ -123,7 +144,7 @@ namespace fan
 
 			if( ImGui::IsItemClicked() )
 			{
-				newGameobjectPopup = true;
+				newNodePopup = true;
 			}
 
 			if( ImGui::MenuItem( "Import prefab" ) )
@@ -136,7 +157,7 @@ namespace fan
 			// rename
 			if( ImGui::Selectable( "Rename" ) )
 			{
-				renameGameobjectPopup = true;
+				renameNodePopup = true;
 			}
 
 			// export to prefab
@@ -149,53 +170,38 @@ namespace fan
 			ImGui::Separator();
 			if( ImGui::Selectable( "Delete" ) )
 			{
-				m_scene->DeleteGameobject( m_lastGameobjectRightClicked );
+				//m_scene->DeleteGameobject( m_lastGameobjectRightClicked );
 			}
 			ImGui::EndPopup();
 		}
 
 		// new gameobject modal
-		if( newGameobjectPopup )
+		if( newNodePopup )
 		{
-			ImGui::OpenPopup( "New gameobject" );
+			ImGui::OpenPopup( "new_scenenode" );
 		} NewGameobjectModal();
 
 		// rename modal
-		if( renameGameobjectPopup )
+		if( renameNodePopup )
 		{
-			ImGui::OpenPopup( "Rename gameobject" );
+			ImGui::OpenPopup( "rename_scenenode" );
 		} RenameGameobjectModal();
 
 		// export to prefab modal
 		if( exportToPrefabPopup )
 		{
 			m_pathBuffer = "content/prefab";
-			ImGui::OpenPopup( "Export to prefab" );
+			ImGui::OpenPopup( "export_to_prefab" );
 		} ExportToPrefabModal();
-
-		// load prefab popup
-		if( loadPrefabPopup )
-		{
-			m_pathBuffer = "content/prefab";
-			ImGui::OpenPopup( "Load prefab" );
-		}
-		if( ImGui::FanLoadFileModal( "Load prefab", RenderGlobal::s_prefabExtensions, m_pathBuffer ) )
-		{
-			Prefab* prefab = Prefab::s_resourceManager.LoadPrefab( m_pathBuffer.string() );
-			if( prefab != nullptr )
-			{
-				m_scene->CreateGameobject( *prefab, m_lastGameobjectRightClicked );
-			}
-		}
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void SceneWindow::R_DrawSceneTree( Gameobject* _gameobjectDrawn, Gameobject*& _gameobjectRightClicked )
+	void SceneWindow::R_DrawSceneTree( SceneNode& _node, SceneNode*& _nodeRightClicked )
 	{
 
 		std::stringstream ss;
-		ss << "##" << _gameobjectDrawn; // Unique id
+		ss << "##" << &_node; // Unique id
 
 		if( ImGui::IsWindowAppearing() || m_expandSceneHierarchy == true )
 		{
@@ -204,45 +210,44 @@ namespace fan
 		bool isOpen = ImGui::TreeNode( ss.str().c_str() );
 
 		// Gameobject dragndrop target empty selectable -> place dragged below
-		Gameobject* gameobjectDrop1 = ImGui::FanBeginDragDropTargetGameobject();
-		if( gameobjectDrop1 && gameobjectDrop1 != _gameobjectDrawn )
+		SceneNode* nodeDrop1 = ImGui::FanBeginDragDropTargetSceneNode();
+		if( nodeDrop1 && nodeDrop1 != &_node )
 		{
-			gameobjectDrop1->InsertBelow( _gameobjectDrawn );
+			nodeDrop1->InsertBelow( _node );
 		}
 
 
 		ImGui::SameLine();
-		bool selected = ( _gameobjectDrawn == m_gameobjectSelected );
+		bool selected = ( &_node == m_sceneNodeSelected );
 
 		// Draw gameobject empty selectable to display a hierarchy
 		std::stringstream ss2;
-		ss2 << _gameobjectDrawn->GetName() << "##" << _gameobjectDrawn; // Unique id
+		ss2 << _node.name << "##" << &_node; // Unique id
 		if( ImGui::Selectable( ss2.str().c_str(), &selected ) )
 		{
-			onSelectGameobject.Emmit( _gameobjectDrawn );
+			onSelectSceneNode.Emmit( &_node );
 		}
 		if( ImGui::IsItemClicked( 1 ) )
 		{
-			_gameobjectRightClicked = _gameobjectDrawn;
+			_nodeRightClicked = &_node;
 		}
 
-		// Gameobject dragndrop source = selectable -^
-		ImGui::FanBeginDragDropSourceGameobject( _gameobjectDrawn );
+		// SceneNode dragndrop source = selectable -^
+		ImGui::FanBeginDragDropSourceSceneNode( _node );
 
-		// Gameobject dragndrop target gameobject name -> place as child
-		Gameobject* gameobjectDrop = ImGui::FanBeginDragDropTargetGameobject();
-		if( gameobjectDrop )
+		// SceneNode dragndrop target gameobject name -> place as child
+		SceneNode* nodeDrop = ImGui::FanBeginDragDropTargetSceneNode();
+		if( nodeDrop )
 		{
-			gameobjectDrop->SetParent( _gameobjectDrawn );
+			nodeDrop->SetParent( &_node );
 		}
 
 		if( isOpen )
 		{
-			const std::vector<Gameobject*>& childs = _gameobjectDrawn->GetChilds();
-			for( int childIndex = 0; childIndex < childs.size(); childIndex++ )
+			for( int childIndex = 0; childIndex < _node.childs.size(); childIndex++ )
 			{
-				Gameobject* child = childs[childIndex];
-				R_DrawSceneTree( child, _gameobjectRightClicked );
+				SceneNode* child = _node.childs[childIndex];
+				R_DrawSceneTree( *child, _nodeRightClicked );
 			}
 
 			ImGui::TreePop();
@@ -254,7 +259,7 @@ namespace fan
 	void SceneWindow::NewGameobjectModal()
 	{
 		ImGui::SetNextWindowSize( ImVec2( 200, 200 ) );
-		if( ImGui::BeginPopupModal( "New gameobject" ) )
+		if( ImGui::BeginPopupModal( "new_scenenode" ) )
 		{
 			if( ImGui::IsWindowAppearing() )
 			{
@@ -267,7 +272,7 @@ namespace fan
 			}
 			if( ImGui::Button( "Cancel" ) || ImGui::IsKeyPressed( GLFW_KEY_ESCAPE, false ) )
 			{
-				m_lastGameobjectRightClicked = nullptr;
+				m_lastSceneNodeRightClicked = nullptr;
 				ImGui::CloseCurrentPopup();
 			}
 			ImGui::SameLine();
@@ -275,10 +280,10 @@ namespace fan
 			{
 				if( std::string( m_textBuffer ) != "" )
 				{
-					//Create new gameobject 
-					Gameobject* newGameobject = m_scene->CreateGameobject( m_textBuffer, m_lastGameobjectRightClicked );
-					onSelectGameobject.Emmit( newGameobject );
-					m_lastGameobjectRightClicked = nullptr;
+					//Create new scene node 
+					SceneNode& newNode = m_scene->CreateSceneNode( m_textBuffer, m_lastSceneNodeRightClicked );
+					onSelectSceneNode.Emmit( &newNode );
+					m_lastSceneNodeRightClicked = nullptr;
 					ImGui::CloseCurrentPopup();
 				}
 			}
@@ -291,11 +296,11 @@ namespace fan
 	void SceneWindow::RenameGameobjectModal()
 	{
 		ImGui::SetNextWindowSize( ImVec2( 200, 200 ) );
-		if( ImGui::BeginPopupModal( "Rename gameobject" ) )
+		if( ImGui::BeginPopupModal( "rename_scenenode" ) )
 		{
 			if( ImGui::IsWindowAppearing() )
 			{
-				strcpy_s( m_textBuffer, 32, m_lastGameobjectRightClicked->GetName().c_str() );
+				strcpy_s( m_textBuffer, 32, m_lastSceneNodeRightClicked->name.c_str() );
 				ImGui::SetKeyboardFocusHere();
 			}
 			bool enterPressed = false;
@@ -305,7 +310,7 @@ namespace fan
 			}
 			if( ImGui::Button( "Cancel" ) || ImGui::IsKeyPressed( GLFW_KEY_ESCAPE, false ) )
 			{
-				m_lastGameobjectRightClicked = nullptr;
+				m_lastSceneNodeRightClicked = nullptr;
 				ImGui::CloseCurrentPopup();
 			}
 			ImGui::SameLine();
@@ -313,8 +318,8 @@ namespace fan
 			{
 				if( std::string( m_textBuffer ) != "" )
 				{
-					m_lastGameobjectRightClicked->SetName( m_textBuffer );
-					m_lastGameobjectRightClicked = nullptr;
+					m_lastSceneNodeRightClicked->name = m_textBuffer;
+					m_lastSceneNodeRightClicked = nullptr;
 					ImGui::CloseCurrentPopup();
 				}
 			}
@@ -326,12 +331,12 @@ namespace fan
 	//================================================================================================================================
 	void SceneWindow::ExportToPrefabModal()
 	{
-		if( m_lastGameobjectRightClicked == nullptr )
+		if( m_lastSceneNodeRightClicked == nullptr )
 		{
 			return;
 		}
 
-		if( ImGui::FanSaveFileModal( "Export to prefab", RenderGlobal::s_prefabExtensions, m_pathBuffer ) )
+		if( ImGui::FanSaveFileModal( "export_to_prefab", RenderGlobal::s_prefabExtensions, m_pathBuffer ) )
 		{
 			Debug::Log() << "Exporting prefab to " << m_pathBuffer.string() << Debug::Endl();
 
@@ -339,15 +344,15 @@ namespace fan
 			if( outStream.is_open() )
 			{
 				// Try to update the existing prefab if it exists
-				Prefab* prefab = Prefab::s_resourceManager.FindPrefab( m_pathBuffer.string() );
-				if( prefab != nullptr )
-				{
-					prefab->CreateFromGameobject( *m_lastGameobjectRightClicked );
-				}
-
-				Prefab newprefab;
-				newprefab.CreateFromGameobject( *m_lastGameobjectRightClicked );
-				outStream << newprefab.GetJson();
+// 				Prefab* prefab = Prefab::s_resourceManager.FindPrefab( m_pathBuffer.string() );
+// 				if( prefab != nullptr )
+// 				{
+// 					prefab->CreateFromGameobject( *m_lastSceneNodeRightClicked );
+// 				}
+// 
+// 				Prefab newprefab;
+// 				newprefab.CreateFromGameobject( *m_lastSceneNodeRightClicked );
+// 				outStream << newprefab.GetJson();
 
 				outStream.close();
 			}

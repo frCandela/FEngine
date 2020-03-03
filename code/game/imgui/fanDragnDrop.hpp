@@ -7,12 +7,16 @@ namespace fan
 	class Component;
 	class Gameobject;
 	class Prefab;
+	struct SceneNode;
 }
 
 namespace ImGui
 {
 	void				FanBeginDragDropSourceGameobject( fan::Gameobject * _gameobject, ImGuiDragDropFlags _flags = ImGuiDragDropFlags_None );
 	fan::Gameobject *	FanBeginDragDropTargetGameobject();
+
+	void				FanBeginDragDropSourceSceneNode( fan::SceneNode& _node, ImGuiDragDropFlags _flags = ImGuiDragDropFlags_None );
+	fan::SceneNode*		FanBeginDragDropTargetSceneNode();
 
 	void				FanBeginDragDropSourcePrefab( fan::Prefab * _prefab, ImGuiDragDropFlags _flags = ImGuiDragDropFlags_None );
 	fan::Prefab *		FanBeginDragDropTargetPrefab();

@@ -7,13 +7,14 @@ namespace fan
 {
 	class Scene;
 	class Gameobject;
+	struct SceneNode;
 
 	//================================================================================================================================
 	//================================================================================================================================
 	class SceneWindow : public EditorWindow
 	{
 	public:
-		Signal< Gameobject* > onSelectGameobject;
+		Signal< SceneNode* > onSelectSceneNode;
 
 		SceneWindow();
 		~SceneWindow();
@@ -21,7 +22,7 @@ namespace fan
 		void SetScene( Scene* _scene ) { m_scene = _scene; }
 
 		// Callbacks
-		void OnGameobjectSelected( Gameobject* _gameobject ) { m_gameobjectSelected = _gameobject; }
+		void OnSceneNodeSelected( SceneNode* node ) { m_sceneNodeSelected = node; }
 		void OnExpandHierarchy( Scene* /*_scene*/ ) { m_expandSceneHierarchy = true; }
 
 	protected:
@@ -29,17 +30,19 @@ namespace fan
 
 	private:
 		Scene* m_scene;
-		Gameobject* m_gameobjectSelected;
+		SceneNode* m_sceneNodeSelected;
+
 
 		std::filesystem::path m_pathBuffer;
 		char m_textBuffer[ 32 ];
-		Gameobject* m_lastGameobjectRightClicked = nullptr;
+		SceneNode* m_lastSceneNodeRightClicked = nullptr;
 		bool m_expandSceneHierarchy = false;
 
 		void NewGameobjectModal();
 		void RenameGameobjectModal();
 		void ExportToPrefabModal();
+		void PopupRightClick();
 
-		void R_DrawSceneTree( Gameobject* _gameobject, Gameobject*& _gameobjectRightClicked );
+		void R_DrawSceneTree( SceneNode& _node, SceneNode*& _nodeRightClicked );
 	};
 }

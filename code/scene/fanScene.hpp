@@ -7,6 +7,7 @@
 
 namespace fan
 {
+	struct SceneNode;
 	class Gameobject;
 	class Component;
 	class Actor;
@@ -45,6 +46,8 @@ namespace fan
 		Scene( const std::string _name );
 		~Scene();
 
+
+		SceneNode&  CreateSceneNode( const std::string _name, SceneNode* const _parentNode, const uint64_t _uniqueId = 0 );
 		Gameobject* CreateGameobject( const std::string _name, Gameobject* const _parent, const uint64_t _uniqueId = 0 );
 		Gameobject* CreateGameobject( const Prefab& _prefab, Gameobject* const _parent );
 		void		DeleteGameobject( Gameobject* _gameobject );
@@ -69,6 +72,8 @@ namespace fan
 		void SetPath( const std::string _path ) { m_path = _path; }
 
 		Gameobject* GetRoot() { return m_root; }
+		SceneNode& GetRootNode() { return *m_rootNode; };
+
 		inline std::string		 GetName() const { return m_name; }
 		bool					 IsServer() const { return m_isServer; }
 		bool					 HasPath() const { return m_path.empty() == false; }
@@ -114,6 +119,7 @@ namespace fan
 		EntityWorld* m_world = nullptr;
 
 		// References
+		SceneNode * m_rootNode = nullptr;
 		Gameobject* m_root;
 		Camera* m_mainCamera = nullptr;
 
