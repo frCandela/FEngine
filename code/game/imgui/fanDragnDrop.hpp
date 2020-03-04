@@ -8,6 +8,8 @@ namespace fan
 	class Gameobject;
 	class Prefab;
 	struct SceneNode;
+	struct ecComponent;
+	struct ComponentInfo;
 }
 
 namespace ImGui
@@ -23,6 +25,9 @@ namespace ImGui
 
 	void				FanBeginDragDropSourceComponent( fan::Component * _component, ImGuiDragDropFlags _flags = ImGuiDragDropFlags_None );
 	fan::Component *	FanBeginDragDropTargetComponent( const uint32_t _typeID );
+
+	void				FanBeginDragDropSourceEcComponent( fan::ecComponent& _component, const fan::ComponentInfo& _info, ImGuiDragDropFlags _flags = ImGuiDragDropFlags_None );
+	fan::Component*		FanBeginDragDropTargetEcComponent( const uint32_t _typeID );
 
 	//================================================================================================================================
 	//================================================================================================================================

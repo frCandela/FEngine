@@ -1,6 +1,8 @@
 #include "editor/windows/fanInspectorWindow.hpp"
 #include "editor/components/fanFPSCamera.hpp"
 #include "game/imgui/fanDragnDrop.hpp"
+#include "scene/ecs/fanEntityWorld.hpp"
+#include "scene/ecs/components/fanSceneNode.hpp"
 #include "scene/components/fanComponent.hpp"
 #include "scene/components/fanTransform.hpp"
 #include "scene/components/fanMaterial.hpp"
@@ -27,68 +29,75 @@ namespace fan
 	{
 		SCOPED_PROFILE( inspector );
 
-		return; //@hack
-
-		if( m_gameobjectSelected != nullptr )
+		if( m_sceneNodeSelected != nullptr )
 		{
+			SceneNode& node = *m_sceneNodeSelected;
+			Scene& scene = *node.scene;
+			EntityWorld& world = scene.GetEntityWorld();
+			const EntityID id = world.GetEntityID( node.entityHandle );
+			Entity& entity = world.GetEntity( id );
+
 			// gameobject gui
-			ImGui::Icon( GetIconType(), { 16,16 } ); ImGui::SameLine();
-			m_gameobjectSelected->OnGui();
+ 			ImGui::Icon( GetIconType(), { 16,16 } ); ImGui::SameLine();
+			std::stringstream ss;
+			ss << "Gameobject : " << node.name << " (handle: " << node.entityHandle << ") (ref: " << -1/*GetRefCount()*/ << ")";
+			ImGui::Text( ss.str().c_str() );
+
 			int componentCount = 0;
-			const std::vector<Component*>& components = m_gameobjectSelected->GetComponents();
-			for( int componentIndex = 0; componentIndex < components.size(); componentIndex++ )
+			for( int componentIndex = 0; componentIndex < entity.componentCount; componentIndex++ )
 			{
-				Component* component = components[componentIndex];
+				ecComponent& component = *entity.components[componentIndex];
+				const ComponentInfo& info = world.GetComponentInfo( component.GetTypeIndex() );
+ 				ImGui::Separator();
+				 
+ 				// Icon
+				ImGui::Icon( info.icon, { 16,16 } ); ImGui::SameLine();
+				ImGui::Text( "%s", info.name.c_str() );
+ 				ImGui::FanBeginDragDropSourceEcComponent( component, info, ImGuiDragDropFlags_SourceAllowNullID );
+// 
+// 				// Actor "enable" checkbox
+// 				if( component->IsActor() )
+// 				{	// TODO : use type info when type info deals with inheritance
+// 					ImGui::PushID( (int*)component );
+// 					Actor* actor = static_cast<Actor*>( component );
+// 					bool enabled = actor->IsEnabled();
+// 					if( ImGui::Checkbox( "", &enabled ) )
+// 					{
+// 						actor->SetEnabled( enabled );
+// 					}
+// 					ImGui::SameLine();
+// 					ImGui::PopID();
+// 				}
+// 
+// 				// Delete button	
+// 				ImGui::Text( component->GetName() );
+// 				ImGui::FanBeginDragDropSourceComponent( component, ImGuiDragDropFlags_SourceAllowNullID );
+// 
+//  			ImGui::SameLine();
+//  			ImGui::Text( "  (ref: %d) ", component->GetRefCount() );
+// 
+// 				if( component->IsRemovable() )
+// 				{
+// 					std::stringstream ss;
+// 					ss << "X" << "##" << component->GetName() << componentCount++;	// make unique id
+// 					ImGui::SameLine( ImGui::GetWindowWidth() - 40 );
+// 					if( ImGui::Button( ss.str().c_str() ) )
+// 					{
+// 						m_sceneNodeSelected->RemoveComponent( component );
+// 						component = nullptr;
+// 					}
+// 				}
 
-				ImGui::Separator();
-
-				// Icon
-				ImGui::Icon( component->GetIcon(), { 16,16 } ); ImGui::SameLine();
-				ImGui::FanBeginDragDropSourceComponent( component, ImGuiDragDropFlags_SourceAllowNullID );
-
-				// Actor "enable" checkbox
-				if( component->IsActor() )
-				{	// TODO : use type info when type info deals with inheritance
-					ImGui::PushID( (int*)component );
-					Actor* actor = static_cast<Actor*>( component );
-					bool enabled = actor->IsEnabled();
-					if( ImGui::Checkbox( "", &enabled ) )
-					{
-						actor->SetEnabled( enabled );
-					}
-					ImGui::SameLine();
-					ImGui::PopID();
-				}
-
-				// Delete button	
-				ImGui::Text( component->GetName() );
-				ImGui::FanBeginDragDropSourceComponent( component, ImGuiDragDropFlags_SourceAllowNullID );
-
-				ImGui::SameLine();
-				ImGui::Text( "  (ref: %d) ", component->GetRefCount() );
-
-				if( component->IsRemovable() )
+ 				// Draw component
+				if( info.onGui != nullptr )
 				{
-					std::stringstream ss;
-					ss << "X" << "##" << component->GetName() << componentCount++;	// make unique id
-					ImGui::SameLine( ImGui::GetWindowWidth() - 40 );
-					if( ImGui::Button( ss.str().c_str() ) )
-					{
-						m_gameobjectSelected->RemoveComponent( component );
-						component = nullptr;
-					}
-				}
-
-				// Draw component
-				if( component != nullptr )
-				{
-					component->OnGui();
-				}
+					info.onGui( component );
+				} 				
 			}
 			ImGui::Separator();
 			//Add component button
 			if( ImGui::Button( "Add component" ) )
-				ImGui::OpenPopup( "New component" );
+				ImGui::OpenPopup( "new_component" );
 
 			NewComponentPopup();
 		}
@@ -98,13 +107,13 @@ namespace fan
 	//================================================================================================================================
 	void InspectorWindow::NewComponentItem( const Component* _component )
 	{
-		ImGui::Icon( _component->GetIcon(), { 16,16 } ); ImGui::SameLine();
-		if( ImGui::MenuItem( _component->GetName() ) )
-		{
-			// Create new Component 
-			m_gameobjectSelected->AddComponent( _component->GetType() );
-			ImGui::CloseCurrentPopup();
-		}
+// 		ImGui::Icon( _component->GetIcon(), { 16,16 } ); ImGui::SameLine();@node
+// 		if( ImGui::MenuItem( _component->GetName() ) )
+// 		{
+// 			// Create new Component 
+// 			m_sceneNodeSelected->AddComponent( _component->GetType() );
+// 			ImGui::CloseCurrentPopup();
+// 		}
 	}
 
 	//================================================================================================================================
@@ -114,7 +123,7 @@ namespace fan
 		using Path = std::filesystem::path;
 
 
-		if( ImGui::BeginPopup( "New component" ) )
+		if( ImGui::BeginPopup( "new_component" ) )
 		{
 			// Get components 
 			std::vector< const Component*> components;

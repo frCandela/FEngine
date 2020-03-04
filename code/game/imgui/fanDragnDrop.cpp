@@ -2,6 +2,7 @@
 
 #include "scene/ecs/components/fanSceneNode.hpp"
 #include "scene/components/fanComponent.hpp"
+#include "scene/ecs/fanEntityWorld.hpp"
 #include "scene/fanGameobject.hpp"
 #include "scene/fanPrefab.hpp"
 #include "render/core/fanTexture.hpp"
@@ -159,4 +160,53 @@ namespace ImGui
 		}
 		return component;
 	}
+
+	//================================================================================================================================
+	//================================================================================================================================
+	void FanBeginDragDropSourceEcComponent( fan::ecComponent& _component, const fan::ComponentInfo& _info, ImGuiDragDropFlags _flags )
+	{
+		fan::ecComponent* component = &_component;
+		if( ImGui::BeginDragDropSource( _flags ) )
+		{
+			std::string nameid = std::string( "dragndrop_" ) + std::to_string( _component.GetTypeIndex() );
+			ImGui::SetDragDropPayload( nameid.c_str(), &component, sizeof( fan::ecComponent** ) );
+			ImGui::Icon( _info.icon, { 16,16 } ); ImGui::SameLine();
+			ImGui::Text( _info.name.c_str() );
+			ImGui::EndDragDropSource();
+		}		
+	}
+
+	//================================================================================================================================
+	// _typeID of the typeinfo type of the component 
+	//================================================================================================================================
+	fan::Component* FanBeginDragDropTargetEcComponent( const uint32_t _typeID )
+	{
+ 		fan::Component* component = nullptr;
+// 		if( ImGui::BeginDragDropTarget() )
+// 		{
+// 			const fan::Component* sample = fan::TypeInfo::Get().GetInstance< fan::Component >( _typeID );
+// 
+// 			std::string nameid = std::string( "dragndrop_" ) + sample->GetName();
+// 			// Drop payload component
+// 			const ImGuiPayload* payloadComponent = ImGui::AcceptDragDropPayload( nameid.c_str() );
+// 			if( payloadComponent )
+// 			{
+// 				assert( payloadComponent->DataSize == sizeof( fan::Component** ) );
+// 				component = *( fan::Component** )payloadComponent->Data;
+// 			}
+// 			// Drop payload gameobject
+// 			else
+// 			{
+// 				const ImGuiPayload* payloadGameobject = ImGui::AcceptDragDropPayload( "dragndrop_gameobject" );
+// 				if( payloadGameobject )
+// 				{
+// 					assert( payloadGameobject->DataSize == sizeof( fan::Gameobject** ) );
+// 					fan::Gameobject* gameobject = *( fan::Gameobject** )payloadGameobject->Data;
+// 					component = gameobject->GetComponent( _typeID );
+// 				}
+// 			}
+// 			ImGui::EndDragDropTarget();
+// 		}
+ 		return component;
+ 	}
 }

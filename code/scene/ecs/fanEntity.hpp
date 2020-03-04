@@ -77,7 +77,8 @@ namespace fan
 		ChunckComponentIndex chunckComponentIndex;
 
 	public:
-		Signature GetSignature() const { return Signature( 1 ) << componentIndex; }
+		ComponentIndex	GetTypeIndex()	const { return componentIndex; };
+		Signature		GetSignature()	const { return Signature( 1 ) << componentIndex; }
 	};
 	static constexpr size_t sizeComponent = sizeof( ecComponent );
 	static_assert( sizeComponent == 4 );

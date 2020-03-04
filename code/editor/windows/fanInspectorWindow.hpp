@@ -5,7 +5,7 @@
 
 namespace fan
 {
-	class Gameobject;
+	struct SceneNode;
 	class Component;
 
 	//================================================================================================================================
@@ -17,13 +17,13 @@ namespace fan
 
 
 		// Callbacks
-		void OnGameobjectSelected( Gameobject* _gameobject ) { m_gameobjectSelected = _gameobject; }
+		void OnSceneNodeSelected( SceneNode* _node ) { m_sceneNodeSelected = _node; }
 
 	protected:
 		void OnGui() override;
 
 	private:
-		Gameobject* m_gameobjectSelected;
+		SceneNode* m_sceneNodeSelected = nullptr;
 
 		void NewComponentPopup();
 		void R_NewComponentPopup( std::set< std::filesystem::path >& _componentsPathSet, std::set< std::filesystem::path >::iterator& _current, const std::vector< const Component*>& _components, const std::vector<std::filesystem::path>& _componentsPath );

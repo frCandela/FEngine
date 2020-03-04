@@ -180,7 +180,7 @@ namespace fan
 		m_mainMenuBar->onExit.Connect( &Engine::Exit, this );
 		m_mainMenuBar->onSetScene.Connect( &Engine::OnSetCurrentScene, this );
 		m_selection->onSceneNodeSelected.Connect( &SceneWindow::OnSceneNodeSelected, m_sceneWindow );
-		//m_selection->onSceneNodeSelected.Connect( &InspectorWindow::OnGameobjectSelected, m_inspectorWindow ); @node
+		m_selection->onSceneNodeSelected.Connect( &InspectorWindow::OnSceneNodeSelected, m_inspectorWindow );
 
 		// Events linking
 		m_gameCallbacks->ConnectCallbacks( *m_gameWindow, *m_renderer );

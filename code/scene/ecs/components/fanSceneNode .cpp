@@ -1,5 +1,7 @@
 #include "scene/ecs/components/fanSceneNode.hpp"
 
+#include "scene/fanScene.hpp"
+
 namespace fan
 {
 	REGISTER_COMPONENT( SceneNode, "scene_node" );
@@ -28,6 +30,16 @@ namespace fan
 		{
 			_parent->childs.push_back( this );
 		}
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
+	void SceneNode::OnGui( ecComponent& _sceneNode )
+	{
+		SceneNode& node = static_cast<SceneNode&>( _sceneNode );
+		ImGui::Text( "name   : %s", node.name.c_str() );
+		ImGui::Text( "scene  : %s", node.scene->GetName().c_str() );
+		ImGui::Text( "handle : %u", node.entityHandle );
 	}
 
 	//================================================================================================================================
