@@ -35,7 +35,7 @@ namespace fan {
 
 		const ComponentInfo&  GetComponentInfo( const ComponentIndex _index ) const { return  m_componentInfo.at( _index );	}
 		EntityID			  CreateEntity();
-		void				  DeleteEntity( EntityID _entityID );
+		void				  KillEntity( EntityID _entityID );
 		EntityHandle		  CreateHandle( EntityID _entityID );
 		EntityID			  GetEntityID( EntityHandle _handle );
 		Entity&				  GetEntity( const EntityID _id );

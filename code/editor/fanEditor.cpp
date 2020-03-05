@@ -216,8 +216,8 @@ namespace fan
 		m_serverScene->New();
 
 		// try open scenes
-		m_clientScene->LoadFrom( "content/scenes/game.scene" );
-		m_serverScene->LoadFrom( "content/scenes/game.scene" );
+// 		m_clientScene->LoadFrom( "content/scenes/game.scene" ); @hack
+// 		m_serverScene->LoadFrom( "content/scenes/game.scene" );
 
 		Debug::Log( "done initializing" );
 

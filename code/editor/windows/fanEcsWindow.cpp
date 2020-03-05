@@ -136,7 +136,7 @@ namespace fan
 			{
 				for( int i = 0; i < num; i++ )
 				{
-					world.DeleteEntity( (EntityID)world.m_entities.size() - i - 1 );
+					world.KillEntity( (EntityID)world.m_entities.size() - i - 1 );
 				}
 			}ImGui::SameLine();
 			if( ImGui::Button( "Run" ) )

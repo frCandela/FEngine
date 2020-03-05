@@ -24,11 +24,9 @@ namespace fan
 		name = _name;
 		scene = &_scene;
 		entityHandle = _entityHandle;
-		parent = _parent;
-
 		if( _parent != nullptr )
 		{
-			_parent->childs.push_back( this );
+			_parent->AddChild( *this );
 		}
 	}
 

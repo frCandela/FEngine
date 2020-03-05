@@ -25,7 +25,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	class Scene : public ISerializable
+	class Scene
 	{
 	public:
 		Signal< Scene* >		onSceneLoad;
@@ -48,6 +48,7 @@ namespace fan
 
 
 		SceneNode&  CreateSceneNode( const std::string _name, SceneNode* const _parentNode, const uint64_t _uniqueId = 0 );
+		void		DeleteSceneNode( SceneNode& _node );
 		Gameobject* CreateGameobject( const std::string _name, Gameobject* const _parent, const uint64_t _uniqueId = 0 );
 		Gameobject* CreateGameobject( const Prefab& _prefab, Gameobject* const _parent );
 		void		DeleteGameobject( Gameobject* _gameobject );
@@ -128,6 +129,7 @@ namespace fan
 
 		// Gameobjects
 		std::vector < Gameobject* >			m_entitiesToDelete;
+		std::vector < SceneNode* >			m_sceneNodesToDelete;
 		std::vector < Component* >			m_componentsToDelete;
 		std::vector< Actor* >				m_actors;
 		std::vector< Actor* >				m_startingActors;
@@ -147,14 +149,15 @@ namespace fan
 
 		uint64_t NextUniqueID() { assert( FindGameobject( m_nextUniqueID ) == nullptr );  return m_nextUniqueID++; }
 
-		bool Load( const Json& _json ) override;
-		bool Save( Json& _json ) const override;
+		bool R_Load( const Json&	  _json, SceneNode& _node );
+		bool R_Save( const SceneNode& _node, Json& _json ) const;
 		void Clear();
 
 		// @todo, place all static scene utility (below) in a separate file
 		template<typename _componentType>
 		void		R_FindComponentsOfType( const Gameobject* _gameobject, std::vector<_componentType*>& _components ) const;
 		void		R_DeleteGameobject( Gameobject* _gameobject, std::set<Gameobject*>& _deletedEntitiesSet );
+		void		R_DeleteSceneNode( SceneNode& _node );
 		void		R_BuildEntitiesList( Gameobject* _gameobject, std::vector<Gameobject*>& _entitiesList ) const;
 		Component*	R_FindComponentOfType( Gameobject* _gameobject, const uint32_t _typeID ) const;
 		uint64_t	R_FindMaximumId( Gameobject& _gameobject );

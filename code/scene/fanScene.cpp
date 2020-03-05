@@ -81,6 +81,32 @@ namespace fan
 	}
 
 	//================================================================================================================================
+	//================================================================================================================================
+	void Scene::R_DeleteSceneNode( SceneNode& _node )
+	{
+		const std::vector<SceneNode*> childs = _node.childs; // copy
+		for( int childIndex = 0; childIndex < childs.size(); childIndex++ )
+		{
+			R_DeleteSceneNode( * childs[childIndex] );
+		}
+
+		//onDeleteGameobject.Emmit( _gameobject );
+		if( _node.parent != nullptr )
+		{
+			_node.parent->RemoveChild( _node );
+		}
+		const EntityID id = m_world->GetEntityID( _node.entityHandle );
+		m_world->KillEntity( id );
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
+	void Scene::DeleteSceneNode( SceneNode& _node )
+	{
+		m_sceneNodesToDelete.push_back( &_node );
+	}
+
+	//================================================================================================================================
 	// Creates a game object from a prefab and adds it to the scene hierarchy
 	// Gameobjects ids are remapped depending on the scene next id
 	//================================================================================================================================
@@ -97,7 +123,6 @@ namespace fan
 	{
 		m_entitiesToDelete.push_back( _gameobject );
 	}
-
 
 	//================================================================================================================================
 	//================================================================================================================================
@@ -491,6 +516,7 @@ namespace fan
 			}
 			m_gameobjects.erase( _gameobject->GetUniqueID() );
 			delete( _gameobject );
+			_gameobject = nullptr;
 		}
 	}
 
@@ -527,6 +553,7 @@ namespace fan
 		m_instantiate->Clear();
 		std::set<Gameobject*> deletedEntitiesSet;
 		R_DeleteGameobject( m_root, deletedEntitiesSet );
+		m_rootNode = nullptr;
 		m_startingActors.clear();
 		m_activeActors.clear();
 		m_pausedActors.clear();
@@ -557,9 +584,19 @@ namespace fan
 		if ( outStream.is_open() )
 		{
 			Json json;
-			if ( Save( json ) )
+
+			// scene global parameters
+			Json& jScene = json["scene"];
+			{
+				Serializable::SaveString( jScene, "name", m_name );
+				Serializable::SaveString( jScene, "path", m_path );
+			}
+
+			// saves all nodes recursively
+			Json& jRoot = jScene["root"];
+			if ( R_Save( *m_rootNode, jRoot ) )
 			{				
-				Prefab::RemapGameobjectIndices( json );
+				//Prefab::RemapGameobjectIndices( json ); @hack
 				// Out to disk
 				outStream << json;
 			}
@@ -569,21 +606,99 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	bool Scene::Save( Json& _json ) const
-	{
-		// Parameters
-		Json& jParameters = _json[ "parameters" ];
-		{
-			Serializable::SaveString( jParameters, "name", m_name );
-			Serializable::SaveString( jParameters, "path", m_path );
-		}
+	bool Scene::R_Save( const SceneNode& _node, Json& _json ) const
+	{	
+		Serializable::SaveString( _json, "name", _node.name );
+		Serializable::SaveUInt64( _json, "gameobject_id", _node.uniqueID );
 
-		// Gameobjects
-		Json& jGameobjects = _json[ "gameobjects" ];
+		Json& jchilds = _json["childs"];
+		unsigned childIndex = 0;
+		for( int sceneNodeIndex = 0; sceneNodeIndex < _node.childs.size(); sceneNodeIndex++ )
 		{
-			if ( !m_root->Save( jGameobjects ) )
+			SceneNode& childNode = *_node.childs[sceneNodeIndex];
+			if( true/*( gameobject->GetEditorFlags() & EditorFlag::NOT_SAVED ) == false*/ )
 			{
+				Json& jchild = jchilds[childIndex];
+				R_Save( childNode, jchild );
+				++childIndex;
+			}
+		}		
+		return true;
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
+	bool Scene::LoadFrom( const std::string _path )
+	{
+		//Stop();@hack
+		Clear();
+ 		std::ifstream inStream( _path );
+ 		if ( inStream.is_open() && inStream.good() )
+ 		{
+ 			// Load scene
+ 			Debug::Get() << Debug::Severity::log << "loading scene: " << _path << Debug::Endl();
+
+			Json sceneJson;
+			inStream >> sceneJson;
+
+			// scene global parameters
+			const Json& jScene = sceneJson["scene"];
+			{
+				Serializable::LoadString( jScene, "name", m_name );
+				Serializable::LoadString( jScene, "path", m_path );
+			}
+
+			// loads all nodes recursively
+			const Json& jRoot = jScene["root"];
+			m_rootNode = &CreateSceneNode( "root", nullptr );
+			if ( R_Load( jRoot, *m_rootNode ) )
+			{
+				m_path = _path;
+				inStream.close();
+
+				//m_nextUniqueID = R_FindMaximumId( *m_root ) + 1;
+				//m_instantiate->ResolveGameobjectPtr( 0 );
+				//m_instantiate->ResolveComponentPtr( 0 );
+
+				//onSceneLoad.Emmit( this );@hack
+				return true;
+			}
+			else
+			{
+				Debug::Get() << Debug::Severity::error << "failed to load scene: " << _path << Debug::Endl();
+				m_path = "";
+				inStream.close();
+				New();
 				return false;
+			}
+		}
+		else
+		{
+			Debug::Get() << Debug::Severity::error << "failed to open file " << _path << Debug::Endl();
+			New();
+			return false;
+		}
+		return false;
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
+	bool Scene::R_Load( const Json& _json, SceneNode& _node )
+	{
+		//ScopedTimer timer("load scene");
+		Serializable::LoadString( _json, "name", _node.name );
+		Serializable::LoadUInt64( _json, "gameobject_id", _node.uniqueID );
+
+		// Load childs
+		const Json& jchilds = _json["childs"];
+		{
+			for( int childIndex = 0; childIndex < jchilds.size(); childIndex++ )
+			{
+				const Json& jchild_i = jchilds[childIndex];
+				{
+					SceneNode& childNode = CreateSceneNode( "tmp", &_node /*+ _idOffset*/ );
+					R_Load( jchild_i, childNode );
+				}
 			}
 		}
 		return true;
@@ -591,77 +706,8 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	bool Scene::Load( const Json& _json )
-	{
-		//ScopedTimer timer("load scene");
-
-		// Parameters
-		const Json& jParameters = _json[ "parameters" ];
-		{
-			Serializable::LoadString( jParameters, "name", m_name );
-			Serializable::LoadString( jParameters, "path", m_path );
-		}
-
-		// Gameobjects
-		const Json& jGameobjects = _json[ "gameobjects" ];
-		{
-			uint64_t id;
-			Serializable::LoadUInt64( jGameobjects, "gameobject_id", id );
-			m_root = CreateGameobject( "root", nullptr, id );
-			m_root->Load( jGameobjects );
-
-			m_nextUniqueID = R_FindMaximumId( *m_root ) + 1;
-		}
-		m_instantiate->ResolveGameobjectPtr( 0 );
-		m_instantiate->ResolveComponentPtr( 0 );
-		return true;
-	}	
-
-	//================================================================================================================================
-	//================================================================================================================================
-	bool Scene::LoadFrom( const std::string _path )
-	{//@hack
-// 		Stop();
-// 		Clear();
-// 		std::ifstream inStream( _path );
-// 		if ( inStream.is_open() && inStream.good() )
-// 		{
-// 			// Load scene
-// 			Debug::Get() << Debug::Severity::log << "loading scene: " << _path << Debug::Endl();
-// 
-// 			Json sceneJson;
-// 			inStream >> sceneJson;
-// 			if ( Load( sceneJson ) )
-// 			{
-// 				m_path = _path;
-// 				inStream.close();
-// 				onSceneLoad.Emmit( this );
-// 				return true;
-// 			}
-// 			else
-// 			{
-// 				Debug::Get() << Debug::Severity::error << "failed to load scene: " << _path << Debug::Endl();
-// 				m_path = "";
-// 				inStream.close();
-// 				New();
-// 				return false;
-// 			}
-// 
-// 		}
-// 		else
-// 		{
-// 			Debug::Get() << Debug::Severity::error << "failed to open file " << _path << Debug::Endl();
-// 			New();
-// 			return false;
-// 		}
-		return false;
-	}
-
-	//================================================================================================================================
-	//================================================================================================================================
 	void Scene::RegisterDirectionalLight( DirectionalLight* _directionalLight )
 	{
-
 		// Looks for the _directionalLight
 		for ( int lightIndex = 0; lightIndex < m_directionalLights.size(); lightIndex++ )
 		{
