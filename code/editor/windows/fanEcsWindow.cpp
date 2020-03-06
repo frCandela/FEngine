@@ -124,8 +124,6 @@ namespace fan
 				for( int i = 0; i < num; i++ )
 				{
 					EntityID id = world.CreateEntity();
-					if( useColor ) world.AddComponent<ColorComponent>( id );
-					if( usePosition ) world.AddComponent<PositionComponent>( id );
 					if( useTag_alwaysUpdate ) world.AddTag<tag_alwaysUpdate>( id );
 					if( useTag_editorOnly ) world.AddTag < tag_editorOnly>( id );
 					if( createHandle ) { world.CreateHandle( id ); }

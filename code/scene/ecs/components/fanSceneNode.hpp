@@ -7,17 +7,21 @@
 namespace fan
 {
 	class Scene;
+	struct ComponentInfo;
 
 	//==============================================================================================================================================================
 	//==============================================================================================================================================================
 	struct SceneNode : public ecComponent
 	{
-		DECLARE_COMPONENT()
+		DECLARE_COMPONENT( SceneNode )
 	public:
 
-		void Clear();
-		void Build( const std::string& _name, Scene& _scene, EntityHandle _entityHandle,  SceneNode* _parent );
+		static void SetInfo( ComponentInfo& _info );
+		static void Clear( ecComponent& _sceneNode );
 		static void OnGui( ecComponent& _sceneNode );
+
+		void Init( const std::string& _name, Scene& _scene, EntityHandle _entityHandle,  SceneNode* _parent );
+
 
 		bool IsAncestorOf( const SceneNode& _node ) const;
 		void RemoveChild( const SceneNode& _child );

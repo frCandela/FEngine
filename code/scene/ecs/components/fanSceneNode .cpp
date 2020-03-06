@@ -1,6 +1,7 @@
 #include "scene/ecs/components/fanSceneNode.hpp"
 
 #include "scene/fanScene.hpp"
+#include "scene/ecs/fanEntityWorld.hpp"
 
 namespace fan
 {
@@ -8,18 +9,28 @@ namespace fan
 	
 	//================================================================================================================================
 	//================================================================================================================================
-	void SceneNode::Clear()
+	void SceneNode::SetInfo( ComponentInfo& _info )
 	{
-		entityHandle = 0;
-		name = "";
-		scene = nullptr;
-		parent = nullptr;
-		childs.clear();
+		_info.icon  = ImGui::IconType::GAMEOBJECT16;
+		_info.onGui = &SceneNode::OnGui;
+		_info.clear = &SceneNode::Clear;
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void SceneNode::Build( const std::string& _name, Scene& _scene, EntityHandle _entityHandle, SceneNode* _parent )
+	void SceneNode::Clear( ecComponent& _sceneNode )
+	{
+		SceneNode& node = static_cast<SceneNode&>( _sceneNode );
+		node.entityHandle = 0;
+		node.name = "";
+		node.scene = nullptr;
+		node.parent = nullptr;
+		node.childs.clear();
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
+	void SceneNode::Init( const std::string& _name, Scene& _scene, EntityHandle _entityHandle, SceneNode* _parent )
 	{
 		name = _name;
 		scene = &_scene;

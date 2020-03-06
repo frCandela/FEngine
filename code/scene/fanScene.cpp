@@ -75,7 +75,7 @@ namespace fan
 		EntityID entityID = m_world->CreateEntity();
 		EntityHandle handle = m_world->CreateHandle( entityID );
 		SceneNode& sceneNode = m_world->AddComponent<SceneNode>( entityID );
-		sceneNode.Build( _name, *this, handle, parent );
+		sceneNode.Init( _name, *this, handle, parent );
 
 		return sceneNode;
 	}

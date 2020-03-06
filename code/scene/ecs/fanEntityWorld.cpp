@@ -1,12 +1,10 @@
 #include "fanEntityWorld.hpp"
 
 #include "scene/ecs/components/fanSceneNode.hpp"
+#include "scene/ecs/components/fanTransform2.hpp"
 
 namespace fan
 {
-	REGISTER_COMPONENT( PositionComponent, "position" );
-	REGISTER_COMPONENT( ColorComponent, "color" );
-
 	REGISTER_SINGLETON_COMPONENT( sc_sunLight, "sunlight" );
 
 	REGISTER_TAG( tag_editorOnly, "editor_only" );
@@ -16,7 +14,7 @@ namespace fan
 
 	Signature UpdateAABBFromRigidbodySystem::GetSignature( const EntityWorld& _world )
 	{
-		return _world.GetSignature<tag_editorOnly>() | _world.GetSignature<ColorComponent>();
+		return _world.GetSignature<tag_editorOnly>();
 	}
 
 	//================================================================================================================================
@@ -34,9 +32,8 @@ namespace fan
 
 		AddSingletonComponentType<sc_sunLight>();
 
-		AddComponentType<PositionComponent>( ImGui::IconType::NONE, nullptr );
-		AddComponentType<ColorComponent>( ImGui::IconType::NONE, nullptr );
-		AddComponentType<SceneNode>( ImGui::IconType::GAMEOBJECT16, &SceneNode::OnGui );
+		AddComponentType<SceneNode>( );
+		AddComponentType<Transform2>();
 
 		AddTagType<tag_alwaysUpdate>();
 		AddTagType<tag_editorOnly>();
@@ -53,6 +50,43 @@ namespace fan
 		EntityID  id = (EntityID)m_entities.size();
 		m_entities.push_back( entity );
 		return id;
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
+	ecComponent& EntityWorld::AddComponent( const EntityID _entityID, const ComponentIndex _index )
+	{
+		Entity& entity = GetEntity( _entityID );
+		assert( !entity.signature[_index] ); // this entity already have this component
+		assert( entity.componentCount < Entity::s_maxComponentsPerEntity );
+
+		const ComponentInfo& info = m_componentInfo[_index];
+
+		// alloc data
+		ecComponent&		 componentBase = m_components[_index].NewComponent();
+		ChunckIndex			 chunckIndex = componentBase.chunckIndex;
+		ChunckComponentIndex chunckComponentIndex = componentBase.chunckComponentIndex;
+		ecComponent&		 component = info.instanciate( &componentBase );			
+
+		// set component
+		info.clear( component );
+		component.componentIndex = _index;
+		component.chunckIndex = chunckIndex;
+		component.chunckComponentIndex = chunckComponentIndex;
+
+		// set entity
+		entity.components[entity.componentCount] = &component;
+		entity.componentCount++;
+		entity.signature[_index] = 1;
+
+		return component;
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
+	bool EntityWorld::HasComponent( const EntityID _entityID, ComponentIndex _index ) 
+	{ 
+		return m_entities[_entityID].HasComponent( _index ); 
 	}
 
 	//================================================================================================================================

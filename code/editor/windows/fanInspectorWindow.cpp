@@ -105,15 +105,23 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void InspectorWindow::NewComponentItem( const Component* _component )
+	void InspectorWindow::NewComponentItem( const ComponentInfo& _info )
 	{
-// 		ImGui::Icon( _component->GetIcon(), { 16,16 } ); ImGui::SameLine();@node
-// 		if( ImGui::MenuItem( _component->GetName() ) )
-// 		{
-// 			// Create new Component 
-// 			m_sceneNodeSelected->AddComponent( _component->GetType() );
-// 			ImGui::CloseCurrentPopup();
-// 		}
+		ImGui::Icon( _info.icon, { 16,16 } ); ImGui::SameLine();
+		if( ImGui::MenuItem( _info.name.c_str() ) )
+		{
+			// Create new Component 
+
+			EntityWorld& world = m_sceneNodeSelected->scene->GetEntityWorld();
+			EntityID id = world.GetEntityID( m_sceneNodeSelected->entityHandle );
+			if( !world.HasComponent( id, _info.index ) )
+			{
+				world.AddComponent( id, _info.index );
+			}
+
+			
+			ImGui::CloseCurrentPopup();
+		}
 	}
 
 	//================================================================================================================================
@@ -122,22 +130,27 @@ namespace fan
 	{
 		using Path = std::filesystem::path;
 
+		EntityWorld& world = m_sceneNodeSelected->scene->GetEntityWorld();
 
 		if( ImGui::BeginPopup( "new_component" ) )
 		{
 			// Get components 
-			std::vector< const Component*> components;
-			for( const void* component : TypeInfo::Get().GetInstancesWithFlags( TypeInfo::EDITOR_COMPONENT ) )
+			std::vector< const ComponentInfo*> components;
+			for ( auto& pair : world.m_componentInfo )
 			{
-				components.push_back( static_cast<const Component*>( component ) );
+				const ComponentInfo& info = pair.second;
+				if( info.editorPath != nullptr )
+				{
+					components.push_back( &info );
+				}
 			}
 
-			// Get components paths
+ 			// Get components paths
 			std::vector<Path> componentsPath;
 			componentsPath.reserve( components.size() );
 			for( int componentIndex = 0; componentIndex < components.size(); componentIndex++ )
 			{
-				componentsPath.push_back( TypeInfo::Get().GetPath( components[componentIndex]->GetType() ) );
+				componentsPath.push_back(  components[componentIndex]->editorPath );
 			}
 
 			// Sort components paths
@@ -158,7 +171,10 @@ namespace fan
 			// Draw menu items for components at path ""
 			for( int componentIndex = 0; componentIndex < components.size(); componentIndex++ )
 			{
-				if( componentsPath[componentIndex] == "" ) { NewComponentItem( components[componentIndex] ); }
+				if( componentsPath[componentIndex] == "" ) 
+				{ 
+					NewComponentItem( *components[componentIndex] ); 
+				}
 			}
 
 			ImGui::EndPopup();
@@ -167,7 +183,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void InspectorWindow::R_NewComponentPopup( std::set< std::filesystem::path >& _componentsPathSet, std::set< std::filesystem::path >::iterator& _current, const std::vector< const Component*>& _components, const std::vector<std::filesystem::path>& _componentsPath )
+	void InspectorWindow::R_NewComponentPopup( std::set< std::filesystem::path >& _componentsPathSet, std::set< std::filesystem::path >::iterator& _current, const std::vector< const ComponentInfo*>& _components, const std::vector<std::filesystem::path>& _componentsPath )
 	{
 		std::filesystem::path rootPath = *_current;
 
@@ -179,7 +195,8 @@ namespace fan
 			if( name[charIndex] == '\\' ) { name[charIndex] = '/'; }
 		}
 
-		while( name[name.size() - 1] == '/' ) { name.erase( name.end() - 1 ); } // Remove trailing slashes
+		// Remove trailing slashes
+		while( name[name.size() - 1] == '/' ) { name.erase( name.end() - 1 ); } 
 		size_t lastSlash = name.find_last_of( "/" );
 		if( lastSlash != std::string::npos )
 		{
@@ -203,8 +220,7 @@ namespace fan
 			{
 				if( _componentsPath[componentIndex] == rootPath.string() )
 				{
-					const Component* component = _components[componentIndex];
-					NewComponentItem( component );
+					NewComponentItem( *_components[componentIndex] );
 				}
 			}
 			ImGui::EndMenu();

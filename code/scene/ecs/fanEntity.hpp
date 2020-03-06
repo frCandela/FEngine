@@ -8,7 +8,7 @@ namespace fan
 	class ComponentsCollection;
 	class EntityWorld;
 	struct Entity;
-
+	struct ecComponent;
 
 	static constexpr uint32_t signatureLength = 32;
 	using Signature = std::bitset<signatureLength>;
@@ -20,11 +20,12 @@ namespace fan
 	using ChunckIndex = uint8_t;
 	using ChunckComponentIndex = uint16_t;
 
-#define DECLARE_COMPONENT()													\
-	private:																\
-	friend class EntityWorld;												\
-	static const uint32_t s_typeInfo;										\
-	static const char* s_typeName;											\
+#define DECLARE_COMPONENT( _componentType)															\
+	private:																						\
+	friend class EntityWorld;																		\
+	static const uint32_t s_typeInfo;																\
+	static const char* s_typeName;																	\
+	static ecComponent& Instanciate( void * _buffer){ return *new( _buffer ) _componentType();}	\
 
 #define REGISTER_COMPONENT( _componentType, _name)				\
 	const uint32_t _componentType::s_typeInfo = SSID(#_name);	\
@@ -123,17 +124,10 @@ namespace fan
 			return *(_componentType*)( 0 );
 		}
 
-		template< typename _tagType >
-		bool HasTag() const
-		{
-			static_assert( std::is_base_of< Tag, _tagType>::value );
-			return signature[_tagType::s_typeID] == 1;
-		}
-		//================================
-		template< typename _componentType >
-		bool HasComponent() const { return signature[_componentType::s_typeID] == 1; }
-		void Kill() { signature[ecAliveBit] = 0; }
-		bool IsAlive() const { return  signature[ecAliveBit] == 1; }
+		bool HasTag( const ComponentIndex _index ) const		{ return signature[_index] == 1;		}
+		bool HasComponent( const ComponentIndex _index ) const	{ return signature[_index] == 1;		}
+		bool IsAlive() const									{ return  signature[ecAliveBit] == 1;	}
+		void Kill()												{ signature[ecAliveBit] = 0;			}
 	};
 	static constexpr size_t sizeEntity = sizeof( Entity );
 	static_assert( sizeEntity == 128 );
@@ -147,31 +141,6 @@ namespace fan
 	//==============================================================================================================================================================
 	struct System
 	{};
-
-	//==============================================================================================================================================================
-	//==============================================================================================================================================================
-	struct PositionComponent : public ecComponent
-	{
-		DECLARE_COMPONENT()
-	public:
-		void Clear() { x = y = z = 0.f; }
-		float x;
-		float y;
-		float z;
-	};
-
-	//==============================================================================================================================================================
-	//==============================================================================================================================================================
-	struct ColorComponent : public ecComponent
-	{
-		DECLARE_COMPONENT()
-	public:
-		void Clear() { r = g = b = a = 0; }
-		char r;
-		char g;
-		char b;
-		char a;
-	};
 
 	//==============================================================================================================================================================
 	//==============================================================================================================================================================

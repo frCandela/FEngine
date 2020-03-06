@@ -6,14 +6,17 @@
 #include "core/imgui/fanImguiIcons.hpp"
 
 namespace fan {
-
 	//==============================================================================================================================================================
 	//==============================================================================================================================================================
 	struct ComponentInfo
 	{
 		std::string name;
-		ImGui::IconType icon;
-		void ( *onGui )( ecComponent& );
+		ImGui::IconType icon = ImGui::IconType::NONE;
+		void ( *onGui )( ecComponent& ) = nullptr;
+		void ( *clear )( ecComponent& ) = nullptr;
+		ecComponent& ( *instanciate)( void* ) = nullptr;
+		const char* editorPath = "";
+		ComponentIndex index;
 	};
 
 	//==============================================================================================================================================================
@@ -25,14 +28,15 @@ namespace fan {
 	public:
 		EntityWorld();
 
-		template< typename _componentType >	_componentType& AddComponent( EntityID _entityID );
+		template< typename _componentType >	_componentType& AddComponent( const EntityID _entityID );
 		template< typename _componentType >	void			RemoveComponent( EntityID _entityID );
 		template< typename _tagType >void					AddTag( EntityID _entityID );
 		template< typename _componentType >	_componentType& GetSingletonComponent();
-		template< typename _systemType > void RunSystem( const float _delta );
+		template< typename _systemType > void				RunSystem( const float _delta );
+		template< typename _tagOrComponentType > Signature	GetSignature() const;
 
-		template< typename _tagOrComponentType > Signature		GetSignature() const;
-
+		ecComponent&		  AddComponent( const EntityID _entityID, const ComponentIndex _index );
+		bool				  HasComponent( const EntityID _entityID, ComponentIndex _index );
 		const ComponentInfo&  GetComponentInfo( const ComponentIndex _index ) const { return  m_componentInfo.at( _index );	}
 		EntityID			  CreateEntity();
 		void				  KillEntity( EntityID _entityID );
@@ -43,8 +47,7 @@ namespace fan {
 		void				  RemoveDeadEntities();
 	//private:
 
-
-		template< typename _componentType >	void AddComponentType( const ImGui::IconType _icon, void ( *_onGui )( ecComponent& ) );
+		template< typename _componentType >	void AddComponentType();
 		template< typename _tagType >		void AddTagType();
 		template< typename _componentType >	void AddSingletonComponentType();
 
@@ -63,32 +66,12 @@ namespace fan {
 	//==============================================================================================================================================================
 	//==============================================================================================================================================================
 	template< typename _componentType >
-	_componentType& EntityWorld::AddComponent( EntityID _entityID )
+	_componentType& EntityWorld::AddComponent( const EntityID _entityID )
 	{
 		static_assert( std::is_base_of< ecComponent, _componentType>::value );
 		const ComponentIndex index = m_typeIndices[_componentType::s_typeInfo];
-		Entity& entity = GetEntity( _entityID );
-		assert( !entity.signature[index] ); // this entity already have this component
-		assert( entity.componentCount < Entity::s_maxComponentsPerEntity );
-
-		// alloc data
-		ecComponent& componentBase = m_components[index].NewComponent();
-		ChunckIndex			 chunckIndex = componentBase.chunckIndex;
-		ChunckComponentIndex chunckComponentIndex = componentBase.chunckComponentIndex;
-		_componentType& component = *new( &componentBase ) _componentType();
-
-		// set component
-		component.Clear();
-		component.componentIndex = index;
-		component.chunckIndex = chunckIndex;
-		component.chunckComponentIndex = chunckComponentIndex;
-
-		// set entity
-		entity.components[entity.componentCount] = &component;
-		entity.componentCount++;
-		entity.signature[index] = 1;
-
-		return component;
+		ecComponent& component = AddComponent( _entityID, index );
+		return static_cast< _componentType& >( component );
 	}
 
 	//==============================================================================================================================================================
@@ -164,7 +147,7 @@ namespace fan {
 
 	//==============================================================================================================================================================
 	//==============================================================================================================================================================
-	template< typename _componentType >	void EntityWorld::AddComponentType( const ImGui::IconType _icon, void ( *_onGui )( ecComponent& ) )
+	template< typename _componentType >	void EntityWorld::AddComponentType()
 	{
 		static_assert( std::is_base_of< ecComponent, _componentType>::value );
 		ComponentsCollection chunck;
@@ -175,10 +158,12 @@ namespace fan {
 
 		// Registers component info
 		ComponentInfo info;
+		_componentType::SetInfo( info );
+		assert( info.clear != nullptr );
 		info.name = _componentType::s_typeName;
-		info.onGui = _onGui;
-		info.icon = _icon;
-		m_componentInfo[index] = info;
+		info.instanciate = &_componentType::Instanciate;
+		info.index = index;		
+		m_componentInfo[index] = info;		
 	}
 
 	//==============================================================================================================================================================
