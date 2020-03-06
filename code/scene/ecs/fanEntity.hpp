@@ -108,22 +108,7 @@ namespace fan
 		Signature signature;
 		EntityHandle handle = 0;
 
-		//================================
-		template< typename _componentType >
-		_componentType& GetComponent()
-		{
-			static_assert( std::is_base_of< ecComponent, _componentType>::value );
-			for( int i = 0; i < componentCount; i++ )
-			{
-				if( components[i]->typeID == _componentType::s_typeID )
-				{
-					return *static_cast<_componentType*> ( components[i] );
-				}
-			}
-			assert( false );
-			return *(_componentType*)( 0 );
-		}
-
+		ecComponent& GetComponent( const ComponentIndex _index );
 		bool HasTag( const ComponentIndex _index ) const		{ return signature[_index] == 1;		}
 		bool HasComponent( const ComponentIndex _index ) const	{ return signature[_index] == 1;		}
 		bool IsAlive() const									{ return  signature[ecAliveBit] == 1;	}
