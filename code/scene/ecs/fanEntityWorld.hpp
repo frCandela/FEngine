@@ -11,12 +11,15 @@ namespace fan {
 	struct ComponentInfo
 	{
 		std::string name;
-		ImGui::IconType icon = ImGui::IconType::NONE;
+		ImGui::IconType icon = ImGui::IconType::NONE;		
 		void ( *onGui )( ecComponent& ) = nullptr;
 		void ( *clear )( ecComponent& ) = nullptr;
+		void ( *save )( const ecComponent&, Json& ) = nullptr;
+		void ( *load )( ecComponent&, const Json& ) = nullptr;
 		ecComponent& ( *instanciate)( void* ) = nullptr;
 		const char* editorPath = "";
 		ComponentIndex index;
+		uint32_t staticIndex;
 	};
 
 	//==============================================================================================================================================================
@@ -162,7 +165,8 @@ namespace fan {
 		assert( info.clear != nullptr );
 		info.name = _componentType::s_typeName;
 		info.instanciate = &_componentType::Instanciate;
-		info.index = index;		
+		info.index = index;	
+		info.staticIndex = _componentType::s_typeInfo;
 		m_componentInfo[index] = info;		
 	}
 

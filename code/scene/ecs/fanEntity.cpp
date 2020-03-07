@@ -8,7 +8,7 @@ namespace fan
 	{
 		for( int i = 0; i < componentCount; i++ )
 		{
-			if( components[i]->GetTypeIndex() == _index )
+			if( components[i]->GetIndex() == _index )
 			{
 				return *components[i];
 			}

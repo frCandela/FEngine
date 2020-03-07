@@ -1,19 +1,20 @@
 #include "scene/fanScene.hpp"
 
 #include "scene/components/fanDirectionalLight.hpp"
-#include "scene/ecs/components/fanSceneNode.hpp"
 #include "scene/components/fanMeshRenderer.hpp"
 #include "scene/components/fanPointLight.hpp"
 #include "scene/components/fanComponent.hpp"
 #include "scene/components/fanTransform.hpp"
 #include "scene/components/fanCamera.hpp"
+#include "scene/actors/fanActor.hpp"
 #include "scene/fanSceneResourcePtr.hpp"
 #include "scene/fanSceneInstantiate.hpp"
-#include "scene/ecs/fanEntityWorld.hpp"
 #include "scene/fanPhysicsManager.hpp"
-#include "scene/actors/fanActor.hpp"
 #include "scene/fanComponentPtr.hpp"
 #include "scene/fanGameobject.hpp"
+#include "scene/ecs/components/fanSceneNode.hpp"
+#include "scene/ecs/fanEntityWorld.hpp"
+#include "scene/ecs/fanEntity.hpp"
 #include "core/time/fanScopedTimer.hpp"
 #include "core/time/fanProfiler.hpp"
 #include "core/fanSignal.hpp"
@@ -594,8 +595,30 @@ namespace fan
 	bool Scene::R_Save( const SceneNode& _node, Json& _json ) const
 	{	
 		Serializable::SaveString( _json, "name", _node.name );
-		Serializable::SaveUInt64( _json, "gameobject_id", _node.uniqueID );
+		Serializable::SaveUInt64( _json, "node_id", _node.uniqueID );
 
+		// save components
+		Json& jComponents = _json["components"];
+		{
+			EntityID id = m_world->GetEntityID( _node.entityHandle );
+			Entity& entity = m_world->GetEntity( id );
+			unsigned nextIndex = 0;
+			for( int componentIndex = 0; componentIndex < entity.componentCount; componentIndex++ )
+			{
+				// if a save method is provided, saves the component
+				ecComponent& component = *entity.components[componentIndex];				
+				const ComponentInfo& info = m_world->GetComponentInfo( component.GetIndex() );								
+				if( info.save != nullptr )
+				{
+					Json& jComponent_i = jComponents[nextIndex++];
+					Serializable::SaveUInt( jComponent_i, "node_id", info.staticIndex );
+					Serializable::SaveString( jComponent_i, "type", info.name );
+					info.save( component, jComponent_i );
+				}				
+			}
+		}
+
+		// save childs
 		Json& jchilds = _json["childs"];
 		unsigned childIndex = 0;
 		for( int sceneNodeIndex = 0; sceneNodeIndex < _node.childs.size(); sceneNodeIndex++ )
@@ -672,7 +695,22 @@ namespace fan
 	{
 		//ScopedTimer timer("load scene");
 		Serializable::LoadString( _json, "name", _node.name );
-		Serializable::LoadUInt64( _json, "gameobject_id", _node.uniqueID );
+		Serializable::LoadUInt64( _json, "node_id", _node.uniqueID );
+
+		const Json& jComponents = _json["components"];
+		{
+			for( int childIndex = 0; childIndex < jComponents.size(); childIndex++ )
+			{
+				const Json& jComponent_i = jComponents[childIndex];				
+				unsigned staticIndex = 0;
+				Serializable::LoadUInt( jComponent_i, "node_id", staticIndex );
+				const ComponentIndex componentIndex = m_world->m_typeIndices[staticIndex];
+				const ComponentInfo& info			= m_world->GetComponentInfo( componentIndex );
+				const EntityID		 entityID		= m_world->GetEntityID( _node.entityHandle );
+				ecComponent& component			    = m_world->AddComponent( entityID, componentIndex );				
+				info.load( component, jComponent_i );
+			}
+		}
 
 		// Load childs
 		const Json& jchilds = _json["childs"];

@@ -168,7 +168,7 @@ namespace ImGui
 		fan::ecComponent* component = &_component;
 		if( ImGui::BeginDragDropSource( _flags ) )
 		{
-			std::string nameid = std::string( "dragndrop_" ) + std::to_string( _component.GetTypeIndex() );
+			std::string nameid = std::string( "dragndrop_" ) + std::to_string( _component.GetIndex() );
 			ImGui::SetDragDropPayload( nameid.c_str(), &component, sizeof( fan::ecComponent** ) );
 			ImGui::Icon( _info.icon, { 16,16 } ); ImGui::SameLine();
 			ImGui::Text( _info.name.c_str() );

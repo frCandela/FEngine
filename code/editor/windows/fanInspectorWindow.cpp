@@ -47,7 +47,7 @@ namespace fan
 			for( int componentIndex = 0; componentIndex < entity.componentCount; componentIndex++ )
 			{
 				ecComponent& component = *entity.components[componentIndex];
-				const ComponentInfo& info = world.GetComponentInfo( component.GetTypeIndex() );
+				const ComponentInfo& info = world.GetComponentInfo( component.GetIndex() );
  				ImGui::Separator();
 				 
  				// Icon

@@ -14,6 +14,8 @@ namespace fan
 		_info.icon = ImGui::IconType::TRANSFORM16;
 		_info.onGui = &Transform2::OnGui;
 		_info.clear = &Transform2::Clear;
+		_info.save = &Transform2::Save;
+		_info.load = &Transform2::Load;
 		_info.editorPath = "toto";
 	}
 

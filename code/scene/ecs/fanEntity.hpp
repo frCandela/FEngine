@@ -90,7 +90,7 @@ namespace fan
 		ChunckComponentIndex chunckComponentIndex;
 
 	public:
-		ComponentIndex	GetTypeIndex()	const { return componentIndex; };
+		ComponentIndex	GetIndex()	const { return componentIndex; };
 		Signature		GetSignature()	const { return Signature( 1 ) << componentIndex; }
 	};
 	static constexpr size_t sizeComponent = sizeof( ecComponent );
