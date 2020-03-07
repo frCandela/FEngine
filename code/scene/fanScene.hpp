@@ -31,7 +31,7 @@ namespace fan
 		Signal< Scene* >		onSceneLoad;
 		Signal< Scene* >		onSceneStop;
 		Signal<>				onSceneClear;
-		Signal< Gameobject* >	onDeleteGameobject;
+		Signal< SceneNode* >	onDeleteSceneNode;
 		Signal< Camera* >		onSetMainCamera;
 
 		Signal< MeshRenderer* >		onRegisterMeshRenderer;
@@ -152,12 +152,11 @@ namespace fan
 		bool R_Load( const Json&	  _json, SceneNode& _node );
 		bool R_Save( const SceneNode& _node, Json& _json ) const;
 		void Clear();
+		void DeleteNodesImmediate( const std::vector<SceneNode*>& _nodes );
 
 		// @todo, place all static scene utility (below) in a separate file
 		template<typename _componentType>
 		void		R_FindComponentsOfType( const Gameobject* _gameobject, std::vector<_componentType*>& _components ) const;
-		void		R_DeleteGameobject( Gameobject* _gameobject, std::set<Gameobject*>& _deletedEntitiesSet );
-		void		R_DeleteSceneNode( SceneNode& _node );
 		void		R_BuildEntitiesList( Gameobject* _gameobject, std::vector<Gameobject*>& _entitiesList ) const;
 		Component*	R_FindComponentOfType( Gameobject* _gameobject, const uint32_t _typeID ) const;
 		uint64_t	R_FindMaximumId( Gameobject& _gameobject );

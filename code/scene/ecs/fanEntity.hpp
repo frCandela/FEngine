@@ -20,6 +20,9 @@ namespace fan
 	using ChunckIndex = uint8_t;
 	using ChunckComponentIndex = uint16_t;
 
+//================================================================================================================================
+// component
+//================================================================================================================================
 #define DECLARE_COMPONENT( _componentType)															\
 	private:																						\
 	friend class EntityWorld;																		\
@@ -31,6 +34,9 @@ namespace fan
 	const uint32_t _componentType::s_typeInfo = SSID(#_name);	\
 	const char* _componentType::s_typeName = _name;				\
 
+//================================================================================================================================
+// singleton component
+//================================================================================================================================
 #define DECLARE_SINGLETON_COMPONENT()		\
 	private:								\
 	friend class EntityWorld;				\
@@ -41,6 +47,9 @@ namespace fan
 	const uint32_t _componentType::s_typeInfo = SSID(#_name);	\
 	const char* _componentType::s_typeName = _name;				\
 
+//================================================================================================================================
+// tag
+//================================================================================================================================
 #define DECLARE_TAG()													\
 	public:																\
 	static const uint32_t s_typeInfo;									\
@@ -50,6 +59,9 @@ namespace fan
 	const uint32_t _componentType::s_typeInfo = SSID(#_name);	\
 	const char* _componentType::s_typeName = _name;				\
 
+//================================================================================================================================
+// system
+//================================================================================================================================
 #define DECLARE_SYSTEM()						\
 	private:									\
 	friend class EntityWorld;					\

@@ -81,25 +81,7 @@ namespace fan
 	}
 
 	//================================================================================================================================
-	//================================================================================================================================
-	void Scene::R_DeleteSceneNode( SceneNode& _node )
-	{
-		const std::vector<SceneNode*> childs = _node.childs; // copy
-		for( int childIndex = 0; childIndex < childs.size(); childIndex++ )
-		{
-			R_DeleteSceneNode( * childs[childIndex] );
-		}
-
-		//onDeleteGameobject.Emmit( _gameobject );
-		if( _node.parent != nullptr )
-		{
-			_node.parent->RemoveChild( _node );
-		}
-		const EntityID id = m_world->GetEntityID( _node.entityHandle );
-		m_world->KillEntity( id );
-	}
-
-	//================================================================================================================================
+	// deletes the scene node at the end of the frame
 	//================================================================================================================================
 	void Scene::DeleteSceneNode( SceneNode& _node )
 	{
@@ -216,24 +198,52 @@ namespace fan
 	{
 		SCOPED_PROFILE( scene_endFrame );
 
-// 		// Delete components 
-// 		for( int componentToDeleteIndex = 0; componentToDeleteIndex < m_componentsToDelete.size(); componentToDeleteIndex++ )
-// 		{
-// 			m_componentsToDelete[componentToDeleteIndex]->GetGameobject().RemoveComponent( m_componentsToDelete[componentToDeleteIndex] );
-// 		}
-// 		m_componentsToDelete.clear();
-// 
-// 		// Delete entities 
-// 		std::set<Gameobject*> deletedEntitiesSet;
-// 		for( int gameobjectToDeleteIndex = 0; gameobjectToDeleteIndex < m_entitiesToDelete.size(); gameobjectToDeleteIndex++ )
-// 		{
-// 			Gameobject* gameobjectDelete = m_entitiesToDelete[gameobjectToDeleteIndex];
-// 			R_DeleteGameobject( gameobjectDelete, deletedEntitiesSet );
-// 		}
-// 		m_entitiesToDelete.clear();
+
+		// deletes scene nodes
+		DeleteNodesImmediate( m_sceneNodesToDelete );
+		m_sceneNodesToDelete.clear();
 
 		m_world->SortEntities();
 		m_world->RemoveDeadEntities();
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
+	void Scene::DeleteNodesImmediate( const std::vector<SceneNode*>& _nodes )
+	{		
+		// stacks of initial nodes
+		std::stack<SceneNode* > nodesstack;
+		for( int nodeIndex = 0; nodeIndex < _nodes.size(); nodeIndex++ )
+		{
+			if( _nodes[nodeIndex] != nullptr )
+			{
+				nodesstack.push( _nodes[nodeIndex] );
+			}			
+		}
+
+		// find all child nodes
+		std::set<SceneNode* > nodesToDelete;
+		while( !nodesstack.empty() )
+		{
+			SceneNode& node = *nodesstack.top();
+			nodesstack.pop();
+			nodesToDelete.insert( &node );
+			for( int childIndex = 0; childIndex < node.childs.size(); childIndex++ )
+			{
+				nodesstack.push( node.childs[childIndex] );
+			}
+		}
+
+		// delete all nodes
+		for( SceneNode* node : nodesToDelete )
+		{
+			EntityID id = m_world->GetEntityID( node->entityHandle );
+			m_world->KillEntity( id );
+			if( node->parent != nullptr )
+			{
+				node->parent->RemoveChild( *node );
+			}
+		}		
 	}
 
 	//================================================================================================================================
@@ -497,31 +507,6 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void  Scene::R_DeleteGameobject( Gameobject* _gameobject, std::set<Gameobject*>& _deletedEntitiesSet )
-	{
-		if ( _gameobject != nullptr && _deletedEntitiesSet.find( _gameobject ) == _deletedEntitiesSet.end() )
-		{
-
-			const std::vector<Gameobject*> childs = _gameobject->GetChilds(); // copy
-			for ( int childIndex = 0; childIndex < childs.size(); childIndex++ )
-			{
-				R_DeleteGameobject( childs[ childIndex ], _deletedEntitiesSet );
-			}
-
-			onDeleteGameobject.Emmit( _gameobject );
-			_deletedEntitiesSet.insert( _gameobject );
-			if ( _gameobject->GetParent() != nullptr )
-			{
-				_gameobject->GetParent()->RemoveChild( _gameobject );
-			}
-			m_gameobjects.erase( _gameobject->GetUniqueID() );
-			delete( _gameobject );
-			_gameobject = nullptr;
-		}
-	}
-
-	//================================================================================================================================
-	//================================================================================================================================
 	void Scene::RegisterActor( Actor* _actor )
 	{
 		m_actors.push_back( _actor );
@@ -551,13 +536,13 @@ namespace fan
 	{
 		m_path = "";
 		m_instantiate->Clear();
-		std::set<Gameobject*> deletedEntitiesSet;
-		R_DeleteGameobject( m_root, deletedEntitiesSet );
+		DeleteNodesImmediate( { m_rootNode } );
 		m_rootNode = nullptr;
 		m_startingActors.clear();
 		m_activeActors.clear();
 		m_pausedActors.clear();
 		m_entitiesToDelete.clear();
+		m_sceneNodesToDelete.clear();
 		m_gameobjects.clear();
 		m_root = nullptr;
 

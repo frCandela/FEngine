@@ -22,7 +22,7 @@ namespace fan
 
 		void Init( const std::string& _name, Scene& _scene, EntityHandle _entityHandle,  SceneNode* _parent );
 
-
+		bool IsRoot() const { return parent == nullptr; }
 		bool IsAncestorOf( const SceneNode& _node ) const;
 		void RemoveChild( const SceneNode& _child );
 		bool HasChild( const SceneNode& _child );

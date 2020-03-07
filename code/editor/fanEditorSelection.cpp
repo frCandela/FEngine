@@ -14,6 +14,7 @@
 #include "scene/components/fanCamera.hpp"
 #include "scene/fanGameobject.hpp"
 #include "scene/fanScene.hpp"
+#include "scene/ecs/components/fanSceneNode.hpp"
 #include "render/fanMesh.hpp"
 
 namespace fan
@@ -27,17 +28,17 @@ namespace fan
 	void EditorSelection::ConnectCallbacks( Scene& _clientScene, Scene& _serverScene )
 	{
 		Input::Get().Manager().FindEvent( "delete" )->Connect( &EditorSelection::DeleteSelection, this );
-// 		_clientScene.onDeleteGameobject.Connect( &EditorSelection::OnSceneNodeDeleted, this ); @node
-// 		_serverScene.onDeleteGameobject.Connect( &EditorSelection::OnSceneNodeDeleted, this );
+ 		_clientScene.onDeleteSceneNode.Connect( &EditorSelection::OnSceneNodeDeleted, this );
+ 		_serverScene.onDeleteSceneNode.Connect( &EditorSelection::OnSceneNodeDeleted, this );
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
 	void EditorSelection::DeleteSelection()
 	{
-		if ( m_selectedSceneNode != nullptr )
+		if ( m_selectedSceneNode != nullptr &&  ! m_selectedSceneNode->IsRoot() )
 		{
-			//m_currentScene->DeleteGameobject( m_selectedSceneNode ); @node
+			m_selectedSceneNode->scene->DeleteSceneNode( *m_selectedSceneNode );
 		}
 	}
 
