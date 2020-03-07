@@ -1,1 +1,73 @@
-{"scene":{"name":"mainScene","path":"./content/scenes\\test.scene","root":{"childs":null,"components":[{"node_id":513741578,"position":{"x":1.0,"y":2.0,"z":3.0},"rotation":{"w":0.9971509575843811,"x":0.0325368195772171,"y":0.04535781219601631,"z":0.05073409527540207},"scale":{"x":7.0,"y":8.0,"z":9.0},"type":"transform"}],"name":"raet","node_id":0}}}
+{
+  "scene": {
+    "name": "mainScene",
+    "path": ".\\content\\scenes\\test.scene",
+    "root": {
+      "childs": [
+        {
+          "childs": null,
+          "components": [
+            {
+              "component_id": 513741578,
+              "position": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+              },
+              "rotation": {
+                "w": 1.0,
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+              },
+              "scale": {
+                "x": 1.0,
+                "y": 1.0,
+                "z": 1.0
+              },
+              "type": "transform"
+            }
+          ],
+          "name": "a",
+          "node_id": 2
+        },
+        {
+          "childs": null,
+          "components": [
+            {
+              "component_id": 513741578,
+              "position": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+              },
+              "rotation": {
+                "w": 1.0,
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+              },
+              "scale": {
+                "x": 1.0,
+                "y": 1.0,
+                "z": 1.0
+              },
+              "type": "transform"
+            }
+          ],
+          "name": "b",
+          "node_id": 3
+        },
+        {
+          "childs": null,
+          "components": null,
+          "name": "c",
+          "node_id": 4
+        }
+      ],
+      "components": null,
+      "name": "root",
+      "node_id": 1
+    }
+  }
+}

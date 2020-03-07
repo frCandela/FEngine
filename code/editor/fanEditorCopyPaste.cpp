@@ -14,32 +14,31 @@ namespace fan
 	//================================================================================================================================
 	void EditorCopyPaste::OnCopy()
 	{
-// 		if ( m_selection.GetSelectedSceneNode() != nullptr ) @node
-// 		{
-// 
-// 			Prefab prefab;
-// 			prefab.CreateFromGameobject( *m_selection.GetSelectedSceneNode() );
-// 
-// 			std::stringstream ss;
-// 			ss << prefab.GetJson();
-// 
-// 			ImGui::SetClipboardText( ss.str().c_str() );
-// 		}
+		if ( m_selection.GetSelectedSceneNode() != nullptr )
+		{
+			Prefab prefab;
+			prefab.CreateFromSceneNode( *m_selection.GetSelectedSceneNode() );
+
+			std::stringstream ss;
+			ss << prefab.GetJson();
+
+			ImGui::SetClipboardText( ss.str().c_str() );
+		}
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
 	void EditorCopyPaste::OnPaste()
 	{
-// 		std::stringstream ss; @node
-// 		ss << ImGui::GetClipboardText();
-// 		Json pastedJson;
-// 		ss >> pastedJson;
-// 
-// 		Prefab prefab;
-// 		if ( prefab.CreateFromJson( pastedJson ) )
-// 		{
-// 			m_selection.GetSelectedScene().CreateGameobject( prefab, m_selection.GetSelectedSceneNode() );
-// 		}
+		std::stringstream ss;
+		ss << ImGui::GetClipboardText();
+		Json pastedJson;
+		ss >> pastedJson;
+
+		Prefab prefab;
+		if ( prefab.CreateFromJson( pastedJson ) )
+		{
+			m_selection.GetSelectedScene().CreatePrefab( prefab, m_selection.GetSelectedSceneNode() );
+		}
 	}
 }

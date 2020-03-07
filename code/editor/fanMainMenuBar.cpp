@@ -332,9 +332,14 @@ namespace fan
 	//================================================================================================================================
 	void MainMenuBar::Reload()
 	{
-		// @node
-// 		if ( m_scene->GetState() == Scene::STOPPED )
-// 		{
+		if( m_scene->GetPath().empty() )
+		{
+			Debug::Warning( "you cannot reload a scene that is not saved." );
+			return;
+		}
+
+		if ( m_scene->GetState() == Scene::STOPPED )// @hack
+		{
 // 			// Save camera data
 // 			Json cameraData;
 // 			m_scene->GetMainCamera().GetGameobject().Save( cameraData );
@@ -342,19 +347,22 @@ namespace fan
 // 			// save old selection
 // 			Gameobject* prevSelection = m_editorSelection.GetSelectedGameobject();
 // 			const uint64_t id = prevSelection != nullptr ? prevSelection->GetUniqueID() : 0;
-// 
-// 			m_scene->LoadFrom( m_scene->GetPath() );
-// 
-// 			// restore camera
-// 			m_scene->GetMainCamera().GetGameobject().CopyDataFrom( cameraData );
-// 
-// 			// restore selection
+
+
+			m_scene->LoadFrom( m_scene->GetPath() );
+			
+
+
+			// restore camera
+//			m_scene->GetMainCamera().GetGameobject().CopyDataFrom( cameraData );
+
+			// restore selection
 // 			if ( id != 0 )
 // 			{
 // 				Gameobject* selection = m_scene->FindGameobject( id );
 // 				m_editorSelection.SetSelectedGameobject( selection );
 // 			}
-// 		}
+		}
 	}
 
 	//================================================================================================================================

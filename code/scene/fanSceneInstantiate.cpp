@@ -2,48 +2,13 @@
 #include "scene/fanGameobject.hpp"
 #include "scene/components/fanComponent.hpp"
 #include "scene/fanPrefab.hpp"
+#include "scene/ecs/components/fanSceneNode.hpp"
 
 namespace fan
 {
 	//================================================================================================================================
 	//================================================================================================================================
 	SceneInstantiate::SceneInstantiate( Scene& _scene ) : m_scene( _scene ) {}
-
-	//================================================================================================================================
-	//================================================================================================================================
-	Gameobject* SceneInstantiate::InstanciatePrefab( const Prefab& _prefab, Gameobject& _parent )
-	{
-		if ( _prefab.IsEmpty() )
-		{
-			Debug::Warning() << "Failed to instantiate prefab" << Debug::Endl();
-			return nullptr;
-		}
-		else
-		{
-			return InstantiateJson( _prefab.GetJsonGameobject(), _parent );
-		}
-	}
-
-	//================================================================================================================================
-	//================================================================================================================================
-	Gameobject* SceneInstantiate::InstantiateJson( const Json& _json, Gameobject& _parent )
-	{
-		const uint64_t idOffset = m_scene.GetNextUniqueID() - 1;
-
-		// Load gameobject
-		uint64_t id;
-		Serializable::LoadUInt64( _json, "gameobject_id", id );
-		Gameobject* gameobject = m_scene.CreateGameobject( "tmp", &_parent, id + idOffset );
-		gameobject->Load( _json, idOffset );
-
-		ResolveGameobjectPtr( idOffset );
-		ResolveComponentPtr( idOffset );
-
-		m_unresolvedGameobjectPtr.clear();
-		m_unresolvedComponentPtr.clear();
-
-		return gameobject;
-	}
 
 	//================================================================================================================================
 	//================================================================================================================================

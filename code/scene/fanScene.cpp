@@ -45,38 +45,35 @@ namespace fan
 	//================================================================================================================================
 	// Creates a game object and adds it to the scene hierarchy
 	//================================================================================================================================
-	Gameobject* Scene::CreateGameobject( const std::string _name, Gameobject * const _parent, const uint64_t _uniqueId )
+	Gameobject* Scene::CreateGameobject( const std::string /*_name*/, Gameobject * const /*_parent*/, const uint64_t /*_uniqueId*/ )
 	{
-		assert( _uniqueId == 0 || ! FindGameobject( _uniqueId ) );
-
-		Gameobject* const parent = _parent == nullptr ? m_root : _parent;
-		const uint64_t id = _uniqueId == 0 ? NextUniqueID() : _uniqueId;
-
-		if ( id >= m_nextUniqueID )
-		{
-			m_nextUniqueID = id + 1;
-		}
-
-		Gameobject* gameobject = new Gameobject( _name, parent, this, id );
-		m_gameobjects[ gameobject->GetUniqueID() ] = gameobject;
-		return gameobject;
+// 		assert( _uniqueId == 0 || ! FindGameobject( _uniqueId ) );
+// 
+// 		Gameobject* const parent = _parent == nullptr ? m_root : _parent;
+// 		const uint64_t id = _uniqueId == 0 ? m_nextUniqueID++ : _uniqueId;
+// 
+// 		if ( id >= m_nextUniqueID )
+// 		{
+// 			m_nextUniqueID = id + 1;
+// 		}
+// 
+// 		Gameobject* gameobject = new Gameobject( _name, parent, this, id );
+// 		m_gameobjects[ gameobject->GetUniqueID() ] = gameobject;
+// 		return gameobject;
+		return nullptr;
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	SceneNode& Scene::CreateSceneNode( const std::string _name, SceneNode* const _parentNode, const uint64_t _uniqueId )
+	SceneNode& Scene::CreateSceneNode( const std::string _name, SceneNode* const _parentNode, const bool _generateID )
 	{
-		//assert( _uniqueId == 0 || !FindGameobject( _uniqueId ) );
 		SceneNode* const parent = _parentNode == nullptr ? m_rootNode : _parentNode;
-		const uint64_t id = _uniqueId == 0 ? NextUniqueID() : _uniqueId; 
-		if( id >= m_nextUniqueID )
-		{
-			m_nextUniqueID = id + 1;
-		}
 		EntityID entityID = m_world->CreateEntity();
 		EntityHandle handle = m_world->CreateHandle( entityID );
 		SceneNode& sceneNode = m_world->AddComponent<SceneNode>( entityID );
-		sceneNode.Init( _name, *this, handle, parent );
+
+		uint32_t id = _generateID ? nextUniqueID++ : 0;
+		sceneNode.Init( _name, *this, handle, id, parent );
 
 		return sceneNode;
 	}
@@ -93,10 +90,10 @@ namespace fan
 	// Creates a game object from a prefab and adds it to the scene hierarchy
 	// Gameobjects ids are remapped depending on the scene next id
 	//================================================================================================================================
-	Gameobject* Scene::CreateGameobject( const Prefab& _prefab, Gameobject * const _parent )
+	SceneNode* Scene::CreatePrefab( const Prefab& _prefab, SceneNode * const _parent )
 	{
-		Gameobject* const parent = _parent == nullptr ? m_root : _parent;
-		return m_instantiate->InstanciatePrefab( _prefab, *parent );
+		SceneNode* const parent = _parent == nullptr ? m_rootNode : _parent;
+		return _prefab.Instanciate( *parent );
 	}
 
 	//================================================================================================================================
@@ -109,13 +106,13 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	uint64_t Scene::R_FindMaximumId( Gameobject& _gameobject )
+	uint32_t Scene::R_FindMaximumId( SceneNode& _node )
 	{
-		uint64_t id = _gameobject.GetUniqueID();
-		const std::vector<Gameobject*>& childs = _gameobject.GetChilds();
+		uint32_t id = _node.uniqueID;
+		const std::vector<SceneNode*>& childs = _node.childs;
 		for ( int childIndex = 0; childIndex < childs.size(); childIndex++ )
 		{
-			uint64_t childId = R_FindMaximumId( *childs[ childIndex ] );
+			uint32_t childId = R_FindMaximumId( *childs[ childIndex ] );
 			if ( childId > id )
 			{
 				id = childId;
@@ -556,7 +553,7 @@ namespace fan
 	{
 		Stop();
 		Clear();
-		/*m_root = CreateGameobject( "root", nullptr );*/
+		nextUniqueID = 1;
 		m_rootNode = & CreateSceneNode( "root", nullptr );
 		onSceneLoad.Emmit( this );
 	}
@@ -580,38 +577,37 @@ namespace fan
 
 			// saves all nodes recursively
 			Json& jRoot = jScene["root"];
-			if ( R_Save( *m_rootNode, jRoot ) )
-			{				
-				//Prefab::RemapGameobjectIndices( json ); @hack
-				// Out to disk
-				outStream << json;
-			}
+			R_SaveToJson( *m_rootNode, jRoot );
+			RemapSceneNodesIndices( json );				
+			outStream << json; // write to disk			
 			outStream.close();
 		}
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	bool Scene::R_Save( const SceneNode& _node, Json& _json ) const
+	void Scene::R_SaveToJson( const SceneNode& _node, Json& _json )
 	{	
+		EntityWorld& world = _node.scene->GetEntityWorld();
+
 		Serializable::SaveString( _json, "name", _node.name );
-		Serializable::SaveUInt64( _json, "node_id", _node.uniqueID );
+		Serializable::SaveUInt( _json, "node_id", _node.uniqueID );
 
 		// save components
 		Json& jComponents = _json["components"];
 		{
-			EntityID id = m_world->GetEntityID( _node.entityHandle );
-			Entity& entity = m_world->GetEntity( id );
+			EntityID id = world.GetEntityID( _node.entityHandle );
+			Entity& entity = world.GetEntity( id );
 			unsigned nextIndex = 0;
 			for( int componentIndex = 0; componentIndex < entity.componentCount; componentIndex++ )
 			{
 				// if a save method is provided, saves the component
 				ecComponent& component = *entity.components[componentIndex];				
-				const ComponentInfo& info = m_world->GetComponentInfo( component.GetIndex() );								
+				const ComponentInfo& info = world.GetComponentInfo( component.GetIndex() );								
 				if( info.save != nullptr )
 				{
 					Json& jComponent_i = jComponents[nextIndex++];
-					Serializable::SaveUInt( jComponent_i, "node_id", info.staticIndex );
+					Serializable::SaveUInt( jComponent_i, "component_id", info.staticIndex );
 					Serializable::SaveString( jComponent_i, "type", info.name );
 					info.save( component, jComponent_i );
 				}				
@@ -627,11 +623,64 @@ namespace fan
 			if( true/*( gameobject->GetEditorFlags() & EditorFlag::NOT_SAVED ) == false*/ )
 			{
 				Json& jchild = jchilds[childIndex];
-				R_Save( childNode, jchild );
+				R_SaveToJson( childNode, jchild );
 				++childIndex;
 			}
 		}		
-		return true;
+	}
+
+	//================================================================================================================================
+	// Find all the gameobject indices in the json and remap them on a range close to zero
+	// ex: 400, 401, 1051 will be remapped to 1,2,3
+	//================================================================================================================================
+	void Scene::RemapSceneNodesIndices( Json& _json )
+	{
+		std::vector< Json* > jsonIndices;
+		std::set< uint64_t > uniqueIndices;
+
+		// parse all the json and get all the gameobject ids
+		std::stack< Json* > stack;
+		stack.push( &_json );
+		while( !stack.empty() )
+		{
+			Json& js = *stack.top();
+			stack.pop();
+
+			Json::iterator& gameobjectId = js.find( "node_id" );
+			if( gameobjectId != js.end() )
+			{
+				uint64_t value = *gameobjectId;
+				if( value != 0 )
+				{
+					jsonIndices.push_back( &( *gameobjectId ) );
+					uniqueIndices.insert( value );
+				}
+			}
+
+			if( js.is_structured() )
+			{
+				for( auto& element : js )
+				{
+					stack.push( &element );
+				}
+			}
+		}
+
+		// creates the remap table
+		std::map< uint64_t, uint64_t > remapTable;
+		int remap = 1;
+		for( uint64_t uniqueIndex : uniqueIndices )
+		{
+			remapTable[uniqueIndex] = remap++;
+		}
+
+		// remap all indices
+		for( int jsonIdIndex = 0; jsonIdIndex < jsonIndices.size(); jsonIdIndex++ )
+		{
+			Json& js = *jsonIndices[jsonIdIndex];
+			const uint64_t value = js;
+			js = remapTable[value];
+		}
 	}
 
 	//================================================================================================================================
@@ -659,26 +708,16 @@ namespace fan
 			// loads all nodes recursively
 			const Json& jRoot = jScene["root"];
 			m_rootNode = &CreateSceneNode( "root", nullptr );
-			if ( R_Load( jRoot, *m_rootNode ) )
-			{
-				m_path = _path;
-				inStream.close();
+			R_LoadFromJson( jRoot, *m_rootNode, 0 );
+			
+			m_path = _path;
+			inStream.close();
+			nextUniqueID = R_FindMaximumId( *m_rootNode ) + 1;
+			//m_instantiate->ResolveGameobjectPtr( 0 );
+			//m_instantiate->ResolveComponentPtr( 0 );
 
-				//m_nextUniqueID = R_FindMaximumId( *m_root ) + 1;
-				//m_instantiate->ResolveGameobjectPtr( 0 );
-				//m_instantiate->ResolveComponentPtr( 0 );
-
-				//onSceneLoad.Emmit( this );@hack
-				return true;
-			}
-			else
-			{
-				Debug::Get() << Debug::Severity::error << "failed to load scene: " << _path << Debug::Endl();
-				m_path = "";
-				inStream.close();
-				New();
-				return false;
-			}
+			//onSceneLoad.Emmit( this );@hack
+			return true;
 		}
 		else
 		{
@@ -691,11 +730,14 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	bool Scene::R_Load( const Json& _json, SceneNode& _node )
+	void Scene::R_LoadFromJson( const Json& _json, SceneNode& _node, const uint32_t _idOffset )
 	{
 		//ScopedTimer timer("load scene");
+		EntityWorld& world = _node.scene->GetEntityWorld();
+
 		Serializable::LoadString( _json, "name", _node.name );
-		Serializable::LoadUInt64( _json, "node_id", _node.uniqueID );
+		Serializable::LoadUInt( _json, "node_id", _node.uniqueID );
+		_node.uniqueID += _idOffset;
 
 		const Json& jComponents = _json["components"];
 		{
@@ -703,11 +745,11 @@ namespace fan
 			{
 				const Json& jComponent_i = jComponents[childIndex];				
 				unsigned staticIndex = 0;
-				Serializable::LoadUInt( jComponent_i, "node_id", staticIndex );
-				const ComponentIndex componentIndex = m_world->m_typeIndices[staticIndex];
-				const ComponentInfo& info			= m_world->GetComponentInfo( componentIndex );
-				const EntityID		 entityID		= m_world->GetEntityID( _node.entityHandle );
-				ecComponent& component			    = m_world->AddComponent( entityID, componentIndex );				
+				Serializable::LoadUInt( jComponent_i, "component_id", staticIndex );
+				const ComponentIndex componentIndex = world.m_typeIndices[staticIndex];
+				const ComponentInfo& info			= world.GetComponentInfo( componentIndex );
+				const EntityID		 entityID		= world.GetEntityID( _node.entityHandle );
+				ecComponent& component			    = world.AddComponent( entityID, componentIndex );				
 				info.load( component, jComponent_i );
 			}
 		}
@@ -719,12 +761,11 @@ namespace fan
 			{
 				const Json& jchild_i = jchilds[childIndex];
 				{
-					SceneNode& childNode = CreateSceneNode( "tmp", &_node /*+ _idOffset*/ );
-					R_Load( jchild_i, childNode );
+					SceneNode& childNode = _node.scene->CreateSceneNode( "tmp", &_node, false );
+					R_LoadFromJson( jchild_i, childNode, _idOffset );
 				}
 			}
 		}
-		return true;
 	}
 
 	//================================================================================================================================

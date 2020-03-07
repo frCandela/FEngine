@@ -39,9 +39,7 @@ namespace fan
 
 			// gameobject gui
  			ImGui::Icon( GetIconType(), { 16,16 } ); ImGui::SameLine();
-			std::stringstream ss;
-			ss << "Gameobject : " << node.name << " (handle: " << node.entityHandle << ") (ref: " << -1/*GetRefCount()*/ << ")";
-			ImGui::Text( ss.str().c_str() );
+			ImGui::Text( "Scene node : %s", node.name.c_str() );
 
 			int componentCount = 0;
 			for( int componentIndex = 0; componentIndex < entity.componentCount; componentIndex++ )

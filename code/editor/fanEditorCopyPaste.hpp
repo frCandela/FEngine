@@ -11,7 +11,7 @@ namespace fan
 	class EditorCopyPaste
 	{
 	public:
-		EditorCopyPaste( EditorSelection& _engine );
+		EditorCopyPaste( EditorSelection& _selection );
 
 		// editor callbacks
 		void OnCopy();

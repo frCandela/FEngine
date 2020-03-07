@@ -7,6 +7,7 @@
 
 namespace fan
 {
+	struct SceneNode;
 	class Gameobject;
 	class Component;
 
@@ -14,14 +15,12 @@ namespace fan
 	class Prefab;
 
 	//================================================================================================================================
-	// Allow gameobject instantiation from json data (copy/paste, prefabs)
 	// SceneInstantiate is also responsible for gameobject & components resolution and ID collisions.
 	//================================================================================================================================
 	class SceneInstantiate
 	{
 	public:
 		SceneInstantiate( Scene& _scene );		
-		Gameobject* InstanciatePrefab( const Prefab& _prefab, Gameobject& _parent );
 
 		void RegisterUnresolvedComponentPtr( ComponentPtrBase& _componentPtr );
 		void RegisterUnresolvedGameobjectPtr( GameobjectPtr& _gameobjectPtr );
@@ -48,7 +47,5 @@ namespace fan
 
 		std::vector< ComponentPtrBase* >	m_unresolvedComponentPtr;
 		std::set< ComponentPtrBase* >		m_registeredComponentPtr;
-
-		Gameobject* InstantiateJson( const Json& _json, Gameobject& _parent );
 	};
 }

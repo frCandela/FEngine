@@ -86,43 +86,43 @@ namespace fan
 	//================================================================================================================================
 	void PlayersManager::SpawnSpaceShips()
 	{
-		for ( auto pair : m_players )
-		{
-			const int playerID = pair.first;
-
-			// Get player data
-			auto it = m_players.find( playerID );
-			assert( it != m_players.end() );
-			PlayerData& playerData = it->second;
-
-
-			assert( playerData.persistent );
-			Gameobject* player = GetScene().CreateGameobject( **m_playerPrefab, playerData.persistent );
-			player->SetEditorFlags( player->GetEditorFlags() | Gameobject::EditorFlag::NOT_SAVED );
-			player->SetName( playerData.persistent->GetName() );
-
-			// Set input
-			PlayerInput* playerInput = player->GetComponent<PlayerInput>();
-			if ( playerInput != nullptr )
-			{
-				playerInput->SetJoystickID( playerID );
-				playerInput->SetInputType( playerID < 0 ? PlayerInput::KEYBOARD_MOUSE : PlayerInput::JOYSTICK );
-			}
-			else
-			{
-				Debug::Warning( "PlayersManager::AddPlayer : Prefab is missing a PlayerInput component." );
-			}
-
-			SpaceShip* playerShip = player->GetComponent<SpaceShip>();
-			if ( playerShip != nullptr )
-			{
-				playerShip->onPlayerDie.Connect( &PlayersManager::OnPlayerDie, this );
-			}
-			else
-			{
-				Debug::Warning( "PlayersManager::AddPlayer : Prefab is missing a SpaceShip component." );
-			}
-		}
+// 		for ( auto pair : m_players )
+// 		{
+// 			const int playerID = pair.first;
+// 
+// 			// Get player data
+// 			auto it = m_players.find( playerID );
+// 			assert( it != m_players.end() );
+// 			PlayerData& playerData = it->second;
+// 
+// 
+// 			assert( playerData.persistent );
+// 			Gameobject* player = GetScene().CreateGameobject( **m_playerPrefab, playerData.persistent );
+// 			player->SetEditorFlags( player->GetEditorFlags() | Gameobject::EditorFlag::NOT_SAVED );
+// 			player->SetName( playerData.persistent->GetName() );
+// 
+// 			// Set input
+// 			PlayerInput* playerInput = player->GetComponent<PlayerInput>();
+// 			if ( playerInput != nullptr )
+// 			{
+// 				playerInput->SetJoystickID( playerID );
+// 				playerInput->SetInputType( playerID < 0 ? PlayerInput::KEYBOARD_MOUSE : PlayerInput::JOYSTICK );
+// 			}
+// 			else
+// 			{
+// 				Debug::Warning( "PlayersManager::AddPlayer : Prefab is missing a PlayerInput component." );
+// 			}
+// 
+// 			SpaceShip* playerShip = player->GetComponent<SpaceShip>();
+// 			if ( playerShip != nullptr )
+// 			{
+// 				playerShip->onPlayerDie.Connect( &PlayersManager::OnPlayerDie, this );
+// 			}
+// 			else
+// 			{
+// 				Debug::Warning( "PlayersManager::AddPlayer : Prefab is missing a SpaceShip component." );
+// 			}
+// 		}
 
 	}
 

@@ -41,16 +41,19 @@ namespace fan
 		Signal< DirectionalLight* > onDirectionalLightAttach;
 		Signal< DirectionalLight* > onDirectionalLightDetach;
 
+		uint32_t	nextUniqueID = 1;
+
 		enum State { STOPPED, PLAYING, PAUSED };
 
 		Scene( const std::string _name );
 		~Scene();
 
 
-		SceneNode&  CreateSceneNode( const std::string _name, SceneNode* const _parentNode, const uint64_t _uniqueId = 0 );
+		SceneNode&  CreateSceneNode( const std::string _name, SceneNode* const _parentNode, const bool _generateID = true );
+		SceneNode*  CreatePrefab( const Prefab& _prefab, SceneNode* const _parent );
 		void		DeleteSceneNode( SceneNode& _node );
+
 		Gameobject* CreateGameobject( const std::string _name, Gameobject* const _parent, const uint64_t _uniqueId = 0 );
-		Gameobject* CreateGameobject( const Prefab& _prefab, Gameobject* const _parent );
 		void		DeleteGameobject( Gameobject* _gameobject );
 		void		DeleteComponent( Component* _component ) { m_componentsToDelete.push_back( _component ); } // Delete at the end of the frame
 		std::vector < Gameobject* >	BuildEntitiesList() const;
@@ -73,7 +76,12 @@ namespace fan
 		void SetPath( const std::string _path ) { m_path = _path; }
 
 		Gameobject* GetRoot() { return m_root; }
-		SceneNode& GetRootNode() { return *m_rootNode; };
+		SceneNode&  GetRootNode() { return *m_rootNode; };
+
+		static uint32_t	R_FindMaximumId( SceneNode& _node );
+		static void		R_SaveToJson( const SceneNode& _node, Json& _json );
+		static void		R_LoadFromJson( const Json& _json, SceneNode& _node, const uint32_t _idOffset );
+		static void		RemapSceneNodesIndices( Json& _json );
 
 		inline std::string		 GetName() const { return m_name; }
 		bool					 IsServer() const { return m_isServer; }
@@ -88,8 +96,6 @@ namespace fan
 		void					 SetMainCamera( Camera* _camera );
 		void					 SetServer( const bool _isServer ) { m_isServer = _isServer; }		
 		Gameobject*				 FindGameobject( const uint64_t _id );
-
-		uint64_t GetNextUniqueID() const { return m_nextUniqueID; }
 
 		const std::vector < DirectionalLight* >& GetDirectionalLights() { return m_directionalLights; }
 		const std::vector < PointLight* >&		 GetPointLights() { return m_pointLights; }
@@ -111,8 +117,7 @@ namespace fan
 	private:
 		// Data
 		std::string	m_name;
-		std::string	m_path;
-		uint64_t	m_nextUniqueID = 1;
+		std::string	m_path;		
 		bool		m_isServer = false;
 
 		SceneInstantiate* m_instantiate = nullptr;
@@ -145,12 +150,7 @@ namespace fan
 		void BeginFrame();
 		void UpdateActors( const float _delta );
 		void LateUpdateActors( const float _delta );
-		void EndFrame();
-
-		uint64_t NextUniqueID() { assert( FindGameobject( m_nextUniqueID ) == nullptr );  return m_nextUniqueID++; }
-
-		bool R_Load( const Json&	  _json, SceneNode& _node );
-		bool R_Save( const SceneNode& _node, Json& _json ) const;
+		void EndFrame();			
 		void Clear();
 		void DeleteNodesImmediate( const std::vector<SceneNode*>& _nodes );
 
@@ -159,7 +159,6 @@ namespace fan
 		void		R_FindComponentsOfType( const Gameobject* _gameobject, std::vector<_componentType*>& _components ) const;
 		void		R_BuildEntitiesList( Gameobject* _gameobject, std::vector<Gameobject*>& _entitiesList ) const;
 		Component*	R_FindComponentOfType( Gameobject* _gameobject, const uint32_t _typeID ) const;
-		uint64_t	R_FindMaximumId( Gameobject& _gameobject );
 	};
 
 	//================================================================================================================================

@@ -20,7 +20,7 @@ namespace fan
 		static void Clear( ecComponent& _sceneNode );
 		static void OnGui( ecComponent& _sceneNode );
 
-		void Init( const std::string& _name, Scene& _scene, EntityHandle _entityHandle,  SceneNode* _parent );
+		void Init( const std::string& _name, Scene& _scene, const EntityHandle _entityHandle, const uint32_t _uniqueID, SceneNode* const _parent);
 
 		bool IsRoot() const { return parent == nullptr; }
 		bool IsAncestorOf( const SceneNode& _node ) const;
@@ -31,7 +31,7 @@ namespace fan
 		void InsertBelow( SceneNode& _brother );
 
 		std::string				name;
-		uint64_t				uniqueID;
+		uint32_t				uniqueID;
 		Scene*					scene;
 		EntityHandle			entityHandle;
 		SceneNode*				parent;

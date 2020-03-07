@@ -109,25 +109,25 @@ namespace fan
 	//================================================================================================================================
 	void Weapon::FireBullet()
 	{
-		if ( *m_bulletPrefab != nullptr )
-		{
-			Gameobject* bullet = m_gameobject->GetScene().CreateGameobject( **m_bulletPrefab, m_gameobject );
-			bullet->AddEcsComponent<ecsBullet>()->Init( m_lifeTime, m_bulletDamage );
-
-			Rigidbody* rb = bullet->GetComponent<Rigidbody>();
-			if ( rb != nullptr )
-			{
-				const Rigidbody* thisRb = m_gameobject->GetComponent<Rigidbody>();
-				const Transform& thisTransform = m_gameobject->GetTransform();
-
-				rb->onContactStarted.Connect( &Weapon::OnBulletContact, this );
-				rb->SetIgnoreCollisionCheck( *thisRb, true );
-				rb->SetVelocity( thisRb->GetVelocity() + m_speed * thisTransform.Forward() );
-
-				Transform& transform = bullet->GetTransform();
-				transform.SetPosition( thisTransform.GetPosition() + thisTransform.TransformDirection( m_offset ) );
-			}
-		}
+// 		if ( *m_bulletPrefab != nullptr )
+// 		{
+// 			Gameobject* bullet = m_gameobject->GetScene().CreateGameobject( **m_bulletPrefab, m_gameobject );
+// 			bullet->AddEcsComponent<ecsBullet>()->Init( m_lifeTime, m_bulletDamage );
+// 
+// 			Rigidbody* rb = bullet->GetComponent<Rigidbody>();
+// 			if ( rb != nullptr )
+// 			{
+// 				const Rigidbody* thisRb = m_gameobject->GetComponent<Rigidbody>();
+// 				const Transform& thisTransform = m_gameobject->GetTransform();
+// 
+// 				rb->onContactStarted.Connect( &Weapon::OnBulletContact, this );
+// 				rb->SetIgnoreCollisionCheck( *thisRb, true );
+// 				rb->SetVelocity( thisRb->GetVelocity() + m_speed * thisTransform.Forward() );
+// 
+// 				Transform& transform = bullet->GetTransform();
+// 				transform.SetPosition( thisTransform.GetPosition() + thisTransform.TransformDirection( m_offset ) );
+// 			}
+// 		}
 	}
 
 	//================================================================================================================================

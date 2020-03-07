@@ -30,11 +30,12 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void SceneNode::Init( const std::string& _name, Scene& _scene, EntityHandle _entityHandle, SceneNode* _parent )
+	void SceneNode::Init( const std::string& _name, Scene& _scene, const EntityHandle _entityHandle, const uint32_t _uniqueID, SceneNode* const _parent )
 	{
 		name = _name;
 		scene = &_scene;
 		entityHandle = _entityHandle;
+		uniqueID = _uniqueID;
 		if( _parent != nullptr )
 		{
 			_parent->AddChild( *this );
@@ -46,9 +47,10 @@ namespace fan
 	void SceneNode::OnGui( ecComponent& _sceneNode )
 	{
 		SceneNode& node = static_cast<SceneNode&>( _sceneNode );
-		ImGui::Text( "name   : %s", node.name.c_str() );
-		ImGui::Text( "scene  : %s", node.scene->GetName().c_str() );
-		ImGui::Text( "handle : %u", node.entityHandle );
+		ImGui::Text( "name      : %s", node.name.c_str() );
+		ImGui::Text( "scene     : %s", node.scene->GetName().c_str() );
+		ImGui::Text( "handle    : %u", node.entityHandle );
+		ImGui::Text( "unique id : %u", node.uniqueID );
 	}
 
 	//================================================================================================================================
