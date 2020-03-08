@@ -1,6 +1,5 @@
 #include "scene/ecs/components/fanMeshRenderer2.hpp"
 
-#include "scene/ecs/fanEntityWorld.hpp"
 #include "core/fanISerializable.hpp"
 #include "render/fanRenderSerializable.hpp"
 

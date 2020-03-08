@@ -1,5 +1,9 @@
 #include "fanEntityWorld.hpp"
 
+#include "fanEcComponent.hpp"
+#include "fanTag.hpp"
+#include "fanSystem.hpp"
+
 #include "scene/ecs/components/fanSceneNode.hpp"
 #include "scene/ecs/components/fanTransform2.hpp"
 #include "scene/ecs/components/fanDirectionalLight2.hpp"
@@ -8,6 +12,7 @@
 #include "scene/ecs/components/fanMaterial2.hpp"
 #include "scene/ecs/components/fanCamera2.hpp"
 #include "scene/ecs/components/fanParticleEmitter.hpp"
+#include "scene/ecs/singletonComponents/fanRenderWorld.hpp"
 
 namespace fan
 {
@@ -35,8 +40,8 @@ namespace fan
 	//================================================================================================================================
 	EntityWorld::EntityWorld()
 	{
-
 		AddSingletonComponentType<sc_sunLight>();
+		AddSingletonComponentType<RenderWorld>();
 
 		AddComponentType<SceneNode>();
 		AddComponentType<Transform2>();
@@ -45,7 +50,8 @@ namespace fan
 		AddComponentType<MeshRenderer2>();
 		AddComponentType<Material2>();
 		AddComponentType<Camera2>();
-		AddComponentType<ParticleEmitter>();		
+		AddComponentType<ParticleEmitter>();
+		
 		
 		AddTagType<tag_alwaysUpdate>();
 		AddTagType<tag_editorOnly>();
@@ -199,6 +205,22 @@ namespace fan
 			}
 			m_entities.pop_back();
 			--reverseIndex;
+		}
+	}
+
+	//================================================================================================================================
+	// Removes the dead entities at the end of the entity vector
+	//================================================================================================================================
+	void EntityWorld::GetVectorComponentInfo( std::vector< const ComponentInfo*>& _outVector ) const
+	{
+		_outVector.clear();
+		for( auto& pair : m_componentInfo )
+		{
+			const ComponentInfo& info = pair.second;
+			if( info.editorPath != nullptr )
+			{
+				_outVector.push_back( &info );
+			}
 		}
 	}
 }

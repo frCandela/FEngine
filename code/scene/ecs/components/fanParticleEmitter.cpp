@@ -1,11 +1,10 @@
 #include "scene/ecs/components/fanParticleEmitter.hpp"
 
-#include "scene/ecs/fanEntityWorld.hpp"
 #include "render/fanRenderSerializable.hpp"
 
 namespace fan
 {
-	REGISTER_COMPONENT( ParticleEmitter, "particle emitter" );
+	REGISTER_COMPONENT( ParticleEmitter, "particle_emitter" );
 
 	//================================================================================================================================
 	//================================================================================================================================

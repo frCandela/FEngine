@@ -1,6 +1,5 @@
 #include "scene/ecs/components/fanDirectionalLight2.hpp"
 
-#include "scene/ecs/fanEntityWorld.hpp"
 #include "core/fanISerializable.hpp"
 
 namespace fan
@@ -11,7 +10,7 @@ namespace fan
 	//================================================================================================================================
 	void DirectionalLight2::SetInfo( ComponentInfo& _info )
 	{
-		_info.icon = ImGui::IconType::POINT_LIGHT16;
+		_info.icon = ImGui::IconType::DIR_LIGHT16;
 		_info.onGui = &DirectionalLight2::OnGui;
 		_info.clear = &DirectionalLight2::Clear;
 		_info.load = &DirectionalLight2::Load;

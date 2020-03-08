@@ -1,7 +1,6 @@
 #include "scene/ecs/components/fanSceneNode.hpp"
 
 #include "scene/fanScene.hpp"
-#include "scene/ecs/fanEntityWorld.hpp"
 
 namespace fan
 {

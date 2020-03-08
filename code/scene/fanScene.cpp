@@ -14,7 +14,6 @@
 #include "scene/fanGameobject.hpp"
 #include "scene/ecs/components/fanSceneNode.hpp"
 #include "scene/ecs/fanEntityWorld.hpp"
-#include "scene/ecs/fanEntity.hpp"
 #include "core/time/fanScopedTimer.hpp"
 #include "core/time/fanProfiler.hpp"
 #include "core/fanSignal.hpp"
@@ -746,7 +745,7 @@ namespace fan
 				const Json& jComponent_i = jComponents[childIndex];				
 				unsigned staticIndex = 0;
 				Serializable::LoadUInt( jComponent_i, "component_id", staticIndex );
-				const ComponentIndex componentIndex = world.m_typeIndices[staticIndex];
+				const ComponentIndex componentIndex = world.GetDynamicIndex(staticIndex);
 				const ComponentInfo& info			= world.GetComponentInfo( componentIndex );
 				const EntityID		 entityID		= world.GetEntityID( _node.entityHandle );
 				ecComponent& component			    = world.AddComponent( entityID, componentIndex );				

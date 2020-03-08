@@ -1,4 +1,5 @@
 #include "editor/windows/fanInspectorWindow.hpp"
+
 #include "editor/components/fanFPSCamera.hpp"
 #include "game/imgui/fanDragnDrop.hpp"
 #include "scene/ecs/fanEntityWorld.hpp"
@@ -134,14 +135,7 @@ namespace fan
 		{
 			// Get components 
 			std::vector< const ComponentInfo*> components;
-			for ( auto& pair : world.m_componentInfo )
-			{
-				const ComponentInfo& info = pair.second;
-				if( info.editorPath != nullptr )
-				{
-					components.push_back( &info );
-				}
-			}
+			world.GetVectorComponentInfo( components );
 
  			// Get components paths
 			std::vector<Path> componentsPath;

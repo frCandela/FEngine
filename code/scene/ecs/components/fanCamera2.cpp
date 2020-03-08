@@ -1,7 +1,6 @@
 #include "scene/ecs/components/fanCamera2.hpp"
 
 #include "scene/ecs/components/fanTransform2.hpp"
-#include "scene/ecs/fanEntityWorld.hpp"
 #include "render/fanRenderSerializable.hpp"
 #include "core/math/shapes/fanRay.hpp"
 

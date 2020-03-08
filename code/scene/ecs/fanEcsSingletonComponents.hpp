@@ -2,7 +2,7 @@
 
 #include "scene/fanScenePrecompiled.hpp"
 
-#include "scene/ecs/singleton_components/fanEcsSunLightMesh.hpp"
+#include "scene/ecs/singletonComponents/fanEcsSunLightMesh.hpp"
 #include "core/meta/fanTuple.hpp"
 
 namespace fan

@@ -2,7 +2,6 @@
 
 #include "scene/ecs/components/fanSceneNode.hpp"
 #include "scene/components/fanComponent.hpp"
-#include "scene/ecs/fanEntityWorld.hpp"
 #include "scene/fanGameobject.hpp"
 #include "scene/fanPrefab.hpp"
 #include "render/core/fanTexture.hpp"

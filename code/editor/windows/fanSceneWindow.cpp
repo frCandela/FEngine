@@ -168,9 +168,9 @@ namespace fan
 
 			// delete
 			ImGui::Separator();
-			if( ImGui::Selectable( "Delete" ) )
+			if( ImGui::Selectable( "Delete" ) && m_lastSceneNodeRightClicked != nullptr )
 			{
-				//m_scene->DeleteGameobject( m_lastGameobjectRightClicked );
+				m_scene->DeleteSceneNode( *m_lastSceneNodeRightClicked );
 			}
 			ImGui::EndPopup();
 		}

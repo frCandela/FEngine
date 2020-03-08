@@ -2,26 +2,19 @@
 
 #include "scene/fanScenePrecompiled.hpp"
 
-#include "scene/ecs/singleton_components/fanEcsSingletonComponent.hpp"
+#include "scene/ecs/fanSingletonComponent.hpp"
 
 namespace fan
 {
 	class Mesh;
-	struct Vertex;
 
 	//================================================================================================================================
 	//================================================================================================================================
-	class ecsSunLightMesh_s : public EcsSingletonComponent
+	class RenderWorld : public SingletonComponent
 	{
+		DECLARE_SINGLETON_COMPONENT()
 	public:
-		ecsSunLightMesh_s();
-		~ecsSunLightMesh_s();
-
-		Mesh* mesh;
-		float subAngle;
-		float radius;
-		bool  debugDraw;
-
-		void AddSunTriangle( std::vector<Vertex>& _vertices, const btVector3& _v0, const btVector3& _v1 );
+		RenderWorld();
+		~RenderWorld();
 	};
 }

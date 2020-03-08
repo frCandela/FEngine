@@ -1,4 +1,4 @@
-#include "scene/ecs/singleton_components/fanECSSunLightMesh.hpp"
+#include "scene/ecs/singletonComponents/fanECSSunLightMesh.hpp"
 #include "render/fanRendererDebug.hpp"
 #include "render/fanMesh.hpp"
 

@@ -1,24 +1,20 @@
-#include "scene/ecs/singleton_components/fanEcsSingletonComponent.hpp"
-#include "render/fanMesh.hpp"
+#include "scene/ecs/singletonComponents/fanRenderWorld.hpp"
 
 namespace fan
 {
-	//================================================================================================================================
-	//================================================================================================================================
-	ecsParticlesMesh_s::ecsParticlesMesh_s()
-	{
-		mesh = new Mesh();
+	REGISTER_SINGLETON_COMPONENT( RenderWorld, "render_world" );
 
-		mesh->LoadFromFile( "particles mesh" );
-		mesh->SetHostVisible( true );
-		mesh->SetOptimizeVertices( false );
-		mesh->SetAutoUpdateHull( false );
+	//================================================================================================================================
+	//================================================================================================================================
+	RenderWorld::RenderWorld()
+	{
+
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	ecsParticlesMesh_s::~ecsParticlesMesh_s()
+	RenderWorld::~RenderWorld()
 	{
-		delete mesh;
+
 	}
 }

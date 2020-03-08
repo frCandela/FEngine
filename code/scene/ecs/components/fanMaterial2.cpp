@@ -1,6 +1,5 @@
 #include "scene/ecs/components/fanMaterial2.hpp"
 
-#include "scene/ecs/fanEntityWorld.hpp"
 #include "render/fanRenderSerializable.hpp"
 
 namespace fan

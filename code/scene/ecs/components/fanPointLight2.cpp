@@ -1,6 +1,5 @@
 #include "scene/ecs/components/fanPointLight2.hpp"
 
-#include "scene/ecs/fanEntityWorld.hpp"
 #include "core/fanISerializable.hpp"
 
 namespace fan

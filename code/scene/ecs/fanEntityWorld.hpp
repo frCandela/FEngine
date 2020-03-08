@@ -4,23 +4,10 @@
 
 #include "scene/ecs/fanEntity.hpp"
 #include "core/imgui/fanImguiIcons.hpp"
+#include "fanComponentsCollection.hpp"
 
 namespace fan {
-	//==============================================================================================================================================================
-	//==============================================================================================================================================================
-	struct ComponentInfo
-	{
-		std::string name;
-		ImGui::IconType icon = ImGui::IconType::NONE;		
-		void ( *onGui )( ecComponent& ) = nullptr;
-		void ( *clear )( ecComponent& ) = nullptr;
-		void ( *save )( const ecComponent&, Json& ) = nullptr;
-		void ( *load )( ecComponent&, const Json& ) = nullptr;
-		ecComponent& ( *instanciate)( void* ) = nullptr;
-		const char* editorPath = "";
-		ComponentIndex index;
-		uint32_t staticIndex;
-	};
+	struct SingletonComponent;
 
 	//==============================================================================================================================================================
 	// Contains the entities, components, singleton components, type information
@@ -45,19 +32,30 @@ namespace fan {
 		void				  KillEntity( EntityID _entityID );
 		EntityHandle		  CreateHandle( EntityID _entityID );
 		EntityID			  GetEntityID( EntityHandle _handle );
+		ComponentIndex		  GetDynamicIndex( const uint32_t _staticIndex ) { return m_typeIndices[_staticIndex]; }
 		Entity&				  GetEntity( const EntityID _id );
 		void				  SortEntities();
 		void				  RemoveDeadEntities();
-	//private:
 
+		// add types
 		template< typename _componentType >	void AddComponentType();
 		template< typename _tagType >		void AddTagType();
 		template< typename _componentType >	void AddSingletonComponentType();
 
+		// const accessors
+		const std::unordered_map< uint32_t, ComponentIndex >&   GetDynamicIndices() const { return m_typeIndices; }
+		const std::unordered_map< EntityHandle, EntityID >&		GetHandles() const { return m_handles; }
+		const std::vector< ComponentsCollection >&				GetComponentCollections() const { return m_components; }
+		const std::vector< Entity >&							GetEntities() const				{ return m_entities; }
+		void	GetVectorComponentInfo( std::vector< const ComponentInfo*>& _outVector ) const;
+		size_t	GetNumSingletonComponents() const { return m_singletonComponents.size(); }
+		size_t	GetNumEntities() const { return m_entities.size();  }
+
+	private:
 		std::unordered_map< uint32_t, ComponentIndex >		m_typeIndices;
 		std::unordered_map< EntityHandle, EntityID >		m_handles;
-		std::unordered_map< uint32_t, SingletonComponent* >	m_singletonComponents;		
-		std::unordered_map< ComponentIndex, ComponentInfo >	m_componentInfo;
+		std::unordered_map< uint32_t, SingletonComponent* >	m_singletonComponents;
+		std::unordered_map< ComponentIndex, ComponentInfo >	m_componentInfo;	
 
 		std::vector< Entity >				m_entities;
 		std::vector< ComponentsCollection > m_components;
