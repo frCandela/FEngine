@@ -2,6 +2,12 @@
 
 #include "scene/ecs/components/fanSceneNode.hpp"
 #include "scene/ecs/components/fanTransform2.hpp"
+#include "scene/ecs/components/fanDirectionalLight2.hpp"
+#include "scene/ecs/components/fanpointLight2.hpp"
+#include "scene/ecs/components/fanMeshRenderer2.hpp"
+#include "scene/ecs/components/fanMaterial2.hpp"
+#include "scene/ecs/components/fanCamera2.hpp"
+#include "scene/ecs/components/fanParticleEmitter.hpp"
 
 namespace fan
 {
@@ -32,9 +38,15 @@ namespace fan
 
 		AddSingletonComponentType<sc_sunLight>();
 
-		AddComponentType<SceneNode>( );
+		AddComponentType<SceneNode>();
 		AddComponentType<Transform2>();
-
+		AddComponentType<DirectionalLight2>();
+		AddComponentType<PointLight2>();
+		AddComponentType<MeshRenderer2>();
+		AddComponentType<Material2>();
+		AddComponentType<Camera2>();
+		AddComponentType<ParticleEmitter>();		
+		
 		AddTagType<tag_alwaysUpdate>();
 		AddTagType<tag_editorOnly>();
 			   

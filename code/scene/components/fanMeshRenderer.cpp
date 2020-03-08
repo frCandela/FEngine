@@ -1,10 +1,12 @@
 #include "scene/components/fanMeshRenderer.hpp"
+
 #include "scene/components/fanTransform.hpp"
 #include "scene/fanSceneResourcePtr.hpp"
+#include "scene/ecs/fanECSConfig.hpp"
 #include "core/math/shapes/fanAABB.hpp"
 #include "core/math/shapes/fanConvexHull.hpp"
 #include "core/time/fanProfiler.hpp"
-#include "scene/ecs/fanECSConfig.hpp"
+#include "render/fanRenderSerializable.hpp"
 #include "render/fanRenderResourcePtr.hpp"
 #include "render/fanMesh.hpp"
 

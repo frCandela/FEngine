@@ -1,7 +1,7 @@
 #include "scene/ecs/components/fanTransform2.hpp"
-#include "core/fanISerializable.hpp"
 
 #include "scene/ecs/fanEntityWorld.hpp"
+#include "core/fanISerializable.hpp"
 
 namespace fan
 {
@@ -16,7 +16,7 @@ namespace fan
 		_info.clear = &Transform2::Clear;
 		_info.save = &Transform2::Save;
 		_info.load = &Transform2::Load;
-		_info.editorPath = "toto";
+		_info.editorPath = "";
 	}
 
 	//================================================================================================================================

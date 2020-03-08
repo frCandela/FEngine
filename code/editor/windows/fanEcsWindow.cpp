@@ -35,7 +35,7 @@ namespace fan
 		if( ImGui::CollapsingHeader( "components" ) )
 		{
 			ImGui::Columns( 4 );
-			ImGui::SetColumnWidth( 0, 100.f );
+			ImGui::SetColumnWidth( 0, 150.f );
 			ImGui::SetColumnWidth( 1, 100.f );
 			ImGui::SetColumnWidth( 2, 100.f );
 			ImGui::SetColumnWidth( 3, 100.f );
