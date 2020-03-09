@@ -16,7 +16,7 @@ namespace fan {
 	class EntityWorld
 	{
 	public:
-		EntityWorld();
+		EntityWorld( void ( *initializeTypes )( EntityWorld& ) );
 
 		template< typename _componentType >	_componentType& GetComponent( const EntityID _entityID );
 		template< typename _componentType >	_componentType& AddComponent( const EntityID _entityID );
@@ -63,6 +63,7 @@ namespace fan {
 
 		EntityHandle	m_nextHandle = 1; // 0 is a null handle
 		ComponentIndex	m_nextTypeIndex = 0;
+		ComponentIndex	m_nextTagIndex = signatureLength - 2;
 	};
 
 	//==============================================================================================================================================================
@@ -176,6 +177,7 @@ namespace fan {
 	template< typename _componentType >	void EntityWorld::AddComponentType()
 	{
 		static_assert( std::is_base_of< ecComponent, _componentType>::value );
+		assert( m_nextTagIndex >= m_nextTypeIndex );
 		ComponentsCollection chunck;
 		chunck.Init<_componentType>( _componentType::s_typeName );
 		m_components.push_back( chunck );
@@ -198,7 +200,8 @@ namespace fan {
 	template< typename _tagType > void EntityWorld::AddTagType()
 	{
 		static_assert( std::is_base_of< Tag, _tagType>::value );
-		m_typeIndices[_tagType::s_typeInfo] = m_nextTypeIndex++;
+		assert( m_nextTagIndex >= m_nextTypeIndex );
+		m_typeIndices[_tagType::s_typeInfo] = m_nextTagIndex--;		
 	}
 
 	//==============================================================================================================================================================

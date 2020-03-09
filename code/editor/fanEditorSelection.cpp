@@ -66,48 +66,48 @@ namespace fan
 // 		} @node
 
 		// Mouse selection
-		if ( !mouseCaptured && _gameWindowHovered && Mouse::Get().GetButtonPressed( Mouse::button0 ) )
-		{
-			const btVector3 cameraOrigin = m_currentScene->GetMainCamera().GetGameobject().GetTransform().GetPosition();
-			const Ray ray = m_currentScene->GetMainCamera().ScreenPosToRay( Mouse::Get().GetScreenSpacePosition() );
-			const std::vector<Gameobject*>& entities = m_currentScene->BuildEntitiesList();
-
-			// raycast on all the entities
-			Gameobject* closestGameobject = nullptr;
-			float closestDistance2 = std::numeric_limits<float>::max();
-			for ( int gameobjectIndex = 0; gameobjectIndex < entities.size(); gameobjectIndex++ )
-			{
-				Gameobject* gameobject = entities[ gameobjectIndex ];
-
-				if ( gameobject == &m_currentScene->GetMainCamera().GetGameobject() )
-				{
-					continue;
-				}
-
-				const AABB& aabb = gameobject->GetAABB();
-				btVector3 intersection;
-				if ( aabb.RayCast( ray.origin, ray.direction, intersection ) == true )
-				{
-					MeshRenderer* meshRenderer = gameobject->GetComponent<MeshRenderer>();
-					if ( meshRenderer != nullptr && meshRenderer->GetMesh() != nullptr )
-					{
-						Transform& transform = gameobject->GetTransform();
-						const Ray transformedRay( transform.InverseTransformPoint( ray.origin ), transform.InverseTransformDirection( ray.direction ) );
-						if ( meshRenderer->GetMesh()->GetHull().RayCast( transformedRay.origin, transformedRay.direction, intersection ) == false )
-						{
-							continue;
-						}
-					}
-					const float distance2 = intersection.distance2( cameraOrigin );
-					if ( distance2 < closestDistance2 )
-					{
-						closestDistance2 = distance2;
-						closestGameobject = gameobject;
-					}
-				}
-			}
+// 		if ( !mouseCaptured && _gameWindowHovered && Mouse::Get().GetButtonPressed( Mouse::button0 ) )
+// 		{
+// 			const btVector3 cameraOrigin = m_currentScene->GetMainCamera().GetGameobject().GetTransform().GetPosition();
+// 			const Ray ray = m_currentScene->GetMainCamera().ScreenPosToRay( Mouse::Get().GetScreenSpacePosition() );
+// 			const std::vector<Gameobject*>& entities = m_currentScene->BuildEntitiesList();
+// 
+// 			// raycast on all the entities
+// 			Gameobject* closestGameobject = nullptr;
+// 			float closestDistance2 = std::numeric_limits<float>::max();
+// 			for ( int gameobjectIndex = 0; gameobjectIndex < entities.size(); gameobjectIndex++ )
+// 			{
+// 				Gameobject* gameobject = entities[ gameobjectIndex ];
+// 
+// 				if ( gameobject == &m_currentScene->GetMainCamera().GetGameobject() )
+// 				{
+// 					continue;
+// 				}
+// 
+// 				const AABB& aabb = gameobject->GetAABB();
+// 				btVector3 intersection;
+// 				if ( aabb.RayCast( ray.origin, ray.direction, intersection ) == true )
+// 				{
+// 					MeshRenderer* meshRenderer = gameobject->GetComponent<MeshRenderer>();
+// 					if ( meshRenderer != nullptr && meshRenderer->GetMesh() != nullptr )
+// 					{
+// 						Transform& transform = gameobject->GetTransform();
+// 						const Ray transformedRay( transform.InverseTransformPoint( ray.origin ), transform.InverseTransformDirection( ray.direction ) );
+// 						if ( meshRenderer->GetMesh()->GetHull().RayCast( transformedRay.origin, transformedRay.direction, intersection ) == false )
+// 						{
+// 							continue;
+// 						}
+// 					}
+// 					const float distance2 = intersection.distance2( cameraOrigin );
+// 					if ( distance2 < closestDistance2 )
+// 					{
+// 						closestDistance2 = distance2;
+// 						closestGameobject = gameobject;
+// 					}
+// 				}
+// 			}
 			//SetSelectedSceneNode( closestGameobject ); @node
-		}
+//		}
 	}
 
 	//================================================================================================================================

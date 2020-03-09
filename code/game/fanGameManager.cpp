@@ -18,7 +18,7 @@ namespace fan
 		{
 			Debug::Warning( "Game manager has no camera attached" );
 			SetEnabled( false );
-			m_gameobject->GetScene().SetMainCamera( *m_gameCamera );
+			//m_gameobject->GetScene().SetMainCamera( *m_gameCamera );
 		}
 	}
 

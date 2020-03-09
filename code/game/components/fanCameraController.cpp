@@ -16,7 +16,7 @@ namespace fan
 		REQUIRE_TRUE( m_camera.IsValid(), "CameraController missing main camera reference" );
 		REQUIRE_TRUE( *m_playersManager != nullptr, "CameraController: missing reference to the PlayersManager" )
 
-		m_gameobject->GetScene().SetMainCamera( *m_camera );
+		//m_gameobject->GetScene().SetMainCamera( *m_camera );
 	}
 
 	//================================================================================================================================

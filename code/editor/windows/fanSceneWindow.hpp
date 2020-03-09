@@ -23,7 +23,7 @@ namespace fan
 
 		// Callbacks
 		void OnSceneNodeSelected( SceneNode* node ) { m_sceneNodeSelected = node; }
-		void OnExpandHierarchy( Scene* /*_scene*/ ) { m_expandSceneHierarchy = true; }
+		void OnExpandHierarchy( Scene& /*_scene*/ ) { m_expandSceneHierarchy = true; }
 
 	protected:
 		void OnGui() override;

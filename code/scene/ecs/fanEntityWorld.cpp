@@ -4,44 +4,16 @@
 #include "fanTag.hpp"
 #include "fanSystem.hpp"
 
-#include "scene/ecs/components/fanSceneNode.hpp"
-#include "scene/ecs/components/fanTransform2.hpp"
-#include "scene/ecs/components/fanDirectionalLight2.hpp"
-#include "scene/ecs/components/fanpointLight2.hpp"
-#include "scene/ecs/components/fanMeshRenderer2.hpp"
-#include "scene/ecs/components/fanMaterial2.hpp"
-#include "scene/ecs/components/fanCamera2.hpp"
-#include "scene/ecs/components/fanParticleEmitter.hpp"
-#include "scene/ecs/singletonComponents/fanRenderWorld.hpp"
-
 namespace fan
 {
-	REGISTER_SINGLETON_COMPONENT( sc_sunLight, "sunlight" );
-
 	REGISTER_TAG( tag_editorOnly, "editor_only" );
 	REGISTER_TAG( tag_alwaysUpdate, "always_update" );	
 
 	//================================================================================================================================
 	//================================================================================================================================
-	EntityWorld::EntityWorld()
+	EntityWorld::EntityWorld( void ( *initializeTypes )( EntityWorld& ) )
 	{
-		AddSingletonComponentType<sc_sunLight>();
-		AddSingletonComponentType<RenderWorld>();
-
-		AddComponentType<SceneNode>();
-		AddComponentType<Transform2>();
-		AddComponentType<DirectionalLight2>();
-		AddComponentType<PointLight2>();
-		AddComponentType<MeshRenderer2>();
-		AddComponentType<Material2>();
-		AddComponentType<Camera2>();
-		AddComponentType<ParticleEmitter>();
-		
-		
-		AddTagType<tag_alwaysUpdate>();
-		AddTagType<tag_editorOnly>();
-			   
-		assert( m_nextTypeIndex < 1 << ( 8 * sizeof( ComponentIndex ) ) );
+		initializeTypes( *this );
 	}
 
 	//================================================================================================================================

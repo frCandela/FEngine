@@ -57,9 +57,12 @@
 #include "game/components/fanCameraController.hpp"
 
 #include "scene/ecs/fanEntityWorld.hpp"
-
+#include "scene/ecs/components/fanDirectionalLight2.hpp"
+#include "scene/ecs/components/fanpointLight2.hpp"
+#include "scene/ecs/components/fanParticleEmitter.hpp"
+#include "scene/ecs/components/fanCamera2.hpp"
 #include "scene/ecs/systems/fanUpdateRenderWorld.hpp"
-
+#include "editor/singletonComponents/fanEditorCamera.hpp"
 
 namespace fan
 {
@@ -134,9 +137,9 @@ namespace fan
 		}
 
 		// Scene
-		m_clientScene = new Scene( "mainScene" );
+		m_clientScene = new Scene( "mainScene", &Engine::InitializeEntityWorldTypes );
 		m_clientScene->SetServer( false );
-		m_serverScene = new Scene( "serverScene" );
+		m_serverScene = new Scene( "serverScene", &Engine::InitializeEntityWorldTypes );
 		m_serverScene->SetServer( true );
 
 		// Initialize editor components		
@@ -210,8 +213,8 @@ namespace fan
 		m_serverScene->New();
 
 		// try open scenes
-// 		m_clientScene->LoadFrom( "content/scenes/game.scene" ); @hack
-// 		m_serverScene->LoadFrom( "content/scenes/game.scene" );
+//  		m_clientScene->LoadFrom( "content/scenes/game.scene" );
+//  		m_serverScene->LoadFrom( "content/scenes/game.scene" );
 
 		Debug::Log( "done initializing" );
 	}
@@ -278,10 +281,16 @@ namespace fan
 					onLPPSynch.Emmit();
 				}
 
-				m_clientScene->Update( targetLogicDelta );
-				m_serverScene->Update( targetLogicDelta );
+				// Update
+				std::vector< Scene* > scenes = { m_clientScene , m_serverScene };
+				for( Scene* scene : scenes )
+				{
+					EntityWorld& world = scene->GetEntityWorld();
+					scene->Update( targetLogicDelta );
 
-				
+					EditorCamera& editorCamera = world.GetSingletonComponent<EditorCamera>();
+					EditorCamera::Update( editorCamera, targetLogicDelta );
+				}			
 
 				if ( m_showUI )
 				{
@@ -342,50 +351,72 @@ namespace fan
 	//================================================================================================================================
 	// switch to editor camera
 	//================================================================================================================================
-	void Engine::OnSceneStop( Scene* _scene )
+	void Engine::OnSceneStop( Scene& _scene )
 	{
-		return; //@hack
-		FPSCamera* editorCam = _scene->FindComponentOfType<FPSCamera>();
-		if ( editorCam != nullptr )
-		{
-			_scene->SetMainCamera( editorCam->GetCamera() );
-		}
+		//@hack
+// 		FPSCamera* editorCam = _scene->FindComponentOfType<FPSCamera>();
+// 		if ( editorCam != nullptr )
+// 		{
+// 			_scene->SetMainCamera( editorCam->GetCamera() );
+// 		}
 	}
 
 	//================================================================================================================================
 	// Todo save camera position depending on the scene
 	//================================================================================================================================
-	void Engine::OnSceneLoad( Scene* _scene )
+	void Engine::OnSceneLoad( Scene& _scene )
 	{
-		// @hack
-// 		m_selection->Deselect();
-// 
-// 		// Editor Camera
-// 		Gameobject* cameraGameobject = _scene->CreateGameobject( "editor_camera", _scene->GetRoot() );
+		m_selection->Deselect();
+
+		EntityWorld& world = _scene.GetEntityWorld();
+
+
+
+		// Editor Camera
+		SceneNode& cameraNode = _scene.CreateSceneNode( "editor_camera", &_scene.GetRootNode() );
+		EntityID id = world.GetEntityID( cameraNode.entityHandle );
 // 		cameraGameobject->SetEditorFlags(
 // 			Gameobject::EditorFlag::NO_DELETE |
 // 			Gameobject::EditorFlag::NOT_SAVED |
 // 			Gameobject::EditorFlag::ALWAYS_PLAY_ACTORS
 // 		);
-// 
-// 
-// 		cameraGameobject->GetTransform().SetPosition( btVector3( 0, 0, -2 ) );
-// 		Camera* editorCamera = cameraGameobject->AddComponent<Camera>();
-// 		editorCamera->SetRemovable( false );
+		Transform2& transform = world.AddComponent< Transform2 >( id );
+		Camera2&    camera = world.AddComponent< Camera2 >( id );
+
+		transform.SetPosition( btVector3( 0, 0, -2 ) );
+//		editorCamera->SetRemovable( false );
 // 		FPSCamera* editorCamController = cameraGameobject->AddComponent<FPSCamera>();
 // 		editorCamController->SetRemovable( false );
-// 
-// 		_scene->SetMainCamera( editorCamera );
+
+		_scene.SetMainCamera( cameraNode );
+
+		// set editor camera singleton
+		EditorCamera& editorCamera = world.GetSingletonComponent<EditorCamera>();
+		editorCamera.node = &cameraNode;
+		editorCamera.transform = &transform;
+		editorCamera.camera = &camera;
+
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
 	void Engine::UpdateRenderWorld()
 	{
-		m_currentScene->GetEntityWorld().RunSystem<S_UpdateRenderWorld>( -1.f );
-		RenderWorld& world = m_currentScene->GetEntityWorld().GetSingletonComponent<RenderWorld>();
-		m_renderer->SetDrawData( world.drawData );
-		
+		EntityWorld& world = m_currentScene->GetEntityWorld();
+
+		// models
+		world.RunSystem<S_UpdateRenderWorld>( -1.f );
+		RenderWorld& renderWorld = world.GetSingletonComponent<RenderWorld>();
+		m_renderer->SetDrawData( renderWorld.drawData );
+
+		// Camera
+		EditorCamera& editorCamera = world.GetSingletonComponent<EditorCamera>();
+		editorCamera.camera->aspectRatio = m_gameWindow->GetAspectRatio();
+		m_renderer->SetMainCamera( 
+			editorCamera.camera->GetProjection(), 
+			editorCamera.camera->GetView( *editorCamera.transform ),
+			ToGLM( editorCamera.transform->GetPosition() )
+		);
 	}
 
 	//================================================================================================================================
@@ -409,16 +440,16 @@ namespace fan
 	//================================================================================================================================
 	void Engine::DrawAABB() const
 	{
-		const std::vector< Gameobject*>& entities = m_currentScene->BuildEntitiesList();
-		for ( int gameobjectIndex = 0; gameobjectIndex < entities.size(); gameobjectIndex++ )
-		{
-			const Gameobject* gameobject = entities[ gameobjectIndex ];
-			if ( gameobject != &m_currentScene->GetMainCamera().GetGameobject() )
-			{
-				AABB aabb = gameobject->GetAABB();
-				RendererDebug::Get().DebugAABB( aabb, Color::Red );
-			}
-		}
+// 		const std::vector< Gameobject*>& entities = m_currentScene->BuildEntitiesList();
+// 		for ( int gameobjectIndex = 0; gameobjectIndex < entities.size(); gameobjectIndex++ )
+// 		{
+// 			const Gameobject* gameobject = entities[ gameobjectIndex ];
+// 			if ( gameobject != &m_currentScene->GetMainCamera().GetGameobject() )
+// 			{
+// 				AABB aabb = gameobject->GetAABB();
+// 				RendererDebug::Get().DebugAABB( aabb, Color::Red );
+// 			}
+// 		}
 	}
 
 	//================================================================================================================================
@@ -580,18 +611,37 @@ namespace fan
 		FPSCamera* editorCameraCtrl = m_currentScene->FindComponentOfType<FPSCamera>();
 		CameraController* gameCameraCtrl = m_currentScene->FindComponentOfType<CameraController>();
 
-		if ( editorCameraCtrl != nullptr && gameCameraCtrl != nullptr )
-		{
-			Camera* editorCamera = editorCameraCtrl->GetGameobject().GetComponent<Camera>();
-			Camera* gameCamera = gameCameraCtrl->GetGameobject().GetComponent<Camera>();
-			if ( &m_currentScene->GetMainCamera() == editorCamera )
-			{
-				m_currentScene->SetMainCamera( gameCamera );
-			}
-			else
-			{
-				m_currentScene->SetMainCamera( editorCamera );
-			}
-		}
+		//@hack
+// 		if ( editorCameraCtrl != nullptr && gameCameraCtrl != nullptr )
+// 		{
+// 			Camera* editorCamera = editorCameraCtrl->GetGameobject().GetComponent<Camera>();
+// 			Camera* gameCamera = gameCameraCtrl->GetGameobject().GetComponent<Camera>();
+// 			if ( &m_currentScene->GetMainCamera() == editorCamera )
+// 			{
+// 				m_currentScene->SetMainCamera( gameCamera );
+// 			}
+// 			else
+// 			{
+// 				m_currentScene->SetMainCamera( editorCamera );
+// 			}
+// 		}
+	}
+
+	void Engine::InitializeEntityWorldTypes( EntityWorld& _world )
+	{
+		_world.AddSingletonComponentType<RenderWorld>();
+		_world.AddSingletonComponentType<EditorCamera>();		
+
+		_world.AddComponentType<SceneNode>();
+		_world.AddComponentType<Transform2>();
+		_world.AddComponentType<DirectionalLight2>();
+		_world.AddComponentType<PointLight2>();
+		_world.AddComponentType<MeshRenderer2>();
+		_world.AddComponentType<Material2>();
+		_world.AddComponentType<Camera2>();
+		_world.AddComponentType<ParticleEmitter>();
+
+		_world.AddTagType<tag_alwaysUpdate>();
+		_world.AddTagType<tag_editorOnly>();
 	}
 }

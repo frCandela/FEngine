@@ -28,11 +28,11 @@ namespace fan
 	class Scene
 	{
 	public:
-		Signal< Scene* >		onSceneLoad;
-		Signal< Scene* >		onSceneStop;
+		Signal< Scene& >		onSceneLoad;
+		Signal< Scene& >		onSceneStop;
 		Signal<>				onSceneClear;
 		Signal< SceneNode* >	onDeleteSceneNode;
-		Signal< Camera* >		onSetMainCamera;
+		Signal< SceneNode& >	onSetMainCamera;
 
 		Signal< MeshRenderer* >		onRegisterMeshRenderer;
 		Signal< MeshRenderer* >		onUnRegisterMeshRenderer;
@@ -45,7 +45,7 @@ namespace fan
 
 		enum State { STOPPED, PLAYING, PAUSED };
 
-		Scene( const std::string _name );
+		Scene( const std::string _name, void ( *_initializeTypesEntityWorld )( EntityWorld& ) );
 		~Scene();
 
 
@@ -92,8 +92,8 @@ namespace fan
 		inline EntityWorld&		 GetEntityWorld() const { return *m_world; }
 		inline PhysicsManager&	 GetPhysicsManager() const { return *m_physicsManager; }
 		State					 GetState() const { return m_state; };
-		Camera&					 GetMainCamera() { return *m_mainCamera; }
-		void					 SetMainCamera( Camera* _camera );
+		SceneNode&				 GetMainCamera() { return *m_mainCamera; }
+		void					 SetMainCamera( SceneNode& _nodeCamera );
 		void					 SetServer( const bool _isServer ) { m_isServer = _isServer; }		
 		Gameobject*				 FindGameobject( const uint64_t _id );
 
@@ -127,7 +127,7 @@ namespace fan
 		// References
 		SceneNode * m_rootNode = nullptr;
 		Gameobject* m_root;
-		Camera* m_mainCamera = nullptr;
+		SceneNode* m_mainCamera = nullptr;
 
 		// State
 		State m_state = State::STOPPED;

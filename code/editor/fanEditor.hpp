@@ -17,6 +17,7 @@ namespace fan
 	class RenderWindow;
 	class EditorGizmos;
 	class EditorWindow;
+	class EntityWorld;
 	class SceneWindow;
 	class MainMenuBar;
 	class Gameobject;
@@ -88,8 +89,8 @@ namespace fan
 
 		void SwitchPlayStop();
 
-		void OnSceneStop( Scene* _scene );
-		void OnSceneLoad( Scene* _scene );
+		void OnSceneStop( Scene& _scene );
+		void OnSceneLoad( Scene& _scene );
 		void OnToogleShowUI() { m_showUI = !m_showUI; }
 		void OnToogleView();
 		void OnToogleCamera();
@@ -101,5 +102,7 @@ namespace fan
 		void DrawNormals() const;
 		void DrawAABB() const;
 		void DrawHull() const;
+
+		static void InitializeEntityWorldTypes( EntityWorld& _world );
 	};
 }

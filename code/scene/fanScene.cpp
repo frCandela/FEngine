@@ -22,12 +22,12 @@ namespace fan
 {
 	//================================================================================================================================
 	//================================================================================================================================
-	Scene::Scene( const std::string _name ) :
+	Scene::Scene( const std::string _name, void ( *_initializeTypesEntityWorld )( EntityWorld& ) ) :
 		m_name( _name )
 		, m_path( "" )
 		, m_root( nullptr )
 		, m_physicsManager( new PhysicsManager( btVector3::Zero() ) )
-		, m_world( new EntityWorld() )
+		, m_world( new EntityWorld( _initializeTypesEntityWorld ) )
 		, m_instantiate( new SceneInstantiate( *this ) )
 	{}
 
@@ -313,12 +313,12 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void Scene::SetMainCamera( Camera* _camera )
+	void Scene::SetMainCamera( SceneNode& _nodeCamera )
 	{
-		if ( _camera != m_mainCamera )
+		if ( &_nodeCamera != m_mainCamera )
 		{
-			m_mainCamera = _camera;
-			onSetMainCamera.Emmit( _camera );
+			m_mainCamera = &_nodeCamera;
+			onSetMainCamera.Emmit( _nodeCamera );
 		}
 	}
 
@@ -454,7 +454,7 @@ namespace fan
 
 			Debug::Highlight() << m_name << ": stopped" << Debug::Endl();
 			m_state = State::STOPPED;
-			onSceneStop.Emmit( this );
+			onSceneStop.Emmit( *this );
 		}
 	}
 
@@ -554,7 +554,7 @@ namespace fan
 		Clear();
 		nextUniqueID = 1;
 		m_rootNode = & CreateSceneNode( "root", nullptr );
-		onSceneLoad.Emmit( this );
+		onSceneLoad.Emmit( *this );
 	}
 
 	//================================================================================================================================
@@ -686,7 +686,7 @@ namespace fan
 	//================================================================================================================================
 	bool Scene::LoadFrom( const std::string _path )
 	{
-		//Stop();@hack
+		Stop();
 		Clear();
  		std::ifstream inStream( _path );
  		if ( inStream.is_open() && inStream.good() )
@@ -715,7 +715,7 @@ namespace fan
 			//m_instantiate->ResolveGameobjectPtr( 0 );
 			//m_instantiate->ResolveComponentPtr( 0 );
 
-			//onSceneLoad.Emmit( this );@hack
+			onSceneLoad.Emmit( *this );
 			return true;
 		}
 		else
