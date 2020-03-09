@@ -404,10 +404,12 @@ namespace fan
 	{
 		EntityWorld& world = m_currentScene->GetEntityWorld();
 
-		// models
-		world.RunSystem<S_UpdateRenderWorld>( -1.f );
+		// update render data
 		RenderWorld& renderWorld = world.GetSingletonComponent<RenderWorld>();
+		world.RunSystem<S_UpdateRenderWorldModels>( -1.f );
+		world.RunSystem<S_UpdateRenderWorldPointLights>( -1.f );		
 		m_renderer->SetDrawData( renderWorld.drawData );
+		m_renderer->SetPointLights( renderWorld.pointLights );
 
 		// Camera
 		EditorCamera& editorCamera = world.GetSingletonComponent<EditorCamera>();

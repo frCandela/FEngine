@@ -15,6 +15,7 @@ namespace fan
 	{
 		DECLARE_SINGLETON_COMPONENT()
 	public:
-		std::vector<DrawMesh> drawData;
+		std::vector<DrawMesh>		drawData;
+		std::vector<DrawPointLight>	pointLights;
 	};
 }

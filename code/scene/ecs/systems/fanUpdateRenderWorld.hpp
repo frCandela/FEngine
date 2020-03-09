@@ -12,10 +12,8 @@ namespace fan
 {
 	//==============================================================================================================================================================
 	//==============================================================================================================================================================
-	struct S_UpdateRenderWorld : System
+	struct S_UpdateRenderWorldModels : System
 	{
-	public:
-
 		static Signature GetSignature( const EntityWorld& _world )
 		{
  			return	 _world.GetSignature<MeshRenderer2>()
@@ -23,11 +21,8 @@ namespace fan
 					|_world.GetSignature<Transform2>()
 					|_world.GetSignature<Material2>();
 		}
-
 		static void Run( EntityWorld& _world, const std::vector<EntityID>& _entities, const float _delta )
 		{
-
-			// 		SCOPED_PROFILE( update_renderer )
 			RenderWorld& renderWorld = _world.GetSingletonComponent<RenderWorld>();
 			renderWorld.drawData.clear();
 
@@ -38,19 +33,14 @@ namespace fan
 				MeshRenderer2& meshRenderer = _world.GetComponent<MeshRenderer2>( id );
 				if( meshRenderer.mesh.IsValid() )
 				{
-					//DrawMesh data;
+					// drawMesh data;
 					Material2& material = _world.GetComponent<Material2>( id );
 					Transform2& transform =_world.GetComponent<Transform2>( id );
 
- 					// Mesh
 					DrawMesh data;
  					data.mesh = * meshRenderer.mesh;
-
-					// Transform
 					data.modelMatrix = transform.GetModelMatrix();
 					data.normalMatrix = transform.GetNormalMatrix();
-
-					// Materials
 					data.textureIndex = material.texture.IsValid() ? material.texture->GetRenderID() : 0;
 					data.color = material.color.ToGLM();
 					data.shininess = material.shininess;		
@@ -58,7 +48,44 @@ namespace fan
 					renderWorld.drawData.push_back( data );
 				}
 			}
-// 
+		}
+	};
+
+	//==============================================================================================================================================================
+	//==============================================================================================================================================================
+	struct S_UpdateRenderWorldPointLights : System
+	{
+		static Signature GetSignature( const EntityWorld& _world )
+		{
+			return	_world.GetSignature<Transform2>()
+				|   _world.GetSignature<PointLight2>();
+		}
+		static void Run( EntityWorld& _world, const std::vector<EntityID>& _entities, const float _delta )
+		{
+			RenderWorld& renderWorld = _world.GetSingletonComponent<RenderWorld>();
+			renderWorld.pointLights.clear();
+
+			for( EntityID id : _entities )
+			{
+				// light data
+				Entity& entity = _world.GetEntity( id );
+				Transform2& transform = _world.GetComponent<Transform2>( id );
+				PointLight2& light = _world.GetComponent<PointLight2>( id );
+				
+				DrawPointLight pointLight;
+				pointLight.position = glm::vec4( ToGLM( transform.GetPosition() ), 1.f );
+				pointLight.diffuse = light.diffuse.ToGLM();
+				pointLight.specular = light.specular.ToGLM();
+				pointLight.ambiant = light.ambiant.ToGLM();
+				pointLight.constant = light.attenuation[PointLight2::CONSTANT];
+				pointLight.linear = light.attenuation[PointLight2::LINEAR];
+				pointLight.quadratic = light.attenuation[PointLight2::QUADRATIC];
+
+				renderWorld.pointLights.push_back( pointLight );
+			}
+		}
+	};
+	// 
 // 		Camera& mainCamera = m_currentScene->GetMainCamera();
 // 		const std::vector < DirectionalLight* > directionalLights = m_currentScene->GetDirectionalLights();
 // 		const std::vector < PointLight* >		pointLights = m_currentScene->GetPointLights();
@@ -171,6 +198,4 @@ namespace fan
 // 			}
 // 		}
 // 		m_renderer->SetUIDrawData( uiDrawData );
-		}
-	};
 }

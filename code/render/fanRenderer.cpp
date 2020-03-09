@@ -278,24 +278,21 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void Renderer::SetPointLight( const int _index, const glm::vec3 _position, const glm::vec3 _diffuse, const glm::vec3 _specular, const glm::vec3 _ambiant, const glm::vec3 _constantLinearQuadratic )
+	void Renderer::SetPointLights( const std::vector<DrawPointLight>& _lightData )
 	{
-		assert( _index < RenderGlobal::s_maximumNumPointLights );
-		m_forwardPipeline->m_lightUniforms.pointlights[ _index ].position = glm::vec4( _position, 1 );
-		m_forwardPipeline->m_lightUniforms.pointlights[ _index ].diffuse = glm::vec4( _diffuse, 1 );
-		m_forwardPipeline->m_lightUniforms.pointlights[ _index ].specular = glm::vec4( _specular, 1 );
-		m_forwardPipeline->m_lightUniforms.pointlights[ _index ].ambiant = glm::vec4( _ambiant, 1 );
-		m_forwardPipeline->m_lightUniforms.pointlights[ _index ].constant = _constantLinearQuadratic[ 0 ];
-		m_forwardPipeline->m_lightUniforms.pointlights[ _index ].linear = _constantLinearQuadratic[ 1 ];
-		m_forwardPipeline->m_lightUniforms.pointlights[ _index ].quadratic = _constantLinearQuadratic[ 2 ];
-	}
-
-	//================================================================================================================================
-	//================================================================================================================================
-	void  Renderer::SetNumPointLights( const uint32_t _num )
-	{
-		assert( _num < RenderGlobal::s_maximumNumPointLights );
-		m_forwardPipeline->m_lightUniforms.pointLightNum = _num;
+		assert( _lightData.size() < RenderGlobal::s_maximumNumPointLights );
+		m_forwardPipeline->m_lightUniforms.pointLightNum = (uint32_t)_lightData.size();
+		for ( int i = 0; i < _lightData.size(); ++i )
+		{
+			const DrawPointLight& light = _lightData[i];
+			m_forwardPipeline->m_lightUniforms.pointlights[i].position	= light.position;
+			m_forwardPipeline->m_lightUniforms.pointlights[i].diffuse	= light.diffuse;
+			m_forwardPipeline->m_lightUniforms.pointlights[i].specular	= light.specular;
+			m_forwardPipeline->m_lightUniforms.pointlights[i].ambiant	= light.ambiant;
+			m_forwardPipeline->m_lightUniforms.pointlights[i].constant	= light.constant;
+			m_forwardPipeline->m_lightUniforms.pointlights[i].linear	= light.linear;
+			m_forwardPipeline->m_lightUniforms.pointlights[i].quadratic = light.quadratic;
+		}
 	}
 
 	//================================================================================================================================
