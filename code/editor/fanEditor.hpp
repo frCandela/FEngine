@@ -84,8 +84,8 @@ namespace fan
 		bool m_applicationShouldExit;
 		bool m_showUI = true;
 
+		void UpdateRenderWorld();
 
-		void UpdateRenderer();
 		void SwitchPlayStop();
 
 		void OnSceneStop( Scene* _scene );

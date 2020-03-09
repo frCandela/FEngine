@@ -18,6 +18,7 @@ namespace fan {
 	public:
 		EntityWorld();
 
+		template< typename _componentType >	_componentType& GetComponent( const EntityID _entityID );
 		template< typename _componentType >	_componentType& AddComponent( const EntityID _entityID );
 		template< typename _componentType >	void			RemoveComponent( EntityID _entityID );
 		template< typename _tagType >void					AddTag( EntityID _entityID );
@@ -77,6 +78,26 @@ namespace fan {
 
 	//==============================================================================================================================================================
 	//==============================================================================================================================================================
+	template< typename _componentType >	
+	_componentType& EntityWorld::GetComponent( const EntityID _entityID )
+	{
+		static_assert( std::is_base_of< ecComponent, _componentType>::value );
+		Entity& entity = GetEntity( _entityID );		
+		const ComponentIndex index = m_typeIndices[_componentType::s_typeInfo];
+		assert( entity.signature[index] ); // entity has have this component
+		for( int i = 0; i < entity.componentCount; i++ )
+		{
+			if( entity.components[i]->componentIndex == index )
+			{
+				return *static_cast<_componentType*>(entity.components[i]);
+			}
+		}
+		assert( false );
+		return *(_componentType*)( 0 );
+	}
+
+	//==============================================================================================================================================================
+	//==============================================================================================================================================================
 	template< typename _componentType >	void EntityWorld::RemoveComponent( EntityID _entityID )
 	{
 		Entity& entity = GetEntity( _entityID );
@@ -122,7 +143,7 @@ namespace fan {
 	template< typename _systemType > void EntityWorld::RunSystem( const float _delta )
 	{
 		static_assert( std::is_base_of< System, _systemType>::value );
-		std::vector<Entity*> matchEntities;
+		std::vector<EntityID> matchEntities;
 
 		const Signature systemSignature = _systemType::GetSignature( *this );
 
@@ -132,10 +153,14 @@ namespace fan {
 			Entity& entity = m_entities[entityIndex];
 			if( ( entity.signature & systemSignature ) == systemSignature )
 			{
-				matchEntities.push_back( &entity );
+				matchEntities.push_back( entityIndex );
 			}
 		}
-		_systemType::Run( *this, matchEntities, _delta );
+
+		if( !matchEntities.empty() )
+		{
+			_systemType::Run( *this, matchEntities, _delta );
+		}		
 	}
 
 	//==============================================================================================================================================================

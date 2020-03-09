@@ -23,19 +23,6 @@ namespace fan
 		bool HasComponent( const ComponentIndex _index ) const	{ return signature[_index] == 1;		}
 		bool IsAlive() const									{ return  signature[ecAliveBit] == 1;	}
 		void Kill()												{ signature[ecAliveBit] = 0;			}
-		ecComponent& GetComponent( const ComponentIndex _index )
-		{
-			for( int i = 0; i < componentCount; i++ )
-			{
-				if( components[i]->GetIndex() == _index )
-				{
-					return *components[i];
-				}
-			}
-			assert( false );
-			return *(ecComponent*)( 0 );
-		}
-
 	};
 	static constexpr size_t sizeEntity = sizeof( Entity );
 	static_assert( sizeEntity == 128 );

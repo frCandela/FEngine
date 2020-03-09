@@ -7,6 +7,8 @@
 #include "scene/ecs/fanSystem.hpp"
 #include "scene/ecs/fanTag.hpp"
 
+#include "scene/ecs/systems/fanUpdateAABBFromRigidbody.hpp"
+
 namespace fan
 {
 

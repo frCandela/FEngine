@@ -3,6 +3,7 @@
 #include "scene/fanScenePrecompiled.hpp"
 
 #include "scene/ecs/fanSingletonComponent.hpp"
+#include "render/fanRenderer.hpp"
 
 namespace fan
 {
@@ -14,7 +15,6 @@ namespace fan
 	{
 		DECLARE_SINGLETON_COMPONENT()
 	public:
-		RenderWorld();
-		~RenderWorld();
+		std::vector<DrawMesh> drawData;
 	};
 }
