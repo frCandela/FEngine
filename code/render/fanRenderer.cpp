@@ -259,21 +259,18 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void Renderer::SetDirectionalLight( const int _index, const glm::vec4 _direction, const glm::vec4 _ambiant, const glm::vec4 _diffuse, const glm::vec4 _specular )
+	void  Renderer::SetDirectionalLights( const std::vector<DrawDirectionalLight>& _lightData )
 	{
-		assert( _index < RenderGlobal::s_maximumNumDirectionalLight );
-		m_forwardPipeline->m_lightUniforms.dirLights[ _index ].direction = _direction;
-		m_forwardPipeline->m_lightUniforms.dirLights[ _index ].ambiant = _ambiant;
-		m_forwardPipeline->m_lightUniforms.dirLights[ _index ].diffuse = _diffuse;
-		m_forwardPipeline->m_lightUniforms.dirLights[ _index ].specular = _specular;
-	}
-
-	//================================================================================================================================
-	//================================================================================================================================
-	void  Renderer::SetNumDirectionalLights( const uint32_t _num )
-	{
-		assert( _num < RenderGlobal::s_maximumNumDirectionalLight );
-		m_forwardPipeline->m_lightUniforms.dirLightsNum = _num;
+		assert( _lightData.size() < RenderGlobal::s_maximumNumDirectionalLight );
+		m_forwardPipeline->m_lightUniforms.dirLightsNum = (uint32_t)_lightData.size();
+		for( int i = 0; i < _lightData.size(); ++i )
+		{
+			const DrawDirectionalLight& light = _lightData[i];
+			m_forwardPipeline->m_lightUniforms.dirLights[i].direction = light.direction;
+			m_forwardPipeline->m_lightUniforms.dirLights[i].ambiant = light.ambiant;
+			m_forwardPipeline->m_lightUniforms.dirLights[i].diffuse = light.diffuse;
+			m_forwardPipeline->m_lightUniforms.dirLights[i].specular = light.specular;
+		}
 	}
 
 	//================================================================================================================================

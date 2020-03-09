@@ -60,6 +60,7 @@ namespace fan
 			return	_world.GetSignature<Transform2>()
 				|   _world.GetSignature<PointLight2>();
 		}
+
 		static void Run( EntityWorld& _world, const std::vector<EntityID>& _entities, const float _delta )
 		{
 			RenderWorld& renderWorld = _world.GetSingletonComponent<RenderWorld>();
@@ -82,6 +83,39 @@ namespace fan
 				pointLight.quadratic = light.attenuation[PointLight2::QUADRATIC];
 
 				renderWorld.pointLights.push_back( pointLight );
+			}
+		}
+	};
+
+	//==============================================================================================================================================================
+//==============================================================================================================================================================
+	struct S_UpdateRenderWorldDirectionalLights : System
+	{
+		static Signature GetSignature( const EntityWorld& _world )
+		{
+			return	_world.GetSignature<Transform2>()
+				  | _world.GetSignature<DirectionalLight2>();
+		}
+
+		static void Run( EntityWorld& _world, const std::vector<EntityID>& _entities, const float _delta )
+		{
+			RenderWorld& renderWorld = _world.GetSingletonComponent<RenderWorld>();
+			renderWorld.directionalLights.clear();
+
+			for( EntityID id : _entities )
+			{
+				// light data
+				Entity& entity = _world.GetEntity( id );
+				Transform2& transform = _world.GetComponent<Transform2>( id );
+				DirectionalLight2& directionalLight = _world.GetComponent<DirectionalLight2>( id );
+
+				DrawDirectionalLight light;
+				light.direction = glm::vec4( ToGLM( transform.Forward() ), 1 );
+				light.ambiant = directionalLight.ambiant.ToGLM();
+				light.diffuse = directionalLight.diffuse.ToGLM();
+				light.specular = directionalLight.specular.ToGLM();
+
+				renderWorld.directionalLights.push_back( light );
 			}
 		}
 	};

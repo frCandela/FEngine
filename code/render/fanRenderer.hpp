@@ -23,6 +23,14 @@ namespace fan
 	class RenderPass;
 
 	// Used to set uniforms
+	struct DrawDirectionalLight
+	{
+		glm::vec4 direction;
+		glm::vec4 ambiant;
+		glm::vec4 diffuse;
+		glm::vec4 specular;
+	};
+
 	struct DrawPointLight
 	{
 		glm::vec4	 position;
@@ -97,8 +105,7 @@ namespace fan
 
 		void SetClearColor( glm::vec4 _color ) { m_clearColor = _color; }
 		void SetMainCamera( const glm::mat4 _projection, const glm::mat4 _view, const glm::vec3 _position );
-		void SetDirectionalLight( const int _index, const glm::vec4 _direction, const glm::vec4 _ambiant, const glm::vec4 _diffuse, const glm::vec4 _specular );
-		void SetNumDirectionalLights( const uint32_t _num );
+		void SetDirectionalLights( const std::vector<DrawDirectionalLight>& _lightData );
 		void SetPointLights( const std::vector<DrawPointLight>& _lightData );
 		void SetDrawData( const std::vector<DrawMesh>& _drawData );
 		void SetUIDrawData( const std::vector<DrawUIMesh>& _drawData );
