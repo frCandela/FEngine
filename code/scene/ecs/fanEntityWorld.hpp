@@ -18,6 +18,7 @@ namespace fan {
 	public:
 		EntityWorld( void ( *initializeTypes )( EntityWorld& ) );
 
+		template< typename _componentType >	bool			HasComponent( const EntityID _entityID );
 		template< typename _componentType >	_componentType& GetComponent( const EntityID _entityID );
 		template< typename _componentType >	_componentType& AddComponent( const EntityID _entityID );
 		template< typename _componentType >	void			RemoveComponent( EntityID _entityID );
@@ -99,8 +100,18 @@ namespace fan {
 
 	//==============================================================================================================================================================
 	//==============================================================================================================================================================
+	template< typename _componentType >	bool EntityWorld::HasComponent( const EntityID _entityID )
+	{
+		static_assert( std::is_base_of< ecComponent, _componentType>::value );
+		const ComponentIndex index = m_typeIndices[_componentType::s_typeInfo];
+		return m_entities[_entityID].HasComponent( index );
+	}
+
+	//==============================================================================================================================================================
+	//==============================================================================================================================================================
 	template< typename _componentType >	void EntityWorld::RemoveComponent( EntityID _entityID )
 	{
+		static_assert( std::is_base_of< ecComponent, _componentType>::value );
 		Entity& entity = GetEntity( _entityID );
 		assert( entity.signature[_componentType::s_typeID] == 1 ); // this entity doesn't have this component
 		_componentType& component = entity.GetComponent<_componentType>();

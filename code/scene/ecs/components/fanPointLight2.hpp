@@ -27,7 +27,7 @@ namespace fan
 		Color specular = Color::White;
 		float attenuation[3] = { 0.f,0.f,0.1f };
 
-		float GetLightRange() const;
+		static float GetLightRange( const PointLight2& _light );
 	};
 	static constexpr size_t sizeof_pointLight2 = sizeof( PointLight2 );
 }

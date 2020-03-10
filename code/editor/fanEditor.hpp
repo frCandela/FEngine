@@ -98,6 +98,7 @@ namespace fan
 		void OnSetCurrentScene( int _scene );
 
 		void DrawEditorGrid() const;
+		void DrawLightGizmos() const;
 		void DrawWireframe() const;
 		void DrawNormals() const;
 		void DrawAABB() const;

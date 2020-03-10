@@ -309,6 +309,7 @@ namespace fan
 					if ( m_mainMenuBar->ShowNormals() ) { DrawNormals(); }
 					if ( m_mainMenuBar->ShowAABB() ) { DrawAABB(); }
 					if ( m_mainMenuBar->ShowHull() ) { DrawHull(); }
+					DrawLightGizmos();
 				}
 
 				{
@@ -436,6 +437,51 @@ namespace fan
 			{
 				RendererDebug::Get().DebugLine( m_editorGrid.offset + btVector3( -count * size, 0.f, coord * size ), m_editorGrid.offset + btVector3( count * size, 0.f, coord * size ), m_editorGrid.color );
 				RendererDebug::Get().DebugLine( m_editorGrid.offset + btVector3( coord * size, 0.f, -count * size ), m_editorGrid.offset + btVector3( coord * size, 0.f, count * size ), m_editorGrid.color );
+			}
+		}
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
+	void Engine::DrawLightGizmos() const
+	{
+		SceneNode* node = m_selection->GetSelectedSceneNode();
+		if( node != nullptr )
+		{
+			EntityWorld& world = node->scene->GetEntityWorld();
+			EntityID id = world.GetEntityID( node->entityHandle );
+
+			// point light
+			if( world.HasComponent<PointLight2>( id ) && world.HasComponent<Transform2>( id ) )
+			{
+				const PointLight2& light = world.GetComponent<PointLight2>( id );
+				const Transform2& transform = world.GetComponent<Transform2>( id );
+				const float lightRange = PointLight2::GetLightRange( light );
+				if( lightRange > 0 )
+				{
+					RendererDebug::Get().DebugSphere( transform.transform, lightRange, 2, light.diffuse );
+				}
+			}
+
+			// dir light
+			if( world.HasComponent<DirectionalLight2>( id ) && world.HasComponent<Transform2>( id ) )
+			{
+				const DirectionalLight2& light = world.GetComponent<DirectionalLight2>( id );
+				const Transform2& transform = world.GetComponent<Transform2>( id );
+				const btVector3 pos = transform.GetPosition();
+				const btVector3 dir = transform.Forward();
+				const btVector3 up = transform.Up();
+				const btVector3 left = transform.Left();
+				const float length = 2.f;
+				const float radius = 0.5f;
+				const Color color = Color::Yellow;
+				btVector3 offsets[5] = { btVector3::Zero(), radius * up ,-radius * up, radius * left ,-radius * left };
+				for( int offsetIndex = 0; offsetIndex < 5; offsetIndex++ )
+				{
+					const btVector3 offset = offsets[offsetIndex];
+					RendererDebug::Get().DebugLine( pos + offset, pos + offset + length * dir, color );
+				}
+				RendererDebug::Get().DebugSphere( transform.transform, radius, 0, color );
 			}
 		}
 	}

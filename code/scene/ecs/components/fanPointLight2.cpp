@@ -104,12 +104,12 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	float PointLight2::GetLightRange() const
+	float PointLight2::GetLightRange( const PointLight2& _light )
 	{
 		const float epsilon = 0.1f;	// Value at which we consider the light value null
-		const float q = attenuation[ 2 ];
-		const float s = attenuation[ 0 ];
-		const float L = attenuation[ 1 ];
+		const float q = _light.attenuation[2];
+		const float s = _light.attenuation[0];
+		const float L = _light.attenuation[1];
 		if ( q < epsilon )
 		{	// first order linear differential equation
 			return ( ( 1.f / epsilon ) - s ) / L;
