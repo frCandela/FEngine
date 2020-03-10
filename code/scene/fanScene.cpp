@@ -619,7 +619,7 @@ namespace fan
 		for( int sceneNodeIndex = 0; sceneNodeIndex < _node.childs.size(); sceneNodeIndex++ )
 		{
 			SceneNode& childNode = *_node.childs[sceneNodeIndex];
-			if( true/*( gameobject->GetEditorFlags() & EditorFlag::NOT_SAVED ) == false*/ )
+			if( ! childNode.HasFlag( SceneNode::NOT_SAVED ) )
 			{
 				Json& jchild = jchilds[childIndex];
 				R_SaveToJson( childNode, jchild );

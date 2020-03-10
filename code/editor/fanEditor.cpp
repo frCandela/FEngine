@@ -376,18 +376,12 @@ namespace fan
 		// Editor Camera
 		SceneNode& cameraNode = _scene.CreateSceneNode( "editor_camera", &_scene.GetRootNode() );
 		EntityID id = world.GetEntityID( cameraNode.entityHandle );
-// 		cameraGameobject->SetEditorFlags(
-// 			Gameobject::EditorFlag::NO_DELETE |
-// 			Gameobject::EditorFlag::NOT_SAVED |
-// 			Gameobject::EditorFlag::ALWAYS_PLAY_ACTORS
-// 		);
+		cameraNode.AddFlag( SceneNode::NOT_SAVED | SceneNode::NO_DELETE );
+
 		Transform2& transform = world.AddComponent< Transform2 >( id );
 		Camera2&    camera = world.AddComponent< Camera2 >( id );
 
 		transform.SetPosition( btVector3( 0, 0, -2 ) );
-//		editorCamera->SetRemovable( false );
-// 		FPSCamera* editorCamController = cameraGameobject->AddComponent<FPSCamera>();
-// 		editorCamController->SetRemovable( false );
 
 		_scene.SetMainCamera( cameraNode );
 
@@ -396,7 +390,6 @@ namespace fan
 		editorCamera.node = &cameraNode;
 		editorCamera.transform = &transform;
 		editorCamera.camera = &camera;
-
 	}
 
 	//================================================================================================================================

@@ -15,6 +15,12 @@ namespace fan
 	{
 		DECLARE_COMPONENT( SceneNode )
 	public:
+		enum Flags
+		{
+			  NONE = 0
+			, NOT_SAVED = 1 << 0 // node is ignored while saving the scene
+			, NO_DELETE = 1 << 1 // node cannot be deleted in the ui
+		};
 
 		static void SetInfo( ComponentInfo& _info );
 		static void Clear( ecComponent& _sceneNode );
@@ -29,13 +35,17 @@ namespace fan
 		void AddChild( SceneNode& _child );
 		void SetParent( SceneNode* _parent );
 		void InsertBelow( SceneNode& _brother );
+		bool HasFlag( uint32_t _flag ) { return flags & _flag; }
+		void AddFlag( uint32_t _flag ) {  flags |= _flag; }
+		void RemoveFlag( Flags _flag ) {  flags &= ~_flag; }
 
-		std::string				name;
-		uint32_t				uniqueID;
-		Scene*					scene;
 		EntityHandle			entityHandle;
+		uint32_t				uniqueID;
+		uint32_t				flags;
+		Scene*					scene;
 		SceneNode*				parent;
 		std::vector<SceneNode*> childs;
+		std::string				name;
 	};
 	static constexpr size_t sizeof_sceneNode = sizeof( SceneNode );
 }
