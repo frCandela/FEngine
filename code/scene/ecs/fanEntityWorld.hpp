@@ -28,6 +28,8 @@ namespace fan {
 		template< typename _tagOrComponentType > Signature	GetSignature() const;
 
 		ecComponent&		  AddComponent( const EntityID _entityID, const ComponentIndex _index );
+		ecComponent&		  GetComponent( const EntityID _entityID, const ComponentIndex _index );
+		void				  RemoveComponent( const EntityID _entityID, const ComponentIndex _index );
 		bool				  HasComponent( const EntityID _entityID, ComponentIndex _index );
 		const ComponentInfo&  GetComponentInfo( const ComponentIndex _index ) const { return  m_componentInfo.at( _index );	}
 		EntityID			  CreateEntity();
@@ -83,19 +85,9 @@ namespace fan {
 	template< typename _componentType >	
 	_componentType& EntityWorld::GetComponent( const EntityID _entityID )
 	{
-		static_assert( std::is_base_of< ecComponent, _componentType>::value );
-		Entity& entity = GetEntity( _entityID );		
+		static_assert( std::is_base_of< ecComponent, _componentType>::value );			
 		const ComponentIndex index = m_typeIndices[_componentType::s_typeInfo];
-		assert( entity.signature[index] ); // entity has have this component
-		for( int i = 0; i < entity.componentCount; i++ )
-		{
-			if( entity.components[i]->componentIndex == index )
-			{
-				return *static_cast<_componentType*>(entity.components[i]);
-			}
-		}
-		assert( false );
-		return *(_componentType*)( 0 );
+		return static_cast<_componentType&> ( GetComponent( _entityID, index ) );
 	}
 
 	//==============================================================================================================================================================
@@ -112,23 +104,8 @@ namespace fan {
 	template< typename _componentType >	void EntityWorld::RemoveComponent( EntityID _entityID )
 	{
 		static_assert( std::is_base_of< ecComponent, _componentType>::value );
-		Entity& entity = GetEntity( _entityID );
-		assert( entity.signature[_componentType::s_typeID] == 1 ); // this entity doesn't have this component
-		_componentType& component = entity.GetComponent<_componentType>();
-		m_components[_componentType::s_typeID].RemoveComponent( component.chunckIndex, component.index );
-		entity.signature[_componentType::s_typeID] = 0;
-
-		for( int componentIndex = 0; componentIndex < entity.componentCount; componentIndex++ )
-		{
-			if( entity.components[componentIndex]->typeID == _componentType::s_typeID )
-			{
-				entity.componentCount--;
-				entity.components[componentIndex] = entity.components[entity.componentCount]; // swap
-				entity.components[entity.componentCount] = nullptr;
-				return;
-			}
-		}
-		assert( false ); // component not found
+		const ComponentIndex index = m_typeIndices[_componentType::s_typeInfo];
+		RemoveComponent( _entityID, index );
 	}
 
 	//==============================================================================================================================================================

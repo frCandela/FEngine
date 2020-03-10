@@ -42,7 +42,6 @@ namespace fan
  			ImGui::Icon( GetIconType(), { 16,16 } ); ImGui::SameLine();
 			ImGui::Text( "Scene node : %s", node.name.c_str() );
 
-			int componentCount = 0;
 			for( int componentIndex = 0; componentIndex < entity.componentCount; componentIndex++ )
 			{
 				ecComponent& component = *entity.components[componentIndex];
@@ -53,42 +52,17 @@ namespace fan
 				ImGui::Icon( info.icon, { 16,16 } ); ImGui::SameLine();
 				ImGui::Text( "%s", info.name.c_str() );
  				ImGui::FanBeginDragDropSourceEcComponent( component, info, ImGuiDragDropFlags_SourceAllowNullID );
-// 
-// 				// Actor "enable" checkbox
-// 				if( component->IsActor() )
-// 				{	// TODO : use type info when type info deals with inheritance
-// 					ImGui::PushID( (int*)component );
-// 					Actor* actor = static_cast<Actor*>( component );
-// 					bool enabled = actor->IsEnabled();
-// 					if( ImGui::Checkbox( "", &enabled ) )
-// 					{
-// 						actor->SetEnabled( enabled );
-// 					}
-// 					ImGui::SameLine();
-// 					ImGui::PopID();
-// 				}
-// 
-// 				// Delete button	
-// 				ImGui::Text( component->GetName() );
-// 				ImGui::FanBeginDragDropSourceComponent( component, ImGuiDragDropFlags_SourceAllowNullID );
-// 
-//  			ImGui::SameLine();
-//  			ImGui::Text( "  (ref: %d) ", component->GetRefCount() );
-// 
-// 				if( component->IsRemovable() )
-// 				{
-// 					std::stringstream ss;
-// 					ss << "X" << "##" << component->GetName() << componentCount++;	// make unique id
-// 					ImGui::SameLine( ImGui::GetWindowWidth() - 40 );
-// 					if( ImGui::Button( ss.str().c_str() ) )
-// 					{
-// 						m_sceneNodeSelected->RemoveComponent( component );
-// 						component = nullptr;
-// 					}
-// 				}
 
+ 				// Delete button	
+				std::stringstream ss;
+				ss << "X" << "##" << info.name;	// make unique id
+				ImGui::SameLine( ImGui::GetWindowWidth() - 40 );
+				if( ImGui::Button( ss.str().c_str() ) )
+				{
+					world.RemoveComponent( id, component.GetIndex() );
+				}
  				// Draw component
-				if( info.onGui != nullptr )
+				else if( info.onGui != nullptr )
 				{
 					info.onGui( component );
 				} 				

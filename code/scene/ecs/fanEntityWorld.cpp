@@ -59,6 +59,46 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
+	ecComponent& EntityWorld::GetComponent( const EntityID _entityID, const ComponentIndex _index )
+	{
+		Entity& entity = GetEntity( _entityID );
+		assert( entity.signature[_index] ); // entity has have this component
+		for( int i = 0; i < entity.componentCount; i++ )
+		{
+			if( entity.components[i]->componentIndex == _index )
+			{
+				return *entity.components[i];
+			}
+		}
+		assert( false );
+		return *(ecComponent*)( 0 );
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
+	void EntityWorld::RemoveComponent( const EntityID _entityID, const ComponentIndex _index )
+	{		
+		Entity& entity = GetEntity( _entityID );
+		assert( entity.signature[_index] == 1 ); // this entity doesn't have this component
+		ecComponent& component = GetComponent( _entityID, _index );
+		m_components[_index].RemoveComponent( component.chunckIndex, component.chunckComponentIndex );
+		entity.signature[_index] = 0;
+
+		for( int componentIndex = 0; componentIndex < entity.componentCount; componentIndex++ )
+		{
+			if( entity.components[componentIndex]->componentIndex == _index )
+			{
+				entity.componentCount--;
+				entity.components[componentIndex] = entity.components[entity.componentCount]; // swap
+				entity.components[entity.componentCount] = nullptr;
+				return;
+			}
+		}
+		assert( false ); // component not found
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
 	bool EntityWorld::HasComponent( const EntityID _entityID, ComponentIndex _index ) 
 	{ 
 		return m_entities[_entityID].HasComponent( _index ); 
