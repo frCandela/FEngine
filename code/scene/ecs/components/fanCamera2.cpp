@@ -149,7 +149,7 @@ namespace fan
 	//================================================================================================================================
 	// Returns a ray going from camera through a screen point ( with screenSpacePosition between {-1.f,-1.f} and {1.f,1.f} ).
 	//================================================================================================================================
-	Ray Camera2::ScreenPosToRay( const Transform2& _cameraTransform, const btVector2& _screenSpacePosition )
+	Ray Camera2::ScreenPosToRay( const Transform2& _cameraTransform, const btVector2& _screenSpacePosition ) const
 	{
 		assert( _screenSpacePosition.x() >= -1.f && _screenSpacePosition.x() <= 1.f );
 		assert( _screenSpacePosition.y() >= -1.f && _screenSpacePosition.y() <= 1.f );
@@ -188,7 +188,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	btVector2 Camera2::WorldPosToScreen( const Transform2& _cameraTransform, const btVector3& worldPosition )
+	btVector2 Camera2::WorldPosToScreen( const Transform2& _cameraTransform, const btVector3& worldPosition ) const
 	{
 		if( type == Type::PERSPECTIVE )
 		{

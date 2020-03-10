@@ -8,13 +8,15 @@
 #include "core/math/shapes/fanRay.hpp"
 #include "scene/components/ui/fanUIMeshRenderer.hpp"
 #include "scene/components/ui/fanUITransform.hpp"
+#include "scene/ecs/components/fanSceneNode.hpp"
+#include "scene/ecs/components/fanTransform2.hpp"
 #include "scene/components/fanMeshRenderer.hpp"
 #include "scene/components/fanTransform.hpp"
 #include "scene/components/fanTransform.hpp"
 #include "scene/components/fanCamera.hpp"
+#include "scene/ecs/fanEntityWorld.hpp"
 #include "scene/fanGameobject.hpp"
 #include "scene/fanScene.hpp"
-#include "scene/ecs/components/fanSceneNode.hpp"
 #include "render/fanMesh.hpp"
 
 namespace fan
@@ -51,19 +53,25 @@ namespace fan
 		bool mouseCaptured = false;
 
 		// Translation gizmo on selected gameobject
-// 		if ( m_selectedSceneNode != nullptr && m_selectedSceneNode != &m_currentScene->GetMainCamera().GetGameobject()
-// 			 && m_selectedSceneNode->GetComponent<UIMeshRenderer>() == nullptr
+		if ( m_selectedSceneNode != nullptr && m_selectedSceneNode != &m_currentScene->GetMainCamera() )
+// 			 && m_selectedSceneNode->GetComponent<UIMeshRenderer>() == nullptr @hack
 // 			 && m_selectedSceneNode->GetComponent<UITransform>() == nullptr )
-// 
-// 		{
-// 			Transform* transform = m_selectedSceneNode->GetComponent< Transform >();
-// 			btVector3 newPosition;
-// 			if ( EditorGizmos::Get().DrawMoveGizmo( btTransform( btQuaternion( 0, 0, 0 ), transform->GetPosition() ), ( size_t ) this, newPosition ) )
-// 			{
-// 				transform->SetPosition( newPosition );
-// 				mouseCaptured = true;
-// 			}
-// 		} @node
+		{
+			EntityWorld& world = m_selectedSceneNode->scene->GetEntityWorld();
+			EntityID id = world.GetEntityID( m_selectedSceneNode->entityHandle );
+			if( world.HasComponent<Transform2>( id ) )
+			{
+				Transform2& transform = world.GetComponent< Transform2 >( id );
+				btVector3 newPosition;
+				if( EditorGizmos::Get().DrawMoveGizmo( btTransform( btQuaternion( 0, 0, 0 ), transform.GetPosition() ), (size_t)&transform, newPosition ) )
+				{
+					transform.SetPosition( newPosition );
+					mouseCaptured = true;
+				}
+			}
+			
+
+		}
 
 		// Mouse selection
 // 		if ( !mouseCaptured && _gameWindowHovered && Mouse::Get().GetButtonPressed( Mouse::button0 ) )
@@ -106,7 +114,7 @@ namespace fan
 // 					}
 // 				}
 // 			}
-			//SetSelectedSceneNode( closestGameobject ); @node
+//			SetSelectedSceneNode( closestGameobject ); @node
 //		}
 	}
 

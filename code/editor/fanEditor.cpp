@@ -296,7 +296,7 @@ namespace fan
 				{
 					SCOPED_PROFILE( draw_ui )
 					m_mainMenuBar->Draw();
-					// m_selection->Update( m_gameWindow->IsHovered() ); @hack
+					m_selection->Update( m_gameWindow->IsHovered() );
 					DrawEditorGrid();
 				}
 

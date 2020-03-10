@@ -34,8 +34,8 @@ namespace fan
 
 		glm::mat4 GetView( const Transform2& _cameraTransform ) const;
 		glm::mat4 GetProjection() const;
-		Ray		  ScreenPosToRay( const Transform2& _cameraTransform, const btVector2& _screenSpacePosition );
-		btVector2 WorldPosToScreen( const Transform2& _cameraTransform, const btVector3& worldPosition );
+		Ray		  ScreenPosToRay( const Transform2& _cameraTransform, const btVector2& _screenSpacePosition ) const ;
+		btVector2 WorldPosToScreen( const Transform2& _cameraTransform, const btVector3& worldPosition ) const;
 	};
 	static constexpr size_t sizeof_camera = sizeof( Camera2 );
 }
