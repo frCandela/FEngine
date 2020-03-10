@@ -24,7 +24,7 @@ namespace fan {
 		template< typename _componentType >	void			RemoveComponent( EntityID _entityID );
 		template< typename _tagType >void					AddTag( EntityID _entityID );
 		template< typename _componentType >	_componentType& GetSingletonComponent();
-		template< typename _systemType > void				RunSystem( const float _delta );
+		template< typename _systemType > bool				RunSystem( const float _delta );
 		template< typename _tagOrComponentType > Signature	GetSignature() const;
 
 		ecComponent&		  AddComponent( const EntityID _entityID, const ComponentIndex _index );
@@ -128,8 +128,9 @@ namespace fan {
 
 	//================================================================================================================================
 	// Find all entities matching the signature of the system and runs it
+	// returns false if there were no entities for the system to run
 	//================================================================================================================================
-	template< typename _systemType > void EntityWorld::RunSystem( const float _delta )
+	template< typename _systemType > bool EntityWorld::RunSystem( const float _delta )
 	{
 		static_assert( std::is_base_of< System, _systemType>::value );
 		std::vector<EntityID> matchEntities;
@@ -146,10 +147,12 @@ namespace fan {
 			}
 		}
 
-		if( !matchEntities.empty() )
+		if( ! matchEntities.empty() )
 		{
 			_systemType::Run( *this, matchEntities, _delta );
 		}		
+
+		return ! matchEntities.empty();
 	}
 
 	//==============================================================================================================================================================

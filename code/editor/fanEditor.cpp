@@ -400,9 +400,9 @@ namespace fan
 
 		// update render data
 		RenderWorld& renderWorld = world.GetSingletonComponent<RenderWorld>();
-		world.RunSystem<S_UpdateRenderWorldModels>( -1.f );
-		world.RunSystem<S_UpdateRenderWorldPointLights>( -1.f );
-		world.RunSystem<S_UpdateRenderWorldDirectionalLights>( -1.f );
+		if( ! world.RunSystem<S_UpdateRenderWorldModels>( -1.f ) )			 {	renderWorld.drawData.clear(); }
+		if( ! world.RunSystem<S_UpdateRenderWorldPointLights>( -1.f ) )		 { renderWorld.pointLights.clear(); }
+		if( ! world.RunSystem<S_UpdateRenderWorldDirectionalLights>( -1.f ) ) { renderWorld.directionalLights.clear(); }
 		m_renderer->SetDrawData( renderWorld.drawData );
 		m_renderer->SetPointLights( renderWorld.pointLights );
 		m_renderer->SetDirectionalLights( renderWorld.directionalLights );
