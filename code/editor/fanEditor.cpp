@@ -61,8 +61,13 @@
 #include "scene/ecs/components/fanpointLight2.hpp"
 #include "scene/ecs/components/fanParticleEmitter.hpp"
 #include "scene/ecs/components/fanCamera2.hpp"
+#include "scene/ecs/components/fanRigidbody2.hpp"
+#include "scene/ecs/components/fanMotionState.hpp"
+#include "scene/ecs/components/fanSphereShape2.hpp"
+#include "scene/ecs/components/fanBoxShape2.hpp"
 #include "scene/ecs/systems/fanUpdateRenderWorld.hpp"
 #include "editor/singletonComponents/fanEditorCamera.hpp"
+#include "scene/ecs/singletonComponents/fanPhysicsWorld.hpp"
 
 namespace fan
 {
@@ -274,6 +279,7 @@ namespace fan
 				{
 					EcsWorld& world = scene->GetWorld();
 					scene->Update( targetLogicDelta );
+
 
 					EditorCamera& editorCamera = world.GetSingletonComponent<EditorCamera>();
 					EditorCamera::Update( editorCamera, targetLogicDelta );
@@ -660,7 +666,8 @@ namespace fan
 	void Engine::InitializeEcsWorldTypes( EcsWorld& _world )
 	{
 		_world.AddSingletonComponentType<RenderWorld>();
-		_world.AddSingletonComponentType<EditorCamera>();		
+		_world.AddSingletonComponentType<PhysicsWorld>();
+		_world.AddSingletonComponentType<EditorCamera>();
 
 		_world.AddComponentType<SceneNode>();
 		_world.AddComponentType<Transform2>();
@@ -670,6 +677,10 @@ namespace fan
 		_world.AddComponentType<Material2>();
 		_world.AddComponentType<Camera2>();
 		_world.AddComponentType<ParticleEmitter>();
+		_world.AddComponentType<Rigidbody2>();
+		_world.AddComponentType<MotionState>();
+		_world.AddComponentType<BoxShape2>();
+		_world.AddComponentType<SphereShape2>();
 
 		_world.AddTagType<tag_alwaysUpdate>();
 		_world.AddTagType<tag_editorOnly>();

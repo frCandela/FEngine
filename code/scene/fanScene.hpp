@@ -82,7 +82,7 @@ namespace fan
 		inline std::string		 GetPath() const { return m_path; }
 		inline SceneInstantiate& GetInstanciator() const { return *m_instantiate;  }
 		inline EcsManager&		 GetEcsManager() const { return * ((EcsManager*)0); }//@hack
-		inline EcsWorld&		 GetWorld() const { return *m_world; }
+		inline EcsWorld&		 GetWorld() const { return *m_ecsWorld; }
 		inline PhysicsManager&	 GetPhysicsManager() const { return *m_physicsManager; }
 		State					 GetState() const { return m_state; };
 		SceneNode&				 GetMainCamera() { return *m_mainCamera; }
@@ -115,7 +115,7 @@ namespace fan
 
 		SceneInstantiate* m_instantiate = nullptr;
 		PhysicsManager* m_physicsManager = nullptr;
-		EcsWorld* m_world = nullptr;
+		EcsWorld* m_ecsWorld = nullptr;
 
 		// References
 		SceneNode * m_rootNode = nullptr;

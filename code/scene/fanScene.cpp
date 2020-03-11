@@ -14,9 +14,11 @@
 #include "scene/fanGameobject.hpp"
 #include "scene/ecs/components/fanSceneNode.hpp"
 #include "scene/ecs/fanEcsWorld.hpp"
+#include "core/time/fanTime.hpp"
 #include "core/time/fanScopedTimer.hpp"
 #include "core/time/fanProfiler.hpp"
 #include "core/fanSignal.hpp"
+#include "ecs/singletonComponents/fanPhysicsWorld.hpp"
 
 namespace fan
 {
@@ -27,7 +29,7 @@ namespace fan
 		, m_path( "" )
 		, m_root( nullptr )
 		, m_physicsManager( new PhysicsManager( btVector3::Zero() ) )
-		, m_world( new EcsWorld( _initializeTypesEcsWorld ) )
+		, m_ecsWorld( new EcsWorld( _initializeTypesEcsWorld ) )
 		, m_instantiate( new SceneInstantiate( *this ) )
 	{}
 
@@ -38,7 +40,7 @@ namespace fan
 		Clear();
 
 		//delete m_physicsManager; @hack
-		delete m_world;
+		delete m_ecsWorld;
 	}
 
 	//================================================================================================================================
@@ -67,9 +69,9 @@ namespace fan
 	SceneNode& Scene::CreateSceneNode( const std::string _name, SceneNode* const _parentNode, const bool _generateID )
 	{
 		SceneNode* const parent = _parentNode == nullptr ? m_rootNode : _parentNode;
-		EntityID entityID = m_world->CreateEntity();
-		EntityHandle handle = m_world->CreateHandle( entityID );
-		SceneNode& sceneNode = m_world->AddComponent<SceneNode>( entityID );
+		EntityID entityID = m_ecsWorld->CreateEntity();
+		EntityHandle handle = m_ecsWorld->CreateHandle( entityID );
+		SceneNode& sceneNode = m_ecsWorld->AddComponent<SceneNode>( entityID );
 
 		uint32_t id = _generateID ? nextUniqueID++ : 0;
 		sceneNode.Init( _name, *this, handle, id, parent );
@@ -200,8 +202,8 @@ namespace fan
 		DeleteNodesImmediate( m_sceneNodesToDelete );
 		m_sceneNodesToDelete.clear();
 
-		m_world->SortEntities();
-		m_world->RemoveDeadEntities();
+		m_ecsWorld->SortEntities();
+		m_ecsWorld->RemoveDeadEntities();
 	}
 
 	//================================================================================================================================
@@ -234,8 +236,8 @@ namespace fan
 		// delete all nodes
 		for( SceneNode* node : nodesToDelete )
 		{
-			EntityID id = m_world->GetEntityID( node->entityHandle );
-			m_world->KillEntity( id );
+			EntityID id = m_ecsWorld->GetEntityID( node->entityHandle );
+			m_ecsWorld->KillEntity( id );
 			if( node->parent != nullptr )
 			{
 				node->parent->RemoveChild( *node );
@@ -252,11 +254,9 @@ namespace fan
 
 		const float delta = m_state == State::PLAYING ? _delta : 0.f;
 
-		//m_ecsManager->GetSingletonComponents().GetComponent<ecsCameraPosition_s>().position = m_mainCamera->GetGameobject().GetTransform().GetPosition();
-
-
 		//m_ecsManager->UpdatePrePhysics( delta );@hack
-		m_physicsManager->StepSimulation( delta );
+		PhysicsWorld& physicsWorld = m_ecsWorld->GetSingletonComponent<PhysicsWorld>();
+		physicsWorld.dynamicsWorld->stepSimulation( delta, 10, Time::Get().GetPhysicsDelta() );
 		//m_ecsManager->UpdatePostPhysics( delta );@hack
 		UpdateActors( _delta );
 		//m_ecsManager->Update( delta );@hack
