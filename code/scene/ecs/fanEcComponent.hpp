@@ -11,7 +11,7 @@ namespace fan
 	//================================================================================================================================
 #define DECLARE_COMPONENT( _componentType)															\
 	private:																						\
-	friend class EntityWorld;																		\
+	friend class EcsWorld;																		\
 	static const uint32_t s_typeInfo;																\
 	static const char* s_typeName;																	\
 	static ecComponent& Instanciate( void * _buffer){ return *new( _buffer ) _componentType();}	\
@@ -25,7 +25,7 @@ namespace fan
 	// If your component is unique, create a SingletonComponent instead
 	//
 	// Component must call the (DECLARE/REGISTER)_COMPONENT macro and implement an Clear() method.
-	// It also must be registered in the EntityWorld constructor to be assigned a unique ID
+	// It also must be registered in the EcsWorld constructor to be assigned a unique ID
 	// - localTypeID is a unique id that also correspond to the index of the ComponentsCollection in its specific Entity world
 	// - chunckIndex is the index of the Chunck in the ComponentsCollection
 	// - index is the index of the component inside the chunck
@@ -34,7 +34,7 @@ namespace fan
 	{
 	private:
 		friend class ComponentsCollection;
-		friend class EntityWorld;
+		friend class EcsWorld;
 		ComponentIndex		 componentIndex;
 		ChunckIndex			 chunckIndex;
 		ChunckComponentIndex chunckComponentIndex;

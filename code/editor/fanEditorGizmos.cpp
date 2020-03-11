@@ -5,7 +5,7 @@
 #include "core/input/fanMouse.hpp"
 #include "scene/components/fanTransform.hpp"
 #include "scene/components/fanCamera.hpp"
-#include "scene/ecs/fanEntityWorld.hpp"
+#include "scene/ecs/fanEcsWorld.hpp"
 #include "scene/ecs/components/fanSceneNode.hpp"
 #include "scene/ecs/components/fanTransform2.hpp"
 #include "scene/ecs/components/fanCamera2.hpp"
@@ -31,7 +31,7 @@ namespace fan
 	{
 		// Get main camera data
 		SceneNode& cameraNode = m_currentScene->GetMainCamera();
-		EntityWorld& world = cameraNode.scene->GetEntityWorld();
+		EcsWorld& world = cameraNode.scene->GetWorld();
 		const EntityID id = world.GetEntityID( cameraNode.entityHandle );
 		const Transform2 & cameraTransform = world.GetComponent<Transform2>( id );
 		const Camera2& camera = world.GetComponent<Camera2>( id );

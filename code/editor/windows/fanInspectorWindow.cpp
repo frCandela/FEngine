@@ -2,7 +2,7 @@
 
 #include "editor/components/fanFPSCamera.hpp"
 #include "game/imgui/fanDragnDrop.hpp"
-#include "scene/ecs/fanEntityWorld.hpp"
+#include "scene/ecs/fanEcsWorld.hpp"
 #include "scene/ecs/components/fanSceneNode.hpp"
 #include "scene/components/fanComponent.hpp"
 #include "scene/components/fanTransform.hpp"
@@ -34,17 +34,16 @@ namespace fan
 		{
 			SceneNode& node = *m_sceneNodeSelected;
 			Scene& scene = *node.scene;
-			EntityWorld& world = scene.GetEntityWorld();
-			const EntityID id = world.GetEntityID( node.entityHandle );
-			Entity& entity = world.GetEntity( id );
+			EcsWorld& world = scene.GetWorld();
+			const EntityID entityID = world.GetEntityID( node.entityHandle );
 
 			// gameobject gui
  			ImGui::Icon( GetIconType(), { 16,16 } ); ImGui::SameLine();
 			ImGui::Text( "Scene node : %s", node.name.c_str() );
 
-			for( int componentIndex = 0; componentIndex < entity.componentCount; componentIndex++ )
+			for( int componentIndex = 0; componentIndex < world.GetComponentCount( entityID ); componentIndex++ )
 			{
-				ecComponent& component = *entity.components[componentIndex];
+				ecComponent& component = world.GetComponentAt( entityID, componentIndex );
 				const ComponentInfo& info = world.GetComponentInfo( component.GetIndex() );
  				ImGui::Separator();
 				 
@@ -59,7 +58,7 @@ namespace fan
 				ImGui::SameLine( ImGui::GetWindowWidth() - 40 );
 				if( ImGui::Button( ss.str().c_str() ) )
 				{
-					world.RemoveComponent( id, component.GetIndex() );
+					world.RemoveComponent( entityID, component.GetIndex() );
 				}
  				// Draw component
 				else if( info.onGui != nullptr )
@@ -85,7 +84,7 @@ namespace fan
 		{
 			// Create new Component 
 
-			EntityWorld& world = m_sceneNodeSelected->scene->GetEntityWorld();
+			EcsWorld& world = m_sceneNodeSelected->scene->GetWorld();
 			EntityID id = world.GetEntityID( m_sceneNodeSelected->entityHandle );
 			if( !world.HasComponent( id, _info.index ) )
 			{
@@ -103,7 +102,7 @@ namespace fan
 	{
 		using Path = std::filesystem::path;
 
-		EntityWorld& world = m_sceneNodeSelected->scene->GetEntityWorld();
+		EcsWorld& world = m_sceneNodeSelected->scene->GetWorld();
 
 		if( ImGui::BeginPopup( "new_component" ) )
 		{

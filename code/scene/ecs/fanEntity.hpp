@@ -6,8 +6,7 @@
 namespace fan 
 {
 	//==============================================================================================================================================================
-	// An Entity is a wrapper class for components
-	//
+	// An Entity is a data struct that contains pointers to components
 	// - signature is a bitset representing the components referenced by the entity
 	// - handle is a unique key that allows access to an entity,( 0 == invalid )
 	//==============================================================================================================================================================
@@ -26,5 +25,4 @@ namespace fan
 	};
 	static constexpr size_t sizeEntity = sizeof( Entity );
 	static_assert( sizeEntity == 128 );
-
 }

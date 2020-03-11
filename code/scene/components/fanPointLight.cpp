@@ -56,7 +56,7 @@ namespace fan
 		*tmpLight = m_gameobject->AddEcsComponent<ecsPointLight>();
 		m_pointLight->Init();
 
-		m_gameobject->GetScene().onPointLightAttach.Emmit( this );
+/*		m_gameobject->GetScene().onPointLightAttach.Emmit( this );*/
 	}
 
 	//================================================================================================================================
@@ -65,7 +65,7 @@ namespace fan
 	{
 		Component::OnDetach();
 		m_gameobject->RemoveEcsComponent<ecsPointLight>();
-		m_gameobject->GetScene().onPointLightDetach.Emmit( this );
+/*		m_gameobject->GetScene().onPointLightDetach.Emmit( this );*/
 	}
 
 	//================================================================================================================================

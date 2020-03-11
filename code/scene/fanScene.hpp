@@ -13,7 +13,7 @@ namespace fan
 	class Actor;
 	class EcsManager;
 	class PhysicsManager;
-	class EntityWorld;
+	class EcsWorld;
 	class SceneInstantiate;
 	class Prefab;
 
@@ -34,18 +34,11 @@ namespace fan
 		Signal< SceneNode* >	onDeleteSceneNode;
 		Signal< SceneNode& >	onSetMainCamera;
 
-		Signal< MeshRenderer* >		onRegisterMeshRenderer;
-		Signal< MeshRenderer* >		onUnRegisterMeshRenderer;
-		Signal< PointLight* >		onPointLightAttach;
-		Signal< PointLight* >		onPointLightDetach;
-		Signal< DirectionalLight* > onDirectionalLightAttach;
-		Signal< DirectionalLight* > onDirectionalLightDetach;
-
 		uint32_t	nextUniqueID = 1;
 
 		enum State { STOPPED, PLAYING, PAUSED };
 
-		Scene( const std::string _name, void ( *_initializeTypesEntityWorld )( EntityWorld& ) );
+		Scene( const std::string _name, void ( *_initializeTypesEcsWorld )( EcsWorld& ) );
 		~Scene();
 
 
@@ -89,7 +82,7 @@ namespace fan
 		inline std::string		 GetPath() const { return m_path; }
 		inline SceneInstantiate& GetInstanciator() const { return *m_instantiate;  }
 		inline EcsManager&		 GetEcsManager() const { return * ((EcsManager*)0); }//@hack
-		inline EntityWorld&		 GetEntityWorld() const { return *m_world; }
+		inline EcsWorld&		 GetWorld() const { return *m_world; }
 		inline PhysicsManager&	 GetPhysicsManager() const { return *m_physicsManager; }
 		State					 GetState() const { return m_state; };
 		SceneNode&				 GetMainCamera() { return *m_mainCamera; }
@@ -122,7 +115,7 @@ namespace fan
 
 		SceneInstantiate* m_instantiate = nullptr;
 		PhysicsManager* m_physicsManager = nullptr;
-		EntityWorld* m_world = nullptr;
+		EcsWorld* m_world = nullptr;
 
 		// References
 		SceneNode * m_rootNode = nullptr;

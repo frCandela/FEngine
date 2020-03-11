@@ -5,7 +5,7 @@
 namespace fan
 {
 	class ComponentsCollection;
-	class EntityWorld;
+	class EcsWorld;
 	struct Entity;
 	struct ecComponent;
 

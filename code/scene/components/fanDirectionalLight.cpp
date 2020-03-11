@@ -46,8 +46,8 @@ namespace fan
 		ecsDirLight** tmpLight = &const_cast< ecsDirLight* >( m_dirLight );
 		*tmpLight = m_gameobject->AddEcsComponent<ecsDirLight>();
 		m_dirLight->Init();
-
-		m_gameobject->GetScene().onDirectionalLightAttach.Emmit( this );
+// 
+// 		m_gameobject->GetScene().onDirectionalLightAttach.Emmit( this );
 	}
 
 	//================================================================================================================================
@@ -55,8 +55,8 @@ namespace fan
 	void DirectionalLight::OnDetach()
 	{
 		Component::OnDetach();
-		m_gameobject->RemoveEcsComponent<ecsDirLight>();
-		m_gameobject->GetScene().onDirectionalLightDetach.Emmit( this );
+ 		m_gameobject->RemoveEcsComponent<ecsDirLight>();
+// 		m_gameobject->GetScene().onDirectionalLightDetach.Emmit( this );
 	}
 
 	//================================================================================================================================

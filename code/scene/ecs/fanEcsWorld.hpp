@@ -13,10 +13,10 @@ namespace fan {
 	// Contains the entities, components, singleton components, type information
 	// and various utilities for processing them
 	//==============================================================================================================================================================
-	class EntityWorld
+	class EcsWorld
 	{
 	public:
-		EntityWorld( void ( *initializeTypes )( EntityWorld& ) );
+		EcsWorld( void ( *initializeTypes )( EcsWorld& ) );
 
 		template< typename _componentType >	bool			HasComponent( const EntityID _entityID );
 		template< typename _componentType >	_componentType& GetComponent( const EntityID _entityID );
@@ -33,13 +33,14 @@ namespace fan {
 		bool				  HasComponent( const EntityID _entityID, ComponentIndex _index );
 		const ComponentInfo&  GetComponentInfo( const ComponentIndex _index ) const { return  m_componentInfo.at( _index );	}
 		EntityID			  CreateEntity();
-		void				  KillEntity( EntityID _entityID );
-		EntityHandle		  CreateHandle( EntityID _entityID );
-		EntityID			  GetEntityID( EntityHandle _handle );
+		void				  KillEntity( const EntityID _entityID );
+		EntityHandle		  CreateHandle( const EntityID _entityID );
+		EntityID			  GetEntityID( const EntityHandle _handle );
 		ComponentIndex		  GetDynamicIndex( const uint32_t _staticIndex ) { return m_typeIndices[_staticIndex]; }
-		Entity&				  GetEntity( const EntityID _id );
 		void				  SortEntities();
 		void				  RemoveDeadEntities();
+		uint32_t			  GetComponentCount( const EntityID _entityID ) { return m_entities[_entityID].componentCount;  }
+		ecComponent&		  GetComponentAt( const EntityID _entityID, int _componentIndex );
 
 		// add types
 		template< typename _componentType >	void AddComponentType();
@@ -67,12 +68,14 @@ namespace fan {
 		EntityHandle	m_nextHandle = 1; // 0 is a null handle
 		ComponentIndex	m_nextTypeIndex = 0;
 		ComponentIndex	m_nextTagIndex = signatureLength - 2;
+
+		Entity& GetEntity( const EntityID _id );
 	};
 
 	//==============================================================================================================================================================
 	//==============================================================================================================================================================
 	template< typename _componentType >
-	_componentType& EntityWorld::AddComponent( const EntityID _entityID )
+	_componentType& EcsWorld::AddComponent( const EntityID _entityID )
 	{
 		static_assert( std::is_base_of< ecComponent, _componentType>::value );
 		const ComponentIndex index = m_typeIndices[_componentType::s_typeInfo];
@@ -83,7 +86,7 @@ namespace fan {
 	//==============================================================================================================================================================
 	//==============================================================================================================================================================
 	template< typename _componentType >	
-	_componentType& EntityWorld::GetComponent( const EntityID _entityID )
+	_componentType& EcsWorld::GetComponent( const EntityID _entityID )
 	{
 		static_assert( std::is_base_of< ecComponent, _componentType>::value );			
 		const ComponentIndex index = m_typeIndices[_componentType::s_typeInfo];
@@ -92,7 +95,7 @@ namespace fan {
 
 	//==============================================================================================================================================================
 	//==============================================================================================================================================================
-	template< typename _componentType >	bool EntityWorld::HasComponent( const EntityID _entityID )
+	template< typename _componentType >	bool EcsWorld::HasComponent( const EntityID _entityID )
 	{
 		static_assert( std::is_base_of< ecComponent, _componentType>::value );
 		const ComponentIndex index = m_typeIndices[_componentType::s_typeInfo];
@@ -101,7 +104,7 @@ namespace fan {
 
 	//==============================================================================================================================================================
 	//==============================================================================================================================================================
-	template< typename _componentType >	void EntityWorld::RemoveComponent( EntityID _entityID )
+	template< typename _componentType >	void EcsWorld::RemoveComponent( EntityID _entityID )
 	{
 		static_assert( std::is_base_of< ecComponent, _componentType>::value );
 		const ComponentIndex index = m_typeIndices[_componentType::s_typeInfo];
@@ -110,7 +113,7 @@ namespace fan {
 
 	//==============================================================================================================================================================
 	//==============================================================================================================================================================
-	template< typename _tagType > void EntityWorld::AddTag( EntityID _entityID )
+	template< typename _tagType > void EcsWorld::AddTag( EntityID _entityID )
 	{
 		static_assert( std::is_base_of< Tag, _tagType>::value );
 		Entity& entity = GetEntity( _entityID );
@@ -120,7 +123,7 @@ namespace fan {
 
 	//==============================================================================================================================================================
 	//==============================================================================================================================================================
-	template< typename _componentType > _componentType& EntityWorld::GetSingletonComponent()
+	template< typename _componentType > _componentType& EcsWorld::GetSingletonComponent()
 	{
 		static_assert( std::is_base_of< SingletonComponent, _componentType>::value );
 		return  *static_cast<_componentType*>( m_singletonComponents[_componentType::s_typeInfo] );
@@ -130,7 +133,7 @@ namespace fan {
 	// Find all entities matching the signature of the system and runs it
 	// returns false if there were no entities for the system to run
 	//================================================================================================================================
-	template< typename _systemType > bool EntityWorld::RunSystem( const float _delta )
+	template< typename _systemType > bool EcsWorld::RunSystem( const float _delta )
 	{
 		static_assert( std::is_base_of< System, _systemType>::value );
 		std::vector<EntityID> matchEntities;
@@ -157,7 +160,7 @@ namespace fan {
 
 	//==============================================================================================================================================================
 	//==============================================================================================================================================================
-	template< typename _tagOrComponentType > Signature EntityWorld::GetSignature() const
+	template< typename _tagOrComponentType > Signature EcsWorld::GetSignature() const
 	{
 		static_assert( std::is_base_of< Tag, _tagOrComponentType>::value || std::is_base_of< ecComponent, _tagOrComponentType>::value );
 		return Signature( 1 ) << m_typeIndices.at( _tagOrComponentType::s_typeInfo );
@@ -165,7 +168,7 @@ namespace fan {
 
 	//==============================================================================================================================================================
 	//==============================================================================================================================================================
-	template< typename _componentType >	void EntityWorld::AddComponentType()
+	template< typename _componentType >	void EcsWorld::AddComponentType()
 	{
 		static_assert( std::is_base_of< ecComponent, _componentType>::value );
 		assert( m_nextTagIndex >= m_nextTypeIndex );
@@ -188,7 +191,7 @@ namespace fan {
 
 	//==============================================================================================================================================================
 	//==============================================================================================================================================================
-	template< typename _tagType > void EntityWorld::AddTagType()
+	template< typename _tagType > void EcsWorld::AddTagType()
 	{
 		static_assert( std::is_base_of< Tag, _tagType>::value );
 		assert( m_nextTagIndex >= m_nextTypeIndex );
@@ -197,7 +200,7 @@ namespace fan {
 
 	//==============================================================================================================================================================
 	//==============================================================================================================================================================
-	template< typename _componentType >	void EntityWorld::AddSingletonComponentType()
+	template< typename _componentType >	void EcsWorld::AddSingletonComponentType()
 	{
 		static_assert( std::is_base_of< SingletonComponent, _componentType>::value );
 		assert( m_singletonComponents.find( _componentType::s_typeInfo ) == m_singletonComponents.end() );

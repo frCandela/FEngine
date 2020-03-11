@@ -14,7 +14,7 @@
 #include "scene/components/fanTransform.hpp"
 #include "scene/components/fanTransform.hpp"
 #include "scene/components/fanCamera.hpp"
-#include "scene/ecs/fanEntityWorld.hpp"
+#include "scene/ecs/fanEcsWorld.hpp"
 #include "scene/fanGameobject.hpp"
 #include "scene/fanScene.hpp"
 #include "render/fanMesh.hpp"
@@ -57,7 +57,7 @@ namespace fan
 // 			 && m_selectedSceneNode->GetComponent<UIMeshRenderer>() == nullptr @hack
 // 			 && m_selectedSceneNode->GetComponent<UITransform>() == nullptr )
 		{
-			EntityWorld& world = m_selectedSceneNode->scene->GetEntityWorld();
+			EcsWorld& world = m_selectedSceneNode->scene->GetWorld();
 			EntityID id = world.GetEntityID( m_selectedSceneNode->entityHandle );
 			if( world.HasComponent<Transform2>( id ) )
 			{

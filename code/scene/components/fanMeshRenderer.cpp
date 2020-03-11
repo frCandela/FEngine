@@ -26,7 +26,7 @@ namespace fan
 		m_mesh = m_gameobject->AddEcsComponent<ecsMesh>();
 		m_mesh->Init();
 
-		m_gameobject->GetScene().onRegisterMeshRenderer.Emmit( this );
+/*		m_gameobject->GetScene().onRegisterMeshRenderer.Emmit( this );*/
 	}
 
 	//================================================================================================================================
@@ -35,7 +35,7 @@ namespace fan
 	{
 		Component::OnDetach();
 		m_gameobject->RemoveEcsComponent<ecsMesh>();
-		m_gameobject->GetScene().onUnRegisterMeshRenderer.Emmit( this );
+/*		m_gameobject->GetScene().onUnRegisterMeshRenderer.Emmit( this );*/
 
 		m_gameobject->SetFlags( m_gameobject->GetFlags() & Gameobject::Flag::OUTDATED_AABB );
 	}

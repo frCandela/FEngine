@@ -1,5 +1,5 @@
 #include "scene/ecs/fanSystem.hpp"
-#include "scene/ecs/fanEntityWorld.hpp"
+#include "scene/ecs/fanEcsWorld.hpp"
 #include "scene/ecs/fanTag.hpp"
 
 #include "scene/ecs/singletonComponents/fanRenderWorld.hpp"
@@ -14,14 +14,14 @@ namespace fan
 	//==============================================================================================================================================================
 	struct S_UpdateRenderWorldModels : System
 	{
-		static Signature GetSignature( const EntityWorld& _world )
+		static Signature GetSignature( const EcsWorld& _world )
 		{
  			return	 _world.GetSignature<MeshRenderer2>()
 					|_world.GetSignature<SceneNode>()
 					|_world.GetSignature<Transform2>()
 					|_world.GetSignature<Material2>();
 		}
-		static void Run( EntityWorld& _world, const std::vector<EntityID>& _entities, const float _delta )
+		static void Run( EcsWorld& _world, const std::vector<EntityID>& _entities, const float _delta )
 		{
 			RenderWorld& renderWorld = _world.GetSingletonComponent<RenderWorld>();
 			renderWorld.drawData.clear();
@@ -29,7 +29,6 @@ namespace fan
 			// get all mesh and adds them to the render world
 			for ( EntityID id : _entities )
 			{
-				Entity& entity = _world.GetEntity( id );
 				MeshRenderer2& meshRenderer = _world.GetComponent<MeshRenderer2>( id );
 				if( meshRenderer.mesh.IsValid() )
 				{
@@ -55,13 +54,13 @@ namespace fan
 	//==============================================================================================================================================================
 	struct S_UpdateRenderWorldPointLights : System
 	{
-		static Signature GetSignature( const EntityWorld& _world )
+		static Signature GetSignature( const EcsWorld& _world )
 		{
 			return	_world.GetSignature<Transform2>()
 				|   _world.GetSignature<PointLight2>();
 		}
 
-		static void Run( EntityWorld& _world, const std::vector<EntityID>& _entities, const float _delta )
+		static void Run( EcsWorld& _world, const std::vector<EntityID>& _entities, const float _delta )
 		{
 			RenderWorld& renderWorld = _world.GetSingletonComponent<RenderWorld>();
 			renderWorld.pointLights.clear();
@@ -69,7 +68,6 @@ namespace fan
 			for( EntityID id : _entities )
 			{
 				// light data
-				Entity& entity = _world.GetEntity( id );
 				Transform2& transform = _world.GetComponent<Transform2>( id );
 				PointLight2& light = _world.GetComponent<PointLight2>( id );
 				
@@ -91,13 +89,13 @@ namespace fan
 //==============================================================================================================================================================
 	struct S_UpdateRenderWorldDirectionalLights : System
 	{
-		static Signature GetSignature( const EntityWorld& _world )
+		static Signature GetSignature( const EcsWorld& _world )
 		{
 			return	_world.GetSignature<Transform2>()
 				  | _world.GetSignature<DirectionalLight2>();
 		}
 
-		static void Run( EntityWorld& _world, const std::vector<EntityID>& _entities, const float _delta )
+		static void Run( EcsWorld& _world, const std::vector<EntityID>& _entities, const float _delta )
 		{
 			RenderWorld& renderWorld = _world.GetSingletonComponent<RenderWorld>();
 			renderWorld.directionalLights.clear();
@@ -105,7 +103,6 @@ namespace fan
 			for( EntityID id : _entities )
 			{
 				// light data
-				Entity& entity = _world.GetEntity( id );
 				Transform2& transform = _world.GetComponent<Transform2>( id );
 				DirectionalLight2& directionalLight = _world.GetComponent<DirectionalLight2>( id );
 

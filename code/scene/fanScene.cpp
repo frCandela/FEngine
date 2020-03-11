@@ -13,7 +13,7 @@
 #include "scene/fanComponentPtr.hpp"
 #include "scene/fanGameobject.hpp"
 #include "scene/ecs/components/fanSceneNode.hpp"
-#include "scene/ecs/fanEntityWorld.hpp"
+#include "scene/ecs/fanEcsWorld.hpp"
 #include "core/time/fanScopedTimer.hpp"
 #include "core/time/fanProfiler.hpp"
 #include "core/fanSignal.hpp"
@@ -22,12 +22,12 @@ namespace fan
 {
 	//================================================================================================================================
 	//================================================================================================================================
-	Scene::Scene( const std::string _name, void ( *_initializeTypesEntityWorld )( EntityWorld& ) ) :
+	Scene::Scene( const std::string _name, void ( *_initializeTypesEcsWorld )( EcsWorld& ) ) :
 		m_name( _name )
 		, m_path( "" )
 		, m_root( nullptr )
 		, m_physicsManager( new PhysicsManager( btVector3::Zero() ) )
-		, m_world( new EntityWorld( _initializeTypesEntityWorld ) )
+		, m_world( new EcsWorld( _initializeTypesEcsWorld ) )
 		, m_instantiate( new SceneInstantiate( *this ) )
 	{}
 
@@ -587,7 +587,7 @@ namespace fan
 	//================================================================================================================================
 	void Scene::R_SaveToJson( const SceneNode& _node, Json& _json )
 	{	
-		EntityWorld& world = _node.scene->GetEntityWorld();
+		EcsWorld& world = _node.scene->GetWorld();
 
 		Serializable::SaveString( _json, "name", _node.name );
 		Serializable::SaveUInt( _json, "node_id", _node.uniqueID );
@@ -595,13 +595,12 @@ namespace fan
 		// save components
 		Json& jComponents = _json["components"];
 		{
-			EntityID id = world.GetEntityID( _node.entityHandle );
-			Entity& entity = world.GetEntity( id );
+			EntityID entityID = world.GetEntityID( _node.entityHandle );
 			unsigned nextIndex = 0;
-			for( int componentIndex = 0; componentIndex < entity.componentCount; componentIndex++ )
+			for( int componentIndex = 0; componentIndex < world.GetComponentCount(entityID) ; componentIndex++ )
 			{
 				// if a save method is provided, saves the component
-				ecComponent& component = *entity.components[componentIndex];				
+				ecComponent& component = world.GetComponentAt( entityID, componentIndex );
 				const ComponentInfo& info = world.GetComponentInfo( component.GetIndex() );								
 				if( info.save != nullptr )
 				{
@@ -732,7 +731,7 @@ namespace fan
 	void Scene::R_LoadFromJson( const Json& _json, SceneNode& _node, const uint32_t _idOffset )
 	{
 		//ScopedTimer timer("load scene");
-		EntityWorld& world = _node.scene->GetEntityWorld();
+		EcsWorld& world = _node.scene->GetWorld();
 
 		Serializable::LoadString( _json, "name", _node.name );
 		Serializable::LoadUInt( _json, "node_id", _node.uniqueID );

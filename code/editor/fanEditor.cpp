@@ -56,7 +56,7 @@
 #include "scene/fanPrefabManager.hpp"
 #include "game/components/fanCameraController.hpp"
 
-#include "scene/ecs/fanEntityWorld.hpp"
+#include "scene/ecs/fanEcsWorld.hpp"
 #include "scene/ecs/components/fanDirectionalLight2.hpp"
 #include "scene/ecs/components/fanpointLight2.hpp"
 #include "scene/ecs/components/fanParticleEmitter.hpp"
@@ -137,9 +137,9 @@ namespace fan
 		}
 
 		// Scene
-		m_clientScene = new Scene( "mainScene", &Engine::InitializeEntityWorldTypes );
+		m_clientScene = new Scene( "mainScene", &Engine::InitializeEcsWorldTypes );
 		m_clientScene->SetServer( false );
-		m_serverScene = new Scene( "serverScene", &Engine::InitializeEntityWorldTypes );
+		m_serverScene = new Scene( "serverScene", &Engine::InitializeEcsWorldTypes );
 		m_serverScene->SetServer( true );
 
 		// Initialize editor components		
@@ -192,24 +192,11 @@ namespace fan
 		m_clientScene->onSceneLoad.Connect( &SceneWindow::OnExpandHierarchy, m_sceneWindow );
 		m_clientScene->onSceneLoad.Connect( &Engine::OnSceneLoad, this );
 		m_clientScene->onSceneStop.Connect( &Engine::OnSceneStop, this );
-
-		m_clientScene->onRegisterMeshRenderer.Connect( &Scene::RegisterMeshRenderer, m_clientScene );
-		m_clientScene->onUnRegisterMeshRenderer.Connect( &Scene::UnRegisterMeshRenderer, m_clientScene );
-		m_clientScene->onPointLightAttach.Connect( &Scene::RegisterPointLight, m_clientScene );
-		m_clientScene->onPointLightDetach.Connect( &Scene::UnRegisterPointLight, m_clientScene );
-		m_clientScene->onDirectionalLightAttach.Connect( &Scene::RegisterDirectionalLight, m_clientScene );
-		m_clientScene->onDirectionalLightDetach.Connect( &Scene::UnRegisterDirectionalLight, m_clientScene );
 		m_clientScene->New();
 
 		m_serverScene->onSceneLoad.Connect( &SceneWindow::OnExpandHierarchy, m_sceneWindow );
 		m_serverScene->onSceneLoad.Connect( &Engine::OnSceneLoad, this );
 		m_serverScene->onSceneStop.Connect( &Engine::OnSceneStop, this );
-		m_serverScene->onRegisterMeshRenderer.Connect( &Scene::RegisterMeshRenderer, m_serverScene );
-		m_serverScene->onUnRegisterMeshRenderer.Connect( &Scene::UnRegisterMeshRenderer, m_serverScene );
-		m_serverScene->onPointLightAttach.Connect( &Scene::RegisterPointLight, m_serverScene );
-		m_serverScene->onPointLightDetach.Connect( &Scene::UnRegisterPointLight, m_serverScene );
-		m_serverScene->onDirectionalLightAttach.Connect( &Scene::RegisterDirectionalLight, m_serverScene );
-		m_serverScene->onDirectionalLightDetach.Connect( &Scene::UnRegisterDirectionalLight, m_serverScene );
 		m_serverScene->New();
 
 		// try open scenes
@@ -285,7 +272,7 @@ namespace fan
 				std::vector< Scene* > scenes = { m_clientScene , m_serverScene };
 				for( Scene* scene : scenes )
 				{
-					EntityWorld& world = scene->GetEntityWorld();
+					EcsWorld& world = scene->GetWorld();
 					scene->Update( targetLogicDelta );
 
 					EditorCamera& editorCamera = world.GetSingletonComponent<EditorCamera>();
@@ -345,7 +332,7 @@ namespace fan
 		m_currentScene = _scene;
 		m_sceneWindow->SetScene( m_currentScene );
 		m_mainMenuBar->SetScene( m_currentScene );
-		m_ecsWindow->SetEntityWorld( m_currentScene->GetEntityWorld() );
+		m_ecsWindow->SetEcsWorld( m_currentScene->GetWorld() );
 		m_gameWindow->SetScene( m_currentScene );
 	}
 
@@ -369,7 +356,7 @@ namespace fan
 	{
 		m_selection->Deselect();
 
-		EntityWorld& world = _scene.GetEntityWorld();
+		EcsWorld& world = _scene.GetWorld();
 
 
 
@@ -396,7 +383,7 @@ namespace fan
 	//================================================================================================================================
 	void Engine::UpdateRenderWorld()
 	{
-		EntityWorld& world = m_currentScene->GetEntityWorld();
+		EcsWorld& world = m_currentScene->GetWorld();
 
 		// update render data
 		RenderWorld& renderWorld = world.GetSingletonComponent<RenderWorld>();
@@ -441,7 +428,7 @@ namespace fan
 		SceneNode* node = m_selection->GetSelectedSceneNode();
 		if( node != nullptr )
 		{
-			EntityWorld& world = node->scene->GetEntityWorld();
+			EcsWorld& world = node->scene->GetWorld();
 			EntityID id = world.GetEntityID( node->entityHandle );
 
 			// point light
@@ -670,7 +657,7 @@ namespace fan
 // 		}
 	}
 
-	void Engine::InitializeEntityWorldTypes( EntityWorld& _world )
+	void Engine::InitializeEcsWorldTypes( EcsWorld& _world )
 	{
 		_world.AddSingletonComponentType<RenderWorld>();
 		_world.AddSingletonComponentType<EditorCamera>();		

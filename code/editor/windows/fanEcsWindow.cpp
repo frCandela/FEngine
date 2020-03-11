@@ -2,7 +2,7 @@
 
 #include "core/time/fanProfiler.hpp"
 #include "scene/ecs/fanComponentsCollection.hpp"
-#include "scene/ecs/fanEntityWorld.hpp"
+#include "scene/ecs/fanEcsWorld.hpp"
 #include "scene/ecs/fanECSManager.hpp"
 #include "scene/ecs/fanSystem.hpp"
 #include "scene/ecs/fanTag.hpp"
@@ -35,7 +35,7 @@ namespace fan
 	{
 		SCOPED_PROFILE( ecs )
 
-		EntityWorld& world = *m_world;
+		EcsWorld& world = *m_world;
 
 		//============================	
 		if( ImGui::CollapsingHeader( "components" ) )

@@ -10,7 +10,7 @@ namespace fan
 	//================================================================================================================================
 #define DECLARE_SINGLETON_COMPONENT()		\
 	private:								\
-	friend class EntityWorld;				\
+	friend class EcsWorld;				\
 	static const uint32_t s_typeInfo;		\
 	static const char* s_typeName;			\
 

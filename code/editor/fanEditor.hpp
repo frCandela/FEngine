@@ -17,7 +17,7 @@ namespace fan
 	class RenderWindow;
 	class EditorGizmos;
 	class EditorWindow;
-	class EntityWorld;
+	class EcsWorld;
 	class SceneWindow;
 	class MainMenuBar;
 	class Gameobject;
@@ -104,6 +104,6 @@ namespace fan
 		void DrawAABB() const;
 		void DrawHull() const;
 
-		static void InitializeEntityWorldTypes( EntityWorld& _world );
+		static void InitializeEcsWorldTypes( EcsWorld& _world );
 	};
 }
