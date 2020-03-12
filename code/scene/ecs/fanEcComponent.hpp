@@ -9,11 +9,12 @@ namespace fan
 	//================================================================================================================================
 	// component
 	//================================================================================================================================
-#define DECLARE_COMPONENT( _componentType)															\
-	private:																						\
+#define DECLARE_COMPONENT( _componentType)														\
+	public:																						\
+	static const uint32_t s_typeInfo;															\
+	static const char* s_typeName;																\
+	private:																					\
 	friend class EcsWorld;																		\
-	static const uint32_t s_typeInfo;																\
-	static const char* s_typeName;																	\
 	static ecComponent& Instanciate( void * _buffer){ return *new( _buffer ) _componentType();}	\
 
 #define REGISTER_COMPONENT( _componentType, _name)				\

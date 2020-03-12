@@ -15,6 +15,12 @@
 #include "render/core/fanTexture.hpp"
 #include "render/fanMesh.hpp"
 
+#include "scene/ecs/singletonComponents/fanPhysicsWorld.hpp"
+#include "scene/ecs/components/fanRigidbody2.hpp"
+#include "scene/ecs/components/fanMotionState.hpp"
+#include "scene/ecs/components/fanSphereShape2.hpp"
+#include "scene/ecs/components/fanBoxShape2.hpp"
+
 namespace fan
 {
 	//================================================================================================================================
@@ -88,12 +94,78 @@ namespace fan
 			EntityID id = world.GetEntityID( m_sceneNodeSelected->entityHandle );
 			if( !world.HasComponent( id, _info.index ) )
 			{
-				world.AddComponent( id, _info.index );
-			}
+				ecComponent& component = world.AddComponent( id, _info.index );
+				RegisterPhysics( world, id, component );	
 
-			
+			}			
 			ImGui::CloseCurrentPopup();
 		}
+	}
+
+	//================================================================================================================================
+	// registers rigidbody, colliders and motions state into each others and into the physics world when created from the editor
+	//================================================================================================================================
+	void InspectorWindow::RegisterPhysics( EcsWorld& _world, EntityID _entity, ecComponent& _component )
+	{
+		
+		if( _world.IsType<Rigidbody2>( _component ) )
+		{
+			// Rigidbody
+			PhysicsWorld& physicsWorld = _world.GetSingletonComponent<PhysicsWorld>();
+			Rigidbody2& rb = static_cast<Rigidbody2&>( _component );
+
+			// find collision shape
+			btCollisionShape* shape = nullptr;
+			if( _world.HasComponent< SphereShape2 >( _entity ) ) 
+			{ 
+				shape = &_world.GetComponent<SphereShape2>( _entity ).sphereShape; 
+			}
+			else if( _world.HasComponent< BoxShape2 >( _entity ) )
+			{
+				shape = &_world.GetComponent<BoxShape2>( _entity ).boxShape;
+			}
+			if( shape !=  nullptr )
+			{
+				rb.SetCollisionShape( shape );
+			}
+
+			// find motion state
+			if( _world.HasComponent< MotionState >( _entity ) )
+			{
+				MotionState& motionState = _world.GetComponent<MotionState>( _entity );
+				rb.rigidbody.setMotionState( &motionState.motionState );
+			}
+			
+			physicsWorld.dynamicsWorld->addRigidBody( &rb.rigidbody );
+		}		
+		else if( _world.HasComponent< Rigidbody2 >( _entity ) )
+		{
+			Rigidbody2& rb = _world.GetComponent<Rigidbody2>( _entity );
+			if( _world.IsType<MotionState>( _component ) )
+			{
+				// motion state
+				MotionState& motionState = static_cast<MotionState&>( _component );
+				
+				rb.rigidbody.setMotionState( &motionState.motionState );
+			}
+			else
+			{
+				// collider
+				btCollisionShape* shape = nullptr;
+				if( _world.IsType<SphereShape2>( _component ) )
+				{
+					shape = &static_cast<SphereShape2&>( _component ).sphereShape;
+				}
+				else if( _world.IsType<BoxShape2>( _component ) )
+				{
+					shape = &static_cast<BoxShape2&>( _component ).boxShape;
+				}
+				if( shape != nullptr )
+				{
+					rb.SetCollisionShape( shape );
+				}
+			}
+		}		
 	}
 
 	//================================================================================================================================
