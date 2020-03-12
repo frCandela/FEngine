@@ -7,8 +7,6 @@
 #include "scene/ecs/fanSystem.hpp"
 #include "scene/ecs/fanTag.hpp"
 
-#include "scene/ecs/systems/fanUpdateAABBFromRigidbody.hpp"
-
 namespace fan
 {
 
@@ -144,10 +142,6 @@ namespace fan
 					world.KillEntity( (EntityID)world.GetNumEntities() - i - 1 );
 				}
 			}ImGui::SameLine();
-			if( ImGui::Button( "Run" ) )
-			{
-				world.RunSystem<UpdateAABBFromRigidbodySystem>( 0.1f );
-			}
 		}
 
 		//============================	

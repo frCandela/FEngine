@@ -1,6 +1,5 @@
 #include "scene/ecs/fanSystem.hpp"
 #include "scene/ecs/fanEcsWorld.hpp"
-#include "scene/ecs/fanTag.hpp"
 
 #include "scene/ecs/singletonComponents/fanRenderWorld.hpp"
 #include "scene/ecs/components/fanMeshRenderer2.hpp"

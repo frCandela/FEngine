@@ -5,6 +5,7 @@
 #include "scene/ecs/fanEntity.hpp"
 #include "core/imgui/fanImguiIcons.hpp"
 #include "fanComponentsCollection.hpp"
+#include "scene/ecs/fanTag.hpp"
 
 namespace fan {
 	struct SingletonComponent;
