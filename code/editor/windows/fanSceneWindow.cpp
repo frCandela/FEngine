@@ -281,7 +281,7 @@ namespace fan
 				if( std::string( m_textBuffer ) != "" )
 				{
 					//Create new scene node 
-					SceneNode& newNode = m_scene->CreateSceneNode( m_textBuffer, m_lastSceneNodeRightClicked );
+					SceneNode& newNode = m_scene->InstanciateSceneNode( m_textBuffer, m_lastSceneNodeRightClicked );
 					onSelectSceneNode.Emmit( &newNode );
 					m_lastSceneNodeRightClicked = nullptr;
 					ImGui::CloseCurrentPopup();

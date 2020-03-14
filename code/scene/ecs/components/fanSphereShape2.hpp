@@ -16,7 +16,7 @@ namespace fan
 	public:
 		SphereShape2();
 		static void SetInfo( ComponentInfo& _info );
-		static void Clear( ecComponent& _sphereShape );
+		static void Init( ecComponent& _component );
 		static void OnGui( ecComponent& _sphereShape );
 		static void Save( const ecComponent& _sphereShape, Json& _json );
 		static void Load( ecComponent& _sphereShape, const Json& _json );

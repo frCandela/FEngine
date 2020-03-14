@@ -15,7 +15,7 @@ namespace fan
 		DECLARE_COMPONENT( Transform2 )
 	public:
 		static void SetInfo( ComponentInfo& _info );
-		static void	Clear( ecComponent& _transform );
+		static void	Init( ecComponent& _component );
 		static void OnGui( ecComponent& _transform );
 		static void Save( const ecComponent& _transform, Json& _json );
 		static void Load( ecComponent& _transform, const Json& _json );

@@ -16,7 +16,7 @@ namespace fan
 	public:
 		BoxShape2();
 		static void SetInfo( ComponentInfo& _info );
-		static void Clear( ecComponent& _boxShape );
+		static void Init( ecComponent& _component );
 		static void OnGui( ecComponent& _boxShape );
 		static void Save( const ecComponent& _boxShape, Json& _json );
 		static void Load( ecComponent& _boxShape, const Json& _json );

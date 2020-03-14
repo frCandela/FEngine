@@ -12,7 +12,7 @@ namespace fan
 	{
 		_info.icon = ImGui::IconType::TRANSFORM16;
 		_info.onGui = &Transform2::OnGui;
-		_info.clear = &Transform2::Clear;
+		_info.init = &Transform2::Init;
 		_info.save = &Transform2::Save;
 		_info.load = &Transform2::Load;
 		_info.editorPath = "";
@@ -20,9 +20,9 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void Transform2::Clear( ecComponent& _transform )
+	void Transform2::Init( ecComponent& _component )
 	{
-		Transform2& transform = static_cast<Transform2&>( _transform );
+		Transform2& transform = static_cast<Transform2&>( _component );
 		transform.transform.setIdentity();
 		transform.scale = btVector3::One();
 	}

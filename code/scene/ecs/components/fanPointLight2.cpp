@@ -12,7 +12,7 @@ namespace fan
 	{
 		_info.icon = ImGui::IconType::POINT_LIGHT16;
 		_info.onGui = &PointLight2::OnGui;
-		_info.clear = &PointLight2::Clear;
+		_info.init = &PointLight2::Init;
 		_info.load = &PointLight2::Load;
 		_info.save = &PointLight2::Save;
 		_info.editorPath = "lights/";
@@ -20,9 +20,9 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void PointLight2::Clear( ecComponent& _pointLight )
+	void PointLight2::Init( ecComponent& _component )
 	{
-		PointLight2& pointLight = static_cast<PointLight2&>( _pointLight );
+		PointLight2& pointLight = static_cast<PointLight2&>( _component );
 		pointLight.ambiant = Color::White;
 		pointLight.diffuse = Color::White;
 		pointLight.specular = Color::White;

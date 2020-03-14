@@ -13,7 +13,7 @@ namespace fan
 	{
 		_info.icon = ImGui::IconType::MESH_RENDERER16;
 		_info.onGui = &MeshRenderer2::OnGui;
-		_info.clear = &MeshRenderer2::Clear;
+		_info.init = &MeshRenderer2::Init;
 		_info.load = &MeshRenderer2::Load;
 		_info.save = &MeshRenderer2::Save;
 		_info.editorPath = "";
@@ -21,9 +21,9 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void MeshRenderer2::Clear( ecComponent& _meshRenderer )
+	void MeshRenderer2::Init( ecComponent& _component )
 	{
-		MeshRenderer2& meshRenderer = static_cast<MeshRenderer2&>( _meshRenderer );
+		MeshRenderer2& meshRenderer = static_cast<MeshRenderer2&>( _component );
 		meshRenderer.mesh = nullptr;
 		meshRenderer.renderID = -1;
 	}

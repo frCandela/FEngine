@@ -12,7 +12,7 @@ namespace fan
 	{
 		_info.icon = ImGui::IconType::DIR_LIGHT16;
 		_info.onGui = &DirectionalLight2::OnGui;
-		_info.clear = &DirectionalLight2::Clear;
+		_info.init = &DirectionalLight2::Init;
 		_info.load = &DirectionalLight2::Load;
 		_info.save = &DirectionalLight2::Save;
 		_info.editorPath = "lights/";
@@ -20,9 +20,9 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void DirectionalLight2::Clear( ecComponent& _light )
+	void DirectionalLight2::Init( ecComponent& _component )
 	{
-		DirectionalLight2& light = static_cast<DirectionalLight2&>( _light );
+		DirectionalLight2& light = static_cast<DirectionalLight2&>( _component );
 		light.ambiant = Color::Black;
 		light.diffuse = Color::White;
 		light.specular = Color::White;

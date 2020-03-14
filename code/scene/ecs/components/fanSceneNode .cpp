@@ -12,14 +12,14 @@ namespace fan
 	{
 		_info.icon  = ImGui::IconType::GAMEOBJECT16;
 		_info.onGui = &SceneNode::OnGui;
-		_info.clear = &SceneNode::Clear;
+		_info.init = &SceneNode::Init;
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void SceneNode::Clear( ecComponent& _sceneNode )
+	void SceneNode::Init( ecComponent& _component )
 	{
-		SceneNode& node = static_cast<SceneNode&>( _sceneNode );
+		SceneNode& node = static_cast<SceneNode&>( _component );
 		node.entityHandle = 0;
 		node.name = "";
 		node.scene = nullptr;
@@ -29,7 +29,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void SceneNode::Init( const std::string& _name, Scene& _scene, const EntityHandle _entityHandle, const uint32_t _uniqueID, SceneNode* const _parent )
+	void SceneNode::Build( const std::string& _name, Scene& _scene, const EntityHandle _entityHandle, const uint32_t _uniqueID, SceneNode* const _parent )
 	{
 		name = _name;
 		scene = &_scene;
@@ -166,6 +166,25 @@ namespace fan
 			{
 				_brother.parent->childs.insert( _brother.parent->childs.begin() + childIndex + 1, this );
 				parent = _brother.parent;
+			}
+		}
+	}
+	//================================================================================================================================
+	// fills the _list with _root and all its descendants  
+	//================================================================================================================================
+	void SceneNode::GetDescendantsOf( SceneNode& _root, std::vector<SceneNode*>& _outList )
+	{
+		_outList.clear();
+		std::stack<SceneNode*> stack;
+		stack.push( &_root );
+		while( !stack.empty() )
+		{
+			SceneNode& node = *stack.top();
+			stack.pop();
+			_outList.push_back( &node );
+			for( int i = 0; i < node.childs.size(); i++ )
+			{
+				stack.push( node.childs[i] );
 			}
 		}
 	}

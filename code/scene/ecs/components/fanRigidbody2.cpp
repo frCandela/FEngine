@@ -1,6 +1,8 @@
 #include "scene/ecs/components/fanRigidbody2.hpp"
 
 #include "render/fanRenderSerializable.hpp"
+#include "scene/ecs/fanEcsWorld.hpp"
+#include "scene/ecs/singletonComponents/fanPhysicsWorld.hpp"
 
 namespace fan
 {
@@ -16,18 +18,20 @@ namespace fan
 	{
 		_info.icon = ImGui::IconType::RIGIDBODY16;
 		_info.onGui = &Rigidbody2::OnGui;
-		_info.clear = &Rigidbody2::Clear;
+		_info.init = &Rigidbody2::Init;
 		_info.load  = &Rigidbody2::Load;
 		_info.save  = &Rigidbody2::Save;
 		_info.editorPath = "";
 	}
-
+	   
 	//================================================================================================================================
 	//================================================================================================================================
-	void Rigidbody2::Clear( ecComponent& _rigidbody )
+	void Rigidbody2::Init( ecComponent& _component )
 	{
-		Rigidbody2& rb = static_cast<Rigidbody2&>( _rigidbody );
+		// clear
+		Rigidbody2& rb = static_cast<Rigidbody2&>( _component );
 		rb.rigidbody = btRigidBody( 1.f, nullptr, nullptr );
+		rb.rigidbody.setUserPointer( &rb );
 	}
 
 	//================================================================================================================================
@@ -242,8 +246,20 @@ namespace fan
 		if( mass != 0.f && _collisionShape != nullptr)
 		{
 			_collisionShape->calculateLocalInertia( mass, localInertia );
+			_collisionShape->setUserPointer( &rigidbody );
 		}
 		rigidbody.setCollisionShape( _collisionShape );
-		rigidbody.setMassProps( mass, localInertia );
+		rigidbody.setMassProps( mass, localInertia );	
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================	
+	void Rigidbody2::SetMotionState( btDefaultMotionState* _motionState )
+	{		
+		rigidbody.setMotionState( _motionState );
+		if( _motionState != nullptr )
+		{
+			_motionState->m_userPointer = this;
+		}
 	}
 }

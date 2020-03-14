@@ -38,7 +38,7 @@ namespace fan
 		Prefab prefab;
 		if ( prefab.CreateFromJson( pastedJson ) )
 		{
-			m_selection.GetSelectedScene().CreatePrefab( prefab, m_selection.GetSelectedSceneNode() );
+			m_selection.GetSelectedScene().InstanciatePrefab( prefab, m_selection.GetSelectedSceneNode() );
 		}
 	}
 }

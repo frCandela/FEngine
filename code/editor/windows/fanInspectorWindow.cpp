@@ -2,8 +2,13 @@
 
 #include "editor/components/fanFPSCamera.hpp"
 #include "game/imgui/fanDragnDrop.hpp"
-#include "scene/ecs/fanEcsWorld.hpp"
+#include "scene/ecs/singletonComponents/fanPhysicsWorld.hpp"
 #include "scene/ecs/components/fanSceneNode.hpp"
+#include "scene/ecs/components/fanSphereShape2.hpp"
+#include "scene/ecs/components/fanBoxShape2.hpp"
+#include "scene/ecs/components/fanMotionState.hpp"
+#include "scene/ecs/components/fanRigidbody2.hpp"
+#include "scene/ecs/fanEcsWorld.hpp"
 #include "scene/components/fanComponent.hpp"
 #include "scene/components/fanTransform.hpp"
 #include "scene/components/fanMaterial.hpp"
@@ -15,11 +20,6 @@
 #include "render/core/fanTexture.hpp"
 #include "render/fanMesh.hpp"
 
-#include "scene/ecs/singletonComponents/fanPhysicsWorld.hpp"
-#include "scene/ecs/components/fanRigidbody2.hpp"
-#include "scene/ecs/components/fanMotionState.hpp"
-#include "scene/ecs/components/fanSphereShape2.hpp"
-#include "scene/ecs/components/fanBoxShape2.hpp"
 
 namespace fan
 {
@@ -64,13 +64,25 @@ namespace fan
 				ImGui::SameLine( ImGui::GetWindowWidth() - 40 );
 				if( ImGui::Button( ss.str().c_str() ) )
 				{
+					// if component is a rigidbody, unregisters from physics world
+					bool rigidbodyNeedsUpdate = PhysicsWorld::IsPhysicsType( world, component );
+					if( world.IsType<Rigidbody2>( component ) )
+					{
+						Rigidbody2& rb = static_cast<Rigidbody2&>( component );
+						PhysicsWorld& physicsWorld = world.GetSingletonComponent<PhysicsWorld>();
+						physicsWorld.dynamicsWorld->removeRigidBody( &rb.rigidbody );
+						rigidbodyNeedsUpdate = false;
+					}					
+
 					world.RemoveComponent( entityID, component.GetIndex() );
+					
+					if( rigidbodyNeedsUpdate ) { UpdateEntityRigidbody( world, entityID ); }					
 				}
  				// Draw component
 				else if( info.onGui != nullptr )
 				{
 					info.onGui( component );
-				} 				
+				} 
 			}
 			ImGui::Separator();
 			//Add component button
@@ -83,89 +95,60 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
+	void  InspectorWindow::UpdateEntityRigidbody( EcsWorld& _world, EntityID _entityID )
+	{		
+		if( _world.HasComponent<Rigidbody2>( _entityID ) )
+		{
+			Rigidbody2& rb = _world.GetComponent<Rigidbody2>( _entityID );
+
+			// find a collision shape
+			btCollisionShape* shape = nullptr;
+			if( _world.HasComponent<SphereShape2>( _entityID ) )
+			{
+				shape = &_world.GetComponent<SphereShape2>( _entityID ).sphereShape;
+			}
+			else if( _world.HasComponent<BoxShape2>( _entityID ) )
+			{
+				shape = &_world.GetComponent<BoxShape2>( _entityID ).boxShape;
+			}
+
+			// find a motion state
+			btDefaultMotionState* motionState = nullptr;
+			if( _world.HasComponent<MotionState>( _entityID ) )
+			{
+				motionState = &_world.GetComponent<MotionState>( _entityID ).motionState;
+			}
+
+			// reset the rigidbody
+			PhysicsWorld& physicsWorld = _world.GetSingletonComponent<PhysicsWorld>();
+			physicsWorld.dynamicsWorld->removeRigidBody( &rb.rigidbody );
+			rb.SetMotionState( motionState );
+			rb.SetCollisionShape( shape );
+			physicsWorld.dynamicsWorld->addRigidBody( &rb.rigidbody );
+		}
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
 	void InspectorWindow::NewComponentItem( const ComponentInfo& _info )
 	{
 		ImGui::Icon( _info.icon, { 16,16 } ); ImGui::SameLine();
 		if( ImGui::MenuItem( _info.name.c_str() ) )
 		{
 			// Create new Component 
-
 			EcsWorld& world = m_sceneNodeSelected->scene->GetWorld();
-			EntityID id = world.GetEntityID( m_sceneNodeSelected->entityHandle );
-			if( !world.HasComponent( id, _info.index ) )
+			EntityID entityID = world.GetEntityID( m_sceneNodeSelected->entityHandle );
+			if( !world.HasComponent( entityID, _info.index ) )
 			{
-				ecComponent& component = world.AddComponent( id, _info.index );
-				RegisterPhysics( world, id, component );	
-
+				ecComponent& component = world.AddComponent( entityID, _info.index );
+				if( PhysicsWorld::IsPhysicsType( world, component ) )
+				{
+					UpdateEntityRigidbody( world, entityID );
+				}
+				
 			}			
 			ImGui::CloseCurrentPopup();
 		}
-	}
-
-	//================================================================================================================================
-	// registers rigidbody, colliders and motions state into each others and into the physics world when created from the editor
-	//================================================================================================================================
-	void InspectorWindow::RegisterPhysics( EcsWorld& _world, EntityID _entity, ecComponent& _component )
-	{
-		
-		if( _world.IsType<Rigidbody2>( _component ) )
-		{
-			// Rigidbody
-			PhysicsWorld& physicsWorld = _world.GetSingletonComponent<PhysicsWorld>();
-			Rigidbody2& rb = static_cast<Rigidbody2&>( _component );
-
-			// find collision shape
-			btCollisionShape* shape = nullptr;
-			if( _world.HasComponent< SphereShape2 >( _entity ) ) 
-			{ 
-				shape = &_world.GetComponent<SphereShape2>( _entity ).sphereShape; 
-			}
-			else if( _world.HasComponent< BoxShape2 >( _entity ) )
-			{
-				shape = &_world.GetComponent<BoxShape2>( _entity ).boxShape;
-			}
-			if( shape !=  nullptr )
-			{
-				rb.SetCollisionShape( shape );
-			}
-
-			// find motion state
-			if( _world.HasComponent< MotionState >( _entity ) )
-			{
-				MotionState& motionState = _world.GetComponent<MotionState>( _entity );
-				rb.rigidbody.setMotionState( &motionState.motionState );
-			}
-			
-			physicsWorld.dynamicsWorld->addRigidBody( &rb.rigidbody );
-		}		
-		else if( _world.HasComponent< Rigidbody2 >( _entity ) )
-		{
-			Rigidbody2& rb = _world.GetComponent<Rigidbody2>( _entity );
-			if( _world.IsType<MotionState>( _component ) )
-			{
-				// motion state
-				MotionState& motionState = static_cast<MotionState&>( _component );
-				
-				rb.rigidbody.setMotionState( &motionState.motionState );
-			}
-			else
-			{
-				// collider
-				btCollisionShape* shape = nullptr;
-				if( _world.IsType<SphereShape2>( _component ) )
-				{
-					shape = &static_cast<SphereShape2&>( _component ).sphereShape;
-				}
-				else if( _world.IsType<BoxShape2>( _component ) )
-				{
-					shape = &static_cast<BoxShape2&>( _component ).boxShape;
-				}
-				if( shape != nullptr )
-				{
-					rb.SetCollisionShape( shape );
-				}
-			}
-		}		
 	}
 
 	//================================================================================================================================

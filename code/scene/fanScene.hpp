@@ -42,8 +42,8 @@ namespace fan
 		~Scene();
 
 
-		SceneNode&  CreateSceneNode( const std::string _name, SceneNode* const _parentNode, const bool _generateID = true );
-		SceneNode*  CreatePrefab( const Prefab& _prefab, SceneNode* const _parent );
+		SceneNode&  InstanciateSceneNode( const std::string _name, SceneNode* const _parentNode, const bool _generateID = true );
+		SceneNode*  InstanciatePrefab( const Prefab& _prefab, SceneNode* const _parent );
 		void		DeleteSceneNode( SceneNode& _node );
 
 		Gameobject* CreateGameobject( const std::string _name, Gameobject* const _parent, const uint64_t _uniqueId = 0 );

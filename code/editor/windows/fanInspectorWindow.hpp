@@ -27,10 +27,9 @@ namespace fan
 	private:
 		SceneNode* m_sceneNodeSelected = nullptr;
 
-		void RegisterPhysics( EcsWorld& _world, EntityID _entity, ecComponent& _component );
-
 		void NewComponentPopup();
 		void R_NewComponentPopup( std::set< std::filesystem::path >& _componentsPathSet, std::set< std::filesystem::path >::iterator& _current, const std::vector< const ComponentInfo*>& _components, const std::vector<std::filesystem::path>& _componentsPath );
 		void NewComponentItem( const ComponentInfo& _info );
+		static void UpdateEntityRigidbody( EcsWorld& _world, EntityID _entityID );
 	};
 }

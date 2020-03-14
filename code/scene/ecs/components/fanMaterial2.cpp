@@ -12,7 +12,7 @@ namespace fan
 	{
 		_info.icon = ImGui::IconType::MATERIAL16;
 		_info.onGui = &Material2::OnGui;
-		_info.clear = &Material2::Clear;
+		_info.init = &Material2::Init;
 		_info.load  = &Material2::Load;
 		_info.save  = &Material2::Save;
 		_info.editorPath = "";
@@ -20,9 +20,9 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void Material2::Clear( ecComponent& _material )
+	void Material2::Init( ecComponent& _component )
 	{
-		Material2& material = static_cast<Material2&>( _material );
+		Material2& material = static_cast<Material2&>( _component );
 
 		material.texture = nullptr;
 		material.shininess = 1;

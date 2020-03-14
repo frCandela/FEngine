@@ -1,6 +1,11 @@
 #include "scene/ecs/singletonComponents/fanPhysicsWorld.hpp"
 
 #include "core/time/fanTime.hpp"
+#include "scene/ecs/fanEcsWorld.hpp"
+#include "scene/ecs/components/fanRigidbody2.hpp"
+#include "scene/ecs/components/fanMotionState.hpp"
+#include "scene/ecs/components/fanSphereShape2.hpp"
+#include "scene/ecs/components/fanBoxShape2.hpp"
 
 namespace fan
 {
@@ -19,7 +24,7 @@ namespace fan
 		gContactStartedCallback = ContactStartedCallback;
 		gContactEndedCallback = ContactEndedCallback;
 
-		dynamicsWorld->setGravity( btVector3::Zero() );
+		dynamicsWorld->setGravity( btVector3(0,-10, 0)  /*btVector3::Zero()*/ );
 
 		// Bullet physics is broken when its internal clock is zero, this prevents it from happening when the timestep is exactly equal to the fixed timestep
 		dynamicsWorld->stepSimulation( 0.015f, 1, Time::Get().GetPhysicsDelta() );
@@ -37,15 +42,26 @@ namespace fan
 	}
 
 	//================================================================================================================================
+	// maybe replace this with a boolean in the component typeinfo ?
+	//================================================================================================================================	
+	bool PhysicsWorld::IsPhysicsType( EcsWorld& _world, ecComponent& _component )
+	{
+		return	_world.IsType<Rigidbody2>( _component ) ||
+				_world.IsType<MotionState>( _component ) ||
+				_world.IsType<SphereShape2>( _component ) ||
+				_world.IsType<BoxShape2>( _component );
+	}
+
+	//================================================================================================================================
 	//================================================================================================================================	
 	void PhysicsWorld::ContactStartedCallback( btPersistentManifold* const& _manifold )
 	{
 		if( _manifold->getNumContacts() == 1 )
 		{
-// 			Rigidbody* rb0 = static_cast<Rigidbody*> ( _manifold->getBody0()->getUserPointer() );
-// 			Rigidbody* rb1 = static_cast<Rigidbody*> ( _manifold->getBody1()->getUserPointer() );
-// 			rb0->onContactStarted.Emmit( rb1, _manifold );
-// 			rb1->onContactStarted.Emmit( rb0, _manifold );
+			Rigidbody2* rb0 = static_cast<Rigidbody2*> ( _manifold->getBody0()->getUserPointer() );
+			Rigidbody2* rb1 = static_cast<Rigidbody2*> ( _manifold->getBody1()->getUserPointer() );
+			rb0->onContactStarted.Emmit( rb1, _manifold );
+			rb1->onContactStarted.Emmit( rb0, _manifold );
 		}
 	}
 
@@ -55,10 +71,10 @@ namespace fan
 	{
 		if( _manifold->getNumContacts() == 0 )
 		{
-// 			Rigidbody* rb0 = static_cast<Rigidbody*> ( _manifold->getBody0()->getUserPointer() );
-// 			Rigidbody* rb1 = static_cast<Rigidbody*> ( _manifold->getBody1()->getUserPointer() );
-// 			rb0->onContactEnded.Emmit( rb1, _manifold );
-// 			rb1->onContactEnded.Emmit( rb0, _manifold );
+			Rigidbody2* rb0 = static_cast<Rigidbody2*> ( _manifold->getBody0()->getUserPointer() );
+			Rigidbody2* rb1 = static_cast<Rigidbody2*> ( _manifold->getBody1()->getUserPointer() );
+			rb0->onContactEnded.Emmit( rb1, _manifold );
+			rb1->onContactEnded.Emmit( rb0, _manifold );
 		}
 	}
 }

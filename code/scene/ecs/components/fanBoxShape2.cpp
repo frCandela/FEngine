@@ -16,7 +16,7 @@ namespace fan
 	{
 		_info.icon = ImGui::IconType::CUBE_SHAPE16;
 		_info.onGui = &BoxShape2::OnGui;
-		_info.clear = &BoxShape2::Clear;
+		_info.init = &BoxShape2::Init;
 		_info.load  = &BoxShape2::Load;
 		_info.save  = &BoxShape2::Save;
 		_info.editorPath = "";
@@ -24,10 +24,11 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void BoxShape2::Clear( ecComponent& _boxShape )
+	void BoxShape2::Init( ecComponent& _component )
 	{
-		BoxShape2& boxShape = static_cast<BoxShape2&>( _boxShape );
+		BoxShape2& boxShape = static_cast<BoxShape2&>( _component );
 		boxShape.boxShape = btBoxShape( btVector3( 0.5f, 0.5f, 0.5f ) );
+		boxShape.boxShape.setUserPointer( nullptr );
 	}
 
 	//================================================================================================================================

@@ -14,7 +14,7 @@ namespace fan
 	{
 		_info.icon = ImGui::IconType::CAMERA16;
 		_info.onGui = &Camera2::OnGui;
-		_info.clear = &Camera2::Clear;
+		_info.init = &Camera2::Init;
 		_info.load = &Camera2::Load;
 		_info.save = &Camera2::Save;
 		_info.editorPath = "";
@@ -22,9 +22,9 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void Camera2::Clear( ecComponent& _camera )
+	void Camera2::Init( ecComponent& _component )
 	{
-		Camera2& camera = static_cast<Camera2&>( _camera );
+		Camera2& camera = static_cast<Camera2&>( _component );
 
 		camera.fov = 110.f;
 		camera.aspectRatio = 1.f;

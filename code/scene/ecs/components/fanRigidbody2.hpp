@@ -17,7 +17,7 @@ namespace fan
 		Rigidbody2();
 
 		static void SetInfo( ComponentInfo& _info );
-		static void Clear( ecComponent& _rigidbody );
+		static void Init(  ecComponent& _component );
 		static void OnGui( ecComponent& _rigidbody );
 		static void Save( const ecComponent& _rigidbody, Json& _json );
 		static void Load( ecComponent& _rigidbody, const Json& _json );		
@@ -39,8 +39,11 @@ namespace fan
 		inline void	ApplyCentralForce( const btVector3& _force ) { rigidbody.applyCentralForce( _force ); }
 
 		void SetCollisionShape( btCollisionShape* _collisionShape );
+		void SetMotionState( btDefaultMotionState* _motionState );
 
 		btRigidBody rigidbody;
+		Signal<Rigidbody2*, btPersistentManifold* const&> onContactStarted;
+		Signal<Rigidbody2*, btPersistentManifold* const&> onContactEnded;
 	};
 	static constexpr size_t sizeof_rigidbody = sizeof( Rigidbody2 );
 }

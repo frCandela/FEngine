@@ -44,7 +44,7 @@ namespace fan
 		ecComponent&		 component = info.instanciate( &componentBase );			
 
 		// set component
-		info.clear( component );
+		info.init( component );
 		component.componentIndex = _index;
 		component.chunckIndex = chunckIndex;
 		component.chunckComponentIndex = chunckComponentIndex;
@@ -81,6 +81,7 @@ namespace fan
 		Entity& entity = GetEntity( _entityID );
 		assert( entity.signature[_index] == 1 ); // this entity doesn't have this component
 		ecComponent& component = GetComponent( _entityID, _index );
+
 		m_components[_index].RemoveComponent( component.chunckIndex, component.chunckComponentIndex );
 		entity.signature[_index] = 0;
 
@@ -141,6 +142,14 @@ namespace fan
 	{
 		assert( _id < m_entities.size() );
 		return m_entities[_id];
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
+	bool EcsWorld::EntityMatchSignature( EntityID _entityID, const Signature& _signature )
+	{
+		Entity& entity = m_entities[_entityID];
+		return  ( entity.signature & _signature ) == _signature ;
 	}
 
 	//================================================================================================================================

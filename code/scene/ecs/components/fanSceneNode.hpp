@@ -23,10 +23,10 @@ namespace fan
 		};
 
 		static void SetInfo( ComponentInfo& _info );
-		static void Clear( ecComponent& _sceneNode );
+		static void Init( ecComponent& _component );
 		static void OnGui( ecComponent& _sceneNode );
 
-		void Init( const std::string& _name, Scene& _scene, const EntityHandle _entityHandle, const uint32_t _uniqueID, SceneNode* const _parent);
+		void Build( const std::string& _name, Scene& _scene, const EntityHandle _entityHandle, const uint32_t _uniqueID, SceneNode* const _parent);
 
 		bool IsRoot() const { return parent == nullptr; }
 		bool IsAncestorOf( const SceneNode& _node ) const;
@@ -38,6 +38,8 @@ namespace fan
 		bool HasFlag( uint32_t _flag ) { return flags & _flag; }
 		void AddFlag( uint32_t _flag ) {  flags |= _flag; }
 		void RemoveFlag( Flags _flag ) {  flags &= ~_flag; }
+
+		static void GetDescendantsOf( SceneNode& _root, std::vector<SceneNode*>& _outList );
 
 		EntityHandle			entityHandle;
 		uint32_t				uniqueID;

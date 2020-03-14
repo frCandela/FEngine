@@ -18,7 +18,7 @@ namespace fan
 		enum Attenuation { CONSTANT = 0, LINEAR = 1, QUADRATIC = 2 };
 
 		static void SetInfo( ComponentInfo& _info );
-		static void Clear( ecComponent& _light );
+		static void Init( ecComponent& _component );
 		static void OnGui( ecComponent& _light );
 		static void Save( const ecComponent& _transform, Json& _json );
 		static void Load( ecComponent& _transform, const Json& _json );

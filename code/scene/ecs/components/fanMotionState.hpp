@@ -16,7 +16,9 @@ namespace fan
 		DECLARE_COMPONENT( MotionState )
 	public:
 		static void SetInfo( ComponentInfo& _info );
-		static void Clear( ecComponent& _motionState );
+		static void Init( ecComponent& _component );
+		static void Save( const ecComponent& _component, Json& _json ) {}
+		static void Load( ecComponent& _component, const Json& _json ) {}
 
 		btDefaultMotionState motionState;
 	};

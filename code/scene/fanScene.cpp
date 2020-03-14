@@ -19,6 +19,8 @@
 #include "core/time/fanProfiler.hpp"
 #include "core/fanSignal.hpp"
 #include "ecs/singletonComponents/fanPhysicsWorld.hpp"
+#include "scene/ecs/systems/fanSynchronizeMotionStates.hpp"
+#include "scene/ecs/systems/fanRegisterPhysics.hpp"
 
 namespace fan
 {
@@ -66,7 +68,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	SceneNode& Scene::CreateSceneNode( const std::string _name, SceneNode* const _parentNode, const bool _generateID )
+	SceneNode& Scene::InstanciateSceneNode( const std::string _name, SceneNode* const _parentNode, const bool _generateID )
 	{
 		SceneNode* const parent = _parentNode == nullptr ? m_rootNode : _parentNode;
 		EntityID entityID = m_ecsWorld->CreateEntity();
@@ -74,7 +76,7 @@ namespace fan
 		SceneNode& sceneNode = m_ecsWorld->AddComponent<SceneNode>( entityID );
 
 		uint32_t id = _generateID ? nextUniqueID++ : 0;
-		sceneNode.Init( _name, *this, handle, id, parent );
+		sceneNode.Build( _name, *this, handle, id, parent );
 
 		return sceneNode;
 	}
@@ -91,10 +93,28 @@ namespace fan
 	// Creates a game object from a prefab and adds it to the scene hierarchy
 	// Gameobjects ids are remapped depending on the scene next id
 	//================================================================================================================================
-	SceneNode* Scene::CreatePrefab( const Prefab& _prefab, SceneNode * const _parent )
+	SceneNode* Scene::InstanciatePrefab( const Prefab& _prefab, SceneNode * const _parent )
 	{
+		// instanciate prefab
 		SceneNode* const parent = _parent == nullptr ? m_rootNode : _parent;
-		return _prefab.Instanciate( *parent );
+		SceneNode * prefabRoot = _prefab.Instanciate( *parent );
+
+		// registers newly added rigidbodies
+		if( prefabRoot != nullptr )
+		{
+			std::vector<SceneNode*> nodes;
+			SceneNode::GetDescendantsOf( *prefabRoot, nodes );
+
+			std::vector<EntityID> entities;
+			entities.reserve( nodes.size() );
+			for ( SceneNode* node : nodes )
+			{
+				entities.push_back( m_ecsWorld->GetEntityID( node->entityHandle ) );
+			}
+			m_ecsWorld->RunSystemOnSubset<S_RegisterAllRigidbodies>( entities, -1.f );
+		}
+
+		return prefabRoot;
 	}
 
 	//================================================================================================================================
@@ -207,6 +227,8 @@ namespace fan
 	}
 
 	//================================================================================================================================
+	// clears a set of scene nodes
+	// warning : very expensive & invalidates all EntityID
 	//================================================================================================================================
 	void Scene::DeleteNodesImmediate( const std::vector<SceneNode*>& _nodes )
 	{		
@@ -234,15 +256,26 @@ namespace fan
 		}
 
 		// delete all nodes
+		PhysicsWorld& physicsWorld = m_ecsWorld->GetSingletonComponent<PhysicsWorld>();
 		for( SceneNode* node : nodesToDelete )
 		{
-			EntityID id = m_ecsWorld->GetEntityID( node->entityHandle );
-			m_ecsWorld->KillEntity( id );
+			EntityID entityID = m_ecsWorld->GetEntityID( node->entityHandle );
+
+			// remove rigidbody from physics world
+			if( m_ecsWorld->HasComponent<Rigidbody2>( entityID ) )
+			{
+				Rigidbody2& rb = m_ecsWorld->GetComponent<Rigidbody2>( entityID );
+				physicsWorld.dynamicsWorld->removeRigidBody( &rb.rigidbody );
+			}
+			m_ecsWorld->KillEntity( entityID );
 			if( node->parent != nullptr )
 			{
 				node->parent->RemoveChild( *node );
 			}
 		}		
+
+		m_ecsWorld->SortEntities();
+		m_ecsWorld->RemoveDeadEntities();
 	}
 
 	//================================================================================================================================
@@ -252,25 +285,31 @@ namespace fan
 		SCOPED_PROFILE( scene_update );
 		BeginFrame();
 
-		const float delta = m_state == State::PLAYING ? _delta : 0.f;
+		//const float delta = m_state == State::PLAYING ? _delta : 0.f;
 
-		//m_ecsManager->UpdatePrePhysics( delta );@hack
+		//m_ecsManager->UpdatePrePhysics( delta );@hack;
 		PhysicsWorld& physicsWorld = m_ecsWorld->GetSingletonComponent<PhysicsWorld>();
-		physicsWorld.dynamicsWorld->stepSimulation( delta, 10, Time::Get().GetPhysicsDelta() );
+		m_ecsWorld->RunSystem<S_SynchronizeMotionStateFromTransform>( _delta );		
+		physicsWorld.dynamicsWorld->stepSimulation( _delta, 10, Time::Get().GetPhysicsDelta() );
 		//m_ecsManager->UpdatePostPhysics( delta );@hack
+		m_ecsWorld->RunSystem<S_SynchronizeTransformFromMotionState>( _delta );
 		UpdateActors( _delta );
 		//m_ecsManager->Update( delta );@hack
 		LateUpdateActors( _delta );
 		//m_ecsManager->LateUpdate( delta );@hack
 		EndFrame();
 
-// 		ImGui::Begin( "testoss" );
-// 		{
+		ImGui::Begin( "physicsWorld" );
+		{
+			ImGui::PushID( &physicsWorld );
+			ImGui::Text( "num %d", physicsWorld.dynamicsWorld->getNumCollisionObjects() );
+			ImGui::PopID();
+
 // 			ImGui::Text( "m_actors         %d", m_actors.size());
 // 			ImGui::Text( "m_startingActors %d", m_startingActors.size() );
 // 			ImGui::Text( "m_activeActors   %d", m_activeActors.size() );
 // 			ImGui::Text( "m_pausedActors   %d", m_pausedActors.size() );
-// 		}ImGui::End();
+		}ImGui::End();
 	}
 
 	//================================================================================================================================
@@ -531,6 +570,7 @@ namespace fan
 	//================================================================================================================================
 	void Scene::Clear()
 	{
+		m_ecsWorld->RunSystem<S_UnregisterAllRigidbodies>( -1.f );
 		m_path = "";
 		m_instantiate->Clear();
 		DeleteNodesImmediate( { m_rootNode } );
@@ -542,7 +582,6 @@ namespace fan
 		m_sceneNodesToDelete.clear();
 		m_gameobjects.clear();
 		m_root = nullptr;
-
 		onSceneClear.Emmit();
 	}
 
@@ -553,7 +592,7 @@ namespace fan
 		Stop();
 		Clear();
 		nextUniqueID = 1;
-		m_rootNode = & CreateSceneNode( "root", nullptr );
+		m_rootNode = & InstanciateSceneNode( "root", nullptr );
 		onSceneLoad.Emmit( *this );
 	}
 
@@ -705,12 +744,14 @@ namespace fan
 
 			// loads all nodes recursively
 			const Json& jRoot = jScene["root"];
-			m_rootNode = &CreateSceneNode( "root", nullptr );
+			m_rootNode = &InstanciateSceneNode( "root", nullptr );
 			R_LoadFromJson( jRoot, *m_rootNode, 0 );
 			
 			m_path = _path;
 			inStream.close();
 			nextUniqueID = R_FindMaximumId( *m_rootNode ) + 1;
+
+			m_ecsWorld->RunSystem<S_RegisterAllRigidbodies>( -1.f );
 			//m_instantiate->ResolveGameobjectPtr( 0 );
 			//m_instantiate->ResolveComponentPtr( 0 );
 
@@ -733,20 +774,22 @@ namespace fan
 		//ScopedTimer timer("load scene");
 		EcsWorld& world = _node.scene->GetWorld();
 
+
 		Serializable::LoadString( _json, "name", _node.name );
 		Serializable::LoadUInt( _json, "node_id", _node.uniqueID );
 		_node.uniqueID += _idOffset;
 
+		// components
 		const Json& jComponents = _json["components"];
 		{
+			const EntityID		 entityID = world.GetEntityID( _node.entityHandle );
 			for( int childIndex = 0; childIndex < jComponents.size(); childIndex++ )
 			{
 				const Json& jComponent_i = jComponents[childIndex];				
 				unsigned staticIndex = 0;
 				Serializable::LoadUInt( jComponent_i, "component_id", staticIndex );
 				const ComponentIndex componentIndex = world.GetDynamicIndex(staticIndex);
-				const ComponentInfo& info			= world.GetComponentInfo( componentIndex );
-				const EntityID		 entityID		= world.GetEntityID( _node.entityHandle );
+				const ComponentInfo& info			= world.GetComponentInfo( componentIndex );				
 				ecComponent& component			    = world.AddComponent( entityID, componentIndex );				
 				info.load( component, jComponent_i );
 			}
@@ -759,7 +802,7 @@ namespace fan
 			{
 				const Json& jchild_i = jchilds[childIndex];
 				{
-					SceneNode& childNode = _node.scene->CreateSceneNode( "tmp", &_node, false );
+					SceneNode& childNode = _node.scene->InstanciateSceneNode( "tmp", &_node, false );
 					R_LoadFromJson( jchild_i, childNode, _idOffset );
 				}
 			}

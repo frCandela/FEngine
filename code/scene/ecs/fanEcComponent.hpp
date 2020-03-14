@@ -48,18 +48,26 @@ namespace fan
 	static_assert( sizeComponent == 4 );
 
 	//==============================================================================================================================================================
+	// function pointers :
+	// onGui		: draws ui associated with the component
+	// attach		: clears the component value and registers it when necessary
+	// detach		: unregister the component when necessary	(optional)
+	// save			: serializes the component to json
+	// load			: deserializes the component from json
+	// instanciate  : don't touch it, it's auto generated
 	//==============================================================================================================================================================
 	struct ComponentInfo
 	{
-		std::string name;
-		ImGui::IconType icon = ImGui::IconType::NONE;
-		void ( *onGui )( ecComponent& ) = nullptr;
-		void ( *clear )( ecComponent& ) = nullptr;
-		void ( *save )( const ecComponent&, Json& ) = nullptr;
-		void ( *load )( ecComponent&, const Json& ) = nullptr;
+		std::string		name;
+		ImGui::IconType icon = ImGui::IconType::NONE;	// editor icon
+		const char*		editorPath = "";				// editor path
+		ComponentIndex	index;							// dynamic index in the ecsWorld
+		uint32_t		staticIndex;					// static index
+
+		void		 ( *onGui )( ecComponent& ) = nullptr;
+		void		 ( *init  )( ecComponent& ) = nullptr; 
+		void		 ( *save  )( const ecComponent&, Json& ) = nullptr;
+		void		 ( *load  )( ecComponent&, const Json& ) = nullptr;
 		ecComponent& ( *instanciate )( void* ) = nullptr;
-		const char* editorPath = "";
-		ComponentIndex index;
-		uint32_t staticIndex;
 	};
 }

@@ -8,7 +8,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	SphereShape2::SphereShape2() : sphereShape( 1.f ){}
+	SphereShape2::SphereShape2() : sphereShape( 0.5f ){}
 
 	//================================================================================================================================
 	//================================================================================================================================
@@ -16,7 +16,7 @@ namespace fan
 	{
 		_info.icon = ImGui::IconType::SPHERE_SHAPE16;
 		_info.onGui = &SphereShape2::OnGui;
-		_info.clear = &SphereShape2::Clear;
+		_info.init = &SphereShape2::Init;
 		_info.load  = &SphereShape2::Load;
 		_info.save  = &SphereShape2::Save;
 		_info.editorPath = "";
@@ -24,10 +24,11 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void SphereShape2::Clear( ecComponent& _sphereShape )
+	void SphereShape2::Init( ecComponent& _component )
 	{
-		SphereShape2& sphereShape = static_cast<SphereShape2&>( _sphereShape );
+		SphereShape2& sphereShape = static_cast<SphereShape2&>( _component );
 		sphereShape.sphereShape = btSphereShape( 1.f );
+		sphereShape.sphereShape.setUserPointer( nullptr );
 	}
 
 	//================================================================================================================================

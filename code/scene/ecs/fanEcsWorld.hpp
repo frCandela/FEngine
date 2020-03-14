@@ -27,6 +27,7 @@ namespace fan {
 		template< typename _componentType > bool			IsType( const ecComponent& _component );
 		template< typename _componentType >	_componentType& GetSingletonComponent();
 		template< typename _systemType > bool				RunSystem( const float _delta );
+		template< typename _systemType > bool				RunSystemOnSubset( const std::vector<EntityID>& _entities, const float _delta );
 		template< typename _tagOrComponentType > Signature	GetSignature() const;
 
 		ecComponent&		  AddComponent( const EntityID _entityID, const ComponentIndex _index );
@@ -72,6 +73,7 @@ namespace fan {
 		ComponentIndex	m_nextTagIndex = signatureLength - 2;
 
 		Entity& GetEntity( const EntityID _id );
+		bool	EntityMatchSignature( EntityID _entityID, const Signature& _signature );
 	};
 
 	//==============================================================================================================================================================
@@ -147,26 +149,57 @@ namespace fan {
 	template< typename _systemType > bool EcsWorld::RunSystem( const float _delta )
 	{
 		static_assert( std::is_base_of< System, _systemType>::value );
-		std::vector<EntityID> matchEntities;
 
+		// find matching entities in the whole wortd
 		const Signature systemSignature = _systemType::GetSignature( *this );
-
-		matchEntities.reserve( m_entities.size() );
+		std::vector<EntityID> matchingEntities;
+		matchingEntities.reserve( m_entities.size() );
 		for( int entityIndex = 0; entityIndex < m_entities.size(); entityIndex++ )
 		{
-			Entity& entity = m_entities[entityIndex];
-			if( ( entity.signature & systemSignature ) == systemSignature )
+			if( EntityMatchSignature( entityIndex, systemSignature ) )
 			{
-				matchEntities.push_back( entityIndex );
+				matchingEntities.push_back( entityIndex );
 			}
 		}
 
-		if( ! matchEntities.empty() )
+		// run system
+		if( !matchingEntities.empty() )
 		{
-			_systemType::Run( *this, matchEntities, _delta );
-		}		
+			_systemType::Run( *this, matchingEntities, _delta );
+		}
 
-		return ! matchEntities.empty();
+		return !matchingEntities.empty();
+
+	}
+
+	//================================================================================================================================
+	// Runs a system on a subset of entities instead of everything
+	//================================================================================================================================
+	template< typename _systemType > 
+	bool EcsWorld::RunSystemOnSubset( const std::vector<EntityID>& _entities, const float _delta )
+	{
+		static_assert( std::is_base_of< System, _systemType>::value );
+
+		// find matching entities in the subset
+		const Signature systemSignature = _systemType::GetSignature( *this );
+		std::vector<EntityID> matchingEntities;
+		matchingEntities.reserve( _entities.size() );
+		for( int i = 0; i < _entities.size(); i++ )
+		{
+			EntityID entityID = _entities[i];
+			if( EntityMatchSignature( entityID, systemSignature ) )
+			{
+				matchingEntities.push_back( entityID );
+			}
+		}
+
+		// run system
+		if( !matchingEntities.empty() )
+		{
+			_systemType::Run( *this, matchingEntities, _delta );
+		}
+
+		return !matchingEntities.empty();
 	}
 
 	//==============================================================================================================================================================
@@ -192,7 +225,7 @@ namespace fan {
 		// Registers component info
 		ComponentInfo info;
 		_componentType::SetInfo( info );
-		assert( info.clear != nullptr );
+		assert( info.init != nullptr );
 		info.name = _componentType::s_typeName;
 		info.instanciate = &_componentType::Instanciate;
 		info.index = index;	

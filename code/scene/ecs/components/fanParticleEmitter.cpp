@@ -12,7 +12,7 @@ namespace fan
 	{
 		_info.icon = ImGui::IconType::PARTICLES16;
 		_info.onGui = &ParticleEmitter::OnGui;
-		_info.clear = &ParticleEmitter::Clear;
+		_info.init = &ParticleEmitter::Init;
 		_info.load = &ParticleEmitter::Load;
 		_info.save = &ParticleEmitter::Save;
 		_info.editorPath = "";
@@ -20,9 +20,9 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void ParticleEmitter::Clear( ecComponent& _emitter )
+	void ParticleEmitter::Init( ecComponent& _component )
 	{
-		ParticleEmitter& emitter = static_cast<ParticleEmitter&>( _emitter );
+		ParticleEmitter& emitter = static_cast<ParticleEmitter&>( _component );
 
 		emitter.particlesPerSecond = 1;
 		emitter.speed = 1.f;
