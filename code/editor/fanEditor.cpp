@@ -66,6 +66,7 @@
 #include "scene/ecs/components/fanSphereShape2.hpp"
 #include "scene/ecs/components/fanBoxShape2.hpp"
 #include "scene/ecs/components/fanTransformUI.hpp"
+#include "scene/ecs/components/fanUIRenderer.hpp"
 #include "scene/ecs/systems/fanUpdateRenderWorld.hpp"
 #include "editor/singletonComponents/fanEditorCamera.hpp"
 #include "scene/ecs/singletonComponents/fanPhysicsWorld.hpp"
@@ -683,6 +684,7 @@ namespace fan
 		_world.AddComponentType<BoxShape2>();
 		_world.AddComponentType<SphereShape2>();
 		_world.AddComponentType<TransformUI>();
+		_world.AddComponentType<UIRenderer>();
 
 		_world.AddTagType<tag_alwaysUpdate>();
 		_world.AddTagType<tag_editorOnly>();
