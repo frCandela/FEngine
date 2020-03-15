@@ -16,7 +16,7 @@ namespace fan
 		_info.init = &MotionState::Init;
 		_info.save = &MotionState::Save;
 		_info.load = &MotionState::Load;
-		_info.editorPath = "";
+		_info.editorPath = "/";
 	}
 
 	//================================================================================================================================

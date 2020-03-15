@@ -19,7 +19,7 @@ namespace fan
 		_info.init = &BoxShape2::Init;
 		_info.load  = &BoxShape2::Load;
 		_info.save  = &BoxShape2::Save;
-		_info.editorPath = "";
+		_info.editorPath = "/";
 	}
 
 	//================================================================================================================================

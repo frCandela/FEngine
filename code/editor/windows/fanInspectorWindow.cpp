@@ -161,9 +161,17 @@ namespace fan
 
 		if( ImGui::BeginPopup( "new_component" ) )
 		{
-			// Get components 
+			// Get components and remove components with an empty path
 			std::vector< const ComponentInfo*> components;
-			world.GetVectorComponentInfo( components );
+			world.GetVectorComponentInfo( components );			
+			for( int i = (int)components.size() - 1; i >= 0; i-- )
+			{
+				if( std::string( components[i]->editorPath ).empty() )
+				{
+					components.erase( components.begin() + i );
+				}
+			}
+
 
  			// Get components paths
 			std::vector<Path> componentsPath;
@@ -188,10 +196,10 @@ namespace fan
 				++it;
 			}
 
-			// Draw menu items for components at path ""
+			// Draw menu items for components at path "/"
 			for( int componentIndex = 0; componentIndex < components.size(); componentIndex++ )
 			{
-				if( componentsPath[componentIndex] == "" ) 
+				if( componentsPath[componentIndex] == "/" ) 
 				{ 
 					NewComponentItem( *components[componentIndex] ); 
 				}
@@ -216,14 +224,16 @@ namespace fan
 		}
 
 		// Remove trailing slashes
-		while( name[name.size() - 1] == '/' ) { name.erase( name.end() - 1 ); } 
+		while( !name.empty() && name[name.size() - 1] == '/' ) {
+			name.erase( name.end() - 1 ); 
+		} 
 		size_t lastSlash = name.find_last_of( "/" );
 		if( lastSlash != std::string::npos )
 		{
 			name.erase( name.begin(), name.begin() + lastSlash + 1 );
 		}
 
-		if( ImGui::BeginMenu( name.c_str() ) )
+		if( name != "" && ImGui::BeginMenu( name.c_str() ) )
 		{
 			// draw next menu paths
 			std::set< std::filesystem::path >::iterator next = _current;

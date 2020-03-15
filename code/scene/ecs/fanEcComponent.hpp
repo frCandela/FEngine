@@ -60,7 +60,7 @@ namespace fan
 	{
 		std::string		name;
 		ImGui::IconType icon = ImGui::IconType::NONE;	// editor icon
-		const char*		editorPath = "";				// editor path
+		const char*		editorPath = "";				// editor path ( for the addComponent ) popup of the inspector
 		ComponentIndex	index;							// dynamic index in the ecsWorld
 		uint32_t		staticIndex;					// static index
 

@@ -16,7 +16,7 @@ namespace fan
 		_info.init = &UIRenderer2::Init;
 		_info.load = &UIRenderer2::Load;
 		_info.save = &UIRenderer2::Save;
-		_info.editorPath = "";
+		_info.editorPath = "/";
 	}
 
 	//================================================================================================================================

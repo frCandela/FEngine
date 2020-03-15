@@ -16,7 +16,7 @@ namespace fan
 		_info.init = &MeshRenderer2::Init;
 		_info.load = &MeshRenderer2::Load;
 		_info.save = &MeshRenderer2::Save;
-		_info.editorPath = "";
+		_info.editorPath = "/";
 	}
 
 	//================================================================================================================================

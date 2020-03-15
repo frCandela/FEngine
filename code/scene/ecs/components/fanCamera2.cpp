@@ -17,7 +17,7 @@ namespace fan
 		_info.init = &Camera2::Init;
 		_info.load = &Camera2::Load;
 		_info.save = &Camera2::Save;
-		_info.editorPath = "";
+		_info.editorPath = "/";
 	}
 
 	//================================================================================================================================

@@ -15,7 +15,7 @@ namespace fan
 		_info.init = &ParticleEmitter::Init;
 		_info.load = &ParticleEmitter::Load;
 		_info.save = &ParticleEmitter::Save;
-		_info.editorPath = "";
+		_info.editorPath = "/";
 	}
 
 	//================================================================================================================================

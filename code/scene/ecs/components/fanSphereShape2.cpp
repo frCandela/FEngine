@@ -19,7 +19,7 @@ namespace fan
 		_info.init = &SphereShape2::Init;
 		_info.load  = &SphereShape2::Load;
 		_info.save  = &SphereShape2::Save;
-		_info.editorPath = "";
+		_info.editorPath = "/";
 	}
 
 	//================================================================================================================================

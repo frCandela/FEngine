@@ -21,7 +21,7 @@ namespace fan
 		_info.init = &Rigidbody2::Init;
 		_info.load  = &Rigidbody2::Load;
 		_info.save  = &Rigidbody2::Save;
-		_info.editorPath = "";
+		_info.editorPath = "/";
 	}
 	   
 	//================================================================================================================================

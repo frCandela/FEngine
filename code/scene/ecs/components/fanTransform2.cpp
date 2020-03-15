@@ -15,7 +15,7 @@ namespace fan
 		_info.init = &Transform2::Init;
 		_info.save = &Transform2::Save;
 		_info.load = &Transform2::Load;
-		_info.editorPath = "";
+		_info.editorPath = "/";
 	}
 
 	//================================================================================================================================

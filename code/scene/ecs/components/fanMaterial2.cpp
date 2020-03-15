@@ -15,7 +15,7 @@ namespace fan
 		_info.init = &Material2::Init;
 		_info.load  = &Material2::Load;
 		_info.save  = &Material2::Save;
-		_info.editorPath = "";
+		_info.editorPath = "/";
 	}
 
 	//================================================================================================================================

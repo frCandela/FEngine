@@ -15,7 +15,7 @@ namespace fan
 		_info.init = &UITransform2::Init;
 		_info.load = &UITransform2::Load;
 		_info.save = &UITransform2::Save;
-		_info.editorPath = "";
+		_info.editorPath = "/";
 	}
 
 	//================================================================================================================================
