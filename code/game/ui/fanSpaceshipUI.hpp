@@ -8,7 +8,7 @@
 namespace fan
 {
 	class ProgressBar;
-	class UIMeshRenderer;
+	class UIRenderer;
 
 	//================================================================================================================================
 	//================================================================================================================================
@@ -36,7 +36,7 @@ namespace fan
 		ComponentPtr<ProgressBar> m_healthProgress;
 		ComponentPtr<ProgressBar> m_energyProgress;
 		ComponentPtr<ProgressBar> m_signalProgress;
-		ComponentPtr<UIMeshRenderer> m_signalRenderer;
+		ComponentPtr<UIRenderer> m_signalRenderer;
 
 
 		Color GetSignalColor( const float _ratio );

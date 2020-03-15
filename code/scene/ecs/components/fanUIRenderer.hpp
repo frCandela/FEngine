@@ -13,9 +13,9 @@ namespace fan
 
 	//==============================================================================================================================================================
 	//==============================================================================================================================================================
-	struct UIRenderer : public ecComponent
+	struct UIRenderer2 : public ecComponent
 	{
-		DECLARE_COMPONENT( UIRenderer )
+		DECLARE_COMPONENT( UIRenderer2 )
 	public:
 		static void SetInfo( ComponentInfo& _info );
 		static void Init( ecComponent& _component );
@@ -30,5 +30,5 @@ namespace fan
 		glm::ivec2	GetTextureSize() const;
 		Texture*	GetTexture() const { return *texture; }
 	};
-	static constexpr size_t sizeof_UIRenderer = sizeof( UIRenderer );
+	static constexpr size_t sizeof_UIRenderer = sizeof( UIRenderer2 );
 }

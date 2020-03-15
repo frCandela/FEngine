@@ -9,11 +9,11 @@
 
 namespace fan
 {
-	REGISTER_TYPE_INFO( UIMeshRenderer, TypeInfo::Flags::EDITOR_COMPONENT, "ui/" )
+	REGISTER_TYPE_INFO( UIRenderer, TypeInfo::Flags::EDITOR_COMPONENT, "ui/" )
 
 		//================================================================================================================================
 		//================================================================================================================================
-		void UIMeshRenderer::OnAttach()
+		void UIRenderer::OnAttach()
 	{
 		m_uiMesh = new UIMesh();
 		std::vector<UIVertex> vertices = {
@@ -32,7 +32,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void UIMeshRenderer::OnDetach()
+	void UIRenderer::OnDetach()
 	{
 		Component::OnDetach();
 
@@ -41,14 +41,14 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	glm::ivec2	UIMeshRenderer::GetTextureSize() const
+	glm::ivec2	UIRenderer::GetTextureSize() const
 	{
 		return *m_texture != nullptr ? m_texture->GetSize() : glm::ivec2( 0, 0 );
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void UIMeshRenderer::OnGui()
+	void UIRenderer::OnGui()
 	{
 		const btVector2 windowSize = Input::Get().WindowSizeF();
 
@@ -82,7 +82,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void UIMeshRenderer::SetPixelPosition( const glm::ivec2 _position )
+	void UIRenderer::SetPixelPosition( const glm::ivec2 _position )
 	{
 		Transform& transform = m_gameobject->GetTransform();
 		const btVector2 newPosition = 2.f * btVector2( ( float ) _position.x, ( float ) _position.y ) / Input::Get().WindowSizeF() - btVector3::One();
@@ -91,7 +91,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void UIMeshRenderer::SetPixelSize( const glm::ivec2 _size )
+	void UIRenderer::SetPixelSize( const glm::ivec2 _size )
 	{
 		Transform& transform = m_gameobject->GetTransform();
 		btVector2 screenSize = btVector2( ( float ) _size.x, ( float ) _size.y ) / Input::Get().WindowSizeF();
@@ -100,7 +100,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	bool UIMeshRenderer::Load( const Json& _json )
+	bool UIRenderer::Load( const Json& _json )
 	{
 		Serializable::LoadColor( _json, "color", m_color );
 		Serializable::LoadTexturePtr( _json, "texture_path", m_texture );
@@ -111,7 +111,7 @@ namespace fan
 
 	//==========================z======================================================================================================
 	//================================================================================================================================
-	bool UIMeshRenderer::Save( Json& _json ) const
+	bool UIRenderer::Save( Json& _json ) const
 	{
 		Component::Save( _json );
 

@@ -10,9 +10,9 @@ namespace fan
 
 	//==============================================================================================================================================================
 	//==============================================================================================================================================================
-	struct TransformUI : public ecComponent
+	struct UITransform2 : public ecComponent
 	{
-		DECLARE_COMPONENT( TransformUI )
+		DECLARE_COMPONENT( UITransform2 )
 	public:
 		static void SetInfo( ComponentInfo& _info );
 		static void Init( ecComponent& _component );
@@ -20,8 +20,8 @@ namespace fan
 		static void Save( const ecComponent& _component, Json& _json );
 		static void Load( ecComponent& _component, const Json& _json );
 
-		glm::ivec2 position;
-		glm::ivec2 size;
+		glm::vec2 position;
+		glm::vec2 scale;
 	};
-	static constexpr size_t sizeof_transformUI = sizeof( TransformUI );
+	static constexpr size_t sizeof_transformUI = sizeof( UITransform2 );
 }

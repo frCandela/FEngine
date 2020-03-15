@@ -16,7 +16,10 @@ namespace fan
 		DECLARE_SINGLETON_COMPONENT()
 	public:
 		std::vector<DrawMesh>				drawData;
+		std::vector<DrawUIMesh>				uiDrawData;
 		std::vector<DrawPointLight>			pointLights;
 		std::vector<DrawDirectionalLight>	directionalLights;
+
+		glm::vec2 targetSize; // render target size in pixels
 	};
 }

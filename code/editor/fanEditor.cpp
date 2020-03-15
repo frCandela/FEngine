@@ -392,13 +392,16 @@ namespace fan
 	void Engine::UpdateRenderWorld()
 	{
 		EcsWorld& world = m_currentScene->GetWorld();
+		RenderWorld& renderWorld = world.GetSingletonComponent<RenderWorld>();		
+		renderWorld.targetSize = glm::vec2( m_gameWindow->GetSize().x(), m_gameWindow->GetSize().y() );
 
-		// update render data
-		RenderWorld& renderWorld = world.GetSingletonComponent<RenderWorld>();
-		if( ! world.RunSystem<S_UpdateRenderWorldModels>( -1.f ) )			 {	renderWorld.drawData.clear(); }
-		if( ! world.RunSystem<S_UpdateRenderWorldPointLights>( -1.f ) )		 { renderWorld.pointLights.clear(); }
+		// update render data		
+		if( ! world.RunSystem<S_UpdateRenderWorldModels>( -1.f ) )			  {	renderWorld.drawData.clear(); }
+		if( ! world.RunSystem<S_UpdateRenderWorldUI>( -1.f ) )				  { renderWorld.uiDrawData.clear(); }
+		if( ! world.RunSystem<S_UpdateRenderWorldPointLights>( -1.f ) )		  { renderWorld.pointLights.clear(); }
 		if( ! world.RunSystem<S_UpdateRenderWorldDirectionalLights>( -1.f ) ) { renderWorld.directionalLights.clear(); }
 		m_renderer->SetDrawData( renderWorld.drawData );
+		m_renderer->SetUIDrawData( renderWorld.uiDrawData );
 		m_renderer->SetPointLights( renderWorld.pointLights );
 		m_renderer->SetDirectionalLights( renderWorld.directionalLights );
 
@@ -683,8 +686,8 @@ namespace fan
 		_world.AddComponentType<MotionState>();
 		_world.AddComponentType<BoxShape2>();
 		_world.AddComponentType<SphereShape2>();
-		_world.AddComponentType<TransformUI>();
-		_world.AddComponentType<UIRenderer>();
+		_world.AddComponentType<UITransform2>();
+		_world.AddComponentType<UIRenderer2>();
 
 		_world.AddTagType<tag_alwaysUpdate>();
 		_world.AddTagType<tag_editorOnly>();

@@ -14,7 +14,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	class UIMeshRenderer : public Component
+	class UIRenderer : public Component
 	{
 	public:
 
@@ -32,7 +32,7 @@ namespace fan
 		void OnGui() override;
 		virtual ImGui::IconType GetIcon() const { return ImGui::IconType::IMAGE16; };
 
-		DECLARE_TYPE_INFO( UIMeshRenderer, Component );
+		DECLARE_TYPE_INFO( UIRenderer, Component );
 
 	protected:
 		bool Load( const Json& _json ) override;

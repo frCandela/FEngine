@@ -51,6 +51,44 @@ namespace fan
 
 	//==============================================================================================================================================================
 	//==============================================================================================================================================================
+	struct 	S_UpdateRenderWorldUI : System
+	{
+		static Signature GetSignature( const EcsWorld& _world )
+		{
+			return _world.GetSignature<UIRenderer2>()
+				|  _world.GetSignature<UITransform2>();
+		}
+		static void Run( EcsWorld& _world, const std::vector<EntityID>& _entities, const float _delta )
+		{
+			RenderWorld& renderWorld = _world.GetSingletonComponent<RenderWorld>();
+			renderWorld.uiDrawData.clear();				
+
+			// get all mesh and adds them to the render world
+			for( EntityID id : _entities )
+			{
+				UIRenderer2&  renderer = _world.GetComponent<UIRenderer2>( id );
+				UITransform2& transform = _world.GetComponent<UITransform2>( id );
+
+				if( renderer.GetTexture() == nullptr ) { continue; }
+
+				const glm::vec2 textureSize = renderer.GetTexture()->GetSize();
+				const glm::vec2 imageRatio = textureSize / renderWorld.targetSize;
+				const glm::vec2 positionRatio = 2.f *transform.position / renderWorld.targetSize;
+
+				DrawUIMesh data;
+				data.mesh  = &renderer.uiMesh;
+				data.scale = transform.scale * imageRatio;
+				data.position = positionRatio - glm::vec2(1,1);
+				data.color = renderer.color.ToGLM();
+				data.textureIndex = renderer.GetTexture() != nullptr ? renderer.GetTexture()->GetRenderID() : 0;
+
+				renderWorld.uiDrawData.push_back( data );
+			}
+		}
+	};
+
+	//==============================================================================================================================================================
+	//==============================================================================================================================================================
 	struct S_UpdateRenderWorldPointLights : System
 	{
 		static Signature GetSignature( const EcsWorld& _world )
@@ -85,7 +123,7 @@ namespace fan
 	};
 
 	//==============================================================================================================================================================
-//==============================================================================================================================================================
+	//==============================================================================================================================================================
 	struct S_UpdateRenderWorldDirectionalLights : System
 	{
 		static Signature GetSignature( const EcsWorld& _world )
