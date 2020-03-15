@@ -299,17 +299,17 @@ namespace fan
 		//m_ecsManager->LateUpdate( delta );@hack
 		EndFrame();
 
-		ImGui::Begin( "physicsWorld" );
-		{
-			ImGui::PushID( &physicsWorld );
-			ImGui::Text( "num %d", physicsWorld.dynamicsWorld->getNumCollisionObjects() );
-			ImGui::PopID();
+// 		ImGui::Begin( "physicsWorld" );
+// 		{
+// 			ImGui::PushID( &physicsWorld );
+// 			ImGui::Text( "num %d", physicsWorld.dynamicsWorld->getNumCollisionObjects() );
+// 			ImGui::PopID();
 
 // 			ImGui::Text( "m_actors         %d", m_actors.size());
 // 			ImGui::Text( "m_startingActors %d", m_startingActors.size() );
 // 			ImGui::Text( "m_activeActors   %d", m_activeActors.size() );
 // 			ImGui::Text( "m_pausedActors   %d", m_pausedActors.size() );
-		}ImGui::End();
+		//}ImGui::End();
 	}
 
 	//================================================================================================================================

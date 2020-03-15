@@ -18,6 +18,8 @@ namespace fan
 	};
 
 	namespace Serializable {
+
+		void SaveIVec2( Json& _json, const char* _name, const glm::ivec2& _vec2 );
 		void SaveVec2(Json& _json, const char* _name, const btVector2& _vec2);
 		void SaveVec3(Json& _json, const char* _name, const btVector3& _vec3);
 		void SaveVec4(Json& _json, const char* _name, const btVector4& _vec4);
@@ -30,6 +32,7 @@ namespace fan
 		void SaveBool(Json& _json, const char* _name, const bool& _bool);
 		void SaveString(Json& _json, const char* _name, const std::string& _string);
 
+		bool LoadIVec2( const Json& _json, const char* _name, glm::ivec2& _outVec2 );
 		bool LoadVec2(const Json& _json, const char* _name, btVector2& _outVec2);
 		bool LoadVec3(const Json& _json, const char* _name, btVector3& _outVec3);
 		bool LoadVec4(const Json& _json, const char* _name, btVector4& _outVec4);
