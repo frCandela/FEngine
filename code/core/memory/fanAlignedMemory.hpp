@@ -1,6 +1,7 @@
 #pragma once
 
 #include "core/fanCorePrecompiled.hpp"
+#include <stdlib.h>
 
 namespace fan
 {
@@ -18,7 +19,7 @@ namespace fan
 
 		~AlignedMemory()
 		{
-			btAlignedFree( m_data );
+			AlignedFree( m_data );
 		}
 
 		size_t	Alignment() const { return m_alignment; }
@@ -37,12 +38,12 @@ namespace fan
 
 			void* oldData = m_data;
 
-			m_data = btAlignedAlloc( _size * m_alignment, ( int ) m_alignment );
+			m_data = AlignedMalloc( _size * m_alignment, ( int ) m_alignment );
 
 			if ( oldData != nullptr )
 			{
 				memcpy( m_data, oldData, m_size );
-				btAlignedFree( oldData );
+				AlignedFree( oldData );
 				oldData = nullptr;
 			}
 
@@ -62,5 +63,34 @@ namespace fan
 		void* m_data;
 		size_t m_size;
 		size_t m_alignment;
+
+		//================================================================================================================================
+		//================================================================================================================================
+		void* AlignedMalloc( size_t _size, size_t _alignment )
+		{
+			void* data = nullptr;
+#if defined(_MSC_VER) || defined(__MINGW32__)
+			data = _aligned_malloc( _size, _alignment );
+#else 
+			int res = posix_memalign( &data, _alignment, _size );
+			if( res != 0 )
+				data = nullptr;
+#endif
+			return data;
+		}
+
+		//================================================================================================================================
+		//================================================================================================================================
+		void AlignedFree( void* _data )
+		{
+			if( _data != nullptr )
+			{
+#if	defined(_MSC_VER) || defined(__MINGW32__)
+				_aligned_free( _data );
+#else 
+				free( _data );
+#endif
+			}
+		}
 	};
 }
