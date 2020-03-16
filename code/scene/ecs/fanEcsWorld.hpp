@@ -19,6 +19,7 @@ namespace fan {
 	{
 	public:
 		EcsWorld( void ( *initializeTypes )( EcsWorld& ) );
+		~EcsWorld();
 
 		template< typename _componentType >	bool			HasComponent( const EntityID _entityID );
 		template< typename _componentType >	_componentType&	GetComponent( const EntityID _entityID );
@@ -169,9 +170,10 @@ namespace fan {
 	{
 		static_assert( std::is_base_of< ecComponent, _componentType>::value );
 		assert( m_nextTagIndex >= m_nextTypeIndex );
-		ComponentsCollection chunck;
-		chunck.Init<_componentType>( _componentType::s_typeName );
-		m_components.push_back( chunck );
+
+		m_components.push_back( ComponentsCollection() );
+		ComponentsCollection& collection = m_components[m_components.size() - 1];
+		collection.Init<_componentType>( _componentType::s_typeName );
 		const ComponentIndex index = m_nextTypeIndex++;
 		m_typeIndices[_componentType::s_typeInfo] = index;
 
@@ -201,6 +203,7 @@ namespace fan {
 	{
 		static_assert( std::is_base_of< SingletonComponent, _componentType>::value );
 		assert( m_singletonComponents.find( _componentType::s_typeInfo ) == m_singletonComponents.end() );
-		m_singletonComponents[_componentType::s_typeInfo] = new _componentType();
+		_componentType * component = new _componentType();
+		m_singletonComponents[_componentType::s_typeInfo] = component;
 	}
 }

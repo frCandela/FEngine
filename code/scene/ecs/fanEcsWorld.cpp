@@ -2,6 +2,7 @@
 
 #include "fanEcComponent.hpp"
 #include "fanTag.hpp"
+#include "scene/ecs/fanSingletonComponent.hpp"
 
 namespace fan
 {
@@ -10,6 +11,17 @@ namespace fan
 	EcsWorld::EcsWorld( void ( *initializeTypes )( EcsWorld& ) )
 	{
 		initializeTypes( *this );
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
+	EcsWorld::~EcsWorld()
+	{
+		// delete singleton components
+		for ( std::pair<uint32_t, SingletonComponent*> pair : m_singletonComponents )
+		{
+			delete pair.second;
+		}
 	}
 
 	//================================================================================================================================

@@ -57,7 +57,7 @@ namespace fan
 			for( int componentIndex = 0; componentIndex < components.size(); componentIndex++ )
 			{
 				const ComponentsCollection& collection = components[componentIndex];
-				const std::vector< ComponentsCollection::Chunck >& chunks = collection.m_chunks;
+				const std::vector< ComponentsCollection::Chunck >& chunks = collection.GetChuncks();
 
 				size_t numElements = 0;
 				for( int chunckIndex = 0; chunckIndex < chunks.size(); chunckIndex++ )
@@ -65,11 +65,11 @@ namespace fan
 					numElements += chunks[chunckIndex].count;
 				}
 
-				ImGui::Text( collection.m_name.c_str() );
+				ImGui::Text( collection.GetName().c_str() );
 				if( ImGui::IsItemHovered() )
 				{
 					ImGui::BeginTooltip();
-					ImGui::Text( "chunk length: %u", collection.m_componentCount );
+					ImGui::Text( "chunk length: %u", collection.GetComponentCount() );
 					ImGui::TextUnformatted( "to recycle" );
 					for( int chunckIndex = 0; chunckIndex < chunks.size(); chunckIndex++ )
 					{
@@ -88,7 +88,7 @@ namespace fan
 
 				// size of a chunk in Ko
 				ImGui::NextColumn();
-				ImGui::Text( std::to_string( chunks.size() * collection.m_componentCount * collection.m_componentSize / 1000 ).c_str() );
+				ImGui::Text( std::to_string( chunks.size() * collection.GetComponentCount() * collection.GetComponentSize() / 1000 ).c_str() );
 
 				ImGui::NextColumn();
 			}
