@@ -234,4 +234,40 @@ namespace fan
 			}
 		}
 	}
+
+	//================================================================================================================================
+	// Find all entities matching the signature of the system
+	//================================================================================================================================
+	std::vector<EntityID> EcsWorld::Match( const Signature _signature )
+	{
+		// find matching entities in the whole world
+		std::vector<EntityID> matchingEntities;
+		matchingEntities.reserve( m_entities.size() );
+		for( int entityIndex = 0; entityIndex < m_entities.size(); entityIndex++ )
+		{
+			if( EntityMatchSignature( entityIndex, _signature ) )
+			{
+				matchingEntities.push_back( entityIndex );
+			}
+		}
+		return matchingEntities;
+	}
+
+	//================================================================================================================================
+	// Find all entities matching the signature of the system in the provided entities subset
+	//================================================================================================================================
+	std::vector<EntityID>	EcsWorld::MatchSubset( const Signature _signature, const std::vector<EntityID>& _subset )
+	{
+		// find matching entities in the subset
+		std::vector<EntityID> matchingEntities;
+		matchingEntities.reserve( _subset.size() );
+		for( EntityID entityID : _subset )
+		{
+			if( EntityMatchSignature( entityID, _signature ) )
+			{
+				matchingEntities.push_back( entityID );
+			}
+		}
+		return matchingEntities;
+	}
 }

@@ -114,8 +114,8 @@ namespace fan
 		bool		m_isServer = false;
 
 		SceneInstantiate* m_instantiate = nullptr;
-		PhysicsManager* m_physicsManager = nullptr;
-		EcsWorld* m_ecsWorld = nullptr;
+		PhysicsManager*   m_physicsManager = nullptr;
+		EcsWorld*         m_ecsWorld = nullptr;
 
 		// References
 		SceneNode * m_rootNode = nullptr;

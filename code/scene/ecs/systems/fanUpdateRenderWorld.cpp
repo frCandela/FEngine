@@ -26,7 +26,7 @@ namespace fan
 
 	//==============================================================================================================================================================
 	//==============================================================================================================================================================
-	void S_UpdateRenderWorldModels::Run( EcsWorld& _world, const std::vector<EntityID>& _entities, const float _delta )
+	void S_UpdateRenderWorldModels::Run( EcsWorld& _world, const std::vector<EntityID>& _entities )
 	{
 		RenderWorld& renderWorld = _world.GetSingletonComponent<RenderWorld>();
 		renderWorld.drawData.clear();
@@ -64,7 +64,7 @@ namespace fan
 
 	//==============================================================================================================================================================
 	//==============================================================================================================================================================
-	void S_UpdateRenderWorldUI::Run( EcsWorld& _world, const std::vector<EntityID>& _entities, const float _delta )
+	void S_UpdateRenderWorldUI::Run( EcsWorld& _world, const std::vector<EntityID>& _entities )
 	{
 		RenderWorld& renderWorld = _world.GetSingletonComponent<RenderWorld>();
 		renderWorld.uiDrawData.clear();
@@ -102,7 +102,7 @@ namespace fan
 
 	//==============================================================================================================================================================
 	//==============================================================================================================================================================
-	void S_UpdateRenderWorldPointLights::Run( EcsWorld& _world, const std::vector<EntityID>& _entities, const float _delta )
+	void S_UpdateRenderWorldPointLights::Run( EcsWorld& _world, const std::vector<EntityID>& _entities )
 	{
 		RenderWorld& renderWorld = _world.GetSingletonComponent<RenderWorld>();
 		renderWorld.pointLights.clear();
@@ -136,7 +136,7 @@ namespace fan
 
 	//==============================================================================================================================================================
 	//==============================================================================================================================================================
-	void S_UpdateRenderWorldDirectionalLights::Run( EcsWorld& _world, const std::vector<EntityID>& _entities, const float _delta )
+	void S_UpdateRenderWorldDirectionalLights::Run( EcsWorld& _world, const std::vector<EntityID>& _entities )
 	{
 		RenderWorld& renderWorld = _world.GetSingletonComponent<RenderWorld>();
 		renderWorld.directionalLights.clear();

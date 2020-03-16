@@ -315,7 +315,12 @@ namespace fan
 					EcsWorld& world = m_currentScene->GetWorld();
 					if ( m_mainMenuBar->ShowWireframe() ) { DrawWireframe(); }
 					if ( m_mainMenuBar->ShowNormals() ) { DrawNormals(); }
-					if( m_mainMenuBar->ShowAABB() ) { world.RunSystem<S_DrawDebugBounds>( -1.f ); }
+					if( m_mainMenuBar->ShowAABB() ) 
+					{ 
+						const Signature signatureDrawDebugBounds = S_DrawDebugBounds::GetSignature( world );
+						S_DrawDebugBounds::Run( world, world.Match( signatureDrawDebugBounds ) );
+					}
+
 					if ( m_mainMenuBar->ShowHull() ) { DrawHull(); }
 					DrawLightGizmos();
 				}
@@ -408,11 +413,16 @@ namespace fan
 		RenderWorld& renderWorld = world.GetSingletonComponent<RenderWorld>();		
 		renderWorld.targetSize = glm::vec2( m_gameWindow->GetSize().x(), m_gameWindow->GetSize().y() );
 
-		// update render data		
-		if( ! world.RunSystem<S_UpdateRenderWorldModels>( -1.f ) )			  {	renderWorld.drawData.clear(); }
-		if( ! world.RunSystem<S_UpdateRenderWorldUI>( -1.f ) )				  { renderWorld.uiDrawData.clear(); }
-		if( ! world.RunSystem<S_UpdateRenderWorldPointLights>( -1.f ) )		  { renderWorld.pointLights.clear(); }
-		if( ! world.RunSystem<S_UpdateRenderWorldDirectionalLights>( -1.f ) ) { renderWorld.directionalLights.clear(); }
+		const Signature signatureURModels = S_UpdateRenderWorldModels::GetSignature( world );
+		const Signature signatureURUI = S_UpdateRenderWorldUI::GetSignature( world );
+		const Signature signatureURPointLights = S_UpdateRenderWorldPointLights::GetSignature( world );
+		const Signature signatureURDirectionalLights = S_UpdateRenderWorldDirectionalLights::GetSignature( world );
+
+		// update render data
+		S_UpdateRenderWorldModels::Run( world, world.Match( signatureURModels ) );
+		S_UpdateRenderWorldUI::Run( world, world.Match( signatureURUI ) );
+		S_UpdateRenderWorldPointLights::Run( world, world.Match( signatureURPointLights ) );
+		S_UpdateRenderWorldDirectionalLights::Run( world, world.Match( signatureURDirectionalLights ) );
 
 		// particles mesh
 		DrawMesh particlesDrawData;

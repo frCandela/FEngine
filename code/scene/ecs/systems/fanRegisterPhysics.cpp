@@ -19,7 +19,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void S_RegisterAllRigidbodies::Run( EcsWorld& _world, const std::vector<EntityID>& _entities, const float _delta )
+	void S_RegisterAllRigidbodies::Run( EcsWorld& _world, const std::vector<EntityID>& _entities )
 	{
 		PhysicsWorld& physicsWorld = _world.GetSingletonComponent<PhysicsWorld>();
 		for( EntityID entityID : _entities )
@@ -61,7 +61,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void S_UnregisterAllRigidbodies::Run( EcsWorld& _world, const std::vector<EntityID>& _entities, const float _delta )
+	void S_UnregisterAllRigidbodies::Run( EcsWorld& _world, const std::vector<EntityID>& _entities )
 	{
 		PhysicsWorld& physicsWorld = _world.GetSingletonComponent<PhysicsWorld>();
 		for( EntityID entityID : _entities )

@@ -20,8 +20,8 @@
 #include "ecs/components/fanRigidbody2.hpp"
 #include "scene/ecs/systems/fanSynchronizeMotionStates.hpp"
 #include "scene/ecs/systems/fanRegisterPhysics.hpp"
-#include "scene/ecs/systems/fanEmitParticles.hpp"
 #include "scene/ecs/systems/fanUpdateParticles.hpp"
+#include "scene/ecs/systems/fanEmitParticles.hpp"
 #include "scene/ecs/systems/fanGenerateParticles.hpp"
 #include "scene/ecs/systems/fanUpdateBounds.hpp"
 #include "ecs/singletonComponents/fanPhysicsWorld.hpp"
@@ -120,7 +120,8 @@ namespace fan
 			{
 				entities.push_back( m_ecsWorld->GetEntityID( node->entityHandle ) );
 			}
-			m_ecsWorld->RunSystemOnSubset<S_RegisterAllRigidbodies>( entities, -1.f );
+			Signature signature = S_RegisterAllRigidbodies::GetSignature( *m_ecsWorld );
+			S_RegisterAllRigidbodies::Run( *m_ecsWorld,  m_ecsWorld->MatchSubset( signature, entities ) );
 		}
 
 		return prefabRoot;
@@ -296,45 +297,44 @@ namespace fan
 		{
 			//const float delta = m_state == State::PLAYING ? _delta : 0.f;
 
-			//m_ecsManager->UpdatePrePhysics( delta );@hack;
+			//RUN_SYSTEM( ecsPlanetsSystem, Run );
+			
+			const Signature signatureSMSFT = S_SynchronizeMotionStateFromTransform::GetSignature( *m_ecsWorld );
+			const Signature signatureSTFMS = S_SynchronizeTransformFromMotionState::GetSignature( *m_ecsWorld );
+			const Signature signatureUpdateParticles = S_UpdateParticles::GetSignature( *m_ecsWorld );
+			const Signature signatureEmitParticles = S_EmitParticles::GetSignature( *m_ecsWorld );
+			const Signature signatureGenParticles = S_GenerateParticles::GetSignature( *m_ecsWorld );
+			const Signature signatureUpdateBoundsFromRigidbody = S_UpdateBoundsFromRigidbody::GetSignature( *m_ecsWorld );
+			const Signature signatureUpdateBoundsFromModel = S_UpdateBoundsFromModel::GetSignature( *m_ecsWorld );
+			const Signature signatureUpdateBoundsFromTransform = S_UpdateBoundsFromTransform::GetSignature( *m_ecsWorld );
+
+			// physics
 			PhysicsWorld& physicsWorld = m_ecsWorld->GetSingletonComponent<PhysicsWorld>();
-
-			m_ecsWorld->RunSystem<S_SynchronizeMotionStateFromTransform>( _delta );
+			S_SynchronizeMotionStateFromTransform::Run( *m_ecsWorld, m_ecsWorld->Match( signatureSMSFT ), _delta );
 			physicsWorld.dynamicsWorld->stepSimulation( _delta, 10, Time::Get().GetPhysicsDelta() );
-			m_ecsWorld->RunSystem<S_SynchronizeTransformFromMotionState>( _delta );
-			//m_ecsManager->UpdatePostPhysics( delta );@hack
+			S_SynchronizeTransformFromMotionState::Run( *m_ecsWorld, m_ecsWorld->Match( signatureSTFMS ), _delta );
 
-			m_ecsWorld->RunSystem<S_UpdateParticles>( _delta );
-			m_ecsWorld->RunSystem<S_EmitParticles>( _delta );
-			if(  !m_ecsWorld->RunSystem<S_GenerateParticles>( _delta ) )
-			{
-				// clears particles mesh
-				RenderWorld& renderWorld = m_ecsWorld->GetSingletonComponent<RenderWorld>();
-				renderWorld.particlesMesh.LoadFromVertices( {} );
-			}
+			// particles
+			S_UpdateParticles::Run( *m_ecsWorld, m_ecsWorld->Match( signatureUpdateParticles ), _delta );
+			S_EmitParticles::Run( *m_ecsWorld, m_ecsWorld->Match( signatureEmitParticles ), _delta );
+			//RUN_SYSTEM( ecsParticleSunlightOcclusionSystem, Run );
+
+			// clears particles mesh
+			S_GenerateParticles::Run( *m_ecsWorld, m_ecsWorld->Match( signatureGenParticles ), _delta );
+
 			//UpdateActors( _delta );
 
-			//m_ecsManager->Update( delta );@hack
-			//LateUpdateActors( _delta );
-			m_ecsWorld->RunSystem<S_UpdateBoundsFromRigidbody>( _delta );
-			m_ecsWorld->RunSystem<S_UpdateBoundsFromModel>( _delta );
-			m_ecsWorld->RunSystem<S_UpdateBoundsFromTransform>( _delta );
 			
-			//m_ecsManager->LateUpdate( delta );@hack
+			//RUN_SYSTEM( ecsSolarEruptionMeshSystem, Run );
+
+			//LateUpdateActors( _delta );
+			S_UpdateBoundsFromRigidbody::Run( *m_ecsWorld, m_ecsWorld->Match( signatureUpdateBoundsFromRigidbody ), _delta );
+			S_UpdateBoundsFromModel::Run( *m_ecsWorld, m_ecsWorld->Match( signatureUpdateBoundsFromModel ), _delta );
+			S_UpdateBoundsFromTransform::Run( *m_ecsWorld, m_ecsWorld->Match( signatureUpdateBoundsFromTransform ), _delta );
+			
+			//RUN_SYSTEM( ecsUpdateBullet, Run );
 		}
 		EndFrame();
-
-// 		ImGui::Begin( "physicsWorld" );
-// 		{
-// 			ImGui::PushID( &physicsWorld );
-// 			ImGui::Text( "num %d", physicsWorld.dynamicsWorld->getNumCollisionObjects() );
-// 			ImGui::PopID();
-
-// 			ImGui::Text( "m_actors         %d", m_actors.size());
-// 			ImGui::Text( "m_startingActors %d", m_startingActors.size() );
-// 			ImGui::Text( "m_activeActors   %d", m_activeActors.size() );
-// 			ImGui::Text( "m_pausedActors   %d", m_pausedActors.size() );
-		//}ImGui::End();
 	}
 
 	//================================================================================================================================
@@ -595,7 +595,9 @@ namespace fan
 	//================================================================================================================================
 	void Scene::Clear()
 	{
-		m_ecsWorld->RunSystem<S_UnregisterAllRigidbodies>( -1.f );
+		const Signature signatureUnregisterAllRigidbodies = S_UnregisterAllRigidbodies::GetSignature( *m_ecsWorld );
+		S_UnregisterAllRigidbodies::Run( *m_ecsWorld, m_ecsWorld->Match( signatureUnregisterAllRigidbodies ) );
+
 		m_path = "";
 		m_instantiate->Clear();
 		DeleteNodesImmediate( { m_rootNode } );
@@ -776,7 +778,8 @@ namespace fan
 			inStream.close();
 			nextUniqueID = R_FindMaximumId( *m_rootNode ) + 1;
 
-			m_ecsWorld->RunSystem<S_RegisterAllRigidbodies>( -1.f );
+			const Signature signatureRegisterAllRigidbodies = S_RegisterAllRigidbodies::GetSignature( *m_ecsWorld );
+			S_RegisterAllRigidbodies::Run( *m_ecsWorld, m_ecsWorld->Match( signatureRegisterAllRigidbodies ) );
 			//m_instantiate->ResolveGameobjectPtr( 0 );
 			//m_instantiate->ResolveComponentPtr( 0 );
 

@@ -16,7 +16,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void S_DrawDebugBounds::Run( EcsWorld& _world, const std::vector<EntityID>& _entities, const float _delta )
+	void S_DrawDebugBounds::Run( EcsWorld& _world, const std::vector<EntityID>& _entities )
 	{
 		for( EntityID entityID : _entities )
 		{
