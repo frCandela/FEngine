@@ -21,6 +21,9 @@
 #include "ecs/singletonComponents/fanPhysicsWorld.hpp"
 #include "scene/ecs/systems/fanSynchronizeMotionStates.hpp"
 #include "scene/ecs/systems/fanRegisterPhysics.hpp"
+#include "scene/ecs/systems/fanEmitParticles.hpp"
+#include "scene/ecs/systems/fanUpdateParticles.hpp"
+#include "scene/ecs/systems/fanGenerateParticles.hpp"
 
 namespace fan
 {
@@ -284,19 +287,30 @@ namespace fan
 	{
 		SCOPED_PROFILE( scene_update );
 		BeginFrame();
+		{
+			//const float delta = m_state == State::PLAYING ? _delta : 0.f;
 
-		//const float delta = m_state == State::PLAYING ? _delta : 0.f;
+			//m_ecsManager->UpdatePrePhysics( delta );@hack;
+			PhysicsWorld& physicsWorld = m_ecsWorld->GetSingletonComponent<PhysicsWorld>();
 
-		//m_ecsManager->UpdatePrePhysics( delta );@hack;
-		PhysicsWorld& physicsWorld = m_ecsWorld->GetSingletonComponent<PhysicsWorld>();
-		m_ecsWorld->RunSystem<S_SynchronizeMotionStateFromTransform>( _delta );		
-		physicsWorld.dynamicsWorld->stepSimulation( _delta, 10, Time::Get().GetPhysicsDelta() );
-		//m_ecsManager->UpdatePostPhysics( delta );@hack
-		m_ecsWorld->RunSystem<S_SynchronizeTransformFromMotionState>( _delta );
-		UpdateActors( _delta );
-		//m_ecsManager->Update( delta );@hack
-		LateUpdateActors( _delta );
-		//m_ecsManager->LateUpdate( delta );@hack
+			m_ecsWorld->RunSystem<S_SynchronizeMotionStateFromTransform>( _delta );
+			physicsWorld.dynamicsWorld->stepSimulation( _delta, 10, Time::Get().GetPhysicsDelta() );
+			m_ecsWorld->RunSystem<S_SynchronizeTransformFromMotionState>( _delta );
+			//m_ecsManager->UpdatePostPhysics( delta );@hack
+
+			m_ecsWorld->RunSystem<S_UpdateParticles>( _delta );
+			m_ecsWorld->RunSystem<S_EmitParticles>( _delta );
+			if(  !m_ecsWorld->RunSystem<S_GenerateParticles>( _delta ) )
+			{
+				RenderWorld& renderWorld = m_ecsWorld->GetSingletonComponent<RenderWorld>();
+				renderWorld.particlesMesh.LoadFromVertices( {} );
+			}
+			//UpdateActors( _delta );
+
+			//m_ecsManager->Update( delta );@hack
+			//LateUpdateActors( _delta );
+			//m_ecsManager->LateUpdate( delta );@hack
+		}
 		EndFrame();
 
 // 		ImGui::Begin( "physicsWorld" );

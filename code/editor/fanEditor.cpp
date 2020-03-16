@@ -60,6 +60,7 @@
 #include "scene/ecs/components/fanDirectionalLight2.hpp"
 #include "scene/ecs/components/fanpointLight2.hpp"
 #include "scene/ecs/components/fanParticleEmitter.hpp"
+#include "scene/ecs/components/fanParticle.hpp"
 #include "scene/ecs/components/fanCamera2.hpp"
 #include "scene/ecs/components/fanRigidbody2.hpp"
 #include "scene/ecs/components/fanMotionState.hpp"
@@ -400,6 +401,17 @@ namespace fan
 		if( ! world.RunSystem<S_UpdateRenderWorldUI>( -1.f ) )				  { renderWorld.uiDrawData.clear(); }
 		if( ! world.RunSystem<S_UpdateRenderWorldPointLights>( -1.f ) )		  { renderWorld.pointLights.clear(); }
 		if( ! world.RunSystem<S_UpdateRenderWorldDirectionalLights>( -1.f ) ) { renderWorld.directionalLights.clear(); }
+
+		// particles mesh
+		DrawMesh particlesDrawData;
+		particlesDrawData.mesh = &renderWorld.particlesMesh;
+		particlesDrawData.modelMatrix = glm::mat4( 1.f );
+		particlesDrawData.normalMatrix = glm::mat4( 1.f );
+		particlesDrawData.color = glm::vec4( 1.f, 1.f, 1.f, 1.f );
+		particlesDrawData.shininess = 1;
+		particlesDrawData.textureIndex = 1;
+		renderWorld.drawData.push_back( particlesDrawData );
+
 		m_renderer->SetDrawData( renderWorld.drawData );
 		m_renderer->SetUIDrawData( renderWorld.uiDrawData );
 		m_renderer->SetPointLights( renderWorld.pointLights );
@@ -682,6 +694,7 @@ namespace fan
 		_world.AddComponentType<Material2>();
 		_world.AddComponentType<Camera2>();
 		_world.AddComponentType<ParticleEmitter>();
+		_world.AddComponentType<Particle>();
 		_world.AddComponentType<Rigidbody2>();
 		_world.AddComponentType<MotionState>();
 		_world.AddComponentType<BoxShape2>();

@@ -10,6 +10,8 @@ namespace fan
 	struct ComponentInfo;
 
 	//==============================================================================================================================================================
+	// Emits particles 
+	// timeAccumulator is used to keep track of time to spawn particles with proper timing
 	//==============================================================================================================================================================
 	struct ParticleEmitter : public ecComponent
 	{
@@ -26,6 +28,7 @@ namespace fan
 		float			duration;
 		btVector3		offset;
 		Color			color;
+
 		float			timeAccumulator;
 	};
 	static constexpr size_t sizeof_particleEmitter = sizeof( ParticleEmitter );
