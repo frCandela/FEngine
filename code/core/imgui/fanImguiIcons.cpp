@@ -18,7 +18,7 @@ namespace ImGui
 	//================================================================================================================================
 	//================================================================================================================================
 	const IconImpl::IconData IconImpl::s_iconsList[ IconType::NUM_ICONS ] = {
-		 DECL_ICON( 32.f, 0,0 )	// NONE
+		 DECL_ICON( 16.f, 0,0 )	// NONE
 
 		// editor windows
 		,DECL_ICON( 16.f, 1, 4 )  // IMGUI16,
@@ -35,10 +35,10 @@ namespace ImGui
 		,DECL_ICON( 16.f, 1, 6 )  // PREFAB16,
 		,DECL_ICON( 16.f, 2, 6 )  // MESH16,
 
-		,DECL_ICON( 16.f, 0, 0 )  // PLAY16
-		,DECL_ICON( 16.f, 1, 0 )  // PAUSE16
-		,DECL_ICON( 16.f, 2, 0 )  // STEP16
-		,DECL_ICON( 16.f, 3, 0 )  // STOP16
+		,DECL_ICON( 16.f, 1, 0 )  // PLAY16
+		,DECL_ICON( 16.f, 2, 0 )  // PAUSE16
+		,DECL_ICON( 16.f, 3, 0 )  // STEP16
+		,DECL_ICON( 16.f, 4, 0 )  // STOP16
 
 		// scene components
 		,DECL_ICON( 16.f, 0, 8 )  // IMAGE16,
