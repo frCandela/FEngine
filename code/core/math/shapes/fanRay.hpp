@@ -15,6 +15,11 @@ namespace fan
 
 		btVector3 origin;
 		btVector3 direction;
+
+		bool operator==( const Ray& _other ) const
+		{
+			return origin == _other.origin && direction == _other.direction;
+		}
 	};
 }
 

@@ -18,6 +18,7 @@
 #include "scene/fanGameobject.hpp"
 #include "scene/fanScene.hpp"
 #include "render/fanMesh.hpp"
+#include "scene/ecs/systems/fanRaycast.hpp"
 #include "scene/ecs/fanEcsWorld.hpp"
 
 namespace fan
@@ -49,11 +50,14 @@ namespace fan
 	//================================================================================================================================
 	void EditorSelection::Update( const bool _gameWindowHovered )
 	{
-		SCOPED_PROFILE( selection )
+		SCOPED_PROFILE( selection );
+
+		//RunSystem<SceneNode>( 42.f, std::string(" bwa") );
 
 		bool mouseCaptured = false;
+		
 
-		// Translation gizmo on selected scene node
+		// translation gizmo on selected scene node
 		if ( m_selectedSceneNode != nullptr && m_selectedSceneNode != &m_currentScene->GetMainCamera() )
 // 			 && m_selectedSceneNode->GetComponent<UIMeshRenderer>() == nullptr @hack
 // 			 && m_selectedSceneNode->GetComponent<UITransform>() == nullptr )
@@ -73,49 +77,42 @@ namespace fan
 			}
 		}
 
-		// Mouse selection
-// 		if ( !mouseCaptured && _gameWindowHovered && Mouse::Get().GetButtonPressed( Mouse::button0 ) )
-// 		{
-// 			const btVector3 cameraOrigin = m_currentScene->GetMainCamera().GetGameobject().GetTransform().GetPosition();
-// 			const Ray ray = m_currentScene->GetMainCamera().ScreenPosToRay( Mouse::Get().GetScreenSpacePosition() );
-// 			const std::vector<Gameobject*>& entities = m_currentScene->BuildEntitiesList();
-// 
-// 			// raycast on all the entities
-// 			Gameobject* closestGameobject = nullptr;
-// 			float closestDistance2 = std::numeric_limits<float>::max();
-// 			for ( int gameobjectIndex = 0; gameobjectIndex < entities.size(); gameobjectIndex++ )
-// 			{
-// 				Gameobject* gameobject = entities[ gameobjectIndex ];
-// 
-// 				if ( gameobject == &m_currentScene->GetMainCamera().GetGameobject() )
-// 				{
-// 					continue;
-// 				}
-// 
-// 				const AABB& aabb = gameobject->GetAABB();
-// 				btVector3 intersection;
-// 				if ( aabb.RayCast( ray.origin, ray.direction, intersection ) == true )
-// 				{
-// 					MeshRenderer* meshRenderer = gameobject->GetComponent<MeshRenderer>();
-// 					if ( meshRenderer != nullptr && meshRenderer->GetMesh() != nullptr )
-// 					{
-// 						Transform& transform = gameobject->GetTransform();
-// 						const Ray transformedRay( transform.InverseTransformPoint( ray.origin ), transform.InverseTransformDirection( ray.direction ) );
-// 						if ( meshRenderer->GetMesh()->GetHull().RayCast( transformedRay.origin, transformedRay.direction, intersection ) == false )
-// 						{
-// 							continue;
-// 						}
-// 					}
-// 					const float distance2 = intersection.distance2( cameraOrigin );
-// 					if ( distance2 < closestDistance2 )
-// 					{
-// 						closestDistance2 = distance2;
-// 						closestGameobject = gameobject;
-// 					}
-// 				}
-// 			}
-//			SetSelectedSceneNode( closestGameobject ); @node
-//		}
+		// mouse selection
+ 		if ( !mouseCaptured && _gameWindowHovered && Mouse::Get().GetButtonPressed( Mouse::button0 ) )
+ 		{
+
+
+			EcsWorld& world = m_currentScene->GetWorld();
+			EntityID cameraID = world.GetEntityID( m_currentScene->GetMainCamera().entityHandle );
+			const Transform2& cameraTransform = world.GetComponent<Transform2>( cameraID );
+			const Camera2& camera = world.GetComponent<Camera2>( cameraID );
+
+ 			const Ray ray = camera.ScreenPosToRay( cameraTransform, Mouse::Get().GetScreenSpacePosition() );
+
+			// raycast on bounds
+			const Signature signatureRaycast = S_RaycastAll::GetSignature( world );
+			std::vector<EntityID> outResults;
+			if( S_RaycastAll::Run( world, world.Match( signatureRaycast ), ray, outResults ) )
+			{
+				// cycle selection
+				static Ray lastRay;
+				static int cycle = 0;
+				int index = 0;
+				if( ray == lastRay )
+				{					
+					index = ( ++cycle % outResults.size() );
+				}
+				lastRay = ray;
+
+				// selection
+				SceneNode& sceneNode = world.GetComponent<SceneNode>( outResults[index] );
+				SetSelectedSceneNode( &sceneNode );
+			}
+			else
+			{
+				SetSelectedSceneNode( nullptr );
+			}
+ 		}
 	}
 
 	//================================================================================================================================
