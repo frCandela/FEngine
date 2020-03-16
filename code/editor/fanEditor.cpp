@@ -68,9 +68,11 @@
 #include "scene/ecs/components/fanBoxShape2.hpp"
 #include "scene/ecs/components/fanTransformUI.hpp"
 #include "scene/ecs/components/fanUIRenderer.hpp"
+#include "scene/ecs/components/fanBounds.hpp"
 #include "scene/ecs/systems/fanUpdateRenderWorld.hpp"
 #include "editor/singletonComponents/fanEditorCamera.hpp"
 #include "scene/ecs/singletonComponents/fanPhysicsWorld.hpp"
+
 
 namespace fan
 {
@@ -680,6 +682,8 @@ namespace fan
 // 		}
 	}
 
+	//================================================================================================================================
+	//================================================================================================================================
 	void Engine::InitializeEcsWorldTypes( EcsWorld& _world )
 	{
 		_world.AddSingletonComponentType<RenderWorld>();
@@ -701,6 +705,7 @@ namespace fan
 		_world.AddComponentType<SphereShape2>();
 		_world.AddComponentType<UITransform2>();
 		_world.AddComponentType<UIRenderer2>();
+		_world.AddComponentType<Bounds>();
 
 		_world.AddTagType<tag_alwaysUpdate>();
 		_world.AddTagType<tag_editorOnly>();
