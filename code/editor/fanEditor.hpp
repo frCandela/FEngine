@@ -1,7 +1,7 @@
 #pragma once
 
 #include "core/fanSerializedValues.hpp"
-#include "editor/fanEditorGrid.hpp"
+#include "scene/ecs/fanEcsWorld.hpp"
 
 namespace fan
 {
@@ -52,11 +52,10 @@ namespace fan
 		Scene& GetServerScene() const { return *m_serverScene; }
 		Renderer& GetRenderer() const { return *m_renderer; }
 
-		EditorGrid GetEditorGrid() const { return m_editorGrid; }
-		void SetEditorGrid( const EditorGrid _editorGrid ) { m_editorGrid = _editorGrid; }
 		void SetCurrentScene( Scene* _scene );
 
 	private:
+		EcsWorld m_editorWorld;
 
 		// UI elements
 		MainMenuBar* m_mainMenuBar;
@@ -69,7 +68,6 @@ namespace fan
 		RenderWindow* m_renderWindow;
 		SceneWindow* m_sceneWindow;
 		GameWindow* m_gameWindow;
-		EditorGrid	m_editorGrid;
 		EcsWindow* m_ecsWindow;
 
 		// Main objects
@@ -98,8 +96,7 @@ namespace fan
 
 		void OnSetCurrentScene( int _scene );
 
-		void DrawEditorGrid() const;
-
 		static void InitializeEcsWorldTypes( EcsWorld& _world );
+		static void InitializeEditorEcsWorldTypes( EcsWorld& _world );
 	};
 }

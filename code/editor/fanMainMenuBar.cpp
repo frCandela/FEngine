@@ -1,7 +1,7 @@
 #include "editor/fanMainMenuBar.hpp"
 #include "editor/windows/fanEditorWindow.hpp"
 #include "editor/fanEditorSelection.hpp"
-#include "editor/fanEditorGrid.hpp"
+#include "editor/singletonComponents/fanEditorGrid.hpp"
 #include "core/imgui/fanModals.hpp"
 #include "core/fanSerializedValues.hpp"
 #include "core/input/fanInput.hpp"

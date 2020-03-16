@@ -1,18 +1,27 @@
 #pragma once
 
 #include "editor/fanEditorPrecompiled.hpp"
+#include "scene/ecs/fanSingletonComponent.hpp"
 
 namespace fan
 {
 
 	//================================================================================================================================
+	// The grid in the 3D view of the editor
 	//================================================================================================================================
-	struct EditorGrid
+	struct EditorGrid : public SingletonComponent
 	{
-		bool		isVisible = true;
-		Color		color = Color( 0.161f, 0.290f, 0.8f, 0.478f );
-		int			linesCount = 10;
-		float		spacing = 1.f;
-		btVector3	offset = btVector3::Zero();
+		DECLARE_SINGLETON_COMPONENT()
+	public:
+
+		EditorGrid();
+
+		btVector3	offset;
+		Color		color;
+		float		spacing;
+		int			linesCount;
+		bool		isVisible;
+
+		static void Draw( const EditorGrid& _grid );
 	};
 }

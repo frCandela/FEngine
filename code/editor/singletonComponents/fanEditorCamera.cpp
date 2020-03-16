@@ -12,6 +12,8 @@ namespace fan
 {
 	REGISTER_SINGLETON_COMPONENT( EditorCamera, "editor_camera" );
 
+	//================================================================================================================================
+	//================================================================================================================================
 	void EditorCamera::Update( EditorCamera& _camera, const float _delta )
 	{
 		if( Mouse::Get().GetButtonPressed( Mouse::button1 ) )
@@ -70,9 +72,5 @@ namespace fan
 		const Ray ray = _camera.camera->ScreenPosToRay( *_camera.transform, btVector2( 0.9f, 0.9f ) );
 		const float size = 0.002f;
 		btVector3 offset = ray.origin + 0.1f * ray.direction;
-
-// 		RendererDebug::Get().DebugLine( offset, offset + btVector3( size, 0, 0 ), Color( 1, 0, 0, 1 ) );
-// 		RendererDebug::Get().DebugLine( offset, offset + btVector3( 0, size, 0 ), Color( 0, 1, 0, 1 ) );
-// 		RendererDebug::Get().DebugLine( offset, offset + btVector3( 0, 0, size ), Color( 0, 0, 1, 1 ) );
 	}
 }

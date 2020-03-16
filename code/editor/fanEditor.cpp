@@ -79,6 +79,7 @@
 
 #include "scene/ecs/singletonComponents/fanRenderWorld.hpp"
 #include "editor/singletonComponents/fanEditorCamera.hpp"
+#include "editor/singletonComponents/fanEditorGrid.hpp"
 #include "scene/ecs/singletonComponents/fanPhysicsWorld.hpp"
 
 #include "scene/ecs/fanEcsWorld.hpp"
@@ -91,6 +92,7 @@ namespace fan
 	//================================================================================================================================
 	Engine::Engine() :
 		m_applicationShouldExit( false )
+		,m_editorWorld( &Engine::InitializeEditorEcsWorldTypes )
 	{
 		// Get serialized editor values
 		VkExtent2D windowSize = { 1280,720 };
@@ -100,12 +102,6 @@ namespace fan
 		glm::ivec2 windowPosition = { 0,23 };
 		SerializedValues::Get().GetInt( "renderer_position_x", windowPosition.x );
 		SerializedValues::Get().GetInt( "renderer_position_y", windowPosition.y );
-
-		SerializedValues::Get().GetBool( "editor_grid_show", m_editorGrid.isVisible );
-		SerializedValues::Get().GetFloat( "editor_grid_spacing", m_editorGrid.spacing );
-		SerializedValues::Get().GetInt( "editor_grid_linesCount", m_editorGrid.linesCount );
-		SerializedValues::Get().GetColor( "editor_grid_color", m_editorGrid.color );
-		SerializedValues::Get().GetVec3( "editor_grid_offset", m_editorGrid.offset );
 
 		SerializedValues::Get().LoadKeyBindings();
 
@@ -181,10 +177,13 @@ namespace fan
 		EditorGizmos::Init( m_gizmos );
 		Prefab::s_resourceManager.Init();
 
+		EditorGrid& grid = m_editorWorld.GetSingletonComponent<EditorGrid>();
+
+
 		m_selection->ConnectCallbacks( *m_clientScene, *m_serverScene );
 		m_renderWindow->SetRenderer( m_renderer );
 		m_preferencesWindow->SetRenderer( m_renderer );
-		m_mainMenuBar->SetGrid( &m_editorGrid );
+		m_mainMenuBar->SetGrid( &grid );
 		SetCurrentScene( m_clientScene );
 
 		m_mainMenuBar->SetWindows( { m_renderWindow , m_sceneWindow , m_inspectorWindow , m_consoleWindow, m_ecsWindow, m_profilerWindow, m_gameWindow, m_networkWindow, m_preferencesWindow } );
@@ -301,45 +300,48 @@ namespace fan
 
 				if ( m_showUI )
 				{
-					SCOPED_PROFILE( draw_ui )
-					m_mainMenuBar->Draw();
-					m_selection->Update( m_gameWindow->IsHovered() );
-					DrawEditorGrid();
+					{
+						SCOPED_PROFILE( draw_ui );
+						m_mainMenuBar->Draw();
+						m_selection->Update( m_gameWindow->IsHovered() );
+					}					
+
+					{
+						SCOPED_PROFILE( debug_draw );
+						EditorGrid::Draw( m_editorWorld.GetSingletonComponent<EditorGrid>() );
+
+						EcsWorld& world = m_currentScene->GetWorld();
+						if( m_mainMenuBar->ShowWireframe() )
+						{
+							const Signature signatureDrawDebugWireframe = S_DrawDebugWireframe::GetSignature( world );
+							S_DrawDebugWireframe::Run( world, world.Match( signatureDrawDebugWireframe ) );
+						}
+						if( m_mainMenuBar->ShowNormals() )
+						{
+							const Signature signatureDrawDebugNormals = S_DrawDebugNormals::GetSignature( world );
+							S_DrawDebugNormals::Run( world, world.Match( signatureDrawDebugNormals ) );
+						}
+						if( m_mainMenuBar->ShowAABB() )
+						{
+							const Signature signatureDrawDebugBounds = S_DrawDebugBounds::GetSignature( world );
+							S_DrawDebugBounds::Run( world, world.Match( signatureDrawDebugBounds ) );
+						}
+						if( m_mainMenuBar->ShowHull() )
+						{
+							const Signature signatureDrawDebugHull = S_DrawDebugHull::GetSignature( world );
+							S_DrawDebugHull::Run( world, world.Match( signatureDrawDebugHull ) );
+						}
+						if( m_mainMenuBar->ShowLights() )
+						{
+							const Signature signatureDrawDebugPointLights = S_DrawDebugPointLights::GetSignature( world );
+							S_DrawDebugPointLights::Run( world, world.Match( signatureDrawDebugPointLights ) );
+							const Signature signatureDrawDebugDirLights = S_DrawDebugDirectionalLights::GetSignature( world );
+							S_DrawDebugDirectionalLights::Run( world, world.Match( signatureDrawDebugDirLights ) );
+						}
+					}					
 				}
 
 				Input::Get().Manager().PullEvents();
-
-				if ( m_showUI )
-				{
-					SCOPED_PROFILE( debug_draw )
-					EcsWorld& world = m_currentScene->GetWorld();
-					if ( m_mainMenuBar->ShowWireframe() ) { 
-						const Signature signatureDrawDebugWireframe = S_DrawDebugWireframe::GetSignature( world );
-						S_DrawDebugWireframe::Run( world, world.Match( signatureDrawDebugWireframe ) );
-					}
-					if ( m_mainMenuBar->ShowNormals() ) 
-					{ 
-						const Signature signatureDrawDebugNormals = S_DrawDebugNormals::GetSignature( world );
-						S_DrawDebugNormals::Run( world, world.Match( signatureDrawDebugNormals ) );
-					}
-					if( m_mainMenuBar->ShowAABB() ) 
-					{ 
-						const Signature signatureDrawDebugBounds = S_DrawDebugBounds::GetSignature( world );
-						S_DrawDebugBounds::Run( world, world.Match( signatureDrawDebugBounds ) );
-					}
-					if ( m_mainMenuBar->ShowHull() ) 
-					{ 
-						const Signature signatureDrawDebugHull = S_DrawDebugHull::GetSignature( world );
-						S_DrawDebugHull::Run( world, world.Match( signatureDrawDebugHull ) );
-					}
-					if( m_mainMenuBar->ShowLights() )
-					{
-						const Signature signatureDrawDebugPointLights= S_DrawDebugPointLights::GetSignature( world );
-						S_DrawDebugPointLights::Run( world, world.Match( signatureDrawDebugPointLights ) );
-						const Signature signatureDrawDebugDirLights = S_DrawDebugDirectionalLights::GetSignature( world );
-						S_DrawDebugDirectionalLights::Run( world, world.Match( signatureDrawDebugDirLights ) );
-					}
-				}
 
 				{
 					SCOPED_PROFILE( imgui_render )
@@ -467,23 +469,6 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void Engine::DrawEditorGrid() const
-	{
-		if ( m_editorGrid.isVisible == true )
-		{
-			const float size = m_editorGrid.spacing;
-			const int count = m_editorGrid.linesCount;
-
-			for ( int coord = -m_editorGrid.linesCount; coord <= m_editorGrid.linesCount; coord++ )
-			{
-				RendererDebug::Get().DebugLine( m_editorGrid.offset + btVector3( -count * size, 0.f, coord * size ), m_editorGrid.offset + btVector3( count * size, 0.f, coord * size ), m_editorGrid.color );
-				RendererDebug::Get().DebugLine( m_editorGrid.offset + btVector3( coord * size, 0.f, -count * size ), m_editorGrid.offset + btVector3( coord * size, 0.f, count * size ), m_editorGrid.color );
-			}
-		}
-	}
-
-	//================================================================================================================================
-	//================================================================================================================================
 	void Engine::SwitchPlayStop()
 	{
 		assert( m_clientScene->GetState() == m_serverScene->GetState() );
@@ -572,5 +557,16 @@ namespace fan
 
 		_world.AddTagType<tag_boundsOutdated>();
 		_world.AddTagType<tag_editorOnly>();
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
+	void Engine::InitializeEditorEcsWorldTypes( EcsWorld& _world )
+	{
+		_world.AddSingletonComponentType<EditorGrid>();
+
+		//_world.AddComponentType<SceneNode>();
+
+		//_world.AddTagType<tag_boundsOutdated>();
 	}
 }
