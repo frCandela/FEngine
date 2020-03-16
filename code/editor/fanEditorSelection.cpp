@@ -10,14 +10,15 @@
 #include "scene/components/ui/fanUITransform.hpp"
 #include "scene/ecs/components/fanSceneNode.hpp"
 #include "scene/ecs/components/fanTransform2.hpp"
+#include "scene/ecs/components/fanCamera2.hpp"
 #include "scene/components/fanMeshRenderer.hpp"
 #include "scene/components/fanTransform.hpp"
 #include "scene/components/fanTransform.hpp"
 #include "scene/components/fanCamera.hpp"
-#include "scene/ecs/fanEcsWorld.hpp"
 #include "scene/fanGameobject.hpp"
 #include "scene/fanScene.hpp"
 #include "render/fanMesh.hpp"
+#include "scene/ecs/fanEcsWorld.hpp"
 
 namespace fan
 {

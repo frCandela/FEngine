@@ -47,7 +47,7 @@ namespace fan
 		// Allocates a new component
 		ecComponent& NewComponent()
 		{
-			for( unsigned chunckIndex = 0; chunckIndex < m_chunks.size(); chunckIndex++ )
+			for( ChunckIndex chunckIndex = 0; chunckIndex < m_chunks.size(); chunckIndex++ )
 			{
 				Chunck& chunck = m_chunks[chunckIndex];
 				if( !chunck.recycleList.empty() )

@@ -1,58 +1,15 @@
 #include "scene/ecs/fanSystem.hpp"
-#include "scene/ecs/fanEcsWorld.hpp"
-#include "core/fanRandom.hpp"
-
-#include "scene/ecs/components/fanTransform2.hpp"
-#include "scene/ecs/components/fanParticleEmitter.hpp"
-#include "scene/ecs/components/fanParticle.hpp"
-
 
 namespace fan
 {
+	class EcsWorld;
+
 	//==============================================================================================================================================================
 	// Spawns particles for all particle emitters in the scene
 	//==============================================================================================================================================================
 	struct S_EmitParticles : System
 	{
-	public:
-
-		static Signature GetSignature( const EcsWorld& _world )
-		{
-			return	_world.GetSignature<Transform2>() | _world.GetSignature<ParticleEmitter>();
-		}
-
-		static void Run( EcsWorld& _world, const std::vector<EntityID>& _entities, const float _delta )
-		{
-			for( EntityID id : _entities )
-			{
-				const Transform2& emitterTransform = _world.GetComponent<Transform2>( id );
-				ParticleEmitter& emitter = _world.GetComponent<ParticleEmitter>( id );
-
-				if( emitter.particlesPerSecond > 0.f )
-				{
-					emitter.timeAccumulator += _delta;
-					float particleSpawnDelta = 1.f / emitter.particlesPerSecond;
-
-					const glm::vec3 origin = ToGLM( emitterTransform.GetPosition() );
-					const glm::vec3 transformedOffset = ToGLM( emitterTransform.TransformDirection( emitter.offset ) );
-
-					// Spawn particles
-					while( emitter.timeAccumulator > particleSpawnDelta )
-					{
-						emitter.timeAccumulator -= particleSpawnDelta;
-
-						EntityID entity = _world.CreateEntity();
-						Particle& particle = _world.AddComponent<Particle>( entity );
-// 						if( m_sunlightParticleOcclusionActive ) { m_ecsManager->AddComponent<ecsSunlightParticleOcclusion>( entity ); } @hack
-
-						particle.speed = glm::normalize ( glm::vec3( Random::FloatClip(), Random::FloatClip(), Random::FloatClip() ) );
-						particle.speed *= emitter.speed;
-						particle.position =  origin + transformedOffset;
-						particle.durationLeft = emitter.duration;
-						particle.color = emitter.color;						
-					}
-				}
-			}
-		}
+		static Signature GetSignature( const EcsWorld& _world );
+		static void Run( EcsWorld& _world, const std::vector<EntityID>& _entities, const float _delta );
 	};
 }

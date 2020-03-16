@@ -2,6 +2,7 @@
 
 #include "scene/fanScenePrecompiled.hpp"
 
+#include "fanSystem.hpp"
 #include "scene/ecs/fanEntity.hpp"
 #include "core/imgui/fanImguiIcons.hpp"
 #include "fanComponentsCollection.hpp"
@@ -28,6 +29,9 @@ namespace fan {
 		template< typename _componentType > bool			IsType( const ecComponent& _component );
 		template< typename _componentType >	_componentType& GetSingletonComponent();
 		template< typename _systemType > bool				RunSystem( const float _delta );
+		//template< typename _systemType, typename... _argsTypes  > bool RunSystem( _argsTypes... _args );
+
+
 		template< typename _systemType > bool				RunSystemOnSubset( const std::vector<EntityID>& _entities, const float _delta );
 		template< typename _tagOrComponentType > Signature	GetSignature() const;
 
@@ -158,10 +162,13 @@ namespace fan {
 	// returns false if there were no entities for the system to run
 	//================================================================================================================================
 	template< typename _systemType > bool EcsWorld::RunSystem( const float _delta )
+	//template< typename _systemType, typename... _argsTypes  > bool RunSystem( _argsTypes... _args )
 	{
+/*		bloup( _systemType::s_typeName, _args... );*/
+
 		static_assert( std::is_base_of< System, _systemType>::value );
 
-		// find matching entities in the whole wortd
+		// find matching entities in the whole world
 		const Signature systemSignature = _systemType::GetSignature( *this );
 		std::vector<EntityID> matchingEntities;
 		matchingEntities.reserve( m_entities.size() );
@@ -177,6 +184,7 @@ namespace fan {
 		if( !matchingEntities.empty() )
 		{
 			_systemType::Run( *this, matchingEntities, _delta );
+			//_systemType::Run( *this, matchingEntities, _args... );
 		}
 
 		return !matchingEntities.empty();

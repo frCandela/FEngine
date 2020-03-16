@@ -1,4 +1,7 @@
 #include "fanEditor.hpp"
+
+#include "scene/ecs/systems/fanUpdateRenderWorld.hpp"
+
 #include "render/pipelines/fanForwardPipeline.hpp"
 #include "render/pipelines/fanDebugPipeline.hpp"
 #include "render/fanRendererDebug.hpp"
@@ -56,7 +59,8 @@
 #include "scene/fanPrefabManager.hpp"
 #include "game/components/fanCameraController.hpp"
 
-#include "scene/ecs/fanEcsWorld.hpp"
+#include "scene/ecs/systems/fanDrawDebug.hpp"
+#include "scene/ecs/components/fanTransform2.hpp"
 #include "scene/ecs/components/fanDirectionalLight2.hpp"
 #include "scene/ecs/components/fanpointLight2.hpp"
 #include "scene/ecs/components/fanParticleEmitter.hpp"
@@ -68,12 +72,16 @@
 #include "scene/ecs/components/fanBoxShape2.hpp"
 #include "scene/ecs/components/fanTransformUI.hpp"
 #include "scene/ecs/components/fanUIRenderer.hpp"
+#include "scene/ecs/components/fanMeshRenderer2.hpp"
+#include "scene/ecs/components/fanMaterial2.hpp"
 #include "scene/ecs/components/fanBounds.hpp"
-#include "scene/ecs/systems/fanUpdateRenderWorld.hpp"
-#include "scene/ecs/systems/fanDrawDebug.hpp"
+#include "scene/ecs/components/fanSceneNode.hpp"
+
+#include "scene/ecs/singletonComponents/fanRenderWorld.hpp"
 #include "editor/singletonComponents/fanEditorCamera.hpp"
 #include "scene/ecs/singletonComponents/fanPhysicsWorld.hpp"
 
+#include "scene/ecs/fanEcsWorld.hpp"
 
 namespace fan
 {

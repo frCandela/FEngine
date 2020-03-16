@@ -2,7 +2,6 @@
 
 #include "fanEcComponent.hpp"
 #include "fanTag.hpp"
-#include "fanSystem.hpp"
 
 namespace fan
 {

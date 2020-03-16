@@ -13,6 +13,7 @@
 // #include <sstream>
 //#include <array>
 #include <set>
+#include <bitset>
 // #include <fstream>
 // #include <iostream>
 // 

@@ -8,7 +8,6 @@
 #include "scene/ecs/components/fanBoxShape2.hpp"
 #include "scene/ecs/components/fanMotionState.hpp"
 #include "scene/ecs/components/fanRigidbody2.hpp"
-#include "scene/ecs/fanEcsWorld.hpp"
 #include "scene/components/fanComponent.hpp"
 #include "scene/components/fanTransform.hpp"
 #include "scene/components/fanMaterial.hpp"
@@ -19,6 +18,7 @@
 #include "render/core/fanTexture.hpp"
 #include "render/core/fanTexture.hpp"
 #include "render/fanMesh.hpp"
+#include "scene/ecs/fanEcsWorld.hpp"
 
 
 namespace fan

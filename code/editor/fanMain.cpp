@@ -1,4 +1,8 @@
+#pragma warning( push )
+#pragma warning( disable : 4005 ) // macro redefinition
 #include "LivePP/API/LPP_API.h"
+#pragma warning( pop )
+
 #include "editor/fanEditor.hpp"
 
 //================================================================================================================================

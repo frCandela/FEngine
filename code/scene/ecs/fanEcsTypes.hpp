@@ -1,6 +1,8 @@
 #pragma once
 
-#include "scene/fanScenePrecompiled.hpp"
+#include <stdint.h>
+#include <bitset>
+#include <vector>
 
 namespace fan
 {
