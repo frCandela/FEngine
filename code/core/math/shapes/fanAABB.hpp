@@ -12,7 +12,7 @@ namespace fan
 	class AABB : public Shape
 	{
 	public:
-		AABB() : AABB( btVector3::Zero(), btVector3::Zero() ) {}
+		AABB();
 		AABB( const btVector3 _low, const btVector3 _high );
 		AABB( const std::vector<btVector3> _pointCloud, const glm::mat4 _modelMatrix );
 

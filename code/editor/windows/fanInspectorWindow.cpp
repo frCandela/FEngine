@@ -51,6 +51,9 @@ namespace fan
 			{
 				ecComponent& component = world.GetComponentAt( entityID, componentIndex );
 				const ComponentInfo& info = world.GetComponentInfo( component.GetIndex() );
+
+				if( std::string(info.editorPath).empty() ) { continue; }
+
  				ImGui::Separator();
 				 
  				// Icon

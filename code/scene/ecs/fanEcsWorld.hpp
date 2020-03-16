@@ -24,6 +24,7 @@ namespace fan {
 		template< typename _componentType >	_componentType& AddComponent( const EntityID _entityID );
 		template< typename _componentType >	void			RemoveComponent( const EntityID _entityID );
 		template< typename _tagType >void					AddTag( const EntityID _entityID );
+		template< typename _tagType >void					RemoveTag( const EntityID _entityID );
 		template< typename _componentType > bool			IsType( const ecComponent& _component );
 		template< typename _componentType >	_componentType& GetSingletonComponent();
 		template< typename _systemType > bool				RunSystem( const float _delta );
@@ -123,6 +124,16 @@ namespace fan {
 		Entity& entity = GetEntity( _entityID );
 		const ComponentIndex index = m_typeIndices[_tagType::s_typeInfo];
 		entity.signature[index] = 1;
+	}
+
+	//==============================================================================================================================================================
+	//==============================================================================================================================================================
+	template< typename _tagType >void EcsWorld::RemoveTag( const EntityID _entityID )
+	{
+		static_assert( std::is_base_of< Tag, _tagType>::value );
+		Entity& entity = GetEntity( _entityID );
+		const ComponentIndex index = m_typeIndices[_tagType::s_typeInfo];
+		entity.signature[index] = 0;
 	}
 
 	//==============================================================================================================================================================

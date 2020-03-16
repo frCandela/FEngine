@@ -25,6 +25,6 @@ namespace fan
 	//==============================================================================================================================================================
 	// tmp test
 	//==============================================================================================================================================================
-	struct tag_editorOnly : Tag { DECLARE_TAG() };
-	struct tag_alwaysUpdate : Tag { DECLARE_TAG() };	// Updates even when the scene is not playing
+	struct tag_editorOnly	  : Tag { DECLARE_TAG() };
+	struct tag_boundsOutdated : Tag { DECLARE_TAG() };	// Updates even when the scene is not playing
 }

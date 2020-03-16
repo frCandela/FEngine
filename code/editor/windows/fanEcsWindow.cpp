@@ -102,14 +102,14 @@ namespace fan
 			static bool createHandle = false;
 			static bool useColor = true;
 			static bool usePosition = true;
-			static bool useTag_alwaysUpdate = true;
+			static bool useTag_boundsOutdated = true;
 			static bool useTag_editorOnly = true;
 			static int num = 1;
 
 			ImGui::Checkbox( "create handle", &createHandle );
 			ImGui::Checkbox( "position", &usePosition );
 			ImGui::Checkbox( "color", &useColor );
-			ImGui::Checkbox( "tag alwaysUpdate", &useTag_alwaysUpdate );
+			ImGui::Checkbox( "tag bounds outdated", &useTag_boundsOutdated );
 			ImGui::Checkbox( "tag editorOnly", &useTag_editorOnly );
 			ImGui::DragInt( "num", &num, 1, 1, 100000 );
 
@@ -129,7 +129,7 @@ namespace fan
 				for( int i = 0; i < num; i++ )
 				{
 					EntityID id = world.CreateEntity();
-					if( useTag_alwaysUpdate ) world.AddTag<tag_alwaysUpdate>( id );
+					if( useTag_boundsOutdated ) world.AddTag<tag_boundsOutdated>( id );
 					if( useTag_editorOnly ) world.AddTag < tag_editorOnly>( id );
 					if( createHandle ) { world.CreateHandle( id ); }
 				}

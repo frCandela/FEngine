@@ -13,6 +13,7 @@ namespace fan
 		_info.icon  = ImGui::IconType::GAMEOBJECT16;
 		_info.onGui = &SceneNode::OnGui;
 		_info.init = &SceneNode::Init;
+		_info.editorPath = "/";
 	}
 
 	//================================================================================================================================

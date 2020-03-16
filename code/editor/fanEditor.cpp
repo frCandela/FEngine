@@ -70,6 +70,7 @@
 #include "scene/ecs/components/fanUIRenderer.hpp"
 #include "scene/ecs/components/fanBounds.hpp"
 #include "scene/ecs/systems/fanUpdateRenderWorld.hpp"
+#include "scene/ecs/systems/fanDrawDebug.hpp"
 #include "editor/singletonComponents/fanEditorCamera.hpp"
 #include "scene/ecs/singletonComponents/fanPhysicsWorld.hpp"
 
@@ -303,9 +304,10 @@ namespace fan
 				if ( m_showUI )
 				{
 					SCOPED_PROFILE( debug_draw )
+					EcsWorld& world = m_currentScene->GetWorld();
 					if ( m_mainMenuBar->ShowWireframe() ) { DrawWireframe(); }
 					if ( m_mainMenuBar->ShowNormals() ) { DrawNormals(); }
-					if ( m_mainMenuBar->ShowAABB() ) { DrawAABB(); }
+					if( m_mainMenuBar->ShowAABB() ) { world.RunSystem<S_DrawDebugBounds>( -1.f ); }
 					if ( m_mainMenuBar->ShowHull() ) { DrawHull(); }
 					DrawLightGizmos();
 				}
@@ -489,22 +491,6 @@ namespace fan
 				RendererDebug::Get().DebugSphere( transform.transform, radius, 0, color );
 			}
 		}
-	}
-
-	//================================================================================================================================
-	//================================================================================================================================
-	void Engine::DrawAABB() const
-	{
-// 		const std::vector< Gameobject*>& entities = m_currentScene->BuildEntitiesList();
-// 		for ( int gameobjectIndex = 0; gameobjectIndex < entities.size(); gameobjectIndex++ )
-// 		{
-// 			const Gameobject* gameobject = entities[ gameobjectIndex ];
-// 			if ( gameobject != &m_currentScene->GetMainCamera().GetGameobject() )
-// 			{
-// 				AABB aabb = gameobject->GetAABB();
-// 				RendererDebug::Get().DebugAABB( aabb, Color::Red );
-// 			}
-// 		}
 	}
 
 	//================================================================================================================================
@@ -707,7 +693,7 @@ namespace fan
 		_world.AddComponentType<UIRenderer2>();
 		_world.AddComponentType<Bounds>();
 
-		_world.AddTagType<tag_alwaysUpdate>();
+		_world.AddTagType<tag_boundsOutdated>();
 		_world.AddTagType<tag_editorOnly>();
 	}
 }

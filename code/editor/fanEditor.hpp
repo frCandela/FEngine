@@ -101,7 +101,6 @@ namespace fan
 		void DrawLightGizmos() const;
 		void DrawWireframe() const;
 		void DrawNormals() const;
-		void DrawAABB() const;
 		void DrawHull() const;
 
 		static void InitializeEcsWorldTypes( EcsWorld& _world );

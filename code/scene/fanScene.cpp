@@ -19,11 +19,13 @@
 #include "core/time/fanProfiler.hpp"
 #include "core/fanSignal.hpp"
 #include "ecs/singletonComponents/fanPhysicsWorld.hpp"
+#include "ecs/components/fanBounds.hpp"
 #include "scene/ecs/systems/fanSynchronizeMotionStates.hpp"
 #include "scene/ecs/systems/fanRegisterPhysics.hpp"
 #include "scene/ecs/systems/fanEmitParticles.hpp"
 #include "scene/ecs/systems/fanUpdateParticles.hpp"
 #include "scene/ecs/systems/fanGenerateParticles.hpp"
+#include "scene/ecs/systems/fanUpdateBounds.hpp"
 
 namespace fan
 {
@@ -77,6 +79,8 @@ namespace fan
 		EntityID entityID = m_ecsWorld->CreateEntity();
 		EntityHandle handle = m_ecsWorld->CreateHandle( entityID );
 		SceneNode& sceneNode = m_ecsWorld->AddComponent<SceneNode>( entityID );
+		m_ecsWorld->AddComponent<Bounds>( entityID );
+		m_ecsWorld->AddTag<tag_boundsOutdated>( entityID );
 
 		uint32_t id = _generateID ? nextUniqueID++ : 0;
 		sceneNode.Build( _name, *this, handle, id, parent );
@@ -302,6 +306,7 @@ namespace fan
 			m_ecsWorld->RunSystem<S_EmitParticles>( _delta );
 			if(  !m_ecsWorld->RunSystem<S_GenerateParticles>( _delta ) )
 			{
+				// clears particles mesh
 				RenderWorld& renderWorld = m_ecsWorld->GetSingletonComponent<RenderWorld>();
 				renderWorld.particlesMesh.LoadFromVertices( {} );
 			}
@@ -309,6 +314,10 @@ namespace fan
 
 			//m_ecsManager->Update( delta );@hack
 			//LateUpdateActors( _delta );
+			m_ecsWorld->RunSystem<S_UpdateBoundsFromRigidbody>( _delta );
+			m_ecsWorld->RunSystem<S_UpdateBoundsFromModel>( _delta );
+			m_ecsWorld->RunSystem<S_UpdateBoundsFromTransform>( _delta );
+			
 			//m_ecsManager->LateUpdate( delta );@hack
 		}
 		EndFrame();

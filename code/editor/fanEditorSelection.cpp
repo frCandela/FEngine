@@ -52,25 +52,24 @@ namespace fan
 
 		bool mouseCaptured = false;
 
-		// Translation gizmo on selected gameobject
+		// Translation gizmo on selected scene node
 		if ( m_selectedSceneNode != nullptr && m_selectedSceneNode != &m_currentScene->GetMainCamera() )
 // 			 && m_selectedSceneNode->GetComponent<UIMeshRenderer>() == nullptr @hack
 // 			 && m_selectedSceneNode->GetComponent<UITransform>() == nullptr )
 		{
 			EcsWorld& world = m_selectedSceneNode->scene->GetWorld();
-			EntityID id = world.GetEntityID( m_selectedSceneNode->entityHandle );
-			if( world.HasComponent<Transform2>( id ) )
+			EntityID entityID = world.GetEntityID( m_selectedSceneNode->entityHandle );
+			if( world.HasComponent<Transform2>( entityID ) )
 			{
-				Transform2& transform = world.GetComponent< Transform2 >( id );
+				Transform2& transform = world.GetComponent< Transform2 >( entityID );
 				btVector3 newPosition;
 				if( EditorGizmos::Get().DrawMoveGizmo( btTransform( btQuaternion( 0, 0, 0 ), transform.GetPosition() ), (size_t)&transform, newPosition ) )
 				{
 					transform.SetPosition( newPosition );
+					world.AddTag<tag_boundsOutdated>( entityID );
 					mouseCaptured = true;
 				}
 			}
-			
-
 		}
 
 		// Mouse selection
