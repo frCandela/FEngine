@@ -48,6 +48,7 @@ namespace fan
 		bool ShowAABB() const { return m_showAABB; }
 		bool ShowWireframe() const { return m_showWireframe; }
 		bool ShowNormals() const { return m_showNormals; }
+		bool ShowLights() const { return m_showLights; }
 
 	private:
 		Scene* m_scene;
@@ -63,6 +64,7 @@ namespace fan
 		bool m_showAABB;
 		bool m_showWireframe;
 		bool m_showNormals;
+		bool m_showLights;
 
 		bool m_openNewScenePopupLater = false;
 		bool m_openLoadScenePopupLater = false;

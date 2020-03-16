@@ -23,6 +23,7 @@ namespace fan
 		, m_showHull( false )
 		, m_showWireframe( false )
 		, m_showNormals( false )
+		, m_showLights( false )
 		, m_sceneExtensionFilter( RenderGlobal::s_sceneExtensions )
 	{
 
@@ -161,7 +162,7 @@ namespace fan
 			}
 
 			// View
-			if ( ImGui::BeginMenu( "View" ) )
+			if ( ImGui::BeginMenu( "Tools" ) )
 			{
 				ImGui::Icon( ImGui::IMGUI16, { 16,16 } ); ImGui::SameLine();
 				ImGui::MenuItem( "Imgui demo", nullptr, &m_showImguiDemoWindow );
@@ -180,12 +181,14 @@ namespace fan
 			}
 
 			// Editor
-			if ( ImGui::BeginMenu( "Editor" ) )
+			if ( ImGui::BeginMenu( "View" ) )
 			{
 				if ( ImGui::MenuItem( "show hull", nullptr, &m_showHull ) ) {}
 				if ( ImGui::MenuItem( "show AABB", nullptr, &m_showAABB ) ) {}
-				if ( ImGui::MenuItem( "show Wireframe", nullptr, &m_showWireframe ) ) {}
-				if ( ImGui::MenuItem( "show Normals", nullptr, &m_showNormals ) ) {}
+				if ( ImGui::MenuItem( "show wireframe", nullptr, &m_showWireframe ) ) {}
+				if ( ImGui::MenuItem( "show normals", nullptr, &m_showNormals ) ) {}
+				if( ImGui::MenuItem(  "show lights", nullptr, &m_showLights ) ) {}
+				
 				ImGui::EndMenu();
 			}
 

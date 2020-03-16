@@ -47,9 +47,10 @@ namespace fan
 		RenderWindow& GetRenderWindow() const { return *m_renderWindow; }
 		MainMenuBar& GetMainMenuBar() const { return *m_mainMenuBar; }
 		SceneWindow& GetSceneWindow() const { return *m_sceneWindow; }
+		
+		Scene& GetScene() const { return *m_currentScene; }
 		Scene& GetServerScene() const { return *m_serverScene; }
 		Renderer& GetRenderer() const { return *m_renderer; }
-		Scene& GetScene() const { return *m_currentScene; }
 
 		EditorGrid GetEditorGrid() const { return m_editorGrid; }
 		void SetEditorGrid( const EditorGrid _editorGrid ) { m_editorGrid = _editorGrid; }
@@ -98,10 +99,6 @@ namespace fan
 		void OnSetCurrentScene( int _scene );
 
 		void DrawEditorGrid() const;
-		void DrawLightGizmos() const;
-		void DrawWireframe() const;
-		void DrawNormals() const;
-		void DrawHull() const;
 
 		static void InitializeEcsWorldTypes( EcsWorld& _world );
 	};

@@ -313,16 +313,32 @@ namespace fan
 				{
 					SCOPED_PROFILE( debug_draw )
 					EcsWorld& world = m_currentScene->GetWorld();
-					if ( m_mainMenuBar->ShowWireframe() ) { DrawWireframe(); }
-					if ( m_mainMenuBar->ShowNormals() ) { DrawNormals(); }
+					if ( m_mainMenuBar->ShowWireframe() ) { 
+						const Signature signatureDrawDebugWireframe = S_DrawDebugWireframe::GetSignature( world );
+						S_DrawDebugWireframe::Run( world, world.Match( signatureDrawDebugWireframe ) );
+					}
+					if ( m_mainMenuBar->ShowNormals() ) 
+					{ 
+						const Signature signatureDrawDebugNormals = S_DrawDebugNormals::GetSignature( world );
+						S_DrawDebugNormals::Run( world, world.Match( signatureDrawDebugNormals ) );
+					}
 					if( m_mainMenuBar->ShowAABB() ) 
 					{ 
 						const Signature signatureDrawDebugBounds = S_DrawDebugBounds::GetSignature( world );
 						S_DrawDebugBounds::Run( world, world.Match( signatureDrawDebugBounds ) );
 					}
-
-					if ( m_mainMenuBar->ShowHull() ) { DrawHull(); }
-					DrawLightGizmos();
+					if ( m_mainMenuBar->ShowHull() ) 
+					{ 
+						const Signature signatureDrawDebugHull = S_DrawDebugHull::GetSignature( world );
+						S_DrawDebugHull::Run( world, world.Match( signatureDrawDebugHull ) );
+					}
+					if( m_mainMenuBar->ShowLights() )
+					{
+						const Signature signatureDrawDebugPointLights= S_DrawDebugPointLights::GetSignature( world );
+						S_DrawDebugPointLights::Run( world, world.Match( signatureDrawDebugPointLights ) );
+						const Signature signatureDrawDebugDirLights = S_DrawDebugDirectionalLights::GetSignature( world );
+						S_DrawDebugDirectionalLights::Run( world, world.Match( signatureDrawDebugDirLights ) );
+					}
 				}
 
 				{
@@ -464,163 +480,6 @@ namespace fan
 				RendererDebug::Get().DebugLine( m_editorGrid.offset + btVector3( coord * size, 0.f, -count * size ), m_editorGrid.offset + btVector3( coord * size, 0.f, count * size ), m_editorGrid.color );
 			}
 		}
-	}
-
-	//================================================================================================================================
-	//================================================================================================================================
-	void Engine::DrawLightGizmos() const
-	{
-		SceneNode* node = m_selection->GetSelectedSceneNode();
-		if( node != nullptr )
-		{
-			EcsWorld& world = node->scene->GetWorld();
-			EntityID id = world.GetEntityID( node->entityHandle );
-
-			// point light
-			if( world.HasComponent<PointLight2>( id ) && world.HasComponent<Transform2>( id ) )
-			{
-				const PointLight2& light = world.GetComponent<PointLight2>( id );
-				const Transform2& transform = world.GetComponent<Transform2>( id );
-				const float lightRange = PointLight2::GetLightRange( light );
-				if( lightRange > 0 )
-				{
-					RendererDebug::Get().DebugSphere( transform.transform, lightRange, 2, light.diffuse );
-				}
-			}
-
-			// dir light
-			if( world.HasComponent<DirectionalLight2>( id ) && world.HasComponent<Transform2>( id ) )
-			{
-				const DirectionalLight2& light = world.GetComponent<DirectionalLight2>( id );
-				const Transform2& transform = world.GetComponent<Transform2>( id );
-				const btVector3 pos = transform.GetPosition();
-				const btVector3 dir = transform.Forward();
-				const btVector3 up = transform.Up();
-				const btVector3 left = transform.Left();
-				const float length = 2.f;
-				const float radius = 0.5f;
-				const Color color = Color::Yellow;
-				btVector3 offsets[5] = { btVector3::Zero(), radius * up ,-radius * up, radius * left ,-radius * left };
-				for( int offsetIndex = 0; offsetIndex < 5; offsetIndex++ )
-				{
-					const btVector3 offset = offsets[offsetIndex];
-					RendererDebug::Get().DebugLine( pos + offset, pos + offset + length * dir, color );
-				}
-				RendererDebug::Get().DebugSphere( transform.transform, radius, 0, color );
-			}
-		}
-	}
-
-	//================================================================================================================================
-	//================================================================================================================================
-	void Engine::DrawHull() const
-	{
-		// @node
-		/*Gameobject* selectedGameobject = m_selection->GetSelectedSceneNode();
-		if ( selectedGameobject != nullptr )
-		{
-			MeshRenderer* meshRenderer = selectedGameobject->GetComponent<MeshRenderer>();
-			if ( meshRenderer != nullptr )
-			{
-				const ConvexHull* hull = nullptr;
-				Mesh* mesh = meshRenderer->GetMesh();
-				if ( mesh != nullptr )
-				{
-					hull = &meshRenderer->GetMesh()->GetHull();
-				}
-				if ( hull != nullptr )
-				{
-					const std::vector<btVector3>& vertices = hull->GetVertices();
-					const std::vector<uint32_t>& indices = hull->GetIndices();
-					if ( !vertices.empty() )
-					{
-						const glm::mat4  modelMat = meshRenderer->GetGameobject().GetTransform().GetModelMatrix();
-
-						Color color = Color::Cyan;
-						for ( unsigned polyIndex = 0; polyIndex < indices.size() / 3; polyIndex++ )
-						{
-							const int index0 = indices[ 3 * polyIndex + 0 ];
-							const int index1 = indices[ 3 * polyIndex + 1 ];
-							const int index2 = indices[ 3 * polyIndex + 2 ];
-							const btVector3 vec0 = vertices[ index0 ];
-							const btVector3 vec1 = vertices[ index1 ];
-							const btVector3 vec2 = vertices[ index2 ];
-							const btVector3 worldVec0 = ToBullet( modelMat * glm::vec4( vec0[ 0 ], vec0[ 1 ], vec0[ 2 ], 1.f ) );
-							const btVector3 worldVec1 = ToBullet( modelMat * glm::vec4( vec1[ 0 ], vec1[ 1 ], vec1[ 2 ], 1.f ) );
-							const btVector3 worldVec2 = ToBullet( modelMat * glm::vec4( vec2[ 0 ], vec2[ 1 ], vec2[ 2 ], 1.f ) );
-
-							RendererDebug::Get().DebugLine( worldVec0, worldVec1, color );
-							RendererDebug::Get().DebugLine( worldVec1, worldVec2, color );
-							RendererDebug::Get().DebugLine( worldVec2, worldVec0, color );
-
-						}
-					}
-				}
-			}
-		}*/
-	}
-
-	//================================================================================================================================
-	//================================================================================================================================
-	void Engine::DrawWireframe() const
-	{
-		// @node
-		/*Gameobject* selectedGameobject = m_selection->GetSelectedSceneNode();
-		if ( selectedGameobject != nullptr )
-		{
-			MeshRenderer* meshRenderer = selectedGameobject->GetComponent<MeshRenderer>();
-			if ( meshRenderer != nullptr )
-			{
-				Mesh* mesh = meshRenderer->GetMesh();
-				if ( mesh != nullptr )
-				{
-					const glm::mat4  modelMat = meshRenderer->GetGameobject().GetTransform().GetModelMatrix();
-					const std::vector<uint32_t>& indices = mesh->GetIndices();
-					const std::vector<Vertex>& vertices = mesh->GetVertices();
-
-					for ( int index = 0; index < indices.size() / 3; index++ )
-					{
-						const btVector3 v0 = ToBullet( modelMat * glm::vec4( vertices[ indices[ 3 * index + 0 ] ].pos, 1.f ) );
-						const btVector3 v1 = ToBullet( modelMat * glm::vec4( vertices[ indices[ 3 * index + 1 ] ].pos, 1.f ) );
-						const btVector3 v2 = ToBullet( modelMat * glm::vec4( vertices[ indices[ 3 * index + 2 ] ].pos, 1.f ) );
-						RendererDebug::Get().DebugLine( v0, v1, Color::Yellow );
-						RendererDebug::Get().DebugLine( v1, v2, Color::Yellow );
-						RendererDebug::Get().DebugLine( v2, v0, Color::Yellow );
-					}
-				}
-			}
-		}*/
-	}
-
-	//================================================================================================================================
-	//================================================================================================================================
-	void Engine::DrawNormals() const
-	{
-		// @node
-		/*Gameobject* selectedGameobject = m_selection->GetSelectedSceneNode();
-		if ( selectedGameobject != nullptr )
-		{
-			MeshRenderer* meshRenderer = selectedGameobject->GetComponent<MeshRenderer>();
-			if ( meshRenderer != nullptr )
-			{
-				Mesh* mesh = meshRenderer->GetMesh();
-				if ( mesh != nullptr )
-				{
-					const glm::mat4  modelMat = meshRenderer->GetGameobject().GetTransform().GetModelMatrix();
-					const glm::mat4  normalMat = meshRenderer->GetGameobject().GetTransform().GetNormalMatrix();
-					const std::vector<uint32_t>& indices = mesh->GetIndices();
-					const std::vector<Vertex>& vertices = mesh->GetVertices();
-
-					for ( int index = 0; index < indices.size(); index++ )
-					{
-						const Vertex& vertex = vertices[ indices[ index ] ];
-						const btVector3 position = ToBullet( modelMat * glm::vec4( vertex.pos, 1.f ) );
-						const btVector3 normal = ToBullet( normalMat * glm::vec4( vertex.normal, 1.f ) );
-						RendererDebug::Get().DebugLine( position, position + 0.1f * normal, Color::Green );
-					}
-				}
-			}
-		}*/
 	}
 
 	//================================================================================================================================
