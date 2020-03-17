@@ -20,7 +20,7 @@ namespace fan
 
 		btDefaultCollisionConfiguration*	 collisionConfiguration;
 		btCollisionDispatcher*				 dispatcher;
-		btBroadphaseInterface*				 overlappingPairCache;
+		btDbvtBroadphase*					 overlappingPairCache;
 		btSequentialImpulseConstraintSolver* solver;
 		btDiscreteDynamicsWorld*			 dynamicsWorld;
 

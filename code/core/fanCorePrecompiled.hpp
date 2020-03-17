@@ -20,6 +20,7 @@
 #pragma warning( disable : 4201 )
 #pragma warning( disable : 4127 )
 #pragma warning( disable : 4100 )
+#pragma warning( disable : 4244 )
 
 #include "bullet/btBulletDynamicsCommon.h"
 #define GLFW_INCLUDE_VULKAN

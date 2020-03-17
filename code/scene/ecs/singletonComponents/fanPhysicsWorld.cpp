@@ -18,7 +18,7 @@ namespace fan
 		collisionConfiguration = new btDefaultCollisionConfiguration();
 		dispatcher = new btCollisionDispatcher( collisionConfiguration );
 		overlappingPairCache = new btDbvtBroadphase();
-		solver = new btSequentialImpulseConstraintSolver;
+		solver = new btSequentialImpulseConstraintSolver();
 		dynamicsWorld = new btDiscreteDynamicsWorld( dispatcher, overlappingPairCache, solver, collisionConfiguration );
 
 		gContactStartedCallback = ContactStartedCallback;
@@ -34,11 +34,18 @@ namespace fan
 	//================================================================================================================================	
 	PhysicsWorld::~PhysicsWorld()
 	{
-		delete dynamicsWorld;
+		// remove all collision objects
+		for (int i = dynamicsWorld->getNumCollisionObjects() - 1; i >= 0; i--)
+		{
+			btCollisionObject* obj = dynamicsWorld->getCollisionObjectArray()[i];
+			dynamicsWorld->removeCollisionObject( obj );
+		}
+
 		delete solver;
 		delete overlappingPairCache;
 		delete dispatcher;
 		delete collisionConfiguration;
+		//delete dynamicsWorld; @hack
 	}
 
 	//================================================================================================================================
