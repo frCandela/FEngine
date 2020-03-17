@@ -1,41 +1,41 @@
-#include "scene/ecs/components/fanSphereShape2.hpp"
+#include "scene/ecs/components/fanSphereShape.hpp"
 
 #include "render/fanRenderSerializable.hpp"
 
 namespace fan
 {
-	REGISTER_COMPONENT( SphereShape2, "sphere_shape" );
+	REGISTER_COMPONENT( SphereShape, "sphere_shape" );
 
 	//================================================================================================================================
 	//================================================================================================================================
-	SphereShape2::SphereShape2() : sphereShape( 0.5f ){}
+	SphereShape::SphereShape() : sphereShape( 0.5f ){}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void SphereShape2::SetInfo( ComponentInfo& _info )
+	void SphereShape::SetInfo( ComponentInfo& _info )
 	{
 		_info.icon = ImGui::IconType::SPHERE_SHAPE16;
-		_info.onGui = &SphereShape2::OnGui;
-		_info.init = &SphereShape2::Init;
-		_info.load  = &SphereShape2::Load;
-		_info.save  = &SphereShape2::Save;
+		_info.onGui = &SphereShape::OnGui;
+		_info.init = &SphereShape::Init;
+		_info.load  = &SphereShape::Load;
+		_info.save  = &SphereShape::Save;
 		_info.editorPath = "/";
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void SphereShape2::Init( ecComponent& _component )
+	void SphereShape::Init( Component& _component )
 	{
-		SphereShape2& sphereShape = static_cast<SphereShape2&>( _component );
+		SphereShape& sphereShape = static_cast<SphereShape&>( _component );
 		sphereShape.sphereShape = btSphereShape( 1.f );
 		sphereShape.sphereShape.setUserPointer( nullptr );
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void SphereShape2::OnGui( ecComponent& _sphereShape )
+	void SphereShape::OnGui( Component& _sphereShape )
 	{
-		SphereShape2& sphereShape = static_cast<SphereShape2&>( _sphereShape );
+		SphereShape& sphereShape = static_cast<SphereShape&>( _sphereShape );
 
 		ImGui::PushItemWidth( 0.6f * ImGui::GetWindowWidth() );
 		{
@@ -50,17 +50,17 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void SphereShape2::Save( const ecComponent& _sphereShape, Json& _json )
+	void SphereShape::Save( const Component& _sphereShape, Json& _json )
 	{
-		const SphereShape2& sphereShape = static_cast<const SphereShape2&>( _sphereShape );
+		const SphereShape& sphereShape = static_cast<const SphereShape&>( _sphereShape );
 		Serializable::SaveFloat( _json, "radius", sphereShape.GetRadius() );
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void SphereShape2::Load( ecComponent& _sphereShape, const Json& _json )
+	void SphereShape::Load( Component& _sphereShape, const Json& _json )
 	{
-		SphereShape2& sphereShape = static_cast<SphereShape2&>( _sphereShape );
+		SphereShape& sphereShape = static_cast<SphereShape&>( _sphereShape );
 		float radius;
 		Serializable::LoadFloat( _json, "radius", radius );
 
@@ -69,14 +69,14 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void  SphereShape2::SetRadius( const float _radius )
+	void  SphereShape::SetRadius( const float _radius )
 	{
 		sphereShape.setUnscaledRadius( _radius >= 0 ? _radius : 0.f );
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	float SphereShape2::GetRadius() const
+	float SphereShape::GetRadius() const
 	{
 		return sphereShape.getRadius();
 	}

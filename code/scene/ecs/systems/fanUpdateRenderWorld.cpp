@@ -1,14 +1,14 @@
 #include "scene/ecs/systems/fanUpdateRenderWorld.hpp"
 
 #include "scene/ecs/singletonComponents/fanRenderWorld.hpp"
-#include "scene/ecs/components/fanMeshRenderer2.hpp"
-#include "scene/ecs/components/fanTransform2.hpp"
+#include "scene/ecs/components/fanMeshRenderer.hpp"
+#include "scene/ecs/components/fanTransform.hpp"
 #include "scene/ecs/components/fanSceneNode.hpp"
-#include "scene/ecs/components/fanMaterial2.hpp"
+#include "scene/ecs/components/fanMaterial.hpp"
 #include "scene/ecs/components/fanTransformUI.hpp"
 #include "scene/ecs/components/fanUIRenderer.hpp"
-#include "scene/ecs/components/fanPointLight2.hpp"
-#include "scene/ecs/components/fanDirectionalLight2.hpp"
+#include "scene/ecs/components/fanPointLight.hpp"
+#include "scene/ecs/components/fanDirectionalLight.hpp"
 
 #include "scene/ecs/fanEcsWorld.hpp"
 
@@ -18,10 +18,10 @@ namespace fan
 	//==============================================================================================================================================================
 	Signature S_UpdateRenderWorldModels::GetSignature( const EcsWorld& _world )
 	{
-		return	 _world.GetSignature<MeshRenderer2>()
+		return	 _world.GetSignature<MeshRenderer>()
 			| _world.GetSignature<SceneNode>()
-			| _world.GetSignature<Transform2>()
-			| _world.GetSignature<Material2>();
+			| _world.GetSignature<Transform>()
+			| _world.GetSignature<Material>();
 	}
 
 	//==============================================================================================================================================================
@@ -34,12 +34,12 @@ namespace fan
 		// get all mesh and adds them to the render world
 		for( EntityID id : _entities )
 		{
-			MeshRenderer2& meshRenderer = _world.GetComponent<MeshRenderer2>( id );
+			MeshRenderer& meshRenderer = _world.GetComponent<MeshRenderer>( id );
 			if( meshRenderer.mesh.IsValid() )
 			{
 				// drawMesh data;
-				Material2& material = _world.GetComponent<Material2>( id );
-				Transform2& transform = _world.GetComponent<Transform2>( id );
+				Material& material = _world.GetComponent<Material>( id );
+				Transform& transform = _world.GetComponent<Transform>( id );
 
 				DrawMesh data;
 				data.mesh = *meshRenderer.mesh;
@@ -58,8 +58,8 @@ namespace fan
 	//==============================================================================================================================================================
 	Signature S_UpdateRenderWorldUI::GetSignature( const EcsWorld& _world )
 	{
-		return _world.GetSignature<UIRenderer2>()
-			| _world.GetSignature<UITransform2>();
+		return _world.GetSignature<UIRenderer>()
+			| _world.GetSignature<UITransform>();
 	}
 
 	//==============================================================================================================================================================
@@ -72,8 +72,8 @@ namespace fan
 		// get all mesh and adds them to the render world
 		for( EntityID id : _entities )
 		{
-			UIRenderer2& renderer = _world.GetComponent<UIRenderer2>( id );
-			UITransform2& transform = _world.GetComponent<UITransform2>( id );
+			UIRenderer& renderer = _world.GetComponent<UIRenderer>( id );
+			UITransform& transform = _world.GetComponent<UITransform>( id );
 
 			if( renderer.GetTexture() == nullptr ) { continue; }
 
@@ -96,8 +96,8 @@ namespace fan
 	//==============================================================================================================================================================
 	Signature S_UpdateRenderWorldPointLights::GetSignature( const EcsWorld& _world )
 	{
-		return	_world.GetSignature<Transform2>()
-			| _world.GetSignature<PointLight2>();
+		return	_world.GetSignature<Transform>()
+			| _world.GetSignature<PointLight>();
 	}
 
 	//==============================================================================================================================================================
@@ -110,17 +110,17 @@ namespace fan
 		for( EntityID id : _entities )
 		{
 			// light data
-			Transform2& transform = _world.GetComponent<Transform2>( id );
-			PointLight2& light = _world.GetComponent<PointLight2>( id );
+			Transform& transform = _world.GetComponent<Transform>( id );
+			PointLight& light = _world.GetComponent<PointLight>( id );
 
 			DrawPointLight pointLight;
 			pointLight.position = glm::vec4( ToGLM( transform.GetPosition() ), 1.f );
 			pointLight.diffuse = light.diffuse.ToGLM();
 			pointLight.specular = light.specular.ToGLM();
 			pointLight.ambiant = light.ambiant.ToGLM();
-			pointLight.constant = light.attenuation[PointLight2::CONSTANT];
-			pointLight.linear = light.attenuation[PointLight2::LINEAR];
-			pointLight.quadratic = light.attenuation[PointLight2::QUADRATIC];
+			pointLight.constant = light.attenuation[PointLight::CONSTANT];
+			pointLight.linear = light.attenuation[PointLight::LINEAR];
+			pointLight.quadratic = light.attenuation[PointLight::QUADRATIC];
 
 			renderWorld.pointLights.push_back( pointLight );
 		}
@@ -130,8 +130,8 @@ namespace fan
 	//==============================================================================================================================================================
 	Signature S_UpdateRenderWorldDirectionalLights::GetSignature( const EcsWorld& _world )
 	{
-		return	_world.GetSignature<Transform2>()
-			| _world.GetSignature<DirectionalLight2>();
+		return	_world.GetSignature<Transform>()
+			| _world.GetSignature<DirectionalLight>();
 	}
 
 	//==============================================================================================================================================================
@@ -144,8 +144,8 @@ namespace fan
 		for( EntityID id : _entities )
 		{
 			// light data
-			Transform2& transform = _world.GetComponent<Transform2>( id );
-			DirectionalLight2& directionalLight = _world.GetComponent<DirectionalLight2>( id );
+			Transform& transform = _world.GetComponent<Transform>( id );
+			DirectionalLight& directionalLight = _world.GetComponent<DirectionalLight>( id );
 
 			DrawDirectionalLight light;
 			light.direction = glm::vec4( ToGLM( transform.Forward() ), 1 );

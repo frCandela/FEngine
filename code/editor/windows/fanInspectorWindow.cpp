@@ -4,10 +4,10 @@
 #include "scene/fanScene.hpp"
 #include "scene/ecs/singletonComponents/fanPhysicsWorld.hpp"
 #include "scene/ecs/components/fanSceneNode.hpp"
-#include "scene/ecs/components/fanSphereShape2.hpp"
-#include "scene/ecs/components/fanBoxShape2.hpp"
+#include "scene/ecs/components/fanSphereShape.hpp"
+#include "scene/ecs/components/fanBoxShape.hpp"
 #include "scene/ecs/components/fanMotionState.hpp"
-#include "scene/ecs/components/fanRigidbody2.hpp"
+#include "scene/ecs/components/fanRigidbody.hpp"
 #include "scene/ecs/fanEcsWorld.hpp"
 #include "core/time/fanProfiler.hpp"
 #include "core/fanSignal.hpp"
@@ -44,7 +44,7 @@ namespace fan
 
 			for( int componentIndex = 0; componentIndex < world.GetComponentCount( entityID ); componentIndex++ )
 			{
-				ecComponent& component = world.GetComponentAt( entityID, componentIndex );
+				Component& component = world.GetComponentAt( entityID, componentIndex );
 				const ComponentInfo& info = world.GetComponentInfo( component.GetIndex() );
 
 				if( std::string(info.editorPath).empty() ) { continue; }
@@ -64,9 +64,9 @@ namespace fan
 				{
 					// if component is a rigidbody, unregisters from physics world
 					bool rigidbodyNeedsUpdate = PhysicsWorld::IsPhysicsType( world, component );
-					if( world.IsType<Rigidbody2>( component ) )
+					if( world.IsType<Rigidbody>( component ) )
 					{
-						Rigidbody2& rb = static_cast<Rigidbody2&>( component );
+						Rigidbody& rb = static_cast<Rigidbody&>( component );
 						PhysicsWorld& physicsWorld = world.GetSingletonComponent<PhysicsWorld>();
 						physicsWorld.dynamicsWorld->removeRigidBody( &rb.rigidbody );
 						rigidbodyNeedsUpdate = false;
@@ -95,19 +95,19 @@ namespace fan
 	//================================================================================================================================
 	void  InspectorWindow::UpdateEntityRigidbody( EcsWorld& _world, EntityID _entityID )
 	{		
-		if( _world.HasComponent<Rigidbody2>( _entityID ) )
+		if( _world.HasComponent<Rigidbody>( _entityID ) )
 		{
-			Rigidbody2& rb = _world.GetComponent<Rigidbody2>( _entityID );
+			Rigidbody& rb = _world.GetComponent<Rigidbody>( _entityID );
 
 			// find a collision shape
 			btCollisionShape* shape = nullptr;
-			if( _world.HasComponent<SphereShape2>( _entityID ) )
+			if( _world.HasComponent<SphereShape>( _entityID ) )
 			{
-				shape = &_world.GetComponent<SphereShape2>( _entityID ).sphereShape;
+				shape = &_world.GetComponent<SphereShape>( _entityID ).sphereShape;
 			}
-			else if( _world.HasComponent<BoxShape2>( _entityID ) )
+			else if( _world.HasComponent<BoxShape>( _entityID ) )
 			{
-				shape = &_world.GetComponent<BoxShape2>( _entityID ).boxShape;
+				shape = &_world.GetComponent<BoxShape>( _entityID ).boxShape;
 			}
 
 			// find a motion state
@@ -138,7 +138,7 @@ namespace fan
 			EntityID entityID = world.GetEntityID( m_sceneNodeSelected->entityHandle );
 			if( !world.HasComponent( entityID, _info.index ) )
 			{
-				ecComponent& component = world.AddComponent( entityID, _info.index );
+				Component& component = world.AddComponent( entityID, _info.index );
 				if( PhysicsWorld::IsPhysicsType( world, component ) )
 				{
 					UpdateEntityRigidbody( world, entityID );

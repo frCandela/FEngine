@@ -1,38 +1,38 @@
-#include "scene/ecs/components/fanMeshRenderer2.hpp"
+#include "scene/ecs/components/fanMeshRenderer.hpp"
 
 #include "core/fanISerializable.hpp"
 #include "render/fanRenderSerializable.hpp"
 
 namespace fan
 {
-	REGISTER_COMPONENT( MeshRenderer2, "mesh_renderer" );
+	REGISTER_COMPONENT( MeshRenderer, "mesh_renderer" );
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void MeshRenderer2::SetInfo( ComponentInfo& _info )
+	void MeshRenderer::SetInfo( ComponentInfo& _info )
 	{
 		_info.icon = ImGui::IconType::MESH_RENDERER16;
-		_info.onGui = &MeshRenderer2::OnGui;
-		_info.init = &MeshRenderer2::Init;
-		_info.load = &MeshRenderer2::Load;
-		_info.save = &MeshRenderer2::Save;
+		_info.onGui = &MeshRenderer::OnGui;
+		_info.init = &MeshRenderer::Init;
+		_info.load = &MeshRenderer::Load;
+		_info.save = &MeshRenderer::Save;
 		_info.editorPath = "/";
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void MeshRenderer2::Init( ecComponent& _component )
+	void MeshRenderer::Init( Component& _component )
 	{
-		MeshRenderer2& meshRenderer = static_cast<MeshRenderer2&>( _component );
+		MeshRenderer& meshRenderer = static_cast<MeshRenderer&>( _component );
 		meshRenderer.mesh = nullptr;
 		meshRenderer.renderID = -1;
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void MeshRenderer2::OnGui( ecComponent& _meshRenderer )
+	void MeshRenderer::OnGui( Component& _meshRenderer )
 	{
-		MeshRenderer2& meshRenderer = static_cast<MeshRenderer2&>( _meshRenderer );
+		MeshRenderer& meshRenderer = static_cast<MeshRenderer&>( _meshRenderer );
 		ImGui::FanMeshPtr( "mesh", meshRenderer.mesh );
 
 		// num triangles
@@ -45,17 +45,17 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void MeshRenderer2::Save( const ecComponent& _meshRenderer, Json& _json )
+	void MeshRenderer::Save( const Component& _meshRenderer, Json& _json )
 	{
-		const MeshRenderer2& meshRenderer = static_cast<const MeshRenderer2&>( _meshRenderer );
+		const MeshRenderer& meshRenderer = static_cast<const MeshRenderer&>( _meshRenderer );
 		Serializable::SaveMeshPtr( _json, "path", meshRenderer.mesh );
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void MeshRenderer2::Load( ecComponent& _meshRenderer, const Json& _json )
+	void MeshRenderer::Load( Component& _meshRenderer, const Json& _json )
 	{
-		MeshRenderer2& meshRenderer = static_cast<MeshRenderer2&>( _meshRenderer );
+		MeshRenderer& meshRenderer = static_cast<MeshRenderer&>( _meshRenderer );
 		Serializable::LoadMeshPtr( _json, "path", meshRenderer.mesh );
 	}
 }

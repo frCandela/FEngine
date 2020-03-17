@@ -1,7 +1,7 @@
 #pragma once
 
 #include "fanEcsTypes.hpp"
-#include "fanEcComponent.hpp"
+#include "fanComponent.hpp"
 
 namespace fan 
 {
@@ -13,7 +13,7 @@ namespace fan
 	struct Entity
 	{
 		static constexpr int s_maxComponentsPerEntity = 14;
-		ecComponent* components[s_maxComponentsPerEntity];
+		Component* components[s_maxComponentsPerEntity];
 		int componentCount = 0;
 		Signature signature;
 		EntityHandle handle = 0;

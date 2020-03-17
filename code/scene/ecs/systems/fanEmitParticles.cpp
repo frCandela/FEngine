@@ -1,7 +1,7 @@
 #include "scene/ecs/systems/fanEmitParticles.hpp"
 
 #include "core/fanRandom.hpp"
-#include "scene/ecs/components/fanTransform2.hpp"
+#include "scene/ecs/components/fanTransform.hpp"
 #include "scene/ecs/components/fanParticleEmitter.hpp"
 #include "scene/ecs/components/fanParticle.hpp"
 #include "scene/ecs/fanEcsWorld.hpp"
@@ -12,7 +12,7 @@ namespace fan
 	//================================================================================================================================
 	Signature S_EmitParticles::GetSignature( const EcsWorld& _world )
 	{
-		return	_world.GetSignature<Transform2>() | _world.GetSignature<ParticleEmitter>();
+		return	_world.GetSignature<Transform>() | _world.GetSignature<ParticleEmitter>();
 	}
 
 	//================================================================================================================================
@@ -21,7 +21,7 @@ namespace fan
 	{
 		for( EntityID id : _entities )
 		{
-			const Transform2& emitterTransform = _world.GetComponent<Transform2>( id );
+			const Transform& emitterTransform = _world.GetComponent<Transform>( id );
 			ParticleEmitter& emitter = _world.GetComponent<ParticleEmitter>( id );
 
 			if( emitter.particlesPerSecond > 0.f )

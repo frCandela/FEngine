@@ -9,7 +9,7 @@ namespace fan
 	class ComponentsCollection;
 	class EcsWorld;
 	struct Entity;
-	struct ecComponent;
+	struct Component;
 
 	static constexpr uint32_t signatureLength = 32;
 	using Signature = std::bitset<signatureLength>;

@@ -2,7 +2,7 @@
 
 #include "scene/fanScenePrecompiled.hpp"
 
-#include "scene/ecs/fanEcComponent.hpp"
+#include "scene/ecs/fanComponent.hpp"
 
 namespace fan
 {
@@ -11,14 +11,14 @@ namespace fan
 	//==============================================================================================================================================================
 	// MotionState is used synchronizes physics with graphics
 	//==============================================================================================================================================================
-	struct MotionState : public ecComponent
+	struct MotionState : public Component
 	{
 		DECLARE_COMPONENT( MotionState )
 	public:
 		static void SetInfo( ComponentInfo& _info );
-		static void Init( ecComponent& _component );
-		static void Save( const ecComponent& _component, Json& _json ) {}
-		static void Load( ecComponent& _component, const Json& _json ) {}
+		static void Init( Component& _component );
+		static void Save( const Component& _component, Json& _json ) {}
+		static void Load( Component& _component, const Json& _json ) {}
 
 		btDefaultMotionState motionState;
 	};

@@ -2,28 +2,28 @@
 
 #include "scene/fanScenePrecompiled.hpp"
 
-#include "scene/ecs/fanEcComponent.hpp"
+#include "scene/ecs/fanComponent.hpp"
 #include "render/fanRenderResourcePtr.hpp"
 
 namespace fan
 {
 	struct ComponentInfo;
-	struct Transform2;
+	struct Transform;
 	struct Ray;
 
 	//==============================================================================================================================================================
 	//==============================================================================================================================================================
-	struct Camera2 : public ecComponent
+	struct Camera : public Component
 	{
-		DECLARE_COMPONENT( Camera2 )
+		DECLARE_COMPONENT( Camera )
 	public:
 		enum Type { PERSPECTIVE, ORTHOGONAL };
 
 		static void SetInfo( ComponentInfo& _info );
-		static void Init(  ecComponent& _component );
-		static void OnGui( ecComponent& _camera );
-		static void Save( const ecComponent& _camera, Json& _json );
-		static void Load( ecComponent& _camera, const Json& _json );
+		static void Init(  Component& _component );
+		static void OnGui( Component& _camera );
+		static void Save( const Component& _camera, Json& _json );
+		static void Load( Component& _camera, const Json& _json );
 
 		float fov;
 		float orthoSize;
@@ -32,10 +32,10 @@ namespace fan
 		float farDistance;
 		Type  type;
 
-		glm::mat4 GetView( const Transform2& _cameraTransform ) const;
+		glm::mat4 GetView( const Transform& _cameraTransform ) const;
 		glm::mat4 GetProjection() const;
-		Ray		  ScreenPosToRay( const Transform2& _cameraTransform, const btVector2& _screenSpacePosition ) const ;
-		btVector2 WorldPosToScreen( const Transform2& _cameraTransform, const btVector3& worldPosition ) const;
+		Ray		  ScreenPosToRay( const Transform& _cameraTransform, const btVector2& _screenSpacePosition ) const ;
+		btVector2 WorldPosToScreen( const Transform& _cameraTransform, const btVector3& worldPosition ) const;
 	};
-	static constexpr size_t sizeof_camera = sizeof( Camera2 );
+	static constexpr size_t sizeof_camera = sizeof( Camera );
 }

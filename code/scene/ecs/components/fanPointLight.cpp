@@ -1,28 +1,28 @@
-#include "scene/ecs/components/fanPointLight2.hpp"
+#include "scene/ecs/components/fanPointLight.hpp"
 
 #include "core/fanISerializable.hpp"
 
 namespace fan
 {
-	REGISTER_COMPONENT( PointLight2, "point_light" );
+	REGISTER_COMPONENT( PointLight, "point_light" );
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void PointLight2::SetInfo( ComponentInfo& _info )
+	void PointLight::SetInfo( ComponentInfo& _info )
 	{
 		_info.icon = ImGui::IconType::POINT_LIGHT16;
-		_info.onGui = &PointLight2::OnGui;
-		_info.init = &PointLight2::Init;
-		_info.load = &PointLight2::Load;
-		_info.save = &PointLight2::Save;
+		_info.onGui = &PointLight::OnGui;
+		_info.init = &PointLight::Init;
+		_info.load = &PointLight::Load;
+		_info.save = &PointLight::Save;
 		_info.editorPath = "lights/";
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void PointLight2::Init( ecComponent& _component )
+	void PointLight::Init( Component& _component )
 	{
-		PointLight2& pointLight = static_cast<PointLight2&>( _component );
+		PointLight& pointLight = static_cast<PointLight&>( _component );
 		pointLight.ambiant = Color::White;
 		pointLight.diffuse = Color::White;
 		pointLight.specular = Color::White;
@@ -33,9 +33,9 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void PointLight2::OnGui( ecComponent& _pointLight )
+	void PointLight::OnGui( Component& _pointLight )
 	{
-		PointLight2& pointLight = static_cast<PointLight2&>( _pointLight );
+		PointLight& pointLight = static_cast<PointLight&>( _pointLight );
 		ImGui::PushItemWidth( 0.6f * ImGui::GetWindowWidth() - 16 );
 		{
 
@@ -76,9 +76,9 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void PointLight2::Save( const ecComponent& _pointLight, Json& _json )
+	void PointLight::Save( const Component& _pointLight, Json& _json )
 	{
-		const PointLight2& pointLight = static_cast<const PointLight2&>( _pointLight );
+		const PointLight& pointLight = static_cast<const PointLight&>( _pointLight );
 		Serializable::SaveColor( _json, "ambiant", pointLight.ambiant );
 		Serializable::SaveColor( _json, "diffuse", pointLight.diffuse );
 		Serializable::SaveColor( _json, "specular", pointLight.specular );
@@ -88,9 +88,9 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void PointLight2::Load( ecComponent& _pointLight, const Json& _json )
+	void PointLight::Load( Component& _pointLight, const Json& _json )
 	{
-		PointLight2& pointLight = static_cast<PointLight2&>( _pointLight );
+		PointLight& pointLight = static_cast<PointLight&>( _pointLight );
 		Serializable::LoadColor( _json, "ambiant", pointLight.ambiant );
 		Serializable::LoadColor( _json, "diffuse", pointLight.diffuse );
 		Serializable::LoadColor( _json, "specular", pointLight.specular );
@@ -104,7 +104,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	float PointLight2::GetLightRange( const PointLight2& _light )
+	float PointLight::GetLightRange( const PointLight& _light )
 	{
 		const float epsilon = 0.1f;	// Value at which we consider the light value null
 		const float q = _light.attenuation[2];

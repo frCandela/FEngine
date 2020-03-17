@@ -5,25 +5,25 @@
 
 namespace fan
 {
-	REGISTER_COMPONENT( UIRenderer2, "ui_renderer" );
+	REGISTER_COMPONENT( UIRenderer, "ui_renderer" );
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void UIRenderer2::SetInfo( ComponentInfo& _info )
+	void UIRenderer::SetInfo( ComponentInfo& _info )
 	{
 		_info.icon = ImGui::IconType::UI_MESH_RENDERER16;
-		_info.onGui = &UIRenderer2::OnGui;
-		_info.init = &UIRenderer2::Init;
-		_info.load = &UIRenderer2::Load;
-		_info.save = &UIRenderer2::Save;
+		_info.onGui = &UIRenderer::OnGui;
+		_info.init = &UIRenderer::Init;
+		_info.load = &UIRenderer::Load;
+		_info.save = &UIRenderer::Save;
 		_info.editorPath = "/";
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void UIRenderer2::Init( ecComponent& _component )
+	void UIRenderer::Init( Component& _component )
 	{
-		UIRenderer2& uiRenderer = static_cast<UIRenderer2&>( _component );
+		UIRenderer& uiRenderer = static_cast<UIRenderer&>( _component );
 
 		if( uiRenderer.uiMesh.GetVertexBuffer() == nullptr )
 		{
@@ -41,9 +41,9 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void UIRenderer2::OnGui( ecComponent& _component )
+	void UIRenderer::OnGui( Component& _component )
 	{
-		UIRenderer2& ui = static_cast<UIRenderer2&>( _component );
+		UIRenderer& ui = static_cast<UIRenderer&>( _component );
 
 		const btVector2 windowSize = Input::Get().WindowSizeF();
 
@@ -64,25 +64,25 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void UIRenderer2::Save( const ecComponent& _component, Json& _json )
+	void UIRenderer::Save( const Component& _component, Json& _json )
 	{
-		const UIRenderer2& ui = static_cast<const UIRenderer2&>( _component );
+		const UIRenderer& ui = static_cast<const UIRenderer&>( _component );
 		Serializable::SaveColor( _json, "color", ui.color );
 		Serializable::SaveTexturePtr( _json, "texture_path", ui.texture );
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void UIRenderer2::Load( ecComponent& _component, const Json& _json )
+	void UIRenderer::Load( Component& _component, const Json& _json )
 	{
-		UIRenderer2& ui = static_cast<UIRenderer2&>( _component );
+		UIRenderer& ui = static_cast<UIRenderer&>( _component );
 		Serializable::LoadColor( _json, "color", ui.color );
 		Serializable::LoadTexturePtr( _json, "texture_path", ui.texture );
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	glm::ivec2	UIRenderer2::GetTextureSize() const 
+	glm::ivec2	UIRenderer::GetTextureSize() const 
 	{ 
 		return *texture != nullptr ? texture->GetSize() : glm::ivec2( 0, 0 ); 
 	}

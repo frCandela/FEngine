@@ -27,12 +27,12 @@ namespace fan {
 		template< typename _componentType >	void			RemoveComponent( const EntityID _entityID );
 		template< typename _tagType >void					AddTag( const EntityID _entityID );
 		template< typename _tagType >void					RemoveTag( const EntityID _entityID );
-		template< typename _componentType > bool			IsType( const ecComponent& _component );
+		template< typename _componentType > bool			IsType( const Component& _component );
 		template< typename _componentType >	_componentType&	GetSingletonComponent();
 		template< typename _tagOrComponentType > Signature	GetSignature() const;
 
-		ecComponent&		  AddComponent( const EntityID _entityID, const ComponentIndex _index );
-		ecComponent&		  GetComponent( const EntityID _entityID, const ComponentIndex _index );
+		Component&		  AddComponent( const EntityID _entityID, const ComponentIndex _index );
+		Component&		  GetComponent( const EntityID _entityID, const ComponentIndex _index );
 		void				  RemoveComponent( const EntityID _entityID, const ComponentIndex _index );
 		bool				  HasComponent( const EntityID _entityID, ComponentIndex _index );
 		const ComponentInfo&  GetComponentInfo( const ComponentIndex _index ) const { return  m_componentInfo.at( _index );	}
@@ -44,7 +44,7 @@ namespace fan {
 		void				  SortEntities();
 		void				  RemoveDeadEntities();
 		uint32_t			  GetComponentCount( const EntityID _entityID ) { return m_entities[_entityID].componentCount;  }
-		ecComponent&		  GetComponentAt( const EntityID _entityID, int _componentIndex );
+		Component&		  GetComponentAt( const EntityID _entityID, int _componentIndex );
 
 		std::vector<EntityID> Match( const Signature _signature );
 		std::vector<EntityID> MatchSubset( const Signature _signature, const std::vector<EntityID>& _subset );
@@ -85,9 +85,9 @@ namespace fan {
 	template< typename _componentType >
 	_componentType& EcsWorld::AddComponent( const EntityID _entityID )
 	{
-		static_assert( std::is_base_of< ecComponent, _componentType>::value );
+		static_assert( std::is_base_of< Component, _componentType>::value );
 		const ComponentIndex index = m_typeIndices[_componentType::s_typeInfo];
-		ecComponent& component = AddComponent( _entityID, index );
+		Component& component = AddComponent( _entityID, index );
 		return static_cast< _componentType& >( component );
 	}
 
@@ -96,7 +96,7 @@ namespace fan {
 	template< typename _componentType >	
 	_componentType& EcsWorld::GetComponent( const EntityID _entityID )
 	{
-		static_assert( std::is_base_of< ecComponent, _componentType>::value );			
+		static_assert( std::is_base_of< Component, _componentType>::value );			
 		const ComponentIndex index = m_typeIndices[_componentType::s_typeInfo];
 		return static_cast<_componentType&> ( GetComponent( _entityID, index ) );
 	}
@@ -105,7 +105,7 @@ namespace fan {
 	//==============================================================================================================================================================
 	template< typename _componentType >	bool EcsWorld::HasComponent( const EntityID _entityID )
 	{
-		static_assert( std::is_base_of< ecComponent, _componentType>::value );
+		static_assert( std::is_base_of< Component, _componentType>::value );
 		const ComponentIndex index = m_typeIndices[_componentType::s_typeInfo];
 		return m_entities[_entityID].HasComponent( index );
 	}
@@ -114,7 +114,7 @@ namespace fan {
 	//==============================================================================================================================================================
 	template< typename _componentType >	void EcsWorld::RemoveComponent( const EntityID _entityID )
 	{
-		static_assert( std::is_base_of< ecComponent, _componentType>::value );
+		static_assert( std::is_base_of< Component, _componentType>::value );
 		const ComponentIndex index = m_typeIndices[_componentType::s_typeInfo];
 		RemoveComponent( _entityID, index );
 	}
@@ -142,9 +142,9 @@ namespace fan {
 	//==============================================================================================================================================================
 	// returns true if the given component has the same type as _componentType
 	//==============================================================================================================================================================
-	template< typename _componentType > bool EcsWorld::IsType( const ecComponent& _component )
+	template< typename _componentType > bool EcsWorld::IsType( const Component& _component )
 	{
-		static_assert( std::is_base_of< ecComponent, _componentType>::value );
+		static_assert( std::is_base_of< Component, _componentType>::value );
 		return _component.GetIndex() == GetDynamicIndex( _componentType::s_typeInfo );
 	}
 
@@ -160,7 +160,7 @@ namespace fan {
 	//==============================================================================================================================================================
 	template< typename _tagOrComponentType > Signature EcsWorld::GetSignature() const
 	{
-		static_assert( std::is_base_of< Tag, _tagOrComponentType>::value || std::is_base_of< ecComponent, _tagOrComponentType>::value );
+		static_assert( std::is_base_of< Tag, _tagOrComponentType>::value || std::is_base_of< Component, _tagOrComponentType>::value );
 		return Signature( 1 ) << m_typeIndices.at( _tagOrComponentType::s_typeInfo );
 	}
 
@@ -168,7 +168,7 @@ namespace fan {
 	//==============================================================================================================================================================
 	template< typename _componentType >	void EcsWorld::AddComponentType()
 	{
-		static_assert( std::is_base_of< ecComponent, _componentType>::value );
+		static_assert( std::is_base_of< Component, _componentType>::value );
 		assert( m_nextTagIndex >= m_nextTypeIndex );
 
 		m_components.push_back( ComponentsCollection() );

@@ -2,10 +2,10 @@
 
 #include "scene/ecs/components/fanBounds.hpp"
 #include "scene/ecs/components/fanSceneNode.hpp"
-#include "scene/ecs/components/fanTransform2.hpp"
-#include "scene/ecs/components/fanMeshRenderer2.hpp"
-#include "scene/ecs/components/fanPointLight2.hpp"
-#include "scene/ecs/components/fanDirectionalLight2.hpp"
+#include "scene/ecs/components/fanTransform.hpp"
+#include "scene/ecs/components/fanMeshRenderer.hpp"
+#include "scene/ecs/components/fanPointLight.hpp"
+#include "scene/ecs/components/fanDirectionalLight.hpp"
 #include "render/fanRendererDebug.hpp"
 #include "scene/ecs/fanEcsWorld.hpp"
 
@@ -34,7 +34,7 @@ namespace fan
 	//================================================================================================================================
 	Signature S_DrawDebugNormals::GetSignature( const EcsWorld& _world )
 	{
-		return _world.GetSignature<MeshRenderer2>() | _world.GetSignature<Transform2>();
+		return _world.GetSignature<MeshRenderer>() | _world.GetSignature<Transform>();
 	}
 
 	//================================================================================================================================
@@ -43,8 +43,8 @@ namespace fan
 	{
 		for( EntityID entityID : _entities )
 		{
-			const MeshRenderer2& meshRenderer = _world.GetComponent<MeshRenderer2>( entityID );
-			const Transform2& transform = _world.GetComponent<Transform2>( entityID );
+			const MeshRenderer& meshRenderer = _world.GetComponent<MeshRenderer>( entityID );
+			const Transform& transform = _world.GetComponent<Transform>( entityID );
 
 			if( *meshRenderer.mesh != nullptr )
 			{
@@ -68,7 +68,7 @@ namespace fan
 	//================================================================================================================================
 	Signature S_DrawDebugWireframe::GetSignature( const EcsWorld& _world )
 	{
-		return _world.GetSignature<MeshRenderer2>() | _world.GetSignature<Transform2>();
+		return _world.GetSignature<MeshRenderer>() | _world.GetSignature<Transform>();
 	}
 
 	//================================================================================================================================
@@ -77,8 +77,8 @@ namespace fan
 	{
 		for( EntityID entityID : _entities )
 		{
-			const MeshRenderer2& meshRenderer = _world.GetComponent<MeshRenderer2>( entityID );
-			const Transform2& transform = _world.GetComponent<Transform2>( entityID );
+			const MeshRenderer& meshRenderer = _world.GetComponent<MeshRenderer>( entityID );
+			const Transform& transform = _world.GetComponent<Transform>( entityID );
 
 			if( *meshRenderer.mesh != nullptr )
 			{
@@ -103,7 +103,7 @@ namespace fan
 	//================================================================================================================================
 	Signature S_DrawDebugHull::GetSignature( const EcsWorld& _world )
 	{
-		return _world.GetSignature<MeshRenderer2>() | _world.GetSignature<Transform2>();
+		return _world.GetSignature<MeshRenderer>() | _world.GetSignature<Transform>();
 	}
 
 	//================================================================================================================================
@@ -112,8 +112,8 @@ namespace fan
 	{
 		for( EntityID entityID : _entities )
 		{
-			const MeshRenderer2& meshRenderer = _world.GetComponent<MeshRenderer2>( entityID );
-			const Transform2& transform = _world.GetComponent<Transform2>( entityID );
+			const MeshRenderer& meshRenderer = _world.GetComponent<MeshRenderer>( entityID );
+			const Transform& transform = _world.GetComponent<Transform>( entityID );
 
 			if( *meshRenderer.mesh != nullptr )
 			{
@@ -152,7 +152,7 @@ namespace fan
 	//================================================================================================================================
 	Signature S_DrawDebugPointLights::GetSignature( const EcsWorld& _world )
 	{
-		return _world.GetSignature<PointLight2>() | _world.GetSignature<Transform2>();
+		return _world.GetSignature<PointLight>() | _world.GetSignature<Transform>();
 	}
 
 	//================================================================================================================================
@@ -161,10 +161,10 @@ namespace fan
 	{
 		for( EntityID entityID : _entities )
 		{
-			const PointLight2& light = _world.GetComponent<PointLight2>( entityID );
-			const Transform2& transform = _world.GetComponent<Transform2>( entityID );
+			const PointLight& light = _world.GetComponent<PointLight>( entityID );
+			const Transform& transform = _world.GetComponent<Transform>( entityID );
 
-			const float lightRange = PointLight2::GetLightRange( light );
+			const float lightRange = PointLight::GetLightRange( light );
 			if( lightRange > 0 )
 			{
 				RendererDebug::Get().DebugSphere( transform.transform, lightRange, 2, light.diffuse );
@@ -176,7 +176,7 @@ namespace fan
 	//================================================================================================================================
 	Signature S_DrawDebugDirectionalLights::GetSignature( const EcsWorld& _world )
 	{
-		return _world.GetSignature<DirectionalLight2>() | _world.GetSignature<Transform2>();
+		return _world.GetSignature<DirectionalLight>() | _world.GetSignature<Transform>();
 	}
 
 	//================================================================================================================================
@@ -185,8 +185,8 @@ namespace fan
 	{
 		for( EntityID entityID : _entities )
 		{
-			const DirectionalLight2& light = _world.GetComponent<DirectionalLight2>( entityID );
-			const Transform2& transform = _world.GetComponent<Transform2>( entityID );
+			const DirectionalLight& light = _world.GetComponent<DirectionalLight>( entityID );
+			const Transform& transform = _world.GetComponent<Transform>( entityID );
 
 			const btVector3 pos = transform.GetPosition();
 			const btVector3 dir = transform.Forward();

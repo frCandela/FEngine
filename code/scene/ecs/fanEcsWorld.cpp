@@ -1,6 +1,6 @@
 #include "fanEcsWorld.hpp"
 
-#include "fanEcComponent.hpp"
+#include "fanComponent.hpp"
 #include "fanTag.hpp"
 #include "scene/ecs/fanSingletonComponent.hpp"
 
@@ -37,7 +37,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	ecComponent& EcsWorld::AddComponent( const EntityID _entityID, const ComponentIndex _index )
+	Component& EcsWorld::AddComponent( const EntityID _entityID, const ComponentIndex _index )
 	{
 		Entity& entity = GetEntity( _entityID );
 		assert( !entity.signature[_index] ); // this entity already have this component
@@ -46,10 +46,10 @@ namespace fan
 		const ComponentInfo& info = m_componentInfo[_index];
 
 		// alloc data
-		ecComponent&		 componentBase = m_components[_index].NewComponent();
+		Component&		 componentBase = m_components[_index].NewComponent();
 		ChunckIndex			 chunckIndex = componentBase.chunckIndex;
 		ChunckComponentIndex chunckComponentIndex = componentBase.chunckComponentIndex;
-		ecComponent&		 component = info.instanciate( &componentBase );			
+		Component&		 component = info.instanciate( &componentBase );			
 
 		// set component
 		info.init( component );
@@ -67,7 +67,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	ecComponent& EcsWorld::GetComponent( const EntityID _entityID, const ComponentIndex _index )
+	Component& EcsWorld::GetComponent( const EntityID _entityID, const ComponentIndex _index )
 	{
 		Entity& entity = GetEntity( _entityID );
 		assert( entity.signature[_index] ); // entity has have this component
@@ -79,7 +79,7 @@ namespace fan
 			}
 		}
 		assert( false );
-		return *(ecComponent*)( 0 );
+		return *(Component*)( 0 );
 	}
 
 	//================================================================================================================================
@@ -88,7 +88,7 @@ namespace fan
 	{		
 		Entity& entity = GetEntity( _entityID );
 		assert( entity.signature[_index] == 1 ); // this entity doesn't have this component
-		ecComponent& component = GetComponent( _entityID, _index );
+		Component& component = GetComponent( _entityID, _index );
 
 		m_components[_index].RemoveComponent( component.chunckIndex, component.chunckComponentIndex );
 		entity.signature[_index] = 0;
@@ -214,7 +214,7 @@ namespace fan
 			// Remove the component
 			for( int componentIndex = 0; componentIndex < entity.componentCount; componentIndex++ )
 			{
-				ecComponent& component = *entity.components[componentIndex];
+				Component& component = *entity.components[componentIndex];
 				m_components[component.componentIndex].RemoveComponent( component.chunckIndex, component.chunckComponentIndex );
 			}
 			m_entities.pop_back();
@@ -224,7 +224,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	ecComponent& EcsWorld::GetComponentAt( const EntityID _entityID, int _componentIndex )
+	Component& EcsWorld::GetComponentAt( const EntityID _entityID, int _componentIndex )
 	{ 
 		Entity& entity = m_entities[_entityID];
 		assert( _componentIndex < entity.componentCount );

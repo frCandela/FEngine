@@ -1,11 +1,12 @@
 #include "editor/fanEditorGizmos.hpp"
+
 #include "editor/fanEditorDebug.hpp"
 #include "core/math/shapes/fanRay.hpp"
 #include "core/math/fanBasicModels.hpp"
 #include "core/input/fanMouse.hpp"
 #include "scene/ecs/components/fanSceneNode.hpp"
-#include "scene/ecs/components/fanTransform2.hpp"
-#include "scene/ecs/components/fanCamera2.hpp"
+#include "scene/ecs/components/fanTransform.hpp"
+#include "scene/ecs/components/fanCamera.hpp"
 #include "scene/fanScene.hpp"
 #include "render/fanRendererDebug.hpp"
 #include "scene/ecs/fanEcsWorld.hpp"
@@ -30,8 +31,8 @@ namespace fan
 		SceneNode& cameraNode = m_currentScene->GetMainCamera();
 		EcsWorld& world = cameraNode.scene->GetWorld();
 		const EntityID id = world.GetEntityID( cameraNode.entityHandle );
-		const Transform2 & cameraTransform = world.GetComponent<Transform2>( id );
-		const Camera2& camera = world.GetComponent<Camera2>( id );
+		const Transform & cameraTransform = world.GetComponent<Transform>( id );
+		const Camera& camera = world.GetComponent<Camera>( id );
 
 		GizmoCacheData& cacheData = m_gizmoCacheData[ _uniqueID ];
 		const btVector3 origin = _transform.getOrigin();

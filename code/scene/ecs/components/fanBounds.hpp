@@ -2,7 +2,7 @@
 
 #include "scene/fanScenePrecompiled.hpp"
 
-#include "scene/ecs/fanEcComponent.hpp"
+#include "scene/ecs/fanComponent.hpp"
 #include "core/math/shapes/fanAABB.hpp"
 
 namespace fan
@@ -11,12 +11,12 @@ namespace fan
 
 	//==============================================================================================================================================================
 	//==============================================================================================================================================================
-	struct Bounds : public ecComponent
+	struct Bounds : public Component
 	{
 		DECLARE_COMPONENT( Bounds )
 	public:
 		static void SetInfo( ComponentInfo& _info );
-		static void Init( ecComponent& _component );
+		static void Init( Component& _component );
 
 		AABB aabb;
 	};

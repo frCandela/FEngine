@@ -3,8 +3,8 @@
 #include "core/math/shapes/fanRay.hpp"
 #include "scene/ecs/components/fanSceneNode.hpp"
 #include "scene/ecs/components/fanBounds.hpp"
-#include "scene/ecs/components/fanMeshRenderer2.hpp"
-#include "scene/ecs/components/fanTransform2.hpp"
+#include "scene/ecs/components/fanMeshRenderer.hpp"
+#include "scene/ecs/components/fanTransform.hpp"
 #include "scene/ecs/fanEcsWorld.hpp"
 
 namespace fan
@@ -13,7 +13,7 @@ namespace fan
 	//================================================================================================================================
 	Signature S_RaycastAll::GetSignature( const EcsWorld& _world )
 	{
-		return	_world.GetSignature<Bounds>() | _world.GetSignature<SceneNode>() | _world.GetSignature<Transform2>();
+		return	_world.GetSignature<Bounds>() | _world.GetSignature<SceneNode>() | _world.GetSignature<Transform>();
 	}
 
 	//================================================================================================================================
@@ -46,10 +46,10 @@ namespace fan
 			if( bounds.aabb.RayCast( _ray.origin, _ray.direction, intersection ) == true )
 			{
 				// raycast on mesh renderer
-				if( _world.HasComponent<MeshRenderer2>( entityID ) )
+				if( _world.HasComponent<MeshRenderer>( entityID ) )
 				{
-					MeshRenderer2& meshRenderer = _world.GetComponent<MeshRenderer2>( entityID );
-					Transform2& transform = _world.GetComponent<Transform2>( entityID );
+					MeshRenderer& meshRenderer = _world.GetComponent<MeshRenderer>( entityID );
+					Transform& transform = _world.GetComponent<Transform>( entityID );
 					const Ray transformedRay( transform.InverseTransformPoint( _ray.origin ), transform.InverseTransformDirection( _ray.direction ) );
 					if( meshRenderer.mesh->GetHull().RayCast( transformedRay.origin, transformedRay.direction, intersection ) )
 					{

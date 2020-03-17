@@ -2,7 +2,7 @@
 
 #include "scene/fanScenePrecompiled.hpp"
 
-#include "scene/ecs/fanEcComponent.hpp"
+#include "scene/ecs/fanComponent.hpp"
 
 namespace fan
 {
@@ -10,24 +10,22 @@ namespace fan
 
 	//==============================================================================================================================================================
 	//==============================================================================================================================================================
-	struct PointLight2 : public ecComponent
+	struct DirectionalLight : public Component
 	{
+		DECLARE_COMPONENT( DirectionalLight )
+	public:
+
 		enum Attenuation { CONSTANT = 0, LINEAR = 1, QUADRATIC = 2 };
 
-		DECLARE_COMPONENT( PointLight2 )
-	public:
 		static void SetInfo( ComponentInfo& _info );
-		static void Init( ecComponent& _component );
-		static void OnGui( ecComponent& _pointLight );
-		static void Save( const ecComponent& _pointLight, Json& _json );
-		static void Load( ecComponent& _pointLight, const Json& _json );
+		static void Init( Component& _component );
+		static void OnGui( Component& _light );
+		static void Save( const Component& _transform, Json& _json );
+		static void Load( Component& _transform, const Json& _json );
 
-		Color ambiant = Color::White;
+		Color ambiant = Color::Black;
 		Color diffuse = Color::White;
 		Color specular = Color::White;
-		float attenuation[3] = { 0.f,0.f,0.1f };
-
-		static float GetLightRange( const PointLight2& _light );
 	};
-	static constexpr size_t sizeof_pointLight2 = sizeof( PointLight2 );
+	static constexpr size_t sizeof_directionalLight = sizeof( DirectionalLight );
 }

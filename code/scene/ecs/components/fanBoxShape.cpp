@@ -1,41 +1,41 @@
-#include "scene/ecs/components/fanBoxShape2.hpp"
+#include "scene/ecs/components/fanBoxShape.hpp"
 
 #include "render/fanRenderSerializable.hpp"
 
 namespace fan
 {
-	REGISTER_COMPONENT( BoxShape2, "box_shape" );
+	REGISTER_COMPONENT( BoxShape, "box_shape" );
 
 	//================================================================================================================================
 	//================================================================================================================================
-	BoxShape2::BoxShape2() : boxShape( btVector3( 0.5f, 0.5f, 0.5f ) ) {}
+	BoxShape::BoxShape() : boxShape( btVector3( 0.5f, 0.5f, 0.5f ) ) {}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void BoxShape2::SetInfo( ComponentInfo& _info )
+	void BoxShape::SetInfo( ComponentInfo& _info )
 	{
 		_info.icon = ImGui::IconType::CUBE_SHAPE16;
-		_info.onGui = &BoxShape2::OnGui;
-		_info.init = &BoxShape2::Init;
-		_info.load  = &BoxShape2::Load;
-		_info.save  = &BoxShape2::Save;
+		_info.onGui = &BoxShape::OnGui;
+		_info.init = &BoxShape::Init;
+		_info.load  = &BoxShape::Load;
+		_info.save  = &BoxShape::Save;
 		_info.editorPath = "/";
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void BoxShape2::Init( ecComponent& _component )
+	void BoxShape::Init( Component& _component )
 	{
-		BoxShape2& boxShape = static_cast<BoxShape2&>( _component );
+		BoxShape& boxShape = static_cast<BoxShape&>( _component );
 		boxShape.boxShape = btBoxShape( btVector3( 0.5f, 0.5f, 0.5f ) );
 		boxShape.boxShape.setUserPointer( nullptr );
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void BoxShape2::OnGui( ecComponent& _boxShape )
+	void BoxShape::OnGui( Component& _boxShape )
 	{
-		BoxShape2& boxShape = static_cast<BoxShape2&>( _boxShape );
+		BoxShape& boxShape = static_cast<BoxShape&>( _boxShape );
 		ImGui::PushItemWidth( 0.6f * ImGui::GetWindowWidth() );
 		{
 			btVector3 extent = boxShape.GetScaling();
@@ -49,18 +49,18 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void BoxShape2::Save( const ecComponent& _boxShape, Json& _json )
+	void BoxShape::Save( const Component& _boxShape, Json& _json )
 	{
-		const BoxShape2& boxShape = static_cast<const BoxShape2&>( _boxShape );
+		const BoxShape& boxShape = static_cast<const BoxShape&>( _boxShape );
 
 		Serializable::SaveVec3( _json, "scaling", boxShape.GetScaling() );
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void BoxShape2::Load( ecComponent& _boxShape, const Json& _json )
+	void BoxShape::Load( Component& _boxShape, const Json& _json )
 	{
-		BoxShape2& boxShape = static_cast<BoxShape2&>( _boxShape );
+		BoxShape& boxShape = static_cast<BoxShape&>( _boxShape );
 
 		btVector3 scaling;
 		Serializable::LoadVec3( _json, "scaling", scaling );
@@ -70,14 +70,14 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void BoxShape2::SetScaling( const btVector3 _scaling )
+	void BoxShape::SetScaling( const btVector3 _scaling )
 	{
 		boxShape.setLocalScaling( _scaling );
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	btVector3 BoxShape2::GetScaling() const
+	btVector3 BoxShape::GetScaling() const
 	{
 		return boxShape.getLocalScaling();
 	}

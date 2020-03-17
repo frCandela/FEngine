@@ -13,7 +13,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void Particle::Init( ecComponent& _component )
+	void Particle::Init( Component& _component )
 	{
 		Particle& particle = static_cast<Particle&>( _component );
 		particle.speed = glm::vec3(0,0,0);

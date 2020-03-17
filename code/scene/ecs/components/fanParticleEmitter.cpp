@@ -20,7 +20,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void ParticleEmitter::Init( ecComponent& _component )
+	void ParticleEmitter::Init( Component& _component )
 	{
 		ParticleEmitter& emitter = static_cast<ParticleEmitter&>( _component );
 
@@ -34,7 +34,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void ParticleEmitter::OnGui( ecComponent& _emitter )
+	void ParticleEmitter::OnGui( Component& _emitter )
 	{
 		ParticleEmitter& emitter = static_cast<ParticleEmitter&>( _emitter );
 
@@ -52,7 +52,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void ParticleEmitter::Save( const ecComponent& _emitter, Json& _json )
+	void ParticleEmitter::Save( const Component& _emitter, Json& _json )
 	{
 		const ParticleEmitter& emitter = static_cast<const ParticleEmitter&>( _emitter );
 
@@ -65,7 +65,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void ParticleEmitter::Load( ecComponent& _emitter, const Json& _json )
+	void ParticleEmitter::Load( Component& _emitter, const Json& _json )
 	{
 		ParticleEmitter& emitter = static_cast<ParticleEmitter&>( _emitter );
 

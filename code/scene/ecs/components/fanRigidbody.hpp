@@ -2,7 +2,7 @@
 
 #include "scene/fanScenePrecompiled.hpp"
 
-#include "scene/ecs/fanEcComponent.hpp"
+#include "scene/ecs/fanComponent.hpp"
 
 namespace fan
 {
@@ -10,17 +10,17 @@ namespace fan
 
 	//==============================================================================================================================================================
 	//==============================================================================================================================================================
-	struct Rigidbody2 : public ecComponent
+	struct Rigidbody : public Component
 	{
-		DECLARE_COMPONENT( Rigidbody2 )
+		DECLARE_COMPONENT( Rigidbody )
 	public:
-		Rigidbody2();
+		Rigidbody();
 
 		static void SetInfo( ComponentInfo& _info );
-		static void Init(  ecComponent& _component );
-		static void OnGui( ecComponent& _rigidbody );
-		static void Save( const ecComponent& _rigidbody, Json& _json );
-		static void Load( ecComponent& _rigidbody, const Json& _json );		
+		static void Init(  Component& _component );
+		static void OnGui( Component& _rigidbody );
+		static void Save( const Component& _rigidbody, Json& _json );
+		static void Load( Component& _rigidbody, const Json& _json );		
 
 		float		GetMass() const;
 		void		SetMass( const float _mass );
@@ -30,7 +30,7 @@ namespace fan
 		bool		IsKinematic() const;
 		void		Activate();
 		bool		IsActive() const;
-		void		SetIgnoreCollisionCheck( const Rigidbody2& _rb, const bool state );
+		void		SetIgnoreCollisionCheck( const Rigidbody& _rb, const bool state );
 		bool		IsDeactivationEnabled() const;
 		void		EnableDeactivation( const bool _enable );
 		btVector3	GetVelocity() const;
@@ -42,8 +42,8 @@ namespace fan
 		void SetMotionState( btDefaultMotionState* _motionState );
 
 		btRigidBody rigidbody;
-		Signal<Rigidbody2*, btPersistentManifold* const&> onContactStarted;
-		Signal<Rigidbody2*, btPersistentManifold* const&> onContactEnded;
+		Signal<Rigidbody*, btPersistentManifold* const&> onContactStarted;
+		Signal<Rigidbody*, btPersistentManifold* const&> onContactEnded;
 	};
-	static constexpr size_t sizeof_rigidbody = sizeof( Rigidbody2 );
+	static constexpr size_t sizeof_rigidbody = sizeof( Rigidbody );
 }

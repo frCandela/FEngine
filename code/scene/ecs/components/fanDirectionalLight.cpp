@@ -1,28 +1,28 @@
-#include "scene/ecs/components/fanDirectionalLight2.hpp"
+#include "scene/ecs/components/fanDirectionalLight.hpp"
 
 #include "core/fanISerializable.hpp"
 
 namespace fan
 {
-	REGISTER_COMPONENT( DirectionalLight2, "directional_light" );
+	REGISTER_COMPONENT( DirectionalLight, "directional_light" );
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void DirectionalLight2::SetInfo( ComponentInfo& _info )
+	void DirectionalLight::SetInfo( ComponentInfo& _info )
 	{
 		_info.icon = ImGui::IconType::DIR_LIGHT16;
-		_info.onGui = &DirectionalLight2::OnGui;
-		_info.init = &DirectionalLight2::Init;
-		_info.load = &DirectionalLight2::Load;
-		_info.save = &DirectionalLight2::Save;
+		_info.onGui = &DirectionalLight::OnGui;
+		_info.init = &DirectionalLight::Init;
+		_info.load = &DirectionalLight::Load;
+		_info.save = &DirectionalLight::Save;
 		_info.editorPath = "lights/";
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void DirectionalLight2::Init( ecComponent& _component )
+	void DirectionalLight::Init( Component& _component )
 	{
-		DirectionalLight2& light = static_cast<DirectionalLight2&>( _component );
+		DirectionalLight& light = static_cast<DirectionalLight&>( _component );
 		light.ambiant = Color::Black;
 		light.diffuse = Color::White;
 		light.specular = Color::White;
@@ -30,9 +30,9 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void DirectionalLight2::OnGui( ecComponent& _light )
+	void DirectionalLight::OnGui( Component& _light )
 	{
-		DirectionalLight2& light = static_cast<DirectionalLight2&>( _light );
+		DirectionalLight& light = static_cast<DirectionalLight&>( _light );
 
 		ImGui::PushItemWidth( 0.6f * ImGui::GetWindowWidth() );
 		{
@@ -67,9 +67,9 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void DirectionalLight2::Save( const ecComponent& _light, Json& _json )
+	void DirectionalLight::Save( const Component& _light, Json& _json )
 	{
-		const DirectionalLight2& light = static_cast<const DirectionalLight2&>( _light );
+		const DirectionalLight& light = static_cast<const DirectionalLight&>( _light );
 		Serializable::SaveColor( _json, "ambiant", light.ambiant );
 		Serializable::SaveColor( _json, "diffuse", light.diffuse );
 		Serializable::SaveColor( _json, "specular", light.specular );
@@ -77,9 +77,9 @@ namespace fan
 	
 	//================================================================================================================================
 	//================================================================================================================================
-	void DirectionalLight2::Load( ecComponent& _light, const Json& _json )
+	void DirectionalLight::Load( Component& _light, const Json& _json )
 	{
-		DirectionalLight2& light = static_cast<DirectionalLight2&>( _light );
+		DirectionalLight& light = static_cast<DirectionalLight&>( _light );
 		Serializable::LoadColor( _json, "ambiant", light.ambiant );
 		Serializable::LoadColor( _json, "diffuse", light.diffuse );
 		Serializable::LoadColor( _json, "specular", light.specular );

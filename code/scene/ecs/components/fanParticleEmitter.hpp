@@ -2,7 +2,7 @@
 
 #include "scene/fanScenePrecompiled.hpp"
 
-#include "scene/ecs/fanEcComponent.hpp"
+#include "scene/ecs/fanComponent.hpp"
 #include "render/fanRenderResourcePtr.hpp"
 
 namespace fan
@@ -13,15 +13,15 @@ namespace fan
 	// Emits particles 
 	// timeAccumulator is used to keep track of time to spawn particles with proper timing
 	//==============================================================================================================================================================
-	struct ParticleEmitter : public ecComponent
+	struct ParticleEmitter : public Component
 	{
 		DECLARE_COMPONENT( ParticleEmitter )
 	public:
 		static void SetInfo( ComponentInfo& _info );
-		static void Init( ecComponent& _component );
-		static void OnGui( ecComponent& _emitter );
-		static void Save( const ecComponent& _emitter, Json& _json );
-		static void Load( ecComponent& _emitter, const Json& _json );
+		static void Init( Component& _component );
+		static void OnGui( Component& _emitter );
+		static void Save( const Component& _emitter, Json& _json );
+		static void Load( Component& _emitter, const Json& _json );
 
 		int				particlesPerSecond;
 		float			speed;

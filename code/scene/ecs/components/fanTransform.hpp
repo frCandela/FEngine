@@ -2,7 +2,7 @@
 
 #include "scene/fanScenePrecompiled.hpp"
 
-#include "scene/ecs/fanEcComponent.hpp"
+#include "scene/ecs/fanComponent.hpp"
 
 namespace fan
 {
@@ -10,15 +10,15 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	struct Transform2 : public ecComponent
+	struct Transform : public Component
 	{
-		DECLARE_COMPONENT( Transform2 )
+		DECLARE_COMPONENT( Transform )
 	public:
 		static void SetInfo( ComponentInfo& _info );
-		static void	Init( ecComponent& _component );
-		static void OnGui( ecComponent& _transform );
-		static void Save( const ecComponent& _transform, Json& _json );
-		static void Load( ecComponent& _transform, const Json& _json );
+		static void	Init( Component& _component );
+		static void OnGui( Component& _transform );
+		static void Save( const Component& _transform, Json& _json );
+		static void Load( Component& _transform, const Json& _json );
 
 		void SetPosition( btVector3 _newPosition );
 		void SetScale( btVector3 _newScale );
@@ -45,5 +45,5 @@ namespace fan
 		btTransform transform;
 		btVector3   scale;
 	};
-	static constexpr size_t sizeof_transform2 = sizeof( Transform2 );
+	static constexpr size_t sizeof_transform2 = sizeof( Transform );
 }

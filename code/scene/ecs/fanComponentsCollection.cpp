@@ -30,7 +30,7 @@ namespace fan
 	//==============================================================================================================================================================
 	// allocates a new component
 	//==============================================================================================================================================================
-	ecComponent& ComponentsCollection::NewComponent()
+	Component& ComponentsCollection::NewComponent()
 	{
 		for( ChunckIndex chunckIndex = 0; chunckIndex < m_chunks.size(); chunckIndex++ )
 		{
@@ -41,7 +41,7 @@ namespace fan
 				const ChunckComponentIndex index = chunck.recycleList[chunck.recycleList.size() - 1];
 				chunck.recycleList.pop_back();
 				chunck.count++;
-				ecComponent& component = *static_cast<ecComponent*>( At( chunckIndex, index ) );
+				Component& component = *static_cast<Component*>( At( chunckIndex, index ) );
 				component.chunckIndex = chunckIndex;
 				component.chunckComponentIndex = index;
 				return component;
@@ -51,7 +51,7 @@ namespace fan
 				// create index
 				const ChunckComponentIndex index = chunck.count;
 				chunck.count++;
-				ecComponent& component = *static_cast<ecComponent*>( At( chunckIndex, index ) );
+				Component& component = *static_cast<Component*>( At( chunckIndex, index ) );
 				component.chunckIndex = chunckIndex;
 				component.chunckComponentIndex = index;
 				return component;
@@ -60,7 +60,7 @@ namespace fan
 
 		// create chunck
 		Chunck& newChunck = AllocChunck();
-		ecComponent& component = *static_cast<ecComponent*>( At( (ChunckIndex)m_chunks.size() - 1, 0 ) );
+		Component& component = *static_cast<Component*>( At( (ChunckIndex)m_chunks.size() - 1, 0 ) );
 		component.chunckIndex = static_cast<ChunckIndex>( m_chunks.size() - 1 );
 		component.chunckComponentIndex = 0;
 		newChunck.count++;

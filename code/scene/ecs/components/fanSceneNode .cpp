@@ -18,7 +18,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void SceneNode::Init( ecComponent& _component )
+	void SceneNode::Init( Component& _component )
 	{
 		SceneNode& node = static_cast<SceneNode&>( _component );
 		node.entityHandle = 0;
@@ -44,7 +44,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void SceneNode::OnGui( ecComponent& _sceneNode )
+	void SceneNode::OnGui( Component& _sceneNode )
 	{
 		SceneNode& node = static_cast<SceneNode&>( _sceneNode );
 		ImGui::Text( "name      : %s", node.name.c_str() );

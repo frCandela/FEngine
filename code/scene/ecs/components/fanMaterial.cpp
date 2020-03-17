@@ -1,28 +1,28 @@
-#include "scene/ecs/components/fanMaterial2.hpp"
+#include "scene/ecs/components/fanMaterial.hpp"
 
 #include "render/fanRenderSerializable.hpp"
 
 namespace fan
 {
-	REGISTER_COMPONENT( Material2, "material" );
+	REGISTER_COMPONENT( Material, "material" );
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void Material2::SetInfo( ComponentInfo& _info )
+	void Material::SetInfo( ComponentInfo& _info )
 	{
 		_info.icon = ImGui::IconType::MATERIAL16;
-		_info.onGui = &Material2::OnGui;
-		_info.init = &Material2::Init;
-		_info.load  = &Material2::Load;
-		_info.save  = &Material2::Save;
+		_info.onGui = &Material::OnGui;
+		_info.init = &Material::Init;
+		_info.load  = &Material::Load;
+		_info.save  = &Material::Save;
 		_info.editorPath = "/";
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void Material2::Init( ecComponent& _component )
+	void Material::Init( Component& _component )
 	{
-		Material2& material = static_cast<Material2&>( _component );
+		Material& material = static_cast<Material&>( _component );
 
 		material.texture = nullptr;
 		material.shininess = 1;
@@ -31,9 +31,9 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void Material2::OnGui( ecComponent& _material )
+	void Material::OnGui( Component& _material )
 	{
-		Material2& material = static_cast<Material2&>( _material );
+		Material& material = static_cast<Material&>( _material );
 
 		ImGui::PushItemWidth( 0.6f * ImGui::GetWindowWidth() - 16 );
 		{
@@ -51,9 +51,9 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void Material2::Save( const ecComponent& _material, Json& _json )
+	void Material::Save( const Component& _material, Json& _json )
 	{
-		const Material2& material = static_cast<const Material2&>( _material );
+		const Material& material = static_cast<const Material&>( _material );
 
 		Serializable::SaveUInt( _json, "shininess", material.shininess );
 		Serializable::SaveColor( _json, "color", material.color );
@@ -62,9 +62,9 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void Material2::Load( ecComponent& _material, const Json& _json )
+	void Material::Load( Component& _material, const Json& _json )
 	{
-		Material2& material = static_cast<Material2&>( _material );
+		Material& material = static_cast<Material&>( _material );
 
 		Serializable::LoadUInt( _json, "shininess", material.shininess );
 		Serializable::LoadColor( _json, "color", material.color );

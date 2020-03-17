@@ -2,7 +2,7 @@
 
 #include "scene/fanScenePrecompiled.hpp"
 
-#include "scene/ecs/fanEcComponent.hpp"
+#include "scene/ecs/fanComponent.hpp"
 
 namespace fan
 {
@@ -11,7 +11,7 @@ namespace fan
 
 	//==============================================================================================================================================================
 	//==============================================================================================================================================================
-	struct SceneNode : public ecComponent
+	struct SceneNode : public Component
 	{
 		DECLARE_COMPONENT( SceneNode )
 	public:
@@ -23,8 +23,8 @@ namespace fan
 		};
 
 		static void SetInfo( ComponentInfo& _info );
-		static void Init( ecComponent& _component );
-		static void OnGui( ecComponent& _sceneNode );
+		static void Init( Component& _component );
+		static void OnGui( Component& _sceneNode );
 
 		void Build( const std::string& _name, Scene& _scene, const EntityHandle _entityHandle, const uint32_t _uniqueID, SceneNode* const _parent);
 

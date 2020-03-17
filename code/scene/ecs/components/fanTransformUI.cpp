@@ -4,25 +4,25 @@
 
 namespace fan
 {
-	REGISTER_COMPONENT( UITransform2, "ui_transform" );
+	REGISTER_COMPONENT( UITransform, "ui_transform" );
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void UITransform2::SetInfo( ComponentInfo& _info )
+	void UITransform::SetInfo( ComponentInfo& _info )
 	{
 		_info.icon = ImGui::IconType::UI_TRANSFORM16;
-		_info.onGui = &UITransform2::OnGui;
-		_info.init = &UITransform2::Init;
-		_info.load = &UITransform2::Load;
-		_info.save = &UITransform2::Save;
+		_info.onGui = &UITransform::OnGui;
+		_info.init = &UITransform::Init;
+		_info.load = &UITransform::Load;
+		_info.save = &UITransform::Save;
 		_info.editorPath = "/";
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void UITransform2::Init( ecComponent& _component )
+	void UITransform::Init( Component& _component )
 	{
-		UITransform2& transform = static_cast<UITransform2&>( _component );
+		UITransform& transform = static_cast<UITransform&>( _component );
 
 		transform.scale = glm::vec2(1.f, 1.f);
 		transform.position = glm::vec2( 0, 0 );
@@ -30,9 +30,9 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void UITransform2::OnGui( ecComponent& _component )
+	void UITransform::OnGui( Component& _component )
 	{
-		UITransform2& transform = static_cast<UITransform2&>( _component );
+		UITransform& transform = static_cast<UITransform&>( _component );
 
 		ImGui::PushItemWidth( 0.6f * ImGui::GetWindowWidth() );
 		{
@@ -49,9 +49,9 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void UITransform2::Save( const ecComponent& _component, Json& _json )
+	void UITransform::Save( const Component& _component, Json& _json )
 	{
-		const UITransform2& transform = static_cast<const UITransform2&>( _component );
+		const UITransform& transform = static_cast<const UITransform&>( _component );
 
 		Serializable::SaveIVec2( _json, "position", transform.position );
 		Serializable::SaveVec2( _json, "scale", { transform.scale .x, transform.scale .y} );
@@ -59,9 +59,9 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void UITransform2::Load( ecComponent& _component, const Json& _json )
+	void UITransform::Load( Component& _component, const Json& _json )
 	{
-		UITransform2& transform = static_cast<UITransform2&>( _component );
+		UITransform& transform = static_cast<UITransform&>( _component );
 
 		btVector2 tmpPos;
 		btVector2 tmpScale;

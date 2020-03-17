@@ -160,13 +160,13 @@ namespace ImGui
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void FanBeginDragDropSourceEcComponent( fan::ecComponent& _component, const fan::ComponentInfo& _info, ImGuiDragDropFlags _flags )
+	void FanBeginDragDropSourceEcComponent( fan::Component& _component, const fan::ComponentInfo& _info, ImGuiDragDropFlags _flags )
 	{
-		fan::ecComponent* component = &_component;
+		fan::Component* component = &_component;
 		if( ImGui::BeginDragDropSource( _flags ) )
 		{
 			std::string nameid = std::string( "dragndrop_" ) + std::to_string( _component.GetIndex() );
-			ImGui::SetDragDropPayload( nameid.c_str(), &component, sizeof( fan::ecComponent** ) );
+			ImGui::SetDragDropPayload( nameid.c_str(), &component, sizeof( fan::Component** ) );
 			ImGui::Icon( _info.icon, { 16,16 } ); ImGui::SameLine();
 			ImGui::Text( _info.name.c_str() );
 			ImGui::EndDragDropSource();
@@ -176,9 +176,9 @@ namespace ImGui
 	//================================================================================================================================
 	// _typeID of the typeinfo type of the component 
 	//================================================================================================================================
-	fan::ecComponent* FanBeginDragDropTargetEcComponent( const uint32_t _typeID )
+	fan::Component* FanBeginDragDropTargetEcComponent( const uint32_t _typeID )
 	{
- 		fan::ecComponent* component = nullptr;
+ 		fan::Component* component = nullptr;
 // 		if( ImGui::BeginDragDropTarget() )
 // 		{
 // 			const fan::Component* sample = fan::TypeInfo::Get().GetInstance< fan::Component >( _typeID );

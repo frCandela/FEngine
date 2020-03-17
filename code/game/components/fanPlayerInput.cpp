@@ -4,8 +4,8 @@
 #include "core/input/fanMouse.hpp"
 #include "core/input/fanJoystick.hpp"
 #include "scene/ecs/components/fanSceneNode.hpp"
-#include "scene/ecs/components/fanCamera2.hpp"
-#include "scene/ecs/components/fanTransform2.hpp"
+#include "scene/ecs/components/fanCamera.hpp"
+#include "scene/ecs/components/fanTransform.hpp"
 #include "scene/ecs/fanEcsWorld.hpp"
 
 namespace fan

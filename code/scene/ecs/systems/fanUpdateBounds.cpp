@@ -1,11 +1,11 @@
 #include "scene/ecs/systems/fanUpdateBounds.hpp"
 
 #include "scene/ecs/components/fanBounds.hpp"
-#include "scene/ecs/components/fanMeshRenderer2.hpp"
+#include "scene/ecs/components/fanMeshRenderer.hpp"
 #include "scene/ecs/components/fanBounds.hpp"
-#include "scene/ecs/components/fanTransform2.hpp"
+#include "scene/ecs/components/fanTransform.hpp"
 #include "scene/ecs/components/fanMotionState.hpp"
-#include "scene/ecs/components/fanRigidbody2.hpp"
+#include "scene/ecs/components/fanRigidbody.hpp"
 #include "scene/ecs/fanEcsWorld.hpp"
 
 namespace fan
@@ -15,9 +15,9 @@ namespace fan
 	Signature S_UpdateBoundsFromRigidbody::GetSignature( const EcsWorld& _world )
 	{
 		return
-			_world.GetSignature<Transform2>() |
+			_world.GetSignature<Transform>() |
 			_world.GetSignature<MotionState>() |
-			_world.GetSignature<Rigidbody2>() |
+			_world.GetSignature<Rigidbody>() |
 			_world.GetSignature<Bounds>();
 	}
 
@@ -27,7 +27,7 @@ namespace fan
 	{
 		for( EntityID entityID : _entities )
 		{
-			const Rigidbody2& rb = _world.GetComponent<Rigidbody2>( entityID );
+			const Rigidbody& rb = _world.GetComponent<Rigidbody>( entityID );
 			Bounds& bounds = _world.GetComponent<Bounds>( entityID );
 
 			// gets bounds from rigidbody
@@ -44,8 +44,8 @@ namespace fan
 	Signature S_UpdateBoundsFromModel::GetSignature( const EcsWorld& _world )
 	{
 		return
-			_world.GetSignature<MeshRenderer2>() |
-			_world.GetSignature<Transform2>() |
+			_world.GetSignature<MeshRenderer>() |
+			_world.GetSignature<Transform>() |
 			_world.GetSignature<Bounds>() |
 			_world.GetSignature<tag_boundsOutdated>();
 	}
@@ -56,10 +56,10 @@ namespace fan
 	{
 		for( EntityID entityID : _entities )
 		{
-			const MeshRenderer2& renderer = _world.GetComponent<MeshRenderer2>( entityID );
+			const MeshRenderer& renderer = _world.GetComponent<MeshRenderer>( entityID );
 			if( *renderer.mesh != nullptr )
 			{
-				const Transform2& transform = _world.GetComponent<Transform2>( entityID );
+				const Transform& transform = _world.GetComponent<Transform>( entityID );
 				const ConvexHull& hull = renderer.mesh->GetHull();
 
 				// Calculates model matrix
@@ -82,7 +82,7 @@ namespace fan
 	Signature S_UpdateBoundsFromTransform::GetSignature( const EcsWorld& _world )
 	{
 		return
-			_world.GetSignature<Transform2>() |
+			_world.GetSignature<Transform>() |
 			_world.GetSignature<Bounds>() |
 			_world.GetSignature<tag_boundsOutdated>();
 	}
@@ -93,7 +93,7 @@ namespace fan
 	{
 		for( EntityID entityID : _entities )
 		{
-			const Transform2& transform = _world.GetComponent<Transform2>( entityID );
+			const Transform& transform = _world.GetComponent<Transform>( entityID );
 			const btVector3 origin = transform.GetPosition();
 
 			const float sizeBounds = 0.2f;

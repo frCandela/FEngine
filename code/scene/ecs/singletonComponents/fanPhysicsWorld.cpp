@@ -1,10 +1,10 @@
 #include "scene/ecs/singletonComponents/fanPhysicsWorld.hpp"
 
 #include "core/time/fanTime.hpp"
-#include "scene/ecs/components/fanRigidbody2.hpp"
+#include "scene/ecs/components/fanRigidbody.hpp"
 #include "scene/ecs/components/fanMotionState.hpp"
-#include "scene/ecs/components/fanSphereShape2.hpp"
-#include "scene/ecs/components/fanBoxShape2.hpp"
+#include "scene/ecs/components/fanSphereShape.hpp"
+#include "scene/ecs/components/fanBoxShape.hpp"
 #include "scene/ecs/fanEcsWorld.hpp"
 
 namespace fan
@@ -51,12 +51,12 @@ namespace fan
 	//================================================================================================================================
 	// maybe replace this with a boolean in the component typeinfo ?
 	//================================================================================================================================	
-	bool PhysicsWorld::IsPhysicsType( EcsWorld& _world, ecComponent& _component )
+	bool PhysicsWorld::IsPhysicsType( EcsWorld& _world, Component& _component )
 	{
-		return	_world.IsType<Rigidbody2>( _component ) ||
+		return	_world.IsType<Rigidbody>( _component ) ||
 				_world.IsType<MotionState>( _component ) ||
-				_world.IsType<SphereShape2>( _component ) ||
-				_world.IsType<BoxShape2>( _component );
+				_world.IsType<SphereShape>( _component ) ||
+				_world.IsType<BoxShape>( _component );
 	}
 
 	//================================================================================================================================
@@ -65,8 +65,8 @@ namespace fan
 	{
 		if( _manifold->getNumContacts() == 1 )
 		{
-			Rigidbody2* rb0 = static_cast<Rigidbody2*> ( _manifold->getBody0()->getUserPointer() );
-			Rigidbody2* rb1 = static_cast<Rigidbody2*> ( _manifold->getBody1()->getUserPointer() );
+			Rigidbody* rb0 = static_cast<Rigidbody*> ( _manifold->getBody0()->getUserPointer() );
+			Rigidbody* rb1 = static_cast<Rigidbody*> ( _manifold->getBody1()->getUserPointer() );
 			rb0->onContactStarted.Emmit( rb1, _manifold );
 			rb1->onContactStarted.Emmit( rb0, _manifold );
 		}
@@ -78,8 +78,8 @@ namespace fan
 	{
 		if( _manifold->getNumContacts() == 0 )
 		{
-			Rigidbody2* rb0 = static_cast<Rigidbody2*> ( _manifold->getBody0()->getUserPointer() );
-			Rigidbody2* rb1 = static_cast<Rigidbody2*> ( _manifold->getBody1()->getUserPointer() );
+			Rigidbody* rb0 = static_cast<Rigidbody*> ( _manifold->getBody0()->getUserPointer() );
+			Rigidbody* rb1 = static_cast<Rigidbody*> ( _manifold->getBody1()->getUserPointer() );
 			rb0->onContactEnded.Emmit( rb1, _manifold );
 			rb1->onContactEnded.Emmit( rb0, _manifold );
 		}

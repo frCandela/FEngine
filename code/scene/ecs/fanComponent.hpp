@@ -54,7 +54,7 @@ namespace fan
 	static const char* s_typeName;																\
 	private:																					\
 	friend class EcsWorld;																		\
-	static ecComponent& Instanciate( void * _buffer){ return *new( _buffer ) _componentType();}	\
+	static Component& Instanciate( void * _buffer){ return *new( _buffer ) _componentType();}	\
 
 #define REGISTER_COMPONENT( _componentType, _name)				\
 	const uint32_t _componentType::s_typeInfo = SSID(#_name);	\
@@ -70,7 +70,7 @@ namespace fan
 	// - chunckIndex is the index of the Chunck in the ComponentsCollection
 	// - index is the index of the component inside the chunck
 	//==============================================================================================================================================================
-	struct ecComponent
+	struct Component
 	{
 	private:
 		friend class ComponentsCollection;
@@ -83,7 +83,7 @@ namespace fan
 		ComponentIndex	GetIndex()	const { return componentIndex; };
 		Signature		GetSignature()	const { return Signature( 1 ) << componentIndex; }
 	};
-	static constexpr size_t sizeComponent = sizeof( ecComponent );
+	static constexpr size_t sizeComponent = sizeof( Component );
 	static_assert( sizeComponent == 4 );
 
 	//==============================================================================================================================================================
@@ -103,10 +103,10 @@ namespace fan
 		ComponentIndex	index;							// dynamic index in the ecsWorld
 		uint32_t		staticIndex;					// static index
 
-		void		 ( *onGui )( ecComponent& ) = nullptr;
-		void		 ( *init  )( ecComponent& ) = nullptr; 
-		void		 ( *save  )( const ecComponent&, Json& ) = nullptr;
-		void		 ( *load  )( ecComponent&, const Json& ) = nullptr;
-		ecComponent& ( *instanciate )( void* ) = nullptr;
+		void		 ( *onGui )( Component& ) = nullptr;
+		void		 ( *init  )( Component& ) = nullptr; 
+		void		 ( *save  )( const Component&, Json& ) = nullptr;
+		void		 ( *load  )( Component&, const Json& ) = nullptr;
+		Component& ( *instanciate )( void* ) = nullptr;
 	};
 }

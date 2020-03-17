@@ -2,7 +2,7 @@
 
 #include "scene/fanScenePrecompiled.hpp"
 
-#include "scene/ecs/fanEcComponent.hpp"
+#include "scene/ecs/fanComponent.hpp"
 
 namespace fan
 {
@@ -10,21 +10,21 @@ namespace fan
 
 	//==============================================================================================================================================================
 	//==============================================================================================================================================================
-	struct BoxShape2 : public ecComponent
+	struct BoxShape : public Component
 	{
-		DECLARE_COMPONENT( BoxShape2 )
+		DECLARE_COMPONENT( BoxShape )
 	public:
-		BoxShape2();
+		BoxShape();
 		static void SetInfo( ComponentInfo& _info );
-		static void Init( ecComponent& _component );
-		static void OnGui( ecComponent& _boxShape );
-		static void Save( const ecComponent& _boxShape, Json& _json );
-		static void Load( ecComponent& _boxShape, const Json& _json );
+		static void Init( Component& _component );
+		static void OnGui( Component& _boxShape );
+		static void Save( const Component& _boxShape, Json& _json );
+		static void Load( Component& _boxShape, const Json& _json );
 		
 		void	  SetScaling( const btVector3 _scaling );
 		btVector3 GetScaling() const;
 
 		btBoxShape boxShape;
 	};
-	static constexpr size_t sizeof_boxShape = sizeof( BoxShape2 );
+	static constexpr size_t sizeof_boxShape = sizeof( BoxShape );
 }

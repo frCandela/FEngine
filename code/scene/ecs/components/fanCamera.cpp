@@ -1,44 +1,44 @@
-#include "scene/ecs/components/fanCamera2.hpp"
+#include "scene/ecs/components/fanCamera.hpp"
 
-#include "scene/ecs/components/fanTransform2.hpp"
+#include "scene/ecs/components/fanTransform.hpp"
 #include "render/fanRenderSerializable.hpp"
 #include "core/math/shapes/fanRay.hpp"
 
 namespace fan
 {
-	REGISTER_COMPONENT( Camera2, "camera" );
+	REGISTER_COMPONENT( Camera, "camera" );
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void Camera2::SetInfo( ComponentInfo& _info )
+	void Camera::SetInfo( ComponentInfo& _info )
 	{
 		_info.icon = ImGui::IconType::CAMERA16;
-		_info.onGui = &Camera2::OnGui;
-		_info.init = &Camera2::Init;
-		_info.load = &Camera2::Load;
-		_info.save = &Camera2::Save;
+		_info.onGui = &Camera::OnGui;
+		_info.init = &Camera::Init;
+		_info.load = &Camera::Load;
+		_info.save = &Camera::Save;
 		_info.editorPath = "/";
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void Camera2::Init( ecComponent& _component )
+	void Camera::Init( Component& _component )
 	{
-		Camera2& camera = static_cast<Camera2&>( _component );
+		Camera& camera = static_cast<Camera&>( _component );
 
 		camera.fov = 110.f;
 		camera.aspectRatio = 1.f;
 		camera.nearDistance = 0.01f;
 		camera.farDistance = 1000.f;
 		camera.orthoSize = 10.f;
-		camera.type = Camera2::PERSPECTIVE;
+		camera.type = Camera::PERSPECTIVE;
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void Camera2::OnGui( ecComponent& _camera )
+	void Camera::OnGui( Component& _camera )
 	{
-		Camera2& camera = static_cast<Camera2&>( _camera );
+		Camera& camera = static_cast<Camera&>( _camera );
 
 		ImGui::PushItemWidth( 0.6f * ImGui::GetWindowWidth() - 16 );
 		{
@@ -94,9 +94,9 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void Camera2::Save( const ecComponent& _camera, Json& _json )
+	void Camera::Save( const Component& _camera, Json& _json )
 	{
-		const Camera2& camera = static_cast<const Camera2&>( _camera );
+		const Camera& camera = static_cast<const Camera&>( _camera );
 
 		Serializable::SaveInt( _json, "camera_type", camera.type );
 		Serializable::SaveFloat( _json, "orthoSize", camera.orthoSize );
@@ -107,9 +107,9 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void Camera2::Load( ecComponent& _camera, const Json& _json )
+	void Camera::Load( Component& _camera, const Json& _json )
 	{
-		Camera2& camera = static_cast<Camera2&>( _camera );
+		Camera& camera = static_cast<Camera&>( _camera );
 
 		Serializable::LoadInt(   _json, "camera_type", (int&)camera.type );
 		Serializable::LoadFloat( _json, "orthoSize",	camera.orthoSize );
@@ -120,7 +120,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	glm::mat4 Camera2::GetView( const Transform2& _cameraTransform ) const
+	glm::mat4 Camera::GetView( const Transform& _cameraTransform ) const
 	{
 		glm::mat4 view = glm::lookAt(
 			ToGLM( _cameraTransform.GetPosition() ),
@@ -131,7 +131,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	glm::mat4 Camera2::GetProjection() const
+	glm::mat4 Camera::GetProjection() const
 	{
 		glm::mat4 proj = glm::mat4( 1 );
 		if( type == Type::ORTHOGONAL )
@@ -149,7 +149,7 @@ namespace fan
 	//================================================================================================================================
 	// Returns a ray going from camera through a screen point ( with screenSpacePosition between {-1.f,-1.f} and {1.f,1.f} ).
 	//================================================================================================================================
-	Ray Camera2::ScreenPosToRay( const Transform2& _cameraTransform, const btVector2& _screenSpacePosition ) const
+	Ray Camera::ScreenPosToRay( const Transform& _cameraTransform, const btVector2& _screenSpacePosition ) const
 	{
 		assert( _screenSpacePosition.x() >= -1.f && _screenSpacePosition.x() <= 1.f );
 		assert( _screenSpacePosition.y() >= -1.f && _screenSpacePosition.y() <= 1.f );
@@ -188,7 +188,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	btVector2 Camera2::WorldPosToScreen( const Transform2& _cameraTransform, const btVector3& worldPosition ) const
+	btVector2 Camera::WorldPosToScreen( const Transform& _cameraTransform, const btVector3& worldPosition ) const
 	{
 		if( type == Type::PERSPECTIVE )
 		{

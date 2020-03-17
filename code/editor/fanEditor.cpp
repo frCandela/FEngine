@@ -46,20 +46,20 @@
 #include "game/components/fanCameraController.hpp"
 
 #include "scene/ecs/systems/fanDrawDebug.hpp"
-#include "scene/ecs/components/fanTransform2.hpp"
-#include "scene/ecs/components/fanDirectionalLight2.hpp"
-#include "scene/ecs/components/fanpointLight2.hpp"
+#include "scene/ecs/components/fanTransform.hpp"
+#include "scene/ecs/components/fanDirectionalLight.hpp"
+#include "scene/ecs/components/fanpointLight.hpp"
 #include "scene/ecs/components/fanParticleEmitter.hpp"
 #include "scene/ecs/components/fanParticle.hpp"
-#include "scene/ecs/components/fanCamera2.hpp"
-#include "scene/ecs/components/fanRigidbody2.hpp"
+#include "scene/ecs/components/fanCamera.hpp"
+#include "scene/ecs/components/fanRigidbody.hpp"
 #include "scene/ecs/components/fanMotionState.hpp"
-#include "scene/ecs/components/fanSphereShape2.hpp"
-#include "scene/ecs/components/fanBoxShape2.hpp"
+#include "scene/ecs/components/fanSphereShape.hpp"
+#include "scene/ecs/components/fanBoxShape.hpp"
 #include "scene/ecs/components/fanTransformUI.hpp"
 #include "scene/ecs/components/fanUIRenderer.hpp"
-#include "scene/ecs/components/fanMeshRenderer2.hpp"
-#include "scene/ecs/components/fanMaterial2.hpp"
+#include "scene/ecs/components/fanMeshRenderer.hpp"
+#include "scene/ecs/components/fanMaterial.hpp"
 #include "scene/ecs/components/fanBounds.hpp"
 #include "scene/ecs/components/fanSceneNode.hpp"
 
@@ -72,8 +72,6 @@
 
 namespace fan
 {
-	Signal<Camera*> Engine::onSetCamera;
-
 	//================================================================================================================================
 	//================================================================================================================================
 	Engine::Engine() :
@@ -395,8 +393,8 @@ namespace fan
 		EntityID id = world.GetEntityID( cameraNode.entityHandle );
 		cameraNode.AddFlag( SceneNode::NOT_SAVED | SceneNode::NO_DELETE );
 
-		Transform2& transform = world.AddComponent< Transform2 >( id );
-		Camera2&    camera = world.AddComponent< Camera2 >( id );
+		Transform& transform = world.AddComponent< Transform >( id );
+		Camera&    camera = world.AddComponent< Camera >( id );
 
 		transform.SetPosition( btVector3( 0, 0, -2 ) );
 
@@ -526,20 +524,20 @@ namespace fan
 		_world.AddSingletonComponentType<EditorCamera>();
 
 		_world.AddComponentType<SceneNode>();
-		_world.AddComponentType<Transform2>();
-		_world.AddComponentType<DirectionalLight2>();
-		_world.AddComponentType<PointLight2>();
-		_world.AddComponentType<MeshRenderer2>();
-		_world.AddComponentType<Material2>();
-		_world.AddComponentType<Camera2>();
+		_world.AddComponentType<Transform>();
+		_world.AddComponentType<DirectionalLight>();
+		_world.AddComponentType<PointLight>();
+		_world.AddComponentType<MeshRenderer>();
+		_world.AddComponentType<Material>();
+		_world.AddComponentType<Camera>();
 		_world.AddComponentType<ParticleEmitter>();
 		_world.AddComponentType<Particle>();
-		_world.AddComponentType<Rigidbody2>();
+		_world.AddComponentType<Rigidbody>();
 		_world.AddComponentType<MotionState>();
-		_world.AddComponentType<BoxShape2>();
-		_world.AddComponentType<SphereShape2>();
-		_world.AddComponentType<UITransform2>();
-		_world.AddComponentType<UIRenderer2>();
+		_world.AddComponentType<BoxShape>();
+		_world.AddComponentType<SphereShape>();
+		_world.AddComponentType<UITransform>();
+		_world.AddComponentType<UIRenderer>();
 		_world.AddComponentType<Bounds>();
 
 		_world.AddTagType<tag_boundsOutdated>();

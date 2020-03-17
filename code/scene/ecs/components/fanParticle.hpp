@@ -2,7 +2,7 @@
 
 #include "scene/fanScenePrecompiled.hpp"
 
-#include "scene/ecs/fanEcComponent.hpp"
+#include "scene/ecs/fanComponent.hpp"
 
 namespace fan
 {
@@ -10,12 +10,12 @@ namespace fan
 
 	//==============================================================================================================================================================
 	//==============================================================================================================================================================
-	struct Particle : public ecComponent
+	struct Particle : public Component
 	{
 		DECLARE_COMPONENT( Particle )
 	public:
 		static void SetInfo( ComponentInfo& _info );
-		static void Init( ecComponent& _component );
+		static void Init( Component& _component );
 
 		Color		color;
 		glm::vec3	position;

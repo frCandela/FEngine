@@ -7,8 +7,8 @@
 namespace fan
 {
 	struct SceneNode;
-	struct Transform2;
-	struct Camera2;
+	struct Transform;
+	struct Camera;
 
 	//================================================================================================================================
 	//================================================================================================================================
@@ -17,8 +17,8 @@ namespace fan
 		DECLARE_SINGLETON_COMPONENT()
 	public:
 		SceneNode* node;
-		Transform2* transform;
-		Camera2* camera;
+		Transform* transform;
+		Camera* camera;
 
 		float	  speed = 10.f;
 		float	  speedMultiplier = 3.f;

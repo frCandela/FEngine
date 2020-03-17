@@ -1,4 +1,5 @@
 #include "editor/fanEditorSelection.hpp"
+
 #include "editor/fanEditorGizmos.hpp"
 #include "editor/fanEditorDebug.hpp"
 #include "core/input/fanInput.hpp"
@@ -7,8 +8,8 @@
 #include "core/input/fanMouse.hpp"
 #include "core/math/shapes/fanRay.hpp"
 #include "scene/ecs/components/fanSceneNode.hpp"
-#include "scene/ecs/components/fanTransform2.hpp"
-#include "scene/ecs/components/fanCamera2.hpp"
+#include "scene/ecs/components/fanTransform.hpp"
+#include "scene/ecs/components/fanCamera.hpp"
 #include "scene/fanScene.hpp"
 #include "render/fanMesh.hpp"
 #include "scene/ecs/systems/fanRaycast.hpp"
@@ -55,9 +56,9 @@ namespace fan
 		{
 			EcsWorld& world = m_selectedSceneNode->scene->GetWorld();
 			EntityID entityID = world.GetEntityID( m_selectedSceneNode->entityHandle );
-			if( world.HasComponent<Transform2>( entityID ) )
+			if( world.HasComponent<Transform>( entityID ) )
 			{
-				Transform2& transform = world.GetComponent< Transform2 >( entityID );
+				Transform& transform = world.GetComponent< Transform >( entityID );
 				btVector3 newPosition;
 				if( EditorGizmos::Get().DrawMoveGizmo( btTransform( btQuaternion( 0, 0, 0 ), transform.GetPosition() ), (size_t)&transform, newPosition ) )
 				{
@@ -75,8 +76,8 @@ namespace fan
 
 			EcsWorld& world = m_currentScene->GetWorld();
 			EntityID cameraID = world.GetEntityID( m_currentScene->GetMainCamera().entityHandle );
-			const Transform2& cameraTransform = world.GetComponent<Transform2>( cameraID );
-			const Camera2& camera = world.GetComponent<Camera2>( cameraID );
+			const Transform& cameraTransform = world.GetComponent<Transform>( cameraID );
+			const Camera& camera = world.GetComponent<Camera>( cameraID );
 
  			const Ray ray = camera.ScreenPosToRay( cameraTransform, Mouse::Get().GetScreenSpacePosition() );
 

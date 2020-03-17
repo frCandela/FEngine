@@ -2,7 +2,7 @@
 
 #include "scene/fanScenePrecompiled.hpp"
 
-#include "scene/ecs/fanEcComponent.hpp"
+#include "scene/ecs/fanComponent.hpp"
 #include "render/fanRenderResourcePtr.hpp"
 #include "render/fanUIMesh.hpp"
 
@@ -13,15 +13,15 @@ namespace fan
 
 	//==============================================================================================================================================================
 	//==============================================================================================================================================================
-	struct UIRenderer2 : public ecComponent
+	struct UIRenderer : public Component
 	{
-		DECLARE_COMPONENT( UIRenderer2 )
+		DECLARE_COMPONENT( UIRenderer )
 	public:
 		static void SetInfo( ComponentInfo& _info );
-		static void Init( ecComponent& _component );
-		static void OnGui( ecComponent& _component );
-		static void Save( const ecComponent& _component, Json& _json );
-		static void Load( ecComponent& _component, const Json& _json );
+		static void Init( Component& _component );
+		static void OnGui( Component& _component );
+		static void Save( const Component& _component, Json& _json );
+		static void Load( Component& _component, const Json& _json );
 
 		UIMesh		uiMesh;
 		Color		color;
@@ -30,5 +30,5 @@ namespace fan
 		glm::ivec2	GetTextureSize() const;
 		Texture*	GetTexture() const { return *texture; }
 	};
-	static constexpr size_t sizeof_UIRenderer = sizeof( UIRenderer2 );
+	static constexpr size_t sizeof_UIRenderer = sizeof( UIRenderer );
 }

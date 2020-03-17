@@ -1,7 +1,7 @@
 #pragma once
 
 #include "fanEcsTypes.hpp"
-#include "fanEcComponent.hpp"
+#include "fanComponent.hpp"
 
 namespace fan
 {
@@ -26,7 +26,7 @@ namespace fan
 		template< typename _componentType >	void Init( const std::string& _name );
 		void*		 At( const ChunckIndex _chunckIndex, const ChunckComponentIndex _componentIndex );
 		void		 RemoveComponent( const ChunckIndex _chunckIndex, const ChunckComponentIndex _index );
-		ecComponent& NewComponent();
+		Component& NewComponent();
 
 		const std::vector< ComponentsCollection::Chunck >& GetChuncks() const { return m_chunks; }
 		const std::string& GetName() const { return m_name; }

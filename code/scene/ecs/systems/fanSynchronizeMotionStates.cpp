@@ -1,8 +1,8 @@
 #include "scene/ecs/systems/fanSynchronizeMotionStates.hpp"
 
-#include "scene/ecs/components/fanRigidbody2.hpp"
+#include "scene/ecs/components/fanRigidbody.hpp"
 #include "scene/ecs/components/fanMotionState.hpp"
-#include "scene/ecs/components/fanTransform2.hpp"
+#include "scene/ecs/components/fanTransform.hpp"
 #include "scene/ecs/fanEcsWorld.hpp"
 
 namespace fan
@@ -12,9 +12,9 @@ namespace fan
 	Signature S_SynchronizeTransformFromMotionState::GetSignature( const EcsWorld& _world )
 	{
 		return
-			_world.GetSignature<Transform2>()
+			_world.GetSignature<Transform>()
 			| _world.GetSignature<MotionState>()
-			| _world.GetSignature<Rigidbody2>();
+			| _world.GetSignature<Rigidbody>();
 	}
 
 	//================================================================================================================================
@@ -25,8 +25,8 @@ namespace fan
 		{
 			// light data
 			const MotionState& motionState = _world.GetComponent<MotionState>( id );
-			const Rigidbody2& rigidbody = _world.GetComponent<Rigidbody2>( id );
-			Transform2& transform = _world.GetComponent<Transform2>( id );
+			const Rigidbody& rigidbody = _world.GetComponent<Rigidbody>( id );
+			Transform& transform = _world.GetComponent<Transform>( id );
 
 
 
@@ -40,9 +40,9 @@ namespace fan
 	Signature S_SynchronizeMotionStateFromTransform::GetSignature( const EcsWorld& _world )
 	{
 		return
-			_world.GetSignature<Transform2>()
+			_world.GetSignature<Transform>()
 			| _world.GetSignature<MotionState>()
-			| _world.GetSignature<Rigidbody2>();
+			| _world.GetSignature<Rigidbody>();
 	}
 
 	//================================================================================================================================
@@ -51,9 +51,9 @@ namespace fan
 	{
 		for( EntityID id : _entities )
 		{
-			const Transform2& transform = _world.GetComponent<Transform2>( id );
+			const Transform& transform = _world.GetComponent<Transform>( id );
 			MotionState& motionState = _world.GetComponent<MotionState>( id );
-			Rigidbody2& rigidbody = _world.GetComponent<Rigidbody2>( id );
+			Rigidbody& rigidbody = _world.GetComponent<Rigidbody>( id );
 
 			rigidbody.rigidbody.setWorldTransform( transform.transform );
 			motionState.motionState.setWorldTransform( transform.transform );

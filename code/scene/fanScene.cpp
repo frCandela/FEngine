@@ -8,7 +8,7 @@
 #include "core/time/fanProfiler.hpp"
 #include "core/fanSignal.hpp"
 #include "ecs/components/fanBounds.hpp"
-#include "ecs/components/fanRigidbody2.hpp"
+#include "ecs/components/fanRigidbody.hpp"
 #include "scene/ecs/systems/fanSynchronizeMotionStates.hpp"
 #include "scene/ecs/systems/fanRegisterPhysics.hpp"
 #include "scene/ecs/systems/fanUpdateParticles.hpp"
@@ -163,9 +163,9 @@ namespace fan
 			EntityID entityID = m_ecsWorld->GetEntityID( node->entityHandle );
 
 			// remove rigidbody from physics world
-			if( m_ecsWorld->HasComponent<Rigidbody2>( entityID ) )
+			if( m_ecsWorld->HasComponent<Rigidbody>( entityID ) )
 			{
-				Rigidbody2& rb = m_ecsWorld->GetComponent<Rigidbody2>( entityID );
+				Rigidbody& rb = m_ecsWorld->GetComponent<Rigidbody>( entityID );
 				physicsWorld.dynamicsWorld->removeRigidBody( &rb.rigidbody );
 			}
 			m_ecsWorld->KillEntity( entityID );
@@ -365,7 +365,7 @@ namespace fan
 			for( int componentIndex = 0; componentIndex < world.GetComponentCount(entityID) ; componentIndex++ )
 			{
 				// if a save method is provided, saves the component
-				ecComponent& component = world.GetComponentAt( entityID, componentIndex );
+				Component& component = world.GetComponentAt( entityID, componentIndex );
 				const ComponentInfo& info = world.GetComponentInfo( component.GetIndex() );								
 				if( info.save != nullptr )
 				{
@@ -517,7 +517,7 @@ namespace fan
 				Serializable::LoadUInt( jComponent_i, "component_id", staticIndex );
 				const ComponentIndex componentIndex = world.GetDynamicIndex(staticIndex);
 				const ComponentInfo& info			= world.GetComponentInfo( componentIndex );				
-				ecComponent& component			    = world.AddComponent( entityID, componentIndex );				
+				Component& component			    = world.AddComponent( entityID, componentIndex );				
 				info.load( component, jComponent_i );
 			}
 		}
