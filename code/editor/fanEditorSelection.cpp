@@ -6,16 +6,9 @@
 #include "core/time/fanProfiler.hpp"
 #include "core/input/fanMouse.hpp"
 #include "core/math/shapes/fanRay.hpp"
-#include "scene/components/ui/fanUIMeshRenderer.hpp"
-#include "scene/components/ui/fanUITransform.hpp"
 #include "scene/ecs/components/fanSceneNode.hpp"
 #include "scene/ecs/components/fanTransform2.hpp"
 #include "scene/ecs/components/fanCamera2.hpp"
-#include "scene/components/fanMeshRenderer.hpp"
-#include "scene/components/fanTransform.hpp"
-#include "scene/components/fanTransform.hpp"
-#include "scene/components/fanCamera.hpp"
-#include "scene/fanGameobject.hpp"
 #include "scene/fanScene.hpp"
 #include "render/fanMesh.hpp"
 #include "scene/ecs/systems/fanRaycast.hpp"
@@ -59,8 +52,6 @@ namespace fan
 
 		// translation gizmo on selected scene node
 		if ( m_selectedSceneNode != nullptr && m_selectedSceneNode != &m_currentScene->GetMainCamera() )
-// 			 && m_selectedSceneNode->GetComponent<UIMeshRenderer>() == nullptr @hack
-// 			 && m_selectedSceneNode->GetComponent<UITransform>() == nullptr )
 		{
 			EcsWorld& world = m_selectedSceneNode->scene->GetWorld();
 			EntityID entityID = world.GetEntityID( m_selectedSceneNode->entityHandle );

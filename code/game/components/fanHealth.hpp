@@ -2,13 +2,11 @@
 
 #include "game/fanGamePrecompiled.hpp"
 
-#include "scene/components/fanComponent.hpp"
-
 namespace fan
 {
 	//================================================================================================================================
 	//================================================================================================================================
-	class Health : public Component
+	class Health// : public Component
 	{
 	public:
 		Signal<> onFallToZero;
@@ -18,15 +16,14 @@ namespace fan
 		float GetHealth() const { return m_currentHealth; }
 		float GetMaxHealth() const { return m_maxHealth; }
 
-		void OnGui() override;
-		ImGui::IconType GetIcon() const override { return ImGui::IconType::HEART16; }
+		void OnGui() /*override*/;
+		//ImGui::IconType GetIcon() const override { return ImGui::IconType::HEART16; }
 
-		DECLARE_TYPE_INFO( Health, Component );
 	protected:
-		void OnAttach() override;
-		void OnDetach() override;
-		bool Load( const Json& _json ) override;
-		bool Save( Json& _json ) const override;
+		void OnAttach() /*override*/;
+		void OnDetach() /*override*/;
+		bool Load( const Json& _json ) /*override*/;
+		bool Save( Json& _json ) const /*override*/;
 
 	private:
 		bool  m_invincible = false;;

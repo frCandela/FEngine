@@ -2,28 +2,26 @@
 
 #include "game/fanGamePrecompiled.hpp"
 
-#include "scene/actors/fanActor.hpp"
 
 namespace fan
 {
 	//================================================================================================================================
 	//================================================================================================================================
-	class SolarSystem : public Actor
+	class SolarSystem// : public Actor
 	{
 	public:
 
-		void Start() override;
-		void Stop() override {}
-		void Update( const float _delta ) override;
-		void LateUpdate( const float /*_delta*/ ) override {}
+		void Start() /*override*/;
+		void Stop() /*override*/ {}
+		void Update( const float _delta ) /*override*/;
+		void LateUpdate( const float /*_delta*/ ) /*override*/ {}
 
-		void OnGui() override;
-		ImGui::IconType GetIcon() const override { return ImGui::IconType::SOLAR_SYSTEM16; }
+		void OnGui() /*override*/;
+		//ImGui::IconType GetIcon() const override { return ImGui::IconType::SOLAR_SYSTEM16; }
 
-		DECLARE_TYPE_INFO( SolarSystem, Actor );
 	protected:
-		bool Load( const Json& _json ) override;
-		bool Save( Json& _json ) const override;
+		bool Load( const Json& _json ) /*override*/;
+		bool Save( Json& _json ) const /*override*/;
 
 	private:
 		int m_seed = 1;

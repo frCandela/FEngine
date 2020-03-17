@@ -2,7 +2,6 @@
 
 #include "game/fanGamePrecompiled.hpp"
 
-#include "scene/actors/fanActor.hpp"
 #include "network/fanUDPSocket.hpp"
 
 namespace fan
@@ -12,7 +11,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	class GameClient : public Actor
+	class GameClient// : public Actor
 	{
 	public:
 		enum NetPlayerState { PLAYER_NONE, PLAYER_CONNECTING, PLAYER_CONNECTED };
@@ -20,48 +19,47 @@ namespace fan
 
 		//================================================================	
 		//================================================================
-		struct NetPlayerData
-		{
-			Gameobject* playerPersistent = nullptr;
-			NetPlayerState  state = PLAYER_NONE;
-		};
+// 		struct NetPlayerData
+// 		{
+// 			Gameobject* playerPersistent = nullptr;
+// 			NetPlayerState  state = PLAYER_NONE;
+// 		};
 
 
-		void			OnGui() override;
-		ImGui::IconType GetIcon() const override { return ImGui::IconType::JOYSTICK16; }
+		void			OnGui() /*override*/;
+		//ImGui::IconType GetIcon() const override { return ImGui::IconType::JOYSTICK16; }
 
 		// ISerializable
-		bool Load( const Json& _json ) override;
-		bool Save( Json& _json ) const override;
+		bool Load( const Json& _json ) /*override*/;
+		bool Save( Json& _json ) const /*override*/;
 
-		void Start() override;
-		void Stop() override;
-		void Update( const float _delta ) override;
-		void LateUpdate( const float _delta ) override;
+		void Start() /*override*/;
+		void Stop() /*override*/;
+		void Update( const float _delta ) /*override*/;
+		void LateUpdate( const float _delta ) /*override*/;
 
-		const std::vector<NetPlayerData >& GetNetPlayers() const { return m_netPlayers; }
+// 		const std::vector<NetPlayerData >& GetNetPlayers() const { return m_netPlayers; }
 
-		DECLARE_TYPE_INFO( GameClient, Component );
 	protected:
-		void OnAttach() override;
-		void OnDetach() override;
+		void OnAttach() /*override*/;
+		void OnDetach() /*override*/;
 
 	private:
-		UDPSocket		m_socket;
-		ClientState		m_state;
-		Port			m_serverPort;
-		sf::IpAddress	m_serverIp;
-
-		float			m_timer = 0.f;
-
-		GameManager* m_gameManager;
-		PlayersManager* m_playersManager;
-
-		std::vector< NetPlayerData > m_netPlayers;
-
-		void OnAddPlayer( Gameobject* _playerPersistent );
-		void ConnectToServer( const Port _serverPort, const sf::IpAddress _ip );
-		void Receive();
-		NetPlayerData* FindNetPlayer( const Gameobject* _gameobject );
+// 		UDPSocket		m_socket;
+// 		ClientState		m_state;
+// 		Port			m_serverPort;
+// 		sf::IpAddress	m_serverIp;
+// 
+// 		float			m_timer = 0.f;
+// 
+// 		GameManager* m_gameManager;
+// 		PlayersManager* m_playersManager;
+// 
+// 		std::vector< NetPlayerData > m_netPlayers;
+// 
+// 		void OnAddPlayer( Gameobject* _playerPersistent );
+// 		void ConnectToServer( const Port _serverPort, const sf::IpAddress _ip );
+// 		void Receive();
+// 		NetPlayerData* FindNetPlayer( const Gameobject* _gameobject );
 	};
 }

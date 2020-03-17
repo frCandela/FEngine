@@ -118,7 +118,6 @@ namespace fan
 			left[0], _up[0], forward[0],
 			left[1], _up[1], forward[1],
 			left[2], _up[2], forward[2] ) );
-		//m_gameobject->SetFlags( m_gameobject->GetFlags() | Gameobject::Flag::OUTDATED_AABB ); @hack
 	}
 
 	//================================================================================================================================
@@ -128,7 +127,6 @@ namespace fan
 		if( transform.getOrigin() != _newPosition )
 		{
 			transform.setOrigin( _newPosition );
-			//m_gameobject->SetFlags( m_gameobject->GetFlags() | Gameobject::Flag::OUTDATED_AABB );@hack
 		}
 	}
 
@@ -139,7 +137,6 @@ namespace fan
 		if( scale != _newScale )
 		{
 			scale = _newScale;
-			//m_gameobject->SetFlags( m_gameobject->GetFlags() | Gameobject::Flag::OUTDATED_AABB );@hack
 		}
 	}
 
@@ -168,7 +165,6 @@ namespace fan
 		if( transform.getRotation() != _rotation )
 		{
 			transform.setRotation( _rotation );
-			//m_gameobject->SetFlags( m_gameobject->GetFlags() | Gameobject::Flag::OUTDATED_AABB );@hack
 		}
 	}
 

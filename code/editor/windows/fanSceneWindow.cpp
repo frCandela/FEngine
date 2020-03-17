@@ -1,16 +1,7 @@
 #include "editor/windows/fanSceneWindow.hpp"
 #include "game/imgui/fanDragnDrop.hpp"
-#include "scene/components/fanDirectionalLight.hpp"
-#include "scene/components/fanMeshRenderer.hpp"
-#include "scene/components/fanSphereShape.hpp"
-#include "scene/components/fanPointLight.hpp"
-#include "scene/actors/fanParticleSystem.hpp"
-#include "scene/components/fanTransform.hpp"
-#include "scene/components/fanRigidbody.hpp"
-#include "scene/components/fanMaterial.hpp"
 #include "scene/fanSceneInstantiate.hpp"
 #include "scene/fanPrefabManager.hpp"
-#include "scene/fanGameobject.hpp"
 #include "scene/fanScene.hpp"
 #include "core/input/fanKeyboard.hpp"
 #include "core/time/fanProfiler.hpp"
@@ -78,6 +69,8 @@ namespace fan
 // 		}
 	}
 
+	//================================================================================================================================
+	//================================================================================================================================
 	void SceneWindow::PopupRightClick()
 	{
 		// Popup set gameobject when right click

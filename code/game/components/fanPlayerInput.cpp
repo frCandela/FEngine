@@ -3,18 +3,19 @@
 #include "core/input/fanInput.hpp"
 #include "core/input/fanMouse.hpp"
 #include "core/input/fanJoystick.hpp"
-#include "scene/components/fanCamera.hpp"
-#include "scene/components/fanTransform.hpp"
+#include "scene/ecs/components/fanSceneNode.hpp"
+#include "scene/ecs/components/fanCamera2.hpp"
+#include "scene/ecs/components/fanTransform2.hpp"
+#include "scene/ecs/fanEcsWorld.hpp"
 
 namespace fan
 {
-	REGISTER_TYPE_INFO( PlayerInput, TypeInfo::Flags::EDITOR_COMPONENT, "game/" )
 
 		//================================================================================================================================
 		//================================================================================================================================
 		void PlayerInput::OnAttach()
 	{
-		Component::OnAttach();
+		
 
 		m_directionBuffer.resize( 8, glm::vec2( 0 ) );
 		m_direction = btVector3( 0, 0, 1.f );
@@ -24,7 +25,7 @@ namespace fan
 	//================================================================================================================================
 	void PlayerInput::OnDetach()
 	{
-		Component::OnDetach();
+
 	}
 
 	//================================================================================================================================
@@ -136,36 +137,38 @@ namespace fan
 	//================================================================================================================================
 	btVector3 PlayerInput::GetInputDirection()
 	{
-		switch ( m_inputType )
-		{
-
-		case fan::PlayerInput::KEYBOARD_MOUSE:
-		{
-			// Get mouse world pos @hack
-// 			Camera& camera = m_gameobject->GetScene().GetMainCamera();
-// 			btVector3 mouseWorldPos = camera.ScreenPosToRay( Mouse::Get().GetScreenSpacePosition() ).origin;
+// 		switch ( m_inputType )
+// 		{
+// 
+// 		case fan::PlayerInput::KEYBOARD_MOUSE:
+// 		{
+// 			// Get mouse world pos @hack
+// 			SceneNode& node = m_gameobject->GetScene().GetMainCamera();
+// 			EcsWorld& world = node.scene->GetWorld();
+// 			Camera2& camera = world.GetComponent<Camera2>( world.GetEntityID( node.entityHandle ) );
+// 			Transform2& cameraTransform = world.GetComponent<Transform2>( world.GetEntityID( node.entityHandle ) );
+// 			btVector3 mouseWorldPos = camera.ScreenPosToRay( cameraTransform, Mouse::Get().GetScreenSpacePosition() ).origin;
 // 			mouseWorldPos.setY( 0 );
-
-			// Get mouse direction
+// 
+// 			// Get mouse direction
 // 			Transform& transform = m_gameobject->GetTransform();
 // 			btVector3 mouseDir = mouseWorldPos - transform.GetPosition();
 // 			mouseDir.normalize();
-/*			return mouseDir;*/
+// 			return mouseDir;
+// 		}
+// 		case fan::PlayerInput::JOYSTICK:
+// 		{
+// 			glm::vec2 average = GetDirectionAverage();
+// 
+// 			btVector3 dir = btVector3( average.x, 0.f, average.y );
+// 
+// 			if ( dir.length() > m_directionCutTreshold ) { m_direction = dir; }
+// 
+// 			return m_direction;
+// 		}
+// 		default:
 			return btVector3::Zero();
-		}
-		case fan::PlayerInput::JOYSTICK:
-		{
-			glm::vec2 average = GetDirectionAverage();
-
-			btVector3 dir = btVector3( average.x, 0.f, average.y );
-
-			if ( dir.length() > m_directionCutTreshold ) { m_direction = dir; }
-
-			return m_direction;
-		}
-		default:
-			return btVector3::Zero();
-		}
+//		}
 	}
 
 	//================================================================================================================================
@@ -191,7 +194,7 @@ namespace fan
 	//================================================================================================================================
 	void PlayerInput::OnGui()
 	{
-		Component::OnGui();
+
 
 		ImGui::PushItemWidth( 0.6f * ImGui::GetWindowWidth() );
 		{
@@ -227,7 +230,7 @@ namespace fan
 	//================================================================================================================================
 	bool PlayerInput::Load( const Json& _json )
 	{
-		Component::Load( _json );
+
 
 		int tmp;
 		if ( Serializable::LoadInt( _json, "direction_buffer_size", tmp ) )
@@ -244,7 +247,7 @@ namespace fan
 	//================================================================================================================================
 	bool PlayerInput::Save( Json& _json ) const
 	{
-		Component::Save( _json );
+
 		Serializable::SaveInt( _json, "direction_buffer_size", ( int ) m_directionBuffer.size() );
 		Serializable::SaveFloat( _json, "direction_cut_treshold", m_directionCutTreshold );
 		Serializable::SaveBool( _json, "replicated", m_isReplicated );

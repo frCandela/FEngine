@@ -1,24 +1,19 @@
 #include "editor/windows/fanInspectorWindow.hpp"
 
-#include "editor/components/fanFPSCamera.hpp"
 #include "game/imgui/fanDragnDrop.hpp"
+#include "scene/fanScene.hpp"
 #include "scene/ecs/singletonComponents/fanPhysicsWorld.hpp"
 #include "scene/ecs/components/fanSceneNode.hpp"
 #include "scene/ecs/components/fanSphereShape2.hpp"
 #include "scene/ecs/components/fanBoxShape2.hpp"
 #include "scene/ecs/components/fanMotionState.hpp"
 #include "scene/ecs/components/fanRigidbody2.hpp"
-#include "scene/components/fanComponent.hpp"
-#include "scene/components/fanTransform.hpp"
-#include "scene/components/fanMaterial.hpp"
-#include "scene/components/fanCamera.hpp"
-#include "scene/fanGameobject.hpp"
+#include "scene/ecs/fanEcsWorld.hpp"
 #include "core/time/fanProfiler.hpp"
 #include "core/fanSignal.hpp"
 #include "render/core/fanTexture.hpp"
 #include "render/core/fanTexture.hpp"
 #include "render/fanMesh.hpp"
-#include "scene/ecs/fanEcsWorld.hpp"
 
 
 namespace fan
@@ -43,7 +38,7 @@ namespace fan
 			EcsWorld& world = scene.GetWorld();
 			const EntityID entityID = world.GetEntityID( node.entityHandle );
 
-			// gameobject gui
+			// scene node gui
  			ImGui::Icon( GetIconType(), { 16,16 } ); ImGui::SameLine();
 			ImGui::Text( "Scene node : %s", node.name.c_str() );
 

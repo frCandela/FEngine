@@ -2,42 +2,36 @@
 
 #include "game/fanGamePrecompiled.hpp"
 
-#include "scene/actors/fanActor.hpp"
-
 namespace fan
 {
 	class Mesh;
-	class Material;
-	class ParticleSystem;
-	class MeshRenderer;
-	class PlayersManager;
+
 	struct Vertex;
 
 	//================================================================================================================================
 	//================================================================================================================================
-	class SolarEruption : public Actor
+	class SolarEruption //: public Actor
 	{
 	public:
-		void Start() override;
-		void Stop() override {}
-		void Update( const float _delta ) override;
-		void LateUpdate( const float /*_delta*/ ) override {}
+		void Start() /*override*/;
+		void Stop() /*override*/ {}
+		void Update( const float _delta ) /*override*/;
+		void LateUpdate( const float /*_delta*/ ) /*override*/ {}
 
-		void OnGui() override;
-		ImGui::IconType GetIcon() const override { return ImGui::IconType::JOYSTICK16; }
+		void OnGui() /*override*/;
+		//ImGui::IconType GetIcon() const override { return ImGui::IconType::JOYSTICK16; }
 
-		DECLARE_TYPE_INFO( SolarEruption, Actor );
 	protected:
-		void OnAttach() override;
-		void OnDetach() override;
-		bool Load( const Json& _json ) override;
-		bool Save( Json& _json ) const override;
+		void OnAttach() /*override*/;
+		void OnDetach() /*override*/;
+		bool Load( const Json& _json ) /*override*/;
+		bool Save( Json& _json ) const /*override*/;
 
 	private:
-		Material* m_material;
-		MeshRenderer* m_meshRenderer;
-		ParticleSystem* m_particleSystem;
-		PlayersManager* m_players;
+// 		Material* m_material;
+// 		MeshRenderer* m_meshRenderer;
+// 		ParticleSystem* m_particleSystem;
+// 		PlayersManager* m_players;
 
 		// State machine
 		float   m_eruptionTime = -1.f;

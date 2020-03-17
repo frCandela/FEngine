@@ -20,7 +20,6 @@ namespace fan
 	class EcsWorld;
 	class SceneWindow;
 	class MainMenuBar;
-	class Gameobject;
 	class EcsWindow;
 	class GameWindow;
 	class Renderer;

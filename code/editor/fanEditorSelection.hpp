@@ -4,7 +4,6 @@
 
 namespace fan
 {
-	class Gameobject;
 	class GameWindow;
 	class Scene;
 	struct SceneNode;

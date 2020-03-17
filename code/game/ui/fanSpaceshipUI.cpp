@@ -2,70 +2,65 @@
 #include "game/components/fanWithEnergy.hpp"
 #include "game/components/fanSolarPanel.hpp"
 #include "game/components/fanHealth.hpp"
-#include "scene/components/fanTransform.hpp"
-#include "scene/components/ui/fanProgressBar.hpp"
-#include "scene/components/ui/fanUIMeshRenderer.hpp"
-#include "scene/components/fanCamera.hpp"
+#include "scene/ecs/components/fanProgressBar.hpp"
 #include "render/fanRendererDebug.hpp"
 
 namespace fan
 {
-	REGISTER_TYPE_INFO( SpaceShipUI, TypeInfo::Flags::EDITOR_COMPONENT, "game/ui/" )
 
-
-		//================================================================================================================================
-		//================================================================================================================================
-		void SpaceShipUI::OnAttach()
+	//================================================================================================================================
+	//================================================================================================================================
+	void SpaceShipUI::OnAttach()
 	{
-		Actor::OnAttach();
+
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
 	void SpaceShipUI::OnDetach()
 	{
-		Actor::OnDetach();
+
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
 	void SpaceShipUI::Start()
 	{
-		REQUIRE_TRUE( *m_spaceShip != nullptr, "SpaceshipUI: missing reference" );
-		REQUIRE_TRUE( *m_healthProgress != nullptr, "SpaceshipUI: missing reference" );
-		REQUIRE_TRUE( *m_energyProgress != nullptr, "SpaceshipUI: missing reference" );
-		REQUIRE_TRUE( *m_signalProgress != nullptr, "SpaceshipUI: missing reference" );
-		REQUIRE_TRUE( *m_signalRenderer != nullptr, "SpaceshipUI: missing reference" );
+// 		REQUIRE_TRUE( *m_spaceShip != nullptr, "SpaceshipUI: missing reference" );
+// 		REQUIRE_TRUE( *m_healthProgress != nullptr, "SpaceshipUI: missing reference" );
+// 		REQUIRE_TRUE( *m_energyProgress != nullptr, "SpaceshipUI: missing reference" );
+// 		REQUIRE_TRUE( *m_signalProgress != nullptr, "SpaceshipUI: missing reference" );
+// 		REQUIRE_TRUE( *m_signalRenderer != nullptr, "SpaceshipUI: missing reference" );
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
 	void SpaceShipUI::Update( const float /*_delta*/ )
 	{
-		// Update energy progress bar
-		WithEnergy* energy = m_spaceShip->GetComponent<WithEnergy>();
-		if ( energy != nullptr )
-		{
-			const float ratio = energy->GetEnergy() / energy->GetMaxEnergy();
-			m_energyProgress->SetProgress( ratio );
-		}
-
-		// Update signal progress bar
-		SolarPanel* solarPanel = m_spaceShip->GetComponent<SolarPanel>();
-		if ( solarPanel != nullptr )
-		{
-			const float ratio = solarPanel->GetChargingRate() / solarPanel->GetMaxChargingRate();
-			m_signalProgress->SetProgress( ratio );
-			m_signalRenderer->SetColor( GetSignalColor( ratio ) );
-		}
-
-		// Update health progress bar
-		Health* health = m_spaceShip->GetComponent<Health>();
-		if ( health != nullptr )
-		{
-			const float ratio = health->GetHealth() / health->GetMaxHealth();
-			m_healthProgress->SetProgress( ratio );
-		}
+// 		// Update energy progress bar
+// 		WithEnergy* energy = m_spaceShip->GetComponent<WithEnergy>();
+// 		if ( energy != nullptr )
+// 		{
+// 			const float ratio = energy->GetEnergy() / energy->GetMaxEnergy();
+// 			m_energyProgress->SetProgress( ratio );
+// 		}
+// 
+// 		// Update signal progress bar
+// 		SolarPanel* solarPanel = m_spaceShip->GetComponent<SolarPanel>();
+// 		if ( solarPanel != nullptr )
+// 		{
+// 			const float ratio = solarPanel->GetChargingRate() / solarPanel->GetMaxChargingRate();
+// 			m_signalProgress->SetProgress( ratio );
+// 			m_signalRenderer->SetColor( GetSignalColor( ratio ) );
+// 		}
+// 
+// 		// Update health progress bar
+// 		Health* health = m_spaceShip->GetComponent<Health>();
+// 		if ( health != nullptr )
+// 		{
+// 			const float ratio = health->GetHealth() / health->GetMaxHealth();
+// 			m_healthProgress->SetProgress( ratio );
+// 		}
 	}
 
 	//================================================================================================================================
@@ -97,13 +92,13 @@ namespace fan
 	//================================================================================================================================
 	void SpaceShipUI::OnGui()
 	{
-		ImGui::FanGameobject( "spaceShip", m_spaceShip );
-		ImGui::FanComponent( "health progress", m_healthProgress );
-		ImGui::FanComponent( "energy progress", m_energyProgress );
-		ImGui::FanComponent( "signal progress", m_signalProgress );
-		ImGui::FanComponent( "signal renderer", m_signalRenderer );
-
-		//@hack
+// 		ImGui::FanGameobject( "spaceShip", m_spaceShip );
+// 		ImGui::FanComponent( "health progress", m_healthProgress );
+// 		ImGui::FanComponent( "energy progress", m_energyProgress );
+// 		ImGui::FanComponent( "signal progress", m_signalProgress );
+// 		ImGui::FanComponent( "signal renderer", m_signalRenderer );
+// 
+// 		//@hack
 // 		if ( *m_spaceShip != nullptr )
 // 		{
 // 			Camera& camera = m_gameobject->GetScene().GetMainCamera();
@@ -116,12 +111,12 @@ namespace fan
 	//================================================================================================================================
 	bool SpaceShipUI::Save( Json& _json ) const
 	{
-		Actor::Save( _json );
-		Serializable::SaveGameobjectPtr( _json, "spaceship", m_spaceShip );
-		Serializable::SaveComponentPtr( _json, "health_progress", m_healthProgress );
-		Serializable::SaveComponentPtr( _json, "energy_progress", m_energyProgress );
-		Serializable::SaveComponentPtr( _json, "signal_progress", m_signalProgress );
-		Serializable::SaveComponentPtr( _json, "signal_renderer", m_signalRenderer );
+// 		Actor::Save( _json );
+// 		Serializable::SaveGameobjectPtr( _json, "spaceship", m_spaceShip );
+// 		Serializable::SaveComponentPtr( _json, "health_progress", m_healthProgress );
+// 		Serializable::SaveComponentPtr( _json, "energy_progress", m_energyProgress );
+// 		Serializable::SaveComponentPtr( _json, "signal_progress", m_signalProgress );
+// 		Serializable::SaveComponentPtr( _json, "signal_renderer", m_signalRenderer );
 
 		return true;
 	}
@@ -130,12 +125,12 @@ namespace fan
 	//================================================================================================================================
 	bool SpaceShipUI::Load( const Json& _json )
 	{
-		Actor::Load(_json);
-		Serializable::LoadGameobjectPtr(_json, m_gameobject->GetScene(), "spaceship", m_spaceShip);
-		Serializable::LoadComponentPtr(_json, m_gameobject->GetScene(), "health_progress", m_healthProgress);
-		Serializable::LoadComponentPtr(_json, m_gameobject->GetScene(), "energy_progress", m_energyProgress);
-		Serializable::LoadComponentPtr(_json, m_gameobject->GetScene(), "signal_progress", m_signalProgress);
-		Serializable::LoadComponentPtr(_json, m_gameobject->GetScene(), "signal_renderer", m_signalRenderer);
+// 		Actor::Load(_json);
+// 		Serializable::LoadGameobjectPtr(_json, m_gameobject->GetScene(), "spaceship", m_spaceShip);
+// 		Serializable::LoadComponentPtr(_json, m_gameobject->GetScene(), "health_progress", m_healthProgress);
+// 		Serializable::LoadComponentPtr(_json, m_gameobject->GetScene(), "energy_progress", m_energyProgress);
+// 		Serializable::LoadComponentPtr(_json, m_gameobject->GetScene(), "signal_progress", m_signalProgress);
+// 		Serializable::LoadComponentPtr(_json, m_gameobject->GetScene(), "signal_renderer", m_signalRenderer);
 		return true;
 	}
 }

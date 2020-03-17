@@ -3,33 +3,30 @@
 #include "game/fanGamePrecompiled.hpp"
 
 #include "scene/fanSceneResourcePtr.hpp"
-#include "scene/actors/fanActor.hpp"
 
 namespace fan
 {
-	class Rigidbody;
 	class WithEnergy;
 	class PlayerInput;
 
 	//================================================================================================================================
 	//================================================================================================================================
-	class Weapon : public Actor
+	class Weapon// : public Actor
 	{
 	public:
-		void Start() override;
-		void Stop() override {}
-		void Update( const float _delta ) override;
-		void LateUpdate( const float _delta ) override;
+		void Start() /*override*/;
+		void Stop() /*override*/ {}
+		void Update( const float _delta ) /*override*/;
+		void LateUpdate( const float _delta ) /*override*/;
 
-		void OnGui() override;
-		ImGui::IconType GetIcon() const override { return ImGui::IconType::JOYSTICK16; }
+		void OnGui() /*override*/;
+		//ImGui::IconType GetIcon() const /*override*/ { return ImGui::IconType::JOYSTICK16; }
 
-		DECLARE_TYPE_INFO( Weapon, Actor );
 	protected:
-		void OnAttach() override;
-		void OnDetach() override;
-		bool Load( const Json& _json ) override;
-		bool Save( Json& _json ) const override;
+		void OnAttach() /*override*/;
+		void OnDetach() /*override*/;
+		bool Load( const Json& _json ) /*override*/;
+		bool Save( Json& _json ) const /*override*/;
 
 	private:
 		// ref
@@ -59,7 +56,7 @@ namespace fan
 		std::default_random_engine			  m_generator;
 		std::uniform_real_distribution<float> m_distribution;
 
-		void OnBulletContact( Rigidbody* _other, btPersistentManifold* const& _manifold );
+// 		void OnBulletContact( Rigidbody* _other, btPersistentManifold* const& _manifold );
 		void CreateExplosion( const btVector3 _point );
 		void FireBullet();
 	};

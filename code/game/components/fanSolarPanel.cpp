@@ -1,33 +1,31 @@
 #include "game/components/fanSolarPanel.hpp"
 #include "game/components/fanSolarEruption.hpp"
 #include "game/components/fanWithEnergy.hpp"
-#include "scene/components/fanTransform.hpp"
 #include "render/fanMesh.hpp"
 
 namespace fan
 {
-	REGISTER_TYPE_INFO( SolarPanel, TypeInfo::Flags::EDITOR_COMPONENT, "game/" )
 
 		//================================================================================================================================
 		//================================================================================================================================
 		void SolarPanel::Start()
 	{
-		REQUIRE_COMPONENT( WithEnergy, m_energy );
-		REQUIRE_SCENE_COMPONENT( SolarEruption, m_eruption );
+// 		REQUIRE_COMPONENT( WithEnergy, m_energy );
+// 		REQUIRE_SCENE_COMPONENT( SolarEruption, m_eruption );
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
 	void SolarPanel::OnAttach()
 	{
-		Actor::OnAttach();
+
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
 	void SolarPanel::OnDetach()
 	{
-		Actor::OnDetach();
+
 	}
 
 	//================================================================================================================================
@@ -60,37 +58,37 @@ namespace fan
 	//================================================================================================================================
 	void SolarPanel::ComputeChargingRate()
 	{
-		// Sunlight mesh raycast
-		const btVector3 rayOrigin = m_gameobject->GetTransform().GetPosition() + btVector3::Up();
-		btVector3 outIntersection;
-		ecsSunLightMesh_s& sunLight = GetScene().GetEcsManager().GetSingletonComponents().GetComponent<ecsSunLightMesh_s>();
-		m_isInsideSunlight = sunLight.mesh->RayCast( rayOrigin, -btVector3::Up(), outIntersection );
-
-		// Charging rate
-		if ( m_isInsideSunlight )
-		{
-			const btVector3 position = m_gameobject->GetTransform().GetPosition();
-			const float distance = position.norm();
-			const float slope = ( m_maxChargingRate - m_minChargingRate ) / ( m_maxRange - m_minRange );
-			const float unclampedRate = m_maxChargingRate - slope * ( distance - m_minRange );
-			m_currentChargingRate = std::clamp( unclampedRate, m_minChargingRate, m_maxChargingRate );
-		}
-		else
-		{
-			m_currentChargingRate = 0.f;
-		}
+// 		// Sunlight mesh raycast
+// 		const btVector3 rayOrigin = m_gameobject->GetTransform().GetPosition() + btVector3::Up();
+// 		btVector3 outIntersection;
+// 		ecsSunLightMesh_s& sunLight = GetScene().GetEcsManager().GetSingletonComponents().GetComponent<ecsSunLightMesh_s>();
+// 		m_isInsideSunlight = sunLight.mesh->RayCast( rayOrigin, -btVector3::Up(), outIntersection );
+// 
+// 		// Charging rate
+// 		if ( m_isInsideSunlight )
+// 		{
+// 			const btVector3 position = m_gameobject->GetTransform().GetPosition();
+// 			const float distance = position.norm();
+// 			const float slope = ( m_maxChargingRate - m_minChargingRate ) / ( m_maxRange - m_minRange );
+// 			const float unclampedRate = m_maxChargingRate - slope * ( distance - m_minRange );
+// 			m_currentChargingRate = std::clamp( unclampedRate, m_minChargingRate, m_maxChargingRate );
+// 		}
+// 		else
+// 		{
+// 			m_currentChargingRate = 0.f;
+// 		}
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
 	bool SolarPanel::Save( Json& _json ) const
 	{
-		Actor::Save( _json );
 
-		Serializable::SaveFloat( _json, "min_charging_rate", m_minChargingRate );
-		Serializable::SaveFloat( _json, "max_charging_rate", m_maxChargingRate );
-		Serializable::SaveFloat( _json, "low_range		", m_minRange );
-		Serializable::SaveFloat( _json, "max_range 		", m_maxRange );
+
+// 		Serializable::SaveFloat( _json, "min_charging_rate", m_minChargingRate );
+// 		Serializable::SaveFloat( _json, "max_charging_rate", m_maxChargingRate );
+// 		Serializable::SaveFloat( _json, "low_range		", m_minRange );
+// 		Serializable::SaveFloat( _json, "max_range 		", m_maxRange );
 
 		return true;
 	}
@@ -99,12 +97,12 @@ namespace fan
 	//================================================================================================================================
 	bool SolarPanel::Load( const Json& _json )
 	{
-		Actor::Load( _json );
 
-		Serializable::LoadFloat( _json, "min_charging_rate", m_minChargingRate );
-		Serializable::LoadFloat( _json, "max_charging_rate", m_maxChargingRate );
-		Serializable::LoadFloat( _json, "low_range		", m_minRange );
-		Serializable::LoadFloat( _json, "max_range 		", m_maxRange );
+
+// 		Serializable::LoadFloat( _json, "min_charging_rate", m_minChargingRate );
+// 		Serializable::LoadFloat( _json, "max_charging_rate", m_maxChargingRate );
+// 		Serializable::LoadFloat( _json, "low_range		", m_minRange );
+// 		Serializable::LoadFloat( _json, "max_range 		", m_maxRange );
 		return true;
 	}
 

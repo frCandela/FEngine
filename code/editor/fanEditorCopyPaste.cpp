@@ -1,8 +1,8 @@
 #include "editor/fanEditorCopyPaste.hpp"
 #include "editor/fanEditorSelection.hpp"
 #include "scene/fanSceneInstantiate.hpp"
-#include "scene/fanGameobject.hpp"
 #include "scene/fanPrefab.hpp"
+#include "scene/fanScene.hpp"
 
 namespace fan
 {

@@ -4,8 +4,6 @@
 
 namespace fan
 {
-	class Component;
-	class Gameobject;
 	class Prefab;
 	struct SceneNode;
 	struct ecComponent;
@@ -14,8 +12,8 @@ namespace fan
 
 namespace ImGui
 {
-	void				FanBeginDragDropSourceGameobject( fan::Gameobject * _gameobject, ImGuiDragDropFlags _flags = ImGuiDragDropFlags_None );
-	fan::Gameobject *	FanBeginDragDropTargetGameobject();
+// 	void				FanBeginDragDropSourceGameobject( fan::Gameobject * _gameobject, ImGuiDragDropFlags _flags = ImGuiDragDropFlags_None );
+// 	fan::Gameobject *	FanBeginDragDropTargetGameobject();
 
 	void				FanBeginDragDropSourceSceneNode( fan::SceneNode& _node, ImGuiDragDropFlags _flags = ImGuiDragDropFlags_None );
 	fan::SceneNode*		FanBeginDragDropTargetSceneNode();
@@ -23,11 +21,11 @@ namespace ImGui
 	void				FanBeginDragDropSourcePrefab( fan::Prefab * _prefab, ImGuiDragDropFlags _flags = ImGuiDragDropFlags_None );
 	fan::Prefab *		FanBeginDragDropTargetPrefab();
 
-	void				FanBeginDragDropSourceComponent( fan::Component * _component, ImGuiDragDropFlags _flags = ImGuiDragDropFlags_None );
-	fan::Component *	FanBeginDragDropTargetComponent( const uint32_t _typeID );
+// 	void				FanBeginDragDropSourceComponent( fan::Component * _component, ImGuiDragDropFlags _flags = ImGuiDragDropFlags_None );
+// 	fan::Component *	FanBeginDragDropTargetComponent( const uint32_t _typeID );
 
 	void				FanBeginDragDropSourceEcComponent( fan::ecComponent& _component, const fan::ComponentInfo& _info, ImGuiDragDropFlags _flags = ImGuiDragDropFlags_None );
-	fan::Component*		FanBeginDragDropTargetEcComponent( const uint32_t _typeID );
+	fan::ecComponent*		FanBeginDragDropTargetEcComponent( const uint32_t _typeID );
 
 	//================================================================================================================================
 	//================================================================================================================================

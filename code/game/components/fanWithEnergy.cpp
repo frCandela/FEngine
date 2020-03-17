@@ -1,15 +1,12 @@
 #include "game/components/fanWithEnergy.hpp"
-#include "scene/components/fanTransform.hpp"
 
 namespace fan
 {
-	REGISTER_TYPE_INFO( WithEnergy, TypeInfo::Flags::EDITOR_COMPONENT, "game/" )
 
 		//================================================================================================================================
 		//================================================================================================================================
 		void WithEnergy::OnAttach()
 	{
-		Component::OnAttach();
 
 		m_currentEnergy = 0;
 	}
@@ -18,7 +15,7 @@ namespace fan
 	//================================================================================================================================
 	void WithEnergy::OnDetach()
 	{
-		Component::OnDetach();
+
 	}
 
 	//================================================================================================================================
@@ -64,8 +61,8 @@ namespace fan
 	//================================================================================================================================
 	bool WithEnergy::Save( Json& _json ) const
 	{
-		Component::Save( _json );
-		Serializable::SaveFloat( _json, "max_energy 		   ", m_maxEnergy );
+
+//		Serializable::SaveFloat( _json, "max_energy 		   ", m_maxEnergy );
 
 		return true;
 	}
@@ -74,7 +71,7 @@ namespace fan
 	//================================================================================================================================
 	bool WithEnergy::Load( const Json& _json )
 	{
-		Serializable::LoadFloat( _json, "max_energy 		   ", m_maxEnergy );
+//		Serializable::LoadFloat( _json, "max_energy 		   ", m_maxEnergy );
 
 		return true;
 	}

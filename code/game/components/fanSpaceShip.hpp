@@ -2,40 +2,38 @@
 
 #include "game/fanGamePrecompiled.hpp"
 
-#include "scene/actors/fanActor.hpp"
 #include "scene/fanComponentPtr.hpp"
 
 namespace fan
 {
 
-	class Rigidbody;
-	class ParticleSystem;
+
+
 	class WithEnergy;
 	class PlayerInput;
 	class Health;
 
 	//================================================================================================================================
 	//================================================================================================================================
-	class SpaceShip : public Actor
+	class SpaceShip// : public Actor
 	{
 	private:
 		enum SpeedMode { REVERSE = 0, SLOW, NORMAL, FAST };
 
 	public:
-		Signal<Gameobject*> onPlayerDie;
+/*		Signal<Gameobject*> onPlayerDie;*/
 
-		void Start() override;
-		void Stop() override {}
-		void Update( const float _delta ) override;
-		void LateUpdate( const float /*_delta*/ ) override {}
+		void Start() /*override*/;
+		void Stop() /*override*/ {}
+		void Update( const float _delta ) /*override*/;
+		void LateUpdate( const float /*_delta*/ ) /*override*/ {}
 
-		void OnGui() override;
-		ImGui::IconType GetIcon() const override { return ImGui::IconType::SPACE_SHIP16; }
+		void OnGui() /*override*/;
+		//ImGui::IconType GetIcon() const /*override*/ { return ImGui::IconType::SPACE_SHIP16; }
 
-		DECLARE_TYPE_INFO( SpaceShip, Actor );
 	protected:
-		bool Load( const Json& _json ) override;
-		bool Save( Json& _json ) const override;
+		bool Load( const Json& _json ) /*override*/;
+		bool Save( Json& _json ) const /*override*/;
 
 	private:
 		btVector4 m_forwardForces = btVector4( 1000.f, 1000.f, 2000.f, 3500.f );
@@ -48,18 +46,18 @@ namespace fan
 		float m_collisionRepulsionForce = 500.f;
 
 		// References
-		Rigidbody* m_rigidbody;
+//		Rigidbody* m_rigidbody;
 		WithEnergy* m_energy;
 		PlayerInput* m_input;
 		Health* m_health;
 
-		ComponentPtr<ParticleSystem> m_fastForwardParticles;
-		ComponentPtr<ParticleSystem> m_slowForwardParticles;
-		ComponentPtr<ParticleSystem> m_reverseParticles;
-		ComponentPtr<ParticleSystem> m_leftParticles;
-		ComponentPtr<ParticleSystem> m_rightParticles;
+// 		ComponentPtr<ParticleSystem> m_fastForwardParticles;
+// 		ComponentPtr<ParticleSystem> m_slowForwardParticles;
+// 		ComponentPtr<ParticleSystem> m_reverseParticles;
+// 		ComponentPtr<ParticleSystem> m_leftParticles;
+// 		ComponentPtr<ParticleSystem> m_rightParticles;
 
-		void OnContactStarted( Rigidbody* _rb, btPersistentManifold* const& _manifold );
-		void Die();
+//		void OnContactStarted( Rigidbody* _rb, btPersistentManifold* const& _manifold );
+//		void Die();
 	};
 }

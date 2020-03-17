@@ -1,8 +1,6 @@
 #include "game/components/fanPlayersManager.hpp"
 #include "game/network/fanGameServer.hpp"
 #include "game/fanGameManager.hpp"
-#include "scene/components/fanCamera.hpp"
-#include "scene/components/fanTransform.hpp"
 #include "network/packets/fanPacketLogin.hpp"
 #include "network/packets/fanPacketPing.hpp"
 #include "network/packets/fanIPacket.hpp"
@@ -14,13 +12,12 @@
 
 namespace fan
 {
-	REGISTER_TYPE_INFO( GameServer, TypeInfo::Flags::EDITOR_COMPONENT, "game/net/" )
 
 		//================================================================================================================================
 		//================================================================================================================================
 		void GameServer::OnAttach()
 	{
-		Actor::OnAttach();
+		//Actor::OnAttach();
 		m_socket.Create( "[SERVER]", 53000 );
 	}
 
@@ -28,7 +25,7 @@ namespace fan
 	//================================================================================================================================
 	void GameServer::OnDetach()
 	{
-		Actor::OnDetach();
+		//Actor::OnDetach();
 		m_socket.UnBind();
 	}
 
@@ -36,23 +33,23 @@ namespace fan
 	//================================================================================================================================
 	void GameServer::Start()
 	{
-		// Remove this if we are on a client scene HACK?
-		if ( !GetScene().IsServer() )
-		{
-			GetScene().DeleteComponent( this );
-			return;
-		}
-
-		REQUIRE_COMPONENT( PlayersManager, m_playersManager );
-		REQUIRE_COMPONENT( GameManager, m_gameManager );
-
-		if ( m_playersManager )
-		{
-			onClientConnected.Connect( &PlayersManager::AddPlayer, m_playersManager );
-		}
-
-		m_socket.Bind();
-		m_state = ServerState::SERVER_WAITING_PLAYERS;
+// 		// Remove this if we are on a client scene HACK?
+// 		if ( !GetScene().IsServer() )
+// 		{
+// 			GetScene().DeleteComponent( this );
+// 			return;
+// 		}
+// 
+// 		REQUIRE_COMPONENT( PlayersManager, m_playersManager );
+// 		REQUIRE_COMPONENT( GameManager, m_gameManager );
+// 
+// 		if ( m_playersManager )
+// 		{
+// 			onClientConnected.Connect( &PlayersManager::AddPlayer, m_playersManager );
+// 		}
+// 
+// 		m_socket.Bind();
+// 		m_state = ServerState::SERVER_WAITING_PLAYERS;
 	}
 
 	//================================================================================================================================
@@ -258,7 +255,7 @@ namespace fan
 	//================================================================================================================================
 	void GameServer::OnGui()
 	{
-		Actor::OnGui();
+
 
 		ImGui::PushItemWidth( 0.6f * ImGui::GetWindowWidth() );
 		{
@@ -274,7 +271,7 @@ namespace fan
 	//================================================================================================================================
 	bool GameServer::Load( const Json& _json )
 	{
-		Actor::Load( _json );
+
 		return true;
 	}
 
@@ -282,7 +279,7 @@ namespace fan
 	//================================================================================================================================
 	bool GameServer::Save( Json& _json ) const
 	{
-		Actor::Save( _json );
+
 		return true;
 	}
 }

@@ -1,11 +1,6 @@
 #include "game/components/fanWeapon.hpp"
 #include "game/components/fanWithEnergy.hpp"
 #include "game/components/fanPlayerInput.hpp"
-#include "scene/components/fanTransform.hpp"
-#include "scene/components/fanMaterial.hpp"
-#include "scene/components/fanRigidbody.hpp"
-#include "scene/components/fanMeshRenderer.hpp"
-#include "scene/components/fanSphereShape.hpp"
 #include "core/input/fanInput.hpp"
 #include "core/input/fanInputManager.hpp"
 #include "core/time/fanProfiler.hpp"
@@ -14,21 +9,20 @@
 
 namespace fan
 {
-	REGISTER_TYPE_INFO( Weapon, TypeInfo::Flags::EDITOR_COMPONENT, "game/" )
 
 		//================================================================================================================================
 		//================================================================================================================================
 		void Weapon::Start()
 	{
-		REQUIRE_COMPONENT( WithEnergy, m_energy );
-		REQUIRE_COMPONENT( PlayerInput, m_input );
+// 		REQUIRE_COMPONENT( WithEnergy, m_energy );
+// 		REQUIRE_COMPONENT( PlayerInput, m_input );
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
 	void Weapon::OnAttach()
 	{
-		Actor::OnAttach();
+
 		m_distribution = std::uniform_real_distribution<float>( 0.f, 1.f );
 	}
 
@@ -36,7 +30,7 @@ namespace fan
 	//================================================================================================================================
 	void Weapon::OnDetach()
 	{
-		Actor::OnDetach();
+
 	}
 
 	//================================================================================================================================
@@ -68,41 +62,40 @@ namespace fan
 		}
 	}
 
-	//================================================================================================================================
-	//================================================================================================================================
-	void Weapon::OnBulletContact( Rigidbody* _other, btPersistentManifold* const& _manifold )
-	{
-
-		Rigidbody* rb0 = static_cast< Rigidbody* > ( _manifold->getBody0()->getUserPointer() );
-		Rigidbody* rb1 = static_cast< Rigidbody* > ( _manifold->getBody1()->getUserPointer() );
-		Rigidbody* bulletRb = _other == rb0 ? rb1 : rb0;
-
-		m_gameobject->GetScene().DeleteGameobject( &bulletRb->GetGameobject() );
-		if ( GetScene().IsServer() == false )
-		{
-			CreateExplosion( bulletRb->GetGameobject().GetTransform().GetPosition() );
-		}
-	}
+// 	//================================================================================================================================
+// 	//================================================================================================================================
+// 	void Weapon::OnBulletContact( Rigidbody* _other, btPersistentManifold* const& _manifold )
+// 	{
+// 		Rigidbody* rb0 = static_cast< Rigidbody* > ( _manifold->getBody0()->getUserPointer() );
+// 		Rigidbody* rb1 = static_cast< Rigidbody* > ( _manifold->getBody1()->getUserPointer() );
+// 		Rigidbody* bulletRb = _other == rb0 ? rb1 : rb0;
+// 
+// 		m_gameobject->GetScene().DeleteGameobject( &bulletRb->GetGameobject() );
+// 		if ( GetScene().IsServer() == false )
+// 		{
+// 			CreateExplosion( bulletRb->GetGameobject().GetTransform().GetPosition() );
+// 		}
+//	}
 
 	//================================================================================================================================
 	//================================================================================================================================
 	void  Weapon::CreateExplosion( const btVector3 _point )
 	{
-		for ( int particleIndex = 0; particleIndex < m_particlesPerExplosion; particleIndex++ )
-		{
-			EcsManager& ecs = m_gameobject->GetScene().GetEcsManager();
-			ecsEntity entity = ecs.CreateEntity();
-			ecsPosition& position = ecs.AddComponent<ecsPosition>( entity );
-			ecs.AddComponent<ecsRotation>( entity ).Init();
-			ecsMovement& movement = ecs.AddComponent<ecsMovement>( entity );
-			ecsParticle& particle = ecs.AddComponent<ecsParticle>( entity );
-
-			movement.speed = btVector3( m_distribution( m_generator ), 0.f, m_distribution( m_generator ) ) - btVector3( 0.5f, 0.0f, 0.5f );
-			movement.speed.normalize();
-			movement.speed *= m_distribution( m_generator ) * m_exposionSpeed;
-			position.position = _point;
-			particle.durationLeft = m_explosionTime;
-		}
+// 		for ( int particleIndex = 0; particleIndex < m_particlesPerExplosion; particleIndex++ )
+// 		{
+// 			EcsManager& ecs = m_gameobject->GetScene().GetEcsManager();
+// 			ecsEntity entity = ecs.CreateEntity();
+// 			ecsPosition& position = ecs.AddComponent<ecsPosition>( entity );
+// 			ecs.AddComponent<ecsRotation>( entity ).Init();
+// 			ecsMovement& movement = ecs.AddComponent<ecsMovement>( entity );
+// 			ecsParticle& particle = ecs.AddComponent<ecsParticle>( entity );
+// 
+// 			movement.speed = btVector3( m_distribution( m_generator ), 0.f, m_distribution( m_generator ) ) - btVector3( 0.5f, 0.0f, 0.5f );
+// 			movement.speed.normalize();
+// 			movement.speed *= m_distribution( m_generator ) * m_exposionSpeed;
+// 			position.position = _point;
+// 			particle.durationLeft = m_explosionTime;
+// 		}
 	}
 
 	//================================================================================================================================
@@ -156,7 +149,7 @@ namespace fan
 	//================================================================================================================================
 	bool Weapon::Save( Json& _json ) const
 	{
-		Actor::Save( _json );
+
 
 		Serializable::SavePrefabPtr( _json, "bulletPrefab", m_bulletPrefab );
 		Serializable::SaveFloat( _json, "scale", m_scale );
@@ -176,7 +169,7 @@ namespace fan
 	//================================================================================================================================
 	bool Weapon::Load( const Json& _json )
 	{
-		Actor::Load( _json );
+
 		Serializable::LoadPrefabPtr( _json, "bulletPrefab", m_bulletPrefab );
 		Serializable::LoadFloat( _json, "scale", m_scale );
 		Serializable::LoadFloat( _json, "speed", m_speed );

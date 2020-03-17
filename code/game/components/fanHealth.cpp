@@ -1,22 +1,20 @@
 #include "game/components/fanHealth.hpp"
-#include "scene/components/fanTransform.hpp"
 
 namespace fan
 {
-	REGISTER_TYPE_INFO( Health, TypeInfo::Flags::EDITOR_COMPONENT, "game/" )
 
 		//================================================================================================================================
 		//================================================================================================================================
 		void Health::OnAttach()
 	{
-		Component::OnAttach();
+
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
 	void Health::OnDetach()
 	{
-		Component::OnDetach();
+
 	}
 
 	//================================================================================================================================
@@ -66,8 +64,8 @@ namespace fan
 	//================================================================================================================================
 	bool Health::Save( Json& _json ) const
 	{
-		Component::Save( _json );
-		Serializable::SaveFloat( _json, "max_energy", m_maxHealth );
+
+		//Serializable::SaveFloat( _json, "max_energy", m_maxHealth );
 
 		return true;
 	}
@@ -76,7 +74,7 @@ namespace fan
 	//================================================================================================================================
 	bool Health::Load( const Json& _json )
 	{
-		Serializable::LoadFloat( _json, "max_energy", m_maxHealth );
+		//Serializable::LoadFloat( _json, "max_energy", m_maxHealth );
 
 		return true;
 	}

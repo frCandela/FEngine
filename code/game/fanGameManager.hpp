@@ -2,38 +2,32 @@
 
 #include "game/fanGamePrecompiled.hpp"
 
-#include "scene/actors/fanActor.hpp"
 #include "scene/fanComponentPtr.hpp"
 
 namespace fan
 {
-
-	class Camera;
-
 	//================================================================================================================================
 	//================================================================================================================================	
-	class GameManager : public Actor
+	class GameManager// : public Actor
 	{
 	public:
 
-		void Start() override;
-		void Stop() override {}
-		void Update( const float _delta ) override;
-		void LateUpdate( const float /*_delta*/ ) override {}
+		void Start() /*override*/;
+		void Stop() /*override*/ {}
+		void Update( const float _delta ) /*override*/;
+		void LateUpdate( const float /*_delta*/ ) /*override*/ {}
 
-		ImGui::IconType GetIcon() const override { return ImGui::IconType::JOYSTICK16; }
+		//ImGui::IconType GetIcon() const override { return ImGui::IconType::JOYSTICK16; }
 
-		void OnGui() override;
-
-		DECLARE_TYPE_INFO( GameManager, Actor );
+		void OnGui() /*override*/;
 	protected:
-		bool Load( const Json& _json ) override;
-		bool Save( Json& _json ) const override;
+		bool Load( const Json& _json ) /*override*/;
+		bool Save( Json& _json ) const /*override*/;
 
-		void OnAttach() override;
-		void OnDetach() override;
-
-	private:
-		ComponentPtr<Camera> m_gameCamera;
+		void OnAttach() /*override*/;
+		void OnDetach() /*override*/;
+// 
+// 	private:
+// 		ComponentPtr<Camera> m_gameCamera;
 	};
 }

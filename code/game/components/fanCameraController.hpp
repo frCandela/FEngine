@@ -2,39 +2,34 @@
 
 #include "game/fanGamePrecompiled.hpp"
 
-#include "scene/actors/fanActor.hpp"
 #include "scene/fanComponentPtr.hpp"
 
 namespace fan
 {
-
-	class Camera;
 	class PlayersManager;
 
 	//================================================================================================================================
 	//================================================================================================================================	
-	class CameraController : public Actor
+	class CameraController// : public Actor
 	{
 	public:
-		void Start() override;
-		void Stop() override {}
-		void Update( const float _delta ) override;
-		void LateUpdate( const float _delta ) override;
+		void Start() /*override*/;
+		void Stop() /*override*/ {}
+		void Update( const float _delta ) /*override*/;
+		void LateUpdate( const float _delta ) /*override*/;
 
-		void OnDetach() override;
+		void OnDetach() /*override*/;
 
-		void OnGui() override;
-		ImGui::IconType GetIcon() const override { return ImGui::IconType::CAMERA16; }
-
-		DECLARE_TYPE_INFO( CameraController, Actor );
+		void OnGui() /*override*/;
+		//ImGui::IconType GetIcon() const /*override*/ { return ImGui::IconType::CAMERA16; }
 
 	protected:
-		bool Load( const Json& _json ) override;
-		bool Save( Json& _json ) const override;
+		bool Load( const Json& _json ) /*override*/;
+		bool Save( Json& _json ) const /*override*/;
 
 	private:
-		ComponentPtr < Camera >		 m_camera;
-		ComponentPtr<PlayersManager> m_playersManager;
+		//ComponentPtr < Camera >		 m_camera;
+		//ComponentPtr<PlayersManager> m_playersManager;
 
 		float		m_heightFromTarget = 30.f;
 		btVector2	m_marginRatio = btVector2( 1.f, 1.f );

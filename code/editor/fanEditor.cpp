@@ -30,8 +30,7 @@
 #include "editor/windows/fanInspectorWindow.hpp"	
 #include "editor/windows/fanProfilerWindow.hpp"	
 #include "editor/windows/fanConsoleWindow.hpp"	
-#include "editor/windows/fanNetworkWindow.hpp"
-#include "editor/components/fanFPSCamera.hpp"		
+#include "editor/windows/fanNetworkWindow.hpp"	
 #include "editor/windows/fanRenderWindow.hpp"	
 #include "editor/windows/fanSceneWindow.hpp"	
 #include "editor/windows/fanGameWindow.hpp"
@@ -41,20 +40,7 @@
 #include "editor/fanEditorGizmos.hpp"
 #include "editor/fanMainMenuBar.hpp"
 #include "editor/fanEditorDebug.hpp"
-#include "scene/components/ui/fanUIMeshRenderer.hpp"
-#include "scene/components/fanDirectionalLight.hpp"
-#include "scene/components/ui/fanUITransform.hpp"
-#include "scene/components/fanMeshRenderer.hpp"
-#include "scene/components/fanSphereShape.hpp"
-#include "scene/components/fanPointLight.hpp"
-#include "scene/components/fanRigidbody.hpp"
-#include "scene/components/fanComponent.hpp"
-#include "scene/components/fanTransform.hpp"
-#include "scene/components/fanMaterial.hpp"
-#include "scene/components/fanCamera.hpp"
 #include "scene/fanSceneInstantiate.hpp"
-#include "scene/actors/fanActor.hpp"
-#include "scene/fanGameobject.hpp"
 #include "scene/fanScene.hpp"
 #include "scene/fanPrefabManager.hpp"
 #include "game/components/fanCameraController.hpp"
@@ -511,10 +497,11 @@ namespace fan
 	//================================================================================================================================
 	void Engine::OnToogleCamera()
 	{
-		FPSCamera* editorCameraCtrl = m_currentScene->FindComponentOfType<FPSCamera>();
-		CameraController* gameCameraCtrl = m_currentScene->FindComponentOfType<CameraController>();
-
 		//@hack
+// 		FPSCamera* editorCameraCtrl = m_currentScene->FindComponentOfType<FPSCamera>();
+// 		CameraController* gameCameraCtrl = m_currentScene->FindComponentOfType<CameraController>();
+// 
+// 		
 // 		if ( editorCameraCtrl != nullptr && gameCameraCtrl != nullptr )
 // 		{
 // 			Camera* editorCamera = editorCameraCtrl->GetGameobject().GetComponent<Camera>();

@@ -1,6 +1,5 @@
 #include "scene/fanSceneResourcePtr.hpp"
 
-#include "scene/fanGameobject.hpp"
 #include "scene/fanSceneInstantiate.hpp"
 #include "scene/fanScene.hpp"
 #include "core/imgui/fanImguiIcons.hpp"
@@ -10,97 +9,97 @@
 
 namespace fan
 {
-	//================================================================================================================================
-	//================================================================================================================================
-	GameobjectPtr::~GameobjectPtr()
-	{
-		( *this ) = nullptr;
-	}
-
-	//================================================================================================================================
-	//================================================================================================================================
-	void GameobjectPtr::Init( Scene& _scene, uint64_t _gameobjectId )
-	{
-		m_gameobjectId = _gameobjectId;
-		m_scene = &_scene;
-		if ( m_gameobjectId != 0 )
-		{
-			_scene.GetInstanciator().RegisterUnresolvedGameobjectPtr( *this );
-		}		
-	}
-
-	//================================================================================================================================
-	//================================================================================================================================
-	GameobjectPtr& GameobjectPtr::operator=( Gameobject* _resource ) 
-	{ 
-		if ( _resource == GetResource() ) { return  *this; }
-
-		if ( GetResource() != nullptr ) 
-		{
-			assert( m_scene != nullptr );
-			m_scene->GetInstanciator().UnregisterGameobjectPtr( *this );
-		}
-
-		if ( _resource != nullptr )
-		{
-			m_scene = & _resource->GetScene();
-			m_scene->GetInstanciator().RegisterGameobjectPtr( *this );
-		}
-		else
-		{
-			m_scene = nullptr;
-		}
-		
-		SetResource( _resource ); 
-
-		return *this; 
-	}
+// 	//================================================================================================================================
+// 	//================================================================================================================================
+// 	GameobjectPtr::~GameobjectPtr()
+// 	{
+// 		( *this ) = nullptr;
+// 	}
+// 
+// 	//================================================================================================================================
+// 	//================================================================================================================================
+// 	void GameobjectPtr::Init( Scene& _scene, uint64_t _gameobjectId )
+// 	{
+// 		m_gameobjectId = _gameobjectId;
+// 		m_scene = &_scene;
+// 		if ( m_gameobjectId != 0 )
+// 		{
+// 			_scene.GetInstanciator().RegisterUnresolvedGameobjectPtr( *this );
+// 		}		
+// 	}
+// 
+// 	//================================================================================================================================
+// 	//================================================================================================================================
+// 	GameobjectPtr& GameobjectPtr::operator=( Gameobject* _resource ) 
+// 	{ 
+// 		if ( _resource == GetResource() ) { return  *this; }
+// 
+// 		if ( GetResource() != nullptr ) 
+// 		{
+// 			assert( m_scene != nullptr );
+// 			m_scene->GetInstanciator().UnregisterGameobjectPtr( *this );
+// 		}
+// 
+// 		if ( _resource != nullptr )
+// 		{
+// 			m_scene = & _resource->GetScene();
+// 			m_scene->GetInstanciator().RegisterGameobjectPtr( *this );
+// 		}
+// 		else
+// 		{
+// 			m_scene = nullptr;
+// 		}
+// 		
+// 		SetResource( _resource ); 
+// 
+// 		return *this; 
+// 	}
 }
 
 namespace ImGui
 {
-	//================================================================================================================================
-	//================================================================================================================================
-	bool FanGameobject( const char* _label, fan::GameobjectPtr& _ptr )
-	{
-		bool returnValue = false;
-
-		fan::Gameobject* gameobject = *_ptr;
-		const std::string name = gameobject != nullptr ? gameobject->GetName() : "null";
-
-		// icon & set from selection
-		if ( ImGui::ButtonIcon( ImGui::IconType::GAMEOBJECT16, { 16,16 } ) )
-		{
-			returnValue = true;
-		}
-		ImGui::SameLine();
-
-		// name button 
-		float width = 0.6f * ImGui::GetWindowWidth() - ImGui::GetCursorPosX() + 8;
-		ImGui::Button( name.c_str(), ImVec2( width, 0.f ) ); ImGui::SameLine();
-		ImGui::SameLine();
-
-		// dragndrop
-		ImGui::FanBeginDragDropSourceGameobject( gameobject );
-		fan::Gameobject* gameobjectDrop = ImGui::FanBeginDragDropTargetGameobject();
-		if ( gameobjectDrop )
-		{
-			_ptr = gameobjectDrop;
-			returnValue = true;
-		}
-
-		// Right click = clear
-		if ( ImGui::IsItemClicked( 1 ) )
-		{
-			_ptr = nullptr;
-			returnValue = true;
-		}
-
-		// label	
-		ImGui::Text( _label );
-
-		return returnValue;
-	}
+// 	//================================================================================================================================
+// 	//================================================================================================================================
+// 	bool FanGameobject( const char* _label, fan::GameobjectPtr& _ptr )
+// 	{
+// 		bool returnValue = false;
+// 
+// 		fan::Gameobject* gameobject = *_ptr;
+// 		const std::string name = gameobject != nullptr ? gameobject->GetName() : "null";
+// 
+// 		// icon & set from selection
+// 		if ( ImGui::ButtonIcon( ImGui::IconType::GAMEOBJECT16, { 16,16 } ) )
+// 		{
+// 			returnValue = true;
+// 		}
+// 		ImGui::SameLine();
+// 
+// 		// name button 
+// 		float width = 0.6f * ImGui::GetWindowWidth() - ImGui::GetCursorPosX() + 8;
+// 		ImGui::Button( name.c_str(), ImVec2( width, 0.f ) ); ImGui::SameLine();
+// 		ImGui::SameLine();
+// 
+// 		// dragndrop
+// 		ImGui::FanBeginDragDropSourceGameobject( gameobject );
+// 		fan::Gameobject* gameobjectDrop = ImGui::FanBeginDragDropTargetGameobject();
+// 		if ( gameobjectDrop )
+// 		{
+// 			_ptr = gameobjectDrop;
+// 			returnValue = true;
+// 		}
+// 
+// 		// Right click = clear
+// 		if ( ImGui::IsItemClicked( 1 ) )
+// 		{
+// 			_ptr = nullptr;
+// 			returnValue = true;
+// 		}
+// 
+// 		// label	
+// 		ImGui::Text( _label );
+// 
+// 		return returnValue;
+// 	}
 
 	//================================================================================================================================
 	//================================================================================================================================

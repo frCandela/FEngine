@@ -9,8 +9,6 @@
 #include "core/time/fanProfiler.hpp"
 #include "core/time/fanTime.hpp"
 #include "scene/fanScene.hpp"
-#include "scene/fanGameobject.hpp"
-#include "scene/components/fanCamera.hpp"
 
 namespace fan
 {

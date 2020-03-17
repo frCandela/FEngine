@@ -7,55 +7,54 @@
 
 namespace fan
 {
-	REGISTER_TYPE_INFO( PlayersManager, TypeInfo::Flags::EDITOR_COMPONENT, "game/managers/" )
 
 	//================================================================================================================================
 	//================================================================================================================================
 	void PlayersManager::Start()
 	{
-		REQUIRE_TRUE( *m_playerPrefab != nullptr, "PlayersManager : missing player prefab " )
-
-			if ( !GetScene().IsServer() )
-			{
-				// Callback used to spawn future joystick players
-				Joystick::Get().onJoystickConnect.Connect( &PlayersManager::OnJoystickConnect, this );
-
-				// Spawn joystick players
-				for ( int joystickIndex = 0; joystickIndex < Joystick::NUM_JOYSTICK; joystickIndex++ )
-				{
-					if ( Joystick::Get().IsConnected( joystickIndex ) )
-					{
-						std::stringstream ss;
-						ss << "joystick" << joystickIndex << "_player";
-						AddPlayer( joystickIndex, ss.str() );
-					}
-				}
-
-				AddPlayer( s_mousePlayerID, "mouse_player" );
-			}
+// 		REQUIRE_TRUE( *m_playerPrefab != nullptr, "PlayersManager : missing player prefab " )
+// 
+// 			if ( !GetScene().IsServer() )
+// 			{
+// 				// Callback used to spawn future joystick players
+// 				Joystick::Get().onJoystickConnect.Connect( &PlayersManager::OnJoystickConnect, this );
+// 
+// 				// Spawn joystick players
+// 				for ( int joystickIndex = 0; joystickIndex < Joystick::NUM_JOYSTICK; joystickIndex++ )
+// 				{
+// 					if ( Joystick::Get().IsConnected( joystickIndex ) )
+// 					{
+// 						std::stringstream ss;
+// 						ss << "joystick" << joystickIndex << "_player";
+// 						AddPlayer( joystickIndex, ss.str() );
+// 					}
+// 				}
+// 
+// 				AddPlayer( s_mousePlayerID, "mouse_player" );
+// 			}
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
 	void PlayersManager::Stop()
 	{
-		if ( !GetScene().IsServer() )
-		{
-			Joystick::Get().onJoystickConnect.Disconnect( &PlayersManager::OnJoystickConnect, this );
-		}
-
-		// Remove all players
-		while ( !m_players.empty() )
-		{
-			RemovePlayer( m_players.begin()->first );
-		}
+// 		if ( !GetScene().IsServer() )
+// 		{
+// 			Joystick::Get().onJoystickConnect.Disconnect( &PlayersManager::OnJoystickConnect, this );
+// 		}
+// 
+// 		// Remove all players
+// 		while ( !m_players.empty() )
+// 		{
+// 			RemovePlayer( m_players.begin()->first );
+// 		}
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
 	void PlayersManager::OnAttach()
 	{
-		Actor::OnAttach();
+
 
 	}
 
@@ -63,7 +62,7 @@ namespace fan
 	//================================================================================================================================
 	void PlayersManager::OnDetach()
 	{
-		Actor::OnDetach();
+
 	}
 
 	//================================================================================================================================
@@ -71,15 +70,15 @@ namespace fan
 	//================================================================================================================================
 	void PlayersManager::AddPlayer( const int _ID, const std::string& _name )
 	{
-		if ( *m_playerPrefab != nullptr )
-		{
-			// Creates a persistent gameobject for the player
-			assert( m_players.find( _ID ) == m_players.end() );
-			PlayerData playerdata;
-			playerdata.persistent = GetScene().CreateGameobject( _name + std::string( "_persistent" ), m_gameobject );
-			m_players[ _ID ] = playerdata;
-			onAddPlayer.Emmit( playerdata.persistent );
-		}
+// 		if ( *m_playerPrefab != nullptr )
+// 		{
+// 			// Creates a persistent gameobject for the player
+// 			assert( m_players.find( _ID ) == m_players.end() );
+// 			PlayerData playerdata;
+// 			playerdata.persistent = GetScene().CreateGameobject( _name + std::string( "_persistent" ), m_gameobject );
+// 			m_players[ _ID ] = playerdata;
+// 			onAddPlayer.Emmit( playerdata.persistent );
+// 		}
 	}
 
 	//================================================================================================================================
@@ -126,29 +125,29 @@ namespace fan
 
 	}
 
-	//================================================================================================================================
-	//================================================================================================================================
-	void PlayersManager::OnPlayerDie( Gameobject* _gameobject )
-	{
-		// Removes dead player from the game
-		PlayerInput* input = _gameobject->GetComponent<PlayerInput>();
-		if ( input != nullptr )
-		{
-			RemovePlayer( input->GetJoystickID() );
-			m_gameobject->GetScene().DeleteGameobject( _gameobject );
-		}
-	}
+// 	//================================================================================================================================
+// 	//================================================================================================================================
+// 	void PlayersManager::OnPlayerDie( Gameobject* _gameobject )
+// 	{
+// 		// Removes dead player from the game
+// 		PlayerInput* input = _gameobject->GetComponent<PlayerInput>();
+// 		if ( input != nullptr )
+// 		{
+// 			RemovePlayer( input->GetJoystickID() );
+// 			m_gameobject->GetScene().DeleteGameobject( _gameobject );
+// 		}
+//	}
 
 	//================================================================================================================================
 	// Removes a player from the scene
 	//================================================================================================================================
 	void PlayersManager::RemovePlayer( const int _ID )
 	{
-		assert( m_players.find( _ID ) != m_players.end() );
-
-		PlayerData playerData = m_players[ _ID ];
-		m_players.erase( _ID );
-		m_gameobject->GetScene().DeleteGameobject( playerData.persistent );
+// 		assert( m_players.find( _ID ) != m_players.end() );
+// 
+// 		PlayerData playerData = m_players[ _ID ];
+// 		m_players.erase( _ID );
+// 		m_gameobject->GetScene().DeleteGameobject( playerData.persistent );
 	}
 
 	//================================================================================================================================
@@ -163,19 +162,19 @@ namespace fan
 		}
 	}
 
-	//================================================================================================================================
-	// Returns an array of connected players data (copy)
-	//================================================================================================================================
-	std::vector< Gameobject* > PlayersManager::GetPlayers() const
-	{
-		std::vector< Gameobject* > players;
-		players.reserve( m_players.size() );
-		for ( auto& pair : m_players )
-		{
-			players.push_back( pair.second.persistent );
-		}
-		return players;
-	}
+// 	//================================================================================================================================
+// 	// Returns an array of connected players data (copy)
+// 	//================================================================================================================================
+// 	std::vector< Gameobject* > PlayersManager::GetPlayers() const
+// 	{
+// 		std::vector< Gameobject* > players;
+// 		players.reserve( m_players.size() );
+// 		for ( auto& pair : m_players )
+// 		{
+// 			players.push_back( pair.second.persistent );
+// 		}
+// 		return players;
+// 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
@@ -188,19 +187,19 @@ namespace fan
 	//================================================================================================================================
 	void PlayersManager::OnGui()
 	{
-		Actor::OnGui();
-		ImGui::PushItemWidth( 0.6f * ImGui::GetWindowWidth() );
-		{
-			ImGui::FanPrefab( "player prefab", m_playerPrefab );
-		} ImGui::PopItemWidth();
+// 		Actor::OnGui();
+// 		ImGui::PushItemWidth( 0.6f * ImGui::GetWindowWidth() );
+// 		{
+// 			ImGui::FanPrefab( "player prefab", m_playerPrefab );
+// 		} ImGui::PopItemWidth();
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
 	bool PlayersManager::Load( const Json& _json )
 	{
-		Actor::Load( _json );
-		Serializable::LoadPrefabPtr( _json, "player_prefab", m_playerPrefab );
+// 		Actor::Load( _json );
+// 		Serializable::LoadPrefabPtr( _json, "player_prefab", m_playerPrefab );
 
 		return true;
 	}
@@ -209,8 +208,8 @@ namespace fan
 	//================================================================================================================================
 	bool PlayersManager::Save( Json& _json ) const
 	{
-		Actor::Save( _json );
-		Serializable::SavePrefabPtr( _json, "player_prefab", m_playerPrefab );
+// 		Actor::Save( _json );
+// 		Serializable::SavePrefabPtr( _json, "player_prefab", m_playerPrefab );
 		return true;
 	}
 }
