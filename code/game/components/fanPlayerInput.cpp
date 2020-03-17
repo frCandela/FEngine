@@ -3,10 +3,10 @@
 #include "core/input/fanInput.hpp"
 #include "core/input/fanMouse.hpp"
 #include "core/input/fanJoystick.hpp"
-#include "scene/ecs/components/fanSceneNode.hpp"
-#include "scene/ecs/components/fanCamera.hpp"
-#include "scene/ecs/components/fanTransform.hpp"
-#include "scene/ecs/fanEcsWorld.hpp"
+#include "scene/components/fanSceneNode.hpp"
+#include "scene/components/fanCamera.hpp"
+#include "scene/components/fanTransform.hpp"
+#include "ecs/fanEcsWorld.hpp"
 
 namespace fan
 {

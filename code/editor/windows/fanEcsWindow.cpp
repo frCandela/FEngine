@@ -1,10 +1,11 @@
 #include "editor/windows/fanEcsWindow.hpp"
 
 #include "core/time/fanProfiler.hpp"
-#include "scene/ecs/fanComponentsCollection.hpp"
-#include "scene/ecs/fanSystem.hpp"
-#include "scene/ecs/fanTag.hpp"
-#include "scene/ecs/fanEcsWorld.hpp"
+#include "ecs/fanComponentsCollection.hpp"
+#include "ecs/fanEcsWorld.hpp"
+#include "ecs/fanSystem.hpp"
+#include "ecs/fanTag.hpp"
+#include "scene/fanSceneTags.hpp"
 
 namespace fan
 {

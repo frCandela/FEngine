@@ -7,13 +7,14 @@
 #include "core/time/fanProfiler.hpp"
 #include "core/input/fanMouse.hpp"
 #include "core/math/shapes/fanRay.hpp"
-#include "scene/ecs/components/fanSceneNode.hpp"
-#include "scene/ecs/components/fanTransform.hpp"
-#include "scene/ecs/components/fanCamera.hpp"
+#include "scene/components/fanSceneNode.hpp"
+#include "scene/components/fanTransform.hpp"
+#include "scene/components/fanCamera.hpp"
 #include "scene/fanScene.hpp"
+#include "scene/systems/fanRaycast.hpp"
+#include "scene/fanSceneTags.hpp"
 #include "render/fanMesh.hpp"
-#include "scene/ecs/systems/fanRaycast.hpp"
-#include "scene/ecs/fanEcsWorld.hpp"
+#include "ecs/fanEcsWorld.hpp"
 
 namespace fan
 {

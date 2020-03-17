@@ -2,7 +2,7 @@
 
 #include "editor/fanEditorPrecompiled.hpp"
 #include "editor/windows/fanEditorWindow.hpp"
-#include "scene/ecs/fanEcsTypes.hpp"
+#include "ecs/fanEcsTypes.hpp"
 
 namespace fan
 {

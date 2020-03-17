@@ -8,6 +8,7 @@ file(GLOB_RECURSE FAN_SCENE_H *.hpp)
 set( FAN_SCENE_LIBS
     fanCore		
     fanRender
+    fanEcs
     BulletDynamics
     BulletCollision
 )

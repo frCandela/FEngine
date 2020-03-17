@@ -1,6 +1,6 @@
 #include "game/imgui/fanDragnDrop.hpp"
 
-#include "scene/ecs/components/fanSceneNode.hpp"
+#include "scene/components/fanSceneNode.hpp"
 #include "scene/fanPrefab.hpp"
 #include "render/core/fanTexture.hpp"
 #include "render/fanMesh.hpp"

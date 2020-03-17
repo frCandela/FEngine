@@ -4,8 +4,8 @@
 #include "core/input/fanInput.hpp"
 #include "core/input/fanInputManager.hpp"
 #include "core/math/shapes/fanRay.hpp"
-#include "scene/ecs/components/fanTransform.hpp"
-#include "scene/ecs/components/fanCamera.hpp"
+#include "scene/components/fanTransform.hpp"
+#include "scene/components/fanCamera.hpp"
 
 
 namespace fan

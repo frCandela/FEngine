@@ -2,7 +2,7 @@
 #include "game/components/fanWithEnergy.hpp"
 #include "game/components/fanSolarPanel.hpp"
 #include "game/components/fanHealth.hpp"
-#include "scene/ecs/components/fanProgressBar.hpp"
+#include "scene/components/fanProgressBar.hpp"
 #include "render/fanRendererDebug.hpp"
 
 namespace fan

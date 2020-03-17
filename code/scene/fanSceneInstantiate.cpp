@@ -1,6 +1,6 @@
 #include "scene/fanSceneInstantiate.hpp"
 #include "scene/fanPrefab.hpp"
-#include "scene/ecs/components/fanSceneNode.hpp"
+#include "scene/components/fanSceneNode.hpp"
 
 namespace fan
 {

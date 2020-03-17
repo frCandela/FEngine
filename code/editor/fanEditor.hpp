@@ -1,7 +1,7 @@
 #pragma once
 
 #include "core/fanSerializedValues.hpp"
-#include "scene/ecs/fanEcsWorld.hpp"
+#include "ecs/fanEcsWorld.hpp"
 
 namespace fan
 {

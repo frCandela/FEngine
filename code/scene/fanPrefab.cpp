@@ -1,8 +1,8 @@
 #include "scene/fanPrefab.hpp"
 
-#include "scene/ecs/components/fanSceneNode.hpp"
+#include "scene/components/fanSceneNode.hpp"
 #include "scene/fanScene.hpp"
-#include "scene/ecs/fanEcsWorld.hpp"
+#include "ecs/fanEcsWorld.hpp"
 
 namespace fan
 {

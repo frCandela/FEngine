@@ -2,7 +2,7 @@
 
 #include "scene/fanScenePrecompiled.hpp"
 
-#include "scene/ecs/fanSingletonComponent.hpp"
+#include "ecs/fanSingletonComponent.hpp"
 
 namespace fan
 {
