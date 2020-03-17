@@ -4,6 +4,45 @@
 #include "core/fanHash.hpp"
 #include "fanEcsTypes.hpp"
 
+
+// TO MIGRATE LATER
+// 	//================================
+// 	struct ecsPlanet : ecsIComponent
+// 	{
+// 		static const char* s_name;
+// 		void Init()
+// 		{
+// 			time = 0.f;
+// 			speed = 1.f;
+// 			radius = 1.f;
+// 			phase = 0.f;
+// 		}
+// 		void Clear(){}
+// 
+// 		float time = 0.f;
+// 		float speed = 1.f;
+// 		float radius = 1.f;
+// 		float phase = 0.f;
+// 	};	//================================
+// 	struct ecsBullet : ecsIComponent
+// 	{
+// 		static const char* s_name;
+// 		void Init( const float _durationLeft, const float _damage )
+// 		{
+// 			durationLeft = _durationLeft;
+// 			damage = _damage;
+// 		}
+// 		void Clear() {}
+// 
+// 		float durationLeft = 1.f;
+// 		float damage = 5.f;
+// 	};
+
+
+
+
+
+
 namespace fan
 {
 	//================================================================================================================================

@@ -9,7 +9,7 @@ namespace fan
 	template< typename T > class ResourcePtr;
 
 	//================================================================================================================================
-	// Base class for resources ( Mesh, textures, components, gameobjects etc.) 
+	// Base class for resources ( Mesh, textures etc.) 
 	//================================================================================================================================
 	class Resource
 	{
