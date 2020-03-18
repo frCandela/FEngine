@@ -130,16 +130,19 @@ public:
 		m_floats[2] = _z;
 		m_floats[3] = btScalar(0.f);
 	}	
-	static const btVector3 Left()		{ return btVector3( 1.f, 0.f, 0.f);	}
-	static const btVector3 Up()			{ return btVector3( 0.f, 1.f, 0.f);	}
-	static const btVector3 Forward()	{ return btVector3( 0.f, 0.f, 1.f);	}
-	static const btVector3 Zero()		{ return btVector3( 0.f, 0.f, 0.f); }
-	static const btVector3 One()		{ return btVector3( 1.f, 1.f, 1.f); }
+
+	// @begin fcandela
+	static btVector3 Left()		{ return btVector3( 1.f, 0.f, 0.f);	}
+	static btVector3 Up()			{ return btVector3( 0.f, 1.f, 0.f);	}
+	static btVector3 Forward()	{ return btVector3( 0.f, 0.f, 1.f);	}
+	static btVector3 Zero()		{ return btVector3( 0.f, 0.f, 0.f); }
+	static btVector3 One()		{ return btVector3( 1.f, 1.f, 1.f); }
 	
 	float SignedAngle( const btVector3 & _other, const btVector3 & _axis ) const {
 		float angle = this->angle( _other ) * ( this->cross( _other ).dot( _axis ) > 0.0f ? 1.f : -1.f );
 		return std::fmodf( angle + SIMD_2_PI, SIMD_2_PI );
 	}
+	// @end fcandela
 
 
 #if (defined(BT_USE_SSE_IN_API) && defined(BT_USE_SSE)) || defined(BT_USE_NEON)

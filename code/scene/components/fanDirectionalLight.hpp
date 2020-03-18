@@ -23,9 +23,9 @@ namespace fan
 		static void Save( const Component& _transform, Json& _json );
 		static void Load( Component& _transform, const Json& _json );
 
-		Color ambiant = Color::Black;
-		Color diffuse = Color::White;
-		Color specular = Color::White;
+		Color ambiant;
+		Color diffuse;
+		Color specular;
 	};
 	static constexpr size_t sizeof_directionalLight = sizeof( DirectionalLight );
 }

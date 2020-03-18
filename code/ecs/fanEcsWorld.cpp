@@ -70,7 +70,7 @@ namespace fan
 	Component& EcsWorld::GetComponent( const EntityID _entityID, const ComponentIndex _index )
 	{
 		Entity& entity = GetEntity( _entityID );
-		assert( entity.signature[_index] ); // entity has have this component
+		assert( entity.signature[_index] ); // entity has this component
 		for( int i = 0; i < entity.componentCount; i++ )
 		{
 			if( entity.components[i]->componentIndex == _index )

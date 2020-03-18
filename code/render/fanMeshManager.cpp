@@ -11,7 +11,7 @@ namespace fan
 	{
 		m_device = &_device;
 		ResourcePtr< Mesh >::s_onResolve.Connect( &MeshManager::ResolvePtr, this );
-		LoadMesh( RenderGlobal::s_defaultMesh );
+		GetMesh( RenderGlobal::s_defaultMesh );
 	}
 
 	//================================================================================================================================
@@ -32,7 +32,7 @@ namespace fan
 		assert( ! _resourcePtr.IsValid() );
 
 		MeshPtr& meshPtr = static_cast< MeshPtr& >( _resourcePtr );
-		Mesh * mesh = LoadMesh( meshPtr.GetPath() );
+		Mesh * mesh = GetMesh( meshPtr.GetPath() );
 
 		if ( mesh != nullptr )
 		{
@@ -41,9 +41,10 @@ namespace fan
 	}
 
 	//================================================================================================================================
-	// Load a mesh from a path, loads it and registers it
+	// returns a mesh at a specific path
+	// first tries to find it, else loads it from a path and registers it
 	//================================================================================================================================
-	Mesh* MeshManager::LoadMesh( const std::string& _path )
+	Mesh* MeshManager::GetMesh( const std::string& _path )
 	{
 		if ( _path.empty() ) { return nullptr; }
 

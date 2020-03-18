@@ -27,9 +27,9 @@ namespace fan
 		pointLight.ambiant = Color::White;
 		pointLight.diffuse = Color::White;
 		pointLight.specular = Color::White;
-		pointLight.attenuation[0] = 0.f; 
-		pointLight.attenuation[1] = 0.f;
-		pointLight.attenuation[2] = 0.1f;
+		pointLight.attenuation[0] = 1.0f; 
+		pointLight.attenuation[1] = 0.5f;
+		pointLight.attenuation[2] = 0.2f;
 	}
 
 	//================================================================================================================================

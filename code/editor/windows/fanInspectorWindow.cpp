@@ -127,6 +127,7 @@ namespace fan
 	}
 
 	//================================================================================================================================
+	// menu item in the NewComponentPopup
 	//================================================================================================================================
 	void InspectorWindow::NewComponentItem( const ComponentInfo& _info )
 	{
@@ -150,6 +151,7 @@ namespace fan
 	}
 
 	//================================================================================================================================
+	// context menu when clicking "add component"
 	//================================================================================================================================
 	void InspectorWindow::NewComponentPopup()
 	{
@@ -208,6 +210,8 @@ namespace fan
 	}
 
 	//================================================================================================================================
+	// recursively draws all components available to add
+	// called from the NewComponentPopup
 	//================================================================================================================================
 	void InspectorWindow::R_NewComponentPopup( std::set< std::filesystem::path >& _componentsPathSet, std::set< std::filesystem::path >::iterator& _current, const std::vector< const ComponentInfo*>& _components, const std::vector<std::filesystem::path>& _componentsPath )
 	{

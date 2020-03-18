@@ -24,7 +24,7 @@ namespace fan
 	void DirectionalLight::Init( Component& _component )
 	{
 		DirectionalLight& light = static_cast<DirectionalLight&>( _component );
-		light.ambiant = Color::Black;
+		light.ambiant = Color( 0.1f, 0.1f, 0.1f );
 		light.diffuse = Color::White;
 		light.specular = Color::White;
 	}

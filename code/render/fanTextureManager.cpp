@@ -11,8 +11,8 @@ namespace fan
 	{
 		m_device = &_device;
 		ResourcePtr< Texture >::s_onResolve.Connect( &TextureManager::ResolvePtr, this );
-		LoadTexture( RenderGlobal::s_defaultTexture );
-		LoadTexture( RenderGlobal::s_whiteTexture );
+		GetTexture( RenderGlobal::s_defaultTexture );
+		GetTexture( RenderGlobal::s_whiteTexture );
 	}
 
 	//================================================================================================================================
@@ -33,7 +33,7 @@ namespace fan
 		assert( ! _resourcePtr.IsValid() );
 
 		TexturePtr& texturePtr = static_cast< TexturePtr& >( _resourcePtr );
-		Texture * texture = LoadTexture( texturePtr.GetPath() );
+		Texture * texture = GetTexture( texturePtr.GetPath() );
 
 		if ( texture )
 		{
@@ -42,9 +42,10 @@ namespace fan
 	}
 
 	//================================================================================================================================
-	// Load a mesh from a path, loads it and registers it
+	// returns a texture at a specific path
+	// First try to find it, else loads it from a path and registers it
 	//================================================================================================================================
-	Texture* TextureManager::LoadTexture( const std::string& _path )
+	Texture* TextureManager::GetTexture( const std::string& _path )
 	{
 		if ( _path.empty() ) { return nullptr; }
 

@@ -21,7 +21,7 @@ namespace fan
 
 		void	ResolvePtr( ResourcePtr< Mesh >& _resourcePtr );
 		Device& GetDevice() const { assert( m_device != nullptr ); return *m_device;  }
-		Mesh*	LoadMesh( const std::string& _path );
+		Mesh*	GetMesh( const std::string& _path );
 
 		const std::map< std::string, Mesh* >& GetList() const { return m_meshList; }
 

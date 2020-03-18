@@ -26,11 +26,11 @@ namespace fan
 	{
 		ParticleEmitter& emitter = static_cast<ParticleEmitter&>( _component );
 
-		emitter.particlesPerSecond = 1;
+		emitter.particlesPerSecond = 100;
 		emitter.speed = 1.f;
 		emitter.duration = 2.f;
 		emitter.offset = btVector3::Zero();
-		emitter.color = Color::White;
+		emitter.color = Color::Magenta;
 		emitter.timeAccumulator = 0.f;
 	}
 

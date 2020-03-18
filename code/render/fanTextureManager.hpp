@@ -21,7 +21,7 @@ namespace fan
 
 		void	 ResolvePtr( ResourcePtr< Texture >& _resourcePtr );
 		Device&  GetDevice() const { assert( m_device != nullptr ); return *m_device; }
-		Texture* LoadTexture( const std::string& _path );
+		Texture* GetTexture( const std::string& _path );
 		Texture* FindTexture( const std::string& _path );
 
 		bool IsModified() const { return m_modified; }
