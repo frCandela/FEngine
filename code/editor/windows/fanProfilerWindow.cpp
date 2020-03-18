@@ -1,7 +1,8 @@
 #include "editor/windows/fanProfilerWindow.hpp"
+
+#include "editor/fanModals.hpp"
 #include "core/input/fanInputManager.hpp"
 #include "core/time/fanProfiler.hpp"
-#include "core/imgui/fanModals.hpp"
 #include "core/input/fanInput.hpp"
 
 namespace fan

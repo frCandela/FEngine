@@ -1,7 +1,7 @@
 #include "render/imgui/fanRenderDragnDrop.hpp"
 #include "render/core/fanTexture.hpp"
 #include "render/fanMesh.hpp"
-#include "core/imgui/fanImguiIcons.hpp"
+#include "editor/fanImguiIcons.hpp"
 
 namespace ImGui
 {

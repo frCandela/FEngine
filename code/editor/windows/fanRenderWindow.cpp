@@ -1,6 +1,7 @@
 #include "editor/windows/fanRenderWindow.hpp"
+
+#include "editor/fanModals.hpp"
 #include "core/time/fanProfiler.hpp"
-#include "core/imgui/fanModals.hpp"
 #include "core/time/fanTime.hpp"
 #include "scene/fanPrefab.hpp"
 #include "render/pipelines/fanPostprocessPipeline.hpp"

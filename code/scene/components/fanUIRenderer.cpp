@@ -2,6 +2,7 @@
 
 #include "render/fanRenderSerializable.hpp"
 #include "core/input/fanInput.hpp"
+#include "editor/fanModals.hpp"
 
 namespace fan
 {

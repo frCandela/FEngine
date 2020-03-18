@@ -1,6 +1,7 @@
 #include "scene/components/fanMaterial.hpp"
 
 #include "render/fanRenderSerializable.hpp"
+#include "editor/fanModals.hpp"
 
 namespace fan
 {

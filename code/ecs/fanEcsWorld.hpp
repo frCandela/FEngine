@@ -4,7 +4,6 @@
 
 #include "fanSystem.hpp"
 #include "ecs/fanEntity.hpp"
-#include "core/imgui/fanImguiIcons.hpp"
 #include "fanComponentsCollection.hpp"
 #include "ecs/fanTag.hpp"
 

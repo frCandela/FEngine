@@ -1,10 +1,10 @@
-#include "game/imgui/fanDragnDrop.hpp"
+#include "editor/fanDragnDrop.hpp"
 
+#include "editor/fanImguiIcons.hpp"
 #include "scene/components/fanSceneNode.hpp"
 #include "scene/fanPrefab.hpp"
 #include "render/core/fanTexture.hpp"
 #include "render/fanMesh.hpp"
-#include "core/imgui/fanImguiIcons.hpp"
 
 namespace ImGui
 {

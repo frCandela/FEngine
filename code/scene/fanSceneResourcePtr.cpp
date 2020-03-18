@@ -2,9 +2,9 @@
 
 #include "scene/fanSceneInstantiate.hpp"
 #include "scene/fanScene.hpp"
-#include "core/imgui/fanImguiIcons.hpp"
-#include "core/imgui/fanModals.hpp"
-#include "game/imgui/fanDragnDrop.hpp"
+#include "editor/fanImguiIcons.hpp"
+#include "editor/fanModals.hpp"
+#include "editor/fanDragnDrop.hpp"
 #include "render/fanRenderGlobal.hpp"
 
 namespace fan

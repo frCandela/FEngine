@@ -1,6 +1,8 @@
 #include "scene/components/fanParticleEmitter.hpp"
 
 #include "render/fanRenderSerializable.hpp"
+#include "editor/fanModals.hpp"
+#include "editor/fanImguiIcons.hpp"
 
 namespace fan
 {
@@ -45,7 +47,6 @@ namespace fan
 			ImGui::DragFloat( "duration", &emitter.duration, 0.01f );
 			ImGui::DragFloat3( "offset", &emitter.offset[0], 0.01f );
 			ImGui::ColorEdit4( "color##pecol", emitter.color.Data(), ImGui::fanColorEditFlags );
-
 		}
 		ImGui::PopItemWidth();
 	}

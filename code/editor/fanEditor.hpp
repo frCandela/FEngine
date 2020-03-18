@@ -94,7 +94,7 @@ namespace fan
 
 		void OnSetCurrentScene( int _scene );
 
-		static void InitializeEcsWorldTypes( EcsWorld& _world );
 		static void InitializeEditorEcsWorldTypes( EcsWorld& _world );
+		static void InitializeSceneEcsWorldTypes( EcsWorld& _world );
 	};
 }

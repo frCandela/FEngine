@@ -4,13 +4,13 @@
 
 #include "core/fanSignal.hpp"
 #include "game/fanGameSerializable.hpp"
+#include "ecs/fanEcsWorld.hpp"
 
 namespace fan
 {
 	struct SceneNode;
 	class Actor;
 	class EcsManager;
-	class EcsWorld;
 	class SceneInstantiate;
 	class Prefab;
 
@@ -63,7 +63,7 @@ namespace fan
 		inline std::string		 GetPath() const { return m_path; }
 		inline SceneInstantiate& GetInstanciator() const { return *m_instantiate;  }
 		inline EcsManager&		 GetEcsManager() const { return * ((EcsManager*)0); }//@hack
-		inline EcsWorld&		 GetWorld() const { return *m_ecsWorld; }
+		inline EcsWorld&		 GetWorld() { return m_world; }
 		State					 GetState() const { return m_state; };
 		SceneNode&				 GetMainCamera() { return *m_mainCamera; }
 		void					 SetMainCamera( SceneNode& _nodeCamera );
@@ -74,21 +74,16 @@ namespace fan
 		std::string	m_name;
 		std::string	m_path;		
 		bool		m_isServer = false;
-
-		SceneInstantiate* m_instantiate = nullptr;
-		EcsWorld*         m_ecsWorld = nullptr;
-
-		// References
+		State		m_state = State::STOPPED; // State
 		SceneNode * m_rootNode = nullptr;
-		SceneNode* m_mainCamera = nullptr;
-
-		// State
-		State m_state = State::STOPPED;
-
+		SceneNode*	m_mainCamera = nullptr;
 		std::vector < SceneNode* > m_sceneNodesToDelete;
 
-		void EndFrame();			
+		SceneInstantiate* m_instantiate = nullptr;
+		EcsWorld          m_world = nullptr;
+
+		void EndFrame();
 		void Clear();
-		void DeleteNodesImmediate( const std::vector<SceneNode*>& _nodes );		
+		void DeleteNodesImmediate( const std::vector<SceneNode*>& _nodes );
 	};
 }

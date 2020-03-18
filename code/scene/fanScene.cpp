@@ -7,19 +7,17 @@
 #include "scene/fanSceneResourcePtr.hpp"
 #include "scene/fanSceneInstantiate.hpp"
 #include "scene/fanComponentPtr.hpp"
-#include "scene/components/fanBounds.hpp"
-#include "scene/components/fanRigidbody.hpp"
 #include "scene/systems/fanSynchronizeMotionStates.hpp"
 #include "scene/systems/fanRegisterPhysics.hpp"
 #include "scene/systems/fanUpdateParticles.hpp"
 #include "scene/systems/fanEmitParticles.hpp"
 #include "scene/systems/fanGenerateParticles.hpp"
 #include "scene/systems/fanUpdateBounds.hpp"
-#include "scene/singletonComponents/fanPhysicsWorld.hpp"
-#include "scene/singletonComponents/fanRenderWorld.hpp"
-#include "scene/components/fanSceneNode.hpp"
 #include "scene/fanSceneTags.hpp"
-#include "ecs/fanEcsWorld.hpp"
+#include "scene/components/fanRigidbody.hpp"
+#include "scene/components/fanBounds.hpp"
+#include "scene/components/fanSceneNode.hpp"
+#include "scene/singletonComponents/fanPhysicsWorld.hpp"
 
 namespace fan
 {
@@ -28,7 +26,7 @@ namespace fan
 	Scene::Scene( const std::string _name, void ( *_initializeTypesEcsWorld )( EcsWorld& ) ) :
 		m_name( _name )
 		, m_path( "" )
-		, m_ecsWorld( new EcsWorld( _initializeTypesEcsWorld ) )
+		, m_world( _initializeTypesEcsWorld )
 		, m_instantiate( new SceneInstantiate( *this ) )
 	{}
 
@@ -37,9 +35,6 @@ namespace fan
 	Scene::~Scene()
 	{
 		Clear();
-
-		//delete m_physicsManager; @hack
-		delete m_ecsWorld;
 	}
 
 	//================================================================================================================================
@@ -47,11 +42,11 @@ namespace fan
 	SceneNode& Scene::InstanciateSceneNode( const std::string _name, SceneNode* const _parentNode, const bool _generateID )
 	{
 		SceneNode* const parent = _parentNode == nullptr ? m_rootNode : _parentNode;
-		EntityID entityID = m_ecsWorld->CreateEntity();
-		EntityHandle handle = m_ecsWorld->CreateHandle( entityID );
-		SceneNode& sceneNode = m_ecsWorld->AddComponent<SceneNode>( entityID );
-		m_ecsWorld->AddComponent<Bounds>( entityID );
-		m_ecsWorld->AddTag<tag_boundsOutdated>( entityID );
+		EntityID entityID = m_world.CreateEntity();
+		EntityHandle handle = m_world.CreateHandle( entityID );
+		SceneNode& sceneNode = m_world.AddComponent<SceneNode>( entityID );
+		m_world.AddComponent<Bounds>( entityID );
+		m_world.AddTag<tag_boundsOutdated>( entityID );
 
 		uint32_t id = _generateID ? nextUniqueID++ : 0;
 		sceneNode.Build( _name, *this, handle, id, parent );
@@ -87,10 +82,10 @@ namespace fan
 			entities.reserve( nodes.size() );
 			for ( SceneNode* node : nodes )
 			{
-				entities.push_back( m_ecsWorld->GetEntityID( node->entityHandle ) );
+				entities.push_back( m_world.GetEntityID( node->entityHandle ) );
 			}
-			Signature signature = S_RegisterAllRigidbodies::GetSignature( *m_ecsWorld );
-			S_RegisterAllRigidbodies::Run( *m_ecsWorld,  m_ecsWorld->MatchSubset( signature, entities ) );
+			Signature signature = S_RegisterAllRigidbodies::GetSignature( m_world );
+			S_RegisterAllRigidbodies::Run( m_world,  m_world.MatchSubset( signature, entities ) );
 		}
 
 		return prefabRoot;
@@ -124,8 +119,8 @@ namespace fan
 		DeleteNodesImmediate( m_sceneNodesToDelete );
 		m_sceneNodesToDelete.clear();
 
-		m_ecsWorld->SortEntities();
-		m_ecsWorld->RemoveDeadEntities();
+		m_world.SortEntities();
+		m_world.RemoveDeadEntities();
 	}
 
 	//================================================================================================================================
@@ -158,26 +153,26 @@ namespace fan
 		}
 
 		// delete all nodes
-		PhysicsWorld& physicsWorld = m_ecsWorld->GetSingletonComponent<PhysicsWorld>();
+		PhysicsWorld& physicsWorld = m_world.GetSingletonComponent<PhysicsWorld>();
 		for( SceneNode* node : nodesToDelete )
 		{
-			EntityID entityID = m_ecsWorld->GetEntityID( node->entityHandle );
+			EntityID entityID = m_world.GetEntityID( node->entityHandle );
 
 			// remove rigidbody from physics world
-			if( m_ecsWorld->HasComponent<Rigidbody>( entityID ) )
+			if( m_world.HasComponent<Rigidbody>( entityID ) )
 			{
-				Rigidbody& rb = m_ecsWorld->GetComponent<Rigidbody>( entityID );
+				Rigidbody& rb = m_world.GetComponent<Rigidbody>( entityID );
 				physicsWorld.dynamicsWorld->removeRigidBody( &rb.rigidbody );
 			}
-			m_ecsWorld->KillEntity( entityID );
+			m_world.KillEntity( entityID );
 			if( node->parent != nullptr )
 			{
 				node->parent->RemoveChild( *node );
 			}
 		}		
 
-		m_ecsWorld->SortEntities();
-		m_ecsWorld->RemoveDeadEntities();
+		m_world.SortEntities();
+		m_world.RemoveDeadEntities();
 	}
 
 	//================================================================================================================================
@@ -190,28 +185,28 @@ namespace fan
 
 			//RUN_SYSTEM( ecsPlanetsSystem, Run );
 			
-			const Signature signatureSMSFT = S_SynchronizeMotionStateFromTransform::GetSignature( *m_ecsWorld );
-			const Signature signatureSTFMS = S_SynchronizeTransformFromMotionState::GetSignature( *m_ecsWorld );
-			const Signature signatureUpdateParticles = S_UpdateParticles::GetSignature( *m_ecsWorld );
-			const Signature signatureEmitParticles = S_EmitParticles::GetSignature( *m_ecsWorld );
-			const Signature signatureGenParticles = S_GenerateParticles::GetSignature( *m_ecsWorld );
-			const Signature signatureUpdateBoundsFromRigidbody = S_UpdateBoundsFromRigidbody::GetSignature( *m_ecsWorld );
-			const Signature signatureUpdateBoundsFromModel = S_UpdateBoundsFromModel::GetSignature( *m_ecsWorld );
-			const Signature signatureUpdateBoundsFromTransform = S_UpdateBoundsFromTransform::GetSignature( *m_ecsWorld );
+			const Signature signatureSMSFT = S_SynchronizeMotionStateFromTransform::GetSignature( m_world );
+			const Signature signatureSTFMS = S_SynchronizeTransformFromMotionState::GetSignature( m_world );
+			const Signature signatureUpdateParticles = S_UpdateParticles::GetSignature( m_world );
+			const Signature signatureEmitParticles = S_EmitParticles::GetSignature( m_world );
+			const Signature signatureGenParticles = S_GenerateParticles::GetSignature( m_world );
+			const Signature signatureUpdateBoundsFromRigidbody = S_UpdateBoundsFromRigidbody::GetSignature( m_world );
+			const Signature signatureUpdateBoundsFromModel = S_UpdateBoundsFromModel::GetSignature( m_world );
+			const Signature signatureUpdateBoundsFromTransform = S_UpdateBoundsFromTransform::GetSignature( m_world );
 
 			// physics
-			PhysicsWorld& physicsWorld = m_ecsWorld->GetSingletonComponent<PhysicsWorld>();
-			S_SynchronizeMotionStateFromTransform::Run( *m_ecsWorld, m_ecsWorld->Match( signatureSMSFT ), _delta );
+			PhysicsWorld& physicsWorld = m_world.GetSingletonComponent<PhysicsWorld>();
+			S_SynchronizeMotionStateFromTransform::Run( m_world, m_world.Match( signatureSMSFT ), _delta );
 			physicsWorld.dynamicsWorld->stepSimulation( _delta, 10, Time::Get().GetPhysicsDelta() );
-			S_SynchronizeTransformFromMotionState::Run( *m_ecsWorld, m_ecsWorld->Match( signatureSTFMS ), _delta );
+			S_SynchronizeTransformFromMotionState::Run( m_world, m_world.Match( signatureSTFMS ), _delta );
 
 			// particles
-			S_UpdateParticles::Run( *m_ecsWorld, m_ecsWorld->Match( signatureUpdateParticles ), _delta );
-			S_EmitParticles::Run( *m_ecsWorld, m_ecsWorld->Match( signatureEmitParticles ), _delta );
+			S_UpdateParticles::Run( m_world, m_world.Match( signatureUpdateParticles ), _delta );
+			S_EmitParticles::Run( m_world, m_world.Match( signatureEmitParticles ), _delta );
 			//RUN_SYSTEM( ecsParticleSunlightOcclusionSystem, Run );
 
 			// clears particles mesh
-			S_GenerateParticles::Run( *m_ecsWorld, m_ecsWorld->Match( signatureGenParticles ), _delta );
+			S_GenerateParticles::Run( m_world, m_world.Match( signatureGenParticles ), _delta );
 
 			//UpdateActors( _delta );
 
@@ -219,9 +214,9 @@ namespace fan
 			//RUN_SYSTEM( ecsSolarEruptionMeshSystem, Run );
 
 			//LateUpdateActors( _delta );
-			S_UpdateBoundsFromRigidbody::Run( *m_ecsWorld, m_ecsWorld->Match( signatureUpdateBoundsFromRigidbody ), _delta );
-			S_UpdateBoundsFromModel::Run( *m_ecsWorld, m_ecsWorld->Match( signatureUpdateBoundsFromModel ), _delta );
-			S_UpdateBoundsFromTransform::Run( *m_ecsWorld, m_ecsWorld->Match( signatureUpdateBoundsFromTransform ), _delta );
+			S_UpdateBoundsFromRigidbody::Run( m_world, m_world.Match( signatureUpdateBoundsFromRigidbody ), _delta );
+			S_UpdateBoundsFromModel::Run( m_world, m_world.Match( signatureUpdateBoundsFromModel ), _delta );
+			S_UpdateBoundsFromTransform::Run( m_world, m_world.Match( signatureUpdateBoundsFromTransform ), _delta );
 			
 			//RUN_SYSTEM( ecsUpdateBullet, Run );
 		}
@@ -301,8 +296,8 @@ namespace fan
 	//================================================================================================================================
 	void Scene::Clear()
 	{
-		const Signature signatureUnregisterAllRigidbodies = S_UnregisterAllRigidbodies::GetSignature( *m_ecsWorld );
-		S_UnregisterAllRigidbodies::Run( *m_ecsWorld, m_ecsWorld->Match( signatureUnregisterAllRigidbodies ) );
+		const Signature signatureUnregisterAllRigidbodies = S_UnregisterAllRigidbodies::GetSignature( m_world );
+		S_UnregisterAllRigidbodies::Run( m_world, m_world.Match( signatureUnregisterAllRigidbodies ) );
 
 		m_path = "";
 		m_instantiate->Clear();
@@ -478,8 +473,8 @@ namespace fan
 			inStream.close();
 			nextUniqueID = R_FindMaximumId( *m_rootNode ) + 1;
 
-			const Signature signatureRegisterAllRigidbodies = S_RegisterAllRigidbodies::GetSignature( *m_ecsWorld );
-			S_RegisterAllRigidbodies::Run( *m_ecsWorld, m_ecsWorld->Match( signatureRegisterAllRigidbodies ) );
+			const Signature signatureRegisterAllRigidbodies = S_RegisterAllRigidbodies::GetSignature( m_world );
+			S_RegisterAllRigidbodies::Run( m_world, m_world.Match( signatureRegisterAllRigidbodies ) );
 			//m_instantiate->ResolveGameobjectPtr( 0 );
 			//m_instantiate->ResolveComponentPtr( 0 );
 

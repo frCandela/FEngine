@@ -4,7 +4,7 @@
 #include "game/components/fanSolarPanel.hpp"
 #include "game/components/fanHealth.hpp"
 #include "core/time/fanProfiler.hpp"
-#include "core/imgui/fanModals.hpp"
+#include "editor/fanModals.hpp"
 #include "render/fanMesh.hpp"
 
 namespace fan

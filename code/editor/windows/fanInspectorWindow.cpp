@@ -1,6 +1,6 @@
 #include "editor/windows/fanInspectorWindow.hpp"
 
-#include "game/imgui/fanDragnDrop.hpp"
+#include "editor/fanDragnDrop.hpp"
 #include "scene/fanScene.hpp"
 #include "scene/singletonComponents/fanPhysicsWorld.hpp"
 #include "scene/components/fanSceneNode.hpp"

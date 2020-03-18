@@ -1,4 +1,6 @@
 #include "editor/windows/fanPreferencesWindow.hpp"
+
+#include "editor/fanModals.hpp"
 #include "render/pipelines/fanPostprocessPipeline.hpp"
 #include "render/fanRenderer.hpp"
 #include "core/input/fanInputManager.hpp"
@@ -7,7 +9,6 @@
 #include "core/input/fanJoystick.hpp"
 #include "core/fanSerializedValues.hpp"
 #include "core/time/fanProfiler.hpp"
-#include "core/imgui/fanModals.hpp"
 #include "core/input/fanAxis.hpp"
 
 namespace fan

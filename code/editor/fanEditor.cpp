@@ -1,7 +1,5 @@
 #include "fanEditor.hpp"
 
-#include "scene/systems/fanUpdateRenderWorld.hpp"
-
 #include "render/pipelines/fanForwardPipeline.hpp"
 #include "render/pipelines/fanDebugPipeline.hpp"
 #include "render/fanRendererDebug.hpp"
@@ -17,11 +15,9 @@
 #include "core/math/shapes/fanPlane.hpp"
 #include "core/math/shapes/fanAABB.hpp"
 #include "core/math/fanBasicModels.hpp"
-#include "core/imgui/fanImguiIcons.hpp"
 #include "core/input/fanKeyboard.hpp"
 #include "core/input/fanJoystick.hpp"
 #include "core/time/fanProfiler.hpp"
-#include "core/imgui/fanModals.hpp"
 #include "core/input/fanMouse.hpp"
 #include "core/input/fanInput.hpp"
 #include "core/time/fanTime.hpp"
@@ -38,36 +34,36 @@
 #include "editor/fanEditorSelection.hpp"
 #include "editor/fanEditorCopyPaste.hpp"
 #include "editor/fanEditorGizmos.hpp"
-#include "editor/fanMainMenuBar.hpp"
 #include "editor/fanEditorDebug.hpp"
+#include "editor/fanMainMenuBar.hpp"
+#include "editor/fanImguiIcons.hpp"
+#include "editor/fanModals.hpp"
+#include "editor/singletonComponents/fanEditorCamera.hpp"
+#include "editor/singletonComponents/fanEditorGrid.hpp"
+#include "scene/singletonComponents/fanRenderWorld.hpp"
+#include "scene/singletonComponents/fanPhysicsWorld.hpp"
+#include "scene/components/fanSceneNode.hpp"
+#include "scene/components/fanTransform.hpp"
+#include "scene/components/fanDirectionalLight.hpp"
+#include "scene/components/fanPointLight.hpp"
+#include "scene/components/fanMeshRenderer.hpp"
+#include "scene/components/fanMaterial.hpp"
+#include "scene/components/fanCamera.hpp"
+#include "scene/components/fanParticleEmitter.hpp"
+#include "scene/components/fanParticle.hpp"
+#include "scene/components/fanRigidbody.hpp"
+#include "scene/components/fanMotionState.hpp"
+#include "scene/components/fanBoxShape.hpp"
+#include "scene/components/fanSphereShape.hpp"
+#include "scene/components/fanTransformUI.hpp"
+#include "scene/components/fanUIRenderer.hpp"
+#include "scene/components/fanBounds.hpp"
+#include "scene/systems/fanDrawDebug.hpp"
+#include "scene/systems/fanUpdateRenderWorld.hpp"
 #include "scene/fanSceneInstantiate.hpp"
 #include "scene/fanScene.hpp"
 #include "scene/fanSceneTags.hpp"
 #include "scene/fanPrefabManager.hpp"
-#include "scene/systems/fanDrawDebug.hpp"
-#include "scene/components/fanTransform.hpp"
-#include "scene/components/fanDirectionalLight.hpp"
-#include "scene/components/fanpointLight.hpp"
-#include "scene/components/fanParticleEmitter.hpp"
-#include "scene/components/fanParticle.hpp"
-#include "scene/components/fanCamera.hpp"
-#include "scene/components/fanRigidbody.hpp"
-#include "scene/components/fanMotionState.hpp"
-#include "scene/components/fanSphereShape.hpp"
-#include "scene/components/fanBoxShape.hpp"
-#include "scene/components/fanTransformUI.hpp"
-#include "scene/components/fanUIRenderer.hpp"
-#include "scene/components/fanMeshRenderer.hpp"
-#include "scene/components/fanMaterial.hpp"
-#include "scene/components/fanBounds.hpp"
-#include "scene/components/fanSceneNode.hpp"
-
-#include "scene/singletonComponents/fanRenderWorld.hpp"
-#include "scene/singletonComponents/fanPhysicsWorld.hpp"
-#include "editor/singletonComponents/fanEditorCamera.hpp"
-#include "editor/singletonComponents/fanEditorGrid.hpp"
-
-#include "ecs/fanEcsWorld.hpp"
 
 namespace fan
 {
@@ -135,9 +131,9 @@ namespace fan
 		}
 
 		// Scene
-		m_clientScene = new Scene( "mainScene", &Engine::InitializeEcsWorldTypes );
+		m_clientScene = new Scene( "mainScene", &Engine::InitializeSceneEcsWorldTypes );
 		m_clientScene->SetServer( false );
-		m_serverScene = new Scene( "serverScene", &Engine::InitializeEcsWorldTypes );
+		m_serverScene = new Scene( "serverScene", &Engine::InitializeSceneEcsWorldTypes );
 		m_serverScene->SetServer( true );
 
 		// Initialize editor components		
@@ -516,7 +512,18 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void Engine::InitializeEcsWorldTypes( EcsWorld& _world )
+	void Engine::InitializeEditorEcsWorldTypes( EcsWorld& _world )
+	{
+		_world.AddSingletonComponentType<EditorGrid>();
+
+		//_world.AddComponentType<SceneNode>();
+
+		//_world.AddTagType<tag_boundsOutdated>();
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
+	void Engine::InitializeSceneEcsWorldTypes( EcsWorld& _world )
 	{
 		_world.AddSingletonComponentType<RenderWorld>();
 		_world.AddSingletonComponentType<PhysicsWorld>();
@@ -541,16 +548,5 @@ namespace fan
 
 		_world.AddTagType<tag_boundsOutdated>();
 		_world.AddTagType<tag_editorOnly>();
-	}
-
-	//================================================================================================================================
-	//================================================================================================================================
-	void Engine::InitializeEditorEcsWorldTypes( EcsWorld& _world )
-	{
-		_world.AddSingletonComponentType<EditorGrid>();
-
-		//_world.AddComponentType<SceneNode>();
-
-		//_world.AddTagType<tag_boundsOutdated>();
 	}
 }

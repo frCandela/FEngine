@@ -13,4 +13,3 @@
 #include "core/math/fanVector2.hpp"
 #include "core/math/fanMathUtils.hpp"
 #include "core/fanSignal.hpp"
-#include "core/imgui/fanModals.hpp"

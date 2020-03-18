@@ -1,8 +1,8 @@
 #include "render/fanRenderResourcePtr.hpp"
 #include "render/imgui/fanRenderDragnDrop.hpp"
 #include "render/fanRenderGlobal.hpp"
-#include "core/imgui/fanImguiIcons.hpp"
-#include "core/imgui/fanModals.hpp"
+#include "editor/fanImguiIcons.hpp"
+#include "editor/fanModals.hpp"
 
 namespace ImGui
 {

@@ -1,8 +1,8 @@
-#include "core/imgui/fanModals.hpp"
+#include "editor/fanModals.hpp"
+
 #include "core/input/fanInput.hpp"
 #include "core/input/fanKeyboard.hpp"
 #include "core/input/fanMouse.hpp"
-
 #include "imgui/imgui_internal.h"
 
 //================================================================================================================================

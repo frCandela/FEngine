@@ -1,6 +1,7 @@
 #include "scene/components/fanDirectionalLight.hpp"
 
 #include "core/fanISerializable.hpp"
+#include "editor/fanModals.hpp"
 
 namespace fan
 {
