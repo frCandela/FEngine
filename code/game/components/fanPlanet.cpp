@@ -1,86 +1,65 @@
 #include "game/components/fanPlanet.hpp"
-#include "core/time/fanTime.hpp"
 
+#include "game/fanGameSerializable.hpp"
 
 namespace fan
 {
+	REGISTER_COMPONENT( Planet, "planet" );
 
-
-		//================================================================================================================================
-		//================================================================================================================================
-		void Planet::Start()
+	//================================================================================================================================
+	//================================================================================================================================
+	void Planet::SetInfo( ComponentInfo& _info )
 	{
-		//m_planet->time = 0.f;
+		_info.icon = ImGui::IconType::PLANET16;
+		_info.onGui = &Planet::OnGui;
+		_info.init = &Planet::Init;
+		_info.load = &Planet::Load;
+		_info.save = &Planet::Save;
+		_info.editorPath = "game/";
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void Planet::OnAttach()
+	void Planet::Init( Component& _component )
 	{
-// 		Actor::OnAttach();
-// 
-// 		ecsPlanet** tmpPlanet = &const_cast< ecsPlanet* >( m_planet );
-// 		*tmpPlanet = m_gameobject->AddEcsComponent<ecsPlanet>();
-// 		m_planet->Init();
+		Planet& pointLight = static_cast<Planet&>( _component );
+		pointLight.timeAccumulator = 0.f;
+		pointLight.speed = 1.f;
+		pointLight.radius = 2.f;
+		pointLight.phase = 0.f;
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void Planet::OnDetach()
+	void Planet::OnGui( Component& _planet )
 	{
-// 		Actor::OnDetach();
-// 		m_gameobject->RemoveEcsComponent<ecsPlanet>();
+		Planet& planet = static_cast<Planet&>( _planet );
+		ImGui::PushItemWidth( 0.6f * ImGui::GetWindowWidth() );
+		{
+			ImGui::DragFloat( "radius", &planet.radius, 0.1f, 0.f, 100.f );
+			ImGui::DragFloat( "speed", &planet.speed, 0.1f, 0.f, 10.f );
+			ImGui::DragFloat( "phase", &planet.phase, PI / 3, 0.f, 2 * PI );
+			//ImGui::DragFloat( "time", &m_planet->time );
+		}
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void Planet::Update( const float /*_delta*/ )
+	void Planet::Save( const Component& _planet, Json& _json )
 	{
-
+		const Planet& planet = static_cast<const Planet&>( _planet );
+		Serializable::SaveFloat( _json, "radius", planet.radius );
+		Serializable::SaveFloat( _json, "speed",  planet.speed );
+		Serializable::SaveFloat( _json, "phase",  planet.phase );
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-// 	void Planet::SetSpeed( const float _speed ) { m_planet->speed = _speed; };
-// 	void Planet::SetRadius( const float _radius ) { m_planet->radius = _radius; };
-// 	void Planet::SetPhase( const float _phase ) { m_planet->phase = _phase; };
-
-	//================================================================================================================================
-	//================================================================================================================================
-	void Planet::OnGui()
+	void Planet::Load( Component& _planet, const Json& _json )
 	{
-// 		ImGui::PushItemWidth( 0.6f * ImGui::GetWindowWidth() );
-// 		{
-// 			ImGui::DragFloat( "radius", &m_planet->radius, 0.1f, 0.f, 100.f );
-// 			ImGui::DragFloat( "speed", &m_planet->speed, 0.1f, 0.f, 10.f );
-// 			ImGui::DragFloat( "phase", &m_planet->phase, PI / 3, 0.f, 2 * PI );
-// 			ImGui::DragFloat( "time", &m_planet->time );
-// 		}
-	}
-
-	//================================================================================================================================
-	//================================================================================================================================
-	bool Planet::Load( const Json& _json )
-	{
-// 		Actor::Load( _json );
-// 
-// 		Serializable::LoadFloat( _json, "radius", m_planet->radius );
-// 		Serializable::LoadFloat( _json, "speed", m_planet->speed );
-// 		Serializable::LoadFloat( _json, "phase", m_planet->phase );
-
-		return true;
-	}
-
-	//================================================================================================================================
-	//================================================================================================================================
-	bool Planet::Save( Json& _json ) const
-	{
-
-// 		Serializable::SaveFloat( _json, "radius", m_planet->radius );
-// 		Serializable::SaveFloat( _json, "speed", m_planet->speed );
-// 		Serializable::SaveFloat( _json, "phase", m_planet->phase );
-// 		Actor::Save( _json );
-
-		return true;
+		Planet& planet = static_cast<Planet&>( _planet );
+		Serializable::LoadFloat( _json, "radius", planet.radius );
+		Serializable::LoadFloat( _json, "speed",  planet.speed );
+		Serializable::LoadFloat( _json, "phase",  planet.phase );
 	}
 }

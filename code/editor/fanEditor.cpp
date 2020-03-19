@@ -58,6 +58,7 @@
 #include "scene/components/fanTransformUI.hpp"
 #include "scene/components/fanUIRenderer.hpp"
 #include "scene/components/fanBounds.hpp"
+#include "game/components/fanPlanet.hpp"
 #include "scene/systems/fanDrawDebug.hpp"
 #include "scene/systems/fanUpdateRenderWorld.hpp"
 #include "scene/fanSceneInstantiate.hpp"
@@ -545,6 +546,8 @@ namespace fan
 		_world.AddComponentType<UITransform>();
 		_world.AddComponentType<UIRenderer>();
 		_world.AddComponentType<Bounds>();
+
+		_world.AddComponentType<Planet>();
 
 		_world.AddTagType<tag_boundsOutdated>();
 		_world.AddTagType<tag_editorOnly>();
