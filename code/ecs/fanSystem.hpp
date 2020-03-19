@@ -21,18 +21,6 @@ namespace fan
 // 		, ComponentData< ecsSunlightParticleOcclusion >& _occlusion );
 // };
 // 
-// //================================
-// // PlanetsSystem
-// //================================
-// class ecsPlanetsSystem : public ISystem<  ecsGameobject, ecsTranform, ecsPlanet, ecsFlags >
-// {
-// public:
-// 	static void Run( float _delta, const size_t _count, std::vector< ecsComponentsKey >& _entitiesData, ecsSingletonComponents& _singletonComponents
-// 		, ComponentData< ecsGameobject >& _gameobjects
-// 		, ComponentData< ecsTranform >& _transforms
-// 		, ComponentData< ecsPlanet >& _planets
-// 		, ComponentData< ecsFlags >& _flags );
-// };
 // 
 // //================================
 // // PlanetsSystem
@@ -102,37 +90,7 @@ namespace fan
 // 		}
 // 	}
 // }
-// 
-// //================================================================================================================================
-// //================================================================================================================================
-// void ecsPlanetsSystem::Run( float _delta, const size_t _count, std::vector< ecsComponentsKey >& _entitiesData, ecsSingletonComponents& /*_singletonComponents*/
-// 	, ComponentData< ecsGameobject >& _gameobjects
-// 	, ComponentData< ecsTranform >& _transforms
-// 	, ComponentData< ecsPlanet >& _planets
-// 	, ComponentData< ecsFlags >& _flags )
-// {
-// 	// 		for ( int entity = 0; entity < _count; entity++ )
-// 	// 		{
-// 	// 			ecsComponentsKey& key = _entitiesData[ entity ];
-// 	// 			if ( key.IsAlive() && key.MatchSignature( signature::bitset ) )
-// 	// 			{
-// 	// 				btTransform& transform = _transforms.At( key ).transform;
-// 	// 				ecsPlanet& planet = _planets.At( key );
-// 	// 				const btTransform& parentTransform = _gameobjects.At( key ).gameobject->GetParent()->GetTransform().GetBtTransform();
-// 	// 				ecsFlags& flags = _flags.At( key );
-// 	// 
-// 	// 				planet.time += _delta;
-// 	// 				float const time = -planet.speed * planet.time;
-// 	// 				btVector3 position( std::cosf( time + planet.phase ), 0, std::sinf( time + planet.phase ) );
-// 	// 
-// 	// 				if ( std::abs( time ) > SIMD_2_PI ) { planet.time -= SIMD_2_PI / std::abs( planet.speed ); }
-// 	// 
-// 	// 				transform.setOrigin( parentTransform.getOrigin() + planet.radius * position );
-// 	// 				flags.flags |= ecsFlags::OUTDATED_AABB;
-// 	// 			}
-// 	// 		}
-// }
-// 
+
 // //================================================================================================================================
 // //================================================================================================================================
 // void ecsSolarEruptionMeshSystem::Run( float /*_delta*/, const size_t _count, std::vector< ecsComponentsKey >& _entitiesData, ecsSingletonComponents& _singletonComponents

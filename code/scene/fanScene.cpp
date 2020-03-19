@@ -13,6 +13,7 @@
 #include "scene/systems/fanEmitParticles.hpp"
 #include "scene/systems/fanGenerateParticles.hpp"
 #include "scene/systems/fanUpdateBounds.hpp"
+#include "game/systems/fanUpdatePlanets.hpp"
 #include "scene/fanSceneTags.hpp"
 #include "scene/components/fanRigidbody.hpp"
 #include "scene/components/fanBounds.hpp"
@@ -193,6 +194,7 @@ namespace fan
 			const Signature signatureUpdateBoundsFromRigidbody = S_UpdateBoundsFromRigidbody::GetSignature( m_world );
 			const Signature signatureUpdateBoundsFromModel = S_UpdateBoundsFromModel::GetSignature( m_world );
 			const Signature signatureUpdateBoundsFromTransform = S_UpdateBoundsFromTransform::GetSignature( m_world );
+			const Signature signatureMovePlanets = S_MovePlanets::GetSignature( m_world );
 
 			// physics
 			PhysicsWorld& physicsWorld = m_world.GetSingletonComponent<PhysicsWorld>();
@@ -206,6 +208,7 @@ namespace fan
 			//RUN_SYSTEM( ecsParticleSunlightOcclusionSystem, Run );
 
 			// clears particles mesh
+			S_MovePlanets::Run( m_world, m_world.Match( signatureMovePlanets ), _delta );
 			S_GenerateParticles::Run( m_world, m_world.Match( signatureGenParticles ), _delta );
 
 			//UpdateActors( _delta );

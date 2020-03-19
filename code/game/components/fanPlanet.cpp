@@ -1,6 +1,7 @@
 #include "game/components/fanPlanet.hpp"
 
 #include "game/fanGameSerializable.hpp"
+#include "render/fanRendererDebug.hpp"
 
 namespace fan
 {
@@ -22,11 +23,11 @@ namespace fan
 	//================================================================================================================================
 	void Planet::Init( Component& _component )
 	{
-		Planet& pointLight = static_cast<Planet&>( _component );
-		pointLight.timeAccumulator = 0.f;
-		pointLight.speed = 1.f;
-		pointLight.radius = 2.f;
-		pointLight.phase = 0.f;
+		Planet& planet = static_cast<Planet&>( _component );
+		planet.timeAccumulator = 0.f;
+		planet.speed = 1.f;
+		planet.radius = 2.f;
+		planet.phase = 0.f;		
 	}
 
 	//================================================================================================================================
@@ -41,6 +42,8 @@ namespace fan
 			ImGui::DragFloat( "phase", &planet.phase, PI / 3, 0.f, 2 * PI );
 			//ImGui::DragFloat( "time", &m_planet->time );
 		}
+
+		RendererDebug::Get().DebugCircle( btVector3::Zero(), planet.radius, btVector3::Up(), 32, Color::Cyan );
 	}
 
 	//================================================================================================================================
