@@ -42,6 +42,7 @@
 #include "editor/singletonComponents/fanEditorGrid.hpp"
 #include "scene/singletonComponents/fanRenderWorld.hpp"
 #include "scene/singletonComponents/fanPhysicsWorld.hpp"
+#include "game/singletonComponents/fanSunLight.hpp"
 #include "scene/components/fanSceneNode.hpp"
 #include "scene/components/fanTransform.hpp"
 #include "scene/components/fanDirectionalLight.hpp"
@@ -132,9 +133,9 @@ namespace fan
 		}
 
 		// Scene
-		m_clientScene = new Scene( "mainScene", &Engine::InitializeSceneEcsWorldTypes );
+		m_clientScene = new Scene( "client scene", &Engine::InitializeSceneEcsWorldTypes );
 		m_clientScene->SetServer( false );
-		m_serverScene = new Scene( "serverScene", &Engine::InitializeSceneEcsWorldTypes );
+		m_serverScene = new Scene( "server scene", &Engine::InitializeSceneEcsWorldTypes );
 		m_serverScene->SetServer( true );
 
 		// Initialize editor components		
@@ -266,7 +267,7 @@ namespace fan
 					onLPPSynch.Emmit();
 				}
 
-				// Update
+				// update
 				std::vector< Scene* > scenes = { m_clientScene , m_serverScene };
 				for( Scene* scene : scenes )
 				{
@@ -278,6 +279,7 @@ namespace fan
 					EditorCamera::Update( editorCamera, targetLogicDelta );
 				}			
 
+				// ui & debug
 				if ( m_showUI )
 				{
 					{
@@ -386,7 +388,7 @@ namespace fan
 
 		// Editor Camera
 		SceneNode& cameraNode = _scene.InstanciateSceneNode( "editor_camera", &_scene.GetRootNode() );
-		EntityID id = world.GetEntityID( cameraNode.entityHandle );
+		EntityID id = world.GetEntityID( cameraNode.handle );
 		cameraNode.AddFlag( SceneNode::NOT_SAVED | SceneNode::NO_DELETE );
 
 		Transform& transform = world.AddComponent< Transform >( id );
@@ -529,6 +531,8 @@ namespace fan
 		_world.AddSingletonComponentType<RenderWorld>();
 		_world.AddSingletonComponentType<PhysicsWorld>();
 		_world.AddSingletonComponentType<EditorCamera>();
+
+		_world.AddSingletonComponentType<SunLight>();
 
 		_world.AddComponentType<SceneNode>();
 		_world.AddComponentType<Transform>();

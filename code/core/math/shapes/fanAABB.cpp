@@ -22,6 +22,12 @@ namespace fan
 	//================================================================================================================================
 	AABB::AABB( const std::vector<btVector3> _pointCloud, const glm::mat4 _modelMatrix )
 	{
+		if( _pointCloud.empty() )
+		{
+			m_low = -0.5f * btVector3::One();
+			m_high = 0.5f * btVector3::One();
+			return;
+		}
 
 		glm::vec3 high( std::numeric_limits<float>::lowest(), std::numeric_limits<float>::lowest(), std::numeric_limits<float>::lowest() );
 		glm::vec3 low( std::numeric_limits<float>::max(), std::numeric_limits<float>::max(), std::numeric_limits<float>::max() );

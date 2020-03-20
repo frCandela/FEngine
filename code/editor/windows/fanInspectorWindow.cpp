@@ -36,7 +36,7 @@ namespace fan
 			SceneNode& node = *m_sceneNodeSelected;
 			Scene& scene = *node.scene;
 			EcsWorld& world = scene.GetWorld();
-			const EntityID entityID = world.GetEntityID( node.entityHandle );
+			const EntityID entityID = world.GetEntityID( node.handle );
 
 			// scene node gui
  			ImGui::Icon( GetIconType(), { 16,16 } ); ImGui::SameLine();
@@ -136,7 +136,7 @@ namespace fan
 		{
 			// Create new Component 
 			EcsWorld& world = m_sceneNodeSelected->scene->GetWorld();
-			EntityID entityID = world.GetEntityID( m_sceneNodeSelected->entityHandle );
+			EntityID entityID = world.GetEntityID( m_sceneNodeSelected->handle );
 			if( !world.HasComponent( entityID, _info.index ) )
 			{
 				Component& component = world.AddComponent( entityID, _info.index );

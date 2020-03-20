@@ -41,7 +41,7 @@ namespace fan
 
 		static void GetDescendantsOf( SceneNode& _root, std::vector<SceneNode*>& _outList );
 
-		EntityHandle			entityHandle;
+		EntityHandle			handle;
 		uint32_t				uniqueID;
 		uint32_t				flags;
 		Scene*					scene;

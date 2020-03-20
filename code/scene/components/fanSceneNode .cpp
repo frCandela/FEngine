@@ -21,7 +21,7 @@ namespace fan
 	void SceneNode::Init( Component& _component )
 	{
 		SceneNode& node = static_cast<SceneNode&>( _component );
-		node.entityHandle = 0;
+		node.handle = 0;
 		node.name = "";
 		node.scene = nullptr;
 		node.parent = nullptr;
@@ -34,7 +34,7 @@ namespace fan
 	{
 		name = _name;
 		scene = &_scene;
-		entityHandle = _entityHandle;
+		handle = _entityHandle;
 		uniqueID = _uniqueID;
 		if( _parent != nullptr )
 		{
@@ -49,7 +49,7 @@ namespace fan
 		SceneNode& node = static_cast<SceneNode&>( _sceneNode );
 		ImGui::Text( "name      : %s", node.name.c_str() );
 		ImGui::Text( "scene     : %s", node.scene->GetName().c_str() );
-		ImGui::Text( "handle    : %u", node.entityHandle );
+		ImGui::Text( "handle    : %u", node.handle );
 		ImGui::Text( "unique id : %u", node.uniqueID );
 	}
 

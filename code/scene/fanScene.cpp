@@ -14,11 +14,17 @@
 #include "scene/systems/fanGenerateParticles.hpp"
 #include "scene/systems/fanUpdateBounds.hpp"
 #include "game/systems/fanUpdatePlanets.hpp"
+#include "game/singletonComponents/fanSunLight.hpp"
 #include "scene/fanSceneTags.hpp"
 #include "scene/components/fanRigidbody.hpp"
 #include "scene/components/fanBounds.hpp"
 #include "scene/components/fanSceneNode.hpp"
+#include "scene/components/fanTransform.hpp"
+#include "scene/components/fanMaterial.hpp"
+#include "scene/components/fanMeshRenderer.hpp"
 #include "scene/singletonComponents/fanPhysicsWorld.hpp"
+
+
 
 namespace fan
 {
@@ -83,7 +89,7 @@ namespace fan
 			entities.reserve( nodes.size() );
 			for ( SceneNode* node : nodes )
 			{
-				entities.push_back( m_world.GetEntityID( node->entityHandle ) );
+				entities.push_back( m_world.GetEntityID( node->handle ) );
 			}
 			Signature signature = S_RegisterAllRigidbodies::GetSignature( m_world );
 			S_RegisterAllRigidbodies::Run( m_world,  m_world.MatchSubset( signature, entities ) );
@@ -157,7 +163,7 @@ namespace fan
 		PhysicsWorld& physicsWorld = m_world.GetSingletonComponent<PhysicsWorld>();
 		for( SceneNode* node : nodesToDelete )
 		{
-			EntityID entityID = m_world.GetEntityID( node->entityHandle );
+			EntityID entityID = m_world.GetEntityID( node->handle );
 
 			// remove rigidbody from physics world
 			if( m_world.HasComponent<Rigidbody>( entityID ) )
@@ -195,7 +201,8 @@ namespace fan
 			const Signature signatureUpdateBoundsFromModel = S_UpdateBoundsFromModel::GetSignature( m_world );
 			const Signature signatureUpdateBoundsFromTransform = S_UpdateBoundsFromTransform::GetSignature( m_world );
 			const Signature signatureMovePlanets = S_MovePlanets::GetSignature( m_world );
-
+			const Signature signatureGenerateLightMesh = S_GenerateLightMesh::GetSignature( m_world );
+			
 			// physics
 			PhysicsWorld& physicsWorld = m_world.GetSingletonComponent<PhysicsWorld>();
 			S_SynchronizeMotionStateFromTransform::Run( m_world, m_world.Match( signatureSMSFT ), _delta );
@@ -205,15 +212,11 @@ namespace fan
 			// particles
 			S_UpdateParticles::Run( m_world, m_world.Match( signatureUpdateParticles ), _delta );
 			S_EmitParticles::Run( m_world, m_world.Match( signatureEmitParticles ), _delta );
-			//RUN_SYSTEM( ecsParticleSunlightOcclusionSystem, Run );
 
-			// clears particles mesh
 			S_MovePlanets::Run( m_world, m_world.Match( signatureMovePlanets ), _delta );
+			S_GenerateLightMesh::Run( m_world, m_world.Match( signatureGenerateLightMesh ), _delta );
 			S_GenerateParticles::Run( m_world, m_world.Match( signatureGenParticles ), _delta );
 
-			//UpdateActors( _delta );
-
-			
 			//RUN_SYSTEM( ecsSolarEruptionMeshSystem, Run );
 
 			//LateUpdateActors( _delta );
@@ -359,7 +362,7 @@ namespace fan
 		// save components
 		Json& jComponents = _json["components"];
 		{
-			EntityID entityID = world.GetEntityID( _node.entityHandle );
+			EntityID entityID = world.GetEntityID( _node.handle );
 			unsigned nextIndex = 0;
 			for( int componentIndex = 0; componentIndex < world.GetComponentCount(entityID) ; componentIndex++ )
 			{
@@ -481,6 +484,20 @@ namespace fan
 			//m_instantiate->ResolveGameobjectPtr( 0 );
 			//m_instantiate->ResolveComponentPtr( 0 );
 
+			// temporary
+			Signature signature = m_world.GetSignature<MeshRenderer>() | m_world.GetSignature<SceneNode>();
+			std::vector<EntityID> entities = m_world.Match( signature );
+			for ( EntityID entityID : entities )
+			{
+				SceneNode& node = m_world.GetComponent<SceneNode>( entityID );
+				if( node.name == "sun_light" )
+				{
+					MeshRenderer& meshRenderer = m_world.GetComponent<MeshRenderer>( entityID );
+					SunLight& sunlight = m_world.GetSingletonComponent<SunLight>();
+					meshRenderer.mesh = &sunlight.mesh;
+				}
+			}
+
 			onSceneLoad.Emmit( *this );
 			return true;
 		}
@@ -508,7 +525,7 @@ namespace fan
 		// components
 		const Json& jComponents = _json["components"];
 		{
-			const EntityID		 entityID = world.GetEntityID( _node.entityHandle );
+			const EntityID		 entityID = world.GetEntityID( _node.handle );
 			for( int childIndex = 0; childIndex < jComponents.size(); childIndex++ )
 			{
 				const Json& jComponent_i = jComponents[childIndex];				

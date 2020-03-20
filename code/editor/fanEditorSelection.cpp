@@ -56,7 +56,7 @@ namespace fan
 		if ( m_selectedSceneNode != nullptr && m_selectedSceneNode != &m_currentScene->GetMainCamera() )
 		{
 			EcsWorld& world = m_selectedSceneNode->scene->GetWorld();
-			EntityID entityID = world.GetEntityID( m_selectedSceneNode->entityHandle );
+			EntityID entityID = world.GetEntityID( m_selectedSceneNode->handle );
 			if( world.HasComponent<Transform>( entityID ) )
 			{
 				Transform& transform = world.GetComponent< Transform >( entityID );
@@ -76,7 +76,7 @@ namespace fan
 
 
 			EcsWorld& world = m_currentScene->GetWorld();
-			EntityID cameraID = world.GetEntityID( m_currentScene->GetMainCamera().entityHandle );
+			EntityID cameraID = world.GetEntityID( m_currentScene->GetMainCamera().handle );
 			const Transform& cameraTransform = world.GetComponent<Transform>( cameraID );
 			const Camera& camera = world.GetComponent<Camera>( cameraID );
 

@@ -99,7 +99,7 @@ namespace fan
 				Scene& scene = *m_lastSceneNodeRightClicked->scene;
 				EcsWorld& world = scene.GetWorld();				
 				btVector3& origin = btVector3::Zero();
-				const EntityID parentID = world.GetEntityID( m_lastSceneNodeRightClicked->entityHandle );
+				const EntityID parentID = world.GetEntityID( m_lastSceneNodeRightClicked->handle );
 				if( world.HasComponent<Transform>( parentID ) )
 				{
 					origin = world.GetComponent<Transform>( parentID ).GetPosition();
@@ -118,7 +118,7 @@ namespace fan
 				if( ImGui::MenuItem( "Model" ) )
 				{
 					SceneNode& node = scene.InstanciateSceneNode( "model", m_lastSceneNodeRightClicked );
-					const EntityID entityID = world.GetEntityID( node.entityHandle );
+					const EntityID entityID = world.GetEntityID( node.handle );
 					
 					Transform& transform = world.AddComponent<Transform>( entityID );
 					transform.SetPosition( origin );
@@ -136,7 +136,7 @@ namespace fan
 				if( ImGui::MenuItem( "Physics model" ) )
 				{
 					SceneNode& node = scene.InstanciateSceneNode( "physics_model", m_lastSceneNodeRightClicked );
-					const EntityID entityID = world.GetEntityID( node.entityHandle );
+					const EntityID entityID = world.GetEntityID( node.handle );
 					
 					Transform& transform = world.AddComponent<Transform>( entityID );
 					transform.SetPosition( origin );
@@ -162,7 +162,7 @@ namespace fan
 
 				{
 					SceneNode& node = scene.InstanciateSceneNode( "point_light", m_lastSceneNodeRightClicked );
-					const EntityID entityID = world.GetEntityID( node.entityHandle );
+					const EntityID entityID = world.GetEntityID( node.handle );
 					
 					Transform& transform = world.AddComponent<Transform>( entityID );
 					transform.SetPosition( origin );
@@ -176,7 +176,7 @@ namespace fan
 				if( ImGui::MenuItem( "Dir light" ) )
 				{
 					SceneNode& node = scene.InstanciateSceneNode( "directional_light", m_lastSceneNodeRightClicked );
-					const EntityID entityID = world.GetEntityID( node.entityHandle );
+					const EntityID entityID = world.GetEntityID( node.handle );
 					
 					Transform& transform = world.AddComponent<Transform>( entityID );
 					transform.SetPosition( origin  );
@@ -191,7 +191,7 @@ namespace fan
 				if( ImGui::MenuItem( "particle system" ) )
 				{
 					SceneNode& node = scene.InstanciateSceneNode( "particle_system", m_lastSceneNodeRightClicked );
-					const EntityID entityID = world.GetEntityID( node.entityHandle );
+					const EntityID entityID = world.GetEntityID( node.handle );
 					
 					Transform& transform = world.AddComponent<Transform>( entityID );
 					transform.SetPosition( origin );
