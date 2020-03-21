@@ -264,10 +264,7 @@ namespace fan
 				std::vector< Game* > games = { &m_game };
 				for( Game* game : games )
 				{
-					if( game->state == Game::PLAYING )
-					{
-						game->Step( targetLogicDelta );
-					}
+					game->Step( targetLogicDelta );
 					EditorCamera& editorCamera = game->world.GetSingletonComponent<EditorCamera>();
 					EditorCamera::Update( editorCamera, targetLogicDelta );
 				}			

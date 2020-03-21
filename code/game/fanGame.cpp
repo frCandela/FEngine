@@ -105,21 +105,31 @@ namespace fan
 			// physics
 			PhysicsWorld& physicsWorld = world.GetSingletonComponent<PhysicsWorld>();
 			S_SynchronizeMotionStateFromTransform::Run( world, world.Match( signatureSMSFT ), _delta );
-			physicsWorld.dynamicsWorld->stepSimulation( _delta, 10, Time::Get().GetPhysicsDelta() );
+			if( state == Game::PLAYING )
+			{
+				physicsWorld.dynamicsWorld->stepSimulation( _delta, 10, Time::Get().GetPhysicsDelta() );
+			}				
 			S_SynchronizeTransformFromMotionState::Run( world, world.Match( signatureSTFMS ), _delta );
 
 			// particles
-			S_UpdateParticles::Run( world, world.Match( signatureUpdateParticles ), _delta );
-			S_EmitParticles::Run( world, world.Match( signatureEmitParticles ), _delta );
+			if( state == Game::PLAYING )
+			{
+				S_UpdateParticles::Run( world, world.Match( signatureUpdateParticles ), _delta );
+				S_EmitParticles::Run( world, world.Match( signatureEmitParticles ), _delta );
 
-			S_MovePlanets::Run( world, world.Match( signatureMovePlanets ), _delta );
-			S_GenerateLightMesh::Run( world, world.Match( signatureGenerateLightMesh ), _delta );
-			S_GenerateParticles::Run( world, world.Match( signatureGenParticles ), _delta );
+				S_MovePlanets::Run( world, world.Match( signatureMovePlanets ), _delta );
+				S_GenerateLightMesh::Run( world, world.Match( signatureGenerateLightMesh ), _delta );
+				S_GenerateParticles::Run( world, world.Match( signatureGenParticles ), _delta );
+			}
+
 
 			//RUN_SYSTEM( ecsSolarEruptionMeshSystem, Run );
 
 			//LateUpdateActors( _delta );
-			S_UpdateBoundsFromRigidbody::Run( world, world.Match( signatureUpdateBoundsFromRigidbody ), _delta );
+			if( state == Game::PLAYING )
+			{
+				S_UpdateBoundsFromRigidbody::Run( world, world.Match( signatureUpdateBoundsFromRigidbody ), _delta );
+			}
 			S_UpdateBoundsFromModel::Run( world, world.Match( signatureUpdateBoundsFromModel ), _delta );
 			S_UpdateBoundsFromTransform::Run( world, world.Match( signatureUpdateBoundsFromTransform ), _delta );
 
