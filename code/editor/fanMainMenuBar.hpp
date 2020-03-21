@@ -5,7 +5,7 @@
 namespace fan
 {
 	struct EditorGrid;
-	class Scene;
+	struct Scene;
 	class EditorWindow;
 	class EditorSelection;
 
@@ -24,7 +24,6 @@ namespace fan
 		};
 
 	public:
-		enum CurrentScene { CLIENTS, SERVER };
 		Signal< int > onSetScene;
 
 		Signal< std::string > onSaveScene;
@@ -34,10 +33,9 @@ namespace fan
 		Signal<> onReloadIcons;
 		Signal<> onExit;
 
-		MainMenuBar( EditorSelection& _editorSelection );
+		MainMenuBar( Scene& _scene, EditorSelection& _editorSelection );
 		~MainMenuBar();
 
-		void SetScene( Scene* _scene ) { m_scene = _scene; }
 		void SetGrid( EditorGrid* _editorGrid ) { m_editorGrid = _editorGrid; }
 
 		void SetWindows( std::vector< EditorWindow* > _editorWindows );
@@ -56,8 +54,6 @@ namespace fan
 		EditorSelection& m_editorSelection;
 
 		std::vector< EditorWindow* > m_editorWindows;
-
-		CurrentScene m_currentScene = CurrentScene::CLIENTS;
 
 		bool m_showImguiDemoWindow;
 		bool m_showHull;

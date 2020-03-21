@@ -1,17 +1,16 @@
 #include "editor/windows/fanNetworkWindow.hpp"
 #include "game/network/fanGameServer.hpp"
 #include "game/network/fanGameClient.hpp"
-#include "scene/fanScene.hpp"
+#include "scene/singletonComponents/fanScene.hpp"
 
 namespace fan
 {
 
 	//================================================================================================================================
 	//================================================================================================================================
-	NetworkWindow::NetworkWindow( Scene* _clientScene, Scene* _serverScene )
+	NetworkWindow::NetworkWindow( Scene& _scene )
 		: EditorWindow( "network", ImGui::IconType::JOYSTICK16 )
-		, m_clientScene( _clientScene )
-		, m_serverScene( _serverScene )
+		, m_scene( &_scene )
 	{
 
 	}

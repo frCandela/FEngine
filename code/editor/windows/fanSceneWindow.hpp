@@ -5,7 +5,7 @@
 
 namespace fan
 {
-	class Scene;
+	struct Scene;
 	struct SceneNode;
 
 	//================================================================================================================================
@@ -15,10 +15,8 @@ namespace fan
 	public:
 		Signal< SceneNode* > onSelectSceneNode;
 
-		SceneWindow();
+		SceneWindow( Scene& _scene );
 		~SceneWindow();
-
-		void SetScene( Scene* _scene ) { m_scene = _scene; }
 
 		// Callbacks
 		void OnSceneNodeSelected( SceneNode* node ) { m_sceneNodeSelected = node; }

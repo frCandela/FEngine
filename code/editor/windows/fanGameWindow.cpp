@@ -1,14 +1,16 @@
 #include "editor/windows/fanGameWindow.hpp"
 #include "core/input/fanMouse.hpp"
 #include "core/time/fanTime.hpp"
-#include "scene/fanScene.hpp"
+#include "scene/singletonComponents/fanScene.hpp"
+#include "game/fanGame.hpp"
 
 namespace fan
 {
 
 	//================================================================================================================================
 	//================================================================================================================================
-	GameWindow::GameWindow() : EditorWindow( "game", ImGui::IconType::JOYSTICK16 )
+	GameWindow::GameWindow( Game& _game ) : EditorWindow( "game", ImGui::IconType::JOYSTICK16 )
+		,m_game( &_game )
 	{
 		AddFlag( ImGuiWindowFlags_MenuBar );
 	}
@@ -33,9 +35,9 @@ namespace fan
 			ImGui::Text( "%d x %d", ( int ) size.x(), ( int ) size.y() );
 
 			const ImVec4 disabledColor = ImVec4( 0.3f, 0.3f, 0.3f, 0.3f );
-			const Scene::State state = m_scene->GetState();
+			const Game::State state = m_game->state;
 
-			if ( state == Scene::STOPPED )
+			if ( state == Game::STOPPED )
 			{
 				// Play
 				if ( ImGui::ButtonIcon( ImGui::PLAY16, { 16,16 }, -1, ImVec4( 0, 0, 0, 0 ), ImVec4( 1.f, 1.f, 1.f, 1.f ) ) )
@@ -53,20 +55,20 @@ namespace fan
 			}
 
 			const ImVec4 pauseTint
-				= state == Scene::PLAYING ? ImVec4( 1.f, 1.f, 1.f, 1.f )
-				: state == Scene::PAUSED ? ImVec4( 0.9f, 0.9f, 0.9f, 1.f )
+				= state == Game::PLAYING ? ImVec4( 1.f, 1.f, 1.f, 1.f )
+				: state == Game::PAUSED ? ImVec4( 0.9f, 0.9f, 0.9f, 1.f )
 				: disabledColor;
 
 			// Pause
 			if ( ImGui::ButtonIcon( ImGui::PAUSE16, { 16,16 }, -1, ImVec4( 0, 0, 0, 0.f ), pauseTint ) )
 			{
-				if ( state == Scene::PLAYING ) { onPause.Emmit(); }
-				else if ( state == Scene::PAUSED ) { onResume.Emmit(); }
+				if ( state == Game::PLAYING ) { onPause.Emmit(); }
+				else if ( state == Game::PAUSED ) { onResume.Emmit(); }
 			}
 
 			// Step
-			const ImVec4 stepTint = state == Scene::PAUSED ? ImVec4( 1.f, 1.f, 1.f, 1.f ) : disabledColor;
-			if ( ImGui::ButtonIcon( ImGui::STEP16, { 16,16 }, -1, ImVec4( 0, 0, 0, 0 ), stepTint ) && state == Scene::PAUSED )
+			const ImVec4 stepTint = state == Game::PAUSED ? ImVec4( 1.f, 1.f, 1.f, 1.f ) : disabledColor;
+			if ( ImGui::ButtonIcon( ImGui::STEP16, { 16,16 }, -1, ImVec4( 0, 0, 0, 0 ), stepTint ) && state == Game::PAUSED )
 			{
 				onStep.Emmit();
 			}

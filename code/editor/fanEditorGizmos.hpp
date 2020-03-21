@@ -4,7 +4,7 @@
 
 namespace fan
 {
-	class Scene;
+	struct Scene;
 
 	//================================================================================================================================
 	//================================================================================================================================	
@@ -21,7 +21,7 @@ namespace fan
 
 	public:
 
-		EditorGizmos( Scene*& _currentScene );
+		EditorGizmos( Scene& _scene );
 		bool DrawMoveGizmo( const btTransform _transform, const size_t _uniqueID, btVector3& _newPosition );
 
 		static EditorGizmos& Get() { return *s_editorGizmos; }
@@ -30,6 +30,6 @@ namespace fan
 		static EditorGizmos* s_editorGizmos; // Used for global debug draw
 
 		std::map< size_t, GizmoCacheData > m_gizmoCacheData;
-		Scene*& m_currentScene;
+		Scene* m_scene;
 	};
 }

@@ -1,8 +1,8 @@
 #include "scene/fanComponentPtr.hpp"
 
 #include "scene/fanSceneResourcePtr.hpp"
-#include "scene/fanSceneInstantiate.hpp"
-#include "scene/fanScene.hpp"
+#include "scene/singletonComponents/fanSceneInstantiate.hpp"
+#include "scene/singletonComponents/fanScene.hpp"
 #include "game/fanGameSerializable.hpp"
 #include "editor/fanDragnDrop.hpp"
 

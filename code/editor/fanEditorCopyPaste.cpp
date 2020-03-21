@@ -1,8 +1,7 @@
 #include "editor/fanEditorCopyPaste.hpp"
 #include "editor/fanEditorSelection.hpp"
-#include "scene/fanSceneInstantiate.hpp"
 #include "scene/fanPrefab.hpp"
-#include "scene/fanScene.hpp"
+#include "scene/singletonComponents/fanScene.hpp"
 
 namespace fan
 {
@@ -38,7 +37,7 @@ namespace fan
 		Prefab prefab;
 		if ( prefab.CreateFromJson( pastedJson ) )
 		{
-			m_selection.GetSelectedScene().InstanciatePrefab( prefab, m_selection.GetSelectedSceneNode() );
+			m_selection.GetSelectedScene().CreatePrefab( prefab, m_selection.GetSelectedSceneNode() );
 		}
 	}
 }

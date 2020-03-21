@@ -4,7 +4,7 @@
 
 namespace fan
 {
-	class Scene;
+	class Game;
 	class GameWindow;
 	class Renderer;
 
@@ -13,7 +13,7 @@ namespace fan
 	class EditorGameWindowCallbacks
 	{
 	public:
-		EditorGameWindowCallbacks( Scene& _clientScene, Scene& _serverScene );
+		EditorGameWindowCallbacks( Game& _game  );
 		void ConnectCallbacks( GameWindow& _gameWindow, Renderer& _renderer );
 
 		void OnGamePlay();
@@ -23,7 +23,6 @@ namespace fan
 		void OnGameStep();
 
 	private:
-		Scene& m_clientScene;
-		Scene& m_serverScene;
+		Game& m_game;
 	};
 }

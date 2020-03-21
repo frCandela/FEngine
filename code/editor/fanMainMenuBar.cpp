@@ -9,13 +9,13 @@
 #include "core/input/fanInputManager.hpp"
 #include "core/time/fanProfiler.hpp"
 #include "core/time/fanTime.hpp"
-#include "scene/fanScene.hpp"
+#include "scene/singletonComponents/fanScene.hpp"
 
 namespace fan
 {
 	//================================================================================================================================
 	//================================================================================================================================
-	MainMenuBar::MainMenuBar( EditorSelection& _editorSelection )
+	MainMenuBar::MainMenuBar( Scene& _scene, EditorSelection& _editorSelection )
 		: m_editorSelection( _editorSelection )
 		, m_showImguiDemoWindow( true )
 		, m_showAABB( false )
@@ -24,6 +24,7 @@ namespace fan
 		, m_showNormals( false )
 		, m_showLights( false )
 		, m_sceneExtensionFilter( RenderGlobal::s_sceneExtensions )
+		, m_scene( &_scene )
 	{
 
 		SerializedValues::Get().GetBool( "show_imguidemo", m_showImguiDemoWindow );
@@ -205,28 +206,6 @@ namespace fan
 				ImGui::EndMenu();
 			}
 
-			// scene selection combo
-			if ( ImGui::BeginMenu( "Scene" ) )
-			{
-
-				bool clientScene = ( m_currentScene == CurrentScene::CLIENTS );
-				if ( ImGui::MenuItem( "client", nullptr, &clientScene ) && clientScene )
-				{
-					m_currentScene = CurrentScene::CLIENTS;
-					onSetScene.Emmit( m_currentScene );
-				}
-
-				bool serverScene = ( m_currentScene == CurrentScene::SERVER );
-				if ( ImGui::MenuItem( "server", nullptr, &serverScene ) && serverScene )
-				{
-					m_currentScene = CurrentScene::SERVER;
-					onSetScene.Emmit( m_currentScene );
-				}
-
-				ImGui::EndMenu();
-			}
-
-
 			// Framerate
 			ImGui::SameLine( ImGui::GetWindowWidth() - 60 );
 			if ( ImGui::BeginMenu( std::to_string( Time::Get().GetRealFramerate() ).c_str(), false ) ) { ImGui::EndMenu(); }
@@ -296,7 +275,7 @@ namespace fan
 		if ( ImGui::FanSaveFileModal( "New scene", RenderGlobal::s_sceneExtensions, m_pathBuffer ) )
 		{
 			m_scene->New();
-			m_scene->SetPath( m_pathBuffer.string() );
+			m_scene->path = m_pathBuffer.string();
 		}
 
 		// Open scene
@@ -308,7 +287,7 @@ namespace fan
 		// Save scene
 		if ( ImGui::FanSaveFileModal( "Save scene", RenderGlobal::s_sceneExtensions, m_pathBuffer ) )
 		{
-			m_scene->SetPath( m_pathBuffer.string() );
+			m_scene->path = m_pathBuffer.string();
 			m_scene->Save();
 		}
 	}
@@ -334,13 +313,13 @@ namespace fan
 	//================================================================================================================================
 	void MainMenuBar::Reload()
 	{
-		if( m_scene->GetPath().empty() )
+		if( m_scene->path.empty() )
 		{
 			Debug::Warning( "you cannot reload a scene that is not saved." );
 			return;
 		}
 
-		if ( m_scene->GetState() == Scene::STOPPED )// @hack
+		if ( true /*m_scene->GetState() == Scene::STOPPED*/ )// @hack
 		{
 // 			// Save camera data
 // 			Json cameraData;
@@ -351,7 +330,7 @@ namespace fan
 // 			const uint64_t id = prevSelection != nullptr ? prevSelection->GetUniqueID() : 0;
 
 
-			m_scene->LoadFrom( m_scene->GetPath() );
+			m_scene->LoadFrom( m_scene->path );
 			
 
 
@@ -371,7 +350,7 @@ namespace fan
 	//================================================================================================================================
 	void MainMenuBar::Save()
 	{
-		if ( m_scene->HasPath() )
+		if ( ! m_scene->path.empty() )
 		{
 			m_scene->Save();
 		}

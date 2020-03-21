@@ -2,15 +2,14 @@
 #include "editor/windows/fanGameWindow.hpp"
 #include "core/time/fanTime.hpp"
 #include "render/fanRenderer.hpp"
-#include "scene/fanScene.hpp"
+#include "game/fanGame.hpp"
 
 namespace fan
 {
 	//================================================================================================================================
 	//================================================================================================================================
-	EditorGameWindowCallbacks::EditorGameWindowCallbacks( Scene& _clientScene, Scene& _serverScene )
-		: m_clientScene( _clientScene )
-		, m_serverScene( _serverScene )
+	EditorGameWindowCallbacks::EditorGameWindowCallbacks( Game& _game )
+		: m_game( _game )
 	{}
 
 	//================================================================================================================================
@@ -28,9 +27,9 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void EditorGameWindowCallbacks::OnGamePlay() { m_clientScene.Play();								m_serverScene.Play(); }
-	void EditorGameWindowCallbacks::OnGamePause() { m_clientScene.Pause();								m_serverScene.Pause(); }
-	void EditorGameWindowCallbacks::OnGameResume() { m_clientScene.Resume();								m_serverScene.Resume(); }
-	void EditorGameWindowCallbacks::OnGameStop() { m_clientScene.Stop();								m_serverScene.Stop(); }
-	void EditorGameWindowCallbacks::OnGameStep() { m_clientScene.Step( Time::Get().GetLogicDelta() );	m_serverScene.Step( Time::Get().GetLogicDelta() ); }
+	void EditorGameWindowCallbacks::OnGamePlay() { m_game.Play(); }
+	void EditorGameWindowCallbacks::OnGamePause() { m_game.Pause(); }
+	void EditorGameWindowCallbacks::OnGameResume() { m_game.Resume();}
+	void EditorGameWindowCallbacks::OnGameStop() { m_game.Stop();}
+	void EditorGameWindowCallbacks::OnGameStep() { m_game.Step( Time::Get().GetLogicDelta() );}
 }

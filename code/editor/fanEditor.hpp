@@ -2,6 +2,7 @@
 
 #include "core/fanSerializedValues.hpp"
 #include "ecs/fanEcsWorld.hpp"
+#include "game/fanGame.hpp"
 
 namespace fan
 {
@@ -24,7 +25,6 @@ namespace fan
 	class GameWindow;
 	class Renderer;
 	class Window;
-	class Scene;
 
 	//================================================================================================================================
 	//================================================================================================================================	
@@ -38,22 +38,10 @@ namespace fan
 
 		void Run();
 		void Exit();
-
-		PreferencesWindow& GetPreferencesWindow() const { return *m_preferencesWindow; }
-		InspectorWindow& GetInspectorWindow() const { return *m_inspectorWindow; }
-		ConsoleWindow& GetConsoleWindow() const { return *m_consoleWindow; }
-		RenderWindow& GetRenderWindow() const { return *m_renderWindow; }
-		MainMenuBar& GetMainMenuBar() const { return *m_mainMenuBar; }
-		SceneWindow& GetSceneWindow() const { return *m_sceneWindow; }
-		
-		Scene& GetScene() const { return *m_currentScene; }
-		Scene& GetServerScene() const { return *m_serverScene; }
-		Renderer& GetRenderer() const { return *m_renderer; }
-
-		void SetCurrentScene( Scene* _scene );
-
+			   
 	private:
 		EcsWorld m_editorWorld;
+		Game	 m_game;
 
 		// UI elements
 		MainMenuBar* m_mainMenuBar;
@@ -75,9 +63,6 @@ namespace fan
 		EditorGizmos* m_gizmos;
 		Renderer* m_renderer;
 		Window* m_window;
-		Scene* m_currentScene;
-		Scene* m_clientScene;
-		Scene* m_serverScene;
 
 		bool m_applicationShouldExit;
 		bool m_showUI = true;
@@ -86,15 +71,12 @@ namespace fan
 
 		void SwitchPlayStop();
 
-		void OnSceneStop( Scene& _scene );
-		void OnSceneLoad( Scene& _scene );
+		void OnGameStop( Game& _game );
+		void OnSceneLoad( Scene& _game );
 		void OnToogleShowUI() { m_showUI = !m_showUI; }
-		void OnToogleView();
 		void OnToogleCamera();
 
-		void OnSetCurrentScene( int _scene );
-
 		static void InitializeEditorEcsWorldTypes( EcsWorld& _world );
-		static void InitializeSceneEcsWorldTypes( EcsWorld& _world );
+		static void InitializeGameEcsWorldTypes( EcsWorld& _world );
 	};
 }

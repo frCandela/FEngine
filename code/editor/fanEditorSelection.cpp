@@ -10,7 +10,7 @@
 #include "scene/components/fanSceneNode.hpp"
 #include "scene/components/fanTransform.hpp"
 #include "scene/components/fanCamera.hpp"
-#include "scene/fanScene.hpp"
+#include "scene/singletonComponents/fanScene.hpp"
 #include "scene/systems/fanRaycast.hpp"
 #include "scene/fanSceneTags.hpp"
 #include "render/fanMesh.hpp"
@@ -20,15 +20,14 @@ namespace fan
 {
 	//================================================================================================================================
 	//================================================================================================================================	
-	EditorSelection::EditorSelection( Scene*& _currentScene ) : m_currentScene( _currentScene ) {}
+	EditorSelection::EditorSelection( Scene& _currentScene ) : m_currentScene( &_currentScene ) {}
 
 	//================================================================================================================================
 	//================================================================================================================================	
-	void EditorSelection::ConnectCallbacks( Scene& _clientScene, Scene& _serverScene )
+	void EditorSelection::ConnectCallbacks( Scene& _scene )
 	{
 		Input::Get().Manager().FindEvent( "delete" )->Connect( &EditorSelection::DeleteSelection, this );
- 		_clientScene.onDeleteSceneNode.Connect( &EditorSelection::OnSceneNodeDeleted, this );
- 		_serverScene.onDeleteSceneNode.Connect( &EditorSelection::OnSceneNodeDeleted, this );
+ 		_scene.onDeleteSceneNode.Connect( &EditorSelection::OnSceneNodeDeleted, this );
 	}
 
 	//================================================================================================================================
@@ -53,9 +52,9 @@ namespace fan
 		
 
 		// translation gizmo on selected scene node
-		if ( m_selectedSceneNode != nullptr && m_selectedSceneNode != &m_currentScene->GetMainCamera() )
+		if ( m_selectedSceneNode != nullptr && m_selectedSceneNode != m_currentScene->mainCamera )
 		{
-			EcsWorld& world = m_selectedSceneNode->scene->GetWorld();
+			EcsWorld& world = *m_selectedSceneNode->scene->world;
 			EntityID entityID = world.GetEntityID( m_selectedSceneNode->handle );
 			if( world.HasComponent<Transform>( entityID ) )
 			{
@@ -73,10 +72,8 @@ namespace fan
 		// mouse selection
  		if ( !mouseCaptured && _gameWindowHovered && Mouse::Get().GetButtonPressed( Mouse::button0 ) )
  		{
-
-
-			EcsWorld& world = m_currentScene->GetWorld();
-			EntityID cameraID = world.GetEntityID( m_currentScene->GetMainCamera().handle );
+			EcsWorld& world = *m_currentScene->world;
+			EntityID cameraID = world.GetEntityID( m_currentScene->mainCamera->handle );
 			const Transform& cameraTransform = world.GetComponent<Transform>( cameraID );
 			const Camera& camera = world.GetComponent<Camera>( cameraID );
 

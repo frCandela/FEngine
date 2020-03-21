@@ -2,15 +2,14 @@
 
 #include "editor/fanDragnDrop.hpp"
 #include "editor/fanModals.hpp"
-#include "scene/fanSceneInstantiate.hpp"
-#include "scene/fanPrefabManager.hpp"
-#include "scene/fanScene.hpp"
 #include "core/input/fanKeyboard.hpp"
 #include "core/time/fanProfiler.hpp"
 #include "core/input/fanInput.hpp"
 #include "core/input/fanMouse.hpp"
+#include "ecs/fanEcsWorld.hpp"
+#include "scene/fanPrefabManager.hpp"
+#include "scene/singletonComponents/fanScene.hpp"
 #include "scene/fanPrefab.hpp"
-
 #include "scene/singletonComponents/fanPhysicsWorld.hpp"
 #include "scene/components/fanMeshRenderer.hpp"
 #include "scene/components/fanSceneNode.hpp"
@@ -27,8 +26,9 @@ namespace fan
 {
 	//================================================================================================================================
 	//================================================================================================================================
-	SceneWindow::SceneWindow() :
+	SceneWindow::SceneWindow( Scene& _scene ) :
 		EditorWindow( "scene", ImGui::IconType::SCENE16 )
+		, m_scene( &_scene )
 	{
 		m_textBuffer[0] = '\0';
 	}
@@ -44,14 +44,12 @@ namespace fan
 		SCOPED_PROFILE( scene );
 
 		ImGui::Icon( GetIconType(), { 16,16 } ); ImGui::SameLine();
-		ImGui::Text( m_scene->GetName().c_str() );
- 		ImGui::SameLine();
- 		ImGui::Text( m_scene->IsServer() ? "- server" : "- client" );
+		ImGui::Text( m_scene->path.c_str() );
  		ImGui::Separator();
 
 		// Draws all scene nodes
 		SceneNode* nodeRightClicked = nullptr;
-		R_DrawSceneTree( m_scene->GetRootNode(), nodeRightClicked );
+		R_DrawSceneTree( *m_scene->root, nodeRightClicked );
 
  		m_expandSceneHierarchy = false;
  
@@ -97,7 +95,7 @@ namespace fan
 			{
 				assert( m_lastSceneNodeRightClicked != nullptr );
 				Scene& scene = *m_lastSceneNodeRightClicked->scene;
-				EcsWorld& world = scene.GetWorld();				
+				EcsWorld& world = *scene.world;				
 				btVector3& origin = btVector3::Zero();
 				const EntityID parentID = world.GetEntityID( m_lastSceneNodeRightClicked->handle );
 				if( world.HasComponent<Transform>( parentID ) )
@@ -117,7 +115,7 @@ namespace fan
 				// model 
 				if( ImGui::MenuItem( "Model" ) )
 				{
-					SceneNode& node = scene.InstanciateSceneNode( "model", m_lastSceneNodeRightClicked );
+					SceneNode& node = scene.CreateSceneNode( "model", m_lastSceneNodeRightClicked );
 					const EntityID entityID = world.GetEntityID( node.handle );
 					
 					Transform& transform = world.AddComponent<Transform>( entityID );
@@ -135,7 +133,7 @@ namespace fan
 				ImGui::Icon( ImGui::RIGIDBODY16, { 16,16 } ); ImGui::SameLine();
 				if( ImGui::MenuItem( "Physics model" ) )
 				{
-					SceneNode& node = scene.InstanciateSceneNode( "physics_model", m_lastSceneNodeRightClicked );
+					SceneNode& node = scene.CreateSceneNode( "physics_model", m_lastSceneNodeRightClicked );
 					const EntityID entityID = world.GetEntityID( node.handle );
 					
 					Transform& transform = world.AddComponent<Transform>( entityID );
@@ -161,7 +159,7 @@ namespace fan
 				if( ImGui::MenuItem( "Point light" ) )
 
 				{
-					SceneNode& node = scene.InstanciateSceneNode( "point_light", m_lastSceneNodeRightClicked );
+					SceneNode& node = scene.CreateSceneNode( "point_light", m_lastSceneNodeRightClicked );
 					const EntityID entityID = world.GetEntityID( node.handle );
 					
 					Transform& transform = world.AddComponent<Transform>( entityID );
@@ -175,7 +173,7 @@ namespace fan
 				ImGui::Icon( ImGui::DIR_LIGHT16, { 16,16 } ); ImGui::SameLine();
 				if( ImGui::MenuItem( "Dir light" ) )
 				{
-					SceneNode& node = scene.InstanciateSceneNode( "directional_light", m_lastSceneNodeRightClicked );
+					SceneNode& node = scene.CreateSceneNode( "directional_light", m_lastSceneNodeRightClicked );
 					const EntityID entityID = world.GetEntityID( node.handle );
 					
 					Transform& transform = world.AddComponent<Transform>( entityID );
@@ -190,7 +188,7 @@ namespace fan
 				ImGui::Icon( ImGui::PARTICLES16, { 16,16 } ); ImGui::SameLine();
 				if( ImGui::MenuItem( "particle system" ) )
 				{
-					SceneNode& node = scene.InstanciateSceneNode( "particle_system", m_lastSceneNodeRightClicked );
+					SceneNode& node = scene.CreateSceneNode( "particle_system", m_lastSceneNodeRightClicked );
 					const EntityID entityID = world.GetEntityID( node.handle );
 					
 					Transform& transform = world.AddComponent<Transform>( entityID );
@@ -342,7 +340,7 @@ namespace fan
 				if( std::string( m_textBuffer ) != "" )
 				{
 					//Create new scene node 
-					SceneNode& newNode = m_scene->InstanciateSceneNode( m_textBuffer, m_lastSceneNodeRightClicked );
+					SceneNode& newNode = m_scene->CreateSceneNode( m_textBuffer, m_lastSceneNodeRightClicked );
 					onSelectSceneNode.Emmit( &newNode );
 					m_lastSceneNodeRightClicked = nullptr;
 					ImGui::CloseCurrentPopup();

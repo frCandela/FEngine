@@ -1,7 +1,7 @@
 #include "editor/windows/fanInspectorWindow.hpp"
 
 #include "editor/fanDragnDrop.hpp"
-#include "scene/fanScene.hpp"
+#include "scene/singletonComponents/fanScene.hpp"
 #include "scene/singletonComponents/fanPhysicsWorld.hpp"
 #include "scene/components/fanSceneNode.hpp"
 #include "scene/components/fanSphereShape.hpp"
@@ -35,7 +35,7 @@ namespace fan
 		{
 			SceneNode& node = *m_sceneNodeSelected;
 			Scene& scene = *node.scene;
-			EcsWorld& world = scene.GetWorld();
+			EcsWorld& world = *scene.world;
 			const EntityID entityID = world.GetEntityID( node.handle );
 
 			// scene node gui
@@ -135,7 +135,7 @@ namespace fan
 		if( ImGui::MenuItem( _info.name.c_str() ) )
 		{
 			// Create new Component 
-			EcsWorld& world = m_sceneNodeSelected->scene->GetWorld();
+			EcsWorld& world = *m_sceneNodeSelected->scene->world;
 			EntityID entityID = world.GetEntityID( m_sceneNodeSelected->handle );
 			if( !world.HasComponent( entityID, _info.index ) )
 			{
@@ -157,7 +157,7 @@ namespace fan
 	{
 		using Path = std::filesystem::path;
 
-		EcsWorld& world = m_sceneNodeSelected->scene->GetWorld();
+		EcsWorld& world = *m_sceneNodeSelected->scene->world;
 
 		if( ImGui::BeginPopup( "new_component" ) )
 		{

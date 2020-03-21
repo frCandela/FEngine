@@ -6,7 +6,7 @@
 namespace fan
 {
 
-	class Scene;
+	struct Scene;
 
 	//================================================================================================================================
 	//================================================================================================================================
@@ -14,12 +14,11 @@ namespace fan
 	{
 	public:
 
-		NetworkWindow( Scene* _clientScene, Scene* _serverScene );
+		NetworkWindow( Scene& _scene );
 	protected:
 		void OnGui() override;
 
 	private:
-		Scene* m_clientScene = nullptr;
-		Scene* m_serverScene = nullptr;
+		Scene* m_scene = nullptr;
 	};
 }

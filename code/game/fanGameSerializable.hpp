@@ -10,7 +10,7 @@ namespace fan
 // 	class GameobjectPtr;
 // 	class ComponentPtrBase;
 
-	class Scene;
+	struct Scene;
 
 	namespace Serializable
 	{

@@ -1,7 +1,7 @@
 #include "scene/fanSceneResourcePtr.hpp"
 
-#include "scene/fanSceneInstantiate.hpp"
-#include "scene/fanScene.hpp"
+#include "scene/singletonComponents/fanSceneInstantiate.hpp"
+#include "scene/singletonComponents/fanScene.hpp"
 #include "editor/fanImguiIcons.hpp"
 #include "editor/fanModals.hpp"
 #include "editor/fanDragnDrop.hpp"

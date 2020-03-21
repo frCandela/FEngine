@@ -1,4 +1,4 @@
-#include "scene/fanSceneInstantiate.hpp"
+#include "scene/singletonComponents/fanSceneInstantiate.hpp"
 #include "scene/fanPrefab.hpp"
 #include "scene/components/fanSceneNode.hpp"
 

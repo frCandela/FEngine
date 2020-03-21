@@ -7,7 +7,7 @@
 
 namespace fan
 {
-	class Scene;
+	struct Scene;
 
 // 	//================================================================================================================================
 // 	// holds a pointer to a gameobject of a specific  scene

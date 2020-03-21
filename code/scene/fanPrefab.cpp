@@ -1,7 +1,7 @@
 #include "scene/fanPrefab.hpp"
 
 #include "scene/components/fanSceneNode.hpp"
-#include "scene/fanScene.hpp"
+#include "scene/singletonComponents/fanScene.hpp"
 #include "ecs/fanEcsWorld.hpp"
 
 namespace fan
@@ -81,8 +81,8 @@ namespace fan
 		else
 		{
 			const uint32_t idOffset = _parent.scene->nextUniqueID - 1;
-			SceneNode& node = _parent.scene->InstanciateSceneNode( "tmp", nullptr, false );
-			EcsWorld& world = _parent.scene->GetWorld();
+			SceneNode& node = _parent.scene->CreateSceneNode( "tmp", nullptr, false );
+			EcsWorld& world = *_parent.scene->world;
 			EntityID indexStart = (EntityID)world.GetNumEntities();
 			Scene::R_LoadFromJson( m_json["prefab"], node, idOffset );
 			_parent.scene->nextUniqueID = Scene::R_FindMaximumId( _parent ) + 1;

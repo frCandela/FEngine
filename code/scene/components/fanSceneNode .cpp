@@ -1,6 +1,6 @@
 #include "scene/components/fanSceneNode.hpp"
 
-#include "scene/fanScene.hpp"
+#include "scene/singletonComponents/fanScene.hpp"
 
 namespace fan
 {
@@ -48,7 +48,7 @@ namespace fan
 	{
 		SceneNode& node = static_cast<SceneNode&>( _sceneNode );
 		ImGui::Text( "name      : %s", node.name.c_str() );
-		ImGui::Text( "scene     : %s", node.scene->GetName().c_str() );
+		ImGui::Text( "scene     : %s", node.scene->path.c_str() );
 		ImGui::Text( "handle    : %u", node.handle );
 		ImGui::Text( "unique id : %u", node.uniqueID );
 	}

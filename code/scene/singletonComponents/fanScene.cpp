@@ -1,20 +1,11 @@
-#include "scene/fanScene.hpp"
+#include "scene/singletonComponents/fanScene.hpp"
 
 #include "core/time/fanTime.hpp"
 #include "core/time/fanScopedTimer.hpp"
 #include "core/time/fanProfiler.hpp"
 #include "core/fanSignal.hpp"
 #include "scene/fanSceneResourcePtr.hpp"
-#include "scene/fanSceneInstantiate.hpp"
 #include "scene/fanComponentPtr.hpp"
-#include "scene/systems/fanSynchronizeMotionStates.hpp"
-#include "scene/systems/fanRegisterPhysics.hpp"
-#include "scene/systems/fanUpdateParticles.hpp"
-#include "scene/systems/fanEmitParticles.hpp"
-#include "scene/systems/fanGenerateParticles.hpp"
-#include "scene/systems/fanUpdateBounds.hpp"
-#include "game/systems/fanUpdatePlanets.hpp"
-#include "game/singletonComponents/fanSunLight.hpp"
 #include "scene/fanSceneTags.hpp"
 #include "scene/components/fanRigidbody.hpp"
 #include "scene/components/fanBounds.hpp"
@@ -22,19 +13,21 @@
 #include "scene/components/fanTransform.hpp"
 #include "scene/components/fanMaterial.hpp"
 #include "scene/components/fanMeshRenderer.hpp"
+#include "scene/systems/fanRegisterPhysics.hpp"
+#include "game/singletonComponents/fanSunLight.hpp"
 #include "scene/singletonComponents/fanPhysicsWorld.hpp"
-
-
+#include "scene/singletonComponents/fanRenderWorld.hpp"
+#include "ecs/fanEcsWorld.hpp"
 
 namespace fan
 {
+	REGISTER_SINGLETON_COMPONENT( Scene, "scene" );
+
 	//================================================================================================================================
 	//================================================================================================================================
-	Scene::Scene( const std::string _name, void ( *_initializeTypesEcsWorld )( EcsWorld& ) ) :
-		m_name( _name )
-		, m_path( "" )
-		, m_world( _initializeTypesEcsWorld )
-		, m_instantiate( new SceneInstantiate( *this ) )
+	Scene::Scene() :
+		  world( nullptr )
+		, path( "" )
 	{}
 
 	//================================================================================================================================
@@ -46,14 +39,15 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	SceneNode& Scene::InstanciateSceneNode( const std::string _name, SceneNode* const _parentNode, const bool _generateID )
-	{
-		SceneNode* const parent = _parentNode == nullptr ? m_rootNode : _parentNode;
-		EntityID entityID = m_world.CreateEntity();
-		EntityHandle handle = m_world.CreateHandle( entityID );
-		SceneNode& sceneNode = m_world.AddComponent<SceneNode>( entityID );
-		m_world.AddComponent<Bounds>( entityID );
-		m_world.AddTag<tag_boundsOutdated>( entityID );
+	SceneNode& Scene::CreateSceneNode( const std::string _name, SceneNode* const _parentNode, const bool _generateID )
+	{		
+		EntityID entityID = world->CreateEntity();
+		EntityHandle handle = world->CreateHandle( entityID );
+		
+		SceneNode* const parent = _parentNode == nullptr ? root : _parentNode;
+		SceneNode& sceneNode = world->AddComponent<SceneNode>( entityID );
+		world->AddComponent<Bounds>( entityID );
+		world->AddTag<tag_boundsOutdated>( entityID );
 
 		uint32_t id = _generateID ? nextUniqueID++ : 0;
 		sceneNode.Build( _name, *this, handle, id, parent );
@@ -62,21 +56,13 @@ namespace fan
 	}
 
 	//================================================================================================================================
-	// deletes the scene node at the end of the frame
-	//================================================================================================================================
-	void Scene::DeleteSceneNode( SceneNode& _node )
-	{
-		m_sceneNodesToDelete.push_back( &_node );
-	}
-
-	//================================================================================================================================
 	// Creates a game object from a prefab and adds it to the scene hierarchy
 	// Gameobjects ids are remapped depending on the scene next id
 	//================================================================================================================================
-	SceneNode* Scene::InstanciatePrefab( const Prefab& _prefab, SceneNode * const _parent )
+	SceneNode* Scene::CreatePrefab( const Prefab& _prefab, SceneNode * const _parent )
 	{
-		// instanciate prefab
-		SceneNode* const parent = _parent == nullptr ? m_rootNode : _parent;
+		// instantiate prefab
+		SceneNode* const parent = _parent == nullptr ? root : _parent;
 		SceneNode * prefabRoot = _prefab.Instanciate( *parent );
 
 		// registers newly added rigidbodies
@@ -89,12 +75,11 @@ namespace fan
 			entities.reserve( nodes.size() );
 			for ( SceneNode* node : nodes )
 			{
-				entities.push_back( m_world.GetEntityID( node->handle ) );
+				entities.push_back( world->GetEntityID( node->handle ) );
 			}
-			Signature signature = S_RegisterAllRigidbodies::GetSignature( m_world );
-			S_RegisterAllRigidbodies::Run( m_world,  m_world.MatchSubset( signature, entities ) );
+			Signature signature = S_RegisterAllRigidbodies::GetSignature( *world );
+			S_RegisterAllRigidbodies::Run( *world,  world->MatchSubset( signature, entities ) );
 		}
-
 		return prefabRoot;
 	}
 
@@ -113,21 +98,6 @@ namespace fan
 			}
 		}
 		return id;
-	}
-
-	//================================================================================================================================
-	// Deletes every scene node in the m_sceneNodesToDelete vector
-	//================================================================================================================================
-	void Scene::EndFrame()
-	{
-		SCOPED_PROFILE( scene_endFrame );
-
-		// deletes scene nodes
-		DeleteNodesImmediate( m_sceneNodesToDelete );
-		m_sceneNodesToDelete.clear();
-
-		m_world.SortEntities();
-		m_world.RemoveDeadEntities();
 	}
 
 	//================================================================================================================================
@@ -160,141 +130,35 @@ namespace fan
 		}
 
 		// delete all nodes
-		PhysicsWorld& physicsWorld = m_world.GetSingletonComponent<PhysicsWorld>();
+		PhysicsWorld& physicsWorld = world->GetSingletonComponent<PhysicsWorld>();
 		for( SceneNode* node : nodesToDelete )
 		{
-			EntityID entityID = m_world.GetEntityID( node->handle );
+			EntityID entityID = world->GetEntityID( node->handle );
 
 			// remove rigidbody from physics world
-			if( m_world.HasComponent<Rigidbody>( entityID ) )
+			if( world->HasComponent<Rigidbody>( entityID ) )
 			{
-				Rigidbody& rb = m_world.GetComponent<Rigidbody>( entityID );
+				Rigidbody& rb = world->GetComponent<Rigidbody>( entityID );
 				physicsWorld.dynamicsWorld->removeRigidBody( &rb.rigidbody );
 			}
-			m_world.KillEntity( entityID );
+			world->KillEntity( entityID );
 			if( node->parent != nullptr )
 			{
 				node->parent->RemoveChild( *node );
 			}
-		}		
-
-		m_world.SortEntities();
-		m_world.RemoveDeadEntities();
-	}
-
-	//================================================================================================================================
-	//================================================================================================================================
-	void Scene::Update( const float _delta )
-	{
-		SCOPED_PROFILE( scene_update );
-		{
-			//const float delta = m_state == State::PLAYING ? _delta : 0.f;
-
-			//RUN_SYSTEM( ecsPlanetsSystem, Run );
-			
-			const Signature signatureSMSFT = S_SynchronizeMotionStateFromTransform::GetSignature( m_world );
-			const Signature signatureSTFMS = S_SynchronizeTransformFromMotionState::GetSignature( m_world );
-			const Signature signatureUpdateParticles = S_UpdateParticles::GetSignature( m_world );
-			const Signature signatureEmitParticles = S_EmitParticles::GetSignature( m_world );
-			const Signature signatureGenParticles = S_GenerateParticles::GetSignature( m_world );
-			const Signature signatureUpdateBoundsFromRigidbody = S_UpdateBoundsFromRigidbody::GetSignature( m_world );
-			const Signature signatureUpdateBoundsFromModel = S_UpdateBoundsFromModel::GetSignature( m_world );
-			const Signature signatureUpdateBoundsFromTransform = S_UpdateBoundsFromTransform::GetSignature( m_world );
-			const Signature signatureMovePlanets = S_MovePlanets::GetSignature( m_world );
-			const Signature signatureGenerateLightMesh = S_GenerateLightMesh::GetSignature( m_world );
-			
-			// physics
-			PhysicsWorld& physicsWorld = m_world.GetSingletonComponent<PhysicsWorld>();
-			S_SynchronizeMotionStateFromTransform::Run( m_world, m_world.Match( signatureSMSFT ), _delta );
-			physicsWorld.dynamicsWorld->stepSimulation( _delta, 10, Time::Get().GetPhysicsDelta() );
-			S_SynchronizeTransformFromMotionState::Run( m_world, m_world.Match( signatureSTFMS ), _delta );
-
-			// particles
-			S_UpdateParticles::Run( m_world, m_world.Match( signatureUpdateParticles ), _delta );
-			S_EmitParticles::Run( m_world, m_world.Match( signatureEmitParticles ), _delta );
-
-			S_MovePlanets::Run( m_world, m_world.Match( signatureMovePlanets ), _delta );
-			S_GenerateLightMesh::Run( m_world, m_world.Match( signatureGenerateLightMesh ), _delta );
-			S_GenerateParticles::Run( m_world, m_world.Match( signatureGenParticles ), _delta );
-
-			//RUN_SYSTEM( ecsSolarEruptionMeshSystem, Run );
-
-			//LateUpdateActors( _delta );
-			S_UpdateBoundsFromRigidbody::Run( m_world, m_world.Match( signatureUpdateBoundsFromRigidbody ), _delta );
-			S_UpdateBoundsFromModel::Run( m_world, m_world.Match( signatureUpdateBoundsFromModel ), _delta );
-			S_UpdateBoundsFromTransform::Run( m_world, m_world.Match( signatureUpdateBoundsFromTransform ), _delta );
-			
-			//RUN_SYSTEM( ecsUpdateBullet, Run );
 		}
-		EndFrame();
+		world->SortEntities();
+		world->RemoveDeadEntities();
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
 	void Scene::SetMainCamera( SceneNode& _nodeCamera )
 	{
-		if ( &_nodeCamera != m_mainCamera )
+		if( &_nodeCamera != mainCamera )
 		{
-			m_mainCamera = &_nodeCamera;
+			mainCamera = &_nodeCamera;
 			onSetMainCamera.Emmit( _nodeCamera );
-		}
-	}
-
-	//================================================================================================================================
-	//================================================================================================================================
-	void Scene::Play()
-	{
-		if ( m_state == State::STOPPED )
-		{
-			Debug::Highlight() << m_name << ": play" << Debug::Endl();
-			m_state = State::PLAYING;
-		}
-	}
-
-	//================================================================================================================================
-	//================================================================================================================================
-	void  Scene::Stop()
-	{
-		if ( m_state == State::PLAYING || m_state == State::PAUSED )
-		{
-
-			Debug::Highlight() << m_name << ": stopped" << Debug::Endl();
-			m_state = State::STOPPED;
-			onSceneStop.Emmit( *this );
-		}
-	}
-
-	//================================================================================================================================
-	//================================================================================================================================
-	void Scene::Pause()
-	{
-		if ( m_state == State::PLAYING )
-		{
-			Debug::Highlight() << m_name << ": paused" << Debug::Endl();
-			m_state = State::PAUSED;
-		}
-	}
-
-	//================================================================================================================================
-	//================================================================================================================================
-	void Scene::Resume()
-	{
-		if ( m_state == State::PAUSED )
-		{
-			Debug::Highlight() << m_name << ": resumed" << Debug::Endl();
-			m_state = State::PLAYING;
-		}
-	}
-
-	//================================================================================================================================
-	//================================================================================================================================
-	void  Scene::Step( const float _delta )
-	{
-		if ( m_state == State::PAUSED )
-		{
-			Resume();
-			Update( _delta );
-			Pause();
 		}
 	}
 
@@ -302,34 +166,33 @@ namespace fan
 	//================================================================================================================================
 	void Scene::Clear()
 	{
-		const Signature signatureUnregisterAllRigidbodies = S_UnregisterAllRigidbodies::GetSignature( m_world );
-		S_UnregisterAllRigidbodies::Run( m_world, m_world.Match( signatureUnregisterAllRigidbodies ) );
+		// unregister rigidbodies
+		const Signature signatureUnregisterAllRigidbodies = S_UnregisterAllRigidbodies::GetSignature( *world );
+		S_UnregisterAllRigidbodies::Run( *world, world->Match( signatureUnregisterAllRigidbodies ) );
 
-		m_path = "";
-		m_instantiate->Clear();
-		DeleteNodesImmediate( { m_rootNode } );
-		m_rootNode = nullptr;
-		m_sceneNodesToDelete.clear();
-		onSceneClear.Emmit();
+		path = "";
+		//instantiate->Clear();
+		DeleteNodesImmediate({ root } );
+		root = nullptr;
+		sceneNodesToDelete.clear();
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
 	void Scene::New()
 	{
-		Stop();
-		Clear();
+		Clear( );
 		nextUniqueID = 1;
-		m_rootNode = & InstanciateSceneNode( "root", nullptr );
-		onSceneLoad.Emmit( *this );
+		root = &CreateSceneNode( "root", nullptr );
+		onLoad.Emmit( *this );
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void Scene::Save() const
+	void Scene::Save( ) const
 	{
-		Debug::Get() << Debug::Severity::log << "saving scene: " << m_name << Debug::Endl();
-		std::ofstream outStream( m_path );
+		Debug::Get() << Debug::Severity::log << "saving scene: " << path << Debug::Endl();
+		std::ofstream outStream( path );
 		if ( outStream.is_open() )
 		{
 			Json json;
@@ -337,13 +200,12 @@ namespace fan
 			// scene global parameters
 			Json& jScene = json["scene"];
 			{
-				Serializable::SaveString( jScene, "name", m_name );
-				Serializable::SaveString( jScene, "path", m_path );
+				Serializable::SaveString( jScene, "path", path );
 			}
 
 			// saves all nodes recursively
 			Json& jRoot = jScene["root"];
-			R_SaveToJson( *m_rootNode, jRoot );
+			R_SaveToJson( *root, jRoot );
 			RemapSceneNodesIndices( json );				
 			outStream << json; // write to disk			
 			outStream.close();
@@ -354,9 +216,7 @@ namespace fan
 	//================================================================================================================================
 	void Scene::R_SaveToJson( const SceneNode& _node, Json& _json )
 	{	
-		EcsWorld& world = _node.scene->GetWorld();
-
-		Serializable::SaveString( _json, "name", _node.name );
+		EcsWorld& world = *_node.scene->world;
 		Serializable::SaveUInt( _json, "node_id", _node.uniqueID );
 
 		// save components
@@ -395,7 +255,7 @@ namespace fan
 	}
 
 	//================================================================================================================================
-	// Find all the gameobject indices in the json and remap them on a range close to zero
+	// Find all the gameobjects indices in the json and remap them on a range close to zero
 	// ex: 400, 401, 1051 will be remapped to 1,2,3
 	//================================================================================================================================
 	void Scene::RemapSceneNodesIndices( Json& _json )
@@ -403,7 +263,7 @@ namespace fan
 		std::vector< Json* > jsonIndices;
 		std::set< uint64_t > uniqueIndices;
 
-		// parse all the json and get all the gameobject ids
+		// parse all the json and get all the gameobjects ids
 		std::stack< Json* > stack;
 		stack.push( &_json );
 		while( !stack.empty() )
@@ -452,7 +312,6 @@ namespace fan
 	//================================================================================================================================
 	bool Scene::LoadFrom( const std::string _path )
 	{
-		Stop();
 		Clear();
  		std::ifstream inStream( _path );
  		if ( inStream.is_open() && inStream.good() )
@@ -466,39 +325,38 @@ namespace fan
 			// scene global parameters
 			const Json& jScene = sceneJson["scene"];
 			{
-				Serializable::LoadString( jScene, "name", m_name );
-				Serializable::LoadString( jScene, "path", m_path );
+				Serializable::LoadString( jScene, "path", path );
 			}
 
 			// loads all nodes recursively
 			const Json& jRoot = jScene["root"];
-			m_rootNode = &InstanciateSceneNode( "root", nullptr );
-			R_LoadFromJson( jRoot, *m_rootNode, 0 );
+			root = &CreateSceneNode( "root", nullptr );
+			R_LoadFromJson( jRoot, *root, 0 );
 			
-			m_path = _path;
+			path = _path;
 			inStream.close();
-			nextUniqueID = R_FindMaximumId( *m_rootNode ) + 1;
+			nextUniqueID = R_FindMaximumId( *root ) + 1;
 
-			const Signature signatureRegisterAllRigidbodies = S_RegisterAllRigidbodies::GetSignature( m_world );
-			S_RegisterAllRigidbodies::Run( m_world, m_world.Match( signatureRegisterAllRigidbodies ) );
+			const Signature signatureRegisterAllRigidbodies = S_RegisterAllRigidbodies::GetSignature( *world );
+			S_RegisterAllRigidbodies::Run( *world, world->Match( signatureRegisterAllRigidbodies ) );
 			//m_instantiate->ResolveGameobjectPtr( 0 );
 			//m_instantiate->ResolveComponentPtr( 0 );
 
 			// temporary
-			Signature signature = m_world.GetSignature<MeshRenderer>() | m_world.GetSignature<SceneNode>();
-			std::vector<EntityID> entities = m_world.Match( signature );
+			Signature signature = world->GetSignature<MeshRenderer>() | world->GetSignature<SceneNode>();
+			std::vector<EntityID> entities = world->Match( signature );
 			for ( EntityID entityID : entities )
 			{
-				SceneNode& node = m_world.GetComponent<SceneNode>( entityID );
+				SceneNode& node = world->GetComponent<SceneNode>( entityID );
 				if( node.name == "sun_light" )
 				{
-					MeshRenderer& meshRenderer = m_world.GetComponent<MeshRenderer>( entityID );
-					SunLight& sunlight = m_world.GetSingletonComponent<SunLight>();
+					MeshRenderer& meshRenderer = world->GetComponent<MeshRenderer>( entityID );
+					SunLight& sunlight = world->GetSingletonComponent<SunLight>();
 					meshRenderer.mesh = &sunlight.mesh;
 				}
 			}
 
-			onSceneLoad.Emmit( *this );
+			onLoad.Emmit( *this );
 			return true;
 		}
 		else
@@ -515,8 +373,7 @@ namespace fan
 	void Scene::R_LoadFromJson( const Json& _json, SceneNode& _node, const uint32_t _idOffset )
 	{
 		//ScopedTimer timer("load scene");
-		EcsWorld& world = _node.scene->GetWorld();
-
+		EcsWorld& world = *_node.scene->world;
 
 		Serializable::LoadString( _json, "name", _node.name );
 		Serializable::LoadUInt( _json, "node_id", _node.uniqueID );
@@ -545,7 +402,7 @@ namespace fan
 			{
 				const Json& jchild_i = jchilds[childIndex];
 				{
-					SceneNode& childNode = _node.scene->InstanciateSceneNode( "tmp", &_node, false );
+					SceneNode& childNode = _node.scene->CreateSceneNode( "tmp", &_node, false );
 					R_LoadFromJson( jchild_i, childNode, _idOffset );
 				}
 			}
