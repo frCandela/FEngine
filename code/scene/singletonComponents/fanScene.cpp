@@ -7,15 +7,13 @@
 #include "scene/fanSceneResourcePtr.hpp"
 #include "scene/fanComponentPtr.hpp"
 #include "scene/fanSceneTags.hpp"
-#include "scene/components/fanRigidbody.hpp"
 #include "scene/components/fanBounds.hpp"
 #include "scene/components/fanSceneNode.hpp"
 #include "scene/components/fanTransform.hpp"
 #include "scene/components/fanMaterial.hpp"
 #include "scene/components/fanMeshRenderer.hpp"
-#include "scene/systems/fanRegisterPhysics.hpp"
+#include "scene/components/fanRigidbody.hpp"
 #include "game/singletonComponents/fanSunLight.hpp"
-#include "scene/singletonComponents/fanPhysicsWorld.hpp"
 #include "scene/singletonComponents/fanRenderWorld.hpp"
 #include "ecs/fanEcsWorld.hpp"
 
@@ -71,14 +69,14 @@ namespace fan
 			std::vector<SceneNode*> nodes;
 			SceneNode::GetDescendantsOf( *prefabRoot, nodes );
 
-			std::vector<EntityID> entities;
-			entities.reserve( nodes.size() );
 			for ( SceneNode* node : nodes )
 			{
-				entities.push_back( world->GetEntityID( node->handle ) );
+				EntityID entityID = world->GetEntityID( node->handle );
+				if( world->HasComponent<Rigidbody>( entityID ) )
+				{
+					onCreateRigidbody.Emmit( entityID );
+				}
 			}
-			Signature signature = S_RegisterAllRigidbodies::GetSignature( *world );
-			S_RegisterAllRigidbodies::Run( *world,  world->MatchSubset( signature, entities ) );
 		}
 		return prefabRoot;
 	}
@@ -130,7 +128,6 @@ namespace fan
 		}
 
 		// delete all nodes
-		PhysicsWorld& physicsWorld = world->GetSingletonComponent<PhysicsWorld>();
 		for( SceneNode* node : nodesToDelete )
 		{
 			EntityID entityID = world->GetEntityID( node->handle );
@@ -138,8 +135,7 @@ namespace fan
 			// remove rigidbody from physics world
 			if( world->HasComponent<Rigidbody>( entityID ) )
 			{
-				Rigidbody& rb = world->GetComponent<Rigidbody>( entityID );
-				physicsWorld.dynamicsWorld->removeRigidBody( &rb.rigidbody );
+				onDeleteRigidbody.Emmit( entityID );
 			}
 			world->KillEntity( entityID );
 			if( node->parent != nullptr )
@@ -166,10 +162,7 @@ namespace fan
 	//================================================================================================================================
 	void Scene::Clear()
 	{
-		// unregister rigidbodies
-		const Signature signatureUnregisterAllRigidbodies = S_UnregisterAllRigidbodies::GetSignature( *world );
-		S_UnregisterAllRigidbodies::Run( *world, world->Match( signatureUnregisterAllRigidbodies ) );
-
+		onClear.Emmit(*this);
 		path = "";
 		//instantiate->Clear();
 		DeleteNodesImmediate({ root } );
@@ -191,7 +184,6 @@ namespace fan
 	//================================================================================================================================
 	void Scene::Save( ) const
 	{
-		Debug::Get() << Debug::Severity::log << "saving scene: " << path << Debug::Endl();
 		std::ofstream outStream( path );
 		if ( outStream.is_open() )
 		{
@@ -217,6 +209,7 @@ namespace fan
 	void Scene::R_SaveToJson( const SceneNode& _node, Json& _json )
 	{	
 		EcsWorld& world = *_node.scene->world;
+		Serializable::SaveString( _json, "name", _node.name );
 		Serializable::SaveUInt( _json, "node_id", _node.uniqueID );
 
 		// save components
@@ -317,8 +310,6 @@ namespace fan
  		if ( inStream.is_open() && inStream.good() )
  		{
  			// Load scene
- 			Debug::Get() << Debug::Severity::log << "loading scene: " << _path << Debug::Endl();
-
 			Json sceneJson;
 			inStream >> sceneJson;
 
@@ -337,8 +328,6 @@ namespace fan
 			inStream.close();
 			nextUniqueID = R_FindMaximumId( *root ) + 1;
 
-			const Signature signatureRegisterAllRigidbodies = S_RegisterAllRigidbodies::GetSignature( *world );
-			S_RegisterAllRigidbodies::Run( *world, world->Match( signatureRegisterAllRigidbodies ) );
 			//m_instantiate->ResolveGameobjectPtr( 0 );
 			//m_instantiate->ResolveComponentPtr( 0 );
 

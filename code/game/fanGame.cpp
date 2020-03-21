@@ -4,7 +4,7 @@
 #include "core/time/fanTime.hpp"
 #include "scene/singletonComponents/fanPhysicsWorld.hpp"
 #include "scene/systems/fanSynchronizeMotionStates.hpp"
-//#include "scene/systems/fanRegisterPhysics.hpp"
+#include "scene/systems/fanRegisterPhysics.hpp"
 #include "scene/systems/fanUpdateParticles.hpp"
 #include "scene/systems/fanEmitParticles.hpp"
 #include "scene/systems/fanGenerateParticles.hpp"
@@ -36,6 +36,9 @@ namespace fan
 	//================================================================================================================================
 	void Game::Play()
 	{
+		// unregister / register rigidbodies		
+		S_RegisterAllRigidbodies::Run( world, world.Match( S_RegisterAllRigidbodies::GetSignature( world ) ) );
+
 		if( state == State::STOPPED )
 		{
 			Debug::Highlight() << name << ": play" << Debug::Endl();
@@ -49,10 +52,10 @@ namespace fan
 	{
 		if( state == State::PLAYING || state == State::PAUSED )
 		{
-
+			S_UnregisterAllRigidbodies::Run( world, world.Match( S_UnregisterAllRigidbodies::GetSignature( world ) ) );
 			Debug::Highlight() << name << ": stopped" << Debug::Endl();
 			state = State::STOPPED;
-			//onSceneStop.Emmit( *this );
+			onStop.Emmit( *this );
 		}
 	}
 
@@ -77,8 +80,6 @@ namespace fan
 			state = State::PLAYING;
 		}
 	}
-
-
 
 	//================================================================================================================================
 	//================================================================================================================================

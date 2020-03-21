@@ -72,7 +72,7 @@ namespace fan
 		void SwitchPlayStop();
 
 		void OnGameStop( Game& _game );
-		void OnSceneLoad( Scene& _game );
+		void OnSceneLoad( Scene& _scene );
 		void OnToogleShowUI() { m_showUI = !m_showUI; }
 		void OnToogleCamera();
 

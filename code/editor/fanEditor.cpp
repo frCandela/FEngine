@@ -150,7 +150,7 @@ namespace fan
 		m_gameWindow = new GameWindow( m_game );
 		m_preferencesWindow = new PreferencesWindow();
 		m_networkWindow = new NetworkWindow( scene );
-		m_mainMenuBar = new MainMenuBar( scene , *m_selection );
+		m_mainMenuBar = new MainMenuBar( m_game, *m_selection );
 
 		RendererDebug::Init( &m_renderer->GetRendererDebug() );
 		EditorGizmos::Init( m_gizmos );
@@ -264,7 +264,10 @@ namespace fan
 				std::vector< Game* > games = { &m_game };
 				for( Game* game : games )
 				{
-					game->Step( targetLogicDelta );
+					if( game->state == Game::PLAYING )
+					{
+						game->Step( targetLogicDelta );
+					}
 					EditorCamera& editorCamera = game->world.GetSingletonComponent<EditorCamera>();
 					EditorCamera::Update( editorCamera, targetLogicDelta );
 				}			

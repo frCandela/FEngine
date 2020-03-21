@@ -151,7 +151,6 @@ namespace fan
 					rigidbody.SetKinematic();
 					rigidbody.SetMotionState( &motionState.motionState );
 					rigidbody.SetCollisionShape( &shape.boxShape );
-					world.GetSingletonComponent<PhysicsWorld>().dynamicsWorld->addRigidBody( &rigidbody.rigidbody );
 				}
 
 				// point light

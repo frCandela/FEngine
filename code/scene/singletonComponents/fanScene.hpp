@@ -37,9 +37,12 @@ namespace fan
 		static void		R_LoadFromJson( const Json& _json, SceneNode& _node, const uint32_t _idOffset );
 		static void		RemapSceneNodesIndices( Json& _json );
 
+		Signal< Scene& >		onClear;
 		Signal< Scene& >		onLoad;
 		Signal< SceneNode* >	onDeleteSceneNode;
 		Signal< SceneNode& >	onSetMainCamera;
+		Signal< EntityID >	onCreateRigidbody;
+		Signal< EntityID >	onDeleteRigidbody;
 
 		EcsWorld*					world;
 		std::string					path;		

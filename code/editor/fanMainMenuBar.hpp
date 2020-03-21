@@ -5,7 +5,7 @@
 namespace fan
 {
 	struct EditorGrid;
-	struct Scene;
+	struct Game;
 	class EditorWindow;
 	class EditorSelection;
 
@@ -24,8 +24,6 @@ namespace fan
 		};
 
 	public:
-		Signal< int > onSetScene;
-
 		Signal< std::string > onSaveScene;
 		Signal< std::string > onNewScene;
 		Signal< std::string > onOpenScene;
@@ -33,7 +31,7 @@ namespace fan
 		Signal<> onReloadIcons;
 		Signal<> onExit;
 
-		MainMenuBar( Scene& _scene, EditorSelection& _editorSelection );
+		MainMenuBar( Game& _game, EditorSelection& _editorSelection );
 		~MainMenuBar();
 
 		void SetGrid( EditorGrid* _editorGrid ) { m_editorGrid = _editorGrid; }
@@ -49,7 +47,7 @@ namespace fan
 		bool ShowLights() const { return m_showLights; }
 
 	private:
-		Scene* m_scene;
+		Game* m_game;
 		EditorGrid* m_editorGrid;
 		EditorSelection& m_editorSelection;
 

@@ -122,7 +122,6 @@ namespace fan
 			physicsWorld.dynamicsWorld->removeRigidBody( &rb.rigidbody );
 			rb.SetMotionState( motionState );
 			rb.SetCollisionShape( shape );
-			physicsWorld.dynamicsWorld->addRigidBody( &rb.rigidbody );
 		}
 	}
 

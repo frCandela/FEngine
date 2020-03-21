@@ -9,13 +9,14 @@
 #include "core/input/fanInputManager.hpp"
 #include "core/time/fanProfiler.hpp"
 #include "core/time/fanTime.hpp"
+#include "game/fanGame.hpp"
 #include "scene/singletonComponents/fanScene.hpp"
 
 namespace fan
 {
 	//================================================================================================================================
 	//================================================================================================================================
-	MainMenuBar::MainMenuBar( Scene& _scene, EditorSelection& _editorSelection )
+	MainMenuBar::MainMenuBar( Game& _game, EditorSelection& _editorSelection )
 		: m_editorSelection( _editorSelection )
 		, m_showImguiDemoWindow( true )
 		, m_showAABB( false )
@@ -24,7 +25,7 @@ namespace fan
 		, m_showNormals( false )
 		, m_showLights( false )
 		, m_sceneExtensionFilter( RenderGlobal::s_sceneExtensions )
-		, m_scene( &_scene )
+		, m_game( &_game )
 	{
 
 		SerializedValues::Get().GetBool( "show_imguidemo", m_showImguiDemoWindow );
@@ -273,22 +274,24 @@ namespace fan
 	{
 		// New scene
 		if ( ImGui::FanSaveFileModal( "New scene", RenderGlobal::s_sceneExtensions, m_pathBuffer ) )
-		{
-			m_scene->New();
-			m_scene->path = m_pathBuffer.string();
+		{		
+			m_game->scene.New();
+			m_game->scene.path = m_pathBuffer.string();
 		}
 
-		// Open scene
+		// Open scenes
 		if ( ImGui::FanLoadFileModal( "Open scene", m_sceneExtensionFilter, m_pathBuffer ) )
 		{
-			m_scene->LoadFrom( m_pathBuffer.string() );
+			Debug::Get() << Debug::Severity::log << "loading scene: " << m_pathBuffer.string() << Debug::Endl();
+			m_game->scene.LoadFrom( m_pathBuffer.string() );
 		}
 
 		// Save scene
 		if ( ImGui::FanSaveFileModal( "Save scene", RenderGlobal::s_sceneExtensions, m_pathBuffer ) )
 		{
-			m_scene->path = m_pathBuffer.string();
-			m_scene->Save();
+			m_game->scene.path = m_pathBuffer.string();
+			Debug::Get() << Debug::Severity::log << "saving scene: " << m_game->scene.path << Debug::Endl();
+			m_game->scene.Save();
 		}
 	}
 
@@ -296,6 +299,12 @@ namespace fan
 	//================================================================================================================================
 	void MainMenuBar::New()
 	{
+		if( m_game->state != Game::STOPPED )
+		{
+			Debug::Warning() << "creating scenes is disabled in play mode" << Debug::Endl();
+			return;
+		}
+
 		m_pathBuffer = "./content/scenes/";
 		m_openNewScenePopupLater = true;
 	}
@@ -304,6 +313,12 @@ namespace fan
 	//================================================================================================================================
 	void MainMenuBar::Open()
 	{
+		if( m_game->state != Game::STOPPED )
+		{
+			Debug::Warning() << "loading scenes is disabled in play mode" << Debug::Endl();
+			return;
+		}
+
 		m_pathBuffer = "./content/scenes/";
 		m_openLoadScenePopupLater = true;
 	}
@@ -313,13 +328,13 @@ namespace fan
 	//================================================================================================================================
 	void MainMenuBar::Reload()
 	{
-		if( m_scene->path.empty() )
+		if( m_game->scene.path.empty() )
 		{
 			Debug::Warning( "you cannot reload a scene that is not saved." );
 			return;
 		}
 
-		if ( true /*m_scene->GetState() == Scene::STOPPED*/ )// @hack
+		if (  m_game->state == Game::STOPPED )
 		{
 // 			// Save camera data
 // 			Json cameraData;
@@ -329,8 +344,8 @@ namespace fan
 // 			Gameobject* prevSelection = m_editorSelection.GetSelectedGameobject();
 // 			const uint64_t id = prevSelection != nullptr ? prevSelection->GetUniqueID() : 0;
 
-
-			m_scene->LoadFrom( m_scene->path );
+			Debug::Get() << Debug::Severity::log << "loading scene: " << m_game->scene.path << Debug::Endl();
+			m_game->scene.LoadFrom( m_game->scene.path );
 			
 
 
@@ -344,15 +359,26 @@ namespace fan
 // 				m_editorSelection.SetSelectedGameobject( selection );
 // 			}
 		}
+		else
+		{
+			Debug::Warning() << "reload is disabled in play mode" << Debug::Endl();
+		}
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
 	void MainMenuBar::Save()
 	{
-		if ( ! m_scene->path.empty() )
+		if( m_game->state != Game::STOPPED )
 		{
-			m_scene->Save();
+			Debug::Warning() << "saving is disabled in play mode" << Debug::Endl();
+			return;
+		}
+
+		if ( !m_game->scene.path.empty() )
+		{
+			Debug::Get() << Debug::Severity::log << "saving scene: " << m_game->scene.path << Debug::Endl();
+			m_game->scene.Save();
 		}
 		else
 		{
