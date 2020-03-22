@@ -9,14 +9,16 @@ namespace fan
 	struct SceneNode;
 	struct Transform;
 	struct Camera;
+	class EcsWorld;
 
 	//================================================================================================================================
+	// contains the information of the editor camera
 	//================================================================================================================================
 	struct EditorCamera : public SingletonComponent
 	{
 		DECLARE_SINGLETON_COMPONENT()
 	public:
-		SceneNode* node;
+		SceneNode* cameraNode;
 		Transform* transform;
 		Camera* camera;
 
@@ -25,5 +27,6 @@ namespace fan
 		btVector2 xySensitivity = btVector2( 0.005f, 0.005f );
 
 		static void Update( EditorCamera& camera, const float _delta );
+		static void CreateEditorCamera( EcsWorld& _world );
 	};
 }

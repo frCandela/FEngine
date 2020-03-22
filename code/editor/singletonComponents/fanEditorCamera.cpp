@@ -6,13 +6,16 @@
 #include "core/math/shapes/fanRay.hpp"
 #include "scene/components/fanTransform.hpp"
 #include "scene/components/fanCamera.hpp"
-
+#include "scene/components/fanSceneNode.hpp"
+#include "scene/singletonComponents/fanScene.hpp"
+#include "ecs/fanEcsWorld.hpp"
 
 namespace fan
 {
 	REGISTER_SINGLETON_COMPONENT( EditorCamera, "editor_camera" );
 
 	//================================================================================================================================
+	// updates the editor camera position & rotation
 	//================================================================================================================================
 	void EditorCamera::Update( EditorCamera& _camera, const float _delta )
 	{
@@ -72,5 +75,31 @@ namespace fan
 		const Ray ray = _camera.camera->ScreenPosToRay( *_camera.transform, btVector2( 0.9f, 0.9f ) );
 		const float size = 0.002f;
 		btVector3 offset = ray.origin + 0.1f * ray.direction;
+	}
+
+	//================================================================================================================================
+	// creates the editor camera entity & components
+	// setups the EditorCamera singleton
+	//================================================================================================================================
+	void EditorCamera::CreateEditorCamera( EcsWorld& _world )
+	{
+		Scene& scene = _world.GetSingletonComponent< Scene >();
+
+		// Editor Camera
+		SceneNode& cameraNode = scene.CreateSceneNode( "editor_camera", scene.root );
+		EntityID cameraID = _world.GetEntityID( cameraNode.handle );
+		cameraNode.AddFlag( SceneNode::NOT_SAVED | SceneNode::NO_DELETE | SceneNode::NO_RAYCAST );
+
+		Transform& transform = _world.AddComponent< Transform >( cameraID );
+		Camera& camera = _world.AddComponent< Camera >( cameraID );
+
+		transform.SetPosition( btVector3( 0, 0, -2 ) );
+		scene.mainCamera = &cameraNode;
+
+		// set editor camera singleton
+		EditorCamera& editorCamera = _world.GetSingletonComponent<EditorCamera>();
+		editorCamera.cameraNode = &cameraNode;
+		editorCamera.transform = &transform;
+		editorCamera.camera = &camera;
 	}
 }

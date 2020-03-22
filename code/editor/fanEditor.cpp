@@ -21,7 +21,6 @@
 #include "core/input/fanMouse.hpp"
 #include "core/input/fanInput.hpp"
 #include "core/time/fanTime.hpp"
-#include "editor/callbacks/fanGameWindowCallbacks.hpp"
 #include "editor/windows/fanPreferencesWindow.hpp"	
 #include "editor/windows/fanInspectorWindow.hpp"	
 #include "editor/windows/fanProfilerWindow.hpp"	
@@ -64,7 +63,9 @@
 #include "scene/singletonComponents/fanScene.hpp"
 #include "scene/fanSceneTags.hpp"
 #include "scene/fanPrefabManager.hpp"
+
 #include "game/fanGame.hpp"
+#include "game/singletonComponents/fanGameCamera.hpp"
 
 namespace fan
 {
@@ -141,7 +142,6 @@ namespace fan
 		m_selection = new EditorSelection( scene );
 		m_copyPaste = new EditorCopyPaste( *m_selection );
 		m_gizmos = new EditorGizmos( scene );
-		m_gameCallbacks = new EditorGameWindowCallbacks( m_game );
 		m_renderWindow = new RenderWindow();
 		m_sceneWindow = new SceneWindow( scene );
 		m_inspectorWindow = new InspectorWindow();
@@ -176,18 +176,21 @@ namespace fan
 		m_selection->onSceneNodeSelected.Connect( &InspectorWindow::OnSceneNodeSelected, m_inspectorWindow );
 
 		// Events linking
-		m_gameCallbacks->ConnectCallbacks( *m_gameWindow, *m_renderer );
 		Input::Get().Manager().FindEvent( "reload_shaders" )->Connect( &Renderer::ReloadShaders, m_renderer );
 		Input::Get().Manager().FindEvent( "play_pause" )->Connect( &Engine::SwitchPlayStop, this );
 		Input::Get().Manager().FindEvent( "copy" )->Connect( &EditorCopyPaste::OnCopy, m_copyPaste );
 		Input::Get().Manager().FindEvent( "paste" )->Connect( &EditorCopyPaste::OnPaste, m_copyPaste );
 		Input::Get().Manager().FindEvent( "show_ui" )->Connect( &Engine::OnToogleShowUI, this );
-		//Input::Get().Manager().FindEvent( "toogle_view" )->Connect( &Engine::OnToogleView, this );
 		Input::Get().Manager().FindEvent( "toogle_camera" )->Connect( &Engine::OnToogleCamera, this );
 
+		m_gameWindow->onSizeChanged.Connect( &Renderer::ResizeGame, m_renderer );
+		m_gameWindow->onPlay.Connect( &Engine::OnGamePlay, this );
+		m_gameWindow->onPause.Connect( &Engine::OnGamePause, this );
+		m_gameWindow->onResume.Connect( &Engine::OnGameResume, this );
+		m_gameWindow->onStop.Connect( &Engine::OnGameStop, this );
+		m_gameWindow->onStep.Connect( &Engine::OnGameStep, this );
 		scene.onLoad.Connect( &SceneWindow::OnExpandHierarchy, m_sceneWindow );
 		scene.onLoad.Connect( &Engine::OnSceneLoad, this );
-		m_game.onStop.Connect( &Engine::OnGameStop, this );
 
 		scene.New();
 
@@ -342,16 +345,53 @@ namespace fan
 	}
 
 	//================================================================================================================================
-	// switch to editor camera
 	//================================================================================================================================
-	void Engine::OnGameStop( Game& _game )
+	void Engine::OnGamePlay()
 	{
-		//@hack
-// 		FPSCamera* editorCam = _scene->FindComponentOfType<FPSCamera>();
-// 		if ( editorCam != nullptr )
-// 		{
-// 			_scene->SetMainCamera( editorCam->GetCamera() );
-// 		}
+		Scene& scene = m_game.world.GetSingletonComponent<Scene>();
+
+		if( scene.path.empty() )
+		{
+			Debug::Warning() << "please save the scene before playing" << Debug::Endl();
+			return;
+		}
+
+		assert( m_game.state == Game::STOPPED );
+		scene.Save();
+		m_game.Start();
+
+		UseGameCamera();
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
+	void Engine::OnGameStop()
+	{
+		UseEditorCamera();
+
+		Scene& scene = m_game.world.GetSingletonComponent<Scene>();
+
+		// Saves the camera position for restoring it later
+		const EntityID oldCameraID = m_game.world.GetEntityID( scene.mainCamera->handle );
+		const btTransform oldCameraTransform = m_game.world.GetComponent<Transform>( oldCameraID ).transform;
+
+		m_game.Stop();
+		scene.LoadFrom( scene.path ); // reload
+
+		const EntityID newCameraID = m_game.world.GetEntityID( scene.mainCamera->handle );
+		m_game.world.GetComponent<Transform>( newCameraID ).transform = oldCameraTransform;
+	}
+
+	void Engine::OnGamePause() { m_game.Pause(); }
+	void Engine::OnGameResume() { m_game.Resume(); }
+
+	//================================================================================================================================
+	//================================================================================================================================
+	void Engine::OnGameStep()
+	{
+		m_game.Resume();
+		m_game.Step( Time::Get().GetLogicDelta() );
+		m_game.Pause();
 	}
 
 	//================================================================================================================================
@@ -360,30 +400,11 @@ namespace fan
 	void Engine::OnSceneLoad( Scene& _scene )
 	{
 		m_selection->Deselect();
-
-		EcsWorld& world = *_scene.world;
-		Scene& scene = world.GetSingletonComponent< Scene >();
-
-		// Editor Camera
-		SceneNode& cameraNode = scene.CreateSceneNode( "editor_camera", scene.root );
-		EntityID id = world.GetEntityID( cameraNode.handle );
-		cameraNode.AddFlag( SceneNode::NOT_SAVED | SceneNode::NO_DELETE | SceneNode::NO_RAYCAST );
-
-		Transform& transform = world.AddComponent< Transform >( id );
-		Camera&    camera = world.AddComponent< Camera >( id );
-
-		transform.SetPosition( btVector3( 0, 0, -2 ) );
-
-		scene.mainCamera = &cameraNode ;
-
-		// set editor camera singleton
-		EditorCamera& editorCamera = world.GetSingletonComponent<EditorCamera>();
-		editorCamera.node = &cameraNode;
-		editorCamera.transform = &transform;
-		editorCamera.camera = &camera;
+		EditorCamera::CreateEditorCamera( m_game.world );
 	}
 
 	//================================================================================================================================
+	// Updates the render world singleton component
 	//================================================================================================================================
 	void Engine::UpdateRenderWorld()
 	{
@@ -418,12 +439,15 @@ namespace fan
 		m_renderer->SetDirectionalLights( renderWorld.directionalLights );
 
 		// Camera
-		EditorCamera& editorCamera = world.GetSingletonComponent<EditorCamera>();
-		editorCamera.camera->aspectRatio = m_gameWindow->GetAspectRatio();
+		Scene& scene = world.GetSingletonComponent<Scene>();
+		EntityID cameraID = world.GetEntityID( scene.mainCamera->handle );
+		Camera& camera = world.GetComponent<Camera>( cameraID );
+		camera.aspectRatio = m_gameWindow->GetAspectRatio();
+		Transform& cameraTransform = world.GetComponent<Transform>( cameraID );
 		m_renderer->SetMainCamera( 
-			editorCamera.camera->GetProjection(), 
-			editorCamera.camera->GetView( *editorCamera.transform ),
-			ToGLM( editorCamera.transform->GetPosition() )
+			camera.GetProjection(), 
+			camera.GetView( cameraTransform ),
+			ToGLM( cameraTransform.GetPosition() )
 		);
 	}
 
@@ -433,37 +457,55 @@ namespace fan
 	{
 		if ( m_game.state == Game::STOPPED )
 		{
-			m_game.Play();
+			OnGamePlay();
 		}
 		else
 		{
-			m_game.Stop();
+			OnGameStop();
 		}
 	}
 
 	//================================================================================================================================
-	// Toogle current scene main camera between editor and game
+	//================================================================================================================================
+	void Engine::UseEditorCamera()
+	{
+		Scene& scene = m_game.world.GetSingletonComponent<Scene>();
+		EditorCamera& editorCamera = m_game.world.GetSingletonComponent<EditorCamera>();
+		scene.SetMainCamera( *editorCamera.cameraNode );
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
+	void Engine::UseGameCamera()
+	{
+		Scene& scene = m_game.world.GetSingletonComponent<Scene>();
+		GameCamera& gameCamera = m_game.world.GetSingletonComponent<GameCamera>();
+		scene.SetMainCamera( *gameCamera.cameraNode );
+	}
+
+	//================================================================================================================================
+	// toogle the camera between editor and game
 	//================================================================================================================================
 	void Engine::OnToogleCamera()
-	{
-		//@hack
-// 		FPSCamera* editorCameraCtrl = m_currentScene->FindComponentOfType<FPSCamera>();
-// 		CameraController* gameCameraCtrl = m_currentScene->FindComponentOfType<CameraController>();
-// 
-// 		
-// 		if ( editorCameraCtrl != nullptr && gameCameraCtrl != nullptr )
-// 		{
-// 			Camera* editorCamera = editorCameraCtrl->GetGameobject().GetComponent<Camera>();
-// 			Camera* gameCamera = gameCameraCtrl->GetGameobject().GetComponent<Camera>();
-// 			if ( &m_currentScene->GetMainCamera() == editorCamera )
-// 			{
-// 				m_currentScene->SetMainCamera( gameCamera );
-// 			}
-// 			else
-// 			{
-// 				m_currentScene->SetMainCamera( editorCamera );
-// 			}
-// 		}
+	{		
+		if( m_game.state == Game::STOPPED )
+		{ 
+			Debug::Warning() << "You cannot toogle camera outside of play mode" << Debug::Endl();
+			return; 
+		}
+
+		Scene& scene = m_game.world.GetSingletonComponent<Scene>();
+		GameCamera& gameCamera = m_game.world.GetSingletonComponent<GameCamera>();
+		EditorCamera& editorCamera = m_game.world.GetSingletonComponent<EditorCamera>();
+
+		if ( scene.mainCamera == editorCamera.cameraNode )
+		{
+			UseGameCamera();
+		}
+		else
+		{
+			UseEditorCamera();
+		}
 	}
 
 	//================================================================================================================================

@@ -20,13 +20,11 @@ namespace fan
 		Game( const std::string _name );
 		~Game();
 
-		void Play();
+		void Start();
 		void Stop();
 		void Pause();
 		void Resume();
 		void Step( const float _delta );
-
-		Signal< Game& >		onStop;
 
 		std::string	name;
 		State		state = State::STOPPED;		

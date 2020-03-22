@@ -57,7 +57,6 @@ namespace fan
 		EcsWindow* m_ecsWindow;
 
 		// Main objects
-		EditorGameWindowCallbacks* m_gameCallbacks;
 		EditorCopyPaste* m_copyPaste;
 		EditorSelection* m_selection;
 		EditorGizmos* m_gizmos;
@@ -68,10 +67,15 @@ namespace fan
 		bool m_showUI = true;
 
 		void UpdateRenderWorld();
-
 		void SwitchPlayStop();
+		void UseEditorCamera();
+		void UseGameCamera();
 
-		void OnGameStop( Game& _game );
+		void OnGamePlay();
+		void OnGamePause();
+		void OnGameResume();
+		void OnGameStop();
+		void OnGameStep();
 		void OnSceneLoad( Scene& _scene );
 		void OnToogleShowUI() { m_showUI = !m_showUI; }
 		void OnToogleCamera();
