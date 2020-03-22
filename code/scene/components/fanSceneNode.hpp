@@ -18,8 +18,9 @@ namespace fan
 		enum Flags
 		{
 			  NONE = 0
-			, NOT_SAVED = 1 << 0 // node is ignored while saving the scene
-			, NO_DELETE = 1 << 1 // node cannot be deleted in the ui
+			, NOT_SAVED  = 1 << 0 // node is ignored while saving the scene
+			, NO_DELETE  = 1 << 1 // node cannot be deleted in the ui
+			, NO_RAYCAST = 1 << 2 // node cannot be selected by raycast
 		};
 
 		static void SetInfo( ComponentInfo& _info );
@@ -35,7 +36,7 @@ namespace fan
 		void AddChild( SceneNode& _child );
 		void SetParent( SceneNode* _parent );
 		void InsertBelow( SceneNode& _brother );
-		bool HasFlag( uint32_t _flag ) { return flags & _flag; }
+		bool HasFlag( uint32_t _flag ) const { return flags & _flag; }
 		void AddFlag( uint32_t _flag ) {  flags |= _flag; }
 		void RemoveFlag( Flags _flag ) {  flags &= ~_flag; }
 

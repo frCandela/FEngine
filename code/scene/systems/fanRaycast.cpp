@@ -39,17 +39,20 @@ namespace fan
 		// raycast
 		for( EntityID entityID : _entities )
 		{
-			Bounds& bounds = _world.GetComponent<Bounds>( entityID );
+			// check NO_RAYCAST flag
+			const SceneNode& sceneNode = _world.GetComponent<SceneNode>( entityID );
+			if( sceneNode.HasFlag( SceneNode::NO_RAYCAST ) ){ continue; }
 
 			// raycast on bounds
+			const Bounds& bounds = _world.GetComponent<Bounds>( entityID );
 			btVector3 intersection;
 			if( bounds.aabb.RayCast( _ray.origin, _ray.direction, intersection ) == true )
 			{
 				// raycast on mesh renderer
 				if( _world.HasComponent<MeshRenderer>( entityID ) )
 				{
-					MeshRenderer& meshRenderer = _world.GetComponent<MeshRenderer>( entityID );
-					Transform& transform = _world.GetComponent<Transform>( entityID );
+					const MeshRenderer& meshRenderer = _world.GetComponent<MeshRenderer>( entityID );
+					const Transform& transform = _world.GetComponent<Transform>( entityID );
 					const Ray transformedRay( transform.InverseTransformPoint( _ray.origin ), transform.InverseTransformDirection( _ray.direction ) );
 					if( meshRenderer.mesh->GetHull().RayCast( transformedRay.origin, transformedRay.direction, intersection ) )
 					{

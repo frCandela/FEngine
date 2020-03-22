@@ -366,7 +366,7 @@ namespace fan
 		// Editor Camera
 		SceneNode& cameraNode = scene.CreateSceneNode( "editor_camera", scene.root );
 		EntityID id = world.GetEntityID( cameraNode.handle );
-		cameraNode.AddFlag( SceneNode::NOT_SAVED | SceneNode::NO_DELETE );
+		cameraNode.AddFlag( SceneNode::NOT_SAVED | SceneNode::NO_DELETE | SceneNode::NO_RAYCAST );
 
 		Transform& transform = world.AddComponent< Transform >( id );
 		Camera&    camera = world.AddComponent< Camera >( id );
