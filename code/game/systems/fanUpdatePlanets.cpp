@@ -22,6 +22,8 @@ namespace fan
 	//================================================================================================================================
 	void S_MovePlanets::Run( EcsWorld& _world, const std::vector<EntityID>& _entities, const float _delta )
 	{
+		if( _delta == 0.f ) { return; }
+
 		for( EntityID entityID : _entities )
 		{
 			Transform& transform = _world.GetComponent<Transform>( entityID );
@@ -64,6 +66,8 @@ namespace fan
 	void S_GenerateLightMesh::Run( EcsWorld& _world, const std::vector<EntityID>& _entities, const float _delta )
 	{
 		SCOPED_PROFILE( ecs_solar_erup )
+
+		if( _delta == 0.f ) { return; }
 
 		SunLight& sunLight = _world.GetSingletonComponent<SunLight>();
 

@@ -16,6 +16,8 @@ namespace fan
 	//================================================================================================================================
 	void S_UpdateParticles::Run( EcsWorld& _world, const std::vector<EntityID>& _entities, const float _delta )
 	{
+		if( _delta == 0.f ) { return; }
+
 		for( EntityID entityID : _entities )
 		{
 			Particle& particle = _world.GetComponent<Particle>( entityID );

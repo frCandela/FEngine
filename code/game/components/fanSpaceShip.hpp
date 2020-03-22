@@ -1,56 +1,41 @@
-#pragma once
+#pragma  once
 
 #include "game/fanGamePrecompiled.hpp"
 
-#include "scene/fanComponentPtr.hpp"
+#include "ecs/fanComponent.hpp"
 
 namespace fan
 {
+	struct ComponentInfo;
 
-
-
-	class WithEnergy;
-	class PlayerInput;
-	class Health;
-
-	//================================================================================================================================
-	//================================================================================================================================
-	class SpaceShip// : public Actor
+	//==============================================================================================================================================================
+	//==============================================================================================================================================================
+	struct SpaceShip : public Component
 	{
-	private:
+		DECLARE_COMPONENT( SpaceShip )
+	public:
+		SpaceShip() {}
+		static void SetInfo( ComponentInfo& _info );
+		static void Init( Component& _component );
+		static void OnGui( Component& _component );
+		static void Save( const Component& _component, Json& _json );
+		static void Load( Component& _component, const Json& _json );
+
 		enum SpeedMode { REVERSE = 0, SLOW, NORMAL, FAST };
 
-	public:
-/*		Signal<Gameobject*> onPlayerDie;*/
+		btVector4 forwardForces;
+		float lateralForce;
+		float activeDrag;
+		float passiveDrag;
+		float energyConsumedPerUnitOfForce;
+		float remainingChargeEnergy;
+		float planetDamage;
+		float collisionRepulsionForce;
 
-		void Start() /*override*/;
-		void Stop() /*override*/ {}
-		void Update( const float _delta ) /*override*/;
-		void LateUpdate( const float /*_delta*/ ) /*override*/ {}
-
-		void OnGui() /*override*/;
-		//ImGui::IconType GetIcon() const /*override*/ { return ImGui::IconType::SPACE_SHIP16; }
-
-	protected:
-		bool Load( const Json& _json ) /*override*/;
-		bool Save( Json& _json ) const /*override*/;
-
-	private:
-		btVector4 m_forwardForces = btVector4( 1000.f, 1000.f, 2000.f, 3500.f );
-		float m_lateralForce = 2000.f;
-		float m_activeDrag = 0.930f;
-		float m_passiveDrag = 0.950f;
-		float m_energyConsumedPerUnitOfForce = 0.001f;
-		float m_remainingChargeEnergy = 0.f;
-		float m_planetDamage = 5.f;
-		float m_collisionRepulsionForce = 500.f;
-
-		// References
+// 		WithEnergy* m_energy;
+// 		PlayerInput* m_input;
+// 		Health* m_health;
 //		Rigidbody* m_rigidbody;
-		WithEnergy* m_energy;
-		PlayerInput* m_input;
-		Health* m_health;
-
 // 		ComponentPtr<ParticleSystem> m_fastForwardParticles;
 // 		ComponentPtr<ParticleSystem> m_slowForwardParticles;
 // 		ComponentPtr<ParticleSystem> m_reverseParticles;
@@ -60,4 +45,5 @@ namespace fan
 //		void OnContactStarted( Rigidbody* _rb, btPersistentManifold* const& _manifold );
 //		void Die();
 	};
+	static constexpr size_t sizeof_spaceship = sizeof( SpaceShip );
 }

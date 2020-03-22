@@ -18,6 +18,8 @@ namespace fan
 	//================================================================================================================================
 	void S_GenerateParticles::Run( EcsWorld& _world, const std::vector<EntityID>& _entities, const float _delta )
 	{
+		if( _delta == 0.f ) { return; }
+
 		RenderWorld& renderWorld = _world.GetSingletonComponent<RenderWorld>();
 		std::vector<Vertex> vertices;
 		vertices.resize( _entities.size() * 3 );

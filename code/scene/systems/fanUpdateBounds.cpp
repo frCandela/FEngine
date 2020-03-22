@@ -26,6 +26,8 @@ namespace fan
 	//================================================================================================================================
 	void S_UpdateBoundsFromRigidbody::Run( EcsWorld& _world, const std::vector<EntityID>& _entities, const float _delta )
 	{
+		if( _delta == 0.f ) { return; }
+
 		for( EntityID entityID : _entities )
 		{
 			const Rigidbody& rb = _world.GetComponent<Rigidbody>( entityID );

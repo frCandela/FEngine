@@ -11,9 +11,14 @@
 #include "scene/systems/fanUpdateBounds.hpp"
 #include "scene/components/fanSceneNode.hpp"
 #include "scene/singletonComponents/fanScene.hpp"
+
 #include "game/singletonComponents/fanSunLight.hpp"
+
 #include "game/systems/fanUpdatePlanets.hpp"
+#include "game/systems/fanUpdateSpaceships.hpp"
+
 #include "game/components/fanPlanet.hpp"
+#include "game/components/fanSpaceShip.hpp"
 
 namespace fan
 {
@@ -88,62 +93,39 @@ namespace fan
 	{
 		SCOPED_PROFILE( scene_update );
 		{
-			//const float delta = m_state == State::PLAYING ? _delta : 0.f;
+			const float delta = ( state == State::PLAYING ? _delta : 0.f );
 
 			//RUN_SYSTEM( ecsPlanetsSystem, Run );
 
-			const Signature signatureSMSFT = S_SynchronizeMotionStateFromTransform::GetSignature( world );
-			const Signature signatureSTFMS = S_SynchronizeTransformFromMotionState::GetSignature( world );
-			const Signature signatureUpdateParticles = S_UpdateParticles::GetSignature( world );
-			const Signature signatureEmitParticles = S_EmitParticles::GetSignature( world );
-			const Signature signatureGenParticles = S_GenerateParticles::GetSignature( world );
-			const Signature signatureUpdateBoundsFromRigidbody = S_UpdateBoundsFromRigidbody::GetSignature( world );
-			const Signature signatureUpdateBoundsFromModel = S_UpdateBoundsFromModel::GetSignature( world );
-			const Signature signatureUpdateBoundsFromTransform = S_UpdateBoundsFromTransform::GetSignature( world );
-			const Signature signatureMovePlanets = S_MovePlanets::GetSignature( world );
-			const Signature signatureGenerateLightMesh = S_GenerateLightMesh::GetSignature( world );
-
 			// physics
 			PhysicsWorld& physicsWorld = world.GetSingletonComponent<PhysicsWorld>();
-			S_SynchronizeMotionStateFromTransform::Run( world, world.Match( signatureSMSFT ), _delta );
-			if( state == Game::PLAYING )
-			{
-				physicsWorld.dynamicsWorld->stepSimulation( _delta, 10, Time::Get().GetPhysicsDelta() );
-			}				
-			S_SynchronizeTransformFromMotionState::Run( world, world.Match( signatureSTFMS ), _delta );
+			S_SynchronizeMotionStateFromTransform::Run( world, world.Match( S_SynchronizeMotionStateFromTransform::GetSignature( world ) ), delta );
+			physicsWorld.dynamicsWorld->stepSimulation( delta, 10, Time::Get().GetPhysicsDelta() );
+			S_SynchronizeTransformFromMotionState::Run( world, world.Match( S_SynchronizeTransformFromMotionState::GetSignature( world ) ), delta );
 
-			// particles
-			if( state == Game::PLAYING )
-			{
-				S_UpdateParticles::Run( world, world.Match( signatureUpdateParticles ), _delta );
-				S_EmitParticles::Run( world, world.Match( signatureEmitParticles ), _delta );
+			// update
+			S_UpdateParticles::Run( world, world.Match( S_UpdateParticles::GetSignature( world ) ), delta );
+			S_EmitParticles::Run( world, world.Match( S_EmitParticles::GetSignature( world ) ), delta );
 
-				S_MovePlanets::Run( world, world.Match( signatureMovePlanets ), _delta );
-				S_GenerateLightMesh::Run( world, world.Match( signatureGenerateLightMesh ), _delta );
-				S_GenerateParticles::Run( world, world.Match( signatureGenParticles ), _delta );
-			}
-
-
+			S_MovePlanets::Run( world, world.Match( S_MovePlanets::GetSignature( world ) ), delta );
+			S_GenerateLightMesh::Run( world, world.Match( S_GenerateLightMesh::GetSignature( world ) ), delta );
+			S_GenerateParticles::Run( world, world.Match( S_GenerateParticles::GetSignature( world ) ), delta );
 			//RUN_SYSTEM( ecsSolarEruptionMeshSystem, Run );
+			
 
-			//LateUpdateActors( _delta );
-			if( state == Game::PLAYING )
-			{
-				S_UpdateBoundsFromRigidbody::Run( world, world.Match( signatureUpdateBoundsFromRigidbody ), _delta );
-			}
-			S_UpdateBoundsFromModel::Run( world, world.Match( signatureUpdateBoundsFromModel ), _delta );
-			S_UpdateBoundsFromTransform::Run( world, world.Match( signatureUpdateBoundsFromTransform ), _delta );
-
-			//RUN_SYSTEM( ecsUpdateBullet, Run );
+			// late update
+			S_UpdateBoundsFromRigidbody::Run( world, world.Match( S_UpdateBoundsFromRigidbody::GetSignature( world ) ), delta );
+			//RUN_SYSTEM( ecsUpdateBullet, Run );			
+			S_UpdateBoundsFromModel::Run( world, world.Match( S_UpdateBoundsFromModel::GetSignature( world ) ), delta );
+			S_UpdateBoundsFromTransform::Run( world, world.Match( S_UpdateBoundsFromTransform::GetSignature( world ) ), delta );
 		}
 
 		{
+			// end frame
 			SCOPED_PROFILE( scene_endFrame );
 			Scene& scene = world.GetSingletonComponent<Scene>();
-			// deletes scene nodes
 			scene.DeleteNodesImmediate( scene.sceneNodesToDelete );
 			scene.sceneNodesToDelete.clear();
-
 			world.SortEntities();
 			world.RemoveDeadEntities();
 		}

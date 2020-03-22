@@ -19,6 +19,8 @@ namespace fan
 	//================================================================================================================================
 	void S_EmitParticles::Run( EcsWorld& _world, const std::vector<EntityID>& _entities, const float _delta )
 	{
+		if( _delta == 0.f ) { return; }
+
 		for( EntityID id : _entities )
 		{
 			const Transform& emitterTransform = _world.GetComponent<Transform>( id );
