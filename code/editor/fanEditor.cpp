@@ -42,7 +42,6 @@
 #include "editor/singletonComponents/fanEditorGrid.hpp"
 #include "scene/singletonComponents/fanRenderWorld.hpp"
 #include "scene/singletonComponents/fanPhysicsWorld.hpp"
-#include "game/singletonComponents/fanSunLight.hpp"
 #include "scene/components/fanSceneNode.hpp"
 #include "scene/components/fanTransform.hpp"
 #include "scene/components/fanDirectionalLight.hpp"
@@ -66,17 +65,19 @@
 #include "scene/fanSceneTags.hpp"
 #include "scene/fanPrefabManager.hpp"
 #include "game/fanGame.hpp"
-#include "game/components/fanPlanet.hpp"
 
 namespace fan
 {
 	//================================================================================================================================
 	//================================================================================================================================
 	Engine::Engine() :
-		 m_game( "game", &Engine::InitializeGameEcsWorldTypes )
+		 m_game( "game")
 		,m_applicationShouldExit( false )
-		,m_editorWorld( &Engine::InitializeEditorEcsWorldTypes )
+		,m_editorWorld()
 	{
+		Engine::InitializeEditorEcsWorldTypes( m_editorWorld);
+		Engine::InitializeGameEcsWorldTypes( m_game.world );
+
 		// Get serialized editor values
 		VkExtent2D windowSize = { 1280,720 };
 		SerializedValues::Get().GetUInt( "renderer_extent_width", windowSize.width );
@@ -188,7 +189,7 @@ namespace fan
 		scene.onLoad.Connect( &Engine::OnSceneLoad, this );
 		m_game.onStop.Connect( &Engine::OnGameStop, this );
 
-		m_game.scene.New();
+		scene.New();
 
  		//scene->LoadFrom( "content/scenes/game.scene" );
 // 		m_currentScene = _scene;
@@ -483,9 +484,9 @@ namespace fan
 		_world.AddSingletonComponentType<RenderWorld>();
 		_world.AddSingletonComponentType<PhysicsWorld>();
 		_world.AddSingletonComponentType<EditorCamera>();
-		_world.AddSingletonComponentType<Scene>();
 
-		_world.AddSingletonComponentType<SunLight>();
+		Scene& scene = _world.AddSingletonComponentType<Scene>();
+		scene.world = &_world; //@hack the scene shoudn't have a reference to the world
 
 		_world.AddComponentType<SceneNode>();
 		_world.AddComponentType<Transform>();
@@ -503,8 +504,6 @@ namespace fan
 		_world.AddComponentType<UITransform>();
 		_world.AddComponentType<UIRenderer>();
 		_world.AddComponentType<Bounds>();
-
-		_world.AddComponentType<Planet>();
 
 		_world.AddTagType<tag_boundsOutdated>();
 		_world.AddTagType<tag_editorOnly>();

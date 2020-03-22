@@ -274,26 +274,28 @@ namespace fan
 	//================================================================================================================================
 	void MainMenuBar::DrawModals()
 	{
+		Scene& scene = m_game->world.GetSingletonComponent<Scene>();
+
 		// New scene
 		if ( ImGui::FanSaveFileModal( "New scene", RenderGlobal::s_sceneExtensions, m_pathBuffer ) )
 		{		
-			m_game->scene.New();
-			m_game->scene.path = m_pathBuffer.string();
+			scene.New();
+			scene.path = m_pathBuffer.string();
 		}
 
 		// Open scenes
 		if ( ImGui::FanLoadFileModal( "Open scene", m_sceneExtensionFilter, m_pathBuffer ) )
 		{
 			Debug::Get() << Debug::Severity::log << "loading scene: " << m_pathBuffer.string() << Debug::Endl();
-			m_game->scene.LoadFrom( m_pathBuffer.string() );
+			scene.LoadFrom( m_pathBuffer.string() );
 		}
 
 		// Save scene
 		if ( ImGui::FanSaveFileModal( "Save scene", RenderGlobal::s_sceneExtensions, m_pathBuffer ) )
 		{
-			m_game->scene.path = m_pathBuffer.string();
-			Debug::Get() << Debug::Severity::log << "saving scene: " << m_game->scene.path << Debug::Endl();
-			m_game->scene.Save();
+			scene.path = m_pathBuffer.string();
+			Debug::Get() << Debug::Severity::log << "saving scene: " << scene.path << Debug::Endl();
+			scene.Save();
 		}
 	}
 
@@ -330,7 +332,10 @@ namespace fan
 	//================================================================================================================================
 	void MainMenuBar::Reload()
 	{
-		if( m_game->scene.path.empty() )
+		Scene& scene = m_game->world.GetSingletonComponent<Scene>();
+
+
+		if( scene.path.empty() )
 		{
 			Debug::Warning( "you cannot reload a scene that is not saved." );
 			return;
@@ -339,7 +344,7 @@ namespace fan
 		if (  m_game->state == Game::STOPPED )
 		{
 			// save old camera transform
-			const EntityID oldCameraID = m_game->world.GetEntityID( m_game->scene.mainCamera->handle );
+			const EntityID oldCameraID = m_game->world.GetEntityID( scene.mainCamera->handle );
 			btTransform oldCameraTransform = m_game->world.GetComponent<Transform>( oldCameraID ).transform;
 
 			// save old selection
@@ -347,13 +352,13 @@ namespace fan
 			const uint32_t prevSelectionID = prevSelectionNode != nullptr ? prevSelectionNode->uniqueID : 0;
 
 
-			Debug::Get() << Debug::Severity::log << "loading scene: " << m_game->scene.path << Debug::Endl();
-			m_game->scene.LoadFrom( m_game->scene.path );
+			Debug::Get() << Debug::Severity::log << "loading scene: " << scene.path << Debug::Endl();
+			scene.LoadFrom( scene.path );
 			
 
 
 			// restore camera
-			const EntityID newCameraID = m_game->world.GetEntityID( m_game->scene.mainCamera->handle );
+			const EntityID newCameraID = m_game->world.GetEntityID( scene.mainCamera->handle );
 			m_game->world.GetComponent<Transform>( newCameraID ).transform = oldCameraTransform;
 
 			// restore selection
@@ -373,16 +378,18 @@ namespace fan
 	//================================================================================================================================
 	void MainMenuBar::Save()
 	{
+		Scene& scene = m_game->world.GetSingletonComponent<Scene>();
+
 		if( m_game->state != Game::STOPPED )
 		{
 			Debug::Warning() << "saving is disabled in play mode" << Debug::Endl();
 			return;
 		}
 
-		if ( !m_game->scene.path.empty() )
+		if ( ! scene.path.empty() )
 		{
-			Debug::Get() << Debug::Severity::log << "saving scene: " << m_game->scene.path << Debug::Endl();
-			m_game->scene.Save();
+			Debug::Get() << Debug::Severity::log << "saving scene: " << scene.path << Debug::Endl();
+			scene.Save();
 		}
 		else
 		{

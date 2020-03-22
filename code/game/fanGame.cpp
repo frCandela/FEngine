@@ -9,21 +9,22 @@
 #include "scene/systems/fanEmitParticles.hpp"
 #include "scene/systems/fanGenerateParticles.hpp"
 #include "scene/systems/fanUpdateBounds.hpp"
-#include "game/systems/fanUpdatePlanets.hpp"
 #include "scene/components/fanSceneNode.hpp"
 #include "scene/singletonComponents/fanScene.hpp"
-
+#include "game/singletonComponents/fanSunLight.hpp"
+#include "game/systems/fanUpdatePlanets.hpp"
+#include "game/components/fanPlanet.hpp"
 
 namespace fan
 {
 	//================================================================================================================================
 	//================================================================================================================================
-	Game::Game( const std::string _name, void ( *_initializeTypesEcsWorld )( EcsWorld& ) ) :
+	Game::Game( const std::string _name ) :
 		  name( _name )
-		, world( _initializeTypesEcsWorld )
-		, scene( world.GetSingletonComponent<Scene>() )
+		, world()
 	{
-		scene.world = &world;
+		world.AddSingletonComponentType<SunLight>();
+		world.AddComponentType<Planet>();
 	}
 
 	//================================================================================================================================
@@ -138,7 +139,7 @@ namespace fan
 
 		{
 			SCOPED_PROFILE( scene_endFrame );
-
+			Scene& scene = world.GetSingletonComponent<Scene>();
 			// deletes scene nodes
 			scene.DeleteNodesImmediate( scene.sceneNodesToDelete );
 			scene.sceneNodesToDelete.clear();

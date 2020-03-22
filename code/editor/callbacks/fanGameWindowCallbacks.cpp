@@ -32,20 +32,20 @@ namespace fan
 	//================================================================================================================================
 	//================================================================================================================================
 	void EditorGameWindowCallbacks::OnGamePlay() { 
-		if( m_game.scene.path.empty() )
+		Scene& scene = m_game.world.GetSingletonComponent<Scene>();
+
+		if( scene.path.empty() )
 		{
 			Debug::Warning() << "please save the scene before playing" << Debug::Endl();
 			return;
 		}
 
-
 		assert( m_game.state == Game::STOPPED );
-		m_game.scene.Save();
+		scene.Save();
 		m_game.Play(); 
 	}
 	void EditorGameWindowCallbacks::OnGamePause() { m_game.Pause(); }
 	void EditorGameWindowCallbacks::OnGameResume() { m_game.Resume();}
-	void EditorGameWindowCallbacks::OnGameStep() { m_game.Step( Time::Get().GetLogicDelta() );}
 
 	//================================================================================================================================
 	//================================================================================================================================
@@ -60,14 +60,16 @@ namespace fan
 	//================================================================================================================================
 	void EditorGameWindowCallbacks::OnGameStop()
 	{
+		Scene& scene = m_game.world.GetSingletonComponent<Scene>();
+
 		// Saves the camera position for restoring it later
-		const EntityID oldCameraID = m_game.world.GetEntityID( m_game.scene.mainCamera->handle );
+		const EntityID oldCameraID = m_game.world.GetEntityID( scene.mainCamera->handle );
 		const btTransform oldCameraTransform = m_game.world.GetComponent<Transform>( oldCameraID ).transform;
 
 		m_game.Stop(); 
-		m_game.scene.LoadFrom( m_game.scene.path ); // reload
+		scene.LoadFrom( scene.path ); // reload
 
-		const EntityID newCameraID = m_game.world.GetEntityID( m_game.scene.mainCamera->handle );
+		const EntityID newCameraID = m_game.world.GetEntityID( scene.mainCamera->handle );
 		m_game.world.GetComponent<Transform>( newCameraID ).transform = oldCameraTransform;
 	}
 }

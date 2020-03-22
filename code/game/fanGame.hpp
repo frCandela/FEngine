@@ -3,8 +3,8 @@
 #include "scene/fanScenePrecompiled.hpp"
 
 #include "core/fanSignal.hpp"
-#include "game/fanGameSerializable.hpp"
 #include "ecs/fanEcsWorld.hpp"
+#include "game/fanGameSerializable.hpp"
 
 namespace fan
 {
@@ -17,7 +17,7 @@ namespace fan
 	public:
 		enum State { STOPPED, PLAYING, PAUSED };
 
-		Game( const std::string _name, void ( *_initializeTypesEcsWorld )( EcsWorld& ) );
+		Game( const std::string _name );
 		~Game();
 
 		void Play();
@@ -31,6 +31,5 @@ namespace fan
 		std::string	name;
 		State		state = State::STOPPED;		
 		EcsWorld    world;
-		Scene&		scene;
 	};
 }

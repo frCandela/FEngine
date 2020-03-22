@@ -17,7 +17,7 @@ namespace fan {
 	class EcsWorld
 	{
 	public:
-		EcsWorld( void ( *initializeTypes )( EcsWorld& ) );
+		EcsWorld();
 		~EcsWorld();
 
 		template< typename _componentType >	bool			HasComponent( const EntityID _entityID );
@@ -51,7 +51,7 @@ namespace fan {
 		// add types
 		template< typename _componentType >	void AddComponentType();
 		template< typename _tagType >		void AddTagType();
-		template< typename _componentType >	void AddSingletonComponentType();
+		template< typename _componentType >	_componentType& AddSingletonComponentType();
 
 		// const accessors
 		const std::unordered_map< uint32_t, ComponentIndex >&   GetDynamicIndices() const { return m_typeIndices; }
@@ -198,11 +198,12 @@ namespace fan {
 
 	//==============================================================================================================================================================
 	//==============================================================================================================================================================
-	template< typename _componentType >	void EcsWorld::AddSingletonComponentType()
+	template< typename _componentType >	_componentType& EcsWorld::AddSingletonComponentType()
 	{
 		static_assert( std::is_base_of< SingletonComponent, _componentType>::value );
 		assert( m_singletonComponents.find( _componentType::s_typeInfo ) == m_singletonComponents.end() );
 		_componentType * component = new _componentType();
 		m_singletonComponents[_componentType::s_typeInfo] = component;
+		return *component;
 	}
 }
