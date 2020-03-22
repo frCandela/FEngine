@@ -11,6 +11,8 @@
 #include "core/time/fanTime.hpp"
 #include "game/fanGame.hpp"
 #include "scene/singletonComponents/fanScene.hpp"
+#include "scene/components/fanSceneNode.hpp"
+#include "scene/components/fanTransform.hpp"
 
 namespace fan
 {
@@ -336,13 +338,14 @@ namespace fan
 
 		if (  m_game->state == Game::STOPPED )
 		{
-// 			// Save camera data
-// 			Json cameraData;
-// 			m_scene->GetMainCamera().GetGameobject().Save( cameraData );
-// 
-// 			// save old selection
-// 			Gameobject* prevSelection = m_editorSelection.GetSelectedGameobject();
-// 			const uint64_t id = prevSelection != nullptr ? prevSelection->GetUniqueID() : 0;
+			// save old camera transform
+			const EntityID oldCameraID = m_game->world.GetEntityID( m_game->scene.mainCamera->handle );
+			btTransform oldCameraTransform = m_game->world.GetComponent<Transform>( oldCameraID ).transform;
+
+			// save old selection
+			SceneNode * prevSelectionNode = m_editorSelection.GetSelectedSceneNode();
+			const uint32_t prevSelectionID = prevSelectionNode != nullptr ? prevSelectionNode->uniqueID : 0;
+
 
 			Debug::Get() << Debug::Severity::log << "loading scene: " << m_game->scene.path << Debug::Endl();
 			m_game->scene.LoadFrom( m_game->scene.path );
@@ -350,14 +353,15 @@ namespace fan
 
 
 			// restore camera
-//			m_scene->GetMainCamera().GetGameobject().CopyDataFrom( cameraData );
+			const EntityID newCameraID = m_game->world.GetEntityID( m_game->scene.mainCamera->handle );
+			m_game->world.GetComponent<Transform>( newCameraID ).transform = oldCameraTransform;
 
 			// restore selection
-// 			if ( id != 0 )
-// 			{
-// 				Gameobject* selection = m_scene->FindGameobject( id );
-// 				m_editorSelection.SetSelectedGameobject( selection );
-// 			}
+			if ( prevSelectionID != 0 )
+			{
+// 				SceneNode* selection = m_scene->Find( prevSelectionID ); // @todo repair me
+// 				m_editorSelection.SetSelectedSceneNode( selection );
+			}
 		}
 		else
 		{

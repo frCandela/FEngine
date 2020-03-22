@@ -60,21 +60,6 @@ namespace fan
  		}
  
 		PopupRightClick();
-// 
-// 		// load prefab popup
-// 		if( loadPrefabPopup )
-// 		{
-// 			m_pathBuffer = "content/prefab";
-// 			ImGui::OpenPopup( "Load prefab" );
-// 		}
-// 		if( ImGui::FanLoadFileModal( "Load prefab", RenderGlobal::s_prefabExtensions, m_pathBuffer ) )
-// 		{
-// 			Prefab* prefab = Prefab::s_resourceManager.LoadPrefab( m_pathBuffer.string() );
-// 			if( prefab != nullptr )
-// 			{
-// 				m_scene->CreateGameobject( *prefab, m_lastGameobjectRightClicked );
-// 			}
-// 		}
 	}
 
 	//================================================================================================================================
@@ -148,7 +133,6 @@ namespace fan
 					Rigidbody& rigidbody = world.AddComponent<Rigidbody>( entityID );
 					MotionState& motionState = world.AddComponent<MotionState>( entityID );
 					BoxShape& shape = world.AddComponent<BoxShape>( entityID );
-					rigidbody.SetKinematic();
 					rigidbody.SetMotionState( &motionState.motionState );
 					rigidbody.SetCollisionShape( &shape.boxShape );
 				}
@@ -249,8 +233,15 @@ namespace fan
 		if( exportToPrefabPopup )
 		{
 			m_pathBuffer = "content/prefab";
-			ImGui::OpenPopup( "export_to_prefab" );
-		} ExportToPrefabModal();
+			ImGui::OpenPopup( "export_prefab" );
+		} ExportPrefabModal();
+
+		// load prefab popup
+		if( loadPrefabPopup )
+		{
+			m_pathBuffer = "content/prefab";
+			ImGui::OpenPopup( "import_prefab" );
+		} ImportPrefabModal(); 		
 	}
 
 	//================================================================================================================================
@@ -387,14 +378,28 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void SceneWindow::ExportToPrefabModal()
+	void SceneWindow::ImportPrefabModal()
+	{
+		if( ImGui::FanLoadFileModal( "import_prefab", RenderGlobal::s_prefabExtensions, m_pathBuffer ) )
+		{
+			Prefab* prefab = Prefab::s_resourceManager.LoadPrefab( m_pathBuffer.string() );
+			if( prefab != nullptr )
+			{
+				m_scene->CreatePrefab( *prefab, m_lastSceneNodeRightClicked );
+			}
+		}
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
+	void SceneWindow::ExportPrefabModal()
 	{
 		if( m_lastSceneNodeRightClicked == nullptr )
 		{
 			return;
 		}
 
-		if( ImGui::FanSaveFileModal( "export_to_prefab", RenderGlobal::s_prefabExtensions, m_pathBuffer ) )
+		if( ImGui::FanSaveFileModal( "export_prefab", RenderGlobal::s_prefabExtensions, m_pathBuffer ) )
 		{
 			Debug::Log() << "Exporting prefab to " << m_pathBuffer.string() << Debug::Endl();
 
@@ -402,16 +407,20 @@ namespace fan
 			if( outStream.is_open() )
 			{
 				// Try to update the existing prefab if it exists
-// 				Prefab* prefab = Prefab::s_resourceManager.FindPrefab( m_pathBuffer.string() );
-// 				if( prefab != nullptr )
-// 				{
-// 					prefab->CreateFromGameobject( *m_lastSceneNodeRightClicked );
-// 				}
-// 
-// 				Prefab newprefab;
-// 				newprefab.CreateFromGameobject( *m_lastSceneNodeRightClicked );
-// 				outStream << newprefab.GetJson();
+				Prefab* prefab = Prefab::s_resourceManager.FindPrefab( m_pathBuffer.string() );
+				if( prefab != nullptr )
+				{
+					prefab->CreateFromSceneNode( *m_lastSceneNodeRightClicked );
+					outStream << prefab->GetJson();
+				}
+				else
+				{
+					Prefab newprefab;
+					newprefab.CreateFromSceneNode( *m_lastSceneNodeRightClicked );
+					outStream << newprefab.GetJson();
+				}
 
+				
 				outStream.close();
 			}
 			else

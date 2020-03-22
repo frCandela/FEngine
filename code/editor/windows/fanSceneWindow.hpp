@@ -37,7 +37,8 @@ namespace fan
 
 		void NewGameobjectModal();
 		void RenameGameobjectModal();
-		void ExportToPrefabModal();
+		void ExportPrefabModal();
+		void ImportPrefabModal();
 		void PopupRightClick();
 
 		void R_DrawSceneTree( SceneNode& _node, SceneNode*& _nodeRightClicked );
