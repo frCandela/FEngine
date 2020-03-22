@@ -19,6 +19,7 @@
 
 #include "game/components/fanPlanet.hpp"
 #include "game/components/fanSpaceShip.hpp"
+#include "game/components/fanPlayerInput.hpp"
 
 namespace fan
 {
@@ -30,6 +31,7 @@ namespace fan
 	{
 		world.AddSingletonComponentType<SunLight>();
 		world.AddComponentType<Planet>();
+		world.AddComponentType<PlayerInput>();
 	}
 
 	//================================================================================================================================

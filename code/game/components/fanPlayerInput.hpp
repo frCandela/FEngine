@@ -2,52 +2,37 @@
 
 #include "game/fanGamePrecompiled.hpp"
 
+#include "ecs/fanComponent.hpp"
 #include "network/packets/fanPacketPlayerInput.hpp"
 
 namespace fan
 {
-
 	//================================================================================================================================
+	// manages the input of the player
+	// this input can be direct in case of a local player or replicated of other players
 	//================================================================================================================================
-	class PlayerInput// : public Component
+	class PlayerInput : public Component
 	{
+		DECLARE_COMPONENT( PlayerInput )
 	public:
+		static void SetInfo( ComponentInfo& _info );
+		static void Init( Component& _component );
+		static void OnGui( Component& _component );
+		static void Save( const Component& _component, Json& _json );
+		static void Load( Component& _component, const Json& _json );
+
 		enum InputType { KEYBOARD_MOUSE, JOYSTICK };
 
-		InputType	GetInputType() const { return m_inputType; }
-		void		SetInputType( const InputType _type );
-		void		SetJoystickID( const int _joystickID ) { m_joystickID = _joystickID; }
-		int			GetJoystickID() const { return m_joystickID; }
+		InputType	inputType;
+		int			joystickID;
+		float		directionCutTreshold;
+		bool		isReplicated;
+		InputData	inputData;
 
-		void			 SetInputData( const InputData _inputData ) { m_inputData = _inputData; }
-		const InputData& GetInputData() const { return m_inputData; }
-		void			 RefreshInput();
-		void			 SetReplicated( const bool _isReplicated ) { m_isReplicated = _isReplicated; }
+		std::vector< glm::vec2 > directionBuffer;
+		btVector3	direction;
 
-
-		void			OnGui() /*override*/;
-		//ImGui::IconType GetIcon() const override { return ImGui::IconType::JOYSTICK16; }
-
-		// ISerializable
-		bool Load( const Json& _json ) /*override*/;
-		bool Save( Json& _json ) const /*override*/;
-
-
-	protected:
-		void OnAttach() /*override*/;
-		void OnDetach() /*override*/;
-
-	private:
-		InputType	m_inputType = KEYBOARD_MOUSE;
-		int			m_joystickID = -1;
-		float		m_directionCutTreshold = 0.25f;
-		bool		m_isReplicated = false;
-
-		InputData	m_inputData;
-
-		std::vector< glm::vec2 > m_directionBuffer;
-		btVector3	m_direction;
-
+		void		RefreshInput();
 		glm::vec2	GetDirectionAverage();
 		btVector3	GetInputDirection();
 		float		GetInputLeft();

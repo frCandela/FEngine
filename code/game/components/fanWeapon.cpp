@@ -50,7 +50,7 @@ namespace fan
 		}
 
 		m_input->RefreshInput();
-		const float fire = m_input->GetInputData().fire;
+		const float fire = m_input->inputData.fire;
 		if ( fire > 0 && m_bulletsAccumulator >= 1.f )
 		{
 			--m_bulletsAccumulator;
