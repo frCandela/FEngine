@@ -14,7 +14,6 @@ namespace fan
 	{
 		DECLARE_COMPONENT( SpaceShip )
 	public:
-		SpaceShip() {}
 		static void SetInfo( ComponentInfo& _info );
 		static void Init( Component& _component );
 		static void OnGui( Component& _component );

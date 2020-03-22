@@ -30,7 +30,9 @@ namespace fan
 		, world()
 	{
 		world.AddSingletonComponentType<SunLight>();
+
 		world.AddComponentType<Planet>();
+		world.AddComponentType<SpaceShip>();
 		world.AddComponentType<PlayerInput>();
 	}
 
@@ -93,11 +95,9 @@ namespace fan
 	//================================================================================================================================
 	void  Game::Step( const float _delta )
 	{
-		SCOPED_PROFILE( scene_update );
 		{
+			SCOPED_PROFILE( scene_update );
 			const float delta = ( state == State::PLAYING ? _delta : 0.f );
-
-			//RUN_SYSTEM( ecsPlanetsSystem, Run );
 
 			// physics
 			PhysicsWorld& physicsWorld = world.GetSingletonComponent<PhysicsWorld>();
@@ -106,6 +106,7 @@ namespace fan
 			S_SynchronizeTransformFromMotionState::Run( world, world.Match( S_SynchronizeTransformFromMotionState::GetSignature( world ) ), delta );
 
 			// update
+			S_UpdateSpaceships::Run( world, world.Match( S_UpdateSpaceships::GetSignature( world ) ), delta );
 			S_UpdateParticles::Run( world, world.Match( S_UpdateParticles::GetSignature( world ) ), delta );
 			S_EmitParticles::Run( world, world.Match( S_EmitParticles::GetSignature( world ) ), delta );
 
