@@ -10,12 +10,16 @@
 #include "scene/systems/fanGenerateParticles.hpp"
 #include "scene/systems/fanUpdateBounds.hpp"
 #include "scene/components/fanSceneNode.hpp"
+#include "scene/components/fanTransform.hpp"
+#include "scene/components/fanCamera.hpp"
 #include "scene/singletonComponents/fanScene.hpp"
 
 #include "game/singletonComponents/fanSunLight.hpp"
+#include "game/singletonComponents/fanGameCamera.hpp"
 
 #include "game/systems/fanUpdatePlanets.hpp"
 #include "game/systems/fanUpdateSpaceships.hpp"
+#include "game/systems/fanUpdateGameCamera.hpp"
 
 #include "game/components/fanPlanet.hpp"
 #include "game/components/fanSpaceShip.hpp"
@@ -30,6 +34,7 @@ namespace fan
 		, world()
 	{
 		world.AddSingletonComponentType<SunLight>();
+		world.AddSingletonComponentType<GameCamera>();
 
 		world.AddComponentType<Planet>();
 		world.AddComponentType<SpaceShip>();
@@ -44,15 +49,15 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void Game::Play()
+	void Game::Start()
 	{
-		// unregister / register rigidbodies		
-		S_RegisterAllRigidbodies::Run( world, world.Match( S_RegisterAllRigidbodies::GetSignature( world ) ) );
-
 		if( state == State::STOPPED )
 		{
 			Debug::Highlight() << name << ": play" << Debug::Endl();
+			
 			state = State::PLAYING;
+			S_RegisterAllRigidbodies::Run( world, world.Match( S_RegisterAllRigidbodies::GetSignature( world ) ) );
+			GameCamera::CreateGameCamera( world );
 		}
 	}
 
@@ -62,10 +67,11 @@ namespace fan
 	{
 		if( state == State::PLAYING || state == State::PAUSED )
 		{
-			S_UnregisterAllRigidbodies::Run( world, world.Match( S_UnregisterAllRigidbodies::GetSignature( world ) ) );
 			Debug::Highlight() << name << ": stopped" << Debug::Endl();
+			
 			state = State::STOPPED;
-			onStop.Emmit( *this );
+			S_UnregisterAllRigidbodies::Run( world, world.Match( S_UnregisterAllRigidbodies::GetSignature( world ) ) );
+			GameCamera::DeleteGameCamera( world );
 		}
 	}
 
@@ -121,6 +127,8 @@ namespace fan
 			//RUN_SYSTEM( ecsUpdateBullet, Run );			
 			S_UpdateBoundsFromModel::Run( world, world.Match( S_UpdateBoundsFromModel::GetSignature( world ) ), delta );
 			S_UpdateBoundsFromTransform::Run( world, world.Match( S_UpdateBoundsFromTransform::GetSignature( world ) ), delta );
+
+			S_UpdateGameCamera::Run( world, world.Match( S_UpdateGameCamera::GetSignature( world ) ), delta );
 		}
 
 		{
