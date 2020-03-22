@@ -46,6 +46,18 @@ namespace fan
 	void EditorGameWindowCallbacks::OnGamePause() { m_game.Pause(); }
 	void EditorGameWindowCallbacks::OnGameResume() { m_game.Resume();}
 	void EditorGameWindowCallbacks::OnGameStep() { m_game.Step( Time::Get().GetLogicDelta() );}
+
+	//================================================================================================================================
+	//================================================================================================================================
+	void EditorGameWindowCallbacks::OnGameStep()
+	{ 
+		m_game.Resume();
+		m_game.Step( Time::Get().GetLogicDelta() );
+		m_game.Pause();
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
 	void EditorGameWindowCallbacks::OnGameStop()
 	{
 		// Saves the camera position for restoring it later
