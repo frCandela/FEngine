@@ -5,22 +5,32 @@
 
 namespace fan
 {
-	REGISTER_SINGLETON_COMPONENT( EditorGrid, "editor_grid" );
+	REGISTER_SINGLETON_COMPONENT( EditorGrid );
 
 	//================================================================================================================================
 	//================================================================================================================================
-	EditorGrid::EditorGrid() :
-		  isVisible ( true )
-		, color		( Color( 0.161f, 0.290f, 0.8f, 0.478f ) )
-		, linesCount( 10 )
-		, spacing	( 1.f )
-		, offset	( btVector3::Zero() )
+	void EditorGrid::SetInfo( SingletonComponentInfo& _info )
 	{
-		SerializedValues::Get().GetBool( "editor_grid_show", isVisible );
-		SerializedValues::Get().GetColor( "editor_grid_color", color );
-		SerializedValues::Get().GetInt( "editor_grid_linesCount", linesCount );
-		SerializedValues::Get().GetFloat( "editor_grid_spacing", spacing );
-		SerializedValues::Get().GetVec3( "editor_grid_offset", offset );
+		_info.icon = ImGui::NONE;
+		_info.init = &EditorGrid::Init;
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
+	void EditorGrid::Init( SingletonComponent& _component )
+	{
+		EditorGrid& editorGrid = static_cast<EditorGrid&>( _component );
+		editorGrid.offset = btVector3::Zero();
+		editorGrid.color = Color( 0.161f, 0.290f, 0.8f, 0.478f );
+		editorGrid.spacing = 1.f;
+		editorGrid.linesCount = 10;
+		editorGrid.isVisible = true;
+
+		SerializedValues::Get().GetBool( "editor_grid_show", editorGrid.isVisible );
+		SerializedValues::Get().GetColor( "editor_grid_color", editorGrid.color );
+		SerializedValues::Get().GetInt( "editor_grid_linesCount", editorGrid.linesCount );
+		SerializedValues::Get().GetFloat( "editor_grid_spacing", editorGrid.spacing );
+		SerializedValues::Get().GetVec3( "editor_grid_offset", editorGrid.offset );
 	}
 
 	//================================================================================================================================

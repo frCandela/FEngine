@@ -234,9 +234,8 @@ namespace fan
 	void EcsWorld::GetVectorComponentInfo( std::vector< const ComponentInfo*>& _outVector ) const
 	{
 		_outVector.clear();
-		for( auto& pair : m_componentInfo )
+		for( const ComponentInfo& info : m_componentInfo )
 		{
-			const ComponentInfo& info = pair.second;
 			if( info.editorPath != nullptr )
 			{
 				_outVector.push_back( &info );

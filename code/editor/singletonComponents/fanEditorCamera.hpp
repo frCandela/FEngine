@@ -18,6 +18,9 @@ namespace fan
 	{
 		DECLARE_SINGLETON_COMPONENT()
 	public:
+		static void SetInfo( SingletonComponentInfo& _info );
+		static void Init( SingletonComponent& _component );
+
 		SceneNode* cameraNode;
 		Transform* transform;
 		Camera* camera;

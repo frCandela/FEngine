@@ -4,26 +4,7 @@
 #include "core/fanHash.hpp"
 #include "fanEcsTypes.hpp"
 
-
-// TO MIGRATE LATER
-// 	//================================
-// 	struct ecsPlanet : ecsIComponent
-// 	{
-// 		static const char* s_name;
-// 		void Init()
-// 		{
-// 			time = 0.f;
-// 			speed = 1.f;
-// 			radius = 1.f;
-// 			phase = 0.f;
-// 		}
-// 		void Clear(){}
-// 
-// 		float time = 0.f;
-// 		float speed = 1.f;
-// 		float radius = 1.f;
-// 		float phase = 0.f;
-// 	};	//================================
+//================================
 // 	struct ecsBullet : ecsIComponent
 // 	{
 // 		static const char* s_name;
@@ -37,10 +18,6 @@
 // 		float durationLeft = 1.f;
 // 		float damage = 5.f;
 // 	};
-
-
-
-
 
 
 namespace fan
@@ -89,8 +66,7 @@ namespace fan
 	//==============================================================================================================================================================
 	// function pointers :
 	// onGui		: draws ui associated with the component
-	// attach		: clears the component value and registers it when necessary
-	// detach		: unregister the component when necessary	(optional)
+	// init			: clears the component value 
 	// save			: serializes the component to json
 	// load			: deserializes the component from json
 	// instanciate  : don't touch it, it's auto generated

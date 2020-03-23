@@ -12,7 +12,29 @@
 
 namespace fan
 {
-	REGISTER_SINGLETON_COMPONENT( EditorCamera, "editor_camera" );
+	REGISTER_SINGLETON_COMPONENT( EditorCamera );
+
+	//================================================================================================================================
+	//================================================================================================================================
+	void EditorCamera::SetInfo( SingletonComponentInfo& _info )
+	{
+		_info.icon = ImGui::CAMERA16;
+		_info.init = &EditorCamera::Init;
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
+	void EditorCamera::Init( SingletonComponent& _component )
+	{
+		EditorCamera& editorCamera = static_cast<EditorCamera&>( _component );
+
+		editorCamera.cameraNode = nullptr;
+		editorCamera.transform = nullptr;
+		editorCamera.camera = nullptr;
+		editorCamera.speed = 10.f;
+		editorCamera.speedMultiplier = 3.f;
+		editorCamera.xySensitivity = btVector2( 0.005f, 0.005f );
+	}
 
 	//================================================================================================================================
 	// updates the editor camera position & rotation

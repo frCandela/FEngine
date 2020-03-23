@@ -18,7 +18,9 @@ namespace fan
 	{
 		DECLARE_SINGLETON_COMPONENT()
 	public:
-		Scene();
+		static void SetInfo( SingletonComponentInfo& _info );
+		static void Init( SingletonComponent& _component );
+
 		~Scene();
 
 		SceneNode& CreateSceneNode( const std::string _name, SceneNode* const _parentNode, const bool _generateID = true );
@@ -41,8 +43,8 @@ namespace fan
 		Signal< Scene& >		onLoad;
 		Signal< SceneNode* >	onDeleteSceneNode;
 		Signal< SceneNode& >	onSetMainCamera;
-		Signal< EntityID >	onCreateRigidbody;
-		Signal< EntityID >	onDeleteRigidbody;
+		Signal< EntityID >		onCreateRigidbody;
+		Signal< EntityID >		onDeleteRigidbody;
 
 		EcsWorld*					world;
 		std::string					path;		

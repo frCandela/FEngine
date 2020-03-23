@@ -14,7 +14,8 @@ namespace fan
 	{
 		DECLARE_SINGLETON_COMPONENT()
 	public:
-		RenderWorld();
+		static void SetInfo( SingletonComponentInfo& _info );
+		static void Init( SingletonComponent& _component );
 
 		std::vector<DrawMesh>				drawData;
 		std::vector<DrawUIMesh>				uiDrawData;

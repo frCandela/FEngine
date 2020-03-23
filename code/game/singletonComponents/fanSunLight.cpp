@@ -4,19 +4,33 @@
 
 namespace fan
 {
-	REGISTER_SINGLETON_COMPONENT( SunLight, "sun_light" );
+	REGISTER_SINGLETON_COMPONENT( SunLight );
 
 	//================================================================================================================================
 	//================================================================================================================================
-	SunLight::SunLight()
+	void SunLight::SetInfo( SingletonComponentInfo& _info )
 	{
-		subAngle = 45.f;
-		radius = 100.f;
-		debugDraw = false;
+		_info.icon = ImGui::NONE;
+		_info.init = &SunLight::Init;
+	}
 
-		mesh.SetHostVisible( true );
-		mesh.SetOptimizeVertices( false );
-		mesh.SetAutoUpdateHull( false );
+	//================================================================================================================================
+	//================================================================================================================================
+	void SunLight::Init( SingletonComponent& _component )
+	{
+		SunLight& sunLight = static_cast<SunLight&>( _component );
+
+		sunLight.subAngle = 45.f;
+		sunLight.radius = 100.f;
+		sunLight.debugDraw = false;
+
+		if( !sunLight.mesh.GetVertices().empty() )
+		{
+			sunLight.mesh = Mesh();
+		}
+		sunLight.mesh.SetHostVisible( true );
+		sunLight.mesh.SetOptimizeVertices( false );
+		sunLight.mesh.SetAutoUpdateHull( false );
 	}
 
 	//================================================================================================================================

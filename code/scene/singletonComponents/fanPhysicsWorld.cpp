@@ -9,7 +9,30 @@
 
 namespace fan
 {
-	REGISTER_SINGLETON_COMPONENT( PhysicsWorld, "physics_world" );
+	REGISTER_SINGLETON_COMPONENT( PhysicsWorld );
+
+	//================================================================================================================================
+	//================================================================================================================================
+	void PhysicsWorld::SetInfo( SingletonComponentInfo& _info )
+	{
+		_info.icon = ImGui::RIGIDBODY16;
+		_info.init = &PhysicsWorld::Init;
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
+	void PhysicsWorld::Init( SingletonComponent& _component )
+	{
+		PhysicsWorld& physicsWorld = static_cast<PhysicsWorld&>( _component );
+		
+		// remove all collision objects
+		for( int i = physicsWorld.dynamicsWorld->getNumCollisionObjects() - 1; i >= 0; i-- )
+		{
+			btCollisionObject* obj = physicsWorld.dynamicsWorld->getCollisionObjectArray()[i];
+			physicsWorld.dynamicsWorld->removeCollisionObject( obj );
+		}
+		physicsWorld.dynamicsWorld->setGravity( btVector3::Zero() );
+	}
 
 	//================================================================================================================================
 	//================================================================================================================================	
@@ -24,7 +47,7 @@ namespace fan
 		gContactStartedCallback = ContactStartedCallback;
 		gContactEndedCallback = ContactEndedCallback;
 
-		dynamicsWorld->setGravity( btVector3(0,-10, 0)  /*btVector3::Zero()*/ );
+		dynamicsWorld->setGravity( btVector3::Zero() );
 
 		// Bullet physics is broken when its internal clock is zero, this prevents it from happening when the timestep is exactly equal to the fixed timestep
 		dynamicsWorld->stepSimulation( 0.015f, 1, Time::Get().GetPhysicsDelta() );

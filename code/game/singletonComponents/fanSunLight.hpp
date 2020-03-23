@@ -15,9 +15,10 @@ namespace fan
 	{
 		DECLARE_SINGLETON_COMPONENT()
 	public:
-		SunLight();
+		static void SetInfo( SingletonComponentInfo& _info );
+		static void Init( SingletonComponent& _component );
 
-		Mesh mesh;
+		Mesh  mesh;
 		float subAngle;
 		float radius;
 		bool  debugDraw;

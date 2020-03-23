@@ -15,7 +15,8 @@ namespace fan
 	{
 		DECLARE_SINGLETON_COMPONENT()
 	public:
-		GameCamera();
+		static void SetInfo( SingletonComponentInfo& _info );
+		static void Init( SingletonComponent& _component );
 
 		//ComponentPtr < Camera >		 m_camera;
 		//ComponentPtr<PlayersManager> m_playersManager;

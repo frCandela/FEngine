@@ -3,9 +3,11 @@
 #include "scene/fanScenePrecompiled.hpp"
 
 #include "fanSystem.hpp"
-#include "ecs/fanEntity.hpp"
-#include "fanComponentsCollection.hpp"
 #include "ecs/fanTag.hpp"
+#include "ecs/fanEntity.hpp"
+#include "ecs/fanSingletonComponent.hpp"
+#include "fanComponentsCollection.hpp"
+
 
 namespace fan {
 	struct SingletonComponent;
@@ -30,20 +32,21 @@ namespace fan {
 		template< typename _componentType >	_componentType&	GetSingletonComponent();
 		template< typename _tagOrComponentType > Signature	GetSignature() const;
 
-		Component&		  AddComponent( const EntityID _entityID, const ComponentIndex _index );
-		Component&		  GetComponent( const EntityID _entityID, const ComponentIndex _index );
-		void				  RemoveComponent( const EntityID _entityID, const ComponentIndex _index );
-		bool				  HasComponent( const EntityID _entityID, ComponentIndex _index );
-		const ComponentInfo&  GetComponentInfo( const ComponentIndex _index ) const { return  m_componentInfo.at( _index );	}
-		EntityID			  CreateEntity();
-		void				  KillEntity( const EntityID _entityID );
-		EntityHandle		  CreateHandle( const EntityID _entityID );
-		EntityID			  GetEntityID( const EntityHandle _handle );
-		ComponentIndex		  GetDynamicIndex( const uint32_t _staticIndex ) { return m_typeIndices[_staticIndex]; }
-		void				  SortEntities();
-		void				  RemoveDeadEntities();
-		uint32_t			  GetComponentCount( const EntityID _entityID ) { return m_entities[_entityID].componentCount;  }
-		Component&		  GetComponentAt( const EntityID _entityID, int _componentIndex );
+		Component&			 AddComponent( const EntityID _entityID, const ComponentIndex _index );
+		Component&			 GetComponent( const EntityID _entityID, const ComponentIndex _index );
+		void				 RemoveComponent( const EntityID _entityID, const ComponentIndex _index );
+		bool				 HasComponent( const EntityID _entityID, ComponentIndex _index );
+		const ComponentInfo& GetComponentInfo( const ComponentIndex _index ) const { return  m_componentInfo[ _index ];	}
+		EntityID			 CreateEntity();
+		void				 KillEntity( const EntityID _entityID );
+		EntityHandle		 CreateHandle( const EntityID _entityID );
+		EntityID			 GetEntityID( const EntityHandle _handle );
+		ComponentIndex		 GetDynamicIndex( const uint32_t _staticIndex ) { return m_typeIndices[_staticIndex]; }
+		uint32_t			 GetComponentCount( const EntityID _entityID ) { return m_entities[_entityID].componentCount;  }
+		Component&			 GetComponentAt( const EntityID _entityID, int _componentIndex );
+		
+		void				 SortEntities();
+		void				 RemoveDeadEntities();
 
 		std::vector<EntityID> Match( const Signature _signature );
 		std::vector<EntityID> MatchSubset( const Signature _signature, const std::vector<EntityID>& _subset );
@@ -60,13 +63,14 @@ namespace fan {
 		const std::vector< Entity >&							GetEntities() const				{ return m_entities; }
 		void	GetVectorComponentInfo( std::vector< const ComponentInfo*>& _outVector ) const;
 		size_t	GetNumSingletonComponents() const { return m_singletonComponents.size(); }
-		size_t	GetNumEntities() const { return m_entities.size();  }
+		size_t	GetNumEntities() const { return m_entities.size(); }
 
 	private:
 		std::unordered_map< uint32_t, ComponentIndex >		m_typeIndices;
 		std::unordered_map< EntityHandle, EntityID >		m_handles;
 		std::unordered_map< uint32_t, SingletonComponent* >	m_singletonComponents;
-		std::unordered_map< ComponentIndex, ComponentInfo >	m_componentInfo;	
+		std::vector< ComponentInfo >						m_componentInfo;	
+		std::vector< SingletonComponentInfo >				m_singletonComponentInfo;
 
 		std::vector< Entity >				m_entities;
 		std::vector< ComponentsCollection > m_components;
@@ -78,6 +82,8 @@ namespace fan {
 		Entity& GetEntity( const EntityID _id );
 		bool	EntityMatchSignature( EntityID _entityID, const Signature& _signature );
 	};
+
+
 
 	//==============================================================================================================================================================
 	//==============================================================================================================================================================
@@ -164,15 +170,19 @@ namespace fan {
 	}
 
 	//==============================================================================================================================================================
+	// creates a component type and adds it to the ecs world
 	//==============================================================================================================================================================
 	template< typename _componentType >	void EcsWorld::AddComponentType()
 	{
 		static_assert( std::is_base_of< Component, _componentType>::value );
 		assert( m_nextTagIndex >= m_nextTypeIndex );
 
+		// creates collection
 		m_components.push_back( ComponentsCollection() );
 		ComponentsCollection& collection = m_components[m_components.size() - 1];
 		collection.Init<_componentType>( _componentType::s_typeName );
+		
+		// generate dynamic index
 		const ComponentIndex index = m_nextTypeIndex++;
 		m_typeIndices[_componentType::s_typeInfo] = index;
 
@@ -184,10 +194,11 @@ namespace fan {
 		info.instanciate = &_componentType::Instanciate;
 		info.index = index;	
 		info.staticIndex = _componentType::s_typeInfo;
-		m_componentInfo[index] = info;		
+		m_componentInfo.push_back( info );		
 	}
 
 	//==============================================================================================================================================================
+	// creates a tag type and adds it to the ecs world
 	//==============================================================================================================================================================
 	template< typename _tagType > void EcsWorld::AddTagType()
 	{
@@ -197,13 +208,24 @@ namespace fan {
 	}
 
 	//==============================================================================================================================================================
+	// creates a singleton component type and adds it to the ecs world
 	//==============================================================================================================================================================
 	template< typename _componentType >	_componentType& EcsWorld::AddSingletonComponentType()
 	{
 		static_assert( std::is_base_of< SingletonComponent, _componentType>::value );
 		assert( m_singletonComponents.find( _componentType::s_typeInfo ) == m_singletonComponents.end() );
+		
+		// creates the singleton component
 		_componentType * component = new _componentType();
 		m_singletonComponents[_componentType::s_typeInfo] = component;
+
+		// Registers component info
+		SingletonComponentInfo info;
+		_componentType::SetInfo( info );
+		assert( info.init != nullptr );
+		m_singletonComponentInfo.push_back( info );
+		info.init( *component );
+
 		return *component;
 	}
 }

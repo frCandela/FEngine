@@ -9,15 +9,24 @@
 
 namespace fan
 {
-	REGISTER_SINGLETON_COMPONENT( GameCamera, "game_camera" );
+	REGISTER_SINGLETON_COMPONENT( GameCamera );
 
 	//================================================================================================================================
 	//================================================================================================================================
-	GameCamera::GameCamera() :
-		  heightFromTarget( 30.f )
-		, marginRatio( btVector2( 1.f, 1.f ) )
-		, minOrthoSize( 15.f )
+	void GameCamera::SetInfo( SingletonComponentInfo& _info )
 	{
+		_info.icon = ImGui::CAMERA16;
+		_info.init = &GameCamera::Init;
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
+	void GameCamera::Init( SingletonComponent& _component )
+	{
+		GameCamera& gameCamera = static_cast<GameCamera&>( _component );
+		gameCamera.heightFromTarget = 30.f;
+		gameCamera.marginRatio = btVector2( 1.f, 1.f );
+		gameCamera.minOrthoSize = 15.f;
 	}
 
 	//================================================================================================================================

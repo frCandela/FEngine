@@ -13,8 +13,8 @@ namespace fan
 	{
 		DECLARE_SINGLETON_COMPONENT()
 	public:
-
-		EditorGrid();
+		static void SetInfo( SingletonComponentInfo& _info );
+		static void Init( SingletonComponent& _component );
 
 		btVector3	offset;
 		Color		color;
