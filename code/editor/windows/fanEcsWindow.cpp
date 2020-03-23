@@ -146,12 +146,6 @@ namespace fan
 		}
 
 		//============================	
-		if( ImGui::CollapsingHeader( "singleton components" ) )
-		{
-			ImGui::Text( "num components: %d", world.GetNumSingletonComponents() );
-		}
-
-		//============================	
 		if( ImGui::CollapsingHeader( "handles" ) )
 		{
 			for( const std::pair< EntityHandle, EntityID > handle : world.GetHandles() )

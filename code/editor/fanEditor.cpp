@@ -22,6 +22,7 @@
 #include "core/input/fanInput.hpp"
 #include "core/time/fanTime.hpp"
 #include "editor/windows/fanPreferencesWindow.hpp"	
+#include "editor/windows/fanSingletonsWindow.hpp"
 #include "editor/windows/fanInspectorWindow.hpp"	
 #include "editor/windows/fanProfilerWindow.hpp"	
 #include "editor/windows/fanConsoleWindow.hpp"	
@@ -29,7 +30,7 @@
 #include "editor/windows/fanRenderWindow.hpp"	
 #include "editor/windows/fanSceneWindow.hpp"	
 #include "editor/windows/fanGameWindow.hpp"
-#include "editor/windows/fanEcsWindow.hpp"	
+#include "editor/windows/fanEcsWindow.hpp"
 #include "editor/fanEditorSelection.hpp"
 #include "editor/fanEditorCopyPaste.hpp"
 #include "editor/fanEditorGizmos.hpp"
@@ -72,12 +73,12 @@ namespace fan
 	//================================================================================================================================
 	//================================================================================================================================
 	Engine::Engine() :
-		 m_game( "game")
+		 m_game( new Game("game"))
 		,m_applicationShouldExit( false )
 		,m_editorWorld()
 	{
 		Engine::InitializeEditorEcsWorldTypes( m_editorWorld);
-		Engine::InitializeGameEcsWorldTypes( m_game.world );
+		Engine::InitializeGameEcsWorldTypes( m_game->world );
 
 		// Get serialized editor values
 		VkExtent2D windowSize = { 1280,720 };
@@ -136,7 +137,7 @@ namespace fan
 			m_renderer->SetClearColor( clearColor.ToGLM() );
 		}
 
-		Scene& scene = m_game.world.GetSingletonComponent<Scene>();
+		Scene& scene = m_game->world.GetSingletonComponent<Scene>();
 
 		// Initialize editor components		
 		m_selection = new EditorSelection( scene );
@@ -148,10 +149,11 @@ namespace fan
 		m_consoleWindow = new ConsoleWindow();
 		m_ecsWindow = new EcsWindow( *scene.world );
 		m_profilerWindow = new ProfilerWindow();
-		m_gameWindow = new GameWindow( m_game );
+		m_gameWindow = new GameWindow( *m_game );
 		m_preferencesWindow = new PreferencesWindow();
 		m_networkWindow = new NetworkWindow( scene );
-		m_mainMenuBar = new MainMenuBar( m_game, *m_selection );
+		m_singletonsWindow = new SingletonsWindow( m_game->world );
+		m_mainMenuBar = new MainMenuBar( *m_game, *m_selection );
 
 		RendererDebug::Init( &m_renderer->GetRendererDebug() );
 		EditorGizmos::Init( m_gizmos );
@@ -165,7 +167,19 @@ namespace fan
 		m_preferencesWindow->SetRenderer( m_renderer );
 		m_mainMenuBar->SetGrid( &grid );
 
-		m_mainMenuBar->SetWindows( { m_renderWindow , m_sceneWindow , m_inspectorWindow , m_consoleWindow, m_ecsWindow, m_profilerWindow, m_gameWindow, m_networkWindow, m_preferencesWindow } );
+		m_mainMenuBar->SetWindows( { 
+			  m_renderWindow
+			, m_sceneWindow
+			, m_inspectorWindow
+			, m_consoleWindow
+			, m_ecsWindow
+			, m_singletonsWindow
+			, m_profilerWindow
+			, m_gameWindow
+			, m_networkWindow
+			, m_preferencesWindow 
+		} );
+
 		m_sceneWindow->onSelectSceneNode.Connect( &EditorSelection::SetSelectedSceneNode, m_selection );
 
 		// Instance messages				
@@ -220,8 +234,8 @@ namespace fan
 		SerializedValues::Get().SetInt( "renderer_position_y", windowPosition.y );
 		SerializedValues::Get().SaveValuesToDisk();
 
+		delete m_game;
 		Prefab::s_resourceManager.Clear();
-
 		delete m_renderer;
 		delete m_window;
 	}
@@ -265,7 +279,7 @@ namespace fan
 				}
 
 				// update
-				std::vector< Game* > games = { &m_game };
+				std::vector< Game* > games = { m_game };
 				for( Game* game : games )
 				{
 					game->Step( targetLogicDelta );
@@ -286,7 +300,7 @@ namespace fan
 						SCOPED_PROFILE( debug_draw );
 						EditorGrid::Draw( m_editorWorld.GetSingletonComponent<EditorGrid>() );
 
-						EcsWorld& world = m_game.world;
+						EcsWorld& world = m_game->world;
 						if( m_mainMenuBar->ShowWireframe() )
 						{
 							const Signature signatureDrawDebugWireframe = S_DrawDebugWireframe::GetSignature( world );
@@ -348,7 +362,7 @@ namespace fan
 	//================================================================================================================================
 	void Engine::OnGamePlay()
 	{
-		Scene& scene = m_game.world.GetSingletonComponent<Scene>();
+		Scene& scene = m_game->world.GetSingletonComponent<Scene>();
 
 		if( scene.path.empty() )
 		{
@@ -356,9 +370,9 @@ namespace fan
 			return;
 		}
 
-		assert( m_game.state == Game::STOPPED );
+		assert( m_game->state == Game::STOPPED );
 		scene.Save();
-		m_game.Start();
+		m_game->Start();
 
 		UseGameCamera();
 	}
@@ -369,29 +383,29 @@ namespace fan
 	{
 		UseEditorCamera();
 
-		Scene& scene = m_game.world.GetSingletonComponent<Scene>();
+		Scene& scene = m_game->world.GetSingletonComponent<Scene>();
 
 		// Saves the camera position for restoring it later
-		const EntityID oldCameraID = m_game.world.GetEntityID( scene.mainCamera->handle );
-		const btTransform oldCameraTransform = m_game.world.GetComponent<Transform>( oldCameraID ).transform;
+		const EntityID oldCameraID = m_game->world.GetEntityID( scene.mainCamera->handle );
+		const btTransform oldCameraTransform = m_game->world.GetComponent<Transform>( oldCameraID ).transform;
 
-		m_game.Stop();
+		m_game->Stop();
 		scene.LoadFrom( scene.path ); // reload
 
-		const EntityID newCameraID = m_game.world.GetEntityID( scene.mainCamera->handle );
-		m_game.world.GetComponent<Transform>( newCameraID ).transform = oldCameraTransform;
+		const EntityID newCameraID = m_game->world.GetEntityID( scene.mainCamera->handle );
+		m_game->world.GetComponent<Transform>( newCameraID ).transform = oldCameraTransform;
 	}
 
-	void Engine::OnGamePause() { m_game.Pause(); }
-	void Engine::OnGameResume() { m_game.Resume(); }
+	void Engine::OnGamePause() { m_game->Pause(); }
+	void Engine::OnGameResume() { m_game->Resume(); }
 
 	//================================================================================================================================
 	//================================================================================================================================
 	void Engine::OnGameStep()
 	{
-		m_game.Resume();
-		m_game.Step( Time::Get().GetLogicDelta() );
-		m_game.Pause();
+		m_game->Resume();
+		m_game->Step( Time::Get().GetLogicDelta() );
+		m_game->Pause();
 	}
 
 	//================================================================================================================================
@@ -400,7 +414,7 @@ namespace fan
 	void Engine::OnSceneLoad( Scene& _scene )
 	{
 		m_selection->Deselect();
-		EditorCamera::CreateEditorCamera( m_game.world );
+		EditorCamera::CreateEditorCamera( m_game->world );
 	}
 
 	//================================================================================================================================
@@ -408,7 +422,7 @@ namespace fan
 	//================================================================================================================================
 	void Engine::UpdateRenderWorld()
 	{
-		EcsWorld& world = m_game.world;
+		EcsWorld& world = m_game->world;
 		RenderWorld& renderWorld = world.GetSingletonComponent<RenderWorld>();		
 		renderWorld.targetSize = glm::vec2( m_gameWindow->GetSize().x(), m_gameWindow->GetSize().y() );
 
@@ -455,7 +469,7 @@ namespace fan
 	//================================================================================================================================
 	void Engine::SwitchPlayStop()
 	{
-		if ( m_game.state == Game::STOPPED )
+		if ( m_game->state == Game::STOPPED )
 		{
 			OnGamePlay();
 		}
@@ -469,8 +483,8 @@ namespace fan
 	//================================================================================================================================
 	void Engine::UseEditorCamera()
 	{
-		Scene& scene = m_game.world.GetSingletonComponent<Scene>();
-		EditorCamera& editorCamera = m_game.world.GetSingletonComponent<EditorCamera>();
+		Scene& scene = m_game->world.GetSingletonComponent<Scene>();
+		EditorCamera& editorCamera = m_game->world.GetSingletonComponent<EditorCamera>();
 		scene.SetMainCamera( *editorCamera.cameraNode );
 	}
 
@@ -478,8 +492,8 @@ namespace fan
 	//================================================================================================================================
 	void Engine::UseGameCamera()
 	{
-		Scene& scene = m_game.world.GetSingletonComponent<Scene>();
-		GameCamera& gameCamera = m_game.world.GetSingletonComponent<GameCamera>();
+		Scene& scene = m_game->world.GetSingletonComponent<Scene>();
+		GameCamera& gameCamera = m_game->world.GetSingletonComponent<GameCamera>();
 		scene.SetMainCamera( *gameCamera.cameraNode );
 	}
 
@@ -488,15 +502,15 @@ namespace fan
 	//================================================================================================================================
 	void Engine::OnToogleCamera()
 	{		
-		if( m_game.state == Game::STOPPED )
+		if( m_game->state == Game::STOPPED )
 		{ 
 			Debug::Warning() << "You cannot toogle camera outside of play mode" << Debug::Endl();
 			return; 
 		}
 
-		Scene& scene = m_game.world.GetSingletonComponent<Scene>();
-		GameCamera& gameCamera = m_game.world.GetSingletonComponent<GameCamera>();
-		EditorCamera& editorCamera = m_game.world.GetSingletonComponent<EditorCamera>();
+		Scene& scene = m_game->world.GetSingletonComponent<Scene>();
+		GameCamera& gameCamera = m_game->world.GetSingletonComponent<GameCamera>();
+		EditorCamera& editorCamera = m_game->world.GetSingletonComponent<EditorCamera>();
 
 		if ( scene.mainCamera == editorCamera.cameraNode )
 		{

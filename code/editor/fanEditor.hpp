@@ -11,6 +11,7 @@ namespace fan
 	class SceneInstantiate;
 	class InspectorWindow;
 	class EditorCopyPaste;
+	class SingletonsWindow;
 	class EditorSelection;
 	class ProfilerWindow;
 	class ConsoleWindow;
@@ -41,12 +42,13 @@ namespace fan
 			   
 	private:
 		EcsWorld m_editorWorld;
-		Game	 m_game;
+		Game*	 m_game;
 
 		// UI elements
 		MainMenuBar* m_mainMenuBar;
 
 		PreferencesWindow* m_preferencesWindow;
+		SingletonsWindow* m_singletonsWindow;
 		InspectorWindow* m_inspectorWindow;
 		ProfilerWindow* m_profilerWindow;
 		NetworkWindow* m_networkWindow;

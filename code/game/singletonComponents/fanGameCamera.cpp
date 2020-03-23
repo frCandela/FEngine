@@ -17,6 +17,8 @@ namespace fan
 	{
 		_info.icon = ImGui::CAMERA16;
 		_info.init = &GameCamera::Init;
+		_info.onGui = &GameCamera::OnGui;
+		_info.name = "game camera";
 	}
 
 	//================================================================================================================================
@@ -27,6 +29,23 @@ namespace fan
 		gameCamera.heightFromTarget = 30.f;
 		gameCamera.marginRatio = btVector2( 1.f, 1.f );
 		gameCamera.minOrthoSize = 15.f;
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
+	void GameCamera::OnGui( SingletonComponent& _component )
+	{
+		GameCamera& gameCamera = static_cast<GameCamera&>( _component );
+
+		ImGui::Indent(); ImGui::Indent();
+		{
+// 			ImGui::FanComponent( "players manager", m_playersManager );
+// 			ImGui::FanComponent( "camera", m_camera );
+			ImGui::DragFloat( "height from target", &gameCamera.heightFromTarget, 0.25f, 0.5f, 30.f );
+			ImGui::DragFloat2( "margin ratio", &gameCamera.marginRatio[0], 0.1f, 0.f, 10.f );
+			ImGui::DragFloat( "minSize", &gameCamera.minOrthoSize, 0.1f, 0.f, 100.f );
+		}
+		ImGui::Unindent(); ImGui::Unindent();
 	}
 
 	//================================================================================================================================
@@ -68,21 +87,6 @@ namespace fan
 // 		REQUIRE_TRUE( *m_playersManager != nullptr, "CameraController: missing reference to the PlayersManager" )
 // 
 // 		m_gameobject->GetScene().SetMainCamera( *m_camera );
-// 	}
-// 
-// 	//================================================================================================================================
-// 	//================================================================================================================================
-// 	void CameraController::OnGui()
-// 	{
-// 		Actor::OnGui();
-// 		ImGui::PushItemWidth( 0.6f * ImGui::GetWindowWidth() );
-// 		{
-// 			ImGui::FanComponent( "players manager", m_playersManager );
-// 			ImGui::FanComponent( "camera", m_camera );
-// 			ImGui::DragFloat( "height from target", &m_heightFromTarget, 0.25f, 0.5f, 30.f );
-// 			ImGui::DragFloat2( "margin ratio", &m_marginRatio[0], 0.1f, 0.f, 10.f );
-// 			ImGui::DragFloat( "minSize", &m_minOrthoSize, 0.1f, 0.f, 100.f );
-// 		}
 // 	}
 // 
 // 

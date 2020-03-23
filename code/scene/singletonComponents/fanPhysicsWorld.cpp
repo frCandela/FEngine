@@ -17,6 +17,8 @@ namespace fan
 	{
 		_info.icon = ImGui::RIGIDBODY16;
 		_info.init = &PhysicsWorld::Init;
+		_info.onGui = &PhysicsWorld::OnGui;
+		_info.name = "physics world";
 	}
 
 	//================================================================================================================================
@@ -32,6 +34,24 @@ namespace fan
 			physicsWorld.dynamicsWorld->removeCollisionObject( obj );
 		}
 		physicsWorld.dynamicsWorld->setGravity( btVector3::Zero() );
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
+	void PhysicsWorld::OnGui( SingletonComponent& _component )
+	{
+		PhysicsWorld& physicsWorld = static_cast<PhysicsWorld&>( _component );
+
+		ImGui::Indent(); ImGui::Indent();
+		{
+			btVector3 gravity = physicsWorld.dynamicsWorld->getGravity();
+			if( ImGui::DragFloat3( "gravity", &gravity[0], 0.1f, -20.f, 20.f ) )
+			{
+				physicsWorld.dynamicsWorld->setGravity( gravity );
+			}
+			ImGui::Text( "num rigidbodies : %d", physicsWorld.dynamicsWorld->getNumCollisionObjects() );
+		}
+		ImGui::Unindent(); ImGui::Unindent();
 	}
 
 	//================================================================================================================================

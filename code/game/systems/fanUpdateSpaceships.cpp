@@ -34,13 +34,12 @@ namespace fan
 			PlayerInput & playerInput = _world.GetComponent<PlayerInput>( entityID );
 
 			// get player input
-			playerInput.RefreshInput();
+			playerInput.RefreshInput( _world, entityID );
 			const btVector3 direction = playerInput.inputData.direction;
 			const bool  stop = playerInput.inputData.stop;
 			const float leftForce = _delta * spaceship.lateralForce * playerInput.inputData.left;
 			const float forwardAxis = stop ? 0.f : _delta * playerInput.inputData.forward;
 			const float boost = playerInput.inputData.boost;
-
 
 			// Orientation
 			if( !direction.isZero() )

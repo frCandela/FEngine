@@ -81,6 +81,13 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
+	SingletonComponent& EcsWorld::GetSingletonComponent( const uint32_t _staticIndex )
+	{
+		return  * m_singletonComponents[_staticIndex];
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
 	void EcsWorld::RemoveComponent( const EntityID _entityID, const ComponentIndex _index )
 	{		
 		Entity& entity = GetEntity( _entityID );
@@ -226,21 +233,6 @@ namespace fan
 		Entity& entity = m_entities[_entityID];
 		assert( _componentIndex < entity.componentCount );
 		return *entity.components[_componentIndex];
-	}
-
-	//================================================================================================================================
-	// Removes the dead entities at the end of the entity vector
-	//================================================================================================================================
-	void EcsWorld::GetVectorComponentInfo( std::vector< const ComponentInfo*>& _outVector ) const
-	{
-		_outVector.clear();
-		for( const ComponentInfo& info : m_componentInfo )
-		{
-			if( info.editorPath != nullptr )
-			{
-				_outVector.push_back( &info );
-			}
-		}
 	}
 
 	//================================================================================================================================

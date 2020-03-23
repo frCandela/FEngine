@@ -17,6 +17,7 @@ namespace fan
 	public:
 		static void SetInfo( SingletonComponentInfo& _info );
 		static void Init( SingletonComponent& _component );
+		static void OnGui( SingletonComponent& _component );
 
 		//ComponentPtr < Camera >		 m_camera;
 		//ComponentPtr<PlayersManager> m_playersManager;

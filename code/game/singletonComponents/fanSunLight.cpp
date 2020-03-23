@@ -1,6 +1,7 @@
 #include "game/singletonComponents/fanSunLight.hpp"
 
 #include "render/fanRendererDebug.hpp"
+#include "game/fanGameSerializable.hpp"
 
 namespace fan
 {
@@ -12,6 +13,8 @@ namespace fan
 	{
 		_info.icon = ImGui::NONE;
 		_info.init = &SunLight::Init;
+		_info.onGui = &SunLight::OnGui;
+		_info.name = "sun light";
 	}
 
 	//================================================================================================================================
@@ -31,6 +34,39 @@ namespace fan
 		sunLight.mesh.SetHostVisible( true );
 		sunLight.mesh.SetOptimizeVertices( false );
 		sunLight.mesh.SetAutoUpdateHull( false );
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
+	void SunLight::OnGui( SingletonComponent& _component )
+	{
+		SunLight& sunLight = static_cast<SunLight&>( _component );
+		
+		ImGui::Indent();ImGui::Indent();
+		{
+			ImGui::DragFloat( "sub angle", &sunLight.subAngle, 1.f, 0.f, 90.f );
+			ImGui::DragFloat( "radius", &sunLight.radius, 1.f, 1.f, 1000.f );
+			ImGui::Checkbox( "debug draw", &sunLight.debugDraw );
+		}
+		ImGui::Unindent(); ImGui::Unindent();
+	}
+	
+	//================================================================================================================================
+	//================================================================================================================================
+	void SunLight::Save( const SingletonComponent& _component, Json& _json )
+	{
+		const SunLight& sunLight = static_cast<const SunLight&>( _component );
+		Serializable::SaveFloat( _json, "sub_angle", sunLight.subAngle );
+		Serializable::SaveFloat( _json, "radius", sunLight.radius );
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
+	void SunLight::Load( SingletonComponent& _component, const Json& _json )
+	{
+		SunLight& sunLight = static_cast<SunLight&>( _component );
+		Serializable::LoadFloat( _json, "sub_angle", sunLight.subAngle );
+		Serializable::LoadFloat( _json, "radius", sunLight.radius );
 	}
 
 	//================================================================================================================================

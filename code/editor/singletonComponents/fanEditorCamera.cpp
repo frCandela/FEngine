@@ -20,6 +20,8 @@ namespace fan
 	{
 		_info.icon = ImGui::CAMERA16;
 		_info.init = &EditorCamera::Init;
+		_info.onGui = &EditorCamera::OnGui;
+		_info.name = "editor camera";
 	}
 
 	//================================================================================================================================
@@ -35,6 +37,22 @@ namespace fan
 		editorCamera.speedMultiplier = 3.f;
 		editorCamera.xySensitivity = btVector2( 0.005f, 0.005f );
 	}
+
+	//================================================================================================================================
+	//================================================================================================================================
+	void EditorCamera::OnGui( SingletonComponent& _component )
+	{
+		EditorCamera& editorCamera = static_cast<EditorCamera&>( _component );
+
+		ImGui::Indent(); ImGui::Indent();
+		{
+			ImGui::DragFloat( "speed", &editorCamera.speed, 1.f, 0.f, 10000.f );
+			ImGui::DragFloat( "speed multiplier", &editorCamera.speedMultiplier, 1.f, 0.f, 10000.f );
+			ImGui::DragFloat2( "xy sensitivity", &editorCamera.xySensitivity[0], 1.f, 0.f, 1.f );
+		}
+		ImGui::Unindent(); ImGui::Unindent();
+	}
+
 
 	//================================================================================================================================
 	// updates the editor camera position & rotation

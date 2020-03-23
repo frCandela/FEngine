@@ -20,6 +20,7 @@ namespace fan
 	public:
 		static void SetInfo( SingletonComponentInfo& _info );
 		static void Init( SingletonComponent& _component );
+		static void OnGui( SingletonComponent& _component );
 
 		SceneNode* cameraNode;
 		Transform* transform;

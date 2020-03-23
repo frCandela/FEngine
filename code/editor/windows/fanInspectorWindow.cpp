@@ -161,11 +161,10 @@ namespace fan
 		if( ImGui::BeginPopup( "new_component" ) )
 		{
 			// Get components and remove components with an empty path
-			std::vector< const ComponentInfo*> components;
-			world.GetVectorComponentInfo( components );			
+			std::vector< ComponentInfo > components = world.GetVectorComponentInfo();			
 			for( int i = (int)components.size() - 1; i >= 0; i-- )
 			{
-				if( std::string( components[i]->editorPath ).empty() )
+				if( std::string( components[i].editorPath ).empty() )
 				{
 					components.erase( components.begin() + i );
 				}
@@ -177,7 +176,7 @@ namespace fan
 			componentsPath.reserve( components.size() );
 			for( int componentIndex = 0; componentIndex < components.size(); componentIndex++ )
 			{
-				componentsPath.push_back(  components[componentIndex]->editorPath );
+				componentsPath.push_back(  components[componentIndex].editorPath );
 			}
 
 			// Sort components paths
@@ -200,7 +199,7 @@ namespace fan
 			{
 				if( componentsPath[componentIndex] == "/" ) 
 				{ 
-					NewComponentItem( *components[componentIndex] ); 
+					NewComponentItem( components[componentIndex] ); 
 				}
 			}
 
@@ -212,7 +211,7 @@ namespace fan
 	// recursively draws all components available to add
 	// called from the NewComponentPopup
 	//================================================================================================================================
-	void InspectorWindow::R_NewComponentPopup( std::set< std::filesystem::path >& _componentsPathSet, std::set< std::filesystem::path >::iterator& _current, const std::vector< const ComponentInfo*>& _components, const std::vector<std::filesystem::path>& _componentsPath )
+	void InspectorWindow::R_NewComponentPopup( std::set< std::filesystem::path >& _componentsPathSet, std::set< std::filesystem::path >::iterator& _current, const std::vector< ComponentInfo >& _components, const std::vector<std::filesystem::path>& _componentsPath )
 	{
 		std::filesystem::path rootPath = *_current;
 
@@ -251,7 +250,7 @@ namespace fan
 			{
 				if( _componentsPath[componentIndex] == rootPath.string() )
 				{
-					NewComponentItem( *_components[componentIndex] );
+					NewComponentItem( _components[componentIndex] );
 				}
 			}
 			ImGui::EndMenu();

@@ -17,6 +17,9 @@ namespace fan
 	public:
 		static void SetInfo( SingletonComponentInfo& _info );
 		static void Init( SingletonComponent& _component );
+		static void OnGui( SingletonComponent& _component );
+		static void Save( const SingletonComponent& _component, Json& _json );
+		static void Load( SingletonComponent& _component, const Json& _json );
 
 		Mesh  mesh;
 		float subAngle;

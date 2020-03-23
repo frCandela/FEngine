@@ -35,13 +35,11 @@ namespace fan
 	{
 		std::string		name;
 		ImGui::IconType icon = ImGui::IconType::NONE;	// editor icon
+		uint32_t		staticIndex = 0;				// static index
+
 		void		 ( *onGui )( SingletonComponent& ) = nullptr;
 		void		 ( *init )( SingletonComponent& ) = nullptr;
 		void		 ( *save )( const SingletonComponent&, Json& ) = nullptr;
-		void		 ( *load )( SingletonComponent&, const Json& ) = nullptr;
-
-	private:
-		friend class EcsWorld;
-		ComponentIndex		 dynamicIndex; // used for fast access in the ecs world
+		void		 ( *load )( SingletonComponent&, const Json& ) = nullptr;		
 	};
 }

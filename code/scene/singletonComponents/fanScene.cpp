@@ -26,7 +26,8 @@ namespace fan
 	void Scene::SetInfo( SingletonComponentInfo& _info )
 	{
 		_info.icon = ImGui::SCENE16;
-		_info.init = &Scene::Init;
+		_info.init = &Scene::Init; 
+		_info.onGui = &Scene::OnGui;
 		_info.name = "scene";
 	}
 
@@ -41,6 +42,19 @@ namespace fan
 		scene.mainCamera = nullptr;
 		scene.sceneNodesToDelete.clear();
 		scene.world = nullptr;
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
+	void Scene::OnGui( SingletonComponent& _component )
+	{
+		Scene& scene = static_cast<Scene&>( _component );
+		ImGui::Indent(); ImGui::Indent();
+		{
+			ImGui::Text( "path: %s", scene.path.c_str() );
+			ImGui::Text( "nextUniqueID: %d", scene.nextUniqueID );
+		}
+		ImGui::Unindent(); ImGui::Unindent();
 	}
 
 	//================================================================================================================================

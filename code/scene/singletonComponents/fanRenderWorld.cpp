@@ -10,6 +10,8 @@ namespace fan
 	{
 		_info.icon = ImGui::RENDERER16;
 		_info.init = &RenderWorld::Init;
+		_info.onGui = &RenderWorld::OnGui;
+		_info.name = "render world";
 	}
 
 	//================================================================================================================================
@@ -29,5 +31,23 @@ namespace fan
 		renderWorld.particlesMesh.SetHostVisible( true );
 		renderWorld.particlesMesh.SetOptimizeVertices( false );
 		renderWorld.particlesMesh.SetAutoUpdateHull( false );
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
+	void RenderWorld::OnGui( SingletonComponent& _component )
+	{
+		RenderWorld& renderWorld = static_cast<RenderWorld&>( _component );
+
+		ImGui::Indent(); ImGui::Indent();
+		{
+			ImGui::Text( "mesh:               %d", renderWorld.drawData.size() );
+			ImGui::Text( "ui mesh:            %d", renderWorld.uiDrawData.size() );
+			ImGui::Text( "pointLights:        %d", renderWorld.pointLights.size() );
+			ImGui::Text( "directionalLights:  %d", renderWorld.directionalLights.size() );
+			ImGui::Text( "particles vertices: %d", renderWorld.particlesMesh.GetVertices().size() );
+			ImGui::Text( "target size:        %d x %d", renderWorld.targetSize.x, renderWorld.targetSize.y );
+		}
+		ImGui::Unindent(); ImGui::Unindent();
 	}
 }

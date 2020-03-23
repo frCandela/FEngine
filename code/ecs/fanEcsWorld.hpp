@@ -34,6 +34,7 @@ namespace fan {
 
 		Component&			 AddComponent( const EntityID _entityID, const ComponentIndex _index );
 		Component&			 GetComponent( const EntityID _entityID, const ComponentIndex _index );
+		SingletonComponent&	 GetSingletonComponent( const uint32_t _staticIndex );
 		void				 RemoveComponent( const EntityID _entityID, const ComponentIndex _index );
 		bool				 HasComponent( const EntityID _entityID, ComponentIndex _index );
 		const ComponentInfo& GetComponentInfo( const ComponentIndex _index ) const { return  m_componentInfo[ _index ];	}
@@ -57,12 +58,12 @@ namespace fan {
 		template< typename _componentType >	_componentType& AddSingletonComponentType();
 
 		// const accessors
-		const std::unordered_map< uint32_t, ComponentIndex >&   GetDynamicIndices() const { return m_typeIndices; }
-		const std::unordered_map< EntityHandle, EntityID >&		GetHandles() const { return m_handles; }
+		const std::unordered_map< uint32_t, ComponentIndex >&   GetDynamicIndices() const		{ return m_typeIndices; }
+		const std::unordered_map< EntityHandle, EntityID >&		GetHandles() const				{ return m_handles; }
 		const std::vector< ComponentsCollection >&				GetComponentCollections() const { return m_components; }
 		const std::vector< Entity >&							GetEntities() const				{ return m_entities; }
-		void	GetVectorComponentInfo( std::vector< const ComponentInfo*>& _outVector ) const;
-		size_t	GetNumSingletonComponents() const { return m_singletonComponents.size(); }
+		const std::vector< ComponentInfo >&						GetVectorComponentInfo() const  { return m_componentInfo;  }
+		const std::vector< SingletonComponentInfo >&			GetVectorSingletonComponentInfo() const { return m_singletonComponentInfo; }
 		size_t	GetNumEntities() const { return m_entities.size(); }
 
 	private:
@@ -158,7 +159,7 @@ namespace fan {
 	template< typename _componentType > _componentType& EcsWorld::GetSingletonComponent()
 	{
 		static_assert( std::is_base_of< SingletonComponent, _componentType>::value );
-		return  *static_cast<_componentType*>( m_singletonComponents[_componentType::s_typeInfo] );
+		return  static_cast<_componentType&>( GetSingletonComponent(_componentType::s_typeInfo) );
 	}
 
 	//==============================================================================================================================================================
@@ -223,8 +224,9 @@ namespace fan {
 		SingletonComponentInfo info;
 		_componentType::SetInfo( info );
 		assert( info.init != nullptr );
-		m_singletonComponentInfo.push_back( info );
 		info.init( *component );
+		info.staticIndex = _componentType::s_typeInfo;
+		m_singletonComponentInfo.push_back( info );
 
 		return *component;
 	}
