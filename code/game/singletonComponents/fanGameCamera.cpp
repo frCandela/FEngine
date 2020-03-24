@@ -84,7 +84,8 @@ namespace fan
 		SceneNode& cameraNode = scene.CreateSceneNode( "game_camera", scene.root );
 		const EntityID cameraID = _world.GetEntityID( cameraNode.handle );
 		
-		_world.AddComponent<Camera>( cameraID );
+		Camera& camera = _world.AddComponent<Camera>( cameraID );
+		camera.type = Camera::ORTHOGONAL;
 
 		Transform& transform = _world.AddComponent<Transform>( cameraID );
 		transform.SetRotationEuler( btVector3( 90.f, 0.f, 0.f ) );
