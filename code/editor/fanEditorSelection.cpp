@@ -12,9 +12,11 @@
 #include "scene/components/fanCamera.hpp"
 #include "scene/singletonComponents/fanScene.hpp"
 #include "scene/systems/fanRaycast.hpp"
+#include "scene/systems/fanDrawDebug.hpp"
 #include "scene/fanSceneTags.hpp"
 #include "render/fanMesh.hpp"
 #include "ecs/fanEcsWorld.hpp"
+
 
 namespace fan
 {
@@ -46,10 +48,7 @@ namespace fan
 	{
 		SCOPED_PROFILE( selection );
 
-		//RunSystem<SceneNode>( 42.f, std::string(" bwa") );
-
-		bool mouseCaptured = false;
-		
+		bool mouseCaptured = false;		
 
 		// translation gizmo on selected scene node
 		if ( m_selectedSceneNode != nullptr && m_selectedSceneNode != m_currentScene->mainCamera )
@@ -103,6 +102,17 @@ namespace fan
 				SetSelectedSceneNode( nullptr );
 			}
  		}
+
+		// draw collision shapes, lights
+		if( m_selectedSceneNode != nullptr )
+		{
+			EcsWorld& world = *m_selectedSceneNode->scene->world;
+			EntityID nodeID = world.GetEntityID( m_selectedSceneNode->handle );
+			S_DrawDebugCollisionShapes::Run( world, world.MatchSubset( S_DrawDebugCollisionShapes::GetSignature( world ), { nodeID } ) );
+			S_DrawDebugDirectionalLights::Run( world, world.MatchSubset( S_DrawDebugDirectionalLights::GetSignature( world ), { nodeID } ) );
+			S_DrawDebugPointLights::Run( world, world.MatchSubset( S_DrawDebugPointLights::GetSignature( world ), { nodeID } ) );
+		}	
+
 	}
 
 	//================================================================================================================================

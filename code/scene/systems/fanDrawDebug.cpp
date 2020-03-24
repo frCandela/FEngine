@@ -6,6 +6,8 @@
 #include "scene/components/fanMeshRenderer.hpp"
 #include "scene/components/fanPointLight.hpp"
 #include "scene/components/fanDirectionalLight.hpp"
+#include "scene/components/fanBoxShape.hpp"
+#include "scene/components/fanSphereShape.hpp"
 #include "render/fanRendererDebug.hpp"
 #include "ecs/fanEcsWorld.hpp"
 
@@ -167,7 +169,7 @@ namespace fan
 			const float lightRange = PointLight::GetLightRange( light );
 			if( lightRange > 0 )
 			{
-				RendererDebug::Get().DebugSphere( transform.transform, lightRange, 2, light.diffuse );
+				RendererDebug::Get().DebugSphere( transform.transform, lightRange, light.diffuse );
 			}
 		}
 	}
@@ -201,7 +203,38 @@ namespace fan
 				const btVector3 offset = offsets[offsetIndex];
 				RendererDebug::Get().DebugLine( pos + offset, pos + offset + length * dir, color );
 			}
-			RendererDebug::Get().DebugSphere( transform.transform, radius, 0, color );
+			RendererDebug::Get().DebugIcoSphere( transform.transform, radius, 0, color );
+		}
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
+	Signature S_DrawDebugCollisionShapes::GetSignature( const EcsWorld& _world )
+	{
+		return _world.GetSignature<Transform>() | _world.GetSignature<SceneNode>();
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
+	void S_DrawDebugCollisionShapes::Run( EcsWorld& _world, const std::vector<EntityID>& _entities )
+	{
+		for( EntityID entityID : _entities )
+		{
+			// box shape
+			if( _world.HasComponent<BoxShape>( entityID ) )
+			{
+				const Transform& transform = _world.GetComponent<Transform>( entityID );
+				const BoxShape & shape = _world.GetComponent<BoxShape>( entityID );
+				RendererDebug::Get().DebugCube( transform.transform, 0.5f * shape.GetScaling(), Color::Green, false  );
+			}
+
+			// sphere shape
+			if( _world.HasComponent<SphereShape>( entityID ) )
+			{
+				const Transform& transform = _world.GetComponent<Transform>( entityID );
+				const SphereShape& shape = _world.GetComponent<SphereShape>( entityID );
+				RendererDebug::Get().DebugSphere( transform.transform, shape.GetRadius(), Color::Green, false );
+			}
 		}
 	}
 }

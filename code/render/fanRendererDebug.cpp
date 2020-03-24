@@ -323,7 +323,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void RendererDebug::DebugCircle( const btVector3 _pos, const float _radius, btVector3 _axis, uint32_t _nbSegments, const Color _color )
+	void RendererDebug::DebugCircle( const btVector3 _pos, const float _radius, btVector3 _axis, uint32_t _nbSegments, const Color _color, const bool _depthTestEnable )
 	{
 		assert( _nbSegments > 2 && _radius >= 0.f );
 
@@ -331,6 +331,7 @@ namespace fan
 		btVector3 orthogonal = _radius * _axis.cross( other ).normalized();
 		const float angle = 2.f * PI / ( float ) _nbSegments;
 
+		std::vector<DebugVertex>& lines = _depthTestEnable ? m_debugLines : m_debugLinesNoDepthTest;
 		for ( uint32_t segmentIndex = 0; segmentIndex < _nbSegments; segmentIndex++ )
 		{
 
@@ -338,8 +339,8 @@ namespace fan
 			orthogonal = orthogonal.rotate( _axis, angle );
 			btVector3 end = _pos + orthogonal;
 
-			m_debugLines.push_back( DebugVertex( ToGLM( start ), glm::vec3( 0, 0, 0 ), _color.ToGLM() ) );
-			m_debugLines.push_back( DebugVertex( ToGLM( end ), glm::vec3( 0, 0, 0 ), _color.ToGLM() ) );
+			lines.push_back( DebugVertex( ToGLM( start ), glm::vec3( 0, 0, 0 ), _color.ToGLM() ) );
+			lines.push_back( DebugVertex( ToGLM( end ), glm::vec3( 0, 0, 0 ), _color.ToGLM() ) );
 		}
 	}
 
@@ -355,43 +356,55 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	std::vector< btVector3> RendererDebug::DebugCube( const btTransform _transform, const btVector3 _halfExtent, const Color _color )
+	void RendererDebug::DebugCube( const btTransform _transform, const btVector3 _halfExtent, const Color _color, const bool _depthTestEnable )
 	{
-		std::vector< btVector3 > square = GetCube( _halfExtent );
+		std::vector< btVector3 > cube = GetCube( _halfExtent );
 
-		for ( int vertIndex = 0; vertIndex < square.size(); vertIndex++ )
+		for ( int vertIndex = 0; vertIndex < cube.size(); vertIndex++ )
 		{
-			square[ vertIndex ] = _transform * square[ vertIndex ];
+			cube[ vertIndex ] = _transform * cube[ vertIndex ];
 		}
 
 		glm::vec4 glmColor = _color.ToGLM();
 
-		for ( int triangleIndex = 0; triangleIndex < square.size() / 3; triangleIndex++ )
-		{
-			const glm::vec3& v0 = ToGLM( square[ 3 * triangleIndex + 0 ] );
-			const glm::vec3& v1 = ToGLM( square[ 3 * triangleIndex + 1 ] );
-			const glm::vec3& v2 = ToGLM( square[ 3 * triangleIndex + 2 ] );
+		std::vector<DebugVertex>& lines = _depthTestEnable ? m_debugLines : m_debugLinesNoDepthTest;
 
-			m_debugLines.push_back( DebugVertex( v0, glm::vec3( 0, 0, 0 ), glmColor ) );
-			m_debugLines.push_back( DebugVertex( v1, glm::vec3( 0, 0, 0 ), glmColor ) );
-			m_debugLines.push_back( DebugVertex( v1, glm::vec3( 0, 0, 0 ), glmColor ) );
-			m_debugLines.push_back( DebugVertex( v2, glm::vec3( 0, 0, 0 ), glmColor ) );
-			m_debugLines.push_back( DebugVertex( v2, glm::vec3( 0, 0, 0 ), glmColor ) );
-			m_debugLines.push_back( DebugVertex( v0, glm::vec3( 0, 0, 0 ), glmColor ) );
+		lines.push_back( DebugVertex( ToGLM( cube[0] ), glm::vec3( 0, 0, 0 ), glmColor ) );
+		lines.push_back( DebugVertex( ToGLM( cube[1] ), glm::vec3( 0, 0, 0 ), glmColor ) );
+		lines.push_back( DebugVertex( ToGLM( cube[1] ), glm::vec3( 0, 0, 0 ), glmColor ) );
+		lines.push_back( DebugVertex( ToGLM( cube[3] ), glm::vec3( 0, 0, 0 ), glmColor ) );
+		lines.push_back( DebugVertex( ToGLM( cube[3] ), glm::vec3( 0, 0, 0 ), glmColor ) );
+		lines.push_back( DebugVertex( ToGLM( cube[2] ), glm::vec3( 0, 0, 0 ), glmColor ) );
+		lines.push_back( DebugVertex( ToGLM( cube[2] ), glm::vec3( 0, 0, 0 ), glmColor ) );
+		lines.push_back( DebugVertex( ToGLM( cube[0] ), glm::vec3( 0, 0, 0 ), glmColor ) );
 
-		}
+		lines.push_back( DebugVertex( ToGLM( cube[4] ), glm::vec3( 0, 0, 0 ), glmColor ) );
+		lines.push_back( DebugVertex( ToGLM( cube[5] ), glm::vec3( 0, 0, 0 ), glmColor ) );
+ 		lines.push_back( DebugVertex( ToGLM( cube[5] ), glm::vec3( 0, 0, 0 ), glmColor ) );
+ 		lines.push_back( DebugVertex( ToGLM( cube[7] ), glm::vec3( 0, 0, 0 ), glmColor ) );
+		lines.push_back( DebugVertex( ToGLM( cube[7] ), glm::vec3( 0, 0, 0 ), glmColor ) );
+		lines.push_back( DebugVertex( ToGLM( cube[6] ), glm::vec3( 0, 0, 0 ), glmColor ) );
+		lines.push_back( DebugVertex( ToGLM( cube[6] ), glm::vec3( 0, 0, 0 ), glmColor ) );
+		lines.push_back( DebugVertex( ToGLM( cube[4] ), glm::vec3( 0, 0, 0 ), glmColor ) );
 
-		return square;
+		lines.push_back( DebugVertex( ToGLM( cube[0] ), glm::vec3( 0, 0, 0 ), glmColor ) );
+		lines.push_back( DebugVertex( ToGLM( cube[4] ), glm::vec3( 0, 0, 0 ), glmColor ) );
+		lines.push_back( DebugVertex( ToGLM( cube[1] ), glm::vec3( 0, 0, 0 ), glmColor ) );
+		lines.push_back( DebugVertex( ToGLM( cube[5] ), glm::vec3( 0, 0, 0 ), glmColor ) );
+		lines.push_back( DebugVertex( ToGLM( cube[3] ), glm::vec3( 0, 0, 0 ), glmColor ) );
+		lines.push_back( DebugVertex( ToGLM( cube[7] ), glm::vec3( 0, 0, 0 ), glmColor ) );
+		lines.push_back( DebugVertex( ToGLM( cube[2] ), glm::vec3( 0, 0, 0 ), glmColor ) );
+		lines.push_back( DebugVertex( ToGLM( cube[6] ), glm::vec3( 0, 0, 0 ), glmColor ) );
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	std::vector< btVector3> RendererDebug::DebugSphere( const btTransform _transform, const float _radius, const int _numSubdivisions, const Color _color )
+	void RendererDebug::DebugIcoSphere( const btTransform _transform, const float _radius, const int _numSubdivisions, const Color _color, const bool _depthTestEnable )
 	{
 		if ( _radius <= 0 )
 		{
 			Debug::Warning( "Debug sphere radius cannot be zero or negative" );
-			return {};
+			return;
 		}
 
 		std::vector<btVector3> sphere = GetSphere( _radius, _numSubdivisions );
@@ -406,17 +419,24 @@ namespace fan
 			const btVector3 v0 = sphere[ 3 * triangleIndex + 0 ];
 			const btVector3 v1 = sphere[ 3 * triangleIndex + 1 ];
 			const btVector3 v2 = sphere[ 3 * triangleIndex + 2 ];
-			DebugLine( v0, v1, _color, false );
-			DebugLine( v1, v2, _color, false );
-			DebugLine( v2, v0, _color, false );
+			DebugLine( v0, v1, _color, _depthTestEnable );
+			DebugLine( v1, v2, _color, _depthTestEnable );
+			DebugLine( v2, v0, _color, _depthTestEnable );
 		}
-
-		return sphere;
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	std::vector< btVector3> RendererDebug::DebugCone( const btTransform _transform, const float _radius, const float _height, const int _numSubdivisions, const Color _color )
+	void RendererDebug::DebugSphere( const btTransform _transform, const float _radius, const Color _color, const bool _depthTestEnable )
+	{
+		DebugCircle( _transform.getOrigin(), _radius, btVector3::Up(), 32, _color, _depthTestEnable );
+		DebugCircle( _transform.getOrigin(), _radius, btVector3::Left(), 32, _color, _depthTestEnable );
+		DebugCircle( _transform.getOrigin(), _radius, btVector3::Forward(), 32, _color, _depthTestEnable );
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
+	void RendererDebug::DebugCone( const btTransform _transform, const float _radius, const float _height, const int _numSubdivisions, const Color _color )
 	{
 		std::vector<btVector3> cone = GetCone( _radius, _height, _numSubdivisions );
 
@@ -429,8 +449,6 @@ namespace fan
 		{
 			DebugTriangle( cone[ 3 * triangleIndex + 0 ], cone[ 3 * triangleIndex + 1 ], cone[ 3 * triangleIndex + 2 ], _color );
 		}
-
-		return cone;
 	}
 
 	//================================================================================================================================

@@ -33,15 +33,16 @@ namespace fan
 		VkCommandBuffer* GetCommandBuffer( const size_t _index ) { return &m_debugCommandBuffers[ _index ]; };
 		std::vector<VkCommandBuffer>& GetCommandBuffers() { return m_debugCommandBuffers; }
 
-		void					DebugPoint( const btVector3 _pos, const Color _color );
-		void					DebugLine( const btVector3 _start, const btVector3 _end, const Color _color, const bool _depthTestEnable = true );
-		void					DebugTriangle( const btVector3 _v0, const btVector3 _v1, const btVector3 _v2, const Color _color );
-		void					DebugTriangles( const std::vector<btVector3>& _triangles, const std::vector<Color>& _colors );
-		void					DebugCircle( const btVector3 _pos, const float _radius, btVector3 _axis, uint32_t _nbSegments, const Color _color );
-		std::vector< btVector3> DebugCube( const btTransform _transform, const btVector3 _halfExtent, const Color _color );
-		std::vector< btVector3> DebugSphere( const btTransform _transform, const float _radius, const int _numSubdivisions, const Color _color );
-		std::vector< btVector3> DebugCone( const btTransform _transform, const float _radius, const float _height, const int _numSubdivisions, const Color _color );
-		void					DebugAABB( const AABB& _aabb, const Color _color );
+		void DebugPoint( const btVector3 _pos, const Color _color );
+		void DebugLine( const btVector3 _start, const btVector3 _end, const Color _color, const bool _depthTestEnable = true );
+		void DebugTriangle( const btVector3 _v0, const btVector3 _v1, const btVector3 _v2, const Color _color );
+		void DebugTriangles( const std::vector<btVector3>& _triangles, const std::vector<Color>& _colors );
+		void DebugCircle( const btVector3 _pos, const float _radius, btVector3 _axis, uint32_t _nbSegments, const Color _color, const bool _depthTestEnable = true );
+		void DebugCube( const btTransform _transform, const btVector3 _halfExtent, const Color _color, const bool _depthTestEnable = true );
+		void DebugIcoSphere( const btTransform _transform, const float _radius, const int _numSubdivisions, const Color _color, const bool _depthTestEnable = true );
+		void DebugSphere( const btTransform _transform, const float _radius, const Color _color, const bool _depthTestEnable = true );
+		void DebugCone( const btTransform _transform, const float _radius, const float _height, const int _numSubdivisions, const Color _color );
+		void DebugAABB( const AABB& _aabb, const Color _color );
 
 		static RendererDebug& Get() { return *s_rendererInstance; }
 		static void Init( RendererDebug* const _rendererDebug ) { assert( s_rendererInstance == nullptr ); s_rendererInstance = _rendererDebug; }

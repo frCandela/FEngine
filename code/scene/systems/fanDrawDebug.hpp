@@ -57,4 +57,13 @@ namespace fan
 		static Signature GetSignature( const EcsWorld& _world );
 		static void Run( EcsWorld& _world, const std::vector<EntityID>& _entities );
 	};
+
+	//==============================================================================================================================================================
+	// Draw physics shapes in wireframe (box, sphere, etc )
+	//==============================================================================================================================================================
+	struct S_DrawDebugCollisionShapes : System
+	{
+		static Signature GetSignature( const EcsWorld& _world );
+		static void Run( EcsWorld& _world, const std::vector<EntityID>& _entities );
+	};
 }

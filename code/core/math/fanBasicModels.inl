@@ -13,14 +13,16 @@ namespace fan
 		const btVector3 v6( -_halfExtent[ 0 ], -_halfExtent[ 1 ], +_halfExtent[ 2 ] );
 		const btVector3 v7( -_halfExtent[ 0 ], -_halfExtent[ 1 ], -_halfExtent[ 2 ] );
 
-		return {
-			 v0,v1,v2	,v1,v3,v2	// top
-			,v6,v5,v4	,v7,v5,v6	// bot
-			,v7,v6,v2	,v7,v2,v3
-			,v6,v4,v0	,v6,v0,v2
-			,v4,v5,v0	,v5,v1,v0
-			,v7,v1,v5	,v7,v3,v1
-		};
+		return { v0, v1, v2, v3, v4, v5, v6, v7 };
+
+// 		return {
+// 			 v0,v1,v2	,v1,v3,v2	// top
+// 			,v6,v5,v4	,v7,v5,v6	// bot
+// 			,v7,v6,v2	,v7,v2,v3
+// 			,v6,v4,v0	,v6,v0,v2
+// 			,v4,v5,v0	,v5,v1,v0
+// 			,v7,v1,v5	,v7,v3,v1
+// 		};
 	}
 
 	//================================================================================================================================
