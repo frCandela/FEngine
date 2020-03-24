@@ -208,13 +208,6 @@ namespace fan
 
 		scene.New();
 
- 		//scene->LoadFrom( "content/scenes/game.scene" );
-// 		m_currentScene = _scene;
-// 		m_sceneWindow->SetScene( m_currentScene );
-// 		m_mainMenuBar->SetScene( m_currentScene );
-// 		m_ecsWindow->SetEcsWorld( m_currentScene->GetWorld() );
-// 		m_gameWindow->SetScene( m_currentScene );
-
 		Debug::Log( "done initializing" );
 	}
 
@@ -284,7 +277,13 @@ namespace fan
 				{
 					game->Step( targetLogicDelta );
 					EditorCamera& editorCamera = game->world.GetSingletonComponent<EditorCamera>();
-					EditorCamera::Update( editorCamera, targetLogicDelta );
+					Scene& scene = game->world.GetSingletonComponent<Scene>();
+					
+					// only update the editor camera when we are using it
+					if( scene.mainCamera == editorCamera.cameraNode )
+					{
+						EditorCamera::Update( editorCamera, targetLogicDelta );
+					}					
 				}			
 
 				// ui & debug
