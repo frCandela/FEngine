@@ -270,4 +270,16 @@ namespace fan
 		}
 		return matchingEntities;
 	}
+
+	//================================================================================================================================
+	//================================================================================================================================
+	std::vector< SingletonComponentInfo > EcsWorld::GetVectorSingletonComponentInfo() const
+	{
+		std::vector< SingletonComponentInfo > infos;
+		for( const std::pair<uint32_t, SingletonComponentInfo>& info : m_singletonComponentInfo )
+		{
+			infos.push_back( info.second );
+		}
+		return infos;
+	}
 }

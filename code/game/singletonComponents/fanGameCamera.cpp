@@ -18,6 +18,8 @@ namespace fan
 		_info.icon = ImGui::CAMERA16;
 		_info.init = &GameCamera::Init;
 		_info.onGui = &GameCamera::OnGui;
+		_info.save = &GameCamera::Save;
+		_info.load = &GameCamera::Load;
 		_info.name = "game camera";
 	}
 
@@ -46,6 +48,30 @@ namespace fan
 			ImGui::DragFloat( "minSize", &gameCamera.minOrthoSize, 0.1f, 0.f, 100.f );
 		}
 		ImGui::Unindent(); ImGui::Unindent();
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
+	void GameCamera::Save( const SingletonComponent& _component, Json& _json )
+	{
+		const GameCamera& gameCamera = static_cast<const GameCamera&>( _component );
+ 		Serializable::SaveVec2( _json, "margin_ratio", gameCamera.marginRatio );
+ 		Serializable::SaveFloat( _json, "min_size", gameCamera.minOrthoSize );
+ 		Serializable::SaveFloat( _json, "height_from_target", gameCamera.heightFromTarget );
+//  		Serializable::SaveComponentPtr( _json, "players_manager", m_playersManager );
+//  		Serializable::SaveComponentPtr( _json,"camera", m_camera );
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
+	void GameCamera::Load( SingletonComponent& _component, const Json& _json )
+	{
+		GameCamera& gameCamera = static_cast<GameCamera&>( _component );
+		Serializable::LoadVec2( _json, "margin_ratio", gameCamera.marginRatio );
+		Serializable::LoadFloat( _json, "min_size", gameCamera.minOrthoSize );
+		Serializable::LoadFloat( _json, "height_from_target", gameCamera.heightFromTarget );
+		//  		Serializable::SaveComponentPtr( _json, "players_manager", m_playersManager );
+		//  		Serializable::SaveComponentPtr( _json,"camera", m_camera );
 	}
 
 	//================================================================================================================================
@@ -87,36 +113,5 @@ namespace fan
 // 		REQUIRE_TRUE( *m_playersManager != nullptr, "CameraController: missing reference to the PlayersManager" )
 // 
 // 		m_gameobject->GetScene().SetMainCamera( *m_camera );
-// 	}
-// 
-// 
-// 	//================================================================================================================================
-// 	//================================================================================================================================
-// 	bool CameraController::Load( const Json& _json )
-// 	{
-// 		Actor::Load( _json );
-// 
-// 		Serializable::LoadVec2( _json, "margin_ratio", m_marginRatio );
-// 		Serializable::LoadFloat( _json, "min_size", m_minOrthoSize );
-// 		Serializable::LoadFloat( _json, "height_from_target", m_heightFromTarget );
-// 		Serializable::LoadComponentPtr( _json, m_gameobject->GetScene(), "players_manager", m_playersManager );
-// 		Serializable::LoadComponentPtr( _json, m_gameobject->GetScene(), "camera", m_camera );
-// 
-// 		return true;
-// 	}
-// 
-// 	//================================================================================================================================
-// 	//================================================================================================================================
-// 	bool CameraController::Save( Json& _json ) const
-// 	{
-// 		Actor::Save( _json );
-// 
-// 		Serializable::SaveVec2( _json, "margin_ratio", m_marginRatio );
-// 		Serializable::SaveFloat( _json, "min_size", m_minOrthoSize );
-// 		Serializable::SaveFloat( _json, "height_from_target", m_heightFromTarget );
-// 		Serializable::SaveComponentPtr( _json, "players_manager", m_playersManager );
-// 		Serializable::SaveComponentPtr( _json,"camera", m_camera );
-// 
-// 		return true;
 // 	}
 }

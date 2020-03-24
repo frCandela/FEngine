@@ -224,7 +224,23 @@ namespace fan
 				Serializable::SaveString( jScene, "path", path );
 			}
 
-			// saves all nodes recursively
+			// save singleton components
+			Json& jSingletons = jScene["singletons"];
+			unsigned nextIndex = 0;
+			const std::vector< SingletonComponentInfo >& singletonsInfos = world->GetVectorSingletonComponentInfo();
+			for ( const SingletonComponentInfo& info : singletonsInfos )
+			{
+				if( info.save != nullptr )
+				{
+					Json& jSingleton_i = jSingletons[nextIndex++];
+					Serializable::SaveUInt( jSingleton_i, "singleton_id", info.staticIndex );
+					Serializable::SaveString( jSingleton_i, "singleton", info.name );
+					SingletonComponent& singleton = world->GetSingletonComponent( info.staticIndex );
+					info.save( singleton, jSingleton_i );
+				}
+			}
+
+			// saves all scene nodes recursively
 			Json& jRoot = jScene["root"];
 			R_SaveToJson( *root, jRoot );
 			RemapSceneNodesIndices( json );				
@@ -348,6 +364,21 @@ namespace fan
 				Serializable::LoadString( jScene, "path", path );
 			}
 
+			// load singleton components
+			if( jScene.find( "singletons" ) != jScene.end() )
+			{
+				const Json& jSingletons = jScene["singletons"];
+				for( int childIndex = 0; childIndex < jSingletons.size(); childIndex++ )
+				{
+					const Json& jSingleton_i = jSingletons[childIndex];
+					unsigned staticIndex = 0;
+					Serializable::LoadUInt( jSingleton_i, "singleton_id", staticIndex );
+					const SingletonComponentInfo& info = world->GetSingletonComponentInfo( staticIndex );
+					SingletonComponent& singleton = world->GetSingletonComponent( staticIndex );
+					info.load( singleton, jSingleton_i );
+				}
+			}			
+
 			// loads all nodes recursively
 			const Json& jRoot = jScene["root"];
 			root = &CreateSceneNode( "root", nullptr );
@@ -360,7 +391,7 @@ namespace fan
 			//m_instantiate->ResolveGameobjectPtr( 0 );
 			//m_instantiate->ResolveComponentPtr( 0 );
 
-			// temporary
+			// @hack : sets the sunlight mesh on loading
 			Signature signature = world->GetSignature<MeshRenderer>() | world->GetSignature<SceneNode>();
 			std::vector<EntityID> entities = world->Match( signature );
 			for ( EntityID entityID : entities )

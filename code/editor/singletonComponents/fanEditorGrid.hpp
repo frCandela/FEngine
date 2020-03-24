@@ -15,6 +15,8 @@ namespace fan
 	public:
 		static void SetInfo( SingletonComponentInfo& _info );
 		static void Init( SingletonComponent& _component );
+		static void Save( const SingletonComponent& _component, Json& _json );
+		static void Load( SingletonComponent& _component, const Json& _json );
 
 		btVector3	offset;
 		Color		color;

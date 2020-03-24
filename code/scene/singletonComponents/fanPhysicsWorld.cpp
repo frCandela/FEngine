@@ -1,6 +1,7 @@
 #include "scene/singletonComponents/fanPhysicsWorld.hpp"
 
 #include "core/time/fanTime.hpp"
+#include "core/fanISerializable.hpp"
 #include "scene/components/fanRigidbody.hpp"
 #include "scene/components/fanMotionState.hpp"
 #include "scene/components/fanSphereShape.hpp"
@@ -18,6 +19,8 @@ namespace fan
 		_info.icon = ImGui::RIGIDBODY16;
 		_info.init = &PhysicsWorld::Init;
 		_info.onGui = &PhysicsWorld::OnGui;
+		_info.save = &PhysicsWorld::Save;
+		_info.load = &PhysicsWorld::Load;
 		_info.name = "physics world";
 	}
 
@@ -52,6 +55,24 @@ namespace fan
 			ImGui::Text( "num rigidbodies : %d", physicsWorld.dynamicsWorld->getNumCollisionObjects() );
 		}
 		ImGui::Unindent(); ImGui::Unindent();
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================	
+	void PhysicsWorld::Save( const SingletonComponent& _component, Json& _json )
+	{
+		const PhysicsWorld& physicsWorld = static_cast<const PhysicsWorld&>( _component );
+		Serializable::SaveVec3( _json, "gravity", physicsWorld.dynamicsWorld->getGravity() );
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================	
+	void PhysicsWorld::Load( SingletonComponent& _component, const Json& _json )
+	{
+		btVector3 gravity;
+		Serializable::LoadVec3(	 _json, "gravity", gravity );
+		PhysicsWorld& physicsWorld = static_cast<PhysicsWorld&>( _component );
+		physicsWorld.dynamicsWorld->setGravity( gravity );
 	}
 
 	//================================================================================================================================

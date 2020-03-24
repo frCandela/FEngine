@@ -14,6 +14,8 @@ namespace fan
 		_info.icon = ImGui::NONE;
 		_info.init = &SunLight::Init;
 		_info.onGui = &SunLight::OnGui;
+		_info.save = &SunLight::Save;
+		_info.load = &SunLight::Load;
 		_info.name = "sun light";
 	}
 

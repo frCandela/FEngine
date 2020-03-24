@@ -37,7 +37,6 @@ namespace fan {
 		SingletonComponent&	 GetSingletonComponent( const uint32_t _staticIndex );
 		void				 RemoveComponent( const EntityID _entityID, const ComponentIndex _index );
 		bool				 HasComponent( const EntityID _entityID, ComponentIndex _index );
-		const ComponentInfo& GetComponentInfo( const ComponentIndex _index ) const { return  m_componentInfo[ _index ];	}
 		EntityID			 CreateEntity();
 		void				 KillEntity( const EntityID _entityID );
 		EntityHandle		 CreateHandle( const EntityID _entityID );
@@ -45,6 +44,8 @@ namespace fan {
 		ComponentIndex		 GetDynamicIndex( const uint32_t _staticIndex ) { return m_typeIndices[_staticIndex]; }
 		uint32_t			 GetComponentCount( const EntityID _entityID ) { return m_entities[_entityID].componentCount;  }
 		Component&			 GetComponentAt( const EntityID _entityID, int _componentIndex );
+		const ComponentInfo& GetComponentInfo( const ComponentIndex _index ) const { return  m_componentInfo[_index]; }
+		const SingletonComponentInfo& GetSingletonComponentInfo( const uint32_t _staticIndex ) const { return  m_singletonComponentInfo.at( _staticIndex ); }
 		
 		void				 SortEntities();
 		void				 RemoveDeadEntities();
@@ -63,15 +64,15 @@ namespace fan {
 		const std::vector< ComponentsCollection >&				GetComponentCollections() const { return m_components; }
 		const std::vector< Entity >&							GetEntities() const				{ return m_entities; }
 		const std::vector< ComponentInfo >&						GetVectorComponentInfo() const  { return m_componentInfo;  }
-		const std::vector< SingletonComponentInfo >&			GetVectorSingletonComponentInfo() const { return m_singletonComponentInfo; }
+		std::vector< SingletonComponentInfo >					GetVectorSingletonComponentInfo() const;
 		size_t	GetNumEntities() const { return m_entities.size(); }
 
 	private:
-		std::unordered_map< uint32_t, ComponentIndex >		m_typeIndices;
-		std::unordered_map< EntityHandle, EntityID >		m_handles;
-		std::unordered_map< uint32_t, SingletonComponent* >	m_singletonComponents;
-		std::vector< ComponentInfo >						m_componentInfo;	
-		std::vector< SingletonComponentInfo >				m_singletonComponentInfo;
+		std::unordered_map< uint32_t, ComponentIndex >		   m_typeIndices;
+		std::unordered_map< EntityHandle, EntityID >		   m_handles;
+		std::unordered_map< uint32_t, SingletonComponent* >	   m_singletonComponents;
+		std::vector< ComponentInfo >						   m_componentInfo;
+		std::unordered_map< uint32_t, SingletonComponentInfo > m_singletonComponentInfo;
 
 		std::vector< Entity >				m_entities;
 		std::vector< ComponentsCollection > m_components;
@@ -226,7 +227,7 @@ namespace fan {
 		assert( info.init != nullptr );
 		info.init( *component );
 		info.staticIndex = _componentType::s_typeInfo;
-		m_singletonComponentInfo.push_back( info );
+		m_singletonComponentInfo[ _componentType::s_typeInfo ] = info ;
 
 		return *component;
 	}
