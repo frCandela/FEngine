@@ -1,4 +1,4 @@
-#include "game/components/fanPlayersManager.hpp"
+//#include "game/components/fanPlayersManager.hpp"
 #include "game/network/fanGameServer.hpp"
 #include "game/fanGameManager.hpp"
 #include "network/packets/fanPacketLogin.hpp"
@@ -56,10 +56,10 @@ namespace fan
 	//================================================================================================================================
 	void GameServer::Stop()
 	{
-		ClearClients();
-		onClientConnected.Disconnect( &PlayersManager::AddPlayer, m_playersManager );
-
-		m_socket.UnBind();
+// 		ClearClients();
+// 		onClientConnected.Disconnect( &PlayersManager::AddPlayer, m_playersManager );
+// 
+// 		m_socket.UnBind();
 	}
 
 	//================================================================================================================================
@@ -186,8 +186,8 @@ namespace fan
 	//================================================================================================================================
 	void GameServer::StartGame()
 	{
-		Broadcast( PacketStartGame().ToPacket() );
-		m_playersManager->SpawnSpaceShips();
+// 		Broadcast( PacketStartGame().ToPacket() );
+// 		m_playersManager->SpawnSpaceShips();
 	}
 
 	//================================================================================================================================

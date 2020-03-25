@@ -1,5 +1,5 @@
 #include "game/network/fanGameClient.hpp"
-#include "game/components/fanPlayersManager.hpp"
+//#include "game/components/fanPlayersManager.hpp"
 #include "game/fanGameManager.hpp"
 #include "network/packets/fanIPacket.hpp"
 #include "network/packets/fanPacketLogin.hpp"
