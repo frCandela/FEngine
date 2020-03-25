@@ -1,12 +1,15 @@
 #include "game/components/fanPlayerInput.hpp"
+
 #include "core/input/fanInputManager.hpp"
 #include "core/input/fanInput.hpp"
 #include "core/input/fanMouse.hpp"
 #include "core/input/fanJoystick.hpp"
+#include "scene/singletonComponents/fanScene.hpp"
 #include "scene/components/fanSceneNode.hpp"
 #include "scene/components/fanCamera.hpp"
 #include "scene/components/fanTransform.hpp"
 #include "ecs/fanEcsWorld.hpp"
+#include "core/math/shapes/fanRay.hpp"
 
 namespace fan
 {
@@ -121,11 +124,11 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void PlayerInput::RefreshInput()
+	void PlayerInput::RefreshInput( EcsWorld& _world, EntityID _entityID )
 	{
 		if ( !isReplicated )
 		{
-			inputData.direction = GetInputDirection();
+			inputData.direction = GetInputDirection( _world, _entityID );
 			inputData.left = GetInputLeft();
 			inputData.forward = GetInputForward();
 			inputData.boost = GetInputBoost();
@@ -200,40 +203,40 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	btVector3 PlayerInput::GetInputDirection()
+	btVector3 PlayerInput::GetInputDirection( EcsWorld& _world, EntityID _entityID )
 	{
-// 		switch ( m_inputType )
-// 		{
-// 
-// 		case fan::PlayerInput::KEYBOARD_MOUSE:
-// 		{
-// 			// Get mouse world pos @hack
-// 			SceneNode& node = m_gameobject->GetScene().GetMainCamera();
-// 			EcsWorld& world = node.scene->GetWorld();
-// 			Camera2& camera = world.GetComponent<Camera2>( world.GetEntityID( node.entityHandle ) );
-// 			Transform2& cameraTransform = world.GetComponent<Transform2>( world.GetEntityID( node.entityHandle ) );
-// 			btVector3 mouseWorldPos = camera.ScreenPosToRay( cameraTransform, Mouse::Get().GetScreenSpacePosition() ).origin;
-// 			mouseWorldPos.setY( 0 );
-// 
-// 			// Get mouse direction
-// 			Transform& transform = m_gameobject->GetTransform();
-// 			btVector3 mouseDir = mouseWorldPos - transform.GetPosition();
-// 			mouseDir.normalize();
-// 			return mouseDir;
-// 		}
-// 		case fan::PlayerInput::JOYSTICK:
-// 		{
-// 			glm::vec2 average = GetDirectionAverage();
-// 
-// 			btVector3 dir = btVector3( average.x, 0.f, average.y );
-// 
-// 			if ( dir.length() > m_directionCutTreshold ) { m_direction = dir; }
-// 
-// 			return m_direction;
-// 		}
-// 		default:
+		const Scene& scene = _world.GetSingletonComponent<Scene>();
+		const EntityID cameraID = _world.GetEntityID( scene.mainCamera->handle );
+		const Transform& cameraTransform = _world.GetComponent<Transform>( cameraID );
+		const Camera& camera = _world.GetComponent<Camera>( cameraID );
+
+		switch ( inputType )
+		{
+		case fan::PlayerInput::KEYBOARD_MOUSE:
+		{
+			// Get mouse world pos
+			btVector3 mouseWorldPos = camera.ScreenPosToRay( cameraTransform, Mouse::Get().GetScreenSpacePosition() ).origin;
+			mouseWorldPos.setY( 0 );
+
+			// Get mouse direction
+			const Transform& transform = _world.GetComponent<Transform>( _entityID );
+			btVector3 mouseDir = mouseWorldPos - transform.GetPosition();
+			mouseDir.normalize();
+			return mouseDir;
+		}
+		case fan::PlayerInput::JOYSTICK:
+		{
+			glm::vec2 average = GetDirectionAverage();
+
+			btVector3 dir = btVector3( average.x, 0.f, average.y );
+
+			if ( dir.length() > directionCutTreshold ) { direction = dir; }
+
+			return direction;
+		}
+		default:
 			return btVector3::Zero();
-//		}
+		}
 	}
 
 	//================================================================================================================================

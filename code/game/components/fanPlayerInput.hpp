@@ -7,6 +7,8 @@
 
 namespace fan
 {
+	class EcsWorld;
+
 	//================================================================================================================================
 	// manages the input of the player
 	// this input can be direct in case of a local player or replicated of other players
@@ -32,9 +34,9 @@ namespace fan
 		std::vector< glm::vec2 > directionBuffer;
 		btVector3	direction;
 
-		void		RefreshInput();
+		void		RefreshInput( EcsWorld& _world, EntityID _entityID );
 		glm::vec2	GetDirectionAverage();
-		btVector3	GetInputDirection();
+		btVector3	GetInputDirection( EcsWorld& _world, EntityID _entityID );
 		float		GetInputLeft();
 		float		GetInputForward();
 		float		GetInputBoost();
