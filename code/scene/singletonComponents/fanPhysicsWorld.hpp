@@ -32,7 +32,6 @@ namespace fan
 
 		static void ContactStartedCallback( btPersistentManifold* const& _manifold );
 		static void ContactEndedCallback( btPersistentManifold* const& _manifold );
-
 		static bool IsPhysicsType( EcsWorld& _world, Component& _component );
 	};
 }

@@ -34,7 +34,6 @@ namespace fan
 			PlayerInput & playerInput = _world.GetComponent<PlayerInput>( entityID );
 
 			// get player input
-			playerInput.RefreshInput( _world, entityID );
 			const btVector3 direction = playerInput.inputData.direction;
 			const bool  stop = playerInput.inputData.stop;
 			const float leftForce = _delta * spaceship.lateralForce * playerInput.inputData.left;

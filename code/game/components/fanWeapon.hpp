@@ -2,62 +2,51 @@
 
 #include "game/fanGamePrecompiled.hpp"
 
-#include "scene/fanSceneResourcePtr.hpp"
+#include "ecs/fanComponent.hpp"
 
 namespace fan
 {
-	class WithEnergy;
-	class PlayerInput;
+	struct ComponentInfo;
 
 	//================================================================================================================================
+	// fires bullets
+	// is placed on the spaceship on the player 
 	//================================================================================================================================
-	class Weapon// : public Actor
+	struct Weapon : public Component
 	{
+		DECLARE_COMPONENT( Weapon )
 	public:
-		void Start() /*override*/;
-		void Stop() /*override*/ {}
-		void Update( const float _delta ) /*override*/;
-		void LateUpdate( const float _delta ) /*override*/;
+		static void SetInfo( ComponentInfo& _info );
+		static void Init( Component& _component );
+		static void OnGui( Component& _component );
+		static void Save( const Component& _component, Json& _json );
+		static void Load( Component& _component, const Json& _json );
 
-		void OnGui() /*override*/;
-		//ImGui::IconType GetIcon() const /*override*/ { return ImGui::IconType::JOYSTICK16; }
 
-	protected:
-		void OnAttach() /*override*/;
-		void OnDetach() /*override*/;
-		bool Load( const Json& _json ) /*override*/;
-		bool Save( Json& _json ) const /*override*/;
-
-	private:
-		// ref
-		WithEnergy* m_energy;
-		PlayerInput* m_input;
-
-		// Bullets parameters
-		PrefabPtr m_bulletPrefab;
-		float m_lifeTime = 1.f;
-		float m_scale = 0.2f;
-		float m_speed = 0.2f;
-		float m_bulletsPerSecond = 10.f;
-		float m_bulletEnergyCost = 1.f;
-		float m_bulletDamage = 30.f;
+		// Bullets parameters		( @todo put some of this in the bullet prefab)
+		float bulletLifeTime;
+		float scale;
+		float bulletSpeed;
+		float bulletsPerSecond;
+		float bulletEnergyCost;
+		float bulletDamage;
+		btVector3 originOffset;
 
 		// explosion parameters
-		float m_explosionTime = 0.15f;
-		float m_exposionSpeed = 2.f;
-		int m_particlesPerExplosion = 3;
+		float explosionTime;
+		float exposionSpeed;
+		int particlesPerExplosion;
 
-		btVector3 m_offset;
 
-		// Accumulator
-		float m_bulletsAccumulator = 0.f;
+		// time accumulator
+		float bulletsAccumulator;
 
-		// for particles
-		std::default_random_engine			  m_generator;
-		std::uniform_real_distribution<float> m_distribution;
+		// PrefabPtr m_bulletPrefab;
+		// WithEnergy* m_energy;
+// 		PlayerInput* m_input;
 
-// 		void OnBulletContact( Rigidbody* _other, btPersistentManifold* const& _manifold );
-		void CreateExplosion( const btVector3 _point );
-		void FireBullet();
+//  	void OnBulletContact( Rigidbody* _other, btPersistentManifold* const& _manifold );
+// 		void CreateExplosion( const btVector3 _point );
 	};
+	static constexpr size_t sizeof_weapon = sizeof( Weapon );
 }

@@ -20,10 +20,14 @@
 #include "game/systems/fanUpdatePlanets.hpp"
 #include "game/systems/fanUpdateSpaceships.hpp"
 #include "game/systems/fanUpdateGameCamera.hpp"
+#include "game/systems/fanUpdateWeapons.hpp"
+#include "game/systems/fanUpdatePlayerInput.hpp"
 
 #include "game/components/fanPlanet.hpp"
 #include "game/components/fanSpaceShip.hpp"
 #include "game/components/fanPlayerInput.hpp"
+#include "game/components/fanWeapon.hpp"
+#include "game/components/fanBullet.hpp"
 
 namespace fan
 {
@@ -39,6 +43,8 @@ namespace fan
 		world.AddComponentType<Planet>();
 		world.AddComponentType<SpaceShip>();
 		world.AddComponentType<PlayerInput>();
+		world.AddComponentType<Weapon>();
+		world.AddComponentType<Bullet>();
 	}
 
 	//================================================================================================================================
@@ -99,6 +105,8 @@ namespace fan
 			SCOPED_PROFILE( scene_update );
 			const float delta = ( state == State::PLAYING ? _delta : 0.f );
 
+			S_RefreshPlayerInput::Run( world, world.Match( S_RefreshPlayerInput::GetSignature( world ) ), delta );
+
 			// physics
 			PhysicsWorld& physicsWorld = world.GetSingletonComponent<PhysicsWorld>();
 			S_SynchronizeMotionStateFromTransform::Run( world, world.Match( S_SynchronizeMotionStateFromTransform::GetSignature( world ) ), delta );
@@ -107,6 +115,7 @@ namespace fan
 
 			// update
 			S_UpdateSpaceships::Run( world, world.Match( S_UpdateSpaceships::GetSignature( world ) ), delta );
+			S_FireWeapons::Run( world, world.Match( S_FireWeapons::GetSignature( world ) ), delta );
 			S_UpdateParticles::Run( world, world.Match( S_UpdateParticles::GetSignature( world ) ), delta );
 			S_EmitParticles::Run( world, world.Match( S_EmitParticles::GetSignature( world ) ), delta );
 

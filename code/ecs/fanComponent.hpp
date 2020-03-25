@@ -4,22 +4,6 @@
 #include "core/fanHash.hpp"
 #include "fanEcsTypes.hpp"
 
-//================================
-// 	struct ecsBullet : ecsIComponent
-// 	{
-// 		static const char* s_name;
-// 		void Init( const float _durationLeft, const float _damage )
-// 		{
-// 			durationLeft = _durationLeft;
-// 			damage = _damage;
-// 		}
-// 		void Clear() {}
-// 
-// 		float durationLeft = 1.f;
-// 		float damage = 5.f;
-// 	};
-
-
 namespace fan
 {
 	//================================================================================================================================
