@@ -40,7 +40,7 @@ namespace fan
 		ImGui::PushItemWidth( 0.6f * ImGui::GetWindowWidth() );
 		{
 			float radius = sphereShape.GetRadius();
-			if( ImGui::DragFloat( "radius", &radius, 0.1f, 0.f ) )
+			if( ImGui::DragFloat( "radius##sphshapradius", &radius, 0.1f, 0.f ) )
 			{
 				sphereShape.SetRadius( radius );
 			}
