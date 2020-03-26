@@ -9,8 +9,8 @@ set( FAN_SCENE_LIBS
     fanCore		
     fanRender
     fanEcs
-    BulletDynamics
-    BulletCollision
+    btDynamics
+    btCollision
 )
 
 add_library(fanScene STATIC ${FAN_SCENE_SRC} ${FAN_SCENE_H})

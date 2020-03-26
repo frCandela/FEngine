@@ -96,7 +96,7 @@ namespace fan
 		std::sort( std::begin( segments ), std::end( segments ),
 			[]( OrientedSegment& _s1, OrientedSegment& _s2 )
 		{
-			return btVector3::Left().SignedAngle( _s1.direction, btVector3::Up() ) < btVector3::Left().SignedAngle( _s2.direction, btVector3::Up() );
+			return SignedAngle( btVector3::Left(), _s1.direction, btVector3::Up() ) < SignedAngle( btVector3::Left(), _s2.direction, btVector3::Up() );
 		} );
 
 		// Finds the starting point of mesh generation loop
@@ -148,7 +148,7 @@ namespace fan
 					if( axisNext.openSide == OrientedSegment::RIGHT )
 					{
 						// Empty space with no planets -> fills the space with triangles
-						float angle = axis.direction.SignedAngle( axisNext.direction, btVector3::Up() );
+						float angle = SignedAngle( axis.direction, axisNext.direction, btVector3::Up() );
 						if( angle > minGapRadians ) // gap is too large -> subdivise it
 						{
 
