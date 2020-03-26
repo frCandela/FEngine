@@ -3,9 +3,9 @@
 project ("FEngine")
 set(CMAKE_CXX_STANDARD 17)
 
-include_directories( deps )
-include_directories( deps/freetype )
 include_directories( code )
+include_directories( middleware )
+include_directories( middleware/freetype )
 include_directories( "C:/VulkanSDK/1.1.106.0/Include" )
 
 # link directories
@@ -32,7 +32,7 @@ add_subdirectory(code/ecs)
 add_subdirectory(code/scene)
 add_subdirectory(code/game)
 add_subdirectory(code/editor)
-add_subdirectory(deps)
+add_subdirectory(middleware)
 
 #defines
 add_compile_definitions(SFML_STATIC)

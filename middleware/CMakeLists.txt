@@ -1,7 +1,7 @@
 ﻿include_directories(
-	${CMAKE_SOURCE_DIR}/deps/imgui
-	${CMAKE_SOURCE_DIR}/deps/glslang
-	${CMAKE_SOURCE_DIR}/deps/bullet
+	${CMAKE_SOURCE_DIR}/middleware/imgui
+	${CMAKE_SOURCE_DIR}/middleware/glslang
+	${CMAKE_SOURCE_DIR}/middleware/bullet
 )
 
 # imgui
