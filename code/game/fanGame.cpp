@@ -74,13 +74,6 @@ namespace fan
 			// clears the physics world
 			S_UnregisterAllRigidbodies::Run( world, world.Match( S_UnregisterAllRigidbodies::GetSignature( world ) ) );
 			GameCamera::DeleteGameCamera( world );
-
-			// clears remaining rigidbodies from  the physics world
-			PhysicsWorld& physicsWorld = world.GetSingletonComponent<PhysicsWorld>();
-			if( physicsWorld.RemoveAllRigidbodies() )
-			{
-				Debug::Warning( "Some rigidbodies not unregistered properly" );
-			}
 		}
 	}
 

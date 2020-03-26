@@ -132,6 +132,21 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
+	void EcsWorld::Clear()
+	{
+		for ( Entity& entity : m_entities )
+		{
+			entity.Kill();
+		}
+		SortEntities();
+		RemoveDeadEntities();
+
+		m_nextHandle = 1;
+		assert( m_handles.empty() );
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
 	EntityHandle EcsWorld::CreateHandle( const EntityID _entityID )
 	{
 		Entity& entity = m_entities[_entityID];
@@ -218,9 +233,6 @@ namespace fan
 			Entity& entity = m_entities[reverseIndex];
 			if( entity.IsAlive() ) { break; } // we removed all dead entities
 
-			// Remove corresponding handle
-			if( entity.handle != 0 ) { m_handles.erase( entity.handle ); }
-
 			// Remove the component
 			for( int componentIndex = 0; componentIndex < entity.componentCount; componentIndex++ )
 			{
@@ -231,9 +243,13 @@ namespace fan
 				{
 					info.onDelete( *this, component );
 				}
-
 				m_components[component.componentIndex].RemoveComponent( component.chunckIndex, component.chunckComponentIndex );
+				entity.components[componentIndex] = nullptr;
 			}
+
+			// Remove corresponding handle
+			if( entity.handle != 0 ) { m_handles.erase( entity.handle ); }
+
 			m_entities.pop_back();
 			--reverseIndex;
 		}

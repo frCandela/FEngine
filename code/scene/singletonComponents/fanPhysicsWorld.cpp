@@ -98,44 +98,17 @@ namespace fan
 	//================================================================================================================================	
 	PhysicsWorld::~PhysicsWorld()
 	{
-		RemoveAllRigidbodies();
-
-		delete solver;
-		delete overlappingPairCache;
-		delete dispatcher;
-		delete collisionConfiguration;
-		//delete dynamicsWorld; @hack bullet physics alignement is broken, check the lib compilation parameters...
-	}
-
-	//================================================================================================================================
-	// remove all collision objects
-	// returns true if some bodies were removed
-	//================================================================================================================================	
-	bool PhysicsWorld::RemoveAllRigidbodies()
-	{
-		if( dynamicsWorld->getNumCollisionObjects() == 0 )
-		{
-			return false;
-		}
-
 		for( int i = dynamicsWorld->getNumCollisionObjects() - 1; i >= 0; i-- )
 		{
 			btCollisionObject* obj = dynamicsWorld->getCollisionObjectArray()[i];
 			dynamicsWorld->removeCollisionObject( obj );
 		}
 
-		return true;
-	}
-
-	//================================================================================================================================
-	// maybe replace this with a boolean in the component typeinfo ?
-	//================================================================================================================================	
-	bool PhysicsWorld::IsPhysicsType( EcsWorld& _world, Component& _component )
-	{
-		return	_world.IsType<Rigidbody>( _component ) ||
-				_world.IsType<MotionState>( _component ) ||
-				_world.IsType<SphereShape>( _component ) ||
-				_world.IsType<BoxShape>( _component );
+		delete solver;
+		delete overlappingPairCache;
+		delete dispatcher;
+		delete collisionConfiguration;
+		delete dynamicsWorld; //@hack bullet physics alignement is broken, check the lib compilation parameters...
 	}
 
 	//================================================================================================================================

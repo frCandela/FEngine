@@ -99,9 +99,13 @@ namespace fan
 	void SceneNode::OnGui( Component& _sceneNode )
 	{
 		SceneNode& node = static_cast<SceneNode&>( _sceneNode );
+		EcsWorld& world = * node.scene->world;
+		EntityID entityID = world.GetEntityID( node.handle );
+
 		ImGui::Text( "name      : %s", node.name.c_str() );
 		ImGui::Text( "scene     : %s", node.scene->path.empty()	? "<null>" : node.scene->path.c_str() );
 		ImGui::Text( "handle    : %u", node.handle );
+		ImGui::Text( "entity id : %u", entityID );
 		ImGui::Text( "unique id : %u", node.uniqueID );
 	}
 

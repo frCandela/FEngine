@@ -20,20 +20,6 @@ namespace fan
 // 		, ComponentData< ecsParticle >& _particles
 // 		, ComponentData< ecsSunlightParticleOcclusion >& _occlusion );
 // };
-// 
-// 
-// 
-// //================================
-// // Update bullet
-// //================================
-// class ecsUpdateBullet : public ISystem<  ecsGameobject, ecsBullet >
-// {
-// public:
-// 	static void Run( float _delta, const size_t _count, std::vector< ecsComponentsKey >& _entitiesData, ecsSingletonComponents& _singletonComponents
-// 		, ComponentData< ecsGameobject >& _gameobjects
-// 		, ComponentData< ecsBullet >& _bullets
-// 	);
-// };
 // 	//================================================================================================================================
 // 	//================================================================================================================================
 // void ecsParticleSunlightOcclusionSystem::Run( float /*_delta*/, const size_t _count, std::vector< ecsComponentsKey >& _entitiesData, ecsSingletonComponents& _singletonComponents
@@ -63,28 +49,4 @@ namespace fan
 // 			}
 // 		}
 // 	}
-// }
-// 	//================================================================================================================================
-// 	//================================================================================================================================
-// void ecsUpdateBullet::Run( float _delta, const size_t _count, std::vector< ecsComponentsKey >& _entitiesData, ecsSingletonComponents& /*_singletonComponents*/
-// 	, ComponentData< ecsGameobject >& _gameobjects
-// 	, ComponentData< ecsBullet >& _bullets )
-// {
-// 	// 		for ( int entity = 0; entity < _count; entity++ )
-// 	// 		{
-// 	// 			ecsComponentsKey& key = _entitiesData[ entity ];
-// 	// 
-// 	// 			if ( key.IsAlive() && key.MatchSignature( signature::bitset ) )
-// 	// 			{
-// 	// 				ecsBullet& bullet = _bullets.At( key );
-// 	// 
-// 	// 				bullet.durationLeft -= _delta;
-// 	// 				if ( bullet.durationLeft <= 0.f )
-// 	// 				{
-// 	// 					Gameobject* gameobject = _gameobjects.At( key ).gameobject;
-// 	// 					gameobject->GetScene().DeleteGameobject( gameobject );
-// 	// 				}
-// 	// 			}
-// 	// 		}
-// }
 // }

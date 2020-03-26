@@ -143,7 +143,11 @@ namespace fan
 	{
 		onClear.Emmit(*this);
 		path = "";
-		//instantiate->Clear();;
+		//instantiate->Clear();
+
+
+		world->Clear();
+
 		root = nullptr;
 	}
 

@@ -39,6 +39,7 @@ namespace fan {
 		bool				 HasComponent( const EntityID _entityID, ComponentIndex _index );
 		EntityID			 CreateEntity();
 		void				 KillEntity( const EntityID _entityID );
+		void				 Clear();
 		EntityHandle		 CreateHandle( const EntityID _entityID );
 		EntityID			 GetEntityID( const EntityHandle _handle );
 		ComponentIndex		 GetDynamicIndex( const uint32_t _staticIndex ) { return m_typeIndices[_staticIndex]; }
