@@ -212,7 +212,8 @@ namespace fan
 			ImGui::Separator();
 			if( ImGui::Selectable( "Delete" ) && m_lastSceneNodeRightClicked != nullptr )
 			{
-				m_scene->DeleteSceneNode( *m_lastSceneNodeRightClicked );
+				EcsWorld& world = *m_scene->world;
+				world.KillEntity( world.GetEntityID( m_lastSceneNodeRightClicked->handle ) );
 			}
 			ImGui::EndPopup();
 		}
@@ -333,6 +334,7 @@ namespace fan
 					SceneNode& newNode = m_scene->CreateSceneNode( m_textBuffer, m_lastSceneNodeRightClicked );
 					onSelectSceneNode.Emmit( &newNode );
 					m_lastSceneNodeRightClicked = nullptr;
+					m_textBuffer[0] = '\0';
 					ImGui::CloseCurrentPopup();
 				}
 			}
