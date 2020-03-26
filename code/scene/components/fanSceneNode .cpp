@@ -1,5 +1,6 @@
 #include "scene/components/fanSceneNode.hpp"
 
+#include "ecs/fanEcsWorld.hpp"
 #include "scene/singletonComponents/fanScene.hpp"
 
 namespace fan
@@ -13,6 +14,7 @@ namespace fan
 		_info.icon  = ImGui::IconType::GAMEOBJECT16;
 		_info.onGui = &SceneNode::OnGui;
 		_info.init = &SceneNode::Init;
+		_info.onDelete = &SceneNode::OnDelete;
 		_info.editorPath = "/";
 	}
 
@@ -26,6 +28,56 @@ namespace fan
 		node.scene = nullptr;
 		node.parent = nullptr;
 		node.childs.clear();
+	}
+
+	//================================================================================================================================
+	// disconnects all the node's child hierarchy tree and kills it
+	//================================================================================================================================
+	void SceneNode::OnDelete( EcsWorld& _world, Component& _component )
+	{
+		SceneNode& node = static_cast<SceneNode&>( _component );
+		Scene& scene = _world.GetSingletonComponent<Scene>();
+		scene.onDeleteSceneNode.Emmit( &node );
+
+
+		// removes from parent
+		if( node.parent != nullptr )
+		{
+			node.parent->RemoveChild( node );
+		}
+
+		if( !node.childs.empty() )
+		{
+			// stacks of initial nodes
+			std::stack<SceneNode* > nodesstack;
+			for ( SceneNode* child : node.childs )
+			{
+				nodesstack.push( child );
+			}
+			
+
+			// find all child nodes
+			std::set<SceneNode* > nodesToDelete;
+			while( !nodesstack.empty() )
+			{
+				SceneNode& node = *nodesstack.top();
+				nodesstack.pop();
+				nodesToDelete.insert( &node );
+				for( int childIndex = 0; childIndex < node.childs.size(); childIndex++ )
+				{
+					nodesstack.push( node.childs[childIndex] );
+				}
+			}
+
+			// delete node & childs
+			for( SceneNode* node : nodesToDelete )
+			{
+				EntityID entityID = _world.GetEntityID( node->handle );
+				_world.KillEntity( entityID );
+				node->parent = nullptr;
+				node->childs.clear();
+			}		
+		}
 	}
 
 	//================================================================================================================================
@@ -48,7 +100,7 @@ namespace fan
 	{
 		SceneNode& node = static_cast<SceneNode&>( _sceneNode );
 		ImGui::Text( "name      : %s", node.name.c_str() );
-		ImGui::Text( "scene     : %s", node.scene->path.c_str() );
+		ImGui::Text( "scene     : %s", node.scene->path.empty()	? "<null>" : node.scene->path.c_str() );
 		ImGui::Text( "handle    : %u", node.handle );
 		ImGui::Text( "unique id : %u", node.uniqueID );
 	}

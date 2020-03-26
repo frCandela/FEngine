@@ -98,18 +98,33 @@ namespace fan
 	//================================================================================================================================	
 	PhysicsWorld::~PhysicsWorld()
 	{
-		// remove all collision objects
-		for (int i = dynamicsWorld->getNumCollisionObjects() - 1; i >= 0; i--)
-		{
-			btCollisionObject* obj = dynamicsWorld->getCollisionObjectArray()[i];
-			dynamicsWorld->removeCollisionObject( obj );
-		}
+		RemoveAllRigidbodies();
 
 		delete solver;
 		delete overlappingPairCache;
 		delete dispatcher;
 		delete collisionConfiguration;
 		//delete dynamicsWorld; @hack bullet physics alignement is broken, check the lib compilation parameters...
+	}
+
+	//================================================================================================================================
+	// remove all collision objects
+	// returns true if some bodies were removed
+	//================================================================================================================================	
+	bool PhysicsWorld::RemoveAllRigidbodies()
+	{
+		if( dynamicsWorld->getNumCollisionObjects() == 0 )
+		{
+			return false;
+		}
+
+		for( int i = dynamicsWorld->getNumCollisionObjects() - 1; i >= 0; i-- )
+		{
+			btCollisionObject* obj = dynamicsWorld->getCollisionObjectArray()[i];
+			dynamicsWorld->removeCollisionObject( obj );
+		}
+
+		return true;
 	}
 
 	//================================================================================================================================

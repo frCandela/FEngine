@@ -26,13 +26,11 @@ namespace fan
 
 		SceneNode& CreateSceneNode( const std::string _name, SceneNode* const _parentNode, const bool _generateID = true );
 		SceneNode* CreatePrefab( const Prefab& _prefab, SceneNode* const _parent );
-		void	   DeleteSceneNode( SceneNode& _node ) { sceneNodesToDelete.push_back( &_node ); }
 
 		void New();
 		void Save() const;
 		bool LoadFrom( const std::string _path );
 		void Clear();
-		void DeleteNodesImmediate( const std::vector<SceneNode*>& _nodes );
 		void SetMainCamera( SceneNode& _nodeCamera );
 
 		static uint32_t	R_FindMaximumId( SceneNode& _node );
@@ -52,6 +50,5 @@ namespace fan
 		SceneNode *					root = nullptr;
 		uint32_t					nextUniqueID = 1;
 		SceneNode*					mainCamera = nullptr;
-		std::vector < SceneNode* >	sceneNodesToDelete; // nodes deleted at the end of the frame
 	};
 }

@@ -38,7 +38,8 @@ namespace fan
 	{
 		if ( m_selectedSceneNode != nullptr &&  ! m_selectedSceneNode->IsRoot() )
 		{
-			m_selectedSceneNode->scene->DeleteSceneNode( *m_selectedSceneNode );
+			EcsWorld& world = *m_selectedSceneNode->scene->world;
+			world.KillEntity( world.GetEntityID( m_selectedSceneNode->handle ) );
 		}
 	}
 

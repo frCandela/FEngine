@@ -51,6 +51,7 @@ namespace fan
 	// function pointers :
 	// onGui		: draws ui associated with the component
 	// init			: clears the component value 
+	// onDelete     : callback when the component is deleted
 	// save			: serializes the component to json
 	// load			: deserializes the component from json
 	// instanciate  : don't touch it, it's auto generated
@@ -65,6 +66,7 @@ namespace fan
 
 		void		 ( *onGui )( Component& ) = nullptr;
 		void		 ( *init  )( Component& ) = nullptr; 
+		void		 ( *onDelete )( EcsWorld& , Component& ) = nullptr;
 		void		 ( *save  )( const Component&, Json& ) = nullptr;
 		void		 ( *load  )( Component&, const Json& ) = nullptr;
 		Component& ( *instanciate )( void* ) = nullptr;

@@ -101,8 +101,7 @@ namespace fan
 	void GameCamera::DeleteGameCamera( EcsWorld& _world )
 	{
 		GameCamera& gameCamera = _world.GetSingletonComponent<GameCamera>();
-		Scene& scene = _world.GetSingletonComponent<Scene>();
-		scene.DeleteSceneNode( *gameCamera.cameraNode );
+		_world.KillEntity( _world.GetEntityID( gameCamera.cameraNode->handle ) );
 		gameCamera.cameraNode = nullptr;
 	}
 

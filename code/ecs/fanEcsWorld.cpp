@@ -94,6 +94,12 @@ namespace fan
 		assert( entity.signature[_index] == 1 ); // this entity doesn't have this component
 		Component& component = GetComponent( _entityID, _index );
 
+		const ComponentInfo& info = GetComponentInfo( component.componentIndex );
+		if( info.onDelete != nullptr ) 
+		{ 
+			info.onDelete( *this , component);
+		}
+
 		m_components[_index].RemoveComponent( component.chunckIndex, component.chunckComponentIndex );
 		entity.signature[_index] = 0;
 
@@ -219,6 +225,13 @@ namespace fan
 			for( int componentIndex = 0; componentIndex < entity.componentCount; componentIndex++ )
 			{
 				Component& component = *entity.components[componentIndex];
+
+				const ComponentInfo& info = GetComponentInfo( component.componentIndex );
+				if( info.onDelete != nullptr )
+				{
+					info.onDelete( *this, component );
+				}
+
 				m_components[component.componentIndex].RemoveComponent( component.chunckIndex, component.chunckComponentIndex );
 			}
 			m_entities.pop_back();

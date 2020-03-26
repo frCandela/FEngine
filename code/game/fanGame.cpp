@@ -68,10 +68,19 @@ namespace fan
 		if( state == State::PLAYING || state == State::PAUSED )
 		{
 			Debug::Highlight() << name << ": stopped" << Debug::Endl();
-			
+
 			state = State::STOPPED;
+
+			// clears the physics world
 			S_UnregisterAllRigidbodies::Run( world, world.Match( S_UnregisterAllRigidbodies::GetSignature( world ) ) );
 			GameCamera::DeleteGameCamera( world );
+
+			// clears remaining rigidbodies from  the physics world
+			PhysicsWorld& physicsWorld = world.GetSingletonComponent<PhysicsWorld>();
+			if( physicsWorld.RemoveAllRigidbodies() )
+			{
+				Debug::Warning( "Some rigidbodies not unregistered properly" );
+			}
 		}
 	}
 
@@ -127,7 +136,7 @@ namespace fan
 
 			// late update
 			S_UpdateBoundsFromRigidbody::Run( world, world.Match( S_UpdateBoundsFromRigidbody::GetSignature( world ) ), delta );
-			//RUN_SYSTEM( ecsUpdateBullet, Run );			
+			S_UpdateBullets::Run( world, world.Match( S_UpdateBullets::GetSignature( world ) ), delta );
 			S_UpdateBoundsFromModel::Run( world, world.Match( S_UpdateBoundsFromModel::GetSignature( world ) ), delta );
 			S_UpdateBoundsFromTransform::Run( world, world.Match( S_UpdateBoundsFromTransform::GetSignature( world ) ), delta );
 
@@ -138,8 +147,6 @@ namespace fan
 			// end frame
 			SCOPED_PROFILE( scene_endFrame );
 			Scene& scene = world.GetSingletonComponent<Scene>();
-			scene.DeleteNodesImmediate( scene.sceneNodesToDelete );
-			scene.sceneNodesToDelete.clear();
 			world.SortEntities();
 			world.RemoveDeadEntities();
 		}

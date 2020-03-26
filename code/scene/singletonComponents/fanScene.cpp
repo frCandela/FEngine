@@ -40,7 +40,6 @@ namespace fan
 		scene.root = nullptr;
 		scene.nextUniqueID = 1;
 		scene.mainCamera = nullptr;
-		scene.sceneNodesToDelete.clear();
 		scene.world = nullptr;
 	}
 
@@ -128,55 +127,6 @@ namespace fan
 	}
 
 	//================================================================================================================================
-	// clears a set of scene nodes
-	// warning : very expensive & invalidates all EntityID
-	//================================================================================================================================
-	void Scene::DeleteNodesImmediate( const std::vector<SceneNode*>& _nodes )
-	{		
-		// stacks of initial nodes
-		std::stack<SceneNode* > nodesstack;
-		for( int nodeIndex = 0; nodeIndex < _nodes.size(); nodeIndex++ )
-		{
-			if( _nodes[nodeIndex] != nullptr )
-			{
-				nodesstack.push( _nodes[nodeIndex] );
-			}			
-		}
-
-		// find all child nodes
-		std::set<SceneNode* > nodesToDelete;
-		while( !nodesstack.empty() )
-		{
-			SceneNode& node = *nodesstack.top();
-			nodesstack.pop();
-			nodesToDelete.insert( &node );
-			for( int childIndex = 0; childIndex < node.childs.size(); childIndex++ )
-			{
-				nodesstack.push( node.childs[childIndex] );
-			}
-		}
-
-		// delete all nodes
-		for( SceneNode* node : nodesToDelete )
-		{
-			EntityID entityID = world->GetEntityID( node->handle );
-
-			// remove rigidbody from physics world
-			if( world->HasComponent<Rigidbody>( entityID ) )
-			{
-				onDeleteRigidbody.Emmit( entityID );
-			}
-			world->KillEntity( entityID );
-			if( node->parent != nullptr )
-			{
-				node->parent->RemoveChild( *node );
-			}
-		}
-		world->SortEntities();
-		world->RemoveDeadEntities();
-	}
-
-	//================================================================================================================================
 	//================================================================================================================================
 	void Scene::SetMainCamera( SceneNode& _nodeCamera )
 	{
@@ -193,10 +143,8 @@ namespace fan
 	{
 		onClear.Emmit(*this);
 		path = "";
-		//instantiate->Clear();
-		DeleteNodesImmediate({ root } );
+		//instantiate->Clear();;
 		root = nullptr;
-		sceneNodesToDelete.clear();
 	}
 
 	//================================================================================================================================
