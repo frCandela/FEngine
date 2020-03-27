@@ -52,41 +52,22 @@ namespace fan
 				--weapon.bulletsAccumulator;
 				//if( m_energy->TryRemoveEnergy( m_bulletEnergyCost ) )
 				{
-					// creates the bullet ( @todo use a prefab to do this )
-					//if( *weapon.bulletPrefab != nullptr )
+					// creates the bullet
+					if( *weapon.bulletPrefab != nullptr )
 					{
-						SceneNode& node = scene.CreateSceneNode( "bullet", nullptr );
+						SceneNode& node = *scene.CreatePrefab( **weapon.bulletPrefab, scene.root );
 						EntityID bulletID = _world.GetEntityID( node.handle );
-						//EntityID bulletID =  _world.CreateEntity();
 
-						Bullet& bullet = _world.AddComponent<Bullet>( bulletID );
-						bullet.damage = weapon.bulletDamage;
-						bullet.durationLeft = weapon.bulletLifeTime;
-
-						Transform& bulletTransform = _world.AddComponent<Transform>( bulletID );
+						Transform& bulletTransform = _world.GetComponent<Transform>( bulletID );
 						bulletTransform.SetPosition( transform.GetPosition() + transform.TransformDirection( weapon.originOffset ) );
-						bulletTransform.SetScale( 0.2f * btVector3::One() );
 
-						MotionState& motionState = _world.AddComponent<MotionState>( bulletID );
-
-						SphereShape& sphereShape = _world.AddComponent<SphereShape>( bulletID );
-						sphereShape.SetRadius( 0.1f );
-
-						Rigidbody& bulletRigidbody = _world.AddComponent<Rigidbody>( bulletID );
+						Rigidbody& bulletRigidbody = _world.GetComponent<Rigidbody>( bulletID );
 						//rigidbody->onContactStarted.Connect( &Weapon::OnBulletContact, this );
 						bulletRigidbody.SetIgnoreCollisionCheck( rigidbody, true );
 						bulletRigidbody.SetVelocity( rigidbody.GetVelocity() + weapon.bulletSpeed * transform.Forward() );
-						bulletRigidbody.SetCollisionShape( &sphereShape.sphereShape );
-						bulletRigidbody.SetMotionState( &motionState.motionState );
-
+						bulletRigidbody.SetMotionState( & _world.GetComponent<MotionState>( bulletID ).motionState );
+						bulletRigidbody.SetCollisionShape( &_world.GetComponent<SphereShape>( bulletID ).sphereShape );
 						physicsWorld.dynamicsWorld->addRigidBody( &bulletRigidbody.rigidbody );
-
-						MeshRenderer& meshRenderer = _world.AddComponent<MeshRenderer>( bulletID );
-						meshRenderer.mesh = Mesh::s_resourceManager.GetMesh( RenderGlobal::s_meshSphere );
-
-						Material& material = _world.AddComponent<Material>( bulletID );
-						material.texture = Texture::	s_resourceManager.GetTexture( RenderGlobal::s_whiteTexture );
-						material.color = Color::Red;
 					}
 				}
 			}
@@ -99,7 +80,7 @@ namespace fan
 	{
 		return
 			_world.GetSignature<Transform>() |
-			_world.GetSignature<Bullet>();
+			_world.GetSignature<Bullet>( );
 	}
 
 	//================================================================================================================================

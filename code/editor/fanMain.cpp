@@ -14,7 +14,7 @@ public:
 	LPPMain()
 	{
 #ifndef NDEBUG
-		livePP = lpp::lppLoadAndRegister( L"deps/LivePP/", "AGroupName" );
+		livePP = lpp::lppLoadAndRegister( L"middleware/LivePP/", "fanEngine" );
 		lpp::lppEnableAllCallingModulesSync( livePP );
 		engine.onLPPSynch.Connect( &LPPMain::OnSynch, this );
 		engine.Run();

@@ -30,7 +30,10 @@ namespace fan
 
 		for( EntityID entityID : _entities )
 		{
+
 			const Rigidbody& rb = _world.GetComponent<Rigidbody>( entityID );
+			if( !rb.rigidbody.isInWorld() ) { continue;}
+
 			Bounds& bounds = _world.GetComponent<Bounds>( entityID );
 
 			// gets bounds from rigidbody
