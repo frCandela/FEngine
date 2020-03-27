@@ -73,33 +73,4 @@ namespace fan
 			}
 		}
 	}
-
-	//================================================================================================================================
-	//================================================================================================================================
-	Signature S_UpdateBullets::GetSignature( const EcsWorld& _world )
-	{
-		return
-			_world.GetSignature<Transform>() |
-			_world.GetSignature<Bullet>( );
-	}
-
-	//================================================================================================================================
-	//================================================================================================================================
-	void S_UpdateBullets::Run( EcsWorld& _world, const std::vector<EntityID>& _entities, const float _delta )
-	{
-		if( _delta == 0.f ) { return; }
-
-		PhysicsWorld& physicsWorld = _world.GetSingletonComponent<PhysicsWorld>();
-		Scene& scene = _world.GetSingletonComponent<Scene>();
-
-		for( EntityID entityID : _entities )
-		{
-			Bullet& bullet = _world.GetComponent<Bullet>( entityID );
-			bullet.durationLeft -= _delta;
-			if( bullet.durationLeft <= 0.f )
-			{
-				_world.KillEntity( entityID );
-			}
-		}
-	}
 }

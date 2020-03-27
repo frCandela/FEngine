@@ -58,6 +58,7 @@
 #include "scene/components/fanTransformUI.hpp"
 #include "scene/components/fanUIRenderer.hpp"
 #include "scene/components/fanBounds.hpp"
+#include "scene/components/fanExpirationTime.hpp"
 #include "scene/systems/fanDrawDebug.hpp"
 #include "scene/systems/fanUpdateRenderWorld.hpp"
 #include "scene/singletonComponents/fanSceneInstantiate.hpp"
@@ -559,6 +560,7 @@ namespace fan
 		_world.AddComponentType<UITransform>();
 		_world.AddComponentType<UIRenderer>();
 		_world.AddComponentType<Bounds>();
+		_world.AddComponentType<ExpirationTime>();
 
 		_world.AddTagType<tag_boundsOutdated>();
 		_world.AddTagType<tag_editorOnly>();

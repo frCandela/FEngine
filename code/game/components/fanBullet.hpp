@@ -20,7 +20,6 @@ namespace fan
 		static void Save( const Component& _component, Json& _json );
 		static void Load( Component& _component, const Json& _json );
 
-		float durationLeft;
 		float damage;
 	};
 	static constexpr size_t sizeof_bullet = sizeof( Bullet );

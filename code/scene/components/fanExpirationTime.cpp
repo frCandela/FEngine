@@ -1,58 +1,56 @@
-#include "game/components/fanBullet.hpp"
+#include "scene/components/fanExpirationTime.hpp"
 
-#include "game/fanGameSerializable.hpp"
+#include "render/fanRenderSerializable.hpp"
 
 namespace fan
 {
-	REGISTER_COMPONENT( Bullet, "bullet" );
+	REGISTER_COMPONENT( ExpirationTime, "expiration_time" );
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void Bullet::SetInfo( ComponentInfo& _info )
+	void ExpirationTime::SetInfo( ComponentInfo& _info )
 	{
-		_info.icon = ImGui::IconType::JOYSTICK16;
-		_info.onGui = &Bullet::OnGui;
-		_info.init = &Bullet::Init;
-		_info.load = &Bullet::Load;
-		_info.save = &Bullet::Save;
-		_info.editorPath = "game/";
+		_info.icon = ImGui::IconType::STOP16;
+		_info.onGui = &ExpirationTime::OnGui;
+		_info.init = &ExpirationTime::Init;
+		_info.load  = &ExpirationTime::Load;
+		_info.save  = &ExpirationTime::Save;
+		_info.editorPath = "/";
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void Bullet::Init( Component& _component )
+	void ExpirationTime::Init( Component& _component )
 	{
-		Bullet& bullet = static_cast<Bullet&>( _component );
-
-		// bullets
-		bullet.damage = 5.f;
+		ExpirationTime& expiration = static_cast<ExpirationTime&>( _component );
+		expiration.duration = 10.f;
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void Bullet::OnGui( Component& _component )
+	void ExpirationTime::OnGui( Component& _component )
 	{
-		Bullet& bullet = static_cast<Bullet&>( _component );
-
+		ExpirationTime& expiration = static_cast<ExpirationTime&>( _component );
 		ImGui::PushItemWidth( 0.6f * ImGui::GetWindowWidth() );
 		{
-			ImGui::DragFloat( "damage ##bullet", &bullet.damage, 0.1f, 0.f, 100.f );
+			ImGui::DragFloat( "duration", &expiration.duration, 0.1f, 0.f, 10.f );
 		} ImGui::PopItemWidth();
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void Bullet::Save( const Component& _component, Json& _json )
+	void ExpirationTime::Save( const Component& _component, Json& _json )
 	{
-		const Bullet& bullet = static_cast<const Bullet&>( _component );
-		Serializable::SaveFloat( _json, "damage", bullet.damage );
+		const ExpirationTime& expiration = static_cast<const ExpirationTime&>( _component );
+
+		Serializable::SaveFloat( _json, "duration", expiration.duration );
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void Bullet::Load( Component& _component, const Json& _json )
+	void ExpirationTime::Load( Component& _component, const Json& _json )
 	{
-		Bullet& bullet = static_cast<Bullet&>( _component );
-		Serializable::LoadFloat( _json, "damage", bullet.damage );
+		ExpirationTime& expiration = static_cast<ExpirationTime&>( _component );
+		Serializable::LoadFloat( _json, "duration", expiration.duration );
 	}
 }

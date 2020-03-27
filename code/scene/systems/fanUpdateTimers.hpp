@@ -5,10 +5,9 @@ namespace fan
 	class EcsWorld;
 
 	//==============================================================================================================================================================
-	// fires the weapons :
-	// creates bullets at the proper position & speed depending on player input
+	// Moves particles, kill them when they are out of time
 	//==============================================================================================================================================================
-	struct S_FireWeapons : System
+	struct S_UpdateExpirationTimes : System
 	{
 		static Signature GetSignature( const EcsWorld& _world );
 		static void Run( EcsWorld& _world, const std::vector<EntityID>& _entities, const float _delta );

@@ -9,6 +9,7 @@
 #include "scene/systems/fanEmitParticles.hpp"
 #include "scene/systems/fanGenerateParticles.hpp"
 #include "scene/systems/fanUpdateBounds.hpp"
+#include "scene/systems/fanUpdateTimers.hpp"
 #include "scene/components/fanSceneNode.hpp"
 #include "scene/components/fanTransform.hpp"
 #include "scene/components/fanCamera.hpp"
@@ -129,7 +130,7 @@ namespace fan
 
 			// late update
 			S_UpdateBoundsFromRigidbody::Run( world, world.Match( S_UpdateBoundsFromRigidbody::GetSignature( world ) ), delta );
-			S_UpdateBullets::Run( world, world.Match( S_UpdateBullets::GetSignature( world ) ), delta );
+			S_UpdateExpirationTimes::Run( world, world.Match( S_UpdateExpirationTimes::GetSignature( world ) ), delta );
 			S_UpdateBoundsFromModel::Run( world, world.Match( S_UpdateBoundsFromModel::GetSignature( world ) ), delta );
 			S_UpdateBoundsFromTransform::Run( world, world.Match( S_UpdateBoundsFromTransform::GetSignature( world ) ), delta );
 
