@@ -1,5 +1,6 @@
 #include "scene/systems/fanRegisterPhysics.hpp"
 
+#include "scene/components/fanSceneNode.hpp"
 #include "scene/components/fanSphereShape.hpp"
 #include "scene/components/fanBoxShape.hpp"
 #include "scene/components/fanMotionState.hpp"
@@ -47,7 +48,16 @@ namespace fan
 			// reset the rigidbody				
 			rb.SetMotionState( motionState );
 			rb.SetCollisionShape( shape );
-			physicsWorld.dynamicsWorld->addRigidBody( &rb.rigidbody );
+
+			if( _world.HasComponent<SceneNode>( entityID ) )
+			{
+				SceneNode& sceneNode = _world.GetComponent<SceneNode>( entityID );
+				physicsWorld.AddRigidbody( rb, sceneNode.handle );
+			}
+			else
+			{
+				physicsWorld.dynamicsWorld->addRigidBody( &rb.rigidbody );
+			}			
 		}
 	}
 
@@ -67,7 +77,7 @@ namespace fan
 		for( EntityID entityID : _entities )
 		{
 			Rigidbody& rigidbody = _world.GetComponent<Rigidbody>( entityID );
-			physicsWorld.dynamicsWorld->removeRigidBody( &rigidbody.rigidbody );
+			physicsWorld.RemoveRigidbody( rigidbody );
 		}
 	}
 }

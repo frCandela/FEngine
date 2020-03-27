@@ -10,8 +10,8 @@
 #include "game/components/fanBullet.hpp"
 #include "game/components/fanWeapon.hpp"
 #include "game/components/fanPlayerInput.hpp"
+#include "game/singletonComponents/fanCollisionManager.hpp"
 #include "scene/singletonComponents/fanPhysicsWorld.hpp"
-
 #include "scene/singletonComponents/fanScene.hpp"
 #include "scene/components/fanSceneNode.hpp"
 
@@ -36,6 +36,7 @@ namespace fan
 
 		PhysicsWorld& physicsWorld = _world.GetSingletonComponent<PhysicsWorld>();
 		Scene& scene = _world.GetSingletonComponent<Scene>();
+		CollisionManager& collisionManager = _world.GetSingletonComponent<CollisionManager>();
 
 		for( EntityID entityID : _entities )
 		{
@@ -62,12 +63,13 @@ namespace fan
 						bulletTransform.SetPosition( transform.GetPosition() + transform.TransformDirection( weapon.originOffset ) );
 
 						Rigidbody& bulletRigidbody = _world.GetComponent<Rigidbody>( bulletID );
-						//rigidbody->onContactStarted.Connect( &Weapon::OnBulletContact, this );
+						bulletRigidbody.onContactStarted.Connect( &CollisionManager::OnBulletContact, &collisionManager );
 						bulletRigidbody.SetIgnoreCollisionCheck( rigidbody, true );
 						bulletRigidbody.SetVelocity( rigidbody.GetVelocity() + weapon.bulletSpeed * transform.Forward() );
 						bulletRigidbody.SetMotionState( & _world.GetComponent<MotionState>( bulletID ).motionState );
 						bulletRigidbody.SetCollisionShape( &_world.GetComponent<SphereShape>( bulletID ).sphereShape );
-						physicsWorld.dynamicsWorld->addRigidBody( &bulletRigidbody.rigidbody );
+
+						physicsWorld.AddRigidbody( bulletRigidbody, node.handle );
 					}
 				}
 			}

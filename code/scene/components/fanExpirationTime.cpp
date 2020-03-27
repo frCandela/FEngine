@@ -33,7 +33,7 @@ namespace fan
 		ExpirationTime& expiration = static_cast<ExpirationTime&>( _component );
 		ImGui::PushItemWidth( 0.6f * ImGui::GetWindowWidth() );
 		{
-			ImGui::DragFloat( "duration", &expiration.duration, 0.1f, 0.f, 10.f );
+			ImGui::DragFloat( "duration##ExpirationTime", &expiration.duration, 0.1f, 0.f, 10.f );
 		} ImGui::PopItemWidth();
 	}
 

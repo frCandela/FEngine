@@ -25,7 +25,7 @@ namespace fan
 		~Scene();
 
 		SceneNode& CreateSceneNode( const std::string _name, SceneNode* const _parentNode, const bool _generateID = true );
-		SceneNode* CreatePrefab( const Prefab& _prefab, SceneNode* const _parent );
+		SceneNode* CreatePrefab( const Prefab& _prefab, SceneNode* const _parent ); // @todo return an entityID instead of a scene node
 
 		void New();
 		void Save() const;

@@ -41,7 +41,7 @@ namespace fan
 	{
 		PhysicsWorld& physicsWorld = _world.GetSingletonComponent<PhysicsWorld>();
 		Rigidbody& rb = static_cast<Rigidbody&>( _component );
-		physicsWorld.dynamicsWorld->removeRigidBody( &rb.rigidbody );		
+		physicsWorld.RemoveRigidbody( rb );
 	}
 
 	//================================================================================================================================

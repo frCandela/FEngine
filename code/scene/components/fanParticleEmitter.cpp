@@ -43,10 +43,10 @@ namespace fan
 		ImGui::PushItemWidth( 0.6f * ImGui::GetWindowWidth() );
 		{
 			ImGui::DragInt( "particles per second", &emitter.particlesPerSecond, 1, 0 );
-			ImGui::DragFloat( "speed", &emitter.speed, 0.01f );
-			ImGui::DragFloat( "duration", &emitter.duration, 0.01f );
-			ImGui::DragFloat3( "offset", &emitter.offset[0], 0.01f );
-			ImGui::ColorEdit4( "color##pecol", emitter.color.Data(), ImGui::fanColorEditFlags );
+			ImGui::DragFloat( "speed##ParticleEmitter", &emitter.speed, 0.01f );
+			ImGui::DragFloat( "duration##ParticleEmitter", &emitter.duration, 0.01f );
+			ImGui::DragFloat3( "offset##ParticleEmitter", &emitter.offset[0], 0.01f );
+			ImGui::ColorEdit4( "color##ParticleEmitter", emitter.color.Data(), ImGui::fanColorEditFlags );
 		}
 		ImGui::PopItemWidth();
 	}

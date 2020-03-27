@@ -53,6 +53,7 @@ namespace fan
 				physicsWorld.dynamicsWorld->setGravity( gravity );
 			}
 			ImGui::Text( "num rigidbodies : %d", physicsWorld.dynamicsWorld->getNumCollisionObjects() );
+			ImGui::Text( "num handles:      %d", physicsWorld.rigidbodiesHandles.size() );
 		}
 		ImGui::Unindent(); ImGui::Unindent();
 	}
@@ -103,6 +104,7 @@ namespace fan
 			btCollisionObject* obj = dynamicsWorld->getCollisionObjectArray()[i];
 			dynamicsWorld->removeCollisionObject( obj );
 		}
+		rigidbodiesHandles.clear();
 
 		delete solver;
 		delete overlappingPairCache;
@@ -135,5 +137,27 @@ namespace fan
 			rb0->onContactEnded.Emmit( rb1, _manifold );
 			rb1->onContactEnded.Emmit( rb0, _manifold );
 		}
+	}
+
+	//================================================================================================================================
+	// adds a rigidbody to the dynamics world and saves its handle ( useful for later use in collision callbacks )
+	//================================================================================================================================	
+	void PhysicsWorld::AddRigidbody( Rigidbody& _rigidbody, EntityHandle _entityhandle )
+	{
+		rigidbodiesHandles[&_rigidbody] = _entityhandle;
+		dynamicsWorld->addRigidBody( &_rigidbody.rigidbody );
+	}
+
+	//================================================================================================================================
+	// removes a rigidbody from the dynamics world and erases its handle
+	//================================================================================================================================	
+	void PhysicsWorld::RemoveRigidbody( Rigidbody& _rigidbody )
+	{
+		auto it = rigidbodiesHandles.find( &_rigidbody );
+		if( it != rigidbodiesHandles.end() )
+		{
+			rigidbodiesHandles.erase( it );
+		}
+		dynamicsWorld->removeRigidBody( &_rigidbody.rigidbody );
 	}
 }

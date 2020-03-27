@@ -23,7 +23,6 @@ namespace fan
 		static void Save( const Component& _component, Json& _json );
 		static void Load( Component& _component, const Json& _json );
 
-
 		// Bullets parameters
 		PrefabPtr bulletPrefab;
 		btVector3 originOffset;
@@ -38,9 +37,6 @@ namespace fan
 
 		// time accumulator
 		float bulletsAccumulator;
-
-//  	void OnBulletContact( Rigidbody* _other, btPersistentManifold* const& _manifold );
-// 		void CreateExplosion( const btVector3 _point );
 	};
 	static constexpr size_t sizeof_weapon = sizeof( Weapon );
 }

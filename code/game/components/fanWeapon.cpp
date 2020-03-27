@@ -45,6 +45,8 @@ namespace fan
 
 		// time accumulator
 		weapon.bulletsAccumulator = 0.f;
+
+		weapon.bulletPrefab = nullptr;		
 	}
 
 	//================================================================================================================================
@@ -55,7 +57,7 @@ namespace fan
 
 		ImGui::PushItemWidth( 0.6f * ImGui::GetWindowWidth() );
 		{
-			ImGui::FanPrefab( "bullet prefab", weapon.bulletPrefab );
+			ImGui::FanPrefab( "bullet prefab", weapon.bulletPrefab );			
 			ImGui::FanToolTip("must have a transform, rigidbody, sphere shape & motion state");
 			ImGui::DragFloat( "speed ##weapon", &weapon.bulletSpeed, 0.1f, 0.f, 100.f );
 			ImGui::DragFloat3( "offset ##weapon", &weapon.originOffset[0] );
@@ -74,7 +76,7 @@ namespace fan
 	{
 		const Weapon& weapon = static_cast<const Weapon&>( _component );
 
-		Serializable::SavePrefabPtr( _json, "bulletPrefab", weapon.bulletPrefab );
+		Serializable::SavePrefabPtr( _json, "bullet_prefab", weapon.bulletPrefab );
 		Serializable::SaveFloat( _json, "speed", weapon.bulletSpeed );
 		Serializable::SaveVec3( _json, "offset", weapon.originOffset );
 		Serializable::SaveFloat( _json, "bullets_per_second", weapon.bulletsPerSecond );
@@ -90,7 +92,7 @@ namespace fan
 	{
 		Weapon& weapon = static_cast<Weapon&>( _component );
 
-		Serializable::LoadPrefabPtr( _json, "bulletPrefab", weapon.bulletPrefab );
+		Serializable::LoadPrefabPtr( _json, "bullet_prefab", weapon.bulletPrefab );
 		Serializable::LoadFloat( _json, "speed", weapon.bulletSpeed );
 		Serializable::LoadVec3( _json, "offset", weapon.originOffset );
 		Serializable::LoadFloat( _json, "bullets_per_second", weapon.bulletsPerSecond );
@@ -99,40 +101,4 @@ namespace fan
 		Serializable::LoadFloat( _json, "explosion_time", weapon.explosionTime );
 		Serializable::LoadInt( _json, "particlesPerExplosion", weapon.particlesPerExplosion );
 	}
-
-// 	//================================================================================================================================
-// 	//================================================================================================================================
-// 	void Weapon::OnBulletContact( Rigidbody* _other, btPersistentManifold* const& _manifold )
-// 	{
-// 		Rigidbody* rb0 = static_cast< Rigidbody* > ( _manifold->getBody0()->getUserPointer() );
-// 		Rigidbody* rb1 = static_cast< Rigidbody* > ( _manifold->getBody1()->getUserPointer() );
-// 		Rigidbody* bulletRb = _other == rb0 ? rb1 : rb0;
-// 
-// 		m_gameobject->GetScene().DeleteGameobject( &bulletRb->GetGameobject() );
-// 		if ( GetScene().IsServer() == false )
-// 		{
-// 			CreateExplosion( bulletRb->GetGameobject().GetTransform().GetPosition() );
-// 		}
-//	}
-// 
-// 	//================================================================================================================================
-// 	//================================================================================================================================
-// 	void  Weapon::CreateExplosion( const btVector3 _point )
-// 	{
-// 		for ( int particleIndex = 0; particleIndex < m_particlesPerExplosion; particleIndex++ )
-// 		{
-// 			EcsManager& ecs = m_gameobject->GetScene().GetEcsManager();
-// 			ecsEntity entity = ecs.CreateEntity();
-// 			ecsPosition& position = ecs.AddComponent<ecsPosition>( entity );
-// 			ecs.AddComponent<ecsRotation>( entity ).Init();
-// 			ecsMovement& movement = ecs.AddComponent<ecsMovement>( entity );
-// 			ecsParticle& particle = ecs.AddComponent<ecsParticle>( entity );
-// 
-// 			movement.speed = btVector3( m_distribution( m_generator ), 0.f, m_distribution( m_generator ) ) - btVector3( 0.5f, 0.0f, 0.5f );
-// 			movement.speed.normalize();
-// 			movement.speed *= m_distribution( m_generator ) * m_exposionSpeed;
-// 			position.position = _point;
-// 			particle.durationLeft = m_explosionTime;
-// 		}
-// 	}
 }

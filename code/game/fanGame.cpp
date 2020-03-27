@@ -17,6 +17,7 @@
 
 #include "game/singletonComponents/fanSunLight.hpp"
 #include "game/singletonComponents/fanGameCamera.hpp"
+#include "game/singletonComponents/fanCollisionManager.hpp"
 
 #include "game/systems/fanUpdatePlanets.hpp"
 #include "game/systems/fanUpdateSpaceships.hpp"
@@ -38,14 +39,19 @@ namespace fan
 		  name( _name )
 		, world()
 	{
+		// Creates singletons
 		world.AddSingletonComponentType<SunLight>();
 		world.AddSingletonComponentType<GameCamera>();
+		world.AddSingletonComponentType<CollisionManager>();
 
 		world.AddComponentType<Planet>();
 		world.AddComponentType<SpaceShip>();
 		world.AddComponentType<PlayerInput>();
 		world.AddComponentType<Weapon>();
 		world.AddComponentType<Bullet>();
+
+		// @hack ? CollisionManager needs a reference to the world to mutuate stuff
+		world.GetSingletonComponent<CollisionManager>().world = &world;
 	}
 
 	//================================================================================================================================
@@ -73,7 +79,10 @@ namespace fan
 			state = State::STOPPED;
 
 			// clears the physics world
+			PhysicsWorld& physicsWorld = world.GetSingletonComponent<PhysicsWorld>();
 			S_UnregisterAllRigidbodies::Run( world, world.Match( S_UnregisterAllRigidbodies::GetSignature( world ) ) );
+			physicsWorld.rigidbodiesHandles.clear();
+
 			GameCamera::DeleteGameCamera( world );
 		}
 	}
