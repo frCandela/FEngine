@@ -14,6 +14,7 @@
 #include "scene/components/fanTransform.hpp"
 #include "scene/components/fanCamera.hpp"
 #include "scene/singletonComponents/fanScene.hpp"
+#include "scene/singletonComponents/fanRenderWorld.hpp"
 
 #include "game/singletonComponents/fanSunLight.hpp"
 #include "game/singletonComponents/fanGameCamera.hpp"
@@ -82,6 +83,10 @@ namespace fan
 			PhysicsWorld& physicsWorld = world.GetSingletonComponent<PhysicsWorld>();
 			S_UnregisterAllRigidbodies::Run( world, world.Match( S_UnregisterAllRigidbodies::GetSignature( world ) ) );
 			physicsWorld.rigidbodiesHandles.clear();
+
+			// clears the particles mesh
+			RenderWorld& renderWorld = world.GetSingletonComponent<RenderWorld>();
+			renderWorld.particlesMesh.LoadFromVertices( {} );
 
 			GameCamera::DeleteGameCamera( world );
 		}
