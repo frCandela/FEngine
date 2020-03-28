@@ -8,17 +8,7 @@ namespace fan
 	struct btVector2;
 	class Color;
 
-	//================================================================================================================================
-	//================================================================================================================================
-	class ISerializable
-	{
-	public:
-		virtual bool Load( const Json& _json ) = 0;
-		virtual bool Save( Json& _json ) const = 0;
-	};
-
 	namespace Serializable {
-
 		void SaveIVec2( Json& _json, const char* _name, const glm::ivec2& _vec2 );
 		void SaveVec2(Json& _json, const char* _name, const btVector2& _vec2);
 		void SaveVec3(Json& _json, const char* _name, const btVector3& _vec3);

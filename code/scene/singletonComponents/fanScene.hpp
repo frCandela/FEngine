@@ -3,7 +3,7 @@
 #include "scene/fanScenePrecompiled.hpp"
 
 #include "core/fanSignal.hpp"
-#include "game/fanGameSerializable.hpp"
+#include "scene/fanSceneSerializable.hpp"
 #include "ecs/fanSingletonComponent.hpp"
 
 namespace fan
@@ -45,10 +45,11 @@ namespace fan
 		Signal< EntityID >		onCreateRigidbody;
 		Signal< EntityID >		onDeleteRigidbody;
 
-		EcsWorld*					world;
-		std::string					path;		
-		SceneNode *					root = nullptr;
-		uint32_t					nextUniqueID = 1;
-		SceneNode*					mainCamera = nullptr;
+		EcsWorld*									world;
+		std::string									path;		
+		SceneNode *									root = nullptr;
+		uint32_t									nextUniqueID = 1;
+		SceneNode*									mainCamera = nullptr;
+		std::unordered_map< uint32_t, SceneNode* >  nodes;
 	};
 }

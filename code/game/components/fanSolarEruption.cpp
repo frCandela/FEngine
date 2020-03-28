@@ -1,12 +1,12 @@
 #include "game/components/fanSolarEruption.hpp"
+
 #include "game/components/fanPlanet.hpp"
-//#include "game/components/fanPlayersManager.hpp"
 #include "game/components/fanSolarPanel.hpp"
 #include "game/components/fanHealth.hpp"
 #include "core/time/fanProfiler.hpp"
 #include "editor/fanModals.hpp"
 #include "render/fanMesh.hpp"
-#include "game/fanGameSerializable.hpp"
+#include "scene/fanSceneSerializable.hpp"
 
 namespace fan
 {

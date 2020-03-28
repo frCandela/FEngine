@@ -19,9 +19,9 @@ namespace fan
 
 		static void SetInfo( ComponentInfo& _info );
 		static void Init( EcsWorld& _world, Component& _component );
-		static void OnGui( Component& _light );
-		static void Save( const Component& _transform, Json& _json );
-		static void Load( Component& _transform, const Json& _json );
+		static void OnGui( Component& _component );
+		static void Save( const Component& _component, Json& _json );
+		static void Load( Component& _component, const Json& _json );
 
 		Color ambiant;
 		Color diffuse;

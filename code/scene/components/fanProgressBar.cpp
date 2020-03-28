@@ -1,5 +1,5 @@
 #include "scene/components/fanProgressBar.hpp"
-#include "game/fanGameSerializable.hpp"
+#include "scene/fanSceneSerializable.hpp"
 
 namespace fan
 {

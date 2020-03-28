@@ -1,6 +1,6 @@
 #include "game/components/fanBullet.hpp"
 
-#include "game/fanGameSerializable.hpp"
+#include "scene/fanSceneSerializable.hpp"
 
 namespace fan
 {
@@ -20,7 +20,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void Bullet::Init( EcsWorld&, Component& _component )
+	void Bullet::Init( EcsWorld& _world, Component& _component )
 	{
 		Bullet& bullet = static_cast<Bullet&>( _component );
 

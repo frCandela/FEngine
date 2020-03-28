@@ -27,7 +27,7 @@ namespace fan
 	   
 	//================================================================================================================================
 	//================================================================================================================================
-	void Rigidbody::Init( EcsWorld&, Component& _component )
+	void Rigidbody::Init( EcsWorld& _world, Component& _component )
 	{
 		// clear
 		Rigidbody& rb = static_cast<Rigidbody&>( _component );
@@ -46,9 +46,9 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void Rigidbody::OnGui( Component& _rigidbody )
+	void Rigidbody::OnGui( Component& _component )
 	{
-		Rigidbody& rb = static_cast<Rigidbody&>( _rigidbody );
+		Rigidbody& rb = static_cast<Rigidbody&>( _component );
 
 		enum ComboState { DYNAMIC = 0, KINEMATIC = 1, STATIC = 2 };
 
@@ -112,9 +112,9 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void Rigidbody::Save( const Component& _rigidbody, Json& _json )
+	void Rigidbody::Save( const Component& _component, Json& _json )
 	{
-		const Rigidbody& rb = static_cast<const Rigidbody&>( _rigidbody );
+		const Rigidbody& rb = static_cast<const Rigidbody&>( _component );
 		Serializable::SaveFloat( _json, "mass", rb.GetMass() );
 		Serializable::SaveBool( _json, "enable_desactivation", rb.IsDeactivationEnabled() );
 		Serializable::SaveBool( _json, "is_kinematic", rb.IsKinematic() );
@@ -122,9 +122,9 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void Rigidbody::Load( Component& _rigidbody, const Json& _json )
+	void Rigidbody::Load( Component& _component, const Json& _json )
 	{
-		Rigidbody& rb = static_cast<Rigidbody&>( _rigidbody );
+		Rigidbody& rb = static_cast<Rigidbody&>( _component );
 
 		float tmpMass;
 		bool tmpEnableDesactivation;

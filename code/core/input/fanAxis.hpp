@@ -3,13 +3,13 @@
 #include "core/fanCorePrecompiled.hpp"
 #include "core/input/fanKeyboard.hpp"
 #include "core/input/fanJoystick.hpp"
-#include "game/fanGameSerializable.hpp"
+#include "scene/fanSceneSerializable.hpp"
 
 namespace fan
 {
 	//================================================================================================================================
 	//================================================================================================================================	
-	class Axis : public ISerializable
+	class Axis
 	{
 	public:
 		enum Type { KEYBOARD, JOYSTICK_AXIS, JOYSTICK_BUTTONS };
@@ -31,8 +31,8 @@ namespace fan
 		std::string				GetKeyPositiveName() const;
 		std::string				GetKeyNegativeName() const;
 
-		bool  Load( const Json& _json ) override;
-		bool  Save( Json& _json ) const override;
+		bool  Load( const Json& _json );
+		bool  Save( Json& _json ) const;
 
 		void  SetFromKeyboardKeys( const Keyboard::Key _keyPositive, const Keyboard::Key _keyNegative );
 		void  SetFromJoystickButtons( const Joystick::JoystickID _joystickID, const Joystick::Button _buttonPositive, const Joystick::Button _buttonNegative );

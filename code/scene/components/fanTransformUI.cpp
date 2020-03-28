@@ -1,6 +1,6 @@
 #include "scene/components/fanTransformUI.hpp"
 
-#include "core/fanISerializable.hpp"
+#include "core/fanSerializable.hpp"
 
 namespace fan
 {
@@ -20,7 +20,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void UITransform::Init( EcsWorld&, Component& _component )
+	void UITransform::Init( EcsWorld& _world, Component& _component )
 	{
 		UITransform& transform = static_cast<UITransform&>( _component );
 

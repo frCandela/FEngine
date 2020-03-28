@@ -1,6 +1,6 @@
 #include "scene/components/fanMeshRenderer.hpp"
 
-#include "core/fanISerializable.hpp"
+#include "core/fanSerializable.hpp"
 #include "render/fanRenderSerializable.hpp"
 
 namespace fan
@@ -21,7 +21,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void MeshRenderer::Init( EcsWorld&, Component& _component )
+	void MeshRenderer::Init( EcsWorld& _world, Component& _component )
 	{
 		MeshRenderer& meshRenderer = static_cast<MeshRenderer&>( _component );
 		meshRenderer.mesh = nullptr;
@@ -30,9 +30,9 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void MeshRenderer::OnGui( Component& _meshRenderer )
+	void MeshRenderer::OnGui( Component& _component )
 	{
-		MeshRenderer& meshRenderer = static_cast<MeshRenderer&>( _meshRenderer );
+		MeshRenderer& meshRenderer = static_cast<MeshRenderer&>( _component );
 		ImGui::FanMeshPtr( "mesh", meshRenderer.mesh );
 
 		// num triangles
@@ -45,17 +45,17 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void MeshRenderer::Save( const Component& _meshRenderer, Json& _json )
+	void MeshRenderer::Save( const Component& _component, Json& _json )
 	{
-		const MeshRenderer& meshRenderer = static_cast<const MeshRenderer&>( _meshRenderer );
+		const MeshRenderer& meshRenderer = static_cast<const MeshRenderer&>( _component );
 		Serializable::SaveMeshPtr( _json, "path", meshRenderer.mesh );
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void MeshRenderer::Load( Component& _meshRenderer, const Json& _json )
+	void MeshRenderer::Load( Component& _component, const Json& _json )
 	{
-		MeshRenderer& meshRenderer = static_cast<MeshRenderer&>( _meshRenderer );
+		MeshRenderer& meshRenderer = static_cast<MeshRenderer&>( _component );
 		Serializable::LoadMeshPtr( _json, "path", meshRenderer.mesh );
 	}
 }

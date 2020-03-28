@@ -24,7 +24,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void SphereShape::Init( EcsWorld&, Component& _component )
+	void SphereShape::Init( EcsWorld& _world, Component& _component )
 	{
 		SphereShape& sphereShape = static_cast<SphereShape&>( _component );
 		sphereShape.sphereShape = btSphereShape( 1.f );
@@ -33,9 +33,9 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void SphereShape::OnGui( Component& _sphereShape )
+	void SphereShape::OnGui( Component& _component )
 	{
-		SphereShape& sphereShape = static_cast<SphereShape&>( _sphereShape );
+		SphereShape& sphereShape = static_cast<SphereShape&>( _component );
 
 		ImGui::PushItemWidth( 0.6f * ImGui::GetWindowWidth() );
 		{
@@ -50,17 +50,17 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void SphereShape::Save( const Component& _sphereShape, Json& _json )
+	void SphereShape::Save( const Component& _component, Json& _json )
 	{
-		const SphereShape& sphereShape = static_cast<const SphereShape&>( _sphereShape );
+		const SphereShape& sphereShape = static_cast<const SphereShape&>( _component );
 		Serializable::SaveFloat( _json, "radius", sphereShape.GetRadius() );
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void SphereShape::Load( Component& _sphereShape, const Json& _json )
+	void SphereShape::Load( Component& _component, const Json& _json )
 	{
-		SphereShape& sphereShape = static_cast<SphereShape&>( _sphereShape );
+		SphereShape& sphereShape = static_cast<SphereShape&>( _component );
 		float radius;
 		Serializable::LoadFloat( _json, "radius", radius );
 

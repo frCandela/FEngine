@@ -1,7 +1,7 @@
 #include "scene/singletonComponents/fanPhysicsWorld.hpp"
 
 #include "core/time/fanTime.hpp"
-#include "core/fanISerializable.hpp"
+#include "core/fanSerializable.hpp"
 #include "scene/components/fanRigidbody.hpp"
 #include "scene/components/fanMotionState.hpp"
 #include "scene/components/fanSphereShape.hpp"

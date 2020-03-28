@@ -17,9 +17,9 @@ namespace fan
 		BoxShape();
 		static void SetInfo( ComponentInfo& _info );
 		static void Init( EcsWorld& _world, Component& _component );
-		static void OnGui( Component& _boxShape );
-		static void Save( const Component& _boxShape, Json& _json );
-		static void Load( Component& _boxShape, const Json& _json );
+		static void OnGui( Component& _component );
+		static void Save( const Component& _component, Json& _json );
+		static void Load( Component& _component, const Json& _json );
 		
 		void	  SetScaling( const btVector3 _scaling );
 		btVector3 GetScaling() const;

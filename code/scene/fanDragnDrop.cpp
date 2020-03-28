@@ -1,8 +1,10 @@
-#include "editor/fanDragnDrop.hpp"
+#include "scene/fanDragnDrop.hpp"
 
 #include "editor/fanImguiIcons.hpp"
 #include "scene/components/fanSceneNode.hpp"
 #include "scene/fanPrefab.hpp"
+#include "scene/singletonComponents/fanScene.hpp"
+#include "ecs/fanEcsWorld.hpp"
 #include "render/core/fanTexture.hpp"
 #include "render/fanMesh.hpp"
 
@@ -43,38 +45,6 @@ namespace ImGui
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void FanBeginDragDropSourceSceneNode( fan::SceneNode& _node, ImGuiDragDropFlags _flags  )
-	{
-		fan::SceneNode * node = &_node;
-
-		if( ImGui::BeginDragDropSource( _flags ) )
-		{
-			ImGui::SetDragDropPayload( "dragndrop_scenenode", &node, sizeof( fan::SceneNode** ) );
-			ImGui::Icon( ImGui::IconType::GAMEOBJECT16, { 16,16 } ); ImGui::SameLine();
-			ImGui::Text( node->name.c_str() );
-			ImGui::EndDragDropSource();
-		}
-	}
-
-	//================================================================================================================================
-	//================================================================================================================================
-	fan::SceneNode* FanBeginDragDropTargetSceneNode()
-	{
-		fan::SceneNode* node = nullptr;
-		if( ImGui::BeginDragDropTarget() )
-		{
-			if( const ImGuiPayload* payload = ImGui::AcceptDragDropPayload( "dragndrop_scenenode" ) )
-			{
-				assert( payload->DataSize == sizeof( fan::SceneNode** ) );
-				node = *( fan::SceneNode** )payload->Data;
-			}
-			ImGui::EndDragDropTarget();
-		}
-		return node;
-	}
-
-	//================================================================================================================================
-	//================================================================================================================================
 	void FanBeginDragDropSourcePrefab( fan::Prefab* _prefab, ImGuiDragDropFlags _flags )
 	{
 		if ( _prefab != nullptr )
@@ -105,24 +75,6 @@ namespace ImGui
 		}
 		return _prefab;
 	}
-
-// 	//================================================================================================================================
-// 	//================================================================================================================================
-// 	void FanBeginDragDropSourceComponent( fan::Component* _component, ImGuiDragDropFlags _flags )
-// 	{
-// 		if ( _component != nullptr )
-// 		{
-// 			if ( ImGui::BeginDragDropSource( _flags ) )
-// 			{
-// 				std::string nameid = std::string( "dragndrop_" ) + _component->GetName();
-// 				ImGui::SetDragDropPayload( nameid.c_str(), &_component, sizeof( fan::Component** ) );
-// 				ImGui::Icon( _component->GetIcon(), { 16,16 } ); ImGui::SameLine();
-// 				ImGui::Text( ( std::string( _component->GetName() ) + ":" ).c_str() ); ImGui::SameLine();
-// 				ImGui::Text( _component->GetGameobject().GetName().c_str() );
-// 				ImGui::EndDragDropSource();
-// 			}
-// 		}
-// 	}
 // 
 // 	//================================================================================================================================
 // 	// _typeID of the typeinfo type of the component 
@@ -160,15 +112,18 @@ namespace ImGui
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void FanBeginDragDropSourceEcComponent( fan::Component& _component, const fan::ComponentInfo& _info, ImGuiDragDropFlags _flags )
+	void FanBeginDragDropSourceComponent( fan::SceneNode& _sceneNode, fan::Component& _component, ImGuiDragDropFlags _flags )
 	{
-		fan::Component* component = &_component;
 		if( ImGui::BeginDragDropSource( _flags ) )
 		{
-			std::string nameid = std::string( "dragndrop_" ) + std::to_string( _component.GetIndex() );
-			ImGui::SetDragDropPayload( nameid.c_str(), &component, sizeof( fan::Component** ) );
-			ImGui::Icon( _info.icon, { 16,16 } ); ImGui::SameLine();
-			ImGui::Text( _info.name.c_str() );
+			fan::EcsWorld& world = *_sceneNode.scene->world;
+			const fan::ComponentInfo& info = world.GetComponentInfo( _component.GetIndex() );
+
+			std::string nameid = std::string( "dragndrop_" ) + std::to_string( info.staticIndex );
+			ComponentPayload payload = { &_sceneNode , &_component };
+			ImGui::SetDragDropPayload( nameid.c_str(), &payload, sizeof( payload ) );
+			ImGui::Icon( info.icon, { 16,16 } ); ImGui::SameLine();
+			ImGui::Text("%s : %s", info.name.c_str(), _sceneNode.name.c_str() );
 			ImGui::EndDragDropSource();
 		}		
 	}
@@ -176,34 +131,46 @@ namespace ImGui
 	//================================================================================================================================
 	// _typeID of the typeinfo type of the component 
 	//================================================================================================================================
-	fan::Component* FanBeginDragDropTargetEcComponent( const uint32_t _typeID )
+	ComponentPayload FanBeginDragDropTargetComponent( const uint32_t _staticID )
 	{
- 		fan::Component* component = nullptr;
-// 		if( ImGui::BeginDragDropTarget() )
-// 		{
-// 			const fan::Component* sample = fan::TypeInfo::Get().GetInstance< fan::Component >( _typeID );
-// 
-// 			std::string nameid = std::string( "dragndrop_" ) + sample->GetName();
-// 			// Drop payload component
-// 			const ImGuiPayload* payloadComponent = ImGui::AcceptDragDropPayload( nameid.c_str() );
-// 			if( payloadComponent )
-// 			{
-// 				assert( payloadComponent->DataSize == sizeof( fan::Component** ) );
-// 				component = *( fan::Component** )payloadComponent->Data;
-// 			}
-// 			// Drop payload gameobject
-// 			else
-// 			{
-// 				const ImGuiPayload* payloadGameobject = ImGui::AcceptDragDropPayload( "dragndrop_gameobject" );
-// 				if( payloadGameobject )
-// 				{
-// 					assert( payloadGameobject->DataSize == sizeof( fan::Gameobject** ) );
-// 					fan::Gameobject* gameobject = *( fan::Gameobject** )payloadGameobject->Data;
-// 					component = gameobject->GetComponent( _typeID );
-// 				}
-// 			}
-// 			ImGui::EndDragDropTarget();
-// 		}
- 		return component;
- 	}
+ 		if( ImGui::BeginDragDropTarget() )
+ 		{ 
+ 			
+			// Drop payload component
+ 			std::string nameid = std::string( "dragndrop_" ) + std::to_string( _staticID );
+ 			const ImGuiPayload* imGuiPayload = ImGui::AcceptDragDropPayload( nameid.c_str() );
+ 			if( imGuiPayload != nullptr )
+ 			{
+ 				assert( imGuiPayload->DataSize == sizeof( ComponentPayload ) );
+				return *(ComponentPayload*)imGuiPayload->Data;
+ 			}
+
+ 			// Drop payload scene node
+			nameid = std::string( "dragndrop_" ) + std::to_string( fan::SceneNode::s_typeInfo );
+			imGuiPayload = ImGui::AcceptDragDropPayload( nameid.c_str() );
+			if( imGuiPayload != nullptr )
+			{
+				// find the component and assigns it if it exists
+				assert( imGuiPayload->DataSize == sizeof( ComponentPayload ) );
+				ComponentPayload& payload = *(ComponentPayload*)imGuiPayload->Data;
+				fan::SceneNode& node = *payload.sceneNode;
+				fan::EcsWorld& world = *node.scene->world;
+				fan::EntityID nodeID = world.GetEntityID( node.handle );
+				fan::ComponentIndex componentIndex = world.GetDynamicIndex( _staticID );
+				if( world.HasComponent( nodeID, componentIndex ) )
+				{
+					fan::Component& component = world.GetComponent( nodeID, componentIndex );
+					return { &node, &component };
+				}
+				else
+				{
+					const fan::ComponentInfo& info = world.GetComponentInfo( componentIndex );
+					fan::Debug::Warning() << "drop failed : " << info.name << " component not found on \"" << node.name << "\"" << fan::Debug::Endl();
+				}
+			}
+
+ 			ImGui::EndDragDropTarget();
+ 		}
+ 		return ComponentPayload();
+	}
 }

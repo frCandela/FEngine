@@ -17,9 +17,9 @@ namespace fan
 		SphereShape();
 		static void SetInfo( ComponentInfo& _info );
 		static void Init( EcsWorld& _world, Component& _component );
-		static void OnGui( Component& _sphereShape );
-		static void Save( const Component& _sphereShape, Json& _json );
-		static void Load( Component& _sphereShape, const Json& _json );
+		static void OnGui( Component& _component );
+		static void Save( const Component& _component, Json& _json );
+		static void Load( Component& _component, const Json& _json );
 
 		void  SetRadius( const float _radius );
 		float GetRadius() const;

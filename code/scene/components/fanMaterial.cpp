@@ -21,7 +21,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void Material::Init( EcsWorld&, Component& _component )
+	void Material::Init( EcsWorld& _world, Component& _component )
 	{
 		Material& material = static_cast<Material&>( _component );
 
@@ -32,9 +32,9 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void Material::OnGui( Component& _material )
+	void Material::OnGui( Component& _component )
 	{
-		Material& material = static_cast<Material&>( _material );
+		Material& material = static_cast<Material&>( _component );
 
 		ImGui::PushItemWidth( 0.6f * ImGui::GetWindowWidth() - 16 );
 		{
@@ -52,9 +52,9 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void Material::Save( const Component& _material, Json& _json )
+	void Material::Save( const Component& _component, Json& _json )
 	{
-		const Material& material = static_cast<const Material&>( _material );
+		const Material& material = static_cast<const Material&>( _component );
 
 		Serializable::SaveUInt( _json, "shininess", material.shininess );
 		Serializable::SaveColor( _json, "color", material.color );
@@ -63,9 +63,9 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void Material::Load( Component& _material, const Json& _json )
+	void Material::Load( Component& _component, const Json& _json )
 	{
-		Material& material = static_cast<Material&>( _material );
+		Material& material = static_cast<Material&>( _component );
 
 		Serializable::LoadUInt( _json, "shininess", material.shininess );
 		Serializable::LoadColor( _json, "color", material.color );

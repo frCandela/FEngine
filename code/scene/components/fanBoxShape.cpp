@@ -24,7 +24,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void BoxShape::Init( EcsWorld&, Component& _component )
+	void BoxShape::Init( EcsWorld& _world, Component& _component )
 	{
 		BoxShape& boxShape = static_cast<BoxShape&>( _component );
 		boxShape.boxShape = btBoxShape( btVector3( 0.5f, 0.5f, 0.5f ) );
@@ -33,9 +33,9 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void BoxShape::OnGui( Component& _boxShape )
+	void BoxShape::OnGui( Component& _component )
 	{
-		BoxShape& boxShape = static_cast<BoxShape&>( _boxShape );
+		BoxShape& boxShape = static_cast<BoxShape&>( _component );
 		ImGui::PushItemWidth( 0.6f * ImGui::GetWindowWidth() );
 		{
 			btVector3 extent = boxShape.GetScaling();
@@ -49,18 +49,18 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void BoxShape::Save( const Component& _boxShape, Json& _json )
+	void BoxShape::Save( const Component& _component, Json& _json )
 	{
-		const BoxShape& boxShape = static_cast<const BoxShape&>( _boxShape );
+		const BoxShape& boxShape = static_cast<const BoxShape&>( _component );
 
 		Serializable::SaveVec3( _json, "scaling", boxShape.GetScaling() );
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void BoxShape::Load( Component& _boxShape, const Json& _json )
+	void BoxShape::Load( Component& _component, const Json& _json )
 	{
-		BoxShape& boxShape = static_cast<BoxShape&>( _boxShape );
+		BoxShape& boxShape = static_cast<BoxShape&>( _component );
 
 		btVector3 scaling;
 		Serializable::LoadVec3( _json, "scaling", scaling );

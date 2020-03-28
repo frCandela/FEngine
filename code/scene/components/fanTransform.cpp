@@ -1,6 +1,6 @@
 #include "scene/components/fanTransform.hpp"
 
-#include "core/fanISerializable.hpp"
+#include "core/fanSerializable.hpp"
 
 namespace fan
 {
@@ -20,7 +20,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void Transform::Init( EcsWorld&, Component& _component )
+	void Transform::Init( EcsWorld& _world, Component& _component )
 	{
 		Transform& transform = static_cast<Transform&>( _component );
 		transform.transform.setIdentity();
@@ -29,9 +29,9 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void Transform::OnGui( Component& _transform )
+	void Transform::OnGui( Component& _component )
 	{
-		Transform& transform = static_cast<Transform&>( _transform );
+		Transform& transform = static_cast<Transform&>( _component );
 		ImGui::PushItemWidth( 0.6f * ImGui::GetWindowWidth() - 16 );
 		{
 			// Position
@@ -69,9 +69,9 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void Transform::Save( const Component& _transform, Json& _json )
+	void Transform::Save( const Component& _component, Json& _json )
 	{
-		const Transform& transform = static_cast<const Transform&>( _transform );
+		const Transform& transform = static_cast<const Transform&>( _component );
 
 		Serializable::SaveVec3( _json, "position", transform.GetPosition() );
 		Serializable::SaveQuat( _json, "rotation", transform.GetRotationQuat() );
@@ -80,9 +80,9 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void Transform::Load( Component& _transform, const Json& _json )
+	void Transform::Load( Component& _component, const Json& _json )
  	{
-		Transform& transform = static_cast<Transform&>( _transform );
+		Transform& transform = static_cast<Transform&>( _component );
 
  		btVector3 tmpVec;
  		btQuaternion tmpQuat;

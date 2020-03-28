@@ -21,7 +21,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void MotionState::Init( EcsWorld&, Component& _component )
+	void MotionState::Init( EcsWorld& _world, Component& _component )
 	{
 		// clear
 		MotionState& motionState = static_cast<MotionState&>( _component );

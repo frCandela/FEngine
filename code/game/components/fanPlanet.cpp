@@ -1,6 +1,6 @@
 #include "game/components/fanPlanet.hpp"
 
-#include "game/fanGameSerializable.hpp"
+#include "scene/fanSceneSerializable.hpp"
 #include "render/fanRendererDebug.hpp"
 
 namespace fan
@@ -21,7 +21,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void Planet::Init( EcsWorld&, Component& _component )
+	void Planet::Init( EcsWorld& _world, Component& _component )
 	{
 		Planet& planet = static_cast<Planet&>( _component );
 		planet.timeAccumulator = 0.f;
@@ -32,9 +32,9 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void Planet::OnGui( Component& _planet )
+	void Planet::OnGui( Component& _component )
 	{
-		Planet& planet = static_cast<Planet&>( _planet );
+		Planet& planet = static_cast<Planet&>( _component );
 		ImGui::PushItemWidth( 0.6f * ImGui::GetWindowWidth() );
 		{
 			ImGui::DragFloat( "radius", &planet.radius, 0.1f, 0.f, 100.f );
@@ -47,9 +47,9 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void Planet::Save( const Component& _planet, Json& _json )
+	void Planet::Save( const Component& _component, Json& _json )
 	{
-		const Planet& planet = static_cast<const Planet&>( _planet );
+		const Planet& planet = static_cast<const Planet&>( _component );
 		Serializable::SaveFloat( _json, "radius", planet.radius );
 		Serializable::SaveFloat( _json, "speed",  planet.speed );
 		Serializable::SaveFloat( _json, "phase",  planet.phase );
@@ -57,9 +57,9 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void Planet::Load( Component& _planet, const Json& _json )
+	void Planet::Load( Component& _component, const Json& _json )
 	{
-		Planet& planet = static_cast<Planet&>( _planet );
+		Planet& planet = static_cast<Planet&>( _component );
 		Serializable::LoadFloat( _json, "radius", planet.radius );
 		Serializable::LoadFloat( _json, "speed",  planet.speed );
 		Serializable::LoadFloat( _json, "phase",  planet.phase );

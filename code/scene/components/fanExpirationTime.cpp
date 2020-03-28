@@ -20,7 +20,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void ExpirationTime::Init( EcsWorld&, Component& _component )
+	void ExpirationTime::Init( EcsWorld& _world, Component& _component )
 	{
 		ExpirationTime& expiration = static_cast<ExpirationTime&>( _component );
 		expiration.duration = 10.f;

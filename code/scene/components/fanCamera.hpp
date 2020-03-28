@@ -21,9 +21,9 @@ namespace fan
 
 		static void SetInfo( ComponentInfo& _info );
 		static void Init( EcsWorld& _world, Component& _component );
-		static void OnGui( Component& _camera );
-		static void Save( const Component& _camera, Json& _json );
-		static void Load( Component& _camera, const Json& _json );
+		static void OnGui( Component& _component );
+		static void Save( const Component& _component, Json& _json );
+		static void Load( Component& _component, const Json& _json );
 
 		float fov;
 		float orthoSize;

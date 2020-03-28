@@ -22,7 +22,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void ParticleEmitter::Init( EcsWorld&, Component& _component )
+	void ParticleEmitter::Init( EcsWorld& _world, Component& _component )
 	{
 		ParticleEmitter& emitter = static_cast<ParticleEmitter&>( _component );
 
@@ -36,9 +36,9 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void ParticleEmitter::OnGui( Component& _emitter )
+	void ParticleEmitter::OnGui( Component& _component )
 	{
-		ParticleEmitter& emitter = static_cast<ParticleEmitter&>( _emitter );
+		ParticleEmitter& emitter = static_cast<ParticleEmitter&>( _component );
 
 		ImGui::PushItemWidth( 0.6f * ImGui::GetWindowWidth() );
 		{
@@ -53,9 +53,9 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void ParticleEmitter::Save( const Component& _emitter, Json& _json )
+	void ParticleEmitter::Save( const Component& _component, Json& _json )
 	{
-		const ParticleEmitter& emitter = static_cast<const ParticleEmitter&>( _emitter );
+		const ParticleEmitter& emitter = static_cast<const ParticleEmitter&>( _component );
 
 		Serializable::SaveInt( _json, "particles_per_second", emitter.particlesPerSecond );
 		Serializable::SaveFloat( _json, "speed", emitter.speed );
@@ -66,9 +66,9 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void ParticleEmitter::Load( Component& _emitter, const Json& _json )
+	void ParticleEmitter::Load( Component& _component, const Json& _json )
 	{
-		ParticleEmitter& emitter = static_cast<ParticleEmitter&>( _emitter );
+		ParticleEmitter& emitter = static_cast<ParticleEmitter&>( _component );
 
 		Serializable::LoadInt( _json, "particles_per_second", emitter.particlesPerSecond );
 		Serializable::LoadFloat( _json, "speed", emitter.speed );
@@ -77,47 +77,3 @@ namespace fan
 		Serializable::LoadColor( _json, "color", emitter.color );
 	}
 }
-
-	//================================================================================================================================
-	//================================================================================================================================
-// 	void ParticleSystem::Update( const float _delta )
-// 	{
-// 		if ( m_particlesPerSecond <= 0.f )
-// 		{
-// 			return;
-// 		}
-// 
-// 		m_timeAccumulator += _delta;
-// 		float particleSpawnDelta = 1.f / m_particlesPerSecond;
-// 
-// 		const Transform& transform = ( *m_origin ) != nullptr ? m_origin->GetTransform() : m_gameobject->GetTransform();
-// 
-// 		const btVector3 origin = transform.GetPosition();
-// 		btVector3 transformedOffset = transform.TransformDirection( m_offset );
-// 
-// 		while ( m_timeAccumulator > particleSpawnDelta )
-// 		{
-// 			m_timeAccumulator -= particleSpawnDelta;
-// 
-// 			ecsEntity entity = m_ecsManager->CreateEntity();
-// 			m_ecsManager->AddComponent<ecsPosition>( entity );
-// 			m_ecsManager->AddComponent<ecsRotation>( entity );
-// 			m_ecsManager->AddComponent<ecsMovement>( entity );
-// 			m_ecsManager->AddComponent<ecsParticle>( entity );
-// 			if ( m_sunlightParticleOcclusionActive ) { m_ecsManager->AddComponent<ecsSunlightParticleOcclusion>( entity ); }
-// 
-// 			ecsPosition* position = m_ecsManager->FindComponentFromEntity<ecsPosition>( entity );
-// 			ecsMovement* movement = m_ecsManager->FindComponentFromEntity<ecsMovement>( entity );
-// 			ecsParticle* particle = m_ecsManager->FindComponentFromEntity<ecsParticle>( entity );
-// 
-// 
-// 			// Spawn particles
-// 
-// 			movement->speed = btVector3( m_distribution( m_generator ), m_distribution( m_generator ), m_distribution( m_generator ) ) - btVector3( 0.5f, 0.5f, 0.5f );
-// 			movement->speed.normalize();
-// 			movement->speed *= m_speed;
-// 			position->position = origin + transformedOffset;
-// 			particle->durationLeft = m_duration;
-// 			particle->color = m_color;
-// 		}
-// 	}

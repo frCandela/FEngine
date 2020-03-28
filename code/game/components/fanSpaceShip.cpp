@@ -1,6 +1,6 @@
 #include "game/components/fanSpaceShip.hpp"
 
-#include "game/fanGameSerializable.hpp"
+#include "scene/fanSceneSerializable.hpp"
 
 namespace fan
 {
@@ -20,7 +20,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void SpaceShip::Init( EcsWorld&, Component& _component )
+	void SpaceShip::Init( EcsWorld& _world, Component& _component )
 	{
 		SpaceShip& spaceship					= static_cast<SpaceShip&>( _component );
 

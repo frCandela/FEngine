@@ -1,6 +1,6 @@
 #include "editor/windows/fanSceneWindow.hpp"
 
-#include "editor/fanDragnDrop.hpp"
+#include "scene/fanDragnDrop.hpp"
 #include "editor/fanModals.hpp"
 #include "core/input/fanKeyboard.hpp"
 #include "core/time/fanProfiler.hpp"
@@ -259,8 +259,8 @@ namespace fan
 		}
 		bool isOpen = ImGui::TreeNode( ss.str().c_str() );
 
-		// Gameobject dragndrop target empty selectable -> place dragged below
-		SceneNode* nodeDrop1 = ImGui::FanBeginDragDropTargetSceneNode();
+		// SceneNode dragndrop target empty selectable -> place dragged below
+		SceneNode* nodeDrop1 = ImGui::FanBeginDragDropTargetComponent<SceneNode>().sceneNode;
 		if( nodeDrop1 && nodeDrop1 != &_node )
 		{
 			nodeDrop1->InsertBelow( _node );
@@ -270,7 +270,7 @@ namespace fan
 		ImGui::SameLine();
 		bool selected = ( &_node == m_sceneNodeSelected );
 
-		// Draw gameobject empty selectable to display a hierarchy
+		// Draw scene node empty selectable to display a hierarchy
 		std::stringstream ss2;
 		ss2 << _node.name << "##" << &_node; // Unique id
 		if( ImGui::Selectable( ss2.str().c_str(), &selected ) )
@@ -283,10 +283,10 @@ namespace fan
 		}
 
 		// SceneNode dragndrop source = selectable -^
-		ImGui::FanBeginDragDropSourceSceneNode( _node );
+		ImGui::FanBeginDragDropSourceComponent( _node, _node );
 
-		// SceneNode dragndrop target gameobject name -> place as child
-		SceneNode* nodeDrop = ImGui::FanBeginDragDropTargetSceneNode();
+		// SceneNode dragndrop target scene node name -> place as child
+		SceneNode* nodeDrop = ImGui::FanBeginDragDropTargetComponent<SceneNode>().sceneNode;
 		if( nodeDrop )
 		{
 			nodeDrop->SetParent( &_node );

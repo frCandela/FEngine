@@ -1,6 +1,6 @@
 #include "game/components/fanPlayerInput.hpp"
 
-#include "core/fanISerializable.hpp"
+#include "core/fanSerializable.hpp"
 #include "core/input/fanJoystick.hpp"
 #include "ecs/fanEcsWorld.hpp"
 
@@ -22,7 +22,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void PlayerInput::Init( EcsWorld&, Component& _component )
+	void PlayerInput::Init( EcsWorld& _world, Component& _component )
 	{
 		PlayerInput& playerInput = static_cast<PlayerInput&>( _component );
 

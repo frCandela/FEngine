@@ -22,7 +22,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void Camera::Init( EcsWorld&, Component& _component )
+	void Camera::Init( EcsWorld& _world, Component& _component )
 	{
 		Camera& camera = static_cast<Camera&>( _component );
 
@@ -36,9 +36,9 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void Camera::OnGui( Component& _camera )
+	void Camera::OnGui( Component& _component )
 	{
-		Camera& camera = static_cast<Camera&>( _camera );
+		Camera& camera = static_cast<Camera&>( _component );
 
 		ImGui::PushItemWidth( 0.6f * ImGui::GetWindowWidth() - 16 );
 		{
@@ -94,9 +94,9 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void Camera::Save( const Component& _camera, Json& _json )
+	void Camera::Save( const Component& _component, Json& _json )
 	{
-		const Camera& camera = static_cast<const Camera&>( _camera );
+		const Camera& camera = static_cast<const Camera&>( _component );
 
 		Serializable::SaveInt( _json, "camera_type", camera.type );
 		Serializable::SaveFloat( _json, "orthoSize", camera.orthoSize );
@@ -107,9 +107,9 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void Camera::Load( Component& _camera, const Json& _json )
+	void Camera::Load( Component& _component, const Json& _json )
 	{
-		Camera& camera = static_cast<Camera&>( _camera );
+		Camera& camera = static_cast<Camera&>( _component );
 
 		Serializable::LoadInt(   _json, "camera_type", (int&)camera.type );
 		Serializable::LoadFloat( _json, "orthoSize",	camera.orthoSize );

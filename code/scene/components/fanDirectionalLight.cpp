@@ -1,6 +1,6 @@
 #include "scene/components/fanDirectionalLight.hpp"
 
-#include "core/fanISerializable.hpp"
+#include "core/fanSerializable.hpp"
 #include "editor/fanModals.hpp"
 
 namespace fan
@@ -21,7 +21,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void DirectionalLight::Init( EcsWorld&, Component& _component )
+	void DirectionalLight::Init( EcsWorld& _world, Component& _component )
 	{
 		DirectionalLight& light = static_cast<DirectionalLight&>( _component );
 		light.ambiant = Color( 0.1f, 0.1f, 0.1f );
@@ -31,9 +31,9 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void DirectionalLight::OnGui( Component& _light )
+	void DirectionalLight::OnGui( Component& _component )
 	{
-		DirectionalLight& light = static_cast<DirectionalLight&>( _light );
+		DirectionalLight& light = static_cast<DirectionalLight&>( _component );
 
 		ImGui::PushItemWidth( 0.6f * ImGui::GetWindowWidth() );
 		{
@@ -68,9 +68,9 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void DirectionalLight::Save( const Component& _light, Json& _json )
+	void DirectionalLight::Save( const Component& _component, Json& _json )
 	{
-		const DirectionalLight& light = static_cast<const DirectionalLight&>( _light );
+		const DirectionalLight& light = static_cast<const DirectionalLight&>( _component );
 		Serializable::SaveColor( _json, "ambiant", light.ambiant );
 		Serializable::SaveColor( _json, "diffuse", light.diffuse );
 		Serializable::SaveColor( _json, "specular", light.specular );
@@ -78,9 +78,9 @@ namespace fan
 	
 	//================================================================================================================================
 	//================================================================================================================================
-	void DirectionalLight::Load( Component& _light, const Json& _json )
+	void DirectionalLight::Load( Component& _component, const Json& _json )
 	{
-		DirectionalLight& light = static_cast<DirectionalLight&>( _light );
+		DirectionalLight& light = static_cast<DirectionalLight&>( _component );
 		Serializable::LoadColor( _json, "ambiant", light.ambiant );
 		Serializable::LoadColor( _json, "diffuse", light.diffuse );
 		Serializable::LoadColor( _json, "specular", light.specular );

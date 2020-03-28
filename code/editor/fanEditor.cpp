@@ -59,12 +59,13 @@
 #include "scene/components/fanUIRenderer.hpp"
 #include "scene/components/fanBounds.hpp"
 #include "scene/components/fanExpirationTime.hpp"
+#include "scene/components/fanFollowTransform.hpp"
 #include "scene/systems/fanDrawDebug.hpp"
 #include "scene/systems/fanUpdateRenderWorld.hpp"
-#include "scene/singletonComponents/fanSceneInstantiate.hpp"
 #include "scene/singletonComponents/fanScene.hpp"
+#include "scene/singletonComponents/fanScenePointers.hpp"
 #include "scene/fanSceneTags.hpp"
-#include "scene/fanPrefabManager.hpp"
+#include "scene/fanPrefab.hpp"
 
 #include "game/fanGame.hpp"
 #include "game/singletonComponents/fanGameCamera.hpp"
@@ -540,6 +541,7 @@ namespace fan
 		_world.AddSingletonComponentType<RenderWorld>();
 		_world.AddSingletonComponentType<PhysicsWorld>();
 		_world.AddSingletonComponentType<EditorCamera>();
+		_world.AddSingletonComponentType<ScenePointers>();
 
 		Scene& scene = _world.AddSingletonComponentType<Scene>();
 		scene.world = &_world; //@hack the scene shoudn't have a reference to the world
@@ -561,6 +563,7 @@ namespace fan
 		_world.AddComponentType<UIRenderer>();
 		_world.AddComponentType<Bounds>();
 		_world.AddComponentType<ExpirationTime>();
+		_world.AddComponentType<FollowTransform>();
 
 		_world.AddTagType<tag_boundsOutdated>();
 		_world.AddTagType<tag_editorOnly>();

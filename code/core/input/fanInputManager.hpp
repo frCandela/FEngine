@@ -2,7 +2,7 @@
 
 #include "core/fanCorePrecompiled.hpp"
 #include "core/fanSingleton.hpp"
-#include "core/fanISerializable.hpp"
+#include "core/fanSerializable.hpp"
 
 #include "core/input/fanAxis.hpp"
 
@@ -10,7 +10,7 @@ namespace fan
 {
 	//================================================================================================================================
 	//================================================================================================================================
-	class InputManager : public ISerializable
+	class InputManager
 	{
 	public:
 		//================================================================
@@ -37,8 +37,8 @@ namespace fan
 		std::map< std::string, KeyboardEvent >& GetListKeyboardEvents() { return m_keyboardEvents; }
 
 		void PullEvents();
-		bool Load( const Json& _json ) override;
-		bool Save( Json& _json ) const override;
+		bool Load( const Json& _json );
+		bool Save( Json& _json ) const;
 
 	private:
 

@@ -14,6 +14,7 @@
 #include "scene/components/fanRigidbody.hpp"
 #include "game/singletonComponents/fanSunLight.hpp"
 #include "scene/singletonComponents/fanRenderWorld.hpp"
+#include "scene/singletonComponents/fanScenePointers.hpp"
 #include "ecs/fanEcsWorld.hpp"
 
 namespace fan
@@ -51,6 +52,14 @@ namespace fan
 		{
 			ImGui::Text( "path: %s", scene.path.c_str() );
 			ImGui::Text( "nextUniqueID: %d", scene.nextUniqueID );
+
+			if( ImGui::CollapsingHeader( "nodes" ) )
+			{
+				for( auto& pair : scene.nodes )
+				{
+					ImGui::Text( "%s : %d", pair.second->name, pair.first );
+				}
+			}
 		}
 		ImGui::Unindent(); ImGui::Unindent();
 	}
@@ -74,9 +83,18 @@ namespace fan
 		world->AddComponent<Bounds>( entityID );
 		world->AddTag<tag_boundsOutdated>( entityID );
 
-		uint32_t id = _generateID ? nextUniqueID++ : 0;
+		uint32_t id;
+		if( _generateID )
+		{
+			assert( nodes.find( id ) == nodes.end() );
+			id = nextUniqueID++;
+			nodes[id] = &sceneNode;
+		}
+		else
+		{
+			id = 0;
+		}
 		sceneNode.Build( _name, *this, handle, id, parent );
-
 		return sceneNode;
 	}
 
@@ -142,12 +160,14 @@ namespace fan
 	{
 		onClear.Emmit(*this);
 		path = "";
-		//instantiate->Clear();
-
-
 		world->Clear();
-
+		nodes.clear();
 		root = nullptr;
+		nextUniqueID = 1;
+		mainCamera = nullptr;
+
+		ScenePointers& scenePointers = world->GetSingletonComponent<ScenePointers>();
+		scenePointers.unresolvedComponentPtr.clear();
 	}
 
 	//================================================================================================================================
@@ -332,15 +352,14 @@ namespace fan
 
 			// loads all nodes recursively
 			const Json& jRoot = jScene["root"];
-			root = &CreateSceneNode( "root", nullptr );
+			root = &CreateSceneNode( "root", nullptr, false );
 			R_LoadFromJson( jRoot, *root, 0 );
 			
 			path = _path;
 			inStream.close();
 			nextUniqueID = R_FindMaximumId( *root ) + 1;
 
-			//m_instantiate->ResolveGameobjectPtr( 0 );
-			//m_instantiate->ResolveComponentPtr( 0 );
+			ScenePointers::ResolveComponentPointers( *this );
 
 			// @hack : sets the sunlight mesh on loading
 			Signature signature = world->GetSignature<MeshRenderer>() | world->GetSignature<SceneNode>();
@@ -378,6 +397,11 @@ namespace fan
 		Serializable::LoadString( _json, "name", _node.name );
 		Serializable::LoadUInt( _json, "node_id", _node.uniqueID );
 		_node.uniqueID += _idOffset;
+
+		// append id
+		Scene& scene = *_node.scene;
+		assert( scene.nodes.find( _node.uniqueID ) == scene.nodes.end() );
+		scene.nodes[_node.uniqueID] = &_node;
 
 		// components
 		const Json& jComponents = _json["components"];

@@ -1,6 +1,6 @@
 #include "scene/components/fanPointLight.hpp"
 
-#include "core/fanISerializable.hpp"
+#include "core/fanSerializable.hpp"
 #include "editor/fanModals.hpp"
 
 namespace fan
@@ -21,7 +21,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void PointLight::Init( EcsWorld&, Component& _component )
+	void PointLight::Init( EcsWorld& _world, Component& _component )
 	{
 		PointLight& pointLight = static_cast<PointLight&>( _component );
 		pointLight.ambiant = Color::White;
@@ -34,9 +34,9 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void PointLight::OnGui( Component& _pointLight )
+	void PointLight::OnGui( Component& _component )
 	{
-		PointLight& pointLight = static_cast<PointLight&>( _pointLight );
+		PointLight& pointLight = static_cast<PointLight&>( _component );
 		ImGui::PushItemWidth( 0.6f * ImGui::GetWindowWidth() - 16 );
 		{
 
@@ -64,22 +64,13 @@ namespace fan
 			ImGui::DragFloat( "quadratic", &pointLight.attenuation[Attenuation::QUADRATIC], 0.0001f, 0.f, 100.f );// ) { m_gameobject->SetFlags( m_gameobject->GetFlags() & Gameobject::Flag::OUTDATED_LIGHT ); }
 
 		} ImGui::PopItemWidth();
-
-		// Sphere gizmo's
-// 		float lightRange = pointLight.GetLightRange();
-// 		if( lightRange > 0 )
-// 		{
-// 			const btTransform transform = m_gameobject->GetTransform().GetBtTransform();
-// 			RendererDebug::Get().DebugSphere( transform, lightRange, 2, m_pointLight->diffuse );
-// 		}
-
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void PointLight::Save( const Component& _pointLight, Json& _json )
+	void PointLight::Save( const Component& _component, Json& _json )
 	{
-		const PointLight& pointLight = static_cast<const PointLight&>( _pointLight );
+		const PointLight& pointLight = static_cast<const PointLight&>( _component );
 		Serializable::SaveColor( _json, "ambiant", pointLight.ambiant );
 		Serializable::SaveColor( _json, "diffuse", pointLight.diffuse );
 		Serializable::SaveColor( _json, "specular", pointLight.specular );
@@ -89,9 +80,9 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void PointLight::Load( Component& _pointLight, const Json& _json )
+	void PointLight::Load( Component& _component, const Json& _json )
 	{
-		PointLight& pointLight = static_cast<PointLight&>( _pointLight );
+		PointLight& pointLight = static_cast<PointLight&>( _component );
 		Serializable::LoadColor( _json, "ambiant", pointLight.ambiant );
 		Serializable::LoadColor( _json, "diffuse", pointLight.diffuse );
 		Serializable::LoadColor( _json, "specular", pointLight.specular );

@@ -42,7 +42,7 @@ namespace fan {
 		void				 Clear();
 		EntityHandle		 CreateHandle( const EntityID _entityID );
 		EntityID			 GetEntityID( const EntityHandle _handle );
-		ComponentIndex		 GetDynamicIndex( const uint32_t _staticIndex ) { return m_typeIndices[_staticIndex]; }
+		ComponentIndex		 GetDynamicIndex( const uint32_t _staticIndex ) const { return m_typeIndices.at(_staticIndex); }
 		uint32_t			 GetComponentCount( const EntityID _entityID ) { return m_entities[_entityID].componentCount;  }
 		Component&			 GetComponentAt( const EntityID _entityID, int _componentIndex );
 		const ComponentInfo& GetComponentInfo( const ComponentIndex _index ) const { return  m_componentInfo[_index]; }

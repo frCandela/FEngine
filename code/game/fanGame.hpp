@@ -4,7 +4,6 @@
 
 #include "core/fanSignal.hpp"
 #include "ecs/fanEcsWorld.hpp"
-#include "game/fanGameSerializable.hpp"
 
 namespace fan
 {

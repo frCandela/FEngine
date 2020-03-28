@@ -2,7 +2,7 @@
 
 #include "render/fanRenderPrecompiled.hpp"
 
-#include "core/fanISerializable.hpp"
+#include "core/fanSerializable.hpp"
 
 namespace fan
 {

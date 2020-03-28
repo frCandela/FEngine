@@ -18,9 +18,9 @@ namespace fan
 	public:
 		static void SetInfo( ComponentInfo& _info );
 		static void Init( EcsWorld& _world, Component& _component );
-		static void OnGui( Component& _meshRenderer );
-		static void Save( const Component& _meshRenderer, Json& _json );
-		static void Load( Component& _meshRenderer, const Json& _json );
+		static void OnGui( Component& _component );
+		static void Save( const Component& _component, Json& _json );
+		static void Load( Component& _component, const Json& _json );
 
 		MeshPtr mesh;
 		int renderID = -1;

@@ -8,7 +8,7 @@
 // #include "core/input/fanMouse.hpp"
 // #include "core/time/fanTime.hpp"
 #include "editor/fanModals.hpp"
-#include "game/fanGameSerializable.hpp"
+#include "scene/fanSceneSerializable.hpp"
 
 namespace fan
 {
@@ -28,7 +28,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void Weapon::Init( EcsWorld&, Component& _component )
+	void Weapon::Init( EcsWorld& _world, Component& _component )
 	{
 		Weapon& weapon = static_cast<Weapon&>( _component );
 

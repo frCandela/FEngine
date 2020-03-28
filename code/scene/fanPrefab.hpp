@@ -3,7 +3,7 @@
 #include "scene/fanScenePrecompiled.hpp"
 
 #include "core/resources/fanResource.hpp"
-#include "game/fanGameSerializable.hpp"
+#include "scene/fanSceneSerializable.hpp"
 #include "scene/fanPrefabManager.hpp"
 
 namespace fan

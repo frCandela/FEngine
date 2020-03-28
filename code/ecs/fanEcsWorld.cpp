@@ -43,10 +43,10 @@ namespace fan
 		const ComponentInfo& info = m_componentInfo[_index];
 
 		// alloc data
-		Component&		 componentBase = m_components[_index].NewComponent();
+		Component&			 componentBase = m_components[_index].NewComponent();
 		ChunckIndex			 chunckIndex = componentBase.chunckIndex;
 		ChunckComponentIndex chunckComponentIndex = componentBase.chunckComponentIndex;
-		Component&		 component = info.instanciate( &componentBase );			
+		Component&			 component = info.instanciate( &componentBase );			
 
 		// set component
 		info.init( *this, component );

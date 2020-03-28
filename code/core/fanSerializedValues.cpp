@@ -1,5 +1,5 @@
 #include "core/fanSerializedValues.hpp"
-#include "core/fanISerializable.hpp"
+#include "core/fanSerializable.hpp"
 #include "core/input/fanInput.hpp"
 #include "core/input/fanInputManager.hpp"
 

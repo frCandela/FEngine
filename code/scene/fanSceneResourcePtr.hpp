@@ -4,10 +4,11 @@
 
 #include "core/resources/fanResourcePtr.hpp"
 #include "scene/fanPrefab.hpp"
+#include "ecs/fanEcsTypes.hpp"
 
 namespace fan
 {
-	struct Scene;
+	class EcsWorld;
 
 // 	//================================================================================================================================
 // 	// holds a pointer to a gameobject of a specific  scene
@@ -34,35 +35,33 @@ namespace fan
 	// holds a pointer to a component of a specific  scene
 	// can be initialized with a scene, scene node ID and a component ID to be resolved later ( loading, copy/paste )
 	//================================================================================================================================
-// 	class ComponentPtrBase : public ResourcePtr<Component>
-// 	{
-// 	public:
-// 		ComponentPtrBase( Component* _component = nullptr ) : ResourcePtr<Component>( _component ) {}
-// 		~ComponentPtrBase() override;
-// 
-// 		void Init( Scene& _scene, uint64_t _gameobjectId, uint32_t _componentId );
-// 
-// 		uint64_t GetSceneNodeID() const { return m_gameobjectId; }
-// 		uint32_t GetComponentID() const { return m_componentId; }
-// 
-// 		ComponentPtrBase& operator=( Component* _component );
-// 
-// 	private:
-// 		uint64_t m_gameobjectId = 0;
-// 		uint32_t m_componentId = 0;
-// 		Scene* m_scene = nullptr;
-// 	};
+	struct ComponentPtrBase
+	{
+		ComponentPtrBase( const uint32_t _staticID ) : staticID(_staticID) {}
+		void Init( EcsWorld& _world );
+		void Create( uint32_t _sceneNodeID );
+		void Create( SceneNode& _sceneNode, Component& _component );
+		void Clear();
+
+		const uint32_t		  staticID;				// static id of the component
+		const ComponentIndex  dynamicID = 255;		// dynamic id of the component
+		EcsWorld* const		  world	 = nullptr;		// world containing the target component
+		uint32_t			  sceneNodeID = 0;		// unique index of the associated scene node
+		Component*			  component = nullptr;  // the component
+	}; static constexpr size_t sizeof_componentPtrBase = sizeof( ComponentPtrBase );
 
 	//================================================================================================================================
 	// Same functionality than ComponentPtrBase but strongly typed
 	//================================================================================================================================
-// 	template< typename _ComponentType>
-// 	class ComponentPtr : public ComponentPtrBase {
-// 	public:
-// 		ComponentPtr( Component* _component = nullptr ) : ComponentPtrBase( _component ) {}
-// 		_ComponentType* operator->() const { return static_cast<_ComponentType*>(GetResource()); }
-// 		_ComponentType* operator*() const { return static_cast<_ComponentType*>(GetResource()); }
-// 	};
+	template< typename _componentType>
+	class ComponentPtr : public ComponentPtrBase
+	{
+	public:
+		ComponentPtr() : ComponentPtrBase( _componentType::s_typeInfo ) {}
+		// 		ComponentPtr( Component* _component = nullptr ) : ComponentPtrBase( _component ) {}
+		// 		_ComponentType* operator->() const { return static_cast<_ComponentType*>(GetResource()); }
+		// 		_ComponentType* operator*() const { return static_cast<_ComponentType*>(GetResource()); }
+	};
 
 	//================================================================================================================================
 	// holds a pointer to a prefab of the prefab resource manager
@@ -88,15 +87,11 @@ namespace fan
 namespace ImGui
 {
 //	bool FanGameobject( const char* _label, fan::GameobjectPtr& _ptr );
-	// 	template< typename _ComponentType >
-// 	bool FanComponent( const char* _label, fan::ComponentPtr<_ComponentType>& _ptr )
-// 	{
-// 		static_assert((std::is_base_of<fan::Component, _ComponentType>::value));
-// 
-// 		return FanComponent( _label, _ComponentType::s_typeID, _ptr );
-// 	}
-// 
-// 	bool FanComponent( const char* _label, const uint32_t _typeID, fan::ComponentPtrBase& _ptr );
-
 	bool FanPrefab( const char* _label, fan::PrefabPtr& _ptr );
+ 	bool FanComponentBase( const char* _label, fan::ComponentPtrBase& _ptr );
+	template< typename _componentType >	bool FanComponent( const char* _label, fan::ComponentPtr<_componentType>& _ptr )
+	{
+		static_assert( ( std::is_base_of<fan::Component, _componentType>::value ) );
+		return FanComponentBase( _label, _ptr );
+	}
 }

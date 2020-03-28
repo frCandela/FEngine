@@ -1,7 +1,7 @@
 #include "game/singletonComponents/fanSunLight.hpp"
 
 #include "render/fanRendererDebug.hpp"
-#include "game/fanGameSerializable.hpp"
+#include "scene/fanSceneSerializable.hpp"
 
 namespace fan
 {

@@ -20,7 +20,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void SceneNode::Init( EcsWorld&, Component& _component )
+	void SceneNode::Init( EcsWorld& _world, Component& _component )
 	{
 		SceneNode& node = static_cast<SceneNode&>( _component );
 		node.handle = 0;
@@ -38,7 +38,7 @@ namespace fan
 		SceneNode& node = static_cast<SceneNode&>( _component );
 		Scene& scene = _world.GetSingletonComponent<Scene>();
 		scene.onDeleteSceneNode.Emmit( &node );
-
+		scene.nodes.erase( node.uniqueID );
 
 		// removes from parent
 		if( node.parent != nullptr )
@@ -53,8 +53,7 @@ namespace fan
 			for ( SceneNode* child : node.childs )
 			{
 				nodesstack.push( child );
-			}
-			
+			}			
 
 			// find all child nodes
 			std::set<SceneNode* > nodesToDelete;
@@ -106,7 +105,7 @@ namespace fan
 		ImGui::Text( "scene     : %s", node.scene->path.empty()	? "<null>" : node.scene->path.c_str() );
 		ImGui::Text( "handle    : %u", node.handle );
 		ImGui::Text( "entity id : %u", entityID );
-		ImGui::Text( "unique id : %u", node.uniqueID );
+		ImGui::Text( "node   id : %u", node.uniqueID );
 	}
 
 	//================================================================================================================================
