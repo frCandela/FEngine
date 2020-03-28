@@ -16,7 +16,7 @@ namespace fan
 		DECLARE_COMPONENT( Material )
 	public:
 		static void SetInfo( ComponentInfo& _info );
-		static void Init( Component& _component );
+		static void Init( EcsWorld& _world, Component& _component );
 		static void OnGui( Component& _material );
 		static void Save( const Component& _material, Json& _json );
 		static void Load( Component& _material, const Json& _json );

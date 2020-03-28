@@ -20,7 +20,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void Transform::Init( Component& _component )
+	void Transform::Init( EcsWorld&, Component& _component )
 	{
 		Transform& transform = static_cast<Transform&>( _component );
 		transform.transform.setIdentity();

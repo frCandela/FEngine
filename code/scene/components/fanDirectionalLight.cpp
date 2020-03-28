@@ -21,7 +21,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void DirectionalLight::Init( Component& _component )
+	void DirectionalLight::Init( EcsWorld&, Component& _component )
 	{
 		DirectionalLight& light = static_cast<DirectionalLight&>( _component );
 		light.ambiant = Color( 0.1f, 0.1f, 0.1f );

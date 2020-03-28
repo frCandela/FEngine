@@ -24,7 +24,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void BoxShape::Init( Component& _component )
+	void BoxShape::Init( EcsWorld&, Component& _component )
 	{
 		BoxShape& boxShape = static_cast<BoxShape&>( _component );
 		boxShape.boxShape = btBoxShape( btVector3( 0.5f, 0.5f, 0.5f ) );

@@ -13,7 +13,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void Bounds::Init( Component& _component )
+	void Bounds::Init( EcsWorld&, Component& _component )
 	{
 		Bounds& bounds = static_cast<Bounds&>( _component );
 		bounds.aabb = AABB();

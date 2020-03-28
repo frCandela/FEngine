@@ -17,7 +17,7 @@ namespace fan
 		DECLARE_COMPONENT( PointLight )
 	public:
 		static void SetInfo( ComponentInfo& _info );
-		static void Init( Component& _component );
+		static void Init( EcsWorld& _world, Component& _component );
 		static void OnGui( Component& _pointLight );
 		static void Save( const Component& _pointLight, Json& _json );
 		static void Load( Component& _pointLight, const Json& _json );

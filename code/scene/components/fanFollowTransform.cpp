@@ -1,56 +1,50 @@
-#include "scene/components/fanExpirationTime.hpp"
+#include "scene/components/fanFollowTransform.hpp"
 
 #include "render/fanRenderSerializable.hpp"
+#include "ecs/fanEcsWorld.hpp"
 
 namespace fan
 {
-	REGISTER_COMPONENT( ExpirationTime, "expiration_time" );
+	REGISTER_COMPONENT( FollowTransform, "follow_transform" );
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void ExpirationTime::SetInfo( ComponentInfo& _info )
+	void FollowTransform::SetInfo( ComponentInfo& _info )
 	{
-		_info.icon = ImGui::IconType::STOP16;
-		_info.onGui = &ExpirationTime::OnGui;
-		_info.init = &ExpirationTime::Init;
-		_info.load  = &ExpirationTime::Load;
-		_info.save  = &ExpirationTime::Save;
+		_info.icon = ImGui::IconType::TRANSFORM16;
+		_info.init = &FollowTransform::Init;
+		_info.onGui = &FollowTransform::OnGui;
+		_info.save = &FollowTransform::Save;
+		_info.load = &FollowTransform::Load;
 		_info.editorPath = "/";
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void ExpirationTime::Init( EcsWorld&, Component& _component )
+	void FollowTransform::Init( EcsWorld&, Component& _component )
 	{
-		ExpirationTime& expiration = static_cast<ExpirationTime&>( _component );
-		expiration.duration = 10.f;
+		// clear
+		FollowTransform& followTransform = static_cast<FollowTransform&>( _component );
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void ExpirationTime::OnGui( Component& _component )
+	void FollowTransform::OnGui( Component& _component )
 	{
-		ExpirationTime& expiration = static_cast<ExpirationTime&>( _component );
-		ImGui::PushItemWidth( 0.6f * ImGui::GetWindowWidth() );
-		{
-			ImGui::DragFloat( "duration##ExpirationTime", &expiration.duration, 0.1f, 0.f, 10.f );
-		} ImGui::PopItemWidth();
+		FollowTransform& followTransform = static_cast<FollowTransform&>( _component );
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void ExpirationTime::Save( const Component& _component, Json& _json )
+	void FollowTransform::Save( const Component& _component, Json& _json )
 	{
-		const ExpirationTime& expiration = static_cast<const ExpirationTime&>( _component );
-
-		Serializable::SaveFloat( _json, "duration", expiration.duration );
+		const FollowTransform& followTransform = static_cast<const FollowTransform&>( _component );
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void ExpirationTime::Load( Component& _component, const Json& _json )
+	void FollowTransform::Load( Component& _component, const Json& _json )
 	{
-		ExpirationTime& expiration = static_cast<ExpirationTime&>( _component );
-		Serializable::LoadFloat( _json, "duration", expiration.duration );
+		FollowTransform& followTransform = static_cast<FollowTransform&>( _component );
 	}
 }

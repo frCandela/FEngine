@@ -21,7 +21,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void MeshRenderer::Init( Component& _component )
+	void MeshRenderer::Init( EcsWorld&, Component& _component )
 	{
 		MeshRenderer& meshRenderer = static_cast<MeshRenderer&>( _component );
 		meshRenderer.mesh = nullptr;

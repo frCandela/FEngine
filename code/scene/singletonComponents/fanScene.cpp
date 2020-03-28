@@ -5,7 +5,6 @@
 #include "core/time/fanProfiler.hpp"
 #include "core/fanSignal.hpp"
 #include "scene/fanSceneResourcePtr.hpp"
-#include "scene/fanComponentPtr.hpp"
 #include "scene/fanSceneTags.hpp"
 #include "scene/components/fanBounds.hpp"
 #include "scene/components/fanSceneNode.hpp"

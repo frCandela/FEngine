@@ -14,13 +14,13 @@ namespace fan
 		_info.icon  = ImGui::IconType::GAMEOBJECT16;
 		_info.onGui = &SceneNode::OnGui;
 		_info.init = &SceneNode::Init;
-		_info.onDelete = &SceneNode::OnDelete;
+		_info.destroy = &SceneNode::Destroy;
 		_info.editorPath = "/";
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void SceneNode::Init( Component& _component )
+	void SceneNode::Init( EcsWorld&, Component& _component )
 	{
 		SceneNode& node = static_cast<SceneNode&>( _component );
 		node.handle = 0;
@@ -33,7 +33,7 @@ namespace fan
 	//================================================================================================================================
 	// disconnects all the node's child hierarchy tree and kills it
 	//================================================================================================================================
-	void SceneNode::OnDelete( EcsWorld& _world, Component& _component )
+	void SceneNode::Destroy( EcsWorld& _world, Component& _component )
 	{
 		SceneNode& node = static_cast<SceneNode&>( _component );
 		Scene& scene = _world.GetSingletonComponent<Scene>();

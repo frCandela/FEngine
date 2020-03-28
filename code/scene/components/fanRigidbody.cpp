@@ -19,7 +19,7 @@ namespace fan
 		_info.icon = ImGui::IconType::RIGIDBODY16;
 		_info.onGui = &Rigidbody::OnGui;
 		_info.init = &Rigidbody::Init;
-		_info.onDelete = &Rigidbody::OnDelete;
+		_info.destroy = &Rigidbody::Destroy;
 		_info.load  = &Rigidbody::Load;
 		_info.save  = &Rigidbody::Save;
 		_info.editorPath = "/";
@@ -27,7 +27,7 @@ namespace fan
 	   
 	//================================================================================================================================
 	//================================================================================================================================
-	void Rigidbody::Init( Component& _component )
+	void Rigidbody::Init( EcsWorld&, Component& _component )
 	{
 		// clear
 		Rigidbody& rb = static_cast<Rigidbody&>( _component );
@@ -37,7 +37,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void Rigidbody::OnDelete( EcsWorld& _world, Component& _component )
+	void Rigidbody::Destroy( EcsWorld& _world, Component& _component )
 	{
 		PhysicsWorld& physicsWorld = _world.GetSingletonComponent<PhysicsWorld>();
 		Rigidbody& rb = static_cast<Rigidbody&>( _component );

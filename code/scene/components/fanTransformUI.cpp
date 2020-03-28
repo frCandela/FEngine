@@ -20,7 +20,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void UITransform::Init( Component& _component )
+	void UITransform::Init( EcsWorld&, Component& _component )
 	{
 		UITransform& transform = static_cast<UITransform&>( _component );
 

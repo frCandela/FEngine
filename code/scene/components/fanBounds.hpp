@@ -16,7 +16,7 @@ namespace fan
 		DECLARE_COMPONENT( Bounds )
 	public:
 		static void SetInfo( ComponentInfo& _info );
-		static void Init( Component& _component );
+		static void Init( EcsWorld& _world, Component& _component );
 
 		AABB aabb;
 	};

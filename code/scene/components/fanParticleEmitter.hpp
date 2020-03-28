@@ -18,7 +18,7 @@ namespace fan
 		DECLARE_COMPONENT( ParticleEmitter )
 	public:
 		static void SetInfo( ComponentInfo& _info );
-		static void Init( Component& _component );
+		static void Init( EcsWorld& _world, Component& _component );
 		static void OnGui( Component& _emitter );
 		static void Save( const Component& _emitter, Json& _json );
 		static void Load( Component& _emitter, const Json& _json );

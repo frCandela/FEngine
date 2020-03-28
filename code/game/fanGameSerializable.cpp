@@ -1,7 +1,6 @@
 #include "game/fanGameSerializable.hpp"
 
 #include "scene/fanSceneResourcePtr.hpp"
-#include "scene/fanComponentPtr.hpp"
 #include "scene/fanPrefab.hpp"
 
 namespace fan

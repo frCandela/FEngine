@@ -20,7 +20,7 @@ namespace fan
 		enum Type { PERSPECTIVE, ORTHOGONAL };
 
 		static void SetInfo( ComponentInfo& _info );
-		static void Init(  Component& _component );
+		static void Init( EcsWorld& _world, Component& _component );
 		static void OnGui( Component& _camera );
 		static void Save( const Component& _camera, Json& _json );
 		static void Load( Component& _camera, const Json& _json );

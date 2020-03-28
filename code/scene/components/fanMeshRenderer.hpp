@@ -17,7 +17,7 @@ namespace fan
 		DECLARE_COMPONENT( MeshRenderer )
 	public:
 		static void SetInfo( ComponentInfo& _info );
-		static void Init( Component& _component );
+		static void Init( EcsWorld& _world, Component& _component );
 		static void OnGui( Component& _meshRenderer );
 		static void Save( const Component& _meshRenderer, Json& _json );
 		static void Load( Component& _meshRenderer, const Json& _json );

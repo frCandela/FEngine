@@ -24,7 +24,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void SphereShape::Init( Component& _component )
+	void SphereShape::Init( EcsWorld&, Component& _component )
 	{
 		SphereShape& sphereShape = static_cast<SphereShape&>( _component );
 		sphereShape.sphereShape = btSphereShape( 1.f );

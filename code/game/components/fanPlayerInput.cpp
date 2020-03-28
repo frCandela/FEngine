@@ -22,7 +22,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void PlayerInput::Init( Component& _component )
+	void PlayerInput::Init( EcsWorld&, Component& _component )
 	{
 		PlayerInput& playerInput = static_cast<PlayerInput&>( _component );
 

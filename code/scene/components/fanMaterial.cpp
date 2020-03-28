@@ -21,7 +21,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void Material::Init( Component& _component )
+	void Material::Init( EcsWorld&, Component& _component )
 	{
 		Material& material = static_cast<Material&>( _component );
 

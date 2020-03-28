@@ -22,7 +22,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void UIRenderer::Init( Component& _component )
+	void UIRenderer::Init( EcsWorld&, Component& _component )
 	{
 		UIRenderer& uiRenderer = static_cast<UIRenderer&>( _component );
 

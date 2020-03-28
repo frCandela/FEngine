@@ -49,7 +49,7 @@ namespace fan
 		Component&		 component = info.instanciate( &componentBase );			
 
 		// set component
-		info.init( component );
+		info.init( *this, component );
 		component.componentIndex = _index;
 		component.chunckIndex = chunckIndex;
 		component.chunckComponentIndex = chunckComponentIndex;
@@ -95,9 +95,9 @@ namespace fan
 		Component& component = GetComponent( _entityID, _index );
 
 		const ComponentInfo& info = GetComponentInfo( component.componentIndex );
-		if( info.onDelete != nullptr ) 
+		if( info.destroy != nullptr ) 
 		{ 
-			info.onDelete( *this , component);
+			info.destroy( *this , component);
 		}
 
 		m_components[_index].RemoveComponent( component.chunckIndex, component.chunckComponentIndex );
@@ -239,9 +239,9 @@ namespace fan
 				Component& component = *entity.components[componentIndex];
 
 				const ComponentInfo& info = GetComponentInfo( component.componentIndex );
-				if( info.onDelete != nullptr )
+				if( info.destroy != nullptr )
 				{
-					info.onDelete( *this, component );
+					info.destroy( *this, component );
 				}
 				m_components[component.componentIndex].RemoveComponent( component.chunckIndex, component.chunckComponentIndex );
 				entity.components[componentIndex] = nullptr;

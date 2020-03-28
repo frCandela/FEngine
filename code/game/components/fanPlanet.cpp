@@ -21,7 +21,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void Planet::Init( Component& _component )
+	void Planet::Init( EcsWorld&, Component& _component )
 	{
 		Planet& planet = static_cast<Planet&>( _component );
 		planet.timeAccumulator = 0.f;

@@ -17,8 +17,8 @@ namespace fan
 		Rigidbody();
 
 		static void SetInfo( ComponentInfo& _info );
-		static void Init(  Component& _component );
-		static void OnDelete( EcsWorld& _world, Component& _component );
+		static void Init( EcsWorld& _world, Component& _component );
+		static void Destroy( EcsWorld& _world, Component& _component );
 		static void OnGui( Component& _rigidbody );
 		static void Save( const Component& _rigidbody, Json& _json );
 		static void Load( Component& _rigidbody, const Json& _json );		
