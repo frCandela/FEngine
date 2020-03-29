@@ -33,7 +33,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void BoxShape::OnGui( Component& _component )
+	void BoxShape::OnGui( EcsWorld& _world, EntityID _entityID, Component& _component )
 	{
 		BoxShape& boxShape = static_cast<BoxShape&>( _component );
 		ImGui::PushItemWidth( 0.6f * ImGui::GetWindowWidth() );

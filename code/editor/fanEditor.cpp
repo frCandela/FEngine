@@ -60,6 +60,7 @@
 #include "scene/components/fanBounds.hpp"
 #include "scene/components/fanExpirationTime.hpp"
 #include "scene/components/fanFollowTransform.hpp"
+#include "scene/systems/fanUpdateTransforms.hpp"
 #include "scene/systems/fanDrawDebug.hpp"
 #include "scene/systems/fanUpdateRenderWorld.hpp"
 #include "scene/singletonComponents/fanScene.hpp"
@@ -107,6 +108,7 @@ namespace fan
 		Input::Get().Manager().CreateKeyboardEvent( "play_pause", Keyboard::F5 );
 		Input::Get().Manager().CreateKeyboardEvent( "reload_shaders", Keyboard::F11 );
 		Input::Get().Manager().CreateKeyboardEvent( "reload_icons", Keyboard::F12 );
+		Input::Get().Manager().CreateKeyboardEvent( "toogle_follow_transform_lock", Keyboard::L );
 
 		//editor axis
 		Input::Get().Manager().CreateKeyboardAxis( "editor_forward", Keyboard::W, Keyboard::S );
@@ -295,6 +297,7 @@ namespace fan
 						SCOPED_PROFILE( draw_ui );
 						m_mainMenuBar->Draw();
 						m_selection->Update( m_gameWindow->IsHovered() );
+						S_MoveFollowTransforms::Run( m_game->world, m_game->world.Match( S_MoveFollowTransforms::GetSignature( m_game->world ) ) );
 					}					
 
 					{

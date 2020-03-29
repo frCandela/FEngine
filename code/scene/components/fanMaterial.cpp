@@ -32,7 +32,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void Material::OnGui( Component& _component )
+	void Material::OnGui( EcsWorld& _world, EntityID _entityID, Component& _component )
 	{
 		Material& material = static_cast<Material&>( _component );
 

@@ -46,7 +46,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void Rigidbody::OnGui( Component& _component )
+	void Rigidbody::OnGui( EcsWorld& _world, EntityID _entityID, Component& _component )
 	{
 		Rigidbody& rb = static_cast<Rigidbody&>( _component );
 

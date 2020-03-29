@@ -32,7 +32,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void Planet::OnGui( Component& _component )
+	void Planet::OnGui( EcsWorld& _world, EntityID _entityID, Component& _component )
 	{
 		Planet& planet = static_cast<Planet&>( _component );
 		ImGui::PushItemWidth( 0.6f * ImGui::GetWindowWidth() );

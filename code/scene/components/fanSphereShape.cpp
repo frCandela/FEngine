@@ -33,7 +33,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void SphereShape::OnGui( Component& _component )
+	void SphereShape::OnGui( EcsWorld& _world, EntityID _entityID, Component& _component )
 	{
 		SphereShape& sphereShape = static_cast<SphereShape&>( _component );
 

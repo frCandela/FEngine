@@ -30,7 +30,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void UITransform::OnGui( Component& _component )
+	void UITransform::OnGui( EcsWorld& _world, EntityID _entityID, Component& _component )
 	{
 		UITransform& transform = static_cast<UITransform&>( _component );
 

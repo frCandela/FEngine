@@ -387,7 +387,7 @@ namespace fan
 			Prefab* prefab = Prefab::s_resourceManager.LoadPrefab( m_pathBuffer.string() );
 			if( prefab != nullptr )
 			{
-				m_scene->CreatePrefab( *prefab, m_lastSceneNodeRightClicked );
+				prefab->Instanciate( *m_lastSceneNodeRightClicked );
 			}
 		}
 	}

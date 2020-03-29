@@ -32,5 +32,6 @@ namespace fan
 		Scene* m_currentScene;
 
 		void OnSceneNodeDeleted( SceneNode* _node );
+		void OnToogleTransformLock();
 	};
 }

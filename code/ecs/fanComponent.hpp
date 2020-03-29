@@ -64,11 +64,11 @@ namespace fan
 		ComponentIndex	index;							// dynamic index in the ecsWorld
 		uint32_t		staticIndex;					// static index
 
-		void		 ( *init )(    EcsWorld&, Component& ) = nullptr;	// (mandatory) called at the creation of the component
-		void		 ( *destroy )( EcsWorld&, Component& ) = nullptr;	// called at the destruction of the component
-		void		 ( *onGui )( Component& ) = nullptr;				// called by the editor for gui display
-		void		 ( *save )( const Component&, Json& ) = nullptr;	// called when the scene is saved
-		void		 ( *load  )( Component&, const Json& ) = nullptr;	// called when the scene is loaded ( after the init )
-		Component& ( *instanciate )( void* ) = nullptr;					// automagic, don't touch that ( for instancing from and ID )
+		void		 ( *init )( EcsWorld&, Component& ) = nullptr;				// (mandatory) called at the creation of the component
+		void		 ( *destroy )( EcsWorld&, Component& ) = nullptr;			// called at the destruction of the component
+		void		 ( *onGui )( EcsWorld&, EntityID, Component& ) = nullptr;	// called by the editor for gui display
+		void		 ( *save )( const Component&, Json& ) = nullptr;			// called when the scene is saved
+		void		 ( *load  )( Component&, const Json& ) = nullptr;			// called when the scene is loaded ( after the init )
+		Component& ( *instanciate )( void* ) = nullptr;							// automagic, don't touch that ( for instancing from and ID )
 	};
 }

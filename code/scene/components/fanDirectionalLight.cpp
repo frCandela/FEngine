@@ -31,7 +31,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void DirectionalLight::OnGui( Component& _component )
+	void DirectionalLight::OnGui( EcsWorld& _world, EntityID _entityID, Component& _component )
 	{
 		DirectionalLight& light = static_cast<DirectionalLight&>( _component );
 

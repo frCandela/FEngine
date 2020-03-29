@@ -36,7 +36,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void ParticleEmitter::OnGui( Component& _component )
+	void ParticleEmitter::OnGui( EcsWorld& _world, EntityID _entityID, Component& _component )
 	{
 		ParticleEmitter& emitter = static_cast<ParticleEmitter&>( _component );
 

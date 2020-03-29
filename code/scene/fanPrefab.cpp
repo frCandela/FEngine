@@ -3,6 +3,7 @@
 #include "scene/components/fanSceneNode.hpp"
 #include "scene/singletonComponents/fanScene.hpp"
 #include "ecs/fanEcsWorld.hpp"
+#include "scene/singletonComponents/fanScenePointers.hpp"
 
 namespace fan
 {
@@ -86,13 +87,8 @@ namespace fan
 			EntityID indexStart = (EntityID)world.GetNumEntities();
 			Scene::R_LoadFromJson( m_json["prefab"], node, idOffset );
 			_parent.scene->nextUniqueID = Scene::R_FindMaximumId( _parent ) + 1;
-
-// 			ResolveGameobjectPtr( idOffset );
-// 			ResolveComponentPtr( idOffset );
-// 			m_unresolvedGameobjectPtr.clear();
-// 			m_unresolvedComponentPtr.clear();
-
+			ScenePointers::ResolveComponentPointers( *_parent.scene, idOffset );
 			return &node;
-		}
+		}		
 	}
 }

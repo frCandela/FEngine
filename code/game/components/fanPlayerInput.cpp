@@ -37,7 +37,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void PlayerInput::OnGui( Component& _component )
+	void PlayerInput::OnGui( EcsWorld& _world, EntityID _entityID, Component& _component )
 	{
 		PlayerInput& playerInput = static_cast<PlayerInput&>( _component );
 

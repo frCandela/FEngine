@@ -23,9 +23,7 @@ namespace fan
 		static void OnGui( SingletonComponent& _component );
 
 		~Scene();
-
 		SceneNode& CreateSceneNode( const std::string _name, SceneNode* const _parentNode, const bool _generateID = true );
-		SceneNode* CreatePrefab( const Prefab& _prefab, SceneNode* const _parent ); // @todo return an entityID instead of a scene node
 
 		void New();
 		void Save() const;
@@ -42,8 +40,6 @@ namespace fan
 		Signal< Scene& >		onLoad;
 		Signal< SceneNode* >	onDeleteSceneNode;
 		Signal< SceneNode& >	onSetMainCamera;
-		Signal< EntityID >		onCreateRigidbody;
-		Signal< EntityID >		onDeleteRigidbody;
 
 		EcsWorld*									world;
 		std::string									path;		

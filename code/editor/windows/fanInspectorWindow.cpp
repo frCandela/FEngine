@@ -68,7 +68,7 @@ namespace fan
  				// Draw component
 				else if( info.onGui != nullptr )
 				{
-					info.onGui( component );
+					info.onGui( world, entityID, component );
 				} 
 			}
 			ImGui::Separator();

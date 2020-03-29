@@ -8,28 +8,7 @@
 
 namespace fan
 {
-	class EcsWorld;
-
-// 	//================================================================================================================================
-// 	// holds a pointer to a gameobject of a specific  scene
-// 	// can be initialized with a scene and a gameobject ID to be resolved later ( loading, copy/paste )
-// 	//================================================================================================================================
-// 	class GameobjectPtr : public ResourcePtr<Gameobject>
-// 	{
-// 	public:
-// 		GameobjectPtr(  Gameobject* _gameobject = nullptr ) : ResourcePtr<Gameobject>( _gameobject ) {}
-// 		~GameobjectPtr();
-// 
-// 		void Init( Scene& _scene, uint64_t _gameobjectId );
-// 
-// 		uint64_t GetId() const	 { return m_gameobjectId; }
-// 
-// 		GameobjectPtr& operator=( Gameobject* _resource );
-// 
-// 	private:
-// 		uint64_t m_gameobjectId = 0;
-// 		Scene * m_scene = nullptr;
-// 	};	  
+	class EcsWorld;	  
 
 	//================================================================================================================================
 	// holds a pointer to a component of a specific  scene
@@ -58,9 +37,10 @@ namespace fan
 	{
 	public:
 		ComponentPtr() : ComponentPtrBase( _componentType::s_typeInfo ) {}
-		// 		ComponentPtr( Component* _component = nullptr ) : ComponentPtrBase( _component ) {}
-		// 		_ComponentType* operator->() const { return static_cast<_ComponentType*>(GetResource()); }
-		// 		_ComponentType* operator*() const { return static_cast<_ComponentType*>(GetResource()); }
+		_componentType* operator->() const { return static_cast<_componentType*>( component ); }
+		_componentType& operator*() const { return *static_cast<_componentType*>( component ); }
+		bool operator!=( const _componentType* _other ) const{ return _other != component;	}
+		bool operator==( const _componentType* _other ) const{ return _other == component;	}
 	};
 
 	//================================================================================================================================
@@ -86,7 +66,6 @@ namespace fan
 //================================================================================================================================
 namespace ImGui
 {
-//	bool FanGameobject( const char* _label, fan::GameobjectPtr& _ptr );
 	bool FanPrefab( const char* _label, fan::PrefabPtr& _ptr );
  	bool FanComponentBase( const char* _label, fan::ComponentPtrBase& _ptr );
 	template< typename _componentType >	bool FanComponent( const char* _label, fan::ComponentPtr<_componentType>& _ptr )

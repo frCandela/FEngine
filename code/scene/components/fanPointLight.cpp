@@ -34,7 +34,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void PointLight::OnGui( Component& _component )
+	void PointLight::OnGui( EcsWorld& _world, EntityID _entityID, Component& _component )
 	{
 		PointLight& pointLight = static_cast<PointLight&>( _component );
 		ImGui::PushItemWidth( 0.6f * ImGui::GetWindowWidth() - 16 );

@@ -26,6 +26,6 @@ namespace fan
 
 		std::set< ComponentPtrBase* > unresolvedComponentPtr;
 
-		static void ResolveComponentPointers( Scene& _scene );
+		static void ResolveComponentPointers( Scene& _scene, const uint32_t _idOffset );
 	};
 }

@@ -36,7 +36,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void SpaceShip::OnGui( Component& _component )
+	void SpaceShip::OnGui( EcsWorld& _world, EntityID _entityID, Component& _component )
 	{
 		SpaceShip& spaceship = static_cast<SpaceShip&>( _component );
 

@@ -42,7 +42,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void UIRenderer::OnGui( Component& _component )
+	void UIRenderer::OnGui( EcsWorld& _world, EntityID _entityID, Component& _component )
 	{
 		UIRenderer& ui = static_cast<UIRenderer&>( _component );
 

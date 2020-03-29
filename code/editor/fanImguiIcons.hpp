@@ -23,6 +23,8 @@ namespace ImGui
 		GAMEOBJECT16,
 		PREFAB16,
 		MESH16,
+		LOCK_OPEN16,
+		LOCK_CLOSED16,
 
 		// scene special
 		PLAY16,

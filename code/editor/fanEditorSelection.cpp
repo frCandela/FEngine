@@ -10,6 +10,7 @@
 #include "scene/components/fanSceneNode.hpp"
 #include "scene/components/fanTransform.hpp"
 #include "scene/components/fanCamera.hpp"
+#include "scene/components/fanFollowTransform.hpp"
 #include "scene/singletonComponents/fanScene.hpp"
 #include "scene/systems/fanRaycast.hpp"
 #include "scene/systems/fanDrawDebug.hpp"
@@ -29,6 +30,7 @@ namespace fan
 	void EditorSelection::ConnectCallbacks( Scene& _scene )
 	{
 		Input::Get().Manager().FindEvent( "delete" )->Connect( &EditorSelection::DeleteSelection, this );
+		Input::Get().Manager().FindEvent( "toogle_follow_transform_lock" )->Connect( &EditorSelection::OnToogleTransformLock, this );
  		_scene.onDeleteSceneNode.Connect( &EditorSelection::OnSceneNodeDeleted, this );
 	}
 
@@ -140,5 +142,23 @@ namespace fan
 		{
 			Deselect();
 		}
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
+	void EditorSelection::OnToogleTransformLock()
+	{
+		if( m_selectedSceneNode != nullptr )
+		{
+			EcsWorld& world = *m_selectedSceneNode->scene->world;
+			EntityID entityID = world.GetEntityID( m_selectedSceneNode->handle );
+			if( world.HasComponent<FollowTransform>( entityID ) )
+			{
+				FollowTransform& follower = world.GetComponent<FollowTransform>( entityID );
+				follower.locked = !follower.locked;
+				FollowTransform::UpdateLocalTransform( world, entityID );
+			}
+		}
+		
 	}
 }

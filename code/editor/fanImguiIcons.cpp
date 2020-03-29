@@ -34,6 +34,8 @@ namespace ImGui
 		,DECL_ICON( 16.f, 0, 6 )  // GAMEOBJECT16,
 		,DECL_ICON( 16.f, 1, 6 )  // PREFAB16,
 		,DECL_ICON( 16.f, 2, 6 )  // MESH16,
+		,DECL_ICON( 16.f, 3, 6 )  // LOCK_OPEN16,
+		,DECL_ICON( 16.f, 4, 6 )  // LOCK_CLOSED16,
 
 		,DECL_ICON( 16.f, 1, 0 )  // PLAY16
 		,DECL_ICON( 16.f, 2, 0 )  // PAUSE16

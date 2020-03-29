@@ -95,9 +95,9 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void SceneNode::OnGui( Component& _sceneNode )
+	void SceneNode::OnGui( EcsWorld& _world, EntityID _entityID, Component& _component )
 	{
-		SceneNode& node = static_cast<SceneNode&>( _sceneNode );
+		SceneNode& node = static_cast<SceneNode&>( _component );
 		EcsWorld& world = * node.scene->world;
 		EntityID entityID = world.GetEntityID( node.handle );
 

@@ -36,7 +36,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void Camera::OnGui( Component& _component )
+	void Camera::OnGui( EcsWorld& _world, EntityID _entityID, Component& _component )
 	{
 		Camera& camera = static_cast<Camera&>( _component );
 

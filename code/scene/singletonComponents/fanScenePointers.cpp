@@ -40,8 +40,10 @@ namespace fan
 
 	//================================================================================================================================
 	// Initializes all unresolved ComponentPointers with the corresponding  sceneNode & component of the scene
+	// When instancing from prefab, scene nodes unique ids are offset by the greatest id in the scene
+	// it is then necessary to offset the id of pointers as well using the field _idOffset
 	//================================================================================================================================
-	void  ScenePointers::ResolveComponentPointers( Scene& _scene )
+	void  ScenePointers::ResolveComponentPointers( Scene& _scene, const uint32_t _idOffset )
 	{
 		EcsWorld& world = *_scene.world;
 		ScenePointers& scenePointers = world.GetSingletonComponent<ScenePointers>();
@@ -49,6 +51,7 @@ namespace fan
 		while( !scenePointers.unresolvedComponentPtr.empty() )
 		{
 			ComponentPtrBase* ptr = *scenePointers.unresolvedComponentPtr.begin();
+			ptr->sceneNodeID += _idOffset;
 			assert( _scene.nodes.find( ptr->sceneNodeID ) != _scene.nodes.end() );
 			SceneNode& node = *_scene.nodes[ptr->sceneNodeID];
 			EntityID entityID = world.GetEntityID( node.handle );

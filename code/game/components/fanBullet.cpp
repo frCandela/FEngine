@@ -31,7 +31,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void Bullet::OnGui( Component& _component )
+	void Bullet::OnGui( EcsWorld& _world, EntityID _entityID, Component& _component )
 	{
 		Bullet& bullet = static_cast<Bullet&>( _component );
 

@@ -47,7 +47,8 @@ namespace fan
 		Bullet& bullet = world->GetComponent< Bullet >( bulletID );
 		Transform& bulletTransform = world->GetComponent< Transform >( bulletID );
 		
-		SceneNode& explosionNode = *scene.CreatePrefab( **bullet.explosionPrefab, nullptr );
+
+		SceneNode& explosionNode = * bullet.explosionPrefab->Instanciate( *scene.root );
 		EntityID explosionID = world->GetEntityID( explosionNode.handle );
 		Transform& explosionTransform = world->GetComponent< Transform >( explosionID );
 		explosionTransform.SetPosition( bulletTransform.GetPosition() );

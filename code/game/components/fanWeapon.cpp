@@ -51,7 +51,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void Weapon::OnGui( Component& _component )
+	void Weapon::OnGui( EcsWorld& _world, EntityID _entityID, Component& _component )
 	{
 		Weapon& weapon = static_cast<Weapon&>( _component );
 

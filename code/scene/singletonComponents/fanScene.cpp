@@ -12,9 +12,10 @@
 #include "scene/components/fanMaterial.hpp"
 #include "scene/components/fanMeshRenderer.hpp"
 #include "scene/components/fanRigidbody.hpp"
-#include "game/singletonComponents/fanSunLight.hpp"
+#include "game/singletonComponents/fanSunLight.hpp" // @hack
 #include "scene/singletonComponents/fanRenderWorld.hpp"
 #include "scene/singletonComponents/fanScenePointers.hpp"
+#include "scene/systems/fanUpdateTransforms.hpp"
 #include "ecs/fanEcsWorld.hpp"
 
 namespace fan
@@ -96,34 +97,6 @@ namespace fan
 		}
 		sceneNode.Build( _name, *this, handle, id, parent );
 		return sceneNode;
-	}
-
-	//================================================================================================================================
-	// Creates a game object from a prefab and adds it to the scene hierarchy
-	// Gameobjects ids are remapped depending on the scene next id
-	//================================================================================================================================
-	SceneNode* Scene::CreatePrefab( const Prefab& _prefab, SceneNode * const _parent )
-	{
-		// instantiate prefab
-		SceneNode* const parent = _parent == nullptr ? root : _parent;
-		SceneNode * prefabRoot = _prefab.Instanciate( *parent );
-
-		// registers newly added rigidbodies
-		if( prefabRoot != nullptr )
-		{
-			std::vector<SceneNode*> nodes;
-			SceneNode::GetDescendantsOf( *prefabRoot, nodes );
-
-			for ( SceneNode* node : nodes )
-			{
-				EntityID entityID = world->GetEntityID( node->handle );
-				if( world->HasComponent<Rigidbody>( entityID ) )
-				{
-					onCreateRigidbody.Emmit( entityID );
-				}
-			}
-		}
-		return prefabRoot;
 	}
 
 	//================================================================================================================================
@@ -359,7 +332,8 @@ namespace fan
 			inStream.close();
 			nextUniqueID = R_FindMaximumId( *root ) + 1;
 
-			ScenePointers::ResolveComponentPointers( *this );
+			ScenePointers::ResolveComponentPointers( *this, 0 );
+			S_InitFollowTransforms::Run( *world, world->Match( S_InitFollowTransforms::GetSignature( *world ) ) );
 
 			// @hack : sets the sunlight mesh on loading
 			Signature signature = world->GetSignature<MeshRenderer>() | world->GetSignature<SceneNode>();

@@ -28,7 +28,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void ExpirationTime::OnGui( Component& _component )
+	void ExpirationTime::OnGui( EcsWorld& _world, EntityID _entityID, Component& _component )
 	{
 		ExpirationTime& expiration = static_cast<ExpirationTime&>( _component );
 		ImGui::PushItemWidth( 0.6f * ImGui::GetWindowWidth() );

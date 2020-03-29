@@ -29,7 +29,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void Transform::OnGui( Component& _component )
+	void Transform::OnGui( EcsWorld& _world, EntityID _entityID, Component& _component )
 	{
 		Transform& transform = static_cast<Transform&>( _component );
 		ImGui::PushItemWidth( 0.6f * ImGui::GetWindowWidth() - 16 );
