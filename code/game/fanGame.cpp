@@ -35,6 +35,7 @@
 #include "game/components/fanBullet.hpp"
 #include "game/components/fanBattery.hpp"
 #include "game/components/fanSolarPanel.hpp"
+#include "game/components/fanHealth.hpp"
 
 namespace fan
 {
@@ -56,6 +57,7 @@ namespace fan
 		world.AddComponentType<Bullet>();
 		world.AddComponentType<Battery>();
 		world.AddComponentType<SolarPanel>();
+		world.AddComponentType<Health>();
 
 		// @hack ? CollisionManager needs a reference to the world to mutate stuff
 		world.GetSingletonComponent<CollisionManager>().world = &world;

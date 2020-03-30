@@ -1,81 +1,62 @@
 #include "game/components/fanHealth.hpp"
 
+#include "scene/fanSceneSerializable.hpp"
+
 namespace fan
-{
+{	
+	REGISTER_COMPONENT( Health, "health" );
 
-		//================================================================================================================================
-		//================================================================================================================================
-		void Health::OnAttach()
+	//================================================================================================================================
+	//================================================================================================================================
+	void Health::SetInfo( ComponentInfo& _info )
 	{
-
+		_info.icon = ImGui::IconType::HEART16;
+		_info.onGui = &Health::OnGui;
+		_info.init = &Health::Init;
+		_info.load = &Health::Load;
+		_info.save = &Health::Save;
+		_info.editorPath = "game/";
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void Health::OnDetach()
+	void Health::Init( EcsWorld& _world, Component& _component )
 	{
-
-	}
-
-	//================================================================================================================================
-	// Try to remove energy 
-	// If there is not enough energy available, do nothing and return false
-	//================================================================================================================================
-	bool Health::TryRemoveHealth( const float _healthConsumed )
-	{
-		assert( _healthConsumed >= 0.f );
-
-		if ( m_invincible ) { return true; }
-
-		if ( m_currentHealth >= _healthConsumed )
-		{
-			m_currentHealth -= _healthConsumed;
-			if ( m_currentHealth <= 0.f ) { onFallToZero.Emmit(); }
-			return true;
-		}
-		else
-		{
-			return false;
-		}
+		Health& health = static_cast<Health&>( _component );
+		health.invincible = false;
+		health.currentHealth = 0.f;
+		health.maxHealth = 100.f;
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void Health::AddHealth( const float _healthAdded )
+	void Health::OnGui( EcsWorld& _world, EntityID _entityID, Component& _component )
 	{
-		assert( _healthAdded >= 0.f );
-		m_currentHealth = std::min( m_currentHealth + _healthAdded, m_maxHealth );
-	}
+		Health& health = static_cast<Health&>( _component );
 
-	//================================================================================================================================
-	//================================================================================================================================
-	void Health::OnGui()
-	{
 		ImGui::PushItemWidth( 0.6f * ImGui::GetWindowWidth() );
 		{
-			ImGui::SliderFloat( "current health", &m_currentHealth, 0.f, m_maxHealth );
-			ImGui::DragFloat( "max health", &m_maxHealth );
-			ImGui::Checkbox( "invincible", &m_invincible );
-
+			ImGui::SliderFloat( "current health", &health.currentHealth, 0.f, health.maxHealth );
+			ImGui::DragFloat( "max health", &health.maxHealth );
+			ImGui::Checkbox( "invincible", &health.invincible );
 		} ImGui::PopItemWidth();
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	bool Health::Save( Json& _json ) const
+	void Health::Save( const Component& _component, Json& _json )
 	{
+		const Health& health = static_cast<const Health&>( _component );
+		Serializable::SaveFloat( _json, "max_energy", health.maxHealth );
 
-		//Serializable::SaveFloat( _json, "max_energy", m_maxHealth );
-
-		return true;
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	bool Health::Load( const Json& _json )
+	void Health::Load( Component& _component, const Json& _json )
 	{
-		//Serializable::LoadFloat( _json, "max_energy", m_maxHealth );
+		Health& health = static_cast<Health&>( _component );
+		Serializable::LoadFloat( _json, "max_energy", health.maxHealth );
 
-		return true;
 	}
 }
