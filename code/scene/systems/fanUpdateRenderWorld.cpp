@@ -5,8 +5,8 @@
 #include "scene/components/fanTransform.hpp"
 #include "scene/components/fanSceneNode.hpp"
 #include "scene/components/fanMaterial.hpp"
-#include "scene/components/fanTransformUI.hpp"
-#include "scene/components/fanUIRenderer.hpp"
+#include "scene/components/ui/fanTransformUI.hpp"
+#include "scene/components/ui/fanUIRenderer.hpp"
 #include "scene/components/fanPointLight.hpp"
 #include "scene/components/fanDirectionalLight.hpp"
 
@@ -59,7 +59,7 @@ namespace fan
 	Signature S_UpdateRenderWorldUI::GetSignature( const EcsWorld& _world )
 	{
 		return _world.GetSignature<UIRenderer>()
-			| _world.GetSignature<UITransform>();
+			| _world.GetSignature<TransformUI>();
 	}
 
 	//==============================================================================================================================================================
@@ -73,7 +73,7 @@ namespace fan
 		for( EntityID id : _entities )
 		{
 			UIRenderer& renderer = _world.GetComponent<UIRenderer>( id );
-			UITransform& transform = _world.GetComponent<UITransform>( id );
+			TransformUI& transform = _world.GetComponent<TransformUI>( id );
 
 			if( renderer.GetTexture() == nullptr ) { continue; }
 

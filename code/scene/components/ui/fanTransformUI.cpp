@@ -1,28 +1,28 @@
-#include "scene/components/fanTransformUI.hpp"
+#include "scene/components/ui/fanTransformUI.hpp"
 
 #include "core/fanSerializable.hpp"
 
 namespace fan
 {
-	REGISTER_COMPONENT( UITransform, "ui_transform" );
+	REGISTER_COMPONENT( TransformUI, "ui_transform" );
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void UITransform::SetInfo( ComponentInfo& _info )
+	void TransformUI::SetInfo( ComponentInfo& _info )
 	{
 		_info.icon = ImGui::IconType::UI_TRANSFORM16;
-		_info.onGui = &UITransform::OnGui;
-		_info.init = &UITransform::Init;
-		_info.load = &UITransform::Load;
-		_info.save = &UITransform::Save;
-		_info.editorPath = "/";
+		_info.onGui = &TransformUI::OnGui;
+		_info.init = &TransformUI::Init;
+		_info.load = &TransformUI::Load;
+		_info.save = &TransformUI::Save;
+		_info.editorPath = "ui/";
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void UITransform::Init( EcsWorld& _world, Component& _component )
+	void TransformUI::Init( EcsWorld& _world, Component& _component )
 	{
-		UITransform& transform = static_cast<UITransform&>( _component );
+		TransformUI& transform = static_cast<TransformUI&>( _component );
 
 		transform.scale = glm::vec2(1.f, 1.f);
 		transform.position = glm::vec2( 0, 0 );
@@ -30,9 +30,9 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void UITransform::OnGui( EcsWorld& _world, EntityID _entityID, Component& _component )
+	void TransformUI::OnGui( EcsWorld& _world, EntityID _entityID, Component& _component )
 	{
-		UITransform& transform = static_cast<UITransform&>( _component );
+		TransformUI& transform = static_cast<TransformUI&>( _component );
 
 		ImGui::PushItemWidth( 0.6f * ImGui::GetWindowWidth() );
 		{
@@ -49,9 +49,9 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void UITransform::Save( const Component& _component, Json& _json )
+	void TransformUI::Save( const Component& _component, Json& _json )
 	{
-		const UITransform& transform = static_cast<const UITransform&>( _component );
+		const TransformUI& transform = static_cast<const TransformUI&>( _component );
 
 		Serializable::SaveIVec2( _json, "position", transform.position );
 		Serializable::SaveVec2( _json, "scale", { transform.scale .x, transform.scale .y} );
@@ -59,9 +59,9 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void UITransform::Load( Component& _component, const Json& _json )
+	void TransformUI::Load( Component& _component, const Json& _json )
 	{
-		UITransform& transform = static_cast<UITransform&>( _component );
+		TransformUI& transform = static_cast<TransformUI&>( _component );
 
 		btVector2 tmpPos;
 		btVector2 tmpScale;

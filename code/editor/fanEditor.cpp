@@ -55,8 +55,9 @@
 #include "scene/components/fanMotionState.hpp"
 #include "scene/components/fanBoxShape.hpp"
 #include "scene/components/fanSphereShape.hpp"
-#include "scene/components/fanTransformUI.hpp"
-#include "scene/components/fanUIRenderer.hpp"
+#include "scene/components/ui/fanTransformUI.hpp"
+#include "scene/components/ui/fanProgressBar.hpp"
+#include "scene/components/ui/fanUIRenderer.hpp"
 #include "scene/components/fanBounds.hpp"
 #include "scene/components/fanExpirationTime.hpp"
 #include "scene/components/fanFollowTransform.hpp"
@@ -560,11 +561,12 @@ namespace fan
 		_world.AddComponentType<MotionState>();
 		_world.AddComponentType<BoxShape>();
 		_world.AddComponentType<SphereShape>();
-		_world.AddComponentType<UITransform>();
+		_world.AddComponentType<TransformUI>();
 		_world.AddComponentType<UIRenderer>();
 		_world.AddComponentType<Bounds>();
 		_world.AddComponentType<ExpirationTime>();
 		_world.AddComponentType<FollowTransform>();
+		_world.AddComponentType<ProgressBar>();
 
 		_world.AddTagType<tag_boundsOutdated>();
 		_world.AddTagType<tag_editorOnly>();

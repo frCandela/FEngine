@@ -1,4 +1,4 @@
-#include "scene/components/fanUIRenderer.hpp"
+#include "scene/components/ui/fanUIRenderer.hpp"
 
 #include "render/fanRenderSerializable.hpp"
 #include "core/input/fanInput.hpp"
@@ -17,7 +17,7 @@ namespace fan
 		_info.init = &UIRenderer::Init;
 		_info.load = &UIRenderer::Load;
 		_info.save = &UIRenderer::Save;
-		_info.editorPath = "/";
+		_info.editorPath = "ui/";
 	}
 
 	//================================================================================================================================
