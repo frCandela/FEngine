@@ -7,8 +7,6 @@
 
 namespace fan
 {
-	struct ComponentInfo;
-
 	//================================================================================================================================
 	// fires bullets
 	// is placed on the spaceship on the player 

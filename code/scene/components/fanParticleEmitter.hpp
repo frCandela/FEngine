@@ -7,8 +7,6 @@
 
 namespace fan
 {
-	struct ComponentInfo;
-
 	//==============================================================================================================================================================
 	// Emits particles 
 	// timeAccumulator is used to keep track of time to spawn particles with proper timing

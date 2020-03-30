@@ -128,9 +128,7 @@ namespace fan
 			SCOPED_PROFILE( scene_update );
 			const float delta = ( state == State::PLAYING ? _delta : 0.f );
 
-			S_RefreshPlayerInput::Run( world, world.Match( S_RefreshPlayerInput::GetSignature( world ) ), delta );
-
-			// physics
+			// physics & transforms
 			PhysicsWorld& physicsWorld = world.GetSingletonComponent<PhysicsWorld>();
 			S_SynchronizeMotionStateFromTransform::Run( world, world.Match( S_SynchronizeMotionStateFromTransform::GetSignature( world ) ), delta );
 			physicsWorld.dynamicsWorld->stepSimulation( delta, 10, Time::Get().GetPhysicsDelta() );
@@ -138,22 +136,20 @@ namespace fan
 			S_MoveFollowTransforms::Run( world, world.Match( S_MoveFollowTransforms::GetSignature( world ) ) );
 
 			// update
+			S_RefreshPlayerInput::Run( world, world.Match( S_RefreshPlayerInput::GetSignature( world ) ), delta );
 			S_UpdateSpaceships::Run( world, world.Match( S_UpdateSpaceships::GetSignature( world ) ), delta );
 			S_FireWeapons::Run( world, world.Match( S_FireWeapons::GetSignature( world ) ), delta );
-			S_UpdateParticles::Run( world, world.Match( S_UpdateParticles::GetSignature( world ) ), delta );
-			S_EmitParticles::Run( world, world.Match( S_EmitParticles::GetSignature( world ) ), delta );
-
 			S_MovePlanets::Run( world, world.Match( S_MovePlanets::GetSignature( world ) ), delta );
 			S_GenerateLightMesh::Run( world, world.Match( S_GenerateLightMesh::GetSignature( world ) ), delta );
 			S_UpdateSolarPannels::Run(world, world.Match( S_UpdateSolarPannels::GetSignature( world ) ), delta );
 			S_RechargeBatteries::Run( world, world.Match( S_RechargeBatteries::GetSignature( world ) ), delta );
-			S_GenerateParticles::Run( world, world.Match( S_GenerateParticles::GetSignature( world ) ), delta );
-			//RUN_SYSTEM( ecsSolarEruptionMeshSystem, Run );
-			
+			S_UpdateExpirationTimes::Run( world, world.Match( S_UpdateExpirationTimes::GetSignature( world ) ), delta );
 
 			// late update
+			S_UpdateParticles::Run( world, world.Match( S_UpdateParticles::GetSignature( world ) ), delta );
+			S_EmitParticles::Run( world, world.Match( S_EmitParticles::GetSignature( world ) ), delta );
+			S_GenerateParticles::Run( world, world.Match( S_GenerateParticles::GetSignature( world ) ), delta );
 			S_UpdateBoundsFromRigidbody::Run( world, world.Match( S_UpdateBoundsFromRigidbody::GetSignature( world ) ), delta );
-			S_UpdateExpirationTimes::Run( world, world.Match( S_UpdateExpirationTimes::GetSignature( world ) ), delta );
 			S_UpdateBoundsFromModel::Run( world, world.Match( S_UpdateBoundsFromModel::GetSignature( world ) ), delta );
 			S_UpdateBoundsFromTransform::Run( world, world.Match( S_UpdateBoundsFromTransform::GetSignature( world ) ), delta );
 
@@ -163,7 +159,6 @@ namespace fan
 		{
 			// end frame
 			SCOPED_PROFILE( scene_endFrame );
-			Scene& scene = world.GetSingletonComponent<Scene>();
 			world.SortEntities();
 			world.RemoveDeadEntities();
 		}

@@ -7,7 +7,6 @@
 
 namespace fan
 {
-	struct ComponentInfo;
 	struct Transform;
 	struct Ray;
 

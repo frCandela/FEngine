@@ -6,13 +6,10 @@
 
 namespace fan
 {
-	struct ComponentInfo;
-
 	//==============================================================================================================================================================
 	//==============================================================================================================================================================
 	struct PointLight : public Component
 	{
-		enum Attenuation { CONSTANT = 0, LINEAR = 1, QUADRATIC = 2 };
 
 		DECLARE_COMPONENT( PointLight )
 	public:
@@ -21,6 +18,8 @@ namespace fan
 		static void OnGui( EcsWorld& _world, EntityID _entityID, Component& _component );
 		static void Save( const Component& _component, Json& _json );
 		static void Load( Component& _component, const Json& _json );
+
+		enum Attenuation { CONSTANT = 0, LINEAR = 1, QUADRATIC = 2 };
 
 		Color ambiant = Color::White;
 		Color diffuse = Color::White;

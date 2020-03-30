@@ -21,14 +21,8 @@ namespace ImGui
 		fan::Component* component = nullptr;
 	};
 
-// 	void				FanBeginDragDropSourceGameobject( fan::Gameobject * _gameobject, ImGuiDragDropFlags _flags = ImGuiDragDropFlags_None );
-// 	fan::Gameobject *	FanBeginDragDropTargetGameobject();
-
 	void				FanBeginDragDropSourcePrefab( fan::Prefab * _prefab, ImGuiDragDropFlags _flags = ImGuiDragDropFlags_None );
 	fan::Prefab *		FanBeginDragDropTargetPrefab();
-
-// 	void				FanBeginDragDropSourceComponent( fan::Component * _component, ImGuiDragDropFlags _flags = ImGuiDragDropFlags_None );
-// 	fan::Component *	FanBeginDragDropTargetComponent( const uint32_t _typeID );
 
 	void				FanBeginDragDropSourceComponent( fan::SceneNode& _sceneNode, fan::Component& _component, ImGuiDragDropFlags _flags = ImGuiDragDropFlags_None );
 	ComponentPayload	FanBeginDragDropTargetComponent( const uint32_t _staticID );
