@@ -22,7 +22,6 @@ namespace fan
 		static void Init( SingletonComponent& _component );
 		static void OnGui( SingletonComponent& _component );
 
-		~Scene();
 		SceneNode& CreateSceneNode( const std::string _name, SceneNode* const _parentNode, const bool _generateID = true );
 
 		void New();
