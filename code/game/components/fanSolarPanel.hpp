@@ -2,11 +2,9 @@
 
 #include "game/fanGamePrecompiled.hpp"
 
-
-
 namespace fan
 {
-	class WithEnergy;
+	class Battery;
 	class SolarEruption;
 
 	//================================================================================================================================
@@ -40,9 +38,9 @@ namespace fan
 		float m_maxChargingRate = 10.f;		// Energy/s
 		float m_minRange = 2.f;				// Distance at which the solar panel reaches maximum charging rate
 		float m_maxRange = 30.f;			// Distance at which the solar panel reaches minimum charging rate
-
-		WithEnergy* m_energy;
-		SolarEruption* m_eruption;
+// 
+// 		WithEnergy* m_energy;
+// 		SolarEruption* m_eruption;
 
 		void ComputeChargingRate();
 	};

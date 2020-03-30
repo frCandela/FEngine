@@ -1,12 +1,5 @@
 #include "game/components/fanWeapon.hpp"
 
-// #include "game/components/fanWithEnergy.hpp"
-// #include "game/components/fanPlayerInput.hpp"
-// #include "core/input/fanInput.hpp"
-// #include "core/input/fanInputManager.hpp"
-// #include "core/time/fanProfiler.hpp"
-// #include "core/input/fanMouse.hpp"
-// #include "core/time/fanTime.hpp"
 #include "editor/fanModals.hpp"
 #include "scene/fanSceneSerializable.hpp"
 

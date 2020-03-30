@@ -32,6 +32,7 @@
 #include "game/components/fanPlayerInput.hpp"
 #include "game/components/fanWeapon.hpp"
 #include "game/components/fanBullet.hpp"
+#include "game/components/fanBattery.hpp"
 
 namespace fan
 {
@@ -51,6 +52,7 @@ namespace fan
 		world.AddComponentType<PlayerInput>();
 		world.AddComponentType<Weapon>();
 		world.AddComponentType<Bullet>();
+		world.AddComponentType<Battery>();
 
 		// @hack ? CollisionManager needs a reference to the world to mutuate stuff
 		world.GetSingletonComponent<CollisionManager>().world = &world;

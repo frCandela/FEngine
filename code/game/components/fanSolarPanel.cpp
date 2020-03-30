@@ -1,6 +1,5 @@
 #include "game/components/fanSolarPanel.hpp"
 #include "game/components/fanSolarEruption.hpp"
-#include "game/components/fanWithEnergy.hpp"
 #include "render/fanMesh.hpp"
 
 namespace fan
@@ -33,7 +32,7 @@ namespace fan
 	void SolarPanel::Update( const float _delta )
 	{
 		ComputeChargingRate();
-		m_energy->AddEnergy( _delta * m_currentChargingRate );
+/*		m_energy->AddEnergy( _delta * m_currentChargingRate );*/
 	}
 
 	//================================================================================================================================

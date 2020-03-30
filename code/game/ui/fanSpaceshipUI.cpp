@@ -1,5 +1,4 @@
 #include "game/ui/fanSpaceShipUI.hpp"
-#include "game/components/fanWithEnergy.hpp"
 #include "game/components/fanSolarPanel.hpp"
 #include "game/components/fanHealth.hpp"
 #include "scene/components/fanProgressBar.hpp"
