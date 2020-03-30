@@ -18,7 +18,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void EditorGrid::Init( SingletonComponent& _component )
+	void EditorGrid::Init( EcsWorld& _world, SingletonComponent& _component )
 	{
 		EditorGrid& editorGrid = static_cast<EditorGrid&>( _component );
 		editorGrid.offset = btVector3::Zero();

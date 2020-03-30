@@ -226,7 +226,7 @@ namespace fan {
 		SingletonComponentInfo info;
 		_componentType::SetInfo( info );
 		assert( info.init != nullptr );
-		info.init( *component );
+		info.init( *this, *component );
 		info.staticIndex = _componentType::s_typeInfo;
 		m_singletonComponentInfo[ _componentType::s_typeInfo ] = info ;
 

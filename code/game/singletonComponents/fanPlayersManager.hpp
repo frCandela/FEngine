@@ -16,7 +16,7 @@ namespace fan
 		DECLARE_SINGLETON_COMPONENT()
 	public:
 		static void SetInfo( SingletonComponentInfo& _info );
-		static void Init( SingletonComponent& _component );
+		static void Init( EcsWorld& _world, SingletonComponent& _component );
 
 		//================================================================	
 		//================================================================

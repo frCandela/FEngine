@@ -23,10 +23,10 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void CollisionManager::Init( SingletonComponent& _component )
+	void CollisionManager::Init( EcsWorld& _world, SingletonComponent& _component )
 	{
 		CollisionManager& collisionManager = static_cast<CollisionManager&>( _component );
-		collisionManager.world = nullptr;
+		const_cast<EcsWorld*>( collisionManager.world ) = &_world;
 	}
 
 	//================================================================================================================================

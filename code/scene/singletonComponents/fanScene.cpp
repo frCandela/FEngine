@@ -34,14 +34,15 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void Scene::Init( SingletonComponent& _component )
+	void Scene::Init( EcsWorld& _world, SingletonComponent& _component )
 	{
 		Scene& scene = static_cast<Scene&>( _component );
 		scene.path = "";
 		scene.root = nullptr;
 		scene.nextUniqueID = 1;
 		scene.mainCamera = nullptr;
-		scene.world = nullptr;
+		scene.nodes.clear();
+		const_cast<EcsWorld*>( scene.world ) = &_world;
 	}
 
 	//================================================================================================================================

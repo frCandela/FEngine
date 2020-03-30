@@ -26,7 +26,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void EditorCamera::Init( SingletonComponent& _component )
+	void EditorCamera::Init( EcsWorld& _world, SingletonComponent& _component )
 	{
 		EditorCamera& editorCamera = static_cast<EditorCamera&>( _component );
 

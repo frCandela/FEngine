@@ -58,9 +58,6 @@ namespace fan
 		world.AddComponentType<Battery>();
 		world.AddComponentType<SolarPanel>();
 		world.AddComponentType<Health>();
-
-		// @hack ? CollisionManager needs a reference to the world to mutate stuff
-		world.GetSingletonComponent<CollisionManager>().world = &world;
 	}
 
 	//================================================================================================================================

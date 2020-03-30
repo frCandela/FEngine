@@ -19,7 +19,7 @@ namespace fan
 		DECLARE_SINGLETON_COMPONENT()
 	public:
 		static void SetInfo( SingletonComponentInfo& _info );
-		static void Init( SingletonComponent& _component );
+		static void Init( EcsWorld& _world, SingletonComponent& _component );
 		static void OnGui( SingletonComponent& _component );
 
 		SceneNode& CreateSceneNode( const std::string _name, SceneNode* const _parentNode, const bool _generateID = true );
@@ -40,11 +40,11 @@ namespace fan
 		Signal< SceneNode* >	onDeleteSceneNode;
 		Signal< SceneNode& >	onSetMainCamera;
 
-		EcsWorld*									world;
+		EcsWorld* const								world = nullptr;
 		std::string									path;		
-		SceneNode *									root = nullptr;
-		uint32_t									nextUniqueID = 1;
-		SceneNode*									mainCamera = nullptr;
+		SceneNode *									root;
+		uint32_t									nextUniqueID;
+		SceneNode*									mainCamera;
 		std::unordered_map< uint32_t, SceneNode* >  nodes;
 	};
 }

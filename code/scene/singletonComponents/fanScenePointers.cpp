@@ -20,7 +20,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void ScenePointers::Init( SingletonComponent& _component )
+	void ScenePointers::Init( EcsWorld& _world, SingletonComponent& _component )
 	{
 		ScenePointers& scenePointers = static_cast<ScenePointers&>( _component );
 		scenePointers.unresolvedComponentPtr.clear();;

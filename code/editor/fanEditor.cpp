@@ -541,13 +541,11 @@ namespace fan
 	//================================================================================================================================
 	void Engine::InitializeGameEcsWorldTypes( EcsWorld& _world )
 	{
+		_world.AddSingletonComponentType<Scene>();
 		_world.AddSingletonComponentType<RenderWorld>();
 		_world.AddSingletonComponentType<PhysicsWorld>();
 		_world.AddSingletonComponentType<EditorCamera>();
 		_world.AddSingletonComponentType<ScenePointers>();
-
-		Scene& scene = _world.AddSingletonComponentType<Scene>();
-		scene.world = &_world; //@hack the scene shoudn't have a reference to the world
 
 		_world.AddComponentType<SceneNode>();
 		_world.AddComponentType<Transform>();
