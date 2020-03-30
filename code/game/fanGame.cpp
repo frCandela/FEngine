@@ -26,6 +26,7 @@
 #include "game/systems/fanUpdateGameCamera.hpp"
 #include "game/systems/fanUpdateWeapons.hpp"
 #include "game/systems/fanUpdatePlayerInput.hpp"
+#include "game/systems/fanUpdateEnergy.hpp"
 
 #include "game/components/fanPlanet.hpp"
 #include "game/components/fanSpaceShip.hpp"
@@ -33,6 +34,7 @@
 #include "game/components/fanWeapon.hpp"
 #include "game/components/fanBullet.hpp"
 #include "game/components/fanBattery.hpp"
+#include "game/components/fanSolarPanel.hpp"
 
 namespace fan
 {
@@ -53,8 +55,9 @@ namespace fan
 		world.AddComponentType<Weapon>();
 		world.AddComponentType<Bullet>();
 		world.AddComponentType<Battery>();
+		world.AddComponentType<SolarPanel>();
 
-		// @hack ? CollisionManager needs a reference to the world to mutuate stuff
+		// @hack ? CollisionManager needs a reference to the world to mutate stuff
 		world.GetSingletonComponent<CollisionManager>().world = &world;
 	}
 
@@ -142,6 +145,8 @@ namespace fan
 
 			S_MovePlanets::Run( world, world.Match( S_MovePlanets::GetSignature( world ) ), delta );
 			S_GenerateLightMesh::Run( world, world.Match( S_GenerateLightMesh::GetSignature( world ) ), delta );
+			S_UpdateSolarPannels::Run(world, world.Match( S_UpdateSolarPannels::GetSignature( world ) ), delta );
+			S_RechargeBatteries::Run( world, world.Match( S_RechargeBatteries::GetSignature( world ) ), delta );
 			S_GenerateParticles::Run( world, world.Match( S_GenerateParticles::GetSignature( world ) ), delta );
 			//RUN_SYSTEM( ecsSolarEruptionMeshSystem, Run );
 			

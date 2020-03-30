@@ -1,109 +1,78 @@
 #include "game/components/fanSolarPanel.hpp"
-#include "game/components/fanSolarEruption.hpp"
-#include "render/fanMesh.hpp"
+
+#include "scene/fanSceneSerializable.hpp"
+#include "editor/fanModals.hpp"
 
 namespace fan
-{
+{	
+	REGISTER_COMPONENT( SolarPanel, "solar pannel" );
 
-		//================================================================================================================================
-		//================================================================================================================================
-		void SolarPanel::Start()
+	//================================================================================================================================
+	//================================================================================================================================
+	void SolarPanel::SetInfo( ComponentInfo& _info )
 	{
-// 		REQUIRE_COMPONENT( WithEnergy, m_energy );
-// 		REQUIRE_SCENE_COMPONENT( SolarEruption, m_eruption );
+		_info.icon = ImGui::IconType::JOYSTICK16;
+		_info.onGui = &SolarPanel::OnGui;
+		_info.init = &SolarPanel::Init;
+		_info.load = &SolarPanel::Load;
+		_info.save = &SolarPanel::Save;
+		_info.editorPath = "game/";
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void SolarPanel::OnAttach()
+	void SolarPanel::Init( EcsWorld& _world, Component& _component )
 	{
-
+		SolarPanel& solarPanel = static_cast<SolarPanel&>( _component );
+		solarPanel.isInsideSunlight = false;
+		solarPanel.currentChargingRate = 0.f;
+		solarPanel.minChargingRate = 0.f;
+		solarPanel.maxChargingRate = 10.f;
+		solarPanel.lowRange = 2.f;
+		solarPanel.highRange = 30.f;
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void SolarPanel::OnDetach()
+	void SolarPanel::OnGui( EcsWorld& _world, EntityID _entityID, Component& _component )
 	{
+		SolarPanel& solarPanel = static_cast<SolarPanel&>( _component );
 
-	}
-
-	//================================================================================================================================
-	//================================================================================================================================
-	void SolarPanel::Update( const float _delta )
-	{
-		ComputeChargingRate();
-/*		m_energy->AddEnergy( _delta * m_currentChargingRate );*/
-	}
-
-	//================================================================================================================================
-	//================================================================================================================================
-	void SolarPanel::LateUpdate( const float /*_delta*/ )
-	{}
-
-	//================================================================================================================================
-	//================================================================================================================================
-	void SolarPanel::OnGui()
-	{
 		ImGui::PushItemWidth( 0.6f * ImGui::GetWindowWidth() );
 		{
-			ImGui::DragFloat( "min_charging_rate", &m_minChargingRate, 0.5f, 0.f, 100.f );
-			ImGui::DragFloat( "max_charging_rate", &m_maxChargingRate, 0.5f, 0.f, 100.f );
-			ImGui::DragFloat( "low_range		", &m_minRange, 0.5f, 0.f, 100.f );
-			ImGui::DragFloat( "max_range 		", &m_maxRange, 0.5f, 0.f, 100.f );
+			ImGui::DragFloat( "min charging rate", &solarPanel.minChargingRate, 0.5f, 0.f, 100.f );
+			ImGui::DragFloat( "max charging rate", &solarPanel.maxChargingRate, 0.5f, 0.f, 100.f );
+			ImGui::DragFloat( "low range		", &solarPanel.lowRange, 0.5f, 0.f, 100.f );
+			ImGui::DragFloat( "high range 		", &solarPanel.highRange, 0.5f, 0.f, 100.f );
+			ImGui::Spacing();
+			ImGui::PushDisable();
+			ImGui::Checkbox( "is inside sunlight", &solarPanel.isInsideSunlight );
+			ImGui::DragFloat( "charging rate", &solarPanel.currentChargingRate, 0.5f, 0.f, 100.f );
+			ImGui::PopDisable();
 		} ImGui::PopItemWidth();
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void SolarPanel::ComputeChargingRate()
+	void SolarPanel::Save( const Component& _component, Json& _json )
 	{
-// 		// Sunlight mesh raycast
-// 		const btVector3 rayOrigin = m_gameobject->GetTransform().GetPosition() + btVector3::Up();
-// 		btVector3 outIntersection;
-// 		ecsSunLightMesh_s& sunLight = GetScene().GetEcsManager().GetSingletonComponents().GetComponent<ecsSunLightMesh_s>();
-// 		m_isInsideSunlight = sunLight.mesh->RayCast( rayOrigin, -btVector3::Up(), outIntersection );
-// 
-// 		// Charging rate
-// 		if ( m_isInsideSunlight )
-// 		{
-// 			const btVector3 position = m_gameobject->GetTransform().GetPosition();
-// 			const float distance = position.norm();
-// 			const float slope = ( m_maxChargingRate - m_minChargingRate ) / ( m_maxRange - m_minRange );
-// 			const float unclampedRate = m_maxChargingRate - slope * ( distance - m_minRange );
-// 			m_currentChargingRate = std::clamp( unclampedRate, m_minChargingRate, m_maxChargingRate );
-// 		}
-// 		else
-// 		{
-// 			m_currentChargingRate = 0.f;
-// 		}
+		const SolarPanel& solarPanel = static_cast<const SolarPanel&>( _component );
+
+		Serializable::SaveFloat( _json, "min_charging_rate", solarPanel.minChargingRate );
+		Serializable::SaveFloat( _json, "max_charging_rate", solarPanel.maxChargingRate );
+		Serializable::SaveFloat( _json, "low_range",		 solarPanel.lowRange );
+		Serializable::SaveFloat( _json, "high_range",		 solarPanel.highRange );
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	bool SolarPanel::Save( Json& _json ) const
+	void SolarPanel::Load( Component& _component, const Json& _json )
 	{
+		SolarPanel& solarPanel = static_cast<SolarPanel&>( _component );
 
-
-// 		Serializable::SaveFloat( _json, "min_charging_rate", m_minChargingRate );
-// 		Serializable::SaveFloat( _json, "max_charging_rate", m_maxChargingRate );
-// 		Serializable::SaveFloat( _json, "low_range		", m_minRange );
-// 		Serializable::SaveFloat( _json, "max_range 		", m_maxRange );
-
-		return true;
+		Serializable::LoadFloat( _json, "min_charging_rate", solarPanel.minChargingRate );
+		Serializable::LoadFloat( _json, "max_charging_rate", solarPanel.maxChargingRate );
+		Serializable::LoadFloat( _json, "low_range", solarPanel.lowRange );
+		Serializable::LoadFloat( _json, "high_range", solarPanel.highRange );
 	}
-
-	//================================================================================================================================
-	//================================================================================================================================
-	bool SolarPanel::Load( const Json& _json )
-	{
-
-
-// 		Serializable::LoadFloat( _json, "min_charging_rate", m_minChargingRate );
-// 		Serializable::LoadFloat( _json, "max_charging_rate", m_maxChargingRate );
-// 		Serializable::LoadFloat( _json, "low_range		", m_minRange );
-// 		Serializable::LoadFloat( _json, "max_range 		", m_maxRange );
-		return true;
-	}
-
-
 }

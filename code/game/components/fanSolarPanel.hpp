@@ -2,46 +2,28 @@
 
 #include "game/fanGamePrecompiled.hpp"
 
+#include "ecs/fanComponent.hpp"
+
 namespace fan
 {
-	class Battery;
-	class SolarEruption;
-
 	//================================================================================================================================
 	//================================================================================================================================
-	class SolarPanel// : public Actor
+	class SolarPanel : public Component
 	{
+		DECLARE_COMPONENT( SolarPanel )
 	public:
-		void Start() /*override*/;
-		void Stop() /*override*/ {}
-		void Update( const float _delta ) /*override*/;
-		void LateUpdate( const float _delta ) /*override*/;
+		static void SetInfo( ComponentInfo& _info );
+		static void Init( EcsWorld& _world, Component& _component );
+		static void OnGui( EcsWorld& _world, EntityID _entityID, Component& _component );
+		static void Save( const Component& _component, Json& _json );
+		static void Load( Component& _component, const Json& _json );
 
-		float GetChargingRate() const { return m_currentChargingRate; }
-		float GetMaxChargingRate() const { return m_maxChargingRate; }
-		bool  IsInsideSunlight() const { return m_isInsideSunlight; }
-
-		void OnGui() /*override*/;
-		//ImGui::IconType GetIcon() const override { return ImGui::IconType::JOYSTICK16; }
-
-	protected:
-		void OnAttach() /*override*/;
-		void OnDetach() /*override*/;
-		bool Load( const Json& _json ) /*override*/;
-		bool Save( Json& _json ) const /*override*/;
-
-	private:
-		bool m_isInsideSunlight = true;
-		float m_currentChargingRate = 0.f;	// Energy/s
-
-		float m_minChargingRate = 0.f;		// Energy/s
-		float m_maxChargingRate = 10.f;		// Energy/s
-		float m_minRange = 2.f;				// Distance at which the solar panel reaches maximum charging rate
-		float m_maxRange = 30.f;			// Distance at which the solar panel reaches minimum charging rate
-// 
-// 		WithEnergy* m_energy;
-// 		SolarEruption* m_eruption;
-
-		void ComputeChargingRate();
+		bool  isInsideSunlight;
+		float currentChargingRate;  // Energy/s
+		float minChargingRate;		// Energy/s
+		float maxChargingRate;		// Energy/s
+		float lowRange;				// Distance at which the solar panel reaches maximum charging rate
+		float highRange;			// Distance at which the solar panel reaches minimum charging rate
 	};
+	static constexpr size_t sizeof_solarPanel = sizeof( SolarPanel );
 }
