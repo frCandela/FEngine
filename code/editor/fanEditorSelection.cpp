@@ -11,13 +11,13 @@
 #include "scene/components/fanTransform.hpp"
 #include "scene/components/fanCamera.hpp"
 #include "scene/components/fanFollowTransform.hpp"
+#include "scene/components/ui/fanFollowTransformUI.hpp"
 #include "scene/singletonComponents/fanScene.hpp"
 #include "scene/systems/fanRaycast.hpp"
 #include "scene/systems/fanDrawDebug.hpp"
 #include "scene/fanSceneTags.hpp"
 #include "render/fanMesh.hpp"
 #include "ecs/fanEcsWorld.hpp"
-
 
 namespace fan
 {
@@ -152,11 +152,21 @@ namespace fan
 		{
 			EcsWorld& world = *m_selectedSceneNode->scene->world;
 			EntityID entityID = world.GetEntityID( m_selectedSceneNode->handle );
+
+			// FollowTransform
 			if( world.HasComponent<FollowTransform>( entityID ) )
 			{
 				FollowTransform& follower = world.GetComponent<FollowTransform>( entityID );
 				follower.locked = !follower.locked;
 				FollowTransform::UpdateLocalTransform( world, entityID );
+			}
+
+			// FollowTransformUI
+			if( world.HasComponent<FollowTransformUI>( entityID ) )
+			{
+				FollowTransformUI& follower = world.GetComponent<FollowTransformUI>( entityID );
+				follower.locked = !follower.locked;
+				FollowTransformUI::UpdateOffset( world, entityID );
 			}
 		}
 		

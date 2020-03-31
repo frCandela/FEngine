@@ -23,4 +23,12 @@ namespace fan
 		static Signature GetSignature( const EcsWorld& _world );
 		static void Run( EcsWorld& _world, const std::vector<EntityID>& _entities );
 	};
+
+	//==============================================================================================================================================================
+	//==============================================================================================================================================================
+	struct S_MoveFollowTransformsUI : System
+	{
+		static Signature GetSignature( const EcsWorld& _world );
+		static void Run( EcsWorld& _world, const std::vector<EntityID>& _entities );
+	};
 }

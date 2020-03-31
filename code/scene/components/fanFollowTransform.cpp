@@ -18,7 +18,7 @@ namespace fan
 		_info.onGui = &FollowTransform::OnGui;
 		_info.save = &FollowTransform::Save;
 		_info.load = &FollowTransform::Load;
-		_info.editorPath = "/";
+		_info.editorPath = "ui/";
 	}
 
 	//================================================================================================================================

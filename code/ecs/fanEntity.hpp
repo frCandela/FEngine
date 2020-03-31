@@ -12,7 +12,7 @@ namespace fan
 	//==============================================================================================================================================================
 	struct Entity
 	{
-		static constexpr int s_maxComponentsPerEntity = 14;
+		static constexpr int s_maxComponentsPerEntity = 30;
 		Component* components[s_maxComponentsPerEntity];
 		int componentCount = 0;
 		Signature signature;
@@ -24,5 +24,5 @@ namespace fan
 		void Kill()												{ signature[ecAliveBit] = 0;			}
 	};
 	static constexpr size_t sizeEntity = sizeof( Entity );
-	static_assert( sizeEntity == 128 );
+	static_assert( sizeEntity == 256 );
 }

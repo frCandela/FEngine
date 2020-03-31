@@ -2,6 +2,8 @@
 
 #include "ecs/fanEcsWorld.hpp"
 #include "scene/components/fanFollowTransform.hpp"
+#include "scene/components/ui/fanFollowTransformUI.hpp"
+#include "scene/components/ui/fanTransformUI.hpp"
 
 namespace fan
 {
@@ -55,6 +57,30 @@ namespace fan
 				Transform& target = *followTransform.targetTransform;
 
 				follow.transform = target.transform * followTransform.localTransform;
+			}
+		}
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
+	Signature S_MoveFollowTransformsUI::GetSignature( const EcsWorld& _world )
+	{
+		return	_world.GetSignature<TransformUI>() | _world.GetSignature<FollowTransformUI>();
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
+	void S_MoveFollowTransformsUI::Run( EcsWorld& _world, const std::vector<EntityID>& _entities )
+	{
+		for( EntityID entityID : _entities )
+		{
+			FollowTransformUI& followTransform = _world.GetComponent<FollowTransformUI>( entityID );
+			if( followTransform.locked && followTransform.targetTransform != nullptr )
+			{
+				TransformUI& follow = _world.GetComponent<TransformUI>( entityID );
+				TransformUI& target = *followTransform.targetTransform;
+
+				follow.position = target.position + followTransform.offset;
 			}
 		}
 	}

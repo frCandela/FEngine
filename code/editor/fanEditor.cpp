@@ -61,6 +61,7 @@
 #include "scene/components/fanBounds.hpp"
 #include "scene/components/fanExpirationTime.hpp"
 #include "scene/components/fanFollowTransform.hpp"
+#include "scene/components/ui/fanFollowTransformUI.hpp"
 #include "scene/systems/fanUpdateTransforms.hpp"
 #include "scene/systems/fanDrawDebug.hpp"
 #include "scene/systems/fanUpdateRenderWorld.hpp"
@@ -299,6 +300,7 @@ namespace fan
 						m_mainMenuBar->Draw();
 						m_selection->Update( m_gameWindow->IsHovered() );
 						S_MoveFollowTransforms::Run( m_game->world, m_game->world.Match( S_MoveFollowTransforms::GetSignature( m_game->world ) ) );
+						S_MoveFollowTransformsUI::Run( m_game->world, m_game->world.Match( S_MoveFollowTransformsUI::GetSignature( m_game->world ) ) );
 					}					
 
 					{
@@ -567,6 +569,7 @@ namespace fan
 		_world.AddComponentType<ExpirationTime>();
 		_world.AddComponentType<FollowTransform>();
 		_world.AddComponentType<ProgressBar>();
+		_world.AddComponentType<FollowTransformUI>();
 
 		_world.AddTagType<tag_boundsOutdated>();
 		_world.AddTagType<tag_editorOnly>();
