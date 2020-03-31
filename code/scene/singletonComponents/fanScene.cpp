@@ -181,7 +181,7 @@ namespace fan
 			// saves all scene nodes recursively
 			Json& jRoot = jScene["root"];
 			R_SaveToJson( *root, jRoot );
-			RemapSceneNodesIndices( json );				
+			RemapSceneNodesIndices( jRoot );
 			outStream << json; // write to disk			
 			outStream.close();
 		}
@@ -237,50 +237,70 @@ namespace fan
 	void Scene::RemapSceneNodesIndices( Json& _json )
 	{
 		std::vector< Json* > jsonIndices;
-		std::set< uint64_t > uniqueIndices;
+		std::set< uint32_t > uniqueIndices;
 
-		// parse all the json and get all the gameobjects ids
-		std::stack< Json* > stack;
-		stack.push( &_json );
-		while( !stack.empty() )
+		// parse all the json, get all the scene nodes IDs & generates a remap table
+		std::map< uint32_t, uint32_t > remapTable;
 		{
-			Json& js = *stack.top();
-			stack.pop();
-
-			Json::iterator& gameobjectId = js.find( "node_id" );
-			if( gameobjectId != js.end() )
+			int nextRemapIndex = 1;
+			std::stack< const Json* > stack;
+			stack.push( &_json );
+			while( !stack.empty() )
 			{
-				uint64_t value = *gameobjectId;
-				if( value != 0 )
-				{
-					jsonIndices.push_back( &( *gameobjectId ) );
-					uniqueIndices.insert( value );
-				}
-			}
+				const Json& jNode = *stack.top();
+				stack.pop();
 
-			if( js.is_structured() )
-			{
-				for( auto& element : js )
+				uint32_t id = jNode["node_id"];
+				remapTable[id] = nextRemapIndex++;
+
+				// push all childs
+				const Json& jchilds = jNode["childs"];
 				{
-					stack.push( &element );
+					for( int childIndex = 0; childIndex < jchilds.size(); childIndex++ )
+					{
+						const Json& jChild = jchilds[childIndex];
+						stack.push( &jChild );
+					}
 				}
 			}
 		}
 
-		// creates the remap table
-		std::map< uint64_t, uint64_t > remapTable;
-		int remap = 1;
-		for( uint64_t uniqueIndex : uniqueIndices )
+		// remap all indices ( scene nodes & component pointers )
 		{
-			remapTable[uniqueIndex] = remap++;
-		}
+			std::stack< Json* > stack;
+			stack.push( &_json );
+			while( !stack.empty() )
+			{
+				Json& js = *stack.top();
+				stack.pop();
 
-		// remap all indices
-		for( int jsonIdIndex = 0; jsonIdIndex < jsonIndices.size(); jsonIdIndex++ )
-		{
-			Json& js = *jsonIndices[jsonIdIndex];
-			const uint64_t value = js;
-			js = remapTable[value];
+				// remap
+				Json::iterator& jNodeId = js.find( "node_id" );
+				if( jNodeId != js.end() )
+				{
+ 					const uint32_t nodeId = *jNodeId;
+					auto it = remapTable.find( nodeId );
+					if( nodeId == 0 ) {}
+ 					else if( it != remapTable.end() )
+					{
+						const uint32_t remapId = it->second;
+						*jNodeId = remapId;
+					}
+					else
+					{						
+						*jNodeId = 0;// pointer target is outside of the json nodes
+					}
+				}
+
+				// push all childs
+				if( js.is_structured() )
+				{
+					for( auto& element : js )
+					{
+						stack.push( &element );
+					}
+				}
+			}
 		}
 	}
 

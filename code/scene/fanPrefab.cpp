@@ -67,7 +67,7 @@ namespace fan
 		Scene& scene = *_node.scene;
 		Json& prefabJson = m_json[ "prefab" ];
 		Scene::R_SaveToJson( _node, prefabJson );
-		Scene::RemapSceneNodesIndices( m_json );
+		Scene::RemapSceneNodesIndices( prefabJson );
 	}
 
 	//================================================================================================================================
@@ -82,7 +82,7 @@ namespace fan
 		else
 		{
 			const uint32_t idOffset = _parent.scene->nextUniqueID - 1;
-			SceneNode& node = _parent.scene->CreateSceneNode( "tmp", nullptr, false );
+			SceneNode& node = _parent.scene->CreateSceneNode( "tmp", &_parent, false );
 			EcsWorld& world = *_parent.scene->world;
 			EntityID indexStart = (EntityID)world.GetNumEntities();
 			Scene::R_LoadFromJson( m_json["prefab"], node, idOffset );
