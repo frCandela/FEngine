@@ -5,6 +5,7 @@
 #include "scene/fanSceneTags.hpp"
 #include "game/components/fanSpaceShip.hpp"
 #include "game/components/fanPlayerInput.hpp"
+#include "game/components/fanBattery.hpp"
 #include "ecs/fanEcsWorld.hpp"
 
 namespace fan
@@ -16,6 +17,7 @@ namespace fan
 		return
 			_world.GetSignature<Transform>() |
 			_world.GetSignature<Rigidbody>() |
+			_world.GetSignature<Battery>() |
 			_world.GetSignature<PlayerInput>() |
 			_world.GetSignature<SpaceShip>();
 	}
@@ -31,6 +33,7 @@ namespace fan
 			Transform& transform = _world.GetComponent<Transform>( entityID );
 			Rigidbody& rigidbody = _world.GetComponent<Rigidbody>( entityID );
 			SpaceShip& spaceship = _world.GetComponent<SpaceShip>( entityID );
+			Battery& battery = _world.GetComponent<Battery>( entityID );
 			PlayerInput & playerInput = _world.GetComponent<PlayerInput>( entityID );
 
 			// get player input
@@ -52,23 +55,25 @@ namespace fan
 			transform.SetPosition( pos );
 
 			SpaceShip::SpeedMode speedMode;
-			if( forwardAxis < 0 ) { speedMode = SpaceShip::SpeedMode::REVERSE; }
-			else if( boost > 0 )  { speedMode = SpaceShip::SpeedMode::FAST; }
-			else if( boost < 0 )  { speedMode = SpaceShip::SpeedMode::SLOW; }
-			else				  { speedMode = SpaceShip::SpeedMode::NORMAL; }
-				
-			
+			if( forwardAxis < 0 ) { speedMode = SpaceShip::REVERSE; }
+			else if( boost > 0 )  { speedMode = SpaceShip::FAST; }
+			else if( boost < 0 )  { speedMode = SpaceShip::SLOW; }
+			else				  { speedMode = SpaceShip::NORMAL; }			
 
 			// Consume energy
  			float totalConsumption = spaceship.energyConsumedPerUnitOfForce * ( std::abs( leftForce ) + std::abs( spaceship.forwardForces[speedMode] * forwardAxis ) );
-// 			if( !spaceship.energy->TryRemoveEnergy( totalConsumption ) ) // not enough energy = go to slow speed mode
-// 			{
-// 				spaceship.energy->TryRemoveEnergy( m_energy->GetEnergy() );
-// 				if( speedMode != SpeedMode::REVERSE )
-// 				{
-// 					speedMode = SpeedMode::SLOW;
-// 				}
-// 			}
+			if( battery.currentEnergy < totalConsumption )
+			{
+				battery.currentEnergy = 0.f;
+				if( speedMode != SpaceShip::REVERSE )
+				{
+					speedMode = SpaceShip::SLOW;
+				}
+			}
+			else
+			{
+				battery.currentEnergy -= totalConsumption;
+			}
 
 // 			// Enable particle systems
 // 			spaceship.fastForwardParticles->SetEnabled( false );
