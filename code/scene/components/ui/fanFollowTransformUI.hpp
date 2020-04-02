@@ -24,7 +24,6 @@ namespace fan
 		glm::vec2 offset;
 		bool locked;
 
-		void ToggleLock();
 		static void UpdateOffset( EcsWorld& _world, EntityID _entityID );
 	};
 	static constexpr size_t sizeof_followTransformUUI = sizeof( FollowTransformUI );

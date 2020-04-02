@@ -24,7 +24,6 @@ namespace fan
 		btTransform localTransform;
 		bool locked;
 
-		void ToggleLock();
 		static void UpdateLocalTransform( EcsWorld& _world, EntityID _entityID );
 	};
 	static constexpr size_t sizeof_followTransform = sizeof( FollowTransform );

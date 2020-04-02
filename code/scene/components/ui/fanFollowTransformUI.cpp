@@ -12,12 +12,12 @@ namespace fan
 	//================================================================================================================================
 	void FollowTransformUI::SetInfo( ComponentInfo& _info )
 	{
-		_info.icon = ImGui::IconType::TRANSFORM16;
+		_info.icon = ImGui::IconType::UI_TRANSFORM16;
 		_info.init = &FollowTransformUI::Init;
 		_info.onGui =&FollowTransformUI::OnGui;
 		_info.save = &FollowTransformUI::Save;
 		_info.load = &FollowTransformUI::Load;
-		_info.editorPath = "/";
+		_info.editorPath = "ui/";
 	}
 
 	//================================================================================================================================
