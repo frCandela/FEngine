@@ -54,7 +54,7 @@ namespace fan
 		const TransformUI& transform = static_cast<const TransformUI&>( _component );
 
 		Serializable::SaveIVec2( _json, "position", transform.position );
-		Serializable::SaveVec2( _json, "scale", { transform.scale .x, transform.scale .y} );
+		Serializable::SaveVec2( _json, "scale", transform.scale );
 	}
 
 	//================================================================================================================================
@@ -62,12 +62,7 @@ namespace fan
 	void TransformUI::Load( Component& _component, const Json& _json )
 	{
 		TransformUI& transform = static_cast<TransformUI&>( _component );
-
-		btVector2 tmpPos;
-		btVector2 tmpScale;
-		Serializable::LoadVec2( _json, "position", tmpPos );
-		Serializable::LoadVec2( _json, "scale", tmpScale );
-		transform.position = { tmpPos[0], tmpPos[1] };
-		transform.scale = { tmpScale[0], tmpScale[1] };
+		Serializable::LoadVec2( _json, "position", transform.position );
+		Serializable::LoadVec2( _json, "scale", transform.scale );
 	}
 }

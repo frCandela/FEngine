@@ -46,7 +46,7 @@ namespace fan
 			ImGui::Text( "pointLights:        %d", renderWorld.pointLights.size() );
 			ImGui::Text( "directionalLights:  %d", renderWorld.directionalLights.size() );
 			ImGui::Text( "particles vertices: %d", renderWorld.particlesMesh.GetVertices().size() );
-			ImGui::Text( "target size:        %d x %d", renderWorld.targetSize.x, renderWorld.targetSize.y );
+			ImGui::Text( "target size:        %d x %d", (int)renderWorld.targetSize.x, (int)renderWorld.targetSize.y );
 		}
 		ImGui::Unindent(); ImGui::Unindent();
 	}

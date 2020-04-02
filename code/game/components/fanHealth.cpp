@@ -24,8 +24,8 @@ namespace fan
 	{
 		Health& health = static_cast<Health&>( _component );
 		health.invincible = false;
-		health.currentHealth = 0.f;
 		health.maxHealth = 100.f;
+		health.currentHealth = health.maxHealth;
 	}
 
 	//================================================================================================================================

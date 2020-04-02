@@ -27,6 +27,7 @@
 #include "game/systems/fanUpdateWeapons.hpp"
 #include "game/systems/fanUpdatePlayerInput.hpp"
 #include "game/systems/fanUpdateEnergy.hpp"
+#include "game/systems/fanUpdateGameUI.hpp"
 
 #include "game/components/fanPlanet.hpp"
 #include "game/components/fanSpaceShip.hpp"
@@ -36,6 +37,7 @@
 #include "game/components/fanBattery.hpp"
 #include "game/components/fanSolarPanel.hpp"
 #include "game/components/fanHealth.hpp"
+#include "game/components/fanSpaceshipUI.hpp"
 
 namespace fan
 {
@@ -58,6 +60,7 @@ namespace fan
 		world.AddComponentType<Battery>();
 		world.AddComponentType<SolarPanel>();
 		world.AddComponentType<Health>();
+		world.AddComponentType<SpaceshipUI>();
 	}
 
 	//================================================================================================================================
@@ -133,6 +136,7 @@ namespace fan
 			physicsWorld.dynamicsWorld->stepSimulation( delta, 10, Time::Get().GetPhysicsDelta() );
 			S_SynchronizeTransformFromMotionState::Run( world, world.Match( S_SynchronizeTransformFromMotionState::GetSignature( world ) ), delta );
 			S_MoveFollowTransforms::Run( world, world.Match( S_MoveFollowTransforms::GetSignature( world ) ) );
+			S_MoveFollowTransformsUI::Run( world, world.Match( S_MoveFollowTransformsUI::GetSignature( world ) ) );
 
 			// update
 			S_RefreshPlayerInput::Run( world, world.Match( S_RefreshPlayerInput::GetSignature( world ) ), delta );
@@ -143,6 +147,8 @@ namespace fan
 			S_UpdateSolarPannels::Run(world, world.Match( S_UpdateSolarPannels::GetSignature( world ) ), delta );
 			S_RechargeBatteries::Run( world, world.Match( S_RechargeBatteries::GetSignature( world ) ), delta );
 			S_UpdateExpirationTimes::Run( world, world.Match( S_UpdateExpirationTimes::GetSignature( world ) ), delta );
+			S_UpdateGameUiValues::Run( world, world.Match( S_UpdateGameUiValues::GetSignature( world ) ), delta );
+			S_UpdateGameUiPosition::Run( world, world.Match( S_UpdateGameUiPosition::GetSignature( world ) ), delta );
 
 			// late update
 			S_UpdateParticles::Run( world, world.Match( S_UpdateParticles::GetSignature( world ) ), delta );
