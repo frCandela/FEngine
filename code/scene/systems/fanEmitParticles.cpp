@@ -26,7 +26,7 @@ namespace fan
 			const Transform& emitterTransform = _world.GetComponent<Transform>( id );
 			ParticleEmitter& emitter = _world.GetComponent<ParticleEmitter>( id );
 
-			if( emitter.particlesPerSecond > 0.f )
+			if( emitter.particlesPerSecond > 0.f && emitter.enabled )
 			{
 				emitter.timeAccumulator += _delta;
 				float particleSpawnDelta = 1.f / emitter.particlesPerSecond;

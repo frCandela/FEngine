@@ -21,13 +21,14 @@ namespace fan
 		static void Save( const Component& _component, Json& _json );
 		static void Load( Component& _component, const Json& _json );
 
-		int				particlesPerSecond;
-		float			speed;
-		float			duration;
-		btVector3		offset;
-		Color			color;
+		bool		enabled;
+		int			particlesPerSecond;
+		float		speed;
+		float		duration;
+		btVector3	offset;
+		Color		color;
 
-		float			timeAccumulator;
+		float		timeAccumulator;
 	};
 	static constexpr size_t sizeof_particleEmitter = sizeof( ParticleEmitter );
 }

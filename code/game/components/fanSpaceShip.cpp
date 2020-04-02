@@ -32,6 +32,14 @@ namespace fan
 		spaceship.remainingChargeEnergy			= 0.f;
 		spaceship.planetDamage					= 5.f;
 		spaceship.collisionRepulsionForce		= 500.f;
+
+		spaceship.fastForwardParticlesL.Init( _world );
+		spaceship.fastForwardParticlesR.Init( _world );
+		spaceship.slowForwardParticlesL.Init( _world );
+		spaceship.slowForwardParticlesR.Init( _world );
+		spaceship.reverseParticles.Init( _world );
+		spaceship.leftParticles.Init( _world );
+		spaceship.rightParticles.Init( _world );
 	}
 
 	//================================================================================================================================
@@ -42,22 +50,26 @@ namespace fan
 
 		ImGui::PushItemWidth( 0.6f * ImGui::GetWindowWidth() );
 		{
-			ImGui::DragFloat( "reverse force", &spaceship.forwardForces[ SpeedMode::REVERSE ], 1.f, 0.f, 100000.f );
-			ImGui::DragFloat( "slow forward force", &spaceship.forwardForces[ SpeedMode::SLOW ], 1.f, 0.f, 100000.f );
-			ImGui::DragFloat( "normal forward force", &spaceship.forwardForces[ SpeedMode::NORMAL ], 1.f, 0.f, 100000.f );
-			ImGui::DragFloat( "fast forward force", &spaceship.forwardForces[ SpeedMode::FAST ], 1.f, 0.f, 100000.f );
-			ImGui::DragFloat( "lateral force", &spaceship.lateralForce, 1.f, 0.f, 100000.f );
-			ImGui::DragFloat( "active drag", &spaceship.activeDrag, 0.001f, 0.f, 1.f );
-			ImGui::DragFloat( "passive drag", &spaceship.passiveDrag, 0.001f, 0.f, 1.f );
-			ImGui::DragFloat( "energyConsumedPerUnitOfForce", &spaceship.energyConsumedPerUnitOfForce, 0.0001f, 0.f, 1.f );
-			ImGui::DragFloat( "planet damage", &spaceship.planetDamage );
-			ImGui::DragFloat( "collision repulsion force", &spaceship.collisionRepulsionForce );
+			ImGui::DragFloat( "reverse force",					&spaceship.forwardForces[ SpeedMode::REVERSE ], 1.f, 0.f, 100000.f );
+			ImGui::DragFloat( "slow forward force",				&spaceship.forwardForces[ SpeedMode::SLOW ], 1.f, 0.f, 100000.f );
+			ImGui::DragFloat( "normal forward force",			&spaceship.forwardForces[ SpeedMode::NORMAL ], 1.f, 0.f, 100000.f );
+			ImGui::DragFloat( "fast forward force",				&spaceship.forwardForces[ SpeedMode::FAST ], 1.f, 0.f, 100000.f );
+			ImGui::DragFloat( "lateral force",					&spaceship.lateralForce, 1.f, 0.f, 100000.f );
+			ImGui::DragFloat( "active drag",					&spaceship.activeDrag, 0.001f, 0.f, 1.f );
+			ImGui::DragFloat( "passive drag",					&spaceship.passiveDrag, 0.001f, 0.f, 1.f );
+			ImGui::DragFloat( "energyConsumedPerUnitOfForce",	&spaceship.energyConsumedPerUnitOfForce, 0.0001f, 0.f, 1.f );
+			ImGui::DragFloat( "planet damage",					&spaceship.planetDamage );
+			ImGui::DragFloat( "collision repulsion force",		&spaceship.collisionRepulsionForce );
 
-// 			ImGui::FanComponent( "fast forward particles", spaceship.fastForwardParticles );
-// 			ImGui::FanComponent( "slow forward particles", spaceship.slowForwardParticles );
-// 			ImGui::FanComponent( "reverse particles", spaceship.reverseParticles );
-// 			ImGui::FanComponent( "left particles", spaceship.leftParticles );
-// 			ImGui::FanComponent( "right particles", spaceship.rightParticles );
+			ImGui::Spacing();
+			 
+			ImGui::FanComponent( "fast forward particles L", spaceship.fastForwardParticlesL );
+			ImGui::FanComponent( "fast forward particles R", spaceship.fastForwardParticlesR );
+			ImGui::FanComponent( "slow forward particles L", spaceship.slowForwardParticlesL );
+			ImGui::FanComponent( "slow forward particles R", spaceship.slowForwardParticlesR );
+ 			ImGui::FanComponent( "reverse particles",		spaceship.reverseParticles );
+ 			ImGui::FanComponent( "left particles",			spaceship.leftParticles );
+ 			ImGui::FanComponent( "right particles",			spaceship.rightParticles );
 		} ImGui::PopItemWidth();	
 	}
 
@@ -74,11 +86,13 @@ namespace fan
 		Serializable::SaveFloat( _json, "energy_consumed_per_unit_of_force", spaceship.energyConsumedPerUnitOfForce );
 		Serializable::SaveFloat( _json, "planet_damage", spaceship.planetDamage );
 		Serializable::SaveFloat( _json, "collision_repulsion_force", spaceship.collisionRepulsionForce );
-// 		Serializable::SaveComponentPtr( _json, "fast_forward_particles", m_fastForwardParticles );
-// 		Serializable::SaveComponentPtr( _json, "slow_forward_particles", m_slowForwardParticles );
-// 		Serializable::SaveComponentPtr( _json, "reverse_particles", m_reverseParticles );
-// 		Serializable::SaveComponentPtr( _json, "left_particles", m_leftParticles );
-// 		Serializable::SaveComponentPtr( _json, "right_particles", m_rightParticles );
+		Serializable::SaveComponentPtr( _json, "fast_forward_particlesR", spaceship.fastForwardParticlesR );
+		Serializable::SaveComponentPtr( _json, "fast_forward_particlesL", spaceship.fastForwardParticlesL );
+		Serializable::SaveComponentPtr( _json, "slow_forward_particlesR", spaceship.slowForwardParticlesR );
+		Serializable::SaveComponentPtr( _json, "slow_forward_particlesL", spaceship.slowForwardParticlesL );
+ 		Serializable::SaveComponentPtr( _json, "reverse_particles", spaceship.reverseParticles );
+ 		Serializable::SaveComponentPtr( _json, "left_particles", spaceship.leftParticles );
+ 		Serializable::SaveComponentPtr( _json, "right_particles", spaceship.rightParticles );
 	}
 
 	//================================================================================================================================
@@ -94,11 +108,13 @@ namespace fan
 		Serializable::LoadFloat( _json, "energy_consumed_per_unit_of_force", spaceship.energyConsumedPerUnitOfForce );
 		Serializable::LoadFloat( _json, "planet_damage", spaceship.planetDamage );
 		Serializable::LoadFloat( _json, "collision_repulsion_force", spaceship.collisionRepulsionForce );
-// 		Serializable::LoadComponentPtr( _json, m_gameobject->GetScene(), "fast_forward_particles", spaceship.fastForwardParticles );
-// 		Serializable::LoadComponentPtr( _json, m_gameobject->GetScene(), "slow_forward_particles", spaceship.slowForwardParticles );
-// 		Serializable::LoadComponentPtr( _json, m_gameobject->GetScene(), "reverse_particles", spaceship.reverseParticles );
-// 		Serializable::LoadComponentPtr( _json, m_gameobject->GetScene(), "left_particles", spaceship.leftParticles );
-// 		Serializable::LoadComponentPtr( _json, m_gameobject->GetScene(), "right_particles", spaceship.rightParticles );
+		Serializable::LoadComponentPtr( _json, "fast_forward_particlesL", spaceship.fastForwardParticlesL );
+		Serializable::LoadComponentPtr( _json, "fast_forward_particlesR", spaceship.fastForwardParticlesR );
+		Serializable::LoadComponentPtr( _json, "slow_forward_particlesL", spaceship.slowForwardParticlesL );
+		Serializable::LoadComponentPtr( _json, "slow_forward_particlesR", spaceship.slowForwardParticlesR );
+		Serializable::LoadComponentPtr( _json, "reverse_particles", spaceship.reverseParticles );
+		Serializable::LoadComponentPtr( _json, "left_particles", spaceship.leftParticles );
+ 		Serializable::LoadComponentPtr( _json, "right_particles", spaceship.rightParticles );
 	}
 }
 

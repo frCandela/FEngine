@@ -3,6 +3,8 @@
 #include "game/fanGamePrecompiled.hpp"
 
 #include "ecs/fanComponent.hpp"
+#include "scene/components/fanParticleEmitter.hpp"
+#include "scene/fanSceneResourcePtr.hpp"
 
 namespace fan
 {
@@ -29,15 +31,13 @@ namespace fan
 		float planetDamage;
 		float collisionRepulsionForce;
 
-// 		WithEnergy* m_energy;
-// 		PlayerInput* m_input;
-// 		Health* m_health;
-//		Rigidbody* m_rigidbody;
-// 		ComponentPtr<ParticleSystem> m_fastForwardParticles;
-// 		ComponentPtr<ParticleSystem> m_slowForwardParticles;
-// 		ComponentPtr<ParticleSystem> m_reverseParticles;
-// 		ComponentPtr<ParticleSystem> m_leftParticles;
-// 		ComponentPtr<ParticleSystem> m_rightParticles;
+		ComponentPtr<ParticleEmitter> fastForwardParticlesL;
+		ComponentPtr<ParticleEmitter> fastForwardParticlesR;
+		ComponentPtr<ParticleEmitter> slowForwardParticlesL;
+		ComponentPtr<ParticleEmitter> slowForwardParticlesR;
+		ComponentPtr<ParticleEmitter> reverseParticles;
+		ComponentPtr<ParticleEmitter> leftParticles;
+		ComponentPtr<ParticleEmitter> rightParticles;
 
 //		void OnContactStarted( Rigidbody* _rb, btPersistentManifold* const& _manifold );
 //		void Die();

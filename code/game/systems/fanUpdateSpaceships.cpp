@@ -53,7 +53,7 @@ namespace fan
 			btVector3 pos = transform.GetPosition();
 			pos.setY( 0.f );
 			transform.SetPosition( pos );
-
+			
 			SpaceShip::SpeedMode speedMode;
 			if( forwardAxis < 0 ) { speedMode = SpaceShip::REVERSE; }
 			else if( boost > 0 )  { speedMode = SpaceShip::FAST; }
@@ -75,24 +75,50 @@ namespace fan
 				battery.currentEnergy -= totalConsumption;
 			}
 
-// 			// Enable particle systems
-// 			spaceship.fastForwardParticles->SetEnabled( false );
-// 			spaceship.slowForwardParticles->SetEnabled( false );
-// 			spaceship.reverseParticles->SetEnabled( false );
-// 			spaceship.leftParticles->SetEnabled( false );
-// 			spaceship.rightParticles->SetEnabled( false );
+			// Enable particle systems
+			if( spaceship.fastForwardParticlesR != nullptr &&
+				spaceship.fastForwardParticlesL != nullptr &&
+				spaceship.slowForwardParticlesR != nullptr &&
+				spaceship.slowForwardParticlesL != nullptr &&
+ 				spaceship.reverseParticles		!= nullptr &&
+ 				spaceship.leftParticles			!= nullptr &&
+ 				spaceship.rightParticles		!= nullptr 
+			)
+			{
+				spaceship.fastForwardParticlesR->enabled = false;
+				spaceship.fastForwardParticlesL->enabled = false;
+				spaceship.slowForwardParticlesR->enabled = false;
+				spaceship.slowForwardParticlesL->enabled = false;
+ 				spaceship.reverseParticles->enabled = false;
+ 				spaceship.leftParticles->enabled = false;
+ 				spaceship.rightParticles->enabled = false;
 
-// 			if( GetScene().IsServer() == false )
-// 			{
-// 				if( forwardAxis != 0.f )
-// 				{
-// 					if( speedMode == SpeedMode::SLOW || speedMode == SpeedMode::NORMAL ) { m_slowForwardParticles->SetEnabled( true ); }
-// 					else if( speedMode == SpeedMode::FAST ) { m_fastForwardParticles->SetEnabled( true ); }
-// 					else if( speedMode == SpeedMode::REVERSE ) { m_reverseParticles->SetEnabled( true ); }
-// 				}
-// 				if( leftForce > 0.f ) { m_leftParticles->SetEnabled( true ); }
-// 				else if( leftForce < 0.f ) { m_rightParticles->SetEnabled( true ); }
-// 			}
+
+				if( forwardAxis != 0.f )
+				{
+					if( speedMode == SpaceShip::SLOW || speedMode == SpaceShip::NORMAL )
+					{ 
+						spaceship.slowForwardParticlesL->enabled = true;
+						spaceship.slowForwardParticlesR->enabled = true;
+					}
+					else if( speedMode == SpaceShip::FAST ) { 
+						spaceship.fastForwardParticlesL->enabled = true;
+						spaceship.fastForwardParticlesR->enabled = true;
+					}
+					else if( speedMode == SpaceShip::REVERSE ) 
+					{ 
+						spaceship.reverseParticles->enabled = true; 
+					}
+				}
+				if( leftForce < 0.f ) 
+				{ 
+					spaceship.leftParticles->enabled = true; 
+				}
+				else if( leftForce > 0.f )
+				{ 
+					spaceship.rightParticles->enabled = true; 
+				}
+			}
 
 			// Forces application		
 			rigidbody.ApplyCentralForce( leftForce * transform.Left() );
