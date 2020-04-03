@@ -38,6 +38,7 @@
 #include "game/components/fanSolarPanel.hpp"
 #include "game/components/fanHealth.hpp"
 #include "game/components/fanSpaceshipUI.hpp"
+#include "game/components/fanDamage.hpp"
 
 namespace fan
 {
@@ -61,6 +62,7 @@ namespace fan
 		world.AddComponentType<SolarPanel>();
 		world.AddComponentType<Health>();
 		world.AddComponentType<SpaceshipUI>();
+		world.AddComponentType<Damage>();
 	}
 
 	//================================================================================================================================
