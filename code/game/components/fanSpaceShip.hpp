@@ -39,7 +39,7 @@ namespace fan
 		ComponentPtr<ParticleEmitter> leftParticles;
 		ComponentPtr<ParticleEmitter> rightParticles;
 
-//		void OnContactStarted( Rigidbody* _rb, btPersistentManifold* const& _manifold );
+		
 //		void Die();
 	};
 	static constexpr size_t sizeof_spaceship = sizeof( SpaceShip );

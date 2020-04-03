@@ -35,7 +35,6 @@ namespace fan
 		btVector3	GetVelocity() const;
 		void		SetVelocity( const btVector3& _velocity );
 		void		SetTransform( const btTransform& _transform ) { rigidbody.setWorldTransform( _transform ); }
-		inline void	ApplyCentralForce( const btVector3& _force ) { rigidbody.applyCentralForce( _force ); }
 
 		void SetCollisionShape( btCollisionShape* _collisionShape );
 		void SetMotionState( btDefaultMotionState* _motionState );

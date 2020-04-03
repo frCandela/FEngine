@@ -6,6 +6,9 @@
 #include "scene/components/fanSceneNode.hpp"
 #include "scene/singletonComponents/fanScene.hpp"
 #include "game/components/fanBullet.hpp"
+#include "game/components/fanHealth.hpp"
+#include "game/components/fanDamage.hpp"
+#include "game/components/fanSpaceShip.hpp"
 #include "scene/singletonComponents/fanPhysicsWorld.hpp"
 
 namespace fan
@@ -33,32 +36,111 @@ namespace fan
 	//================================================================================================================================
 	void CollisionManager::OnBulletContact( Rigidbody* _other, btPersistentManifold* const& _manifold )
 	{
-		assert( world != nullptr );
 		Rigidbody* rb0 = static_cast<Rigidbody*> ( _manifold->getBody0()->getUserPointer() );
 		Rigidbody* rb1 = static_cast<Rigidbody*> ( _manifold->getBody1()->getUserPointer() );
 		Rigidbody& bulletRb = _other == rb0 ? *rb1 : *rb0;
 
 		PhysicsWorld& physicsWorld = world->GetSingletonComponent<PhysicsWorld>();
-		EntityHandle bulletHandle = physicsWorld.rigidbodiesHandles[&bulletRb];
-		EntityID bulletID = world->GetEntityID( bulletHandle );
-		world->KillEntity( bulletID );
-
-		Scene& scene = world->GetSingletonComponent<Scene>();
-		Bullet& bullet = world->GetComponent< Bullet >( bulletID );
-		Transform& bulletTransform = world->GetComponent< Transform >( bulletID );
+		const EntityHandle bulletHandle = physicsWorld.rigidbodiesHandles[&bulletRb];
+		const EntityID bulletID = world->GetEntityID( bulletHandle );
+		const Bullet& bullet = world->GetComponent< Bullet >( bulletID );
 		
-
-		SceneNode& explosionNode = * bullet.explosionPrefab->Instanciate( *scene.root );
-		EntityID explosionID = world->GetEntityID( explosionNode.handle );
+		world->KillEntity( bulletID );
+		
+		// create explosion
+		const Transform& bulletTransform = world->GetComponent< Transform >( bulletID );
+		const Scene& scene = world->GetSingletonComponent<Scene>();
+		const SceneNode& explosionNode = * bullet.explosionPrefab->Instanciate( *scene.root );
+		const EntityID explosionID = world->GetEntityID( explosionNode.handle );
 		Transform& explosionTransform = world->GetComponent< Transform >( explosionID );
 		explosionTransform.SetPosition( bulletTransform.GetPosition() );
-
-		//Bullet& bullet
-
-// 		m_gameobject->GetScene().DeleteGameobject( &bulletRb->GetGameobject() );
-// 		if( GetScene().IsServer() == false )
-// 		{
-// 			CreateExplosion( bulletRb->GetGameobject().GetTransform().GetPosition() );
-// 		}
 	}
+
+	//================================================================================================================================
+	//================================================================================================================================
+	void CollisionManager::OnSpaceShipContact( Rigidbody* _other, btPersistentManifold* const& _manifold )
+	{
+		Rigidbody* rb0 = static_cast<Rigidbody*> ( _manifold->getBody0()->getUserPointer() );
+		Rigidbody* rb1 = static_cast<Rigidbody*> ( _manifold->getBody1()->getUserPointer() );
+		Rigidbody& spaceshipRb = _other == rb0 ? *rb1 : *rb0;
+		Rigidbody& otherRb = *_other;
+
+		// get ids
+		PhysicsWorld& physicsWorld = world->GetSingletonComponent<PhysicsWorld>();
+		const EntityHandle spaceshipHandle = physicsWorld.rigidbodiesHandles[&spaceshipRb];
+		const EntityHandle otherHandle = physicsWorld.rigidbodiesHandles[&otherRb];
+		const EntityID spaceshipID = world->GetEntityID( spaceshipHandle );
+		const EntityID otherID = world->GetEntityID( otherHandle );
+
+		// bump
+		const Transform& spaceshipTransform = world->GetComponent<Transform>( spaceshipID );
+		const Transform& otherTransform = world->GetComponent<Transform>( otherID );
+		const btVector3 dir = spaceshipTransform.GetPosition() - otherTransform.GetPosition();
+		if( !dir.fuzzyZero() )
+		{
+			SpaceShip& spaceship = world->GetComponent<SpaceShip>( spaceshipID );
+			spaceshipRb.rigidbody.applyCentralForce( spaceship.collisionRepulsionForce * dir.normalized() );
+		}
+
+		// applies damage
+		if( world->HasComponent<Health>( spaceshipID ) )
+		{
+			if( world->HasComponent<Damage>( otherID ) )
+			{
+				Damage& damage = world->GetComponent<Damage>( otherID );
+				Health& health = world->GetComponent<Health>( spaceshipID );
+				health.currentHealth -= damage.damage;
+
+				if( health.currentHealth <= 0.f )
+				{
+					health.currentHealth = 0;
+				}
+			}
+		}
+		else
+		{
+			Debug::Error() << "CollisionManager: spaceship has no health !" << Debug::Endl();
+		}
+	}
+
+	// 	//================================================================================================================================
+// 	//================================================================================================================================
+// 	void  SpaceShip::OnContactStarted( Rigidbody* _rb, btPersistentManifold* const& )
+// 	{
+// 		float damage = 0.f;
+// 
+// 		if ( ecsBullet* bullet = _rb->GetGameobject().GetEcsComponent<ecsBullet>() )
+// 		{
+// 			//Debug::Log("bullet");
+// 			damage = bullet->damage;
+// 		}
+// 		else if ( _rb->GetGameobject().GetComponent<Planet>() )
+// 		{
+// 			btVector3 dir = m_gameobject->GetTransform().GetPosition() - _rb->GetGameobject().GetTransform().GetPosition();
+// 			if ( !dir.fuzzyZero() )
+// 			{
+// 				m_rigidbody->ApplyCentralForce( m_collisionRepulsionForce * dir.normalized() );
+// 			}
+// 
+// 			//Debug::Log("planet");
+// 			damage = m_planetDamage;
+// 		}
+// 		else if ( _rb->GetGameobject().GetComponent<SolarSystem>() )
+// 		{
+// 			//Debug::Log( "sun" );
+// 			damage = m_health->GetHealth() + 1.f;
+// 		}
+// 		else
+// 		{
+// 			//Debug::Log( "other" );
+// 		}
+// 
+// 		// Death
+// 		if ( m_health->GetHealth() > 0 && !m_health->TryRemoveHealth( damage ) )
+// 
+// 		{
+// 			m_health->TryRemoveHealth( m_health->GetHealth() );
+// 		}
+//	}
+
 }

@@ -19,8 +19,8 @@ namespace fan
 		static void Save( const Component& _component, Json& _json );
 		static void Load( Component& _component, const Json& _json );
 
-		float currentEnergy = 0.f;
-		float maxEnergy = 100.f;
+		float currentEnergy;
+		float maxEnergy;
 	};
 	static constexpr size_t sizeof_battery = sizeof( Battery );
 }

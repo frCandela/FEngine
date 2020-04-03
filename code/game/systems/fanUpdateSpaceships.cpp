@@ -31,7 +31,7 @@ namespace fan
 		for( EntityID entityID : _entities )
 		{
 			Transform& transform = _world.GetComponent<Transform>( entityID );
-			Rigidbody& rigidbody = _world.GetComponent<Rigidbody>( entityID );
+			Rigidbody& rb = _world.GetComponent<Rigidbody>( entityID );
 			SpaceShip& spaceship = _world.GetComponent<SpaceShip>( entityID );
 			Battery& battery = _world.GetComponent<Battery>( entityID );
 			PlayerInput & playerInput = _world.GetComponent<PlayerInput>( entityID );
@@ -121,14 +121,14 @@ namespace fan
 			}
 
 			// Forces application		
-			rigidbody.ApplyCentralForce( leftForce * transform.Left() );
-			rigidbody.ApplyCentralForce( spaceship.forwardForces[speedMode] * forwardAxis * transform.Forward() );
-			rigidbody.rigidbody.setAngularVelocity( btVector3::Zero() );
+			rb.rigidbody.applyCentralForce( leftForce * transform.Left() );
+			rb.rigidbody.applyCentralForce( spaceship.forwardForces[speedMode] * forwardAxis * transform.Forward() );
+			rb.rigidbody.setAngularVelocity( btVector3::Zero() );
 
 			// Drag
-			btVector3 newVelocity = ( totalConsumption > 0.f ? spaceship.activeDrag : spaceship.passiveDrag ) * rigidbody.GetVelocity();
+			btVector3 newVelocity = ( totalConsumption > 0.f ? spaceship.activeDrag : spaceship.passiveDrag ) * rb.GetVelocity();
 			newVelocity.setY( 0.f );
-			rigidbody.SetVelocity( newVelocity );
+			rb.SetVelocity( newVelocity );
 
 			_world.AddTag<tag_boundsOutdated>( entityID );
 		}

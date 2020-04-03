@@ -118,80 +118,6 @@ namespace fan
 	}
 }
 
-namespace fan
-{
-
-// 		//================================================================================================================================
-// 		//================================================================================================================================
-// 		void SpaceShip::Start()
-// 	{
-// 		REQUIRE_COMPONENT( WithEnergy, m_energy )
-// 			REQUIRE_COMPONENT( Rigidbody, m_rigidbody )
-// 			REQUIRE_COMPONENT( PlayerInput, m_input );
-// 		REQUIRE_COMPONENT( Health, m_health );
-//
-// 		REQUIRE_TRUE( *m_fastForwardParticles != nullptr, "Spaceship: missing particles reference" );
-// 		REQUIRE_TRUE( *m_slowForwardParticles != nullptr, "Spaceship: missing particles reference" );
-// 		REQUIRE_TRUE( *m_reverseParticles != nullptr, "Spaceship: missing particles reference" );
-// 		REQUIRE_TRUE( *m_leftParticles != nullptr, "Spaceship: missing particles reference" );
-// 		REQUIRE_TRUE( *m_rightParticles != nullptr, "Spaceship: missing particles reference" );
-//
-// 		if ( *m_fastForwardParticles != nullptr ) { m_fastForwardParticles->SetEnabled( false ); }
-// 		if ( *m_slowForwardParticles != nullptr ) { m_slowForwardParticles->SetEnabled( false ); }
-// 		if ( *m_reverseParticles != nullptr ) { m_reverseParticles->SetEnabled( false ); }
-// 		if ( *m_leftParticles != nullptr ) { m_leftParticles->SetEnabled( false ); }
-// 		if ( *m_rightParticles != nullptr ) { m_rightParticles->SetEnabled( false ); }
-// 
-// 		if ( m_health )
-// 		{
-// 			m_health->AddHealth( m_health->GetMaxHealth() );
-// 			m_health->onFallToZero.Connect( &SpaceShip::Die, this );
-// 		}
-// 		if ( m_energy ) { m_energy->AddEnergy( m_energy->GetMaxEnergy() ); }
-// 		if ( m_rigidbody != nullptr ) { m_rigidbody->onContactStarted.Connect( &SpaceShip::OnContactStarted, this ); }
-// 	}
-// 
-//
-// 	//================================================================================================================================
-// 	//================================================================================================================================
-// 	void  SpaceShip::OnContactStarted( Rigidbody* _rb, btPersistentManifold* const& )
-// 	{
-// 		float damage = 0.f;
-// 
-// 		if ( ecsBullet* bullet = _rb->GetGameobject().GetEcsComponent<ecsBullet>() )
-// 		{
-// 			//Debug::Log("bullet");
-// 			damage = bullet->damage;
-// 		}
-// 		else if ( _rb->GetGameobject().GetComponent<Planet>() )
-// 		{
-// 			btVector3 dir = m_gameobject->GetTransform().GetPosition() - _rb->GetGameobject().GetTransform().GetPosition();
-// 			if ( !dir.fuzzyZero() )
-// 			{
-// 				m_rigidbody->ApplyCentralForce( m_collisionRepulsionForce * dir.normalized() );
-// 			}
-// 
-// 			//Debug::Log("planet");
-// 			damage = m_planetDamage;
-// 		}
-// 		else if ( _rb->GetGameobject().GetComponent<SolarSystem>() )
-// 		{
-// 			//Debug::Log( "sun" );
-// 			damage = m_health->GetHealth() + 1.f;
-// 		}
-// 		else
-// 		{
-// 			//Debug::Log( "other" );
-// 		}
-// 
-// 		// Death
-// 		if ( m_health->GetHealth() > 0 && !m_health->TryRemoveHealth( damage ) )
-// 
-// 		{
-// 			m_health->TryRemoveHealth( m_health->GetHealth() );
-// 		}
-//	}
-
 // 	//================================================================================================================================
 // 	//================================================================================================================================
 // 	void SpaceShip::Die()
@@ -222,4 +148,3 @@ namespace fan
 // 
 // 		onPlayerDie.Emmit( m_gameobject );
 //	}
-}

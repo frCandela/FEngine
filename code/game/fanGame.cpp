@@ -14,6 +14,9 @@
 #include "scene/components/fanSceneNode.hpp"
 #include "scene/components/fanTransform.hpp"
 #include "scene/components/fanCamera.hpp"
+#include "scene/components/fanBoxShape.hpp"
+#include "scene/components/fanRigidbody.hpp"
+#include "scene/components/fanMotionState.hpp"
 #include "scene/singletonComponents/fanScene.hpp"
 #include "scene/singletonComponents/fanRenderWorld.hpp"
 
@@ -77,9 +80,48 @@ namespace fan
 		{
 			Debug::Highlight() << name << ": play" << Debug::Endl();
 			
+			// init
 			state = State::PLAYING;
 			S_RegisterAllRigidbodies::Run( world, world.Match( S_RegisterAllRigidbodies::GetSignature( world ) ) );
 			GameCamera::CreateGameCamera( world );
+
+			// spawn the spaceship
+			if( spaceship != nullptr )
+			{
+				Scene& scene = world.GetSingletonComponent<Scene>();
+				SceneNode & spaceshipNode = * spaceship->Instanciate( *scene.root );
+				EntityID spaceshipID = world.GetEntityID( spaceshipNode.handle );
+
+				if( world.HasComponent<Transform>( spaceshipID ) 
+					&& world.HasComponent<Rigidbody>( spaceshipID ) 
+					&& world.HasComponent<MotionState>( spaceshipID )
+					&& world.HasComponent<BoxShape>( spaceshipID ))
+				{
+					// set initial position
+					Transform& transform = world.GetComponent<Transform>( spaceshipID );
+					transform.SetPosition( btVector3(0,0,4.f) );	
+
+					// add rigidbody to the physics world
+					PhysicsWorld& physicsWorld = world.GetSingletonComponent<PhysicsWorld>();
+					Rigidbody& rigidbody = world.GetComponent<Rigidbody>( spaceshipID );
+					MotionState& motionState = world.GetComponent<MotionState>( spaceshipID );
+					BoxShape& boxShape = world.GetComponent<BoxShape>( spaceshipID );
+					rigidbody.SetCollisionShape( &boxShape.boxShape );
+					rigidbody.SetMotionState( &motionState.motionState );
+					physicsWorld.AddRigidbody( rigidbody, spaceshipNode.handle );
+
+					// registers physics callbacks
+					CollisionManager& collisionManager = world.GetSingletonComponent<CollisionManager>();
+					rigidbody.onContactStarted.Connect( &CollisionManager::OnSpaceShipContact, &collisionManager );
+				}
+				else
+				{
+					Debug::Error() 
+					<< "Game: spaceship prefab is missing a component" << "\n"
+					<< "component needed: Transform, Rigidbody, MotionState, BoxShape" << Debug::Endl();
+					return;
+				}
+			}
 		}
 	}
 
