@@ -12,7 +12,7 @@ namespace fan
 	//==============================================================================================================================================================
 	struct Entity
 	{
-		static constexpr int s_maxComponentsPerEntity = 30;
+		static constexpr int s_maxComponentsPerEntity = 29;
 		Component* components[s_maxComponentsPerEntity];
 		int componentCount = 0;
 		Signature signature;

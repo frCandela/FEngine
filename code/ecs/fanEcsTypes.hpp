@@ -11,7 +11,7 @@ namespace fan
 	struct Entity;
 	struct Component;
 
-	static constexpr uint32_t signatureLength = 32;
+	static constexpr uint32_t signatureLength = 64;
 	using Signature = std::bitset<signatureLength>;
 	static constexpr uint32_t ecAliveBit = signatureLength - 1;
 	using EntityHandle = uint64_t;
