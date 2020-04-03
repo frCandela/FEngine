@@ -20,6 +20,7 @@
 #include "game/singletonComponents/fanSunLight.hpp"
 #include "game/singletonComponents/fanGameCamera.hpp"
 #include "game/singletonComponents/fanCollisionManager.hpp"
+#include "game/singletonComponents/fanGameReference.hpp"
 
 #include "game/systems/fanUpdatePlanets.hpp"
 #include "game/systems/fanUpdateSpaceships.hpp"
@@ -48,10 +49,10 @@ namespace fan
 		  name( _name )
 		, world()
 	{
-		// Creates singletons
 		world.AddSingletonComponentType<SunLight>();
 		world.AddSingletonComponentType<GameCamera>();
 		world.AddSingletonComponentType<CollisionManager>();
+		world.AddSingletonComponentType<GameReference>();
 
 		world.AddComponentType<Planet>();
 		world.AddComponentType<SpaceShip>();
@@ -63,6 +64,9 @@ namespace fan
 		world.AddComponentType<Health>();
 		world.AddComponentType<SpaceshipUI>();
 		world.AddComponentType<Damage>();
+
+		// init the game ref
+		const_cast< Game* >(world.GetSingletonComponent<GameReference>().game) = this;
 	}
 
 	//================================================================================================================================

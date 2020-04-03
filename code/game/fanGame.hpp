@@ -4,6 +4,8 @@
 
 #include "core/fanSignal.hpp"
 #include "ecs/fanEcsWorld.hpp"
+#include "scene/fanSceneResourcePtr.hpp"
+#include "scene/fanPrefab.hpp"
 
 namespace fan
 {
@@ -28,5 +30,7 @@ namespace fan
 		std::string	name;
 		State		state = State::STOPPED;		
 		EcsWorld    world;
+
+		PrefabPtr spaceship;
 	};
 }
