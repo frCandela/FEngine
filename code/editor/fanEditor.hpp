@@ -10,20 +10,20 @@ namespace fan
 	class PreferencesWindow;
 	class SceneInstantiate;
 	class InspectorWindow;
-	class EditorCopyPaste;
 	class SingletonsWindow;
+	class EditorCopyPaste;
 	class EditorSelection;
 	class ProfilerWindow;
+	class GameViewWindow;
 	class ConsoleWindow;
 	class NetworkWindow;
 	class RenderWindow;
 	class EditorGizmos;
 	class EditorWindow;
-	class EcsWorld;
 	class SceneWindow;
 	class MainMenuBar;
 	class EcsWindow;
-	class GameWindow;
+	class EcsWorld;
 	class Renderer;
 	class Window;
 	struct Scene;
@@ -56,7 +56,7 @@ namespace fan
 		ConsoleWindow* m_consoleWindow;
 		RenderWindow* m_renderWindow;
 		SceneWindow* m_sceneWindow;
-		GameWindow* m_gameWindow;
+		GameViewWindow* m_gameViewWindow;
 		EcsWindow* m_ecsWindow;
 
 		// Main objects

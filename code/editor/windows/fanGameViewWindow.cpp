@@ -1,4 +1,4 @@
-#include "editor/windows/fanGameWindow.hpp"
+#include "editor/windows/fanGameViewWindow.hpp"
 #include "core/input/fanMouse.hpp"
 #include "core/time/fanTime.hpp"
 #include "scene/singletonComponents/fanScene.hpp"
@@ -9,15 +9,16 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	GameWindow::GameWindow( Game& _game ) : EditorWindow( "game", ImGui::IconType::JOYSTICK16 )
+	GameViewWindow::GameViewWindow( Game& _game ) : EditorWindow( "game view", ImGui::IconType::JOYSTICK16 )
 		,m_game( &_game )
+		,m_isHovered( false )
 	{
 		AddFlag( ImGuiWindowFlags_MenuBar );
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void GameWindow::OnGui()
+	void GameViewWindow::OnGui()
 	{
 
 		// update window size

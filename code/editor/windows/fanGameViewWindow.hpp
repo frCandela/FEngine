@@ -8,8 +8,9 @@ namespace fan
 	struct Game;
 
 	//================================================================================================================================
+	// show the game in 3D
 	//================================================================================================================================
-	class GameWindow : public EditorWindow
+	class GameViewWindow : public EditorWindow
 	{
 	public:
 		Signal< btVector2 > onSizeChanged;
@@ -19,7 +20,7 @@ namespace fan
 		Signal<> onStop;
 		Signal<> onStep;
 
-		GameWindow( Game& _game );
+		GameViewWindow( Game& _game );
 		btVector2 GetSize()			const { return m_size; }
 		btVector2 GetPosition()		const { return m_position; }
 		float	  GetAspectRatio()	const { return ( float ) m_size[ 0 ] / ( float ) m_size[ 1 ]; }

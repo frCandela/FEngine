@@ -29,7 +29,7 @@
 #include "editor/windows/fanNetworkWindow.hpp"	
 #include "editor/windows/fanRenderWindow.hpp"	
 #include "editor/windows/fanSceneWindow.hpp"	
-#include "editor/windows/fanGameWindow.hpp"
+#include "editor/windows/fanGameViewWindow.hpp"
 #include "editor/windows/fanEcsWindow.hpp"
 #include "editor/fanEditorSelection.hpp"
 #include "editor/fanEditorCopyPaste.hpp"
@@ -155,25 +155,13 @@ namespace fan
 		m_consoleWindow = new ConsoleWindow();
 		m_ecsWindow = new EcsWindow( *scene.world );
 		m_profilerWindow = new ProfilerWindow();
-		m_gameWindow = new GameWindow( *m_game );
+		m_gameViewWindow = new GameViewWindow( *m_game );
 		m_preferencesWindow = new PreferencesWindow();
 		m_networkWindow = new NetworkWindow( scene );
 		m_singletonsWindow = new SingletonsWindow( m_game->world );
 		m_mainMenuBar = new MainMenuBar( *m_game, *m_selection );
-
-		RendererDebug::Init( &m_renderer->GetRendererDebug() );
-		EditorGizmos::Init( m_gizmos );
-		Prefab::s_resourceManager.Init();
-
-		EditorGrid& grid = m_editorWorld.GetSingletonComponent<EditorGrid>();
-
-
-		m_selection->ConnectCallbacks( scene );
-		m_renderWindow->SetRenderer( m_renderer );
-		m_preferencesWindow->SetRenderer( m_renderer );
-		m_mainMenuBar->SetGrid( &grid );
-
-		m_mainMenuBar->SetWindows( { 
+		m_mainMenuBar->SetGrid( &m_editorWorld.GetSingletonComponent<EditorGrid>() );
+		m_mainMenuBar->SetWindows( {
 			  m_renderWindow
 			, m_sceneWindow
 			, m_inspectorWindow
@@ -181,10 +169,17 @@ namespace fan
 			, m_ecsWindow
 			, m_singletonsWindow
 			, m_profilerWindow
-			, m_gameWindow
+			, m_gameViewWindow
 			, m_networkWindow
-			, m_preferencesWindow 
-		} );
+			, m_preferencesWindow
+			} );
+		RendererDebug::Init( &m_renderer->GetRendererDebug() );
+		EditorGizmos::Init( m_gizmos );
+		Prefab::s_resourceManager.Init();
+		m_selection->ConnectCallbacks( scene );
+		m_renderWindow->SetRenderer( m_renderer );
+		m_preferencesWindow->SetRenderer( m_renderer );
+
 
 		m_sceneWindow->onSelectSceneNode.Connect( &EditorSelection::SetSelectedSceneNode, m_selection );
 
@@ -203,12 +198,12 @@ namespace fan
 		Input::Get().Manager().FindEvent( "show_ui" )->Connect( &Engine::OnToogleShowUI, this );
 		Input::Get().Manager().FindEvent( "toogle_camera" )->Connect( &Engine::OnToogleCamera, this );
 
-		m_gameWindow->onSizeChanged.Connect( &Renderer::ResizeGame, m_renderer );
-		m_gameWindow->onPlay.Connect( &Engine::OnGamePlay, this );
-		m_gameWindow->onPause.Connect( &Engine::OnGamePause, this );
-		m_gameWindow->onResume.Connect( &Engine::OnGameResume, this );
-		m_gameWindow->onStop.Connect( &Engine::OnGameStop, this );
-		m_gameWindow->onStep.Connect( &Engine::OnGameStep, this );
+		m_gameViewWindow->onSizeChanged.Connect( &Renderer::ResizeGame, m_renderer );
+		m_gameViewWindow->onPlay.Connect( &Engine::OnGamePlay, this );
+		m_gameViewWindow->onPause.Connect( &Engine::OnGamePause, this );
+		m_gameViewWindow->onResume.Connect( &Engine::OnGameResume, this );
+		m_gameViewWindow->onStop.Connect( &Engine::OnGameStop, this );
+		m_gameViewWindow->onStep.Connect( &Engine::OnGameStep, this );
 		scene.onLoad.Connect( &SceneWindow::OnExpandHierarchy, m_sceneWindow );
 		scene.onLoad.Connect( &Engine::OnSceneLoad, this );
 
@@ -269,7 +264,7 @@ namespace fan
 				{
 					SCOPED_PROFILE( init )					
 					Input::Get().NewFrame();
-					Mouse::Get().Update( m_gameWindow->GetPosition(), m_gameWindow->GetSize(), m_gameWindow->IsHovered() );
+					Mouse::Get().Update( m_gameViewWindow->GetPosition(), m_gameViewWindow->GetSize(), m_gameViewWindow->IsHovered() );
 					ImGui::NewFrame();					
 					ImGui::GetIO().DeltaTime = targetLogicDelta;
 					m_renderer->GetRendererDebug().ClearDebug();
@@ -298,7 +293,7 @@ namespace fan
 					{
 						SCOPED_PROFILE( draw_ui );
 						m_mainMenuBar->Draw();
-						m_selection->Update( m_gameWindow->IsHovered() );
+						m_selection->Update( m_gameViewWindow->IsHovered() );
 						S_MoveFollowTransforms::Run( m_game->world, m_game->world.Match( S_MoveFollowTransforms::GetSignature( m_game->world ) ) );
 						S_MoveFollowTransformsUI::Run( m_game->world, m_game->world.Match( S_MoveFollowTransformsUI::GetSignature( m_game->world ) ) );
 					}					
@@ -431,7 +426,7 @@ namespace fan
 	{
 		EcsWorld& world = m_game->world;
 		RenderWorld& renderWorld = world.GetSingletonComponent<RenderWorld>();		
-		renderWorld.targetSize = glm::vec2( m_gameWindow->GetSize().x(), m_gameWindow->GetSize().y() );
+		renderWorld.targetSize = glm::vec2( m_gameViewWindow->GetSize().x(), m_gameViewWindow->GetSize().y() );
 
 		const Signature signatureURModels = S_UpdateRenderWorldModels::GetSignature( world );
 		const Signature signatureURUI = S_UpdateRenderWorldUI::GetSignature( world );
@@ -463,7 +458,7 @@ namespace fan
 		Scene& scene = world.GetSingletonComponent<Scene>();
 		EntityID cameraID = world.GetEntityID( scene.mainCamera->handle );
 		Camera& camera = world.GetComponent<Camera>( cameraID );
-		camera.aspectRatio = m_gameWindow->GetAspectRatio();
+		camera.aspectRatio = m_gameViewWindow->GetAspectRatio();
 		Transform& cameraTransform = world.GetComponent<Transform>( cameraID );
 		m_renderer->SetMainCamera( 
 			camera.GetProjection(), 

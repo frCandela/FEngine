@@ -4,7 +4,7 @@
 
 namespace fan
 {
-	class GameWindow;
+	class GameViewWindow;
 	struct Scene;
 	struct SceneNode;
 
