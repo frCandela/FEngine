@@ -539,34 +539,7 @@ namespace fan
 	//================================================================================================================================
 	void Engine::InitializeGameEcsWorldTypes( EcsWorld& _world )
 	{
-		_world.AddSingletonComponentType<Scene>();
-		_world.AddSingletonComponentType<RenderWorld>();
-		_world.AddSingletonComponentType<PhysicsWorld>();
 		_world.AddSingletonComponentType<EditorCamera>();
-		_world.AddSingletonComponentType<ScenePointers>();
-
-		_world.AddComponentType<SceneNode>();
-		_world.AddComponentType<Transform>();
-		_world.AddComponentType<DirectionalLight>();
-		_world.AddComponentType<PointLight>();
-		_world.AddComponentType<MeshRenderer>();
-		_world.AddComponentType<Material>();
-		_world.AddComponentType<Camera>();
-		_world.AddComponentType<ParticleEmitter>();
-		_world.AddComponentType<Particle>();
-		_world.AddComponentType<Rigidbody>();
-		_world.AddComponentType<MotionState>();
-		_world.AddComponentType<BoxShape>();
-		_world.AddComponentType<SphereShape>();
-		_world.AddComponentType<TransformUI>();
-		_world.AddComponentType<UIRenderer>();
-		_world.AddComponentType<Bounds>();
-		_world.AddComponentType<ExpirationTime>();
-		_world.AddComponentType<FollowTransform>();
-		_world.AddComponentType<ProgressBar>();
-		_world.AddComponentType<FollowTransformUI>();
-
-		_world.AddTagType<tag_boundsOutdated>();
 		_world.AddTagType<tag_editorOnly>();
 	}
 }

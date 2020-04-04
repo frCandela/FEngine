@@ -12,7 +12,6 @@
 #include "scene/components/fanMaterial.hpp"
 #include "scene/components/fanMeshRenderer.hpp"
 #include "scene/components/fanRigidbody.hpp"
-#include "game/singletonComponents/fanSunLight.hpp" // @hack
 #include "scene/singletonComponents/fanRenderWorld.hpp"
 #include "scene/singletonComponents/fanScenePointers.hpp"
 #include "scene/systems/fanUpdateTransforms.hpp"
@@ -348,20 +347,6 @@ namespace fan
 
 			ScenePointers::ResolveComponentPointers( *this, 0 );
 			S_InitFollowTransforms::Run( *world, world->Match( S_InitFollowTransforms::GetSignature( *world ) ) );
-
-			// @hack : sets the sunlight mesh on loading
-			Signature signature = world->GetSignature<MeshRenderer>() | world->GetSignature<SceneNode>();
-			std::vector<EntityID> entities = world->Match( signature );
-			for ( EntityID entityID : entities )
-			{
-				SceneNode& node = world->GetComponent<SceneNode>( entityID );
-				if( node.name == "sun_light" )
-				{
-					MeshRenderer& meshRenderer = world->GetComponent<MeshRenderer>( entityID );
-					SunLight& sunlight = world->GetSingletonComponent<SunLight>();
-					meshRenderer.mesh = &sunlight.mesh;
-				}
-			}
 
 			onLoad.Emmit( *this );
 			return true;

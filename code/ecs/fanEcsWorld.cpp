@@ -143,6 +143,13 @@ namespace fan
 
 		m_nextHandle = 1;
 		assert( m_handles.empty() );
+
+		// clears singleton components
+		for ( std::pair< uint32_t, SingletonComponent*> pair : m_singletonComponents )
+		{
+			const SingletonComponentInfo& info = GetSingletonComponentInfo( pair.first );
+			info.init( *this, *pair.second );
+		}
 	}
 
 	//================================================================================================================================

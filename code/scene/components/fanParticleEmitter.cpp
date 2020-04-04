@@ -27,7 +27,7 @@ namespace fan
 		ParticleEmitter& emitter = static_cast<ParticleEmitter&>( _component );
 
 		emitter.enabled = true;
-		emitter.particlesPerSecond = 100;
+		emitter.particlesPerSecond = 100.f;
 		emitter.speed = 1.f;
 		emitter.duration = 2.f;
 		emitter.offset = btVector3::Zero();
@@ -44,7 +44,7 @@ namespace fan
 		ImGui::PushItemWidth( 0.6f * ImGui::GetWindowWidth() );
 		{
 			ImGui::Checkbox( "enabled", &emitter.enabled );
-			ImGui::DragInt( "particles per second", &emitter.particlesPerSecond, 1, 0 );
+			ImGui::DragFloat( "particles per second", &emitter.particlesPerSecond, 1.f, 0.f, 10000.f );
 			ImGui::DragFloat( "speed##ParticleEmitter", &emitter.speed, 0.01f );
 			ImGui::DragFloat( "duration##ParticleEmitter", &emitter.duration, 0.01f );
 			ImGui::DragFloat3( "offset##ParticleEmitter", &emitter.offset[0], 0.01f );
@@ -60,7 +60,7 @@ namespace fan
 		const ParticleEmitter& emitter = static_cast<const ParticleEmitter&>( _component );
 
 		Serializable::SaveBool( _json, "enabled", emitter.enabled );
-		Serializable::SaveInt( _json, "particles_per_second", emitter.particlesPerSecond );
+		Serializable::SaveFloat( _json, "particles_per_second", emitter.particlesPerSecond );
 		Serializable::SaveFloat( _json, "speed", emitter.speed );
 		Serializable::SaveFloat( _json, "duration", emitter.duration );
 		Serializable::SaveVec3( _json, "offset", emitter.offset );
@@ -74,7 +74,7 @@ namespace fan
 		ParticleEmitter& emitter = static_cast<ParticleEmitter&>( _component );
 
 		Serializable::LoadBool( _json, "enabled", emitter.enabled );
-		Serializable::LoadInt( _json, "particles_per_second", emitter.particlesPerSecond );
+		Serializable::LoadFloat( _json, "particles_per_second", emitter.particlesPerSecond );
 		Serializable::LoadFloat( _json, "speed", emitter.speed );
 		Serializable::LoadFloat( _json, "duration", emitter.duration );
 		Serializable::LoadVec3( _json, "offset", emitter.offset );

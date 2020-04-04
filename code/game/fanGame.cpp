@@ -2,7 +2,7 @@
 
 #include "core/time/fanProfiler.hpp"
 #include "core/time/fanTime.hpp"
-#include "scene/singletonComponents/fanPhysicsWorld.hpp"
+
 #include "scene/systems/fanSynchronizeMotionStates.hpp"
 #include "scene/systems/fanRegisterPhysics.hpp"
 #include "scene/systems/fanUpdateParticles.hpp"
@@ -17,13 +17,25 @@
 #include "scene/components/fanBoxShape.hpp"
 #include "scene/components/fanRigidbody.hpp"
 #include "scene/components/fanMotionState.hpp"
+#include "scene/components/fanDirectionalLight.hpp"
+#include "scene/components/fanPointLight.hpp"
+#include "scene/components/fanParticle.hpp"
+#include "scene/components/fanSphereShape.hpp"
+#include "scene/components/fanBounds.hpp"
+#include "scene/components/fanExpirationTime.hpp"
+#include "scene/components/fanFollowTransform.hpp"
+#include "scene/components/ui/fanFollowTransformUI.hpp"
 #include "scene/singletonComponents/fanScene.hpp"
 #include "scene/singletonComponents/fanRenderWorld.hpp"
+#include "scene/singletonComponents/fanScenePointers.hpp"
+#include "scene/singletonComponents/fanPhysicsWorld.hpp"
+#include "scene/fanSceneTags.hpp"
 
 #include "game/singletonComponents/fanSunLight.hpp"
 #include "game/singletonComponents/fanGameCamera.hpp"
 #include "game/singletonComponents/fanCollisionManager.hpp"
 #include "game/singletonComponents/fanGameReference.hpp"
+#include "game/singletonComponents/fanSolarEruption.hpp"
 
 #include "game/systems/fanUpdatePlanets.hpp"
 #include "game/systems/fanUpdateSpaceships.hpp"
@@ -52,11 +64,29 @@ namespace fan
 		  name( _name )
 		, world()
 	{
-		world.AddSingletonComponentType<SunLight>();
-		world.AddSingletonComponentType<GameCamera>();
-		world.AddSingletonComponentType<CollisionManager>();
-		world.AddSingletonComponentType<GameReference>();
+		// base components
+		world.AddComponentType<SceneNode>();
+		world.AddComponentType<Transform>();
+		world.AddComponentType<DirectionalLight>();
+		world.AddComponentType<PointLight>();
+		world.AddComponentType<MeshRenderer>();
+		world.AddComponentType<Material>();
+		world.AddComponentType<Camera>();
+		world.AddComponentType<ParticleEmitter>();
+		world.AddComponentType<Particle>();
+		world.AddComponentType<Rigidbody>();
+		world.AddComponentType<MotionState>();
+		world.AddComponentType<BoxShape>();
+		world.AddComponentType<SphereShape>();
+		world.AddComponentType<TransformUI>();
+		world.AddComponentType<UIRenderer>();
+		world.AddComponentType<Bounds>();
+		world.AddComponentType<ExpirationTime>();
+		world.AddComponentType<FollowTransform>();
+		world.AddComponentType<ProgressBar>();
+		world.AddComponentType<FollowTransformUI>();
 
+		// game components
 		world.AddComponentType<Planet>();
 		world.AddComponentType<SpaceShip>();
 		world.AddComponentType<PlayerInput>();
@@ -67,6 +97,21 @@ namespace fan
 		world.AddComponentType<Health>();
 		world.AddComponentType<SpaceshipUI>();
 		world.AddComponentType<Damage>();
+
+		// base singleton components
+		world.AddSingletonComponentType<Scene>();
+		world.AddSingletonComponentType<RenderWorld>();
+		world.AddSingletonComponentType<PhysicsWorld>();
+		world.AddSingletonComponentType<ScenePointers>();
+
+		// game singleton components
+		world.AddSingletonComponentType<SunLight>();
+		world.AddSingletonComponentType<GameCamera>();
+		world.AddSingletonComponentType<CollisionManager>();
+		world.AddSingletonComponentType<GameReference>();
+		world.AddSingletonComponentType<SolarEruption>();
+
+		world.AddTagType<tag_boundsOutdated>();
 
 		// init the game ref
 		const_cast< Game* >(world.GetSingletonComponent<GameReference>().game) = this;
@@ -84,6 +129,8 @@ namespace fan
 			state = State::PLAYING;
 			S_RegisterAllRigidbodies::Run( world, world.Match( S_RegisterAllRigidbodies::GetSignature( world ) ) );
 			GameCamera::CreateGameCamera( world );
+
+			SolarEruption::Start( world );
 
 			// spawn the spaceship
 			if( spaceship != nullptr )
@@ -197,6 +244,8 @@ namespace fan
 			S_UpdateExpirationTimes::Run( world, world.Match( S_UpdateExpirationTimes::GetSignature( world ) ), delta );
 			S_UpdateGameUiValues::Run( world, world.Match( S_UpdateGameUiValues::GetSignature( world ) ), delta );
 			S_UpdateGameUiPosition::Run( world, world.Match( S_UpdateGameUiPosition::GetSignature( world ) ), delta );
+
+			SolarEruption::Step( world, delta );
 
 			// late update
 			S_UpdateParticles::Run( world, world.Match( S_UpdateParticles::GetSignature( world ) ), delta );

@@ -12,7 +12,8 @@ namespace fan
 
 	//================================================================================================================================
 	// holds a pointer to a component of a specific  scene
-	// can be initialized with a scene, scene node ID and a component ID to be resolved later ( loading, copy/paste )
+	// must be initialized with an EcsWorld
+	// can be initialized with scene node/component directly or with a sceneNode ID  to be resolved later ( loading, copy/paste )
 	//================================================================================================================================
 	struct ComponentPtrBase
 	{

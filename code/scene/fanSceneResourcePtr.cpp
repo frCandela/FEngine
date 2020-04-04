@@ -16,6 +16,8 @@ namespace fan
 	{
 		const_cast<EcsWorld*>( world ) = &_world;
 		*const_cast<ComponentIndex*>( &dynamicID ) = world->GetDynamicIndex( staticID );
+		sceneNodeID = 0;
+		component = nullptr;
 	}
 
 	//================================================================================================================================

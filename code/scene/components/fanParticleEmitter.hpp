@@ -22,7 +22,7 @@ namespace fan
 		static void Load( Component& _component, const Json& _json );
 
 		bool		enabled;
-		int			particlesPerSecond;
+		float		particlesPerSecond;
 		float		speed;
 		float		duration;
 		btVector3	offset;
