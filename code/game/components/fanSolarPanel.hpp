@@ -18,7 +18,7 @@ namespace fan
 		static void Save( const Component& _component, Json& _json );
 		static void Load( Component& _component, const Json& _json );
 
-		bool  isInsideSunlight;
+		bool  isInSunlight;
 		float currentChargingRate;  // Energy/s
 		float minChargingRate;		// Energy/s
 		float maxChargingRate;		// Energy/s

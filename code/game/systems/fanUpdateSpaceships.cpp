@@ -1,18 +1,21 @@
 #include "game/systems/fanUpdateSpaceships.hpp"
 
+#include "scene/fanSceneTags.hpp"
 #include "scene/components/fanTransform.hpp"
 #include "scene/components/fanRigidbody.hpp"
-#include "scene/fanSceneTags.hpp"
 #include "game/components/fanSpaceShip.hpp"
+#include "game/components/fanSolarPanel.hpp"
+#include "game/components/fanHealth.hpp"
 #include "game/components/fanPlayerInput.hpp"
 #include "game/components/fanBattery.hpp"
+#include "game/singletonComponents/fanSolarEruption.hpp"
 #include "ecs/fanEcsWorld.hpp"
 
 namespace fan
 {
 	//================================================================================================================================
 	//================================================================================================================================
-	Signature S_UpdateSpaceships::GetSignature( const EcsWorld& _world )
+	Signature S_MoveSpaceships::GetSignature( const EcsWorld& _world )
 	{
 		return
 			_world.GetSignature<Transform>() |
@@ -24,7 +27,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void S_UpdateSpaceships::Run( EcsWorld& _world, const std::vector<EntityID>& _entities, const float _delta )
+	void S_MoveSpaceships::Run( EcsWorld& _world, const std::vector<EntityID>& _entities, const float _delta )
 	{
 		if( _delta == 0.f ) { return; }
 
@@ -131,6 +134,45 @@ namespace fan
 			rb.SetVelocity( newVelocity );
 
 			_world.AddTag<tag_boundsOutdated>( entityID );
+		}
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
+	Signature S_EruptionDamage::GetSignature( const EcsWorld& _world )
+	{
+		return
+			_world.GetSignature<SolarPanel>() |
+			_world.GetSignature<Transform>() |
+			_world.GetSignature<Health>()	 |
+			_world.GetSignature<SpaceShip>();
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
+	void S_EruptionDamage::Run( EcsWorld& _world, const std::vector<EntityID>& _entities, const float _delta )
+	{
+		if( _delta == 0.f ) { return; }
+
+		const SolarEruption& eruption = _world.GetSingletonComponent<SolarEruption>();
+		for( EntityID entityID : _entities )
+		{
+			const Transform& transform = _world.GetComponent<Transform>( entityID );
+			Health& health = _world.GetComponent<Health>( entityID );
+			SolarPanel& solarPanel = _world.GetComponent<SolarPanel>( entityID );
+
+			if( solarPanel.isInSunlight && eruption.state == SolarEruption::EXPODING )
+			{
+				const float damage = _delta * eruption.damagePerSecond;
+				if( health.currentHealth < damage )
+				{
+					health.currentHealth = 0.f;
+				}
+				else
+				{
+					health.currentHealth -= damage;
+				}
+			}
 		}
 	}
 }

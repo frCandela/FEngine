@@ -235,13 +235,14 @@ namespace fan
 
 			// update
 			S_RefreshPlayerInput::Run( world, world.Match( S_RefreshPlayerInput::GetSignature( world ) ), delta );
-			S_UpdateSpaceships::Run( world, world.Match( S_UpdateSpaceships::GetSignature( world ) ), delta );
+			S_MoveSpaceships::Run( world, world.Match( S_MoveSpaceships::GetSignature( world ) ), delta );
 			S_FireWeapons::Run( world, world.Match( S_FireWeapons::GetSignature( world ) ), delta );
 			S_MovePlanets::Run( world, world.Match( S_MovePlanets::GetSignature( world ) ), delta );
 			S_GenerateLightMesh::Run( world, world.Match( S_GenerateLightMesh::GetSignature( world ) ), delta );
 			S_UpdateSolarPannels::Run(world, world.Match( S_UpdateSolarPannels::GetSignature( world ) ), delta );
 			S_RechargeBatteries::Run( world, world.Match( S_RechargeBatteries::GetSignature( world ) ), delta );
 			S_UpdateExpirationTimes::Run( world, world.Match( S_UpdateExpirationTimes::GetSignature( world ) ), delta );
+			S_EruptionDamage::Run( world, world.Match( S_EruptionDamage::GetSignature( world ) ), delta );
 			S_UpdateGameUiValues::Run( world, world.Match( S_UpdateGameUiValues::GetSignature( world ) ), delta );
 			S_UpdateGameUiPosition::Run( world, world.Match( S_UpdateGameUiPosition::GetSignature( world ) ), delta );
 

@@ -24,7 +24,7 @@ namespace fan
 	void SolarPanel::Init( EcsWorld& _world, Component& _component )
 	{
 		SolarPanel& solarPanel = static_cast<SolarPanel&>( _component );
-		solarPanel.isInsideSunlight = false;
+		solarPanel.isInSunlight = false;
 		solarPanel.currentChargingRate = 0.f;
 		solarPanel.minChargingRate = 0.f;
 		solarPanel.maxChargingRate = 10.f;
@@ -46,7 +46,7 @@ namespace fan
 			ImGui::DragFloat( "high range 		", &solarPanel.highRange, 0.5f, 0.f, 100.f );
 			ImGui::Spacing();
 			ImGui::PushDisable();
-			ImGui::Checkbox( "is inside sunlight", &solarPanel.isInsideSunlight );
+			ImGui::Checkbox( "is inside sunlight", &solarPanel.isInSunlight );
 			ImGui::DragFloat( "charging rate", &solarPanel.currentChargingRate, 0.5f, 0.f, 100.f );
 			ImGui::PopDisable();
 		} ImGui::PopItemWidth();

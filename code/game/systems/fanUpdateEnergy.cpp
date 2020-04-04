@@ -33,10 +33,10 @@ namespace fan
 			// sunlight mesh raycast
 			const btVector3 rayOrigin = transform.GetPosition() + btVector3::Up();
 			btVector3 outIntersection;
-			solarPanel.isInsideSunlight = sunLight.mesh.RayCast( rayOrigin, -btVector3::Up(), outIntersection );
+			solarPanel.isInSunlight = sunLight.mesh.RayCast( rayOrigin, -btVector3::Up(), outIntersection );
 			
 			// Charging rate
-			if ( solarPanel.isInsideSunlight )
+			if ( solarPanel.isInSunlight )
 			{
 				const btVector3 position = transform.GetPosition();
 				const float distance = position.norm();
