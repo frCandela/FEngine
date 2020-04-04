@@ -40,6 +40,8 @@ namespace fan
 		spaceship.reverseParticles.Init( _world );
 		spaceship.leftParticles.Init( _world );
 		spaceship.rightParticles.Init( _world );
+
+		spaceship.deathFx = nullptr;
 	}
 
 	//================================================================================================================================
@@ -70,6 +72,11 @@ namespace fan
  			ImGui::FanComponent( "reverse particles",		spaceship.reverseParticles );
  			ImGui::FanComponent( "left particles",			spaceship.leftParticles );
  			ImGui::FanComponent( "right particles",			spaceship.rightParticles );
+
+			ImGui::Spacing();
+
+			ImGui::FanPrefab( "death fx", spaceship.deathFx );
+
 		} ImGui::PopItemWidth();	
 	}
 
@@ -93,6 +100,7 @@ namespace fan
  		Serializable::SaveComponentPtr( _json, "reverse_particles", spaceship.reverseParticles );
  		Serializable::SaveComponentPtr( _json, "left_particles", spaceship.leftParticles );
  		Serializable::SaveComponentPtr( _json, "right_particles", spaceship.rightParticles );
+		Serializable::SavePrefabPtr( _json, "death_fx", spaceship.deathFx );
 	}
 
 	//================================================================================================================================
@@ -115,36 +123,6 @@ namespace fan
 		Serializable::LoadComponentPtr( _json, "reverse_particles", spaceship.reverseParticles );
 		Serializable::LoadComponentPtr( _json, "left_particles", spaceship.leftParticles );
  		Serializable::LoadComponentPtr( _json, "right_particles", spaceship.rightParticles );
+		Serializable::LoadPrefabPtr( _json, "death_fx", spaceship.deathFx );
 	}
 }
-
-// 	//================================================================================================================================
-// 	//================================================================================================================================
-// 	void SpaceShip::Die()
-// 	{
-// 		Debug::Log( "dead" );
-// 
-// 		if ( GetScene().IsServer() == false )
-// 		{
-// 			// Explosion
-// 			std::default_random_engine			  m_generator;
-// 			std::uniform_real_distribution<float> m_distribution( 0.f, 1.f );
-// 			for ( int particleIndex = 0; particleIndex < 1000; particleIndex++ )
-// 			{
-// 				EcsManager& ecs = m_gameobject->GetScene().GetEcsManager();
-// 				ecsEntity entity = ecs.CreateEntity();
-// 				ecsPosition& position = ecs.AddComponent<ecsPosition>( entity );
-// 				ecs.AddComponent<ecsRotation>( entity ).Init();
-// 				ecsMovement& movement = ecs.AddComponent<ecsMovement>( entity );
-// 				ecsParticle& particle = ecs.AddComponent<ecsParticle>( entity );
-// 
-// 				movement.speed = btVector3( m_distribution( m_generator ), m_distribution( m_generator ), m_distribution( m_generator ) ) - btVector3( 0.5f, 0.5f, 0.5f );
-// 				movement.speed.normalize();
-// 				movement.speed *= m_distribution( m_generator ) * 10.f + 10.f;
-// 				position.position = m_gameobject->GetTransform().GetPosition();
-// 				particle.durationLeft = 3.f;
-// 			}
-// 		}
-// 
-// 		onPlayerDie.Emmit( m_gameobject );
-//	}

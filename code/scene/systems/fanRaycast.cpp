@@ -54,7 +54,7 @@ namespace fan
 					const MeshRenderer& meshRenderer = _world.GetComponent<MeshRenderer>( entityID );
 					const Transform& transform = _world.GetComponent<Transform>( entityID );
 					const Ray transformedRay( transform.InverseTransformPoint( _ray.origin ), transform.InverseTransformDirection( _ray.direction ) );
-					if( meshRenderer.mesh->GetHull().RayCast( transformedRay.origin, transformedRay.direction, intersection ) )
+					if( meshRenderer.mesh!= nullptr && meshRenderer.mesh->GetHull().RayCast( transformedRay.origin, transformedRay.direction, intersection ) )
 					{
 						results.push_back( { entityID , intersection.distance2( _ray.origin ) } );
 					}

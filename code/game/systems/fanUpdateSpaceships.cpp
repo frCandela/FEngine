@@ -3,6 +3,8 @@
 #include "scene/fanSceneTags.hpp"
 #include "scene/components/fanTransform.hpp"
 #include "scene/components/fanRigidbody.hpp"
+#include "scene/components/fanSceneNode.hpp"
+#include "scene/singletonComponents/fanScene.hpp"
 #include "game/components/fanSpaceShip.hpp"
 #include "game/components/fanSolarPanel.hpp"
 #include "game/components/fanHealth.hpp"
@@ -17,12 +19,11 @@ namespace fan
 	//================================================================================================================================
 	Signature S_MoveSpaceships::GetSignature( const EcsWorld& _world )
 	{
-		return
-			_world.GetSignature<Transform>() |
-			_world.GetSignature<Rigidbody>() |
-			_world.GetSignature<Battery>() |
-			_world.GetSignature<PlayerInput>() |
-			_world.GetSignature<SpaceShip>();
+		return _world.GetSignature<Transform>() |
+			   _world.GetSignature<Rigidbody>() |
+			   _world.GetSignature<Battery>() |
+			   _world.GetSignature<PlayerInput>() |
+			   _world.GetSignature<SpaceShip>();
 	}
 
 	//================================================================================================================================
@@ -141,11 +142,10 @@ namespace fan
 	//================================================================================================================================
 	Signature S_EruptionDamage::GetSignature( const EcsWorld& _world )
 	{
-		return
-			_world.GetSignature<SolarPanel>() |
-			_world.GetSignature<Transform>() |
-			_world.GetSignature<Health>()	 |
-			_world.GetSignature<SpaceShip>();
+		return  _world.GetSignature<SolarPanel>() |
+				_world.GetSignature<Transform>() |
+				_world.GetSignature<Health>()	 |
+				_world.GetSignature<SpaceShip>();
 	}
 
 	//================================================================================================================================
@@ -172,6 +172,49 @@ namespace fan
 				{
 					health.currentHealth -= damage;
 				}
+			}
+		}
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
+	Signature S_PlayerDeath::GetSignature( const EcsWorld& _world )
+	{
+		return	_world.GetSignature<Health>() |
+				_world.GetSignature<Transform>() |
+				_world.GetSignature<SpaceShip>();
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
+	void S_PlayerDeath::Run( EcsWorld& _world, const std::vector<EntityID>& _entities, const float _delta )
+	{
+		if( _delta == 0.f ) { return; }
+
+		const SolarEruption& eruption = _world.GetSingletonComponent<SolarEruption>();
+		for( EntityID entityID : _entities )
+		{
+			Health& health = _world.GetComponent<Health>( entityID );
+
+			if( health.currentHealth == 0.f )
+			{
+				Transform& transform = _world.GetComponent<Transform>( entityID );
+				SpaceShip& spaceShip = _world.GetComponent<SpaceShip>( entityID );
+				Scene& scene = _world.GetSingletonComponent<Scene>();
+				
+				if( spaceShip.deathFx == nullptr )
+				{
+					Debug::Error() << "S_PlayerDeath: SpaceShip has no death fx" << Debug::Endl();
+				}
+				else
+				{
+					SceneNode& fxNode = *spaceShip.deathFx->Instanciate( *scene.root );
+					EntityID fxId = _world.GetEntityID( fxNode.handle );
+					Transform& fxTransform = _world.GetComponent<Transform>( fxId );
+					fxTransform.SetPosition( transform.GetPosition() );
+				}
+
+				_world.KillEntity( entityID );
 			}
 		}
 	}

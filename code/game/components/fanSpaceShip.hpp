@@ -39,8 +39,7 @@ namespace fan
 		ComponentPtr<ParticleEmitter> leftParticles;
 		ComponentPtr<ParticleEmitter> rightParticles;
 
-		
-//		void Die();
+		PrefabPtr deathFx;
 	};
 	static constexpr size_t sizeof_spaceship = sizeof( SpaceShip );
 }

@@ -248,6 +248,8 @@ namespace fan
 
 			SolarEruption::Step( world, delta );
 
+			S_PlayerDeath::Run( world, world.Match( S_PlayerDeath::GetSignature( world ) ), delta );
+
 			// late update
 			S_UpdateParticles::Run( world, world.Match( S_UpdateParticles::GetSignature( world ) ), delta );
 			S_EmitParticles::Run( world, world.Match( S_EmitParticles::GetSignature( world ) ), delta );
