@@ -391,11 +391,26 @@ namespace fan
 		const EntityID oldCameraID = m_game->world.GetEntityID( scene.mainCamera->handle );
 		const btTransform oldCameraTransform = m_game->world.GetComponent<Transform>( oldCameraID ).transform;
 
+		// save old selection
+		SceneNode* prevSelectionNode = m_selection->GetSelectedSceneNode();
+		const uint32_t prevSelectionID = prevSelectionNode != nullptr ? prevSelectionNode->uniqueID : 0;
+
 		m_game->Stop();
 		scene.LoadFrom( scene.path ); // reload
 
+		// restore camera transform
 		const EntityID newCameraID = m_game->world.GetEntityID( scene.mainCamera->handle );
 		m_game->world.GetComponent<Transform>( newCameraID ).transform = oldCameraTransform;
+
+		// restore selection
+		if( prevSelectionID != 0 )
+		{
+			auto it = scene.nodes.find( prevSelectionID );
+			if( it != scene.nodes.end() )
+			{
+				m_selection->SetSelectedSceneNode( it->second );
+			}
+		}
 	}
 
 	void Engine::OnGamePause() { m_game->Pause(); }

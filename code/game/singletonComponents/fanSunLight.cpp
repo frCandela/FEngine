@@ -27,7 +27,6 @@ namespace fan
 
 		sunLight.subAngle = 45.f;
 		sunLight.radius = 100.f;
-		sunLight.debugDraw = false;
 
 		if( !sunLight.mesh.GetVertices().empty() )
 		{
@@ -48,7 +47,6 @@ namespace fan
 		{
 			ImGui::DragFloat( "sub angle", &sunLight.subAngle, 1.f, 0.f, 90.f );
 			ImGui::DragFloat( "radius", &sunLight.radius, 1.f, 1.f, 1000.f );
-			ImGui::Checkbox( "debug draw", &sunLight.debugDraw );
 		}
 		ImGui::Unindent(); ImGui::Unindent();
 	}
@@ -92,13 +90,5 @@ namespace fan
 		_vertices.push_back( { center,	normal, color,centerUV } );
 		_vertices.push_back( { p1,		normal, color, uv1 } );
 		_vertices.push_back( { p2,		normal, color, uv2 } );
-
-		//@hack move this debug draw elsewhere
-		if( debugDraw )
-		{
-			const Color debugColor( 1.f, 1.f, 0.f, 0.3f );
-			RendererDebug::Get().DebugTriangle( btVector3::Zero(), _v0, _v1, debugColor );
-			RendererDebug::Get().DebugLine( btVector3::Zero(), _v0, Color::Green );
-		}
 	}
 }

@@ -110,7 +110,7 @@ namespace fan
 		delete overlappingPairCache;
 		delete dispatcher;
 		delete collisionConfiguration;
-		delete dynamicsWorld; //@hack bullet physics alignement is broken, check the lib compilation parameters...
+		delete dynamicsWorld;
 	}
 
 	//================================================================================================================================

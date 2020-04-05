@@ -40,7 +40,6 @@ namespace fan
 
 					EntityID entity = _world.CreateEntity();
 					Particle& particle = _world.AddComponent<Particle>( entity );
-					//if( m_sunlightParticleOcclusionActive ) { m_ecsManager->AddComponent<ecsSunlightParticleOcclusion>( entity ); } @hack
 
 					particle.speed = glm::normalize( glm::vec3( Random::FloatClip(), Random::FloatClip(), Random::FloatClip() ) );
 					particle.speed *= emitter.speed;

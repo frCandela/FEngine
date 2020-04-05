@@ -334,38 +334,37 @@ namespace fan
 	{
 		Scene& scene = m_game->world.GetSingletonComponent<Scene>();
 
-
 		if( scene.path.empty() )
 		{
 			Debug::Warning( "you cannot reload a scene that is not saved." );
 			return;
 		}
 
-		if (  m_game->state == Game::STOPPED )
+		if( m_game->state == Game::STOPPED )
 		{
 			// save old camera transform
 			const EntityID oldCameraID = m_game->world.GetEntityID( scene.mainCamera->handle );
 			btTransform oldCameraTransform = m_game->world.GetComponent<Transform>( oldCameraID ).transform;
 
 			// save old selection
-			SceneNode * prevSelectionNode = m_editorSelection.GetSelectedSceneNode();
+			SceneNode* prevSelectionNode = m_editorSelection.GetSelectedSceneNode();
 			const uint32_t prevSelectionID = prevSelectionNode != nullptr ? prevSelectionNode->uniqueID : 0;
-
 
 			Debug::Get() << Debug::Severity::log << "loading scene: " << scene.path << Debug::Endl();
 			scene.LoadFrom( scene.path );
-			
-
 
 			// restore camera
 			const EntityID newCameraID = m_game->world.GetEntityID( scene.mainCamera->handle );
 			m_game->world.GetComponent<Transform>( newCameraID ).transform = oldCameraTransform;
 
 			// restore selection
-			if ( prevSelectionID != 0 )
+			if( prevSelectionID != 0 )
 			{
-// 				SceneNode* selection = m_scene->Find( prevSelectionID ); // @todo repair me
-// 				m_editorSelection.SetSelectedSceneNode( selection );
+				auto it = scene.nodes.find( prevSelectionID );
+				if( it != scene.nodes.end() )
+				{
+					m_editorSelection.SetSelectedSceneNode( it->second );
+				}
 			}
 		}
 		else

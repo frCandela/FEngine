@@ -24,7 +24,6 @@ namespace fan
 		Mesh  mesh;
 		float subAngle;
 		float radius;
-		bool  debugDraw;
 
 		void AddSunTriangle( std::vector<Vertex>& _vertices, const btVector3& _v0, const btVector3& _v1 );
 	};
