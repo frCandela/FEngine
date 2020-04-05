@@ -37,6 +37,8 @@ namespace fan {
 		SingletonComponent&	 GetSingletonComponent( const uint32_t _staticIndex );
 		void				 RemoveComponent( const EntityID _entityID, const ComponentIndex _index );
 		bool				 HasComponent( const EntityID _entityID, ComponentIndex _index );
+		void				 AddTagsFromSignature( const EntityID _entityID, const Signature& _signature );
+		Signature			 AliveSignature() const { return ( Signature( 1 ) << ecAliveBit ); }
 		EntityID			 CreateEntity();
 		void				 KillEntity( const EntityID _entityID );
 		void				 Clear();
@@ -47,7 +49,7 @@ namespace fan {
 		Component&			 GetComponentAt( const EntityID _entityID, int _componentIndex );
 		const ComponentInfo& GetComponentInfo( const ComponentIndex _index ) const { return  m_componentInfo[_index]; }
 		const SingletonComponentInfo& GetSingletonComponentInfo( const uint32_t _staticIndex ) const { return  m_singletonComponentInfo.at( _staticIndex ); }
-		
+
 		void				 SortEntities();
 		void				 RemoveDeadEntities();
 
@@ -81,6 +83,8 @@ namespace fan {
 		EntityHandle	m_nextHandle = 1; // 0 is a null handle
 		ComponentIndex	m_nextTypeIndex = 0;
 		ComponentIndex	m_nextTagIndex = signatureLength - 2;
+
+		Signature m_tagsMask;	// signature of all tag types combined
 
 		Entity& GetEntity( const EntityID _id );
 		bool	EntityMatchSignature( EntityID _entityID, const Signature& _signature );
@@ -207,7 +211,10 @@ namespace fan {
 	{
 		static_assert( std::is_base_of< Tag, _tagType>::value );
 		assert( m_nextTagIndex >= m_nextTypeIndex );
-		m_typeIndices[_tagType::s_typeInfo] = m_nextTagIndex--;		
+		const ComponentIndex newTagIndex = m_nextTagIndex--;
+		m_typeIndices[_tagType::s_typeInfo] = newTagIndex;
+
+		m_tagsMask[newTagIndex] = 1; 
 	}
 
 	//==============================================================================================================================================================

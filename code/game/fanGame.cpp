@@ -30,6 +30,7 @@
 #include "scene/singletonComponents/fanScenePointers.hpp"
 #include "scene/singletonComponents/fanPhysicsWorld.hpp"
 #include "scene/fanSceneTags.hpp"
+#include "game/fanGameTags.hpp"
 
 #include "game/singletonComponents/fanSunLight.hpp"
 #include "game/singletonComponents/fanGameCamera.hpp"
@@ -44,6 +45,7 @@
 #include "game/systems/fanUpdatePlayerInput.hpp"
 #include "game/systems/fanUpdateEnergy.hpp"
 #include "game/systems/fanUpdateGameUI.hpp"
+#include "game/systems/fanParticlesOcclusion.hpp"
 
 #include "game/components/fanPlanet.hpp"
 #include "game/components/fanSpaceShip.hpp"
@@ -112,6 +114,7 @@ namespace fan
 		world.AddSingletonComponentType<SolarEruption>();
 
 		world.AddTagType<tag_boundsOutdated>();
+		world.AddTagType<tag_sunlight_occlusion>();
 
 		// init the game ref
 		const_cast< Game* >(world.GetSingletonComponent<GameReference>().game) = this;
@@ -251,6 +254,7 @@ namespace fan
 			S_PlayerDeath::Run( world, world.Match( S_PlayerDeath::GetSignature( world ) ), delta );
 
 			// late update
+			S_ParticlesOcclusion::Run( world, world.Match( S_ParticlesOcclusion::GetSignature( world ) ), delta );
 			S_UpdateParticles::Run( world, world.Match( S_UpdateParticles::GetSignature( world ) ), delta );
 			S_EmitParticles::Run( world, world.Match( S_EmitParticles::GetSignature( world ) ), delta );
 			S_GenerateParticles::Run( world, world.Match( S_GenerateParticles::GetSignature( world ) ), delta );

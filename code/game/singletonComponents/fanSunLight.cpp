@@ -93,7 +93,7 @@ namespace fan
 		_vertices.push_back( { p1,		normal, color, uv1 } );
 		_vertices.push_back( { p2,		normal, color, uv2 } );
 
-		//@todo move this debug draw elsewhere
+		//@hack move this debug draw elsewhere
 		if( debugDraw )
 		{
 			const Color debugColor( 1.f, 1.f, 0.f, 0.3f );

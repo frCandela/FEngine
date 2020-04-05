@@ -32,7 +32,6 @@ namespace fan
 				float particleSpawnDelta = 1.f / emitter.particlesPerSecond;
 
 				const glm::vec3 origin = ToGLM( emitterTransform.GetPosition() );
-				const glm::vec3 transformedOffset = ToGLM( emitterTransform.TransformDirection( emitter.offset ) );
 
 				// Spawn particles
 				while( emitter.timeAccumulator > particleSpawnDelta )
@@ -45,9 +44,11 @@ namespace fan
 
 					particle.speed = glm::normalize( glm::vec3( Random::FloatClip(), Random::FloatClip(), Random::FloatClip() ) );
 					particle.speed *= emitter.speed;
-					particle.position = origin + transformedOffset;
+					particle.position = origin;
 					particle.durationLeft = emitter.duration;
 					particle.color = emitter.color;
+
+					_world.AddTagsFromSignature( entity, emitter.tagsSignature );
 				}
 			}
 		}

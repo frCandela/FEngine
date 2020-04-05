@@ -11,7 +11,7 @@ namespace fan
 	//================================================================================================================================
 	Signature S_GenerateParticles::GetSignature( const EcsWorld& _world )
 	{
-		return	_world.GetSignature<Particle>();
+		return	_world.GetSignature<Particle>() | _world.AliveSignature();
 	}
 
 	//================================================================================================================================

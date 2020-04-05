@@ -23,10 +23,10 @@ namespace fan
 
 		bool		enabled;
 		float		particlesPerSecond;
-		float		speed;
-		float		duration;
-		btVector3	offset;
+		float		speed;					// speed of the particles
+		float		duration;				// lifetime of a particle in seconds
 		Color		color;
+		Signature	tagsSignature;					// tags added to the particles
 
 		float		timeAccumulator;
 	};

@@ -4,6 +4,7 @@
 #include "scene/fanSceneSerializable.hpp"
 #include "ecs/fanEcsWorld.hpp"
 #include "game/singletonComponents/fanSunLight.hpp"
+#include "game/fanGameTags.hpp"
 #include "core/fanRandom.hpp"
 #include "core/math/fanLerp.hpp"
 
@@ -205,10 +206,18 @@ namespace fan
 			eruption.sunlightRenderer->mesh = &sunlight.mesh;
 		}		
 
+		// initialize the sun point light
 		if( eruption.sunlightLight != nullptr )
 		{
 			eruption.sunlightLight->attenuation[PointLight::LINEAR] = eruption.stateLightAttenuation[WAITING];
 			eruption.previousLightAttenuation = eruption.stateLightAttenuation[WAITING];
+		}
+
+		// initialize particles tags
+		if( eruption.particleEmitter != nullptr )
+		{
+			const ComponentIndex tagIndex = _world.GetDynamicIndex( tag_sunlight_occlusion::s_typeInfo );;
+			eruption.particleEmitter->tagsSignature[tagIndex] = 1;
 		}
 	}
 
