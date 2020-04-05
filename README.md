@@ -1,21 +1,24 @@
 # FEngine
 FEngine is a 3D game engine. It uses Vulkan for Rendering, Dear ImGui for user interface and a lot of other open libraries for various purposes.
 
-## Features: 
-* Scene management
-	 * Scene Editor
+## Some features: 
+* Global
+	 * Game Editor
 	 * Entity/Component system
-	 * Save/Load
-	 * Various component ( transform, mesh, material, actors etc.)
-* Rendering with vulkan
-	 * Mesh display
-	 * Simple phong illumination
+	 * Scene tree & serialization
+	 * Profiling tools
+	 * keyboard & gamepad input
+	 * client/server network
+* Rendering
+	 * 3D Models
+	 * ui
+	 * directionnal & point lights
+	 * Phong illumination
 	 * Postprocessing
 	 * Debug lines/shapes
 	 * Shader runtime compilation
-* Other
-	 * Simple glTF mesh import
-	 * png textures import
+	 * glTF mesh 
+	 * png textures
 
 ## Dependencies : 	
 * 3D Models IO : [glTF ](https://github.com/KhronosGroup/glTF)	
@@ -28,8 +31,7 @@ FEngine is a 3D game engine. It uses Vulkan for Rendering, Dear ImGui for user i
 * spirv compilation: [shaderc](https://github.com/google/shaderc)
 * UI: [Dear ImGui <3](https://github.com/ocornut/imgui)
 * rendering : [VulkanSDK 1.1.106.0](https://vulkan.lunarg.com/sdk/home)
-* bitsets : [ClaasBontus - bitset2](https://github.com/ClaasBontus/bitset2)
 * network : [SFML 2.5.1](https://www.sfml-dev.org/index.php)
 	
 ## Screenshots
-![Editor preview](/docs/screenshot.png)
+![Editor preview](/docs/screenshot2.png)
