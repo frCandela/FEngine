@@ -1,0 +1,181 @@
+#include "game/systems/fanUpdatePlayerInput.hpp"
+
+#include "ecs/fanEcsWorld.hpp"
+#include "game/components/fanPlayerInput.hpp"
+#include "scene/components/fanTransform.hpp"
+#include "scene/components/fanCamera.hpp"
+#include "scene/components/fanSceneNode.hpp"
+#include "scene/singletonComponents/fanScene.hpp"
+#include "core/input/fanMouse.hpp"
+#include "core/math/shapes/fanRay.hpp"
+
+#include "core/input/fanInputManager.hpp"
+#include "core/input/fanInput.hpp"
+#include "core/input/fanJoystick.hpp"
+
+namespace fan
+{
+	//================================================================================================================================
+	//================================================================================================================================
+	Signature S_RefreshPlayerInput::GetSignature( const EcsWorld& _world )
+	{
+		return	_world.GetSignature<PlayerInput>() | _world.GetSignature<Transform>();
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
+	void S_RefreshPlayerInput::Run( EcsWorld& _world, const std::vector<EntityID>& _entities, const float _delta )
+	{
+		if( _delta == 0.f ) { return; }
+
+		const Scene& scene = _world.GetSingletonComponent<Scene>();
+		const EntityID cameraID = _world.GetEntityID( scene.mainCamera->handle );
+		const Transform& cameraTransform = _world.GetComponent<Transform>( cameraID );
+		const Camera& camera = _world.GetComponent<Camera>( cameraID );
+
+		for( EntityID entityID : _entities )
+		{
+			const Transform& transform = _world.GetComponent<Transform>( entityID );
+			PlayerInput& input = _world.GetComponent<PlayerInput>( entityID );
+
+			if( !input.isReplicated )
+			{
+				InputData& inputData = input.inputData;
+
+				inputData.left =	  GetInputLeft( input );
+				inputData.forward =   GetInputForward( input );
+				inputData.boost =	  GetInputBoost( input );
+				inputData.fire =	  GetInputFire( input );
+				inputData.stop =	  GetInputStop( input );
+
+				// input direction
+				if( input.type == PlayerInput::KEYBOARD_MOUSE )
+				{
+					// Get mouse world pos
+					btVector3 mouseWorldPos = camera.ScreenPosToRay( cameraTransform, Mouse::Get().GetScreenSpacePosition() ).origin;
+					mouseWorldPos.setY( 0 );
+
+					// Get mouse direction
+
+					btVector3 mouseDir = mouseWorldPos - transform.GetPosition();
+					mouseDir.normalize();
+					inputData.direction = mouseDir;
+				} 
+				else if( input.type == fan::PlayerInput::JOYSTICK )
+				{
+					glm::vec2 average = GetDirectionAverage( input );
+
+					btVector3 dir = btVector3( average.x, 0.f, average.y );
+
+					if( dir.length() > input.directionCutTreshold ) { input.direction = dir; }
+
+					inputData.direction = input.direction;
+				} else
+				{
+					inputData.direction = btVector3::Zero();
+				}
+			}
+		}
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
+	float S_RefreshPlayerInput::GetInputLeft( const PlayerInput& _input )
+	{
+		switch( _input.type )
+		{
+		case fan::PlayerInput::KEYBOARD_MOUSE:
+			return Input::Get().Manager().GetAxis( "game_left", _input.joystickID );
+		case fan::PlayerInput::JOYSTICK:
+		{
+			float rawInput = Input::Get().Manager().GetAxis( "gamejs_axis_left", _input.joystickID );
+			return std::abs( rawInput ) > 0.15f ? rawInput : 0.f;
+		}
+		default:
+			return 0.f;
+		}
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
+	float S_RefreshPlayerInput::GetInputForward( const PlayerInput& _input )
+	{
+		switch( _input.type )
+		{
+		case fan::PlayerInput::KEYBOARD_MOUSE:
+			return Input::Get().Manager().GetAxis( "game_forward" );
+		case fan::PlayerInput::JOYSTICK:
+		{
+			const float x = Input::Get().Manager().GetAxis( "gamejs_x_axis_direction" );
+			const float y = Input::Get().Manager().GetAxis( "gamejs_y_axis_direction", _input.joystickID );
+			float forward = btVector3( x, 0.f, y ).length();
+			return forward > 0.2f ? forward : 0.f;
+		} default:
+			return 0.f;
+		}
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
+	float S_RefreshPlayerInput::GetInputBoost( const PlayerInput& _input )
+	{
+		switch( _input.type )
+		{
+		case fan::PlayerInput::KEYBOARD_MOUSE:
+			return Input::Get().Manager().GetAxis( "game_boost" );
+		case fan::PlayerInput::JOYSTICK:
+			return Input::Get().Manager().GetAxis( "gamejs_axis_boost", _input.joystickID );
+		default:
+			return 0.f;
+		}
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
+	float S_RefreshPlayerInput::GetInputFire( const PlayerInput& _input )
+	{
+		switch( _input.type )
+		{
+		case fan::PlayerInput::KEYBOARD_MOUSE:
+			return Input::Get().Manager().GetAxis( "game_fire" );
+		case fan::PlayerInput::JOYSTICK:
+			return Input::Get().Manager().GetAxis( "gamejs_axis_fire", _input.joystickID );
+		default:
+			return 0.f;
+		}
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
+	bool S_RefreshPlayerInput::GetInputStop( const PlayerInput& _input )
+	{
+		switch( _input.type )
+		{
+		case fan::PlayerInput::KEYBOARD_MOUSE:
+			return Input::Get().Manager().GetAxis( "game_axis_stop" ) > 0.f;
+		case fan::PlayerInput::JOYSTICK:
+			return Input::Get().Manager().GetAxis( "gamejs_axis_stop", _input.joystickID ) > 0.f;
+		default:
+			return false;
+		}
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
+	glm::vec2 S_RefreshPlayerInput::GetDirectionAverage( PlayerInput& _input )
+	{
+		const size_t index = Input::Get().FrameCount() % _input.directionBuffer.size();
+		const float x = Input::Get().Manager().GetAxis( "gamejs_x_axis_direction", _input.joystickID );
+		const float y = Input::Get().Manager().GetAxis( "gamejs_y_axis_direction", _input.joystickID );
+		_input.directionBuffer[index] = glm::vec2( x, y );
+
+		glm::vec2 average( 0.f, 0.f );
+		for( int dirIndex = 0; dirIndex < _input.directionBuffer.size(); dirIndex++ )
+		{
+			average += _input.directionBuffer[dirIndex];
+		}
+		average /= float( _input.directionBuffer.size() );
+
+		return average;
+	}
+}
