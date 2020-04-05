@@ -17,3 +17,12 @@ FEngine/FEngine.exe
 FEngine/deps/imgui/_docking
 FEngine/deps/imgui/_old
 /.project
+out
+middleware/LivePP
+fengine_editor.exe
+fengine_editor.exe.manifest
+fengine_editor.exe.patch_*
+fengine_editor.pdb.patch_*
+fengine_editor.pdb
+fengine_editor.ilk
+content/_default/texture/blender_icons.png
