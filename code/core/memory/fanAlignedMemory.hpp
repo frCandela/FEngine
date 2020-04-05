@@ -6,6 +6,8 @@
 namespace fan
 {
 	//================================================================================================================================
+	// creates a buffer with a specific size & alignment
+	// 
 	//================================================================================================================================
 	template<typename T>
 	class AlignedMemory
@@ -49,8 +51,6 @@ namespace fan
 
 			m_size = _size;
 		}
-
-		static constexpr size_t tmp = sizeof( void* );
 
 		T& operator[]( const int& _pos )
 		{

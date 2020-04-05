@@ -10,6 +10,7 @@ namespace fan
 	class EcsWorld;
 
 	//================================================================================================================================
+	// Contains the data of the game camera ( what entity it is and how it should be placed )
 	//================================================================================================================================	
 	struct GameCamera : public SingletonComponent
 	{
@@ -21,8 +22,6 @@ namespace fan
 		static void Save( const SingletonComponent& _component, Json& _json );
 		static void Load( SingletonComponent& _component, const Json& _json );
 
-		//ComponentPtr < Camera >		 m_camera;
-		//ComponentPtr<PlayersManager> m_playersManager;
 		SceneNode*  cameraNode;
 		float		heightFromTarget;
 		btVector2	marginRatio;

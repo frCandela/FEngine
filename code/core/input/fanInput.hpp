@@ -9,6 +9,9 @@ namespace fan
 	class InputManager;
 
 	//================================================================================================================================
+	// global input manager
+	// @todo make an ecs singleton component to store inputs and simplify this.
+	// accessing global input should only be done in the editor
 	//================================================================================================================================
 	class Input : public Singleton<Input>
 	{

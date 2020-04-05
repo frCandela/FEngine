@@ -6,21 +6,6 @@
 
 namespace fan
 {
-	//================================================================================================================================
-	// component
-	//================================================================================================================================
-#define DECLARE_COMPONENT( _componentType)														\
-	public:																						\
-	static const uint32_t s_typeInfo;															\
-	static const char* s_typeName;																\
-	private:																					\
-	friend class EcsWorld;																		\
-	static Component& Instanciate( void * _buffer){ return *new( _buffer ) _componentType();}	\
-
-#define REGISTER_COMPONENT( _componentType, _name)				\
-	const uint32_t _componentType::s_typeInfo = SSID(#_name);	\
-	const char* _componentType::s_typeName = _name;				\
-
 	//==============================================================================================================================================================
 	// Component is a data struct that stores no logic. Components are processed through System::Run() calls
 	// If your component is unique, create a SingletonComponent instead
@@ -71,4 +56,16 @@ namespace fan
 		void		 ( *load  )( Component&, const Json& ) = nullptr;			// called when the scene is loaded ( after the init )
 		Component& ( *instanciate )( void* ) = nullptr;							// automagic, don't touch that ( for instancing from and ID )
 	};
+
+#define DECLARE_COMPONENT( _componentType)														\
+	public:																						\
+	static const uint32_t s_typeInfo;															\
+	static const char* s_typeName;																\
+	private:																					\
+	friend class EcsWorld;																		\
+	static Component& Instanciate( void * _buffer){ return *new( _buffer ) _componentType();}	\
+
+#define REGISTER_COMPONENT( _componentType, _name)				\
+	const uint32_t _componentType::s_typeInfo = SSID(#_name);	\
+	const char* _componentType::s_typeName = _name;				
 }

@@ -7,6 +7,8 @@ namespace fan
 	class EditorSelection;
 
 	//================================================================================================================================
+	// copy paste editor callbacks
+	// @todo make this a singleton component in the editor ecs world
 	//================================================================================================================================
 	class EditorCopyPaste
 	{

@@ -4,6 +4,10 @@
 
 namespace fan
 {
+	//================================================================================================================================
+	// Computes a 32 bits hash from a c string (compile time or runtime )
+	// Original code from @aredhele
+	//================================================================================================================================
 	namespace hash_str
 	{
 		constexpr const int8_t   STRING_END_BYTE = 0;

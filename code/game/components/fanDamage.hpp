@@ -7,7 +7,7 @@
 namespace fan
 {
 	//================================================================================================================================
-	// A damage component is used to remove health points
+	// A damage component is used to remove health points when colliding with stuff
 	//================================================================================================================================
 	struct Damage : public Component
 	{

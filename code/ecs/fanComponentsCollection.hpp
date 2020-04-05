@@ -7,7 +7,6 @@ namespace fan
 {
 	//==============================================================================================================================================================
 	// ComponentsCollection holds an array of chunks that store components.
-	//
 	// components size are defined in the Init, chunks maximum size is 65536 bytes
 	//==============================================================================================================================================================
 	class ComponentsCollection

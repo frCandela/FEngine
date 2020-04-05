@@ -10,6 +10,9 @@ namespace fan
 	struct MotionState;
 
 	//================================================================================================================================
+	// Contains all Bullet physics components
+	// allows registering of rigidbodies and quick rigidbodies access through handles
+	// triggers collision callbacks
 	//================================================================================================================================
 	struct PhysicsWorld : public SingletonComponent
 	{

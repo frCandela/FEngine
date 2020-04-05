@@ -7,6 +7,7 @@
 namespace fan
 {
 	//================================================================================================================================
+	// A battery is an energy container
 	// a battery allows fast moving of ships & firing weapons
 	//================================================================================================================================
 	struct Battery : public Component
@@ -24,23 +25,3 @@ namespace fan
 	};
 	static constexpr size_t sizeof_battery = sizeof( Battery );
 }
-
-
-// ================================================================================================================================
-// Try to remove energy 
-// If there is not enough energy available, do nothing and return false
-// ================================================================================================================================
-// bool Battery::TryRemoveEnergy( const float _energyConsumed )
-// {
-// 	assert( _energyConsumed >= 0.f );
-// 
-// 	if( m_currentEnergy >= _energyConsumed )
-// 	{
-// 		m_currentEnergy -= _energyConsumed;
-// 		return true;
-// 	}
-// 	else
-// 	{
-// 		return false;
-// 	}
-// }

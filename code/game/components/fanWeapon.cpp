@@ -31,11 +31,6 @@ namespace fan
 		weapon.bulletEnergyCost = 1.f;
 		weapon.originOffset = btVector3::Zero();
 
-		// explosion parameters
-		weapon.explosionTime = 0.15f;
-		weapon.exposionSpeed = 2.f;
-		weapon.particlesPerExplosion = 3;
-
 		// time accumulator
 		weapon.bulletsAccumulator = 0.f;
 
@@ -56,10 +51,6 @@ namespace fan
 			ImGui::DragFloat3( "offset ##weapon", &weapon.originOffset[0] );
 			ImGui::DragFloat( "bullets per second", &weapon.bulletsPerSecond, 1.f, 0.f, 1000.f );
 			ImGui::DragFloat( "bullet energy cost", &weapon.bulletEnergyCost, 0.05f, 0.f, 10.f );
-			ImGui::Spacing(); 
-			ImGui::DragFloat( "explosion time ##weapon", &weapon.explosionTime, 0.05f, 0.f, 10.f );
-			ImGui::DragFloat( "explosion speed ##weapon", &weapon.exposionSpeed, 0.5f, 0.f, 100.f );
-			ImGui::DragInt( "particles per explosion ##weapon", &weapon.particlesPerExplosion );
 		} ImGui::PopItemWidth();
 	}
 	
@@ -74,9 +65,6 @@ namespace fan
 		Serializable::SaveVec3( _json, "offset", weapon.originOffset );
 		Serializable::SaveFloat( _json, "bullets_per_second", weapon.bulletsPerSecond );
 		Serializable::SaveFloat( _json, "bullet_energy_cost", weapon.bulletEnergyCost );
-		Serializable::SaveFloat( _json, "exposion_speed", weapon.exposionSpeed );
-		Serializable::SaveFloat( _json, "explosion_time", weapon.explosionTime );
-		Serializable::SaveInt( _json, "particlesPerExplosion", weapon.particlesPerExplosion );
 	}
 	
 	//================================================================================================================================
@@ -90,8 +78,5 @@ namespace fan
 		Serializable::LoadVec3( _json, "offset", weapon.originOffset );
 		Serializable::LoadFloat( _json, "bullets_per_second", weapon.bulletsPerSecond );
 		Serializable::LoadFloat( _json, "bullet_energy_cost", weapon.bulletEnergyCost );
-		Serializable::LoadFloat( _json, "exposion_speed", weapon.exposionSpeed );
-		Serializable::LoadFloat( _json, "explosion_time", weapon.explosionTime );
-		Serializable::LoadInt( _json, "particlesPerExplosion", weapon.particlesPerExplosion );
 	}
 }

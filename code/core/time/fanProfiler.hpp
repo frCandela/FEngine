@@ -7,7 +7,8 @@
 namespace fan
 {
 	//================================================================================================================================
-	// Mesures time intervals in scoped segments of code
+	// Measures time intervals in scoped segments of code
+	// data is displayed in the profiler window of the editor
 	//================================================================================================================================
 	class Profiler : public Singleton<Profiler>
 	{

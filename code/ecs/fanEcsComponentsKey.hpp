@@ -4,7 +4,9 @@
 
 namespace fan
 {
-	// @old 04/01/2020 maybe usefull sometime ?
+	// @old 04/01/2020 taken from the old static ecs ( rip)
+	// implements a memory efficient storage of components for ecs entities
+	// can be usefull if the ecs entities consumes too much memory
 
 // 	//================================================================================================================================
 // 	// Bitset part of a componentsKey

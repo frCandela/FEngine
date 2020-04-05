@@ -13,8 +13,10 @@ namespace fan {
 	struct SingletonComponent;
 
 	//==============================================================================================================================================================
-	// Contains the entities, components, singleton components, type information
-	// and various utilities for processing them
+	// Contains the entities, components, singleton components and runtime type information
+	// component, tags and singleton are added dynamically when creating the ecs
+	// they all have a static id based on their name and an ecs local dynamic id. These ids are unique
+	// Entity ids will change from one frame to the other, use a EntityHandle to keep track of an entity
 	//==============================================================================================================================================================
 	class EcsWorld
 	{

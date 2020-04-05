@@ -7,7 +7,7 @@
 namespace fan
 {
 	//==============================================================================================================================================================
-	// MotionState is used synchronizes physics with graphics
+	// MotionState is used synchronizes physics transforms with graphics transforms
 	//==============================================================================================================================================================
 	struct MotionState : public Component
 	{

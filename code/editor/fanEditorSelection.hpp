@@ -9,6 +9,8 @@ namespace fan
 	struct SceneNode;
 
 	//================================================================================================================================
+	// Manages the editor scene node selection
+	// @todo make this a singleton component in the editor ecs world
 	//================================================================================================================================	
 	class EditorSelection
 	{

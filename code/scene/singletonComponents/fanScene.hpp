@@ -13,6 +13,8 @@ namespace fan
 	class Prefab;
 
 	//================================================================================================================================
+	// contains the scene tree root and a map of scene nodes for fast access
+	// also controls the unique ids for the nodes & the scene serialization to json
 	//================================================================================================================================
 	struct Scene : public SingletonComponent
 	{

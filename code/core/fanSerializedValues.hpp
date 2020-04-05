@@ -6,6 +6,8 @@
 namespace fan
 {
 	//================================================================================================================================
+	// holds global editor value that are saved/restored
+	// @todo put this in a singleton component in the editor ecs
 	//================================================================================================================================
 	class SerializedValues : public Singleton<SerializedValues>
 	{

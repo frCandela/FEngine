@@ -6,30 +6,23 @@
 
 namespace fan
 {
-	//================================================================================================================================
-	// singleton component
-	//================================================================================================================================
-#define DECLARE_SINGLETON_COMPONENT()		\
-	private:								\
-	friend class EcsWorld;				\
-	static const uint32_t s_typeInfo;		\
-
-#define REGISTER_SINGLETON_COMPONENT( _componentType )	\
-	const uint32_t _componentType::s_typeInfo = SSID(#_componentType);	\
-
 	//==============================================================================================================================================================
-	// A singleton is a unique component, it can be accessed by systems
+	// A singleton is a component that can only have a single instance per ecs world
+	// it can be accessed by systems
 	//==============================================================================================================================================================
-	struct SingletonComponent {
-		virtual ~SingletonComponent(){}
+	struct SingletonComponent
+	{
+		virtual ~SingletonComponent() {}
 	};
 
 	//==============================================================================================================================================================
+	// SingletonComponentInfo is runtime type information for singleton components
+	// it can be accessed from the ecs world
 	// function pointers :
-	// onGui		: draws ui associated with the component
-	// init			: clears the component value and registers it when necessary
-	// save			: serializes the component to json
-	// load			: deserializes the component from json
+	// init			: clears the component value and registers it when necessary (mandatory)
+	// onGui		: draws ui associated with the component (optional)
+	// save			: serializes the component to json (optional)
+	// load			: deserializes the component from json (optional)
 	//==============================================================================================================================================================
 	struct SingletonComponentInfo
 	{
@@ -42,4 +35,12 @@ namespace fan
 		void		 ( *save )( const SingletonComponent&, Json& ) = nullptr;
 		void		 ( *load )( SingletonComponent&, const Json& ) = nullptr;		
 	};
+
+#define DECLARE_SINGLETON_COMPONENT()		\
+	private:								\
+	friend class EcsWorld;					\
+	static const uint32_t s_typeInfo;		\
+
+#define REGISTER_SINGLETON_COMPONENT( _componentType )	\
+	const uint32_t _componentType::s_typeInfo = SSID(#_componentType);	
 }

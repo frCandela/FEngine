@@ -8,6 +8,7 @@ namespace fan
 	class EcsWorld;
 
 	//================================================================================================================================
+	// diplays the state of the ecs world ( entities, components, memory consuption etc. )
 	//================================================================================================================================
 	class EcsWindow : public EditorWindow
 	{
@@ -20,5 +21,4 @@ namespace fan
 	private:
 		EcsWorld* m_world = nullptr;
 	};
-
 }

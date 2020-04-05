@@ -8,7 +8,7 @@
 namespace fan
 {
 	//================================================================================================================================
-	// fires bullets
+	// fires bullets pew pew
 	// is placed on the spaceship on the player 
 	//================================================================================================================================
 	struct Weapon : public Component
@@ -27,11 +27,6 @@ namespace fan
 		float bulletSpeed;
 		float bulletsPerSecond;
 		float bulletEnergyCost;
-
-		// explosion parameters
-		float explosionTime;
-		float exposionSpeed;
-		int particlesPerExplosion;
 
 		// time accumulator
 		float bulletsAccumulator;

@@ -12,7 +12,7 @@ namespace fan
 	class EcsWorld;
 
 	//================================================================================================================================
-	// contains the information of the editor camera
+	// Editor camera data (transform, camera, speed, sensitivity )
 	//================================================================================================================================
 	struct EditorCamera : public SingletonComponent
 	{

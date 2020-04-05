@@ -21,7 +21,7 @@ namespace fan
 		bool			IsValid()       const { return m_resource != nullptr; }
 		_ResourceType*  GetResource()   const { return static_cast< _ResourceType* >( m_resource ); }
 
-		_ResourceType* operator->() const { return ( _ResourceType* ) ( m_resource ); }
+		_ResourceType* operator->() const { return ( _ResourceType* ) ( m_resource ); } //@todo return a reference
 		_ResourceType* operator*()  const { return ( _ResourceType* ) ( m_resource ); } //@todo return a reference
 		ResourcePtr & operator=(const ResourcePtr&) = delete;
 		bool operator==( const _ResourceType* _other ) const { return _other == m_resource; }

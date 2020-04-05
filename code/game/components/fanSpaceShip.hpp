@@ -9,6 +9,7 @@
 namespace fan
 {
 	//==============================================================================================================================================================
+	// vehicle controlled by the player
 	//==============================================================================================================================================================
 	struct SpaceShip : public Component
 	{
@@ -28,7 +29,7 @@ namespace fan
 		float passiveDrag;
 		float energyConsumedPerUnitOfForce;
 		float remainingChargeEnergy;
-		float planetDamage;
+		float planetDamage;		// @todo remove this. Planets should have a damage component
 		float collisionRepulsionForce;
 
 		ComponentPtr<ParticleEmitter> fastForwardParticlesL;

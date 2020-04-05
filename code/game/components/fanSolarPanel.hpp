@@ -7,6 +7,7 @@
 namespace fan
 {
 	//================================================================================================================================
+	// creates energy from the sun light and stores it in a battery
 	//================================================================================================================================
 	class SolarPanel : public Component
 	{
@@ -19,7 +20,7 @@ namespace fan
 		static void Load( Component& _component, const Json& _json );
 
 		bool  isInSunlight;
-		float currentChargingRate;  // Energy/s
+		float currentChargingRate;  // Energy/s  @todo remove this ?
 		float minChargingRate;		// Energy/s
 		float maxChargingRate;		// Energy/s
 		float lowRange;				// Distance at which the solar panel reaches maximum charging rate

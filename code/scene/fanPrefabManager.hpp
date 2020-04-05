@@ -26,8 +26,6 @@ namespace fan
 
 		void RegisterPrefab( Prefab* _prefab );
 
-		std::string CleanPath( const std::string& _path );
-
 		// Callbacks
 		void ResolvePtr( ResourcePtr<Prefab>& _resourcePtr );
 	};

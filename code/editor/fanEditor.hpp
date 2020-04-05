@@ -29,6 +29,8 @@ namespace fan
 	struct Scene;
 
 	//================================================================================================================================
+	// base class that contains everything
+	// contains a game, a renderer, editions windows/ui and an editor ecs world (@wip)
 	//================================================================================================================================	
 	class Engine
 	{

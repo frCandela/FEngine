@@ -6,8 +6,8 @@
 namespace fan 
 {
 	//==============================================================================================================================================================
-	// An Entity is a data struct that contains pointers to components
-	// - signature is a bitset representing the components referenced by the entity
+	// An Entity is a data struct that is composed of a signature and pointers to components
+	// - signature is the bitset of the components referenced by the entity
 	// - handle is a unique key that allows access to an entity,( 0 == invalid )
 	//==============================================================================================================================================================
 	struct Entity

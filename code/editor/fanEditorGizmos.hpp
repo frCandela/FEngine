@@ -7,6 +7,8 @@ namespace fan
 	struct Scene;
 
 	//================================================================================================================================
+	// allows displaying of the translation manipulator
+	// @todo make this a singleton component in the editor ecs world
 	//================================================================================================================================	
 	class EditorGizmos
 	{

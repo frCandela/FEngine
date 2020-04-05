@@ -8,6 +8,9 @@ namespace fan
 	class Mesh;
 }
 
+//================================================================================================================================
+// Imgui widgets for mesh & textures
+//================================================================================================================================
 namespace ImGui
 {
 	void			FanBeginDragDropSourceTexture( fan::Texture* _texture, ImGuiDragDropFlags _flags = ImGuiDragDropFlags_None );

@@ -8,6 +8,8 @@ namespace fan
 	class Renderer;
 
 	//================================================================================================================================
+	// shows data from the renderer
+	// loaded mesh, textures, prefabs, lights & buffer sizes
 	//================================================================================================================================
 	class RenderWindow : public EditorWindow
 	{

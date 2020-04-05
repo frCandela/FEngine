@@ -7,5 +7,5 @@ namespace fan
 	//==============================================================================================================================================================
 	// game tags
 	//==============================================================================================================================================================
-	struct tag_sunlight_occlusion : Tag { DECLARE_TAG() }; // entity is destroyed when out of the sunlight
+	struct tag_sunlight_occlusion : Tag { DECLARE_TAG() }; // a particle is destroyed when out of the sunlight
 }

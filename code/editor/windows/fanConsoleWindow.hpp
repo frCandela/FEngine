@@ -6,10 +6,11 @@
 namespace fan
 {
 	//================================================================================================================================
+	// Visual output for the debug logging
+	//  allow submitting of text commands
 	//================================================================================================================================
 	class ConsoleWindow : public EditorWindow
 	{
-
 	private:
 		// Fast drawing version
 		struct LogItem

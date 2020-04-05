@@ -10,8 +10,8 @@ namespace fan
 	class EcsWorld;
 
 	//================================================================================================================================
-	// manages the input of the player
-	// this input can be direct in case of a local player or replicated of other players
+	// Stores the input of the player
+	// this input can be direct in case of a local player or replicated for remote players
 	//================================================================================================================================
 	struct PlayerInput : public Component
 	{
@@ -26,9 +26,9 @@ namespace fan
 		enum InputType { KEYBOARD_MOUSE, JOYSTICK };
 
 		InputType	type;
+		bool		isReplicated;
 		int			joystickID;
 		float		directionCutTreshold;
-		bool		isReplicated;
 		InputData	inputData;
 
 		std::vector< glm::vec2 > directionBuffer;
