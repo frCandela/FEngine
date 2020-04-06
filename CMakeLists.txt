@@ -40,7 +40,7 @@ add_compile_definitions(SFML_STATIC)
 # sources
 file( GLOB_RECURSE LPP_SRC deps/LivePP/*.h )
 list(APPEND APP_SOURCES
-    code/editor/fanMain.cpp
+    code/fanMain.cpp
     ${LPP_SRC}    
 ) 
 
@@ -64,7 +64,6 @@ set_target_properties(fengine_editor PROPERTIES
     CXX_STANDARD 17
     CXX_STANDARD_REQUIRED ON
 )
-
   # Force W4
 if(MSVC)
   if(CMAKE_CXX_FLAGS MATCHES "/W[0-4]")

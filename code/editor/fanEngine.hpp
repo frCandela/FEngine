@@ -29,6 +29,16 @@ namespace fan
 	struct Scene;
 
 	//================================================================================================================================
+	// the launch parameters of the engine
+	//================================================================================================================================
+	struct EngineSettings
+	{
+		std::string	loadScene = "";			// loads a scene at startup
+		bool		autoPlay = false;		// auto play the scene loaded at startup
+		bool		enableLivepp = false;	// enables Live++ hot reload
+	};
+
+	//================================================================================================================================
 	// base class that contains everything
 	// contains a game, a renderer, editions windows/ui and an editor ecs world (@wip)
 	//================================================================================================================================	
@@ -37,7 +47,7 @@ namespace fan
 	public:
 		Signal <> onLPPSynch;
 
-		Engine();
+		Engine( const EngineSettings _settings );
 		~Engine();
 
 		void Run();

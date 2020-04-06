@@ -1,4 +1,4 @@
-#include "fanEditor.hpp"
+#include "fanEngine.hpp"
 
 #include "render/pipelines/fanForwardPipeline.hpp"
 #include "render/pipelines/fanDebugPipeline.hpp"
@@ -77,7 +77,7 @@ namespace fan
 {
 	//================================================================================================================================
 	//================================================================================================================================
-	Engine::Engine() :
+	Engine::Engine( const EngineSettings _settings ) :
 		 m_game( new Game("game"))
 		,m_applicationShouldExit( false )
 		,m_editorWorld()
