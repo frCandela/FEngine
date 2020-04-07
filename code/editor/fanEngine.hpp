@@ -33,9 +33,11 @@ namespace fan
 	//================================================================================================================================
 	struct EngineSettings
 	{
-		std::string	loadScene = "";			// loads a scene at startup
-		bool		autoPlay = false;		// auto play the scene loaded at startup
-		bool		enableLivepp = false;	// enables Live++ hot reload
+		std::string	loadScene = "";				// loads a scene at startup
+		bool		autoPlay = false;			// auto play the scene loaded at startup
+		bool		enableLivepp = false;		// enables Live++ hot reload
+		glm::ivec2  window_position = {-1,-1};	// forces the position of the window
+		glm::ivec2  window_size = { -1,-1 };	// forces the size of the window
 	};
 
 	//================================================================================================================================

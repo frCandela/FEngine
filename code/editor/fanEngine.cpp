@@ -85,14 +85,29 @@ namespace fan
 		Engine::InitializeEditorEcsWorldTypes( m_editorWorld);
 		Engine::InitializeGameEcsWorldTypes( m_game->world );
 
-		// Get serialized editor values
-		VkExtent2D windowSize = { 1280,720 };
-		SerializedValues::Get().GetUInt( "renderer_extent_width", windowSize.width );
-		SerializedValues::Get().GetUInt( "renderer_extent_height", windowSize.height );
-
+		// window position
 		glm::ivec2 windowPosition = { 0,23 };
-		SerializedValues::Get().GetInt( "renderer_position_x", windowPosition.x );
-		SerializedValues::Get().GetInt( "renderer_position_y", windowPosition.y );
+		if( _settings.window_position != glm::ivec2 (-1, -1) ) 
+		{ 
+			windowPosition = _settings.window_position;	
+		}
+		else
+		{
+			SerializedValues::Get().GetInt( "renderer_position_x", windowPosition.x );
+			SerializedValues::Get().GetInt( "renderer_position_y", windowPosition.y );
+		}
+
+		// window size
+		VkExtent2D windowSize = { 1280,720 };
+		if( _settings.window_size != glm::ivec2( -1, -1 ) ) 
+		{ 
+			windowSize = { (uint32_t)_settings.window_size.x, (uint32_t)_settings.window_size.y };
+		}
+		else
+		{
+			SerializedValues::Get().GetUInt( "renderer_extent_width", windowSize.width );
+			SerializedValues::Get().GetUInt( "renderer_extent_height", windowSize.height );
+		}
 
 		SerializedValues::Get().LoadKeyBindings();
 
@@ -180,7 +195,6 @@ namespace fan
 		m_renderWindow->SetRenderer( m_renderer );
 		m_preferencesWindow->SetRenderer( m_renderer );
 
-
 		m_sceneWindow->onSelectSceneNode.Connect( &EditorSelection::SetSelectedSceneNode, m_selection );
 
 		// Instance messages				
@@ -207,9 +221,18 @@ namespace fan
 		scene.onLoad.Connect( &SceneWindow::OnExpandHierarchy, m_sceneWindow );
 		scene.onLoad.Connect( &Engine::OnSceneLoad, this );
 
+		// load scene
 		scene.New();
+		if( ! _settings.loadScene.empty() )	
+		{ 
+			scene.LoadFrom( _settings.loadScene ); 
 
-		Debug::Log( "done initializing" );
+			// auto play the scene
+			if( _settings.autoPlay )
+			{
+				OnGamePlay();
+			}
+		}
 	}
 
 	//================================================================================================================================

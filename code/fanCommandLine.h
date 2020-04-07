@@ -19,7 +19,7 @@ namespace fan
 		};
 
 		CommandLine();
-		EngineSettings	Parse( const std::vector< std::string >& _args );
+		EngineSettings	Parse( const std::vector< std::string >& _args );								  // parses the command line & returns its settings
 		const Command*  FindCommand( const std::string& _name );										  // returns the command matching _name
 		bool			IsCommand( const std::string& _text ) { return FindCommand( _text ) != nullptr; } // returns true it _text matches a command
 
@@ -27,6 +27,9 @@ namespace fan
 
 		// commands
 		static bool CMD_EnableLivePP( const std::vector < std::string >& _args, EngineSettings& _settings );
+		static bool CMD_OpenScene( const std::vector < std::string >& _args, EngineSettings& _settings );
+		static bool CMD_SetWindow( const std::vector < std::string >& _args, EngineSettings& _settings );
+		static bool CMD_AutoPlay( const std::vector < std::string >& _args, EngineSettings& _settings );
 	};
 
 	//==============================================================================================================================================================
@@ -34,8 +37,11 @@ namespace fan
 	//==============================================================================================================================================================
 	CommandLine::CommandLine() :
 		commands( {
-			{ &CommandLine::CMD_EnableLivePP, "-livepp", "usage: livepp <0-1>" }
-			} )
+			{ &CommandLine::CMD_EnableLivePP,	"-livepp",	 "usage: -livepp <0-1>" },
+			{ &CommandLine::CMD_OpenScene,		"-scene",	 "usage: -scene \"scene/path.scene\"" },
+			{ &CommandLine::CMD_SetWindow,		"-window",	 "usage:  -window <x <y> <width> <height>" },
+			{ &CommandLine::CMD_AutoPlay,		"-autoplay", "usage:  -autoplay <0-1>" }
+		} )
 	{}
 
 	//==============================================================================================================================================================
@@ -61,23 +67,22 @@ namespace fan
 	{
 		EngineSettings settings;
 
-		// live++ setting
+		// live++ default settings
 #ifndef NDEBUG		
 		settings.enableLivepp = true;
 #else				
 		settings.enableLivepp = false;
 #endif // !NDEBUG
 
-		// parse arguments looking for commands
+		// parse commands & arguments
 		int argIndex = 1;
 		while( argIndex < _args.size() )
 		{
-			// find the command		 
 			const Command* command = FindCommand( _args[argIndex] );
 			if( command != nullptr )
 			{
 
-				// find the arguments
+				// find the arguments of this command
 				std::vector < std::string > commandArguments;
 				while( ++argIndex < _args.size() && !IsCommand( _args[argIndex] ) )
 				{
@@ -93,7 +98,6 @@ namespace fan
 			}
 			else
 			{
-				// error
 				std::cout << "invalid command line" << std::endl;
 				break;
 			}
@@ -115,6 +119,56 @@ namespace fan
 		_settings.enableLivepp = value == 1 ? true : false;
 
 		std::cout << "cmd : live++ " << ( value == 1 ? "enabled" : "disabled" ) << std::endl;
+
+		return true;
+	}
+
+	//==============================================================================================================================================================
+	// command: -scene "scene/path.scene"
+	// auto opens a scene at startup
+	//==============================================================================================================================================================
+	bool CommandLine::CMD_OpenScene( const std::vector < std::string >& _args, EngineSettings& _settings )
+	{
+		if( _args.size() != 1 ) { return false; }
+
+		_settings.loadScene = _args[0];
+
+		std::cout << "cmd : open scene " << _settings.loadScene << std::endl;
+		return true;
+	}
+
+	//==============================================================================================================================================================
+	// command: -window <x <y> <width> <height>"
+	// moves the engine window it position (x,y) and resizes it to (width,height)
+	//==============================================================================================================================================================
+	bool CommandLine::CMD_SetWindow( const std::vector < std::string >& _args, EngineSettings& _settings )
+	{
+		if( _args.size() != 4 ) { return false; }
+
+		_settings.window_position.x = std::atoi( _args[0].c_str() );
+		_settings.window_position.y = std::atoi( _args[1].c_str() );
+		_settings.window_size.x = std::atoi( _args[2].c_str() );
+		_settings.window_size.y = std::atoi( _args[3].c_str() );
+
+		std::cout << "cmd : window position(" << _settings.window_position.x << "," << _settings.window_position.y << ")";
+		std::cout << ", size(" << _settings.window_size.x << "," << _settings.window_size.y << ")" << std::endl;
+		return true;
+	}
+
+	//==============================================================================================================================================================
+	// command: -autoplay <0-1>"
+	// if a scene is loaded at startup, plays it directly
+	//==============================================================================================================================================================
+	bool CommandLine::CMD_AutoPlay( const std::vector < std::string >& _args, EngineSettings& _settings )
+	{
+		if( _args.size() != 1 ) { return false; }
+
+		const int value = std::atoi( _args[0].c_str() );
+		if( value != 1 && value != 0 ) { return false; }
+
+		_settings.autoPlay = value == 1 ? true : false;
+
+		std::cout << "cmd : autoplay " << ( value == 1 ? "enabled" : "disabled" ) << std::endl;
 
 		return true;
 	}
