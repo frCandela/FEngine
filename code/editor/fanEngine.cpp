@@ -77,10 +77,11 @@ namespace fan
 {
 	//================================================================================================================================
 	//================================================================================================================================
-	Engine::Engine( const EngineSettings _settings ) :
-		 m_game( new Game("game"))
-		,m_applicationShouldExit( false )
-		,m_editorWorld()
+	Engine::Engine( const LaunchSettings _settings ) :
+		m_game( new Game( "game" ) )
+		, m_applicationShouldExit( false )
+		, m_editorWorld()
+		, m_launchSettings( _settings )
 	{
 		Engine::InitializeEditorEcsWorldTypes( m_editorWorld);
 		Engine::InitializeGameEcsWorldTypes( m_game->world );
@@ -242,13 +243,17 @@ namespace fan
 		// Deletes ui
 		delete m_mainMenuBar;
 
-		// Serialize editor positions
-		const VkExtent2D rendererSize = m_window->GetExtent();
-		const glm::ivec2 windowPosition = m_window->GetPosition();
-		SerializedValues::Get().SetUInt( "renderer_extent_width", rendererSize.width );
-		SerializedValues::Get().SetUInt( "renderer_extent_height", rendererSize.height );
-		SerializedValues::Get().SetInt( "renderer_position_x", windowPosition.x );
-		SerializedValues::Get().SetInt( "renderer_position_y", windowPosition.y );
+		// Serialize editor positions if it was not modified by a launch command
+		if( m_launchSettings.window_size == glm::ivec2( -1, -1 ) )
+		{
+			const VkExtent2D rendererSize = m_window->GetExtent();
+			const glm::ivec2 windowPosition = m_window->GetPosition();
+			SerializedValues::Get().SetUInt( "renderer_extent_width", rendererSize.width );
+			SerializedValues::Get().SetUInt( "renderer_extent_height", rendererSize.height );
+			SerializedValues::Get().SetInt( "renderer_position_x", windowPosition.x );
+			SerializedValues::Get().SetInt( "renderer_position_y", windowPosition.y );
+		}
+
 		SerializedValues::Get().SaveValuesToDisk();
 
 		delete m_game;

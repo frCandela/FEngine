@@ -3,7 +3,7 @@
 #include "LivePP/API/LPP_API.h"
 #pragma warning( pop )
 
-#include "fanCommandLine.h"
+#include "fanLaunchArguments.h"
 
 namespace fan
 {
@@ -13,7 +13,7 @@ namespace fan
 	class LPPMain
 	{
 	public:
-		LPPMain( EngineSettings& _settings )
+		LPPMain( LaunchSettings& _settings )
 		{
 			fan::Engine engine( _settings );
 			if( _settings.enableLivepp )
@@ -37,8 +37,6 @@ namespace fan
 }
 
 //==============================================================================================================================================================
-// an example command 
-// fengine_editor.exe - livepp 0 - scene "content/scenes/game00.scene" - autoplay 1 - window - 1920 0 960 540
 //==============================================================================================================================================================
 int main( int _argc, char* _argv[] )
 {
@@ -52,8 +50,8 @@ int main( int _argc, char* _argv[] )
 // force arguments into the command line
 // 	args.push_back( "-livepp" );
 // 	args.push_back( "0" );
-  args.push_back( "-scene" );
-  args.push_back( "content/scenes/game00.scene" );
+//  args.push_back( "-scene" );
+//  args.push_back( "content/scenes/game00.scene" );
 // 	args.push_back( "-window" );
 // 	args.push_back( "1" );
 // 	args.push_back( "2" );
@@ -63,8 +61,8 @@ int main( int _argc, char* _argv[] )
 //  args.push_back( "1" );
 
 	// Parse the arguments & run the engine
-	fan::CommandLine commandLine;
-	fan::EngineSettings settings = commandLine.Parse( args );
+	fan::LaunchArguments commandLine;
+	fan::LaunchSettings settings = commandLine.Parse( args );
 	fan::LPPMain main( settings );
 
 	return 0;

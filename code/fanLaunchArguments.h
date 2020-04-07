@@ -7,51 +7,51 @@ namespace fan
 	//==============================================================================================================================================================
 	// CommandLine generates EngineSettings from command line arguments 
 	//==============================================================================================================================================================
-	struct CommandLine
+	struct LaunchArguments
 	{
 		//===============================================================================
 		//===============================================================================
-		struct Command
+		struct LaunchCommand
 		{
-			bool ( *Run )( const std::vector < std::string >& _args, EngineSettings& _settings ) = nullptr; // run the command ( parse arguments & modify the settings )
+			bool ( *Run )( const std::vector < std::string >& _args, LaunchSettings& _settings ) = nullptr; // run the command ( parse arguments & modify the settings )
 			std::string name = "";																			// command string
 			std::string usage = "";																			// usage helper string
 		};
 
-		CommandLine();
-		EngineSettings	Parse( const std::vector< std::string >& _args );								  // parses the command line & returns its settings
-		const Command*  FindCommand( const std::string& _name );										  // returns the command matching _name
-		bool			IsCommand( const std::string& _text ) { return FindCommand( _text ) != nullptr; } // returns true it _text matches a command
+		LaunchArguments();
+		LaunchSettings			Parse( const std::vector< std::string >& _args );								  // parses the command line & returns its settings
+		const LaunchCommand*	FindCommand( const std::string& _name );										  // returns the command matching _name
+		bool					IsCommand( const std::string& _text ) { return FindCommand( _text ) != nullptr; } // returns true it _text matches a command
 
-		std::vector< Command >	commands;	// the full list of commands of the engine
+		std::vector< LaunchCommand >	commands;	// the full list of commands of the engine
 
 		// commands
-		static bool CMD_EnableLivePP( const std::vector < std::string >& _args, EngineSettings& _settings );
-		static bool CMD_OpenScene( const std::vector < std::string >& _args, EngineSettings& _settings );
-		static bool CMD_SetWindow( const std::vector < std::string >& _args, EngineSettings& _settings );
-		static bool CMD_AutoPlay( const std::vector < std::string >& _args, EngineSettings& _settings );
+		static bool CMD_EnableLivePP( const std::vector < std::string >& _args, LaunchSettings& _settings );
+		static bool CMD_OpenScene( const std::vector < std::string >& _args, LaunchSettings& _settings );
+		static bool CMD_SetWindow( const std::vector < std::string >& _args, LaunchSettings& _settings );
+		static bool CMD_AutoPlay( const std::vector < std::string >& _args, LaunchSettings& _settings );
 	};
 
 	//==============================================================================================================================================================
 	// generates the list of all commands
 	//==============================================================================================================================================================
-	CommandLine::CommandLine() :
+	LaunchArguments::LaunchArguments() :
 		commands( {
-			{ &CommandLine::CMD_EnableLivePP,	"-livepp",	 "usage: -livepp <0-1>" },
-			{ &CommandLine::CMD_OpenScene,		"-scene",	 "usage: -scene \"scene/path.scene\"" },
-			{ &CommandLine::CMD_SetWindow,		"-window",	 "usage:  -window <x <y> <width> <height>" },
-			{ &CommandLine::CMD_AutoPlay,		"-autoplay", "usage:  -autoplay <0-1>" }
+			{ &LaunchArguments::CMD_EnableLivePP,	"-livepp",	 "usage: -livepp <0-1>" },
+			{ &LaunchArguments::CMD_OpenScene,		"-scene",	 "usage: -scene \"scene/path.scene\"" },
+			{ &LaunchArguments::CMD_SetWindow,		"-window",	 "usage:  -window <x> <y> <width> <height>" },
+			{ &LaunchArguments::CMD_AutoPlay,		"-autoplay", "usage:  -autoplay <0-1>" }
 		} )
 	{}
 
 	//==============================================================================================================================================================
 	// returns the command with a name matching _arg
 	//==============================================================================================================================================================
-	const CommandLine::Command* CommandLine::FindCommand( const std::string& _arg )
+	const LaunchArguments::LaunchCommand* LaunchArguments::FindCommand( const std::string& _arg )
 	{
 		for( int cmdIndex = 0; cmdIndex < commands.size(); cmdIndex++ )
 		{
-			const Command& cmd = commands[cmdIndex];
+			const LaunchCommand& cmd = commands[cmdIndex];
 			if( _arg == cmd.name )
 			{
 				return &cmd;
@@ -63,9 +63,9 @@ namespace fan
 	//==============================================================================================================================================================
 	// parse command line arguments and returns EngineSettings
 	//==============================================================================================================================================================
-	EngineSettings CommandLine::Parse( const std::vector< std::string >& _args )
+	LaunchSettings LaunchArguments::Parse( const std::vector< std::string >& _args )
 	{
-		EngineSettings settings;
+		LaunchSettings settings;
 
 		// live++ default settings
 #ifndef NDEBUG		
@@ -78,7 +78,7 @@ namespace fan
 		int argIndex = 1;
 		while( argIndex < _args.size() )
 		{
-			const Command* command = FindCommand( _args[argIndex] );
+			const LaunchCommand* command = FindCommand( _args[argIndex] );
 			if( command != nullptr )
 			{
 
@@ -109,7 +109,7 @@ namespace fan
 	// command: -livepp <0-1>
 	// forces the activation of live++ 
 	//==============================================================================================================================================================
-	bool CommandLine::CMD_EnableLivePP( const std::vector < std::string >& _args, EngineSettings& _settings )
+	bool LaunchArguments::CMD_EnableLivePP( const std::vector < std::string >& _args, LaunchSettings& _settings )
 	{
 		if( _args.size() != 1 ) { return false; }
 
@@ -127,7 +127,7 @@ namespace fan
 	// command: -scene "scene/path.scene"
 	// auto opens a scene at startup
 	//==============================================================================================================================================================
-	bool CommandLine::CMD_OpenScene( const std::vector < std::string >& _args, EngineSettings& _settings )
+	bool LaunchArguments::CMD_OpenScene( const std::vector < std::string >& _args, LaunchSettings& _settings )
 	{
 		if( _args.size() != 1 ) { return false; }
 
@@ -141,7 +141,7 @@ namespace fan
 	// command: -window <x <y> <width> <height>"
 	// moves the engine window it position (x,y) and resizes it to (width,height)
 	//==============================================================================================================================================================
-	bool CommandLine::CMD_SetWindow( const std::vector < std::string >& _args, EngineSettings& _settings )
+	bool LaunchArguments::CMD_SetWindow( const std::vector < std::string >& _args, LaunchSettings& _settings )
 	{
 		if( _args.size() != 4 ) { return false; }
 
@@ -159,7 +159,7 @@ namespace fan
 	// command: -autoplay <0-1>"
 	// if a scene is loaded at startup, plays it directly
 	//==============================================================================================================================================================
-	bool CommandLine::CMD_AutoPlay( const std::vector < std::string >& _args, EngineSettings& _settings )
+	bool LaunchArguments::CMD_AutoPlay( const std::vector < std::string >& _args, LaunchSettings& _settings )
 	{
 		if( _args.size() != 1 ) { return false; }
 

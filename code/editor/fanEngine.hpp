@@ -31,7 +31,7 @@ namespace fan
 	//================================================================================================================================
 	// the launch parameters of the engine
 	//================================================================================================================================
-	struct EngineSettings
+	struct LaunchSettings
 	{
 		std::string	loadScene = "";				// loads a scene at startup
 		bool		autoPlay = false;			// auto play the scene loaded at startup
@@ -49,7 +49,7 @@ namespace fan
 	public:
 		Signal <> onLPPSynch;
 
-		Engine( const EngineSettings _settings );
+		Engine( const LaunchSettings _settings );
 		~Engine();
 
 		void Run();
@@ -58,6 +58,8 @@ namespace fan
 	private:
 		EcsWorld m_editorWorld;
 		Game*	 m_game;
+
+		const LaunchSettings m_launchSettings;
 
 		// UI elements
 		MainMenuBar* m_mainMenuBar;
