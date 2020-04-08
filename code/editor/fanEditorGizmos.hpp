@@ -4,7 +4,7 @@
 
 namespace fan
 {
-	struct Scene;
+	class EcsWorld;
 
 	//================================================================================================================================
 	// allows displaying of the translation manipulator
@@ -23,7 +23,7 @@ namespace fan
 
 	public:
 
-		EditorGizmos( Scene& _scene );
+		EditorGizmos( EcsWorld& _world );
 		bool DrawMoveGizmo( const btTransform _transform, const size_t _uniqueID, btVector3& _newPosition );
 
 		static EditorGizmos& Get() { return *s_editorGizmos; }
@@ -32,6 +32,6 @@ namespace fan
 		static EditorGizmos* s_editorGizmos; // Used for global debug draw
 
 		std::map< size_t, GizmoCacheData > m_gizmoCacheData;
-		Scene* m_scene;
+		EcsWorld* m_world;
 	};
 }

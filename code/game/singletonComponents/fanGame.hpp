@@ -3,17 +3,18 @@
 #include "game/fanGamePrecompiled.hpp"
 
 #include "ecs/fanSingletonComponent.hpp"
+#include "scene/fanSceneResourcePtr.hpp"
 
 namespace fan
 {
-	struct Game;
+	struct GameClient;
+	struct GameServer;
 
 	//================================================================================================================================
-	// a reference to the game
+	// Contains game data & a reference to the game client or server depending on which is used
 	// allows saving properties of the game into the scene & edition of parameters from the editor
-	// you normally don't need it for gameplay code (we will see how this goes :3 )
 	//================================================================================================================================	
-	struct GameReference : public SingletonComponent
+	struct Game : public SingletonComponent
 	{
 		DECLARE_SINGLETON_COMPONENT()
 	public:
@@ -23,6 +24,14 @@ namespace fan
 		static void Save( const SingletonComponent& _component, Json& _json );
 		static void Load( SingletonComponent& _component, const Json& _json );
 
-		Game* const game = nullptr;
+		enum State { STOPPED, PLAYING, PAUSED };
+
+		State	    state;
+		std::string name;
+		PrefabPtr	spaceshipPrefab;
+
+		// @hack for the editor, only one of these should be null
+		GameClient* gameClient = nullptr;
+		GameServer* gameServer = nullptr;
 	};
 }

@@ -1,4 +1,4 @@
-#include "game/network/fanGameServer.hpp"
+#include "game/network/fanOldGameServer.hpp"
 
 #include "network/packets/fanPacketLogin.hpp"
 #include "network/packets/fanPacketPing.hpp"
@@ -14,7 +14,7 @@ namespace fan
 
 		//================================================================================================================================
 		//================================================================================================================================
-		void GameServer::OnAttach()
+		void OldGameServer::OnAttach()
 	{
 		//Actor::OnAttach();
 		m_socket.Create( "[SERVER]", 53000 );
@@ -22,7 +22,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void GameServer::OnDetach()
+	void OldGameServer::OnDetach()
 	{
 		//Actor::OnDetach();
 		m_socket.UnBind();
@@ -30,7 +30,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void GameServer::Start()
+	void OldGameServer::Start()
 	{
 // 		// Remove this if we are on a client scene HACK?
 // 		if ( !GetScene().IsServer() )
@@ -53,7 +53,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void GameServer::Stop()
+	void OldGameServer::Stop()
 	{
 // 		ClearClients();
 // 		onClientConnected.Disconnect( &PlayersManager::AddPlayer, m_playersManager );
@@ -63,7 +63,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void GameServer::Update( const float _delta )
+	void OldGameServer::Update( const float _delta )
 	{
 		if ( m_state != ServerState::SERVER_NONE )
 		{
@@ -79,7 +79,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void GameServer::Receive()
+	void OldGameServer::Receive()
 	{
 		sf::Packet		packet;
 		bool disconnected = false;
@@ -102,7 +102,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void GameServer::ProcessPacket( const sf::IpAddress& _ip, const Port& _port, sf::Packet& _packet )
+	void OldGameServer::ProcessPacket( const sf::IpAddress& _ip, const Port& _port, sf::Packet& _packet )
 	{
 		ClientData* client = FindClient( _ip, _port );
 
@@ -147,7 +147,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	bool GameServer::Send( sf::Packet _packet, const ClientData& _client )
+	bool OldGameServer::Send( sf::Packet _packet, const ClientData& _client )
 	{
 		return m_socket.Send( _packet, _client.ipAdress, _client.port );
 	}
@@ -155,7 +155,7 @@ namespace fan
 	//================================================================================================================================
 	// Send to all clients
 	//================================================================================================================================
-	void GameServer::Broadcast( sf::Packet _packet )
+	void OldGameServer::Broadcast( sf::Packet _packet )
 	{
 		for ( int clientIndex = 0; clientIndex < m_clients.size(); clientIndex++ )
 		{
@@ -166,7 +166,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void GameServer::UpdateClient( ClientData& _client, const float _delta )
+	void OldGameServer::UpdateClient( ClientData& _client, const float _delta )
 	{
 		_client.lastResponse += _delta;
 
@@ -183,7 +183,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void GameServer::StartGame()
+	void OldGameServer::StartGame()
 	{
 // 		Broadcast( PacketStartGame().ToPacket() );
 // 		m_playersManager->SpawnSpaceShips();
@@ -191,11 +191,11 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void GameServer::LateUpdate( const float /*_delta*/ ) {}
+	void OldGameServer::LateUpdate( const float /*_delta*/ ) {}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	GameServer::ClientData* GameServer::AddClient( const sf::IpAddress& _ip, const Port& _port, const PacketLogin& _loginInfo )
+	OldGameServer::ClientData* OldGameServer::AddClient( const sf::IpAddress& _ip, const Port& _port, const PacketLogin& _loginInfo )
 	{
 		assert( FindClient( _ip, _port ) == nullptr );
 
@@ -213,7 +213,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void GameServer::RemoveClient( ClientData& _client )
+	void OldGameServer::RemoveClient( ClientData& _client )
 	{
 		for ( int clientIndex = ( int ) m_clients.size() - 1; clientIndex >= 0; --clientIndex )
 		{
@@ -227,7 +227,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void GameServer::ClearClients()
+	void OldGameServer::ClearClients()
 	{
 		while ( m_clients.size() > 0 )
 		{
@@ -237,7 +237,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	GameServer::ClientData* GameServer::FindClient( const sf::IpAddress& _ip, const Port& _port )
+	OldGameServer::ClientData* OldGameServer::FindClient( const sf::IpAddress& _ip, const Port& _port )
 	{
 		for ( int clientIndex = 0; clientIndex < m_clients.size(); ++clientIndex )
 		{
@@ -252,7 +252,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void GameServer::OnGui()
+	void OldGameServer::OnGui()
 	{
 
 
@@ -268,7 +268,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	bool GameServer::Load( const Json& _json )
+	bool OldGameServer::Load( const Json& _json )
 	{
 
 		return true;
@@ -276,7 +276,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	bool GameServer::Save( Json& _json ) const
+	bool OldGameServer::Save( Json& _json ) const
 	{
 
 		return true;

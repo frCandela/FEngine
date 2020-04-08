@@ -13,7 +13,7 @@ namespace fan
 	//================================================================================================================================
 	// @wip old code from the gameobject system
 	//================================================================================================================================
-	class GameServer// : public Actor
+	class OldGameServer// : public Actor
 	{
 	public:
 		enum ServerState { SERVER_NONE, SERVER_WAITING_PLAYERS };

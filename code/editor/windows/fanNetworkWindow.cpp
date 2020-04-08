@@ -1,6 +1,6 @@
 #include "editor/windows/fanNetworkWindow.hpp"
-#include "game/network/fanGameServer.hpp"
-#include "game/network/fanGameClient.hpp"
+#include "game/fanGameServer.hpp"
+#include "game/fanGameClient.hpp"
 #include "scene/singletonComponents/fanScene.hpp"
 
 namespace fan

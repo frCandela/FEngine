@@ -19,6 +19,8 @@ namespace fan
 		void Init( Device& _device );
 		void Clear();
 
+		bool IsCleared() { return m_device == nullptr; } //@hack ressources gpu buffers deletion problem
+
 		void	 ResolvePtr( ResourcePtr< Texture >& _resourcePtr );
 		Device&  GetDevice() const { assert( m_device != nullptr ); return *m_device; }
 		Texture* GetTexture( const std::string& _path );

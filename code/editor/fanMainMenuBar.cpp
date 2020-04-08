@@ -9,16 +9,17 @@
 #include "core/input/fanInputManager.hpp"
 #include "core/time/fanProfiler.hpp"
 #include "core/time/fanTime.hpp"
-#include "game/fanGame.hpp"
+#include "ecs/fanEcsWorld.hpp"
 #include "scene/singletonComponents/fanScene.hpp"
 #include "scene/components/fanSceneNode.hpp"
 #include "scene/components/fanTransform.hpp"
+#include "game/singletonComponents/fanGame.hpp"
 
 namespace fan
 {
 	//================================================================================================================================
 	//================================================================================================================================
-	MainMenuBar::MainMenuBar( Game& _game, EditorSelection& _editorSelection )
+	MainMenuBar::MainMenuBar( EcsWorld& _world, EditorSelection& _editorSelection )
 		: m_editorSelection( _editorSelection )
 		, m_showImguiDemoWindow( true )
 		, m_showAABB( false )
@@ -27,7 +28,7 @@ namespace fan
 		, m_showNormals( false )
 		, m_showLights( false )
 		, m_sceneExtensionFilter( RenderGlobal::s_sceneExtensions )
-		, m_game( &_game )
+		, m_world( &_world )
 	{
 
 		SerializedValues::Get().GetBool( "show_imguidemo", m_showImguiDemoWindow );
@@ -274,7 +275,7 @@ namespace fan
 	//================================================================================================================================
 	void MainMenuBar::DrawModals()
 	{
-		Scene& scene = m_game->world.GetSingletonComponent<Scene>();
+		Scene& scene = m_world->GetSingletonComponent<Scene>();
 
 		// New scene
 		if ( ImGui::FanSaveFileModal( "New scene", RenderGlobal::s_sceneExtensions, m_pathBuffer ) )
@@ -303,7 +304,8 @@ namespace fan
 	//================================================================================================================================
 	void MainMenuBar::New()
 	{
-		if( m_game->state != Game::STOPPED )
+		Game& game = m_world->GetSingletonComponent<Game>();
+		if( game.state != Game::STOPPED )
 		{
 			Debug::Warning() << "creating scenes is disabled in play mode" << Debug::Endl();
 			return;
@@ -317,7 +319,8 @@ namespace fan
 	//================================================================================================================================
 	void MainMenuBar::Open()
 	{
-		if( m_game->state != Game::STOPPED )
+		Game& game = m_world->GetSingletonComponent<Game>();
+		if( game.state != Game::STOPPED )
 		{
 			Debug::Warning() << "loading scenes is disabled in play mode" << Debug::Endl();
 			return;
@@ -332,7 +335,8 @@ namespace fan
 	//================================================================================================================================
 	void MainMenuBar::Reload()
 	{
-		Scene& scene = m_game->world.GetSingletonComponent<Scene>();
+		Game& game = m_world->GetSingletonComponent<Game>();
+		Scene& scene = m_world->GetSingletonComponent<Scene>();
 
 		if( scene.path.empty() )
 		{
@@ -340,11 +344,11 @@ namespace fan
 			return;
 		}
 
-		if( m_game->state == Game::STOPPED )
+		if( game.state == Game::STOPPED )
 		{
 			// save old camera transform
-			const EntityID oldCameraID = m_game->world.GetEntityID( scene.mainCamera->handle );
-			btTransform oldCameraTransform = m_game->world.GetComponent<Transform>( oldCameraID ).transform;
+			const EntityID oldCameraID = m_world->GetEntityID( scene.mainCamera->handle );
+			btTransform oldCameraTransform = m_world->GetComponent<Transform>( oldCameraID ).transform;
 
 			// save old selection
 			SceneNode* prevSelectionNode = m_editorSelection.GetSelectedSceneNode();
@@ -354,8 +358,8 @@ namespace fan
 			scene.LoadFrom( scene.path );
 
 			// restore camera
-			const EntityID newCameraID = m_game->world.GetEntityID( scene.mainCamera->handle );
-			m_game->world.GetComponent<Transform>( newCameraID ).transform = oldCameraTransform;
+			const EntityID newCameraID = m_world->GetEntityID( scene.mainCamera->handle );
+			m_world->GetComponent<Transform>( newCameraID ).transform = oldCameraTransform;
 
 			// restore selection
 			if( prevSelectionID != 0 )
@@ -377,9 +381,10 @@ namespace fan
 	//================================================================================================================================
 	void MainMenuBar::Save()
 	{
-		Scene& scene = m_game->world.GetSingletonComponent<Scene>();
+		Game& game = m_world->GetSingletonComponent<Game>();
+		Scene& scene = m_world->GetSingletonComponent<Scene>();
 
-		if( m_game->state != Game::STOPPED )
+		if( game.state != Game::STOPPED )
 		{
 			Debug::Warning() << "saving is disabled in play mode" << Debug::Endl();
 			return;

@@ -12,7 +12,7 @@ namespace fan
 	//================================================================================================================================
 	// @wip old code from the gameobject system
 	//================================================================================================================================
-	class GameClient// : public Actor
+	class OldGameClient// : public Actor
 	{
 	public:
 		enum NetPlayerState { PLAYER_NONE, PLAYER_CONNECTING, PLAYER_CONNECTED };

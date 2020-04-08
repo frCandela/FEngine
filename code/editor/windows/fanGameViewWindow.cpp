@@ -1,16 +1,17 @@
 #include "editor/windows/fanGameViewWindow.hpp"
+
 #include "core/input/fanMouse.hpp"
 #include "core/time/fanTime.hpp"
 #include "scene/singletonComponents/fanScene.hpp"
-#include "game/fanGame.hpp"
+#include "game/singletonComponents/fanGame.hpp"
+#include "ecs/fanEcsWorld.hpp"
 
 namespace fan
 {
-
 	//================================================================================================================================
 	//================================================================================================================================
-	GameViewWindow::GameViewWindow( Game& _game ) : EditorWindow( "game view", ImGui::IconType::JOYSTICK16 )
-		,m_game( &_game )
+	GameViewWindow::GameViewWindow( EcsWorld& _world ) : EditorWindow( "game view", ImGui::IconType::JOYSTICK16 )
+		, m_world( &_world )
 		,m_isHovered( false )
 	{
 		AddFlag( ImGuiWindowFlags_MenuBar );
@@ -20,6 +21,7 @@ namespace fan
 	//================================================================================================================================
 	void GameViewWindow::OnGui()
 	{
+		Game& game = m_world->GetSingletonComponent<Game>();
 
 		// update window size
 		const ImVec2 imGuiSize = ImGui::GetContentRegionAvail();
@@ -33,12 +35,12 @@ namespace fan
 		// draw menu bar
 		if ( ImGui::BeginMenuBar() )
 		{
+			
 			ImGui::Text( "%d x %d", ( int ) size.x(), ( int ) size.y() );
 
 			const ImVec4 disabledColor = ImVec4( 0.3f, 0.3f, 0.3f, 0.3f );
-			const Game::State state = m_game->state;
 
-			if ( state == Game::STOPPED )
+			if ( game.state == Game::STOPPED )
 			{
 				// Play
 				if ( ImGui::ButtonIcon( ImGui::PLAY16, { 16,16 }, -1, ImVec4( 0, 0, 0, 0 ), ImVec4( 1.f, 1.f, 1.f, 1.f ) ) )
@@ -56,20 +58,20 @@ namespace fan
 			}
 
 			const ImVec4 pauseTint
-				= state == Game::PLAYING ? ImVec4( 1.f, 1.f, 1.f, 1.f )
-				: state == Game::PAUSED ? ImVec4( 0.9f, 0.9f, 0.9f, 1.f )
+				= game.state == Game::PLAYING ? ImVec4( 1.f, 1.f, 1.f, 1.f )
+				: game.state == Game::PAUSED ? ImVec4( 0.9f, 0.9f, 0.9f, 1.f )
 				: disabledColor;
 
 			// Pause
 			if ( ImGui::ButtonIcon( ImGui::PAUSE16, { 16,16 }, -1, ImVec4( 0, 0, 0, 0.f ), pauseTint ) )
 			{
-				if ( state == Game::PLAYING ) { onPause.Emmit(); }
-				else if ( state == Game::PAUSED ) { onResume.Emmit(); }
+				if ( game.state == Game::PLAYING ) { onPause.Emmit(); }
+				else if ( game.state == Game::PAUSED ) { onResume.Emmit(); }
 			}
 
 			// Step
-			const ImVec4 stepTint = state == Game::PAUSED ? ImVec4( 1.f, 1.f, 1.f, 1.f ) : disabledColor;
-			if ( ImGui::ButtonIcon( ImGui::STEP16, { 16,16 }, -1, ImVec4( 0, 0, 0, 0 ), stepTint ) && state == Game::PAUSED )
+			const ImVec4 stepTint = game.state == Game::PAUSED ? ImVec4( 1.f, 1.f, 1.f, 1.f ) : disabledColor;
+			if ( ImGui::ButtonIcon( ImGui::STEP16, { 16,16 }, -1, ImVec4( 0, 0, 0, 0 ), stepTint ) && game.state == Game::PAUSED )
 			{
 				onStep.Emmit();
 			}

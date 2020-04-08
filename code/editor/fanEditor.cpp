@@ -1,4 +1,4 @@
-#include "fanEngine.hpp"
+#include "fanEditor.hpp"
 
 #include "render/pipelines/fanForwardPipeline.hpp"
 #include "render/pipelines/fanDebugPipeline.hpp"
@@ -70,21 +70,20 @@
 #include "scene/fanSceneTags.hpp"
 #include "scene/fanPrefab.hpp"
 
-#include "game/fanGame.hpp"
 #include "game/singletonComponents/fanGameCamera.hpp"
+#include "game/singletonComponents/fanGame.hpp"
 
 namespace fan
 {
 	//================================================================================================================================
 	//================================================================================================================================
-	Engine::Engine( const LaunchSettings _settings ) :
-		m_game( new Game( "game" ) )
+	Editor::Editor( const LaunchSettings _settings, EcsWorld& _gameWorld ) :
+		m_gameWorld( _gameWorld )
 		, m_applicationShouldExit( false )
-		, m_editorWorld()
 		, m_launchSettings( _settings )
 	{
-		Engine::InitializeEditorEcsWorldTypes( m_editorWorld);
-		Engine::InitializeGameEcsWorldTypes( m_game->world );
+		Editor::InitializeEditorEcsWorldTypes( m_editorWorld);
+		Editor::InitializeGameEcsWorldTypes( m_gameWorld );
 
 		// window position
 		glm::ivec2 windowPosition = { 0,23 };
@@ -159,23 +158,23 @@ namespace fan
 			m_renderer->SetClearColor( clearColor.ToGLM() );
 		}
 
-		Scene& scene = m_game->world.GetSingletonComponent<Scene>();
+		Scene& scene = m_gameWorld.GetSingletonComponent<Scene>();
 
 		// Initialize editor components		
 		m_selection = new EditorSelection( scene );
 		m_copyPaste = new EditorCopyPaste( *m_selection );
-		m_gizmos = new EditorGizmos( scene );
+		m_gizmos = new EditorGizmos( m_gameWorld );
 		m_renderWindow = new RenderWindow();
 		m_sceneWindow = new SceneWindow( scene );
 		m_inspectorWindow = new InspectorWindow();
 		m_consoleWindow = new ConsoleWindow();
 		m_ecsWindow = new EcsWindow( *scene.world );
 		m_profilerWindow = new ProfilerWindow();
-		m_gameViewWindow = new GameViewWindow( *m_game );
+		m_gameViewWindow = new GameViewWindow( m_gameWorld );
 		m_preferencesWindow = new PreferencesWindow();
 		m_networkWindow = new NetworkWindow( scene );
-		m_singletonsWindow = new SingletonsWindow( m_game->world );
-		m_mainMenuBar = new MainMenuBar( *m_game, *m_selection );
+		m_singletonsWindow = new SingletonsWindow( m_gameWorld );
+		m_mainMenuBar = new MainMenuBar( m_gameWorld, *m_selection );
 		m_mainMenuBar->SetGrid( &m_editorWorld.GetSingletonComponent<EditorGrid>() );
 		m_mainMenuBar->SetWindows( {
 			  m_renderWindow
@@ -201,26 +200,26 @@ namespace fan
 		// Instance messages				
 		m_mainMenuBar->onReloadShaders.Connect( &Renderer::ReloadShaders, m_renderer );
 		m_mainMenuBar->onReloadIcons.Connect( &Renderer::ReloadIcons, m_renderer );
-		m_mainMenuBar->onExit.Connect( &Engine::Exit, this );
+		m_mainMenuBar->onExit.Connect( &Editor::Exit, this );
 		m_selection->onSceneNodeSelected.Connect( &SceneWindow::OnSceneNodeSelected, m_sceneWindow );
 		m_selection->onSceneNodeSelected.Connect( &InspectorWindow::OnSceneNodeSelected, m_inspectorWindow );
 
 		// Events linking
 		Input::Get().Manager().FindEvent( "reload_shaders" )->Connect( &Renderer::ReloadShaders, m_renderer );
-		Input::Get().Manager().FindEvent( "play_pause" )->Connect( &Engine::SwitchPlayStop, this );
+		Input::Get().Manager().FindEvent( "play_pause" )->Connect( &Editor::SwitchPlayStop, this );
 		Input::Get().Manager().FindEvent( "copy" )->Connect( &EditorCopyPaste::OnCopy, m_copyPaste );
 		Input::Get().Manager().FindEvent( "paste" )->Connect( &EditorCopyPaste::OnPaste, m_copyPaste );
-		Input::Get().Manager().FindEvent( "show_ui" )->Connect( &Engine::OnToogleShowUI, this );
-		Input::Get().Manager().FindEvent( "toogle_camera" )->Connect( &Engine::OnToogleCamera, this );
+		Input::Get().Manager().FindEvent( "show_ui" )->Connect( &Editor::OnToogleShowUI, this );
+		Input::Get().Manager().FindEvent( "toogle_camera" )->Connect( &Editor::OnToogleCamera, this );
 
 		m_gameViewWindow->onSizeChanged.Connect( &Renderer::ResizeGame, m_renderer );
-		m_gameViewWindow->onPlay.Connect( &Engine::OnGamePlay, this );
-		m_gameViewWindow->onPause.Connect( &Engine::OnGamePause, this );
-		m_gameViewWindow->onResume.Connect( &Engine::OnGameResume, this );
-		m_gameViewWindow->onStop.Connect( &Engine::OnGameStop, this );
-		m_gameViewWindow->onStep.Connect( &Engine::OnGameStep, this );
+		m_gameViewWindow->onPlay.Connect( &Editor::GameStart, this );
+		m_gameViewWindow->onPause.Connect( &Editor::GamePause, this );
+		m_gameViewWindow->onResume.Connect( &Editor::GameResume, this );
+		m_gameViewWindow->onStop.Connect( &Editor::GameStop, this );
+		m_gameViewWindow->onStep.Connect( &Editor::OnEditorStep, this );
 		scene.onLoad.Connect( &SceneWindow::OnExpandHierarchy, m_sceneWindow );
-		scene.onLoad.Connect( &Engine::OnSceneLoad, this );
+		scene.onLoad.Connect( &Editor::OnSceneLoad, this );
 
 		// load scene
 		scene.New();
@@ -231,14 +230,14 @@ namespace fan
 			// auto play the scene
 			if( _settings.autoPlay )
 			{
-				OnGamePlay();
+				GameStart();
 			}
 		}
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	Engine::~Engine()
+	Editor::~Editor()
 	{
 		// Deletes ui
 		delete m_mainMenuBar;
@@ -256,7 +255,6 @@ namespace fan
 
 		SerializedValues::Get().SaveValuesToDisk();
 
-		delete m_game;
 		Prefab::s_resourceManager.Clear();
 		delete m_renderer;
 		delete m_window;
@@ -264,14 +262,14 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void Engine::Exit()
+	void Editor::Exit()
 	{
 		m_applicationShouldExit = true;
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void Engine::Run()
+	void Editor::Run()
 	{
 		Clock logicClock;
 		Clock renderClock;
@@ -300,20 +298,19 @@ namespace fan
 					onLPPSynch.Emmit();
 				}
 
-				// update
-				std::vector< Game* > games = { m_game };
-				for( Game* game : games )
+				// update				
 				{
-					game->Step( targetLogicDelta );
-					EditorCamera& editorCamera = game->world.GetSingletonComponent<EditorCamera>();
-					Scene& scene = game->world.GetSingletonComponent<Scene>();
-					
+					GameStep( targetLogicDelta );
+
+					EditorCamera& editorCamera = m_gameWorld.GetSingletonComponent<EditorCamera>();
+					Scene& scene = m_gameWorld.GetSingletonComponent<Scene>();
+
 					// only update the editor camera when we are using it
 					if( scene.mainCamera == editorCamera.cameraNode )
 					{
 						EditorCamera::Update( editorCamera, targetLogicDelta );
 					}					
-				}			
+				}		
 
 				// ui & debug
 				if ( m_showUI )
@@ -322,41 +319,40 @@ namespace fan
 						SCOPED_PROFILE( draw_ui );
 						m_mainMenuBar->Draw();
 						m_selection->Update( m_gameViewWindow->IsHovered() );
-						S_MoveFollowTransforms::Run( m_game->world, m_game->world.Match( S_MoveFollowTransforms::GetSignature( m_game->world ) ) );
-						S_MoveFollowTransformsUI::Run( m_game->world, m_game->world.Match( S_MoveFollowTransformsUI::GetSignature( m_game->world ) ) );
+						S_MoveFollowTransforms::Run( m_gameWorld, m_gameWorld.Match( S_MoveFollowTransforms::GetSignature( m_gameWorld ) ) );
+						S_MoveFollowTransformsUI::Run( m_gameWorld, m_gameWorld.Match( S_MoveFollowTransformsUI::GetSignature( m_gameWorld ) ) );
 					}					
 
 					{
 						SCOPED_PROFILE( debug_draw );
 						EditorGrid::Draw( m_editorWorld.GetSingletonComponent<EditorGrid>() );
 
-						EcsWorld& world = m_game->world;
 						if( m_mainMenuBar->ShowWireframe() )
 						{
-							const Signature signatureDrawDebugWireframe = S_DrawDebugWireframe::GetSignature( world );
-							S_DrawDebugWireframe::Run( world, world.Match( signatureDrawDebugWireframe ) );
+							const Signature signatureDrawDebugWireframe = S_DrawDebugWireframe::GetSignature( m_gameWorld );
+							S_DrawDebugWireframe::Run( m_gameWorld, m_gameWorld.Match( signatureDrawDebugWireframe ) );
 						}
 						if( m_mainMenuBar->ShowNormals() )
 						{
-							const Signature signatureDrawDebugNormals = S_DrawDebugNormals::GetSignature( world );
-							S_DrawDebugNormals::Run( world, world.Match( signatureDrawDebugNormals ) );
+							const Signature signatureDrawDebugNormals = S_DrawDebugNormals::GetSignature( m_gameWorld );
+							S_DrawDebugNormals::Run( m_gameWorld, m_gameWorld.Match( signatureDrawDebugNormals ) );
 						}
 						if( m_mainMenuBar->ShowAABB() )
 						{
-							const Signature signatureDrawDebugBounds = S_DrawDebugBounds::GetSignature( world );
-							S_DrawDebugBounds::Run( world, world.Match( signatureDrawDebugBounds ) );
+							const Signature signatureDrawDebugBounds = S_DrawDebugBounds::GetSignature( m_gameWorld );
+							S_DrawDebugBounds::Run( m_gameWorld, m_gameWorld.Match( signatureDrawDebugBounds ) );
 						}
 						if( m_mainMenuBar->ShowHull() )
 						{
-							const Signature signatureDrawDebugHull = S_DrawDebugHull::GetSignature( world );
-							S_DrawDebugHull::Run( world, world.Match( signatureDrawDebugHull ) );
+							const Signature signatureDrawDebugHull = S_DrawDebugHull::GetSignature( m_gameWorld );
+							S_DrawDebugHull::Run( m_gameWorld, m_gameWorld.Match( signatureDrawDebugHull ) );
 						}
 						if( m_mainMenuBar->ShowLights() )
 						{
-							const Signature signatureDrawDebugPointLights = S_DrawDebugPointLights::GetSignature( world );
-							S_DrawDebugPointLights::Run( world, world.Match( signatureDrawDebugPointLights ) );
-							const Signature signatureDrawDebugDirLights = S_DrawDebugDirectionalLights::GetSignature( world );
-							S_DrawDebugDirectionalLights::Run( world, world.Match( signatureDrawDebugDirLights ) );
+							const Signature signatureDrawDebugPointLights = S_DrawDebugPointLights::GetSignature( m_gameWorld );
+							S_DrawDebugPointLights::Run( m_gameWorld, m_gameWorld.Match( signatureDrawDebugPointLights ) );
+							const Signature signatureDrawDebugDirLights = S_DrawDebugDirectionalLights::GetSignature( m_gameWorld );
+							S_DrawDebugDirectionalLights::Run( m_gameWorld, m_gameWorld.Match( signatureDrawDebugDirLights ) );
 						}
 					}					
 				}
@@ -390,97 +386,142 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void Engine::OnGamePlay()
+	void  Editor::GameStart()
 	{
-		Scene& scene = m_game->world.GetSingletonComponent<Scene>();
-
-		if( scene.path.empty() )
+		Game& game = m_gameWorld.GetSingletonComponent<Game>();
+		if( game.state == Game::STOPPED )
 		{
-			Debug::Warning() << "please save the scene before playing" << Debug::Endl();
-			return;
-		}
+			// saves the scene before playing
+			Scene& scene = m_gameWorld.GetSingletonComponent<Scene>();
+			if( scene.path.empty() )
+			{
+				Debug::Warning() << "please save the scene before playing" << Debug::Endl();
+				return;
+			}
 
-		assert( m_game->state == Game::STOPPED );
-		scene.Save();
-		m_game->Start();
+			scene.Save();
 
-		UseGameCamera();
+			Debug::Highlight() << game.name << ": play" << Debug::Endl();
+			game.state = Game::PLAYING;
+
+			if( game.gameServer != nullptr ) game.gameServer->Start();
+			else							 game.gameClient->Start();
+
+			UseGameCamera();
+		}		
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void Engine::OnGameStop()
+	void  Editor::GameStop()
 	{
-		UseEditorCamera();
-
-		Scene& scene = m_game->world.GetSingletonComponent<Scene>();
-
-		// Saves the camera position for restoring it later
-		const EntityID oldCameraID = m_game->world.GetEntityID( scene.mainCamera->handle );
-		const btTransform oldCameraTransform = m_game->world.GetComponent<Transform>( oldCameraID ).transform;
-
-		// save old selection
-		SceneNode* prevSelectionNode = m_selection->GetSelectedSceneNode();
-		const uint32_t prevSelectionID = prevSelectionNode != nullptr ? prevSelectionNode->uniqueID : 0;
-
-		m_game->Stop();
-		scene.LoadFrom( scene.path ); // reload
-
-		// restore camera transform
-		const EntityID newCameraID = m_game->world.GetEntityID( scene.mainCamera->handle );
-		m_game->world.GetComponent<Transform>( newCameraID ).transform = oldCameraTransform;
-
-		// restore selection
-		if( prevSelectionID != 0 )
+		Game& game = m_gameWorld.GetSingletonComponent<Game>();
+		if( game.state == Game::PLAYING || game.state == Game::PAUSED )
 		{
-			auto it = scene.nodes.find( prevSelectionID );
-			if( it != scene.nodes.end() )
+			UseEditorCamera();
+
+			Scene& scene = m_gameWorld.GetSingletonComponent<Scene>();
+
+			// Saves the camera position for restoring it later
+			const EntityID oldCameraID = m_gameWorld.GetEntityID( scene.mainCamera->handle );
+			const btTransform oldCameraTransform = m_gameWorld.GetComponent<Transform>( oldCameraID ).transform;
+
+			// save old selection
+			SceneNode* prevSelectionNode = m_selection->GetSelectedSceneNode();
+			const uint32_t prevSelectionID = prevSelectionNode != nullptr ? prevSelectionNode->uniqueID : 0;
+
+			Debug::Highlight() << game.name << ": stopped" << Debug::Endl();
+			game.state = Game::STOPPED;
+			if( game.gameServer != nullptr ) game.gameServer->Stop();
+			else							 game.gameClient->Stop();
+			scene.LoadFrom( scene.path ); // reload
+
+			// restore camera transform
+			const EntityID newCameraID = m_gameWorld.GetEntityID( scene.mainCamera->handle );
+			m_gameWorld.GetComponent<Transform>( newCameraID ).transform = oldCameraTransform;
+
+			// restore selection
+			if( prevSelectionID != 0 )
 			{
-				m_selection->SetSelectedSceneNode( it->second );
+				auto it = scene.nodes.find( prevSelectionID );
+				if( it != scene.nodes.end() )
+				{
+					m_selection->SetSelectedSceneNode( it->second );
+				}
 			}
 		}
 	}
 
-	void Engine::OnGamePause() { m_game->Pause(); }
-	void Engine::OnGameResume() { m_game->Resume(); }
+	//================================================================================================================================
+	//================================================================================================================================
+	void  Editor::GamePause()
+	{
+		Game& game = m_gameWorld.GetSingletonComponent<Game>();
+		if( game.state == Game::PLAYING )
+		{
+			Debug::Highlight() << game.name << ": paused" << Debug::Endl();
+			game.state = Game::PAUSED;
+
+			if( game.gameServer != nullptr ) game.gameServer->Pause();
+			else							 game.gameClient->Pause();
+		}
+	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void Engine::OnGameStep()
+	void  Editor::GameResume()
 	{
-		m_game->Resume();
-		m_game->Step( Time::Get().GetLogicDelta() );
-		m_game->Pause();
+		Game& game = m_gameWorld.GetSingletonComponent<Game>();
+		if( game.state == Game::PAUSED )
+		{
+			Debug::Highlight() << game.name << ": resumed" << Debug::Endl();
+			game.state = Game::PLAYING;
+
+			if( game.gameServer != nullptr ) game.gameServer->Resume();
+			else							 game.gameClient->Resume();
+		}
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
+	void  Editor::GameStep( const float _delta )
+	{
+		Game& game = m_gameWorld.GetSingletonComponent<Game>();
+		if( game.state == Game::PLAYING )
+		{
+			const float delta = ( game.state == Game::PLAYING ? _delta : 0.f );
+			if( game.gameServer != nullptr ) game.gameServer->Step( delta );
+			else							 game.gameClient->Step( delta );
+		}
 	}
 
 	//================================================================================================================================
 	// Todo save camera position depending on the scene
 	//================================================================================================================================
-	void Engine::OnSceneLoad( Scene& _scene )
+	void Editor::OnSceneLoad( Scene& _scene )
 	{
 		m_selection->Deselect();
-		EditorCamera::CreateEditorCamera( m_game->world );
+		EditorCamera::CreateEditorCamera( m_gameWorld );
 	}
 
 	//================================================================================================================================
 	// Updates the render world singleton component
 	//================================================================================================================================
-	void Engine::UpdateRenderWorld()
+	void Editor::UpdateRenderWorld()
 	{
-		EcsWorld& world = m_game->world;
-		RenderWorld& renderWorld = world.GetSingletonComponent<RenderWorld>();		
+		RenderWorld& renderWorld = m_gameWorld.GetSingletonComponent<RenderWorld>();
 		renderWorld.targetSize = glm::vec2( m_gameViewWindow->GetSize().x(), m_gameViewWindow->GetSize().y() );
 
-		const Signature signatureURModels = S_UpdateRenderWorldModels::GetSignature( world );
-		const Signature signatureURUI = S_UpdateRenderWorldUI::GetSignature( world );
-		const Signature signatureURPointLights = S_UpdateRenderWorldPointLights::GetSignature( world );
-		const Signature signatureURDirectionalLights = S_UpdateRenderWorldDirectionalLights::GetSignature( world );
+		const Signature signatureURModels = S_UpdateRenderWorldModels::GetSignature( m_gameWorld );
+		const Signature signatureURUI = S_UpdateRenderWorldUI::GetSignature( m_gameWorld );
+		const Signature signatureURPointLights = S_UpdateRenderWorldPointLights::GetSignature( m_gameWorld );
+		const Signature signatureURDirectionalLights = S_UpdateRenderWorldDirectionalLights::GetSignature( m_gameWorld );
 
 		// update render data
-		S_UpdateRenderWorldModels::Run( world, world.Match( signatureURModels ) );
-		S_UpdateRenderWorldUI::Run( world, world.Match( signatureURUI ) );
-		S_UpdateRenderWorldPointLights::Run( world, world.Match( signatureURPointLights ) );
-		S_UpdateRenderWorldDirectionalLights::Run( world, world.Match( signatureURDirectionalLights ) );
+		S_UpdateRenderWorldModels::Run( m_gameWorld, m_gameWorld.Match( signatureURModels ) );
+		S_UpdateRenderWorldUI::Run( m_gameWorld, m_gameWorld.Match( signatureURUI ) );
+		S_UpdateRenderWorldPointLights::Run( m_gameWorld, m_gameWorld.Match( signatureURPointLights ) );
+		S_UpdateRenderWorldDirectionalLights::Run( m_gameWorld, m_gameWorld.Match( signatureURDirectionalLights ) );
 
 		// particles mesh
 		DrawMesh particlesDrawData;
@@ -498,11 +539,11 @@ namespace fan
 		m_renderer->SetDirectionalLights( renderWorld.directionalLights );
 
 		// Camera
-		Scene& scene = world.GetSingletonComponent<Scene>();
-		EntityID cameraID = world.GetEntityID( scene.mainCamera->handle );
-		Camera& camera = world.GetComponent<Camera>( cameraID );
+		Scene& scene = m_gameWorld.GetSingletonComponent<Scene>();
+		EntityID cameraID = m_gameWorld.GetEntityID( scene.mainCamera->handle );
+		Camera& camera = m_gameWorld.GetComponent<Camera>( cameraID );
 		camera.aspectRatio = m_gameViewWindow->GetAspectRatio();
-		Transform& cameraTransform = world.GetComponent<Transform>( cameraID );
+		Transform& cameraTransform = m_gameWorld.GetComponent<Transform>( cameraID );
 		m_renderer->SetMainCamera( 
 			camera.GetProjection(), 
 			camera.GetView( cameraTransform ),
@@ -512,50 +553,52 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void Engine::SwitchPlayStop()
+	void Editor::SwitchPlayStop()
 	{
-		if ( m_game->state == Game::STOPPED )
+		Game& game = m_gameWorld.GetSingletonComponent<Game>();
+		if ( game.state == Game::STOPPED )
 		{
-			OnGamePlay();
+			GameStart();
 		}
 		else
 		{
-			OnGameStop();
+			GameStop();
 		}
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void Engine::UseEditorCamera()
+	void Editor::UseEditorCamera()
 	{
-		Scene& scene = m_game->world.GetSingletonComponent<Scene>();
-		EditorCamera& editorCamera = m_game->world.GetSingletonComponent<EditorCamera>();
+		Scene& scene = m_gameWorld.GetSingletonComponent<Scene>();
+		EditorCamera& editorCamera = m_gameWorld.GetSingletonComponent<EditorCamera>();
 		scene.SetMainCamera( *editorCamera.cameraNode );
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void Engine::UseGameCamera()
+	void Editor::UseGameCamera()
 	{
-		Scene& scene = m_game->world.GetSingletonComponent<Scene>();
-		GameCamera& gameCamera = m_game->world.GetSingletonComponent<GameCamera>();
+		Scene& scene = m_gameWorld.GetSingletonComponent<Scene>();
+		GameCamera& gameCamera = m_gameWorld.GetSingletonComponent<GameCamera>();
 		scene.SetMainCamera( *gameCamera.cameraNode );
 	}
 
 	//================================================================================================================================
 	// toogle the camera between editor and game
 	//================================================================================================================================
-	void Engine::OnToogleCamera()
+	void Editor::OnToogleCamera()
 	{		
-		if( m_game->state == Game::STOPPED )
+		Game& game = m_gameWorld.GetSingletonComponent<Game>();
+		if( game.state == Game::STOPPED )
 		{ 
 			Debug::Warning() << "You cannot toogle camera outside of play mode" << Debug::Endl();
 			return; 
 		}
 
-		Scene& scene = m_game->world.GetSingletonComponent<Scene>();
-		GameCamera& gameCamera = m_game->world.GetSingletonComponent<GameCamera>();
-		EditorCamera& editorCamera = m_game->world.GetSingletonComponent<EditorCamera>();
+		Scene& scene = m_gameWorld.GetSingletonComponent<Scene>();
+		GameCamera& gameCamera = m_gameWorld.GetSingletonComponent<GameCamera>();
+		EditorCamera& editorCamera = m_gameWorld.GetSingletonComponent<EditorCamera>();
 
 		if ( scene.mainCamera == editorCamera.cameraNode )
 		{
@@ -568,21 +611,40 @@ namespace fan
 	}
 
 	//================================================================================================================================
+	// callback of the game view step button
 	//================================================================================================================================
-	void Engine::InitializeEditorEcsWorldTypes( EcsWorld& _world )
+	void Editor::OnEditorStep()
 	{
-		_world.AddSingletonComponentType<EditorGrid>();
+		Game& game = m_gameWorld.GetSingletonComponent<Game>();
+		assert( game.state == Game::PAUSED );
 
-		//_world.AddComponentType<SceneNode>();
-
-		//_world.AddTagType<tag_boundsOutdated>();
+		if( game.gameServer != nullptr )
+		{
+			game.gameServer->Resume();
+			game.gameServer->Step( Time::Get().GetLogicDelta() );
+			game.gameServer->Pause();
+		}
+		else
+		{
+			game.gameClient->Resume();
+			game.gameClient->Step( Time::Get().GetLogicDelta() );
+			game.gameClient->Pause();
+		}
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void Engine::InitializeGameEcsWorldTypes( EcsWorld& _world )
+	void Editor::InitializeEditorEcsWorldTypes( EcsWorld& _world )
+	{
+		_world.AddSingletonComponentType<EditorGrid>();
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
+	void Editor::InitializeGameEcsWorldTypes( EcsWorld& _world )
 	{
 		_world.AddSingletonComponentType<EditorCamera>();
+
 		_world.AddTagType<tag_editorOnly>();
 	}
 }

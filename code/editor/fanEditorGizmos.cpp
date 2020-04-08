@@ -8,7 +8,6 @@
 #include "scene/components/fanTransform.hpp"
 #include "scene/components/fanCamera.hpp"
 #include "scene/singletonComponents/fanScene.hpp"
-#include "game/fanGame.hpp"
 #include "render/fanRendererDebug.hpp"
 #include "ecs/fanEcsWorld.hpp"
 
@@ -18,8 +17,8 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	EditorGizmos::EditorGizmos( Scene& _scene )
-		: m_scene( &_scene )
+	EditorGizmos::EditorGizmos( EcsWorld& _world )
+		: m_world( &_world )
 	{}
 
 	//================================================================================================================================
@@ -28,8 +27,10 @@ namespace fan
 	//================================================================================================================================
 	bool EditorGizmos::DrawMoveGizmo( const btTransform _transform, const size_t _uniqueID, btVector3& _newPosition )
 	{
+		Scene& scene = m_world->GetSingletonComponent<Scene>();
+
 		// Get main camera data
-		SceneNode& cameraNode = * m_scene->mainCamera;
+		SceneNode& cameraNode = * scene.mainCamera;
 		EcsWorld& world = *cameraNode.scene->world;
 		const EntityID id = world.GetEntityID( cameraNode.handle );
 		const Transform & cameraTransform = world.GetComponent<Transform>( id );

@@ -23,6 +23,7 @@ namespace fan
 			delete m_meshList.begin()->second; 
 			m_meshList.erase( m_meshList.begin() );
 		}
+		m_device = nullptr;
 	}
 
 	//================================================================================================================================

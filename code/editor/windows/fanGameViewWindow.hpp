@@ -5,7 +5,7 @@
 
 namespace fan
 {
-	struct Game;
+	class EcsWorld;
 
 	//================================================================================================================================
 	// show the game in 3D
@@ -20,7 +20,7 @@ namespace fan
 		Signal<> onStop;
 		Signal<> onStep;
 
-		GameViewWindow( Game& _game );
+		GameViewWindow( EcsWorld& _world );
 		btVector2 GetSize()			const { return m_size; }
 		btVector2 GetPosition()		const { return m_position; }
 		float	  GetAspectRatio()	const { return ( float ) m_size[ 0 ] / ( float ) m_size[ 1 ]; }
@@ -34,7 +34,7 @@ namespace fan
 		btVector2	m_position;
 		bool		m_isHovered;
 
-		Game* m_game;
+		EcsWorld* m_world;
 	};
 
 }

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "editor/fanEngine.hpp"
+#include "editor/fanEditor.hpp"
 
 namespace fan
 {

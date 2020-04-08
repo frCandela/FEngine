@@ -1,4 +1,4 @@
-#include "game/fanGame.hpp"
+#include "game/fanGameServer.hpp"
 
 #include "core/time/fanProfiler.hpp"
 #include "core/time/fanTime.hpp"
@@ -32,11 +32,11 @@
 #include "scene/fanSceneTags.hpp"
 #include "game/fanGameTags.hpp"
 
-#include "game/singletonComponents/fanSunLight.hpp"
-#include "game/singletonComponents/fanGameCamera.hpp"
 #include "game/singletonComponents/fanCollisionManager.hpp"
-#include "game/singletonComponents/fanGameReference.hpp"
 #include "game/singletonComponents/fanSolarEruption.hpp"
+#include "game/singletonComponents/fanGameCamera.hpp"
+#include "game/singletonComponents/fanSunLight.hpp"
+#include "game/singletonComponents/fanGame.hpp"
 
 #include "game/systems/fanUpdatePlanets.hpp"
 #include "game/systems/fanUpdateSpaceships.hpp"
@@ -62,9 +62,7 @@ namespace fan
 {
 	//================================================================================================================================
 	//================================================================================================================================
-	Game::Game( const std::string _name ) :
-		  name( _name )
-		, world()
+	GameServer::GameServer( const std::string _name )
 	{
 		// base components
 		world.AddComponentType<SceneNode>();
@@ -110,159 +108,139 @@ namespace fan
 		world.AddSingletonComponentType<SunLight>();
 		world.AddSingletonComponentType<GameCamera>();
 		world.AddSingletonComponentType<CollisionManager>();
-		world.AddSingletonComponentType<GameReference>();
+		world.AddSingletonComponentType<Game>();
 		world.AddSingletonComponentType<SolarEruption>();
 
 		world.AddTagType<tag_boundsOutdated>();
 		world.AddTagType<tag_sunlight_occlusion>();
 
-		// init the game ref
-		const_cast< Game* >(world.GetSingletonComponent<GameReference>().game) = this;
+		Game& game = world.GetSingletonComponent<Game>();
+		game.gameServer = this;
+		game.name = _name;
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void Game::Start()
+	void GameServer::Start()
 	{
-		if( state == State::STOPPED )
+		S_RegisterAllRigidbodies::Run( world, world.Match( S_RegisterAllRigidbodies::GetSignature( world ) ) );
+		GameCamera::CreateGameCamera( world );
+
+		SolarEruption::Start( world );
+
+		// spawn the spaceship
+		Game& gameData = world.GetSingletonComponent<Game>();
+		if( gameData.spaceshipPrefab != nullptr )
 		{
-			Debug::Highlight() << name << ": play" << Debug::Endl();
-			
-			// init
-			state = State::PLAYING;
-			S_RegisterAllRigidbodies::Run( world, world.Match( S_RegisterAllRigidbodies::GetSignature( world ) ) );
-			GameCamera::CreateGameCamera( world );
+			Scene& scene = world.GetSingletonComponent<Scene>();
+			SceneNode& spaceshipNode = *gameData.spaceshipPrefab->Instanciate( *scene.root );
+			EntityID spaceshipID = world.GetEntityID( spaceshipNode.handle );
 
-			SolarEruption::Start( world );
-
-			// spawn the spaceship
-			if( spaceship != nullptr )
+			if( world.HasComponent<Transform>( spaceshipID )
+				&& world.HasComponent<Rigidbody>( spaceshipID )
+				&& world.HasComponent<MotionState>( spaceshipID )
+				&& world.HasComponent<BoxShape>( spaceshipID ) )
 			{
-				Scene& scene = world.GetSingletonComponent<Scene>();
-				SceneNode & spaceshipNode = * spaceship->Instanciate( *scene.root );
-				EntityID spaceshipID = world.GetEntityID( spaceshipNode.handle );
+				// set initial position
+				Transform& transform = world.GetComponent<Transform>( spaceshipID );
+				transform.SetPosition( btVector3( 0, 0, 4.f ) );
 
-				if( world.HasComponent<Transform>( spaceshipID ) 
-					&& world.HasComponent<Rigidbody>( spaceshipID ) 
-					&& world.HasComponent<MotionState>( spaceshipID )
-					&& world.HasComponent<BoxShape>( spaceshipID ))
-				{
-					// set initial position
-					Transform& transform = world.GetComponent<Transform>( spaceshipID );
-					transform.SetPosition( btVector3(0,0,4.f) );	
+				// add rigidbody to the physics world
+				PhysicsWorld& physicsWorld = world.GetSingletonComponent<PhysicsWorld>();
+				Rigidbody& rigidbody = world.GetComponent<Rigidbody>( spaceshipID );
+				MotionState& motionState = world.GetComponent<MotionState>( spaceshipID );
+				BoxShape& boxShape = world.GetComponent<BoxShape>( spaceshipID );
+				rigidbody.SetCollisionShape( &boxShape.boxShape );
+				rigidbody.SetMotionState( &motionState.motionState );
+				physicsWorld.AddRigidbody( rigidbody, spaceshipNode.handle );
 
-					// add rigidbody to the physics world
-					PhysicsWorld& physicsWorld = world.GetSingletonComponent<PhysicsWorld>();
-					Rigidbody& rigidbody = world.GetComponent<Rigidbody>( spaceshipID );
-					MotionState& motionState = world.GetComponent<MotionState>( spaceshipID );
-					BoxShape& boxShape = world.GetComponent<BoxShape>( spaceshipID );
-					rigidbody.SetCollisionShape( &boxShape.boxShape );
-					rigidbody.SetMotionState( &motionState.motionState );
-					physicsWorld.AddRigidbody( rigidbody, spaceshipNode.handle );
-
-					// registers physics callbacks
-					CollisionManager& collisionManager = world.GetSingletonComponent<CollisionManager>();
-					rigidbody.onContactStarted.Connect( &CollisionManager::OnSpaceShipContact, &collisionManager );
-				}
-				else
-				{
-					Debug::Error() 
+				// registers physics callbacks
+				CollisionManager& collisionManager = world.GetSingletonComponent<CollisionManager>();
+				rigidbody.onContactStarted.Connect( &CollisionManager::OnSpaceShipContact, &collisionManager );
+			}
+			else
+			{
+				Debug::Error()
 					<< "Game: spaceship prefab is missing a component" << "\n"
 					<< "component needed: Transform, Rigidbody, MotionState, BoxShape" << Debug::Endl();
-					return;
-				}
+				return;
 			}
 		}
+
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void  Game::Stop()
+	void  GameServer::Stop()
 	{
-		if( state == State::PLAYING || state == State::PAUSED )
-		{
-			Debug::Highlight() << name << ": stopped" << Debug::Endl();
+		// clears the physics world
+		PhysicsWorld& physicsWorld = world.GetSingletonComponent<PhysicsWorld>();
+		S_UnregisterAllRigidbodies::Run( world, world.Match( S_UnregisterAllRigidbodies::GetSignature( world ) ) );
+		physicsWorld.rigidbodiesHandles.clear();
 
-			state = State::STOPPED;
+		// clears the particles mesh
+		RenderWorld& renderWorld = world.GetSingletonComponent<RenderWorld>();
+		renderWorld.particlesMesh.LoadFromVertices( {} );
 
-			// clears the physics world
-			PhysicsWorld& physicsWorld = world.GetSingletonComponent<PhysicsWorld>();
-			S_UnregisterAllRigidbodies::Run( world, world.Match( S_UnregisterAllRigidbodies::GetSignature( world ) ) );
-			physicsWorld.rigidbodiesHandles.clear();
-
-			// clears the particles mesh
-			RenderWorld& renderWorld = world.GetSingletonComponent<RenderWorld>();
-			renderWorld.particlesMesh.LoadFromVertices( {} );
-
-			GameCamera::DeleteGameCamera( world );
-		}
+		GameCamera::DeleteGameCamera( world );
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void Game::Pause()
+	void GameServer::Pause()
 	{
-		if( state == State::PLAYING )
-		{
-			Debug::Highlight() << name << ": paused" << Debug::Endl();
-			state = State::PAUSED;
-		}
+
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void Game::Resume()
+	void GameServer::Resume()
 	{
-		if( state == State::PAUSED )
-		{
-			Debug::Highlight() << name << ": resumed" << Debug::Endl();
-			state = State::PLAYING;
-		}
+
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void  Game::Step( const float _delta )
+	void  GameServer::Step( const float _delta )
 	{
 		{
 			SCOPED_PROFILE( scene_update );
-			const float delta = ( state == State::PLAYING ? _delta : 0.f );
 
 			// physics & transforms
 			PhysicsWorld& physicsWorld = world.GetSingletonComponent<PhysicsWorld>();
-			S_SynchronizeMotionStateFromTransform::Run( world, world.Match( S_SynchronizeMotionStateFromTransform::GetSignature( world ) ), delta );
-			physicsWorld.dynamicsWorld->stepSimulation( delta, 10, Time::Get().GetPhysicsDelta() );
-			S_SynchronizeTransformFromMotionState::Run( world, world.Match( S_SynchronizeTransformFromMotionState::GetSignature( world ) ), delta );
+			S_SynchronizeMotionStateFromTransform::Run( world, world.Match( S_SynchronizeMotionStateFromTransform::GetSignature( world ) ), _delta );
+			physicsWorld.dynamicsWorld->stepSimulation( _delta, 10, Time::Get().GetPhysicsDelta() );
+			S_SynchronizeTransformFromMotionState::Run( world, world.Match( S_SynchronizeTransformFromMotionState::GetSignature( world ) ), _delta );
 			S_MoveFollowTransforms::Run( world, world.Match( S_MoveFollowTransforms::GetSignature( world ) ) );
 			S_MoveFollowTransformsUI::Run( world, world.Match( S_MoveFollowTransformsUI::GetSignature( world ) ) );
 
 			// update
-			S_RefreshPlayerInput::Run( world, world.Match( S_RefreshPlayerInput::GetSignature( world ) ), delta );
-			S_MoveSpaceships::Run( world, world.Match( S_MoveSpaceships::GetSignature( world ) ), delta );
-			S_FireWeapons::Run( world, world.Match( S_FireWeapons::GetSignature( world ) ), delta );
-			S_MovePlanets::Run( world, world.Match( S_MovePlanets::GetSignature( world ) ), delta );
-			S_GenerateLightMesh::Run( world, world.Match( S_GenerateLightMesh::GetSignature( world ) ), delta );
-			S_UpdateSolarPannels::Run(world, world.Match( S_UpdateSolarPannels::GetSignature( world ) ), delta );
-			S_RechargeBatteries::Run( world, world.Match( S_RechargeBatteries::GetSignature( world ) ), delta );
-			S_UpdateExpirationTimes::Run( world, world.Match( S_UpdateExpirationTimes::GetSignature( world ) ), delta );
-			S_EruptionDamage::Run( world, world.Match( S_EruptionDamage::GetSignature( world ) ), delta );
-			S_UpdateGameUiValues::Run( world, world.Match( S_UpdateGameUiValues::GetSignature( world ) ), delta );
-			S_UpdateGameUiPosition::Run( world, world.Match( S_UpdateGameUiPosition::GetSignature( world ) ), delta );
+			S_RefreshPlayerInput::Run( world, world.Match( S_RefreshPlayerInput::GetSignature( world ) ), _delta );
+			S_MoveSpaceships::Run( world, world.Match( S_MoveSpaceships::GetSignature( world ) ), _delta );
+			S_FireWeapons::Run( world, world.Match( S_FireWeapons::GetSignature( world ) ), _delta );
+			S_MovePlanets::Run( world, world.Match( S_MovePlanets::GetSignature( world ) ), _delta );
+			S_GenerateLightMesh::Run( world, world.Match( S_GenerateLightMesh::GetSignature( world ) ), _delta );
+			S_UpdateSolarPannels::Run( world, world.Match( S_UpdateSolarPannels::GetSignature( world ) ), _delta );
+			S_RechargeBatteries::Run( world, world.Match( S_RechargeBatteries::GetSignature( world ) ), _delta );
+			S_UpdateExpirationTimes::Run( world, world.Match( S_UpdateExpirationTimes::GetSignature( world ) ), _delta );
+			S_EruptionDamage::Run( world, world.Match( S_EruptionDamage::GetSignature( world ) ), _delta );
+			S_UpdateGameUiValues::Run( world, world.Match( S_UpdateGameUiValues::GetSignature( world ) ), _delta );
+			S_UpdateGameUiPosition::Run( world, world.Match( S_UpdateGameUiPosition::GetSignature( world ) ), _delta );
 
-			SolarEruption::Step( world, delta );
+			SolarEruption::Step( world, _delta );
 
-			S_PlayerDeath::Run( world, world.Match( S_PlayerDeath::GetSignature( world ) ), delta );
+			S_PlayerDeath::Run( world, world.Match( S_PlayerDeath::GetSignature( world ) ), _delta );
 
 			// late update
-			S_ParticlesOcclusion::Run( world, world.Match( S_ParticlesOcclusion::GetSignature( world ) ), delta );
-			S_UpdateParticles::Run( world, world.Match( S_UpdateParticles::GetSignature( world ) ), delta );
-			S_EmitParticles::Run( world, world.Match( S_EmitParticles::GetSignature( world ) ), delta );
-			S_GenerateParticles::Run( world, world.Match( S_GenerateParticles::GetSignature( world ) ), delta );
-			S_UpdateBoundsFromRigidbody::Run( world, world.Match( S_UpdateBoundsFromRigidbody::GetSignature( world ) ), delta );
-			S_UpdateBoundsFromModel::Run( world, world.Match( S_UpdateBoundsFromModel::GetSignature( world ) ), delta );
-			S_UpdateBoundsFromTransform::Run( world, world.Match( S_UpdateBoundsFromTransform::GetSignature( world ) ), delta );
+			S_ParticlesOcclusion::Run( world, world.Match( S_ParticlesOcclusion::GetSignature( world ) ), _delta );
+			S_UpdateParticles::Run( world, world.Match( S_UpdateParticles::GetSignature( world ) ), _delta );
+			S_EmitParticles::Run( world, world.Match( S_EmitParticles::GetSignature( world ) ), _delta );
+			S_GenerateParticles::Run( world, world.Match( S_GenerateParticles::GetSignature( world ) ), _delta );
+			S_UpdateBoundsFromRigidbody::Run( world, world.Match( S_UpdateBoundsFromRigidbody::GetSignature( world ) ), _delta );
+			S_UpdateBoundsFromModel::Run( world, world.Match( S_UpdateBoundsFromModel::GetSignature( world ) ), _delta );
+			S_UpdateBoundsFromTransform::Run( world, world.Match( S_UpdateBoundsFromTransform::GetSignature( world ) ), _delta );
 
-			S_UpdateGameCamera::Run( world, world.Match( S_UpdateGameCamera::GetSignature( world ) ), delta );
+			S_UpdateGameCamera::Run( world, world.Match( S_UpdateGameCamera::GetSignature( world ) ), _delta );
 		}
 
 		{

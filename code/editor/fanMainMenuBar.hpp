@@ -5,7 +5,7 @@
 namespace fan
 {
 	struct EditorGrid;
-	struct Game;
+	class EcsWorld;
 	class EditorWindow;
 	class EditorSelection;
 
@@ -32,7 +32,7 @@ namespace fan
 		Signal<> onReloadIcons;
 		Signal<> onExit;
 
-		MainMenuBar( Game& _game, EditorSelection& _editorSelection );
+		MainMenuBar( EcsWorld& _world, EditorSelection& _editorSelection );
 		~MainMenuBar();
 
 		void SetGrid( EditorGrid* _editorGrid ) { m_editorGrid = _editorGrid; }
@@ -48,7 +48,7 @@ namespace fan
 		bool ShowLights() const { return m_showLights; }
 
 	private:
-		Game* m_game;
+		EcsWorld* m_world;
 		EditorGrid* m_editorGrid;
 		EditorSelection& m_editorSelection;
 

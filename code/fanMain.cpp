@@ -15,18 +15,35 @@ namespace fan
 	public:
 		LPPMain( LaunchSettings& _settings )
 		{
-			fan::Engine engine( _settings );
+			if( _settings.launchServer )
+			{
+				// attaches an editor to a game server and runs it
+				fan::GameServer server( "server" );
+				fan::Editor editor( _settings, server.world );
+				RunEditor( _settings, editor );
+			}
+			else
+			{
+				// attaches an editor to a game client and runs it
+				fan::GameClient client( "client" );
+				fan::Editor editor( _settings, client.world );
+				RunEditor( _settings, editor );
+			}
+		}
+
+		void RunEditor( LaunchSettings& _settings, fan::Editor& _editor )
+		{
 			if( _settings.enableLivepp )
 			{
 				livePP = lpp::lppLoadAndRegister( L"middleware/LivePP/", "fanEngine" );
 				lpp::lppEnableAllCallingModulesSync( livePP );
-				engine.onLPPSynch.Connect( &LPPMain::OnSynch, this );
-				engine.Run();
+				_editor.onLPPSynch.Connect( &LPPMain::OnSynch, this );
+				_editor.Run();
 				::FreeLibrary( livePP );
 			}
 			else
 			{
-				engine.Run();
+				_editor.Run();
 			}
 		}
 

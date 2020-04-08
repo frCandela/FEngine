@@ -1,73 +1,78 @@
-#include "game/singletonComponents/fanGameReference.hpp"
+#include "game/singletonComponents/fanGame.hpp"
 
 #include "ecs/fanEcsWorld.hpp"
-#include "game/fanGame.hpp"
 
 #include "scene/fanSceneResourcePtr.hpp"
+#include "game/fanGameClient.hpp"
+#include "game/fanGameServer.hpp"
 
 namespace fan
 {
-	REGISTER_SINGLETON_COMPONENT( GameReference );
+	REGISTER_SINGLETON_COMPONENT( Game );
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void GameReference::SetInfo( SingletonComponentInfo& _info )
+	void Game::SetInfo( SingletonComponentInfo& _info )
 	{
 		_info.icon = ImGui::JOYSTICK16;
-		_info.init = &GameReference::Init;
-		_info.onGui = &GameReference::OnGui;
-		_info.save = &GameReference::Save;
-		_info.load = &GameReference::Load;
+		_info.init = &Game::Init;
+		_info.onGui = &Game::OnGui;
+		_info.save = &Game::Save;
+		_info.load = &Game::Load;
 		_info.name = "game";
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void GameReference::Init( EcsWorld& _world, SingletonComponent& _component ){}
+	void Game::Init( EcsWorld& _world, SingletonComponent& _component ){
+		Game& gameData = static_cast<Game&>( _component );
+		gameData.spaceshipPrefab = nullptr;
+	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void GameReference::OnGui( SingletonComponent& _component )
+	void Game::OnGui( SingletonComponent& _component )
 	{
-		Game& game = *static_cast<const GameReference&>( _component ).game;
+		Game& gameData = static_cast<Game&>( _component );
 
 		ImGui::Indent(); ImGui::Indent();
 		{
 			// names
 			char buffer[32];
-			game.name.copy( buffer, game.name.size() );
-			buffer[game.name.size()] = '\0';
+			gameData.name.copy( buffer, gameData.name.size() );
+			buffer[gameData.name.size()] = '\0';
 			if( ImGui::InputText( "name", buffer, IM_ARRAYSIZE( buffer ) ) )
 			{
-				game.name = buffer;
+				gameData.name = buffer;
 			}
 
-			// spaceship prefab
-			ImGui::FanPrefab( "spaceship", game.spaceship );
-
 			// game state
-			std::string state =
-				game.state == Game::STOPPED ? "stopped" :
-				game.state == Game::PLAYING ? "playing" :
-				game.state == Game::PAUSED ? "paused" : "error";
-			ImGui::Text( "game state : %s", state.c_str() );
+			std::string stateStr =
+				gameData.state == Game::STOPPED ? "stopped" :
+				gameData.state == Game::PLAYING ? "playing" :
+				gameData.state == Game::PAUSED ? "paused" : "error";
+			ImGui::Text( "game state : %s", stateStr.c_str() );			
+
+			// spaceship prefab
+			ImGui::FanPrefab( "spaceship", gameData.spaceshipPrefab );
+
 		}
 		ImGui::Unindent(); ImGui::Unindent();
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void GameReference::Save( const SingletonComponent& _component, Json& _json )
+	void Game::Save( const SingletonComponent& _component, Json& _json )
 	{
-		const Game& game = * static_cast<const GameReference&>( _component ).game;
-		Serializable::SavePrefabPtr( _json, "spaceship", game.spaceship );
+		const Game& gameData = static_cast<const Game&>( _component );
+		Serializable::SavePrefabPtr( _json, "spaceship", gameData.spaceshipPrefab );
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void GameReference::Load( SingletonComponent& _component, const Json& _json )
+	void Game::Load( SingletonComponent& _component, const Json& _json )
 	{
-		Game& game = *static_cast< GameReference&>( _component ).game;
-		Serializable::LoadPrefabPtr( _json, "spaceship", game.spaceship );
+		Game& gameData = static_cast<Game&>( _component );
+		Serializable::LoadPrefabPtr( _json, "spaceship", gameData.spaceshipPrefab );
 	}
 }

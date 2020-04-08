@@ -24,6 +24,7 @@ namespace fan
 			delete m_textureList[ m_textureList.size() - 1]; 
 			m_textureList.pop_back();
 		}
+		m_device = nullptr;
 	}
 
 	//================================================================================================================================
