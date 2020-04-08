@@ -51,6 +51,8 @@ namespace fan {
 		Component&			 GetComponentAt( const EntityID _entityID, int _componentIndex );
 		const ComponentInfo& GetComponentInfo( const ComponentIndex _index ) const { return  m_componentInfo[_index]; }
 		const SingletonComponentInfo& GetSingletonComponentInfo( const uint32_t _staticIndex ) const { return  m_singletonComponentInfo.at( _staticIndex ); }
+		const SingletonComponentInfo* SafeGetSingletonComponentInfo( const uint32_t _staticIndex ) const;
+
 
 		void				 SortEntities();
 		void				 RemoveDeadEntities();

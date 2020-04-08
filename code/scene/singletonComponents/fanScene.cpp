@@ -330,9 +330,16 @@ namespace fan
 					const Json& jSingleton_i = jSingletons[childIndex];
 					unsigned staticIndex = 0;
 					Serializable::LoadUInt( jSingleton_i, "singleton_id", staticIndex );
-					const SingletonComponentInfo& info = world->GetSingletonComponentInfo( staticIndex );
-					SingletonComponent& singleton = world->GetSingletonComponent( staticIndex );
-					info.load( singleton, jSingleton_i );
+					const SingletonComponentInfo* info = world->SafeGetSingletonComponentInfo( staticIndex );
+					if( info )
+					{
+						SingletonComponent& singleton = world->GetSingletonComponent( staticIndex );
+						info->load( singleton, jSingleton_i );
+					}
+					else
+					{
+						Debug::Error() << "corrupted singleton component with id " << staticIndex << Debug::Endl();
+					}
 				}
 			}			
 

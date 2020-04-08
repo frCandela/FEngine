@@ -274,6 +274,14 @@ namespace fan
 	}
 
 	//================================================================================================================================
+	//================================================================================================================================
+	const SingletonComponentInfo* EcsWorld::SafeGetSingletonComponentInfo( const uint32_t _staticIndex ) const 
+	{ 
+		const auto& it = m_singletonComponentInfo.find( _staticIndex );
+		return it == m_singletonComponentInfo.end() ? nullptr : &it->second;
+	}
+
+	//================================================================================================================================
 	// Find all entities matching the signature of the system
 	//================================================================================================================================
 	std::vector<EntityID> EcsWorld::Match( const Signature _signature )
