@@ -57,6 +57,7 @@
 #include "game/components/fanHealth.hpp"
 #include "game/components/fanSpaceshipUI.hpp"
 #include "game/components/fanDamage.hpp"
+#include "game/components/fanPlayerController.hpp"
 
 namespace fan
 {
@@ -97,6 +98,7 @@ namespace fan
 		world.AddComponentType<Health>();
 		world.AddComponentType<SpaceshipUI>();
 		world.AddComponentType<Damage>();
+		world.AddComponentType<PlayerController>();
 
 		// base singleton components
 		world.AddSingletonComponentType<Scene>();
@@ -137,7 +139,11 @@ namespace fan
 		S_RegisterAllRigidbodies::Run( world, world.Match( S_RegisterAllRigidbodies::GetSignature( world ) ) );
 		GameCamera::CreateGameCamera( world );
 		SolarEruption::Start( world );
-		Game::SpawnSpaceship( world );
+		EntityID spaceshipID = Game::SpawnSpaceship( world );
+		if( spaceshipID != 0 )
+		{
+			world.AddComponent<PlayerController>( spaceshipID );
+		}
 	}
 
 	//================================================================================================================================

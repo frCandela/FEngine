@@ -45,10 +45,10 @@ namespace fan
 			ImGui::DragFloat( "low range		", &solarPanel.lowRange, 0.5f, 0.f, 100.f );
 			ImGui::DragFloat( "high range 		", &solarPanel.highRange, 0.5f, 0.f, 100.f );
 			ImGui::Spacing();
-			ImGui::PushDisable();
+			ImGui::PushReadOnly();
 			ImGui::Checkbox( "is inside sunlight", &solarPanel.isInSunlight );
 			ImGui::DragFloat( "charging rate", &solarPanel.currentChargingRate, 0.5f, 0.f, 100.f );
-			ImGui::PopDisable();
+			ImGui::PopReadOnly();
 		} ImGui::PopItemWidth();
 	}
 

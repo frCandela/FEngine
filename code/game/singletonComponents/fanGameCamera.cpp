@@ -89,6 +89,7 @@ namespace fan
 
 		Transform& transform = _world.AddComponent<Transform>( cameraID );
 		transform.SetRotationEuler( btVector3( 90.f, 0.f, 0.f ) );
+		transform.SetPosition( btVector3( 0, 5, 0 ) );
 
 		GameCamera& gameCamera = _world.GetSingletonComponent<GameCamera>();
 		gameCamera.cameraNode = &cameraNode;

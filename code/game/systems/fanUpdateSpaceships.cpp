@@ -41,16 +41,15 @@ namespace fan
 			PlayerInput & playerInput = _world.GetComponent<PlayerInput>( entityID );
 
 			// get player input
-			const btVector3 direction = playerInput.inputData.direction;
-			const bool  stop = playerInput.inputData.stop;
-			const float leftForce = _delta * spaceship.lateralForce * playerInput.inputData.left;
-			const float forwardAxis = stop ? 0.f : _delta * playerInput.inputData.forward;
-			const float boost = playerInput.inputData.boost;
+			const btVector3 orientation = playerInput.orientation;
+			const float leftForce = _delta * spaceship.lateralForce * playerInput.left;
+			const float forwardAxis = _delta * playerInput.forward;
+			const float boost = playerInput.boost;
 
 			// Orientation
-			if( !direction.isZero() )
+			if( !orientation.isZero() )
 			{
-				transform.LookAt( transform.GetPosition() + direction, btVector3::Up() );
+				transform.LookAt( transform.GetPosition() + orientation, btVector3::Up() );
 			}
 
 			// constrain position

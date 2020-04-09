@@ -51,7 +51,7 @@ namespace fan
 			weapon.bulletsAccumulator += _delta * weapon.bulletsPerSecond;
 			if( weapon.bulletsAccumulator > 1.f ) { weapon.bulletsAccumulator = 1.f; }
 
-			if( input.inputData.fire > 0 && weapon.bulletsAccumulator >= 1.f && battery.currentEnergy >= weapon.bulletEnergyCost )
+			if( input.fire > 0 && weapon.bulletsAccumulator >= 1.f && battery.currentEnergy >= weapon.bulletEnergyCost )
 			{
 				--weapon.bulletsAccumulator;
 				battery.currentEnergy -= weapon.bulletEnergyCost;

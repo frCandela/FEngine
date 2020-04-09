@@ -10,12 +10,12 @@ namespace fan
 	class EcsWorld;
 
 	//================================================================================================================================
-	// Stores the input of the player
-	// This input can be direct in case of a local player or replicated ( server or remote players )
+	// PlayerController can be the mouse/keyboard or a game pad
+	// @wip gamepad is disabled for now
 	//================================================================================================================================
-	struct PlayerInput : public Component
+	struct PlayerController : public Component
 	{
-		DECLARE_COMPONENT( PlayerInput )
+		DECLARE_COMPONENT( PlayerController )
 	public:
 		static void SetInfo( ComponentInfo& _info );
 		static void Init( EcsWorld& _world, Component& _component );
@@ -23,10 +23,14 @@ namespace fan
 		static void Save( const Component& _component, Json& _json );
 		static void Load( Component& _component, const Json& _json );
 
-		btVector3	orientation; // orientation of the ship
-		float		left;		 // left/right key pressed ( strafing )
-		float		forward;	 // forward or backward
-		float		boost;		 // shift to go faster
-		float		fire;		 // firing in front of the ship
+// 		enum InputType { KEYBOARD_MOUSE, JOYSTICK };
+// 
+// 		InputType	type;
+// 		int			joystickID;
+// 		float		directionCutTreshold;
+// 		InputData	inputData;
+// 
+// 		std::vector< glm::vec2 > directionBuffer;
+// 		btVector3	direction;
 	};
 }

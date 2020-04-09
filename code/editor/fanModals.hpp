@@ -24,8 +24,8 @@ namespace ImGui
 	void FanToolTip( const char* _desc );
 	bool FanSaveFileModal( const char* _popupName, const std::set<std::string>& _extensionWhiteList, std::filesystem::path& _outCurrentPath );
 	bool FanLoadFileModal( const char* _popupName, const std::set<std::string>& _extensionWhiteList, std::filesystem::path& _path );
-	void PushDisable();
-	void PopDisable();
+	void PushReadOnly();
+	void PopReadOnly();
 
 	namespace impl
 	{

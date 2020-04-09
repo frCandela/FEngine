@@ -60,13 +60,9 @@ namespace fan
 //==============================================================================================================================================================
 //==============================================================================================================================================================
 int main( int _argc, char* _argv[] )
-{
-	// generates a list of strings from the command line arguments
-	std::vector< std::string > args;
-	for( int i = 0; i < _argc; i++ )
-	{ 
-		args.push_back( _argv[i] ); 
-	}
+{	
+	std::vector< std::string > args; // command line arguments
+	args.push_back( _argv[0] );
 
 // force arguments into the command line
 // 	args.push_back( "-livepp" );
@@ -80,7 +76,10 @@ int main( int _argc, char* _argv[] )
 //  args.push_back( "1" );
 	args.push_back( "-scene" );
 	args.push_back( "content/scenes/game00.scene" );
-	args.push_back( "-server" );
+	args.push_back( "-client" );
+
+	// generates a list of strings from the command line arguments
+	for( int i = 1; i < _argc; i++ ){	args.push_back( _argv[i] );	}
 
 	// Parse the arguments & run the engine
 	fan::LaunchArguments commandLine;

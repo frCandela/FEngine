@@ -87,7 +87,7 @@ namespace fan
 	//================================================================================================================================
 	// generates the spaceship entity from the game prefab
 	//================================================================================================================================
-	void Game::SpawnSpaceship( EcsWorld& _world )
+	EntityID Game::SpawnSpaceship( EcsWorld& _world )
 	{
 		// spawn the spaceship	
 		Game& game = _world.GetSingletonComponent< Game >();
@@ -118,18 +118,21 @@ namespace fan
 				// registers physics callbacks
 				CollisionManager& collisionManager = _world.GetSingletonComponent<CollisionManager>();
 				rigidbody.onContactStarted.Connect( &CollisionManager::OnSpaceShipContact, &collisionManager );
+
+				return spaceshipID;
 			}
 			else
 			{
 				Debug::Error()
 					<< "Game: spaceship prefab is missing a component" << "\n"
 					<< "component needed: Transform, Rigidbody, MotionState, BoxShape" << Debug::Endl();
-				return;
+				return 0;
 			}
 		}
 		else
 		{
 			Debug::Error() << game.name << " spaceship prefab is null" << Debug::Endl();
+			return 0;
 		}
 	}
 }
