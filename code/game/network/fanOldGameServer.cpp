@@ -16,16 +16,16 @@ namespace fan
 		//================================================================================================================================
 		void OldGameServer::OnAttach()
 	{
-		//Actor::OnAttach();
-		m_socket.Create( "[SERVER]", 53000 );
+// 		//Actor::OnAttach();
+// 		m_socket.Create( "[SERVER]", 53000 );
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
 	void OldGameServer::OnDetach()
 	{
-		//Actor::OnDetach();
-		m_socket.UnBind();
+// 		//Actor::OnDetach();
+// 		m_socket.UnBind();
 	}
 
 	//================================================================================================================================
@@ -65,91 +65,92 @@ namespace fan
 	//================================================================================================================================
 	void OldGameServer::Update( const float _delta )
 	{
-		if ( m_state != ServerState::SERVER_NONE )
-		{
-			Receive();
-
-			for ( int clientIndex = 0; clientIndex < m_clients.size(); clientIndex++ )
-			{
-				ClientData& client = m_clients[ clientIndex ];
-				UpdateClient( client, _delta );
-			}
-		}
+// 		if ( m_state != ServerState::SERVER_NONE )
+// 		{
+// 			Receive();
+// 
+// 			for ( int clientIndex = 0; clientIndex < m_clients.size(); clientIndex++ )
+// 			{
+// 				ClientData& client = m_clients[ clientIndex ];
+// 				UpdateClient( client, _delta );
+// 			}
+// 		}
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
 	void OldGameServer::Receive()
 	{
-		sf::Packet		packet;
-		bool disconnected = false;
-		while ( m_socket.Receive( packet, disconnected ) )
-		{
-			if ( disconnected )
-			{
-				ClientData* client = FindClient( m_socket.GetLastReceiveIp(), m_socket.GetLastReceivePort() );
-				if ( client != nullptr )
-				{
-					RemoveClient( *client );
-				}
-			}
-			else if ( m_socket.GetLastReceivePort() != m_socket.GetPort() )
-			{
-				ProcessPacket( m_socket.GetLastReceiveIp(), m_socket.GetLastReceivePort(), packet );
-			}
-		}
+// 		sf::Packet		packet;
+// 		bool disconnected = false;
+// 		while ( m_socket.Receive( packet, disconnected ) )
+// 		{
+// 			if ( disconnected )
+// 			{
+// 				ClientData* client = FindClient( m_socket.GetLastReceiveIp(), m_socket.GetLastReceivePort() );
+// 				if ( client != nullptr )
+// 				{
+// 					RemoveClient( *client );
+// 				}
+// 			}
+// 			else if ( m_socket.GetLastReceivePort() != m_socket.GetPort() )
+// 			{
+// 				ProcessPacket( m_socket.GetLastReceiveIp(), m_socket.GetLastReceivePort(), packet );
+// 			}
+// 		}
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
 	void OldGameServer::ProcessPacket( const sf::IpAddress& _ip, const Port& _port, sf::Packet& _packet )
 	{
-		ClientData* client = FindClient( _ip, _port );
-
-		// Process packet
-		sf::Uint16 intType;
-		_packet >> intType;
-		const PacketType type = PacketType( intType );
-
-		if ( client == nullptr )
-		{
-			if ( type == PacketType::LOGIN )
-			{
-				PacketLogin packetLogin;
-				packetLogin.LoadFrom( _packet );
-				client = AddClient( _ip, _port, packetLogin );
-				Send( PacketAckLogin().ToPacket(), *client );
-			}
-			else
-			{
-				Debug::Log() << "[SERVER] drunk client " << Debug::Endl();
-			}
-		}
-		else
-		{
-			client->lastResponse = 0.f;
-
-			switch ( type )
-			{
-			case PacketType::PING:
-			{
-				PacketPing packetPing;
-				packetPing.LoadFrom( _packet );
-				const float time = Time::Get().ElapsedSinceStartup();
-				client->ping = time - packetPing.GetTime();
-			} break;
-			default:
-				Debug::Log() << "[SERVER] strange packet received with id:  " << intType << Debug::Endl();
-				break;
-			}
-		}
+// 		ClientData* client = FindClient( _ip, _port );
+// 
+// 		// Process packet
+// 		sf::Uint16 intType;
+// 		_packet >> intType;
+// 		const PacketType type = PacketType( intType );
+// 
+// 		if ( client == nullptr )
+// 		{
+// 			if ( type == PacketType::LOGIN )
+// 			{
+// 				PacketLogin packetLogin;
+// 				packetLogin.LoadFrom( _packet );
+// 				client = AddClient( _ip, _port, packetLogin );
+// 				Send( PacketAckLogin().ToPacket(), *client );
+// 			}
+// 			else
+// 			{
+// 				Debug::Log() << "[SERVER] drunk client " << Debug::Endl();
+// 			}
+// 		}
+// 		else
+// 		{
+// 			client->lastResponse = 0.f;
+// 
+// 			switch ( type )
+// 			{
+// 			case PacketType::PING:
+// 			{
+// 				PacketPing packetPing;
+// 				packetPing.LoadFrom( _packet );
+// 				const float time = Time::Get().ElapsedSinceStartup();
+// 				client->ping = time - packetPing.GetTime();
+// 			} break;
+// 			default:
+// 				Debug::Log() << "[SERVER] strange packet received with id:  " << intType << Debug::Endl();
+// 				break;
+// 			}
+// 		}
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
 	bool OldGameServer::Send( sf::Packet _packet, const ClientData& _client )
 	{
-		return m_socket.Send( _packet, _client.ipAdress, _client.port );
+/*		return m_socket.Send( _packet, _client.ipAdress, _client.port );*/
+		return false;
 	}
 
 	//================================================================================================================================
@@ -157,28 +158,28 @@ namespace fan
 	//================================================================================================================================
 	void OldGameServer::Broadcast( sf::Packet _packet )
 	{
-		for ( int clientIndex = 0; clientIndex < m_clients.size(); clientIndex++ )
-		{
-			ClientData& client = m_clients[ clientIndex ];
-			Send( _packet, client );
-		}
+// 		for ( int clientIndex = 0; clientIndex < m_clients.size(); clientIndex++ )
+// 		{
+// 			ClientData& client = m_clients[ clientIndex ];
+// 			Send( _packet, client );
+// 		}
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
 	void OldGameServer::UpdateClient( ClientData& _client, const float _delta )
 	{
-		_client.lastResponse += _delta;
-
-		if ( _client.lastResponse > 2.f )
-		{
-			RemoveClient( _client );
-		}
-		else if ( _client.lastResponse > 1.f )
-		{
-			PacketPing ping( Time::Get().ElapsedSinceStartup() );
-			Send( ping.ToPacket(), _client );
-		}
+// 		_client.lastResponse += _delta;
+// 
+// 		if ( _client.lastResponse > 2.f )
+// 		{
+// 			RemoveClient( _client );
+// 		}
+// 		else if ( _client.lastResponse > 1.f )
+// 		{
+// 			PacketPing ping( Time::Get().ElapsedSinceStartup() );
+// 			Send( ping.ToPacket(), _client );
+// 		}
 	}
 
 	//================================================================================================================================

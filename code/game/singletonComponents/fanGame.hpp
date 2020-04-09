@@ -33,5 +33,7 @@ namespace fan
 		// @hack for the editor, only one of these should be null
 		GameClient* gameClient = nullptr;
 		GameServer* gameServer = nullptr;
+
+		static void SpawnSpaceship( EcsWorld& _world );
 	};
 }

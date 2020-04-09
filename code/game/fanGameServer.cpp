@@ -123,50 +123,21 @@ namespace fan
 	//================================================================================================================================
 	void GameServer::Start()
 	{
-		S_RegisterAllRigidbodies::Run( world, world.Match( S_RegisterAllRigidbodies::GetSignature( world ) ) );
-		GameCamera::CreateGameCamera( world );
-
-		SolarEruption::Start( world );
-
-		// spawn the spaceship
 		Game& gameData = world.GetSingletonComponent<Game>();
-		if( gameData.spaceshipPrefab != nullptr )
+
+		// init network
+		socket.setBlocking( false );
+		Debug::Log() << gameData.name << " bind on port " << listenPort << Debug::Endl();
+		if( socket.bind( listenPort ) != sf::Socket::Done )
 		{
-			Scene& scene = world.GetSingletonComponent<Scene>();
-			SceneNode& spaceshipNode = *gameData.spaceshipPrefab->Instanciate( *scene.root );
-			EntityID spaceshipID = world.GetEntityID( spaceshipNode.handle );
-
-			if( world.HasComponent<Transform>( spaceshipID )
-				&& world.HasComponent<Rigidbody>( spaceshipID )
-				&& world.HasComponent<MotionState>( spaceshipID )
-				&& world.HasComponent<BoxShape>( spaceshipID ) )
-			{
-				// set initial position
-				Transform& transform = world.GetComponent<Transform>( spaceshipID );
-				transform.SetPosition( btVector3( 0, 0, 4.f ) );
-
-				// add rigidbody to the physics world
-				PhysicsWorld& physicsWorld = world.GetSingletonComponent<PhysicsWorld>();
-				Rigidbody& rigidbody = world.GetComponent<Rigidbody>( spaceshipID );
-				MotionState& motionState = world.GetComponent<MotionState>( spaceshipID );
-				BoxShape& boxShape = world.GetComponent<BoxShape>( spaceshipID );
-				rigidbody.SetCollisionShape( &boxShape.boxShape );
-				rigidbody.SetMotionState( &motionState.motionState );
-				physicsWorld.AddRigidbody( rigidbody, spaceshipNode.handle );
-
-				// registers physics callbacks
-				CollisionManager& collisionManager = world.GetSingletonComponent<CollisionManager>();
-				rigidbody.onContactStarted.Connect( &CollisionManager::OnSpaceShipContact, &collisionManager );
-			}
-			else
-			{
-				Debug::Error()
-					<< "Game: spaceship prefab is missing a component" << "\n"
-					<< "component needed: Transform, Rigidbody, MotionState, BoxShape" << Debug::Endl();
-				return;
-			}
+			Debug::Error() << gameData.name << " bind failed on port " << listenPort << Debug::Endl();
 		}
 
+		// init game
+		S_RegisterAllRigidbodies::Run( world, world.Match( S_RegisterAllRigidbodies::GetSignature( world ) ) );
+		GameCamera::CreateGameCamera( world );
+		SolarEruption::Start( world );
+		Game::SpawnSpaceship( world );
 	}
 
 	//================================================================================================================================
@@ -183,6 +154,9 @@ namespace fan
 		renderWorld.particlesMesh.LoadFromVertices( {} );
 
 		GameCamera::DeleteGameCamera( world );
+
+		// clears the network
+		socket.unbind();
 	}
 
 	//================================================================================================================================

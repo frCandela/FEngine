@@ -3,6 +3,9 @@
 #include "scene/fanScenePrecompiled.hpp"
 #include "ecs/fanEcsWorld.hpp"
 
+#include "SFML/System.hpp"
+#include "SFML/Network.hpp"
+
 namespace fan
 {
 	//================================================================================================================================
@@ -18,6 +21,8 @@ namespace fan
 		void Resume();
 		void Step( const float _delta );
 
-		EcsWorld    world;
+		EcsWorld		world;
+		sf::UdpSocket	socket;
+		unsigned short	listenPort = 53001;
 	};
 }
