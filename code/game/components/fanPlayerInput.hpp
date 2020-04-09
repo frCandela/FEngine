@@ -26,7 +26,6 @@ namespace fan
 		enum InputType { KEYBOARD_MOUSE, JOYSTICK };
 
 		InputType	type;
-		bool		isReplicated;
 		int			joystickID;
 		float		directionCutTreshold;
 		InputData	inputData;

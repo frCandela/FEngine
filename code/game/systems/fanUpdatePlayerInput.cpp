@@ -38,43 +38,42 @@ namespace fan
 			const Transform& transform = _world.GetComponent<Transform>( entityID );
 			PlayerInput& input = _world.GetComponent<PlayerInput>( entityID );
 
-			if( !input.isReplicated )
+			InputData& inputData = input.inputData;
+
+			inputData.left = GetInputLeft( input );
+			inputData.forward = GetInputForward( input );
+			inputData.boost = GetInputBoost( input );
+			inputData.fire = GetInputFire( input );
+			inputData.stop = GetInputStop( input );
+
+			// input direction
+			if( input.type == PlayerInput::KEYBOARD_MOUSE )
 			{
-				InputData& inputData = input.inputData;
+				// Get mouse world pos
+				btVector3 mouseWorldPos = camera.ScreenPosToRay( cameraTransform, Mouse::Get().GetScreenSpacePosition() ).origin;
+				mouseWorldPos.setY( 0 );
 
-				inputData.left =	  GetInputLeft( input );
-				inputData.forward =   GetInputForward( input );
-				inputData.boost =	  GetInputBoost( input );
-				inputData.fire =	  GetInputFire( input );
-				inputData.stop =	  GetInputStop( input );
+				// Get mouse direction
 
-				// input direction
-				if( input.type == PlayerInput::KEYBOARD_MOUSE )
-				{
-					// Get mouse world pos
-					btVector3 mouseWorldPos = camera.ScreenPosToRay( cameraTransform, Mouse::Get().GetScreenSpacePosition() ).origin;
-					mouseWorldPos.setY( 0 );
-
-					// Get mouse direction
-
-					btVector3 mouseDir = mouseWorldPos - transform.GetPosition();
-					mouseDir.normalize();
-					inputData.direction = mouseDir;
-				} 
-				else if( input.type == fan::PlayerInput::JOYSTICK )
-				{
-					glm::vec2 average = GetDirectionAverage( input );
-
-					btVector3 dir = btVector3( average.x, 0.f, average.y );
-
-					if( dir.length() > input.directionCutTreshold ) { input.direction = dir; }
-
-					inputData.direction = input.direction;
-				} else
-				{
-					inputData.direction = btVector3::Zero();
-				}
+				btVector3 mouseDir = mouseWorldPos - transform.GetPosition();
+				mouseDir.normalize();
+				inputData.direction = mouseDir;
 			}
+			else if( input.type == fan::PlayerInput::JOYSTICK )
+			{
+				glm::vec2 average = GetDirectionAverage( input );
+
+				btVector3 dir = btVector3( average.x, 0.f, average.y );
+
+				if( dir.length() > input.directionCutTreshold ) { input.direction = dir; }
+
+				inputData.direction = input.direction;
+			}
+			else
+			{
+				inputData.direction = btVector3::Zero();
+			}
+
 		}
 	}
 

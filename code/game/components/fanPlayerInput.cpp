@@ -31,7 +31,6 @@ namespace fan
 		playerInput.type = KEYBOARD_MOUSE;
 		playerInput.joystickID = -1;
 		playerInput.directionCutTreshold = 0.25f;
-		playerInput.isReplicated = false;
 		playerInput.inputData;
 	}
 
@@ -49,7 +48,6 @@ namespace fan
 			{
 				playerInput.type = InputType( type );
 			}
-			ImGui::Checkbox( "replicated", &playerInput.isReplicated );
 
 			ImGui::DragFloat( "fire", &playerInput.inputData.fire );
 
@@ -83,7 +81,6 @@ namespace fan
 			playerInput.directionBuffer.resize( tmp, glm::vec3( 0.f ) );
 		}
 		Serializable::LoadFloat( _json, "direction_cut_treshold", playerInput.directionCutTreshold );
-		Serializable::LoadBool( _json, "replicated", playerInput.isReplicated );
 	}
 
 	//================================================================================================================================
@@ -94,6 +91,5 @@ namespace fan
 
 		Serializable::SaveInt( _json, "direction_buffer_size", (int)playerInput.directionBuffer.size() );
 		Serializable::SaveFloat( _json, "direction_cut_treshold", playerInput.directionCutTreshold );
-		Serializable::SaveBool( _json, "replicated", playerInput.isReplicated );
 	}
 }
