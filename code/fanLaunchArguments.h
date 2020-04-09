@@ -30,6 +30,8 @@ namespace fan
 		static bool CMD_OpenScene( const std::vector < std::string >& _args, LaunchSettings& _settings );
 		static bool CMD_SetWindow( const std::vector < std::string >& _args, LaunchSettings& _settings );
 		static bool CMD_AutoPlay( const std::vector < std::string >& _args, LaunchSettings& _settings );
+		static bool CMD_RunClient( const std::vector < std::string >& _args, LaunchSettings& _settings );
+		static bool CMD_RunServer( const std::vector < std::string >& _args, LaunchSettings& _settings );
 	};
 
 	//==============================================================================================================================================================
@@ -39,8 +41,10 @@ namespace fan
 		commands( {
 			{ &LaunchArguments::CMD_EnableLivePP,	"-livepp",	 "usage: -livepp <0-1>" },
 			{ &LaunchArguments::CMD_OpenScene,		"-scene",	 "usage: -scene \"scene/path.scene\"" },
-			{ &LaunchArguments::CMD_SetWindow,		"-window",	 "usage:  -window <x> <y> <width> <height>" },
-			{ &LaunchArguments::CMD_AutoPlay,		"-autoplay", "usage:  -autoplay <0-1>" }
+			{ &LaunchArguments::CMD_SetWindow,		"-window",	 "usage: -window <x> <y> <width> <height>" },
+			{ &LaunchArguments::CMD_AutoPlay,		"-autoplay", "usage: -autoplay <0-1>" },
+			{ &LaunchArguments::CMD_RunClient,		"-client",   "usage: -client" },
+			{ &LaunchArguments::CMD_RunServer,		"-server",   "usage: -server" }
 		} )
 	{}
 
@@ -119,7 +123,6 @@ namespace fan
 		_settings.enableLivepp = value == 1 ? true : false;
 
 		std::cout << "cmd : live++ " << ( value == 1 ? "enabled" : "disabled" ) << std::endl;
-
 		return true;
 	}
 
@@ -169,7 +172,34 @@ namespace fan
 		_settings.autoPlay = value == 1 ? true : false;
 
 		std::cout << "cmd : autoplay " << ( value == 1 ? "enabled" : "disabled" ) << std::endl;
+		return true;
+	}
 
+	//==============================================================================================================================================================
+	// command: -client"
+	// runs the game in client mode
+	//==============================================================================================================================================================
+	bool LaunchArguments::CMD_RunClient( const std::vector < std::string >& _args, LaunchSettings& _settings )
+	{
+		if( _args.size() != 0 ) { return false; }
+
+		_settings.launchMode = LaunchSettings::CLIENT;
+
+		std::cout << "cmd : launch client" << std::endl;
+		return true;
+	}
+
+	//==============================================================================================================================================================
+	// command: -server"
+	// runs the game in server mode
+	//==============================================================================================================================================================
+	bool LaunchArguments::CMD_RunServer( const std::vector < std::string >& _args, LaunchSettings& _settings )
+	{
+		if( _args.size() != 0 ) { return false; }
+
+		_settings.launchMode = LaunchSettings::SERVER;
+
+		std::cout << "cmd : launch server" << std::endl;
 		return true;
 	}
 }

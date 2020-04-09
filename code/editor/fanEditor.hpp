@@ -34,10 +34,12 @@ namespace fan
 	//================================================================================================================================
 	struct LaunchSettings
 	{
+		enum Mode{ CLIENT, SERVER};
+
 		std::string	loadScene = "";				// loads a scene at startup
 		bool		autoPlay = false;			// auto play the scene loaded at startup
 		bool		enableLivepp = false;		// enables Live++ hot reload
-		bool		launchServer = false;		// launch a server or a client
+		Mode		launchMode = CLIENT;		// launch as server or client
 		glm::ivec2  window_position = {-1,-1};	// forces the position of the window
 		glm::ivec2  window_size = { -1,-1 };	// forces the size of the window
 	};

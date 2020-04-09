@@ -15,19 +15,23 @@ namespace fan
 	public:
 		LPPMain( LaunchSettings& _settings )
 		{
-			if( _settings.launchServer )
+			if( _settings.launchMode == LaunchSettings::SERVER )
 			{
 				// attaches an editor to a game server and runs it
 				fan::GameServer server( "server" );
 				fan::Editor editor( _settings, server.world );
 				RunEditor( _settings, editor );
 			}
-			else
+			else if( _settings.launchMode == LaunchSettings::CLIENT )
 			{
 				// attaches an editor to a game client and runs it
 				fan::GameClient client( "client" );
 				fan::Editor editor( _settings, client.world );
 				RunEditor( _settings, editor );
+			}
+			else
+			{
+				assert( false );
 			}
 		}
 
