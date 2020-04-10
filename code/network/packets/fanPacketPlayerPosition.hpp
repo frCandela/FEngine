@@ -1,5 +1,5 @@
 #pragma once
-
+/*
 #include "network/packets/fanIPacket.hpp"
 
 namespace fan
@@ -30,4 +30,4 @@ namespace fan
 
 		float		m_time;
 	};
-}
+}*/

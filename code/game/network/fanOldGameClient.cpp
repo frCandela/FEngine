@@ -1,6 +1,5 @@
 #include "game/network/fanOldGameClient.hpp"
 
-#include "network/packets/fanIPacket.hpp"
 #include "network/packets/fanPacketLogin.hpp"
 #include "core/input/fanInputManager.hpp"
 #include "core/input/fanInput.hpp"

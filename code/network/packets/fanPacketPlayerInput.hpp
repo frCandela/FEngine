@@ -1,14 +1,14 @@
 #pragma once
 
-#include "network/packets/fanIPacket.hpp"
+//#include "network/packets/fanIPacket.hpp"
 
-namespace fan
-{
+//namespace fan
+//{
 	//================================================================================================================================
 	// @wip
 	//================================================================================================================================
-	struct PacketPlayerInput : IPacket<PacketType::PLAYER_INPUT>
-	{
+// 	struct PacketPlayerInput : IPacket<PacketType::PLAYER_INPUT>
+// 	{
 // 
 // 		PacketPlayerInput( InputData _inputData )
 // 			: m_inputData( _inputData )
@@ -43,5 +43,5 @@ namespace fan
 // 		}
 // 
 // 		InputData		m_inputData;
-	};
-}
+//	};
+//}

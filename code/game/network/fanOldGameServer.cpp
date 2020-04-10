@@ -2,7 +2,6 @@
 
 #include "network/packets/fanPacketLogin.hpp"
 #include "network/packets/fanPacketPing.hpp"
-#include "network/packets/fanIPacket.hpp"
 #include "core/input/fanInputManager.hpp"
 #include "core/input/fanInput.hpp"
 #include "core/input/fanMouse.hpp"
@@ -198,16 +197,16 @@ namespace fan
 	//================================================================================================================================
 	OldGameServer::ClientData* OldGameServer::AddClient( const sf::IpAddress& _ip, const Port& _port, const PacketLogin& _loginInfo )
 	{
-		assert( FindClient( _ip, _port ) == nullptr );
-
-		ClientData client;
-		client.ipAdress = _ip;
-		client.port = _port;
-		client.name = _loginInfo.GetName();
-		m_clients.push_back( client );
-		onClientConnected.Emmit( ( int ) m_clients.size() - 1, client.name );
-
-		Debug::Log() << "[SERVER] client connected " << client.name << " " << client.ipAdress.toString() << "::" << client.port << Debug::Endl();
+// 		assert( FindClient( _ip, _port ) == nullptr );
+// 
+// 		ClientData client;
+// 		client.ipAdress = _ip;
+// 		client.port = _port;
+// 		client.name = _loginInfo.GetName();
+// 		m_clients.push_back( client );
+// 		onClientConnected.Emmit( ( int ) m_clients.size() - 1, client.name );
+// 
+// 		Debug::Log() << "[SERVER] client connected " << client.name << " " << client.ipAdress.toString() << "::" << client.port << Debug::Endl();
 
 		return &m_clients[ m_clients.size() - 1 ];
 	}
@@ -216,39 +215,39 @@ namespace fan
 	//================================================================================================================================
 	void OldGameServer::RemoveClient( ClientData& _client )
 	{
-		for ( int clientIndex = ( int ) m_clients.size() - 1; clientIndex >= 0; --clientIndex )
-		{
-			if ( &m_clients[ clientIndex ] == &_client )
-			{
-				Debug::Log() << "[SERVER] client disconnected: " << _client.name << " " << _client.ipAdress.toString() << "::" << _client.port << Debug::Endl();
-				m_clients.erase( m_clients.begin() + clientIndex );
-			}
-		}
+// 		for ( int clientIndex = ( int ) m_clients.size() - 1; clientIndex >= 0; --clientIndex )
+// 		{
+// 			if ( &m_clients[ clientIndex ] == &_client )
+// 			{
+// 				Debug::Log() << "[SERVER] client disconnected: " << _client.name << " " << _client.ipAdress.toString() << "::" << _client.port << Debug::Endl();
+// 				m_clients.erase( m_clients.begin() + clientIndex );
+// 			}
+// 		}
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
 	void OldGameServer::ClearClients()
 	{
-		while ( m_clients.size() > 0 )
-		{
-			RemoveClient( m_clients[ m_clients.size() - 1 ] );
-		}
+// 		while ( m_clients.size() > 0 )
+// 		{
+// 			RemoveClient( m_clients[ m_clients.size() - 1 ] );
+// 		}
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
 	OldGameServer::ClientData* OldGameServer::FindClient( const sf::IpAddress& _ip, const Port& _port )
 	{
-		for ( int clientIndex = 0; clientIndex < m_clients.size(); ++clientIndex )
-		{
-			ClientData& client = m_clients[ clientIndex ];
-			if ( client.ipAdress == _ip && client.port == _port )
-			{
-				return &client;
-			}
-		}
-		return nullptr;
+// 		for ( int clientIndex = 0; clientIndex < m_clients.size(); ++clientIndex )
+// 		{
+// 			ClientData& client = m_clients[ clientIndex ];
+// 			if ( client.ipAdress == _ip && client.port == _port )
+// 			{
+// 				return &client;
+// 			}
+// 		}
+ 		return nullptr;
 	}
 
 	//================================================================================================================================

@@ -30,6 +30,7 @@
 #include "scene/singletonComponents/fanScenePointers.hpp"
 #include "scene/singletonComponents/fanPhysicsWorld.hpp"
 #include "scene/fanSceneTags.hpp"
+#include "game/network/fanPacket.hpp"
 #include "game/fanGameTags.hpp"
 
 #include "game/singletonComponents/fanSunLight.hpp"
@@ -128,6 +129,7 @@ namespace fan
 		Game& gameData = world.GetSingletonComponent<Game>();
 
 		// init network
+		status = Status::DISCONNECTED;
 		socket.setBlocking( false );
 		Debug::Log() << gameData.name << " bind on port " << listenPort << Debug::Endl();
 		if( socket.bind( listenPort ) != sf::Socket::Done )
@@ -186,6 +188,8 @@ namespace fan
 		{
 			SCOPED_PROFILE( scene_update );
 
+			NetworkReceive();
+
 			// physics & transforms
 			PhysicsWorld& physicsWorld = world.GetSingletonComponent<PhysicsWorld>();
 			S_SynchronizeMotionStateFromTransform::Run( world, world.Match( S_SynchronizeMotionStateFromTransform::GetSignature( world ) ), _delta );
@@ -221,6 +225,8 @@ namespace fan
 			S_UpdateBoundsFromTransform::Run( world, world.Match( S_UpdateBoundsFromTransform::GetSignature( world ) ), _delta );
 
 			S_UpdateGameCamera::Run( world, world.Match( S_UpdateGameCamera::GetSignature( world ) ), _delta );
+
+			NetworkSend();
 		}
 
 		{
@@ -228,6 +234,95 @@ namespace fan
 			SCOPED_PROFILE( scene_endFrame );
 			world.SortEntities();
 			world.RemoveDeadEntities();
+		}
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
+	void GameClient::NetworkReceive()
+	{
+		// receive
+		sf::Packet		packet;
+		sf::IpAddress	receiveIP = "127.0.0.1";
+		unsigned short	receivePort = 53000;
+
+		const sf::Socket::Status socketStatus = socket.receive( packet, receiveIP, receivePort );
+		if( receiveIP == serverIP && receivePort == serverPort )
+		{
+			switch( status )
+			{
+			case sf::UdpSocket::Done:
+			{
+
+				// Process packet
+				sf::Uint16 intType;
+				packet >> intType;
+				const PacketType type = PacketType( intType );
+
+				switch( type )
+				{
+				case PacketType::ACK:
+				{
+					PacketACK ack;
+					ack.LoadFrom( packet );
+					if( ack.ackType == PacketType::LOGIN && status == Status::DISCONNECTED )
+					{
+						status = Status::CONNECTED;
+						Debug::Highlight() << " connected !" << Debug::Endl();
+					}
+				} break;
+				// 				case PacketType::PING:
+				// 					m_socket.Send( packet, m_serverIp, m_serverPort );
+				// 					break;
+				// 				case PacketType::START_GAME:
+				// 					Debug::Log() << m_socket.GetName() << " start game " << Debug::Endl();
+				// 					m_playersManager->SpawnSpaceShips();
+				// 					break;
+				default:
+					Debug::Warning() << " strange packet received with id: " << intType << Debug::Endl();
+					break;
+				}
+			} break;
+			case sf::UdpSocket::Error:
+				Debug::Warning() << "socket.receive: an unexpected error happened " << Debug::Endl();
+				break;
+			case sf::UdpSocket::Partial:
+			case sf::UdpSocket::NotReady:
+			{
+				// do nothing
+			}break;
+			case sf::UdpSocket::Disconnected:
+			{
+				// disconnect
+			}break;
+			default:
+				assert( false );
+				break;
+			}
+		}
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
+	void GameClient::NetworkSend()
+	{
+		switch( status )
+		{
+		case Status::DISCONNECTED:
+		{
+			PacketLogin packetLogin;
+			packetLogin.name = world.GetSingletonComponent<Game>().name;
+			sf::Packet packet;
+			packetLogin.SaveTo( packet );
+			socket.send( packet, serverIP, serverPort );
+		} break;
+		case Status::CONNECTED:
+		{
+			
+		} break;
+		default:
+			assert( false );
+			break;
 		}
 	}
 }

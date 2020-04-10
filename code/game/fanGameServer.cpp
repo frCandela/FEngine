@@ -2,6 +2,7 @@
 
 #include "core/time/fanProfiler.hpp"
 #include "core/time/fanTime.hpp"
+#include "game/network/fanPacket.hpp"
 
 #include "scene/systems/fanSynchronizeMotionStates.hpp"
 #include "scene/systems/fanRegisterPhysics.hpp"
@@ -127,10 +128,10 @@ namespace fan
 
 		// init network
 		socket.setBlocking( false );
-		Debug::Log() << gameData.name << " bind on port " << listenPort << Debug::Endl();
-		if( socket.bind( listenPort ) != sf::Socket::Done )
+		Debug::Log() << gameData.name << " bind on port " << serverPort << Debug::Endl();
+		if( socket.bind( serverPort ) != sf::Socket::Done )
 		{
-			Debug::Error() << gameData.name << " bind failed on port " << listenPort << Debug::Endl();
+			Debug::Error() << gameData.name << " bind failed on port " << serverPort << Debug::Endl();
 		}
 
 		// init game
@@ -179,6 +180,8 @@ namespace fan
 		{
 			SCOPED_PROFILE( scene_update );
 
+			NetworkReceive();
+
 			// physics & transforms
 			PhysicsWorld& physicsWorld = world.GetSingletonComponent<PhysicsWorld>();
 			S_SynchronizeMotionStateFromTransform::Run( world, world.Match( S_SynchronizeMotionStateFromTransform::GetSignature( world ) ), _delta );
@@ -213,6 +216,8 @@ namespace fan
 			S_UpdateBoundsFromTransform::Run( world, world.Match( S_UpdateBoundsFromTransform::GetSignature( world ) ), _delta );
 
 			S_UpdateGameCamera::Run( world, world.Match( S_UpdateGameCamera::GetSignature( world ) ), _delta );
+
+			NetworkSend();
 		}
 
 		{
@@ -222,4 +227,142 @@ namespace fan
 			world.RemoveDeadEntities();
 		}
 	}
+
+	//================================================================================================================================
+	//================================================================================================================================
+	void GameServer::NetworkReceive()
+	{
+		// receive
+		sf::Packet		packet;
+		sf::IpAddress	receiveIP;
+		unsigned short	receivePort;
+
+		const sf::Socket::Status socketStatus = socket.receive( packet, receiveIP, receivePort );
+		if( receivePort != serverPort )
+		{
+			switch( socketStatus )
+			{
+			case sf::UdpSocket::Done:
+			{
+				Client* client = FindClient( receiveIP, receivePort );
+
+				// create client
+				if( client == nullptr )
+				{
+					Client newClient;
+					newClient.ip = receiveIP;
+					newClient.port = receivePort;
+					newClient.state = Client::DISCONNECTED;
+					newClient.name = "Unknown";
+					clients.push_back( newClient );
+					client = &clients[clients.size() - 1];
+				}
+
+				sf::Uint16 intType;
+				packet >> intType;
+				const PacketType type = PacketType( intType );
+
+				switch( type )
+				{
+				case PacketType::LOGIN:
+				{
+					// first connection
+					if( client->state == Client::DISCONNECTED )
+					{
+
+						PacketLogin login;
+						login.LoadFrom( packet );
+						client->state = Client::CONNECTED_NEED_ACK;
+						client->name = login.name;
+					}
+					// client didn't receive the connection ack yet
+					else if( client->state == Client::CONNECTED )
+					{
+						client->state = Client::CONNECTED_NEED_ACK;
+					}
+
+				} break;
+				// 				case PacketType::PING:
+				// 					m_socket.Send( packet, m_serverIp, m_serverPort );
+				// 					break;
+				// 				case PacketType::START_GAME:
+				// 					Debug::Log() << m_socket.GetName() << " start game " << Debug::Endl();
+				// 					m_playersManager->SpawnSpaceShips();
+				// 					break;
+				default:
+					Debug::Warning() << " strange packet received with id: " << intType << Debug::Endl();
+					break;
+				}
+			} break;
+			case sf::UdpSocket::Error: 
+				Debug::Warning() << "socket.receive: an unexpected error happened " << Debug::Endl();
+				break;
+			case sf::UdpSocket::Partial:
+			case sf::UdpSocket::NotReady:
+			{
+				// do nothing
+			} break;
+			case sf::UdpSocket::Disconnected:
+			{
+				// disconnect client
+			} break;
+			default:
+				assert( false );
+				break;
+			}
+		}
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
+	void GameServer::NetworkSend()
+	{
+		// send
+		for ( Client& client : clients )
+		{
+			switch( client.state )
+			{
+			case Client::DISCONNECTED:
+			{
+				PacketLogin packetLogin;
+				packetLogin.name = "please login potato";
+				sf::Packet packet;
+				packetLogin.SaveTo( packet );
+				socket.send( packet, client.ip, client.port );
+			} break;
+			case Client::CONNECTED_NEED_ACK:
+			{
+				PacketACK packetAck;
+				packetAck.ackType = PacketType::LOGIN;
+				sf::Packet packet;
+				packetAck.SaveTo( packet );
+				socket.send( packet, client.ip, client.port );
+				client.state = Client::CONNECTED;
+			} break;
+			case Client::CONNECTED:
+			{
+
+			} break;
+			default:
+				assert( false );
+				break;
+			}
+		}
+	}
+
+	//================================================================================================================================
+	// returns the client data associated with an ip/port, returns nullptr if it doesn't exists
+	//================================================================================================================================
+	Client* GameServer::FindClient( const sf::IpAddress _ip, const unsigned short _port )
+	{
+		for ( Client& client : clients )
+		{
+			if( client.ip == _ip && client.port == _port )
+			{
+				return &client;
+			}
+		}
+		return nullptr;
+	}
+
 }
