@@ -244,19 +244,22 @@ namespace fan
 			{
 			case sf::UdpSocket::Done:
 			{
+				// create / get client
 				Client* client = FindClient( receiveIP, receivePort );
-
-				// create client
 				if( client == nullptr )
 				{
 					Client newClient;
 					newClient.ip = receiveIP;
 					newClient.port = receivePort;
-					newClient.state = Client::DISCONNECTED;
-					newClient.name = "Unknown";
+					newClient.state = Client::CONNECTING;
+					newClient.name = "Unknown";					
 					clients.push_back( newClient );
 					client = &clients[clients.size() - 1];
 				}
+
+				// update client time
+				const double currentTime = Time::Get().ElapsedSinceStartup();
+				client->lastResponse = currentTime;
 
 				sf::Uint16 intType;
 				packet >> intType;
@@ -267,11 +270,9 @@ namespace fan
 				case PacketType::LOGIN:
 				{
 					// first connection
-					if( client->state == Client::DISCONNECTED )
+					if( client->state == Client::CONNECTING )
 					{
-
-						PacketLogin login;
-						login.LoadFrom( packet );
+						PacketLogin login( packet );
 						client->state = Client::CONNECTED_NEED_ACK;
 						client->name = login.name;
 					}
@@ -282,9 +283,25 @@ namespace fan
 					}
 
 				} break;
-				// 				case PacketType::PING:
-				// 					m_socket.Send( packet, m_serverIp, m_serverPort );
-				// 					break;
+				case PacketType::ACK:
+				{
+// 					PacketACK packetAck( packet );
+// 					switch( packetAck.ackType )
+// 					{
+// 					case PING:
+// 						break;
+// 					default:
+// 						assert( false );
+// 						break;
+// 					}
+				} break;
+				case PacketType::PING:
+				{
+					PacketPing packetPing( packet );
+					client->ping = (float)( currentTime - packetPing.time );
+					Debug::Log() << "ping: " << .5f * 1000.f * client->ping << " ms" << Debug::Endl();
+					break;
+				} break;
 				// 				case PacketType::START_GAME:
 				// 					Debug::Log() << m_socket.GetName() << " start game " << Debug::Endl();
 				// 					m_playersManager->SpawnSpaceShips();
@@ -317,26 +334,24 @@ namespace fan
 	//================================================================================================================================
 	void GameServer::NetworkSend()
 	{
+		const double currentTime = Time::Get().ElapsedSinceStartup();
+
 		// send
-		for ( Client& client : clients )
+		for( Client& client : clients )
 		{
 			switch( client.state )
 			{
-			case Client::DISCONNECTED:
+			case Client::CONNECTING:
 			{
 				PacketLogin packetLogin;
 				packetLogin.name = "please login potato";
-				sf::Packet packet;
-				packetLogin.SaveTo( packet );
-				socket.send( packet, client.ip, client.port );
+				socket.send( packetLogin.ToPacket(), client.ip, client.port );
 			} break;
 			case Client::CONNECTED_NEED_ACK:
 			{
 				PacketACK packetAck;
 				packetAck.ackType = PacketType::LOGIN;
-				sf::Packet packet;
-				packetAck.SaveTo( packet );
-				socket.send( packet, client.ip, client.port );
+				socket.send( packetAck.ToPacket(), client.ip, client.port );
 				client.state = Client::CONNECTED;
 			} break;
 			case Client::CONNECTED:
@@ -346,6 +361,23 @@ namespace fan
 			default:
 				assert( false );
 				break;
+			}
+
+
+			// ping 
+			if( currentTime - client.lastResponse > timeoutDuration )
+			{
+				Debug::Log() << "timeout" << Debug::Endl();
+				//RemoveClient( _client );
+			}
+
+			// ping client
+			if( currentTime - client.lastPingTime > pingDuration )
+			{
+				PacketPing packetPing;
+				packetPing.time = Time::ElapsedSinceStartup();
+				socket.send( packetPing.ToPacket(), client.ip, client.port );
+				client.lastPingTime = currentTime;
 			}
 		}
 	}
@@ -364,5 +396,4 @@ namespace fan
 		}
 		return nullptr;
 	}
-
 }

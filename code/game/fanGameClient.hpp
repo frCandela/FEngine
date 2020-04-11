@@ -25,10 +25,13 @@ namespace fan
 
 		EcsWorld		world;
 		sf::UdpSocket	socket;
-		unsigned short	listenPort = 53001;
+		unsigned short	clientPort = 53001;
 		sf::IpAddress	serverIP = "127.0.0.1";
 		unsigned short	serverPort = 53000;
 		Status			status;
+
+		double mustPingServer = -1.f;
+		float ping = 0.f;
 
 	private:
 		void	NetworkSend();

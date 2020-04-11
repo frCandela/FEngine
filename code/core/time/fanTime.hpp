@@ -14,8 +14,8 @@ namespace fan
 		friend class Singleton<Time>;
 
 	public:
-		static float ElapsedSinceStartup() { return static_cast< float >( glfwGetTime() ); }
-		static double ElapsedSinceStartupDouble() { return glfwGetTime(); }
+		static float ElapsedSinceStartupFloat() { return static_cast< float >( glfwGetTime() ); }
+		static double ElapsedSinceStartup() { return glfwGetTime(); }
 
 		float	GetLogicDelta()	const { return m_logicDelta; }
 		void	SetLogicDelta( const float _delta ) { m_logicDelta = _delta; }
@@ -38,6 +38,6 @@ namespace fan
 
 		uint32_t m_framesCounter = 0;
 		uint32_t m_realFramerateLastSecond = 0;
-		float m_lastLogFrameTime = 0.f;
+		double m_lastLogFrameTime = 0.f;
 	};
 }

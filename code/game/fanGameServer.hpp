@@ -13,7 +13,7 @@ namespace fan
 	struct Client
 	{
 		enum State{ 
-			DISCONNECTED,		// client is disconnected
+			CONNECTING,			// client is disconnected
 			CONNECTED_NEED_ACK, // client is connected but needs an ACK
 			CONNECTED			// client is connected
 		};
@@ -21,9 +21,10 @@ namespace fan
 		sf::IpAddress	ip;
 		unsigned short	port;
 		std::string		name = "";
-		State			state = State::DISCONNECTED;
+		State			state = State::CONNECTING;
 		float			ping = 0.f;
-		float			lastResponse = 0.f;
+		double			lastResponse = 0.f;
+		double			lastPingTime = 0.f;
 	};
 
 	//================================================================================================================================
@@ -43,6 +44,9 @@ namespace fan
 		sf::UdpSocket		socket;
 		unsigned short		serverPort = 53000;
 		std::vector<Client> clients;
+
+		float pingDuration = .1f;	// clients are pinged every X seconds
+		float timeoutDuration = 3.f;	// clients are disconnected after X seconds
 
 	private:
 		void	NetworkSend();

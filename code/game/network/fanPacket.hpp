@@ -9,7 +9,7 @@ namespace fan
 {
 	enum PacketType
 	{
-		PING = 0
+		  PING = 0
 		, ACK
 		, LOGIN
 		, LOGOUT
@@ -23,13 +23,16 @@ namespace fan
 	//================================================================================================================================
 	struct PacketLogin
 	{
-		void SaveTo( sf::Packet& _packet )
+		sf::Packet ToPacket()
 		{
-			_packet << sf::Uint16( PacketType::LOGIN );
-			_packet << name;
+			sf::Packet packet;
+			packet << sf::Uint16( PacketType::LOGIN );
+			packet << name;
+			return packet;
 		}
 
-		void LoadFrom( sf::Packet& _packet )
+		PacketLogin() {}
+		PacketLogin( sf::Packet& _packet )		
 		{
 			_packet >> name;
 		}
@@ -42,13 +45,16 @@ namespace fan
 	//================================================================================================================================
 	struct PacketACK
 	{
-		void SaveTo( sf::Packet& _packet )
+		sf::Packet ToPacket()
 		{
-			_packet << sf::Uint16( PacketType::ACK);
-			_packet << sf::Uint16( ackType );
+			sf::Packet packet;
+			packet << sf::Uint16( PacketType::ACK );
+			packet << sf::Uint16( ackType );
+			return packet;
 		}
 
-		void LoadFrom( sf::Packet& _packet )
+		PacketACK() {}
+		PacketACK( sf::Packet& _packet )
 		{
 			sf::Uint16 intType;
 			_packet >> intType;
@@ -57,6 +63,31 @@ namespace fan
 
 		PacketType ackType = PacketType::COUNT;
 	};
+
+
+	//================================================================================================================================
+	// Packet ping
+	//================================================================================================================================
+	struct PacketPing
+	{
+		PacketPing(){}
+
+		PacketPing( sf::Packet& _packet )
+		{
+			_packet >> time;
+		}
+
+		sf::Packet ToPacket()
+		{
+			sf::Packet packet;
+			packet << sf::Uint16( PacketType::PING );
+			packet << time;
+			return packet;
+		}
+
+		double time = -1.f;
+	};
+	
 
 	//================================================================================================================================
 	//================================================================================================================================

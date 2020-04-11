@@ -50,7 +50,7 @@ namespace fan
 	{
 		++m_framesCounter;
 
-		const float time = ElapsedSinceStartup();
+		const double time = ElapsedSinceStartup();
 		if ( time - m_lastLogFrameTime > 1.f )
 		{
 			m_realFramerateLastSecond = m_framesCounter;

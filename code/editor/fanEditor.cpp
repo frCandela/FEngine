@@ -278,8 +278,6 @@ namespace fan
 
 		while ( m_applicationShouldExit == false && m_window->IsOpen() == true )
 		{
-			const float time = Time::ElapsedSinceStartup();
-
 			// Runs logic, renders ui
 			const float targetLogicDelta = Time::Get().GetLogicDelta();
 			if ( logicClock.ElapsedSeconds() > targetLogicDelta )

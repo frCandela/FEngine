@@ -131,10 +131,10 @@ namespace fan
 		// init network
 		status = Status::DISCONNECTED;
 		socket.setBlocking( false );
-		Debug::Log() << gameData.name << " bind on port " << listenPort << Debug::Endl();
-		if( socket.bind( listenPort ) != sf::Socket::Done )
+		Debug::Log() << gameData.name << " bind on port " << clientPort << Debug::Endl();
+		if( socket.bind( clientPort ) != sf::Socket::Done )
 		{
-			Debug::Error() << gameData.name << " bind failed on port " << listenPort << Debug::Endl();
+			Debug::Error() << gameData.name << " bind failed on port " << clientPort << Debug::Endl();
 		}
 
 		// init game
@@ -249,7 +249,7 @@ namespace fan
 		const sf::Socket::Status socketStatus = socket.receive( packet, receiveIP, receivePort );
 		if( receiveIP == serverIP && receivePort == serverPort )
 		{
-			switch( status )
+			switch( socketStatus )
 			{
 			case sf::UdpSocket::Done:
 			{
@@ -263,18 +263,19 @@ namespace fan
 				{
 				case PacketType::ACK:
 				{
-					PacketACK ack;
-					ack.LoadFrom( packet );
+					PacketACK ack( packet );
 					if( ack.ackType == PacketType::LOGIN && status == Status::DISCONNECTED )
 					{
 						status = Status::CONNECTED;
 						Debug::Highlight() << " connected !" << Debug::Endl();
 					}
 				} break;
-				// 				case PacketType::PING:
-				// 					m_socket.Send( packet, m_serverIp, m_serverPort );
-				// 					break;
-				// 				case PacketType::START_GAME:
+				case PacketType::PING:
+				{
+					PacketPing packetPing( packet );
+					mustPingServer = packetPing.time;				
+				} break;
+				 //case PacketType::START_GAME:
 				// 					Debug::Log() << m_socket.GetName() << " start game " << Debug::Endl();
 				// 					m_playersManager->SpawnSpaceShips();
 				// 					break;
@@ -312,9 +313,7 @@ namespace fan
 		{
 			PacketLogin packetLogin;
 			packetLogin.name = world.GetSingletonComponent<Game>().name;
-			sf::Packet packet;
-			packetLogin.SaveTo( packet );
-			socket.send( packet, serverIP, serverPort );
+			socket.send( packetLogin.ToPacket(), serverIP, serverPort );
 		} break;
 		case Status::CONNECTED:
 		{
@@ -323,6 +322,15 @@ namespace fan
 		default:
 			assert( false );
 			break;
+		}
+
+		// ping
+		if( mustPingServer > 0.f )
+		{
+			PacketPing packetPing;
+			packetPing.time = mustPingServer;
+			socket.send( packetPing.ToPacket(), serverIP, serverPort );
+			mustPingServer = -1.f;
 		}
 	}
 }
