@@ -24,7 +24,6 @@ namespace fan
 	void Planet::Init( EcsWorld& _world, Component& _component )
 	{
 		Planet& planet = static_cast<Planet&>( _component );
-		planet.timeAccumulator = 0.f;
 		planet.speed = 1.f;
 		planet.radius = 2.f;
 		planet.phase = 0.f;		

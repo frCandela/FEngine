@@ -185,6 +185,8 @@ namespace fan
 	//================================================================================================================================
 	void  GameClient::Step( const float _delta )
 	{
+		Game& game = world.GetSingletonComponent<Game>();
+		game.frameIndex++;
 		{
 			SCOPED_PROFILE( scene_update );
 
@@ -247,68 +249,86 @@ namespace fan
 		unsigned short	receivePort = 53000;
 
 		double currentTime = Time::Get().ElapsedSinceStartup();
+		Game& game = world.GetSingletonComponent<Game>();
 
-		const sf::Socket::Status socketStatus = socket.receive( packet, receiveIP, receivePort );
-		if( receiveIP == serverIP && receivePort == serverPort )
+		sf::Socket::Status socketStatus;
+		do
 		{
-			switch( socketStatus )
+			socketStatus = socket.receive( packet, receiveIP, receivePort );
+			if( receiveIP == serverIP && receivePort == serverPort )
 			{
-			case sf::UdpSocket::Done:
-			{
-				serverLastResponse = currentTime;
-
-				// Process packet
-				sf::Uint16 intType;
-				packet >> intType;
-				const PacketType type = PacketType( intType );
-
-				switch( type )
+				switch( socketStatus )
 				{
-				case PacketType::ACK:
+				case sf::UdpSocket::Done:
 				{
-					PacketACK ack( packet );
-					if( ack.ackType == PacketType::LOGIN && status == Status::DISCONNECTED )
+					serverLastResponse = currentTime;
+
+					// Process packet
+					sf::Uint16 intType;
+					packet >> intType;
+					const PacketType type = PacketType( intType );
+
+					switch( type )
 					{
-						status = Status::CONNECTED;
-						Debug::Highlight() << " connected !" << Debug::Endl();
+					case PacketType::ACK:
+					{
+						PacketACK ack( packet );
+						if( ack.ackType == PacketType::LOGIN && status == Status::DISCONNECTED )
+						{
+							status = Status::CONNECTED;
+							Debug::Highlight() << " connected !" << Debug::Endl();
+						}
+					} break;
+					case PacketType::PING:
+					{
+						PacketPing packetPing( packet );
+						mustPingServer = packetPing.time;
+					} break;
+					case PacketType::STATUS:
+					{
+						PacketStatus packetstatus( packet );
+						game.frameIndex = packetstatus.frameIndex;
+						roundTripDelay = packetstatus.roundTripDelay;
+
+					} break;
+					case PacketType::LOGIN:
+					{
+						if( status != DISCONNECTED )
+						{
+							PacketLogin packetLogin( packet );
+							status = DISCONNECTED;
+							Debug::Highlight() << "disconnected" << Debug::Endl();
+						}
+					} break;
+
+					//case PacketType::START_GAME:
+				   // 					Debug::Log() << m_socket.GetName() << " start game " << Debug::Endl();
+				   // 					m_playersManager->SpawnSpaceShips();
+				   // 					break;
+					default:
+						Debug::Warning() << " strange packet received with id: " << intType << Debug::Endl();
+						break;
 					}
 				} break;
-				case PacketType::PING:
+				case sf::UdpSocket::Error:
+					Debug::Warning() << "socket.receive: an unexpected error happened " << Debug::Endl();
+					break;
+				case sf::UdpSocket::Partial:
+				case sf::UdpSocket::NotReady:
 				{
-					PacketPing packetPing( packet );
-					mustPingServer = packetPing.time;				
-				} break;
-				case PacketType::STATUS:
+					// do nothing
+				}break;
+				case sf::UdpSocket::Disconnected:
 				{
-					PacketStatus packetstatus( packet );
-					roundTripDelay = packetstatus.roundTripDelay;
+					// disconnect
 				} break;
-				 //case PacketType::START_GAME:
-				// 					Debug::Log() << m_socket.GetName() << " start game " << Debug::Endl();
-				// 					m_playersManager->SpawnSpaceShips();
-				// 					break;
 				default:
-					Debug::Warning() << " strange packet received with id: " << intType << Debug::Endl();
+					assert( false );
 					break;
 				}
-			} break;
-			case sf::UdpSocket::Error:
-				Debug::Warning() << "socket.receive: an unexpected error happened " << Debug::Endl();
-				break;
-			case sf::UdpSocket::Partial:
-			case sf::UdpSocket::NotReady:
-			{
-				// do nothing
-			}break;
-			case sf::UdpSocket::Disconnected:
-			{
-				// disconnect
-			} break;
-			default:
-				assert( false );
-				break;
 			}
-		}
+		} 
+		while( socketStatus == sf::UdpSocket::Done );
 	}
 
 	//================================================================================================================================
@@ -336,9 +356,10 @@ namespace fan
 
 
 		// server timeout 
-		if( currentTime - serverLastResponse > timeoutDuration )
+		if( status == CONNECTED &&  currentTime - serverLastResponse > timeoutDuration )
 		{
 			Debug::Log() << "server timeout" << Debug::Endl();
+			Debug::Highlight() << "disconnected !" << Debug::Endl();
 			status = DISCONNECTED;
 		}
 

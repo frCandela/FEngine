@@ -3,9 +3,11 @@
 #include "scene/fanSceneTags.hpp"
 #include "scene/components/fanTransform.hpp"
 #include "game/components/fanPlanet.hpp"
+#include "game/singletonComponents/fanGame.hpp"
 #include "game/singletonComponents/fanSunLight.hpp"
 #include "ecs/fanEcsWorld.hpp"
 #include "core/time/fanProfiler.hpp"
+#include "core/time/fanTime.hpp"
 
 namespace fan
 {
@@ -24,16 +26,16 @@ namespace fan
 	{
 		if( _delta == 0.f ) { return; }
 
+		Game& game = _world.GetSingletonComponent<Game>();
+		const float currentTime = game.frameIndex * game.logicDelta;
+
 		for( EntityID entityID : _entities )
 		{
 			Transform& transform = _world.GetComponent<Transform>( entityID );
 			Planet& planet = _world.GetComponent<Planet>( entityID );
 
-			planet.timeAccumulator += _delta;
-			float const time = -planet.speed * planet.timeAccumulator;
+			float const time = -planet.speed * currentTime;
 			btVector3 position( std::cosf( time + planet.phase ), 0, std::sinf( time + planet.phase ) );
-
-			if( std::abs( time ) > SIMD_2_PI ) { planet.timeAccumulator -= SIMD_2_PI / std::abs( planet.speed ); }
 			transform.SetPosition( /*parentTransform.getOrigin()*/ planet.radius * position );
 
 			_world.AddTag<tag_boundsOutdated>( entityID );

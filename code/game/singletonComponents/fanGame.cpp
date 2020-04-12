@@ -34,7 +34,10 @@ namespace fan
 	//================================================================================================================================
 	void Game::Init( EcsWorld& _world, SingletonComponent& _component ){
 		Game& gameData = static_cast<Game&>( _component );
+		gameData.state = STOPPED;
 		gameData.spaceshipPrefab = nullptr;
+		gameData.frameIndex = 0;
+		gameData.logicDelta = 1.f / 60.f;
 	}
 
 	//================================================================================================================================
@@ -53,6 +56,7 @@ namespace fan
 			{
 				gameData.name = buffer;
 			}
+			ImGui::Text( "frame index: %d", gameData.frameIndex );
 
 			// game state
 			std::string stateStr =

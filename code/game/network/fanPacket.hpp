@@ -100,6 +100,7 @@ namespace fan
 		PacketStatus( sf::Packet& _packet )
 		{
 			_packet >> roundTripDelay;
+			_packet >> frameIndex;
 		}
 
 		sf::Packet ToPacket()
@@ -107,10 +108,12 @@ namespace fan
 			sf::Packet packet;
 			packet << sf::Uint16( PacketType::STATUS );
 			packet << roundTripDelay;
+			packet << frameIndex;
 			return packet;
 		}
 
-		float roundTripDelay = -1.f;
+		float		roundTripDelay = -1.f;
+		sf::Uint64	frameIndex = 0;
 	};
 	
 

@@ -18,7 +18,6 @@ namespace fan
 		static void Save( const Component& _component, Json& _json );
 		static void Load( Component& _component, const Json& _json );
 
-		float timeAccumulator;
 		float speed;
 		float radius;
 		float phase;
