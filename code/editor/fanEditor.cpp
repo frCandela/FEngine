@@ -168,11 +168,11 @@ namespace fan
 		m_sceneWindow = new SceneWindow( scene );
 		m_inspectorWindow = new InspectorWindow();
 		m_consoleWindow = new ConsoleWindow();
-		m_ecsWindow = new EcsWindow( *scene.world );
+		m_ecsWindow = new EcsWindow( m_gameWorld );
 		m_profilerWindow = new ProfilerWindow();
 		m_gameViewWindow = new GameViewWindow( m_gameWorld );
 		m_preferencesWindow = new PreferencesWindow();
-		m_networkWindow = new NetworkWindow( scene );
+		m_networkWindow = new NetworkWindow( m_gameWorld );
 		m_singletonsWindow = new SingletonsWindow( m_gameWorld );
 		m_mainMenuBar = new MainMenuBar( m_gameWorld, *m_selection );
 		m_mainMenuBar->SetGrid( &m_editorWorld.GetSingletonComponent<EditorGrid>() );

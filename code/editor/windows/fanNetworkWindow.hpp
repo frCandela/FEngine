@@ -3,23 +3,33 @@
 #include "editor/fanEditorPrecompiled.hpp"
 #include "editor/windows/fanEditorWindow.hpp"
 
+#include "game/fanGameServer.hpp"
+#include "game/fanGameClient.hpp"
+
 namespace fan
 {
-
-	struct Scene;
+	class EcsWorld;
+	struct GameServer;
+	struct GameClient;
 
 	//================================================================================================================================
-	// @wip
+	// Draw gui for the client game or the server game
 	//================================================================================================================================
 	class NetworkWindow : public EditorWindow
 	{
 	public:
+		NetworkWindow( EcsWorld& _world );
 
-		NetworkWindow( Scene& _scene );
 	protected:
 		void OnGui() override;
 
 	private:
-		Scene* m_scene = nullptr;
+		EcsWorld* m_world = nullptr;
+
+		void OnGuiServer( GameServer& _game );
+		void OnGuiClient( GameClient& _game );
+
+		static std::string StateToString( const Client::State	   _state );
+		static std::string StateToString( const GameClient::Status _status );
 	};
 }
