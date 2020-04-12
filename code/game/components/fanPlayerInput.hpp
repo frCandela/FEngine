@@ -3,7 +3,6 @@
 #include "game/fanGamePrecompiled.hpp"
 
 #include "ecs/fanComponent.hpp"
-#include "network/packets/fanPacketPlayerInput.hpp"
 
 namespace fan
 {

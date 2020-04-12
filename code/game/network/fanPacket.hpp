@@ -13,8 +13,10 @@ namespace fan
 		, ACK
 		, LOGIN
 		, LOGOUT
+		, STATUS
 		, PLAYER_INPUT
 		, START_GAME
+
 		, COUNT
 	};
 
@@ -86,6 +88,29 @@ namespace fan
 		}
 
 		double time = -1.f;
+	};
+
+	//================================================================================================================================
+	// Packet status -> client status send from the server to the client
+	//================================================================================================================================
+	struct PacketStatus
+	{
+		PacketStatus() {}
+
+		PacketStatus( sf::Packet& _packet )
+		{
+			_packet >> roundTripDelay;
+		}
+
+		sf::Packet ToPacket()
+		{
+			sf::Packet packet;
+			packet << sf::Uint16( PacketType::STATUS );
+			packet << roundTripDelay;
+			return packet;
+		}
+
+		float roundTripDelay = -1.f;
 	};
 	
 

@@ -246,6 +246,8 @@ namespace fan
 		sf::IpAddress	receiveIP = "127.0.0.1";
 		unsigned short	receivePort = 53000;
 
+		double currentTime = Time::Get().ElapsedSinceStartup();
+
 		const sf::Socket::Status socketStatus = socket.receive( packet, receiveIP, receivePort );
 		if( receiveIP == serverIP && receivePort == serverPort )
 		{
@@ -253,6 +255,7 @@ namespace fan
 			{
 			case sf::UdpSocket::Done:
 			{
+				serverLastResponse = currentTime;
 
 				// Process packet
 				sf::Uint16 intType;
@@ -275,6 +278,11 @@ namespace fan
 					PacketPing packetPing( packet );
 					mustPingServer = packetPing.time;				
 				} break;
+				case PacketType::STATUS:
+				{
+					PacketStatus packetstatus( packet );
+					roundTripDelay = packetstatus.roundTripDelay;
+				} break;
 				 //case PacketType::START_GAME:
 				// 					Debug::Log() << m_socket.GetName() << " start game " << Debug::Endl();
 				// 					m_playersManager->SpawnSpaceShips();
@@ -295,7 +303,7 @@ namespace fan
 			case sf::UdpSocket::Disconnected:
 			{
 				// disconnect
-			}break;
+			} break;
 			default:
 				assert( false );
 				break;
@@ -307,6 +315,8 @@ namespace fan
 	//================================================================================================================================
 	void GameClient::NetworkSend()
 	{
+		double currentTime = Time::Get().ElapsedSinceStartup();
+
 		switch( status )
 		{
 		case Status::DISCONNECTED:
@@ -322,6 +332,14 @@ namespace fan
 		default:
 			assert( false );
 			break;
+		}
+
+
+		// server timeout 
+		if( currentTime - serverLastResponse > timeoutDuration )
+		{
+			Debug::Log() << "server timeout" << Debug::Endl();
+			status = DISCONNECTED;
 		}
 
 		// ping

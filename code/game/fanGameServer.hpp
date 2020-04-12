@@ -22,7 +22,7 @@ namespace fan
 		unsigned short	port;
 		std::string		name = "";
 		State			state = State::CONNECTING;
-		float			ping = 0.f;
+		float			roundTripDelay = 0.f;
 		double			lastResponse = 0.f;
 		double			lastPingTime = 0.f;
 	};
@@ -45,9 +45,8 @@ namespace fan
 		unsigned short		serverPort = 53000;
 		std::vector<Client> clients;
 
-		float pingDuration = .1f;	// clients are pinged every X seconds
-		float timeoutDuration = 3.f;	// clients are disconnected after X seconds
-
+		float pingDuration = .1f;	 // clients are pinged every X seconds
+		float timeoutDuration = 3.f; // clients are disconnected after X seconds
 	private:
 		void	NetworkSend();
 		void	NetworkReceive();

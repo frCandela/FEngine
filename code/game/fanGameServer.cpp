@@ -298,8 +298,7 @@ namespace fan
 				case PacketType::PING:
 				{
 					PacketPing packetPing( packet );
-					client->ping = (float)( currentTime - packetPing.time );
-					Debug::Log() << "ping: " << .5f * 1000.f * client->ping << " ms" << Debug::Endl();
+					client->roundTripDelay = (float)( currentTime - packetPing.time );
 					break;
 				} break;
 				// 				case PacketType::START_GAME:
@@ -337,8 +336,10 @@ namespace fan
 		const double currentTime = Time::Get().ElapsedSinceStartup();
 
 		// send
-		for( Client& client : clients )
+		for( int i = (int)clients.size() - 1; i >= 0; i-- )
 		{
+			Client& client = clients[i];
+
 			switch( client.state )
 			{
 			case Client::CONNECTING:
@@ -364,20 +365,24 @@ namespace fan
 			}
 
 
-			// ping 
+			// client timeout 
 			if( currentTime - client.lastResponse > timeoutDuration )
 			{
-				Debug::Log() << "timeout" << Debug::Endl();
-				//RemoveClient( _client );
+				Debug::Log() << "timeout" << client.name << Debug::Endl();
+				clients.erase( clients.begin() + i );
 			}
 
-			// ping client
+			// ping client & send a status
 			if( currentTime - client.lastPingTime > pingDuration )
 			{
 				PacketPing packetPing;
 				packetPing.time = Time::ElapsedSinceStartup();
 				socket.send( packetPing.ToPacket(), client.ip, client.port );
 				client.lastPingTime = currentTime;
+
+				PacketStatus packetStatus;
+				packetStatus.roundTripDelay = client.roundTripDelay;
+				socket.send( packetStatus.ToPacket(), client.ip, client.port );
 			}
 		}
 	}
