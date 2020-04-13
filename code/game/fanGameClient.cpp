@@ -129,7 +129,7 @@ namespace fan
 		Game& gameData = world.GetSingletonComponent<Game>();
 
 		// init network
-		status = Status::DISCONNECTED;
+		state = State::DISCONNECTED;
 		socket.setBlocking( false );
 		Debug::Log() << gameData.name << " bind on port " << clientPort << Debug::Endl();
 		if( socket.bind( clientPort ) != sf::Socket::Done )
@@ -141,11 +141,11 @@ namespace fan
 		S_RegisterAllRigidbodies::Run( world, world.Match( S_RegisterAllRigidbodies::GetSignature( world ) ) );
 		GameCamera::CreateGameCamera( world );
 		SolarEruption::Start( world );
-		EntityID spaceshipID = Game::SpawnSpaceship( world );
-		if( spaceshipID != 0 )
-		{
-			world.AddComponent<PlayerController>( spaceshipID );
-		}
+// 		EntityID spaceshipID = Game::SpawnSpaceship( world );
+// 		if( spaceshipID != 0 )
+// 		{
+// 			world.AddComponent<PlayerController>( spaceshipID );
+// 		}
 	}
 
 	//================================================================================================================================
@@ -273,9 +273,9 @@ namespace fan
 					case PacketType::ACK:
 					{
 						PacketACK ack( packet );
-						if( ack.ackType == PacketType::LOGIN && status == Status::DISCONNECTED )
+						if( ack.ackType == PacketType::LOGIN && state == State::DISCONNECTED )
 						{
-							status = Status::CONNECTED;
+							state = State::CONNECTED;
 							Debug::Highlight() << " connected !" << Debug::Endl();
 						}
 					} break;
@@ -293,18 +293,24 @@ namespace fan
 					} break;
 					case PacketType::LOGIN:
 					{
-						if( status != DISCONNECTED )
+						if( state != DISCONNECTED )
 						{
 							PacketLogin packetLogin( packet );
-							status = DISCONNECTED;
+							state = DISCONNECTED;
 							Debug::Highlight() << "disconnected" << Debug::Endl();
 						}
 					} break;
-
-					//case PacketType::START_GAME:
-				   // 					Debug::Log() << m_socket.GetName() << " start game " << Debug::Endl();
-				   // 					m_playersManager->SpawnSpaceShips();
-				   // 					break;
+					case PacketType::START:
+					{
+						randomFlags |= MUST_ACK_START;
+						if( state == CONNECTED )
+						{
+							PacketStart packetStart( packet );
+							game.frameStart = packetStart.frameStartIndex;
+							state = STARTING;
+							Debug::Highlight() << "game started" << Debug::Endl();
+						}
+					} break;
 					default:
 						Debug::Warning() << " strange packet received with id: " << intType << Debug::Endl();
 						break;
@@ -337,33 +343,44 @@ namespace fan
 	{
 		double currentTime = Time::Get().ElapsedSinceStartup();
 
-		switch( status )
+		switch( state )
 		{
-		case Status::DISCONNECTED:
+		case State::DISCONNECTED:
 		{
 			PacketLogin packetLogin;
 			packetLogin.name = world.GetSingletonComponent<Game>().name;
 			socket.send( packetLogin.ToPacket(), serverIP, serverPort );
 		} break;
-		case Status::CONNECTED:
+		case State::CONNECTED:
 		{
 			
 		} break;
+		case State::STARTING:
+		{
+
+		} break;
+
 		default:
 			assert( false );
 			break;
 		}
 
-
 		// server timeout 
-		if( status == CONNECTED &&  currentTime - serverLastResponse > timeoutDuration )
+		if( state == CONNECTED &&  currentTime - serverLastResponse > timeoutDuration )
 		{
 			Debug::Log() << "server timeout" << Debug::Endl();
 			Debug::Highlight() << "disconnected !" << Debug::Endl();
-			status = DISCONNECTED;
+			state = DISCONNECTED;
 		}
 
 		// ping
+		if( randomFlags && MUST_ACK_START )
+		{
+			PacketACK packetAck;
+			packetAck.ackType = PacketType::START;
+			socket.send( packetAck.ToPacket(), serverIP, serverPort );
+			randomFlags &= ! MUST_ACK_START;
+		}
 		if( mustPingServer > 0.f )
 		{
 			PacketPing packetPing;

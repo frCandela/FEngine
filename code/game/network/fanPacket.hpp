@@ -14,14 +14,14 @@ namespace fan
 		, LOGIN
 		, LOGOUT
 		, STATUS
+		, START
 		, PLAYER_INPUT
-		, START_GAME
 
 		, COUNT
 	};
 
 	//================================================================================================================================
-	// PacketLogin
+	// PacketLogin server<-client
 	//================================================================================================================================
 	struct PacketLogin
 	{
@@ -43,7 +43,7 @@ namespace fan
 	};
 
 	//================================================================================================================================
-	// Packet ACK
+	// Packet ACK server<->client
 	//================================================================================================================================
 	struct PacketACK
 	{
@@ -68,7 +68,7 @@ namespace fan
 
 
 	//================================================================================================================================
-	// Packet ping
+	// Packet ping server<->client
 	//================================================================================================================================
 	struct PacketPing
 	{
@@ -91,7 +91,7 @@ namespace fan
 	};
 
 	//================================================================================================================================
-	// Packet status -> client status send from the server to the client
+	// Packet status : server->client
 	//================================================================================================================================
 	struct PacketStatus
 	{
@@ -116,29 +116,29 @@ namespace fan
 		sf::Uint64	frameIndex = 0;
 	};
 	
-
 	//================================================================================================================================
+	// Packet game start : server->client
+	// send to the client when the game is starting
 	//================================================================================================================================
-/*	template< PacketType _Type >
-	struct IPacket
+	struct PacketStart
 	{
-		virtual void LoadFrom( sf::Packet&  ) {};
+		PacketStart() {}
+
+		PacketStart( sf::Packet& _packet )
+		{
+			_packet >> frameStartIndex;
+		}
 
 		sf::Packet ToPacket()
 		{
-			ExportTo( packet );
+			sf::Packet packet;
+			packet << sf::Uint16( PacketType::START );
+			packet << frameStartIndex;
 			return packet;
 		}
 
-	protected:
-		virtual void ExportTo( sf::Packet& _packet ) const
-		{
-			_packet << sf::Uint16( s_type );
-		}
-
-		static const PacketType s_type = _Type;
-	};*/
-
+		sf::Uint64	frameStartIndex = 0;
+	};
 
 	//================================================================================================================================
 	// Empty packets

@@ -17,8 +17,6 @@ namespace fan
 		static float ElapsedSinceStartupFloat() { return static_cast< float >( glfwGetTime() ); }
 		static double ElapsedSinceStartup() { return glfwGetTime(); }
 
-		float	GetLogicDelta()	const { return m_logicDelta; }
-		void	SetLogicDelta( const float _delta ) { m_logicDelta = _delta; }
 		float	GetRenderDelta()const { return m_renderDelta; }
 		void	SetRenderDelta( const float _delta ) { m_renderDelta = _delta; }
 		float	GetPhysicsDelta()const { return m_physicsDelta; }

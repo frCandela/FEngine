@@ -38,6 +38,7 @@ namespace fan
 		gameData.spaceshipPrefab = nullptr;
 		gameData.frameIndex = 0;
 		gameData.logicDelta = 1.f / 60.f;
+		gameData.frameStart = 0;
 	}
 
 	//================================================================================================================================

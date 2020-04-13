@@ -34,22 +34,29 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void  NetworkWindow::OnGuiServer( GameServer& _game )
+	void  NetworkWindow::OnGuiServer( GameServer& _gameServer )
 	{
 		double currentTime = Time::Get().ElapsedSinceStartup();
 
+		Game& game = m_world->GetSingletonComponent<Game>();
+
 		ImGui::Text( "Server" );
 		ImGui::Separator();
-		ImGui::Text( "port: %u", _game.serverPort );
-		ImGui::DragFloat( "ping duration", &_game.pingDuration, 0.1f, 0.f, 10.f );
-		ImGui::DragFloat( "timeout duration", &_game.timeoutDuration, 0.1f, 0.f, 10.f );
+		ImGui::Text( "port: %u", _gameServer.serverPort );
+		ImGui::DragFloat( "ping duration", &_gameServer.pingDuration, 0.1f, 0.f, 10.f );
+		ImGui::DragFloat( "timeout duration", &_gameServer.timeoutDuration, 0.1f, 0.f, 10.f );
+		if( ImGui::Button( "Start" ) && _gameServer.state == GameServer::WAITING_FOR_PLAYERS )
+		{ 
+			_gameServer.state = GameServer::STARTING;
+			game.frameStart = game.frameIndex + 180; 
+		}
 
 		// draw all clients
 		if( ImGui::CollapsingHeader( "clients" ) )
 		{
-			for( int i = (int)_game.clients.size() - 1; i >= 0; i-- )
+			for( int i = (int)_gameServer.clients.size() - 1; i >= 0; i-- )
 			{
-				Client& client = _game.clients[i];
+				Client& client = _gameServer.clients[i];
 
 				ImGui::Text( "name           %s", client.name.c_str() );
 				ImGui::Text( "adress         %s::%u", client.ip.toString().c_str(), client.port );
@@ -73,7 +80,7 @@ namespace fan
 		ImGui::DragFloat( "timeout duration",		&_game.timeoutDuration, 0.1f, 0.f, 10.f );
 		ImGui::Text( "client port           %u",	_game.clientPort );
 		ImGui::Text( "server adress         %s::%u", _game.serverIP.toString().c_str(), _game.serverPort );
-		ImGui::Text( "state                 %s",	StateToString( _game.status ).c_str() );
+		ImGui::Text( "state                 %s",	StateToString( _game.state ).c_str() );
 		ImGui::Text( "server last response  %.1f",	currentTime - _game.serverLastResponse );
 		ImGui::Text( "ping                  %.01f", .5f * 1000.f * _game.roundTripDelay );
 	}
@@ -88,19 +95,22 @@ namespace fan
 		case Client::CONNECTING:		  return "CONNECTING";
 		case Client::CONNECTED_NEED_ACK:  return "CONNECTED_NEED_ACK";
 		case Client::CONNECTED:			  return "CONNECTED";
-		default: assert( false ); return "";
+		case Client::STARTING:			  return "STARTING";
+		case Client::PLAYING:			  return "PLAYING";
+		default: return "<ERROR>";
 		}
 	}
 
 	//================================================================================================================================
 	// helper to draw the game client status to string
 	//================================================================================================================================
-	std::string NetworkWindow::StateToString( const GameClient::Status _status )
+	std::string NetworkWindow::StateToString( const GameClient::State _status )
 	{
 		switch( _status )
 		{
 		case GameClient::DISCONNECTED:	return "DISCONNECTED";
 		case GameClient::CONNECTED:		return "CONNECTED";
+		case GameClient::STARTING:		return "STARTING";			
 		default: assert( false ); return "";
 		}
 	}

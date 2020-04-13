@@ -71,10 +71,10 @@ namespace fan
 	//================================================================================================================================
 	void MainMenuBar::Draw()
 	{
-		SCOPED_PROFILE( main_bar )
+		SCOPED_PROFILE( main_bar );
 
 
-			static ImGuiDockNodeFlags dockspace_flags = ImGuiDockNodeFlags_None;
+		static ImGuiDockNodeFlags dockspace_flags = ImGuiDockNodeFlags_None;
 		ImGuiViewport* viewport = ImGui::GetMainViewport();
 		ImGui::SetNextWindowPos( viewport->Pos );
 		ImGui::SetNextWindowSize( viewport->Size );
@@ -94,8 +94,6 @@ namespace fan
 		bool p_open = true;
 		ImGui::PushStyleVar( ImGuiStyleVar_WindowPadding, ImVec2( 0.0f, 0.0f ) );
 		ImGui::Begin( "DockSpace Demo", &p_open, window_flags );
-
-
 
 		ImGui::PopStyleVar();
 		ImGui::PopStyleVar( 2 );
@@ -223,16 +221,18 @@ namespace fan
 			// Framerate set popup
 			if ( ImGui::BeginPopup( "main_menu_bar_set_fps" ) )
 			{
+				Game& game = m_world->GetSingletonComponent<Game>();
+
 				ImGui::PushItemWidth( 80.f );
 				float maxFps = 1.f / Time::Get().GetRenderDelta();
 				if ( ImGui::DragFloat( "fps", &maxFps, 1.f, 1.f, 3000.f, "%.f" ) )
 				{
 					Time::Get().SetRenderDelta( maxFps < 1.f ? 1.f : 1.f / maxFps );
 				}
-				float maxLogicFrequency = 1.f / Time::Get().GetLogicDelta();
+				float maxLogicFrequency = 1.f / game.logicDelta;
 				if ( ImGui::DragFloat( "logic frequency", &maxLogicFrequency, 1.f, 1.f, 3000.f, "%.f" ) )
 				{
-					Time::Get().SetLogicDelta( maxLogicFrequency < 1.f ? 1.f : 1.f / maxLogicFrequency );
+					game.logicDelta = maxLogicFrequency < 1.f ? 1.f : 1.f / maxLogicFrequency;
 				}
 				float maxPhysicsFrequency = 1.f / Time::Get().GetPhysicsDelta();
 				if ( ImGui::DragFloat( "physics frequency", &maxPhysicsFrequency, 1.f, 1.f, 3000.f, "%.f" ) )

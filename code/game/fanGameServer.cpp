@@ -133,6 +133,8 @@ namespace fan
 		{
 			Debug::Error() << gameData.name << " bind failed on port " << serverPort << Debug::Endl();
 		}
+		state = WAITING_FOR_PLAYERS;
+		clients.clear();
 
 		// init game
 		S_RegisterAllRigidbodies::Run( world, world.Match( S_RegisterAllRigidbodies::GetSignature( world ) ) );
@@ -294,16 +296,16 @@ namespace fan
 						} break;
 						case PacketType::ACK:
 						{
-							// 					PacketACK packetAck( packet );
-							// 					switch( packetAck.ackType )
-							// 					{
-							// 					case PING:
-							// 						break;
-							// 					default:
-							// 						assert( false );
-							// 						break;
-
-							// 					}
+							PacketACK packetAck( packet );
+							switch( packetAck.ackType )
+							{
+							case START:
+								client->state = Client::STARTING;
+								break;
+							default:
+								assert( false );
+								break;
+							}
 
 						} break;
 						case PacketType::PING:
@@ -312,10 +314,6 @@ namespace fan
 							client->roundTripDelay = (float)( currentTime - packetPing.time );
 							break;
 						} break;
-						// 				case PacketType::START_GAME:
-						// 					Debug::Log() << m_socket.GetName() << " start game " << Debug::Endl();
-						// 					m_playersManager->SpawnSpaceShips();
-						// 					break;
 						default:
 							Debug::Warning() << " strange packet received with id: " << intType << Debug::Endl();
 							break;
@@ -372,6 +370,15 @@ namespace fan
 				client.state = Client::CONNECTED;
 			} break;
 			case Client::CONNECTED:
+			{
+				if( state == STARTING )
+				{
+					PacketStart packetStart;
+					packetStart.frameStartIndex = game.frameStart;
+					socket.send( packetStart.ToPacket(), client.ip, client.port );
+				}
+			} break;
+			case Client::STARTING:
 			{
 
 			} break;

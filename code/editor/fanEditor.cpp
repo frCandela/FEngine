@@ -276,11 +276,12 @@ namespace fan
 
 		Profiler::Get().Begin();
 
+		Game& game = m_gameWorld.GetSingletonComponent<Game>();
+
 		while ( m_applicationShouldExit == false && m_window->IsOpen() == true )
 		{
 			// Runs logic, renders ui
-			const float targetLogicDelta = Time::Get().GetLogicDelta();
-			if ( logicClock.ElapsedSeconds() > targetLogicDelta )
+			if ( logicClock.ElapsedSeconds() > game.logicDelta )
 			{
 				logicClock.Reset();
 
@@ -290,7 +291,7 @@ namespace fan
 					Input::Get().NewFrame();
 					Mouse::Get().Update( m_gameViewWindow->GetPosition(), m_gameViewWindow->GetSize(), m_gameViewWindow->IsHovered() );
 					ImGui::NewFrame();					
-					ImGui::GetIO().DeltaTime = targetLogicDelta;
+					ImGui::GetIO().DeltaTime = game.logicDelta;
 					m_renderer->GetRendererDebug().ClearDebug();
 
 					onLPPSynch.Emmit();
@@ -298,7 +299,7 @@ namespace fan
 
 				// update				
 				{
-					GameStep( targetLogicDelta );
+					GameStep( game.logicDelta );
 
 					EditorCamera& editorCamera = m_gameWorld.GetSingletonComponent<EditorCamera>();
 					Scene& scene = m_gameWorld.GetSingletonComponent<Scene>();
@@ -306,7 +307,7 @@ namespace fan
 					// only update the editor camera when we are using it
 					if( scene.mainCamera == editorCamera.cameraNode )
 					{
-						EditorCamera::Update( editorCamera, targetLogicDelta );
+						EditorCamera::Update( editorCamera, game.logicDelta );
 					}					
 				}		
 
@@ -619,13 +620,13 @@ namespace fan
 		if( game.gameServer != nullptr )
 		{
 			game.gameServer->Resume();
-			game.gameServer->Step( Time::Get().GetLogicDelta() );
+			game.gameServer->Step( game.logicDelta );
 			game.gameServer->Pause();
 		}
 		else
 		{
 			game.gameClient->Resume();
-			game.gameClient->Step( Time::Get().GetLogicDelta() );
+			game.gameClient->Step( game.logicDelta );
 			game.gameClient->Pause();
 		}
 	}
