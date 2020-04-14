@@ -127,9 +127,9 @@ namespace fan
 		Game& gameData = world.GetSingletonComponent<Game>();
 
 		// init network
-		socket.setBlocking( false );
+		socket.SetBlocking( false );
 		Debug::Log() << gameData.name << " bind on port " << serverPort << Debug::Endl();
-		if( socket.bind( serverPort ) != sf::Socket::Done )
+		if( socket.Bind( serverPort ) != sf::Socket::Done )
 		{
 			Debug::Error() << gameData.name << " bind failed on port " << serverPort << Debug::Endl();
 		}
@@ -158,7 +158,7 @@ namespace fan
 		GameCamera::DeleteGameCamera( world );
 
 		// clears the network
-		socket.unbind();
+		socket.Unbind();
 	}
 
 	//================================================================================================================================
@@ -244,7 +244,7 @@ namespace fan
 		sf::Socket::Status socketStatus;
 		do
 		{
-			socketStatus = socket.receive( packet, receiveIP, receivePort );
+			socketStatus = socket.Receive( packet, receiveIP, receivePort );
 			if( receivePort != serverPort )
 			{
 				switch( socketStatus )
@@ -360,13 +360,13 @@ namespace fan
 			{
 				PacketLogin packetLogin;
 				packetLogin.name = "please login potato";
-				socket.send( packetLogin.ToPacket(), client.ip, client.port );
+				socket.Send( packetLogin.ToPacket(), client.ip, client.port );
 			} break;
 			case Client::CONNECTED_NEED_ACK:
 			{
 				PacketACK packetAck;
 				packetAck.ackType = PacketType::LOGIN;
-				socket.send( packetAck.ToPacket(), client.ip, client.port );
+				socket.Send( packetAck.ToPacket(), client.ip, client.port );
 				client.state = Client::CONNECTED;
 			} break;
 			case Client::CONNECTED:
@@ -375,7 +375,7 @@ namespace fan
 				{
 					PacketStart packetStart;
 					packetStart.frameStartIndex = game.frameStart;
-					socket.send( packetStart.ToPacket(), client.ip, client.port );
+					socket.Send( packetStart.ToPacket(), client.ip, client.port );
 				}
 			} break;
 			case Client::STARTING:
@@ -400,13 +400,13 @@ namespace fan
 			{
 				PacketPing packetPing;
 				packetPing.time = Time::ElapsedSinceStartup();
-				socket.send( packetPing.ToPacket(), client.ip, client.port );
+				socket.Send( packetPing.ToPacket(), client.ip, client.port );
 				client.lastPingTime = currentTime;
 
 				PacketStatus packetStatus;
 				packetStatus.roundTripDelay = client.roundTripDelay;
 				packetStatus.frameIndex = game.frameIndex;
-				socket.send( packetStatus.ToPacket(), client.ip, client.port );
+				socket.Send( packetStatus.ToPacket(), client.ip, client.port );
 			}
 		}
 	}

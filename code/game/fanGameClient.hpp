@@ -3,8 +3,7 @@
 #include "scene/fanScenePrecompiled.hpp"
 #include "ecs/fanEcsWorld.hpp"
 
-#include "SFML/System.hpp"
-#include "SFML/Network.hpp"
+#include "network/fanUdpSocket.hpp"
 
 namespace fan
 {
@@ -25,7 +24,7 @@ namespace fan
 		enum RandomFlags { MUST_PING_SERVER = 1 << 0, MUST_ACK_START = 1 << 1 };
 
 		EcsWorld		world;
-		sf::UdpSocket	socket;
+		UdpSocket		socket;
 		unsigned short	clientPort			= 53001;
 		sf::IpAddress	serverIP			= "127.0.0.1";
 		unsigned short	serverPort			= 53000;

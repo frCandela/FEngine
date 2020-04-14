@@ -130,9 +130,9 @@ namespace fan
 
 		// init network
 		state = State::DISCONNECTED;
-		socket.setBlocking( false );
+		socket.SetBlocking( false );
 		Debug::Log() << gameData.name << " bind on port " << clientPort << Debug::Endl();
-		if( socket.bind( clientPort ) != sf::Socket::Done )
+		if( socket.Bind( clientPort ) != sf::Socket::Done )
 		{
 			Debug::Error() << gameData.name << " bind failed on port " << clientPort << Debug::Endl();
 		}
@@ -164,7 +164,7 @@ namespace fan
 		GameCamera::DeleteGameCamera( world );
 
 		// clears the network
-		socket.unbind();
+		socket.Unbind();
 	}
 
 	//================================================================================================================================
@@ -254,7 +254,7 @@ namespace fan
 		sf::Socket::Status socketStatus;
 		do
 		{
-			socketStatus = socket.receive( packet, receiveIP, receivePort );
+			socketStatus = socket.Receive( packet, receiveIP, receivePort );
 			if( receiveIP == serverIP && receivePort == serverPort )
 			{
 				switch( socketStatus )
@@ -349,7 +349,7 @@ namespace fan
 		{
 			PacketLogin packetLogin;
 			packetLogin.name = world.GetSingletonComponent<Game>().name;
-			socket.send( packetLogin.ToPacket(), serverIP, serverPort );
+			socket.Send( packetLogin.ToPacket(), serverIP, serverPort );
 		} break;
 		case State::CONNECTED:
 		{
@@ -378,14 +378,14 @@ namespace fan
 		{
 			PacketACK packetAck;
 			packetAck.ackType = PacketType::START;
-			socket.send( packetAck.ToPacket(), serverIP, serverPort );
+			socket.Send( packetAck.ToPacket(), serverIP, serverPort );
 			randomFlags &= ! MUST_ACK_START;
 		}
 		if( mustPingServer > 0.f )
 		{
 			PacketPing packetPing;
 			packetPing.time = mustPingServer;
-			socket.send( packetPing.ToPacket(), serverIP, serverPort );
+			socket.Send( packetPing.ToPacket(), serverIP, serverPort );
 			mustPingServer = -1.f;
 		}
 	}

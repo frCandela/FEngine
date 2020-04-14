@@ -3,8 +3,7 @@
 #include "game/fanGamePrecompiled.hpp"
 #include "ecs/fanEcsWorld.hpp"
 
-#include "SFML/System.hpp"
-#include "SFML/Network.hpp"
+#include "network/fanUDPSocket.hpp"
 
 namespace fan
 {
@@ -45,7 +44,7 @@ namespace fan
 		enum State { WAITING_FOR_PLAYERS = 0, STARTING, PLAYING };
 
 		EcsWorld			world;
-		sf::UdpSocket		socket;
+		UdpSocket			socket;
 		unsigned short		serverPort = 53000;
 		std::vector<Client> clients;
 		State				state = WAITING_FOR_PLAYERS;
