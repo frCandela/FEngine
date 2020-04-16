@@ -74,7 +74,6 @@ namespace fan
 		SCOPED_PROFILE( main_bar );
 
 
-		static ImGuiDockNodeFlags dockspace_flags = ImGuiDockNodeFlags_None;
 		ImGuiViewport* viewport = ImGui::GetMainViewport();
 		ImGui::SetNextWindowPos( viewport->Pos );
 		ImGui::SetNextWindowSize( viewport->Size );
@@ -98,8 +97,7 @@ namespace fan
 		ImGui::PopStyleVar();
 		ImGui::PopStyleVar( 2 );
 
-		ImGuiID dockspace_id = ImGui::GetID( "MyDockSpace" );
-		ImGui::DockSpace( dockspace_id, ImVec2( 0.0f, 0.0f ), dockspace_flags );
+		ImGui::DockSpace( ImGui::GetID( "MyDockSpace" ) );
 		ImGui::End();
 
 		// Draw editor windows

@@ -23,7 +23,6 @@ namespace fan
 		struct Connection
 		{
 			void* object = nullptr;
-			void* method = nullptr;
 			std::function<void( _Args... )> lambda;
 		};
 
@@ -31,23 +30,22 @@ namespace fan
 		void Connect( void( _Object::* _method )( _Args... ), _Object* _object )
 		{
 			std::function<void( _Args... )> func = [_method, _object]( _Args... _args ) { ( ( *_object ).*( _method ) )( _args... ); };
-			m_connections.push_back( { _object, &_method, func } );
+			Connection c = { _object, func };
+			m_connections.push_back( c );
 		}
 
 		template <typename _Object >
-		void Disconnect( void( _Object::* _method )( _Args... ), _Object* _object )
+		void Disconnect( _Object* _object )
 		{
-
 			for( int i = 0; i < m_connections.size(); i++ )
 			{
 				Connection& connection = m_connections[i];
-				if( connection.object == _object && connection.method == &_method )
+				if( connection.object )
 				{
 					m_connections.erase( m_connections.begin() + i );
 					return;
 				}
 			}
-			assert( false ); // Remove failed : no connection found
 		}
 
 		void Emmit( _Args... _args )
