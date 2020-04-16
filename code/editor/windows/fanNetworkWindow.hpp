@@ -29,7 +29,7 @@ namespace fan
 		void OnGuiServer( GameServer& _game );
 		void OnGuiClient( GameClient& _game );
 
-		static std::string StateToString( const Client::State	   _state );
-		static std::string StateToString( const GameClient::State _status );
+// 		static std::string StateToString( const Client::State	   _state );
+// 		static std::string StateToString( const GameClient::State _status );
 	};
 }

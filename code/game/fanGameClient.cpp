@@ -30,7 +30,8 @@
 #include "scene/singletonComponents/fanScenePointers.hpp"
 #include "scene/singletonComponents/fanPhysicsWorld.hpp"
 #include "scene/fanSceneTags.hpp"
-#include "game/network/fanPacket.hpp"
+#include "network/fanPacket.hpp"
+#include "network/singletonComponents/fanClientConnectionManager.hpp"
 #include "game/fanGameTags.hpp"
 
 #include "game/singletonComponents/fanSunLight.hpp"
@@ -38,6 +39,7 @@
 #include "game/singletonComponents/fanCollisionManager.hpp"
 #include "game/singletonComponents/fanSolarEruption.hpp"
 #include "game/singletonComponents/fanGame.hpp"
+#include "network/singletonComponents/fanDeliveryNotificationManager.hpp"
 
 #include "game/systems/fanUpdatePlanets.hpp"
 #include "game/systems/fanUpdateSpaceships.hpp"
@@ -106,13 +108,15 @@ namespace fan
 		world.AddSingletonComponentType<RenderWorld>();
 		world.AddSingletonComponentType<PhysicsWorld>();
 		world.AddSingletonComponentType<ScenePointers>();
-
 		// game singleton components
 		world.AddSingletonComponentType<SunLight>();
 		world.AddSingletonComponentType<GameCamera>();
 		world.AddSingletonComponentType<CollisionManager>();
 		world.AddSingletonComponentType<Game>();
 		world.AddSingletonComponentType<SolarEruption>();
+		// network singleton components
+		world.AddSingletonComponentType<DeliveryNotificationManager>();
+		world.AddSingletonComponentType<ClientConnectionManager>();
 
 		world.AddTagType<tag_boundsOutdated>();
 		world.AddTagType<tag_sunlight_occlusion>();
@@ -128,16 +132,19 @@ namespace fan
 	{
 		Game& gameData = world.GetSingletonComponent<Game>();
 
-		// init network
-		state = State::DISCONNECTED;
-		socket.SetBlocking( false );
-		Debug::Log() << gameData.name << " bind on port " << clientPort << Debug::Endl();
-		if( socket.Bind( clientPort ) != sf::Socket::Done )
+		// Init network
+		// bind
+		ClientConnectionManager& connection = world.GetSingletonComponent<ClientConnectionManager>();
+		Debug::Log() << gameData.name << " bind on port " << connection.clientPort << Debug::Endl();
+		if( connection.socket.Bind( connection.clientPort ) != sf::Socket::Done )
 		{
-			Debug::Error() << gameData.name << " bind failed on port " << clientPort << Debug::Endl();
+			Debug::Error() << gameData.name << " bind failed on port " << connection.clientPort << Debug::Endl();
 		}
+		// create remote host for the server
+		DeliveryNotificationManager& deliveryNotificationManager = world.GetSingletonComponent<DeliveryNotificationManager>();
+		deliveryNotificationManager.CreateHost();
 
-		// init game
+		// Init game
 		S_RegisterAllRigidbodies::Run( world, world.Match( S_RegisterAllRigidbodies::GetSignature( world ) ) );
 		GameCamera::CreateGameCamera( world );
 		SolarEruption::Start( world );
@@ -164,7 +171,8 @@ namespace fan
 		GameCamera::DeleteGameCamera( world );
 
 		// clears the network
-		socket.Unbind();
+		ClientConnectionManager& connection = world.GetSingletonComponent<ClientConnectionManager>();
+		connection.socket.Unbind();
 	}
 
 	//================================================================================================================================
@@ -191,6 +199,8 @@ namespace fan
 			SCOPED_PROFILE( scene_update );
 
 			NetworkReceive();
+			DeliveryNotificationManager& deliveryNotificationManager = world.GetSingletonComponent<DeliveryNotificationManager>();
+			deliveryNotificationManager.ProcessTimedOutPackets();
 
 			// physics & transforms
 			PhysicsWorld& physicsWorld = world.GetSingletonComponent<PhysicsWorld>();
@@ -244,149 +254,210 @@ namespace fan
 	void GameClient::NetworkReceive()
 	{
 		// receive
-		sf::Packet		packet;
-		sf::IpAddress	receiveIP = "127.0.0.1";
-		unsigned short	receivePort = 53000;
+		Packet			packet;
+		sf::IpAddress	receiveIP;
+		unsigned short	receivePort;
 
-		double currentTime = Time::Get().ElapsedSinceStartup();
-		Game& game = world.GetSingletonComponent<Game>();
+		DeliveryNotificationManager& deliveryNotificationManager = world.GetSingletonComponent<DeliveryNotificationManager>();
+		ClientConnectionManager& connection = world.GetSingletonComponent<ClientConnectionManager>();
 
 		sf::Socket::Status socketStatus;
 		do
 		{
-			socketStatus = socket.Receive( packet, receiveIP, receivePort );
-			if( receiveIP == serverIP && receivePort == serverPort )
+			packet.Clear();
+			socketStatus = connection.socket.Receive( packet, receiveIP, receivePort );
+
+			// only receive from the server
+			if( receiveIP != connection.serverIP || receivePort != connection.serverPort )
 			{
-				switch( socketStatus )
+				continue;
+			}
+
+			switch( socketStatus )
+			{
+			case sf::UdpSocket::Done:
+			{
+				// read the first packet type separately
+				PacketType packetType = packet.ReadType();
+				if( packetType == PacketType::Ack )
 				{
-				case sf::UdpSocket::Done:
+					packet.onlyContainsAck = true;
+				}
+
+				if( !deliveryNotificationManager.ValidatePacket( packet ) ) 
 				{
-					serverLastResponse = currentTime;
+					continue; 
+				}
 
-					// Process packet
-					sf::Uint16 intType;
-					packet >> intType;
-					const PacketType type = PacketType( intType );
-
-					switch( type )
+				// Process packet
+				while( true )
+				{					
+					switch( packetType )
 					{
-					case PacketType::ACK:
+					case PacketType::Ack:
 					{
-						PacketACK ack( packet );
-						if( ack.ackType == PacketType::LOGIN && state == State::DISCONNECTED )
-						{
-							state = State::CONNECTED;
-							Debug::Highlight() << " connected !" << Debug::Endl();
-						}
+						PacketAck packetAck;
+						packetAck.Read( packet );
+						deliveryNotificationManager.Receive( packetAck );
+					}break;
+					case PacketType::Ping:
+					{
+						PacketPing packetPing;
+						packetPing.Load( packet );
+						connection.ProcessPacket( packetPing );
 					} break;
-					case PacketType::PING:
+// 					case PacketType::STATUS:
+// 					{
+// 						PacketStatus packetstatus;
+// 						packetstatus.Load( packet );
+// 						game.frameIndex = packetstatus.frameIndex;
+// 						roundTripDelay = packetstatus.roundTripDelay;
+// 					
+// 					} break;
+					case PacketType::LoggedIn:
 					{
-						PacketPing packetPing( packet );
-						mustPingServer = packetPing.time;
+						PacketLoginSuccess packetLogin;
+						packetLogin.Load( packet );
+						connection.ProcessPacket( packetLogin );
 					} break;
-					case PacketType::STATUS:
-					{
-						PacketStatus packetstatus( packet );
-						game.frameIndex = packetstatus.frameIndex;
-						roundTripDelay = packetstatus.roundTripDelay;
-
-					} break;
-					case PacketType::LOGIN:
-					{
-						if( state != DISCONNECTED )
-						{
-							PacketLogin packetLogin( packet );
-							state = DISCONNECTED;
-							Debug::Highlight() << "disconnected" << Debug::Endl();
-						}
-					} break;
-					case PacketType::START:
-					{
-						randomFlags |= MUST_ACK_START;
-						if( state == CONNECTED )
-						{
-							PacketStart packetStart( packet );
-							game.frameStart = packetStart.frameStartIndex;
-							state = STARTING;
-							Debug::Highlight() << "game started" << Debug::Endl();
-						}
-					} break;
+// 					case PacketType::START:
+// 					{
+// 						randomFlags |= MUST_ACK_START;
+// 						if( state == CONNECTED )
+// 						{
+// 							PacketStart packetStart;
+// 							packetStart.Load( packet );
+// 							game.frameStart = packetStart.frameStartIndex;
+// 							state = STARTING;
+// 							Debug::Highlight() << "game started" << Debug::Endl();
+// 						}
+// 					} break;
 					default:
-						Debug::Warning() << " strange packet received with id: " << intType << Debug::Endl();
+						Debug::Warning() << " strange packet received with id: " << int( packetType ) << Debug::Endl();
 						break;
 					}
-				} break;
-				case sf::UdpSocket::Error:
-					Debug::Warning() << "socket.receive: an unexpected error happened " << Debug::Endl();
-					break;
-				case sf::UdpSocket::Partial:
-				case sf::UdpSocket::NotReady:
-				{
-					// do nothing
-				}break;
-				case sf::UdpSocket::Disconnected:
-				{
-					// disconnect
-				} break;
-				default:
-					assert( false );
-					break;
+
+					// stop if we reach the end or reads the next packet type
+					if( packet.EndOfPacket() ) 
+					{ 
+						break; 
+					}
+					else { 
+						packetType = packet.ReadType(); 
+					}
 				}
+			} break;
+			case sf::UdpSocket::Error:
+				Debug::Warning() << "socket.receive: an unexpected error happened " << Debug::Endl();
+				break;
+			case sf::UdpSocket::Partial:
+			case sf::UdpSocket::NotReady:
+			{
+				// do nothing
+			}break;
+			case sf::UdpSocket::Disconnected:
+			{
+				// disconnect
+			} break;
+			default:
+				assert( false );
+				break;
 			}
-		} 
+		}
 		while( socketStatus == sf::UdpSocket::Done );
+	}
+
+	void  GameClient::OnTestFailure( HostID _client )
+	{
+		Debug::Log( "failure" );
+	}
+	void  GameClient::OnTestSuccess( HostID _client )
+	{
+		Debug::Log( "success" );
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
 	void GameClient::NetworkSend()
 	{
-		double currentTime = Time::Get().ElapsedSinceStartup();
+		ClientConnectionManager& connection = world.GetSingletonComponent<ClientConnectionManager>();
+		DeliveryNotificationManager& deliveryNotificationManager = world.GetSingletonComponent<DeliveryNotificationManager>();
 
-		switch( state )
-		{
-		case State::DISCONNECTED:
-		{
-			PacketLogin packetLogin;
-			packetLogin.name = world.GetSingletonComponent<Game>().name;
-			socket.Send( packetLogin.ToPacket(), serverIP, serverPort );
-		} break;
-		case State::CONNECTED:
-		{
-			
-		} break;
-		case State::STARTING:
-		{
+		// create packet
+		Packet packet( deliveryNotificationManager.GetNextPacketTag() );
 
-		} break;
+		// write packet
+		connection.Send( packet );
 
-		default:
-			assert( false );
-			break;
+		if( packet.GetSize() == sizeof( PacketTag ) ) { packet.onlyContainsAck = true; }
+
+		deliveryNotificationManager.SendAck( packet );
+
+		// send packet, don't send empty packets
+		if( packet.GetSize() > sizeof( PacketTag ) )
+		{
+			deliveryNotificationManager.RegisterPacket( packet );
+			connection.socket.Send( packet, connection.serverIP, connection.serverPort );
+		}
+		else
+		{
+			deliveryNotificationManager.hostDatas[0].nextPacketTag--;
 		}
 
-		// server timeout 
-		if( state == CONNECTED &&  currentTime - serverLastResponse > timeoutDuration )
-		{
-			Debug::Log() << "server timeout" << Debug::Endl();
-			Debug::Highlight() << "disconnected !" << Debug::Endl();
-			state = DISCONNECTED;
-		}
-
-		// ping
-		if( randomFlags && MUST_ACK_START )
-		{
-			PacketACK packetAck;
-			packetAck.ackType = PacketType::START;
-			socket.Send( packetAck.ToPacket(), serverIP, serverPort );
-			randomFlags &= ! MUST_ACK_START;
-		}
-		if( mustPingServer > 0.f )
-		{
-			PacketPing packetPing;
-			packetPing.time = mustPingServer;
-			socket.Send( packetPing.ToPacket(), serverIP, serverPort );
-			mustPingServer = -1.f;
-		}
-	}
+// 		double currentTime = Time::Get().ElapsedSinceStartup();
+// 
+//  		Packet packet = socket.CreatePacket(); // One packet to rule them all
+// 
+// 		switch( state )
+// 		{
+// 		case State::DISCONNECTED:
+// 		{
+// 			PacketLogin packetLogin;
+// 			packetLogin.name = world.GetSingletonComponent<Game>().name;
+// 			packetLogin.Save( packet );
+// 		} break;
+// 		case State::CONNECTED:
+// 		{
+// 			
+// 		} break;
+// 		case State::STARTING:
+// 		{
+// 
+// 		} break;
+// 
+// 		default:
+// 			assert( false );
+// 			break;
+// 		}
+// 
+// 		// server timeout 
+// 		if( state == CONNECTED &&  currentTime - serverLastResponse > timeoutDuration )
+// 		{
+// 			Debug::Log() << "server timeout" << Debug::Endl();
+// 			Debug::Highlight() << "disconnected !" << Debug::Endl();
+// 			state = DISCONNECTED;
+// 		}
+// 
+// 		// ping
+// 		if( randomFlags && MUST_ACK_START )
+// 		{
+// 			PacketACK packetAck;
+// 			packetAck.ackType = PacketType::START;
+// 			packetAck.Save( packet );
+// 			randomFlags &= ! MUST_ACK_START;
+// 		}
+// 		if( mustPingServer > 0.f )
+// 		{
+// 			PacketPing packetPing;
+// 			packetPing.time = mustPingServer;
+// 			packetPing.Save( packet );
+// 			mustPingServer = -1.f;
+// 		}
+// 
+// 		// send packet
+// 		if( packet.getDataSize() > 0 )
+// 		{
+// 			socket.Send( packet, serverIP, serverPort );
+// 		}
+ 	}
 }

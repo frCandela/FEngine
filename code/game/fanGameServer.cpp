@@ -2,7 +2,7 @@
 
 #include "core/time/fanProfiler.hpp"
 #include "core/time/fanTime.hpp"
-#include "game/network/fanPacket.hpp"
+#include "network/fanPacket.hpp"
 
 #include "scene/systems/fanSynchronizeMotionStates.hpp"
 #include "scene/systems/fanRegisterPhysics.hpp"
@@ -33,6 +33,8 @@
 #include "scene/fanSceneTags.hpp"
 #include "game/fanGameTags.hpp"
 
+#include "network/singletonComponents/fanServerConnectionManager.hpp"
+#include "network/singletonComponents/fanDeliveryNotificationManager.hpp"
 #include "game/singletonComponents/fanCollisionManager.hpp"
 #include "game/singletonComponents/fanSolarEruption.hpp"
 #include "game/singletonComponents/fanGameCamera.hpp"
@@ -104,14 +106,16 @@ namespace fan
 		world.AddSingletonComponentType<RenderWorld>();
 		world.AddSingletonComponentType<PhysicsWorld>();
 		world.AddSingletonComponentType<ScenePointers>();
-
 		// game singleton components
 		world.AddSingletonComponentType<SunLight>();
 		world.AddSingletonComponentType<GameCamera>();
 		world.AddSingletonComponentType<CollisionManager>();
 		world.AddSingletonComponentType<Game>();
 		world.AddSingletonComponentType<SolarEruption>();
-
+		// net singleton components
+		world.AddSingletonComponentType<ServerConnectionManager>();
+		world.AddSingletonComponentType<DeliveryNotificationManager>();
+		
 		world.AddTagType<tag_boundsOutdated>();
 		world.AddTagType<tag_sunlight_occlusion>();
 
@@ -127,19 +131,18 @@ namespace fan
 		Game& gameData = world.GetSingletonComponent<Game>();
 
 		// init network
-		socket.SetBlocking( false );
-		Debug::Log() << gameData.name << " bind on port " << serverPort << Debug::Endl();
-		if( socket.Bind( serverPort ) != sf::Socket::Done )
+		ServerConnectionManager& connection = world.GetSingletonComponent<ServerConnectionManager>();
+		Debug::Log() << gameData.name << " bind on port " << connection.serverPort << Debug::Endl();
+		if( connection.socket.Bind( connection.serverPort ) != sf::Socket::Done )
 		{
-			Debug::Error() << gameData.name << " bind failed on port " << serverPort << Debug::Endl();
+			Debug::Error() << gameData.name << " bind failed on port " << connection.serverPort << Debug::Endl();
 		}
 		state = WAITING_FOR_PLAYERS;
-		clients.clear();
 
 		// init game
 		S_RegisterAllRigidbodies::Run( world, world.Match( S_RegisterAllRigidbodies::GetSignature( world ) ) );
 		GameCamera::CreateGameCamera( world );
-		SolarEruption::Start( world );
+		SolarEruption::Start( world );		
 	}
 
 	//================================================================================================================================
@@ -158,7 +161,9 @@ namespace fan
 		GameCamera::DeleteGameCamera( world );
 
 		// clears the network
-		socket.Unbind();
+		ServerConnectionManager& connection = world.GetSingletonComponent<ServerConnectionManager>();
+		connection.socket.Unbind();
+		connection.clients.clear();
 	}
 
 	//================================================================================================================================
@@ -185,6 +190,8 @@ namespace fan
 			SCOPED_PROFILE( scene_update );
 
 			NetworkReceive();
+			DeliveryNotificationManager& deliveryNotificationManager = world.GetSingletonComponent<DeliveryNotificationManager>();
+			deliveryNotificationManager.ProcessTimedOutPackets();
 
 			// physics & transforms
 			PhysicsWorld& physicsWorld = world.GetSingletonComponent<PhysicsWorld>();
@@ -237,192 +244,192 @@ namespace fan
 	void GameServer::NetworkReceive()
 	{
 		// receive
-		sf::Packet		packet;
+		Packet			packet;
 		sf::IpAddress	receiveIP;
 		unsigned short	receivePort;
 
+		ServerConnectionManager& connection = world.GetSingletonComponent<ServerConnectionManager>();
+		DeliveryNotificationManager& deliveryNotificationManager = world.GetSingletonComponent<DeliveryNotificationManager>();
 		sf::Socket::Status socketStatus;
 		do
 		{
-			socketStatus = socket.Receive( packet, receiveIP, receivePort );
-			if( receivePort != serverPort )
+			packet.Clear();
+			socketStatus = connection.socket.Receive( packet, receiveIP, receivePort );
+
+			// Don't receive from itself
+			if( receivePort == connection.serverPort ) { continue; }
+
+			switch( socketStatus )
 			{
-				switch( socketStatus )
+			case sf::UdpSocket::Done:
+			{
+				// create / get client
+				HostID clientID = connection.FindClient( receiveIP, receivePort );
+				if( clientID == -1 )
 				{
-				case sf::UdpSocket::Done:
-				{
-					// create / get client
-					Client* client = FindClient( receiveIP, receivePort );
-					if( client == nullptr )
-					{
-						Client newClient;
-						newClient.ip = receiveIP;
-						newClient.port = receivePort;
-						newClient.state = Client::CONNECTING;
-						newClient.name = "Unknown";
-						clients.push_back( newClient );
-						client = &clients[clients.size() - 1];
-					}
-
-					// update client last response
-					const double currentTime = Time::Get().ElapsedSinceStartup();
-					client->lastResponse = currentTime;
-
-					// get packet type
-					sf::Uint16 intType;
-					packet >> intType;
-					const PacketType type = PacketType( intType );
-
-					// the client must login before doing anything else
-					if( type == PacketType::LOGIN || client->state != Client::CONNECTING )
-					{
-						switch( type )
-						{
-						case PacketType::LOGIN:
-						{
-							// first connection
-							if( client->state == Client::CONNECTING )
-							{
-								PacketLogin login( packet );
-								client->state = Client::CONNECTED_NEED_ACK;
-								client->name = login.name;
-							}
-							// client didn't receive the connection ack yet
-							else if( client->state == Client::CONNECTED )
-							{
-								client->state = Client::CONNECTED_NEED_ACK;
-							}
-
-						} break;
-						case PacketType::ACK:
-						{
-							PacketACK packetAck( packet );
-							switch( packetAck.ackType )
-							{
-							case START:
-								client->state = Client::STARTING;
-								break;
-							default:
-								assert( false );
-								break;
-							}
-
-						} break;
-						case PacketType::PING:
-						{
-							PacketPing packetPing( packet );
-							client->roundTripDelay = (float)( currentTime - packetPing.time );
-							break;
-						} break;
-						default:
-							Debug::Warning() << " strange packet received with id: " << intType << Debug::Endl();
-							break;
-						}
-					}
-				} break;
-				case sf::UdpSocket::Error:
-				{
-					Debug::Warning() << "socket.receive: an unexpected error happened " << Debug::Endl();
-				} break;
-				case sf::UdpSocket::Partial:
-				case sf::UdpSocket::NotReady:
-				{
-					// do nothing
-				} break;
-				case sf::UdpSocket::Disconnected:
-				{
-					// disconnect client
-				} break;
-				default:
-					assert( false );
-					break;
+					clientID = connection.CreateClient( receiveIP, receivePort );
+					deliveryNotificationManager.CreateHost( clientID );
 				}
+
+				// read the first packet type separately
+				PacketType packetType = packet.ReadType();
+				if( packetType == PacketType::Ack )
+				{
+					packet.onlyContainsAck = true;
+				}
+
+				// packet must be approved & ack must be sent
+				if( !deliveryNotificationManager.ValidatePacket( packet, clientID ) ){continue; }
+
+				// process packet
+				while( true )
+				{
+					switch( packetType )
+					{
+					case PacketType::Ack:
+					{
+						PacketAck packetAck;
+						packetAck.Read( packet );
+						deliveryNotificationManager.Receive( packetAck, clientID );
+					}break;
+					case PacketType::Hello:
+					{
+						PacketHello packetHello;
+						packetHello.Load( packet );
+						connection.ProcessPacket( clientID, packetHello );
+					} break;
+
+					default:
+						Debug::Warning() << " strange packet received with id: " << int( packetType ) << Debug::Endl();
+						break;
+					}
+
+					// stop if we reach the end or reads the next packet type
+					if( packet.EndOfPacket() )
+					{
+						break;
+					}
+					else
+					{
+						packetType = packet.ReadType();
+					}
+				}
+			} break;
+			case sf::UdpSocket::Error:
+			{
+				Debug::Warning() << "socket.receive: an unexpected error happened " << Debug::Endl();
+			} break;
+			case sf::UdpSocket::Partial:
+			case sf::UdpSocket::NotReady:
+			{
+				// do nothing
+			} break;
+			case sf::UdpSocket::Disconnected:
+			{
+				// disconnect client
+			} break;
+			default:
+				assert( false );
+				break;
 			}
-		}
-		while( socketStatus == sf::UdpSocket::Done );
+		} while( socketStatus == sf::UdpSocket::Done );
+	}
+
+	void  GameServer::OnTestFailure( HostID _client )
+	{
+		Debug::Log( "failure" );
+	}
+	void  GameServer::OnTestSuccess( HostID _client )
+	{
+		Debug::Log( "success" );
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
 	void GameServer::NetworkSend()
 	{
-		const double currentTime = Time::Get().ElapsedSinceStartup();
-		Game& game = world.GetSingletonComponent<Game>();
-
-		// send
-		for( int i = (int)clients.size() - 1; i >= 0; i-- )
+		ServerConnectionManager& connection = world.GetSingletonComponent<ServerConnectionManager>();
+		DeliveryNotificationManager& deliveryNotificationManager = world.GetSingletonComponent<DeliveryNotificationManager>();
+		for( int i = (int)connection.clients.size() - 1; i >= 0; i-- )
 		{
-			Client& client = clients[i];
+			// create packet
+			Client& client = connection.clients[i];
+			Packet packet( deliveryNotificationManager.GetNextPacketTag( client.clientId ) );
 
-			switch( client.state )
-			{
-			case Client::CONNECTING:
-			{
-				PacketLogin packetLogin;
-				packetLogin.name = "please login potato";
-				socket.Send( packetLogin.ToPacket(), client.ip, client.port );
-			} break;
-			case Client::CONNECTED_NEED_ACK:
-			{
-				PacketACK packetAck;
-				packetAck.ackType = PacketType::LOGIN;
-				socket.Send( packetAck.ToPacket(), client.ip, client.port );
-				client.state = Client::CONNECTED;
-			} break;
-			case Client::CONNECTED:
-			{
-				if( state == STARTING )
-				{
-					PacketStart packetStart;
-					packetStart.frameStartIndex = game.frameStart;
-					socket.Send( packetStart.ToPacket(), client.ip, client.port );
-				}
-			} break;
-			case Client::STARTING:
-			{
+			// write packet
+			connection.Send( packet,  client.clientId );
 
-			} break;
-			default:
-				assert( false );
-				break;
+			if( packet.GetSize() == sizeof( PacketTag ) ) { packet.onlyContainsAck = true; }
+
+			deliveryNotificationManager.SendAck( packet, client.clientId );
+
+			// send packet
+			if( packet.GetSize() > sizeof(PacketTag ) )// don't send empty packets
+			{
+				deliveryNotificationManager.RegisterPacket( packet, client.clientId );
+				connection.socket.Send( packet, client.ip, client.port );
 			}
-
-
-			// client timeout 
-			if( currentTime - client.lastResponse > timeoutDuration )
+			else
 			{
-				Debug::Log() << "timeout" << client.name << Debug::Endl();
-				clients.erase( clients.begin() + i );
-			}
-
-			// ping client & send a status
-			if( currentTime - client.lastPingTime > pingDuration )
-			{
-				PacketPing packetPing;
-				packetPing.time = Time::ElapsedSinceStartup();
-				socket.Send( packetPing.ToPacket(), client.ip, client.port );
-				client.lastPingTime = currentTime;
-
-				PacketStatus packetStatus;
-				packetStatus.roundTripDelay = client.roundTripDelay;
-				packetStatus.frameIndex = game.frameIndex;
-				socket.Send( packetStatus.ToPacket(), client.ip, client.port );
+				deliveryNotificationManager.hostDatas[i].nextPacketTag --; 
 			}
 		}
-	}
-
-	//================================================================================================================================
-	// returns the client data associated with an ip/port, returns nullptr if it doesn't exists
-	//================================================================================================================================
-	Client* GameServer::FindClient( const sf::IpAddress _ip, const unsigned short _port )
-	{
-		for ( Client& client : clients )
-		{
-			if( client.ip == _ip && client.port == _port )
-			{
-				return &client;
-			}
-		}
-		return nullptr;
+// 
+// 		Game& game = world.GetSingletonComponent<Game>();		
+// 
+// 		// send
+// 		for( int i = (int)clients.size() - 1; i >= 0; i-- )
+// 		{
+// 			Client& client = clients[i];
+// 			Packet packet = socket.CreatePacket(); // One packet to rule them all
+// 
+// 			switch( client.state )
+// 			{
+// 			case Client::CONNECTED:
+// 			{
+// 				if( state == STARTING )
+// 				{
+// 					PacketStart packetStart;
+// 					packetStart.frameStartIndex = game.frameStart;
+// 					packetStart.Save( packet );
+// 				}
+// 			} break;
+// 			case Client::STARTING:
+// 			{
+// 
+// 			} break;
+// 			default:
+// 				assert( false );
+// 				break;
+// 			}
+// 
+// 
+// 			// client timeout 
+// 			if( currentTime - client.lastResponse > timeoutDuration )
+// 			{
+// 				Debug::Log() << "timeout" << client.name << Debug::Endl();
+// 				clients.erase( clients.begin() + i );
+// 			}
+// 
+// 			// ping client & send a status
+// 			if( currentTime - client.lastPingTime > pingDuration )
+// 			{
+// 				PacketPing packetPing;
+// 				packetPing.time = Time::ElapsedSinceStartup();
+// 				packetPing.Save( packet );
+// 				client.lastPingTime = currentTime;
+// 
+// 				PacketStatus packetStatus;
+// 				packetStatus.roundTripDelay = client.roundTripDelay;
+// 				packetStatus.frameIndex = game.frameIndex;
+// 				packetStatus.Save( packet );
+// 			}
+// 
+// 			// send packet
+// 			if( packet.getDataSize() > 0 )
+// 			{
+// 				socket.Send( packet, client.ip, client.port );
+// 			}
+//		}
 	}
 }
