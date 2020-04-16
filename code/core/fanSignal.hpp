@@ -1,116 +1,64 @@
 #pragma once
 
 #include <vector>
+#include <functional>
+#include <cassert>
 
 namespace fan
 {
-	namespace impl
+	//================================================================================================================================
+	// A signal is used for communication between objects ( similar to qt Signals & Slots )
+	//
+	// ex : 
+	// struct MyClass {void TestFunction( int ) {} {
+	// MyClass test;
+	// Signal<int> signal;
+	// signal.Connect( &MyClass::TestFunction, &test );
+	// signal.Emmit( 42 );
+	//================================================================================================================================
+	template < typename ..._Args > struct Signal
 	{
-		//================================================================================================================================
-		//================================================================================================================================
-		template < typename... _Args >
-		struct SlotBase
+		//================================================================
+		//================================================================
+		struct Connection
 		{
-			virtual void Call( _Args... _args ) = 0;
+			void* object = nullptr;
+			void* method = nullptr;
+			std::function<void( _Args... )> lambda;
 		};
 
-		//================================================================================================================================
-		//================================================================================================================================
-		template <typename _Target, typename... _Args >
-		class Slot : public SlotBase<_Args...>
+		template <typename _Object >
+		void Connect( void( _Object::* _method )( _Args... ), _Object* _object )
 		{
-		public:
-			Slot( void( _Target::* _method )( _Args... ), _Target* _object ) :
-				m_object( _object ),
-				m_method( _method )
-			{}
+			std::function<void( _Args... )> func = [_method, _object]( _Args... _args ) { ( ( *_object ).*( _method ) )( _args... ); };
+			m_connections.push_back( { _object, &_method, func } );
+		}
 
-			void Call( _Args... _args ) override { ( ( *m_object ).*( m_method ) )( _args... ); }
+		template <typename _Object >
+		void Disconnect( void( _Object::* _method )( _Args... ), _Object* _object )
+		{
 
-			bool Equals( void( _Target::* const _method )( _Args... ), const _Target* _object )
+			for( int i = 0; i < m_connections.size(); i++ )
 			{
-				return m_object == _object && m_method == _method;
+				Connection& connection = m_connections[i];
+				if( connection.object == _object && connection.method == &_method )
+				{
+					m_connections.erase( m_connections.begin() + i );
+					return;
+				}
 			}
-		private:
-			_Target* m_object;
-			void ( _Target::* m_method )( _Args... );
-		};
-	}
+			assert( false ); // Remove failed : no connection found
+		}
 
-	//================================================================================================================================
-	// Signal class for connecting two unrelated classes
-	// Resembles Qt signals/slots but simpler
-	//================================================================================================================================
-	template < typename... _Args > class Signal
-	{
-	public:
-		~Signal();
-		
-		template <typename _Target>
-		void Connect( void( _Target::* _method )( _Args... ), _Target* _object );
-		template <typename _Target>
-		void Disconnect( void( _Target::* _method )( _Args... ), _Target* _object );
-		void Emmit( _Args... _args );
-		void Clear(){ m_slots.clear(); }
+		void Emmit( _Args... _args )
+		{
+			for( auto connection : m_connections )
+			{
+				connection.lambda( _args... );
+			}
+		}
+		void Clear() { m_connections.clear(); }
 
-	private:
-		std::vector<impl::SlotBase< _Args...>*> m_slots;
+		std::vector< Connection > m_connections;
 	};
-
-	//================================================================================================================================
-	// destructor
-	//================================================================================================================================
-	template < typename...  _Args >
-	Signal< _Args...>::~Signal()
-	{
-		for( size_t slotIndex = 0; slotIndex < m_slots.size(); slotIndex++ )
-		{
-			delete( m_slots[slotIndex] );
-		}
-		m_slots.clear();
-	}
-
-	//================================================================================================================================
-	// calls all slots connected to the signal
-	//================================================================================================================================
-	template < typename...  _Args >
-	void Signal< _Args...>::Emmit( _Args... _args )
-	{
-		for( size_t slotIndex = 0; slotIndex < m_slots.size(); slotIndex++ )
-		{
-			impl::SlotBase< _Args...>* slot = m_slots[slotIndex];
-			slot->Call( _args... );
-		}
-	}
-
-	//================================================================================================================================
-	// disconnect the signal from the the member function _method of _Target object
-	//================================================================================================================================
-	template < typename...  _Args >
-	template <typename _Target>
-	void Signal< _Args...>::Disconnect( void( _Target::* _method )( _Args... ), _Target* _object )
-	{
-		for( size_t slotIndex = 0; slotIndex < m_slots.size(); slotIndex++ )
-		{
-			impl::SlotBase< _Args...>* slotbase = m_slots[slotIndex];
-			impl::Slot<_Target, _Args...>* slot = static_cast<impl::Slot<_Target, _Args...>*>( slotbase );
-
-			if( slot->Equals( _method, _object ) )
-			{
-				delete( slot );
-				m_slots.erase( m_slots.begin() + slotIndex );
-				return;
-			}
-		}
-	}
-
-	//================================================================================================================================
-	// connects the signal to the member function _method of _Target _object
-	//================================================================================================================================
-	template < typename...  _Args >
-	template <typename _Target>
-	void Signal< _Args...>::Connect( void( _Target::* _method )( _Args... ), _Target* _object )
-	{
-		m_slots.push_back( new impl::Slot<_Target, _Args...>( _method, _object ) );
-	}
 }
