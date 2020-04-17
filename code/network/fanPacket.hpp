@@ -64,8 +64,18 @@ namespace fan
 	//================================================================================================================================
 	struct PacketPing
 	{
-		void Load( Packet& /*_packet*/ ) {}
-		void Save( Packet& _packet ) { _packet << sf::Uint16( PacketType::Ping ); }
+		void Load( Packet& _packet ) 
+		{
+			_packet >> roundTripTime;
+		}
+
+		void Save( Packet& _packet ) 
+		{ 
+			_packet << sf::Uint16( PacketType::Ping );
+			_packet << roundTripTime;
+		}
+
+		float roundTripTime;
 	};
 
 	//================================================================================================================================

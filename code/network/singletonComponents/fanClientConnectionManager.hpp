@@ -27,17 +27,22 @@ namespace fan
 			Connected			// Client received a LoginSuccess, client is connected
 		};
 
+		Signal< HostID >  onServerDisconnected;
+
 		UdpSocket		socket;
 		Port			clientPort;
 		sf::IpAddress	serverIP;
 		Port			serverPort;
 		ClientState		state;
 		float			roundTripTime;
-		double			timeoutTime;
-		double			serverLastResponse = 0;
+		float			timeoutTime;			// disconnects from server after X seconds without a response
+		double			serverLastResponse;
 
 		void Send( Packet& _packet );
 		void OnLoginFail( HostID );
+		void DetectServerTimout();
+		void DisconnectFromServer();
+
 		void ProcessPacket( const PacketLoginSuccess& _packetLogin );
 		void ProcessPacket( const PacketPing& _packetPing );
 	};

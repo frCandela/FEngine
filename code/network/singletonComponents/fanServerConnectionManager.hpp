@@ -14,7 +14,8 @@ namespace fan
 	//================================================================================================================================
 	struct Client
 	{
-		enum class ClientState { 
+		enum class State { 
+			Null,				// empty client slot
 			Disconnected,		// Requires a hello packet from the client to start connection process
 			NeedingApprouval,	// Client hello is received, a Login packet must be sent back
 			PendingApprouval,	// Login packet was sent, waiting for ack
@@ -25,11 +26,16 @@ namespace fan
 		IpAddress	ip;
 		Port		port;
 		std::string	name = "";
-		ClientState	state = ClientState::Disconnected;
-		float		roundTripTime = 0.f;
+		State		state = State::Null;
+		float		roundTripTime = -1.f;
 		double		lastResponseTime = 0.f;
 		double		lastPingTime = 0.f;
 		bool		pingInFlight = false;
+
+		void Clear()
+		{
+
+		}
 	};
 
 	//================================================================================================================================
@@ -43,16 +49,20 @@ namespace fan
 		static void Init( EcsWorld& _world, SingletonComponent& _component );
 		static void OnGui( SingletonComponent& _component );
 
+		Signal<HostID> onClientDisconnected;
+
 		UdpSocket			socket;
 		Port				serverPort;
-		float				pingDelay;			// clients are pinged every X seconds
-		float				timeoutDuration;	// clients are disconnected after X seconds
+		float				pingDelay;		// send a ping to clients every X seconds
+		float				timeoutTime;	// disconnects clients after X seconds without a response
 		std::vector<Client> clients;
 
 		HostID	FindClient( const sf::IpAddress _ip, const unsigned short _port );
 		HostID	CreateClient( const sf::IpAddress _ip, const unsigned short _port );
-		void	Send( Packet& _packet, const HostID _client );
-		void	ProcessPacket( const HostID _client, const PacketHello& _packetHello );
+		void	Send( Packet& _packet, const HostID _clientID );
+		void	ProcessPacket( const HostID _clientID, const PacketHello& _packetHello );
+		void	DetectClientTimout();
+		void	DisconnectClient( const HostID _clientID );
 
 		void OnLoginFail( const HostID _clientID );
 		void OnLoginSuccess( const HostID _clientID );

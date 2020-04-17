@@ -2,7 +2,7 @@
 
 #include "ecs/fanEcsWorld.hpp"
 #include "core/time/fanTime.hpp"
-
+#include "network/fanImGuiNetwork.hpp"
 
 namespace fan
 {
@@ -25,8 +25,8 @@ namespace fan
 		ServerConnectionManager& connection = static_cast<ServerConnectionManager&>( _component );
 		connection.clients.clear();
 		connection.serverPort = 53000;
-		connection.pingDelay = 1.f;			// clients are pinged every X seconds
-		connection.timeoutDuration = 10.f;	// clients are disconnected after X seconds
+		connection.pingDelay = 1.f;
+		connection.timeoutTime = 10.f;
 	}
 
 	//================================================================================================================================
@@ -36,7 +36,7 @@ namespace fan
 	{
 		for( Client& client : clients )
 		{
-			if( client.ip == _ip && client.port == _port )
+			if( client.state != Client::State::Null && client.ip == _ip && client.port == _port )
 			{
 				return client.clientId;
 			}
@@ -50,14 +50,35 @@ namespace fan
 	{
 		assert( FindClient( _ip, _port ) == -1 );
 
-		Client newClient;
-		newClient.clientId = (HostID)clients.size();
-		newClient.ip = _ip;
-		newClient.port = _port;
-		newClient.state = Client::ClientState::Disconnected;
-		newClient.name = "Unknown";
-		clients.push_back( newClient );
-		return newClient.clientId;
+		// find an empty slot for the new client
+		Client* newClient = nullptr;
+		for (int i = 0; i < clients.size() ; i++)
+		{
+			Client& client = clients[i];
+			if( client.state == Client::State::Null )
+			{
+				newClient = &client;
+				assert( client.clientId == i );
+			}
+		}
+
+		// creates a new slot
+		if( newClient == nullptr )
+		{
+			newClient = &clients.emplace_back();
+			newClient->clientId = HostID( clients.size() - 1 );
+		}
+
+		newClient->ip = _ip;
+		newClient->port = _port;
+		newClient->name = "Unknown";
+		newClient->state = Client::State::Disconnected;
+		newClient->roundTripTime = 0.f;
+		newClient->lastResponseTime = 0.f;
+		newClient->lastPingTime = 0.f;
+		newClient->pingInFlight = false;
+
+		return newClient->clientId;
 	}
 
 	//================================================================================================================================
@@ -65,20 +86,21 @@ namespace fan
 	void ServerConnectionManager::Send( Packet& _packet, const HostID _clientID )
 	{
 		Client& client = clients[_clientID];
-		if( client.state == Client::ClientState::NeedingApprouval )
+		if( client.state == Client::State::NeedingApprouval )
 		{
 			PacketLoginSuccess packetLogin;
 			packetLogin.Save( _packet );
 			_packet.onSuccess.Connect( &ServerConnectionManager::OnLoginSuccess, this );
 			_packet.onFail.Connect( &ServerConnectionManager::OnLoginFail, this );
-			client.state = Client::ClientState::PendingApprouval;
+			client.state = Client::State::PendingApprouval;
 		}
-		else if( client.state == Client::ClientState::Connected )
+		else if( client.state == Client::State::Connected )
 		{
 			const double currentTime = Time::Get().ElapsedSinceStartup();
 			if( ! client.pingInFlight && ( currentTime - client.lastPingTime > pingDelay )  )
 			{
 				PacketPing packetPing;
+				packetPing.roundTripTime = client.roundTripTime;
 				_packet.onSuccess.Connect( &ServerConnectionManager::OnPingSuccess, this );
 				_packet.onFail.Connect( &ServerConnectionManager::OnPingFail, this );
 				packetPing.Save( _packet );
@@ -90,13 +112,41 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
+	void ServerConnectionManager::DetectClientTimout()
+	{
+		for ( Client& client : clients )
+		{
+			if( client.state == Client::State::Connected )
+			{
+				const double currentTime = Time::Get().ElapsedSinceStartup();
+				if( client.lastResponseTime + timeoutTime < currentTime )
+				{
+					Debug::Log() << "client " << client.clientId << " timeout " << Debug::Endl();	
+					DisconnectClient( client.clientId );
+				}
+			}
+		}
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
+	void ServerConnectionManager::DisconnectClient( const HostID _clientID )
+	{
+		Debug::Log() << "client " << _clientID << " disconnected " << Debug::Endl();
+		onClientDisconnected.Emmit( _clientID );
+		Client& client = clients[_clientID];
+		client.state = Client::State::Null;
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
 	void ServerConnectionManager::OnLoginFail( const HostID _clientID )
 	{
 		Client& client = clients[_clientID];
-		if( client.state == Client::ClientState::PendingApprouval )
+		if( client.state == Client::State::PendingApprouval )
 		{
 			Debug::Log() << "client " << _clientID << " login failed, resending approval. " << Debug::Endl();
-			client.state = Client::ClientState::NeedingApprouval;
+			client.state = Client::State::NeedingApprouval;
 		}
 	}
 
@@ -105,10 +155,10 @@ namespace fan
 	void ServerConnectionManager::OnLoginSuccess( const HostID _clientID )
 	{
 		Client& client = clients[_clientID];
-		if( client.state == Client::ClientState::PendingApprouval )
+		if( client.state == Client::State::PendingApprouval )
 		{
-			Debug::Log() << "Client " << _clientID << " connected ! " << Debug::Endl();
-			client.state = Client::ClientState::Connected;
+			Debug::Log() << "Client " << _clientID << " connected " << Debug::Endl();
+			client.state = Client::State::Connected;
 		}
 	}
 
@@ -123,7 +173,7 @@ namespace fan
 	}
 
 	//================================================================================================================================
-//================================================================================================================================
+	//================================================================================================================================
 	void ServerConnectionManager::OnPingFail( const HostID _clientID )
 	{
 		Client& client = clients[_clientID];
@@ -131,30 +181,52 @@ namespace fan
 	}
 
 	//================================================================================================================================
-	// 
 	//================================================================================================================================
 	void ServerConnectionManager::ProcessPacket( const HostID _clientID, const PacketHello& _packetHello )
 	{
 		Client& client = clients[_clientID];
-		if( client.state == Client::ClientState::Disconnected )
+		if( client.state == Client::State::Disconnected )
 		{
 			client.name = _packetHello.name;
-			client.state = Client::ClientState::NeedingApprouval;
+			client.state = Client::State::NeedingApprouval;
+		}
+		else if( client.state == Client::State::Connected )
+		{
+			client.state = Client::State::NeedingApprouval;
+			Debug::Log() << "Client " << _clientID << " disconnected" << Debug::Endl();
 		}
 	}
 
 	//================================================================================================================================
 	// Editor gui helper
 	//================================================================================================================================
-	std::string ToString( Client::ClientState _clientState )
+	std::string GetStateName( const Client::State _clientState )
 	{
 		switch( _clientState )
 		{
-		case fan::Client::ClientState::Disconnected:		return "Disconnected";		break;
-		case fan::Client::ClientState::NeedingApprouval:	return "NeedingApprouval";	break;
-		case fan::Client::ClientState::PendingApprouval:	return "PendingApprouval";	break;
-		case fan::Client::ClientState::Connected:			return "Connected";			break;
+		case fan::Client::State::Null:				return "Null";		break;
+		case fan::Client::State::Disconnected:		return "Disconnected";		break;
+		case fan::Client::State::NeedingApprouval:	return "NeedingApprouval";	break;
+		case fan::Client::State::PendingApprouval:	return "PendingApprouval";	break;
+		case fan::Client::State::Connected:			return "Connected";			break;
 		default:			assert( false );				return "error";				break;
+		}
+	}
+
+
+	//================================================================================================================================
+	// returns a color corresponding to a rtt time in seconds
+	//================================================================================================================================
+	static ImVec4 GetStateColor( const Client::State _clientState )
+	{
+		switch( _clientState )
+		{
+		case fan::Client::State::Null:				return  Color::Red.ToImGui(); break;
+		case fan::Client::State::Disconnected:		return  Color::Orange.ToImGui(); break;
+		case fan::Client::State::NeedingApprouval:	return  Color::Yellow.ToImGui(); break;
+		case fan::Client::State::PendingApprouval:	return  Color::Yellow.ToImGui(); break;
+		case fan::Client::State::Connected:			return  Color::Green.ToImGui(); break;
+		default:			assert( false );		return  Color::Purple.ToImGui(); break;
 		}
 	}
 
@@ -172,7 +244,7 @@ namespace fan
 			ImGui::Spacing();
 			ImGui::Text( "port: %u", connection.serverPort );
 			ImGui::DragFloat( "ping delay", &connection.pingDelay, 0.1f, 0.f, 10.f );
-			ImGui::DragFloat( "timeout duration", &connection.timeoutDuration, 0.1f, 0.f, 10.f );
+			ImGui::DragFloat( "timeout time", &connection.timeoutTime, 0.1f, 0.f, 10.f );
 			// 		if( ImGui::Button( "Start" ) && _gameServer.state == GameServer::WAITING_FOR_PLAYERS )
 			// 		{
 			// 			_gameServer.state = GameServer::STARTING;
@@ -187,9 +259,11 @@ namespace fan
 					Client& client = connection.clients[i];
 
 					ImGui::Text( "name           %s", client.name.c_str() );
-					ImGui::Text( "state:         %s", ToString( client.state ).c_str() );
+					ImGui::Text( "state:        " ); ImGui::SameLine();
+					ImGui::TextColored( GetStateColor( client.state ),  "%s", GetStateName( client.state ).c_str() );
 					ImGui::Text( "adress         %s::%u", client.ip.toString().c_str(), client.port );
-					ImGui::Text( "ping           %.01f", .5f * 1000.f * client.roundTripTime );
+					ImGui::Text( "rtt           "); ImGui::SameLine();
+					ImGui::TextColored( GetRttColor( client.roundTripTime ), "%.1f", 1000.f * client.roundTripTime );
 					ImGui::Text( "last response  %.1f", currentTime - client.lastResponseTime );
 					ImGui::Spacing();
 				}

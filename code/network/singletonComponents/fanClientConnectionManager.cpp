@@ -2,6 +2,7 @@
 
 #include "ecs/fanEcsWorld.hpp"
 #include "core/time/fanTime.hpp"
+#include "network/fanImGuiNetwork.hpp"
 
 namespace fan
 {
@@ -22,12 +23,13 @@ namespace fan
 	void ClientConnectionManager::Init( EcsWorld& _world, SingletonComponent& _component )
 	{
 		ClientConnectionManager& connectionManager = static_cast<ClientConnectionManager&>( _component );
-		connectionManager.clientPort = 53001;
+		connectionManager.clientPort = 53010;
 		connectionManager.serverIP = "127.0.0.1";
 		connectionManager.serverPort = 53000;
 		connectionManager.state = ClientState::Disconnected;
 		connectionManager.roundTripTime = 0.f;
-		connectionManager.timeoutTime = 10;
+		connectionManager.timeoutTime = 10.f;
+		connectionManager.serverLastResponse = 0.f;
 	}
 
 	//================================================================================================================================
@@ -44,15 +46,6 @@ namespace fan
 			hello.Save( _packet );
 			_packet.onFail.Connect( &ClientConnectionManager::OnLoginFail, this );
 		}
-		else if( state == ClientState::Connected )
-		{
-			const double currentTime = Time::Get().ElapsedSinceStartup();
-			if( serverLastResponse + timeoutTime < currentTime )
-			{
-				Debug::Log() << "server timeout " << Debug::Endl();
-				state = ClientState::Disconnected;
-			}
-		}
 	}
 
 	//================================================================================================================================
@@ -62,7 +55,7 @@ namespace fan
 	{
 		if( state == ClientState::PendingConnection )
 		{
-			Debug::Log() << "login failure" << Debug::Endl();
+			Debug::Log() << "login fail" << Debug::Endl();
 			state = ClientState::Disconnected;
 		}
 	}
@@ -82,13 +75,39 @@ namespace fan
 	//================================================================================================================================
 	void ClientConnectionManager::ProcessPacket( const PacketPing& _packetPing )
 	{
+		if( state == ClientState::Connected )
+		{
+			roundTripTime = _packetPing.roundTripTime;
+		}
+	}
 
+	//================================================================================================================================
+	//================================================================================================================================
+	void ClientConnectionManager::DetectServerTimout()
+	{
+		if( state == ClientState::Connected )
+		{
+			const double currentTime = Time::Get().ElapsedSinceStartup();
+			if( serverLastResponse + timeoutTime < currentTime )
+			{
+				DisconnectFromServer();
+			}
+		}
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
+	void ClientConnectionManager::DisconnectFromServer()
+	{
+		onServerDisconnected.Emmit(0);
+		Debug::Log() << "server timeout " << Debug::Endl();
+		state = ClientState::Disconnected;
 	}
 
 	//================================================================================================================================
 	// Editor gui helper
 	//================================================================================================================================
-	std::string ToString( ClientConnectionManager::ClientState _clientState )
+	std::string GetStateName( const ClientConnectionManager::ClientState _clientState )
 	{
 		switch( _clientState )
 		{
@@ -96,6 +115,20 @@ namespace fan
 		case fan::ClientConnectionManager::ClientState::PendingConnection:	return "PendingConnection";	break;
 		case fan::ClientConnectionManager::ClientState::Connected:			return "Connected";			break;
 		default:			assert( false );								return "Error";				break;
+		}
+	}
+
+	//================================================================================================================================
+	// returns a color corresponding to a rtt time in seconds
+	//================================================================================================================================
+	static ImVec4 GetStateColor( const ClientConnectionManager::ClientState _clientState )
+	{
+		switch( _clientState )
+		{
+		case fan::ClientConnectionManager::ClientState::Disconnected:		return Color::Red.ToImGui(); break;
+		case fan::ClientConnectionManager::ClientState::PendingConnection:	return Color::Yellow.ToImGui(); break;
+		case fan::ClientConnectionManager::ClientState::Connected:			return Color::Green.ToImGui(); break;
+		default:			assert( false );								return Color::Purple.ToImGui(); break;
 		}
 	}
 
@@ -110,11 +143,14 @@ namespace fan
 
 			ImGui::Text( "Client" );
 			ImGui::Separator();
-			ImGui::Text( "state:                %s", ToString( connection.state ).c_str() );
+			ImGui::DragFloat( "timeout time", &connection.timeoutTime, 0.1f, 0.f, 10.f );
+			ImGui::Text( "state:               " ); ImGui::SameLine();
+			ImGui::TextColored( GetStateColor( connection.state ), "%s", GetStateName( connection.state ).c_str() );
 			ImGui::Text( "client port           %u", connection.clientPort );
-			ImGui::Text( "server adress         %s::%u", connection.serverIP.toString().c_str(), connection.serverPort );
-			ImGui::Text( "ping                  %.01f", 0.5f * 1000.f * connection.roundTripTime );
-			ImGui::Text( "server last response:  %.1f", Time::Get().ElapsedSinceStartup() - connection.serverLastResponse );
+			ImGui::Text( "server adress         %s::%u", connection.serverIP.toString().c_str(), connection.serverPort );			
+			ImGui::Text( "rtt                  "); ImGui::SameLine();
+			ImGui::TextColored( GetRttColor( connection.roundTripTime ), "%.1f", 1000.f * connection.roundTripTime );
+			ImGui::Text( "server last response: %.1f", Time::Get().ElapsedSinceStartup() - connection.serverLastResponse );
 		}ImGui::Unindent(); ImGui::Unindent();
 	}
 }

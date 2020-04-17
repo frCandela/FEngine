@@ -122,6 +122,11 @@ namespace fan
 		Game& game = world.GetSingletonComponent<Game>();
 		game.gameServer = this;
 		game.name = _name;
+
+		// connect network callbacks
+		ServerConnectionManager& connection = world.GetSingletonComponent<ServerConnectionManager>();
+		DeliveryNotificationManager& deliveryNotificationManager = world.GetSingletonComponent<DeliveryNotificationManager>();
+		connection.onClientDisconnected.Connect( &DeliveryNotificationManager::ClearHostData, &deliveryNotificationManager );
 	}
 
 	//================================================================================================================================
@@ -185,13 +190,16 @@ namespace fan
 	void  GameServer::Step( const float _delta )
 	{
 		Game& game = world.GetSingletonComponent<Game>();
+		DeliveryNotificationManager& deliveryNotificationManager = world.GetSingletonComponent<DeliveryNotificationManager>();
+		ServerConnectionManager& connection = world.GetSingletonComponent<ServerConnectionManager>();
+		
 		game.frameIndex++;
 		{
 			SCOPED_PROFILE( scene_update );
 
 			NetworkReceive();
-			DeliveryNotificationManager& deliveryNotificationManager = world.GetSingletonComponent<DeliveryNotificationManager>();
 			deliveryNotificationManager.ProcessTimedOutPackets();
+			connection.DetectClientTimout();
 
 			// physics & transforms
 			PhysicsWorld& physicsWorld = world.GetSingletonComponent<PhysicsWorld>();
@@ -354,8 +362,14 @@ namespace fan
 		DeliveryNotificationManager& deliveryNotificationManager = world.GetSingletonComponent<DeliveryNotificationManager>();
 		for( int i = (int)connection.clients.size() - 1; i >= 0; i-- )
 		{
-			// create packet
 			Client& client = connection.clients[i];
+			if( client.state == Client::State::Null )
+			{
+				continue;
+			}
+
+			// create packet
+			
 			Packet packet( deliveryNotificationManager.GetNextPacketTag( client.clientId ) );
 
 			// write packet

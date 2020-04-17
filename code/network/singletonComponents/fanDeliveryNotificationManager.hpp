@@ -58,6 +58,7 @@ namespace fan
 
 		void CreateHost( const HostID _hostID = 0 );
 		void DeleteHost( const HostID _hostID = 0 );
+		void ClearHostData( const HostID _hostID = 0 );
 
 		PacketTag GetNextPacketTag( const HostID _hostID = 0 ) { return hostDatas[_hostID].nextPacketTag++; }
 		void RegisterPacket( Packet& _packet, const HostID  _hostID = 0 );

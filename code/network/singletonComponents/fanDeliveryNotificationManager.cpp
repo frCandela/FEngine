@@ -23,7 +23,7 @@ namespace fan
 	void DeliveryNotificationManager::Init( EcsWorld& _world, SingletonComponent& _component )
 	{
 		DeliveryNotificationManager& deliveryNotificationManager = static_cast<DeliveryNotificationManager&>( _component );
-		deliveryNotificationManager.timeoutDuration = 3.f;
+		deliveryNotificationManager.timeoutDuration = 2.f;
 		deliveryNotificationManager.hostDatas.clear();
 		deliveryNotificationManager.hostDatas.reserve( 4 );
 	}
@@ -36,6 +36,13 @@ namespace fan
 		{
 			hostDatas.resize( (size_t)_hostID + 1 );
 		}
+		hostDatas[_hostID] = {};
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
+	void DeliveryNotificationManager::ClearHostData( const HostID _hostID )
+	{
 		hostDatas[_hostID] = {};
 	}
 
@@ -58,10 +65,12 @@ namespace fan
 		}
 		else if( _packet.tag < hostData.expectedPacketTag ) // silently drop old packet.
 		{
+			Debug::Log() << "dropped old packet " << _packet.tag << Debug::Endl();
 			return false;
 		}
 		else //we missed some packets
 		{
+			Debug::Log() << "missed packets before " << _packet.tag << Debug::Endl();
 			assert( _packet.tag > hostData.expectedPacketTag );
 			hostData.expectedPacketTag = _packet.tag + 1;
 			hostData.pendingAck.push_back( _packet.tag );

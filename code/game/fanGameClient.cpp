@@ -124,6 +124,10 @@ namespace fan
 		Game& game = world.GetSingletonComponent<Game>();
 		game.gameClient = this;
 		game.name = _name;
+
+		ClientConnectionManager& connection = world.GetSingletonComponent<ClientConnectionManager>();
+		DeliveryNotificationManager& deliveryNotificationManager = world.GetSingletonComponent<DeliveryNotificationManager>();
+		connection.onServerDisconnected.Connect( &DeliveryNotificationManager::ClearHostData, &deliveryNotificationManager );
 	}
 
 	//================================================================================================================================
@@ -132,15 +136,21 @@ namespace fan
 	{
 		Game& gameData = world.GetSingletonComponent<Game>();
 
-		// Init network
-		// bind
-		ClientConnectionManager& connection = world.GetSingletonComponent<ClientConnectionManager>();
-		Debug::Log() << gameData.name << " bind on port " << connection.clientPort << Debug::Endl();
-		if( connection.socket.Bind( connection.clientPort ) != sf::Socket::Done )
+		// Bind socket
+		ClientConnectionManager& connection = world.GetSingletonComponent<ClientConnectionManager>();		
+		sf::Socket::Status socketStatus = sf::Socket::Disconnected;
+		for (int tryIndex = 0; tryIndex < 10 && socketStatus != sf::Socket::Done; tryIndex++)
 		{
-			Debug::Error() << gameData.name << " bind failed on port " << connection.clientPort << Debug::Endl();
+			Debug::Log() << gameData.name << "bind on port " << connection.clientPort << Debug::Endl();
+			socketStatus = connection.socket.Bind( connection.clientPort );
+			if( socketStatus != sf::Socket::Done )
+			{
+				Debug::Warning() << gameData.name << " bind failed" << Debug::Endl();
+				connection.clientPort++; // try bind on the next port ( useful when using multiple clients on the same machine )
+			}
 		}
-		// create remote host for the server
+
+		// Create remote host for the server
 		DeliveryNotificationManager& deliveryNotificationManager = world.GetSingletonComponent<DeliveryNotificationManager>();
 		deliveryNotificationManager.CreateHost();
 
@@ -148,6 +158,7 @@ namespace fan
 		S_RegisterAllRigidbodies::Run( world, world.Match( S_RegisterAllRigidbodies::GetSignature( world ) ) );
 		GameCamera::CreateGameCamera( world );
 		SolarEruption::Start( world );
+
 // 		EntityID spaceshipID = Game::SpawnSpaceship( world );
 // 		if( spaceshipID != 0 )
 // 		{
@@ -194,13 +205,15 @@ namespace fan
 	void  GameClient::Step( const float _delta )
 	{
 		Game& game = world.GetSingletonComponent<Game>();
+		DeliveryNotificationManager& deliveryNotificationManager = world.GetSingletonComponent<DeliveryNotificationManager>();
+		ClientConnectionManager& connection = world.GetSingletonComponent<ClientConnectionManager>();
 		game.frameIndex++;
 		{
 			SCOPED_PROFILE( scene_update );
 
 			NetworkReceive();
-			DeliveryNotificationManager& deliveryNotificationManager = world.GetSingletonComponent<DeliveryNotificationManager>();
 			deliveryNotificationManager.ProcessTimedOutPackets();
+			connection.DetectServerTimout();
 
 			// physics & transforms
 			PhysicsWorld& physicsWorld = world.GetSingletonComponent<PhysicsWorld>();
