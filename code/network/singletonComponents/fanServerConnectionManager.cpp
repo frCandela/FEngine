@@ -25,8 +25,8 @@ namespace fan
 		ServerConnectionManager& connection = static_cast<ServerConnectionManager&>( _component );
 		connection.clients.clear();
 		connection.serverPort = 53000;
-		connection.pingDuration = 0.1f;		// clients are pinged every X seconds
-		connection.timeoutDuration = 3.f;	// clients are disconnected after X seconds
+		connection.pingDelay = 1.f;			// clients are pinged every X seconds
+		connection.timeoutDuration = 10.f;	// clients are disconnected after X seconds
 	}
 
 	//================================================================================================================================
@@ -73,6 +73,19 @@ namespace fan
 			_packet.onFail.Connect( &ServerConnectionManager::OnLoginFail, this );
 			client.state = Client::ClientState::PendingApprouval;
 		}
+		else if( client.state == Client::ClientState::Connected )
+		{
+			const double currentTime = Time::Get().ElapsedSinceStartup();
+			if( ! client.pingInFlight && ( currentTime - client.lastPingTime > pingDelay )  )
+			{
+				PacketPing packetPing;
+				_packet.onSuccess.Connect( &ServerConnectionManager::OnPingSuccess, this );
+				_packet.onFail.Connect( &ServerConnectionManager::OnPingFail, this );
+				packetPing.Save( _packet );
+				client.lastPingTime = currentTime;
+				client.pingInFlight = true;
+			}
+		}
 	}
 
 	//================================================================================================================================
@@ -97,6 +110,24 @@ namespace fan
 			Debug::Log() << "Client " << _clientID << " connected ! " << Debug::Endl();
 			client.state = Client::ClientState::Connected;
 		}
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
+	void ServerConnectionManager::OnPingSuccess( const HostID _clientID )
+	{
+		Client& client = clients[_clientID];
+		const double currentTime = Time::Get().ElapsedSinceStartup();
+		client.pingInFlight = false;
+		client.roundTripTime = (float)( currentTime - client.lastPingTime);
+	}
+
+	//================================================================================================================================
+//================================================================================================================================
+	void ServerConnectionManager::OnPingFail( const HostID _clientID )
+	{
+		Client& client = clients[_clientID];
+		client.pingInFlight = false;
 	}
 
 	//================================================================================================================================
@@ -140,7 +171,7 @@ namespace fan
 			ImGui::Text( "Server" );
 			ImGui::Spacing();
 			ImGui::Text( "port: %u", connection.serverPort );
-			ImGui::DragFloat( "ping duration", &connection.pingDuration, 0.1f, 0.f, 10.f );
+			ImGui::DragFloat( "ping delay", &connection.pingDelay, 0.1f, 0.f, 10.f );
 			ImGui::DragFloat( "timeout duration", &connection.timeoutDuration, 0.1f, 0.f, 10.f );
 			// 		if( ImGui::Button( "Start" ) && _gameServer.state == GameServer::WAITING_FOR_PLAYERS )
 			// 		{
@@ -158,8 +189,8 @@ namespace fan
 					ImGui::Text( "name           %s", client.name.c_str() );
 					ImGui::Text( "state:         %s", ToString( client.state ).c_str() );
 					ImGui::Text( "adress         %s::%u", client.ip.toString().c_str(), client.port );
-					ImGui::Text( "ping           %.01f", .5f * 1000.f * client.roundTripDelay );
-					ImGui::Text( "last response  %.1f", currentTime - client.lastResponse );
+					ImGui::Text( "ping           %.01f", .5f * 1000.f * client.roundTripTime );
+					ImGui::Text( "last response  %.1f", currentTime - client.lastResponseTime );
 					ImGui::Spacing();
 				}
 			}

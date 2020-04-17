@@ -60,16 +60,12 @@ namespace fan
 
 	//================================================================================================================================
 	// server -> client
-	// Used to calculate a the connection RTT and keep track of disconnected clients
+	// Used to calculate a the connection RTT
 	//================================================================================================================================
 	struct PacketPing
 	{
 		void Load( Packet& /*_packet*/ ) {}
-
-		void Save( Packet& _packet )
-		{
-			_packet << sf::Uint16( PacketType::Ping );
-		}
+		void Save( Packet& _packet ) { _packet << sf::Uint16( PacketType::Ping ); }
 	};
 
 	//================================================================================================================================

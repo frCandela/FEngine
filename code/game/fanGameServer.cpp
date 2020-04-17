@@ -271,6 +271,8 @@ namespace fan
 					deliveryNotificationManager.CreateHost( clientID );
 				}
 
+				connection.clients[clientID].lastResponseTime = Time::Get().ElapsedSinceStartup();
+
 				// read the first packet type separately
 				PacketType packetType = packet.ReadType();
 				if( packetType == PacketType::Ack )

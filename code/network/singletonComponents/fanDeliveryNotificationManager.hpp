@@ -64,8 +64,8 @@ namespace fan
 		bool ValidatePacket( Packet& _packet, const HostID  _hostID = 0 );
 		void ProcessTimedOutPackets();
 
-		void Receive( const PacketAck& _packetAck, const HostID _hostID = 0 );
-		void SendAck   ( Packet& _packet,			   const HostID _hostID = 0 );
+		void Receive( const PacketAck& _packetAck,  const HostID _hostID = 0 );
+		void SendAck   ( Packet& _packet,			const HostID _hostID = 0 );
 
 		//================================================================
 		//================================================================

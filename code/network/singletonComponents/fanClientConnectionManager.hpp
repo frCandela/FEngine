@@ -33,7 +33,8 @@ namespace fan
 		Port			serverPort;
 		ClientState		state;
 		float			roundTripTime;
-		double			serverLastResponse;	// the last time we received a packet from the server
+		double			timeoutTime;
+		double			serverLastResponse = 0;
 
 		void Send( Packet& _packet );
 		void OnLoginFail( HostID );

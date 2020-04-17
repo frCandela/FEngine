@@ -26,8 +26,10 @@ namespace fan
 		Port		port;
 		std::string	name = "";
 		ClientState	state = ClientState::Disconnected;
-		float		roundTripDelay = 0.f;
-		double		lastResponse = 0.f;
+		float		roundTripTime = 0.f;
+		double		lastResponseTime = 0.f;
+		double		lastPingTime = 0.f;
+		bool		pingInFlight = false;
 	};
 
 	//================================================================================================================================
@@ -43,7 +45,7 @@ namespace fan
 
 		UdpSocket			socket;
 		Port				serverPort;
-		float				pingDuration;		// clients are pinged every X seconds
+		float				pingDelay;			// clients are pinged every X seconds
 		float				timeoutDuration;	// clients are disconnected after X seconds
 		std::vector<Client> clients;
 
@@ -54,5 +56,7 @@ namespace fan
 
 		void OnLoginFail( const HostID _clientID );
 		void OnLoginSuccess( const HostID _clientID );
+		void OnPingSuccess( const HostID _clientID );
+		void OnPingFail( const HostID _clientID );
 	};
 }

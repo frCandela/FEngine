@@ -48,6 +48,7 @@ namespace fan
 		if( _packet.onlyContainsAck ) return true;
 
 		HostData& hostData = hostDatas[_hostID];
+		
 		if( _packet.tag == hostData.expectedPacketTag )	// packet is perfect \o/
 		{
 			Debug::Log() << "received " << _packet.tag << Debug::Endl();
@@ -145,8 +146,7 @@ namespace fan
 					hostData.inFlightPackets.pop();
 				}
 				else //no packets beyond could be timed out
-				{
-					
+				{					
 					break;
 				}
 			}
@@ -183,10 +183,10 @@ namespace fan
 				HostData& hostData = deliveryNotificationManager.hostDatas[i];
 
 				ImGui::Text( "Host %d:", i );
-				ImGui::Text( "next packet tag:       %d", hostData.nextPacketTag );
-				ImGui::Text( "expected packet tag:   %d", hostData.expectedPacketTag );
-				ImGui::Text( "num pending ack:       %d", hostData.pendingAck.size() );
-				ImGui::Text( "num in flight packets: %d", hostData.inFlightPackets.size() );
+				ImGui::Text( "next packet tag:       %d",   hostData.nextPacketTag );
+				ImGui::Text( "expected packet tag:   %d",   hostData.expectedPacketTag );
+				ImGui::Text( "num pending ack:       %d",   hostData.pendingAck.size() );
+				ImGui::Text( "num in flight packets: %d",   hostData.inFlightPackets.size() );
 				ImGui::Spacing(); ImGui::Spacing();
 			}
 		}ImGui::Unindent(); ImGui::Unindent();

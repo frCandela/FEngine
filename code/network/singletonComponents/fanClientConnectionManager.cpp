@@ -27,7 +27,7 @@ namespace fan
 		connectionManager.serverPort = 53000;
 		connectionManager.state = ClientState::Disconnected;
 		connectionManager.roundTripTime = 0.f;
-		connectionManager.serverLastResponse = 0.f;
+		connectionManager.timeoutTime = 10;
 	}
 
 	//================================================================================================================================
@@ -43,6 +43,15 @@ namespace fan
 			hello.name = "toto";
 			hello.Save( _packet );
 			_packet.onFail.Connect( &ClientConnectionManager::OnLoginFail, this );
+		}
+		else if( state == ClientState::Connected )
+		{
+			const double currentTime = Time::Get().ElapsedSinceStartup();
+			if( serverLastResponse + timeoutTime < currentTime )
+			{
+				Debug::Log() << "server timeout " << Debug::Endl();
+				state = ClientState::Disconnected;
+			}
 		}
 	}
 
@@ -86,7 +95,7 @@ namespace fan
 		case fan::ClientConnectionManager::ClientState::Disconnected:		return "Disconnected";		break;
 		case fan::ClientConnectionManager::ClientState::PendingConnection:	return "PendingConnection";	break;
 		case fan::ClientConnectionManager::ClientState::Connected:			return "Connected";			break;
-		default:			assert( false );								return "error";				break;
+		default:			assert( false );								return "Error";				break;
 		}
 	}
 
@@ -104,8 +113,8 @@ namespace fan
 			ImGui::Text( "state:                %s", ToString( connection.state ).c_str() );
 			ImGui::Text( "client port           %u", connection.clientPort );
 			ImGui::Text( "server adress         %s::%u", connection.serverIP.toString().c_str(), connection.serverPort );
-			ImGui::Text( "server last response  %.1f", currentTime - connection.serverLastResponse );
-			ImGui::Text( "ping                  %.01f", .5f * 1000.f * connection.roundTripTime );
+			ImGui::Text( "ping                  %.01f", 0.5f * 1000.f * connection.roundTripTime );
+			ImGui::Text( "server last response:  %.1f", Time::Get().ElapsedSinceStartup() - connection.serverLastResponse );
 		}ImGui::Unindent(); ImGui::Unindent();
 	}
 }

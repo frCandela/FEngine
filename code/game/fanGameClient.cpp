@@ -277,6 +277,8 @@ namespace fan
 			{
 			case sf::UdpSocket::Done:
 			{
+				connection.serverLastResponse = Time::Get().ElapsedSinceStartup();
+
 				// read the first packet type separately
 				PacketType packetType = packet.ReadType();
 				if( packetType == PacketType::Ack )
