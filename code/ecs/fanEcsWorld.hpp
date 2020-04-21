@@ -52,10 +52,10 @@ namespace fan {
 		const ComponentInfo& GetComponentInfo( const ComponentIndex _index ) const { return  m_componentInfo[_index]; }
 		const SingletonComponentInfo& GetSingletonComponentInfo( const uint32_t _staticIndex ) const { return  m_singletonComponentInfo.at( _staticIndex ); }
 		const SingletonComponentInfo* SafeGetSingletonComponentInfo( const uint32_t _staticIndex ) const;
+		const std::unordered_map< uint32_t, SingletonComponent* >& GetSingletonComponents() { return m_singletonComponents; }
 
-
-		void				 SortEntities();
-		void				 RemoveDeadEntities();
+		void SortEntities();
+		void RemoveDeadEntities();
 
 		std::vector<EntityID> Match( const Signature _signature );
 		std::vector<EntityID> MatchSubset( const Signature _signature, const std::vector<EntityID>& _subset );
