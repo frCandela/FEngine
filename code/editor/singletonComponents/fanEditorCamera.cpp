@@ -40,7 +40,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void EditorCamera::OnGui( SingletonComponent& _component )
+	void EditorCamera::OnGui( EcsWorld&, SingletonComponent& _component )
 	{
 		EditorCamera& editorCamera = static_cast<EditorCamera&>( _component );
 

@@ -39,7 +39,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void SunLight::OnGui( SingletonComponent& _component )
+	void SunLight::OnGui( EcsWorld&, SingletonComponent& _component )
 	{
 		SunLight& sunLight = static_cast<SunLight&>( _component );
 		

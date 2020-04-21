@@ -22,7 +22,7 @@ namespace fan
 	public:
 		static void SetInfo( SingletonComponentInfo& _info );
 		static void Init( EcsWorld& _world, SingletonComponent& _component );
-		static void OnGui( SingletonComponent& _component );
+		static void OnGui( EcsWorld&, SingletonComponent& _component );
 
 		SceneNode& CreateSceneNode( const std::string _name, SceneNode* const _parentNode, const bool _generateID = true );
 

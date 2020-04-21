@@ -17,7 +17,7 @@ namespace fan
 	public:
 		static void SetInfo( SingletonComponentInfo& _info );
 		static void Init( EcsWorld& _world, SingletonComponent& _component );
-		static void OnGui( SingletonComponent& _component );
+		static void OnGui( EcsWorld&, SingletonComponent& _component );
 
 		std::vector<DrawMesh>				drawData;
 		std::vector<DrawUIMesh>				uiDrawData;

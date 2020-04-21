@@ -4,6 +4,8 @@
 #include "core/fanHash.hpp"
 #include "editor/fanImguiIcons.hpp"
 
+namespace sf { class Packet;  }
+
 namespace fan
 {
 	//==============================================================================================================================================================
@@ -23,6 +25,8 @@ namespace fan
 	// onGui		: draws ui associated with the component (optional)
 	// save			: serializes the component to json (optional)
 	// load			: deserializes the component from json (optional)
+	// netSave		: serializes the component into a packet for replication (optional)
+	// netLoad		: deserializes the component from a packet for replication (optional)
 	//==============================================================================================================================================================
 	struct SingletonComponentInfo
 	{
@@ -30,10 +34,12 @@ namespace fan
 		ImGui::IconType icon = ImGui::IconType::NONE;	// editor icon
 		uint32_t		staticIndex = 0;				// static index
 
-		void		 ( *onGui )( SingletonComponent& ) = nullptr;
-		void		 ( *init )( EcsWorld&, SingletonComponent& ) = nullptr;
-		void		 ( *save )( const SingletonComponent&, Json& ) = nullptr;
-		void		 ( *load )( SingletonComponent&, const Json& ) = nullptr;		
+		void ( *onGui	) ( EcsWorld&, SingletonComponent& ) = nullptr;
+		void ( *init	) ( EcsWorld&, SingletonComponent& ) = nullptr;
+		void ( *save	) ( const SingletonComponent&, Json& ) = nullptr;
+		void ( *load	) ( SingletonComponent&, const Json& ) = nullptr;		
+		void ( *netSave ) ( const SingletonComponent&, sf::Packet& _packet ) = nullptr;
+		void ( *netLoad ) ( SingletonComponent&,	   sf::Packet& _packet ) = nullptr;
 	};
 
 #define DECLARE_SINGLETON_COMPONENT()		\

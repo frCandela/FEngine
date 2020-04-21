@@ -35,7 +35,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void GameCamera::OnGui( SingletonComponent& _component )
+	void GameCamera::OnGui( EcsWorld&, SingletonComponent& _component )
 	{
 		GameCamera& gameCamera = static_cast<GameCamera&>( _component );
 

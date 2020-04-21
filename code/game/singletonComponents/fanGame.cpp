@@ -43,7 +43,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void Game::OnGui( SingletonComponent& _component )
+	void Game::OnGui( EcsWorld&, SingletonComponent& _component )
 	{
 		Game& gameData = static_cast<Game&>( _component );
 

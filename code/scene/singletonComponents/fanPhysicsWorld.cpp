@@ -41,7 +41,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void PhysicsWorld::OnGui( SingletonComponent& _component )
+	void PhysicsWorld::OnGui( EcsWorld&, SingletonComponent& _component )
 	{
 		PhysicsWorld& physicsWorld = static_cast<PhysicsWorld&>( _component );
 

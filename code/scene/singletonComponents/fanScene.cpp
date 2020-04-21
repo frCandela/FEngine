@@ -46,7 +46,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void Scene::OnGui( SingletonComponent& _component )
+	void Scene::OnGui( EcsWorld&, SingletonComponent& _component )
 	{
 		Scene& scene = static_cast<Scene&>( _component );
 		ImGui::Indent(); ImGui::Indent();

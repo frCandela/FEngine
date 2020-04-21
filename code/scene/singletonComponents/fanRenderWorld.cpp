@@ -35,7 +35,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void RenderWorld::OnGui( SingletonComponent& _component )
+	void RenderWorld::OnGui( EcsWorld&, SingletonComponent& _component )
 	{
 		RenderWorld& renderWorld = static_cast<RenderWorld&>( _component );
 

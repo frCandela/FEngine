@@ -31,7 +31,7 @@ namespace fan
 				// draws gui 
 				if( info.onGui != nullptr )
 				{
-					info.onGui( m_world->GetSingletonComponent( info.staticIndex ) );
+					info.onGui( *m_world, m_world->GetSingletonComponent( info.staticIndex ) );
 				}
 			}			
 		}
