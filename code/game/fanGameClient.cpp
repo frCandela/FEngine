@@ -32,6 +32,8 @@
 #include "scene/fanSceneTags.hpp"
 #include "network/fanPacket.hpp"
 #include "network/singletonComponents/fanClientConnectionManager.hpp"
+#include "network/singletonComponents/fanClientReplicationManager.hpp"
+#include "network/singletonComponents/fanDeliveryNotificationManager.hpp"
 #include "game/fanGameTags.hpp"
 
 #include "game/singletonComponents/fanSunLight.hpp"
@@ -39,7 +41,6 @@
 #include "game/singletonComponents/fanCollisionManager.hpp"
 #include "game/singletonComponents/fanSolarEruption.hpp"
 #include "game/singletonComponents/fanGame.hpp"
-#include "network/singletonComponents/fanDeliveryNotificationManager.hpp"
 
 #include "game/systems/fanUpdatePlanets.hpp"
 #include "game/systems/fanUpdateSpaceships.hpp"
@@ -117,6 +118,7 @@ namespace fan
 		// network singleton components
 		world.AddSingletonComponentType<DeliveryNotificationManager>();
 		world.AddSingletonComponentType<ClientConnectionManager>();
+		world.AddSingletonComponentType<ClientReplicationManager>();
 
 		world.AddTagType<tag_boundsOutdated>();
 		world.AddTagType<tag_sunlight_occlusion>();
@@ -127,7 +129,7 @@ namespace fan
 
 		ClientConnectionManager& connection = world.GetSingletonComponent<ClientConnectionManager>();
 		DeliveryNotificationManager& deliveryNotificationManager = world.GetSingletonComponent<DeliveryNotificationManager>();
-		connection.onServerDisconnected.Connect( &DeliveryNotificationManager::ClearHostData, &deliveryNotificationManager );
+		connection.onServerDisconnected.Connect( &DeliveryNotificationManager::DeleteHost, &deliveryNotificationManager );
 	}
 
 	//================================================================================================================================
@@ -273,6 +275,7 @@ namespace fan
 
 		DeliveryNotificationManager& deliveryNotificationManager = world.GetSingletonComponent<DeliveryNotificationManager>();
 		ClientConnectionManager& connection = world.GetSingletonComponent<ClientConnectionManager>();
+		ClientReplicationManager& replicationManager = world.GetSingletonComponent<ClientReplicationManager>();
 
 		sf::Socket::Status socketStatus;
 		do
@@ -305,7 +308,8 @@ namespace fan
 				}
 
 				// Process packet
-				while( true )
+				bool packetValid = true;
+				while( packetValid )
 				{					
 					switch( packetType )
 					{
@@ -318,23 +322,32 @@ namespace fan
 					case PacketType::Ping:
 					{
 						PacketPing packetPing;
-						packetPing.Load( packet );
+						packetPing.Read( packet );
 						connection.ProcessPacket( packetPing );
 					} break;
-// 					case PacketType::STATUS:
-// 					{
-// 						PacketStatus packetstatus;
-// 						packetstatus.Load( packet );
-// 						game.frameIndex = packetstatus.frameIndex;
-// 						roundTripDelay = packetstatus.roundTripDelay;
-// 					
-// 					} break;
 					case PacketType::LoggedIn:
 					{
 						PacketLoginSuccess packetLogin;
-						packetLogin.Load( packet );
+						packetLogin.Read( packet );
 						connection.ProcessPacket( packetLogin );
 					} break;
+					case PacketType::ReplicationSingletonComponents:
+					{
+						PacketReplicationSingletonComponents packetReplication;
+						packetReplication.Read( packet );
+						replicationManager.ProcessPacket( packetReplication );
+					} break;
+
+// 					case PacketType::GameState:
+// 					{
+// 						PacketGameState packetGameState;
+// 						packetGameState.Read( packet );
+// 						replicationManager.ProcessPacket( packetGameState );
+// 					} break;
+
+
+
+					
 // 					case PacketType::START:
 // 					{
 // 						randomFlags |= MUST_ACK_START;
@@ -348,7 +361,8 @@ namespace fan
 // 						}
 // 					} break;
 					default:
-						Debug::Warning() << " strange packet received with id: " << int( packetType ) << Debug::Endl();
+						Debug::Warning() << "Invalid packet " << int( packetType ) << " received. Reading canceled." << Debug::Endl();
+						packetValid = false;
 						break;
 					}
 

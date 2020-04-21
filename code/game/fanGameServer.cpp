@@ -35,6 +35,7 @@
 
 #include "network/singletonComponents/fanServerConnectionManager.hpp"
 #include "network/singletonComponents/fanDeliveryNotificationManager.hpp"
+#include "network/singletonComponents/fanServerReplicationManager.hpp"
 #include "game/singletonComponents/fanCollisionManager.hpp"
 #include "game/singletonComponents/fanSolarEruption.hpp"
 #include "game/singletonComponents/fanGameCamera.hpp"
@@ -115,6 +116,7 @@ namespace fan
 		// net singleton components
 		world.AddSingletonComponentType<ServerConnectionManager>();
 		world.AddSingletonComponentType<DeliveryNotificationManager>();
+		world.AddSingletonComponentType<ServerReplicationManager>();
 		
 		world.AddTagType<tag_boundsOutdated>();
 		world.AddTagType<tag_sunlight_occlusion>();
@@ -126,7 +128,12 @@ namespace fan
 		// connect network callbacks
 		ServerConnectionManager& connection = world.GetSingletonComponent<ServerConnectionManager>();
 		DeliveryNotificationManager& deliveryNotificationManager = world.GetSingletonComponent<DeliveryNotificationManager>();
-		connection.onClientDisconnected.Connect( &DeliveryNotificationManager::ClearHostData, &deliveryNotificationManager );
+		connection.onClientCreated.Connect( &DeliveryNotificationManager::CreateHost, &deliveryNotificationManager );
+		connection.onClientDeleted.Connect( &DeliveryNotificationManager::DeleteHost, &deliveryNotificationManager );
+		ServerReplicationManager& serverReplicationManager = world.GetSingletonComponent<ServerReplicationManager>();
+		connection.onClientCreated.Connect( &ServerReplicationManager::CreateHost, &serverReplicationManager );
+		connection.onClientDeleted.Connect( &ServerReplicationManager::DeleteHost, &serverReplicationManager );
+
 	}
 
 	//================================================================================================================================
@@ -276,7 +283,6 @@ namespace fan
 				if( clientID == -1 )
 				{
 					clientID = connection.CreateClient( receiveIP, receivePort );
-					deliveryNotificationManager.CreateHost( clientID );
 				}
 
 				connection.clients[clientID].lastResponseTime = Time::Get().ElapsedSinceStartup();
@@ -292,7 +298,8 @@ namespace fan
 				if( !deliveryNotificationManager.ValidatePacket( packet, clientID ) ){continue; }
 
 				// process packet
-				while( true )
+				bool packetValid = true;
+				while( packetValid )
 				{
 					switch( packetType )
 					{
@@ -305,12 +312,13 @@ namespace fan
 					case PacketType::Hello:
 					{
 						PacketHello packetHello;
-						packetHello.Load( packet );
+						packetHello.Read( packet );
 						connection.ProcessPacket( clientID, packetHello );
 					} break;
 
 					default:
-						Debug::Warning() << " strange packet received with id: " << int( packetType ) << Debug::Endl();
+						Debug::Warning() << "Invalid packet " << int( packetType ) << " received. Reading canceled." << Debug::Endl();
+						packetValid = false;
 						break;
 					}
 
@@ -345,21 +353,21 @@ namespace fan
 		} while( socketStatus == sf::UdpSocket::Done );
 	}
 
-	void  GameServer::OnTestFailure( HostID _client )
-	{
-		Debug::Log( "failure" );
-	}
-	void  GameServer::OnTestSuccess( HostID _client )
-	{
-		Debug::Log( "success" );
-	}
-
 	//================================================================================================================================
 	//================================================================================================================================
 	void GameServer::NetworkSend()
 	{
 		ServerConnectionManager& connection = world.GetSingletonComponent<ServerConnectionManager>();
 		DeliveryNotificationManager& deliveryNotificationManager = world.GetSingletonComponent<DeliveryNotificationManager>();
+		ServerReplicationManager& replicationManager = world.GetSingletonComponent<ServerReplicationManager>();
+
+		// generates game state packet
+// 		const Game& game = world.GetSingletonComponent<Game>();
+// 		const SolarEruption& solarEruption = world.GetSingletonComponent<SolarEruption>();
+// 		PacketGameState	gameState;
+// 		gameState.frameIndex = game.frameIndex;
+// 		gameState.solarEruptionStart = solarEruption.eruptionStartFrame;
+
 		for( int i = (int)connection.clients.size() - 1; i >= 0; i-- )
 		{
 			Client& client = connection.clients[i];
@@ -368,15 +376,15 @@ namespace fan
 				continue;
 			}
 
-			// create packet
-			
+			// create new packet			
 			Packet packet( deliveryNotificationManager.GetNextPacketTag( client.clientId ) );
 
-			// write packet
-			connection.Send( packet,  client.clientId );
+			// write game data
+			connection.Send( packet,  client.clientId );			
+			replicationManager.Send( packet, client.clientId );
 
+			// write ack
 			if( packet.GetSize() == sizeof( PacketTag ) ) { packet.onlyContainsAck = true; }
-
 			deliveryNotificationManager.SendAck( packet, client.clientId );
 
 			// send packet
@@ -390,62 +398,5 @@ namespace fan
 				deliveryNotificationManager.hostDatas[i].nextPacketTag --; 
 			}
 		}
-// 
-// 		Game& game = world.GetSingletonComponent<Game>();		
-// 
-// 		// send
-// 		for( int i = (int)clients.size() - 1; i >= 0; i-- )
-// 		{
-// 			Client& client = clients[i];
-// 			Packet packet = socket.CreatePacket(); // One packet to rule them all
-// 
-// 			switch( client.state )
-// 			{
-// 			case Client::CONNECTED:
-// 			{
-// 				if( state == STARTING )
-// 				{
-// 					PacketStart packetStart;
-// 					packetStart.frameStartIndex = game.frameStart;
-// 					packetStart.Save( packet );
-// 				}
-// 			} break;
-// 			case Client::STARTING:
-// 			{
-// 
-// 			} break;
-// 			default:
-// 				assert( false );
-// 				break;
-// 			}
-// 
-// 
-// 			// client timeout 
-// 			if( currentTime - client.lastResponse > timeoutDuration )
-// 			{
-// 				Debug::Log() << "timeout" << client.name << Debug::Endl();
-// 				clients.erase( clients.begin() + i );
-// 			}
-// 
-// 			// ping client & send a status
-// 			if( currentTime - client.lastPingTime > pingDuration )
-// 			{
-// 				PacketPing packetPing;
-// 				packetPing.time = Time::ElapsedSinceStartup();
-// 				packetPing.Save( packet );
-// 				client.lastPingTime = currentTime;
-// 
-// 				PacketStatus packetStatus;
-// 				packetStatus.roundTripDelay = client.roundTripDelay;
-// 				packetStatus.frameIndex = game.frameIndex;
-// 				packetStatus.Save( packet );
-// 			}
-// 
-// 			// send packet
-// 			if( packet.getDataSize() > 0 )
-// 			{
-// 				socket.Send( packet, client.ip, client.port );
-// 			}
-//		}
 	}
 }

@@ -41,7 +41,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void DeliveryNotificationManager::ClearHostData( const HostID _hostID )
+	void DeliveryNotificationManager::DeleteHost( const HostID _hostID )
 	{
 		hostDatas[_hostID] = {};
 	}
@@ -58,20 +58,20 @@ namespace fan
 		
 		if( _packet.tag == hostData.expectedPacketTag )	// packet is perfect \o/
 		{
-			Debug::Log() << "received " << _packet.tag << Debug::Endl();
+			//Debug::Log() << "received " << _packet.tag << Debug::Endl();
 			hostData.expectedPacketTag++;
 			hostData.pendingAck.push_back( _packet.tag );
 			return true;
 		}
 		else if( _packet.tag < hostData.expectedPacketTag ) // silently drop old packet.
 		{
-			Debug::Log() << "dropped old packet " << _packet.tag << Debug::Endl();
+			//Debug::Log() << "dropped old packet " << _packet.tag << Debug::Endl();
 			return false;
 		}
 		else //we missed some packets
 		{
-			Debug::Log() << "missed packets before " << _packet.tag << Debug::Endl();
 			assert( _packet.tag > hostData.expectedPacketTag );
+			//Debug::Log() << "missed packets before " << _packet.tag << Debug::Endl();
 			hostData.expectedPacketTag = _packet.tag + 1;
 			hostData.pendingAck.push_back( _packet.tag );
 			return true;
@@ -99,7 +99,7 @@ namespace fan
 		inFlightPacket.timeDispatch = Time::Get().ElapsedSinceStartup();		
 		hostData.inFlightPackets.push( inFlightPacket );
 
-		Debug::Log() << "sending " << inFlightPacket.tag << Debug::Endl();
+		//Debug::Log() << "sending " << inFlightPacket.tag << Debug::Endl();
 	}
 
 	//================================================================================================================================
@@ -116,19 +116,20 @@ namespace fan
 			/*const*/ InFlightPacket& inFlightPacket = hostData.inFlightPackets.front();
 			if( inFlightPacket.tag == ackPacketTag ) // packet was received ! \o/
 			{
-				Debug::Log() << "receive ack " << ackPacketTag << Debug::Endl();
-				inFlightPacket.onSuccess.Emmit( _hostID );
+				//Debug::Log() << "ACK " << ackPacketTag << Debug::Endl();
+				inFlightPacket.onSuccess.Emmit( _hostID, inFlightPacket.tag );
 				hostData.inFlightPackets.pop();	
 				ackIndex++;
 			}
 			else if( inFlightPacket.tag < ackPacketTag ) // packet was dropped or too old
 			{
-				Debug::Log() << "drop " << ackPacketTag << Debug::Endl();
-				inFlightPacket.onFailure.Emmit( _hostID ); 
+				//Debug::Log() << "OLD " << inFlightPacket.tag << Debug::Endl();
+				inFlightPacket.onFailure.Emmit( _hostID, inFlightPacket.tag );
 				hostData.inFlightPackets.pop();
 			}
 			else // inFlightPacket was already removed (maybe from timeout)	
 			{				
+				//Debug::Log() << "TIMOUT " << ackPacketTag << Debug::Endl();
 				assert( inFlightPacket.tag > ackPacketTag );							
 				ackIndex++;
 			}
@@ -150,8 +151,8 @@ namespace fan
 				InFlightPacket& inFlightPacket = hostData.inFlightPackets.front();
 				if( inFlightPacket.timeDispatch < timeoutTime ) // packet timed out
 				{
-					Debug::Log() << "timeout " << inFlightPacket.tag << Debug::Endl();
-					inFlightPacket.onFailure.Emmit( hostID );
+					//Debug::Log() << "timeout " << inFlightPacket.tag << Debug::Endl();
+					inFlightPacket.onFailure.Emmit( hostID, inFlightPacket.tag );
 					hostData.inFlightPackets.pop();
 				}
 				else //no packets beyond could be timed out
@@ -179,7 +180,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void DeliveryNotificationManager::OnGui( SingletonComponent& _component )
+	void DeliveryNotificationManager::OnGui( EcsWorld&, SingletonComponent& _component )
 	{
 		ImGui::Indent(); ImGui::Indent();
 		{

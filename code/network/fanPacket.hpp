@@ -8,6 +8,10 @@
 
 namespace fan
 {
+	struct SingletonComponent;
+	struct SingletonComponentInfo;
+	class EcsWorld;
+
 	struct Client;
 	using HostID = int;	
 	using IpAddress = sf::IpAddress;
@@ -20,6 +24,8 @@ namespace fan
 		, Ack
 		, Hello
 		, LoggedIn
+		, ReplicationSingletonComponents
+		, GameState
 		, COUNT
 	};
 
@@ -51,8 +57,8 @@ namespace fan
 		size_t		GetSize() const{ return m_packet.getDataSize(); }
 
 		PacketTag		 tag;
-		Signal< HostID > onFail;	// packet was dropped
-		Signal< HostID > onSuccess;	// packet was received
+		Signal< HostID, PacketTag > onFail;		// packet was dropped
+		Signal< HostID, PacketTag > onSuccess;	// packet was received
 		bool onlyContainsAck = false;
 	private:
 		sf::Packet m_packet;
@@ -64,12 +70,12 @@ namespace fan
 	//================================================================================================================================
 	struct PacketPing
 	{
-		void Load( Packet& _packet ) 
+		void Read( Packet& _packet ) 
 		{
 			_packet >> roundTripTime;
 		}
 
-		void Save( Packet& _packet ) 
+		void Write( Packet& _packet ) 
 		{ 
 			_packet << sf::Uint16( PacketType::Ping );
 			_packet << roundTripTime;
@@ -85,12 +91,12 @@ namespace fan
 	//================================================================================================================================
 	struct PacketHello
 	{
-		void Save( Packet& _packet )
+		void Write( Packet& _packet )
 		{
 			_packet << sf::Uint16( PacketType::Hello );
 			_packet << name;
 		}
-		void Load( Packet& _packet )
+		void Read( Packet& _packet )
 		{
 			_packet >> name;
 		}
@@ -104,54 +110,56 @@ namespace fan
 	//================================================================================================================================
 	struct PacketLoginSuccess
 	{
-		void Save( Packet& _packet )
+		void Write( Packet& _packet )
 		{
 			_packet << sf::Uint16( PacketType::LoggedIn );
 		}
-		void Load( Packet& /*_packet*/ )
+		void Read( Packet& /*_packet*/ )
 		{
 		}
 	};
 
-// 	//================================================================================================================================
-// 	// Packet status : server->client
-// 	//================================================================================================================================
-// 	struct PacketStatus
-// 	{
-// 		void Load( Packet& _packet )
-// 		{
-// 			_packet >> roundTripDelay;
-// 			_packet >> frameIndex;
-// 		}
-// 
-// 		void Save( Packet& _packet )
-// 		{
-// 			_packet << sf::Uint16( PacketType::Status );
-// 			_packet << roundTripDelay;
-// 			_packet << frameIndex;
-// 		}
-// 
-// 		float		roundTripDelay = -1.f;
-// 		sf::Uint64	frameIndex = 0;
-// 	};
-// 	
-// 	//================================================================================================================================
-// 	// Packet game start : server->client
-// 	// send to the client when the game is starting
-// 	//================================================================================================================================
-// 	struct PacketStart
-// 	{
-// 		void Load( Packet& _packet )
-// 		{
-// 			_packet >> frameStartIndex;
-// 		}
-// 
-// 		void Save( Packet& _packet )
-// 		{
-// 			_packet << sf::Uint16( PacketType::START );
-// 			_packet << frameStartIndex;
-// 		}
-// 
-// 		sf::Uint64	frameStartIndex = 0;
-// 	};
+	//================================================================================================================================
+	// Packet status : server->client
+	//================================================================================================================================
+	struct PacketGameState
+	{
+		void Read( Packet& _packet )
+		{
+			_packet >> frameIndex;
+			_packet >> solarEruptionStart;
+		}
+
+		void Write( Packet& _packet )
+		{
+			_packet << sf::Uint16( PacketType::GameState );
+			_packet << frameIndex;
+			_packet << solarEruptionStart;
+		}
+
+		sf::Uint64			frameIndex			= 0;
+		sf::Uint64			solarEruptionStart  = 0;
+	};
+
+	//================================================================================================================================
+	// server->client  Replication packet for singleton components 
+	// serialized data is stored in a sf::Packet
+	//================================================================================================================================
+	struct PacketReplicationSingletonComponents
+	{
+		//================================================================
+		//================================================================
+		struct SingletonData
+		{
+			const SingletonComponentInfo* componentInfo = nullptr;
+			SingletonComponent* component = nullptr;
+		};		
+
+		void Read( Packet& _packet );
+		void Write( Packet& _packet ) const;
+		void Generate( const SingletonComponentInfo& _componentInfo, const SingletonComponent& _component );
+		void ReplicateOnWorld( EcsWorld& _world );
+
+		sf::Packet packetData;
+	};
 }

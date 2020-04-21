@@ -78,24 +78,30 @@ namespace fan
 		newClient->lastPingTime = 0.f;
 		newClient->pingInFlight = false;
 
+		onClientCreated.Emmit( newClient->clientId );
+
 		return newClient->clientId;
 	}
 
 	//================================================================================================================================
+	// sends a login packet to the clients needing approval
+	// regularly sends ping to clients to calculate RTT
 	//================================================================================================================================
 	void ServerConnectionManager::Send( Packet& _packet, const HostID _clientID )
 	{
+		// Send login packet
 		Client& client = clients[_clientID];
 		if( client.state == Client::State::NeedingApprouval )
 		{
 			PacketLoginSuccess packetLogin;
-			packetLogin.Save( _packet );
+			packetLogin.Write( _packet );
 			_packet.onSuccess.Connect( &ServerConnectionManager::OnLoginSuccess, this );
 			_packet.onFail.Connect( &ServerConnectionManager::OnLoginFail, this );
 			client.state = Client::State::PendingApprouval;
 		}
 		else if( client.state == Client::State::Connected )
 		{
+			// Ping client
 			const double currentTime = Time::Get().ElapsedSinceStartup();
 			if( ! client.pingInFlight && ( currentTime - client.lastPingTime > pingDelay )  )
 			{
@@ -103,7 +109,7 @@ namespace fan
 				packetPing.roundTripTime = client.roundTripTime;
 				_packet.onSuccess.Connect( &ServerConnectionManager::OnPingSuccess, this );
 				_packet.onFail.Connect( &ServerConnectionManager::OnPingFail, this );
-				packetPing.Save( _packet );
+				packetPing.Write( _packet );
 				client.lastPingTime = currentTime;
 				client.pingInFlight = true;
 			}
@@ -122,7 +128,7 @@ namespace fan
 				if( client.lastResponseTime + timeoutTime < currentTime )
 				{
 					Debug::Log() << "client " << client.clientId << " timeout " << Debug::Endl();	
-					DisconnectClient( client.clientId );
+					DeleteClient( client.clientId );
 				}
 			}
 		}
@@ -130,17 +136,17 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void ServerConnectionManager::DisconnectClient( const HostID _clientID )
+	void ServerConnectionManager::DeleteClient( const HostID _clientID )
 	{
 		Debug::Log() << "client " << _clientID << " disconnected " << Debug::Endl();
-		onClientDisconnected.Emmit( _clientID );
+		onClientDeleted.Emmit( _clientID );
 		Client& client = clients[_clientID];
 		client.state = Client::State::Null;
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void ServerConnectionManager::OnLoginFail( const HostID _clientID )
+	void ServerConnectionManager::OnLoginFail( const HostID _clientID, const PacketTag /*_packetTag*/ )
 	{
 		Client& client = clients[_clientID];
 		if( client.state == Client::State::PendingApprouval )
@@ -152,7 +158,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void ServerConnectionManager::OnLoginSuccess( const HostID _clientID )
+	void ServerConnectionManager::OnLoginSuccess( const HostID _clientID, const PacketTag /*_packetTag*/ )
 	{
 		Client& client = clients[_clientID];
 		if( client.state == Client::State::PendingApprouval )
@@ -164,7 +170,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void ServerConnectionManager::OnPingSuccess( const HostID _clientID )
+	void ServerConnectionManager::OnPingSuccess( const HostID _clientID, const PacketTag /*_packetTag*/ )
 	{
 		Client& client = clients[_clientID];
 		const double currentTime = Time::Get().ElapsedSinceStartup();
@@ -174,7 +180,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void ServerConnectionManager::OnPingFail( const HostID _clientID )
+	void ServerConnectionManager::OnPingFail( const HostID _clientID, const PacketTag /*_packetTag*/ )
 	{
 		Client& client = clients[_clientID];
 		client.pingInFlight = false;
@@ -232,7 +238,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void ServerConnectionManager::OnGui( SingletonComponent& _component )
+	void ServerConnectionManager::OnGui( EcsWorld&, SingletonComponent& _component )
 	{
 		ImGui::Indent(); ImGui::Indent();
 		{

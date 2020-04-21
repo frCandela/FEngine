@@ -43,7 +43,7 @@ namespace fan
 
 			PacketHello hello;
 			hello.name = "toto";
-			hello.Save( _packet );
+			hello.Write( _packet );
 			_packet.onFail.Connect( &ClientConnectionManager::OnLoginFail, this );
 		}
 	}
@@ -51,7 +51,7 @@ namespace fan
 	//================================================================================================================================
 	// login packet dropped our timed out. Resend a new one.
 	//================================================================================================================================
-	void ClientConnectionManager::OnLoginFail( HostID )
+	void ClientConnectionManager::OnLoginFail( HostID, const PacketTag /*_packetTag*/ )
 	{
 		if( state == ClientState::PendingConnection )
 		{
@@ -134,7 +134,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void ClientConnectionManager::OnGui( SingletonComponent& _component )
+	void ClientConnectionManager::OnGui( EcsWorld&, SingletonComponent& _component )
 	{
 		ImGui::Indent(); ImGui::Indent();
 		{

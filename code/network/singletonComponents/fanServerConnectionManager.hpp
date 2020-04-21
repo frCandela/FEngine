@@ -47,9 +47,10 @@ namespace fan
 	public:
 		static void SetInfo( SingletonComponentInfo& _info );
 		static void Init( EcsWorld& _world, SingletonComponent& _component );
-		static void OnGui( SingletonComponent& _component );
+		static void OnGui( EcsWorld&, SingletonComponent& _component );
 
-		Signal<HostID> onClientDisconnected;
+		Signal<HostID> onClientCreated;
+		Signal<HostID> onClientDeleted;
 
 		UdpSocket			socket;
 		Port				serverPort;
@@ -59,14 +60,14 @@ namespace fan
 
 		HostID	FindClient( const sf::IpAddress _ip, const unsigned short _port );
 		HostID	CreateClient( const sf::IpAddress _ip, const unsigned short _port );
+		void	DeleteClient( const HostID _clientID );
 		void	Send( Packet& _packet, const HostID _clientID );
 		void	ProcessPacket( const HostID _clientID, const PacketHello& _packetHello );
 		void	DetectClientTimout();
-		void	DisconnectClient( const HostID _clientID );
 
-		void OnLoginFail( const HostID _clientID );
-		void OnLoginSuccess( const HostID _clientID );
-		void OnPingSuccess( const HostID _clientID );
-		void OnPingFail( const HostID _clientID );
+		void OnLoginFail( const HostID _clientID, const PacketTag _packetTag );
+		void OnLoginSuccess( const HostID _clientID, const PacketTag _packetTag );
+		void OnPingSuccess( const HostID _clientID, const PacketTag _packetTag );
+		void OnPingFail( const HostID _clientID, const PacketTag _packetTag );
 	};
 }
