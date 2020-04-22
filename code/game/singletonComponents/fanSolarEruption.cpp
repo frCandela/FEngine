@@ -284,7 +284,10 @@ namespace fan
 				{
 					solarEruption.eruptionStartFrame = SolarEruption::CalculateNextEruptionStartFrame( solarEruption, game );
 					ServerReplicationManager& replication = _world.GetSingletonComponent<ServerReplicationManager>();
-					replication.ReplicateSingleton( SolarEruption::s_typeInfo, ServerReplicationManager::EnsureReplicated );
+					replication.ReplicateOnAllClients(
+						  ServerReplicationManager::BuildSingletonPacket( _world, SolarEruption::s_typeInfo ) 	
+						, ServerReplicationManager::ResendUntilReplicated 
+					);
 				}
 				ImGui::Text( "state: %s", StateToString( solarEruption.state ).c_str() );
 				ImGui::Text( "timer: %f", solarEruption.timer );

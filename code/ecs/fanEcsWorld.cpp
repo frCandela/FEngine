@@ -83,10 +83,8 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	SingletonComponent& EcsWorld::GetSingletonComponent( const uint32_t _staticIndex )
-	{
-		return  * m_singletonComponents[_staticIndex];
-	}
+	SingletonComponent&       EcsWorld::GetSingletonComponent( const uint32_t _staticIndex )	   {	return  * m_singletonComponents[_staticIndex]; }
+	const SingletonComponent& EcsWorld::GetSingletonComponent( const uint32_t _staticIndex ) const { return  *m_singletonComponents.at(_staticIndex); }
 
 	//================================================================================================================================
 	//================================================================================================================================

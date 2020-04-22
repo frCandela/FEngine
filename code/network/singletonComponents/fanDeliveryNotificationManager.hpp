@@ -17,7 +17,7 @@ namespace fan
 	{
 		void Write( Packet& _packet )
 		{
-			_packet << sf::Uint16( PacketType::Ack );
+			_packet << PacketTypeInt( PacketType::Ack );
 			_packet << sf::Uint16( tags.size() );
 			for( PacketTag tag : tags )
 			{

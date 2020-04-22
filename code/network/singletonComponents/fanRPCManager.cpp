@@ -27,6 +27,7 @@ namespace fan
 	}
 
 	//================================================================================================================================
+	// Registers all available RPC unwrap functions
 	//================================================================================================================================
 	void RPCManager::RegisterRPCs( )
 	{
@@ -34,22 +35,45 @@ namespace fan
 	}
 
 	//================================================================================================================================
+	// Registers a RPC unwrap function
+	// A unwrap function must decode a packet and run the corresponding procedure
 	//================================================================================================================================
-	void RPCManager::RegisterUnwrapFunction( const uint32_t _id, const RPCUnwrapFunc _RPCUnwrapFunc )
+	void RPCManager::RegisterUnwrapFunction( const RpcId _id, const RpcUnwrapFunc _rpcUnwrapFunc )
 	{
 		assert( nameToRPCTable.find( _id ) == nameToRPCTable.end() );
-		nameToRPCTable[_id] = _RPCUnwrapFunc;
+		nameToRPCTable[_id] = _rpcUnwrapFunc;
 	}
 
 	//================================================================================================================================
+	// Runs a procedure from an incoming rpc packet data
 	//================================================================================================================================
-	void RPCManager::RPCSynchClientFrame( sf::Packet& _packet, const sf::Uint64 _frameIndex, const float _RTT )
+	void RPCManager::TriggerRPC( sf::Packet& _packet )
 	{
-		_packet << _frameIndex;
-		_packet << _RTT;
+		RpcId rpcID;
+		_packet >> rpcID;
+
+		const RpcUnwrapFunc function =  nameToRPCTable[rpcID];
+		( ( *this ).*( function ) )( _packet );
 	}
 
 	//================================================================================================================================
+	// SynchClientFrame RPC - wrap data
+	//================================================================================================================================
+	PacketReplication RPCManager::RPCSynchClientFrame( const sf::Uint64 _frameIndex, const float _rtt )
+	{
+		PacketReplication packet;
+		packet.replicationType = PacketReplication::ReplicationType::RPC;
+
+		packet.packetData.clear();
+		packet.packetData << RpcId( 'SYCF' );
+		packet.packetData << _frameIndex;
+		packet.packetData << _rtt;
+
+		return packet;
+	}
+
+	//================================================================================================================================
+	// SynchClientFrame RPC - unwrap data & synchronizes the frame index of the client depending on its rtt
 	//================================================================================================================================
 	void RPCManager::UnwrapSynchClientFrame( sf::Packet& _packet )
 	{
@@ -59,16 +83,27 @@ namespace fan
 		_packet >> frameIndex;
 		_packet >> RTT;
 
-		OnSynchClientFrame.Emmit( frameIndex, RTT );
+		Debug::Highlight() << frameIndex << " " << RTT << Debug::Endl();
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
 	void RPCManager::OnGui( EcsWorld&, SingletonComponent& _component )
 	{
+		RPCManager& rpc = static_cast<RPCManager&>( _component );
+
 		ImGui::Indent(); ImGui::Indent();
 		{
-	
+			ImGui::Text( "rpc list: " );
+			ImGui::Indent();
+			for ( std::pair<RpcId, RpcUnwrapFunc> pair : rpc.nameToRPCTable )
+			{
+				char* charArray = (char*)(&pair.first);
+				std::stringstream ss;
+				ss << charArray[3] << charArray[2] << charArray[1] << charArray[0];
+				ImGui::Text( ss.str().c_str() );
+			}
+			ImGui::Unindent();
 		}ImGui::Unindent(); ImGui::Unindent();
 	}
 }

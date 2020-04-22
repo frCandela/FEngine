@@ -25,7 +25,6 @@ namespace fan
 	void ServerReplicationManager::Init( EcsWorld& _world, SingletonComponent& _component )
 	{
 		ServerReplicationManager& replicationManager = static_cast<ServerReplicationManager&>( _component );
-		replicationManager.world = &_world;
 		replicationManager.hostDatas.clear();
 	}
 
@@ -50,29 +49,54 @@ namespace fan
 	}
 
 	//================================================================================================================================
+	// Replicates data on all connected hosts
 	//================================================================================================================================
-	void ServerReplicationManager::ReplicateSingleton( const uint32_t _staticID, const ReplicationFlags _flags )
+	void ServerReplicationManager::ReplicateOnAllClients( PacketReplication& _packet, const ReplicationFlags _flags )
 	{
-		// generates replicated data
-		const SingletonComponentInfo& info = world->GetSingletonComponentInfo( _staticID );
-		const SingletonComponent& component = world->GetSingletonComponent( _staticID );	
-		PacketReplicationSingletonComponents packet;
-		packet.Generate( info, component );
-
-		for ( HostData& hostData : hostDatas )
+		for( HostData& hostData : hostDatas )
 		{
 			if( !hostData.isNull )
 			{
 				hostData.nextReplication.emplace_back();
 				SingletonReplicationData& replicationData = hostData.nextReplication[hostData.nextReplication.size() - 1];
-				replicationData.staticID = _staticID;
 				replicationData.flags = _flags;
-				replicationData.packet = packet;
+				replicationData.packet = _packet;
 			}
 		}
 	}
 
 	//================================================================================================================================
+	// Builds & returns a replication packet to replicate an ecs singleton
+	//================================================================================================================================
+	PacketReplication ServerReplicationManager::BuildSingletonPacket( const EcsWorld& _world, const uint32_t _staticID )
+	{
+		// generates replicated data for a singleton component
+		const SingletonComponentInfo& info = _world.GetSingletonComponentInfo( _staticID );
+		const SingletonComponent& component = _world.GetSingletonComponent( _staticID );
+		PacketReplication packet;
+		packet.replicationType = PacketReplication::ReplicationType::SingletonComponent;
+		packet.packetData.clear();
+		packet.packetData << sf::Uint32( info.staticIndex );
+		info.netSave( component, packet.packetData );
+
+		return packet;
+	}
+
+	//================================================================================================================================
+	// Builds & returns a replication packet for running RPC 
+	//================================================================================================================================
+	PacketReplication ServerReplicationManager::BuildRPCPacket( sf::Packet& _dataRPC )
+	{
+		PacketReplication packet;
+		packet.replicationType = PacketReplication::ReplicationType::RPC;
+		packet.packetData.clear();
+		packet.packetData = _dataRPC;
+
+		return packet;
+	}
+
+	//================================================================================================================================
+	// Sends all new replication packed
 	//================================================================================================================================
 	void ServerReplicationManager::Send( Packet& _packet, const HostID _hostID )
 	{
@@ -80,7 +104,7 @@ namespace fan
 		for( SingletonReplicationData& data : hostData.nextReplication )
 		{
 			data.packet.Write( _packet );
-			if( data.flags & ReplicationFlags::EnsureReplicated )
+			if( data.flags & ReplicationFlags::ResendUntilReplicated )
 			{
 				hostData.pendingReplication.insert( { _packet.tag , data } );
 				_packet.onSuccess.Connect( &ServerReplicationManager::OnReplicationSuccess, this );
@@ -92,6 +116,7 @@ namespace fan
 	}
 	
 	//================================================================================================================================
+	// Replication packet has arrived, remove from pending list
 	//================================================================================================================================
 	void ServerReplicationManager::OnReplicationSuccess( const HostID _hostID, const PacketTag _packetTag )
 	{
@@ -101,6 +126,7 @@ namespace fan
 	}
 	
 	//================================================================================================================================
+	// Replication packet has dropped, resends it if necessary
 	//================================================================================================================================
 	void ServerReplicationManager::OnReplicationFail( const HostID _hostID, const PacketTag _packetTag )
 	{

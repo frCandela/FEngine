@@ -21,17 +21,17 @@ namespace fan
 		static void Init( EcsWorld& _world, SingletonComponent& _component );
 		static void OnGui( EcsWorld&, SingletonComponent& _component );
 
-		//================================================================
-		//================================================================
-		using RPCUnwrapFunc = void ( RPCManager::* )( sf::Packet& );
+		using RpcUnwrapFunc = void ( RPCManager::* )( sf::Packet& );
+		using RpcId = sf::Uint32;
 
-		void RegisterRPCs();
-		void RegisterUnwrapFunction( const uint32_t _id, const RPCUnwrapFunc _RPCUnwrapFunc );
+		void RegisterRPCs( );
+		void RegisterUnwrapFunction( const RpcId _id, const RpcUnwrapFunc _rpcUnwrapFunc );
+		void TriggerRPC( sf::Packet& _packet );
 
-		std::unordered_map<uint32_t, RPCUnwrapFunc > nameToRPCTable;
+		std::unordered_map<RpcId , RpcUnwrapFunc > nameToRPCTable;
 
-		Signal<uint64_t, float> OnSynchClientFrame;
-		void RPCSynchClientFrame( sf::Packet& _packet, const uint64_t _frameIndex, const float _RTT );
-		void UnwrapSynchClientFrame( sf::Packet& _packet );
+		// List of available rpc
+		void					 UnwrapSynchClientFrame( sf::Packet& _packet );
+		static PacketReplication RPCSynchClientFrame( const uint64_t _frameIndex, const float _rtt );
 	};
 }

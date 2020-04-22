@@ -16,7 +16,7 @@ namespace fan
 	//================================================================================================================================
 	PacketType Packet::ReadType()
 	{
-		sf::Uint16 intType;
+		PacketTypeInt intType;
 		m_packet >> intType;
 		return PacketType( intType );
 	}
@@ -33,39 +33,22 @@ namespace fan
 	}
 
 	//================================================================================================================================
-	// Generates the packet data from a list of singleton
-	//================================================================================================================================
-	void PacketReplicationSingletonComponents::Generate( const SingletonComponentInfo& _componentInfo, const SingletonComponent& _component )
-	{
-		packetData.clear();
-		packetData << sf::Uint32( _componentInfo.staticIndex );
-		_componentInfo.netSave( _component, packetData );
-	}
-
-	//================================================================================================================================
-	// Generates the packet data from a list of singleton
-	//================================================================================================================================
-	void PacketReplicationSingletonComponents::ReplicateOnWorld( EcsWorld& _world )
-	{
-		sf::Uint32 staticIndex;
-		packetData >> staticIndex;
-
-		SingletonComponent& singleton = _world.GetSingletonComponent( staticIndex );
-		const SingletonComponentInfo& info = _world.GetSingletonComponentInfo( staticIndex );
-		info.netLoad( singleton, packetData );
-
-		assert( packetData.endOfPacket() );
-	}
-
-	//================================================================================================================================
 	// we could make this more efficient with a custom packet/socket library that allows better access to packet data
 	//================================================================================================================================
-	void PacketReplicationSingletonComponents::Read( Packet& _packet )
+	void PacketReplication::Read( Packet& _packet )
 	{
 		packetData.clear();
 
-		sf::Uint16 dataSize;
+		// get replication type
+		sf::Uint8 replicationTypeInt;
+		_packet >> replicationTypeInt;
+		replicationType = ReplicationType( replicationTypeInt );	
+
+		// get data size
+		sf::Uint8 dataSize;
 		_packet >> dataSize;
+
+		// get data
 		for (int i = 0; i < dataSize ; i++)
 		{
 			sf::Uint8 data;
@@ -76,14 +59,15 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void PacketReplicationSingletonComponents::Write( Packet& _packet ) const
+	void PacketReplication::Write( Packet& _packet ) const
 	{
-		assert( packetData.getDataSize() < std::numeric_limits<sf::Uint16>::max() );
-		
-
-		_packet << sf::Uint16( PacketType::ReplicationSingletonComponents );
-		_packet << sf::Uint16( packetData.getDataSize() );
-		
+ 		assert( packetData.getDataSize() < std::numeric_limits<sf::Uint8>::max() );		
+ 		assert( replicationType != ReplicationType::Count );
+ 
+ 		_packet << PacketTypeInt( PacketType::Replication );
+ 		_packet << sf::Uint8( replicationType );
+ 		_packet << sf::Uint8( packetData.getDataSize() );
+ 		
 		sf::Packet packetCpy = packetData;
 		for( int i = 0; i < packetData.getDataSize(); i++ )
 		{

@@ -7,6 +7,7 @@
 namespace fan
 {
 	class EcsWorld;
+	struct RPCManager;
 
 	//================================================================================================================================
 	// [Client] processes server packets to replicates objects / run events
@@ -21,8 +22,11 @@ namespace fan
 		static void Save( const SingletonComponent& _component, Json& _json );
 		static void Load( SingletonComponent& _component, const Json& _json );
 
-		void ProcessPacket( PacketReplicationSingletonComponents& _packet );
+		void ProcessPacket( PacketReplication& _packet );
+		void ReplicateRPC( RPCManager& _rpcManager );
+		void ReplicateSingletons( EcsWorld& _world );
 
-		EcsWorld* world = nullptr;
+		std::vector< PacketReplication > replicationListSingletons;
+		std::vector< PacketReplication > replicationListRPC;
 	};
 }

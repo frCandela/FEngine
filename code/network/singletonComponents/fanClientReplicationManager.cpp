@@ -3,6 +3,7 @@
 #include "scene/fanSceneSerializable.hpp"
 #include "ecs/fanEcsWorld.hpp"
 #include "game/singletonComponents/fanGame.hpp"
+#include "network/singletonComponents/fanRPCManager.hpp"
 
 namespace fan
 {
@@ -25,14 +26,48 @@ namespace fan
 	void ClientReplicationManager::Init( EcsWorld& _world, SingletonComponent& _component )
 	{
 		ClientReplicationManager& replicationManager = static_cast<ClientReplicationManager&>( _component );
-		replicationManager.world = &_world;
+		replicationManager.replicationListRPC.clear();
+		replicationManager.replicationListSingletons.clear();
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void ClientReplicationManager::ProcessPacket( PacketReplicationSingletonComponents& _packet )
+	void ClientReplicationManager::ProcessPacket( PacketReplication& _packet )
 	{
-		_packet.ReplicateOnWorld( *world );
+		switch( _packet.replicationType )
+		{
+		case PacketReplication::ReplicationType::Component:				assert( false );								break;
+		case PacketReplication::ReplicationType::SingletonComponent:	replicationListSingletons.push_back( _packet );	break;
+		case PacketReplication::ReplicationType::RPC:					replicationListRPC.push_back( _packet );		break;
+		default:														assert( false );								break;
+		}
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
+	void ClientReplicationManager::ReplicateRPC( RPCManager& _rpcManager )
+	{
+		for( PacketReplication packet : replicationListRPC )
+		{
+			_rpcManager.TriggerRPC( packet.packetData );
+		}
+		replicationListRPC.clear();
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
+	void ClientReplicationManager::ReplicateSingletons( EcsWorld& _world )
+	{
+		for ( PacketReplication packet : replicationListSingletons )
+		{
+			sf::Uint32 staticIndex;
+			packet.packetData >> staticIndex;
+			SingletonComponent& singleton = _world.GetSingletonComponent( staticIndex );
+			const SingletonComponentInfo& info = _world.GetSingletonComponentInfo( staticIndex );
+			info.netLoad( singleton, packet.packetData );
+			assert( packet.packetData.endOfPacket() );
+		}
+		replicationListSingletons.clear();
 	}
 	
 	//================================================================================================================================
@@ -59,6 +94,8 @@ namespace fan
 
 		ImGui::Indent(); ImGui::Indent();
 		{
+			ImGui::Text( "singletons: %d", replicationManager.replicationListSingletons.size() );
+			ImGui::Text( "rpc:        %d", replicationManager.replicationListRPC.size() );
 		}
 		ImGui::Unindent(); ImGui::Unindent();
 	}

@@ -211,6 +211,8 @@ namespace fan
 		Game& game = world.GetSingletonComponent<Game>();
 		DeliveryNotificationManager& deliveryNotificationManager = world.GetSingletonComponent<DeliveryNotificationManager>();
 		ClientConnectionManager& connection = world.GetSingletonComponent<ClientConnectionManager>();
+		ClientReplicationManager& replicationManager = world.GetSingletonComponent<ClientReplicationManager>();
+		RPCManager& rpcManager = world.GetSingletonComponent<RPCManager>();
 		game.frameIndex++;
 		{
 			SCOPED_PROFILE( scene_update );
@@ -218,6 +220,8 @@ namespace fan
 			NetworkReceive();
 			deliveryNotificationManager.ProcessTimedOutPackets();
 			connection.DetectServerTimout();
+			replicationManager.ReplicateSingletons( world );
+			replicationManager.ReplicateRPC( rpcManager );
 
 			// physics & transforms
 			PhysicsWorld& physicsWorld = world.GetSingletonComponent<PhysicsWorld>();
@@ -333,9 +337,9 @@ namespace fan
 						packetLogin.Read( packet );
 						connection.ProcessPacket( packetLogin );
 					} break;
-					case PacketType::ReplicationSingletonComponents:
+					case PacketType::Replication:
 					{
-						PacketReplicationSingletonComponents packetReplication;
+						PacketReplication packetReplication;
 						packetReplication.Read( packet );
 						replicationManager.ProcessPacket( packetReplication );
 					} break;

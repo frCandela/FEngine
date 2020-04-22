@@ -9,7 +9,7 @@ namespace fan
 	class EcsWorld;
 
 	//================================================================================================================================
-	// [Server] sends packets to clients to replicates objects / run events
+	// [Server] sends packets to clients to replicates objects / run PRC
 	//================================================================================================================================
 	class ServerReplicationManager : public SingletonComponent
 	{
@@ -24,18 +24,15 @@ namespace fan
 		enum ReplicationFlags
 		{
 			None = 0,
-			EnsureReplicated = 1 << 1
+			ResendUntilReplicated = 1 << 1	// if the packets is droppeds, resend it
 		};
 
 		//================================================================
 		//================================================================
 		struct SingletonReplicationData
 		{
-			Signal< HostID, PacketTag > onFailure;				// fail callback
-			Signal< HostID, PacketTag > onSuccess;				// success callback
-			uint32_t staticID;									// singleton static id
 			ReplicationFlags flags = ReplicationFlags::None;	// replication parameters
-			PacketReplicationSingletonComponents packet;		// saved replication data
+			PacketReplication packet;							// saved replication data
 		};
 
 		//================================================================
@@ -47,15 +44,19 @@ namespace fan
 			std::vector<SingletonReplicationData>				nextReplication;	// waiting  to be sent on the network	
 		};
 
+		std::vector<HostData> hostDatas;
+
 		void CreateHost( const HostID _hostID );
 		void DeleteHost( const HostID _hostID );
-		void ReplicateSingleton( const uint32_t _staticID, const ReplicationFlags _flags = ReplicationFlags::None );
 		void Send( Packet& _packet, const HostID _hostID );
-		
+		void ReplicateOnAllClients( PacketReplication& _packet, const ReplicationFlags _flags );
+
+		static PacketReplication BuildSingletonPacket( const EcsWorld& _world, const uint32_t _staticID );
+		static PacketReplication BuildRPCPacket( sf::Packet& _dataRPC );
+
 		void OnReplicationSuccess( const HostID _hostID, const PacketTag _packetTag );
 		void OnReplicationFail( const HostID _hostID, const PacketTag _packetTag );
 
-		EcsWorld* world = nullptr;	
-		std::vector<HostData> hostDatas;
+
 	};
 }

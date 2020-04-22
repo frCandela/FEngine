@@ -8,26 +8,24 @@
 
 namespace fan
 {
-	struct SingletonComponent;
-	struct SingletonComponentInfo;
-	class EcsWorld;
-
 	struct Client;
 	using HostID = int;	
 	using IpAddress = sf::IpAddress;
 	using Port = unsigned short;
 	using PacketTag = sf::Uint32;		// may change to uint16 on release
+	using PacketTypeInt = sf::Uint8;	// the sf integer type encoding the PacketType enum
 
+	// all the types of packets of the network engine
 	enum class PacketType
 	{
-		  Ping = 0
-		, Ack
-		, Hello
-		, LoggedIn
-		, ReplicationSingletonComponents
-		, GameState
-		, COUNT
-	};
+		  Ping = 0		// server calculates the RTT &sends it to the client
+		, Ack			// packet reception acknowledgment 
+		, Hello			// first presentation of the client to the server for logging in
+		, LoggedIn		// server informs client that login was successful
+		, Replication	// replication of data on the client's world
+		, COUNT			
+	}; 
+	static_assert( int( PacketType::COUNT ) < std::numeric_limits<PacketTypeInt>::max() );
 
 	//================================================================================================================================
 	//================================================================================================================================
@@ -75,9 +73,9 @@ namespace fan
 			_packet >> roundTripTime;
 		}
 
-		void Write( Packet& _packet ) 
+		void Write( Packet& _packet ) const
 		{ 
-			_packet << sf::Uint16( PacketType::Ping );
+			_packet << PacketTypeInt( PacketType::Ping );
 			_packet << roundTripTime;
 		}
 
@@ -91,9 +89,9 @@ namespace fan
 	//================================================================================================================================
 	struct PacketHello
 	{
-		void Write( Packet& _packet )
+		void Write( Packet& _packet ) const
 		{
-			_packet << sf::Uint16( PacketType::Hello );
+			_packet << PacketTypeInt( PacketType::Hello );
 			_packet << name;
 		}
 		void Read( Packet& _packet )
@@ -110,9 +108,9 @@ namespace fan
 	//================================================================================================================================
 	struct PacketLoginSuccess
 	{
-		void Write( Packet& _packet )
+		void Write( Packet& _packet ) const
 		{
-			_packet << sf::Uint16( PacketType::LoggedIn );
+			_packet << PacketTypeInt( PacketType::LoggedIn );
 		}
 		void Read( Packet& /*_packet*/ )
 		{
@@ -120,46 +118,23 @@ namespace fan
 	};
 
 	//================================================================================================================================
-	// Packet status : server->client
+	// server->client  Replication packet for singleton components, components & RPC
+	// serialized data is stored in a sf::Packet, it must be generated from the server replication manager
 	//================================================================================================================================
-	struct PacketGameState
+	struct PacketReplication
 	{
-		void Read( Packet& _packet )
-		{
-			_packet >> frameIndex;
-			_packet >> solarEruptionStart;
-		}
-
-		void Write( Packet& _packet )
-		{
-			_packet << sf::Uint16( PacketType::GameState );
-			_packet << frameIndex;
-			_packet << solarEruptionStart;
-		}
-
-		sf::Uint64			frameIndex			= 0;
-		sf::Uint64			solarEruptionStart  = 0;
-	};
-
-	//================================================================================================================================
-	// server->client  Replication packet for singleton components 
-	// serialized data is stored in a sf::Packet
-	//================================================================================================================================
-	struct PacketReplicationSingletonComponents
-	{
-		//================================================================
-		//================================================================
-		struct SingletonData
-		{
-			const SingletonComponentInfo* componentInfo = nullptr;
-			SingletonComponent* component = nullptr;
-		};		
-
 		void Read( Packet& _packet );
 		void Write( Packet& _packet ) const;
-		void Generate( const SingletonComponentInfo& _componentInfo, const SingletonComponent& _component );
-		void ReplicateOnWorld( EcsWorld& _world );
+		
+		enum class ReplicationType
+		{
+			  SingletonComponent
+			, Component
+			, RPC
+			, Count
+		};
 
-		sf::Packet packetData;
+		ReplicationType replicationType = ReplicationType::Count;
+		sf::Packet		packetData;	
 	};
 }

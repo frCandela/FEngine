@@ -37,6 +37,7 @@ namespace fan {
 		Component&			 AddComponent( const EntityID _entityID, const ComponentIndex _index );
 		Component&			 GetComponent( const EntityID _entityID, const ComponentIndex _index );
 		SingletonComponent&	 GetSingletonComponent( const uint32_t _staticIndex );
+		const SingletonComponent& GetSingletonComponent( const uint32_t _staticIndex ) const;
 		void				 RemoveComponent( const EntityID _entityID, const ComponentIndex _index );
 		bool				 HasComponent( const EntityID _entityID, ComponentIndex _index );
 		void				 AddTagsFromSignature( const EntityID _entityID, const Signature& _signature );

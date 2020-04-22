@@ -244,6 +244,20 @@ namespace fan
 
 			S_UpdateGameCamera::Run( world, world.Match( S_UpdateGameCamera::GetSignature( world ) ), _delta );
 
+			if( ImGui::Begin( "toto" ) )
+			{
+				if( ImGui::Button( "test" ) )
+				{
+					RPCManager& rpcManager = world.GetSingletonComponent<RPCManager>();
+					ServerReplicationManager& replication = world.GetSingletonComponent<ServerReplicationManager>();
+
+					replication.ReplicateOnAllClients( 
+						 rpcManager.RPCSynchClientFrame( game.frameIndex, 42.42f )
+						, ServerReplicationManager::ResendUntilReplicated 
+					);
+				}
+			} ImGui::End();
+
 			NetworkSend();
 		}
 
