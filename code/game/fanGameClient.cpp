@@ -34,6 +34,7 @@
 #include "network/singletonComponents/fanClientConnectionManager.hpp"
 #include "network/singletonComponents/fanClientReplicationManager.hpp"
 #include "network/singletonComponents/fanDeliveryNotificationManager.hpp"
+#include "network/singletonComponents/fanRPCManager.hpp"
 #include "game/fanGameTags.hpp"
 
 #include "game/singletonComponents/fanSunLight.hpp"
@@ -119,6 +120,7 @@ namespace fan
 		world.AddSingletonComponentType<DeliveryNotificationManager>();
 		world.AddSingletonComponentType<ClientConnectionManager>();
 		world.AddSingletonComponentType<ClientReplicationManager>();
+		world.AddSingletonComponentType<RPCManager>();
 
 		world.AddTagType<tag_boundsOutdated>();
 		world.AddTagType<tag_sunlight_occlusion>();
