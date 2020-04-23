@@ -31,7 +31,7 @@ namespace fan
 	//================================================================================================================================
 	void RPCManager::RegisterRPCs( )
 	{
-		RegisterUnwrapFunction( 'SYCF', &RPCManager::UnwrapSynchClientFrame );
+		RegisterUnwrapFunction( 'SYNC', &RPCManager::UnwrapSyncClientFrame );
 	}
 
 	//================================================================================================================================
@@ -59,13 +59,13 @@ namespace fan
 	//================================================================================================================================
 	// SynchClientFrame RPC - wrap data
 	//================================================================================================================================
-	PacketReplication RPCManager::RPCSynchClientFrame( const sf::Uint64 _frameIndex, const float _rtt )
+	PacketReplication RPCManager::RPCSyncClientFrame( const sf::Uint64 _frameIndex, const float _rtt )
 	{
 		PacketReplication packet;
 		packet.replicationType = PacketReplication::ReplicationType::RPC;
 
 		packet.packetData.clear();
-		packet.packetData << RpcId( 'SYCF' );
+		packet.packetData << RpcId( 'SYNC' );
 		packet.packetData << _frameIndex;
 		packet.packetData << _rtt;
 
@@ -75,7 +75,7 @@ namespace fan
 	//================================================================================================================================
 	// SynchClientFrame RPC - unwrap data & synchronizes the frame index of the client depending on its rtt
 	//================================================================================================================================
-	void RPCManager::UnwrapSynchClientFrame( sf::Packet& _packet )
+	void RPCManager::UnwrapSyncClientFrame( sf::Packet& _packet )
 	{
 		sf::Uint64 frameIndex;
 		float RTT;
@@ -83,7 +83,7 @@ namespace fan
 		_packet >> frameIndex;
 		_packet >> RTT;
 
-		Debug::Highlight() << frameIndex << " " << RTT << Debug::Endl();
+		onSync.Emmit( frameIndex, RTT );		
 	}
 
 	//================================================================================================================================

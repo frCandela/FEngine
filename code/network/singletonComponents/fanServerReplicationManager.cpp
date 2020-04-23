@@ -108,7 +108,7 @@ namespace fan
 				hostData.pendingReplication.insert( { _packet.tag , data } );
 				_packet.onSuccess.Connect( &ServerReplicationManager::OnReplicationSuccess, this );
 				_packet.onFail.Connect( &ServerReplicationManager::OnReplicationFail, this );
-				Debug::Log() << "rep send: " << _packet.tag << Debug::Endl();
+				//Debug::Log() << "rep send: " << _packet.tag << Debug::Endl();
 			}
 		}
 		hostData.nextReplication.clear();
@@ -121,7 +121,7 @@ namespace fan
 	{
 		HostData& hostData = hostDatas[_hostID];
 		hostData.pendingReplication.erase( _packetTag );
-		Debug::Highlight() << "success: " << _packetTag << Debug::Endl();
+		//Debug::Highlight() << "success: " << _packetTag << Debug::Endl();
 	}
 	
 	//================================================================================================================================
@@ -139,7 +139,7 @@ namespace fan
 		}
 		hostData.pendingReplication.erase( _packetTag );
 
-		Debug::Warning() << "fail: " << _packetTag << Debug::Endl();
+		//Debug::Warning() << "fail: " << _packetTag << Debug::Endl();
 	}
 
 	//================================================================================================================================

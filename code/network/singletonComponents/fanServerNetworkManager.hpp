@@ -25,12 +25,16 @@ namespace fan
 		//================================================================
 		struct HostData
 		{
-			bool isNull = false; // client was deleted
+			bool isNull = false;		// client was deleted
+			double lastSync = -100.f; // last time the client frame was synced with the server
 		};
 
 		std::vector<HostData> hostDatas;
+		double				  syncInterval; // the delay between two clients sync 
 
 		void CreateHost( const HostID _hostID );
 		void DeleteHost( const HostID _hostID );
+
+		void Update( EcsWorld& _world, const HostID _hostID );
 	};
 }

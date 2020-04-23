@@ -25,7 +25,24 @@ namespace fan
 	void ClientNetworkManager::Init( EcsWorld& _world, SingletonComponent& _component )
 	{
 		ClientNetworkManager& netManager = static_cast<ClientNetworkManager&>( _component );
+		netManager.world = &_world;
+	}
 
+	//================================================================================================================================
+	//================================================================================================================================
+	void ClientNetworkManager::Sync( uint64_t _serverFrameIndex, float _rtt )
+	{
+		
+		Game& game = world->GetSingletonComponent<Game>();
+		const uint64_t target = _serverFrameIndex + uint64_t( _rtt / game.logicDelta );
+		const uint64_t diff = game.frameIndex > _serverFrameIndex ? game.frameIndex - _serverFrameIndex : _serverFrameIndex - game.frameIndex;
+
+		if( diff > 5 )
+		{
+			game.frameIndex = target;
+		}
+
+		//Debug::Highlight() << "server: " << _serverFrameIndex << " target: " << target << " client: " << game.frameIndex << " diff: " <<  diff << Debug::Endl();
 	}
 
 	//================================================================================================================================

@@ -21,6 +21,8 @@ namespace fan
 		static void Save( const SingletonComponent& _component, Json& _json );
 		static void Load( SingletonComponent& _component, const Json& _json );
 
+		void Sync( uint64_t _serverFrameIndex, float _rtt );
 
+		EcsWorld* world;
 	};
 }

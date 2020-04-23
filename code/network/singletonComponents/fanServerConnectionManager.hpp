@@ -22,7 +22,7 @@ namespace fan
 			Connected			// Login packet was received, client is connected
 		};
 
-		HostID		clientId;
+		HostID		hostId;
 		IpAddress	ip;
 		Port		port;
 		std::string	name = "";
@@ -31,11 +31,6 @@ namespace fan
 		double		lastResponseTime = 0.f;
 		double		lastPingTime = 0.f;
 		bool		pingInFlight = false;
-
-		void Clear()
-		{
-
-		}
 	};
 
 	//================================================================================================================================

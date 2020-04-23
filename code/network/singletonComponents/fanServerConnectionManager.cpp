@@ -38,7 +38,7 @@ namespace fan
 		{
 			if( client.state != Client::State::Null && client.ip == _ip && client.port == _port )
 			{
-				return client.clientId;
+				return client.hostId;
 			}
 		}
 		return -1;
@@ -58,7 +58,7 @@ namespace fan
 			if( client.state == Client::State::Null )
 			{
 				newClient = &client;
-				assert( client.clientId == i );
+				assert( client.hostId == i );
 			}
 		}
 
@@ -66,7 +66,7 @@ namespace fan
 		if( newClient == nullptr )
 		{
 			newClient = &clients.emplace_back();
-			newClient->clientId = HostID( clients.size() - 1 );
+			newClient->hostId = HostID( clients.size() - 1 );
 		}
 
 		newClient->ip = _ip;
@@ -78,9 +78,9 @@ namespace fan
 		newClient->lastPingTime = 0.f;
 		newClient->pingInFlight = false;
 
-		onClientCreated.Emmit( newClient->clientId );
+		onClientCreated.Emmit( newClient->hostId );
 
-		return newClient->clientId;
+		return newClient->hostId;
 	}
 
 	//================================================================================================================================
@@ -127,8 +127,8 @@ namespace fan
 				const double currentTime = Time::Get().ElapsedSinceStartup();
 				if( client.lastResponseTime + timeoutTime < currentTime )
 				{
-					Debug::Log() << "client " << client.clientId << " timeout " << Debug::Endl();	
-					DeleteClient( client.clientId );
+					Debug::Log() << "client " << client.hostId << " timeout " << Debug::Endl();	
+					DeleteClient( client.hostId );
 				}
 			}
 		}

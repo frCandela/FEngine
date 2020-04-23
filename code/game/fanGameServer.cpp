@@ -249,20 +249,6 @@ namespace fan
 
 			S_UpdateGameCamera::Run( world, world.Match( S_UpdateGameCamera::GetSignature( world ) ), _delta );
 
-// 			if( ImGui::Begin( "toto" ) )
-// 			{
-// 				if( ImGui::Button( "test" ) )
-// 				{
-// 					RPCManager& rpcManager = world.GetSingletonComponent<RPCManager>();
-// 					ServerReplicationManager& replication = world.GetSingletonComponent<ServerReplicationManager>();
-// 
-// 					replication.ReplicateOnAllClients( 
-// 						 rpcManager.RPCSynchClientFrame( game.frameIndex, 42.42f )
-// 						, ServerReplicationManager::ResendUntilReplicated 
-// 					);
-// 				}
-// 			} ImGui::End();
-
 			NetworkSend();
 		}
 
@@ -380,6 +366,7 @@ namespace fan
 		ServerConnectionManager& connection = world.GetSingletonComponent<ServerConnectionManager>();
 		DeliveryNotificationManager& deliveryNotificationManager = world.GetSingletonComponent<DeliveryNotificationManager>();
 		ServerReplicationManager& replicationManager = world.GetSingletonComponent<ServerReplicationManager>();
+		ServerNetworkManager& netManager = world.GetSingletonComponent<ServerNetworkManager>();
 
 		// generates game state packet
 // 		const Game& game = world.GetSingletonComponent<Game>();
@@ -396,22 +383,23 @@ namespace fan
 				continue;
 			}
 
+			netManager.Update( world, client.hostId );
+
 			// create new packet			
-			Packet packet( deliveryNotificationManager.GetNextPacketTag( client.clientId ) );
+			Packet packet( deliveryNotificationManager.GetNextPacketTag( client.hostId ) );
 
 			// write game data
-			connection.Send( packet,  client.clientId );			
-			replicationManager.Send( packet, client.clientId );
-
+			connection.Send( packet,  client.hostId );			
+			replicationManager.Send( packet, client.hostId );
 
 			// write ack
 			if( packet.GetSize() == sizeof( PacketTag ) ) { packet.onlyContainsAck = true; }
-			deliveryNotificationManager.SendAck( packet, client.clientId );
+			deliveryNotificationManager.SendAck( packet, client.hostId );
 
 			// send packet
 			if( packet.GetSize() > sizeof(PacketTag ) )// don't send empty packets
 			{
-				deliveryNotificationManager.RegisterPacket( packet, client.clientId );
+				deliveryNotificationManager.RegisterPacket( packet, client.hostId );
 				connection.socket.Send( packet, client.ip, client.port );
 			}
 			else

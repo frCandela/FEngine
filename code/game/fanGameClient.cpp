@@ -134,6 +134,11 @@ namespace fan
 		ClientConnectionManager& connection = world.GetSingletonComponent<ClientConnectionManager>();
 		DeliveryNotificationManager& deliveryNotificationManager = world.GetSingletonComponent<DeliveryNotificationManager>();
 		connection.onServerDisconnected.Connect( &DeliveryNotificationManager::DeleteHost, &deliveryNotificationManager );
+
+
+		RPCManager& rpcManager = world.GetSingletonComponent<RPCManager>();
+		ClientNetworkManager& netManager = world.GetSingletonComponent<ClientNetworkManager>();
+		rpcManager.onSync.Connect( &ClientNetworkManager::Sync, &netManager );
 	}
 
 	//================================================================================================================================

@@ -207,8 +207,6 @@ namespace fan
 		_packet >> eruptionStartFrame;
 
 		solarEruption.eruptionStartFrame = eruptionStartFrame;
-
-		Debug::Highlight() << "RECEIVED" << Debug::Endl();
 	}
 
 	//================================================================================================================================
