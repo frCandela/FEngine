@@ -12,7 +12,7 @@ namespace fan
 	//================================================================================================================================
 	void DeliveryNotificationManager::SetInfo( SingletonComponentInfo& _info )
 	{
-		_info.icon = ImGui::JOYSTICK16;
+		_info.icon = ImGui::NETWORK16;
 		_info.init = &DeliveryNotificationManager::Init;
 		_info.onGui = &DeliveryNotificationManager::OnGui;
 		_info.name = "delivery notification manager";

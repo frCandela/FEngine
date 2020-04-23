@@ -13,7 +13,7 @@ namespace fan
 	//================================================================================================================================
 	void ClientReplicationManager::SetInfo( SingletonComponentInfo& _info )
 	{
-		_info.icon = ImGui::NONE;
+		_info.icon = ImGui::NETWORK16;
 		_info.init = &ClientReplicationManager::Init;
 		_info.onGui = &ClientReplicationManager::OnGui;
 		_info.save = &ClientReplicationManager::Save;

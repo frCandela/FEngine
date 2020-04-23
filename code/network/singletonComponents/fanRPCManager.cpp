@@ -10,7 +10,7 @@ namespace fan
 	//================================================================================================================================
 	void RPCManager::SetInfo( SingletonComponentInfo& _info )
 	{
-		_info.icon = ImGui::JOYSTICK16;
+		_info.icon = ImGui::NETWORK16;
 		_info.init = &RPCManager::Init;
 		_info.onGui = &RPCManager::OnGui;
 		_info.name = "RPC manager";

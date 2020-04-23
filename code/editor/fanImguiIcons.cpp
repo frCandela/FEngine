@@ -36,6 +36,7 @@ namespace ImGui
 		,DECL_ICON( 16.f, 2, 6 )  // MESH16,
 		,DECL_ICON( 16.f, 3, 6 )  // LOCK_OPEN16,
 		,DECL_ICON( 16.f, 4, 6 )  // LOCK_CLOSED16,
+		,DECL_ICON( 16.f, 5, 6 )  // NETWORK16,
 
 		,DECL_ICON( 16.f, 1, 0 )  // PLAY16
 		,DECL_ICON( 16.f, 2, 0 )  // PAUSE16
@@ -66,5 +67,6 @@ namespace ImGui
 		,DECL_ICON( 16.f, 3, 10 )  // JOYSTICK16,
 		,DECL_ICON( 16.f, 4, 10 )  // SPACE_SHIP16,
 		,DECL_ICON( 16.f, 5, 10 )  // PLANET16,		
+		,DECL_ICON( 16.f, 6, 10 )  // SUN16,		
 	};
 }

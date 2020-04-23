@@ -27,6 +27,7 @@ namespace ImGui
 		MESH16,
 		LOCK_OPEN16,
 		LOCK_CLOSED16,
+		NETWORK16,
 
 		// scene special
 		PLAY16,
@@ -58,6 +59,7 @@ namespace ImGui
 		JOYSTICK16,
 		SPACE_SHIP16,
 		PLANET16,
+		SUN16,
 
 		NUM_ICONS
 	};

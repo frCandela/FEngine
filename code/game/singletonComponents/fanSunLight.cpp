@@ -11,7 +11,7 @@ namespace fan
 	//================================================================================================================================
 	void SunLight::SetInfo( SingletonComponentInfo& _info )
 	{
-		_info.icon = ImGui::NONE;
+		_info.icon = ImGui::SUN16;
 		_info.init = &SunLight::Init;
 		_info.onGui = &SunLight::OnGui;
 		_info.save = &SunLight::Save;

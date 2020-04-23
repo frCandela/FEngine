@@ -12,7 +12,7 @@ namespace fan
 	//================================================================================================================================
 	void ClientConnectionManager::SetInfo( SingletonComponentInfo& _info )
 	{
-		_info.icon = ImGui::JOYSTICK16;
+		_info.icon = ImGui::NETWORK16;
 		_info.init = &ClientConnectionManager::Init;
 		_info.onGui = &ClientConnectionManager::OnGui;
 		_info.name = "client connection manager";
