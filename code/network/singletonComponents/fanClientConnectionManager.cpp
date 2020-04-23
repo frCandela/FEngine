@@ -77,7 +77,7 @@ namespace fan
 	{
 		if( state == ClientState::Connected )
 		{
-			roundTripTime = _packetPing.roundTripTime;
+			roundTripTime = _packetPing.rtt;
 		}
 	}
 

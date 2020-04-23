@@ -37,6 +37,7 @@
 #include "network/singletonComponents/fanDeliveryNotificationManager.hpp"
 #include "network/singletonComponents/fanServerReplicationManager.hpp"
 #include "network/singletonComponents/fanRPCManager.hpp"
+#include "network/singletonComponents/fanServerNetworkManager.hpp"
 #include "game/singletonComponents/fanCollisionManager.hpp"
 #include "game/singletonComponents/fanSolarEruption.hpp"
 #include "game/singletonComponents/fanGameCamera.hpp"
@@ -119,6 +120,7 @@ namespace fan
 		world.AddSingletonComponentType<DeliveryNotificationManager>();
 		world.AddSingletonComponentType<ServerReplicationManager>();
 		world.AddSingletonComponentType<RPCManager>();
+		world.AddSingletonComponentType<ServerNetworkManager>();
 		
 		world.AddTagType<tag_boundsOutdated>();
 		world.AddTagType<tag_sunlight_occlusion>();
@@ -127,14 +129,17 @@ namespace fan
 		game.gameServer = this;
 		game.name = _name;
 
-		// connect network callbacks
+		// connect host creation/deletion callbacks
 		ServerConnectionManager& connection = world.GetSingletonComponent<ServerConnectionManager>();
 		DeliveryNotificationManager& deliveryNotificationManager = world.GetSingletonComponent<DeliveryNotificationManager>();
 		connection.onClientCreated.Connect( &DeliveryNotificationManager::CreateHost, &deliveryNotificationManager );
 		connection.onClientDeleted.Connect( &DeliveryNotificationManager::DeleteHost, &deliveryNotificationManager );
-		ServerReplicationManager& serverReplicationManager = world.GetSingletonComponent<ServerReplicationManager>();
-		connection.onClientCreated.Connect( &ServerReplicationManager::CreateHost, &serverReplicationManager );
-		connection.onClientDeleted.Connect( &ServerReplicationManager::DeleteHost, &serverReplicationManager );
+		ServerReplicationManager& replicationManager = world.GetSingletonComponent<ServerReplicationManager>();
+		connection.onClientCreated.Connect( &ServerReplicationManager::CreateHost, &replicationManager );
+		connection.onClientDeleted.Connect( &ServerReplicationManager::DeleteHost, &replicationManager );
+		ServerNetworkManager& networkManager = world.GetSingletonComponent<ServerNetworkManager>();
+		connection.onClientCreated.Connect( &ServerNetworkManager::CreateHost, &networkManager );
+		connection.onClientDeleted.Connect( &ServerNetworkManager::DeleteHost, &networkManager );
 	}
 
 	//================================================================================================================================
@@ -397,6 +402,7 @@ namespace fan
 			// write game data
 			connection.Send( packet,  client.clientId );			
 			replicationManager.Send( packet, client.clientId );
+
 
 			// write ack
 			if( packet.GetSize() == sizeof( PacketTag ) ) { packet.onlyContainsAck = true; }

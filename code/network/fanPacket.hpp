@@ -70,16 +70,16 @@ namespace fan
 	{
 		void Read( Packet& _packet ) 
 		{
-			_packet >> roundTripTime;
+			_packet >> rtt;
 		}
 
 		void Write( Packet& _packet ) const
 		{ 
 			_packet << PacketTypeInt( PacketType::Ping );
-			_packet << roundTripTime;
+			_packet << rtt;
 		}
 
-		float roundTripTime;
+		float rtt;
 	};
 
 	//================================================================================================================================

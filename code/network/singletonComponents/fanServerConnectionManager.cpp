@@ -106,7 +106,7 @@ namespace fan
 			if( ! client.pingInFlight && ( currentTime - client.lastPingTime > pingDelay )  )
 			{
 				PacketPing packetPing;
-				packetPing.roundTripTime = client.roundTripTime;
+				packetPing.rtt = client.roundTripTime;
 				_packet.onSuccess.Connect( &ServerConnectionManager::OnPingSuccess, this );
 				_packet.onFail.Connect( &ServerConnectionManager::OnPingFail, this );
 				packetPing.Write( _packet );
