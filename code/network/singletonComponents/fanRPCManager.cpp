@@ -31,7 +31,8 @@ namespace fan
 	//================================================================================================================================
 	void RPCManager::RegisterRPCs( )
 	{
-		RegisterUnwrapFunction( 'SYNC', &RPCManager::UnwrapSyncClientFrame );
+		RegisterUnwrapFunction( 'SYNC', &RPCManager::UnwrapShiftClientFrame );
+		RegisterUnwrapFunction( 'SPWN', &RPCManager::UnwrapSpawnShip );
 	}
 
 	//================================================================================================================================
@@ -57,17 +58,16 @@ namespace fan
 	}
 
 	//================================================================================================================================
-	// SynchClientFrame RPC - wrap data
+	// SynchClientFrame RPC - chan
 	//================================================================================================================================
-	PacketReplication RPCManager::RPCSyncClientFrame( const sf::Uint64 _frameIndex, const float _rtt )
+	PacketReplication RPCManager::RPCShiftClientFrame( const sf::Int64 _framesDelta )
 	{
 		PacketReplication packet;
 		packet.replicationType = PacketReplication::ReplicationType::RPC;
 
 		packet.packetData.clear();
 		packet.packetData << RpcId( 'SYNC' );
-		packet.packetData << _frameIndex;
-		packet.packetData << _rtt;
+		packet.packetData << _framesDelta;
 
 		return packet;
 	}
@@ -75,15 +75,38 @@ namespace fan
 	//================================================================================================================================
 	// SynchClientFrame RPC - unwrap data & synchronizes the frame index of the client depending on its rtt
 	//================================================================================================================================
-	void RPCManager::UnwrapSyncClientFrame( sf::Packet& _packet )
+	void RPCManager::UnwrapShiftClientFrame( sf::Packet& _packet )
+	{
+		sf::Int64 framesDelta;
+		_packet >> framesDelta;
+		onShiftFrameIndex.Emmit( framesDelta );
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
+	PacketReplication RPCManager::RPCSSpawnShip( const NetID _spaceshipID, const uint64_t _frameIndex )
+	{
+		PacketReplication packet;
+		packet.replicationType = PacketReplication::ReplicationType::RPC;
+
+		packet.packetData.clear();
+		packet.packetData << RpcId( 'SPWN' );
+		packet.packetData << _spaceshipID;
+		packet.packetData << _frameIndex;
+
+		return packet;
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
+	void RPCManager::UnwrapSpawnShip( sf::Packet& _packet )
 	{
 		sf::Uint64 frameIndex;
-		float RTT;
+		NetID spaceshipID;
 
+		_packet >> spaceshipID;
 		_packet >> frameIndex;
-		_packet >> RTT;
-
-		onSync.Emmit( frameIndex, RTT );		
+		onSpawnShip.Emmit( spaceshipID, frameIndex );
 	}
 
 	//================================================================================================================================

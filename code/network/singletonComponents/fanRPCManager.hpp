@@ -31,8 +31,12 @@ namespace fan
 		std::unordered_map<RpcId , RpcUnwrapFunc > nameToRPCTable;
 
 		// List of available rpc
-		Signal < sf::Uint64, float > onSync;
-		void					 UnwrapSyncClientFrame( sf::Packet& _packet );
-		static PacketReplication RPCSyncClientFrame( const uint64_t _frameIndex, const float _rtt );
+		Signal < sf::Int64 >	 onShiftFrameIndex;
+		void					 UnwrapShiftClientFrame( sf::Packet& _packet );
+		static PacketReplication RPCShiftClientFrame( const sf::Int64 _framesDelta );
+
+		Signal < NetID, uint64_t > onSpawnShip;
+		void					 UnwrapSpawnShip( sf::Packet& _packet );
+		static PacketReplication RPCSSpawnShip( const NetID _spaceshipID, const uint64_t _frameIndex );
 	};
 }

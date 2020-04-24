@@ -3,6 +3,9 @@
 #include "ecs/fanEcsWorld.hpp"
 #include "core/time/fanTime.hpp"
 #include "network/fanImGuiNetwork.hpp"
+#include "network/singletonComponents/fanRPCManager.hpp"
+#include "network/singletonComponents/fanServerReplicationManager.hpp"
+#include "game/singletonComponents/fanGame.hpp"
 
 namespace fan
 {
@@ -25,7 +28,7 @@ namespace fan
 		ServerConnectionManager& connection = static_cast<ServerConnectionManager&>( _component );
 		connection.clients.clear();
 		connection.serverPort = 53000;
-		connection.pingDelay = 1.f;
+		connection.pingDelay = .5f;
 		connection.timeoutTime = 10.f;
 	}
 
@@ -73,10 +76,9 @@ namespace fan
 		newClient->port = _port;
 		newClient->name = "Unknown";
 		newClient->state = Client::State::Disconnected;
-		newClient->roundTripTime = 0.f;
+		newClient->rtt = 0.f;
 		newClient->lastResponseTime = 0.f;
 		newClient->lastPingTime = 0.f;
-		newClient->pingInFlight = false;
 
 		onClientCreated.Emmit( newClient->hostId );
 
@@ -85,9 +87,9 @@ namespace fan
 
 	//================================================================================================================================
 	// sends a login packet to the clients needing approval
-	// regularly sends ping to clients to calculate RTT
+	// regularly sends ping to clients to calculate RTT & sync frame index
 	//================================================================================================================================
-	void ServerConnectionManager::Send( Packet& _packet, const HostID _clientID )
+	void ServerConnectionManager::Send( Packet& _packet, const HostID _clientID, EcsWorld& _world )
 	{
 		// Send login packet
 		Client& client = clients[_clientID];
@@ -103,15 +105,43 @@ namespace fan
 		{
 			// Ping client
 			const double currentTime = Time::Get().ElapsedSinceStartup();
-			if( ! client.pingInFlight && ( currentTime - client.lastPingTime > pingDelay )  )
+			if( currentTime - client.lastPingTime > pingDelay )
 			{
-				PacketPing packetPing;
-				packetPing.rtt = client.roundTripTime;
-				_packet.onSuccess.Connect( &ServerConnectionManager::OnPingSuccess, this );
-				_packet.onFail.Connect( &ServerConnectionManager::OnPingFail, this );
-				packetPing.Write( _packet );
+				const Game& game = _world.GetSingletonComponent<Game>();
 				client.lastPingTime = currentTime;
-				client.pingInFlight = true;
+
+				PacketPing packetPing;
+				packetPing.previousRtt = client.rtt;
+				packetPing.serverFrame = game.frameIndex;
+				packetPing.Write( _packet );
+			}
+
+			// sync the client frame index with the server
+			if( currentTime - client.lastSync > 3.f )
+			{
+				int64_t max = client.framesDelta[0];
+				int64_t min = client.framesDelta[0];
+				for (int i = 1; i < client.framesDelta.size(); i++)
+				{
+					max = std::max( max, client.framesDelta[i] );
+					min = std::min( min, client.framesDelta[i] );
+				}
+				if( max - min <= 1 ) // we have consistent readings
+				{
+					if( std::abs( min ) > 2 ) // only sync when we have a big enough frame index difference
+					{
+						RPCManager& rpcManager = _world.GetSingletonComponent<RPCManager>();
+						ServerReplicationManager& replication = _world.GetSingletonComponent<ServerReplicationManager>();
+						replication.ReplicateOnClient(
+							_clientID
+							, rpcManager.RPCShiftClientFrame( min )
+							, ServerReplicationManager::None
+						);
+						client.lastSync = currentTime;
+
+						Debug::Warning() << "Shifting client " << _clientID << " frame index : " << min << Debug::Endl();
+					}
+				}
 			}
 		}
 	}
@@ -170,24 +200,6 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void ServerConnectionManager::OnPingSuccess( const HostID _clientID, const PacketTag /*_packetTag*/ )
-	{
-		Client& client = clients[_clientID];
-		const double currentTime = Time::Get().ElapsedSinceStartup();
-		client.pingInFlight = false;
-		client.roundTripTime = (float)( currentTime - client.lastPingTime);
-	}
-
-	//================================================================================================================================
-	//================================================================================================================================
-	void ServerConnectionManager::OnPingFail( const HostID _clientID, const PacketTag /*_packetTag*/ )
-	{
-		Client& client = clients[_clientID];
-		client.pingInFlight = false;
-	}
-
-	//================================================================================================================================
-	//================================================================================================================================
 	void ServerConnectionManager::ProcessPacket( const HostID _clientID, const PacketHello& _packetHello )
 	{
 		Client& client = clients[_clientID];
@@ -204,18 +216,31 @@ namespace fan
 	}
 
 	//================================================================================================================================
+	//================================================================================================================================
+	void ServerConnectionManager::ProcessPacket( const HostID _clientID, const PacketPing& _packetPing, const uint64_t _frameIndex, const float _logicDelta )
+	{
+		const uint64_t delta = _frameIndex - _packetPing.serverFrame; // number of frames elapsed between sending & receiving
+		const uint64_t clientCurrentFrameIndex = _packetPing.clientFrame + delta / 2;
+
+		Client& client = clients[_clientID];
+		client.rtt = _logicDelta * delta;
+		client.framesDelta[client.nextDeltaIndex] = _frameIndex - clientCurrentFrameIndex;
+		client.nextDeltaIndex = ( client.nextDeltaIndex + 1 ) % int(client.framesDelta.size());
+	}
+
+	//================================================================================================================================
 	// Editor gui helper
 	//================================================================================================================================
 	std::string GetStateName( const Client::State _clientState )
 	{
 		switch( _clientState )
 		{
-		case fan::Client::State::Null:				return "Null";		break;
-		case fan::Client::State::Disconnected:		return "Disconnected";		break;
-		case fan::Client::State::NeedingApprouval:	return "NeedingApprouval";	break;
-		case fan::Client::State::PendingApprouval:	return "PendingApprouval";	break;
-		case fan::Client::State::Connected:			return "Connected";			break;
-		default:			assert( false );				return "error";				break;
+		case Client::State::Null:				return "Null";				break;
+		case Client::State::Disconnected:		return "Disconnected";		break;
+		case Client::State::NeedingApprouval:	return "NeedingApprouval";	break;
+		case Client::State::PendingApprouval:	return "PendingApprouval";	break;
+		case Client::State::Connected:			return "Connected";			break;
+		default:			assert( false );		return "error";				break;
 		}
 	}
 
@@ -227,11 +252,11 @@ namespace fan
 	{
 		switch( _clientState )
 		{
-		case fan::Client::State::Null:				return  Color::Red.ToImGui(); break;
-		case fan::Client::State::Disconnected:		return  Color::Orange.ToImGui(); break;
-		case fan::Client::State::NeedingApprouval:	return  Color::Yellow.ToImGui(); break;
-		case fan::Client::State::PendingApprouval:	return  Color::Yellow.ToImGui(); break;
-		case fan::Client::State::Connected:			return  Color::Green.ToImGui(); break;
+		case Client::State::Null:				return  Color::Red.ToImGui(); break;
+		case Client::State::Disconnected:		return  Color::Orange.ToImGui(); break;
+		case Client::State::NeedingApprouval:	return  Color::Yellow.ToImGui(); break;
+		case Client::State::PendingApprouval:	return  Color::Yellow.ToImGui(); break;
+		case Client::State::Connected:			return  Color::Green.ToImGui(); break;
 		default:			assert( false );		return  Color::Purple.ToImGui(); break;
 		}
 	}
@@ -269,7 +294,8 @@ namespace fan
 					ImGui::TextColored( GetStateColor( client.state ),  "%s", GetStateName( client.state ).c_str() );
 					ImGui::Text( "adress         %s::%u", client.ip.toString().c_str(), client.port );
 					ImGui::Text( "rtt           "); ImGui::SameLine();
-					ImGui::TextColored( GetRttColor( client.roundTripTime ), "%.1f", 1000.f * client.roundTripTime );
+					ImGui::TextColored( GetRttColor( client.rtt ), "%.1f", 1000.f * client.rtt );
+					ImGui::Text( "frame delta    %d %d %d %d %d", client.framesDelta[0], client.framesDelta[1], client.framesDelta[2], client.framesDelta[3], client.framesDelta[4] );
 					ImGui::Text( "last response  %.1f", currentTime - client.lastResponseTime );
 					ImGui::Spacing();
 				}

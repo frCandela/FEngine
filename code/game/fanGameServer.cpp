@@ -271,6 +271,8 @@ namespace fan
 
 		ServerConnectionManager& connection = world.GetSingletonComponent<ServerConnectionManager>();
 		DeliveryNotificationManager& deliveryNotificationManager = world.GetSingletonComponent<DeliveryNotificationManager>();
+		const Game& game = world.GetSingletonComponent<Game>();
+
 		sf::Socket::Status socketStatus;
 		do
 		{
@@ -321,7 +323,12 @@ namespace fan
 						packetHello.Read( packet );
 						connection.ProcessPacket( clientID, packetHello );
 					} break;
-
+					case PacketType::Ping:
+					{
+						PacketPing packetPing;
+						packetPing.Read( packet );
+						connection.ProcessPacket( clientID, packetPing, game.frameIndex, game.logicDelta );
+					} break;
 					default:
 						Debug::Warning() << "Invalid packet " << int( packetType ) << " received. Reading canceled." << Debug::Endl();
 						packetValid = false;
@@ -368,12 +375,6 @@ namespace fan
 		ServerReplicationManager& replicationManager = world.GetSingletonComponent<ServerReplicationManager>();
 		ServerNetworkManager& netManager = world.GetSingletonComponent<ServerNetworkManager>();
 
-		// generates game state packet
-// 		const Game& game = world.GetSingletonComponent<Game>();
-// 		const SolarEruption& solarEruption = world.GetSingletonComponent<SolarEruption>();
-// 		PacketGameState	gameState;
-// 		gameState.frameIndex = game.frameIndex;
-// 		gameState.solarEruptionStart = solarEruption.eruptionStartFrame;
 
 		for( int i = (int)connection.clients.size() - 1; i >= 0; i-- )
 		{
@@ -383,13 +384,11 @@ namespace fan
 				continue;
 			}
 
-			netManager.Update( world, client.hostId );
-
 			// create new packet			
 			Packet packet( deliveryNotificationManager.GetNextPacketTag( client.hostId ) );
 
 			// write game data
-			connection.Send( packet,  client.hostId );			
+			connection.Send( packet,  client.hostId, world );
 			replicationManager.Send( packet, client.hostId );
 
 			// write ack

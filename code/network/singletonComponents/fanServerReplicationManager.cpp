@@ -50,17 +50,26 @@ namespace fan
 	//================================================================================================================================
 	// Replicates data on all connected hosts
 	//================================================================================================================================
+	void ServerReplicationManager::ReplicateOnClient( const HostID _hostID, PacketReplication& _packet, const ReplicationFlags _flags )
+	{
+		HostData& hostData = hostDatas[_hostID];
+		if( !hostData.isNull )
+		{
+			hostData.nextReplication.emplace_back();
+			SingletonReplicationData& replicationData = hostData.nextReplication[hostData.nextReplication.size() - 1];
+			replicationData.flags = _flags;
+			replicationData.packet = _packet;
+		}
+	}
+
+	//================================================================================================================================
+	// Replicates data on all connected hosts
+	//================================================================================================================================
 	void ServerReplicationManager::ReplicateOnAllClients( PacketReplication& _packet, const ReplicationFlags _flags )
 	{
-		for( HostData& hostData : hostDatas )
+		for ( HostID i = 0; i < hostDatas.size(); i++)
 		{
-			if( !hostData.isNull )
-			{
-				hostData.nextReplication.emplace_back();
-				SingletonReplicationData& replicationData = hostData.nextReplication[hostData.nextReplication.size() - 1];
-				replicationData.flags = _flags;
-				replicationData.packet = _packet;
-			}
+			ReplicateOnClient( i, _packet, _flags );
 		}
 	}
 

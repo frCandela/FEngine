@@ -27,9 +27,10 @@ namespace fan
 		connectionManager.serverIP = "127.0.0.1";
 		connectionManager.serverPort = 53000;
 		connectionManager.state = ClientState::Disconnected;
-		connectionManager.roundTripTime = 0.f;
+		connectionManager.rtt = 0.f;
 		connectionManager.timeoutTime = 10.f;
 		connectionManager.serverLastResponse = 0.f;
+		connectionManager.mustSendBackPacketPing = false;
 	}
 
 	//================================================================================================================================
@@ -45,6 +46,14 @@ namespace fan
 			hello.name = "toto";
 			hello.Write( _packet );
 			_packet.onFail.Connect( &ClientConnectionManager::OnLoginFail, this );
+		}
+		else if( state == ClientState::Connected )
+		{
+			if( mustSendBackPacketPing )
+			{
+				lastPacketPing.Write( _packet ); 
+				mustSendBackPacketPing = false;
+			}
 		}
 	}
 
@@ -72,12 +81,17 @@ namespace fan
 	}
 
 	//================================================================================================================================
+	// received ping packet from the server.
+	// updates the rtt & sends back the packet later while adding the current client frame index
 	//================================================================================================================================
-	void ClientConnectionManager::ProcessPacket( const PacketPing& _packetPing )
+	void ClientConnectionManager::ProcessPacket( const PacketPing& _packetPing, const uint64_t _frameIndex )
 	{
 		if( state == ClientState::Connected )
 		{
-			roundTripTime = _packetPing.rtt;
+			lastPacketPing = _packetPing;
+			lastPacketPing.clientFrame = _frameIndex,
+			rtt = _packetPing.previousRtt;
+			mustSendBackPacketPing = true;
 		}
 	}
 
@@ -149,7 +163,7 @@ namespace fan
 			ImGui::Text( "client port           %u", connection.clientPort );
 			ImGui::Text( "server adress         %s::%u", connection.serverIP.toString().c_str(), connection.serverPort );			
 			ImGui::Text( "rtt                  "); ImGui::SameLine();
-			ImGui::TextColored( GetRttColor( connection.roundTripTime ), "%.1f", 1000.f * connection.roundTripTime );
+			ImGui::TextColored( GetRttColor( connection.rtt ), "%.1f", 1000.f * connection.rtt );
 			ImGui::Text( "server last response: %.1f", Time::Get().ElapsedSinceStartup() - connection.serverLastResponse );
 		}ImGui::Unindent(); ImGui::Unindent();
 	}

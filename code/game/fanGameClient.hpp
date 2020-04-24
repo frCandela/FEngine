@@ -27,8 +27,5 @@ namespace fan
 	private:
 		void	NetworkSend();
 		void	NetworkReceive();
-
-		void OnTestFailure( HostID _client );
-		void OnTestSuccess( HostID _client );
 	};
 }

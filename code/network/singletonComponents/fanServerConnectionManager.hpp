@@ -10,11 +10,12 @@ namespace fan
 {
 	class EcsWorld;	
 
-	//================================================================================================================================
-	//================================================================================================================================
+	//================================================================
+	//================================================================
 	struct Client
 	{
-		enum class State { 
+		enum class State
+		{
 			Null,				// empty client slot
 			Disconnected,		// Requires a hello packet from the client to start connection process
 			NeedingApprouval,	// Client hello is received, a Login packet must be sent back
@@ -27,10 +28,14 @@ namespace fan
 		Port		port;
 		std::string	name = "";
 		State		state = State::Null;
-		float		roundTripTime = -1.f;
-		double		lastResponseTime = 0.f;
-		double		lastPingTime = 0.f;
-		bool		pingInFlight = false;
+		double		lastResponseTime = 0.f;		// last time the client answered back
+		double		lastPingTime = 0.f;			// last time the client was sent a ping
+		float		rtt = -1.f;
+
+		// client frame index synchronization
+		double					lastSync = 0.f;	// client frame index value is correct
+		std::array<int64_t, 5>  framesDelta;		// server/client frame index delta in the N previous frames
+		int						nextDeltaIndex = 0; // next delta to update in the array
 	};
 
 	//================================================================================================================================
@@ -56,13 +61,13 @@ namespace fan
 		HostID	FindClient( const sf::IpAddress _ip, const unsigned short _port );
 		HostID	CreateClient( const sf::IpAddress _ip, const unsigned short _port );
 		void	DeleteClient( const HostID _clientID );
-		void	Send( Packet& _packet, const HostID _clientID );
+		void	Send( Packet& _packet, const HostID _clientID, EcsWorld& _world );
+
 		void	ProcessPacket( const HostID _clientID, const PacketHello& _packetHello );
+		void	ProcessPacket( const HostID _clientID, const PacketPing& _packetPing, const uint64_t _frameIndex, const float _logicDelta );
 		void	DetectClientTimout();
 
 		void OnLoginFail( const HostID _clientID, const PacketTag _packetTag );
 		void OnLoginSuccess( const HostID _clientID, const PacketTag _packetTag );
-		void OnPingSuccess( const HostID _clientID, const PacketTag _packetTag );
-		void OnPingFail( const HostID _clientID, const PacketTag _packetTag );
 	};
 }

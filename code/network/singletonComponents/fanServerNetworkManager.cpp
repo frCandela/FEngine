@@ -30,7 +30,6 @@ namespace fan
 	{
 		ServerNetworkManager& netManager = static_cast<ServerNetworkManager&>( _component );
 		netManager.hostDatas.clear();
-		netManager.syncInterval = 2.f;
 	}
 
 	//================================================================================================================================
@@ -51,31 +50,6 @@ namespace fan
 	void ServerNetworkManager::DeleteHost( const HostID _hostID )
 	{
 		hostDatas[_hostID].isNull = true;
-	}
-
-	//================================================================================================================================
-	//================================================================================================================================
-	void ServerNetworkManager::Update( EcsWorld& _world, const HostID _hostID )
-	{
-		const double currentTime = Time::Get().ElapsedSinceStartup();
-		HostData& hostData = hostDatas[_hostID];
-		if( !hostData.isNull )
-		{
-			if( currentTime > hostData.lastSync + syncInterval )
-			{
-				hostData.lastSync = currentTime;
-
-				RPCManager& rpcManager = _world.GetSingletonComponent<RPCManager>();
-				ServerReplicationManager& replication = _world.GetSingletonComponent<ServerReplicationManager>();
-				ServerConnectionManager& connection = _world.GetSingletonComponent<ServerConnectionManager>();
-				Game& game = _world.GetSingletonComponent<Game>();
-
-				replication.ReplicateOnAllClients(
-					rpcManager.RPCSyncClientFrame( game.frameIndex, connection.clients[_hostID].roundTripTime )
-					, ServerReplicationManager::None
-				);
-			}
-		}
 	}
 
 	//================================================================================================================================

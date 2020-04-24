@@ -30,19 +30,12 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void ClientNetworkManager::Sync( uint64_t _serverFrameIndex, float _rtt )
+	void ClientNetworkManager::ShiftFrameIndex( const int64_t _framesDelta  )
 	{
-		
-		Game& game = world->GetSingletonComponent<Game>();
-		const uint64_t target = _serverFrameIndex + uint64_t( _rtt / game.logicDelta );
-		const uint64_t diff = game.frameIndex > _serverFrameIndex ? game.frameIndex - _serverFrameIndex : _serverFrameIndex - game.frameIndex;
+		Game& game = world->GetSingletonComponent<Game>();		
+		game.frameIndex += _framesDelta;
 
-		if( diff > 5 )
-		{
-			game.frameIndex = target;
-		}
-
-		//Debug::Highlight() << "server: " << _serverFrameIndex << " target: " << target << " client: " << game.frameIndex << " diff: " <<  diff << Debug::Endl();
+		Debug::Warning() << "Shifted client frame index : " << _framesDelta << Debug::Endl();
 	}
 
 	//================================================================================================================================

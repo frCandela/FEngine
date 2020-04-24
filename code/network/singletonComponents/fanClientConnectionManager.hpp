@@ -34,9 +34,12 @@ namespace fan
 		sf::IpAddress	serverIP;
 		Port			serverPort;
 		ClientState		state;
-		float			roundTripTime;
+		float			rtt;
 		float			timeoutTime;			// disconnects from server after X seconds without a response
 		double			serverLastResponse;
+
+		PacketPing		lastPacketPing;
+		bool			mustSendBackPacketPing;
 
 		void Send( Packet& _packet );
 		void OnLoginFail( HostID, const PacketTag _packetTag );
@@ -44,6 +47,6 @@ namespace fan
 		void DisconnectFromServer();
 
 		void ProcessPacket( const PacketLoginSuccess& _packetLogin );
-		void ProcessPacket( const PacketPing& _packetPing );
+		void ProcessPacket( const PacketPing& _packetPing, const uint64_t _frameIndex );
 	};
 }

@@ -138,7 +138,7 @@ namespace fan
 
 		RPCManager& rpcManager = world.GetSingletonComponent<RPCManager>();
 		ClientNetworkManager& netManager = world.GetSingletonComponent<ClientNetworkManager>();
-		rpcManager.onSync.Connect( &ClientNetworkManager::Sync, &netManager );
+		rpcManager.onShiftFrameIndex.Connect( &ClientNetworkManager::ShiftFrameIndex, &netManager );
 	}
 
 	//================================================================================================================================
@@ -289,6 +289,7 @@ namespace fan
 		DeliveryNotificationManager& deliveryNotificationManager = world.GetSingletonComponent<DeliveryNotificationManager>();
 		ClientConnectionManager& connection = world.GetSingletonComponent<ClientConnectionManager>();
 		ClientReplicationManager& replicationManager = world.GetSingletonComponent<ClientReplicationManager>();
+		const Game& game = world.GetSingletonComponent<Game>();
 
 		sf::Socket::Status socketStatus;
 		do
@@ -336,7 +337,7 @@ namespace fan
 					{
 						PacketPing packetPing;
 						packetPing.Read( packet );
-						connection.ProcessPacket( packetPing );
+						connection.ProcessPacket( packetPing, game.frameIndex );
 					} break;
 					case PacketType::LoggedIn:
 					{
@@ -350,29 +351,6 @@ namespace fan
 						packetReplication.Read( packet );
 						replicationManager.ProcessPacket( packetReplication );
 					} break;
-
-// 					case PacketType::GameState:
-// 					{
-// 						PacketGameState packetGameState;
-// 						packetGameState.Read( packet );
-// 						replicationManager.ProcessPacket( packetGameState );
-// 					} break;
-
-
-
-					
-// 					case PacketType::START:
-// 					{
-// 						randomFlags |= MUST_ACK_START;
-// 						if( state == CONNECTED )
-// 						{
-// 							PacketStart packetStart;
-// 							packetStart.Load( packet );
-// 							game.frameStart = packetStart.frameStartIndex;
-// 							state = STARTING;
-// 							Debug::Highlight() << "game started" << Debug::Endl();
-// 						}
-// 					} break;
 					default:
 						Debug::Warning() << "Invalid packet " << int( packetType ) << " received. Reading canceled." << Debug::Endl();
 						packetValid = false;
@@ -409,15 +387,6 @@ namespace fan
 		while( socketStatus == sf::UdpSocket::Done );
 	}
 
-	void  GameClient::OnTestFailure( HostID _client )
-	{
-		Debug::Log( "failure" );
-	}
-	void  GameClient::OnTestSuccess( HostID _client )
-	{
-		Debug::Log( "success" );
-	}
-
 	//================================================================================================================================
 	//================================================================================================================================
 	void GameClient::NetworkSend()
@@ -445,61 +414,5 @@ namespace fan
 		{
 			deliveryNotificationManager.hostDatas[0].nextPacketTag--;
 		}
-
-// 		double currentTime = Time::Get().ElapsedSinceStartup();
-// 
-//  		Packet packet = socket.CreatePacket(); // One packet to rule them all
-// 
-// 		switch( state )
-// 		{
-// 		case State::DISCONNECTED:
-// 		{
-// 			PacketLogin packetLogin;
-// 			packetLogin.name = world.GetSingletonComponent<Game>().name;
-// 			packetLogin.Save( packet );
-// 		} break;
-// 		case State::CONNECTED:
-// 		{
-// 			
-// 		} break;
-// 		case State::STARTING:
-// 		{
-// 
-// 		} break;
-// 
-// 		default:
-// 			assert( false );
-// 			break;
-// 		}
-// 
-// 		// server timeout 
-// 		if( state == CONNECTED &&  currentTime - serverLastResponse > timeoutDuration )
-// 		{
-// 			Debug::Log() << "server timeout" << Debug::Endl();
-// 			Debug::Highlight() << "disconnected !" << Debug::Endl();
-// 			state = DISCONNECTED;
-// 		}
-// 
-// 		// ping
-// 		if( randomFlags && MUST_ACK_START )
-// 		{
-// 			PacketACK packetAck;
-// 			packetAck.ackType = PacketType::START;
-// 			packetAck.Save( packet );
-// 			randomFlags &= ! MUST_ACK_START;
-// 		}
-// 		if( mustPingServer > 0.f )
-// 		{
-// 			PacketPing packetPing;
-// 			packetPing.time = mustPingServer;
-// 			packetPing.Save( packet );
-// 			mustPingServer = -1.f;
-// 		}
-// 
-// 		// send packet
-// 		if( packet.getDataSize() > 0 )
-// 		{
-// 			socket.Send( packet, serverIP, serverPort );
-// 		}
  	}
 }

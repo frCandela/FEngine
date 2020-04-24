@@ -10,6 +10,7 @@ namespace fan
 {
 	struct Client;
 	using HostID = int;	
+	using NetID = sf::Uint32;
 	using IpAddress = sf::IpAddress;
 	using Port = unsigned short;
 	using PacketTag = sf::Uint32;		// may change to uint16 on release
@@ -63,23 +64,29 @@ namespace fan
 	};
 
 	//================================================================================================================================
-	// server -> client
-	// Used to calculate a the connection RTT
+	// server -> client then client -> server	
+	// Used to calculate a the connection RTT & frame index synch delta with the client
 	//================================================================================================================================
 	struct PacketPing
 	{
 		void Read( Packet& _packet ) 
 		{
-			_packet >> rtt;
+			_packet >> serverFrame;
+			_packet >> clientFrame;
+			_packet >> previousRtt;
 		}
 
 		void Write( Packet& _packet ) const
 		{ 
 			_packet << PacketTypeInt( PacketType::Ping );
-			_packet << rtt;
+			_packet << serverFrame;
+			_packet << clientFrame;
+			_packet << previousRtt;
 		}
 
-		float rtt;
+		sf::Uint64 serverFrame;	// frame index of the server when sending the packet
+		sf::Uint64 clientFrame; // frame index of the client when sending back the packet
+		float previousRtt;		// client rtt from the previous ping
 	};
 
 	//================================================================================================================================

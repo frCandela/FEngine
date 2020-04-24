@@ -49,6 +49,7 @@ namespace fan
 		void CreateHost( const HostID _hostID );
 		void DeleteHost( const HostID _hostID );
 		void Send( Packet& _packet, const HostID _hostID );
+		void ReplicateOnClient( const HostID _hostID, PacketReplication& _packet, const ReplicationFlags _flags );
 		void ReplicateOnAllClients( PacketReplication& _packet, const ReplicationFlags _flags );
 
 		static PacketReplication BuildSingletonPacket( const EcsWorld& _world, const uint32_t _staticID );
