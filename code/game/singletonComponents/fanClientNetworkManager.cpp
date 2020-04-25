@@ -4,6 +4,7 @@
 #include "ecs/fanEcsWorld.hpp"
 #include "core/time/fanTime.hpp"
 #include "game/singletonComponents/fanGame.hpp"
+#include "game/components/fanPlayerController.hpp"
 #include "network/singletonComponents/fanDeliveryNotificationManager.hpp"
 #include "network/singletonComponents/fanClientReplicationManager.hpp"
 #include "network/singletonComponents/fanClientConnectionManager.hpp"
@@ -37,16 +38,9 @@ namespace fan
 		netManager.connection = nullptr;
 		netManager.rpcManager = nullptr;
 		netManager.game = nullptr;
+		netManager.spaceshipSpawnFrameIndex = 0;
+		netManager.spaceshipNetID = 0;
 	}
-
-	//================================================================================================================================
-	//================================================================================================================================
-	void ClientNetworkManager::ShiftFrameIndex( const int64_t _framesDelta  )
-	{		
-		game->frameIndex += _framesDelta;
-		Debug::Warning() << "Shifted client frame index : " << _framesDelta << Debug::Endl();
-	}
-
 
 	//================================================================================================================================
 	//================================================================================================================================
@@ -58,6 +52,10 @@ namespace fan
 		linkingContext			    = &_world.GetSingletonComponent<LinkingContext>();
 		rpcManager					= &_world.GetSingletonComponent<RPCManager>();
 		game						= &_world.GetSingletonComponent<Game>();
+
+		connection->onServerDisconnected.Connect( &DeliveryNotificationManager::DeleteHost, deliveryNotificationManager );
+		rpcManager->onShiftFrameIndex.Connect( &ClientNetworkManager::ShiftFrameIndex, this );
+		rpcManager->onSpawnShip.Connect( &ClientNetworkManager::SpawnShip, this );
 
 		// Bind socket
 		sf::Socket::Status socketStatus = sf::Socket::Disconnected;
@@ -77,12 +75,53 @@ namespace fan
 	//================================================================================================================================
 	void ClientNetworkManager::Stop( EcsWorld& _world )
 	{
-
+		connection->socket.Unbind();
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void ClientNetworkManager::NetworkReceive( EcsWorld& _world )
+	void ClientNetworkManager::Update( EcsWorld& _world )
+	{
+		replicationManager->ReplicateSingletons( _world );
+
+		if( spaceshipSpawnFrameIndex != 0 && game->frameIndex >= spaceshipSpawnFrameIndex )
+		{
+			assert( spaceshipNetID != 0 );
+
+			spaceshipSpawnFrameIndex = 0;
+			const EntityHandle spaceshipHandle = Game::SpawnSpaceship( _world );
+			linkingContext->AddEntity( spaceshipHandle, spaceshipNetID );
+
+			const EntityID spaceshipID = _world.GetEntityID( spaceshipHandle );
+			if( spaceshipHandle != 0 )
+			{
+				_world.AddComponent<PlayerController>( spaceshipID );
+			}
+		}
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
+	void ClientNetworkManager::ShiftFrameIndex( const int64_t _framesDelta )
+	{
+		game->frameIndex += _framesDelta;
+		Debug::Warning() << "Shifted client frame index : " << _framesDelta << Debug::Endl();
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
+	void ClientNetworkManager::SpawnShip( NetID _spaceshipID, uint64_t _frameIndex )
+	{
+		if( spaceshipNetID == 0 )
+		{
+			spaceshipSpawnFrameIndex = _frameIndex;
+			spaceshipNetID = _spaceshipID;
+		}
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
+	void ClientNetworkManager::NetworkReceive()
 	{
 		// receive
 		Packet			packet;
@@ -185,37 +224,33 @@ namespace fan
 		} while( socketStatus == sf::UdpSocket::Done );
 
 		deliveryNotificationManager->ProcessTimedOutPackets();
-		connection->DetectServerTimout();
-		replicationManager->ReplicateSingletons( _world );
+		connection->DetectServerTimout();		
 		replicationManager->ReplicateRPC( *rpcManager );
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void ClientNetworkManager::NetworkSend( EcsWorld& _world )
+	void ClientNetworkManager::NetworkSend()
 	{
-		ClientConnectionManager& connection = _world.GetSingletonComponent<ClientConnectionManager>();
-		DeliveryNotificationManager& deliveryNotificationManager = _world.GetSingletonComponent<DeliveryNotificationManager>();
-
 		// create packet
-		Packet packet( deliveryNotificationManager.GetNextPacketTag() );
+		Packet packet( deliveryNotificationManager->GetNextPacketTag() );
 
 		// write packet
-		connection.Send( packet );
+		connection->Send( packet );
 
 		if( packet.GetSize() == sizeof( PacketTag ) ) { packet.onlyContainsAck = true; }
 
-		deliveryNotificationManager.SendAck( packet );
+		deliveryNotificationManager->SendAck( packet );
 
 		// send packet, don't send empty packets
 		if( packet.GetSize() > sizeof( PacketTag ) )
 		{
-			deliveryNotificationManager.RegisterPacket( packet );
-			connection.socket.Send( packet, connection.serverIP, connection.serverPort );
+			deliveryNotificationManager->RegisterPacket( packet );
+			connection->socket.Send( packet, connection->serverIP, connection->serverPort );
 		}
 		else
 		{
-			deliveryNotificationManager.hostDatas[0].nextPacketTag--;
+			deliveryNotificationManager->hostDatas[0].nextPacketTag--;
 		}
 	}
 

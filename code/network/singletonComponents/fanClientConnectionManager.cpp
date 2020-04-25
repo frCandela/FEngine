@@ -31,6 +31,7 @@ namespace fan
 		connectionManager.timeoutTime = 10.f;
 		connectionManager.serverLastResponse = 0.f;
 		connectionManager.mustSendBackPacketPing = false;
+		connectionManager.onServerDisconnected.Clear();
 	}
 
 	//================================================================================================================================

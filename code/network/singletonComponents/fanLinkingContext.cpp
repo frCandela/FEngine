@@ -28,8 +28,10 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void LinkingContext::CreateEntity( const EntityHandle _entityHandle, const NetID _netID )
+	void LinkingContext::AddEntity( const EntityHandle _entityHandle, const NetID _netID )
 	{
+		assert( entityHandleToNetID.find( _entityHandle ) == entityHandleToNetID.end() );
+		assert( netIDToEntityHandle.find( _netID ) == netIDToEntityHandle.end() );		
 		netIDToEntityHandle[_netID] = _entityHandle;
 		entityHandleToNetID[_entityHandle] = _netID;
 	}

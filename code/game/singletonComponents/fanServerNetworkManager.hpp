@@ -11,6 +11,7 @@ namespace fan
 	struct DeliveryNotificationManager;
 	struct ServerReplicationManager;
 	struct LinkingContext;
+	struct RPCManager;
 	struct Game;
 
 	//================================================================================================================================
@@ -37,17 +38,19 @@ namespace fan
 
 		// pre-get singletons
 		ServerConnectionManager*	 connection;
-		DeliveryNotificationManager* deliveryNotificationManager;
-		ServerReplicationManager*	 replicationManager;
+		DeliveryNotificationManager* deliveryNotification;
+		ServerReplicationManager*	 replication;
 		LinkingContext*				 linkingContext;
+		RPCManager*					 rpcManager;
 		Game*						 game;
 
 		void Start( EcsWorld& _world );
 		void Stop( EcsWorld& _world );
+		void Update( EcsWorld& _world );
+		void NetworkSend();
+		void NetworkReceive();
+
 		void CreateHost( const HostID _hostID );
 		void DeleteHost( const HostID _hostID );
-		void Update( EcsWorld& _world );
-		void NetworkSend( EcsWorld& _world );
-		void NetworkReceive( EcsWorld& _world );
 	};
 }

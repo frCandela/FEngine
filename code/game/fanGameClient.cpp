@@ -128,18 +128,10 @@ namespace fan
 		world.AddTagType<tag_boundsOutdated>();
 		world.AddTagType<tag_sunlight_occlusion>();
 
+		// @hack
 		Game& game = world.GetSingletonComponent<Game>();
 		game.gameClient = this;
 		game.name = _name;
-
-		ClientConnectionManager& connection = world.GetSingletonComponent<ClientConnectionManager>();
-		DeliveryNotificationManager& deliveryNotificationManager = world.GetSingletonComponent<DeliveryNotificationManager>();
-		connection.onServerDisconnected.Connect( &DeliveryNotificationManager::DeleteHost, &deliveryNotificationManager );
-
-
-		RPCManager& rpcManager = world.GetSingletonComponent<RPCManager>();
-		ClientNetworkManager& netManager = world.GetSingletonComponent<ClientNetworkManager>();
-		rpcManager.onShiftFrameIndex.Connect( &ClientNetworkManager::ShiftFrameIndex, &netManager );
 	}
 
 	//================================================================================================================================
@@ -176,9 +168,7 @@ namespace fan
 
 		GameCamera::DeleteGameCamera( world );
 
-		// clears the network
-		ClientConnectionManager& connection = world.GetSingletonComponent<ClientConnectionManager>();
-		connection.socket.Unbind();
+		netManager->Stop( world );
 	}
 
 	//================================================================================================================================
@@ -202,7 +192,7 @@ namespace fan
 		game->frameIndex++;
 		{
 			SCOPED_PROFILE( scene_update );			
-			netManager->NetworkReceive( world );
+			netManager->NetworkReceive();
 
 			// physics & transforms
 			PhysicsWorld& physicsWorld = world.GetSingletonComponent<PhysicsWorld>();
@@ -240,7 +230,8 @@ namespace fan
 
 			S_UpdateGameCamera::Run( world, world.Match( S_UpdateGameCamera::GetSignature( world ) ), _delta );
 
-			netManager->NetworkSend( world );
+			netManager->Update( world );
+			netManager->NetworkSend();
 		}
 
 		{

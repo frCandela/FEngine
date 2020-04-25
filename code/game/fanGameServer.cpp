@@ -127,21 +127,10 @@ namespace fan
 		world.AddTagType<tag_boundsOutdated>();
 		world.AddTagType<tag_sunlight_occlusion>();
 
+		// @hack
 		Game& game = world.GetSingletonComponent<Game>();
 		game.gameServer = this;
 		game.name = _name;
-
-		// connect host creation/deletion callbacks
-		ServerConnectionManager& connection = world.GetSingletonComponent<ServerConnectionManager>();
-		DeliveryNotificationManager& deliveryNotificationManager = world.GetSingletonComponent<DeliveryNotificationManager>();
-		connection.onClientCreated.Connect( &DeliveryNotificationManager::CreateHost, &deliveryNotificationManager );
-		connection.onClientDeleted.Connect( &DeliveryNotificationManager::DeleteHost, &deliveryNotificationManager );
-		ServerReplicationManager& replicationManager = world.GetSingletonComponent<ServerReplicationManager>();
-		connection.onClientCreated.Connect( &ServerReplicationManager::CreateHost, &replicationManager );
-		connection.onClientDeleted.Connect( &ServerReplicationManager::DeleteHost, &replicationManager );
-		ServerNetworkManager& networkManager = world.GetSingletonComponent<ServerNetworkManager>();
-		connection.onClientCreated.Connect( &ServerNetworkManager::CreateHost, &networkManager );
-		connection.onClientDeleted.Connect( &ServerNetworkManager::DeleteHost, &networkManager );
 	}
 
 	//================================================================================================================================
@@ -200,7 +189,7 @@ namespace fan
 		{
 			SCOPED_PROFILE( scene_update );
 
-			netManager->NetworkReceive( world );
+			netManager->NetworkReceive();
 
 			// physics & transforms
 			PhysicsWorld& physicsWorld = world.GetSingletonComponent<PhysicsWorld>();
@@ -238,7 +227,7 @@ namespace fan
 			S_UpdateGameCamera::Run( world, world.Match( S_UpdateGameCamera::GetSignature( world ) ), _delta );
 
 			netManager->Update( world );
-			netManager->NetworkSend( world );
+			netManager->NetworkSend();
 		}
 
 		{

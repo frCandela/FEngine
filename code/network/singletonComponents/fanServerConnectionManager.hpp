@@ -33,7 +33,7 @@ namespace fan
 		float		rtt = -1.f;
 
 		// client frame index synchronization
-		double					lastSync = 0.f;	// client frame index value is correct
+		double					lastSync = 0.f;		// client frame index value is correct
 		std::array<int64_t, 5>  framesDelta;		// server/client frame index delta in the N previous frames
 		int						nextDeltaIndex = 0; // next delta to update in the array
 	};
@@ -61,7 +61,7 @@ namespace fan
 		HostID	FindClient( const sf::IpAddress _ip, const unsigned short _port );
 		HostID	CreateClient( const sf::IpAddress _ip, const unsigned short _port );
 		void	DeleteClient( const HostID _clientID );
-		void	Send( Packet& _packet, const HostID _clientID, EcsWorld& _world );
+		void	Send( Packet& _packet, const HostID _clientID, const uint64_t _frameIndex );
 
 		void	ProcessPacket( const HostID _clientID, const PacketHello& _packetHello );
 		void	ProcessPacket( const HostID _clientID, const PacketPing& _packetPing, const uint64_t _frameIndex, const float _logicDelta );

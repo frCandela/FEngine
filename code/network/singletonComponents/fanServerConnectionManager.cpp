@@ -27,6 +27,8 @@ namespace fan
 	{
 		ServerConnectionManager& connection = static_cast<ServerConnectionManager&>( _component );
 		connection.clients.clear();
+		connection.onClientCreated.Clear();
+		connection.onClientDeleted.Clear();
 		connection.serverPort = 53000;
 		connection.pingDelay = .5f;
 		connection.timeoutTime = 10.f;
@@ -89,7 +91,7 @@ namespace fan
 	// sends a login packet to the clients needing approval
 	// regularly sends ping to clients to calculate RTT & sync frame index
 	//================================================================================================================================
-	void ServerConnectionManager::Send( Packet& _packet, const HostID _clientID, EcsWorld& _world )
+	void ServerConnectionManager::Send( Packet& _packet, const HostID _clientID, const uint64_t	_frameIndex )
 	{
 		// Send login packet
 		Client& client = clients[_clientID];
@@ -107,41 +109,12 @@ namespace fan
 			const double currentTime = Time::Get().ElapsedSinceStartup();
 			if( currentTime - client.lastPingTime > pingDelay )
 			{
-				const Game& game = _world.GetSingletonComponent<Game>();
 				client.lastPingTime = currentTime;
 
 				PacketPing packetPing;
 				packetPing.previousRtt = client.rtt;
-				packetPing.serverFrame = game.frameIndex;
+				packetPing.serverFrame = _frameIndex;
 				packetPing.Write( _packet );
-			}
-
-			// sync the client frame index with the server
-			if( currentTime - client.lastSync > 3.f )
-			{
-				int64_t max = client.framesDelta[0];
-				int64_t min = client.framesDelta[0];
-				for (int i = 1; i < client.framesDelta.size(); i++)
-				{
-					max = std::max( max, client.framesDelta[i] );
-					min = std::min( min, client.framesDelta[i] );
-				}
-				if( max - min <= 1 ) // we have consistent readings
-				{
-					if( std::abs( min ) > 2 ) // only sync when we have a big enough frame index difference
-					{
-						RPCManager& rpcManager = _world.GetSingletonComponent<RPCManager>();
-						ServerReplicationManager& replication = _world.GetSingletonComponent<ServerReplicationManager>();
-						replication.ReplicateOnClient(
-							_clientID
-							, rpcManager.RPCShiftClientFrame( min )
-							, ServerReplicationManager::None
-						);
-						client.lastSync = currentTime;
-
-						Debug::Warning() << "Shifting client " << _clientID << " frame index : " << min << Debug::Endl();
-					}
-				}
 			}
 		}
 	}

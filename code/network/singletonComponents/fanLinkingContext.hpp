@@ -22,7 +22,7 @@ namespace fan
 		std::unordered_map<EntityHandle, NetID > entityHandleToNetID;
 		NetID nextNetID;
 
-		void CreateEntity( const EntityHandle _entityHandle, const NetID _netID );
+		void AddEntity( const EntityHandle _entityHandle, const NetID _netID );
 		void RemoveEntity( const EntityHandle _entityHandle );
 	};
 }
