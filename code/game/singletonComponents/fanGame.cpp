@@ -92,7 +92,7 @@ namespace fan
 	//================================================================================================================================
 	// generates the spaceship entity from the game prefab
 	//================================================================================================================================
-	EntityID Game::SpawnSpaceship( EcsWorld& _world )
+	EntityHandle Game::SpawnSpaceship( EcsWorld& _world )
 	{
 		// spawn the spaceship	
 		Game& game = _world.GetSingletonComponent< Game >();
@@ -124,7 +124,7 @@ namespace fan
 				CollisionManager& collisionManager = _world.GetSingletonComponent<CollisionManager>();
 				rigidbody.onContactStarted.Connect( &CollisionManager::OnSpaceShipContact, &collisionManager );
 
-				return spaceshipID;
+				return spaceshipNode.handle;
 			}
 			else
 			{

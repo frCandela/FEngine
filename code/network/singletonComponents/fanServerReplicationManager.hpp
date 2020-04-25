@@ -11,7 +11,7 @@ namespace fan
 	//================================================================================================================================
 	// [Server] sends packets to clients to replicates objects / run PRC
 	//================================================================================================================================
-	class ServerReplicationManager : public SingletonComponent
+	struct ServerReplicationManager : public SingletonComponent
 	{
 		DECLARE_SINGLETON_COMPONENT()
 	public:

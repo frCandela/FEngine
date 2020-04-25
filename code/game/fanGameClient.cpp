@@ -34,7 +34,7 @@
 #include "network/singletonComponents/fanClientConnectionManager.hpp"
 #include "network/singletonComponents/fanClientReplicationManager.hpp"
 #include "network/singletonComponents/fanDeliveryNotificationManager.hpp"
-#include "network/singletonComponents/fanClientNetworkManager.hpp"
+#include "game/singletonComponents/fanClientNetworkManager.hpp"
 #include "network/singletonComponents/fanRPCManager.hpp"
 #include "network/singletonComponents/fanLinkingContext.hpp"
 #include "game/fanGameTags.hpp"
@@ -117,12 +117,12 @@ namespace fan
 		world.AddSingletonComponentType<CollisionManager>();
 		world.AddSingletonComponentType<Game>();
 		world.AddSingletonComponentType<SolarEruption>();
+		world.AddSingletonComponentType<ClientNetworkManager>();
 		// network singleton components
 		world.AddSingletonComponentType<DeliveryNotificationManager>();
 		world.AddSingletonComponentType<ClientConnectionManager>();
 		world.AddSingletonComponentType<ClientReplicationManager>();
 		world.AddSingletonComponentType<RPCManager>();
-		world.AddSingletonComponentType<ClientNetworkManager>();
 		world.AddSingletonComponentType<LinkingContext>();
 
 		world.AddTagType<tag_boundsOutdated>();
@@ -146,21 +146,10 @@ namespace fan
 	//================================================================================================================================
 	void GameClient::Start()
 	{
-		Game& gameData = world.GetSingletonComponent<Game>();
+		game = &world.GetSingletonComponent<Game>();
+		netManager = &world.GetSingletonComponent<ClientNetworkManager>();
 
-		// Bind socket
-		ClientConnectionManager& connection = world.GetSingletonComponent<ClientConnectionManager>();		
-		sf::Socket::Status socketStatus = sf::Socket::Disconnected;
-		for (int tryIndex = 0; tryIndex < 10 && socketStatus != sf::Socket::Done; tryIndex++)
-		{
-			Debug::Log() << gameData.name << "bind on port " << connection.clientPort << Debug::Endl();
-			socketStatus = connection.socket.Bind( connection.clientPort );
-			if( socketStatus != sf::Socket::Done )
-			{
-				Debug::Warning() << gameData.name << " bind failed" << Debug::Endl();
-				connection.clientPort++; // try bind on the next port ( useful when using multiple clients on the same machine )
-			}
-		}
+		netManager->Start( world );
 
 		// Create remote host for the server
 		DeliveryNotificationManager& deliveryNotificationManager = world.GetSingletonComponent<DeliveryNotificationManager>();
@@ -170,12 +159,6 @@ namespace fan
 		S_RegisterAllRigidbodies::Run( world, world.Match( S_RegisterAllRigidbodies::GetSignature( world ) ) );
 		GameCamera::CreateGameCamera( world );
 		SolarEruption::Start( world );
-
-// 		EntityID spaceshipID = Game::SpawnSpaceship( world );
-// 		if( spaceshipID != 0 )
-// 		{
-// 			world.AddComponent<PlayerController>( spaceshipID );
-// 		}
 	}
 
 	//================================================================================================================================
@@ -216,20 +199,10 @@ namespace fan
 	//================================================================================================================================
 	void  GameClient::Step( const float _delta )
 	{
-		Game& game = world.GetSingletonComponent<Game>();
-		DeliveryNotificationManager& deliveryNotificationManager = world.GetSingletonComponent<DeliveryNotificationManager>();
-		ClientConnectionManager& connection = world.GetSingletonComponent<ClientConnectionManager>();
-		ClientReplicationManager& replicationManager = world.GetSingletonComponent<ClientReplicationManager>();
-		RPCManager& rpcManager = world.GetSingletonComponent<RPCManager>();
-		game.frameIndex++;
+		game->frameIndex++;
 		{
-			SCOPED_PROFILE( scene_update );
-
-			NetworkReceive();
-			deliveryNotificationManager.ProcessTimedOutPackets();
-			connection.DetectServerTimout();
-			replicationManager.ReplicateSingletons( world );
-			replicationManager.ReplicateRPC( rpcManager );
+			SCOPED_PROFILE( scene_update );			
+			netManager->NetworkReceive( world );
 
 			// physics & transforms
 			PhysicsWorld& physicsWorld = world.GetSingletonComponent<PhysicsWorld>();
@@ -267,7 +240,7 @@ namespace fan
 
 			S_UpdateGameCamera::Run( world, world.Match( S_UpdateGameCamera::GetSignature( world ) ), _delta );
 
-			NetworkSend();
+			netManager->NetworkSend( world );
 		}
 
 		{
@@ -277,143 +250,4 @@ namespace fan
 			world.RemoveDeadEntities();
 		}
 	}
-
-	//================================================================================================================================
-	//================================================================================================================================
-	void GameClient::NetworkReceive()
-	{
-		// receive
-		Packet			packet;
-		sf::IpAddress	receiveIP;
-		unsigned short	receivePort;
-
-		DeliveryNotificationManager& deliveryNotificationManager = world.GetSingletonComponent<DeliveryNotificationManager>();
-		ClientConnectionManager& connection = world.GetSingletonComponent<ClientConnectionManager>();
-		ClientReplicationManager& replicationManager = world.GetSingletonComponent<ClientReplicationManager>();
-		const Game& game = world.GetSingletonComponent<Game>();
-
-		sf::Socket::Status socketStatus;
-		do
-		{
-			packet.Clear();
-			socketStatus = connection.socket.Receive( packet, receiveIP, receivePort );
-
-			// only receive from the server
-			if( receiveIP != connection.serverIP || receivePort != connection.serverPort )
-			{
-				continue;
-			}
-
-			switch( socketStatus )
-			{
-			case sf::UdpSocket::Done:
-			{
-				connection.serverLastResponse = Time::Get().ElapsedSinceStartup();
-
-				// read the first packet type separately
-				PacketType packetType = packet.ReadType();
-				if( packetType == PacketType::Ack )
-				{
-					packet.onlyContainsAck = true;
-				}
-
-				if( !deliveryNotificationManager.ValidatePacket( packet ) ) 
-				{
-					continue; 
-				}
-
-				// Process packet
-				bool packetValid = true;
-				while( packetValid )
-				{					
-					switch( packetType )
-					{
-					case PacketType::Ack:
-					{
-						PacketAck packetAck;
-						packetAck.Read( packet );
-						deliveryNotificationManager.Receive( packetAck );
-					}break;
-					case PacketType::Ping:
-					{
-						PacketPing packetPing;
-						packetPing.Read( packet );
-						connection.ProcessPacket( packetPing, game.frameIndex );
-					} break;
-					case PacketType::LoggedIn:
-					{
-						PacketLoginSuccess packetLogin;
-						packetLogin.Read( packet );
-						connection.ProcessPacket( packetLogin );
-					} break;
-					case PacketType::Replication:
-					{
-						PacketReplication packetReplication;
-						packetReplication.Read( packet );
-						replicationManager.ProcessPacket( packetReplication );
-					} break;
-					default:
-						Debug::Warning() << "Invalid packet " << int( packetType ) << " received. Reading canceled." << Debug::Endl();
-						packetValid = false;
-						break;
-					}
-
-					// stop if we reach the end or reads the next packet type
-					if( packet.EndOfPacket() ) 
-					{ 
-						break; 
-					}
-					else { 
-						packetType = packet.ReadType(); 
-					}
-				}
-			} break;
-			case sf::UdpSocket::Error:
-				Debug::Warning() << "socket.receive: an unexpected error happened " << Debug::Endl();
-				break;
-			case sf::UdpSocket::Partial:
-			case sf::UdpSocket::NotReady:
-			{
-				// do nothing
-			}break;
-			case sf::UdpSocket::Disconnected:
-			{
-				// disconnect
-			} break;
-			default:
-				assert( false );
-				break;
-			}
-		}
-		while( socketStatus == sf::UdpSocket::Done );
-	}
-
-	//================================================================================================================================
-	//================================================================================================================================
-	void GameClient::NetworkSend()
-	{
-		ClientConnectionManager& connection = world.GetSingletonComponent<ClientConnectionManager>();
-		DeliveryNotificationManager& deliveryNotificationManager = world.GetSingletonComponent<DeliveryNotificationManager>();
-
-		// create packet
-		Packet packet( deliveryNotificationManager.GetNextPacketTag() );
-
-		// write packet
-		connection.Send( packet );
-
-		if( packet.GetSize() == sizeof( PacketTag ) ) { packet.onlyContainsAck = true; }
-
-		deliveryNotificationManager.SendAck( packet );
-
-		// send packet, don't send empty packets
-		if( packet.GetSize() > sizeof( PacketTag ) )
-		{
-			deliveryNotificationManager.RegisterPacket( packet );
-			connection.socket.Send( packet, connection.serverIP, connection.serverPort );
-		}
-		else
-		{
-			deliveryNotificationManager.hostDatas[0].nextPacketTag--;
-		}
- 	}
 }

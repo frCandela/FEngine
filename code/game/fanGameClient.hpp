@@ -1,14 +1,16 @@
 #pragma once
 
 #include "scene/fanScenePrecompiled.hpp"
-#include "ecs/fanEcsWorld.hpp"
 
+#include "ecs/fanEcsWorld.hpp"
 #include "network/fanUdpSocket.hpp"
 
 namespace fan
 {
+	struct Game;
+	struct ClientNetworkManager;
+
 	//================================================================================================================================
-	// 
 	//================================================================================================================================
 	struct GameClient
 	{
@@ -20,12 +22,8 @@ namespace fan
 		void Resume();
 		void Step( const float _delta );
 
-		enum RandomFlags { MUST_PING_SERVER = 1 << 0, MUST_ACK_START = 1 << 1 };
-
-		EcsWorld		world;
-
-	private:
-		void	NetworkSend();
-		void	NetworkReceive();
+		EcsWorld			  world;
+		Game*				  game;
+		ClientNetworkManager* netManager;
 	};
 }

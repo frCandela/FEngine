@@ -10,9 +10,9 @@ namespace fan
 	struct RPCManager;
 
 	//================================================================================================================================
-	// [Client] processes server packets to replicates objects / run events
+	//  processes server packets to replicates objects / run events
 	//================================================================================================================================
-	class ClientReplicationManager : public SingletonComponent
+	struct ClientReplicationManager : public SingletonComponent
 	{
 		DECLARE_SINGLETON_COMPONENT()
 	public:

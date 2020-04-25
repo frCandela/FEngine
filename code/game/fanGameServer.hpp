@@ -7,6 +7,9 @@
 
 namespace fan
 {
+	struct ServerNetworkManager;
+	struct Game;
+
 	//================================================================================================================================
 	//================================================================================================================================
 	struct GameServer
@@ -19,13 +22,8 @@ namespace fan
 		void Resume();
 		void Step( const float _delta );
 
-		enum State { WAITING_FOR_PLAYERS = 0, STARTING, PLAYING };
-
-		EcsWorld	world;
-		State		state = WAITING_FOR_PLAYERS;
-
-	private:
-		void	NetworkSend();
-		void	NetworkReceive();
+		EcsWorld			  world;
+		ServerNetworkManager* netManager;
+		Game*				  game;
 	};					  
 }

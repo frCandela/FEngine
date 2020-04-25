@@ -7,11 +7,15 @@
 namespace fan
 {
 	class EcsWorld;
+	struct ServerConnectionManager;
+	struct DeliveryNotificationManager;
+	struct ServerReplicationManager;
+	struct LinkingContext;
+	struct Game;
 
 	//================================================================================================================================
-	// [Server]
 	//================================================================================================================================
-	class ServerNetworkManager : public SingletonComponent
+	struct ServerNetworkManager : public SingletonComponent
 	{
 		DECLARE_SINGLETON_COMPONENT()
 	public:
@@ -31,9 +35,19 @@ namespace fan
 
 		std::vector<HostData> hostDatas;
 
+		// pre-get singletons
+		ServerConnectionManager*	 connection;
+		DeliveryNotificationManager* deliveryNotificationManager;
+		ServerReplicationManager*	 replicationManager;
+		LinkingContext*				 linkingContext;
+		Game*						 game;
+
+		void Start( EcsWorld& _world );
+		void Stop( EcsWorld& _world );
 		void CreateHost( const HostID _hostID );
 		void DeleteHost( const HostID _hostID );
-
-		NetID nextNetID = 1;	// 0 is the null netID
+		void Update( EcsWorld& _world );
+		void NetworkSend( EcsWorld& _world );
+		void NetworkReceive( EcsWorld& _world );
 	};
 }

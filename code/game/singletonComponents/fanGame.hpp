@@ -37,6 +37,6 @@ namespace fan
 		GameClient* gameClient = nullptr;
 		GameServer* gameServer = nullptr;
 
-		static EntityID SpawnSpaceship( EcsWorld& _world );
+		static EntityHandle SpawnSpaceship( EcsWorld& _world );
 	};
 }
