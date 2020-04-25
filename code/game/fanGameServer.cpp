@@ -38,6 +38,7 @@
 #include "network/singletonComponents/fanServerReplicationManager.hpp"
 #include "network/singletonComponents/fanRPCManager.hpp"
 #include "network/singletonComponents/fanServerNetworkManager.hpp"
+#include "network/singletonComponents/fanLinkingContext.hpp"
 #include "game/singletonComponents/fanCollisionManager.hpp"
 #include "game/singletonComponents/fanSolarEruption.hpp"
 #include "game/singletonComponents/fanGameCamera.hpp"
@@ -121,6 +122,7 @@ namespace fan
 		world.AddSingletonComponentType<ServerReplicationManager>();
 		world.AddSingletonComponentType<RPCManager>();
 		world.AddSingletonComponentType<ServerNetworkManager>();
+		world.AddSingletonComponentType<LinkingContext>();
 		
 		world.AddTagType<tag_boundsOutdated>();
 		world.AddTagType<tag_sunlight_occlusion>();

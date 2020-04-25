@@ -36,6 +36,7 @@
 #include "network/singletonComponents/fanDeliveryNotificationManager.hpp"
 #include "network/singletonComponents/fanClientNetworkManager.hpp"
 #include "network/singletonComponents/fanRPCManager.hpp"
+#include "network/singletonComponents/fanLinkingContext.hpp"
 #include "game/fanGameTags.hpp"
 
 #include "game/singletonComponents/fanSunLight.hpp"
@@ -92,7 +93,6 @@ namespace fan
 		world.AddComponentType<FollowTransform>();
 		world.AddComponentType<ProgressBar>();
 		world.AddComponentType<FollowTransformUI>();
-
 		// game components
 		world.AddComponentType<Planet>();
 		world.AddComponentType<SpaceShip>();
@@ -123,6 +123,7 @@ namespace fan
 		world.AddSingletonComponentType<ClientReplicationManager>();
 		world.AddSingletonComponentType<RPCManager>();
 		world.AddSingletonComponentType<ClientNetworkManager>();
+		world.AddSingletonComponentType<LinkingContext>();
 
 		world.AddTagType<tag_boundsOutdated>();
 		world.AddTagType<tag_sunlight_occlusion>();
