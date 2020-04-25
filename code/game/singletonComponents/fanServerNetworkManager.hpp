@@ -52,5 +52,7 @@ namespace fan
 
 		void CreateHost( const HostID _hostID );
 		void DeleteHost( const HostID _hostID );
+
+		void OnSyncSuccess( HostID _hostID );
 	};
 }

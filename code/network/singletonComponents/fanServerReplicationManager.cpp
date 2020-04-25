@@ -49,8 +49,10 @@ namespace fan
 
 	//================================================================================================================================
 	// Replicates data on all connected hosts
+	// returns a success signal that the caller can connect to to get notified of the acknowledgments 
+	// ( ResendUntilReplicated flag must be on )
 	//================================================================================================================================
-	void ServerReplicationManager::ReplicateOnClient( const HostID _hostID, PacketReplication& _packet, const ReplicationFlags _flags )
+	Signal<HostID>* ServerReplicationManager::ReplicateOnClient( const HostID _hostID, PacketReplication& _packet, const ReplicationFlags _flags )
 	{
 		HostData& hostData = hostDatas[_hostID];
 		if( !hostData.isNull )
@@ -59,7 +61,9 @@ namespace fan
 			SingletonReplicationData& replicationData = hostData.nextReplication[hostData.nextReplication.size() - 1];
 			replicationData.flags = _flags;
 			replicationData.packet = _packet;
+			return &replicationData.onSuccess;
 		}
+		return nullptr;
 	}
 
 	//================================================================================================================================
@@ -129,6 +133,13 @@ namespace fan
 	void ServerReplicationManager::OnReplicationSuccess( const HostID _hostID, const PacketTag _packetTag )
 	{
 		HostData& hostData = hostDatas[_hostID];
+		using MMapIt = std::multimap< PacketTag, SingletonReplicationData>::iterator;
+		std::pair<MMapIt, MMapIt> result = hostData.pendingReplication.equal_range( _packetTag );
+		for( MMapIt it = result.first; it != result.second; it++ )
+		{
+			SingletonReplicationData& data = it->second;
+			data.onSuccess.Emmit( _hostID );
+		}
 		hostData.pendingReplication.erase( _packetTag );
 		//Debug::Highlight() << "success: " << _packetTag << Debug::Endl();
 	}

@@ -109,7 +109,7 @@ namespace fan
 				HostData& hostData = hostDatas[i];
 
 				// spawns spaceship
-				if( client.lastSync != 0.f && hostData.spaceshipID == 0 )
+				if( client.synced == true && hostData.spaceshipID == 0 )
 				{
 					EntityHandle spaceshipHandle = Game::SpawnSpaceship( _world );
 					hostData.spaceshipID = linkingContext->nextNetID ++;
@@ -138,13 +138,15 @@ namespace fan
 						if( std::abs( min ) > 2 ) // only sync when we have a big enough frame index difference
 						{
 							RPCManager& rpcManager = _world.GetSingletonComponent<RPCManager>();
-							ServerReplicationManager& replication = _world.GetSingletonComponent<ServerReplicationManager>();
-							replication.ReplicateOnClient(
+							ServerReplicationManager& replication = _world.GetSingletonComponent<ServerReplicationManager>();							
+							
+							Signal<HostID>& success = * replication.ReplicateOnClient(
 								client.hostId
 								, rpcManager.RPCShiftClientFrame( min )
-								, ServerReplicationManager::None
+								, ServerReplicationManager::ResendUntilReplicated
 							);
 							client.lastSync = currentTime;
+							success.Connect( &ServerNetworkManager::OnSyncSuccess, this );
 
 							Debug::Warning() << "Shifting client " << client.hostId << " frame index : " << min << Debug::Endl();
 						}
@@ -152,6 +154,14 @@ namespace fan
 				}
 			}
 		}
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
+	void ServerNetworkManager::OnSyncSuccess( HostID _hostID )
+	{
+		Client& client = connection->clients[_hostID];
+		client.synced = true;
 	}
 
 	//================================================================================================================================
