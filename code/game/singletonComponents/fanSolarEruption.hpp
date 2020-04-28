@@ -42,7 +42,7 @@ namespace fan
 		
 		float previousLightAttenuation;
 
-		uint64_t eruptionStartFrame;// the eruption starts at this frame
+		FrameIndex eruptionStartFrame;// the eruption starts at this frame
 
 		bool	enabled;
 		State	state;
@@ -58,6 +58,6 @@ namespace fan
 		float	stateParticleDuration[SIZE];
 		Color	stateParticleColor[SIZE];
 
-		static uint64_t CalculateNextEruptionStartFrame( const SolarEruption& _eruption, const Game& game );
+		static FrameIndex CalculateNextEruptionStartFrame( const SolarEruption& _eruption, const Game& game );
 	};
 }

@@ -26,7 +26,7 @@ namespace fan
 		static void Save( const SingletonComponent& _component, Json& _json );
 		static void Load( SingletonComponent& _component, const Json& _json );
 
-		uint64_t spaceshipSpawnFrameIndex;	// the frame index on which the spaceship is spawned
+		FrameIndex spaceshipSpawnFrameIndex;	// the frame index on which the spaceship is spawned
 		NetID	 spaceshipNetID;
 
 		// pre-get singletons
@@ -44,7 +44,7 @@ namespace fan
 		void NetworkReceive();
 
 		// RPC callbacks
-		void ShiftFrameIndex( const int64_t _framesDelta );
-		void SpawnShip( NetID _spaceshipID, uint64_t _frameIndex );
+		void ShiftFrameIndex( const int _framesDelta );
+		void SpawnShip( NetID _spaceshipID, FrameIndex _frameIndex );
 	};
 }

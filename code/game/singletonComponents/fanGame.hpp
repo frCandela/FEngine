@@ -29,8 +29,8 @@ namespace fan
 		State	    state;
 		std::string name;
 		PrefabPtr	spaceshipPrefab;
-		uint64_t	frameIndex;			// the index of the current time
-		uint64_t	frameStart;			// the index of the first frame of the game
+		FrameIndex	frameIndex;			// the index of the current time
+		FrameIndex	frameStart;			// the index of the first frame of the game
 		float		logicDelta;			// time between two frames in seconds
 
 		// @hack for the editor, only one of these should be null

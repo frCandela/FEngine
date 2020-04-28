@@ -15,6 +15,7 @@ namespace fan
 	using Port = unsigned short;
 	using PacketTag = sf::Uint32;		// may change to uint16 on release
 	using PacketTypeInt = sf::Uint8;	// the sf integer type encoding the PacketType enum
+	using FrameIndexNet = sf::Uint32;
 
 	// all the types of packets of the network engine
 	enum class PacketType
@@ -84,8 +85,8 @@ namespace fan
 			_packet << previousRtt;
 		}
 
-		sf::Uint64 serverFrame;	// frame index of the server when sending the packet
-		sf::Uint64 clientFrame; // frame index of the client when sending back the packet
+		FrameIndexNet serverFrame;	// frame index of the server when sending the packet
+		FrameIndexNet clientFrame; // frame index of the client when sending back the packet
 		float previousRtt;		// client rtt from the previous ping
 	};
 

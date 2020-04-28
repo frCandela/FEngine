@@ -102,7 +102,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void ClientNetworkManager::ShiftFrameIndex( const int64_t _framesDelta )
+	void ClientNetworkManager::ShiftFrameIndex( const int _framesDelta )
 	{
 		game->frameIndex += _framesDelta;
 		Debug::Warning() << "Shifted client frame index : " << _framesDelta << Debug::Endl();
@@ -110,7 +110,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void ClientNetworkManager::SpawnShip( NetID _spaceshipID, uint64_t _frameIndex )
+	void ClientNetworkManager::SpawnShip( NetID _spaceshipID, FrameIndex _frameIndex )
 	{
 		if( spaceshipNetID == 0 )
 		{

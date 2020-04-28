@@ -85,7 +85,7 @@ namespace fan
 	// received ping packet from the server.
 	// updates the rtt & sends back the packet later while adding the current client frame index
 	//================================================================================================================================
-	void ClientConnectionManager::ProcessPacket( const PacketPing& _packetPing, const uint64_t _frameIndex )
+	void ClientConnectionManager::ProcessPacket( const PacketPing& _packetPing, const FrameIndex _frameIndex )
 	{
 		if( state == ClientState::Connected )
 		{

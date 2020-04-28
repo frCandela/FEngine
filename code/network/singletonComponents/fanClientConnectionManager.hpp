@@ -47,6 +47,6 @@ namespace fan
 		void DisconnectFromServer();
 
 		void ProcessPacket( const PacketLoginSuccess& _packetLogin );
-		void ProcessPacket( const PacketPing& _packetPing, const uint64_t _frameIndex );
+		void ProcessPacket( const PacketPing& _packetPing, const FrameIndex _frameIndex );
 	};
 }

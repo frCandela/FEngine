@@ -62,14 +62,14 @@ namespace fan
 	//================================================================================================================================
 	// SynchClientFrame RPC - chan
 	//================================================================================================================================
-	PacketReplication RPCManager::RPCShiftClientFrame( const sf::Int64 _framesDelta )
+	PacketReplication RPCManager::RPCShiftClientFrame( const int _framesDelta )
 	{
 		PacketReplication packet;
 		packet.replicationType = PacketReplication::ReplicationType::RPC;
 
 		packet.packetData.clear();
 		packet.packetData << RpcId( 'SYNC' );
-		packet.packetData << _framesDelta;
+		packet.packetData << sf::Int32(_framesDelta);
 
 		return packet;
 	}
@@ -79,14 +79,14 @@ namespace fan
 	//================================================================================================================================
 	void RPCManager::UnwrapShiftClientFrame( sf::Packet& _packet )
 	{
-		sf::Int64 framesDelta;
+		sf::Int32 framesDelta;
 		_packet >> framesDelta;
 		onShiftFrameIndex.Emmit( framesDelta );
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	PacketReplication RPCManager::RPCSSpawnShip( const NetID _spaceshipID, const uint64_t _frameIndex )
+	PacketReplication RPCManager::RPCSSpawnShip( const NetID _spaceshipID, const FrameIndex _frameIndex )
 	{
 		PacketReplication packet;
 		packet.replicationType = PacketReplication::ReplicationType::RPC;
@@ -94,7 +94,7 @@ namespace fan
 		packet.packetData.clear();
 		packet.packetData << RpcId( 'SPWN' );
 		packet.packetData << _spaceshipID;
-		packet.packetData << _frameIndex;
+		packet.packetData << FrameIndexNet(_frameIndex);
 
 		return packet;
 	}
@@ -103,7 +103,7 @@ namespace fan
 	//================================================================================================================================
 	void RPCManager::UnwrapSpawnShip( sf::Packet& _packet )
 	{
-		sf::Uint64 frameIndex;
+		FrameIndexNet frameIndex;
 		NetID spaceshipID;
 
 		_packet >> spaceshipID;

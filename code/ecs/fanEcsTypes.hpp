@@ -23,4 +23,5 @@ namespace fan
 	using SingletonComponentID = int;
 	using ChunckIndex = uint8_t;
 	using ChunckComponentIndex = uint16_t;
+	using FrameIndex = uint32_t;
 }

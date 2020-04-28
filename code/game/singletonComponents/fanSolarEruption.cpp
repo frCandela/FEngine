@@ -60,10 +60,10 @@ namespace fan
 	//================================================================================================================================
 	// returns the next eruption start frame
 	//================================================================================================================================
-	uint64_t SolarEruption::CalculateNextEruptionStartFrame( const SolarEruption& _eruption, const Game& game )
+	FrameIndex SolarEruption::CalculateNextEruptionStartFrame( const SolarEruption& _eruption, const Game& game )
 	{
 		const float delay = _eruption.cooldown + Random::Float() * _eruption.randomCooldown;
-		return game.frameIndex + ( uint64_t )( delay / game.logicDelta);
+		return game.frameIndex + (FrameIndex)( delay / game.logicDelta);
 	}
 
 	//================================================================================================================================
@@ -75,7 +75,7 @@ namespace fan
 
 		eruption.enabled = true;
 		eruption.stateDuration[WAITING] = std::numeric_limits<float>::max(); // wait forever
-		eruption.eruptionStartFrame = std::numeric_limits<uint64_t>::max(); // no eruption planned
+		eruption.eruptionStartFrame = std::numeric_limits<FrameIndex>::max(); // no eruption planned
 
 		// pointers check
 		if( eruption.sunlightMaterial == nullptr
@@ -194,7 +194,7 @@ namespace fan
 	void SolarEruption::NetSave( const SingletonComponent& _component, sf::Packet& _packet )
 	{
 		const SolarEruption& solarEruption = static_cast<const SolarEruption&>( _component );
-		_packet << sf::Int64( solarEruption.eruptionStartFrame);
+		_packet << FrameIndexNet( solarEruption.eruptionStartFrame);
 	}
 
 	//================================================================================================================================
@@ -203,7 +203,7 @@ namespace fan
 	{
 		SolarEruption& solarEruption = static_cast< SolarEruption&>( _component );
 
-		sf::Int64 eruptionStartFrame;
+		FrameIndexNet eruptionStartFrame;
 		_packet >> eruptionStartFrame;
 
 		solarEruption.eruptionStartFrame = eruptionStartFrame;

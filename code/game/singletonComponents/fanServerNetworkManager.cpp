@@ -126,8 +126,8 @@ namespace fan
 				const double currentTime = Time::Get().ElapsedSinceStartup();
 				if( currentTime - client.lastSync > 3.f )
 				{
-					int64_t max = client.framesDelta[0];
-					int64_t min = client.framesDelta[0];
+					int max = client.framesDelta[0];
+					int min = client.framesDelta[0];
 					for( int i = 1; i < client.framesDelta.size(); i++ )
 					{
 						max = std::max( max, client.framesDelta[i] );

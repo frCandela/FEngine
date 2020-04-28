@@ -91,7 +91,7 @@ namespace fan
 	// sends a login packet to the clients needing approval
 	// regularly sends ping to clients to calculate RTT & sync frame index
 	//================================================================================================================================
-	void ServerConnectionManager::Send( Packet& _packet, const HostID _clientID, const uint64_t	_frameIndex )
+	void ServerConnectionManager::Send( Packet& _packet, const HostID _clientID, const FrameIndex	_frameIndex )
 	{
 		// Send login packet
 		Client& client = clients[_clientID];
@@ -190,10 +190,10 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void ServerConnectionManager::ProcessPacket( const HostID _clientID, const PacketPing& _packetPing, const uint64_t _frameIndex, const float _logicDelta )
+	void ServerConnectionManager::ProcessPacket( const HostID _clientID, const PacketPing& _packetPing, const FrameIndex _frameIndex, const float _logicDelta )
 	{
-		const uint64_t delta = _frameIndex - _packetPing.serverFrame; // number of frames elapsed between sending & receiving
-		const uint64_t clientCurrentFrameIndex = _packetPing.clientFrame + delta / 2;
+		const FrameIndex delta = _frameIndex - _packetPing.serverFrame; // number of frames elapsed between sending & receiving
+		const FrameIndex clientCurrentFrameIndex = _packetPing.clientFrame + delta / 2;
 
 		Client& client = clients[_clientID];
 		client.rtt = _logicDelta * delta;
