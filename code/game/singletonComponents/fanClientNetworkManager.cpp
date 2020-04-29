@@ -5,6 +5,7 @@
 #include "core/time/fanTime.hpp"
 #include "game/singletonComponents/fanGame.hpp"
 #include "game/components/fanPlayerController.hpp"
+#include "game/components/fanPlayerInput.hpp"
 #include "network/singletonComponents/fanDeliveryNotificationManager.hpp"
 #include "network/singletonComponents/fanClientReplicationManager.hpp"
 #include "network/singletonComponents/fanClientConnectionManager.hpp"
@@ -40,6 +41,7 @@ namespace fan
 		netManager.game = nullptr;
 		netManager.spaceshipSpawnFrameIndex = 0;
 		netManager.spaceshipNetID = 0;
+		netManager.spaceshipHandle = 0;
 	}
 
 	//================================================================================================================================
@@ -84,12 +86,13 @@ namespace fan
 	{
 		replicationManager->ReplicateSingletons( _world );
 
+		// spawns spaceship
 		if( spaceshipSpawnFrameIndex != 0 && game->frameIndex >= spaceshipSpawnFrameIndex )
 		{
 			assert( spaceshipNetID != 0 );
 
 			spaceshipSpawnFrameIndex = 0;
-			const EntityHandle spaceshipHandle = Game::SpawnSpaceship( _world );
+			spaceshipHandle = Game::SpawnSpaceship( _world );
 			linkingContext->AddEntity( spaceshipHandle, spaceshipNetID );
 
 			const EntityID spaceshipID = _world.GetEntityID( spaceshipHandle );
@@ -97,6 +100,19 @@ namespace fan
 			{
 				_world.AddComponent<PlayerController>( spaceshipID );
 			}
+		}
+
+		// streams position
+		if( spaceshipHandle != 0 )
+		{
+			const EntityID entityID = _world.GetEntityID( spaceshipHandle );
+			const PlayerInput& input = _world.GetComponent<PlayerInput>( entityID );
+			nextInput.frameIndex = game->frameIndex;
+			nextInput.orientation = input.orientation;
+			nextInput.left = input.left;
+			nextInput.forward = input.forward;
+			nextInput.boost = input.boost;
+			nextInput.fire = input.fire;
 		}
 	}
 
@@ -237,6 +253,7 @@ namespace fan
 
 		// write packet
 		connection->Send( packet );
+		nextInput.Write( packet );
 
 		if( packet.GetSize() == sizeof( PacketTag ) ) { packet.onlyContainsAck = true; }
 

@@ -4,12 +4,14 @@
 #include "core/time/fanTime.hpp"
 #include "ecs/fanEcsWorld.hpp"
 #include "game/singletonComponents/fanGame.hpp"
+#include "game/components/fanPlayerInput.hpp"
 #include "network/singletonComponents/fanRPCManager.hpp"
 #include "network/singletonComponents/fanDeliveryNotificationManager.hpp"
 #include "network/singletonComponents/fanServerReplicationManager.hpp"
 #include "network/singletonComponents/fanServerConnectionManager.hpp"
 #include "network/singletonComponents/fanLinkingContext.hpp"
 #include "network/singletonComponents/fanRPCManager.hpp"
+
 
 namespace fan
 {
@@ -108,18 +110,54 @@ namespace fan
 			{
 				HostData& hostData = hostDatas[i];
 
-				// spawns spaceship
-				if( client.synced == true && hostData.spaceshipID == 0 )
+				
+				if( client.synced == true  )
 				{
-					EntityHandle spaceshipHandle = Game::SpawnSpaceship( _world );
-					hostData.spaceshipID = linkingContext->nextNetID ++;
-					linkingContext->AddEntity( spaceshipHandle, hostData.spaceshipID );
+					if( hostData.spaceshipID == 0 )
+					{
+						// spawns spaceship
+						hostData.spaceshipHandle = Game::SpawnSpaceship( _world );
+						hostData.spaceshipID = linkingContext->nextNetID++;
+						linkingContext->AddEntity( hostData.spaceshipHandle, hostData.spaceshipID );
 
-					replication->ReplicateOnClient(
-						client.hostId
-						, rpcManager->RPCSSpawnShip( hostData.spaceshipID, game->frameIndex + 120 )
-						, ServerReplicationManager::ResendUntilReplicated
-					);
+						replication->ReplicateOnClient(
+							client.hostId
+							, rpcManager->RPCSSpawnShip( hostData.spaceshipID, game->frameIndex + 120 )
+							, ServerReplicationManager::ResendUntilReplicated
+						);
+					}
+					else if( !hostData.inputs.empty() )
+					{	
+						while( !hostData.inputs.empty() )
+						{
+							const PacketInput& packetInput = hostData.inputs.front();
+							if( packetInput.frameIndex < game->frameIndex - 6 )
+							{
+								hostData.inputs.pop();
+							}
+							else
+							{
+								break;
+							}
+						}
+
+						if( !hostData.inputs.empty() )
+						{
+							const PacketInput& packetInput = hostData.inputs.front();
+							// moves spaceship
+							const EntityID entityID = _world.GetEntityID( hostData.spaceshipHandle );
+							PlayerInput& input = _world.GetComponent<PlayerInput>( entityID );
+							input.orientation = packetInput.orientation;
+							input.left = packetInput.left;
+							input.forward = packetInput.forward;
+							input.boost = packetInput.boost;
+							input.fire = packetInput.fire;
+						}
+						else
+						{
+							Debug::Warning() << "no available input from player " << i << Debug::Endl();
+						}						
+					}
 				}
 
 				// sync the client frame index with the server
@@ -229,6 +267,12 @@ namespace fan
 						packetPing.Read( packet );
 						connection->ProcessPacket( clientID, packetPing, game->frameIndex, game->logicDelta );
 					} break;
+					case PacketType::PlayerInput:
+					{
+						PacketInput packetInput;
+						packetInput.Read( packet );
+						hostDatas[clientID].inputs.push( packetInput );
+					} break;					
 					default:
 						Debug::Warning() << "Invalid packet " << int( packetType ) << " received. Reading canceled." << Debug::Endl();
 						packetValid = false;

@@ -3,6 +3,7 @@
 #include "ecs/fanSingletonComponent.hpp"
 
 #include "network/fanPacket.hpp"
+#include <queue>
 
 namespace fan
 {
@@ -32,6 +33,8 @@ namespace fan
 		{
 			bool   isNull = false;		// client was deleted
 			NetID  spaceshipID = 0;
+			EntityHandle spaceshipHandle = 0;
+			std::queue<PacketInput> inputs;
 		};
 
 		std::vector<HostData> hostDatas;

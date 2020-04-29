@@ -1,10 +1,12 @@
 #pragma once
 
 #include <iostream>
+
 #include "SFML/System.hpp"
 #include "SFML/Network.hpp"
 
 #include "core/fanSignal.hpp"
+#include "bullet/LinearMath/btVector3.h"
 
 namespace fan
 {
@@ -25,6 +27,7 @@ namespace fan
 		, Hello			// first presentation of the client to the server for logging in
 		, LoggedIn		// server informs client that login was successful
 		, Replication	// replication of data on the client's world
+		, PlayerInput	// client input ring buffer sent to the server
 		, COUNT			
 	}; 
 	static_assert( int( PacketType::COUNT ) < std::numeric_limits<PacketTypeInt>::max() );
@@ -145,4 +148,67 @@ namespace fan
 		ReplicationType replicationType = ReplicationType::Count;
 		sf::Packet		packetData;	
 	};
+
+	//================================================================================================================================
+	//================================================================================================================================
+	struct PacketInput
+	{
+
+		enum AxisBits
+		{
+			Zero = 0
+			, Positive = 1 << 0
+			, Negative = 1 << 1
+			, Mask	   = 0b11
+		};
+
+		void Read( Packet& _packet )
+		{
+			_packet >> frameIndex;
+			_packet >> orientation[0] >> orientation[1] >> orientation[2];
+			_packet >> left;
+			_packet >> forward;
+			_packet >> boost;
+			_packet >> fire;
+
+			// decode input bits to floats
+// 			sf::Uint8 inputsBits;
+// 			_packet >> inputsBits;
+// 			float* values[4] = { &left, &forward, &boost, &fire };
+// 			for( int i = 0; i < 4; i++ )
+// 			{
+// 				const uint32_t valueBits = ( inputsBits >> i * 2 ) & Mask;
+// 				( *values[i] ) = valueBits == Positive ? 1.f : ( valueBits == Negative ? -1.f : 0.f );
+// 			}
+		}
+
+		void Write( Packet& _packet ) const
+		{
+			// encode positive/negative/zero input floats into bits that fit into one byte
+// 			sf::Uint8 inputsBits = 0;
+// 			float values[4] = { left, forward, boost, fire };
+// 			for (int i = 0; i < 4; i++)
+// 			{
+// 				const float value = values[i];
+// 				const uint32_t valueBits = value > 0.f ? Positive : ( value < 0.f ? Negative : Zero );
+// 				inputsBits |= valueBits << i * 2;
+// 			}
+
+			_packet << PacketTypeInt( PacketType::PlayerInput );
+			_packet << frameIndex;
+			_packet << orientation[0] << orientation[1] << orientation[2];
+			_packet << left;
+			_packet << forward;
+			_packet << boost;
+			_packet << fire;
+		}
+
+		FrameIndexNet	frameIndex;	 // the  frame index when creating the input
+		btVector3		orientation; // orientation of the ship
+		float			left;		 // left/right key pressed ( strafing )
+		float			forward;	 // forward or backward
+		float			boost;		 // shift to go faster
+		float			fire;		 // firing in front of the ship
+	};
+	
 }

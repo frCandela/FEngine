@@ -10,3 +10,5 @@ imgui.ini
 enc_temp_folder
 content/_default/texture/blender_icons.png
 middleware/LivePP
+*.dmp
+*.callstack.txt

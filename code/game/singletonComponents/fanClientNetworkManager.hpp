@@ -28,6 +28,9 @@ namespace fan
 
 		FrameIndex spaceshipSpawnFrameIndex;	// the frame index on which the spaceship is spawned
 		NetID	 spaceshipNetID;
+		EntityHandle spaceshipHandle;
+
+		PacketInput nextInput;
 
 		// pre-get singletons
 		DeliveryNotificationManager*	deliveryNotificationManager;
