@@ -131,7 +131,7 @@ namespace fan
 						while( !hostData.inputs.empty() )
 						{
 							const PacketInput& packetInput = hostData.inputs.front();
-							if( packetInput.frameIndex < game->frameIndex - 6 )
+							if( packetInput.frameIndex < game->frameIndex )
 							{
 								hostData.inputs.pop();
 							}
@@ -173,20 +173,20 @@ namespace fan
 					}
 					if( max - min <= 1 ) // we have consistent readings
 					{
-						if( std::abs( min ) > 2 ) // only sync when we have a big enough frame index difference
+						if( std::abs( min + targetFrameDifference ) > 2 ) // only sync when we have a big enough frame index difference
 						{
 							RPCManager& rpcManager = _world.GetSingletonComponent<RPCManager>();
 							ServerReplicationManager& replication = _world.GetSingletonComponent<ServerReplicationManager>();							
 							
 							Signal<HostID>& success = * replication.ReplicateOnClient(
 								client.hostId
-								, rpcManager.RPCShiftClientFrame( min )
+								, rpcManager.RPCShiftClientFrame( min + targetFrameDifference )
 								, ServerReplicationManager::ResendUntilReplicated
 							);
 							client.lastSync = currentTime;
 							success.Connect( &ServerNetworkManager::OnSyncSuccess, this );
 
-							Debug::Warning() << "Shifting client " << client.hostId << " frame index : " << min << Debug::Endl();
+							Debug::Warning() << "Shifting client " << client.hostId << " frame index : " << min + targetFrameDifference << Debug::Endl();
 						}
 					}
 				}

@@ -38,6 +38,7 @@ namespace fan
 		};
 
 		std::vector<HostData> hostDatas;
+		static const int targetFrameDifference = 7; // the client must be N frames ahead of the server
 
 		// pre-get singletons
 		ServerConnectionManager*	 connection;

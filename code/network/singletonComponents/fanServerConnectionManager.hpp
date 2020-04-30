@@ -35,7 +35,7 @@ namespace fan
 		// client frame index synchronization
 		bool				synced = false;		// true if the client has been synced 
 		double				lastSync = 0.f;		// client frame index value is correct
-		std::array<int, 5>  framesDelta;		// server/client frame index delta in the N previous frames
+		std::array<int, 5>  framesDelta;		// server-client frame index delta in the N previous frames
 		int					nextDeltaIndex = 0; // next delta to update in the array
 	};
 
