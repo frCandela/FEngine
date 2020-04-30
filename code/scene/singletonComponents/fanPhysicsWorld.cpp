@@ -8,6 +8,8 @@
 #include "scene/components/fanBoxShape.hpp"
 #include "ecs/fanEcsWorld.hpp"
 
+#include "bullet/BulletCollision/CollisionDispatch/btSimulationIslandManager.h"
+
 namespace fan
 {
 	REGISTER_SINGLETON_COMPONENT( PhysicsWorld );
@@ -86,13 +88,58 @@ namespace fan
 		solver = new btSequentialImpulseConstraintSolver();
 		dynamicsWorld = new btDiscreteDynamicsWorld( dispatcher, overlappingPairCache, solver, collisionConfiguration );
 
+		// deterministic configuration ( not sure if it helps -> please test )
+		btContactSolverInfo& info = dynamicsWorld->getSolverInfo();
+		info.m_solverMode = info.m_solverMode & ~( SOLVER_USE_WARMSTARTING );	// not tested
+		dynamicsWorld->getSimulationIslandManager()->setSplitIslands( false );  // not tested
+
 		gContactStartedCallback = ContactStartedCallback;
 		gContactEndedCallback = ContactEndedCallback;
-
 		dynamicsWorld->setGravity( btVector3::Zero() );
 
 		// Bullet physics is broken when its internal clock is zero, this prevents it from happening when the timestep is exactly equal to the fixed timestep
 		dynamicsWorld->stepSimulation( 0.015f, 1, Time::Get().GetPhysicsDelta() );
+	}
+
+	void PhysicsWorld::Reset()
+	{
+		///create a copy of the array, not a reference!
+		const btCollisionObjectArray& collisionObjects = dynamicsWorld->getCollisionObjectArray();
+
+		for( int i = 0; i < dynamicsWorld->getNumCollisionObjects(); i++ )
+		{
+			btCollisionObject* colObj = collisionObjects[i];
+			btRigidBody* body = btRigidBody::upcast( colObj );
+			if( body )
+			{
+				if( body->getMotionState() )
+				{
+					btDefaultMotionState* myMotionState = (btDefaultMotionState*)body->getMotionState();
+					myMotionState->m_graphicsWorldTrans = myMotionState->m_startWorldTrans;
+					body->setCenterOfMassTransform( myMotionState->m_graphicsWorldTrans );
+					colObj->setInterpolationWorldTransform( myMotionState->m_startWorldTrans );
+					colObj->forceActivationState( ACTIVE_TAG );
+					colObj->activate();
+					colObj->setActivationState( DISABLE_DEACTIVATION );
+					colObj->setDeactivationTime( btScalar( 2e7 ) );
+				}
+				//removed cached contact points (this is not necessary if all objects have been removed from the dynamics world)
+				m_dynamicsWorld->getBroadphase()->getOverlappingPairCache()->cleanProxyFromPairs( colObj->getBroadphaseHandle(), m_dynamicsWorld->getDispatcher() );
+
+				btRigidBody* body = btRigidBody::upcast( colObj );
+				if( body && !body->isStaticObject() )
+				{
+					btRigidBody::upcast( colObj )->setLinearVelocity( btVector3( 0, 0, 0 ) );
+					btRigidBody::upcast( colObj )->setAngularVelocity( btVector3( 0, 0, 0 ) );
+
+					btRigidBody::upcast( colObj )->clearForces();
+				}
+			}
+		}
+
+		///reset some internal cached data in the broad phase
+		m_dynamicsWorld->getBroadphase()->resetPool( m_dynamicsWorld->getDispatcher() );
+		m_dynamicsWorld->getConstraintSolver()->reset();
 	}
 
 	//================================================================================================================================

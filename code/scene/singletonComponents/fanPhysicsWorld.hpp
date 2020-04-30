@@ -36,6 +36,7 @@ namespace fan
 
 		void AddRigidbody( Rigidbody& _rigidbody, EntityHandle _entityID );
 		void RemoveRigidbody( Rigidbody& _rigidbody );
+		void Reset();
 
 		static void ContactStartedCallback( btPersistentManifold* const& _manifold );
 		static void ContactEndedCallback( btPersistentManifold* const& _manifold );
