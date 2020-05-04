@@ -3,6 +3,7 @@
 #include "ecs/fanSingletonComponent.hpp"
 
 #include "network/fanPacket.hpp"
+#include <queue>
 
 namespace fan
 {
@@ -30,7 +31,8 @@ namespace fan
 		NetID	 spaceshipNetID;
 		EntityHandle spaceshipHandle;
 
-		PacketInput nextInput;
+		 std::queue< PacketInput > inputs;
+		 bool synced;
 
 		// pre-get singletons
 		DeliveryNotificationManager*	deliveryNotificationManager;

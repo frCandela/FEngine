@@ -5,6 +5,8 @@
 #include "ecs/fanEcsWorld.hpp"
 #include "game/singletonComponents/fanGame.hpp"
 #include "game/components/fanPlayerInput.hpp"
+#include "scene/components/fanRigidbody.hpp"
+#include "scene/components/fanTransform.hpp"
 #include "network/singletonComponents/fanRPCManager.hpp"
 #include "network/singletonComponents/fanDeliveryNotificationManager.hpp"
 #include "network/singletonComponents/fanServerReplicationManager.hpp"
@@ -109,7 +111,6 @@ namespace fan
 			if( client.state == Client::State::Connected )
 			{
 				HostData& hostData = hostDatas[i];
-
 				
 				if( client.synced == true  )
 				{
@@ -126,8 +127,10 @@ namespace fan
 							, ServerReplicationManager::ResendUntilReplicated
 						);
 					}
-					else if( !hostData.inputs.empty() )
-					{	
+					
+					if( hostData.spaceshipID != 0 )
+					{
+						// get the current input for this client
 						while( !hostData.inputs.empty() )
 						{
 							const PacketInput& packetInput = hostData.inputs.front();
@@ -141,10 +144,11 @@ namespace fan
 							}
 						}
 
-						if( !hostData.inputs.empty() )
-						{
+						// moves spaceship						
+						if( !hostData.inputs.empty() && hostData.inputs.front().frameIndex == game->frameIndex )
+						{	
 							const PacketInput& packetInput = hostData.inputs.front();
-							// moves spaceship
+							hostData.inputs.pop();
 							const EntityID entityID = _world.GetEntityID( hostData.spaceshipHandle );
 							PlayerInput& input = _world.GetComponent<PlayerInput>( entityID );
 							input.orientation = packetInput.orientation;
@@ -156,7 +160,20 @@ namespace fan
 						else
 						{
 							Debug::Warning() << "no available input from player " << i << Debug::Endl();
-						}						
+						}
+
+						// generate player state
+						{
+							const EntityID entityID = _world.GetEntityID( hostData.spaceshipHandle );
+							const Rigidbody& rb = _world.GetComponent<Rigidbody>( entityID );
+							const Transform& transform = _world.GetComponent<Transform>( entityID );
+							hostData.nextPlayerState.frameIndex = game->frameIndex;
+							hostData.nextPlayerState.playerID = client.hostId;
+							hostData.nextPlayerState.position = transform.GetPosition();
+							hostData.nextPlayerState.orientation = transform.GetRotationEuler();
+							hostData.nextPlayerState.velocity = rb.GetVelocity();
+							hostData.nextPlayerState.angularVelocity = rb.GetAngularVelocity();
+						}
 					}
 				}
 
@@ -321,6 +338,7 @@ namespace fan
 		for( int i = (int)connection->clients.size() - 1; i >= 0; i-- )
 		{
 			Client& client = connection->clients[i];
+			HostData& hostData = hostDatas[i];
 			if( client.state == Client::State::Null )
 			{
 				continue;
@@ -330,6 +348,12 @@ namespace fan
 			Packet packet( deliveryNotification->GetNextPacketTag( client.hostId ) );
 
 			// write game data
+			if( hostData.spaceshipID != 0 )
+			{
+				assert( hostData.nextPlayerState.frameIndex == game->frameIndex );
+				hostData.nextPlayerState.Write( packet );
+			}
+
 			connection->Send( packet, client.hostId, game->frameIndex );
 			replication->Send( packet, client.hostId );
 
@@ -380,6 +404,7 @@ namespace fan
 				if( !data.isNull )
 				{
 					ImGui::Text( "client %d", i );
+					ImGui::Text( "input buffer size %d", data.inputs.size() );
 					ImGui::Spacing(); ImGui::Spacing();
 				}
 			}

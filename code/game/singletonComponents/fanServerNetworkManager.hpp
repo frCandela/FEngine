@@ -31,10 +31,11 @@ namespace fan
 		//================================================================
 		struct HostData
 		{
-			bool   isNull = false;		// client was deleted
-			NetID  spaceshipID = 0;
-			EntityHandle spaceshipHandle = 0;
+			bool					isNull = false;		// client was deleted
+			NetID					spaceshipID = 0;
+			EntityHandle			spaceshipHandle = 0;
 			std::queue<PacketInput> inputs;
+			PacketPlayerGameState	nextPlayerState;
 		};
 
 		std::vector<HostData> hostDatas;

@@ -22,12 +22,13 @@ namespace fan
 	// all the types of packets of the network engine
 	enum class PacketType
 	{
-		  Ping = 0		// server calculates the RTT &sends it to the client
-		, Ack			// packet reception acknowledgment 
-		, Hello			// first presentation of the client to the server for logging in
-		, LoggedIn		// server informs client that login was successful
-		, Replication	// replication of data on the client's world
-		, PlayerInput	// client input ring buffer sent to the server
+		Ping = 0			// server calculates the RTT &sends it to the client
+		, Ack				// packet reception acknowledgment 
+		, Hello				// first presentation of the client to the server for logging in
+		, LoggedIn			// server informs client that login was successful
+		, Replication		// replication of data on the client's world
+		, PlayerInput		// client input ring buffer sent to the server
+		, PlayerGameState	// the game state of one player at a specific frame
 		, COUNT			
 	}; 
 	static_assert( int( PacketType::COUNT ) < std::numeric_limits<PacketTypeInt>::max() );
@@ -209,6 +210,39 @@ namespace fan
 		float			forward;	 // forward or backward
 		float			boost;		 // shift to go faster
 		float			fire;		 // firing in front of the ship
+	};
+
+	//================================================================================================================================
+	//================================================================================================================================
+	struct PacketPlayerGameState
+	{
+		void Read( Packet& _packet )
+		{
+			_packet >> frameIndex;
+			_packet >> playerID;
+			_packet >> position[0]			>> position[1]			>> position[2];
+			_packet >> orientation[0]		>> orientation[1]		>> orientation[2];
+			_packet >> velocity[0]			>> velocity[1]			>> velocity[2];
+			_packet >> angularVelocity[0]	>> angularVelocity[1]	>> angularVelocity[2];
+		}
+
+		void Write( Packet& _packet ) const
+		{
+			_packet << PacketTypeInt( PacketType::PlayerGameState );
+			_packet << frameIndex;
+			_packet << playerID;
+			_packet << position[0]			<< position[1]			<< position[2];
+			_packet << orientation[0]		<< orientation[1]		<< orientation[2];
+			_packet << velocity[0]			<< velocity[1]			<< velocity[2];
+			_packet << angularVelocity[0]	<< angularVelocity[1]	<< angularVelocity[2];
+		}
+
+		FrameIndexNet	frameIndex;			// the  frame index when creating state
+		NetID			playerID;			
+		btVector3		position;			
+		btVector3		orientation;		
+		btVector3		velocity;			
+		btVector3		angularVelocity;
 	};
 	
 }

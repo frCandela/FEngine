@@ -42,6 +42,7 @@ namespace fan
 		netManager.spaceshipSpawnFrameIndex = 0;
 		netManager.spaceshipNetID = 0;
 		netManager.spaceshipHandle = 0;
+		netManager.synced = false;
 	}
 
 	//================================================================================================================================
@@ -102,17 +103,20 @@ namespace fan
 			}
 		}
 
-		// streams position
-		if( spaceshipHandle != 0 )
+		// streams input
+		if( spaceshipHandle != 0  && synced )
 		{
 			const EntityID entityID = _world.GetEntityID( spaceshipHandle );
 			const PlayerInput& input = _world.GetComponent<PlayerInput>( entityID );
-			nextInput.frameIndex = game->frameIndex;
-			nextInput.orientation = input.orientation;
-			nextInput.left = input.left;
-			nextInput.forward = input.forward;
-			nextInput.boost = input.boost;
-			nextInput.fire = input.fire;
+
+			PacketInput packetInput;
+			packetInput.frameIndex = game->frameIndex;
+			packetInput.orientation = input.orientation;
+			packetInput.left = input.left;
+			packetInput.forward = input.forward;
+			packetInput.boost = input.boost;
+			packetInput.fire = input.fire;
+			inputs.push( packetInput );
 		}
 	}
 
@@ -122,6 +126,7 @@ namespace fan
 	{
 		game->frameIndex += _framesDelta;
 		Debug::Warning() << "Shifted client frame index : " << _framesDelta << Debug::Endl();
+		synced = true;
 	}
 
 	//================================================================================================================================
@@ -204,6 +209,11 @@ namespace fan
 						packetReplication.Read( packet );
 						replicationManager->ProcessPacket( packetReplication );
 					} break;
+					case PacketType::PlayerGameState:
+					{
+						PacketPlayerGameState packetPlayerGameState;
+						packetPlayerGameState.Read( packet );
+					} break;
 					default:
 						Debug::Warning() << "Invalid packet " << int( packetType ) << " received. Reading canceled." << Debug::Endl();
 						packetValid = false;
@@ -253,7 +263,14 @@ namespace fan
 
 		// write packet
 		connection->Send( packet );
-		nextInput.Write( packet );
+
+		if( !inputs.empty() )
+		{
+			const PacketInput& lastInput = inputs.front();
+			inputs.pop();
+			assert( lastInput.frameIndex == game->frameIndex );
+			lastInput.Write( packet );
+		}
 
 		if( packet.GetSize() == sizeof( PacketTag ) ) { packet.onlyContainsAck = true; }
 
