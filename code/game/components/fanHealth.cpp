@@ -48,7 +48,7 @@ namespace fan
 	{
 		const Health& health = static_cast<const Health&>( _component );
 		Serializable::SaveFloat( _json, "max_energy", health.maxHealth );
-
+		Serializable::SaveBool( _json, "invincible", health.invincible );
 	}
 
 	//================================================================================================================================
@@ -57,6 +57,6 @@ namespace fan
 	{
 		Health& health = static_cast<Health&>( _component );
 		Serializable::LoadFloat( _json, "max_energy", health.maxHealth );
-
+		Serializable::LoadBool( _json, "invincible", health.invincible );
 	}
 }

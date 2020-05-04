@@ -87,13 +87,15 @@ namespace fan
 		{
 			if( world->HasComponent<Damage>( otherID ) )
 			{
-				Damage& damage = world->GetComponent<Damage>( otherID );
 				Health& health = world->GetComponent<Health>( spaceshipID );
-				health.currentHealth -= damage.damage;
-
-				if( health.currentHealth <= 0.f )
+				if( !health.invincible )
 				{
-					health.currentHealth = 0;
+					Damage& damage = world->GetComponent<Damage>( otherID );
+					health.currentHealth -= damage.damage;
+					if( health.currentHealth <= 0.f )
+					{
+						health.currentHealth = 0;
+					}
 				}
 			}
 		}
