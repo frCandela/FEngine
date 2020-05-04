@@ -36,6 +36,7 @@ namespace fan
 		bool		IsDeactivationEnabled() const;
 		void		EnableDeactivation( const bool _enable );
 		btVector3	GetVelocity() const;
+		btVector3   GetAngularVelocity() const;
 		void		SetVelocity( const btVector3& _velocity );
 		void		SetTransform( const btTransform& _transform ) { rigidbody.setWorldTransform( _transform ); }
 

@@ -88,10 +88,10 @@ namespace fan
 		solver = new btSequentialImpulseConstraintSolver();
 		dynamicsWorld = new btDiscreteDynamicsWorld( dispatcher, overlappingPairCache, solver, collisionConfiguration );
 
-		// deterministic configuration ( not sure if it helps -> please test )
-		btContactSolverInfo& info = dynamicsWorld->getSolverInfo();
-		info.m_solverMode = info.m_solverMode & ~( SOLVER_USE_WARMSTARTING );	// not tested
-		dynamicsWorld->getSimulationIslandManager()->setSplitIslands( false );  // not tested
+		// deterministic configuration ( not sure if it helps -> please test as you need it )
+// 		btContactSolverInfo& info = dynamicsWorld->getSolverInfo();
+// 		info.m_solverMode = info.m_solverMode & ~( SOLVER_USE_WARMSTARTING );	// not tested
+// 		dynamicsWorld->getSimulationIslandManager()->setSplitIslands( false );  // not tested
 
 		gContactStartedCallback = ContactStartedCallback;
 		gContactEndedCallback = ContactEndedCallback;
@@ -101,11 +101,13 @@ namespace fan
 		dynamicsWorld->stepSimulation( 0.015f, 1, Time::Get().GetPhysicsDelta() );
 	}
 
+	//================================================================================================================================
+	// this is untested copy pasted code, for inspiration before implementing the real feature
+	//================================================================================================================================	
 	void PhysicsWorld::Reset()
 	{
 		///create a copy of the array, not a reference!
 		const btCollisionObjectArray& collisionObjects = dynamicsWorld->getCollisionObjectArray();
-
 		for( int i = 0; i < dynamicsWorld->getNumCollisionObjects(); i++ )
 		{
 			btCollisionObject* colObj = collisionObjects[i];
@@ -124,22 +126,21 @@ namespace fan
 					colObj->setDeactivationTime( btScalar( 2e7 ) );
 				}
 				//removed cached contact points (this is not necessary if all objects have been removed from the dynamics world)
-				m_dynamicsWorld->getBroadphase()->getOverlappingPairCache()->cleanProxyFromPairs( colObj->getBroadphaseHandle(), m_dynamicsWorld->getDispatcher() );
+				dynamicsWorld->getBroadphase()->getOverlappingPairCache()->cleanProxyFromPairs( colObj->getBroadphaseHandle(), dynamicsWorld->getDispatcher() );
 
 				btRigidBody* body = btRigidBody::upcast( colObj );
 				if( body && !body->isStaticObject() )
 				{
 					btRigidBody::upcast( colObj )->setLinearVelocity( btVector3( 0, 0, 0 ) );
 					btRigidBody::upcast( colObj )->setAngularVelocity( btVector3( 0, 0, 0 ) );
-
 					btRigidBody::upcast( colObj )->clearForces();
 				}
 			}
 		}
 
-		///reset some internal cached data in the broad phase
-		m_dynamicsWorld->getBroadphase()->resetPool( m_dynamicsWorld->getDispatcher() );
-		m_dynamicsWorld->getConstraintSolver()->reset();
+		// reset some internal cached data in the broad phase
+		dynamicsWorld->getBroadphase()->resetPool( dynamicsWorld->getDispatcher() );
+		dynamicsWorld->getConstraintSolver()->reset();
 	}
 
 	//================================================================================================================================
