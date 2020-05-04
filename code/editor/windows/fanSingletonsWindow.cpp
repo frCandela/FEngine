@@ -8,7 +8,7 @@ namespace fan
 	//================================================================================================================================
 	//================================================================================================================================
 	SingletonsWindow::SingletonsWindow( EcsWorld& _world ) :
-		EditorWindow( "singletons", ImGui::IconType::NONE )
+		EditorWindow( "singletons", ImGui::IconType::SINGLETON16 )
 		, m_world( &_world )
 	{
 	}

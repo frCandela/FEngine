@@ -29,6 +29,7 @@ namespace ImGui
 		,DECL_ICON( 16.f, 6, 4 )  // ECS16,
 		,DECL_ICON( 16.f, 7, 4 )  // PROFILER16,
 		,DECL_ICON( 16.f, 8, 4 )  // PREFERENCES16,
+		,DECL_ICON( 16.f, 9, 4 )  // SINGLETON16,
 
 		// scene special
 		,DECL_ICON( 16.f, 0, 6 )  // GAMEOBJECT16,
@@ -54,11 +55,11 @@ namespace ImGui
 		,DECL_ICON( 16.f, 7, 8 )  // MESH_RENDERER16,
 		,DECL_ICON( 16.f, 8, 8 )  // RIGIDBODY16,
 		,DECL_ICON( 16.f, 9, 8 )  // CUBE_SHAPE16,
-		,DECL_ICON( 16.f, 10, 8 )  // SPHERE_SHAPE16,
-		,DECL_ICON( 16.f, 11, 8 )  // UI_MESH_RENDERER16,
-		,DECL_ICON( 16.f, 12, 8 )  // UI_TRANSFORM16,
-		,DECL_ICON( 16.f, 13, 8 )  // UI_PROGRESS_BAR16,
-		,DECL_ICON( 16.f, 14, 8 )  // FOLLOW_TRANSFORM
+		,DECL_ICON( 16.f, 10, 8 ) // SPHERE_SHAPE16,
+		,DECL_ICON( 16.f, 11, 8 ) // UI_MESH_RENDERER16,
+		,DECL_ICON( 16.f, 12, 8 ) // UI_TRANSFORM16,
+		,DECL_ICON( 16.f, 13, 8 ) // UI_PROGRESS_BAR16,
+		,DECL_ICON( 16.f, 14, 8 ) // FOLLOW_TRANSFORM
 
 		// generics	
 		,DECL_ICON( 16.f, 0, 10 )  // SOLAR_SYSTEM16,

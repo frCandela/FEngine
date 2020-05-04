@@ -20,6 +20,7 @@ namespace ImGui
 		ECS16,
 		PROFILER16,
 		PREFERENCES16,
+		SINGLETON16,
 
 		// special
 		GAMEOBJECT16,

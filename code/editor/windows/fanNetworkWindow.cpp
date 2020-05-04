@@ -12,7 +12,7 @@ namespace fan
 	//================================================================================================================================
 	//================================================================================================================================
 	NetworkWindow::NetworkWindow( EcsWorld& _world )
-		: EditorWindow( "network", ImGui::IconType::JOYSTICK16 )
+		: EditorWindow( "network", ImGui::IconType::NETWORK16 )
 		, m_world( &_world )
 	{
 
