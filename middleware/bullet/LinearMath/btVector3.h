@@ -133,7 +133,7 @@ public:
 
 	// @begin fcandela
 	static btVector3 Left()		{ return btVector3( 1.f, 0.f, 0.f);	}
-	static btVector3 Up()			{ return btVector3( 0.f, 1.f, 0.f);	}
+	static btVector3 Up()		{ return btVector3( 0.f, 1.f, 0.f);	}
 	static btVector3 Forward()	{ return btVector3( 0.f, 0.f, 1.f);	}
 	static btVector3 Zero()		{ return btVector3( 0.f, 0.f, 0.f); }
 	static btVector3 One()		{ return btVector3( 1.f, 1.f, 1.f); }

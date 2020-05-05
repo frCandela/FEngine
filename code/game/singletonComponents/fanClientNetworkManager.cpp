@@ -1,12 +1,14 @@
 #include "game/singletonComponents/fanClientNetworkManager.hpp"
 
 #include "core/fanDebug.hpp"
-#include "scene/fanSceneSerializable.hpp"
-#include "ecs/fanEcsWorld.hpp"
 #include "core/time/fanTime.hpp"
 #include "game/singletonComponents/fanGame.hpp"
 #include "game/components/fanPlayerController.hpp"
 #include "game/components/fanPlayerInput.hpp"
+#include "ecs/fanEcsWorld.hpp"
+#include "scene/fanSceneSerializable.hpp"
+#include "scene/components/fanTransform.hpp"
+#include "scene/components/fanRigidbody.hpp"
 #include "network/singletonComponents/fanDeliveryNotificationManager.hpp"
 #include "network/singletonComponents/fanClientReplicationManager.hpp"
 #include "network/singletonComponents/fanClientConnectionManager.hpp"
@@ -84,6 +86,63 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
+	void ClientNetworkManager::ShiftFrameIndex( const int _framesDelta )
+	{
+		game->frameIndex += _framesDelta;
+		previousStates = std::queue< PacketPlayerGameState >(); // clear
+		Debug::Warning() << "Shifted client frame index : " << _framesDelta << Debug::Endl();
+		synced = true;
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
+	void ClientNetworkManager::SpawnShip( NetID _spaceshipID, FrameIndex _frameIndex )
+	{
+		if( spaceshipNetID == 0 )
+		{
+			spaceshipSpawnFrameIndex = _frameIndex;
+			spaceshipNetID = _spaceshipID;
+		}
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
+	void ClientNetworkManager::ProcessPacket( const PacketPlayerGameState& _packet )
+	{
+		// get the current input for this client
+		while( ! previousStates.empty() )
+		{
+			const PacketPlayerGameState& packetInput = previousStates.front();
+			if( packetInput.frameIndex < _packet.frameIndex )
+			{
+				previousStates.pop();
+			}
+			else
+			{
+				break;
+			}
+		}
+
+		// moves spaceship						
+		if( !previousStates.empty() && previousStates.front().frameIndex == _packet.frameIndex )
+		{
+			const PacketPlayerGameState& packetState = previousStates.front();
+			previousStates.pop();
+
+			if( packetState != _packet )
+			{
+				Debug::Warning() << "player is out of sync" << Debug::Endl();
+			}
+
+		}
+		else
+		{
+			Debug::Warning() << "no available game state for this frame" << Debug::Endl();
+		}
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
 	void ClientNetworkManager::Update( EcsWorld& _world )
 	{
 		replicationManager->ReplicateSingletons( _world );
@@ -104,12 +163,12 @@ namespace fan
 			}
 		}
 
-		// streams input
 		if( spaceshipHandle != 0  && synced )
 		{
 			const EntityID entityID = _world.GetEntityID( spaceshipHandle );
 			const PlayerInput& input = _world.GetComponent<PlayerInput>( entityID );
 
+			// streams input to the server
 			PacketInput packetInput;
 			packetInput.frameIndex = game->frameIndex;
 			packetInput.orientation = input.orientation;
@@ -118,26 +177,17 @@ namespace fan
 			packetInput.boost = input.boost;
 			packetInput.fire = input.fire;
 			inputs.push( packetInput );
-		}
-	}
 
-	//================================================================================================================================
-	//================================================================================================================================
-	void ClientNetworkManager::ShiftFrameIndex( const int _framesDelta )
-	{
-		game->frameIndex += _framesDelta;
-		Debug::Warning() << "Shifted client frame index : " << _framesDelta << Debug::Endl();
-		synced = true;
-	}
-
-	//================================================================================================================================
-	//================================================================================================================================
-	void ClientNetworkManager::SpawnShip( NetID _spaceshipID, FrameIndex _frameIndex )
-	{
-		if( spaceshipNetID == 0 )
-		{
-			spaceshipSpawnFrameIndex = _frameIndex;
-			spaceshipNetID = _spaceshipID;
+			// saves previous player state
+			const Rigidbody& rb = _world.GetComponent<Rigidbody>( entityID );
+			const Transform& transform = _world.GetComponent<Transform>( entityID );
+			PacketPlayerGameState playerState;			
+			playerState.frameIndex = game->frameIndex;
+			playerState.position = transform.GetPosition();
+			playerState.orientation = transform.GetRotationEuler();
+			playerState.velocity = rb.GetVelocity();
+			playerState.angularVelocity = rb.GetAngularVelocity();
+			previousStates.push( playerState );
 		}
 	}
 
@@ -214,6 +264,7 @@ namespace fan
 					{
 						PacketPlayerGameState packetPlayerGameState;
 						packetPlayerGameState.Read( packet );
+						ProcessPacket( packetPlayerGameState );
 					} break;
 					default:
 						Debug::Warning() << "Invalid packet " << int( packetType ) << " received. Reading canceled." << Debug::Endl();

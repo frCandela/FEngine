@@ -27,11 +27,12 @@ namespace fan
 		static void Save( const SingletonComponent& _component, Json& _json );
 		static void Load( SingletonComponent& _component, const Json& _json );
 
-		FrameIndex spaceshipSpawnFrameIndex;	// the frame index on which the spaceship is spawned
-		NetID	 spaceshipNetID;
-		EntityHandle spaceshipHandle;
+		FrameIndex		spaceshipSpawnFrameIndex;	// the frame index on which the spaceship is spawned
+		NetID			spaceshipNetID;
+		EntityHandle	spaceshipHandle;
 
-		 std::queue< PacketInput > inputs;
+		 std::queue< PacketInput >			 inputs;
+		 std::queue< PacketPlayerGameState > previousStates;
 		 bool synced;
 
 		// pre-get singletons
@@ -47,6 +48,8 @@ namespace fan
 		void Update( EcsWorld& _world );
 		void NetworkSend();
 		void NetworkReceive();
+
+		void ProcessPacket( const PacketPlayerGameState& _packet );
 
 		// RPC callbacks
 		void ShiftFrameIndex( const int _framesDelta );

@@ -9,6 +9,7 @@
 #include "SFML/Network.hpp"
 
 #include "core/fanSignal.hpp"
+#include "core/fanDebug.hpp"
 #include "bullet/LinearMath/btVector3.h"
 
 namespace fan
@@ -222,7 +223,6 @@ namespace fan
 		void Read( Packet& _packet )
 		{
 			_packet >> frameIndex;
-			_packet >> playerID;
 			_packet >> position[0]			>> position[1]			>> position[2];
 			_packet >> orientation[0]		>> orientation[1]		>> orientation[2];
 			_packet >> velocity[0]			>> velocity[1]			>> velocity[2];
@@ -233,15 +233,23 @@ namespace fan
 		{
 			_packet << PacketTypeInt( PacketType::PlayerGameState );
 			_packet << frameIndex;
-			_packet << playerID;
 			_packet << position[0]			<< position[1]			<< position[2];
 			_packet << orientation[0]		<< orientation[1]		<< orientation[2];
 			_packet << velocity[0]			<< velocity[1]			<< velocity[2];
 			_packet << angularVelocity[0]	<< angularVelocity[1]	<< angularVelocity[2];
 		}
 
-		FrameIndexNet	frameIndex;			// the  frame index when creating state
-		NetID			playerID;			
+		bool operator==( const PacketPlayerGameState& _other ) const
+		{
+			return    frameIndex == _other.frameIndex &&
+				( position			- _other.position			).fuzzyZero() &&
+				( orientation		- _other.orientation		).fuzzyZero() &&
+				( velocity			- _other.velocity			).fuzzyZero() &&
+				( angularVelocity	- _other.angularVelocity	).fuzzyZero();
+		}
+		bool operator!=( const PacketPlayerGameState& _other ) const { return !( *this == _other ); }
+
+		FrameIndexNet	frameIndex;			// the  frame index when creating state		
 		btVector3		position;			
 		btVector3		orientation;		
 		btVector3		velocity;			

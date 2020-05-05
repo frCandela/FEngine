@@ -101,6 +101,14 @@ namespace fan
 	}
 
 	//================================================================================================================================
+	//================================================================================================================================
+	void ServerNetworkManager::OnSyncSuccess( HostID _hostID )
+	{
+		Client& client = connection->clients[_hostID];
+		client.synced = true;
+	}
+
+	//================================================================================================================================
 	// Updates network objects in preparation for sending it to all clients
 	//================================================================================================================================
 	void ServerNetworkManager::Update( EcsWorld& _world )
@@ -112,8 +120,8 @@ namespace fan
 			if( client.state == Client::State::Connected )
 			{
 				HostData& hostData = hostDatas[i];
-				
-				if( client.synced == true  )
+
+				if( client.synced == true )
 				{
 					if( hostData.spaceshipID == 0 )
 					{
@@ -128,7 +136,7 @@ namespace fan
 							, ServerReplicationManager::ResendUntilReplicated
 						);
 					}
-					
+
 					if( hostData.spaceshipID != 0 )
 					{
 						// get the current input for this client
@@ -147,7 +155,7 @@ namespace fan
 
 						// moves spaceship						
 						if( !hostData.inputs.empty() && hostData.inputs.front().frameIndex == game->frameIndex )
-						{	
+						{
 							const PacketInput& packetInput = hostData.inputs.front();
 							hostData.inputs.pop();
 							const EntityID entityID = _world.GetEntityID( hostData.spaceshipHandle );
@@ -169,7 +177,6 @@ namespace fan
 							const Rigidbody& rb = _world.GetComponent<Rigidbody>( entityID );
 							const Transform& transform = _world.GetComponent<Transform>( entityID );
 							hostData.nextPlayerState.frameIndex = game->frameIndex;
-							hostData.nextPlayerState.playerID = client.hostId;
 							hostData.nextPlayerState.position = transform.GetPosition();
 							hostData.nextPlayerState.orientation = transform.GetRotationEuler();
 							hostData.nextPlayerState.velocity = rb.GetVelocity();
@@ -194,9 +201,9 @@ namespace fan
 						if( std::abs( min + targetFrameDifference ) > 2 ) // only sync when we have a big enough frame index difference
 						{
 							RPCManager& rpcManager = _world.GetSingletonComponent<RPCManager>();
-							ServerReplicationManager& replication = _world.GetSingletonComponent<ServerReplicationManager>();							
-							
-							Signal<HostID>& success = * replication.ReplicateOnClient(
+							ServerReplicationManager& replication = _world.GetSingletonComponent<ServerReplicationManager>();
+
+							Signal<HostID>& success = *replication.ReplicateOnClient(
 								client.hostId
 								, rpcManager.RPCShiftClientFrame( min + targetFrameDifference )
 								, ServerReplicationManager::ResendUntilReplicated
@@ -210,14 +217,6 @@ namespace fan
 				}
 			}
 		}
-	}
-
-	//================================================================================================================================
-	//================================================================================================================================
-	void ServerNetworkManager::OnSyncSuccess( HostID _hostID )
-	{
-		Client& client = connection->clients[_hostID];
-		client.synced = true;
 	}
 
 	//================================================================================================================================
