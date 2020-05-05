@@ -31,6 +31,7 @@ namespace fan
 		double		lastResponseTime = 0.f;		// last time the client answered back
 		double		lastPingTime = 0.f;			// last time the client was sent a ping
 		float		rtt = -1.f;
+		float		bandwidth = 0.f;			// Ko/s send to the client
 
 		// client frame index synchronization
 		bool				synced = false;		// true if the client has been synced 

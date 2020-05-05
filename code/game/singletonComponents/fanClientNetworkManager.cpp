@@ -280,6 +280,7 @@ namespace fan
 		if( packet.GetSize() > sizeof( PacketTag ) )
 		{
 			deliveryNotificationManager->RegisterPacket( packet );
+			connection->bandwidth = 1.f / game->logicDelta * float( packet.GetSize() ) / 1000.f; // in Ko/s
 			connection->socket.Send( packet, connection->serverIP, connection->serverPort );
 		}
 		else

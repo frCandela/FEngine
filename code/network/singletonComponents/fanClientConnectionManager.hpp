@@ -36,6 +36,7 @@ namespace fan
 		ClientState		state;
 		float			rtt;
 		float			timeoutTime;			// disconnects from server after X seconds without a response
+		float			bandwidth;				// in Ko/s
 		double			serverLastResponse;
 
 		PacketPing		lastPacketPing;

@@ -365,6 +365,7 @@ namespace fan
 			if( packet.GetSize() > sizeof( PacketTag ) )// don't send empty packets
 			{
 				deliveryNotification->RegisterPacket( packet, client.hostId );
+				client.bandwidth = 1.f / game->logicDelta * float( packet.GetSize() ) / 1000.f; // in Ko/s
 				connection->socket.Send( packet, client.ip, client.port );
 			}
 			else

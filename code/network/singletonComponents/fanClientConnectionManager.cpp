@@ -165,6 +165,7 @@ namespace fan
 			ImGui::Text( "server adress         %s::%u", connection.serverIP.toString().c_str(), connection.serverPort );			
 			ImGui::Text( "rtt                  "); ImGui::SameLine();
 			ImGui::TextColored( GetRttColor( connection.rtt ), "%.1f", 1000.f * connection.rtt );
+			ImGui::Text( "bandwidth:            %.1f Ko/s", connection.bandwidth );
 			ImGui::Text( "server last response: %.1f", Time::Get().ElapsedSinceStartup() - connection.serverLastResponse );
 		}ImGui::Unindent(); ImGui::Unindent();
 	}

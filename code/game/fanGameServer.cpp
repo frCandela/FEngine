@@ -227,7 +227,6 @@ namespace fan
 
 			S_UpdateGameCamera::Run( world, world.Match( S_UpdateGameCamera::GetSignature( world ) ), _delta );
 
-			
 			netManager->NetworkSend();
 		}
 

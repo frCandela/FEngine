@@ -258,10 +258,11 @@ namespace fan
 			// draw all clients
 			if( ImGui::CollapsingHeader( "clients" ) )
 			{
-				ImGui::Columns( 6 );
+				ImGui::Columns( 7 );
 				ImGui::Text( "name" );			ImGui::NextColumn();
 				ImGui::Text( "state" );			ImGui::NextColumn();
 				ImGui::Text( "rtt" );			ImGui::NextColumn();
+				ImGui::Text( "bandwidth" );			ImGui::NextColumn();
 				ImGui::Text( "last response" );	ImGui::NextColumn();
 				ImGui::Text( "adress" );		ImGui::NextColumn();				
 				ImGui::Text( "frame delta" );	ImGui::NextColumn();
@@ -276,6 +277,9 @@ namespace fan
 					ImGui::NextColumn();
 
 					ImGui::TextColored( GetRttColor( client.rtt ), "%.1f", 1000.f * client.rtt );
+					ImGui::NextColumn();
+
+					ImGui::Text( "%.1f Ko/s", client.bandwidth );
 					ImGui::NextColumn();
 
 					ImGui::Text( "%.1f", currentTime - client.lastResponseTime );
