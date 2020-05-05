@@ -185,19 +185,32 @@ namespace fan
 		ServerReplicationManager& replicationManager = static_cast<ServerReplicationManager&>( _component );
 
 		ImGui::Indent(); ImGui::Indent();
+		ImGui::Columns( 3 );
+
+		ImGui::Text( "id" );					ImGui::NextColumn();
+		ImGui::Text( "next replication" );		ImGui::NextColumn();
+		ImGui::Text( "pending replication" );	ImGui::NextColumn();
+
 		{
 			for (int i = 0; i < replicationManager.hostDatas.size(); i++)
 			{
 				HostData& data = replicationManager.hostDatas[i];
 				if( !data.isNull )
 				{
-					ImGui::Text( "client %d", i );
-					ImGui::Text( "next replication:     %d", data.nextReplication.size() );
-					ImGui::Text( "pending replication:  %d", data.pendingReplication.size() );
-					ImGui::Spacing(); ImGui::Spacing();
+					ImGui::Text( "%d", i ); 
+					ImGui::NextColumn();
+
+					ImGui::Text( "%d", data.nextReplication.size() );
+					ImGui::NextColumn();
+
+					ImGui::Text( "%d", data.pendingReplication.size() );
+					ImGui::NextColumn();
+
 				}
 			}
 		}
+
+		ImGui::Columns( 1 );
 		ImGui::Unindent(); ImGui::Unindent();
 	}
 }

@@ -398,16 +398,24 @@ namespace fan
 
 		ImGui::Indent(); ImGui::Indent();
 		{
+			ImGui::Columns( 2 );
+			ImGui::Text( "id" );			ImGui::NextColumn();
+			ImGui::Text( "input buffer size");  ImGui::NextColumn();
+			
+
 			for (int i = 0; i < netManager.hostDatas.size(); i++)
 			{
 				HostData& data = netManager.hostDatas[i];
 				if( !data.isNull )
 				{
-					ImGui::Text( "client %d", i );
-					ImGui::Text( "input buffer size %d", data.inputs.size() );
-					ImGui::Spacing(); ImGui::Spacing();
+					ImGui::Text( "%d", i ); 
+					ImGui::NextColumn();
+
+					ImGui::Text( "%d", data.inputs.size() );
+					ImGui::NextColumn();
 				}
 			}
+			ImGui::Columns( 1 );
 		}
 		ImGui::Unindent(); ImGui::Unindent();
 	}

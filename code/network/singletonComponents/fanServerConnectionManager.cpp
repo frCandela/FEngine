@@ -255,23 +255,39 @@ namespace fan
 			// 			game.frameStart = game.frameIndex + 180;
 			// 		}
 
-					// draw all clients
+			// draw all clients
 			if( ImGui::CollapsingHeader( "clients" ) )
 			{
-				for( int i = (int)connection.clients.size() - 1; i >= 0; i-- )
-				{
-					Client& client = connection.clients[i];
+				ImGui::Columns( 6 );
+				ImGui::Text( "name" );			ImGui::NextColumn();
+				ImGui::Text( "state" );			ImGui::NextColumn();
+				ImGui::Text( "rtt" );			ImGui::NextColumn();
+				ImGui::Text( "last response" );	ImGui::NextColumn();
+				ImGui::Text( "adress" );		ImGui::NextColumn();				
+				ImGui::Text( "frame delta" );	ImGui::NextColumn();
 
-					ImGui::Text( "name           %s", client.name.c_str() );
-					ImGui::Text( "state:        " ); ImGui::SameLine();
-					ImGui::TextColored( GetStateColor( client.state ),  "%s", GetStateName( client.state ).c_str() );
-					ImGui::Text( "adress         %s::%u", client.ip.toString().c_str(), client.port );
-					ImGui::Text( "rtt           "); ImGui::SameLine();
+				for( int i = (int)connection.clients.size() - 1; i >= 0; i-- )
+				{					
+					Client& client = connection.clients[i];
+					ImGui::Text( client.name.c_str());
+					ImGui::NextColumn();
+
+					ImGui::TextColored( GetStateColor( client.state ), GetStateName( client.state ).c_str() );
+					ImGui::NextColumn();
+
 					ImGui::TextColored( GetRttColor( client.rtt ), "%.1f", 1000.f * client.rtt );
-					ImGui::Text( "frame delta    %d %d %d %d %d", client.framesDelta[0], client.framesDelta[1], client.framesDelta[2], client.framesDelta[3], client.framesDelta[4] );
-					ImGui::Text( "last response  %.1f", currentTime - client.lastResponseTime );
-					ImGui::Spacing();
+					ImGui::NextColumn();
+
+					ImGui::Text( "%.1f", currentTime - client.lastResponseTime );
+					ImGui::NextColumn();
+
+					ImGui::Text( "%s::%u", client.ip.toString().c_str(), client.port );
+					ImGui::NextColumn();
+ 					
+					ImGui::Text( "%d %d %d %d %d", client.framesDelta[0], client.framesDelta[1], client.framesDelta[2], client.framesDelta[3], client.framesDelta[4] );
+					ImGui::NextColumn();
 				}
+				ImGui::Columns( 1 );
 			}
 		}ImGui::Unindent(); ImGui::Unindent();
 	}

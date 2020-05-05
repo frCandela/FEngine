@@ -188,17 +188,35 @@ namespace fan
 			
 			ImGui::DragFloat( "timeout", &deliveryNotificationManager.timeoutDuration );
 
+			ImGui::Columns( 5 );
+			ImGui::Text( "id" );				ImGui::NextColumn();
+			ImGui::Text( "next packet tag");		ImGui::NextColumn();
+			ImGui::Text( "expected packet tag");	ImGui::NextColumn();
+			ImGui::Text( "num pending ack");		ImGui::NextColumn();
+			ImGui::Text( "num in flight packets");	ImGui::NextColumn();	
+
 			for (int i = 0; i < deliveryNotificationManager.hostDatas.size(); i++)
 			{
 				HostData& hostData = deliveryNotificationManager.hostDatas[i];
 
-				ImGui::Text( "Host %d:", i );
-				ImGui::Text( "next packet tag:       %d",   hostData.nextPacketTag );
-				ImGui::Text( "expected packet tag:   %d",   hostData.expectedPacketTag );
-				ImGui::Text( "num pending ack:       %d",   hostData.pendingAck.size() );
-				ImGui::Text( "num in flight packets: %d",   hostData.inFlightPackets.size() );
-				ImGui::Spacing(); ImGui::Spacing();
+				ImGui::Text( "%d", i );
+				ImGui::NextColumn();
+
+				ImGui::Text( "%d",   hostData.nextPacketTag );
+				ImGui::NextColumn();
+
+				ImGui::Text( "%d",   hostData.expectedPacketTag );
+				ImGui::NextColumn();
+
+				ImGui::Text( "%d",   hostData.pendingAck.size() );
+				ImGui::NextColumn();
+
+				ImGui::Text( "%d",   hostData.inFlightPackets.size() );
+				ImGui::NextColumn();
+
 			}
-		}ImGui::Unindent(); ImGui::Unindent();
+
+			ImGui::Columns( 1 );
+		} ImGui::Unindent(); ImGui::Unindent();
 	}
 }
