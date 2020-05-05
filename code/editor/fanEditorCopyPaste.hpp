@@ -1,7 +1,5 @@
 #pragma once
 
-#include "editor/fanEditorPrecompiled.hpp"
-
 namespace fan
 {
 	class EditorSelection;

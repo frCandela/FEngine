@@ -1,8 +1,10 @@
 #include "editor/fanModals.hpp"
 
+#include <sstream>
 #include "core/input/fanInput.hpp"
 #include "core/input/fanKeyboard.hpp"
 #include "core/input/fanMouse.hpp"
+#include "fanImgui.hpp"
 #include "imgui/imgui_internal.h"
 
 //================================================================================================================================

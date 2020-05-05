@@ -1,5 +1,6 @@
 #include "game/singletonComponents/fanSolarEruption.hpp"
 
+#include "core/fanDebug.hpp"
 #include "editor/fanModals.hpp"
 #include "scene/fanSceneSerializable.hpp"
 #include "ecs/fanEcsWorld.hpp"

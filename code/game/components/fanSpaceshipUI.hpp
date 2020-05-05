@@ -1,7 +1,5 @@
 #pragma once
 
-#include "game/fanGamePrecompiled.hpp"
-
 #include "ecs/fanComponent.hpp"
 #include "scene/fanSceneResourcePtr.hpp"
 #include "scene/components/ui/fanUIRenderer.hpp"

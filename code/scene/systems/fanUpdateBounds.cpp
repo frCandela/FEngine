@@ -1,5 +1,6 @@
 #include "scene/systems/fanUpdateBounds.hpp"
 
+#include "core/math/fanMathUtils.hpp"
 #include "scene/components/fanBounds.hpp"
 #include "scene/components/fanMeshRenderer.hpp"
 #include "scene/components/fanBounds.hpp"

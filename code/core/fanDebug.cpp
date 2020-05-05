@@ -1,4 +1,6 @@
 #include "core/fanDebug.hpp"
+
+#include <iostream>
 #include "core/time/fanTime.hpp"
 
 namespace fan

@@ -1,5 +1,6 @@
 #include "scene/components/fanRigidbody.hpp"
 
+#include "bullet/btBulletDynamicsCommon.h"
 #include "render/fanRenderSerializable.hpp"
 #include "scene/singletonComponents/fanPhysicsWorld.hpp"
 #include "ecs/fanEcsWorld.hpp"

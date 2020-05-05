@@ -1,8 +1,8 @@
 #pragma once
 
-#include "editor/fanEditorPrecompiled.hpp"
 #include "editor/windows/fanEditorWindow.hpp"
 #include "core/time/fanProfiler.hpp"
+#include "core/fanColor.hpp"
 
 namespace fan
 {

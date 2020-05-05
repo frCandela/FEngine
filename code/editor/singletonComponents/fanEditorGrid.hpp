@@ -1,7 +1,8 @@
 #pragma once
 
-#include "editor/fanEditorPrecompiled.hpp"
+#include "bullet/LinearMath/btVector3.h"
 #include "ecs/fanSingletonComponent.hpp"
+#include "core/fanColor.hpp"
 
 namespace fan
 {

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "core/fanCorePrecompiled.hpp"
+#include "fanGLFW.hpp"
 #include "core/fanSingleton.hpp"
 #include "core/fanSignal.hpp"
 

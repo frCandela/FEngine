@@ -1,6 +1,6 @@
 #pragma once
 
-#include "render/fanRenderPrecompiled.hpp"
+#include "fanGLFW.hpp"
 
 namespace fan
 {

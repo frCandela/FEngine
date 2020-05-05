@@ -1,7 +1,6 @@
 #pragma once
 
-#include "game/fanGamePrecompiled.hpp"
-
+#include "bullet/LinearMath/btVector3.h"
 #include "ecs/fanComponent.hpp"
 #include "scene/fanSceneResourcePtr.hpp"
 

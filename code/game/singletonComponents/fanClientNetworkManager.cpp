@@ -1,5 +1,6 @@
 #include "game/singletonComponents/fanClientNetworkManager.hpp"
 
+#include "core/fanDebug.hpp"
 #include "scene/fanSceneSerializable.hpp"
 #include "ecs/fanEcsWorld.hpp"
 #include "core/time/fanTime.hpp"

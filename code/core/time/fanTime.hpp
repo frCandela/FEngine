@@ -1,6 +1,8 @@
 #pragma once
 
-#include "core/fanCorePrecompiled.hpp"
+#include <string>
+#include <cstdint>
+#include "fanGLFW.hpp"
 #include "core/fanSingleton.hpp"
 
 namespace fan

@@ -1,5 +1,6 @@
 #include "game/systems/fanUpdateSpaceships.hpp"
 
+#include "core/fanDebug.hpp"
 #include "scene/fanSceneTags.hpp"
 #include "scene/components/fanTransform.hpp"
 #include "scene/components/fanRigidbody.hpp"

@@ -1,6 +1,5 @@
 #pragma once
 
-#include "game/fanGamePrecompiled.hpp"
 #include "ecs/fanComponent.hpp"
 
 namespace fan

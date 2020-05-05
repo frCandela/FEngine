@@ -1,9 +1,11 @@
 #include "render/core/fanFrameBuffer.hpp"
+
+#include <cassert>
+#include "core/fanDebug.hpp"
 #include "render/core/fanDevice.hpp"
 #include "render/core/fanSampler.hpp"
 #include "render/core/fanImage.hpp"
 #include "render/core/fanImageView.hpp" 
-
 
 namespace fan
 {

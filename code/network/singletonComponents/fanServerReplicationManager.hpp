@@ -9,7 +9,7 @@ namespace fan
 	class EcsWorld;
 
 	//================================================================================================================================
-	// [Server] sends packets to clients to replicates objects / run PRC
+	// Sends packets to clients to replicates objects / run PRC
 	//================================================================================================================================
 	struct ServerReplicationManager : public SingletonComponent
 	{
@@ -24,7 +24,7 @@ namespace fan
 		enum ReplicationFlags
 		{
 			None = 0,
-			ResendUntilReplicated = 1 << 1	// if the packets is droppeds, resend it
+			ResendUntilReplicated = 1 << 1	// if the packets drops, resend it
 		};
 
 		//================================================================

@@ -1,5 +1,6 @@
 #include "editor/windows/fanProfilerWindow.hpp"
 
+#include <sstream>
 #include "editor/fanModals.hpp"
 #include "core/input/fanInputManager.hpp"
 #include "core/time/fanProfiler.hpp"

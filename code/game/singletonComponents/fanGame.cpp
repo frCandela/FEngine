@@ -1,7 +1,7 @@
 #include "game/singletonComponents/fanGame.hpp"
 
+#include "core/fanDebug.hpp"
 #include "ecs/fanEcsWorld.hpp"
-
 #include "scene/singletonComponents/fanScene.hpp"
 #include "scene/singletonComponents/fanPhysicsWorld.hpp"
 #include "scene/components/fanSceneNode.hpp"

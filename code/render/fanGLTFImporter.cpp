@@ -1,6 +1,9 @@
 #include "render/fanGLTFImporter.hpp"
 #include "render/fanMesh.hpp"
 
+#include <filesystem>
+#include <fstream>
+#include "core/fanDebug.hpp"
 #include "core/memory/fanBase64.hpp"
 #include "core/time/fanScopedTimer.hpp"
 

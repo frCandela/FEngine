@@ -1,7 +1,7 @@
 #pragma once
 
-#include "render/fanRenderPrecompiled.hpp"
-
+#include <map>
+#include <string>
 #include "core/resources/fanResourcePtr.hpp"
 
 namespace fan

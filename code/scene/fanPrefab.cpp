@@ -1,5 +1,7 @@
 #include "scene/fanPrefab.hpp"
 
+#include <fstream>
+#include "core/fanDebug.hpp"
 #include "scene/components/fanSceneNode.hpp"
 #include "scene/singletonComponents/fanScene.hpp"
 #include "ecs/fanEcsWorld.hpp"

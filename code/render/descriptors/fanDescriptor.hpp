@@ -1,6 +1,7 @@
 #pragma once
 
-#include "render/fanRenderPrecompiled.hpp"
+#include "fanGLFW.hpp"
+#include <vector>
 #include "core/memory/fanAlignedMemory.hpp"
 
 namespace fan

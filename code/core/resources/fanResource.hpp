@@ -1,10 +1,7 @@
 #pragma once
 
-#include "core/fanCorePrecompiled.hpp"
-
 namespace fan
 {
-
 	template< typename T > class ResourceList;
 	template< typename T > class ResourcePtr;
 

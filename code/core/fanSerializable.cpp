@@ -1,6 +1,10 @@
 #include "fanSerializable.hpp"
 
+#include "bullet/LinearMath/btVector3.h"
+#include "bullet/LinearMath/btQuaternion.h"
+#include "core/fanDebug.hpp"
 #include "core/math/fanVector2.hpp"
+#include "core/fanColor.hpp"
 
 namespace fan
 {

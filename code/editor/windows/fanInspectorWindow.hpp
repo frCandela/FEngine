@@ -1,6 +1,7 @@
 #pragma once
 
-#include "editor/fanEditorPrecompiled.hpp"
+#include <set>
+#include <filesystem>
 #include "editor/windows/fanEditorWindow.hpp"
 #include "ecs/fanEcsTypes.hpp"
 

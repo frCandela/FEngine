@@ -1,6 +1,9 @@
 #pragma once
 
-#include "editor/fanEditorPrecompiled.hpp"
+#include "bullet/LinearMath/btVector3.h"
+#include "bullet/LinearMath/btTransform.h"
+#include <map>
+#include <cassert>
 
 namespace fan
 {

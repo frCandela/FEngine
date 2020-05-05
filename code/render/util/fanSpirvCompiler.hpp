@@ -1,6 +1,8 @@
 #pragma once
 
-#include "render/fanRenderPrecompiled.hpp"
+#include <vector>
+#include <cstdint>
+#include <string>
 
 namespace fan
 {

@@ -1,8 +1,8 @@
 #pragma  once
 
-#include "scene/fanScenePrecompiled.hpp"
-
 #include "ecs/fanComponent.hpp"
+
+#include "bullet/btBulletDynamicsCommon.h"
 
 namespace fan
 {

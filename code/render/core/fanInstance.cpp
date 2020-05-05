@@ -1,5 +1,8 @@
 #include "render/core/fanInstance.hpp"
 
+#include <iostream>
+#include "core/fanDebug.hpp"
+
 namespace fan
 {
 	//================================================================================================================================
@@ -176,8 +179,8 @@ namespace fan
 	//================================================================================================================================
 	VKAPI_ATTR VkBool32 VKAPI_CALL Instance::DebugCallback( VkDebugReportFlagsEXT /*_flags*/, VkDebugReportObjectTypeEXT /*_objType*/, uint64_t /*_obj*/, size_t /*_location*/, int32_t /*_code*/, const char* /*_layerPrefix*/, const char* _msg, void* /*_userData*/ )
 	{
-
-		Debug::Get() << Debug::Severity::error << "Vulkan  Error:  " << _msg << Debug::Endl();
+		//Debug::Get() << Debug::Severity::error << "Vulkan  Error:  " << _msg << Debug::Endl();
+		std::cout << "Vulkan  Error:  " << _msg << std::endl;
 		return VK_FALSE;
 	}
 }

@@ -1,5 +1,8 @@
 #include "scene/singletonComponents/fanScene.hpp"
 
+#include <stack>
+#include <fstream>
+#include "core/fanDebug.hpp"
 #include "core/time/fanTime.hpp"
 #include "core/time/fanScopedTimer.hpp"
 #include "core/time/fanProfiler.hpp"
@@ -199,7 +202,7 @@ namespace fan
 		{
 			EntityID entityID = world.GetEntityID( _node.handle );
 			unsigned nextIndex = 0;
-			for( int componentIndex = 0; componentIndex < world.GetComponentCount(entityID) ; componentIndex++ )
+			for( int componentIndex = 0; componentIndex < (int)world.GetComponentCount(entityID) ; componentIndex++ )
 			{
 				// if a save method is provided, saves the component
 				Component& component = world.GetComponentAt( entityID, componentIndex );

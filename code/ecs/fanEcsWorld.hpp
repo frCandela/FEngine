@@ -1,13 +1,10 @@
 #pragma once
 
-#include "scene/fanScenePrecompiled.hpp"
-
 #include "fanSystem.hpp"
 #include "ecs/fanTag.hpp"
 #include "ecs/fanEntity.hpp"
 #include "ecs/fanSingletonComponent.hpp"
 #include "fanComponentsCollection.hpp"
-
 
 namespace fan {
 	struct SingletonComponent;

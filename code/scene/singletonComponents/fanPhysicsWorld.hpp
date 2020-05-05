@@ -1,13 +1,11 @@
 #pragma once
 
-#include "scene/fanScenePrecompiled.hpp"
-
 #include "ecs/fanSingletonComponent.hpp"
+#include "bullet/btBulletDynamicsCommon.h"
 
 namespace fan
 {
 	struct Rigidbody;
-	struct MotionState;
 
 	//================================================================================================================================
 	// Contains all Bullet physics components

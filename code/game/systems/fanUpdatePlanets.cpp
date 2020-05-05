@@ -1,5 +1,6 @@
 #include "game/systems/fanUpdatePlanets.hpp"
 
+#include <set>
 #include "scene/fanSceneTags.hpp"
 #include "scene/components/fanTransform.hpp"
 #include "game/components/fanPlanet.hpp"
@@ -8,6 +9,7 @@
 #include "ecs/fanEcsWorld.hpp"
 #include "core/time/fanProfiler.hpp"
 #include "core/time/fanTime.hpp"
+#include "core/math/fanMathUtils.hpp"
 
 namespace fan
 {

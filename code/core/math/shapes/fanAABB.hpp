@@ -1,6 +1,7 @@
 #pragma once
 
-#include "core/fanCorePrecompiled.hpp"
+#include <vector>
+#include "fanGLM.hpp"
 #include "core/math/shapes/fanTriangle.hpp"
 
 namespace fan

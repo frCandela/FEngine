@@ -1,6 +1,7 @@
 #pragma once
 
-#include "core/fanCorePrecompiled.hpp"
+#include "fanGLM.hpp"
+#include "fanImgui.hpp"
 
 namespace fan
 {

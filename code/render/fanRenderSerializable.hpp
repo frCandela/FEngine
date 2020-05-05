@@ -1,7 +1,5 @@
 #pragma once
 
-#include "render/fanRenderPrecompiled.hpp"
-
 #include "core/fanSerializable.hpp"
 
 namespace fan

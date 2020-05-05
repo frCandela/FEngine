@@ -1,4 +1,8 @@
 #include "render/core/fanShader.hpp"
+
+#include <filesystem>
+#include <fstream>
+#include "core/fanDebug.hpp"
 #include "render/core/fanDevice.hpp"
 #include "render/util/fanSpirvCompiler.hpp"
 

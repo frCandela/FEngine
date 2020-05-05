@@ -1,6 +1,6 @@
 #pragma once
 
-#include "editor/fanEditorPrecompiled.hpp"
+#include <string>
 #include "editor/fanImguiIcons.hpp"
 
 namespace fan

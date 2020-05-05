@@ -1,5 +1,6 @@
 #include "editor/fanMainMenuBar.hpp"
 
+#include "core/fanDebug.hpp"
 #include "editor/singletonComponents/fanEditorGrid.hpp"
 #include "editor/windows/fanEditorWindow.hpp"
 #include "editor/fanEditorSelection.hpp"
@@ -14,6 +15,7 @@
 #include "scene/components/fanSceneNode.hpp"
 #include "scene/components/fanTransform.hpp"
 #include "game/singletonComponents/fanGame.hpp"
+#include "render/fanRenderGlobal.hpp"
 
 namespace fan
 {

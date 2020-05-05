@@ -1,11 +1,13 @@
 #pragma once
 
-#include "render/fanRenderPrecompiled.hpp"
+#include "fanGLFW.hpp"
+#include <string>
+#include <vector>
 
 namespace fan
 {
 	//================================================================================================================================
-	// the vulkan instance of the application
+	// The vulkan instance of the application
 	//================================================================================================================================
 	class Instance
 	{

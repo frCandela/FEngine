@@ -1,4 +1,6 @@
 #include "render/core/fanImageView.hpp"
+
+#include "core/fanDebug.hpp"
 #include "render/core/fanDevice.hpp"
 
 namespace fan

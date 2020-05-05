@@ -192,11 +192,11 @@ namespace fan
 // 		}
 	}
 
-	//================================================================================================================================
-	//================================================================================================================================
-	bool SolarSystem::Load( const Json& _json )
-	{
-
+// 	//================================================================================================================================
+// 	//================================================================================================================================
+// 	bool SolarSystem::Load( const Json& _json )
+// 	{
+// 
 
 // 		Serializable::LoadInt( _json, "seed", m_seed );
 // 		Serializable::LoadInt( _json, "maxPlanetsPerOrbit", m_maxPlanetsPerOrbit );
@@ -207,14 +207,14 @@ namespace fan
 // 		Serializable::LoadVec2( _json, "radiusRFactors", m_radiusRFactors );
 // 		Serializable::LoadVec2( _json, "scaleMinMax", m_scaleMinMax );
 // 		Serializable::LoadVec2( _json, "speedFactors", m_speedFactors );
-
-		return true;
-	}
-
-	//================================================================================================================================
-	//================================================================================================================================
-	bool SolarSystem::Save( Json& _json ) const
-	{
+// 
+// 		return true;
+// 	}
+// 
+// 	//================================================================================================================================
+// 	//================================================================================================================================
+// 	bool SolarSystem::Save( Json& _json ) const
+// 	{
 // 		Serializable::SaveInt( _json, "seed", m_seed );
 // 		Serializable::SaveInt( _json, "maxPlanetsPerOrbit", m_maxPlanetsPerOrbit );
 // 		Serializable::SaveFloat( _json, "max_radius", m_maxRadius );
@@ -224,8 +224,8 @@ namespace fan
 // 		Serializable::SaveVec2( _json, "radiusRFactors", m_radiusRFactors );
 // 		Serializable::SaveVec2( _json, "scaleMinMax", m_scaleMinMax );
 // 		Serializable::SaveVec2( _json, "speedFactors", m_speedFactors );
-
-
-		return true;
-	}
+// 
+// 
+// 		return true;
+// 	}
 }

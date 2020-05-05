@@ -1,7 +1,5 @@
 #pragma once
 
-#include "render/fanRenderPrecompiled.hpp"
-
 #include "core/math/shapes/fanConvexHull.hpp"
 #include "core/resources/fanResource.hpp"
 #include "core/resources/fanResource.hpp"

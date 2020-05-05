@@ -1,8 +1,8 @@
 #pragma once
 
-#include "core/fanCorePrecompiled.hpp"
-#include "core/resources/fanResource.hpp"
 #include "core/fanHash.hpp"
+#include "core/fanSignal.hpp"
+#include "core/resources/fanResource.hpp"
 
 namespace fan
 {

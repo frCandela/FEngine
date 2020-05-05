@@ -1,5 +1,6 @@
 ﻿include_directories(
 	${CMAKE_SOURCE_DIR}/code
+	${CMAKE_SOURCE_DIR}/middleware
 )
 
 file(GLOB_RECURSE FAN_RENDER_SRC *.cpp)

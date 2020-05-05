@@ -1,5 +1,6 @@
 #include "scene/components/fanPointLight.hpp"
 
+#include "bullet/LinearMath/btVector3.h"
 #include "core/fanSerializable.hpp"
 #include "editor/fanModals.hpp"
 

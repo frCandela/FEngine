@@ -1,5 +1,6 @@
 #include "editor/windows/fanInspectorWindow.hpp"
 
+#include <sstream>
 #include "scene/fanDragnDrop.hpp"
 #include "scene/singletonComponents/fanScene.hpp"
 #include "scene/singletonComponents/fanPhysicsWorld.hpp"
@@ -42,7 +43,7 @@ namespace fan
  			ImGui::Icon( GetIconType(), { 16,16 } ); ImGui::SameLine();
 			ImGui::Text( "Scene node : %s", node.name.c_str() );
 
-			for( int componentIndex = 0; componentIndex < world.GetComponentCount( entityID ); componentIndex++ )
+			for( int componentIndex = 0; componentIndex < (int)world.GetComponentCount( entityID ); componentIndex++ )
 			{
 				Component& component = world.GetComponentAt( entityID, componentIndex );
 				const ComponentInfo& info = world.GetComponentInfo( component.GetIndex() );

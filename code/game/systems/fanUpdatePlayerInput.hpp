@@ -1,5 +1,3 @@
-#include "game/fanGamePrecompiled.hpp"
-
 #include "ecs/fanSystem.hpp"
 
 namespace fan

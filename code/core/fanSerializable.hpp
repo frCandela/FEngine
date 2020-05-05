@@ -1,6 +1,14 @@
 #pragma once
 
-#include "core/fanCorePrecompiled.hpp"
+#include <cstdint>
+#include "fanGLM.hpp"
+#include "fanJson.hpp"
+
+class Color;
+class btQuaternion;
+class btVector2;
+class btVector3;
+class btVector4;
 
 namespace fan
 {

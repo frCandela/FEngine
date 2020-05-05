@@ -1,7 +1,8 @@
 #pragma once
 
-#include "core/fanCorePrecompiled.hpp"
 #include "core/math/shapes/fanShape.hpp"
+#include <vector>
+#include <cstdint>
 
 namespace fan
 {

@@ -1,6 +1,7 @@
 #pragma once
 
-#include "editor/fanEditorPrecompiled.hpp"
+#include "core/math/fanVector2.hpp"
+#include "core/fanSignal.hpp"
 #include "editor/windows/fanEditorWindow.hpp"
 
 namespace fan

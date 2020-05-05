@@ -1,7 +1,5 @@
 #pragma once
 
-#include "scene/fanScenePrecompiled.hpp"
-
 #include "core/resources/fanResourcePtr.hpp"
 #include "render/core/fanTexture.hpp"
 #include "render/fanMesh.hpp"
@@ -9,7 +7,7 @@
 namespace fan
 {
 	//================================================================================================================================
-	// ressource pointer for textures
+	// Resource pointer for textures
 	//================================================================================================================================
 	class TexturePtr : public ResourcePtr<Texture>
 	{
@@ -25,7 +23,7 @@ namespace fan
 	};
 
 	//================================================================================================================================
-	// ressource pointer for meshes
+	// Resource pointer for meshes
 	//================================================================================================================================
 	class MeshPtr : public ResourcePtr<Mesh>
 	{

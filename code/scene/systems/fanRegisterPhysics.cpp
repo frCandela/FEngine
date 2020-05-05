@@ -1,11 +1,12 @@
 #include "scene/systems/fanRegisterPhysics.hpp"
 
+#include "bullet/btBulletDynamicsCommon.h"
+#include "scene/singletonComponents/fanPhysicsWorld.hpp"
 #include "scene/components/fanSceneNode.hpp"
 #include "scene/components/fanSphereShape.hpp"
 #include "scene/components/fanBoxShape.hpp"
 #include "scene/components/fanMotionState.hpp"
 #include "scene/components/fanRigidbody.hpp"
-#include "scene/singletonComponents/fanPhysicsWorld.hpp"
 #include "ecs/fanEcsWorld.hpp"
 
 namespace fan

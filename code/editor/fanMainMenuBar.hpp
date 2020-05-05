@@ -1,6 +1,8 @@
 #pragma once
 
-#include "editor/fanEditorPrecompiled.hpp"
+#include "core/fanSignal.hpp"
+#include <filesystem>
+#include <set>
 
 namespace fan
 {

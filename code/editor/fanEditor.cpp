@@ -9,6 +9,7 @@
 #include "render/fanUIMesh.hpp"
 #include "render/fanMesh.hpp"
 #include "render/fanRendererDebug.hpp"
+#include "core/math/fanMathUtils.hpp"
 #include "core/math/shapes/fanConvexHull.hpp"
 #include "core/math/shapes/fanTriangle.hpp"
 #include "core/input/fanInputManager.hpp"

@@ -1,7 +1,5 @@
 #pragma once
 
-#include "game/fanGamePrecompiled.hpp"
-
 #include "ecs/fanSingletonComponent.hpp"
 #include "network/fanUdpSocket.hpp"
 #include "network/fanPacket.hpp"
@@ -11,6 +9,7 @@ namespace fan
 	class EcsWorld;	
 
 	//================================================================
+	// Contains client data for the ServerConnectionManager
 	//================================================================
 	struct Client
 	{

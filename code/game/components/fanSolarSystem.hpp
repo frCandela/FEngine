@@ -1,8 +1,5 @@
 #pragma once
 
-#include "game/fanGamePrecompiled.hpp"
-
-
 namespace fan
 {
 	//================================================================================================================================
@@ -22,8 +19,8 @@ namespace fan
 		//ImGui::IconType GetIcon() const override { return ImGui::IconType::SOLAR_SYSTEM16; }
 
 	protected:
-		bool Load( const Json& _json ) /*override*/;
-		bool Save( Json& _json ) const /*override*/;
+// 		bool Load( const Json& _json ) /*override*/;
+// 		bool Save( Json& _json ) const /*override*/;
 
 	private:
 		int m_seed = 1;
@@ -33,10 +30,10 @@ namespace fan
 		float m_scaleMult = 0.8f;
 
 
-		btVector2 m_radiusFactors = btVector2( 0.44f, 0.29f );
-		btVector2 m_radiusRFactors = btVector2( 1.f, 1.f );
-		btVector2 m_scaleMinMax = btVector2( 0.3f, 0.1f );
-		btVector2 m_speedFactors = btVector2( 0.1f, 0.012f );
+// 		btVector2 m_radiusFactors = btVector2( 0.44f, 0.29f );
+// 		btVector2 m_radiusRFactors = btVector2( 1.f, 1.f );
+// 		btVector2 m_scaleMinMax = btVector2( 0.3f, 0.1f );
+// 		btVector2 m_speedFactors = btVector2( 0.1f, 0.012f );
 		int m_maxPlanetsPerOrbit = 3;
 	};
 }

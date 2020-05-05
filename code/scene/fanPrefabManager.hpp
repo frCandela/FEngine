@@ -1,6 +1,6 @@
 #pragma once
 
-#include "scene/fanScenePrecompiled.hpp"
+#include <map>
 
 #include "core/resources/fanResourcePtr.hpp"
 

@@ -1,5 +1,6 @@
 #include "network/singletonComponents/fanRPCManager.hpp"
 
+#include <sstream>
 #include "ecs/fanEcsWorld.hpp"
 
 namespace fan

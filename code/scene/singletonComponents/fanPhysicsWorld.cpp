@@ -8,8 +8,6 @@
 #include "scene/components/fanBoxShape.hpp"
 #include "ecs/fanEcsWorld.hpp"
 
-#include "bullet/BulletCollision/CollisionDispatch/btSimulationIslandManager.h"
-
 namespace fan
 {
 	REGISTER_SINGLETON_COMPONENT( PhysicsWorld );

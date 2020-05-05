@@ -1,13 +1,15 @@
 #pragma once
 
-#include "render/fanRenderPrecompiled.hpp"
+#include "fanGLFW.hpp"
+#include <vector>
+#include <string>
 
 namespace fan
 {
 	class Instance;
 
 	//================================================================================================================================
-	// vulkan device (gpu)
+	// Vulkan device (gpu)
 	//================================================================================================================================
 	class Device
 	{

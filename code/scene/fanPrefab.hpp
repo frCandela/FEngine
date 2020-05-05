@@ -1,7 +1,5 @@
 #pragma once
 
-#include "scene/fanScenePrecompiled.hpp"
-
 #include "core/resources/fanResource.hpp"
 #include "scene/fanSceneSerializable.hpp"
 #include "scene/fanPrefabManager.hpp"

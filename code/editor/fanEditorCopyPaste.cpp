@@ -1,4 +1,6 @@
 #include "editor/fanEditorCopyPaste.hpp"
+
+#include <sstream>
 #include "editor/fanEditorSelection.hpp"
 #include "scene/fanPrefab.hpp"
 #include "scene/singletonComponents/fanScene.hpp"

@@ -3,6 +3,7 @@
 #include "editor/fanModals.hpp"
 #include "render/pipelines/fanPostprocessPipeline.hpp"
 #include "render/fanRenderer.hpp"
+#include "core/fanColor.hpp"
 #include "core/input/fanInputManager.hpp"
 #include "core/input/fanInput.hpp"
 #include "core/input/fanKeyboard.hpp"

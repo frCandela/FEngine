@@ -1,5 +1,6 @@
 #include "editor/windows/fanEcsWindow.hpp"
 
+#include <sstream>
 #include "core/time/fanProfiler.hpp"
 #include "ecs/fanComponentsCollection.hpp"
 #include "ecs/fanEcsWorld.hpp"

@@ -1,8 +1,10 @@
 #pragma once
 
-#include "core/fanCorePrecompiled.hpp"
+
 #include "core/fanSingleton.hpp"
 #include "core/fanSignal.hpp"
+
+#include <sstream>
 
 namespace fan
 {

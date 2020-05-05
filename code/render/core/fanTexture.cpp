@@ -1,11 +1,17 @@
 #include "render/core/fanTexture.hpp"
-#include "render/core/fanDevice.hpp"
-#include "render/core/fanBuffer.hpp"
+
+#include <algorithm>
 
 #pragma warning(push, 0)   
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
 #pragma warning(pop)
+
+#include "core/fanDebug.hpp"
+#include "render/core/fanDevice.hpp"
+#include "render/core/fanBuffer.hpp"
+
+
 
 namespace fan
 {

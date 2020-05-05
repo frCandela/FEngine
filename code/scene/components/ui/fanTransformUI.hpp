@@ -1,8 +1,7 @@
 #pragma  once
 
-#include "scene/fanScenePrecompiled.hpp"
-
 #include "ecs/fanComponent.hpp"
+#include "fanGLM.hpp"
 
 namespace fan
 {

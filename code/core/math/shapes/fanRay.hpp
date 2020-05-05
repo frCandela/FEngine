@@ -1,6 +1,6 @@
 #pragma once
 
-#include "core/fanCorePrecompiled.hpp"
+#include "bullet/LinearMath/btVector3.h"
 
 namespace fan
 {

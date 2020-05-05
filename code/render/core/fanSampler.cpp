@@ -1,4 +1,6 @@
 #include "render/core/fanSampler.hpp"
+
+#include "core/fanDebug.hpp"
 #include "render/core/fanDevice.hpp"
 
 namespace fan
@@ -42,7 +44,9 @@ namespace fan
 		samplerInfo.maxLod = _maxLod;
 		samplerInfo.mipLodBias = 0;
 
-		if ( vkCreateSampler( m_device.vkDevice, &samplerInfo, nullptr, &m_sampler ) != VK_SUCCESS )
-			throw std::runtime_error( "failed to create texture sampler!" );
+		if( vkCreateSampler( m_device.vkDevice, &samplerInfo, nullptr, &m_sampler ) != VK_SUCCESS )
+		{
+			Debug::Error() << "sampler creation failed" << Debug::Endl();
+		}
 	}
 }

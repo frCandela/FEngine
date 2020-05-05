@@ -1,6 +1,5 @@
 #pragma once
 
-#include "game/fanGamePrecompiled.hpp"
 #include "ecs/fanEcsWorld.hpp"
 
 #include "network/fanUDPSocket.hpp"

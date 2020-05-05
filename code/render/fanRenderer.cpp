@@ -1,4 +1,6 @@
 #include "render/fanRenderer.hpp"
+
+#include "core/fanDebug.hpp"
 #include "core/time/fanTime.hpp"
 #include "core/input/fanInput.hpp"
 #include "core/time/fanProfiler.hpp"

@@ -1,8 +1,12 @@
 #pragma  once
 
-#include "scene/fanScenePrecompiled.hpp"
-
+#include "bullet/btBulletDynamicsCommon.h"
 #include "ecs/fanComponent.hpp"
+#include "core/fanSignal.hpp"
+
+class btCollisionShape;
+class btPersistentManifold;
+struct btDefaultMotionState;
 
 namespace fan
 {

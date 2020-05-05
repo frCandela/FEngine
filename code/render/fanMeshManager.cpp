@@ -1,7 +1,9 @@
 #include "render/fanMeshManager.hpp"
 
-#include "render/fanMesh.hpp"
+#include <filesystem>
 #include "render/fanRenderResourcePtr.hpp"
+#include "render/fanMesh.hpp"
+#include "render/fanRenderGlobal.hpp"
 
 namespace fan
 {

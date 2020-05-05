@@ -1,7 +1,9 @@
 #pragma once
 
-#include "core/fanCorePrecompiled.hpp"
+#include <array>
+#include "fanGLFW.hpp"
 #include "core/fanSingleton.hpp"
+#include "core/math/fanVector2.hpp"
 
 namespace fan
 {
@@ -14,9 +16,9 @@ namespace fan
 		friend class Input;
 	public:
 		enum CursorState { disabled = GLFW_CURSOR_DISABLED, hidden = GLFW_CURSOR_HIDDEN, normal = GLFW_CURSOR_NORMAL };
-		enum Button { button0 = 0, button1 = 1, button2, button3, button4, button5, button6, button7 };
+		enum Button		 { button0 = 0, button1 = 1, button2, button3, button4, button5, button6, button7 };
 
-		btVector2	GetDelta() { return m_delta; }
+		btVector2	GetDelta()		 { return m_delta; }
 		btVector2	GetDeltaScroll() { return m_deltaScroll; }
 		btVector2	GetScreenSpacePosition( const bool _localToGameWindow = true );
 		btVector2	GetPosition( const bool _localToGameWindow = true );

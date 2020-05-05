@@ -1,5 +1,9 @@
 #include "core/input/fanInputManager.hpp"
+
+#include "fanJson.hpp"
+#include "fanImgui.hpp"
 #include "core/input/fanKeyboard.hpp"
+#include "core/fanDebug.hpp"
 
 namespace fan
 {

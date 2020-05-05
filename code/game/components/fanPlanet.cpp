@@ -38,7 +38,7 @@ namespace fan
 		{
 			ImGui::DragFloat( "radius", &planet.radius, 0.1f, 0.f, 100.f );
 			ImGui::DragFloat( "speed", &planet.speed, 0.1f, 0.f, 10.f );
-			ImGui::DragFloat( "phase", &planet.phase, PI / 3, 0.f, 2 * PI );
+			ImGui::DragFloat( "phase", &planet.phase, SIMD_PI / 3, 0.f, 2 * SIMD_PI );
 		}
 
 		RendererDebug::Get().DebugCircle( btVector3::Zero(), planet.radius, btVector3::Up(), 32, Color::Cyan );

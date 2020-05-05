@@ -1,4 +1,6 @@
 #include "render/pipelines/fanUIPipeline.hpp"
+
+#include "core/fanDebug.hpp"
 #include "render/core/fanDevice.hpp"
 #include "render/descriptors/fanDescriptor.hpp"
 #include "render/descriptors/fanDescriptorTexture.hpp"

@@ -1,5 +1,8 @@
 #include "core/input/fanAxis.hpp"
 
+#include "fanImgui.hpp"
+#include "core/fanDebug.hpp"
+
 namespace fan
 {
 	//================================================================================================================================

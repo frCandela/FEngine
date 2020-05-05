@@ -1,5 +1,6 @@
 #include "scene/components/fanMeshRenderer.hpp"
 
+#include <sstream>
 #include "core/fanSerializable.hpp"
 #include "render/fanRenderSerializable.hpp"
 

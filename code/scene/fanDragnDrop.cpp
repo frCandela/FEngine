@@ -1,5 +1,6 @@
 #include "scene/fanDragnDrop.hpp"
 
+#include "core/fanDebug.hpp"
 #include "editor/fanImguiIcons.hpp"
 #include "scene/components/fanSceneNode.hpp"
 #include "scene/fanPrefab.hpp"

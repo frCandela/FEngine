@@ -1,10 +1,11 @@
 #include "game/singletonComponents/fanServerNetworkManager.hpp"
 
-#include "scene/fanSceneSerializable.hpp"
+#include "core/fanDebug.hpp"
 #include "core/time/fanTime.hpp"
 #include "ecs/fanEcsWorld.hpp"
 #include "game/singletonComponents/fanGame.hpp"
 #include "game/components/fanPlayerInput.hpp"
+#include "scene/fanSceneSerializable.hpp"
 #include "scene/components/fanRigidbody.hpp"
 #include "scene/components/fanTransform.hpp"
 #include "network/singletonComponents/fanRPCManager.hpp"

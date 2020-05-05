@@ -1,6 +1,6 @@
 #pragma once
 
-#include "render/fanRenderPrecompiled.hpp"
+#include "fanGLM.hpp"
 #include "core/memory/fanAlignedMemory.hpp"
 #include "render/core/fanPipeline.hpp"
 #include "render/fanRenderGlobal.hpp"

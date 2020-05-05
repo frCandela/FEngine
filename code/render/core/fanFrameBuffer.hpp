@@ -1,6 +1,7 @@
 #pragma once
 
-#include "render/fanRenderPrecompiled.hpp"
+#include "fanGLFW.hpp"
+#include <vector>
 
 namespace fan
 {
@@ -10,7 +11,7 @@ namespace fan
 	class ImageView;
 
 	//================================================================================================================================
-	// render target with attachements (color, depth, etc. )
+	// render target with attachments (color, depth, etc. )
 	//================================================================================================================================
 	class FrameBuffer
 	{

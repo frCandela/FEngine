@@ -1,5 +1,8 @@
 #include "scene/components/fanSceneNode.hpp"
 
+#include <stack>
+#include <set>
+#include "core/fanDebug.hpp"
 #include "ecs/fanEcsWorld.hpp"
 #include "scene/singletonComponents/fanScene.hpp"
 

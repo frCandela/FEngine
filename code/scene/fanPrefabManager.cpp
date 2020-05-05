@@ -1,5 +1,6 @@
 #include "scene/fanPrefabManager.hpp"
 
+#include <filesystem>
 #include "scene/fanSceneResourcePtr.hpp"
 #include "scene/fanPrefab.hpp"
 #include "core/fanSignal.hpp"

@@ -1,6 +1,5 @@
 #pragma once
 
-#include "editor/fanEditorPrecompiled.hpp"
 #include "editor/windows/fanEditorWindow.hpp"
 
 #include "game/fanGameServer.hpp"

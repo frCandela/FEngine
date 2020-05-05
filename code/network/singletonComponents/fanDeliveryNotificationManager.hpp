@@ -1,7 +1,5 @@
 #pragma once
 
-#include "game/fanGamePrecompiled.hpp"
-
 #include "ecs/fanSingletonComponent.hpp"
 #include "network/fanUdpSocket.hpp"
 #include "network/fanPacket.hpp"
@@ -68,11 +66,12 @@ namespace fan
 		void Write   ( Packet& _packet,			const HostID _hostID = 0 );
 
 		//================================================================
+		// Packet that was send & waiting for a delivery status (received/dropped)
 		//================================================================
 		struct InFlightPacket
 		{
-			PacketTag			tag;
-			double				timeDispatch;
+			PacketTag					tag;
+			double						timeDispatch;
 			Signal< HostID, PacketTag >	onFailure;
 			Signal< HostID, PacketTag >	onSuccess;
 		};

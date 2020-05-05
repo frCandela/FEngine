@@ -1,9 +1,10 @@
 #pragma once
 
-#include "render/fanRenderPrecompiled.hpp"
-
+#include "fanGLM.hpp"
+#include "fanGLFW.hpp"
 #include "core/resources/fanResource.hpp"
 #include "render/fanTextureManager.hpp"
+
 namespace fan
 {
 	class Device;

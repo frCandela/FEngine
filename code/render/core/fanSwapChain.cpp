@@ -1,4 +1,6 @@
 #include "render/core/fanSwapChain.hpp"
+
+#include "core/fanDebug.hpp"
 #include "render/core/fanDevice.hpp"
 #include "render/core/fanImage.hpp"
 #include "render/core/fanImageView.hpp"

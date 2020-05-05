@@ -1,5 +1,6 @@
 #pragma once
 
+#include "fanJson.hpp"
 #include "fanEcsTypes.hpp"
 #include "core/fanHash.hpp"
 #include "editor/fanImguiIcons.hpp"

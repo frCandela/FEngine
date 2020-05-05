@@ -1,5 +1,6 @@
 #include "game/singletonComponents/fanCollisionManager.hpp"
 
+#include "core/fanDebug.hpp"
 #include "ecs/fanEcsWorld.hpp"
 #include "scene/components/fanRigidbody.hpp"
 #include "scene/components/fanTransform.hpp"
@@ -104,45 +105,4 @@ namespace fan
 			Debug::Error() << "CollisionManager: spaceship has no health !" << Debug::Endl();
 		}
 	}
-
-	// 	//================================================================================================================================
-// 	//================================================================================================================================
-// 	void  SpaceShip::OnContactStarted( Rigidbody* _rb, btPersistentManifold* const& )
-// 	{
-// 		float damage = 0.f;
-// 
-// 		if ( ecsBullet* bullet = _rb->GetGameobject().GetEcsComponent<ecsBullet>() )
-// 		{
-// 			//Debug::Log("bullet");
-// 			damage = bullet->damage;
-// 		}
-// 		else if ( _rb->GetGameobject().GetComponent<Planet>() )
-// 		{
-// 			btVector3 dir = m_gameobject->GetTransform().GetPosition() - _rb->GetGameobject().GetTransform().GetPosition();
-// 			if ( !dir.fuzzyZero() )
-// 			{
-// 				m_rigidbody->ApplyCentralForce( m_collisionRepulsionForce * dir.normalized() );
-// 			}
-// 
-// 			//Debug::Log("planet");
-// 			damage = m_planetDamage;
-// 		}
-// 		else if ( _rb->GetGameobject().GetComponent<SolarSystem>() )
-// 		{
-// 			//Debug::Log( "sun" );
-// 			damage = m_health->GetHealth() + 1.f;
-// 		}
-// 		else
-// 		{
-// 			//Debug::Log( "other" );
-// 		}
-// 
-// 		// Death
-// 		if ( m_health->GetHealth() > 0 && !m_health->TryRemoveHealth( damage ) )
-// 
-// 		{
-// 			m_health->TryRemoveHealth( m_health->GetHealth() );
-// 		}
-//	}
-
 }

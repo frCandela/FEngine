@@ -1,6 +1,9 @@
 #pragma once
 
 #include <iostream>
+#include <limits>
+#include <assert.h>
+#include <type_traits>
 
 #include "SFML/System.hpp"
 #include "SFML/Network.hpp"

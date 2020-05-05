@@ -1,6 +1,8 @@
 #pragma once
 
-#include "core/fanCorePrecompiled.hpp"
+#include "bullet/LinearMath/btVector3.h"
+#include "bullet/LinearMath/btQuaternion.h"
+#include "fanGLM.hpp"
 
 namespace fan
 {
@@ -19,8 +21,6 @@ namespace fan
 		return rotation;
 	}
 
-	const float PI = SIMD_PI;
-
 	inline btVector3 btDegrees3( const  btVector3 _radians ) { return btVector3( btDegrees( _radians[ 0 ] ), btDegrees( _radians[ 1 ] ), btDegrees( _radians[ 2 ] ) ); }
 	inline btVector3 btRadians3( const  btVector3 _degrees ) { return btVector3( btRadians( _degrees[ 0 ] ), btRadians( _degrees[ 1 ] ), btRadians( _degrees[ 2 ] ) ); }
 	inline float SignedAngle( const btVector3& _vector1, const btVector3& _vector2, const btVector3& _axis )
@@ -28,5 +28,4 @@ namespace fan
 		float angle = _vector1.angle( _vector2 ) * ( _vector1.cross( _vector2 ).dot( _axis ) > 0.0f ? 1.f : -1.f );
 		return std::fmodf( angle + SIMD_2_PI, SIMD_2_PI );
 	}
-
 }

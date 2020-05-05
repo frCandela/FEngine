@@ -1,5 +1,6 @@
 #pragma once
 
+#include "fanGLM.hpp"
 #include "core/fanSerializedValues.hpp"
 #include "ecs/fanEcsWorld.hpp"
 #include "game/fanGameClient.hpp"

@@ -1,6 +1,8 @@
 #pragma once
 
-#include "render/fanRenderPrecompiled.hpp"
+#include "fanJson.hpp"
+#include <string>
+
 
 namespace fan
 {

@@ -1,7 +1,6 @@
 #pragma once
 
-#include "game/fanGamePrecompiled.hpp"
-
+#include "bullet/btBulletDynamicsCommon.h"
 #include "ecs/fanSingletonComponent.hpp"
 
 namespace fan

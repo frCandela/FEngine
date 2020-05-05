@@ -1,4 +1,8 @@
 #include "render/pipelines/fanImguiPipeline.hpp"
+
+#include <array>
+#include "fanImgui.hpp"
+#include "core/fanDebug.hpp"
 #include "render/fanRenderGlobal.hpp"
 #include "render/core/fanDevice.hpp"
 #include "render/core/fanShader.hpp"

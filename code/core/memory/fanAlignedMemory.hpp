@@ -1,7 +1,7 @@
 #pragma once
 
-#include "core/fanCorePrecompiled.hpp"
 #include <stdlib.h>
+#include <cassert>
 
 namespace fan
 {

@@ -1,6 +1,8 @@
 #pragma once
 
-#include "core/fanCorePrecompiled.hpp"
+#include <array>
+#include <vector>
+#include "fanGLFW.hpp"
 #include "core/fanSingleton.hpp"
 
 namespace fan

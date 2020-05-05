@@ -1,4 +1,6 @@
 #include "core/time/fanScopedTimer.hpp"
+
+#include "core/fanDebug.hpp"
 #include "core/time/fanTime.hpp"
 
 namespace fan

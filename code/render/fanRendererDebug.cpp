@@ -1,4 +1,8 @@
 #include "render/fanRendererDebug.hpp"
+
+#include <array>
+#include "core/fanDebug.hpp"
+#include "core/math/fanMathUtils.hpp"
 #include "render/core/fanDevice.hpp"
 #include "render/core/fanBuffer.hpp"
 #include "render/core/fanSwapChain.hpp"
@@ -329,7 +333,7 @@ namespace fan
 
 		const btVector3 other = btVector3( -_axis[ 1 ], -_axis[ 2 ], _axis[ 0 ] );
 		btVector3 orthogonal = _radius * _axis.cross( other ).normalized();
-		const float angle = 2.f * PI / ( float ) _nbSegments;
+		const float angle = 2.f * SIMD_PI / ( float ) _nbSegments;
 
 		std::vector<DebugVertex>& lines = _depthTestEnable ? m_debugLines : m_debugLinesNoDepthTest;
 		for ( uint32_t segmentIndex = 0; segmentIndex < _nbSegments; segmentIndex++ )

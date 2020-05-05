@@ -1,4 +1,6 @@
 #include "editor/windows/fanEditorWindow.hpp"
+
+#include <sstream>
 #include "core/fanSerializedValues.hpp"
 #include "core/time/fanProfiler.hpp"
 

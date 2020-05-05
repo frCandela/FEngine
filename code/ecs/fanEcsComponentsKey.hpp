@@ -1,7 +1,5 @@
 #pragma once
 
-#include "scene/fanScenePrecompiled.hpp"
-
 namespace fan
 {
 	// @old 04/01/2020 taken from the old static ecs ( rip)

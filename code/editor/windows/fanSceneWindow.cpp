@@ -1,5 +1,7 @@
 #include "editor/windows/fanSceneWindow.hpp"
 
+#include <fstream>
+#include "core/fanDebug.hpp"
 #include "scene/fanDragnDrop.hpp"
 #include "editor/fanModals.hpp"
 #include "core/input/fanKeyboard.hpp"
@@ -21,6 +23,7 @@
 #include "scene/components/fanMotionState.hpp"
 #include "scene/components/fanBoxShape.hpp"
 #include "scene/components/fanParticleEmitter.hpp"
+#include "render/fanRenderGlobal.hpp"
 
 namespace fan
 {

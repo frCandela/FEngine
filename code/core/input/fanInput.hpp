@@ -1,8 +1,10 @@
 #pragma once
 
-#include "core/fanCorePrecompiled.hpp"
+#include "fanGLM.hpp"
 #include "core/fanSingleton.hpp"
 #include "core/math/fanVector2.hpp"
+
+struct GLFWwindow;
 
 namespace fan
 {
@@ -21,18 +23,18 @@ namespace fan
 	public:
 		void			Setup( GLFWwindow* _window );
 		void			NewFrame();
-		GLFWwindow*		Window() { return m_window; }
-		btVector2		WindowSizeF() { return btVector2( ( float ) m_windowSize.x, ( float ) m_windowSize.y ); }
-		glm::ivec2		WindowSize() { return m_windowSize; }
-		uint64_t		FrameCount() { return m_count; }
-		InputManager&	Manager() { return *m_eventManager; }
+		GLFWwindow*		Window()		{ return m_window; }
+		btVector2		WindowSizeF()	{ return btVector2( ( float ) m_windowSize.x, ( float ) m_windowSize.y ); }
+		glm::ivec2		WindowSize()	{ return m_windowSize; }
+		uint64_t		FrameCount()	{ return m_count; }
+		InputManager&	Manager()		{ return *m_eventManager; }
 
 	private:
 		Input();
 
 		GLFWwindow* m_window;
-		glm::ivec2		m_windowSize;
-		uint64_t		m_count;
+		glm::ivec2	m_windowSize;
+		uint64_t	m_count;
 
 		InputManager* m_eventManager;
 

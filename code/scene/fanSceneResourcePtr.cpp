@@ -6,6 +6,7 @@
 #include "ecs/fanEcsWorld.hpp"
 #include "editor/fanModals.hpp"
 #include "scene/fanDragnDrop.hpp"
+#include "render/fanRenderGlobal.hpp"
 
 namespace fan
 {

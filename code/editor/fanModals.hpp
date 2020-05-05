@@ -1,13 +1,13 @@
 #pragma once
 
-#include "core/fanCorePrecompiled.hpp"
+#include <set>
+#include <filesystem>
+#include "fanImgui.hpp"
 
 //================================================================================================================================
 // imgui utilities for the editor
 // @todo clean this
 //================================================================================================================================
-
-
 namespace std
 {
 	namespace filesystem

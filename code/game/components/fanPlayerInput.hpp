@@ -1,8 +1,7 @@
 #pragma once
 
-#include "game/fanGamePrecompiled.hpp"
-
 #include "ecs/fanComponent.hpp"
+#include "bullet/LinearMath/btVector3.h"
 
 namespace fan
 {

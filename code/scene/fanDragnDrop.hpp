@@ -1,6 +1,7 @@
 #pragma once
 
-#include "game/fanGamePrecompiled.hpp"
+#include "fanImgui.hpp"
+#include <cstdint>
 
 namespace fan
 {

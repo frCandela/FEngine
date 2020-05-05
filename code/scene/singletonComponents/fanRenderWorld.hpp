@@ -1,7 +1,5 @@
 #pragma once
 
-#include "scene/fanScenePrecompiled.hpp"
-
 #include "ecs/fanSingletonComponent.hpp"
 #include "render/fanRenderer.hpp"
 #include "render/fanMesh.hpp"

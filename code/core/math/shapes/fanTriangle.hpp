@@ -1,6 +1,5 @@
 #pragma once
 
-#include "core/fanCorePrecompiled.hpp"
 #include "core/math/shapes/fanShape.hpp"
 
 namespace fan

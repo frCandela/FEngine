@@ -1,5 +1,6 @@
 #include "network/singletonComponents/fanServerConnectionManager.hpp"
 
+#include "core/fanDebug.hpp"
 #include "ecs/fanEcsWorld.hpp"
 #include "core/time/fanTime.hpp"
 #include "network/fanImGuiNetwork.hpp"

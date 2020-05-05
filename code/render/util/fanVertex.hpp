@@ -1,6 +1,9 @@
 #pragma once
 
-#include "render/fanRenderPrecompiled.hpp"
+#include <vector>
+#include "fanGLFW.hpp"
+#include "fanGLM.hpp"
+#include "core/fanColor.hpp"
 
 namespace fan
 {

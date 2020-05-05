@@ -1,7 +1,6 @@
 #pragma once
 
-#include "scene/fanScenePrecompiled.hpp"
-
+#include <set>
 #include "ecs/fanSingletonComponent.hpp"
 #include "scene/fanSceneResourcePtr.hpp"
 
@@ -13,8 +12,8 @@ namespace fan
 	class Prefab;
 
 	//================================================================================================================================
-	// contains all scene pointers that need to be resolved
-	// unresolved pointer appear when loading scenes or instancing prefabs
+	// Contains all scene pointers that need to be resolved
+	// unresolved pointers appear when loading scenes or instancing prefabs
 	//================================================================================================================================
 	struct ScenePointers : public SingletonComponent
 	{

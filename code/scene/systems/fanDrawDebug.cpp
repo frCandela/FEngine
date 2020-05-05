@@ -1,5 +1,6 @@
 #include "scene/systems/fanDrawDebug.hpp"
 
+#include "core/math/fanMathUtils.hpp"
 #include "scene/components/fanBounds.hpp"
 #include "scene/components/fanSceneNode.hpp"
 #include "scene/components/fanTransform.hpp"

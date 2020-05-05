@@ -1,5 +1,8 @@
 #include "render/core/fanDevice.hpp"
+
+#include <vector>
 #include "render/core/fanInstance.hpp"
+#include "core/fanDebug.hpp"
 
 namespace fan
 {

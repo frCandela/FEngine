@@ -1,5 +1,7 @@
 #include "scene/components/ui/fanFollowTransformUI.hpp"
 
+#include "core/math/fanVector2.hpp"
+#include "core/math/fanMathUtils.hpp"
 #include "ecs/fanEcsWorld.hpp"
 #include "editor/fanModals.hpp"
 #include "render/fanRendererDebug.hpp"

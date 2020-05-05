@@ -1,5 +1,8 @@
 #include "render/core/fanBuffer.hpp"
+
+#include <cassert>
 #include "render/core/fanDevice.hpp"
+#include "core/fanDebug.hpp"
 
 namespace fan
 {

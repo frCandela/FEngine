@@ -1,6 +1,6 @@
 #pragma once
 
-#include "core/fanCorePrecompiled.hpp"
+#include "fanImgui.hpp"
 
 namespace ImGui
 {

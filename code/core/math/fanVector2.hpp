@@ -1,6 +1,7 @@
 #pragma once
 
-#include "core/fanCorePrecompiled.hpp"
+#include "fanGLM.hpp"
+#include "bullet/LinearMath/btVector3.h"
 
 namespace fan
 {
@@ -75,6 +76,6 @@ namespace fan
 	btVector2 operator*( const btVector2& _v0, const btVector2& _v1 );
 	btVector2 operator/( const btVector2& _v0, const btVector2& _v1 );
 
-	inline btVector2 ToBullet( const glm::vec2 _vec ) { return btVector2( _vec.x, _vec.y ); }
-	inline glm::vec2 ToGLM( const btVector2 _vec ) { return glm::vec2( _vec[0], _vec[1] ); }
+	inline btVector2 ToBullet( const glm::vec2 _vec )	{ return btVector2( _vec.x, _vec.y ); }
+	inline glm::vec2 ToGLM( const btVector2 _vec )		{ return glm::vec2( _vec[0], _vec[1] ); }
 }

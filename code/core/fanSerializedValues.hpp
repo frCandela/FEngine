@@ -1,10 +1,17 @@
 #pragma once
 
-#include "core/fanCorePrecompiled.hpp"
 #include "core/fanSingleton.hpp"
+#include "fanJson.hpp"
+
+class btQuaternion;
+class btVector3;
+class btVector4;
 
 namespace fan
 {
+	class Color;
+	struct btVector2;
+
 	//================================================================================================================================
 	// holds global editor value that are saved/restored
 	// @todo put this in a singleton component in the editor ecs

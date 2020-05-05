@@ -1,6 +1,7 @@
 #pragma once
 
-#include "render/fanRenderPrecompiled.hpp"
+#include <cassert>
+#include <vector>
 
 namespace fan
 {

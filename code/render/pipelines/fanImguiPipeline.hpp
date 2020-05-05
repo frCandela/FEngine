@@ -1,6 +1,8 @@
 #pragma once
 
-#include "render/fanRenderPrecompiled.hpp"
+#include <vector>
+#include "fanGLFW.hpp"
+#include "fanGLM.hpp"
 
 namespace fan
 {
@@ -64,6 +66,6 @@ namespace fan
 		void CreateDescriptors();
 
 		static void			SetClipboardText( void* _userData, const char* _text ) { glfwSetClipboardString( ( GLFWwindow* ) _userData, _text ); }
-		static const char* GetClipboardText( void* _userData ) { return glfwGetClipboardString( ( GLFWwindow* ) _userData ); }
+		static const char*	GetClipboardText( void* _userData ) { return glfwGetClipboardString( ( GLFWwindow* ) _userData ); }
 	};
 }

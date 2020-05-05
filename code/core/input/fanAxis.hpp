@@ -1,6 +1,5 @@
 #pragma once
 
-#include "core/fanCorePrecompiled.hpp"
 #include "core/input/fanKeyboard.hpp"
 #include "core/input/fanJoystick.hpp"
 #include "scene/fanSceneSerializable.hpp"

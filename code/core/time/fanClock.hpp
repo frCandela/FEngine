@@ -1,6 +1,6 @@
 #pragma once
 
-#include "core/fanCorePrecompiled.hpp"
+#include <chrono>
 
 namespace fan
 {

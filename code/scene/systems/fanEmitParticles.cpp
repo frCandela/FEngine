@@ -1,5 +1,6 @@
 #include "scene/systems/fanEmitParticles.hpp"
 
+#include "core/math/fanMathUtils.hpp"
 #include "core/fanRandom.hpp"
 #include "scene/components/fanTransform.hpp"
 #include "scene/components/fanParticleEmitter.hpp"

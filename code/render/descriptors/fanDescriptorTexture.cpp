@@ -1,4 +1,6 @@
 #include "render/descriptors/fanDescriptorTexture.hpp"
+
+#include "core/fanDebug.hpp"
 #include "render/core/fanDevice.hpp"
 #include "render/core/fanTexture.hpp"
 

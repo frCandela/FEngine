@@ -1,6 +1,6 @@
 #pragma once
 
-#include "game/fanGamePrecompiled.hpp"
+#include "fanImgui.hpp"
 
 namespace fan
 {
@@ -16,6 +16,6 @@ namespace ImGui
 	void			FanBeginDragDropSourceTexture( fan::Texture* _texture, ImGuiDragDropFlags _flags = ImGuiDragDropFlags_None );
 	fan::Texture*	FanBeginDragDropTargetTexture();
 
-	void		FanBeginDragDropSourceMesh( fan::Mesh* _mesh, ImGuiDragDropFlags _flags = ImGuiDragDropFlags_None );
-	fan::Mesh*	FanBeginDragDropTargetMesh();
+	void			FanBeginDragDropSourceMesh( fan::Mesh* _mesh, ImGuiDragDropFlags _flags = ImGuiDragDropFlags_None );
+	fan::Mesh*		FanBeginDragDropTargetMesh();
 }

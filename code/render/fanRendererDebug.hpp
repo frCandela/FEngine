@@ -1,8 +1,8 @@
 #pragma once
 
-#include "render/fanRenderPrecompiled.hpp"
 #include "core/math/shapes/fanAABB.hpp"
 #include "render/util/fanVertex.hpp"
+#include "bullet/LinearMath/btTransform.h"
 
 namespace fan
 {

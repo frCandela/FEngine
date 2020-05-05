@@ -1,4 +1,6 @@
 #include "core/math/shapes/fanAABB.hpp"
+
+#include "core/math/fanMathUtils.hpp"
 #include "core/math/shapes/fanPlane.hpp"
 
 namespace fan

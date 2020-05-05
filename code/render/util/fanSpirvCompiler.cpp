@@ -1,12 +1,15 @@
 #include "render/util/fanSpirvCompiler.hpp"
 
 #include "shaderc/shaderc.hpp"
+#include "core/fanDebug.hpp"
+#include <cassert>
+#include <filesystem>
+#include <fstream>
 
 namespace fan
 {
 	std::vector<uint32_t> SpirvCompiler::Compile( const std::string _filename )
 	{
-
 		const std::string name = std::filesystem::path( _filename ).filename().string();
 
 		// Find shader kind based on the file extension
@@ -42,7 +45,7 @@ namespace fan
 		if ( module.GetCompilationStatus() !=
 			 shaderc_compilation_status_success )
 		{
-			std::cerr << module.GetErrorMessage();
+			Debug::Log() << module.GetErrorMessage() << Debug::Endl();
 		}
 
 		std::vector<uint32_t> result( module.cbegin(), module.cend() );

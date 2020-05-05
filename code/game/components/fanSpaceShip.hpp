@@ -1,7 +1,5 @@
 #pragma  once
 
-#include "game/fanGamePrecompiled.hpp"
-
 #include "ecs/fanComponent.hpp"
 #include "scene/components/fanParticleEmitter.hpp"
 #include "scene/fanSceneResourcePtr.hpp"

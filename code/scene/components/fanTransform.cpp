@@ -1,6 +1,7 @@
 #include "scene/components/fanTransform.hpp"
 
 #include "core/fanSerializable.hpp"
+#include "core/math/fanMathUtils.hpp"
 
 namespace fan
 {
