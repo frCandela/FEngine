@@ -354,12 +354,12 @@ namespace fan
 				hostData.nextPlayerState.Write( packet );
 			}
 
-			connection->Send( packet, client.hostId, game->frameIndex );
-			replication->Send( packet, client.hostId );
+			connection->Write( packet, client.hostId, game->frameIndex );
+			replication->Write( packet, client.hostId );
 
 			// write ack
 			if( packet.GetSize() == sizeof( PacketTag ) ) { packet.onlyContainsAck = true; }
-			deliveryNotification->SendAck( packet, client.hostId );
+			deliveryNotification->Write( packet, client.hostId );
 
 			// send packet
 			if( packet.GetSize() > sizeof( PacketTag ) )// don't send empty packets

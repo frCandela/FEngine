@@ -91,7 +91,7 @@ namespace fan
 	// sends a login packet to the clients needing approval
 	// regularly sends ping to clients to calculate RTT & sync frame index
 	//================================================================================================================================
-	void ServerConnectionManager::Send( Packet& _packet, const HostID _clientID, const FrameIndex	_frameIndex )
+	void ServerConnectionManager::Write( Packet& _packet, const HostID _clientID, const FrameIndex	_frameIndex )
 	{
 		// Send login packet
 		Client& client = clients[_clientID];

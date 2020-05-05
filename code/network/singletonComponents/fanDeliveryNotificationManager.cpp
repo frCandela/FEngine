@@ -166,7 +166,7 @@ namespace fan
 	//================================================================================================================================
 	// Send out an acknowledgment for each validated packet 
 	//================================================================================================================================
-	void DeliveryNotificationManager::SendAck( Packet& _packet, const HostID _hostID )
+	void DeliveryNotificationManager::Write( Packet& _packet, const HostID _hostID )
 	{
 		HostData& hostData = hostDatas[_hostID];
 		if( !hostData.pendingAck.empty() )

@@ -110,7 +110,7 @@ namespace fan
 	//================================================================================================================================
 	// Sends all new replication packed
 	//================================================================================================================================
-	void ServerReplicationManager::Send( Packet& _packet, const HostID _hostID )
+	void ServerReplicationManager::Write( Packet& _packet, const HostID _hostID )
 	{
 		HostData& hostData = hostDatas[_hostID];
 		for( SingletonReplicationData& data : hostData.nextReplication )

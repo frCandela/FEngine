@@ -65,7 +65,7 @@ namespace fan
 		void ProcessTimedOutPackets();
 
 		void Receive( const PacketAck& _packetAck,  const HostID _hostID = 0 );
-		void SendAck   ( Packet& _packet,			const HostID _hostID = 0 );
+		void Write   ( Packet& _packet,			const HostID _hostID = 0 );
 
 		//================================================================
 		//================================================================

@@ -63,7 +63,7 @@ namespace fan
 		HostID	FindClient( const sf::IpAddress _ip, const unsigned short _port );
 		HostID	CreateClient( const sf::IpAddress _ip, const unsigned short _port );
 		void	DeleteClient( const HostID _clientID );
-		void	Send( Packet& _packet, const HostID _clientID, const FrameIndex _frameIndex );
+		void	Write( Packet& _packet, const HostID _clientID, const FrameIndex _frameIndex );
 
 		void	ProcessPacket( const HostID _clientID, const PacketHello& _packetHello );
 		void	ProcessPacket( const HostID _clientID, const PacketPing& _packetPing, const FrameIndex _frameIndex, const float _logicDelta );

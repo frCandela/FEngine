@@ -262,7 +262,7 @@ namespace fan
 		Packet packet( deliveryNotificationManager->GetNextPacketTag() );
 
 		// write packet
-		connection->Send( packet );
+		connection->Write( packet );
 
 		if( !inputs.empty() )
 		{
@@ -274,7 +274,7 @@ namespace fan
 
 		if( packet.GetSize() == sizeof( PacketTag ) ) { packet.onlyContainsAck = true; }
 
-		deliveryNotificationManager->SendAck( packet );
+		deliveryNotificationManager->Write( packet );
 
 		// send packet, don't send empty packets
 		if( packet.GetSize() > sizeof( PacketTag ) )

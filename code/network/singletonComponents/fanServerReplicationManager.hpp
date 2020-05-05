@@ -49,7 +49,7 @@ namespace fan
 
 		void CreateHost( const HostID _hostID );
 		void DeleteHost( const HostID _hostID );
-		void Send( Packet& _packet, const HostID _hostID );
+		void Write( Packet& _packet, const HostID _hostID );
 		Signal<HostID>* ReplicateOnClient( const HostID _hostID, PacketReplication& _packet, const ReplicationFlags _flags );
 		void ReplicateOnAllClients( PacketReplication& _packet, const ReplicationFlags _flags );
 

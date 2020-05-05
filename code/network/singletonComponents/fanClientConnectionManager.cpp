@@ -37,7 +37,7 @@ namespace fan
 	//================================================================================================================================
 	// Write into the _packet to communicate with the server
 	//================================================================================================================================
-	void ClientConnectionManager::Send( Packet& _packet )
+	void ClientConnectionManager::Write( Packet& _packet )
 	{
 		if( state == ClientState::Disconnected )
 		{

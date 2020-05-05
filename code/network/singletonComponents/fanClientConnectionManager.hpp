@@ -42,7 +42,7 @@ namespace fan
 		PacketPing		lastPacketPing;
 		bool			mustSendBackPacketPing;
 
-		void Send( Packet& _packet );
+		void Write( Packet& _packet );
 		void OnLoginFail( HostID, const PacketTag _packetTag );
 		void DetectServerTimout();
 		void DisconnectFromServer();
