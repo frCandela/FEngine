@@ -48,7 +48,7 @@ namespace fan
 				Component& component = world.GetComponentAt( entityID, componentIndex );
 				const ComponentInfo& info = world.GetComponentInfo( component.GetIndex() );
 
-				if( std::string(info.editorPath).empty() ) { continue; }
+				if( info.onGui == nullptr ) { continue; }
 
  				ImGui::Separator();
 				 
@@ -67,7 +67,7 @@ namespace fan
 					world.RemoveComponent( entityID, component.GetIndex() );				
 				}
  				// Draw component
-				else if( info.onGui != nullptr )
+				else
 				{
 					info.onGui( world, entityID, component );
 				} 

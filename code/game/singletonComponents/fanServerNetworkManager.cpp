@@ -6,15 +6,20 @@
 #include "game/singletonComponents/fanGame.hpp"
 #include "game/components/fanPlayerInput.hpp"
 #include "scene/fanSceneSerializable.hpp"
+#include "scene/singletonComponents/fanScene.hpp"
 #include "scene/components/fanRigidbody.hpp"
+#include "scene/components/fanSceneNode.hpp"
 #include "scene/components/fanTransform.hpp"
+#include "network/components/fanHostGameData.hpp"
+#include "network/components/fanHostConnection.hpp"
+#include "network/components/fanHostReplication.hpp"
+#include "network/components/fanHostDeliveryNotification.hpp"
 #include "network/singletonComponents/fanRPCManager.hpp"
-#include "network/singletonComponents/fanDeliveryNotificationManager.hpp"
-#include "network/singletonComponents/fanServerReplicationManager.hpp"
 #include "network/singletonComponents/fanServerConnectionManager.hpp"
 #include "network/singletonComponents/fanLinkingContext.hpp"
 #include "network/singletonComponents/fanRPCManager.hpp"
-
+#include "network/singletonComponents/fanHostManager.hpp"
+#include "network/systems/fanUpdateDeliveryNotification.hpp"
 
 namespace fan
 {
@@ -37,10 +42,7 @@ namespace fan
 	void ServerNetworkManager::Init( EcsWorld& _world, SingletonComponent& _component )
 	{
 		ServerNetworkManager& netManager = static_cast<ServerNetworkManager&>( _component );
-		netManager.hostDatas.clear();
 		netManager.connection = nullptr;
-		netManager.deliveryNotification = nullptr;
-		netManager.replication = nullptr;
 		netManager.linkingContext = nullptr;
 		netManager.rpcManager = nullptr;
 		netManager.game = nullptr;
@@ -48,42 +50,17 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void ServerNetworkManager::CreateHost( const HostID _hostID )
-	{
-		if( _hostID >= hostDatas.size() )
-		{
-			hostDatas.resize( _hostID + 1 );
-		}
-
-		HostData& hostData = hostDatas[_hostID];
-		hostData = {};
-	}
-
-	//================================================================================================================================
-	//================================================================================================================================
-	void ServerNetworkManager::DeleteHost( const HostID _hostID )
-	{
-		hostDatas[_hostID].isNull = true;
-	}
-
-	//================================================================================================================================
-	//================================================================================================================================
 	void ServerNetworkManager::Start( EcsWorld& _world )
 	{
 		connection			= &_world.GetSingletonComponent<ServerConnectionManager>();
-		deliveryNotification = &_world.GetSingletonComponent<DeliveryNotificationManager>();
-		replication			= &_world.GetSingletonComponent<ServerReplicationManager>();
 		linkingContext		= &_world.GetSingletonComponent<LinkingContext>();
 		rpcManager			= &_world.GetSingletonComponent<RPCManager>();
 		game				= &_world.GetSingletonComponent<Game>();
 
-		// connect host creation/deletion callbacks
-		connection->onClientCreated.Connect( &DeliveryNotificationManager::CreateHost, deliveryNotification );
-		connection->onClientDeleted.Connect( &DeliveryNotificationManager::DeleteHost, deliveryNotification );
-		connection->onClientCreated.Connect( &ServerReplicationManager::CreateHost, replication );
-		connection->onClientDeleted.Connect( &ServerReplicationManager::DeleteHost, replication );
-		connection->onClientCreated.Connect( &ServerNetworkManager::CreateHost, this );
-		connection->onClientDeleted.Connect( &ServerNetworkManager::DeleteHost, this );
+		// create the network scene root for ordering net objects
+		HostManager& hostManager = _world.GetSingletonComponent<HostManager>();
+		Scene& scene = _world.GetSingletonComponent<Scene>();
+		hostManager.netRoot = &scene.CreateSceneNode( "net root", scene.root );
 
 		Debug::Log() << game->name << " bind on port " << connection->serverPort << Debug::Endl();
 		if( connection->socket.Bind( connection->serverPort ) != sf::Socket::Done )
@@ -97,31 +74,28 @@ namespace fan
 	void ServerNetworkManager::Stop( EcsWorld& _world )
 	{
 		connection->socket.Unbind();
-		connection->clients.clear();
-	}
-
-	//================================================================================================================================
-	//================================================================================================================================
-	void ServerNetworkManager::OnSyncSuccess( HostID _hostID )
-	{
-		Client& client = connection->clients[_hostID];
-		client.synced = true;
 	}
 
 	//================================================================================================================================
 	// Updates network objects in preparation for sending it to all clients
+	// @todo this should be a system
 	//================================================================================================================================
 	void ServerNetworkManager::Update( EcsWorld& _world )
 	{
+		HostManager & hostManager = _world.GetSingletonComponent<HostManager>();
 		ServerConnectionManager& connection = _world.GetSingletonComponent<ServerConnectionManager>();
-		for( int i = (int)connection.clients.size() - 1; i >= 0; i-- )
-		{
-			Client& client = connection.clients[i];
-			if( client.state == Client::State::Connected )
-			{
-				HostData& hostData = hostDatas[i];
+		for ( std::pair<HostID, EntityHandle> pair : hostManager.hostHandles )
+		{			
+			const HostID   hostID   = pair.first;
+			const EntityID entityID = _world.GetEntityID( pair.second );
+			HostConnection& hostConnection = _world.GetComponent<HostConnection>( entityID );
 
-				if( client.synced == true )
+			if( hostConnection.state == HostConnection::Connected )
+			{
+				HostGameData& hostData = _world.GetComponent< HostGameData >( entityID );
+				HostReplication& hostReplication = _world.GetComponent< HostReplication >( entityID );
+
+				if( hostConnection.synced == true )
 				{
 					if( hostData.spaceshipID == 0 )
 					{
@@ -130,10 +104,10 @@ namespace fan
 						hostData.spaceshipID = linkingContext->nextNetID++;
 						linkingContext->AddEntity( hostData.spaceshipHandle, hostData.spaceshipID );
 
-						replication->ReplicateOnClient(
-							client.hostId
+						hostReplication.ReplicateOnClient(
+							hostConnection.hostId
 							, rpcManager->RPCSSpawnShip( hostData.spaceshipID, game->frameIndex + 120 )
-							, ServerReplicationManager::ResendUntilReplicated
+							, HostReplication::ResendUntilReplicated
 						);
 					}
 
@@ -168,7 +142,7 @@ namespace fan
 						}
 						else
 						{
-							Debug::Warning() << "no available input from player " << i << Debug::Endl();
+							Debug::Warning() << "no available input from player " << hostID << Debug::Endl();
 						}
 
 						// generate player state
@@ -187,31 +161,31 @@ namespace fan
 
 				// sync the client frame index with the server
 				const double currentTime = Time::Get().ElapsedSinceStartup();
-				if( currentTime - client.lastSync > 3.f )
+				if( currentTime - hostConnection.lastSync > 3.f )
 				{
-					int max = client.framesDelta[0];
-					int min = client.framesDelta[0];
-					for( int i = 1; i < client.framesDelta.size(); i++ )
+					int max = hostConnection.framesDelta[0];
+					int min = hostConnection.framesDelta[0];
+					for( int i = 1; i < hostConnection.framesDelta.size(); i++ )
 					{
-						max = std::max( max, client.framesDelta[i] );
-						min = std::min( min, client.framesDelta[i] );
+						max = std::max( max, hostConnection.framesDelta[i] );
+						min = std::min( min, hostConnection.framesDelta[i] );
 					}
+
 					if( max - min <= 1 ) // we have consistent readings
 					{
-						if( std::abs( min + targetFrameDifference ) > 2 ) // only sync when we have a big enough frame index difference
+						if( std::abs( min + hostManager.targetFrameDifference ) > 2 ) // only sync when we have a big enough frame index difference
 						{
 							RPCManager& rpcManager = _world.GetSingletonComponent<RPCManager>();
-							ServerReplicationManager& replication = _world.GetSingletonComponent<ServerReplicationManager>();
 
-							Signal<HostID>& success = *replication.ReplicateOnClient(
-								client.hostId
-								, rpcManager.RPCShiftClientFrame( min + targetFrameDifference )
-								, ServerReplicationManager::ResendUntilReplicated
+							Signal<>& success = hostReplication.ReplicateOnClient(
+								hostConnection.hostId
+								, rpcManager.RPCShiftClientFrame( min + hostManager.targetFrameDifference )
+								, HostReplication::ResendUntilReplicated
 							);
-							client.lastSync = currentTime;
-							success.Connect( &ServerNetworkManager::OnSyncSuccess, this );
+							hostConnection.lastSync = currentTime;
+							success.Connect( &HostConnection::OnSyncSuccess, &hostConnection );
 
-							Debug::Warning() << "Shifting client " << client.hostId << " frame index : " << min + targetFrameDifference << Debug::Endl();
+							Debug::Warning() << "Shifting client " << hostConnection.hostId << " frame index : " << min + hostManager.targetFrameDifference << Debug::Endl();
 						}
 					}
 				}
@@ -220,9 +194,12 @@ namespace fan
 	}
 
 	//================================================================================================================================
+	// this should be a system
 	//================================================================================================================================
-	void ServerNetworkManager::NetworkReceive()
+	void ServerNetworkManager::NetworkReceive( EcsWorld& _world )
 	{
+		HostManager& hostManager = _world.GetSingletonComponent<HostManager>();
+
 		// receive
 		Packet			packet;
 		sf::IpAddress	receiveIP;
@@ -242,13 +219,16 @@ namespace fan
 			case sf::UdpSocket::Done:
 			{
 				// create / get client
-				HostID clientID = connection->FindClient( receiveIP, receivePort );
+				HostID clientID = hostManager.FindHost( receiveIP, receivePort );
 				if( clientID == -1 )
 				{
-					clientID = connection->CreateClient( receiveIP, receivePort );
+					clientID = hostManager.CreateHost( receiveIP, receivePort );
 				}
-
-				connection->clients[clientID].lastResponseTime = Time::Get().ElapsedSinceStartup();
+				const EntityHandle handle = hostManager.hostHandles[clientID];
+				const EntityID entityID = _world.GetEntityID( handle );
+				
+				HostConnection& hostConnection = _world.GetComponent<HostConnection>( entityID );
+				hostConnection.lastResponseTime = Time::Get().ElapsedSinceStartup();
 
 				// read the first packet type separately
 				PacketType packetType = packet.ReadType();
@@ -258,7 +238,8 @@ namespace fan
 				}
 
 				// packet must be approved & ack must be sent
-				if( !deliveryNotification->ValidatePacket( packet, clientID ) ) { continue; }
+				HostDeliveryNotification& hostDeliveryNotification = _world.GetComponent<HostDeliveryNotification>( entityID );
+				if( !hostDeliveryNotification.ValidatePacket( packet, clientID ) ) { continue; }
 
 				// process packet
 				bool packetValid = true;
@@ -270,25 +251,26 @@ namespace fan
 					{
 						PacketAck packetAck;
 						packetAck.Read( packet );
-						deliveryNotification->Receive( packetAck, clientID );
+						hostDeliveryNotification.ProcessPacket( packetAck, clientID );
 					}break;
 					case PacketType::Hello:
 					{
 						PacketHello packetHello;
 						packetHello.Read( packet );
-						connection->ProcessPacket( clientID, packetHello );
+						hostConnection.ProcessPacket( clientID, packetHello );
 					} break;
 					case PacketType::Ping:
 					{
 						PacketPing packetPing;
 						packetPing.Read( packet );
-						connection->ProcessPacket( clientID, packetPing, game->frameIndex, game->logicDelta );
+						hostConnection.ProcessPacket( clientID, packetPing, game->frameIndex, game->logicDelta );
 					} break;
 					case PacketType::PlayerInput:
 					{
 						PacketInput packetInput;
 						packetInput.Read( packet );
-						hostDatas[clientID].inputs.push( packetInput );
+						HostGameData& hostData = _world.GetComponent< HostGameData >( entityID );
+						hostData.inputs.push( packetInput );
 					} break;					
 					default:
 						Debug::Warning() << "Invalid packet " << int( packetType ) << " received. Reading canceled." << Debug::Endl();
@@ -326,26 +308,29 @@ namespace fan
 			}
 		} while( socketStatus == sf::UdpSocket::Done );
 
-		deliveryNotification->ProcessTimedOutPackets();
-		connection->DetectClientTimout();
+		S_ProcessTimedOutPackets::Run( _world, _world.Match( S_ProcessTimedOutPackets::GetSignature( _world ) ) );
+		connection->DetectClientTimout( _world );
 	}
 
 	//================================================================================================================================
+	// this should be a system
 	// sends data to all clients
 	//================================================================================================================================
-	void ServerNetworkManager::NetworkSend()
+	void ServerNetworkManager::NetworkSend( EcsWorld& _world )
 	{
-		for( int i = (int)connection->clients.size() - 1; i >= 0; i-- )
+		HostManager& hostManager = _world.GetSingletonComponent<HostManager>();
+
+		for( std::pair<HostID, EntityHandle> pair : hostManager.hostHandles )
 		{
-			Client& client = connection->clients[i];
-			HostData& hostData = hostDatas[i];
-			if( client.state == Client::State::Null )
-			{
-				continue;
-			}
+			const HostID   hostID = pair.first;
+			const EntityID entityID = _world.GetEntityID( pair.second );
+			HostConnection& hostConnection = _world.GetComponent<HostConnection>( entityID );
+			HostGameData&	hostData	   = _world.GetComponent< HostGameData >( entityID );
+			HostReplication& hostReplication = _world.GetComponent< HostReplication >( entityID );
+			HostDeliveryNotification& deliveryNotification = _world.GetComponent< HostDeliveryNotification >( entityID );
 
 			// create new packet			
-			Packet packet( deliveryNotification->GetNextPacketTag( client.hostId ) );
+			Packet packet( deliveryNotification.GetNextPacketTag( hostID ) );
 
 			// write game data
 			if( hostData.spaceshipID != 0 )
@@ -354,23 +339,23 @@ namespace fan
 				hostData.nextPlayerState.Write( packet );
 			}
 
-			connection->Write( packet, client.hostId, game->frameIndex );
-			replication->Write( packet, client.hostId );
+			connection->Write( _world, packet, hostID );
+			hostReplication.Write( packet, hostID );
 
 			// write ack
 			if( packet.GetSize() == sizeof( PacketTag ) ) { packet.onlyContainsAck = true; }
-			deliveryNotification->Write( packet, client.hostId );
+			deliveryNotification.Write( packet, hostID );
 
 			// send packet
 			if( packet.GetSize() > sizeof( PacketTag ) )// don't send empty packets
 			{
-				deliveryNotification->RegisterPacket( packet, client.hostId );
-				client.bandwidth = 1.f / game->logicDelta * float( packet.GetSize() ) / 1000.f; // in Ko/s
-				connection->socket.Send( packet, client.ip, client.port );
+				deliveryNotification.RegisterPacket( packet, hostID );
+				hostConnection.bandwidth = 1.f / game->logicDelta * float( packet.GetSize() ) / 1000.f; // in Ko/s
+				connection->socket.Send( packet, hostConnection.ip, hostConnection.port );
 			}
 			else
 			{
-				deliveryNotification->hostDatas[i].nextPacketTag--;
+				deliveryNotification.nextPacketTag--;
 			}
 		}
 	}
@@ -402,20 +387,6 @@ namespace fan
 			ImGui::Columns( 2 );
 			ImGui::Text( "id" );			ImGui::NextColumn();
 			ImGui::Text( "input buffer size");  ImGui::NextColumn();
-			
-
-			for (int i = 0; i < netManager.hostDatas.size(); i++)
-			{
-				HostData& data = netManager.hostDatas[i];
-				if( !data.isNull )
-				{
-					ImGui::Text( "%d", i ); 
-					ImGui::NextColumn();
-
-					ImGui::Text( "%d", data.inputs.size() );
-					ImGui::NextColumn();
-				}
-			}
 			ImGui::Columns( 1 );
 		}
 		ImGui::Unindent(); ImGui::Unindent();

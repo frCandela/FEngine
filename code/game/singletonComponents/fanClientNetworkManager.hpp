@@ -9,7 +9,7 @@ namespace fan
 {
 	class EcsWorld;
 	struct RPCManager;
-	struct DeliveryNotificationManager;
+	struct HostDeliveryNotification;
 	struct ClientConnectionManager;
 	struct ClientReplicationManager;
 	struct LinkingContext;
@@ -30,13 +30,14 @@ namespace fan
 		FrameIndex		spaceshipSpawnFrameIndex;	// the frame index on which the spaceship is spawned
 		NetID			spaceshipNetID;
 		EntityHandle	spaceshipHandle;
+		EntityHandle	persistentHandle;
 
 		 std::queue< PacketInput >			 inputs;
 		 std::queue< PacketPlayerGameState > previousStates;
 		 bool synced;
 
 		// pre-get singletons
-		DeliveryNotificationManager*	deliveryNotificationManager;
+		 HostDeliveryNotification*		deliveryNotification;
 		ClientReplicationManager*		replicationManager;
 		ClientConnectionManager*		connection;
 		LinkingContext*					linkingContext;
@@ -47,7 +48,7 @@ namespace fan
 		void Stop( EcsWorld& _world );
 		void Update( EcsWorld& _world );
 		void NetworkSend();
-		void NetworkReceive();
+		void NetworkReceive( EcsWorld& _world );
 
 		void ProcessPacket( const PacketPlayerGameState& _packet );
 

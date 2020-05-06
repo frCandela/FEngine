@@ -34,11 +34,16 @@
 #include "game/fanGameTags.hpp"
 
 #include "network/singletonComponents/fanServerConnectionManager.hpp"
-#include "network/singletonComponents/fanDeliveryNotificationManager.hpp"
-#include "network/singletonComponents/fanServerReplicationManager.hpp"
 #include "network/singletonComponents/fanRPCManager.hpp"
-#include "game/singletonComponents/fanServerNetworkManager.hpp"
 #include "network/singletonComponents/fanLinkingContext.hpp"
+#include "network/singletonComponents/fanHostManager.hpp"
+
+#include "network/components/fanHostGameData.hpp"
+#include "network/components/fanHostConnection.hpp"
+#include "network/components/fanHostReplication.hpp"
+#include "network/components/fanHostDeliveryNotification.hpp"
+
+#include "game/singletonComponents/fanServerNetworkManager.hpp"
 #include "game/singletonComponents/fanCollisionManager.hpp"
 #include "game/singletonComponents/fanSolarEruption.hpp"
 #include "game/singletonComponents/fanGameCamera.hpp"
@@ -92,7 +97,6 @@ namespace fan
 		world.AddComponentType<FollowTransform>();
 		world.AddComponentType<ProgressBar>();
 		world.AddComponentType<FollowTransformUI>();
-
 		// game components
 		world.AddComponentType<Planet>();
 		world.AddComponentType<SpaceShip>();
@@ -104,6 +108,11 @@ namespace fan
 		world.AddComponentType<Health>();
 		world.AddComponentType<SpaceshipUI>();
 		world.AddComponentType<Damage>();
+		// net components
+		world.AddComponentType<HostGameData>();
+		world.AddComponentType<HostConnection>();
+		world.AddComponentType<HostReplication>();
+		world.AddComponentType<HostDeliveryNotification>();
 
 		// base singleton components
 		world.AddSingletonComponentType<Scene>();
@@ -119,10 +128,9 @@ namespace fan
 		world.AddSingletonComponentType<ServerNetworkManager>();
 		// net singleton components
 		world.AddSingletonComponentType<ServerConnectionManager>();
-		world.AddSingletonComponentType<DeliveryNotificationManager>();
-		world.AddSingletonComponentType<ServerReplicationManager>();
 		world.AddSingletonComponentType<RPCManager>();
 		world.AddSingletonComponentType<LinkingContext>();
+		world.AddSingletonComponentType<HostManager>();
 		
 		world.AddTagType<tag_boundsOutdated>();
 		world.AddTagType<tag_sunlight_occlusion>();
@@ -189,7 +197,7 @@ namespace fan
 		{
 			SCOPED_PROFILE( scene_update );
 
-			netManager->NetworkReceive();
+			netManager->NetworkReceive( world );
 
 			// physics & transforms
 			PhysicsWorld& physicsWorld = world.GetSingletonComponent<PhysicsWorld>();
@@ -227,7 +235,7 @@ namespace fan
 
 			S_UpdateGameCamera::Run( world, world.Match( S_UpdateGameCamera::GetSignature( world ) ), _delta );
 
-			netManager->NetworkSend();
+			netManager->NetworkSend( world );
 		}
 
 		{

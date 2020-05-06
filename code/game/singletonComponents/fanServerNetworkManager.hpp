@@ -8,12 +8,12 @@
 namespace fan
 {
 	class EcsWorld;
+	struct SceneNode;
 	struct ServerConnectionManager;
-	struct DeliveryNotificationManager;
-	struct ServerReplicationManager;
 	struct LinkingContext;
 	struct RPCManager;
 	struct Game;
+	struct HostConnection;
 
 	//================================================================================================================================
 	//================================================================================================================================
@@ -27,24 +27,8 @@ namespace fan
 		static void Save( const SingletonComponent& _component, Json& _json );
 		static void Load( SingletonComponent& _component, const Json& _json );
 
-		//================================================================
-		//================================================================
-		struct HostData
-		{
-			bool					isNull = false;		// client was deleted
-			NetID					spaceshipID = 0;
-			EntityHandle			spaceshipHandle = 0;
-			std::queue<PacketInput> inputs;
-			PacketPlayerGameState	nextPlayerState;
-		};
-
-		std::vector<HostData> hostDatas;
-		static const int targetFrameDifference = 7; // the client must be N frames ahead of the server
-
 		// pre-get singletons
 		ServerConnectionManager*	 connection;
-		DeliveryNotificationManager* deliveryNotification;
-		ServerReplicationManager*	 replication;
 		LinkingContext*				 linkingContext;
 		RPCManager*					 rpcManager;
 		Game*						 game;
@@ -52,12 +36,7 @@ namespace fan
 		void Start( EcsWorld& _world );
 		void Stop( EcsWorld& _world );
 		void Update( EcsWorld& _world );
-		void NetworkSend();
-		void NetworkReceive();
-
-		void CreateHost( const HostID _hostID );
-		void DeleteHost( const HostID _hostID );
-
-		void OnSyncSuccess( HostID _hostID );
+		void NetworkSend( EcsWorld& _world );
+		void NetworkReceive( EcsWorld& _world );
 	};
 }

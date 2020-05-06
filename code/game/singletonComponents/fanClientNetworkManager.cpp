@@ -9,11 +9,14 @@
 #include "scene/fanSceneSerializable.hpp"
 #include "scene/components/fanTransform.hpp"
 #include "scene/components/fanRigidbody.hpp"
-#include "network/singletonComponents/fanDeliveryNotificationManager.hpp"
+#include "scene/components/fanSceneNode.hpp"
+#include "scene/singletonComponents/fanScene.hpp"
 #include "network/singletonComponents/fanClientReplicationManager.hpp"
 #include "network/singletonComponents/fanClientConnectionManager.hpp"
 #include "network/singletonComponents/fanLinkingContext.hpp"
 #include "network/singletonComponents/fanRPCManager.hpp"
+#include "network/components/fanHostDeliveryNotification.hpp"
+#include "network/systems/fanUpdateDeliveryNotification.hpp"
 
 namespace fan
 {
@@ -36,7 +39,7 @@ namespace fan
 	void ClientNetworkManager::Init( EcsWorld& _world, SingletonComponent& _component )
 	{
 		ClientNetworkManager& netManager = static_cast<ClientNetworkManager&>( _component );
-		netManager.deliveryNotificationManager = nullptr;
+		netManager.deliveryNotification = nullptr;
 		netManager.replicationManager = nullptr;
 		netManager.linkingContext = nullptr;
 		netManager.connection = nullptr;
@@ -45,6 +48,7 @@ namespace fan
 		netManager.spaceshipSpawnFrameIndex = 0;
 		netManager.spaceshipNetID = 0;
 		netManager.spaceshipHandle = 0;
+		netManager.persistentHandle = 0;
 		netManager.synced = false;
 	}
 
@@ -52,16 +56,21 @@ namespace fan
 	//================================================================================================================================
 	void ClientNetworkManager::Start( EcsWorld& _world )
 	{
-		deliveryNotificationManager = &_world.GetSingletonComponent<DeliveryNotificationManager>();
-		replicationManager			= &_world.GetSingletonComponent<ClientReplicationManager>();
-		connection					= &_world.GetSingletonComponent<ClientConnectionManager>();
-		linkingContext			    = &_world.GetSingletonComponent<LinkingContext>();
-		rpcManager					= &_world.GetSingletonComponent<RPCManager>();
-		game						= &_world.GetSingletonComponent<Game>();
+		replicationManager			= & _world.GetSingletonComponent<ClientReplicationManager>();
+		connection					= & _world.GetSingletonComponent<ClientConnectionManager>();
+		linkingContext			    = & _world.GetSingletonComponent<LinkingContext>();
+		rpcManager					= & _world.GetSingletonComponent<RPCManager>();
+		game						= & _world.GetSingletonComponent<Game>();
 
-		connection->onServerDisconnected.Connect( &DeliveryNotificationManager::DeleteHost, deliveryNotificationManager );
 		rpcManager->onShiftFrameIndex.Connect( &ClientNetworkManager::ShiftFrameIndex, this );
 		rpcManager->onSpawnShip.Connect( &ClientNetworkManager::SpawnShip, this );
+
+		// Create player persistent scene node
+		Scene& scene			= _world.GetSingletonComponent<Scene>();
+		SceneNode& sceneNode	= scene.CreateSceneNode( "persistent", scene.root );
+		persistentHandle		= sceneNode.handle;
+		EntityID entityID		= _world.GetEntityID( persistentHandle );
+		deliveryNotification	= &_world.AddComponent<HostDeliveryNotification>( entityID );
 
 		// Bind socket
 		sf::Socket::Status socketStatus = sf::Socket::Disconnected;
@@ -193,7 +202,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void ClientNetworkManager::NetworkReceive()
+	void ClientNetworkManager::NetworkReceive( EcsWorld& _world )
 	{
 		// receive
 		Packet			packet;
@@ -225,7 +234,7 @@ namespace fan
 					packet.onlyContainsAck = true;
 				}
 
-				if( !deliveryNotificationManager->ValidatePacket( packet ) )
+				if( !deliveryNotification->ValidatePacket( packet ) )
 				{
 					continue;
 				}
@@ -240,7 +249,7 @@ namespace fan
 					{
 						PacketAck packetAck;
 						packetAck.Read( packet );
-						deliveryNotificationManager->Receive( packetAck );
+						deliveryNotification->ProcessPacket( packetAck );
 					}break;
 					case PacketType::Ping:
 					{
@@ -301,7 +310,7 @@ namespace fan
 			}
 		} while( socketStatus == sf::UdpSocket::Done );
 
-		deliveryNotificationManager->ProcessTimedOutPackets();
+		S_ProcessTimedOutPackets::Run( _world, _world.Match( S_ProcessTimedOutPackets::GetSignature( _world ) ) );
 		connection->DetectServerTimout();		
 		replicationManager->ReplicateRPC( *rpcManager );
 	}
@@ -311,7 +320,7 @@ namespace fan
 	void ClientNetworkManager::NetworkSend()
 	{
 		// create packet
-		Packet packet( deliveryNotificationManager->GetNextPacketTag() );
+		Packet packet( deliveryNotification->GetNextPacketTag() );
 
 		// write packet
 		connection->Write( packet );
@@ -326,18 +335,18 @@ namespace fan
 
 		if( packet.GetSize() == sizeof( PacketTag ) ) { packet.onlyContainsAck = true; }
 
-		deliveryNotificationManager->Write( packet );
+		deliveryNotification->Write( packet );
 
 		// send packet, don't send empty packets
 		if( packet.GetSize() > sizeof( PacketTag ) )
 		{
-			deliveryNotificationManager->RegisterPacket( packet );
+			deliveryNotification->RegisterPacket( packet );
 			connection->bandwidth = 1.f / game->logicDelta * float( packet.GetSize() ) / 1000.f; // in Ko/s
 			connection->socket.Send( packet, connection->serverIP, connection->serverPort );
 		}
 		else
 		{
-			deliveryNotificationManager->hostDatas[0].nextPacketTag--;
+			deliveryNotification->nextPacketTag--;
 		}
 	}
 

@@ -65,11 +65,38 @@ namespace fan
 		size_t		GetSize() const{ return m_packet.getDataSize(); }
 
 		PacketTag		 tag;
-		Signal< HostID, PacketTag > onFail;		// packet was dropped
-		Signal< HostID, PacketTag > onSuccess;	// packet was received
+		Signal< PacketTag > onFail;		// packet was dropped
+		Signal< PacketTag > onSuccess;	// packet was received
 		bool onlyContainsAck = false;
 	private:
 		sf::Packet m_packet;
+	};
+
+	//================================================================================================================================
+	//================================================================================================================================
+	struct PacketAck
+	{
+		void Write( Packet& _packet )
+		{
+			_packet << PacketTypeInt( PacketType::Ack );
+			_packet << sf::Uint16( tags.size() );
+			for( PacketTag tag : tags )
+			{
+				_packet << tag;
+			}
+		}
+		void Read( Packet& _packet )
+		{
+			sf::Uint16 size;
+			_packet >> size;
+			tags.resize( size );
+			for( int i = 0; i < size; i++ )
+			{
+				_packet >> tags[i];
+			}
+		}
+
+		std::vector<PacketTag> tags;
 	};
 
 	//================================================================================================================================

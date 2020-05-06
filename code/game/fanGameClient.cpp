@@ -33,12 +33,12 @@
 #include "network/fanPacket.hpp"
 #include "network/singletonComponents/fanClientConnectionManager.hpp"
 #include "network/singletonComponents/fanClientReplicationManager.hpp"
-#include "network/singletonComponents/fanDeliveryNotificationManager.hpp"
-#include "game/singletonComponents/fanClientNetworkManager.hpp"
+#include "game/fanGameTags.hpp"
 #include "network/singletonComponents/fanRPCManager.hpp"
 #include "network/singletonComponents/fanLinkingContext.hpp"
-#include "game/fanGameTags.hpp"
+#include "network/components/fanHostDeliveryNotification.hpp"
 
+#include "game/singletonComponents/fanClientNetworkManager.hpp"
 #include "game/singletonComponents/fanSunLight.hpp"
 #include "game/singletonComponents/fanGameCamera.hpp"
 #include "game/singletonComponents/fanCollisionManager.hpp"
@@ -105,6 +105,8 @@ namespace fan
 		world.AddComponentType<SpaceshipUI>();
 		world.AddComponentType<Damage>();
 		world.AddComponentType<PlayerController>();
+		// network components
+		world.AddComponentType<HostDeliveryNotification>();
 
 		// base singleton components
 		world.AddSingletonComponentType<Scene>();
@@ -119,7 +121,6 @@ namespace fan
 		world.AddSingletonComponentType<SolarEruption>();
 		world.AddSingletonComponentType<ClientNetworkManager>();
 		// network singleton components
-		world.AddSingletonComponentType<DeliveryNotificationManager>();
 		world.AddSingletonComponentType<ClientConnectionManager>();
 		world.AddSingletonComponentType<ClientReplicationManager>();
 		world.AddSingletonComponentType<RPCManager>();
@@ -142,10 +143,6 @@ namespace fan
 		netManager = &world.GetSingletonComponent<ClientNetworkManager>();
 
 		netManager->Start( world );
-
-		// Create remote host for the server
-		DeliveryNotificationManager& deliveryNotificationManager = world.GetSingletonComponent<DeliveryNotificationManager>();
-		deliveryNotificationManager.CreateHost();
 
 		// Init game
 		S_RegisterAllRigidbodies::Run( world, world.Match( S_RegisterAllRigidbodies::GetSignature( world ) ) );
@@ -192,7 +189,7 @@ namespace fan
 		game->frameIndex++;
 		{
 			SCOPED_PROFILE( scene_update );			
-			netManager->NetworkReceive();
+			netManager->NetworkReceive( world );
 
 			// physics & transforms
 			PhysicsWorld& physicsWorld = world.GetSingletonComponent<PhysicsWorld>();

@@ -62,7 +62,7 @@ namespace fan
 	//================================================================================================================================
 	// login packet dropped our timed out. Resend a new one.
 	//================================================================================================================================
-	void ClientConnectionManager::OnLoginFail( HostID, const PacketTag /*_packetTag*/ )
+	void ClientConnectionManager::OnLoginFail( const PacketTag /*_packetTag*/ )
 	{
 		if( state == ClientState::PendingConnection )
 		{

@@ -6,7 +6,6 @@
 #include "ecs/fanEcsWorld.hpp"
 #include "game/singletonComponents/fanSunLight.hpp"
 #include "game/singletonComponents/fanGame.hpp"
-#include "network/singletonComponents/fanServerReplicationManager.hpp"
 #include "game/fanGameTags.hpp"
 #include "core/fanRandom.hpp"
 #include "core/math/fanLerp.hpp"
@@ -277,17 +276,6 @@ namespace fan
 			ImGui::PushItemWidth( 200.f );
 			{
 				const Game& game = _world.GetSingletonComponent<Game>();
-
-				// read only info
-				if( ImGui::Button( "test start" ) && game.gameServer != nullptr )
-				{
-					solarEruption.eruptionStartFrame = SolarEruption::CalculateNextEruptionStartFrame( solarEruption, game );
-					ServerReplicationManager& replication = _world.GetSingletonComponent<ServerReplicationManager>();
-					replication.ReplicateOnAllClients(
-						  ServerReplicationManager::BuildSingletonPacket( _world, SolarEruption::s_typeInfo ) 	
-						, ServerReplicationManager::ResendUntilReplicated 
-					);
-				}
 				ImGui::Text( "state: %s", StateToString( solarEruption.state ).c_str() );
 				ImGui::Text( "timer: %f", solarEruption.timer );
 

@@ -41,7 +41,7 @@ namespace fan
 		bool			mustSendBackPacketPing;
 
 		void Write( Packet& _packet );
-		void OnLoginFail( HostID, const PacketTag _packetTag );
+		void OnLoginFail( const PacketTag _packetTag );
 		void DetectServerTimout();
 		void DisconnectFromServer();
 
