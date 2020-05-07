@@ -18,7 +18,6 @@ namespace fan
 
 		enum State
 		{
-			Null,				// empty client slot
 			Disconnected,		// Requires a hello packet from the client to start connection process
 			NeedingApprouval,	// Client hello is received, a Login packet must be sent back
 			PendingApprouval,	// Login packet was sent, waiting for ack
@@ -31,10 +30,12 @@ namespace fan
 		State		state;
 		double		lastResponseTime;	// last time the client answered back
 		double		lastPingTime;		// last time the client was sent a ping
+		double		lastDisconnectTime;	// last time the client was sent a disconnect packet
 		float		rtt;
 		float		bandwidth;			// Ko/s send to the client
 		float		pingDelay;			// send a ping to clients every X seconds
-		float		timeoutTime;		// disconnects clients after X seconds without a response
+		float		disconnectDelay;	// send a disconnect packet to clients every X seconds
+		float		timeoutDelay;		// disconnects clients after X seconds without a response
 
 		// client frame index synchronization
 		bool				synced;			// true if the client has been synced 

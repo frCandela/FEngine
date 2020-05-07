@@ -25,14 +25,16 @@ namespace fan
 		HostConnection& hostConnection = static_cast<HostConnection&>( _component );
 		hostConnection.ip = sf::IpAddress();
 		hostConnection.port = 0;
-		hostConnection.name = "";
-		hostConnection.state = State::Null;
+		hostConnection.name = "unknown";
+		hostConnection.state = State::Disconnected;
 		hostConnection.lastResponseTime = 0.f;
 		hostConnection.lastPingTime = 0.f;
+		hostConnection.lastDisconnectTime = 0.f;
 		hostConnection.rtt = -1.f;
 		hostConnection.bandwidth = 0.f;
-		hostConnection.pingDelay = .5f;
-		hostConnection.timeoutTime = 10.f;
+		hostConnection.pingDelay = .2f;
+		hostConnection.disconnectDelay = 1.f;
+		hostConnection.timeoutDelay = 5.f;
 
 		hostConnection.synced = false;
 		hostConnection.lastSync = 0.f;
@@ -71,6 +73,19 @@ namespace fan
 				packetPing.Write( _packet );
 			}
 		}
+		else if( state == HostConnection::Disconnected )
+		{
+			const double currentTime = Time::Get().ElapsedSinceStartup();
+			if( currentTime - lastDisconnectTime > disconnectDelay )
+			{
+				lastDisconnectTime = currentTime;
+
+				PacketDisconnect packetDisconnect;
+				packetDisconnect.Write( _packet );
+
+				Debug::Log() << "host connection error " << ip.toString() << "::" << port << Debug::Endl();
+			}
+		}
 	}
 
 	//================================================================================================================================
@@ -85,7 +100,7 @@ namespace fan
 		else if( state == HostConnection::Connected )
 		{
 			state = HostConnection::NeedingApprouval;
-			Debug::Log() << " disconnected" << Debug::Endl();
+			Debug::Log() << "host disconnected " << ip.toString() << "::" << port << Debug::Endl();
 		}
 	}
 
@@ -114,7 +129,7 @@ namespace fan
 	{
 		if( state == HostConnection::PendingApprouval )
 		{
-			Debug::Log() << " login failed, resending approval. " << Debug::Endl();
+			Debug::Log() << "host " << ip.toString() << "::" << port << " login failed, resending approval. " << Debug::Endl();
 			state = HostConnection::NeedingApprouval;
 		}
 	}
@@ -125,7 +140,7 @@ namespace fan
 	{
 		if( state == HostConnection::PendingApprouval )
 		{
-			Debug::Log() << " connected " << Debug::Endl();
+			Debug::Log() << "host connected " << ip.toString() << "::" << port << Debug::Endl();
 			state = HostConnection::Connected;
 		}
 	}
@@ -137,7 +152,6 @@ namespace fan
 	{
 		switch( _clientState )
 		{
-		case HostConnection::Null:				return "Null";				break;
 		case HostConnection::Disconnected:		return "Disconnected";		break;
 		case HostConnection::NeedingApprouval:	return "NeedingApprouval";	break;
 		case HostConnection::PendingApprouval:	return "PendingApprouval";	break;
@@ -153,12 +167,11 @@ namespace fan
 	{
 		switch( _clientState )
 		{
-		case HostConnection::Null:				return  Color::Red.ToImGui(); break;
 		case HostConnection::Disconnected:		return  Color::Orange.ToImGui(); break;
 		case HostConnection::NeedingApprouval:	return  Color::Yellow.ToImGui(); break;
 		case HostConnection::PendingApprouval:	return  Color::Yellow.ToImGui(); break;
 		case HostConnection::Connected:			return  Color::Green.ToImGui(); break;
-		default:			assert( false );		return  Color::Purple.ToImGui(); break;
+		default:			assert( false );	return  Color::Purple.ToImGui(); break;
 		}
 	}
 
@@ -178,7 +191,7 @@ namespace fan
 			ImGui::Text( "adress:        %s::%u", hostConnection.ip.toString().c_str(), hostConnection.port );
 			ImGui::Text( "frame delta:   %d %d %d %d %d", hostConnection.framesDelta[0], hostConnection.framesDelta[1], hostConnection.framesDelta[2], hostConnection.framesDelta[3], hostConnection.framesDelta[4] );
 			ImGui::DragFloat( "ping delay", &hostConnection.pingDelay, 0.1f, 0.f, 10.f );
-			ImGui::DragFloat( "timeout time", &hostConnection.timeoutTime, 0.1f, 0.f, 10.f );
+			ImGui::DragFloat( "timeout time", &hostConnection.timeoutDelay, 0.1f, 0.f, 10.f );
 		} ImGui::PopItemWidth();
 	}
 }

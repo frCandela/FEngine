@@ -67,7 +67,7 @@ namespace fan
 						while( !hostData.inputs.empty() )
 						{
 							const PacketInput& packetInput = hostData.inputs.front();
-							if( packetInput.frameIndex < game.frameIndex )
+							if( packetInput.frameIndex < game.frameIndex || packetInput.frameIndex > game.frameIndex + 60 )
 							{
 								hostData.inputs.pop();
 							}
@@ -134,7 +134,8 @@ namespace fan
 							hostConnection.lastSync = currentTime;
 							success.Connect( &HostConnection::OnSyncSuccess, &hostConnection );
 
-							Debug::Warning() << "Shifting client frame index : " << min + hostManager.targetFrameDifference << Debug::Endl();
+							Debug::Log() << "shifting host frame index : " << min + hostManager.targetFrameDifference;
+							Debug::Get() << " " << hostConnection.ip.toString() << "::" << hostConnection.port << Debug::Endl();
 						}
 					}
 				}
@@ -174,8 +175,14 @@ namespace fan
 			// write game data
 			if( hostData.spaceshipID != 0 )
 			{
-				assert( hostData.nextPlayerState.frameIndex == game.frameIndex );
-				hostData.nextPlayerState.Write( packet );
+				if( hostData.nextPlayerState.frameIndex == game.frameIndex )
+				{
+					hostData.nextPlayerState.Write( packet );
+				}
+				else
+				{
+					Debug::Warning() << "wrong host state frame index " << hostConnection.ip.toString() << "::" << hostConnection.port << Debug::Endl();
+				}
 			}
 
 			hostConnection.Write( _world, packet );

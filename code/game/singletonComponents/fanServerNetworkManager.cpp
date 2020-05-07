@@ -53,10 +53,10 @@ namespace fan
 
 		// bind
 		ServerConnection& connection = _world.GetSingletonComponent<ServerConnection>();
-		Debug::Log() << " bind on port " << connection.serverPort << Debug::Endl();
+		Debug::Log() << "bind on port " << connection.serverPort << Debug::Endl();
 		if( connection.socket.Bind( connection.serverPort ) != sf::Socket::Done )
 		{
-			Debug::Error() << " bind failed on port " << connection.serverPort << Debug::Endl();
+			Debug::Error() << "bind failed on port " << connection.serverPort << Debug::Endl();
 		}
 	}
 
@@ -75,7 +75,7 @@ namespace fan
 	{
 		HostManager& hostManager = _world.GetSingletonComponent<HostManager>();
 		ServerConnection& connection = _world.GetSingletonComponent<ServerConnection>();
-		Game& game = _world.GetSingletonComponent<Game>();
+		Game& game = _world.GetSingletonComponent<Game>();		
 
 		// receive
 		Packet			packet;
@@ -96,14 +96,15 @@ namespace fan
 			case sf::UdpSocket::Done:
 			{
 				// create / get client
-				EntityHandle handle = hostManager.FindHost( receiveIP, receivePort );
-				if( handle == 0 )
+				EntityHandle clientHandle = hostManager.FindHost( receiveIP, receivePort );
+				if( clientHandle == 0 )
 				{
-					handle = hostManager.CreateHost( receiveIP, receivePort );
+					clientHandle = hostManager.CreateHost( receiveIP, receivePort );
 				}
-				const EntityID entityID = _world.GetEntityID( handle );
+				const EntityID entityID = _world.GetEntityID( clientHandle );
 				
-				HostConnection& hostConnection = _world.GetComponent<HostConnection>( entityID );
+				ReliabilityLayer&	reliabilityLayer = _world.GetComponent<ReliabilityLayer>( entityID );
+				HostConnection&		hostConnection = _world.GetComponent<HostConnection>( entityID );
 				hostConnection.lastResponseTime = Time::Get().ElapsedSinceStartup();
 
 				// read the first packet type separately
@@ -112,10 +113,18 @@ namespace fan
 				{
 					packet.onlyContainsAck = true;
 				}
+				else if( packetType == PacketType::Hello )
+				{
+					// disconnections can cause the reliability layer tags to be off
+					reliabilityLayer.expectedPacketTag = packet.tag;
+				}
 
-				// packet must be approved & ack must be sent
-				ReliabilityLayer& reliabilityLayer = _world.GetComponent<ReliabilityLayer>( entityID );
-				if( !reliabilityLayer.ValidatePacket( packet ) ) { continue; }
+
+				// packet must be approved & ack must be sent				
+				if( !reliabilityLayer.ValidatePacket( packet ) ) 
+				{ 
+					continue; 
+				}
 
 				// process packet
 				bool packetValid = true;
@@ -135,6 +144,12 @@ namespace fan
 						packetHello.Read( packet );
 						hostConnection.ProcessPacket( packetHello );
 					} break;
+					case PacketType::Disconnect:
+					{
+						PacketDisconnect packetDisconnect;
+						packetDisconnect.Read( packet );
+						hostManager.DeleteHost( clientHandle );
+					} break;
 					case PacketType::Ping:
 					{
 						PacketPing packetPing;
@@ -145,8 +160,11 @@ namespace fan
 					{
 						PacketInput packetInput;
 						packetInput.Read( packet );
-						HostGameData& hostData = _world.GetComponent< HostGameData >( entityID );
-						hostData.inputs.push( packetInput );
+						if( hostConnection.state == HostConnection::Connected )
+						{
+							HostGameData& hostData = _world.GetComponent< HostGameData >( entityID );
+							hostData.inputs.push( packetInput );
+						}
 					} break;					
 					default:
 						Debug::Warning() << "Invalid packet " << int( packetType ) << " received. Reading canceled." << Debug::Endl();

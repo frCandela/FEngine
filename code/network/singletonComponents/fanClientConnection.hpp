@@ -22,7 +22,8 @@ namespace fan
 		enum class ClientState { 
 			Disconnected,		// Client needs to send a Hello packet to the server to login
 			PendingConnection,	// A Hello packet was sent, waiting for LoginSuccess packet from the server
-			Connected			// Client received a LoginSuccess, client is connected
+			Connected,			// Client received a LoginSuccess, client is connected
+			Stopping			// Client is being stopped, a disconnect packet must be sent to the server
 		};
 		
 		UdpSocket		socket;
@@ -31,7 +32,7 @@ namespace fan
 		Port			serverPort;
 		ClientState		state;
 		float			rtt;
-		float			timeoutTime;			// disconnects from server after X seconds without a response
+		float			timeoutDelay;			// disconnects from server after X seconds without a response
 		float			bandwidth;				// in Ko/s
 		double			serverLastResponse;
 
@@ -44,6 +45,7 @@ namespace fan
 		void DisconnectFromServer();
 
 		void ProcessPacket( const PacketLoginSuccess& _packetLogin );
+		void ProcessPacket( const PacketDisconnect& _packetDisconnect );
 		void ProcessPacket( const PacketPing& _packetPing, const FrameIndex _frameIndex );
 	};
 }

@@ -52,11 +52,6 @@ namespace fan
 		HostConnection& hostConnection = world.AddComponent< HostConnection >( entityID );
 		hostConnection.ip				= _ip;
 		hostConnection.port				= _port;
-		hostConnection.name				= "Unknown";
-		hostConnection.state			= HostConnection::Disconnected;
-		hostConnection.rtt				= 0.f;
-		hostConnection.lastResponseTime = 0.f;
-		hostConnection.lastPingTime		= 0.f;
 
 		return hostNode.handle;
 	}
@@ -84,7 +79,7 @@ namespace fan
 		assert( it != hostHandles.end() );
 		hostHandles.erase( it );
 
-		Debug::Log() << "host disconnected " << _hostHandle << Debug::Endl();
+		Debug::Log() << "host disconnected " << hostConnection.ip.toString() << "::" << hostConnection.port << Debug::Endl();
 	}
 
 	//================================================================================================================================

@@ -434,7 +434,8 @@ namespace fan
 			game.state = Game::STOPPED;
 			if( game.gameServer != nullptr ) game.gameServer->Stop();
 			else							 game.gameClient->Stop();
-			scene.LoadFrom( scene.path ); // reload
+
+			scene.LoadFrom( scene.path ); // reload the scene 
 
 			// restore camera transform
 			const EntityID newCameraID = m_gameWorld.GetEntityID( scene.mainCamera->handle );

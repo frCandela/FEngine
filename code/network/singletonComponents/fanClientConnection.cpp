@@ -30,7 +30,7 @@ namespace fan
 		connection.serverPort = 53000;
 		connection.state = ClientState::Disconnected;
 		connection.rtt = 0.f;
-		connection.timeoutTime = 10.f;
+		connection.timeoutDelay = 5.f;
 		connection.bandwidth = 0.f;
 		connection.serverLastResponse = 0.f;
 		connection.lastPacketPing = PacketPing();
@@ -42,22 +42,43 @@ namespace fan
 	//================================================================================================================================
 	void ClientConnection::Write( Packet& _packet )
 	{
-		if( state == ClientState::Disconnected )
+		switch( state )
 		{
-			state = ClientState::PendingConnection;
 
+		case fan::ClientConnection::ClientState::Disconnected:
+		{
 			PacketHello hello;
 			hello.name = "toto";
 			hello.Write( _packet );
 			_packet.onFail.Connect( &ClientConnection::OnLoginFail, this );
+			state = ClientState::PendingConnection;
+			Debug::Log() << "logging in..." << Debug::Endl();
 		}
-		else if( state == ClientState::Connected )
-		{
+		break;
+
+		case fan::ClientConnection::ClientState::PendingConnection:
+			break;
+
+		case fan::ClientConnection::ClientState::Connected:
 			if( mustSendBackPacketPing )
 			{
-				lastPacketPing.Write( _packet ); 
+				lastPacketPing.Write( _packet );
 				mustSendBackPacketPing = false;
 			}
+			break;
+
+		case fan::ClientConnection::ClientState::Stopping:
+		{
+			{
+				PacketDisconnect disconnect;
+				disconnect.Write( _packet );
+				state = ClientState::Disconnected;
+			}
+		}break;
+
+		default:
+			assert( false );
+			break;
 		}
 	}
 
@@ -68,7 +89,6 @@ namespace fan
 	{
 		if( state == ClientState::PendingConnection )
 		{
-			Debug::Log() << "login fail" << Debug::Endl();
 			state = ClientState::Disconnected;
 		}
 	}
@@ -79,9 +99,17 @@ namespace fan
 	{
 		if( state == ClientState::PendingConnection )
 		{
-			Debug::Log() << "login success !" << Debug::Endl();
+			Debug::Log() << "login success" << Debug::Endl();
 			state = ClientState::Connected;
 		}
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
+	void ClientConnection::ProcessPacket( const PacketDisconnect& _packetDisconnect )
+	{
+		state = ClientState::Disconnected;
+		Debug::Log() << "disconnected from server" << Debug::Endl();		
 	}
 
 	//================================================================================================================================
@@ -106,7 +134,7 @@ namespace fan
 		if( state == ClientState::Connected )
 		{
 			const double currentTime = Time::Get().ElapsedSinceStartup();
-			if( serverLastResponse + timeoutTime < currentTime )
+			if( serverLastResponse + timeoutDelay < currentTime )
 			{
 				DisconnectFromServer();
 			}
@@ -129,9 +157,10 @@ namespace fan
 		switch( _clientState )
 		{
 		case fan::ClientConnection::ClientState::Disconnected:		return "Disconnected";		break;
+		case fan::ClientConnection::ClientState::Stopping:			return "Stopping";			break;
 		case fan::ClientConnection::ClientState::PendingConnection:	return "PendingConnection";	break;
 		case fan::ClientConnection::ClientState::Connected:			return "Connected";			break;
-		default:			assert( false );								return "Error";				break;
+		default:			assert( false );						return "Error";				break;
 		}
 	}
 
@@ -143,6 +172,7 @@ namespace fan
 		switch( _clientState )
 		{
 		case fan::ClientConnection::ClientState::Disconnected:		return Color::Red.ToImGui(); break;
+		case fan::ClientConnection::ClientState::Stopping:			return Color::Purple.ToImGui(); break;
 		case fan::ClientConnection::ClientState::PendingConnection:	return Color::Yellow.ToImGui(); break;
 		case fan::ClientConnection::ClientState::Connected:			return Color::Green.ToImGui(); break;
 		default:			assert( false );								return Color::Purple.ToImGui(); break;
@@ -160,7 +190,7 @@ namespace fan
 
 			ImGui::Text( "Client" );
 			ImGui::Separator();
-			ImGui::DragFloat( "timeout time", &connection.timeoutTime, 0.1f, 0.f, 10.f );
+			ImGui::DragFloat( "timeout time", &connection.timeoutDelay, 0.1f, 0.f, 10.f );
 			ImGui::Text( "state:               " ); ImGui::SameLine();
 			ImGui::TextColored( GetStateColor( connection.state ), "%s", GetStateName( connection.state ).c_str() );
 			ImGui::Text( "client port           %u", connection.clientPort );

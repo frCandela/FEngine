@@ -53,7 +53,6 @@ namespace fan
 		RPCManager& rpcManager = _world.GetSingletonComponent<RPCManager>();
 		rpcManager.onShiftFrameIndex.Connect( &ClientNetworkManager::OnShiftFrameIndex, this );
 		rpcManager.onShiftFrameIndex.Connect( &Game::OnShiftFrameIndex, &game );
-
 		rpcManager.onSpawnShip.Connect( &ClientNetworkManager::OnSpawnShip, this );
 
 		// Create player persistent scene node
@@ -84,6 +83,8 @@ namespace fan
 	void ClientNetworkManager::Stop( EcsWorld& _world )
 	{
 		ClientConnection& connection = _world.GetSingletonComponent<ClientConnection>();
+		connection.state = ClientConnection::ClientState::Stopping;
+		NetworkSend( _world ); // send a last packet
 		connection.socket.Unbind();
 	}
 
@@ -150,6 +151,7 @@ namespace fan
 		ClientReplication& replication	= _world.GetSingletonComponent<ClientReplication>();
 		LinkingContext& linkingContext  = _world.GetSingletonComponent<LinkingContext>();
 		Game& game						= _world.GetSingletonComponent<Game>();
+		ClientConnection& connection	= _world.GetSingletonComponent<ClientConnection>();
 
 		replication.ReplicateSingletons( _world );
 
@@ -201,6 +203,8 @@ namespace fan
 	//================================================================================================================================
 	void ClientNetworkManager::NetworkReceive( EcsWorld& _world )
 	{
+		S_ProcessTimedOutPackets::Run( _world, _world.Match( S_ProcessTimedOutPackets::GetSignature( _world ) ) );
+
 		const EntityID presistentEntityID = _world.GetEntityID( persistentHandle );
 		ReliabilityLayer& reliabilityLayer = _world.GetComponent<ReliabilityLayer>( presistentEntityID );
 		ClientConnection& connection = _world.GetSingletonComponent<ClientConnection>();
@@ -236,6 +240,11 @@ namespace fan
 				if( packetType == PacketType::Ack )
 				{
 					packet.onlyContainsAck = true;
+				}				
+				else if( packetType == PacketType::Disconnect )
+				{
+					// disconnection can cause the reliability layer tags to be off
+					reliabilityLayer.expectedPacketTag = packet.tag;
 				}
 
 				if( !reliabilityLayer.ValidatePacket( packet ) )
@@ -243,7 +252,7 @@ namespace fan
 					continue;
 				}
 
-				// Process packet
+				// process packet
 				bool packetValid = true;
 				while( packetValid )
 				{
@@ -267,6 +276,13 @@ namespace fan
 						packetLogin.Read( packet );
 						connection.ProcessPacket( packetLogin );
 					} break;
+					case PacketType::Disconnect:
+					{
+						PacketDisconnect packetDisconnect;
+						packetDisconnect.Read( packet );
+						connection.ProcessPacket( packetDisconnect );
+					} break;
+
 					case PacketType::Replication:
 					{
 						PacketReplication packetReplication;
@@ -314,7 +330,7 @@ namespace fan
 			}
 		} while( socketStatus == sf::UdpSocket::Done );
 
-		S_ProcessTimedOutPackets::Run( _world, _world.Match( S_ProcessTimedOutPackets::GetSignature( _world ) ) );
+		
 		connection.DetectServerTimout();		
 		replication.ReplicateRPC( rpcManager );
 	}

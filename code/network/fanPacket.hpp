@@ -28,6 +28,7 @@ namespace fan
 		Ping = 0			// server calculates the RTT &sends it to the client
 		, Ack				// packet reception acknowledgment 
 		, Hello				// first presentation of the client to the server for logging in
+		, Disconnect		// packet sent/received when the player disconnects from the server
 		, LoggedIn			// server informs client that login was successful
 		, Replication		// replication of data on the client's world
 		, PlayerInput		// client input ring buffer sent to the server
@@ -143,6 +144,19 @@ namespace fan
 
 		std::string name = "";
 	};
+
+	//================================================================================================================================
+	// client -> server when the client disconnects
+	// server -> client when the server shuts down
+	//================================================================================================================================
+	struct PacketDisconnect
+	{
+		void Write( Packet& _packet ) const
+		{
+			_packet << PacketTypeInt( PacketType::Disconnect );
+		}
+		void Read( Packet& /*_packet*/ ){}
+	};	
 
 	//================================================================================================================================
 	// server -> client
