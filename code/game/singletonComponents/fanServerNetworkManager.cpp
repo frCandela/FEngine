@@ -196,10 +196,7 @@ namespace fan
 
 		ImGui::Indent(); ImGui::Indent();
 		{
-			ImGui::Columns( 2 );
-			ImGui::Text( "id" );			ImGui::NextColumn();
-			ImGui::Text( "input buffer size");  ImGui::NextColumn();
-			ImGui::Columns( 1 );
+			ImGui::Text( "Stop looking at me plz" );
 		}
 		ImGui::Unindent(); ImGui::Unindent();
 	}

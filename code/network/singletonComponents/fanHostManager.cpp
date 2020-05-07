@@ -96,6 +96,18 @@ namespace fan
 
 		ImGui::Indent(); ImGui::Indent();
 		{
+			ImGui::Columns( 3 );
+
+			ImGui::Text( "name" );	ImGui::NextColumn();
+			ImGui::Text( "ip" );		ImGui::NextColumn();
+			ImGui::Text( "port" );		ImGui::NextColumn();
+			for( const std::pair<IPPort, EntityHandle>& pair : hostManager.hostHandles )
+			{
+				ImGui::Text( "host%d", pair.second );						ImGui::NextColumn();
+				ImGui::Text( "%s", pair.first.adress.toString().c_str() );	ImGui::NextColumn();
+				ImGui::Text( "%d", pair.first.port );						ImGui::NextColumn();
+			}
+			ImGui::Columns( 1 );
 
 		}ImGui::Unindent(); ImGui::Unindent();
 	}

@@ -52,12 +52,19 @@ namespace fan
 		LinkingContext& linkingContext = static_cast<LinkingContext&>( _component );
 
 		ImGui::Indent(); ImGui::Indent();
+		ImGui::Columns( 2 );
+
+		ImGui::Text( "net ID" );		ImGui::NextColumn();
+		ImGui::Text( "entity handle" ); ImGui::NextColumn();
+		for( std::pair<NetID, EntityHandle> pair : linkingContext.netIDToEntityHandle )
 		{
-			ImGui::Text( "NetID <-> EntityHandle" );
-			for ( std::pair<NetID, EntityHandle> pair : linkingContext.netIDToEntityHandle )
-			{
-				ImGui::Text( "%d <-> %d", pair.first, pair .second );
-			}
-		}ImGui::Unindent(); ImGui::Unindent();
+			ImGui::Text( "%d", pair.first );
+			ImGui::NextColumn();
+			ImGui::Text( "%d", pair.second );
+			ImGui::NextColumn();
+		}
+
+		ImGui::Columns( 1 );
+		ImGui::Unindent(); ImGui::Unindent();
 	}
 }
