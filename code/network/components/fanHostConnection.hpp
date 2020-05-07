@@ -25,7 +25,6 @@ namespace fan
 			Connected			// Login packet was received, client is connected
 		};
 
-		HostID		hostId;
 		IpAddress	ip;
 		Port		port;
 		std::string	name;
@@ -34,6 +33,8 @@ namespace fan
 		double		lastPingTime;		// last time the client was sent a ping
 		float		rtt;
 		float		bandwidth;			// Ko/s send to the client
+		float		pingDelay;			// send a ping to clients every X seconds
+		float		timeoutTime;		// disconnects clients after X seconds without a response
 
 		// client frame index synchronization
 		bool				synced;			// true if the client has been synced 
@@ -41,11 +42,12 @@ namespace fan
 		std::array<int, 5>  framesDelta;	// server-client frame index delta in the N previous frames
 		int					nextDeltaIndex;	// next delta to update in the array
 
-		void ProcessPacket	( const HostID _clientID, const PacketHello& _packetHello );
-		void ProcessPacket	( const HostID _clientID, const PacketPing& _packetPing, const FrameIndex _frameIndex, const float _logicDelta );
+		void Write( EcsWorld& _world, Packet& _packet );
+		void ProcessPacket	( const PacketHello& _packetHello );
+		void ProcessPacket	( const PacketPing&  _packetPing, const FrameIndex _frameIndex, const float _logicDelta );
 		void OnSyncSuccess	();
-		void OnLoginFail	( const PacketTag _packetTag );
-		void OnLoginSuccess	( const PacketTag _packetTag );
+		void OnLoginFail	( const PacketTag );
+		void OnLoginSuccess	( const PacketTag );
 	};
 	static constexpr size_t sizeof_hostConnection = sizeof( HostConnection );
 }

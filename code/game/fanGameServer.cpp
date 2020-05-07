@@ -33,7 +33,7 @@
 #include "scene/fanSceneTags.hpp"
 #include "game/fanGameTags.hpp"
 
-#include "network/singletonComponents/fanServerConnectionManager.hpp"
+#include "network/singletonComponents/fanServerConnection.hpp"
 #include "network/singletonComponents/fanRPCManager.hpp"
 #include "network/singletonComponents/fanLinkingContext.hpp"
 #include "network/singletonComponents/fanHostManager.hpp"
@@ -41,7 +41,9 @@
 #include "network/components/fanHostGameData.hpp"
 #include "network/components/fanHostConnection.hpp"
 #include "network/components/fanHostReplication.hpp"
-#include "network/components/fanHostDeliveryNotification.hpp"
+#include "network/components/fanReliabilityLayer.hpp"
+
+#include "network/systems/fanServerUpdates.hpp"
 
 #include "game/singletonComponents/fanServerNetworkManager.hpp"
 #include "game/singletonComponents/fanCollisionManager.hpp"
@@ -112,7 +114,7 @@ namespace fan
 		world.AddComponentType<HostGameData>();
 		world.AddComponentType<HostConnection>();
 		world.AddComponentType<HostReplication>();
-		world.AddComponentType<HostDeliveryNotification>();
+		world.AddComponentType<ReliabilityLayer>();
 
 		// base singleton components
 		world.AddSingletonComponentType<Scene>();
@@ -127,7 +129,7 @@ namespace fan
 		world.AddSingletonComponentType<SolarEruption>();
 		world.AddSingletonComponentType<ServerNetworkManager>();
 		// net singleton components
-		world.AddSingletonComponentType<ServerConnectionManager>();
+		world.AddSingletonComponentType<ServerConnection>();
 		world.AddSingletonComponentType<RPCManager>();
 		world.AddSingletonComponentType<LinkingContext>();
 		world.AddSingletonComponentType<HostManager>();
@@ -208,7 +210,7 @@ namespace fan
 			S_MoveFollowTransformsUI::Run( world, world.Match( S_MoveFollowTransformsUI::GetSignature( world ) ) );
 
 			// update
-			netManager->Update( world );
+			S_ServerUpdateHosts::Run( world, world.Match( S_ServerUpdateHosts::GetSignature( world ) ) );
 			S_MoveSpaceships::Run( world, world.Match( S_MoveSpaceships::GetSignature( world ) ), _delta );
 			S_FireWeapons::Run( world, world.Match( S_FireWeapons::GetSignature( world ) ), _delta );
 			S_MovePlanets::Run( world, world.Match( S_MovePlanets::GetSignature( world ) ), _delta );
@@ -235,7 +237,7 @@ namespace fan
 
 			S_UpdateGameCamera::Run( world, world.Match( S_UpdateGameCamera::GetSignature( world ) ), _delta );
 
-			netManager->NetworkSend( world );
+			S_ServerNetworkSend::Run( world, world.Match( S_ServerNetworkSend::GetSignature( world ) ) );
 		}
 
 		{

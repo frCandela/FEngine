@@ -7,19 +7,14 @@
 namespace fan
 {
 	//==============================================================================================================================================================
-	// [Server]
-	// Uniquely identify and tag each packet send out
+	// [Server] Uniquely identify and tag each packet send out
 	// Send out an acknowledgment for each validated packet 
 	// Process incoming acknowledgments and notify connected modules about which packets were received or dropped
 	// Ensure packets are never processed out of order. Old packets arriving after newer packets are dropped.
-	//
-	// HostID is an unique ID used to identify a remote host and store its state
-	// The server has multiple hosts, on for each client
-	// The client has a single host, the server. Its id is always zero
 	//==============================================================================================================================================================
-	struct HostDeliveryNotification: public Component
+	struct ReliabilityLayer: public Component
 	{
-		DECLARE_COMPONENT( HostDeliveryNotification )
+		DECLARE_COMPONENT( ReliabilityLayer )
 	public:
 		static void SetInfo( ComponentInfo& _info );
 		static void Init( EcsWorld& _world, Component& _component );
@@ -42,11 +37,11 @@ namespace fan
 		std::vector<PacketTag>		 pendingAck;			// validated packets waiting for ack dispatch @todo change into a range to gain space
 		std::queue< InFlightPacket > inFlightPackets;		// list of packets pending success/drop status
 
-		void		RegisterPacket( Packet& _packet, const HostID  _hostID = 0 );
-		bool		ValidatePacket( Packet& _packet, const HostID  _hostID = 0 );
-		PacketTag	GetNextPacketTag( const HostID _hostID = 0 ) { return nextPacketTag++; }
-		void		ProcessPacket( const PacketAck& _packetAck, const HostID _hostID = 0 );
-		void		Write( Packet& _packet, const HostID _hostID = 0 );
+		void		RegisterPacket( Packet& _packet );
+		bool		ValidatePacket( Packet& _packet );
+		PacketTag	GetNextPacketTag() { return nextPacketTag++; }
+		void		ProcessPacket( const PacketAck& _packetAck );
+		void		Write( Packet& _packet );
 	};
-	static constexpr size_t sizeof_hostDeliveryNotification = sizeof( HostDeliveryNotification );
+	static constexpr size_t sizeof_reliabilityLayer = sizeof( ReliabilityLayer );
 }

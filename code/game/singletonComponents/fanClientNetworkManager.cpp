@@ -11,12 +11,12 @@
 #include "scene/components/fanRigidbody.hpp"
 #include "scene/components/fanSceneNode.hpp"
 #include "scene/singletonComponents/fanScene.hpp"
-#include "network/singletonComponents/fanClientReplicationManager.hpp"
-#include "network/singletonComponents/fanClientConnectionManager.hpp"
+#include "network/singletonComponents/fanClientReplication.hpp"
+#include "network/singletonComponents/fanClientConnection.hpp"
 #include "network/singletonComponents/fanLinkingContext.hpp"
 #include "network/singletonComponents/fanRPCManager.hpp"
-#include "network/components/fanHostDeliveryNotification.hpp"
-#include "network/systems/fanUpdateDeliveryNotification.hpp"
+#include "network/components/fanReliabilityLayer.hpp"
+#include "network/systems/fanTimeout.hpp"
 
 namespace fan
 {
@@ -29,8 +29,6 @@ namespace fan
 		_info.icon = ImGui::NETWORK16;
 		_info.init = &ClientNetworkManager::Init;
 		_info.onGui = &ClientNetworkManager::OnGui;
-		_info.save = &ClientNetworkManager::Save;
-		_info.load = &ClientNetworkManager::Load;
 		_info.name = "client network manager";
 	}
 
@@ -39,12 +37,6 @@ namespace fan
 	void ClientNetworkManager::Init( EcsWorld& _world, SingletonComponent& _component )
 	{
 		ClientNetworkManager& netManager = static_cast<ClientNetworkManager&>( _component );
-		netManager.deliveryNotification = nullptr;
-		netManager.replicationManager = nullptr;
-		netManager.linkingContext = nullptr;
-		netManager.connection = nullptr;
-		netManager.rpcManager = nullptr;
-		netManager.game = nullptr;
 		netManager.spaceshipSpawnFrameIndex = 0;
 		netManager.spaceshipNetID = 0;
 		netManager.spaceshipHandle = 0;
@@ -56,32 +48,33 @@ namespace fan
 	//================================================================================================================================
 	void ClientNetworkManager::Start( EcsWorld& _world )
 	{
-		replicationManager			= & _world.GetSingletonComponent<ClientReplicationManager>();
-		connection					= & _world.GetSingletonComponent<ClientConnectionManager>();
-		linkingContext			    = & _world.GetSingletonComponent<LinkingContext>();
-		rpcManager					= & _world.GetSingletonComponent<RPCManager>();
-		game						= & _world.GetSingletonComponent<Game>();
+		// connect rpc
+		Game& game = _world.GetSingletonComponent<Game>();
+		RPCManager& rpcManager = _world.GetSingletonComponent<RPCManager>();
+		rpcManager.onShiftFrameIndex.Connect( &ClientNetworkManager::OnShiftFrameIndex, this );
+		rpcManager.onShiftFrameIndex.Connect( &Game::OnShiftFrameIndex, &game );
 
-		rpcManager->onShiftFrameIndex.Connect( &ClientNetworkManager::ShiftFrameIndex, this );
-		rpcManager->onSpawnShip.Connect( &ClientNetworkManager::SpawnShip, this );
+		rpcManager.onSpawnShip.Connect( &ClientNetworkManager::OnSpawnShip, this );
 
 		// Create player persistent scene node
 		Scene& scene			= _world.GetSingletonComponent<Scene>();
 		SceneNode& sceneNode	= scene.CreateSceneNode( "persistent", scene.root );
 		persistentHandle		= sceneNode.handle;
 		EntityID entityID		= _world.GetEntityID( persistentHandle );
-		deliveryNotification	= &_world.AddComponent<HostDeliveryNotification>( entityID );
+		_world.AddComponent<ReliabilityLayer>( entityID );
 
 		// Bind socket
+		ClientConnection& connection = _world.GetSingletonComponent<ClientConnection>();
 		sf::Socket::Status socketStatus = sf::Socket::Disconnected;
 		for( int tryIndex = 0; tryIndex < 10 && socketStatus != sf::Socket::Done; tryIndex++ )
 		{
-			Debug::Log() << game->name << "bind on port " << connection->clientPort << Debug::Endl();
-			socketStatus = connection->socket.Bind( connection->clientPort );
+			Debug::Log() << "bind on port " << connection.clientPort << Debug::Endl();
+			socketStatus = connection.socket.Bind( connection.clientPort );
 			if( socketStatus != sf::Socket::Done )
 			{
-				Debug::Warning() << game->name << " bind failed" << Debug::Endl();
-				connection->clientPort++; // try bind on the next port ( useful when using multiple clients on the same machine )
+				Debug::Warning() << " bind failed" << Debug::Endl();
+				// try bind on the next port ( useful when using multiple clients on the same machine )
+				connection.clientPort++; 
 			}
 		}
 	}
@@ -90,28 +83,28 @@ namespace fan
 	//================================================================================================================================
 	void ClientNetworkManager::Stop( EcsWorld& _world )
 	{
-		connection->socket.Unbind();
+		ClientConnection& connection = _world.GetSingletonComponent<ClientConnection>();
+		connection.socket.Unbind();
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void ClientNetworkManager::ShiftFrameIndex( const int _framesDelta )
-	{
-		game->frameIndex += _framesDelta;
-		previousStates = std::queue< PacketPlayerGameState >(); // clear
-		Debug::Warning() << "Shifted client frame index : " << _framesDelta << Debug::Endl();
-		synced = true;
-	}
-
-	//================================================================================================================================
-	//================================================================================================================================
-	void ClientNetworkManager::SpawnShip( NetID _spaceshipID, FrameIndex _frameIndex )
+	void ClientNetworkManager::OnSpawnShip( NetID _spaceshipID, FrameIndex _frameIndex )
 	{
 		if( spaceshipNetID == 0 )
 		{
 			spaceshipSpawnFrameIndex = _frameIndex;
-			spaceshipNetID = _spaceshipID;
+			spaceshipNetID			 = _spaceshipID;
 		}
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
+	void ClientNetworkManager::OnShiftFrameIndex( const int _framesDelta )
+	{
+		previousStates = std::queue< PacketPlayerGameState >(); // clear
+		synced = true;
+		Debug::Log() << "Shifted client frame index : " << _framesDelta << Debug::Endl();
 	}
 
 	//================================================================================================================================
@@ -154,16 +147,20 @@ namespace fan
 	//================================================================================================================================
 	void ClientNetworkManager::Update( EcsWorld& _world )
 	{
-		replicationManager->ReplicateSingletons( _world );
+		ClientReplication& replication	= _world.GetSingletonComponent<ClientReplication>();
+		LinkingContext& linkingContext  = _world.GetSingletonComponent<LinkingContext>();
+		Game& game						= _world.GetSingletonComponent<Game>();
+
+		replication.ReplicateSingletons( _world );
 
 		// spawns spaceship
-		if( spaceshipSpawnFrameIndex != 0 && game->frameIndex >= spaceshipSpawnFrameIndex )
+		if( spaceshipSpawnFrameIndex != 0 && game.frameIndex >= spaceshipSpawnFrameIndex )
 		{
 			assert( spaceshipNetID != 0 );
 
 			spaceshipSpawnFrameIndex = 0;
 			spaceshipHandle = Game::SpawnSpaceship( _world );
-			linkingContext->AddEntity( spaceshipHandle, spaceshipNetID );
+			linkingContext.AddEntity( spaceshipHandle, spaceshipNetID );
 
 			const EntityID spaceshipID = _world.GetEntityID( spaceshipHandle );
 			if( spaceshipHandle != 0 )
@@ -179,7 +176,7 @@ namespace fan
 
 			// streams input to the server
 			PacketInput packetInput;
-			packetInput.frameIndex = game->frameIndex;
+			packetInput.frameIndex = game.frameIndex;
 			packetInput.orientation = input.orientation;
 			packetInput.left = input.left;
 			packetInput.forward = input.forward;
@@ -191,7 +188,7 @@ namespace fan
 			const Rigidbody& rb = _world.GetComponent<Rigidbody>( entityID );
 			const Transform& transform = _world.GetComponent<Transform>( entityID );
 			PacketPlayerGameState playerState;			
-			playerState.frameIndex = game->frameIndex;
+			playerState.frameIndex = game.frameIndex;
 			playerState.position = transform.GetPosition();
 			playerState.orientation = transform.GetRotationEuler();
 			playerState.velocity = rb.GetVelocity();
@@ -204,6 +201,13 @@ namespace fan
 	//================================================================================================================================
 	void ClientNetworkManager::NetworkReceive( EcsWorld& _world )
 	{
+		const EntityID presistentEntityID = _world.GetEntityID( persistentHandle );
+		ReliabilityLayer& reliabilityLayer = _world.GetComponent<ReliabilityLayer>( presistentEntityID );
+		ClientConnection& connection = _world.GetSingletonComponent<ClientConnection>();
+		ClientReplication& replication = _world.GetSingletonComponent<ClientReplication>();
+		RPCManager& rpcManager = _world.GetSingletonComponent<RPCManager>();
+		Game& game = _world.GetSingletonComponent<Game>();
+
 		// receive
 		Packet			packet;
 		sf::IpAddress	receiveIP;
@@ -213,10 +217,10 @@ namespace fan
 		do
 		{
 			packet.Clear();
-			socketStatus = connection->socket.Receive( packet, receiveIP, receivePort );
+			socketStatus = connection.socket.Receive( packet, receiveIP, receivePort );
 
 			// only receive from the server
-			if( receiveIP != connection->serverIP || receivePort != connection->serverPort )
+			if( receiveIP != connection.serverIP || receivePort != connection.serverPort )
 			{
 				continue;
 			}
@@ -225,7 +229,7 @@ namespace fan
 			{
 			case sf::UdpSocket::Done:
 			{
-				connection->serverLastResponse = Time::Get().ElapsedSinceStartup();
+				connection.serverLastResponse = Time::Get().ElapsedSinceStartup();
 
 				// read the first packet type separately
 				PacketType packetType = packet.ReadType();
@@ -234,7 +238,7 @@ namespace fan
 					packet.onlyContainsAck = true;
 				}
 
-				if( !deliveryNotification->ValidatePacket( packet ) )
+				if( !reliabilityLayer.ValidatePacket( packet ) )
 				{
 					continue;
 				}
@@ -249,25 +253,25 @@ namespace fan
 					{
 						PacketAck packetAck;
 						packetAck.Read( packet );
-						deliveryNotification->ProcessPacket( packetAck );
+						reliabilityLayer.ProcessPacket( packetAck );
 					}break;
 					case PacketType::Ping:
 					{
 						PacketPing packetPing;
 						packetPing.Read( packet );
-						connection->ProcessPacket( packetPing, game->frameIndex );
+						connection.ProcessPacket( packetPing, game.frameIndex );
 					} break;
 					case PacketType::LoggedIn:
 					{
 						PacketLoginSuccess packetLogin;
 						packetLogin.Read( packet );
-						connection->ProcessPacket( packetLogin );
+						connection.ProcessPacket( packetLogin );
 					} break;
 					case PacketType::Replication:
 					{
 						PacketReplication packetReplication;
 						packetReplication.Read( packet );
-						replicationManager->ProcessPacket( packetReplication );
+						replication.ProcessPacket( packetReplication );
 					} break;
 					case PacketType::PlayerGameState:
 					{
@@ -311,59 +315,48 @@ namespace fan
 		} while( socketStatus == sf::UdpSocket::Done );
 
 		S_ProcessTimedOutPackets::Run( _world, _world.Match( S_ProcessTimedOutPackets::GetSignature( _world ) ) );
-		connection->DetectServerTimout();		
-		replicationManager->ReplicateRPC( *rpcManager );
+		connection.DetectServerTimout();		
+		replication.ReplicateRPC( rpcManager );
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void ClientNetworkManager::NetworkSend()
+	void ClientNetworkManager::NetworkSend( EcsWorld& _world )
 	{
+		const EntityID presistentEntityID = _world.GetEntityID( persistentHandle );
+		ReliabilityLayer& reliabilityLayer = _world.GetComponent<ReliabilityLayer>( presistentEntityID );
+		ClientConnection& connection = _world.GetSingletonComponent<ClientConnection>();
+		Game& game = _world.GetSingletonComponent<Game>();
+
 		// create packet
-		Packet packet( deliveryNotification->GetNextPacketTag() );
+		Packet packet( reliabilityLayer.GetNextPacketTag() );
 
 		// write packet
-		connection->Write( packet );
+		connection.Write( packet );
 
 		if( !inputs.empty() )
 		{
 			const PacketInput& lastInput = inputs.front();
 			inputs.pop();
-			assert( lastInput.frameIndex == game->frameIndex );
+			assert( lastInput.frameIndex == game.frameIndex );
 			lastInput.Write( packet );
 		}
 
 		if( packet.GetSize() == sizeof( PacketTag ) ) { packet.onlyContainsAck = true; }
 
-		deliveryNotification->Write( packet );
+		reliabilityLayer.Write( packet );
 
 		// send packet, don't send empty packets
 		if( packet.GetSize() > sizeof( PacketTag ) )
 		{
-			deliveryNotification->RegisterPacket( packet );
-			connection->bandwidth = 1.f / game->logicDelta * float( packet.GetSize() ) / 1000.f; // in Ko/s
-			connection->socket.Send( packet, connection->serverIP, connection->serverPort );
+			reliabilityLayer.RegisterPacket( packet );
+			connection.bandwidth = 1.f / game.logicDelta * float( packet.GetSize() ) / 1000.f; // in Ko/s
+			connection.socket.Send( packet, connection.serverIP, connection.serverPort );
 		}
 		else
 		{
-			deliveryNotification->nextPacketTag--;
+			reliabilityLayer.nextPacketTag--;
 		}
-	}
-
-	//================================================================================================================================
-	//================================================================================================================================
-	void ClientNetworkManager::Save( const SingletonComponent& _component, Json& _json )
-	{
-		const ClientNetworkManager& netManager = static_cast<const ClientNetworkManager&>( _component );
-
-	}
-
-	//================================================================================================================================
-	//================================================================================================================================
-	void ClientNetworkManager::Load( SingletonComponent& _component, const Json& _json )
-	{
-		ClientNetworkManager& netManager = static_cast<ClientNetworkManager&>( _component );
-
 	}
 
 	//================================================================================================================================

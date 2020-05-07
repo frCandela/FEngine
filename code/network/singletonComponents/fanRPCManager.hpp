@@ -11,6 +11,7 @@ namespace fan
 	//================================================================================================================================
 	// Manages remote procedure calls
 	// A remote procedure call is the act of one host causing a	procedure to execute on one or more remote hosts
+	// Can generate replication packets to send using the server replication
 	//================================================================================================================================	
 	struct RPCManager : public SingletonComponent
 	{
@@ -30,7 +31,7 @@ namespace fan
 		std::unordered_map<RpcId , RpcUnwrapFunc > nameToRPCTable;
 
 		// List of available rpc
-		Signal < int >			onShiftFrameIndex;
+		Signal < int >			 onShiftFrameIndex;
 		void					 UnwrapShiftClientFrame( sf::Packet& _packet );
 		static PacketReplication RPCShiftClientFrame( const int _framesDelta );
 

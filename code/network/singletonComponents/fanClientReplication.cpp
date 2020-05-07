@@ -1,4 +1,4 @@
-#include "network/singletonComponents/fanClientReplicationManager.hpp"
+#include "network/singletonComponents/fanClientReplication.hpp"
 
 #include "scene/fanSceneSerializable.hpp"
 #include "ecs/fanEcsWorld.hpp"
@@ -7,32 +7,30 @@
 
 namespace fan
 {
-	REGISTER_SINGLETON_COMPONENT( ClientReplicationManager );
+	REGISTER_SINGLETON_COMPONENT( ClientReplication );
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void ClientReplicationManager::SetInfo( SingletonComponentInfo& _info )
+	void ClientReplication::SetInfo( SingletonComponentInfo& _info )
 	{
 		_info.icon = ImGui::NETWORK16;
-		_info.init = &ClientReplicationManager::Init;
-		_info.onGui = &ClientReplicationManager::OnGui;
-		_info.save = &ClientReplicationManager::Save;
-		_info.load = &ClientReplicationManager::Load;
-		_info.name = "replication manager";
+		_info.init = &ClientReplication::Init;
+		_info.onGui = &ClientReplication::OnGui;
+		_info.name = "client replication";
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void ClientReplicationManager::Init( EcsWorld& _world, SingletonComponent& _component )
+	void ClientReplication::Init( EcsWorld& _world, SingletonComponent& _component )
 	{
-		ClientReplicationManager& replicationManager = static_cast<ClientReplicationManager&>( _component );
+		ClientReplication& replicationManager = static_cast<ClientReplication&>( _component );
 		replicationManager.replicationListRPC.clear();
 		replicationManager.replicationListSingletons.clear();
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void ClientReplicationManager::ProcessPacket( PacketReplication& _packet )
+	void ClientReplication::ProcessPacket( PacketReplication& _packet )
 	{
 		switch( _packet.replicationType )
 		{
@@ -45,7 +43,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void ClientReplicationManager::ReplicateRPC( RPCManager& _rpcManager )
+	void ClientReplication::ReplicateRPC( RPCManager& _rpcManager )
 	{
 		for( PacketReplication packet : replicationListRPC )
 		{
@@ -56,7 +54,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void ClientReplicationManager::ReplicateSingletons( EcsWorld& _world )
+	void ClientReplication::ReplicateSingletons( EcsWorld& _world )
 	{
 		for ( PacketReplication packet : replicationListSingletons )
 		{
@@ -69,28 +67,12 @@ namespace fan
 		}
 		replicationListSingletons.clear();
 	}
-	
+
 	//================================================================================================================================
 	//================================================================================================================================
-	void ClientReplicationManager::Save( const SingletonComponent& _component, Json& _json )
+	void ClientReplication::OnGui( EcsWorld&, SingletonComponent& _component )
 	{
-		const ClientReplicationManager& replicationManager = static_cast<const ClientReplicationManager&>( _component );
-
-	}
-
-	//================================================================================================================================
-	//================================================================================================================================
-	void ClientReplicationManager::Load( SingletonComponent& _component, const Json& _json )
-	{
-		ClientReplicationManager& replicationManager = static_cast<ClientReplicationManager&>( _component );
-
-	}
-
-	//================================================================================================================================
-	//================================================================================================================================
-	void ClientReplicationManager::OnGui( EcsWorld&, SingletonComponent& _component )
-	{
-		ClientReplicationManager& replicationManager = static_cast<ClientReplicationManager&>( _component );
+		ClientReplication& replicationManager = static_cast<ClientReplication&>( _component );
 
 		ImGui::Indent(); ImGui::Indent();
 		{

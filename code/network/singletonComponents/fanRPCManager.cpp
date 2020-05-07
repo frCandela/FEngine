@@ -23,10 +23,10 @@ namespace fan
 	{
 		RPCManager& rpc = static_cast<RPCManager&>( _component );
 		rpc.nameToRPCTable.clear();
-		rpc.RegisterRPCs();
 		rpc.onShiftFrameIndex.Clear();
 		rpc.onSpawnShip.Clear();
 
+		rpc.RegisterRPCs();
 	}
 
 	//================================================================================================================================

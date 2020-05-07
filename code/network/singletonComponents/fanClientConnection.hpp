@@ -11,7 +11,7 @@ namespace fan
 	//================================================================================================================================
 	// Manages the connection of the client with the server
 	//================================================================================================================================	
-	struct ClientConnectionManager : public SingletonComponent
+	struct ClientConnection : public SingletonComponent
 	{
 		DECLARE_SINGLETON_COMPONENT()
 	public:
@@ -24,9 +24,7 @@ namespace fan
 			PendingConnection,	// A Hello packet was sent, waiting for LoginSuccess packet from the server
 			Connected			// Client received a LoginSuccess, client is connected
 		};
-
-		Signal< HostID >  onServerDisconnected;
-
+		
 		UdpSocket		socket;
 		Port			clientPort;
 		sf::IpAddress	serverIP;

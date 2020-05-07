@@ -11,7 +11,7 @@ namespace fan
 	//================================================================================================================================
 	// Manages server udp socket & some timings
 	//================================================================================================================================	
-	struct ServerConnectionManager : public SingletonComponent
+	struct ServerConnection : public SingletonComponent
 	{
 		DECLARE_SINGLETON_COMPONENT()
 	public:
@@ -19,12 +19,7 @@ namespace fan
 		static void Init( EcsWorld& _world, SingletonComponent& _component );
 		static void OnGui( EcsWorld&, SingletonComponent& _component );
 
-		UdpSocket			socket;
-		Port				serverPort;
-		float				pingDelay;		// send a ping to clients every X seconds
-		float				timeoutTime;	// disconnects clients after X seconds without a response
-
-		void	Write( EcsWorld& _world, Packet& _packet, const HostID _clientID );
-		void	DetectClientTimout( EcsWorld& _world );
+		UdpSocket	socket;
+		Port		serverPort;
 	};
 }

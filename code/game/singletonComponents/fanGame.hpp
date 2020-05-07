@@ -36,5 +36,6 @@ namespace fan
 		GameServer* gameServer = nullptr;
 
 		static EntityHandle SpawnSpaceship( EcsWorld& _world );
+		void OnShiftFrameIndex( const int _framesDelta );
 	};
 }

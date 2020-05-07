@@ -6,7 +6,7 @@
 #include "network/components/fanHostGameData.hpp"
 #include "network/components/fanHostConnection.hpp"
 #include "network/components/fanHostReplication.hpp"
-#include "network/components/fanHostDeliveryNotification.hpp"
+#include "network/components/fanReliabilityLayer.hpp"
 
 namespace fan
 {
@@ -29,76 +29,63 @@ namespace fan
 		HostManager& hostManager = static_cast<HostManager&>( _component );
 		hostManager.hostHandles.clear();
 		hostManager.netRoot = nullptr;
-		hostManager.nextHostID = 1;
-		hostManager.onHostCreated.Clear();
-		hostManager.onHostDeleted.Clear();
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	HostID HostManager::CreateHost( const sf::IpAddress _ip, const unsigned short _port )
+	EntityHandle HostManager::CreateHost( const sf::IpAddress _ip, const Port _port )
 	{
-		assert( FindHost( _ip, _port ) == -1 );
+		assert( FindHost( _ip, _port ) == 0 );
 
 		// Create an ecs entity associated with the host
 		EcsWorld& world = *netRoot->scene->world;
-		const HostID hostID = nextHostID++;
-		const SceneNode& hostNode = netRoot->scene->CreateSceneNode( "host" + std::to_string( hostID ), netRoot );
-		assert( hostHandles.find( hostID ) == hostHandles.end() );
-		hostHandles[hostID] = hostNode.handle;
+		SceneNode& hostNode = netRoot->scene->CreateSceneNode( "tmp", netRoot );
+		assert( hostHandles.find( { _ip,_port } ) == hostHandles.end() );
+		hostHandles[{_ip, _port}] = hostNode.handle;
+		hostNode.name = std::string("host") + std::to_string( hostNode.handle );
 		const EntityID entityID = world.GetEntityID( hostNode.handle );
 		world.AddComponent< HostGameData >( entityID );
 		world.AddComponent< HostReplication >( entityID );
-		world.AddComponent< HostDeliveryNotification >( entityID );
-		HostConnection& hostConnection = world.AddComponent< HostConnection >( entityID );
+		world.AddComponent< ReliabilityLayer >( entityID );
 
 		// fills in the host connection data
-		hostConnection.ip = _ip;
-		hostConnection.port = _port;
-		hostConnection.name = "Unknown";
-		hostConnection.state = HostConnection::Disconnected;
-		hostConnection.rtt = 0.f;
+		HostConnection& hostConnection = world.AddComponent< HostConnection >( entityID );
+		hostConnection.ip				= _ip;
+		hostConnection.port				= _port;
+		hostConnection.name				= "Unknown";
+		hostConnection.state			= HostConnection::Disconnected;
+		hostConnection.rtt				= 0.f;
 		hostConnection.lastResponseTime = 0.f;
-		hostConnection.lastPingTime = 0.f;
+		hostConnection.lastPingTime		= 0.f;
 
-		onHostCreated.Emmit( hostID );
-
-		return hostID;
+		return hostNode.handle;
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void HostManager::DeleteHost( const HostID _hostID )
+	void HostManager::DeleteHost( const EntityHandle _hostHandle )
 	{
 		// Deletes the ecs entity associated with the host
 		EcsWorld& world = *netRoot->scene->world;
-		const EntityHandle hostHandle = hostHandles[_hostID];
-		const EntityID hostID = world.GetEntityID( hostHandle );
-		world.KillEntity( hostID );
-		hostHandles.erase( _hostID );
+		const EntityID entityID = world.GetEntityID( _hostHandle );
+		world.KillEntity( entityID );
 
-		Debug::Log() << "host " << _hostID << " disconnected " << Debug::Endl();
-		onHostDeleted.Emmit( _hostID );
+		// delete the host ip/port entry
+		HostConnection& hostConnection = world.GetComponent< HostConnection >( entityID );		
+		auto& it = hostHandles.find( { hostConnection.ip, hostConnection.port } );
+		assert( it != hostHandles.end() );
+		hostHandles.erase( it );
+
+		Debug::Log() << "host disconnected " << _hostHandle << Debug::Endl();
 	}
 
 	//================================================================================================================================
-	// returns the client data associated with an ip/port, returns nullptr if it doesn't exists
+	// returns the client handle associated with an ip/port, returns 0 if it doesn't exists
 	//================================================================================================================================
-	HostID HostManager::FindHost( const sf::IpAddress _ip, const unsigned short _port )
+	EntityHandle HostManager::FindHost( const sf::IpAddress _ip, const Port _port )
 	{
-		for( std::pair<HostID, EntityHandle> pair : hostHandles )
-		{
-			EcsWorld& world = *netRoot->scene->world;
-			const HostID   hostID = pair.first;
-			const EntityID entityID = world.GetEntityID( pair.second );
-			HostConnection& hostConnection = world.GetComponent<HostConnection>( entityID );
-
-			if( hostConnection.ip == _ip && hostConnection.port == _port )
-			{
-				return hostID;
-			}
-		}
-		return -1;
+		const auto& it = hostHandles.find({_ip, _port});
+		return it == hostHandles.end() ? 0 : it->second;
 	}
 
 	//================================================================================================================================

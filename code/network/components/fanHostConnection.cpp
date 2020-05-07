@@ -1,7 +1,8 @@
 #include "network/components/fanHostConnection.hpp"
 
-#include "core/fanColor.hpp"
 #include "core/time/fanTime.hpp"
+#include "ecs/fanEcsWorld.hpp"
+#include "game/singletonComponents/fanGame.hpp"
 #include "network/fanImGuiNetwork.hpp"
 
 namespace fan
@@ -22,7 +23,6 @@ namespace fan
 	void HostConnection::Init( EcsWorld& _world, Component& _component )
 	{
 		HostConnection& hostConnection = static_cast<HostConnection&>( _component );
-		hostConnection.hostId = 0;
 		hostConnection.ip = sf::IpAddress();
 		hostConnection.port = 0;
 		hostConnection.name = "";
@@ -31,6 +31,8 @@ namespace fan
 		hostConnection.lastPingTime = 0.f;
 		hostConnection.rtt = -1.f;
 		hostConnection.bandwidth = 0.f;
+		hostConnection.pingDelay = .5f;
+		hostConnection.timeoutTime = 10.f;
 
 		hostConnection.synced = false;
 		hostConnection.lastSync = 0.f;
@@ -39,8 +41,41 @@ namespace fan
 	}
 
 	//================================================================================================================================
+	// sends a login packet to the clients needing approval
+	// regularly sends ping to clients to calculate RTT & sync frame index
 	//================================================================================================================================
-	void HostConnection::ProcessPacket( const HostID _clientID, const PacketHello& _packetHello ) 
+	void HostConnection::Write( EcsWorld& _world, Packet& _packet )
+	{
+ 		const Game& game = _world.GetSingletonComponent<Game>();
+
+		// Send login packet
+		if( state == HostConnection::NeedingApprouval )
+		{
+			PacketLoginSuccess packetLogin;
+			packetLogin.Write( _packet );
+			_packet.onSuccess.Connect( &HostConnection::OnLoginSuccess, this );
+			_packet.onFail.Connect( &HostConnection::OnLoginFail, this );
+			state = HostConnection::PendingApprouval;
+		}
+		else if( state == HostConnection::Connected )
+		{
+			// Ping client
+			const double currentTime = Time::Get().ElapsedSinceStartup();
+			if( currentTime - lastPingTime > pingDelay )
+			{
+				lastPingTime = currentTime;
+
+				PacketPing packetPing;
+				packetPing.previousRtt = rtt;
+				packetPing.serverFrame = game.frameIndex;
+				packetPing.Write( _packet );
+			}
+		}
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
+	void HostConnection::ProcessPacket( const PacketHello& _packetHello ) 
 	{
 		if( state == HostConnection::Disconnected )
 		{
@@ -50,13 +85,13 @@ namespace fan
 		else if( state == HostConnection::Connected )
 		{
 			state = HostConnection::NeedingApprouval;
-			Debug::Log() << "Client " << _clientID << " disconnected" << Debug::Endl();
+			Debug::Log() << " disconnected" << Debug::Endl();
 		}
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void HostConnection::ProcessPacket( const HostID _clientID, const PacketPing& _packetPing, const FrameIndex _frameIndex, const float _logicDelta )
+	void HostConnection::ProcessPacket( const PacketPing& _packetPing, const FrameIndex _frameIndex, const float _logicDelta )
 	{
 		const FrameIndex delta = _frameIndex - _packetPing.serverFrame; // number of frames elapsed between sending & receiving
 		const FrameIndex clientCurrentFrameIndex = _packetPing.clientFrame + delta / 2;
@@ -75,7 +110,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void HostConnection::OnLoginFail( const PacketTag /*_packetTag*/ )
+	void HostConnection::OnLoginFail( const PacketTag  )
 	{
 		if( state == HostConnection::PendingApprouval )
 		{
@@ -86,7 +121,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void HostConnection::OnLoginSuccess( const PacketTag /*_packetTag*/ )
+	void HostConnection::OnLoginSuccess( const PacketTag )
 	{
 		if( state == HostConnection::PendingApprouval )
 		{
@@ -142,6 +177,8 @@ namespace fan
 			ImGui::Text( "last response: %.1f", currentTime - hostConnection.lastResponseTime );
 			ImGui::Text( "adress:        %s::%u", hostConnection.ip.toString().c_str(), hostConnection.port );
 			ImGui::Text( "frame delta:   %d %d %d %d %d", hostConnection.framesDelta[0], hostConnection.framesDelta[1], hostConnection.framesDelta[2], hostConnection.framesDelta[3], hostConnection.framesDelta[4] );
+			ImGui::DragFloat( "ping delay", &hostConnection.pingDelay, 0.1f, 0.f, 10.f );
+			ImGui::DragFloat( "timeout time", &hostConnection.timeoutTime, 0.1f, 0.f, 10.f );
 		} ImGui::PopItemWidth();
 	}
 }

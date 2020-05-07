@@ -29,7 +29,7 @@ namespace fan
 	// returns a success signal that the caller can connect to to get notified of the acknowledgments 
 	// ( ResendUntilReplicated flag must be on )
 	//================================================================================================================================
-	Signal<>& HostReplication::ReplicateOnClient( const HostID _hostID, PacketReplication& _packet, const ReplicationFlags _flags )
+	Signal<>& HostReplication::ReplicateOnClient( PacketReplication& _packet, const ReplicationFlags _flags )
 	{
 		nextReplication.emplace_back();
 		SingletonReplicationData& replicationData = nextReplication[nextReplication.size() - 1];
@@ -71,7 +71,7 @@ namespace fan
 	//================================================================================================================================
 	// Sends all new replication packed
 	//================================================================================================================================
-	void HostReplication::Write( Packet& _packet, const HostID _hostID )
+	void HostReplication::Write( Packet& _packet )
 	{
 		for( SingletonReplicationData& data : nextReplication )
 		{

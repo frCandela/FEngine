@@ -1,4 +1,4 @@
-#include "network/singletonComponents/fanClientConnectionManager.hpp"
+#include "network/singletonComponents/fanClientConnection.hpp"
 
 #include "core/fanDebug.hpp"
 #include "ecs/fanEcsWorld.hpp"
@@ -7,38 +7,40 @@
 
 namespace fan
 {
-	REGISTER_SINGLETON_COMPONENT( ClientConnectionManager );
+	REGISTER_SINGLETON_COMPONENT( ClientConnection );
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void ClientConnectionManager::SetInfo( SingletonComponentInfo& _info )
+	void ClientConnection::SetInfo( SingletonComponentInfo& _info )
 	{
 		_info.icon = ImGui::NETWORK16;
-		_info.init = &ClientConnectionManager::Init;
-		_info.onGui = &ClientConnectionManager::OnGui;
-		_info.name = "client connection manager";
+		_info.init = &ClientConnection::Init;
+		_info.onGui = &ClientConnection::OnGui;
+		_info.name = "client connection";
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void ClientConnectionManager::Init( EcsWorld& _world, SingletonComponent& _component )
+	void ClientConnection::Init( EcsWorld& _world, SingletonComponent& _component )
 	{
-		ClientConnectionManager& connectionManager = static_cast<ClientConnectionManager&>( _component );
-		connectionManager.clientPort = 53010;
-		connectionManager.serverIP = "127.0.0.1";
-		connectionManager.serverPort = 53000;
-		connectionManager.state = ClientState::Disconnected;
-		connectionManager.rtt = 0.f;
-		connectionManager.timeoutTime = 10.f;
-		connectionManager.serverLastResponse = 0.f;
-		connectionManager.mustSendBackPacketPing = false;
-		connectionManager.onServerDisconnected.Clear();
+		ClientConnection& connection = static_cast<ClientConnection&>( _component );
+		connection.socket.Unbind();
+		connection.clientPort = 53010;
+		connection.serverIP = "127.0.0.1";
+		connection.serverPort = 53000;
+		connection.state = ClientState::Disconnected;
+		connection.rtt = 0.f;
+		connection.timeoutTime = 10.f;
+		connection.bandwidth = 0.f;
+		connection.serverLastResponse = 0.f;
+		connection.lastPacketPing = PacketPing();
+		connection.mustSendBackPacketPing = false;
 	}
 
 	//================================================================================================================================
 	// Write into the _packet to communicate with the server
 	//================================================================================================================================
-	void ClientConnectionManager::Write( Packet& _packet )
+	void ClientConnection::Write( Packet& _packet )
 	{
 		if( state == ClientState::Disconnected )
 		{
@@ -47,7 +49,7 @@ namespace fan
 			PacketHello hello;
 			hello.name = "toto";
 			hello.Write( _packet );
-			_packet.onFail.Connect( &ClientConnectionManager::OnLoginFail, this );
+			_packet.onFail.Connect( &ClientConnection::OnLoginFail, this );
 		}
 		else if( state == ClientState::Connected )
 		{
@@ -62,7 +64,7 @@ namespace fan
 	//================================================================================================================================
 	// login packet dropped our timed out. Resend a new one.
 	//================================================================================================================================
-	void ClientConnectionManager::OnLoginFail( const PacketTag /*_packetTag*/ )
+	void ClientConnection::OnLoginFail( const PacketTag /*_packetTag*/ )
 	{
 		if( state == ClientState::PendingConnection )
 		{
@@ -73,7 +75,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void ClientConnectionManager::ProcessPacket( const PacketLoginSuccess& _packetLogin )
+	void ClientConnection::ProcessPacket( const PacketLoginSuccess& _packetLogin )
 	{
 		if( state == ClientState::PendingConnection )
 		{
@@ -86,7 +88,7 @@ namespace fan
 	// received ping packet from the server.
 	// updates the rtt & sends back the packet later while adding the current client frame index
 	//================================================================================================================================
-	void ClientConnectionManager::ProcessPacket( const PacketPing& _packetPing, const FrameIndex _frameIndex )
+	void ClientConnection::ProcessPacket( const PacketPing& _packetPing, const FrameIndex _frameIndex )
 	{
 		if( state == ClientState::Connected )
 		{
@@ -99,7 +101,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void ClientConnectionManager::DetectServerTimout()
+	void ClientConnection::DetectServerTimout()
 	{
 		if( state == ClientState::Connected )
 		{
@@ -113,9 +115,8 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void ClientConnectionManager::DisconnectFromServer()
+	void ClientConnection::DisconnectFromServer()
 	{
-		onServerDisconnected.Emmit(0);
 		Debug::Log() << "server timeout " << Debug::Endl();
 		state = ClientState::Disconnected;
 	}
@@ -123,13 +124,13 @@ namespace fan
 	//================================================================================================================================
 	// Editor gui helper
 	//================================================================================================================================
-	std::string GetStateName( const ClientConnectionManager::ClientState _clientState )
+	std::string GetStateName( const ClientConnection::ClientState _clientState )
 	{
 		switch( _clientState )
 		{
-		case fan::ClientConnectionManager::ClientState::Disconnected:		return "Disconnected";		break;
-		case fan::ClientConnectionManager::ClientState::PendingConnection:	return "PendingConnection";	break;
-		case fan::ClientConnectionManager::ClientState::Connected:			return "Connected";			break;
+		case fan::ClientConnection::ClientState::Disconnected:		return "Disconnected";		break;
+		case fan::ClientConnection::ClientState::PendingConnection:	return "PendingConnection";	break;
+		case fan::ClientConnection::ClientState::Connected:			return "Connected";			break;
 		default:			assert( false );								return "Error";				break;
 		}
 	}
@@ -137,24 +138,24 @@ namespace fan
 	//================================================================================================================================
 	// returns a color corresponding to a rtt time in seconds
 	//================================================================================================================================
-	static ImVec4 GetStateColor( const ClientConnectionManager::ClientState _clientState )
+	static ImVec4 GetStateColor( const ClientConnection::ClientState _clientState )
 	{
 		switch( _clientState )
 		{
-		case fan::ClientConnectionManager::ClientState::Disconnected:		return Color::Red.ToImGui(); break;
-		case fan::ClientConnectionManager::ClientState::PendingConnection:	return Color::Yellow.ToImGui(); break;
-		case fan::ClientConnectionManager::ClientState::Connected:			return Color::Green.ToImGui(); break;
+		case fan::ClientConnection::ClientState::Disconnected:		return Color::Red.ToImGui(); break;
+		case fan::ClientConnection::ClientState::PendingConnection:	return Color::Yellow.ToImGui(); break;
+		case fan::ClientConnection::ClientState::Connected:			return Color::Green.ToImGui(); break;
 		default:			assert( false );								return Color::Purple.ToImGui(); break;
 		}
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void ClientConnectionManager::OnGui( EcsWorld&, SingletonComponent& _component )
+	void ClientConnection::OnGui( EcsWorld&, SingletonComponent& _component )
 	{
 		ImGui::Indent(); ImGui::Indent();
 		{
-			ClientConnectionManager& connection = static_cast<ClientConnectionManager&>( _component );
+			ClientConnection& connection = static_cast<ClientConnection&>( _component );
 			double currentTime = Time::Get().ElapsedSinceStartup();
 
 			ImGui::Text( "Client" );

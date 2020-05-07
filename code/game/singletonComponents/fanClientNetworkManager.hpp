@@ -9,9 +9,9 @@ namespace fan
 {
 	class EcsWorld;
 	struct RPCManager;
-	struct HostDeliveryNotification;
-	struct ClientConnectionManager;
-	struct ClientReplicationManager;
+	struct ReliabilityLayer;
+	struct ClientConnection;
+	struct ClientReplication;
 	struct LinkingContext;
 	struct Game;
 
@@ -24,36 +24,24 @@ namespace fan
 		static void SetInfo( SingletonComponentInfo& _info );
 		static void Init( EcsWorld& _world, SingletonComponent& _component );
 		static void OnGui( EcsWorld&, SingletonComponent& _component );
-		static void Save( const SingletonComponent& _component, Json& _json );
-		static void Load( SingletonComponent& _component, const Json& _json );
 
 		FrameIndex		spaceshipSpawnFrameIndex;	// the frame index on which the spaceship is spawned
 		NetID			spaceshipNetID;
 		EntityHandle	spaceshipHandle;
 		EntityHandle	persistentHandle;
-
-		 std::queue< PacketInput >			 inputs;
-		 std::queue< PacketPlayerGameState > previousStates;
-		 bool synced;
-
-		// pre-get singletons
-		 HostDeliveryNotification*		deliveryNotification;
-		ClientReplicationManager*		replicationManager;
-		ClientConnectionManager*		connection;
-		LinkingContext*					linkingContext;
-		RPCManager*						rpcManager;
-		Game*							game;
+		std::queue< PacketInput >			inputs;
+		std::queue< PacketPlayerGameState > previousStates;
+		bool synced;
 
 		void Start( EcsWorld& _world );
 		void Stop( EcsWorld& _world );
 		void Update( EcsWorld& _world );
-		void NetworkSend();
+		void NetworkSend( EcsWorld& _world );
 		void NetworkReceive( EcsWorld& _world );
-
 		void ProcessPacket( const PacketPlayerGameState& _packet );
 
 		// RPC callbacks
-		void ShiftFrameIndex( const int _framesDelta );
-		void SpawnShip( NetID _spaceshipID, FrameIndex _frameIndex );
+		void OnShiftFrameIndex( const int _framesDelta );
+		void OnSpawnShip( NetID _spaceshipID, FrameIndex _frameIndex );
 	};
 }

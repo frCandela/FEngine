@@ -23,6 +23,7 @@ namespace fan
 		};
 
 		//================================================================
+		// replication data for a singleton component
 		//================================================================
 		struct SingletonReplicationData
 		{
@@ -34,11 +35,10 @@ namespace fan
 		std::multimap< PacketTag, SingletonReplicationData> pendingReplication; // sent on the network, waiting for a status
 		std::vector<SingletonReplicationData>				nextReplication;	// waiting  to be sent on the network
 	
-		void		Write( Packet& _packet, const HostID _hostID );
-		Signal<>&	ReplicateOnClient( const HostID _hostID, PacketReplication& _packet, const ReplicationFlags _flags );
+		void		Write( Packet& _packet );
+		Signal<>&	ReplicateOnClient( PacketReplication& _packet, const ReplicationFlags _flags );
 		void		OnReplicationSuccess( const PacketTag _packetTag );
 		void		OnReplicationFail( const PacketTag _packetTag );
-
 		static PacketReplication BuildSingletonPacket( const EcsWorld& _world, const uint32_t _staticID );
 		static PacketReplication BuildRPCPacket( sf::Packet& _dataRPC );
 	};

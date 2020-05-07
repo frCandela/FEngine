@@ -15,7 +15,6 @@
 namespace fan
 {
 	struct Client;
-	using HostID = int;	
 	using NetID = sf::Uint32;
 	using IpAddress = sf::IpAddress;
 	using Port = unsigned short;
