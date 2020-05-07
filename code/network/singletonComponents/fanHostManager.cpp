@@ -70,6 +70,14 @@ namespace fan
 		const EntityID entityID = world.GetEntityID( _hostHandle );
 		world.KillEntity( entityID );
 
+		// Delete the host spaceship if spawned
+		HostGameData hostGameData = world.GetComponent<HostGameData>( entityID );
+		if( hostGameData.spaceshipHandle != 0 )
+		{
+			const EntityID spaceshipID = world.GetEntityID( hostGameData.spaceshipHandle );
+			world.KillEntity( spaceshipID );
+		}		
+
 		// delete the host ip/port entry
 		HostConnection& hostConnection = world.GetComponent< HostConnection >( entityID );		
 		auto& it = hostHandles.find( { hostConnection.ip, hostConnection.port } );
