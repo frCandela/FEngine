@@ -12,7 +12,7 @@
 #include "scene/components/fanSceneNode.hpp"
 #include "scene/singletonComponents/fanScene.hpp"
 #include "network/singletonComponents/fanClientReplication.hpp"
-#include "network/singletonComponents/fanClientConnection.hpp"
+#include "network/components/fanClientConnection.hpp"
 #include "network/singletonComponents/fanLinkingContext.hpp"
 #include "network/singletonComponents/fanRPCManager.hpp"
 #include "network/components/fanReliabilityLayer.hpp"
@@ -61,9 +61,10 @@ namespace fan
 		persistentHandle		= sceneNode.handle;
 		EntityID entityID		= _world.GetEntityID( persistentHandle );
 		_world.AddComponent<ReliabilityLayer>( entityID );
+		_world.AddComponent<ClientConnection>( entityID );
 
 		// Bind socket
-		ClientConnection& connection = _world.GetSingletonComponent<ClientConnection>();
+		ClientConnection& connection = _world.GetComponent<ClientConnection>( entityID );
 		sf::Socket::Status socketStatus = sf::Socket::Disconnected;
 		for( int tryIndex = 0; tryIndex < 10 && socketStatus != sf::Socket::Done; tryIndex++ )
 		{
@@ -82,7 +83,8 @@ namespace fan
 	//================================================================================================================================
 	void ClientNetworkManager::Stop( EcsWorld& _world )
 	{
-		ClientConnection& connection = _world.GetSingletonComponent<ClientConnection>();
+		const EntityID persistentID = _world.GetEntityID( persistentHandle );		
+		ClientConnection& connection = _world.GetComponent<ClientConnection>( persistentID );
 		connection.state = ClientConnection::ClientState::Stopping;
 		NetworkSend( _world ); // send a last packet
 		connection.socket.Unbind();
@@ -148,10 +150,11 @@ namespace fan
 	//================================================================================================================================
 	void ClientNetworkManager::Update( EcsWorld& _world )
 	{
-		ClientReplication& replication	= _world.GetSingletonComponent<ClientReplication>();
-		LinkingContext& linkingContext  = _world.GetSingletonComponent<LinkingContext>();
-		Game& game						= _world.GetSingletonComponent<Game>();
-		ClientConnection& connection	= _world.GetSingletonComponent<ClientConnection>();
+		const EntityID persistentID = _world.GetEntityID( persistentHandle );
+		ClientConnection& connection = _world.GetComponent<ClientConnection>( persistentID );
+		ClientReplication& replication = _world.GetSingletonComponent<ClientReplication>();
+		LinkingContext& linkingContext = _world.GetSingletonComponent<LinkingContext>();
+		Game& game = _world.GetSingletonComponent<Game>();
 
 		replication.ReplicateSingletons( _world );
 
@@ -205,9 +208,9 @@ namespace fan
 	{
 		S_ProcessTimedOutPackets::Run( _world, _world.Match( S_ProcessTimedOutPackets::GetSignature( _world ) ) );
 
-		const EntityID presistentEntityID = _world.GetEntityID( persistentHandle );
-		ReliabilityLayer& reliabilityLayer = _world.GetComponent<ReliabilityLayer>( presistentEntityID );
-		ClientConnection& connection = _world.GetSingletonComponent<ClientConnection>();
+		const EntityID persistentID = _world.GetEntityID( persistentHandle );
+		ReliabilityLayer& reliabilityLayer = _world.GetComponent<ReliabilityLayer>( persistentID );
+		ClientConnection& connection = _world.GetComponent<ClientConnection>( persistentID);
 		ClientReplication& replication = _world.GetSingletonComponent<ClientReplication>();
 		RPCManager& rpcManager = _world.GetSingletonComponent<RPCManager>();
 		Game& game = _world.GetSingletonComponent<Game>();
@@ -339,9 +342,9 @@ namespace fan
 	//================================================================================================================================
 	void ClientNetworkManager::NetworkSend( EcsWorld& _world )
 	{
-		const EntityID presistentEntityID = _world.GetEntityID( persistentHandle );
-		ReliabilityLayer& reliabilityLayer = _world.GetComponent<ReliabilityLayer>( presistentEntityID );
-		ClientConnection& connection = _world.GetSingletonComponent<ClientConnection>();
+		const EntityID persistentID = _world.GetEntityID( persistentHandle );
+		ReliabilityLayer& reliabilityLayer = _world.GetComponent<ReliabilityLayer>( persistentID );
+		ClientConnection& connection = _world.GetComponent<ClientConnection>( persistentID);
 		Game& game = _world.GetSingletonComponent<Game>();
 
 		// create packet

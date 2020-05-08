@@ -1,4 +1,4 @@
-#include "network/singletonComponents/fanClientConnection.hpp"
+#include "network/components/fanClientConnection.hpp"
 
 #include "core/fanDebug.hpp"
 #include "ecs/fanEcsWorld.hpp"
@@ -7,21 +7,20 @@
 
 namespace fan
 {
-	REGISTER_SINGLETON_COMPONENT( ClientConnection );
+	REGISTER_COMPONENT( ClientConnection, "client connection" );
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void ClientConnection::SetInfo( SingletonComponentInfo& _info )
+	void ClientConnection::SetInfo( ComponentInfo& _info )
 	{
 		_info.icon = ImGui::NETWORK16;
 		_info.init = &ClientConnection::Init;
 		_info.onGui = &ClientConnection::OnGui;
-		_info.name = "client connection";
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void ClientConnection::Init( EcsWorld& _world, SingletonComponent& _component )
+	void ClientConnection::Init( EcsWorld& _world, Component& _component )
 	{
 		ClientConnection& connection = static_cast<ClientConnection&>( _component );
 		connection.socket.Unbind();
@@ -181,7 +180,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void ClientConnection::OnGui( EcsWorld&, SingletonComponent& _component )
+	void ClientConnection::OnGui( EcsWorld& _world, EntityID _entityID, Component& _component )
 	{
 		ImGui::Indent(); ImGui::Indent();
 		{
