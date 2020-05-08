@@ -15,8 +15,10 @@
 #include "network/components/fanClientConnection.hpp"
 #include "network/singletonComponents/fanLinkingContext.hpp"
 #include "network/components/fanClientRPC.hpp"
+#include "network/components/fanClientGameData.hpp"
 #include "network/components/fanReliabilityLayer.hpp"
 #include "network/systems/fanTimeout.hpp"
+#include "network/systems/fanClientUpdates.hpp"
 
 namespace fan
 {
@@ -37,11 +39,7 @@ namespace fan
 	void ClientNetworkManager::Init( EcsWorld& _world, SingletonComponent& _component )
 	{
 		ClientNetworkManager& netManager = static_cast<ClientNetworkManager&>( _component );
-		netManager.spaceshipSpawnFrameIndex = 0;
-		netManager.spaceshipNetID = 0;
-		netManager.spaceshipHandle = 0;
-		netManager.persistentHandle = 0;
-		netManager.synced = false;
+		netManager.playerPersistent = nullptr;
 	}
 
 	//================================================================================================================================
@@ -50,20 +48,21 @@ namespace fan
 	{
 		// Create player persistent scene node
 		Scene& scene			= _world.GetSingletonComponent<Scene>();
-		SceneNode& sceneNode	= scene.CreateSceneNode( "persistent", scene.root );
-		persistentHandle		= sceneNode.handle;
-		EntityID persistentID		= _world.GetEntityID( persistentHandle );
+		playerPersistent		= & scene.CreateSceneNode( "persistent", scene.root );
+		EntityID persistentID	= _world.GetEntityID( playerPersistent->handle );
 		_world.AddComponent<ReliabilityLayer>( persistentID );
 		_world.AddComponent<ClientConnection>( persistentID );
 		_world.AddComponent<ClientReplication>( persistentID );
 		_world.AddComponent<ClientRPC>( persistentID );
+		_world.AddComponent<ClientGameData>( persistentID );
 
 		// connect rpc
 		Game& game = _world.GetSingletonComponent<Game>();
 		ClientRPC& rpcManager = _world.GetComponent<ClientRPC>( persistentID );
-		rpcManager.onShiftFrameIndex.Connect( &ClientNetworkManager::OnShiftFrameIndex, this );
+		ClientGameData& gameData = _world.GetComponent<ClientGameData>( persistentID );
+		rpcManager.onShiftFrameIndex.Connect( &ClientGameData::OnShiftFrameIndex, &gameData );
 		rpcManager.onShiftFrameIndex.Connect( &Game::OnShiftFrameIndex, &game );
-		rpcManager.onSpawnShip.Connect( &ClientNetworkManager::OnSpawnShip, this );
+		rpcManager.onSpawnShip.Connect( &ClientGameData::OnSpawnShip, &gameData );
 
 		// Bind socket
 		ClientConnection& connection = _world.GetComponent<ClientConnection>( persistentID );
@@ -85,123 +84,11 @@ namespace fan
 	//================================================================================================================================
 	void ClientNetworkManager::Stop( EcsWorld& _world )
 	{
-		const EntityID persistentID = _world.GetEntityID( persistentHandle );		
+		const EntityID persistentID = _world.GetEntityID( playerPersistent->handle );		
 		ClientConnection& connection = _world.GetComponent<ClientConnection>( persistentID );
 		connection.state = ClientConnection::ClientState::Stopping;
-		NetworkSend( _world ); // send a last packet
+		S_ClientNetworkSend::Run( _world, _world.Match( S_ClientNetworkSend::GetSignature( _world ) ) );// send a last packet
 		connection.socket.Unbind();
-	}
-
-	//================================================================================================================================
-	//================================================================================================================================
-	void ClientNetworkManager::OnSpawnShip( NetID _spaceshipID, FrameIndex _frameIndex )
-	{
-		if( spaceshipNetID == 0 )
-		{
-			spaceshipSpawnFrameIndex = _frameIndex;
-			spaceshipNetID			 = _spaceshipID;
-		}
-	}
-
-	//================================================================================================================================
-	//================================================================================================================================
-	void ClientNetworkManager::OnShiftFrameIndex( const int _framesDelta )
-	{
-		previousStates = std::queue< PacketPlayerGameState >(); // clear
-		synced = true;
-		Debug::Log() << "Shifted client frame index : " << _framesDelta << Debug::Endl();
-	}
-
-	//================================================================================================================================
-	//================================================================================================================================
-	void ClientNetworkManager::ProcessPacket( const PacketPlayerGameState& _packet )
-	{
-		// get the current input for this client
-		while( ! previousStates.empty() )
-		{
-			const PacketPlayerGameState& packetInput = previousStates.front();
-			if( packetInput.frameIndex < _packet.frameIndex )
-			{
-				previousStates.pop();
-			}
-			else
-			{
-				break;
-			}
-		}
-
-		// moves spaceship						
-		if( !previousStates.empty() && previousStates.front().frameIndex == _packet.frameIndex )
-		{
-			const PacketPlayerGameState& packetState = previousStates.front();
-			previousStates.pop();
-
-			if( packetState != _packet )
-			{
-				Debug::Warning() << "player is out of sync" << Debug::Endl();
-			}
-
-		}
-		else
-		{
-			Debug::Warning() << "no available game state for this frame" << Debug::Endl();
-		}
-	}
-
-	//================================================================================================================================
-	//================================================================================================================================
-	void ClientNetworkManager::Update( EcsWorld& _world )
-	{
-		const EntityID persistentID = _world.GetEntityID( persistentHandle );
-		ClientConnection& connection = _world.GetComponent<ClientConnection>( persistentID );
-		ClientReplication& replication = _world.GetComponent<ClientReplication>( persistentID );
-		LinkingContext& linkingContext = _world.GetSingletonComponent<LinkingContext>();
-		Game& game = _world.GetSingletonComponent<Game>();
-
-		replication.ReplicateSingletons( _world );
-
-		// spawns spaceship
-		if( spaceshipSpawnFrameIndex != 0 && game.frameIndex >= spaceshipSpawnFrameIndex )
-		{
-			assert( spaceshipNetID != 0 );
-
-			spaceshipSpawnFrameIndex = 0;
-			spaceshipHandle = Game::SpawnSpaceship( _world );
-			linkingContext.AddEntity( spaceshipHandle, spaceshipNetID );
-
-			const EntityID spaceshipID = _world.GetEntityID( spaceshipHandle );
-			if( spaceshipHandle != 0 )
-			{
-				_world.AddComponent<PlayerController>( spaceshipID );
-			}
-		}
-
-		if( spaceshipHandle != 0  && synced )
-		{
-			const EntityID entityID = _world.GetEntityID( spaceshipHandle );
-			const PlayerInput& input = _world.GetComponent<PlayerInput>( entityID );
-
-			// streams input to the server
-			PacketInput packetInput;
-			packetInput.frameIndex = game.frameIndex;
-			packetInput.orientation = input.orientation;
-			packetInput.left = input.left;
-			packetInput.forward = input.forward;
-			packetInput.boost = input.boost;
-			packetInput.fire = input.fire;
-			inputs.push( packetInput );
-
-			// saves previous player state
-			const Rigidbody& rb = _world.GetComponent<Rigidbody>( entityID );
-			const Transform& transform = _world.GetComponent<Transform>( entityID );
-			PacketPlayerGameState playerState;			
-			playerState.frameIndex = game.frameIndex;
-			playerState.position = transform.GetPosition();
-			playerState.orientation = transform.GetRotationEuler();
-			playerState.velocity = rb.GetVelocity();
-			playerState.angularVelocity = rb.GetAngularVelocity();
-			previousStates.push( playerState );
-		}
 	}
 
 	//================================================================================================================================
@@ -210,11 +97,12 @@ namespace fan
 	{
 		S_ProcessTimedOutPackets::Run( _world, _world.Match( S_ProcessTimedOutPackets::GetSignature( _world ) ) );
 
-		const EntityID persistentID = _world.GetEntityID( persistentHandle );
+		const EntityID persistentID = _world.GetEntityID( playerPersistent->handle );
 		ReliabilityLayer& reliabilityLayer	= _world.GetComponent<ReliabilityLayer>	( persistentID );
 		ClientConnection& connection		= _world.GetComponent<ClientConnection>	( persistentID);
 		ClientReplication& replication		= _world.GetComponent<ClientReplication>( persistentID );
 		ClientRPC& rpc						= _world.GetComponent<ClientRPC>		( persistentID);
+		ClientGameData& gameData			= _world.GetComponent<ClientGameData>( persistentID );
 		Game& game							= _world.GetSingletonComponent<Game>();
 
 		// receive
@@ -298,7 +186,7 @@ namespace fan
 					{
 						PacketPlayerGameState packetPlayerGameState;
 						packetPlayerGameState.Read( packet );
-						ProcessPacket( packetPlayerGameState );
+						gameData.ProcessPacket( packetPlayerGameState );
 					} break;
 					default:
 						Debug::Warning() << "Invalid packet " << int( packetType ) << " received. Reading canceled." << Debug::Endl();
@@ -338,46 +226,6 @@ namespace fan
 		
 		connection.DetectServerTimout();		
 		replication.ReplicateRPC( rpc );
-	}
-
-	//================================================================================================================================
-	//================================================================================================================================
-	void ClientNetworkManager::NetworkSend( EcsWorld& _world )
-	{
-		const EntityID persistentID = _world.GetEntityID( persistentHandle );
-		ReliabilityLayer& reliabilityLayer = _world.GetComponent<ReliabilityLayer>( persistentID );
-		ClientConnection& connection = _world.GetComponent<ClientConnection>( persistentID);
-		Game& game = _world.GetSingletonComponent<Game>();
-
-		// create packet
-		Packet packet( reliabilityLayer.GetNextPacketTag() );
-
-		// write packet
-		connection.Write( packet );
-
-		if( !inputs.empty() )
-		{
-			const PacketInput& lastInput = inputs.front();
-			inputs.pop();
-			assert( lastInput.frameIndex == game.frameIndex );
-			lastInput.Write( packet );
-		}
-
-		if( packet.GetSize() == sizeof( PacketTag ) ) { packet.onlyContainsAck = true; }
-
-		reliabilityLayer.Write( packet );
-
-		// send packet, don't send empty packets
-		if( packet.GetSize() > sizeof( PacketTag ) )
-		{
-			reliabilityLayer.RegisterPacket( packet );
-			connection.bandwidth = 1.f / game.logicDelta * float( packet.GetSize() ) / 1000.f; // in Ko/s
-			connection.socket.Send( packet, connection.serverIP, connection.serverPort );
-		}
-		else
-		{
-			reliabilityLayer.nextPacketTag--;
-		}
 	}
 
 	//================================================================================================================================

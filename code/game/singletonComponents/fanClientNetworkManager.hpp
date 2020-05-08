@@ -2,12 +2,10 @@
 
 #include "ecs/fanSingletonComponent.hpp"
 
-#include "network/fanPacket.hpp"
-#include <queue>
-
 namespace fan
 {
 	class EcsWorld;
+	struct SceneNode;
 
 	//================================================================================================================================
 	//================================================================================================================================
@@ -19,23 +17,10 @@ namespace fan
 		static void Init( EcsWorld& _world, SingletonComponent& _component );
 		static void OnGui( EcsWorld&, SingletonComponent& _component );
 
-		FrameIndex		spaceshipSpawnFrameIndex;	// the frame index on which the spaceship is spawned
-		NetID			spaceshipNetID;
-		EntityHandle	spaceshipHandle;
-		EntityHandle	persistentHandle;
-		std::queue< PacketInput >			inputs;
-		std::queue< PacketPlayerGameState > previousStates;
-		bool synced;
-
 		void Start( EcsWorld& _world );
 		void Stop( EcsWorld& _world );
-		void Update( EcsWorld& _world );
-		void NetworkSend( EcsWorld& _world );
-		void NetworkReceive( EcsWorld& _world );
-		void ProcessPacket( const PacketPlayerGameState& _packet );
+		void NetworkReceive( EcsWorld& _world );		
 
-		// RPC callbacks
-		void OnShiftFrameIndex( const int _framesDelta );
-		void OnSpawnShip( NetID _spaceshipID, FrameIndex _frameIndex );
+		SceneNode* playerPersistent;
 	};
 }

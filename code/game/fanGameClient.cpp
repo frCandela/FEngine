@@ -30,13 +30,16 @@
 #include "scene/singletonComponents/fanScenePointers.hpp"
 #include "scene/singletonComponents/fanPhysicsWorld.hpp"
 #include "scene/fanSceneTags.hpp"
-#include "network/fanPacket.hpp"
 #include "game/fanGameTags.hpp"
+#include "network/fanPacket.hpp"
+
+#include "network/singletonComponents/fanLinkingContext.hpp"
 #include "network/components/fanClientReplication.hpp"
 #include "network/components/fanClientRPC.hpp"
-#include "network/singletonComponents/fanLinkingContext.hpp"
+#include "network/components/fanClientGameData.hpp"
 #include "network/components/fanReliabilityLayer.hpp"
 #include "network/components/fanClientConnection.hpp"
+#include "network/systems/fanClientUpdates.hpp"
 
 #include "game/singletonComponents/fanClientNetworkManager.hpp"
 #include "game/singletonComponents/fanSunLight.hpp"
@@ -110,6 +113,7 @@ namespace fan
 		world.AddComponentType<ClientConnection>();
 		world.AddComponentType<ClientReplication>();
 		world.AddComponentType<ClientRPC>();
+		world.AddComponentType<ClientGameData>();
 
 		// base singleton components
 		world.AddSingletonComponentType<Scene>();
@@ -202,7 +206,7 @@ namespace fan
 
 			// update
 			S_RefreshPlayerInput::Run( world, world.Match( S_RefreshPlayerInput::GetSignature( world ) ), _delta );
-			netManager->Update( world );
+			S_ClientNetworkUpdate::Run( world, world.Match( S_ClientNetworkUpdate::GetSignature( world ) ) );
 			S_MoveSpaceships::Run( world, world.Match( S_MoveSpaceships::GetSignature( world ) ), _delta );
 			S_FireWeapons::Run( world, world.Match( S_FireWeapons::GetSignature( world ) ), _delta );
 			S_MovePlanets::Run( world, world.Match( S_MovePlanets::GetSignature( world ) ), _delta );
@@ -229,7 +233,7 @@ namespace fan
 
 			S_UpdateGameCamera::Run( world, world.Match( S_UpdateGameCamera::GetSignature( world ) ), _delta );
 
-			netManager->NetworkSend( world );
+			S_ClientNetworkSend::Run( world, world.Match( S_ClientNetworkSend::GetSignature( world ) ) );
 		}
 
 		{

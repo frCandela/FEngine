@@ -2,9 +2,6 @@
 
 #include "ecs/fanSingletonComponent.hpp"
 
-#include "network/fanPacket.hpp"
-#include <queue>
-
 namespace fan
 {
 	class EcsWorld;
