@@ -65,8 +65,8 @@ namespace fan
 						// get the current input for this client
 						while( !hostData.inputs.empty() )
 						{
-							const PacketInput& packetInput = hostData.inputs.front();
-							if( packetInput.frameIndex < game.frameIndex || packetInput.frameIndex > game.frameIndex + 60 )
+							const PacketInput::InputData& inputData = hostData.inputs.front();
+							if( inputData.frameIndex < game.frameIndex || inputData.frameIndex > game.frameIndex + 60 )
 							{
 								hostData.inputs.pop();
 							}
@@ -79,15 +79,16 @@ namespace fan
 						// moves spaceship						
 						if( !hostData.inputs.empty() && hostData.inputs.front().frameIndex == game.frameIndex )
 						{
-							const PacketInput& packetInput = hostData.inputs.front();
+							const PacketInput::InputData& inputData = hostData.inputs.front();
 							hostData.inputs.pop();
+
 							const EntityID shipEntityID = _world.GetEntityID( hostData.spaceshipHandle );
 							PlayerInput& input = _world.GetComponent<PlayerInput>( shipEntityID );
-							input.orientation = packetInput.orientation;
-							input.left = packetInput.left;
-							input.forward = packetInput.forward;
-							input.boost = packetInput.boost;
-							input.fire = packetInput.fire;
+							input.orientation = btVector3( inputData.orientation.x, 0.f, inputData.orientation.y );
+							input.left		= inputData.left	? 1.f : ( inputData.right	 ? -1.f : 0.f );
+							input.forward	= inputData.forward ? 1.f : ( inputData.backward ? -1.f : 0.f );
+							input.boost		= inputData.boost;
+							input.fire		= inputData.fire;
 						}
 						else
 						{

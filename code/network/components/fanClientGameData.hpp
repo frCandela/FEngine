@@ -18,12 +18,23 @@ namespace fan
 		static void Init( EcsWorld& _world, Component& _component );
 		static void OnGui( EcsWorld& _world, EntityID _entityID, Component& _component );
 		
+		//===============================================================================
+		// for registering inputs sent to the server		
+		//===============================================================================
+		struct InputSent
+		{
+			PacketTag  tag;					// tag of the packet
+			FrameIndex mostRecentFrame;		// most recent frame index when the inputs were sent
+		};
+
 		FrameIndex							spaceshipSpawnFrameIndex;	// the frame index on which the spaceship is spawned
 		NetID								spaceshipNetID;
 		EntityHandle						spaceshipHandle;
-		std::deque< PacketInput >			inputs;
+		std::deque< PacketInput::InputData >previousInputs;
+		std::deque< InputSent>				inputsSent;
 		std::queue< PacketPlayerGameState > previousStates;
 		bool								synced;
+		int									maxInputSent;
 
 		void Write( Packet& _packet );
 		void ProcessPacket( const PacketPlayerGameState& _packet );

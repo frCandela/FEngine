@@ -4,7 +4,6 @@
 #include <limits>
 #include <assert.h>
 #include <type_traits>
-
 #include "SFML/System.hpp"
 #include "SFML/Network.hpp"
 
@@ -198,64 +197,64 @@ namespace fan
 	//================================================================================================================================
 	struct PacketInput
 	{
-
-		enum AxisBits
+		struct InputData
 		{
-			Zero = 0
-			, Positive = 1 << 0
-			, Negative = 1 << 1
-			, Mask	   = 0b11
-		};
+			bool left : 1;
+			bool right : 1;
+			bool forward : 1;
+			bool backward : 1;
+			bool boost : 1;
+			bool fire : 1;
+			sf::Vector2f	orientation;
+			FrameIndexNet	frameIndex;
+		}; 
+
+		std::vector<InputData> inputs;
 
 		void Read( Packet& _packet )
 		{
-			_packet >> frameIndex;
-			_packet >> orientation[0] >> orientation[1] >> orientation[2];
-			_packet >> left;
-			_packet >> forward;
-			_packet >> boost;
-			_packet >> fire;
+			sf::Uint8 size;
+			_packet >> size;
 
-			// decode input bits to floats
-// 			sf::Uint8 inputsBits;
-// 			_packet >> inputsBits;
-// 			float* values[4] = { &left, &forward, &boost, &fire };
-// 			for( int i = 0; i < 4; i++ )
-// 			{
-// 				const uint32_t valueBits = ( inputsBits >> i * 2 ) & Mask;
-// 				( *values[i] ) = valueBits == Positive ? 1.f : ( valueBits == Negative ? -1.f : 0.f );
-// 			}
+			inputs.resize( size );
+			for( int i = 0; i < size; i++ )
+			{
+				InputData& inputData = inputs[i];
+				_packet >> inputData.frameIndex;
+				_packet >> inputData.orientation.x >> inputData.orientation.y;
+				sf::Uint8 keyBits;
+				_packet >> keyBits;
+
+				inputData.left		= keyBits & (1<<0);
+				inputData.right		= keyBits & (1<<1);
+				inputData.forward	= keyBits & (1<<2);
+				inputData.backward	= keyBits & (1<<3);
+				inputData.boost		= keyBits & (1<<4);
+				inputData.fire		= keyBits & (1<<5);
+			}
 		}
 
 		void Write( Packet& _packet ) const
 		{
-			// encode positive/negative/zero input floats into bits that fit into one byte
-// 			sf::Uint8 inputsBits = 0;
-// 			float values[4] = { left, forward, boost, fire };
-// 			for (int i = 0; i < 4; i++)
-// 			{
-// 				const float value = values[i];
-// 				const uint32_t valueBits = value > 0.f ? Positive : ( value < 0.f ? Negative : Zero );
-// 				inputsBits |= valueBits << i * 2;
-// 			}
-
 			_packet << PacketTypeInt( PacketType::PlayerInput );
-			_packet << frameIndex;
-			_packet << orientation[0] << orientation[1] << orientation[2];
-			_packet << left;
-			_packet << forward;
-			_packet << boost;
-			_packet << fire;
+			_packet << sf::Uint8(inputs.size());
+
+			for( int i = 0; i < inputs.size(); i++ )
+			{
+				const InputData& inputData = inputs[i];
+				const sf::Uint8 keyBits =
+				inputData.left		<< 0 |
+				inputData.right		<< 1 |
+				inputData.forward	<< 2 |
+				inputData.backward	<< 3 |
+				inputData.boost		<< 4 |
+				inputData.fire		<< 5;
+
+				_packet << inputData.frameIndex;
+				_packet << inputData.orientation.x << inputData.orientation.y;
+				_packet << keyBits;
+			}
 		}
-
-		FrameIndexNet	frameIndex;	// the  frame index when creating the input
-		btVector3		orientation;// orientation of the ship
-		float			left;		// left/right key pressed ( strafing )
-		float			forward;	// forward or backward
-		float			boost;		// shift to go faster
-		float			fire;		// firing in front of the ship
-
-		PacketTag		tag;		// not serialized
 	};
 
 	//================================================================================================================================

@@ -98,8 +98,9 @@ namespace fan
 				}
 				const EntityID entityID = _world.GetEntityID( clientHandle );
 				
-				ReliabilityLayer&	reliabilityLayer = _world.GetComponent<ReliabilityLayer>( entityID );
-				HostConnection&		hostConnection = _world.GetComponent<HostConnection>( entityID );
+				HostGameData&		hostData			= _world.GetComponent< HostGameData >( entityID );
+				ReliabilityLayer&	reliabilityLayer	= _world.GetComponent<ReliabilityLayer>( entityID );
+				HostConnection&		hostConnection		= _world.GetComponent<HostConnection>( entityID );
 				hostConnection.lastResponseTime = Time::Get().ElapsedSinceStartup();
 
 				// read the first packet type separately
@@ -157,8 +158,7 @@ namespace fan
 						packetInput.Read( packet );
 						if( hostConnection.state == HostConnection::Connected )
 						{
-							HostGameData& hostData = _world.GetComponent< HostGameData >( entityID );
-							hostData.inputs.push( packetInput );
+							hostData.ProcessPacket( packetInput );
 						}
 					} break;					
 					default:

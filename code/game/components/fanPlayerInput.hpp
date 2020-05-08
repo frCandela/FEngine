@@ -27,4 +27,5 @@ namespace fan
 		float		boost;		 // shift to go faster
 		float		fire;		 // firing in front of the ship
 	};
+	static constexpr size_t sizeof_playerInput = sizeof( PlayerInput );
 }

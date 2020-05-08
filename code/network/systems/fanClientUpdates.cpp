@@ -64,14 +64,16 @@ namespace fan
 				const PlayerInput& input = _world.GetComponent<PlayerInput>( entityID );
 
 				// streams input to the server
-				PacketInput packetInput;
-				packetInput.frameIndex = game.frameIndex;
-				packetInput.orientation = input.orientation;
-				packetInput.left = input.left;
-				packetInput.forward = input.forward;
-				packetInput.boost = input.boost;
-				packetInput.fire = input.fire;
-				gameData.inputs.push_front( packetInput );
+				PacketInput::InputData inputData;
+				inputData.frameIndex = game.frameIndex;
+				inputData.orientation = sf::Vector2f( input.orientation.x(), input.orientation.z() );
+				inputData.left = input.left > 0;
+				inputData.right = input.left < 0;
+				inputData.forward = input.forward > 0;
+				inputData.backward = input.forward < 0;
+				inputData.boost = input.boost > 0;
+				inputData.fire = input.fire > 0;
+				gameData.previousInputs.push_front( inputData );
 
 				// saves previous player state
 				const Rigidbody& rb = _world.GetComponent<Rigidbody>( entityID );

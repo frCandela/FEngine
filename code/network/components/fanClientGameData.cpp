@@ -22,8 +22,9 @@ namespace fan
 		gameData.spaceshipNetID = 0;
 		gameData.spaceshipHandle = 0;
 		gameData.synced = false;
-		gameData.inputs = std::deque< PacketInput >();					// clear
-		gameData.previousStates = std::queue< PacketPlayerGameState >();// clear		
+		gameData.previousInputs = std::deque< PacketInput::InputData >();			// clear
+		gameData.previousStates = std::queue< PacketPlayerGameState >();// clear	
+		gameData.maxInputSent = 10;
 	}
 
 	//================================================================================================================================
@@ -61,12 +62,27 @@ namespace fan
 	//================================================================================================================================
 	void ClientGameData::Write( Packet& _packet )
 	{
-		if( !inputs.empty() )
+		// calculates the number of inputs to send
+		int numInputs = (int)previousInputs.size();
+		if( numInputs > maxInputSent )
 		{
-			PacketInput& lastInput = inputs.front();
-			lastInput.tag = _packet.tag;
-			lastInput.Write( _packet );
+			numInputs = maxInputSent;
+		}
+
+		if( numInputs > 0 )
+		{
+			// registers packet success
 			_packet.onSuccess.Connect( &ClientGameData::OnInputReceived, this );
+			inputsSent.push_front( { _packet.tag, previousInputs.front().frameIndex } );
+
+			// generate & send inputs
+			PacketInput packetInput;
+			packetInput.inputs.resize( numInputs );
+			for( int i = 0; i < numInputs; i++ )
+			{
+				packetInput.inputs[numInputs - i - 1] = * (previousInputs.begin() + i) ;
+			}				
+			packetInput.Write( _packet );			
 		}
 	}
 
@@ -75,12 +91,30 @@ namespace fan
 	//================================================================================================================================
 	void ClientGameData::OnInputReceived( PacketTag _tag )
 	{
-		while( ! inputs.empty() )
+		while( !inputsSent.empty() )
 		{
-			const PacketInput& oldestInput = inputs.back();
-			if( oldestInput.tag <= _tag )
+			const InputSent inputSent = inputsSent.back();
+			if( inputSent.tag < _tag ) // packets were lost but we don't care
 			{
-				inputs.pop_back();
+				inputsSent.pop_back();
+			} 
+			else if( inputSent.tag == _tag ) 
+			{
+				inputsSent.pop_back();
+				// input packet was received, remove all corresponding inputs from the buffer
+				while( !previousInputs.empty() )
+				{
+					const PacketInput::InputData packetInput = previousInputs.back();
+					if( packetInput.frameIndex <= inputSent.mostRecentFrame )
+					{
+						previousInputs.pop_back();
+					}
+					else
+					{
+						break;
+					}
+				}
+				break;
 			}
 			else
 			{
@@ -116,11 +150,13 @@ namespace fan
 		ClientGameData& gameData = static_cast<ClientGameData&>( _component );
 		ImGui::PushItemWidth( 0.6f * ImGui::GetWindowWidth() - 16 );
 		{
+			ImGui::DragInt( "max input sent", &gameData.maxInputSent, 1.f, 0, 200 );
 			ImGui::Text( "spaceship spawn frame: %d", gameData.spaceshipSpawnFrameIndex);
 			ImGui::Text( "spaceship net ID:      %d", gameData.spaceshipNetID);
-			ImGui::Text( "size inputs:           %d", gameData.inputs.size() );
 			ImGui::Text( "size previous states:  %d", gameData.previousStates.size());
 			ImGui::Text( "%s", gameData.synced ? "synced" : "unsynced" );
+			ImGui::Text( "size inputs:           %d", gameData.previousInputs.size() );
+			ImGui::Text( "size inputs sent :     %d", gameData.inputsSent.size() );
 		} ImGui::PopItemWidth();
 	}
 }

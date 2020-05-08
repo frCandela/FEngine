@@ -17,10 +17,12 @@ namespace fan
 		static void Init( EcsWorld& _world, Component& _component );
 		static void OnGui( EcsWorld& _world, EntityID _entityID, Component& _component );
 
-		NetID					spaceshipID;
-		EntityHandle			spaceshipHandle;
-		std::queue<PacketInput> inputs;
-		PacketPlayerGameState	nextPlayerState;
+		NetID									spaceshipID;
+		EntityHandle							spaceshipHandle;
+		std::queue< PacketInput::InputData >	inputs;
+		PacketPlayerGameState					nextPlayerState;
+
+		void ProcessPacket( PacketInput& _packet );
 	};
 	static constexpr size_t sizeof_hostGameData = sizeof( HostGameData );
 }

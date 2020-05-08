@@ -20,8 +20,34 @@ namespace fan
 		HostGameData& hostGameData = static_cast<HostGameData&>( _component );
 		hostGameData.spaceshipID = 0;
 		hostGameData.spaceshipHandle = 0;
-		hostGameData.inputs = std::queue<PacketInput>();
+		hostGameData.inputs = std::queue<PacketInput::InputData>();
 		hostGameData.nextPlayerState = PacketPlayerGameState();
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
+	void HostGameData::ProcessPacket( PacketInput& _packet )
+	{
+		if( inputs.empty() )
+		{
+			for ( const PacketInput::InputData& inputData : _packet.inputs )
+			{
+				inputs.push( inputData );
+			}			
+		}
+		else
+		{
+			for ( const PacketInput::InputData& inputData : _packet.inputs )
+			{
+				FrameIndex fi = inputs.back().frameIndex;
+
+				assert( inputData.frameIndex <= fi + 1 );
+				if( inputData.frameIndex == fi + 1 )
+				{
+					inputs.push( inputData );
+				} 				
+			}
+		}	
 	}
 
 	//================================================================================================================================
@@ -34,6 +60,17 @@ namespace fan
 			ImGui::Text( "spaceshipID :      %u", hostGameData.spaceshipID );
 			ImGui::Text( "spaceship handle : %u", hostGameData.spaceshipHandle );
 			ImGui::Text( "inputs size :      %u", hostGameData.inputs.size() );
+
+			if( ImGui::CollapsingHeader( "inputs" ) )
+			{
+				std::queue< PacketInput::InputData > inputsCpy = hostGameData.inputs;
+				while( !inputsCpy.empty() )
+				{
+					ImGui::Text( "%d", inputsCpy.front().frameIndex );
+					inputsCpy.pop();
+				}
+			}
+
 		} ImGui::PopItemWidth();
 	}
 }
