@@ -3,7 +3,7 @@
 #include "scene/fanSceneSerializable.hpp"
 #include "ecs/fanEcsWorld.hpp"
 #include "game/singletonComponents/fanGame.hpp"
-#include "network/singletonComponents/fanRPCManager.hpp"
+#include "network/components/fanClientRPC.hpp"
 
 namespace fan
 {
@@ -42,11 +42,11 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void ClientReplication::ReplicateRPC( RPCManager& _rpcManager )
+	void ClientReplication::ReplicateRPC( ClientRPC& _rpc )
 	{
 		for( PacketReplication packet : replicationListRPC )
 		{
-			_rpcManager.TriggerRPC( packet.packetData );
+			_rpc.TriggerRPC( packet.packetData );
 		}
 		replicationListRPC.clear();
 	}

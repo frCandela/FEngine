@@ -14,10 +14,8 @@
 #include "network/components/fanHostConnection.hpp"
 #include "network/components/fanHostReplication.hpp"
 #include "network/components/fanReliabilityLayer.hpp"
-#include "network/singletonComponents/fanRPCManager.hpp"
 #include "network/singletonComponents/fanServerConnection.hpp"
 #include "network/singletonComponents/fanLinkingContext.hpp"
-#include "network/singletonComponents/fanRPCManager.hpp"
 #include "network/singletonComponents/fanHostManager.hpp"
 #include "network/systems/fanTimeout.hpp"
 

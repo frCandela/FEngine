@@ -1,27 +1,26 @@
-#include "network/singletonComponents/fanRPCManager.hpp"
+#include "network/components/fanClientRPC.hpp"
 
 #include <sstream>
 #include "ecs/fanEcsWorld.hpp"
 
 namespace fan
 {
-	REGISTER_SINGLETON_COMPONENT( RPCManager );
+	REGISTER_COMPONENT( ClientRPC, "RPC manager" );
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void RPCManager::SetInfo( SingletonComponentInfo& _info )
+	void ClientRPC::SetInfo( ComponentInfo& _info )
 	{
 		_info.icon = ImGui::NETWORK16;
-		_info.init = &RPCManager::Init;
-		_info.onGui = &RPCManager::OnGui;
-		_info.name = "RPC manager";
+		_info.init = &ClientRPC::Init;
+		_info.onGui = &ClientRPC::OnGui;
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void RPCManager::Init( EcsWorld& _world, SingletonComponent& _component )
+	void ClientRPC::Init( EcsWorld& _world, Component& _component )
 	{
-		RPCManager& rpc = static_cast<RPCManager&>( _component );
+		ClientRPC& rpc = static_cast<ClientRPC&>( _component );
 		rpc.nameToRPCTable.clear();
 		rpc.onShiftFrameIndex.Clear();
 		rpc.onSpawnShip.Clear();
@@ -32,17 +31,17 @@ namespace fan
 	//================================================================================================================================
 	// Registers all available RPC unwrap functions
 	//================================================================================================================================
-	void RPCManager::RegisterRPCs( )
+	void ClientRPC::RegisterRPCs( )
 	{
-		RegisterUnwrapFunction( 'SYNC', &RPCManager::UnwrapShiftClientFrame );
-		RegisterUnwrapFunction( 'SPWN', &RPCManager::UnwrapSpawnShip );
+		RegisterUnwrapFunction( 'SYNC', &ClientRPC::UnwrapShiftClientFrame );
+		RegisterUnwrapFunction( 'SPWN', &ClientRPC::UnwrapSpawnShip );
 	}
 
 	//================================================================================================================================
 	// Registers a RPC unwrap function
 	// A unwrap function must decode a packet and run the corresponding procedure
 	//================================================================================================================================
-	void RPCManager::RegisterUnwrapFunction( const RpcId _id, const RpcUnwrapFunc _rpcUnwrapFunc )
+	void ClientRPC::RegisterUnwrapFunction( const RpcId _id, const RpcUnwrapFunc _rpcUnwrapFunc )
 	{
 		assert( nameToRPCTable.find( _id ) == nameToRPCTable.end() );
 		nameToRPCTable[_id] = _rpcUnwrapFunc;
@@ -51,7 +50,7 @@ namespace fan
 	//================================================================================================================================
 	// Runs a procedure from an incoming rpc packet data
 	//================================================================================================================================
-	void RPCManager::TriggerRPC( sf::Packet& _packet )
+	void ClientRPC::TriggerRPC( sf::Packet& _packet )
 	{
 		RpcId rpcID;
 		_packet >> rpcID;
@@ -63,7 +62,7 @@ namespace fan
 	//================================================================================================================================
 	// SynchClientFrame RPC - chan
 	//================================================================================================================================
-	PacketReplication RPCManager::RPCShiftClientFrame( const int _framesDelta )
+	PacketReplication ClientRPC::RPCShiftClientFrame( const int _framesDelta )
 	{
 		PacketReplication packet;
 		packet.replicationType = PacketReplication::ReplicationType::RPC;
@@ -78,7 +77,7 @@ namespace fan
 	//================================================================================================================================
 	// SynchClientFrame RPC - unwrap data & synchronizes the frame index of the client depending on its rtt
 	//================================================================================================================================
-	void RPCManager::UnwrapShiftClientFrame( sf::Packet& _packet )
+	void ClientRPC::UnwrapShiftClientFrame( sf::Packet& _packet )
 	{
 		sf::Int32 framesDelta;
 		_packet >> framesDelta;
@@ -87,7 +86,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	PacketReplication RPCManager::RPCSSpawnShip( const NetID _spaceshipID, const FrameIndex _frameIndex )
+	PacketReplication ClientRPC::RPCSSpawnShip( const NetID _spaceshipID, const FrameIndex _frameIndex )
 	{
 		PacketReplication packet;
 		packet.replicationType = PacketReplication::ReplicationType::RPC;
@@ -102,7 +101,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void RPCManager::UnwrapSpawnShip( sf::Packet& _packet )
+	void ClientRPC::UnwrapSpawnShip( sf::Packet& _packet )
 	{
 		FrameIndexNet frameIndex;
 		NetID spaceshipID;
@@ -114,9 +113,9 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void RPCManager::OnGui( EcsWorld&, SingletonComponent& _component )
+	void ClientRPC::OnGui( EcsWorld& _world, EntityID _entityID, Component& _component )
 	{
-		RPCManager& rpc = static_cast<RPCManager&>( _component );
+		ClientRPC& rpc = static_cast<ClientRPC&>( _component );
 
 		ImGui::Indent(); ImGui::Indent();
 		{

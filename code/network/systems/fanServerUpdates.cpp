@@ -4,7 +4,7 @@
 #include "core/time/fanTime.hpp"
 #include "scene/components/fanSceneNode.hpp"
 #include "network/singletonComponents/fanLinkingContext.hpp"
-#include "network/singletonComponents/fanRPCManager.hpp"
+#include "network/components/fanClientRPC.hpp"
 #include "network/singletonComponents/fanHostManager.hpp"
 #include "network/singletonComponents/fanServerConnection.hpp"
 #include "network/components/fanHostConnection.hpp"
@@ -33,7 +33,6 @@ namespace fan
 	//================================================================================================================================
 	void S_ServerUpdateHosts::Run( EcsWorld& _world, const std::vector<EntityID>& _entities )
 	{
-		RPCManager&			rpcManager		= _world.GetSingletonComponent<RPCManager>();
 		LinkingContext&		linkingContext	= _world.GetSingletonComponent<LinkingContext>();
 		const HostManager&	hostManager		= _world.GetSingletonComponent<HostManager>();
 		const Game&			game			= _world.GetSingletonComponent<Game>();
@@ -56,7 +55,7 @@ namespace fan
 						linkingContext.AddEntity( hostData.spaceshipHandle, hostData.spaceshipID );
 
 						hostReplication.Replicate(
-							rpcManager.RPCSSpawnShip( hostData.spaceshipID, game.frameIndex + 120 )
+							ClientRPC::RPCSSpawnShip( hostData.spaceshipID, game.frameIndex + 120 )
 							, HostReplication::ResendUntilReplicated
 						);
 					}
@@ -125,10 +124,8 @@ namespace fan
 					{
 						if( std::abs( min + hostManager.targetFrameDifference ) > 2 ) // only sync when we have a big enough frame index difference
 						{
-							RPCManager& rpcManager = _world.GetSingletonComponent<RPCManager>();
-
 							Signal<>& success = hostReplication.Replicate(
-								rpcManager.RPCShiftClientFrame( min + hostManager.targetFrameDifference )
+								ClientRPC::RPCShiftClientFrame( min + hostManager.targetFrameDifference )
 								, HostReplication::ResendUntilReplicated
 							);
 							hostConnection.lastSync = currentTime;

@@ -8,12 +8,6 @@
 namespace fan
 {
 	class EcsWorld;
-	struct RPCManager;
-	struct ReliabilityLayer;
-	struct ClientConnection;
-	struct ClientReplication;
-	struct LinkingContext;
-	struct Game;
 
 	//================================================================================================================================
 	//================================================================================================================================

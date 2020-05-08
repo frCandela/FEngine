@@ -34,7 +34,6 @@
 #include "game/fanGameTags.hpp"
 
 #include "network/singletonComponents/fanServerConnection.hpp"
-#include "network/singletonComponents/fanRPCManager.hpp"
 #include "network/singletonComponents/fanLinkingContext.hpp"
 #include "network/singletonComponents/fanHostManager.hpp"
 
@@ -130,7 +129,6 @@ namespace fan
 		world.AddSingletonComponentType<ServerNetworkManager>();
 		// net singleton components
 		world.AddSingletonComponentType<ServerConnection>();
-		world.AddSingletonComponentType<RPCManager>();
 		world.AddSingletonComponentType<LinkingContext>();
 		world.AddSingletonComponentType<HostManager>();
 		

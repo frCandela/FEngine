@@ -1,8 +1,7 @@
 #pragma once
 
 #include <unordered_map>
-
-#include "ecs/fanSingletonComponent.hpp"
+#include "ecs/fanComponent.hpp"
 #include "network/fanPacket.hpp"
 #include "core/fanSignal.hpp"
 
@@ -13,15 +12,15 @@ namespace fan
 	// A remote procedure call is the act of one host causing a	procedure to execute on one or more remote hosts
 	// Can generate replication packets to send using the server replication
 	//================================================================================================================================	
-	struct RPCManager : public SingletonComponent
+	struct ClientRPC : public Component
 	{
-		DECLARE_SINGLETON_COMPONENT()
+		DECLARE_COMPONENT( ClientRPC )
 	public:
-		static void SetInfo( SingletonComponentInfo& _info );
-		static void Init( EcsWorld& _world, SingletonComponent& _component );
-		static void OnGui( EcsWorld&, SingletonComponent& _component );
+		static void SetInfo( ComponentInfo& _info );
+		static void Init( EcsWorld& _world, Component& _component );
+		static void OnGui( EcsWorld& _world, EntityID _entityID, Component& _component );
 
-		using RpcUnwrapFunc = void ( RPCManager::* )( sf::Packet& );
+		using RpcUnwrapFunc = void ( ClientRPC::* )( sf::Packet& );
 		using RpcId = sf::Uint32;
 
 		void RegisterRPCs( );

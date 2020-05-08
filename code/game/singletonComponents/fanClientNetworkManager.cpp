@@ -14,7 +14,7 @@
 #include "network/components/fanClientReplication.hpp"
 #include "network/components/fanClientConnection.hpp"
 #include "network/singletonComponents/fanLinkingContext.hpp"
-#include "network/singletonComponents/fanRPCManager.hpp"
+#include "network/components/fanClientRPC.hpp"
 #include "network/components/fanReliabilityLayer.hpp"
 #include "network/systems/fanTimeout.hpp"
 
@@ -48,24 +48,25 @@ namespace fan
 	//================================================================================================================================
 	void ClientNetworkManager::Start( EcsWorld& _world )
 	{
-		// connect rpc
-		Game& game = _world.GetSingletonComponent<Game>();
-		RPCManager& rpcManager = _world.GetSingletonComponent<RPCManager>();
-		rpcManager.onShiftFrameIndex.Connect( &ClientNetworkManager::OnShiftFrameIndex, this );
-		rpcManager.onShiftFrameIndex.Connect( &Game::OnShiftFrameIndex, &game );
-		rpcManager.onSpawnShip.Connect( &ClientNetworkManager::OnSpawnShip, this );
-
 		// Create player persistent scene node
 		Scene& scene			= _world.GetSingletonComponent<Scene>();
 		SceneNode& sceneNode	= scene.CreateSceneNode( "persistent", scene.root );
 		persistentHandle		= sceneNode.handle;
-		EntityID entityID		= _world.GetEntityID( persistentHandle );
-		_world.AddComponent<ReliabilityLayer>( entityID );
-		_world.AddComponent<ClientConnection>( entityID );
-		_world.AddComponent<ClientReplication>( entityID );
+		EntityID persistentID		= _world.GetEntityID( persistentHandle );
+		_world.AddComponent<ReliabilityLayer>( persistentID );
+		_world.AddComponent<ClientConnection>( persistentID );
+		_world.AddComponent<ClientReplication>( persistentID );
+		_world.AddComponent<ClientRPC>( persistentID );
+
+		// connect rpc
+		Game& game = _world.GetSingletonComponent<Game>();
+		ClientRPC& rpcManager = _world.GetComponent<ClientRPC>( persistentID );
+		rpcManager.onShiftFrameIndex.Connect( &ClientNetworkManager::OnShiftFrameIndex, this );
+		rpcManager.onShiftFrameIndex.Connect( &Game::OnShiftFrameIndex, &game );
+		rpcManager.onSpawnShip.Connect( &ClientNetworkManager::OnSpawnShip, this );
 
 		// Bind socket
-		ClientConnection& connection = _world.GetComponent<ClientConnection>( entityID );
+		ClientConnection& connection = _world.GetComponent<ClientConnection>( persistentID );
 		sf::Socket::Status socketStatus = sf::Socket::Disconnected;
 		for( int tryIndex = 0; tryIndex < 10 && socketStatus != sf::Socket::Done; tryIndex++ )
 		{
@@ -210,11 +211,11 @@ namespace fan
 		S_ProcessTimedOutPackets::Run( _world, _world.Match( S_ProcessTimedOutPackets::GetSignature( _world ) ) );
 
 		const EntityID persistentID = _world.GetEntityID( persistentHandle );
-		ReliabilityLayer& reliabilityLayer = _world.GetComponent<ReliabilityLayer>( persistentID );
-		ClientConnection& connection = _world.GetComponent<ClientConnection>( persistentID);
-		ClientReplication& replication = _world.GetComponent<ClientReplication>( persistentID );
-		RPCManager& rpcManager = _world.GetSingletonComponent<RPCManager>();
-		Game& game = _world.GetSingletonComponent<Game>();
+		ReliabilityLayer& reliabilityLayer	= _world.GetComponent<ReliabilityLayer>	( persistentID );
+		ClientConnection& connection		= _world.GetComponent<ClientConnection>	( persistentID);
+		ClientReplication& replication		= _world.GetComponent<ClientReplication>( persistentID );
+		ClientRPC& rpc						= _world.GetComponent<ClientRPC>		( persistentID);
+		Game& game							= _world.GetSingletonComponent<Game>();
 
 		// receive
 		Packet			packet;
@@ -336,7 +337,7 @@ namespace fan
 
 		
 		connection.DetectServerTimout();		
-		replication.ReplicateRPC( rpcManager );
+		replication.ReplicateRPC( rpc );
 	}
 
 	//================================================================================================================================
