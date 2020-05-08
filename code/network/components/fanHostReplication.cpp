@@ -29,7 +29,7 @@ namespace fan
 	// returns a success signal that the caller can connect to to get notified of the acknowledgments 
 	// ( ResendUntilReplicated flag must be on )
 	//================================================================================================================================
-	Signal<>& HostReplication::ReplicateOnClient( PacketReplication& _packet, const ReplicationFlags _flags )
+	Signal<>& HostReplication::Replicate( PacketReplication& _packet, const ReplicationFlags _flags )
 	{
 		nextReplication.emplace_back();
 		SingletonReplicationData& replicationData = nextReplication[nextReplication.size() - 1];

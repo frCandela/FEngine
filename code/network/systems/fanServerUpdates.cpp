@@ -55,7 +55,7 @@ namespace fan
 						hostData.spaceshipID = linkingContext.nextNetID++;
 						linkingContext.AddEntity( hostData.spaceshipHandle, hostData.spaceshipID );
 
-						hostReplication.ReplicateOnClient(
+						hostReplication.Replicate(
 							rpcManager.RPCSSpawnShip( hostData.spaceshipID, game.frameIndex + 120 )
 							, HostReplication::ResendUntilReplicated
 						);
@@ -127,7 +127,7 @@ namespace fan
 						{
 							RPCManager& rpcManager = _world.GetSingletonComponent<RPCManager>();
 
-							Signal<>& success = hostReplication.ReplicateOnClient(
+							Signal<>& success = hostReplication.Replicate(
 								rpcManager.RPCShiftClientFrame( min + hostManager.targetFrameDifference )
 								, HostReplication::ResendUntilReplicated
 							);

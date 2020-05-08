@@ -1,6 +1,6 @@
 #pragma once
 
-#include "ecs/fanSingletonComponent.hpp"
+#include "ecs/fanComponent.hpp"
 
 #include "network/fanPacket.hpp"
 
@@ -12,13 +12,13 @@ namespace fan
 	//================================================================================================================================
 	//  processes server packets to replicates objects / run events
 	//================================================================================================================================
-	struct ClientReplication : public SingletonComponent
+	struct ClientReplication : public Component
 	{
-		DECLARE_SINGLETON_COMPONENT()
+		DECLARE_COMPONENT( ClientReplication )
 	public:
-		static void SetInfo( SingletonComponentInfo& _info );
-		static void Init( EcsWorld& _world, SingletonComponent& _component );
-		static void OnGui( EcsWorld&, SingletonComponent& _component );
+		static void SetInfo( ComponentInfo& _info );
+		static void Init( EcsWorld& _world, Component& _component );
+		static void OnGui( EcsWorld& _world, EntityID _entityID, Component& _component );
 
 		void ProcessPacket( PacketReplication& _packet );
 		void ReplicateRPC( RPCManager& _rpcManager );

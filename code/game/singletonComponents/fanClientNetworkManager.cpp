@@ -11,7 +11,7 @@
 #include "scene/components/fanRigidbody.hpp"
 #include "scene/components/fanSceneNode.hpp"
 #include "scene/singletonComponents/fanScene.hpp"
-#include "network/singletonComponents/fanClientReplication.hpp"
+#include "network/components/fanClientReplication.hpp"
 #include "network/components/fanClientConnection.hpp"
 #include "network/singletonComponents/fanLinkingContext.hpp"
 #include "network/singletonComponents/fanRPCManager.hpp"
@@ -62,6 +62,7 @@ namespace fan
 		EntityID entityID		= _world.GetEntityID( persistentHandle );
 		_world.AddComponent<ReliabilityLayer>( entityID );
 		_world.AddComponent<ClientConnection>( entityID );
+		_world.AddComponent<ClientReplication>( entityID );
 
 		// Bind socket
 		ClientConnection& connection = _world.GetComponent<ClientConnection>( entityID );
@@ -152,7 +153,7 @@ namespace fan
 	{
 		const EntityID persistentID = _world.GetEntityID( persistentHandle );
 		ClientConnection& connection = _world.GetComponent<ClientConnection>( persistentID );
-		ClientReplication& replication = _world.GetSingletonComponent<ClientReplication>();
+		ClientReplication& replication = _world.GetComponent<ClientReplication>( persistentID );
 		LinkingContext& linkingContext = _world.GetSingletonComponent<LinkingContext>();
 		Game& game = _world.GetSingletonComponent<Game>();
 
@@ -211,7 +212,7 @@ namespace fan
 		const EntityID persistentID = _world.GetEntityID( persistentHandle );
 		ReliabilityLayer& reliabilityLayer = _world.GetComponent<ReliabilityLayer>( persistentID );
 		ClientConnection& connection = _world.GetComponent<ClientConnection>( persistentID);
-		ClientReplication& replication = _world.GetSingletonComponent<ClientReplication>();
+		ClientReplication& replication = _world.GetComponent<ClientReplication>( persistentID );
 		RPCManager& rpcManager = _world.GetSingletonComponent<RPCManager>();
 		Game& game = _world.GetSingletonComponent<Game>();
 

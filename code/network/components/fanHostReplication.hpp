@@ -36,7 +36,7 @@ namespace fan
 		std::vector<SingletonReplicationData>				nextReplication;	// waiting  to be sent on the network
 	
 		void		Write( Packet& _packet );
-		Signal<>&	ReplicateOnClient( PacketReplication& _packet, const ReplicationFlags _flags );
+		Signal<>&	Replicate( PacketReplication& _packet, const ReplicationFlags _flags );
 		void		OnReplicationSuccess( const PacketTag _packetTag );
 		void		OnReplicationFail( const PacketTag _packetTag );
 		static PacketReplication BuildSingletonPacket( const EcsWorld& _world, const uint32_t _staticID );

@@ -1,4 +1,4 @@
-#include "network/singletonComponents/fanClientReplication.hpp"
+#include "network/components/fanClientReplication.hpp"
 
 #include "scene/fanSceneSerializable.hpp"
 #include "ecs/fanEcsWorld.hpp"
@@ -7,21 +7,20 @@
 
 namespace fan
 {
-	REGISTER_SINGLETON_COMPONENT( ClientReplication );
+	REGISTER_COMPONENT( ClientReplication, "client replication" );
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void ClientReplication::SetInfo( SingletonComponentInfo& _info )
+	void ClientReplication::SetInfo( ComponentInfo& _info )
 	{
 		_info.icon = ImGui::NETWORK16;
 		_info.init = &ClientReplication::Init;
 		_info.onGui = &ClientReplication::OnGui;
-		_info.name = "client replication";
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void ClientReplication::Init( EcsWorld& _world, SingletonComponent& _component )
+	void ClientReplication::Init( EcsWorld& _world, Component& _component )
 	{
 		ClientReplication& replicationManager = static_cast<ClientReplication&>( _component );
 		replicationManager.replicationListRPC.clear();
@@ -70,7 +69,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void ClientReplication::OnGui( EcsWorld&, SingletonComponent& _component )
+	void ClientReplication::OnGui( EcsWorld& _world, EntityID _entityID, Component& _component )
 	{
 		ClientReplication& replicationManager = static_cast<ClientReplication&>( _component );
 

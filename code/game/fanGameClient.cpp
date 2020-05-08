@@ -32,7 +32,7 @@
 #include "scene/fanSceneTags.hpp"
 #include "network/fanPacket.hpp"
 #include "game/fanGameTags.hpp"
-#include "network/singletonComponents/fanClientReplication.hpp"
+#include "network/components/fanClientReplication.hpp"
 #include "network/singletonComponents/fanRPCManager.hpp"
 #include "network/singletonComponents/fanLinkingContext.hpp"
 #include "network/components/fanReliabilityLayer.hpp"
@@ -108,6 +108,7 @@ namespace fan
 		// network components
 		world.AddComponentType<ReliabilityLayer>();
 		world.AddComponentType<ClientConnection>();
+		world.AddComponentType<ClientReplication>();
 
 		// base singleton components
 		world.AddSingletonComponentType<Scene>();
@@ -122,8 +123,6 @@ namespace fan
 		world.AddSingletonComponentType<SolarEruption>();
 		world.AddSingletonComponentType<ClientNetworkManager>();
 		// network singleton components
-		
-		world.AddSingletonComponentType<ClientReplication>();
 		world.AddSingletonComponentType<RPCManager>();
 		world.AddSingletonComponentType<LinkingContext>();
 
