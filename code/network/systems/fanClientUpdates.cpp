@@ -71,7 +71,7 @@ namespace fan
 				packetInput.forward = input.forward;
 				packetInput.boost = input.boost;
 				packetInput.fire = input.fire;
-				gameData.inputs.push( packetInput );
+				gameData.inputs.push_front( packetInput );
 
 				// saves previous player state
 				const Rigidbody& rb = _world.GetComponent<Rigidbody>( entityID );
@@ -114,14 +114,7 @@ namespace fan
 
 			// write packet
 			connection.Write( packet );
-
-			if( !gameData.inputs.empty() )
-			{
-				const PacketInput& lastInput = gameData.inputs.front();
-				gameData.inputs.pop();
-				assert( lastInput.frameIndex == game.frameIndex );
-				lastInput.Write( packet );
-			}
+			gameData.Write( packet );
 
 			if( packet.GetSize() == sizeof( PacketTag ) ) { packet.onlyContainsAck = true; }
 

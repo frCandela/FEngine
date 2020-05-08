@@ -22,7 +22,7 @@ namespace fan
 		gameData.spaceshipNetID = 0;
 		gameData.spaceshipHandle = 0;
 		gameData.synced = false;
-		gameData.inputs = std::queue< PacketInput >();					// clear
+		gameData.inputs = std::deque< PacketInput >();					// clear
 		gameData.previousStates = std::queue< PacketPlayerGameState >();// clear		
 	}
 
@@ -54,11 +54,38 @@ namespace fan
 			{
 				Debug::Warning() << "player is out of sync" << Debug::Endl();
 			}
-
 		}
-		else
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
+	void ClientGameData::Write( Packet& _packet )
+	{
+		if( !inputs.empty() )
 		{
-			Debug::Warning() << "no available game state for this frame" << Debug::Endl();
+			PacketInput& lastInput = inputs.front();
+			lastInput.tag = _packet.tag;
+			lastInput.Write( _packet );
+			_packet.onSuccess.Connect( &ClientGameData::OnInputReceived, this );
+		}
+	}
+
+	//================================================================================================================================
+	// removes all inputs that have been received from the buffer
+	//================================================================================================================================
+	void ClientGameData::OnInputReceived( PacketTag _tag )
+	{
+		while( ! inputs.empty() )
+		{
+			const PacketInput& oldestInput = inputs.back();
+			if( oldestInput.tag <= _tag )
+			{
+				inputs.pop_back();
+			}
+			else
+			{
+				break;
+			}
 		}
 	}
 
@@ -89,6 +116,11 @@ namespace fan
 		ClientGameData& gameData = static_cast<ClientGameData&>( _component );
 		ImGui::PushItemWidth( 0.6f * ImGui::GetWindowWidth() - 16 );
 		{
+			ImGui::Text( "spaceship spawn frame: %d", gameData.spaceshipSpawnFrameIndex);
+			ImGui::Text( "spaceship net ID:      %d", gameData.spaceshipNetID);
+			ImGui::Text( "size inputs:           %d", gameData.inputs.size() );
+			ImGui::Text( "size previous states:  %d", gameData.previousStates.size());
+			ImGui::Text( "%s", gameData.synced ? "synced" : "unsynced" );
 		} ImGui::PopItemWidth();
 	}
 }

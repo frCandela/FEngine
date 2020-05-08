@@ -1,5 +1,6 @@
 #pragma  once
 
+#include <deque>
 #include <queue>
 #include "ecs/fanComponent.hpp"
 #include "network/fanPacket.hpp"
@@ -20,12 +21,15 @@ namespace fan
 		FrameIndex							spaceshipSpawnFrameIndex;	// the frame index on which the spaceship is spawned
 		NetID								spaceshipNetID;
 		EntityHandle						spaceshipHandle;
-		std::queue< PacketInput >			inputs;
+		std::deque< PacketInput >			inputs;
 		std::queue< PacketPlayerGameState > previousStates;
 		bool								synced;
 
+		void Write( Packet& _packet );
 		void ProcessPacket( const PacketPlayerGameState& _packet );
-		// RPC callbacks
+		
+		// callbacks
+		void OnInputReceived( PacketTag _tag );
 		void OnShiftFrameIndex( const int _framesDelta );
 		void OnSpawnShip( NetID _spaceshipID, FrameIndex _frameIndex );
 	};

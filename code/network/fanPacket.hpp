@@ -248,12 +248,14 @@ namespace fan
 			_packet << fire;
 		}
 
-		FrameIndexNet	frameIndex;	 // the  frame index when creating the input
-		btVector3		orientation; // orientation of the ship
-		float			left;		 // left/right key pressed ( strafing )
-		float			forward;	 // forward or backward
-		float			boost;		 // shift to go faster
-		float			fire;		 // firing in front of the ship
+		FrameIndexNet	frameIndex;	// the  frame index when creating the input
+		btVector3		orientation;// orientation of the ship
+		float			left;		// left/right key pressed ( strafing )
+		float			forward;	// forward or backward
+		float			boost;		// shift to go faster
+		float			fire;		// firing in front of the ship
+
+		PacketTag		tag;		// not serialized
 	};
 
 	//================================================================================================================================
