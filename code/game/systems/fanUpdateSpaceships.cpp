@@ -42,7 +42,7 @@ namespace fan
 			PlayerInput & playerInput = _world.GetComponent<PlayerInput>( entityID );
 
 			// get player input
-			const btVector3 orientation = playerInput.orientation;
+			const btVector3 orientation = btVector3( playerInput.orientation.x(), 0.f, playerInput.orientation.z() );
 			const float leftForce = _delta * spaceship.lateralForce * playerInput.left;
 			const float forwardAxis = _delta * playerInput.forward;
 			const float boost = playerInput.boost;
