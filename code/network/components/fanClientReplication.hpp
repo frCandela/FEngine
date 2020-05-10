@@ -21,8 +21,6 @@ namespace fan
 		static void OnGui( EcsWorld& _world, EntityID _entityID, Component& _component );
 
 		void ProcessPacket( PacketReplication& _packet );
-		void ReplicateRPC( ClientRPC& _rpc );
-		void ReplicateSingletons( EcsWorld& _world );
 
 		std::vector< PacketReplication > replicationListSingletons;
 		std::vector< PacketReplication > replicationListRPC;

@@ -42,33 +42,6 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void ClientReplication::ReplicateRPC( ClientRPC& _rpc )
-	{
-		for( PacketReplication packet : replicationListRPC )
-		{
-			_rpc.TriggerRPC( packet.packetData );
-		}
-		replicationListRPC.clear();
-	}
-
-	//================================================================================================================================
-	//================================================================================================================================
-	void ClientReplication::ReplicateSingletons( EcsWorld& _world )
-	{
-		for ( PacketReplication packet : replicationListSingletons )
-		{
-			sf::Uint32 staticIndex;
-			packet.packetData >> staticIndex;
-			SingletonComponent& singleton = _world.GetSingletonComponent( staticIndex );
-			const SingletonComponentInfo& info = _world.GetSingletonComponentInfo( staticIndex );
-			info.netLoad( singleton, packet.packetData );
-			assert( packet.packetData.endOfPacket() );
-		}
-		replicationListSingletons.clear();
-	}
-
-	//================================================================================================================================
-	//================================================================================================================================
 	void ClientReplication::OnGui( EcsWorld& _world, EntityID _entityID, Component& _component )
 	{
 		ClientReplication& replicationManager = static_cast<ClientReplication&>( _component );

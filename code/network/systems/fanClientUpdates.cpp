@@ -1,13 +1,12 @@
 #include "network/systems/fanClientUpdates.hpp"
 
 #include "ecs/fanEcsWorld.hpp"
-// #include "core/time/fanTime.hpp"
-// #include "scene/components/fanSceneNode.hpp"
+#include "core/time/fanTime.hpp"
 #include "network/singletonComponents/fanLinkingContext.hpp"
 #include "network/components/fanClientReplication.hpp"
 #include "network/components/fanClientConnection.hpp"
 #include "network/components/fanClientGameData.hpp"
-#include "network/components/fanReliabilityLayer.hpp"
+#include "network/components/fanClientRPC.hpp"
 #include "game/singletonComponents/fanGame.hpp"
 #include "game/components/fanPlayerInput.hpp"
 #include "game/components/fanPlayerController.hpp"
@@ -18,7 +17,7 @@ namespace fan
 {
 	//================================================================================================================================
 	//================================================================================================================================
-	Signature S_ClientNetworkUpdate::GetSignature( const EcsWorld& _world )
+	Signature S_ClientSpawnSpaceship::GetSignature( const EcsWorld& _world )
 	{
 		return
 			_world.GetSignature<ClientConnection>() |
@@ -28,21 +27,16 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void S_ClientNetworkUpdate::Run( EcsWorld& _world, const std::vector<EntityID>& _entities, const float _delta )
+	void S_ClientSpawnSpaceship::Run( EcsWorld& _world, const std::vector<EntityID>& _entities, const float _delta )
 	{
 		if( _delta == 0.f ) { return; }
 
 		LinkingContext& linkingContext = _world.GetSingletonComponent<LinkingContext>();
+		const Game& game = _world.GetSingletonComponent<Game>();
 
 		for( EntityID entityID : _entities )
-		{
-			ClientConnection& connection = _world.GetComponent<ClientConnection>( entityID );
-			ClientReplication& replication = _world.GetComponent<ClientReplication>( entityID );
+		{			
 			ClientGameData& gameData = _world.GetComponent<ClientGameData>( entityID );
-
-			Game& game = _world.GetSingletonComponent<Game>();
-
-			replication.ReplicateSingletons( _world );
 
 			// spawns spaceship
 			if( gameData.spaceshipSpawnFrameIndex != 0 && game.frameIndex >= gameData.spaceshipSpawnFrameIndex )
@@ -59,11 +53,144 @@ namespace fan
 					_world.AddComponent<PlayerController>( spaceshipID );
 				}
 			}
+		}
+	}
+
+
+
+	//================================================================================================================================
+	//================================================================================================================================
+	Signature S_ClientSaveState::GetSignature( const EcsWorld& _world )
+	{
+		return _world.GetSignature<ClientGameData>();
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
+	void S_ClientSaveState::Run( EcsWorld& _world, const std::vector<EntityID>& _entities, const float _delta )
+	{
+		if( _delta == 0.f ) { return; }
+
+		const Game& game = _world.GetSingletonComponent<Game>();
+
+		for( EntityID entityID : _entities )
+		{
+			ClientGameData& gameData = _world.GetComponent<ClientGameData>( entityID );
 
 			if( gameData.spaceshipHandle != 0 && gameData.frameSynced )
 			{
-				const EntityID entityID = _world.GetEntityID( gameData.spaceshipHandle );
-				const PlayerInput& input = _world.GetComponent<PlayerInput>( entityID );
+				const EntityID spaceshipID = _world.GetEntityID( gameData.spaceshipHandle );
+
+				// saves previous player state
+				const Rigidbody& rb = _world.GetComponent<Rigidbody>( spaceshipID );
+				const Transform& transform = _world.GetComponent<Transform>( spaceshipID );
+				PacketPlayerGameState playerState;
+				playerState.frameIndex = game.frameIndex;
+				playerState.position = transform.GetPosition();
+				playerState.orientation = transform.GetRotationEuler();
+				playerState.velocity = rb.GetVelocity();
+				playerState.angularVelocity = rb.GetAngularVelocity();
+				gameData.previousStates.push( playerState );
+			}
+		}
+	}
+
+
+	//================================================================================================================================
+	//================================================================================================================================
+	Signature S_ClientRunReplication::GetSignature( const EcsWorld& _world )
+	{
+		return _world.GetSignature<ClientReplication>() | _world.GetSignature<ClientRPC>();
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
+	void S_ClientRunReplication::Run( EcsWorld& _world, const std::vector<EntityID>& _entities, const float _delta )
+	{
+		if( _delta == 0.f ) { return; }
+
+		for( EntityID entityID : _entities )
+		{
+			ClientReplication&	replication = _world.GetComponent<ClientReplication>( entityID );
+			ClientRPC&			rpc			= _world.GetComponent<ClientRPC>( entityID );
+
+			// replicate singletons components
+			for( PacketReplication packet : replication.replicationListSingletons )
+			{
+				sf::Uint32 staticIndex;
+				packet.packetData >> staticIndex;
+				SingletonComponent& singleton = _world.GetSingletonComponent( staticIndex );
+				const SingletonComponentInfo& info = _world.GetSingletonComponentInfo( staticIndex );
+				info.netLoad( singleton, packet.packetData );
+				assert( packet.packetData.endOfPacket() );
+			}
+			replication.replicationListSingletons.clear();
+
+			// replicate RPC
+			for( PacketReplication packet : replication.replicationListRPC )
+			{
+				rpc.TriggerRPC( packet.packetData );
+			}
+			replication.replicationListRPC.clear();
+		}
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
+	Signature S_ClientDetectServerTimeout::GetSignature( const EcsWorld& _world )
+	{
+		return _world.GetSignature<ClientConnection>();
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
+	void S_ClientDetectServerTimeout::Run( EcsWorld& _world, const std::vector<EntityID>& _entities, const float _delta )
+	{
+		if( _delta == 0.f ) { return; }
+
+		for( EntityID entityID : _entities )
+		{
+			ClientConnection& connection = _world.GetComponent<ClientConnection>( entityID );
+			
+			if( connection.state == ClientConnection::ClientState::Connected )
+			{
+				const double currentTime = Time::Get().ElapsedSinceStartup();
+				if( connection.serverLastResponse + connection.timeoutDelay < currentTime )
+				{
+					Debug::Log() << "server timeout " << Debug::Endl();
+					connection.state = ClientConnection::ClientState::Disconnected;
+				}
+			}
+		}
+	}
+
+
+
+
+
+	//================================================================================================================================
+	//================================================================================================================================
+	Signature S_ClientSaveInput::GetSignature( const EcsWorld& _world )
+	{
+		return _world.GetSignature<ClientGameData>();
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
+	void S_ClientSaveInput::Run( EcsWorld& _world, const std::vector<EntityID>& _entities, const float _delta )
+	{
+		if( _delta == 0.f ) { return; }
+
+		const Game& game = _world.GetSingletonComponent<Game>();
+
+		for( EntityID entityID : _entities )
+		{
+			ClientGameData& gameData = _world.GetComponent<ClientGameData>( entityID );
+
+			if( gameData.spaceshipHandle != 0 && gameData.frameSynced )
+			{
+				const EntityID spaceshipID = _world.GetEntityID( gameData.spaceshipHandle );
+				const PlayerInput& input = _world.GetComponent<PlayerInput>( spaceshipID );
 
 				// streams input to the server
 				PacketInput::InputData inputData;
@@ -77,66 +204,6 @@ namespace fan
 				inputData.fire = input.fire > 0;
 				gameData.previousInputs.push_front( inputData );
 				gameData.previousInputsSinceLastGameState.push_front( inputData );
-
-				// saves previous player state
-				const Rigidbody& rb = _world.GetComponent<Rigidbody>( entityID );
-				const Transform& transform = _world.GetComponent<Transform>( entityID );
-				PacketPlayerGameState playerState;
-				playerState.frameIndex = game.frameIndex;
-				playerState.position = transform.GetPosition();
-				playerState.orientation = transform.GetRotationEuler();
-				playerState.velocity = rb.GetVelocity();
-				playerState.angularVelocity = rb.GetAngularVelocity();
-				gameData.previousStates.push( playerState );
-			}
-		}
-	}
-
-	//================================================================================================================================
-	//================================================================================================================================
-	Signature S_ClientNetworkSend::GetSignature( const EcsWorld& _world )
-	{
-		return
-			_world.GetSignature<ReliabilityLayer>() |
-			_world.GetSignature<ClientConnection>() |
-			_world.GetSignature<ClientGameData>();
-	}
-
-	//================================================================================================================================
-	//================================================================================================================================
-	void S_ClientNetworkSend::Run( EcsWorld& _world, const std::vector<EntityID>& _entities, const float _delta )
-	{
-		if( _delta == 0.f ) { return; }
-
-		Game& game = _world.GetSingletonComponent<Game>();
-
-		for( EntityID entityID : _entities )
-		{
-			ReliabilityLayer& reliabilityLayer = _world.GetComponent<ReliabilityLayer>( entityID );
-			ClientConnection& connection = _world.GetComponent<ClientConnection>( entityID );
-			ClientGameData& gameData = _world.GetComponent<ClientGameData>( entityID );
-
-			// create packet
-			Packet packet( reliabilityLayer.GetNextPacketTag() );
-
-			// write packet
-			connection.Write( packet );
-			gameData.Write( packet );
-
-			if( packet.GetSize() == sizeof( PacketTag ) ) { packet.onlyContainsAck = true; }
-
-			reliabilityLayer.Write( packet );
-
-			// send packet, don't send empty packets
-			if( packet.GetSize() > sizeof( PacketTag ) )
-			{
-				reliabilityLayer.RegisterPacket( packet );
-				connection.bandwidth = 1.f / game.logicDelta * float( packet.GetSize() ) / 1000.f; // in Ko/s
-				connection.socket.Send( packet, connection.serverIP, connection.serverPort );
-			}
-			else
-			{
-				reliabilityLayer.nextPacketTag--;
 			}
 		}
 	}

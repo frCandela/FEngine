@@ -42,8 +42,6 @@ namespace fan
 
 		void Write( Packet& _packet );
 		void OnLoginFail( const PacketTag _packetTag );
-		void DetectServerTimout();
-		void DisconnectFromServer();
 
 		void ProcessPacket( const PacketLoginSuccess& _packetLogin );
 		void ProcessPacket( const PacketDisconnect& _packetDisconnect );

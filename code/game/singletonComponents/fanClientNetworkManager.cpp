@@ -19,6 +19,7 @@
 #include "network/components/fanReliabilityLayer.hpp"
 #include "network/systems/fanTimeout.hpp"
 #include "network/systems/fanClientUpdates.hpp"
+#include "network/systems/fanClientSendReceive.hpp"
 
 namespace fan
 {
@@ -87,145 +88,8 @@ namespace fan
 		const EntityID persistentID = _world.GetEntityID( playerPersistent->handle );		
 		ClientConnection& connection = _world.GetComponent<ClientConnection>( persistentID );
 		connection.state = ClientConnection::ClientState::Stopping;
-		S_ClientNetworkSend::Run( _world, _world.Match( S_ClientNetworkSend::GetSignature( _world ) ), .42f );// send a last packet
+		S_ClientSend::Run( _world, _world.Match( S_ClientSend::GetSignature( _world ) ), .42f );// send a last packet
 		connection.socket.Unbind();
-	}
-
-	//================================================================================================================================
-	//================================================================================================================================
-	void ClientNetworkManager::NetworkReceive( EcsWorld& _world )
-	{
-		S_ProcessTimedOutPackets::Run( _world, _world.Match( S_ProcessTimedOutPackets::GetSignature( _world ) ) );
-
-		const EntityID persistentID = _world.GetEntityID( playerPersistent->handle );
-		ReliabilityLayer& reliabilityLayer	= _world.GetComponent<ReliabilityLayer>	( persistentID );
-		ClientConnection& connection		= _world.GetComponent<ClientConnection>	( persistentID);
-		ClientReplication& replication		= _world.GetComponent<ClientReplication>( persistentID );
-		ClientRPC& rpc						= _world.GetComponent<ClientRPC>		( persistentID);
-		ClientGameData& gameData			= _world.GetComponent<ClientGameData>( persistentID );
-		Game& game							= _world.GetSingletonComponent<Game>();
-
-		// receive
-		Packet			packet;
-		sf::IpAddress	receiveIP;
-		unsigned short	receivePort;
-
-		sf::Socket::Status socketStatus;
-		do
-		{
-			packet.Clear();
-			socketStatus = connection.socket.Receive( packet, receiveIP, receivePort );
-
-			// only receive from the server
-			if( receiveIP != connection.serverIP || receivePort != connection.serverPort )
-			{
-				continue;
-			}
-
-			switch( socketStatus )
-			{
-			case sf::UdpSocket::Done:
-			{
-				connection.serverLastResponse = Time::Get().ElapsedSinceStartup();
-
-				// read the first packet type separately
-				PacketType packetType = packet.ReadType();
-				if( packetType == PacketType::Ack )
-				{
-					packet.onlyContainsAck = true;
-				}				
-				else if( packetType == PacketType::Disconnect )
-				{
-					// disconnection can cause the reliability layer tags to be off
-					reliabilityLayer.expectedPacketTag = packet.tag;
-				}
-
-				if( !reliabilityLayer.ValidatePacket( packet ) )
-				{
-					continue;
-				}
-
-				// process packet
-				bool packetValid = true;
-				while( packetValid )
-				{
-					switch( packetType )
-					{
-					case PacketType::Ack:
-					{
-						PacketAck packetAck;
-						packetAck.Read( packet );
-						reliabilityLayer.ProcessPacket( packetAck );
-					}break;
-					case PacketType::Ping:
-					{
-						PacketPing packetPing;
-						packetPing.Read( packet );
-						connection.ProcessPacket( packetPing, game.frameIndex );
-					} break;
-					case PacketType::LoggedIn:
-					{
-						PacketLoginSuccess packetLogin;
-						packetLogin.Read( packet );
-						connection.ProcessPacket( packetLogin );
-					} break;
-					case PacketType::Disconnect:
-					{
-						PacketDisconnect packetDisconnect;
-						packetDisconnect.Read( packet );
-						connection.ProcessPacket( packetDisconnect );
-					} break;
-
-					case PacketType::Replication:
-					{
-						PacketReplication packetReplication;
-						packetReplication.Read( packet );
-						replication.ProcessPacket( packetReplication );
-					} break;
-					case PacketType::PlayerGameState:
-					{
-						PacketPlayerGameState packetPlayerGameState;
-						packetPlayerGameState.Read( packet );
-						gameData.ProcessPacket( packetPlayerGameState );
-					} break;
-					default:
-						Debug::Warning() << "Invalid packet " << int( packetType ) << " received. Reading canceled." << Debug::Endl();
-						packetValid = false;
-						break;
-					}
-
-					// stop if we reach the end or reads the next packet type
-					if( packet.EndOfPacket() )
-					{
-						break;
-					}
-					else
-					{
-						packetType = packet.ReadType();
-					}
-				}
-			} break;
-			case sf::UdpSocket::Error:
-				Debug::Warning() << "socket.receive: an unexpected error happened " << Debug::Endl();
-				break;
-			case sf::UdpSocket::Partial:
-			case sf::UdpSocket::NotReady:
-			{
-				// do nothing
-			}break;
-			case sf::UdpSocket::Disconnected:
-			{
-				// disconnect
-			} break;
-			default:
-				assert( false );
-				break;
-			}
-		} while( socketStatus == sf::UdpSocket::Done );
-
-		
-		connection.DetectServerTimout();		
-		replication.ReplicateRPC( rpc );
 	}
 
 	//================================================================================================================================
