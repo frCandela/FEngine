@@ -44,14 +44,14 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	Signature S_DetectClientTimout::GetSignature( const EcsWorld& _world )
+	Signature S_DetectHostTimout::GetSignature( const EcsWorld& _world )
 	{
 		return _world.GetSignature<HostConnection>();
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void S_DetectClientTimout::Run( EcsWorld& _world, const std::vector<EntityID>& _entities )
+	void S_DetectHostTimout::Run( EcsWorld& _world, const std::vector<EntityID>& _entities )
 	{
 		HostManager& hostManager = _world.GetSingletonComponent<HostManager>();
 		const double currentTime = Time::Get().ElapsedSinceStartup();

@@ -273,9 +273,9 @@ namespace fan
 			// update
 			S_RefreshPlayerInput	::Run( world, world.Match( S_RefreshPlayerInput::GetSignature( world ) )	, _delta );
 			S_ClientSaveInput		::Run( world, world.Match( S_ClientSaveInput::GetSignature( world ) )		, _delta );
-			S_ClientRunReplication	::Run( world, world.Match( S_ClientRunReplication::GetSignature( world ) )	, _delta );
-			S_ClientSaveState		::Run( world, world.Match( S_ClientSaveState::GetSignature( world ) )		, _delta );
+			S_ClientRunReplication	::Run( world, world.Match( S_ClientRunReplication::GetSignature( world ) )	, _delta );			
 			S_ClientSpawnSpaceship	::Run( world, world.Match( S_ClientSpawnSpaceship::GetSignature( world ) )	, _delta );
+			S_ClientSaveState::Run( world, world.Match( S_ClientSaveState::GetSignature( world ) ), _delta );
 
 			S_MoveSpaceships		::Run( world, world.Match( S_MoveSpaceships::GetSignature( world ) )		, _delta );
 			S_FireWeapons			::Run( world, world.Match( S_FireWeapons::GetSignature( world ) )			, _delta );
@@ -299,7 +299,7 @@ namespace fan
 			S_UpdateBoundsFromModel		::Run( world, world.Match( S_UpdateBoundsFromModel::GetSignature( world ) )		, _delta );
 			S_UpdateBoundsFromTransform	::Run( world, world.Match( S_UpdateBoundsFromTransform::GetSignature( world ) )	, _delta );
 			S_UpdateGameCamera			::Run( world, world.Match( S_UpdateGameCamera::GetSignature( world ) )			, _delta );
-			S_ClientSend				::Run( world, world.Match( S_ClientSend::GetSignature( world ) )				, _delta );
+			S_ClientSend				::Run( world, world.Match( S_ClientSend::GetSignature( world ) )				, _delta );			
 		}
 
 		{
