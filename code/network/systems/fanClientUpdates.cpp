@@ -56,8 +56,6 @@ namespace fan
 		}
 	}
 
-
-
 	//================================================================================================================================
 	//================================================================================================================================
 	Signature S_ClientSaveState::GetSignature( const EcsWorld& _world )
@@ -84,6 +82,7 @@ namespace fan
 				// saves previous player state
 				const Rigidbody& rb = _world.GetComponent<Rigidbody>( spaceshipID );
 				const Transform& transform = _world.GetComponent<Transform>( spaceshipID );
+				assert( rb.rigidbody.getTotalForce().isZero() );
 				PacketPlayerGameState playerState;
 				playerState.frameIndex = game.frameIndex;
 				playerState.position = transform.GetPosition();

@@ -22,6 +22,7 @@ namespace fan
 		hostGameData.spaceshipHandle = 0;
 		hostGameData.inputs = std::queue<PacketInput::InputData>();
 		hostGameData.nextPlayerState = PacketPlayerGameState();
+		hostGameData.nextPlayerStateFrame = 0;
 	}
 
 	//================================================================================================================================

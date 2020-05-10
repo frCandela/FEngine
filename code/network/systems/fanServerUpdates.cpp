@@ -58,6 +58,8 @@ namespace fan
 							ClientRPC::RPCSSpawnShip( hostData.spaceshipID, game.frameIndex + 60 )
 							, HostReplication::ResendUntilReplicated
 						);
+
+						hostData.nextPlayerStateFrame = game.frameIndex + 120; // next player state snapshot will be 7 frames later
 					}
 				}
 			}
@@ -137,7 +139,7 @@ namespace fan
 		{
 			HostGameData& hostData = _world.GetComponent< HostGameData >( entityID );
 
-			if(  hostData.spaceshipHandle != 0 )
+			if(  hostData.spaceshipHandle != 0 && game.frameIndex >= hostData.nextPlayerStateFrame )
 			{
 				const EntityID shipEntityID = _world.GetEntityID( hostData.spaceshipHandle );
 				const Rigidbody& rb = _world.GetComponent<Rigidbody>( shipEntityID );
@@ -147,6 +149,8 @@ namespace fan
 				hostData.nextPlayerState.orientation = transform.GetRotationEuler();
 				hostData.nextPlayerState.velocity = rb.GetVelocity();
 				hostData.nextPlayerState.angularVelocity = rb.GetAngularVelocity();
+
+				hostData.nextPlayerStateFrame = game.frameIndex + 7;
 			}
 		}
 	}

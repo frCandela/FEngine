@@ -51,10 +51,6 @@ namespace fan
 				{
 					hostData.nextPlayerState.Write( packet );
 				}
-				else
-				{
-					Debug::Warning() << "wrong host state frame index " << hostConnection.ip.toString() << "::" << hostConnection.port << Debug::Endl();
-				}
 			}
 
 			hostConnection.Write( _world, packet );
