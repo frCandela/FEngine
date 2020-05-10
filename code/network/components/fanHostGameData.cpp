@@ -39,10 +39,9 @@ namespace fan
 		{
 			for ( const PacketInput::InputData& inputData : _packet.inputs )
 			{
-				FrameIndex fi = inputs.back().frameIndex;
-
-				assert( inputData.frameIndex <= fi + 1 );
-				if( inputData.frameIndex == fi + 1 )
+				const FrameIndex mostRecentFrame = inputs.back().frameIndex;
+				//assert( inputData.frameIndex <= mostRecentFrame + 1 );
+				if( inputData.frameIndex == mostRecentFrame + 1 )
 				{
 					inputs.push( inputData );
 				} 				

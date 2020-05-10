@@ -189,6 +189,62 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
+	void GameClient::RollbackResimulate( EcsWorld& _world )
+	{
+		const EntityID persistentID = _world.GetEntityID( netManager->playerPersistent->handle );
+		ClientGameData& gameData = _world.GetComponent<ClientGameData>( persistentID );
+		if( !gameData.spaceshipSynced && ! gameData.previousInputsSinceLastGameState.empty() )
+		{
+			const PacketInput::InputData& mostRecent = gameData.previousInputsSinceLastGameState.front();
+			const PacketInput::InputData& oldest = gameData.previousInputsSinceLastGameState.back();
+
+			if( mostRecent.frameIndex == game->frameIndex - 1 && oldest.frameIndex == gameData.lastServerState.frameIndex )
+			{
+				Debug::Highlight() << "rollback " << game->frameIndex - oldest.frameIndex << Debug::Endl();
+				const EntityID spaceshipID = _world.GetEntityID( gameData.spaceshipHandle );
+				PhysicsWorld& physicsWorld = world.GetSingletonComponent<PhysicsWorld>();
+
+				Rigidbody& rigidbody = _world.GetComponent<Rigidbody>( spaceshipID );
+				physicsWorld.dynamicsWorld->removeRigidBody( &rigidbody.rigidbody );
+				physicsWorld.dynamicsWorld->addRigidBody( &rigidbody.rigidbody );
+
+				Transform& transform = _world.GetComponent<Transform>( spaceshipID );
+				rigidbody.rigidbody.clearForces();
+				rigidbody.SetVelocity(			gameData.lastServerState.velocity			);
+				rigidbody.SetAngularVelocity(	gameData.lastServerState.angularVelocity	);
+				transform.SetPosition(			gameData.lastServerState.position			);
+				transform.SetRotationEuler(		gameData.lastServerState.orientation		);
+
+// 				PlayerInput& input = _world.GetComponent<PlayerInput>( spaceshipID );
+// 				game->frameIndex = oldest.frameIndex;
+// 				S_MovePlanets::Run( world, world.Match( S_MovePlanets::GetSignature( world ) ), game->logicDelta );
+// 
+// 				for (int i = 0; i < gameData.previousInputsSinceLastGameState.size(); i++)
+// 				{
+// 					game->frameIndex++;
+// 					S_SynchronizeMotionStateFromTransform::Run( world, world.Match( S_SynchronizeMotionStateFromTransform::GetSignature( world ) ), game->logicDelta );
+// 					physicsWorld.dynamicsWorld->stepSimulation( game->logicDelta, 10, Time::Get().GetPhysicsDelta() );
+// 					S_SynchronizeTransformFromMotionState::Run( world, world.Match( S_SynchronizeTransformFromMotionState::GetSignature( world ) ), game->logicDelta );
+// 					
+// 					const PacketInput::InputData& inputData = *( gameData.previousInputsSinceLastGameState.rbegin() + i );
+// 					input.orientation = btVector3( inputData.orientation.x, 0.f, inputData.orientation.y );
+// 					input.left = inputData.left ? 1.f : ( inputData.right ? -1.f : 0.f );
+// 					input.forward = inputData.forward ? 1.f : ( inputData.backward ? -1.f : 0.f );
+// 					input.boost = inputData.boost;
+// 					input.fire = inputData.fire;
+// 
+// 					S_MoveSpaceships::Run( world, world.Match( S_MoveSpaceships::GetSignature( world ) ), game->logicDelta );
+// 					S_MovePlanets::Run( world, world.Match( S_MovePlanets::GetSignature( world ) ), game->logicDelta );
+// 				}			
+			}
+			gameData.spaceshipSynced = true;
+			//assert( game->frameIndex == mostRecent.frameIndex + 1);
+		}
+
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
 	void  GameClient::Step( const float _delta )
 	{
 		if( _delta > 0.f )
@@ -200,6 +256,8 @@ namespace fan
 		{
 			SCOPED_PROFILE( scene_update );			
 			netManager->NetworkReceive( world );
+
+			RollbackResimulate( world );
 
 			// physics & transforms
 			PhysicsWorld& physicsWorld = world.GetSingletonComponent<PhysicsWorld>();

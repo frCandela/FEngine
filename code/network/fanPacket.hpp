@@ -290,7 +290,7 @@ namespace fan
 		}
 		bool operator!=( const PacketPlayerGameState& _other ) const { return !( *this == _other ); }
 
-		FrameIndexNet	frameIndex;			// the  frame index when creating state		
+		FrameIndexNet	frameIndex = 0;			// the  frame index when creating state		
 		btVector3		position;			
 		btVector3		orientation;		
 		btVector3		velocity;			

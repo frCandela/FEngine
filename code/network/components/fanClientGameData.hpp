@@ -31,10 +31,13 @@ namespace fan
 		NetID								spaceshipNetID;
 		EntityHandle						spaceshipHandle;
 		std::deque< PacketInput::InputData >previousInputs;
+		std::deque< PacketInput::InputData >previousInputsSinceLastGameState;
 		std::deque< InputSent>				inputsSent;
 		std::queue< PacketPlayerGameState > previousStates;
-		bool								synced;
+		bool								frameSynced;
+		bool								spaceshipSynced;
 		int									maxInputSent;
+		PacketPlayerGameState				lastServerState;
 
 		void Write( Packet& _packet );
 		void ProcessPacket( const PacketPlayerGameState& _packet );

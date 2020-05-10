@@ -21,21 +21,41 @@ namespace fan
 		gameData.spaceshipSpawnFrameIndex = 0;
 		gameData.spaceshipNetID = 0;
 		gameData.spaceshipHandle = 0;
-		gameData.synced = false;
-		gameData.previousInputs = std::deque< PacketInput::InputData >();			// clear
-		gameData.previousStates = std::queue< PacketPlayerGameState >();// clear	
+		gameData.frameSynced = false;
+		gameData.previousInputs					  = std::deque< PacketInput::InputData >();	// clear
+		gameData.previousInputsSinceLastGameState = std::deque< PacketInput::InputData >();	// clear
+		gameData.previousStates					  = std::queue< PacketPlayerGameState >();	// clear	
 		gameData.maxInputSent = 10;
+		gameData.spaceshipSynced = true;
+		gameData.lastServerState = {};
+
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
 	void ClientGameData::ProcessPacket( const PacketPlayerGameState& _packet )
 	{
-		// get the current input for this client
+		lastServerState = _packet;
+
+		// removes all the previous inputs before the gameState
+		while( !previousInputsSinceLastGameState.empty() )
+		{
+			const PacketInput::InputData& input = previousInputsSinceLastGameState.back();
+			if( input.frameIndex < _packet.frameIndex )
+			{
+				previousInputsSinceLastGameState.pop_back();
+			}
+			else
+			{
+				break;
+			}
+		} 
+
+		// get the corresponding game state for the client
 		while( !previousStates.empty() )
 		{
-			const PacketPlayerGameState& packetInput = previousStates.front();
-			if( packetInput.frameIndex < _packet.frameIndex )
+			const PacketPlayerGameState& clientState = previousStates.front();
+			if( clientState.frameIndex < _packet.frameIndex )
 			{
 				previousStates.pop();
 			}
@@ -45,7 +65,7 @@ namespace fan
 			}
 		}
 
-		// moves spaceship						
+		// compares the server state & client state to verify we are synchronized				
 		if( !previousStates.empty() && previousStates.front().frameIndex == _packet.frameIndex )
 		{
 			const PacketPlayerGameState& packetState = previousStates.front();
@@ -54,6 +74,33 @@ namespace fan
 			if( packetState != _packet )
 			{
 				Debug::Warning() << "player is out of sync" << Debug::Endl();
+				spaceshipSynced = false;
+
+				if( packetState.frameIndex != _packet.frameIndex )
+				{
+					Debug::Log() << "frame index difference: " << packetState.frameIndex << " " << _packet.frameIndex << Debug::Endl();
+				}
+				if( !( packetState.position - _packet.position ).fuzzyZero() )
+				{
+					const btVector3 diff = packetState.position - _packet.position;
+					Debug::Log() << "position difference: " << diff[0] << " " << diff[1] << " " << diff[2] << Debug::Endl();
+				}
+				if( !( packetState.orientation - _packet.orientation ).fuzzyZero() )
+				{
+					const btVector3 diff = packetState.orientation - _packet.orientation;
+					Debug::Log() << "orientation difference: " << diff[0] << " " << diff[1] << " " << diff[2] << Debug::Endl();
+				}
+				if( !( packetState.velocity - _packet.velocity ).fuzzyZero() )
+				{
+					const btVector3 diff = packetState.velocity - _packet.velocity;
+					Debug::Log() << "velocity difference: " << diff[0] << " " << diff[1] << " " << diff[2] << Debug::Endl();
+				}
+				if( !( packetState.angularVelocity - _packet.angularVelocity ).fuzzyZero() )
+				{
+					const btVector3 diff = packetState.angularVelocity - _packet.angularVelocity;
+					Debug::Log() << "angular velocity difference: " << diff[0] << " " << diff[1] << " " << diff[2] << Debug::Endl();
+				}
+
 			}
 		}
 	}
@@ -97,7 +144,7 @@ namespace fan
 			if( inputSent.tag < _tag ) // packets were lost but we don't care
 			{
 				inputsSent.pop_back();
-			} 
+			}
 			else if( inputSent.tag == _tag ) 
 			{
 				inputsSent.pop_back();
@@ -128,7 +175,7 @@ namespace fan
 	void ClientGameData::OnShiftFrameIndex( const int _framesDelta )
 	{
 		previousStates = std::queue< PacketPlayerGameState >(); // clear
-		synced = true;
+		frameSynced = true;
 		Debug::Log() << "Shifted client frame index : " << _framesDelta << Debug::Endl();
 	}
 
@@ -140,6 +187,7 @@ namespace fan
 		{
 			spaceshipSpawnFrameIndex = _frameIndex;
 			spaceshipNetID = _spaceshipID;
+			spaceshipSynced = true;
 		}
 	}
 
@@ -154,9 +202,11 @@ namespace fan
 			ImGui::Text( "spaceship spawn frame: %d", gameData.spaceshipSpawnFrameIndex);
 			ImGui::Text( "spaceship net ID:      %d", gameData.spaceshipNetID);
 			ImGui::Text( "size previous states:  %d", gameData.previousStates.size());
-			ImGui::Text( "%s", gameData.synced ? "synced" : "unsynced" );
-			ImGui::Text( "size inputs:           %d", gameData.previousInputs.size() );
-			ImGui::Text( "size inputs sent :     %d", gameData.inputsSent.size() );
+			ImGui::Text( "%s", gameData.frameSynced ? "frame synced" : "frame not synced" );
+			ImGui::Text( "size pennding inputs:  %d", gameData.previousInputs.size() );
+			ImGui::Text( "size inputs sent:      %d", gameData.inputsSent.size() );
+			ImGui::Text( "size previous inputs:  %d", gameData.previousInputsSinceLastGameState.size() );
+			
 		} ImGui::PopItemWidth();
 	}
 }

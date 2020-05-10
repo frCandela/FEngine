@@ -23,5 +23,7 @@ namespace fan
 		EcsWorld			  world;
 		Game*				  game;
 		ClientNetworkManager* netManager;
+
+		void RollbackResimulate( EcsWorld& _world );
 	};
 }
