@@ -191,7 +191,12 @@ namespace fan
 	//================================================================================================================================
 	void  GameClient::Step( const float _delta )
 	{
-		game->frameIndex++;
+		if( _delta > 0.f )
+		{
+			game->frameIndex++;
+		}
+
+		
 		{
 			SCOPED_PROFILE( scene_update );			
 			netManager->NetworkReceive( world );
@@ -206,7 +211,7 @@ namespace fan
 
 			// update
 			S_RefreshPlayerInput::Run( world, world.Match( S_RefreshPlayerInput::GetSignature( world ) ), _delta );
-			S_ClientNetworkUpdate::Run( world, world.Match( S_ClientNetworkUpdate::GetSignature( world ) ) );
+			S_ClientNetworkUpdate::Run( world, world.Match( S_ClientNetworkUpdate::GetSignature( world ) ), _delta );
 			S_MoveSpaceships::Run( world, world.Match( S_MoveSpaceships::GetSignature( world ) ), _delta );
 			S_FireWeapons::Run( world, world.Match( S_FireWeapons::GetSignature( world ) ), _delta );
 			S_MovePlanets::Run( world, world.Match( S_MovePlanets::GetSignature( world ) ), _delta );
@@ -233,7 +238,7 @@ namespace fan
 
 			S_UpdateGameCamera::Run( world, world.Match( S_UpdateGameCamera::GetSignature( world ) ), _delta );
 
-			S_ClientNetworkSend::Run( world, world.Match( S_ClientNetworkSend::GetSignature( world ) ) );
+			S_ClientNetworkSend::Run( world, world.Match( S_ClientNetworkSend::GetSignature( world ) ), _delta );
 		}
 
 		{

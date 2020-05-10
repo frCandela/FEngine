@@ -31,8 +31,10 @@ namespace fan
 	//================================================================================================================================
 	// @todo split this in multiple systems
 	//================================================================================================================================
-	void S_ServerUpdateHosts::Run( EcsWorld& _world, const std::vector<EntityID>& _entities )
+	void S_ServerUpdateHosts::Run( EcsWorld& _world, const std::vector<EntityID>& _entities, const float _delta )
 	{
+		if( _delta == 0.f ) { return; }
+
 		LinkingContext&		linkingContext	= _world.GetSingletonComponent<LinkingContext>();
 		const HostManager&	hostManager		= _world.GetSingletonComponent<HostManager>();
 		const Game&			game			= _world.GetSingletonComponent<Game>();
@@ -55,7 +57,7 @@ namespace fan
 						linkingContext.AddEntity( hostData.spaceshipHandle, hostData.spaceshipID );
 
 						hostReplication.Replicate(
-							ClientRPC::RPCSSpawnShip( hostData.spaceshipID, game.frameIndex + 120 )
+							ClientRPC::RPCSSpawnShip( hostData.spaceshipID, game.frameIndex + 60 )
 							, HostReplication::ResendUntilReplicated
 						);
 					}
@@ -154,8 +156,10 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void S_ServerNetworkSend::Run( EcsWorld& _world, const std::vector<EntityID>& _entities )
+	void S_ServerNetworkSend::Run( EcsWorld& _world, const std::vector<EntityID>& _entities, const float _delta )
 	{
+		if( _delta == 0.f ) { return; }
+
 		const HostManager&	hostManager = _world.GetSingletonComponent<HostManager>();
 		const Game&			game		 = _world.GetSingletonComponent<Game>();
 		ServerConnection&	connection  = _world.GetSingletonComponent<ServerConnection>();

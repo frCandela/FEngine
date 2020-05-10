@@ -28,8 +28,10 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void S_ClientNetworkUpdate::Run( EcsWorld& _world, const std::vector<EntityID>& _entities )
+	void S_ClientNetworkUpdate::Run( EcsWorld& _world, const std::vector<EntityID>& _entities, const float _delta )
 	{
+		if( _delta == 0.f ) { return; }
+
 		LinkingContext& linkingContext = _world.GetSingletonComponent<LinkingContext>();
 
 		for( EntityID entityID : _entities )
@@ -58,7 +60,7 @@ namespace fan
 				}
 			}
 
-			if( gameData.spaceshipHandle != 0 && gameData.synced )
+			if( gameData.spaceshipHandle != 0 && gameData.frameSynced )
 			{
 				const EntityID entityID = _world.GetEntityID( gameData.spaceshipHandle );
 				const PlayerInput& input = _world.GetComponent<PlayerInput>( entityID );
@@ -74,6 +76,7 @@ namespace fan
 				inputData.boost = input.boost > 0;
 				inputData.fire = input.fire > 0;
 				gameData.previousInputs.push_front( inputData );
+				gameData.previousInputsSinceLastGameState.push_front( inputData );
 
 				// saves previous player state
 				const Rigidbody& rb = _world.GetComponent<Rigidbody>( entityID );
@@ -101,8 +104,10 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void S_ClientNetworkSend::Run( EcsWorld& _world, const std::vector<EntityID>& _entities )
+	void S_ClientNetworkSend::Run( EcsWorld& _world, const std::vector<EntityID>& _entities, const float _delta )
 	{
+		if( _delta == 0.f ) { return; }
+
 		Game& game = _world.GetSingletonComponent<Game>();
 
 		for( EntityID entityID : _entities )

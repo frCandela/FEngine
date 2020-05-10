@@ -10,7 +10,7 @@ namespace fan
 	struct S_ServerUpdateHosts : System
 	{
 		static Signature GetSignature( const EcsWorld& _world );
-		static void Run( EcsWorld& _world, const std::vector<EntityID>& _entities );
+		static void Run( EcsWorld& _world, const std::vector<EntityID>& _entities, const float _delta );
 	};
 	
 	//==============================================================================================================================================================
@@ -19,6 +19,6 @@ namespace fan
 	struct S_ServerNetworkSend : System
 	{
 		static Signature GetSignature( const EcsWorld& _world );
-		static void Run( EcsWorld& _world, const std::vector<EntityID>& _entities );
+		static void Run( EcsWorld& _world, const std::vector<EntityID>& _entities, const float _delta );
 	};
 }

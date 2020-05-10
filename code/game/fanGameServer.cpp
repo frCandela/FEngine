@@ -208,7 +208,7 @@ namespace fan
 			S_MoveFollowTransformsUI::Run( world, world.Match( S_MoveFollowTransformsUI::GetSignature( world ) ) );
 
 			// update
-			S_ServerUpdateHosts::Run( world, world.Match( S_ServerUpdateHosts::GetSignature( world ) ) );
+			S_ServerUpdateHosts::Run( world, world.Match( S_ServerUpdateHosts::GetSignature( world ) ), _delta );
 			S_MoveSpaceships::Run( world, world.Match( S_MoveSpaceships::GetSignature( world ) ), _delta );
 			S_FireWeapons::Run( world, world.Match( S_FireWeapons::GetSignature( world ) ), _delta );
 			S_MovePlanets::Run( world, world.Match( S_MovePlanets::GetSignature( world ) ), _delta );
@@ -235,7 +235,7 @@ namespace fan
 
 			S_UpdateGameCamera::Run( world, world.Match( S_UpdateGameCamera::GetSignature( world ) ), _delta );
 
-			S_ServerNetworkSend::Run( world, world.Match( S_ServerNetworkSend::GetSignature( world ) ) );
+			S_ServerNetworkSend::Run( world, world.Match( S_ServerNetworkSend::GetSignature( world ) ), _delta );
 		}
 
 		{
