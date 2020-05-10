@@ -25,5 +25,7 @@ namespace fan
 		ClientNetworkManager* netManager;
 
 		void RollbackResimulate( EcsWorld& _world );
+
+		void Test();
 	};
 }

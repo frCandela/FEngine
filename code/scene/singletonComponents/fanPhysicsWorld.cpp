@@ -112,27 +112,27 @@ namespace fan
 			btRigidBody* body = btRigidBody::upcast( colObj );
 			if( body )
 			{
-				if( body->getMotionState() )
-				{
-					btDefaultMotionState* myMotionState = (btDefaultMotionState*)body->getMotionState();
-					myMotionState->m_graphicsWorldTrans = myMotionState->m_startWorldTrans;
-					body->setCenterOfMassTransform( myMotionState->m_graphicsWorldTrans );
-					colObj->setInterpolationWorldTransform( myMotionState->m_startWorldTrans );
-					colObj->forceActivationState( ACTIVE_TAG );
-					colObj->activate();
-					colObj->setActivationState( DISABLE_DEACTIVATION );
-					colObj->setDeactivationTime( btScalar( 2e7 ) );
-				}
+// 				if( body->getMotionState() )
+// 				{
+// 					btDefaultMotionState* myMotionState = (btDefaultMotionState*)body->getMotionState();
+// 					myMotionState->m_graphicsWorldTrans = myMotionState->m_startWorldTrans;
+// 					body->setCenterOfMassTransform( myMotionState->m_graphicsWorldTrans );
+// 					colObj->setInterpolationWorldTransform( myMotionState->m_startWorldTrans );
+// 					colObj->forceActivationState( ACTIVE_TAG );
+// 					colObj->activate();
+// 					colObj->setActivationState( DISABLE_DEACTIVATION );
+// 					colObj->setDeactivationTime( btScalar( 2e7 ) );
+// 				}
 				//removed cached contact points (this is not necessary if all objects have been removed from the dynamics world)
 				dynamicsWorld->getBroadphase()->getOverlappingPairCache()->cleanProxyFromPairs( colObj->getBroadphaseHandle(), dynamicsWorld->getDispatcher() );
-
-				btRigidBody* body = btRigidBody::upcast( colObj );
-				if( body && !body->isStaticObject() )
-				{
-					btRigidBody::upcast( colObj )->setLinearVelocity( btVector3( 0, 0, 0 ) );
-					btRigidBody::upcast( colObj )->setAngularVelocity( btVector3( 0, 0, 0 ) );
-					btRigidBody::upcast( colObj )->clearForces();
-				}
+// 
+// 				btRigidBody* body = btRigidBody::upcast( colObj );
+// 				if( body && !body->isStaticObject() )
+// 				{
+// 					btRigidBody::upcast( colObj )->setLinearVelocity( btVector3( 0, 0, 0 ) );
+// 					btRigidBody::upcast( colObj )->setAngularVelocity( btVector3( 0, 0, 0 ) );
+// 					btRigidBody::upcast( colObj )->clearForces();
+// 				}
 			}
 		}
 
