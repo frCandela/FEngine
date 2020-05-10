@@ -197,18 +197,23 @@ namespace fan
 		ClientGameData& gameData = _world.GetComponent<ClientGameData>( persistentID );
 		if( !gameData.spaceshipSynced && ! gameData.previousInputsSinceLastGameState.empty() )
 		{
-			const PacketInput::InputData& mostRecent = gameData.previousInputsSinceLastGameState.front();
-			const PacketInput::InputData& oldest = gameData.previousInputsSinceLastGameState.back();
+			const PacketInput::InputData mostRecent = gameData.previousInputsSinceLastGameState.front();
+			const PacketInput::InputData oldest = gameData.previousInputsSinceLastGameState.back();
 
-			if( mostRecent.frameIndex == game->frameIndex - 1 && oldest.frameIndex == gameData.lastServerState.frameIndex )
+			if( mostRecent.frameIndex == game->frameIndex && oldest.frameIndex == gameData.lastServerState.frameIndex )
 			{
-				Debug::Highlight() << "rollback " << game->frameIndex - oldest.frameIndex << Debug::Endl();
+				const float delta = game->logicDelta;
+
+				// Rollback at the frame we took the snapshot of the player game state
+				game->frameIndex = oldest.frameIndex;
+				Debug::Highlight() << "rollback to frame " << oldest.frameIndex << Debug::Endl();
 				const EntityID spaceshipID = _world.GetEntityID( gameData.spaceshipHandle );
 				PhysicsWorld& physicsWorld = world.GetSingletonComponent<PhysicsWorld>();
 
 				Rigidbody& rigidbody = _world.GetComponent<Rigidbody>( spaceshipID );
 				physicsWorld.dynamicsWorld->removeRigidBody( &rigidbody.rigidbody );
 				physicsWorld.dynamicsWorld->addRigidBody( &rigidbody.rigidbody );
+				rigidbody.rigidbody.clearForces();
 
 				Transform& transform = _world.GetComponent<Transform>( spaceshipID );
 				rigidbody.rigidbody.clearForces();
@@ -216,51 +221,68 @@ namespace fan
 				rigidbody.SetAngularVelocity(	gameData.lastServerState.angularVelocity	);
 				transform.SetPosition(			gameData.lastServerState.position			);
 				transform.SetRotationEuler(		gameData.lastServerState.orientation		);
+				S_SynchronizeMotionStateFromTransform::Run( world, world.Match( S_SynchronizeMotionStateFromTransform::GetSignature( world ) ), delta );
+				
+				PlayerInput& input = _world.GetComponent<PlayerInput>( spaceshipID );
+				gameData.previousStates = std::queue< PacketPlayerGameState >(); // clear previous states
+				gameData.previousStates.push( gameData.lastServerState );
 
-// 				PlayerInput& input = _world.GetComponent<PlayerInput>( spaceshipID );
-// 				game->frameIndex = oldest.frameIndex;
-// 				S_MovePlanets::Run( world, world.Match( S_MovePlanets::GetSignature( world ) ), game->logicDelta );
-// 
-// 				for (int i = 0; i < gameData.previousInputsSinceLastGameState.size(); i++)
-// 				{
-// 					game->frameIndex++;
-// 					S_SynchronizeMotionStateFromTransform::Run( world, world.Match( S_SynchronizeMotionStateFromTransform::GetSignature( world ) ), game->logicDelta );
-// 					physicsWorld.dynamicsWorld->stepSimulation( game->logicDelta, 10, Time::Get().GetPhysicsDelta() );
-// 					S_SynchronizeTransformFromMotionState::Run( world, world.Match( S_SynchronizeTransformFromMotionState::GetSignature( world ) ), game->logicDelta );
-// 					
-// 					const PacketInput::InputData& inputData = *( gameData.previousInputsSinceLastGameState.rbegin() + i );
-// 					input.orientation = btVector3( inputData.orientation.x, 0.f, inputData.orientation.y );
-// 					input.left = inputData.left ? 1.f : ( inputData.right ? -1.f : 0.f );
-// 					input.forward = inputData.forward ? 1.f : ( inputData.backward ? -1.f : 0.f );
-// 					input.boost = inputData.boost;
-// 					input.fire = inputData.fire;
-// 
-// 					S_MoveSpaceships::Run( world, world.Match( S_MoveSpaceships::GetSignature( world ) ), game->logicDelta );
-// 					S_MovePlanets::Run( world, world.Match( S_MovePlanets::GetSignature( world ) ), game->logicDelta );
-// 				}			
-			}
-			gameData.spaceshipSynced = true;
-			//assert( game->frameIndex == mostRecent.frameIndex + 1);
+				const PacketInput::InputData& inputData = *( gameData.previousInputsSinceLastGameState.rbegin() + 0 );
+				assert( inputData.frameIndex == game->frameIndex );
+				input.orientation = btVector3( inputData.orientation.x, 0.f, inputData.orientation.y );
+				input.left = inputData.left ? 1.f : ( inputData.right ? -1.f : 0.f );
+				input.forward = inputData.forward ? 1.f : ( inputData.backward ? -1.f : 0.f );
+				input.boost = inputData.boost;
+				input.fire = inputData.fire;
+
+				S_MoveSpaceships::Run( world, world.Match( S_MoveSpaceships::GetSignature( world ) ), delta );
+
+				for (int i = 1; i < gameData.previousInputsSinceLastGameState.size(); i++)
+				{
+					game->frameIndex++;
+
+					S_SynchronizeMotionStateFromTransform::Run( world, world.Match( S_SynchronizeMotionStateFromTransform::GetSignature( world ) ), delta );
+					physicsWorld.dynamicsWorld->stepSimulation( game->logicDelta, 10, Time::Get().GetPhysicsDelta() );
+					S_SynchronizeTransformFromMotionState::Run( world, world.Match( S_SynchronizeTransformFromMotionState::GetSignature( world ) ), delta );
+
+					const PacketInput::InputData& inputData = *( gameData.previousInputsSinceLastGameState.rbegin() + i );
+					assert( inputData.frameIndex == game->frameIndex );
+					input.orientation = btVector3( inputData.orientation.x, 0.f, inputData.orientation.y );
+					input.left = inputData.left ? 1.f : ( inputData.right ? -1.f : 0.f );
+					input.forward = inputData.forward ? 1.f : ( inputData.backward ? -1.f : 0.f );
+					input.boost = inputData.boost;
+					input.fire = inputData.fire;
+
+					S_ClientSaveState::Run( world, world.Match( S_ClientSaveState::GetSignature( world ) ), delta );
+
+					S_MoveSpaceships::Run( world, world.Match( S_MoveSpaceships::GetSignature( world ) ), delta );
+					S_MovePlanets::Run( world, world.Match( S_MovePlanets::GetSignature( world ) ), delta );
+ 				}	
+				gameData.spaceshipSynced = true;
+				assert( game->frameIndex == mostRecent.frameIndex );
+ 			}		
 		}
-
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
 	void  GameClient::Step( const float _delta )
-	{
-		if( _delta > 0.f )
-		{
-			game->frameIndex++;
-		}
-		
+	{		
 		{
 			SCOPED_PROFILE( scene_update );			
-			S_ClientReceive				::Run( world, world.Match( S_ClientReceive::GetSignature( world ) )				, _delta );
-			S_ProcessTimedOutPackets	::Run( world, world.Match( S_ProcessTimedOutPackets::GetSignature( world ) ) );
-			S_ClientDetectServerTimeout	::Run( world, world.Match( S_ClientDetectServerTimeout::GetSignature( world ) )	, _delta );
+			S_ClientReceive::Run( world, world.Match( S_ClientReceive::GetSignature( world ) ), _delta );
 
 			RollbackResimulate( world );
+
+			if( _delta > 0.f )
+			{
+				game->frameIndex++;
+			}
+
+			S_ProcessTimedOutPackets	::Run( world, world.Match( S_ProcessTimedOutPackets::GetSignature( world ) ) );
+			S_ClientDetectServerTimeout	::Run( world, world.Match( S_ClientDetectServerTimeout::GetSignature( world ) )	, _delta );
+			S_ClientRunReplication		::Run( world, world.Match( S_ClientRunReplication::GetSignature( world ) )		, _delta );
+			S_ClientSpawnSpaceship		::Run( world, world.Match( S_ClientSpawnSpaceship::GetSignature( world ) )		, _delta );
 
 			// physics & transforms
 			PhysicsWorld& physicsWorld = world.GetSingletonComponent<PhysicsWorld>();
@@ -268,13 +290,11 @@ namespace fan
 			physicsWorld.dynamicsWorld->stepSimulation( _delta, 10, Time::Get().GetPhysicsDelta() );
 			S_SynchronizeTransformFromMotionState	::Run( world, world.Match( S_SynchronizeTransformFromMotionState::GetSignature( world ) ), _delta );
 			S_MoveFollowTransforms					::Run( world, world.Match( S_MoveFollowTransforms::GetSignature( world ) ) );
-			S_MoveFollowTransformsUI				::Run( world, world.Match( S_MoveFollowTransformsUI::GetSignature( world ) ) );
+			S_MoveFollowTransformsUI				::Run( world, world.Match( S_MoveFollowTransformsUI::GetSignature( world ) ) );			
 
 			// update
 			S_RefreshPlayerInput	::Run( world, world.Match( S_RefreshPlayerInput::GetSignature( world ) )	, _delta );
-			S_ClientSaveInput		::Run( world, world.Match( S_ClientSaveInput::GetSignature( world ) )		, _delta );
-			S_ClientRunReplication	::Run( world, world.Match( S_ClientRunReplication::GetSignature( world ) )	, _delta );			
-			S_ClientSpawnSpaceship	::Run( world, world.Match( S_ClientSpawnSpaceship::GetSignature( world ) )	, _delta );
+			S_ClientSaveInput::Run( world, world.Match( S_ClientSaveInput::GetSignature( world ) ), _delta );
 			S_ClientSaveState::Run( world, world.Match( S_ClientSaveState::GetSignature( world ) ), _delta );
 
 			S_MoveSpaceships		::Run( world, world.Match( S_MoveSpaceships::GetSignature( world ) )		, _delta );
@@ -299,7 +319,8 @@ namespace fan
 			S_UpdateBoundsFromModel		::Run( world, world.Match( S_UpdateBoundsFromModel::GetSignature( world ) )		, _delta );
 			S_UpdateBoundsFromTransform	::Run( world, world.Match( S_UpdateBoundsFromTransform::GetSignature( world ) )	, _delta );
 			S_UpdateGameCamera			::Run( world, world.Match( S_UpdateGameCamera::GetSignature( world ) )			, _delta );
-			S_ClientSend				::Run( world, world.Match( S_ClientSend::GetSignature( world ) )				, _delta );			
+			
+			S_ClientSend		::Run( world, world.Match( S_ClientSend::GetSignature( world ) )  , _delta );
 		}
 
 		{

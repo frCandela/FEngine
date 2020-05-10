@@ -194,13 +194,19 @@ namespace fan
 	//================================================================================================================================
 	void  GameServer::Step( const float _delta )
 	{
-		game->frameIndex++;
+		if( _delta > 0.f )
+		{
+			game->frameIndex++;
+		}
+
 		{
 			SCOPED_PROFILE( scene_update );
 
 			S_ServerReceive			::Run( world );
 			S_ProcessTimedOutPackets::Run( world, world.Match( S_ProcessTimedOutPackets::GetSignature( world ) ) );
 			S_DetectHostTimout		::Run( world, world.Match( S_DetectHostTimout::GetSignature( world ) ) );
+			S_HostSpawnShip			::Run( world, world.Match( S_HostSpawnShip::GetSignature( world ) ), _delta );
+			S_HostSyncFrame			::Run( world, world.Match( S_HostSyncFrame::GetSignature( world ) ), _delta );
 
 			// physics & transforms
 			PhysicsWorld& physicsWorld = world.GetSingletonComponent<PhysicsWorld>();
@@ -210,10 +216,8 @@ namespace fan
 			S_MoveFollowTransforms					::Run( world, world.Match( S_MoveFollowTransforms::GetSignature( world ) ) );
 			S_MoveFollowTransformsUI				::Run( world, world.Match( S_MoveFollowTransformsUI::GetSignature( world ) ) );
 
-			// update
-			S_HostSpawnShip		::Run( world, world.Match( S_HostSpawnShip::GetSignature( world ) )		, _delta );
+			// update		
 			S_HostUpdateInput	::Run( world, world.Match( S_HostUpdateInput::GetSignature( world ) )	, _delta );
-			S_HostSyncFrame		::Run( world, world.Match( S_HostSyncFrame::GetSignature( world ) )		, _delta );
 			S_HostSaveState		::Run( world, world.Match( S_HostSaveState::GetSignature( world ) )		, _delta );
 
 			S_MoveSpaceships		::Run( world, world.Match( S_MoveSpaceships::GetSignature( world ) )		, _delta );
@@ -238,6 +242,7 @@ namespace fan
 			S_UpdateBoundsFromModel		::Run( world, world.Match( S_UpdateBoundsFromModel::GetSignature( world ) )		, _delta );
 			S_UpdateBoundsFromTransform	::Run( world, world.Match( S_UpdateBoundsFromTransform::GetSignature( world ) )	, _delta );
 			S_UpdateGameCamera			::Run( world, world.Match( S_UpdateGameCamera::GetSignature( world ) )			, _delta );			
+			
 			S_ServerSend				::Run( world, world.Match( S_ServerSend::GetSignature( world ) )				, _delta );
 		}
 
