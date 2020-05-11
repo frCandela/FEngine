@@ -126,7 +126,9 @@ namespace fan
 		Input::Get().Manager().CreateKeyboardEvent( "play_pause", Keyboard::F5 );
 		Input::Get().Manager().CreateKeyboardEvent( "reload_shaders", Keyboard::F11 );
 		Input::Get().Manager().CreateKeyboardEvent( "reload_icons", Keyboard::F12 );
-		Input::Get().Manager().CreateKeyboardEvent( "toogle_follow_transform_lock", Keyboard::L );
+		Input::Get().Manager().CreateKeyboardEvent( "toogle_follow_transform_lock", Keyboard::L );		
+
+		Input::Get().Manager().CreateKeyboardEvent( "test", Keyboard::T );
 
 		//editor axis
 		Input::Get().Manager().CreateKeyboardAxis( "editor_forward", Keyboard::W, Keyboard::S );

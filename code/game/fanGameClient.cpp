@@ -142,9 +142,6 @@ namespace fan
 		Game& game = world.GetSingletonComponent<Game>();
 		game.gameClient = this;
 		game.name = _name;
-
-		Input::Get().Manager().CreateKeyboardEvent( "test", Keyboard::T );
-		Input::Get().Manager().FindEvent( "test" )->Connect( &GameClient::Test, this );
 	}
 
 	//================================================================================================================================
@@ -160,6 +157,9 @@ namespace fan
 		S_RegisterAllRigidbodies::Run( world, world.Match( S_RegisterAllRigidbodies::GetSignature( world ) ) );
 		GameCamera::CreateGameCamera( world );
 		SolarEruption::Start( world );
+
+		Input::Get().Manager().FindEvent( "test" )->Clear();
+		Input::Get().Manager().FindEvent( "test" )->Connect( &GameClient::Test, this );
 	}
 
 	//================================================================================================================================
@@ -216,7 +216,9 @@ namespace fan
 			const PacketInput::InputData mostRecent = gameData.previousInputsSinceLastGameState.front();
 			const PacketInput::InputData oldest = gameData.previousInputsSinceLastGameState.back();
 
-			if( mostRecent.frameIndex == game->frameIndex && oldest.frameIndex == gameData.lastServerState.frameIndex )
+			if( mostRecent.frameIndex == game->frameIndex && 
+				oldest.frameIndex == gameData.lastServerState.frameIndex && 
+				( oldest.frameIndex + gameData.previousInputsSinceLastGameState.size() == mostRecent.frameIndex + 1 ))
 			{
 				// Rollback at the frame we took the snapshot of the player game state
 				game->frameIndex = oldest.frameIndex;

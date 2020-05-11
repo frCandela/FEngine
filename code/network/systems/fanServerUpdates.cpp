@@ -82,6 +82,7 @@ namespace fan
 		if( _delta == 0.f ) { return; }
 
 		const HostManager& hostManager = _world.GetSingletonComponent<HostManager>();
+		const Game& game = _world.GetSingletonComponent<Game>();
 
 		for( EntityID entityID : _entities )
 		{
@@ -102,16 +103,18 @@ namespace fan
 
 				if( max - min <= 1 ) // we have consistent readings
 				{
-					if( std::abs( min + hostManager.targetFrameDifference ) > 2 ) // only sync when we have a big enough frame index difference
+					const int targetFrameDifference =  int( hostConnection.rtt / 2.f / game.logicDelta ) + 3;
+
+					if( std::abs( min + targetFrameDifference ) > 2 ) // only sync when we have a big enough frame index difference
 					{
 						Signal<>& success = hostReplication.Replicate(
-							ClientRPC::RPCShiftClientFrame( min + hostManager.targetFrameDifference )
+							ClientRPC::RPCShiftClientFrame( min + targetFrameDifference )
 							, HostReplication::ResendUntilReplicated
 						);
 						hostConnection.lastSync = currentTime;
 						success.Connect( &HostConnection::OnSyncSuccess, &hostConnection );
 
-						Debug::Log() << "shifting host frame index : " << min + hostManager.targetFrameDifference;
+						Debug::Log() << "shifting host frame index : " << min + targetFrameDifference;
 						Debug::Get() << " " << hostConnection.ip.toString() << "::" << hostConnection.port << Debug::Endl();
 					}
 				}

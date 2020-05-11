@@ -36,7 +36,6 @@ namespace fan
 		};
 
 		std::unordered_map < IPPort, EntityHandle, IPPort > hostHandles;  // links host ip-port to its entity handle
-		static const int	targetFrameDifference = 7;					  // the host must be N frames ahead of the server
 		SceneNode*			netRoot;									  // host entity nodes are placed below the net root node
 
 		EntityHandle CreateHost( const IpAddress _ip, const Port _port );
