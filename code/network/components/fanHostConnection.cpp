@@ -38,7 +38,8 @@ namespace fan
 
 		hostConnection.synced = false;
 		hostConnection.lastSync = 0.f;
-		hostConnection.framesDelta = { -1000,0,0,0,1000 };
+		hostConnection.targetBufferSize = 10;
+		hostConnection.framesDelta = { -1000,0,1000 };
 		hostConnection.nextDeltaIndex = 0;
 	}
 
@@ -183,13 +184,14 @@ namespace fan
 		const double currentTime = Time::Get().ElapsedSinceStartup();
 		ImGui::PushItemWidth( 0.6f * ImGui::GetWindowWidth() - 16 );
 		{
-			ImGui::Text( "name:          %s", hostConnection.name.c_str() );
-			ImGui::TextColored( GetStateColor( hostConnection.state ), "state:         %s", GetStateName( hostConnection.state ).c_str() );
-			ImGui::TextColored( GetRttColor( hostConnection.rtt ), "rtt:           %.1f", 1000.f * hostConnection.rtt );
-			ImGui::Text( "bandwidth :    %.1f Ko/s", hostConnection.bandwidth );
-			ImGui::Text( "last response: %.1f", currentTime - hostConnection.lastResponseTime );
-			ImGui::Text( "adress:        %s::%u", hostConnection.ip.toString().c_str(), hostConnection.port );
-			ImGui::Text( "frame delta:   %d %d %d %d %d", hostConnection.framesDelta[0], hostConnection.framesDelta[1], hostConnection.framesDelta[2], hostConnection.framesDelta[3], hostConnection.framesDelta[4] );
+			ImGui::Text( "name:               %s", hostConnection.name.c_str() );
+			ImGui::TextColored( GetStateColor( hostConnection.state ), "state:              %s", GetStateName( hostConnection.state ).c_str() );
+			ImGui::TextColored( GetRttColor( hostConnection.rtt ), "rtt:                %.1f", 1000.f * hostConnection.rtt );
+			ImGui::Text( "bandwidth :         %.1f Ko/s", hostConnection.bandwidth );
+			ImGui::Text( "last response:      %.1f", currentTime - hostConnection.lastResponseTime );			
+			ImGui::Text( "adress:             %s::%u", hostConnection.ip.toString().c_str(), hostConnection.port );
+			ImGui::Text( "target buffer size: %d", hostConnection.targetBufferSize );
+			ImGui::Text( "frame delta:        %d %d %d", hostConnection.framesDelta[0], hostConnection.framesDelta[1], hostConnection.framesDelta[2]); 
 			ImGui::DragFloat( "ping delay", &hostConnection.pingDelay, 0.1f, 0.f, 10.f );
 			ImGui::DragFloat( "timeout time", &hostConnection.timeoutDelay, 0.1f, 0.f, 10.f );
 		} ImGui::PopItemWidth();

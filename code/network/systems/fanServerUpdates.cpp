@@ -91,7 +91,7 @@ namespace fan
 
 			// sync the client frame index with the server
 			const double currentTime = Time::Get().ElapsedSinceStartup();
-			if( currentTime - hostConnection.lastSync > 3.f )
+			if( currentTime - hostConnection.lastSync > 1.f )
 			{
 				int max = hostConnection.framesDelta[0];
 				int min = hostConnection.framesDelta[0];
@@ -103,9 +103,13 @@ namespace fan
 
 				if( max - min <= 1 ) // we have consistent readings
 				{
-					const int targetFrameDifference =  int( hostConnection.rtt / 2.f / game.logicDelta ) + 3;
-
-					if( std::abs( min + targetFrameDifference ) > 2 ) // only sync when we have a big enough frame index difference
+					// @todo calculate buffer size depending on jitter, not rtt
+					hostConnection.targetBufferSize = int( 1000.f * hostConnection.rtt * (5.f - 2.f) / 100.f + 2.f ); // size 5 at 100 ms rtt
+					hostConnection.targetBufferSize = std::min( hostConnection.targetBufferSize, 15 );
+					
+					const int targetFrameDifference =  int( hostConnection.rtt / 2.f / game.logicDelta ) + hostConnection.targetBufferSize;
+					const int diff = std::abs( min + targetFrameDifference );
+					if( diff > 1 ) // only sync when we have a big enough frame index difference
 					{
 						Signal<>& success = hostReplication.Replicate(
 							ClientRPC::RPCShiftClientFrame( min + targetFrameDifference )
@@ -114,8 +118,11 @@ namespace fan
 						hostConnection.lastSync = currentTime;
 						success.Connect( &HostConnection::OnSyncSuccess, &hostConnection );
 
-						Debug::Log() << "shifting host frame index : " << min + targetFrameDifference;
-						Debug::Get() << " " << hostConnection.ip.toString() << "::" << hostConnection.port << Debug::Endl();
+						if( diff > 10 )
+						{
+							Debug::Log() << "shifting host frame index : " << min + targetFrameDifference;
+							Debug::Get() << " " << hostConnection.ip.toString() << "::" << hostConnection.port << Debug::Endl();
+						}
 					}
 				}
 			}

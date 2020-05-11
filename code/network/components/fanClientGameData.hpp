@@ -35,6 +35,7 @@ namespace fan
 		std::deque< InputSent>				inputsSent;
 		std::queue< PacketPlayerGameState > previousStates;
 		bool								frameSynced;
+		static const int					maxFrameDeltaBeforeShift = 20; // if the server/client frame delta > this, shift frameIndex. Otherwise use timescale
 		bool								spaceshipSynced;
 		int									maxInputSent;
 		PacketPlayerGameState				lastServerState;

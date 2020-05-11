@@ -188,54 +188,54 @@ namespace fan
 			, m_singletonsWindow
 			, m_profilerWindow
 			, m_gameViewWindow
-			, m_networkWindow
-			, m_preferencesWindow
+, m_networkWindow
+, m_preferencesWindow
 			} );
-		RendererDebug::Init( &m_renderer->GetRendererDebug() );
-		EditorGizmos::Init( m_gizmos );
-		Prefab::s_resourceManager.Init();
-		m_selection->ConnectCallbacks( scene );
-		m_renderWindow->SetRenderer( m_renderer );
-		m_preferencesWindow->SetRenderer( m_renderer );
+			RendererDebug::Init( &m_renderer->GetRendererDebug() );
+			EditorGizmos::Init( m_gizmos );
+			Prefab::s_resourceManager.Init();
+			m_selection->ConnectCallbacks( scene );
+			m_renderWindow->SetRenderer( m_renderer );
+			m_preferencesWindow->SetRenderer( m_renderer );
 
-		m_sceneWindow->onSelectSceneNode.Connect( &EditorSelection::SetSelectedSceneNode, m_selection );
+			m_sceneWindow->onSelectSceneNode.Connect( &EditorSelection::SetSelectedSceneNode, m_selection );
 
-		// Instance messages				
-		m_mainMenuBar->onReloadShaders.Connect( &Renderer::ReloadShaders, m_renderer );
-		m_mainMenuBar->onReloadIcons.Connect( &Renderer::ReloadIcons, m_renderer );
-		m_mainMenuBar->onExit.Connect( &Editor::Exit, this );
-		m_selection->onSceneNodeSelected.Connect( &SceneWindow::OnSceneNodeSelected, m_sceneWindow );
-		m_selection->onSceneNodeSelected.Connect( &InspectorWindow::OnSceneNodeSelected, m_inspectorWindow );
+			// Instance messages				
+			m_mainMenuBar->onReloadShaders.Connect( &Renderer::ReloadShaders, m_renderer );
+			m_mainMenuBar->onReloadIcons.Connect( &Renderer::ReloadIcons, m_renderer );
+			m_mainMenuBar->onExit.Connect( &Editor::Exit, this );
+			m_selection->onSceneNodeSelected.Connect( &SceneWindow::OnSceneNodeSelected, m_sceneWindow );
+			m_selection->onSceneNodeSelected.Connect( &InspectorWindow::OnSceneNodeSelected, m_inspectorWindow );
 
-		// Events linking
-		Input::Get().Manager().FindEvent( "reload_shaders" )->Connect( &Renderer::ReloadShaders, m_renderer );
-		Input::Get().Manager().FindEvent( "play_pause" )->Connect( &Editor::SwitchPlayStop, this );
-		Input::Get().Manager().FindEvent( "copy" )->Connect( &EditorCopyPaste::OnCopy, m_copyPaste );
-		Input::Get().Manager().FindEvent( "paste" )->Connect( &EditorCopyPaste::OnPaste, m_copyPaste );
-		Input::Get().Manager().FindEvent( "show_ui" )->Connect( &Editor::OnToogleShowUI, this );
-		Input::Get().Manager().FindEvent( "toogle_camera" )->Connect( &Editor::OnToogleCamera, this );
+			// Events linking
+			Input::Get().Manager().FindEvent( "reload_shaders" )->Connect( &Renderer::ReloadShaders, m_renderer );
+			Input::Get().Manager().FindEvent( "play_pause" )->Connect( &Editor::SwitchPlayStop, this );
+			Input::Get().Manager().FindEvent( "copy" )->Connect( &EditorCopyPaste::OnCopy, m_copyPaste );
+			Input::Get().Manager().FindEvent( "paste" )->Connect( &EditorCopyPaste::OnPaste, m_copyPaste );
+			Input::Get().Manager().FindEvent( "show_ui" )->Connect( &Editor::OnToogleShowUI, this );
+			Input::Get().Manager().FindEvent( "toogle_camera" )->Connect( &Editor::OnToogleCamera, this );
 
-		m_gameViewWindow->onSizeChanged.Connect( &Renderer::ResizeGame, m_renderer );
-		m_gameViewWindow->onPlay.Connect( &Editor::GameStart, this );
-		m_gameViewWindow->onPause.Connect( &Editor::GamePause, this );
-		m_gameViewWindow->onResume.Connect( &Editor::GameResume, this );
-		m_gameViewWindow->onStop.Connect( &Editor::GameStop, this );
-		m_gameViewWindow->onStep.Connect( &Editor::OnEditorStep, this );
-		scene.onLoad.Connect( &SceneWindow::OnExpandHierarchy, m_sceneWindow );
-		scene.onLoad.Connect( &Editor::OnSceneLoad, this );
+			m_gameViewWindow->onSizeChanged.Connect( &Renderer::ResizeGame, m_renderer );
+			m_gameViewWindow->onPlay.Connect( &Editor::GameStart, this );
+			m_gameViewWindow->onPause.Connect( &Editor::GamePause, this );
+			m_gameViewWindow->onResume.Connect( &Editor::GameResume, this );
+			m_gameViewWindow->onStop.Connect( &Editor::GameStop, this );
+			m_gameViewWindow->onStep.Connect( &Editor::OnEditorStep, this );
+			scene.onLoad.Connect( &SceneWindow::OnExpandHierarchy, m_sceneWindow );
+			scene.onLoad.Connect( &Editor::OnSceneLoad, this );
 
-		// load scene
-		scene.New();
-		if( ! _settings.loadScene.empty() )	
-		{ 
-			scene.LoadFrom( _settings.loadScene ); 
-
-			// auto play the scene
-			if( _settings.autoPlay )
+			// load scene
+			scene.New();
+			if( !_settings.loadScene.empty() )
 			{
-				GameStart();
+				scene.LoadFrom( _settings.loadScene );
+
+				// auto play the scene
+				if( _settings.autoPlay )
+				{
+					GameStart();
+				}
 			}
-		}
 	}
 
 	//================================================================================================================================
@@ -274,19 +274,26 @@ namespace fan
 	//================================================================================================================================
 	void Editor::Run()
 	{
-		Clock logicClock;
+		double lastLogicFrameTime = Time::Get().ElapsedSinceStartup();
 		Clock renderClock;
 
 		Profiler::Get().Begin();
 
 		Game& game = m_gameWorld.GetSingletonComponent<Game>();
-
-		while ( m_applicationShouldExit == false && m_window->IsOpen() == true )
+		while( m_applicationShouldExit == false && m_window->IsOpen() == true )
 		{
+			const double currentTime = Time::Get().ElapsedSinceStartup();
+
 			// Runs logic, renders ui
-			if ( logicClock.ElapsedSeconds() > game.logicDelta )
+			if( currentTime > lastLogicFrameTime + game.logicDelta )
 			{
-				logicClock.Reset();
+				if( std::abs( game.timeScaleDelta ) >= game.timeScaleIncrement ) {
+					const float increment = game.timeScaleDelta > 0.f ? game.timeScaleIncrement : -game.timeScaleIncrement;
+					lastLogicFrameTime -= increment;
+					game.timeScaleDelta -= increment;
+				}
+
+				lastLogicFrameTime += game.logicDelta;
 
 				SCOPED_PROFILE( logic )
 				{

@@ -13,6 +13,7 @@
 #include "game/singletonComponents/fanCollisionManager.hpp"
 #include "game/fanGameClient.hpp"
 #include "game/fanGameServer.hpp"
+#include "network/components/fanClientGameData.hpp"
 
 namespace fan
 {
@@ -39,45 +40,25 @@ namespace fan
 		gameData.frameIndex = 0;
 		gameData.logicDelta = 1.f / 60.f;
 		gameData.frameStart = 0;
+		gameData.timeScaleDelta = 0.f;
+		gameData.timeScaleIncrement = gameData.logicDelta / 20.f; // it takes 20 frames to time scale one frame ( 5% faster/slower )
 	}
 
 	//================================================================================================================================
+	// Client must adjust it frame index to be in sync with the server
+	// if the delta is small enough, use timescale
+	// if it's too big, offsets the frame index directly
 	//================================================================================================================================
 	void Game::OnShiftFrameIndex( const int _framesDelta )
 	{
-		frameIndex += _framesDelta;
-	}
-
-	//================================================================================================================================
-	//================================================================================================================================
-	void Game::OnGui( EcsWorld&, SingletonComponent& _component )
-	{
-		Game& gameData = static_cast<Game&>( _component );
-
-		ImGui::Indent(); ImGui::Indent();
+		if( std::abs( _framesDelta ) > ClientGameData::maxFrameDeltaBeforeShift )
 		{
-			// names
-			char buffer[32];
-			gameData.name.copy( buffer, gameData.name.size() );
-			buffer[gameData.name.size()] = '\0';
-			if( ImGui::InputText( "name", buffer, IM_ARRAYSIZE( buffer ) ) )
-			{
-				gameData.name = buffer;
-			}
-			ImGui::Text( "frame index: %d", gameData.frameIndex );
-
-			// game state
-			std::string stateStr =
-				gameData.state == Game::STOPPED ? "stopped" :
-				gameData.state == Game::PLAYING ? "playing" :
-				gameData.state == Game::PAUSED ? "paused" : "error";
-			ImGui::Text( "game state : %s", stateStr.c_str() );			
-
-			// spaceship prefab
-			ImGui::FanPrefab( "spaceship", gameData.spaceshipPrefab );
-
+			frameIndex += _framesDelta;
 		}
-		ImGui::Unindent(); ImGui::Unindent();
+		else
+		{
+			timeScaleDelta = _framesDelta * logicDelta;
+		}
 	}
 
 	//================================================================================================================================
@@ -97,8 +78,8 @@ namespace fan
 	}
 
 	//================================================================================================================================
-	// generates the spaceship entity from the game prefab
-	//================================================================================================================================
+// generates the spaceship entity from the game prefab
+//================================================================================================================================
 	EntityHandle Game::SpawnSpaceship( EcsWorld& _world )
 	{
 		// spawn the spaceship	
@@ -146,5 +127,36 @@ namespace fan
 			Debug::Error() << game.name << " spaceship prefab is null" << Debug::Endl();
 			return 0;
 		}
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
+	void Game::OnGui( EcsWorld&, SingletonComponent& _component )
+	{
+		Game& gameData = static_cast<Game&>( _component );
+
+		ImGui::Indent(); ImGui::Indent();
+		{
+			// names
+			char buffer[32];
+			gameData.name.copy( buffer, gameData.name.size() );
+			buffer[gameData.name.size()] = '\0';
+			if( ImGui::InputText( "name", buffer, IM_ARRAYSIZE( buffer ) ) )
+			{
+				gameData.name = buffer;
+			}
+			ImGui::Text( "frame index: %d", gameData.frameIndex );
+
+			// game state
+			std::string stateStr =
+				gameData.state == Game::STOPPED ? "stopped" :
+				gameData.state == Game::PLAYING ? "playing" :
+				gameData.state == Game::PAUSED ? "paused" : "error";
+			ImGui::Text( "game state : %s", stateStr.c_str() );
+
+			ImGui::FanPrefab( "spaceship", gameData.spaceshipPrefab );
+			ImGui::DragFloat( "timescale", &gameData.timeScaleDelta, 0.1f );
+		}
+		ImGui::Unindent(); ImGui::Unindent();
 	}
 }

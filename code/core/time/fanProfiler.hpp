@@ -22,7 +22,7 @@ namespace fan
 		struct Interval
 		{
 
-			TimePoint time;
+			Clock::TimePoint time;
 			char	name[ s_nameSize ];
 			size_t  id;
 

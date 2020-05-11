@@ -176,7 +176,12 @@ namespace fan
 	{
 		previousStates = std::queue< PacketPlayerGameState >(); // clear
 		frameSynced = true;
-		Debug::Log() << "Shifted client frame index : " << _framesDelta << Debug::Endl();
+
+		if( std::abs( _framesDelta ) > maxFrameDeltaBeforeShift )
+		{
+			Debug::Log() << "Shifted client frame index : " << _framesDelta << Debug::Endl();
+			previousStates = std::queue< PacketPlayerGameState >(); // clear
+		}
 	}
 
 	//================================================================================================================================

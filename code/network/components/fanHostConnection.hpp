@@ -38,10 +38,11 @@ namespace fan
 		float		timeoutDelay;		// disconnects clients after X seconds without a response
 
 		// client frame index synchronization
-		bool				synced;			// true if the client has been synced 
-		double				lastSync;		// client frame index value is correct
-		std::array<int, 5>  framesDelta;	// server-client frame index delta in the N previous frames
-		int					nextDeltaIndex;	// next delta to update in the array
+		bool				synced;				// true if the client has been synced 
+		double				lastSync;			// client frame index value is correct
+		std::array<int, 3>  framesDelta;		// server-client frame index delta in the N previous frames
+		int					targetBufferSize;	// the size of the input buffer we target for the client specific rtt
+		int					nextDeltaIndex;		// next delta to update in the array
 
 		void Write( EcsWorld& _world, Packet& _packet );
 		void ProcessPacket	( const PacketHello& _packetHello );

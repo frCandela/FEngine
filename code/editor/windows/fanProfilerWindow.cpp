@@ -61,8 +61,8 @@ namespace fan
 			// Constants		
 			const float fontHeight = ImGui::GetFontSize();
 			const float fontWidth = 0.75f * fontHeight;
-			const float totalTime = TimePoint::SecondsBetween( m_intervalsCopy[ 0 ].time, m_intervalsCopy[ m_intervalsCopy.size() - 1 ].time );
-			const TimePoint  beginTime = m_intervalsCopy[ 0 ].time;
+			const float totalTime = Clock::SecondsBetween( m_intervalsCopy[ 0 ].time, m_intervalsCopy[ m_intervalsCopy.size() - 1 ].time );
+			const Clock::TimePoint  beginTime = m_intervalsCopy[ 0 ].time;
 			const ImVec2 unsclaledTL = ImGui::GetCursorScreenPos();
 			const ImVec2 tl = { unsclaledTL.x, unsclaledTL.y };
 			const ImColor colorText = Color::Black.ToImGui();
@@ -126,9 +126,9 @@ namespace fan
 				const Profiler::Interval& begin = m_intervalsCopy[ beginIndex ];
 				const Profiler::Interval& end = m_intervalsCopy[ endIndex ];
 
-				// Usefull values
-				const float ratio = TimePoint::SecondsBetween( begin.time, end.time ) / totalTime;
-				const float offset = TimePoint::SecondsBetween( beginTime, begin.time ) / totalTime * width;
+				// Useful values
+				const float ratio = Clock::SecondsBetween( begin.time, end.time ) / totalTime;
+				const float offset = Clock::SecondsBetween( beginTime, begin.time ) / totalTime * width;
 				const float subWidth = ratio * width;
 				const ImVec2 tli = { tl.x + offset, tl.y + ( fontHeight + 1 ) * depth };
 				const ImVec2 bri = { tli.x + subWidth, tli.y + fontHeight };
@@ -146,7 +146,7 @@ namespace fan
 
 
 					std::stringstream ss;
-					ss << ( int ) 1000.f * TimePoint::SecondsBetween( begin.time, end.time ) << " ms.";
+					ss << ( int ) 1000.f * Clock::SecondsBetween( begin.time, end.time ) << " ms.";
 					ImGui::TextUnformatted( begin.name );
 					ImGui::TextUnformatted( ss.str().c_str() );
 

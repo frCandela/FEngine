@@ -30,6 +30,8 @@ namespace fan
 		FrameIndex	frameIndex;			// the index of the current time
 		FrameIndex	frameStart;			// the index of the first frame of the game
 		float		logicDelta;			// time between two frames in seconds
+		float		timeScaleDelta;		// accelerate, decelerates the logic frame rate
+		float		timeScaleIncrement; // the maximum amount that can be added to each frame
 
 		// @hack for the editor, only one of these should be null
 		GameClient* gameClient = nullptr;

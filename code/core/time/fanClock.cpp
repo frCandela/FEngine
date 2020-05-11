@@ -12,7 +12,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	TimePoint Clock::Now() const
+	Clock::TimePoint Clock::Now() const
 	{
 		return TimePoint( m_clock.now() );
 	}
@@ -29,6 +29,6 @@ namespace fan
 	//================================================================================================================================
 	float Clock::ElapsedSeconds() const
 	{
-		return TimePoint::SecondsBetween( m_startPoint, Now() );
+		return SecondsBetween( m_startPoint, Now() );
 	}
 }
