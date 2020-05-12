@@ -186,7 +186,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void ClientGameData::OnSpawnShip( NetID _spaceshipID, FrameIndex _frameIndex )
+	void ClientGameData::OnSpawnClientShip( NetID _spaceshipID, FrameIndex _frameIndex )
 	{
 		if( spaceshipNetID == 0 )
 		{

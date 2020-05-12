@@ -46,7 +46,7 @@ namespace fan
 		// callbacks
 		void OnInputReceived( PacketTag _tag );
 		void OnShiftFrameIndex( const int _framesDelta );
-		void OnSpawnShip( NetID _spaceshipID, FrameIndex _frameIndex );
+		void OnSpawnClientShip( NetID _spaceshipID, FrameIndex _frameIndex );
 	};
 	static constexpr size_t sizeof_clientGameData = sizeof( ClientGameData );
 }

@@ -299,6 +299,7 @@ namespace fan
 			S_ClientSaveInput::Run( world, world.Match( S_ClientSaveInput::GetSignature( world ) ), _delta );
 			S_MovePlanets::Run( world, world.Match( S_MovePlanets::GetSignature( world ) ), _delta );
 			S_MoveSpaceships::Run( world, world.Match( S_MoveSpaceships::GetSignature( world ) ), _delta );
+			ClientNetworkManager::SpawnShips( world );
 
 			// physics & transforms
 			PhysicsWorld& physicsWorld = world.GetSingletonComponent<PhysicsWorld>();

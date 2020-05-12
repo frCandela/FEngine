@@ -41,6 +41,7 @@ namespace fan
 	{
 		ClientNetworkManager& netManager = static_cast<ClientNetworkManager&>( _component );
 		netManager.playerPersistent = nullptr;
+		netManager.shipsToSpawn.clear();
 	}
 
 	//================================================================================================================================
@@ -63,7 +64,7 @@ namespace fan
 		ClientGameData& gameData = _world.GetComponent<ClientGameData>( persistentID );
 		rpcManager.onShiftFrameIndex.Connect( &ClientGameData::OnShiftFrameIndex, &gameData );
 		rpcManager.onShiftFrameIndex.Connect( &Game::OnShiftFrameIndex, &game );
-		rpcManager.onSpawnClientShip.Connect( &ClientGameData::OnSpawnShip, &gameData );
+		rpcManager.onSpawnClientShip.Connect( &ClientGameData::OnSpawnClientShip, &gameData );
 		rpcManager.onSpawnShip.Connect( &ClientNetworkManager::OnSpawnShip, this );
 
 		// Bind socket
@@ -95,9 +96,34 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
+	void ClientNetworkManager::SpawnShips( EcsWorld& _world )
+	{
+		const Game& game = _world.GetSingletonComponent<Game>();
+		ClientNetworkManager& netManager = _world.GetSingletonComponent<ClientNetworkManager>();
+		LinkingContext& linkingContext = _world.GetSingletonComponent<LinkingContext>();
+
+		for (int i = (int)netManager.shipsToSpawn.size() - 1; i >= 0 ; i--)
+		{
+			std::pair<NetID, FrameIndex> pair = netManager.shipsToSpawn[i];
+			if( game.frameIndex >= pair.second )
+			{
+				// do not spawn twice
+				if( linkingContext.netIDToEntityHandle.find( pair.first ) == linkingContext.netIDToEntityHandle.end() )
+				{
+					// spawn
+					const EntityHandle handle = Game::SpawnSpaceship( _world );
+					linkingContext.AddEntity( handle, pair.first );
+				}
+				netManager.shipsToSpawn.erase( netManager.shipsToSpawn.begin() + i );
+			}
+		}
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
 	void ClientNetworkManager::OnSpawnShip( NetID _spaceshipID, FrameIndex _frameIndex )
 	{
-		Debug::Highlight() << "spawn " << _spaceshipID << " " << _frameIndex << Debug::Endl();
+		shipsToSpawn.push_back( {_spaceshipID, _frameIndex} );
 	}
 
 	//================================================================================================================================

@@ -50,7 +50,7 @@ namespace fan
 				{
 					if( hostData.spaceshipID == 0 )
 					{
-						// spawns spaceship
+						// spawns new host spaceship
 						hostData.spaceshipHandle = Game::SpawnSpaceship( _world );
 						hostData.spaceshipID = linkingContext.nextNetID++;
 						linkingContext.AddEntity( hostData.spaceshipHandle, hostData.spaceshipID );
@@ -62,7 +62,7 @@ namespace fan
 
 						hostData.nextPlayerStateFrame = spawnFrame + 60; // next player state snapshot done later
 
-						// replicate new host on all other hosts
+						// replicate other ships
 						for( const auto& pair : hostManager.hostHandles )
 						{
 							const EntityHandle otherHostHandle = pair.second;
@@ -70,9 +70,17 @@ namespace fan
 
 							if( otherHostID != entityID )
 							{
+								// replicate new host on all other hosts
 								HostReplication& otherHostReplication = _world.GetComponent< HostReplication >( otherHostID );
 								otherHostReplication.Replicate(
 									ClientRPC::RPCSpawnShip( hostData.spaceshipID, spawnFrame )
+									, HostReplication::ResendUntilReplicated
+								);
+
+ 								// replicate all other hosts on new host		
+								HostGameData& otherHostData = _world.GetComponent< HostGameData >( otherHostID );
+								hostReplication.Replicate(
+									ClientRPC::RPCSpawnShip( otherHostData.spaceshipID, game.frameIndex )
 									, HostReplication::ResendUntilReplicated
 								);
 							}

@@ -5,6 +5,8 @@
 #include "core/fanHash.hpp"
 #include "fanEcsTypes.hpp"
 
+namespace sf { class Packet; }
+
 namespace fan
 {
 	//==============================================================================================================================================================
@@ -41,6 +43,8 @@ namespace fan
 	// save			: serializes the component to json
 	// load			: deserializes the component from json
 	// instanciate  : don't touch it, it's auto generated
+	// netSave		: serializes the component into a packet for replication (optional)
+	// netLoad		: deserializes the component from a packet for replication (optional)
 	//==============================================================================================================================================================
 	struct ComponentInfo
 	{
@@ -55,7 +59,9 @@ namespace fan
 		void		 ( *onGui )( EcsWorld&, EntityID, Component& ) = nullptr;	// called by the editor for gui display
 		void		 ( *save )( const Component&, Json& ) = nullptr;			// called when the scene is saved
 		void		 ( *load  )( Component&, const Json& ) = nullptr;			// called when the scene is loaded ( after the init )
-		Component& ( *instanciate )( void* ) = nullptr;							// automagic, don't touch that ( for instancing from and ID )
+		void		 ( *netSave ) ( const Component&, sf::Packet& _packet ) = nullptr;
+		void		 ( *netLoad ) ( Component&, sf::Packet& _packet ) = nullptr;
+		Component&   ( *instanciate )( void* ) = nullptr;							// automagic, don't touch that ( for instancing from and ID )
 	};
 
 #define DECLARE_COMPONENT( _componentType)														\

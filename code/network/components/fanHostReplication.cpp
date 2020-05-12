@@ -1,6 +1,7 @@
 #include "network/components/fanHostReplication.hpp"
 
 #include "ecs/fanEcsWorld.hpp"
+#include "network/singletonComponents/fanLinkingContext.hpp"
 
 namespace fan
 {
@@ -32,7 +33,7 @@ namespace fan
 	Signal<>& HostReplication::Replicate( PacketReplication& _packet, const ReplicationFlags _flags )
 	{
 		nextReplication.emplace_back();
-		SingletonReplicationData& replicationData = nextReplication[nextReplication.size() - 1];
+		ReplicationData& replicationData = nextReplication[nextReplication.size() - 1];
 		replicationData.flags = _flags;
 		replicationData.packet = _packet;
 		return replicationData.onSuccess;
@@ -56,6 +57,37 @@ namespace fan
 	}
 
 	//================================================================================================================================
+	// Builds & returns a replication packet to replicate a list of components on an entity
+	//================================================================================================================================
+	PacketReplication HostReplication::BuildEntityPacket( EcsWorld& _world, const EntityHandle _entityHandle, const std::vector<ComponentIndex>& _componentIndices )
+	{
+		PacketReplication packet;
+		packet.replicationType = PacketReplication::ReplicationType::Entity;
+		packet.packetData.clear();
+
+		const LinkingContext& linkingContext = _world.GetSingletonComponent< LinkingContext> ();
+		const EntityID entityID = _world.GetEntityID( _entityHandle );
+
+		// Serializes net id
+		 const auto it = linkingContext.entityHandleToNetID.find( _entityHandle );
+		 const NetID netID = it->second;
+		 packet.packetData << sf::Uint32( netID );
+		 packet.packetData << sf::Uint8( _componentIndices.size() );
+		 if( it != linkingContext.entityHandleToNetID.end() )
+		 {
+			 for( const ComponentIndex index : _componentIndices )
+			 {
+				 const ComponentInfo& info = _world.GetComponentInfo( index );
+				 Component& component = _world.GetComponent( entityID, index );
+				 packet.packetData << sf::Uint32( info.staticIndex );
+				 info.netSave( component, packet.packetData );
+			 }
+		 }
+
+		 return packet;
+	}
+
+	//================================================================================================================================
 	// Builds & returns a replication packet for running RPC 
 	//================================================================================================================================
 	PacketReplication HostReplication::BuildRPCPacket( sf::Packet& _dataRPC )
@@ -73,7 +105,7 @@ namespace fan
 	//================================================================================================================================
 	void HostReplication::Write( Packet& _packet )
 	{
-		for( SingletonReplicationData& data : nextReplication )
+		for( ReplicationData& data : nextReplication )
 		{
 			data.packet.Write( _packet );
 			if( data.flags & ReplicationFlags::ResendUntilReplicated )
@@ -92,11 +124,11 @@ namespace fan
 	//================================================================================================================================
 	void HostReplication::OnReplicationSuccess( const PacketTag _packetTag )
 	{
-		using MMapIt = std::multimap< PacketTag, SingletonReplicationData>::iterator;
+		using MMapIt = std::multimap< PacketTag, ReplicationData>::iterator;
 		std::pair<MMapIt, MMapIt> result = pendingReplication.equal_range( _packetTag );
 		for( MMapIt it = result.first; it != result.second; it++ )
 		{
-			SingletonReplicationData& data = it->second;
+			ReplicationData& data = it->second;
 			data.onSuccess.Emmit();
 		}
 		pendingReplication.erase( _packetTag );
@@ -108,11 +140,11 @@ namespace fan
 	//================================================================================================================================
 	void HostReplication::OnReplicationFail( const PacketTag _packetTag )
 	{
-		using MMapIt = std::multimap< PacketTag, SingletonReplicationData>::iterator;
+		using MMapIt = std::multimap< PacketTag, ReplicationData>::iterator;
 		std::pair<MMapIt, MMapIt> result = pendingReplication.equal_range( _packetTag );
 		for( MMapIt it = result.first; it != result.second; it++ )
 		{
-			SingletonReplicationData& data = it->second;
+			ReplicationData& data = it->second;
 			nextReplication.push_back( data );
 		}
 		pendingReplication.erase( _packetTag );

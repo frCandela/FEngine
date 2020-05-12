@@ -39,7 +39,9 @@ namespace fan
 			ClientGameData& gameData = _world.GetComponent<ClientGameData>( entityID );
 
 			// spawns spaceship
-			if( gameData.spaceshipSpawnFrameIndex != 0 && game.frameIndex >= gameData.spaceshipSpawnFrameIndex )
+			if( gameData.spaceshipSpawnFrameIndex != 0 
+				&& game.frameIndex >= gameData.spaceshipSpawnFrameIndex
+				&& gameData.spaceshipHandle == 0 )
 			{
 				assert( gameData.spaceshipNetID != 0 );
 

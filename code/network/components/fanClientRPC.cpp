@@ -24,7 +24,7 @@ namespace fan
 		rpc.nameToRPCTable.clear();
 		rpc.onShiftFrameIndex.Clear();
 		rpc.onSpawnClientShip.Clear();
-
+		rpc.onSpawnShip.Clear();
 		rpc.RegisterRPCs();
 	}
 

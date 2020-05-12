@@ -23,6 +23,7 @@ namespace fan
 		void ProcessPacket( PacketReplication& _packet );
 
 		std::vector< PacketReplication > replicationListSingletons;
+		std::vector< PacketReplication > replicationListEntities;
 		std::vector< PacketReplication > replicationListRPC;
 	};
 }

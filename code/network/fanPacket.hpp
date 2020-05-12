@@ -184,7 +184,7 @@ namespace fan
 		enum class ReplicationType
 		{
 			  SingletonComponent
-			, Component
+			, Entity
 			, RPC
 			, Count
 		};

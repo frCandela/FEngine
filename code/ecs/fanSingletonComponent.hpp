@@ -44,7 +44,7 @@ namespace fan
 	};
 
 #define DECLARE_SINGLETON_COMPONENT()		\
-	private:								\
+	public:									\
 	friend class EcsWorld;					\
 	static const uint32_t s_typeInfo;		\
 

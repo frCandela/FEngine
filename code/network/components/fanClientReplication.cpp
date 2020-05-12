@@ -33,7 +33,7 @@ namespace fan
 	{
 		switch( _packet.replicationType )
 		{
-		case PacketReplication::ReplicationType::Component:				assert( false );								break;
+		case PacketReplication::ReplicationType::Entity:				replicationListEntities.push_back( _packet );	break;
 		case PacketReplication::ReplicationType::SingletonComponent:	replicationListSingletons.push_back( _packet );	break;
 		case PacketReplication::ReplicationType::RPC:					replicationListRPC.push_back( _packet );		break;
 		default:														assert( false );								break;
