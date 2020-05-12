@@ -34,8 +34,12 @@ namespace fan
 		void					 UnwrapShiftClientFrame( sf::Packet& _packet );
 		static PacketReplication RPCShiftClientFrame( const int _framesDelta );
 
+		Signal < NetID, FrameIndex > onSpawnClientShip;
+		void					 UnwrapSpawnClientShip( sf::Packet& _packet );
+		static PacketReplication RPCSpawnClientShip( const NetID _spaceshipID, const FrameIndex _frameIndex );
+
 		Signal < NetID, FrameIndex > onSpawnShip;
-		void					 UnwrapSpawnShip( sf::Packet& _packet );
-		static PacketReplication RPCSSpawnShip( const NetID _spaceshipID, const FrameIndex _frameIndex );
+		void					 UnwrapSpawnShip( sf::Packet& _packet);
+		static PacketReplication RPCSpawnShip( const NetID _spaceshipID, const FrameIndex _frameIndex );
 	};
 }

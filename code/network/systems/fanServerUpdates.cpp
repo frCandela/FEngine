@@ -34,6 +34,7 @@ namespace fan
 	{
 		if( _delta == 0.f ) { return; }
 
+		HostManager& hostManager = _world.GetSingletonComponent<HostManager>();
 		LinkingContext& linkingContext = _world.GetSingletonComponent<LinkingContext>();
 		const Game& game = _world.GetSingletonComponent<Game>();
 
@@ -53,13 +54,29 @@ namespace fan
 						hostData.spaceshipHandle = Game::SpawnSpaceship( _world );
 						hostData.spaceshipID = linkingContext.nextNetID++;
 						linkingContext.AddEntity( hostData.spaceshipHandle, hostData.spaceshipID );
-
+						const FrameIndexNet spawnFrame = game.frameIndex + 60;
 						hostReplication.Replicate(
-							ClientRPC::RPCSSpawnShip( hostData.spaceshipID, game.frameIndex + 60 )
+							ClientRPC::RPCSpawnClientShip( hostData.spaceshipID, spawnFrame )
 							, HostReplication::ResendUntilReplicated
 						);
 
-						hostData.nextPlayerStateFrame = game.frameIndex + 120; // next player state snapshot will be 7 frames later
+						hostData.nextPlayerStateFrame = spawnFrame + 60; // next player state snapshot done later
+
+						// replicate new host on all other hosts
+						for( const auto& pair : hostManager.hostHandles )
+						{
+							const EntityHandle otherHostHandle = pair.second;
+							const EntityID otherHostID = _world.GetEntityID( otherHostHandle );
+
+							if( otherHostID != entityID )
+							{
+								HostReplication& otherHostReplication = _world.GetComponent< HostReplication >( otherHostID );
+								otherHostReplication.Replicate(
+									ClientRPC::RPCSpawnShip( hostData.spaceshipID, spawnFrame )
+									, HostReplication::ResendUntilReplicated
+								);
+							}
+						}
 					}
 				}
 			}

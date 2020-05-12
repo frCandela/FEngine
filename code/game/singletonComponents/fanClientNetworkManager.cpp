@@ -63,7 +63,8 @@ namespace fan
 		ClientGameData& gameData = _world.GetComponent<ClientGameData>( persistentID );
 		rpcManager.onShiftFrameIndex.Connect( &ClientGameData::OnShiftFrameIndex, &gameData );
 		rpcManager.onShiftFrameIndex.Connect( &Game::OnShiftFrameIndex, &game );
-		rpcManager.onSpawnShip.Connect( &ClientGameData::OnSpawnShip, &gameData );
+		rpcManager.onSpawnClientShip.Connect( &ClientGameData::OnSpawnShip, &gameData );
+		rpcManager.onSpawnShip.Connect( &ClientNetworkManager::OnSpawnShip, this );
 
 		// Bind socket
 		ClientConnection& connection = _world.GetComponent<ClientConnection>( persistentID );
@@ -90,6 +91,13 @@ namespace fan
 		connection.state = ClientConnection::ClientState::Stopping;
 		S_ClientSend::Run( _world, _world.Match( S_ClientSend::GetSignature( _world ) ), .42f );// send a last packet
 		connection.socket.Unbind();
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
+	void ClientNetworkManager::OnSpawnShip( NetID _spaceshipID, FrameIndex _frameIndex )
+	{
+		Debug::Highlight() << "spawn " << _spaceshipID << " " << _frameIndex << Debug::Endl();
 	}
 
 	//================================================================================================================================

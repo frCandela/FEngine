@@ -23,7 +23,7 @@ namespace fan
 		ClientRPC& rpc = static_cast<ClientRPC&>( _component );
 		rpc.nameToRPCTable.clear();
 		rpc.onShiftFrameIndex.Clear();
-		rpc.onSpawnShip.Clear();
+		rpc.onSpawnClientShip.Clear();
 
 		rpc.RegisterRPCs();
 	}
@@ -34,7 +34,8 @@ namespace fan
 	void ClientRPC::RegisterRPCs( )
 	{
 		RegisterUnwrapFunction( 'SYNC', &ClientRPC::UnwrapShiftClientFrame );
-		RegisterUnwrapFunction( 'SPWN', &ClientRPC::UnwrapSpawnShip );
+		RegisterUnwrapFunction( 'SPWN', &ClientRPC::UnwrapSpawnClientShip );
+		RegisterUnwrapFunction( 'SPSH', &ClientRPC::UnwrapSpawnShip );
 	}
 
 	//================================================================================================================================
@@ -85,8 +86,9 @@ namespace fan
 	}
 
 	//================================================================================================================================
+	// spawns the clients spaceship at a specific frame
 	//================================================================================================================================
-	PacketReplication ClientRPC::RPCSSpawnShip( const NetID _spaceshipID, const FrameIndex _frameIndex )
+	PacketReplication ClientRPC::RPCSpawnClientShip( const NetID _spaceshipID, const FrameIndex _frameIndex )
 	{
 		PacketReplication packet;
 		packet.replicationType = PacketReplication::ReplicationType::RPC;
@@ -100,6 +102,36 @@ namespace fan
 	}
 
 	//================================================================================================================================
+	// spawns the clients spaceship at a specific frame
+	//================================================================================================================================
+	void ClientRPC::UnwrapSpawnClientShip( sf::Packet& _packet )
+	{
+		FrameIndexNet frameIndex;
+		NetID spaceshipID;
+
+		_packet >> spaceshipID;
+		_packet >> frameIndex;
+		onSpawnClientShip.Emmit( spaceshipID, frameIndex );
+	}
+
+	//================================================================================================================================
+	// spawns a spaceship controlled by another client
+	//================================================================================================================================
+	PacketReplication ClientRPC::RPCSpawnShip( const NetID _spaceshipID, const FrameIndex _frameIndex )
+	{
+		PacketReplication packet;
+		packet.replicationType = PacketReplication::ReplicationType::RPC;
+
+		packet.packetData.clear();
+		packet.packetData << RpcId( 'SPSH' );
+		packet.packetData << _spaceshipID;
+		packet.packetData << FrameIndexNet( _frameIndex );
+
+		return packet;
+	}
+
+	//================================================================================================================================
+	// spawns a spaceship controlled by another client
 	//================================================================================================================================
 	void ClientRPC::UnwrapSpawnShip( sf::Packet& _packet )
 	{

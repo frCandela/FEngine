@@ -1,6 +1,7 @@
 #pragma once
 
 #include "ecs/fanSingletonComponent.hpp"
+#include "network/fanPacket.hpp"
 
 namespace fan
 {
@@ -21,5 +22,7 @@ namespace fan
 		void Stop( EcsWorld& _world );			
 
 		SceneNode* playerPersistent;
+		void OnSpawnShip( NetID _spaceshipID, FrameIndex _frameIndex );
+
 	};
 }
