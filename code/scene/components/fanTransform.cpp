@@ -2,6 +2,7 @@
 
 #include "core/fanSerializable.hpp"
 #include "core/math/fanMathUtils.hpp"
+#include "network/fanPacket.hpp"
 
 namespace fan
 {
@@ -95,6 +96,32 @@ namespace fan
 		transform.transform.setOrigin( tmpVec );
 		transform.transform.setRotation( tmpQuat );
  	}
+
+	//================================================================================================================================
+	//================================================================================================================================
+	void Transform::NetSave( const Component& _component, sf::Packet& _packet )
+	{
+		const Transform& transform = static_cast<const Transform&>( _component );
+		const btVector3 position = transform.GetPosition();
+		const float rotation = transform.GetRotationEuler().y();
+
+		_packet << position[0] << position[2];
+		_packet << rotation;
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
+	void Transform::NetLoad( Component& _component, sf::Packet& _packet )
+	{
+		Transform& transform = static_cast<Transform&>( _component );
+		btVector3 position( 0.f, 0.f, 0.f );
+		float rotation;
+		_packet >> position[0] >> position[2];
+		_packet >> rotation;
+
+		transform.SetPosition( position );
+		transform.SetRotationEuler( btVector3( 0.f, rotation, 0.f ) );
+	}
 
 	//================================================================================================================================
 	//================================================================================================================================

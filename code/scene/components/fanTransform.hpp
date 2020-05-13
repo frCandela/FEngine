@@ -20,6 +20,8 @@ namespace fan
 		static void OnGui( EcsWorld& _world, EntityID _entityID, Component& _component );
 		static void Save( const Component& _component, Json& _json );
 		static void Load( Component& _component, const Json& _json );
+		static void NetSave( const Component& _component, sf::Packet& _packet );
+		static void NetLoad( Component& _component, sf::Packet& _packet );
 
 		void SetPosition( btVector3 _newPosition );
 		void SetScale( btVector3 _newScale );
