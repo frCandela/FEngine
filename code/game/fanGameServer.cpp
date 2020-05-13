@@ -244,6 +244,31 @@ namespace fan
 			S_UpdateBoundsFromTransform	::Run( world, world.Match( S_UpdateBoundsFromTransform::GetSignature( world ) )	, _delta );
 			S_UpdateGameCamera			::Run( world, world.Match( S_UpdateGameCamera::GetSignature( world ) )			, _delta );			
 			
+			HostManager& hostManager = world.GetSingletonComponent<HostManager>();
+			for( const std::pair<HostManager::IPPort, EntityHandle>& pair : hostManager.hostHandles )
+			{
+				const EntityHandle hostHandle = pair.second;
+				const EntityID hostID = world.GetEntityID( hostHandle );
+				const HostGameData& hostData = world.GetComponent<HostGameData>( hostID );
+				if( hostData.spaceshipHandle != 0 )
+				{
+					const PacketReplication packet = HostReplication::BuildEntityPacket( world, hostData.spaceshipHandle, { Transform::s_typeInfo/*,Rigidbody::s_typeInfo*/ } );
+
+					for( const std::pair<HostManager::IPPort, EntityHandle>& otherPair : hostManager.hostHandles )
+					{
+						const EntityHandle otherHostHandle = otherPair.second;
+						if( otherHostHandle != hostHandle )
+						{
+							const EntityID otherHostID = world.GetEntityID( otherHostHandle );
+							HostReplication& hostReplication = world.GetComponent<HostReplication>( otherHostID );
+							hostReplication.Replicate( packet, HostReplication::None );
+						}
+					}
+				}
+			}
+
+
+
 			S_ServerSend				::Run( world, world.Match( S_ServerSend::GetSignature( world ) )				, _delta );
 		}
 

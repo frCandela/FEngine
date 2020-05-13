@@ -110,6 +110,8 @@ namespace fan
 	{
 		if( _delta == 0.f ) { return; }
 
+		LinkingContext& linkingContext = _world.GetSingletonComponent<LinkingContext>();
+
 		for( EntityID entityID : _entities )
 		{
 			ClientReplication&	replication = _world.GetComponent<ClientReplication>( entityID );
@@ -126,6 +128,34 @@ namespace fan
 				assert( packet.packetData.endOfPacket() );
 			}
 			replication.replicationListSingletons.clear();
+
+			// replicate entities
+			for( PacketReplication packet : replication.replicationListEntities )
+			{
+				NetID netID;
+				sf::Uint8 numComponents;
+
+				packet.packetData >> netID;
+				packet.packetData >> numComponents;
+
+				auto it = linkingContext.netIDToEntityHandle.find( netID );
+				if( it != linkingContext.netIDToEntityHandle.end() )
+				{
+					const EntityHandle replicatedHandle = it->second;
+					const EntityID replicatedID = _world.GetEntityID( replicatedHandle );
+
+					for( int i = 0; i < numComponents; i++ )
+					{
+						sf::Uint32 staticIndex;
+						packet.packetData >> staticIndex;
+						const ComponentIndex dynamicIndex = _world.GetDynamicIndex( staticIndex );
+						const ComponentInfo& info = _world.GetComponentInfo( dynamicIndex );
+						Component& component = _world.GetComponent( replicatedID, dynamicIndex );
+						info.netLoad( component, packet.packetData );
+					}
+				}
+			}
+			replication.replicationListEntities.clear();
 
 			// replicate RPC
 			for( PacketReplication packet : replication.replicationListRPC )

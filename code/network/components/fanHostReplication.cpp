@@ -30,7 +30,7 @@ namespace fan
 	// returns a success signal that the caller can connect to to get notified of the acknowledgments 
 	// ( ResendUntilReplicated flag must be on )
 	//================================================================================================================================
-	Signal<>& HostReplication::Replicate( PacketReplication& _packet, const ReplicationFlags _flags )
+	Signal<>& HostReplication::Replicate( const PacketReplication& _packet, const ReplicationFlags _flags )
 	{
 		nextReplication.emplace_back();
 		ReplicationData& replicationData = nextReplication[nextReplication.size() - 1];
@@ -59,7 +59,7 @@ namespace fan
 	//================================================================================================================================
 	// Builds & returns a replication packet to replicate a list of components on an entity
 	//================================================================================================================================
-	PacketReplication HostReplication::BuildEntityPacket( EcsWorld& _world, const EntityHandle _entityHandle, const std::vector<ComponentIndex>& _componentIndices )
+	PacketReplication HostReplication::BuildEntityPacket( EcsWorld& _world, const EntityHandle _entityHandle, const std::vector<uint32_t>& _componentTypeInfo )
 	{
 		PacketReplication packet;
 		packet.replicationType = PacketReplication::ReplicationType::Entity;
@@ -71,12 +71,13 @@ namespace fan
 		// Serializes net id
 		 const auto it = linkingContext.entityHandleToNetID.find( _entityHandle );
 		 const NetID netID = it->second;
-		 packet.packetData << sf::Uint32( netID );
-		 packet.packetData << sf::Uint8( _componentIndices.size() );
+		 packet.packetData << netID;
+		 packet.packetData << sf::Uint8( _componentTypeInfo.size() );
 		 if( it != linkingContext.entityHandleToNetID.end() )
 		 {
-			 for( const ComponentIndex index : _componentIndices )
+			 for( const uint32_t typeInfo : _componentTypeInfo )
 			 {
+				 const ComponentIndex index = _world.GetDynamicIndex( typeInfo );
 				 const ComponentInfo& info = _world.GetComponentInfo( index );
 				 Component& component = _world.GetComponent( entityID, index );
 				 packet.packetData << sf::Uint32( info.staticIndex );

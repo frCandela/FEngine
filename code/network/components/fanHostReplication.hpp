@@ -37,12 +37,12 @@ namespace fan
 	
 		void		Write( Packet& _packet );
 
-		Signal<>&	Replicate( PacketReplication& _packet, const ReplicationFlags _flags );
+		Signal<>&	Replicate( const PacketReplication& _packet, const ReplicationFlags _flags );
 		void		OnReplicationSuccess( const PacketTag _packetTag );
 		void		OnReplicationFail( const PacketTag _packetTag );
 
 		static PacketReplication BuildSingletonPacket( const EcsWorld& _world, const uint32_t _staticID );
-		static PacketReplication BuildEntityPacket( EcsWorld& _world, const EntityHandle _entityHandle, const std::vector<ComponentIndex>& _componentIndices );
+		static PacketReplication BuildEntityPacket( EcsWorld& _world, const EntityHandle _entityHandle, const std::vector<uint32_t>& _componentTypeInfo );
 		static PacketReplication BuildRPCPacket( sf::Packet& _dataRPC );
 	};
 	static constexpr size_t sizeof_hostReplication = sizeof( HostReplication );

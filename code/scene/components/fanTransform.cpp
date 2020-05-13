@@ -17,6 +17,8 @@ namespace fan
 		_info.init = &Transform::Init;
 		_info.save = &Transform::Save;
 		_info.load = &Transform::Load;
+		_info.netSave = &Transform::NetSave;
+		_info.netLoad = &Transform::NetLoad;
 		_info.editorPath = "/";
 	}
 
@@ -119,8 +121,8 @@ namespace fan
 		_packet >> position[0] >> position[2];
 		_packet >> rotation;
 
-		transform.SetPosition( position );
 		transform.SetRotationEuler( btVector3( 0.f, rotation, 0.f ) );
+		transform.SetPosition( position );
 	}
 
 	//================================================================================================================================

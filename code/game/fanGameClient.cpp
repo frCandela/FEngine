@@ -291,8 +291,8 @@ namespace fan
 
 			S_ProcessTimedOutPackets	::Run( world, world.Match( S_ProcessTimedOutPackets::GetSignature( world ) ) );
 			S_ClientDetectServerTimeout	::Run( world, world.Match( S_ClientDetectServerTimeout::GetSignature( world ) )	, _delta );
-			S_ClientRunReplication		::Run( world, world.Match( S_ClientRunReplication::GetSignature( world ) )		, _delta );
 			S_ClientSpawnSpaceship		::Run( world, world.Match( S_ClientSpawnSpaceship::GetSignature( world ) )		, _delta );
+			S_ClientRunReplication		::Run( world, world.Match( S_ClientRunReplication::GetSignature( world ) )		, _delta );
 
 			// update
 			S_RefreshPlayerInput::Run( world, world.Match( S_RefreshPlayerInput::GetSignature( world ) ), _delta );
