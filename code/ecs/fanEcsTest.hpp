@@ -285,7 +285,7 @@ namespace fan
 	{		
 		Archetype*		archetype = nullptr;
 		EntityHandle2	handle	  = 0;
-		uint32_t		index = 0;	// index of the entity in the chunk
+		uint32_t		index = 0;	// index of the entity in the archetype
 	};
 
 	//================================
@@ -300,9 +300,34 @@ namespace fan
 		EntityHandle2									m_nextHandle = 1; // 0 is a null handle
 		std::vector< Entity2 >							m_deadEntities;
 
-		void Kill( const Entity2& _entity )
+		int NumComponents() const 
 		{
-			m_deadEntities.push_back( _entity );
+			return int(m_componentsInfo.size());
+		}
+
+		void EndFrame()
+		{
+			// Remove dead entities
+			for ( const Entity2& entity : m_deadEntities )
+			{
+				for (int i = 0; i < NumComponents(); i++)
+				{
+					if( entity.archetype->m_signature[i] )
+					{
+						entity.archetype->m_chunks[i].Remove( entity.index );
+					}
+				}	
+				entity.archetype->m_size --;
+			}
+			m_deadEntities.clear();
+		}
+
+		void Kill( Archetype& _archetype,  const uint32_t _index )
+		{
+			Entity2 entity;
+			entity.archetype = &_archetype;
+			entity.index = _index;
+			m_deadEntities.push_back( entity );
 		}
 
 		EntityHandle CreateHandle( const EntityID2 _entityID )
@@ -372,8 +397,7 @@ namespace fan
 			// copy old components from the old archetype to the new archetype
 			if( oldArchetype != nullptr )
 			{
-				const size_t numComponents = m_componentsInfo.size();
-				for( int i = 0; i < numComponents; i++ )
+				for( int i = 0; i < NumComponents(); i++ )
 				{
 					if( oldArchetype->m_signature[i] )
 					{

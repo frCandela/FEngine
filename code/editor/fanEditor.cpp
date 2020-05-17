@@ -303,7 +303,7 @@ namespace fan
 					if( hasSpeed )		{ m_world2.AddComponent( entity, Speed2::Info::s_type ); }
 					if( hasExpiration ) { m_world2.AddComponent( entity, Expiration2::Info::s_type ); }
 				}
-			}
+			}				
 
 			ImGui::Text( "num entities: %d", m_world2.m_entities.size() );
 
@@ -342,20 +342,21 @@ namespace fan
 				ImGui::Columns( 1 );
 			}
 
-
 			if( ImGui::CollapsingHeader( "Entities" ) )
 			{
 				for( std::pair<Signature2, Archetype*> pair : m_world2.m_archetypes )
 				{
 					Archetype& archetype = *pair.second;
+					std::stringstream ss;
+					ss << archetype.m_signature;
+					ImGui::Text( "%s", ss.str().c_str() );
 					for( uint32_t i = 0; i < archetype.m_size; i++ )
 					{
-						if( ImGui::Button( "X" ) )
-						{
-
-						}
 						ImGui::SameLine();
-						ImGui::Text( "%d", i );
+						if( ImGui::Button( std::to_string(i).c_str() ) )
+						{
+							m_world2.Kill( archetype, i );
+						}						
 					}
 				}
 			}
@@ -463,11 +464,10 @@ namespace fan
 					Debug::Error() << "ERROR" << Debug::Endl();
 				}
 			}
-
-
-
 		}
 		ImGui::End();
+
+		m_world2.EndFrame();
 	}
 
 	//================================================================================================================================
