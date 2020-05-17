@@ -169,8 +169,8 @@ namespace fan
 		{
 			const int chunkIndex = _index / m_chunkCapacity;
 			const int elementIndex = _index % m_chunkCapacity;
-			assert( _index.chunkIndex < m_chunks.size() );
-			assert( _index.elementIndex < m_chunks[_index.chunkIndex].Size() );
+			assert( chunkIndex < m_chunks.size() );
+			assert( elementIndex < m_chunks[chunkIndex].Size() );
 
 			Chunk& chunk = m_chunks[chunkIndex];
 
@@ -199,8 +199,8 @@ namespace fan
 		{
 			const int chunkIndex = _index / m_chunkCapacity;
 			const int elementIndex = _index % m_chunkCapacity;
-			assert( _index.chunkIndex < m_chunks.size() );
-			assert( _index.elementIndex < m_chunks[_index.chunkIndex].Size() );
+			assert( chunkIndex < m_chunks.size() );
+			assert( elementIndex < m_chunks[chunkIndex].Size() );
 			
 			return m_chunks[chunkIndex].At( elementIndex );
 		}
@@ -254,11 +254,15 @@ namespace fan
 	class Archetype
 	{
 	public:
+		struct EntityData
+		{
+			bool isDead  = false;
+		};
+
 		void Create( const std::vector< ComponentInfo2 >& _componentsInfo, const Signature2& _signature )
 		{
 			const size_t numComponents = _componentsInfo.size();
 
-			m_size = 0;
 			m_signature = _signature;
 			m_chunks.resize( numComponents );
 
@@ -272,11 +276,18 @@ namespace fan
 			}
 		}
 
-		bool Empty() const { return m_size == 0; }
+		void RemoveEntity( const int _entityIndex )
+		{
+			m_entities[_entityIndex] = *m_entities.rbegin();
+			m_entities.pop_back();
+		}
+
+		int		Size() const  { return int(m_entities.size());  }
+		bool	Empty() const { return m_entities.empty(); }
 
 		Signature2					m_signature;
-		std::vector< ChunkVector >	m_chunks;		// components are contained in a list of small buffers
-		uint32_t					m_size;			// number of entities in the archetype
+		std::vector< ChunkVector >	m_chunks;		// one index per component type
+		std::vector<EntityData>		m_entities;	
 	};
 
 	//================================
@@ -298,7 +309,6 @@ namespace fan
 		std::unordered_map<uint32_t, ComponentIndex2>	m_typeToIndex;
 		std::unordered_map< EntityHandle2, EntityID2 >	m_handles;
 		EntityHandle2									m_nextHandle = 1; // 0 is a null handle
-		std::vector< Entity2 >							m_deadEntities;
 
 		int NumComponents() const 
 		{
@@ -307,27 +317,32 @@ namespace fan
 
 		void EndFrame()
 		{
-			// Remove dead entities
-			for ( const Entity2& entity : m_deadEntities )
+			for ( auto pair : m_archetypes)
 			{
-				for (int i = 0; i < NumComponents(); i++)
+				Archetype& archetype = *pair.second;
+				for (int entityIndex = archetype.Size() - 1; entityIndex >= 0 ; entityIndex--)
 				{
-					if( entity.archetype->m_signature[i] )
+					if( archetype.m_entities[entityIndex].isDead )
 					{
-						entity.archetype->m_chunks[i].Remove( entity.index );
+						for( int componentIndex = 0; componentIndex < NumComponents(); componentIndex++ )
+						{
+							if( archetype.m_signature[componentIndex] )
+							{
+								archetype.m_chunks[componentIndex].Remove( entityIndex );
+							}
+						}
+						archetype.RemoveEntity( entityIndex );
 					}
-				}	
-				entity.archetype->m_size --;
+				}				
 			}
-			m_deadEntities.clear();
+
+			// update handles
+			m_entities.clear();
 		}
 
 		void Kill( Archetype& _archetype,  const uint32_t _index )
 		{
-			Entity2 entity;
-			entity.archetype = &_archetype;
-			entity.index = _index;
-			m_deadEntities.push_back( entity );
+			_archetype.m_entities[_index].isDead = true;
 		}
 
 		EntityHandle CreateHandle( const EntityID2 _entityID )
@@ -404,10 +419,15 @@ namespace fan
 						newArchetype->m_chunks[i].PushBack( oldArchetype->m_chunks[i].At( entity.index ) );
 						oldArchetype->m_chunks[i].Remove( entity.index );
 					}
+
 				}
-				oldArchetype->m_size--;
+				newArchetype->m_entities.push_back( oldArchetype->m_entities[entity.index] );
+				oldArchetype->RemoveEntity( entity.index );
 			}
-			newArchetype->m_size++;
+			else
+			{
+				newArchetype->m_entities.emplace_back();
+			}
 
 			// create new component
 			entity.index = newArchetype->m_chunks[index].EmplaceBack();
@@ -506,10 +526,8 @@ namespace fan
 		template < typename _ComponentType >
 		void Kill( const Iterator<_ComponentType> _iterator )
 		{
-			Entity2 _entity;
-			_entity.archetype = _iterator.m_currentArchetype;
-			_entity.index = _iterator.m_chunkIndex * _iterator.m_currentChunk->Capacity() + _iterator.m_elementIndex;
-			m_world.Kill( _entity );
+			const uint32_t index = _iterator.m_chunkIndex * _iterator.m_currentChunk->Capacity() + _iterator.m_elementIndex;
+			m_world.Kill( *_iterator.m_currentArchetype, index );
 		}
 	};
 }

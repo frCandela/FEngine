@@ -322,7 +322,7 @@ namespace fan
 					std::stringstream ss;
 					ss << it->first;
 					ImGui::Text( "%s ", ss.str().c_str() );	ImGui::NextColumn();
-					ImGui::Text( "%d ", archetype.m_size );	ImGui::NextColumn();
+					ImGui::Text( "%d ", archetype.Size() );	ImGui::NextColumn();
 
 					for (int i = 0; i < archetype.m_chunks.size(); i++)
 					{
@@ -350,7 +350,8 @@ namespace fan
 					std::stringstream ss;
 					ss << archetype.m_signature;
 					ImGui::Text( "%s", ss.str().c_str() );
-					for( uint32_t i = 0; i < archetype.m_size; i++ )
+					ImGui::PushID( ss.str().c_str() );
+					for( int i = 0; i < archetype.Size(); i++ )
 					{
 						ImGui::SameLine();
 						if( ImGui::Button( std::to_string(i).c_str() ) )
@@ -358,6 +359,7 @@ namespace fan
 							m_world2.Kill( archetype, i );
 						}						
 					}
+					ImGui::PopID();
 				}
 			}
 
@@ -388,7 +390,7 @@ namespace fan
 
 			const ComponentIndex2 indexPos = m_world2.m_typeToIndex[Position2::Info::s_type];
 			const ComponentIndex2 indexSpeed = m_world2.m_typeToIndex[Speed2::Info::s_type];
-			const Signature2 targetSignature = ( Signature2( 1 ) << indexPos ) | ( Signature2( 1 ) << indexSpeed );
+			const Signature2 targetSignature = ( Signature2( 1 ) << indexPos );
 
 			if( ImGui::Button( "Init" ) ){
 				// Init 
@@ -454,7 +456,7 @@ namespace fan
 					for( SystemView::Iterator<Position2> positionIt = view.Begin<Position2>(); !positionIt.End(); ++positionIt )
 					{
 						total2 += ( *positionIt ).position[0];
-						//fview.Kill( positionIt );
+						view.Kill( positionIt );
 					}
 				}
 
