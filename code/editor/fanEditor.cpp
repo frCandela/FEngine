@@ -286,7 +286,7 @@ namespace fan
 			static bool hasPosition = true;
 			static bool hasSpeed = true;
 			static bool hasExpiration = true;
-			static int num = 100;
+			static int num = 1;
 
 			ImGui::Checkbox( "position", &hasPosition ); ImGui::SameLine();
 			ImGui::Checkbox( "speed", &hasSpeed ); ImGui::SameLine();
@@ -296,12 +296,12 @@ namespace fan
 			if( ImGui::Button( "Create entity" ) )
 			{
 				ScopedTimer timer( "Create" );
-				for( int i = 0; i < num; i++ )
+				for( int i = 0; i < num; i++ ) 
 				{
-					const EntityID2 entityID = m_world2.CreateEntity();
-					if( hasPosition )	{ m_world2.AddComponent( entityID, Position2::Info::s_type ); }
-					if( hasSpeed )		{ m_world2.AddComponent( entityID, Speed2::Info::s_type ); }
-					if( hasExpiration ) { m_world2.AddComponent( entityID, Expiration2::Info::s_type ); }
+					EntityID2 entity = m_world2.CreateEntity();
+					if( hasPosition )	{ m_world2.AddComponent( entity, Position2::Info::s_type ); }
+					if( hasSpeed )		{ m_world2.AddComponent( entity, Speed2::Info::s_type ); }
+					if( hasExpiration ) { m_world2.AddComponent( entity, Expiration2::Info::s_type ); }
 				}
 			}
 
@@ -317,7 +317,7 @@ namespace fan
 
 				for( auto it = m_world2.m_archetypes.begin(); it != m_world2.m_archetypes.end(); ++it )
 				{
-					Archetype& archetype = it->second;
+					Archetype& archetype = * it->second;
 
 					std::stringstream ss;
 					ss << it->first;
@@ -326,15 +326,42 @@ namespace fan
 
 					for (int i = 0; i < archetype.m_chunks.size(); i++)
 					{
-						ImGui::Text( "%d: ", i ); 
-						for( int j = 0; j < archetype.m_chunks[i].NumChunk(); j++ )
+						if( archetype.m_chunks[i].NumChunk() != 0 )
 						{
-							ImGui::SameLine();
-							ImGui::Text( "%d ", archetype.m_chunks[i].GetChunk(j).Size() );
+							ImGui::Text( "%d: ", i );
+							for( int j = 0; j < archetype.m_chunks[i].NumChunk(); j++ )
+							{
+								ImGui::SameLine();
+								ImGui::Text( "%d ", archetype.m_chunks[i].GetChunk( j ).Size() );
+							}
 						}
 					}
 					ImGui::NextColumn();
 					ImGui::Separator();
+				}
+				ImGui::Columns( 1 );
+			}
+
+			if( ImGui::CollapsingHeader( "entities" ) )
+			{
+				ImGui::Columns( 4 );
+				ImGui::Text( "id" );		ImGui::NextColumn();
+				ImGui::Text( "archetype" ); ImGui::NextColumn();
+				ImGui::Text( "handle" );	ImGui::NextColumn();
+				ImGui::Text( "index" );	ImGui::NextColumn();
+				ImGui::Separator();
+				for (int i = 0; i < m_world2.m_entities.size(); i++)
+				{
+					const Entity2& entity = m_world2.m_entities[i];
+					ImGui::Text( "%d", i );		ImGui::NextColumn();
+
+					std::stringstream ss;
+					if( entity.archetype == nullptr ) { ss << "null"; }
+					else { ss << entity.archetype->m_signature;  }
+					ImGui::Text( "%s", ss.str().c_str() );		ImGui::NextColumn();
+
+					ImGui::Text( "%d", entity.handle );	ImGui::NextColumn();
+					ImGui::Text( "%d-%d", entity.index.chunkIndex, entity.index.elementIndex );	ImGui::NextColumn();
 				}
 				ImGui::Columns( 1 );
 			}
@@ -349,7 +376,7 @@ namespace fan
 				{
 					if( ( it->first & targetSignature ) == targetSignature )
 					{
-						Archetype& archetype = it->second;
+						Archetype& archetype = *it->second;
 						for( int chunkIndex = 0; chunkIndex < archetype.m_chunks[indexPos].NumChunk(); chunkIndex++ )
 						{
 							Chunk& chunk = archetype.m_chunks[indexPos].GetChunk( chunkIndex );
@@ -370,7 +397,7 @@ namespace fan
 				std::vector<Chunk*> match1;
 				for( auto it = m_world2.m_archetypes.begin(); it != m_world2.m_archetypes.end(); ++it )
 				{
-					Archetype& archetype = it->second;
+					Archetype& archetype = *it->second;
 					if( ( archetype.m_signature & targetSignature ) == targetSignature )
 					{
 						ChunkVector& chunks = archetype.m_chunks[indexPos];
@@ -397,9 +424,9 @@ namespace fan
 				MatchComponents match2( m_world2 );
 				for( auto it = m_world2.m_archetypes.begin(); it != m_world2.m_archetypes.end(); ++it )
 				{
-					if( ( it->first & targetSignature ) == targetSignature && ! it->second.Empty() )
+					if( ( it->first & targetSignature ) == targetSignature && ! it->second->Empty() )
 					{
-						match2.m_archetypes.push_back( &( it->second ) );
+						match2.m_archetypes.push_back(  it->second );
 					}
 				}
 				{

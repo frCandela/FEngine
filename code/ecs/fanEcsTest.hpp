@@ -21,9 +21,10 @@ namespace fan
 
 	//================================
 	//================================
-	static constexpr uint32_t signatureLength2 = 4;//256;
+	static constexpr uint32_t signatureLength2 = 8;
 	using Signature2 = std::bitset<signatureLength2>;
 	using EntityID2 = uint32_t;
+	using EntityHandle2 = uint32_t;
 	using ComponentIndex2 = uint16_t;
 	static constexpr uint32_t aliveBit2 = signatureLength2 - 1;
 	static constexpr size_t chunkMaxSize = 65536;
@@ -280,34 +281,51 @@ namespace fan
 	//================================
 	//================================
 	struct Entity2
-	{
-		Signature2	signature;	// signature of all components & tags
-		Archetype* archetype;
-		ChunkVector::Index index;
+	{		
+		Archetype* archetype = nullptr;
+		ChunkVector::Index index = { 0,0 };
+		EntityHandle2 handle = 0;
 	};
 
 	//================================
 	//================================
 	struct EcsWorld2
 	{
-		std::unordered_map< Signature2, Archetype >	 m_archetypes;
-		std::vector< ComponentInfo2 >				 m_componentsInfo;
-		std::vector< Entity2 >						 m_entities;
-		std::unordered_map<uint32_t, ComponentIndex2> m_typeToIndex;
+		std::unordered_map< Signature2, Archetype* >	m_archetypes;
+		std::vector< ComponentInfo2 >					m_componentsInfo;
+		std::vector< Entity2 >							m_entities;
+		std::unordered_map<uint32_t, ComponentIndex2>	m_typeToIndex;
+		std::unordered_map< EntityHandle2, EntityID2 >	m_handles;
+		EntityHandle2									m_nextHandle = 1; // 0 is a null handle
+
+		EntityHandle CreateHandle( const EntityID2 _entityID )
+		{
+			Entity2& entity = m_entities[_entityID];
+			if( entity.handle != 0 )
+			{
+				return entity.handle;
+			}
+			else
+			{
+				entity.handle = m_nextHandle++;
+				m_handles[entity.handle] = _entityID;
+				return entity.handle;
+			}
+		}
 
 		Archetype* FindArchetype( const Signature2 _signature )
 		{
 			auto it = m_archetypes.find( _signature );
-			return it == m_archetypes.end() ? nullptr : &it->second;
+			return it == m_archetypes.end() ? nullptr : it->second;
 		}
 
 		Archetype& CreateArchetype( const Signature2 _signature )
 		{
 			assert( FindArchetype( _signature ) == nullptr );
-			m_archetypes.emplace( _signature, Archetype() );
-			Archetype& archetype = m_archetypes[_signature];
-			archetype.Create( m_componentsInfo, _signature );
-			return archetype;
+			Archetype* newArchetype = new Archetype();
+			newArchetype->Create( m_componentsInfo, _signature );
+			m_archetypes[_signature] = newArchetype;
+			return *newArchetype;
 		}
 
 		template <typename _ComponentType >
@@ -324,25 +342,25 @@ namespace fan
 
 			m_typeToIndex[_ComponentType::Info::s_type] = index;
 		}
-
-		Component2& AddComponent( const EntityID2 _entityID, const uint32_t s_type )
+		
+		Component2& AddComponent( EntityID2& _entityID, const uint32_t s_type )
 		{
-			const uint32_t index = m_typeToIndex[s_type];
 			Entity2& entity = m_entities[_entityID];
-			assert( !entity.signature[index] ); // entity doesn't already have this component
+			const uint32_t index = m_typeToIndex[s_type];
+			assert( entity.archetype == nullptr ||  !entity.archetype->m_signature[index] ); // entity doesn't already have this component
 
-			// Get signatures
-			const Signature2 oldSignature = entity.signature;
-			const Signature2 newSignature = entity.signature | Signature2( 1 ) << index;
-			entity.signature = newSignature;
+			const Signature2 newSignature = entity.archetype != nullptr ?
+				( ( entity.archetype->m_signature ) | ( Signature2( 1 ) << index ) ) :
+				( ( Signature2( 1 ) << aliveBit2 )  | ( Signature2( 1 ) << index ) );
 
-			// Get archetypes
-			Archetype* oldArchetype = FindArchetype( oldSignature );
+
+			Archetype* oldArchetype = entity.archetype;
 			Archetype* newArchetype = FindArchetype( newSignature );
 			if( newArchetype == nullptr )
 			{
-				newArchetype = &CreateArchetype( entity.signature );
+				newArchetype = &CreateArchetype( newSignature );
 			}
+			entity.archetype = newArchetype;
 
 			// copy old components from the old archetype to the new archetype
 			if( oldArchetype != nullptr )
@@ -368,8 +386,8 @@ namespace fan
 
 		EntityID2 CreateEntity()
 		{
-			m_entities.push_back( { Signature2( 1 ) << aliveBit2 } );
-			return (EntityID2)m_entities.size() - 1;
+			m_entities.emplace_back();
+			return EntityID2(m_entities.size() - 1);
 		}
 	};
 
@@ -405,19 +423,25 @@ namespace fan
 
 				chunkIndex = 0;
 				elementIndex = 0;
+				currentChunk = m_chunks[chunkIndex];
 			}
 
 			std::vector< Chunk* > m_chunks;
 			uint16_t chunkIndex;
 			uint16_t elementIndex;
+			Chunk* currentChunk;
 
 			void operator++() // prefix ++
 			{
 				++elementIndex;
-				if( elementIndex >= m_chunks[chunkIndex]->Size() )
+				if( elementIndex >= currentChunk->Size() )
 				{
 					elementIndex = 0;
 					++chunkIndex;
+					if( chunkIndex < m_chunks.size() )
+					{
+						currentChunk = m_chunks[chunkIndex];
+					}
 				}
 			}
 
@@ -428,7 +452,7 @@ namespace fan
 
 			inline _ComponentType& operator*()
 			{
-				return *static_cast<_ComponentType*>( m_chunks[chunkIndex]->At( elementIndex ) );
+				return *static_cast<_ComponentType*>( currentChunk->At( elementIndex ) );
 			}
 		}; static constexpr size_t itSize = sizeof( Iterator<Position2> );
 
@@ -436,7 +460,6 @@ namespace fan
 		Iterator<_ComponentType> Begin()
 		{
 			const ComponentIndex2 index = m_world.m_typeToIndex[_ComponentType::Info::s_type];
-
 			return Iterator<_ComponentType>( index, *this );
 		}
 	};
