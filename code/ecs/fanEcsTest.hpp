@@ -23,10 +23,8 @@ namespace fan
 	//================================
 	static constexpr uint32_t signatureLength2 = 8;
 	using Signature2 = std::bitset<signatureLength2>;
-	using EntityID2 = uint32_t;
 	using EntityHandle2 = uint32_t;
 	using ComponentIndex2 = uint16_t;
-	static constexpr uint32_t aliveBit2 = signatureLength2 - 1;
 	static constexpr size_t chunkMaxSize = 65536;
 
 	//================================
@@ -249,16 +247,39 @@ namespace fan
 		int m_chunkCapacity;
 	};
 
+	class Archetype;
+
+	//================================
+	//================================
+	struct EntityID2
+	{
+		Archetype* archetype = nullptr;
+		uint32_t	index = 0;	// index of the entity in the archetype
+	};
+
+	//================================
+	//================================
+	struct Entity2
+	{
+		bool isDead = false;
+		int	 transitionIndex = -1;
+	};
+
+	//================================
+	//================================
+	struct Transition
+	{
+		EntityID2	entityID;
+		Signature2  transitionSignature = Signature2( 0 );
+	};
+
+	static const size_t trrtrtrt = sizeof( Entity2 );
+
 	//================================
 	//================================
 	class Archetype
 	{
 	public:
-		struct EntityData
-		{
-			bool isDead  = false;
-		};
-
 		void Create( const std::vector< ComponentInfo2 >& _componentsInfo, const Signature2& _signature )
 		{
 			const size_t numComponents = _componentsInfo.size();
@@ -287,28 +308,25 @@ namespace fan
 
 		Signature2					m_signature;
 		std::vector< ChunkVector >	m_chunks;		// one index per component type
-		std::vector<EntityData>		m_entities;	
-	};
-
-	//================================
-	//================================
-	struct Entity2
-	{		
-		Archetype*		archetype = nullptr;
-		EntityHandle2	handle	  = 0;
-		uint32_t		index = 0;	// index of the entity in the archetype
+		std::vector<Entity2>		m_entities;	
 	};
 
 	//================================
 	//================================
 	struct EcsWorld2
 	{
+		Archetype m_transitionArchetype;
 		std::unordered_map< Signature2, Archetype* >	m_archetypes;
 		std::vector< ComponentInfo2 >					m_componentsInfo;
-		std::vector< Entity2 >							m_entities;
 		std::unordered_map<uint32_t, ComponentIndex2>	m_typeToIndex;
-		std::unordered_map< EntityHandle2, EntityID2 >	m_handles;
+		//std::unordered_map< EntityHandle2, EntityID2 >	m_handles;
 		EntityHandle2									m_nextHandle = 1; // 0 is a null handle
+		std::vector< Transition >					m_transitions;
+
+		void Create()
+		{
+			m_transitionArchetype.Create( m_componentsInfo, ~Signature2( 0 ) );
+		}
 
 		int NumComponents() const 
 		{
@@ -317,6 +335,7 @@ namespace fan
 
 		void EndFrame()
 		{
+			// delete dead entities
 			for ( auto pair : m_archetypes)
 			{
 				Archetype& archetype = *pair.second;
@@ -336,8 +355,58 @@ namespace fan
 				}				
 			}
 
-			// update handles
-			m_entities.clear();
+			// Move entities from transition archetype to real ones
+			assert( m_transitionArchetype.Size() == m_transitions.size() );
+			for (int transitionIndex = 0; transitionIndex < m_transitionArchetype.Size() ; transitionIndex++)
+			{
+				const Transition& transition = m_transitions[transitionIndex];
+				Archetype& srcArchetype = *transition.entityID.archetype;
+				const uint32_t srcIndex = transition.entityID.index;
+				Entity2& srcEntity = srcArchetype.m_entities[srcIndex];
+				assert( srcEntity.transitionIndex == transitionIndex );
+				srcEntity.transitionIndex = -1;
+
+				// Get new Signature
+				const Signature2 targetSignature = &srcArchetype != &m_transitionArchetype
+					? ( transition.transitionSignature | srcArchetype.m_signature )
+					: transition.transitionSignature;
+
+				// Get new archetype
+				Archetype* newArchetype = FindArchetype( targetSignature );
+				if( newArchetype == nullptr )
+				{
+					newArchetype = &CreateArchetype( targetSignature );
+				}
+
+				// Push new entity
+				newArchetype->m_entities.push_back( srcArchetype.m_entities[srcIndex] );
+
+				// Moves components from the source archetype to the new archetype
+				if( &srcArchetype != &m_transitionArchetype )
+				{
+					for( int i = 0; i < NumComponents(); i++ )
+					{
+						if( srcArchetype.m_signature[i] )
+						{
+							newArchetype->m_chunks[i].PushBack( srcArchetype.m_chunks[i].At( srcIndex ) );
+							srcArchetype.m_chunks[i].Remove( srcIndex );
+						}
+					}					
+					srcArchetype.RemoveEntity( srcIndex );
+				}
+
+				// copy all components from the transition archetype to the new archetype
+				for( int i = 0; i < NumComponents(); i++ )
+				{
+					if( transition.transitionSignature[i] )
+					{
+						newArchetype->m_chunks[i].PushBack( m_transitionArchetype.m_chunks[i].At( transitionIndex ) );
+						m_transitionArchetype.m_chunks[i].Remove( transitionIndex );
+					}
+				}
+				m_transitionArchetype.RemoveEntity( transitionIndex );
+			}
+			m_transitions.clear();
 		}
 
 		void Kill( Archetype& _archetype,  const uint32_t _index )
@@ -345,19 +414,19 @@ namespace fan
 			_archetype.m_entities[_index].isDead = true;
 		}
 
-		EntityHandle CreateHandle( const EntityID2 _entityID )
+		EntityHandle CreateHandle( const Entity2& /*_entity*/ )
 		{
-			Entity2& entity = m_entities[_entityID];
-			if( entity.handle != 0 )
-			{
-				return entity.handle;
-			}
-			else
-			{
-				entity.handle = m_nextHandle++;
-				m_handles[entity.handle] = _entityID;
-				return entity.handle;
-			}
+// 			Entity2& entity = m_entities[_entityID];
+// 			if( entity.handle != 0 )
+// 			{
+// 				return entity.handle;
+// 			}
+// 			else
+// 			{
+// 				entity.handle = m_nextHandle++;
+// 				m_handles[entity.handle] = _entityID;
+// 				return entity.handle;
+// 			}
 		}
 
 		Archetype* FindArchetype( const Signature2 _signature )
@@ -390,59 +459,64 @@ namespace fan
 			m_typeToIndex[_ComponentType::Info::s_type] = index;
 		}
 		
-		Component2& AddComponent( EntityID2& _entityID, const uint32_t s_type )
+		Component2& AddComponent( const EntityID2 _entityID, const uint32_t s_type )
 		{
-			Entity2& entity = m_entities[_entityID];
-			const uint32_t index = m_typeToIndex[s_type];
-			assert( entity.archetype == nullptr ||  !entity.archetype->m_signature[index] ); // entity doesn't already have this component
+			Entity2& entity = _entityID.archetype->m_entities[_entityID.index];
 
-			const Signature2 newSignature = entity.archetype != nullptr ?
-				( ( entity.archetype->m_signature ) | ( Signature2( 1 ) << index ) ) :
-				( ( Signature2( 1 ) << aliveBit2 )  | ( Signature2( 1 ) << index ) );
-
-
-			Archetype* oldArchetype = entity.archetype;
-			Archetype* newArchetype = FindArchetype( newSignature );
-			if( newArchetype == nullptr )
+			// Get/register transition
+			Transition* transition = nullptr;
+			if( entity.transitionIndex < 0 )
 			{
-				newArchetype = &CreateArchetype( newSignature );
-			}
-			entity.archetype = newArchetype;
+				entity.transitionIndex = m_transitionArchetype.Size();
+				m_transitions.emplace_back( );
+				transition = &( *m_transitions.rbegin() );
+				transition->entityID = _entityID;
 
-			// copy old components from the old archetype to the new archetype
-			if( oldArchetype != nullptr )
-			{
 				for( int i = 0; i < NumComponents(); i++ )
 				{
-					if( oldArchetype->m_signature[i] )
-					{
-						newArchetype->m_chunks[i].PushBack( oldArchetype->m_chunks[i].At( entity.index ) );
-						oldArchetype->m_chunks[i].Remove( entity.index );
-					}
-
+					m_transitionArchetype.m_chunks[i].EmplaceBack();
 				}
-				newArchetype->m_entities.push_back( oldArchetype->m_entities[entity.index] );
-				oldArchetype->RemoveEntity( entity.index );
+				m_transitionArchetype.m_entities.emplace_back();
 			}
 			else
 			{
-				newArchetype->m_entities.emplace_back();
+				transition = &m_transitions[entity.transitionIndex];
 			}
 
-			// create new component
-			entity.index = newArchetype->m_chunks[index].EmplaceBack();
+ 			const uint32_t componentIndex = m_typeToIndex[s_type];
 
-			return *static_cast<Component2*>( newArchetype->m_chunks[index].At( entity.index ) );
+			// entity doesn't already have this component
+			assert( _entityID.archetype == &m_transitionArchetype || !_entityID.archetype->m_signature[componentIndex] );
+			assert( !transition->transitionSignature[componentIndex] );
+
+			// Save transition
+			transition->transitionSignature |=  Signature2( 1 ) << componentIndex;
+
+			return *static_cast<Component2*>( m_transitionArchetype.m_chunks[componentIndex].At( entity.transitionIndex ) );
 		}
 
 		EntityID2 CreateEntity()
-		{
-			m_entities.emplace_back();
-			return EntityID2(m_entities.size() - 1);
+		{			
+			EntityID2 entityID; 
+			entityID.archetype = &m_transitionArchetype;
+			entityID.index = m_transitionArchetype.Size();
+
+			Entity2 entity;
+			entity.transitionIndex = int(m_transitions.size());
+
+			Transition transition;
+			transition.entityID = entityID;
+
+			m_transitions.push_back( transition );
+			m_transitionArchetype.m_entities.push_back( entity );
+			for( int i = 0; i < NumComponents(); i++ )
+			{
+				m_transitionArchetype.m_chunks[i].EmplaceBack();
+			}			
+
+			return entityID;
 		}
 	};
-
-	static const size_t sdfsdfsdf = sizeof( EcsWorld2 ) / 1000 / 1000;
 
 	//================================
 	//================================

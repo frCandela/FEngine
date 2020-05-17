@@ -243,6 +243,7 @@ namespace fan
 		m_world2.AddComponentType<Position2>();
 		m_world2.AddComponentType<Speed2>();
 		m_world2.AddComponentType<Expiration2>();
+		m_world2.Create();
 	}
 
 	//================================================================================================================================
@@ -304,9 +305,7 @@ namespace fan
 					if( hasExpiration ) { m_world2.AddComponent( entity, Expiration2::Info::s_type ); }
 				}
 			}				
-
-			ImGui::Text( "num entities: %d", m_world2.m_entities.size() );
-
+			
 			if( ImGui::CollapsingHeader( "archetypes" ) )
 			{
 				ImGui::Columns( 3 );
@@ -363,30 +362,30 @@ namespace fan
 				}
 			}
 
-			if( ImGui::CollapsingHeader( "Handles" ) )
-			{
-				ImGui::Columns( 4 );
-				ImGui::Text( "id" );		ImGui::NextColumn();
-				ImGui::Text( "archetype" ); ImGui::NextColumn();
-				ImGui::Text( "handle" );	ImGui::NextColumn();
-				ImGui::Text( "index" );	ImGui::NextColumn();
-				ImGui::Separator();
-
-				for (int i = 0; i < m_world2.m_entities.size(); i++)
-				{
-					const Entity2& entity = m_world2.m_entities[i];
-					ImGui::Text( "%d", i );		ImGui::NextColumn();
-
-					std::stringstream ss;
-					if( entity.archetype == nullptr ) { ss << "null"; }
-					else { ss << entity.archetype->m_signature;  }
-					ImGui::Text( "%s", ss.str().c_str() );		ImGui::NextColumn();
-
-					ImGui::Text( "%d", entity.handle );	ImGui::NextColumn();
-					ImGui::Text( "%d", entity.index );	ImGui::NextColumn();
-				}
-				ImGui::Columns( 1 );
-			}
+// 			if( ImGui::CollapsingHeader( "Handles" ) )
+// 			{
+// 				ImGui::Columns( 4 );
+// 				ImGui::Text( "id" );		ImGui::NextColumn();
+// 				ImGui::Text( "archetype" ); ImGui::NextColumn();
+// 				ImGui::Text( "handle" );	ImGui::NextColumn();
+// 				ImGui::Text( "index" );	ImGui::NextColumn();
+// 				ImGui::Separator();
+// 
+// 				for (int i = 0; i < m_world2.m_entities.size(); i++)
+// 				{
+// 					const Entity2& entity = m_world2.m_entities[i];
+// 					ImGui::Text( "%d", i );		ImGui::NextColumn();
+// 
+// 					std::stringstream ss;
+// 					if( entity.archetype == nullptr ) { ss << "null"; }
+// 					else { ss << entity.archetype->m_signature;  }
+// 					ImGui::Text( "%s", ss.str().c_str() );		ImGui::NextColumn();
+// 
+// 					ImGui::Text( "%d", entity.handle );	ImGui::NextColumn();
+// 					ImGui::Text( "%d", entity.index );	ImGui::NextColumn();
+// 				}
+// 				ImGui::Columns( 1 );
+// 			}
 
 			const ComponentIndex2 indexPos = m_world2.m_typeToIndex[Position2::Info::s_type];
 			const ComponentIndex2 indexSpeed = m_world2.m_typeToIndex[Speed2::Info::s_type];
