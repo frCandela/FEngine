@@ -286,7 +286,7 @@ namespace fan
 			static bool hasPosition = true;
 			static bool hasSpeed = true;
 			static bool hasExpiration = true;
-			static int num = 1;
+			static int num = 100;
 
 			ImGui::Checkbox( "position", &hasPosition ); ImGui::SameLine();
 			ImGui::Checkbox( "speed", &hasSpeed ); ImGui::SameLine();
@@ -295,11 +295,12 @@ namespace fan
 
 			if( ImGui::Button( "Create entity" ) )
 			{
+				ScopedTimer timer( "Create" );
 				for( int i = 0; i < num; i++ )
 				{
 					const EntityID2 entityID = m_world2.CreateEntity();
-					if( hasPosition ) { m_world2.AddComponent( entityID, Position2::Info::s_type ); }
-					if( hasSpeed ) { m_world2.AddComponent( entityID, Speed2::Info::s_type ); }
+					if( hasPosition )	{ m_world2.AddComponent( entityID, Position2::Info::s_type ); }
+					if( hasSpeed )		{ m_world2.AddComponent( entityID, Speed2::Info::s_type ); }
 					if( hasExpiration ) { m_world2.AddComponent( entityID, Expiration2::Info::s_type ); }
 				}
 			}
@@ -308,16 +309,32 @@ namespace fan
 
 			if( ImGui::CollapsingHeader( "archetypes" ) )
 			{
-				ImGui::Columns( 2 );
+				ImGui::Columns( 3 );
 				ImGui::Text( "signature" ); ImGui::NextColumn();
 				ImGui::Text( "size" );      ImGui::NextColumn();
+				ImGui::Text( "chunks" );    ImGui::NextColumn();
 				ImGui::Separator();
-				for( const std::pair<Signature2, Archetype>& pair : m_world2.m_archetypes )
+
+				for( auto it = m_world2.m_archetypes.begin(); it != m_world2.m_archetypes.end(); ++it )
 				{
+					Archetype& archetype = it->second;
+
 					std::stringstream ss;
-					ss << pair.first;
-					ImGui::Text( "%s ", ss.str().c_str() );		ImGui::NextColumn();
-					ImGui::Text( "%d ", pair.second.m_size );	ImGui::NextColumn();
+					ss << it->first;
+					ImGui::Text( "%s ", ss.str().c_str() );	ImGui::NextColumn();
+					ImGui::Text( "%d ", archetype.m_size );	ImGui::NextColumn();
+
+					for (int i = 0; i < archetype.m_chunks.size(); i++)
+					{
+						ImGui::Text( "%d: ", i ); 
+						for( int j = 0; j < archetype.m_chunks[i].NumChunk(); j++ )
+						{
+							ImGui::SameLine();
+							ImGui::Text( "%d ", archetype.m_chunks[i].GetChunk(j).Size() );
+						}
+					}
+					ImGui::NextColumn();
+					ImGui::Separator();
 				}
 				ImGui::Columns( 1 );
 			}
@@ -326,103 +343,82 @@ namespace fan
 			const ComponentIndex2 indexSpeed = m_world2.m_typeToIndex[Speed2::Info::s_type];
 			const Signature2 targetSignature = ( Signature2( 1 ) << indexPos ) | ( Signature2( 1 ) << indexSpeed );
 
-			if( ImGui::Button( "Init" ) )
-			{
+			if( ImGui::Button( "Init" ) ){
+				// Init 
 				for( auto it = m_world2.m_archetypes.begin(); it != m_world2.m_archetypes.end(); ++it )
 				{
 					if( ( it->first & targetSignature ) == targetSignature )
 					{
 						Archetype& archetype = it->second;
-						for( int i = 0; i < archetype.m_size; i++ )
+						for( int chunkIndex = 0; chunkIndex < archetype.m_chunks[indexPos].NumChunk(); chunkIndex++ )
 						{
-							Position2* position = static_cast<Position2*>( archetype.m_chunks[indexPos]->At( i ) );
-							position->position[0] = (float)i;
+							Chunk& chunk = archetype.m_chunks[indexPos].GetChunk( chunkIndex );
+							for( int elementIdex = 0; elementIdex < chunk.Size(); elementIdex++ )
+							{
+								Position2* position = static_cast<Position2*>( chunk.At( elementIdex ) );
+								position->position[0] = (float)std::rand();
+							}
 						}
 					}
 				}
 			}
 
-			if( ImGui::Button( "Test1" ) )
+			if( ImGui::Button( "Test" ) )
 			{
-				ScopedTimer timer( "Test1" );
-				float total = 0.f;
+				// Test 1
+				float total1 = 0.f;
+				std::vector<Chunk*> match1;
+				for( auto it = m_world2.m_archetypes.begin(); it != m_world2.m_archetypes.end(); ++it )
 				{
-					std::vector<Archetype*> match;
-					for( auto it = m_world2.m_archetypes.begin(); it != m_world2.m_archetypes.end(); ++it )
+					Archetype& archetype = it->second;
+					if( ( archetype.m_signature & targetSignature ) == targetSignature )
 					{
-						if( ( it->first & targetSignature ) == targetSignature )
+						ChunkVector& chunks = archetype.m_chunks[indexPos];
+						for( int i = 0; i < chunks.NumChunk(); i++ )
 						{
-							match.push_back( &( it->second ) );
+							match1.push_back( &chunks.GetChunk( i ) );
 						}
 					}
-
-					for( Archetype* archetype : match )
-					{
-						for( int i = 0; i < archetype->m_size; i++ )
-						{
-							Position2* position = static_cast<Position2*>( archetype->m_chunks[indexPos]->At( i ) );
-							total += position->position[0];
-						}
-					}
-
 				}
-				Debug::Highlight() << total << Debug::Endl();
+				{
+					ScopedTimer timer( "Test for loop" );
+					for( Chunk* chunk : match1 )
+					{
+						for( int i = 0; i < chunk->Size(); i++ )
+						{
+							Position2* position = static_cast<Position2*>( chunk->At( i ) );
+							total1 += position->position[0];
+						}
+					}
+				}	
+
+				// Test 2
+				float total2 = 0.f;
+				MatchComponents match2( m_world2 );
+				for( auto it = m_world2.m_archetypes.begin(); it != m_world2.m_archetypes.end(); ++it )
+				{
+					if( ( it->first & targetSignature ) == targetSignature && ! it->second.Empty() )
+					{
+						match2.m_archetypes.push_back( &( it->second ) );
+					}
+				}
+				{
+					ScopedTimer timer( "Test Iterator" );
+					for( MatchComponents::Iterator<Position2> positionIt = match2.Begin<Position2>(); !positionIt.End(); ++positionIt )
+					{
+							total2 += ( *positionIt ).position[0];
+					}
+				}
+
+				Debug::Highlight() << "total1:" << total1 << " " << total2 << ":total2" << Debug::Endl();
+				if( total1 != total2 )
+				{
+					Debug::Error() << "ERROR" << Debug::Endl();
+				}
 			}
 
-			if( ImGui::Button( "Test2" ) )
-			{
-				struct Iterator
-				{
-					std::vector<Archetype*> archetypes;
-					size_t archetypeIndex = 0;
-					size_t entityIndex = 0;
 
-					void Next()
-					{
-						entityIndex++;
-						if( entityIndex >= archetypes[archetypeIndex]->m_size )
-						{
-							entityIndex = 0;
-							archetypeIndex++;
-						}
-					}
-					void Begin()
-					{
-						archetypeIndex = 0;
-						entityIndex = 0;
-					}
-					bool End()
-					{
-						return archetypeIndex >= archetypes.size();
-					}
-					void* Current( ComponentIndex2 _componentIndex )
-					{
-						return archetypes[archetypeIndex]->m_chunks[_componentIndex]->At( entityIndex);
-					}
 
-				};
-
-				ScopedTimer timer( "Test2" );
-				float total = 0.f;
-				{		
-					Iterator archIterator;
-					for( auto it = m_world2.m_archetypes.begin(); it != m_world2.m_archetypes.end(); ++it )
-					{
-						if( ( it->first & targetSignature ) == targetSignature )
-						{
-							archIterator.archetypes.push_back( &( it->second ) );
-						}
-					}
-
-					for( archIterator.Begin(); ! archIterator.End(); archIterator.Next() )
-					{
-						Position2* position = static_cast<Position2*>( archIterator.Current( indexPos ) );
-						total += position->position[0];
-					}
-
-				}
-				Debug::Highlight() << total << Debug::Endl();
-			}
 		}
 		ImGui::End();
 	}
