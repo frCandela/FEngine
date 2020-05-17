@@ -342,7 +342,25 @@ namespace fan
 				ImGui::Columns( 1 );
 			}
 
-			if( ImGui::CollapsingHeader( "entities" ) )
+
+			if( ImGui::CollapsingHeader( "Entities" ) )
+			{
+				for( std::pair<Signature2, Archetype*> pair : m_world2.m_archetypes )
+				{
+					Archetype& archetype = *pair.second;
+					for( uint32_t i = 0; i < archetype.m_size; i++ )
+					{
+						if( ImGui::Button( "X" ) )
+						{
+
+						}
+						ImGui::SameLine();
+						ImGui::Text( "%d", i );
+					}
+				}
+			}
+
+			if( ImGui::CollapsingHeader( "Handles" ) )
 			{
 				ImGui::Columns( 4 );
 				ImGui::Text( "id" );		ImGui::NextColumn();
@@ -350,6 +368,7 @@ namespace fan
 				ImGui::Text( "handle" );	ImGui::NextColumn();
 				ImGui::Text( "index" );	ImGui::NextColumn();
 				ImGui::Separator();
+
 				for (int i = 0; i < m_world2.m_entities.size(); i++)
 				{
 					const Entity2& entity = m_world2.m_entities[i];
@@ -361,7 +380,7 @@ namespace fan
 					ImGui::Text( "%s", ss.str().c_str() );		ImGui::NextColumn();
 
 					ImGui::Text( "%d", entity.handle );	ImGui::NextColumn();
-					ImGui::Text( "%d-%d", entity.index.chunkIndex, entity.index.elementIndex );	ImGui::NextColumn();
+					ImGui::Text( "%d", entity.index );	ImGui::NextColumn();
 				}
 				ImGui::Columns( 1 );
 			}
@@ -421,19 +440,20 @@ namespace fan
 
 				// Test 2
 				float total2 = 0.f;
-				MatchComponents match2( m_world2 );
+				SystemView view( m_world2 );
 				for( auto it = m_world2.m_archetypes.begin(); it != m_world2.m_archetypes.end(); ++it )
 				{
 					if( ( it->first & targetSignature ) == targetSignature && ! it->second->Empty() )
 					{
-						match2.m_archetypes.push_back(  it->second );
+						view.m_archetypes.push_back(  it->second );
 					}
 				}
 				{
 					ScopedTimer timer( "Test Iterator" );
-					for( MatchComponents::Iterator<Position2> positionIt = match2.Begin<Position2>(); !positionIt.End(); ++positionIt )
+					for( SystemView::Iterator<Position2> positionIt = view.Begin<Position2>(); !positionIt.End(); ++positionIt )
 					{
-							total2 += ( *positionIt ).position[0];
+						total2 += ( *positionIt ).position[0];
+						//fview.Kill( positionIt );
 					}
 				}
 

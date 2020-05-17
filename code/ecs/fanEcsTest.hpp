@@ -73,13 +73,13 @@ namespace fan
 	class Chunk
 	{
 	public:
-		void Create( const size_t _componentSize, const size_t _alignment )
+		void Create( const int _componentSize, const int _alignment )
 		{
 			m_componentSize = _componentSize;
-			m_capacity = uint16_t( chunkMaxSize / _componentSize );
+			m_capacity =  chunkMaxSize / _componentSize;
 			m_size = 0;
 
-			size_t chunckSize = m_capacity * _componentSize;
+			int chunckSize = m_capacity * _componentSize;
 			m_buffer = new uint8_t[chunckSize + _alignment];
 
 			size_t space = chunckSize + _alignment;
@@ -94,25 +94,25 @@ namespace fan
 			m_alignedBuffer = nullptr;
 		}
 
-		bool		Empty() const { return m_size == 0; }
-		bool		Full() const { return m_size == m_capacity; }
-		uint16_t	Size() const { return m_size; }
-		uint16_t	Capacity() const { return m_capacity; }
+		bool	Empty() const { return m_size == 0; }
+		bool	Full() const { return m_size == m_capacity; }
+		int		Size() const { return m_size; }
+		int		Capacity() const { return m_capacity; }
 
-		void* At( const size_t _index )
+		void* At( const int _index )
 		{
 			assert( _index < m_size );
 			uint8_t* buffer = static_cast<uint8_t*>( m_alignedBuffer );
 			return &buffer[_index * m_componentSize];
 		}
 
-		void Set( const uint16_t _index, void* _data )
+		void Set( const int _index, void* _data )
 		{
 			assert( _index < m_size );
 			std::memcpy( At( _index ), _data, m_componentSize );
 		}
 
-		void Remove( const uint16_t _index )
+		void Remove( const int _index )
 		{
 			assert( _index < m_size );
 			// back swap
@@ -126,7 +126,7 @@ namespace fan
 		void PushBack( void* _data )
 		{
 			assert( m_size < m_capacity );
-			const uint16_t index = m_size;
+			const int index = m_size;
 			m_size++;
 			Set( index, _data );
 		}
@@ -144,9 +144,9 @@ namespace fan
 		}
 
 	private:
-		uint16_t m_capacity = 0;
-		uint16_t m_size;
-		size_t m_componentSize;
+		int m_capacity = 0;
+		int m_size;
+		int m_componentSize;
 		void* m_buffer;
 		void* m_alignedBuffer;
 	};
@@ -156,38 +156,34 @@ namespace fan
 	class ChunkVector
 	{
 	public:
-		//================================
-		//================================
-		struct Index
-		{
-			uint16_t chunkIndex;	// index of the chunk
-			uint16_t elementIndex;	// index of the data in the chunk
-		};
-
-		void Create( const size_t _componentSize, const size_t _alignment )
+		void Create( const int _componentSize, const int _alignment )
 		{
 			m_componentSize = _componentSize;
 			m_alignment = _alignment;
 			m_chunks.emplace_back();
 			m_chunks.rbegin()->Create( m_componentSize, m_alignment );
+			m_chunkCapacity = m_chunks.rbegin()->Capacity();
 		}
 
-		void Remove( const Index& _index )
+		void Remove( const int& _index )
 		{
+			const int chunkIndex = _index / m_chunkCapacity;
+			const int elementIndex = _index % m_chunkCapacity;
 			assert( _index.chunkIndex < m_chunks.size() );
 			assert( _index.elementIndex < m_chunks[_index.chunkIndex].Size() );
-			Chunk& chunk = m_chunks[_index.chunkIndex];
+
+			Chunk& chunk = m_chunks[chunkIndex];
 
 			// Last chunk ? just remove the element & back swap locally in the chunk
-			if( _index.chunkIndex == m_chunks.size() - 1 )
+			if( chunkIndex == m_chunks.size() - 1 )
 			{
-				chunk.Remove( _index.elementIndex );
+				chunk.Remove( elementIndex );
 			}
 			else
 			{
 				// back swap the removed element with the last element of the last chunk
 				Chunk& lastChunk = *m_chunks.rbegin();
-				chunk.Set( _index.elementIndex, lastChunk.At( lastChunk.Size() - 1 ) );
+				chunk.Set( elementIndex, lastChunk.At( lastChunk.Size() - 1 ) );
 				lastChunk.PopBack();
 			}
 
@@ -199,12 +195,17 @@ namespace fan
 			}
 		}
 
-		void* At( const Index& _index )
+		void* At( const int& _index )
 		{
-			return m_chunks[_index.chunkIndex].At( _index.elementIndex );
+			const int chunkIndex = _index / m_chunkCapacity;
+			const int elementIndex = _index % m_chunkCapacity;
+			assert( _index.chunkIndex < m_chunks.size() );
+			assert( _index.elementIndex < m_chunks[_index.chunkIndex].Size() );
+			
+			return m_chunks[chunkIndex].At( elementIndex );
 		}
 
-		Index PushBack( void* _data )
+		int PushBack( void* _data )
 		{
 			// Create a new chunk if necessary
 			if( m_chunks.rbegin()->Full() )
@@ -215,14 +216,13 @@ namespace fan
 
 			// Push to the last chunk
 			Chunk& chunk = *m_chunks.rbegin();
-			Index index;
-			index.chunkIndex = uint16_t( m_chunks.size() - 1 );
-			index.elementIndex = chunk.Size();
+			const int chunkIndex = int( m_chunks.size() - 1 );
+			const int elementIndex = chunk.Size();
 			chunk.PushBack( _data );
-			return index;
+			return chunkIndex * m_chunkCapacity + elementIndex;
 		}
 
-		Index EmplaceBack()
+		int EmplaceBack()
 		{
 			// Create a new chunk if necessary
 			if( m_chunks.rbegin()->Full() )
@@ -233,19 +233,20 @@ namespace fan
 
 			// Emplace to the last chunk
 			Chunk& chunk = *m_chunks.rbegin();
-			Index index;
-			index.chunkIndex = uint16_t( m_chunks.size() - 1 );
-			index.elementIndex = chunk.Size();
+			const int chunkIndex = int( m_chunks.size() - 1 );
+			const int elementIndex = chunk.Size();
 			chunk.EmplaceBack();
-			return index;
+			return chunkIndex * m_chunkCapacity + elementIndex;
 		}
 
-		Chunk& GetChunk( const size_t _index ) { return m_chunks[_index]; }
-		uint16_t NumChunk() const { return uint16_t( m_chunks.size() ); }
+		
+		Chunk& GetChunk( const int _index ) { return m_chunks[_index]; }
+		int NumChunk() const { return int( m_chunks.size() ); }
 	private:
 		std::vector<Chunk> m_chunks;
-		size_t m_componentSize;
-		size_t m_alignment;
+		int m_componentSize;
+		int m_alignment;
+		int m_chunkCapacity;
 	};
 
 	//================================
@@ -282,9 +283,9 @@ namespace fan
 	//================================
 	struct Entity2
 	{		
-		Archetype* archetype = nullptr;
-		ChunkVector::Index index = { 0,0 };
-		EntityHandle2 handle = 0;
+		Archetype*		archetype = nullptr;
+		EntityHandle2	handle	  = 0;
+		uint32_t		index = 0;	// index of the entity in the chunk
 	};
 
 	//================================
@@ -297,6 +298,12 @@ namespace fan
 		std::unordered_map<uint32_t, ComponentIndex2>	m_typeToIndex;
 		std::unordered_map< EntityHandle2, EntityID2 >	m_handles;
 		EntityHandle2									m_nextHandle = 1; // 0 is a null handle
+		std::vector< Entity2 >							m_deadEntities;
+
+		void Kill( const Entity2& _entity )
+		{
+			m_deadEntities.push_back( _entity );
+		}
 
 		EntityHandle CreateHandle( const EntityID2 _entityID )
 		{
@@ -395,9 +402,9 @@ namespace fan
 
 	//================================
 	//================================
-	struct MatchComponents
+	struct SystemView
 	{
-		MatchComponents( EcsWorld2& _world ) : m_world( _world )
+		SystemView( EcsWorld2& _world ) : m_world( _world )
 		{
 		}
 
@@ -410,49 +417,58 @@ namespace fan
 		template < typename _ComponentType >
 		struct Iterator
 		{
-			Iterator( const ComponentIndex2 _componentIndex, MatchComponents& _matchComponents )
+			Iterator( const ComponentIndex2 _componentIndex, SystemView& _view )
 			{
-				for( Archetype* archetype : _matchComponents.m_archetypes )
-				{
-					ChunkVector& chunks = archetype->m_chunks[_componentIndex];
-					for( int i = 0; i < chunks.NumChunk(); i++ )
-					{
-						m_chunks.push_back( &chunks.GetChunk( i ) );
-					}
-				}
-
-				chunkIndex = 0;
-				elementIndex = 0;
-				currentChunk = m_chunks[chunkIndex];
+				m_archetypes = _view.m_archetypes;
+				m_componentIndex = _componentIndex;
+				m_archetypeIndex = 0;
+				m_chunkIndex = 0;
+				m_elementIndex = 0;
+				m_currentArchetype = m_archetypes[m_archetypeIndex];
+				m_currentChunk = &m_currentArchetype->m_chunks[_componentIndex].GetChunk( m_chunkIndex );
 			}
 
-			std::vector< Chunk* > m_chunks;
-			uint16_t chunkIndex;
-			uint16_t elementIndex;
-			Chunk* currentChunk;
+			std::vector< Archetype* >	m_archetypes;
+			ComponentIndex2				m_componentIndex;
+			uint16_t					m_archetypeIndex;
+			uint16_t					m_chunkIndex;
+			uint16_t					m_elementIndex;
+			Archetype*					m_currentArchetype;
+			Chunk*						m_currentChunk;			
 
 			void operator++() // prefix ++
 			{
-				++elementIndex;
-				if( elementIndex >= currentChunk->Size() )
+				++m_elementIndex;
+				if( m_elementIndex >= m_currentChunk->Size() )
 				{
-					elementIndex = 0;
-					++chunkIndex;
-					if( chunkIndex < m_chunks.size() )
+					m_elementIndex = 0;
+					++m_chunkIndex;
+
+					if( m_chunkIndex < m_currentArchetype->m_chunks[m_componentIndex].NumChunk() )
 					{
-						currentChunk = m_chunks[chunkIndex];
+						m_currentChunk = &m_currentArchetype->m_chunks[m_componentIndex].GetChunk( m_chunkIndex );
+					}
+					else
+					{
+						m_chunkIndex = 0;
+						++m_archetypeIndex;
+						if( m_archetypeIndex < m_archetypes.size() )
+						{
+							m_currentArchetype = m_archetypes[m_archetypeIndex];
+							m_currentChunk = &m_currentArchetype->m_chunks[m_componentIndex].GetChunk( m_chunkIndex );
+						}
 					}
 				}
 			}
 
 			bool End()
 			{
-				return chunkIndex >= m_chunks.size();
+				return m_archetypeIndex >= m_archetypes.size();
 			}
 
 			inline _ComponentType& operator*()
 			{
-				return *static_cast<_ComponentType*>( currentChunk->At( elementIndex ) );
+				return *static_cast<_ComponentType*>( m_currentChunk->At( m_elementIndex ) );
 			}
 		}; static constexpr size_t itSize = sizeof( Iterator<Position2> );
 
@@ -461,6 +477,15 @@ namespace fan
 		{
 			const ComponentIndex2 index = m_world.m_typeToIndex[_ComponentType::Info::s_type];
 			return Iterator<_ComponentType>( index, *this );
+		}
+
+		template < typename _ComponentType >
+		void Kill( const Iterator<_ComponentType> _iterator )
+		{
+			Entity2 _entity;
+			_entity.archetype = _iterator.m_currentArchetype;
+			_entity.index = _iterator.m_chunkIndex * _iterator.m_currentChunk->Capacity() + _iterator.m_elementIndex;
+			m_world.Kill( _entity );
 		}
 	};
 }
