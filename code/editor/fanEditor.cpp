@@ -314,24 +314,28 @@ namespace fan
 				ImGui::Text( "chunks" );    ImGui::NextColumn();
 				ImGui::Separator();
 
+				std::vector<Archetype*> archetypes;
 				for( auto it = m_world2.m_archetypes.begin(); it != m_world2.m_archetypes.end(); ++it )
 				{
-					Archetype& archetype = * it->second;
+					archetypes.push_back( it->second );
+				}archetypes.push_back( &m_world2.m_transitionArchetype );
 
+				for ( Archetype* archetype : archetypes )
+				{
 					std::stringstream ss;
-					ss << it->first;
+					ss << archetype->m_signature;
 					ImGui::Text( "%s ", ss.str().c_str() );	ImGui::NextColumn();
-					ImGui::Text( "%d ", archetype.Size() );	ImGui::NextColumn();
+					ImGui::Text( "%d ", archetype->Size() );	ImGui::NextColumn();
 
-					for (int i = 0; i < archetype.m_chunks.size(); i++)
+					for (int i = 0; i < archetype->m_chunks.size(); i++)
 					{
-						if( archetype.m_chunks[i].NumChunk() != 0 )
+						if( archetype->m_chunks[i].NumChunk() != 0 )
 						{
 							ImGui::Text( "%d: ", i );
-							for( int j = 0; j < archetype.m_chunks[i].NumChunk(); j++ )
+							for( int j = 0; j < archetype->m_chunks[i].NumChunk(); j++ )
 							{
 								ImGui::SameLine();
-								ImGui::Text( "%d ", archetype.m_chunks[i].GetChunk( j ).Size() );
+								ImGui::Text( "%d ", archetype->m_chunks[i].GetChunk( j ).Size() );
 							}
 						}
 					}
