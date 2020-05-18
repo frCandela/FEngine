@@ -67,6 +67,7 @@ namespace fan
 	};
 
 	//================================
+	// Small aligned memory buffer
 	//================================
 	class Chunk
 	{
@@ -150,6 +151,8 @@ namespace fan
 	};
 
 	//================================
+	// Dynamic array of fixed size chunks
+	// Can be indexed like a continuous array	
 	//================================
 	class ChunkVector
 	{
@@ -250,32 +253,39 @@ namespace fan
 	class Archetype;
 
 	//================================
+	// Allows indexing of entities
 	//================================
 	struct EntityID2
 	{
 		Archetype* archetype = nullptr;
-		uint32_t	index = 0;	// index of the entity in the archetype
+		uint32_t	index = 0;	// index in the archetype
 	};
 
 	//================================
+	// Small data relative to a specific entity
 	//================================
 	struct Entity2
 	{
 		bool isDead = false;
-		int	 transitionIndex = -1;
+		int	 transitionIndex = -1;	// index of the corresponding transition if it exists
 	};
 
 	//================================
+	// A transition is created when structural change happen on an entity ( creating / removing components )
 	//================================
 	struct Transition
 	{
 		EntityID2	entityID;
-		Signature2  transitionSignature = Signature2( 0 );
+		Signature2  signatureAdd = Signature2( 0 );		// bit to 1 means add componenent
+		Signature2  signatureRemove = Signature2( 0 );	// bit to 1 means remove componenent
 	};
 
 	static const size_t trrtrtrt = sizeof( Entity2 );
 
 	//================================
+	// An archetype is a collection of entities with the same signature
+	// All component of the same entity are at the same index
+	// components are put in arrays of small buffers called chunks
 	//================================
 	class Archetype
 	{
@@ -366,10 +376,14 @@ namespace fan
 				assert( srcEntity.transitionIndex == transitionIndex );
 				srcEntity.transitionIndex = -1;
 
-				// Get new Signature
-				const Signature2 targetSignature = &srcArchetype != &m_transitionArchetype
-					? ( transition.transitionSignature | srcArchetype.m_signature )
-					: transition.transitionSignature;
+				// Get new signature
+				Signature2 targetSignature = Signature2( 0 );				
+				if( &srcArchetype != &m_transitionArchetype )
+				{
+					targetSignature |= srcArchetype.m_signature;
+				}
+				targetSignature |= transition.signatureAdd;
+				targetSignature &= ~transition.signatureRemove;
 
 				// Get new archetype
 				Archetype* newArchetype = FindArchetype( targetSignature );
@@ -381,12 +395,13 @@ namespace fan
 				// Push new entity
 				newArchetype->m_entities.push_back( srcArchetype.m_entities[srcIndex] );
 
-				// Moves components from the source archetype to the new archetype
+				// Moves components from the source archetype to the new archetype				
 				if( &srcArchetype != &m_transitionArchetype )
 				{
+					const Signature2 srcMoveSignature = srcArchetype.m_signature & targetSignature;
 					for( int i = 0; i < NumComponents(); i++ )
 					{
-						if( srcArchetype.m_signature[i] )
+						if( srcMoveSignature[i] )
 						{
 							newArchetype->m_chunks[i].PushBack( srcArchetype.m_chunks[i].At( srcIndex ) );
 							srcArchetype.m_chunks[i].Remove( srcIndex );
@@ -396,9 +411,10 @@ namespace fan
 				}
 
 				// copy all components from the transition archetype to the new archetype
+				const Signature2 transitionMoveSignature = transition.signatureAdd & ~transition.signatureRemove;
 				for( int i = 0; i < NumComponents(); i++ )
 				{
-					if( transition.transitionSignature[i] )
+					if( transitionMoveSignature[i] )
 					{
 						newArchetype->m_chunks[i].PushBack( m_transitionArchetype.m_chunks[i].At( transitionIndex ) );
 						m_transitionArchetype.m_chunks[i].Remove( transitionIndex );
@@ -409,9 +425,9 @@ namespace fan
 			m_transitions.clear();
 		}
 
-		void Kill( Archetype& _archetype,  const uint32_t _index )
+		void Kill( const EntityID2 _entityID )
 		{
-			_archetype.m_entities[_index].isDead = true;
+			_entityID.archetype->m_entities[ _entityID.index].isDead = true;
 		}
 
 		EntityHandle CreateHandle( const Entity2& /*_entity*/ )
@@ -458,17 +474,16 @@ namespace fan
 
 			m_typeToIndex[_ComponentType::Info::s_type] = index;
 		}
-		
-		Component2& AddComponent( const EntityID2 _entityID, const uint32_t s_type )
-		{
-			Entity2& entity = _entityID.archetype->m_entities[_entityID.index];
 
+		Transition& FindOrCreateTransition( const EntityID2 _entityID )
+		{
 			// Get/register transition
+			Entity2& entity = _entityID.archetype->m_entities[_entityID.index];
 			Transition* transition = nullptr;
 			if( entity.transitionIndex < 0 )
 			{
 				entity.transitionIndex = m_transitionArchetype.Size();
-				m_transitions.emplace_back( );
+				m_transitions.emplace_back();
 				transition = &( *m_transitions.rbegin() );
 				transition->entityID = _entityID;
 
@@ -480,17 +495,39 @@ namespace fan
 			}
 			else
 			{
+				// transition already exists
 				transition = &m_transitions[entity.transitionIndex];
 			}
+			return *transition;
+		}
 
- 			const uint32_t componentIndex = m_typeToIndex[s_type];
+		Entity2& GetEntity( const EntityID2 _entityID )
+		{
+			return _entityID.archetype->m_entities[_entityID.index];
+		}
+		void RemoveComponent( const EntityID2 _entityID, const uint32_t s_type )
+		{
+			const uint32_t componentIndex = m_typeToIndex[s_type];
+			Transition& transition = FindOrCreateTransition( _entityID );
+
+			// entity must have this component
+			assert( _entityID.archetype == &m_transitionArchetype || _entityID.archetype->m_signature[componentIndex] );
+
+			// Update transition
+			transition.signatureRemove |= Signature2( 1 ) << componentIndex;
+		}
+
+		Component2& AddComponent( const EntityID2 _entityID, const uint32_t s_type )
+		{			
+			const uint32_t componentIndex = m_typeToIndex[s_type];
+			Transition& transition = FindOrCreateTransition( _entityID );
+			Entity2& entity = GetEntity( _entityID ); 			
 
 			// entity doesn't already have this component
 			assert( _entityID.archetype == &m_transitionArchetype || !_entityID.archetype->m_signature[componentIndex] );
-			assert( !transition->transitionSignature[componentIndex] );
 
-			// Save transition
-			transition->transitionSignature |=  Signature2( 1 ) << componentIndex;
+			// Update transition
+			transition.signatureAdd |=  Signature2( 1 ) << componentIndex;
 
 			return *static_cast<Component2*>( m_transitionArchetype.m_chunks[componentIndex].At( entity.transitionIndex ) );
 		}
@@ -601,7 +638,7 @@ namespace fan
 		void Kill( const Iterator<_ComponentType> _iterator )
 		{
 			const uint32_t index = _iterator.m_chunkIndex * _iterator.m_currentChunk->Capacity() + _iterator.m_elementIndex;
-			m_world.Kill( *_iterator.m_currentArchetype, index );
+			m_world.Kill( { &( *_iterator.m_currentArchetype ), index } );
 		}
 	};
 }

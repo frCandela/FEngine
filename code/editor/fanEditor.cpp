@@ -343,6 +343,16 @@ namespace fan
 
 			if( ImGui::CollapsingHeader( "Entities" ) )
 			{
+				enum class Mode{ removeEntity, removeComponent, addComponent};
+				static Mode mode = Mode::removeEntity;
+
+				bool removeEntityVal = mode == Mode::removeEntity;
+				if( ImGui::Checkbox( "remove entity", &removeEntityVal ) ) { if( removeEntityVal ) mode = Mode::removeEntity; } ImGui::SameLine();
+				bool removeComponentVal = mode == Mode::removeComponent;
+				if( ImGui::Checkbox( "remove component", &removeComponentVal ) ) { if( removeComponentVal ) mode = Mode::removeComponent; }ImGui::SameLine();
+				bool addComponentVal = mode == Mode::addComponent;
+				if( ImGui::Checkbox( "add component", &addComponentVal ) ) { if( addComponentVal ) mode = Mode::addComponent; }
+
 				for( std::pair<Signature2, Archetype*> pair : m_world2.m_archetypes )
 				{
 					Archetype& archetype = *pair.second;
@@ -355,7 +365,26 @@ namespace fan
 						ImGui::SameLine();
 						if( ImGui::Button( std::to_string(i).c_str() ) )
 						{
-							m_world2.Kill( archetype, i );
+							EntityID2 entityID = { &archetype, uint32_t( i ) };
+							switch( mode )
+							{
+							case Mode::removeEntity:
+								m_world2.Kill( entityID );
+								break;
+							case Mode::removeComponent:
+								if( hasPosition ) { m_world2.RemoveComponent( entityID, Position2::Info::s_type ); }
+								if( hasSpeed ) { m_world2.RemoveComponent( entityID, Speed2::Info::s_type ); }
+								if( hasExpiration ) { m_world2.RemoveComponent( entityID, Expiration2::Info::s_type ); }
+								break;
+							case Mode::addComponent:
+								if( hasPosition ) { m_world2.AddComponent( entityID, Position2::Info::s_type ); }
+								if( hasSpeed ) { m_world2.AddComponent( entityID, Speed2::Info::s_type ); }
+								if( hasExpiration ) { m_world2.AddComponent( entityID, Expiration2::Info::s_type ); }
+								break;
+							default:
+								break;
+							}
+							
 						}						
 					}
 					ImGui::PopID();
