@@ -267,6 +267,7 @@ namespace fan
 	struct Entity2
 	{
 		int	 transitionIndex = -1;	// index of the corresponding transition if it exists
+		EntityHandle2 handle = 0;
 	};
 
 	//================================
@@ -307,10 +308,20 @@ namespace fan
 			}
 		}
 
-		void RemoveEntity( const int _entityIndex )
+		// Returns true if the last entity was swapped with the removed one
+		bool RemoveEntity( const int _entityIndex )
 		{
+			// pop the last element
+			if( _entityIndex == Size() - 1 )
+			{
+				m_entities.pop_back();
+				return false;
+			}
+			
+			// else swap with the last
 			m_entities[_entityIndex] = *m_entities.rbegin();
 			m_entities.pop_back();
+			return true;
 		}
 
 		int		Size() const  { return int(m_entities.size());  }
@@ -329,9 +340,9 @@ namespace fan
 		std::unordered_map< Signature2, Archetype* >	m_archetypes;
 		std::vector< ComponentInfo2 >					m_componentsInfo;
 		std::unordered_map<uint32_t, ComponentIndex2>	m_typeToIndex;
-		//std::unordered_map< EntityHandle2, EntityID2 >	m_handles;
+		std::unordered_map< EntityHandle2, EntityID2 >	m_handles;
 		EntityHandle2									m_nextHandle = 1; // 0 is a null handle
-		std::vector< Transition >					m_transitions;
+		std::vector< Transition >						m_transitions;
 
 		void Create()
 		{
@@ -353,6 +364,10 @@ namespace fan
 				Archetype& srcArchetype = *transition.entityID.archetype;
 				const uint32_t srcIndex = transition.entityID.index;
 
+				Entity2 srcEntityCpy = srcArchetype.m_entities[srcIndex];
+				assert( srcEntityCpy.transitionIndex == transitionIndex );
+				srcEntityCpy.transitionIndex = -1;
+
 				// Create new signature
 				Signature2 targetSignature = Signature2( 0 );
 				if( &srcArchetype != &m_transitionArchetype )
@@ -362,8 +377,15 @@ namespace fan
 				targetSignature |= transition.signatureAdd;
 				targetSignature &= ~transition.signatureRemove;
 
+				// Entity is dead
 				if( transition.isDead || targetSignature == Signature2( 0 ) )
 				{
+					// remove handle
+					if( srcEntityCpy.handle != 0 )
+					{
+						m_handles.erase( srcEntityCpy.handle );
+					}
+
 					// remove all components from the src archetype
 					if( &srcArchetype != &m_transitionArchetype )
 					{
@@ -374,7 +396,15 @@ namespace fan
 								srcArchetype.m_chunks[componentIndex].Remove( srcIndex );
 							}
 						}
-						srcArchetype.RemoveEntity( srcIndex );
+						if( srcArchetype.RemoveEntity( srcIndex ) )
+						{
+							// update the handle of the element if it was moved
+							Entity2 movedEntity = srcArchetype.m_entities[srcIndex];
+							if( movedEntity.handle != 0 )
+							{
+								m_handles[movedEntity.handle].index = srcIndex;
+							}
+						}
 					}
 
 					// clears the transition archetype
@@ -387,19 +417,23 @@ namespace fan
 				}
 				else
 				{
-					Entity2& srcEntity = srcArchetype.m_entities[srcIndex];
-					assert( srcEntity.transitionIndex == transitionIndex );
-					srcEntity.transitionIndex = -1;
-
 					// Get new archetype
-					Archetype* newArchetype = FindArchetype( targetSignature );
-					if( newArchetype == nullptr )
+					Archetype* dstArchetype = FindArchetype( targetSignature );
+					if( dstArchetype == nullptr )
 					{
-						newArchetype = &CreateArchetype( targetSignature );
+						dstArchetype = &CreateArchetype( targetSignature );
 					}
 
 					// Push new entity
-					newArchetype->m_entities.push_back( srcArchetype.m_entities[srcIndex] );
+					const uint32_t dstIndex = dstArchetype->Size();
+					dstArchetype->m_entities.push_back( srcArchetype.m_entities[srcIndex] );
+					Entity2& dstEntity = * dstArchetype->m_entities.rbegin();
+					dstEntity = srcEntityCpy;
+					dstEntity.transitionIndex = -1;
+					if( dstEntity.handle != 0 )
+					{
+						m_handles[dstEntity.handle] = { dstArchetype, dstIndex };
+					}
 
 					// Moves components from the source archetype to the new archetype				
 					if( &srcArchetype != &m_transitionArchetype )
@@ -410,12 +444,19 @@ namespace fan
 							{
 								if( targetSignature[i] )
 								{
-									newArchetype->m_chunks[i].PushBack( srcArchetype.m_chunks[i].At( srcIndex ) );
+									dstArchetype->m_chunks[i].PushBack( srcArchetype.m_chunks[i].At( srcIndex ) );
 								}
 								srcArchetype.m_chunks[i].Remove( srcIndex );
 							}
 						}
-						srcArchetype.RemoveEntity( srcIndex );
+						if( srcArchetype.RemoveEntity( srcIndex ) )
+						{
+							Entity2 swappedEntity = srcArchetype.m_entities[srcIndex];
+							if( swappedEntity.handle != 0 )
+							{
+								m_handles[swappedEntity.handle].index = srcIndex;
+							}
+						}
 					}
 
 					// copy all components from the transition archetype to the new archetype
@@ -424,7 +465,7 @@ namespace fan
 					{
 						if( transitionMoveSignature[i] )
 						{
-							newArchetype->m_chunks[i].PushBack( m_transitionArchetype.m_chunks[i].At( transitionIndex ) );
+							dstArchetype->m_chunks[i].PushBack( m_transitionArchetype.m_chunks[i].At( transitionIndex ) );
 						}
 						m_transitionArchetype.m_chunks[i].Remove( transitionIndex );
 					}
@@ -440,19 +481,34 @@ namespace fan
 			transition.isDead = true;
 		}
 
-		EntityHandle CreateHandle( const Entity2& /*_entity*/ )
+		EntityID2 GetEntityID( const EntityHandle2 _handle )
 		{
-// 			Entity2& entity = m_entities[_entityID];
-// 			if( entity.handle != 0 )
-// 			{
-// 				return entity.handle;
-// 			}
-// 			else
-// 			{
-// 				entity.handle = m_nextHandle++;
-// 				m_handles[entity.handle] = _entityID;
-// 				return entity.handle;
-// 			}
+			return m_handles[ _handle ];
+		}
+
+		EntityHandle CreateHandle( const EntityID2 _entityID )
+		{
+			Entity2& entity = _entityID.archetype->m_entities[_entityID.index];
+			if( entity.handle != 0 )
+			{
+				return entity.handle;
+			}
+			else
+			{
+				entity.handle = m_nextHandle++;
+				m_handles[entity.handle] = _entityID;
+				return entity.handle;
+			}
+		}
+
+		void RemoveHandle( const EntityID2 _entityID )
+		{
+			Entity2& entity = _entityID.archetype->m_entities[_entityID.index];
+			if( entity.handle != 0 )
+			{
+				m_handles.erase( entity.handle );
+				entity.handle = 0;
+			}
 		}
 
 		Archetype* FindArchetype( const Signature2 _signature )

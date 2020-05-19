@@ -284,6 +284,7 @@ namespace fan
 	{
 		if( ImGui::Begin( "Ecs2" ) )
 		{
+			// Test code
 			static bool hasPosition = true;
 			static bool hasSpeed = true;
 			static bool hasExpiration = true;
@@ -304,8 +305,9 @@ namespace fan
 					if( hasSpeed )		{ m_world2.AddComponent( entity, Speed2::Info::s_type ); }
 					if( hasExpiration ) { m_world2.AddComponent( entity, Expiration2::Info::s_type ); }
 				}
-			}				
-			
+			}
+
+			// Archetypes
 			if( ImGui::CollapsingHeader( "archetypes" ) )
 			{
 				ImGui::Columns( 3 );
@@ -345,17 +347,22 @@ namespace fan
 				ImGui::Columns( 1 );
 			}
 
+			// Entities
 			if( ImGui::CollapsingHeader( "Entities" ) )
 			{
-				enum class Mode{ removeEntity, removeComponent, addComponent};
+				enum class Mode{ removeEntity, removeComponent, addComponent, createHandle, removeHandle };
 				static Mode mode = Mode::removeEntity;
 
 				bool removeEntityVal = mode == Mode::removeEntity;
 				if( ImGui::Checkbox( "remove entity", &removeEntityVal ) ) { if( removeEntityVal ) mode = Mode::removeEntity; } ImGui::SameLine();
 				bool removeComponentVal = mode == Mode::removeComponent;
-				if( ImGui::Checkbox( "remove component", &removeComponentVal ) ) { if( removeComponentVal ) mode = Mode::removeComponent; }ImGui::SameLine();
+				if( ImGui::Checkbox( "remove component", &removeComponentVal ) ) { if( removeComponentVal ) mode = Mode::removeComponent; } ImGui::SameLine();
 				bool addComponentVal = mode == Mode::addComponent;
-				if( ImGui::Checkbox( "add component", &addComponentVal ) ) { if( addComponentVal ) mode = Mode::addComponent; }
+				if( ImGui::Checkbox( "add component", &addComponentVal ) ) { if( addComponentVal ) mode = Mode::addComponent; } ImGui::SameLine();
+				bool createHandleVal = mode == Mode::createHandle;
+				if( ImGui::Checkbox( "create handle", &createHandleVal ) ) { if( createHandleVal ) mode = Mode::createHandle; } ImGui::SameLine();
+				bool removeHandleVal = mode == Mode::removeHandle;
+				if( ImGui::Checkbox( "remove handle", &removeHandleVal ) ) { if( removeHandleVal ) mode = Mode::removeHandle; }
 
 				for( std::pair<Signature2, Archetype*> pair : m_world2.m_archetypes )
 				{
@@ -385,7 +392,14 @@ namespace fan
 								if( hasSpeed ) { m_world2.AddComponent( entityID, Speed2::Info::s_type ); }
 								if( hasExpiration ) { m_world2.AddComponent( entityID, Expiration2::Info::s_type ); }
 								break;
+							case Mode::createHandle:
+								m_world2.CreateHandle( entityID );
+								break;
+							case Mode::removeHandle:
+								m_world2.RemoveHandle( entityID );
+								break;
 							default:
+								assert( false );
 								break;
 							}
 							
@@ -395,30 +409,31 @@ namespace fan
 				}
 			}
 
-// 			if( ImGui::CollapsingHeader( "Handles" ) )
-// 			{
-// 				ImGui::Columns( 4 );
-// 				ImGui::Text( "id" );		ImGui::NextColumn();
-// 				ImGui::Text( "archetype" ); ImGui::NextColumn();
-// 				ImGui::Text( "handle" );	ImGui::NextColumn();
-// 				ImGui::Text( "index" );	ImGui::NextColumn();
-// 				ImGui::Separator();
-// 
-// 				for (int i = 0; i < m_world2.m_entities.size(); i++)
-// 				{
-// 					const Entity2& entity = m_world2.m_entities[i];
-// 					ImGui::Text( "%d", i );		ImGui::NextColumn();
-// 
-// 					std::stringstream ss;
-// 					if( entity.archetype == nullptr ) { ss << "null"; }
-// 					else { ss << entity.archetype->m_signature;  }
-// 					ImGui::Text( "%s", ss.str().c_str() );		ImGui::NextColumn();
-// 
-// 					ImGui::Text( "%d", entity.handle );	ImGui::NextColumn();
-// 					ImGui::Text( "%d", entity.index );	ImGui::NextColumn();
-// 				}
-// 				ImGui::Columns( 1 );
-// 			}
+			// Handles
+			if( ImGui::CollapsingHeader( "Handles" ) )
+			{
+				ImGui::Columns( 4 );
+				ImGui::Text( "id" );		ImGui::NextColumn();
+				ImGui::Text( "handle" );	ImGui::NextColumn();
+				ImGui::Text( "archetype" ); ImGui::NextColumn();
+				ImGui::Text( "index" );	ImGui::NextColumn();
+				ImGui::Separator();
+
+				int i = 0;
+				for ( const auto& pair : m_world2.m_handles )
+				{
+					const EntityHandle2 handle = pair.first;
+					EntityID2 entityID = pair.second;
+
+					ImGui::Text( "%d", i++ );		ImGui::NextColumn();
+					ImGui::Text( "%d", handle );	ImGui::NextColumn();
+					std::stringstream ss;
+					ss << entityID.archetype->m_signature;
+					ImGui::Text( "%s", ss.str().c_str() );	ImGui::NextColumn();
+					ImGui::Text( "%d", entityID.index );	ImGui::NextColumn();
+				}
+				ImGui::Columns( 1 );
+			}
 
 			const ComponentIndex2 indexPos = m_world2.m_typeToIndex[Position2::Info::s_type];
 			const ComponentIndex2 indexSpeed = m_world2.m_typeToIndex[Speed2::Info::s_type];
