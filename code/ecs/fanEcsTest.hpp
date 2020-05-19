@@ -8,32 +8,43 @@ namespace fan
 {
 	//================================
 	//================================
-#define DECLARE_COMPONENT2( _componentType)									\
+#define DECLARE_COMPONENT2( _ComponentType)									\
 	public:																	\
 	template <class T> struct ComponentInfoImpl	{							\
 		static constexpr uint32_t	 s_size		{ sizeof( T )			  };\
 		static constexpr uint32_t	 s_alignment{ alignof( T )			  };\
-		static constexpr const char* s_name		{ #_componentType		  };\
-		static constexpr uint32_t	 s_type		{ SSID( #_componentType ) };\
+		static constexpr const char* s_name		{ #_ComponentType		  };\
+		static constexpr uint32_t	 s_type		{ SSID( #_ComponentType ) };\
 	};																		\
-	using Info = ComponentInfoImpl< _componentType >;
+	using Info = ComponentInfoImpl< _ComponentType >;
 
 
 	//================================
 	//================================
-	static constexpr uint32_t signatureLength2 = 8;
-	using Signature2 = std::bitset<signatureLength2>;
-	using EntityHandle2 = uint32_t;
-	using ComponentIndex2 = uint16_t;
-	static constexpr size_t chunkMaxSize = 65536;
+#define DECLARE_TAG2( _TagType )										\
+	public:																\
+		static constexpr const char* s_name		{ #_TagType		  };	\
+		static constexpr uint32_t	 s_type		{ SSID( #_TagType ) };																		
 
 	//================================
 	//================================
-	struct Component2 {};
+	static constexpr uint32_t ecsSignatureLength = 8;
+	using EcsSignature = std::bitset<ecsSignatureLength>;
+	using EcsHandle = uint32_t;
+	static constexpr size_t ecsChunkMaxSize = 65536;
 
 	//================================
 	//================================
-	struct Position2 : Component2
+	struct EcsComponent {};
+	struct EcsTag {};
+
+	//================================
+	//================================
+	struct TagBoundsOutdated : EcsTag { DECLARE_TAG2 ( TagBoundsOutdated ) };
+
+	//================================
+	//================================
+	struct Position2 : EcsComponent
 	{
 		DECLARE_COMPONENT2( Position2 );
 
@@ -42,7 +53,7 @@ namespace fan
 
 	//================================
 	//================================
-	struct Speed2 : Component2
+	struct Speed2 : EcsComponent
 	{
 		DECLARE_COMPONENT2( Speed2 );
 		float speed[2];
@@ -50,7 +61,7 @@ namespace fan
 
 	//================================
 	//================================
-	struct Expiration2 : Component2
+	struct Expiration2 : EcsComponent
 	{
 		DECLARE_COMPONENT2( Expiration2 );
 		float timeLeft;
@@ -58,7 +69,7 @@ namespace fan
 
 	//================================
 	//================================
-	struct ComponentInfo2
+	struct EcsComponentInfo
 	{
 		uint32_t	size;
 		uint32_t	alignment;
@@ -69,13 +80,13 @@ namespace fan
 	//================================
 	// Small aligned memory buffer
 	//================================
-	class Chunk
+	class EcsChunk
 	{
 	public:
 		void Create( const int _componentSize, const int _alignment )
 		{
 			m_componentSize = _componentSize;
-			m_capacity =  chunkMaxSize / _componentSize;
+			m_capacity =  ecsChunkMaxSize / _componentSize;
 			m_size = 0;
 
 			int chunckSize = m_capacity * _componentSize;
@@ -154,7 +165,7 @@ namespace fan
 	// Dynamic array of fixed size chunks
 	// Can be indexed like a continuous array	
 	//================================
-	class ChunkVector
+	class EcsChunkVector
 	{
 	public:
 		void Create( const int _componentSize, const int _alignment )
@@ -173,7 +184,7 @@ namespace fan
 			assert( chunkIndex < m_chunks.size() );
 			assert( elementIndex < m_chunks[chunkIndex].Size() );
 
-			Chunk& chunk = m_chunks[chunkIndex];
+			EcsChunk& chunk = m_chunks[chunkIndex];
 
 			// Last chunk ? just remove the element & back swap locally in the chunk
 			if( chunkIndex == m_chunks.size() - 1 )
@@ -183,12 +194,12 @@ namespace fan
 			else
 			{
 				// back swap the removed element with the last element of the last chunk
-				Chunk& lastChunk = *m_chunks.rbegin();
+				EcsChunk& lastChunk = *m_chunks.rbegin();
 				chunk.Set( elementIndex, lastChunk.At( lastChunk.Size() - 1 ) );
 				lastChunk.PopBack();
 			}
 
-			Chunk& lastChunk = *m_chunks.rbegin();
+			EcsChunk& lastChunk = *m_chunks.rbegin();
 			if( lastChunk.Empty() && m_chunks.size() > 1 )
 			{
 				lastChunk.Destroy();
@@ -211,12 +222,12 @@ namespace fan
 			// Create a new chunk if necessary
 			if( m_chunks.rbegin()->Full() )
 			{
-				m_chunks.push_back( Chunk() );
+				m_chunks.push_back( EcsChunk() );
 				m_chunks.rbegin()->Create( m_componentSize, m_alignment );
 			}
 
 			// Push to the last chunk
-			Chunk& chunk = *m_chunks.rbegin();
+			EcsChunk& chunk = *m_chunks.rbegin();
 			const int chunkIndex = int( m_chunks.size() - 1 );
 			const int elementIndex = chunk.Size();
 			chunk.PushBack( _data );
@@ -228,70 +239,67 @@ namespace fan
 			// Create a new chunk if necessary
 			if( m_chunks.rbegin()->Full() )
 			{
-				m_chunks.push_back( Chunk() );
+				m_chunks.push_back( EcsChunk() );
 				m_chunks.rbegin()->Create( m_componentSize, m_alignment );
 			}
 
 			// Emplace to the last chunk
-			Chunk& chunk = *m_chunks.rbegin();
+			EcsChunk& chunk = *m_chunks.rbegin();
 			const int chunkIndex = int( m_chunks.size() - 1 );
 			const int elementIndex = chunk.Size();
 			chunk.EmplaceBack();
 			return chunkIndex * m_chunkCapacity + elementIndex;
 		}
-
 		
-		Chunk& GetChunk( const int _index ) { return m_chunks[_index]; }
-		int NumChunk() const { return int( m_chunks.size() ); }
+		EcsChunk&	GetChunk( const int _index ) { return m_chunks[_index]; }
+		int			NumChunk() const { return int( m_chunks.size() ); }
 	private:
-		std::vector<Chunk> m_chunks;
+		std::vector<EcsChunk> m_chunks;
 		int m_componentSize;
 		int m_alignment;
 		int m_chunkCapacity;
 	};
 
-	class Archetype;
+	class EcsArchetype;
 
 	//================================
 	// Allows indexing of entities
 	//================================
-	struct EntityID2
+	struct EcsEntity
 	{
-		Archetype* archetype = nullptr;
+		EcsArchetype* archetype = nullptr;
 		uint32_t	index = 0;	// index in the archetype
 	};
 
 	//================================
 	// Small data relative to a specific entity
 	//================================
-	struct Entity2
+	struct EcsEntityData
 	{
 		int	 transitionIndex = -1;	// index of the corresponding transition if it exists
-		EntityHandle2 handle = 0;
+		EcsHandle handle = 0;
 	};
 
 	//================================
 	// A transition is created when structural change happen on an entity ( creating / removing components )
 	//================================
-	struct Transition
+	struct EcsTransition
 	{
-		EntityID2	entityID;
-		Signature2  signatureAdd = Signature2( 0 );		// bit to 1 means add componenent
-		Signature2  signatureRemove = Signature2( 0 );	// bit to 1 means remove componenent
+		EcsEntity	entityID;
+		EcsSignature  signatureAdd = EcsSignature( 0 );		// bit to 1 means add component
+		EcsSignature  signatureRemove = EcsSignature( 0 );	// bit to 1 means remove component
 		bool isDead = false;
 	};
-
-	static const size_t trrtrtrt = sizeof( Entity2 );
 
 	//================================
 	// An archetype is a collection of entities with the same signature
 	// All component of the same entity are at the same index
 	// components are put in arrays of small buffers called chunks
 	//================================
-	class Archetype
+	class EcsArchetype
 	{
 	public:
-		void Create( const std::vector< ComponentInfo2 >& _componentsInfo, const Signature2& _signature )
+		void Create( const std::vector< EcsComponentInfo >& _componentsInfo, const EcsSignature& _signature )
 		{
 			const size_t numComponents = _componentsInfo.size();
 
@@ -302,7 +310,7 @@ namespace fan
 			{
 				if( m_signature[i] )
 				{
-					const ComponentInfo2& info = _componentsInfo[i];
+					const EcsComponentInfo& info = _componentsInfo[i];
 					m_chunks[i].Create( info.size, info.alignment );
 				}
 			}
@@ -327,26 +335,28 @@ namespace fan
 		int		Size() const  { return int(m_entities.size());  }
 		bool	Empty() const { return m_entities.empty(); }
 
-		Signature2					m_signature;
-		std::vector< ChunkVector >	m_chunks;		// one index per component type
-		std::vector<Entity2>		m_entities;	
+		EcsSignature					m_signature;
+		std::vector< EcsChunkVector >	m_chunks;		// one index per component type
+		std::vector<EcsEntityData>		m_entities;	
 	};
 
 	//================================
 	//================================
 	struct EcsWorld2
 	{
-		Archetype m_transitionArchetype;
-		std::unordered_map< Signature2, Archetype* >	m_archetypes;
-		std::vector< ComponentInfo2 >					m_componentsInfo;
-		std::unordered_map<uint32_t, ComponentIndex2>	m_typeToIndex;
-		std::unordered_map< EntityHandle2, EntityID2 >	m_handles;
-		EntityHandle2									m_nextHandle = 1; // 0 is a null handle
-		std::vector< Transition >						m_transitions;
+		EcsArchetype m_transitionArchetype;
+		std::unordered_map< EcsSignature, EcsArchetype* >	m_archetypes;
+		std::vector< EcsComponentInfo >						m_componentsInfo;
+		std::unordered_map<uint32_t, int >					m_typeToIndex;
+		std::unordered_map< EcsHandle, EcsEntity >			m_handles;
+		EcsHandle											m_nextHandle = 1; // 0 is a null handle
+		std::vector< EcsTransition >						m_transitions;
+		int													m_nextTagIndex = ecsSignatureLength - 1;
+		EcsSignature										m_tagsMask; // signature of all tag types combined
 
 		void Create()
 		{
-			m_transitionArchetype.Create( m_componentsInfo, ~Signature2( 0 ) );
+			m_transitionArchetype.Create( m_componentsInfo, ~EcsSignature( 0 ) );
 		}
 
 		int NumComponents() const 
@@ -354,22 +364,22 @@ namespace fan
 			return int(m_componentsInfo.size());
 		}
 
-		void EndFrame()
+		void ApplyTransitions()
 		{
-			// Applies structural transition to entities
+			// Applies structural transition to entities ( add/remove components/tags, add/remove entities
 			assert( m_transitionArchetype.Size() == m_transitions.size() );
 			for (int transitionIndex = m_transitionArchetype.Size() - 1; transitionIndex >= 0; --transitionIndex)
 			{
-				const Transition& transition = m_transitions[transitionIndex];
-				Archetype& srcArchetype = *transition.entityID.archetype;
+				const EcsTransition& transition = m_transitions[transitionIndex];
+				EcsArchetype& srcArchetype = *transition.entityID.archetype;
 				const uint32_t srcIndex = transition.entityID.index;
 
-				Entity2 srcEntityCpy = srcArchetype.m_entities[srcIndex];
+				EcsEntityData srcEntityCpy = srcArchetype.m_entities[srcIndex];
 				assert( srcEntityCpy.transitionIndex == transitionIndex );
 				srcEntityCpy.transitionIndex = -1;
 
 				// Create new signature
-				Signature2 targetSignature = Signature2( 0 );
+				EcsSignature targetSignature = EcsSignature( 0 );
 				if( &srcArchetype != &m_transitionArchetype )
 				{
 					targetSignature |= srcArchetype.m_signature;
@@ -378,7 +388,7 @@ namespace fan
 				targetSignature &= ~transition.signatureRemove;
 
 				// Entity is dead
-				if( transition.isDead || targetSignature == Signature2( 0 ) )
+				if( transition.isDead || targetSignature == EcsSignature( 0 ) )
 				{
 					// remove handle
 					if( srcEntityCpy.handle != 0 )
@@ -399,7 +409,7 @@ namespace fan
 						if( srcArchetype.RemoveEntity( srcIndex ) )
 						{
 							// update the handle of the element if it was moved
-							Entity2 movedEntity = srcArchetype.m_entities[srcIndex];
+							EcsEntityData movedEntity = srcArchetype.m_entities[srcIndex];
 							if( movedEntity.handle != 0 )
 							{
 								m_handles[movedEntity.handle].index = srcIndex;
@@ -408,7 +418,7 @@ namespace fan
 					}
 
 					// clears the transition archetype
-					const Signature2 transitionMoveSignature = transition.signatureAdd & ~transition.signatureRemove;
+					const EcsSignature transitionMoveSignature = transition.signatureAdd & ~transition.signatureRemove;
 					for( int i = 0; i < NumComponents(); i++ )
 					{
 						m_transitionArchetype.m_chunks[i].Remove( transitionIndex );						
@@ -418,7 +428,7 @@ namespace fan
 				else
 				{
 					// Get new archetype
-					Archetype* dstArchetype = FindArchetype( targetSignature );
+					EcsArchetype* dstArchetype = FindArchetype( targetSignature );
 					if( dstArchetype == nullptr )
 					{
 						dstArchetype = &CreateArchetype( targetSignature );
@@ -427,7 +437,7 @@ namespace fan
 					// Push new entity
 					const uint32_t dstIndex = dstArchetype->Size();
 					dstArchetype->m_entities.push_back( srcArchetype.m_entities[srcIndex] );
-					Entity2& dstEntity = * dstArchetype->m_entities.rbegin();
+					EcsEntityData& dstEntity = * dstArchetype->m_entities.rbegin();
 					dstEntity = srcEntityCpy;
 					dstEntity.transitionIndex = -1;
 					if( dstEntity.handle != 0 )
@@ -451,7 +461,7 @@ namespace fan
 						}
 						if( srcArchetype.RemoveEntity( srcIndex ) )
 						{
-							Entity2 swappedEntity = srcArchetype.m_entities[srcIndex];
+							EcsEntityData swappedEntity = srcArchetype.m_entities[srcIndex];
 							if( swappedEntity.handle != 0 )
 							{
 								m_handles[swappedEntity.handle].index = srcIndex;
@@ -460,7 +470,7 @@ namespace fan
 					}
 
 					// copy all components from the transition archetype to the new archetype
-					const Signature2 transitionMoveSignature = transition.signatureAdd & targetSignature;
+					const EcsSignature transitionMoveSignature = transition.signatureAdd & targetSignature;
 					for( int i = 0; i < NumComponents(); i++ )
 					{
 						if( transitionMoveSignature[i] )
@@ -475,77 +485,11 @@ namespace fan
 			m_transitions.clear();
 		}
 
-		void Kill( const EntityID2 _entityID )
-		{
-			Transition& transition = FindOrCreateTransition( _entityID );
-			transition.isDead = true;
-		}
-
-		EntityID2 GetEntityID( const EntityHandle2 _handle )
-		{
-			return m_handles[ _handle ];
-		}
-
-		EntityHandle CreateHandle( const EntityID2 _entityID )
-		{
-			Entity2& entity = _entityID.archetype->m_entities[_entityID.index];
-			if( entity.handle != 0 )
-			{
-				return entity.handle;
-			}
-			else
-			{
-				entity.handle = m_nextHandle++;
-				m_handles[entity.handle] = _entityID;
-				return entity.handle;
-			}
-		}
-
-		void RemoveHandle( const EntityID2 _entityID )
-		{
-			Entity2& entity = _entityID.archetype->m_entities[_entityID.index];
-			if( entity.handle != 0 )
-			{
-				m_handles.erase( entity.handle );
-				entity.handle = 0;
-			}
-		}
-
-		Archetype* FindArchetype( const Signature2 _signature )
-		{
-			auto it = m_archetypes.find( _signature );
-			return it == m_archetypes.end() ? nullptr : it->second;
-		}
-
-		Archetype& CreateArchetype( const Signature2 _signature )
-		{
-			assert( FindArchetype( _signature ) == nullptr );
-			Archetype* newArchetype = new Archetype();
-			newArchetype->Create( m_componentsInfo, _signature );
-			m_archetypes[_signature] = newArchetype;
-			return *newArchetype;
-		}
-
-		template <typename _ComponentType >
-		void AddComponentType()
-		{
-			const ComponentIndex2 index = static_cast<uint32_t>( m_componentsInfo.size() );
-
-			ComponentInfo2 info;
-			info.size = _ComponentType::Info::s_size;
-			info.alignment = _ComponentType::Info::s_alignment;
-			info.name = _ComponentType::Info::s_name;
-			info.type = _ComponentType::Info::s_type;
-			m_componentsInfo.push_back( info );
-
-			m_typeToIndex[_ComponentType::Info::s_type] = index;
-		}
-
-		Transition& FindOrCreateTransition( const EntityID2 _entityID )
+		EcsTransition& FindOrCreateTransition( const EcsEntity _entityID )
 		{
 			// Get/register transition
-			Entity2& entity = _entityID.archetype->m_entities[_entityID.index];
-			Transition* transition = nullptr;
+			EcsEntityData& entity = _entityID.archetype->m_entities[_entityID.index];
+			EcsTransition* transition = nullptr;
 			if( entity.transitionIndex < 0 )
 			{
 				entity.transitionIndex = m_transitionArchetype.Size();
@@ -567,47 +511,148 @@ namespace fan
 			return *transition;
 		}
 
-		Entity2& GetEntity( const EntityID2 _entityID )
+		EcsEntity GetEntityID( const EcsHandle _handle )
+		{
+			return m_handles[ _handle ];
+		}
+
+		EntityHandle AddHandle( const EcsEntity _entityID )
+		{
+			EcsEntityData& entity = _entityID.archetype->m_entities[_entityID.index];
+			if( entity.handle != 0 )
+			{
+				return entity.handle;
+			}
+			else
+			{
+				entity.handle = m_nextHandle++;
+				m_handles[entity.handle] = _entityID;
+				return entity.handle;
+			}
+		}
+
+		void RemoveHandle( const EcsEntity _entityID )
+		{
+			EcsEntityData& entity = _entityID.archetype->m_entities[_entityID.index];
+			if( entity.handle != 0 )
+			{
+				m_handles.erase( entity.handle );
+				entity.handle = 0;
+			}
+		}
+
+		EcsArchetype* FindArchetype( const EcsSignature _signature )
+		{
+			auto it = m_archetypes.find( _signature );
+			return it == m_archetypes.end() ? nullptr : it->second;
+		}
+
+		EcsArchetype& CreateArchetype( const EcsSignature _signature )
+		{
+			assert( FindArchetype( _signature ) == nullptr );
+			EcsArchetype* newArchetype = new EcsArchetype();
+			newArchetype->Create( m_componentsInfo, _signature );
+			m_archetypes[_signature] = newArchetype;
+			return *newArchetype;
+		}
+
+		EcsEntityData& GetEntity( const EcsEntity _entityID )
 		{
 			return _entityID.archetype->m_entities[_entityID.index];
 		}
-		void RemoveComponent( const EntityID2 _entityID, const uint32_t s_type )
+
+		void Kill( const EcsEntity _entityID )
 		{
-			const uint32_t componentIndex = m_typeToIndex[s_type];
-			Transition& transition = FindOrCreateTransition( _entityID );
-
-			// entity must have this component
-			assert( _entityID.archetype == &m_transitionArchetype || _entityID.archetype->m_signature[componentIndex] );
-
-			// Update transition
-			transition.signatureRemove |= Signature2( 1 ) << componentIndex;
+			EcsTransition& transition = FindOrCreateTransition( _entityID );
+			transition.isDead = true;
 		}
 
-		Component2& AddComponent( const EntityID2 _entityID, const uint32_t s_type )
-		{			
+		template <typename _TagType > 
+		void AddTagType()
+		{
+			static_assert( std::is_base_of< EcsTag, _TagType>::value );
+ 			assert( m_nextTagIndex >= NumComponents() );
+ 			const ComponentIndex newTagIndex = m_nextTagIndex--;
+			m_typeToIndex[_TagType::s_type] = newTagIndex;
+ 			m_tagsMask[newTagIndex] = 1;
+		}
+
+		void AddTag( const EcsEntity _entityID, const uint32_t s_type )
+		{
+			const uint32_t tagIndex = m_typeToIndex[s_type];
+			EcsTransition& transition = FindOrCreateTransition( _entityID );
+
+			// entity doesn't already have this tag
+			assert( _entityID.archetype == &m_transitionArchetype || !_entityID.archetype->m_signature[tagIndex] );
+
+			// Update transition
+			transition.signatureAdd[tagIndex] = 1;
+		}
+
+		void RemoveTag( const EcsEntity _entityID, const uint32_t s_type )
+		{
+			const uint32_t tagIndex = m_typeToIndex[s_type];
+			EcsTransition& transition = FindOrCreateTransition( _entityID );
+
+			// entity must have this tag
+			assert( _entityID.archetype == &m_transitionArchetype || _entityID.archetype->m_signature[tagIndex] );
+
+			// Update transition
+			transition.signatureRemove[tagIndex] = 1;
+		}
+
+		template <typename _ComponentType >
+		void AddComponentType()
+		{
+			const int index = NumComponents();
+
+			EcsComponentInfo info;
+			info.size = _ComponentType::Info::s_size;
+			info.alignment = _ComponentType::Info::s_alignment;
+			info.name = _ComponentType::Info::s_name;
+			info.type = _ComponentType::Info::s_type;
+			m_componentsInfo.push_back( info );
+
+			m_typeToIndex[_ComponentType::Info::s_type] = index;
+		}
+
+		EcsComponent& AddComponent( const EcsEntity _entityID, const uint32_t s_type )
+		{
 			const uint32_t componentIndex = m_typeToIndex[s_type];
-			Transition& transition = FindOrCreateTransition( _entityID );
-			Entity2& entity = GetEntity( _entityID ); 			
+			EcsTransition& transition = FindOrCreateTransition( _entityID );
+			EcsEntityData& entity = GetEntity( _entityID );
 
 			// entity doesn't already have this component
 			assert( _entityID.archetype == &m_transitionArchetype || !_entityID.archetype->m_signature[componentIndex] );
 
 			// Update transition
-			transition.signatureAdd |=  Signature2( 1 ) << componentIndex;
+			transition.signatureAdd[componentIndex] = 1;
 
-			return *static_cast<Component2*>( m_transitionArchetype.m_chunks[componentIndex].At( entity.transitionIndex ) );
+			return *static_cast<EcsComponent*>( m_transitionArchetype.m_chunks[componentIndex].At( entity.transitionIndex ) );
 		}
 
-		EntityID2 CreateEntity()
+		void RemoveComponent( const EcsEntity _entityID, const uint32_t s_type )
+		{
+			const uint32_t componentIndex = m_typeToIndex[s_type];
+			EcsTransition& transition = FindOrCreateTransition( _entityID );
+
+			// entity must have this component
+			assert( _entityID.archetype == &m_transitionArchetype || _entityID.archetype->m_signature[componentIndex] );
+
+			// Update transition
+			transition.signatureRemove[componentIndex] = 1;
+		}
+
+		EcsEntity CreateEntity()
 		{			
-			EntityID2 entityID; 
+			EcsEntity entityID; 
 			entityID.archetype = &m_transitionArchetype;
 			entityID.index = m_transitionArchetype.Size();
 
-			Entity2 entity;
+			EcsEntityData entity;
 			entity.transitionIndex = int(m_transitions.size());
 
-			Transition transition;
+			EcsTransition transition;
 			transition.entityID = entityID;
 
 			m_transitions.push_back( transition );
@@ -623,14 +668,14 @@ namespace fan
 
 	//================================
 	//================================
-	struct SystemView
+	struct EcsSystemView
 	{
-		SystemView( EcsWorld2& _world ) : m_world( _world )
+		EcsSystemView( EcsWorld2& _world ) : m_world( _world )
 		{
 		}
 
 		EcsWorld2& m_world;
-		std::vector<Archetype*> m_archetypes;
+		std::vector<EcsArchetype*> m_archetypes;
 
 
 		//================================
@@ -638,7 +683,7 @@ namespace fan
 		template < typename _ComponentType >
 		struct Iterator
 		{
-			Iterator( const ComponentIndex2 _componentIndex, SystemView& _view )
+			Iterator( const int _componentIndex, EcsSystemView& _view )
 			{
 				m_archetypes = _view.m_archetypes;
 				m_componentIndex = _componentIndex;
@@ -649,13 +694,13 @@ namespace fan
 				m_currentChunk = &m_currentArchetype->m_chunks[_componentIndex].GetChunk( m_chunkIndex );
 			}
 
-			std::vector< Archetype* >	m_archetypes;
-			ComponentIndex2				m_componentIndex;
+			std::vector< EcsArchetype* >	m_archetypes;
+			int							m_componentIndex;
 			uint16_t					m_archetypeIndex;
 			uint16_t					m_chunkIndex;
 			uint16_t					m_elementIndex;
-			Archetype*					m_currentArchetype;
-			Chunk*						m_currentChunk;			
+			EcsArchetype*					m_currentArchetype;
+			EcsChunk*						m_currentChunk;			
 
 			void operator++() // prefix ++
 			{
@@ -696,7 +741,7 @@ namespace fan
 		template < typename _ComponentType >
 		Iterator<_ComponentType> Begin()
 		{
-			const ComponentIndex2 index = m_world.m_typeToIndex[_ComponentType::Info::s_type];
+			const int index = m_world.m_typeToIndex[_ComponentType::Info::s_type];
 			return Iterator<_ComponentType>( index, *this );
 		}
 

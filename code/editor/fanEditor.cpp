@@ -243,6 +243,7 @@ namespace fan
 		m_world2.AddComponentType<Position2>();
 		m_world2.AddComponentType<Speed2>();
 		m_world2.AddComponentType<Expiration2>();
+		m_world2.AddTagType<TagBoundsOutdated>();
 		m_world2.Create();
 	}
 
@@ -288,11 +289,15 @@ namespace fan
 			static bool hasPosition = true;
 			static bool hasSpeed = true;
 			static bool hasExpiration = true;
+			static bool hasTagBounds = true;
+			static bool hasHandle = false;
 			static int num = 1;
 
 			ImGui::Checkbox( "position", &hasPosition ); ImGui::SameLine();
 			ImGui::Checkbox( "speed", &hasSpeed ); ImGui::SameLine();
-			ImGui::Checkbox( "expiration", &hasExpiration );
+			ImGui::Checkbox( "expiration   ", &hasExpiration ); ImGui::SameLine();
+			ImGui::Checkbox( "tag bounds   ", &hasTagBounds ); ImGui::SameLine();
+			ImGui::Checkbox( "handle", &hasHandle );
 			ImGui::DragInt( "num", &num, 1.f, 0, 10000 );
 
 			if( ImGui::Button( "Create entity" ) )
@@ -300,10 +305,12 @@ namespace fan
 				ScopedTimer timer( "Create" );
 				for( int i = 0; i < num; i++ ) 
 				{
-					EntityID2 entity = m_world2.CreateEntity();
+					EcsEntity entity = m_world2.CreateEntity();
 					if( hasPosition )	{ m_world2.AddComponent( entity, Position2::Info::s_type ); }
 					if( hasSpeed )		{ m_world2.AddComponent( entity, Speed2::Info::s_type ); }
 					if( hasExpiration ) { m_world2.AddComponent( entity, Expiration2::Info::s_type ); }
+					if( hasTagBounds )  { m_world2.AddTag( entity, TagBoundsOutdated::s_type ); }
+					if( hasHandle ) { m_world2.AddHandle( entity ); }
 				}
 			}
 
@@ -316,13 +323,13 @@ namespace fan
 				ImGui::Text( "chunks" );    ImGui::NextColumn();
 				ImGui::Separator();
 
-				std::vector<Archetype*> archetypes;
+				std::vector<EcsArchetype*> archetypes;
 				for( auto it = m_world2.m_archetypes.begin(); it != m_world2.m_archetypes.end(); ++it )
 				{
 					archetypes.push_back( it->second );
 				}archetypes.push_back( &m_world2.m_transitionArchetype );
 
-				for ( Archetype* archetype : archetypes )
+				for ( EcsArchetype* archetype : archetypes )
 				{
 					std::stringstream ss;
 					ss << archetype->m_signature;
@@ -350,7 +357,7 @@ namespace fan
 			// Entities
 			if( ImGui::CollapsingHeader( "Entities" ) )
 			{
-				enum class Mode{ removeEntity, removeComponent, addComponent, createHandle, removeHandle };
+				enum class Mode{ removeEntity, removeComponent, addComponent, addTag, removeTag, createHandle, removeHandle };
 				static Mode mode = Mode::removeEntity;
 
 				bool removeEntityVal = mode == Mode::removeEntity;
@@ -358,15 +365,19 @@ namespace fan
 				bool removeComponentVal = mode == Mode::removeComponent;
 				if( ImGui::Checkbox( "remove component", &removeComponentVal ) ) { if( removeComponentVal ) mode = Mode::removeComponent; } ImGui::SameLine();
 				bool addComponentVal = mode == Mode::addComponent;
-				if( ImGui::Checkbox( "add component", &addComponentVal ) ) { if( addComponentVal ) mode = Mode::addComponent; } ImGui::SameLine();
+				if( ImGui::Checkbox( "add component", &addComponentVal ) ) { if( addComponentVal ) mode = Mode::addComponent; } ImGui::SameLine();				
+				bool removeTagVal = mode == Mode::removeTag;
+				if( ImGui::Checkbox( "remove tag", &removeTagVal ) ) { if( removeTagVal ) mode = Mode::removeTag; } ImGui::SameLine();
+				bool addTagVal = mode == Mode::addTag;
+				if( ImGui::Checkbox( "add tag", &addTagVal ) ) { if( addTagVal ) mode = Mode::addTag; } ImGui::SameLine();
 				bool createHandleVal = mode == Mode::createHandle;
 				if( ImGui::Checkbox( "create handle", &createHandleVal ) ) { if( createHandleVal ) mode = Mode::createHandle; } ImGui::SameLine();
 				bool removeHandleVal = mode == Mode::removeHandle;
 				if( ImGui::Checkbox( "remove handle", &removeHandleVal ) ) { if( removeHandleVal ) mode = Mode::removeHandle; }
 
-				for( std::pair<Signature2, Archetype*> pair : m_world2.m_archetypes )
+				for( std::pair<EcsSignature, EcsArchetype*> pair : m_world2.m_archetypes )
 				{
-					Archetype& archetype = *pair.second;
+					EcsArchetype& archetype = *pair.second;
 					std::stringstream ss;
 					ss << archetype.m_signature;
 					ImGui::Text( "%s", ss.str().c_str() );
@@ -376,7 +387,7 @@ namespace fan
 						ImGui::SameLine();
 						if( ImGui::Button( std::to_string(i).c_str() ) )
 						{
-							EntityID2 entityID = { &archetype, uint32_t( i ) };
+							EcsEntity entityID = { &archetype, uint32_t( i ) };
 							switch( mode )
 							{
 							case Mode::removeEntity:
@@ -392,8 +403,14 @@ namespace fan
 								if( hasSpeed ) { m_world2.AddComponent( entityID, Speed2::Info::s_type ); }
 								if( hasExpiration ) { m_world2.AddComponent( entityID, Expiration2::Info::s_type ); }
 								break;
+							case Mode::removeTag:
+								if( hasTagBounds ) { m_world2.RemoveTag( entityID, TagBoundsOutdated::s_type ); }
+								break;
+							case Mode::addTag:
+								if( hasTagBounds ) { m_world2.AddTag( entityID, TagBoundsOutdated::s_type ); }
+								break;
 							case Mode::createHandle:
-								m_world2.CreateHandle( entityID );
+								m_world2.AddHandle( entityID );
 								break;
 							case Mode::removeHandle:
 								m_world2.RemoveHandle( entityID );
@@ -422,8 +439,8 @@ namespace fan
 				int i = 0;
 				for ( const auto& pair : m_world2.m_handles )
 				{
-					const EntityHandle2 handle = pair.first;
-					EntityID2 entityID = pair.second;
+					const EcsHandle handle = pair.first;
+					EcsEntity entityID = pair.second;
 
 					ImGui::Text( "%d", i++ );		ImGui::NextColumn();
 					ImGui::Text( "%d", handle );	ImGui::NextColumn();
@@ -435,9 +452,9 @@ namespace fan
 				ImGui::Columns( 1 );
 			}
 
-			const ComponentIndex2 indexPos = m_world2.m_typeToIndex[Position2::Info::s_type];
-			const ComponentIndex2 indexSpeed = m_world2.m_typeToIndex[Speed2::Info::s_type];
-			const Signature2 targetSignature = ( Signature2( 1 ) << indexPos );
+			const int indexPos   = m_world2.m_typeToIndex[Position2::Info::s_type];
+			const int indexSpeed = m_world2.m_typeToIndex[Speed2::Info::s_type];
+			const EcsSignature targetSignature = ( EcsSignature( 1 ) << indexPos );
 
 			if( ImGui::Button( "Init" ) ){
 				// Init 
@@ -445,10 +462,10 @@ namespace fan
 				{
 					if( ( it->first & targetSignature ) == targetSignature )
 					{
-						Archetype& archetype = *it->second;
+						EcsArchetype& archetype = *it->second;
 						for( int chunkIndex = 0; chunkIndex < archetype.m_chunks[indexPos].NumChunk(); chunkIndex++ )
 						{
-							Chunk& chunk = archetype.m_chunks[indexPos].GetChunk( chunkIndex );
+							EcsChunk& chunk = archetype.m_chunks[indexPos].GetChunk( chunkIndex );
 							for( int elementIdex = 0; elementIdex < chunk.Size(); elementIdex++ )
 							{
 								Position2* position = static_cast<Position2*>( chunk.At( elementIdex ) );
@@ -463,13 +480,13 @@ namespace fan
 			{
 				// Test 1
 				float total1 = 0.f;
-				std::vector<Chunk*> match1;
+				std::vector<EcsChunk*> match1;
 				for( auto it = m_world2.m_archetypes.begin(); it != m_world2.m_archetypes.end(); ++it )
 				{
-					Archetype& archetype = *it->second;
+					EcsArchetype& archetype = *it->second;
 					if( ( archetype.m_signature & targetSignature ) == targetSignature )
 					{
-						ChunkVector& chunks = archetype.m_chunks[indexPos];
+						EcsChunkVector& chunks = archetype.m_chunks[indexPos];
 						for( int i = 0; i < chunks.NumChunk(); i++ )
 						{
 							match1.push_back( &chunks.GetChunk( i ) );
@@ -478,7 +495,7 @@ namespace fan
 				}
 				{
 					ScopedTimer timer( "Test for loop" );
-					for( Chunk* chunk : match1 )
+					for( EcsChunk* chunk : match1 )
 					{
 						for( int i = 0; i < chunk->Size(); i++ )
 						{
@@ -490,7 +507,7 @@ namespace fan
 
 				// Test 2
 				float total2 = 0.f;
-				SystemView view( m_world2 );
+				EcsSystemView view( m_world2 );
 				for( auto it = m_world2.m_archetypes.begin(); it != m_world2.m_archetypes.end(); ++it )
 				{
 					if( ( it->first & targetSignature ) == targetSignature && ! it->second->Empty() )
@@ -500,7 +517,7 @@ namespace fan
 				}
 				{
 					ScopedTimer timer( "Test Iterator" );
-					for( SystemView::Iterator<Position2> positionIt = view.Begin<Position2>(); !positionIt.End(); ++positionIt )
+					for( EcsSystemView::Iterator<Position2> positionIt = view.Begin<Position2>(); !positionIt.End(); ++positionIt )
 					{
 						total2 += ( *positionIt ).position[0];
 						view.Kill( positionIt );
@@ -516,7 +533,7 @@ namespace fan
 		}
 		ImGui::End();
 
-		m_world2.EndFrame();
+		m_world2.ApplyTransitions();
 	}
 
 	//================================================================================================================================
