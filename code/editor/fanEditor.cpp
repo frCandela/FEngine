@@ -244,6 +244,7 @@ namespace fan
 		m_world2.AddComponentType<Speed2>();
 		m_world2.AddComponentType<Expiration2>();
 		m_world2.AddTagType<TagBoundsOutdated>();
+		m_world2.AddSingletonType<SingletonTest>();
 		m_world2.Create();
 	}
 
@@ -521,10 +522,12 @@ namespace fan
 				}
 				{
 					ScopedTimer timer( "Test Iterator" );
+					SingletonTest& singletonTest = m_world2.GetSingleton<SingletonTest>();
 					for( EcsSystemView::Iterator<Position2> positionIt = view.Begin<Position2>(); !positionIt.End(); ++positionIt )
 					{
-						total2 += ( *positionIt ).position[0];
-						view.Kill( positionIt );
+						float value = ( *positionIt ).position[0];
+						total2 += value;
+						Debug::Log() << value << Debug::Endl();
 					}
 				}
 

@@ -8,16 +8,15 @@ namespace fan
 {
 	//================================
 	//================================
-#define DECLARE_COMPONENT2( _ComponentType)									\
-	public:																	\
-	template <class T> struct ComponentInfoImpl	{							\
-		static constexpr uint32_t	 s_size		{ sizeof( T )			  };\
-		static constexpr uint32_t	 s_alignment{ alignof( T )			  };\
-		static constexpr const char* s_name		{ #_ComponentType		  };\
-		static constexpr uint32_t	 s_type		{ SSID( #_ComponentType ) };\
-	};																		\
-	using Info = ComponentInfoImpl< _ComponentType >;
-
+#define DECLARE_COMPONENT2( _ComponentType)															\
+	public:																							\
+	template <class T> struct ComponentInfoImpl	{													\
+		static constexpr uint32_t	 s_size		{ sizeof( T )			  };						\
+		static constexpr uint32_t	 s_alignment{ alignof( T )			  };						\
+		static constexpr const char* s_name		{ #_ComponentType		  };						\
+		static constexpr uint32_t	 s_type		{ SSID( #_ComponentType ) };						\
+	};																								\
+	using Info = ComponentInfoImpl< _ComponentType >;												\
 
 	//================================
 	//================================
@@ -28,6 +27,13 @@ namespace fan
 
 	//================================
 	//================================
+#define DECLARE_SINGLETON2( _SingletonType )									\
+	public:																		\
+		static constexpr const char* s_name		{ #_SingletonType		  };	\
+		static constexpr uint32_t	 s_type		{ SSID( #_SingletonType ) };	
+
+	//================================
+	//================================
 	static constexpr uint32_t ecsSignatureLength = 8;
 	using EcsSignature = std::bitset<ecsSignatureLength>;
 	using EcsHandle = uint32_t;
@@ -35,8 +41,65 @@ namespace fan
 
 	//================================
 	//================================
+	struct EcsSingleton {};
 	struct EcsComponent {};
 	struct EcsTag {};
+
+	class EcsWorld2;
+	class EcsArchetype;
+
+	//================================
+	// Allows indexing of individual entities
+	//================================
+	struct EcsEntity
+	{
+		EcsArchetype* archetype = nullptr;
+		uint32_t	index = 0;	// index in the archetype
+	};
+
+	//================================
+	//================================
+	struct EcsComponentInfo
+	{
+		std::string name;
+		ImGui::IconType icon = ImGui::IconType::NONE;	// editor icon
+		uint32_t	type;
+		int			index;
+		uint32_t	size;
+		uint32_t	alignment;
+		const char* editorPath = "";					// editor path ( for the addComponent ) popup of the inspector
+
+		void ( *init )( EcsWorld2&, EcsComponent& ) = nullptr;						// (mandatory) called at the creation of the component
+		void ( *destroy )( EcsWorld2&, EcsComponent& ) = nullptr;					// called at the destruction of the component
+		void ( *onGui )( EcsWorld2&, EcsEntity, EcsComponent& ) = nullptr;			// called by the editor for gui display
+		void ( *save )( const EcsComponent&, Json& ) = nullptr;						// called when the scene is saved
+		void ( *load )( EcsComponent&, const Json& ) = nullptr;						// called when the scene is loaded ( after the init )
+		void ( *netSave ) ( const EcsComponent&, sf::Packet& _packet ) = nullptr;
+		void ( *netLoad ) ( EcsComponent&, sf::Packet& _packet ) = nullptr;
+	};
+
+	//==============================================================================================================================================================
+	// EcsSingletonInfo is runtime type information for singleton components
+	// Function pointers :
+	// init			: clears the component value and registers it when necessary (mandatory)
+	// onGui		: draws ui associated with the component (optional)
+	// save			: serializes the component to json (optional)
+	// load			: deserializes the component from json (optional)
+	// netSave		: serializes the component into a packet for replication (optional)
+	// netLoad		: deserializes the component from a packet for replication (optional)
+	//==============================================================================================================================================================
+	struct EcsSingletonInfo
+	{
+		std::string		name;
+		uint32_t		type;
+		ImGui::IconType icon = ImGui::IconType::NONE;
+		void ( *init ) ( EcsWorld2&, EcsSingleton& ) = nullptr;
+		void ( *onGui ) ( EcsWorld2&, EcsSingleton& ) = nullptr;
+		void ( *save ) ( const EcsSingleton&, Json& ) = nullptr;
+		void ( *load ) ( EcsSingleton&, const Json& ) = nullptr;
+		void ( *netSave ) ( const EcsSingleton&, sf::Packet& _packet ) = nullptr;
+		void ( *netLoad ) ( EcsSingleton&, sf::Packet& _packet ) = nullptr;
+	};
 
 	//================================
 	//================================
@@ -44,9 +107,22 @@ namespace fan
 
 	//================================
 	//================================
+	struct SingletonTest : EcsSingleton
+	{
+		DECLARE_SINGLETON2( SingletonTest )
+		static void SetInfo( EcsSingletonInfo& /*_info*/ ){}
+		static void Init( EcsWorld2& /*_world*/, EcsSingleton& /*_singleton*/ ) {}
+
+		float number;
+	};
+
+	//================================
+	//================================
 	struct Position2 : EcsComponent
 	{
 		DECLARE_COMPONENT2( Position2 );
+		static void SetInfo( EcsComponentInfo& /*_info*/ ){}
+		static void Init( EcsWorld2& /*_world*/, EcsComponent& /*_component*/ ) {}
 
 		float position[2];
 	};
@@ -56,6 +132,9 @@ namespace fan
 	struct Speed2 : EcsComponent
 	{
 		DECLARE_COMPONENT2( Speed2 );
+		static void SetInfo( EcsComponentInfo& /*_info*/ ) {}
+		static void Init( EcsWorld2& /*_world*/, EcsComponent& /*_component*/ ) {}
+
 		float speed[2];
 	};
 
@@ -64,17 +143,10 @@ namespace fan
 	struct Expiration2 : EcsComponent
 	{
 		DECLARE_COMPONENT2( Expiration2 );
-		float timeLeft;
-	};
+		static void SetInfo( EcsComponentInfo& /*_info*/ ) {}
+		static void Init( EcsWorld2& /*_world*/, EcsComponent& /*_component*/ ) {}
 
-	//================================
-	//================================
-	struct EcsComponentInfo
-	{
-		uint32_t	size;
-		uint32_t	alignment;
-		std::string name;
-		uint32_t	type;
+		float timeLeft;
 	};
 
 	//================================
@@ -320,15 +392,6 @@ namespace fan
 	};
 
 	//================================
-	// Allows indexing of individual entities
-	//================================
-	struct EcsEntity
-	{
-		EcsArchetype* archetype = nullptr;
-		uint32_t	index = 0;	// index in the archetype
-	};
-
-	//================================
 	// A transition is created when structural change happen on an entity ( creating / removing components, changing archetype etc )
 	//================================
 	struct EcsTransition
@@ -341,8 +404,9 @@ namespace fan
 
 	//================================
 	//================================
-	struct EcsWorld2
+	class EcsWorld2
 	{
+	public:
 		void Create()
 		{
 			m_transitionArchetype.Create( m_componentsInfo, ~EcsSignature( 0 ) );
@@ -505,6 +569,34 @@ namespace fan
 			transition.isDead = true;
 		}
 
+		template <typename _SingletonType >
+		void AddSingletonType()
+		{
+			static_assert( std::is_base_of< EcsSingleton, _SingletonType>::value );
+			assert( m_singletons.find( _SingletonType::s_type ) == m_singletons.end() );
+
+			// Creates the singleton component
+			_SingletonType* singleton = new _SingletonType();
+			m_singletons[_SingletonType::s_type] = singleton;
+
+			// Registers singleton info
+			EcsSingletonInfo info;
+			_SingletonType::SetInfo( info );
+			info.init = &_SingletonType::Init;			
+			info.type = _SingletonType::s_type;
+			m_singletonInfos[_SingletonType::s_type] = info;
+
+			// init singleton
+			info.init( *this, *singleton );
+		}
+
+		template< typename _SingletonType > _SingletonType& GetSingleton()
+		{ 
+			static_assert( std::is_base_of< EcsSingleton, _SingletonType >::value );
+			return static_cast<_SingletonType&>(  GetSingleton( _SingletonType::s_type  ) );
+		}
+		EcsSingleton& GetSingleton( const uint32_t _type ) { return  *m_singletons[_type]; }
+
 		template <typename _TagType > 
 		void AddTagType()
 		{
@@ -512,6 +604,7 @@ namespace fan
  			assert( m_nextTagIndex >= NumComponents() );
  			const ComponentIndex newTagIndex = m_nextTagIndex--;
 			m_typeToIndex[_TagType::s_type] = newTagIndex;
+
  			m_tagsMask[newTagIndex] = 1;
 		}
 
@@ -542,16 +635,23 @@ namespace fan
 		template <typename _ComponentType >
 		void AddComponentType()
 		{
-			const int index = NumComponents();
+			static_assert( std::is_base_of< EcsComponent, _ComponentType>::value );
+			
+			const int nextTypeIndex = NumComponents();
+			assert( m_nextTagIndex >= nextTypeIndex );
 
+			// Set component info
 			EcsComponentInfo info;
-			info.size = _ComponentType::Info::s_size;
-			info.alignment = _ComponentType::Info::s_alignment;
-			info.name = _ComponentType::Info::s_name;
-			info.type = _ComponentType::Info::s_type;
+			info.name		= _ComponentType::Info::s_name;
+			info.init		= &_ComponentType::Init;			
+			info.size		= _ComponentType::Info::s_size;
+			info.alignment	= _ComponentType::Info::s_alignment;			
+			info.type		= _ComponentType::Info::s_type;
+			info.index		= nextTypeIndex;
+			_ComponentType::SetInfo( info );
 			m_componentsInfo.push_back( info );
 
-			m_typeToIndex[_ComponentType::Info::s_type] = index;
+			m_typeToIndex[_ComponentType::Info::s_type] = nextTypeIndex;
 		}
 
 		EcsComponent& AddComponent( const EcsEntity _entityID, const uint32_t s_type )
@@ -668,8 +768,10 @@ namespace fan
 		std::unordered_map< EcsSignature, EcsArchetype* >	m_archetypes;
 		std::unordered_map<uint32_t, int >					m_typeToIndex;
 		std::unordered_map< EcsHandle, EcsEntity >			m_handles;
-		std::vector< EcsTransition >						m_transitions;
+		std::unordered_map< uint32_t, EcsSingleton* >		m_singletons;
+		std::unordered_map< uint32_t, EcsSingletonInfo >	m_singletonInfos;
 		std::vector< EcsComponentInfo >						m_componentsInfo;
+		std::vector< EcsTransition >						m_transitions;
 	};
 
 	//================================
