@@ -323,13 +323,14 @@ namespace fan
 				ImGui::Text( "chunks" );    ImGui::NextColumn();
 				ImGui::Separator();
 
-				std::vector<EcsArchetype*> archetypes;
-				for( auto it = m_world2.m_archetypes.begin(); it != m_world2.m_archetypes.end(); ++it )
+				std::vector<const EcsArchetype*> archetypes;
+				const std::unordered_map< EcsSignature, EcsArchetype* >& archetypesRef = m_world2.GetArchetypes();
+				for( auto it = archetypesRef.begin(); it != archetypesRef.end(); ++it )
 				{
 					archetypes.push_back( it->second );
-				}archetypes.push_back( &m_world2.m_transitionArchetype );
+				}archetypes.push_back( &m_world2.GetTransitionArchetype() );
 
-				for ( EcsArchetype* archetype : archetypes )
+				for ( const EcsArchetype* archetype : archetypes )
 				{
 					std::stringstream ss;
 					ss << archetype->m_signature;
@@ -375,7 +376,8 @@ namespace fan
 				bool removeHandleVal = mode == Mode::removeHandle;
 				if( ImGui::Checkbox( "remove handle", &removeHandleVal ) ) { if( removeHandleVal ) mode = Mode::removeHandle; }
 
-				for( std::pair<EcsSignature, EcsArchetype*> pair : m_world2.m_archetypes )
+				const std::unordered_map< EcsSignature, EcsArchetype* >& archetypesRef = m_world2.GetArchetypes();
+				for( std::pair<EcsSignature, EcsArchetype*> pair : archetypesRef )
 				{
 					EcsArchetype& archetype = *pair.second;
 					std::stringstream ss;
@@ -437,7 +439,7 @@ namespace fan
 				ImGui::Separator();
 
 				int i = 0;
-				for ( const auto& pair : m_world2.m_handles )
+				for ( const auto& pair : m_world2.GetHandles() )
 				{
 					const EcsHandle handle = pair.first;
 					EcsEntity entityID = pair.second;
@@ -452,13 +454,14 @@ namespace fan
 				ImGui::Columns( 1 );
 			}
 
-			const int indexPos   = m_world2.m_typeToIndex[Position2::Info::s_type];
-			const int indexSpeed = m_world2.m_typeToIndex[Speed2::Info::s_type];
+			const int indexPos   = m_world2.GetIndex(Position2::Info::s_type);
+			const int indexSpeed = m_world2.GetIndex(Speed2::Info::s_type);
 			const EcsSignature targetSignature = ( EcsSignature( 1 ) << indexPos );
 
 			if( ImGui::Button( "Init" ) ){
 				// Init 
-				for( auto it = m_world2.m_archetypes.begin(); it != m_world2.m_archetypes.end(); ++it )
+				const std::unordered_map< EcsSignature, EcsArchetype* >& archetypesRef = m_world2.GetArchetypes();
+				for( auto it = archetypesRef.begin(); it != archetypesRef.end(); ++it )
 				{
 					if( ( it->first & targetSignature ) == targetSignature )
 					{
@@ -481,7 +484,8 @@ namespace fan
 				// Test 1
 				float total1 = 0.f;
 				std::vector<EcsChunk*> match1;
-				for( auto it = m_world2.m_archetypes.begin(); it != m_world2.m_archetypes.end(); ++it )
+				const std::unordered_map< EcsSignature, EcsArchetype* >& archetypesRef = m_world2.GetArchetypes();
+				for( auto it = archetypesRef.begin(); it != archetypesRef.end(); ++it )
 				{
 					EcsArchetype& archetype = *it->second;
 					if( ( archetype.m_signature & targetSignature ) == targetSignature )
@@ -508,7 +512,7 @@ namespace fan
 				// Test 2
 				float total2 = 0.f;
 				EcsSystemView view( m_world2 );
-				for( auto it = m_world2.m_archetypes.begin(); it != m_world2.m_archetypes.end(); ++it )
+				for( auto it = archetypesRef.begin(); it != archetypesRef.end(); ++it )
 				{
 					if( ( it->first & targetSignature ) == targetSignature && ! it->second->Empty() )
 					{
