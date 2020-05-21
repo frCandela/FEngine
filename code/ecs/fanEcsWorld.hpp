@@ -1,244 +1,470 @@
 #pragma once
 
-#include "fanSystem.hpp"
-#include "ecs/fanTag.hpp"
-#include "ecs/fanEntity.hpp"
-#include "ecs/fanSingletonComponent.hpp"
-#include "fanComponentsCollection.hpp"
+#include <unordered_map>
+#include <cassert>
+#include "core/fanHash.hpp"
+#include "ecs/fanEcsEntity.hpp"
+#include "ecs/fanEcsComponent.hpp"
+#include "ecs/fanEcsSingleton.hpp"
+#include "ecs/fanEcsTag.hpp"
+#include "ecs/fanEcsArchetype.hpp"
+#include "ecs/fanEcsView.hpp"
 
-namespace fan {
-	struct SingletonComponent;
+namespace fan
+{
+	struct EcsView;
 
-	//==============================================================================================================================================================
-	// Contains the entities, components, singleton components and runtime type information
-	// component, tags and singleton are added dynamically when creating the ecs
-	// they all have a static id based on their name and an ecs local dynamic id. These ids are unique
-	// Entity ids will change from one frame to the other, use a EntityHandle to keep track of an entity
-	//==============================================================================================================================================================
+	//================================
+	// A transition is created when structural change happen on an entity ( creating / removing components, changing archetype etc )
+	//================================
+	struct EcsTransition
+	{
+		EcsEntity	entityID;
+		EcsSignature  signatureAdd = EcsSignature( 0 );		// bit to 1 means add component
+		EcsSignature  signatureRemove = EcsSignature( 0 );	// bit to 1 means remove component
+		bool isDead = false;
+	};
+
+	//================================	
+	//================================
 	class EcsWorld
 	{
 	public:
-		EcsWorld();
-		~EcsWorld();
+		// Global
+		void Create()
+		{
+			m_transitionArchetype.Create( m_componentsInfo, ~EcsSignature( 0 ) );
+		}
+		void ApplyTransitions()
+		{
+			// Applies structural transition to entities ( add/remove components/tags, add/remove entities
+			assert( m_transitionArchetype.Size() == m_transitions.size() );
+			for (int transitionIndex = m_transitionArchetype.Size() - 1; transitionIndex >= 0; --transitionIndex)
+			{
+				const EcsTransition& transition = m_transitions[transitionIndex];
+				EcsArchetype& srcArchetype = *transition.entityID.archetype;
+				const uint32_t srcIndex = transition.entityID.index;
 
-		template< typename _componentType >	bool			HasComponent( const EntityID _entityID );
-		template< typename _componentType >	_componentType&	GetComponent( const EntityID _entityID );
-		template< typename _componentType >	_componentType&	AddComponent( const EntityID _entityID );
-		template< typename _componentType >	void			RemoveComponent( const EntityID _entityID );
-		template< typename _tagType >void					AddTag( const EntityID _entityID );
-		template< typename _tagType >void					RemoveTag( const EntityID _entityID );
-		template< typename _componentType > bool			IsType( const Component& _component );
-		template< typename _componentType >	_componentType&	GetSingletonComponent();
-		template< typename _tagOrComponentType > Signature	GetSignature() const;
+				EcsEntityData srcEntityCpy = srcArchetype.m_entities[srcIndex];
+				assert( srcEntityCpy.transitionIndex == transitionIndex );
+				srcEntityCpy.transitionIndex = -1;
 
-		Component&			 AddComponent( const EntityID _entityID, const ComponentIndex _index );
-		Component&			 GetComponent( const EntityID _entityID, const ComponentIndex _index );
-		SingletonComponent&	 GetSingletonComponent( const uint32_t _staticIndex );
-		const SingletonComponent& GetSingletonComponent( const uint32_t _staticIndex ) const;
-		void				 RemoveComponent( const EntityID _entityID, const ComponentIndex _index );
-		bool				 HasComponent( const EntityID _entityID, ComponentIndex _index );
-		void				 AddTagsFromSignature( const EntityID _entityID, const Signature& _signature );
-		Signature			 AliveSignature() const { return ( Signature( 1 ) << ecAliveBit ); }
-		EntityID			 CreateEntity();
-		void				 KillEntity( const EntityID _entityID );
-		void				 Clear();
-		EntityHandle		 CreateHandle( const EntityID _entityID );
-		EntityID			 GetEntityID( const EntityHandle _handle );
-		ComponentIndex		 GetDynamicIndex( const uint32_t _staticIndex ) const { return m_typeIndices.at(_staticIndex); }
-		uint32_t			 GetComponentCount( const EntityID _entityID ) { return m_entities[_entityID].componentCount;  }
-		Component&			 GetComponentAt( const EntityID _entityID, int _componentIndex );
-		const ComponentInfo& GetComponentInfo( const ComponentIndex _index ) const { return  m_componentInfo[_index]; }
-		const SingletonComponentInfo& GetSingletonComponentInfo( const uint32_t _staticIndex ) const { return  m_singletonComponentInfo.at( _staticIndex ); }
-		const SingletonComponentInfo* SafeGetSingletonComponentInfo( const uint32_t _staticIndex ) const;
-		const std::unordered_map< uint32_t, SingletonComponent* >& GetSingletonComponents() { return m_singletonComponents; }
+				// Create new signature
+				EcsSignature targetSignature = EcsSignature( 0 );
+				if( &srcArchetype != &m_transitionArchetype )
+				{
+					targetSignature |= srcArchetype.m_signature;
+				}
+				targetSignature |= transition.signatureAdd;
+				targetSignature &= ~transition.signatureRemove;
 
-		void SortEntities();
-		void RemoveDeadEntities();
+				// Entity is dead
+				if( transition.isDead || targetSignature == EcsSignature( 0 ) )
+				{
+					// remove handle
+					if( srcEntityCpy.handle != 0 )
+					{
+						m_handles.erase( srcEntityCpy.handle );
+					}
 
-		std::vector<EntityID> Match( const Signature _signature );
-		std::vector<EntityID> MatchSubset( const Signature _signature, const std::vector<EntityID>& _subset );
+					// remove all components from the src archetype
+					if( &srcArchetype != &m_transitionArchetype )
+					{
+						for( int componentIndex = 0; componentIndex < NumComponents(); componentIndex++ )
+						{
+							if( srcArchetype.m_signature[componentIndex] )
+							{
+								srcArchetype.m_chunks[componentIndex].Remove( srcIndex );
+							}
+						}
+						if( srcArchetype.RemoveEntity( srcIndex ) )
+						{
+							// update the handle of the element if it was moved
+							EcsEntityData movedEntity = srcArchetype.m_entities[srcIndex];
+							if( movedEntity.handle != 0 )
+							{
+								m_handles[movedEntity.handle].index = srcIndex;
+							}
+						}
+					}
 
-		// add types
-		template< typename _componentType >	void AddComponentType();
-		template< typename _tagType >		void AddTagType();
-		template< typename _componentType >	_componentType& AddSingletonComponentType();
+					// clears the transition archetype
+					const EcsSignature transitionMoveSignature = transition.signatureAdd & ~transition.signatureRemove;
+					for( int i = 0; i < NumComponents(); i++ )
+					{
+						m_transitionArchetype.m_chunks[i].Remove( transitionIndex );						
+					}
+					m_transitionArchetype.RemoveEntity( transitionIndex );
+				}
+				else
+				{
+					// Get new archetype
+					EcsArchetype* dstArchetype = FindArchetype( targetSignature );
+					if( dstArchetype == nullptr )
+					{
+						dstArchetype = &CreateArchetype( targetSignature );
+					}
 
-		// const accessors
-		const std::unordered_map< uint32_t, ComponentIndex >&   GetDynamicIndices() const		{ return m_typeIndices; }
-		const std::unordered_map< EntityHandle, EntityID >&		GetHandles() const				{ return m_handles; }
-		const std::vector< ComponentsCollection >&				GetComponentCollections() const { return m_components; }
-		const std::vector< Entity >&							GetEntities() const				{ return m_entities; }
-		const std::vector< ComponentInfo >&						GetVectorComponentInfo() const  { return m_componentInfo;  }
-		std::vector< SingletonComponentInfo >					GetVectorSingletonComponentInfo() const;
-		size_t	GetNumEntities() const { return m_entities.size(); }
+					// Push new entity
+					const uint32_t dstIndex = dstArchetype->Size();
+					dstArchetype->m_entities.push_back( srcArchetype.m_entities[srcIndex] );
+					EcsEntityData& dstEntity = * dstArchetype->m_entities.rbegin();
+					dstEntity = srcEntityCpy;
+					dstEntity.transitionIndex = -1;
+					if( dstEntity.handle != 0 )
+					{
+						m_handles[dstEntity.handle] = { dstArchetype, dstIndex };
+					}
+
+					// Moves components from the source archetype to the new archetype				
+					if( &srcArchetype != &m_transitionArchetype )
+					{
+						for( int i = 0; i < NumComponents(); i++ )
+						{
+							if( srcArchetype.m_signature[i] )
+							{
+								if( targetSignature[i] )
+								{
+									dstArchetype->m_chunks[i].PushBack( srcArchetype.m_chunks[i].At( srcIndex ) );
+								}
+								srcArchetype.m_chunks[i].Remove( srcIndex );
+							}
+						}
+						if( srcArchetype.RemoveEntity( srcIndex ) )
+						{
+							EcsEntityData swappedEntity = srcArchetype.m_entities[srcIndex];
+							if( swappedEntity.handle != 0 )
+							{
+								m_handles[swappedEntity.handle].index = srcIndex;
+							}
+						}
+					}
+
+					// copy all components from the transition archetype to the new archetype
+					const EcsSignature transitionMoveSignature = transition.signatureAdd & targetSignature;
+					for( int i = 0; i < NumComponents(); i++ )
+					{
+						if( transitionMoveSignature[i] )
+						{
+							dstArchetype->m_chunks[i].PushBack( m_transitionArchetype.m_chunks[i].At( transitionIndex ) );
+						}
+						m_transitionArchetype.m_chunks[i].Remove( transitionIndex );
+					}
+					m_transitionArchetype.RemoveEntity( transitionIndex );
+				}
+			}
+			m_transitions.clear();
+		}
+		void Clear()
+		{
+			ApplyTransitions();
+			// Remove all entities
+			for( auto it = m_archetypes.begin(); it != m_archetypes.end(); ++it )
+			{
+				it->second->Clear();
+			}
+			m_transitionArchetype.Clear();
+
+			m_handles.clear();
+			m_nextHandle = 1;
+
+			// clears singleton components
+			for( std::pair< uint32_t, EcsSingleton*> pair : m_singletons )
+			{
+				const EcsSingletonInfo& info = GetSingletonInfo( pair.first );
+				info.init( *this, *pair.second );
+			}
+
+		}
+		int  NumComponents() const
+		{
+			return int( m_componentsInfo.size() );
+		}
+		int  GetIndex( const uint32_t  _type ) const { return m_typeToIndex.at( _type ); }
+
+		// Handles
+		EcsEntity	 GetEntity( const EcsHandle _handle )
+		{
+			return m_handles[ _handle ];
+		}
+		EcsHandle AddHandle( const EcsEntity _entity )
+		{
+			EcsEntityData& entity = _entity.archetype->m_entities[_entity.index];
+			if( entity.handle != 0 )
+			{
+				return entity.handle;
+			}
+			else
+			{
+				entity.handle = m_nextHandle++;
+				m_handles[entity.handle] = _entity;
+				return entity.handle;
+			}
+		}
+		void		 RemoveHandle( const EcsEntity _entity )
+		{
+			EcsEntityData& entity = _entity.archetype->m_entities[_entity.index];
+			if( entity.handle != 0 )
+			{
+				m_handles.erase( entity.handle );
+				entity.handle = 0;
+			}
+		}
+
+		// Singletons
+		template <typename _SingletonType >	void			AddSingletonType()
+		{
+			static_assert( std::is_base_of< EcsSingleton, _SingletonType>::value );
+			assert( m_singletons.find( _SingletonType::s_type ) == m_singletons.end() );
+
+			// Creates the singleton component
+			_SingletonType* singleton = new _SingletonType();
+			m_singletons[_SingletonType::s_type] = singleton;
+
+			// Registers singleton info
+			EcsSingletonInfo info;
+			_SingletonType::SetInfo( info );
+			info.init = &_SingletonType::Init;			
+			info.type = _SingletonType::s_type;
+			m_singletonInfos[_SingletonType::s_type] = info;
+
+			// init singleton
+			info.init( *this, *singleton );
+		}
+		template< typename _SingletonType > _SingletonType& GetSingleton()
+		{ 
+			static_assert( std::is_base_of< EcsSingleton, _SingletonType >::value );
+			return static_cast<_SingletonType&>(  GetSingleton( _SingletonType::s_type  ) );
+		}
+		EcsSingleton&			GetSingleton( const uint32_t _type ) { return  *m_singletons[_type]; }
+		const EcsSingletonInfo& GetSingletonInfo( const uint32_t _type ) const { return  m_singletonInfos.at( _type ); }
+		const EcsSingletonInfo* SafeGetSingletonInfo( const uint32_t _type ) const
+		{
+			const auto& it = m_singletonInfos.find( _type );
+			return it == m_singletonInfos.end() ? nullptr : &it->second;
+		}
+
+		// Tags
+		template <typename _TagType > void AddTagType()
+		{
+			static_assert( std::is_base_of< EcsTag, _TagType>::value );
+ 			assert( m_nextTagIndex >= NumComponents() );
+ 			const int newTagIndex = m_nextTagIndex--;
+			m_typeToIndex[_TagType::s_type] = newTagIndex;
+
+ 			m_tagsMask[newTagIndex] = 1;
+		}
+		template <typename _TagType > void AddTag( const EcsEntity _entity ) 
+		{ 
+			static_assert( std::is_base_of< EcsTag, _TagType>::value ); 
+			AddTag( _TagType::s_type );
+		}
+		template <typename _TagType > void RemoveTag( const EcsEntity _entity )
+		{
+			static_assert( std::is_base_of< EcsTag, _TagType>::value ); 
+			RemoveTag( _TagType::s_type );
+		}
+		void AddTag( const EcsEntity _entity, const uint32_t _type )
+		{
+			const int tagIndex = GetIndex(_type);
+			EcsTransition& transition = FindOrCreateTransition( _entity );
+
+			// entity doesn't already have this tag
+			assert( _entity.archetype == &m_transitionArchetype || !_entity.archetype->m_signature[tagIndex] );
+
+			// Update transition
+			transition.signatureAdd[tagIndex] = 1;
+		}
+		void RemoveTag( const EcsEntity _entity, const uint32_t _type )
+		{
+			const int tagIndex = GetIndex( _type );
+			EcsTransition& transition = FindOrCreateTransition( _entity );
+
+			// entity must have this tag
+			assert( _entity.archetype == &m_transitionArchetype || _entity.archetype->m_signature[tagIndex] );
+
+			// Update transition
+			transition.signatureRemove[tagIndex] = 1;
+		}
+		bool HasTag( const EcsEntity _entity, const uint32_t _type ) const 
+		{ 
+			const int tagIndex = GetIndex( _type );
+			return _entity.archetype->m_signature[tagIndex];
+		}
+		void AddTagsFromSignature( const EcsEntity _entity, const EcsSignature& _signature )
+		{
+			EcsTransition& transition = FindOrCreateTransition( _entity );
+			transition.signatureAdd |= _signature & m_tagsMask;
+		}
+
+		// Components
+		template <typename _ComponentType >	void			AddComponentType()
+		{
+			static_assert( std::is_base_of< EcsComponent, _ComponentType>::value );
+			
+			const int nextTypeIndex = NumComponents();
+			assert( m_nextTagIndex >= nextTypeIndex );
+
+			// Set component info
+			EcsComponentInfo info;
+			info.name		= _ComponentType::Info::s_name;
+			info.init		= &_ComponentType::Init;			
+			info.size		= _ComponentType::Info::s_size;
+			info.alignment	= _ComponentType::Info::s_alignment;			
+			info.type		= _ComponentType::Info::s_type;
+			info.index		= nextTypeIndex;
+			_ComponentType::SetInfo( info );
+			m_componentsInfo.push_back( info );
+
+			m_typeToIndex[_ComponentType::Info::s_type] = nextTypeIndex;
+		}
+		template <typename _ComponentType > _ComponentType& AddComponent( const EcsEntity _entity )
+		{
+			static_assert( std::is_base_of< EcsComponent, _ComponentType>::value );
+			return static_cast<_ComponentType&>( AddComponent( _ComponentType::s_type ) );
+		}
+		template <typename _ComponentType > void			RemoveComponent( const EcsEntity _entity )
+		{
+			static_assert( std::is_base_of< EcsComponent, _ComponentType>::value );
+			RemoveComponent( _ComponentType::s_type );
+		}
+		template <typename _ComponentType > bool			HasComponent( const EcsEntity _entity )
+		{
+			static_assert( std::is_base_of< EcsComponent, _ComponentType>::value );
+			return HasComponent( _entity, _ComponentType::Info::s_type );
+		}
+		EcsComponent& AddComponent( const EcsEntity _entity, const uint32_t _type )
+		{
+			const int componentIndex = GetIndex(_type);
+			EcsTransition& transition = FindOrCreateTransition( _entity );
+			EcsEntityData& entityData = GetEntityData( _entity );
+
+			// entity doesn't already have this component
+			assert( _entity.archetype == &m_transitionArchetype || !_entity.archetype->m_signature[componentIndex] );
+
+			// Update transition
+			transition.signatureAdd[componentIndex] = 1;
+
+			return *static_cast<EcsComponent*>( m_transitionArchetype.m_chunks[componentIndex].At( entityData.transitionIndex ) );
+		}
+		void		  RemoveComponent( const EcsEntity _entity, const uint32_t s_type )
+		{
+			const int componentIndex = GetIndex(s_type);
+			EcsTransition& transition = FindOrCreateTransition( _entity );
+
+			// entity must have this component
+			assert( _entity.archetype == &m_transitionArchetype || _entity.archetype->m_signature[componentIndex] );
+
+			// Update transition
+			transition.signatureRemove[componentIndex] = 1;
+		}
+		bool		  HasComponent( const EcsEntity _entity, const uint32_t _type )
+		{			
+			return _entity.archetype->m_signature[GetIndex( _type )];
+		}
+
+		// Entities
+		EcsEntity CreateEntity()
+		{			
+			EcsEntity entityID; 
+			entityID.archetype = &m_transitionArchetype;
+			entityID.index = m_transitionArchetype.Size();
+
+			EcsEntityData entity;
+			entity.transitionIndex = int(m_transitions.size());
+
+			EcsTransition transition;
+			transition.entityID = entityID;
+
+			m_transitions.push_back( transition );
+			m_transitionArchetype.m_entities.push_back( entity );
+			for( int i = 0; i < NumComponents(); i++ )
+			{
+				m_transitionArchetype.m_chunks[i].EmplaceBack();
+			}			
+
+			return entityID;
+		}
+		void Kill( const EcsEntity _entity )
+		{
+			EcsTransition& transition = FindOrCreateTransition( _entity );
+			transition.isDead = true;
+		}
+ 		bool IsAlive( const EcsEntity _entity ) const 
+		{ 
+			const EcsEntityData& entityData = GetEntityData( _entity );
+			return entityData.transitionIndex < 0 || ! m_transitions[entityData.transitionIndex].isDead;
+		}
+		EcsView Match( const EcsSignature _signature ) const
+		{
+			EcsView view( m_typeToIndex, _signature );
+			for( auto it = m_archetypes.begin(); it != m_archetypes.end(); ++it )
+			{
+				if( ( it->first & _signature ) == _signature && !it->second->Empty() )
+				{
+					view.m_archetypes.push_back( it->second );
+				}
+			}
+			return view;			
+		}
+
+		// Const accessors
+		const std::unordered_map< EcsHandle, EcsEntity >&		 GetHandles() const				{ return m_handles;				}
+		const std::unordered_map< EcsSignature, EcsArchetype* >& GetArchetypes() const			{ return m_archetypes;			}
+		const EcsArchetype&										 GetTransitionArchetype() const { return m_transitionArchetype; }
 
 	private:
-		std::unordered_map< uint32_t, ComponentIndex >		   m_typeIndices;
-		std::unordered_map< EntityHandle, EntityID >		   m_handles;
-		std::unordered_map< uint32_t, SingletonComponent* >	   m_singletonComponents;
-		std::vector< ComponentInfo >						   m_componentInfo;
-		std::unordered_map< uint32_t, SingletonComponentInfo > m_singletonComponentInfo;
+		const EcsEntityData& GetEntityData( const EcsEntity _entity ) const { return _entity.archetype->m_entities[_entity.index]; }
+		EcsEntityData&	GetEntityData( const EcsEntity _entity )	{	return _entity.archetype->m_entities[_entity.index]; }
+		EcsArchetype*	FindArchetype( const EcsSignature _signature )
+		{
+			auto it = m_archetypes.find( _signature );
+			return it == m_archetypes.end() ? nullptr : it->second;
+		}
+		EcsArchetype&	CreateArchetype( const EcsSignature _signature )
+		{
+			assert( FindArchetype( _signature ) == nullptr );
+			EcsArchetype* newArchetype = new EcsArchetype();
+			newArchetype->Create( m_componentsInfo, _signature );
+			m_archetypes[_signature] = newArchetype;
+			return *newArchetype;
+		}
+		EcsTransition&	FindOrCreateTransition( const EcsEntity _entity )
+		{
+			// Get/register transition
+			EcsEntityData& entity = _entity.archetype->m_entities[_entity.index];
+			EcsTransition* transition = nullptr;
+			if( entity.transitionIndex < 0 )
+			{
+				entity.transitionIndex = m_transitionArchetype.Size();
+				m_transitions.emplace_back();
+				transition = &( *m_transitions.rbegin() );
+				transition->entityID = _entity;
 
-		std::vector< Entity >				m_entities;
-		std::vector< ComponentsCollection > m_components;
+				for( int i = 0; i < NumComponents(); i++ )
+				{
+					m_transitionArchetype.m_chunks[i].EmplaceBack();
+				}
+				m_transitionArchetype.m_entities.emplace_back();
+			}
+			else
+			{
+				// transition already exists
+				transition = &m_transitions[entity.transitionIndex];
+			}
+			return *transition;
+		}
 
-		EntityHandle	m_nextHandle = 1; // 0 is a null handle
-		ComponentIndex	m_nextTypeIndex = 0;
-		ComponentIndex	m_nextTagIndex = signatureLength - 2;
-
-		Signature m_tagsMask;	// signature of all tag types combined
-
-		Entity& GetEntity( const EntityID _id );
-		bool	EntityMatchSignature( EntityID _entityID, const Signature& _signature );
+		EcsHandle											m_nextHandle = 1;	// 0 is a null handle
+		int													m_nextTagIndex = ecsSignatureLength - 1;
+		EcsSignature										m_tagsMask;			// signature of all tag types combined
+		EcsArchetype										m_transitionArchetype;
+		std::unordered_map< EcsSignature, EcsArchetype* >	m_archetypes;
+		std::unordered_map<uint32_t, int >					m_typeToIndex;
+		std::unordered_map< EcsHandle, EcsEntity >			m_handles;
+		std::unordered_map< uint32_t, EcsSingleton* >		m_singletons;
+		std::unordered_map< uint32_t, EcsSingletonInfo >	m_singletonInfos;
+		std::vector< EcsComponentInfo >						m_componentsInfo;
+		std::vector< EcsTransition >						m_transitions;
 	};
-
-
-
-	//==============================================================================================================================================================
-	//==============================================================================================================================================================
-	template< typename _componentType >
-	_componentType& EcsWorld::AddComponent( const EntityID _entityID )
-	{
-		static_assert( std::is_base_of< Component, _componentType>::value );
-		const ComponentIndex index = m_typeIndices[_componentType::s_typeInfo];
-		Component& component = AddComponent( _entityID, index );
-		return static_cast< _componentType& >( component );
-	}
-
-	//==============================================================================================================================================================
-	//==============================================================================================================================================================
-	template< typename _componentType >	
-	_componentType& EcsWorld::GetComponent( const EntityID _entityID )
-	{
-		static_assert( std::is_base_of< Component, _componentType>::value );			
-		const ComponentIndex index = m_typeIndices[_componentType::s_typeInfo];
-		return static_cast<_componentType&> ( GetComponent( _entityID, index ) );
-	}
-
-	//==============================================================================================================================================================
-	//==============================================================================================================================================================
-	template< typename _componentType >	bool EcsWorld::HasComponent( const EntityID _entityID )
-	{
-		static_assert( std::is_base_of< Component, _componentType>::value );
-		const ComponentIndex index = m_typeIndices[_componentType::s_typeInfo];
-		return m_entities[_entityID].HasComponent( index );
-	}
-
-	//==============================================================================================================================================================
-	//==============================================================================================================================================================
-	template< typename _componentType >	void EcsWorld::RemoveComponent( const EntityID _entityID )
-	{
-		static_assert( std::is_base_of< Component, _componentType>::value );
-		const ComponentIndex index = m_typeIndices[_componentType::s_typeInfo];
-		RemoveComponent( _entityID, index );
-	}
-
-	//==============================================================================================================================================================
-	//==============================================================================================================================================================
-	template< typename _tagType > void EcsWorld::AddTag( const EntityID _entityID )
-	{
-		static_assert( std::is_base_of< Tag, _tagType>::value );
-		Entity& entity = GetEntity( _entityID );
-		const ComponentIndex index = m_typeIndices[_tagType::s_typeInfo];
-		entity.signature[index] = 1;
-	}
-
-	//==============================================================================================================================================================
-	//==============================================================================================================================================================
-	template< typename _tagType >void EcsWorld::RemoveTag( const EntityID _entityID )
-	{
-		static_assert( std::is_base_of< Tag, _tagType>::value );
-		Entity& entity = GetEntity( _entityID );
-		const ComponentIndex index = m_typeIndices[_tagType::s_typeInfo];
-		entity.signature[index] = 0;
-	}
-
-	//==============================================================================================================================================================
-	// returns true if the given component has the same type as _componentType
-	//==============================================================================================================================================================
-	template< typename _componentType > bool EcsWorld::IsType( const Component& _component )
-	{
-		static_assert( std::is_base_of< Component, _componentType>::value );
-		return _component.GetIndex() == GetDynamicIndex( _componentType::s_typeInfo );
-	}
-
-	//==============================================================================================================================================================
-	//==============================================================================================================================================================
-	template< typename _componentType > _componentType& EcsWorld::GetSingletonComponent()
-	{
-		static_assert( std::is_base_of< SingletonComponent, _componentType>::value );
-		return  static_cast<_componentType&>( GetSingletonComponent(_componentType::s_typeInfo) );
-	}
-
-	//==============================================================================================================================================================
-	//==============================================================================================================================================================
-	template< typename _tagOrComponentType > Signature EcsWorld::GetSignature() const
-	{
-		static_assert( std::is_base_of< Tag, _tagOrComponentType>::value || std::is_base_of< Component, _tagOrComponentType>::value );
-		return Signature( 1 ) << m_typeIndices.at( _tagOrComponentType::s_typeInfo );
-	}
-
-	//==============================================================================================================================================================
-	// creates a component type and adds it to the ecs world
-	//==============================================================================================================================================================
-	template< typename _componentType >	void EcsWorld::AddComponentType()
-	{
-		static_assert( std::is_base_of< Component, _componentType>::value );
-		assert( m_nextTagIndex >= m_nextTypeIndex );
-
-		// creates collection
-		m_components.push_back( ComponentsCollection() );
-		ComponentsCollection& collection = m_components[m_components.size() - 1];
-		collection.Init<_componentType>( _componentType::s_typeName );
-		
-		// generate dynamic index
-		const ComponentIndex index = m_nextTypeIndex++;
-		m_typeIndices[_componentType::s_typeInfo] = index;
-
-		// Registers component info
-		ComponentInfo info;
-		_componentType::SetInfo( info );
-		assert( info.init != nullptr );
-		info.name = _componentType::s_typeName;
-		info.instanciate = &_componentType::Instanciate;
-		info.index = index;	
-		info.staticIndex = _componentType::s_typeInfo;
-		m_componentInfo.push_back( info );		
-	}
-
-	//==============================================================================================================================================================
-	// creates a tag type and adds it to the ecs world
-	//==============================================================================================================================================================
-	template< typename _tagType > void EcsWorld::AddTagType()
-	{
-		static_assert( std::is_base_of< Tag, _tagType>::value );
-		assert( m_nextTagIndex >= m_nextTypeIndex );
-		const ComponentIndex newTagIndex = m_nextTagIndex--;
-		m_typeIndices[_tagType::s_typeInfo] = newTagIndex;
-
-		m_tagsMask[newTagIndex] = 1; 
-	}
-
-	//==============================================================================================================================================================
-	// creates a singleton component type and adds it to the ecs world
-	//==============================================================================================================================================================
-	template< typename _componentType >	_componentType& EcsWorld::AddSingletonComponentType()
-	{
-		static_assert( std::is_base_of< SingletonComponent, _componentType>::value );
-		assert( m_singletonComponents.find( _componentType::s_typeInfo ) == m_singletonComponents.end() );
-		
-		// creates the singleton component
-		_componentType * component = new _componentType();
-		m_singletonComponents[_componentType::s_typeInfo] = component;
-
-		// Registers component info
-		SingletonComponentInfo info;
-		_componentType::SetInfo( info );
-		assert( info.init != nullptr );
-		info.init( *this, *component );
-		info.staticIndex = _componentType::s_typeInfo;
-		m_singletonComponentInfo[ _componentType::s_typeInfo ] = info ;
-
-		return *component;
-	}
 }
