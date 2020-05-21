@@ -6,7 +6,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void ServerConnection::SetInfo( SingletonComponentInfo& _info )
+	void ServerConnection::SetInfo( EcsSingletonInfo& _info )
 	{
 		_info.icon = ImGui::NETWORK16;
 		_info.init = &ServerConnection::Init;
@@ -16,7 +16,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void ServerConnection::Init( EcsWorld& _world, SingletonComponent& _component )
+	void ServerConnection::Init( EcsWorld& _world, EcsSingleton& _component )
 	{
 		ServerConnection& connection = static_cast<ServerConnection&>( _component );
 		connection.serverPort = 53000;
@@ -25,7 +25,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void ServerConnection::OnGui( EcsWorld&, SingletonComponent& _component )
+	void ServerConnection::OnGui( EcsWorld&, EcsSingleton& _component )
 	{
 		ServerConnection& connection = static_cast<ServerConnection&>( _component );
 

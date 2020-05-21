@@ -1,6 +1,6 @@
 #pragma  once
 
-#include "ecs/fanComponent.hpp"
+#include "ecs/fanEcsComponent.hpp"
 #include "render/fanRenderResourcePtr.hpp"
 
 namespace fan
@@ -9,15 +9,15 @@ namespace fan
 	// Emits particles 
 	// timeAccumulator is used to keep track of time to spawn particles with proper timing
 	//==============================================================================================================================================================
-	struct ParticleEmitter : public Component
+	struct ParticleEmitter : public EcsComponent
 	{
-		DECLARE_COMPONENT( ParticleEmitter )
+		ECS_COMPONENT( ParticleEmitter )
 	public:
-		static void SetInfo( ComponentInfo& _info );
-		static void Init( EcsWorld& _world, Component& _component );
-		static void OnGui( EcsWorld& _world, EntityID _entityID, Component& _component );
-		static void Save( const Component& _component, Json& _json );
-		static void Load( Component& _component, const Json& _json );
+		static void SetInfo( EcsComponentInfo& _info );
+		static void Init( EcsWorld& _world, EcsComponent& _component );
+		static void OnGui( EcsWorld& _world, EcsEntity _entityID, EcsComponent& _component );
+		static void Save( const EcsComponent& _component, Json& _json );
+		static void Load( EcsComponent& _component, const Json& _json );
 
 		bool		enabled;
 		float		particlesPerSecond;

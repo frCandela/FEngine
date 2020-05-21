@@ -6,11 +6,9 @@
 
 namespace fan
 {
-	REGISTER_COMPONENT( UIRenderer, "ui_renderer" );
-
 	//================================================================================================================================
 	//================================================================================================================================
-	void UIRenderer::SetInfo( ComponentInfo& _info )
+	void UIRenderer::SetInfo( EcsComponentInfo& _info )
 	{
 		_info.icon = ImGui::IconType::UI_MESH_RENDERER16;
 		_info.onGui = &UIRenderer::OnGui;
@@ -18,11 +16,12 @@ namespace fan
 		_info.load = &UIRenderer::Load;
 		_info.save = &UIRenderer::Save;
 		_info.editorPath = "ui/";
+		_info.name = "ui renderer";
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void UIRenderer::Init( EcsWorld& _world, Component& _component )
+	void UIRenderer::Init( EcsWorld& _world, EcsComponent& _component )
 	{
 		UIRenderer& uiRenderer = static_cast<UIRenderer&>( _component );
 
@@ -42,7 +41,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void UIRenderer::OnGui( EcsWorld& _world, EntityID _entityID, Component& _component )
+	void UIRenderer::OnGui( EcsWorld& _world, EcsEntity _entityID, EcsComponent& _component )
 	{
 		UIRenderer& ui = static_cast<UIRenderer&>( _component );
 
@@ -65,7 +64,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void UIRenderer::Save( const Component& _component, Json& _json )
+	void UIRenderer::Save( const EcsComponent& _component, Json& _json )
 	{
 		const UIRenderer& ui = static_cast<const UIRenderer&>( _component );
 		Serializable::SaveColor( _json, "color", ui.color );
@@ -74,7 +73,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void UIRenderer::Load( Component& _component, const Json& _json )
+	void UIRenderer::Load( EcsComponent& _component, const Json& _json )
 	{
 		UIRenderer& ui = static_cast<UIRenderer&>( _component );
 		Serializable::LoadColor( _json, "color", ui.color );

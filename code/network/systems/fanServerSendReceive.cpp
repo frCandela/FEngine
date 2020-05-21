@@ -15,7 +15,7 @@ namespace fan
 {	
 	//================================================================================================================================
 	//================================================================================================================================
-	Signature S_ServerSend::GetSignature( const EcsWorld& _world )
+	EcsSignature S_ServerSend::GetSignature( const EcsWorld& _world )
 	{
 		return
 			_world.GetSignature<HostConnection>() |
@@ -26,20 +26,20 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void S_ServerSend::Run( EcsWorld& _world, const std::vector<EntityID>& _entities, const float _delta )
+	void S_ServerSend::Run( EcsWorld& _world, const std::vector<EcsEntity>& _entities, const float _delta )
 	{
 		if( _delta == 0.f ) { return; }
 
-		const HostManager& hostManager = _world.GetSingletonComponent<HostManager>();
-		const Game& game = _world.GetSingletonComponent<Game>();
-		ServerConnection& connection = _world.GetSingletonComponent<ServerConnection>();
+		const HostManager& hostManager = _world.GetSingleton<HostManager>();
+		const Game& game = _world.GetSingleton<Game>();
+		ServerConnection& connection = _world.GetSingleton<ServerConnection>();
 
-		for( EntityID entityID : _entities )
+		for( EcsEntity entity : _entities )
 		{
-			HostConnection& hostConnection = _world.GetComponent< HostConnection >( entityID );
-			HostGameData& hostData = _world.GetComponent< HostGameData >( entityID );
-			HostReplication& hostReplication = _world.GetComponent< HostReplication >( entityID );
-			ReliabilityLayer& reliabilityLayer = _world.GetComponent< ReliabilityLayer >( entityID );
+			HostConnection& hostConnection = _world.GetComponent< HostConnection >( entity );
+			HostGameData& hostData = _world.GetComponent< HostGameData >( entity );
+			HostReplication& hostReplication = _world.GetComponent< HostReplication >( entity );
+			ReliabilityLayer& reliabilityLayer = _world.GetComponent< ReliabilityLayer >( entity );
 
 			// create new packet			
 			Packet packet( reliabilityLayer.GetNextPacketTag() );
@@ -78,9 +78,9 @@ namespace fan
 	//================================================================================================================================
 	void S_ServerReceive::Run( EcsWorld& _world )
 	{
-		HostManager& hostManager = _world.GetSingletonComponent<HostManager>();
-		ServerConnection& connection = _world.GetSingletonComponent<ServerConnection>();
-		Game& game = _world.GetSingletonComponent<Game>();
+		HostManager& hostManager = _world.GetSingleton<HostManager>();
+		ServerConnection& connection = _world.GetSingleton<ServerConnection>();
+		Game& game = _world.GetSingleton<Game>();
 
 		// receive
 		Packet			packet;
@@ -101,16 +101,16 @@ namespace fan
 			case sf::UdpSocket::Done:
 			{
 				// create / get client
-				EntityHandle clientHandle = hostManager.FindHost( receiveIP, receivePort );
+				EcsHandle clientHandle = hostManager.FindHost( receiveIP, receivePort );
 				if( clientHandle == 0 )
 				{
 					clientHandle = hostManager.CreateHost( receiveIP, receivePort );
 				}
-				const EntityID entityID = _world.GetEntityID( clientHandle );
+				const EcsEntity entity = _world.GetEntity( clientHandle );
 
-				HostGameData& hostData = _world.GetComponent< HostGameData >( entityID );
-				ReliabilityLayer& reliabilityLayer = _world.GetComponent<ReliabilityLayer>( entityID );
-				HostConnection& hostConnection = _world.GetComponent<HostConnection>( entityID );
+				HostGameData& hostData = _world.GetComponent< HostGameData >( entity );
+				ReliabilityLayer& reliabilityLayer = _world.GetComponent<ReliabilityLayer>( entity );
+				HostConnection& hostConnection = _world.GetComponent<HostConnection>( entity );
 				hostConnection.lastResponseTime = Time::Get().ElapsedSinceStartup();
 
 				// read the first packet type separately

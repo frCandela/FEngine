@@ -85,7 +85,7 @@ namespace fan
 				Scene& scene = *m_lastSceneNodeRightClicked->scene;
 				EcsWorld& world = *scene.world;				
 				btVector3& origin = btVector3::Zero();
-				const EntityID parentID = world.GetEntityID( m_lastSceneNodeRightClicked->handle );
+				const EcsEntity parentID = world.GetEntity( m_lastSceneNodeRightClicked->handle );
 				if( world.HasComponent<Transform>( parentID ) )
 				{
 					origin = world.GetComponent<Transform>( parentID ).GetPosition();
@@ -104,15 +104,15 @@ namespace fan
 				if( ImGui::MenuItem( "Model" ) )
 				{
 					SceneNode& node = scene.CreateSceneNode( "model", m_lastSceneNodeRightClicked );
-					const EntityID entityID = world.GetEntityID( node.handle );
+					const EcsEntity entity = world.GetEntity( node.handle );
 					
-					Transform& transform = world.AddComponent<Transform>( entityID );
+					Transform& transform = world.AddComponent<Transform>( entity );
 					transform.SetPosition( origin );
 					
-					MeshRenderer& meshRenderer = world.AddComponent<MeshRenderer>( entityID );	
+					MeshRenderer& meshRenderer = world.AddComponent<MeshRenderer>( entity );	
 					meshRenderer.mesh = Mesh::s_resourceManager.GetMesh( RenderGlobal::s_meshSphere );
 					
-					Material& material = world.AddComponent<Material>( entityID );
+					Material& material = world.AddComponent<Material>( entity );
 					material.texture = Texture::s_resourceManager.GetTexture( RenderGlobal::s_textureWhite );
 					onSelectSceneNode.Emmit( &node );
 				}
@@ -122,20 +122,20 @@ namespace fan
 				if( ImGui::MenuItem( "Physics model" ) )
 				{
 					SceneNode& node = scene.CreateSceneNode( "physics_model", m_lastSceneNodeRightClicked );
-					const EntityID entityID = world.GetEntityID( node.handle );
+					const EcsEntity entity = world.GetEntity( node.handle );
 					
-					Transform& transform = world.AddComponent<Transform>( entityID );
+					Transform& transform = world.AddComponent<Transform>( entity );
 					transform.SetPosition( origin );
 					
-					MeshRenderer& meshRenderer = world.AddComponent<MeshRenderer>( entityID );
+					MeshRenderer& meshRenderer = world.AddComponent<MeshRenderer>( entity );
 					meshRenderer.mesh = Mesh::s_resourceManager.GetMesh( RenderGlobal::s_meshCube );
-					Material& material = world.AddComponent<Material>( entityID );
+					Material& material = world.AddComponent<Material>( entity );
 					material.texture = Texture::s_resourceManager.GetTexture( RenderGlobal::s_textureWhite );
 					onSelectSceneNode.Emmit( &node );
 					
-					Rigidbody& rigidbody = world.AddComponent<Rigidbody>( entityID );
-					MotionState& motionState = world.AddComponent<MotionState>( entityID );
-					BoxShape& shape = world.AddComponent<BoxShape>( entityID );
+					Rigidbody& rigidbody = world.AddComponent<Rigidbody>( entity );
+					MotionState& motionState = world.AddComponent<MotionState>( entity );
+					BoxShape& shape = world.AddComponent<BoxShape>( entity );
 					rigidbody.SetMotionState( &motionState.motionState );
 					rigidbody.SetCollisionShape( &shape.boxShape );
 				}
@@ -146,12 +146,12 @@ namespace fan
 
 				{
 					SceneNode& node = scene.CreateSceneNode( "point_light", m_lastSceneNodeRightClicked );
-					const EntityID entityID = world.GetEntityID( node.handle );
+					const EcsEntity entity = world.GetEntity( node.handle );
 					
-					Transform& transform = world.AddComponent<Transform>( entityID );
+					Transform& transform = world.AddComponent<Transform>( entity );
 					transform.SetPosition( origin );
 					
-					PointLight& light = world.AddComponent<PointLight>( entityID );
+					PointLight& light = world.AddComponent<PointLight>( entity );
 					onSelectSceneNode.Emmit( &node );
 				}
 
@@ -160,12 +160,12 @@ namespace fan
 				if( ImGui::MenuItem( "Dir light" ) )
 				{
 					SceneNode& node = scene.CreateSceneNode( "directional_light", m_lastSceneNodeRightClicked );
-					const EntityID entityID = world.GetEntityID( node.handle );
+					const EcsEntity entity = world.GetEntity( node.handle );
 					
-					Transform& transform = world.AddComponent<Transform>( entityID );
+					Transform& transform = world.AddComponent<Transform>( entity );
 					transform.SetPosition( origin  );
 					
-					DirectionalLight& light = world.AddComponent<DirectionalLight>( entityID );
+					DirectionalLight& light = world.AddComponent<DirectionalLight>( entity );
 					transform.SetRotationEuler( btVector3(30.f,10.f,0.f) );
 					onSelectSceneNode.Emmit( &node );
 				}
@@ -175,12 +175,12 @@ namespace fan
 				if( ImGui::MenuItem( "particle system" ) )
 				{
 					SceneNode& node = scene.CreateSceneNode( "particle_system", m_lastSceneNodeRightClicked );
-					const EntityID entityID = world.GetEntityID( node.handle );
+					const EcsEntity entity = world.GetEntity( node.handle );
 					
-					Transform& transform = world.AddComponent<Transform>( entityID );
+					Transform& transform = world.AddComponent<Transform>( entity );
 					transform.SetPosition( origin );
 
-					ParticleEmitter& emitter = world.AddComponent<ParticleEmitter>( entityID );
+					ParticleEmitter& emitter = world.AddComponent<ParticleEmitter>( entity );
 					transform.SetPosition( origin );
 				}
 
@@ -216,7 +216,7 @@ namespace fan
 			if( ImGui::Selectable( "Delete" ) && m_lastSceneNodeRightClicked != nullptr )
 			{
 				EcsWorld& world = *m_scene->world;
-				world.KillEntity( world.GetEntityID( m_lastSceneNodeRightClicked->handle ) );
+				world.Kill( world.GetEntity( m_lastSceneNodeRightClicked->handle ) );
 			}
 			ImGui::EndPopup();
 		}

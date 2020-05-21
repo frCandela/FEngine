@@ -1,7 +1,7 @@
 #pragma once
 
 #include "bullet/LinearMath/btVector3.h"
-#include "ecs/fanSingletonComponent.hpp"
+#include "ecs/fanEcsSingleton.hpp"
 #include "core/fanColor.hpp"
 
 namespace fan
@@ -9,14 +9,14 @@ namespace fan
 	//================================================================================================================================
 	// The grid in the 3D view of the editor
 	//================================================================================================================================
-	struct EditorGrid : public SingletonComponent
+	struct EditorGrid : public EcsSingleton
 	{
-		DECLARE_SINGLETON_COMPONENT()
+		ECS_SINGLETON( EditorGrid )
 	public:
-		static void SetInfo( SingletonComponentInfo& _info );
-		static void Init( EcsWorld& _world, SingletonComponent& _component );
-		static void Save( const SingletonComponent& _component, Json& _json );
-		static void Load( SingletonComponent& _component, const Json& _json );
+		static void SetInfo( EcsSingletonInfo& _info );
+		static void Init( EcsWorld& _world, EcsSingleton& _component );
+		static void Save( const EcsSingleton& _component, Json& _json );
+		static void Load( EcsSingleton& _component, const Json& _json );
 
 		btVector3	offset;
 		Color		color;

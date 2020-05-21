@@ -4,11 +4,9 @@
 
 namespace fan
 {
-	REGISTER_COMPONENT( ExpirationTime, "expiration_time" );
-
 	//================================================================================================================================
 	//================================================================================================================================
-	void ExpirationTime::SetInfo( ComponentInfo& _info )
+	void ExpirationTime::SetInfo( EcsComponentInfo& _info )
 	{
 		_info.icon = ImGui::IconType::STOP16;
 		_info.onGui = &ExpirationTime::OnGui;
@@ -16,11 +14,12 @@ namespace fan
 		_info.load  = &ExpirationTime::Load;
 		_info.save  = &ExpirationTime::Save;
 		_info.editorPath = "/";
+		_info.name = "expiration time";
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void ExpirationTime::Init( EcsWorld& _world, Component& _component )
+	void ExpirationTime::Init( EcsWorld& _world, EcsComponent& _component )
 	{
 		ExpirationTime& expiration = static_cast<ExpirationTime&>( _component );
 		expiration.duration = 10.f;
@@ -28,7 +27,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void ExpirationTime::OnGui( EcsWorld& _world, EntityID _entityID, Component& _component )
+	void ExpirationTime::OnGui( EcsWorld& _world, EcsEntity _entityID, EcsComponent& _component )
 	{
 		ExpirationTime& expiration = static_cast<ExpirationTime&>( _component );
 		ImGui::PushItemWidth( 0.6f * ImGui::GetWindowWidth() );
@@ -39,7 +38,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void ExpirationTime::Save( const Component& _component, Json& _json )
+	void ExpirationTime::Save( const EcsComponent& _component, Json& _json )
 	{
 		const ExpirationTime& expiration = static_cast<const ExpirationTime&>( _component );
 
@@ -48,7 +47,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void ExpirationTime::Load( Component& _component, const Json& _json )
+	void ExpirationTime::Load( EcsComponent& _component, const Json& _json )
 	{
 		ExpirationTime& expiration = static_cast<ExpirationTime&>( _component );
 		Serializable::LoadFloat( _json, "duration", expiration.duration );

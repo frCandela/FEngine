@@ -16,7 +16,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void EditorCamera::SetInfo( SingletonComponentInfo& _info )
+	void EditorCamera::SetInfo( EcsSingletonInfo& _info )
 	{
 		_info.icon = ImGui::CAMERA16;
 		_info.init = &EditorCamera::Init;
@@ -26,7 +26,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void EditorCamera::Init( EcsWorld& _world, SingletonComponent& _component )
+	void EditorCamera::Init( EcsWorld& _world, EcsSingleton& _component )
 	{
 		EditorCamera& editorCamera = static_cast<EditorCamera&>( _component );
 
@@ -40,7 +40,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void EditorCamera::OnGui( EcsWorld&, SingletonComponent& _component )
+	void EditorCamera::OnGui( EcsWorld&, EcsSingleton& _component )
 	{
 		EditorCamera& editorCamera = static_cast<EditorCamera&>( _component );
 
@@ -123,11 +123,11 @@ namespace fan
 	//================================================================================================================================
 	void EditorCamera::CreateEditorCamera( EcsWorld& _world )
 	{
-		Scene& scene = _world.GetSingletonComponent< Scene >();
+		Scene& scene = _world.GetSingleton< Scene >();
 
 		// Editor Camera
 		SceneNode& cameraNode = scene.CreateSceneNode( "editor_camera", scene.root );
-		EntityID cameraID = _world.GetEntityID( cameraNode.handle );
+		EcsEntity cameraID = _world.GetEntity( cameraNode.handle );
 		cameraNode.AddFlag( SceneNode::NOT_SAVED | SceneNode::NO_DELETE | SceneNode::NO_RAYCAST );
 
 		Transform& transform = _world.AddComponent< Transform >( cameraID );
@@ -137,7 +137,7 @@ namespace fan
 		scene.mainCamera = &cameraNode;
 
 		// set editor camera singleton
-		EditorCamera& editorCamera = _world.GetSingletonComponent<EditorCamera>();
+		EditorCamera& editorCamera = _world.GetSingleton<EditorCamera>();
 		editorCamera.cameraNode = &cameraNode;
 		editorCamera.transform = &transform;
 		editorCamera.camera = &camera;

@@ -139,7 +139,7 @@ namespace fan
 		world.AddTagType<tag_sunlight_occlusion>();
 
 		// @hack
-		Game& game = world.GetSingletonComponent<Game>();
+		Game& game = world.GetSingleton<Game>();
 		game.gameClient = this;
 		game.name = _name;
 	}
@@ -148,8 +148,8 @@ namespace fan
 	//================================================================================================================================
 	void GameClient::Start()
 	{
-		game = &world.GetSingletonComponent<Game>();
-		netManager = &world.GetSingletonComponent<ClientNetworkManager>();
+		game = &world.GetSingleton<Game>();
+		netManager = &world.GetSingleton<ClientNetworkManager>();
 
 		netManager->Start( world );
 
@@ -167,12 +167,12 @@ namespace fan
 	void  GameClient::Stop()
 	{
 		// clears the physics world
-		PhysicsWorld& physicsWorld = world.GetSingletonComponent<PhysicsWorld>();
+		PhysicsWorld& physicsWorld = world.GetSingleton<PhysicsWorld>();
 		S_UnregisterAllRigidbodies::Run( world, world.Match( S_UnregisterAllRigidbodies::GetSignature( world ) ) );
 		physicsWorld.rigidbodiesHandles.clear();
 
 		// clears the particles mesh
-		RenderWorld& renderWorld = world.GetSingletonComponent<RenderWorld>();
+		RenderWorld& renderWorld = world.GetSingleton<RenderWorld>();
 		renderWorld.particlesMesh.LoadFromVertices( {} );
 
 		GameCamera::DeleteGameCamera( world );
@@ -198,9 +198,9 @@ namespace fan
 	//================================================================================================================================
 	void GameClient::Test()
 	{
-		const EntityID persistentID = world.GetEntityID( netManager->playerPersistent->handle );
+		const EcsEntity persistentID = world.GetEntity( netManager->playerPersistent->handle );
 		ClientGameData& gameData = world.GetComponent<ClientGameData>( persistentID );
-		const EntityID spaceshipID = world.GetEntityID( gameData.spaceshipHandle );
+		const EcsEntity spaceshipID = world.GetEntity( gameData.spaceshipHandle );
 		Transform& transform = world.GetComponent<Transform>( spaceshipID );
 		transform.SetPosition( transform.GetPosition() + btVector3( 1, 0, 0 ) );
 	}
@@ -209,7 +209,7 @@ namespace fan
 	//================================================================================================================================
 	void GameClient::RollbackResimulate( EcsWorld& _world )
 	{
-		const EntityID persistentID = _world.GetEntityID( netManager->playerPersistent->handle );
+		const EcsEntity persistentID = _world.GetEntity( netManager->playerPersistent->handle );
 		ClientGameData& gameData = _world.GetComponent<ClientGameData>( persistentID );
 		if( !gameData.spaceshipSynced && ! gameData.previousInputsSinceLastGameState.empty() )
 		{
@@ -223,10 +223,10 @@ namespace fan
 				// Rollback at the frame we took the snapshot of the player game state
 				game->frameIndex = oldest.frameIndex;
 				Debug::Highlight() << "rollback to frame " << oldest.frameIndex << Debug::Endl();
-				const EntityID spaceshipID = _world.GetEntityID( gameData.spaceshipHandle );
+				const EcsEntity spaceshipID = _world.GetEntity( gameData.spaceshipHandle );
 				
 				// Resets the player rigidbody & transform
-				PhysicsWorld& physicsWorld = world.GetSingletonComponent<PhysicsWorld>();
+				PhysicsWorld& physicsWorld = world.GetSingleton<PhysicsWorld>();
 				physicsWorld.Reset();
 				Rigidbody& rigidbody = _world.GetComponent<Rigidbody>( spaceshipID );
 				physicsWorld.dynamicsWorld->removeRigidBody( &rigidbody.rigidbody );
@@ -302,7 +302,7 @@ namespace fan
 			ClientNetworkManager::SpawnShips( world );
 
 			// physics & transforms
-			PhysicsWorld& physicsWorld = world.GetSingletonComponent<PhysicsWorld>();
+			PhysicsWorld& physicsWorld = world.GetSingleton<PhysicsWorld>();
 			S_SynchronizeMotionStateFromTransform	::Run( world, world.Match( S_SynchronizeMotionStateFromTransform::GetSignature( world ) ), _delta );
 			physicsWorld.dynamicsWorld->stepSimulation( _delta, 10, Time::Get().GetPhysicsDelta() );
 			S_SynchronizeTransformFromMotionState	::Run( world, world.Match( S_SynchronizeTransformFromMotionState::GetSignature( world ) ), _delta );

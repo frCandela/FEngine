@@ -1,6 +1,6 @@
 #pragma once
 
-#include "ecs/fanSingletonComponent.hpp"
+#include "ecs/fanEcsSingleton.hpp"
 #include "core/math/fanVector2.hpp"
 
 namespace fan
@@ -13,13 +13,13 @@ namespace fan
 	//================================================================================================================================
 	// Editor camera data (transform, camera, speed, sensitivity )
 	//================================================================================================================================
-	struct EditorCamera : public SingletonComponent
+	struct EditorCamera : public EcsSingleton
 	{
-		DECLARE_SINGLETON_COMPONENT()
+		ECS_SINGLETON( EditorCamera )
 	public:
-		static void SetInfo( SingletonComponentInfo& _info );
-		static void Init( EcsWorld& _world, SingletonComponent& _component );
-		static void OnGui( EcsWorld&, SingletonComponent& _component );
+		static void SetInfo( EcsSingletonInfo& _info );
+		static void Init( EcsWorld& _world, EcsSingleton& _component );
+		static void OnGui( EcsWorld&, EcsSingleton& _component );
 
 		SceneNode* cameraNode;
 		Transform* transform;

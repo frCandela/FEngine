@@ -26,7 +26,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void PhysicsWorld::Init( EcsWorld& _world, SingletonComponent& _component )
+	void PhysicsWorld::Init( EcsWorld& _world, EcsSingleton& _component )
 	{
 		PhysicsWorld& physicsWorld = static_cast<PhysicsWorld&>( _component );
 		
@@ -41,7 +41,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void PhysicsWorld::OnGui( EcsWorld&, SingletonComponent& _component )
+	void PhysicsWorld::OnGui( EcsWorld&, EcsSingleton& _component )
 	{
 		PhysicsWorld& physicsWorld = static_cast<PhysicsWorld&>( _component );
 
@@ -60,7 +60,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================	
-	void PhysicsWorld::Save( const SingletonComponent& _component, Json& _json )
+	void PhysicsWorld::Save( const EcsSingleton& _component, Json& _json )
 	{
 		const PhysicsWorld& physicsWorld = static_cast<const PhysicsWorld&>( _component );
 		Serializable::SaveVec3( _json, "gravity", physicsWorld.dynamicsWorld->getGravity() );
@@ -68,7 +68,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================	
-	void PhysicsWorld::Load( SingletonComponent& _component, const Json& _json )
+	void PhysicsWorld::Load( EcsSingleton& _component, const Json& _json )
 	{
 		btVector3 gravity;
 		Serializable::LoadVec3(	 _json, "gravity", gravity );
@@ -188,9 +188,9 @@ namespace fan
 	//================================================================================================================================
 	// adds a rigidbody to the dynamics world and saves its handle ( useful for later use in collision callbacks )
 	//================================================================================================================================	
-	void PhysicsWorld::AddRigidbody( Rigidbody& _rigidbody, EntityHandle _entityhandle )
+	void PhysicsWorld::AddRigidbody( Rigidbody& _rigidbody, EcsHandle _handle )
 	{
-		rigidbodiesHandles[&_rigidbody] = _entityhandle;
+		rigidbodiesHandles[&_rigidbody] = _handle;
 		dynamicsWorld->addRigidBody( &_rigidbody.rigidbody );
 	}
 

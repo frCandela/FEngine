@@ -137,7 +137,7 @@ namespace fan
 		world.AddTagType<tag_sunlight_occlusion>();
 
 		// @hack
-		Game& game = world.GetSingletonComponent<Game>();
+		Game& game = world.GetSingleton<Game>();
 		game.gameServer = this;
 		game.name = _name;
 	}
@@ -146,8 +146,8 @@ namespace fan
 	//================================================================================================================================
 	void GameServer::Start()
 	{
-		game = &world.GetSingletonComponent<Game>();
-		netManager = &world.GetSingletonComponent<ServerNetworkManager>();
+		game = &world.GetSingleton<Game>();
+		netManager = &world.GetSingleton<ServerNetworkManager>();
 
 		netManager->Start( world );
 		S_RegisterAllRigidbodies::Run( world, world.Match( S_RegisterAllRigidbodies::GetSignature( world ) ) );
@@ -160,12 +160,12 @@ namespace fan
 	void  GameServer::Stop()
 	{
 		// clears the physics world
-		PhysicsWorld& physicsWorld = world.GetSingletonComponent<PhysicsWorld>();
+		PhysicsWorld& physicsWorld = world.GetSingleton<PhysicsWorld>();
 		S_UnregisterAllRigidbodies::Run( world, world.Match( S_UnregisterAllRigidbodies::GetSignature( world ) ) );
 		physicsWorld.rigidbodiesHandles.clear();
 
 		// clears the particles mesh
-		RenderWorld& renderWorld = world.GetSingletonComponent<RenderWorld>();
+		RenderWorld& renderWorld = world.GetSingleton<RenderWorld>();
 		renderWorld.particlesMesh.LoadFromVertices( {} );
 
 		GameCamera::DeleteGameCamera( world );
@@ -214,7 +214,7 @@ namespace fan
 			S_MoveSpaceships::Run( world, world.Match( S_MoveSpaceships::GetSignature( world ) ), _delta );
 
 			// physics & transforms
-			PhysicsWorld& physicsWorld = world.GetSingletonComponent<PhysicsWorld>();
+			PhysicsWorld& physicsWorld = world.GetSingleton<PhysicsWorld>();
 			S_SynchronizeMotionStateFromTransform	::Run( world, world.Match( S_SynchronizeMotionStateFromTransform::GetSignature( world ) ), _delta );
 			physicsWorld.dynamicsWorld->stepSimulation( _delta, 10, Time::Get().GetPhysicsDelta() );
 			S_SynchronizeTransformFromMotionState	::Run( world, world.Match( S_SynchronizeTransformFromMotionState::GetSignature( world ) ), _delta );
@@ -244,22 +244,22 @@ namespace fan
 			S_UpdateBoundsFromTransform	::Run( world, world.Match( S_UpdateBoundsFromTransform::GetSignature( world ) )	, _delta );
 			S_UpdateGameCamera			::Run( world, world.Match( S_UpdateGameCamera::GetSignature( world ) )			, _delta );			
 			
-			HostManager& hostManager = world.GetSingletonComponent<HostManager>();
-			for( const std::pair<HostManager::IPPort, EntityHandle>& pair : hostManager.hostHandles )
+			HostManager& hostManager = world.GetSingleton<HostManager>();
+			for( const std::pair<HostManager::IPPort, EcsHandle>& pair : hostManager.hostHandles )
 			{
-				const EntityHandle hostHandle = pair.second;
-				const EntityID hostID = world.GetEntityID( hostHandle );
+				const EcsHandle hostHandle = pair.second;
+				const EcsEntity hostID = world.GetEntity( hostHandle );
 				const HostGameData& hostData = world.GetComponent<HostGameData>( hostID );
 				if( hostData.spaceshipHandle != 0 )
 				{
 					const PacketReplication packet = HostReplication::BuildEntityPacket( world, hostData.spaceshipHandle, { Transform::s_typeInfo/*,Rigidbody::s_typeInfo*/ } );
 
-					for( const std::pair<HostManager::IPPort, EntityHandle>& otherPair : hostManager.hostHandles )
+					for( const std::pair<HostManager::IPPort, EcsHandle>& otherPair : hostManager.hostHandles )
 					{
-						const EntityHandle otherHostHandle = otherPair.second;
+						const EcsHandle otherHostHandle = otherPair.second;
 						if( otherHostHandle != hostHandle )
 						{
-							const EntityID otherHostID = world.GetEntityID( otherHostHandle );
+							const EcsEntity otherHostID = world.GetEntity( otherHostHandle );
 							HostReplication& hostReplication = world.GetComponent<HostReplication>( otherHostID );
 							hostReplication.Replicate( packet, HostReplication::None );
 						}

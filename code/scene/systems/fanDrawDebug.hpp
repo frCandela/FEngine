@@ -1,4 +1,4 @@
-#include "ecs/fanSystem.hpp"
+#include "ecs/fanEcsSystem.hpp"
 
 namespace fan
 {
@@ -7,63 +7,63 @@ namespace fan
 	//==============================================================================================================================================================
 	// Draw the bounds of all scene nodes 
 	//==============================================================================================================================================================
-	struct S_DrawDebugBounds : System
+	struct S_DrawDebugBounds : EcsSystem
 	{
-		static Signature GetSignature( const EcsWorld& _world );
-		static void Run( EcsWorld& _world, const std::vector<EntityID>& _entities );
+		staticEcsSignatureGetSignature( const EcsWorld& _world );
+		static void Run( EcsWorld& _world, const std::vector<EcsEntity>& _entities );
 	};
 
 	//==============================================================================================================================================================
 	// Draw the normals of all models 
 	//==============================================================================================================================================================
-	struct S_DrawDebugNormals : System
+	struct S_DrawDebugNormals : EcsSystem
 	{
-		static Signature GetSignature( const EcsWorld& _world );
-		static void Run( EcsWorld& _world, const std::vector<EntityID>& _entities );
+		staticEcsSignatureGetSignature( const EcsWorld& _world );
+		static void Run( EcsWorld& _world, const std::vector<EcsEntity>& _entities );
 	};
 
 	//==============================================================================================================================================================
 	// Draw all the models in wireframe
 	//==============================================================================================================================================================
-	struct S_DrawDebugWireframe : System
+	struct S_DrawDebugWireframe : EcsSystem
 	{
-		static Signature GetSignature( const EcsWorld& _world );
-		static void Run( EcsWorld& _world, const std::vector<EntityID>& _entities );
+		staticEcsSignatureGetSignature( const EcsWorld& _world );
+		static void Run( EcsWorld& _world, const std::vector<EcsEntity>& _entities );
 	};
 
 	//==============================================================================================================================================================
 	// Draw all the models convex hull in wireframe
 	//==============================================================================================================================================================
-	struct S_DrawDebugHull : System
+	struct S_DrawDebugHull : EcsSystem
 	{
-		static Signature GetSignature( const EcsWorld& _world );
-		static void Run( EcsWorld& _world, const std::vector<EntityID>& _entities );
+		staticEcsSignatureGetSignature( const EcsWorld& _world );
+		static void Run( EcsWorld& _world, const std::vector<EcsEntity>& _entities );
 	};
 
 	//==============================================================================================================================================================
 	// Draw all the point lights gizmos
 	//==============================================================================================================================================================
-	struct S_DrawDebugPointLights : System
+	struct S_DrawDebugPointLights : EcsSystem
 	{
-		static Signature GetSignature( const EcsWorld& _world );
-		static void Run( EcsWorld& _world, const std::vector<EntityID>& _entities );
+		staticEcsSignatureGetSignature( const EcsWorld& _world );
+		static void Run( EcsWorld& _world, const std::vector<EcsEntity>& _entities );
 	};
 
 	//==============================================================================================================================================================
 	// Draw all the directional lights gizmos
 	//==============================================================================================================================================================
-	struct S_DrawDebugDirectionalLights : System
+	struct S_DrawDebugDirectionalLights : EcsSystem
 	{
-		static Signature GetSignature( const EcsWorld& _world );
-		static void Run( EcsWorld& _world, const std::vector<EntityID>& _entities );
+		staticEcsSignatureGetSignature( const EcsWorld& _world );
+		static void Run( EcsWorld& _world, const std::vector<EcsEntity>& _entities );
 	};
 
 	//==============================================================================================================================================================
 	// Draw physics shapes in wireframe (box, sphere, etc )
 	//==============================================================================================================================================================
-	struct S_DrawDebugCollisionShapes : System
+	struct S_DrawDebugCollisionShapes : EcsSystem
 	{
-		static Signature GetSignature( const EcsWorld& _world );
-		static void Run( EcsWorld& _world, const std::vector<EntityID>& _entities );
+		staticEcsSignatureGetSignature( const EcsWorld& _world );
+		static void Run( EcsWorld& _world, const std::vector<EcsEntity>& _entities );
 	};
 }

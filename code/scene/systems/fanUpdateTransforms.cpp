@@ -9,21 +9,21 @@ namespace fan
 {
 	//================================================================================================================================
 	//================================================================================================================================
-	Signature S_InitFollowTransforms::GetSignature( const EcsWorld& _world )
+	EcsSignature S_InitFollowTransforms::GetSignature( const EcsWorld& _world )
 	{
 		return	_world.GetSignature<Transform>() | _world.GetSignature<FollowTransform>();
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void S_InitFollowTransforms::Run( EcsWorld& _world, const std::vector<EntityID>& _entities )
+	void S_InitFollowTransforms::Run( EcsWorld& _world, const std::vector<EcsEntity>& _entities )
 	{
-		for( EntityID entityID : _entities )
+		for( EcsEntity entity : _entities )
 		{
-			FollowTransform& followTransform = _world.GetComponent<FollowTransform>( entityID );
+			FollowTransform& followTransform = _world.GetComponent<FollowTransform>( entity );
 			if( followTransform.targetTransform != nullptr )
 			{
-				Transform& follow = _world.GetComponent<Transform>( entityID );
+				Transform& follow = _world.GetComponent<Transform>( entity );
 				Transform& target = *followTransform.targetTransform;
 				followTransform.localTransform = S_InitFollowTransforms::GetLocalTransform( target.transform, follow.transform );
 			}
@@ -39,21 +39,21 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	Signature S_MoveFollowTransforms::GetSignature( const EcsWorld& _world )
+	EcsSignature S_MoveFollowTransforms::GetSignature( const EcsWorld& _world )
 	{
 		return	_world.GetSignature<Transform>() | _world.GetSignature<FollowTransform>();
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void S_MoveFollowTransforms::Run( EcsWorld& _world, const std::vector<EntityID>& _entities )
+	void S_MoveFollowTransforms::Run( EcsWorld& _world, const std::vector<EcsEntity>& _entities )
 	{
-		for( EntityID entityID : _entities )
+		for( EcsEntity entity : _entities )
 		{
-			FollowTransform& followTransform = _world.GetComponent<FollowTransform>( entityID );
+			FollowTransform& followTransform = _world.GetComponent<FollowTransform>( entity );
 			if( followTransform.locked && followTransform.targetTransform != nullptr )
 			{
-				Transform& follow = _world.GetComponent<Transform>( entityID );
+				Transform& follow = _world.GetComponent<Transform>( entity );
 				Transform& target = *followTransform.targetTransform;
 
 				follow.transform = target.transform * followTransform.localTransform;
@@ -63,21 +63,21 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	Signature S_MoveFollowTransformsUI::GetSignature( const EcsWorld& _world )
+	EcsSignature S_MoveFollowTransformsUI::GetSignature( const EcsWorld& _world )
 	{
 		return	_world.GetSignature<TransformUI>() | _world.GetSignature<FollowTransformUI>();
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void S_MoveFollowTransformsUI::Run( EcsWorld& _world, const std::vector<EntityID>& _entities )
+	void S_MoveFollowTransformsUI::Run( EcsWorld& _world, const std::vector<EcsEntity>& _entities )
 	{
-		for( EntityID entityID : _entities )
+		for( EcsEntity entity : _entities )
 		{
-			FollowTransformUI& followTransform = _world.GetComponent<FollowTransformUI>( entityID );
+			FollowTransformUI& followTransform = _world.GetComponent<FollowTransformUI>( entity );
 			if( followTransform.locked && followTransform.targetTransform != nullptr )
 			{
-				TransformUI& follow = _world.GetComponent<TransformUI>( entityID );
+				TransformUI& follow = _world.GetComponent<TransformUI>( entity );
 				TransformUI& target = *followTransform.targetTransform;
 
 				follow.position = target.position + followTransform.offset;

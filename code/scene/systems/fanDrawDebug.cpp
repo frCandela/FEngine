@@ -16,38 +16,38 @@ namespace fan
 {
 	//================================================================================================================================
 	//================================================================================================================================
-	Signature S_DrawDebugBounds::GetSignature( const EcsWorld& _world )
+	EcsSignature S_DrawDebugBounds::GetSignature( const EcsWorld& _world )
 	{
 		return	_world.GetSignature<Bounds>() | _world.GetSignature<SceneNode>();
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void S_DrawDebugBounds::Run( EcsWorld& _world, const std::vector<EntityID>& _entities )
+	void S_DrawDebugBounds::Run( EcsWorld& _world, const std::vector<EcsEntity>& _entities )
 	{
-		for( EntityID entityID : _entities )
+		for( EcsEntity entity : _entities )
 		{
-			const Bounds& bounds = _world.GetComponent<Bounds>( entityID );
-			const SceneNode& node = _world.GetComponent<SceneNode>( entityID );
+			const Bounds& bounds = _world.GetComponent<Bounds>( entity );
+			const SceneNode& node = _world.GetComponent<SceneNode>( entity );
 			RendererDebug::Get().DebugAABB( bounds.aabb, Color::Red );
 		}
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	Signature S_DrawDebugNormals::GetSignature( const EcsWorld& _world )
+	EcsSignature S_DrawDebugNormals::GetSignature( const EcsWorld& _world )
 	{
 		return _world.GetSignature<MeshRenderer>() | _world.GetSignature<Transform>();
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void S_DrawDebugNormals::Run( EcsWorld& _world, const std::vector<EntityID>& _entities )
+	void S_DrawDebugNormals::Run( EcsWorld& _world, const std::vector<EcsEntity>& _entities )
 	{
-		for( EntityID entityID : _entities )
+		for( EcsEntity entity : _entities )
 		{
-			const MeshRenderer& meshRenderer = _world.GetComponent<MeshRenderer>( entityID );
-			const Transform& transform = _world.GetComponent<Transform>( entityID );
+			const MeshRenderer& meshRenderer = _world.GetComponent<MeshRenderer>( entity );
+			const Transform& transform = _world.GetComponent<Transform>( entity );
 
 			if( *meshRenderer.mesh != nullptr )
 			{
@@ -69,19 +69,19 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	Signature S_DrawDebugWireframe::GetSignature( const EcsWorld& _world )
+	EcsSignature S_DrawDebugWireframe::GetSignature( const EcsWorld& _world )
 	{
 		return _world.GetSignature<MeshRenderer>() | _world.GetSignature<Transform>();
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void S_DrawDebugWireframe::Run( EcsWorld& _world, const std::vector<EntityID>& _entities )
+	void S_DrawDebugWireframe::Run( EcsWorld& _world, const std::vector<EcsEntity>& _entities )
 	{
-		for( EntityID entityID : _entities )
+		for( EcsEntity entity : _entities )
 		{
-			const MeshRenderer& meshRenderer = _world.GetComponent<MeshRenderer>( entityID );
-			const Transform& transform = _world.GetComponent<Transform>( entityID );
+			const MeshRenderer& meshRenderer = _world.GetComponent<MeshRenderer>( entity );
+			const Transform& transform = _world.GetComponent<Transform>( entity );
 
 			if( *meshRenderer.mesh != nullptr )
 			{
@@ -104,19 +104,19 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	Signature S_DrawDebugHull::GetSignature( const EcsWorld& _world )
+	EcsSignature S_DrawDebugHull::GetSignature( const EcsWorld& _world )
 	{
 		return _world.GetSignature<MeshRenderer>() | _world.GetSignature<Transform>();
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void S_DrawDebugHull::Run( EcsWorld& _world, const std::vector<EntityID>& _entities )
+	void S_DrawDebugHull::Run( EcsWorld& _world, const std::vector<EcsEntity>& _entities )
 	{
-		for( EntityID entityID : _entities )
+		for( EcsEntity entity : _entities )
 		{
-			const MeshRenderer& meshRenderer = _world.GetComponent<MeshRenderer>( entityID );
-			const Transform& transform = _world.GetComponent<Transform>( entityID );
+			const MeshRenderer& meshRenderer = _world.GetComponent<MeshRenderer>( entity );
+			const Transform& transform = _world.GetComponent<Transform>( entity );
 
 			if( *meshRenderer.mesh != nullptr )
 			{
@@ -153,19 +153,19 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	Signature S_DrawDebugPointLights::GetSignature( const EcsWorld& _world )
+	EcsSignature S_DrawDebugPointLights::GetSignature( const EcsWorld& _world )
 	{
 		return _world.GetSignature<PointLight>() | _world.GetSignature<Transform>();
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void S_DrawDebugPointLights::Run( EcsWorld& _world, const std::vector<EntityID>& _entities )
+	void S_DrawDebugPointLights::Run( EcsWorld& _world, const std::vector<EcsEntity>& _entities )
 	{
-		for( EntityID entityID : _entities )
+		for( EcsEntity entity : _entities )
 		{
-			const PointLight& light = _world.GetComponent<PointLight>( entityID );
-			const Transform& transform = _world.GetComponent<Transform>( entityID );
+			const PointLight& light = _world.GetComponent<PointLight>( entity );
+			const Transform& transform = _world.GetComponent<Transform>( entity );
 
 			const float lightRange = PointLight::GetLightRange( light );
 			if( lightRange > 0 )
@@ -177,19 +177,19 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	Signature S_DrawDebugDirectionalLights::GetSignature( const EcsWorld& _world )
+	EcsSignature S_DrawDebugDirectionalLights::GetSignature( const EcsWorld& _world )
 	{
 		return _world.GetSignature<DirectionalLight>() | _world.GetSignature<Transform>();
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void S_DrawDebugDirectionalLights::Run( EcsWorld& _world, const std::vector<EntityID>& _entities )
+	void S_DrawDebugDirectionalLights::Run( EcsWorld& _world, const std::vector<EcsEntity>& _entities )
 	{
-		for( EntityID entityID : _entities )
+		for( EcsEntity entity : _entities )
 		{
-			const DirectionalLight& light = _world.GetComponent<DirectionalLight>( entityID );
-			const Transform& transform = _world.GetComponent<Transform>( entityID );
+			const DirectionalLight& light = _world.GetComponent<DirectionalLight>( entity );
+			const Transform& transform = _world.GetComponent<Transform>( entity );
 
 			const btVector3 pos = transform.GetPosition();
 			const btVector3 dir = transform.Forward();
@@ -210,30 +210,30 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	Signature S_DrawDebugCollisionShapes::GetSignature( const EcsWorld& _world )
+	EcsSignature S_DrawDebugCollisionShapes::GetSignature( const EcsWorld& _world )
 	{
 		return _world.GetSignature<Transform>() | _world.GetSignature<SceneNode>();
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void S_DrawDebugCollisionShapes::Run( EcsWorld& _world, const std::vector<EntityID>& _entities )
+	void S_DrawDebugCollisionShapes::Run( EcsWorld& _world, const std::vector<EcsEntity>& _entities )
 	{
-		for( EntityID entityID : _entities )
+		for( EcsEntity entity : _entities )
 		{
 			// box shape
-			if( _world.HasComponent<BoxShape>( entityID ) )
+			if( _world.HasComponent<BoxShape>( entity ) )
 			{
-				const Transform& transform = _world.GetComponent<Transform>( entityID );
-				const BoxShape & shape = _world.GetComponent<BoxShape>( entityID );
+				const Transform& transform = _world.GetComponent<Transform>( entity );
+				const BoxShape & shape = _world.GetComponent<BoxShape>( entity );
 				RendererDebug::Get().DebugCube( transform.transform, 0.5f * shape.GetScaling(), Color::Green, false  );
 			}
 
 			// sphere shape
-			if( _world.HasComponent<SphereShape>( entityID ) )
+			if( _world.HasComponent<SphereShape>( entity ) )
 			{
-				const Transform& transform = _world.GetComponent<Transform>( entityID );
-				const SphereShape& shape = _world.GetComponent<SphereShape>( entityID );
+				const Transform& transform = _world.GetComponent<Transform>( entity );
+				const SphereShape& shape = _world.GetComponent<SphereShape>( entity );
 				RendererDebug::Get().DebugSphere( transform.transform, shape.GetRadius(), Color::Green, false );
 			}
 		}

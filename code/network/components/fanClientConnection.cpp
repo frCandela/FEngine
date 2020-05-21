@@ -7,20 +7,19 @@
 
 namespace fan
 {
-	REGISTER_COMPONENT( ClientConnection, "client connection" );
-
 	//================================================================================================================================
 	//================================================================================================================================
-	void ClientConnection::SetInfo( ComponentInfo& _info )
+	void ClientConnection::SetInfo( EcsComponentInfo& _info )
 	{
 		_info.icon = ImGui::NETWORK16;
 		_info.init = &ClientConnection::Init;
 		_info.onGui = &ClientConnection::OnGui;
+		_info.name = "client connection";
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void ClientConnection::Init( EcsWorld& _world, Component& _component )
+	void ClientConnection::Init( EcsWorld& _world, EcsComponent& _component )
 	{
 		ClientConnection& connection = static_cast<ClientConnection&>( _component );
 		connection.socket.Unbind();
@@ -158,7 +157,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void ClientConnection::OnGui( EcsWorld& _world, EntityID _entityID, Component& _component )
+	void ClientConnection::OnGui( EcsWorld& _world, EcsEntity _entityID, EcsComponent& _component )
 	{
 		ImGui::Indent(); ImGui::Indent();
 		{

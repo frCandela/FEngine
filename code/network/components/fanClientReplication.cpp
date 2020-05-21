@@ -7,20 +7,19 @@
 
 namespace fan
 {
-	REGISTER_COMPONENT( ClientReplication, "client replication" );
-
 	//================================================================================================================================
 	//================================================================================================================================
-	void ClientReplication::SetInfo( ComponentInfo& _info )
+	void ClientReplication::SetInfo( EcsComponentInfo& _info )
 	{
 		_info.icon = ImGui::NETWORK16;
 		_info.init = &ClientReplication::Init;
 		_info.onGui = &ClientReplication::OnGui;
+		_info.name = "client replication";
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void ClientReplication::Init( EcsWorld& _world, Component& _component )
+	void ClientReplication::Init( EcsWorld& _world, EcsComponent& _component )
 	{
 		ClientReplication& replicationManager = static_cast<ClientReplication&>( _component );
 		replicationManager.replicationListRPC.clear();
@@ -42,7 +41,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void ClientReplication::OnGui( EcsWorld& _world, EntityID _entityID, Component& _component )
+	void ClientReplication::OnGui( EcsWorld& _world, EcsEntity _entityID, EcsComponent& _component )
 	{
 		ClientReplication& replicationManager = static_cast<ClientReplication&>( _component );
 

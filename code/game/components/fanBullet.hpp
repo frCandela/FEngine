@@ -1,6 +1,6 @@
 #pragma once
 
-#include "ecs/fanComponent.hpp"
+#include "ecs/fanEcsComponent.hpp"
 #include "scene/fanSceneResourcePtr.hpp"
 
 namespace fan
@@ -9,15 +9,15 @@ namespace fan
 	// A projectile that deals damage 
 	// @todo merge this with the damage component
 	//================================================================================================================================
-	struct Bullet : public Component
+	struct Bullet : public EcsComponent
 	{
-		DECLARE_COMPONENT( Bullet )
+		ECS_COMPONENT( Bullet )
 	public:
-		static void SetInfo( ComponentInfo& _info );
-		static void Init( EcsWorld& _world, Component& _component );
-		static void OnGui( EcsWorld& _world, EntityID _entityID, Component& _component );
-		static void Save( const Component& _component, Json& _json );
-		static void Load( Component& _component, const Json& _json );
+		static void SetInfo( EcsComponentInfo& _info );
+		static void Init( EcsWorld& _world, EcsComponent& _component );
+		static void OnGui( EcsWorld& _world, EcsEntity _entityID, EcsComponent& _component );
+		static void Save( const EcsComponent& _component, Json& _json );
+		static void Load( EcsComponent& _component, const Json& _json );
 
 		PrefabPtr explosionPrefab;
 	};

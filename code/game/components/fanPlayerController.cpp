@@ -6,11 +6,9 @@
 
 namespace fan
 {
-	REGISTER_COMPONENT( PlayerController, "player_controller" );
-
 	//================================================================================================================================
 	//================================================================================================================================
-	void PlayerController::SetInfo( ComponentInfo& _info )
+	void PlayerController::SetInfo( EcsComponentInfo& _info )
 	{
 		_info.icon = ImGui::IconType::JOYSTICK16;
 		_info.onGui = &PlayerController::OnGui;
@@ -18,11 +16,12 @@ namespace fan
 		_info.load = &PlayerController::Load;
 		_info.save = &PlayerController::Save;
 		_info.editorPath = "game/player/";
+		_info.name = "player_controller";
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void PlayerController::Init( EcsWorld& _world, Component& _component )
+	void PlayerController::Init( EcsWorld& _world, EcsComponent& _component )
 	{
 		PlayerController& playerController = static_cast<PlayerController&>( _component );
 
@@ -30,7 +29,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void PlayerController::OnGui( EcsWorld& _world, EntityID _entityID, Component& _component )
+	void PlayerController::OnGui( EcsWorld& _world, EcsEntity _entityID, EcsComponent& _component )
 	{
 		PlayerController& playerController = static_cast<PlayerController&>( _component );
 
@@ -65,7 +64,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void PlayerController::Load( Component& _component, const Json& _json )
+	void PlayerController::Load( EcsComponent& _component, const Json& _json )
 	{
 		PlayerController& playerController = static_cast<PlayerController&>( _component );
 
@@ -79,7 +78,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void PlayerController::Save( const Component& _component, Json& _json )
+	void PlayerController::Save( const EcsComponent& _component, Json& _json )
 	{
 		const PlayerController& playerController = static_cast<const PlayerController&>( _component );
 

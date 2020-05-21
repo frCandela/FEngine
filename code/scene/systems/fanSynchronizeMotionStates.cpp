@@ -9,7 +9,7 @@ namespace fan
 {
 	//================================================================================================================================
 	//================================================================================================================================
-	Signature S_SynchronizeTransformFromMotionState::GetSignature( const EcsWorld& _world )
+	EcsSignature S_SynchronizeTransformFromMotionState::GetSignature( const EcsWorld& _world )
 	{
 		return
 			_world.GetSignature<Transform>()
@@ -19,9 +19,9 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void S_SynchronizeTransformFromMotionState::Run( EcsWorld& _world, const std::vector<EntityID>& _entities, const float _delta )
+	void S_SynchronizeTransformFromMotionState::Run( EcsWorld& _world, const std::vector<EcsEntity>& _entities, const float _delta )
 	{
-		for( EntityID id : _entities )
+		for( EcsEntity id : _entities )
 		{
 			// light data
 			const MotionState& motionState = _world.GetComponent<MotionState>( id );
@@ -37,7 +37,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	Signature S_SynchronizeMotionStateFromTransform::GetSignature( const EcsWorld& _world )
+	EcsSignature S_SynchronizeMotionStateFromTransform::GetSignature( const EcsWorld& _world )
 	{
 		return
 			_world.GetSignature<Transform>()
@@ -47,9 +47,9 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void S_SynchronizeMotionStateFromTransform::Run( EcsWorld& _world, const std::vector<EntityID>& _entities, const float _delta )
+	void S_SynchronizeMotionStateFromTransform::Run( EcsWorld& _world, const std::vector<EcsEntity>& _entities, const float _delta )
 	{
-		for( EntityID id : _entities )
+		for( EcsEntity id : _entities )
 		{
 			const Transform& transform = _world.GetComponent<Transform>( id );
 			MotionState& motionState = _world.GetComponent<MotionState>( id );

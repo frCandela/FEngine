@@ -1,4 +1,4 @@
-#include "ecs/fanSystem.hpp"
+#include "ecs/fanEcsSystem.hpp"
 
 namespace fan
 {
@@ -9,18 +9,18 @@ namespace fan
 	// optionally a motion state and adds them to the physics world.
 	// this can be called post scene load to register all new scene nodes that need it
 	//==============================================================================================================================================================
-	struct S_RegisterAllRigidbodies : System
+	struct S_RegisterAllRigidbodies : EcsSystem
 	{
-		static Signature GetSignature( const EcsWorld& _world );
-		static void Run( EcsWorld& _world, const std::vector<EntityID>& _entities );		
+		staticEcsSignatureGetSignature( const EcsWorld& _world );
+		static void Run( EcsWorld& _world, const std::vector<EcsEntity>& _entities );		
 	};
 
 	//==============================================================================================================================================================
 	// enumerates over all rigidbody in the world, and removes them from the physics world
 	//==============================================================================================================================================================
-	struct S_UnregisterAllRigidbodies : System
+	struct S_UnregisterAllRigidbodies : EcsSystem
 	{
-		static Signature GetSignature( const EcsWorld& _world );
-		static void Run( EcsWorld& _world, const std::vector<EntityID>& _entities );
+		staticEcsSignatureGetSignature( const EcsWorld& _world );
+		static void Run( EcsWorld& _world, const std::vector<EcsEntity>& _entities );
 	};
 }

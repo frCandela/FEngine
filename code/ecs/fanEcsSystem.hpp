@@ -1,15 +1,12 @@
-#include "ecs/fanEcsSystem.hpp"
+#pragma once
+
+#include "fanEcsTypes.hpp"
 
 namespace fan
 {
-	class EcsWorld;
-
 	//==============================================================================================================================================================
-	// moves the camera above the players spaceships
+	// A System is a static function Run() with no state that processes entities
+	// implement GetSignature() and  Run(..) methods
 	//==============================================================================================================================================================
-	struct S_UpdateGameCamera : EcsSystem
-	{
-		staticEcsSignatureGetSignature( const EcsWorld& _world );
-		static void Run( EcsWorld& _world, const std::vector<EcsEntity>& _entities, const float _delta );
-	};
+	struct EcsSystem {};
 }

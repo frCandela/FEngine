@@ -18,7 +18,7 @@ namespace fan
 {
 	//================================================================================================================================
 	//================================================================================================================================
-	Signature S_MoveSpaceships::GetSignature( const EcsWorld& _world )
+	EcsSignature S_MoveSpaceships::GetSignature( const EcsWorld& _world )
 	{
 		return _world.GetSignature<Transform>() |
 			   _world.GetSignature<Rigidbody>() |
@@ -29,17 +29,17 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void S_MoveSpaceships::Run( EcsWorld& _world, const std::vector<EntityID>& _entities, const float _delta )
+	void S_MoveSpaceships::Run( EcsWorld& _world, const std::vector<EcsEntity>& _entities, const float _delta )
 	{
 		if( _delta == 0.f ) { return; }
 
-		for( EntityID entityID : _entities )
+		for( EcsEntity entity : _entities )
 		{
-			Transform& transform = _world.GetComponent<Transform>( entityID );
-			Rigidbody& rb = _world.GetComponent<Rigidbody>( entityID );
-			SpaceShip& spaceship = _world.GetComponent<SpaceShip>( entityID );
-			Battery& battery = _world.GetComponent<Battery>( entityID );
-			PlayerInput & playerInput = _world.GetComponent<PlayerInput>( entityID );
+			Transform& transform = _world.GetComponent<Transform>( entity );
+			Rigidbody& rb = _world.GetComponent<Rigidbody>( entity );
+			SpaceShip& spaceship = _world.GetComponent<SpaceShip>( entity );
+			Battery& battery = _world.GetComponent<Battery>( entity );
+			PlayerInput & playerInput = _world.GetComponent<PlayerInput>( entity );
 
 			// get player input
 			const btVector3 orientation = btVector3( playerInput.orientation.x(), 0.f, playerInput.orientation.z() );
@@ -134,13 +134,13 @@ namespace fan
 			newVelocity.setY( 0.f );
 			rb.SetVelocity( newVelocity );
 
-			_world.AddTag<tag_boundsOutdated>( entityID );
+			_world.AddTag<tag_boundsOutdated>( entity );
 		}
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	Signature S_EruptionDamage::GetSignature( const EcsWorld& _world )
+	EcsSignature S_EruptionDamage::GetSignature( const EcsWorld& _world )
 	{
 		return  _world.GetSignature<SolarPanel>() |
 				_world.GetSignature<Transform>() |
@@ -150,16 +150,16 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void S_EruptionDamage::Run( EcsWorld& _world, const std::vector<EntityID>& _entities, const float _delta )
+	void S_EruptionDamage::Run( EcsWorld& _world, const std::vector<EcsEntity>& _entities, const float _delta )
 	{
 		if( _delta == 0.f ) { return; }
 
-		const SolarEruption& eruption = _world.GetSingletonComponent<SolarEruption>();
-		for( EntityID entityID : _entities )
+		const SolarEruption& eruption = _world.GetSingleton<SolarEruption>();
+		for( EcsEntity entity : _entities )
 		{
-			const Transform& transform = _world.GetComponent<Transform>( entityID );
-			Health& health = _world.GetComponent<Health>( entityID );
-			SolarPanel& solarPanel = _world.GetComponent<SolarPanel>( entityID );
+			const Transform& transform = _world.GetComponent<Transform>( entity );
+			Health& health = _world.GetComponent<Health>( entity );
+			SolarPanel& solarPanel = _world.GetComponent<SolarPanel>( entity );
 
 			if( solarPanel.isInSunlight && eruption.state == SolarEruption::EXPODING )
 			{
@@ -178,7 +178,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	Signature S_PlayerDeath::GetSignature( const EcsWorld& _world )
+	EcsSignature S_PlayerDeath::GetSignature( const EcsWorld& _world )
 	{
 		return	_world.GetSignature<Health>() |
 				_world.GetSignature<Transform>() |
@@ -187,20 +187,20 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void S_PlayerDeath::Run( EcsWorld& _world, const std::vector<EntityID>& _entities, const float _delta )
+	void S_PlayerDeath::Run( EcsWorld& _world, const std::vector<EcsEntity>& _entities, const float _delta )
 	{
 		if( _delta == 0.f ) { return; }
 
-		const SolarEruption& eruption = _world.GetSingletonComponent<SolarEruption>();
-		for( EntityID entityID : _entities )
+		const SolarEruption& eruption = _world.GetSingleton<SolarEruption>();
+		for( EcsEntity entity : _entities )
 		{
-			Health& health = _world.GetComponent<Health>( entityID );
+			Health& health = _world.GetComponent<Health>( entity );
 
 			if( health.currentHealth == 0.f )
 			{
-				Transform& transform = _world.GetComponent<Transform>( entityID );
-				SpaceShip& spaceShip = _world.GetComponent<SpaceShip>( entityID );
-				Scene& scene = _world.GetSingletonComponent<Scene>();
+				Transform& transform = _world.GetComponent<Transform>( entity );
+				SpaceShip& spaceShip = _world.GetComponent<SpaceShip>( entity );
+				Scene& scene = _world.GetSingleton<Scene>();
 				
 				if( spaceShip.deathFx == nullptr )
 				{
@@ -209,12 +209,12 @@ namespace fan
 				else
 				{
 					SceneNode& fxNode = *spaceShip.deathFx->Instanciate( *scene.root );
-					EntityID fxId = _world.GetEntityID( fxNode.handle );
+					EcsEntity fxId = _world.GetEntity( fxNode.handle );
 					Transform& fxTransform = _world.GetComponent<Transform>( fxId );
 					fxTransform.SetPosition( transform.GetPosition() );
 				}
 
-				_world.KillEntity( entityID );
+				_world.KillEntity( entity );
 			}
 		}
 	}

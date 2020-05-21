@@ -163,7 +163,7 @@ namespace fan
 			m_renderer->SetClearColor( clearColor.ToGLM() );
 		}
 
-		Scene& scene = m_gameWorld.GetSingletonComponent<Scene>();
+		Scene& scene = m_gameWorld.GetSingleton<Scene>();
 
 		// Initialize editor components		
 		m_selection = new EditorSelection( scene );
@@ -180,7 +180,7 @@ namespace fan
 		m_networkWindow = new NetworkWindow( m_gameWorld );
 		m_singletonsWindow = new SingletonsWindow( m_gameWorld );
 		m_mainMenuBar = new MainMenuBar( m_gameWorld, *m_selection );
-		m_mainMenuBar->SetGrid( &m_editorWorld.GetSingletonComponent<EditorGrid>() );
+		m_mainMenuBar->SetGrid( &m_editorWorld.GetSingleton<EditorGrid>() );
 		m_mainMenuBar->SetWindows( {
 			  m_renderWindow
 			, m_sceneWindow
@@ -238,14 +238,6 @@ namespace fan
 				GameStart();
 			}
 		}
-
-		// test
-		m_world2.AddComponentType<Position2>();
-		m_world2.AddComponentType<Speed2>();
-		m_world2.AddComponentType<Expiration2>();
-		m_world2.AddTagType<TagBoundsOutdated>();
-		m_world2.AddSingletonType<SingletonTest>();
-		m_world2.Create();
 	}
 
 	//================================================================================================================================
@@ -284,7 +276,7 @@ namespace fan
 	//================================================================================================================================
 	void Editor::Test()
 	{
-		if( ImGui::Begin( "Ecs2" ) )
+		/*if( ImGui::Begin( "Ecs2" ) )
 		{
 			// Test code
 			static bool hasPosition = true;
@@ -390,11 +382,11 @@ namespace fan
 						ImGui::SameLine();
 						if( ImGui::Button( std::to_string(i).c_str() ) )
 						{
-							EcsEntity entityID = { &archetype, uint32_t( i ) };
+							EcsEntity entity = { &archetype, uint32_t( i ) };
 							switch( mode )
 							{
 							case Mode::removeEntity:
-								m_world2.Kill( entityID );
+								m_world2.Kill( entity );
 								break;
 							case Mode::removeComponent:
 								if( hasPosition ) { m_world2.RemoveComponent( entityID, Position2::Info::s_type ); }
@@ -413,10 +405,10 @@ namespace fan
 								if( hasTagBounds ) { m_world2.AddTag( entityID, TagBoundsOutdated::s_type ); }
 								break;
 							case Mode::createHandle:
-								m_world2.AddHandle( entityID );
+								m_world2.AddHandle( entity );
 								break;
 							case Mode::removeHandle:
-								m_world2.RemoveHandle( entityID );
+								m_world2.RemoveHandle( entity );
 								break;
 							default:
 								assert( false );
@@ -443,7 +435,7 @@ namespace fan
 				for ( const auto& pair : m_world2.GetHandles() )
 				{
 					const EcsHandle handle = pair.first;
-					EcsEntity entityID = pair.second;
+					EcsEntity entity = pair.second;
 
 					ImGui::Text( "%d", i++ );		ImGui::NextColumn();
 					ImGui::Text( "%d", handle );	ImGui::NextColumn();
@@ -540,7 +532,7 @@ namespace fan
 		}
 		ImGui::End();
 
-		m_world2.ApplyTransitions();
+		m_world2.ApplyTransitions();*/
 	}
 
 	//================================================================================================================================
@@ -552,7 +544,7 @@ namespace fan
 
 		Profiler::Get().Begin();
 
-		Game& game = m_gameWorld.GetSingletonComponent<Game>();
+		Game& game = m_gameWorld.GetSingleton<Game>();
 		while( m_applicationShouldExit == false && m_window->IsOpen() == true )
 		{
 			const double currentTime = Time::Get().ElapsedSinceStartup();
@@ -585,8 +577,8 @@ namespace fan
 				{
 					GameStep( game.logicDelta );
 
-					EditorCamera& editorCamera = m_gameWorld.GetSingletonComponent<EditorCamera>();
-					Scene& scene = m_gameWorld.GetSingletonComponent<Scene>();
+					EditorCamera& editorCamera = m_gameWorld.GetSingleton<EditorCamera>();
+					Scene& scene = m_gameWorld.GetSingleton<Scene>();
 
 					// only update the editor camera when we are using it
 					if( scene.mainCamera == editorCamera.cameraNode )
@@ -609,33 +601,33 @@ namespace fan
 
 					{
 						SCOPED_PROFILE( debug_draw );
-						EditorGrid::Draw( m_editorWorld.GetSingletonComponent<EditorGrid>() );
+						EditorGrid::Draw( m_editorWorld.GetSingleton<EditorGrid>() );
 
 						if( m_mainMenuBar->ShowWireframe() )
 						{
-							const Signature signatureDrawDebugWireframe = S_DrawDebugWireframe::GetSignature( m_gameWorld );
+							const EcsSignature signatureDrawDebugWireframe = S_DrawDebugWireframe::GetSignature( m_gameWorld );
 							S_DrawDebugWireframe::Run( m_gameWorld, m_gameWorld.Match( signatureDrawDebugWireframe ) );
 						}
 						if( m_mainMenuBar->ShowNormals() )
 						{
-							const Signature signatureDrawDebugNormals = S_DrawDebugNormals::GetSignature( m_gameWorld );
+							const EcsSignature signatureDrawDebugNormals = S_DrawDebugNormals::GetSignature( m_gameWorld );
 							S_DrawDebugNormals::Run( m_gameWorld, m_gameWorld.Match( signatureDrawDebugNormals ) );
 						}
 						if( m_mainMenuBar->ShowAABB() )
 						{
-							const Signature signatureDrawDebugBounds = S_DrawDebugBounds::GetSignature( m_gameWorld );
+							const EcsSignature signatureDrawDebugBounds = S_DrawDebugBounds::GetSignature( m_gameWorld );
 							S_DrawDebugBounds::Run( m_gameWorld, m_gameWorld.Match( signatureDrawDebugBounds ) );
 						}
 						if( m_mainMenuBar->ShowHull() )
 						{
-							const Signature signatureDrawDebugHull = S_DrawDebugHull::GetSignature( m_gameWorld );
+							const EcsSignature signatureDrawDebugHull = S_DrawDebugHull::GetSignature( m_gameWorld );
 							S_DrawDebugHull::Run( m_gameWorld, m_gameWorld.Match( signatureDrawDebugHull ) );
 						}
 						if( m_mainMenuBar->ShowLights() )
 						{
-							const Signature signatureDrawDebugPointLights = S_DrawDebugPointLights::GetSignature( m_gameWorld );
+							const EcsSignature signatureDrawDebugPointLights = S_DrawDebugPointLights::GetSignature( m_gameWorld );
 							S_DrawDebugPointLights::Run( m_gameWorld, m_gameWorld.Match( signatureDrawDebugPointLights ) );
-							const Signature signatureDrawDebugDirLights = S_DrawDebugDirectionalLights::GetSignature( m_gameWorld );
+							const EcsSignature signatureDrawDebugDirLights = S_DrawDebugDirectionalLights::GetSignature( m_gameWorld );
 							S_DrawDebugDirectionalLights::Run( m_gameWorld, m_gameWorld.Match( signatureDrawDebugDirLights ) );
 						}
 					}
@@ -672,11 +664,11 @@ namespace fan
 	//================================================================================================================================
 	void  Editor::GameStart()
 	{
-		Game& game = m_gameWorld.GetSingletonComponent<Game>();
+		Game& game = m_gameWorld.GetSingleton<Game>();
 		if( game.state == Game::STOPPED )
 		{
 			// saves the scene before playing
-			Scene& scene = m_gameWorld.GetSingletonComponent<Scene>();
+			Scene& scene = m_gameWorld.GetSingleton<Scene>();
 			if( scene.path.empty() )
 			{
 				Debug::Warning() << "please save the scene before playing" << Debug::Endl();
@@ -699,15 +691,15 @@ namespace fan
 	//================================================================================================================================
 	void  Editor::GameStop()
 	{
-		Game& game = m_gameWorld.GetSingletonComponent<Game>();
+		Game& game = m_gameWorld.GetSingleton<Game>();
 		if( game.state == Game::PLAYING || game.state == Game::PAUSED )
 		{
 			UseEditorCamera();
 
-			Scene& scene = m_gameWorld.GetSingletonComponent<Scene>();
+			Scene& scene = m_gameWorld.GetSingleton<Scene>();
 
 			// Saves the camera position for restoring it later
-			const EntityID oldCameraID = m_gameWorld.GetEntityID( scene.mainCamera->handle );
+			const EcsEntity oldCameraID = m_gameWorld.GetEntity( scene.mainCamera->handle );
 			const btTransform oldCameraTransform = m_gameWorld.GetComponent<Transform>( oldCameraID ).transform;
 
 			// save old selection
@@ -722,7 +714,7 @@ namespace fan
 			scene.LoadFrom( scene.path ); // reload the scene 
 
 			// restore camera transform
-			const EntityID newCameraID = m_gameWorld.GetEntityID( scene.mainCamera->handle );
+			const EcsEntity newCameraID = m_gameWorld.GetEntity( scene.mainCamera->handle );
 			m_gameWorld.GetComponent<Transform>( newCameraID ).transform = oldCameraTransform;
 
 			// restore selection
@@ -741,7 +733,7 @@ namespace fan
 	//================================================================================================================================
 	void  Editor::GamePause()
 	{
-		Game& game = m_gameWorld.GetSingletonComponent<Game>();
+		Game& game = m_gameWorld.GetSingleton<Game>();
 		if( game.state == Game::PLAYING )
 		{
 			Debug::Highlight() << game.name << ": paused" << Debug::Endl();
@@ -756,7 +748,7 @@ namespace fan
 	//================================================================================================================================
 	void  Editor::GameResume()
 	{
-		Game& game = m_gameWorld.GetSingletonComponent<Game>();
+		Game& game = m_gameWorld.GetSingleton<Game>();
 		if( game.state == Game::PAUSED )
 		{
 			Debug::Highlight() << game.name << ": resumed" << Debug::Endl();
@@ -771,7 +763,7 @@ namespace fan
 	//================================================================================================================================
 	void  Editor::GameStep( const float _delta )
 	{
-		Game& game = m_gameWorld.GetSingletonComponent<Game>();
+		Game& game = m_gameWorld.GetSingleton<Game>();
 		if( game.state == Game::PLAYING )
 		{
 			const float delta = ( game.state == Game::PLAYING ? _delta : 0.f );
@@ -794,13 +786,13 @@ namespace fan
 	//================================================================================================================================
 	void Editor::UpdateRenderWorld()
 	{
-		RenderWorld& renderWorld = m_gameWorld.GetSingletonComponent<RenderWorld>();
+		RenderWorld& renderWorld = m_gameWorld.GetSingleton<RenderWorld>();
 		renderWorld.targetSize = glm::vec2( m_gameViewWindow->GetSize().x(), m_gameViewWindow->GetSize().y() );
 
-		const Signature signatureURModels = S_UpdateRenderWorldModels::GetSignature( m_gameWorld );
-		const Signature signatureURUI = S_UpdateRenderWorldUI::GetSignature( m_gameWorld );
-		const Signature signatureURPointLights = S_UpdateRenderWorldPointLights::GetSignature( m_gameWorld );
-		const Signature signatureURDirectionalLights = S_UpdateRenderWorldDirectionalLights::GetSignature( m_gameWorld );
+		const EcsSignature signatureURModels = S_UpdateRenderWorldModels::GetSignature( m_gameWorld );
+		const EcsSignature signatureURUI = S_UpdateRenderWorldUI::GetSignature( m_gameWorld );
+		const EcsSignature signatureURPointLights = S_UpdateRenderWorldPointLights::GetSignature( m_gameWorld );
+		const EcsSignature signatureURDirectionalLights = S_UpdateRenderWorldDirectionalLights::GetSignature( m_gameWorld );
 
 		// update render data
 		S_UpdateRenderWorldModels::Run( m_gameWorld, m_gameWorld.Match( signatureURModels ) );
@@ -824,8 +816,8 @@ namespace fan
 		m_renderer->SetDirectionalLights( renderWorld.directionalLights );
 
 		// Camera
-		Scene& scene = m_gameWorld.GetSingletonComponent<Scene>();
-		EntityID cameraID = m_gameWorld.GetEntityID( scene.mainCamera->handle );
+		Scene& scene = m_gameWorld.GetSingleton<Scene>();
+		EcsEntity cameraID = m_gameWorld.GetEntity( scene.mainCamera->handle );
 		Camera& camera = m_gameWorld.GetComponent<Camera>( cameraID );
 		camera.aspectRatio = m_gameViewWindow->GetAspectRatio();
 		Transform& cameraTransform = m_gameWorld.GetComponent<Transform>( cameraID );
@@ -840,7 +832,7 @@ namespace fan
 	//================================================================================================================================
 	void Editor::SwitchPlayStop()
 	{
-		Game& game = m_gameWorld.GetSingletonComponent<Game>();
+		Game& game = m_gameWorld.GetSingleton<Game>();
 		if( game.state == Game::STOPPED )
 		{
 			GameStart();
@@ -855,8 +847,8 @@ namespace fan
 	//================================================================================================================================
 	void Editor::UseEditorCamera()
 	{
-		Scene& scene = m_gameWorld.GetSingletonComponent<Scene>();
-		EditorCamera& editorCamera = m_gameWorld.GetSingletonComponent<EditorCamera>();
+		Scene& scene = m_gameWorld.GetSingleton<Scene>();
+		EditorCamera& editorCamera = m_gameWorld.GetSingleton<EditorCamera>();
 		scene.SetMainCamera( *editorCamera.cameraNode );
 	}
 
@@ -864,8 +856,8 @@ namespace fan
 	//================================================================================================================================
 	void Editor::UseGameCamera()
 	{
-		Scene& scene = m_gameWorld.GetSingletonComponent<Scene>();
-		GameCamera& gameCamera = m_gameWorld.GetSingletonComponent<GameCamera>();
+		Scene& scene = m_gameWorld.GetSingleton<Scene>();
+		GameCamera& gameCamera = m_gameWorld.GetSingleton<GameCamera>();
 		scene.SetMainCamera( *gameCamera.cameraNode );
 	}
 
@@ -874,16 +866,16 @@ namespace fan
 	//================================================================================================================================
 	void Editor::OnToogleCamera()
 	{
-		Game& game = m_gameWorld.GetSingletonComponent<Game>();
+		Game& game = m_gameWorld.GetSingleton<Game>();
 		if( game.state == Game::STOPPED )
 		{
 			Debug::Warning() << "You cannot toogle camera outside of play mode" << Debug::Endl();
 			return;
 		}
 
-		Scene& scene = m_gameWorld.GetSingletonComponent<Scene>();
-		GameCamera& gameCamera = m_gameWorld.GetSingletonComponent<GameCamera>();
-		EditorCamera& editorCamera = m_gameWorld.GetSingletonComponent<EditorCamera>();
+		Scene& scene = m_gameWorld.GetSingleton<Scene>();
+		GameCamera& gameCamera = m_gameWorld.GetSingleton<GameCamera>();
+		EditorCamera& editorCamera = m_gameWorld.GetSingleton<EditorCamera>();
 
 		if( scene.mainCamera == editorCamera.cameraNode )
 		{
@@ -900,7 +892,7 @@ namespace fan
 	//================================================================================================================================
 	void Editor::OnEditorStep()
 	{
-		Game& game = m_gameWorld.GetSingletonComponent<Game>();
+		Game& game = m_gameWorld.GetSingleton<Game>();
 		assert( game.state == Game::PAUSED );
 
 		if( game.gameServer != nullptr )

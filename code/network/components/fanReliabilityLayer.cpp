@@ -6,22 +6,21 @@
 
 namespace fan
 {
-	REGISTER_COMPONENT( ReliabilityLayer, "reliability layer" );
-
 	const float ReliabilityLayer::timeoutDuration = 2.f;
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void ReliabilityLayer::SetInfo( ComponentInfo& _info )
+	void ReliabilityLayer::SetInfo( EcsComponentInfo& _info )
 	{
 		_info.icon = ImGui::IconType::NETWORK16;
 		_info.onGui = &ReliabilityLayer::OnGui;
 		_info.init = &ReliabilityLayer::Init;
+		_info.name = "reliability layer";
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void ReliabilityLayer::Init( EcsWorld& _world, Component& _component )
+	void ReliabilityLayer::Init( EcsWorld& _world, EcsComponent& _component )
 	{
 		ReliabilityLayer& reliabilityLayer = static_cast<ReliabilityLayer&>( _component );
 		reliabilityLayer.nextPacketTag = 0;
@@ -122,7 +121,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void ReliabilityLayer::OnGui( EcsWorld& _world, EntityID _entityID, Component& _component )
+	void ReliabilityLayer::OnGui( EcsWorld& _world, EcsEntity _entityID, EcsComponent& _component )
 	{
 		ReliabilityLayer& deliveryNotification = static_cast<ReliabilityLayer&>( _component );
 		ImGui::PushItemWidth( 0.6f * ImGui::GetWindowWidth() - 16 );

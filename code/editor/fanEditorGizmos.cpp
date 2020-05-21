@@ -32,7 +32,7 @@ namespace fan
 		// Get main camera data
 		SceneNode& cameraNode = * scene.mainCamera;
 		EcsWorld& world = *cameraNode.scene->world;
-		const EntityID id = world.GetEntityID( cameraNode.handle );
+		const EcsEntity id = world.GetEntity( cameraNode.handle );
 		const Transform & cameraTransform = world.GetComponent<Transform>( id );
 		const Camera& camera = world.GetComponent<Camera>( id );
 

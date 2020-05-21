@@ -2,7 +2,7 @@
 
 #include "core/fanSignal.hpp"
 #include "scene/fanSceneSerializable.hpp"
-#include "ecs/fanSingletonComponent.hpp"
+#include "ecs/fanEcsSingleton.hpp"
 
 namespace fan
 {
@@ -14,13 +14,13 @@ namespace fan
 	// contains the scene tree root and a map of scene nodes for fast access
 	// also controls the unique ids for the nodes & the scene serialization to json
 	//================================================================================================================================
-	struct Scene : public SingletonComponent
+	struct Scene : public EcsSingleton
 	{
-		DECLARE_SINGLETON_COMPONENT()
+		ECS_SINGLETON( Scene )
 	public:
-		static void SetInfo( SingletonComponentInfo& _info );
-		static void Init( EcsWorld& _world, SingletonComponent& _component );
-		static void OnGui( EcsWorld&, SingletonComponent& _component );
+		static void SetInfo( EcsSingletonInfo& _info );
+		static void Init( EcsWorld& _world, EcsSingleton& _component );
+		static void OnGui( EcsWorld&, EcsSingleton& _component );
 
 		SceneNode& CreateSceneNode( const std::string _name, SceneNode* const _parentNode, const bool _generateID = true );
 

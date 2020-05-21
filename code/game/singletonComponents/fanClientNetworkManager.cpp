@@ -37,7 +37,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void ClientNetworkManager::Init( EcsWorld& _world, SingletonComponent& _component )
+	void ClientNetworkManager::Init( EcsWorld& _world, EcsSingleton& _component )
 	{
 		ClientNetworkManager& netManager = static_cast<ClientNetworkManager&>( _component );
 		netManager.playerPersistent = nullptr;
@@ -49,9 +49,9 @@ namespace fan
 	void ClientNetworkManager::Start( EcsWorld& _world )
 	{
 		// Create player persistent scene node
-		Scene& scene			= _world.GetSingletonComponent<Scene>();
+		Scene& scene			= _world.GetSingleton<Scene>();
 		playerPersistent		= & scene.CreateSceneNode( "persistent", scene.root );
-		EntityID persistentID	= _world.GetEntityID( playerPersistent->handle );
+		EcsEntity persistentID	= _world.GetEntity( playerPersistent->handle );
 		_world.AddComponent<ReliabilityLayer>( persistentID );
 		_world.AddComponent<ClientConnection>( persistentID );
 		_world.AddComponent<ClientReplication>( persistentID );
@@ -59,7 +59,7 @@ namespace fan
 		_world.AddComponent<ClientGameData>( persistentID );
 
 		// connect rpc
-		Game& game = _world.GetSingletonComponent<Game>();
+		Game& game = _world.GetSingleton<Game>();
 		ClientRPC& rpcManager = _world.GetComponent<ClientRPC>( persistentID );
 		ClientGameData& gameData = _world.GetComponent<ClientGameData>( persistentID );
 		rpcManager.onShiftFrameIndex.Connect( &ClientGameData::OnShiftFrameIndex, &gameData );
@@ -87,7 +87,7 @@ namespace fan
 	//================================================================================================================================
 	void ClientNetworkManager::Stop( EcsWorld& _world )
 	{
-		const EntityID persistentID = _world.GetEntityID( playerPersistent->handle );		
+		const EcsEntity persistentID = _world.GetEntity( playerPersistent->handle );		
 		ClientConnection& connection = _world.GetComponent<ClientConnection>( persistentID );
 		connection.state = ClientConnection::ClientState::Stopping;
 		S_ClientSend::Run( _world, _world.Match( S_ClientSend::GetSignature( _world ) ), .42f );// send a last packet
@@ -98,9 +98,9 @@ namespace fan
 	//================================================================================================================================
 	void ClientNetworkManager::SpawnShips( EcsWorld& _world )
 	{
-		const Game& game = _world.GetSingletonComponent<Game>();
-		ClientNetworkManager& netManager = _world.GetSingletonComponent<ClientNetworkManager>();
-		LinkingContext& linkingContext = _world.GetSingletonComponent<LinkingContext>();
+		const Game& game = _world.GetSingleton<Game>();
+		ClientNetworkManager& netManager = _world.GetSingleton<ClientNetworkManager>();
+		LinkingContext& linkingContext = _world.GetSingleton<LinkingContext>();
 
 		for (int i = (int)netManager.shipsToSpawn.size() - 1; i >= 0 ; i--)
 		{
@@ -108,10 +108,10 @@ namespace fan
 			if( game.frameIndex >= pair.second )
 			{
 				// do not spawn twice
-				if( linkingContext.netIDToEntityHandle.find( pair.first ) == linkingContext.netIDToEntityHandle.end() )
+				if( linkingContext.netIDToEcsHandle.find( pair.first ) == linkingContext.netIDToEcsHandle.end() )
 				{
 					// spawn
-					const EntityHandle handle = Game::SpawnSpaceship( _world );
+					const EcsHandle handle = Game::SpawnSpaceship( _world );
 					linkingContext.AddEntity( handle, pair.first );
 				}
 				netManager.shipsToSpawn.erase( netManager.shipsToSpawn.begin() + i );
@@ -128,7 +128,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void ClientNetworkManager::OnGui( EcsWorld&, SingletonComponent& _component )
+	void ClientNetworkManager::OnGui( EcsWorld&, EcsSingleton& _component )
 	{
 		ClientNetworkManager& netManager = static_cast<ClientNetworkManager&>( _component );
 

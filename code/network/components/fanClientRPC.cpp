@@ -5,20 +5,19 @@
 
 namespace fan
 {
-	REGISTER_COMPONENT( ClientRPC, "RPC manager" );
-
 	//================================================================================================================================
 	//================================================================================================================================
-	void ClientRPC::SetInfo( ComponentInfo& _info )
+	void ClientRPC::SetInfo( EcsComponentInfo& _info )
 	{
 		_info.icon = ImGui::NETWORK16;
 		_info.init = &ClientRPC::Init;
 		_info.onGui = &ClientRPC::OnGui;
+		_info.name = "RPC manager";
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void ClientRPC::Init( EcsWorld& _world, Component& _component )
+	void ClientRPC::Init( EcsWorld& _world, EcsComponent& _component )
 	{
 		ClientRPC& rpc = static_cast<ClientRPC&>( _component );
 		rpc.nameToRPCTable.clear();
@@ -145,7 +144,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void ClientRPC::OnGui( EcsWorld& _world, EntityID _entityID, Component& _component )
+	void ClientRPC::OnGui( EcsWorld& _world, EcsEntity _entityID, EcsComponent& _component )
 	{
 		ClientRPC& rpc = static_cast<ClientRPC&>( _component );
 

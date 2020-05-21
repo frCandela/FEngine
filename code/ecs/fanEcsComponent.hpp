@@ -4,8 +4,9 @@
 #include "core/fanHash.hpp"
 #include "editor/fanImguiIcons.hpp"
 #include "ecs/fanEcsEntity.hpp"
+#include "ecs/fanEcsTypes.hpp"
+#include "fanJson.hpp"
 
-class Json;
 namespace sf
 {
 	class Packet;
@@ -19,13 +20,13 @@ namespace fan
 	//================================
 	#define ECS_COMPONENT( _ComponentType)															\
 	public:																							\
-	template <class T> struct ComponentInfoImpl	{													\
+	template <class T> struct EcsComponentInfoImpl	{													\
 		static constexpr uint32_t	 s_size		{ sizeof( T )			  };						\
 		static constexpr uint32_t	 s_alignment{ alignof( T )			  };						\
 		static constexpr const char* s_name		{ #_ComponentType		  };						\
 		static constexpr uint32_t	 s_type		{ SSID( #_ComponentType ) };						\
 	};																								\
-	using Info = ComponentInfoImpl< _ComponentType >;												\
+	using Info = EcsComponentInfoImpl< _ComponentType >;												\
 
 	struct EcsComponent {};
 

@@ -17,7 +17,7 @@ namespace fan
 {
 	//==============================================================================================================================================================
 	//==============================================================================================================================================================
-	Signature S_UpdateRenderWorldModels::GetSignature( const EcsWorld& _world )
+	EcsSignature S_UpdateRenderWorldModels::GetSignature( const EcsWorld& _world )
 	{
 		return	 _world.GetSignature<MeshRenderer>()
 			| _world.GetSignature<SceneNode>()
@@ -27,13 +27,13 @@ namespace fan
 
 	//==============================================================================================================================================================
 	//==============================================================================================================================================================
-	void S_UpdateRenderWorldModels::Run( EcsWorld& _world, const std::vector<EntityID>& _entities )
+	void S_UpdateRenderWorldModels::Run( EcsWorld& _world, const std::vector<EcsEntity>& _entities )
 	{
-		RenderWorld& renderWorld = _world.GetSingletonComponent<RenderWorld>();
+		RenderWorld& renderWorld = _world.GetSingleton<RenderWorld>();
 		renderWorld.drawData.clear();
 
 		// get all mesh and adds them to the render world
-		for( EntityID id : _entities )
+		for( EcsEntity id : _entities )
 		{
 			MeshRenderer& meshRenderer = _world.GetComponent<MeshRenderer>( id );
 			if( meshRenderer.mesh.IsValid() )
@@ -57,7 +57,7 @@ namespace fan
 
 	//==============================================================================================================================================================
 	//==============================================================================================================================================================
-	Signature S_UpdateRenderWorldUI::GetSignature( const EcsWorld& _world )
+	EcsSignature S_UpdateRenderWorldUI::GetSignature( const EcsWorld& _world )
 	{
 		return _world.GetSignature<UIRenderer>()
 			| _world.GetSignature<TransformUI>();
@@ -65,13 +65,13 @@ namespace fan
 
 	//==============================================================================================================================================================
 	//==============================================================================================================================================================
-	void S_UpdateRenderWorldUI::Run( EcsWorld& _world, const std::vector<EntityID>& _entities )
+	void S_UpdateRenderWorldUI::Run( EcsWorld& _world, const std::vector<EcsEntity>& _entities )
 	{
-		RenderWorld& renderWorld = _world.GetSingletonComponent<RenderWorld>();
+		RenderWorld& renderWorld = _world.GetSingleton<RenderWorld>();
 		renderWorld.uiDrawData.clear();
 
 		// get all mesh and adds them to the render world
-		for( EntityID id : _entities )
+		for( EcsEntity id : _entities )
 		{
 			UIRenderer& renderer = _world.GetComponent<UIRenderer>( id );
 			TransformUI& transform = _world.GetComponent<TransformUI>( id );
@@ -95,7 +95,7 @@ namespace fan
 
 	//==============================================================================================================================================================
 	//==============================================================================================================================================================
-	Signature S_UpdateRenderWorldPointLights::GetSignature( const EcsWorld& _world )
+	EcsSignature S_UpdateRenderWorldPointLights::GetSignature( const EcsWorld& _world )
 	{
 		return	_world.GetSignature<Transform>()
 			| _world.GetSignature<PointLight>();
@@ -103,12 +103,12 @@ namespace fan
 
 	//==============================================================================================================================================================
 	//==============================================================================================================================================================
-	void S_UpdateRenderWorldPointLights::Run( EcsWorld& _world, const std::vector<EntityID>& _entities )
+	void S_UpdateRenderWorldPointLights::Run( EcsWorld& _world, const std::vector<EcsEntity>& _entities )
 	{
-		RenderWorld& renderWorld = _world.GetSingletonComponent<RenderWorld>();
+		RenderWorld& renderWorld = _world.GetSingleton<RenderWorld>();
 		renderWorld.pointLights.clear();
 
-		for( EntityID id : _entities )
+		for( EcsEntity id : _entities )
 		{
 			// light data
 			Transform& transform = _world.GetComponent<Transform>( id );
@@ -129,7 +129,7 @@ namespace fan
 
 	//==============================================================================================================================================================
 	//==============================================================================================================================================================
-	Signature S_UpdateRenderWorldDirectionalLights::GetSignature( const EcsWorld& _world )
+	EcsSignature S_UpdateRenderWorldDirectionalLights::GetSignature( const EcsWorld& _world )
 	{
 		return	_world.GetSignature<Transform>()
 			| _world.GetSignature<DirectionalLight>();
@@ -137,12 +137,12 @@ namespace fan
 
 	//==============================================================================================================================================================
 	//==============================================================================================================================================================
-	void S_UpdateRenderWorldDirectionalLights::Run( EcsWorld& _world, const std::vector<EntityID>& _entities )
+	void S_UpdateRenderWorldDirectionalLights::Run( EcsWorld& _world, const std::vector<EcsEntity>& _entities )
 	{
-		RenderWorld& renderWorld = _world.GetSingletonComponent<RenderWorld>();
+		RenderWorld& renderWorld = _world.GetSingleton<RenderWorld>();
 		renderWorld.directionalLights.clear();
 
-		for( EntityID id : _entities )
+		for( EcsEntity id : _entities )
 		{
 			// light data
 			Transform& transform = _world.GetComponent<Transform>( id );

@@ -7,11 +7,9 @@
 
 namespace fan
 {
-	REGISTER_COMPONENT( Camera, "camera" );
-
 	//================================================================================================================================
 	//================================================================================================================================
-	void Camera::SetInfo( ComponentInfo& _info )
+	void Camera::SetInfo( EcsComponentInfo& _info )
 	{
 		_info.icon = ImGui::IconType::CAMERA16;
 		_info.onGui = &Camera::OnGui;
@@ -19,11 +17,12 @@ namespace fan
 		_info.load = &Camera::Load;
 		_info.save = &Camera::Save;
 		_info.editorPath = "/";
+		_info.name = "camera";
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void Camera::Init( EcsWorld& _world, Component& _component )
+	void Camera::Init( EcsWorld& _world, EcsComponent& _component )
 	{
 		Camera& camera = static_cast<Camera&>( _component );
 
@@ -37,7 +36,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void Camera::OnGui( EcsWorld& _world, EntityID _entityID, Component& _component )
+	void Camera::OnGui( EcsWorld& _world, EcsEntity _entityID, EcsComponent& _component )
 	{
 		Camera& camera = static_cast<Camera&>( _component );
 
@@ -95,7 +94,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void Camera::Save( const Component& _component, Json& _json )
+	void Camera::Save( const EcsComponent& _component, Json& _json )
 	{
 		const Camera& camera = static_cast<const Camera&>( _component );
 
@@ -108,7 +107,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void Camera::Load( Component& _component, const Json& _json )
+	void Camera::Load( EcsComponent& _component, const Json& _json )
 	{
 		Camera& camera = static_cast<Camera&>( _component );
 

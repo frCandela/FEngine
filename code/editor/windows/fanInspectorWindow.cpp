@@ -37,16 +37,16 @@ namespace fan
 			SceneNode& node = *m_sceneNodeSelected;
 			Scene& scene = *node.scene;
 			EcsWorld& world = *scene.world;
-			const EntityID entityID = world.GetEntityID( node.handle );
+			const EcsEntity entity = world.GetEntity( node.handle );
 
 			// scene node gui
  			ImGui::Icon( GetIconType(), { 16,16 } ); ImGui::SameLine();
 			ImGui::Text( "Scene node : %s", node.name.c_str() );
 
-			for( int componentIndex = 0; componentIndex < (int)world.GetComponentCount( entityID ); componentIndex++ )
+			for( int componentIndex = 0; componentIndex < (int)world.GetComponentCount( entity ); componentIndex++ )
 			{
-				Component& component = world.GetComponentAt( entityID, componentIndex );
-				const ComponentInfo& info = world.GetComponentInfo( component.GetIndex() );
+				EcsComponent& component = world.GetComponentAt( entityID, componentIndex );
+				const EcsComponentInfo& info = world.GetComponentInfo( component.GetIndex() );
 
 				if( info.onGui == nullptr ) { continue; }
 
@@ -84,14 +84,14 @@ namespace fan
 	//================================================================================================================================
 	// menu item in the NewComponentPopup
 	//================================================================================================================================
-	void InspectorWindow::NewComponentItem( const ComponentInfo& _info )
+	void InspectorWindow::NewComponentItem( const EcsComponentInfo& _info )
 	{
 		ImGui::Icon( _info.icon, { 16,16 } ); ImGui::SameLine();
 		if( ImGui::MenuItem( _info.name.c_str() ) )
 		{
-			// Create new Component 
+			// Create new EcsComponent 
 			EcsWorld& world = *m_sceneNodeSelected->scene->world;
-			EntityID entityID = world.GetEntityID( m_sceneNodeSelected->handle );
+			EcsEntity entity = world.GetEntity( m_sceneNodeSelected->handle );
 			if( !world.HasComponent( entityID, _info.index ) )
 			{
 				world.AddComponent( entityID, _info.index );				
@@ -112,7 +112,7 @@ namespace fan
 		if( ImGui::BeginPopup( "new_component" ) )
 		{
 			// Get components and remove components with an empty path
-			std::vector< ComponentInfo > components = world.GetVectorComponentInfo();			
+			std::vector< EcsComponentInfo > components = world.GetVectorEcsComponentInfo();			
 			for( int i = (int)components.size() - 1; i >= 0; i-- )
 			{
 				if( std::string( components[i].editorPath ).empty() )
@@ -162,7 +162,7 @@ namespace fan
 	// recursively draws all components available to add
 	// called from the NewComponentPopup
 	//================================================================================================================================
-	void InspectorWindow::R_NewComponentPopup( std::set< std::filesystem::path >& _componentsPathSet, std::set< std::filesystem::path >::iterator& _current, const std::vector< ComponentInfo >& _components, const std::vector<std::filesystem::path>& _componentsPath )
+	void InspectorWindow::R_NewComponentPopup( std::set< std::filesystem::path >& _componentsPathSet, std::set< std::filesystem::path >::iterator& _current, const std::vector< EcsComponentInfo >& _components, const std::vector<std::filesystem::path>& _componentsPath )
 	{
 		std::filesystem::path rootPath = *_current;
 

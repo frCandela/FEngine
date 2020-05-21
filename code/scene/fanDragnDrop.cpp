@@ -46,14 +46,14 @@ namespace ImGui
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void FanBeginDragDropSourceComponent( fan::SceneNode& _sceneNode, fan::Component& _component, ImGuiDragDropFlags _flags )
+	void FanBeginDragDropSourceComponent( fan::SceneNode& _sceneNode, fan::EcsComponent& _component, ImGuiDragDropFlags _flags )
 	{
 		if( ImGui::BeginDragDropSource( _flags ) )
 		{
 			fan::EcsWorld& world = *_sceneNode.scene->world;
-			const fan::ComponentInfo& info = world.GetComponentInfo( _component.GetIndex() );
+			const fan::EcsComponentInfo& info = world.GetComponentInfo( _component.GetIndex() );
 
-			std::string nameid = std::string( "dragndrop_" ) + std::to_string( info.staticIndex );
+			std::string nameid = std::string( "dragndrop_" ) + std::to_string( info.type);
 			ComponentPayload payload = { &_sceneNode , &_component };
 			ImGui::SetDragDropPayload( nameid.c_str(), &payload, sizeof( payload ) );
 			ImGui::Icon( info.icon, { 16,16 } ); ImGui::SameLine();
@@ -89,16 +89,16 @@ namespace ImGui
 				ComponentPayload& payload = *(ComponentPayload*)imGuiPayload->Data;
 				fan::SceneNode& node = *payload.sceneNode;
 				fan::EcsWorld& world = *node.scene->world;
-				fan::EntityID nodeID = world.GetEntityID( node.handle );
-				fan::ComponentIndex componentIndex = world.GetDynamicIndex( _staticID );
+				fan::EcsEntity nodeID = world.GetEntity( node.handle );
+				fan::ComponentIndex componentIndex = world.GetIndex( _staticID );
 				if( world.HasComponent( nodeID, componentIndex ) )
 				{
-					fan::Component& component = world.GetComponent( nodeID, componentIndex );
+					fan::EcsComponent& component = world.GetComponent( nodeID, componentIndex );
 					return { &node, &component };
 				}
 				else
 				{
-					const fan::ComponentInfo& info = world.GetComponentInfo( componentIndex );
+					const fan::EcsComponentInfo& info = world.GetComponentInfo( componentIndex );
 					fan::Debug::Warning() << "drop failed : " << info.name << " component not found on \"" << node.name << "\"" << fan::Debug::Endl();
 				}
 			}

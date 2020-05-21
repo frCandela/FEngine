@@ -5,11 +5,9 @@
 
 namespace fan
 {	
-	REGISTER_COMPONENT( SolarPanel, "solar pannel" );
-
 	//================================================================================================================================
 	//================================================================================================================================
-	void SolarPanel::SetInfo( ComponentInfo& _info )
+	void SolarPanel::SetInfo( EcsComponentInfo& _info )
 	{
 		_info.icon = ImGui::IconType::JOYSTICK16;
 		_info.onGui = &SolarPanel::OnGui;
@@ -17,11 +15,12 @@ namespace fan
 		_info.load = &SolarPanel::Load;
 		_info.save = &SolarPanel::Save;
 		_info.editorPath = "game/";
+		_info.name = "solar panel";
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void SolarPanel::Init( EcsWorld& _world, Component& _component )
+	void SolarPanel::Init( EcsWorld& _world, EcsComponent& _component )
 	{
 		SolarPanel& solarPanel = static_cast<SolarPanel&>( _component );
 		solarPanel.isInSunlight = false;
@@ -34,7 +33,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void SolarPanel::OnGui( EcsWorld& _world, EntityID _entityID, Component& _component )
+	void SolarPanel::OnGui( EcsWorld& _world, EcsEntity _entityID, EcsComponent& _component )
 	{
 		SolarPanel& solarPanel = static_cast<SolarPanel&>( _component );
 
@@ -54,7 +53,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void SolarPanel::Save( const Component& _component, Json& _json )
+	void SolarPanel::Save( const EcsComponent& _component, Json& _json )
 	{
 		const SolarPanel& solarPanel = static_cast<const SolarPanel&>( _component );
 
@@ -66,7 +65,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void SolarPanel::Load( Component& _component, const Json& _json )
+	void SolarPanel::Load( EcsComponent& _component, const Json& _json )
 	{
 		SolarPanel& solarPanel = static_cast<SolarPanel&>( _component );
 

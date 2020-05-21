@@ -4,7 +4,7 @@
 #include "core/time/fanProfiler.hpp"
 #include "ecs/fanComponentsCollection.hpp"
 #include "ecs/fanEcsWorld.hpp"
-#include "ecs/fanSystem.hpp"
+#include "ecs/fanEcsSystem.hpp"
 #include "ecs/fanTag.hpp"
 #include "scene/fanSceneTags.hpp"
 
@@ -130,7 +130,7 @@ namespace fan
 			{
 				for( int i = 0; i < num; i++ )
 				{
-					EntityID id = world.CreateEntity();
+					EcsEntity id = world.CreateEntity();
 					if( useTag_boundsOutdated ) world.AddTag<tag_boundsOutdated>( id );
 					if( useTag_editorOnly ) world.AddTag < tag_editorOnly>( id );
 					if( createHandle ) { world.CreateHandle( id ); }
@@ -141,7 +141,7 @@ namespace fan
 			{
 				for( int i = 0; i < num; i++ )
 				{
-					world.KillEntity( (EntityID)world.GetNumEntities() - i - 1 );
+					world.Kill( (EcsEntity)world.GetNumEntities() - i - 1 );
 				}
 			}ImGui::SameLine();
 		}
@@ -149,7 +149,7 @@ namespace fan
 		//============================	
 		if( ImGui::CollapsingHeader( "handles" ) )
 		{
-			for( const std::pair< EntityHandle, EntityID > handle : world.GetHandles() )
+			for( const std::pair< EcsHandle, EcsEntity > handle : world.GetHandles() )
 			{
 				ImGui::Text( "%d -> %d", handle.first, handle.second );
 			}
@@ -166,7 +166,7 @@ namespace fan
 				ImGui::PushID( entityIndex );
 				if( ImGui::Button( "X" ) )
 				{
-					world.KillEntity( entityIndex );
+					world.Kill( entityIndex );
 				} ImGui::PopID();
 				ImGui::SameLine();
 				std::stringstream ss;
@@ -182,7 +182,7 @@ namespace fan
 
 		if( ImGui::CollapsingHeader( "components & tags" ) )
 		{
-			for ( const std::pair< uint32_t, ComponentIndex >& pair : world.GetDynamicIndices() )
+			for ( const std::pair< uint32_t, int >& pair : world.GetDynamicIndices() )
 			{
 				ImGui::Text( "%u -> %u ", pair.first, pair.second );
 			}			

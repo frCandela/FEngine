@@ -26,7 +26,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void Scene::SetInfo( SingletonComponentInfo& _info )
+	void Scene::SetInfo( EcsSingletonInfo& _info )
 	{
 		_info.icon = ImGui::SCENE16;
 		_info.init = &Scene::Init; 
@@ -36,7 +36,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void Scene::Init( EcsWorld& _world, SingletonComponent& _component )
+	void Scene::Init( EcsWorld& _world, EcsSingleton& _component )
 	{
 		Scene& scene = static_cast<Scene&>( _component );
 		scene.path = "";
@@ -49,7 +49,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void Scene::OnGui( EcsWorld&, SingletonComponent& _component )
+	void Scene::OnGui( EcsWorld&, EcsSingleton& _component )
 	{
 		Scene& scene = static_cast<Scene&>( _component );
 		ImGui::Indent(); ImGui::Indent();
@@ -72,13 +72,13 @@ namespace fan
 	//================================================================================================================================
 	SceneNode& Scene::CreateSceneNode( const std::string _name, SceneNode* const _parentNode, const bool _generateID )
 	{		
-		EntityID entityID = world->CreateEntity();
-		EntityHandle handle = world->CreateHandle( entityID );
+		EcsEntity entity = world->CreateEntity();
+		EcsHandle handle = world->CreateHandle( entity );
 		
 		SceneNode* const parent = _parentNode == nullptr ? root : _parentNode;
-		SceneNode& sceneNode = world->AddComponent<SceneNode>( entityID );
-		world->AddComponent<Bounds>( entityID );
-		world->AddTag<tag_boundsOutdated>( entityID );
+		SceneNode& sceneNode = world->AddComponent<SceneNode>( entity );
+		world->AddComponent<Bounds>( entity );
+		world->AddTag<tag_boundsOutdated>( entity );
 
 		uint32_t id;
 		if( _generateID )
@@ -167,15 +167,15 @@ namespace fan
 			// save singleton components
 			Json& jSingletons = jScene["singletons"];
 			unsigned nextIndex = 0;
-			const std::vector< SingletonComponentInfo >& singletonsInfos = world->GetVectorSingletonComponentInfo();
-			for ( const SingletonComponentInfo& info : singletonsInfos )
+			const std::vector< EcsSingletonInfo >& singletonsInfos = world->GetVectorSingletonEcsComponentInfo();
+			for ( const EcsSingletonInfo& info : singletonsInfos )
 			{
 				if( info.save != nullptr )
 				{
 					Json& jSingleton_i = jSingletons[nextIndex++];
-					Serializable::SaveUInt( jSingleton_i, "singleton_id", info.staticIndex );
+					Serializable::SaveUInt( jSingleton_i, "singleton_id", info.type);
 					Serializable::SaveString( jSingleton_i, "singleton", info.name );
-					SingletonComponent& singleton = world->GetSingletonComponent( info.staticIndex );
+					SingletonComponent& singleton = world->GetSingletonComponent( info.type);
 					info.save( singleton, jSingleton_i );
 				}
 			}
@@ -200,17 +200,17 @@ namespace fan
 		// save components
 		Json& jComponents = _json["components"];
 		{
-			EntityID entityID = world.GetEntityID( _node.handle );
+			EcsEntity entity = world.GetEntity( _node.handle );
 			unsigned nextIndex = 0;
 			for( int componentIndex = 0; componentIndex < (int)world.GetComponentCount(entityID) ; componentIndex++ )
 			{
 				// if a save method is provided, saves the component
-				Component& component = world.GetComponentAt( entityID, componentIndex );
-				const ComponentInfo& info = world.GetComponentInfo( component.GetIndex() );								
+				EcsComponent& component = world.GetComponentAt( entityID, componentIndex );
+				const EcsComponentInfo& info = world.GetComponentInfo( component.GetIndex() );								
 				if( info.save != nullptr )
 				{
 					Json& jComponent_i = jComponents[nextIndex++];
-					Serializable::SaveUInt( jComponent_i, "component_id", info.staticIndex );
+					Serializable::SaveUInt( jComponent_i, "component_id", info.type);
 					Serializable::SaveString( jComponent_i, "type", info.name );
 					info.save( component, jComponent_i );
 				}				
@@ -333,7 +333,7 @@ namespace fan
 					const Json& jSingleton_i = jSingletons[childIndex];
 					unsigned staticIndex = 0;
 					Serializable::LoadUInt( jSingleton_i, "singleton_id", staticIndex );
-					const SingletonComponentInfo* info = world->SafeGetSingletonComponentInfo( staticIndex );
+					const EcsSingletonInfo* info = world->SafeGetSingletonEcsComponentInfo( staticIndex );
 					if( info )
 					{
 						SingletonComponent& singleton = world->GetSingletonComponent( staticIndex );
@@ -389,15 +389,15 @@ namespace fan
 		// components
 		const Json& jComponents = _json["components"];
 		{
-			const EntityID		 entityID = world.GetEntityID( _node.handle );
+			const EcsEntity		 entity = world.GetEntity( _node.handle );
 			for( int childIndex = 0; childIndex < jComponents.size(); childIndex++ )
 			{
 				const Json& jComponent_i = jComponents[childIndex];				
 				unsigned staticIndex = 0;
 				Serializable::LoadUInt( jComponent_i, "component_id", staticIndex );
-				const ComponentIndex componentIndex = world.GetDynamicIndex(staticIndex);
-				const ComponentInfo& info			= world.GetComponentInfo( componentIndex );				
-				Component& component			    = world.AddComponent( entityID, componentIndex );				
+				const int componentIndex = world.GetIndex(staticIndex);
+				const EcsComponentInfo& info			= world.GetComponentInfo( componentIndex );				
+				EcsComponent& component			    = world.AddComponent( entityID, componentIndex );				
 				info.load( component, jComponent_i );
 			}
 		}

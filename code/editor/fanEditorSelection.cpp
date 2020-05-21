@@ -41,7 +41,7 @@ namespace fan
 		if ( m_selectedSceneNode != nullptr &&  ! m_selectedSceneNode->IsRoot() )
 		{
 			EcsWorld& world = *m_selectedSceneNode->scene->world;
-			world.KillEntity( world.GetEntityID( m_selectedSceneNode->handle ) );
+			world.Kill( world.GetEntity( m_selectedSceneNode->handle ) );
 		}
 	}
 
@@ -57,15 +57,15 @@ namespace fan
 		if ( m_selectedSceneNode != nullptr && m_selectedSceneNode != m_currentScene->mainCamera )
 		{
 			EcsWorld& world = *m_selectedSceneNode->scene->world;
-			EntityID entityID = world.GetEntityID( m_selectedSceneNode->handle );
-			if( world.HasComponent<Transform>( entityID ) )
+			EcsEntity entity = world.GetEntity( m_selectedSceneNode->handle );
+			if( world.HasComponent<Transform>( entity ) )
 			{
-				Transform& transform = world.GetComponent< Transform >( entityID );
+				Transform& transform = world.GetComponent< Transform >( entity );
 				btVector3 newPosition;
 				if( EditorGizmos::Get().DrawMoveGizmo( btTransform( btQuaternion( 0, 0, 0 ), transform.GetPosition() ), (size_t)&transform, newPosition ) )
 				{
 					transform.SetPosition( newPosition );
-					world.AddTag<tag_boundsOutdated>( entityID );
+					world.AddTag<tag_boundsOutdated>( entity );
 					mouseCaptured = true;
 				}
 			}
@@ -75,15 +75,15 @@ namespace fan
  		if ( !mouseCaptured && _gameWindowHovered && Mouse::Get().GetButtonPressed( Mouse::button0 ) )
  		{
 			EcsWorld& world = *m_currentScene->world;
-			EntityID cameraID = world.GetEntityID( m_currentScene->mainCamera->handle );
+			EcsEntity cameraID = world.GetEntity( m_currentScene->mainCamera->handle );
 			const Transform& cameraTransform = world.GetComponent<Transform>( cameraID );
 			const Camera& camera = world.GetComponent<Camera>( cameraID );
 
  			const Ray ray = camera.ScreenPosToRay( cameraTransform, Mouse::Get().GetScreenSpacePosition() );
 
 			// raycast on bounds
-			const Signature signatureRaycast = S_RaycastAll::GetSignature( world );
-			std::vector<EntityID> outResults;
+			constEcsSignaturesignatureRaycast = S_RaycastAll::GetSignature( world );
+			std::vector<EcsEntity> outResults;
 			if( S_RaycastAll::Run( world, world.Match( signatureRaycast ), ray, outResults ) )
 			{
 				// cycle selection
@@ -110,7 +110,7 @@ namespace fan
 		if( m_selectedSceneNode != nullptr )
 		{
 			EcsWorld& world = *m_selectedSceneNode->scene->world;
-			EntityID nodeID = world.GetEntityID( m_selectedSceneNode->handle );
+			EcsEntity nodeID = world.GetEntity( m_selectedSceneNode->handle );
 			S_DrawDebugCollisionShapes::Run( world, world.MatchSubset( S_DrawDebugCollisionShapes::GetSignature( world ), { nodeID } ) );
 			S_DrawDebugDirectionalLights::Run( world, world.MatchSubset( S_DrawDebugDirectionalLights::GetSignature( world ), { nodeID } ) );
 			S_DrawDebugPointLights::Run( world, world.MatchSubset( S_DrawDebugPointLights::GetSignature( world ), { nodeID } ) );
@@ -151,22 +151,22 @@ namespace fan
 		if( m_selectedSceneNode != nullptr )
 		{
 			EcsWorld& world = *m_selectedSceneNode->scene->world;
-			EntityID entityID = world.GetEntityID( m_selectedSceneNode->handle );
+			EcsEntity entity = world.GetEntity( m_selectedSceneNode->handle );
 
 			// FollowTransform
-			if( world.HasComponent<FollowTransform>( entityID ) )
+			if( world.HasComponent<FollowTransform>( entity ) )
 			{
-				FollowTransform& follower = world.GetComponent<FollowTransform>( entityID );
+				FollowTransform& follower = world.GetComponent<FollowTransform>( entity );
 				follower.locked = !follower.locked;
-				FollowTransform::UpdateLocalTransform( world, entityID );
+				FollowTransform::UpdateLocalTransform( world, entity );
 			}
 
 			// FollowTransformUI
-			if( world.HasComponent<FollowTransformUI>( entityID ) )
+			if( world.HasComponent<FollowTransformUI>( entity ) )
 			{
-				FollowTransformUI& follower = world.GetComponent<FollowTransformUI>( entityID );
+				FollowTransformUI& follower = world.GetComponent<FollowTransformUI>( entity );
 				follower.locked = !follower.locked;
-				FollowTransformUI::UpdateOffset( world, entityID );
+				FollowTransformUI::UpdateOffset( world, entity );
 			}
 		}
 		

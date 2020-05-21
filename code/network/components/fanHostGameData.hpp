@@ -1,7 +1,7 @@
 #pragma  once
 
 #include <queue>
-#include "ecs/fanComponent.hpp"
+#include "ecs/fanEcsComponent.hpp"
 #include "network/fanPacket.hpp"
 
 namespace fan
@@ -9,16 +9,16 @@ namespace fan
 	//==============================================================================================================================================================
 	// [Server] All game info for a remote player
 	//==============================================================================================================================================================
-	struct HostGameData : public Component
+	struct HostGameData : public EcsComponent
 	{
-		DECLARE_COMPONENT( HostGameData )
+		ECS_COMPONENT( HostGameData )
 	public:
-		static void SetInfo( ComponentInfo& _info );
-		static void Init( EcsWorld& _world, Component& _component );
-		static void OnGui( EcsWorld& _world, EntityID _entityID, Component& _component );
+		static void SetInfo( EcsComponentInfo& _info );
+		static void Init( EcsWorld& _world, EcsComponent& _component );
+		static void OnGui( EcsWorld& _world, EcsEntity _entityID, EcsComponent& _component );
 
 		NetID									spaceshipID;
-		EntityHandle							spaceshipHandle;
+		EcsHandle							spaceshipHandle;
 		std::queue< PacketInput::InputData >	inputs;
 		PacketPlayerGameState					nextPlayerState;
 		FrameIndex								nextPlayerStateFrame;	// the index of the next frame on which we will save the player game state

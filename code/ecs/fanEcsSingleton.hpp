@@ -1,10 +1,11 @@
 #pragma once
 
+#include <string>
 #include "editor/fanImguiIcons.hpp"
 #include "core/fanHash.hpp"
-#include <string>
+#include "fanJson.hpp"
+#include "ecs/fanEcsTypes.hpp"
 
-class Json;
 namespace sf
 {
 	class Packet;
@@ -20,6 +21,7 @@ namespace fan
 		static constexpr uint32_t	 s_type		{ SSID( #_SingletonType ) };	
 
 	struct EcsSingleton {};
+	class EcsWorld;
 
 	//==============================================================================================================================================================
 	// EcsSingletonInfo is runtime type information for singleton components

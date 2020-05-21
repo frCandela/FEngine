@@ -18,7 +18,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void CollisionManager::SetInfo( SingletonComponentInfo& _info )
+	void CollisionManager::SetInfo( EcsSingletonInfo& _info )
 	{
 		_info.icon = ImGui::RIGIDBODY16;
 		_info.init = &CollisionManager::Init;
@@ -27,7 +27,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void CollisionManager::Init( EcsWorld& _world, SingletonComponent& _component )
+	void CollisionManager::Init( EcsWorld& _world, EcsSingleton& _component )
 	{
 		CollisionManager& collisionManager = static_cast<CollisionManager&>( _component );
 		const_cast<EcsWorld*>( collisionManager.world ) = &_world;
@@ -42,8 +42,8 @@ namespace fan
 		Rigidbody& bulletRb = _other == rb0 ? *rb1 : *rb0;
 
 		PhysicsWorld& physicsWorld = world->GetSingletonComponent<PhysicsWorld>();
-		const EntityHandle bulletHandle = physicsWorld.rigidbodiesHandles[&bulletRb];
-		const EntityID bulletID = world->GetEntityID( bulletHandle );
+		const EcsHandle bulletHandle = physicsWorld.rigidbodiesHandles[&bulletRb];
+		const EcsEntity bulletID = world->GetEntityID( bulletHandle );
 		const Bullet& bullet = world->GetComponent< Bullet >( bulletID );
 		
 		world->KillEntity( bulletID );
@@ -52,7 +52,7 @@ namespace fan
 		const Transform& bulletTransform = world->GetComponent< Transform >( bulletID );
 		const Scene& scene = world->GetSingletonComponent<Scene>();
 		const SceneNode& explosionNode = * bullet.explosionPrefab->Instanciate( *scene.root );
-		const EntityID explosionID = world->GetEntityID( explosionNode.handle );
+		const EcsEntity explosionID = world->GetEntityID( explosionNode.handle );
 		Transform& explosionTransform = world->GetComponent< Transform >( explosionID );
 		explosionTransform.SetPosition( bulletTransform.GetPosition() );
 	}
@@ -68,10 +68,10 @@ namespace fan
 
 		// get ids
 		PhysicsWorld& physicsWorld = world->GetSingletonComponent<PhysicsWorld>();
-		const EntityHandle spaceshipHandle = physicsWorld.rigidbodiesHandles[&spaceshipRb];
-		const EntityHandle otherHandle = physicsWorld.rigidbodiesHandles[&otherRb];
-		const EntityID spaceshipID = world->GetEntityID( spaceshipHandle );
-		const EntityID otherID = world->GetEntityID( otherHandle );
+		const EcsHandle spaceshipHandle = physicsWorld.rigidbodiesHandles[&spaceshipRb];
+		const EcsHandle otherHandle = physicsWorld.rigidbodiesHandles[&otherRb];
+		const EcsEntity spaceshipID = world->GetEntityID( spaceshipHandle );
+		const EcsEntity otherID = world->GetEntityID( otherHandle );
 
 		// bump
 		const Transform& spaceshipTransform = world->GetComponent<Transform>( spaceshipID );

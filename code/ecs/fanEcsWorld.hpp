@@ -236,7 +236,8 @@ namespace fan
 			static_assert( std::is_base_of< EcsSingleton, _SingletonType >::value );
 			return static_cast<_SingletonType&>(  GetSingleton( _SingletonType::s_type  ) );
 		}
-		EcsSingleton&			GetSingleton( const uint32_t _type ) { return  *m_singletons[_type]; }
+		EcsSingleton&		GetSingleton( const uint32_t _type )		{ return  *m_singletons[_type];		}
+		const EcsSingleton& GetSingleton( const uint32_t _type ) const	{ return  *m_singletons.at(_type);	}
 		const EcsSingletonInfo& GetSingletonInfo( const uint32_t _type ) const { return  m_singletonInfos.at( _type ); }
 		const EcsSingletonInfo* SafeGetSingletonInfo( const uint32_t _type ) const
 		{
@@ -362,6 +363,7 @@ namespace fan
 		{			
 			return _entity.archetype->m_signature[GetIndex( _type )];
 		}
+		const EcsComponentInfo& GetComponentInfo( const uint32_t _type ) const { return  m_componentsInfo.at( GetIndex(_type) ); }
 
 		// Entities
 		EcsEntity CreateEntity()

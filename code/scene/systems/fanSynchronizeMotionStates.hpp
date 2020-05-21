@@ -1,4 +1,4 @@
-#include "ecs/fanSystem.hpp"
+#include "ecs/fanEcsSystem.hpp"
 
 namespace fan
 {
@@ -8,19 +8,19 @@ namespace fan
 	// Updates the entity transform using the transform of the motion state of its rigidbody
 	// Called after the physics update
 	//==============================================================================================================================================================
-	struct S_SynchronizeTransformFromMotionState : System
+	struct S_SynchronizeTransformFromMotionState : EcsSystem
 	{
-		static Signature GetSignature( const EcsWorld& _world );
-		static void Run( EcsWorld& _world, const std::vector<EntityID>& _entities, const float _delta );
+		staticEcsSignatureGetSignature( const EcsWorld& _world );
+		static void Run( EcsWorld& _world, const std::vector<EcsEntity>& _entities, const float _delta );
 	};
 
 	//==============================================================================================================================================================
 	// Updates rigidbody and motion state using the transform of the entity
 	// Called before the physics update
 	//==============================================================================================================================================================
-	struct S_SynchronizeMotionStateFromTransform : System
+	struct S_SynchronizeMotionStateFromTransform : EcsSystem
 	{
-		static Signature GetSignature( const EcsWorld& _world );
-		static void Run( EcsWorld& _world, const std::vector<EntityID>& _entities, const float _delta );
+		staticEcsSignatureGetSignature( const EcsWorld& _world );
+		static void Run( EcsWorld& _world, const std::vector<EcsEntity>& _entities, const float _delta );
 	};
 }

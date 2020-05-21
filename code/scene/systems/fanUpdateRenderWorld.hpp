@@ -1,4 +1,4 @@
-#include "ecs/fanSystem.hpp"
+#include "ecs/fanEcsSystem.hpp"
 
 namespace fan
 {
@@ -7,38 +7,38 @@ namespace fan
 	//==============================================================================================================================================================
 	// Update the render world rendered meshes
 	//==============================================================================================================================================================
-	struct S_UpdateRenderWorldModels : System
+	struct S_UpdateRenderWorldModels : EcsSystem
 	{
-		static Signature GetSignature( const EcsWorld& _world );		
-		static void Run( EcsWorld& _world, const std::vector<EntityID>& _entities );
+		staticEcsSignatureGetSignature( const EcsWorld& _world );		
+		static void Run( EcsWorld& _world, const std::vector<EcsEntity>& _entities );
 	};
 
 	//==============================================================================================================================================================
 	// Update the render world rendered ui meshes
 	//==============================================================================================================================================================
-	struct 	S_UpdateRenderWorldUI : System
+	struct 	S_UpdateRenderWorldUI : EcsSystem
 	{
-		static Signature GetSignature( const EcsWorld& _world );
-		static void Run( EcsWorld& _world, const std::vector<EntityID>& _entities );
+		staticEcsSignatureGetSignature( const EcsWorld& _world );
+		static void Run( EcsWorld& _world, const std::vector<EcsEntity>& _entities );
 	};
 
 	//==============================================================================================================================================================
 	// Update the render world point lights
 	//==============================================================================================================================================================
-	struct S_UpdateRenderWorldPointLights : System
+	struct S_UpdateRenderWorldPointLights : EcsSystem
 	{
-		static Signature GetSignature( const EcsWorld& _world );
+		staticEcsSignatureGetSignature( const EcsWorld& _world );
 
-		static void Run( EcsWorld& _world, const std::vector<EntityID>& _entities );
+		static void Run( EcsWorld& _world, const std::vector<EcsEntity>& _entities );
 	};
 
 	//==============================================================================================================================================================
 	// Update the render world directional lights
 	//==============================================================================================================================================================
-	struct S_UpdateRenderWorldDirectionalLights : System
+	struct S_UpdateRenderWorldDirectionalLights : EcsSystem
 	{
-		static Signature GetSignature( const EcsWorld& _world );
+		staticEcsSignatureGetSignature( const EcsWorld& _world );
 
-		static void Run( EcsWorld& _world, const std::vector<EntityID>& _entities );
+		static void Run( EcsWorld& _world, const std::vector<EcsEntity>& _entities );
 	};
 }

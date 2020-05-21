@@ -1,6 +1,6 @@
 #pragma once
 
-#include "ecs/fanSingletonComponent.hpp"
+#include "ecs/fanEcsSingleton.hpp"
 #include "network/fanUdpSocket.hpp"
 #include "network/fanPacket.hpp"
 
@@ -11,13 +11,13 @@ namespace fan
 	//================================================================================================================================
 	// Manages server udp socket & some timings
 	//================================================================================================================================	
-	struct ServerConnection : public SingletonComponent
+	struct ServerConnection : public EcsSingleton
 	{
-		DECLARE_SINGLETON_COMPONENT()
+		ECS_SINGLETON( ServerConnection )
 	public:
-		static void SetInfo( SingletonComponentInfo& _info );
-		static void Init( EcsWorld& _world, SingletonComponent& _component );
-		static void OnGui( EcsWorld&, SingletonComponent& _component );
+		static void SetInfo( EcsSingletonInfo& _info );
+		static void Init( EcsWorld& _world, EcsSingleton& _component );
+		static void OnGui( EcsWorld&, EcsSingleton& _component );
 
 		UdpSocket	socket;
 		Port		serverPort;

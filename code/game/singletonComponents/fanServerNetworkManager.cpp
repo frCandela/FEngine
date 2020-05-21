@@ -22,7 +22,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void ServerNetworkManager::SetInfo( SingletonComponentInfo& _info )
+	void ServerNetworkManager::SetInfo( EcsSingletonInfo& _info )
 	{
 		_info.icon = ImGui::NETWORK16;
 		_info.init = &ServerNetworkManager::Init;
@@ -32,7 +32,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void ServerNetworkManager::Init( EcsWorld& _world, SingletonComponent& _component )
+	void ServerNetworkManager::Init( EcsWorld& _world, EcsSingleton& _component )
 	{
 		ServerNetworkManager& netManager = static_cast<ServerNetworkManager&>( _component );
 	}
@@ -42,12 +42,12 @@ namespace fan
 	void ServerNetworkManager::Start( EcsWorld& _world )
 	{
 		// create the network scene root for ordering net objects
-		HostManager& hostManager = _world.GetSingletonComponent<HostManager>();
-		Scene& scene = _world.GetSingletonComponent<Scene>();
+		HostManager& hostManager = _world.GetSingleton<HostManager>();
+		Scene& scene = _world.GetSingleton<Scene>();
 		hostManager.netRoot = &scene.CreateSceneNode( "net root", scene.root );
 
 		// bind
-		ServerConnection& connection = _world.GetSingletonComponent<ServerConnection>();
+		ServerConnection& connection = _world.GetSingleton<ServerConnection>();
 		Debug::Log() << "bind on port " << connection.serverPort << Debug::Endl();
 		if( connection.socket.Bind( connection.serverPort ) != sf::Socket::Done )
 		{
@@ -59,13 +59,13 @@ namespace fan
 	//================================================================================================================================
 	void ServerNetworkManager::Stop( EcsWorld& _world )
 	{
-		ServerConnection& connection = _world.GetSingletonComponent<ServerConnection>();
+		ServerConnection& connection = _world.GetSingleton<ServerConnection>();
 		connection.socket.Unbind();
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void ServerNetworkManager::OnGui( EcsWorld&, SingletonComponent& _component )
+	void ServerNetworkManager::OnGui( EcsWorld&, EcsSingleton& _component )
 	{
 		ServerNetworkManager& netManager = static_cast<ServerNetworkManager&>( _component );
 

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "ecs/fanComponent.hpp"
+#include "ecs/fanEcsComponent.hpp"
 #include "bullet/LinearMath/btVector3.h"
 
 namespace fan
@@ -11,15 +11,15 @@ namespace fan
 	// Stores the input of the player
 	// This input can be direct in case of a local player or replicated ( server or remote players )
 	//================================================================================================================================
-	struct PlayerInput : public Component
+	struct PlayerInput : public EcsComponent
 	{
-		DECLARE_COMPONENT( PlayerInput )
+		ECS_COMPONENT( PlayerInput )
 	public:
-		static void SetInfo( ComponentInfo& _info );
-		static void Init( EcsWorld& _world, Component& _component );
-		static void OnGui( EcsWorld& _world, EntityID _entityID, Component& _component );
-		static void Save( const Component& _component, Json& _json );
-		static void Load( Component& _component, const Json& _json );
+		static void SetInfo( EcsComponentInfo& _info );
+		static void Init( EcsWorld& _world, EcsComponent& _component );
+		static void OnGui( EcsWorld& _world, EcsEntity _entityID, EcsComponent& _component );
+		static void Save( const EcsComponent& _component, Json& _json );
+		static void Load( EcsComponent& _component, const Json& _json );
 
 		btVector3	orientation; // orientation of the ship
 		float		left;		 // left/right key pressed ( strafing )

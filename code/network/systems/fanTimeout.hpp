@@ -1,4 +1,4 @@
-#include "ecs/fanSystem.hpp"
+#include "ecs/fanEcsSystem.hpp"
 
 namespace fan
 {
@@ -6,17 +6,17 @@ namespace fan
 
 	//==============================================================================================================================================================
 	//==============================================================================================================================================================
-	struct S_DetectHostTimout : System
+	struct S_DetectHostTimout : EcsSystem
 	{
-		static Signature GetSignature( const EcsWorld& _world );
-		static void Run( EcsWorld& _world, const std::vector<EntityID>& _entities );
+		staticEcsSignatureGetSignature( const EcsWorld& _world );
+		static void Run( EcsWorld& _world, const std::vector<EcsEntity>& _entities );
 	};
 
 	//==============================================================================================================================================================
 	//==============================================================================================================================================================
-	struct S_ProcessTimedOutPackets : System
+	struct S_ProcessTimedOutPackets : EcsSystem
 	{
-		static Signature GetSignature( const EcsWorld& _world );
-		static void Run( EcsWorld& _world, const std::vector<EntityID>& _entities );
+		staticEcsSignatureGetSignature( const EcsWorld& _world );
+		static void Run( EcsWorld& _world, const std::vector<EcsEntity>& _entities );
 	};
 }

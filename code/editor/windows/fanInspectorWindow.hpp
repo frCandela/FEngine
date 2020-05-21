@@ -8,7 +8,7 @@
 namespace fan
 {
 	struct SceneNode;
-	struct ComponentInfo;
+	struct EcsComponentInfo;
 
 	//================================================================================================================================
 	// displays a scene node and its components
@@ -29,7 +29,7 @@ namespace fan
 		SceneNode* m_sceneNodeSelected = nullptr;
 
 		void NewComponentPopup();
-		void R_NewComponentPopup( std::set< std::filesystem::path >& _componentsPathSet, std::set< std::filesystem::path >::iterator& _current, const std::vector<ComponentInfo>& _components, const std::vector<std::filesystem::path>& _componentsPath );
-		void NewComponentItem( const ComponentInfo& _info );
+		void R_NewComponentPopup( std::set< std::filesystem::path >& _componentsPathSet, std::set< std::filesystem::path >::iterator& _current, const std::vector<EcsComponentInfo>& _components, const std::vector<std::filesystem::path>& _componentsPath );
+		void NewComponentItem( const EcsComponentInfo& _info );
 	};
 }

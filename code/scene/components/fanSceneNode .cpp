@@ -8,22 +8,21 @@
 
 namespace fan
 {
-	REGISTER_COMPONENT( SceneNode, "scene_node" );
-	
 	//================================================================================================================================
 	//================================================================================================================================
-	void SceneNode::SetInfo( ComponentInfo& _info )
+	void SceneNode::SetInfo( EcsComponentInfo& _info )
 	{
 		_info.icon  = ImGui::IconType::GAMEOBJECT16;
 		_info.onGui = &SceneNode::OnGui;
 		_info.init = &SceneNode::Init;
 		_info.destroy = &SceneNode::Destroy;
 		_info.editorPath = "/";
+		_info.name = "scene node";
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void SceneNode::Init( EcsWorld& _world, Component& _component )
+	void SceneNode::Init( EcsWorld& _world, EcsComponent& _component )
 	{
 		SceneNode& node = static_cast<SceneNode&>( _component );
 		node.handle = 0;
@@ -36,10 +35,10 @@ namespace fan
 	//================================================================================================================================
 	// disconnects all the node's child hierarchy tree and kills it
 	//================================================================================================================================
-	void SceneNode::Destroy( EcsWorld& _world, Component& _component )
+	void SceneNode::Destroy( EcsWorld& _world, EcsComponent& _component )
 	{
 		SceneNode& node = static_cast<SceneNode&>( _component );
-		Scene& scene = _world.GetSingletonComponent<Scene>();
+		Scene& scene = _world.GetSingleton<Scene>();
 		scene.onDeleteSceneNode.Emmit( &node );
 		scene.nodes.erase( node.uniqueID );
 
@@ -74,8 +73,8 @@ namespace fan
 			// delete node & childs
 			for( SceneNode* node : nodesToDelete )
 			{
-				EntityID entityID = _world.GetEntityID( node->handle );
-				_world.KillEntity( entityID );
+				EcsEntity entity = _world.GetEntity( node->handle );
+				_world.KillEntity( entity );
 				node->parent = nullptr;
 				node->childs.clear();
 			}		
@@ -84,11 +83,11 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void SceneNode::Build( const std::string& _name, Scene& _scene, const EntityHandle _entityHandle, const uint32_t _uniqueID, SceneNode* const _parent )
+	void SceneNode::Build( const std::string& _name, Scene& _scene, const EcsHandle _handle, const uint32_t _uniqueID, SceneNode* const _parent )
 	{
 		name = _name;
 		scene = &_scene;
-		handle = _entityHandle;
+		handle = _handle;
 		uniqueID = _uniqueID;
 		if( _parent != nullptr )
 		{
@@ -98,16 +97,16 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void SceneNode::OnGui( EcsWorld& _world, EntityID _entityID, Component& _component )
+	void SceneNode::OnGui( EcsWorld& _world, EcsEntity _entityID, EcsComponent& _component )
 	{
 		SceneNode& node = static_cast<SceneNode&>( _component );
 		EcsWorld& world = * node.scene->world;
-		EntityID entityID = world.GetEntityID( node.handle );
+		EcsEntity entity = world.GetEntity( node.handle );
 
 		ImGui::Text( "name      : %s", node.name.c_str() );
 		ImGui::Text( "scene     : %s", node.scene->path.empty()	? "<null>" : node.scene->path.c_str() );
 		ImGui::Text( "handle    : %u", node.handle );
-		ImGui::Text( "entity id : %u", entityID );
+		ImGui::Text( "entity id : %u", entity );
 		ImGui::Text( "node   id : %u", node.uniqueID );
 	}
 

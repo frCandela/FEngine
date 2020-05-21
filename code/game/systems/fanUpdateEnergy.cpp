@@ -10,7 +10,7 @@ namespace fan
 {
 	//================================================================================================================================
 	//================================================================================================================================
-	Signature S_UpdateSolarPannels::GetSignature( const EcsWorld& _world )
+	EcsSignature S_UpdateSolarPannels::GetSignature( const EcsWorld& _world )
 	{
 		return
 			_world.GetSignature<Transform>() |
@@ -19,16 +19,16 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void S_UpdateSolarPannels::Run( EcsWorld& _world, const std::vector<EntityID>& _entities, const float _delta )
+	void S_UpdateSolarPannels::Run( EcsWorld& _world, const std::vector<EcsEntity>& _entities, const float _delta )
 	{
 		if( _delta == 0.f ) { return; }
 
-		const SunLight& sunLight = _world.GetSingletonComponent<SunLight>();
+		const SunLight& sunLight = _world.GetSingleton<SunLight>();
 
-		for( EntityID entityID : _entities )
+		for( EcsEntity entity : _entities )
 		{
-			const Transform& transform = _world.GetComponent<Transform>( entityID );
-			SolarPanel& solarPanel = _world.GetComponent<SolarPanel>( entityID );
+			const Transform& transform = _world.GetComponent<Transform>( entity );
+			SolarPanel& solarPanel = _world.GetComponent<SolarPanel>( entity );
 
 			// sunlight mesh raycast
 			const btVector3 rayOrigin = transform.GetPosition() + btVector3::Up();
@@ -53,7 +53,7 @@ namespace fan
 
 	//================================================================================================================================
 //================================================================================================================================
-	Signature S_RechargeBatteries::GetSignature( const EcsWorld& _world )
+	EcsSignature S_RechargeBatteries::GetSignature( const EcsWorld& _world )
 	{
 		return
 			_world.GetSignature<Battery>() |
@@ -62,14 +62,14 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void S_RechargeBatteries::Run( EcsWorld& _world, const std::vector<EntityID>& _entities, const float _delta )
+	void S_RechargeBatteries::Run( EcsWorld& _world, const std::vector<EcsEntity>& _entities, const float _delta )
 	{
 		if( _delta == 0.f ) { return; }
 
-		for( EntityID entityID : _entities )
+		for( EcsEntity entity : _entities )
 		{
-			const SolarPanel& solarPanel = _world.GetComponent<SolarPanel>( entityID );
-			Battery& battery = _world.GetComponent<Battery>( entityID );
+			const SolarPanel& solarPanel = _world.GetComponent<SolarPanel>( entity );
+			Battery& battery = _world.GetComponent<Battery>( entity );
 
 			const float energyAdded = _delta * solarPanel.currentChargingRate;
 			battery.currentEnergy = std::min( battery.currentEnergy + energyAdded, battery.maxEnergy );

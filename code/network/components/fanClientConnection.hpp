@@ -1,6 +1,6 @@
 #pragma once
 
-#include "ecs/fanComponent.hpp"
+#include "ecs/fanEcsComponent.hpp"
 
 #include "network/fanUdpSocket.hpp"
 #include "network/fanPacket.hpp"
@@ -12,13 +12,13 @@ namespace fan
 	//================================================================================================================================
 	// Manages the connection of the client with the server
 	//================================================================================================================================	
-	struct ClientConnection : public Component
+	struct ClientConnection : public EcsComponent
 	{
-		DECLARE_COMPONENT( ClientConnection )
+		ECS_COMPONENT( ClientConnection )
 	public:
-		static void SetInfo( ComponentInfo& _info );
-		static void Init( EcsWorld& _world, Component& _component );
-		static void OnGui( EcsWorld& _world, EntityID _entityID, Component& _component );
+		static void SetInfo( EcsComponentInfo& _info );
+		static void Init( EcsWorld& _world, EcsComponent& _component );
+		static void OnGui( EcsWorld& _world, EcsEntity _entityID, EcsComponent& _component );
 
 		enum class ClientState { 
 			Disconnected,		// Client needs to send a Hello packet to the server to login

@@ -5,12 +5,10 @@
 #include "network/fanPacket.hpp"
 
 namespace fan
-{
-	REGISTER_COMPONENT( Transform, "transform" );
-
+{	
 	//================================================================================================================================
 	//================================================================================================================================
-	void Transform::SetInfo( ComponentInfo& _info )
+	void Transform::SetInfo( EcsComponentInfo& _info )
 	{
 		_info.icon = ImGui::IconType::TRANSFORM16;
 		_info.onGui = &Transform::OnGui;
@@ -20,11 +18,12 @@ namespace fan
 		_info.netSave = &Transform::NetSave;
 		_info.netLoad = &Transform::NetLoad;
 		_info.editorPath = "/";
+		_info.name = "transform";
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void Transform::Init( EcsWorld& _world, Component& _component )
+	void Transform::Init( EcsWorld& _world, EcsComponent& _component )
 	{
 		Transform& transform = static_cast<Transform&>( _component );
 		transform.transform.setIdentity();
@@ -33,7 +32,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void Transform::OnGui( EcsWorld& _world, EntityID _entityID, Component& _component )
+	void Transform::OnGui( EcsWorld& _world, EcsEntity _entityID, EcsComponent& _component )
 	{
 		Transform& transform = static_cast<Transform&>( _component );
 		ImGui::PushItemWidth( 0.6f * ImGui::GetWindowWidth() - 16 );
@@ -73,7 +72,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void Transform::Save( const Component& _component, Json& _json )
+	void Transform::Save( const EcsComponent& _component, Json& _json )
 	{
 		const Transform& transform = static_cast<const Transform&>( _component );
 
@@ -84,7 +83,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void Transform::Load( Component& _component, const Json& _json )
+	void Transform::Load( EcsComponent& _component, const Json& _json )
  	{
 		Transform& transform = static_cast<Transform&>( _component );
 
@@ -101,7 +100,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void Transform::NetSave( const Component& _component, sf::Packet& _packet )
+	void Transform::NetSave( const EcsComponent& _component, sf::Packet& _packet )
 	{
 		const Transform& transform = static_cast<const Transform&>( _component );
 		const btVector3 position = transform.GetPosition();
@@ -113,7 +112,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void Transform::NetLoad( Component& _component, sf::Packet& _packet )
+	void Transform::NetLoad( EcsComponent& _component, sf::Packet& _packet )
 	{
 		Transform& transform = static_cast<Transform&>( _component );
 		btVector3 position( 0.f, 0.f, 0.f );

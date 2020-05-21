@@ -9,7 +9,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void EditorGrid::SetInfo( SingletonComponentInfo& _info )
+	void EditorGrid::SetInfo( EcsSingletonInfo& _info )
 	{
 		_info.icon = ImGui::NONE;
 		_info.init = &EditorGrid::Init;
@@ -18,7 +18,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void EditorGrid::Init( EcsWorld& _world, SingletonComponent& _component )
+	void EditorGrid::Init( EcsWorld& _world, EcsSingleton& _component )
 	{
 		EditorGrid& editorGrid = static_cast<EditorGrid&>( _component );
 		editorGrid.offset = btVector3::Zero();

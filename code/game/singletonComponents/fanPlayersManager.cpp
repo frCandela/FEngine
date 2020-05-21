@@ -12,7 +12,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void PlayersManager::SetInfo( SingletonComponentInfo& _info )
+	void PlayersManager::SetInfo( EcsSingletonInfo& _info )
 	{
 		_info.icon = ImGui::JOYSTICK16;
 		_info.init = &PlayersManager::Init;
@@ -21,7 +21,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void PlayersManager::Init( EcsWorld& _world, SingletonComponent& _component )
+	void PlayersManager::Init( EcsWorld& _world, EcsSingleton& _component )
 	{
 		PlayersManager& playersManager = static_cast<PlayersManager&>( _component );
 		playersManager.playerPrefab = nullptr;

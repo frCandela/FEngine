@@ -42,7 +42,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void ComponentPtrBase::Create( SceneNode& _sceneNode, Component& _component )
+	void ComponentPtrBase::Create( SceneNode& _sceneNode, EcsComponent& _component )
 	{
 		assert( _sceneNode.scene->world == world );
 
@@ -79,7 +79,7 @@ namespace ImGui
 
  		bool returnValue = false;
  
-		const fan::ComponentInfo& info = world.GetComponentInfo( _ptr.dynamicID );
+		const fan::EcsComponentInfo& info = world.GetComponentInfo( _ptr.dynamicID );
 
 		// create button title
 		std::string name;
@@ -89,7 +89,7 @@ namespace ImGui
 		}
 		else
 		{
-			fan::Scene& scene = world.GetSingletonComponent<fan::Scene>();
+			fan::Scene& scene = world.GetSingleton<fan::Scene>();
 			fan::SceneNode& node = * scene.nodes[_ptr.sceneNodeID];
 			name = info.name + " : " + node.name;
 		}		

@@ -10,7 +10,7 @@ namespace fan
 {
 	//================================================================================================================================
 	//================================================================================================================================
-	Signature S_ParticlesOcclusion::GetSignature( const EcsWorld& _world )
+	EcsSignature S_ParticlesOcclusion::GetSignature( const EcsWorld& _world )
 	{
 		return
 			_world.GetSignature< Particle >() |
@@ -19,15 +19,15 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void S_ParticlesOcclusion::Run( EcsWorld& _world, const std::vector<EntityID>& _entities, const float _delta )
+	void S_ParticlesOcclusion::Run( EcsWorld& _world, const std::vector<EcsEntity>& _entities, const float _delta )
 	{
 		if( _delta == 0.f ) { return; }
 
-		SunLight& sunlight = _world.GetSingletonComponent<SunLight>();
+		SunLight& sunlight = _world.GetSingleton<SunLight>();
 
-		for( EntityID entityID : _entities )
+		for( EcsEntity entity : _entities )
 		{
-			const Particle& particle = _world.GetComponent<Particle>( entityID );
+			const Particle& particle = _world.GetComponent<Particle>( entity );
 			const btVector3& position = ToBullet( particle.position );
 
 			// raycast on the light mesh
@@ -36,7 +36,7 @@ namespace fan
 			bool isInsideSunlight = sunlight.mesh.RayCast( rayOrigin, -btVector3::Up(), outIntersection );
 			if( !isInsideSunlight )
 			{
-				_world.KillEntity( entityID );
+				_world.KillEntity( entity );
 			}
 		}
 

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "ecs/fanSingletonComponent.hpp"
+#include "ecs/fanEcsSingleton.hpp"
 #include "render/fanRenderer.hpp"
 #include "render/fanMesh.hpp"
 
@@ -9,13 +9,13 @@ namespace fan
 	//================================================================================================================================
 	// contains all the render data of the world for the renderer
 	//================================================================================================================================
-	class RenderWorld : public SingletonComponent
+	class RenderWorld : public EcsSingleton
 	{
-		DECLARE_SINGLETON_COMPONENT()
+		ECS_SINGLETON( RenderWorld )
 	public:
-		static void SetInfo( SingletonComponentInfo& _info );
-		static void Init( EcsWorld& _world, SingletonComponent& _component );
-		static void OnGui( EcsWorld&, SingletonComponent& _component );
+		static void SetInfo( EcsSingletonInfo& _info );
+		static void Init( EcsWorld& _world, EcsSingleton& _component );
+		static void OnGui( EcsWorld&, EcsSingleton& _component );
 
 		std::vector<DrawMesh>				drawData;
 		std::vector<DrawUIMesh>				uiDrawData;

@@ -11,18 +11,18 @@ namespace fan
 {
 	//================================================================================================================================
 	//================================================================================================================================
-	Signature S_ProcessTimedOutPackets::GetSignature( const EcsWorld& _world )
+	EcsSignature S_ProcessTimedOutPackets::GetSignature( const EcsWorld& _world )
 	{
 		return _world.GetSignature<ReliabilityLayer>();
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void S_ProcessTimedOutPackets::Run( EcsWorld& _world, const std::vector<EntityID>& _entities )
+	void S_ProcessTimedOutPackets::Run( EcsWorld& _world, const std::vector<EcsEntity>& _entities )
 	{
-		for( EntityID entityID : _entities )
+		for( EcsEntity entity : _entities )
 		{
-			ReliabilityLayer& reliabilityLayer = _world.GetComponent<ReliabilityLayer>( entityID );
+			ReliabilityLayer& reliabilityLayer = _world.GetComponent<ReliabilityLayer>( entity );
 			const double timoutTime = Time::Get().ElapsedSinceStartup() - reliabilityLayer.timeoutDuration;
 
 			//packets are sorted, so all timed out packets must be at front
@@ -44,20 +44,20 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	Signature S_DetectHostTimout::GetSignature( const EcsWorld& _world )
+	EcsSignature S_DetectHostTimout::GetSignature( const EcsWorld& _world )
 	{
 		return _world.GetSignature<HostConnection>();
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void S_DetectHostTimout::Run( EcsWorld& _world, const std::vector<EntityID>& _entities )
+	void S_DetectHostTimout::Run( EcsWorld& _world, const std::vector<EcsEntity>& _entities )
 	{
-		HostManager& hostManager = _world.GetSingletonComponent<HostManager>();
+		HostManager& hostManager = _world.GetSingleton<HostManager>();
 		const double currentTime = Time::Get().ElapsedSinceStartup();
-		for( EntityID entityID : _entities )
+		for( EcsEntity entity : _entities )
 		{
-			HostConnection& connection = _world.GetComponent<HostConnection>( entityID );
+			HostConnection& connection = _world.GetComponent<HostConnection>( entity );
 
 			//packets are sorted, so all timed out packets must be at front
 			if( connection.state == HostConnection::Connected )
@@ -65,7 +65,7 @@ namespace fan
 				if( connection.lastResponseTime + connection.timeoutDelay < currentTime )
 				{
 					Debug::Log() << "client timeout " << Debug::Endl();
-					SceneNode& sceneNode = _world.GetComponent<SceneNode>( entityID );
+					SceneNode& sceneNode = _world.GetComponent<SceneNode>( entity );
 					hostManager.DeleteHost( sceneNode.handle );
 				}
 			}

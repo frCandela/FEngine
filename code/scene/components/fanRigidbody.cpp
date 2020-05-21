@@ -8,15 +8,9 @@
 
 namespace fan
 {
-	REGISTER_COMPONENT( Rigidbody, "rigidbody" );
-
 	//================================================================================================================================
 	//================================================================================================================================
-	Rigidbody::Rigidbody() : rigidbody( 1.f, nullptr, nullptr ){}
-
-	//================================================================================================================================
-	//================================================================================================================================
-	void Rigidbody::SetInfo( ComponentInfo& _info )
+	void Rigidbody::SetInfo( EcsComponentInfo& _info )
 	{
 		_info.icon = ImGui::IconType::RIGIDBODY16;
 		_info.onGui = &Rigidbody::OnGui;
@@ -27,11 +21,12 @@ namespace fan
 		_info.netSave= &Rigidbody::NetSave;
 		_info.netLoad = &Rigidbody::NetLoad;
 		_info.editorPath = "/";
+		_info.name = "rigidbody";
 	}
 	   
 	//================================================================================================================================
 	//================================================================================================================================
-	void Rigidbody::Init( EcsWorld& _world, Component& _component )
+	void Rigidbody::Init( EcsWorld& _world, EcsComponent& _component )
 	{
 		// clear
 		Rigidbody& rb = static_cast<Rigidbody&>( _component );
@@ -41,16 +36,16 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void Rigidbody::Destroy( EcsWorld& _world, Component& _component )
+	void Rigidbody::Destroy( EcsWorld& _world, EcsComponent& _component )
 	{
-		PhysicsWorld& physicsWorld = _world.GetSingletonComponent<PhysicsWorld>();
+		PhysicsWorld& physicsWorld = _world.GetSingleton<PhysicsWorld>();
 		Rigidbody& rb = static_cast<Rigidbody&>( _component );
 		physicsWorld.RemoveRigidbody( rb );
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void Rigidbody::Save( const Component& _component, Json& _json )
+	void Rigidbody::Save( const EcsComponent& _component, Json& _json )
 	{
 		const Rigidbody& rb = static_cast<const Rigidbody&>( _component );
 		Serializable::SaveFloat( _json, "mass", rb.GetMass() );
@@ -60,7 +55,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void Rigidbody::Load( Component& _component, const Json& _json )
+	void Rigidbody::Load( EcsComponent& _component, const Json& _json )
 	{
 		Rigidbody& rb = static_cast<Rigidbody&>( _component );
 
@@ -79,7 +74,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================	
-	void Rigidbody::NetSave( const Component& _component, sf::Packet& _packet )
+	void Rigidbody::NetSave( const EcsComponent& _component, sf::Packet& _packet )
 	{
 		const Rigidbody& rb = static_cast<const Rigidbody&>( _component );
 		const btVector3 velocity = rb.GetVelocity();
@@ -89,7 +84,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================	
-	void Rigidbody::NetLoad( Component& _component, sf::Packet& _packet )
+	void Rigidbody::NetLoad( EcsComponent& _component, sf::Packet& _packet )
 	{
 		Rigidbody& rb = static_cast<Rigidbody&>( _component );
 		btVector3 velocity( 0.f, 0.f, 0.f );
@@ -238,7 +233,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void Rigidbody::OnGui( EcsWorld& _world, EntityID _entityID, Component& _component )
+	void Rigidbody::OnGui( EcsWorld& _world, EcsEntity _entityID, EcsComponent& _component )
 	{
 		Rigidbody& rb = static_cast<Rigidbody&>( _component );
 

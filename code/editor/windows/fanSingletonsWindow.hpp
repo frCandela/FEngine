@@ -1,7 +1,7 @@
 #pragma once
 
 #include "editor/windows/fanEditorWindow.hpp"
-#include "ecs/fanSingletonComponent.hpp"
+#include "ecs/fanEcsSingleton.hpp"
 
 namespace fan
 {

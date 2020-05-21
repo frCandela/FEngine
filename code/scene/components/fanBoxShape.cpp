@@ -4,15 +4,9 @@
 
 namespace fan
 {
-	REGISTER_COMPONENT( BoxShape, "box_shape" );
-
 	//================================================================================================================================
 	//================================================================================================================================
-	BoxShape::BoxShape() : boxShape( btVector3( 0.5f, 0.5f, 0.5f ) ) {}
-
-	//================================================================================================================================
-	//================================================================================================================================
-	void BoxShape::SetInfo( ComponentInfo& _info )
+	void BoxShape::SetInfo( EcsComponentInfo& _info )
 	{
 		_info.icon = ImGui::IconType::CUBE_SHAPE16;
 		_info.onGui = &BoxShape::OnGui;
@@ -20,11 +14,12 @@ namespace fan
 		_info.load  = &BoxShape::Load;
 		_info.save  = &BoxShape::Save;
 		_info.editorPath = "/";
+		_info.name = "box_shape";
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void BoxShape::Init( EcsWorld& _world, Component& _component )
+	void BoxShape::Init( EcsWorld& _world, EcsComponent& _component )
 	{
 		BoxShape& boxShape = static_cast<BoxShape&>( _component );
 		boxShape.boxShape = btBoxShape( btVector3( 0.5f, 0.5f, 0.5f ) );
@@ -33,7 +28,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void BoxShape::OnGui( EcsWorld& _world, EntityID _entityID, Component& _component )
+	void BoxShape::OnGui( EcsWorld& _world, EcsEntity _entityID, EcsComponent& _component )
 	{
 		BoxShape& boxShape = static_cast<BoxShape&>( _component );
 		ImGui::PushItemWidth( 0.6f * ImGui::GetWindowWidth() );
@@ -49,7 +44,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void BoxShape::Save( const Component& _component, Json& _json )
+	void BoxShape::Save( const EcsComponent& _component, Json& _json )
 	{
 		const BoxShape& boxShape = static_cast<const BoxShape&>( _component );
 
@@ -58,7 +53,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void BoxShape::Load( Component& _component, const Json& _json )
+	void BoxShape::Load( EcsComponent& _component, const Json& _json )
 	{
 		BoxShape& boxShape = static_cast<BoxShape&>( _component );
 

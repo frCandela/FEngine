@@ -6,9 +6,6 @@
 #include "ecs/fanEcsEntity.hpp"
 
 namespace fan {
-	static constexpr uint32_t ecsSignatureLength = 8;
-	using EcsSignature = std::bitset<ecsSignatureLength>;
-
 	//================================
 	// An archetype is a collection of entities with the same signature
 	// All component of the same entity are at the same index

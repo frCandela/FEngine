@@ -4,11 +4,10 @@
 
 namespace fan
 {
-	REGISTER_COMPONENT( Bullet, "bullet" );
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void Bullet::SetInfo( ComponentInfo& _info )
+	void Bullet::SetInfo( EcsComponentInfo& _info )
 	{
 		_info.icon = ImGui::IconType::JOYSTICK16;
 		_info.onGui = &Bullet::OnGui;
@@ -16,11 +15,12 @@ namespace fan
 		_info.load = &Bullet::Load;
 		_info.save = &Bullet::Save;
 		_info.editorPath = "game/";
+		_info.name = "bullet";
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void Bullet::Init( EcsWorld& _world, Component& _component )
+	void Bullet::Init( EcsWorld& _world, EcsComponent& _component )
 	{
 		Bullet& bullet = static_cast<Bullet&>( _component );
 
@@ -30,7 +30,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void Bullet::OnGui( EcsWorld& _world, EntityID _entityID, Component& _component )
+	void Bullet::OnGui( EcsWorld& _world, EcsEntity _entityID, EcsComponent& _component )
 	{
 		Bullet& bullet = static_cast<Bullet&>( _component );
 
@@ -42,7 +42,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void Bullet::Save( const Component& _component, Json& _json )
+	void Bullet::Save( const EcsComponent& _component, Json& _json )
 	{
 		const Bullet& bullet = static_cast<const Bullet&>( _component );
 		Serializable::SavePrefabPtr( _json, "explosion_prefab", bullet.explosionPrefab );	
@@ -50,7 +50,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void Bullet::Load( Component& _component, const Json& _json )
+	void Bullet::Load( EcsComponent& _component, const Json& _json )
 	{
 		Bullet& bullet = static_cast<Bullet&>( _component );
 		Serializable::LoadPrefabPtr( _json, "explosion_prefab", bullet.explosionPrefab );

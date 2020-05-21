@@ -1,6 +1,6 @@
 #pragma  once
 
-#include "ecs/fanComponent.hpp"
+#include "ecs/fanEcsComponent.hpp"
 #include "network/fanPacket.hpp"
 
 namespace fan
@@ -8,13 +8,13 @@ namespace fan
 	//==============================================================================================================================================================
 	// [Server] Sends packets to clients to replicates objects / run RPC
 	//==============================================================================================================================================================
-	struct HostReplication: public Component
+	struct HostReplication: public EcsComponent
 	{
-		DECLARE_COMPONENT( HostReplication )
+		ECS_COMPONENT( HostReplication )
 	public:
-		static void SetInfo( ComponentInfo& _info );
-		static void Init( EcsWorld& _world, Component& _component );
-		static void OnGui( EcsWorld& _world, EntityID _entityID, Component& _component );
+		static void SetInfo( EcsComponentInfo& _info );
+		static void Init( EcsWorld& _world, EcsComponent& _component );
+		static void OnGui( EcsWorld& _world, EcsEntity _entityID, EcsComponent& _component );
 
 		enum ReplicationFlags
 		{
@@ -42,7 +42,7 @@ namespace fan
 		void		OnReplicationFail( const PacketTag _packetTag );
 
 		static PacketReplication BuildSingletonPacket( const EcsWorld& _world, const uint32_t _staticID );
-		static PacketReplication BuildEntityPacket( EcsWorld& _world, const EntityHandle _entityHandle, const std::vector<uint32_t>& _componentTypeInfo );
+		static PacketReplication BuildEntityPacket( EcsWorld& _world, const EcsHandle _handle, const std::vector<uint32_t>& _componentTypeInfo );
 		static PacketReplication BuildRPCPacket( sf::Packet& _dataRPC );
 	};
 	static constexpr size_t sizeof_hostReplication = sizeof( HostReplication );

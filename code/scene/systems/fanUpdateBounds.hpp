@@ -1,4 +1,4 @@
-#include "ecs/fanSystem.hpp"
+#include "ecs/fanEcsSystem.hpp"
 
 namespace fan
 {
@@ -7,27 +7,27 @@ namespace fan
 	//==============================================================================================================================================================
 	// Uses the rigidbody bounds to set the entity bounds
 	//==============================================================================================================================================================
-	struct S_UpdateBoundsFromRigidbody : System
+	struct S_UpdateBoundsFromRigidbody : EcsSystem
 	{
-		static Signature GetSignature( const EcsWorld& _world );
-		static void Run( EcsWorld& _world, const std::vector<EntityID>& _entities, const float _delta );
+		staticEcsSignatureGetSignature( const EcsWorld& _world );
+		static void Run( EcsWorld& _world, const std::vector<EcsEntity>& _entities, const float _delta );
 	};
 		
 	//==============================================================================================================================================================
 	// Uses the convex hull in the mesh renderer mesh to generate new bounds
 	//==============================================================================================================================================================
-	struct S_UpdateBoundsFromModel : System
+	struct S_UpdateBoundsFromModel : EcsSystem
 	{
-		static Signature GetSignature( const EcsWorld& _world );
-		static void Run( EcsWorld& _world, const std::vector<EntityID>& _entities, const float _delta );
+		staticEcsSignatureGetSignature( const EcsWorld& _world );
+		static void Run( EcsWorld& _world, const std::vector<EcsEntity>& _entities, const float _delta );
 	};
 
 	//==============================================================================================================================================================
 	// Uses a transform bounds to set the entity bounds
 	//==============================================================================================================================================================
-	struct S_UpdateBoundsFromTransform : System
+	struct S_UpdateBoundsFromTransform : EcsSystem
 	{
-		static Signature GetSignature( const EcsWorld& _world );
-		static void Run( EcsWorld& _world, const std::vector<EntityID>& _entities, const float _delta );
+		staticEcsSignatureGetSignature( const EcsWorld& _world );
+		static void Run( EcsWorld& _world, const std::vector<EcsEntity>& _entities, const float _delta );
 	};
 }

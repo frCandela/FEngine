@@ -2,20 +2,19 @@
 
 namespace fan
 {
-	REGISTER_COMPONENT( HostGameData, "host game data" );
-
 	//================================================================================================================================
 	//================================================================================================================================
-	void HostGameData::SetInfo( ComponentInfo& _info )
+	void HostGameData::SetInfo( EcsComponentInfo& _info )
 	{
 		_info.icon = ImGui::IconType::NETWORK16;
 		_info.onGui = &HostGameData::OnGui;
 		_info.init =  &HostGameData::Init;
+		_info.name = "host game data";
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void HostGameData::Init( EcsWorld& _world, Component& _component )
+	void HostGameData::Init( EcsWorld& _world, EcsComponent& _component )
 	{
 		HostGameData& hostGameData = static_cast<HostGameData&>( _component );
 		hostGameData.spaceshipID = 0;
@@ -52,7 +51,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void HostGameData::OnGui( EcsWorld& _world, EntityID _entityID, Component& _component )
+	void HostGameData::OnGui( EcsWorld& _world, EcsEntity _entityID, EcsComponent& _component )
 	{
 		HostGameData& hostGameData = static_cast<HostGameData&>( _component );
 		ImGui::PushItemWidth( 0.6f * ImGui::GetWindowWidth() - 16 );

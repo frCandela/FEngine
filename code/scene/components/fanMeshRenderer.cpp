@@ -6,11 +6,9 @@
 
 namespace fan
 {
-	REGISTER_COMPONENT( MeshRenderer, "mesh_renderer" );
-
 	//================================================================================================================================
 	//================================================================================================================================
-	void MeshRenderer::SetInfo( ComponentInfo& _info )
+	void MeshRenderer::SetInfo( EcsComponentInfo& _info )
 	{
 		_info.icon = ImGui::IconType::MESH_RENDERER16;
 		_info.onGui = &MeshRenderer::OnGui;
@@ -18,11 +16,12 @@ namespace fan
 		_info.load = &MeshRenderer::Load;
 		_info.save = &MeshRenderer::Save;
 		_info.editorPath = "/";
+		_info.name = "mesh renderer";
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void MeshRenderer::Init( EcsWorld& _world, Component& _component )
+	void MeshRenderer::Init( EcsWorld& _world, EcsComponent& _component )
 	{
 		MeshRenderer& meshRenderer = static_cast<MeshRenderer&>( _component );
 		meshRenderer.mesh = nullptr;
@@ -31,7 +30,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void MeshRenderer::OnGui( EcsWorld& _world, EntityID _entityID, Component& _component )
+	void MeshRenderer::OnGui( EcsWorld& _world, EcsEntity _entityID, EcsComponent& _component )
 	{
 		MeshRenderer& meshRenderer = static_cast<MeshRenderer&>( _component );
 		ImGui::FanMeshPtr( "mesh", meshRenderer.mesh );
@@ -46,7 +45,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void MeshRenderer::Save( const Component& _component, Json& _json )
+	void MeshRenderer::Save( const EcsComponent& _component, Json& _json )
 	{
 		const MeshRenderer& meshRenderer = static_cast<const MeshRenderer&>( _component );
 		Serializable::SaveMeshPtr( _json, "path", meshRenderer.mesh );
@@ -54,7 +53,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void MeshRenderer::Load( Component& _component, const Json& _json )
+	void MeshRenderer::Load( EcsComponent& _component, const Json& _json )
 	{
 		MeshRenderer& meshRenderer = static_cast<MeshRenderer&>( _component );
 		Serializable::LoadMeshPtr( _json, "path", meshRenderer.mesh );

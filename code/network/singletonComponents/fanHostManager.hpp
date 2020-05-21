@@ -1,6 +1,6 @@
 #pragma once
 
-#include "ecs/fanSingletonComponent.hpp"
+#include "ecs/fanEcsSingleton.hpp"
 #include "network/fanPacket.hpp"
 
 namespace fan
@@ -10,13 +10,13 @@ namespace fan
 	//================================================================================================================================
 	// [SERVER] Manages host creation/destruction & holds references to the hosts data
 	//================================================================================================================================	
-	struct HostManager : public SingletonComponent
+	struct HostManager : public EcsSingleton
 	{
-		DECLARE_SINGLETON_COMPONENT()
+		ECS_SINGLETON( HostManager )
 	public:
-		static void SetInfo( SingletonComponentInfo& _info );
-		static void Init( EcsWorld& _world, SingletonComponent& _component );
-		static void OnGui( EcsWorld&, SingletonComponent& _component );
+		static void SetInfo( EcsSingletonInfo& _info );
+		static void Init( EcsWorld& _world, EcsSingleton& _component );
+		static void OnGui( EcsWorld&, EcsSingleton& _component );
 
 		//================================================================
 		// Hold an ip & port + defines some operators for storing in a unordered_map
@@ -35,11 +35,11 @@ namespace fan
 			}
 		};
 
-		std::unordered_map < IPPort, EntityHandle, IPPort > hostHandles;  // links host ip-port to its entity handle
+		std::unordered_map < IPPort, EcsHandle, IPPort > hostHandles;  // links host ip-port to its entity handle
 		SceneNode*			netRoot;									  // host entity nodes are placed below the net root node
 
-		EntityHandle CreateHost( const IpAddress _ip, const Port _port );
-		void		 DeleteHost( const EntityHandle _hostHandle );
-		EntityHandle FindHost( const IpAddress _ip, const Port _port );
+		EcsHandle CreateHost( const IpAddress _ip, const Port _port );
+		void		 DeleteHost( const EcsHandle _hostHandle );
+		EcsHandle FindHost( const IpAddress _ip, const Port _port );
 	};
 }

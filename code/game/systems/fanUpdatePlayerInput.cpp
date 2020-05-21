@@ -18,27 +18,27 @@ namespace fan
 {
 	//================================================================================================================================
 	//================================================================================================================================
-	Signature S_RefreshPlayerInput::GetSignature( const EcsWorld& _world )
+	EcsSignature S_RefreshPlayerInput::GetSignature( const EcsWorld& _world )
 	{
 		return	_world.GetSignature<PlayerInput>() | _world.GetSignature<Transform>() | _world.GetSignature<PlayerController>();
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void S_RefreshPlayerInput::Run( EcsWorld& _world, const std::vector<EntityID>& _entities, const float _delta )
+	void S_RefreshPlayerInput::Run( EcsWorld& _world, const std::vector<EcsEntity>& _entities, const float _delta )
 	{
 		if( _delta == 0.f ) { return; }
 
-		const Scene& scene = _world.GetSingletonComponent<Scene>();
-		const EntityID cameraID = _world.GetEntityID( scene.mainCamera->handle );
+		const Scene& scene = _world.GetSingleton<Scene>();
+		const EcsEntity cameraID = _world.GetEntity( scene.mainCamera->handle );
 		const Transform& cameraTransform = _world.GetComponent<Transform>( cameraID );
 		const Camera& camera = _world.GetComponent<Camera>( cameraID );
 
-		for( EntityID entityID : _entities )
+		for( EcsEntity entity : _entities )
 		{
-			const Transform& transform = _world.GetComponent<Transform>( entityID );
-			PlayerInput& input = _world.GetComponent<PlayerInput>( entityID );
-			PlayerController& controller = _world.GetComponent<PlayerController>( entityID );
+			const Transform& transform = _world.GetComponent<Transform>( entity );
+			PlayerInput& input = _world.GetComponent<PlayerInput>( entity );
+			PlayerController& controller = _world.GetComponent<PlayerController>( entity );
 
 			input.left =	Input::Get().Manager().GetAxis( "game_left" );
 			input.forward = Input::Get().Manager().GetAxis( "game_forward" );

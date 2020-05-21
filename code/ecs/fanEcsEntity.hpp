@@ -1,14 +1,10 @@
 #pragma once
 
-#include <cstdint>
+#include "ecs/fanEcsTypes.hpp"
 
 namespace fan
 {
 	class EcsArchetype;
-
-	//================================
-	//================================
-	using EcsHandle = uint32_t;
 
 	//================================
 	// Allows indexing of individual entities

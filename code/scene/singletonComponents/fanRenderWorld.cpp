@@ -6,7 +6,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void RenderWorld::SetInfo( SingletonComponentInfo& _info )
+	void RenderWorld::SetInfo( EcsSingletonInfo& _info )
 	{
 		_info.icon = ImGui::RENDERER16;
 		_info.init = &RenderWorld::Init;
@@ -16,7 +16,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void RenderWorld::Init( EcsWorld& _world, SingletonComponent& _component )
+	void RenderWorld::Init( EcsWorld& _world, EcsSingleton& _component )
 	{
 		RenderWorld& renderWorld = static_cast<RenderWorld&>( _component );
 		renderWorld.drawData.clear();
@@ -35,7 +35,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void RenderWorld::OnGui( EcsWorld&, SingletonComponent& _component )
+	void RenderWorld::OnGui( EcsWorld&, EcsSingleton& _component )
 	{
 		RenderWorld& renderWorld = static_cast<RenderWorld&>( _component );
 

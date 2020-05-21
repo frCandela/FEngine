@@ -8,7 +8,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void LinkingContext::SetInfo( SingletonComponentInfo& _info )
+	void LinkingContext::SetInfo( EcsSingletonInfo& _info )
 	{
 		_info.icon = ImGui::NETWORK16;
 		_info.init = &LinkingContext::Init;
@@ -18,36 +18,36 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void LinkingContext::Init( EcsWorld& _world, SingletonComponent& _component )
+	void LinkingContext::Init( EcsWorld& _world, EcsSingleton& _component )
 	{
 		LinkingContext& linkingContext = static_cast<LinkingContext&>( _component );
-		linkingContext.netIDToEntityHandle.clear();
-		linkingContext.entityHandleToNetID.clear();
+		linkingContext.netIDToEcsHandle.clear();
+		linkingContext.EcsHandleToNetID.clear();
 		linkingContext.nextNetID = 1;
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void LinkingContext::AddEntity( const EntityHandle _entityHandle, const NetID _netID )
+	void LinkingContext::AddEntity( const EcsHandle _handle, const NetID _netID )
 	{
-		assert( entityHandleToNetID.find( _entityHandle ) == entityHandleToNetID.end() );
-		assert( netIDToEntityHandle.find( _netID ) == netIDToEntityHandle.end() );		
-		netIDToEntityHandle[_netID] = _entityHandle;
-		entityHandleToNetID[_entityHandle] = _netID;
+		assert( EcsHandleToNetID.find( _handle ) == EcsHandleToNetID.end() );
+		assert( netIDToEcsHandle.find( _netID ) == netIDToEcsHandle.end() );		
+		netIDToEcsHandle[_netID] = _handle;
+		EcsHandleToNetID[_handle] = _netID;
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void LinkingContext::RemoveEntity( const EntityHandle _entityHandle )
+	void LinkingContext::RemoveEntity( const EcsHandle _handle )
 	{
-		const NetID netID = entityHandleToNetID[ _entityHandle ];
-		netIDToEntityHandle.erase( netID );
-		entityHandleToNetID.erase( _entityHandle );
+		const NetID netID = EcsHandleToNetID[ _handle ];
+		netIDToEcsHandle.erase( netID );
+		EcsHandleToNetID.erase( _handle );
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void LinkingContext::OnGui( EcsWorld&, SingletonComponent& _component )
+	void LinkingContext::OnGui( EcsWorld&, EcsSingleton& _component )
 	{
 		LinkingContext& linkingContext = static_cast<LinkingContext&>( _component );
 
@@ -56,7 +56,7 @@ namespace fan
 
 		ImGui::Text( "net ID" );		ImGui::NextColumn();
 		ImGui::Text( "entity handle" ); ImGui::NextColumn();
-		for( std::pair<NetID, EntityHandle> pair : linkingContext.netIDToEntityHandle )
+		for( std::pair<NetID, EcsHandle> pair : linkingContext.netIDToEcsHandle )
 		{
 			ImGui::Text( "%d", pair.first );
 			ImGui::NextColumn();

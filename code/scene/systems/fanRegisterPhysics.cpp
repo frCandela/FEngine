@@ -14,45 +14,45 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	Signature S_RegisterAllRigidbodies::GetSignature( const EcsWorld& _world )
+	EcsSignature S_RegisterAllRigidbodies::GetSignature( const EcsWorld& _world )
 	{
 		return _world.GetSignature<Rigidbody>();
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void S_RegisterAllRigidbodies::Run( EcsWorld& _world, const std::vector<EntityID>& _entities )
+	void S_RegisterAllRigidbodies::Run( EcsWorld& _world, const std::vector<EcsEntity>& _entities )
 	{
-		PhysicsWorld& physicsWorld = _world.GetSingletonComponent<PhysicsWorld>();
-		for( EntityID entityID : _entities )
+		PhysicsWorld& physicsWorld = _world.GetSingleton<PhysicsWorld>();
+		for( EcsEntity entity : _entities )
 		{
-			Rigidbody& rb = _world.GetComponent<Rigidbody>( entityID );
+			Rigidbody& rb = _world.GetComponent<Rigidbody>( entity );
 
 			// find a collision shape
 			btCollisionShape* shape = nullptr;
-			if( _world.HasComponent<SphereShape>( entityID ) )
+			if( _world.HasComponent<SphereShape>( entity ) )
 			{
-				shape = &_world.GetComponent<SphereShape>( entityID ).sphereShape;
+				shape = &_world.GetComponent<SphereShape>( entity ).sphereShape;
 			}
-			else if( _world.HasComponent<BoxShape>( entityID ) )
+			else if( _world.HasComponent<BoxShape>( entity ) )
 			{
-				shape = &_world.GetComponent<BoxShape>( entityID ).boxShape;
+				shape = &_world.GetComponent<BoxShape>( entity ).boxShape;
 			}
 
 			// find a motion state
 			btDefaultMotionState* motionState = nullptr;
-			if( _world.HasComponent<MotionState>( entityID ) )
+			if( _world.HasComponent<MotionState>( entity ) )
 			{
-				motionState = &_world.GetComponent<MotionState>( entityID ).motionState;
+				motionState = &_world.GetComponent<MotionState>( entity ).motionState;
 			}
 
 			// reset the rigidbody				
 			rb.SetMotionState( motionState );
 			rb.SetCollisionShape( shape );
 
-			if( _world.HasComponent<SceneNode>( entityID ) )
+			if( _world.HasComponent<SceneNode>( entity ) )
 			{
-				SceneNode& sceneNode = _world.GetComponent<SceneNode>( entityID );
+				SceneNode& sceneNode = _world.GetComponent<SceneNode>( entity );
 				physicsWorld.AddRigidbody( rb, sceneNode.handle );
 			}
 			else
@@ -65,19 +65,19 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	Signature S_UnregisterAllRigidbodies::GetSignature( const EcsWorld& _world )
+	EcsSignature S_UnregisterAllRigidbodies::GetSignature( const EcsWorld& _world )
 	{
 		return _world.GetSignature<Rigidbody>();
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void S_UnregisterAllRigidbodies::Run( EcsWorld& _world, const std::vector<EntityID>& _entities )
+	void S_UnregisterAllRigidbodies::Run( EcsWorld& _world, const std::vector<EcsEntity>& _entities )
 	{
-		PhysicsWorld& physicsWorld = _world.GetSingletonComponent<PhysicsWorld>();
-		for( EntityID entityID : _entities )
+		PhysicsWorld& physicsWorld = _world.GetSingleton<PhysicsWorld>();
+		for( EcsEntity entity : _entities )
 		{
-			Rigidbody& rigidbody = _world.GetComponent<Rigidbody>( entityID );
+			Rigidbody& rigidbody = _world.GetComponent<Rigidbody>( entity );
 			physicsWorld.RemoveRigidbody( rigidbody );
 		}
 	}

@@ -7,11 +7,9 @@
 
 namespace fan
 {
-	REGISTER_COMPONENT( FollowTransform, "follow_transform" );
-
 	//================================================================================================================================
 	//================================================================================================================================
-	void FollowTransform::SetInfo( ComponentInfo& _info )
+	void FollowTransform::SetInfo( EcsComponentInfo& _info )
 	{
 		_info.icon = ImGui::IconType::TRANSFORM16;
 		_info.init = &FollowTransform::Init;
@@ -19,11 +17,12 @@ namespace fan
 		_info.save = &FollowTransform::Save;
 		_info.load = &FollowTransform::Load;
 		_info.editorPath = "/";
+		_info.name = "follow transform";
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void FollowTransform::Init( EcsWorld& _world, Component& _component )
+	void FollowTransform::Init( EcsWorld& _world, EcsComponent& _component )
 	{
 		// clear
 		FollowTransform& followTransform = static_cast<FollowTransform&>( _component );
@@ -35,7 +34,7 @@ namespace fan
 	//================================================================================================================================
 	// calculates the new local transform from the follower & target transforms
 	//================================================================================================================================
-	void FollowTransform::UpdateLocalTransform( EcsWorld& _world, EntityID _entityID )
+	void FollowTransform::UpdateLocalTransform( EcsWorld& _world, EcsEntity _entityID )
 	{
 		assert( _world.HasComponent<FollowTransform>( _entityID ) );
 
@@ -55,7 +54,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void FollowTransform::OnGui( EcsWorld& _world, EntityID _entityID, Component& _component )
+	void FollowTransform::OnGui( EcsWorld& _world, EcsEntity _entityID, EcsComponent& _component )
 	{
 		FollowTransform& followTransform = static_cast<FollowTransform&>( _component );
 		if( ImGui::FanComponent<Transform>( "target transform", followTransform.targetTransform ) )
@@ -88,7 +87,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void FollowTransform::Save( const Component& _component, Json& _json )
+	void FollowTransform::Save( const EcsComponent& _component, Json& _json )
 	{
 		const FollowTransform& followTransform = static_cast<const FollowTransform&>( _component );
 		Serializable::SaveComponentPtr( _json, "target_transform", followTransform.targetTransform );
@@ -98,7 +97,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void FollowTransform::Load( Component& _component, const Json& _json )
+	void FollowTransform::Load( EcsComponent& _component, const Json& _json )
 	{
 		FollowTransform& followTransform = static_cast<FollowTransform&>( _component );
 		Serializable::LoadComponentPtr( _json, "target_transform", followTransform.targetTransform );

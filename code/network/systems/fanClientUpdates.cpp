@@ -17,7 +17,7 @@ namespace fan
 {
 	//================================================================================================================================
 	//================================================================================================================================
-	Signature S_ClientSpawnSpaceship::GetSignature( const EcsWorld& _world )
+	EcsSignature S_ClientSpawnSpaceship::GetSignature( const EcsWorld& _world )
 	{
 		return
 			_world.GetSignature<ClientConnection>() |
@@ -27,16 +27,16 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void S_ClientSpawnSpaceship::Run( EcsWorld& _world, const std::vector<EntityID>& _entities, const float _delta )
+	void S_ClientSpawnSpaceship::Run( EcsWorld& _world, const std::vector<EcsEntity>& _entities, const float _delta )
 	{
 		if( _delta == 0.f ) { return; }
 
-		LinkingContext& linkingContext = _world.GetSingletonComponent<LinkingContext>();
-		const Game& game = _world.GetSingletonComponent<Game>();
+		LinkingContext& linkingContext = _world.GetSingleton<LinkingContext>();
+		const Game& game = _world.GetSingleton<Game>();
 
-		for( EntityID entityID : _entities )
+		for( EcsEntity entity : _entities )
 		{			
-			ClientGameData& gameData = _world.GetComponent<ClientGameData>( entityID );
+			ClientGameData& gameData = _world.GetComponent<ClientGameData>( entity );
 
 			// spawns spaceship
 			if( gameData.spaceshipSpawnFrameIndex != 0 
@@ -49,7 +49,7 @@ namespace fan
 				gameData.spaceshipHandle = Game::SpawnSpaceship( _world );
 				linkingContext.AddEntity( gameData.spaceshipHandle, gameData.spaceshipNetID );
 
-				const EntityID spaceshipID = _world.GetEntityID( gameData.spaceshipHandle );
+				const EcsEntity spaceshipID = _world.GetEntity( gameData.spaceshipHandle );
 				if( gameData.spaceshipHandle != 0 )
 				{
 					_world.AddComponent<PlayerController>( spaceshipID );
@@ -60,26 +60,26 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	Signature S_ClientSaveState::GetSignature( const EcsWorld& _world )
+	EcsSignature S_ClientSaveState::GetSignature( const EcsWorld& _world )
 	{
 		return _world.GetSignature<ClientGameData>();
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void S_ClientSaveState::Run( EcsWorld& _world, const std::vector<EntityID>& _entities, const float _delta )
+	void S_ClientSaveState::Run( EcsWorld& _world, const std::vector<EcsEntity>& _entities, const float _delta )
 	{
 		if( _delta == 0.f ) { return; }
 
-		const Game& game = _world.GetSingletonComponent<Game>();
+		const Game& game = _world.GetSingleton<Game>();
 
-		for( EntityID entityID : _entities )
+		for( EcsEntity entity : _entities )
 		{
-			ClientGameData& gameData = _world.GetComponent<ClientGameData>( entityID );
+			ClientGameData& gameData = _world.GetComponent<ClientGameData>( entity );
 
 			if( gameData.spaceshipHandle != 0 && gameData.frameSynced )
 			{
-				const EntityID spaceshipID = _world.GetEntityID( gameData.spaceshipHandle );
+				const EcsEntity spaceshipID = _world.GetEntity( gameData.spaceshipHandle );
 
 				// saves previous player state
 				const Rigidbody& rb = _world.GetComponent<Rigidbody>( spaceshipID );
@@ -99,31 +99,31 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	Signature S_ClientRunReplication::GetSignature( const EcsWorld& _world )
+	EcsSignature S_ClientRunReplication::GetSignature( const EcsWorld& _world )
 	{
 		return _world.GetSignature<ClientReplication>() | _world.GetSignature<ClientRPC>();
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void S_ClientRunReplication::Run( EcsWorld& _world, const std::vector<EntityID>& _entities, const float _delta )
+	void S_ClientRunReplication::Run( EcsWorld& _world, const std::vector<EcsEntity>& _entities, const float _delta )
 	{
 		if( _delta == 0.f ) { return; }
 
-		LinkingContext& linkingContext = _world.GetSingletonComponent<LinkingContext>();
+		LinkingContext& linkingContext = _world.GetSingleton<LinkingContext>();
 
-		for( EntityID entityID : _entities )
+		for( EcsEntity entity : _entities )
 		{
-			ClientReplication&	replication = _world.GetComponent<ClientReplication>( entityID );
-			ClientRPC&			rpc			= _world.GetComponent<ClientRPC>( entityID );
+			ClientReplication&	replication = _world.GetComponent<ClientReplication>( entity );
+			ClientRPC&			rpc			= _world.GetComponent<ClientRPC>( entity );
 
 			// replicate singletons components
 			for( PacketReplication packet : replication.replicationListSingletons )
 			{
 				sf::Uint32 staticIndex;
 				packet.packetData >> staticIndex;
-				SingletonComponent& singleton = _world.GetSingletonComponent( staticIndex );
-				const SingletonComponentInfo& info = _world.GetSingletonComponentInfo( staticIndex );
+				SingletonComponent& singleton = _world.GetSingleton( staticIndex );
+				const EcsSingletonInfo& info = _world.GetSingletonEcsComponentInfo( staticIndex );
 				info.netLoad( singleton, packet.packetData );
 				assert( packet.packetData.endOfPacket() );
 			}
@@ -138,19 +138,19 @@ namespace fan
 				packet.packetData >> netID;
 				packet.packetData >> numComponents;
 
-				auto it = linkingContext.netIDToEntityHandle.find( netID );
-				if( it != linkingContext.netIDToEntityHandle.end() )
+				auto it = linkingContext.netIDToEcsHandle.find( netID );
+				if( it != linkingContext.netIDToEcsHandle.end() )
 				{
-					const EntityHandle replicatedHandle = it->second;
-					const EntityID replicatedID = _world.GetEntityID( replicatedHandle );
+					const EcsHandle replicatedHandle = it->second;
+					const EcsEntity replicatedID = _world.GetEntity( replicatedHandle );
 
 					for( int i = 0; i < numComponents; i++ )
 					{
 						sf::Uint32 staticIndex;
 						packet.packetData >> staticIndex;
-						const ComponentIndex dynamicIndex = _world.GetDynamicIndex( staticIndex );
-						const ComponentInfo& info = _world.GetComponentInfo( dynamicIndex );
-						Component& component = _world.GetComponent( replicatedID, dynamicIndex );
+						const int dynamicIndex = _world.GetIndex( staticIndex );
+						const EcsComponentInfo& info = _world.GetComponentInfo( dynamicIndex );
+						EcsComponent& component = _world.GetComponent( replicatedID, dynamicIndex );
 						info.netLoad( component, packet.packetData );
 					}
 				}
@@ -168,20 +168,20 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	Signature S_ClientDetectServerTimeout::GetSignature( const EcsWorld& _world )
+	EcsSignature S_ClientDetectServerTimeout::GetSignature( const EcsWorld& _world )
 	{
 		return _world.GetSignature<ClientConnection>();
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void S_ClientDetectServerTimeout::Run( EcsWorld& _world, const std::vector<EntityID>& _entities, const float _delta )
+	void S_ClientDetectServerTimeout::Run( EcsWorld& _world, const std::vector<EcsEntity>& _entities, const float _delta )
 	{
 		if( _delta == 0.f ) { return; }
 
-		for( EntityID entityID : _entities )
+		for( EcsEntity entity : _entities )
 		{
-			ClientConnection& connection = _world.GetComponent<ClientConnection>( entityID );
+			ClientConnection& connection = _world.GetComponent<ClientConnection>( entity );
 			
 			if( connection.state == ClientConnection::ClientState::Connected )
 			{
@@ -201,26 +201,26 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	Signature S_ClientSaveInput::GetSignature( const EcsWorld& _world )
+	EcsSignature S_ClientSaveInput::GetSignature( const EcsWorld& _world )
 	{
 		return _world.GetSignature<ClientGameData>();
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void S_ClientSaveInput::Run( EcsWorld& _world, const std::vector<EntityID>& _entities, const float _delta )
+	void S_ClientSaveInput::Run( EcsWorld& _world, const std::vector<EcsEntity>& _entities, const float _delta )
 	{
 		if( _delta == 0.f ) { return; }
 
-		const Game& game = _world.GetSingletonComponent<Game>();
+		const Game& game = _world.GetSingleton<Game>();
 
-		for( EntityID entityID : _entities )
+		for( EcsEntity entity : _entities )
 		{
-			ClientGameData& gameData = _world.GetComponent<ClientGameData>( entityID );
+			ClientGameData& gameData = _world.GetComponent<ClientGameData>( entity );
 
 			if( gameData.spaceshipHandle != 0 && gameData.frameSynced )
 			{
-				const EntityID spaceshipID = _world.GetEntityID( gameData.spaceshipHandle );
+				const EcsEntity spaceshipID = _world.GetEntity( gameData.spaceshipHandle );
 				const PlayerInput& input = _world.GetComponent<PlayerInput>( spaceshipID );
 
 				// streams input to the server

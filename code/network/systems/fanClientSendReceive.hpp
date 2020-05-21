@@ -1,4 +1,4 @@
-#include "ecs/fanSystem.hpp"
+#include "ecs/fanEcsSystem.hpp"
 
 namespace fan
 {
@@ -7,18 +7,18 @@ namespace fan
 	//==============================================================================================================================================================
 	// Sends packet for each client connection
 	//==============================================================================================================================================================
-	struct S_ClientSend : System
+	struct S_ClientSend : EcsSystem
 	{
-		static Signature GetSignature( const EcsWorld& _world );
-		static void Run( EcsWorld& _world, const std::vector<EntityID>& _entities, const float _delta );
+		staticEcsSignatureGetSignature( const EcsWorld& _world );
+		static void Run( EcsWorld& _world, const std::vector<EcsEntity>& _entities, const float _delta );
 	};
 
 	//==============================================================================================================================================================
 	// Receives packets for each client connection
 	//==============================================================================================================================================================
-	struct S_ClientReceive : System
+	struct S_ClientReceive : EcsSystem
 	{
-		static Signature GetSignature( const EcsWorld& _world );
-		static void Run( EcsWorld& _world, const std::vector<EntityID>& _entities, const float _delta );
+		staticEcsSignatureGetSignature( const EcsWorld& _world );
+		static void Run( EcsWorld& _world, const std::vector<EcsEntity>& _entities, const float _delta );
 	};
 }

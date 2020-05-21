@@ -6,8 +6,6 @@
 #include "game/fanGameClient.hpp"
 #include "game/fanGameServer.hpp"
 
-#include "ecs/fanEcsTest.hpp"
-
 namespace fan
 {
 	class EditorGameWindowCallbacks;
@@ -68,8 +66,6 @@ namespace fan
 		EcsWorld& m_gameWorld;		
 		Renderer* m_renderer;
 		Window*   m_window;
-
-		EcsWorld2 m_world2;
 
 		const LaunchSettings m_launchSettings;
 

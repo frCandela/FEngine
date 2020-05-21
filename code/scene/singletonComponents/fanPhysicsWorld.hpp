@@ -1,6 +1,6 @@
 #pragma once
 
-#include "ecs/fanSingletonComponent.hpp"
+#include "ecs/fanEcsSingleton.hpp"
 #include "bullet/btBulletDynamicsCommon.h"
 
 namespace fan
@@ -12,15 +12,15 @@ namespace fan
 	// allows registering of rigidbodies and quick rigidbodies access through handles
 	// triggers collision callbacks
 	//================================================================================================================================
-	struct PhysicsWorld : public SingletonComponent
+	struct PhysicsWorld : public EcsSingleton
 	{
-		DECLARE_SINGLETON_COMPONENT()
+		ECS_SINGLETON( PhysicsWorld )
 	public:
-		static void SetInfo( SingletonComponentInfo& _info );
-		static void Init( EcsWorld& _world, SingletonComponent& _component );
-		static void OnGui( EcsWorld&, SingletonComponent& _component );
-		static void Save( const SingletonComponent& _component, Json& _json );
-		static void Load( SingletonComponent& _component, const Json& _json );
+		static void SetInfo( EcsSingletonInfo& _info );
+		static void Init( EcsWorld& _world, EcsSingleton& _component );
+		static void OnGui( EcsWorld&, EcsSingleton& _component );
+		static void Save( const EcsSingleton& _component, Json& _json );
+		static void Load( EcsSingleton& _component, const Json& _json );
 
 		PhysicsWorld();
 		~PhysicsWorld();
@@ -30,9 +30,9 @@ namespace fan
 		btDbvtBroadphase*					 overlappingPairCache;
 		btSequentialImpulseConstraintSolver* solver;
 		btDiscreteDynamicsWorld*			 dynamicsWorld;
-		std::unordered_map< Rigidbody*, EntityHandle > rigidbodiesHandles;
+		std::unordered_map< Rigidbody*, EcsHandle > rigidbodiesHandles;
 
-		void AddRigidbody( Rigidbody& _rigidbody, EntityHandle _entityID );
+		void AddRigidbody( Rigidbody& _rigidbody, EcsHandle _entityID );
 		void RemoveRigidbody( Rigidbody& _rigidbody );
 		void Reset();
 

@@ -5,11 +5,9 @@
 
 namespace fan
 {
-	REGISTER_COMPONENT( DirectionalLight, "directional_light" );
-
 	//================================================================================================================================
 	//================================================================================================================================
-	void DirectionalLight::SetInfo( ComponentInfo& _info )
+	void DirectionalLight::SetInfo( EcsComponentInfo& _info )
 	{
 		_info.icon = ImGui::IconType::DIR_LIGHT16;
 		_info.onGui = &DirectionalLight::OnGui;
@@ -17,11 +15,12 @@ namespace fan
 		_info.load = &DirectionalLight::Load;
 		_info.save = &DirectionalLight::Save;
 		_info.editorPath = "lights/";
+		_info.name = "directional light";
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void DirectionalLight::Init( EcsWorld& _world, Component& _component )
+	void DirectionalLight::Init( EcsWorld& _world, EcsComponent& _component )
 	{
 		DirectionalLight& light = static_cast<DirectionalLight&>( _component );
 		light.ambiant = Color( 0.1f, 0.1f, 0.1f );
@@ -31,7 +30,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void DirectionalLight::OnGui( EcsWorld& _world, EntityID _entityID, Component& _component )
+	void DirectionalLight::OnGui( EcsWorld& _world, EcsEntity _entityID, EcsComponent& _component )
 	{
 		DirectionalLight& light = static_cast<DirectionalLight&>( _component );
 
@@ -68,7 +67,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void DirectionalLight::Save( const Component& _component, Json& _json )
+	void DirectionalLight::Save( const EcsComponent& _component, Json& _json )
 	{
 		const DirectionalLight& light = static_cast<const DirectionalLight&>( _component );
 		Serializable::SaveColor( _json, "ambiant", light.ambiant );
@@ -78,7 +77,7 @@ namespace fan
 	
 	//================================================================================================================================
 	//================================================================================================================================
-	void DirectionalLight::Load( Component& _component, const Json& _json )
+	void DirectionalLight::Load( EcsComponent& _component, const Json& _json )
 	{
 		DirectionalLight& light = static_cast<DirectionalLight&>( _component );
 		Serializable::LoadColor( _json, "ambiant", light.ambiant );

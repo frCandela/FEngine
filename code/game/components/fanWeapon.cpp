@@ -5,11 +5,9 @@
 
 namespace fan
 {
-	REGISTER_COMPONENT( Weapon, "weapon" );
-
 	//================================================================================================================================
 	//================================================================================================================================
-	void Weapon::SetInfo( ComponentInfo& _info )
+	void Weapon::SetInfo( EcsComponentInfo& _info )
 	{
 		_info.icon = ImGui::IconType::JOYSTICK16;
 		_info.onGui = &Weapon::OnGui;
@@ -17,11 +15,12 @@ namespace fan
 		_info.load = &Weapon::Load;
 		_info.save = &Weapon::Save;
 		_info.editorPath = "game/";
+		_info.name = "weapon";
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void Weapon::Init( EcsWorld& _world, Component& _component )
+	void Weapon::Init( EcsWorld& _world, EcsComponent& _component )
 	{
 		Weapon& weapon = static_cast<Weapon&>( _component );
 
@@ -39,7 +38,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void Weapon::OnGui( EcsWorld& _world, EntityID _entityID, Component& _component )
+	void Weapon::OnGui( EcsWorld& _world, EcsEntity _entityID, EcsComponent& _component )
 	{
 		Weapon& weapon = static_cast<Weapon&>( _component );
 
@@ -56,7 +55,7 @@ namespace fan
 	
 	//================================================================================================================================
 	//================================================================================================================================
-	void Weapon::Save( const Component& _component, Json& _json )
+	void Weapon::Save( const EcsComponent& _component, Json& _json )
 	{
 		const Weapon& weapon = static_cast<const Weapon&>( _component );
 
@@ -69,7 +68,7 @@ namespace fan
 	
 	//================================================================================================================================
 	//================================================================================================================================
-	void Weapon::Load( Component& _component, const Json& _json )
+	void Weapon::Load( EcsComponent& _component, const Json& _json )
 	{
 		Weapon& weapon = static_cast<Weapon&>( _component );
 

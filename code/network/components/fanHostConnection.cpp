@@ -7,20 +7,19 @@
 
 namespace fan
 {
-	REGISTER_COMPONENT( HostConnection, "host connection" );
-
 	//================================================================================================================================
 	//================================================================================================================================
-	void HostConnection::SetInfo( ComponentInfo& _info )
+	void HostConnection::SetInfo( EcsComponentInfo& _info )
 	{
 		_info.icon = ImGui::IconType::NETWORK16;
 		_info.onGui = &HostConnection::OnGui;
 		_info.init = &HostConnection::Init;
+		_info.name = "host connection";
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void HostConnection::Init( EcsWorld& _world, Component& _component )
+	void HostConnection::Init( EcsWorld& _world, EcsComponent& _component )
 	{
 		HostConnection& hostConnection = static_cast<HostConnection&>( _component );
 		hostConnection.ip = sf::IpAddress();
@@ -49,7 +48,7 @@ namespace fan
 	//================================================================================================================================
 	void HostConnection::Write( EcsWorld& _world, Packet& _packet )
 	{
- 		const Game& game = _world.GetSingletonComponent<Game>();
+ 		const Game& game = _world.GetSingleton<Game>();
 
 		// Send login packet
 		if( state == HostConnection::NeedingApprouval )
@@ -178,7 +177,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void HostConnection::OnGui( EcsWorld& _world, EntityID _entityID, Component& _component )
+	void HostConnection::OnGui( EcsWorld& _world, EcsEntity _entityID, EcsComponent& _component )
 	{
 		HostConnection& hostConnection = static_cast<HostConnection&>( _component );
 		const double currentTime = Time::Get().ElapsedSinceStartup();

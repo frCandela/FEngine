@@ -1,4 +1,4 @@
-#include "ecs/fanSystem.hpp"
+#include "ecs/fanEcsSystem.hpp"
 
 namespace fan
 {
@@ -7,27 +7,27 @@ namespace fan
 	//==============================================================================================================================================================
 	// moves the spaceships
 	//==============================================================================================================================================================
-	struct S_MoveSpaceships : System
+	struct S_MoveSpaceships : EcsSystem
 	{
-		static Signature GetSignature( const EcsWorld& _world );
-		static void Run( EcsWorld& _world, const std::vector<EntityID>& _entities, const float _delta );
+		staticEcsSignatureGetSignature( const EcsWorld& _world );
+		static void Run( EcsWorld& _world, const std::vector<EcsEntity>& _entities, const float _delta );
 	};
 
 	//==============================================================================================================================================================
 	// Deals damage to the health entities that are in the sunlight when the sun is bursting
 	//==============================================================================================================================================================
-	struct S_EruptionDamage : System
+	struct S_EruptionDamage : EcsSystem
 	{
-		static Signature GetSignature( const EcsWorld& _world );
-		static void Run( EcsWorld& _world, const std::vector<EntityID>& _entities, const float _delta );
+		staticEcsSignatureGetSignature( const EcsWorld& _world );
+		static void Run( EcsWorld& _world, const std::vector<EcsEntity>& _entities, const float _delta );
 	};
 
 	//==============================================================================================================================================================
 	// checks if any player is death and makes an explosion
 	//==============================================================================================================================================================
-	struct S_PlayerDeath : System
+	struct S_PlayerDeath : EcsSystem
 	{
-		static Signature GetSignature( const EcsWorld& _world );
-		static void Run( EcsWorld& _world, const std::vector<EntityID>& _entities, const float _delta );
+		staticEcsSignatureGetSignature( const EcsWorld& _world );
+		static void Run( EcsWorld& _world, const std::vector<EcsEntity>& _entities, const float _delta );
 	};
 }

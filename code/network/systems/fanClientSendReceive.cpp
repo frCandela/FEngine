@@ -12,7 +12,7 @@ namespace fan
 {	
 	//================================================================================================================================
 	//================================================================================================================================
-	Signature S_ClientSend::GetSignature( const EcsWorld& _world )
+	EcsSignature S_ClientSend::GetSignature( const EcsWorld& _world )
 	{
 		return
 			_world.GetSignature<ReliabilityLayer>() |
@@ -22,17 +22,17 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void S_ClientSend::Run( EcsWorld& _world, const std::vector<EntityID>& _entities, const float _delta )
+	void S_ClientSend::Run( EcsWorld& _world, const std::vector<EcsEntity>& _entities, const float _delta )
 	{
 		if( _delta == 0.f ) { return; }
 
-		Game& game = _world.GetSingletonComponent<Game>();
+		Game& game = _world.GetSingleton<Game>();
 
-		for( EntityID entityID : _entities )
+		for( EcsEntity entity : _entities )
 		{
-			ReliabilityLayer& reliabilityLayer = _world.GetComponent<ReliabilityLayer>( entityID );
-			ClientConnection& connection = _world.GetComponent<ClientConnection>( entityID );
-			ClientGameData& gameData = _world.GetComponent<ClientGameData>( entityID );
+			ReliabilityLayer& reliabilityLayer = _world.GetComponent<ReliabilityLayer>( entity );
+			ClientConnection& connection = _world.GetComponent<ClientConnection>( entity );
+			ClientGameData& gameData = _world.GetComponent<ClientGameData>( entity );
 
 			// create packet
 			Packet packet( reliabilityLayer.GetNextPacketTag() );
@@ -61,7 +61,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	Signature S_ClientReceive::GetSignature( const EcsWorld& _world )
+	EcsSignature S_ClientReceive::GetSignature( const EcsWorld& _world )
 	{
 		return
 			_world.GetSignature<ReliabilityLayer>() |
@@ -71,18 +71,18 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void S_ClientReceive::Run( EcsWorld& _world, const std::vector<EntityID>& _entities, const float _delta )
+	void S_ClientReceive::Run( EcsWorld& _world, const std::vector<EcsEntity>& _entities, const float _delta )
 	{
 		if( _delta == 0.f ) { return; }
 
-		const Game& game = _world.GetSingletonComponent<Game>();
+		const Game& game = _world.GetSingleton<Game>();
 
-		for( EntityID entityID : _entities )
+		for( EcsEntity entity : _entities )
 		{
-			ReliabilityLayer&	reliabilityLayer = _world.GetComponent<ReliabilityLayer>( entityID );
-			ClientConnection&	connection = _world.GetComponent<ClientConnection>( entityID );
-			ClientReplication&	replication = _world.GetComponent<ClientReplication>( entityID );
-			ClientGameData&		gameData = _world.GetComponent<ClientGameData>( entityID );
+			ReliabilityLayer&	reliabilityLayer = _world.GetComponent<ReliabilityLayer>( entity );
+			ClientConnection&	connection = _world.GetComponent<ClientConnection>( entity );
+			ClientReplication&	replication = _world.GetComponent<ClientReplication>( entity );
+			ClientGameData&		gameData = _world.GetComponent<ClientGameData>( entity );
 
 			// receive
 			Packet			packet;

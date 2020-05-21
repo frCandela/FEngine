@@ -1,6 +1,6 @@
 #pragma  once
 
-#include "ecs/fanComponent.hpp"
+#include "ecs/fanEcsComponent.hpp"
 #include "render/fanRenderResourcePtr.hpp"
 #include "render/fanUIMesh.hpp"
 
@@ -8,15 +8,15 @@ namespace fan
 {
 	//==============================================================================================================================================================
 	//==============================================================================================================================================================
-	struct UIRenderer : public Component
+	struct UIRenderer : public EcsComponent
 	{
-		DECLARE_COMPONENT( UIRenderer )
+		ECS_COMPONENT( UIRenderer )
 	public:
-		static void SetInfo( ComponentInfo& _info );
-		static void Init( EcsWorld& _world, Component& _component );
-		static void OnGui( EcsWorld& _world, EntityID _entityID, Component& _component );
-		static void Save( const Component& _component, Json& _json );
-		static void Load( Component& _component, const Json& _json );
+		static void SetInfo( EcsComponentInfo& _info );
+		static void Init( EcsWorld& _world, EcsComponent& _component );
+		static void OnGui( EcsWorld& _world, EcsEntity _entityID, EcsComponent& _component );
+		static void Save( const EcsComponent& _component, Json& _json );
+		static void Load( EcsComponent& _component, const Json& _json );
 
 		UIMesh		uiMesh;
 		Color		color;

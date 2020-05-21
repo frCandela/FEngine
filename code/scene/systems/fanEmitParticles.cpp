@@ -11,18 +11,18 @@ namespace fan
 {
 	//================================================================================================================================
 	//================================================================================================================================
-	Signature S_EmitParticles::GetSignature( const EcsWorld& _world )
+	EcsSignature S_EmitParticles::GetSignature( const EcsWorld& _world )
 	{
 		return	_world.GetSignature<Transform>() | _world.GetSignature<ParticleEmitter>();
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void S_EmitParticles::Run( EcsWorld& _world, const std::vector<EntityID>& _entities, const float _delta )
+	void S_EmitParticles::Run( EcsWorld& _world, const std::vector<EcsEntity>& _entities, const float _delta )
 	{
 		if( _delta == 0.f ) { return; }
 
-		for( EntityID id : _entities )
+		for( EcsEntity id : _entities )
 		{
 			const Transform& emitterTransform = _world.GetComponent<Transform>( id );
 			ParticleEmitter& emitter = _world.GetComponent<ParticleEmitter>( id );
@@ -39,7 +39,7 @@ namespace fan
 				{
 					emitter.timeAccumulator -= particleSpawnDelta;
 
-					EntityID entity = _world.CreateEntity();
+					EcsEntity entity = _world.CreateEntity();
 					Particle& particle = _world.AddComponent<Particle>( entity );
 
 					particle.speed = glm::normalize( glm::vec3( Random::FloatClip(), Random::FloatClip(), Random::FloatClip() ) );
