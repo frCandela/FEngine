@@ -3,6 +3,13 @@
 #include <memory>
 #include <cassert>
 #include "core/fanHash.hpp"
+#include "editor/fanImguiIcons.hpp"
+#include "fanJson.hpp"
+
+namespace sf
+{
+	class Packet;
+}
 
 namespace fan
 {
@@ -428,6 +435,8 @@ namespace fan
 		bool isDead = false;
 	};
 
+	struct EcsView;
+
 	//================================	
 	//================================
 	class EcsWorld2
@@ -590,7 +599,7 @@ namespace fan
 		{
 			return m_handles[ _handle ];
 		}
-		EntityHandle AddHandle( const EcsEntity _entity )
+		EcsHandle AddHandle( const EcsEntity _entity )
 		{
 			EcsEntityData& entity = _entity.archetype->m_entities[_entity.index];
 			if( entity.handle != 0 )
@@ -798,6 +807,7 @@ namespace fan
 			const EcsEntityData& entityData = GetEntityData( _entity );
 			return entityData.transitionIndex < 0 || ! m_transitions[entityData.transitionIndex].isDead;
 		}
+		EcsView Match( const EcsSignature _signature ) const;
 
 		// Const accessors
 		const std::unordered_map< EcsHandle, EcsEntity >&		 GetHandles() const				{ return m_handles;				}
@@ -861,38 +871,49 @@ namespace fan
 
 	//================================
 	//================================
-	struct EcsSystemView
+	struct EcsView
 	{
-		EcsSystemView( EcsWorld2& _world ) : m_world( _world )
+		EcsView( const EcsWorld2& _world, const EcsSignature _signature ) : 
+			m_world( _world )
+			,m_signature( _signature )
 		{}
 
-		EcsWorld2& m_world;
+		const EcsWorld2& m_world;
+		const EcsSignature m_signature;
 		std::vector<EcsArchetype*> m_archetypes;
 
 
 		//================================
 		//================================
 		template < typename _ComponentType >
-		struct Iterator
-		{
-			Iterator( const int _componentIndex, EcsSystemView& _view )
+		struct iterator
+		{			
+			iterator( EcsView& _view, const int _componentIndex )
 			{
-				m_archetypes = _view.m_archetypes;
-				m_componentIndex = _componentIndex;
-				m_archetypeIndex = 0;
-				m_chunkIndex = 0;
-				m_elementIndex = 0;
-				m_currentArchetype = m_archetypes[m_archetypeIndex];
-				m_currentChunk = &m_currentArchetype->m_chunks[_componentIndex].GetChunk( m_chunkIndex );
+				if( _componentIndex == -1 )
+				{					
+					m_archetypeIndex = int(_view.m_archetypes.size()); // end() iterator
+				}
+				else
+				{
+					assert( _view.m_signature[_componentIndex] );
+					m_archetypes = _view.m_archetypes;
+					m_componentIndex = _componentIndex;
+					m_chunkIndex = 0;
+					m_elementIndex = 0;
+					m_archetypeIndex = 0;
+					if( !m_archetypes.empty() )
+					{						
+						m_currentArchetype = m_archetypes[m_archetypeIndex];
+						m_currentChunk = &m_currentArchetype->m_chunks[_componentIndex].GetChunk( m_chunkIndex );
+					}				 
+				}				
 			}
 
-			std::vector< EcsArchetype* >	m_archetypes;
-			int							m_componentIndex;
-			uint16_t					m_archetypeIndex;
-			uint16_t					m_chunkIndex;
-			uint16_t					m_elementIndex;
-			EcsArchetype*					m_currentArchetype;
-			EcsChunk*						m_currentChunk;			
+			inline bool operator!=( const iterator& _other ) const
+			{
+				return m_archetypeIndex != _other.m_archetypeIndex;
+			}			
 
 			void operator++() // prefix ++
 			{
@@ -919,29 +940,38 @@ namespace fan
 				}
 			}
 
-			bool End()
-			{
-				return m_archetypeIndex >= m_archetypes.size();
-			}
-
 			inline _ComponentType& operator*()
 			{
 				return *static_cast<_ComponentType*>( m_currentChunk->At( m_elementIndex ) );
 			}
-		}; static constexpr size_t itSize = sizeof( Iterator<Position2> );
+
+			EcsEntity Entity() const
+			{
+				const uint32_t index = m_chunkIndex * m_currentChunk->Capacity() + m_elementIndex;
+				return { m_currentArchetype, index };
+			}
+
+		private:
+			std::vector< EcsArchetype* >	m_archetypes;
+			int								m_componentIndex;
+			uint16_t						m_archetypeIndex;
+			uint16_t						m_chunkIndex;
+			uint16_t						m_elementIndex;
+			EcsArchetype*	m_currentArchetype;
+			EcsChunk*		m_currentChunk;
+		};
 
 		template < typename _ComponentType >
-		Iterator<_ComponentType> Begin()
+		iterator<_ComponentType> begin()
 		{
 			const int index = m_world.GetIndex(_ComponentType::Info::s_type);
-			return Iterator<_ComponentType>( index, *this );
+			return iterator<_ComponentType>( *this, index );
 		}
 
 		template < typename _ComponentType >
-		void Kill( const Iterator<_ComponentType> _iterator )
+		inline iterator<_ComponentType> end()
 		{
-			const uint32_t index = _iterator.m_chunkIndex * _iterator.m_currentChunk->Capacity() + _iterator.m_elementIndex;
-			m_world.Kill( { &( *_iterator.m_currentArchetype ), index } );
+			return iterator<_ComponentType>( *this, -1 );
 		}
 	};
 }

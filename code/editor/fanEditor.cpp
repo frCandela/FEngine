@@ -457,7 +457,7 @@ namespace fan
 
 			const int indexPos   = m_world2.GetIndex(Position2::Info::s_type);
 			const int indexSpeed = m_world2.GetIndex(Speed2::Info::s_type);
-			const EcsSignature targetSignature = ( EcsSignature( 1 ) << indexPos );
+			const EcsSignature targetSignature = ( EcsSignature( 1 ) << indexPos ) | ( EcsSignature( 1 ) << indexSpeed );
 
 			if( ImGui::Button( "Init" ) ){
 				// Init 
@@ -484,22 +484,23 @@ namespace fan
 			{
 				// Test 1
 				float total1 = 0.f;
-				std::vector<EcsChunk*> match1;
-				const std::unordered_map< EcsSignature, EcsArchetype* >& archetypesRef = m_world2.GetArchetypes();
-				for( auto it = archetypesRef.begin(); it != archetypesRef.end(); ++it )
-				{
-					EcsArchetype& archetype = *it->second;
-					if( ( archetype.m_signature & targetSignature ) == targetSignature )
-					{
-						EcsChunkVector& chunks = archetype.m_chunks[indexPos];
-						for( int i = 0; i < chunks.NumChunk(); i++ )
-						{
-							match1.push_back( &chunks.GetChunk( i ) );
-						}
-					}
-				}
 				{
 					ScopedTimer timer( "Test for loop" );
+					std::vector<EcsChunk*> match1;
+					const std::unordered_map< EcsSignature, EcsArchetype* >& archetypesRef = m_world2.GetArchetypes();
+					for( auto it = archetypesRef.begin(); it != archetypesRef.end(); ++it )
+					{
+						EcsArchetype& archetype = *it->second;
+						if( ( archetype.m_signature & targetSignature ) == targetSignature )
+						{
+							EcsChunkVector& chunks = archetype.m_chunks[indexPos];
+							for( int i = 0; i < chunks.NumChunk(); i++ )
+							{
+								match1.push_back( &chunks.GetChunk( i ) );
+							}
+						}
+					}
+
 					for( EcsChunk* chunk : match1 )
 					{
 						for( int i = 0; i < chunk->Size(); i++ )
@@ -508,26 +509,25 @@ namespace fan
 							total1 += position->position[0];
 						}
 					}
-				}	
+				}
 
 				// Test 2
 				float total2 = 0.f;
-				EcsSystemView view( m_world2 );
-				for( auto it = archetypesRef.begin(); it != archetypesRef.end(); ++it )
-				{
-					if( ( it->first & targetSignature ) == targetSignature && ! it->second->Empty() )
-					{
-						view.m_archetypes.push_back(  it->second );
-					}
-				}
 				{
 					ScopedTimer timer( "Test Iterator" );
-					SingletonTest& singletonTest = m_world2.GetSingleton<SingletonTest>();
-					for( EcsSystemView::Iterator<Position2> positionIt = view.Begin<Position2>(); !positionIt.End(); ++positionIt )
+					EcsView view = m_world2.Match( targetSignature );
+					//SingletonTest& singletonTest = m_world2.GetSingleton<SingletonTest>();
+
+					EcsView::iterator<Position2> positionIt	= view.begin<Position2>();
+					//EcsView::iterator<Speed2>    speedIt = view.begin<Speed2>();
+					while( positionIt != view.end<Position2>() )
 					{
-						float value = ( *positionIt ).position[0];
-						total2 += value;
-						Debug::Log() << value << Debug::Endl();
+						float pos =		( *positionIt ).position[0];
+						//float speed =	( *speedIt ).speed[0];
+						//total2 += pos + speed;
+						total2 += pos;
+						++positionIt;
+						//++speedIt;
 					}
 				}
 
