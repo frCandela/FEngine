@@ -1,15 +1,7 @@
 #include "game/singletonComponents/fanPlayersManager.hpp"
 
-// #include "game/components/fanPlayerInput.hpp"
-// #include "game/components/fanSpaceShip.hpp"
-// #include "game/network/fanGameClient.hpp"
-// #include "core/input/fanJoystick.hpp"
-
 namespace fan
 {
-	//
-	REGISTER_SINGLETON_COMPONENT( PlayersManager );
-
 	//================================================================================================================================
 	//================================================================================================================================
 	void PlayersManager::SetInfo( EcsSingletonInfo& _info )

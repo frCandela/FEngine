@@ -23,11 +23,9 @@
 
 namespace fan
 {
-	REGISTER_SINGLETON_COMPONENT( ClientNetworkManager );
-
 	//================================================================================================================================
 	//================================================================================================================================
-	void ClientNetworkManager::SetInfo( SingletonComponentInfo& _info )
+	void ClientNetworkManager::SetInfo( EcsSingletonInfo& _info )
 	{
 		_info.icon = ImGui::NETWORK16;
 		_info.init = &ClientNetworkManager::Init;

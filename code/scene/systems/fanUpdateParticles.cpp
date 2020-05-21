@@ -25,7 +25,7 @@ namespace fan
 			particle.durationLeft -= _delta;
 			if( particle.durationLeft < 0.f )
 			{
-				_world.KillEntity( entity );
+				_world.Kill( entity );
 			}
 			particle.position += _delta * particle.speed;
 		}

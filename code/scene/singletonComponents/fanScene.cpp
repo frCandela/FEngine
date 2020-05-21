@@ -22,8 +22,6 @@
 
 namespace fan
 {
-	REGISTER_SINGLETON_COMPONENT( Scene );
-
 	//================================================================================================================================
 	//================================================================================================================================
 	void Scene::SetInfo( EcsSingletonInfo& _info )
@@ -175,7 +173,7 @@ namespace fan
 					Json& jSingleton_i = jSingletons[nextIndex++];
 					Serializable::SaveUInt( jSingleton_i, "singleton_id", info.type);
 					Serializable::SaveString( jSingleton_i, "singleton", info.name );
-					SingletonComponent& singleton = world->GetSingletonComponent( info.type);
+					EcsSingleton& singleton = world->GetSingletonComponent( info.type);
 					info.save( singleton, jSingleton_i );
 				}
 			}
@@ -336,7 +334,7 @@ namespace fan
 					const EcsSingletonInfo* info = world->SafeGetSingletonEcsComponentInfo( staticIndex );
 					if( info )
 					{
-						SingletonComponent& singleton = world->GetSingletonComponent( staticIndex );
+						EcsSingleton& singleton = world->GetSingletonComponent( staticIndex );
 						info->load( singleton, jSingleton_i );
 					}
 					else

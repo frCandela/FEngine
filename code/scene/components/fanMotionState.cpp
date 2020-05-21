@@ -12,6 +12,7 @@ namespace fan
 	{
 		_info.icon = ImGui::IconType::RIGIDBODY16;
 		_info.init = &MotionState::Init;
+		_info.destroy = &MotionState::Destroy;
 		_info.save = &MotionState::Save;
 		_info.load = &MotionState::Load;
 		_info.editorPath = "/";
@@ -24,6 +25,16 @@ namespace fan
 	{
 		// clear
 		MotionState& motionState = static_cast<MotionState&>( _component );
-		motionState.motionState = btDefaultMotionState();
+		motionState.motionState = new btDefaultMotionState();
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
+	void MotionState::Destroy( EcsWorld& _world, EcsComponent& _component )
+	{
+		MotionState& motionState = static_cast<MotionState&>( _component );
+		assert( motionState.motionState != nullptr );
+		delete motionState.motionState;
+		motionState.motionState = nullptr;
 	}
 }

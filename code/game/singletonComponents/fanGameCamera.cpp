@@ -9,8 +9,6 @@
 
 namespace fan
 {
-	REGISTER_SINGLETON_COMPONENT( GameCamera );
-
 	//================================================================================================================================
 	//================================================================================================================================
 	void GameCamera::SetInfo( EcsSingletonInfo& _info )
@@ -102,7 +100,7 @@ namespace fan
 	void GameCamera::DeleteGameCamera( EcsWorld& _world )
 	{
 		GameCamera& gameCamera = _world.GetSingleton<GameCamera>();
-		_world.KillEntity( _world.GetEntity( gameCamera.cameraNode->handle ) );
+		_world.Kill( _world.GetEntity( gameCamera.cameraNode->handle ) );
 		gameCamera.cameraNode = nullptr;
 	}
 

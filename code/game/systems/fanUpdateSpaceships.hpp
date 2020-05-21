@@ -9,7 +9,7 @@ namespace fan
 	//==============================================================================================================================================================
 	struct S_MoveSpaceships : EcsSystem
 	{
-		staticEcsSignatureGetSignature( const EcsWorld& _world );
+		static EcsSignature GetSignature( const EcsWorld& _world );
 		static void Run( EcsWorld& _world, const std::vector<EcsEntity>& _entities, const float _delta );
 	};
 
@@ -18,7 +18,7 @@ namespace fan
 	//==============================================================================================================================================================
 	struct S_EruptionDamage : EcsSystem
 	{
-		staticEcsSignatureGetSignature( const EcsWorld& _world );
+		static EcsSignature GetSignature( const EcsWorld& _world );
 		static void Run( EcsWorld& _world, const std::vector<EcsEntity>& _entities, const float _delta );
 	};
 
@@ -27,7 +27,7 @@ namespace fan
 	//==============================================================================================================================================================
 	struct S_PlayerDeath : EcsSystem
 	{
-		staticEcsSignatureGetSignature( const EcsWorld& _world );
+		static EcsSignature GetSignature( const EcsWorld& _world );
 		static void Run( EcsWorld& _world, const std::vector<EcsEntity>& _entities, const float _delta );
 	};
 }

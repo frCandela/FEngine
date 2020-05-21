@@ -11,6 +11,7 @@ namespace fan
 		_info.icon = ImGui::IconType::CUBE_SHAPE16;
 		_info.onGui = &BoxShape::OnGui;
 		_info.init = &BoxShape::Init;
+		_info.destroy = &BoxShape::Destroy;
 		_info.load  = &BoxShape::Load;
 		_info.save  = &BoxShape::Save;
 		_info.editorPath = "/";
@@ -22,8 +23,18 @@ namespace fan
 	void BoxShape::Init( EcsWorld& _world, EcsComponent& _component )
 	{
 		BoxShape& boxShape = static_cast<BoxShape&>( _component );
-		boxShape.boxShape = btBoxShape( btVector3( 0.5f, 0.5f, 0.5f ) );
-		boxShape.boxShape.setUserPointer( nullptr );
+		boxShape.boxShape = new btBoxShape( btVector3( 0.5f, 0.5f, 0.5f ) );
+		boxShape.boxShape->setUserPointer( nullptr );
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
+	void BoxShape::Destroy( EcsWorld& _world, EcsComponent& _component )
+	{
+		BoxShape& boxShape = static_cast<BoxShape&>( _component );
+		assert( boxShape.boxShape != nullptr );
+		delete boxShape.boxShape;
+		boxShape.boxShape = nullptr;
 	}
 
 	//================================================================================================================================

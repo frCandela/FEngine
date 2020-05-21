@@ -24,7 +24,7 @@ namespace fan
 		float		speed;					// speed of the particles
 		float		duration;				// lifetime of a particle in seconds
 		Color		color;
-		Signature	tagsSignature;					// tags added to the particles
+		EcsSignature	tagsSignature;					// tags added to the particles
 
 		float		timeAccumulator;
 	};

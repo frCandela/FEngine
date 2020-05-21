@@ -78,7 +78,7 @@ namespace fan
 			 {
 				 const int index = _world.GetIndex( typeInfo );
 				 const EcsComponentInfo& info = _world.GetComponentInfo( index );
-				 EcsComponent& component = _world.GetComponent( entityID, index );
+				 EcsComponent& component = _world.GetComponent( entity, index );
 				 packet.packetData << sf::Uint32( info.type);
 				 info.netSave( component, packet.packetData );
 			 }

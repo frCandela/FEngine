@@ -25,7 +25,7 @@ namespace fan
 			expiration.duration -= _delta;
 			if( expiration.duration < 0.f )
 			{
-				_world.KillEntity( entity );
+				_world.Kill( entity );
 			}
 		}
 	}

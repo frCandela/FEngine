@@ -10,7 +10,7 @@ namespace fan
 	//==============================================================================================================================================================
 	struct S_SynchronizeTransformFromMotionState : EcsSystem
 	{
-		staticEcsSignatureGetSignature( const EcsWorld& _world );
+		static EcsSignature GetSignature( const EcsWorld& _world );
 		static void Run( EcsWorld& _world, const std::vector<EcsEntity>& _entities, const float _delta );
 	};
 
@@ -20,7 +20,7 @@ namespace fan
 	//==============================================================================================================================================================
 	struct S_SynchronizeMotionStateFromTransform : EcsSystem
 	{
-		staticEcsSignatureGetSignature( const EcsWorld& _world );
+		static EcsSignature GetSignature( const EcsWorld& _world );
 		static void Run( EcsWorld& _world, const std::vector<EcsEntity>& _entities, const float _delta );
 	};
 }

@@ -15,10 +15,11 @@ namespace fan
 	public:
 		static void SetInfo( EcsComponentInfo& _info );
 		static void Init( EcsWorld& _world, EcsComponent& _component );
+		static void Destroy( EcsWorld& _world, EcsComponent& _component );
 		static void Save( const EcsComponent& _component, Json& _json ) {}
 		static void Load( EcsComponent& _component, const Json& _json ) {}
 
-		btDefaultMotionState motionState;
+		btDefaultMotionState* motionState;
 	};
 	static constexpr size_t sizeof_motionState = sizeof( MotionState );
 }

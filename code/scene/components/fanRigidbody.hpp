@@ -43,12 +43,12 @@ namespace fan
 		btVector3   GetAngularVelocity() const;
 		void		SetAngularVelocity( const btVector3& _velocity );
 		void		SetVelocity( const btVector3& _velocity );
-		void		SetTransform( const btTransform& _transform ) { rigidbody.setWorldTransform( _transform ); }
+		void		SetTransform( const btTransform& _transform ) { rigidbody->setWorldTransform( _transform ); }
 
 		void SetCollisionShape( btCollisionShape* _collisionShape );
 		void SetMotionState( btDefaultMotionState* _motionState );
 
-		btRigidBody rigidbody;
+		btRigidBody * rigidbody;
 		Signal<Rigidbody*, btPersistentManifold* const&> onContactStarted;
 		Signal<Rigidbody*, btPersistentManifold* const&> onContactEnded;
 	};

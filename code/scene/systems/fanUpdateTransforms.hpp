@@ -11,7 +11,7 @@ namespace fan
 	//==============================================================================================================================================================
 	struct S_InitFollowTransforms : EcsSystem
 	{
-		staticEcsSignatureGetSignature( const EcsWorld& _world );
+		static EcsSignature GetSignature( const EcsWorld& _world );
 		static void Run( EcsWorld& _world, const std::vector<EcsEntity>& _entities );
 
 		static btTransform GetLocalTransform( const btTransform& _target, const btTransform& _follower );
@@ -22,7 +22,7 @@ namespace fan
 	//==============================================================================================================================================================
 	struct S_MoveFollowTransforms : EcsSystem
 	{
-		staticEcsSignatureGetSignature( const EcsWorld& _world );
+		static EcsSignature GetSignature( const EcsWorld& _world );
 		static void Run( EcsWorld& _world, const std::vector<EcsEntity>& _entities );
 	};
 
@@ -31,7 +31,7 @@ namespace fan
 	//==============================================================================================================================================================
 	struct S_MoveFollowTransformsUI : EcsSystem
 	{
-		staticEcsSignatureGetSignature( const EcsWorld& _world );
+		static EcsSignature GetSignature( const EcsWorld& _world );
 		static void Run( EcsWorld& _world, const std::vector<EcsEntity>& _entities );
 	};
 }

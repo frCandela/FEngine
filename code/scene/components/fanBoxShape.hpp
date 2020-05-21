@@ -15,6 +15,7 @@ namespace fan
 	public:
 		static void SetInfo( EcsComponentInfo& _info );
 		static void Init( EcsWorld& _world, EcsComponent& _component );
+		static void Destroy( EcsWorld& _world, EcsComponent& _component );
 		static void OnGui( EcsWorld& _world, EcsEntity _entityID, EcsComponent& _component );
 		static void Save( const EcsComponent& _component, Json& _json );
 		static void Load( EcsComponent& _component, const Json& _json );
@@ -22,7 +23,7 @@ namespace fan
 		void	  SetScaling( const btVector3 _scaling );
 		btVector3 GetScaling() const;
 
-		btBoxShape boxShape;
+		btBoxShape* boxShape;
 	};
 	static constexpr size_t sizeof_boxShape = sizeof( BoxShape );
 }

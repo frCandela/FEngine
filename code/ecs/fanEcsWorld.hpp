@@ -322,7 +322,7 @@ namespace fan
 		template <typename _ComponentType > _ComponentType& AddComponent( const EcsEntity _entity )
 		{
 			static_assert( std::is_base_of< EcsComponent, _ComponentType>::value );
-			return static_cast<_ComponentType&>( AddComponent( _ComponentType::s_type ) );
+			return static_cast<_ComponentType&>( AddComponent( _entity, _ComponentType::Info::s_type ) );
 		}
 		template <typename _ComponentType > void			RemoveComponent( const EcsEntity _entity )
 		{
@@ -333,6 +333,11 @@ namespace fan
 		{
 			static_assert( std::is_base_of< EcsComponent, _ComponentType>::value );
 			return HasComponent( _entity, _ComponentType::Info::s_type );
+		}
+		template< typename _ComponentType >	_ComponentType& GetComponent( const EcsEntity _entity )
+		{
+			static_assert( std::is_base_of< EcsComponent, _ComponentType>::value );
+			return static_cast<_ComponentType&> ( GetComponent( _entity, _ComponentType::Info::s_type ) );
 		}
 		EcsComponent& AddComponent( const EcsEntity _entity, const uint32_t _type )
 		{
@@ -348,9 +353,9 @@ namespace fan
 
 			return *static_cast<EcsComponent*>( m_transitionArchetype.m_chunks[componentIndex].At( entityData.transitionIndex ) );
 		}
-		void		  RemoveComponent( const EcsEntity _entity, const uint32_t s_type )
+		void		  RemoveComponent( const EcsEntity _entity, const uint32_t _type )
 		{
-			const int componentIndex = GetIndex(s_type);
+			const int componentIndex = GetIndex(_type);
 			EcsTransition& transition = FindOrCreateTransition( _entity );
 
 			// entity must have this component
@@ -362,6 +367,11 @@ namespace fan
 		bool		  HasComponent( const EcsEntity _entity, const uint32_t _type )
 		{			
 			return _entity.archetype->m_signature[GetIndex( _type )];
+		}
+		EcsComponent& GetComponent( const EcsEntity _entity, const uint32_t _type )
+		{
+			const int index = m_typeToIndex[_type];
+			return *static_cast<EcsComponent*>( _entity.archetype->m_chunks[index].At( _entity.index ) );
 		}
 		const EcsComponentInfo& GetComponentInfo( const uint32_t _type ) const { return  m_componentsInfo.at( GetIndex(_type) ); }
 
@@ -408,6 +418,11 @@ namespace fan
 				}
 			}
 			return view;			
+		}
+		template< typename _tagOrComponentType > EcsSignature	GetSignature() const
+		{
+			static_assert( std::is_base_of< EcsTag, _tagOrComponentType>::value || std::is_base_of< Component, _tagOrComponentType>::value );
+			return EcsSignature( 1 ) << m_typeToIndex.at( _tagOrComponentType::s_type );
 		}
 
 		// Const accessors

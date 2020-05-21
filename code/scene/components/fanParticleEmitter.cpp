@@ -24,7 +24,6 @@ namespace fan
 	void ParticleEmitter::Init( EcsWorld& _world, EcsComponent& _component )
 	{
 		ParticleEmitter& emitter = static_cast<ParticleEmitter&>( _component );
-
 		emitter.enabled = true;
 		emitter.particlesPerSecond = 100.f;
 		emitter.speed = 1.f;

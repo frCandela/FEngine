@@ -9,7 +9,7 @@ namespace fan
 	//==============================================================================================================================================================
 	struct S_UpdateRenderWorldModels : EcsSystem
 	{
-		staticEcsSignatureGetSignature( const EcsWorld& _world );		
+		static EcsSignature GetSignature( const EcsWorld& _world );		
 		static void Run( EcsWorld& _world, const std::vector<EcsEntity>& _entities );
 	};
 
@@ -18,7 +18,7 @@ namespace fan
 	//==============================================================================================================================================================
 	struct 	S_UpdateRenderWorldUI : EcsSystem
 	{
-		staticEcsSignatureGetSignature( const EcsWorld& _world );
+		static EcsSignature GetSignature( const EcsWorld& _world );
 		static void Run( EcsWorld& _world, const std::vector<EcsEntity>& _entities );
 	};
 
@@ -27,7 +27,7 @@ namespace fan
 	//==============================================================================================================================================================
 	struct S_UpdateRenderWorldPointLights : EcsSystem
 	{
-		staticEcsSignatureGetSignature( const EcsWorld& _world );
+		static EcsSignature GetSignature( const EcsWorld& _world );
 
 		static void Run( EcsWorld& _world, const std::vector<EcsEntity>& _entities );
 	};
@@ -37,7 +37,7 @@ namespace fan
 	//==============================================================================================================================================================
 	struct S_UpdateRenderWorldDirectionalLights : EcsSystem
 	{
-		staticEcsSignatureGetSignature( const EcsWorld& _world );
+		static EcsSignature GetSignature( const EcsWorld& _world );
 
 		static void Run( EcsWorld& _world, const std::vector<EcsEntity>& _entities );
 	};

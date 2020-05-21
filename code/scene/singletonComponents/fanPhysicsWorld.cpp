@@ -10,11 +10,9 @@
 
 namespace fan
 {
-	REGISTER_SINGLETON_COMPONENT( PhysicsWorld );
-
 	//================================================================================================================================
 	//================================================================================================================================
-	void PhysicsWorld::SetInfo( SingletonComponentInfo& _info )
+	void PhysicsWorld::SetInfo( EcsSingletonInfo& _info )
 	{
 		_info.icon = ImGui::RIGIDBODY16;
 		_info.init = &PhysicsWorld::Init;

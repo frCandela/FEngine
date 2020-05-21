@@ -122,8 +122,8 @@ namespace fan
 			{
 				sf::Uint32 staticIndex;
 				packet.packetData >> staticIndex;
-				SingletonComponent& singleton = _world.GetSingleton( staticIndex );
-				const EcsSingletonInfo& info = _world.GetSingletonEcsComponentInfo( staticIndex );
+				EcsSingleton& singleton = _world.GetSingleton( staticIndex );
+				const EcsSingletonInfo& info = _world.GetSingletonInfo( staticIndex );
 				info.netLoad( singleton, packet.packetData );
 				assert( packet.packetData.endOfPacket() );
 			}
@@ -194,10 +194,6 @@ namespace fan
 			}
 		}
 	}
-
-
-
-
 
 	//================================================================================================================================
 	//================================================================================================================================

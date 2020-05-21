@@ -214,7 +214,7 @@ namespace fan
 					fxTransform.SetPosition( transform.GetPosition() );
 				}
 
-				_world.KillEntity( entity );
+				_world.Kill( entity );
 			}
 		}
 	}

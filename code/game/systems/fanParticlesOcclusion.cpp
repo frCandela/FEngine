@@ -36,7 +36,7 @@ namespace fan
 			bool isInsideSunlight = sunlight.mesh.RayCast( rayOrigin, -btVector3::Up(), outIntersection );
 			if( !isInsideSunlight )
 			{
-				_world.KillEntity( entity );
+				_world.Kill( entity );
 			}
 		}
 

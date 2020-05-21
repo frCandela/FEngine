@@ -11,6 +11,7 @@ namespace fan
 		_info.icon = ImGui::IconType::SPHERE_SHAPE16;
 		_info.onGui = &SphereShape::OnGui;
 		_info.init = &SphereShape::Init;
+		_info.destroy = &SphereShape::Destroy;
 		_info.load  = &SphereShape::Load;
 		_info.save  = &SphereShape::Save;
 		_info.editorPath = "/";
@@ -22,8 +23,18 @@ namespace fan
 	void SphereShape::Init( EcsWorld& _world, EcsComponent& _component )
 	{
 		SphereShape& sphereShape = static_cast<SphereShape&>( _component );
-		sphereShape.sphereShape = btSphereShape( 1.f );
-		sphereShape.sphereShape.setUserPointer( nullptr );
+		sphereShape.sphereShape = new btSphereShape( 1.f );
+		sphereShape.sphereShape->setUserPointer( nullptr );
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
+	void SphereShape::Destroy( EcsWorld& _world, EcsComponent& _component )
+	{
+		SphereShape& sphereShape = static_cast<SphereShape&>( _component );
+		assert( sphereShape.sphereShape != nullptr );
+		delete sphereShape.sphereShape;
+		sphereShape.sphereShape = nullptr;
 	}
 
 	//================================================================================================================================

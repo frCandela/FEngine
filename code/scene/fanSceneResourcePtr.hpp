@@ -32,10 +32,10 @@ namespace fan
 	// Same functionality than ComponentPtrBase but strongly typed
 	//================================================================================================================================
 	template< typename _componentType>
-	class ComponentPtr : public EcsComponentPtrBase
+	class ComponentPtr : public ComponentPtrBase
 	{
 	public:
-		ComponentPtr() : ComponentPtrBase( _componentType::s_typeInfo ) {}
+		ComponentPtr() : ComponentPtrBase( _componentType::s_type ) {}
 		_componentType* operator->() const { return static_cast<_componentType*>( component ); }
 		_componentType& operator*() const { return *static_cast<_componentType*>( component ); }
 		bool operator!=( const _componentType* _other ) const{ return _other != component;	}

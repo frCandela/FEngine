@@ -74,7 +74,7 @@ namespace fan
 			for( SceneNode* node : nodesToDelete )
 			{
 				EcsEntity entity = _world.GetEntity( node->handle );
-				_world.KillEntity( entity );
+				_world.Kill( entity );
 				node->parent = nullptr;
 				node->childs.clear();
 			}		

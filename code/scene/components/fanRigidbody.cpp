@@ -30,8 +30,18 @@ namespace fan
 	{
 		// clear
 		Rigidbody& rb = static_cast<Rigidbody&>( _component );
-		rb.rigidbody = btRigidBody( 1.f, nullptr, nullptr );
-		rb.rigidbody.setUserPointer( &rb );
+		rb.rigidbody = new btRigidBody( 1.f, nullptr, nullptr );
+		rb.rigidbody->setUserPointer( &rb );
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
+	void Rigidbody::Destroy( EcsWorld& _world, EcsComponent& _component )
+	{
+		Rigidbody& rigidbody = static_cast<Rigidbody&>( _component );
+		assert( rigidbody.rigidbody != nullptr );
+		delete rigidbody.rigidbody;
+		rigidbody.rigidbody = nullptr;
 	}
 
 	//================================================================================================================================
@@ -96,7 +106,7 @@ namespace fan
 	//================================================================================================================================	
 	float  Rigidbody::GetMass() const
 	{
-		const float invMass = rigidbody.getInvMass();
+		const float invMass = rigidbody->getInvMass();
 		return ( invMass > 0.f ? 1.f / invMass : 0.f );
 	}
 
@@ -104,7 +114,7 @@ namespace fan
 	//================================================================================================================================	
 	void  Rigidbody::SetMass( const float _mass )
 	{
-		btCollisionShape * collisionShape = rigidbody.getCollisionShape();
+		btCollisionShape * collisionShape = rigidbody->getCollisionShape();
 
 
 		float mass = _mass >= 0.f ? _mass : 0.f;
@@ -113,11 +123,11 @@ namespace fan
 		{
 			collisionShape->calculateLocalInertia( mass, localInertia );
 		}
-		rigidbody.setMassProps( mass, localInertia );
+		rigidbody->setMassProps( mass, localInertia );
 
 		if( mass > 0.f ) 
 		{ 
-			rigidbody.setCollisionFlags( rigidbody.getCollisionFlags() & ~btCollisionObject::CF_KINEMATIC_OBJECT ); 
+			rigidbody->setCollisionFlags( rigidbody->getCollisionFlags() & ~btCollisionObject::CF_KINEMATIC_OBJECT );
 		}
 	}
 
@@ -133,76 +143,76 @@ namespace fan
 	void Rigidbody::SetKinematic()
 	{
 		SetMass( 0.f );
-		rigidbody.setCollisionFlags( rigidbody.getCollisionFlags() | btCollisionObject::CF_KINEMATIC_OBJECT );
-		rigidbody.setActivationState( DISABLE_DEACTIVATION );
+		rigidbody->setCollisionFlags( rigidbody->getCollisionFlags() | btCollisionObject::CF_KINEMATIC_OBJECT );
+		rigidbody->setActivationState( DISABLE_DEACTIVATION );
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================	
 	bool Rigidbody::IsStatic() const
 	{
-		return  !IsKinematic() && rigidbody.getInvMass() <= 0.f;
+		return  !IsKinematic() && rigidbody->getInvMass() <= 0.f;
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================	
 	bool Rigidbody::IsKinematic() const
 	{
-		return  rigidbody.getCollisionFlags() & btCollisionObject::CF_KINEMATIC_OBJECT;
+		return  rigidbody->getCollisionFlags() & btCollisionObject::CF_KINEMATIC_OBJECT;
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================	
 	void Rigidbody::Activate()
 	{
-		rigidbody.activate();
+		rigidbody->activate();
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================	
 	bool Rigidbody::IsActive() const
 	{
-		return rigidbody.isActive();
+		return rigidbody->isActive();
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================	
 	void Rigidbody::SetIgnoreCollisionCheck( const Rigidbody& _rb, const bool state )
 	{
-		rigidbody.setIgnoreCollisionCheck( &_rb.rigidbody, state );
+		rigidbody->setIgnoreCollisionCheck( _rb.rigidbody, state );
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================	
 	bool Rigidbody::IsDeactivationEnabled() const
 	{
-		return  rigidbody.getActivationState() != DISABLE_DEACTIVATION;
+		return  rigidbody->getActivationState() != DISABLE_DEACTIVATION;
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================	
 	void Rigidbody::EnableDeactivation( const bool _enable )
 	{
-		rigidbody.forceActivationState( _enable ? ACTIVE_TAG : DISABLE_DEACTIVATION );
+		rigidbody->forceActivationState( _enable ? ACTIVE_TAG : DISABLE_DEACTIVATION );
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================	
-	btVector3 Rigidbody::GetVelocity() const {	return rigidbody.getLinearVelocity();	}
-	btVector3 Rigidbody::GetAngularVelocity() const { return rigidbody.getAngularVelocity(); }
+	btVector3 Rigidbody::GetVelocity() const {	return rigidbody->getLinearVelocity();	}
+	btVector3 Rigidbody::GetAngularVelocity() const { return rigidbody->getAngularVelocity(); }
 
 	//================================================================================================================================
 	//================================================================================================================================	
 	void Rigidbody::SetVelocity( const btVector3& _velocity )
 	{
-		rigidbody.setLinearVelocity( _velocity );
+		rigidbody->setLinearVelocity( _velocity );
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================	
 	void Rigidbody::SetAngularVelocity( const btVector3& _velocity )
 	{
-		rigidbody.setAngularVelocity( _velocity );
+		rigidbody->setAngularVelocity( _velocity );
 	}
 
 	//================================================================================================================================
@@ -216,15 +226,15 @@ namespace fan
 			_collisionShape->calculateLocalInertia( mass, localInertia );
 			_collisionShape->setUserPointer( &rigidbody );
 		}
-		rigidbody.setCollisionShape( _collisionShape );
-		rigidbody.setMassProps( mass, localInertia );	
+		rigidbody->setCollisionShape( _collisionShape );
+		rigidbody->setMassProps( mass, localInertia );
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================	
 	void Rigidbody::SetMotionState( btDefaultMotionState* _motionState )
 	{		
-		rigidbody.setMotionState( _motionState );
+		rigidbody->setMotionState( _motionState );
 		if( _motionState != nullptr )
 		{
 			_motionState->m_userPointer = this;
@@ -277,7 +287,7 @@ namespace fan
 			{
 				rb.SetMass( 0.f );
 			} ImGui::SameLine();
-			float invMass = rb.rigidbody.getInvMass();
+			float invMass = rb.rigidbody->getInvMass();
 			float mass = ( invMass > 0.f ? 1.f / invMass : 0.f );
 			if( ImGui::DragFloat( "mass", &mass, 1.f, 0.f, 1000.f ) )
 			{
