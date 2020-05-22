@@ -10,7 +10,7 @@ namespace fan
 	struct S_HostSpawnShip : EcsSystem
 	{
 		static EcsSignature GetSignature( const EcsWorld& _world );
-		static void Run( EcsWorld& _world, const std::vector<EcsEntity>& _entities, const float _delta );
+		static void Run( EcsWorld& _world, const EcsView& _view, const float _delta );
 	};
 
 	//==============================================================================================================================================================
@@ -19,7 +19,7 @@ namespace fan
 	struct S_HostSyncFrame : EcsSystem
 	{
 		static EcsSignature GetSignature( const EcsWorld& _world );
-		static void Run( EcsWorld& _world, const std::vector<EcsEntity>& _entities, const float _delta );
+		static void Run( EcsWorld& _world, const EcsView& _view, const float _delta );
 	};
 
 	//==============================================================================================================================================================
@@ -28,7 +28,7 @@ namespace fan
 	struct S_HostSaveState : EcsSystem
 	{
 		static EcsSignature GetSignature( const EcsWorld& _world );
-		static void Run( EcsWorld& _world, const std::vector<EcsEntity>& _entities, const float _delta );
+		static void Run( EcsWorld& _world, const EcsView& _view, const float _delta );
 	};
 
 	//==============================================================================================================================================================
@@ -37,6 +37,6 @@ namespace fan
 	struct S_HostUpdateInput : EcsSystem
 	{
 		static EcsSignature GetSignature( const EcsWorld& _world );
-		static void Run( EcsWorld& _world, const std::vector<EcsEntity>& _entities, const float _delta );
+		static void Run( EcsWorld& _world, const EcsView& _view, const float _delta );
 	};
 }

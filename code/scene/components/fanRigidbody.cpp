@@ -38,19 +38,14 @@ namespace fan
 	//================================================================================================================================
 	void Rigidbody::Destroy( EcsWorld& _world, EcsComponent& _component )
 	{
-		Rigidbody& rigidbody = static_cast<Rigidbody&>( _component );
-		assert( rigidbody.rigidbody != nullptr );
-		delete rigidbody.rigidbody;
-		rigidbody.rigidbody = nullptr;
-	}
-
-	//================================================================================================================================
-	//================================================================================================================================
-	void Rigidbody::Destroy( EcsWorld& _world, EcsComponent& _component )
-	{
 		PhysicsWorld& physicsWorld = _world.GetSingleton<PhysicsWorld>();
 		Rigidbody& rb = static_cast<Rigidbody&>( _component );
+		assert( rb.rigidbody != nullptr );
+
 		physicsWorld.RemoveRigidbody( rb );
+
+		delete rb.rigidbody;
+		rb.rigidbody = nullptr;
 	}
 
 	//================================================================================================================================

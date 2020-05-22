@@ -44,6 +44,7 @@ namespace fan
 		void		SetAngularVelocity( const btVector3& _velocity );
 		void		SetVelocity( const btVector3& _velocity );
 		void		SetTransform( const btTransform& _transform ) { rigidbody->setWorldTransform( _transform ); }
+		void		ClearForces() { rigidbody->clearForces();  }
 
 		void SetCollisionShape( btCollisionShape* _collisionShape );
 		void SetMotionState( btDefaultMotionState* _motionState );

@@ -16,7 +16,7 @@ namespace fan
 	void ComponentPtrBase::Init( EcsWorld& _world )
 	{
 		const_cast<EcsWorld*>( world ) = &_world;
-		*const_cast<ComponentIndex*>( &dynamicID ) = world->GetDynamicIndex( staticID );
+		*const_cast<int*>( &dynamicID ) = world->GetIndex( staticID );
 		sceneNodeID = 0;
 		component = nullptr;
 	}
@@ -35,7 +35,7 @@ namespace fan
 		// adds to the unresolved pointers list
 		if( sceneNodeID != 0 )
 		{
-			ScenePointers& scenePointers = world->GetSingletonComponent<ScenePointers>();
+			ScenePointers& scenePointers = world->GetSingleton<ScenePointers>();
 			scenePointers.unresolvedComponentPtr.insert( this );
 		}
 	}
@@ -50,7 +50,7 @@ namespace fan
 		component = &_component;
 
 		// removes from unresolved pointers list
-		ScenePointers& scenePointers = world->GetSingletonComponent<ScenePointers>();
+		ScenePointers& scenePointers = world->GetSingleton<ScenePointers>();
 		auto it = scenePointers.unresolvedComponentPtr.find( this );
 		if( it != scenePointers.unresolvedComponentPtr.end() )
 		{
@@ -102,7 +102,7 @@ namespace ImGui
 		// dragndrop source for icon
 		if( _ptr.component != nullptr )
 		{
-			fan::Scene& scene = _ptr.world->GetSingletonComponent<fan::Scene>();
+			fan::Scene& scene = _ptr.world->GetSingleton<fan::Scene>();
 			fan::SceneNode& node = *scene.nodes.at( _ptr.sceneNodeID );
 			ImGui::FanBeginDragDropSourceComponent( node, *_ptr.component );
 		}
@@ -122,7 +122,7 @@ namespace ImGui
  		// dragndrop source for button
 		if( _ptr.component != nullptr )
 		{
-			fan::Scene& scene = _ptr.world->GetSingletonComponent<fan::Scene>();
+			fan::Scene& scene = _ptr.world->GetSingleton<fan::Scene>();
 			fan::SceneNode& node = *scene.nodes.at( _ptr.sceneNodeID );
 			ImGui::FanBeginDragDropSourceComponent( node, *_ptr.component );
 		}

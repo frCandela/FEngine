@@ -136,8 +136,8 @@ namespace fan
 					Rigidbody& rigidbody = world.AddComponent<Rigidbody>( entity );
 					MotionState& motionState = world.AddComponent<MotionState>( entity );
 					BoxShape& shape = world.AddComponent<BoxShape>( entity );
-					rigidbody.SetMotionState( &motionState.motionState );
-					rigidbody.SetCollisionShape( &shape.boxShape );
+					rigidbody.SetMotionState( motionState.motionState );
+					rigidbody.SetCollisionShape( shape.boxShape );
 				}
 
 				// point light

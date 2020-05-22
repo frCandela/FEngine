@@ -10,7 +10,7 @@ namespace fan
 	struct S_DrawDebugBounds : EcsSystem
 	{
 		static EcsSignature GetSignature( const EcsWorld& _world );
-		static void Run( EcsWorld& _world, const std::vector<EcsEntity>& _entities );
+		static void Run( EcsWorld& _world, const EcsView& _view );
 	};
 
 	//==============================================================================================================================================================
@@ -19,7 +19,7 @@ namespace fan
 	struct S_DrawDebugNormals : EcsSystem
 	{
 		static EcsSignature GetSignature( const EcsWorld& _world );
-		static void Run( EcsWorld& _world, const std::vector<EcsEntity>& _entities );
+		static void Run( EcsWorld& _world, const EcsView& _view ) ;
 	};
 
 	//==============================================================================================================================================================
@@ -28,7 +28,7 @@ namespace fan
 	struct S_DrawDebugWireframe : EcsSystem
 	{
 		static EcsSignature GetSignature( const EcsWorld& _world );
-		static void Run( EcsWorld& _world, const std::vector<EcsEntity>& _entities );
+		static void Run( EcsWorld& _world, const EcsView& _view ) ;
 	};
 
 	//==============================================================================================================================================================
@@ -37,7 +37,7 @@ namespace fan
 	struct S_DrawDebugHull : EcsSystem
 	{
 		static EcsSignature GetSignature( const EcsWorld& _world );
-		static void Run( EcsWorld& _world, const std::vector<EcsEntity>& _entities );
+		static void Run( EcsWorld& _world, const EcsView& _view ) ;
 	};
 
 	//==============================================================================================================================================================
@@ -46,7 +46,7 @@ namespace fan
 	struct S_DrawDebugPointLights : EcsSystem
 	{
 		static EcsSignature GetSignature( const EcsWorld& _world );
-		static void Run( EcsWorld& _world, const std::vector<EcsEntity>& _entities );
+		static void Run( EcsWorld& _world, const EcsView& _view ) ;
 	};
 
 	//==============================================================================================================================================================
@@ -55,7 +55,7 @@ namespace fan
 	struct S_DrawDebugDirectionalLights : EcsSystem
 	{
 		static EcsSignature GetSignature( const EcsWorld& _world );
-		static void Run( EcsWorld& _world, const std::vector<EcsEntity>& _entities );
+		static void Run( EcsWorld& _world, const EcsView& _view ) ;
 	};
 
 	//==============================================================================================================================================================
@@ -64,6 +64,6 @@ namespace fan
 	struct S_DrawDebugCollisionShapes : EcsSystem
 	{
 		static EcsSignature GetSignature( const EcsWorld& _world );
-		static void Run( EcsWorld& _world, const std::vector<EcsEntity>& _entities );
+		static void Run( EcsWorld& _world, const EcsView& _view ) ;
 	};
 }

@@ -189,7 +189,7 @@ namespace fan
 	void PhysicsWorld::AddRigidbody( Rigidbody& _rigidbody, EcsHandle _handle )
 	{
 		rigidbodiesHandles[&_rigidbody] = _handle;
-		dynamicsWorld->addRigidBody( &_rigidbody.rigidbody );
+		dynamicsWorld->addRigidBody( _rigidbody.rigidbody );
 	}
 
 	//================================================================================================================================
@@ -202,6 +202,6 @@ namespace fan
 		{
 			rigidbodiesHandles.erase( it );
 		}
-		dynamicsWorld->removeRigidBody( &_rigidbody.rigidbody );
+		dynamicsWorld->removeRigidBody( _rigidbody.rigidbody );
 	}
 }

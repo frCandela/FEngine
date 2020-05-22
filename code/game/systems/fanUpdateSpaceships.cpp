@@ -28,18 +28,25 @@ namespace fan
 	}
 
 	//================================================================================================================================
+	// @todo split this in multiple sub systems for force application & energy management
 	//================================================================================================================================
-	void S_MoveSpaceships::Run( EcsWorld& _world, const std::vector<EcsEntity>& _entities, const float _delta )
+	void S_MoveSpaceships::Run( EcsWorld& _world, const EcsView& _view, const float _delta )
 	{
 		if( _delta == 0.f ) { return; }
 
-		for( EcsEntity entity : _entities )
+		auto rbIt = _view.begin<Rigidbody>();
+		auto transformIt = _view.begin<Transform>();
+		auto spaceshipIt = _view.begin<SpaceShip>();
+		auto batteryIt = _view.begin<Battery>();
+		auto playerInputIt = _view.begin<PlayerInput>();
+		for( ; rbIt != _view.end<Rigidbody>(); ++rbIt, ++transformIt, ++spaceshipIt, ++batteryIt, ++playerInputIt )
 		{
-			Transform& transform = _world.GetComponent<Transform>( entity );
-			Rigidbody& rb = _world.GetComponent<Rigidbody>( entity );
-			SpaceShip& spaceship = _world.GetComponent<SpaceShip>( entity );
-			Battery& battery = _world.GetComponent<Battery>( entity );
-			PlayerInput & playerInput = _world.GetComponent<PlayerInput>( entity );
+			const EcsEntity entity = rbIt.Entity();
+			const SpaceShip& spaceship = *spaceshipIt;
+			const PlayerInput& playerInput = *playerInputIt;
+			Rigidbody& rb = *rbIt;
+			Transform& transform = *transformIt;
+			Battery& battery = *batteryIt;
 
 			// get player input
 			const btVector3 orientation = btVector3( playerInput.orientation.x(), 0.f, playerInput.orientation.z() );
@@ -125,9 +132,9 @@ namespace fan
 			}
 
 			// Forces application		
-			rb.rigidbody.applyCentralForce( leftForce * transform.Left() );
-			rb.rigidbody.applyCentralForce( spaceship.forwardForces[speedMode] * forwardAxis * transform.Forward() );
-			rb.rigidbody.setAngularVelocity( btVector3::Zero() );
+			rb.rigidbody->applyCentralForce( leftForce * transform.Left() );
+			rb.rigidbody->applyCentralForce( spaceship.forwardForces[speedMode] * forwardAxis * transform.Forward() );
+			rb.rigidbody->setAngularVelocity( btVector3::Zero() );
 
 			// Drag
 			btVector3 newVelocity = ( totalConsumption > 0.f ? spaceship.activeDrag : spaceship.passiveDrag ) * rb.GetVelocity();
@@ -150,16 +157,22 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void S_EruptionDamage::Run( EcsWorld& _world, const std::vector<EcsEntity>& _entities, const float _delta )
+	void S_EruptionDamage::Run( EcsWorld& _world, const EcsView& _view, const float _delta )
 	{
 		if( _delta == 0.f ) { return; }
 
 		const SolarEruption& eruption = _world.GetSingleton<SolarEruption>();
-		for( EcsEntity entity : _entities )
+
+
+
+		auto transformIt = _view.begin<Transform>();
+		auto healthIt = _view.begin<Health>();
+		auto solarPanelIt = _view.begin<SolarPanel>();
+		for( ; transformIt != _view.end<Transform>(); ++transformIt, ++healthIt, ++solarPanelIt )
 		{
-			const Transform& transform = _world.GetComponent<Transform>( entity );
-			Health& health = _world.GetComponent<Health>( entity );
-			SolarPanel& solarPanel = _world.GetComponent<SolarPanel>( entity );
+			const Transform& transform = *transformIt;
+			Health& health = *healthIt;
+			const SolarPanel& solarPanel = *solarPanelIt;
 
 			if( solarPanel.isInSunlight && eruption.state == SolarEruption::EXPODING )
 			{
@@ -187,19 +200,24 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void S_PlayerDeath::Run( EcsWorld& _world, const std::vector<EcsEntity>& _entities, const float _delta )
+	void S_PlayerDeath::Run( EcsWorld& _world, const EcsView& _view, const float _delta )
 	{
 		if( _delta == 0.f ) { return; }
 
 		const SolarEruption& eruption = _world.GetSingleton<SolarEruption>();
-		for( EcsEntity entity : _entities )
+
+		auto healthIt = _view.begin<Health>();
+		auto transformIt = _view.begin<Transform>();
+		auto spaceShipIt = _view.begin<SpaceShip>();
+		for( ; healthIt != _view.end<Health>(); ++healthIt, ++transformIt, ++spaceShipIt )
 		{
-			Health& health = _world.GetComponent<Health>( entity );
+			const Health& health = *healthIt;
+			const Transform& transform = *transformIt;
+			const SpaceShip& spaceShip = *spaceShipIt;
+			const EcsEntity entity = healthIt.Entity();
 
 			if( health.currentHealth == 0.f )
 			{
-				Transform& transform = _world.GetComponent<Transform>( entity );
-				SpaceShip& spaceShip = _world.GetComponent<SpaceShip>( entity );
 				Scene& scene = _world.GetSingleton<Scene>();
 				
 				if( spaceShip.deathFx == nullptr )

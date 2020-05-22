@@ -87,7 +87,6 @@ namespace fan
 			const uint32_t idOffset = _parent.scene->nextUniqueID - 1;
 			SceneNode& node = _parent.scene->CreateSceneNode( "tmp", &_parent, false );
 			EcsWorld& world = *_parent.scene->world;
-			EcsEntity indexStart = (EcsEntity)world.GetNumEntities();
 			Scene::R_LoadFromJson( m_json["prefab"], node, idOffset );
 			_parent.scene->nextUniqueID = Scene::R_FindMaximumId( _parent ) + 1;
 			ScenePointers::ResolveComponentPointers( *_parent.scene, idOffset );

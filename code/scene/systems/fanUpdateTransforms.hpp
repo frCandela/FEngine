@@ -12,7 +12,7 @@ namespace fan
 	struct S_InitFollowTransforms : EcsSystem
 	{
 		static EcsSignature GetSignature( const EcsWorld& _world );
-		static void Run( EcsWorld& _world, const std::vector<EcsEntity>& _entities );
+		static void Run( EcsWorld& _world, const EcsView& _view ) ;
 
 		static btTransform GetLocalTransform( const btTransform& _target, const btTransform& _follower );
 	};
@@ -23,7 +23,7 @@ namespace fan
 	struct S_MoveFollowTransforms : EcsSystem
 	{
 		static EcsSignature GetSignature( const EcsWorld& _world );
-		static void Run( EcsWorld& _world, const std::vector<EcsEntity>& _entities );
+		static void Run( EcsWorld& _world, const EcsView& _view ) ;
 	};
 
 	//==============================================================================================================================================================
@@ -32,6 +32,6 @@ namespace fan
 	struct S_MoveFollowTransformsUI : EcsSystem
 	{
 		static EcsSignature GetSignature( const EcsWorld& _world );
-		static void Run( EcsWorld& _world, const std::vector<EcsEntity>& _entities );
+		static void Run( EcsWorld& _world, const EcsView& _view ) ;
 	};
 }

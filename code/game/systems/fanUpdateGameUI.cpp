@@ -26,13 +26,20 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void S_UpdateGameUiValues::Run( EcsWorld& _world, const std::vector<EcsEntity>& _entities, const float _delta )
+	void S_UpdateGameUiValues::Run( EcsWorld& _world, const EcsView& _view, const float _delta )
 	{
 		if( _delta == 0.f ) { return; }
 
-		for( EcsEntity entity : _entities )
-		{	
-			SpaceshipUI& ui = _world.GetComponent<SpaceshipUI>( entity );
+		auto uiIt = _view.begin<SpaceshipUI>();
+		auto batteryIt = _view.begin<Battery>();
+		auto solarPanelIt = _view.begin<SolarPanel>();
+		auto healthIt = _view.begin<Health>();
+		for( ; uiIt != _view.end<SpaceshipUI>(); ++uiIt, ++batteryIt, ++solarPanelIt, ++healthIt )
+		{
+			const SpaceshipUI& ui = *uiIt;
+			const Battery& battery = *batteryIt;
+			const SolarPanel& solarPanel = *solarPanelIt;
+			const Health& health = *healthIt;
 
 			if( ui.energyProgress == nullptr || 
 				ui.signalProgress == nullptr || 
@@ -43,11 +50,9 @@ namespace fan
 			}
 
 			// Update energy progress bar
-			Battery& battery = _world.GetComponent<Battery>( entity );
 			ui.energyProgress->SetProgress( battery.currentEnergy / battery.maxEnergy );
 
 			// Update signal progress bar
-			SolarPanel& solarPanel = _world.GetComponent<SolarPanel>( entity );
 			const float signalRatio = solarPanel.currentChargingRate / solarPanel.maxChargingRate;
 			ui.signalProgress->SetProgress( signalRatio );
 
@@ -62,7 +67,6 @@ namespace fan
 			}
 
 			// Update health progress bar
-			Health& health = _world.GetComponent<Health>( entity );
 			ui.healthProgress->SetProgress( health.currentHealth / health.maxHealth );
 		}
 	}
@@ -78,7 +82,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void S_UpdateGameUiPosition::Run( EcsWorld& _world, const std::vector<EcsEntity>& _entities, const float _delta )
+	void S_UpdateGameUiPosition::Run( EcsWorld& _world, const EcsView& _view, const float _delta )
 	{
 		if( _delta == 0.f ) { return; }
 
@@ -88,13 +92,16 @@ namespace fan
 		Transform& cameraTransform = _world.GetComponent<Transform>( cameraID );
 		RenderWorld& renderWorld = _world.GetSingleton<RenderWorld>();
 
-		for( EcsEntity entity : _entities )
+		auto uiIt = _view.begin<SpaceshipUI>();
+		auto transformIt = _view.begin<Transform>();
+		for( ; uiIt != _view.end<SpaceshipUI>(); ++uiIt, ++transformIt )
 		{
-			SpaceshipUI& ui = _world.GetComponent<SpaceshipUI>( entity );
+			const SpaceshipUI& ui = *uiIt;
+			const Transform& transform = *transformIt;
+
 			if( ui.uiRootTransform == nullptr ) { continue; }
 
 			// Set ui position
-			Transform& transform = _world.GetComponent<Transform>( entity );
 			glm::vec2 screenPos = ToGLM( camera.WorldPosToScreen( cameraTransform, transform.GetPosition() ) );
 			glm::vec2 pixelPosition = renderWorld.targetSize * 0.5f * ( screenPos + glm::vec2( 1.f, 1.f ) );
 			ui.uiRootTransform->position = pixelPosition + ui.uiOffset;

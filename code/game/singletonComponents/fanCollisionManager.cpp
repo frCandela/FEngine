@@ -39,18 +39,18 @@ namespace fan
 		Rigidbody* rb1 = static_cast<Rigidbody*> ( _manifold->getBody1()->getUserPointer() );
 		Rigidbody& bulletRb = _other == rb0 ? *rb1 : *rb0;
 
-		PhysicsWorld& physicsWorld = world->GetSingletonComponent<PhysicsWorld>();
+		PhysicsWorld& physicsWorld = world->GetSingleton<PhysicsWorld>();
 		const EcsHandle bulletHandle = physicsWorld.rigidbodiesHandles[&bulletRb];
-		const EcsEntity bulletID = world->GetEntityID( bulletHandle );
+		const EcsEntity bulletID = world->GetEntity( bulletHandle );
 		const Bullet& bullet = world->GetComponent< Bullet >( bulletID );
 		
-		world->KillEntity( bulletID );
+		world->Kill( bulletID );
 		
 		// create explosion
 		const Transform& bulletTransform = world->GetComponent< Transform >( bulletID );
-		const Scene& scene = world->GetSingletonComponent<Scene>();
+		const Scene& scene = world->GetSingleton<Scene>();
 		const SceneNode& explosionNode = * bullet.explosionPrefab->Instanciate( *scene.root );
-		const EcsEntity explosionID = world->GetEntityID( explosionNode.handle );
+		const EcsEntity explosionID = world->GetEntity( explosionNode.handle );
 		Transform& explosionTransform = world->GetComponent< Transform >( explosionID );
 		explosionTransform.SetPosition( bulletTransform.GetPosition() );
 	}
@@ -65,11 +65,11 @@ namespace fan
 		Rigidbody& otherRb = *_other;
 
 		// get ids
-		PhysicsWorld& physicsWorld = world->GetSingletonComponent<PhysicsWorld>();
+		PhysicsWorld& physicsWorld = world->GetSingleton<PhysicsWorld>();
 		const EcsHandle spaceshipHandle = physicsWorld.rigidbodiesHandles[&spaceshipRb];
 		const EcsHandle otherHandle = physicsWorld.rigidbodiesHandles[&otherRb];
-		const EcsEntity spaceshipID = world->GetEntityID( spaceshipHandle );
-		const EcsEntity otherID = world->GetEntityID( otherHandle );
+		const EcsEntity spaceshipID = world->GetEntity( spaceshipHandle );
+		const EcsEntity otherID = world->GetEntity( otherHandle );
 
 		// bump
 		const Transform& spaceshipTransform = world->GetComponent<Transform>( spaceshipID );
@@ -78,7 +78,7 @@ namespace fan
 		if( !dir.fuzzyZero() )
 		{
 			SpaceShip& spaceship = world->GetComponent<SpaceShip>( spaceshipID );
-			spaceshipRb.rigidbody.applyCentralForce( spaceship.collisionRepulsionForce * dir.normalized() );
+			spaceshipRb.rigidbody->applyCentralForce( spaceship.collisionRepulsionForce * dir.normalized() );
 		}
 
 		// applies damage

@@ -1,5 +1,7 @@
 #pragma once
 
+#include "ecs/fanEcsArchetype.hpp"
+
 namespace fan
 {
 	//================================
@@ -22,7 +24,7 @@ namespace fan
 		template < typename _ComponentType >
 		struct iterator
 		{
-			iterator( EcsView& _view, const int _componentIndex )
+			iterator( const EcsView& _view, const int _componentIndex )
 			{
 				if( _componentIndex == -1 )
 				{
@@ -84,7 +86,6 @@ namespace fan
 				const uint32_t index = m_chunkIndex * m_currentChunk->Capacity() + m_elementIndex;
 				return { m_currentArchetype, index };
 			}
-
 		private:
 			std::vector< EcsArchetype* >	m_archetypes;
 			int								m_componentIndex;
@@ -96,16 +97,31 @@ namespace fan
 		};
 
 		template < typename _ComponentType >
-		iterator<_ComponentType> begin()
+		iterator<_ComponentType> begin() const
 		{
-			const int index = m_typesToIndex[ _ComponentType::Info::s_type ];
+			const int index = m_typesToIndex.at( _ComponentType::Info::s_type );
 			return iterator<_ComponentType>( *this, index );
 		}
 
 		template < typename _ComponentType >
-		inline iterator<_ComponentType> end()
+		inline iterator<_ComponentType> end() const
 		{
 			return iterator<_ComponentType>( *this, -1 );
+		}
+
+		int Size() const
+		{
+			int size = 0;
+			for( int i = 0; i < m_archetypes.size(); i++ )
+			{
+				size += m_archetypes[i]->Size();
+			}
+			return size;
+		}
+
+		bool Empty() const
+		{
+			return Size() == 0;
 		}
 	};
 }

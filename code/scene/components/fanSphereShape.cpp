@@ -77,13 +77,13 @@ namespace fan
 	//================================================================================================================================
 	void  SphereShape::SetRadius( const float _radius )
 	{
-		sphereShape.setUnscaledRadius( _radius >= 0 ? _radius : 0.f );
+		sphereShape->setUnscaledRadius( _radius >= 0 ? _radius : 0.f );
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
 	float SphereShape::GetRadius() const
 	{
-		return sphereShape.getRadius();
+		return sphereShape->getRadius();
 	}
 }

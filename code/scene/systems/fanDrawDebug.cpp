@@ -23,12 +23,14 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void S_DrawDebugBounds::Run( EcsWorld& _world, const std::vector<EcsEntity>& _entities )
+	void S_DrawDebugBounds::Run( EcsWorld& _world, const EcsView& _view )
 	{
-		for( EcsEntity entity : _entities )
+		auto boundsIt = _view.begin<Bounds>();
+		auto sceneNodeIt = _view.begin<SceneNode>();
+		for( ;boundsIt != _view.end<Bounds>(); ++boundsIt, ++sceneNodeIt )
 		{
-			const Bounds& bounds = _world.GetComponent<Bounds>( entity );
-			const SceneNode& node = _world.GetComponent<SceneNode>( entity );
+			const Bounds& bounds   = *boundsIt;
+			const SceneNode& node = *sceneNodeIt;
 			RendererDebug::Get().DebugAABB( bounds.aabb, Color::Red );
 		}
 	}
@@ -42,12 +44,14 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void S_DrawDebugNormals::Run( EcsWorld& _world, const std::vector<EcsEntity>& _entities )
+	void S_DrawDebugNormals::Run( EcsWorld& _world, const EcsView& _view )
 	{
-		for( EcsEntity entity : _entities )
+		auto meshRendererIt = _view.begin<MeshRenderer>();
+		auto transformIt = _view.begin<Transform>();
+		for( ; meshRendererIt != _view.end<MeshRenderer>(); ++meshRendererIt, ++transformIt )
 		{
-			const MeshRenderer& meshRenderer = _world.GetComponent<MeshRenderer>( entity );
-			const Transform& transform = _world.GetComponent<Transform>( entity );
+			const MeshRenderer& meshRenderer = *meshRendererIt;
+			const Transform& transform = *transformIt;
 
 			if( *meshRenderer.mesh != nullptr )
 			{
@@ -76,12 +80,14 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void S_DrawDebugWireframe::Run( EcsWorld& _world, const std::vector<EcsEntity>& _entities )
+	void S_DrawDebugWireframe::Run( EcsWorld& _world, const EcsView& _view ) 
 	{
-		for( EcsEntity entity : _entities )
+		auto meshRendererIt = _view.begin<MeshRenderer>();
+		auto transformIt = _view.begin<Transform>();
+		for( ; meshRendererIt != _view.end<MeshRenderer>(); ++meshRendererIt, ++transformIt )
 		{
-			const MeshRenderer& meshRenderer = _world.GetComponent<MeshRenderer>( entity );
-			const Transform& transform = _world.GetComponent<Transform>( entity );
+			const MeshRenderer& meshRenderer = *meshRendererIt;
+			const Transform& transform = *transformIt;
 
 			if( *meshRenderer.mesh != nullptr )
 			{
@@ -111,12 +117,14 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void S_DrawDebugHull::Run( EcsWorld& _world, const std::vector<EcsEntity>& _entities )
+	void S_DrawDebugHull::Run( EcsWorld& _world, const EcsView& _view ) 
 	{
-		for( EcsEntity entity : _entities )
+		auto meshRendererIt = _view.begin<MeshRenderer>();
+		auto transformIt = _view.begin<Transform>();
+		for( ; meshRendererIt != _view.end<MeshRenderer>(); ++meshRendererIt, ++transformIt )
 		{
-			const MeshRenderer& meshRenderer = _world.GetComponent<MeshRenderer>( entity );
-			const Transform& transform = _world.GetComponent<Transform>( entity );
+			const MeshRenderer& meshRenderer = *meshRendererIt;
+			const Transform& transform = *transformIt;
 
 			if( *meshRenderer.mesh != nullptr )
 			{
@@ -160,12 +168,14 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void S_DrawDebugPointLights::Run( EcsWorld& _world, const std::vector<EcsEntity>& _entities )
+	void S_DrawDebugPointLights::Run( EcsWorld& _world, const EcsView& _view ) 
 	{
-		for( EcsEntity entity : _entities )
+		auto lightIt = _view.begin<PointLight>();
+		auto transformIt = _view.begin<Transform>();
+		for( ; lightIt != _view.end<PointLight>(); ++lightIt, ++transformIt )
 		{
-			const PointLight& light = _world.GetComponent<PointLight>( entity );
-			const Transform& transform = _world.GetComponent<Transform>( entity );
+			const PointLight& light = *lightIt;
+			const Transform& transform = *transformIt;		
 
 			const float lightRange = PointLight::GetLightRange( light );
 			if( lightRange > 0 )
@@ -184,12 +194,14 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void S_DrawDebugDirectionalLights::Run( EcsWorld& _world, const std::vector<EcsEntity>& _entities )
+	void S_DrawDebugDirectionalLights::Run( EcsWorld& _world, const EcsView& _view ) 
 	{
-		for( EcsEntity entity : _entities )
+		auto lightIt = _view.begin<DirectionalLight>();
+		auto transformIt = _view.begin<Transform>();
+		for( ; lightIt != _view.end<DirectionalLight>(); ++lightIt, ++transformIt )
 		{
-			const DirectionalLight& light = _world.GetComponent<DirectionalLight>( entity );
-			const Transform& transform = _world.GetComponent<Transform>( entity );
+			const DirectionalLight& light = *lightIt;
+			const Transform& transform = *transformIt;
 
 			const btVector3 pos = transform.GetPosition();
 			const btVector3 dir = transform.Forward();
@@ -209,6 +221,7 @@ namespace fan
 	}
 
 	//================================================================================================================================
+	// @todo split this in two systems for BoxShape & SphereShape
 	//================================================================================================================================
 	EcsSignature S_DrawDebugCollisionShapes::GetSignature( const EcsWorld& _world )
 	{
@@ -217,14 +230,19 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void S_DrawDebugCollisionShapes::Run( EcsWorld& _world, const std::vector<EcsEntity>& _entities )
+	void S_DrawDebugCollisionShapes::Run( EcsWorld& _world, const EcsView& _view ) 
 	{
-		for( EcsEntity entity : _entities )
+		auto transformIt = _view.begin<Transform>();
+		auto sceneNodeIt = _view.begin<SceneNode>();
+		for( ; transformIt != _view.end<Transform>(); ++transformIt, ++sceneNodeIt )
 		{
+			const EcsEntity entity = transformIt.Entity();
+			const Transform& transform = *transformIt;
+			const SceneNode& node = *sceneNodeIt;
+		
 			// box shape
 			if( _world.HasComponent<BoxShape>( entity ) )
 			{
-				const Transform& transform = _world.GetComponent<Transform>( entity );
 				const BoxShape & shape = _world.GetComponent<BoxShape>( entity );
 				RendererDebug::Get().DebugCube( transform.transform, 0.5f * shape.GetScaling(), Color::Green, false  );
 			}
@@ -232,7 +250,6 @@ namespace fan
 			// sphere shape
 			if( _world.HasComponent<SphereShape>( entity ) )
 			{
-				const Transform& transform = _world.GetComponent<Transform>( entity );
 				const SphereShape& shape = _world.GetComponent<SphereShape>( entity );
 				RendererDebug::Get().DebugSphere( transform.transform, shape.GetRadius(), Color::Green, false );
 			}

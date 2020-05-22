@@ -26,7 +26,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void S_ServerSend::Run( EcsWorld& _world, const std::vector<EcsEntity>& _entities, const float _delta )
+	void S_ServerSend::Run( EcsWorld& _world, const EcsView& _view, const float _delta )
 	{
 		if( _delta == 0.f ) { return; }
 
@@ -34,12 +34,16 @@ namespace fan
 		const Game& game = _world.GetSingleton<Game>();
 		ServerConnection& connection = _world.GetSingleton<ServerConnection>();
 
-		for( EcsEntity entity : _entities )
+		auto hostConnectionIt = _view.begin<HostConnection>();
+		auto hostDataIt = _view.begin<HostGameData>();
+		auto hostReplicationIt = _view.begin<HostReplication>();
+		auto reliabilityLayerIt = _view.begin<ReliabilityLayer>();
+		for( ; hostConnectionIt != _view.end<HostConnection>(); ++hostConnectionIt, ++hostDataIt, ++hostReplicationIt, ++reliabilityLayerIt )
 		{
-			HostConnection& hostConnection = _world.GetComponent< HostConnection >( entity );
-			HostGameData& hostData = _world.GetComponent< HostGameData >( entity );
-			HostReplication& hostReplication = _world.GetComponent< HostReplication >( entity );
-			ReliabilityLayer& reliabilityLayer = _world.GetComponent< ReliabilityLayer >( entity );
+			HostConnection& hostConnection = *hostConnectionIt;
+			const HostGameData& hostData = *hostDataIt;
+			HostReplication& hostReplication = *hostReplicationIt;
+			ReliabilityLayer& reliabilityLayer = *reliabilityLayerIt;
 
 			// create new packet			
 			Packet packet( reliabilityLayer.GetNextPacketTag() );

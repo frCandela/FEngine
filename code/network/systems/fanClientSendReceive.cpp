@@ -22,17 +22,20 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void S_ClientSend::Run( EcsWorld& _world, const std::vector<EcsEntity>& _entities, const float _delta )
+	void S_ClientSend::Run( EcsWorld& _world, const EcsView& _view, const float _delta )
 	{
 		if( _delta == 0.f ) { return; }
 
 		Game& game = _world.GetSingleton<Game>();
 
-		for( EcsEntity entity : _entities )
+		auto reliabilityLayerIt = _view.begin<ReliabilityLayer>();
+		auto connectionIt = _view.begin<ClientConnection>();
+		auto gameDataIt = _view.begin<ClientGameData>();
+		for( ; reliabilityLayerIt != _view.end<ReliabilityLayer>(); ++reliabilityLayerIt, ++connectionIt, ++gameDataIt )
 		{
-			ReliabilityLayer& reliabilityLayer = _world.GetComponent<ReliabilityLayer>( entity );
-			ClientConnection& connection = _world.GetComponent<ClientConnection>( entity );
-			ClientGameData& gameData = _world.GetComponent<ClientGameData>( entity );
+			ReliabilityLayer& reliabilityLayer = *reliabilityLayerIt;
+			ClientConnection& connection = *connectionIt;
+			ClientGameData& gameData = *gameDataIt;
 
 			// create packet
 			Packet packet( reliabilityLayer.GetNextPacketTag() );
@@ -66,23 +69,28 @@ namespace fan
 		return
 			_world.GetSignature<ReliabilityLayer>() |
 			_world.GetSignature<ClientConnection>() |
+			_world.GetSignature<ClientReplication>() |
 			_world.GetSignature<ClientGameData>();
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void S_ClientReceive::Run( EcsWorld& _world, const std::vector<EcsEntity>& _entities, const float _delta )
+	void S_ClientReceive::Run( EcsWorld& _world, const EcsView& _view, const float _delta )
 	{
 		if( _delta == 0.f ) { return; }
 
 		const Game& game = _world.GetSingleton<Game>();
 
-		for( EcsEntity entity : _entities )
+		auto reliabilityLayerIt = _view.begin<ReliabilityLayer>();
+		auto connectionIt = _view.begin<ClientConnection>();
+		auto replicationIt = _view.begin<ClientReplication>();
+		auto gameDataIt = _view.begin<ClientGameData>();
+		for( ; reliabilityLayerIt != _view.end<ReliabilityLayer>(); ++reliabilityLayerIt, ++connectionIt, ++replicationIt, ++gameDataIt )
 		{
-			ReliabilityLayer&	reliabilityLayer = _world.GetComponent<ReliabilityLayer>( entity );
-			ClientConnection&	connection = _world.GetComponent<ClientConnection>( entity );
-			ClientReplication&	replication = _world.GetComponent<ClientReplication>( entity );
-			ClientGameData&		gameData = _world.GetComponent<ClientGameData>( entity );
+			ReliabilityLayer& reliabilityLayer = *reliabilityLayerIt;
+			ClientConnection& connection = *connectionIt;
+			ClientReplication& replication = *replicationIt;
+			ClientGameData& gameData = *gameDataIt;
 
 			// receive
 			Packet			packet;

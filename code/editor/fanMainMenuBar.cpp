@@ -221,7 +221,7 @@ namespace fan
 			// Framerate set popup
 			if ( ImGui::BeginPopup( "main_menu_bar_set_fps" ) )
 			{
-				Game& game = m_world->GetSingletonComponent<Game>();
+				Game& game = m_world->GetSingleton<Game>();
 
 				ImGui::PushItemWidth( 80.f );
 				float maxFps = 1.f / Time::Get().GetRenderDelta();
@@ -275,7 +275,7 @@ namespace fan
 	//================================================================================================================================
 	void MainMenuBar::DrawModals()
 	{
-		Scene& scene = m_world->GetSingletonComponent<Scene>();
+		Scene& scene = m_world->GetSingleton<Scene>();
 
 		// New scene
 		if ( ImGui::FanSaveFileModal( "New scene", RenderGlobal::s_sceneExtensions, m_pathBuffer ) )
@@ -304,7 +304,7 @@ namespace fan
 	//================================================================================================================================
 	void MainMenuBar::New()
 	{
-		Game& game = m_world->GetSingletonComponent<Game>();
+		Game& game = m_world->GetSingleton<Game>();
 		if( game.state != Game::STOPPED )
 		{
 			Debug::Warning() << "creating scenes is disabled in play mode" << Debug::Endl();
@@ -319,7 +319,7 @@ namespace fan
 	//================================================================================================================================
 	void MainMenuBar::Open()
 	{
-		Game& game = m_world->GetSingletonComponent<Game>();
+		Game& game = m_world->GetSingleton<Game>();
 		if( game.state != Game::STOPPED )
 		{
 			Debug::Warning() << "loading scenes is disabled in play mode" << Debug::Endl();
@@ -335,8 +335,8 @@ namespace fan
 	//================================================================================================================================
 	void MainMenuBar::Reload()
 	{
-		Game& game = m_world->GetSingletonComponent<Game>();
-		Scene& scene = m_world->GetSingletonComponent<Scene>();
+		Game& game = m_world->GetSingleton<Game>();
+		Scene& scene = m_world->GetSingleton<Scene>();
 
 		if( scene.path.empty() )
 		{
@@ -347,7 +347,7 @@ namespace fan
 		if( game.state == Game::STOPPED )
 		{
 			// save old camera transform
-			const EcsEntity oldCameraID = m_world->GetEntityID( scene.mainCamera->handle );
+			const EcsEntity oldCameraID = m_world->GetEntity( scene.mainCamera->handle );
 			btTransform oldCameraTransform = m_world->GetComponent<Transform>( oldCameraID ).transform;
 
 			// save old selection
@@ -358,7 +358,7 @@ namespace fan
 			scene.LoadFrom( scene.path );
 
 			// restore camera
-			const EcsEntity newCameraID = m_world->GetEntityID( scene.mainCamera->handle );
+			const EcsEntity newCameraID = m_world->GetEntity( scene.mainCamera->handle );
 			m_world->GetComponent<Transform>( newCameraID ).transform = oldCameraTransform;
 
 			// restore selection
@@ -381,8 +381,8 @@ namespace fan
 	//================================================================================================================================
 	void MainMenuBar::Save()
 	{
-		Game& game = m_world->GetSingletonComponent<Game>();
-		Scene& scene = m_world->GetSingletonComponent<Scene>();
+		Game& game = m_world->GetSingleton<Game>();
+		Scene& scene = m_world->GetSingleton<Scene>();
 
 		if( game.state != Game::STOPPED )
 		{

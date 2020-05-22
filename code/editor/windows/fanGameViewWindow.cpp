@@ -21,7 +21,7 @@ namespace fan
 	//================================================================================================================================
 	void GameViewWindow::OnGui()
 	{
-		Game& game = m_world->GetSingletonComponent<Game>();
+		Game& game = m_world->GetSingleton<Game>();
 
 		// update window size
 		const ImVec2 imGuiSize = ImGui::GetContentRegionAvail();

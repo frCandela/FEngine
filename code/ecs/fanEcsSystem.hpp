@@ -1,6 +1,7 @@
 #pragma once
 
 #include "fanEcsTypes.hpp"
+#include "ecs/fanEcsView.hpp"
 
 namespace fan
 {

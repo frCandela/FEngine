@@ -27,21 +27,24 @@ namespace fan
 
 	//==============================================================================================================================================================
 	//==============================================================================================================================================================
-	void S_UpdateRenderWorldModels::Run( EcsWorld& _world, const std::vector<EcsEntity>& _entities )
+	void S_UpdateRenderWorldModels::Run( EcsWorld& _world, const EcsView& _view ) 
 	{
 		RenderWorld& renderWorld = _world.GetSingleton<RenderWorld>();
 		renderWorld.drawData.clear();
 
+		auto meshRendererIt = _view.begin<MeshRenderer>();
+		auto transformIt = _view.begin<Transform>();
+		auto materialIt = _view.begin<Material>();
 		// get all mesh and adds them to the render world
-		for( EcsEntity id : _entities )
+		for( ; meshRendererIt != _view.end<MeshRenderer>(); ++meshRendererIt, ++transformIt, ++materialIt )
 		{
-			MeshRenderer& meshRenderer = _world.GetComponent<MeshRenderer>( id );
+			MeshRenderer& meshRenderer = *meshRendererIt;
+			Transform& transform = *transformIt;
+			Material& material = *materialIt;
+
 			if( meshRenderer.mesh.IsValid() )
 			{
 				// drawMesh data;
-				Material& material = _world.GetComponent<Material>( id );
-				Transform& transform = _world.GetComponent<Transform>( id );
-
 				DrawMesh data;
 				data.mesh = *meshRenderer.mesh;
 				data.modelMatrix = transform.GetModelMatrix();
@@ -65,16 +68,18 @@ namespace fan
 
 	//==============================================================================================================================================================
 	//==============================================================================================================================================================
-	void S_UpdateRenderWorldUI::Run( EcsWorld& _world, const std::vector<EcsEntity>& _entities )
+	void S_UpdateRenderWorldUI::Run( EcsWorld& _world, const EcsView& _view ) 
 	{
 		RenderWorld& renderWorld = _world.GetSingleton<RenderWorld>();
 		renderWorld.uiDrawData.clear();
 
+		auto rendererIt = _view.begin<UIRenderer>();
+		auto transformIt = _view.begin<TransformUI>();
 		// get all mesh and adds them to the render world
-		for( EcsEntity id : _entities )
+		for( ; rendererIt != _view.end<UIRenderer>(); ++rendererIt, ++transformIt )
 		{
-			UIRenderer& renderer = _world.GetComponent<UIRenderer>( id );
-			TransformUI& transform = _world.GetComponent<TransformUI>( id );
+			UIRenderer& renderer = *rendererIt;
+			const TransformUI& transform = *transformIt;
 
 			if( renderer.GetTexture() == nullptr ) { continue; }
 
@@ -103,16 +108,17 @@ namespace fan
 
 	//==============================================================================================================================================================
 	//==============================================================================================================================================================
-	void S_UpdateRenderWorldPointLights::Run( EcsWorld& _world, const std::vector<EcsEntity>& _entities )
+	void S_UpdateRenderWorldPointLights::Run( EcsWorld& _world, const EcsView& _view ) 
 	{
 		RenderWorld& renderWorld = _world.GetSingleton<RenderWorld>();
 		renderWorld.pointLights.clear();
 
-		for( EcsEntity id : _entities )
+		auto transformIt = _view.begin<Transform>();
+		auto lightIt = _view.begin<PointLight>();
+		for( ; transformIt != _view.end<Transform>(); ++transformIt, ++lightIt )
 		{
-			// light data
-			Transform& transform = _world.GetComponent<Transform>( id );
-			PointLight& light = _world.GetComponent<PointLight>( id );
+			const Transform& transform = *transformIt;
+			PointLight& light = *lightIt;
 
 			DrawPointLight pointLight;
 			pointLight.position = glm::vec4( ToGLM( transform.GetPosition() ), 1.f );
@@ -137,16 +143,17 @@ namespace fan
 
 	//==============================================================================================================================================================
 	//==============================================================================================================================================================
-	void S_UpdateRenderWorldDirectionalLights::Run( EcsWorld& _world, const std::vector<EcsEntity>& _entities )
+	void S_UpdateRenderWorldDirectionalLights::Run( EcsWorld& _world, const EcsView& _view ) 
 	{
 		RenderWorld& renderWorld = _world.GetSingleton<RenderWorld>();
 		renderWorld.directionalLights.clear();
 
-		for( EcsEntity id : _entities )
+		auto transformIt = _view.begin<Transform>();
+		auto lightIt = _view.begin<DirectionalLight>();
+		for( ; transformIt != _view.end<Transform>(); ++transformIt, ++lightIt )
 		{
-			// light data
-			Transform& transform = _world.GetComponent<Transform>( id );
-			DirectionalLight& directionalLight = _world.GetComponent<DirectionalLight>( id );
+			const Transform& transform = *transformIt;
+			DirectionalLight& directionalLight = *lightIt;
 
 			DrawDirectionalLight light;
 			light.direction = glm::vec4( ToGLM( transform.Forward() ), 1 );

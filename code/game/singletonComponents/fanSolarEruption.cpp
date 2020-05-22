@@ -102,7 +102,7 @@ namespace fan
 		// initialize particles tags
 		if( eruption.particleEmitter != nullptr )
 		{
-			const int tagIndex = _world.GetIndex( tag_sunlight_occlusion::s_typeInfo );
+			const int tagIndex = _world.GetIndex( tag_sunlight_occlusion::Info::s_type );
 			eruption.particleEmitter->tagsSignature[tagIndex] = 1;
 		}
 	}

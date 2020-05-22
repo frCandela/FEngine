@@ -25,21 +25,24 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void S_UpdateBoundsFromRigidbody::Run( EcsWorld& _world, const std::vector<EcsEntity>& _entities, const float _delta )
+	void S_UpdateBoundsFromRigidbody::Run( EcsWorld& _world, const EcsView& _view, const float _delta )
 	{
 		if( _delta == 0.f ) { return; }
 
-		for( EcsEntity entity : _entities )
+
+		auto rigidbodyIt = _view.begin<Rigidbody>();
+		auto boundsIt = _view.begin<Bounds>();
+		for( ; rigidbodyIt != _view.end<Rigidbody>(); ++rigidbodyIt, ++boundsIt )
 		{
+			const EcsEntity entity = rigidbodyIt.Entity();
+			const Rigidbody& rb = *rigidbodyIt;
+			Bounds& bounds = *boundsIt;
 
-			const Rigidbody& rb = _world.GetComponent<Rigidbody>( entity );
-			if( !rb.rigidbody.isInWorld() ) { continue;}
-
-			Bounds& bounds = _world.GetComponent<Bounds>( entity );
+			if( !rb.rigidbody->isInWorld() ) { continue;}
 
 			// gets bounds from rigidbody
 			btVector3 low, high;
-			rb.rigidbody.getAabb( low, high );
+			rb.rigidbody->getAabb( low, high );
 			bounds.aabb = AABB( low, high );
 
 			_world.RemoveTag<tag_boundsOutdated>( entity );
@@ -59,14 +62,20 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void S_UpdateBoundsFromModel::Run( EcsWorld& _world, const std::vector<EcsEntity>& _entities, const float _delta )
+	void S_UpdateBoundsFromModel::Run( EcsWorld& _world, const EcsView& _view, const float _delta )
 	{
-		for( EcsEntity entity : _entities )
+		auto meshRendererIt = _view.begin<MeshRenderer>();
+		auto transformIt = _view.begin<Transform>();
+		auto boundsIt = _view.begin<Bounds>();
+		for( ; meshRendererIt != _view.end<MeshRenderer>(); ++meshRendererIt, ++transformIt, ++boundsIt )
 		{
-			const MeshRenderer& renderer = _world.GetComponent<MeshRenderer>( entity );
+			const EcsEntity entity = meshRendererIt.Entity();
+			const MeshRenderer& renderer = *meshRendererIt;
+			const Transform& transform = *transformIt;
+			Bounds& bounds = *boundsIt;
+
 			if( *renderer.mesh != nullptr )
 			{
-				const Transform& transform = _world.GetComponent<Transform>( entity );
 				const ConvexHull& hull = renderer.mesh->GetHull();
 
 				// Calculates model matrix
@@ -76,7 +85,6 @@ namespace fan
 				glm::mat4 modelMatrix = glm::translate( glm::mat4( 1.f ), position ) * glm::mat4_cast( rotation ) * glm::scale( glm::mat4( 1.f ), scale );
 
 				// Set the bounds
-				Bounds& bounds = _world.GetComponent<Bounds>( entity );
 				bounds.aabb = AABB( hull.GetVertices(), modelMatrix );
 
 				_world.RemoveTag<tag_boundsOutdated>( entity );
@@ -96,17 +104,19 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void S_UpdateBoundsFromTransform::Run( EcsWorld& _world, const std::vector<EcsEntity>& _entities, const float _delta )
+	void S_UpdateBoundsFromTransform::Run( EcsWorld& _world, const EcsView& _view, const float _delta )
 	{
-		for( EcsEntity entity : _entities )
+		auto transformIt = _view.begin<Transform>();
+		auto boundsIt = _view.begin<Bounds>();
+		for( ; transformIt != _view.end<Transform>(); ++transformIt, ++boundsIt )
 		{
-			const Transform& transform = _world.GetComponent<Transform>( entity );
+			const EcsEntity entity = transformIt.Entity();
+			const Transform& transform = *transformIt;
+			Bounds& bounds = *boundsIt;
+
 			const btVector3 origin = transform.GetPosition();
-
 			const float sizeBounds = 0.2f;
-			Bounds& bounds = _world.GetComponent<Bounds>( entity );
 			bounds.aabb = AABB( origin - sizeBounds * btVector3::One(), origin + sizeBounds * btVector3::One() );
-
 			_world.RemoveTag<tag_boundsOutdated>( entity );
 		}
 	}

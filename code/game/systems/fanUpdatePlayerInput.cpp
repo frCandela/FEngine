@@ -20,12 +20,15 @@ namespace fan
 	//================================================================================================================================
 	EcsSignature S_RefreshPlayerInput::GetSignature( const EcsWorld& _world )
 	{
-		return	_world.GetSignature<PlayerInput>() | _world.GetSignature<Transform>() | _world.GetSignature<PlayerController>();
+		return	
+			_world.GetSignature<PlayerInput>() | 
+			_world.GetSignature<Transform>() | 
+			_world.GetSignature<PlayerController>();
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void S_RefreshPlayerInput::Run( EcsWorld& _world, const std::vector<EcsEntity>& _entities, const float _delta )
+	void S_RefreshPlayerInput::Run( EcsWorld& _world, const EcsView& _view, const float _delta )
 	{
 		if( _delta == 0.f ) { return; }
 
@@ -34,11 +37,14 @@ namespace fan
 		const Transform& cameraTransform = _world.GetComponent<Transform>( cameraID );
 		const Camera& camera = _world.GetComponent<Camera>( cameraID );
 
-		for( EcsEntity entity : _entities )
+		auto transformIt = _view.begin<Transform>();
+		auto inputIt = _view.begin<PlayerInput>();
+		auto controllerIt = _view.begin<PlayerController>();
+		for( ; transformIt != _view.end<Transform>(); ++transformIt, ++inputIt, ++controllerIt )
 		{
-			const Transform& transform = _world.GetComponent<Transform>( entity );
-			PlayerInput& input = _world.GetComponent<PlayerInput>( entity );
-			PlayerController& controller = _world.GetComponent<PlayerController>( entity );
+			const Transform& transform = *transformIt;
+			PlayerInput& input = *inputIt;
+			const PlayerController& controller = *controllerIt;
 
 			input.left =	Input::Get().Manager().GetAxis( "game_left" );
 			input.forward = Input::Get().Manager().GetAxis( "game_forward" );

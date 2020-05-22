@@ -24,17 +24,20 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void S_MovePlanets::Run( EcsWorld& _world, const std::vector<EcsEntity>& _entities, const float _delta )
+	void S_MovePlanets::Run( EcsWorld& _world, const EcsView& _view, const float _delta )
 	{
 		if( _delta == 0.f ) { return; }
 
 		Game& game = _world.GetSingleton<Game>();
 		const float currentTime = game.frameIndex * game.logicDelta;
 
-		for( EcsEntity entity : _entities )
+		auto transformIt = _view.begin<Transform>();
+		auto planetIt = _view.begin<Planet>();
+		for( ; transformIt != _view.end<Transform>(); ++transformIt, ++planetIt )
 		{
-			Transform& transform = _world.GetComponent<Transform>( entity );
-			Planet& planet = _world.GetComponent<Planet>( entity );
+			const EcsEntity entity = transformIt.Entity();
+			Transform& transform = *transformIt;
+			const Planet& planet = *planetIt;
 
 			float const time = -planet.speed * currentTime;
 			btVector3 position( std::cosf( time + planet.phase ), 0, std::sinf( time + planet.phase ) );
@@ -67,7 +70,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void S_GenerateLightMesh::Run( EcsWorld& _world, const std::vector<EcsEntity>& _entities, const float _delta )
+	void S_GenerateLightMesh::Run( EcsWorld& _world, const EcsView& _view, const float _delta )
 	{
 		SCOPED_PROFILE( ecs_solar_erup )
 
@@ -77,10 +80,13 @@ namespace fan
 
 		// Generates occlusion rays for each planet
 		std::vector< OrientedSegment > segments;
-		segments.reserve( 2 * _entities.size() );
-		for( EcsEntity entity : _entities )
+		segments.reserve( 2 * _view.Size() );
+
+		auto transformIt = _view.begin<Transform>();
+		for( ; transformIt != _view.end<Transform>(); ++transformIt )
 		{
-			Transform& transform = _world.GetComponent<Transform>(entityID);
+			Transform& transform = *transformIt;
+
 			btVector3& scale = transform.scale;
 
 			const btVector3 planetPos = transform.GetPosition();
@@ -123,7 +129,7 @@ namespace fan
 
 		// generates the mesh
 		std::vector<Vertex>	vertices;
-		vertices.reserve( 3 * _entities.size() );
+		vertices.reserve( 3 * _view.Size() );
 		const float minGapRadians = btRadians( sunLight.subAngle );
 		std::set<float> norms;	// Stores the nested opening segments norms
 		for( int axisIndex = 0; axisIndex < segments.size(); axisIndex++ )

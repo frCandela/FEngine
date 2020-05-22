@@ -30,7 +30,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void S_HostSpawnShip::Run( EcsWorld& _world, const std::vector<EcsEntity>& _entities, const float _delta )
+	void S_HostSpawnShip::Run( EcsWorld& _world, const EcsView& _view, const float _delta )
 	{
 		if( _delta == 0.f ) { return; }
 
@@ -38,11 +38,15 @@ namespace fan
 		LinkingContext& linkingContext = _world.GetSingleton<LinkingContext>();
 		const Game& game = _world.GetSingleton<Game>();
 
-		for( EcsEntity entity : _entities )
+		auto hostConnectionIt = _view.begin<HostConnection>();
+		auto hostDataIt = _view.begin<HostGameData>();
+		auto hostReplicationIt = _view.begin<HostReplication>();
+		for( ; hostConnectionIt != _view.end<HostConnection>(); ++hostConnectionIt, ++hostDataIt, ++hostReplicationIt )
 		{
-			HostConnection&  hostConnection  = _world.GetComponent< HostConnection >( entity );
-			HostGameData&	 hostData		 = _world.GetComponent< HostGameData >( entity );
-			HostReplication& hostReplication = _world.GetComponent< HostReplication >( entity );
+			const EcsEntity entity = hostConnectionIt.Entity();
+			const HostConnection& hostConnection = *hostConnectionIt;
+			HostGameData& hostData = *hostDataIt;
+			HostReplication& hostReplication = *hostReplicationIt;
 
 			if( hostConnection.state == HostConnection::Connected )
 			{
@@ -102,17 +106,19 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void S_HostSyncFrame::Run( EcsWorld& _world, const std::vector<EcsEntity>& _entities, const float _delta )
+	void S_HostSyncFrame::Run( EcsWorld& _world, const EcsView& _view, const float _delta )
 	{
 		if( _delta == 0.f ) { return; }
 
 		const HostManager& hostManager = _world.GetSingleton<HostManager>();
 		const Game& game = _world.GetSingleton<Game>();
 
-		for( EcsEntity entity : _entities )
+		auto hostConnectionIt = _view.begin<HostConnection>();
+		auto hostReplicationIt = _view.begin<HostReplication>();
+		for( ; hostConnectionIt != _view.end<HostConnection>(); ++hostConnectionIt, ++hostReplicationIt )
 		{
-			HostConnection&		hostConnection  = _world.GetComponent< HostConnection >( entity );
-			HostReplication&	hostReplication = _world.GetComponent< HostReplication >( entity );
+			HostConnection& hostConnection = *hostConnectionIt;
+			HostReplication& hostReplication = *hostReplicationIt;
 
 			// sync the client frame index with the server
 			const double currentTime = Time::Get().ElapsedSinceStartup();
@@ -164,15 +170,15 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void S_HostSaveState::Run( EcsWorld& _world, const std::vector<EcsEntity>& _entities, const float _delta )
+	void S_HostSaveState::Run( EcsWorld& _world, const EcsView& _view, const float _delta )
 	{
 		if( _delta == 0.f ) { return; }
 
 		const Game& game = _world.GetSingleton<Game>();
 
-		for( EcsEntity entity : _entities )
+		for( auto hostDataIt = _view.begin<HostGameData>(); hostDataIt != _view.end<HostGameData>(); ++hostDataIt )
 		{
-			HostGameData& hostData = _world.GetComponent< HostGameData >( entity );
+			HostGameData& hostData = *hostDataIt;
 
 			if(  hostData.spaceshipHandle != 0 && game.frameIndex >= hostData.nextPlayerStateFrame )
 			{
@@ -199,15 +205,15 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void S_HostUpdateInput::Run( EcsWorld& _world, const std::vector<EcsEntity>& _entities, const float _delta )
+	void S_HostUpdateInput::Run( EcsWorld& _world, const EcsView& _view, const float _delta )
 	{
 		if( _delta == 0.f ) { return; }
 
 		const Game& game = _world.GetSingleton<Game>();
 
-		for( EcsEntity entity : _entities )
+		for( auto hostDataIt = _view.begin<HostGameData>(); hostDataIt != _view.end<HostGameData>(); ++hostDataIt )
 		{
-			HostGameData& hostData = _world.GetComponent< HostGameData >( entity );
+			HostGameData& hostData = *hostDataIt;
 
 			if( hostData.spaceshipID != 0 )
 			{

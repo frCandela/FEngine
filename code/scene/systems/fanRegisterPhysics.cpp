@@ -13,6 +13,7 @@ namespace fan
 {
 
 	//================================================================================================================================
+	// @todo split this in two systems for SphereShape & BoxShape
 	//================================================================================================================================
 	EcsSignature S_RegisterAllRigidbodies::GetSignature( const EcsWorld& _world )
 	{
@@ -21,29 +22,30 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void S_RegisterAllRigidbodies::Run( EcsWorld& _world, const std::vector<EcsEntity>& _entities )
+	void S_RegisterAllRigidbodies::Run( EcsWorld& _world, const EcsView& _view ) 
 	{
 		PhysicsWorld& physicsWorld = _world.GetSingleton<PhysicsWorld>();
-		for( EcsEntity entity : _entities )
+		for( auto rigidbodyIt = _view.begin<Rigidbody>(); rigidbodyIt != _view.end<Rigidbody>(); ++rigidbodyIt )
 		{
-			Rigidbody& rb = _world.GetComponent<Rigidbody>( entity );
+			const EcsEntity entity = rigidbodyIt.Entity();
+			Rigidbody& rb = *rigidbodyIt;
 
 			// find a collision shape
 			btCollisionShape* shape = nullptr;
 			if( _world.HasComponent<SphereShape>( entity ) )
 			{
-				shape = &_world.GetComponent<SphereShape>( entity ).sphereShape;
+				shape = _world.GetComponent<SphereShape>( entity ).sphereShape;
 			}
 			else if( _world.HasComponent<BoxShape>( entity ) )
 			{
-				shape = &_world.GetComponent<BoxShape>( entity ).boxShape;
+				shape = _world.GetComponent<BoxShape>( entity ).boxShape;
 			}
 
 			// find a motion state
 			btDefaultMotionState* motionState = nullptr;
 			if( _world.HasComponent<MotionState>( entity ) )
 			{
-				motionState = &_world.GetComponent<MotionState>( entity ).motionState;
+				motionState = _world.GetComponent<MotionState>( entity ).motionState;
 			}
 
 			// reset the rigidbody				
@@ -57,7 +59,7 @@ namespace fan
 			}
 			else
 			{
-				physicsWorld.dynamicsWorld->addRigidBody( &rb.rigidbody );
+				physicsWorld.dynamicsWorld->addRigidBody( rb.rigidbody );
 			}			
 		}
 	}
@@ -72,12 +74,12 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void S_UnregisterAllRigidbodies::Run( EcsWorld& _world, const std::vector<EcsEntity>& _entities )
+	void S_UnregisterAllRigidbodies::Run( EcsWorld& _world, const EcsView& _view ) 
 	{
 		PhysicsWorld& physicsWorld = _world.GetSingleton<PhysicsWorld>();
-		for( EcsEntity entity : _entities )
+		for( auto rigidbodyIt = _view.begin<Rigidbody>(); rigidbodyIt != _view.end<Rigidbody>(); ++rigidbodyIt )
 		{
-			Rigidbody& rigidbody = _world.GetComponent<Rigidbody>( entity );
+			Rigidbody& rigidbody = *rigidbodyIt;
 			physicsWorld.RemoveRigidbody( rigidbody );
 		}
 	}

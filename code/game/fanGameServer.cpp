@@ -117,21 +117,21 @@ namespace fan
 		world.AddComponentType<ReliabilityLayer>();
 
 		// base singleton components
-		world.AddSingletonComponentType<Scene>();
-		world.AddSingletonComponentType<RenderWorld>();
-		world.AddSingletonComponentType<PhysicsWorld>();
-		world.AddSingletonComponentType<ScenePointers>();
+		world.AddSingletonType<Scene>();
+		world.AddSingletonType<RenderWorld>();
+		world.AddSingletonType<PhysicsWorld>();
+		world.AddSingletonType<ScenePointers>();
 		// game singleton components
-		world.AddSingletonComponentType<SunLight>();
-		world.AddSingletonComponentType<GameCamera>();
-		world.AddSingletonComponentType<CollisionManager>();
-		world.AddSingletonComponentType<Game>();
-		world.AddSingletonComponentType<SolarEruption>();
-		world.AddSingletonComponentType<ServerNetworkManager>();
+		world.AddSingletonType<SunLight>();
+		world.AddSingletonType<GameCamera>();
+		world.AddSingletonType<CollisionManager>();
+		world.AddSingletonType<Game>();
+		world.AddSingletonType<SolarEruption>();
+		world.AddSingletonType<ServerNetworkManager>();
 		// net singleton components
-		world.AddSingletonComponentType<ServerConnection>();
-		world.AddSingletonComponentType<LinkingContext>();
-		world.AddSingletonComponentType<HostManager>();
+		world.AddSingletonType<ServerConnection>();
+		world.AddSingletonType<LinkingContext>();
+		world.AddSingletonType<HostManager>();
 		
 		world.AddTagType<tag_boundsOutdated>();
 		world.AddTagType<tag_sunlight_occlusion>();
@@ -252,7 +252,7 @@ namespace fan
 				const HostGameData& hostData = world.GetComponent<HostGameData>( hostID );
 				if( hostData.spaceshipHandle != 0 )
 				{
-					const PacketReplication packet = HostReplication::BuildEntityPacket( world, hostData.spaceshipHandle, { Transform::s_typeInfo/*,Rigidbody::s_typeInfo*/ } );
+					const PacketReplication packet = HostReplication::BuildEntityPacket( world, hostData.spaceshipHandle, { Transform::Info::s_type/*,Rigidbody::s_typeInfo*/ } );
 
 					for( const std::pair<HostManager::IPPort, EcsHandle>& otherPair : hostManager.hostHandles )
 					{
@@ -275,8 +275,7 @@ namespace fan
 		{
 			// end frame
 			SCOPED_PROFILE( scene_endFrame );
-			world.SortEntities();
-			world.RemoveDeadEntities();
+			world.ApplyTransitions();
 		}
 	}
 }

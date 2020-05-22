@@ -7,6 +7,7 @@
 namespace fan
 {
 	class EcsWorld;	  
+	struct EcsComponent;
 
 	//================================================================================================================================
 	// holds a pointer to a component of a specific  scene
@@ -22,10 +23,10 @@ namespace fan
 		void Clear();
 
 		const uint32_t		  staticID;				// static id of the component
-		const int  dynamicID = 255;		// dynamic id of the component
+		const int			  dynamicID = 255;		// dynamic id of the component
 		EcsWorld* const		  world	 = nullptr;		// world containing the target component
 		uint32_t			  sceneNodeID = 0;		// unique index of the associated scene node
-		EcsComponent*			  component = nullptr;  // the component
+		EcsComponent*		  component = nullptr;  // the component
 	}; static constexpr size_t sizeof_componentPtrBase = sizeof( ComponentPtrBase );
 
 	//================================================================================================================================
@@ -35,7 +36,7 @@ namespace fan
 	class ComponentPtr : public ComponentPtrBase
 	{
 	public:
-		ComponentPtr() : ComponentPtrBase( _componentType::s_type ) {}
+		ComponentPtr() : ComponentPtrBase( _componentType::Info::s_type ) {}
 		_componentType* operator->() const { return static_cast<_componentType*>( component ); }
 		_componentType& operator*() const { return *static_cast<_componentType*>( component ); }
 		bool operator!=( const _componentType* _other ) const{ return _other != component;	}

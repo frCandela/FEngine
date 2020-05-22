@@ -20,7 +20,7 @@ namespace fan
 	{
 		SCOPED_PROFILE( singleton_win );
 		
-		const std::vector< EcsSingletonInfo >& info = m_world->GetVectorSingletonEcsComponentInfo();
+		const std::vector< EcsSingletonInfo >& info = m_world->GetVectorSingletonInfo();
 		for( const EcsSingletonInfo& info : info )
 		{
 			ImGui::SetCursorPosY( ImGui::GetCursorPosY() + 3);		// moves cursor lower to center the icon
@@ -31,7 +31,7 @@ namespace fan
 				// draws gui 
 				if( info.onGui != nullptr )
 				{
-					info.onGui( *m_world, m_world->GetSingletonComponent( info.type) );
+					info.onGui( *m_world, m_world->GetSingleton( info.type) );
 				}
 			}			
 		}

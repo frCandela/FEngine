@@ -32,7 +32,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void S_FireWeapons::Run( EcsWorld& _world, const std::vector<EcsEntity>& _entities, const float _delta )
+	void S_FireWeapons::Run( EcsWorld& _world, const EcsView& _view, const float _delta )
 	{
 		if( _delta == 0.f ) { return; }
 
@@ -40,13 +40,18 @@ namespace fan
 		Scene& scene = _world.GetSingleton<Scene>();
 		CollisionManager& collisionManager = _world.GetSingleton<CollisionManager>();
 
-		for( EcsEntity entity : _entities )
+		auto transformIt = _view.begin<Transform>();
+		auto rigidbodyIt = _view.begin<Rigidbody>();
+		auto inputIt = _view.begin<PlayerInput>();
+		auto weaponIt = _view.begin<Weapon>();
+		auto batteryIt = _view.begin<Battery>();
+		for( ; transformIt != _view.end<Transform>(); ++transformIt, ++rigidbodyIt, ++inputIt, ++weaponIt, ++batteryIt )
 		{
-			const Transform& transform = _world.GetComponent<Transform>( entity );
-			const Rigidbody& rigidbody = _world.GetComponent<Rigidbody>( entity );
-			PlayerInput& input = _world.GetComponent<PlayerInput>( entity );
-			Weapon& weapon = _world.GetComponent<Weapon>( entity );
-			Battery& battery = _world.GetComponent<Battery>( entity );
+			const Transform& transform = *transformIt;
+			const Rigidbody& rigidbody = *rigidbodyIt;
+			const PlayerInput& input = *inputIt;
+			Weapon& weapon = *weaponIt;
+			Battery& battery = *batteryIt;
 
 			weapon.bulletsAccumulator += _delta * weapon.bulletsPerSecond;
 			if( weapon.bulletsAccumulator > 1.f ) { weapon.bulletsAccumulator = 1.f; }
@@ -69,8 +74,8 @@ namespace fan
 					bulletRigidbody.onContactStarted.Connect( &CollisionManager::OnBulletContact, &collisionManager );
 					bulletRigidbody.SetIgnoreCollisionCheck( rigidbody, true );
 					bulletRigidbody.SetVelocity( rigidbody.GetVelocity() + weapon.bulletSpeed * transform.Forward() );
-					bulletRigidbody.SetMotionState( &_world.GetComponent<MotionState>( bulletID ).motionState );
-					bulletRigidbody.SetCollisionShape( &_world.GetComponent<SphereShape>( bulletID ).sphereShape );
+					bulletRigidbody.SetMotionState( _world.GetComponent<MotionState>( bulletID ).motionState );
+					bulletRigidbody.SetCollisionShape( _world.GetComponent<SphereShape>( bulletID ).sphereShape );
 
 					physicsWorld.AddRigidbody( bulletRigidbody, node.handle );
 				}				

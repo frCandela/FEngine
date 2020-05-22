@@ -82,7 +82,7 @@ namespace fan
  			const Ray ray = camera.ScreenPosToRay( cameraTransform, Mouse::Get().GetScreenSpacePosition() );
 
 			// raycast on bounds
-			constEcsSignaturesignatureRaycast = S_RaycastAll::GetSignature( world );
+			const EcsSignature signatureRaycast = S_RaycastAll::GetSignature( world );
 			std::vector<EcsEntity> outResults;
 			if( S_RaycastAll::Run( world, world.Match( signatureRaycast ), ray, outResults ) )
 			{
@@ -106,15 +106,15 @@ namespace fan
 			}
  		}
 
-		// draw collision shapes, lights
-		if( m_selectedSceneNode != nullptr )
-		{
-			EcsWorld& world = *m_selectedSceneNode->scene->world;
-			EcsEntity nodeID = world.GetEntity( m_selectedSceneNode->handle );
-			S_DrawDebugCollisionShapes::Run( world, world.MatchSubset( S_DrawDebugCollisionShapes::GetSignature( world ), { nodeID } ) );
-			S_DrawDebugDirectionalLights::Run( world, world.MatchSubset( S_DrawDebugDirectionalLights::GetSignature( world ), { nodeID } ) );
-			S_DrawDebugPointLights::Run( world, world.MatchSubset( S_DrawDebugPointLights::GetSignature( world ), { nodeID } ) );
-		}	
+		// draw collision shapes, lights @migration
+// 		if( m_selectedSceneNode != nullptr )
+// 		{
+// 			EcsWorld& world = *m_selectedSceneNode->scene->world;
+// 			EcsEntity nodeID = world.GetEntity( m_selectedSceneNode->handle );
+// 			S_DrawDebugCollisionShapes::Run( world, world.MatchSubset( S_DrawDebugCollisionShapes::GetSignature( world ), { nodeID } ) );
+// 			S_DrawDebugDirectionalLights::Run( world, world.MatchSubset( S_DrawDebugDirectionalLights::GetSignature( world ), { nodeID } ) );
+// 			S_DrawDebugPointLights::Run( world, world.MatchSubset( S_DrawDebugPointLights::GetSignature( world ), { nodeID } ) );
+// 		}	
 
 	}
 

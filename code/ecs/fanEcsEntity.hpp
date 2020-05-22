@@ -13,6 +13,11 @@ namespace fan
 	{
 		EcsArchetype* archetype = nullptr;
 		uint32_t	index = 0;	// index in the archetype
+
+		bool operator!=( const EcsEntity& _other ) const
+		{
+			return archetype == _other.archetype && index == _other.index;
+		}
 	};
 
 	//================================

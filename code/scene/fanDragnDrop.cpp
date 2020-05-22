@@ -48,18 +48,19 @@ namespace ImGui
 	//================================================================================================================================
 	void FanBeginDragDropSourceComponent( fan::SceneNode& _sceneNode, fan::EcsComponent& _component, ImGuiDragDropFlags _flags )
 	{
-		if( ImGui::BeginDragDropSource( _flags ) )
-		{
-			fan::EcsWorld& world = *_sceneNode.scene->world;
-			const fan::EcsComponentInfo& info = world.GetComponentInfo( _component.GetIndex() );
-
-			std::string nameid = std::string( "dragndrop_" ) + std::to_string( info.type);
-			ComponentPayload payload = { &_sceneNode , &_component };
-			ImGui::SetDragDropPayload( nameid.c_str(), &payload, sizeof( payload ) );
-			ImGui::Icon( info.icon, { 16,16 } ); ImGui::SameLine();
-			ImGui::Text("%s : %s", info.name.c_str(), _sceneNode.name.c_str() );
-			ImGui::EndDragDropSource();
-		}		
+		// @migration
+// 		if( ImGui::BeginDragDropSource( _flags ) )
+// 		{
+// 			fan::EcsWorld& world = *_sceneNode.scene->world;
+// 			const fan::EcsComponentInfo& info = world.GetComponentInfo( _component.GetIndex() );
+// 
+// 			std::string nameid = std::string( "dragndrop_" ) + std::to_string( info.type);
+// 			ComponentPayload payload = { &_sceneNode , &_component };
+// 			ImGui::SetDragDropPayload( nameid.c_str(), &payload, sizeof( payload ) );
+// 			ImGui::Icon( info.icon, { 16,16 } ); ImGui::SameLine();
+// 			ImGui::Text("%s : %s", info.name.c_str(), _sceneNode.name.c_str() );
+// 			ImGui::EndDragDropSource();
+// 		}		
 	}
 
 	//================================================================================================================================
@@ -80,7 +81,7 @@ namespace ImGui
  			}
 
  			// Drop payload scene node
-			nameid = std::string( "dragndrop_" ) + std::to_string( fan::SceneNode::s_typeInfo );
+			nameid = std::string( "dragndrop_" ) + std::to_string( fan::SceneNode::Info::s_type );
 			imGuiPayload = ImGui::AcceptDragDropPayload( nameid.c_str() );
 			if( imGuiPayload != nullptr )
 			{
@@ -90,15 +91,14 @@ namespace ImGui
 				fan::SceneNode& node = *payload.sceneNode;
 				fan::EcsWorld& world = *node.scene->world;
 				fan::EcsEntity nodeID = world.GetEntity( node.handle );
-				fan::ComponentIndex componentIndex = world.GetIndex( _staticID );
-				if( world.HasComponent( nodeID, componentIndex ) )
+				if( world.HasComponent( nodeID, _staticID ) )
 				{
-					fan::EcsComponent& component = world.GetComponent( nodeID, componentIndex );
+					fan::EcsComponent& component = world.GetComponent( nodeID, _staticID );
 					return { &node, &component };
 				}
 				else
 				{
-					const fan::EcsComponentInfo& info = world.GetComponentInfo( componentIndex );
+					const fan::EcsComponentInfo& info = world.GetComponentInfo( _staticID );
 					fan::Debug::Warning() << "drop failed : " << info.name << " component not found on \"" << node.name << "\"" << fan::Debug::Endl();
 				}
 			}

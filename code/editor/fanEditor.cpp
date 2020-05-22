@@ -88,6 +88,9 @@ namespace fan
 		Editor::InitializeEditorEcsWorldTypes( m_editorWorld );
 		Editor::InitializeGameEcsWorldTypes( m_gameWorld );
 
+		m_editorWorld.Create();
+		m_gameWorld.Create();
+
 		// window position
 		glm::ivec2 windowPosition = { 0,23 };
 		if( _settings.window_position != glm::ivec2( -1, -1 ) )
@@ -913,14 +916,14 @@ namespace fan
 	//================================================================================================================================
 	void Editor::InitializeEditorEcsWorldTypes( EcsWorld& _world )
 	{
-		_world.AddSingletonComponentType<EditorGrid>();
+		_world.AddSingletonType<EditorGrid>();
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
 	void Editor::InitializeGameEcsWorldTypes( EcsWorld& _world )
 	{
-		_world.AddSingletonComponentType<EditorCamera>();
+		_world.AddSingletonType<EditorCamera>();
 
 		_world.AddTagType<tag_editorOnly>();
 	}

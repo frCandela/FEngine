@@ -19,24 +19,21 @@ namespace fan
 	//================================================================================================================================
 	EcsSignature S_ClientSpawnSpaceship::GetSignature( const EcsWorld& _world )
 	{
-		return
-			_world.GetSignature<ClientConnection>() |
-			_world.GetSignature<ClientGameData>()   |
-			_world.GetSignature<ClientReplication>();
+		return	_world.GetSignature<ClientGameData>();
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void S_ClientSpawnSpaceship::Run( EcsWorld& _world, const std::vector<EcsEntity>& _entities, const float _delta )
+	void S_ClientSpawnSpaceship::Run( EcsWorld& _world, const EcsView& _view, const float _delta )
 	{
 		if( _delta == 0.f ) { return; }
 
 		LinkingContext& linkingContext = _world.GetSingleton<LinkingContext>();
 		const Game& game = _world.GetSingleton<Game>();
 
-		for( EcsEntity entity : _entities )
-		{			
-			ClientGameData& gameData = _world.GetComponent<ClientGameData>( entity );
+		for( auto gameDataIt = _view.begin<ClientGameData>(); gameDataIt != _view.end<ClientGameData>(); ++gameDataIt )
+		{
+			ClientGameData& gameData = *gameDataIt;
 
 			// spawns spaceship
 			if( gameData.spaceshipSpawnFrameIndex != 0 
@@ -67,15 +64,15 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void S_ClientSaveState::Run( EcsWorld& _world, const std::vector<EcsEntity>& _entities, const float _delta )
+	void S_ClientSaveState::Run( EcsWorld& _world, const EcsView& _view, const float _delta )
 	{
 		if( _delta == 0.f ) { return; }
 
 		const Game& game = _world.GetSingleton<Game>();
 
-		for( EcsEntity entity : _entities )
+		for( auto gameDataIt = _view.begin<ClientGameData>(); gameDataIt != _view.end<ClientGameData>(); ++gameDataIt )
 		{
-			ClientGameData& gameData = _world.GetComponent<ClientGameData>( entity );
+			ClientGameData& gameData = *gameDataIt;
 
 			if( gameData.spaceshipHandle != 0 && gameData.frameSynced )
 			{
@@ -84,7 +81,7 @@ namespace fan
 				// saves previous player state
 				const Rigidbody& rb = _world.GetComponent<Rigidbody>( spaceshipID );
 				const Transform& transform = _world.GetComponent<Transform>( spaceshipID );
-				assert( rb.rigidbody.getTotalForce().isZero() );
+				assert( rb.rigidbody->getTotalForce().isZero() );
 				PacketPlayerGameState playerState;
 				playerState.frameIndex = game.frameIndex;
 				playerState.position = transform.GetPosition();
@@ -106,16 +103,18 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void S_ClientRunReplication::Run( EcsWorld& _world, const std::vector<EcsEntity>& _entities, const float _delta )
+	void S_ClientRunReplication::Run( EcsWorld& _world, const EcsView& _view, const float _delta )
 	{
 		if( _delta == 0.f ) { return; }
 
 		LinkingContext& linkingContext = _world.GetSingleton<LinkingContext>();
 
-		for( EcsEntity entity : _entities )
+		auto rpcIt = _view.begin<ClientRPC>();
+		auto replicationIt = _view.begin<ClientReplication>();
+		for( ; rpcIt != _view.end<ClientRPC>(); ++rpcIt, ++replicationIt )
 		{
-			ClientReplication&	replication = _world.GetComponent<ClientReplication>( entity );
-			ClientRPC&			rpc			= _world.GetComponent<ClientRPC>( entity );
+			ClientRPC& rpc = *rpcIt;
+			ClientReplication& replication = *replicationIt;
 
 			// replicate singletons components
 			for( PacketReplication packet : replication.replicationListSingletons )
@@ -175,13 +174,13 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void S_ClientDetectServerTimeout::Run( EcsWorld& _world, const std::vector<EcsEntity>& _entities, const float _delta )
+	void S_ClientDetectServerTimeout::Run( EcsWorld& _world, const EcsView& _view, const float _delta )
 	{
 		if( _delta == 0.f ) { return; }
 
-		for( EcsEntity entity : _entities )
+		for( auto connectionIt = _view.begin<ClientConnection>(); connectionIt != _view.end<ClientConnection>(); ++connectionIt )
 		{
-			ClientConnection& connection = _world.GetComponent<ClientConnection>( entity );
+			ClientConnection& connection = *connectionIt;
 			
 			if( connection.state == ClientConnection::ClientState::Connected )
 			{
@@ -204,15 +203,15 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void S_ClientSaveInput::Run( EcsWorld& _world, const std::vector<EcsEntity>& _entities, const float _delta )
+	void S_ClientSaveInput::Run( EcsWorld& _world, const EcsView& _view, const float _delta )
 	{
 		if( _delta == 0.f ) { return; }
 
 		const Game& game = _world.GetSingleton<Game>();
 
-		for( EcsEntity entity : _entities )
+		for( auto gameDataIt = _view.begin<ClientGameData>(); gameDataIt != _view.end<ClientGameData>(); ++gameDataIt )
 		{
-			ClientGameData& gameData = _world.GetComponent<ClientGameData>( entity );
+			ClientGameData& gameData = *gameDataIt;
 
 			if( gameData.spaceshipHandle != 0 && gameData.frameSynced )
 			{

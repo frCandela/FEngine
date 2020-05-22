@@ -15,7 +15,7 @@ namespace fan
 {
 	//================================
 	//================================
-	#define ECS_SINGLETON( _SingletonType )								\
+	#define ECS_SINGLETON( _SingletonType )										\
 	public:																		\
 		static constexpr const char* s_name		{ #_SingletonType		  };	\
 		static constexpr uint32_t	 s_type		{ SSID( #_SingletonType ) };	

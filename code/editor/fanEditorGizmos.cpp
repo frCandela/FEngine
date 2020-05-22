@@ -27,7 +27,7 @@ namespace fan
 	//================================================================================================================================
 	bool EditorGizmos::DrawMoveGizmo( const btTransform _transform, const size_t _uniqueID, btVector3& _newPosition )
 	{
-		Scene& scene = m_world->GetSingletonComponent<Scene>();
+		Scene& scene = m_world->GetSingleton<Scene>();
 
 		// Get main camera data
 		SceneNode& cameraNode = * scene.mainCamera;

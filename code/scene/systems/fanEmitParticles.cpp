@@ -18,14 +18,16 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void S_EmitParticles::Run( EcsWorld& _world, const std::vector<EcsEntity>& _entities, const float _delta )
+	void S_EmitParticles::Run( EcsWorld& _world, const EcsView& _view, const float _delta )
 	{
 		if( _delta == 0.f ) { return; }
 
-		for( EcsEntity id : _entities )
+		auto transformIt = _view.begin<Transform>();
+		auto particleEmitterIt = _view.begin<ParticleEmitter>();
+		for( ; transformIt != _view.end<Transform>(); ++transformIt, ++particleEmitterIt )
 		{
-			const Transform& emitterTransform = _world.GetComponent<Transform>( id );
-			ParticleEmitter& emitter = _world.GetComponent<ParticleEmitter>( id );
+			const Transform& emitterTransform = *transformIt;
+			ParticleEmitter& emitter = *particleEmitterIt;
 
 			if( emitter.particlesPerSecond > 0.f && emitter.enabled )
 			{

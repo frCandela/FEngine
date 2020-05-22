@@ -14,13 +14,14 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void S_UpdateExpirationTimes::Run( EcsWorld& _world, const std::vector<EcsEntity>& _entities, const float _delta )
+	void S_UpdateExpirationTimes::Run( EcsWorld& _world, const EcsView& _view, const float _delta )
 	{
 		if( _delta == 0.f ) { return; }
 
-		for( EcsEntity entity : _entities )
+		for( auto expirationeIt = _view.begin<ExpirationTime>(); expirationeIt != _view.end<ExpirationTime>(); ++expirationeIt )
 		{
-			ExpirationTime& expiration = _world.GetComponent<ExpirationTime>( entity );
+			const EcsEntity entity = expirationeIt.Entity();
+			ExpirationTime& expiration = *expirationeIt;
 
 			expiration.duration -= _delta;
 			if( expiration.duration < 0.f )

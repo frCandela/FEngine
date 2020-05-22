@@ -14,13 +14,14 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void S_UpdateParticles::Run( EcsWorld& _world, const std::vector<EcsEntity>& _entities, const float _delta )
+	void S_UpdateParticles::Run( EcsWorld& _world, const EcsView& _view, const float _delta )
 	{
 		if( _delta == 0.f ) { return; }
 
-		for( EcsEntity entity : _entities )
+		for( auto particleIt = _view.begin<Particle>(); particleIt != _view.end<Particle>(); ++particleIt )
 		{
-			Particle& particle = _world.GetComponent<Particle>( entity );
+			const EcsEntity entity = particleIt.Entity();
+			Particle& particle = *particleIt;
 
 			particle.durationLeft -= _delta;
 			if( particle.durationLeft < 0.f )

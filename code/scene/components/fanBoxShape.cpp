@@ -78,13 +78,13 @@ namespace fan
 	//================================================================================================================================
 	void BoxShape::SetScaling( const btVector3 _scaling )
 	{
-		boxShape.setLocalScaling( _scaling );
+		boxShape->setLocalScaling( _scaling );
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
 	btVector3 BoxShape::GetScaling() const
 	{
-		return boxShape.getLocalScaling();
+		return boxShape->getLocalScaling();
 	}
 }

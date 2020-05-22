@@ -120,20 +120,20 @@ namespace fan
 		world.AddComponentType<ClientGameData>();
 
 		// base singleton components
-		world.AddSingletonComponentType<Scene>();
-		world.AddSingletonComponentType<RenderWorld>();
-		world.AddSingletonComponentType<PhysicsWorld>();
-		world.AddSingletonComponentType<ScenePointers>();
+		world.AddSingletonType<Scene>();
+		world.AddSingletonType<RenderWorld>();
+		world.AddSingletonType<PhysicsWorld>();
+		world.AddSingletonType<ScenePointers>();
 		// game singleton components
-		world.AddSingletonComponentType<SunLight>();
-		world.AddSingletonComponentType<GameCamera>();
-		world.AddSingletonComponentType<CollisionManager>();
-		world.AddSingletonComponentType<Game>();
-		world.AddSingletonComponentType<SolarEruption>();
-		world.AddSingletonComponentType<ClientNetworkManager>();
+		world.AddSingletonType<SunLight>();
+		world.AddSingletonType<GameCamera>();
+		world.AddSingletonType<CollisionManager>();
+		world.AddSingletonType<Game>();
+		world.AddSingletonType<SolarEruption>();
+		world.AddSingletonType<ClientNetworkManager>();
 		// network singleton components
 		
-		world.AddSingletonComponentType<LinkingContext>();
+		world.AddSingletonType<LinkingContext>();
 
 		world.AddTagType<tag_boundsOutdated>();
 		world.AddTagType<tag_sunlight_occlusion>();
@@ -229,11 +229,11 @@ namespace fan
 				PhysicsWorld& physicsWorld = world.GetSingleton<PhysicsWorld>();
 				physicsWorld.Reset();
 				Rigidbody& rigidbody = _world.GetComponent<Rigidbody>( spaceshipID );
-				physicsWorld.dynamicsWorld->removeRigidBody( &rigidbody.rigidbody );
-				physicsWorld.dynamicsWorld->addRigidBody( &rigidbody.rigidbody );
-				rigidbody.rigidbody.clearForces();
+				physicsWorld.dynamicsWorld->removeRigidBody( rigidbody.rigidbody );
+				physicsWorld.dynamicsWorld->addRigidBody( rigidbody.rigidbody );
+				rigidbody.ClearForces();
 				Transform& transform = _world.GetComponent<Transform>( spaceshipID );
-				rigidbody.rigidbody.clearForces();
+				rigidbody.ClearForces();
 				rigidbody.SetVelocity(			gameData.lastServerState.velocity			);
 				rigidbody.SetAngularVelocity(	gameData.lastServerState.angularVelocity	);
 				transform.SetPosition(			gameData.lastServerState.position			);
@@ -243,7 +243,7 @@ namespace fan
  				gameData.previousStates = std::queue< PacketPlayerGameState >(); 
  				gameData.previousStates.push( gameData.lastServerState );
 
-				// Resimulate the last frames of input of the player
+				// resimulate the last frames of input of the player
 				PlayerInput& input = _world.GetComponent<PlayerInput>( spaceshipID );
 				const float delta = game->logicDelta;
 				for (int i = 1; i < gameData.previousInputsSinceLastGameState.size(); i++)
@@ -338,8 +338,7 @@ namespace fan
 		{
 			// end frame
 			SCOPED_PROFILE( scene_endFrame );
-			world.SortEntities();
-			world.RemoveDeadEntities();
+			world.ApplyTransitions();
 		}
 	}
 }

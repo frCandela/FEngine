@@ -19,16 +19,18 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void S_UpdateSolarPannels::Run( EcsWorld& _world, const std::vector<EcsEntity>& _entities, const float _delta )
+	void S_UpdateSolarPannels::Run( EcsWorld& _world, const EcsView& _view, const float _delta )
 	{
 		if( _delta == 0.f ) { return; }
 
 		const SunLight& sunLight = _world.GetSingleton<SunLight>();
 
-		for( EcsEntity entity : _entities )
+		auto transformIt = _view.begin<Transform>();
+		auto solarPanelIt = _view.begin<SolarPanel>();
+		for( ; transformIt != _view.end<Transform>(); ++transformIt, ++solarPanelIt )
 		{
-			const Transform& transform = _world.GetComponent<Transform>( entity );
-			SolarPanel& solarPanel = _world.GetComponent<SolarPanel>( entity );
+			const Transform& transform = *transformIt;
+			SolarPanel& solarPanel = *solarPanelIt;
 
 			// sunlight mesh raycast
 			const btVector3 rayOrigin = transform.GetPosition() + btVector3::Up();
@@ -62,14 +64,16 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void S_RechargeBatteries::Run( EcsWorld& _world, const std::vector<EcsEntity>& _entities, const float _delta )
+	void S_RechargeBatteries::Run( EcsWorld& _world, const EcsView& _view, const float _delta )
 	{
 		if( _delta == 0.f ) { return; }
 
-		for( EcsEntity entity : _entities )
+		auto batteryIt = _view.begin<Battery>();
+		auto solarPanelIt = _view.begin<SolarPanel>();
+		for( ; batteryIt != _view.end<Battery>(); ++batteryIt, ++solarPanelIt )
 		{
-			const SolarPanel& solarPanel = _world.GetComponent<SolarPanel>( entity );
-			Battery& battery = _world.GetComponent<Battery>( entity );
+			Battery& battery = *batteryIt;
+			const SolarPanel& solarPanel = *solarPanelIt;
 
 			const float energyAdded = _delta * solarPanel.currentChargingRate;
 			battery.currentEnergy = std::min( battery.currentEnergy + energyAdded, battery.maxEnergy );
