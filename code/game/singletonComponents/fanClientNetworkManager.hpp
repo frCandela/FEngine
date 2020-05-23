@@ -21,7 +21,7 @@ namespace fan
 		void Start( EcsWorld& _world );
 		void Stop( EcsWorld& _world );			
 
-		SceneNode* playerPersistent;
+		EcsHandle persistentHandle;
 		std::vector< std::pair<NetID, FrameIndex> > shipsToSpawn;
 
 		static void SpawnShips( EcsWorld& _world );

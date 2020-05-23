@@ -38,7 +38,7 @@ namespace fan
 	void ClientNetworkManager::Init( EcsWorld& _world, EcsSingleton& _component )
 	{
 		ClientNetworkManager& netManager = static_cast<ClientNetworkManager&>( _component );
-		netManager.playerPersistent = nullptr;
+		netManager.persistentHandle = 0;
 		netManager.shipsToSpawn.clear();
 	}
 
@@ -48,8 +48,9 @@ namespace fan
 	{
 		// Create player persistent scene node
 		Scene& scene			= _world.GetSingleton<Scene>();
-		playerPersistent		= & scene.CreateSceneNode( "persistent", &scene.GetRootNode() );
-		EcsEntity persistentID	= _world.GetEntity( playerPersistent->handle );
+		SceneNode& persistentNode =  scene.CreateSceneNode( "persistent", &scene.GetRootNode() );
+		persistentHandle = persistentNode.handle;
+		EcsEntity persistentID	= _world.GetEntity( persistentHandle );
 		_world.AddComponent<ReliabilityLayer>( persistentID );
 		_world.AddComponent<ClientConnection>( persistentID );
 		_world.AddComponent<ClientReplication>( persistentID );
@@ -85,7 +86,7 @@ namespace fan
 	//================================================================================================================================
 	void ClientNetworkManager::Stop( EcsWorld& _world )
 	{
-		const EcsEntity persistentID = _world.GetEntity( playerPersistent->handle );		
+		const EcsEntity persistentID = _world.GetEntity( persistentHandle );
 		ClientConnection& connection = _world.GetComponent<ClientConnection>( persistentID );
 		connection.state = ClientConnection::ClientState::Stopping;
 		S_ClientSend::Run( _world, _world.Match( S_ClientSend::GetSignature( _world ) ), .42f );// send a last packet

@@ -198,7 +198,7 @@ namespace fan
 	//================================================================================================================================
 	void GameClient::Test()
 	{
-		const EcsEntity persistentID = world.GetEntity( netManager->playerPersistent->handle );
+		const EcsEntity persistentID = world.GetEntity( netManager->persistentHandle );
 		ClientGameData& gameData = world.GetComponent<ClientGameData>( persistentID );
 		const EcsEntity spaceshipID = world.GetEntity( gameData.spaceshipHandle );
 		Transform& transform = world.GetComponent<Transform>( spaceshipID );
@@ -209,7 +209,7 @@ namespace fan
 	//================================================================================================================================
 	void GameClient::RollbackResimulate( EcsWorld& _world )
 	{
-		const EcsEntity persistentID = _world.GetEntity( netManager->playerPersistent->handle );
+		const EcsEntity persistentID = _world.GetEntity( netManager->persistentHandle );
 		ClientGameData& gameData = _world.GetComponent<ClientGameData>( persistentID );
 		if( !gameData.spaceshipSynced && ! gameData.previousInputsSinceLastGameState.empty() )
 		{
