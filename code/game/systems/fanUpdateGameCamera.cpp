@@ -49,10 +49,10 @@ namespace fan
 
 		// set main camera
 		GameCamera& gameCamera = _world.GetSingleton<GameCamera>();
-		if( gameCamera.cameraNode != nullptr )
+		if( gameCamera.cameraHandle != 0 )
 		{
 			// set position
-			const EcsEntity cameraID = _world.GetEntity( gameCamera.cameraNode->handle );
+			const EcsEntity cameraID = _world.GetEntity( gameCamera.cameraHandle );
 			Transform& cameraTransform = _world.GetComponent<Transform>( cameraID );
 			cameraTransform.SetPosition( center + gameCamera.heightFromTarget * btVector3::Up() );
 

@@ -38,8 +38,8 @@ namespace fan
 	{
 		Scene& scene = static_cast<Scene&>( _component );
 		scene.path = "";
-		scene.rootSceneNode = 0;
-		scene.mainCameraSceneNode = 0;
+		scene.rootNodeHandle = 0;
+		scene.mainCameraHandle = 0;
 		scene.nextUniqueID = 1;
 		scene.nodes.clear();
 		const_cast<EcsWorld*>( scene.world ) = &_world;
@@ -70,14 +70,14 @@ namespace fan
 	//================================================================================================================================
 	SceneNode& Scene::GetRootNode() const
 	{
-		return world->GetComponent<SceneNode>( world->GetEntity( rootSceneNode ) );
+		return world->GetComponent<SceneNode>( world->GetEntity( rootNodeHandle ) );
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
 	SceneNode& Scene::GetMainCamera() const
 	{
-		return world->GetComponent<SceneNode>( world->GetEntity( mainCameraSceneNode ) );
+		return world->GetComponent<SceneNode>( world->GetEntity( mainCameraHandle ) );
 	}
 
 	//================================================================================================================================
@@ -126,12 +126,11 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void Scene::SetMainCamera( SceneNode& _nodeCamera )
+	void Scene::SetMainCamera( const EcsHandle _cameraHandle )
 	{
-		if( _nodeCamera.handle != mainCameraSceneNode )
+		if( _cameraHandle != mainCameraHandle )
 		{
-			mainCameraSceneNode = _nodeCamera.handle;
-			onSetMainCamera.Emmit( _nodeCamera );
+			mainCameraHandle = _cameraHandle;
 		}
 	}
 
@@ -143,8 +142,8 @@ namespace fan
 		path = "";
 		world->Clear();
 		nodes.clear();
-		rootSceneNode = 0;
-		mainCameraSceneNode = 0;
+		rootNodeHandle = 0;
+		mainCameraHandle = 0;
 		nextUniqueID = 1;
 
 		ScenePointers& scenePointers = world->GetSingleton<ScenePointers>();
@@ -157,7 +156,7 @@ namespace fan
 	{
 		Clear( );
 		nextUniqueID = 1;
-		rootSceneNode = CreateSceneNode( "root", nullptr ).handle;
+		rootNodeHandle = CreateSceneNode( "root", nullptr ).handle;
 		onLoad.Emmit( *this );
 	}
 
@@ -363,7 +362,7 @@ namespace fan
 			// loads all nodes recursively
 			const Json& jRoot = jScene["root"];
 			SceneNode& rootNode = CreateSceneNode( "root", nullptr, false );
-			rootSceneNode = rootNode.handle;
+			rootNodeHandle = rootNode.handle;
 			R_LoadFromJson( jRoot, rootNode, 0 );
 			
 			path = _path;

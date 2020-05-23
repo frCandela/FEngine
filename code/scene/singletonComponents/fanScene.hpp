@@ -28,7 +28,7 @@ namespace fan
 		void Save() const;
 		bool LoadFrom( const std::string _path );
 		void Clear();
-		void SetMainCamera( SceneNode& _nodeCamera );
+		void SetMainCamera( const EcsHandle _cameraHandle );
 
 		static uint32_t	R_FindMaximumId( SceneNode& _node );
 		static void		R_SaveToJson( const SceneNode& _node, Json& _json );
@@ -38,12 +38,11 @@ namespace fan
 		Signal< Scene& >		onClear;
 		Signal< Scene& >		onLoad;
 		Signal< SceneNode* >	onDeleteSceneNode;
-		Signal< SceneNode& >	onSetMainCamera;
 
 		EcsWorld* const								world = nullptr;
 		std::string									path;		
-		EcsHandle 									rootSceneNode;
-		EcsHandle									mainCameraSceneNode;
+		EcsHandle 									rootNodeHandle;
+		EcsHandle									mainCameraHandle;
 		uint32_t									nextUniqueID;
 		std::unordered_map< uint32_t, SceneNode* >  nodes;
 

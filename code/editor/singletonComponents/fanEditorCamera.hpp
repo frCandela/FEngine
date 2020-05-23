@@ -21,15 +21,13 @@ namespace fan
 		static void Init( EcsWorld& _world, EcsSingleton& _component );
 		static void OnGui( EcsWorld&, EcsSingleton& _component );
 
-		SceneNode* cameraNode;
-		Transform* transform;
-		Camera* camera;
+		EcsHandle cameraHandle;
 
 		float	  speed = 10.f;
 		float	  speedMultiplier = 3.f;
 		btVector2 xySensitivity = btVector2( 0.005f, 0.005f );
 
-		static void Update( EditorCamera& camera, const float _delta );
+		static void Update( EcsWorld& _world, const float _delta );
 		static void CreateEditorCamera( EcsWorld& _world );
 	};
 }

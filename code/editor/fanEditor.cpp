@@ -584,9 +584,9 @@ namespace fan
 					Scene& scene = m_gameWorld.GetSingleton<Scene>();
 
 					// only update the editor camera when we are using it
-					if( &scene.GetMainCamera() == editorCamera.cameraNode )
+					if( scene.mainCameraHandle == editorCamera.cameraHandle )
 					{
-						EditorCamera::Update( editorCamera, game.logicDelta );
+						EditorCamera::Update( m_gameWorld, game.logicDelta );
 					}
 				}
 
@@ -702,7 +702,7 @@ namespace fan
 			Scene& scene = m_gameWorld.GetSingleton<Scene>();
 
 			// Saves the camera position for restoring it later
-			const EcsEntity oldCameraID = m_gameWorld.GetEntity( scene.mainCameraSceneNode );
+			const EcsEntity oldCameraID = m_gameWorld.GetEntity( scene.mainCameraHandle );
 			const btTransform oldCameraTransform = m_gameWorld.GetComponent<Transform>( oldCameraID ).transform;
 
 			// save old selection
@@ -717,7 +717,7 @@ namespace fan
 			scene.LoadFrom( scene.path ); // reload the scene 
 
 			// restore camera transform
-			const EcsEntity newCameraID = m_gameWorld.GetEntity( scene.mainCameraSceneNode );
+			const EcsEntity newCameraID = m_gameWorld.GetEntity( scene.mainCameraHandle );
 			m_gameWorld.GetComponent<Transform>( newCameraID ).transform = oldCameraTransform;
 
 			// restore selection
@@ -820,7 +820,7 @@ namespace fan
 
 		// Camera
 		Scene& scene = m_gameWorld.GetSingleton<Scene>();
-		EcsEntity cameraID = m_gameWorld.GetEntity( scene.mainCameraSceneNode );
+		EcsEntity cameraID = m_gameWorld.GetEntity( scene.mainCameraHandle );
 		Camera& camera = m_gameWorld.GetComponent<Camera>( cameraID );
 		camera.aspectRatio = m_gameViewWindow->GetAspectRatio();
 		Transform& cameraTransform = m_gameWorld.GetComponent<Transform>( cameraID );
@@ -852,7 +852,7 @@ namespace fan
 	{
 		Scene& scene = m_gameWorld.GetSingleton<Scene>();
 		EditorCamera& editorCamera = m_gameWorld.GetSingleton<EditorCamera>();
-		scene.SetMainCamera( *editorCamera.cameraNode );
+		scene.SetMainCamera( editorCamera.cameraHandle );
 	}
 
 	//================================================================================================================================
@@ -861,7 +861,7 @@ namespace fan
 	{
 		Scene& scene = m_gameWorld.GetSingleton<Scene>();
 		GameCamera& gameCamera = m_gameWorld.GetSingleton<GameCamera>();
-		scene.SetMainCamera( *gameCamera.cameraNode );
+		scene.SetMainCamera( gameCamera.cameraHandle );
 	}
 
 	//================================================================================================================================
@@ -880,7 +880,7 @@ namespace fan
 		GameCamera& gameCamera = m_gameWorld.GetSingleton<GameCamera>();
 		EditorCamera& editorCamera = m_gameWorld.GetSingleton<EditorCamera>();
 
-		if( &scene.GetMainCamera() == editorCamera.cameraNode )
+		if( scene.mainCameraHandle == editorCamera.cameraHandle )
 		{
 			UseGameCamera();
 		}

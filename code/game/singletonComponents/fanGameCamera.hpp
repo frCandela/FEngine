@@ -21,7 +21,7 @@ namespace fan
 		static void Save( const EcsSingleton& _component, Json& _json );
 		static void Load( EcsSingleton& _component, const Json& _json );
 
-		SceneNode*  cameraNode;
+		EcsHandle   cameraHandle;
 		float		heightFromTarget;
 		btVector2	marginRatio;
 		float		minOrthoSize;
