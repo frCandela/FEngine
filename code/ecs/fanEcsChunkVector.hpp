@@ -97,6 +97,11 @@ namespace fan
 
 		void Clear()
 		{
+			if( m_chunks.empty() )
+			{
+				return;
+			}
+
 			for( int i = NumChunk() - 1; i > 0; i-- )
 			{
 				m_chunks[i].Destroy();

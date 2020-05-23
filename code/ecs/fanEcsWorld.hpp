@@ -38,7 +38,7 @@ namespace fan
 		{
 			return int( m_componentsInfo.size() );
 		}
-		int  GetIndex( const uint32_t  _type ) const { return m_typeToIndex.at( _type ); }
+		int  GetIndex( const uint32_t  _type ) const;
 
 		// Handles
 		EcsEntity	 GetEntity( const EcsHandle _handle )

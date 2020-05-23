@@ -334,11 +334,5 @@ namespace fan
 			
 			S_ClientSend		::Run( world, world.Match( S_ClientSend::GetSignature( world ) )  , _delta );
 		}
-
-		{
-			// end frame
-			SCOPED_PROFILE( scene_endFrame );
-			world.ApplyTransitions();
-		}
 	}
 }

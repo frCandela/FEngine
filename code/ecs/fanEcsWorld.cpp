@@ -129,6 +129,116 @@ namespace fan
 		}
 		m_transitions.clear();
 	}
+
+	int  EcsWorld::GetIndex( const uint32_t  _type ) const 
+	{ 
+		if( _type == 513741578 )
+		{
+			return m_typeToIndex.at( 1269105190);
+		}
+		if( _type == 4286953425 )
+		{
+			return m_typeToIndex.at( 2472396462 );
+		}
+		if( _type == 1574011037 )
+		{
+			return m_typeToIndex.at( 1828911513 );
+		}
+		if( _type == 766107570 )
+		{
+			return m_typeToIndex.at( 1669599886 );
+		}
+		if( _type == 3817588683 )
+		{
+			return m_typeToIndex.at( 3581780679 );
+		}
+		if( _type == 1868194788 )
+		{
+			return m_typeToIndex.at( 4227813153 );
+		}
+		if( _type == 978376389 )
+		{
+			return m_typeToIndex.at( 3410179010 );
+		}
+		if( _type == 2031637357 )
+		{
+			return m_typeToIndex.at( 697391374 );
+		}
+		if( _type == 3638998287 )
+		{
+			return m_typeToIndex.at( 3039791276 );
+		}
+		if( _type == 2627283387 )
+		{
+			return m_typeToIndex.at( 1676694936 );
+		}
+		if( _type == 801674951 )
+		{
+			return m_typeToIndex.at( 2212983812 );
+		}
+		if( _type == 4196195411 )
+		{
+			return m_typeToIndex.at( 944608624 );
+		}
+		if( _type == 3273264334 )
+		{
+			return m_typeToIndex.at( 3824437066 );
+		}
+		if( _type == 942583576 )
+		{
+			return m_typeToIndex.at( 1935248692 );
+		}
+		if( _type == 3578408745 )
+		{
+			return m_typeToIndex.at( 2248765157 );
+		}
+		if( _type == 3045262020 )
+		{
+			return m_typeToIndex.at( 2566483963 );
+		}
+		if( _type == 1409047757 )
+		{
+			return m_typeToIndex.at( 1348213600 );
+		}
+		if( _type == 736127148 )
+		{
+			return m_typeToIndex.at( 4240990504 );
+		}
+		if( _type == 836241034 )
+		{
+			return m_typeToIndex.at( 2779572775 );
+		}
+		if( _type == 3762896743 )
+		{
+			return m_typeToIndex.at( 3371052772 );
+		}
+		if( _type == 4008037218 )
+		{
+			return m_typeToIndex.at( 2212932191 );
+		}
+		if( _type == 2303042683 )
+		{
+			return m_typeToIndex.at( 1339151255 );
+		}
+		if( _type == 1513010456 )
+		{
+			return m_typeToIndex.at( 1299548564 );
+		}
+		if( _type == 1526324732 )
+		{
+			return m_typeToIndex.at( 1299548564 );
+		}		
+		if( _type == 230616982 )
+		{
+			return m_typeToIndex.at( 1132770802 );
+		}
+		if( _type == 3213329567 )
+		{
+			return m_typeToIndex.at( 2940798460 );
+		}
+		return m_typeToIndex.at( _type ); 
+	}
+
 	void EcsWorld::Clear()
 	{
 		ApplyTransitions();
@@ -194,9 +304,6 @@ namespace fan
 		const int tagIndex = GetIndex( _type );
 		EcsTransition& transition = FindOrCreateTransition( _entity );
 
-		// entity doesn't already have this tag
-		assert( _entity.archetype == &m_transitionArchetype || !_entity.archetype->m_signature[tagIndex] );
-
 		// Update transition
 		transition.signatureAdd[tagIndex] = 1;
 	}
@@ -204,9 +311,6 @@ namespace fan
 	{
 		const int tagIndex = GetIndex( _type );
 		EcsTransition& transition = FindOrCreateTransition( _entity );
-
-		// entity must have this tag
-		assert( _entity.archetype == &m_transitionArchetype || _entity.archetype->m_signature[tagIndex] );
 
 		// Update transition
 		transition.signatureRemove[tagIndex] = 1;
@@ -237,6 +341,7 @@ namespace fan
 		EcsComponent& component = *static_cast<EcsComponent*>( m_transitionArchetype.m_chunks[componentIndex].At( entityData.transitionIndex ) );
 		EcsComponentInfo info = m_componentsInfo[componentIndex];
 		info.instanciate( &component );
+		info.init( *this, component );
 
 		return component;
 	}

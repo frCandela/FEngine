@@ -21,64 +21,74 @@ namespace fan
 {
 	//================================================================================================================================
 	//================================================================================================================================
-	InspectorWindow::InspectorWindow() :
-		EditorWindow( "inspector", ImGui::IconType::INSPECTOR16 )
+	InspectorWindow::InspectorWindow( EcsWorld& _world ) :
+		EditorWindow( "inspector", ImGui::IconType::INSPECTOR16 ), 
+		m_world( _world )
 	{
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
+	void InspectorWindow::OnSceneNodeSelected( SceneNode* _node ) 
+	{
+		m_handleNodeSelected = _node == nullptr ? 0 : _node->handle; 
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
 	void InspectorWindow::OnGui()
 	{
-// 		SCOPED_PROFILE( inspector ); @migration
-// 
-// 		if( m_sceneNodeSelected != nullptr )
-// 		{
-// 			SceneNode& node = *m_sceneNodeSelected;
-// 			Scene& scene = *node.scene;
-// 			EcsWorld& world = *scene.world;
-// 			const EcsEntity entity = world.GetEntity( node.handle );
-// 
-// 			// scene node gui
-//  			ImGui::Icon( GetIconType(), { 16,16 } ); ImGui::SameLine();
-// 			ImGui::Text( "Scene node : %s", node.name.c_str() );
-// 
-// 			for( int componentIndex = 0; componentIndex < (int)world.GetComponentCount( entity ); componentIndex++ )
-// 			{
-// 				EcsComponent& component = world.GetComponentAt( entityID, componentIndex );
-// 				const EcsComponentInfo& info = world.GetComponentInfo( component.GetIndex() );
-// 
-// 				if( info.onGui == nullptr ) { continue; }
-// 
-//  				ImGui::Separator();
-// 				 
-//  				// Icon
-// 				ImGui::Icon( info.icon, { 16,16 } ); ImGui::SameLine();
-// 				ImGui::FanBeginDragDropSourceComponent( node, component, ImGuiDragDropFlags_SourceAllowNullID );
-// 				ImGui::Text( "%s", info.name.c_str() );
-//  				ImGui::FanBeginDragDropSourceComponent( node, component, ImGuiDragDropFlags_SourceAllowNullID );
-// 
-//  				// Delete button	
-// 				std::stringstream ss;
-// 				ss << "X" << "##" << info.name;	// make unique id
-// 				ImGui::SameLine( ImGui::GetWindowWidth() - 40 );
-// 				if( ImGui::Button( ss.str().c_str() ) )
-// 				{
-// 					world.RemoveComponent( entityID, component.GetIndex() );				
-// 				}
-//  				// Draw component
-// 				else
-// 				{
-// 					info.onGui( world, entityID, component );
-// 				} 
-// 			}
-// 			ImGui::Separator();
-// 			//Add component button
-// 			if( ImGui::Button( "Add component" ) )
-// 				ImGui::OpenPopup( "new_component" );
-// 
-// 			NewComponentPopup();
-// 		}
+		SCOPED_PROFILE( inspector );
+
+		if( m_handleNodeSelected != 0 )
+		{
+			SceneNode& node = m_world.GetComponent<SceneNode>( m_world.GetEntity(m_handleNodeSelected) );
+			Scene& scene = *node.scene;
+			EcsWorld& world = *scene.world;
+			const EcsEntity entity = world.GetEntity( node.handle );
+
+			// scene node gui
+ 			ImGui::Icon( GetIconType(), { 16,16 } ); ImGui::SameLine();
+			ImGui::Text( "Scene node : %s", node.name.c_str() );
+
+			
+			for( const EcsComponentInfo& info : world.GetVectorComponentInfo() )
+			{
+				if( !world.HasComponent( entity, info.type ) ) { continue; }
+
+				EcsComponent& component = world.GetComponent( entity, info.type );
+
+				if( info.onGui == nullptr ) { continue; }
+
+ 				ImGui::Separator();
+				 
+ 				// Icon
+				ImGui::Icon( info.icon, { 16,16 } ); ImGui::SameLine();
+				ImGui::FanBeginDragDropSourceComponent( node, component, ImGuiDragDropFlags_SourceAllowNullID );
+				ImGui::Text( "%s", info.name.c_str() );
+ 				ImGui::FanBeginDragDropSourceComponent( node, component, ImGuiDragDropFlags_SourceAllowNullID );
+
+ 				// Delete button	
+				std::stringstream ss;
+				ss << "X" << "##" << info.name;	// make unique id
+				ImGui::SameLine( ImGui::GetWindowWidth() - 40 );
+				if( ImGui::Button( ss.str().c_str() ) )
+				{
+					world.RemoveComponent( entity, info.type );
+				}
+ 				// Draw component
+				else
+				{
+					info.onGui( world, entity, component );
+				} 
+			}
+			ImGui::Separator();
+			//Add component button
+			if( ImGui::Button( "Add component" ) )
+				ImGui::OpenPopup( "new_component" );
+
+			NewComponentPopup();
+		}
 	}
 
 	//================================================================================================================================
@@ -90,11 +100,10 @@ namespace fan
 		if( ImGui::MenuItem( _info.name.c_str() ) )
 		{
 			// Create new EcsComponent 
-			EcsWorld& world = *m_sceneNodeSelected->scene->world;
-			EcsEntity entity = world.GetEntity( m_sceneNodeSelected->handle );
-			if( !world.HasComponent( entity, _info.index ) )
+			EcsEntity entity = m_world.GetEntity( m_handleNodeSelected );
+			if( !m_world.HasComponent( entity, _info.index ) )
 			{
-				world.AddComponent( entity, _info.index );				
+				m_world.AddComponent( entity, _info.index );				
 			}			
 			ImGui::CloseCurrentPopup();
 		}
@@ -106,13 +115,10 @@ namespace fan
 	void InspectorWindow::NewComponentPopup()
 	{
 		using Path = std::filesystem::path;
-
-		EcsWorld& world = *m_sceneNodeSelected->scene->world;
-
 		if( ImGui::BeginPopup( "new_component" ) )
 		{
 			// Get components and remove components with an empty path
-			std::vector< EcsComponentInfo > components = world.GetVectorComponentInfo();			
+			std::vector< EcsComponentInfo > components = m_world.GetVectorComponentInfo();			
 			for( int i = (int)components.size() - 1; i >= 0; i-- )
 			{
 				if( std::string( components[i].editorPath ).empty() )
@@ -120,7 +126,6 @@ namespace fan
 					components.erase( components.begin() + i );
 				}
 			}
-
 
  			// Get components paths
 			std::vector<Path> componentsPath;

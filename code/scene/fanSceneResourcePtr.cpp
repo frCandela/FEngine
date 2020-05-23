@@ -16,7 +16,6 @@ namespace fan
 	void ComponentPtrBase::Init( EcsWorld& _world )
 	{
 		const_cast<EcsWorld*>( world ) = &_world;
-		*const_cast<int*>( &dynamicID ) = world->GetIndex( staticID );
 		sceneNodeID = 0;
 		component = nullptr;
 	}
@@ -79,7 +78,7 @@ namespace ImGui
 
  		bool returnValue = false;
  
-		const fan::EcsComponentInfo& info = world.GetComponentInfo( _ptr.dynamicID );
+		const fan::EcsComponentInfo& info = world.GetComponentInfo( _ptr.staticID );
 
 		// create button title
 		std::string name;
@@ -168,7 +167,6 @@ namespace ImGui
 		{
 			if ( ImGui::ButtonIcon( ImGui::IconType::PREFAB16, { 16,16 } ) )
 			{
-
 				openModal = true;
 			}
 		} ImGui::PopID();

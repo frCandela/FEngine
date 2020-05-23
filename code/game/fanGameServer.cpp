@@ -271,11 +271,5 @@ namespace fan
 
 			S_ServerSend				::Run( world, world.Match( S_ServerSend::GetSignature( world ) )				, _delta );
 		}
-
-		{
-			// end frame
-			SCOPED_PROFILE( scene_endFrame );
-			world.ApplyTransitions();
-		}
 	}
 }

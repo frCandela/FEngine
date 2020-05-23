@@ -147,9 +147,8 @@ namespace fan
 					{
 						sf::Uint32 staticIndex;
 						packet.packetData >> staticIndex;
-						const int dynamicIndex = _world.GetIndex( staticIndex );
-						const EcsComponentInfo& info = _world.GetComponentInfo( dynamicIndex );
-						EcsComponent& component = _world.GetComponent( replicatedID, dynamicIndex );
+						const EcsComponentInfo& info = _world.GetComponentInfo( staticIndex );
+						EcsComponent& component = _world.GetComponent( replicatedID, staticIndex );
 						info.netLoad( component, packet.packetData );
 					}
 				}

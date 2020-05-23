@@ -23,7 +23,6 @@ namespace fan
 		void Clear();
 
 		const uint32_t		  staticID;				// static id of the component
-		const int			  dynamicID = 255;		// dynamic id of the component
 		EcsWorld* const		  world	 = nullptr;		// world containing the target component
 		uint32_t			  sceneNodeID = 0;		// unique index of the associated scene node
 		EcsComponent*		  component = nullptr;  // the component

@@ -174,7 +174,7 @@ namespace fan
 		m_gizmos = new EditorGizmos( m_gameWorld );
 		m_renderWindow = new RenderWindow();
 		m_sceneWindow = new SceneWindow( scene );
-		m_inspectorWindow = new InspectorWindow();
+		m_inspectorWindow = new InspectorWindow( m_gameWorld );
 		m_consoleWindow = new ConsoleWindow();
 		m_ecsWindow = new EcsWindow( m_gameWorld );
 		m_profilerWindow = new ProfilerWindow();
@@ -636,11 +636,16 @@ namespace fan
 					}
 				}
 
+				{
+					// end frame
+					SCOPED_PROFILE( scene_endFrame );
+					m_gameWorld.ApplyTransitions();
+				}
 				Input::Get().Manager().PullEvents();
 
 				{
-					SCOPED_PROFILE( imgui_render )
-						ImGui::Render();
+					SCOPED_PROFILE( imgui_render );
+					ImGui::Render();
 				}
 			}
 
