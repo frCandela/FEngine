@@ -70,7 +70,7 @@ namespace fan
 
 		if ( prefab != nullptr )
 		{
-			prefabPtr = prefab;
+			prefabPtr.Set( prefab );
 		}
 	}
 

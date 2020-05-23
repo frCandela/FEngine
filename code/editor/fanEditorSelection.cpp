@@ -35,13 +35,29 @@ namespace fan
 	}
 
 	//================================================================================================================================
+	//================================================================================================================================	
+	SceneNode* EditorSelection::GetSelectedSceneNode() const 
+	{ 
+		if( m_selectedNodeHandle == 0 )
+		{
+			return nullptr;
+		}
+		else
+		{
+			EcsWorld& world = *m_currentScene->world;
+			return &world.GetComponent<SceneNode>( world.GetEntity( m_selectedNodeHandle ) );
+		}
+	}
+
+	//================================================================================================================================
 	//================================================================================================================================
 	void EditorSelection::DeleteSelection()
 	{
-		if ( m_selectedSceneNode != nullptr &&  ! m_selectedSceneNode->IsRoot() )
+		SceneNode* selectedSceneNode = GetSelectedSceneNode();
+		if ( selectedSceneNode != nullptr &&  !selectedSceneNode->IsRoot() )
 		{
-			EcsWorld& world = *m_selectedSceneNode->scene->world;
-			world.Kill( world.GetEntity( m_selectedSceneNode->handle ) );
+			EcsWorld& world = *selectedSceneNode->scene->world;
+			world.Kill( world.GetEntity( selectedSceneNode->handle ) );
 		}
 	}
 
@@ -54,10 +70,11 @@ namespace fan
 		bool mouseCaptured = false;		
 
 		// translation gizmo on selected scene node
-		if ( m_selectedSceneNode != nullptr && m_selectedSceneNode->handle != m_currentScene->mainCameraHandle )
+		SceneNode* selectedSceneNode = GetSelectedSceneNode();
+		if ( selectedSceneNode != nullptr && selectedSceneNode->handle != m_currentScene->mainCameraHandle )
 		{
-			EcsWorld& world = *m_selectedSceneNode->scene->world;
-			EcsEntity entity = world.GetEntity( m_selectedSceneNode->handle );
+			EcsWorld& world = *selectedSceneNode->scene->world;
+			EcsEntity entity = world.GetEntity( selectedSceneNode->handle );
 			if( world.HasComponent<Transform>( entity ) )
 			{
 				Transform& transform = world.GetComponent< Transform >( entity );
@@ -122,23 +139,24 @@ namespace fan
 	//================================================================================================================================
 	void EditorSelection::SetSelectedSceneNode( SceneNode* _node )
 	{
-		m_selectedSceneNode = _node;
-		onSceneNodeSelected.Emmit( m_selectedSceneNode );
+		m_selectedNodeHandle = _node != nullptr ? _node->handle : 0;
+		onSceneNodeSelected.Emmit( _node );
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
 	void EditorSelection::Deselect()
 	{
-		m_selectedSceneNode = nullptr;
-		onSceneNodeSelected.Emmit( m_selectedSceneNode );
+		SceneNode* selectedSceneNode = GetSelectedSceneNode();
+		m_selectedNodeHandle = 0;
+		onSceneNodeSelected.Emmit( selectedSceneNode );
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
 	void EditorSelection::OnSceneNodeDeleted( SceneNode* _node )
 	{
-		if ( _node == m_selectedSceneNode )
+		if ( _node == GetSelectedSceneNode() )
 		{
 			Deselect();
 		}
@@ -148,10 +166,11 @@ namespace fan
 	//================================================================================================================================
 	void EditorSelection::OnToogleTransformLock()
 	{
-		if( m_selectedSceneNode != nullptr )
+		SceneNode* selectedSceneNode = GetSelectedSceneNode();
+		if( selectedSceneNode != nullptr )
 		{
-			EcsWorld& world = *m_selectedSceneNode->scene->world;
-			EcsEntity entity = world.GetEntity( m_selectedSceneNode->handle );
+			EcsWorld& world = *selectedSceneNode->scene->world;
+			EcsEntity entity = world.GetEntity( selectedSceneNode->handle );
 
 			// FollowTransform
 			if( world.HasComponent<FollowTransform>( entity ) )

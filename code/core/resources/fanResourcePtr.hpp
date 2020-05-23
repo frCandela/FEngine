@@ -23,12 +23,8 @@ namespace fan
 
 		_ResourceType* operator->() const { return ( _ResourceType* ) ( m_resource ); } //@todo return a reference
 		_ResourceType* operator*()  const { return ( _ResourceType* ) ( m_resource ); } //@todo return a reference
-		ResourcePtr & operator=(const ResourcePtr&) = delete;
 		bool operator==( const _ResourceType* _other ) const { return _other == m_resource; }
-		bool operator!=( const _ResourceType* _other ) const { return _other != m_resource; }
-
-		ResourcePtr(const ResourcePtr&) = delete;
-		
+		bool operator!=( const _ResourceType* _other ) const { return _other != m_resource; }		
 	protected:
 		void SetResource(Resource* _resource);
 

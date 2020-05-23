@@ -72,7 +72,7 @@ namespace fan
 		for( int tryIndex = 0; tryIndex < 10 && socketStatus != sf::Socket::Done; tryIndex++ )
 		{
 			Debug::Log() << "bind on port " << connection.clientPort << Debug::Endl();
-			socketStatus = connection.socket.Bind( connection.clientPort );
+			socketStatus = connection.socket->Bind( connection.clientPort );
 			if( socketStatus != sf::Socket::Done )
 			{
 				Debug::Warning() << " bind failed" << Debug::Endl();
@@ -90,7 +90,7 @@ namespace fan
 		ClientConnection& connection = _world.GetComponent<ClientConnection>( persistentID );
 		connection.state = ClientConnection::ClientState::Stopping;
 		S_ClientSend::Run( _world, _world.Match( S_ClientSend::GetSignature( _world ) ), .42f );// send a last packet
-		connection.socket.Unbind();
+		connection.socket->Unbind();
 	}
 
 	//================================================================================================================================

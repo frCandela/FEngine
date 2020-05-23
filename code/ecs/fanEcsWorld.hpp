@@ -115,7 +115,8 @@ namespace fan
 			// Set component info
 			EcsComponentInfo info;
 			info.name		= _ComponentType::Info::s_name;
-			info.instanciate = &_ComponentType::Instanciate;
+			info.construct  = &_ComponentType::Info::Instanciate;
+			info.copy		= std::is_trivially_copyable<_ComponentType>::value ? &std::memcpy : &_ComponentType::Info::Memcpy;
 			info.init		= &_ComponentType::Init;			
 			info.size		= _ComponentType::Info::s_size;
 			info.alignment	= _ComponentType::Info::s_alignment;			
@@ -148,10 +149,7 @@ namespace fan
 		}
 		EcsComponent& AddComponent( const EcsEntity _entity, const uint32_t _type );
 		void		  RemoveComponent( const EcsEntity _entity, const uint32_t _type );
-		bool		  HasComponent( const EcsEntity _entity, const uint32_t _type )
-		{			
-			return _entity.archetype->m_signature[GetIndex( _type )];
-		}
+		bool		  HasComponent( const EcsEntity _entity, const uint32_t _type );
 		EcsComponent& GetComponent( const EcsEntity _entity, const uint32_t _type );
 		const EcsComponentInfo& GetComponentInfo( const uint32_t _type ) const { return  m_componentsInfo.at( GetIndex(_type) ); }
 		const std::vector< EcsComponentInfo >& GetVectorComponentInfo() const { return m_componentsInfo; }

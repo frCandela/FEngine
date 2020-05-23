@@ -19,6 +19,11 @@ namespace fan
 		static void Save( const EcsComponent& _component, Json& _json );
 		static void Load( EcsComponent& _component, const Json& _json );
 
+// 		Bullet::Bullet( const Bullet& _other ) :
+// 			explosionPrefab( _other.explosionPrefab )
+// 		{
+// 		}
+
 		PrefabPtr explosionPrefab;
 	};
 	static constexpr size_t sizeof_bullet = sizeof( Bullet );

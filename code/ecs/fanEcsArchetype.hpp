@@ -26,7 +26,7 @@ namespace fan {
 				if( m_signature[i] )
 				{
 					const EcsComponentInfo& info = _componentsInfo[i];
-					m_chunks[i].Create( info.size, info.alignment );
+					m_chunks[i].Create( info.copy, info.size, info.alignment );
 				}
 			}
 		}

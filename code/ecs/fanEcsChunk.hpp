@@ -13,8 +13,9 @@ namespace fan
 	public:
 		static constexpr size_t ecsChunkMaxSize = 65536;
 
-		void Create( const int _componentSize, const int _alignment )
+		void Create( void* ( *_cpyFunction )( void*, const void*, size_t ),  const int _componentSize, const int _alignment )
 		{
+			m_cpyFunction = _cpyFunction;
 			m_componentSize = _componentSize;
 			m_capacity = ecsChunkMaxSize / _componentSize;
 			m_size = 0;
@@ -49,7 +50,7 @@ namespace fan
 		void Set( const int _index, void* _data )
 		{
 			assert( _index < m_size );
-			std::memcpy( At( _index ), _data, m_componentSize );
+			m_cpyFunction( At( _index ), _data, m_componentSize );
 		}
 
 		void Remove( const int _index )
@@ -94,5 +95,6 @@ namespace fan
 		int m_componentSize;
 		void* m_buffer;
 		void* m_alignedBuffer;
+		void* ( *m_cpyFunction )( void*, const void*, size_t ) = nullptr;
 	};
 }

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "core/fanSignal.hpp"
+#include "ecs/fanEcsTypes.hpp"
 
 namespace fan
 {
@@ -25,12 +26,12 @@ namespace fan
 		void DeleteSelection();
 		void Update( const bool _gameWindowHovered );
 
-		inline SceneNode* GetSelectedSceneNode() const { return m_selectedSceneNode; }
-		inline Scene& GetSelectedScene() const { return *m_currentScene; }
+		SceneNode* GetSelectedSceneNode() const;
+		Scene& GetSelectedScene() const { return *m_currentScene; }
 
 
 	private:
-		SceneNode* m_selectedSceneNode;
+		EcsHandle m_selectedNodeHandle = 0;
 		Scene* m_currentScene;
 
 		void OnSceneNodeDeleted( SceneNode* _node );

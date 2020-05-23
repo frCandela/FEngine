@@ -35,25 +35,32 @@ namespace fan
 			// Entity is dead
 			if( transition.isDead || targetSignature == EcsSignature( 0 ) )
 			{
-				// remove handle
-				if( srcEntityCpy.handle != 0 )
-				{
-					m_handles.erase( srcEntityCpy.handle );
-				}
-
-				// remove all components from the src archetype
 				if( &srcArchetype != &m_transitionArchetype )
 				{
+					// remove all components from the src archetype
 					for( int componentIndex = 0; componentIndex < NumComponents(); componentIndex++ )
 					{
 						if( srcArchetype.m_signature[componentIndex] )
 						{
+							const EcsComponentInfo& info = m_componentsInfo[componentIndex];
+							if( info.destroy != nullptr )
+							{
+								EcsComponent& component = *static_cast<EcsComponent*>( srcArchetype.m_chunks[componentIndex].At( srcIndex ) );
+								info.destroy( *this, component );
+							}
 							srcArchetype.m_chunks[componentIndex].Remove( srcIndex );
 						}
 					}
+
+					// remove handle
+					if( srcEntityCpy.handle != 0 )
+					{
+						m_handles.erase( srcEntityCpy.handle );
+					}
+
+					// update the handle of the element if it was moved
 					if( srcArchetype.RemoveEntity( srcIndex ) )
 					{
-						// update the handle of the element if it was moved
 						EcsEntityData movedEntity = srcArchetype.m_entities[srcIndex];
 						if( movedEntity.handle != 0 )
 						{
@@ -72,6 +79,24 @@ namespace fan
 			}
 			else
 			{
+				// destroy call for every components
+				if( transition.signatureRemove != EcsSignature( 0 ) )
+				{
+					for (int componentIndex = 0; componentIndex < NumComponents(); componentIndex++)
+					{
+						assert( (srcArchetype.m_signature & transition.signatureRemove) == transition.signatureRemove );
+						if( transition.signatureRemove[componentIndex] )
+						{
+							const EcsComponentInfo& info = m_componentsInfo[componentIndex];
+							if( info.destroy != nullptr )
+							{
+								EcsComponent& component = *static_cast<EcsComponent*>( srcArchetype.m_chunks[componentIndex].At( srcIndex ) );
+								info.destroy( *this, component );
+							}
+						}
+					}
+				}
+
 				// Get new archetype
 				EcsArchetype* dstArchetype = FindArchetype( targetSignature );
 				if( dstArchetype == nullptr )
@@ -132,110 +157,6 @@ namespace fan
 
 	int  EcsWorld::GetIndex( const uint32_t  _type ) const 
 	{ 
-		if( _type == 513741578 )
-		{
-			return m_typeToIndex.at( 1269105190);
-		}
-		if( _type == 4286953425 )
-		{
-			return m_typeToIndex.at( 2472396462 );
-		}
-		if( _type == 1574011037 )
-		{
-			return m_typeToIndex.at( 1828911513 );
-		}
-		if( _type == 766107570 )
-		{
-			return m_typeToIndex.at( 1669599886 );
-		}
-		if( _type == 3817588683 )
-		{
-			return m_typeToIndex.at( 3581780679 );
-		}
-		if( _type == 1868194788 )
-		{
-			return m_typeToIndex.at( 4227813153 );
-		}
-		if( _type == 978376389 )
-		{
-			return m_typeToIndex.at( 3410179010 );
-		}
-		if( _type == 2031637357 )
-		{
-			return m_typeToIndex.at( 697391374 );
-		}
-		if( _type == 3638998287 )
-		{
-			return m_typeToIndex.at( 3039791276 );
-		}
-		if( _type == 2627283387 )
-		{
-			return m_typeToIndex.at( 1676694936 );
-		}
-		if( _type == 801674951 )
-		{
-			return m_typeToIndex.at( 2212983812 );
-		}
-		if( _type == 4196195411 )
-		{
-			return m_typeToIndex.at( 944608624 );
-		}
-		if( _type == 3273264334 )
-		{
-			return m_typeToIndex.at( 3824437066 );
-		}
-		if( _type == 942583576 )
-		{
-			return m_typeToIndex.at( 1935248692 );
-		}
-		if( _type == 3578408745 )
-		{
-			return m_typeToIndex.at( 2248765157 );
-		}
-		if( _type == 3045262020 )
-		{
-			return m_typeToIndex.at( 2566483963 );
-		}
-		if( _type == 1409047757 )
-		{
-			return m_typeToIndex.at( 1348213600 );
-		}
-		if( _type == 736127148 )
-		{
-			return m_typeToIndex.at( 4240990504 );
-		}
-		if( _type == 836241034 )
-		{
-			return m_typeToIndex.at( 2779572775 );
-		}
-		if( _type == 3762896743 )
-		{
-			return m_typeToIndex.at( 3371052772 );
-		}
-		if( _type == 4008037218 )
-		{
-			return m_typeToIndex.at( 2212932191 );
-		}
-		if( _type == 2303042683 )
-		{
-			return m_typeToIndex.at( 1339151255 );
-		}
-		if( _type == 1513010456 )
-		{
-			return m_typeToIndex.at( 1299548564 );
-		}
-		if( _type == 1526324732 )
-		{
-			return m_typeToIndex.at( 1299548564 );
-		}		
-		if( _type == 230616982 )
-		{
-			return m_typeToIndex.at( 1132770802 );
-		}
-		if( _type == 3213329567 )
-		{
-			return m_typeToIndex.at( 2940798460 );
-		}
 		return m_typeToIndex.at( _type ); 
 	}
 
@@ -284,7 +205,7 @@ namespace fan
 			entity.handle = 0;
 		}
 	}
-	const EcsSingletonInfo* EcsWorld::SafeGetSingletonInfo( const uint32_t _type ) const
+	const	    EcsSingletonInfo* EcsWorld::SafeGetSingletonInfo( const uint32_t _type ) const
 	{
 		const auto& it = m_singletonInfos.find( _type );
 		return it == m_singletonInfos.end() ? nullptr : &it->second;
@@ -340,7 +261,7 @@ namespace fan
 
 		EcsComponent& component = *static_cast<EcsComponent*>( m_transitionArchetype.m_chunks[componentIndex].At( entityData.transitionIndex ) );
 		EcsComponentInfo info = m_componentsInfo[componentIndex];
-		info.instanciate( &component );
+		info.construct( &component );
 		info.init( *this, component );
 
 		return component;
@@ -356,10 +277,61 @@ namespace fan
 		// Update transition
 		transition.signatureRemove[componentIndex] = 1;
 	}
+	bool		  EcsWorld::HasComponent( const EcsEntity _entity, const uint32_t _type )
+	{
+		const int componentIndex = GetIndex( _type );
+		if( _entity.archetype == &m_transitionArchetype )
+		{
+			const EcsEntityData& entityData = _entity.archetype->m_entities[_entity.index];
+			assert( entityData.transitionIndex != -1 );
+			const EcsTransition& transition = m_transitions[entityData.transitionIndex];
+			return transition.signatureAdd[componentIndex];
+		}
+		else
+		{
+			if( _entity.archetype->m_signature[componentIndex] )
+			{
+				return true;
+			}
+			else
+			{
+				const EcsEntityData& entityData = _entity.archetype->m_entities[_entity.index];
+				if( entityData.transitionIndex != -1 )
+				{
+					const EcsTransition& transition = m_transitions[entityData.transitionIndex];
+					return transition.signatureAdd[componentIndex];
+				}
+				else
+				{
+					return false;
+				}
+			}
+		}
+	}
 	EcsComponent& EcsWorld::GetComponent( const EcsEntity _entity, const uint32_t _type )
 	{
-		const int index = m_typeToIndex[_type];
-		return *static_cast<EcsComponent*>( _entity.archetype->m_chunks[index].At( _entity.index ) );
+		assert( HasComponent( _entity, _type ) );
+		const int componentIndex = GetIndex( _type );
+		if( _entity.archetype == &m_transitionArchetype )
+		{
+			const EcsEntityData& entityData = _entity.archetype->m_entities[_entity.index];
+			assert( entityData.transitionIndex != -1 );
+			const EcsTransition& transition = m_transitions[entityData.transitionIndex];
+			return *static_cast<EcsComponent*>( m_transitionArchetype.m_chunks[componentIndex].At( entityData.transitionIndex ) );
+		}
+		else
+		{
+			if( _entity.archetype->m_signature[componentIndex] )
+			{
+				return *static_cast<EcsComponent*>( _entity.archetype->m_chunks[componentIndex].At( _entity.index ) );
+			}
+			else
+			{
+				const EcsEntityData& entityData = _entity.archetype->m_entities[_entity.index];
+				const EcsTransition& transition = m_transitions[entityData.transitionIndex];
+				return *static_cast<EcsComponent*>( m_transitionArchetype.m_chunks[componentIndex].At( entityData.transitionIndex ) );
+			}
+		}
 	}
 
 	EcsEntity EcsWorld::CreateEntity()
@@ -419,6 +391,7 @@ namespace fan
 		m_archetypes[_signature] = newArchetype;
 		return *newArchetype;
 	}
+	
 	EcsTransition& EcsWorld::FindOrCreateTransition( const EcsEntity _entity )
 	{
 		// Get/register transition

@@ -12,12 +12,13 @@ namespace fan
 	class EcsChunkVector
 	{
 	public:
-		void Create( const int _componentSize, const int _alignment )
+		void Create( void* ( *_cpyFunction )( void*, const void*, size_t ), const int _componentSize, const int _alignment )
 		{
+			m_cpyFunction = _cpyFunction;
 			m_componentSize = _componentSize;
 			m_alignment = _alignment;
 			m_chunks.emplace_back();
-			m_chunks.rbegin()->Create( m_componentSize, m_alignment );
+			m_chunks.rbegin()->Create( m_cpyFunction, m_componentSize, m_alignment );
 			m_chunkCapacity = m_chunks.rbegin()->Capacity();
 		}
 
@@ -66,8 +67,8 @@ namespace fan
 			// Create a new chunk if necessary
 			if( m_chunks.rbegin()->Full() )
 			{
-				m_chunks.push_back( EcsChunk() );
-				m_chunks.rbegin()->Create( m_componentSize, m_alignment );
+				m_chunks.emplace_back();
+				m_chunks.rbegin()->Create( m_cpyFunction, m_componentSize, m_alignment );
 			}
 
 			// Push to the last chunk
@@ -83,8 +84,8 @@ namespace fan
 			// Create a new chunk if necessary
 			if( m_chunks.rbegin()->Full() )
 			{
-				m_chunks.push_back( EcsChunk() );
-				m_chunks.rbegin()->Create( m_componentSize, m_alignment );
+				m_chunks.emplace_back();
+				m_chunks.rbegin()->Create( m_cpyFunction, m_componentSize, m_alignment );
 			}
 
 			// Emplace to the last chunk
@@ -120,5 +121,6 @@ namespace fan
 		int m_componentSize;
 		int m_alignment;
 		int m_chunkCapacity;
+		void* ( *m_cpyFunction )( void*, const void*, size_t ) = nullptr;
 	};
 }

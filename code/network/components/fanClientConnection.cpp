@@ -13,6 +13,7 @@ namespace fan
 	{
 		_info.icon = ImGui::NETWORK16;
 		_info.init = &ClientConnection::Init;
+		_info.destroy = &ClientConnection::Destroy;
 		_info.onGui = &ClientConnection::OnGui;
 		_info.name = "client connection";
 	}
@@ -22,7 +23,8 @@ namespace fan
 	void ClientConnection::Init( EcsWorld& _world, EcsComponent& _component )
 	{
 		ClientConnection& connection = static_cast<ClientConnection&>( _component );
-		connection.socket.Unbind();
+		assert( connection.socket == nullptr );
+		connection.socket = new UdpSocket();
 		connection.clientPort = 53010;
 		connection.serverIP = "127.0.0.1";
 		connection.serverPort = 53000;
@@ -33,6 +35,15 @@ namespace fan
 		connection.serverLastResponse = 0.f;
 		connection.lastPacketPing = PacketPing();
 		connection.mustSendBackPacketPing = false;
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
+	void ClientConnection::Destroy( EcsWorld& _world, EcsComponent& _component )
+	{
+		ClientConnection& connection = static_cast<ClientConnection&>( _component );
+		delete connection.socket;
+		connection.socket = nullptr;
 	}
 
 	//================================================================================================================================

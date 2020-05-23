@@ -50,11 +50,10 @@ namespace fan
 	{
 	public:
 		PrefabPtr( Prefab* _prefab = nullptr ) : ResourcePtr<Prefab>( _prefab ) {}
-
 		void Init( const std::string _path ) { m_path = _path; }
 		const std::string& GetPath() const { return m_path; }
 
-		ResourcePtr& operator=( Prefab* _resource ) { SetResource( _resource ); return *this; }
+		ResourcePtr& Set( Prefab* _resource ) { SetResource( _resource ); return *this; }
 	private:
 		std::string m_path;
 	};

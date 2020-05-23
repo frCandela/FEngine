@@ -25,7 +25,7 @@ namespace fan
 		Bullet& bullet = static_cast<Bullet&>( _component );
 
 		// bullets
-		bullet.explosionPrefab = nullptr;
+		bullet.explosionPrefab.Set( nullptr );
 	}
 
 	//================================================================================================================================

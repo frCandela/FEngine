@@ -33,7 +33,7 @@ namespace fan
 		// time accumulator
 		weapon.bulletsAccumulator = 0.f;
 
-		weapon.bulletPrefab = nullptr;		
+		weapon.bulletPrefab.Set( nullptr );		
 	}
 
 	//================================================================================================================================

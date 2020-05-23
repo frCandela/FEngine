@@ -12,7 +12,6 @@ namespace fan
 	{
 	public:
 		UdpSocket();
-
 		using Status = sf::Socket::Status;
 
 		static constexpr size_t maxPacketSize = 508;

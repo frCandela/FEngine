@@ -60,7 +60,7 @@ namespace fan
 				for( auto& pair : scene.nodes )
 				{
 					SceneNode& sceneNode = _world.GetComponent<SceneNode>( _world.GetEntity( pair.second ) );
-					ImGui::Text( "%s : %d", sceneNode.name, pair.first );
+					ImGui::Text( "%s : %d", sceneNode.name.c_str(), pair.first );
 				}
 			}
 		}

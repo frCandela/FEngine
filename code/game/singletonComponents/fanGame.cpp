@@ -34,7 +34,7 @@ namespace fan
 	void Game::Init( EcsWorld& _world, EcsSingleton& _component ){
 		Game& gameData = static_cast<Game&>( _component );
 		gameData.state = STOPPED;
-		gameData.spaceshipPrefab = nullptr;
+		gameData.spaceshipPrefab.Set( nullptr );
 		gameData.frameIndex = 0;
 		gameData.logicDelta = 1.f / 60.f;
 		gameData.frameStart = 0;

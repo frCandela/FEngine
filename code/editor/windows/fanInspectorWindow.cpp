@@ -101,9 +101,9 @@ namespace fan
 		{
 			// Create new EcsComponent 
 			EcsEntity entity = m_world.GetEntity( m_handleNodeSelected );
-			if( !m_world.HasComponent( entity, _info.index ) )
+			if( !m_world.HasComponent( entity, _info.type ) )
 			{
-				m_world.AddComponent( entity, _info.index );				
+				m_world.AddComponent( entity, _info.type );
 			}			
 			ImGui::CloseCurrentPopup();
 		}

@@ -106,7 +106,7 @@ namespace fan
 		EcsEntity entity = world.GetEntity( node.handle );
 
 		ImGui::Text( "name      : %s", node.name.c_str() );
-		ImGui::Text( "scene     : %s", node.scene->path.empty()	? "<null>" : node.scene->path.c_str() );
+		ImGui::Text( "scene     : %s", node.scene->path.empty()	? "<no path>" : node.scene->path.c_str() );
 		ImGui::Text( "handle    : %u", node.handle );
 		ImGui::Text( "entity id : %u", entity );
 		ImGui::Text( "node   id : %u", node.uniqueID );
@@ -133,12 +133,13 @@ namespace fan
 	}
 
 	//================================================================================================================================
-	//================================================================================================================================bool IsAncestorOf( const SceneNode* _node ) const;
+	//================================================================================================================================
 	void SceneNode::RemoveChild( const SceneNode& _child )
 	{
 		for( int childIndex = 0; childIndex < childs.size(); childIndex++ )
 		{
-			if( childs[childIndex] == _child.handle )
+			EcsHandle childHandle = childs[childIndex];
+			if( childHandle == _child.handle )
 			{
 				childs.erase( childs.begin() + childIndex );
 				return;

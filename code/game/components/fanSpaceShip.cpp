@@ -40,7 +40,7 @@ namespace fan
 		spaceship.leftParticles.Init( _world );
 		spaceship.rightParticles.Init( _world );
 
-		spaceship.deathFx = nullptr;
+		spaceship.deathFx.Set( nullptr );
 	}
 
 	//================================================================================================================================

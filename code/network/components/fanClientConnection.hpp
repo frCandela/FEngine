@@ -18,7 +18,11 @@ namespace fan
 	public:
 		static void SetInfo( EcsComponentInfo& _info );
 		static void Init( EcsWorld& _world, EcsComponent& _component );
+		static void Destroy ( EcsWorld& _world, EcsComponent& _component );
 		static void OnGui( EcsWorld& _world, EcsEntity _entityID, EcsComponent& _component );
+		 
+
+
 
 		enum class ClientState { 
 			Disconnected,		// Client needs to send a Hello packet to the server to login
@@ -27,7 +31,7 @@ namespace fan
 			Stopping			// Client is being stopped, a disconnect packet must be sent to the server
 		};
 		
-		UdpSocket		socket;
+		UdpSocket*		socket;
 		Port			clientPort;
 		sf::IpAddress	serverIP;
 		Port			serverPort;

@@ -192,14 +192,14 @@ namespace ImGui
 		fan::Prefab* prefabDrop = ImGui::FanBeginDragDropTargetPrefab();
 		if ( prefabDrop )
 		{
-			_ptr = prefabDrop;
+			_ptr.Set( prefabDrop );
 			returnValue = true;
 		}
 
 		// Right click = clear
 		if ( ImGui::IsItemClicked( 1 ) )
 		{
-			_ptr = nullptr;
+			_ptr.Set( nullptr );
 			returnValue = true;
 		}
 

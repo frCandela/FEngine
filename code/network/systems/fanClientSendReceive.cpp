@@ -53,7 +53,7 @@ namespace fan
 			{
 				reliabilityLayer.RegisterPacket( packet );
 				connection.bandwidth = 1.f / game.logicDelta * float( packet.GetSize() ) / 1000.f; // in Ko/s
-				connection.socket.Send( packet, connection.serverIP, connection.serverPort );
+				connection.socket->Send( packet, connection.serverIP, connection.serverPort );
 			}
 			else
 			{
@@ -101,7 +101,7 @@ namespace fan
 			do
 			{
 				packet.Clear();
-				socketStatus = connection.socket.Receive( packet, receiveIP, receivePort );
+				socketStatus = connection.socket->Receive( packet, receiveIP, receivePort );
 
 				// only receive from the server
 				if( receiveIP != connection.serverIP || receivePort != connection.serverPort )

@@ -14,9 +14,7 @@ namespace sf
 }
 
 namespace fan
-
 {
-
 	struct EcsComponent {};
 
 	//================================
@@ -28,9 +26,11 @@ namespace fan
 		static constexpr uint32_t	 s_alignment{ alignof( T )			  };						\
 		static constexpr const char* s_name		{ #_ComponentType		  };						\
 		static constexpr uint32_t	 s_type		{ SSID( #_ComponentType ) };						\
+		static EcsComponent& Instanciate( void* _buffer ) { return *new( _buffer ) T(); }			\
+	    static void* Memcpy( void* _dst, const void* _src, size_t /*_count*/ ){	new( _dst )T( *static_cast<const T*>( _src ) ); return _dst; } \
 	};																								\
 	using Info = EcsComponentInfoImpl< _ComponentType >;											\
-	static EcsComponent& Instanciate( void* _buffer ) { return *new( _buffer ) _ComponentType(); }	
+	
 
 
 	class EcsWorld;
@@ -53,6 +53,7 @@ namespace fan
 		void ( *load )( EcsComponent&, const Json& ) = nullptr;						// called when the scene is loaded ( after the init )
 		void ( *netSave ) ( const EcsComponent&, sf::Packet& _packet ) = nullptr;
 		void ( *netLoad ) ( EcsComponent&, sf::Packet& _packet ) = nullptr;
-		EcsComponent& ( *instanciate )( void* ) = nullptr;							// for contructing components
+		EcsComponent& ( *construct )( void* ) = nullptr;							// for constructing components
+		void* ( *copy )( void* _dst, const void* _src, size_t _count ) = nullptr;	// for copying components
 	};
 }
