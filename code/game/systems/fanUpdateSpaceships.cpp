@@ -226,7 +226,7 @@ namespace fan
 				}
 				else
 				{
-					SceneNode& fxNode = *spaceShip.deathFx->Instanciate( *scene.root );
+					SceneNode& fxNode = *spaceShip.deathFx->Instanciate( scene.GetRootNode() );
 					EcsEntity fxId = _world.GetEntity( fxNode.handle );
 					Transform& fxTransform = _world.GetComponent<Transform>( fxId );
 					fxTransform.SetPosition( transform.GetPosition() );

@@ -48,7 +48,7 @@ namespace fan
 	{
 		// Create player persistent scene node
 		Scene& scene			= _world.GetSingleton<Scene>();
-		playerPersistent		= & scene.CreateSceneNode( "persistent", scene.root );
+		playerPersistent		= & scene.CreateSceneNode( "persistent", &scene.GetRootNode() );
 		EcsEntity persistentID	= _world.GetEntity( playerPersistent->handle );
 		_world.AddComponent<ReliabilityLayer>( persistentID );
 		_world.AddComponent<ClientConnection>( persistentID );

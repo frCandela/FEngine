@@ -52,7 +52,7 @@ namespace fan
 
 		// Draws all scene nodes
 		SceneNode* nodeRightClicked = nullptr;
-		R_DrawSceneTree( *m_scene->root, nodeRightClicked );
+		R_DrawSceneTree( m_scene->GetRootNode(), nodeRightClicked );
 
  		m_expandSceneHierarchy = false;
  

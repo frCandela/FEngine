@@ -38,7 +38,7 @@ namespace fan
 	{
 		Scene& scene = static_cast<Scene&>( _component );
 		scene.path = "";
-		scene.root = nullptr;
+		scene.rootSceneNode = 0;
 		scene.nextUniqueID = 1;
 		scene.mainCamera = nullptr;
 		scene.nodes.clear();
@@ -68,12 +68,19 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
+	SceneNode& Scene::GetRootNode() const
+	{
+		return world->GetComponent<SceneNode>( world->GetEntity( rootSceneNode ) );
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
 	SceneNode& Scene::CreateSceneNode( const std::string _name, SceneNode* const _parentNode, const bool _generateID )
 	{		
 		EcsEntity entity = world->CreateEntity();
 		EcsHandle handle = world->AddHandle( entity );
 		
-		SceneNode* const parent = _parentNode == nullptr ? root : _parentNode;
+		SceneNode* const parent = _parentNode == nullptr ? &GetRootNode() : _parentNode;
 		SceneNode& sceneNode = world->AddComponent<SceneNode>( entity );
 		world->AddComponent<Bounds>( entity );
 		world->AddTag<tag_boundsOutdated>( entity );
@@ -129,7 +136,7 @@ namespace fan
 		path = "";
 		world->Clear();
 		nodes.clear();
-		root = nullptr;
+		rootSceneNode = 0;
 		nextUniqueID = 1;
 		mainCamera = nullptr;
 
@@ -143,7 +150,7 @@ namespace fan
 	{
 		Clear( );
 		nextUniqueID = 1;
-		root = &CreateSceneNode( "root", nullptr );
+		rootSceneNode = CreateSceneNode( "root", nullptr ).handle;
 		onLoad.Emmit( *this );
 	}
 
@@ -180,7 +187,7 @@ namespace fan
 
 			// saves all scene nodes recursively
 			Json& jRoot = jScene["root"];
-			R_SaveToJson( *root, jRoot );
+			R_SaveToJson( GetRootNode(), jRoot );
 			RemapSceneNodesIndices( jRoot );
 			outStream << json; // write to disk			
 			outStream.close();
@@ -348,12 +355,13 @@ namespace fan
 
 			// loads all nodes recursively
 			const Json& jRoot = jScene["root"];
-			root = &CreateSceneNode( "root", nullptr, false );
-			R_LoadFromJson( jRoot, *root, 0 );
+			SceneNode& rootNode = CreateSceneNode( "root", nullptr, false );
+			rootSceneNode = rootNode.handle;
+			R_LoadFromJson( jRoot, rootNode, 0 );
 			
 			path = _path;
 			inStream.close();
-			nextUniqueID = R_FindMaximumId( *root ) + 1;
+			nextUniqueID = R_FindMaximumId( rootNode ) + 1;
 
 			ScenePointers::ResolveComponentPointers( *this, 0 );
 			S_InitFollowTransforms::Run( *world, world->Match( S_InitFollowTransforms::GetSignature( *world ) ) );

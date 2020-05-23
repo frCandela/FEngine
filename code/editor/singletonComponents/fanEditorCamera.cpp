@@ -124,7 +124,7 @@ namespace fan
 		Scene& scene = _world.GetSingleton< Scene >();
 
 		// Editor Camera
-		SceneNode& cameraNode = scene.CreateSceneNode( "editor_camera", scene.root );
+		SceneNode& cameraNode = scene.CreateSceneNode( "editor_camera", &scene.GetRootNode() );
 		EcsEntity cameraID = _world.GetEntity( cameraNode.handle );
 		cameraNode.AddFlag( SceneNode::NOT_SAVED | SceneNode::NO_DELETE | SceneNode::NO_RAYCAST );
 
