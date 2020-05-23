@@ -584,7 +584,7 @@ namespace fan
 					Scene& scene = m_gameWorld.GetSingleton<Scene>();
 
 					// only update the editor camera when we are using it
-					if( scene.mainCamera == editorCamera.cameraNode )
+					if( &scene.GetMainCamera() == editorCamera.cameraNode )
 					{
 						EditorCamera::Update( editorCamera, game.logicDelta );
 					}
@@ -702,7 +702,7 @@ namespace fan
 			Scene& scene = m_gameWorld.GetSingleton<Scene>();
 
 			// Saves the camera position for restoring it later
-			const EcsEntity oldCameraID = m_gameWorld.GetEntity( scene.mainCamera->handle );
+			const EcsEntity oldCameraID = m_gameWorld.GetEntity( scene.mainCameraSceneNode );
 			const btTransform oldCameraTransform = m_gameWorld.GetComponent<Transform>( oldCameraID ).transform;
 
 			// save old selection
@@ -717,7 +717,7 @@ namespace fan
 			scene.LoadFrom( scene.path ); // reload the scene 
 
 			// restore camera transform
-			const EcsEntity newCameraID = m_gameWorld.GetEntity( scene.mainCamera->handle );
+			const EcsEntity newCameraID = m_gameWorld.GetEntity( scene.mainCameraSceneNode );
 			m_gameWorld.GetComponent<Transform>( newCameraID ).transform = oldCameraTransform;
 
 			// restore selection
@@ -820,7 +820,7 @@ namespace fan
 
 		// Camera
 		Scene& scene = m_gameWorld.GetSingleton<Scene>();
-		EcsEntity cameraID = m_gameWorld.GetEntity( scene.mainCamera->handle );
+		EcsEntity cameraID = m_gameWorld.GetEntity( scene.mainCameraSceneNode );
 		Camera& camera = m_gameWorld.GetComponent<Camera>( cameraID );
 		camera.aspectRatio = m_gameViewWindow->GetAspectRatio();
 		Transform& cameraTransform = m_gameWorld.GetComponent<Transform>( cameraID );
@@ -880,7 +880,7 @@ namespace fan
 		GameCamera& gameCamera = m_gameWorld.GetSingleton<GameCamera>();
 		EditorCamera& editorCamera = m_gameWorld.GetSingleton<EditorCamera>();
 
-		if( scene.mainCamera == editorCamera.cameraNode )
+		if( &scene.GetMainCamera() == editorCamera.cameraNode )
 		{
 			UseGameCamera();
 		}

@@ -54,7 +54,7 @@ namespace fan
 		bool mouseCaptured = false;		
 
 		// translation gizmo on selected scene node
-		if ( m_selectedSceneNode != nullptr && m_selectedSceneNode != m_currentScene->mainCamera )
+		if ( m_selectedSceneNode != nullptr && m_selectedSceneNode->handle != m_currentScene->mainCameraSceneNode )
 		{
 			EcsWorld& world = *m_selectedSceneNode->scene->world;
 			EcsEntity entity = world.GetEntity( m_selectedSceneNode->handle );
@@ -75,7 +75,7 @@ namespace fan
  		if ( !mouseCaptured && _gameWindowHovered && Mouse::Get().GetButtonPressed( Mouse::button0 ) )
  		{
 			EcsWorld& world = *m_currentScene->world;
-			EcsEntity cameraID = world.GetEntity( m_currentScene->mainCamera->handle );
+			EcsEntity cameraID = world.GetEntity( m_currentScene->mainCameraSceneNode );
 			const Transform& cameraTransform = world.GetComponent<Transform>( cameraID );
 			const Camera& camera = world.GetComponent<Camera>( cameraID );
 

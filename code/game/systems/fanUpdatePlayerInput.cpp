@@ -33,7 +33,7 @@ namespace fan
 		if( _delta == 0.f ) { return; }
 
 		const Scene& scene = _world.GetSingleton<Scene>();
-		const EcsEntity cameraID = _world.GetEntity( scene.mainCamera->handle );
+		const EcsEntity cameraID = _world.GetEntity( scene.mainCameraSceneNode );
 		const Transform& cameraTransform = _world.GetComponent<Transform>( cameraID );
 		const Camera& camera = _world.GetComponent<Camera>( cameraID );
 

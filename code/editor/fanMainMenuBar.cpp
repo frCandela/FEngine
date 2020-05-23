@@ -347,7 +347,7 @@ namespace fan
 		if( game.state == Game::STOPPED )
 		{
 			// save old camera transform
-			const EcsEntity oldCameraID = m_world->GetEntity( scene.mainCamera->handle );
+			const EcsEntity oldCameraID = m_world->GetEntity( scene.mainCameraSceneNode );
 			btTransform oldCameraTransform = m_world->GetComponent<Transform>( oldCameraID ).transform;
 
 			// save old selection
@@ -358,7 +358,7 @@ namespace fan
 			scene.LoadFrom( scene.path );
 
 			// restore camera
-			const EcsEntity newCameraID = m_world->GetEntity( scene.mainCamera->handle );
+			const EcsEntity newCameraID = m_world->GetEntity( scene.mainCameraSceneNode );
 			m_world->GetComponent<Transform>( newCameraID ).transform = oldCameraTransform;
 
 			// restore selection

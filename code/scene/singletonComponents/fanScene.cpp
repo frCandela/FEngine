@@ -39,8 +39,8 @@ namespace fan
 		Scene& scene = static_cast<Scene&>( _component );
 		scene.path = "";
 		scene.rootSceneNode = 0;
+		scene.mainCameraSceneNode = 0;
 		scene.nextUniqueID = 1;
-		scene.mainCamera = nullptr;
 		scene.nodes.clear();
 		const_cast<EcsWorld*>( scene.world ) = &_world;
 	}
@@ -71,6 +71,13 @@ namespace fan
 	SceneNode& Scene::GetRootNode() const
 	{
 		return world->GetComponent<SceneNode>( world->GetEntity( rootSceneNode ) );
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
+	SceneNode& Scene::GetMainCamera() const
+	{
+		return world->GetComponent<SceneNode>( world->GetEntity( mainCameraSceneNode ) );
 	}
 
 	//================================================================================================================================
@@ -121,9 +128,9 @@ namespace fan
 	//================================================================================================================================
 	void Scene::SetMainCamera( SceneNode& _nodeCamera )
 	{
-		if( &_nodeCamera != mainCamera )
+		if( _nodeCamera.handle != mainCameraSceneNode )
 		{
-			mainCamera = &_nodeCamera;
+			mainCameraSceneNode = _nodeCamera.handle;
 			onSetMainCamera.Emmit( _nodeCamera );
 		}
 	}
@@ -137,8 +144,8 @@ namespace fan
 		world->Clear();
 		nodes.clear();
 		rootSceneNode = 0;
+		mainCameraSceneNode = 0;
 		nextUniqueID = 1;
-		mainCamera = nullptr;
 
 		ScenePointers& scenePointers = world->GetSingleton<ScenePointers>();
 		scenePointers.unresolvedComponentPtr.clear();

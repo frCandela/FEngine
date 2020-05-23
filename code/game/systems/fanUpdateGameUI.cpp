@@ -87,7 +87,7 @@ namespace fan
 		if( _delta == 0.f ) { return; }
 
 		Scene& scene = _world.GetSingleton<Scene>();
-		EcsEntity cameraID = _world.GetEntity( scene.mainCamera->handle );
+		EcsEntity cameraID = _world.GetEntity( scene.mainCameraSceneNode );
 		Camera& camera = _world.GetComponent<Camera>( cameraID );
 		Transform& cameraTransform = _world.GetComponent<Transform>( cameraID );
 		RenderWorld& renderWorld = _world.GetSingleton<RenderWorld>();

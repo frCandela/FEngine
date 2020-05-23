@@ -43,10 +43,11 @@ namespace fan
 		EcsWorld* const								world = nullptr;
 		std::string									path;		
 		EcsHandle 									rootSceneNode;
+		EcsHandle									mainCameraSceneNode;
 		uint32_t									nextUniqueID;
-		SceneNode*									mainCamera;
 		std::unordered_map< uint32_t, SceneNode* >  nodes;
 
 		SceneNode& GetRootNode() const;
+		SceneNode& GetMainCamera() const;
 	};
 }
