@@ -12,7 +12,6 @@ namespace fan
 	{
 		ECS_COMPONENT( SphereShape )
 	public:
-		SphereShape();
 		static void SetInfo( EcsComponentInfo& _info );
 		static void Init( EcsWorld& _world, EcsComponent& _component );
 		static void Destroy( EcsWorld& _world, EcsComponent& _component );

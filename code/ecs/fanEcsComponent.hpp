@@ -1,6 +1,7 @@
 #pragma once
 
 #include <string>
+#include <type_traits>
 #include "core/fanHash.hpp"
 #include "editor/fanImguiIcons.hpp"
 #include "ecs/fanEcsEntity.hpp"
@@ -13,23 +14,26 @@ namespace sf
 }
 
 namespace fan
+
 {
-	class EcsWorld;
+
+	struct EcsComponent {};
 
 	//================================
 	//================================
 	#define ECS_COMPONENT( _ComponentType)															\
 	public:																							\
-	template <class T> struct EcsComponentInfoImpl	{													\
+	template <class T> struct EcsComponentInfoImpl	{												\
 		static constexpr uint32_t	 s_size		{ sizeof( T )			  };						\
 		static constexpr uint32_t	 s_alignment{ alignof( T )			  };						\
 		static constexpr const char* s_name		{ #_ComponentType		  };						\
 		static constexpr uint32_t	 s_type		{ SSID( #_ComponentType ) };						\
 	};																								\
-	using Info = EcsComponentInfoImpl< _ComponentType >;												\
+	using Info = EcsComponentInfoImpl< _ComponentType >;											\
+	static EcsComponent& Instanciate( void* _buffer ) { return *new( _buffer ) _ComponentType(); }	
 
-	struct EcsComponent {};
 
+	class EcsWorld;
 	//================================
 	//================================
 	struct EcsComponentInfo
@@ -49,5 +53,6 @@ namespace fan
 		void ( *load )( EcsComponent&, const Json& ) = nullptr;						// called when the scene is loaded ( after the init )
 		void ( *netSave ) ( const EcsComponent&, sf::Packet& _packet ) = nullptr;
 		void ( *netLoad ) ( EcsComponent&, sf::Packet& _packet ) = nullptr;
+		EcsComponent& ( *instanciate )( void* ) = nullptr;							// for contructing components
 	};
 }

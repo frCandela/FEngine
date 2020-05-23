@@ -44,7 +44,7 @@ namespace fan
 		EcsHandle 									rootNodeHandle;
 		EcsHandle									mainCameraHandle;
 		uint32_t									nextUniqueID;
-		std::unordered_map< uint32_t, SceneNode* >  nodes;
+		std::unordered_map< uint32_t, EcsHandle >   nodes;
 
 		SceneNode& GetRootNode() const;
 		SceneNode& GetMainCamera() const;

@@ -90,10 +90,10 @@ namespace ImGui
 		else
 		{
 			fan::Scene& scene = world.GetSingleton<fan::Scene>();
-			fan::SceneNode& node = * scene.nodes[_ptr.sceneNodeID];
+			const fan::EcsHandle nodeHandle = scene.nodes[_ptr.sceneNodeID];
+			fan::SceneNode& node = world.GetComponent<fan::SceneNode>( world.GetEntity( nodeHandle ) );
 			name = info.name + " : " + node.name;
 		}		
- 
  		// icon
  		if (ImGui::ButtonIcon( info.icon, { 16,16 } ))
  		{
@@ -103,7 +103,8 @@ namespace ImGui
 		if( _ptr.component != nullptr )
 		{
 			fan::Scene& scene = _ptr.world->GetSingleton<fan::Scene>();
-			fan::SceneNode& node = *scene.nodes.at( _ptr.sceneNodeID );
+			const fan::EcsHandle nodeHandle = scene.nodes.at( _ptr.sceneNodeID );
+			fan::SceneNode& node = world.GetComponent<fan::SceneNode>( world.GetEntity( nodeHandle ) );
 			ImGui::FanBeginDragDropSourceComponent( node, *_ptr.component );
 		}
 		// dragndrop target for icon
@@ -123,7 +124,8 @@ namespace ImGui
 		if( _ptr.component != nullptr )
 		{
 			fan::Scene& scene = _ptr.world->GetSingleton<fan::Scene>();
-			fan::SceneNode& node = *scene.nodes.at( _ptr.sceneNodeID );
+			const fan::EcsHandle nodeHandle = scene.nodes.at( _ptr.sceneNodeID );
+			fan::SceneNode& node = world.GetComponent<fan::SceneNode>( world.GetEntity( nodeHandle ) );
 			ImGui::FanBeginDragDropSourceComponent( node, *_ptr.component );
 		}
 

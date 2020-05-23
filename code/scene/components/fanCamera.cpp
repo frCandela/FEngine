@@ -168,7 +168,9 @@ namespace fan
 
 			Ray ray;
 			ray.origin = nearMiddle - _screenSpacePosition.x() * nearWidth * left - _screenSpacePosition.y() * nearHeight * upVec;
-			ray.direction = ( 100.f * ( ray.origin - pos ) ).normalized();
+			ray.direction = 100.f * ( ray.origin - pos ) ;
+			if( !ray.direction.fuzzyZero() ) { ray.direction.normalize(); }
+
 
 			return ray;
 		}

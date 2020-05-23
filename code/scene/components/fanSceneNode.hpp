@@ -29,12 +29,13 @@ namespace fan
 
 		void Build( const std::string& _name, Scene& _scene, const EcsHandle _handle, const uint32_t _uniqueID, SceneNode* const _parent);
 
-		bool IsRoot() const { return parent == nullptr; }
+		bool IsRoot() const { return parentHandle == 0; }
 		bool IsAncestorOf( const SceneNode& _node ) const;
 		void RemoveChild( const SceneNode& _child );
 		bool HasChild( const SceneNode& _child );
 		void AddChild( SceneNode& _child );
 		void SetParent( SceneNode* _parent );
+		SceneNode& GetParent() const;
 		void InsertBelow( SceneNode& _brother );
 		bool HasFlag( uint32_t _flag ) const { return flags & _flag; }
 		void AddFlag( uint32_t _flag ) {  flags |= _flag; }
@@ -42,12 +43,12 @@ namespace fan
 
 		static void GetDescendantsOf( SceneNode& _root, std::vector<SceneNode*>& _outList );
 
-		EcsHandle			handle;
+		EcsHandle				handle;
 		uint32_t				uniqueID;
 		uint32_t				flags;
 		Scene*					scene;
-		SceneNode*				parent;
-		std::vector<SceneNode*> childs;
+		EcsHandle				parentHandle;
+		std::vector<EcsHandle>  childs;
 		std::string				name;
 	};
 	static constexpr size_t sizeof_sceneNode = sizeof( SceneNode );

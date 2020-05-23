@@ -726,7 +726,10 @@ namespace fan
 				auto it = scene.nodes.find( prevSelectionID );
 				if( it != scene.nodes.end() )
 				{
-					m_selection->SetSelectedSceneNode( it->second );
+					const fan::EcsHandle nodeHandle = scene.nodes.at( it->second );
+					fan::SceneNode& node = m_gameWorld.GetComponent<fan::SceneNode>( m_gameWorld.GetEntity( nodeHandle ) );
+
+					m_selection->SetSelectedSceneNode( &node );
 				}
 			}
 		}

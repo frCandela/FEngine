@@ -234,7 +234,11 @@ namespace fan
 		// Update transition
 		transition.signatureAdd[componentIndex] = 1;
 
-		return *static_cast<EcsComponent*>( m_transitionArchetype.m_chunks[componentIndex].At( entityData.transitionIndex ) );
+		EcsComponent& component = *static_cast<EcsComponent*>( m_transitionArchetype.m_chunks[componentIndex].At( entityData.transitionIndex ) );
+		EcsComponentInfo info = m_componentsInfo[componentIndex];
+		info.instanciate( &component );
+
+		return component;
 	}
 	void		  EcsWorld::RemoveComponent( const EcsEntity _entity, const uint32_t _type )
 	{

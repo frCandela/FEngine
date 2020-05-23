@@ -18,7 +18,7 @@ namespace fan
 		static void OnGui( EcsWorld& _world, EcsEntity _entityID, EcsComponent& _component );
 
 		NetID									spaceshipID;
-		EcsHandle							spaceshipHandle;
+		EcsHandle								spaceshipHandle;
 		std::queue< PacketInput::InputData >	inputs;
 		PacketPlayerGameState					nextPlayerState;
 		FrameIndex								nextPlayerStateFrame;	// the index of the next frame on which we will save the player game state

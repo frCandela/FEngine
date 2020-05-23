@@ -8,7 +8,7 @@ namespace fan
 	//================================
 	struct EcsView
 	{
-		EcsView( std::unordered_map<uint32_t, int > _typesToIndex, const EcsSignature _signature ) :
+		EcsView( const std::unordered_map<uint32_t, int >& _typesToIndex, const EcsSignature _signature ) :
 			m_typesToIndex( _typesToIndex )
 			, m_signature( _signature )
 		{

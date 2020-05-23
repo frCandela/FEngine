@@ -367,7 +367,9 @@ namespace fan
 				auto it = scene.nodes.find( prevSelectionID );
 				if( it != scene.nodes.end() )
 				{
-					m_editorSelection.SetSelectedSceneNode( it->second );
+					const fan::EcsHandle nodeHandle = scene.nodes.at( it->second );
+					fan::SceneNode& node = m_world->GetComponent<fan::SceneNode>( m_world->GetEntity( nodeHandle ) );
+					m_editorSelection.SetSelectedSceneNode( &node );
 				}
 			}
 		}

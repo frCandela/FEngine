@@ -252,7 +252,6 @@ namespace fan
 	//================================================================================================================================
 	void SceneWindow::R_DrawSceneTree( SceneNode& _node, SceneNode*& _nodeRightClicked )
 	{
-
 		std::stringstream ss;
 		ss << "##" << &_node; // Unique id
 
@@ -297,10 +296,11 @@ namespace fan
 
 		if( isOpen )
 		{
+			EcsWorld& world = *_node.scene->world;
 			for( int childIndex = 0; childIndex < _node.childs.size(); childIndex++ )
 			{
-				SceneNode* child = _node.childs[childIndex];
-				R_DrawSceneTree( *child, _nodeRightClicked );
+				SceneNode& child = world.GetComponent<SceneNode>( world.GetEntity( _node.childs[childIndex] ) );
+				R_DrawSceneTree( child, _nodeRightClicked );
 			}
 
 			ImGui::TreePop();

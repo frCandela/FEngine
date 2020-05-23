@@ -115,6 +115,7 @@ namespace fan
 			// Set component info
 			EcsComponentInfo info;
 			info.name		= _ComponentType::Info::s_name;
+			info.instanciate = &_ComponentType::Instanciate;
 			info.init		= &_ComponentType::Init;			
 			info.size		= _ComponentType::Info::s_size;
 			info.alignment	= _ComponentType::Info::s_alignment;			

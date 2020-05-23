@@ -47,7 +47,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void Scene::OnGui( EcsWorld&, EcsSingleton& _component )
+	void Scene::OnGui( EcsWorld& _world, EcsSingleton& _component )
 	{
 		Scene& scene = static_cast<Scene&>( _component );
 		ImGui::Indent(); ImGui::Indent();
@@ -59,7 +59,8 @@ namespace fan
 			{
 				for( auto& pair : scene.nodes )
 				{
-					ImGui::Text( "%s : %d", pair.second->name, pair.first );
+					SceneNode& sceneNode = _world.GetComponent<SceneNode>( _world.GetEntity( pair.second ) );
+					ImGui::Text( "%s : %d", sceneNode.name, pair.first );
 				}
 			}
 		}
@@ -84,10 +85,11 @@ namespace fan
 	//================================================================================================================================
 	SceneNode& Scene::CreateSceneNode( const std::string _name, SceneNode* const _parentNode, const bool _generateID )
 	{		
+		assert( _parentNode != nullptr || rootNodeHandle == 0 ); // we can have only one root node
+
 		EcsEntity entity = world->CreateEntity();
 		EcsHandle handle = world->AddHandle( entity );
-		
-		SceneNode* const parent = _parentNode == nullptr ? &GetRootNode() : _parentNode;
+
 		SceneNode& sceneNode = world->AddComponent<SceneNode>( entity );
 		world->AddComponent<Bounds>( entity );
 		world->AddTag<tag_boundsOutdated>( entity );
@@ -97,13 +99,13 @@ namespace fan
 		{
 			assert( nodes.find( id ) == nodes.end() );
 			id = nextUniqueID++;
-			nodes[id] = &sceneNode;
+			nodes[id] = handle;
 		}
 		else
 		{
 			id = 0;
 		}
-		sceneNode.Build( _name, *this, handle, id, parent );
+		sceneNode.Build( _name, *this, handle, id, _parentNode );
 		return sceneNode;
 	}
 
@@ -111,11 +113,13 @@ namespace fan
 	//================================================================================================================================
 	uint32_t Scene::R_FindMaximumId( SceneNode& _node )
 	{
+		EcsWorld& world = *_node.scene->world;
+
 		uint32_t id = _node.uniqueID;
-		const std::vector<SceneNode*>& childs = _node.childs;
+		const std::vector<EcsHandle>& childs = _node.childs;
 		for ( int childIndex = 0; childIndex < childs.size(); childIndex++ )
 		{
-			uint32_t childId = R_FindMaximumId( *childs[ childIndex ] );
+			uint32_t childId = R_FindMaximumId( world.GetComponent<SceneNode>( world.GetEntity( childs[childIndex] ) ) );
 			if ( childId > id )
 			{
 				id = childId;
@@ -398,7 +402,7 @@ namespace fan
 		// append id
 		Scene& scene = *_node.scene;
 		assert( scene.nodes.find( _node.uniqueID ) == scene.nodes.end() );
-		scene.nodes[_node.uniqueID] = &_node;
+		scene.nodes[_node.uniqueID] = _node.handle;
 
 		// components
 		const Json& jComponents = _json["components"];
