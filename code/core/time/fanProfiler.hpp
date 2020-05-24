@@ -50,7 +50,7 @@ namespace fan
 	class ScopedProfile
 	{
 	public:
-		ScopedProfile( const char  _name[ 16 ] );
+		ScopedProfile( const char  _name[ 24 ] );
 		~ScopedProfile();
 	private:
 		size_t m_index;

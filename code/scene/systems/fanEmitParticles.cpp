@@ -6,6 +6,7 @@
 #include "scene/components/fanParticleEmitter.hpp"
 #include "scene/components/fanParticle.hpp"
 #include "ecs/fanEcsWorld.hpp"
+#include "core/time/fanProfiler.hpp"
 
 namespace fan
 {
@@ -19,7 +20,9 @@ namespace fan
 	//================================================================================================================================
 	//================================================================================================================================
 	void S_EmitParticles::Run( EcsWorld& _world, const EcsView& _view, const float _delta )
-	{
+	{	
+		SCOPED_PROFILE( S_EmitParticles );
+	
 		if( _delta == 0.f ) { return; }
 
 		auto transformIt = _view.begin<Transform>();

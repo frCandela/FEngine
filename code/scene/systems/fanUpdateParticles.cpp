@@ -2,6 +2,7 @@
 
 #include "scene/components/fanParticle.hpp"
 #include "ecs/fanEcsWorld.hpp"
+#include "core/time/fanProfiler.hpp"
 
 namespace fan
 {
@@ -17,6 +18,7 @@ namespace fan
 	void S_UpdateParticles::Run( EcsWorld& _world, const EcsView& _view, const float _delta )
 	{
 		if( _delta == 0.f ) { return; }
+		SCOPED_PROFILE( UpdateParticles );
 
 		for( auto particleIt = _view.begin<Particle>(); particleIt != _view.end<Particle>(); ++particleIt )
 		{

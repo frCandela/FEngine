@@ -221,8 +221,8 @@ namespace fan
 			S_MoveFollowTransforms					::Run( world, world.Match( S_MoveFollowTransforms::GetSignature( world ) ) );
 			S_MoveFollowTransformsUI				::Run( world, world.Match( S_MoveFollowTransformsUI::GetSignature( world ) ) );			
 			
-			S_HostSaveState		::Run( world, world.Match( S_HostSaveState::GetSignature( world ) )		, _delta );
-			
+			S_HostSaveState		::Run( world, world.Match( S_HostSaveState::GetSignature( world ) )		, _delta );		
+
 			S_FireWeapons			::Run( world, world.Match( S_FireWeapons::GetSignature( world ) )			, _delta );			
 			S_GenerateLightMesh		::Run( world, world.Match( S_GenerateLightMesh::GetSignature( world ) )		, _delta );
 			S_UpdateSolarPannels	::Run( world, world.Match( S_UpdateSolarPannels::GetSignature( world ) )	, _delta );
@@ -235,15 +235,19 @@ namespace fan
 			S_PlayerDeath			::Run( world, world.Match( S_PlayerDeath::GetSignature( world ) )			, _delta );
 
 			// late update
-			S_ParticlesOcclusion		::Run( world, world.Match( S_ParticlesOcclusion::GetSignature( world ) )		, _delta );
-			S_UpdateParticles			::Run( world, world.Match( S_UpdateParticles::GetSignature( world ) )			, _delta );
-			S_EmitParticles				::Run( world, world.Match( S_EmitParticles::GetSignature( world ) )				, _delta );
-			S_GenerateParticles			::Run( world, world.Match( S_GenerateParticles::GetSignature( world ) )			, _delta );
-			S_UpdateBoundsFromRigidbody	::Run( world, world.Match( S_UpdateBoundsFromRigidbody::GetSignature( world ) )	, _delta );
-			S_UpdateBoundsFromModel		::Run( world, world.Match( S_UpdateBoundsFromModel::GetSignature( world ) )		, _delta );
-			S_UpdateBoundsFromTransform	::Run( world, world.Match( S_UpdateBoundsFromTransform::GetSignature( world ) )	, _delta );
-			S_UpdateGameCamera			::Run( world, world.Match( S_UpdateGameCamera::GetSignature( world ) )			, _delta );			
-			
+			{
+				SCOPED_PROFILE( game_late );
+
+				S_ParticlesOcclusion::Run( world, world.Match( S_ParticlesOcclusion::GetSignature( world ) ), _delta );
+				S_UpdateParticles::Run( world, world.Match( S_UpdateParticles::GetSignature( world ) ), _delta );
+				S_EmitParticles::Run( world, world.Match( S_EmitParticles::GetSignature( world ) ), _delta );
+				S_GenerateParticles::Run( world, world.Match( S_GenerateParticles::GetSignature( world ) ), _delta );
+				S_UpdateBoundsFromRigidbody::Run( world, world.Match( S_UpdateBoundsFromRigidbody::GetSignature( world ) ), _delta );
+				S_UpdateBoundsFromModel::Run( world, world.Match( S_UpdateBoundsFromModel::GetSignature( world ) ), _delta );
+				S_UpdateBoundsFromTransform::Run( world, world.Match( S_UpdateBoundsFromTransform::GetSignature( world ) ), _delta );
+				S_UpdateGameCamera::Run( world, world.Match( S_UpdateGameCamera::GetSignature( world ) ), _delta );
+			}
+
 			HostManager& hostManager = world.GetSingleton<HostManager>();
 			for( const std::pair<HostManager::IPPort, EcsHandle>& pair : hostManager.hostHandles )
 			{

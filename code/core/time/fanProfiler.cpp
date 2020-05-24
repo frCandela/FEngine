@@ -12,7 +12,7 @@ namespace fan
 		interval.time = m_clock.Now();
 		interval.id = m_index++;
 
-		strcpy_s( interval.name, _name ); // If you crash here, you probably entered a name that is more than 16 characters long
+		strcpy_s( interval.name, _name ); // If you crash here, you probably entered a name that is more than 24 characters long
 		m_intervals.push_back( interval );
 
 		return interval.id;
@@ -53,7 +53,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	ScopedProfile::ScopedProfile( const char  _name[ 16 ] )
+	ScopedProfile::ScopedProfile( const char  _name[ 24 ] )
 	{
 		m_index = Profiler::Get().OpenTimeInterval( _name );
 	}
