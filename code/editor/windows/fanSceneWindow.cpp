@@ -4,6 +4,7 @@
 #include "core/fanDebug.hpp"
 #include "scene/fanDragnDrop.hpp"
 #include "editor/fanModals.hpp"
+#include "editor/singletonComponents/fanEditorSelection.hpp"
 #include "core/input/fanKeyboard.hpp"
 #include "core/time/fanProfiler.hpp"
 #include "core/input/fanInput.hpp"
@@ -270,7 +271,8 @@ namespace fan
 
 
 		ImGui::SameLine();
-		bool selected = ( &_node == m_sceneNodeSelected );
+		const EcsHandle handleSelected = m_scene->world->GetSingleton<EditorSelection>().m_selectedNodeHandle;
+		bool selected = ( _node.handle == handleSelected );
 
 		// Draw scene node empty selectable to display a hierarchy
 		std::stringstream ss2;

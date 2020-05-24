@@ -1,4 +1,4 @@
-#include "editor/fanEditorGizmos.hpp"
+#include "editor/singletonComponents/fanEditorGizmos.hpp"
 
 #include "editor/fanEditorDebug.hpp"
 #include "core/math/shapes/fanRay.hpp"

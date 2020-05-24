@@ -32,9 +32,9 @@
 #include "editor/windows/fanSceneWindow.hpp"	
 #include "editor/windows/fanGameViewWindow.hpp"
 #include "editor/windows/fanEcsWindow.hpp"
-#include "editor/fanEditorSelection.hpp"
-#include "editor/fanEditorCopyPaste.hpp"
-#include "editor/fanEditorGizmos.hpp"
+#include "editor/singletonComponents/fanEditorSelection.hpp"
+#include "editor/singletonComponents/fanEditorCopyPaste.hpp"
+#include "editor/singletonComponents/fanEditorGizmos.hpp"
 #include "editor/fanEditorDebug.hpp"
 #include "editor/fanMainMenuBar.hpp"
 #include "editor/fanImguiIcons.hpp"
@@ -211,8 +211,6 @@ namespace fan
 		m_mainMenuBar->onReloadShaders.Connect( &Renderer::ReloadShaders, m_renderer );
 		m_mainMenuBar->onReloadIcons.Connect( &Renderer::ReloadIcons, m_renderer );
 		m_mainMenuBar->onExit.Connect( &Editor::Exit, this );
-		selection.onSceneNodeSelected.Connect( &SceneWindow::OnSceneNodeSelected, m_sceneWindow );
-		selection.onSceneNodeSelected.Connect( &InspectorWindow::OnSceneNodeSelected, m_inspectorWindow );
 
 		// Events linking
 		Input::Get().Manager().FindEvent( "reload_shaders" )->Connect( &Renderer::ReloadShaders, m_renderer );

@@ -18,16 +18,11 @@ namespace fan
 	{
 	public:
 		InspectorWindow( EcsWorld& _world );
-
-		// Callbacks
-		void OnSceneNodeSelected( SceneNode* _node );
-
 	protected:
 		void OnGui() override;
 
 	private:
 		EcsWorld& m_world;
-		EcsHandle m_handleNodeSelected = 0;
 
 		void NewComponentPopup();
 		void R_NewComponentPopup( std::set< std::filesystem::path >& _componentsPathSet, std::set< std::filesystem::path >::iterator& _current, const std::vector<EcsComponentInfo>& _components, const std::vector<std::filesystem::path>& _componentsPath );

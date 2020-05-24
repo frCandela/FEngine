@@ -1,6 +1,6 @@
-#include "editor/fanEditorSelection.hpp"
+#include "editor/singletonComponents/fanEditorSelection.hpp"
 
-#include "editor/fanEditorGizmos.hpp"
+#include "editor/singletonComponents/fanEditorGizmos.hpp"
 #include "editor/fanEditorDebug.hpp"
 #include "core/input/fanInput.hpp"
 #include "core/input/fanInputManager.hpp"

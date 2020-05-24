@@ -1,6 +1,7 @@
 #include "editor/windows/fanInspectorWindow.hpp"
 
 #include <sstream>
+#include "editor/singletonComponents/fanEditorSelection.hpp"
 #include "scene/fanDragnDrop.hpp"
 #include "scene/singletonComponents/fanScene.hpp"
 #include "scene/singletonComponents/fanPhysicsWorld.hpp"
@@ -24,15 +25,7 @@ namespace fan
 	InspectorWindow::InspectorWindow( EcsWorld& _world ) :
 		EditorWindow( "inspector", ImGui::IconType::INSPECTOR16 ), 
 		m_world( _world )
-	{
-	}
-
-	//================================================================================================================================
-	//================================================================================================================================
-	void InspectorWindow::OnSceneNodeSelected( SceneNode* _node ) 
-	{
-		m_handleNodeSelected = _node == nullptr ? 0 : _node->handle; 
-	}
+	{}
 
 	//================================================================================================================================
 	//================================================================================================================================
@@ -40,9 +33,10 @@ namespace fan
 	{
 		SCOPED_PROFILE( inspector );
 
-		if( m_handleNodeSelected != 0 )
+		EcsHandle handleSelected = m_world.GetSingleton<EditorSelection>().m_selectedNodeHandle;
+		if( handleSelected != 0 )
 		{
-			SceneNode& node = m_world.GetComponent<SceneNode>( m_world.GetEntity(m_handleNodeSelected) );
+			SceneNode& node = m_world.GetComponent<SceneNode>( m_world.GetEntity( handleSelected ) );
 			Scene& scene = *node.scene;
 			EcsWorld& world = *scene.world;
 			const EcsEntity entity = world.GetEntity( node.handle );
@@ -100,7 +94,8 @@ namespace fan
 		if( ImGui::MenuItem( _info.name.c_str() ) )
 		{
 			// Create new EcsComponent 
-			EcsEntity entity = m_world.GetEntity( m_handleNodeSelected );
+			EcsHandle handleSelected = m_world.GetSingleton<EditorSelection>().m_selectedNodeHandle;
+			EcsEntity entity = m_world.GetEntity( handleSelected );
 			if( !m_world.HasComponent( entity, _info.type ) )
 			{
 				m_world.AddComponent( entity, _info.type );

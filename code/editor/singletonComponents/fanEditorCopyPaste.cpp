@@ -1,8 +1,8 @@
-#include "editor/fanEditorCopyPaste.hpp"
+#include "editor/singletonComponents/fanEditorCopyPaste.hpp"
 
 #include <sstream>
 #include "ecs/fanEcsWorld.hpp"
-#include "editor/fanEditorSelection.hpp"
+#include "editor/singletonComponents/fanEditorSelection.hpp"
 #include "scene/fanPrefab.hpp"
 #include "scene/singletonComponents/fanScene.hpp"
 

@@ -3,7 +3,7 @@
 #include "core/fanDebug.hpp"
 #include "editor/singletonComponents/fanEditorGrid.hpp"
 #include "editor/windows/fanEditorWindow.hpp"
-#include "editor/fanEditorSelection.hpp"
+#include "editor/singletonComponents/fanEditorSelection.hpp"
 #include "editor/fanModals.hpp"
 #include "core/fanSerializedValues.hpp"
 #include "core/input/fanInput.hpp"
