@@ -62,15 +62,23 @@ namespace fan
 					{
 						if( archetype->m_chunks[componentIndex].NumChunk() != 0 )
 						{
+							const EcsComponentInfo& info = infos[componentIndex];
 							std::stringstream ss;
-							ss << componentIndex << ":";
+							ImGui::Icon( info.icon, { 16,16 } ); ImGui::SameLine();
+							ss << info.name.c_str();
+							for (int i = 0; i < 19 - info.name.size(); i++)
+							{
+								ss << " ";
+							}
+							ss <<": ";
+
 							for( int chunkIndex = 0; chunkIndex < archetype->m_chunks[componentIndex].NumChunk(); chunkIndex++ )
 							{
 								ss << archetype->m_chunks[componentIndex].GetChunk( chunkIndex ).Size() << " ";
 							}
 							ImGui::Text( ss.str().c_str() );
 
-							const EcsComponentInfo& info = infos[componentIndex];
+							
 							std::stringstream ssTooltip;
 							ssTooltip << info.name << '\n';
 							ssTooltip << "component size: " << info.size;

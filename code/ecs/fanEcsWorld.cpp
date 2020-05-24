@@ -84,9 +84,9 @@ namespace fan
 				{
 					for (int componentIndex = 0; componentIndex < NumComponents(); componentIndex++)
 					{
-						assert( (srcArchetype.m_signature & transition.signatureRemove) == transition.signatureRemove );
 						if( transition.signatureRemove[componentIndex] )
 						{
+							assert( srcArchetype.m_signature[componentIndex] );
 							const EcsComponentInfo& info = m_componentsInfo[componentIndex];
 							if( info.destroy != nullptr )
 							{
