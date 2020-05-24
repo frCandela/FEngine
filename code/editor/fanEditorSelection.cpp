@@ -22,8 +22,19 @@
 namespace fan
 {
 	//================================================================================================================================
-	//================================================================================================================================	
-	EditorSelection::EditorSelection( Scene& _currentScene ) : m_currentScene( &_currentScene ) {}
+	//================================================================================================================================
+	void EditorSelection::SetInfo( EcsSingletonInfo& _info )
+	{
+		_info.name = "editor selection";
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
+	void EditorSelection::Init( EcsWorld& _world, EcsSingleton& _component )
+	{
+		EditorSelection& editorSelection = static_cast<EditorSelection&>( _component );
+		editorSelection.m_currentScene = &_world.GetSingleton<Scene>();
+	}
 
 	//================================================================================================================================
 	//================================================================================================================================	
@@ -79,7 +90,9 @@ namespace fan
 			{
 				Transform& transform = world.GetComponent< Transform >( entity );
 				btVector3 newPosition;
-				if( EditorGizmos::Get().DrawMoveGizmo( btTransform( btQuaternion( 0, 0, 0 ), transform.GetPosition() ), (size_t)&transform, newPosition ) )
+
+				EditorGizmos& gizmos = world.GetSingleton<EditorGizmos>();
+				if( gizmos.DrawMoveGizmo( btTransform( btQuaternion( 0, 0, 0 ), transform.GetPosition() ), (size_t)&transform, newPosition ) )
 				{
 					transform.SetPosition( newPosition );
 					world.AddTag<tag_boundsOutdated>( entity );

@@ -13,16 +13,23 @@
 
 namespace fan
 {
-	EditorGizmos* EditorGizmos::s_editorGizmos = nullptr;
+	//================================================================================================================================
+	//================================================================================================================================
+	void EditorGizmos::SetInfo( EcsSingletonInfo& _info )
+	{
+		_info.name = "editor gizmo";
+	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	EditorGizmos::EditorGizmos( EcsWorld& _world )
-		: m_world( &_world )
-	{}
+	void EditorGizmos::Init( EcsWorld& _world, EcsSingleton& _component )
+	{
+		EditorGizmos& editorGizmos = static_cast<EditorGizmos&>( _component );
+		editorGizmos.m_world = &_world;
+	}
 
 	//================================================================================================================================
-	// Returns the new position of the move gizmos
+	// Returns the new position of the move gizmo
 	// Caller must provide a unique ID to allow proper caching of the user input data
 	//================================================================================================================================
 	bool EditorGizmos::DrawMoveGizmo( const btTransform _transform, const size_t _uniqueID, btVector3& _newPosition )

@@ -4,7 +4,7 @@
 
 namespace fan
 {
-	class EditorGizmos;
+	struct EditorGizmos;
 	class RendererDebug;
 
 	//================================================================================================================================

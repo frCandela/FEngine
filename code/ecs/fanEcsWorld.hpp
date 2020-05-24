@@ -43,7 +43,7 @@ namespace fan
 		// Handles
 		EcsEntity	 GetEntity( const EcsHandle _handle )
 		{
-			return m_handles[ _handle ];
+			return m_handles.at( _handle );
 		}
 		EcsHandle	 AddHandle( const EcsEntity _entity );
 		void		 RemoveHandle( const EcsEntity _entity );

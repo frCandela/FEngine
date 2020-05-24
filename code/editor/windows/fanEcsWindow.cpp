@@ -6,6 +6,7 @@
 #include "ecs/fanEcsSystem.hpp"
 #include "ecs/fanEcsTag.hpp"
 #include "scene/fanSceneTags.hpp"
+#include "editor/fanModals.hpp"
 
 namespace fan
 {
@@ -50,21 +51,30 @@ namespace fan
 
 				for ( const EcsArchetype* archetype : archetypes )
 				{
-					std::stringstream ss;
-					ss << archetype->m_signature;
-					ImGui::Text( "%s ", ss.str().c_str() );	ImGui::NextColumn();
-					ImGui::Text( "%d ", archetype->Size() );	ImGui::NextColumn();
+					std::stringstream ssSignature;
+					ssSignature << archetype->m_signature;
+					ImGui::Text(  ssSignature.str().c_str() );	ImGui::NextColumn();		// signature
+					ImGui::Text( "%d ", archetype->Size() );	ImGui::NextColumn();	// size
 
-					for (int i = 0; i < archetype->m_chunks.size(); i++)
+					// chunks
+					const std::vector< EcsComponentInfo >& infos = m_world->GetVectorComponentInfo();
+					for (int componentIndex = 0; componentIndex < archetype->m_chunks.size(); componentIndex++)
 					{
-						if( archetype->m_chunks[i].NumChunk() != 0 )
+						if( archetype->m_chunks[componentIndex].NumChunk() != 0 )
 						{
-							ImGui::Text( "%d: ", i );
-							for( int j = 0; j < archetype->m_chunks[i].NumChunk(); j++ )
+							std::stringstream ss;
+							ss << componentIndex << ":";
+							for( int chunkIndex = 0; chunkIndex < archetype->m_chunks[componentIndex].NumChunk(); chunkIndex++ )
 							{
-								ImGui::SameLine();
-								ImGui::Text( "%d ", archetype->m_chunks[i].GetChunk( j ).Size() );
+								ss << archetype->m_chunks[componentIndex].GetChunk( chunkIndex ).Size() << " ";
 							}
+							ImGui::Text( ss.str().c_str() );
+
+							const EcsComponentInfo& info = infos[componentIndex];
+							std::stringstream ssTooltip;
+							ssTooltip << info.name << '\n';
+							ssTooltip << "component size: " << info.size;
+							ImGui::FanToolTip( ssTooltip.str().c_str() );
 						}
 					}
 					ImGui::NextColumn();
@@ -146,31 +156,31 @@ namespace fan
 				}
 			}*/
 
-// 			// Handles
-// 			if( ImGui::CollapsingHeader( "Handles" ) )
-// 			{
-// 				ImGui::Columns( 4 );
-// 				ImGui::Text( "id" );		ImGui::NextColumn();
-// 				ImGui::Text( "handle" );	ImGui::NextColumn();
-// 				ImGui::Text( "archetype" ); ImGui::NextColumn();
-// 				ImGui::Text( "index" );	ImGui::NextColumn();
-// 				ImGui::Separator();
-// 
-// 				int i = 0;
-// 				for ( const auto& pair : m_world->GetHandles() )
-// 				{
-// 					const EcsHandle handle = pair.first;
-// 					EcsEntity entity = pair.second;
-// 
-// 					ImGui::Text( "%d", i++ );		ImGui::NextColumn();
-// 					ImGui::Text( "%d", handle );	ImGui::NextColumn();
-// 					std::stringstream ss;
-// 					ss << entity.archetype->m_signature;
-// 					ImGui::Text( "%s", ss.str().c_str() );	ImGui::NextColumn();
-// 					ImGui::Text( "%d", entity.index );	ImGui::NextColumn();
-// 				}
-// 				ImGui::Columns( 1 );
-// 			}
+			// Handles
+			if( ImGui::CollapsingHeader( "Handles" ) )
+			{
+				ImGui::Columns( 4 );
+				ImGui::Text( "id" );		ImGui::NextColumn();
+				ImGui::Text( "handle" );	ImGui::NextColumn();
+				ImGui::Text( "archetype" ); ImGui::NextColumn();
+				ImGui::Text( "index" );	ImGui::NextColumn();
+				ImGui::Separator();
+
+				int i = 0;
+				for ( const auto& pair : m_world->GetHandles() )
+				{
+					const EcsHandle handle = pair.first;
+					EcsEntity entity = pair.second;
+
+					ImGui::Text( "%d", i++ );		ImGui::NextColumn();
+					ImGui::Text( "%d", handle );	ImGui::NextColumn();
+					std::stringstream ss;
+					ss << entity.archetype->m_signature;
+					ImGui::Text( "%s", ss.str().c_str() );	ImGui::NextColumn();
+					ImGui::Text( "%d", entity.index );	ImGui::NextColumn();
+				}
+				ImGui::Columns( 1 );
+			}
 
 
 

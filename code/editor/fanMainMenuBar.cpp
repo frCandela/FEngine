@@ -21,8 +21,8 @@ namespace fan
 {
 	//================================================================================================================================
 	//================================================================================================================================
-	MainMenuBar::MainMenuBar( EcsWorld& _world, EditorSelection& _editorSelection )
-		: m_editorSelection( _editorSelection )
+	MainMenuBar::MainMenuBar( EcsWorld& _world )
+		: m_editorSelection( _world.GetSingleton<EditorSelection>() )
 		, m_showImguiDemoWindow( true )
 		, m_showAABB( false )
 		, m_showHull( false )

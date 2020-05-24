@@ -1,23 +1,26 @@
 #pragma once
 
+#include "ecs/fanEcsSingleton.hpp"
+
 namespace fan
 {
-	class EditorSelection;
+	struct EditorSelection;
 
 	//================================================================================================================================
 	// copy paste editor callbacks
 	// @todo make this a singleton component in the editor ecs world
 	//================================================================================================================================
-	class EditorCopyPaste
+	struct EditorCopyPaste : EcsSingleton
 	{
+		ECS_SINGLETON( EditorCopyPaste );
 	public:
-		EditorCopyPaste( EditorSelection& _selection );
+		static void SetInfo( EcsSingletonInfo& _info );
+		static void Init( EcsWorld& _world, EcsSingleton& _component );
 
 		// editor callbacks
 		void OnCopy();
 		void OnPaste();
 
-	private:
-		EditorSelection& m_selection;
+		EditorSelection* m_selection;
 	};
 }

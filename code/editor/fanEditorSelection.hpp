@@ -1,7 +1,7 @@
 #pragma once
 
 #include "core/fanSignal.hpp"
-#include "ecs/fanEcsTypes.hpp"
+#include "ecs/fanEcsSingleton.hpp"
 
 namespace fan
 {
@@ -13,26 +13,25 @@ namespace fan
 	// Manages the editor scene node selection
 	// @todo make this a singleton component in the editor ecs world
 	//================================================================================================================================	
-	class EditorSelection
+	struct EditorSelection : EcsSingleton
 	{
-	public:
-		Signal<SceneNode*> onSceneNodeSelected;
+		ECS_SINGLETON( EditorSelection );
 
-		EditorSelection( Scene& _currentScene );
+		static void SetInfo( EcsSingletonInfo& _info );
+		static void Init( EcsWorld& _world, EcsSingleton& _component );
+
 		void ConnectCallbacks( Scene& _scene );
-
 		void SetSelectedSceneNode( SceneNode* _node );
 		void Deselect();
 		void DeleteSelection();
 		void Update( const bool _gameWindowHovered );
 
 		SceneNode* GetSelectedSceneNode() const;
-		Scene& GetSelectedScene() const { return *m_currentScene; }
+		Scene&	   GetSelectedScene() const { return *m_currentScene; }
 
-
-	private:
-		EcsHandle m_selectedNodeHandle = 0;
-		Scene* m_currentScene;
+		Signal<SceneNode*>	onSceneNodeSelected;
+		EcsHandle			m_selectedNodeHandle = 0;
+		Scene*				m_currentScene = nullptr;
 
 		void OnSceneNodeDeleted( SceneNode* _node );
 		void OnToogleTransformLock();
