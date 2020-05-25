@@ -352,7 +352,7 @@ namespace fan
 
 			// save old selection
 			SceneNode* prevSelectionNode = m_editorSelection.GetSelectedSceneNode();
-			const uint32_t prevSelectionID = prevSelectionNode != nullptr ? prevSelectionNode->uniqueID : 0;
+			const EcsHandle prevSelectionHandle= prevSelectionNode != nullptr ? prevSelectionNode->handle : 0;
 
 			Debug::Get() << Debug::Severity::log << "loading scene: " << scene.path << Debug::Endl();
 			scene.LoadFrom( scene.path );
@@ -362,15 +362,10 @@ namespace fan
 			m_world->GetComponent<Transform>( newCameraID ).transform = oldCameraTransform;
 
 			// restore selection
-			if( prevSelectionID != 0 )
+			if( prevSelectionHandle != 0 && scene.nodes.find(prevSelectionHandle) != scene.nodes.end() )
 			{
-				auto it = scene.nodes.find( prevSelectionID );
-				if( it != scene.nodes.end() )
-				{
-					const fan::EcsHandle nodeHandle = scene.nodes.at( it->second );
-					fan::SceneNode& node = m_world->GetComponent<fan::SceneNode>( m_world->GetEntity( nodeHandle ) );
-					m_editorSelection.SetSelectedSceneNode( &node );
-				}
+				fan::SceneNode& node = m_world->GetComponent<fan::SceneNode>( m_world->GetEntity( prevSelectionHandle ) );
+				m_editorSelection.SetSelectedSceneNode( &node );				
 			}
 		}
 		else

@@ -58,9 +58,9 @@ namespace fan
 				 
  				// Icon
 				ImGui::Icon( info.icon, { 16,16 } ); ImGui::SameLine();
-				ImGui::FanBeginDragDropSourceComponent( node, component, ImGuiDragDropFlags_SourceAllowNullID );
+				ImGui::FanBeginDragDropSourceComponent( world, node.handle, info.type, ImGuiDragDropFlags_SourceAllowNullID );
 				ImGui::Text( "%s", info.name.c_str() );
- 				ImGui::FanBeginDragDropSourceComponent( node, component, ImGuiDragDropFlags_SourceAllowNullID );
+ 				ImGui::FanBeginDragDropSourceComponent( world, node.handle, info.type, ImGuiDragDropFlags_SourceAllowNullID );
 
  				// Delete button	
 				std::stringstream ss;

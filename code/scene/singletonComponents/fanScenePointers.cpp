@@ -46,17 +46,17 @@ namespace fan
 		EcsWorld& world = *_scene.world;
 		ScenePointers& scenePointers = world.GetSingleton<ScenePointers>();
 
-		while( !scenePointers.unresolvedComponentPtr.empty() )
+//		while( !scenePointers.unresolvedComponentPtr.empty() )
 		{
-			ComponentPtrBase* ptr = *scenePointers.unresolvedComponentPtr.begin();
-			ptr->sceneNodeID += _idOffset;
-			assert( _scene.nodes.find( ptr->sceneNodeID ) != _scene.nodes.end() );
-			const EcsHandle nodeHandle = _scene.nodes[ptr->sceneNodeID];
-			SceneNode& node = world.GetComponent<SceneNode>( world.GetEntity(nodeHandle));
-			EcsEntity entity = world.GetEntity( node.handle );
-			assert( world.HasComponent( entity, ptr->staticID ) );
-			EcsComponent& component = world.GetComponent( entity, ptr->staticID );
-			ptr->Create( node, component );
+// 			ComponentPtrBase* ptr = *scenePointers.unresolvedComponentPtr.begin(); @migration
+// 			ptr->sceneNodeID += _idOffset;
+// 			assert( _scene.nodes.find( ptr->sceneNodeID ) != _scene.nodes.end() );
+// 			const EcsHandle nodeHandle = _scene.nodes[ptr->sceneNodeID];
+// 			SceneNode& node = world.GetComponent<SceneNode>( world.GetEntity(nodeHandle));
+// 			EcsEntity entity = world.GetEntity( node.handle );
+// 			assert( world.HasComponent( entity, ptr->staticID ) );
+// 			EcsComponent& component = world.GetComponent( entity, ptr->staticID );
+// 			ptr->Create( node, component );
 		}
 	}
 }

@@ -19,6 +19,7 @@ namespace fan
 	//================================================================================================================================
 	void S_GenerateParticles::Run( EcsWorld& _world, const EcsView& _view, const float _delta )
 	{
+		SCOPED_PROFILE( S_GenParticles );
 		if( _delta == 0.f ) { return; }
 
 		RenderWorld& renderWorld = _world.GetSingleton<RenderWorld>();
@@ -37,6 +38,5 @@ namespace fan
 			vertices.push_back( { particle.position + glm::vec3( size, 0.0f, -size ), glm::vec3( 0.f, 1.f, 0.f ), color, glm::vec2( -0.5f, -0.5f ) } );
 		}
 		renderWorld.particlesMesh.LoadFromVertices( vertices );
-		SCOPED_PROFILE( S_GenParticles );
 	}
 }

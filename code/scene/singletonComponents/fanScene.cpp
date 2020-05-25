@@ -40,8 +40,8 @@ namespace fan
 		scene.path = "";
 		scene.rootNodeHandle = 0;
 		scene.mainCameraHandle = 0;
-		scene.nextUniqueID = 1;
 		scene.nodes.clear();
+		scene.nodesToKill.clear();
 		const_cast<EcsWorld*>( scene.world ) = &_world;
 	}
 
@@ -53,14 +53,13 @@ namespace fan
 		ImGui::Indent(); ImGui::Indent();
 		{
 			ImGui::Text( "path: %s", scene.path.c_str() );
-			ImGui::Text( "nextUniqueID: %d", scene.nextUniqueID );
 
 			if( ImGui::CollapsingHeader( "nodes" ) )
 			{
-				for( auto& pair : scene.nodes )
+				for( EcsHandle handle : scene.nodes )
 				{
-					SceneNode& sceneNode = _world.GetComponent<SceneNode>( _world.GetEntity( pair.second ) );
-					ImGui::Text( "%s : %d", sceneNode.name.c_str(), pair.first );
+					SceneNode& sceneNode = _world.GetComponent<SceneNode>( _world.GetEntity( handle ) );
+					ImGui::Text( "%s : %d", sceneNode.name.c_str(), sceneNode.handle );
 				}
 			}
 		}
@@ -82,50 +81,65 @@ namespace fan
 	}
 
 	//================================================================================================================================
+	// _handle can be used to force the handle of scene node entity, if _handle=0 (by default), generate a new handle
 	//================================================================================================================================
-	SceneNode& Scene::CreateSceneNode( const std::string _name, SceneNode* const _parentNode, const bool _generateID )
+	SceneNode& Scene::CreateSceneNode( const std::string _name, SceneNode* const _parentNode, EcsHandle _handle )
 	{		
 		assert( _parentNode != nullptr || rootNodeHandle == 0 ); // we can have only one root node
 
 		EcsEntity entity = world->CreateEntity();
-		EcsHandle handle = world->AddHandle( entity );
+
+		// set entity handle
+		EcsHandle handle = 0;
+		if( _handle == 0 )
+		{
+			handle = world->AddHandle( entity );
+		}
+		else
+		{
+			world->SetHandle( entity, _handle );
+			handle = _handle;
+		}
+		assert( nodes.find( handle ) == nodes.end() );
+		nodes.insert( handle );
 
 		SceneNode& sceneNode = world->AddComponent<SceneNode>( entity );
 		world->AddComponent<Bounds>( entity );
 		world->AddTag<tag_boundsOutdated>( entity );
 
-		uint32_t id;
-		if( _generateID )
-		{
-			assert( nodes.find( id ) == nodes.end() );
-			id = nextUniqueID++;
-			nodes[id] = handle;
-		}
-		else
-		{
-			id = 0;
-		}
-		sceneNode.Build( _name, *this, handle, id, _parentNode );
+		sceneNode.Build( _name, *this, handle, _parentNode );
 		return sceneNode;
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	uint32_t Scene::R_FindMaximumId( SceneNode& _node )
+	void Scene::EndFrame( EcsWorld& _world )
+	{
+		Scene& scene = _world.GetSingleton<Scene>();		
+		for ( EcsHandle handle : scene.nodesToKill )
+		{
+			_world.Kill( _world.GetEntity( handle ) );
+		}
+		scene.nodesToKill.clear();
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
+	EcsHandle Scene::R_FindMaximumHandle( SceneNode& _node )
 	{
 		EcsWorld& world = *_node.scene->world;
 
-		uint32_t id = _node.uniqueID;
+		EcsHandle handle = _node.handle;
 		const std::vector<EcsHandle>& childs = _node.childs;
 		for ( int childIndex = 0; childIndex < childs.size(); childIndex++ )
 		{
-			uint32_t childId = R_FindMaximumId( world.GetComponent<SceneNode>( world.GetEntity( childs[childIndex] ) ) );
-			if ( childId > id )
+			EcsHandle childHandle = R_FindMaximumHandle( world.GetComponent<SceneNode>( world.GetEntity( childs[childIndex] ) ) );
+			if ( childHandle > handle )
 			{
-				id = childId;
+				handle = childHandle;
 			}
 		}
-		return id;
+		return handle;
 	}
 
 	//================================================================================================================================
@@ -148,7 +162,6 @@ namespace fan
 		nodes.clear();
 		rootNodeHandle = 0;
 		mainCameraHandle = 0;
-		nextUniqueID = 1;
 
 		ScenePointers& scenePointers = world->GetSingleton<ScenePointers>();
 		scenePointers.unresolvedComponentPtr.clear();
@@ -159,7 +172,6 @@ namespace fan
 	void Scene::New()
 	{
 		Clear( );
-		nextUniqueID = 1;
 		rootNodeHandle = CreateSceneNode( "root", nullptr ).handle;
 		onLoad.Emmit( *this );
 	}
@@ -210,7 +222,7 @@ namespace fan
 	{	
 		EcsWorld& world = *_node.scene->world;
 		Serializable::SaveString( _json, "name", _node.name );
-		Serializable::SaveUInt( _json, "node_id", _node.uniqueID );
+		Serializable::SaveUInt( _json, "handle", _node.handle );
 
 		// save components
 		Json& jComponents = _json["components"];
@@ -226,8 +238,8 @@ namespace fan
 				if( info.save != nullptr )
 				{
 					Json& jComponent_i = jComponents[nextIndex++];
-					Serializable::SaveUInt( jComponent_i, "component_id", info.type);
-					Serializable::SaveString( jComponent_i, "type", info.name );
+					Serializable::SaveUInt( jComponent_i, "component_type", info.type);
+					Serializable::SaveString( jComponent_i, "type_name", info.name );
 					info.save( component, jComponent_i );
 				}				
 			}
@@ -250,7 +262,7 @@ namespace fan
 	}
 
 	//================================================================================================================================
-	// Find all the gameobjects indices in the json and remap them on a range close to zero
+	// Find all the gameobjects handles in the json and remap them on a range close to zero
 	// ex: 400, 401, 1051 will be remapped to 1,2,3
 	//================================================================================================================================
 	void Scene::RemapSceneNodesIndices( Json& _json )
@@ -269,7 +281,7 @@ namespace fan
 				const Json& jNode = *stack.top();
 				stack.pop();
 
-				uint32_t id = jNode["node_id"];
+				uint32_t id = jNode["handle"];
 				remapTable[id] = nextRemapIndex++;
 
 				// push all childs
@@ -294,7 +306,7 @@ namespace fan
 				stack.pop();
 
 				// remap
-				Json::iterator& jNodeId = js.find( "node_id" );
+				Json::iterator& jNodeId = js.find( "handle" );
 				if( jNodeId != js.end() )
 				{
  					const uint32_t nodeId = *jNodeId;
@@ -365,13 +377,13 @@ namespace fan
 
 			// loads all nodes recursively
 			const Json& jRoot = jScene["root"];
-			SceneNode& rootNode = CreateSceneNode( "root", nullptr, false );
+			SceneNode&  rootNode = R_LoadFromJson( jRoot, *this, nullptr, 1 );
 			rootNodeHandle = rootNode.handle;
-			R_LoadFromJson( jRoot, rootNode, 0 );
 			
 			path = _path;
 			inStream.close();
-			nextUniqueID = R_FindMaximumId( rootNode ) + 1;
+			const EcsHandle maxHandle = R_FindMaximumHandle( rootNode ) + 1;
+			world->SetNextHandle( maxHandle );
 
 			ScenePointers::ResolveComponentPointers( *this, 0 );
 			S_InitFollowTransforms::Run( *world, world->Match( S_InitFollowTransforms::GetSignature( *world ) ) );
@@ -390,29 +402,28 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void Scene::R_LoadFromJson( const Json& _json, SceneNode& _node, const uint32_t _idOffset )
+	SceneNode& Scene::R_LoadFromJson( const Json& _json, Scene& _scene, SceneNode* _parent, const uint32_t _handleOffset )
 	{
 		//ScopedTimer timer("load scene");
-		EcsWorld& world = *_node.scene->world;
+		EcsWorld& world = *_scene.world;
 
-		Serializable::LoadString( _json, "name", _node.name );
-		Serializable::LoadUInt( _json, "node_id", _node.uniqueID );
-		_node.uniqueID += _idOffset;
+		EcsHandle nodeHandle;
+		Serializable::LoadUInt( _json, "handle", nodeHandle );
+		SceneNode& node = _scene.CreateSceneNode( "tmp", _parent, nodeHandle + _handleOffset );
+		Serializable::LoadString( _json, "name", node.name );
 
-		// append id
-		Scene& scene = *_node.scene;
-		assert( scene.nodes.find( _node.uniqueID ) == scene.nodes.end() );
-		scene.nodes[_node.uniqueID] = _node.handle;
+		// append id		
+		_scene.nodes.insert(node.handle);
 
 		// components
 		const Json& jComponents = _json["components"];
 		{
-			const EcsEntity	entity = world.GetEntity( _node.handle );
+			const EcsEntity	entity = world.GetEntity( node.handle );
 			for( int childIndex = 0; childIndex < jComponents.size(); childIndex++ )
 			{
 				const Json& jComponent_i = jComponents[childIndex];				
 				unsigned staticIndex = 0;
-				Serializable::LoadUInt( jComponent_i, "component_id", staticIndex );
+				Serializable::LoadUInt( jComponent_i, "component_type", staticIndex );
 				const EcsComponentInfo& info		= world.GetComponentInfo( staticIndex );
 				EcsComponent& component			    = world.AddComponent( entity, staticIndex );
 				info.load( component, jComponent_i );
@@ -425,11 +436,12 @@ namespace fan
 			for( int childIndex = 0; childIndex < jchilds.size(); childIndex++ )
 			{
 				const Json& jchild_i = jchilds[childIndex];
-				{
-					SceneNode& childNode = _node.scene->CreateSceneNode( "tmp", &_node, false );
-					R_LoadFromJson( jchild_i, childNode, _idOffset );
+				{					
+					R_LoadFromJson( jchild_i, _scene, &node, _handleOffset );
 				}
 			}
 		}
+
+		return node;
 	}
 }

@@ -8,20 +8,13 @@ include_directories( middleware )
 include_directories( middleware/freetype )
 include_directories( "C:/VulkanSDK/1.1.106.0/Include" )
 
-# link directories
-IF( ${MSVC_VERSION} GREATER_EQUAL 1910 AND ${MSVC_VERSION} LESS_EQUAL 1919 ) # v141 toolset
-	set( MSVC_LINK_DIR "2017" )
-ELSEIF( ${MSVC_VERSION} GREATER_EQUAL 1920 AND ${MSVC_VERSION} LESS_EQUAL 1929 ) # v142 toolset
-	set( MSVC_LINK_DIR "2019" )
-ENDIF()
-
 link_directories("C:/VulkanSDK/1.1.106.0/Lib")
 IF(${CMAKE_BUILD_TYPE} MATCHES Debug)
-    link_directories(lib/${MSVC_LINK_DIR}/debug)
-    link_directories("C:/VulkanSDK/1.1.106.0/Lib/${MSVC_LINK_DIR}/debug")
+    link_directories(lib/2019/debug)
+    link_directories("C:/VulkanSDK/1.1.106.0/Lib/2019/debug")
 ELSEIF(${CMAKE_BUILD_TYPE} MATCHES Release)
-    link_directories(lib/${MSVC_LINK_DIR}/release)
-    link_directories("C:/VulkanSDK/1.1.106.0/Lib/${MSVC_LINK_DIR}/release")
+    link_directories(lib/2019/release)
+    link_directories("C:/VulkanSDK/1.1.106.0/Lib/2019/release")
 ENDIF()
 
 # libs directories
@@ -73,6 +66,8 @@ if(MSVC)
   endif()
 endif()
 
+
+
   # Force WX (warning as error)
 target_compile_options(fanCore PRIVATE /WX /FUNCTIONPADMIN )
 target_compile_options(fanRender PRIVATE /WX /FUNCTIONPADMIN )
@@ -81,3 +76,10 @@ target_compile_options(fanScene PRIVATE /WX /FUNCTIONPADMIN )
 target_compile_options(fanGame PRIVATE /WX /FUNCTIONPADMIN )
 target_compile_options(fanEditor PRIVATE /WX /FUNCTIONPADMIN )
 target_compile_options(fengine_editor PRIVATE /WX /FUNCTIONPADMIN )
+
+#set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR})
+#set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/Bin/Lib)
+#set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/Bin/Lib)
+#set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/Bin/Lib)
+
+# activate release pdb

@@ -27,7 +27,7 @@ namespace fan
 		static void Destroy( EcsWorld& _world, EcsComponent& _component );
 		static void OnGui( EcsWorld& _world, EcsEntity _entityID, EcsComponent& _component );
 
-		void Build( const std::string& _name, Scene& _scene, const EcsHandle _handle, const uint32_t _uniqueID, SceneNode* const _parent);
+		void Build( const std::string& _name, Scene& _scene, const EcsHandle _handle, SceneNode* const _parent);
 
 		bool IsRoot() const { return parentHandle == 0; }
 		bool IsAncestorOf( const SceneNode& _node ) const;
@@ -44,7 +44,6 @@ namespace fan
 		static void GetDescendantsOf( SceneNode& _root, std::vector<SceneNode*>& _outList );
 
 		EcsHandle				handle;
-		uint32_t				uniqueID;
 		uint32_t				flags;
 		Scene*					scene;
 		EcsHandle				parentHandle;

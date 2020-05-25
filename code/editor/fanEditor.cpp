@@ -381,6 +381,7 @@ namespace fan
 				}
 
 				Input::Get().Manager().PullEvents();
+				Scene::EndFrame( m_world );
 				{
 					// end frame
 					SCOPED_PROFILE( scene_endFrame );
@@ -456,7 +457,7 @@ namespace fan
 
 			// save old selection
 			SceneNode* prevSelectionNode = m_world.GetSingleton<EditorSelection>().GetSelectedSceneNode();
-			const uint32_t prevSelectionID = prevSelectionNode != nullptr ? prevSelectionNode->uniqueID : 0;
+			const uint32_t prevSelectionHandle = prevSelectionNode != nullptr ? prevSelectionNode->handle : 0;
 
 			Debug::Highlight() << game.name << ": stopped" << Debug::Endl();
 			game.state = Game::STOPPED;
@@ -470,16 +471,11 @@ namespace fan
 			m_world.GetComponent<Transform>( newCameraID ).transform = oldCameraTransform;
 
 			// restore selection
-			if( prevSelectionID != 0 )
+			if( prevSelectionHandle != 0 && scene.nodes.find( prevSelectionHandle ) != scene.nodes.end() )
 			{
-				auto it = scene.nodes.find( prevSelectionID );
-				if( it != scene.nodes.end() )
-				{
-					const fan::EcsHandle nodeHandle = scene.nodes.at( it->second );
-					fan::SceneNode& node = m_world.GetComponent<fan::SceneNode>( m_world.GetEntity( nodeHandle ) );
+				fan::SceneNode& node = m_world.GetComponent<fan::SceneNode>( m_world.GetEntity( prevSelectionHandle ) );
 
-					m_world.GetSingleton<EditorSelection>().SetSelectedSceneNode( &node );
-				}
+				m_world.GetSingleton<EditorSelection>().SetSelectedSceneNode( &node );
 			}
 		}
 	}

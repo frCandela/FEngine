@@ -2,11 +2,11 @@
 
 #include "core/resources/fanResourcePtr.hpp"
 #include "scene/fanPrefab.hpp"
-#include "ecs/fanEcsTypes.hpp"
+#include "ecs/fanEcsWorld.hpp"
+
 
 namespace fan
 {
-	class EcsWorld;	  
 	struct EcsComponent;
 
 	//================================================================================================================================
@@ -16,16 +16,16 @@ namespace fan
 	//================================================================================================================================
 	struct ComponentPtrBase
 	{
-		ComponentPtrBase( const uint32_t _staticID ) : staticID(_staticID) {}
-		void Init( EcsWorld& _world );
-		void Create( uint32_t _sceneNodeID );
-		void Create( SceneNode& _sceneNode, EcsComponent& _component );
+		ComponentPtrBase( uint32_t  _type ) : type( _type ){ }
+		void Init( EcsWorld& _world ) { world = &_world; }
+		void Create( EcsHandle _handle );
+		void CreateUnresolved( EcsHandle _handle );
 		void Clear();
 
-		const uint32_t		  staticID;				// static id of the component
-		EcsWorld* const		  world	 = nullptr;		// world containing the target component
-		uint32_t			  sceneNodeID = 0;		// unique index of the associated scene node
-		EcsComponent*		  component = nullptr;  // the component
+		EcsWorld*		world;
+		const uint32_t	type = 0;	
+		EcsHandle		handle = 0;
+
 	}; static constexpr size_t sizeof_componentPtrBase = sizeof( ComponentPtrBase );
 
 	//================================================================================================================================
@@ -36,10 +36,33 @@ namespace fan
 	{
 	public:
 		ComponentPtr() : ComponentPtrBase( _componentType::Info::s_type ) {}
-		_componentType* operator->() const { return static_cast<_componentType*>( component ); }
-		_componentType& operator*() const { return *static_cast<_componentType*>( component ); }
-		bool operator!=( const _componentType* _other ) const{ return _other != component;	}
-		bool operator==( const _componentType* _other ) const{ return _other == component;	}
+		_componentType* operator->() const { return &static_cast<_componentType&> ( world->GetComponent( world->GetEntity( handle ), type )); }
+		_componentType& operator*() const {  return  static_cast<_componentType&>( world->GetComponent( world->GetEntity( handle ), type )); }
+		bool operator!=( const ComponentPtr<_componentType>& _other ) const { return !( *this == _other ); }
+		bool operator==( const ComponentPtr<_componentType>& _other ) const { return _other.handle == handle; }
+		bool operator!=( _componentType* _component ) const { 
+			if( _component == nullptr )
+			{
+				return handle != 0;
+			} 
+			else if( handle == 0 )
+			{
+				return true;
+			}
+			return &( *( *this ) ) != _component;
+		}
+		bool operator==( _componentType* _component ) const
+		{
+			if( _component == nullptr )
+			{
+				return handle == 0;
+			}
+			else if( handle == 0 )
+			{
+				return false;
+			}
+			return &( *( *this ) ) == _component;
+		}
 	};
 
 	//================================================================================================================================

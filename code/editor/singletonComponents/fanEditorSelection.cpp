@@ -153,16 +153,13 @@ namespace fan
 	void EditorSelection::SetSelectedSceneNode( SceneNode* _node )
 	{
 		m_selectedNodeHandle = _node != nullptr ? _node->handle : 0;
-		onSceneNodeSelected.Emmit( _node );
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
 	void EditorSelection::Deselect()
 	{
-		SceneNode* selectedSceneNode = GetSelectedSceneNode();
 		m_selectedNodeHandle = 0;
-		onSceneNodeSelected.Emmit( selectedSceneNode );
 	}
 
 	//================================================================================================================================

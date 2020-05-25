@@ -9,8 +9,8 @@ namespace fan
 	//================================================================================================================================
 	void Serializable::SaveComponentPtr(Json& _json, const char* _name, const ComponentPtrBase& _ptr)
 	{
-		_json[_name]["node_id"] = _ptr.sceneNodeID;
-		_json[_name]["component_id"] = _ptr.staticID;
+		_json[_name]["handle"] = _ptr.handle;
+		_json[_name]["component_type"] = _ptr.type;
 	}
 
 	//================================================================================================================================
@@ -27,7 +27,8 @@ namespace fan
 		const Json* token = FindToken(_json, _name);
 		if (token != nullptr)
 		{
-			_outPtr.Create( (*token)["node_id"]);
+			assert( _outPtr.type == ( *token )["component_type"] );
+			_outPtr.CreateUnresolved( (*token)["handle"] );
 			return true;
 		}
 		return false;

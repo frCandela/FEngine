@@ -11,6 +11,8 @@ namespace fan
 	}
 	void EcsWorld::ApplyTransitions()
 	{
+		m_isApplyingTransitions = true;
+
 		// Applies structural transition to entities ( add/remove components/tags, add/remove entities
 		assert( m_transitionArchetype.Size() == m_transitions.size() );
 		for( int transitionIndex = m_transitionArchetype.Size() - 1; transitionIndex >= 0; --transitionIndex )
@@ -153,6 +155,8 @@ namespace fan
 			}
 		}
 		m_transitions.clear();
+
+		m_isApplyingTransitions = false;
 	}
 
 	int  EcsWorld::GetIndex( const uint32_t  _type ) const 
@@ -195,6 +199,24 @@ namespace fan
 			m_handles[entity.handle] = _entity;
 			return entity.handle;
 		}
+	}
+
+
+	//================================================================================================================================
+	// Assigns a specific handle to an entity without incrementing the m_nextHandle counter
+	// usefull during scene loading & prefab instanciation
+	//================================================================================================================================
+	void EcsWorld::SetHandle( const EcsEntity _entity, EcsHandle _handle )
+	{
+		assert( _handle != 0 );
+		assert( _handle >= m_nextHandle );
+
+		EcsEntityData& entity = _entity.archetype->m_entities[_entity.index];
+		assert( entity.handle == 0 );
+		entity.handle = _handle;
+
+		assert( m_handles.find(entity.handle) == m_handles.end() );
+		m_handles[entity.handle] = _entity;
 	}
 	void		EcsWorld::RemoveHandle( const EcsEntity _entity )
 	{
@@ -394,6 +416,8 @@ namespace fan
 	
 	EcsTransition& EcsWorld::FindOrCreateTransition( const EcsEntity _entity )
 	{
+		assert( !m_isApplyingTransitions );
+
 		// Get/register transition
 		EcsEntityData& entity = _entity.archetype->m_entities[_entity.index];
 		EcsTransition* transition = nullptr;

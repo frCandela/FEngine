@@ -1,5 +1,6 @@
 #pragma once
 
+#include <set>
 #include "core/fanSignal.hpp"
 #include "scene/fanSceneSerializable.hpp"
 #include "ecs/fanEcsSingleton.hpp"
@@ -22,7 +23,7 @@ namespace fan
 		static void Init( EcsWorld& _world, EcsSingleton& _component );
 		static void OnGui( EcsWorld&, EcsSingleton& _component );
 
-		SceneNode& CreateSceneNode( const std::string _name, SceneNode* const _parentNode, const bool _generateID = true );
+		SceneNode& CreateSceneNode( const std::string _name, SceneNode* const _parentNode, EcsHandle _handle = 0 );
 
 		void New();
 		void Save() const;
@@ -30,21 +31,22 @@ namespace fan
 		void Clear();
 		void SetMainCamera( const EcsHandle _cameraHandle );
 
-		static uint32_t	R_FindMaximumId( SceneNode& _node );
-		static void		R_SaveToJson( const SceneNode& _node, Json& _json );
-		static void		R_LoadFromJson( const Json& _json, SceneNode& _node, const uint32_t _idOffset );
-		static void		RemapSceneNodesIndices( Json& _json );
+		static void			EndFrame( EcsWorld& _world );
+		static EcsHandle	R_FindMaximumHandle( SceneNode& _node );
+		static void			R_SaveToJson( const SceneNode& _node, Json& _json );
+		static SceneNode&   R_LoadFromJson( const Json& _json, Scene& _scene, SceneNode* _parent, const uint32_t _handleOffset );
+		static void			RemapSceneNodesIndices( Json& _json );
 
 		Signal< Scene& >		onClear;
 		Signal< Scene& >		onLoad;
 		Signal< SceneNode* >	onDeleteSceneNode;
 
-		EcsWorld* const								world = nullptr;
-		std::string									path;		
-		EcsHandle 									rootNodeHandle;
-		EcsHandle									mainCameraHandle;
-		uint32_t									nextUniqueID;
-		std::unordered_map< uint32_t, EcsHandle >   nodes;
+		EcsWorld* const			 world = nullptr;
+		std::string				 path;
+		EcsHandle 				 rootNodeHandle;
+		EcsHandle				 mainCameraHandle;
+		std::set<EcsHandle>      nodes;
+		std::set<EcsHandle>      nodesToKill; // killed at the end of the frame
 
 		SceneNode& GetRootNode() const;
 		SceneNode& GetMainCamera() const;

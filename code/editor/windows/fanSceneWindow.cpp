@@ -263,12 +263,16 @@ namespace fan
 		bool isOpen = ImGui::TreeNode( ss.str().c_str() );
 
 		// SceneNode dragndrop target empty selectable -> place dragged below
-		SceneNode* nodeDrop1 = ImGui::FanBeginDragDropTargetComponent<SceneNode>().sceneNode;
-		if( nodeDrop1 && nodeDrop1 != &_node )
+		ImGui::ComponentPayload payload = ImGui::FanBeginDragDropTargetComponent<SceneNode>();
+		if( payload.handle != 0 )
 		{
-			nodeDrop1->InsertBelow( _node );
+			assert( payload.type == SceneNode::Info::s_type );
+			SceneNode& nodeDrop1 = m_scene->world->GetComponent<SceneNode>( m_scene->world->GetEntity( payload.handle) );
+			if( &nodeDrop1 != &_node )
+			{
+				nodeDrop1.InsertBelow( _node );
+			}
 		}
-
 
 		ImGui::SameLine();
 		const EcsHandle handleSelected = m_scene->world->GetSingleton<EditorSelection>().m_selectedNodeHandle;
@@ -287,13 +291,15 @@ namespace fan
 		}
 
 		// SceneNode dragndrop source = selectable -^
-		ImGui::FanBeginDragDropSourceComponent( _node, _node );
+		ImGui::FanBeginDragDropSourceComponent( *m_scene->world, _node.handle, SceneNode::Info::s_type );
 
 		// SceneNode dragndrop target scene node name -> place as child
-		SceneNode* nodeDrop = ImGui::FanBeginDragDropTargetComponent<SceneNode>().sceneNode;
-		if( nodeDrop )
+		ImGui::ComponentPayload payload2 = ImGui::FanBeginDragDropTargetComponent<SceneNode>();
+		if( payload2.handle != 0 )
 		{
-			nodeDrop->SetParent( &_node );
+			assert( payload2.type == SceneNode::Info::s_type );
+			SceneNode& nodeDrop2 = m_scene->world->GetComponent<SceneNode>( m_scene->world->GetEntity( payload2.handle ) );
+			nodeDrop2.SetParent( &_node );
 		}
 
 		if( isOpen )

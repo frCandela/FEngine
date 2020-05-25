@@ -29,7 +29,6 @@ namespace fan
 		SceneNode* GetSelectedSceneNode() const;
 		Scene&	   GetSelectedScene() const { return *m_currentScene; }
 
-		Signal<SceneNode*>	onSceneNodeSelected;
 		EcsHandle			m_selectedNodeHandle = 0;
 		Scene*				m_currentScene = nullptr;
 

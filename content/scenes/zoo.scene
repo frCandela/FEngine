@@ -1,1 +1,662 @@
-{"scene":{"path":"./content/scenes\\zoo.scene","root":{"childs":[{"childs":null,"components":[{"component_id":1269105190,"position":{"x":0.0,"y":0.0,"z":0.0},"rotation":{"w":1.0,"x":0.0,"y":0.0,"z":0.0},"scale":{"x":10.0,"y":1.0,"z":10.0},"type":"transform"},{"component_id":2472396462,"path":"content\\_default\\mesh\\cube.gltf","type":"mesh renderer"},{"color":{"a":1.0,"b":1.0,"g":1.0,"r":1.0},"component_id":1828911513,"material":"content\\models\\sarielle.png","shininess":1,"type":"material"},{"component_id":3581780679,"enable_desactivation":false,"is_kinematic":true,"mass":0.0,"type":"rigidbody"},{"component_id":4227813153,"type":"motion state"},{"component_id":2212983812,"scaling":{"x":10.0,"y":1.0,"z":10.0},"type":"box_shape"}],"name":"floor","node_id":10},{"childs":null,"components":[{"component_id":1269105190,"position":{"x":-1.6656550168991089,"y":2.927015781402588,"z":-0.10152705013751984},"rotation":{"w":0.629172682762146,"x":0.33857107162475586,"y":-0.6502034068107605,"z":0.2583540976047516},"scale":{"x":1.0,"y":1.0,"z":1.0},"type":"transform"},{"component_id":2472396462,"path":"content\\_default\\mesh\\sphere.gltf","type":"mesh renderer"},{"color":{"a":1.0,"b":1.0,"g":1.0,"r":1.0},"component_id":1828911513,"material":"content\\models\\sarielle.png","shininess":1,"type":"material"},{"component_id":3581780679,"enable_desactivation":false,"is_kinematic":false,"mass":1.0,"type":"rigidbody"},{"component_id":4227813153,"type":"motion state"},{"component_id":3410179010,"radius":0.5,"type":"sphere shape"}],"name":"sphere","node_id":9},{"childs":null,"components":[{"component_id":1269105190,"position":{"x":0.0,"y":2.0,"z":11.72707748413086},"rotation":{"w":1.0,"x":0.0,"y":0.0,"z":0.0},"scale":{"x":1.0,"y":1.0,"z":1.0},"type":"transform"},{"ambiant":{"a":1.0,"b":1.0,"g":1.0,"r":1.0},"attenuation":{"x":0.0,"y":0.0,"z":0.10000000149011612},"component_id":3039791276,"diffuse":{"a":1.0,"b":1.0,"g":1.0,"r":1.0},"specular":{"a":1.0,"b":1.0,"g":1.0,"r":1.0},"type":"point light"}],"name":"point_light","node_id":8},{"childs":null,"components":[{"component_id":1269105190,"position":{"x":0.0,"y":5.2026896476745605,"z":-1.4163386821746826},"rotation":{"w":0.9894634485244751,"x":0.08150121569633484,"y":0.11670904606580734,"z":0.026432333514094353},"scale":{"x":1.0,"y":1.0,"z":1.0},"type":"transform"},{"ambiant":{"a":1.0,"b":0.18009327352046967,"g":0.18009327352046967,"r":0.18011128902435303},"component_id":944608624,"diffuse":{"a":1.0,"b":1.0,"g":1.0,"r":1.0},"specular":{"a":1.0,"b":1.0,"g":1.0,"r":1.0},"type":"directional light"}],"name":"directional_light","node_id":7},{"childs":null,"components":[{"component_id":1269105190,"position":{"x":0.036303576081991196,"y":3.0672712326049805,"z":-2.324880599975586},"rotation":{"w":0.6137728095054626,"x":-0.351116806268692,"y":0.3511166572570801,"z":-0.6137727499008179},"scale":{"x":1.0,"y":1.0,"z":1.0},"type":"transform"},{"component_id":2472396462,"path":"content\\_default\\mesh\\cube.gltf","type":"mesh renderer"},{"color":{"a":1.0,"b":1.0,"g":1.0,"r":1.0},"component_id":1828911513,"material":"content\\models\\sarielle.png","shininess":1,"type":"material"},{"component_id":3581780679,"enable_desactivation":false,"is_kinematic":false,"mass":1.0,"type":"rigidbody"},{"component_id":4227813153,"type":"motion state"},{"component_id":2212983812,"scaling":{"x":1.0,"y":1.0,"z":1.0},"type":"box_shape"}],"name":"cube","node_id":6},{"childs":null,"components":[{"component_id":1269105190,"position":{"x":0.0,"y":2.839365005493164,"z":-16.746217727661133},"rotation":{"w":1.0,"x":0.0,"y":0.0,"z":0.0},"scale":{"x":1.0,"y":1.0,"z":1.0},"type":"transform"},{"color":{"a":1.0,"b":0.25045204162597656,"g":0.0,"r":1.0},"component_id":1676694936,"duration":1.0,"enabled":true,"particles_per_second":1000.0,"speed":4.0,"type":"particle emitter"}],"name":"particles","node_id":5},{"childs":null,"components":[{"component_id":1269105190,"position":{"x":0.0,"y":5.401857852935791,"z":0.0},"rotation":{"w":1.0,"x":0.0,"y":0.0,"z":0.0},"scale":{"x":1.0,"y":1.0,"z":1.0},"type":"transform"},{"component_id":2472396462,"path":"content\\models\\spaceship.gltf","type":"mesh renderer"},{"color":{"a":1.0,"b":1.0,"g":1.0,"r":1.0},"component_id":1828911513,"material":"content\\models\\spaceship_d.png","shininess":1,"type":"material"},{"component_id":3581780679,"enable_desactivation":false,"is_kinematic":false,"mass":1.0,"type":"rigidbody"},{"component_id":4227813153,"type":"motion state"},{"component_id":2212983812,"scaling":{"x":1.0,"y":1.0,"z":1.0},"type":"box_shape"},{"active_drag":0.9300000071525574,"collision_repulsion_force":500.0,"component_id":3824437066,"death_fx":"","energy_consumed_per_unit_of_force":0.0010000000474974513,"fast_forward_particlesL":{"component_id":1676694936,"node_id":0},"fast_forward_particlesR":{"component_id":1676694936,"node_id":0},"forward_forces":{"w":3500.0,"x":1000.0,"y":1000.0,"z":2000.0},"lateral_force":2000.0,"left_particles":{"component_id":1676694936,"node_id":0},"passive_drag":0.949999988079071,"planet_damage":5.0,"reverse_particles":{"component_id":1676694936,"node_id":0},"right_particles":{"component_id":1676694936,"node_id":0},"slow_forward_particlesL":{"component_id":1676694936,"node_id":0},"slow_forward_particlesR":{"component_id":1676694936,"node_id":0},"type":"spaceship"},{"component_id":2779572775,"type":"player_input"},{"bullet_energy_cost":1.0,"bullet_prefab":"","bullets_per_second":10.0,"component_id":1935248692,"offset":{"x":0.0,"y":0.0,"z":0.0},"speed":0.20000000298023224,"type":"weapon"}],"name":"spaceship","node_id":4},{"childs":[{"childs":null,"components":[{"component_id":3371052772,"position":{"x":37,"y":387},"scale":{"x":1.0,"y":0.10000000149011612},"type":"ui transform"},{"color":{"a":1.0,"b":1.0,"g":1.0,"r":1.0},"component_id":2212932191,"texture_path":"content\\models\\sarielle.png","type":"ui renderer"},{"component_id":1299548564,"max_scale":1.0,"target_ui_transform":{"component_id":3371052772,"node_id":3},"type":"progress bar"},{"component_id":1339151255,"offset":{"x":37.0,"y":283.0},"target_transform":{"component_id":3371052772,"node_id":2},"type":"follow transform ui"}],"name":"progress","node_id":3}],"components":[{"component_id":3371052772,"position":{"x":0,"y":104},"scale":{"x":1.0,"y":1.0},"type":"ui transform"},{"color":{"a":0.11940300464630127,"b":1.0,"g":1.0,"r":1.0},"component_id":2212932191,"texture_path":"content\\_default\\texture\\uv_checker.png","type":"ui renderer"}],"name":"ui","node_id":2}],"components":null,"name":"root","node_id":1},"singletons":[{"height_from_target":10.0,"margin_ratio":{"x":1.0,"y":1.0},"min_size":15.0,"singleton":"game camera","singleton_id":3178157869},{"singleton":"game","singleton_id":52469540,"spaceship":""},{"gravity":{"x":0.0,"y":-10.0,"z":0.0},"singleton":"physics world","singleton_id":2057302101},{"radius":100.0,"singleton":"sun light","singleton_id":3931268760,"sub_angle":45.0},{"back to normal_duration":2.0,"back to normal_light_attenuation_linear":0.0,"back to normal_particle_color":{"a":1.0,"b":1.0,"g":0.0,"r":1.0},"back to normal_particle_duration":3.0,"back to normal_particle_per_second":100.0,"back to normal_particle_speed":3.0,"collapsing_duration":2.0,"collapsing_light_attenuation_linear":0.0,"collapsing_particle_color":{"a":1.0,"b":1.0,"g":0.0,"r":1.0},"collapsing_particle_duration":3.0,"collapsing_particle_per_second":100.0,"collapsing_particle_speed":3.0,"cooldown":5.0,"damage_per_second":10.0,"exploding_duration":2.0,"exploding_light_attenuation_linear":0.0,"exploding_particle_color":{"a":1.0,"b":1.0,"g":0.0,"r":1.0},"exploding_particle_duration":3.0,"exploding_particle_per_second":100.0,"exploding_particle_speed":3.0,"particle_emitter":{"component_id":1676694936,"node_id":0},"random_cooldown":1.0,"singleton":"solar eruption","singleton_id":1722544033,"sunlight_light":{"component_id":3039791276,"node_id":0},"sunlight_material":{"component_id":1828911513,"node_id":0},"sunlight_renderer":{"component_id":2472396462,"node_id":0},"waiting_duration":2.0,"waiting_light_attenuation_linear":0.0,"waiting_particle_color":{"a":1.0,"b":1.0,"g":0.0,"r":1.0},"waiting_particle_duration":3.0,"waiting_particle_per_second":100.0,"waiting_particle_speed":3.0,"warming_duration":2.0,"warming_light_attenuation_linear":0.0,"warming_particle_color":{"a":1.0,"b":1.0,"g":0.0,"r":1.0},"warming_particle_duration":3.0,"warming_particle_per_second":100.0,"warming_particle_speed":3.0}]}}
+{
+  "scene": {
+    "path": "./content/scenes\\zoo.scene",
+    "root": {
+      "childs": [
+        {
+          "childs": null,
+          "components": [
+            {
+              "component_type": 1269105190,
+              "position": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+              },
+              "rotation": {
+                "w": 1.0,
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+              },
+              "scale": {
+                "x": 10.0,
+                "y": 1.0,
+                "z": 10.0
+              },
+              "type": "transform"
+            },
+            {
+              "component_type": 2472396462,
+              "path": "content\\_default\\mesh\\cube.gltf",
+              "type": "mesh renderer"
+            },
+            {
+              "color": {
+                "a": 1.0,
+                "b": 1.0,
+                "g": 1.0,
+                "r": 1.0
+              },
+              "component_type": 1828911513,
+              "material": "content\\models\\sarielle.png",
+              "shininess": 1,
+              "type": "material"
+            },
+            {
+              "component_type": 3581780679,
+              "enable_desactivation": false,
+              "is_kinematic": true,
+              "mass": 0.0,
+              "type": "rigidbody"
+            },
+            {
+              "component_type": 4227813153,
+              "type": "motion state"
+            },
+            {
+              "component_type": 2212983812,
+              "scaling": {
+                "x": 10.0,
+                "y": 1.0,
+                "z": 10.0
+              },
+              "type": "box_shape"
+            }
+          ],
+          "name": "floor",
+          "handle": 10
+        },
+        {
+          "childs": null,
+          "components": [
+            {
+              "component_type": 1269105190,
+              "position": {
+                "x": -1.6656550168991089,
+                "y": 2.927015781402588,
+                "z": -0.10152705013751984
+              },
+              "rotation": {
+                "w": 0.629172682762146,
+                "x": 0.33857107162475586,
+                "y": -0.6502034068107605,
+                "z": 0.2583540976047516
+              },
+              "scale": {
+                "x": 1.0,
+                "y": 1.0,
+                "z": 1.0
+              },
+              "type": "transform"
+            },
+            {
+              "component_type": 2472396462,
+              "path": "content\\_default\\mesh\\sphere.gltf",
+              "type": "mesh renderer"
+            },
+            {
+              "color": {
+                "a": 1.0,
+                "b": 1.0,
+                "g": 1.0,
+                "r": 1.0
+              },
+              "component_type": 1828911513,
+              "material": "content\\models\\sarielle.png",
+              "shininess": 1,
+              "type": "material"
+            },
+            {
+              "component_type": 3581780679,
+              "enable_desactivation": false,
+              "is_kinematic": false,
+              "mass": 1.0,
+              "type": "rigidbody"
+            },
+            {
+              "component_type": 4227813153,
+              "type": "motion state"
+            },
+            {
+              "component_type": 3410179010,
+              "radius": 0.5,
+              "type": "sphere shape"
+            }
+          ],
+          "name": "sphere",
+          "handle": 9
+        },
+        {
+          "childs": null,
+          "components": [
+            {
+              "component_type": 1269105190,
+              "position": {
+                "x": 0.0,
+                "y": 2.0,
+                "z": 11.72707748413086
+              },
+              "rotation": {
+                "w": 1.0,
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+              },
+              "scale": {
+                "x": 1.0,
+                "y": 1.0,
+                "z": 1.0
+              },
+              "type": "transform"
+            },
+            {
+              "ambiant": {
+                "a": 1.0,
+                "b": 1.0,
+                "g": 1.0,
+                "r": 1.0
+              },
+              "attenuation": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.10000000149011612
+              },
+              "component_type": 3039791276,
+              "diffuse": {
+                "a": 1.0,
+                "b": 1.0,
+                "g": 1.0,
+                "r": 1.0
+              },
+              "specular": {
+                "a": 1.0,
+                "b": 1.0,
+                "g": 1.0,
+                "r": 1.0
+              },
+              "type": "point light"
+            }
+          ],
+          "name": "point_light",
+          "handle": 8
+        },
+        {
+          "childs": null,
+          "components": [
+            {
+              "component_type": 1269105190,
+              "position": {
+                "x": 0.0,
+                "y": 5.2026896476745605,
+                "z": -1.4163386821746826
+              },
+              "rotation": {
+                "w": 0.9894634485244751,
+                "x": 0.08150121569633484,
+                "y": 0.11670904606580734,
+                "z": 0.026432333514094353
+              },
+              "scale": {
+                "x": 1.0,
+                "y": 1.0,
+                "z": 1.0
+              },
+              "type": "transform"
+            },
+            {
+              "ambiant": {
+                "a": 1.0,
+                "b": 0.18009327352046967,
+                "g": 0.18009327352046967,
+                "r": 0.18011128902435303
+              },
+              "component_type": 944608624,
+              "diffuse": {
+                "a": 1.0,
+                "b": 1.0,
+                "g": 1.0,
+                "r": 1.0
+              },
+              "specular": {
+                "a": 1.0,
+                "b": 1.0,
+                "g": 1.0,
+                "r": 1.0
+              },
+              "type": "directional light"
+            }
+          ],
+          "name": "directional_light",
+          "handle": 7
+        },
+        {
+          "childs": null,
+          "components": [
+            {
+              "component_type": 1269105190,
+              "position": {
+                "x": 0.036303576081991196,
+                "y": 3.0672712326049805,
+                "z": -2.324880599975586
+              },
+              "rotation": {
+                "w": 0.6137728095054626,
+                "x": -0.351116806268692,
+                "y": 0.3511166572570801,
+                "z": -0.6137727499008179
+              },
+              "scale": {
+                "x": 1.0,
+                "y": 1.0,
+                "z": 1.0
+              },
+              "type": "transform"
+            },
+            {
+              "component_type": 2472396462,
+              "path": "content\\_default\\mesh\\cube.gltf",
+              "type": "mesh renderer"
+            },
+            {
+              "color": {
+                "a": 1.0,
+                "b": 1.0,
+                "g": 1.0,
+                "r": 1.0
+              },
+              "component_type": 1828911513,
+              "material": "content\\models\\sarielle.png",
+              "shininess": 1,
+              "type": "material"
+            },
+            {
+              "component_type": 3581780679,
+              "enable_desactivation": false,
+              "is_kinematic": false,
+              "mass": 1.0,
+              "type": "rigidbody"
+            },
+            {
+              "component_type": 4227813153,
+              "type": "motion state"
+            },
+            {
+              "component_type": 2212983812,
+              "scaling": {
+                "x": 1.0,
+                "y": 1.0,
+                "z": 1.0
+              },
+              "type": "box_shape"
+            }
+          ],
+          "name": "cube",
+          "handle": 6
+        },
+        {
+          "childs": null,
+          "components": [
+            {
+              "component_type": 1269105190,
+              "position": {
+                "x": 0.0,
+                "y": 2.839365005493164,
+                "z": -16.746217727661133
+              },
+              "rotation": {
+                "w": 1.0,
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+              },
+              "scale": {
+                "x": 1.0,
+                "y": 1.0,
+                "z": 1.0
+              },
+              "type": "transform"
+            },
+            {
+              "color": {
+                "a": 1.0,
+                "b": 0.25045204162597656,
+                "g": 0.0,
+                "r": 1.0
+              },
+              "component_type": 1676694936,
+              "duration": 1.0,
+              "enabled": true,
+              "particles_per_second": 1000.0,
+              "speed": 4.0,
+              "type": "particle emitter"
+            }
+          ],
+          "name": "particles",
+          "handle": 5
+        },
+        {
+          "childs": null,
+          "components": [
+            {
+              "component_type": 1269105190,
+              "position": {
+                "x": 0.0,
+                "y": 5.401857852935791,
+                "z": 0.0
+              },
+              "rotation": {
+                "w": 1.0,
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+              },
+              "scale": {
+                "x": 1.0,
+                "y": 1.0,
+                "z": 1.0
+              },
+              "type": "transform"
+            },
+            {
+              "component_type": 2472396462,
+              "path": "content\\models\\spaceship.gltf",
+              "type": "mesh renderer"
+            },
+            {
+              "color": {
+                "a": 1.0,
+                "b": 1.0,
+                "g": 1.0,
+                "r": 1.0
+              },
+              "component_type": 1828911513,
+              "material": "content\\models\\spaceship_d.png",
+              "shininess": 1,
+              "type": "material"
+            },
+            {
+              "component_type": 3581780679,
+              "enable_desactivation": false,
+              "is_kinematic": false,
+              "mass": 1.0,
+              "type": "rigidbody"
+            },
+            {
+              "component_type": 4227813153,
+              "type": "motion state"
+            },
+            {
+              "component_type": 2212983812,
+              "scaling": {
+                "x": 1.0,
+                "y": 1.0,
+                "z": 1.0
+              },
+              "type": "box_shape"
+            },
+            {
+              "active_drag": 0.9300000071525574,
+              "collision_repulsion_force": 500.0,
+              "component_type": 3824437066,
+              "death_fx": "",
+              "energy_consumed_per_unit_of_force": 0.0010000000474974513,
+              "fast_forward_particlesL": {
+                "component_type": 1676694936,
+                "handle": 0
+              },
+              "fast_forward_particlesR": {
+                "component_type": 1676694936,
+                "handle": 0
+              },
+              "forward_forces": {
+                "w": 3500.0,
+                "x": 1000.0,
+                "y": 1000.0,
+                "z": 2000.0
+              },
+              "lateral_force": 2000.0,
+              "left_particles": {
+                "component_type": 1676694936,
+                "handle": 0
+              },
+              "passive_drag": 0.949999988079071,
+              "planet_damage": 5.0,
+              "reverse_particles": {
+                "component_type": 1676694936,
+                "handle": 0
+              },
+              "right_particles": {
+                "component_type": 1676694936,
+                "handle": 0
+              },
+              "slow_forward_particlesL": {
+                "component_type": 1676694936,
+                "handle": 0
+              },
+              "slow_forward_particlesR": {
+                "component_type": 1676694936,
+                "handle": 0
+              },
+              "type": "spaceship"
+            },
+            {
+              "component_type": 2779572775,
+              "type": "player_input"
+            },
+            {
+              "bullet_energy_cost": 1.0,
+              "bullet_prefab": "",
+              "bullets_per_second": 10.0,
+              "component_type": 1935248692,
+              "offset": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+              },
+              "speed": 0.20000000298023224,
+              "type": "weapon"
+            }
+          ],
+          "name": "spaceship",
+          "handle": 4
+        },
+        {
+          "childs": [
+            {
+              "childs": null,
+              "components": [
+                {
+                  "component_type": 3371052772,
+                  "position": {
+                    "x": 37,
+                    "y": 387
+                  },
+                  "scale": {
+                    "x": 1.0,
+                    "y": 0.10000000149011612
+                  },
+                  "type": "ui transform"
+                },
+                {
+                  "color": {
+                    "a": 1.0,
+                    "b": 1.0,
+                    "g": 1.0,
+                    "r": 1.0
+                  },
+                  "component_type": 2212932191,
+                  "texture_path": "content\\models\\sarielle.png",
+                  "type": "ui renderer"
+                },
+                {
+                  "component_type": 1299548564,
+                  "max_scale": 1.0,
+                  "target_ui_transform": {
+                    "component_type": 3371052772,
+                    "handle": 3
+                  },
+                  "type": "progress bar"
+                },
+                {
+                  "component_type": 1339151255,
+                  "offset": {
+                    "x": 37.0,
+                    "y": 283.0
+                  },
+                  "target_transform": {
+                    "component_type": 3371052772,
+                    "handle": 2
+                  },
+                  "type": "follow transform ui"
+                }
+              ],
+              "name": "progress",
+              "handle": 3
+            }
+          ],
+          "components": [
+            {
+              "component_type": 3371052772,
+              "position": {
+                "x": 0,
+                "y": 104
+              },
+              "scale": {
+                "x": 1.0,
+                "y": 1.0
+              },
+              "type": "ui transform"
+            },
+            {
+              "color": {
+                "a": 0.11940300464630127,
+                "b": 1.0,
+                "g": 1.0,
+                "r": 1.0
+              },
+              "component_type": 2212932191,
+              "texture_path": "content\\_default\\texture\\uv_checker.png",
+              "type": "ui renderer"
+            }
+          ],
+          "name": "ui",
+          "handle": 2
+        }
+      ],
+      "components": null,
+      "name": "root",
+      "handle": 1
+    },
+    "singletons": [
+      {
+        "height_from_target": 10.0,
+        "margin_ratio": {
+          "x": 1.0,
+          "y": 1.0
+        },
+        "min_size": 15.0,
+        "singleton": "game camera",
+        "singleton_id": 3178157869
+      },
+      {
+        "singleton": "game",
+        "singleton_id": 52469540,
+        "spaceship": ""
+      },
+      {
+        "gravity": {
+          "x": 0.0,
+          "y": -10.0,
+          "z": 0.0
+        },
+        "singleton": "physics world",
+        "singleton_id": 2057302101
+      },
+      {
+        "radius": 100.0,
+        "singleton": "sun light",
+        "singleton_id": 3931268760,
+        "sub_angle": 45.0
+      },
+      {
+        "back to normal_duration": 2.0,
+        "back to normal_light_attenuation_linear": 0.0,
+        "back to normal_particle_color": {
+          "a": 1.0,
+          "b": 1.0,
+          "g": 0.0,
+          "r": 1.0
+        },
+        "back to normal_particle_duration": 3.0,
+        "back to normal_particle_per_second": 100.0,
+        "back to normal_particle_speed": 3.0,
+        "collapsing_duration": 2.0,
+        "collapsing_light_attenuation_linear": 0.0,
+        "collapsing_particle_color": {
+          "a": 1.0,
+          "b": 1.0,
+          "g": 0.0,
+          "r": 1.0
+        },
+        "collapsing_particle_duration": 3.0,
+        "collapsing_particle_per_second": 100.0,
+        "collapsing_particle_speed": 3.0,
+        "cooldown": 5.0,
+        "damage_per_second": 10.0,
+        "exploding_duration": 2.0,
+        "exploding_light_attenuation_linear": 0.0,
+        "exploding_particle_color": {
+          "a": 1.0,
+          "b": 1.0,
+          "g": 0.0,
+          "r": 1.0
+        },
+        "exploding_particle_duration": 3.0,
+        "exploding_particle_per_second": 100.0,
+        "exploding_particle_speed": 3.0,
+        "particle_emitter": {
+          "component_type": 1676694936,
+          "handle": 0
+        },
+        "random_cooldown": 1.0,
+        "singleton": "solar eruption",
+        "singleton_id": 1722544033,
+        "sunlight_light": {
+          "component_type": 3039791276,
+          "handle": 0
+        },
+        "sunlight_material": {
+          "component_type": 1828911513,
+          "handle": 0
+        },
+        "sunlight_renderer": {
+          "component_type": 2472396462,
+          "handle": 0
+        },
+        "waiting_duration": 2.0,
+        "waiting_light_attenuation_linear": 0.0,
+        "waiting_particle_color": {
+          "a": 1.0,
+          "b": 1.0,
+          "g": 0.0,
+          "r": 1.0
+        },
+        "waiting_particle_duration": 3.0,
+        "waiting_particle_per_second": 100.0,
+        "waiting_particle_speed": 3.0,
+        "warming_duration": 2.0,
+        "warming_light_attenuation_linear": 0.0,
+        "warming_particle_color": {
+          "a": 1.0,
+          "b": 1.0,
+          "g": 0.0,
+          "r": 1.0
+        },
+        "warming_particle_duration": 3.0,
+        "warming_particle_per_second": 100.0,
+        "warming_particle_speed": 3.0
+      }
+    ]
+  }
+}

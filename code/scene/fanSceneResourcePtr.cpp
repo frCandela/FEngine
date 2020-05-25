@@ -11,28 +11,16 @@
 namespace fan
 {
 	//================================================================================================================================
-	// set the world of the pointer ( done during the Init() of the component on which the ComponentPtr is a member
-	//================================================================================================================================
-	void ComponentPtrBase::Init( EcsWorld& _world )
-	{
-		const_cast<EcsWorld*>( world ) = &_world;
-		sceneNodeID = 0;
-		component = nullptr;
-	}
-
-	//================================================================================================================================
 	// initializes the ComponentPtr from ids :
 	// - _sceneNodeID is the unique index of the target scene node on which the component is attached
 	// - _staticID is the static id of the component
 	//================================================================================================================================
-	void ComponentPtrBase::Create( uint32_t _sceneNodeID )
+	void ComponentPtrBase::CreateUnresolved( EcsHandle _handle )
 	{
-		assert( world != nullptr );
-
-		sceneNodeID = _sceneNodeID;
+		handle = _handle;
 		
 		// adds to the unresolved pointers list
-		if( sceneNodeID != 0 )
+		if( _handle != 0 )
 		{
 			ScenePointers& scenePointers = world->GetSingleton<ScenePointers>();
 			scenePointers.unresolvedComponentPtr.insert( this );
@@ -41,12 +29,9 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void ComponentPtrBase::Create( SceneNode& _sceneNode, EcsComponent& _component )
+	void ComponentPtrBase::Create( EcsHandle _handle )
 	{
-		assert( _sceneNode.scene->world == world );
-
-		sceneNodeID = _sceneNode.uniqueID;
-		component = &_component;
+		handle = _handle;
 
 		// removes from unresolved pointers list
 		ScenePointers& scenePointers = world->GetSingleton<ScenePointers>();
@@ -61,8 +46,7 @@ namespace fan
 	//================================================================================================================================
 	void ComponentPtrBase::Clear()
 	{
-		sceneNodeID = 0;
-		component = nullptr;
+		handle = 0;
 	}
 }
 
@@ -74,23 +58,19 @@ namespace ImGui
  	bool FanComponentBase( const char* _label, fan::ComponentPtrBase& _ptr )
  	{
 		fan::EcsWorld& world = *_ptr.world;
-
-
  		bool returnValue = false;
  
-		const fan::EcsComponentInfo& info = world.GetComponentInfo( _ptr.staticID );
+		const fan::EcsComponentInfo& info = world.GetComponentInfo( _ptr.type );
 
 		// create button title
 		std::string name;
-		if( _ptr.component == nullptr )
+		if( _ptr.handle == 0 )
 		{
 			name = info.name + " : NULL";
 		}
 		else
 		{
-			fan::Scene& scene = world.GetSingleton<fan::Scene>();
-			const fan::EcsHandle nodeHandle = scene.nodes[_ptr.sceneNodeID];
-			fan::SceneNode& node = world.GetComponent<fan::SceneNode>( world.GetEntity( nodeHandle ) );
+			fan::SceneNode& node = world.GetComponent<fan::SceneNode>( world.GetEntity( _ptr.handle ) );
 			name = info.name + " : " + node.name;
 		}		
  		// icon
@@ -99,15 +79,13 @@ namespace ImGui
  			returnValue = true;
  		}
 		// dragndrop source for icon
-		if( _ptr.component != nullptr )
+		if( _ptr.handle != 0 )
 		{
-			fan::Scene& scene = _ptr.world->GetSingleton<fan::Scene>();
-			const fan::EcsHandle nodeHandle = scene.nodes.at( _ptr.sceneNodeID );
-			fan::SceneNode& node = world.GetComponent<fan::SceneNode>( world.GetEntity( nodeHandle ) );
-			ImGui::FanBeginDragDropSourceComponent( node, *_ptr.component );
+			fan::SceneNode& node = world.GetComponent<fan::SceneNode>( world.GetEntity( _ptr.handle ) );
+			ImGui::FanBeginDragDropSourceComponent( world, node.handle, _ptr.type );
 		}
 		// dragndrop target for icon
-		ImGui::ComponentPayload payloadDropOnIcon = ImGui::FanBeginDragDropTargetComponent( _ptr.staticID );
+		ImGui::ComponentPayload payloadDropOnIcon = ImGui::FanBeginDragDropTargetComponent( _ptr.type );
  		
 		ImGui::SameLine();
  
@@ -120,20 +98,18 @@ namespace ImGui
  		ImGui::SameLine();
  
  		// dragndrop source for button
-		if( _ptr.component != nullptr )
+		if( _ptr.handle != 0 )
 		{
-			fan::Scene& scene = _ptr.world->GetSingleton<fan::Scene>();
-			const fan::EcsHandle nodeHandle = scene.nodes.at( _ptr.sceneNodeID );
-			fan::SceneNode& node = world.GetComponent<fan::SceneNode>( world.GetEntity( nodeHandle ) );
-			ImGui::FanBeginDragDropSourceComponent( node, *_ptr.component );
+			fan::SceneNode& node = world.GetComponent<fan::SceneNode>( world.GetEntity( _ptr.handle ) );
+			ImGui::FanBeginDragDropSourceComponent( world, _ptr.handle, _ptr.type );
 		}
 
 		// dragndrop target for button
-  		ImGui::ComponentPayload payloadDropOnButton = ImGui::FanBeginDragDropTargetComponent( _ptr.staticID );
-		if( payloadDropOnButton.sceneNode != nullptr || payloadDropOnIcon.sceneNode != nullptr )
+  		ImGui::ComponentPayload payloadDropOnButton = ImGui::FanBeginDragDropTargetComponent( _ptr.type );
+		if( payloadDropOnButton.handle != 0 || payloadDropOnIcon.handle != 0 )
 		{
-			ImGui::ComponentPayload & payload  = payloadDropOnButton.sceneNode != nullptr ? payloadDropOnButton : payloadDropOnIcon;
-			_ptr.Create( *payload.sceneNode, *payload.component );
+			ImGui::ComponentPayload & payload  = payloadDropOnButton.handle != 0 ? payloadDropOnButton : payloadDropOnIcon;
+			_ptr.Create( payload.handle );
 			returnValue = true;
 		}
  

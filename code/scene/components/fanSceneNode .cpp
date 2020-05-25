@@ -26,7 +26,6 @@ namespace fan
 	{
 		SceneNode& node = static_cast<SceneNode&>( _component );
 		node.handle = 0;
-		node.uniqueID = 0;
 		node.flags = 0;
 		node.name = "";
 		node.scene = nullptr;
@@ -42,7 +41,7 @@ namespace fan
 		SceneNode& node = static_cast<SceneNode&>( _component );
 		Scene& scene = _world.GetSingleton<Scene>();
 		scene.onDeleteSceneNode.Emmit( &node );
-		scene.nodes.erase( node.uniqueID );
+		scene.nodes.erase( node.handle );
 
 		// removes from parent
 		if( node.parentHandle != 0 )
@@ -76,7 +75,7 @@ namespace fan
 			for( SceneNode* node : nodesToDelete )
 			{
 				EcsEntity entity = _world.GetEntity( node->handle );
-				_world.Kill( entity );
+				scene.nodesToKill.insert( node->handle );
 				node->parentHandle = 0;
 				node->childs.clear();
 			}		
@@ -85,11 +84,10 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void SceneNode::Build( const std::string& _name, Scene& _scene, const EcsHandle _handle, const uint32_t _uniqueID, SceneNode* const _parent )
+	void SceneNode::Build( const std::string& _name, Scene& _scene, const EcsHandle _handle, SceneNode* const _parent )
 	{
 		scene = &_scene;
 		handle = _handle;
-		uniqueID = _uniqueID;
 		name = _name;
 		if( _parent != nullptr )
 		{
@@ -109,7 +107,6 @@ namespace fan
 		ImGui::Text( "scene     : %s", node.scene->path.empty()	? "<no path>" : node.scene->path.c_str() );
 		ImGui::Text( "handle    : %u", node.handle );
 		ImGui::Text( "entity id : %u", entity );
-		ImGui::Text( "node   id : %u", node.uniqueID );
 	}
 
 	//================================================================================================================================

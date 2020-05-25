@@ -10,6 +10,8 @@
 #include "ecs/fanEcsArchetype.hpp"
 #include "ecs/fanEcsView.hpp"
 
+#include "core/fanOwlMemcpy.hpp"
+
 namespace fan
 {
 	struct EcsView;
@@ -41,12 +43,15 @@ namespace fan
 		int  GetIndex( const uint32_t  _type ) const;
 
 		// Handles
-		EcsEntity	 GetEntity( const EcsHandle _handle )
+		EcsEntity	GetEntity( const EcsHandle _handle )
 		{
 			return m_handles.at( _handle );
 		}
-		EcsHandle	 AddHandle( const EcsEntity _entity );
-		void		 RemoveHandle( const EcsEntity _entity );
+		EcsHandle	AddHandle( const EcsEntity _entity );
+		void		SetHandle( const EcsEntity _entity, EcsHandle _handle );
+		void		RemoveHandle( const EcsEntity _entity );
+		EcsHandle	GetNextHandle() const { return m_nextHandle; }
+		void		SetNextHandle( const EcsHandle  _handle ) { m_nextHandle = _handle; }
 
 		// Singletons
 		template <typename _SingletonType >	void			AddSingletonType()
@@ -117,6 +122,7 @@ namespace fan
 			info.name		= _ComponentType::Info::s_name;
 			info.construct  = &_ComponentType::Info::Instanciate;
 			info.copy		= std::is_trivially_copyable<_ComponentType>::value ? &std::memcpy : &_ComponentType::Info::Memcpy;
+			//info.copy		= std::is_trivially_copyable<_ComponentType>::value ? &MemcpyCustom : &_ComponentType::Info::Memcpy;
 			info.init		= &_ComponentType::Init;			
 			info.size		= _ComponentType::Info::s_size;
 			info.alignment	= _ComponentType::Info::s_alignment;			
@@ -188,5 +194,7 @@ namespace fan
 		std::unordered_map< uint32_t, EcsSingletonInfo >	m_singletonInfos;
 		std::vector< EcsComponentInfo >						m_componentsInfo;
 		std::vector< EcsTransition >						m_transitions;
+
+		bool m_isApplyingTransitions = false;	// Prevent modifying transitions while applying transition ( for components destroy() )
 	};
 }
