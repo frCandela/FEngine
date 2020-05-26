@@ -78,7 +78,7 @@ namespace ImGui
 			ImGui::FanBeginDragDropSourceComponent( world, node.handle, _ptr.type );
 		}
 		// dragndrop target for icon
-		ImGui::ComponentPayload payloadDropOnIcon = ImGui::FanBeginDragDropTargetComponent( _ptr.type );
+		ImGui::ComponentPayload payloadDropOnIcon = ImGui::FanBeginDragDropTargetComponent( world, _ptr.type );
  		
 		ImGui::SameLine();
  
@@ -98,7 +98,7 @@ namespace ImGui
 		}
 
 		// dragndrop target for button
-  		ImGui::ComponentPayload payloadDropOnButton = ImGui::FanBeginDragDropTargetComponent( _ptr.type );
+  		ImGui::ComponentPayload payloadDropOnButton = ImGui::FanBeginDragDropTargetComponent( world, _ptr.type );
 		if( payloadDropOnButton.handle != 0 || payloadDropOnIcon.handle != 0 )
 		{
 			ImGui::ComponentPayload & payload  = payloadDropOnButton.handle != 0 ? payloadDropOnButton : payloadDropOnIcon;

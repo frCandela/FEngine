@@ -63,7 +63,7 @@ namespace ImGui
 
 	//================================================================================================================================
 	//================================================================================================================================
-	ComponentPayload FanBeginDragDropTargetComponent( uint32_t _type )
+	ComponentPayload FanBeginDragDropTargetComponent( fan::EcsWorld& _world, uint32_t _type )
 	{
  		if( ImGui::BeginDragDropTarget() )
  		{  			
@@ -84,7 +84,15 @@ namespace ImGui
 				// find the component and assigns it if it exists
 				assert( imGuiPayload->DataSize == sizeof( ComponentPayload ) );
 				ComponentPayload& payload = *(ComponentPayload*)imGuiPayload->Data;
-				return payload;
+				if( _world.HasComponent( _world.GetEntity( payload.handle ), _type ) )
+				{
+					return payload;
+				}
+				else
+				{
+					const fan::EcsComponentInfo& info = _world.GetComponentInfo( _type );
+					fan::Debug::Warning() << "dropped scene node doesn't have a " << info.name << " component" << fan::Debug::Endl();
+				}
 			}
 
  			ImGui::EndDragDropTarget();

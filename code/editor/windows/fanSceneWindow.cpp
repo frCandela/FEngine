@@ -253,6 +253,8 @@ namespace fan
 	//================================================================================================================================
 	void SceneWindow::R_DrawSceneTree( SceneNode& _node, SceneNode*& _nodeRightClicked )
 	{
+		EcsWorld& world = *_node.scene->world;
+
 		std::stringstream ss;
 		ss << "##" << &_node; // Unique id
 
@@ -263,7 +265,7 @@ namespace fan
 		bool isOpen = ImGui::TreeNode( ss.str().c_str() );
 
 		// SceneNode dragndrop target empty selectable -> place dragged below
-		ImGui::ComponentPayload payload = ImGui::FanBeginDragDropTargetComponent<SceneNode>();
+		ImGui::ComponentPayload payload = ImGui::FanBeginDragDropTargetComponent<SceneNode>( world );
 		if( payload.handle != 0 )
 		{
 			assert( payload.type == SceneNode::Info::s_type );
@@ -294,7 +296,7 @@ namespace fan
 		ImGui::FanBeginDragDropSourceComponent( *m_scene->world, _node.handle, SceneNode::Info::s_type );
 
 		// SceneNode dragndrop target scene node name -> place as child
-		ImGui::ComponentPayload payload2 = ImGui::FanBeginDragDropTargetComponent<SceneNode>();
+		ImGui::ComponentPayload payload2 = ImGui::FanBeginDragDropTargetComponent<SceneNode>( world );
 		if( payload2.handle != 0 )
 		{
 			assert( payload2.type == SceneNode::Info::s_type );

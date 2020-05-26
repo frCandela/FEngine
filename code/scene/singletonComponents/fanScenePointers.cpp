@@ -46,8 +46,7 @@ namespace fan
 		ScenePointers& scenePointers = _world.GetSingleton<ScenePointers>();
 		for ( ComponentPtrBase* componentPtr : scenePointers.unresolvedComponentPtr )
 		{
-			ComponentPtrBase* ptr = *scenePointers.unresolvedComponentPtr.begin();
-			ptr->handle += _idOffset;
+			componentPtr->handle += _idOffset;
 		}
 		scenePointers.unresolvedComponentPtr.clear();
 	}

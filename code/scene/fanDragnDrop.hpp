@@ -26,15 +26,15 @@ namespace ImGui
 	fan::Prefab *		FanBeginDragDropTargetPrefab();
 
 	void				FanBeginDragDropSourceComponent( fan::EcsWorld& _world, fan::EcsHandle& _handle, uint32_t _type, ImGuiDragDropFlags _flags = ImGuiDragDropFlags_None );
-	ComponentPayload	FanBeginDragDropTargetComponent( uint32_t _type );
+	ComponentPayload	FanBeginDragDropTargetComponent( fan::EcsWorld& _world, uint32_t _type );
 
 
  	//================================================================================================================================
  	//================================================================================================================================
  	template< typename _componentType >
-	ComponentPayload FanBeginDragDropTargetComponent()
+	ComponentPayload FanBeginDragDropTargetComponent( fan::EcsWorld& _world )
  	{
  		static_assert((std::is_base_of<fan::EcsComponent, _componentType>::value));
- 		return FanBeginDragDropTargetComponent( _componentType::Info::s_type );
+ 		return FanBeginDragDropTargetComponent( _world, _componentType::Info::s_type );
  	}
 }

@@ -86,8 +86,8 @@ namespace fan
 
 			if( followTransform.locked && followTransform.targetTransform != nullptr )
 			{
-				TransformUI& target = *followTransform.targetTransform;
-				follow.position = target.position + followTransform.offset;
+// 				TransformUI& target = *followTransform.targetTransform;
+// 				follow.position = target.position + followTransform.offset;
 			}
 		}
 	}

@@ -165,13 +165,13 @@ namespace fan
 	{
 		if( _child.IsAncestorOf( *this ) )
 		{
-			Debug::Log( "Cannot parent an object to one of its children" );
+			Debug::Warning( "Cannot parent an object to one of its children" );
 			return;
 		}
 
 		if( _child.parentHandle == handle )
 		{
-			Debug::Get() << Debug::Severity::log << _child.name << " is already a child of " << name << Debug::Endl();
+			Debug::Warning() << _child.name << " is already a child of " << name << Debug::Endl();
 			return;
 		}
 
@@ -192,7 +192,7 @@ namespace fan
 	{
 		if( _parent == nullptr )
 		{
-			Debug::Log( "Root cannot have a brother :'(" );
+			Debug::Warning( "Root cannot have a brother :'(" );
 			return;
 		}
 		_parent->AddChild( *this );
@@ -212,12 +212,12 @@ namespace fan
 	{
 		if( IsAncestorOf( _brother ) )
 		{
-			Debug::Log( "Cannot parent an object to one of its children" );
+			Debug::Warning( "Cannot parent an object to one of its children" );
 			return;
 		}
 		if( _brother.parentHandle == 0 )
 		{
-			Debug::Log( "Root cannot have a brother :'(" );
+			Debug::Warning( "Root cannot have a brother :'(" );
 			return;
 		}
 

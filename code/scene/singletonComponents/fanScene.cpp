@@ -377,7 +377,7 @@ namespace fan
 
 			// loads all nodes recursively
 			const Json& jRoot = jScene["root"];
-			const EcsHandle handleOffset = 1; 
+			const EcsHandle handleOffset = 0; 
 			SceneNode&  rootNode = R_LoadFromJson( jRoot, *this, nullptr, handleOffset );
 			rootNodeHandle = rootNode.handle;
 			
