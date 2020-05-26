@@ -89,7 +89,7 @@ namespace fan
 			SceneNode& newNode = Scene::R_LoadFromJson( m_json["prefab"], scene, &_parent, handleOffset );
 			const EcsHandle maxHandle = Scene::R_FindMaximumHandle( _parent );
 			world.SetNextHandle( maxHandle + 1);
-			ScenePointers::ResolveComponentPointers( *_parent.scene, handleOffset );
+			ScenePointers::ResolveComponentPointers( world, handleOffset );
 			return &newNode;
 		}		
 	}

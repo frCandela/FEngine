@@ -1,6 +1,5 @@
 #pragma once
 
-#include <set>
 #include "ecs/fanEcsSingleton.hpp"
 #include "scene/fanSceneResourcePtr.hpp"
 
@@ -23,8 +22,8 @@ namespace fan
 		static void Init( EcsWorld& _world, EcsSingleton& _component );
 		static void OnGui( EcsWorld&, EcsSingleton& _component );
 
-		std::set< ComponentPtrBase* > unresolvedComponentPtr;
+		std::vector< ComponentPtrBase* > unresolvedComponentPtr;
 
-		static void ResolveComponentPointers( Scene& _scene, const uint32_t _idOffset );
+		static void ResolveComponentPointers( EcsWorld& _world, const uint32_t _idOffset );
 	};
 }

@@ -377,7 +377,8 @@ namespace fan
 
 			// loads all nodes recursively
 			const Json& jRoot = jScene["root"];
-			SceneNode&  rootNode = R_LoadFromJson( jRoot, *this, nullptr, 1 );
+			const EcsHandle handleOffset = 1; 
+			SceneNode&  rootNode = R_LoadFromJson( jRoot, *this, nullptr, handleOffset );
 			rootNodeHandle = rootNode.handle;
 			
 			path = _path;
@@ -385,7 +386,7 @@ namespace fan
 			const EcsHandle maxHandle = R_FindMaximumHandle( rootNode ) + 1;
 			world->SetNextHandle( maxHandle );
 
-			ScenePointers::ResolveComponentPointers( *this, 0 );
+			ScenePointers::ResolveComponentPointers( *world, handleOffset );
 			S_InitFollowTransforms::Run( *world, world->Match( S_InitFollowTransforms::GetSignature( *world ) ) );
 
 			onLoad.Emmit( *this );

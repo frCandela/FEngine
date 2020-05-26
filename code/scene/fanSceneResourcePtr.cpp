@@ -23,7 +23,7 @@ namespace fan
 		if( _handle != 0 )
 		{
 			ScenePointers& scenePointers = world->GetSingleton<ScenePointers>();
-			scenePointers.unresolvedComponentPtr.insert( this );
+			scenePointers.unresolvedComponentPtr.push_back( this );
 		}
 	}
 
@@ -32,14 +32,7 @@ namespace fan
 	void ComponentPtrBase::Create( EcsHandle _handle )
 	{
 		handle = _handle;
-
-		// removes from unresolved pointers list
-		ScenePointers& scenePointers = world->GetSingleton<ScenePointers>();
-		auto it = scenePointers.unresolvedComponentPtr.find( this );
-		if( it != scenePointers.unresolvedComponentPtr.end() )
-		{
-			scenePointers.unresolvedComponentPtr.erase( this );
-		}
+		assert( world->HasComponent( world->GetEntity( _handle ), type ) );
 	}
 
 	//================================================================================================================================

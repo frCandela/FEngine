@@ -36,7 +36,7 @@ namespace fan
 	{
 	public:
 		ComponentPtr() : ComponentPtrBase( _componentType::Info::s_type ) {}
-		_componentType* operator->() const { return &static_cast<_componentType&> ( world->GetComponent( world->GetEntity( handle ), type )); }
+		_componentType* operator->() const { return &(**this); /* use operator**/ }
 		_componentType& operator*() const {  return  static_cast<_componentType&>( world->GetComponent( world->GetEntity( handle ), type )); }
 		bool operator!=( const ComponentPtr<_componentType>& _other ) const { return !( *this == _other ); }
 		bool operator==( const ComponentPtr<_componentType>& _other ) const { return _other.handle == handle; }
