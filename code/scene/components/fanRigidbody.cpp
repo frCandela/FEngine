@@ -14,7 +14,6 @@ namespace fan
 	{
 		_info.icon = ImGui::IconType::RIGIDBODY16;
 		_info.onGui = &Rigidbody::OnGui;
-		_info.init = &Rigidbody::Init;
 		_info.destroy = &Rigidbody::Destroy;
 		_info.load  = &Rigidbody::Load;
 		_info.save  = &Rigidbody::Save;
@@ -26,23 +25,24 @@ namespace fan
 	   
 	//================================================================================================================================
 	//================================================================================================================================
-	void Rigidbody::Init( EcsWorld& _world, EcsComponent& _component )
+	void Rigidbody::Init( EcsWorld& _world, EcsEntity _entity, EcsComponent& _component )
 	{
 		// clear
 		Rigidbody& rb = static_cast<Rigidbody&>( _component );
 		rb.rigidbody = new btRigidBody( 1.f, nullptr, nullptr );
-		rb.rigidbody->setUserPointer( &rb );
+		rb.rigidbody->setUserPointer( &_world );
+		rb.rigidbody->setUserIndex( _world.GetHandle( _entity ) );
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void Rigidbody::Destroy( EcsWorld& _world, EcsComponent& _component )
+	void Rigidbody::Destroy( EcsWorld& _world, EcsEntity _entity, EcsComponent& _component )
 	{
 		PhysicsWorld& physicsWorld = _world.GetSingleton<PhysicsWorld>();
 		Rigidbody& rb = static_cast<Rigidbody&>( _component );
 		assert( rb.rigidbody != nullptr );
 
-		physicsWorld.RemoveRigidbody( rb );
+		physicsWorld.dynamicsWorld->removeRigidBody( rb.rigidbody );
 
 		delete rb.rigidbody;
 		rb.rigidbody = nullptr;

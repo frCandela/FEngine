@@ -11,7 +11,6 @@ namespace fan
 	void MotionState::SetInfo( EcsComponentInfo& _info )
 	{
 		_info.icon = ImGui::IconType::RIGIDBODY16;
-		_info.init = &MotionState::Init;
 		_info.destroy = &MotionState::Destroy;
 		_info.save = &MotionState::Save;
 		_info.load = &MotionState::Load;
@@ -21,7 +20,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void MotionState::Init( EcsWorld& _world, EcsComponent& _component )
+	void MotionState::Init( EcsWorld& _world, EcsEntity _entity, EcsComponent& _component )
 	{
 		// clear
 		MotionState& motionState = static_cast<MotionState&>( _component );
@@ -30,7 +29,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void MotionState::Destroy( EcsWorld& _world, EcsComponent& _component )
+	void MotionState::Destroy( EcsWorld& _world, EcsEntity _entity, EcsComponent& _component )
 	{
 		MotionState& motionState = static_cast<MotionState&>( _component );
 		assert( motionState.motionState != nullptr );

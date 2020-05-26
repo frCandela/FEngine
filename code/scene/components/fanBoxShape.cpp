@@ -10,7 +10,6 @@ namespace fan
 	{
 		_info.icon = ImGui::IconType::CUBE_SHAPE16;
 		_info.onGui = &BoxShape::OnGui;
-		_info.init = &BoxShape::Init;
 		_info.destroy = &BoxShape::Destroy;
 		_info.load  = &BoxShape::Load;
 		_info.save  = &BoxShape::Save;
@@ -20,7 +19,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void BoxShape::Init( EcsWorld& _world, EcsComponent& _component )
+	void BoxShape::Init( EcsWorld& _world, EcsEntity _entity, EcsComponent& _component )
 	{
 		BoxShape& boxShape = static_cast<BoxShape&>( _component );
 		boxShape.boxShape = new btBoxShape( btVector3( 0.5f, 0.5f, 0.5f ) );
@@ -29,7 +28,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void BoxShape::Destroy( EcsWorld& _world, EcsComponent& _component )
+	void BoxShape::Destroy( EcsWorld& _world, EcsEntity _entity, EcsComponent& _component )
 	{
 		BoxShape& boxShape = static_cast<BoxShape&>( _component );
 		assert( boxShape.boxShape != nullptr );

@@ -10,7 +10,6 @@ namespace fan
 	{
 		_info.icon = ImGui::IconType::SPHERE_SHAPE16;
 		_info.onGui = &SphereShape::OnGui;
-		_info.init = &SphereShape::Init;
 		_info.destroy = &SphereShape::Destroy;
 		_info.load  = &SphereShape::Load;
 		_info.save  = &SphereShape::Save;
@@ -20,7 +19,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void SphereShape::Init( EcsWorld& _world, EcsComponent& _component )
+	void SphereShape::Init( EcsWorld& _world, EcsEntity _entity, EcsComponent& _component )
 	{
 		SphereShape& sphereShape = static_cast<SphereShape&>( _component );
 		sphereShape.sphereShape = new btSphereShape( 1.f );
@@ -29,7 +28,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void SphereShape::Destroy( EcsWorld& _world, EcsComponent& _component )
+	void SphereShape::Destroy( EcsWorld& _world, EcsEntity _entity, EcsComponent& _component )
 	{
 		SphereShape& sphereShape = static_cast<SphereShape&>( _component );
 		assert( sphereShape.sphereShape != nullptr );

@@ -11,13 +11,12 @@ namespace fan
 	{
 		_info.icon = ImGui::IconType::NETWORK16;
 		_info.onGui = &HostReplication::OnGui;
-		_info.init = &HostReplication::Init;
 		_info.name = "host replication";
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void HostReplication::Init( EcsWorld& _world, EcsComponent& _component )
+	void HostReplication::Init( EcsWorld& _world, EcsEntity _entity, EcsComponent& _component )
 	{
 		HostReplication& hostReplication = static_cast<HostReplication&>( _component );
 		hostReplication.pendingReplication.clear();

@@ -23,8 +23,8 @@ namespace fan
 		};
 
 		static void SetInfo( EcsComponentInfo& _info );
-		static void Init( EcsWorld& _world, EcsComponent& _component );
-		static void Destroy( EcsWorld& _world, EcsComponent& _component );
+		static void Init( EcsWorld& _world, EcsEntity _entity, EcsComponent& _component );
+		static void Destroy( EcsWorld& _world, EcsEntity _entity, EcsComponent& _component );
 		static void OnGui( EcsWorld& _world, EcsEntity _entityID, EcsComponent& _component );
 
 		void Build( const std::string& _name, Scene& _scene, const EcsHandle _handle, SceneNode* const _parent);

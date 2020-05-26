@@ -10,7 +10,6 @@ namespace fan
 	{
 		_info.icon = ImGui::IconType::UI_PROGRESS_BAR16;
 		_info.onGui = &ProgressBar::OnGui;
-		_info.init = &ProgressBar::Init;
 		_info.load = &ProgressBar::Load;
 		_info.save = &ProgressBar::Save;
 		_info.editorPath = "ui/";
@@ -19,7 +18,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void ProgressBar::Init( EcsWorld& _world, EcsComponent& _component )
+	void ProgressBar::Init( EcsWorld& _world, EcsEntity _entity, EcsComponent& _component )
 	{
 		ProgressBar& progressBar = static_cast<ProgressBar&>( _component );
 		progressBar.progress = 1.f;

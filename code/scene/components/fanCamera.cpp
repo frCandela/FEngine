@@ -13,7 +13,6 @@ namespace fan
 	{
 		_info.icon = ImGui::IconType::CAMERA16;
 		_info.onGui = &Camera::OnGui;
-		_info.init = &Camera::Init;
 		_info.load = &Camera::Load;
 		_info.save = &Camera::Save;
 		_info.editorPath = "/";
@@ -22,7 +21,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void Camera::Init( EcsWorld& _world, EcsComponent& _component )
+	void Camera::Init( EcsWorld& _world, EcsEntity _entity, EcsComponent& _component )
 	{
 		Camera& camera = static_cast<Camera&>( _component );
 

@@ -18,8 +18,8 @@ namespace fan
 		static void SetInfo( EcsSingletonInfo& _info );
 		static void Init( EcsWorld& _world, EcsSingleton& _component );
 
-		void OnBulletContact(	 Rigidbody* _other, btPersistentManifold* const& _manifold );
-		void OnSpaceShipContact( Rigidbody* _other, btPersistentManifold* const& _manifold );
+		void OnBulletContact( Rigidbody& _bulletBody, Rigidbody& _otherBody, btPersistentManifold* const& _manifold );
+		void OnSpaceShipContact( Rigidbody& _spaceshipBody, Rigidbody& _otherBody, btPersistentManifold* const& _manifold );
 
 		EcsWorld* const world = nullptr;
 	};

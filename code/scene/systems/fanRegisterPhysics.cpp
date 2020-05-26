@@ -52,15 +52,7 @@ namespace fan
 			rb.SetMotionState( motionState );
 			rb.SetCollisionShape( shape );
 
-			if( _world.HasComponent<SceneNode>( entity ) )
-			{
-				SceneNode& sceneNode = _world.GetComponent<SceneNode>( entity );
-				physicsWorld.AddRigidbody( rb, sceneNode.handle );
-			}
-			else
-			{
-				physicsWorld.dynamicsWorld->addRigidBody( rb.rigidbody );
-			}			
+			physicsWorld.dynamicsWorld->addRigidBody( rb.rigidbody );		
 		}
 	}
 
@@ -80,7 +72,7 @@ namespace fan
 		for( auto rigidbodyIt = _view.begin<Rigidbody>(); rigidbodyIt != _view.end<Rigidbody>(); ++rigidbodyIt )
 		{
 			Rigidbody& rigidbody = *rigidbodyIt;
-			physicsWorld.RemoveRigidbody( rigidbody );
+			physicsWorld.dynamicsWorld->removeRigidBody( rigidbody.rigidbody );
 		}
 	}
 }

@@ -7,7 +7,6 @@ namespace fan
 	void ServerConnection::SetInfo( EcsSingletonInfo& _info )
 	{
 		_info.icon = ImGui::NETWORK16;
-		_info.init = &ServerConnection::Init;
 		_info.onGui = &ServerConnection::OnGui;
 		_info.name = "server connection";
 	}

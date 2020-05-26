@@ -10,14 +10,13 @@ namespace fan
 	void ClientRPC::SetInfo( EcsComponentInfo& _info )
 	{
 		_info.icon = ImGui::NETWORK16;
-		_info.init = &ClientRPC::Init;
 		_info.onGui = &ClientRPC::OnGui;
 		_info.name = "RPC manager";
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void ClientRPC::Init( EcsWorld& _world, EcsComponent& _component )
+	void ClientRPC::Init( EcsWorld& _world, EcsEntity _entity, EcsComponent& _component )
 	{
 		ClientRPC& rpc = static_cast<ClientRPC&>( _component );
 		rpc.nameToRPCTable.clear();

@@ -11,7 +11,6 @@ namespace fan
 	{
 		_info.icon = ImGui::IconType::DIR_LIGHT16;
 		_info.onGui = &DirectionalLight::OnGui;
-		_info.init = &DirectionalLight::Init;
 		_info.load = &DirectionalLight::Load;
 		_info.save = &DirectionalLight::Save;
 		_info.editorPath = "lights/";
@@ -20,7 +19,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void DirectionalLight::Init( EcsWorld& _world, EcsComponent& _component )
+	void DirectionalLight::Init( EcsWorld& _world, EcsEntity _entity, EcsComponent& _component )
 	{
 		DirectionalLight& light = static_cast<DirectionalLight&>( _component );
 		light.ambiant = Color( 0.1f, 0.1f, 0.1f );

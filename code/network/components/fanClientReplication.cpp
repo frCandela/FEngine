@@ -12,14 +12,13 @@ namespace fan
 	void ClientReplication::SetInfo( EcsComponentInfo& _info )
 	{
 		_info.icon = ImGui::NETWORK16;
-		_info.init = &ClientReplication::Init;
 		_info.onGui = &ClientReplication::OnGui;
 		_info.name = "client replication";
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void ClientReplication::Init( EcsWorld& _world, EcsComponent& _component )
+	void ClientReplication::Init( EcsWorld& _world, EcsEntity _entity, EcsComponent& _component )
 	{
 		ClientReplication& replicationManager = static_cast<ClientReplication&>( _component );
 		replicationManager.replicationListRPC.clear();

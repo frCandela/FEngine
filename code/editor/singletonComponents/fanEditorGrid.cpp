@@ -10,7 +10,6 @@ namespace fan
 	void EditorGrid::SetInfo( EcsSingletonInfo& _info )
 	{
 		_info.icon = ImGui::NONE;
-		_info.init = &EditorGrid::Init;
 		_info.name = "editor grid";
 	}
 

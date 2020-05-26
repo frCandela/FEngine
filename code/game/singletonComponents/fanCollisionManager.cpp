@@ -19,7 +19,6 @@ namespace fan
 	void CollisionManager::SetInfo( EcsSingletonInfo& _info )
 	{
 		_info.icon = ImGui::RIGIDBODY16;
-		_info.init = &CollisionManager::Init;
 		_info.name = "collision manager";
 	}
 
@@ -33,14 +32,9 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void CollisionManager::OnBulletContact( Rigidbody* _other, btPersistentManifold* const& _manifold )
+	void CollisionManager::OnBulletContact( Rigidbody& _bulletBody, Rigidbody& _otherBody, btPersistentManifold* const& _manifold )
 	{
-		Rigidbody* rb0 = static_cast<Rigidbody*> ( _manifold->getBody0()->getUserPointer() );
-		Rigidbody* rb1 = static_cast<Rigidbody*> ( _manifold->getBody1()->getUserPointer() );
-		Rigidbody& bulletRb = _other == rb0 ? *rb1 : *rb0;
-
-		PhysicsWorld& physicsWorld = world->GetSingleton<PhysicsWorld>();
-		const EcsHandle bulletHandle = physicsWorld.rigidbodiesHandles[&bulletRb];
+		const EcsHandle bulletHandle = _bulletBody.GetHandle();
 		const EcsEntity bulletID = world->GetEntity( bulletHandle );
 		const Bullet& bullet = world->GetComponent< Bullet >( bulletID );
 		
@@ -57,17 +51,11 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void CollisionManager::OnSpaceShipContact( Rigidbody* _other, btPersistentManifold* const& _manifold )
+	void CollisionManager::OnSpaceShipContact( Rigidbody& _spaceshipBody, Rigidbody& _otherBody, btPersistentManifold* const& _manifold )
 	{
-		Rigidbody* rb0 = static_cast<Rigidbody*> ( _manifold->getBody0()->getUserPointer() );
-		Rigidbody* rb1 = static_cast<Rigidbody*> ( _manifold->getBody1()->getUserPointer() );
-		Rigidbody& spaceshipRb = _other == rb0 ? *rb1 : *rb0;
-		Rigidbody& otherRb = *_other;
-
 		// get ids
-		PhysicsWorld& physicsWorld = world->GetSingleton<PhysicsWorld>();
-		const EcsHandle spaceshipHandle = physicsWorld.rigidbodiesHandles[&spaceshipRb];
-		const EcsHandle otherHandle = physicsWorld.rigidbodiesHandles[&otherRb];
+		const EcsHandle spaceshipHandle = _spaceshipBody.GetHandle();
+		const EcsHandle otherHandle = _otherBody.GetHandle();
 		const EcsEntity spaceshipID = world->GetEntity( spaceshipHandle );
 		const EcsEntity otherID = world->GetEntity( otherHandle );
 
@@ -78,7 +66,7 @@ namespace fan
 		if( !dir.fuzzyZero() )
 		{
 			SpaceShip& spaceship = world->GetComponent<SpaceShip>( spaceshipID );
-			spaceshipRb.rigidbody->applyCentralForce( spaceship.collisionRepulsionForce * dir.normalized() );
+			_spaceshipBody.rigidbody->applyCentralForce( spaceship.collisionRepulsionForce * dir.normalized() );
 		}
 
 		// applies damage

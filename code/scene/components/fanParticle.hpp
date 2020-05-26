@@ -14,7 +14,7 @@ namespace fan
 		ECS_COMPONENT( Particle )
 	public:
 		static void SetInfo( EcsComponentInfo& _info );
-		static void Init( EcsWorld& _world, EcsComponent& _component );
+		static void Init( EcsWorld& _world, EcsEntity _entity, EcsComponent& _component );
 
 		Color		color;
 		glm::vec3	position;

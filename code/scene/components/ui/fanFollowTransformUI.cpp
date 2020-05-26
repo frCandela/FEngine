@@ -13,7 +13,6 @@ namespace fan
 	void FollowTransformUI::SetInfo( EcsComponentInfo& _info )
 	{
 		_info.icon = ImGui::IconType::UI_TRANSFORM16;
-		_info.init = &FollowTransformUI::Init;
 		_info.onGui =&FollowTransformUI::OnGui;
 		_info.save = &FollowTransformUI::Save;
 		_info.load = &FollowTransformUI::Load;
@@ -23,7 +22,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void FollowTransformUI::Init( EcsWorld& _world, EcsComponent& _component )
+	void FollowTransformUI::Init( EcsWorld& _world, EcsEntity _entity, EcsComponent& _component )
 	{
 		// clear
 		FollowTransformUI& followTransform = static_cast<FollowTransformUI&>( _component );

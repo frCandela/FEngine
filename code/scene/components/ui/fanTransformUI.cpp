@@ -10,7 +10,6 @@ namespace fan
 	{
 		_info.icon = ImGui::IconType::UI_TRANSFORM16;
 		_info.onGui = &TransformUI::OnGui;
-		_info.init = &TransformUI::Init;
 		_info.load = &TransformUI::Load;
 		_info.save = &TransformUI::Save;
 		_info.editorPath = "ui/";
@@ -19,7 +18,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void TransformUI::Init( EcsWorld& _world, EcsComponent& _component )
+	void TransformUI::Init( EcsWorld& _world, EcsEntity _entity, EcsComponent& _component )
 	{
 		TransformUI& transform = static_cast<TransformUI&>( _component );
 

@@ -30,10 +30,7 @@ namespace fan
 		btDbvtBroadphase*					 overlappingPairCache;
 		btSequentialImpulseConstraintSolver* solver;
 		btDiscreteDynamicsWorld*			 dynamicsWorld;
-		std::unordered_map< Rigidbody*, EcsHandle > rigidbodiesHandles;
 
-		void AddRigidbody( Rigidbody& _rigidbody, EcsHandle _entityID );
-		void RemoveRigidbody( Rigidbody& _rigidbody );
 		void Reset();
 
 		static void ContactStartedCallback( btPersistentManifold* const& _manifold );

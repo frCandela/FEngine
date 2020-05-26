@@ -10,7 +10,6 @@ namespace fan
 	{
 		_info.icon = ImGui::IconType::JOYSTICK16;
 		_info.onGui = &Damage::OnGui;
-		_info.init = &Damage::Init;
 		_info.load = &Damage::Load;
 		_info.save = &Damage::Save;
 		_info.editorPath = "game/";
@@ -19,7 +18,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void Damage::Init( EcsWorld& _world, EcsComponent& _component )
+	void Damage::Init( EcsWorld& _world, EcsEntity _entity, EcsComponent& _component )
 	{
 		Damage& damage = static_cast<Damage&>( _component );
 		damage.damage = 1.f;

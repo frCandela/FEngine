@@ -11,7 +11,6 @@ namespace fan
 	{
 		_info.icon = ImGui::IconType::JOYSTICK16;
 		_info.onGui = &SolarPanel::OnGui;
-		_info.init = &SolarPanel::Init;
 		_info.load = &SolarPanel::Load;
 		_info.save = &SolarPanel::Save;
 		_info.editorPath = "game/";
@@ -20,7 +19,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void SolarPanel::Init( EcsWorld& _world, EcsComponent& _component )
+	void SolarPanel::Init( EcsWorld& _world, EcsEntity _entity, EcsComponent& _component )
 	{
 		SolarPanel& solarPanel = static_cast<SolarPanel&>( _component );
 		solarPanel.isInSunlight = false;

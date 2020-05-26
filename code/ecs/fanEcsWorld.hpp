@@ -49,6 +49,7 @@ namespace fan
 		}
 		EcsHandle	AddHandle( const EcsEntity _entity );
 		void		SetHandle( const EcsEntity _entity, EcsHandle _handle );
+		EcsHandle	GetHandle( const EcsEntity _entity ) const;
 		void		RemoveHandle( const EcsEntity _entity );
 		EcsHandle	GetNextHandle() const { return m_nextHandle; }
 		void		SetNextHandle( const EcsHandle  _handle ) { m_nextHandle = _handle; }

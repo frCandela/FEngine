@@ -13,7 +13,6 @@ namespace fan
 	{
 		_info.icon = ImGui::IconType::JOYSTICK16;
 		_info.onGui = &PlayerInput::OnGui;
-		_info.init = &PlayerInput::Init;
 		_info.save = &PlayerInput::Save;
 		_info.load = &PlayerInput::Load;
 		_info.editorPath = "game/player/";
@@ -22,7 +21,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void PlayerInput::Init( EcsWorld& _world, EcsComponent& _component )
+	void PlayerInput::Init( EcsWorld& _world, EcsEntity _entity, EcsComponent& _component )
 	{
 		PlayerInput& playerInput = static_cast<PlayerInput&>( _component );
 		playerInput.orientation = btVector3(0,0,1);

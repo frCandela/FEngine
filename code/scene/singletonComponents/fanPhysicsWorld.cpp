@@ -15,7 +15,6 @@ namespace fan
 	void PhysicsWorld::SetInfo( EcsSingletonInfo& _info )
 	{
 		_info.icon = ImGui::RIGIDBODY16;
-		_info.init = &PhysicsWorld::Init;
 		_info.onGui = &PhysicsWorld::OnGui;
 		_info.save = &PhysicsWorld::Save;
 		_info.load = &PhysicsWorld::Load;
@@ -51,7 +50,6 @@ namespace fan
 				physicsWorld.dynamicsWorld->setGravity( gravity );
 			}
 			ImGui::Text( "num rigidbodies : %d", physicsWorld.dynamicsWorld->getNumCollisionObjects() );
-			ImGui::Text( "num handles:      %d", physicsWorld.rigidbodiesHandles.size() );
 		}
 		ImGui::Unindent(); ImGui::Unindent();
 	}
@@ -148,7 +146,6 @@ namespace fan
 			btCollisionObject* obj = dynamicsWorld->getCollisionObjectArray()[i];
 			dynamicsWorld->removeCollisionObject( obj );
 		}
-		rigidbodiesHandles.clear();
 
 		delete solver;
 		delete overlappingPairCache;
@@ -163,10 +160,14 @@ namespace fan
 	{
 		if( _manifold->getNumContacts() == 1 )
 		{
-			Rigidbody* rb0 = static_cast<Rigidbody*> ( _manifold->getBody0()->getUserPointer() );
-			Rigidbody* rb1 = static_cast<Rigidbody*> ( _manifold->getBody1()->getUserPointer() );
-			rb0->onContactStarted.Emmit( rb1, _manifold );
-			rb1->onContactStarted.Emmit( rb0, _manifold );
+			EcsWorld& world = * static_cast<EcsWorld*> ( _manifold->getBody0()->getUserPointer() );
+
+			const EcsHandle rb0Handle = static_cast<EcsHandle> ( _manifold->getBody0()->getUserIndex() );
+			const EcsHandle rb1Handle = static_cast<EcsHandle> ( _manifold->getBody1()->getUserIndex() );
+			Rigidbody& rb0 = world.GetComponent< Rigidbody >( world.GetEntity( rb0Handle ) );
+			Rigidbody& rb1 = world.GetComponent< Rigidbody >( world.GetEntity( rb1Handle ) );
+			rb0.onContactStarted.Emmit( rb0, rb1, _manifold );
+			rb1.onContactStarted.Emmit( rb1, rb0, _manifold );
 		}
 	}
 
@@ -176,32 +177,14 @@ namespace fan
 	{
 		if( _manifold->getNumContacts() == 0 )
 		{
-			Rigidbody* rb0 = static_cast<Rigidbody*> ( _manifold->getBody0()->getUserPointer() );
-			Rigidbody* rb1 = static_cast<Rigidbody*> ( _manifold->getBody1()->getUserPointer() );
-			rb0->onContactEnded.Emmit( rb1, _manifold );
-			rb1->onContactEnded.Emmit( rb0, _manifold );
-		}
-	}
+			EcsWorld& world = *static_cast<EcsWorld*> ( _manifold->getBody0()->getUserPointer() );
 
-	//================================================================================================================================
-	// adds a rigidbody to the dynamics world and saves its handle ( useful for later use in collision callbacks )
-	//================================================================================================================================	
-	void PhysicsWorld::AddRigidbody( Rigidbody& _rigidbody, EcsHandle _handle )
-	{
-		rigidbodiesHandles[&_rigidbody] = _handle;
-		dynamicsWorld->addRigidBody( _rigidbody.rigidbody );
-	}
-
-	//================================================================================================================================
-	// removes a rigidbody from the dynamics world and erases its handle
-	//================================================================================================================================	
-	void PhysicsWorld::RemoveRigidbody( Rigidbody& _rigidbody )
-	{
-		auto it = rigidbodiesHandles.find( &_rigidbody );
-		if( it != rigidbodiesHandles.end() )
-		{
-			rigidbodiesHandles.erase( it );
+			const EcsHandle rb0Handle = static_cast<EcsHandle> ( _manifold->getBody0()->getUserIndex() );
+			const EcsHandle rb1Handle = static_cast<EcsHandle> ( _manifold->getBody1()->getUserIndex() );
+			Rigidbody& rb0 = world.GetComponent< Rigidbody >( world.GetEntity( rb0Handle ) );
+			Rigidbody& rb1 = world.GetComponent< Rigidbody >( world.GetEntity( rb1Handle ) );
+			rb0.onContactEnded.Emmit( rb0, rb1, _manifold );
+			rb1.onContactEnded.Emmit( rb1, rb0, _manifold );
 		}
-		dynamicsWorld->removeRigidBody( _rigidbody.rigidbody );
 	}
 }

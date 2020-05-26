@@ -10,7 +10,6 @@ namespace fan
 	{
 		_info.icon = ImGui::IconType::ENERGY16;
 		_info.onGui = &Battery::OnGui;
-		_info.init = &Battery::Init;
 		_info.load = &Battery::Load;
 		_info.save = &Battery::Save;
 		_info.name = "battery";
@@ -19,7 +18,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void Battery::Init( EcsWorld& _world, EcsComponent& _component )
+	void Battery::Init( EcsWorld& _world, EcsEntity _entity, EcsComponent& _component )
 	{
 		Battery& battery = static_cast<Battery&>( _component );
 		battery.maxEnergy = 100.f;

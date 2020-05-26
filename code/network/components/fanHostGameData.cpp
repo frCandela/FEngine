@@ -8,13 +8,12 @@ namespace fan
 	{
 		_info.icon = ImGui::IconType::NETWORK16;
 		_info.onGui = &HostGameData::OnGui;
-		_info.init =  &HostGameData::Init;
 		_info.name = "host game data";
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void HostGameData::Init( EcsWorld& _world, EcsComponent& _component )
+	void HostGameData::Init( EcsWorld& _world, EcsEntity _entity, EcsComponent& _component )
 	{
 		HostGameData& hostGameData = static_cast<HostGameData&>( _component );
 		hostGameData.spaceshipID = 0;

@@ -10,7 +10,6 @@ namespace fan
 	{
 		_info.icon = ImGui::IconType::STOP16;
 		_info.onGui = &ExpirationTime::OnGui;
-		_info.init = &ExpirationTime::Init;
 		_info.load  = &ExpirationTime::Load;
 		_info.save  = &ExpirationTime::Save;
 		_info.editorPath = "/";
@@ -19,7 +18,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void ExpirationTime::Init( EcsWorld& _world, EcsComponent& _component )
+	void ExpirationTime::Init( EcsWorld& _world, EcsEntity _entity, EcsComponent& _component )
 	{
 		ExpirationTime& expiration = static_cast<ExpirationTime&>( _component );
 		expiration.duration = 10.f;

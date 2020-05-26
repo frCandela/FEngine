@@ -11,7 +11,6 @@ namespace fan
 	{
 		_info.icon = ImGui::IconType::MATERIAL16;
 		_info.onGui = &Material::OnGui;
-		_info.init = &Material::Init;
 		_info.load  = &Material::Load;
 		_info.save  = &Material::Save;
 		_info.editorPath = "/";
@@ -20,7 +19,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void Material::Init( EcsWorld& _world, EcsComponent& _component )
+	void Material::Init( EcsWorld& _world, EcsEntity _entity, EcsComponent& _component )
 	{
 		Material& material = static_cast<Material&>( _component );
 

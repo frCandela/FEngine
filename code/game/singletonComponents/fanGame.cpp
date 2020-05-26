@@ -22,7 +22,6 @@ namespace fan
 	void Game::SetInfo( EcsSingletonInfo& _info )
 	{
 		_info.icon = ImGui::JOYSTICK16;
-		_info.init = &Game::Init;
 		_info.onGui = &Game::OnGui;
 		_info.save = &Game::Save;
 		_info.load = &Game::Load;
@@ -76,8 +75,8 @@ namespace fan
 	}
 
 	//================================================================================================================================
-// generates the spaceship entity from the game prefab
-//================================================================================================================================
+	// generates the spaceship entity from the game prefab
+	//================================================================================================================================
 	EcsHandle Game::SpawnSpaceship( EcsWorld& _world )
 	{
 		// spawn the spaceship	
@@ -104,7 +103,7 @@ namespace fan
 				BoxShape& boxShape = _world.GetComponent<BoxShape>( spaceshipID );
 				rigidbody.SetCollisionShape( boxShape.boxShape );
 				rigidbody.SetMotionState( motionState.motionState );
-				physicsWorld.AddRigidbody( rigidbody, spaceshipNode.handle );
+				physicsWorld.dynamicsWorld->addRigidBody( rigidbody.rigidbody );
 
 				// registers physics callbacks
 				CollisionManager& collisionManager = _world.GetSingleton<CollisionManager>();

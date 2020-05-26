@@ -13,7 +13,6 @@ namespace fan
 	{
 		_info.icon = ImGui::IconType::POINT_LIGHT16;
 		_info.onGui = &PointLight::OnGui;
-		_info.init = &PointLight::Init;
 		_info.load = &PointLight::Load;
 		_info.save = &PointLight::Save;
 		_info.editorPath = "lights/";
@@ -22,7 +21,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void PointLight::Init( EcsWorld& _world, EcsComponent& _component )
+	void PointLight::Init( EcsWorld& _world, EcsEntity _entity, EcsComponent& _component )
 	{
 		PointLight& pointLight = static_cast<PointLight&>( _component );
 		pointLight.ambiant = Color::White;

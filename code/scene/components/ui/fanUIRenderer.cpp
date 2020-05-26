@@ -12,7 +12,6 @@ namespace fan
 	{
 		_info.icon = ImGui::IconType::UI_MESH_RENDERER16;
 		_info.onGui = &UIRenderer::OnGui;
-		_info.init = &UIRenderer::Init;
 		_info.load = &UIRenderer::Load;
 		_info.save = &UIRenderer::Save;
 		_info.editorPath = "ui/";
@@ -21,7 +20,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void UIRenderer::Init( EcsWorld& _world, EcsComponent& _component )
+	void UIRenderer::Init( EcsWorld& _world, EcsEntity _entity, EcsComponent& _component )
 	{
 		UIRenderer& uiRenderer = static_cast<UIRenderer&>( _component );
 

@@ -23,7 +23,6 @@ namespace fan
 	void ServerNetworkManager::SetInfo( EcsSingletonInfo& _info )
 	{
 		_info.icon = ImGui::NETWORK16;
-		_info.init = &ServerNetworkManager::Init;
 		_info.onGui = &ServerNetworkManager::OnGui;
 		_info.name = "server network manager";
 	}

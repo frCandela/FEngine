@@ -12,7 +12,6 @@ namespace fan
 	{
 		_info.icon = ImGui::IconType::JOYSTICK16;
 		_info.onGui = &PlayerController::OnGui;
-		_info.init = &PlayerController::Init;
 		_info.load = &PlayerController::Load;
 		_info.save = &PlayerController::Save;
 		_info.editorPath = "game/player/";
@@ -21,7 +20,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void PlayerController::Init( EcsWorld& _world, EcsComponent& _component )
+	void PlayerController::Init( EcsWorld& _world, EcsEntity _entity, EcsComponent& _component )
 	{
 		PlayerController& playerController = static_cast<PlayerController&>( _component );
 

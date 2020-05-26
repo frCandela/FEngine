@@ -11,7 +11,6 @@ namespace fan
 	{
 		_info.icon = ImGui::IconType::PLANET16;
 		_info.onGui = &Planet::OnGui;
-		_info.init = &Planet::Init;
 		_info.load = &Planet::Load;
 		_info.save = &Planet::Save;
 		_info.editorPath = "game/";
@@ -20,7 +19,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void Planet::Init( EcsWorld& _world, EcsComponent& _component )
+	void Planet::Init( EcsWorld& _world, EcsEntity _entity, EcsComponent& _component )
 	{
 		Planet& planet = static_cast<Planet&>( _component );
 		planet.speed = 1.f;

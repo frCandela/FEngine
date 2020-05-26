@@ -18,8 +18,9 @@ namespace fan
 		for( int transitionIndex = m_transitionArchetype.Size() - 1; transitionIndex >= 0; --transitionIndex )
 		{
 			const EcsTransition& transition = m_transitions[transitionIndex];
-			EcsArchetype& srcArchetype = *transition.entityID.archetype;
-			const uint32_t srcIndex = transition.entityID.index;
+			const EcsEntity srcEntity = transition.entityID;
+			EcsArchetype& srcArchetype = *srcEntity.archetype;
+			const uint32_t srcIndex = srcEntity.index;
 
 			EcsEntityData srcEntityCpy = srcArchetype.m_entities[srcIndex];
 			assert( srcEntityCpy.transitionIndex == transitionIndex );
@@ -48,7 +49,7 @@ namespace fan
 							if( info.destroy != nullptr )
 							{
 								EcsComponent& component = *static_cast<EcsComponent*>( srcArchetype.m_chunks[componentIndex].At( srcIndex ) );
-								info.destroy( *this, component );
+								info.destroy( *this, srcEntity, component );
 							}
 							srcArchetype.m_chunks[componentIndex].Remove( srcIndex );
 						}
@@ -93,7 +94,7 @@ namespace fan
 							if( info.destroy != nullptr )
 							{
 								EcsComponent& component = *static_cast<EcsComponent*>( srcArchetype.m_chunks[componentIndex].At( srcIndex ) );
-								info.destroy( *this, component );
+								info.destroy( *this, srcEntity, component );
 							}
 						}
 					}
@@ -189,18 +190,17 @@ namespace fan
 	EcsHandle	EcsWorld::AddHandle( const EcsEntity _entity )
 	{
 		EcsEntityData& entity = _entity.archetype->m_entities[_entity.index];
-		if( entity.handle != 0 )
-		{
-			return entity.handle;
-		}
-		else
-		{
-			entity.handle = m_nextHandle++;
-			m_handles[entity.handle] = _entity;
-			return entity.handle;
-		}
+		assert( entity.handle == 0 );
+		entity.handle = m_nextHandle++;
+		m_handles[entity.handle] = _entity;
+		return entity.handle;
 	}
 
+	EcsHandle	EcsWorld::GetHandle( const EcsEntity _entity ) const
+	{
+		EcsEntityData& entity = _entity.archetype->m_entities[_entity.index];
+		return entity.handle;
+	}
 
 	//================================================================================================================================
 	// Assigns a specific handle to an entity without incrementing the m_nextHandle counter
@@ -284,7 +284,7 @@ namespace fan
 		EcsComponent& component = *static_cast<EcsComponent*>( m_transitionArchetype.m_chunks[componentIndex].At( entityData.transitionIndex ) );
 		EcsComponentInfo info = m_componentsInfo[componentIndex];
 		info.construct( &component );
-		info.init( *this, component );
+		info.init( *this, _entity, component );
 
 		return component;
 	}

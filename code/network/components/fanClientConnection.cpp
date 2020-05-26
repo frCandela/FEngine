@@ -12,7 +12,6 @@ namespace fan
 	void ClientConnection::SetInfo( EcsComponentInfo& _info )
 	{
 		_info.icon = ImGui::NETWORK16;
-		_info.init = &ClientConnection::Init;
 		_info.destroy = &ClientConnection::Destroy;
 		_info.onGui = &ClientConnection::OnGui;
 		_info.name = "client connection";
@@ -20,7 +19,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void ClientConnection::Init( EcsWorld& _world, EcsComponent& _component )
+	void ClientConnection::Init( EcsWorld& _world, EcsEntity _entity, EcsComponent& _component )
 	{
 		ClientConnection& connection = static_cast<ClientConnection&>( _component );
 		assert( connection.socket == nullptr );
@@ -39,7 +38,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void ClientConnection::Destroy( EcsWorld& _world, EcsComponent& _component )
+	void ClientConnection::Destroy( EcsWorld& _world, EcsEntity _entity, EcsComponent& _component )
 	{
 		ClientConnection& connection = static_cast<ClientConnection&>( _component );
 		delete connection.socket;

@@ -12,7 +12,6 @@ namespace fan
 	{
 		_info.icon = ImGui::IconType::TRANSFORM16;
 		_info.onGui = &Transform::OnGui;
-		_info.init = &Transform::Init;
 		_info.save = &Transform::Save;
 		_info.load = &Transform::Load;
 		_info.netSave = &Transform::NetSave;
@@ -23,7 +22,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void Transform::Init( EcsWorld& _world, EcsComponent& _component )
+	void Transform::Init( EcsWorld& _world, EcsEntity _entity, EcsComponent& _component )
 	{
 		Transform& transform = static_cast<Transform&>( _component );
 		transform.transform.setIdentity();

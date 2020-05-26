@@ -14,13 +14,12 @@ namespace fan
 	{
 		_info.icon = ImGui::IconType::NETWORK16;
 		_info.onGui = &ReliabilityLayer::OnGui;
-		_info.init = &ReliabilityLayer::Init;
 		_info.name = "reliability layer";
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void ReliabilityLayer::Init( EcsWorld& _world, EcsComponent& _component )
+	void ReliabilityLayer::Init( EcsWorld& _world, EcsEntity _entity, EcsComponent& _component )
 	{
 		ReliabilityLayer& reliabilityLayer = static_cast<ReliabilityLayer&>( _component );
 		reliabilityLayer.nextPacketTag = 0;

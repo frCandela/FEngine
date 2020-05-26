@@ -10,7 +10,6 @@ namespace fan
 	{
 		_info.icon = ImGui::IconType::SPACE_SHIP16;
 		_info.onGui = &SpaceShip::OnGui;
-		_info.init = &SpaceShip::Init;
 		_info.load = &SpaceShip::Load;
 		_info.save = &SpaceShip::Save;
 		_info.editorPath = "game/player/";
@@ -19,7 +18,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void SpaceShip::Init( EcsWorld& _world, EcsComponent& _component )
+	void SpaceShip::Init( EcsWorld& _world, EcsEntity _entity, EcsComponent& _component )
 	{
 		SpaceShip& spaceship					= static_cast<SpaceShip&>( _component );
 

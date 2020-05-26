@@ -11,7 +11,6 @@ namespace fan
 	{
 		_info.icon = ImGui::IconType::JOYSTICK16;
 		_info.onGui = &Bullet::OnGui;
-		_info.init = &Bullet::Init;
 		_info.load = &Bullet::Load;
 		_info.save = &Bullet::Save;
 		_info.editorPath = "game/";
@@ -20,7 +19,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void Bullet::Init( EcsWorld& _world, EcsComponent& _component )
+	void Bullet::Init( EcsWorld& _world, EcsEntity _entity, EcsComponent& _component )
 	{
 		Bullet& bullet = static_cast<Bullet&>( _component );
 

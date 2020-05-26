@@ -10,7 +10,6 @@ namespace fan
 	{
 		_info.icon = ImGui::IconType::HEART16;
 		_info.onGui = &Health::OnGui;
-		_info.init = &Health::Init;
 		_info.load = &Health::Load;
 		_info.save = &Health::Save;
 		_info.editorPath = "game/";
@@ -19,7 +18,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void Health::Init( EcsWorld& _world, EcsComponent& _component )
+	void Health::Init( EcsWorld& _world, EcsEntity _entity, EcsComponent& _component )
 	{
 		Health& health = static_cast<Health&>( _component );
 		health.invincible = false;

@@ -11,7 +11,6 @@ namespace fan
 	{
 		_info.icon = ImGui::IconType::JOYSTICK16;
 		_info.onGui = &Weapon::OnGui;
-		_info.init = &Weapon::Init;
 		_info.load = &Weapon::Load;
 		_info.save = &Weapon::Save;
 		_info.editorPath = "game/";
@@ -20,7 +19,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void Weapon::Init( EcsWorld& _world, EcsComponent& _component )
+	void Weapon::Init( EcsWorld& _world, EcsEntity _entity, EcsComponent& _component )
 	{
 		Weapon& weapon = static_cast<Weapon&>( _component );
 

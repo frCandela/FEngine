@@ -13,13 +13,12 @@ namespace fan
 	{
 		_info.icon = ImGui::IconType::NETWORK16;
 		_info.onGui = &HostConnection::OnGui;
-		_info.init = &HostConnection::Init;
 		_info.name = "host connection";
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void HostConnection::Init( EcsWorld& _world, EcsComponent& _component )
+	void HostConnection::Init( EcsWorld& _world, EcsEntity _entity, EcsComponent& _component )
 	{
 		HostConnection& hostConnection = static_cast<HostConnection&>( _component );
 		hostConnection.ip = sf::IpAddress();

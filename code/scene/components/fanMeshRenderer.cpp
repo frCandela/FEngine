@@ -12,7 +12,6 @@ namespace fan
 	{
 		_info.icon = ImGui::IconType::MESH_RENDERER16;
 		_info.onGui = &MeshRenderer::OnGui;
-		_info.init = &MeshRenderer::Init;
 		_info.load = &MeshRenderer::Load;
 		_info.save = &MeshRenderer::Save;
 		_info.editorPath = "/";
@@ -21,7 +20,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void MeshRenderer::Init( EcsWorld& _world, EcsComponent& _component )
+	void MeshRenderer::Init( EcsWorld& _world, EcsEntity _entity, EcsComponent& _component )
 	{
 		MeshRenderer& meshRenderer = static_cast<MeshRenderer&>( _component );
 		meshRenderer.mesh = nullptr;

@@ -77,7 +77,7 @@ namespace fan
 					bulletRigidbody.SetMotionState( _world.GetComponent<MotionState>( bulletID ).motionState );
 					bulletRigidbody.SetCollisionShape( _world.GetComponent<SphereShape>( bulletID ).sphereShape );
 
-					physicsWorld.AddRigidbody( bulletRigidbody, node.handle );
+					physicsWorld.dynamicsWorld->addRigidBody( bulletRigidbody.rigidbody );
 				}				
 			}
 		}

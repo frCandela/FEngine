@@ -162,7 +162,6 @@ namespace fan
 		// clears the physics world
 		PhysicsWorld& physicsWorld = world.GetSingleton<PhysicsWorld>();
 		S_UnregisterAllRigidbodies::Run( world, world.Match( S_UnregisterAllRigidbodies::GetSignature( world ) ) );
-		physicsWorld.rigidbodiesHandles.clear();
 
 		// clears the particles mesh
 		RenderWorld& renderWorld = world.GetSingleton<RenderWorld>();

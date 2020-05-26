@@ -7,7 +7,6 @@ namespace fan
 	void PlayersManager::SetInfo( EcsSingletonInfo& _info )
 	{
 		_info.icon = ImGui::JOYSTICK16;
-		_info.init = &PlayersManager::Init;
 		_info.name = "players manager";
 	}
 

@@ -8,7 +8,6 @@ namespace fan
 	{
 		_info.icon = ImGui::IconType::SPACE_SHIP16;
 		_info.onGui = &SpaceshipUI::OnGui;
-		_info.init = &SpaceshipUI::Init;
 		_info.load = &SpaceshipUI::Load;
 		_info.save = &SpaceshipUI::Save;
 		_info.editorPath = "game/";
@@ -17,7 +16,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void SpaceshipUI::Init( EcsWorld& _world, EcsComponent& _component )
+	void SpaceshipUI::Init( EcsWorld& _world, EcsEntity _entity, EcsComponent& _component )
 	{
 		SpaceshipUI& spaceshipUI = static_cast<SpaceshipUI&>( _component );
 		spaceshipUI.uiRootTransform.Init( _world );
