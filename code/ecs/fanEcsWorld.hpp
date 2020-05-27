@@ -21,7 +21,7 @@ namespace fan
 	//================================
 	struct EcsTransition
 	{
-		EcsEntity	entityID;
+		EcsEntity	  entity;
 		EcsSignature  signatureAdd = EcsSignature( 0 );		// bit to 1 means add component
 		EcsSignature  signatureRemove = EcsSignature( 0 );	// bit to 1 means remove component
 		bool isDead = false;

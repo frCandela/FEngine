@@ -61,6 +61,6 @@ namespace fan {
 
 		EcsSignature					m_signature;
 		std::vector< EcsChunkVector >	m_chunks;		// one index per component type
-		std::vector< EcsEntityData >		m_entities;	
+		std::vector< EcsEntityData >	m_entities;	
 	};
 }

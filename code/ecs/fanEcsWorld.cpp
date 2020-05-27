@@ -9,24 +9,46 @@ namespace fan
 	{
 		m_transitionArchetype.Create( m_componentsInfo, ~EcsSignature( 0 ) );
 	}
+
+	struct SortedTransition
+	{
+		int transitionIndex;
+		uint32_t entityIndex;
+		bool operator<( const SortedTransition& _other ) const  { return ( entityIndex < _other.entityIndex ); }
+	};
+
 	void EcsWorld::ApplyTransitions()
 	{
+		assert( m_transitionArchetype.Size() == m_transitions.size() );
+		if( m_transitions.size() == 0 ) { return; }
+
 		m_isApplyingTransitions = true;
 
-		// Applies structural transition to entities ( add/remove components/tags, add/remove entities
-		assert( m_transitionArchetype.Size() == m_transitions.size() );
-		for( int transitionIndex = m_transitionArchetype.Size() - 1; transitionIndex >= 0; --transitionIndex )
+		// Sort transitions by ascending entity index
+		std::vector<SortedTransition> sortedTransitions;
+		sortedTransitions.reserve( m_transitions.size() );
+		for (int transitionIndex = 0; transitionIndex < m_transitions.size(); transitionIndex++)
 		{
 			const EcsTransition& transition = m_transitions[transitionIndex];
-			const EcsEntity srcEntity = transition.entityID;
-			EcsArchetype& srcArchetype = *srcEntity.archetype;
-			const uint32_t srcIndex = srcEntity.index;
+			sortedTransitions.push_back( { transitionIndex, transition.entity.index } );
+		}
+		std::sort( sortedTransitions.begin(), sortedTransitions.end() );
 
-			EcsEntityData srcEntityCpy = srcArchetype.m_entities[srcIndex];
-			assert( srcEntityCpy.transitionIndex == transitionIndex );
-			srcEntityCpy.transitionIndex = -1;
+		// Applies structural transition to entities ( add/remove components/tags, add/remove entities
+		for (int sortedTransitionIdx = int(sortedTransitions.size()) - 1; sortedTransitionIdx >= 0 ; sortedTransitionIdx--)
+		{
+			const SortedTransition&		sortedTransition = sortedTransitions[sortedTransitionIdx];
+			const int					transitionIndex = sortedTransition.transitionIndex;
+			const EcsTransition&		transition = m_transitions[ transitionIndex ];
+			const EcsEntity&			srcEntity = transition.entity;
+			const uint32_t				srcIndex = srcEntity.index;
+			EcsArchetype&				srcArchetype = *srcEntity.archetype;
+			const bool					srcArchetypeIsTransitionArchetype = &srcArchetype == &m_transitionArchetype;
+			const EcsEntityData&		srcEntityData = srcArchetype.m_entities[srcIndex];
+			assert( srcEntityData.transitionIndex == transitionIndex );
+			assert( ! ( srcArchetypeIsTransitionArchetype && transition.signatureRemove != EcsSignature( 0 ) ) );
 
-			// Create new signature
+			// Create destination signature
 			EcsSignature targetSignature = EcsSignature( 0 );
 			if( &srcArchetype != &m_transitionArchetype )
 			{
@@ -35,12 +57,11 @@ namespace fan
 			targetSignature |= transition.signatureAdd;
 			targetSignature &= ~transition.signatureRemove;
 
-			// Entity is dead
-			if( transition.isDead || targetSignature == EcsSignature( 0 ) )
+			if( transition.isDead || targetSignature == EcsSignature( 0 ) ) // Entity is dead, no need to consider a target archetype
 			{
-				if( &srcArchetype != &m_transitionArchetype )
+				// destroy all components from the src archetype
+				if( !srcArchetypeIsTransitionArchetype )
 				{
-					// remove all components from the src archetype
 					for( int componentIndex = 0; componentIndex < NumComponents(); componentIndex++ )
 					{
 						if( srcArchetype.m_signature[componentIndex] )
@@ -54,14 +75,85 @@ namespace fan
 							srcArchetype.m_chunks[componentIndex].Remove( srcIndex );
 						}
 					}
+				}
 
-					// remove handle
-					if( srcEntityCpy.handle != 0 )
+				// destroy all components from the transition archetype
+				for( int componentIndex = 0; componentIndex < NumComponents(); componentIndex++ )
+				{
+					if( transition.signatureAdd[componentIndex] )
 					{
-						m_handles.erase( srcEntityCpy.handle );
+						const EcsComponentInfo& info = m_componentsInfo[componentIndex];
+						if( info.destroy != nullptr )
+						{
+							EcsComponent& component = *static_cast<EcsComponent*>( srcArchetype.m_chunks[componentIndex].At( srcIndex ) );
+							info.destroy( *this, srcEntity, component );
+						}
 					}
+				}
 
-					// update the handle of the element if it was moved
+				// remove handle
+				if( srcEntityData.handle != 0 )
+				{
+					m_handles.erase( srcEntityData.handle );
+				}
+
+				// if another entity was moved, update its handle
+				if( !srcArchetypeIsTransitionArchetype )
+				{
+					if( srcArchetype.RemoveEntity( srcIndex ) )
+					{
+						EcsEntityData movedEntity = srcArchetype.m_entities[srcIndex];
+						if( movedEntity.handle != 0 )
+						{
+							m_handles[movedEntity.handle].index = srcIndex;
+						}
+					}
+				}
+			}
+			else // entity is alive, we need to copy remaining components to the target archetype
+			{
+				// get dst archetype
+				EcsArchetype* dstArchetype = FindArchetype( targetSignature );
+				if( dstArchetype == nullptr )
+				{
+					dstArchetype = &CreateArchetype( targetSignature );
+				}
+
+				// push new entity
+				const uint32_t dstIndex = dstArchetype->Size();
+				dstArchetype->m_entities.push_back( srcArchetype.m_entities[srcIndex] );
+				EcsEntityData& dstEntityData = *dstArchetype->m_entities.rbegin();
+				dstEntityData = srcEntityData;
+				dstEntityData.transitionIndex = -1;
+				if( srcEntityData.handle != 0 )
+				{
+					m_handles[srcEntityData.handle] = { dstArchetype, dstIndex };
+				}
+
+				// moves components from the source archetype to the target archetype			
+				if( !srcArchetypeIsTransitionArchetype )
+				{
+					for( int i = 0; i < NumComponents(); i++ )
+					{
+						if( srcArchetype.m_signature[i] )
+						{
+							if( transition.signatureRemove[i] ) // if the component was removed, calls destroy
+							{
+								const EcsComponentInfo& info = m_componentsInfo[i];
+								if( info.destroy != nullptr )
+								{
+									EcsComponent& component = *static_cast<EcsComponent*>( srcArchetype.m_chunks[i].At( srcIndex ) );
+									info.destroy( *this, srcEntity, component );
+								}
+							}
+							else // copy component to the target archetype
+							{
+								dstArchetype->m_chunks[i].PushBack( srcArchetype.m_chunks[i].At( srcIndex ) );
+							}
+							srcArchetype.m_chunks[i].Remove( srcIndex );							
+						}
+					}
+					// if another entity was moved, update its handle
 					if( srcArchetype.RemoveEntity( srcIndex ) )
 					{
 						EcsEntityData movedEntity = srcArchetype.m_entities[srcIndex];
@@ -72,90 +164,21 @@ namespace fan
 					}
 				}
 
-				// clears the transition archetype
-				const EcsSignature transitionMoveSignature = transition.signatureAdd & ~transition.signatureRemove;
+				// moves components from the transition archetype to the target archetype
 				for( int i = 0; i < NumComponents(); i++ )
 				{
-					m_transitionArchetype.m_chunks[i].Remove( transitionIndex );
-				}
-				m_transitionArchetype.RemoveEntity( transitionIndex );
-			}
-			else
-			{
-				// destroy call for every components
-				if( transition.signatureRemove != EcsSignature( 0 ) )
-				{
-					for (int componentIndex = 0; componentIndex < NumComponents(); componentIndex++)
-					{
-						if( transition.signatureRemove[componentIndex] )
-						{
-							assert( srcArchetype.m_signature[componentIndex] );
-							const EcsComponentInfo& info = m_componentsInfo[componentIndex];
-							if( info.destroy != nullptr )
-							{
-								EcsComponent& component = *static_cast<EcsComponent*>( srcArchetype.m_chunks[componentIndex].At( srcIndex ) );
-								info.destroy( *this, srcEntity, component );
-							}
-						}
-					}
-				}
-
-				// Get new archetype
-				EcsArchetype* dstArchetype = FindArchetype( targetSignature );
-				if( dstArchetype == nullptr )
-				{
-					dstArchetype = &CreateArchetype( targetSignature );
-				}
-
-				// Push new entity
-				const uint32_t dstIndex = dstArchetype->Size();
-				dstArchetype->m_entities.push_back( srcArchetype.m_entities[srcIndex] );
-				EcsEntityData& dstEntity = *dstArchetype->m_entities.rbegin();
-				dstEntity = srcEntityCpy;
-				dstEntity.transitionIndex = -1;
-				if( dstEntity.handle != 0 )
-				{
-					m_handles[dstEntity.handle] = { dstArchetype, dstIndex };
-				}
-
-				// Moves components from the source archetype to the new archetype				
-				if( &srcArchetype != &m_transitionArchetype )
-				{
-					for( int i = 0; i < NumComponents(); i++ )
-					{
-						if( srcArchetype.m_signature[i] )
-						{
-							if( targetSignature[i] )
-							{
-								dstArchetype->m_chunks[i].PushBack( srcArchetype.m_chunks[i].At( srcIndex ) );
-							}
-							srcArchetype.m_chunks[i].Remove( srcIndex );
-						}
-					}
-					if( srcArchetype.RemoveEntity( srcIndex ) )
-					{
-						EcsEntityData swappedEntity = srcArchetype.m_entities[srcIndex];
-						if( swappedEntity.handle != 0 )
-						{
-							m_handles[swappedEntity.handle].index = srcIndex;
-						}
-					}
-				}
-
-				// copy all components from the transition archetype to the new archetype
-				const EcsSignature transitionMoveSignature = transition.signatureAdd & targetSignature;
-				for( int i = 0; i < NumComponents(); i++ )
-				{
-					if( transitionMoveSignature[i] )
+					if( transition.signatureAdd[i] )
 					{
 						dstArchetype->m_chunks[i].PushBack( m_transitionArchetype.m_chunks[i].At( transitionIndex ) );
 					}
-					m_transitionArchetype.m_chunks[i].Remove( transitionIndex );
 				}
-				m_transitionArchetype.RemoveEntity( transitionIndex );
 			}
 		}
+		assert( m_transitions.size() == sortedTransitions.size() );			// we must keep the transitions intact during the apply
+		assert( m_transitionArchetype.Size() == sortedTransitions.size() );	// we must keep the transition archetype intact during the apply 
+
 		m_transitions.clear();
+		m_transitionArchetype.Clear();
 
 		m_isApplyingTransitions = false;
 	}
@@ -272,13 +295,14 @@ namespace fan
 	EcsComponent& EcsWorld::AddComponent( const EcsEntity _entity, const uint32_t _type )
 	{
 		const int componentIndex = GetIndex( _type );
-		EcsTransition& transition = FindOrCreateTransition( _entity );
 		EcsEntityData& entityData = GetEntityData( _entity );
 
 		// entity doesn't already have this component
 		assert( _entity.archetype == &m_transitionArchetype || !_entity.archetype->m_signature[componentIndex] );
 
 		// Update transition
+		EcsTransition& transition = FindOrCreateTransition( _entity );
+		assert( !transition.signatureRemove[componentIndex] );
 		transition.signatureAdd[componentIndex] = 1;
 
 		EcsComponent& component = *static_cast<EcsComponent*>( m_transitionArchetype.m_chunks[componentIndex].At( entityData.transitionIndex ) );
@@ -291,12 +315,13 @@ namespace fan
 	void		  EcsWorld::RemoveComponent( const EcsEntity _entity, const uint32_t _type )
 	{
 		const int componentIndex = GetIndex( _type );
-		EcsTransition& transition = FindOrCreateTransition( _entity );
 
 		// entity must have this component
 		assert( _entity.archetype == &m_transitionArchetype || _entity.archetype->m_signature[componentIndex] );
 
 		// Update transition
+		EcsTransition& transition = FindOrCreateTransition( _entity );
+		assert( !transition.signatureAdd[componentIndex] );
 		transition.signatureRemove[componentIndex] = 1;
 	}
 	bool		  EcsWorld::HasComponent( const EcsEntity _entity, const uint32_t _type )
@@ -366,7 +391,7 @@ namespace fan
 		entity.transitionIndex = int( m_transitions.size() );
 
 		EcsTransition transition;
-		transition.entityID = entityID;
+		transition.entity = entityID;
 
 		m_transitions.push_back( transition );
 		m_transitionArchetype.m_entities.push_back( entity );
@@ -426,7 +451,7 @@ namespace fan
 			entity.transitionIndex = m_transitionArchetype.Size();
 			m_transitions.emplace_back();
 			transition = &( *m_transitions.rbegin() );
-			transition->entityID = _entity;
+			transition->entity = _entity;
 
 			for( int i = 0; i < NumComponents(); i++ )
 			{
