@@ -32,19 +32,19 @@ namespace fan {
 		}
 
 		// Returns true if the last entity was swapped with the removed one
-		bool RemoveEntity( const int _entityIndex )
+		void RemoveEntity( const int _entityIndex )
 		{
 			// pop the last element
 			if( _entityIndex == Size() - 1 )
 			{
 				m_entities.pop_back();
-				return false;
 			}
-			
-			// else swap with the last
-			m_entities[_entityIndex] = *m_entities.rbegin();
-			m_entities.pop_back();
-			return true;
+			else
+			{
+				// else swap with the last
+				m_entities[_entityIndex] = *m_entities.rbegin();
+				m_entities.pop_back();
+			}
 		}
 
 		void Clear()

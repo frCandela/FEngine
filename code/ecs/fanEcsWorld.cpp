@@ -57,7 +57,7 @@ namespace fan
 			targetSignature |= transition.signatureAdd;
 			targetSignature &= ~transition.signatureRemove;
 
-			if( transition.isDead || targetSignature == EcsSignature( 0 ) ) // Entity is dead, no need to consider a target archetype
+			if( transition.isDead || targetSignature == EcsSignature( 0 ) ) // entity is dead, no need to consider a target archetype
 			{
 				// destroy all components from the src archetype
 				if( !srcArchetypeIsTransitionArchetype )
@@ -85,7 +85,7 @@ namespace fan
 						const EcsComponentInfo& info = m_componentsInfo[componentIndex];
 						if( info.destroy != nullptr )
 						{
-							EcsComponent& component = *static_cast<EcsComponent*>( srcArchetype.m_chunks[componentIndex].At( srcIndex ) );
+							EcsComponent& component = *static_cast<EcsComponent*>( m_transitionArchetype.m_chunks[componentIndex].At( srcIndex ) );
 							info.destroy( *this, srcEntity, component );
 						}
 					}
@@ -97,18 +97,20 @@ namespace fan
 					m_handles.erase( srcEntityData.handle );
 				}
 
-				// if another entity was moved, update its handle
+				// if another entity was moved, update its handle	
 				if( !srcArchetypeIsTransitionArchetype )
-				{
-					if( srcArchetype.RemoveEntity( srcIndex ) )
-					{
-						EcsEntityData movedEntity = srcArchetype.m_entities[srcIndex];
+				{					
+					if( srcIndex != srcArchetype.Size() - 1 )
+					{						
+						EcsEntityData movedEntity = *srcArchetype.m_entities.rbegin();
 						if( movedEntity.handle != 0 )
 						{
 							m_handles[movedEntity.handle].index = srcIndex;
 						}
-					}
+					}	
+					srcArchetype.RemoveEntity( srcIndex );
 				}
+				
 			}
 			else // entity is alive, we need to copy remaining components to the target archetype
 			{
@@ -153,14 +155,19 @@ namespace fan
 							srcArchetype.m_chunks[i].Remove( srcIndex );							
 						}
 					}
-					// if another entity was moved, update its handle
-					if( srcArchetype.RemoveEntity( srcIndex ) )
+
+					// if another entity was moved, update its handle	
+					if( !srcArchetypeIsTransitionArchetype )
 					{
-						EcsEntityData movedEntity = srcArchetype.m_entities[srcIndex];
-						if( movedEntity.handle != 0 )
+						if( srcIndex != srcArchetype.Size() - 1 )
 						{
-							m_handles[movedEntity.handle].index = srcIndex;
+							EcsEntityData movedEntity = *srcArchetype.m_entities.rbegin();
+							if( movedEntity.handle != 0 )
+							{
+								m_handles[movedEntity.handle].index = srcIndex;
+							}
 						}
+						srcArchetype.RemoveEntity( srcIndex );
 					}
 				}
 

@@ -142,7 +142,7 @@ namespace fan
 		template <typename _ComponentType > void			RemoveComponent( const EcsEntity _entity )
 		{
 			static_assert( std::is_base_of< EcsComponent, _ComponentType>::value );
-			RemoveComponent( _ComponentType::s_type );
+			RemoveComponent( _entity, _ComponentType::Info::s_type );
 		}
 		template <typename _ComponentType > bool			HasComponent( const EcsEntity _entity )
 		{

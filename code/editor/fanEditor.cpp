@@ -278,8 +278,47 @@ namespace fan
 	//================================================================================================================================
 	//================================================================================================================================
 	void Editor::Test()
-	{
+	{ 
 
+// 		if( ImGui::Begin( "test" ) )
+// 		{
+// 			if( ImGui::Button( "go" ) )
+// 			{
+// 				EcsEntity & entity1 = m_world.CreateEntity();
+// 				EcsHandle entity1Handle = m_world.AddHandle( entity1 );
+// 				m_world.AddComponent<Rigidbody>( entity1 );
+// 				m_world.AddComponent<SceneNode>( entity1 );
+// 
+// 				EcsEntity& entity2 = m_world.CreateEntity();
+// 				EcsHandle entity2Handle = m_world.AddHandle( entity2 );
+// 				m_world.AddComponent<Rigidbody>( entity2 );
+// 				m_world.AddComponent<SceneNode>( entity2 );
+// 
+// 				m_world.ApplyTransitions();
+// 
+// 				EcsEntity& entity11 = m_world.GetEntity( entity1Handle );
+// 				EcsEntity& entity22 = m_world.GetEntity( entity2Handle );
+// 				m_world.AddComponent<Transform>( entity11 );
+// 				m_world.AddComponent<Transform>( entity22 );
+// 				m_world.RemoveComponent<Rigidbody>( entity11 );
+// 				m_world.RemoveComponent<Rigidbody>( entity22 );
+// 
+// 
+// // 				EcsEntity& entity2 = m_world.CreateEntity();
+// // 				EcsHandle entity2Handle = m_world.AddHandle( entity2 );
+// // 				m_world.AddComponent<Rigidbody>( entity2 );
+// // 
+// // 				m_world.ApplyTransitions();
+// // 
+// // 				
+// // 				
+// // 				m_world.Kill( entity11 );
+// // 				m_world.AddComponent<SceneNode>( entity11 );
+// // 				m_world.Kill( entity22 );
+// // 				m_world.AddComponent<SceneNode>( entity22 );
+// 				m_world.ApplyTransitions();
+// 			}
+// 		} ImGui::End();
 	}
 
 	//================================================================================================================================
