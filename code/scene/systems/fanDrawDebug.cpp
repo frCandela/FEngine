@@ -176,12 +176,18 @@ namespace fan
 		{
 			const PointLight& light = *lightIt;
 			const Transform& transform = *transformIt;		
+			DrawPointLight( transform, light );
+		}
+	}
 
-			const float lightRange = PointLight::GetLightRange( light );
-			if( lightRange > 0 )
-			{
-				RendererDebug::Get().DebugSphere( transform.transform, lightRange, light.diffuse );
-			}
+	//================================================================================================================================
+	//================================================================================================================================
+	void S_DrawDebugPointLights::DrawPointLight( const Transform& _transform, const PointLight& _light )
+	{
+		const float lightRange = PointLight::GetLightRange( _light );
+		if( lightRange > 0 )
+		{
+			RendererDebug::Get().DebugSphere( _transform.transform, lightRange, _light.diffuse );
 		}
 	}
 
@@ -202,22 +208,28 @@ namespace fan
 		{
 			const DirectionalLight& light = *lightIt;
 			const Transform& transform = *transformIt;
-
-			const btVector3 pos = transform.GetPosition();
-			const btVector3 dir = transform.Forward();
-			const btVector3 up = transform.Up();
-			const btVector3 left = transform.Left();
-			const float length = 2.f;
-			const float radius = 0.5f;
-			const Color color = Color::Yellow;
-			btVector3 offsets[5] = { btVector3::Zero(), radius * up ,-radius * up, radius * left ,-radius * left };
-			for( int offsetIndex = 0; offsetIndex < 5; offsetIndex++ )
-			{
-				const btVector3 offset = offsets[offsetIndex];
-				RendererDebug::Get().DebugLine( pos + offset, pos + offset + length * dir, color );
-			}
-			RendererDebug::Get().DebugIcoSphere( transform.transform, radius, 0, color );
+			DrawDirectionalLight( transform, light );
 		}
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
+	void S_DrawDebugDirectionalLights::DrawDirectionalLight( const Transform& _transform, const DirectionalLight& _light )
+	{
+		const btVector3 pos = _transform.GetPosition();
+		const btVector3 dir = _transform.Forward();
+		const btVector3 up = _transform.Up();
+		const btVector3 left = _transform.Left();
+		const float length = 2.f;
+		const float radius = 0.5f;
+		const Color color = Color::Yellow;
+		btVector3 offsets[5] = { btVector3::Zero(), radius * up ,-radius * up, radius * left ,-radius * left };
+		for( int offsetIndex = 0; offsetIndex < 5; offsetIndex++ )
+		{
+			const btVector3 offset = offsets[offsetIndex];
+			RendererDebug::Get().DebugLine( pos + offset, pos + offset + length * dir, color, false );
+		}
+		RendererDebug::Get().DebugIcoSphere( _transform.transform, radius, 0, color, false );
 	}
 
 	//================================================================================================================================
@@ -225,7 +237,7 @@ namespace fan
 	//================================================================================================================================
 	EcsSignature S_DrawDebugCollisionShapes::GetSignature( const EcsWorld& _world )
 	{
-		return _world.GetSignature<Transform>() | _world.GetSignature<SceneNode>();
+		return _world.GetSignature<Transform>();
 	}
 
 	//================================================================================================================================
@@ -233,26 +245,34 @@ namespace fan
 	void S_DrawDebugCollisionShapes::Run( EcsWorld& _world, const EcsView& _view ) 
 	{
 		auto transformIt = _view.begin<Transform>();
-		auto sceneNodeIt = _view.begin<SceneNode>();
-		for( ; transformIt != _view.end<Transform>(); ++transformIt, ++sceneNodeIt )
+		for( ; transformIt != _view.end<Transform>(); ++transformIt )
 		{
 			const EcsEntity entity = transformIt.Entity();
 			const Transform& transform = *transformIt;
-			const SceneNode& node = *sceneNodeIt;
-		
-			// box shape
-			if( _world.HasComponent<BoxShape>( entity ) )
-			{
-				const BoxShape & shape = _world.GetComponent<BoxShape>( entity );
-				RendererDebug::Get().DebugCube( transform.transform, 0.5f * shape.GetScaling(), Color::Green, false  );
-			}
+			DrawCollisionShape( _world, entity );
+		}
+	}	
 
-			// sphere shape
-			if( _world.HasComponent<SphereShape>( entity ) )
-			{
-				const SphereShape& shape = _world.GetComponent<SphereShape>( entity );
-				RendererDebug::Get().DebugSphere( transform.transform, shape.GetRadius(), Color::Green, false );
-			}
+	//================================================================================================================================
+	//================================================================================================================================
+	void S_DrawDebugCollisionShapes::DrawCollisionShape( EcsWorld& _world, EcsEntity _entity )
+	{
+		if( !_world.HasComponent<Transform>( _entity ) ) { return; }
+
+		const Transform& transform = _world.GetComponent<Transform>( _entity );
+
+		// box shape
+		if( _world.HasComponent<BoxShape>( _entity ) )
+		{
+			const BoxShape& shape = _world.GetComponent<BoxShape>( _entity );
+			RendererDebug::Get().DebugCube( transform.transform, 0.5f * shape.GetScaling(), Color::Green, false );
+		}
+
+		// sphere shape
+		if( _world.HasComponent<SphereShape>( _entity ) )
+		{
+			const SphereShape& shape = _world.GetComponent<SphereShape>( _entity );
+			RendererDebug::Get().DebugSphere( transform.transform, shape.GetRadius(), Color::Green, false );
 		}
 	}
 }

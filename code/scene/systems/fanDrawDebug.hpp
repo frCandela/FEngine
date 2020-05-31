@@ -40,6 +40,9 @@ namespace fan
 		static void Run( EcsWorld& _world, const EcsView& _view ) ;
 	};
 
+
+	struct Transform;
+	struct PointLight;
 	//==============================================================================================================================================================
 	// Draw all the point lights gizmos
 	//==============================================================================================================================================================
@@ -47,8 +50,12 @@ namespace fan
 	{
 		static EcsSignature GetSignature( const EcsWorld& _world );
 		static void Run( EcsWorld& _world, const EcsView& _view ) ;
+
+		static void DrawPointLight( const Transform& _transform, const PointLight& _light );
 	};
 
+
+	struct DirectionalLight;
 	//==============================================================================================================================================================
 	// Draw all the directional lights gizmos
 	//==============================================================================================================================================================
@@ -56,6 +63,8 @@ namespace fan
 	{
 		static EcsSignature GetSignature( const EcsWorld& _world );
 		static void Run( EcsWorld& _world, const EcsView& _view ) ;
+
+		static void DrawDirectionalLight( const Transform& _transform, const DirectionalLight& _light );
 	};
 
 	//==============================================================================================================================================================
@@ -65,5 +74,7 @@ namespace fan
 	{
 		static EcsSignature GetSignature( const EcsWorld& _world );
 		static void Run( EcsWorld& _world, const EcsView& _view ) ;
+
+		static void DrawCollisionShape( EcsWorld& _world, EcsEntity _entity  );
 	};
 }

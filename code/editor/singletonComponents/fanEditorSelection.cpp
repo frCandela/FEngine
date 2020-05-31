@@ -10,6 +10,8 @@
 #include "scene/components/fanSceneNode.hpp"
 #include "scene/components/fanTransform.hpp"
 #include "scene/components/fanCamera.hpp"
+#include "scene/components/fanPointLight.hpp"
+#include "scene/components/fanDirectionalLight.hpp"
 #include "scene/components/fanFollowTransform.hpp"
 #include "scene/components/ui/fanFollowTransformUI.hpp"
 #include "scene/singletonComponents/fanScene.hpp"
@@ -137,14 +139,27 @@ namespace fan
  		}
 
 		// draw collision shapes, lights @migration
-// 		if( m_selectedSceneNode != nullptr )
-// 		{
-// 			EcsWorld& world = *m_selectedSceneNode->scene->world;
-// 			EcsEntity nodeID = world.GetEntity( m_selectedSceneNode->handle );
-// 			S_DrawDebugCollisionShapes::Run( world, world.MatchSubset( S_DrawDebugCollisionShapes::GetSignature( world ), { nodeID } ) );
-// 			S_DrawDebugDirectionalLights::Run( world, world.MatchSubset( S_DrawDebugDirectionalLights::GetSignature( world ), { nodeID } ) );
-// 			S_DrawDebugPointLights::Run( world, world.MatchSubset( S_DrawDebugPointLights::GetSignature( world ), { nodeID } ) );
-// 		}	
+		if( m_selectedNodeHandle != 0 )
+		{
+			EcsWorld& world = *m_currentScene->world;
+			const EcsEntity selectedEntity = world.GetEntity( m_selectedNodeHandle );
+			S_DrawDebugCollisionShapes::DrawCollisionShape( world, selectedEntity );
+
+			if( world.HasComponent<Transform>( selectedEntity ) ) 
+			{
+				const Transform& transform = world.GetComponent<Transform>( selectedEntity );
+				if( world.HasComponent<DirectionalLight>( selectedEntity ) )
+				{
+					const DirectionalLight& directionalLight = world.GetComponent<DirectionalLight>( selectedEntity );
+					S_DrawDebugDirectionalLights::DrawDirectionalLight( transform , directionalLight );
+				} 
+				if( world.HasComponent<PointLight>( selectedEntity ) )
+				{
+					const PointLight& pointLight = world.GetComponent<PointLight>( selectedEntity );
+					S_DrawDebugPointLights::DrawPointLight( transform, pointLight );
+				}
+			}
+		}	
 
 	}
 
