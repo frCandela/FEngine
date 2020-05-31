@@ -21,7 +21,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void Camera::Init( EcsWorld& _world, EcsEntity _entity, EcsComponent& _component )
+	void Camera::Init( EcsWorld& /*_world*/, EcsEntity /*_entity*/, EcsComponent& _component )
 	{
 		Camera& camera = static_cast<Camera&>( _component );
 
@@ -35,7 +35,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void Camera::OnGui( EcsWorld& _world, EcsEntity _entityID, EcsComponent& _component )
+	void Camera::OnGui( EcsWorld& /*_world*/, EcsEntity /*_entityID*/, EcsComponent& _component )
 	{
 		Camera& camera = static_cast<Camera&>( _component );
 

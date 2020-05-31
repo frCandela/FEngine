@@ -137,9 +137,9 @@ namespace fan
 		world.AddTagType<tag_sunlight_occlusion>();
 
 		// @hack
-		Game& game = world.GetSingleton<Game>();
-		game.gameServer = this;
-		game.name = _name;
+		Game& gameNotConst = world.GetSingleton<Game>();
+		gameNotConst.gameServer = this;
+		gameNotConst.name = _name;
 	}
 
 	//================================================================================================================================
@@ -160,7 +160,6 @@ namespace fan
 	void  GameServer::Stop()
 	{
 		// clears the physics world
-		PhysicsWorld& physicsWorld = world.GetSingleton<PhysicsWorld>();
 		S_UnregisterAllRigidbodies::Run( world, world.Match( S_UnregisterAllRigidbodies::GetSignature( world ) ) );
 
 		// clears the particles mesh
@@ -214,9 +213,9 @@ namespace fan
 
 			// physics & transforms
 			PhysicsWorld& physicsWorld = world.GetSingleton<PhysicsWorld>();
-			S_SynchronizeMotionStateFromTransform	::Run( world, world.Match( S_SynchronizeMotionStateFromTransform::GetSignature( world ) ), _delta );
+			S_SynchronizeMotionStateFromTransform	::Run( world, world.Match( S_SynchronizeMotionStateFromTransform::GetSignature( world ) ) );
 			physicsWorld.dynamicsWorld->stepSimulation( _delta, 10, Time::Get().GetPhysicsDelta() );
-			S_SynchronizeTransformFromMotionState	::Run( world, world.Match( S_SynchronizeTransformFromMotionState::GetSignature( world ) ), _delta );
+			S_SynchronizeTransformFromMotionState	::Run( world, world.Match( S_SynchronizeTransformFromMotionState::GetSignature( world ) ) );
 			S_MoveFollowTransforms					::Run( world, world.Match( S_MoveFollowTransforms::GetSignature( world ) ) );
 			S_MoveFollowTransformsUI				::Run( world, world.Match( S_MoveFollowTransformsUI::GetSignature( world ) ) );			
 			
@@ -242,8 +241,8 @@ namespace fan
 				S_EmitParticles::Run( world, world.Match( S_EmitParticles::GetSignature( world ) ), _delta );
 				S_GenerateParticles::Run( world, world.Match( S_GenerateParticles::GetSignature( world ) ), _delta );
 				S_UpdateBoundsFromRigidbody::Run( world, world.Match( S_UpdateBoundsFromRigidbody::GetSignature( world ) ), _delta );
-				S_UpdateBoundsFromModel::Run( world, world.Match( S_UpdateBoundsFromModel::GetSignature( world ) ), _delta );
-				S_UpdateBoundsFromTransform::Run( world, world.Match( S_UpdateBoundsFromTransform::GetSignature( world ) ), _delta );
+				S_UpdateBoundsFromModel::Run( world, world.Match( S_UpdateBoundsFromModel::GetSignature( world ) ) );
+				S_UpdateBoundsFromTransform::Run( world, world.Match( S_UpdateBoundsFromTransform::GetSignature( world ) ) );
 				S_UpdateGameCamera::Run( world, world.Match( S_UpdateGameCamera::GetSignature( world ) ), _delta );
 			}
 

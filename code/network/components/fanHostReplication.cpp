@@ -16,7 +16,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void HostReplication::Init( EcsWorld& _world, EcsEntity _entity, EcsComponent& _component )
+	void HostReplication::Init( EcsWorld& /*_world*/, EcsEntity /*_entity*/, EcsComponent& _component )
 	{
 		HostReplication& hostReplication = static_cast<HostReplication&>( _component );
 		hostReplication.pendingReplication.clear();
@@ -151,7 +151,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void HostReplication::OnGui( EcsWorld& _world, EcsEntity _entityID, EcsComponent& _component )
+	void HostReplication::OnGui( EcsWorld& /*_world*/, EcsEntity /*_entityID*/, EcsComponent& _component )
 	{
 		HostReplication& hostReplication = static_cast<HostReplication&>( _component );
 		ImGui::PushItemWidth( 0.6f * ImGui::GetWindowWidth() - 16 );

@@ -18,7 +18,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void ProgressBar::Init( EcsWorld& _world, EcsEntity _entity, EcsComponent& _component )
+	void ProgressBar::Init( EcsWorld& _world, EcsEntity /*_entity*/, EcsComponent& _component )
 	{
 		ProgressBar& progressBar = static_cast<ProgressBar&>( _component );
 		progressBar.progress = 1.f;
@@ -28,7 +28,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void ProgressBar::OnGui( EcsWorld& _world, EcsEntity _entityID, EcsComponent& _component )
+	void ProgressBar::OnGui( EcsWorld& /*_world*/, EcsEntity /*_entityID*/, EcsComponent& _component )
 	{
 		ProgressBar& progressBar = static_cast<ProgressBar&>( _component );
 

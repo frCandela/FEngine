@@ -100,7 +100,7 @@ namespace fan
 				// if another entity was moved, update its handle	
 				if( !srcArchetypeIsTransitionArchetype )
 				{					
-					if( srcIndex != srcArchetype.Size() - 1 )
+					if( srcIndex != uint32_t(srcArchetype.Size() - 1) )
 					{						
 						EcsEntityData movedEntity = *srcArchetype.m_entities.rbegin();
 						if( movedEntity.handle != 0 )
@@ -159,7 +159,7 @@ namespace fan
 					// if another entity was moved, update its handle	
 					if( !srcArchetypeIsTransitionArchetype )
 					{
-						if( srcIndex != srcArchetype.Size() - 1 )
+						if( srcIndex != uint32_t(srcArchetype.Size() - 1) )
 						{
 							EcsEntityData movedEntity = *srcArchetype.m_entities.rbegin();
 							if( movedEntity.handle != 0 )
@@ -370,7 +370,6 @@ namespace fan
 		{
 			const EcsEntityData& entityData = _entity.archetype->m_entities[_entity.index];
 			assert( entityData.transitionIndex != -1 );
-			const EcsTransition& transition = m_transitions[entityData.transitionIndex];
 			return *static_cast<EcsComponent*>( m_transitionArchetype.m_chunks[componentIndex].At( entityData.transitionIndex ) );
 		}
 		else
@@ -382,7 +381,6 @@ namespace fan
 			else
 			{
 				const EcsEntityData& entityData = _entity.archetype->m_entities[_entity.index];
-				const EcsTransition& transition = m_transitions[entityData.transitionIndex];
 				return *static_cast<EcsComponent*>( m_transitionArchetype.m_chunks[componentIndex].At( entityData.transitionIndex ) );
 			}
 		}

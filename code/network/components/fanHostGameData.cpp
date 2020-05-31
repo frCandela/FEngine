@@ -13,7 +13,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void HostGameData::Init( EcsWorld& _world, EcsEntity _entity, EcsComponent& _component )
+	void HostGameData::Init( EcsWorld& /*_world*/, EcsEntity /*_entity*/, EcsComponent& _component )
 	{
 		HostGameData& hostGameData = static_cast<HostGameData&>( _component );
 		hostGameData.spaceshipID = 0;
@@ -50,7 +50,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void HostGameData::OnGui( EcsWorld& _world, EcsEntity _entityID, EcsComponent& _component )
+	void HostGameData::OnGui( EcsWorld& /*_world*/, EcsEntity /*_entityID*/, EcsComponent& _component )
 	{
 		HostGameData& hostGameData = static_cast<HostGameData&>( _component );
 		ImGui::PushItemWidth( 0.6f * ImGui::GetWindowWidth() - 16 );

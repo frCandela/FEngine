@@ -16,7 +16,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void ClientRPC::Init( EcsWorld& _world, EcsEntity _entity, EcsComponent& _component )
+	void ClientRPC::Init( EcsWorld& /*_world*/, EcsEntity /*_entity*/, EcsComponent& _component )
 	{
 		ClientRPC& rpc = static_cast<ClientRPC&>( _component );
 		rpc.nameToRPCTable.clear();
@@ -143,7 +143,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void ClientRPC::OnGui( EcsWorld& _world, EcsEntity _entityID, EcsComponent& _component )
+	void ClientRPC::OnGui( EcsWorld& /*_world*/, EcsEntity /*_entityID*/, EcsComponent& _component )
 	{
 		ClientRPC& rpc = static_cast<ClientRPC&>( _component );
 

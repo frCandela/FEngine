@@ -169,7 +169,6 @@ namespace fan
 		}
 
 		Scene& scene = m_world.GetSingleton<Scene>();
-		EditorGizmos& gizmos = m_world.GetSingleton<EditorGizmos>();
 		EditorSelection& selection = m_world.GetSingleton<EditorSelection>();
 		EditorCopyPaste& copyPaste = m_world.GetSingleton<EditorCopyPaste>();
 
@@ -565,7 +564,7 @@ namespace fan
 	//================================================================================================================================
 	// Todo save camera position depending on the scene
 	//================================================================================================================================
-	void Editor::OnSceneLoad( Scene& _scene )
+	void Editor::OnSceneLoad( Scene& /*_scene*/ )
 	{
 		m_world.GetSingleton<EditorSelection>().Deselect();
 		EditorCamera::CreateEditorCamera( m_world );
@@ -664,7 +663,6 @@ namespace fan
 		}
 
 		Scene& scene = m_world.GetSingleton<Scene>();
-		GameCamera& gameCamera = m_world.GetSingleton<GameCamera>();
 		EditorCamera& editorCamera = m_world.GetSingleton<EditorCamera>();
 
 		if( scene.mainCameraHandle == editorCamera.cameraHandle )

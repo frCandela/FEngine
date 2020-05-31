@@ -20,7 +20,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void UIRenderer::Init( EcsWorld& _world, EcsEntity _entity, EcsComponent& _component )
+	void UIRenderer::Init( EcsWorld& /*_world*/, EcsEntity /*_entity*/, EcsComponent& _component )
 	{
 		UIRenderer& uiRenderer = static_cast<UIRenderer&>( _component );
 
@@ -40,7 +40,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void UIRenderer::OnGui( EcsWorld& _world, EcsEntity _entityID, EcsComponent& _component )
+	void UIRenderer::OnGui( EcsWorld& /*_world*/, EcsEntity /*_entityID*/, EcsComponent& _component )
 	{
 		UIRenderer& ui = static_cast<UIRenderer&>( _component );
 

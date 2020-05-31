@@ -19,7 +19,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void Weapon::Init( EcsWorld& _world, EcsEntity _entity, EcsComponent& _component )
+	void Weapon::Init( EcsWorld& /*_world*/, EcsEntity /*_entity*/, EcsComponent& _component )
 	{
 		Weapon& weapon = static_cast<Weapon&>( _component );
 
@@ -37,7 +37,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void Weapon::OnGui( EcsWorld& _world, EcsEntity _entityID, EcsComponent& _component )
+	void Weapon::OnGui( EcsWorld& /*_world*/, EcsEntity /*_entityID*/, EcsComponent& _component )
 	{
 		Weapon& weapon = static_cast<Weapon&>( _component );
 

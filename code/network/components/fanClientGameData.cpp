@@ -13,7 +13,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void ClientGameData::Init( EcsWorld& _world, EcsEntity _entity, EcsComponent& _component )
+	void ClientGameData::Init( EcsWorld& /*_world*/, EcsEntity /*_entity*/, EcsComponent& _component )
 	{
 		ClientGameData& gameData = static_cast<ClientGameData&>( _component );
 		gameData.spaceshipSpawnFrameIndex = 0;
@@ -196,7 +196,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void ClientGameData::OnGui( EcsWorld& _world, EcsEntity _entityID, EcsComponent& _component )
+	void ClientGameData::OnGui( EcsWorld& /*_world*/, EcsEntity /*_entityID*/, EcsComponent& _component )
 	{
 		ClientGameData& gameData = static_cast<ClientGameData&>( _component );
 		ImGui::PushItemWidth( 0.6f * ImGui::GetWindowWidth() - 16 );

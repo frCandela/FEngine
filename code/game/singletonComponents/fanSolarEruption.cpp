@@ -67,8 +67,7 @@ namespace fan
 	//================================================================================================================================
 	void SolarEruption::Start( EcsWorld& _world )
 	{
-		SolarEruption& eruption = _world.GetSingleton<SolarEruption>();		
-		const Game& game = _world.GetSingleton<Game>();
+		SolarEruption& eruption = _world.GetSingleton<SolarEruption>();
 
 		eruption.enabled = true;
 		eruption.stateDuration[WAITING] = std::numeric_limits<float>::max(); // wait forever

@@ -19,7 +19,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void BoxShape::Init( EcsWorld& _world, EcsEntity _entity, EcsComponent& _component )
+	void BoxShape::Init( EcsWorld& /*_world*/, EcsEntity /*_entity*/, EcsComponent& _component )
 	{
 		BoxShape& boxShape = static_cast<BoxShape&>( _component );
 		boxShape.boxShape = new btBoxShape( btVector3( 0.5f, 0.5f, 0.5f ) );
@@ -28,7 +28,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void BoxShape::Destroy( EcsWorld& _world, EcsEntity _entity, EcsComponent& _component )
+	void BoxShape::Destroy( EcsWorld& /*_world*/, EcsEntity /*_entity*/, EcsComponent& _component )
 	{
 		BoxShape& boxShape = static_cast<BoxShape&>( _component );
 		assert( boxShape.boxShape != nullptr );
@@ -38,7 +38,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void BoxShape::OnGui( EcsWorld& _world, EcsEntity _entityID, EcsComponent& _component )
+	void BoxShape::OnGui( EcsWorld& /*_world*/, EcsEntity /*_entityID*/, EcsComponent& _component )
 	{
 		BoxShape& boxShape = static_cast<BoxShape&>( _component );
 		ImGui::PushItemWidth( 0.6f * ImGui::GetWindowWidth() );

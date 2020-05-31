@@ -19,7 +19,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void DirectionalLight::Init( EcsWorld& _world, EcsEntity _entity, EcsComponent& _component )
+	void DirectionalLight::Init( EcsWorld& /*_world*/, EcsEntity /*_entity*/, EcsComponent& _component )
 	{
 		DirectionalLight& light = static_cast<DirectionalLight&>( _component );
 		light.ambiant = Color( 0.1f, 0.1f, 0.1f );
@@ -29,7 +29,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void DirectionalLight::OnGui( EcsWorld& _world, EcsEntity _entityID, EcsComponent& _component )
+	void DirectionalLight::OnGui( EcsWorld& /*_world*/, EcsEntity /*_entityID*/, EcsComponent& _component )
 	{
 		DirectionalLight& light = static_cast<DirectionalLight&>( _component );
 

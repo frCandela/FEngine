@@ -1,6 +1,9 @@
 #include "scene/systems/fanRegisterPhysics.hpp"
 
+#include "core/fanBulletWarnings.hpp"
+BULLET_PUSH()
 #include "bullet/btBulletDynamicsCommon.h"
+BULLET_POP()
 #include "scene/singletonComponents/fanPhysicsWorld.hpp"
 #include "scene/components/fanSceneNode.hpp"
 #include "scene/components/fanSphereShape.hpp"

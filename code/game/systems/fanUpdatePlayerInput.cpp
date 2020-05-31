@@ -22,8 +22,7 @@ namespace fan
 	{
 		return	
 			_world.GetSignature<PlayerInput>() | 
-			_world.GetSignature<Transform>() | 
-			_world.GetSignature<PlayerController>();
+			_world.GetSignature<Transform>();
 	}
 
 	//================================================================================================================================
@@ -39,12 +38,10 @@ namespace fan
 
 		auto transformIt = _view.begin<Transform>();
 		auto inputIt = _view.begin<PlayerInput>();
-		auto controllerIt = _view.begin<PlayerController>();
-		for( ; transformIt != _view.end<Transform>(); ++transformIt, ++inputIt, ++controllerIt )
+		for( ; transformIt != _view.end<Transform>(); ++transformIt, ++inputIt )
 		{
 			const Transform& transform = *transformIt;
 			PlayerInput& input = *inputIt;
-			const PlayerController& controller = *controllerIt;
 
 			input.left =	Input::Get().Manager().GetAxis( "game_left" );
 			input.forward = Input::Get().Manager().GetAxis( "game_forward" );

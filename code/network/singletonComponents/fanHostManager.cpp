@@ -21,7 +21,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void HostManager::Init( EcsWorld& _world, EcsSingleton& _component )
+	void HostManager::Init( EcsWorld& /*_world*/, EcsSingleton& _component )
 	{
 		HostManager& hostManager = static_cast<HostManager&>( _component );
 		hostManager.hostHandles.clear();
@@ -71,8 +71,8 @@ namespace fan
 		}		
 
 		// delete the host ip/port entry
-		HostConnection& hostConnection = world.GetComponent< HostConnection >( entity );		
-		auto& it = hostHandles.find( { hostConnection.ip, hostConnection.port } );
+		HostConnection& hostConnection = world.GetComponent< HostConnection >( entity );	
+		auto it = hostHandles.find( { hostConnection.ip, hostConnection.port } );
 		assert( it != hostHandles.end() );
 		hostHandles.erase( it );
 

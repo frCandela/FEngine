@@ -18,7 +18,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void HostConnection::Init( EcsWorld& _world, EcsEntity _entity, EcsComponent& _component )
+	void HostConnection::Init( EcsWorld& /*_world*/, EcsEntity /*_entity*/, EcsComponent& _component )
 	{
 		HostConnection& hostConnection = static_cast<HostConnection&>( _component );
 		hostConnection.ip = sf::IpAddress();
@@ -176,7 +176,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void HostConnection::OnGui( EcsWorld& _world, EcsEntity _entityID, EcsComponent& _component )
+	void HostConnection::OnGui( EcsWorld& /*_world*/, EcsEntity /*_entityID*/, EcsComponent& _component )
 	{
 		HostConnection& hostConnection = static_cast<HostConnection&>( _component );
 		const double currentTime = Time::Get().ElapsedSinceStartup();

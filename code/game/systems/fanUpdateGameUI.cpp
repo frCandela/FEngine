@@ -26,7 +26,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void S_UpdateGameUiValues::Run( EcsWorld& _world, const EcsView& _view, const float _delta )
+	void S_UpdateGameUiValues::Run( EcsWorld& /*_world*/, const EcsView& _view, const float _delta )
 	{
 		if( _delta == 0.f ) { return; }
 
@@ -62,7 +62,6 @@ namespace fan
 			}
 			else
 			{
-				float ratio = 2.f * ( signalRatio - 0.5f );
 				ui.signalRenderer->color = Color( 1.f - signalRatio, 1.f, 0.f, 1.f ); // orange to green
 			}
 

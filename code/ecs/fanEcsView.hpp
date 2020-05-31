@@ -28,7 +28,7 @@ namespace fan
 			{
 				if( _componentIndex == -1 )
 				{
-					m_archetypeIndex = int( _view.m_archetypes.size() ); // end() iterator
+					m_archetypeIndex = uint16_t( _view.m_archetypes.size() ); // end() iterator
 				}
 				else
 				{

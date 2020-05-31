@@ -13,7 +13,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void RenderWorld::Init( EcsWorld& _world, EcsSingleton& _component )
+	void RenderWorld::Init( EcsWorld& /*_world*/, EcsSingleton& _component )
 	{
 		RenderWorld& renderWorld = static_cast<RenderWorld&>( _component );
 		renderWorld.drawData.clear();

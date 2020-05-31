@@ -20,7 +20,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void ParticleEmitter::Init( EcsWorld& _world, EcsEntity _entity, EcsComponent& _component )
+	void ParticleEmitter::Init( EcsWorld& /*_world*/, EcsEntity /*_entity*/, EcsComponent& _component )
 	{
 		ParticleEmitter& emitter = static_cast<ParticleEmitter&>( _component );
 		emitter.enabled = true;
@@ -34,7 +34,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void ParticleEmitter::OnGui( EcsWorld& _world, EcsEntity _entityID, EcsComponent& _component )
+	void ParticleEmitter::OnGui( EcsWorld& /*_world*/, EcsEntity /*_entityID*/, EcsComponent& _component )
 	{
 		ParticleEmitter& emitter = static_cast<ParticleEmitter&>( _component );
 

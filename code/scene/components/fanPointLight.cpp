@@ -21,7 +21,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void PointLight::Init( EcsWorld& _world, EcsEntity _entity, EcsComponent& _component )
+	void PointLight::Init( EcsWorld& /*_world*/, EcsEntity /*_entity*/, EcsComponent& _component )
 	{
 		PointLight& pointLight = static_cast<PointLight&>( _component );
 		pointLight.ambiant = Color::White;
@@ -34,7 +34,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void PointLight::OnGui( EcsWorld& _world, EcsEntity _entityID, EcsComponent& _component )
+	void PointLight::OnGui( EcsWorld& /*_world*/, EcsEntity /*_entityID*/, EcsComponent& _component )
 	{
 		PointLight& pointLight = static_cast<PointLight&>( _component );
 		ImGui::PushItemWidth( 0.6f * ImGui::GetWindowWidth() - 16 );

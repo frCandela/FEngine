@@ -18,7 +18,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void Damage::Init( EcsWorld& _world, EcsEntity _entity, EcsComponent& _component )
+	void Damage::Init( EcsWorld& /*_world*/, EcsEntity /*_entity*/, EcsComponent& _component )
 	{
 		Damage& damage = static_cast<Damage&>( _component );
 		damage.damage = 1.f;
@@ -26,7 +26,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void Damage::OnGui( EcsWorld& _world, EcsEntity _entityID, EcsComponent& _component )
+	void Damage::OnGui( EcsWorld& /*_world*/, EcsEntity /*_entityID*/, EcsComponent& _component )
 	{
 		Damage& damage = static_cast<Damage&>( _component );
 

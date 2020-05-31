@@ -20,7 +20,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void MeshRenderer::Init( EcsWorld& _world, EcsEntity _entity, EcsComponent& _component )
+	void MeshRenderer::Init( EcsWorld& /*_world*/, EcsEntity /*_entity*/, EcsComponent& _component )
 	{
 		MeshRenderer& meshRenderer = static_cast<MeshRenderer&>( _component );
 		meshRenderer.mesh = nullptr;
@@ -29,7 +29,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void MeshRenderer::OnGui( EcsWorld& _world, EcsEntity _entityID, EcsComponent& _component )
+	void MeshRenderer::OnGui( EcsWorld& /*_world*/, EcsEntity /*_entityID*/, EcsComponent& _component )
 	{
 		MeshRenderer& meshRenderer = static_cast<MeshRenderer&>( _component );
 		ImGui::FanMeshPtr( "mesh", meshRenderer.mesh );

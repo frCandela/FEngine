@@ -18,7 +18,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void Health::Init( EcsWorld& _world, EcsEntity _entity, EcsComponent& _component )
+	void Health::Init( EcsWorld& /*_world*/, EcsEntity /*_entity*/, EcsComponent& _component )
 	{
 		Health& health = static_cast<Health&>( _component );
 		health.invincible = false;
@@ -28,7 +28,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void Health::OnGui( EcsWorld& _world, EcsEntity _entityID, EcsComponent& _component )
+	void Health::OnGui( EcsWorld& /*_world*/, EcsEntity /*_entityID*/, EcsComponent& _component )
 	{
 		Health& health = static_cast<Health&>( _component );
 

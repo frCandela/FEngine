@@ -23,7 +23,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void PhysicsWorld::Init( EcsWorld& _world, EcsSingleton& _component )
+	void PhysicsWorld::Init( EcsWorld& /*_world*/, EcsSingleton& _component )
 	{
 		PhysicsWorld& physicsWorld = static_cast<PhysicsWorld&>( _component );
 		

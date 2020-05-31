@@ -22,7 +22,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void GameCamera::Init( EcsWorld& _world, EcsSingleton& _component )
+	void GameCamera::Init( EcsWorld& /*_world*/, EcsSingleton& _component )
 	{
 		GameCamera& gameCamera = static_cast<GameCamera&>( _component );
 		gameCamera.heightFromTarget = 30.f;

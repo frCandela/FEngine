@@ -18,7 +18,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void TransformUI::Init( EcsWorld& _world, EcsEntity _entity, EcsComponent& _component )
+	void TransformUI::Init( EcsWorld& /*_world*/, EcsEntity /*_entity*/, EcsComponent& _component )
 	{
 		TransformUI& transform = static_cast<TransformUI&>( _component );
 
@@ -28,7 +28,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void TransformUI::OnGui( EcsWorld& _world, EcsEntity _entityID, EcsComponent& _component )
+	void TransformUI::OnGui( EcsWorld& /*_world*/, EcsEntity /*_entityID*/, EcsComponent& _component )
 	{
 		TransformUI& transform = static_cast<TransformUI&>( _component );
 

@@ -34,7 +34,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void ClientNetworkManager::Init( EcsWorld& _world, EcsSingleton& _component )
+	void ClientNetworkManager::Init( EcsWorld& /*_world*/, EcsSingleton& _component )
 	{
 		ClientNetworkManager& netManager = static_cast<ClientNetworkManager&>( _component );
 		netManager.persistentHandle = 0;
@@ -126,9 +126,9 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void ClientNetworkManager::OnGui( EcsWorld&, EcsSingleton& _component )
+	void ClientNetworkManager::OnGui( EcsWorld& /*_world*/, EcsSingleton& /*_component*/ )
 	{
-		ClientNetworkManager& netManager = static_cast<ClientNetworkManager&>( _component );
+		//ClientNetworkManager& netManager = static_cast<ClientNetworkManager&>( _component );
 
 		ImGui::Indent(); ImGui::Indent();
 		{

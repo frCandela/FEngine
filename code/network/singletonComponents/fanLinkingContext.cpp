@@ -15,7 +15,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void LinkingContext::Init( EcsWorld& _world, EcsSingleton& _component )
+	void LinkingContext::Init( EcsWorld& /*_world*/, EcsSingleton& _component )
 	{
 		LinkingContext& linkingContext = static_cast<LinkingContext&>( _component );
 		linkingContext.netIDToEcsHandle.clear();

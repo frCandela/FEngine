@@ -19,7 +19,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void Material::Init( EcsWorld& _world, EcsEntity _entity, EcsComponent& _component )
+	void Material::Init( EcsWorld& /*_world*/, EcsEntity /*_entity*/, EcsComponent& _component )
 	{
 		Material& material = static_cast<Material&>( _component );
 
@@ -30,7 +30,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void Material::OnGui( EcsWorld& _world, EcsEntity _entityID, EcsComponent& _component )
+	void Material::OnGui( EcsWorld& /*_world*/, EcsEntity /*_entityID*/, EcsComponent& _component )
 	{
 		Material& material = static_cast<Material&>( _component );
 

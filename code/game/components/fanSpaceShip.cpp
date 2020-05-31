@@ -18,7 +18,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void SpaceShip::Init( EcsWorld& _world, EcsEntity _entity, EcsComponent& _component )
+	void SpaceShip::Init( EcsWorld& _world, EcsEntity /*_entity*/, EcsComponent& _component )
 	{
 		SpaceShip& spaceship					= static_cast<SpaceShip&>( _component );
 
@@ -44,7 +44,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void SpaceShip::OnGui( EcsWorld& _world, EcsEntity _entityID, EcsComponent& _component )
+	void SpaceShip::OnGui( EcsWorld& /*_world*/, EcsEntity /*_entityID*/, EcsComponent& _component )
 	{
 		SpaceShip& spaceship = static_cast<SpaceShip&>( _component );
 

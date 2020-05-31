@@ -18,7 +18,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void ExpirationTime::Init( EcsWorld& _world, EcsEntity _entity, EcsComponent& _component )
+	void ExpirationTime::Init( EcsWorld& /*_world*/, EcsEntity /*_entity*/, EcsComponent& _component )
 	{
 		ExpirationTime& expiration = static_cast<ExpirationTime&>( _component );
 		expiration.duration = 10.f;
@@ -26,7 +26,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void ExpirationTime::OnGui( EcsWorld& _world, EcsEntity _entityID, EcsComponent& _component )
+	void ExpirationTime::OnGui( EcsWorld& /*_world*/, EcsEntity /*_entityID*/, EcsComponent& _component )
 	{
 		ExpirationTime& expiration = static_cast<ExpirationTime&>( _component );
 		ImGui::PushItemWidth( 0.6f * ImGui::GetWindowWidth() );

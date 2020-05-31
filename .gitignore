@@ -12,3 +12,6 @@ content/_default/texture/blender_icons.png
 middleware/LivePP
 *.dmp
 *.callstack.txt
+lib/debug
+lib/release
+bin

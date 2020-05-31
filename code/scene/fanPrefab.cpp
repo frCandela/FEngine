@@ -66,7 +66,6 @@ namespace fan
 	{
 		Clear();
 
-		Scene& scene = *_node.scene;
 		Json& prefabJson = m_json[ "prefab" ];
 		Scene::R_SaveToJson( _node, prefabJson );
 		Scene::RemapSceneNodesIndices( prefabJson );

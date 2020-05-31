@@ -40,7 +40,7 @@ namespace fan
 			for( int i = 0; i < connections.size(); i++ )
 			{
 				Connection& connection = connections[i];
-				if( connection.object )
+				if( connection.object == _object )
 				{
 					connections.erase( connections.begin() + i );
 					return;

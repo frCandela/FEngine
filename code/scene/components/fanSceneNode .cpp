@@ -21,7 +21,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void SceneNode::Init( EcsWorld& _world, EcsEntity _entity, EcsComponent& _component )
+	void SceneNode::Init( EcsWorld& /*_world*/, EcsEntity /*_entity*/, EcsComponent& _component )
 	{
 		SceneNode& node = static_cast<SceneNode&>( _component );
 		node.handle = 0;
@@ -35,7 +35,7 @@ namespace fan
 	//================================================================================================================================
 	// disconnects all the node's child hierarchy tree and kills it
 	//================================================================================================================================
-	void SceneNode::Destroy( EcsWorld& _world, EcsEntity _entity, EcsComponent& _component )
+	void SceneNode::Destroy( EcsWorld& _world, EcsEntity /*_entity*/, EcsComponent& _component )
 	{
 		SceneNode& node = static_cast<SceneNode&>( _component );
 		Scene& scene = _world.GetSingleton<Scene>();
@@ -61,22 +61,22 @@ namespace fan
 			std::set<SceneNode* > nodesToDelete;
 			while( !nodesstack.empty() )
 			{				
-				SceneNode& node = _world.GetComponent<SceneNode>( _world.GetEntity( nodesstack.top() ));
+				SceneNode& childNode = _world.GetComponent<SceneNode>( _world.GetEntity( nodesstack.top() ));
 				nodesstack.pop();
-				nodesToDelete.insert( &node );
-				for( int childIndex = 0; childIndex < node.childs.size(); childIndex++ )
+				nodesToDelete.insert( &childNode );
+				for( int childIndex = 0; childIndex < childNode.childs.size(); childIndex++ )
 				{
-					nodesstack.push( node.childs[childIndex] );
+					nodesstack.push( childNode.childs[childIndex] );
 				}
 			}
 
 			// delete node & childs
-			for( SceneNode* node : nodesToDelete )
+			for( SceneNode* deletedNode : nodesToDelete )
 			{
-				EcsEntity entity = _world.GetEntity( node->handle );
-				scene.nodesToKill.insert( node->handle );
-				node->parentHandle = 0;
-				node->childs.clear();
+				EcsEntity entity = _world.GetEntity( deletedNode->handle );
+				scene.nodesToKill.insert( deletedNode->handle );
+				deletedNode->parentHandle = 0;
+				deletedNode->childs.clear();
 			}		
 		}
 	}
@@ -96,7 +96,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void SceneNode::OnGui( EcsWorld& _world, EcsEntity _entityID, EcsComponent& _component )
+	void SceneNode::OnGui( EcsWorld& /*_world*/, EcsEntity /*_entityID*/, EcsComponent& _component )
 	{
 		SceneNode& node = static_cast<SceneNode&>( _component );
 		EcsWorld& world = * node.scene->world;

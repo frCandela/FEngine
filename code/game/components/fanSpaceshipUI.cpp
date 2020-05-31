@@ -16,7 +16,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void SpaceshipUI::Init( EcsWorld& _world, EcsEntity _entity, EcsComponent& _component )
+	void SpaceshipUI::Init( EcsWorld& _world, EcsEntity /*_entity*/, EcsComponent& _component )
 	{
 		SpaceshipUI& spaceshipUI = static_cast<SpaceshipUI&>( _component );
 		spaceshipUI.uiRootTransform.Init( _world );
@@ -29,7 +29,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void SpaceshipUI::OnGui( EcsWorld& _world, EcsEntity _entityID, EcsComponent& _component )
+	void SpaceshipUI::OnGui( EcsWorld& /*_world*/, EcsEntity /*_entityID*/, EcsComponent& _component )
 	{
 		SpaceshipUI& spaceshipUI = static_cast<SpaceshipUI&>( _component );
 

@@ -20,17 +20,17 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void PlayerController::Init( EcsWorld& _world, EcsEntity _entity, EcsComponent& _component )
+	void PlayerController::Init( EcsWorld& /*_world*/, EcsEntity /*_entity*/, EcsComponent& /*_component*/ )
 	{
-		PlayerController& playerController = static_cast<PlayerController&>( _component );
+		//PlayerController& playerController = static_cast<PlayerController&>( _component );
 
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void PlayerController::OnGui( EcsWorld& _world, EcsEntity _entityID, EcsComponent& _component )
+	void PlayerController::OnGui( EcsWorld& /*_world*/, EcsEntity /*_entityID*/, EcsComponent& /*_component*/ )
 	{
-		PlayerController& playerController = static_cast<PlayerController&>( _component );
+//		PlayerController& playerController = static_cast<PlayerController&>( _component );
 
 		ImGui::PushItemWidth( 0.6f * ImGui::GetWindowWidth() );
 		{
@@ -63,10 +63,10 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void PlayerController::Load( EcsComponent& _component, const Json& _json )
+	void PlayerController::Load( EcsComponent& /*_component*/, const Json& /*_json*/ )
 	{
-		PlayerController& playerController = static_cast<PlayerController&>( _component );
-
+//		PlayerController& playerController = static_cast<PlayerController&>( _component );
+//
 // 		int tmp;
 // 		if( Serializable::LoadInt( _json, "direction_buffer_size", tmp ) )
 // 		{
@@ -77,9 +77,9 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void PlayerController::Save( const EcsComponent& _component, Json& _json )
+	void PlayerController::Save( const EcsComponent& /*_component*/, Json& /*_json*/ )
 	{
-		const PlayerController& playerController = static_cast<const PlayerController&>( _component );
+//		const PlayerController& playerController = static_cast<const PlayerController&>( _component );
 
 // 		Serializable::SaveInt( _json, "direction_buffer_size", (int)playerInput.directionBuffer.size() );
 // 		Serializable::SaveFloat( _json, "direction_cut_treshold", playerInput.directionCutTreshold );

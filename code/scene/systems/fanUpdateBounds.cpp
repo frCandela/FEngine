@@ -62,7 +62,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void S_UpdateBoundsFromModel::Run( EcsWorld& _world, const EcsView& _view, const float _delta )
+	void S_UpdateBoundsFromModel::Run( EcsWorld& _world, const EcsView& _view )
 	{
 		auto meshRendererIt = _view.begin<MeshRenderer>();
 		auto transformIt = _view.begin<Transform>();
@@ -104,7 +104,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void S_UpdateBoundsFromTransform::Run( EcsWorld& _world, const EcsView& _view, const float _delta )
+	void S_UpdateBoundsFromTransform::Run( EcsWorld& _world, const EcsView& _view )
 	{
 		auto transformIt = _view.begin<Transform>();
 		auto boundsIt = _view.begin<Bounds>();

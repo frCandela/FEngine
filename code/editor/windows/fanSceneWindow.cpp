@@ -85,7 +85,7 @@ namespace fan
 				assert( m_lastSceneNodeRightClicked != nullptr );
 				Scene& scene = *m_lastSceneNodeRightClicked->scene;
 				EcsWorld& world = *scene.world;				
-				btVector3& origin = btVector3::Zero();
+				btVector3 origin = btVector3::Zero();
 				const EcsEntity parentID = world.GetEntity( m_lastSceneNodeRightClicked->handle );
 				if( world.HasComponent<Transform>( parentID ) )
 				{
@@ -150,9 +150,8 @@ namespace fan
 					const EcsEntity entity = world.GetEntity( node.handle );
 					
 					Transform& transform = world.AddComponent<Transform>( entity );
-					transform.SetPosition( origin );
-					
-					PointLight& light = world.AddComponent<PointLight>( entity );
+					transform.SetPosition( origin );					
+					world.AddComponent<PointLight>( entity );
 					onSelectSceneNode.Emmit( &node );
 				}
 
@@ -166,7 +165,7 @@ namespace fan
 					Transform& transform = world.AddComponent<Transform>( entity );
 					transform.SetPosition( origin  );
 					
-					DirectionalLight& light = world.AddComponent<DirectionalLight>( entity );
+					world.AddComponent<DirectionalLight>( entity );
 					transform.SetRotationEuler( btVector3(30.f,10.f,0.f) );
 					onSelectSceneNode.Emmit( &node );
 				}
@@ -181,7 +180,7 @@ namespace fan
 					Transform& transform = world.AddComponent<Transform>( entity );
 					transform.SetPosition( origin );
 
-					ParticleEmitter& emitter = world.AddComponent<ParticleEmitter>( entity );
+					world.AddComponent<ParticleEmitter>( entity );
 					transform.SetPosition( origin );
 				}
 
@@ -306,7 +305,6 @@ namespace fan
 
 		if( isOpen )
 		{
-			EcsWorld& world = *_node.scene->world;
 			for( int childIndex = 0; childIndex < _node.childs.size(); childIndex++ )
 			{
 				SceneNode& child = world.GetComponent<SceneNode>( world.GetEntity( _node.childs[childIndex] ) );

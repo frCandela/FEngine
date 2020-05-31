@@ -19,7 +19,7 @@ namespace fan
 	struct S_UpdateBoundsFromModel : EcsSystem
 	{
 		static EcsSignature GetSignature( const EcsWorld& _world );
-		static void Run( EcsWorld& _world, const EcsView& _view, const float _delta );
+		static void Run( EcsWorld& _world, const EcsView& _view );
 	};
 
 	//==============================================================================================================================================================
@@ -28,6 +28,6 @@ namespace fan
 	struct S_UpdateBoundsFromTransform : EcsSystem
 	{
 		static EcsSignature GetSignature( const EcsWorld& _world );
-		static void Run( EcsWorld& _world, const EcsView& _view, const float _delta );
+		static void Run( EcsWorld& _world, const EcsView& _view );
 	};
 }

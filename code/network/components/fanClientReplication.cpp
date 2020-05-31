@@ -18,7 +18,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void ClientReplication::Init( EcsWorld& _world, EcsEntity _entity, EcsComponent& _component )
+	void ClientReplication::Init( EcsWorld& /*_world*/, EcsEntity /*_entity*/, EcsComponent& _component )
 	{
 		ClientReplication& replicationManager = static_cast<ClientReplication&>( _component );
 		replicationManager.replicationListRPC.clear();
@@ -40,7 +40,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void ClientReplication::OnGui( EcsWorld& _world, EcsEntity _entityID, EcsComponent& _component )
+	void ClientReplication::OnGui( EcsWorld& /*_world*/, EcsEntity /*_entityID*/, EcsComponent& _component )
 	{
 		ClientReplication& replicationManager = static_cast<ClientReplication&>( _component );
 

@@ -61,7 +61,6 @@ namespace fan
 				if( _world.HasComponent<MeshRenderer>( entity ) )
 				{
 					const MeshRenderer& meshRenderer = _world.GetComponent<MeshRenderer>( entity );
-					const Transform& transform = _world.GetComponent<Transform>( entity );
 					const Ray transformedRay( transform.InverseTransformPoint( _ray.origin ), transform.InverseTransformDirection( _ray.direction ) );
 					if( meshRenderer.mesh!= nullptr && meshRenderer.mesh->GetHull().RayCast( transformedRay.origin, transformedRay.direction, intersection ) )
 					{

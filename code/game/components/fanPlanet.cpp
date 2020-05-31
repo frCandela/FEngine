@@ -19,7 +19,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void Planet::Init( EcsWorld& _world, EcsEntity _entity, EcsComponent& _component )
+	void Planet::Init( EcsWorld& /*_world*/, EcsEntity /*_entity*/, EcsComponent& _component )
 	{
 		Planet& planet = static_cast<Planet&>( _component );
 		planet.speed = 1.f;
@@ -29,7 +29,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void Planet::OnGui( EcsWorld& _world, EcsEntity _entityID, EcsComponent& _component )
+	void Planet::OnGui( EcsWorld& /*_world*/, EcsEntity /*_entityID*/, EcsComponent& _component )
 	{
 		Planet& planet = static_cast<Planet&>( _component );
 		ImGui::PushItemWidth( 0.6f * ImGui::GetWindowWidth() );

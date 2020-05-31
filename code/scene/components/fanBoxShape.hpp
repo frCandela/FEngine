@@ -1,9 +1,10 @@
 #pragma  once
 
 #include "ecs/fanEcsComponent.hpp"
-
+#include "core/fanBulletWarnings.hpp"
+BULLET_PUSH()
 #include "bullet/btBulletDynamicsCommon.h"
-
+BULLET_POP()
 namespace fan
 {
 	//==============================================================================================================================================================

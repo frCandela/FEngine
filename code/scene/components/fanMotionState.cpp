@@ -20,7 +20,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void MotionState::Init( EcsWorld& _world, EcsEntity _entity, EcsComponent& _component )
+	void MotionState::Init( EcsWorld& /*_world*/, EcsEntity /*_entity*/, EcsComponent& _component )
 	{
 		// clear
 		MotionState& motionState = static_cast<MotionState&>( _component );
@@ -29,7 +29,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void MotionState::Destroy( EcsWorld& _world, EcsEntity _entity, EcsComponent& _component )
+	void MotionState::Destroy( EcsWorld& /*_world*/, EcsEntity /*_entity*/, EcsComponent& _component )
 	{
 		MotionState& motionState = static_cast<MotionState&>( _component );
 		assert( motionState.motionState != nullptr );

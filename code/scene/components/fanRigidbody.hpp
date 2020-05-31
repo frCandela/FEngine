@@ -1,6 +1,9 @@
 #pragma  once
 
+#include "core/fanBulletWarnings.hpp"
+BULLET_PUSH()
 #include "bullet/btBulletDynamicsCommon.h"
+BULLET_POP()
 #include "ecs/fanEcsComponent.hpp"
 #include "core/fanSignal.hpp"
 

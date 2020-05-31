@@ -19,7 +19,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void ClientConnection::Init( EcsWorld& _world, EcsEntity _entity, EcsComponent& _component )
+	void ClientConnection::Init( EcsWorld& /*_world*/, EcsEntity /*_entity*/, EcsComponent& _component )
 	{
 		ClientConnection& connection = static_cast<ClientConnection&>( _component );
 		assert( connection.socket == nullptr );
@@ -38,7 +38,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void ClientConnection::Destroy( EcsWorld& _world, EcsEntity _entity, EcsComponent& _component )
+	void ClientConnection::Destroy( EcsWorld& /*_world*/, EcsEntity /*_entity*/, EcsComponent& _component )
 	{
 		ClientConnection& connection = static_cast<ClientConnection&>( _component );
 		delete connection.socket;
@@ -103,7 +103,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void ClientConnection::ProcessPacket( const PacketLoginSuccess& _packetLogin )
+	void ClientConnection::ProcessPacket( const PacketLoginSuccess& /*_packetLogin*/ )
 	{
 		if( state == ClientState::PendingConnection )
 		{
@@ -114,7 +114,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void ClientConnection::ProcessPacket( const PacketDisconnect& _packetDisconnect )
+	void ClientConnection::ProcessPacket( const PacketDisconnect& /*_packetDisconnect*/ )
 	{
 		state = ClientState::Disconnected;
 		Debug::Log() << "disconnected from server" << Debug::Endl();		
@@ -167,12 +167,11 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void ClientConnection::OnGui( EcsWorld& _world, EcsEntity _entityID, EcsComponent& _component )
+	void ClientConnection::OnGui( EcsWorld& /*_world*/, EcsEntity /*_entityID*/, EcsComponent& _component )
 	{
 		ImGui::Indent(); ImGui::Indent();
 		{
 			ClientConnection& connection = static_cast<ClientConnection&>( _component );
-			double currentTime = Time::Get().ElapsedSinceStartup();
 
 			ImGui::Text( "Client" );
 			ImGui::Separator();

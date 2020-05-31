@@ -64,7 +64,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void S_RechargeBatteries::Run( EcsWorld& _world, const EcsView& _view, const float _delta )
+	void S_RechargeBatteries::Run( EcsWorld& /*_world*/, const EcsView& _view, const float _delta )
 	{
 		if( _delta == 0.f ) { return; }
 

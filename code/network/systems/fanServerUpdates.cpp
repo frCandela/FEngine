@@ -110,7 +110,6 @@ namespace fan
 	{
 		if( _delta == 0.f ) { return; }
 
-		const HostManager& hostManager = _world.GetSingleton<HostManager>();
 		const Game& game = _world.GetSingleton<Game>();
 
 		auto hostConnectionIt = _view.begin<HostConnection>();

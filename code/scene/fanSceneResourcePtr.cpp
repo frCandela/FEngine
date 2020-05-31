@@ -93,7 +93,6 @@ namespace ImGui
  		// dragndrop source for button
 		if( _ptr.handle != 0 )
 		{
-			fan::SceneNode& node = world.GetComponent<fan::SceneNode>( world.GetEntity( _ptr.handle ) );
 			ImGui::FanBeginDragDropSourceComponent( world, _ptr.handle, _ptr.type );
 		}
 

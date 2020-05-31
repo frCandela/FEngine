@@ -13,8 +13,6 @@ set( FAN_EDITOR_LIBS
     fanGame
 )
 
-add_compile_definitions(SFML_STATIC)
-
+add_compile_options( ${COMPILATION_FLAGS} )
 add_library(fanEditor STATIC ${FAN_EDITOR_SRC} ${FAN_EDITOR_H})
-
 target_link_libraries(fanEditor ${FAN_EDITOR_LIBS})

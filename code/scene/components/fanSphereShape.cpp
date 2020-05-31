@@ -19,7 +19,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void SphereShape::Init( EcsWorld& _world, EcsEntity _entity, EcsComponent& _component )
+	void SphereShape::Init( EcsWorld& /*_world*/, EcsEntity /*_entity*/, EcsComponent& _component )
 	{
 		SphereShape& sphereShape = static_cast<SphereShape&>( _component );
 		sphereShape.sphereShape = new btSphereShape( 1.f );
@@ -28,7 +28,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void SphereShape::Destroy( EcsWorld& _world, EcsEntity _entity, EcsComponent& _component )
+	void SphereShape::Destroy( EcsWorld& /*_world*/, EcsEntity /*_entity*/, EcsComponent& _component )
 	{
 		SphereShape& sphereShape = static_cast<SphereShape&>( _component );
 		assert( sphereShape.sphereShape != nullptr );
@@ -38,7 +38,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void SphereShape::OnGui( EcsWorld& _world, EcsEntity _entityID, EcsComponent& _component )
+	void SphereShape::OnGui( EcsWorld& /*_world*/, EcsEntity /*_entityID*/, EcsComponent& _component )
 	{
 		SphereShape& sphereShape = static_cast<SphereShape&>( _component );
 
@@ -49,7 +49,6 @@ namespace fan
 			{
 				sphereShape.SetRadius( radius );
 			}
-			//RendererDebug::Get().DebugSphere( m_gameobject->GetTransform().GetBtTransform(), radius, 2, Color::Green );
 		} ImGui::PopItemWidth();
 	}
 

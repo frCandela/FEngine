@@ -19,7 +19,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void Bullet::Init( EcsWorld& _world, EcsEntity _entity, EcsComponent& _component )
+	void Bullet::Init( EcsWorld& /*_world*/, EcsEntity /*_entity*/, EcsComponent& _component )
 	{
 		Bullet& bullet = static_cast<Bullet&>( _component );
 
@@ -29,7 +29,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void Bullet::OnGui( EcsWorld& _world, EcsEntity _entityID, EcsComponent& _component )
+	void Bullet::OnGui( EcsWorld& /*_world*/, EcsEntity /*_entityID*/, EcsComponent& _component )
 	{
 		Bullet& bullet = static_cast<Bullet&>( _component );
 

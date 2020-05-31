@@ -16,7 +16,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void S_InitFollowTransforms::Run( EcsWorld& _world, const EcsView& _view ) 
+	void S_InitFollowTransforms::Run( EcsWorld& /*_world*/, const EcsView& _view ) 
 	{
 		auto transformIt = _view.begin<Transform>();
 		auto followTransformIt = _view.begin<FollowTransform>();
@@ -49,7 +49,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void S_MoveFollowTransforms::Run( EcsWorld& _world, const EcsView& _view ) 
+	void S_MoveFollowTransforms::Run( EcsWorld& /*_world*/, const EcsView& _view ) 
 	{
 		auto transformIt = _view.begin<Transform>();
 		auto followTransformIt = _view.begin<FollowTransform>();
@@ -75,7 +75,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void S_MoveFollowTransformsUI::Run( EcsWorld& _world, const EcsView& _view ) 
+	void S_MoveFollowTransformsUI::Run( EcsWorld& /*_world*/, const EcsView& _view ) 
 	{
 		auto transformUiIt = _view.begin<TransformUI>();
 		auto followTransformIt = _view.begin<FollowTransformUI>();
@@ -86,8 +86,8 @@ namespace fan
 
 			if( followTransform.locked && followTransform.targetTransform != nullptr )
 			{
-// 				TransformUI& target = *followTransform.targetTransform;
-// 				follow.position = target.position + followTransform.offset;
+				TransformUI& target = *followTransform.targetTransform;
+				follow.position = target.position + followTransform.offset;
 			}
 		}
 	}

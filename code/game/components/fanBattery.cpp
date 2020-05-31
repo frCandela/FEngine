@@ -18,7 +18,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void Battery::Init( EcsWorld& _world, EcsEntity _entity, EcsComponent& _component )
+	void Battery::Init( EcsWorld& /*_world*/, EcsEntity /*_entity*/, EcsComponent& _component )
 	{
 		Battery& battery = static_cast<Battery&>( _component );
 		battery.maxEnergy = 100.f;
@@ -27,7 +27,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void Battery::OnGui( EcsWorld& _world, EcsEntity _entityID, EcsComponent& _component )
+	void Battery::OnGui( EcsWorld& /*_world*/, EcsEntity /*_entityID*/, EcsComponent& _component )
 	{
 		Battery& battery = static_cast<Battery&>( _component );
 

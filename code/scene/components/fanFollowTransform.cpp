@@ -21,7 +21,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void FollowTransform::Init( EcsWorld& _world, EcsEntity _entity, EcsComponent& _component )
+	void FollowTransform::Init( EcsWorld& _world, EcsEntity /*_entity*/, EcsComponent& _component )
 	{
 		// clear
 		FollowTransform& followTransform = static_cast<FollowTransform&>( _component );

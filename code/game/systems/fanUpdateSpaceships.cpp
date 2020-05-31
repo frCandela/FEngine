@@ -150,7 +150,6 @@ namespace fan
 	EcsSignature S_EruptionDamage::GetSignature( const EcsWorld& _world )
 	{
 		return  _world.GetSignature<SolarPanel>() |
-				_world.GetSignature<Transform>() |
 				_world.GetSignature<Health>()	 |
 				_world.GetSignature<SpaceShip>();
 	}
@@ -163,14 +162,10 @@ namespace fan
 
 		const SolarEruption& eruption = _world.GetSingleton<SolarEruption>();
 
-
-
-		auto transformIt = _view.begin<Transform>();
 		auto healthIt = _view.begin<Health>();
 		auto solarPanelIt = _view.begin<SolarPanel>();
-		for( ; transformIt != _view.end<Transform>(); ++transformIt, ++healthIt, ++solarPanelIt )
+		for( ; healthIt != _view.end<Health>(); ++healthIt, ++solarPanelIt )
 		{
-			const Transform& transform = *transformIt;
 			Health& health = *healthIt;
 			const SolarPanel& solarPanel = *solarPanelIt;
 
@@ -203,9 +198,7 @@ namespace fan
 	void S_PlayerDeath::Run( EcsWorld& _world, const EcsView& _view, const float _delta )
 	{
 		if( _delta == 0.f ) { return; }
-
-		const SolarEruption& eruption = _world.GetSingleton<SolarEruption>();
-
+		
 		auto healthIt = _view.begin<Health>();
 		auto transformIt = _view.begin<Transform>();
 		auto spaceShipIt = _view.begin<SpaceShip>();

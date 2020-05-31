@@ -19,7 +19,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void SolarPanel::Init( EcsWorld& _world, EcsEntity _entity, EcsComponent& _component )
+	void SolarPanel::Init( EcsWorld& /*_world*/, EcsEntity /*_entity*/, EcsComponent& _component )
 	{
 		SolarPanel& solarPanel = static_cast<SolarPanel&>( _component );
 		solarPanel.isInSunlight = false;
@@ -32,7 +32,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void SolarPanel::OnGui( EcsWorld& _world, EcsEntity _entityID, EcsComponent& _component )
+	void SolarPanel::OnGui( EcsWorld& /*_world*/, EcsEntity /*_entityID*/, EcsComponent& _component )
 	{
 		SolarPanel& solarPanel = static_cast<SolarPanel&>( _component );
 

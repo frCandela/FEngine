@@ -22,7 +22,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void Transform::Init( EcsWorld& _world, EcsEntity _entity, EcsComponent& _component )
+	void Transform::Init( EcsWorld& /*_world*/, EcsEntity /*_entity*/, EcsComponent& _component )
 	{
 		Transform& transform = static_cast<Transform&>( _component );
 		transform.transform.setIdentity();
@@ -31,7 +31,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void Transform::OnGui( EcsWorld& _world, EcsEntity _entityID, EcsComponent& _component )
+	void Transform::OnGui( EcsWorld& /*_world*/, EcsEntity /*_entityID*/, EcsComponent& _component )
 	{
 		Transform& transform = static_cast<Transform&>( _component );
 		ImGui::PushItemWidth( 0.6f * ImGui::GetWindowWidth() - 16 );
@@ -229,8 +229,8 @@ namespace fan
 	//================================================================================================================================
 	btVector3 Transform::TransformDirection( const btVector3 _point ) const
 	{
-		const btTransform transform( GetRotationQuat() );
-		btVector3 transformedPoint = transform * _point;
+		const btTransform rotationTransform( GetRotationQuat() );
+		btVector3 transformedPoint = rotationTransform * _point;
 		return transformedPoint;
 	}
 
@@ -240,8 +240,8 @@ namespace fan
 	btVector3 Transform::InverseTransformDirection( const btVector3 _point ) const
 	{
 		const btVector3 invertScale( 1.f / scale[0], 1.f / scale[1], 1.f / scale[2] );
-		const btTransform transform( GetRotationQuat() );
-		btVector3 transformedPoint = invertScale * ( transform.inverse() * _point );
+		const btTransform rotationTransform( GetRotationQuat() );
+		btVector3 transformedPoint = invertScale * ( rotationTransform.inverse() * _point );
 		return transformedPoint;
 	}
 }

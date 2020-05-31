@@ -23,7 +23,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void EditorCamera::Init( EcsWorld& _world, EcsSingleton& _component )
+	void EditorCamera::Init( EcsWorld& /*_world*/, EcsSingleton& _component )
 	{
 		EditorCamera& editorCamera = static_cast<EditorCamera&>( _component );
 
@@ -132,7 +132,7 @@ namespace fan
 		cameraNode.AddFlag( SceneNode::NOT_SAVED | SceneNode::NO_DELETE | SceneNode::NO_RAYCAST );
 
 		Transform& transform = _world.AddComponent< Transform >( cameraID );
-		Camera& camera = _world.AddComponent< Camera >( cameraID );
+		_world.AddComponent< Camera >( cameraID );
 
 		transform.SetPosition( btVector3( 0, 0, -2 ) );
 		scene.mainCameraHandle = cameraNode.handle;

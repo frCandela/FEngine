@@ -22,7 +22,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void FollowTransformUI::Init( EcsWorld& _world, EcsEntity _entity, EcsComponent& _component )
+	void FollowTransformUI::Init( EcsWorld& _world, EcsEntity /*_entity*/, EcsComponent& _component )
 	{
 		// clear
 		FollowTransformUI& followTransform = static_cast<FollowTransformUI&>( _component );

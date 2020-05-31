@@ -11,7 +11,7 @@ namespace fan
 	struct S_SynchronizeTransformFromMotionState : EcsSystem
 	{
 		static EcsSignature GetSignature( const EcsWorld& _world );
-		static void Run( EcsWorld& _world, const EcsView& _view, const float _delta );
+		static void Run( EcsWorld& _world, const EcsView& _view );
 	};
 
 	//==============================================================================================================================================================
@@ -21,6 +21,6 @@ namespace fan
 	struct S_SynchronizeMotionStateFromTransform : EcsSystem
 	{
 		static EcsSignature GetSignature( const EcsWorld& _world );
-		static void Run( EcsWorld& _world, const EcsView& _view, const float _delta );
+		static void Run( EcsWorld& _world, const EcsView& _view );
 	};
 }

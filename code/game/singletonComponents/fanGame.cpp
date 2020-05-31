@@ -30,7 +30,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void Game::Init( EcsWorld& _world, EcsSingleton& _component ){
+	void Game::Init( EcsWorld& /*_world*/, EcsSingleton& _component ){
 		Game& gameData = static_cast<Game&>( _component );
 		gameData.state = STOPPED;
 		gameData.spaceshipPrefab.Set( nullptr );

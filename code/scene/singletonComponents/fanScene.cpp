@@ -41,7 +41,9 @@ namespace fan
 		scene.mainCameraHandle = 0;
 		scene.nodes.clear();
 		scene.nodesToKill.clear();
-		const_cast<EcsWorld*>( scene.world ) = &_world;
+
+		EcsWorld* worldNoConst = const_cast<EcsWorld*>( scene.world );
+		worldNoConst = &_world;
 	}
 
 	//================================================================================================================================
@@ -306,7 +308,7 @@ namespace fan
 				stack.pop();
 
 				// remap
-				Json::iterator& jNodeId = js.find( "handle" );
+				Json::iterator jNodeId = js.find( "handle" );
 				if( jNodeId != js.end() )
 				{
  					const uint32_t nodeId = *jNodeId;

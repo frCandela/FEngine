@@ -27,12 +27,14 @@ namespace fan
 	void CollisionManager::Init( EcsWorld& _world, EcsSingleton& _component )
 	{
 		CollisionManager& collisionManager = static_cast<CollisionManager&>( _component );
-		const_cast<EcsWorld*>( collisionManager.world ) = &_world;
+
+		EcsWorld* nonConstWorld = const_cast<EcsWorld*>( collisionManager.world );
+		nonConstWorld = &_world;
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void CollisionManager::OnBulletContact( Rigidbody& _bulletBody, Rigidbody& _otherBody, btPersistentManifold* const& _manifold )
+	void CollisionManager::OnBulletContact( Rigidbody& _bulletBody, Rigidbody& /*_otherBody*/, btPersistentManifold* const& /*_manifold*/ )
 	{
 		const EcsHandle bulletHandle = _bulletBody.GetHandle();
 		const EcsEntity bulletID = world->GetEntity( bulletHandle );
@@ -51,7 +53,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void CollisionManager::OnSpaceShipContact( Rigidbody& _spaceshipBody, Rigidbody& _otherBody, btPersistentManifold* const& _manifold )
+	void CollisionManager::OnSpaceShipContact( Rigidbody& _spaceshipBody, Rigidbody& _otherBody, btPersistentManifold* const& /*_manifold*/ )
 	{
 		// get ids
 		const EcsHandle spaceshipHandle = _spaceshipBody.GetHandle();

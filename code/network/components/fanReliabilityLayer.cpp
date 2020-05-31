@@ -19,7 +19,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void ReliabilityLayer::Init( EcsWorld& _world, EcsEntity _entity, EcsComponent& _component )
+	void ReliabilityLayer::Init( EcsWorld& /*_world*/, EcsEntity /*_entity*/, EcsComponent& _component )
 	{
 		ReliabilityLayer& reliabilityLayer = static_cast<ReliabilityLayer&>( _component );
 		reliabilityLayer.nextPacketTag = 0;
@@ -120,7 +120,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void ReliabilityLayer::OnGui( EcsWorld& _world, EcsEntity _entityID, EcsComponent& _component )
+	void ReliabilityLayer::OnGui( EcsWorld& /*_world*/, EcsEntity /*_entityID*/, EcsComponent& _component )
 	{
 		ReliabilityLayer& deliveryNotification = static_cast<ReliabilityLayer&>( _component );
 		ImGui::PushItemWidth( 0.6f * ImGui::GetWindowWidth() - 16 );

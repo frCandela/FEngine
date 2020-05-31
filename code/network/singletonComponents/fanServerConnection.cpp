@@ -13,7 +13,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void ServerConnection::Init( EcsWorld& _world, EcsSingleton& _component )
+	void ServerConnection::Init( EcsWorld& /*_world*/, EcsSingleton& _component )
 	{
 		ServerConnection& connection = static_cast<ServerConnection&>( _component );
 		connection.serverPort = 53000;

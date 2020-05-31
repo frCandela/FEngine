@@ -18,7 +18,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void SunLight::Init( EcsWorld& _world, EcsSingleton& _component )
+	void SunLight::Init( EcsWorld& /*_world*/, EcsSingleton& _component )
 	{
 		SunLight& sunLight = static_cast<SunLight&>( _component );
 

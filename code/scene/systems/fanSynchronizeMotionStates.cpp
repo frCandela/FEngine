@@ -19,7 +19,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void S_SynchronizeTransformFromMotionState::Run( EcsWorld& _world, const EcsView& _view, const float _delta )
+	void S_SynchronizeTransformFromMotionState::Run( EcsWorld& /*_world*/, const EcsView& _view )
 	{
 		auto motionStateIt = _view.begin<MotionState>();
 		auto rigidbodyIt = _view.begin<Rigidbody>();
@@ -47,7 +47,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void S_SynchronizeMotionStateFromTransform::Run( EcsWorld& _world, const EcsView& _view, const float _delta )
+	void S_SynchronizeMotionStateFromTransform::Run( EcsWorld& /*_world*/, const EcsView& _view )
 	{
 		auto motionStateIt = _view.begin<MotionState>();
 		auto rigidbodyIt = _view.begin<Rigidbody>();

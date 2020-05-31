@@ -12,7 +12,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void PlayersManager::Init( EcsWorld& _world, EcsSingleton& _component )
+	void PlayersManager::Init( EcsWorld& /*_world*/, EcsSingleton& _component )
 	{
 		PlayersManager& playersManager = static_cast<PlayersManager&>( _component );
 		playersManager.playerPrefab.Set( nullptr );

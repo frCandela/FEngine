@@ -1,6 +1,5 @@
 #include "scene/components/fanRigidbody.hpp"
 
-#include "bullet/btBulletDynamicsCommon.h"
 #include "render/fanRenderSerializable.hpp"
 #include "scene/singletonComponents/fanPhysicsWorld.hpp"
 #include "ecs/fanEcsWorld.hpp"
@@ -36,7 +35,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void Rigidbody::Destroy( EcsWorld& _world, EcsEntity _entity, EcsComponent& _component )
+	void Rigidbody::Destroy( EcsWorld& _world, EcsEntity /*_entity*/, EcsComponent& _component )
 	{
 		PhysicsWorld& physicsWorld = _world.GetSingleton<PhysicsWorld>();
 		Rigidbody& rb = static_cast<Rigidbody&>( _component );
@@ -238,7 +237,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void Rigidbody::OnGui( EcsWorld& _world, EcsEntity _entityID, EcsComponent& _component )
+	void Rigidbody::OnGui( EcsWorld& /*_world*/, EcsEntity /*_entityID*/, EcsComponent& _component )
 	{
 		Rigidbody& rb = static_cast<Rigidbody&>( _component );
 

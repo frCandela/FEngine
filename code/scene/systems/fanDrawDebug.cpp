@@ -23,14 +23,13 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void S_DrawDebugBounds::Run( EcsWorld& _world, const EcsView& _view )
+	void S_DrawDebugBounds::Run( EcsWorld& /*_world*/, const EcsView& _view )
 	{
 		auto boundsIt = _view.begin<Bounds>();
 		auto sceneNodeIt = _view.begin<SceneNode>();
 		for( ;boundsIt != _view.end<Bounds>(); ++boundsIt, ++sceneNodeIt )
 		{
 			const Bounds& bounds   = *boundsIt;
-			const SceneNode& node = *sceneNodeIt;
 			RendererDebug::Get().DebugAABB( bounds.aabb, Color::Red );
 		}
 	}
@@ -44,7 +43,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void S_DrawDebugNormals::Run( EcsWorld& _world, const EcsView& _view )
+	void S_DrawDebugNormals::Run( EcsWorld& /*_world*/, const EcsView& _view )
 	{
 		auto meshRendererIt = _view.begin<MeshRenderer>();
 		auto transformIt = _view.begin<Transform>();
@@ -80,7 +79,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void S_DrawDebugWireframe::Run( EcsWorld& _world, const EcsView& _view ) 
+	void S_DrawDebugWireframe::Run( EcsWorld& /*_world*/, const EcsView& _view ) 
 	{
 		auto meshRendererIt = _view.begin<MeshRenderer>();
 		auto transformIt = _view.begin<Transform>();
@@ -117,7 +116,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void S_DrawDebugHull::Run( EcsWorld& _world, const EcsView& _view ) 
+	void S_DrawDebugHull::Run( EcsWorld& /*_world*/, const EcsView& _view ) 
 	{
 		auto meshRendererIt = _view.begin<MeshRenderer>();
 		auto transformIt = _view.begin<Transform>();
@@ -168,7 +167,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void S_DrawDebugPointLights::Run( EcsWorld& _world, const EcsView& _view ) 
+	void S_DrawDebugPointLights::Run( EcsWorld& /*_world*/, const EcsView& _view ) 
 	{
 		auto lightIt = _view.begin<PointLight>();
 		auto transformIt = _view.begin<Transform>();
@@ -200,7 +199,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void S_DrawDebugDirectionalLights::Run( EcsWorld& _world, const EcsView& _view ) 
+	void S_DrawDebugDirectionalLights::Run( EcsWorld& /*_world*/, const EcsView& _view ) 
 	{
 		auto lightIt = _view.begin<DirectionalLight>();
 		auto transformIt = _view.begin<Transform>();
@@ -214,7 +213,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void S_DrawDebugDirectionalLights::DrawDirectionalLight( const Transform& _transform, const DirectionalLight& _light )
+	void S_DrawDebugDirectionalLights::DrawDirectionalLight( const Transform& _transform, const DirectionalLight& /*_light*/ )
 	{
 		const btVector3 pos = _transform.GetPosition();
 		const btVector3 dir = _transform.Forward();
@@ -248,7 +247,6 @@ namespace fan
 		for( ; transformIt != _view.end<Transform>(); ++transformIt )
 		{
 			const EcsEntity entity = transformIt.Entity();
-			const Transform& transform = *transformIt;
 			DrawCollisionShape( _world, entity );
 		}
 	}	
