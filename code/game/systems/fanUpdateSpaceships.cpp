@@ -216,7 +216,7 @@ namespace fan
 			const SpaceShip& spaceShip = *spaceShipIt;
 			const EcsEntity entity = healthIt.Entity();
 
-			if( health.currentHealth == 0.f )
+			if( health.currentHealth == 0.f && !health.invincible )
 			{
 				Scene& scene = _world.GetSingleton<Scene>();
 				

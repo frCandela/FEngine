@@ -201,7 +201,7 @@ namespace fan
 		{
 			SCOPED_PROFILE( scene_update );
 
-			S_ServerReceive			::Run( world );
+			S_ServerReceive			::Run( world, _delta );
 			S_ProcessTimedOutPackets::Run( world, world.Match( S_ProcessTimedOutPackets::GetSignature( world ) ) );
 			S_DetectHostTimout		::Run( world, world.Match( S_DetectHostTimout::GetSignature( world ) ) );
 			S_HostSpawnShip			::Run( world, world.Match( S_HostSpawnShip::GetSignature( world ) ), _delta );
@@ -269,8 +269,6 @@ namespace fan
 					}
 				}
 			}
-
-
 
 			S_ServerSend				::Run( world, world.Match( S_ServerSend::GetSignature( world ) )				, _delta );
 		}

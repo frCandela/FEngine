@@ -15,43 +15,46 @@ namespace fan
 	public:
 		LPPMain( LaunchSettings& _settings )
 		{
+			if( _settings.enableLivepp )
+			{
+				livePP = lpp::lppLoadAndRegister( L"middleware/LivePP/", "fanEngine" );
+				lpp::lppEnableAllCallingModulesSync( livePP );
+			}
+
 			if( _settings.launchMode == LaunchSettings::SERVER )
 			{
 				// attaches an editor to a game server and runs it
 				fan::GameServer server( "server" );
 				fan::Editor editor( _settings, server.world );
-				RunEditor( _settings, editor );
+				if( _settings.enableLivepp )
+				{
+					editor.onLPPSynch.Connect( &LPPMain::OnSync, this );
+				}
+				editor.Run();				
 			}
 			else if( _settings.launchMode == LaunchSettings::CLIENT )
 			{
 				// attaches an editor to a game client and runs it
 				fan::GameClient client( "client" );
 				fan::Editor editor( _settings, client.world );
-				RunEditor( _settings, editor );
+				if( _settings.enableLivepp )
+				{
+					editor.onLPPSynch.Connect( &LPPMain::OnSync, this );
+				}
+				editor.Run();
 			}
 			else
 			{
 				assert( false );
 			}
-		}
 
-		void RunEditor( LaunchSettings& _settings, fan::Editor& _editor )
-		{
 			if( _settings.enableLivepp )
 			{
-				livePP = lpp::lppLoadAndRegister( L"middleware/LivePP/", "fanEngine" );
-				lpp::lppEnableAllCallingModulesSync( livePP );
-				_editor.onLPPSynch.Connect( &LPPMain::OnSynch, this );
-				_editor.Run();
 				::FreeLibrary( livePP );
-			}
-			else
-			{
-				_editor.Run();
 			}
 		}
 
-		void OnSynch() { lpp::lppSyncPoint( livePP ); }
+		void OnSync() { lpp::lppSyncPoint( livePP ); }
 
 		HMODULE livePP;
 	};

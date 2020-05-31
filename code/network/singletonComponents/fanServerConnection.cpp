@@ -17,7 +17,6 @@ namespace fan
 	{
 		ServerConnection& connection = static_cast<ServerConnection&>( _component );
 		connection.serverPort = 53000;
-		connection.socket.Unbind();
 	}
 
 	//================================================================================================================================

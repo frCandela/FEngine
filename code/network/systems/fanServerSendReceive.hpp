@@ -18,6 +18,6 @@ namespace fan
 	//==============================================================================================================================================================
 	struct S_ServerReceive : EcsSystem
 	{
-		static void Run( EcsWorld& _world );
+		static void Run( EcsWorld& _world, const float _delta );
 	};
 }

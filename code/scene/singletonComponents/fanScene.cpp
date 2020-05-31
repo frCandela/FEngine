@@ -173,6 +173,7 @@ namespace fan
 		Clear( );
 		rootNodeHandle = CreateSceneNode( "root", nullptr ).handle;
 		onLoad.Emmit( *this );
+		world->ApplyTransitions();
 	}
 
 	//================================================================================================================================
@@ -389,6 +390,7 @@ namespace fan
 			S_InitFollowTransforms::Run( *world, world->Match( S_InitFollowTransforms::GetSignature( *world ) ) );
 
 			onLoad.Emmit( *this );
+			world->ApplyTransitions();
 			return true;
 		}
 		else

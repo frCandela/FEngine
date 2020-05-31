@@ -44,11 +44,14 @@ namespace fan
 		hostManager.netRoot = &scene.CreateSceneNode( "net root", &scene.GetRootNode() );
 
 		// bind
-		ServerConnection& connection = _world.GetSingleton<ServerConnection>();
-		Debug::Log() << "bind on port " << connection.serverPort << Debug::Endl();
+		ServerConnection& connection = _world.GetSingleton<ServerConnection>();	
 		if( connection.socket.Bind( connection.serverPort ) != sf::Socket::Done )
 		{
 			Debug::Error() << "bind failed on port " << connection.serverPort << Debug::Endl();
+		}
+		else
+		{
+			Debug::Log() << "bind on port " << connection.serverPort << Debug::Endl();
 		}
 	}
 
@@ -57,6 +60,7 @@ namespace fan
 	void ServerNetworkManager::Stop( EcsWorld& _world )
 	{
 		ServerConnection& connection = _world.GetSingleton<ServerConnection>();
+		Debug::Log() << "unbind from port " << connection.socket.GetPort() << Debug::Endl();
 		connection.socket.Unbind();
 	}
 

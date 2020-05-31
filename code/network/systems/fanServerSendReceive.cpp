@@ -80,8 +80,10 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void S_ServerReceive::Run( EcsWorld& _world )
+	void S_ServerReceive::Run( EcsWorld& _world, const float _delta )
 	{
+		if( _delta == 0.f ) { return; }
+
 		HostManager& hostManager = _world.GetSingleton<HostManager>();
 		ServerConnection& connection = _world.GetSingleton<ServerConnection>();
 		Game& game = _world.GetSingleton<Game>();
