@@ -8,6 +8,7 @@ namespace fan
 
 	//================================================================================================================================
 	// PlayerController can be the mouse/keyboard or a game pad
+	// It is automatically placed on the spaceship in client mode to update the player input
 	// @wip gamepad is disabled for now
 	//================================================================================================================================
 	struct PlayerController : public EcsComponent

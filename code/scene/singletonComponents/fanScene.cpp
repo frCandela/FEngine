@@ -42,7 +42,7 @@ namespace fan
 		scene.nodes.clear();
 		scene.nodesToKill.clear();
 
-		EcsWorld* worldNoConst = const_cast<EcsWorld*>( scene.world );
+		EcsWorld*& worldNoConst = const_cast<EcsWorld*&>( scene.world );
 		worldNoConst = &_world;
 	}
 

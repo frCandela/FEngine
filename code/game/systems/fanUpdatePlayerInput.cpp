@@ -21,6 +21,7 @@ namespace fan
 	EcsSignature S_RefreshPlayerInput::GetSignature( const EcsWorld& _world )
 	{
 		return	
+			_world.GetSignature<PlayerController>() |
 			_world.GetSignature<PlayerInput>() | 
 			_world.GetSignature<Transform>();
 	}
