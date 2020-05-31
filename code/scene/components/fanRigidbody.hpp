@@ -31,7 +31,8 @@ namespace fan
 		static void NetSave( const EcsComponent& _component, sf::Packet& _packet );
 		static void NetLoad( EcsComponent& _component, sf::Packet& _packet );
 
-		EcsHandle	GetHandle() { return static_cast<EcsHandle>( rigidbody->getUserIndex() ); }
+		EcsHandle	GetHandle(){ return static_cast<EcsHandle>( rigidbody->getUserIndex() ); }
+		EcsWorld&	GetWorld() { return *static_cast<EcsWorld*>( rigidbody->getUserPointer() ); }
 		float		GetMass() const;
 		void		SetMass( const float _mass );
 		void		SetStatic();

@@ -23,7 +23,5 @@ namespace fan
 
 		void OnBulletContact( Rigidbody& _bulletBody, Rigidbody& _otherBody, btPersistentManifold* const& _manifold );
 		void OnSpaceShipContact( Rigidbody& _spaceshipBody, Rigidbody& _otherBody, btPersistentManifold* const& _manifold );
-
-		EcsWorld* const world = nullptr;
 	};
 }

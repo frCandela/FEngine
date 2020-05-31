@@ -24,30 +24,29 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void CollisionManager::Init( EcsWorld& _world, EcsSingleton& _component )
+	void CollisionManager::Init( EcsWorld& /*_world*/, EcsSingleton& /*_component*/ )
 	{
-		CollisionManager& collisionManager = static_cast<CollisionManager&>( _component );
+		//CollisionManager& collisionManager = static_cast<CollisionManager&>( _component );
 
-		EcsWorld* nonConstWorld = const_cast<EcsWorld*>( collisionManager.world );
-		nonConstWorld = &_world;
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
 	void CollisionManager::OnBulletContact( Rigidbody& _bulletBody, Rigidbody& /*_otherBody*/, btPersistentManifold* const& /*_manifold*/ )
 	{
+		EcsWorld& world =  _bulletBody.GetWorld();
 		const EcsHandle bulletHandle = _bulletBody.GetHandle();
-		const EcsEntity bulletID = world->GetEntity( bulletHandle );
-		const Bullet& bullet = world->GetComponent< Bullet >( bulletID );
+		const EcsEntity bulletID = world.GetEntity( bulletHandle );
+		const Bullet& bullet = world.GetComponent< Bullet >( bulletID );
 		
-		world->Kill( bulletID );
+		world.Kill( bulletID );
 		
 		// create explosion
-		const Transform& bulletTransform = world->GetComponent< Transform >( bulletID );
-		const Scene& scene = world->GetSingleton<Scene>();
+		const Transform& bulletTransform = world.GetComponent< Transform >( bulletID );
+		const Scene& scene = world.GetSingleton<Scene>();
 		const SceneNode& explosionNode = * bullet.explosionPrefab->Instanciate( scene.GetRootNode() );
-		const EcsEntity explosionID = world->GetEntity( explosionNode.handle );
-		Transform& explosionTransform = world->GetComponent< Transform >( explosionID );
+		const EcsEntity explosionID = world.GetEntity( explosionNode.handle );
+		Transform& explosionTransform = world.GetComponent< Transform >( explosionID );
 		explosionTransform.SetPosition( bulletTransform.GetPosition() );
 	}
 
@@ -56,30 +55,31 @@ namespace fan
 	void CollisionManager::OnSpaceShipContact( Rigidbody& _spaceshipBody, Rigidbody& _otherBody, btPersistentManifold* const& /*_manifold*/ )
 	{
 		// get ids
+		EcsWorld& world = _spaceshipBody.GetWorld();
 		const EcsHandle spaceshipHandle = _spaceshipBody.GetHandle();
 		const EcsHandle otherHandle = _otherBody.GetHandle();
-		const EcsEntity spaceshipID = world->GetEntity( spaceshipHandle );
-		const EcsEntity otherID = world->GetEntity( otherHandle );
+		const EcsEntity spaceshipID = world.GetEntity( spaceshipHandle );
+		const EcsEntity otherID = world.GetEntity( otherHandle );
 
 		// bump
-		const Transform& spaceshipTransform = world->GetComponent<Transform>( spaceshipID );
-		const Transform& otherTransform = world->GetComponent<Transform>( otherID );
+		const Transform& spaceshipTransform = world.GetComponent<Transform>( spaceshipID );
+		const Transform& otherTransform = world.GetComponent<Transform>( otherID );
 		const btVector3 dir = spaceshipTransform.GetPosition() - otherTransform.GetPosition();
 		if( !dir.fuzzyZero() )
 		{
-			SpaceShip& spaceship = world->GetComponent<SpaceShip>( spaceshipID );
+			SpaceShip& spaceship = world.GetComponent<SpaceShip>( spaceshipID );
 			_spaceshipBody.rigidbody->applyCentralForce( spaceship.collisionRepulsionForce * dir.normalized() );
 		}
 
 		// applies damage
-		if( world->HasComponent<Health>( spaceshipID ) )
+		if( world.HasComponent<Health>( spaceshipID ) )
 		{
-			if( world->HasComponent<Damage>( otherID ) )
+			if( world.HasComponent<Damage>( otherID ) )
 			{
-				Health& health = world->GetComponent<Health>( spaceshipID );
+				Health& health = world.GetComponent<Health>( spaceshipID );
 				if( !health.invincible )
 				{
-					Damage& damage = world->GetComponent<Damage>( otherID );
+					Damage& damage = world.GetComponent<Damage>( otherID );
 					health.currentHealth -= damage.damage;
 					if( health.currentHealth <= 0.f )
 					{

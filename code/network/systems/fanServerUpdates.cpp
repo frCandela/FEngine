@@ -64,7 +64,7 @@ namespace fan
 							, HostReplication::ResendUntilReplicated
 						);
 
-						hostData.nextPlayerStateFrame = spawnFrame + 60; // next player state snapshot done later
+						hostData.nextPlayerStateFrame = spawnFrame + 60; // next player state snapshot will be done later
 
 						// replicate other ships
 						for( const auto& pair : hostManager.hostHandles )

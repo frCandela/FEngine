@@ -103,6 +103,7 @@ namespace fan
 				BoxShape& boxShape = _world.GetComponent<BoxShape>( spaceshipID );
 				rigidbody.SetCollisionShape( boxShape.boxShape );
 				rigidbody.SetMotionState( motionState.motionState );
+				rigidbody.rigidbody->setWorldTransform( transform.transform );
 				physicsWorld.dynamicsWorld->addRigidBody( rigidbody.rigidbody );
 
 				// registers physics callbacks
