@@ -21,6 +21,8 @@ namespace fan
 		void Create( EcsHandle _handle );
 		void CreateUnresolved( EcsHandle _handle );
 		void Clear();
+		EcsComponent& operator*() const { return  world->GetComponent( world->GetEntity( handle ), type ); }
+		EcsComponent* operator->() const { return &( **this ); /* use operator* */ }
 
 		EcsWorld*		world;
 		const uint32_t	type = 0;	
@@ -36,8 +38,8 @@ namespace fan
 	{
 	public:
 		ComponentPtr() : ComponentPtrBase( _componentType::Info::s_type ) {}
-		_componentType* operator->() const { return &(**this); /* use operator**/ }
 		_componentType& operator*() const {  return  static_cast<_componentType&>( world->GetComponent( world->GetEntity( handle ), type )); }
+		_componentType* operator->() const { return &(**this); /* use operator* */ }
 		bool operator!=( const ComponentPtr<_componentType>& _other ) const { return !( *this == _other ); }
 		bool operator==( const ComponentPtr<_componentType>& _other ) const { return _other.handle == handle; }
 		bool operator!=( _componentType* _component ) const { 

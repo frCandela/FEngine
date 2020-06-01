@@ -2,7 +2,7 @@
 
 #include "fanGLFW.hpp"
 #include "core/fanSingleton.hpp"
-#include "core/fanSignal.hpp"
+#include "ecs/fanSignal.hpp"
 
 namespace fan
 {
@@ -16,7 +16,6 @@ namespace fan
 		using Button = int;
 		using Axis = int;
 		using JoystickID = int;
-
 
 		bool IsGamepad( const JoystickID _GLFW_JOYSTICK ) const;
 		bool IsConnected( const JoystickID _GLFW_JOYSTICK ) const;

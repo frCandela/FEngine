@@ -56,8 +56,9 @@ namespace fan
 				}
 			}
 
-			hostConnection.Write( _world, packet );
-			hostReplication.Write( packet );
+			const EcsEntity entity = hostDataIt.Entity();
+			hostConnection.Write( _world, entity, packet );
+			hostReplication.Write( _world, entity, packet );
 
 			// write ack
 			if( packet.GetSize() == sizeof( PacketTag ) ) { packet.onlyContainsAck = true; }

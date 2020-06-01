@@ -39,10 +39,11 @@ namespace fan
 
 			// create packet
 			Packet packet( reliabilityLayer.GetNextPacketTag() );
-
+			
 			// write packet
-			connection.Write( packet );
-			gameData.Write( packet );
+			const EcsEntity entity = gameDataIt.Entity();
+			connection.Write( _world, entity, packet );
+			gameData.Write( _world, entity, packet );
 
 			if( packet.GetSize() == sizeof( PacketTag ) ) { packet.onlyContainsAck = true; }
 

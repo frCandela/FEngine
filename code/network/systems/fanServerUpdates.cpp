@@ -69,20 +69,22 @@ namespace fan
 						// replicate other ships
 						for( const auto& pair : hostManager.hostHandles )
 						{
-							const EcsHandle otherHostHandle = pair.second;
-							const EcsEntity otherHostID = _world.GetEntity( otherHostHandle );
+							const EcsHandle hostHandle = _world.GetHandle(entity);
+							const EcsHandle otherHostHandle = pair.second;							
 
-							if( otherHostID != entity )
+							if( otherHostHandle != hostHandle )
 							{
+								const EcsEntity otherHostEntity = _world.GetEntity( otherHostHandle );
+
 								// replicate new host on all other hosts
-								HostReplication& otherHostReplication = _world.GetComponent< HostReplication >( otherHostID );
+								HostReplication& otherHostReplication = _world.GetComponent< HostReplication >( otherHostEntity );
 								otherHostReplication.Replicate(
 									ClientRPC::RPCSpawnShip( hostData.spaceshipID, spawnFrame )
 									, HostReplication::ResendUntilReplicated
 								);
 
  								// replicate all other hosts on new host		
-								HostGameData& otherHostData = _world.GetComponent< HostGameData >( otherHostID );
+								HostGameData& otherHostData = _world.GetComponent< HostGameData >( otherHostEntity );
 								hostReplication.Replicate(
 									ClientRPC::RPCSpawnShip( otherHostData.spaceshipID, game.frameIndex )
 									, HostReplication::ResendUntilReplicated
@@ -146,8 +148,7 @@ namespace fan
 							, HostReplication::ResendUntilReplicated
 						);
 						hostConnection.lastSync = currentTime;
-						success.Connect( &HostConnection::OnSyncSuccess, &hostConnection );
-
+						success.Connect( &HostConnection::OnSyncSuccess, _world, _world.GetHandle( hostConnectionIt.Entity() ) );
 						if( diff > 10 )
 						{
 							Debug::Log() << "shifting host frame index : " << min + targetFrameDifference;

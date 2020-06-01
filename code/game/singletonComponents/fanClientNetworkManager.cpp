@@ -59,10 +59,9 @@ namespace fan
 		// connect rpc
 		Game& game = _world.GetSingleton<Game>();
 		ClientRPC& rpcManager = _world.GetComponent<ClientRPC>( persistentID );
-		ClientGameData& gameData = _world.GetComponent<ClientGameData>( persistentID );
-		rpcManager.onShiftFrameIndex.Connect( &ClientGameData::OnShiftFrameIndex, &gameData );
+		rpcManager.onShiftFrameIndex.Connect( &ClientGameData::OnShiftFrameIndex, _world, persistentHandle );
 		rpcManager.onShiftFrameIndex.Connect( &Game::OnShiftFrameIndex, &game );
-		rpcManager.onSpawnClientShip.Connect( &ClientGameData::OnSpawnClientShip, &gameData );
+		rpcManager.onSpawnClientShip.Connect( &ClientGameData::OnSpawnClientShip, _world, persistentHandle );
 		rpcManager.onSpawnShip.Connect( &ClientNetworkManager::OnSpawnShip, this );
 
 		// Bind socket

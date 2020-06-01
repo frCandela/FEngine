@@ -101,7 +101,7 @@ namespace fan
 	//================================================================================================================================
 	// Sends all new replication packed
 	//================================================================================================================================
-	void HostReplication::Write( Packet& _packet )
+	void HostReplication::Write( EcsWorld& _world, EcsEntity _entity, Packet& _packet )
 	{
 		for( ReplicationData& data : nextReplication )
 		{
@@ -109,9 +109,9 @@ namespace fan
 			if( data.flags & ReplicationFlags::ResendUntilReplicated )
 			{
 				pendingReplication.insert( { _packet.tag , data } );
-				_packet.onSuccess.Connect( &HostReplication::OnReplicationSuccess, this );
-				_packet.onFail.Connect( &HostReplication::OnReplicationFail, this );
-				//Debug::Log() << "rep send: " << _packet.tag << Debug::Endl();
+				const EcsHandle& handle = _world.GetHandle( _entity );
+				_packet.onSuccess.Connect( &HostReplication::OnReplicationSuccess, _world, handle );
+				_packet.onFail.Connect( &HostReplication::OnReplicationFail, _world, handle );
 			}
 		}
 		nextReplication.clear();

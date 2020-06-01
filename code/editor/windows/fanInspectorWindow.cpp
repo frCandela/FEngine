@@ -12,7 +12,7 @@
 #include "scene/components/fanRigidbody.hpp"
 #include "ecs/fanEcsWorld.hpp"
 #include "core/time/fanProfiler.hpp"
-#include "core/fanSignal.hpp"
+#include "ecs/fanSignal.hpp"
 #include "render/core/fanTexture.hpp"
 #include "render/core/fanTexture.hpp"
 #include "render/fanMesh.hpp"

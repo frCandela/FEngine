@@ -45,7 +45,7 @@ namespace fan
 	// sends a login packet to the clients needing approval
 	// regularly sends ping to clients to calculate RTT & sync frame index
 	//================================================================================================================================
-	void HostConnection::Write( EcsWorld& _world, Packet& _packet )
+	void HostConnection::Write( EcsWorld& _world, EcsEntity _entity, Packet& _packet )
 	{
  		const Game& game = _world.GetSingleton<Game>();
 
@@ -54,8 +54,9 @@ namespace fan
 		{
 			PacketLoginSuccess packetLogin;
 			packetLogin.Write( _packet );
-			_packet.onSuccess.Connect( &HostConnection::OnLoginSuccess, this );
-			_packet.onFail.Connect( &HostConnection::OnLoginFail, this );
+			const EcsHandle handle = _world.GetHandle( _entity );
+			_packet.onSuccess.Connect( &HostConnection::OnLoginSuccess, _world, handle );
+			_packet.onFail.Connect( &HostConnection::OnLoginFail, _world, handle );
 			state = HostConnection::PendingApprouval;
 		}
 		else if( state == HostConnection::Connected )

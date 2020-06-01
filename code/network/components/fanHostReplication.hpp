@@ -35,7 +35,7 @@ namespace fan
 		std::multimap< PacketTag, ReplicationData> pendingReplication; // sent on the network, waiting for a status
 		std::vector<ReplicationData>				nextReplication;	// waiting  to be sent on the network
 	
-		void		Write( Packet& _packet );
+		void		Write( EcsWorld& _world, EcsEntity _entity, Packet& _packet );
 
 		Signal<>&	Replicate( const PacketReplication& _packet, const ReplicationFlags _flags );
 		void		OnReplicationSuccess( const PacketTag _packetTag );

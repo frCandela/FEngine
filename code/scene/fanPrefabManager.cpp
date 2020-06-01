@@ -3,7 +3,7 @@
 #include <filesystem>
 #include "scene/fanSceneResourcePtr.hpp"
 #include "scene/fanPrefab.hpp"
-#include "core/fanSignal.hpp"
+#include "ecs/fanSignal.hpp"
 
 namespace fan
 {

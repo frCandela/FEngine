@@ -6,7 +6,7 @@
 #include "core/time/fanTime.hpp"
 #include "core/time/fanScopedTimer.hpp"
 #include "core/time/fanProfiler.hpp"
-#include "core/fanSignal.hpp"
+#include "ecs/fanSignal.hpp"
 #include "scene/fanSceneResourcePtr.hpp"
 #include "scene/fanSceneTags.hpp"
 #include "scene/components/fanBounds.hpp"

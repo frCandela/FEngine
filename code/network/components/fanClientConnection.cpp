@@ -48,7 +48,7 @@ namespace fan
 	//================================================================================================================================
 	// Write into the _packet to communicate with the server
 	//================================================================================================================================
-	void ClientConnection::Write( Packet& _packet )
+	void ClientConnection::Write( EcsWorld& _world, EcsEntity _entity, Packet& _packet )
 	{
 		switch( state )
 		{
@@ -58,7 +58,7 @@ namespace fan
 			PacketHello hello;
 			hello.name = "toto";
 			hello.Write( _packet );
-			_packet.onFail.Connect( &ClientConnection::OnLoginFail, this );
+			_packet.onFail.Connect( &ClientConnection::OnLoginFail, _world, _world.GetHandle( _entity ) );
 			state = ClientState::PendingConnection;
 			Debug::Log() << "logging in..." << Debug::Endl();
 		}

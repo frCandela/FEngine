@@ -7,7 +7,7 @@
 #include "SFML/System.hpp"
 #include "SFML/Network.hpp"
 
-#include "core/fanSignal.hpp"
+#include "ecs/fanSignal.hpp"
 #include "core/fanDebug.hpp"
 #include "bullet/LinearMath/btVector3.h"
 

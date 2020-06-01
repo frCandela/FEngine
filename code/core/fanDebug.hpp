@@ -2,7 +2,7 @@
 
 
 #include "core/fanSingleton.hpp"
-#include "core/fanSignal.hpp"
+#include "ecs/fanSignal.hpp"
 
 #include <sstream>
 

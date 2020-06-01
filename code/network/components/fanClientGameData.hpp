@@ -40,7 +40,7 @@ namespace fan
 		int									maxInputSent;
 		PacketPlayerGameState				lastServerState;
 
-		void Write( Packet& _packet );
+		void Write( EcsWorld& _world, EcsEntity _entity, Packet& _packet );
 		void ProcessPacket( const PacketPlayerGameState& _packet );
 		
 		// callbacks

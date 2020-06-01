@@ -1,7 +1,7 @@
 #pragma once
 
 #include <set>
-#include "core/fanSignal.hpp"
+#include "ecs/fanSignal.hpp"
 #include "scene/fanSceneSerializable.hpp"
 #include "ecs/fanEcsSingleton.hpp"
 

@@ -20,9 +20,6 @@ namespace fan
 		static void Init( EcsWorld& _world, EcsEntity _entity, EcsComponent& _component );
 		static void Destroy( EcsWorld& _world, EcsEntity _entity, EcsComponent& _component );
 		static void OnGui( EcsWorld& _world, EcsEntity _entityID, EcsComponent& _component );
-		 
-
-
 
 		enum class ClientState { 
 			Disconnected,		// Client needs to send a Hello packet to the server to login
@@ -44,7 +41,7 @@ namespace fan
 		PacketPing		lastPacketPing;
 		bool			mustSendBackPacketPing;
 
-		void Write( Packet& _packet );
+		void Write( EcsWorld& _world, EcsEntity _entity, Packet& _packet );
 		void OnLoginFail( const PacketTag _packetTag );
 
 		void ProcessPacket( const PacketLoginSuccess& _packetLogin );
