@@ -32,6 +32,7 @@ namespace fan
 		static bool CMD_AutoPlay( const std::vector < std::string >& _args, LaunchSettings& _settings );
 		static bool CMD_RunClient( const std::vector < std::string >& _args, LaunchSettings& _settings );
 		static bool CMD_RunServer( const std::vector < std::string >& _args, LaunchSettings& _settings );
+		static bool CMD_MainLoopSleep( const std::vector < std::string >& _args, LaunchSettings& _settings );
 	};
 
 	//==============================================================================================================================================================
@@ -39,12 +40,13 @@ namespace fan
 	//==============================================================================================================================================================
 	LaunchArguments::LaunchArguments() :
 		commands( {
-			{ &LaunchArguments::CMD_EnableLivePP,	"-livepp",	 "usage: -livepp <0-1>" },
-			{ &LaunchArguments::CMD_OpenScene,		"-scene",	 "usage: -scene \"scene/path.scene\"" },
-			{ &LaunchArguments::CMD_SetWindow,		"-window",	 "usage: -window <x> <y> <width> <height>" },
-			{ &LaunchArguments::CMD_AutoPlay,		"-autoplay", "usage: -autoplay <0-1>" },
-			{ &LaunchArguments::CMD_RunClient,		"-client",   "usage: -client" },
-			{ &LaunchArguments::CMD_RunServer,		"-server",   "usage: -server" }
+			{ &LaunchArguments::CMD_EnableLivePP,	"-livepp",			"usage: -livepp <0-1>" },
+			{ &LaunchArguments::CMD_OpenScene,		"-scene",			"usage: -scene \"scene/path.scene\"" },
+			{ &LaunchArguments::CMD_SetWindow,		"-window",			"usage: -window <x> <y> <width> <height>" },
+			{ &LaunchArguments::CMD_AutoPlay,		"-autoplay",		"usage: -autoplay <0-1>" },
+			{ &LaunchArguments::CMD_RunClient,		"-client",			"usage: -client" },
+			{ &LaunchArguments::CMD_RunServer,		"-server",			"usage: -server" },
+			{ &LaunchArguments::CMD_MainLoopSleep,	"-main_loop_sleep", "usage: -main_loop_sleep <0-1>" },
 		} )
 	{}
 
@@ -200,6 +202,23 @@ namespace fan
 		_settings.launchMode = LaunchSettings::SERVER;
 
 		std::cout << "cmd : launch server" << std::endl;
+		return true;
+	}
+
+	//==============================================================================================================================================================
+	// command: -main_loop_sleep"
+	// makes the main loop sleep et the end of the frame
+	//==============================================================================================================================================================
+	bool LaunchArguments::CMD_MainLoopSleep( const std::vector < std::string >& _args, LaunchSettings& _settings )
+	{
+		if( _args.size() != 1 ) { return false; }
+
+		const int value = std::atoi( _args[0].c_str() );
+		if( value != 1 && value != 0 ) { return false; }
+
+		_settings.mainLoopSleep = value == 1 ? true : false;
+
+		std::cout << "cmd : main loop sleep " << ( value == 1 ? "enabled" : "disabled" ) << std::endl;
 		return true;
 	}
 }

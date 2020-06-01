@@ -75,6 +75,8 @@ int main( int _argc, char* _argv[] )
 // 	args.push_back( "2" );
 // 	args.push_back( "800" );
 // 	args.push_back( "600" );
+// 	args.push_back( "-main_loop_sleep" );
+// 	args.push_back( "1" );
 	args.push_back( "-autoplay" );
 	args.push_back( "1" );
   	args.push_back( "-scene" );

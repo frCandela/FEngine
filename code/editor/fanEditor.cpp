@@ -1,5 +1,6 @@
 #include "fanEditor.hpp"
 
+#include <thread>
 #include "render/pipelines/fanForwardPipeline.hpp"
 #include "render/pipelines/fanDebugPipeline.hpp"
 #include "render/fanRendererDebug.hpp"
@@ -278,8 +279,8 @@ namespace fan
 	//================================================================================================================================
 	void Editor::Run()
 	{
-		double lastLogicFrameTime = Time::Get().ElapsedSinceStartup();
-		Clock renderClock;
+		double lastLogicTime = Time::Get().ElapsedSinceStartup();
+		double lastRenderTime = Time::Get().ElapsedSinceStartup();
 
 		Profiler::Get().Begin();
 
@@ -287,18 +288,26 @@ namespace fan
 		while( m_applicationShouldExit == false && m_window->IsOpen() == true )
 		{
 			const double currentTime = Time::Get().ElapsedSinceStartup();
+			const float renderDelta = Time::Get().GetRenderDelta();
 
 			// Runs logic, renders ui
-			if( currentTime > lastLogicFrameTime + game.logicDelta )
+			while( currentTime > lastLogicTime + game.logicDelta )
 			{
+				// checking the loop timing
+				const double loopDelayMilliseconds = 1000. * (currentTime - ( lastLogicTime + game.logicDelta ) );
+ 				if( loopDelayMilliseconds > 30 )
+ 				{
+ 					Debug::Warning() << "logic is late of " << loopDelayMilliseconds << "ms" << Debug::Endl();
+ 				}
+
 				if( std::abs( game.timeScaleDelta ) >= game.timeScaleIncrement )
 				{
 					const float increment = game.timeScaleDelta > 0.f ? game.timeScaleIncrement : -game.timeScaleIncrement;
-					lastLogicFrameTime -= increment;
+					lastLogicTime -= increment;
 					game.timeScaleDelta -= increment;
 				}
 
-				lastLogicFrameTime += game.logicDelta;
+				lastLogicTime += game.logicDelta;
 
 				SCOPED_PROFILE( logic )
 				{
@@ -385,11 +394,11 @@ namespace fan
 				}
 			}
 
-			// Render world
-			const float targetRenderDelta = Time::Get().GetRenderDelta();
-			if( renderClock.ElapsedSeconds() > targetRenderDelta )
+			// Render world			
+			if( currentTime > lastRenderTime + renderDelta )
 			{
-				renderClock.Reset();
+				lastRenderTime = currentTime;
+
 				Time::Get().RegisterFrameDrawn();	// used for stats
 
 				UpdateRenderWorld();
@@ -397,6 +406,20 @@ namespace fan
 				m_renderer->DrawFrame();
 				Profiler::Get().End();
 				Profiler::Get().Begin();
+			}
+		
+			// sleep for the rest of the frame
+			if( m_launchSettings.mainLoopSleep )
+			{
+				const double minSleepTime = 1;
+				const double endFrameTime = Time::Get().ElapsedSinceStartup();
+				const double timeBeforeNextLogic = lastLogicTime + game.logicDelta - endFrameTime;
+				const double timeBeforeNextRender = lastRenderTime + renderDelta - endFrameTime;
+				const double sleepTimeMiliseconds = 1000. * std::min( timeBeforeNextLogic, timeBeforeNextRender );
+				if( sleepTimeMiliseconds > minSleepTime )
+				{
+					std::this_thread::sleep_for( std::chrono::milliseconds( int( sleepTimeMiliseconds / 2 ) ) );
+				}
 			}
 		}
 
