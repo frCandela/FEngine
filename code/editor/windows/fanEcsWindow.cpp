@@ -59,15 +59,15 @@ namespace fan
 			for( const EcsArchetype* archetype : archetypes )
 			{
 				std::stringstream ssSignature;
-				ssSignature << archetype->m_signature;
+				ssSignature << archetype->GetSignature();
 				ImGui::Text( ssSignature.str().c_str() );	ImGui::NextColumn();		// signature
 				ImGui::Text( "%d ", archetype->Size() );	ImGui::NextColumn();	// size
 
 				// chunks
 				const std::vector< EcsComponentInfo >& infos = m_world->GetVectorComponentInfo();
-				for( int componentIndex = 0; componentIndex < archetype->m_chunks.size(); componentIndex++ )
+				for( int componentIndex = 0; componentIndex < archetype->Size(); componentIndex++ )
 				{
-					if( archetype->m_chunks[componentIndex].NumChunk() != 0 )
+					if( archetype->GetChunkVector(componentIndex).NumChunk() != 0 )
 					{
 						const EcsComponentInfo& info = infos[componentIndex];
 						std::stringstream ss;
@@ -79,9 +79,9 @@ namespace fan
 						}
 						ss << ": ";
 
-						for( int chunkIndex = 0; chunkIndex < archetype->m_chunks[componentIndex].NumChunk(); chunkIndex++ )
+						for( int chunkIndex = 0; chunkIndex < archetype->GetChunkVector(componentIndex).NumChunk(); chunkIndex++ )
 						{
-							ss << archetype->m_chunks[componentIndex].GetChunk( chunkIndex ).Size() << " ";
+							ss << archetype->GetChunkVector(componentIndex).GetChunk( chunkIndex ).Size() << " ";
 						}
 						ImGui::Text( ss.str().c_str() );
 
@@ -117,7 +117,7 @@ namespace fan
 				ImGui::Text( "%d", i++ );		ImGui::NextColumn();
 				ImGui::Text( "%d", handle );	ImGui::NextColumn();
 				std::stringstream ss;
-				ss << entity.archetype->m_signature;
+				ss << entity.archetype->GetSignature();
 				ImGui::Text( "%s", ss.str().c_str() );	ImGui::NextColumn();
 				ImGui::Text( "%d", entity.index );	ImGui::NextColumn();
 			}

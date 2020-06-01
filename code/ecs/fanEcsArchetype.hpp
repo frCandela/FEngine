@@ -1,66 +1,35 @@
 #pragma once
 
-#include <bitset>
 #include "ecs/fanEcsChunkVector.hpp"
 #include "ecs/fanEcsComponent.hpp"
-#include "ecs/fanEcsEntity.hpp"
 
-namespace fan {
-	//================================
+namespace fan
+{
+	//================================================================================================================================
 	// An archetype is a collection of entities with the same signature
 	// All component of the same entity are at the same index
 	// components are put in arrays of small buffers called chunks
-	//================================
+	//================================================================================================================================
 	class EcsArchetype
 	{
 	public:
-		void Create( const std::vector< EcsComponentInfo >& _componentsInfo, const EcsSignature& _signature )
-		{
-			const int numComponents = int(_componentsInfo.size());
+		void Create( const std::vector< EcsComponentInfo >& _componentsInfo, const EcsSignature& _signature );
+		void RemoveEntity( const int _entityIndex );
+		void Clear();
+		int	 Size() const{ return int( m_entities.size() ); }
+		bool Empty() const{ return m_entities.empty(); }
+		void PushBackEntityData( const EcsEntityData& _entityData )	{ m_entities.push_back( _entityData ); }
 
-			m_signature = _signature;
-			m_chunks.resize( numComponents );
+		const EcsEntityData&	GetEntityData ( const int _index ) const	{ return m_entities[_index];	}
+		EcsEntityData&			GetEntityData ( const int _index )			{ return m_entities[_index];	}
+		const EcsChunkVector&	GetChunkVector( const int _index ) const	{ return m_chunks[_index];		}
+		EcsChunkVector&			GetChunkVector( const int _index )			{ return m_chunks[_index];		}
+		const EcsSignature&		GetSignature  () const						{ return m_signature;			}
 
-			for( int i = 0; i < numComponents; i++ )
-			{
-				if( m_signature[i] )
-				{
-					const EcsComponentInfo& info = _componentsInfo[i];
-					m_chunks[i].Create( info.copy, info.size, info.alignment );
-				}
-			}
-		}
 
-		// Returns true if the last entity was swapped with the removed one
-		void RemoveEntity( const int _entityIndex )
-		{
-			// pop the last element
-			if( _entityIndex == Size() - 1 )
-			{
-				m_entities.pop_back();
-			}
-			else
-			{
-				// else swap with the last
-				m_entities[_entityIndex] = *m_entities.rbegin();
-				m_entities.pop_back();
-			}
-		}
-
-		void Clear()
-		{			
-			for ( EcsChunkVector& chunkVector : m_chunks )
-			{
-				chunkVector.Clear();
-			}
-			m_entities.clear();
-		}
-
-		int		Size() const  { return int(m_entities.size());  }
-		bool	Empty() const { return m_entities.empty(); }
-
+	private:
 		EcsSignature					m_signature;
 		std::vector< EcsChunkVector >	m_chunks;		// one index per component type
-		std::vector< EcsEntityData >	m_entities;	
+		std::vector< EcsEntityData >	m_entities;
 	};
 }

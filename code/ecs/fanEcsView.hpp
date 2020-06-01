@@ -41,7 +41,7 @@ namespace fan
 					if( !m_archetypes.empty() )
 					{
 						m_currentArchetype = m_archetypes[m_archetypeIndex];
-						m_currentChunk = &m_currentArchetype->m_chunks[_componentIndex].GetChunk( m_chunkIndex );
+						m_currentChunk = &m_currentArchetype->GetChunkVector( _componentIndex ).GetChunk( m_chunkIndex );
 					}
 				}
 			}
@@ -59,9 +59,9 @@ namespace fan
 					m_elementIndex = 0;
 					++m_chunkIndex;
 
-					if( m_chunkIndex < m_currentArchetype->m_chunks[m_componentIndex].NumChunk() )
+					if( m_chunkIndex < m_currentArchetype->GetChunkVector( m_componentIndex ).NumChunk() )
 					{
-						m_currentChunk = &m_currentArchetype->m_chunks[m_componentIndex].GetChunk( m_chunkIndex );
+						m_currentChunk = &m_currentArchetype->GetChunkVector( m_componentIndex ).GetChunk( m_chunkIndex );
 					}
 					else
 					{
@@ -70,7 +70,7 @@ namespace fan
 						if( m_archetypeIndex < m_archetypes.size() )
 						{
 							m_currentArchetype = m_archetypes[m_archetypeIndex];
-							m_currentChunk = &m_currentArchetype->m_chunks[m_componentIndex].GetChunk( m_chunkIndex );
+							m_currentChunk = &m_currentArchetype->GetChunkVector( m_componentIndex ).GetChunk( m_chunkIndex );
 						}
 					}
 				}
