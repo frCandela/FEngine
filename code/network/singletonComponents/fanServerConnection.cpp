@@ -2,30 +2,26 @@
 
 namespace fan
 {
-	REGISTER_SINGLETON_COMPONENT( ServerConnection );
-
 	//================================================================================================================================
 	//================================================================================================================================
-	void ServerConnection::SetInfo( SingletonComponentInfo& _info )
+	void ServerConnection::SetInfo( EcsSingletonInfo& _info )
 	{
 		_info.icon = ImGui::NETWORK16;
-		_info.init = &ServerConnection::Init;
 		_info.onGui = &ServerConnection::OnGui;
 		_info.name = "server connection";
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void ServerConnection::Init( EcsWorld& _world, SingletonComponent& _component )
+	void ServerConnection::Init( EcsWorld& /*_world*/, EcsSingleton& _component )
 	{
 		ServerConnection& connection = static_cast<ServerConnection&>( _component );
 		connection.serverPort = 53000;
-		connection.socket.Unbind();
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void ServerConnection::OnGui( EcsWorld&, SingletonComponent& _component )
+	void ServerConnection::OnGui( EcsWorld&, EcsSingleton& _component )
 	{
 		ServerConnection& connection = static_cast<ServerConnection&>( _component );
 

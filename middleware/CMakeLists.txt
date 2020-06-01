@@ -4,9 +4,12 @@
 	${CMAKE_SOURCE_DIR}/middleware/bullet
 )
 
+add_compile_options( ${MIDDLEWARE_COMPILATION_FLAGS} )
+
 # imgui
 file(GLOB_RECURSE IMGUI_SRC imgui/*.cpp)
 file(GLOB_RECURSE IMGUI_H imgui/*.hpp)
+
 add_library( imgui STATIC ${IMGUI_SRC} ${IMGUI_H})
 target_link_libraries(imgui freetype28)
 
@@ -29,8 +32,3 @@ add_library( btDynamics STATIC ${BT_DYNAMICS_SRC} ${BT_DYNAMICS_H})
 file(GLOB_RECURSE BT_COLLISION_SRC bullet/BulletCollision/*.cpp)
 file(GLOB_RECURSE BT_COLLISION_H bullet/BulletCollision/*.hpp)
 add_library( btCollision STATIC ${BT_COLLISION_SRC} ${BT_COLLISION_H})
-
-target_compile_options(btLinearMath PRIVATE /FUNCTIONPADMIN /W0 )
-target_compile_options(btDynamics PRIVATE /FUNCTIONPADMIN /W0 )
-target_compile_options(quickhull PRIVATE /FUNCTIONPADMIN /W0 )
-target_compile_options(imgui PRIVATE /FUNCTIONPADMIN /W0 )

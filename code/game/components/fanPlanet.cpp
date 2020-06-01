@@ -5,23 +5,21 @@
 
 namespace fan
 {
-	REGISTER_COMPONENT( Planet, "planet" );
-
 	//================================================================================================================================
 	//================================================================================================================================
-	void Planet::SetInfo( ComponentInfo& _info )
+	void Planet::SetInfo( EcsComponentInfo& _info )
 	{
 		_info.icon = ImGui::IconType::PLANET16;
 		_info.onGui = &Planet::OnGui;
-		_info.init = &Planet::Init;
 		_info.load = &Planet::Load;
 		_info.save = &Planet::Save;
 		_info.editorPath = "game/";
+		_info.name = "planet";
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void Planet::Init( EcsWorld& _world, Component& _component )
+	void Planet::Init( EcsWorld& /*_world*/, EcsEntity /*_entity*/, EcsComponent& _component )
 	{
 		Planet& planet = static_cast<Planet&>( _component );
 		planet.speed = 1.f;
@@ -31,7 +29,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void Planet::OnGui( EcsWorld& _world, EntityID _entityID, Component& _component )
+	void Planet::OnGui( EcsWorld& /*_world*/, EcsEntity /*_entityID*/, EcsComponent& _component )
 	{
 		Planet& planet = static_cast<Planet&>( _component );
 		ImGui::PushItemWidth( 0.6f * ImGui::GetWindowWidth() );
@@ -46,7 +44,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void Planet::Save( const Component& _component, Json& _json )
+	void Planet::Save( const EcsComponent& _component, Json& _json )
 	{
 		const Planet& planet = static_cast<const Planet&>( _component );
 		Serializable::SaveFloat( _json, "radius", planet.radius );
@@ -56,7 +54,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void Planet::Load( Component& _component, const Json& _json )
+	void Planet::Load( EcsComponent& _component, const Json& _json )
 	{
 		Planet& planet = static_cast<Planet&>( _component );
 		Serializable::LoadFloat( _json, "radius", planet.radius );

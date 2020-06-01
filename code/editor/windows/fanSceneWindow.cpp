@@ -4,6 +4,7 @@
 #include "core/fanDebug.hpp"
 #include "scene/fanDragnDrop.hpp"
 #include "editor/fanModals.hpp"
+#include "editor/singletonComponents/fanEditorSelection.hpp"
 #include "core/input/fanKeyboard.hpp"
 #include "core/time/fanProfiler.hpp"
 #include "core/input/fanInput.hpp"
@@ -52,7 +53,7 @@ namespace fan
 
 		// Draws all scene nodes
 		SceneNode* nodeRightClicked = nullptr;
-		R_DrawSceneTree( *m_scene->root, nodeRightClicked );
+		R_DrawSceneTree( m_scene->GetRootNode(), nodeRightClicked );
 
  		m_expandSceneHierarchy = false;
  
@@ -84,8 +85,8 @@ namespace fan
 				assert( m_lastSceneNodeRightClicked != nullptr );
 				Scene& scene = *m_lastSceneNodeRightClicked->scene;
 				EcsWorld& world = *scene.world;				
-				btVector3& origin = btVector3::Zero();
-				const EntityID parentID = world.GetEntityID( m_lastSceneNodeRightClicked->handle );
+				btVector3 origin = btVector3::Zero();
+				const EcsEntity parentID = world.GetEntity( m_lastSceneNodeRightClicked->handle );
 				if( world.HasComponent<Transform>( parentID ) )
 				{
 					origin = world.GetComponent<Transform>( parentID ).GetPosition();
@@ -104,15 +105,15 @@ namespace fan
 				if( ImGui::MenuItem( "Model" ) )
 				{
 					SceneNode& node = scene.CreateSceneNode( "model", m_lastSceneNodeRightClicked );
-					const EntityID entityID = world.GetEntityID( node.handle );
+					const EcsEntity entity = world.GetEntity( node.handle );
 					
-					Transform& transform = world.AddComponent<Transform>( entityID );
+					Transform& transform = world.AddComponent<Transform>( entity );
 					transform.SetPosition( origin );
 					
-					MeshRenderer& meshRenderer = world.AddComponent<MeshRenderer>( entityID );	
+					MeshRenderer& meshRenderer = world.AddComponent<MeshRenderer>( entity );	
 					meshRenderer.mesh = Mesh::s_resourceManager.GetMesh( RenderGlobal::s_meshSphere );
 					
-					Material& material = world.AddComponent<Material>( entityID );
+					Material& material = world.AddComponent<Material>( entity );
 					material.texture = Texture::s_resourceManager.GetTexture( RenderGlobal::s_textureWhite );
 					onSelectSceneNode.Emmit( &node );
 				}
@@ -122,22 +123,22 @@ namespace fan
 				if( ImGui::MenuItem( "Physics model" ) )
 				{
 					SceneNode& node = scene.CreateSceneNode( "physics_model", m_lastSceneNodeRightClicked );
-					const EntityID entityID = world.GetEntityID( node.handle );
+					const EcsEntity entity = world.GetEntity( node.handle );
 					
-					Transform& transform = world.AddComponent<Transform>( entityID );
+					Transform& transform = world.AddComponent<Transform>( entity );
 					transform.SetPosition( origin );
 					
-					MeshRenderer& meshRenderer = world.AddComponent<MeshRenderer>( entityID );
+					MeshRenderer& meshRenderer = world.AddComponent<MeshRenderer>( entity );
 					meshRenderer.mesh = Mesh::s_resourceManager.GetMesh( RenderGlobal::s_meshCube );
-					Material& material = world.AddComponent<Material>( entityID );
+					Material& material = world.AddComponent<Material>( entity );
 					material.texture = Texture::s_resourceManager.GetTexture( RenderGlobal::s_textureWhite );
 					onSelectSceneNode.Emmit( &node );
 					
-					Rigidbody& rigidbody = world.AddComponent<Rigidbody>( entityID );
-					MotionState& motionState = world.AddComponent<MotionState>( entityID );
-					BoxShape& shape = world.AddComponent<BoxShape>( entityID );
-					rigidbody.SetMotionState( &motionState.motionState );
-					rigidbody.SetCollisionShape( &shape.boxShape );
+					Rigidbody& rigidbody = world.AddComponent<Rigidbody>( entity );
+					MotionState& motionState = world.AddComponent<MotionState>( entity );
+					BoxShape& shape = world.AddComponent<BoxShape>( entity );
+					rigidbody.SetMotionState( motionState.motionState );
+					rigidbody.SetCollisionShape( shape.boxShape );
 				}
 
 				// point light
@@ -146,12 +147,11 @@ namespace fan
 
 				{
 					SceneNode& node = scene.CreateSceneNode( "point_light", m_lastSceneNodeRightClicked );
-					const EntityID entityID = world.GetEntityID( node.handle );
+					const EcsEntity entity = world.GetEntity( node.handle );
 					
-					Transform& transform = world.AddComponent<Transform>( entityID );
-					transform.SetPosition( origin );
-					
-					PointLight& light = world.AddComponent<PointLight>( entityID );
+					Transform& transform = world.AddComponent<Transform>( entity );
+					transform.SetPosition( origin );					
+					world.AddComponent<PointLight>( entity );
 					onSelectSceneNode.Emmit( &node );
 				}
 
@@ -160,12 +160,12 @@ namespace fan
 				if( ImGui::MenuItem( "Dir light" ) )
 				{
 					SceneNode& node = scene.CreateSceneNode( "directional_light", m_lastSceneNodeRightClicked );
-					const EntityID entityID = world.GetEntityID( node.handle );
+					const EcsEntity entity = world.GetEntity( node.handle );
 					
-					Transform& transform = world.AddComponent<Transform>( entityID );
+					Transform& transform = world.AddComponent<Transform>( entity );
 					transform.SetPosition( origin  );
 					
-					DirectionalLight& light = world.AddComponent<DirectionalLight>( entityID );
+					world.AddComponent<DirectionalLight>( entity );
 					transform.SetRotationEuler( btVector3(30.f,10.f,0.f) );
 					onSelectSceneNode.Emmit( &node );
 				}
@@ -175,12 +175,12 @@ namespace fan
 				if( ImGui::MenuItem( "particle system" ) )
 				{
 					SceneNode& node = scene.CreateSceneNode( "particle_system", m_lastSceneNodeRightClicked );
-					const EntityID entityID = world.GetEntityID( node.handle );
+					const EcsEntity entity = world.GetEntity( node.handle );
 					
-					Transform& transform = world.AddComponent<Transform>( entityID );
+					Transform& transform = world.AddComponent<Transform>( entity );
 					transform.SetPosition( origin );
 
-					ParticleEmitter& emitter = world.AddComponent<ParticleEmitter>( entityID );
+					world.AddComponent<ParticleEmitter>( entity );
 					transform.SetPosition( origin );
 				}
 
@@ -216,7 +216,7 @@ namespace fan
 			if( ImGui::Selectable( "Delete" ) && m_lastSceneNodeRightClicked != nullptr )
 			{
 				EcsWorld& world = *m_scene->world;
-				world.KillEntity( world.GetEntityID( m_lastSceneNodeRightClicked->handle ) );
+				world.Kill( world.GetEntity( m_lastSceneNodeRightClicked->handle ) );
 			}
 			ImGui::EndPopup();
 		}
@@ -252,6 +252,7 @@ namespace fan
 	//================================================================================================================================
 	void SceneWindow::R_DrawSceneTree( SceneNode& _node, SceneNode*& _nodeRightClicked )
 	{
+		EcsWorld& world = *_node.scene->world;
 
 		std::stringstream ss;
 		ss << "##" << &_node; // Unique id
@@ -263,15 +264,20 @@ namespace fan
 		bool isOpen = ImGui::TreeNode( ss.str().c_str() );
 
 		// SceneNode dragndrop target empty selectable -> place dragged below
-		SceneNode* nodeDrop1 = ImGui::FanBeginDragDropTargetComponent<SceneNode>().sceneNode;
-		if( nodeDrop1 && nodeDrop1 != &_node )
+		ImGui::ComponentPayload payload = ImGui::FanBeginDragDropTargetComponent<SceneNode>( world );
+		if( payload.handle != 0 )
 		{
-			nodeDrop1->InsertBelow( _node );
+			assert( payload.type == SceneNode::Info::s_type );
+			SceneNode& nodeDrop1 = m_scene->world->GetComponent<SceneNode>( m_scene->world->GetEntity( payload.handle) );
+			if( &nodeDrop1 != &_node )
+			{
+				nodeDrop1.InsertBelow( _node );
+			}
 		}
 
-
 		ImGui::SameLine();
-		bool selected = ( &_node == m_sceneNodeSelected );
+		const EcsHandle handleSelected = m_scene->world->GetSingleton<EditorSelection>().m_selectedNodeHandle;
+		bool selected = ( _node.handle == handleSelected );
 
 		// Draw scene node empty selectable to display a hierarchy
 		std::stringstream ss2;
@@ -286,21 +292,23 @@ namespace fan
 		}
 
 		// SceneNode dragndrop source = selectable -^
-		ImGui::FanBeginDragDropSourceComponent( _node, _node );
+		ImGui::FanBeginDragDropSourceComponent( *m_scene->world, _node.handle, SceneNode::Info::s_type );
 
 		// SceneNode dragndrop target scene node name -> place as child
-		SceneNode* nodeDrop = ImGui::FanBeginDragDropTargetComponent<SceneNode>().sceneNode;
-		if( nodeDrop )
+		ImGui::ComponentPayload payload2 = ImGui::FanBeginDragDropTargetComponent<SceneNode>( world );
+		if( payload2.handle != 0 )
 		{
-			nodeDrop->SetParent( &_node );
+			assert( payload2.type == SceneNode::Info::s_type );
+			SceneNode& nodeDrop2 = m_scene->world->GetComponent<SceneNode>( m_scene->world->GetEntity( payload2.handle ) );
+			nodeDrop2.SetParent( &_node );
 		}
 
 		if( isOpen )
 		{
 			for( int childIndex = 0; childIndex < _node.childs.size(); childIndex++ )
 			{
-				SceneNode* child = _node.childs[childIndex];
-				R_DrawSceneTree( *child, _nodeRightClicked );
+				SceneNode& child = world.GetComponent<SceneNode>( world.GetEntity( _node.childs[childIndex] ) );
+				R_DrawSceneTree( child, _nodeRightClicked );
 			}
 
 			ImGui::TreePop();

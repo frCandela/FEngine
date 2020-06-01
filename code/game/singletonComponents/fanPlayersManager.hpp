@@ -1,6 +1,6 @@
 #pragma once
 
-#include "ecs/fanSingletonComponent.hpp"
+#include "ecs/fanEcsSingleton.hpp"
 #include "scene/fanSceneResourcePtr.hpp"
 
 namespace fan
@@ -10,12 +10,12 @@ namespace fan
 	//================================================================================================================================
 	// @wip old code from the gameobject system
 	//================================================================================================================================	
-	struct  PlayersManager : public SingletonComponent
+	struct  PlayersManager : public EcsSingleton
 	{
-		DECLARE_SINGLETON_COMPONENT()
+		ECS_SINGLETON( PlayersManager )
 	public:
-		static void SetInfo( SingletonComponentInfo& _info );
-		static void Init( EcsWorld& _world, SingletonComponent& _component );
+		static void SetInfo( EcsSingletonInfo& _info );
+		static void Init( EcsWorld& _world, EcsSingleton& _component );
 
 		//================================================================	
 		//================================================================

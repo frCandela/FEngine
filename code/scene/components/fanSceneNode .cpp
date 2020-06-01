@@ -8,52 +8,51 @@
 
 namespace fan
 {
-	REGISTER_COMPONENT( SceneNode, "scene_node" );
-	
 	//================================================================================================================================
 	//================================================================================================================================
-	void SceneNode::SetInfo( ComponentInfo& _info )
+	void SceneNode::SetInfo( EcsComponentInfo& _info )
 	{
 		_info.icon  = ImGui::IconType::GAMEOBJECT16;
 		_info.onGui = &SceneNode::OnGui;
-		_info.init = &SceneNode::Init;
 		_info.destroy = &SceneNode::Destroy;
 		_info.editorPath = "/";
+		_info.name = "scene node";
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void SceneNode::Init( EcsWorld& _world, Component& _component )
+	void SceneNode::Init( EcsWorld& /*_world*/, EcsEntity /*_entity*/, EcsComponent& _component )
 	{
 		SceneNode& node = static_cast<SceneNode&>( _component );
 		node.handle = 0;
+		node.flags = 0;
 		node.name = "";
 		node.scene = nullptr;
-		node.parent = nullptr;
+		node.parentHandle = 0;
 		node.childs.clear();
 	}
 
 	//================================================================================================================================
 	// disconnects all the node's child hierarchy tree and kills it
 	//================================================================================================================================
-	void SceneNode::Destroy( EcsWorld& _world, Component& _component )
+	void SceneNode::Destroy( EcsWorld& _world, EcsEntity /*_entity*/, EcsComponent& _component )
 	{
 		SceneNode& node = static_cast<SceneNode&>( _component );
-		Scene& scene = _world.GetSingletonComponent<Scene>();
+		Scene& scene = _world.GetSingleton<Scene>();
 		scene.onDeleteSceneNode.Emmit( &node );
-		scene.nodes.erase( node.uniqueID );
+		scene.nodes.erase( node.handle );
 
 		// removes from parent
-		if( node.parent != nullptr )
+		if( node.parentHandle != 0 )
 		{
-			node.parent->RemoveChild( node );
+			node.GetParent().RemoveChild( node );
 		}
 
 		if( !node.childs.empty() )
 		{
 			// stacks of initial nodes
-			std::stack<SceneNode* > nodesstack;
-			for ( SceneNode* child : node.childs )
+			std::stack< EcsHandle > nodesstack;
+			for ( EcsHandle child : node.childs )
 			{
 				nodesstack.push( child );
 			}			
@@ -61,35 +60,34 @@ namespace fan
 			// find all child nodes
 			std::set<SceneNode* > nodesToDelete;
 			while( !nodesstack.empty() )
-			{
-				SceneNode& node = *nodesstack.top();
+			{				
+				SceneNode& childNode = _world.GetComponent<SceneNode>( _world.GetEntity( nodesstack.top() ));
 				nodesstack.pop();
-				nodesToDelete.insert( &node );
-				for( int childIndex = 0; childIndex < node.childs.size(); childIndex++ )
+				nodesToDelete.insert( &childNode );
+				for( int childIndex = 0; childIndex < childNode.childs.size(); childIndex++ )
 				{
-					nodesstack.push( node.childs[childIndex] );
+					nodesstack.push( childNode.childs[childIndex] );
 				}
 			}
 
 			// delete node & childs
-			for( SceneNode* node : nodesToDelete )
+			for( SceneNode* deletedNode : nodesToDelete )
 			{
-				EntityID entityID = _world.GetEntityID( node->handle );
-				_world.KillEntity( entityID );
-				node->parent = nullptr;
-				node->childs.clear();
+				EcsEntity entity = _world.GetEntity( deletedNode->handle );
+				scene.nodesToKill.insert( deletedNode->handle );
+				deletedNode->parentHandle = 0;
+				deletedNode->childs.clear();
 			}		
 		}
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void SceneNode::Build( const std::string& _name, Scene& _scene, const EntityHandle _entityHandle, const uint32_t _uniqueID, SceneNode* const _parent )
+	void SceneNode::Build( const std::string& _name, Scene& _scene, const EcsHandle _handle, SceneNode* const _parent )
 	{
-		name = _name;
 		scene = &_scene;
-		handle = _entityHandle;
-		uniqueID = _uniqueID;
+		handle = _handle;
+		name = _name;
 		if( _parent != nullptr )
 		{
 			_parent->AddChild( *this );
@@ -98,17 +96,16 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void SceneNode::OnGui( EcsWorld& _world, EntityID _entityID, Component& _component )
+	void SceneNode::OnGui( EcsWorld& /*_world*/, EcsEntity /*_entityID*/, EcsComponent& _component )
 	{
 		SceneNode& node = static_cast<SceneNode&>( _component );
 		EcsWorld& world = * node.scene->world;
-		EntityID entityID = world.GetEntityID( node.handle );
+		EcsEntity entity = world.GetEntity( node.handle );
 
 		ImGui::Text( "name      : %s", node.name.c_str() );
-		ImGui::Text( "scene     : %s", node.scene->path.empty()	? "<null>" : node.scene->path.c_str() );
+		ImGui::Text( "scene     : %s", node.scene->path.empty()	? "<no path>" : node.scene->path.c_str() );
 		ImGui::Text( "handle    : %u", node.handle );
-		ImGui::Text( "entity id : %u", entityID );
-		ImGui::Text( "node   id : %u", node.uniqueID );
+		ImGui::Text( "entity id : %u", entity );
 	}
 
 	//================================================================================================================================
@@ -117,28 +114,28 @@ namespace fan
 	bool SceneNode::IsAncestorOf( const SceneNode& _node ) const
 	{
 		const SceneNode* node = &_node;
-		while( node->parent != nullptr )
+		while( node->parentHandle != 0 )
 		{
-			if( node->parent == this )
+			if( node->parentHandle == handle )
 			{
 				return true;
 			}
 			else
 			{
-				node = node->parent;
+				node = &node->GetParent();
 			}
 		} 
 		return false;
 	}
 
 	//================================================================================================================================
-	//================================================================================================================================bool IsAncestorOf( const SceneNode* _node ) const;
+	//================================================================================================================================
 	void SceneNode::RemoveChild( const SceneNode& _child )
 	{
 		for( int childIndex = 0; childIndex < childs.size(); childIndex++ )
 		{
-			SceneNode* child = childs[childIndex];
-			if( child == &_child )
+			EcsHandle childHandle = childs[childIndex];
+			if( childHandle == _child.handle )
 			{
 				childs.erase( childs.begin() + childIndex );
 				return;
@@ -153,8 +150,7 @@ namespace fan
 	{
 		for( int childIndex = 0; childIndex < childs.size(); childIndex++ )
 		{
-			SceneNode* child = childs[childIndex];
-			if( child == &_child )
+			if( childs[childIndex] == _child.handle )
 			{
 				return true;
 			}
@@ -168,24 +164,24 @@ namespace fan
 	{
 		if( _child.IsAncestorOf( *this ) )
 		{
-			Debug::Log( "Cannot parent an object to one of its children" );
+			Debug::Warning( "Cannot parent an object to one of its children" );
 			return;
 		}
 
-		if( _child.parent == this )
+		if( _child.parentHandle == handle )
 		{
-			Debug::Get() << Debug::Severity::log << _child.name << " is already a child of " << name << Debug::Endl();
+			Debug::Warning() << _child.name << " is already a child of " << name << Debug::Endl();
 			return;
 		}
 
-		if( HasChild( _child ) == false )
+		if( ! HasChild( _child ) )
 		{
-			if( _child.parent != nullptr )
+			if( _child.parentHandle != 0 )
 			{
-				_child.parent->RemoveChild( _child );
+				_child.GetParent().RemoveChild( _child );
 			}
-			childs.push_back( &_child );
-			_child.parent = this;
+			childs.push_back( _child.handle );
+			_child.parentHandle = handle;
 		}
 	}
 
@@ -195,10 +191,18 @@ namespace fan
 	{
 		if( _parent == nullptr )
 		{
-			Debug::Log( "Root cannot have a brother :'(" );
+			Debug::Warning( "Root cannot have a brother :'(" );
 			return;
 		}
 		_parent->AddChild( *this );
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
+	SceneNode& SceneNode::GetParent() const
+	{
+		assert( parentHandle != 0 );
+		return scene->world->GetComponent<SceneNode>( scene->world->GetEntity( parentHandle ) );
 	}
 
 	//================================================================================================================================
@@ -207,24 +211,24 @@ namespace fan
 	{
 		if( IsAncestorOf( _brother ) )
 		{
-			Debug::Log( "Cannot parent an object to one of its children" );
+			Debug::Warning( "Cannot parent an object to one of its children" );
 			return;
 		}
-		if( _brother.parent == nullptr )
+		if( _brother.parentHandle == 0 )
 		{
-			Debug::Log( "Root cannot have a brother :'(" );
+			Debug::Warning( "Root cannot have a brother :'(" );
 			return;
 		}
 
-		parent->RemoveChild( *this );
+		GetParent().RemoveChild( *this );
 
-		for( int childIndex = 0; childIndex < _brother.parent->childs.size(); childIndex++ )
+		SceneNode& brotherParent = _brother.GetParent();
+		for( int childIndex = 0; childIndex < brotherParent.childs.size(); childIndex++ )
 		{
-			SceneNode* child = _brother.parent->childs[childIndex];
-			if( child == &_brother )
+			if( brotherParent.childs[childIndex] == _brother.handle )
 			{
-				_brother.parent->childs.insert( _brother.parent->childs.begin() + childIndex + 1, this );
-				parent = _brother.parent;
+				brotherParent.childs.insert( brotherParent.childs.begin() + childIndex + 1, handle );
+				parentHandle = _brother.parentHandle;
 			}
 		}
 	}
@@ -233,12 +237,14 @@ namespace fan
 	//================================================================================================================================
 	void SceneNode::GetDescendantsOf( SceneNode& _root, std::vector<SceneNode*>& _outList )
 	{
+		EcsWorld& world = *_root.scene->world;
+
 		_outList.clear();
-		std::stack<SceneNode*> stack;
-		stack.push( &_root );
+		std::stack<EcsHandle> stack;
+		stack.push( _root.handle );
 		while( !stack.empty() )
 		{
-			SceneNode& node = *stack.top();
+			SceneNode& node =  world.GetComponent<SceneNode>( world.GetEntity( stack.top() ) );
 			stack.pop();
 			_outList.push_back( &node );
 			for( int i = 0; i < node.childs.size(); i++ )

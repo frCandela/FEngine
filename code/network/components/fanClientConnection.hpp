@@ -1,6 +1,6 @@
 #pragma once
 
-#include "ecs/fanComponent.hpp"
+#include "ecs/fanEcsComponent.hpp"
 
 #include "network/fanUdpSocket.hpp"
 #include "network/fanPacket.hpp"
@@ -12,13 +12,14 @@ namespace fan
 	//================================================================================================================================
 	// Manages the connection of the client with the server
 	//================================================================================================================================	
-	struct ClientConnection : public Component
+	struct ClientConnection : public EcsComponent
 	{
-		DECLARE_COMPONENT( ClientConnection )
+		ECS_COMPONENT( ClientConnection )
 	public:
-		static void SetInfo( ComponentInfo& _info );
-		static void Init( EcsWorld& _world, Component& _component );
-		static void OnGui( EcsWorld& _world, EntityID _entityID, Component& _component );
+		static void SetInfo( EcsComponentInfo& _info );
+		static void Init( EcsWorld& _world, EcsEntity _entity, EcsComponent& _component );
+		static void Destroy( EcsWorld& _world, EcsEntity _entity, EcsComponent& _component );
+		static void OnGui( EcsWorld& _world, EcsEntity _entityID, EcsComponent& _component );
 
 		enum class ClientState { 
 			Disconnected,		// Client needs to send a Hello packet to the server to login
@@ -27,7 +28,7 @@ namespace fan
 			Stopping			// Client is being stopped, a disconnect packet must be sent to the server
 		};
 		
-		UdpSocket		socket;
+		UdpSocket*		socket;
 		Port			clientPort;
 		sf::IpAddress	serverIP;
 		Port			serverPort;
@@ -40,7 +41,7 @@ namespace fan
 		PacketPing		lastPacketPing;
 		bool			mustSendBackPacketPing;
 
-		void Write( Packet& _packet );
+		void Write( EcsWorld& _world, EcsEntity _entity, Packet& _packet );
 		void OnLoginFail( const PacketTag _packetTag );
 
 		void ProcessPacket( const PacketLoginSuccess& _packetLogin );

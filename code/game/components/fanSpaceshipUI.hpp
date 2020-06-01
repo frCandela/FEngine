@@ -1,6 +1,6 @@
 #pragma once
 
-#include "ecs/fanComponent.hpp"
+#include "ecs/fanEcsComponent.hpp"
 #include "scene/fanSceneResourcePtr.hpp"
 #include "scene/components/ui/fanUIRenderer.hpp"
 #include "scene/components/ui/fanProgressBar.hpp"
@@ -12,15 +12,15 @@ namespace fan
 	//================================================================================================================================
 	// the ui flating on top of a spaceship
 	//================================================================================================================================
-	class SpaceshipUI : public Component
+	class SpaceshipUI : public EcsComponent
 	{
-		DECLARE_COMPONENT( SpaceshipUI )
+		ECS_COMPONENT( SpaceshipUI )
 	public:
-		static void SetInfo( ComponentInfo& _info );
-		static void Init( EcsWorld& _world, Component& _component );
-		static void OnGui( EcsWorld& _world, EntityID _entityID, Component& _component );
-		static void Save( const Component& _component, Json& _json );
-		static void Load( Component& _component, const Json& _json );
+		static void SetInfo( EcsComponentInfo& _info );
+		static void Init( EcsWorld& _world, EcsEntity _entity, EcsComponent& _component );
+		static void OnGui( EcsWorld& _world, EcsEntity _entityID, EcsComponent& _component );
+		static void Save( const EcsComponent& _component, Json& _json );
+		static void Load( EcsComponent& _component, const Json& _json );
 
 		glm::vec2 uiOffset;
 		ComponentPtr<TransformUI> uiRootTransform;

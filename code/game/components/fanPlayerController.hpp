@@ -1,6 +1,6 @@
 #pragma once
 
-#include "ecs/fanComponent.hpp"
+#include "ecs/fanEcsComponent.hpp"
 
 namespace fan
 {
@@ -8,17 +8,18 @@ namespace fan
 
 	//================================================================================================================================
 	// PlayerController can be the mouse/keyboard or a game pad
+	// It is automatically placed on the spaceship in client mode to update the player input
 	// @wip gamepad is disabled for now
 	//================================================================================================================================
-	struct PlayerController : public Component
+	struct PlayerController : public EcsComponent
 	{
-		DECLARE_COMPONENT( PlayerController )
+		ECS_COMPONENT( PlayerController )
 	public:
-		static void SetInfo( ComponentInfo& _info );
-		static void Init( EcsWorld& _world, Component& _component );
-		static void OnGui( EcsWorld& _world, EntityID _entityID, Component& _component );
-		static void Save( const Component& _component, Json& _json );
-		static void Load( Component& _component, const Json& _json );
+		static void SetInfo( EcsComponentInfo& _info );
+		static void Init( EcsWorld& _world, EcsEntity _entity, EcsComponent& _component );
+		static void OnGui( EcsWorld& _world, EcsEntity _entityID, EcsComponent& _component );
+		static void Save( const EcsComponent& _component, Json& _json );
+		static void Load( EcsComponent& _component, const Json& _json );
 
 // 		enum InputType { KEYBOARD_MOUSE, JOYSTICK };
 // 

@@ -2,30 +2,33 @@
 
 #include "scene/components/fanParticle.hpp"
 #include "ecs/fanEcsWorld.hpp"
+#include "core/time/fanProfiler.hpp"
 
 namespace fan
 {
 	//================================================================================================================================
 	//================================================================================================================================
-	Signature S_UpdateParticles::GetSignature( const EcsWorld& _world )
+	EcsSignature S_UpdateParticles::GetSignature( const EcsWorld& _world )
 	{
 		return	_world.GetSignature<Particle>();
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void S_UpdateParticles::Run( EcsWorld& _world, const std::vector<EntityID>& _entities, const float _delta )
+	void S_UpdateParticles::Run( EcsWorld& _world, const EcsView& _view, const float _delta )
 	{
 		if( _delta == 0.f ) { return; }
+		SCOPED_PROFILE( UpdateParticles );
 
-		for( EntityID entityID : _entities )
+		for( auto particleIt = _view.begin<Particle>(); particleIt != _view.end<Particle>(); ++particleIt )
 		{
-			Particle& particle = _world.GetComponent<Particle>( entityID );
+			const EcsEntity entity = particleIt.Entity();
+			Particle& particle = *particleIt;
 
 			particle.durationLeft -= _delta;
 			if( particle.durationLeft < 0.f )
 			{
-				_world.KillEntity( entityID );
+				_world.Kill( entity );
 			}
 			particle.position += _delta * particle.speed;
 		}

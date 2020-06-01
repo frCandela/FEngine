@@ -20,7 +20,7 @@ namespace fan
 {
 	//================================================================================================================================
 	//================================================================================================================================
-	Signature S_FireWeapons::GetSignature( const EcsWorld& _world )
+	EcsSignature S_FireWeapons::GetSignature( const EcsWorld& _world )
 	{
 		return
 			_world.GetSignature<Transform>()   |
@@ -32,21 +32,26 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void S_FireWeapons::Run( EcsWorld& _world, const std::vector<EntityID>& _entities, const float _delta )
+	void S_FireWeapons::Run( EcsWorld& _world, const EcsView& _view, const float _delta )
 	{
 		if( _delta == 0.f ) { return; }
 
-		PhysicsWorld& physicsWorld = _world.GetSingletonComponent<PhysicsWorld>();
-		Scene& scene = _world.GetSingletonComponent<Scene>();
-		CollisionManager& collisionManager = _world.GetSingletonComponent<CollisionManager>();
+		PhysicsWorld& physicsWorld = _world.GetSingleton<PhysicsWorld>();
+		Scene& scene = _world.GetSingleton<Scene>();
+		CollisionManager& collisionManager = _world.GetSingleton<CollisionManager>();
 
-		for( EntityID entityID : _entities )
+		auto transformIt = _view.begin<Transform>();
+		auto rigidbodyIt = _view.begin<Rigidbody>();
+		auto inputIt = _view.begin<PlayerInput>();
+		auto weaponIt = _view.begin<Weapon>();
+		auto batteryIt = _view.begin<Battery>();
+		for( ; transformIt != _view.end<Transform>(); ++transformIt, ++rigidbodyIt, ++inputIt, ++weaponIt, ++batteryIt )
 		{
-			const Transform& transform = _world.GetComponent<Transform>( entityID );
-			const Rigidbody& rigidbody = _world.GetComponent<Rigidbody>( entityID );
-			PlayerInput& input = _world.GetComponent<PlayerInput>( entityID );
-			Weapon& weapon = _world.GetComponent<Weapon>( entityID );
-			Battery& battery = _world.GetComponent<Battery>( entityID );
+			const Transform& transform = *transformIt;
+			const Rigidbody& rigidbody = *rigidbodyIt;
+			const PlayerInput& input = *inputIt;
+			Weapon& weapon = *weaponIt;
+			Battery& battery = *batteryIt;
 
 			weapon.bulletsAccumulator += _delta * weapon.bulletsPerSecond;
 			if( weapon.bulletsAccumulator > 1.f ) { weapon.bulletsAccumulator = 1.f; }
@@ -59,8 +64,8 @@ namespace fan
 				// creates the bullet
 				if( *weapon.bulletPrefab != nullptr )
 				{
-					SceneNode& node = *weapon.bulletPrefab->Instanciate( *scene.root );
-					EntityID bulletID = _world.GetEntityID( node.handle );
+					SceneNode& node = *weapon.bulletPrefab->Instanciate( scene.GetRootNode() );
+					EcsEntity bulletID = _world.GetEntity( node.handle );
 
 					Transform& bulletTransform = _world.GetComponent<Transform>( bulletID );
 					bulletTransform.SetPosition( transform.GetPosition() + transform.TransformDirection( weapon.originOffset ) );
@@ -69,10 +74,10 @@ namespace fan
 					bulletRigidbody.onContactStarted.Connect( &CollisionManager::OnBulletContact, &collisionManager );
 					bulletRigidbody.SetIgnoreCollisionCheck( rigidbody, true );
 					bulletRigidbody.SetVelocity( rigidbody.GetVelocity() + weapon.bulletSpeed * transform.Forward() );
-					bulletRigidbody.SetMotionState( &_world.GetComponent<MotionState>( bulletID ).motionState );
-					bulletRigidbody.SetCollisionShape( &_world.GetComponent<SphereShape>( bulletID ).sphereShape );
+					bulletRigidbody.SetMotionState( _world.GetComponent<MotionState>( bulletID ).motionState );
+					bulletRigidbody.SetCollisionShape( _world.GetComponent<SphereShape>( bulletID ).sphereShape );
 
-					physicsWorld.AddRigidbody( bulletRigidbody, node.handle );
+					physicsWorld.dynamicsWorld->addRigidBody( bulletRigidbody.rigidbody );
 				}				
 			}
 		}

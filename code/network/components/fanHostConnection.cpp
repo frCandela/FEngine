@@ -7,20 +7,18 @@
 
 namespace fan
 {
-	REGISTER_COMPONENT( HostConnection, "host connection" );
-
 	//================================================================================================================================
 	//================================================================================================================================
-	void HostConnection::SetInfo( ComponentInfo& _info )
+	void HostConnection::SetInfo( EcsComponentInfo& _info )
 	{
 		_info.icon = ImGui::IconType::NETWORK16;
 		_info.onGui = &HostConnection::OnGui;
-		_info.init = &HostConnection::Init;
+		_info.name = "host connection";
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void HostConnection::Init( EcsWorld& _world, Component& _component )
+	void HostConnection::Init( EcsWorld& /*_world*/, EcsEntity /*_entity*/, EcsComponent& _component )
 	{
 		HostConnection& hostConnection = static_cast<HostConnection&>( _component );
 		hostConnection.ip = sf::IpAddress();
@@ -47,17 +45,18 @@ namespace fan
 	// sends a login packet to the clients needing approval
 	// regularly sends ping to clients to calculate RTT & sync frame index
 	//================================================================================================================================
-	void HostConnection::Write( EcsWorld& _world, Packet& _packet )
+	void HostConnection::Write( EcsWorld& _world, EcsEntity _entity, Packet& _packet )
 	{
- 		const Game& game = _world.GetSingletonComponent<Game>();
+ 		const Game& game = _world.GetSingleton<Game>();
 
 		// Send login packet
 		if( state == HostConnection::NeedingApprouval )
 		{
 			PacketLoginSuccess packetLogin;
 			packetLogin.Write( _packet );
-			_packet.onSuccess.Connect( &HostConnection::OnLoginSuccess, this );
-			_packet.onFail.Connect( &HostConnection::OnLoginFail, this );
+			const EcsHandle handle = _world.GetHandle( _entity );
+			_packet.onSuccess.Connect( &HostConnection::OnLoginSuccess, _world, handle );
+			_packet.onFail.Connect( &HostConnection::OnLoginFail, _world, handle );
 			state = HostConnection::PendingApprouval;
 		}
 		else if( state == HostConnection::Connected )
@@ -178,7 +177,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void HostConnection::OnGui( EcsWorld& _world, EntityID _entityID, Component& _component )
+	void HostConnection::OnGui( EcsWorld& /*_world*/, EcsEntity /*_entityID*/, EcsComponent& _component )
 	{
 		HostConnection& hostConnection = static_cast<HostConnection&>( _component );
 		const double currentTime = Time::Get().ElapsedSinceStartup();

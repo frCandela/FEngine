@@ -1,6 +1,6 @@
 #pragma once
 
-#include "ecs/fanSingletonComponent.hpp"
+#include "ecs/fanEcsSingleton.hpp"
 
 namespace fan
 {
@@ -8,13 +8,13 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	struct ServerNetworkManager : public SingletonComponent
+	struct ServerNetworkManager : public EcsSingleton
 	{
-		DECLARE_SINGLETON_COMPONENT()
+		ECS_SINGLETON( ServerNetworkManager )
 	public:
-		static void SetInfo( SingletonComponentInfo& _info );
-		static void Init( EcsWorld& _world, SingletonComponent& _component );
-		static void OnGui( EcsWorld&, SingletonComponent& _component );
+		static void SetInfo( EcsSingletonInfo& _info );
+		static void Init( EcsWorld& _world, EcsSingleton& _component );
+		static void OnGui( EcsWorld&, EcsSingleton& _component );
 
 		void Start( EcsWorld& _world );
 		void Stop( EcsWorld& _world );		

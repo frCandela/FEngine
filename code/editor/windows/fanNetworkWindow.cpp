@@ -22,7 +22,7 @@ namespace fan
 	//================================================================================================================================
 	void NetworkWindow::OnGui()
 	{
-		Game& game = m_world->GetSingletonComponent<Game>();
+		Game& game = m_world->GetSingleton<Game>();
 		if( game.gameClient != nullptr )
 		{
 			OnGuiClient( *game.gameClient ); 
@@ -35,13 +35,13 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void  NetworkWindow::OnGuiServer( GameServer& _gameServer )
+	void  NetworkWindow::OnGuiServer( GameServer& /*_gameServer*/ )
 	{
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void  NetworkWindow::OnGuiClient( GameClient& _game )
+	void  NetworkWindow::OnGuiClient( GameClient& /*_game*/ )
 	{
 	}
 }

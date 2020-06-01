@@ -9,14 +9,11 @@
 
 namespace fan
 {
-	REGISTER_SINGLETON_COMPONENT( GameCamera );
-
 	//================================================================================================================================
 	//================================================================================================================================
-	void GameCamera::SetInfo( SingletonComponentInfo& _info )
+	void GameCamera::SetInfo( EcsSingletonInfo& _info )
 	{
 		_info.icon = ImGui::CAMERA16;
-		_info.init = &GameCamera::Init;
 		_info.onGui = &GameCamera::OnGui;
 		_info.save = &GameCamera::Save;
 		_info.load = &GameCamera::Load;
@@ -25,7 +22,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void GameCamera::Init( EcsWorld& _world, SingletonComponent& _component )
+	void GameCamera::Init( EcsWorld& /*_world*/, EcsSingleton& _component )
 	{
 		GameCamera& gameCamera = static_cast<GameCamera&>( _component );
 		gameCamera.heightFromTarget = 30.f;
@@ -35,14 +32,12 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void GameCamera::OnGui( EcsWorld&, SingletonComponent& _component )
+	void GameCamera::OnGui( EcsWorld&, EcsSingleton& _component )
 	{
 		GameCamera& gameCamera = static_cast<GameCamera&>( _component );
 
 		ImGui::Indent(); ImGui::Indent();
 		{
-// 			ImGui::FanComponent( "players manager", m_playersManager );
-// 			ImGui::FanComponent( "camera", m_camera );
 			ImGui::DragFloat( "height from target", &gameCamera.heightFromTarget, 0.25f, 0.5f, 30.f );
 			ImGui::DragFloat2( "margin ratio", &gameCamera.marginRatio[0], 0.1f, 0.f, 10.f );
 			ImGui::DragFloat( "minSize", &gameCamera.minOrthoSize, 0.1f, 0.f, 100.f );
@@ -52,26 +47,22 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void GameCamera::Save( const SingletonComponent& _component, Json& _json )
+	void GameCamera::Save( const EcsSingleton& _component, Json& _json )
 	{
 		const GameCamera& gameCamera = static_cast<const GameCamera&>( _component );
  		Serializable::SaveVec2( _json, "margin_ratio", gameCamera.marginRatio );
  		Serializable::SaveFloat( _json, "min_size", gameCamera.minOrthoSize );
  		Serializable::SaveFloat( _json, "height_from_target", gameCamera.heightFromTarget );
-//  		Serializable::SaveComponentPtr( _json, "players_manager", m_playersManager );
-//  		Serializable::SaveComponentPtr( _json,"camera", m_camera );
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void GameCamera::Load( SingletonComponent& _component, const Json& _json )
+	void GameCamera::Load( EcsSingleton& _component, const Json& _json )
 	{
 		GameCamera& gameCamera = static_cast<GameCamera&>( _component );
 		Serializable::LoadVec2( _json, "margin_ratio", gameCamera.marginRatio );
 		Serializable::LoadFloat( _json, "min_size", gameCamera.minOrthoSize );
 		Serializable::LoadFloat( _json, "height_from_target", gameCamera.heightFromTarget );
-		//  		Serializable::SaveComponentPtr( _json, "players_manager", m_playersManager );
-		//  		Serializable::SaveComponentPtr( _json,"camera", m_camera );
 	}
 
 	//================================================================================================================================
@@ -80,9 +71,9 @@ namespace fan
 	//================================================================================================================================
 	void GameCamera::CreateGameCamera( EcsWorld & _world )
 	{
-		Scene& scene = _world.GetSingletonComponent<Scene>();
-		SceneNode& cameraNode = scene.CreateSceneNode( "game_camera", scene.root );
-		const EntityID cameraID = _world.GetEntityID( cameraNode.handle );
+		Scene& scene = _world.GetSingleton<Scene>();
+		SceneNode& cameraNode = scene.CreateSceneNode( "game_camera", &scene.GetRootNode() );
+		const EcsEntity cameraID = _world.GetEntity( cameraNode.handle );
 		
 		Camera& camera = _world.AddComponent<Camera>( cameraID );
 		camera.type = Camera::ORTHOGONAL;
@@ -91,8 +82,8 @@ namespace fan
 		transform.SetRotationEuler( btVector3( 90.f, 0.f, 0.f ) );
 		transform.SetPosition( btVector3( 0, 5, 0 ) );
 
-		GameCamera& gameCamera = _world.GetSingletonComponent<GameCamera>();
-		gameCamera.cameraNode = &cameraNode;
+		GameCamera& gameCamera = _world.GetSingleton<GameCamera>();
+		gameCamera.cameraHandle = cameraNode.handle;
 	}
 
 	//================================================================================================================================
@@ -101,18 +92,8 @@ namespace fan
 	//================================================================================================================================
 	void GameCamera::DeleteGameCamera( EcsWorld& _world )
 	{
-		GameCamera& gameCamera = _world.GetSingletonComponent<GameCamera>();
-		_world.KillEntity( _world.GetEntityID( gameCamera.cameraNode->handle ) );
-		gameCamera.cameraNode = nullptr;
+		GameCamera& gameCamera = _world.GetSingleton<GameCamera>();
+		_world.Kill( _world.GetEntity( gameCamera.cameraHandle ) );
+		gameCamera.cameraHandle = 0;
 	}
-
-// 	//================================================================================================================================
-// 	//================================================================================================================================
-// 	void CameraController::Start()
-// 	{
-// 		REQUIRE_TRUE( m_camera.IsValid(), "CameraController missing main camera reference" );
-// 		REQUIRE_TRUE( *m_playersManager != nullptr, "CameraController: missing reference to the PlayersManager" )
-// 
-// 		m_gameobject->GetScene().SetMainCamera( *m_camera );
-// 	}
 }

@@ -1,4 +1,4 @@
-#include "ecs/fanSystem.hpp"
+#include "ecs/fanEcsSystem.hpp"
 
 namespace fan
 {
@@ -7,9 +7,9 @@ namespace fan
 	//==============================================================================================================================================================
 	// Deletes the entities that are ouut of time
 	//==============================================================================================================================================================
-	struct S_UpdateExpirationTimes : System
+	struct S_UpdateExpirationTimes : EcsSystem
 	{
-		static Signature GetSignature( const EcsWorld& _world );
-		static void Run( EcsWorld& _world, const std::vector<EntityID>& _entities, const float _delta );
+		static EcsSignature GetSignature( const EcsWorld& _world );
+		static void Run( EcsWorld& _world, const EcsView& _view, const float _delta );
 	};
 }

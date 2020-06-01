@@ -4,36 +4,41 @@
 
 namespace fan
 {
-	REGISTER_COMPONENT( SphereShape, "sphere_shape" );
-
 	//================================================================================================================================
 	//================================================================================================================================
-	SphereShape::SphereShape() : sphereShape( 0.5f ){}
-
-	//================================================================================================================================
-	//================================================================================================================================
-	void SphereShape::SetInfo( ComponentInfo& _info )
+	void SphereShape::SetInfo( EcsComponentInfo& _info )
 	{
 		_info.icon = ImGui::IconType::SPHERE_SHAPE16;
 		_info.onGui = &SphereShape::OnGui;
-		_info.init = &SphereShape::Init;
+		_info.destroy = &SphereShape::Destroy;
 		_info.load  = &SphereShape::Load;
 		_info.save  = &SphereShape::Save;
 		_info.editorPath = "/";
+		_info.name = "sphere shape";
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void SphereShape::Init( EcsWorld& _world, Component& _component )
+	void SphereShape::Init( EcsWorld& /*_world*/, EcsEntity /*_entity*/, EcsComponent& _component )
 	{
 		SphereShape& sphereShape = static_cast<SphereShape&>( _component );
-		sphereShape.sphereShape = btSphereShape( 1.f );
-		sphereShape.sphereShape.setUserPointer( nullptr );
+		sphereShape.sphereShape = new btSphereShape( 1.f );
+		sphereShape.sphereShape->setUserPointer( nullptr );
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void SphereShape::OnGui( EcsWorld& _world, EntityID _entityID, Component& _component )
+	void SphereShape::Destroy( EcsWorld& /*_world*/, EcsEntity /*_entity*/, EcsComponent& _component )
+	{
+		SphereShape& sphereShape = static_cast<SphereShape&>( _component );
+		assert( sphereShape.sphereShape != nullptr );
+		delete sphereShape.sphereShape;
+		sphereShape.sphereShape = nullptr;
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
+	void SphereShape::OnGui( EcsWorld& /*_world*/, EcsEntity /*_entityID*/, EcsComponent& _component )
 	{
 		SphereShape& sphereShape = static_cast<SphereShape&>( _component );
 
@@ -44,13 +49,12 @@ namespace fan
 			{
 				sphereShape.SetRadius( radius );
 			}
-			//RendererDebug::Get().DebugSphere( m_gameobject->GetTransform().GetBtTransform(), radius, 2, Color::Green );
 		} ImGui::PopItemWidth();
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void SphereShape::Save( const Component& _component, Json& _json )
+	void SphereShape::Save( const EcsComponent& _component, Json& _json )
 	{
 		const SphereShape& sphereShape = static_cast<const SphereShape&>( _component );
 		Serializable::SaveFloat( _json, "radius", sphereShape.GetRadius() );
@@ -58,7 +62,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void SphereShape::Load( Component& _component, const Json& _json )
+	void SphereShape::Load( EcsComponent& _component, const Json& _json )
 	{
 		SphereShape& sphereShape = static_cast<SphereShape&>( _component );
 		float radius;
@@ -71,13 +75,13 @@ namespace fan
 	//================================================================================================================================
 	void  SphereShape::SetRadius( const float _radius )
 	{
-		sphereShape.setUnscaledRadius( _radius >= 0 ? _radius : 0.f );
+		sphereShape->setUnscaledRadius( _radius >= 0 ? _radius : 0.f );
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
 	float SphereShape::GetRadius() const
 	{
-		return sphereShape.getRadius();
+		return sphereShape->getRadius();
 	}
 }

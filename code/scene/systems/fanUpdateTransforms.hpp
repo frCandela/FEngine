@@ -1,4 +1,4 @@
-#include "ecs/fanSystem.hpp"
+#include "ecs/fanEcsSystem.hpp"
 
 #include "scene/components/fanTransform.hpp"
 
@@ -9,10 +9,10 @@ namespace fan
 	//==============================================================================================================================================================
 	// setups the FollowTransforms offsets @todo remove this ( useless ? )
 	//==============================================================================================================================================================
-	struct S_InitFollowTransforms : System
+	struct S_InitFollowTransforms : EcsSystem
 	{
-		static Signature GetSignature( const EcsWorld& _world );
-		static void Run( EcsWorld& _world, const std::vector<EntityID>& _entities );
+		static EcsSignature GetSignature( const EcsWorld& _world );
+		static void Run( EcsWorld& _world, const EcsView& _view ) ;
 
 		static btTransform GetLocalTransform( const btTransform& _target, const btTransform& _follower );
 	};
@@ -20,18 +20,18 @@ namespace fan
 	//==============================================================================================================================================================
 	// moves the 3D FollowTransforms after their targets
 	//==============================================================================================================================================================
-	struct S_MoveFollowTransforms : System
+	struct S_MoveFollowTransforms : EcsSystem
 	{
-		static Signature GetSignature( const EcsWorld& _world );
-		static void Run( EcsWorld& _world, const std::vector<EntityID>& _entities );
+		static EcsSignature GetSignature( const EcsWorld& _world );
+		static void Run( EcsWorld& _world, const EcsView& _view ) ;
 	};
 
 	//==============================================================================================================================================================
 	// moves the 2D FollowTransforms after their targets
 	//==============================================================================================================================================================
-	struct S_MoveFollowTransformsUI : System
+	struct S_MoveFollowTransformsUI : EcsSystem
 	{
-		static Signature GetSignature( const EcsWorld& _world );
-		static void Run( EcsWorld& _world, const std::vector<EntityID>& _entities );
+		static EcsSignature GetSignature( const EcsWorld& _world );
+		static void Run( EcsWorld& _world, const EcsView& _view ) ;
 	};
 }

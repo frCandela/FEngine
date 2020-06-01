@@ -9,7 +9,7 @@ namespace fan
 {
 	//================================================================================================================================
 	//================================================================================================================================
-	Signature S_SynchronizeTransformFromMotionState::GetSignature( const EcsWorld& _world )
+	EcsSignature S_SynchronizeTransformFromMotionState::GetSignature( const EcsWorld& _world )
 	{
 		return
 			_world.GetSignature<Transform>()
@@ -19,25 +19,25 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void S_SynchronizeTransformFromMotionState::Run( EcsWorld& _world, const std::vector<EntityID>& _entities, const float _delta )
+	void S_SynchronizeTransformFromMotionState::Run( EcsWorld& /*_world*/, const EcsView& _view )
 	{
-		for( EntityID id : _entities )
+		auto motionStateIt = _view.begin<MotionState>();
+		auto rigidbodyIt = _view.begin<Rigidbody>();
+		auto transformIt = _view.begin<Transform>();
+		for( ; transformIt != _view.end<Transform>(); ++motionStateIt, ++rigidbodyIt, ++transformIt )
 		{
-			// light data
-			const MotionState& motionState = _world.GetComponent<MotionState>( id );
-			const Rigidbody& rigidbody = _world.GetComponent<Rigidbody>( id );
-			Transform& transform = _world.GetComponent<Transform>( id );
+			const MotionState& motionState = *motionStateIt;
+			const Rigidbody& rigidbody = *rigidbodyIt;
+			Transform& transform = *transformIt;
 
-
-
-			if( rigidbody.rigidbody.getInvMass() <= 0.f ) { continue; }
-			motionState.motionState.getWorldTransform( transform.transform );
+			if( rigidbody.rigidbody->getInvMass() <= 0.f ) { continue; }
+			motionState.motionState->getWorldTransform( transform.transform );
 		}
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	Signature S_SynchronizeMotionStateFromTransform::GetSignature( const EcsWorld& _world )
+	EcsSignature S_SynchronizeMotionStateFromTransform::GetSignature( const EcsWorld& _world )
 	{
 		return
 			_world.GetSignature<Transform>()
@@ -47,16 +47,19 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void S_SynchronizeMotionStateFromTransform::Run( EcsWorld& _world, const std::vector<EntityID>& _entities, const float _delta )
+	void S_SynchronizeMotionStateFromTransform::Run( EcsWorld& /*_world*/, const EcsView& _view )
 	{
-		for( EntityID id : _entities )
+		auto motionStateIt = _view.begin<MotionState>();
+		auto rigidbodyIt = _view.begin<Rigidbody>();
+		auto transformIt = _view.begin<Transform>();
+		for( ; transformIt != _view.end<Transform>(); ++motionStateIt, ++rigidbodyIt, ++transformIt )
 		{
-			const Transform& transform = _world.GetComponent<Transform>( id );
-			MotionState& motionState = _world.GetComponent<MotionState>( id );
-			Rigidbody& rigidbody = _world.GetComponent<Rigidbody>( id );
+			MotionState& motionState = *motionStateIt;
+			Rigidbody& rigidbody = *rigidbodyIt;
+			const Transform& transform = *transformIt;
 
-			rigidbody.rigidbody.setWorldTransform( transform.transform );
-			motionState.motionState.setWorldTransform( transform.transform );
+			rigidbody.rigidbody->setWorldTransform( transform.transform );
+			motionState.motionState->setWorldTransform( transform.transform );
 		}
 	}
 }

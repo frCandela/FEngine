@@ -5,23 +5,21 @@
 
 namespace fan
 {
-	REGISTER_COMPONENT( Material, "material" );
-
 	//================================================================================================================================
 	//================================================================================================================================
-	void Material::SetInfo( ComponentInfo& _info )
+	void Material::SetInfo( EcsComponentInfo& _info )
 	{
 		_info.icon = ImGui::IconType::MATERIAL16;
 		_info.onGui = &Material::OnGui;
-		_info.init = &Material::Init;
 		_info.load  = &Material::Load;
 		_info.save  = &Material::Save;
 		_info.editorPath = "/";
+		_info.name = "material";
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void Material::Init( EcsWorld& _world, Component& _component )
+	void Material::Init( EcsWorld& /*_world*/, EcsEntity /*_entity*/, EcsComponent& _component )
 	{
 		Material& material = static_cast<Material&>( _component );
 
@@ -32,7 +30,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void Material::OnGui( EcsWorld& _world, EntityID _entityID, Component& _component )
+	void Material::OnGui( EcsWorld& /*_world*/, EcsEntity /*_entityID*/, EcsComponent& _component )
 	{
 		Material& material = static_cast<Material&>( _component );
 
@@ -52,7 +50,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void Material::Save( const Component& _component, Json& _json )
+	void Material::Save( const EcsComponent& _component, Json& _json )
 	{
 		const Material& material = static_cast<const Material&>( _component );
 
@@ -63,7 +61,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void Material::Load( Component& _component, const Json& _json )
+	void Material::Load( EcsComponent& _component, const Json& _json )
 	{
 		Material& material = static_cast<Material&>( _component );
 

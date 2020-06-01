@@ -3,7 +3,7 @@
 #include "core/fanDebug.hpp"
 #include "editor/singletonComponents/fanEditorGrid.hpp"
 #include "editor/windows/fanEditorWindow.hpp"
-#include "editor/fanEditorSelection.hpp"
+#include "editor/singletonComponents/fanEditorSelection.hpp"
 #include "editor/fanModals.hpp"
 #include "core/fanSerializedValues.hpp"
 #include "core/input/fanInput.hpp"
@@ -21,8 +21,8 @@ namespace fan
 {
 	//================================================================================================================================
 	//================================================================================================================================
-	MainMenuBar::MainMenuBar( EcsWorld& _world, EditorSelection& _editorSelection )
-		: m_editorSelection( _editorSelection )
+	MainMenuBar::MainMenuBar( EcsWorld& _world )
+		: m_editorSelection( _world.GetSingleton<EditorSelection>() )
 		, m_showImguiDemoWindow( true )
 		, m_showAABB( false )
 		, m_showHull( false )
@@ -221,7 +221,7 @@ namespace fan
 			// Framerate set popup
 			if ( ImGui::BeginPopup( "main_menu_bar_set_fps" ) )
 			{
-				Game& game = m_world->GetSingletonComponent<Game>();
+				Game& game = m_world->GetSingleton<Game>();
 
 				ImGui::PushItemWidth( 80.f );
 				float maxFps = 1.f / Time::Get().GetRenderDelta();
@@ -275,7 +275,7 @@ namespace fan
 	//================================================================================================================================
 	void MainMenuBar::DrawModals()
 	{
-		Scene& scene = m_world->GetSingletonComponent<Scene>();
+		Scene& scene = m_world->GetSingleton<Scene>();
 
 		// New scene
 		if ( ImGui::FanSaveFileModal( "New scene", RenderGlobal::s_sceneExtensions, m_pathBuffer ) )
@@ -304,7 +304,7 @@ namespace fan
 	//================================================================================================================================
 	void MainMenuBar::New()
 	{
-		Game& game = m_world->GetSingletonComponent<Game>();
+		Game& game = m_world->GetSingleton<Game>();
 		if( game.state != Game::STOPPED )
 		{
 			Debug::Warning() << "creating scenes is disabled in play mode" << Debug::Endl();
@@ -319,7 +319,7 @@ namespace fan
 	//================================================================================================================================
 	void MainMenuBar::Open()
 	{
-		Game& game = m_world->GetSingletonComponent<Game>();
+		Game& game = m_world->GetSingleton<Game>();
 		if( game.state != Game::STOPPED )
 		{
 			Debug::Warning() << "loading scenes is disabled in play mode" << Debug::Endl();
@@ -335,8 +335,8 @@ namespace fan
 	//================================================================================================================================
 	void MainMenuBar::Reload()
 	{
-		Game& game = m_world->GetSingletonComponent<Game>();
-		Scene& scene = m_world->GetSingletonComponent<Scene>();
+		Game& game = m_world->GetSingleton<Game>();
+		Scene& scene = m_world->GetSingleton<Scene>();
 
 		if( scene.path.empty() )
 		{
@@ -347,28 +347,25 @@ namespace fan
 		if( game.state == Game::STOPPED )
 		{
 			// save old camera transform
-			const EntityID oldCameraID = m_world->GetEntityID( scene.mainCamera->handle );
+			const EcsEntity oldCameraID = m_world->GetEntity( scene.mainCameraHandle );
 			btTransform oldCameraTransform = m_world->GetComponent<Transform>( oldCameraID ).transform;
 
 			// save old selection
 			SceneNode* prevSelectionNode = m_editorSelection.GetSelectedSceneNode();
-			const uint32_t prevSelectionID = prevSelectionNode != nullptr ? prevSelectionNode->uniqueID : 0;
+			const EcsHandle prevSelectionHandle= prevSelectionNode != nullptr ? prevSelectionNode->handle : 0;
 
 			Debug::Get() << Debug::Severity::log << "loading scene: " << scene.path << Debug::Endl();
 			scene.LoadFrom( scene.path );
 
 			// restore camera
-			const EntityID newCameraID = m_world->GetEntityID( scene.mainCamera->handle );
+			const EcsEntity newCameraID = m_world->GetEntity( scene.mainCameraHandle );
 			m_world->GetComponent<Transform>( newCameraID ).transform = oldCameraTransform;
 
 			// restore selection
-			if( prevSelectionID != 0 )
+			if( prevSelectionHandle != 0 && scene.nodes.find(prevSelectionHandle) != scene.nodes.end() )
 			{
-				auto it = scene.nodes.find( prevSelectionID );
-				if( it != scene.nodes.end() )
-				{
-					m_editorSelection.SetSelectedSceneNode( it->second );
-				}
+				fan::SceneNode& node = m_world->GetComponent<fan::SceneNode>( m_world->GetEntity( prevSelectionHandle ) );
+				m_editorSelection.SetSelectedSceneNode( &node );				
 			}
 		}
 		else
@@ -381,8 +378,8 @@ namespace fan
 	//================================================================================================================================
 	void MainMenuBar::Save()
 	{
-		Game& game = m_world->GetSingletonComponent<Game>();
-		Scene& scene = m_world->GetSingletonComponent<Scene>();
+		Game& game = m_world->GetSingleton<Game>();
+		Scene& scene = m_world->GetSingleton<Scene>();
 
 		if( game.state != Game::STOPPED )
 		{

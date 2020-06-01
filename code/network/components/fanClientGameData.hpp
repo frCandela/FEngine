@@ -2,7 +2,7 @@
 
 #include <deque>
 #include <queue>
-#include "ecs/fanComponent.hpp"
+#include "ecs/fanEcsComponent.hpp"
 #include "network/fanPacket.hpp"
 
 namespace fan
@@ -10,13 +10,13 @@ namespace fan
 	//==============================================================================================================================================================
 	// All game info for a remote player
 	//==============================================================================================================================================================
-	struct ClientGameData : public Component
+	struct ClientGameData : public EcsComponent
 	{
-		DECLARE_COMPONENT( ClientGameData )
+		ECS_COMPONENT( ClientGameData )
 	public:
-		static void SetInfo( ComponentInfo& _info );
-		static void Init( EcsWorld& _world, Component& _component );
-		static void OnGui( EcsWorld& _world, EntityID _entityID, Component& _component );
+		static void SetInfo( EcsComponentInfo& _info );
+		static void Init( EcsWorld& _world, EcsEntity _entity, EcsComponent& _component );
+		static void OnGui( EcsWorld& _world, EcsEntity _entityID, EcsComponent& _component );
 		
 		//===============================================================================
 		// for registering inputs sent to the server		
@@ -29,7 +29,7 @@ namespace fan
 
 		FrameIndex							spaceshipSpawnFrameIndex;	// the frame index on which the spaceship is spawned
 		NetID								spaceshipNetID;
-		EntityHandle						spaceshipHandle;
+		EcsHandle						spaceshipHandle;
 		std::deque< PacketInput::InputData >previousInputs;
 		std::deque< PacketInput::InputData >previousInputsSinceLastGameState;
 		std::deque< InputSent>				inputsSent;
@@ -40,7 +40,7 @@ namespace fan
 		int									maxInputSent;
 		PacketPlayerGameState				lastServerState;
 
-		void Write( Packet& _packet );
+		void Write( EcsWorld& _world, EcsEntity _entity, Packet& _packet );
 		void ProcessPacket( const PacketPlayerGameState& _packet );
 		
 		// callbacks

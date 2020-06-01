@@ -1,6 +1,7 @@
 #include "editor/windows/fanInspectorWindow.hpp"
 
 #include <sstream>
+#include "editor/singletonComponents/fanEditorSelection.hpp"
 #include "scene/fanDragnDrop.hpp"
 #include "scene/singletonComponents/fanScene.hpp"
 #include "scene/singletonComponents/fanPhysicsWorld.hpp"
@@ -11,7 +12,7 @@
 #include "scene/components/fanRigidbody.hpp"
 #include "ecs/fanEcsWorld.hpp"
 #include "core/time/fanProfiler.hpp"
-#include "core/fanSignal.hpp"
+#include "ecs/fanSignal.hpp"
 #include "render/core/fanTexture.hpp"
 #include "render/core/fanTexture.hpp"
 #include "render/fanMesh.hpp"
@@ -21,10 +22,10 @@ namespace fan
 {
 	//================================================================================================================================
 	//================================================================================================================================
-	InspectorWindow::InspectorWindow() :
-		EditorWindow( "inspector", ImGui::IconType::INSPECTOR16 )
-	{
-	}
+	InspectorWindow::InspectorWindow( EcsWorld& _world ) :
+		EditorWindow( "inspector", ImGui::IconType::INSPECTOR16 ), 
+		m_world( _world )
+	{}
 
 	//================================================================================================================================
 	//================================================================================================================================
@@ -32,21 +33,24 @@ namespace fan
 	{
 		SCOPED_PROFILE( inspector );
 
-		if( m_sceneNodeSelected != nullptr )
+		EcsHandle handleSelected = m_world.GetSingleton<EditorSelection>().m_selectedNodeHandle;
+		if( handleSelected != 0 )
 		{
-			SceneNode& node = *m_sceneNodeSelected;
+			SceneNode& node = m_world.GetComponent<SceneNode>( m_world.GetEntity( handleSelected ) );
 			Scene& scene = *node.scene;
 			EcsWorld& world = *scene.world;
-			const EntityID entityID = world.GetEntityID( node.handle );
+			const EcsEntity entity = world.GetEntity( node.handle );
 
 			// scene node gui
  			ImGui::Icon( GetIconType(), { 16,16 } ); ImGui::SameLine();
 			ImGui::Text( "Scene node : %s", node.name.c_str() );
 
-			for( int componentIndex = 0; componentIndex < (int)world.GetComponentCount( entityID ); componentIndex++ )
+			
+			for( const EcsComponentInfo& info : world.GetVectorComponentInfo() )
 			{
-				Component& component = world.GetComponentAt( entityID, componentIndex );
-				const ComponentInfo& info = world.GetComponentInfo( component.GetIndex() );
+				if( !world.HasComponent( entity, info.type ) ) { continue; }
+
+				EcsComponent& component = world.GetComponent( entity, info.type );
 
 				if( info.onGui == nullptr ) { continue; }
 
@@ -54,9 +58,9 @@ namespace fan
 				 
  				// Icon
 				ImGui::Icon( info.icon, { 16,16 } ); ImGui::SameLine();
-				ImGui::FanBeginDragDropSourceComponent( node, component, ImGuiDragDropFlags_SourceAllowNullID );
+				ImGui::FanBeginDragDropSourceComponent( world, node.handle, info.type, ImGuiDragDropFlags_SourceAllowNullID );
 				ImGui::Text( "%s", info.name.c_str() );
- 				ImGui::FanBeginDragDropSourceComponent( node, component, ImGuiDragDropFlags_SourceAllowNullID );
+ 				ImGui::FanBeginDragDropSourceComponent( world, node.handle, info.type, ImGuiDragDropFlags_SourceAllowNullID );
 
  				// Delete button	
 				std::stringstream ss;
@@ -64,12 +68,12 @@ namespace fan
 				ImGui::SameLine( ImGui::GetWindowWidth() - 40 );
 				if( ImGui::Button( ss.str().c_str() ) )
 				{
-					world.RemoveComponent( entityID, component.GetIndex() );				
+					world.RemoveComponent( entity, info.type );
 				}
  				// Draw component
 				else
 				{
-					info.onGui( world, entityID, component );
+					info.onGui( world, entity, component );
 				} 
 			}
 			ImGui::Separator();
@@ -84,17 +88,17 @@ namespace fan
 	//================================================================================================================================
 	// menu item in the NewComponentPopup
 	//================================================================================================================================
-	void InspectorWindow::NewComponentItem( const ComponentInfo& _info )
+	void InspectorWindow::NewComponentItem( const EcsComponentInfo& _info )
 	{
 		ImGui::Icon( _info.icon, { 16,16 } ); ImGui::SameLine();
 		if( ImGui::MenuItem( _info.name.c_str() ) )
 		{
-			// Create new Component 
-			EcsWorld& world = *m_sceneNodeSelected->scene->world;
-			EntityID entityID = world.GetEntityID( m_sceneNodeSelected->handle );
-			if( !world.HasComponent( entityID, _info.index ) )
+			// Create new EcsComponent 
+			EcsHandle handleSelected = m_world.GetSingleton<EditorSelection>().m_selectedNodeHandle;
+			EcsEntity entity = m_world.GetEntity( handleSelected );
+			if( !m_world.HasComponent( entity, _info.type ) )
 			{
-				world.AddComponent( entityID, _info.index );				
+				m_world.AddComponent( entity, _info.type );
 			}			
 			ImGui::CloseCurrentPopup();
 		}
@@ -106,13 +110,10 @@ namespace fan
 	void InspectorWindow::NewComponentPopup()
 	{
 		using Path = std::filesystem::path;
-
-		EcsWorld& world = *m_sceneNodeSelected->scene->world;
-
 		if( ImGui::BeginPopup( "new_component" ) )
 		{
 			// Get components and remove components with an empty path
-			std::vector< ComponentInfo > components = world.GetVectorComponentInfo();			
+			std::vector< EcsComponentInfo > components = m_world.GetVectorComponentInfo();			
 			for( int i = (int)components.size() - 1; i >= 0; i-- )
 			{
 				if( std::string( components[i].editorPath ).empty() )
@@ -120,7 +121,6 @@ namespace fan
 					components.erase( components.begin() + i );
 				}
 			}
-
 
  			// Get components paths
 			std::vector<Path> componentsPath;
@@ -162,7 +162,7 @@ namespace fan
 	// recursively draws all components available to add
 	// called from the NewComponentPopup
 	//================================================================================================================================
-	void InspectorWindow::R_NewComponentPopup( std::set< std::filesystem::path >& _componentsPathSet, std::set< std::filesystem::path >::iterator& _current, const std::vector< ComponentInfo >& _components, const std::vector<std::filesystem::path>& _componentsPath )
+	void InspectorWindow::R_NewComponentPopup( std::set< std::filesystem::path >& _componentsPathSet, std::set< std::filesystem::path >::iterator& _current, const std::vector< EcsComponentInfo >& _components, const std::vector<std::filesystem::path>& _componentsPath )
 	{
 		std::filesystem::path rootPath = *_current;
 

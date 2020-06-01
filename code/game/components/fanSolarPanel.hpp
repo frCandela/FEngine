@@ -1,21 +1,21 @@
 #pragma once
 
-#include "ecs/fanComponent.hpp"
+#include "ecs/fanEcsComponent.hpp"
 
 namespace fan
 {
 	//================================================================================================================================
 	// creates energy from the sun light and stores it in a battery
 	//================================================================================================================================
-	class SolarPanel : public Component
+	class SolarPanel : public EcsComponent
 	{
-		DECLARE_COMPONENT( SolarPanel )
+		ECS_COMPONENT( SolarPanel )
 	public:
-		static void SetInfo( ComponentInfo& _info );
-		static void Init( EcsWorld& _world, Component& _component );
-		static void OnGui( EcsWorld& _world, EntityID _entityID, Component& _component );
-		static void Save( const Component& _component, Json& _json );
-		static void Load( Component& _component, const Json& _json );
+		static void SetInfo( EcsComponentInfo& _info );
+		static void Init( EcsWorld& _world, EcsEntity _entity, EcsComponent& _component );
+		static void OnGui( EcsWorld& _world, EcsEntity _entityID, EcsComponent& _component );
+		static void Save( const EcsComponent& _component, Json& _json );
+		static void Load( EcsComponent& _component, const Json& _json );
 
 		bool  isInSunlight;
 		float currentChargingRate;  // Energy/s  @todo remove this ?

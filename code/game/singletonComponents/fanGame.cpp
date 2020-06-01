@@ -17,14 +17,11 @@
 
 namespace fan
 {
-	REGISTER_SINGLETON_COMPONENT( Game );
-
 	//================================================================================================================================
 	//================================================================================================================================
-	void Game::SetInfo( SingletonComponentInfo& _info )
+	void Game::SetInfo( EcsSingletonInfo& _info )
 	{
 		_info.icon = ImGui::JOYSTICK16;
-		_info.init = &Game::Init;
 		_info.onGui = &Game::OnGui;
 		_info.save = &Game::Save;
 		_info.load = &Game::Load;
@@ -33,10 +30,10 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void Game::Init( EcsWorld& _world, SingletonComponent& _component ){
+	void Game::Init( EcsWorld& /*_world*/, EcsSingleton& _component ){
 		Game& gameData = static_cast<Game&>( _component );
 		gameData.state = STOPPED;
-		gameData.spaceshipPrefab = nullptr;
+		gameData.spaceshipPrefab.Set( nullptr );
 		gameData.frameIndex = 0;
 		gameData.logicDelta = 1.f / 60.f;
 		gameData.frameStart = 0;
@@ -63,7 +60,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void Game::Save( const SingletonComponent& _component, Json& _json )
+	void Game::Save( const EcsSingleton& _component, Json& _json )
 	{
 		const Game& gameData = static_cast<const Game&>( _component );
 		Serializable::SavePrefabPtr( _json, "spaceship", gameData.spaceshipPrefab );
@@ -71,24 +68,24 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void Game::Load( SingletonComponent& _component, const Json& _json )
+	void Game::Load( EcsSingleton& _component, const Json& _json )
 	{
 		Game& gameData = static_cast<Game&>( _component );
 		Serializable::LoadPrefabPtr( _json, "spaceship", gameData.spaceshipPrefab );
 	}
 
 	//================================================================================================================================
-// generates the spaceship entity from the game prefab
-//================================================================================================================================
-	EntityHandle Game::SpawnSpaceship( EcsWorld& _world )
+	// generates the spaceship entity from the game prefab
+	//================================================================================================================================
+	EcsHandle Game::SpawnSpaceship( EcsWorld& _world )
 	{
 		// spawn the spaceship	
-		Game& game = _world.GetSingletonComponent< Game >();
+		Game& game = _world.GetSingleton< Game >();
 		if( game.spaceshipPrefab != nullptr )
 		{
-			Scene& scene = _world.GetSingletonComponent<Scene>();
-			SceneNode& spaceshipNode = *game.spaceshipPrefab->Instanciate( *scene.root );
-			EntityID spaceshipID = _world.GetEntityID( spaceshipNode.handle );
+			Scene& scene = _world.GetSingleton<Scene>();
+			SceneNode& spaceshipNode = *game.spaceshipPrefab->Instanciate( scene.GetRootNode() );
+			EcsEntity spaceshipID = _world.GetEntity( spaceshipNode.handle );
 
 			if( _world.HasComponent<Transform>( spaceshipID )
 				&& _world.HasComponent<Rigidbody>( spaceshipID )
@@ -100,16 +97,17 @@ namespace fan
 				transform.SetPosition( btVector3( 0, 0, 4.f ) );
 
 				// add rigidbody to the physics world
-				PhysicsWorld& physicsWorld = _world.GetSingletonComponent<PhysicsWorld>();
+				PhysicsWorld& physicsWorld = _world.GetSingleton<PhysicsWorld>();
 				Rigidbody& rigidbody = _world.GetComponent<Rigidbody>( spaceshipID );
 				MotionState& motionState = _world.GetComponent<MotionState>( spaceshipID );
 				BoxShape& boxShape = _world.GetComponent<BoxShape>( spaceshipID );
-				rigidbody.SetCollisionShape( &boxShape.boxShape );
-				rigidbody.SetMotionState( &motionState.motionState );
-				physicsWorld.AddRigidbody( rigidbody, spaceshipNode.handle );
+				rigidbody.SetCollisionShape( boxShape.boxShape );
+				rigidbody.SetMotionState( motionState.motionState );
+				rigidbody.rigidbody->setWorldTransform( transform.transform );
+				physicsWorld.dynamicsWorld->addRigidBody( rigidbody.rigidbody );
 
 				// registers physics callbacks
-				CollisionManager& collisionManager = _world.GetSingletonComponent<CollisionManager>();
+				CollisionManager& collisionManager = _world.GetSingleton<CollisionManager>();
 				rigidbody.onContactStarted.Connect( &CollisionManager::OnSpaceShipContact, &collisionManager );
 
 				return spaceshipNode.handle;
@@ -131,7 +129,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void Game::OnGui( EcsWorld&, SingletonComponent& _component )
+	void Game::OnGui( EcsWorld&, EcsSingleton& _component )
 	{
 		Game& gameData = static_cast<Game&>( _component );
 

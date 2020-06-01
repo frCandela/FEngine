@@ -11,19 +11,22 @@ namespace fan
 {
 	//================================================================================================================================
 	//================================================================================================================================
-	Signature S_RaycastAll::GetSignature( const EcsWorld& _world )
+	EcsSignature S_RaycastAll::GetSignature( const EcsWorld& _world )
 	{
-		return	_world.GetSignature<Bounds>() | _world.GetSignature<SceneNode>() | _world.GetSignature<Transform>();
+		return	
+			_world.GetSignature<Bounds>() | 
+			_world.GetSignature<SceneNode>() | 
+			_world.GetSignature<Transform>();
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	bool S_RaycastAll::Run( EcsWorld& _world, const std::vector<EntityID>& _entities, const Ray& _ray, std::vector<EntityID>& _outResults )
+	bool S_RaycastAll::Run( EcsWorld& _world, const EcsView& _view, const Ray& _ray, std::vector<EcsEntity>& _outResults )
 	{
 		// Helper class for storing the result of a raycast
 		struct Result
 		{
-			EntityID entityID;
+			EcsEntity entityID;
 			float distance;
 
 			static bool Sort( Result& _resultA, Result& _resultB )
@@ -34,34 +37,39 @@ namespace fan
 
 		// results
 		std::vector<Result> results;
-		results.reserve( _entities.size() );
+		results.reserve( _view.Size() );
 
 		// raycast
-		for( EntityID entityID : _entities )
+		auto boundsIt = _view.begin<Bounds>();
+		auto sceneNodeIt = _view.begin<SceneNode>();
+		auto TransformIt = _view.begin<Transform>();
+		for( ; boundsIt != _view.end<Bounds>(); ++boundsIt, ++sceneNodeIt, ++TransformIt )
 		{
+			const EcsEntity entity = boundsIt.Entity();
+			const Bounds& bounds = *boundsIt;
+			const SceneNode& sceneNode = *sceneNodeIt;
+			const Transform transform = *TransformIt;
+
 			// check NO_RAYCAST flag
-			const SceneNode& sceneNode = _world.GetComponent<SceneNode>( entityID );
 			if( sceneNode.HasFlag( SceneNode::NO_RAYCAST ) ){ continue; }
 
 			// raycast on bounds
-			const Bounds& bounds = _world.GetComponent<Bounds>( entityID );
 			btVector3 intersection;
 			if( bounds.aabb.RayCast( _ray.origin, _ray.direction, intersection ) == true )
 			{
 				// raycast on mesh renderer
-				if( _world.HasComponent<MeshRenderer>( entityID ) )
+				if( _world.HasComponent<MeshRenderer>( entity ) )
 				{
-					const MeshRenderer& meshRenderer = _world.GetComponent<MeshRenderer>( entityID );
-					const Transform& transform = _world.GetComponent<Transform>( entityID );
+					const MeshRenderer& meshRenderer = _world.GetComponent<MeshRenderer>( entity );
 					const Ray transformedRay( transform.InverseTransformPoint( _ray.origin ), transform.InverseTransformDirection( _ray.direction ) );
 					if( meshRenderer.mesh!= nullptr && meshRenderer.mesh->GetHull().RayCast( transformedRay.origin, transformedRay.direction, intersection ) )
 					{
-						results.push_back( { entityID , intersection.distance2( _ray.origin ) } );
+						results.push_back( { entity , intersection.distance2( _ray.origin ) } );
 					}
 				}
 				else
 				{
-					results.push_back( { entityID , intersection.distance2( _ray.origin ) } );
+					results.push_back( { entity , intersection.distance2( _ray.origin ) } );
 				}
 			}
 		}

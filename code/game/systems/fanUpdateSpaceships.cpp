@@ -18,7 +18,7 @@ namespace fan
 {
 	//================================================================================================================================
 	//================================================================================================================================
-	Signature S_MoveSpaceships::GetSignature( const EcsWorld& _world )
+	EcsSignature S_MoveSpaceships::GetSignature( const EcsWorld& _world )
 	{
 		return _world.GetSignature<Transform>() |
 			   _world.GetSignature<Rigidbody>() |
@@ -28,18 +28,25 @@ namespace fan
 	}
 
 	//================================================================================================================================
+	// @todo split this in multiple sub systems for force application & energy management
 	//================================================================================================================================
-	void S_MoveSpaceships::Run( EcsWorld& _world, const std::vector<EntityID>& _entities, const float _delta )
+	void S_MoveSpaceships::Run( EcsWorld& _world, const EcsView& _view, const float _delta )
 	{
 		if( _delta == 0.f ) { return; }
 
-		for( EntityID entityID : _entities )
+		auto rbIt = _view.begin<Rigidbody>();
+		auto transformIt = _view.begin<Transform>();
+		auto spaceshipIt = _view.begin<SpaceShip>();
+		auto batteryIt = _view.begin<Battery>();
+		auto playerInputIt = _view.begin<PlayerInput>();
+		for( ; rbIt != _view.end<Rigidbody>(); ++rbIt, ++transformIt, ++spaceshipIt, ++batteryIt, ++playerInputIt )
 		{
-			Transform& transform = _world.GetComponent<Transform>( entityID );
-			Rigidbody& rb = _world.GetComponent<Rigidbody>( entityID );
-			SpaceShip& spaceship = _world.GetComponent<SpaceShip>( entityID );
-			Battery& battery = _world.GetComponent<Battery>( entityID );
-			PlayerInput & playerInput = _world.GetComponent<PlayerInput>( entityID );
+			const EcsEntity entity = rbIt.Entity();
+			const SpaceShip& spaceship = *spaceshipIt;
+			const PlayerInput& playerInput = *playerInputIt;
+			Rigidbody& rb = *rbIt;
+			Transform& transform = *transformIt;
+			Battery& battery = *batteryIt;
 
 			// get player input
 			const btVector3 orientation = btVector3( playerInput.orientation.x(), 0.f, playerInput.orientation.z() );
@@ -125,41 +132,42 @@ namespace fan
 			}
 
 			// Forces application		
-			rb.rigidbody.applyCentralForce( leftForce * transform.Left() );
-			rb.rigidbody.applyCentralForce( spaceship.forwardForces[speedMode] * forwardAxis * transform.Forward() );
-			rb.rigidbody.setAngularVelocity( btVector3::Zero() );
+			rb.rigidbody->applyCentralForce( leftForce * transform.Left() );
+			rb.rigidbody->applyCentralForce( spaceship.forwardForces[speedMode] * forwardAxis * transform.Forward() );
+			rb.rigidbody->setAngularVelocity( btVector3::Zero() );
 
 			// Drag
 			btVector3 newVelocity = ( totalConsumption > 0.f ? spaceship.activeDrag : spaceship.passiveDrag ) * rb.GetVelocity();
 			newVelocity.setY( 0.f );
 			rb.SetVelocity( newVelocity );
 
-			_world.AddTag<tag_boundsOutdated>( entityID );
+			_world.AddTag<tag_boundsOutdated>( entity );
 		}
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	Signature S_EruptionDamage::GetSignature( const EcsWorld& _world )
+	EcsSignature S_EruptionDamage::GetSignature( const EcsWorld& _world )
 	{
 		return  _world.GetSignature<SolarPanel>() |
-				_world.GetSignature<Transform>() |
 				_world.GetSignature<Health>()	 |
 				_world.GetSignature<SpaceShip>();
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void S_EruptionDamage::Run( EcsWorld& _world, const std::vector<EntityID>& _entities, const float _delta )
+	void S_EruptionDamage::Run( EcsWorld& _world, const EcsView& _view, const float _delta )
 	{
 		if( _delta == 0.f ) { return; }
 
-		const SolarEruption& eruption = _world.GetSingletonComponent<SolarEruption>();
-		for( EntityID entityID : _entities )
+		const SolarEruption& eruption = _world.GetSingleton<SolarEruption>();
+
+		auto healthIt = _view.begin<Health>();
+		auto solarPanelIt = _view.begin<SolarPanel>();
+		for( ; healthIt != _view.end<Health>(); ++healthIt, ++solarPanelIt )
 		{
-			const Transform& transform = _world.GetComponent<Transform>( entityID );
-			Health& health = _world.GetComponent<Health>( entityID );
-			SolarPanel& solarPanel = _world.GetComponent<SolarPanel>( entityID );
+			Health& health = *healthIt;
+			const SolarPanel& solarPanel = *solarPanelIt;
 
 			if( solarPanel.isInSunlight && eruption.state == SolarEruption::EXPODING )
 			{
@@ -178,7 +186,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	Signature S_PlayerDeath::GetSignature( const EcsWorld& _world )
+	EcsSignature S_PlayerDeath::GetSignature( const EcsWorld& _world )
 	{
 		return	_world.GetSignature<Health>() |
 				_world.GetSignature<Transform>() |
@@ -187,20 +195,23 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void S_PlayerDeath::Run( EcsWorld& _world, const std::vector<EntityID>& _entities, const float _delta )
+	void S_PlayerDeath::Run( EcsWorld& _world, const EcsView& _view, const float _delta )
 	{
 		if( _delta == 0.f ) { return; }
-
-		const SolarEruption& eruption = _world.GetSingletonComponent<SolarEruption>();
-		for( EntityID entityID : _entities )
+		
+		auto healthIt = _view.begin<Health>();
+		auto transformIt = _view.begin<Transform>();
+		auto spaceShipIt = _view.begin<SpaceShip>();
+		for( ; healthIt != _view.end<Health>(); ++healthIt, ++transformIt, ++spaceShipIt )
 		{
-			Health& health = _world.GetComponent<Health>( entityID );
+			const Health& health = *healthIt;
+			const Transform& transform = *transformIt;
+			const SpaceShip& spaceShip = *spaceShipIt;
+			const EcsEntity entity = healthIt.Entity();
 
-			if( health.currentHealth == 0.f )
+			if( health.currentHealth == 0.f && !health.invincible )
 			{
-				Transform& transform = _world.GetComponent<Transform>( entityID );
-				SpaceShip& spaceShip = _world.GetComponent<SpaceShip>( entityID );
-				Scene& scene = _world.GetSingletonComponent<Scene>();
+				Scene& scene = _world.GetSingleton<Scene>();
 				
 				if( spaceShip.deathFx == nullptr )
 				{
@@ -208,13 +219,13 @@ namespace fan
 				}
 				else
 				{
-					SceneNode& fxNode = *spaceShip.deathFx->Instanciate( *scene.root );
-					EntityID fxId = _world.GetEntityID( fxNode.handle );
+					SceneNode& fxNode = *spaceShip.deathFx->Instanciate( scene.GetRootNode() );
+					EcsEntity fxId = _world.GetEntity( fxNode.handle );
 					Transform& fxTransform = _world.GetComponent<Transform>( fxId );
 					fxTransform.SetPosition( transform.GetPosition() );
 				}
 
-				_world.KillEntity( entityID );
+				_world.Kill( entity );
 			}
 		}
 	}

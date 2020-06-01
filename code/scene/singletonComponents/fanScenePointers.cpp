@@ -6,29 +6,26 @@
 
 namespace fan
 {
-	REGISTER_SINGLETON_COMPONENT( ScenePointers	 );
-
 	//================================================================================================================================
 	//================================================================================================================================
-	void ScenePointers::SetInfo( SingletonComponentInfo& _info )
+	void ScenePointers::SetInfo( EcsSingletonInfo& _info )
 	{
 		_info.icon = ImGui::SCENE16;
-		_info.init = &ScenePointers::Init;
 		_info.onGui = &ScenePointers::OnGui;
 		_info.name = "scene pointers";
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void ScenePointers::Init( EcsWorld& _world, SingletonComponent& _component )
+	void ScenePointers::Init( EcsWorld& /*_world*/, EcsSingleton& _component )
 	{
 		ScenePointers& scenePointers = static_cast<ScenePointers&>( _component );
-		scenePointers.unresolvedComponentPtr.clear();;
+		scenePointers.unresolvedComponentPtr.clear();
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void ScenePointers::OnGui( EcsWorld&, SingletonComponent& _component )
+	void ScenePointers::OnGui( EcsWorld&, EcsSingleton& _component )
 	{
 		ScenePointers& scenePointers = static_cast<ScenePointers&>( _component );
 		ImGui::Indent(); ImGui::Indent();
@@ -43,21 +40,13 @@ namespace fan
 	// When instancing from prefab, scene nodes unique ids are offset by the greatest id in the scene
 	// it is then necessary to offset the id of pointers as well using the field _idOffset
 	//================================================================================================================================
-	void  ScenePointers::ResolveComponentPointers( Scene& _scene, const uint32_t _idOffset )
+	void  ScenePointers::ResolveComponentPointers( EcsWorld& _world, const uint32_t _idOffset )
 	{
-		EcsWorld& world = *_scene.world;
-		ScenePointers& scenePointers = world.GetSingletonComponent<ScenePointers>();
-
-		while( !scenePointers.unresolvedComponentPtr.empty() )
+		ScenePointers& scenePointers = _world.GetSingleton<ScenePointers>();
+		for ( ComponentPtrBase* componentPtr : scenePointers.unresolvedComponentPtr )
 		{
-			ComponentPtrBase* ptr = *scenePointers.unresolvedComponentPtr.begin();
-			ptr->sceneNodeID += _idOffset;
-			assert( _scene.nodes.find( ptr->sceneNodeID ) != _scene.nodes.end() );
-			SceneNode& node = *_scene.nodes[ptr->sceneNodeID];
-			EntityID entityID = world.GetEntityID( node.handle );
-			assert( world.HasComponent( entityID, ptr->dynamicID ) );
-			Component& component = world.GetComponent( entityID, ptr->dynamicID );
-			ptr->Create( node, component );
+			componentPtr->handle += _idOffset;
 		}
+		scenePointers.unresolvedComponentPtr.clear();
 	}
 }

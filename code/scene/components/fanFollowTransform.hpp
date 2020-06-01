@@ -1,6 +1,6 @@
 #pragma  once
 
-#include "ecs/fanComponent.hpp"
+#include "ecs/fanEcsComponent.hpp"
 #include "scene/fanSceneResourcePtr.hpp"
 #include "scene/components/fanTransform.hpp"
 namespace fan
@@ -8,21 +8,21 @@ namespace fan
 	//==============================================================================================================================================================
 	// makes a transform follow another transform
 	//==============================================================================================================================================================
-	struct FollowTransform : public Component
+	struct FollowTransform : public EcsComponent
 	{
-		DECLARE_COMPONENT( FollowTransform )
+		ECS_COMPONENT( FollowTransform )
 	public:
-		static void SetInfo( ComponentInfo& _info );
-		static void Init( EcsWorld& _world, Component& _component );
-		static void OnGui( EcsWorld& _world, EntityID _entityID, Component& _component );
-		static void Save( const Component& _component, Json& _json );
-		static void Load( Component& _component, const Json& _json );
+		static void SetInfo( EcsComponentInfo& _info );
+		static void Init( EcsWorld& _world, EcsEntity _entity, EcsComponent& _component );
+		static void OnGui( EcsWorld& _world, EcsEntity _entityID, EcsComponent& _component );
+		static void Save( const EcsComponent& _component, Json& _json );
+		static void Load( EcsComponent& _component, const Json& _json );
 
 		ComponentPtr<Transform> targetTransform;
 		btTransform localTransform;
 		bool locked;
 
-		static void UpdateLocalTransform( EcsWorld& _world, EntityID _entityID );
+		static void UpdateLocalTransform( EcsWorld& _world, EcsEntity _entityID );
 	};
 	static constexpr size_t sizeof_followTransform = sizeof( FollowTransform );
 }

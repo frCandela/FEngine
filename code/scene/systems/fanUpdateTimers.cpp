@@ -7,25 +7,26 @@ namespace fan
 {
 	//================================================================================================================================
 	//================================================================================================================================
-	Signature S_UpdateExpirationTimes::GetSignature( const EcsWorld& _world )
+	EcsSignature S_UpdateExpirationTimes::GetSignature( const EcsWorld& _world )
 	{
 		return	_world.GetSignature<ExpirationTime>();
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void S_UpdateExpirationTimes::Run( EcsWorld& _world, const std::vector<EntityID>& _entities, const float _delta )
+	void S_UpdateExpirationTimes::Run( EcsWorld& _world, const EcsView& _view, const float _delta )
 	{
 		if( _delta == 0.f ) { return; }
 
-		for( EntityID entityID : _entities )
+		for( auto expirationeIt = _view.begin<ExpirationTime>(); expirationeIt != _view.end<ExpirationTime>(); ++expirationeIt )
 		{
-			ExpirationTime& expiration = _world.GetComponent<ExpirationTime>( entityID );
+			const EcsEntity entity = expirationeIt.Entity();
+			ExpirationTime& expiration = *expirationeIt;
 
 			expiration.duration -= _delta;
 			if( expiration.duration < 0.f )
 			{
-				_world.KillEntity( entityID );
+				_world.Kill( entity );
 			}
 		}
 	}

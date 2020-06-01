@@ -1,6 +1,6 @@
 #pragma once
 
-#include "ecs/fanSingletonComponent.hpp"
+#include "ecs/fanEcsSingleton.hpp"
 
 #include "scene/fanSceneResourcePtr.hpp"
 #include "scene/components/fanMaterial.hpp"
@@ -16,17 +16,17 @@ namespace fan
 	// SolarEruption is the fx of the sun exploding out and projecting matter all around it
 	// The sun periodically erupts, forcing the player to hide behind planets or take damage
 	//================================================================================================================================
-	class SolarEruption : public SingletonComponent
+	class SolarEruption : public EcsSingleton
 	{
-		DECLARE_SINGLETON_COMPONENT()
+		ECS_SINGLETON( SolarEruption )
 	public:
-		static void SetInfo( SingletonComponentInfo& _info );
-		static void Init( EcsWorld& _world, SingletonComponent& _component );
-		static void OnGui( EcsWorld& _world, SingletonComponent& _component );
-		static void Save( const SingletonComponent& _component, Json& _json );
-		static void Load( SingletonComponent& _component, const Json& _json );
-		static void NetSave( const SingletonComponent& _component, sf::Packet& _packet );
-		static void NetLoad( SingletonComponent& _component, sf::Packet& _packet );
+		static void SetInfo( EcsSingletonInfo& _info );
+		static void Init( EcsWorld& _world, EcsSingleton& _component );
+		static void OnGui( EcsWorld& _world, EcsSingleton& _component );
+		static void Save( const EcsSingleton& _component, Json& _json );
+		static void Load( EcsSingleton& _component, const Json& _json );
+		static void NetSave( const EcsSingleton& _component, sf::Packet& _packet );
+		static void NetLoad( EcsSingleton& _component, sf::Packet& _packet );
 
 		enum State { WAITING = 0, WARMING = 1, COLLAPSING = 2, EXPODING= 3, BACK_TO_NORMAL = 4, SIZE = 5 };
 

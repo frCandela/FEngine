@@ -6,26 +6,31 @@
 #include "scene/components/fanParticleEmitter.hpp"
 #include "scene/components/fanParticle.hpp"
 #include "ecs/fanEcsWorld.hpp"
+#include "core/time/fanProfiler.hpp"
 
 namespace fan
 {
 	//================================================================================================================================
 	//================================================================================================================================
-	Signature S_EmitParticles::GetSignature( const EcsWorld& _world )
+	EcsSignature S_EmitParticles::GetSignature( const EcsWorld& _world )
 	{
 		return	_world.GetSignature<Transform>() | _world.GetSignature<ParticleEmitter>();
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void S_EmitParticles::Run( EcsWorld& _world, const std::vector<EntityID>& _entities, const float _delta )
-	{
+	void S_EmitParticles::Run( EcsWorld& _world, const EcsView& _view, const float _delta )
+	{	
+		SCOPED_PROFILE( S_EmitParticles );
+	
 		if( _delta == 0.f ) { return; }
 
-		for( EntityID id : _entities )
+		auto transformIt = _view.begin<Transform>();
+		auto particleEmitterIt = _view.begin<ParticleEmitter>();
+		for( ; transformIt != _view.end<Transform>(); ++transformIt, ++particleEmitterIt )
 		{
-			const Transform& emitterTransform = _world.GetComponent<Transform>( id );
-			ParticleEmitter& emitter = _world.GetComponent<ParticleEmitter>( id );
+			const Transform& emitterTransform = *transformIt;
+			ParticleEmitter& emitter = *particleEmitterIt;
 
 			if( emitter.particlesPerSecond > 0.f && emitter.enabled )
 			{
@@ -39,7 +44,7 @@ namespace fan
 				{
 					emitter.timeAccumulator -= particleSpawnDelta;
 
-					EntityID entity = _world.CreateEntity();
+					EcsEntity entity = _world.CreateEntity();
 					Particle& particle = _world.AddComponent<Particle>( entity );
 
 					particle.speed = glm::normalize( glm::vec3( Random::FloatClip(), Random::FloatClip(), Random::FloatClip() ) );

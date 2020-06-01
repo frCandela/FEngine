@@ -4,23 +4,21 @@
 
 namespace fan
 {
-	REGISTER_COMPONENT( TransformUI, "ui_transform" );
-
 	//================================================================================================================================
 	//================================================================================================================================
-	void TransformUI::SetInfo( ComponentInfo& _info )
+	void TransformUI::SetInfo( EcsComponentInfo& _info )
 	{
 		_info.icon = ImGui::IconType::UI_TRANSFORM16;
 		_info.onGui = &TransformUI::OnGui;
-		_info.init = &TransformUI::Init;
 		_info.load = &TransformUI::Load;
 		_info.save = &TransformUI::Save;
 		_info.editorPath = "ui/";
+		_info.name = "ui transform";
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void TransformUI::Init( EcsWorld& _world, Component& _component )
+	void TransformUI::Init( EcsWorld& /*_world*/, EcsEntity /*_entity*/, EcsComponent& _component )
 	{
 		TransformUI& transform = static_cast<TransformUI&>( _component );
 
@@ -30,7 +28,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void TransformUI::OnGui( EcsWorld& _world, EntityID _entityID, Component& _component )
+	void TransformUI::OnGui( EcsWorld& /*_world*/, EcsEntity /*_entityID*/, EcsComponent& _component )
 	{
 		TransformUI& transform = static_cast<TransformUI&>( _component );
 
@@ -49,7 +47,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void TransformUI::Save( const Component& _component, Json& _json )
+	void TransformUI::Save( const EcsComponent& _component, Json& _json )
 	{
 		const TransformUI& transform = static_cast<const TransformUI&>( _component );
 
@@ -59,7 +57,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void TransformUI::Load( Component& _component, const Json& _json )
+	void TransformUI::Load( EcsComponent& _component, const Json& _json )
 	{
 		TransformUI& transform = static_cast<TransformUI&>( _component );
 		Serializable::LoadVec2( _json, "position", transform.position );

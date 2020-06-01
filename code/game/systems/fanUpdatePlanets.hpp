@@ -1,4 +1,4 @@
-#include "ecs/fanSystem.hpp"
+#include "ecs/fanEcsSystem.hpp"
 
 namespace fan
 {
@@ -7,18 +7,18 @@ namespace fan
 	//==============================================================================================================================================================
 	// moves the planets in circles around their origin ( zero for now )
 	//==============================================================================================================================================================
-	struct S_MovePlanets : System
+	struct S_MovePlanets : EcsSystem
 	{
-		static Signature GetSignature( const EcsWorld& _world );
-		static void Run( EcsWorld& _world, const std::vector<EntityID>& _entities, const float _delta );
+		static EcsSignature GetSignature( const EcsWorld& _world );
+		static void Run( EcsWorld& _world, const EcsView& _view, const float _delta );
 	};
 
 	//==============================================================================================================================================================
 	// generates a light mesh from the planets positions & radius
 	//==============================================================================================================================================================
-	struct S_GenerateLightMesh : System
+	struct S_GenerateLightMesh : EcsSystem
 	{
-		static Signature GetSignature( const EcsWorld& _world );
-		static void Run( EcsWorld& _world, const std::vector<EntityID>& _entities, const float _delta );
+		static EcsSignature GetSignature( const EcsWorld& _world );
+		static void Run( EcsWorld& _world, const EcsView& _view, const float _delta );
 	};
 }

@@ -1,24 +1,27 @@
 #pragma  once
 
-#include "ecs/fanComponent.hpp"
-
+#include "ecs/fanEcsComponent.hpp"
+#include "core/fanBulletWarnings.hpp"
+BULLET_PUSH()
 #include "bullet/btBulletDynamicsCommon.h"
+BULLET_POP()
 
 namespace fan
 {
 	//==============================================================================================================================================================
 	// MotionState is used synchronizes physics transforms with graphics transforms
 	//==============================================================================================================================================================
-	struct MotionState : public Component
+	struct MotionState : public EcsComponent
 	{
-		DECLARE_COMPONENT( MotionState )
+		ECS_COMPONENT( MotionState )
 	public:
-		static void SetInfo( ComponentInfo& _info );
-		static void Init( EcsWorld& _world, Component& _component );
-		static void Save( const Component& _component, Json& _json ) {}
-		static void Load( Component& _component, const Json& _json ) {}
+		static void SetInfo( EcsComponentInfo& _info );
+		static void Init( EcsWorld& _world, EcsEntity _entity, EcsComponent& _component );
+		static void Destroy( EcsWorld& _world, EcsEntity _entity, EcsComponent& _component );
+		static void Save( const EcsComponent& /*_component*/, Json& /*_json*/ ) {}
+		static void Load( EcsComponent& /*_component*/, const Json& /*_json*/ ) {}
 
-		btDefaultMotionState motionState;
+		btDefaultMotionState* motionState;
 	};
 	static constexpr size_t sizeof_motionState = sizeof( MotionState );
 }

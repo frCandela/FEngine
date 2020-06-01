@@ -3,24 +3,22 @@
 #include "scene/fanSceneSerializable.hpp"
 
 namespace fan
-{	
-	REGISTER_COMPONENT( ProgressBar, "progress bar" );
-
+{
 	//================================================================================================================================
 	//================================================================================================================================
-	void ProgressBar::SetInfo( ComponentInfo& _info )
+	void ProgressBar::SetInfo( EcsComponentInfo& _info )
 	{
 		_info.icon = ImGui::IconType::UI_PROGRESS_BAR16;
 		_info.onGui = &ProgressBar::OnGui;
-		_info.init = &ProgressBar::Init;
 		_info.load = &ProgressBar::Load;
 		_info.save = &ProgressBar::Save;
 		_info.editorPath = "ui/";
+		_info.name = "progress bar";
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void ProgressBar::Init( EcsWorld& _world, Component& _component )
+	void ProgressBar::Init( EcsWorld& _world, EcsEntity /*_entity*/, EcsComponent& _component )
 	{
 		ProgressBar& progressBar = static_cast<ProgressBar&>( _component );
 		progressBar.progress = 1.f;
@@ -30,7 +28,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void ProgressBar::OnGui( EcsWorld& _world, EntityID _entityID, Component& _component )
+	void ProgressBar::OnGui( EcsWorld& /*_world*/, EcsEntity /*_entityID*/, EcsComponent& _component )
 	{
 		ProgressBar& progressBar = static_cast<ProgressBar&>( _component );
 
@@ -47,7 +45,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void ProgressBar::Save( const Component& _component, Json& _json )
+	void ProgressBar::Save( const EcsComponent& _component, Json& _json )
 	{
 		const ProgressBar& progressBar = static_cast<const ProgressBar&>( _component );
 		Serializable::SaveComponentPtr( _json, "target_ui_transform", progressBar.targetUiTransform );
@@ -56,7 +54,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void ProgressBar::Load( Component& _component, const Json& _json )
+	void ProgressBar::Load( EcsComponent& _component, const Json& _json )
 	{
 		ProgressBar& progressBar = static_cast<ProgressBar&>( _component );
 		Serializable::LoadComponentPtr( _json, "target_ui_transform", progressBar.targetUiTransform );

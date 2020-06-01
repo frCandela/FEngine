@@ -3,24 +3,22 @@
 #include "scene/fanSceneSerializable.hpp"
 
 namespace fan
-{	
-	REGISTER_COMPONENT( Health, "health" );
-
+{
 	//================================================================================================================================
 	//================================================================================================================================
-	void Health::SetInfo( ComponentInfo& _info )
+	void Health::SetInfo( EcsComponentInfo& _info )
 	{
 		_info.icon = ImGui::IconType::HEART16;
 		_info.onGui = &Health::OnGui;
-		_info.init = &Health::Init;
 		_info.load = &Health::Load;
 		_info.save = &Health::Save;
 		_info.editorPath = "game/";
+		_info.name = "health";
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void Health::Init( EcsWorld& _world, Component& _component )
+	void Health::Init( EcsWorld& /*_world*/, EcsEntity /*_entity*/, EcsComponent& _component )
 	{
 		Health& health = static_cast<Health&>( _component );
 		health.invincible = false;
@@ -30,7 +28,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void Health::OnGui( EcsWorld& _world, EntityID _entityID, Component& _component )
+	void Health::OnGui( EcsWorld& /*_world*/, EcsEntity /*_entityID*/, EcsComponent& _component )
 	{
 		Health& health = static_cast<Health&>( _component );
 
@@ -44,7 +42,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void Health::Save( const Component& _component, Json& _json )
+	void Health::Save( const EcsComponent& _component, Json& _json )
 	{
 		const Health& health = static_cast<const Health&>( _component );
 		Serializable::SaveFloat( _json, "max_energy", health.maxHealth );
@@ -53,7 +51,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void Health::Load( Component& _component, const Json& _json )
+	void Health::Load( EcsComponent& _component, const Json& _json )
 	{
 		Health& health = static_cast<Health&>( _component );
 		Serializable::LoadFloat( _json, "max_energy", health.maxHealth );

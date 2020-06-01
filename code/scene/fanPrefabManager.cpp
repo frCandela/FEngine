@@ -3,7 +3,7 @@
 #include <filesystem>
 #include "scene/fanSceneResourcePtr.hpp"
 #include "scene/fanPrefab.hpp"
-#include "core/fanSignal.hpp"
+#include "ecs/fanSignal.hpp"
 
 namespace fan
 {
@@ -70,7 +70,7 @@ namespace fan
 
 		if ( prefab != nullptr )
 		{
-			prefabPtr = prefab;
+			prefabPtr.Set( prefab );
 		}
 	}
 

@@ -1,7 +1,7 @@
 #pragma once
 
 #include <filesystem>
-#include "core/fanSignal.hpp"
+#include "ecs/fanSignal.hpp"
 #include "editor/windows/fanEditorWindow.hpp"
 
 namespace fan
@@ -21,7 +21,6 @@ namespace fan
 		~SceneWindow();
 
 		// Callbacks
-		void OnSceneNodeSelected( SceneNode* node ) { m_sceneNodeSelected = node; }
 		void OnExpandHierarchy( Scene& /*_scene*/ ) { m_expandSceneHierarchy = true; }
 
 	protected:
@@ -29,7 +28,6 @@ namespace fan
 
 	private:
 		Scene* m_scene;
-		SceneNode* m_sceneNodeSelected;
 
 
 		std::filesystem::path m_pathBuffer;

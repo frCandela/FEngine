@@ -1,28 +1,31 @@
 #pragma  once
 
-#include "ecs/fanComponent.hpp"
+#include "ecs/fanEcsComponent.hpp"
+#include "core/fanBulletWarnings.hpp"
+BULLET_PUSH()
 #include "bullet/btBulletDynamicsCommon.h"
+BULLET_POP()
 
 namespace fan
 {
 	//==============================================================================================================================================================
 	// sphere physics shape
 	//==============================================================================================================================================================
-	struct SphereShape : public Component
+	struct SphereShape : public EcsComponent
 	{
-		DECLARE_COMPONENT( SphereShape )
+		ECS_COMPONENT( SphereShape )
 	public:
-		SphereShape();
-		static void SetInfo( ComponentInfo& _info );
-		static void Init( EcsWorld& _world, Component& _component );
-		static void OnGui( EcsWorld& _world, EntityID _entityID, Component& _component );
-		static void Save( const Component& _component, Json& _json );
-		static void Load( Component& _component, const Json& _json );
+		static void SetInfo( EcsComponentInfo& _info );
+		static void Init( EcsWorld& _world, EcsEntity _entity, EcsComponent& _component );
+		static void Destroy( EcsWorld& _world, EcsEntity _entity, EcsComponent& _component );
+		static void OnGui( EcsWorld& _world, EcsEntity _entityID, EcsComponent& _component );
+		static void Save( const EcsComponent& _component, Json& _json );
+		static void Load( EcsComponent& _component, const Json& _json );
 
 		void  SetRadius( const float _radius );
 		float GetRadius() const;
 
-		btSphereShape sphereShape;
+		btSphereShape* sphereShape;
 	};
 	static constexpr size_t sizeof_sphereShape = sizeof( SphereShape );
 }

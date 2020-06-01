@@ -1,6 +1,6 @@
 #pragma once
 
-#include "core/fanSignal.hpp"
+#include "ecs/fanSignal.hpp"
 #include <filesystem>
 #include <set>
 
@@ -9,7 +9,7 @@ namespace fan
 	struct EditorGrid;
 	class EcsWorld;
 	class EditorWindow;
-	class EditorSelection;
+	struct EditorSelection;
 
 	//================================================================================================================================
 	// top main menu bar of the editor
@@ -34,7 +34,7 @@ namespace fan
 		Signal<> onReloadIcons;
 		Signal<> onExit;
 
-		MainMenuBar( EcsWorld& _world, EditorSelection& _editorSelection );
+		MainMenuBar( EcsWorld& _world );
 		~MainMenuBar();
 
 		void SetGrid( EditorGrid* _editorGrid ) { m_editorGrid = _editorGrid; }

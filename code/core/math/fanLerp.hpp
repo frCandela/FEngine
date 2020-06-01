@@ -20,10 +20,10 @@ namespace fan
 			return _begin + _delta * ( _end - _begin );
 		}
 
-		static float EaseLinear( float _val )   { return _val; }
-		static float EaseOutExpo2( float _val ) { return _val * _val; }
-		static float EaseOutExpo3( float _val ) { return _val * _val * _val; }
-		static float EaseOutExpo4( float _val ) { return _val * _val * _val * _val; }
-		static float EaseOutExpo5( float _val ) { return _val * _val * _val * _val * _val; }
+//		static float EaseLinear( float _val )   { return _val; }
+// 		static float EaseOutExpo2( float _val ) { return _val * _val; }
+// 		static float EaseOutExpo3( float _val ) { return _val * _val * _val; }
+// 		static float EaseOutExpo4( float _val ) { return _val * _val * _val * _val; }
+// 		static float EaseOutExpo5( float _val ) { return _val * _val * _val * _val * _val; }
 	};
 }

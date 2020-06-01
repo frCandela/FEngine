@@ -1,4 +1,4 @@
-#include "ecs/fanSystem.hpp"
+#include "ecs/fanEcsSystem.hpp"
 
 namespace fan
 {
@@ -7,9 +7,9 @@ namespace fan
 	//==============================================================================================================================================================
 	// removes the particles that are not in the sunlight
 	//==============================================================================================================================================================
-	struct S_ParticlesOcclusion : System
+	struct S_ParticlesOcclusion : EcsSystem
 	{
-		static Signature GetSignature( const EcsWorld& _world );
-		static void Run( EcsWorld& _world, const std::vector<EntityID>& _entities, const float _delta );
+		static EcsSignature GetSignature( const EcsWorld& _world );
+		static void Run( EcsWorld& _world, const EcsView& _view, const float _delta );
 	};
 }

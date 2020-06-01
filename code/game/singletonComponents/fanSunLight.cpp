@@ -5,14 +5,11 @@
 
 namespace fan
 {
-	REGISTER_SINGLETON_COMPONENT( SunLight );
-
 	//================================================================================================================================
 	//================================================================================================================================
-	void SunLight::SetInfo( SingletonComponentInfo& _info )
+	void SunLight::SetInfo( EcsSingletonInfo& _info )
 	{
 		_info.icon = ImGui::SUN16;
-		_info.init = &SunLight::Init;
 		_info.onGui = &SunLight::OnGui;
 		_info.save = &SunLight::Save;
 		_info.load = &SunLight::Load;
@@ -21,7 +18,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void SunLight::Init( EcsWorld& _world, SingletonComponent& _component )
+	void SunLight::Init( EcsWorld& /*_world*/, EcsSingleton& _component )
 	{
 		SunLight& sunLight = static_cast<SunLight&>( _component );
 
@@ -39,7 +36,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void SunLight::OnGui( EcsWorld&, SingletonComponent& _component )
+	void SunLight::OnGui( EcsWorld&, EcsSingleton& _component )
 	{
 		SunLight& sunLight = static_cast<SunLight&>( _component );
 		
@@ -53,7 +50,7 @@ namespace fan
 	
 	//================================================================================================================================
 	//================================================================================================================================
-	void SunLight::Save( const SingletonComponent& _component, Json& _json )
+	void SunLight::Save( const EcsSingleton& _component, Json& _json )
 	{
 		const SunLight& sunLight = static_cast<const SunLight&>( _component );
 		Serializable::SaveFloat( _json, "sub_angle", sunLight.subAngle );
@@ -62,7 +59,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void SunLight::Load( SingletonComponent& _component, const Json& _json )
+	void SunLight::Load( EcsSingleton& _component, const Json& _json )
 	{
 		SunLight& sunLight = static_cast<SunLight&>( _component );
 		Serializable::LoadFloat( _json, "sub_angle", sunLight.subAngle );

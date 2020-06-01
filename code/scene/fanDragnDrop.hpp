@@ -1,14 +1,14 @@
 #pragma once
 
-#include "fanImgui.hpp"
 #include <cstdint>
+#include "fanImgui.hpp"
+#include "ecs/fanEcsTypes.hpp"
 
 namespace fan
 {
-	class Prefab;
-	struct SceneNode;
-	struct Component;
-	struct ComponentInfo;
+	class  Prefab;
+	struct EcsComponentInfo;
+	class EcsWorld;
 }
 
 namespace ImGui
@@ -18,23 +18,23 @@ namespace ImGui
 	//================================================================================================================================
 	struct ComponentPayload
 	{
-		fan::SceneNode* sceneNode = nullptr;
-		fan::Component* component = nullptr;
+		fan::EcsHandle handle = 0;
+		uint32_t type = 0;
 	};
 
 	void				FanBeginDragDropSourcePrefab( fan::Prefab * _prefab, ImGuiDragDropFlags _flags = ImGuiDragDropFlags_None );
 	fan::Prefab *		FanBeginDragDropTargetPrefab();
 
-	void				FanBeginDragDropSourceComponent( fan::SceneNode& _sceneNode, fan::Component& _component, ImGuiDragDropFlags _flags = ImGuiDragDropFlags_None );
-	ComponentPayload	FanBeginDragDropTargetComponent( const uint32_t _staticID );
+	void				FanBeginDragDropSourceComponent( fan::EcsWorld& _world, fan::EcsHandle& _handle, uint32_t _type, ImGuiDragDropFlags _flags = ImGuiDragDropFlags_None );
+	ComponentPayload	FanBeginDragDropTargetComponent( fan::EcsWorld& _world, uint32_t _type );
 
 
  	//================================================================================================================================
  	//================================================================================================================================
  	template< typename _componentType >
-	ComponentPayload FanBeginDragDropTargetComponent()
+	ComponentPayload FanBeginDragDropTargetComponent( fan::EcsWorld& _world )
  	{
- 		static_assert((std::is_base_of<fan::Component, _componentType>::value));
- 		return FanBeginDragDropTargetComponent( _componentType::s_typeInfo );
+ 		static_assert((std::is_base_of<fan::EcsComponent, _componentType>::value));
+ 		return FanBeginDragDropTargetComponent( _world, _componentType::Info::s_type );
  	}
 }

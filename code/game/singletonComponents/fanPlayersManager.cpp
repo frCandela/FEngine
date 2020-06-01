@@ -1,30 +1,21 @@
 #include "game/singletonComponents/fanPlayersManager.hpp"
 
-// #include "game/components/fanPlayerInput.hpp"
-// #include "game/components/fanSpaceShip.hpp"
-// #include "game/network/fanGameClient.hpp"
-// #include "core/input/fanJoystick.hpp"
-
 namespace fan
 {
-	//
-	REGISTER_SINGLETON_COMPONENT( PlayersManager );
-
 	//================================================================================================================================
 	//================================================================================================================================
-	void PlayersManager::SetInfo( SingletonComponentInfo& _info )
+	void PlayersManager::SetInfo( EcsSingletonInfo& _info )
 	{
 		_info.icon = ImGui::JOYSTICK16;
-		_info.init = &PlayersManager::Init;
 		_info.name = "players manager";
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void PlayersManager::Init( EcsWorld& _world, SingletonComponent& _component )
+	void PlayersManager::Init( EcsWorld& /*_world*/, EcsSingleton& _component )
 	{
 		PlayersManager& playersManager = static_cast<PlayersManager&>( _component );
-		playersManager.playerPrefab = nullptr;
+		playersManager.playerPrefab.Set( nullptr );
 		playersManager.players.clear();
 	}
 

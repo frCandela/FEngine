@@ -120,36 +120,36 @@ namespace fan
 		world.AddComponentType<ClientGameData>();
 
 		// base singleton components
-		world.AddSingletonComponentType<Scene>();
-		world.AddSingletonComponentType<RenderWorld>();
-		world.AddSingletonComponentType<PhysicsWorld>();
-		world.AddSingletonComponentType<ScenePointers>();
+		world.AddSingletonType<Scene>();
+		world.AddSingletonType<RenderWorld>();
+		world.AddSingletonType<PhysicsWorld>();
+		world.AddSingletonType<ScenePointers>();
 		// game singleton components
-		world.AddSingletonComponentType<SunLight>();
-		world.AddSingletonComponentType<GameCamera>();
-		world.AddSingletonComponentType<CollisionManager>();
-		world.AddSingletonComponentType<Game>();
-		world.AddSingletonComponentType<SolarEruption>();
-		world.AddSingletonComponentType<ClientNetworkManager>();
+		world.AddSingletonType<SunLight>();
+		world.AddSingletonType<GameCamera>();
+		world.AddSingletonType<CollisionManager>();
+		world.AddSingletonType<Game>();
+		world.AddSingletonType<SolarEruption>();
+		world.AddSingletonType<ClientNetworkManager>();
 		// network singleton components
 		
-		world.AddSingletonComponentType<LinkingContext>();
+		world.AddSingletonType<LinkingContext>();
 
 		world.AddTagType<tag_boundsOutdated>();
 		world.AddTagType<tag_sunlight_occlusion>();
-
+		
 		// @hack
-		Game& game = world.GetSingletonComponent<Game>();
-		game.gameClient = this;
-		game.name = _name;
+		Game& gameSingleton = world.GetSingleton<Game>();
+		gameSingleton.gameClient = this;
+		gameSingleton.name = _name;
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
 	void GameClient::Start()
 	{
-		game = &world.GetSingletonComponent<Game>();
-		netManager = &world.GetSingletonComponent<ClientNetworkManager>();
+		game = &world.GetSingleton<Game>();
+		netManager = &world.GetSingleton<ClientNetworkManager>();
 
 		netManager->Start( world );
 
@@ -167,12 +167,10 @@ namespace fan
 	void  GameClient::Stop()
 	{
 		// clears the physics world
-		PhysicsWorld& physicsWorld = world.GetSingletonComponent<PhysicsWorld>();
 		S_UnregisterAllRigidbodies::Run( world, world.Match( S_UnregisterAllRigidbodies::GetSignature( world ) ) );
-		physicsWorld.rigidbodiesHandles.clear();
 
 		// clears the particles mesh
-		RenderWorld& renderWorld = world.GetSingletonComponent<RenderWorld>();
+		RenderWorld& renderWorld = world.GetSingleton<RenderWorld>();
 		renderWorld.particlesMesh.LoadFromVertices( {} );
 
 		GameCamera::DeleteGameCamera( world );
@@ -198,9 +196,9 @@ namespace fan
 	//================================================================================================================================
 	void GameClient::Test()
 	{
-		const EntityID persistentID = world.GetEntityID( netManager->playerPersistent->handle );
+		const EcsEntity persistentID = world.GetEntity( netManager->persistentHandle );
 		ClientGameData& gameData = world.GetComponent<ClientGameData>( persistentID );
-		const EntityID spaceshipID = world.GetEntityID( gameData.spaceshipHandle );
+		const EcsEntity spaceshipID = world.GetEntity( gameData.spaceshipHandle );
 		Transform& transform = world.GetComponent<Transform>( spaceshipID );
 		transform.SetPosition( transform.GetPosition() + btVector3( 1, 0, 0 ) );
 	}
@@ -209,7 +207,7 @@ namespace fan
 	//================================================================================================================================
 	void GameClient::RollbackResimulate( EcsWorld& _world )
 	{
-		const EntityID persistentID = _world.GetEntityID( netManager->playerPersistent->handle );
+		const EcsEntity persistentID = _world.GetEntity( netManager->persistentHandle );
 		ClientGameData& gameData = _world.GetComponent<ClientGameData>( persistentID );
 		if( !gameData.spaceshipSynced && ! gameData.previousInputsSinceLastGameState.empty() )
 		{
@@ -223,17 +221,17 @@ namespace fan
 				// Rollback at the frame we took the snapshot of the player game state
 				game->frameIndex = oldest.frameIndex;
 				Debug::Highlight() << "rollback to frame " << oldest.frameIndex << Debug::Endl();
-				const EntityID spaceshipID = _world.GetEntityID( gameData.spaceshipHandle );
+				const EcsEntity spaceshipID = _world.GetEntity( gameData.spaceshipHandle );
 				
 				// Resets the player rigidbody & transform
-				PhysicsWorld& physicsWorld = world.GetSingletonComponent<PhysicsWorld>();
+				PhysicsWorld& physicsWorld = world.GetSingleton<PhysicsWorld>();
 				physicsWorld.Reset();
 				Rigidbody& rigidbody = _world.GetComponent<Rigidbody>( spaceshipID );
-				physicsWorld.dynamicsWorld->removeRigidBody( &rigidbody.rigidbody );
-				physicsWorld.dynamicsWorld->addRigidBody( &rigidbody.rigidbody );
-				rigidbody.rigidbody.clearForces();
+				physicsWorld.dynamicsWorld->removeRigidBody( rigidbody.rigidbody );
+				physicsWorld.dynamicsWorld->addRigidBody( rigidbody.rigidbody );
+				rigidbody.ClearForces();
 				Transform& transform = _world.GetComponent<Transform>( spaceshipID );
-				rigidbody.rigidbody.clearForces();
+				rigidbody.ClearForces();
 				rigidbody.SetVelocity(			gameData.lastServerState.velocity			);
 				rigidbody.SetAngularVelocity(	gameData.lastServerState.angularVelocity	);
 				transform.SetPosition(			gameData.lastServerState.position			);
@@ -243,7 +241,7 @@ namespace fan
  				gameData.previousStates = std::queue< PacketPlayerGameState >(); 
  				gameData.previousStates.push( gameData.lastServerState );
 
-				// Resimulate the last frames of input of the player
+				// resimulate the last frames of input of the player
 				PlayerInput& input = _world.GetComponent<PlayerInput>( spaceshipID );
 				const float delta = game->logicDelta;
 				for (int i = 1; i < gameData.previousInputsSinceLastGameState.size(); i++)
@@ -261,9 +259,9 @@ namespace fan
 					S_MovePlanets::Run( world, world.Match( S_MovePlanets::GetSignature( world ) ), delta );
 					S_MoveSpaceships::Run( world, world.Match( S_MoveSpaceships::GetSignature( world ) ), delta );
 
-					S_SynchronizeMotionStateFromTransform::Run( world, world.Match( S_SynchronizeMotionStateFromTransform::GetSignature( world ) ), delta );
+					S_SynchronizeMotionStateFromTransform::Run( world, world.Match( S_SynchronizeMotionStateFromTransform::GetSignature( world ) ) );
 					physicsWorld.dynamicsWorld->stepSimulation( game->logicDelta, 10, Time::Get().GetPhysicsDelta() );
-					S_SynchronizeTransformFromMotionState::Run( world, world.Match( S_SynchronizeTransformFromMotionState::GetSignature( world ) ), delta );
+					S_SynchronizeTransformFromMotionState::Run( world, world.Match( S_SynchronizeTransformFromMotionState::GetSignature( world ) ) );
 
 					S_ClientSaveState::Run( world, world.Match( S_ClientSaveState::GetSignature( world ) ), delta );									
  				}	
@@ -302,10 +300,10 @@ namespace fan
 			ClientNetworkManager::SpawnShips( world );
 
 			// physics & transforms
-			PhysicsWorld& physicsWorld = world.GetSingletonComponent<PhysicsWorld>();
-			S_SynchronizeMotionStateFromTransform	::Run( world, world.Match( S_SynchronizeMotionStateFromTransform::GetSignature( world ) ), _delta );
+			PhysicsWorld& physicsWorld = world.GetSingleton<PhysicsWorld>();
+			S_SynchronizeMotionStateFromTransform	::Run( world, world.Match( S_SynchronizeMotionStateFromTransform::GetSignature( world ) ) );
 			physicsWorld.dynamicsWorld->stepSimulation( _delta, 10, Time::Get().GetPhysicsDelta() );
-			S_SynchronizeTransformFromMotionState	::Run( world, world.Match( S_SynchronizeTransformFromMotionState::GetSignature( world ) ), _delta );
+			S_SynchronizeTransformFromMotionState	::Run( world, world.Match( S_SynchronizeTransformFromMotionState::GetSignature( world ) ) );
 			S_MoveFollowTransforms					::Run( world, world.Match( S_MoveFollowTransforms::GetSignature( world ) ) );
 			S_MoveFollowTransformsUI				::Run( world, world.Match( S_MoveFollowTransformsUI::GetSignature( world ) ) );	
 
@@ -328,18 +326,11 @@ namespace fan
 			S_EmitParticles				::Run( world, world.Match( S_EmitParticles::GetSignature( world ) )				, _delta );
 			S_GenerateParticles			::Run( world, world.Match( S_GenerateParticles::GetSignature( world ) )			, _delta );
 			S_UpdateBoundsFromRigidbody	::Run( world, world.Match( S_UpdateBoundsFromRigidbody::GetSignature( world ) )	, _delta );
-			S_UpdateBoundsFromModel		::Run( world, world.Match( S_UpdateBoundsFromModel::GetSignature( world ) )		, _delta );
-			S_UpdateBoundsFromTransform	::Run( world, world.Match( S_UpdateBoundsFromTransform::GetSignature( world ) )	, _delta );
+			S_UpdateBoundsFromModel		::Run( world, world.Match( S_UpdateBoundsFromModel::GetSignature( world ) ) );
+			S_UpdateBoundsFromTransform	::Run( world, world.Match( S_UpdateBoundsFromTransform::GetSignature( world ) ) );
 			S_UpdateGameCamera			::Run( world, world.Match( S_UpdateGameCamera::GetSignature( world ) )			, _delta );
 			
 			S_ClientSend		::Run( world, world.Match( S_ClientSend::GetSignature( world ) )  , _delta );
-		}
-
-		{
-			// end frame
-			SCOPED_PROFILE( scene_endFrame );
-			world.SortEntities();
-			world.RemoveDeadEntities();
 		}
 	}
 }

@@ -7,23 +7,23 @@
 
 namespace fan
 {
-	REGISTER_COMPONENT( ClientConnection, "client connection" );
-
 	//================================================================================================================================
 	//================================================================================================================================
-	void ClientConnection::SetInfo( ComponentInfo& _info )
+	void ClientConnection::SetInfo( EcsComponentInfo& _info )
 	{
 		_info.icon = ImGui::NETWORK16;
-		_info.init = &ClientConnection::Init;
+		_info.destroy = &ClientConnection::Destroy;
 		_info.onGui = &ClientConnection::OnGui;
+		_info.name = "client connection";
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void ClientConnection::Init( EcsWorld& _world, Component& _component )
+	void ClientConnection::Init( EcsWorld& /*_world*/, EcsEntity /*_entity*/, EcsComponent& _component )
 	{
 		ClientConnection& connection = static_cast<ClientConnection&>( _component );
-		connection.socket.Unbind();
+		assert( connection.socket == nullptr );
+		connection.socket = new UdpSocket();
 		connection.clientPort = 53010;
 		connection.serverIP = "127.0.0.1";
 		connection.serverPort = 53000;
@@ -37,9 +37,18 @@ namespace fan
 	}
 
 	//================================================================================================================================
+	//================================================================================================================================
+	void ClientConnection::Destroy( EcsWorld& /*_world*/, EcsEntity /*_entity*/, EcsComponent& _component )
+	{
+		ClientConnection& connection = static_cast<ClientConnection&>( _component );
+		delete connection.socket;
+		connection.socket = nullptr;
+	}
+
+	//================================================================================================================================
 	// Write into the _packet to communicate with the server
 	//================================================================================================================================
-	void ClientConnection::Write( Packet& _packet )
+	void ClientConnection::Write( EcsWorld& _world, EcsEntity _entity, Packet& _packet )
 	{
 		switch( state )
 		{
@@ -49,7 +58,7 @@ namespace fan
 			PacketHello hello;
 			hello.name = "toto";
 			hello.Write( _packet );
-			_packet.onFail.Connect( &ClientConnection::OnLoginFail, this );
+			_packet.onFail.Connect( &ClientConnection::OnLoginFail, _world, _world.GetHandle( _entity ) );
 			state = ClientState::PendingConnection;
 			Debug::Log() << "logging in..." << Debug::Endl();
 		}
@@ -94,7 +103,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void ClientConnection::ProcessPacket( const PacketLoginSuccess& _packetLogin )
+	void ClientConnection::ProcessPacket( const PacketLoginSuccess& /*_packetLogin*/ )
 	{
 		if( state == ClientState::PendingConnection )
 		{
@@ -105,7 +114,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void ClientConnection::ProcessPacket( const PacketDisconnect& _packetDisconnect )
+	void ClientConnection::ProcessPacket( const PacketDisconnect& /*_packetDisconnect*/ )
 	{
 		state = ClientState::Disconnected;
 		Debug::Log() << "disconnected from server" << Debug::Endl();		
@@ -158,12 +167,11 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void ClientConnection::OnGui( EcsWorld& _world, EntityID _entityID, Component& _component )
+	void ClientConnection::OnGui( EcsWorld& /*_world*/, EcsEntity /*_entityID*/, EcsComponent& _component )
 	{
 		ImGui::Indent(); ImGui::Indent();
 		{
 			ClientConnection& connection = static_cast<ClientConnection&>( _component );
-			double currentTime = Time::Get().ElapsedSinceStartup();
 
 			ImGui::Text( "Client" );
 			ImGui::Separator();

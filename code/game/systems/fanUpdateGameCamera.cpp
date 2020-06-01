@@ -11,7 +11,7 @@ namespace fan
 {
 	//================================================================================================================================
 	//================================================================================================================================
-	Signature S_UpdateGameCamera::GetSignature( const EcsWorld& _world )
+	EcsSignature S_UpdateGameCamera::GetSignature( const EcsWorld& _world )
 	{
 		return
 			_world.GetSignature<Transform>() |
@@ -20,10 +20,10 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void S_UpdateGameCamera::Run( EcsWorld& _world, const std::vector<EntityID>& _entities, const float _delta )
+	void S_UpdateGameCamera::Run( EcsWorld& _world, const EcsView& _view, const float _delta )
 	{
 		if( _delta == 0.f ) { return; }
-		if( _entities.empty() ) { return; }
+		if( _view.Empty() ) { return; }
 
 		// bounding box
 		btVector3 low( 10000.f, 0.f, 10000.f );
@@ -31,9 +31,9 @@ namespace fan
 		btVector3 center = btVector3::Zero();
 
 		// calculates players center and bounding box	
-		for( EntityID entityID : _entities )
-		{	
-			const Transform& transform = _world.GetComponent<Transform>( entityID );
+		for( auto transformIt = _view.begin<Transform>(); transformIt != _view.end<Transform>(); ++transformIt )
+		{
+			const Transform& transform = *transformIt;
 			const btVector3 position = transform.GetPosition();
 			center += position;
 
@@ -44,21 +44,21 @@ namespace fan
 			high[2] = high[2] > position[2] ? high[2] : position[2];
 		}
 
-		center /= (float)_entities.size();
+		center /= (float)_view.Size();
 		assert( low[0] <= high[0] && low[2] <= high[2] );
 
 		// set main camera
-		GameCamera& gameCamera = _world.GetSingletonComponent<GameCamera>();
-		if( gameCamera.cameraNode != nullptr )
+		GameCamera& gameCamera = _world.GetSingleton<GameCamera>();
+		if( gameCamera.cameraHandle != 0 )
 		{
 			// set position
-			const EntityID cameraID = _world.GetEntityID( gameCamera.cameraNode->handle );
+			const EcsEntity cameraID = _world.GetEntity( gameCamera.cameraHandle );
 			Transform& cameraTransform = _world.GetComponent<Transform>( cameraID );
 			cameraTransform.SetPosition( center + gameCamera.heightFromTarget * btVector3::Up() );
 
 			// set size
 			Camera& camera = _world.GetComponent<Camera>( cameraID );
-			if( _entities.size() == 1 )
+			if( _view.Size() == 1 )
 			{
 				camera.orthoSize = 10.f;
 			}

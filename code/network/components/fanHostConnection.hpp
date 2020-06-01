@@ -1,6 +1,6 @@
 #pragma  once
 
-#include "ecs/fanComponent.hpp"
+#include "ecs/fanEcsComponent.hpp"
 #include "network/fanPacket.hpp"
 
 namespace fan
@@ -8,13 +8,13 @@ namespace fan
 	//==============================================================================================================================================================
 	// [Server]
 	//==============================================================================================================================================================
-	struct HostConnection: public Component
+	struct HostConnection: public EcsComponent
 	{
-		DECLARE_COMPONENT( HostConnection )
+		ECS_COMPONENT( HostConnection )
 	public:
-		static void SetInfo( ComponentInfo& _info );
-		static void Init( EcsWorld& _world, Component& _component );
-		static void OnGui( EcsWorld& _world, EntityID _entityID, Component& _component );
+		static void SetInfo( EcsComponentInfo& _info );
+		static void Init( EcsWorld& _world, EcsEntity _entity, EcsComponent& _component );
+		static void OnGui( EcsWorld& _world, EcsEntity _entityID, EcsComponent& _component );
 
 		enum State
 		{
@@ -44,7 +44,7 @@ namespace fan
 		int					targetBufferSize;	// the size of the input buffer we target for the client specific rtt
 		int					nextDeltaIndex;		// next delta to update in the array
 
-		void Write( EcsWorld& _world, Packet& _packet );
+		void Write( EcsWorld& _world, EcsEntity _entity, Packet& _packet );
 		void ProcessPacket	( const PacketHello& _packetHello );
 		void ProcessPacket	( const PacketPing&  _packetPing, const FrameIndex _frameIndex, const float _logicDelta );
 		void OnSyncSuccess	();

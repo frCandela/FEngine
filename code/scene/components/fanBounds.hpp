@@ -1,6 +1,6 @@
 #pragma  once
 
-#include "ecs/fanComponent.hpp"
+#include "ecs/fanEcsComponent.hpp"
 #include "core/math/shapes/fanAABB.hpp"
 
 namespace fan
@@ -8,12 +8,12 @@ namespace fan
 	//==============================================================================================================================================================
 	// axis aligned bounding box
 	//==============================================================================================================================================================
-	struct Bounds : public Component
+	struct Bounds : public EcsComponent
 	{
-		DECLARE_COMPONENT( Bounds )
+		ECS_COMPONENT( Bounds )
 	public:
-		static void SetInfo( ComponentInfo& _info );
-		static void Init( EcsWorld& _world, Component& _component );
+		static void SetInfo( EcsComponentInfo& _info );
+		static void Init( EcsWorld& _world, EcsEntity _entity, EcsComponent& _component );
 
 		AABB aabb;
 	};

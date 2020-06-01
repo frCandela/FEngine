@@ -1,6 +1,6 @@
 #pragma  once
 
-#include "ecs/fanComponent.hpp"
+#include "ecs/fanEcsComponent.hpp"
 #include "scene/components/fanParticleEmitter.hpp"
 #include "scene/fanSceneResourcePtr.hpp"
 
@@ -9,15 +9,15 @@ namespace fan
 	//==============================================================================================================================================================
 	// vehicle controlled by the player
 	//==============================================================================================================================================================
-	struct SpaceShip : public Component
+	struct SpaceShip : public EcsComponent
 	{
-		DECLARE_COMPONENT( SpaceShip )
+		ECS_COMPONENT( SpaceShip )
 	public:
-		static void SetInfo( ComponentInfo& _info );
-		static void Init( EcsWorld& _world, Component& _component );
-		static void OnGui( EcsWorld& _world, EntityID _entityID, Component& _component );
-		static void Save( const Component& _component, Json& _json );
-		static void Load( Component& _component, const Json& _json );
+		static void SetInfo( EcsComponentInfo& _info );
+		static void Init( EcsWorld& _world, EcsEntity _entity, EcsComponent& _component );
+		static void OnGui( EcsWorld& _world, EcsEntity _entityID, EcsComponent& _component );
+		static void Save( const EcsComponent& _component, Json& _json );
+		static void Load( EcsComponent& _component, const Json& _json );
 
 		enum SpeedMode { REVERSE = 0, SLOW, NORMAL, FAST };
 

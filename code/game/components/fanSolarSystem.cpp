@@ -37,7 +37,7 @@ namespace fan
 	//================================================================================================================================
 	void SolarSystem::OnGui()
 	{
-// 		Component::OnGui();
+// 		EcsComponent::OnGui();
 // 
 // 		Transform& transform = m_gameobject->GetTransform();
 // 

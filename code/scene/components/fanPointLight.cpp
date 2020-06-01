@@ -6,23 +6,22 @@
 
 namespace fan
 {
-	REGISTER_COMPONENT( PointLight, "point_light" );
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void PointLight::SetInfo( ComponentInfo& _info )
+	void PointLight::SetInfo( EcsComponentInfo& _info )
 	{
 		_info.icon = ImGui::IconType::POINT_LIGHT16;
 		_info.onGui = &PointLight::OnGui;
-		_info.init = &PointLight::Init;
 		_info.load = &PointLight::Load;
 		_info.save = &PointLight::Save;
 		_info.editorPath = "lights/";
+		_info.name = "point light";
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void PointLight::Init( EcsWorld& _world, Component& _component )
+	void PointLight::Init( EcsWorld& /*_world*/, EcsEntity /*_entity*/, EcsComponent& _component )
 	{
 		PointLight& pointLight = static_cast<PointLight&>( _component );
 		pointLight.ambiant = Color::White;
@@ -35,7 +34,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void PointLight::OnGui( EcsWorld& _world, EntityID _entityID, Component& _component )
+	void PointLight::OnGui( EcsWorld& /*_world*/, EcsEntity /*_entityID*/, EcsComponent& _component )
 	{
 		PointLight& pointLight = static_cast<PointLight&>( _component );
 		ImGui::PushItemWidth( 0.6f * ImGui::GetWindowWidth() - 16 );
@@ -69,7 +68,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void PointLight::Save( const Component& _component, Json& _json )
+	void PointLight::Save( const EcsComponent& _component, Json& _json )
 	{
 		const PointLight& pointLight = static_cast<const PointLight&>( _component );
 		Serializable::SaveColor( _json, "ambiant", pointLight.ambiant );
@@ -81,7 +80,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void PointLight::Load( Component& _component, const Json& _json )
+	void PointLight::Load( EcsComponent& _component, const Json& _json )
 	{
 		PointLight& pointLight = static_cast<PointLight&>( _component );
 		Serializable::LoadColor( _json, "ambiant", pointLight.ambiant );

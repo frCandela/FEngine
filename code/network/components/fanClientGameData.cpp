@@ -1,21 +1,21 @@
 #include "network/components/fanClientGameData.hpp"
 
+#include "ecs/fanEcsWorld.hpp"
+
 namespace fan
 {
-	REGISTER_COMPONENT( ClientGameData, "client game data" );
-
 	//================================================================================================================================
 	//================================================================================================================================
-	void ClientGameData::SetInfo( ComponentInfo& _info )
+	void ClientGameData::SetInfo( EcsComponentInfo& _info )
 	{
 		_info.icon = ImGui::IconType::NETWORK16;
 		_info.onGui = &ClientGameData::OnGui;
-		_info.init =  &ClientGameData::Init;
+		_info.name = "client game data";
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void ClientGameData::Init( EcsWorld& _world, Component& _component )
+	void ClientGameData::Init( EcsWorld& /*_world*/, EcsEntity /*_entity*/, EcsComponent& _component )
 	{
 		ClientGameData& gameData = static_cast<ClientGameData&>( _component );
 		gameData.spaceshipSpawnFrameIndex = 0;
@@ -107,7 +107,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void ClientGameData::Write( Packet& _packet )
+	void ClientGameData::Write( EcsWorld& _world, EcsEntity _entity,  Packet& _packet )
 	{
 		// calculates the number of inputs to send
 		int numInputs = (int)previousInputs.size();
@@ -119,7 +119,7 @@ namespace fan
 		if( numInputs > 0 )
 		{
 			// registers packet success
-			_packet.onSuccess.Connect( &ClientGameData::OnInputReceived, this );
+			_packet.onSuccess.Connect( &ClientGameData::OnInputReceived, _world, _world.GetHandle(_entity) );
 			inputsSent.push_front( { _packet.tag, previousInputs.front().frameIndex } );
 
 			// generate & send inputs
@@ -198,7 +198,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void ClientGameData::OnGui( EcsWorld& _world, EntityID _entityID, Component& _component )
+	void ClientGameData::OnGui( EcsWorld& /*_world*/, EcsEntity /*_entityID*/, EcsComponent& _component )
 	{
 		ClientGameData& gameData = static_cast<ClientGameData&>( _component );
 		ImGui::PushItemWidth( 0.6f * ImGui::GetWindowWidth() - 16 );

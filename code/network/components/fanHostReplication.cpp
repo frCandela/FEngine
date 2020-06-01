@@ -5,20 +5,18 @@
 
 namespace fan
 {
-	REGISTER_COMPONENT( HostReplication, "host replication" );
-
 	//================================================================================================================================
 	//================================================================================================================================
-	void HostReplication::SetInfo( ComponentInfo& _info )
+	void HostReplication::SetInfo( EcsComponentInfo& _info )
 	{
 		_info.icon = ImGui::IconType::NETWORK16;
 		_info.onGui = &HostReplication::OnGui;
-		_info.init = &HostReplication::Init;
+		_info.name = "host replication";
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void HostReplication::Init( EcsWorld& _world, Component& _component )
+	void HostReplication::Init( EcsWorld& /*_world*/, EcsEntity /*_entity*/, EcsComponent& _component )
 	{
 		HostReplication& hostReplication = static_cast<HostReplication&>( _component );
 		hostReplication.pendingReplication.clear();
@@ -45,12 +43,12 @@ namespace fan
 	PacketReplication HostReplication::BuildSingletonPacket( const EcsWorld& _world, const uint32_t _staticID )
 	{
 		// generates replicated data for a singleton component
-		const SingletonComponentInfo& info = _world.GetSingletonComponentInfo( _staticID );
-		const SingletonComponent& component = _world.GetSingletonComponent( _staticID );
+		const EcsSingletonInfo& info = _world.GetSingletonInfo( _staticID );
+		const EcsSingleton& component = _world.GetSingleton( _staticID );
 		PacketReplication packet;
 		packet.replicationType = PacketReplication::ReplicationType::SingletonComponent;
 		packet.packetData.clear();
-		packet.packetData << sf::Uint32( info.staticIndex );
+		packet.packetData << sf::Uint32( info.type);
 		info.netSave( component, packet.packetData );
 
 		return packet;
@@ -59,28 +57,27 @@ namespace fan
 	//================================================================================================================================
 	// Builds & returns a replication packet to replicate a list of components on an entity
 	//================================================================================================================================
-	PacketReplication HostReplication::BuildEntityPacket( EcsWorld& _world, const EntityHandle _entityHandle, const std::vector<uint32_t>& _componentTypeInfo )
+	PacketReplication HostReplication::BuildEntityPacket( EcsWorld& _world, const EcsHandle _handle, const std::vector<uint32_t>& _componentTypeInfo )
 	{
 		PacketReplication packet;
 		packet.replicationType = PacketReplication::ReplicationType::Entity;
 		packet.packetData.clear();
 
-		const LinkingContext& linkingContext = _world.GetSingletonComponent< LinkingContext> ();
-		const EntityID entityID = _world.GetEntityID( _entityHandle );
+		const LinkingContext& linkingContext = _world.GetSingleton< LinkingContext> ();
+		const EcsEntity entity = _world.GetEntity( _handle );
 
 		// Serializes net id
-		 const auto it = linkingContext.entityHandleToNetID.find( _entityHandle );
+		 const auto it = linkingContext.EcsHandleToNetID.find( _handle );
 		 const NetID netID = it->second;
 		 packet.packetData << netID;
 		 packet.packetData << sf::Uint8( _componentTypeInfo.size() );
-		 if( it != linkingContext.entityHandleToNetID.end() )
+		 if( it != linkingContext.EcsHandleToNetID.end() )
 		 {
 			 for( const uint32_t typeInfo : _componentTypeInfo )
 			 {
-				 const ComponentIndex index = _world.GetDynamicIndex( typeInfo );
-				 const ComponentInfo& info = _world.GetComponentInfo( index );
-				 Component& component = _world.GetComponent( entityID, index );
-				 packet.packetData << sf::Uint32( info.staticIndex );
+				 const EcsComponentInfo& info = _world.GetComponentInfo( typeInfo );
+				 EcsComponent& component = _world.GetComponent( entity, typeInfo );
+				 packet.packetData << sf::Uint32( info.type);
 				 info.netSave( component, packet.packetData );
 			 }
 		 }
@@ -104,7 +101,7 @@ namespace fan
 	//================================================================================================================================
 	// Sends all new replication packed
 	//================================================================================================================================
-	void HostReplication::Write( Packet& _packet )
+	void HostReplication::Write( EcsWorld& _world, EcsEntity _entity, Packet& _packet )
 	{
 		for( ReplicationData& data : nextReplication )
 		{
@@ -112,9 +109,9 @@ namespace fan
 			if( data.flags & ReplicationFlags::ResendUntilReplicated )
 			{
 				pendingReplication.insert( { _packet.tag , data } );
-				_packet.onSuccess.Connect( &HostReplication::OnReplicationSuccess, this );
-				_packet.onFail.Connect( &HostReplication::OnReplicationFail, this );
-				//Debug::Log() << "rep send: " << _packet.tag << Debug::Endl();
+				const EcsHandle& handle = _world.GetHandle( _entity );
+				_packet.onSuccess.Connect( &HostReplication::OnReplicationSuccess, _world, handle );
+				_packet.onFail.Connect( &HostReplication::OnReplicationFail, _world, handle );
 			}
 		}
 		nextReplication.clear();
@@ -154,7 +151,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void HostReplication::OnGui( EcsWorld& _world, EntityID _entityID, Component& _component )
+	void HostReplication::OnGui( EcsWorld& /*_world*/, EcsEntity /*_entityID*/, EcsComponent& _component )
 	{
 		HostReplication& hostReplication = static_cast<HostReplication&>( _component );
 		ImGui::PushItemWidth( 0.6f * ImGui::GetWindowWidth() - 16 );

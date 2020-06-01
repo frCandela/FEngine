@@ -14,6 +14,6 @@ set( FAN_SCENE_LIBS
     btCollision
 )
 
+add_compile_options( ${COMPILATION_FLAGS} )
 add_library(fanScene STATIC ${FAN_SCENE_SRC} ${FAN_SCENE_H})
-
 target_link_libraries(fanScene ${FAN_SCENE_LIBS})

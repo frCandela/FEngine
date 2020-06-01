@@ -15,7 +15,7 @@ namespace fan
 {	
 	//================================================================================================================================
 	//================================================================================================================================
-	Signature S_ServerSend::GetSignature( const EcsWorld& _world )
+	EcsSignature S_ServerSend::GetSignature( const EcsWorld& _world )
 	{
 		return
 			_world.GetSignature<HostConnection>() |
@@ -26,20 +26,23 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void S_ServerSend::Run( EcsWorld& _world, const std::vector<EntityID>& _entities, const float _delta )
+	void S_ServerSend::Run( EcsWorld& _world, const EcsView& _view, const float _delta )
 	{
 		if( _delta == 0.f ) { return; }
 
-		const HostManager& hostManager = _world.GetSingletonComponent<HostManager>();
-		const Game& game = _world.GetSingletonComponent<Game>();
-		ServerConnection& connection = _world.GetSingletonComponent<ServerConnection>();
+		const Game& game = _world.GetSingleton<Game>();
+		ServerConnection& connection = _world.GetSingleton<ServerConnection>();
 
-		for( EntityID entityID : _entities )
+		auto hostConnectionIt = _view.begin<HostConnection>();
+		auto hostDataIt = _view.begin<HostGameData>();
+		auto hostReplicationIt = _view.begin<HostReplication>();
+		auto reliabilityLayerIt = _view.begin<ReliabilityLayer>();
+		for( ; hostConnectionIt != _view.end<HostConnection>(); ++hostConnectionIt, ++hostDataIt, ++hostReplicationIt, ++reliabilityLayerIt )
 		{
-			HostConnection& hostConnection = _world.GetComponent< HostConnection >( entityID );
-			HostGameData& hostData = _world.GetComponent< HostGameData >( entityID );
-			HostReplication& hostReplication = _world.GetComponent< HostReplication >( entityID );
-			ReliabilityLayer& reliabilityLayer = _world.GetComponent< ReliabilityLayer >( entityID );
+			HostConnection& hostConnection = *hostConnectionIt;
+			const HostGameData& hostData = *hostDataIt;
+			HostReplication& hostReplication = *hostReplicationIt;
+			ReliabilityLayer& reliabilityLayer = *reliabilityLayerIt;
 
 			// create new packet			
 			Packet packet( reliabilityLayer.GetNextPacketTag() );
@@ -53,8 +56,9 @@ namespace fan
 				}
 			}
 
-			hostConnection.Write( _world, packet );
-			hostReplication.Write( packet );
+			const EcsEntity entity = hostDataIt.Entity();
+			hostConnection.Write( _world, entity, packet );
+			hostReplication.Write( _world, entity, packet );
 
 			// write ack
 			if( packet.GetSize() == sizeof( PacketTag ) ) { packet.onlyContainsAck = true; }
@@ -76,11 +80,13 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void S_ServerReceive::Run( EcsWorld& _world )
+	void S_ServerReceive::Run( EcsWorld& _world, const float _delta )
 	{
-		HostManager& hostManager = _world.GetSingletonComponent<HostManager>();
-		ServerConnection& connection = _world.GetSingletonComponent<ServerConnection>();
-		Game& game = _world.GetSingletonComponent<Game>();
+		if( _delta == 0.f ) { return; }
+
+		HostManager& hostManager = _world.GetSingleton<HostManager>();
+		ServerConnection& connection = _world.GetSingleton<ServerConnection>();
+		Game& game = _world.GetSingleton<Game>();
 
 		// receive
 		Packet			packet;
@@ -101,16 +107,16 @@ namespace fan
 			case sf::UdpSocket::Done:
 			{
 				// create / get client
-				EntityHandle clientHandle = hostManager.FindHost( receiveIP, receivePort );
+				EcsHandle clientHandle = hostManager.FindHost( receiveIP, receivePort );
 				if( clientHandle == 0 )
 				{
 					clientHandle = hostManager.CreateHost( receiveIP, receivePort );
 				}
-				const EntityID entityID = _world.GetEntityID( clientHandle );
+				const EcsEntity entity = _world.GetEntity( clientHandle );
 
-				HostGameData& hostData = _world.GetComponent< HostGameData >( entityID );
-				ReliabilityLayer& reliabilityLayer = _world.GetComponent<ReliabilityLayer>( entityID );
-				HostConnection& hostConnection = _world.GetComponent<HostConnection>( entityID );
+				HostGameData& hostData = _world.GetComponent< HostGameData >( entity );
+				ReliabilityLayer& reliabilityLayer = _world.GetComponent<ReliabilityLayer>( entity );
+				HostConnection& hostConnection = _world.GetComponent<HostConnection>( entity );
 				hostConnection.lastResponseTime = Time::Get().ElapsedSinceStartup();
 
 				// read the first packet type separately

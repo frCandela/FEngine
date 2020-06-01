@@ -13,14 +13,11 @@
 
 namespace fan
 {
-	REGISTER_SINGLETON_COMPONENT( SolarEruption );
-
 	//================================================================================================================================
 	//================================================================================================================================
-	void SolarEruption::SetInfo( SingletonComponentInfo& _info )
+	void SolarEruption::SetInfo( EcsSingletonInfo& _info )
 	{
 		_info.icon = ImGui::SUN16;
-		_info.init = &SolarEruption::Init;
 		_info.onGui = &SolarEruption::OnGui;
 		_info.save = &SolarEruption::Save;
 		_info.load = &SolarEruption::Load;
@@ -31,7 +28,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void SolarEruption::Init( EcsWorld& _world, SingletonComponent& _component )
+	void SolarEruption::Init( EcsWorld& _world, EcsSingleton& _component )
 	{
 		SolarEruption& solarEruption = static_cast<SolarEruption&>( _component );
 
@@ -70,8 +67,7 @@ namespace fan
 	//================================================================================================================================
 	void SolarEruption::Start( EcsWorld& _world )
 	{
-		SolarEruption& eruption = _world.GetSingletonComponent<SolarEruption>();		
-		const Game& game = _world.GetSingletonComponent<Game>();
+		SolarEruption& eruption = _world.GetSingleton<SolarEruption>();
 
 		eruption.enabled = true;
 		eruption.stateDuration[WAITING] = std::numeric_limits<float>::max(); // wait forever
@@ -90,7 +86,7 @@ namespace fan
 		// sets the sunlight mesh
 		if( eruption.sunlightRenderer != nullptr )
 		{
-			SunLight& sunlight = _world.GetSingletonComponent<SunLight>();
+			SunLight& sunlight = _world.GetSingleton<SunLight>();
 			eruption.sunlightRenderer->mesh = &sunlight.mesh;
 		}
 
@@ -104,7 +100,7 @@ namespace fan
 		// initialize particles tags
 		if( eruption.particleEmitter != nullptr )
 		{
-			const ComponentIndex tagIndex = _world.GetDynamicIndex( tag_sunlight_occlusion::s_typeInfo );
+			const int tagIndex = _world.GetIndex( tag_sunlight_occlusion::Info::s_type );
 			eruption.particleEmitter->tagsSignature[tagIndex] = 1;
 		}
 	}
@@ -113,7 +109,7 @@ namespace fan
 	//================================================================================================================================
 	void SolarEruption::Step( EcsWorld& _world, const float _delta )
 	{
-		SolarEruption& eruption = _world.GetSingletonComponent<SolarEruption>();
+		SolarEruption& eruption = _world.GetSingleton<SolarEruption>();
 
 		if( !eruption.enabled || _delta == 0.f ) { return; }
 
@@ -121,7 +117,7 @@ namespace fan
 
 		if( eruption.state == State::WAITING )
 		{
-			const Game& game = _world.GetSingletonComponent<Game>();
+			const Game& game = _world.GetSingleton<Game>();
 			if( game.frameIndex == eruption.eruptionStartFrame )
 			{
 				eruption.stateDuration[WAITING] = 0;
@@ -191,7 +187,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void SolarEruption::NetSave( const SingletonComponent& _component, sf::Packet& _packet )
+	void SolarEruption::NetSave( const EcsSingleton& _component, sf::Packet& _packet )
 	{
 		const SolarEruption& solarEruption = static_cast<const SolarEruption&>( _component );
 		_packet << FrameIndexNet( solarEruption.eruptionStartFrame);
@@ -199,7 +195,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void SolarEruption::NetLoad( SingletonComponent& _component, sf::Packet& _packet )
+	void SolarEruption::NetLoad( EcsSingleton& _component, sf::Packet& _packet )
 	{
 		SolarEruption& solarEruption = static_cast< SolarEruption&>( _component );
 
@@ -211,7 +207,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void SolarEruption::Save( const SingletonComponent& _component, Json& _json )
+	void SolarEruption::Save( const EcsSingleton& _component, Json& _json )
 	{
 		const SolarEruption& solarEruption = static_cast<const SolarEruption&>( _component );
 
@@ -239,7 +235,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void SolarEruption::Load( SingletonComponent& _component, const Json& _json )
+	void SolarEruption::Load( EcsSingleton& _component, const Json& _json )
 	{
 		SolarEruption& solarEruption = static_cast<SolarEruption&>( _component );
 
@@ -267,7 +263,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void SolarEruption::OnGui( EcsWorld& _world, SingletonComponent& _component )
+	void SolarEruption::OnGui( EcsWorld& _world, EcsSingleton& _component )
 	{
 		SolarEruption& solarEruption = static_cast<SolarEruption&>( _component );
 
@@ -275,7 +271,7 @@ namespace fan
 		{
 			ImGui::PushItemWidth( 200.f );
 			{
-				const Game& game = _world.GetSingletonComponent<Game>();
+				const Game& game = _world.GetSingleton<Game>();
 				ImGui::Text( "state: %s", StateToString( solarEruption.state ).c_str() );
 				ImGui::Text( "timer: %f", solarEruption.timer );
 

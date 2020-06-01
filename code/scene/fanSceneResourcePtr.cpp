@@ -11,59 +11,35 @@
 namespace fan
 {
 	//================================================================================================================================
-	// set the world of the pointer ( done during the Init() of the component on which the ComponentPtr is a member
-	//================================================================================================================================
-	void ComponentPtrBase::Init( EcsWorld& _world )
-	{
-		const_cast<EcsWorld*>( world ) = &_world;
-		*const_cast<ComponentIndex*>( &dynamicID ) = world->GetDynamicIndex( staticID );
-		sceneNodeID = 0;
-		component = nullptr;
-	}
-
-	//================================================================================================================================
 	// initializes the ComponentPtr from ids :
 	// - _sceneNodeID is the unique index of the target scene node on which the component is attached
 	// - _staticID is the static id of the component
 	//================================================================================================================================
-	void ComponentPtrBase::Create( uint32_t _sceneNodeID )
+	void ComponentPtrBase::CreateUnresolved( EcsHandle _handle )
 	{
-		assert( world != nullptr );
-
-		sceneNodeID = _sceneNodeID;
+		handle = _handle;
 		
 		// adds to the unresolved pointers list
-		if( sceneNodeID != 0 )
+		if( _handle != 0 )
 		{
-			ScenePointers& scenePointers = world->GetSingletonComponent<ScenePointers>();
-			scenePointers.unresolvedComponentPtr.insert( this );
+			ScenePointers& scenePointers = world->GetSingleton<ScenePointers>();
+			scenePointers.unresolvedComponentPtr.push_back( this );
 		}
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void ComponentPtrBase::Create( SceneNode& _sceneNode, Component& _component )
+	void ComponentPtrBase::Create( EcsHandle _handle )
 	{
-		assert( _sceneNode.scene->world == world );
-
-		sceneNodeID = _sceneNode.uniqueID;
-		component = &_component;
-
-		// removes from unresolved pointers list
-		ScenePointers& scenePointers = world->GetSingletonComponent<ScenePointers>();
-		auto it = scenePointers.unresolvedComponentPtr.find( this );
-		if( it != scenePointers.unresolvedComponentPtr.end() )
-		{
-			scenePointers.unresolvedComponentPtr.erase( this );
-		}
+		handle = _handle;
+		assert( world->HasComponent( world->GetEntity( _handle ), type ) );
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
 	void ComponentPtrBase::Clear()
 	{
-		sceneNodeID = 0;
-		component = nullptr;
+		handle = 0;
 	}
 }
 
@@ -75,39 +51,34 @@ namespace ImGui
  	bool FanComponentBase( const char* _label, fan::ComponentPtrBase& _ptr )
  	{
 		fan::EcsWorld& world = *_ptr.world;
-
-
  		bool returnValue = false;
  
-		const fan::ComponentInfo& info = world.GetComponentInfo( _ptr.dynamicID );
+		const fan::EcsComponentInfo& info = world.GetComponentInfo( _ptr.type );
 
 		// create button title
 		std::string name;
-		if( _ptr.component == nullptr )
+		if( _ptr.handle == 0 )
 		{
 			name = info.name + " : NULL";
 		}
 		else
 		{
-			fan::Scene& scene = world.GetSingletonComponent<fan::Scene>();
-			fan::SceneNode& node = * scene.nodes[_ptr.sceneNodeID];
+			fan::SceneNode& node = world.GetComponent<fan::SceneNode>( world.GetEntity( _ptr.handle ) );
 			name = info.name + " : " + node.name;
 		}		
- 
  		// icon
  		if (ImGui::ButtonIcon( info.icon, { 16,16 } ))
  		{
  			returnValue = true;
  		}
 		// dragndrop source for icon
-		if( _ptr.component != nullptr )
+		if( _ptr.handle != 0 )
 		{
-			fan::Scene& scene = _ptr.world->GetSingletonComponent<fan::Scene>();
-			fan::SceneNode& node = *scene.nodes.at( _ptr.sceneNodeID );
-			ImGui::FanBeginDragDropSourceComponent( node, *_ptr.component );
+			fan::SceneNode& node = world.GetComponent<fan::SceneNode>( world.GetEntity( _ptr.handle ) );
+			ImGui::FanBeginDragDropSourceComponent( world, node.handle, _ptr.type );
 		}
 		// dragndrop target for icon
-		ImGui::ComponentPayload payloadDropOnIcon = ImGui::FanBeginDragDropTargetComponent( _ptr.staticID );
+		ImGui::ComponentPayload payloadDropOnIcon = ImGui::FanBeginDragDropTargetComponent( world, _ptr.type );
  		
 		ImGui::SameLine();
  
@@ -120,19 +91,17 @@ namespace ImGui
  		ImGui::SameLine();
  
  		// dragndrop source for button
-		if( _ptr.component != nullptr )
+		if( _ptr.handle != 0 )
 		{
-			fan::Scene& scene = _ptr.world->GetSingletonComponent<fan::Scene>();
-			fan::SceneNode& node = *scene.nodes.at( _ptr.sceneNodeID );
-			ImGui::FanBeginDragDropSourceComponent( node, *_ptr.component );
+			ImGui::FanBeginDragDropSourceComponent( world, _ptr.handle, _ptr.type );
 		}
 
 		// dragndrop target for button
-  		ImGui::ComponentPayload payloadDropOnButton = ImGui::FanBeginDragDropTargetComponent( _ptr.staticID );
-		if( payloadDropOnButton.sceneNode != nullptr || payloadDropOnIcon.sceneNode != nullptr )
+  		ImGui::ComponentPayload payloadDropOnButton = ImGui::FanBeginDragDropTargetComponent( world, _ptr.type );
+		if( payloadDropOnButton.handle != 0 || payloadDropOnIcon.handle != 0 )
 		{
-			ImGui::ComponentPayload & payload  = payloadDropOnButton.sceneNode != nullptr ? payloadDropOnButton : payloadDropOnIcon;
-			_ptr.Create( *payload.sceneNode, *payload.component );
+			ImGui::ComponentPayload & payload  = payloadDropOnButton.handle != 0 ? payloadDropOnButton : payloadDropOnIcon;
+			_ptr.Create( payload.handle );
 			returnValue = true;
 		}
  
@@ -166,7 +135,6 @@ namespace ImGui
 		{
 			if ( ImGui::ButtonIcon( ImGui::IconType::PREFAB16, { 16,16 } ) )
 			{
-
 				openModal = true;
 			}
 		} ImGui::PopID();
@@ -192,14 +160,14 @@ namespace ImGui
 		fan::Prefab* prefabDrop = ImGui::FanBeginDragDropTargetPrefab();
 		if ( prefabDrop )
 		{
-			_ptr = prefabDrop;
+			_ptr.Set( prefabDrop );
 			returnValue = true;
 		}
 
 		// Right click = clear
 		if ( ImGui::IsItemClicked( 1 ) )
 		{
-			_ptr = nullptr;
+			_ptr.Set( nullptr );
 			returnValue = true;
 		}
 

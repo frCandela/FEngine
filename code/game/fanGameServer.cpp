@@ -117,37 +117,37 @@ namespace fan
 		world.AddComponentType<ReliabilityLayer>();
 
 		// base singleton components
-		world.AddSingletonComponentType<Scene>();
-		world.AddSingletonComponentType<RenderWorld>();
-		world.AddSingletonComponentType<PhysicsWorld>();
-		world.AddSingletonComponentType<ScenePointers>();
+		world.AddSingletonType<Scene>();
+		world.AddSingletonType<RenderWorld>();
+		world.AddSingletonType<PhysicsWorld>();
+		world.AddSingletonType<ScenePointers>();
 		// game singleton components
-		world.AddSingletonComponentType<SunLight>();
-		world.AddSingletonComponentType<GameCamera>();
-		world.AddSingletonComponentType<CollisionManager>();
-		world.AddSingletonComponentType<Game>();
-		world.AddSingletonComponentType<SolarEruption>();
-		world.AddSingletonComponentType<ServerNetworkManager>();
+		world.AddSingletonType<SunLight>();
+		world.AddSingletonType<GameCamera>();
+		world.AddSingletonType<CollisionManager>();
+		world.AddSingletonType<Game>();
+		world.AddSingletonType<SolarEruption>();
+		world.AddSingletonType<ServerNetworkManager>();
 		// net singleton components
-		world.AddSingletonComponentType<ServerConnection>();
-		world.AddSingletonComponentType<LinkingContext>();
-		world.AddSingletonComponentType<HostManager>();
+		world.AddSingletonType<ServerConnection>();
+		world.AddSingletonType<LinkingContext>();
+		world.AddSingletonType<HostManager>();
 		
 		world.AddTagType<tag_boundsOutdated>();
 		world.AddTagType<tag_sunlight_occlusion>();
 
 		// @hack
-		Game& game = world.GetSingletonComponent<Game>();
-		game.gameServer = this;
-		game.name = _name;
+		Game& gameNotConst = world.GetSingleton<Game>();
+		gameNotConst.gameServer = this;
+		gameNotConst.name = _name;
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
 	void GameServer::Start()
 	{
-		game = &world.GetSingletonComponent<Game>();
-		netManager = &world.GetSingletonComponent<ServerNetworkManager>();
+		game = &world.GetSingleton<Game>();
+		netManager = &world.GetSingleton<ServerNetworkManager>();
 
 		netManager->Start( world );
 		S_RegisterAllRigidbodies::Run( world, world.Match( S_RegisterAllRigidbodies::GetSignature( world ) ) );
@@ -160,12 +160,10 @@ namespace fan
 	void  GameServer::Stop()
 	{
 		// clears the physics world
-		PhysicsWorld& physicsWorld = world.GetSingletonComponent<PhysicsWorld>();
 		S_UnregisterAllRigidbodies::Run( world, world.Match( S_UnregisterAllRigidbodies::GetSignature( world ) ) );
-		physicsWorld.rigidbodiesHandles.clear();
 
 		// clears the particles mesh
-		RenderWorld& renderWorld = world.GetSingletonComponent<RenderWorld>();
+		RenderWorld& renderWorld = world.GetSingleton<RenderWorld>();
 		renderWorld.particlesMesh.LoadFromVertices( {} );
 
 		GameCamera::DeleteGameCamera( world );
@@ -202,7 +200,7 @@ namespace fan
 		{
 			SCOPED_PROFILE( scene_update );
 
-			S_ServerReceive			::Run( world );
+			S_ServerReceive			::Run( world, _delta );
 			S_ProcessTimedOutPackets::Run( world, world.Match( S_ProcessTimedOutPackets::GetSignature( world ) ) );
 			S_DetectHostTimout		::Run( world, world.Match( S_DetectHostTimout::GetSignature( world ) ) );
 			S_HostSpawnShip			::Run( world, world.Match( S_HostSpawnShip::GetSignature( world ) ), _delta );
@@ -214,15 +212,15 @@ namespace fan
 			S_MoveSpaceships::Run( world, world.Match( S_MoveSpaceships::GetSignature( world ) ), _delta );
 
 			// physics & transforms
-			PhysicsWorld& physicsWorld = world.GetSingletonComponent<PhysicsWorld>();
-			S_SynchronizeMotionStateFromTransform	::Run( world, world.Match( S_SynchronizeMotionStateFromTransform::GetSignature( world ) ), _delta );
+			PhysicsWorld& physicsWorld = world.GetSingleton<PhysicsWorld>();
+			S_SynchronizeMotionStateFromTransform	::Run( world, world.Match( S_SynchronizeMotionStateFromTransform::GetSignature( world ) ) );
 			physicsWorld.dynamicsWorld->stepSimulation( _delta, 10, Time::Get().GetPhysicsDelta() );
-			S_SynchronizeTransformFromMotionState	::Run( world, world.Match( S_SynchronizeTransformFromMotionState::GetSignature( world ) ), _delta );
+			S_SynchronizeTransformFromMotionState	::Run( world, world.Match( S_SynchronizeTransformFromMotionState::GetSignature( world ) ) );
 			S_MoveFollowTransforms					::Run( world, world.Match( S_MoveFollowTransforms::GetSignature( world ) ) );
 			S_MoveFollowTransformsUI				::Run( world, world.Match( S_MoveFollowTransformsUI::GetSignature( world ) ) );			
 			
-			S_HostSaveState		::Run( world, world.Match( S_HostSaveState::GetSignature( world ) )		, _delta );
-			
+			S_HostSaveState		::Run( world, world.Match( S_HostSaveState::GetSignature( world ) )		, _delta );		
+
 			S_FireWeapons			::Run( world, world.Match( S_FireWeapons::GetSignature( world ) )			, _delta );			
 			S_GenerateLightMesh		::Run( world, world.Match( S_GenerateLightMesh::GetSignature( world ) )		, _delta );
 			S_UpdateSolarPannels	::Run( world, world.Match( S_UpdateSolarPannels::GetSignature( world ) )	, _delta );
@@ -235,31 +233,35 @@ namespace fan
 			S_PlayerDeath			::Run( world, world.Match( S_PlayerDeath::GetSignature( world ) )			, _delta );
 
 			// late update
-			S_ParticlesOcclusion		::Run( world, world.Match( S_ParticlesOcclusion::GetSignature( world ) )		, _delta );
-			S_UpdateParticles			::Run( world, world.Match( S_UpdateParticles::GetSignature( world ) )			, _delta );
-			S_EmitParticles				::Run( world, world.Match( S_EmitParticles::GetSignature( world ) )				, _delta );
-			S_GenerateParticles			::Run( world, world.Match( S_GenerateParticles::GetSignature( world ) )			, _delta );
-			S_UpdateBoundsFromRigidbody	::Run( world, world.Match( S_UpdateBoundsFromRigidbody::GetSignature( world ) )	, _delta );
-			S_UpdateBoundsFromModel		::Run( world, world.Match( S_UpdateBoundsFromModel::GetSignature( world ) )		, _delta );
-			S_UpdateBoundsFromTransform	::Run( world, world.Match( S_UpdateBoundsFromTransform::GetSignature( world ) )	, _delta );
-			S_UpdateGameCamera			::Run( world, world.Match( S_UpdateGameCamera::GetSignature( world ) )			, _delta );			
-			
-			HostManager& hostManager = world.GetSingletonComponent<HostManager>();
-			for( const std::pair<HostManager::IPPort, EntityHandle>& pair : hostManager.hostHandles )
 			{
-				const EntityHandle hostHandle = pair.second;
-				const EntityID hostID = world.GetEntityID( hostHandle );
+				SCOPED_PROFILE( game_late );
+
+				S_ParticlesOcclusion::Run( world, world.Match( S_ParticlesOcclusion::GetSignature( world ) ), _delta );
+				S_UpdateParticles::Run( world, world.Match( S_UpdateParticles::GetSignature( world ) ), _delta );
+				S_EmitParticles::Run( world, world.Match( S_EmitParticles::GetSignature( world ) ), _delta );
+				S_GenerateParticles::Run( world, world.Match( S_GenerateParticles::GetSignature( world ) ), _delta );
+				S_UpdateBoundsFromRigidbody::Run( world, world.Match( S_UpdateBoundsFromRigidbody::GetSignature( world ) ), _delta );
+				S_UpdateBoundsFromModel::Run( world, world.Match( S_UpdateBoundsFromModel::GetSignature( world ) ) );
+				S_UpdateBoundsFromTransform::Run( world, world.Match( S_UpdateBoundsFromTransform::GetSignature( world ) ) );
+				S_UpdateGameCamera::Run( world, world.Match( S_UpdateGameCamera::GetSignature( world ) ), _delta );
+			}
+
+			HostManager& hostManager = world.GetSingleton<HostManager>();
+			for( const std::pair<HostManager::IPPort, EcsHandle>& pair : hostManager.hostHandles )
+			{
+				const EcsHandle hostHandle = pair.second;
+				const EcsEntity hostID = world.GetEntity( hostHandle );
 				const HostGameData& hostData = world.GetComponent<HostGameData>( hostID );
 				if( hostData.spaceshipHandle != 0 )
 				{
-					const PacketReplication packet = HostReplication::BuildEntityPacket( world, hostData.spaceshipHandle, { Transform::s_typeInfo/*,Rigidbody::s_typeInfo*/ } );
+					const PacketReplication packet = HostReplication::BuildEntityPacket( world, hostData.spaceshipHandle, { Transform::Info::s_type/*,Rigidbody::s_typeInfo*/ } );
 
-					for( const std::pair<HostManager::IPPort, EntityHandle>& otherPair : hostManager.hostHandles )
+					for( const std::pair<HostManager::IPPort, EcsHandle>& otherPair : hostManager.hostHandles )
 					{
-						const EntityHandle otherHostHandle = otherPair.second;
+						const EcsHandle otherHostHandle = otherPair.second;
 						if( otherHostHandle != hostHandle )
 						{
-							const EntityID otherHostID = world.GetEntityID( otherHostHandle );
+							const EcsEntity otherHostID = world.GetEntity( otherHostHandle );
 							HostReplication& hostReplication = world.GetComponent<HostReplication>( otherHostID );
 							hostReplication.Replicate( packet, HostReplication::None );
 						}
@@ -267,16 +269,7 @@ namespace fan
 				}
 			}
 
-
-
 			S_ServerSend				::Run( world, world.Match( S_ServerSend::GetSignature( world ) )				, _delta );
-		}
-
-		{
-			// end frame
-			SCOPED_PROFILE( scene_endFrame );
-			world.SortEntities();
-			world.RemoveDeadEntities();
 		}
 	}
 }

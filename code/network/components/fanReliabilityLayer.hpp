@@ -1,7 +1,7 @@
 #pragma  once
 
 #include <queue>
-#include "ecs/fanComponent.hpp"
+#include "ecs/fanEcsComponent.hpp"
 #include "network/fanPacket.hpp"
 
 namespace fan
@@ -12,13 +12,13 @@ namespace fan
 	// Process incoming acknowledgments and notify connected modules about which packets were received or dropped
 	// Ensure packets are never processed out of order. Old packets arriving after newer packets are dropped.
 	//==============================================================================================================================================================
-	struct ReliabilityLayer: public Component
+	struct ReliabilityLayer: public EcsComponent
 	{
-		DECLARE_COMPONENT( ReliabilityLayer )
+		ECS_COMPONENT( ReliabilityLayer )
 	public:
-		static void SetInfo( ComponentInfo& _info );
-		static void Init( EcsWorld& _world, Component& _component );
-		static void OnGui( EcsWorld& _world, EntityID _entityID, Component& _component );
+		static void SetInfo( EcsComponentInfo& _info );
+		static void Init( EcsWorld& _world, EcsEntity _entity, EcsComponent& _component );
+		static void OnGui( EcsWorld& _world, EcsEntity _entityID, EcsComponent& _component );
 
 		//================================================================
 		// Packet that was send & waiting for a delivery status (received/dropped)

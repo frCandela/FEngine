@@ -1,24 +1,22 @@
 #include "game/components/fanSpaceShipUI.hpp"
 
 namespace fan
-{	
-	REGISTER_COMPONENT( SpaceshipUI, "spaceship ui" );
-
+{
 	//================================================================================================================================
 	//================================================================================================================================
-	void SpaceshipUI::SetInfo( ComponentInfo& _info )
+	void SpaceshipUI::SetInfo( EcsComponentInfo& _info )
 	{
 		_info.icon = ImGui::IconType::SPACE_SHIP16;
 		_info.onGui = &SpaceshipUI::OnGui;
-		_info.init = &SpaceshipUI::Init;
 		_info.load = &SpaceshipUI::Load;
 		_info.save = &SpaceshipUI::Save;
 		_info.editorPath = "game/";
+		_info.name = "spaceship ui";
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void SpaceshipUI::Init( EcsWorld& _world, Component& _component )
+	void SpaceshipUI::Init( EcsWorld& _world, EcsEntity /*_entity*/, EcsComponent& _component )
 	{
 		SpaceshipUI& spaceshipUI = static_cast<SpaceshipUI&>( _component );
 		spaceshipUI.uiRootTransform.Init( _world );
@@ -31,7 +29,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void SpaceshipUI::OnGui( EcsWorld& _world, EntityID _entityID, Component& _component )
+	void SpaceshipUI::OnGui( EcsWorld& /*_world*/, EcsEntity /*_entityID*/, EcsComponent& _component )
 	{
 		SpaceshipUI& spaceshipUI = static_cast<SpaceshipUI&>( _component );
 
@@ -48,7 +46,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void SpaceshipUI::Save( const Component& _component, Json& _json )
+	void SpaceshipUI::Save( const EcsComponent& _component, Json& _json )
 	{
 		const SpaceshipUI& spaceshipUI = static_cast<const SpaceshipUI&>( _component );
 		Serializable::SaveVec2(         _json, "ui offset",       spaceshipUI.uiOffset);
@@ -61,7 +59,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void SpaceshipUI::Load( Component& _component, const Json& _json )
+	void SpaceshipUI::Load( EcsComponent& _component, const Json& _json )
 	{
 		SpaceshipUI& spaceshipUI = static_cast<SpaceshipUI&>( _component );
 		Serializable::LoadVec2(         _json, "ui offset",       spaceshipUI.uiOffset );

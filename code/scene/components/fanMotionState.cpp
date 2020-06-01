@@ -6,25 +6,34 @@
 
 namespace fan
 {
-	REGISTER_COMPONENT( MotionState, "motion_state" );
-
 	//================================================================================================================================
 	//================================================================================================================================
-	void MotionState::SetInfo( ComponentInfo& _info )
+	void MotionState::SetInfo( EcsComponentInfo& _info )
 	{
 		_info.icon = ImGui::IconType::RIGIDBODY16;
-		_info.init = &MotionState::Init;
+		_info.destroy = &MotionState::Destroy;
 		_info.save = &MotionState::Save;
 		_info.load = &MotionState::Load;
 		_info.editorPath = "/";
+		_info.name = "motion state";
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void MotionState::Init( EcsWorld& _world, Component& _component )
+	void MotionState::Init( EcsWorld& /*_world*/, EcsEntity /*_entity*/, EcsComponent& _component )
 	{
 		// clear
 		MotionState& motionState = static_cast<MotionState&>( _component );
-		motionState.motionState = btDefaultMotionState();
+		motionState.motionState = new btDefaultMotionState();
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
+	void MotionState::Destroy( EcsWorld& /*_world*/, EcsEntity /*_entity*/, EcsComponent& _component )
+	{
+		MotionState& motionState = static_cast<MotionState&>( _component );
+		assert( motionState.motionState != nullptr );
+		delete motionState.motionState;
+		motionState.motionState = nullptr;
 	}
 }

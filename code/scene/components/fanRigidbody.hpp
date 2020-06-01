@@ -1,8 +1,11 @@
 #pragma  once
 
+#include "core/fanBulletWarnings.hpp"
+BULLET_PUSH()
 #include "bullet/btBulletDynamicsCommon.h"
-#include "ecs/fanComponent.hpp"
-#include "core/fanSignal.hpp"
+BULLET_POP()
+#include "ecs/fanEcsComponent.hpp"
+#include "ecs/fanSignal.hpp"
 
 class btCollisionShape;
 class btPersistentManifold;
@@ -15,21 +18,21 @@ namespace fan
 	// must be registered manually
 	// unregisters automagically
 	//==============================================================================================================================================================
-	struct Rigidbody : public Component
+	struct Rigidbody : public EcsComponent
 	{
-		DECLARE_COMPONENT( Rigidbody )
+		ECS_COMPONENT( Rigidbody )
 	public:
-		Rigidbody();
+		static void SetInfo( EcsComponentInfo& _info );
+		static void Init( EcsWorld& _world, EcsEntity _entity, EcsComponent& _component );
+		static void Destroy( EcsWorld& _world, EcsEntity _entity, EcsComponent& _component );
+		static void OnGui( EcsWorld& _world, EcsEntity _entityID, EcsComponent& _component );
+		static void Save( const EcsComponent& _component, Json& _json );
+		static void Load( EcsComponent& _component, const Json& _json );
+		static void NetSave( const EcsComponent& _component, sf::Packet& _packet );
+		static void NetLoad( EcsComponent& _component, sf::Packet& _packet );
 
-		static void SetInfo( ComponentInfo& _info );
-		static void Init( EcsWorld& _world, Component& _component );
-		static void Destroy( EcsWorld& _world, Component& _component );
-		static void OnGui( EcsWorld& _world, EntityID _entityID, Component& _component );
-		static void Save( const Component& _component, Json& _json );
-		static void Load( Component& _component, const Json& _json );
-		static void NetSave( const Component& _component, sf::Packet& _packet );
-		static void NetLoad( Component& _component, sf::Packet& _packet );
-
+		EcsHandle	GetHandle(){ return static_cast<EcsHandle>( rigidbody->getUserIndex() ); }
+		EcsWorld&	GetWorld() { return *static_cast<EcsWorld*>( rigidbody->getUserPointer() ); }
 		float		GetMass() const;
 		void		SetMass( const float _mass );
 		void		SetStatic();
@@ -45,14 +48,15 @@ namespace fan
 		btVector3   GetAngularVelocity() const;
 		void		SetAngularVelocity( const btVector3& _velocity );
 		void		SetVelocity( const btVector3& _velocity );
-		void		SetTransform( const btTransform& _transform ) { rigidbody.setWorldTransform( _transform ); }
+		void		SetTransform( const btTransform& _transform ) { rigidbody->setWorldTransform( _transform ); }
+		void		ClearForces() { rigidbody->clearForces();  }
 
 		void SetCollisionShape( btCollisionShape* _collisionShape );
 		void SetMotionState( btDefaultMotionState* _motionState );
 
-		btRigidBody rigidbody;
-		Signal<Rigidbody*, btPersistentManifold* const&> onContactStarted;
-		Signal<Rigidbody*, btPersistentManifold* const&> onContactEnded;
+		btRigidBody * rigidbody;
+		Signal<Rigidbody&, Rigidbody&, btPersistentManifold* const&> onContactStarted;
+		Signal<Rigidbody&, Rigidbody&, btPersistentManifold* const&> onContactEnded;
 	};
 	static constexpr size_t sizeof_rigidbody = sizeof( Rigidbody );
 }

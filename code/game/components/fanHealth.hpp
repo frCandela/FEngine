@@ -1,21 +1,21 @@
 #pragma once
 
-#include "ecs/fanComponent.hpp"
+#include "ecs/fanEcsComponent.hpp"
 
 namespace fan
 {
 	//================================================================================================================================
 	// The health of en entity
 	//================================================================================================================================
-	class Health : public Component
+	class Health : public EcsComponent
 	{
-		DECLARE_COMPONENT( Health )
+		ECS_COMPONENT( Health )
 	public:
-		static void SetInfo( ComponentInfo& _info );
-		static void Init( EcsWorld& _world, Component& _component );
-		static void OnGui( EcsWorld& _world, EntityID _entityID, Component& _component );
-		static void Save( const Component& _component, Json& _json );
-		static void Load( Component& _component, const Json& _json );
+		static void SetInfo( EcsComponentInfo& _info );
+		static void Init( EcsWorld& _world, EcsEntity _entity, EcsComponent& _component );
+		static void OnGui( EcsWorld& _world, EcsEntity _entityID, EcsComponent& _component );
+		static void Save( const EcsComponent& _component, Json& _json );
+		static void Load( EcsComponent& _component, const Json& _json );
 
 		bool  invincible = false;
 		float currentHealth = 0.f;

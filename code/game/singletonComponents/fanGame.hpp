@@ -1,6 +1,6 @@
 #pragma once
 
-#include "ecs/fanSingletonComponent.hpp"
+#include "ecs/fanEcsSingleton.hpp"
 #include "scene/fanSceneResourcePtr.hpp"
 
 namespace fan
@@ -12,15 +12,15 @@ namespace fan
 	// Contains game data & a reference to the game client or server depending on which is used
 	// allows saving properties of the game into the scene & edition of parameters from the editor
 	//================================================================================================================================	
-	struct Game : public SingletonComponent
+	struct Game : public EcsSingleton
 	{
-		DECLARE_SINGLETON_COMPONENT()
+		ECS_SINGLETON( Game )
 	public:
-		static void SetInfo( SingletonComponentInfo& _info );
-		static void Init( EcsWorld& _world, SingletonComponent& _component );
-		static void OnGui( EcsWorld&, SingletonComponent& _component );
-		static void Save( const SingletonComponent& _component, Json& _json );
-		static void Load( SingletonComponent& _component, const Json& _json );
+		static void SetInfo( EcsSingletonInfo& _info );
+		static void Init( EcsWorld& _world, EcsSingleton& _component );
+		static void OnGui( EcsWorld&, EcsSingleton& _component );
+		static void Save( const EcsSingleton& _component, Json& _json );
+		static void Load( EcsSingleton& _component, const Json& _json );
 
 		enum State { STOPPED, PLAYING, PAUSED };
 
@@ -37,7 +37,7 @@ namespace fan
 		GameClient* gameClient = nullptr;
 		GameServer* gameServer = nullptr;
 
-		static EntityHandle SpawnSpaceship( EcsWorld& _world );
+		static EcsHandle SpawnSpaceship( EcsWorld& _world );
 		void OnShiftFrameIndex( const int _framesDelta );
 	};
 }

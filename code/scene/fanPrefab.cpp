@@ -66,14 +66,12 @@ namespace fan
 	{
 		Clear();
 
-		Scene& scene = *_node.scene;
 		Json& prefabJson = m_json[ "prefab" ];
 		Scene::R_SaveToJson( _node, prefabJson );
 		Scene::RemapSceneNodesIndices( prefabJson );
 	}
 
 	//================================================================================================================================
-	// @todo take a world as an argument instead of a scenenode
 	//================================================================================================================================
 	SceneNode* Prefab::Instanciate( SceneNode& _parent ) const
 	{
@@ -84,14 +82,14 @@ namespace fan
 		}
 		else
 		{
-			const uint32_t idOffset = _parent.scene->nextUniqueID - 1;
-			SceneNode& node = _parent.scene->CreateSceneNode( "tmp", &_parent, false );
 			EcsWorld& world = *_parent.scene->world;
-			EntityID indexStart = (EntityID)world.GetNumEntities();
-			Scene::R_LoadFromJson( m_json["prefab"], node, idOffset );
-			_parent.scene->nextUniqueID = Scene::R_FindMaximumId( _parent ) + 1;
-			ScenePointers::ResolveComponentPointers( *_parent.scene, idOffset );
-			return &node;
+			Scene& scene = world.GetSingleton<Scene>();
+			const EcsHandle handleOffset = world.GetNextHandle() - 1;
+			SceneNode& newNode = Scene::R_LoadFromJson( m_json["prefab"], scene, &_parent, handleOffset );
+			const EcsHandle maxHandle = Scene::R_FindMaximumHandle( _parent );
+			world.SetNextHandle( maxHandle + 1);
+			ScenePointers::ResolveComponentPointers( world, handleOffset );
+			return &newNode;
 		}		
 	}
 }

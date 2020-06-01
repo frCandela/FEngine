@@ -15,7 +15,7 @@ namespace fan
 {
 	//================================================================================================================================
 	//================================================================================================================================
-	Signature S_MovePlanets::GetSignature( const EcsWorld& _world )
+	EcsSignature S_MovePlanets::GetSignature( const EcsWorld& _world )
 	{
 		return
 			_world.GetSignature<Transform>() |
@@ -24,29 +24,32 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void S_MovePlanets::Run( EcsWorld& _world, const std::vector<EntityID>& _entities, const float _delta )
+	void S_MovePlanets::Run( EcsWorld& _world, const EcsView& _view, const float _delta )
 	{
 		if( _delta == 0.f ) { return; }
 
-		Game& game = _world.GetSingletonComponent<Game>();
+		Game& game = _world.GetSingleton<Game>();
 		const float currentTime = game.frameIndex * game.logicDelta;
 
-		for( EntityID entityID : _entities )
+		auto transformIt = _view.begin<Transform>();
+		auto planetIt = _view.begin<Planet>();
+		for( ; transformIt != _view.end<Transform>(); ++transformIt, ++planetIt )
 		{
-			Transform& transform = _world.GetComponent<Transform>( entityID );
-			Planet& planet = _world.GetComponent<Planet>( entityID );
+			const EcsEntity entity = transformIt.Entity();
+			Transform& transform = *transformIt;
+			const Planet& planet = *planetIt;
 
 			float const time = -planet.speed * currentTime;
 			btVector3 position( std::cosf( time + planet.phase ), 0, std::sinf( time + planet.phase ) );
 			transform.SetPosition( /*parentTransform.getOrigin()*/ planet.radius * position );
 
-			_world.AddTag<tag_boundsOutdated>( entityID );
+			_world.AddTag<tag_boundsOutdated>( entity );
 		}
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	Signature S_GenerateLightMesh::GetSignature( const EcsWorld& _world )
+	EcsSignature S_GenerateLightMesh::GetSignature( const EcsWorld& _world )
 	{
 		return
 			_world.GetSignature<Transform>() |
@@ -67,20 +70,23 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void S_GenerateLightMesh::Run( EcsWorld& _world, const std::vector<EntityID>& _entities, const float _delta )
+	void S_GenerateLightMesh::Run( EcsWorld& _world, const EcsView& _view, const float _delta )
 	{
 		SCOPED_PROFILE( ecs_solar_erup )
 
 		if( _delta == 0.f ) { return; }
 
-		SunLight& sunLight = _world.GetSingletonComponent<SunLight>();
+		SunLight& sunLight = _world.GetSingleton<SunLight>();
 
 		// Generates occlusion rays for each planet
 		std::vector< OrientedSegment > segments;
-		segments.reserve( 2 * _entities.size() );
-		for( EntityID entityID : _entities )
+		segments.reserve( 2 * _view.Size() );
+
+		auto transformIt = _view.begin<Transform>();
+		for( ; transformIt != _view.end<Transform>(); ++transformIt )
 		{
-			Transform& transform = _world.GetComponent<Transform>(entityID);
+			Transform& transform = *transformIt;
+
 			btVector3& scale = transform.scale;
 
 			const btVector3 planetPos = transform.GetPosition();
@@ -123,7 +129,7 @@ namespace fan
 
 		// generates the mesh
 		std::vector<Vertex>	vertices;
-		vertices.reserve( 3 * _entities.size() );
+		vertices.reserve( 3 * _view.Size() );
 		const float minGapRadians = btRadians( sunLight.subAngle );
 		std::set<float> norms;	// Stores the nested opening segments norms
 		for( int axisIndex = 0; axisIndex < segments.size(); axisIndex++ )

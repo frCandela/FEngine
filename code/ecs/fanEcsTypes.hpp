@@ -1,27 +1,12 @@
 #pragma once
 
-#include <stdint.h>
+#include <cstdint>
 #include <bitset>
-#include <vector>
 
 namespace fan
 {
-	//==============================================================================================================================================================
-	// base types & sizes for the ecs
-	//==============================================================================================================================================================
-	class ComponentsCollection;
-	class EcsWorld;
-	struct Entity;
-	struct Component;
-
-	static constexpr uint32_t signatureLength = 64;
-	using Signature = std::bitset<signatureLength>;
-	static constexpr uint32_t ecAliveBit = signatureLength - 1;
-	using EntityHandle = uint64_t;
-	using EntityID = uint32_t;
-	using ComponentIndex = uint8_t;
-	using SingletonComponentID = int;
-	using ChunckIndex = uint8_t;
-	using ChunckComponentIndex = uint16_t;
+	static constexpr uint32_t ecsSignatureLength = 64; 
+	using EcsSignature = std::bitset<ecsSignatureLength>;
+	using EcsHandle = uint32_t;
 	using FrameIndex = uint32_t;
 }

@@ -1,6 +1,6 @@
 #pragma  once
 
-#include "ecs/fanComponent.hpp"
+#include "ecs/fanEcsComponent.hpp"
 #include "core/fanColor.hpp"
 
 namespace fan
@@ -9,12 +9,12 @@ namespace fan
 	// A particle that disappears after some time
 	// Is emmited from a particle emmiter
 	//==============================================================================================================================================================
-	struct Particle : public Component
+	struct Particle : public EcsComponent
 	{
-		DECLARE_COMPONENT( Particle )
+		ECS_COMPONENT( Particle )
 	public:
-		static void SetInfo( ComponentInfo& _info );
-		static void Init( EcsWorld& _world, Component& _component );
+		static void SetInfo( EcsComponentInfo& _info );
+		static void Init( EcsWorld& _world, EcsEntity _entity, EcsComponent& _component );
 
 		Color		color;
 		glm::vec3	position;

@@ -1,7 +1,10 @@
 #pragma once
 
+#include "core/fanBulletWarnings.hpp"
+BULLET_PUSH()
 #include "bullet/btBulletDynamicsCommon.h"
-#include "ecs/fanSingletonComponent.hpp"
+BULLET_POP()
+#include "ecs/fanEcsSingleton.hpp"
 
 namespace fan
 {
@@ -11,16 +14,14 @@ namespace fan
 	//================================================================================================================================
 	// And empty singleton used to receive physics callbacks from the game
 	//================================================================================================================================	
-	struct CollisionManager : public SingletonComponent
+	struct CollisionManager : public EcsSingleton
 	{
-		DECLARE_SINGLETON_COMPONENT()
+		ECS_SINGLETON( CollisionManager )
 	public:
-		static void SetInfo( SingletonComponentInfo& _info );
-		static void Init( EcsWorld& _world, SingletonComponent& _component );
+		static void SetInfo( EcsSingletonInfo& _info );
+		static void Init( EcsWorld& _world, EcsSingleton& _component );
 
-		void OnBulletContact(	 Rigidbody* _other, btPersistentManifold* const& _manifold );
-		void OnSpaceShipContact( Rigidbody* _other, btPersistentManifold* const& _manifold );
-
-		EcsWorld* const world = nullptr;
+		void OnBulletContact( Rigidbody& _bulletBody, Rigidbody& _otherBody, btPersistentManifold* const& _manifold );
+		void OnSpaceShipContact( Rigidbody& _spaceshipBody, Rigidbody& _otherBody, btPersistentManifold* const& _manifold );
 	};
 }

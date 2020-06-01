@@ -1,6 +1,6 @@
 #pragma once
 
-#include "ecs/fanSingletonComponent.hpp"
+#include "ecs/fanEcsSingleton.hpp"
 #include "network/fanPacket.hpp"
 
 namespace fan
@@ -10,18 +10,18 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	struct ClientNetworkManager : public SingletonComponent
+	struct ClientNetworkManager : public EcsSingleton
 	{
-		DECLARE_SINGLETON_COMPONENT()
+		ECS_SINGLETON( ClientNetworkManager )
 	public:
-		static void SetInfo( SingletonComponentInfo& _info );
-		static void Init( EcsWorld& _world, SingletonComponent& _component );
-		static void OnGui( EcsWorld&, SingletonComponent& _component );
+		static void SetInfo( EcsSingletonInfo& _info );
+		static void Init( EcsWorld& _world, EcsSingleton& _component );
+		static void OnGui( EcsWorld&, EcsSingleton& _component );
 
 		void Start( EcsWorld& _world );
 		void Stop( EcsWorld& _world );			
 
-		SceneNode* playerPersistent;
+		EcsHandle persistentHandle;
 		std::vector< std::pair<NetID, FrameIndex> > shipsToSpawn;
 
 		static void SpawnShips( EcsWorld& _world );

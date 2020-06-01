@@ -13,14 +13,11 @@ namespace fan
 	class SceneInstantiate;
 	class InspectorWindow;
 	class SingletonsWindow;
-	class EditorCopyPaste;
-	class EditorSelection;
 	class ProfilerWindow;
 	class GameViewWindow;
 	class ConsoleWindow;
 	class NetworkWindow;
 	class RenderWindow;
-	class EditorGizmos;
 	class EditorWindow;
 	class SceneWindow;
 	class MainMenuBar;
@@ -61,8 +58,7 @@ namespace fan
 		void Exit();
 			   
 	private:		
-		EcsWorld  m_editorWorld;
-		EcsWorld& m_gameWorld;		
+		EcsWorld& m_world;		
 		Renderer* m_renderer;
 		Window*   m_window;
 
@@ -82,12 +78,6 @@ namespace fan
 		GameViewWindow* m_gameViewWindow;
 		EcsWindow* m_ecsWindow;
 
-		// Main objects
-		EditorCopyPaste* m_copyPaste;
-		EditorSelection* m_selection;
-		EditorGizmos* m_gizmos;
-
-
 		bool m_applicationShouldExit;
 		bool m_showUI = true;
 
@@ -106,8 +96,5 @@ namespace fan
 		void OnToogleShowUI() { m_showUI = !m_showUI; }
 		void OnToogleCamera();
 		void OnEditorStep();
-
-		static void InitializeEditorEcsWorldTypes( EcsWorld& _world );
-		static void InitializeGameEcsWorldTypes( EcsWorld& _world );
 	};
 }

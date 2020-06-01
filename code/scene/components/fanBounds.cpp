@@ -2,18 +2,16 @@
 
 namespace fan
 {
-	REGISTER_COMPONENT( Bounds, "bounds" );
-
 	//================================================================================================================================
 	//================================================================================================================================
-	void Bounds::SetInfo( ComponentInfo& _info )
+	void Bounds::SetInfo( EcsComponentInfo& _info )
 	{
-		_info.init = &Bounds::Init;
+		_info.name = "bounds";
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void Bounds::Init( EcsWorld& _world, Component& _component )
+	void Bounds::Init( EcsWorld& /*_world*/, EcsEntity /*_entity*/, EcsComponent& _component )
 	{
 		Bounds& bounds = static_cast<Bounds&>( _component );
 		bounds.aabb = AABB();

@@ -20,7 +20,7 @@ namespace fan
 {
 	//================================================================================================================================
 	//================================================================================================================================
-	Signature S_HostSpawnShip::GetSignature( const EcsWorld& _world )
+	EcsSignature S_HostSpawnShip::GetSignature( const EcsWorld& _world )
 	{
 		return
 			_world.GetSignature<HostConnection>() |
@@ -30,19 +30,23 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void S_HostSpawnShip::Run( EcsWorld& _world, const std::vector<EntityID>& _entities, const float _delta )
+	void S_HostSpawnShip::Run( EcsWorld& _world, const EcsView& _view, const float _delta )
 	{
 		if( _delta == 0.f ) { return; }
 
-		HostManager& hostManager = _world.GetSingletonComponent<HostManager>();
-		LinkingContext& linkingContext = _world.GetSingletonComponent<LinkingContext>();
-		const Game& game = _world.GetSingletonComponent<Game>();
+		HostManager& hostManager = _world.GetSingleton<HostManager>();
+		LinkingContext& linkingContext = _world.GetSingleton<LinkingContext>();
+		const Game& game = _world.GetSingleton<Game>();
 
-		for( EntityID entityID : _entities )
+		auto hostConnectionIt = _view.begin<HostConnection>();
+		auto hostDataIt = _view.begin<HostGameData>();
+		auto hostReplicationIt = _view.begin<HostReplication>();
+		for( ; hostConnectionIt != _view.end<HostConnection>(); ++hostConnectionIt, ++hostDataIt, ++hostReplicationIt )
 		{
-			HostConnection&  hostConnection  = _world.GetComponent< HostConnection >( entityID );
-			HostGameData&	 hostData		 = _world.GetComponent< HostGameData >( entityID );
-			HostReplication& hostReplication = _world.GetComponent< HostReplication >( entityID );
+			const EcsEntity entity = hostConnectionIt.Entity();
+			const HostConnection& hostConnection = *hostConnectionIt;
+			HostGameData& hostData = *hostDataIt;
+			HostReplication& hostReplication = *hostReplicationIt;
 
 			if( hostConnection.state == HostConnection::Connected )
 			{
@@ -60,25 +64,27 @@ namespace fan
 							, HostReplication::ResendUntilReplicated
 						);
 
-						hostData.nextPlayerStateFrame = spawnFrame + 60; // next player state snapshot done later
+						hostData.nextPlayerStateFrame = spawnFrame + 60; // next player state snapshot will be done later
 
 						// replicate other ships
 						for( const auto& pair : hostManager.hostHandles )
 						{
-							const EntityHandle otherHostHandle = pair.second;
-							const EntityID otherHostID = _world.GetEntityID( otherHostHandle );
+							const EcsHandle hostHandle = _world.GetHandle(entity);
+							const EcsHandle otherHostHandle = pair.second;							
 
-							if( otherHostID != entityID )
+							if( otherHostHandle != hostHandle )
 							{
+								const EcsEntity otherHostEntity = _world.GetEntity( otherHostHandle );
+
 								// replicate new host on all other hosts
-								HostReplication& otherHostReplication = _world.GetComponent< HostReplication >( otherHostID );
+								HostReplication& otherHostReplication = _world.GetComponent< HostReplication >( otherHostEntity );
 								otherHostReplication.Replicate(
 									ClientRPC::RPCSpawnShip( hostData.spaceshipID, spawnFrame )
 									, HostReplication::ResendUntilReplicated
 								);
 
  								// replicate all other hosts on new host		
-								HostGameData& otherHostData = _world.GetComponent< HostGameData >( otherHostID );
+								HostGameData& otherHostData = _world.GetComponent< HostGameData >( otherHostEntity );
 								hostReplication.Replicate(
 									ClientRPC::RPCSpawnShip( otherHostData.spaceshipID, game.frameIndex )
 									, HostReplication::ResendUntilReplicated
@@ -93,7 +99,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	Signature S_HostSyncFrame::GetSignature( const EcsWorld& _world )
+	EcsSignature S_HostSyncFrame::GetSignature( const EcsWorld& _world )
 	{
 		return
 			_world.GetSignature<HostConnection>() |
@@ -102,17 +108,18 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void S_HostSyncFrame::Run( EcsWorld& _world, const std::vector<EntityID>& _entities, const float _delta )
+	void S_HostSyncFrame::Run( EcsWorld& _world, const EcsView& _view, const float _delta )
 	{
 		if( _delta == 0.f ) { return; }
 
-		const HostManager& hostManager = _world.GetSingletonComponent<HostManager>();
-		const Game& game = _world.GetSingletonComponent<Game>();
+		const Game& game = _world.GetSingleton<Game>();
 
-		for( EntityID entityID : _entities )
+		auto hostConnectionIt = _view.begin<HostConnection>();
+		auto hostReplicationIt = _view.begin<HostReplication>();
+		for( ; hostConnectionIt != _view.end<HostConnection>(); ++hostConnectionIt, ++hostReplicationIt )
 		{
-			HostConnection&		hostConnection  = _world.GetComponent< HostConnection >( entityID );
-			HostReplication&	hostReplication = _world.GetComponent< HostReplication >( entityID );
+			HostConnection& hostConnection = *hostConnectionIt;
+			HostReplication& hostReplication = *hostReplicationIt;
 
 			// sync the client frame index with the server
 			const double currentTime = Time::Get().ElapsedSinceStartup();
@@ -141,8 +148,7 @@ namespace fan
 							, HostReplication::ResendUntilReplicated
 						);
 						hostConnection.lastSync = currentTime;
-						success.Connect( &HostConnection::OnSyncSuccess, &hostConnection );
-
+						success.Connect( &HostConnection::OnSyncSuccess, _world, _world.GetHandle( hostConnectionIt.Entity() ) );
 						if( diff > 10 )
 						{
 							Debug::Log() << "shifting host frame index : " << min + targetFrameDifference;
@@ -157,26 +163,26 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	Signature S_HostSaveState::GetSignature( const EcsWorld& _world )
+	EcsSignature S_HostSaveState::GetSignature( const EcsWorld& _world )
 	{
 		return _world.GetSignature<HostGameData>();
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void S_HostSaveState::Run( EcsWorld& _world, const std::vector<EntityID>& _entities, const float _delta )
+	void S_HostSaveState::Run( EcsWorld& _world, const EcsView& _view, const float _delta )
 	{
 		if( _delta == 0.f ) { return; }
 
-		const Game& game = _world.GetSingletonComponent<Game>();
+		const Game& game = _world.GetSingleton<Game>();
 
-		for( EntityID entityID : _entities )
+		for( auto hostDataIt = _view.begin<HostGameData>(); hostDataIt != _view.end<HostGameData>(); ++hostDataIt )
 		{
-			HostGameData& hostData = _world.GetComponent< HostGameData >( entityID );
+			HostGameData& hostData = *hostDataIt;
 
 			if(  hostData.spaceshipHandle != 0 && game.frameIndex >= hostData.nextPlayerStateFrame )
 			{
-				const EntityID shipEntityID = _world.GetEntityID( hostData.spaceshipHandle );
+				const EcsEntity shipEntityID = _world.GetEntity( hostData.spaceshipHandle );
 				const Rigidbody& rb = _world.GetComponent<Rigidbody>( shipEntityID );
 				const Transform& transform = _world.GetComponent<Transform>( shipEntityID );
 				hostData.nextPlayerState.frameIndex = game.frameIndex;
@@ -192,22 +198,22 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	Signature S_HostUpdateInput::GetSignature( const EcsWorld& _world )
+	EcsSignature S_HostUpdateInput::GetSignature( const EcsWorld& _world )
 	{
 		return _world.GetSignature<HostGameData>();
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void S_HostUpdateInput::Run( EcsWorld& _world, const std::vector<EntityID>& _entities, const float _delta )
+	void S_HostUpdateInput::Run( EcsWorld& _world, const EcsView& _view, const float _delta )
 	{
 		if( _delta == 0.f ) { return; }
 
-		const Game& game = _world.GetSingletonComponent<Game>();
+		const Game& game = _world.GetSingleton<Game>();
 
-		for( EntityID entityID : _entities )
+		for( auto hostDataIt = _view.begin<HostGameData>(); hostDataIt != _view.end<HostGameData>(); ++hostDataIt )
 		{
-			HostGameData& hostData = _world.GetComponent< HostGameData >( entityID );
+			HostGameData& hostData = *hostDataIt;
 
 			if( hostData.spaceshipID != 0 )
 			{
@@ -231,7 +237,7 @@ namespace fan
 					const PacketInput::InputData& inputData = hostData.inputs.front();
 					hostData.inputs.pop();
 
-					const EntityID shipEntityID = _world.GetEntityID( hostData.spaceshipHandle );
+					const EcsEntity shipEntityID = _world.GetEntity( hostData.spaceshipHandle );
 					PlayerInput& input = _world.GetComponent<PlayerInput>( shipEntityID );
 					input.orientation = btVector3( inputData.orientation.x, 0.f, inputData.orientation.y );
 					input.left = inputData.left ? 1.f : ( inputData.right ? -1.f : 0.f );

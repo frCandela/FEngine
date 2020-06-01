@@ -18,23 +18,20 @@
 
 namespace fan
 {
-	REGISTER_SINGLETON_COMPONENT( ServerNetworkManager );
-
 	//================================================================================================================================
 	//================================================================================================================================
-	void ServerNetworkManager::SetInfo( SingletonComponentInfo& _info )
+	void ServerNetworkManager::SetInfo( EcsSingletonInfo& _info )
 	{
 		_info.icon = ImGui::NETWORK16;
-		_info.init = &ServerNetworkManager::Init;
 		_info.onGui = &ServerNetworkManager::OnGui;
 		_info.name = "server network manager";
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void ServerNetworkManager::Init( EcsWorld& _world, SingletonComponent& _component )
+	void ServerNetworkManager::Init( EcsWorld& /*_world*/, EcsSingleton& /*_component*/ )
 	{
-		ServerNetworkManager& netManager = static_cast<ServerNetworkManager&>( _component );
+		//ServerNetworkManager& netManager = static_cast<ServerNetworkManager&>( _component );
 	}
 
 	//================================================================================================================================
@@ -42,16 +39,19 @@ namespace fan
 	void ServerNetworkManager::Start( EcsWorld& _world )
 	{
 		// create the network scene root for ordering net objects
-		HostManager& hostManager = _world.GetSingletonComponent<HostManager>();
-		Scene& scene = _world.GetSingletonComponent<Scene>();
-		hostManager.netRoot = &scene.CreateSceneNode( "net root", scene.root );
+		HostManager& hostManager = _world.GetSingleton<HostManager>();
+		Scene& scene = _world.GetSingleton<Scene>();
+		hostManager.netRoot = &scene.CreateSceneNode( "net root", &scene.GetRootNode() );
 
 		// bind
-		ServerConnection& connection = _world.GetSingletonComponent<ServerConnection>();
-		Debug::Log() << "bind on port " << connection.serverPort << Debug::Endl();
+		ServerConnection& connection = _world.GetSingleton<ServerConnection>();	
 		if( connection.socket.Bind( connection.serverPort ) != sf::Socket::Done )
 		{
 			Debug::Error() << "bind failed on port " << connection.serverPort << Debug::Endl();
+		}
+		else
+		{
+			Debug::Log() << "bind on port " << connection.serverPort << Debug::Endl();
 		}
 	}
 
@@ -59,15 +59,16 @@ namespace fan
 	//================================================================================================================================
 	void ServerNetworkManager::Stop( EcsWorld& _world )
 	{
-		ServerConnection& connection = _world.GetSingletonComponent<ServerConnection>();
+		ServerConnection& connection = _world.GetSingleton<ServerConnection>();
+		Debug::Log() << "unbind from port " << connection.socket.GetPort() << Debug::Endl();
 		connection.socket.Unbind();
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void ServerNetworkManager::OnGui( EcsWorld&, SingletonComponent& _component )
+	void ServerNetworkManager::OnGui( EcsWorld& /*_world*/, EcsSingleton& /*_component*/ )
 	{
-		ServerNetworkManager& netManager = static_cast<ServerNetworkManager&>( _component );
+		//ServerNetworkManager& netManager = static_cast<ServerNetworkManager&>( _component );
 
 		ImGui::Indent(); ImGui::Indent();
 		{

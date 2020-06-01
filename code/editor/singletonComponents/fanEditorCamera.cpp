@@ -12,27 +12,22 @@
 
 namespace fan
 {
-	REGISTER_SINGLETON_COMPONENT( EditorCamera );
-
 	//================================================================================================================================
 	//================================================================================================================================
-	void EditorCamera::SetInfo( SingletonComponentInfo& _info )
+	void EditorCamera::SetInfo( EcsSingletonInfo& _info )
 	{
 		_info.icon = ImGui::CAMERA16;
-		_info.init = &EditorCamera::Init;
 		_info.onGui = &EditorCamera::OnGui;
 		_info.name = "editor camera";
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void EditorCamera::Init( EcsWorld& _world, SingletonComponent& _component )
+	void EditorCamera::Init( EcsWorld& /*_world*/, EcsSingleton& _component )
 	{
 		EditorCamera& editorCamera = static_cast<EditorCamera&>( _component );
 
-		editorCamera.cameraNode = nullptr;
-		editorCamera.transform = nullptr;
-		editorCamera.camera = nullptr;
+		editorCamera.cameraHandle = 0;
 		editorCamera.speed = 10.f;
 		editorCamera.speedMultiplier = 3.f;
 		editorCamera.xySensitivity = btVector2( 0.005f, 0.005f );
@@ -40,7 +35,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void EditorCamera::OnGui( EcsWorld&, SingletonComponent& _component )
+	void EditorCamera::OnGui( EcsWorld&, EcsSingleton& _component )
 	{
 		EditorCamera& editorCamera = static_cast<EditorCamera&>( _component );
 
@@ -57,8 +52,14 @@ namespace fan
 	//================================================================================================================================
 	// updates the editor camera position & rotation
 	//================================================================================================================================
-	void EditorCamera::Update( EditorCamera& _camera, const float _delta )
+	void EditorCamera::Update( EcsWorld& _world, const float _delta )
 	{
+		EditorCamera& editorCamera = _world.GetSingleton<EditorCamera>();
+		const EcsEntity cameraEntity = _world.GetEntity( editorCamera.cameraHandle );
+		Transform& cameraTransform = _world.GetComponent<Transform>( cameraEntity );
+		Camera&	cameraCamera = _world.GetComponent<Camera>( cameraEntity );
+
+
 		if( Mouse::Get().GetButtonPressed( Mouse::button1 ) )
 		{
 			Mouse::Get().LockCursor( true );
@@ -68,7 +69,7 @@ namespace fan
 			Mouse::Get().LockCursor( false );
 		}
 
-		btVector3 position = _camera.transform->GetPosition();
+		btVector3 position = cameraTransform.GetPosition();
 
 		float forwardAxis	= Input::Get().Manager().GetAxis( "editor_forward" );
 		float upAxis		= Input::Get().Manager().GetAxis( "editor_up" );
@@ -76,15 +77,15 @@ namespace fan
 		float boost			= Input::Get().Manager().GetAxis( "editor_boost" );
 
 		// Calculates speed
-		float realSpeed = _camera.speed;
+		float realSpeed = editorCamera.speed;
 		if( boost > 0.f )
 		{
-			realSpeed *= _camera.speedMultiplier;
+			realSpeed *= editorCamera.speedMultiplier;
 		}
 
-		position += _delta * realSpeed * leftAxis * _camera.transform->Left();		// Camera goes left		
-		position += _delta * realSpeed * upAxis * _camera.transform->Up();			// Camera goes up		
-		position += _delta * realSpeed * forwardAxis * _camera.transform->Forward();	// Camera goes forward
+		position += _delta * realSpeed * leftAxis * cameraTransform.Left();		// Camera goes left		
+		position += _delta * realSpeed * upAxis * cameraTransform.Up();			// Camera goes up		
+		position += _delta * realSpeed * forwardAxis * cameraTransform.Forward();	// Camera goes forward
 
 		// Camera rotation
 		const btVector2 mouseDelta = Mouse::Get().GetDelta();
@@ -93,12 +94,12 @@ namespace fan
 		{
 			// Rotation depending on mouse movement
 			const float invertAxis = -1;
-			const btQuaternion rotationY( btVector3::Up(), -_camera.xySensitivity.x() * mouseDelta.x() );
-			const btQuaternion rotationX( invertAxis * _camera.transform->Left(), -_camera.xySensitivity.y() * mouseDelta.y() );
-			_camera.transform->SetRotationQuat( rotationX * rotationY * _camera.transform->GetRotationQuat() );
+			const btQuaternion rotationY( btVector3::Up(), -editorCamera.xySensitivity.x() * mouseDelta.x() );
+			const btQuaternion rotationX( invertAxis * cameraTransform.Left(), -editorCamera.xySensitivity.y() * mouseDelta.y() );
+			cameraTransform.SetRotationQuat( rotationX * rotationY * cameraTransform.GetRotationQuat() );
 
 			// Remove roll
-			const btVector3 relativeLeft = _camera.transform->Left();
+			const btVector3 relativeLeft = cameraTransform.Left();
 			const btVector3 leftNoRoll( relativeLeft.x(), 0, relativeLeft.z() );
 			const btVector3 axis = relativeLeft.cross( leftNoRoll );
 			const float angle = leftNoRoll.angle( relativeLeft );
@@ -107,12 +108,12 @@ namespace fan
 
 				const btQuaternion rot( axis, angle );
 
-				_camera.transform->SetRotationQuat( rot * _camera.transform->GetRotationQuat() );
+				cameraTransform.SetRotationQuat( rot * cameraTransform.GetRotationQuat() );
 			}
 		}
-		_camera.transform->SetPosition( position );
+		cameraTransform.SetPosition( position );
 
-		const Ray ray = _camera.camera->ScreenPosToRay( *_camera.transform, btVector2( 0.9f, 0.9f ) );
+		const Ray ray = cameraCamera.ScreenPosToRay( cameraTransform, btVector2( 0.9f, 0.9f ) );
 		const float size = 0.002f;
 		btVector3 offset = ray.origin + 0.1f * ray.direction;
 	}
@@ -123,23 +124,21 @@ namespace fan
 	//================================================================================================================================
 	void EditorCamera::CreateEditorCamera( EcsWorld& _world )
 	{
-		Scene& scene = _world.GetSingletonComponent< Scene >();
+		Scene& scene = _world.GetSingleton< Scene >();
 
 		// Editor Camera
-		SceneNode& cameraNode = scene.CreateSceneNode( "editor_camera", scene.root );
-		EntityID cameraID = _world.GetEntityID( cameraNode.handle );
+		SceneNode& cameraNode = scene.CreateSceneNode( "editor_camera", &scene.GetRootNode() );
+		EcsEntity cameraID = _world.GetEntity( cameraNode.handle );
 		cameraNode.AddFlag( SceneNode::NOT_SAVED | SceneNode::NO_DELETE | SceneNode::NO_RAYCAST );
 
 		Transform& transform = _world.AddComponent< Transform >( cameraID );
-		Camera& camera = _world.AddComponent< Camera >( cameraID );
+		_world.AddComponent< Camera >( cameraID );
 
 		transform.SetPosition( btVector3( 0, 0, -2 ) );
-		scene.mainCamera = &cameraNode;
+		scene.mainCameraHandle = cameraNode.handle;
 
 		// set editor camera singleton
-		EditorCamera& editorCamera = _world.GetSingletonComponent<EditorCamera>();
-		editorCamera.cameraNode = &cameraNode;
-		editorCamera.transform = &transform;
-		editorCamera.camera = &camera;
+		EditorCamera& editorCamera = _world.GetSingleton<EditorCamera>();
+		editorCamera.cameraHandle = cameraNode.handle;
 	}
 }

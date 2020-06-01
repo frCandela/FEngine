@@ -4,23 +4,21 @@
 
 namespace fan
 {
-	REGISTER_COMPONENT( SpaceShip, "spaceship" );
-
 	//================================================================================================================================
 	//================================================================================================================================
-	void SpaceShip::SetInfo( ComponentInfo& _info )
+	void SpaceShip::SetInfo( EcsComponentInfo& _info )
 	{
 		_info.icon = ImGui::IconType::SPACE_SHIP16;
 		_info.onGui = &SpaceShip::OnGui;
-		_info.init = &SpaceShip::Init;
 		_info.load = &SpaceShip::Load;
 		_info.save = &SpaceShip::Save;
 		_info.editorPath = "game/player/";
+		_info.name = "spaceship";
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void SpaceShip::Init( EcsWorld& _world, Component& _component )
+	void SpaceShip::Init( EcsWorld& _world, EcsEntity /*_entity*/, EcsComponent& _component )
 	{
 		SpaceShip& spaceship					= static_cast<SpaceShip&>( _component );
 
@@ -41,12 +39,12 @@ namespace fan
 		spaceship.leftParticles.Init( _world );
 		spaceship.rightParticles.Init( _world );
 
-		spaceship.deathFx = nullptr;
+		spaceship.deathFx.Set( nullptr );
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void SpaceShip::OnGui( EcsWorld& _world, EntityID _entityID, Component& _component )
+	void SpaceShip::OnGui( EcsWorld& /*_world*/, EcsEntity /*_entityID*/, EcsComponent& _component )
 	{
 		SpaceShip& spaceship = static_cast<SpaceShip&>( _component );
 
@@ -82,7 +80,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void SpaceShip::Save( const Component& _component, Json& _json )
+	void SpaceShip::Save( const EcsComponent& _component, Json& _json )
 	{
 		const SpaceShip& spaceship = static_cast<const SpaceShip&>( _component );
 
@@ -105,7 +103,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void SpaceShip::Load( Component& _component, const Json& _json )
+	void SpaceShip::Load( EcsComponent& _component, const Json& _json )
 	{
 		SpaceShip& spaceship = static_cast<SpaceShip&>( _component );
 

@@ -1,6 +1,6 @@
 #pragma  once
 
-#include "ecs/fanComponent.hpp"
+#include "ecs/fanEcsComponent.hpp"
 
 namespace fan
 {
@@ -10,9 +10,9 @@ namespace fan
 	// node of the scene tree
 	// Contains reference to a parent, a list of childs and an entity handle 
 	//==============================================================================================================================================================
-	struct SceneNode : public Component
+	struct SceneNode : public EcsComponent
 	{
-		DECLARE_COMPONENT( SceneNode )
+		ECS_COMPONENT( SceneNode )
 	public:
 		enum Flags
 		{
@@ -22,19 +22,20 @@ namespace fan
 			, NO_RAYCAST = 1 << 2 // node cannot be selected by raycast
 		};
 
-		static void SetInfo( ComponentInfo& _info );
-		static void Init( EcsWorld& _world, Component& _component );
-		static void Destroy( EcsWorld& _world, Component& _component );
-		static void OnGui( EcsWorld& _world, EntityID _entityID, Component& _component );
+		static void SetInfo( EcsComponentInfo& _info );
+		static void Init( EcsWorld& _world, EcsEntity _entity, EcsComponent& _component );
+		static void Destroy( EcsWorld& _world, EcsEntity _entity, EcsComponent& _component );
+		static void OnGui( EcsWorld& _world, EcsEntity _entityID, EcsComponent& _component );
 
-		void Build( const std::string& _name, Scene& _scene, const EntityHandle _entityHandle, const uint32_t _uniqueID, SceneNode* const _parent);
+		void Build( const std::string& _name, Scene& _scene, const EcsHandle _handle, SceneNode* const _parent);
 
-		bool IsRoot() const { return parent == nullptr; }
+		bool IsRoot() const { return parentHandle == 0; }
 		bool IsAncestorOf( const SceneNode& _node ) const;
 		void RemoveChild( const SceneNode& _child );
 		bool HasChild( const SceneNode& _child );
 		void AddChild( SceneNode& _child );
 		void SetParent( SceneNode* _parent );
+		SceneNode& GetParent() const;
 		void InsertBelow( SceneNode& _brother );
 		bool HasFlag( uint32_t _flag ) const { return flags & _flag; }
 		void AddFlag( uint32_t _flag ) {  flags |= _flag; }
@@ -42,12 +43,11 @@ namespace fan
 
 		static void GetDescendantsOf( SceneNode& _root, std::vector<SceneNode*>& _outList );
 
-		EntityHandle			handle;
-		uint32_t				uniqueID;
+		EcsHandle				handle;
 		uint32_t				flags;
 		Scene*					scene;
-		SceneNode*				parent;
-		std::vector<SceneNode*> childs;
+		EcsHandle				parentHandle;
+		std::vector<EcsHandle>  childs;
 		std::string				name;
 	};
 	static constexpr size_t sizeof_sceneNode = sizeof( SceneNode );
