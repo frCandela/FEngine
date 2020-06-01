@@ -18,6 +18,7 @@ namespace fan
 		void* result = std::align( _alignment, _componentSize, m_alignedBuffer, space );
 		assert( result != nullptr );
 		assert( result == m_alignedBuffer );
+		(void)result;
 
 		m_capacity = int( space / _componentSize );
 	}
