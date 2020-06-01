@@ -12,8 +12,7 @@ set_target_properties(${APP_NAME} PROPERTIES
 
 set( APP_NAME "fengine_editor")
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR})
-set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin)
-set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin)
+
 
 include_directories( code )
 include_directories( middleware )
@@ -23,8 +22,12 @@ include_directories( "C:/VulkanSDK/1.1.106.0/Include" )
 link_directories("C:/VulkanSDK/1.1.106.0/Lib")
 IF(${CMAKE_BUILD_TYPE} MATCHES Debug)
     link_directories(lib/debug)
+    set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin/debug )
+    set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin/debug )
 ELSEIF(${CMAKE_BUILD_TYPE} MATCHES Release)
     link_directories(lib/release)
+    set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin/release )
+    set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin/release )
 ENDIF()
 
 #Removes default warning setting
