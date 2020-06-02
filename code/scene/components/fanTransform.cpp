@@ -31,46 +31,6 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void Transform::OnGui( EcsWorld& /*_world*/, EcsEntity /*_entityID*/, EcsComponent& _component )
-	{
-		Transform& transform = static_cast<Transform&>( _component );
-		ImGui::PushItemWidth( 0.6f * ImGui::GetWindowWidth() - 16 );
-		{
-			// Position
-			if( ImGui::Button( "##TransPos" ) )
-			{
-				transform.SetPosition( btVector3( 0, 0, 0 ) );
-			} ImGui::SameLine();
-			btVector3 position = transform.GetPosition();			
-			if( ImGui::DragFloat3( "position", &position[0], 0.1f ) )
-			{
-				transform.SetPosition( position );
-			}
-
-			// rotation
-			if( ImGui::Button( "##TransRot" ) )
-			{
-				transform.SetRotationQuat( btQuaternion::getIdentity() );
-			} ImGui::SameLine();
-			btVector3 rotation = transform.GetRotationEuler();
-			if( ImGui::DragFloat3( "rotation", &rotation[0], 0.1f ) )
-			{
-				transform.SetRotationEuler( rotation );
-			}
-
-			// Scale
-			if( ImGui::Button( "##TransScale" ) )
-			{
-				transform.SetScale( btVector3( 1, 1, 1 ) );
-			} ImGui::SameLine();
-			ImGui::DragFloat3( "scale", &transform.scale[0], 0.1f );
-
-		}
-		ImGui::PopItemWidth();
-	}
-
-	//================================================================================================================================
-	//================================================================================================================================
 	void Transform::Save( const EcsComponent& _component, Json& _json )
 	{
 		const Transform& transform = static_cast<const Transform&>( _component );
@@ -96,32 +56,6 @@ namespace fan
 		transform.transform.setOrigin( tmpVec );
 		transform.transform.setRotation( tmpQuat );
  	}
-
-	//================================================================================================================================
-	//================================================================================================================================
-	void Transform::NetSave( const EcsComponent& _component, sf::Packet& _packet )
-	{
-		const Transform& transform = static_cast<const Transform&>( _component );
-		const btVector3 position = transform.GetPosition();
-		const float rotation = transform.GetRotationEuler().y();
-
-		_packet << position[0] << position[2];
-		_packet << rotation;
-	}
-
-	//================================================================================================================================
-	//================================================================================================================================
-	void Transform::NetLoad( EcsComponent& _component, sf::Packet& _packet )
-	{
-		Transform& transform = static_cast<Transform&>( _component );
-		btVector3 position( 0.f, 0.f, 0.f );
-		float rotation;
-		_packet >> position[0] >> position[2];
-		_packet >> rotation;
-
-		transform.SetRotationEuler( btVector3( 0.f, rotation, 0.f ) );
-		transform.SetPosition( position );
-	}
 
 	//================================================================================================================================
 	//================================================================================================================================
@@ -244,4 +178,75 @@ namespace fan
 		btVector3 transformedPoint = invertScale * ( rotationTransform.inverse() * _point );
 		return transformedPoint;
 	}
+
+	//================================================================================================================================
+	//================================================================================================================================
+	void Transform::NetSave( const EcsComponent& _component, sf::Packet& _packet )
+	{
+		const Transform& transform = static_cast<const Transform&>( _component );
+		const btVector3 position = transform.GetPosition();
+		const float yAxis = transform.GetRotationQuat().getAxis().y();
+		float rotation = btDegrees( transform.GetRotationQuat().getAngle() );
+		if( yAxis < 0.f )
+		{
+			rotation = -rotation;
+		}
+
+		_packet << position[0] << position[2];
+		_packet << rotation;
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
+	void Transform::NetLoad( EcsComponent& _component, sf::Packet& _packet )
+	{
+		Transform& transform = static_cast<Transform&>( _component );
+		btVector3 position( 0.f, 0.f, 0.f );
+		float rotation;
+		_packet >> position[0] >> position[2];
+		_packet >> rotation;
+
+		transform.SetRotationEuler( btVector3( 0.f, rotation, 0.f ) );
+		transform.SetPosition( position );
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
+	void Transform::OnGui( EcsWorld& /*_world*/, EcsEntity /*_entityID*/, EcsComponent& _component )
+	{
+		Transform& transform = static_cast<Transform&>( _component );
+		ImGui::PushItemWidth( 0.6f * ImGui::GetWindowWidth() - 16 );
+		{
+			// Position
+			if( ImGui::Button( "##TransPos" ) )
+			{
+				transform.SetPosition( btVector3( 0, 0, 0 ) );
+			} ImGui::SameLine();
+			btVector3 position = transform.GetPosition();
+			if( ImGui::DragFloat3( "position", &position[0], 0.1f ) )
+			{
+				transform.SetPosition( position );
+			}
+
+			// rotation
+			if( ImGui::Button( "##TransRot" ) )
+			{
+				transform.SetRotationQuat( btQuaternion::getIdentity() );
+			} ImGui::SameLine();
+			btVector3 rotation = transform.GetRotationEuler();
+			if( ImGui::DragFloat3( "rotation", &rotation[0], 0.1f ) )
+			{
+				transform.SetRotationEuler( rotation );
+			}
+
+			// Scale
+			if( ImGui::Button( "##TransScale" ) )
+			{
+				transform.SetScale( btVector3( 1, 1, 1 ) );
+			} ImGui::SameLine();
+			ImGui::DragFloat3( "scale", &transform.scale[0], 0.1f );
+		}
+		ImGui::PopItemWidth();
+	}
+
 }
