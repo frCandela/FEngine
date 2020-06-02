@@ -108,7 +108,7 @@ namespace fan
 				if( linkingContext.netIDToEcsHandle.find( pair.first ) == linkingContext.netIDToEcsHandle.end() )
 				{
 					// spawn
-					const EcsHandle handle = Game::SpawnSpaceship( _world );
+					const EcsHandle handle = Game::SpawnSpaceship( _world, false, false );
 					linkingContext.AddEntity( handle, pair.first );
 				}
 				netManager.shipsToSpawn.erase( netManager.shipsToSpawn.begin() + i );

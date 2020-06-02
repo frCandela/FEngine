@@ -13,6 +13,8 @@
 #include "game/singletonComponents/fanCollisionManager.hpp"
 #include "game/fanGameClient.hpp"
 #include "game/fanGameServer.hpp"
+#include "game/components/fanPlayerInput.hpp"
+#include "game/components/fanPlayerController.hpp"
 #include "network/components/fanClientGameData.hpp"
 
 namespace fan
@@ -75,9 +77,11 @@ namespace fan
 	}
 
 	//================================================================================================================================
-	// generates the spaceship entity from the game prefab
+	// Generates the spaceship entity from the game prefab
+	// PlayerInput component causes the ship to be driven by inputs ( forward, left, right, boost etc. )
+	// PlayerController automatically updates the PlayerInput with local inputs from mouse & keyboard
 	//================================================================================================================================
-	EcsHandle Game::SpawnSpaceship( EcsWorld& _world )
+	EcsHandle Game::SpawnSpaceship( EcsWorld& _world, const bool _hasPlayerInput, const bool _hasPlayerController )
 	{
 		// spawn the spaceship	
 		Game& game = _world.GetSingleton< Game >();
@@ -86,6 +90,15 @@ namespace fan
 			Scene& scene = _world.GetSingleton<Scene>();
 			SceneNode& spaceshipNode = *game.spaceshipPrefab->Instanciate( scene.GetRootNode() );
 			EcsEntity spaceshipID = _world.GetEntity( spaceshipNode.handle );
+			
+			if( _hasPlayerInput )
+			{
+				_world.AddComponent<PlayerInput>( spaceshipID );
+			}
+			if( _hasPlayerController )
+			{
+				_world.AddComponent<PlayerController>( spaceshipID );
+			}
 
 			if( _world.HasComponent<Transform>( spaceshipID )
 				&& _world.HasComponent<Rigidbody>( spaceshipID )

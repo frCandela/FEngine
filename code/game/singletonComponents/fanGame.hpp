@@ -37,7 +37,7 @@ namespace fan
 		GameClient* gameClient = nullptr;
 		GameServer* gameServer = nullptr;
 
-		static EcsHandle SpawnSpaceship( EcsWorld& _world );
+		static EcsHandle SpawnSpaceship( EcsWorld& _world, const bool _hasPlayerInput, const bool _hasPlayerController );
 		void OnShiftFrameIndex( const int _framesDelta );
 	};
 }

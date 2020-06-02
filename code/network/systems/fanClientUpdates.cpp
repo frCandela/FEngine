@@ -43,14 +43,8 @@ namespace fan
 				assert( gameData.spaceshipNetID != 0 );
 
 				gameData.spaceshipSpawnFrameIndex = 0;
-				gameData.spaceshipHandle = Game::SpawnSpaceship( _world );
+				gameData.spaceshipHandle = Game::SpawnSpaceship( _world, true, true );
 				linkingContext.AddEntity( gameData.spaceshipHandle, gameData.spaceshipNetID );
-
-				const EcsEntity spaceshipID = _world.GetEntity( gameData.spaceshipHandle );
-				if( gameData.spaceshipHandle != 0 )
-				{
-					_world.AddComponent<PlayerController>( spaceshipID );
-				}
 			}
 		}
 	}
