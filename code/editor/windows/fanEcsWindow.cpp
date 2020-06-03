@@ -2,6 +2,7 @@
 
 #include <sstream>
 #include "core/time/fanProfiler.hpp"
+#include "core/fanDebug.hpp"
 #include "ecs/fanEcsWorld.hpp"
 #include "ecs/fanEcsSystem.hpp"
 #include "ecs/fanEcsTag.hpp"
@@ -62,12 +63,26 @@ namespace fan
 				ssSignature << archetype->GetSignature();
 				ImGui::Text( ssSignature.str().c_str() );	ImGui::NextColumn();		// signature
 				ImGui::Text( "%d ", archetype->Size() );	ImGui::NextColumn();	// size
+				if( ImGui::IsItemHovered() )
+				{
+					ImGui::BeginTooltip();
+					ImGui::PushTextWrapPos( ImGui::GetFontSize() * 35.0f );
+					std::stringstream ss;
+					for (int i = 0; i < archetype->Size() ; i++)
+					{
+						ss <<archetype->GetEntityData( i ).handle << " ";
+					}
+					ImGui::TextUnformatted( ss.str().c_str() );
+					ImGui::PopTextWrapPos();
+					ImGui::EndTooltip();
+				}
+
 
 				// chunks
 				const std::vector< EcsComponentInfo >& infos = m_world->GetVectorComponentInfo();
-				for( int componentIndex = 0; componentIndex < archetype->Size(); componentIndex++ )
+				for( int componentIndex = 0; componentIndex < m_world->NumComponents(); componentIndex++ )
 				{
-					if( archetype->GetChunkVector(componentIndex).NumChunk() != 0 )
+					if( archetype->GetSignature()[componentIndex] )
 					{
 						const EcsComponentInfo& info = infos[componentIndex];
 						std::stringstream ss;
