@@ -14,6 +14,7 @@ namespace fan
 		_info.destroy = &MotionState::Destroy;
 		_info.save = &MotionState::Save;
 		_info.load = &MotionState::Load;
+		_info.onGui = &MotionState::OnGui;
 		_info.editorPath = "/";
 		_info.name = "motion state";
 	}
@@ -36,4 +37,8 @@ namespace fan
 		delete motionState.motionState;
 		motionState.motionState = nullptr;
 	}
+
+	//================================================================================================================================
+	//================================================================================================================================
+	void MotionState::OnGui( EcsWorld& /*_world*/, EcsEntity /*_entityID*/, EcsComponent& /*_component*/ ){}
 }
