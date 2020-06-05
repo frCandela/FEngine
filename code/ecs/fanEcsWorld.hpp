@@ -28,6 +28,16 @@ namespace fan
 	};
 
 	//================================================================================================================================
+	// Contains a component and its destructor, destructor is called at the end of the frame before ApplyTransitions
+	//================================================================================================================================
+	struct DestroyedComponent
+	{
+		EcsEntity entity;
+		EcsComponent& component;
+		void ( *destroy )( EcsWorld&, EcsEntity, EcsComponent& );
+	};
+
+	//================================================================================================================================
 	//================================================================================================================================
 	class EcsWorld
 	{
@@ -47,6 +57,7 @@ namespace fan
 		void		RemoveHandle	( const EcsEntity _entity );
 		EcsHandle	GetNextHandle() const { return m_nextHandle; }
 		void		SetNextHandle( const EcsHandle  _handle ) { m_nextHandle = _handle; }
+		bool		HandleExists( const EcsHandle _handle ) { return m_handles.find( _handle ) != m_handles.end();  }
 
 		// Singletons
 		template <typename _SingletonType >	void			AddSingletonType();
@@ -109,8 +120,7 @@ namespace fan
 		std::unordered_map< uint32_t, EcsSingletonInfo >	m_singletonInfos;
 		std::vector< EcsComponentInfo >						m_componentsInfo;
 		std::vector< EcsTransition >						m_transitions;
-
-		bool m_isApplyingTransitions = false;	// Prevent modifying transitions while applying transition ( for components destroy() )
+		std::vector< DestroyedComponent >					m_destroyedComponents;
 	};
 
 	//================================================================================================================================

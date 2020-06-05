@@ -57,27 +57,22 @@ namespace fan
 				nodesstack.push( child );
 			}			
 
-			// find all child nodes
-			std::set<SceneNode* > nodesToDelete;
+			// find all child nodes and kills them
 			while( !nodesstack.empty() )
-			{				
-				SceneNode& childNode = _world.GetComponent<SceneNode>( _world.GetEntity( nodesstack.top() ));
+			{			
+				const EcsEntity childEntity = _world.GetEntity( nodesstack.top() );
+				SceneNode& childNode = _world.GetComponent<SceneNode>( childEntity );
 				nodesstack.pop();
-				nodesToDelete.insert( &childNode );
+				
 				for( int childIndex = 0; childIndex < childNode.childs.size(); childIndex++ )
 				{
 					nodesstack.push( childNode.childs[childIndex] );
 				}
-			}
 
-			// delete node & childs
-			for( SceneNode* deletedNode : nodesToDelete )
-			{
-				EcsEntity entity = _world.GetEntity( deletedNode->handle );
-				scene.nodesToKill.insert( deletedNode->handle );
-				deletedNode->parentHandle = 0;
-				deletedNode->childs.clear();
-			}		
+				childNode.parentHandle = 0;
+				childNode.childs.clear();
+				_world.Kill( childEntity );
+			}	
 		}
 	}
 

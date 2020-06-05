@@ -40,8 +40,6 @@ namespace fan
 		scene.rootNodeHandle = 0;
 		scene.mainCameraHandle = 0;
 		scene.nodes.clear();
-		scene.nodesToKill.clear();
-
 		EcsWorld*& worldNoConst = const_cast<EcsWorld*&>( scene.world );
 		worldNoConst = &_world;
 	}
@@ -110,18 +108,6 @@ namespace fan
 
 		sceneNode.Build( _name, *this, handle, _parentNode );
 		return sceneNode;
-	}
-
-	//================================================================================================================================
-	//================================================================================================================================
-	void Scene::EndFrame( EcsWorld& _world )
-	{
-		Scene& scene = _world.GetSingleton<Scene>();		
-		for ( EcsHandle handle : scene.nodesToKill )
-		{
-			_world.Kill( _world.GetEntity( handle ) );
-		}
-		scene.nodesToKill.clear();
 	}
 
 	//================================================================================================================================

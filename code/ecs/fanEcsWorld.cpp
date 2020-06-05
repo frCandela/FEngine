@@ -4,12 +4,15 @@
 
 namespace fan
 {
-
+	//================================================================================================================================
+	//================================================================================================================================
 	void EcsWorld::Create() //@todo delete this method and do it incrementally
 	{
 		m_transitionArchetype.Create( m_componentsInfo, ~EcsSignature( 0 ) );
 	}
 
+	//================================================================================================================================
+	//================================================================================================================================
 	struct SortedTransition
 	{
 		int transitionIndex;
@@ -17,12 +20,20 @@ namespace fan
 		bool operator<( const SortedTransition& _other ) const  { return ( entityIndex < _other.entityIndex ); }
 	};
 
+	//================================================================================================================================
+	//================================================================================================================================
 	void EcsWorld::ApplyTransitions()
 	{
+		// calls destructors
+		while( !m_destroyedComponents.empty() )
+		{
+			const DestroyedComponent destroyedComponent = *m_destroyedComponents.rbegin();
+			m_destroyedComponents.pop_back();
+			destroyedComponent.destroy( *this, destroyedComponent.entity, destroyedComponent.component );
+		}
+
 		assert( m_transitionArchetype.Size() == m_transitions.size() );
 		if( m_transitions.size() == 0 ) { return; }
-
-		m_isApplyingTransitions = true;
 
 		// Sort transitions by ascending entity index
 		std::vector<SortedTransition> sortedTransitions;
@@ -57,8 +68,12 @@ namespace fan
 			targetSignature |= transition.signatureAdd;
 			targetSignature &= ~transition.signatureRemove;
 
+			assert( transition.isDead || targetSignature != srcArchetype.GetSignature() );
+
 			if( transition.isDead || targetSignature == EcsSignature( 0 ) ) // entity is dead, no need to consider a target archetype
 			{
+				assert( !srcArchetypeIsTransitionArchetype );
+
 				// destroy all components from the src archetype
 				if( !srcArchetypeIsTransitionArchetype )
 				{
@@ -66,27 +81,7 @@ namespace fan
 					{
 						if( srcArchetype.GetSignature()[componentIndex] )
 						{
-							const EcsComponentInfo& info = m_componentsInfo[componentIndex];
-							if( info.destroy != nullptr )
-							{
-								EcsComponent& component = *static_cast<EcsComponent*>( srcArchetype.GetChunkVector(componentIndex).At( srcIndex ) );
-								info.destroy( *this, srcEntity, component );
-							}
 							srcArchetype.GetChunkVector(componentIndex).Remove( srcIndex );
-						}
-					}
-				}
-
-				// destroy all components from the transition archetype
-				for( int componentIndex = 0; componentIndex < NumComponents(); componentIndex++ )
-				{
-					if( transition.signatureAdd[componentIndex] )
-					{
-						const EcsComponentInfo& info = m_componentsInfo[componentIndex];
-						if( info.destroy != nullptr )
-						{
-							EcsComponent& component = *static_cast<EcsComponent*>( m_transitionArchetype.GetChunkVector(componentIndex).At( srcIndex ) );
-							info.destroy( *this, srcEntity, component );
 						}
 					}
 				}
@@ -139,16 +134,7 @@ namespace fan
 					{
 						if( srcArchetype.GetSignature()[i] )
 						{
-							if( transition.signatureRemove[i] ) // if the component was removed, calls destroy
-							{
-								const EcsComponentInfo& info = m_componentsInfo[i];
-								if( info.destroy != nullptr )
-								{
-									EcsComponent& component = *static_cast<EcsComponent*>( srcArchetype.GetChunkVector(i).At( srcIndex ) );
-									info.destroy( *this, srcEntity, component );
-								}
-							}
-							else // copy component to the target archetype
+							if( ! transition.signatureRemove[i] ) // copy component to the target archetype
 							{
 								dstArchetype->GetChunkVector(i).PushBack( srcArchetype.GetChunkVector(i).At( srcIndex ) );
 							}
@@ -186,15 +172,17 @@ namespace fan
 
 		m_transitions.clear();
 		m_transitionArchetype.Clear();
-
-		m_isApplyingTransitions = false;
 	}
 
-	int  EcsWorld::GetIndex( const uint32_t  _type ) const 
+	//================================================================================================================================
+	//================================================================================================================================
+	int  EcsWorld::GetIndex( const uint32_t  _type ) const
 	{ 
 		return m_typeToIndex.at( _type ); 
 	}
 
+	//================================================================================================================================
+	//================================================================================================================================
 	void EcsWorld::Clear()
 	{
 		ApplyTransitions();
@@ -217,6 +205,8 @@ namespace fan
 
 	}
 
+	//================================================================================================================================
+	//================================================================================================================================
 	EcsHandle	EcsWorld::AddHandle( const EcsEntity _entity )
 	{
 		EcsEntityData& entity = _entity.archetype->GetEntityData(_entity.index);
@@ -248,6 +238,9 @@ namespace fan
 		assert( m_handles.find(entity.handle) == m_handles.end() );
 		m_handles[entity.handle] = _entity;
 	}
+
+	//================================================================================================================================
+	//================================================================================================================================
 	void		EcsWorld::RemoveHandle( const EcsEntity _entity )
 	{
 		EcsEntityData& entity = _entity.archetype->GetEntityData(_entity.index);
@@ -257,11 +250,17 @@ namespace fan
 			entity.handle = 0;
 		}
 	}
+
+	//================================================================================================================================
+	//================================================================================================================================
 	const	    EcsSingletonInfo* EcsWorld::SafeGetSingletonInfo( const uint32_t _type ) const
 	{
 		const auto& it = m_singletonInfos.find( _type );
 		return it == m_singletonInfos.end() ? nullptr : &it->second;
 	}
+
+	//================================================================================================================================
+	//================================================================================================================================
 	std::vector< EcsSingletonInfo > EcsWorld::GetVectorSingletonInfo() const
 	{
 		std::vector< EcsSingletonInfo > infos;
@@ -272,40 +271,59 @@ namespace fan
 		return infos;
 	}
 
+	//================================================================================================================================
+	//================================================================================================================================
 	void EcsWorld::AddTag( const EcsEntity _entity, const uint32_t _type )
 	{
 		const int tagIndex = GetIndex( _type );
-		EcsTransition& transition = FindOrCreateTransition( _entity );
-
-		// Update transition
-		transition.signatureAdd[tagIndex] = 1;
+		if( _entity.archetype == &m_transitionArchetype || !_entity.archetype->GetSignature()[tagIndex] )
+		{			
+			EcsTransition& transition = FindOrCreateTransition( _entity );
+			transition.signatureAdd[tagIndex] = 1;
+		}	
 	}
+
+	//================================================================================================================================
+	//================================================================================================================================
 	void EcsWorld::RemoveTag( const EcsEntity _entity, const uint32_t _type )
 	{
-		const int tagIndex = GetIndex( _type );
-		EcsTransition& transition = FindOrCreateTransition( _entity );
+		assert( _entity.archetype != &m_transitionArchetype );
 
-		// Update transition
-		transition.signatureRemove[tagIndex] = 1;
+		const int tagIndex = GetIndex( _type );
+		if( _entity.archetype->GetSignature()[tagIndex] )
+		{
+			EcsTransition& transition = FindOrCreateTransition( _entity );
+			transition.signatureRemove[tagIndex] = 1;
+		}
 	}
+
+	//================================================================================================================================
+	//================================================================================================================================
 	bool EcsWorld::HasTag( const EcsEntity _entity, const uint32_t _type ) const
 	{
 		const int tagIndex = GetIndex( _type );
 		return _entity.archetype->GetSignature()[tagIndex];
 	}
+
+	//================================================================================================================================
+	//================================================================================================================================
 	void EcsWorld::AddTagsFromSignature( const EcsEntity _entity, const EcsSignature& _signature )
 	{
 		EcsTransition& transition = FindOrCreateTransition( _entity );
 		transition.signatureAdd |= _signature & m_tagsMask;
 	}
 
+	//================================================================================================================================
+	//================================================================================================================================
 	EcsComponent& EcsWorld::AddComponent( const EcsEntity _entity, const uint32_t _type )
-	{
+	{		
+		if( HasComponent( _entity, _type ) )
+		{
+			return GetComponent( _entity, _type );
+		}
+
 		const int componentIndex = GetIndex( _type );
 		EcsEntityData& entityData = GetEntityData( _entity );
-
-		// entity doesn't already have this component
-		assert( _entity.archetype == &m_transitionArchetype || !_entity.archetype->GetSignature()[componentIndex] );
 
 		// Update transition
 		EcsTransition& transition = FindOrCreateTransition( _entity );
@@ -319,19 +337,36 @@ namespace fan
 
 		return component;
 	}
-	void		  EcsWorld::RemoveComponent( const EcsEntity _entity, const uint32_t _type )
+
+	//================================================================================================================================
+	//================================================================================================================================
+	void  EcsWorld::RemoveComponent( const EcsEntity _entity, const uint32_t _type )
 	{
 		const int componentIndex = GetIndex( _type );
-
-		// entity must have this component
-		assert( _entity.archetype == &m_transitionArchetype || _entity.archetype->GetSignature()[componentIndex] );
+		
+		assert( _entity.archetype != &m_transitionArchetype );
+		assert( _entity.archetype->GetSignature()[componentIndex] );// entity must have this component
 
 		// Update transition
 		EcsTransition& transition = FindOrCreateTransition( _entity );
 		assert( !transition.signatureAdd[componentIndex] );
-		transition.signatureRemove[componentIndex] = 1;
+
+		// calls destructor on the component
+		if( !transition.signatureRemove[componentIndex] )
+		{
+			transition.signatureRemove[componentIndex] = 1;
+			const EcsComponentInfo& info = m_componentsInfo[componentIndex];
+			if( info.destroy != nullptr )
+			{
+				EcsComponent& component = *static_cast<EcsComponent*>( _entity.archetype->GetChunkVector( componentIndex ).At( _entity.index ) );
+				m_destroyedComponents.push_back( { _entity, component, info.destroy } );
+			}			
+		}
 	}
-	bool		  EcsWorld::HasComponent( const EcsEntity _entity, const uint32_t _type )
+
+	//================================================================================================================================
+	//================================================================================================================================
+	bool EcsWorld::HasComponent( const EcsEntity _entity, const uint32_t _type )
 	{
 		const int componentIndex = GetIndex( _type );
 		if( _entity.archetype == &m_transitionArchetype )
@@ -362,6 +397,9 @@ namespace fan
 			}
 		}
 	}
+
+	//================================================================================================================================
+	//================================================================================================================================
 	EcsComponent& EcsWorld::GetComponent( const EcsEntity _entity, const uint32_t _type )
 	{
 		assert( HasComponent( _entity, _type ) );
@@ -386,6 +424,8 @@ namespace fan
 		}
 	}
 
+	//================================================================================================================================
+	//================================================================================================================================
 	EcsEntity EcsWorld::CreateEntity()
 	{
 		EcsEntity entityID;
@@ -407,16 +447,45 @@ namespace fan
 
 		return entityID;
 	}
+
+	//================================================================================================================================
+	//================================================================================================================================
 	void EcsWorld::Kill( const EcsEntity _entity )
 	{
 		EcsTransition& transition = FindOrCreateTransition( _entity );
-		transition.isDead = true;
+
+		// do not delete twice
+		if( !transition.isDead )
+		{
+			transition.isDead = true;
+
+			// calls destructor on all components
+			for( int i = 0; i < NumComponents(); i++ )
+			{
+				const EcsSignature& signature = _entity.archetype->GetSignature();
+				if( signature[i] && !transition.signatureRemove[i] )
+				{
+					const EcsComponentInfo& info = m_componentsInfo[i];
+					if( info.destroy != nullptr )
+					{
+						EcsComponent& component = *static_cast<EcsComponent*>( _entity.archetype->GetChunkVector( i ).At( _entity.index ) );
+						m_destroyedComponents.push_back( { _entity, component, info.destroy } );
+					}
+				}
+			}
+		}
 	}
+
+	//================================================================================================================================
+	//================================================================================================================================
 	bool EcsWorld::IsAlive( const EcsEntity _entity ) const
 	{
 		const EcsEntityData& entityData = GetEntityData( _entity );
 		return entityData.transitionIndex < 0 || !m_transitions[entityData.transitionIndex].isDead;
 	}
+
+	//================================================================================================================================
+	//================================================================================================================================
 	EcsView EcsWorld::Match( const EcsSignature _signature ) const
 	{
 		EcsView view( m_typeToIndex, _signature );
@@ -430,11 +499,16 @@ namespace fan
 		return view;
 	}
 
+	//================================================================================================================================
+	//================================================================================================================================
 	EcsArchetype* EcsWorld::FindArchetype( const EcsSignature _signature )
 	{
 		auto it = m_archetypes.find( _signature );
 		return it == m_archetypes.end() ? nullptr : it->second;
 	}
+
+	//================================================================================================================================
+	//================================================================================================================================
 	EcsArchetype& EcsWorld::CreateArchetype( const EcsSignature _signature )
 	{
 		assert( FindArchetype( _signature ) == nullptr );
@@ -444,10 +518,10 @@ namespace fan
 		return *newArchetype;
 	}
 	
+	//================================================================================================================================
+	//================================================================================================================================
 	EcsTransition& EcsWorld::FindOrCreateTransition( const EcsEntity _entity )
 	{
-		assert( !m_isApplyingTransitions );
-
 		// Get/register transition
 		EcsEntityData& entity = _entity.archetype->GetEntityData(_entity.index);
 		EcsTransition* transition = nullptr;

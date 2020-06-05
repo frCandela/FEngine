@@ -381,7 +381,6 @@ namespace fan
 				}
 
 				Input::Get().Manager().PullEvents();
-				Scene::EndFrame( m_world );
 				{
 					// end frame
 					SCOPED_PROFILE( scene_endFrame );

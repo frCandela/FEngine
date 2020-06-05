@@ -31,7 +31,6 @@ namespace fan
 		void Clear();
 		void SetMainCamera( const EcsHandle _cameraHandle );
 
-		static void			EndFrame( EcsWorld& _world );
 		static EcsHandle	R_FindMaximumHandle( SceneNode& _node );
 		static void			R_SaveToJson( const SceneNode& _node, Json& _json );
 		static SceneNode&   R_LoadFromJson( const Json& _json, Scene& _scene, SceneNode* _parent, const uint32_t _handleOffset );
@@ -46,7 +45,6 @@ namespace fan
 		EcsHandle 				 rootNodeHandle;
 		EcsHandle				 mainCameraHandle;
 		std::set<EcsHandle>      nodes;
-		std::set<EcsHandle>      nodesToKill; // killed at the end of the frame
 
 		SceneNode& GetRootNode() const;
 		SceneNode& GetMainCamera() const;
