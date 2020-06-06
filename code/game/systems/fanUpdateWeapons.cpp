@@ -2,19 +2,15 @@
 
 #include "ecs/fanEcsWorld.hpp"
 #include "scene/components/fanTransform.hpp"
-#include "scene/components/fanRigidbody.hpp"
-#include "scene/components/fanMotionState.hpp"
-#include "scene/components/fanSphereShape.hpp"
-#include "scene/components/fanMeshRenderer.hpp"
-#include "scene/components/fanMaterial.hpp"
-#include "game/components/fanBullet.hpp"
-#include "game/components/fanWeapon.hpp"
-#include "game/components/fanBattery.hpp"
 #include "game/components/fanPlayerInput.hpp"
-#include "game/singletonComponents/fanCollisionManager.hpp"
-#include "scene/singletonComponents/fanPhysicsWorld.hpp"
-#include "scene/singletonComponents/fanScene.hpp"
-#include "scene/components/fanSceneNode.hpp"
+#include "game/components/fanBattery.hpp"
+#include "scene/components/fanRigidbody.hpp"
+#include "game/components/fanWeapon.hpp"
+#include "game/singletonComponents/fanSpawnManager.hpp"
+#include "game/singletonComponents/fanGame.hpp"
+#include "network/singletonComponents/fanLinkingContext.hpp"
+#include "network/systems/fanHostReplication.hpp"
+#include "network/components/fanClientRPC.hpp"
 
 namespace fan
 {
@@ -34,11 +30,11 @@ namespace fan
 	//================================================================================================================================
 	void S_FireWeapons::Run( EcsWorld& _world, const EcsView& _view, const float _delta )
 	{
-		if( _delta == 0.f ) { return; }
+		if( _delta == 0.f ) { return; }		
 
-		PhysicsWorld& physicsWorld = _world.GetSingleton<PhysicsWorld>();
-		Scene& scene = _world.GetSingleton<Scene>();
-		CollisionManager& collisionManager = _world.GetSingleton<CollisionManager>();
+		const Game& game = _world.GetSingleton<Game>();
+		SpawnManager& spawnManager = _world.GetSingleton<SpawnManager>();
+		const LinkingContext& linkingContext = _world.GetSingleton<LinkingContext>();
 
 		auto transformIt = _view.begin<Transform>();
 		auto rigidbodyIt = _view.begin<Rigidbody>();
@@ -60,25 +56,21 @@ namespace fan
 			{
 				--weapon.bulletsAccumulator;
 				battery.currentEnergy -= weapon.bulletEnergyCost;
-
-				// creates the bullet
-				if( *weapon.bulletPrefab != nullptr )
+				
+				// Adds bullet to the spawn manager for spawning on hosts
+				if( game.IsServer() )
 				{
-					SceneNode& node = *weapon.bulletPrefab->Instanciate( scene.GetRootNode() );
-					EcsEntity bulletID = _world.GetEntity( node.handle );
+					const EcsHandle ownerHandle = _world.GetHandle( transformIt.Entity() );
+					const NetID ownerID = linkingContext.EcsHandleToNetID.at( ownerHandle );
+					const btVector3 bulletPosition = transform.GetPosition() + transform.TransformDirection( weapon.originOffset );
+					const btVector3 bulletVelocity = rigidbody.GetVelocity() + weapon.bulletSpeed * transform.Forward();
+					const ClientRPC::BulletSpawnInfo info = { ownerID,bulletPosition,bulletVelocity, game.frameIndex + 5 };
+					spawnManager.bullets.push_back( info );
 
-					Transform& bulletTransform = _world.GetComponent<Transform>( bulletID );
-					bulletTransform.SetPosition( transform.GetPosition() + transform.TransformDirection( weapon.originOffset ) );
+					S_ReplicateOnAllHosts::Run( _world, _world.Match( S_ReplicateOnAllHosts::GetSignature( _world ) ),
+						ClientRPC::RPCSpawnBullet( info ), HostReplication::ResendUntilReplicated );
 
-					Rigidbody& bulletRigidbody = _world.GetComponent<Rigidbody>( bulletID );
-					bulletRigidbody.onContactStarted.Connect( &CollisionManager::OnBulletContact, &collisionManager );
-					bulletRigidbody.SetIgnoreCollisionCheck( rigidbody, true );
-					bulletRigidbody.SetVelocity( rigidbody.GetVelocity() + weapon.bulletSpeed * transform.Forward() );
-					bulletRigidbody.SetMotionState( _world.GetComponent<MotionState>( bulletID ).motionState );
-					bulletRigidbody.SetCollisionShape( _world.GetComponent<SphereShape>( bulletID ).sphereShape );
-
-					physicsWorld.dynamicsWorld->addRigidBody( bulletRigidbody.rigidbody );
-				}				
+				}			
 			}
 		}
 	}

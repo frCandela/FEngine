@@ -14,6 +14,7 @@
 #include "network/components/fanClientReplication.hpp"
 #include "network/components/fanClientConnection.hpp"
 #include "network/singletonComponents/fanLinkingContext.hpp"
+#include "game/singletonComponents/fanSpawnManager.hpp"
 #include "network/components/fanClientRPC.hpp"
 #include "network/components/fanClientGameData.hpp"
 #include "network/components/fanReliabilityLayer.hpp"
@@ -59,10 +60,12 @@ namespace fan
 		// connect rpc
 		Game& game = _world.GetSingleton<Game>();
 		ClientRPC& rpcManager = _world.GetComponent<ClientRPC>( persistentID );
+		SpawnManager& spawnManager = _world.GetSingleton<SpawnManager>();
 		rpcManager.onShiftFrameIndex.Connect( &ClientGameData::OnShiftFrameIndex, _world, persistentHandle );
 		rpcManager.onShiftFrameIndex.Connect( &Game::OnShiftFrameIndex, &game );
 		rpcManager.onSpawnClientShip.Connect( &ClientGameData::OnSpawnClientShip, _world, persistentHandle );
 		rpcManager.onSpawnShip.Connect( &ClientNetworkManager::OnSpawnShip, this );
+		rpcManager.onSpawnBullet.Connect( &SpawnManager::OnSpawnBullet, &spawnManager );
 
 		// Bind socket
 		ClientConnection& connection = _world.GetComponent<ClientConnection>( persistentID );
@@ -102,14 +105,16 @@ namespace fan
 		for (int i = (int)netManager.shipsToSpawn.size() - 1; i >= 0 ; i--)
 		{
 			std::pair<NetID, FrameIndex> pair = netManager.shipsToSpawn[i];
-			if( game.frameIndex >= pair.second )
+			const FrameIndex spawnFrameIndex = pair.second;
+			if( game.frameIndex >= spawnFrameIndex )
 			{
 				// do not spawn twice
-				if( linkingContext.netIDToEcsHandle.find( pair.first ) == linkingContext.netIDToEcsHandle.end() )
+				const NetID spaceshipID = pair.first;
+				if( linkingContext.netIDToEcsHandle.find( spaceshipID ) == linkingContext.netIDToEcsHandle.end() )
 				{
 					// spawn
 					const EcsHandle handle = Game::SpawnSpaceship( _world, false, false );
-					linkingContext.AddEntity( handle, pair.first );
+					linkingContext.AddEntity( handle, spaceshipID );
 				}
 				netManager.shipsToSpawn.erase( netManager.shipsToSpawn.begin() + i );
 			}

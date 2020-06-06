@@ -16,6 +16,16 @@ namespace fan
 	{
 		ECS_COMPONENT( ClientRPC )
 	public:
+		//================================================================
+		//================================================================
+		struct BulletSpawnInfo
+		{
+			NetID			owner;
+			btVector3		position = btVector3::Zero();
+			btVector3		velocity = btVector3::Zero();
+			FrameIndexNet	spawnFrameIndex;
+		};
+
 		static void SetInfo( EcsComponentInfo& _info );
 		static void Init( EcsWorld& _world, EcsEntity _entity, EcsComponent& _component );
 		static void OnGui( EcsWorld& _world, EcsEntity _entityID, EcsComponent& _component );
@@ -41,5 +51,9 @@ namespace fan
 		Signal < NetID, FrameIndex > onSpawnShip;
 		void					 UnwrapSpawnShip( sf::Packet& _packet);
 		static PacketReplication RPCSpawnShip( const NetID _spaceshipID, const FrameIndex _frameIndex );
+
+		Signal < BulletSpawnInfo > onSpawnBullet;
+		void					 UnwrapSpawnBullet( sf::Packet& _packet );
+		static PacketReplication RPCSpawnBullet( const BulletSpawnInfo& _spawnInfo );
 	};
 }

@@ -55,9 +55,9 @@ namespace fan
 					if( hostData.spaceshipID == 0 )
 					{
 						// spawns new host spaceship
-						hostData.spaceshipHandle = Game::SpawnSpaceship( _world, true, false );
 						hostData.spaceshipID = linkingContext.nextNetID++;
-						linkingContext.AddEntity( hostData.spaceshipHandle, hostData.spaceshipID );
+						hostData.spaceshipHandle = Game::SpawnSpaceship( _world, true, false );
+						linkingContext.AddEntity( hostData.spaceshipHandle, hostData.spaceshipID );						
 						const FrameIndexNet spawnFrame = game.frameIndex + 60;
 						hostReplication.Replicate(
 							ClientRPC::RPCSpawnClientShip( hostData.spaceshipID, spawnFrame )

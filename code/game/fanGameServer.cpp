@@ -51,6 +51,7 @@
 #include "game/singletonComponents/fanGameCamera.hpp"
 #include "game/singletonComponents/fanSunLight.hpp"
 #include "game/singletonComponents/fanGame.hpp"
+#include "game/singletonComponents/fanSpawnManager.hpp"
 
 #include "game/systems/fanUpdatePlanets.hpp"
 #include "game/systems/fanUpdateSpaceships.hpp"
@@ -127,6 +128,7 @@ namespace fan
 		world.AddSingletonType<CollisionManager>();
 		world.AddSingletonType<Game>();
 		world.AddSingletonType<SolarEruption>();
+		world.AddSingletonType<SpawnManager>();
 		world.AddSingletonType<ServerNetworkManager>();
 		// net singleton components
 		world.AddSingletonType<ServerConnection>();
@@ -210,6 +212,7 @@ namespace fan
 			S_HostUpdateInput::Run( world, world.Match( S_HostUpdateInput::GetSignature( world ) ), _delta );
 			S_MovePlanets::Run( world, world.Match( S_MovePlanets::GetSignature( world ) ), _delta );
 			S_MoveSpaceships::Run( world, world.Match( S_MoveSpaceships::GetSignature( world ) ), _delta );
+			SpawnManager::Spawn( world );
 
 			// physics & transforms
 			PhysicsWorld& physicsWorld = world.GetSingleton<PhysicsWorld>();
@@ -219,9 +222,8 @@ namespace fan
 			S_MoveFollowTransforms					::Run( world, world.Match( S_MoveFollowTransforms::GetSignature( world ) ) );
 			S_MoveFollowTransformsUI				::Run( world, world.Match( S_MoveFollowTransformsUI::GetSignature( world ) ) );			
 			
-			S_HostSaveState		::Run( world, world.Match( S_HostSaveState::GetSignature( world ) )		, _delta );		
-
-			S_FireWeapons			::Run( world, world.Match( S_FireWeapons::GetSignature( world ) )			, _delta );			
+			S_HostSaveState		::Run( world, world.Match( S_HostSaveState::GetSignature( world ) )		, _delta );			
+			S_FireWeapons::Run( world, world.Match( S_FireWeapons::GetSignature( world ) ), _delta );		
 			S_GenerateLightMesh		::Run( world, world.Match( S_GenerateLightMesh::GetSignature( world ) )		, _delta );
 			S_UpdateSolarPannels	::Run( world, world.Match( S_UpdateSolarPannels::GetSignature( world ) )	, _delta );
 			S_RechargeBatteries		::Run( world, world.Match( S_RechargeBatteries::GetSignature( world ) )		, _delta );

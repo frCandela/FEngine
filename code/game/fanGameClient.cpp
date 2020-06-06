@@ -51,6 +51,7 @@
 #include "game/singletonComponents/fanCollisionManager.hpp"
 #include "game/singletonComponents/fanSolarEruption.hpp"
 #include "game/singletonComponents/fanGame.hpp"
+#include "game/singletonComponents/fanSpawnManager.hpp"
 
 #include "game/systems/fanUpdatePlanets.hpp"
 #include "game/systems/fanUpdateSpaceships.hpp"
@@ -130,6 +131,7 @@ namespace fan
 		world.AddSingletonType<CollisionManager>();
 		world.AddSingletonType<Game>();
 		world.AddSingletonType<SolarEruption>();
+		world.AddSingletonType<SpawnManager>();
 		world.AddSingletonType<ClientNetworkManager>();
 		// network singleton components
 		
@@ -298,6 +300,7 @@ namespace fan
 			S_MovePlanets::Run( world, world.Match( S_MovePlanets::GetSignature( world ) ), _delta );
 			S_MoveSpaceships::Run( world, world.Match( S_MoveSpaceships::GetSignature( world ) ), _delta );
 			ClientNetworkManager::SpawnShips( world );
+			SpawnManager::Spawn( world );
 
 			// physics & transforms
 			PhysicsWorld& physicsWorld = world.GetSingleton<PhysicsWorld>();
