@@ -70,7 +70,7 @@ namespace fan
 				if( connection.lastResponseTime + connection.timeoutDelay < currentTime )
 				{
 					Debug::Log() << "client timeout " << Debug::Endl();					
-					hostManager.DeleteHost( sceneNode.handle );
+					hostManager.DeleteHost( _world, sceneNode.handle );
 				}
 			}
 		}

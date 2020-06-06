@@ -35,11 +35,11 @@ namespace fan
 			}
 		};
 
-		std::unordered_map < IPPort, EcsHandle, IPPort > hostHandles;  // links host ip-port to its entity handle
-		SceneNode*			netRoot;									  // host entity nodes are placed below the net root node
+		std::unordered_map < IPPort, EcsHandle, IPPort > hostHandles;		// links host ip-port to its entity handle
+		EcsHandle										 netRootNodeHandle; // host entity nodes are placed below the net root node
 
-		EcsHandle CreateHost( const IpAddress _ip, const Port _port );
-		void		 DeleteHost( const EcsHandle _hostHandle );
+		EcsHandle CreateHost( EcsWorld& _world, const IpAddress _ip, const Port _port );
+		void	  DeleteHost( EcsWorld& _world, const EcsHandle _hostHandle );
 		EcsHandle FindHost( const IpAddress _ip, const Port _port );
 	};
 }

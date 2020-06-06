@@ -25,28 +25,28 @@ namespace fan
 	{
 		HostManager& hostManager = static_cast<HostManager&>( _component );
 		hostManager.hostHandles.clear();
-		hostManager.netRoot = nullptr;
+		hostManager.netRootNodeHandle = 0;
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	EcsHandle HostManager::CreateHost( const sf::IpAddress _ip, const Port _port )
+	EcsHandle HostManager::CreateHost( EcsWorld& _world, IpAddress _ip, const Port _port )
 	{
 		assert( FindHost( _ip, _port ) == 0 );
 
 		// Create an ecs entity associated with the host
-		EcsWorld& world = *netRoot->scene->world;
-		SceneNode& hostNode = netRoot->scene->CreateSceneNode( "tmp", netRoot );
-		assert( hostHandles.find( { _ip,_port } ) == hostHandles.end() );
+		SceneNode& rootNode = _world.GetComponent<SceneNode>( _world.GetEntity( netRootNodeHandle ) );
+		Scene& scene = _world.GetSingleton<Scene>();
+		SceneNode& hostNode = scene.CreateSceneNode( "tmp", &rootNode );
 		hostHandles[{_ip, _port}] = hostNode.handle;
 		hostNode.name = std::string("host") + std::to_string( hostNode.handle );
-		const EcsEntity entity = world.GetEntity( hostNode.handle );
-		world.AddComponent< HostGameData >( entity );
-		world.AddComponent< HostReplication >( entity );
-		world.AddComponent< ReliabilityLayer >( entity );
+		const EcsEntity entity = _world.GetEntity( hostNode.handle );
+		_world.AddComponent< HostGameData >( entity );
+		_world.AddComponent< HostReplication >( entity );
+		_world.AddComponent< ReliabilityLayer >( entity );
 
 		// fills in the host connection data
-		HostConnection& hostConnection = world.AddComponent< HostConnection >( entity );
+		HostConnection& hostConnection = _world.AddComponent< HostConnection >( entity );
 		hostConnection.ip				= _ip;
 		hostConnection.port				= _port;
 
@@ -55,23 +55,22 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void HostManager::DeleteHost( const EcsHandle _hostHandle )
+	void HostManager::DeleteHost( EcsWorld& _world, const EcsHandle _hostHandle )
 	{
 		// Deletes the ecs entity associated with the host
-		EcsWorld& world = *netRoot->scene->world;
-		const EcsEntity entity = world.GetEntity( _hostHandle );
-		world.Kill( entity );
+		const EcsEntity entity = _world.GetEntity( _hostHandle );
+		_world.Kill( entity );
 
 		// Delete the host spaceship if spawned
-		HostGameData hostGameData = world.GetComponent<HostGameData>( entity );
+		HostGameData hostGameData = _world.GetComponent<HostGameData>( entity );
 		if( hostGameData.spaceshipHandle != 0 )
 		{
-			const EcsEntity spaceshipID = world.GetEntity( hostGameData.spaceshipHandle );
-			world.Kill( spaceshipID );
+			const EcsEntity spaceshipID = _world.GetEntity( hostGameData.spaceshipHandle );
+			_world.Kill( spaceshipID );
 		}		
 
 		// delete the host ip/port entry
-		HostConnection& hostConnection = world.GetComponent< HostConnection >( entity );	
+		HostConnection& hostConnection = _world.GetComponent< HostConnection >( entity );
 		auto it = hostHandles.find( { hostConnection.ip, hostConnection.port } );
 		assert( it != hostHandles.end() );
 		hostHandles.erase( it );

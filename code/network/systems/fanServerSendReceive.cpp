@@ -110,7 +110,7 @@ namespace fan
 				EcsHandle clientHandle = hostManager.FindHost( receiveIP, receivePort );
 				if( clientHandle == 0 )
 				{
-					clientHandle = hostManager.CreateHost( receiveIP, receivePort );
+					clientHandle = hostManager.CreateHost( _world, receiveIP, receivePort );
 				}
 				const EcsEntity entity = _world.GetEntity( clientHandle );
 
@@ -160,7 +160,7 @@ namespace fan
 					{
 						PacketDisconnect packetDisconnect;
 						packetDisconnect.Read( packet );
-						hostManager.DeleteHost( clientHandle );
+						hostManager.DeleteHost( _world, clientHandle );
 					} break;
 					case PacketType::Ping:
 					{
