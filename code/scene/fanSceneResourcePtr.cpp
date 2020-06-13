@@ -1,7 +1,7 @@
 #include "scene/fanSceneResourcePtr.hpp"
 
-#include "scene/singletonComponents/fanScenePointers.hpp"
-#include "scene/singletonComponents/fanScene.hpp"
+#include "scene/singletons/fanScenePointers.hpp"
+#include "scene/singletons/fanScene.hpp"
 #include "scene/components/fanSceneNode.hpp"
 #include "ecs/fanEcsWorld.hpp"
 #include "editor/fanModals.hpp"

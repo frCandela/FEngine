@@ -5,13 +5,13 @@
 #include "scene/components/fanTransform.hpp"
 #include "scene/components/fanRigidbody.hpp"
 #include "scene/components/fanSceneNode.hpp"
-#include "scene/singletonComponents/fanScene.hpp"
+#include "scene/singletons/fanScene.hpp"
 #include "game/components/fanSpaceShip.hpp"
 #include "game/components/fanSolarPanel.hpp"
 #include "game/components/fanHealth.hpp"
 #include "game/components/fanPlayerInput.hpp"
 #include "game/components/fanBattery.hpp"
-#include "game/singletonComponents/fanSolarEruption.hpp"
+#include "game/singletons/fanSolarEruption.hpp"
 #include "ecs/fanEcsWorld.hpp"
 
 namespace fan

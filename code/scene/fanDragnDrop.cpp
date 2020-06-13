@@ -4,7 +4,7 @@
 #include "editor/fanImguiIcons.hpp"
 #include "scene/components/fanSceneNode.hpp"
 #include "scene/fanPrefab.hpp"
-#include "scene/singletonComponents/fanScene.hpp"
+#include "scene/singletons/fanScene.hpp"
 #include "ecs/fanEcsWorld.hpp"
 #include "render/core/fanTexture.hpp"
 #include "render/fanMesh.hpp"

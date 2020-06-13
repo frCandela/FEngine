@@ -1,4 +1,4 @@
-#include "game/singletonComponents/fanPlayersManager.hpp"
+#include "game/singletons/fanPlayersManager.hpp"
 
 namespace fan
 {

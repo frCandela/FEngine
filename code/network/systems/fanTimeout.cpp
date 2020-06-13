@@ -3,7 +3,7 @@
 #include "ecs/fanEcsWorld.hpp"
 #include "core/time/fanTime.hpp"
 #include "scene/components/fanSceneNode.hpp"
-#include "network/singletonComponents/fanHostManager.hpp"
+#include "network/singletons/fanHostManager.hpp"
 #include "network/components/fanHostConnection.hpp"
 #include "network/components/fanReliabilityLayer.hpp"
 

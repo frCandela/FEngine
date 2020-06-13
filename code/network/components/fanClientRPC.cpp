@@ -27,24 +27,16 @@ namespace fan
 	}
 
 	//================================================================================================================================
-	// Registers all available RPC unwrap functions
+	// Registers  RPC unwrap functions
+	// A unwrap function must decode a packet and run the corresponding procedure
 	//================================================================================================================================
 	void ClientRPC::RegisterRPCs( )
 	{
-		RegisterUnwrapFunction( 'SYNC', &ClientRPC::UnwrapShiftClientFrame );
-		RegisterUnwrapFunction( 'SPWN', &ClientRPC::UnwrapSpawnClientShip );
-		RegisterUnwrapFunction( 'SPSH', &ClientRPC::UnwrapSpawnShip );
-		RegisterUnwrapFunction( 'SPNB', &ClientRPC::UnwrapSpawnBullet );		
-	}
-
-	//================================================================================================================================
-	// Registers a RPC unwrap function
-	// A unwrap function must decode a packet and run the corresponding procedure
-	//================================================================================================================================
-	void ClientRPC::RegisterUnwrapFunction( const RpcId _id, const RpcUnwrapFunc _rpcUnwrapFunc )
-	{
-		assert( nameToRPCTable.find( _id ) == nameToRPCTable.end() );
-		nameToRPCTable[_id] = _rpcUnwrapFunc;
+		nameToRPCTable.clear();
+		nameToRPCTable[ 'SYNC' ] = &ClientRPC::UnwrapShiftClientFrame ;
+		nameToRPCTable[ 'SPAN' ] = &ClientRPC::UnwrapSpawn ;
+		nameToRPCTable[ 'SPWN' ] = &ClientRPC::UnwrapSpawnClientShip ;
+		nameToRPCTable[ 'SPSH' ] = &ClientRPC::UnwrapSpawnShip ;		
 	}
 
 	//================================================================================================================================
@@ -60,7 +52,7 @@ namespace fan
 	}
 
 	//================================================================================================================================
-	// SynchClientFrame RPC - chan
+	// SynchClientFrame RPC
 	//================================================================================================================================
 	PacketReplication ClientRPC::RPCShiftClientFrame( const int _framesDelta )
 	{
@@ -75,7 +67,40 @@ namespace fan
 	}
 
 	//================================================================================================================================
-	// SynchClientFrame RPC - unwrap data & synchronizes the frame index of the client depending on its rtt
+	// Must be connected to the SpawnManager, copy packet data for future spawning
+	//================================================================================================================================
+	void ClientRPC::UnwrapSpawn( sf::Packet& _packet )
+	{
+		FrameIndexNet frameIndex;
+		_packet >> frameIndex;
+		onSpawn.Emmit( frameIndex, _packet );
+	}
+
+	//================================================================================================================================
+	// Generate a RPC replication packet for spawning entities
+	//================================================================================================================================
+	PacketReplication ClientRPC::RPCSpawn( const FrameIndexNet _frameIndex, const sf::Packet& _data )
+	{
+		PacketReplication packet;
+		packet.replicationType = PacketReplication::ReplicationType::RPC;
+
+		packet.packetData.clear();
+		packet.packetData << RpcId( 'SPAN' );
+		packet.packetData << _frameIndex;
+
+		sf::Packet dataCpy = _data;
+		while( !dataCpy.endOfPacket() )
+		{
+			uint8_t dataByte;
+			dataCpy >> dataByte;
+			packet.packetData << dataByte;
+		}
+
+		return packet;
+	}
+
+	//================================================================================================================================
+	// ShiftClientFrame RPC - unwrap data & synchronizes the frame index of the client depending on its rtt
 	//================================================================================================================================
 	void ClientRPC::UnwrapShiftClientFrame( sf::Packet& _packet )
 	{
@@ -140,36 +165,6 @@ namespace fan
 		_packet >> spaceshipID;
 		_packet >> frameIndex;
 		onSpawnShip.Emmit( spaceshipID, frameIndex );
-	}
-
-
-	//================================================================================================================================
-	//================================================================================================================================
-	void ClientRPC::UnwrapSpawnBullet( sf::Packet& _packet )
-	{
-		BulletSpawnInfo spawnInfo;
-		_packet >> spawnInfo.position[0] >> spawnInfo.position[2];
-		_packet >> spawnInfo.velocity[0] >> spawnInfo.velocity[2];
-		_packet >> spawnInfo.owner;
-		_packet >> spawnInfo.spawnFrameIndex;
-		onSpawnBullet.Emmit( spawnInfo );
-	}
-
-	//================================================================================================================================
-	//================================================================================================================================
-	PacketReplication ClientRPC::RPCSpawnBullet( const BulletSpawnInfo& _spawnInfo )
-	{
-		PacketReplication packet;
-		packet.replicationType = PacketReplication::ReplicationType::RPC;
-
-		packet.packetData.clear();
-		packet.packetData << RpcId( 'SPNB' );
-		packet.packetData << _spawnInfo.position[0] << _spawnInfo.position[2];
-		packet.packetData << _spawnInfo.velocity[0] << _spawnInfo.velocity[2];
-		packet.packetData << _spawnInfo.owner;
-		packet.packetData << _spawnInfo.spawnFrameIndex;
-
-		return packet;
 	}
 
 	//================================================================================================================================

@@ -1,4 +1,4 @@
-#include "network/singletonComponents/fanServerConnection.hpp"
+#include "network/singletons/fanServerConnection.hpp"
 
 namespace fan
 {

@@ -16,16 +16,6 @@ namespace fan
 	{
 		ECS_COMPONENT( ClientRPC )
 	public:
-		//================================================================
-		//================================================================
-		struct BulletSpawnInfo
-		{
-			NetID			owner;
-			btVector3		position = btVector3::Zero();
-			btVector3		velocity = btVector3::Zero();
-			FrameIndexNet	spawnFrameIndex;
-		};
-
 		static void SetInfo( EcsComponentInfo& _info );
 		static void Init( EcsWorld& _world, EcsEntity _entity, EcsComponent& _component );
 		static void OnGui( EcsWorld& _world, EcsEntity _entityID, EcsComponent& _component );
@@ -34,7 +24,6 @@ namespace fan
 		using RpcId = sf::Uint32;
 
 		void RegisterRPCs( );
-		void RegisterUnwrapFunction( const RpcId _id, const RpcUnwrapFunc _rpcUnwrapFunc );
 		void TriggerRPC( sf::Packet& _packet );
 
 		std::unordered_map<RpcId , RpcUnwrapFunc > nameToRPCTable;
@@ -44,6 +33,10 @@ namespace fan
 		void					 UnwrapShiftClientFrame( sf::Packet& _packet );
 		static PacketReplication RPCShiftClientFrame( const int _framesDelta );
 
+		Signal< FrameIndexNet, sf::Packet >	 onSpawn;
+		void					 UnwrapSpawn( sf::Packet& _packet );
+		static PacketReplication RPCSpawn( const FrameIndexNet _frameIndex, const sf::Packet& _data );
+
 		Signal < NetID, FrameIndex > onSpawnClientShip;
 		void					 UnwrapSpawnClientShip( sf::Packet& _packet );
 		static PacketReplication RPCSpawnClientShip( const NetID _spaceshipID, const FrameIndex _frameIndex );
@@ -51,9 +44,5 @@ namespace fan
 		Signal < NetID, FrameIndex > onSpawnShip;
 		void					 UnwrapSpawnShip( sf::Packet& _packet);
 		static PacketReplication RPCSpawnShip( const NetID _spaceshipID, const FrameIndex _frameIndex );
-
-		Signal < BulletSpawnInfo > onSpawnBullet;
-		void					 UnwrapSpawnBullet( sf::Packet& _packet );
-		static PacketReplication RPCSpawnBullet( const BulletSpawnInfo& _spawnInfo );
 	};
 }

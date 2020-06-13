@@ -8,8 +8,8 @@
 #include "scene/components/fanCamera.hpp"
 #include "scene/components/fanTransform.hpp"
 #include "scene/components/ui/fanTransformUI.hpp"
-#include "scene/singletonComponents/fanScene.hpp"
-#include "scene/singletonComponents/fanRenderWorld.hpp"
+#include "scene/singletons/fanScene.hpp"
+#include "scene/singletons/fanRenderWorld.hpp"
 
 namespace fan
 {

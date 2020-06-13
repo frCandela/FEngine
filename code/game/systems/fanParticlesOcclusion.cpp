@@ -3,7 +3,7 @@
 #include "ecs/fanEcsWorld.hpp"
 #include "core/math/fanMathUtils.hpp"
 #include "scene/components/fanParticle.hpp"
-#include "game/singletonComponents/fanSunLight.hpp"
+#include "game/singletons/fanSunLight.hpp"
 #include "game/fanGameTags.hpp"
 
 namespace fan

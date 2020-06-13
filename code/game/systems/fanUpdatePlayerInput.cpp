@@ -6,7 +6,7 @@
 #include "scene/components/fanTransform.hpp"
 #include "scene/components/fanCamera.hpp"
 #include "scene/components/fanSceneNode.hpp"
-#include "scene/singletonComponents/fanScene.hpp"
+#include "scene/singletons/fanScene.hpp"
 #include "core/input/fanMouse.hpp"
 #include "core/math/shapes/fanRay.hpp"
 

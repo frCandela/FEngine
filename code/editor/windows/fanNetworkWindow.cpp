@@ -2,9 +2,9 @@
 
 #include "game/fanGameServer.hpp"
 #include "game/fanGameClient.hpp"
-#include "game/singletonComponents/fanGame.hpp"
+#include "game/singletons/fanGame.hpp"
 #include "core/time/fanTime.hpp"
-#include "network/singletonComponents/fanServerConnection.hpp"
+#include "network/singletons/fanServerConnection.hpp"
 
 namespace fan
 {

@@ -1,4 +1,4 @@
-#include "game/singletonComponents/fanSunLight.hpp"
+#include "game/singletons/fanSunLight.hpp"
 
 #include "render/fanRendererDebug.hpp"
 #include "scene/fanSceneSerializable.hpp"

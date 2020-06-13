@@ -1,7 +1,7 @@
 #include "scene/components/fanMotionState.hpp"
 
 #include "render/fanRenderSerializable.hpp"
-#include "scene/singletonComponents/fanPhysicsWorld.hpp"
+#include "scene/singletons/fanPhysicsWorld.hpp"
 #include "ecs/fanEcsWorld.hpp"
 
 namespace fan

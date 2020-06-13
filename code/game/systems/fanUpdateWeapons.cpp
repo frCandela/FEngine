@@ -6,11 +6,12 @@
 #include "game/components/fanBattery.hpp"
 #include "scene/components/fanRigidbody.hpp"
 #include "game/components/fanWeapon.hpp"
-#include "game/singletonComponents/fanSpawnManager.hpp"
-#include "game/singletonComponents/fanGame.hpp"
-#include "network/singletonComponents/fanLinkingContext.hpp"
+#include "network/singletons/fanSpawnManager.hpp"
+#include "game/singletons/fanGame.hpp"
+#include "network/singletons/fanLinkingContext.hpp"
 #include "network/systems/fanHostReplication.hpp"
 #include "network/components/fanClientRPC.hpp"
+#include "game/spawn/fanSpawnBullet.hpp"
 
 namespace fan
 {
@@ -64,12 +65,17 @@ namespace fan
 					const NetID ownerID = linkingContext.EcsHandleToNetID.at( ownerHandle );
 					const btVector3 bulletPosition = transform.GetPosition() + transform.TransformDirection( weapon.originOffset );
 					const btVector3 bulletVelocity = rigidbody.GetVelocity() + weapon.bulletSpeed * transform.Forward();
-					const ClientRPC::BulletSpawnInfo info = { ownerID,bulletPosition,bulletVelocity, game.frameIndex + 5 };
-					spawnManager.bullets.push_back( info );
 
+					SpawnInfo info;
+					info.spawnFrameIndex = game.frameIndex + 5;
+					spawn::SpawnBullet::WriteInfo( info.data, ownerID, bulletPosition, bulletVelocity );
+					
+					// spawn on server
+					spawnManager.spawns.push_back( info ); 
+
+					// spawn on all hosts
 					S_ReplicateOnAllHosts::Run( _world, _world.Match( S_ReplicateOnAllHosts::GetSignature( _world ) ),
-						ClientRPC::RPCSpawnBullet( info ), HostReplication::ResendUntilReplicated );
-
+					ClientRPC::RPCSpawn( info.spawnFrameIndex, info.data ), HostReplication::ResendUntilReplicated );
 				}			
 			}
 		}

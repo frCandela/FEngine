@@ -2,8 +2,8 @@
 
 #include "core/input/fanMouse.hpp"
 #include "core/time/fanTime.hpp"
-#include "scene/singletonComponents/fanScene.hpp"
-#include "game/singletonComponents/fanGame.hpp"
+#include "scene/singletons/fanScene.hpp"
+#include "game/singletons/fanGame.hpp"
 #include "ecs/fanEcsWorld.hpp"
 
 namespace fan

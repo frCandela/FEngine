@@ -1,4 +1,4 @@
-#include "scene/singletonComponents/fanScene.hpp"
+#include "scene/singletons/fanScene.hpp"
 
 #include <stack>
 #include <fstream>
@@ -15,8 +15,8 @@
 #include "scene/components/fanMaterial.hpp"
 #include "scene/components/fanMeshRenderer.hpp"
 #include "scene/components/fanRigidbody.hpp"
-#include "scene/singletonComponents/fanRenderWorld.hpp"
-#include "scene/singletonComponents/fanScenePointers.hpp"
+#include "scene/singletons/fanRenderWorld.hpp"
+#include "scene/singletons/fanScenePointers.hpp"
 #include "scene/systems/fanUpdateTransforms.hpp"
 #include "ecs/fanEcsWorld.hpp"
 

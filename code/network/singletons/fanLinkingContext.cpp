@@ -1,4 +1,4 @@
-#include "network/singletonComponents/fanLinkingContext.hpp"
+#include "network/singletons/fanLinkingContext.hpp"
 
 #include "ecs/fanEcsWorld.hpp"
 

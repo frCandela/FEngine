@@ -2,7 +2,7 @@
 
 #include "render/fanMesh.hpp"
 #include "scene/components/fanParticle.hpp"
-#include "scene/singletonComponents/fanRenderWorld.hpp"
+#include "scene/singletons/fanRenderWorld.hpp"
 #include "ecs/fanEcsWorld.hpp"
 #include "core/time/fanProfiler.hpp"
 

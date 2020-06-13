@@ -1,6 +1,6 @@
-#include "editor/singletonComponents/fanEditorSelection.hpp"
+#include "editor/singletons/fanEditorSelection.hpp"
 
-#include "editor/singletonComponents/fanEditorGizmos.hpp"
+#include "editor/singletons/fanEditorGizmos.hpp"
 #include "editor/fanEditorDebug.hpp"
 #include "core/input/fanInput.hpp"
 #include "core/input/fanInputManager.hpp"
@@ -14,7 +14,7 @@
 #include "scene/components/fanDirectionalLight.hpp"
 #include "scene/components/fanFollowTransform.hpp"
 #include "scene/components/ui/fanFollowTransformUI.hpp"
-#include "scene/singletonComponents/fanScene.hpp"
+#include "scene/singletons/fanScene.hpp"
 #include "scene/systems/fanRaycast.hpp"
 #include "scene/systems/fanDrawDebug.hpp"
 #include "scene/fanSceneTags.hpp"

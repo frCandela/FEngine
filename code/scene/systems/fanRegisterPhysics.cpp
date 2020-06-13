@@ -4,7 +4,7 @@
 BULLET_PUSH()
 #include "bullet/btBulletDynamicsCommon.h"
 BULLET_POP()
-#include "scene/singletonComponents/fanPhysicsWorld.hpp"
+#include "scene/singletons/fanPhysicsWorld.hpp"
 #include "scene/components/fanSceneNode.hpp"
 #include "scene/components/fanSphereShape.hpp"
 #include "scene/components/fanBoxShape.hpp"

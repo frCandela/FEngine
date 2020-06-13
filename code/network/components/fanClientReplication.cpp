@@ -2,7 +2,7 @@
 
 #include "scene/fanSceneSerializable.hpp"
 #include "ecs/fanEcsWorld.hpp"
-#include "game/singletonComponents/fanGame.hpp"
+#include "game/singletons/fanGame.hpp"
 #include "network/components/fanClientRPC.hpp"
 
 namespace fan

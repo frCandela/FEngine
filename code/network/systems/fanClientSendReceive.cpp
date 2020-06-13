@@ -6,7 +6,7 @@
 #include "network/components/fanClientGameData.hpp"
 #include "network/components/fanReliabilityLayer.hpp"
 #include "network/components/fanClientReplication.hpp"
-#include "game/singletonComponents/fanGame.hpp"
+#include "game/singletons/fanGame.hpp"
 
 namespace fan
 {	

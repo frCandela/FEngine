@@ -1,10 +1,10 @@
-#include "editor/singletonComponents/fanEditorCopyPaste.hpp"
+#include "editor/singletons/fanEditorCopyPaste.hpp"
 
 #include <sstream>
 #include "ecs/fanEcsWorld.hpp"
-#include "editor/singletonComponents/fanEditorSelection.hpp"
+#include "editor/singletons/fanEditorSelection.hpp"
 #include "scene/fanPrefab.hpp"
-#include "scene/singletonComponents/fanScene.hpp"
+#include "scene/singletons/fanScene.hpp"
 
 namespace fan
 {

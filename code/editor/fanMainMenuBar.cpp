@@ -1,9 +1,9 @@
 #include "editor/fanMainMenuBar.hpp"
 
 #include "core/fanDebug.hpp"
-#include "editor/singletonComponents/fanEditorGrid.hpp"
+#include "editor/singletons/fanEditorGrid.hpp"
 #include "editor/windows/fanEditorWindow.hpp"
-#include "editor/singletonComponents/fanEditorSelection.hpp"
+#include "editor/singletons/fanEditorSelection.hpp"
 #include "editor/fanModals.hpp"
 #include "core/fanSerializedValues.hpp"
 #include "core/input/fanInput.hpp"
@@ -11,10 +11,10 @@
 #include "core/time/fanProfiler.hpp"
 #include "core/time/fanTime.hpp"
 #include "ecs/fanEcsWorld.hpp"
-#include "scene/singletonComponents/fanScene.hpp"
+#include "scene/singletons/fanScene.hpp"
 #include "scene/components/fanSceneNode.hpp"
 #include "scene/components/fanTransform.hpp"
-#include "game/singletonComponents/fanGame.hpp"
+#include "game/singletons/fanGame.hpp"
 #include "render/fanRenderGlobal.hpp"
 
 namespace fan

@@ -1,7 +1,7 @@
 #include "network/components/fanHostReplication.hpp"
 
 #include "ecs/fanEcsWorld.hpp"
-#include "network/singletonComponents/fanLinkingContext.hpp"
+#include "network/singletons/fanLinkingContext.hpp"
 
 namespace fan
 {

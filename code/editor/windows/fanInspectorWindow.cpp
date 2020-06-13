@@ -1,10 +1,10 @@
 #include "editor/windows/fanInspectorWindow.hpp"
 
 #include <sstream>
-#include "editor/singletonComponents/fanEditorSelection.hpp"
+#include "editor/singletons/fanEditorSelection.hpp"
 #include "scene/fanDragnDrop.hpp"
-#include "scene/singletonComponents/fanScene.hpp"
-#include "scene/singletonComponents/fanPhysicsWorld.hpp"
+#include "scene/singletons/fanScene.hpp"
+#include "scene/singletons/fanPhysicsWorld.hpp"
 #include "scene/components/fanSceneNode.hpp"
 #include "scene/components/fanSphereShape.hpp"
 #include "scene/components/fanBoxShape.hpp"

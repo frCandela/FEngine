@@ -1,16 +1,16 @@
-#include "game/singletonComponents/fanCollisionManager.hpp"
+#include "game/singletons/fanCollisionManager.hpp"
 
 #include "core/fanDebug.hpp"
 #include "ecs/fanEcsWorld.hpp"
 #include "scene/components/fanRigidbody.hpp"
 #include "scene/components/fanTransform.hpp"
 #include "scene/components/fanSceneNode.hpp"
-#include "scene/singletonComponents/fanScene.hpp"
+#include "scene/singletons/fanScene.hpp"
 #include "game/components/fanBullet.hpp"
 #include "game/components/fanHealth.hpp"
 #include "game/components/fanDamage.hpp"
 #include "game/components/fanSpaceShip.hpp"
-#include "scene/singletonComponents/fanPhysicsWorld.hpp"
+#include "scene/singletons/fanPhysicsWorld.hpp"
 
 namespace fan
 {

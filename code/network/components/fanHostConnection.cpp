@@ -2,7 +2,7 @@
 
 #include "core/time/fanTime.hpp"
 #include "ecs/fanEcsWorld.hpp"
-#include "game/singletonComponents/fanGame.hpp"
+#include "game/singletons/fanGame.hpp"
 #include "network/fanImGuiNetwork.hpp"
 
 namespace fan

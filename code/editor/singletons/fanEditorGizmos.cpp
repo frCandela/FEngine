@@ -1,4 +1,4 @@
-#include "editor/singletonComponents/fanEditorGizmos.hpp"
+#include "editor/singletons/fanEditorGizmos.hpp"
 
 #include "editor/fanEditorDebug.hpp"
 #include "core/math/shapes/fanRay.hpp"
@@ -7,7 +7,7 @@
 #include "scene/components/fanSceneNode.hpp"
 #include "scene/components/fanTransform.hpp"
 #include "scene/components/fanCamera.hpp"
-#include "scene/singletonComponents/fanScene.hpp"
+#include "scene/singletons/fanScene.hpp"
 #include "render/fanRendererDebug.hpp"
 #include "ecs/fanEcsWorld.hpp"
 

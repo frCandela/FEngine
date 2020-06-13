@@ -1,8 +1,8 @@
-#include "game/singletonComponents/fanClientNetworkManager.hpp"
+#include "game/singletons/fanClientNetworkManager.hpp"
 
 #include "core/fanDebug.hpp"
 #include "core/time/fanTime.hpp"
-#include "game/singletonComponents/fanGame.hpp"
+#include "game/singletons/fanGame.hpp"
 #include "game/components/fanPlayerController.hpp"
 #include "game/components/fanPlayerInput.hpp"
 #include "ecs/fanEcsWorld.hpp"
@@ -10,11 +10,11 @@
 #include "scene/components/fanTransform.hpp"
 #include "scene/components/fanRigidbody.hpp"
 #include "scene/components/fanSceneNode.hpp"
-#include "scene/singletonComponents/fanScene.hpp"
+#include "scene/singletons/fanScene.hpp"
 #include "network/components/fanClientReplication.hpp"
 #include "network/components/fanClientConnection.hpp"
-#include "network/singletonComponents/fanLinkingContext.hpp"
-#include "game/singletonComponents/fanSpawnManager.hpp"
+#include "network/singletons/fanLinkingContext.hpp"
+#include "network/singletons/fanSpawnManager.hpp"
 #include "network/components/fanClientRPC.hpp"
 #include "network/components/fanClientGameData.hpp"
 #include "network/components/fanReliabilityLayer.hpp"
@@ -65,7 +65,7 @@ namespace fan
 		rpcManager.onShiftFrameIndex.Connect( &Game::OnShiftFrameIndex, &game );
 		rpcManager.onSpawnClientShip.Connect( &ClientGameData::OnSpawnClientShip, _world, persistentHandle );
 		rpcManager.onSpawnShip.Connect( &ClientNetworkManager::OnSpawnShip, this );
-		rpcManager.onSpawnBullet.Connect( &SpawnManager::OnSpawnBullet, &spawnManager );
+		rpcManager.onSpawn.Connect( &SpawnManager::OnSpawn, &spawnManager );
 
 		// Bind socket
 		ClientConnection& connection = _world.GetComponent<ClientConnection>( persistentID );

@@ -1,4 +1,4 @@
-#include "editor/singletonComponents/fanEditorGrid.hpp"
+#include "editor/singletons/fanEditorGrid.hpp"
 
 #include "core/fanSerializedValues.hpp"
 #include "render/fanRendererDebug.hpp"

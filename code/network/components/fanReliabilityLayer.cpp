@@ -1,6 +1,6 @@
 #include "network/components/fanReliabilityLayer.hpp"
 
-#include "network/singletonComponents/fanHostManager.hpp"
+#include "network/singletons/fanHostManager.hpp"
 #include "core/time/fanTime.hpp"
 #include "ecs/fanEcsWorld.hpp"
 

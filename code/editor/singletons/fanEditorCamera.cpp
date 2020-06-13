@@ -1,4 +1,4 @@
-#include "editor/singletonComponents/fanEditorCamera.hpp"
+#include "editor/singletons/fanEditorCamera.hpp"
 
 #include "core/input/fanMouse.hpp"
 #include "core/input/fanInput.hpp"
@@ -7,7 +7,7 @@
 #include "scene/components/fanTransform.hpp"
 #include "scene/components/fanCamera.hpp"
 #include "scene/components/fanSceneNode.hpp"
-#include "scene/singletonComponents/fanScene.hpp"
+#include "scene/singletons/fanScene.hpp"
 #include "ecs/fanEcsWorld.hpp"
 
 namespace fan

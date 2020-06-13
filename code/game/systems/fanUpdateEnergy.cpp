@@ -4,7 +4,7 @@
 #include "scene/components/fanTransform.hpp"
 #include "game/components/fanSolarPanel.hpp"
 #include "game/components/fanBattery.hpp"
-#include "game/singletonComponents/fanSunLight.hpp"
+#include "game/singletons/fanSunLight.hpp"
 
 namespace fan
 {

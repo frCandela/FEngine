@@ -1,4 +1,4 @@
-#include "scene/singletonComponents/fanRenderWorld.hpp"
+#include "scene/singletons/fanRenderWorld.hpp"
 
 namespace fan
 {

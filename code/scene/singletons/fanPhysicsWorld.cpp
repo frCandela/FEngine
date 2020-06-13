@@ -1,4 +1,4 @@
-#include "scene/singletonComponents/fanPhysicsWorld.hpp"
+#include "scene/singletons/fanPhysicsWorld.hpp"
 
 #include "core/time/fanTime.hpp"
 #include "core/fanSerializable.hpp"
