@@ -65,17 +65,14 @@ namespace fan
 					const NetID ownerID = linkingContext.EcsHandleToNetID.at( ownerHandle );
 					const btVector3 bulletPosition = transform.GetPosition() + transform.TransformDirection( weapon.originOffset );
 					const btVector3 bulletVelocity = rigidbody.GetVelocity() + weapon.bulletSpeed * transform.Forward();
-
-					SpawnInfo info;
-					info.spawnFrameIndex = game.frameIndex + 5;
-					spawn::SpawnBullet::WriteInfo( info.data, ownerID, bulletPosition, bulletVelocity );
+					const SpawnInfo info = spawn::SpawnBullet::GenerateInfo( game.frameIndex + 5, ownerID, bulletPosition, bulletVelocity );
 					
 					// spawn on server
 					spawnManager.spawns.push_back( info ); 
 
 					// spawn on all hosts
 					S_ReplicateOnAllHosts::Run( _world, _world.Match( S_ReplicateOnAllHosts::GetSignature( _world ) ),
-					ClientRPC::RPCSpawn( info.spawnFrameIndex, info.data ), HostReplication::ResendUntilReplicated );
+					ClientRPC::RPCSpawn( info ), HostReplication::ResendUntilReplicated );
 				}			
 			}
 		}

@@ -3,6 +3,7 @@
 #include "core/fanDebug.hpp"
 #include "game/singletons/fanGame.hpp"
 #include "game/spawn/fanSpawnBullet.hpp"
+#include "game/spawn/fanSpawnShip.hpp"
 
 namespace fan
 {
@@ -30,7 +31,8 @@ namespace fan
 	void SpawnManager::RegisterSpawnMethods( SpawnManager& _spawnManager )
 	{
 		_spawnManager.spawnMethods.clear();
-		_spawnManager.spawnMethods[ spawn::SpawnBullet::id ] = &spawn::SpawnBullet::Spawn;
+		_spawnManager.spawnMethods[ spawn::SpawnBullet::s_id ] = &spawn::SpawnBullet::Spawn;
+		_spawnManager.spawnMethods[ spawn::SpawnShip::s_id   ] = &spawn::SpawnShip::Spawn;
 	}
 
 	//================================================================================================================================

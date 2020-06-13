@@ -7,6 +7,8 @@
 
 namespace fan
 {
+	struct SpawnInfo;
+
 	//================================================================================================================================
 	// Manages remote procedure calls
 	// A remote procedure call is the act of one host causing a	procedure to execute on one or more remote hosts
@@ -35,14 +37,10 @@ namespace fan
 
 		Signal< FrameIndexNet, sf::Packet >	 onSpawn;
 		void					 UnwrapSpawn( sf::Packet& _packet );
-		static PacketReplication RPCSpawn( const FrameIndexNet _frameIndex, const sf::Packet& _data );
+		static PacketReplication RPCSpawn( const SpawnInfo& spawnInfo );
 
 		Signal < NetID, FrameIndex > onSpawnClientShip;
 		void					 UnwrapSpawnClientShip( sf::Packet& _packet );
 		static PacketReplication RPCSpawnClientShip( const NetID _spaceshipID, const FrameIndex _frameIndex );
-
-		Signal < NetID, FrameIndex > onSpawnShip;
-		void					 UnwrapSpawnShip( sf::Packet& _packet);
-		static PacketReplication RPCSpawnShip( const NetID _spaceshipID, const FrameIndex _frameIndex );
 	};
 }

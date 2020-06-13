@@ -7,10 +7,12 @@
 #include "network/components/fanClientRPC.hpp"
 #include "network/singletons/fanHostManager.hpp"
 #include "network/singletons/fanServerConnection.hpp"
+#include "network/singletons/fanSpawnManager.hpp"	
 #include "network/components/fanHostConnection.hpp"
 #include "network/components/fanHostReplication.hpp"
 #include "network/components/fanHostGameData.hpp"
 #include "network/components/fanReliabilityLayer.hpp"
+#include "game/spawn/fanSpawnShip.hpp"
 #include "game/singletons/fanGame.hpp"
 #include "game/components/fanPlayerInput.hpp"
 #include "scene/components/fanTransform.hpp"
@@ -77,16 +79,18 @@ namespace fan
 								const EcsEntity otherHostEntity = _world.GetEntity( otherHostHandle );
 
 								// replicate new host on all other hosts
-								HostReplication& otherHostReplication = _world.GetComponent< HostReplication >( otherHostEntity );
+								const SpawnInfo spawnInfo1 = spawn::SpawnShip::GenerateInfo( spawnFrame, hostData.spaceshipID, btVector3::Zero() );
+								HostReplication& otherHostReplication = _world.GetComponent< HostReplication >( otherHostEntity );								
 								otherHostReplication.Replicate(
-									ClientRPC::RPCSpawnShip( hostData.spaceshipID, spawnFrame )
+									ClientRPC::RPCSpawn( spawnInfo1 )
 									, HostReplication::ResendUntilReplicated
 								);
 
  								// replicate all other hosts on new host		
 								HostGameData& otherHostData = _world.GetComponent< HostGameData >( otherHostEntity );
+								const SpawnInfo spawnInfo2 = spawn::SpawnShip::GenerateInfo( spawnFrame, otherHostData.spaceshipID, btVector3::Zero() );
 								hostReplication.Replicate(
-									ClientRPC::RPCSpawnShip( otherHostData.spaceshipID, game.frameIndex )
+									ClientRPC::RPCSpawn( spawnInfo2 )
 									, HostReplication::ResendUntilReplicated
 								);
 							}

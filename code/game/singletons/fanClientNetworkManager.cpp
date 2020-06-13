@@ -3,8 +3,6 @@
 #include "core/fanDebug.hpp"
 #include "core/time/fanTime.hpp"
 #include "game/singletons/fanGame.hpp"
-#include "game/components/fanPlayerController.hpp"
-#include "game/components/fanPlayerInput.hpp"
 #include "ecs/fanEcsWorld.hpp"
 #include "scene/fanSceneSerializable.hpp"
 #include "scene/components/fanTransform.hpp"
@@ -39,7 +37,6 @@ namespace fan
 	{
 		ClientNetworkManager& netManager = static_cast<ClientNetworkManager&>( _component );
 		netManager.persistentHandle = 0;
-		netManager.shipsToSpawn.clear();
 	}
 
 	//================================================================================================================================
@@ -64,7 +61,6 @@ namespace fan
 		rpcManager.onShiftFrameIndex.Connect( &ClientGameData::OnShiftFrameIndex, _world, persistentHandle );
 		rpcManager.onShiftFrameIndex.Connect( &Game::OnShiftFrameIndex, &game );
 		rpcManager.onSpawnClientShip.Connect( &ClientGameData::OnSpawnClientShip, _world, persistentHandle );
-		rpcManager.onSpawnShip.Connect( &ClientNetworkManager::OnSpawnShip, this );
 		rpcManager.onSpawn.Connect( &SpawnManager::OnSpawn, &spawnManager );
 
 		// Bind socket
@@ -96,46 +92,13 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void ClientNetworkManager::SpawnShips( EcsWorld& _world )
+	void ClientNetworkManager::OnGui( EcsWorld& /*_world*/, EcsSingleton& _component )
 	{
-		const Game& game = _world.GetSingleton<Game>();
-		ClientNetworkManager& netManager = _world.GetSingleton<ClientNetworkManager>();
-		LinkingContext& linkingContext = _world.GetSingleton<LinkingContext>();
-
-		for (int i = (int)netManager.shipsToSpawn.size() - 1; i >= 0 ; i--)
-		{
-			std::pair<NetID, FrameIndex> pair = netManager.shipsToSpawn[i];
-			const FrameIndex spawnFrameIndex = pair.second;
-			if( game.frameIndex >= spawnFrameIndex )
-			{
-				// do not spawn twice
-				const NetID spaceshipID = pair.first;
-				if( linkingContext.netIDToEcsHandle.find( spaceshipID ) == linkingContext.netIDToEcsHandle.end() )
-				{
-					// spawn
-					const EcsHandle handle = Game::SpawnSpaceship( _world, false, false );
-					linkingContext.AddEntity( handle, spaceshipID );
-				}
-				netManager.shipsToSpawn.erase( netManager.shipsToSpawn.begin() + i );
-			}
-		}
-	}
-
-	//================================================================================================================================
-	//================================================================================================================================
-	void ClientNetworkManager::OnSpawnShip( NetID _spaceshipID, FrameIndex _frameIndex )
-	{
-		shipsToSpawn.push_back( {_spaceshipID, _frameIndex} );
-	}
-
-	//================================================================================================================================
-	//================================================================================================================================
-	void ClientNetworkManager::OnGui( EcsWorld& /*_world*/, EcsSingleton& /*_component*/ )
-	{
-		//ClientNetworkManager& netManager = static_cast<ClientNetworkManager&>( _component );
+		ClientNetworkManager& netManager = static_cast<ClientNetworkManager&>( _component );
 
 		ImGui::Indent(); ImGui::Indent();
 		{
+			ImGui::Text( "persistent handle : %d", netManager.persistentHandle );
 		}
 		ImGui::Unindent(); ImGui::Unindent();
 	}

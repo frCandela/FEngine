@@ -22,11 +22,5 @@ namespace fan
 		void Stop( EcsWorld& _world );			
 
 		EcsHandle persistentHandle;
-		std::vector< std::pair<NetID, FrameIndex> > shipsToSpawn;
-
-		static void SpawnShips( EcsWorld& _world );
-
-		// callbacks
-		void OnSpawnShip( NetID _spaceshipID, FrameIndex _frameIndex );
 	};
 }

@@ -1,3 +1,5 @@
+#pragma once
+
 #include "network/singletons/fanSpawnManager.hpp"
 
 #include "game/singletons/fanCollisionManager.hpp"
@@ -20,17 +22,22 @@ namespace fan
 		//================================================================================================================================
 		struct SpawnBullet
 		{
-			static const SpawnIdType  id = 'BLET';
+			static const SpawnIdType  s_id = 'BLET';
 
 			//================================================================
 			//================================================================
-			static void WriteInfo( sf::Packet& _data, const NetID _owner, const  btVector3 _position, const btVector3 _velocity )
+			static SpawnInfo GenerateInfo( const FrameIndexNet _spawnFrameIndex, const NetID _owner, const  btVector3 _position, const btVector3 _velocity )
 			{
+				SpawnInfo info;
+				info.spawnFrameIndex = _spawnFrameIndex;
+
 				// Write data to packet
-				_data << id;
-				_data << _position[0] << _position[2];
-				_data << _velocity[0] << _velocity[2];
-				_data << _owner;
+				info.data << s_id;
+				info.data << _position[0] << _position[2];
+				info.data << _velocity[0] << _velocity[2];
+				info.data << _owner;
+
+				return info;
 			}
 
 			//================================================================
