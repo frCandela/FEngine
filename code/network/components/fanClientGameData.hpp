@@ -27,9 +27,7 @@ namespace fan
 			FrameIndex mostRecentFrame;		// most recent frame index when the inputs were sent
 		};
 
-		FrameIndex							spaceshipSpawnFrameIndex;	// the frame index on which the spaceship is spawned
-		NetID								spaceshipNetID;
-		EcsHandle						spaceshipHandle;
+		EcsHandle							spaceshipHandle;
 		std::deque< PacketInput::InputData >previousInputs;
 		std::deque< PacketInput::InputData >previousInputsSinceLastGameState;
 		std::deque< InputSent>				inputsSent;
@@ -46,7 +44,6 @@ namespace fan
 		// callbacks
 		void OnInputReceived( PacketTag _tag );
 		void OnShiftFrameIndex( const int _framesDelta );
-		void OnSpawnClientShip( NetID _spaceshipID, FrameIndex _frameIndex );
 	};
 	static constexpr size_t sizeof_clientGameData = sizeof( ClientGameData );
 }

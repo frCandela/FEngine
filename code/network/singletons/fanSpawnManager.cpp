@@ -33,6 +33,7 @@ namespace fan
 		_spawnManager.spawnMethods.clear();
 		_spawnManager.spawnMethods[ spawn::SpawnBullet::s_id ] = &spawn::SpawnBullet::Spawn;
 		_spawnManager.spawnMethods[ spawn::SpawnShip::s_id   ] = &spawn::SpawnShip::Spawn;
+		_spawnManager.spawnMethods[ spawn::SpawnClientShip::s_id] = &spawn::SpawnClientShip::Spawn;
 	}
 
 	//================================================================================================================================

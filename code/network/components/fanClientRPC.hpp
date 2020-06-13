@@ -38,9 +38,5 @@ namespace fan
 		Signal< FrameIndexNet, sf::Packet >	 onSpawn;
 		void					 UnwrapSpawn( sf::Packet& _packet );
 		static PacketReplication RPCSpawn( const SpawnInfo& spawnInfo );
-
-		Signal < NetID, FrameIndex > onSpawnClientShip;
-		void					 UnwrapSpawnClientShip( sf::Packet& _packet );
-		static PacketReplication RPCSpawnClientShip( const NetID _spaceshipID, const FrameIndex _frameIndex );
 	};
 }

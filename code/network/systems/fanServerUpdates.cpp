@@ -61,8 +61,9 @@ namespace fan
 						hostData.spaceshipHandle = Game::SpawnSpaceship( _world, true, false );
 						linkingContext.AddEntity( hostData.spaceshipHandle, hostData.spaceshipID );						
 						const FrameIndexNet spawnFrame = game.frameIndex + 60;
+						const SpawnInfo spawnInfo0 = spawn::SpawnClientShip::GenerateInfo( spawnFrame, hostData.spaceshipID, btVector3::Zero() );
 						hostReplication.Replicate(
-							ClientRPC::RPCSpawnClientShip( hostData.spaceshipID, spawnFrame )
+							ClientRPC::RPCSpawn( spawnInfo0 )
 							, HostReplication::ResendUntilReplicated
 						);
 

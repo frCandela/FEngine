@@ -14,41 +14,7 @@
 #include "scene/components/fanRigidbody.hpp"
 
 namespace fan
-{
-	//================================================================================================================================
-	//================================================================================================================================
-	EcsSignature S_ClientSpawnSpaceship::GetSignature( const EcsWorld& _world )
-	{
-		return	_world.GetSignature<ClientGameData>();
-	}
-
-	//================================================================================================================================
-	//================================================================================================================================
-	void S_ClientSpawnSpaceship::Run( EcsWorld& _world, const EcsView& _view, const float _delta )
-	{
-		if( _delta == 0.f ) { return; }
-
-		LinkingContext& linkingContext = _world.GetSingleton<LinkingContext>();
-		const Game& game = _world.GetSingleton<Game>();
-
-		for( auto gameDataIt = _view.begin<ClientGameData>(); gameDataIt != _view.end<ClientGameData>(); ++gameDataIt )
-		{
-			ClientGameData& gameData = *gameDataIt;
-
-			// spawns spaceship
-			if( gameData.spaceshipSpawnFrameIndex != 0 
-				&& game.frameIndex >= gameData.spaceshipSpawnFrameIndex
-				&& gameData.spaceshipHandle == 0 )
-			{
-				assert( gameData.spaceshipNetID != 0 );
-
-				gameData.spaceshipSpawnFrameIndex = 0;
-				gameData.spaceshipHandle = Game::SpawnSpaceship( _world, true, true );
-				linkingContext.AddEntity( gameData.spaceshipHandle, gameData.spaceshipNetID );
-			}
-		}
-	}
-
+{ 
 	//================================================================================================================================
 	//================================================================================================================================
 	EcsSignature S_ClientSaveState::GetSignature( const EcsWorld& _world )

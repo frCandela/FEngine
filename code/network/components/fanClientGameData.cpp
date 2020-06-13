@@ -18,8 +18,6 @@ namespace fan
 	void ClientGameData::Init( EcsWorld& /*_world*/, EcsEntity /*_entity*/, EcsComponent& _component )
 	{
 		ClientGameData& gameData = static_cast<ClientGameData&>( _component );
-		gameData.spaceshipSpawnFrameIndex = 0;
-		gameData.spaceshipNetID = 0;
 		gameData.spaceshipHandle = 0;
 		gameData.frameSynced = false;
 		gameData.previousInputs					  = std::deque< PacketInput::InputData >();	// clear
@@ -186,29 +184,15 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void ClientGameData::OnSpawnClientShip( NetID _spaceshipID, FrameIndex _frameIndex )
-	{
-		if( spaceshipNetID == 0 )
-		{
-			spaceshipSpawnFrameIndex = _frameIndex;
-			spaceshipNetID = _spaceshipID;
-			spaceshipSynced = true;
-		}
-	}
-
-	//================================================================================================================================
-	//================================================================================================================================
 	void ClientGameData::OnGui( EcsWorld& /*_world*/, EcsEntity /*_entityID*/, EcsComponent& _component )
 	{
 		ClientGameData& gameData = static_cast<ClientGameData&>( _component );
 		ImGui::PushItemWidth( 0.6f * ImGui::GetWindowWidth() - 16 );
 		{
 			ImGui::DragInt( "max input sent", &gameData.maxInputSent, 1.f, 0, 200 );
-			ImGui::Text( "spaceship spawn frame: %d", gameData.spaceshipSpawnFrameIndex);
-			ImGui::Text( "spaceship net ID:      %d", gameData.spaceshipNetID);
 			ImGui::Text( "size previous states:  %d", gameData.previousStates.size());
 			ImGui::Text( "%s", gameData.frameSynced ? "frame synced" : "frame not synced" );
-			ImGui::Text( "size pennding inputs:  %d", gameData.previousInputs.size() );
+			ImGui::Text( "size pending inputs:  %d", gameData.previousInputs.size() );
 			ImGui::Text( "size inputs sent:      %d", gameData.inputsSent.size() );
 			ImGui::Text( "size previous inputs:  %d", gameData.previousInputsSinceLastGameState.size() );
 			

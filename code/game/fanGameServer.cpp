@@ -207,12 +207,12 @@ namespace fan
 			S_DetectHostTimout		::Run( world, world.Match( S_DetectHostTimout::GetSignature( world ) ) );
 			S_HostSpawnShip			::Run( world, world.Match( S_HostSpawnShip::GetSignature( world ) ), _delta );
 			S_HostSyncFrame			::Run( world, world.Match( S_HostSyncFrame::GetSignature( world ) ), _delta );
+			SpawnManager			::Spawn( world );
 
 			// update	
 			S_HostUpdateInput::Run( world, world.Match( S_HostUpdateInput::GetSignature( world ) ), _delta );
 			S_MovePlanets::Run( world, world.Match( S_MovePlanets::GetSignature( world ) ), _delta );
 			S_MoveSpaceships::Run( world, world.Match( S_MoveSpaceships::GetSignature( world ) ), _delta );
-			SpawnManager::Spawn( world );
 
 			// physics & transforms
 			PhysicsWorld& physicsWorld = world.GetSingleton<PhysicsWorld>();

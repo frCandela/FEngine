@@ -22,7 +22,6 @@ namespace fan
 		ClientRPC& rpc = static_cast<ClientRPC&>( _component );
 		rpc.nameToRPCTable.clear();
 		rpc.onShiftFrameIndex.Clear();
-		rpc.onSpawnClientShip.Clear();
 		rpc.onSpawn.Clear();
 		rpc.RegisterRPCs();
 	}
@@ -36,7 +35,6 @@ namespace fan
 		nameToRPCTable.clear();
 		nameToRPCTable[ 'SYNC' ] = &ClientRPC::UnwrapShiftClientFrame ;
 		nameToRPCTable[ 'SPAN' ] = &ClientRPC::UnwrapSpawn ;
-		nameToRPCTable[ 'SPWN' ] = &ClientRPC::UnwrapSpawnClientShip ;
 	}
 
 	//================================================================================================================================
@@ -107,35 +105,6 @@ namespace fan
 		sf::Int32 framesDelta;
 		_packet >> framesDelta;
 		onShiftFrameIndex.Emmit( framesDelta );
-	}
-
-	//================================================================================================================================
-	// spawns the clients spaceship at a specific frame
-	//================================================================================================================================
-	PacketReplication ClientRPC::RPCSpawnClientShip( const NetID _spaceshipID, const FrameIndex _frameIndex )
-	{
-		PacketReplication packet;
-		packet.replicationType = PacketReplication::ReplicationType::RPC;
-
-		packet.packetData.clear();
-		packet.packetData << RpcId( 'SPWN' );
-		packet.packetData << _spaceshipID;
-		packet.packetData << FrameIndexNet(_frameIndex);
-
-		return packet;
-	}
-
-	//================================================================================================================================
-	// spawns the clients spaceship at a specific frame
-	//================================================================================================================================
-	void ClientRPC::UnwrapSpawnClientShip( sf::Packet& _packet )
-	{
-		FrameIndexNet frameIndex;
-		NetID spaceshipID;
-
-		_packet >> spaceshipID;
-		_packet >> frameIndex;
-		onSpawnClientShip.Emmit( spaceshipID, frameIndex );
 	}
 
 	//================================================================================================================================

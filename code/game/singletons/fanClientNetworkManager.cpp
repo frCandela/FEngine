@@ -60,7 +60,6 @@ namespace fan
 		SpawnManager& spawnManager = _world.GetSingleton<SpawnManager>();
 		rpcManager.onShiftFrameIndex.Connect( &ClientGameData::OnShiftFrameIndex, _world, persistentHandle );
 		rpcManager.onShiftFrameIndex.Connect( &Game::OnShiftFrameIndex, &game );
-		rpcManager.onSpawnClientShip.Connect( &ClientGameData::OnSpawnClientShip, _world, persistentHandle );
 		rpcManager.onSpawn.Connect( &SpawnManager::OnSpawn, &spawnManager );
 
 		// Bind socket
