@@ -12,6 +12,6 @@ namespace fan
 	struct S_RaycastAll : EcsSystem
 	{
 		static EcsSignature GetSignature( const EcsWorld& _world );
-		static bool Run( EcsWorld& _world, const EcsView& _view, const Ray& _ray, std::vector<EcsEntity>& _outResults );
+		static void Run( EcsWorld& _world, const EcsView& _view, const Ray& _ray, std::vector<EcsEntity>& _outResults );
 	};
 }

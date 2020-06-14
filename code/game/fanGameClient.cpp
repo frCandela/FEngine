@@ -156,7 +156,7 @@ namespace fan
 		netManager->Start( world );
 
 		// Init game
-		S_RegisterAllRigidbodies::Run( world, world.Match( S_RegisterAllRigidbodies::GetSignature( world ) ) );
+		world.Run<S_RegisterAllRigidbodies>();
 		GameCamera::CreateGameCamera( world );
 		SolarEruption::Start( world );
 
@@ -169,7 +169,7 @@ namespace fan
 	void  GameClient::Stop()
 	{
 		// clears the physics world
-		S_UnregisterAllRigidbodies::Run( world, world.Match( S_UnregisterAllRigidbodies::GetSignature( world ) ) );
+		world.Run<S_UnregisterAllRigidbodies>();
 
 		// clears the particles mesh
 		RenderWorld& renderWorld = world.GetSingleton<RenderWorld>();
@@ -258,14 +258,13 @@ namespace fan
 					input.boost = inputData.boost;
 					input.fire = inputData.fire;
 
-					S_MovePlanets::Run( world, world.Match( S_MovePlanets::GetSignature( world ) ), delta );
-					S_MoveSpaceships::Run( world, world.Match( S_MoveSpaceships::GetSignature( world ) ), delta );
+					world.Run<S_MovePlanets>( delta );
+					world.Run<S_MoveSpaceships>( delta );
 
-					S_SynchronizeMotionStateFromTransform::Run( world, world.Match( S_SynchronizeMotionStateFromTransform::GetSignature( world ) ) );
+					world.Run<S_SynchronizeMotionStateFromTransform>();
 					physicsWorld.dynamicsWorld->stepSimulation( game->logicDelta, 10, Time::Get().GetPhysicsDelta() );
-					S_SynchronizeTransformFromMotionState::Run( world, world.Match( S_SynchronizeTransformFromMotionState::GetSignature( world ) ) );
-
-					S_ClientSaveState::Run( world, world.Match( S_ClientSaveState::GetSignature( world ) ), delta );									
+					world.Run<S_SynchronizeTransformFromMotionState>();
+					world.Run<S_ClientSaveState>( delta );
  				}	
 
 				gameData.spaceshipSynced = true;
@@ -280,7 +279,7 @@ namespace fan
 	{		
 		{
 			SCOPED_PROFILE( scene_update );			
-			S_ClientReceive::Run( world, world.Match( S_ClientReceive::GetSignature( world ) ), _delta );
+			world.Run<S_ClientReceive>( _delta );
 
 			RollbackResimulate( world );
 
@@ -289,49 +288,48 @@ namespace fan
 				game->frameIndex++;
 			}
 
-			S_ProcessTimedOutPackets	::Run( world, world.Match( S_ProcessTimedOutPackets::GetSignature( world ) ) );
-			S_ClientDetectServerTimeout	::Run( world, world.Match( S_ClientDetectServerTimeout::GetSignature( world ) )	, _delta );
-			S_ClientRunReplication		::Run( world, world.Match( S_ClientRunReplication::GetSignature( world ) )		, _delta );
-			SpawnManager				::Spawn( world );
+			world.Run<S_ProcessTimedOutPackets>();
+			world.Run<S_ClientDetectServerTimeout>( _delta );
+			world.Run<S_ClientRunReplication>(		_delta );
+			SpawnManager::Spawn( world );
 
 			// update
-			S_RefreshPlayerInput::Run( world, world.Match( S_RefreshPlayerInput::GetSignature( world ) ), _delta );
-			S_ClientSaveInput::Run( world, world.Match( S_ClientSaveInput::GetSignature( world ) ), _delta );
-			S_MovePlanets::Run( world, world.Match( S_MovePlanets::GetSignature( world ) ), _delta );
-			S_MoveSpaceships::Run( world, world.Match( S_MoveSpaceships::GetSignature( world ) ), _delta );
+			world.Run<S_RefreshPlayerInput>( _delta );
+			world.Run<S_ClientSaveInput>( _delta );
+			world.Run<S_MovePlanets>( _delta );
+			world.Run<S_MoveSpaceships>( _delta );
 
 			// physics & transforms
 			PhysicsWorld& physicsWorld = world.GetSingleton<PhysicsWorld>();
-			S_SynchronizeMotionStateFromTransform	::Run( world, world.Match( S_SynchronizeMotionStateFromTransform::GetSignature( world ) ) );
+			world.Run<S_SynchronizeMotionStateFromTransform>();
 			physicsWorld.dynamicsWorld->stepSimulation( _delta, 10, Time::Get().GetPhysicsDelta() );
-			S_SynchronizeTransformFromMotionState	::Run( world, world.Match( S_SynchronizeTransformFromMotionState::GetSignature( world ) ) );
-			S_MoveFollowTransforms					::Run( world, world.Match( S_MoveFollowTransforms::GetSignature( world ) ) );
-			S_MoveFollowTransformsUI				::Run( world, world.Match( S_MoveFollowTransformsUI::GetSignature( world ) ) );	
+			world.Run<S_SynchronizeTransformFromMotionState>();
+			world.Run<S_MoveFollowTransforms>();
+			world.Run<S_MoveFollowTransformsUI>();
 
-			S_ClientSaveState::Run( world, world.Match( S_ClientSaveState::GetSignature( world ) ), _delta );
+			world.Run<S_ClientSaveState>( _delta );
 			
-			S_FireWeapons			::Run( world, world.Match( S_FireWeapons::GetSignature( world ) )			, _delta );			
-			S_GenerateLightMesh		::Run( world, world.Match( S_GenerateLightMesh::GetSignature( world ) )		, _delta );
-			S_UpdateSolarPannels	::Run(world, world.Match( S_UpdateSolarPannels::GetSignature( world ) )		, _delta );
-			S_RechargeBatteries		::Run( world, world.Match( S_RechargeBatteries::GetSignature( world ) )		, _delta );
-			S_UpdateExpirationTimes	::Run( world, world.Match( S_UpdateExpirationTimes::GetSignature( world ) )	, _delta );
-			S_EruptionDamage		::Run( world, world.Match( S_EruptionDamage::GetSignature( world ) )		, _delta );
-			S_UpdateGameUiValues	::Run( world, world.Match( S_UpdateGameUiValues::GetSignature( world ) )	, _delta );
-			S_UpdateGameUiPosition	::Run( world, world.Match( S_UpdateGameUiPosition::GetSignature( world ) )	, _delta );
-			SolarEruption			::Step( world, _delta );
-			S_PlayerDeath			::Run( world, world.Match( S_PlayerDeath::GetSignature( world ) ), _delta );
+			world.Run<S_FireWeapons>(			 _delta );
+			world.Run<S_GenerateLightMesh>(		 _delta );
+			world.Run<S_UpdateSolarPannels>(	 _delta );
+			world.Run<S_RechargeBatteries>(		 _delta );
+			world.Run<S_UpdateExpirationTimes>(	 _delta );
+			world.Run<S_EruptionDamage>(		 _delta );
+			world.Run<S_UpdateGameUiValues>(	 _delta );
+			world.Run<S_UpdateGameUiPosition>(	 _delta );
+			SolarEruption::Step(world,			 _delta );
+			world.Run<S_PlayerDeath>(			 _delta );
 
 			// late update
-			S_ParticlesOcclusion		::Run( world, world.Match( S_ParticlesOcclusion::GetSignature( world ) )		, _delta );
-			S_UpdateParticles			::Run( world, world.Match( S_UpdateParticles::GetSignature( world ) )			, _delta );
-			S_EmitParticles				::Run( world, world.Match( S_EmitParticles::GetSignature( world ) )				, _delta );
-			S_GenerateParticles			::Run( world, world.Match( S_GenerateParticles::GetSignature( world ) )			, _delta );
-			S_UpdateBoundsFromRigidbody	::Run( world, world.Match( S_UpdateBoundsFromRigidbody::GetSignature( world ) )	, _delta );
-			S_UpdateBoundsFromModel		::Run( world, world.Match( S_UpdateBoundsFromModel::GetSignature( world ) ) );
-			S_UpdateBoundsFromTransform	::Run( world, world.Match( S_UpdateBoundsFromTransform::GetSignature( world ) ) );
-			S_UpdateGameCamera			::Run( world, world.Match( S_UpdateGameCamera::GetSignature( world ) )			, _delta );
-			
-			S_ClientSend		::Run( world, world.Match( S_ClientSend::GetSignature( world ) )  , _delta );
+			world.Run<S_ParticlesOcclusion>(		_delta );
+			world.Run<S_UpdateParticles>(			_delta );
+			world.Run<S_EmitParticles>(				_delta );
+			world.Run<S_GenerateParticles>(			_delta );
+			world.Run<S_UpdateBoundsFromRigidbody>(	_delta );
+			world.Run<S_UpdateBoundsFromModel>();
+			world.Run<S_UpdateBoundsFromTransform>();
+			world.Run<S_UpdateGameCamera>(			_delta );			
+			world.Run<S_ClientSend>(				_delta );
 		}
 	}
 }

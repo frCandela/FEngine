@@ -114,9 +114,9 @@ namespace fan
  			const Ray ray = camera.ScreenPosToRay( cameraTransform, Mouse::Get().GetScreenSpacePosition() );
 
 			// raycast on bounds
-			const EcsSignature signatureRaycast = S_RaycastAll::GetSignature( world );
-			std::vector<EcsEntity> outResults;
-			if( S_RaycastAll::Run( world, world.Match( signatureRaycast ), ray, outResults ) )
+			std::vector<EcsEntity> results;
+			world.Run<S_RaycastAll>( ray, results );
+			if( !results.empty() )
 			{
 				// cycle selection
 				static Ray lastRay;
@@ -124,12 +124,12 @@ namespace fan
 				int index = 0;
 				if( ray == lastRay )
 				{					
-					index = ( ++cycle % outResults.size() );
+					index = ( ++cycle % results.size() );
 				}
 				lastRay = ray;
 
 				// selection
-				SceneNode& sceneNode = world.GetComponent<SceneNode>( outResults[index] );
+				SceneNode& sceneNode = world.GetComponent<SceneNode>( results[index] );
 				SetSelectedSceneNode( &sceneNode );
 			}
 			else

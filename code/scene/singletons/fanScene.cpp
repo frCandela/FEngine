@@ -375,7 +375,7 @@ namespace fan
 			world->SetNextHandle( maxHandle );
 
 			ScenePointers::ResolveComponentPointers( *world, handleOffset );
-			S_InitFollowTransforms::Run( *world, world->Match( S_InitFollowTransforms::GetSignature( *world ) ) );
+			world->Run<S_InitFollowTransforms>();
 
 			onLoad.Emmit( *this );
 			world->ApplyTransitions();

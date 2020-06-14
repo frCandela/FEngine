@@ -21,7 +21,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	bool S_RaycastAll::Run( EcsWorld& _world, const EcsView& _view, const Ray& _ray, std::vector<EcsEntity>& _outResults )
+	void S_RaycastAll::Run( EcsWorld& _world, const EcsView& _view, const Ray& _ray, std::vector<EcsEntity>& _outResults )
 	{
 		// Helper class for storing the result of a raycast
 		struct Result
@@ -84,7 +84,5 @@ namespace fan
 		{
 			_outResults.push_back( result.entityID );
 		}
-
-		return ! _outResults.empty();
 	}
 }

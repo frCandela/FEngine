@@ -342,8 +342,8 @@ namespace fan
 						SCOPED_PROFILE( draw_ui );
 						m_mainMenuBar->Draw();
 						m_world.GetSingleton<EditorSelection>().Update( m_gameViewWindow->IsHovered() );
-						S_MoveFollowTransforms::Run( m_world, m_world.Match( S_MoveFollowTransforms::GetSignature( m_world ) ) );
-						S_MoveFollowTransformsUI::Run( m_world, m_world.Match( S_MoveFollowTransformsUI::GetSignature( m_world ) ) );
+						m_world.Run<S_MoveFollowTransforms>();
+						m_world.Run<S_MoveFollowTransformsUI>();
 					}
 
 					{
@@ -352,30 +352,24 @@ namespace fan
 
 						if( m_mainMenuBar->ShowWireframe() )
 						{
-							const EcsSignature signatureDrawDebugWireframe = S_DrawDebugWireframe::GetSignature( m_world );
-							S_DrawDebugWireframe::Run( m_world, m_world.Match( signatureDrawDebugWireframe ) );
+							m_world.Run<S_DrawDebugWireframe>();
 						}
 						if( m_mainMenuBar->ShowNormals() )
 						{
-							const EcsSignature signatureDrawDebugNormals = S_DrawDebugNormals::GetSignature( m_world );
-							S_DrawDebugNormals::Run( m_world, m_world.Match( signatureDrawDebugNormals ) );
+							m_world.Run<S_DrawDebugNormals>();
 						}
 						if( m_mainMenuBar->ShowAABB() )
 						{
-							const EcsSignature signatureDrawDebugBounds = S_DrawDebugBounds::GetSignature( m_world );
-							S_DrawDebugBounds::Run( m_world, m_world.Match( signatureDrawDebugBounds ) );
+							m_world.Run<S_DrawDebugBounds>();
 						}
 						if( m_mainMenuBar->ShowHull() )
 						{
-							const EcsSignature signatureDrawDebugHull = S_DrawDebugHull::GetSignature( m_world );
-							S_DrawDebugHull::Run( m_world, m_world.Match( signatureDrawDebugHull ) );
+							m_world.Run<S_DrawDebugHull>();
 						}
 						if( m_mainMenuBar->ShowLights() )
 						{
-							const EcsSignature signatureDrawDebugPointLights = S_DrawDebugPointLights::GetSignature( m_world );
-							S_DrawDebugPointLights::Run( m_world, m_world.Match( signatureDrawDebugPointLights ) );
-							const EcsSignature signatureDrawDebugDirLights = S_DrawDebugDirectionalLights::GetSignature( m_world );
-							S_DrawDebugDirectionalLights::Run( m_world, m_world.Match( signatureDrawDebugDirLights ) );
+							m_world.Run<S_DrawDebugPointLights>();
+							m_world.Run<S_DrawDebugDirectionalLights>();
 						}
 					}
 				}
@@ -553,16 +547,11 @@ namespace fan
 		RenderWorld& renderWorld = m_world.GetSingleton<RenderWorld>();
 		renderWorld.targetSize = glm::vec2( m_gameViewWindow->GetSize().x(), m_gameViewWindow->GetSize().y() );
 
-		const EcsSignature signatureURModels = S_UpdateRenderWorldModels::GetSignature( m_world );
-		const EcsSignature signatureURUI = S_UpdateRenderWorldUI::GetSignature( m_world );
-		const EcsSignature signatureURPointLights = S_UpdateRenderWorldPointLights::GetSignature( m_world );
-		const EcsSignature signatureURDirectionalLights = S_UpdateRenderWorldDirectionalLights::GetSignature( m_world );
-
 		// update render data
-		S_UpdateRenderWorldModels::Run( m_world, m_world.Match( signatureURModels ) );
-		S_UpdateRenderWorldUI::Run( m_world, m_world.Match( signatureURUI ) );
-		S_UpdateRenderWorldPointLights::Run( m_world, m_world.Match( signatureURPointLights ) );
-		S_UpdateRenderWorldDirectionalLights::Run( m_world, m_world.Match( signatureURDirectionalLights ) );
+		m_world.Run<S_UpdateRenderWorldModels>();
+		m_world.Run<S_UpdateRenderWorldUI>();
+		m_world.Run<S_UpdateRenderWorldPointLights>();
+		m_world.Run<S_UpdateRenderWorldDirectionalLights>();
 
 		// particles mesh
 		DrawMesh particlesDrawData;

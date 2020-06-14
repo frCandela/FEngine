@@ -71,8 +71,7 @@ namespace fan
 					spawnManager.spawns.push_back( info ); 
 
 					// spawn on all hosts
-					S_ReplicateOnAllHosts::Run( _world, _world.Match( S_ReplicateOnAllHosts::GetSignature( _world ) ),
-					ClientRPC::RPCSpawn( info ), HostReplication::ResendUntilReplicated );
+					_world.Run<S_ReplicateOnAllHosts>( ClientRPC::RPCSpawn( info ), HostReplication::ResendUntilReplicated );
 				}			
 			}
 		}
