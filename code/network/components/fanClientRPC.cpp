@@ -27,14 +27,23 @@ namespace fan
 	}
 
 	//================================================================================================================================
+	// register one rpc unwrap method, checks that there is no RpcID collision
+	//================================================================================================================================
+	void ClientRPC::RegisterUnwrapMethod( const RpcID _rpcID, const RpcUnwrapMethod _unwrapMethod )
+	{
+		assert( nameToRPCTable.find( _rpcID ) == nameToRPCTable.end() );
+		nameToRPCTable[_rpcID] = _unwrapMethod;
+	}
+
+	//================================================================================================================================
 	// Registers  RPC unwrap functions
 	// A unwrap function must decode a packet and run the corresponding procedure
 	//================================================================================================================================
 	void ClientRPC::RegisterRPCs( )
 	{
-		nameToRPCTable.clear();
-		nameToRPCTable[ 'SYNC' ] = &ClientRPC::UnwrapShiftClientFrame ;
-		nameToRPCTable[ 'SPAN' ] = &ClientRPC::UnwrapSpawn ;
+		nameToRPCTable.clear(); 
+		RegisterUnwrapMethod( s_rpcIdShiftFrame, &ClientRPC::UnwrapShiftClientFrame );
+		RegisterUnwrapMethod( s_rpcIdSpawn, &ClientRPC::UnwrapSpawn );
 	}
 
 	//================================================================================================================================
@@ -42,11 +51,11 @@ namespace fan
 	//================================================================================================================================
 	void ClientRPC::TriggerRPC( sf::Packet& _packet )
 	{
-		RpcId rpcID;
+		RpcID rpcID;
 		_packet >> rpcID;
 
-		const RpcUnwrapFunc function =  nameToRPCTable[rpcID];
-		( ( *this ).*( function ) )( _packet );
+		const RpcUnwrapMethod method =  nameToRPCTable[rpcID];
+		( ( *this ).*( method ) )( _packet );
 	}
 
 	//================================================================================================================================
@@ -58,7 +67,7 @@ namespace fan
 		packet.replicationType = PacketReplication::ReplicationType::RPC;
 
 		packet.packetData.clear();
-		packet.packetData << RpcId( 'SYNC' );
+		packet.packetData << s_rpcIdShiftFrame;
 		packet.packetData << sf::Int32(_framesDelta);
 
 		return packet;
@@ -83,7 +92,7 @@ namespace fan
 		packet.replicationType = PacketReplication::ReplicationType::RPC;
 
 		packet.packetData.clear();
-		packet.packetData << RpcId( 'SPAN' );
+		packet.packetData << s_rpcIdSpawn;
 		packet.packetData << spawnInfo.spawnFrameIndex;
 
 		sf::Packet dataCpy = spawnInfo.data;
@@ -117,12 +126,9 @@ namespace fan
 		{
 			ImGui::Text( "rpc list: " );
 			ImGui::Indent();
-			for ( std::pair<RpcId, RpcUnwrapFunc> pair : rpc.nameToRPCTable )
+			for ( std::pair<RpcID, RpcUnwrapMethod> pair : rpc.nameToRPCTable )
 			{
-				char* charArray = (char*)(&pair.first);
-				std::stringstream ss;
-				ss << charArray[3] << charArray[2] << charArray[1] << charArray[0];
-				ImGui::Text( ss.str().c_str() );
+				ImGui::Text( "%d", pair.first );
 			}
 			ImGui::Unindent();
 		}ImGui::Unindent(); ImGui::Unindent();

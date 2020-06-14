@@ -21,19 +21,27 @@ namespace fan
 	void SpawnManager::Init( EcsWorld& /*_world*/, EcsSingleton& _component )
 	{
 		SpawnManager& spawnManager = static_cast<SpawnManager&>( _component );
-		spawnManager.spawns.clear();
-		RegisterSpawnMethods( spawnManager );
+		spawnManager.RegisterSpawnMethods();
+	}
+
+	//================================================================================================================================
+	// register one spawn method, checks that there is no spawnID collision
+	//================================================================================================================================
+	void SpawnManager::RegisterSpawnMethod( const SpawnID _spawnID, const SpawnMethod _spawnMethod )
+	{
+		assert( spawnMethods.find( _spawnID ) == spawnMethods.end() );
+		spawnMethods[_spawnID] = _spawnMethod;
 	}
 
 	//================================================================================================================================
 	// @todo put this in game lib to prevent linking issues
 	//================================================================================================================================
-	void SpawnManager::RegisterSpawnMethods( SpawnManager& _spawnManager )
+	void SpawnManager::RegisterSpawnMethods()
 	{
-		_spawnManager.spawnMethods.clear();
-		_spawnManager.spawnMethods[ spawn::SpawnBullet::s_id ] = &spawn::SpawnBullet::Spawn;
-		_spawnManager.spawnMethods[ spawn::SpawnShip::s_id   ] = &spawn::SpawnShip::Spawn;
-		_spawnManager.spawnMethods[ spawn::SpawnClientShip::s_id] = &spawn::SpawnClientShip::Spawn;
+		spawnMethods.clear();		
+		RegisterSpawnMethod( spawn::SpawnBullet::s_id, &spawn::SpawnBullet::Spawn );
+		RegisterSpawnMethod( spawn::SpawnShip::s_id, &spawn::SpawnShip::Spawn );
+		RegisterSpawnMethod( spawn::SpawnClientShip::s_id, &spawn::SpawnClientShip::Spawn );
 	}
 
 	//================================================================================================================================
@@ -48,23 +56,17 @@ namespace fan
 		for (int spawnIndex = int(spawnManager.spawns.size()) - 1; spawnIndex >= 0 ; spawnIndex--)
 		{
 			SpawnInfo& spawnInfo = spawnManager.spawns[spawnIndex];
-			if( game.frameIndex < spawnInfo.spawnFrameIndex )
+			if( game.frameIndex >= spawnInfo.spawnFrameIndex )
 			{
-				continue; // spawn will happen later
-			}
-			else if( game.frameIndex == spawnInfo.spawnFrameIndex )
-			{
-				SpawnIdType spawnId;
+				if( game.frameIndex > spawnInfo.spawnFrameIndex )
+				{
+					Debug::Warning() << "missed spawning for frame" << spawnInfo.spawnFrameIndex << Debug::Endl();
+				}
+
+				SpawnID spawnId;
 				spawnInfo.data >> spawnId;
 				spawnManager.spawnMethods.at(spawnId)( _world, spawnInfo.data );
 				spawnManager.spawns.erase( spawnManager.spawns.begin() + spawnIndex );
-			}
-			else // game.frameIndex > spawnInfo.spawnFrameIndex
-			{
-				// we missed the spawn :'(
-				// @todo rollback client to spawn the bullet correctly 
-				Debug::Warning() << "missed bullet spawning for frame" << spawnInfo.spawnFrameIndex << Debug::Endl();
- 				spawnManager.spawns.erase( spawnManager.spawns.begin() + spawnIndex );
 			}
  		}
 	}

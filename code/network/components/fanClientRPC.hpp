@@ -22,20 +22,23 @@ namespace fan
 		static void Init( EcsWorld& _world, EcsEntity _entity, EcsComponent& _component );
 		static void OnGui( EcsWorld& _world, EcsEntity _entityID, EcsComponent& _component );
 
-		using RpcUnwrapFunc = void ( ClientRPC::* )( sf::Packet& );
-		using RpcId = sf::Uint32;
-
+		using RpcID = sf::Uint32;
+		using RpcUnwrapMethod = void ( ClientRPC::* )( sf::Packet& );
+		
+		void RegisterUnwrapMethod( const RpcID _rpcID, const RpcUnwrapMethod _unwrapMethod );
 		void RegisterRPCs( );
 		void TriggerRPC( sf::Packet& _packet );
 
-		std::unordered_map<RpcId , RpcUnwrapFunc > nameToRPCTable;
+		std::unordered_map<RpcID , RpcUnwrapMethod > nameToRPCTable;
 
 		// List of available rpc
 		Signal < int >			 onShiftFrameIndex;
+		static const RpcID		 s_rpcIdShiftFrame = SSID( "RPCShiftFrame" );
 		void					 UnwrapShiftClientFrame( sf::Packet& _packet );
 		static PacketReplication RPCShiftClientFrame( const int _framesDelta );
 
 		Signal< FrameIndexNet, sf::Packet >	 onSpawn;
+		static const RpcID		 s_rpcIdSpawn = SSID( "RPCSpawn" );
 		void					 UnwrapSpawn( sf::Packet& _packet );
 		static PacketReplication RPCSpawn( const SpawnInfo& spawnInfo );
 	};
