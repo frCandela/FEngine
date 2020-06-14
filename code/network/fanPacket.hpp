@@ -4,37 +4,16 @@
 #include <limits>
 #include <assert.h>
 #include <type_traits>
-#include "SFML/System.hpp"
-#include "SFML/Network.hpp"
 
+#include "bullet/LinearMath/btVector3.h"
+
+#include "network/fanNetConfig.hpp"
 #include "ecs/fanSignal.hpp"
 #include "core/fanDebug.hpp"
-#include "bullet/LinearMath/btVector3.h"
 
 namespace fan
 {
 	struct Client;
-	using NetID = sf::Uint32;
-	using IpAddress = sf::IpAddress;
-	using Port = unsigned short;
-	using PacketTag = sf::Uint32;		// may change to uint16 on release
-	using PacketTypeInt = sf::Uint8;	// the sf integer type encoding the PacketType enum
-	using FrameIndexNet = sf::Uint32;
-
-	// all the types of packets of the network engine
-	enum class PacketType
-	{
-		Ping = 0			// server calculates the RTT &sends it to the client
-		, Ack				// packet reception acknowledgment 
-		, Hello				// first presentation of the client to the server for logging in
-		, Disconnect		// packet sent/received when the player disconnects from the server
-		, LoggedIn			// server informs client that login was successful
-		, Replication		// replication of data on the client's world
-		, PlayerInput		// client input ring buffer sent to the server
-		, PlayerGameState	// the game state of one player at a specific frame
-		, COUNT			
-	}; 
-	static_assert( int( PacketType::COUNT ) < std::numeric_limits<PacketTypeInt>::max() );
 
 	//================================================================================================================================
 	//================================================================================================================================
@@ -119,8 +98,8 @@ namespace fan
 			_packet << previousRtt;
 		}
 
-		FrameIndexNet serverFrame;	// frame index of the server when sending the packet
-		FrameIndexNet clientFrame; // frame index of the client when sending back the packet
+		FrameIndex serverFrame;	// frame index of the server when sending the packet
+		FrameIndex clientFrame; // frame index of the client when sending back the packet
 		float previousRtt;		// client rtt from the previous ping
 	};
 
@@ -206,7 +185,7 @@ namespace fan
 			bool boost : 1;
 			bool fire : 1;
 			sf::Vector2f	orientation;
-			FrameIndexNet	frameIndex;
+			FrameIndex	frameIndex;
 		}; 
 
 		std::vector<InputData> inputs;
@@ -290,7 +269,7 @@ namespace fan
 		}
 		bool operator!=( const PacketPlayerGameState& _other ) const { return !( *this == _other ); }
 
-		FrameIndexNet	frameIndex = 0;			// the  frame index when creating state		
+		FrameIndex	frameIndex = 0;			// the  frame index when creating state		
 		btVector3		position;			
 		btVector3		orientation;		
 		btVector3		velocity;			

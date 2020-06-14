@@ -25,7 +25,7 @@ namespace fan
 
 			//================================================================
 			//================================================================
-			static SpawnInfo GenerateInfo( const FrameIndexNet _spawnFrameIndex, const NetID _owner, const  btVector3 _position, const btVector3 _velocity )
+			static SpawnInfo GenerateInfo( const FrameIndex _spawnFrameIndex, const NetID _owner, const  btVector3 _position, const btVector3 _velocity )
 			{
 				SpawnInfo info;
 				info.spawnFrameIndex = _spawnFrameIndex;

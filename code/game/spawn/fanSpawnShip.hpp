@@ -18,7 +18,7 @@ namespace fan
 
 			//================================================================
 			//================================================================
-			static SpawnInfo GenerateInfo( const FrameIndexNet _spawnFrameIndex, const NetID _spaceshipID, const  btVector3 _position )
+			static SpawnInfo GenerateInfo( const FrameIndex _spawnFrameIndex, const NetID _spaceshipID, const  btVector3 _position )
 			{
 				SpawnInfo info;
 
@@ -62,7 +62,7 @@ namespace fan
 
 			//================================================================
 			//================================================================
-			static SpawnInfo GenerateInfo( const FrameIndexNet _spawnFrameIndex, const NetID _spaceshipID, const  btVector3 _position )
+			static SpawnInfo GenerateInfo( const FrameIndex _spawnFrameIndex, const NetID _spaceshipID, const  btVector3 _position )
 			{
 				SpawnInfo info;
 				info.spawnFrameIndex = _spawnFrameIndex;

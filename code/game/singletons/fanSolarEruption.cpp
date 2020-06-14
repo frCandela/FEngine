@@ -190,7 +190,7 @@ namespace fan
 	void SolarEruption::NetSave( const EcsSingleton& _component, sf::Packet& _packet )
 	{
 		const SolarEruption& solarEruption = static_cast<const SolarEruption&>( _component );
-		_packet << FrameIndexNet( solarEruption.eruptionStartFrame);
+		_packet << FrameIndex( solarEruption.eruptionStartFrame);
 	}
 
 	//================================================================================================================================
@@ -199,7 +199,7 @@ namespace fan
 	{
 		SolarEruption& solarEruption = static_cast< SolarEruption&>( _component );
 
-		FrameIndexNet eruptionStartFrame;
+		FrameIndex eruptionStartFrame;
 		_packet >> eruptionStartFrame;
 
 		solarEruption.eruptionStartFrame = eruptionStartFrame;

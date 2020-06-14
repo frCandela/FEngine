@@ -1,6 +1,7 @@
 #pragma once
 
 #include "ecs/fanEcsSingleton.hpp"
+#include "network/fanNetConfig.hpp"
 #include "scene/fanSceneResourcePtr.hpp"
 
 namespace fan

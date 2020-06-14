@@ -74,7 +74,7 @@ namespace fan
 	//================================================================================================================================
 	// Called by the rpc manager when a spawn is received
 	//================================================================================================================================
-	void SpawnManager::OnSpawn( const FrameIndexNet _frameIndex, sf::Packet _data )
+	void SpawnManager::OnSpawn( const FrameIndex _frameIndex, sf::Packet _data )
 	{
 		spawns.push_back( { _frameIndex , _data } );
 	}

@@ -18,7 +18,7 @@ namespace fan
 	//================================================================
 	struct SpawnInfo
 	{
-		FrameIndexNet spawnFrameIndex = 0;
+		FrameIndex spawnFrameIndex = 0;
 		sf::Packet    data;
 	};
 
@@ -39,7 +39,7 @@ namespace fan
 
 		void RegisterSpawnMethods();
 		void RegisterSpawnMethod( const SpawnID _spawnID, const SpawnMethod _spawnMethod );
-		void OnSpawn( const FrameIndexNet _frameIndex, sf::Packet _data );
+		void OnSpawn( const FrameIndex _frameIndex, sf::Packet _data );
 
 		std::vector< SpawnInfo > spawns;
 		std::unordered_map< SpawnID, SpawnMethod > spawnMethods;

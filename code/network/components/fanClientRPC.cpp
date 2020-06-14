@@ -78,7 +78,7 @@ namespace fan
 	//================================================================================================================================
 	void ClientRPC::UnwrapSpawn( sf::Packet& _packet )
 	{
-		FrameIndexNet frameIndex;
+		FrameIndex frameIndex;
 		_packet >> frameIndex;
 		onSpawn.Emmit( frameIndex, _packet );
 	}

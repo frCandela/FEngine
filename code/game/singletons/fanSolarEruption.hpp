@@ -2,6 +2,7 @@
 
 #include "ecs/fanEcsSingleton.hpp"
 
+#include "network/fanNetConfig.hpp"
 #include "scene/fanSceneResourcePtr.hpp"
 #include "scene/components/fanMaterial.hpp"
 #include "scene/components/fanMeshRenderer.hpp"
@@ -40,7 +41,7 @@ namespace fan
 		
 		float previousLightAttenuation;
 
-		FrameIndex eruptionStartFrame;// the eruption starts at this frame
+		FrameIndex eruptionStartFrame;// the eruption starts at this frame @todo make a spawner for this
 
 		bool	enabled;
 		State	state;
