@@ -1,6 +1,9 @@
 #pragma once
 
-#include "fanGLM.hpp"
+#include "fanDisableWarnings.hpp"
+WARNINGS_GLM_PUSH()
+#include "glm/glm.hpp"
+WARNINGS_POP()
 #include "core/fanSerializedValues.hpp"
 #include "ecs/fanEcsWorld.hpp"
 #include "game/fanGameClient.hpp"

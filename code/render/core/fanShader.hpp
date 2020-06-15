@@ -1,6 +1,6 @@
 #pragma once
 
-#include "fanGLFW.hpp"
+#include "glfw/glfw3.h"
 #include <string>
 #include <vector>
 

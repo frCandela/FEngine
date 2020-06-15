@@ -1,7 +1,10 @@
 #pragma once
 
 #include "ecs/fanEcsComponent.hpp"
-#include "fanGLM.hpp"
+#include "fanDisableWarnings.hpp"
+WARNINGS_GLM_PUSH()
+#include "glm/glm.hpp"
+WARNINGS_POP()
 #include "bullet/LinearMath/btVector3.h"
 #include "bullet/LinearMath/btQuaternion.h"
 #include "bullet/LinearMath/btTransform.h"

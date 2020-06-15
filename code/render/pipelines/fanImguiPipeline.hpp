@@ -1,8 +1,11 @@
 #pragma once
 
 #include <vector>
-#include "fanGLFW.hpp"
-#include "fanGLM.hpp"
+#include "glfw/glfw3.h"
+#include "fanDisableWarnings.hpp"
+WARNINGS_GLM_PUSH()
+#include "glm/glm.hpp"
+WARNINGS_POP()
 
 namespace fan
 {

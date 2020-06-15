@@ -4,7 +4,7 @@
 #include "core/input/fanInput.hpp"
 #include "core/input/fanKeyboard.hpp"
 #include "core/input/fanMouse.hpp"
-#include "fanImgui.hpp"
+#include "imgui/imgui.h"
 #include "imgui/imgui_internal.h"
 
 //================================================================================================================================

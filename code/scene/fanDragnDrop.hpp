@@ -1,7 +1,7 @@
 #pragma once
 
 #include <cstdint>
-#include "fanImgui.hpp"
+#include "imgui/imgui.h"
 #include "ecs/fanEcsTypes.hpp"
 
 namespace fan

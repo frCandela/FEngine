@@ -1,6 +1,6 @@
 #include "core/input/fanAxis.hpp"
 
-#include "fanImgui.hpp"
+#include "imgui/imgui.h"
 #include "core/fanDebug.hpp"
 
 namespace fan

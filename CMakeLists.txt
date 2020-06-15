@@ -1,6 +1,5 @@
 ﻿cmake_minimum_required (VERSION 3.8)
 
-
 project ("FEngine")
 set(CMAKE_CXX_STANDARD 17)
 
@@ -12,7 +11,6 @@ set_target_properties(${APP_NAME} PROPERTIES
 
 set( APP_NAME "fengine_editor")
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR})
-
 
 include_directories( code )
 include_directories( middleware )
@@ -40,7 +38,13 @@ endif()
 set( COMPILATION_FLAGS /W4 /WX  )
 set( MIDDLEWARE_COMPILATION_FLAGS /W0 )
 add_compile_options( /FUNCTIONPADMIN )
+
 add_compile_definitions(SFML_STATIC)
+add_compile_definitions(GLFW_INCLUDE_VULKAN)
+add_compile_definitions(GLM_FORCE_RADIANS)
+add_compile_definitions(GLM_FORCE_DEPTH_ZERO_TO_ONE)
+add_compile_definitions(GLM_ENABLE_EXPERIMENTAL)
+add_compile_definitions(IMGUI_DISABLE_OBSOLETE_FUNCTIONS)
 
 # libs directories
 add_subdirectory(middleware)

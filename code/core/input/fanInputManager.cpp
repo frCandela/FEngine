@@ -1,7 +1,7 @@
 #include "core/input/fanInputManager.hpp"
 
 #include "fanJson.hpp"
-#include "fanImgui.hpp"
+#include "imgui/imgui.h"
 #include "core/input/fanKeyboard.hpp"
 #include "core/fanDebug.hpp"
 

@@ -1,7 +1,12 @@
 #pragma once
 
-#include "fanGLM.hpp"
-#include "fanGLFW.hpp"
+#include <vector>
+#include "fanDisableWarnings.hpp"
+WARNINGS_GLM_PUSH()
+#include "glm/glm.hpp"
+#include "glm/gtc/matrix_transform.hpp"
+WARNINGS_POP()
+#include "glfw/glfw3.h"
 #include "core/math/fanVector2.hpp"
 
 namespace fan

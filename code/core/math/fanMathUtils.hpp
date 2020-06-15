@@ -2,8 +2,11 @@
 
 #include "bullet/LinearMath/btVector3.h"
 #include "bullet/LinearMath/btQuaternion.h"
-
-#include "fanGLM.hpp"
+#include "fanDisableWarnings.hpp"
+WARNINGS_GLM_PUSH()
+#include "glm/glm.hpp"
+#include "glm/gtc/quaternion.hpp"
+WARNINGS_POP()
 
 namespace fan
 {

@@ -1,7 +1,10 @@
 #pragma once
 
-#include "fanGLM.hpp"
 #include "bullet/LinearMath/btVector3.h"
+#include "fanDisableWarnings.hpp"
+WARNINGS_GLM_PUSH()
+#include "glm/glm.hpp"
+WARNINGS_POP()
 
 namespace fan
 {

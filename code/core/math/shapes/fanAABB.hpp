@@ -1,8 +1,11 @@
 #pragma once
 
 #include <vector>
-#include "fanGLM.hpp"
 #include "core/math/shapes/fanTriangle.hpp"
+#include "fanDisableWarnings.hpp"
+WARNINGS_GLM_PUSH()
+#include "glm/glm.hpp"
+WARNINGS_POP()
 
 namespace fan
 {

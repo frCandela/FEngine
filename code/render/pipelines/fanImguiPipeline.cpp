@@ -1,7 +1,7 @@
 #include "render/pipelines/fanImguiPipeline.hpp"
 
 #include <array>
-#include "fanImgui.hpp"
+#include "imgui/imgui.h"
 #include "core/fanDebug.hpp"
 #include "render/fanRenderGlobal.hpp"
 #include "render/core/fanDevice.hpp"

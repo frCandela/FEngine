@@ -2,7 +2,7 @@
 
 #include <string>
 #include <cstdint>
-#include "fanGLFW.hpp"
+#include "glfw/glfw3.h"
 #include "core/fanSingleton.hpp"
 
 namespace fan

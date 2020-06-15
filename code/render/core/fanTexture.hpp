@@ -1,7 +1,10 @@
 #pragma once
 
-#include "fanGLM.hpp"
-#include "fanGLFW.hpp"
+#include "fanDisableWarnings.hpp"
+WARNINGS_GLM_PUSH()
+#include "glm/glm.hpp"
+WARNINGS_POP()
+#include "glfw/glfw3.h"
 #include "core/resources/fanResource.hpp"
 #include "render/fanTextureManager.hpp"
 

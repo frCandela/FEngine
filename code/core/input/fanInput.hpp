@@ -1,6 +1,5 @@
 #pragma once
 
-#include "fanGLM.hpp"
 #include "core/fanSingleton.hpp"
 #include "core/math/fanVector2.hpp"
 

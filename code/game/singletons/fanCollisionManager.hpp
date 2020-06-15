@@ -1,9 +1,9 @@
 #pragma once
 
-#include "core/fanBulletWarnings.hpp"
-BULLET_PUSH()
+#include "fanDisableWarnings.hpp"
+WARNINGS_BULLET_PUSH()
 #include "bullet/btBulletDynamicsCommon.h"
-BULLET_POP()
+WARNINGS_POP()
 #include "ecs/fanEcsSingleton.hpp"
 
 namespace fan

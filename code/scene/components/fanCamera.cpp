@@ -1,5 +1,6 @@
 #include "scene/components/fanCamera.hpp"
 
+#include "glm/gtc/matrix_transform.hpp"
 #include "core/math/fanMathUtils.hpp"
 #include "scene/components/fanTransform.hpp"
 #include "render/fanRenderSerializable.hpp"

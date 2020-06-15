@@ -1,6 +1,9 @@
 #pragma once
 
-#include "fanGLM.hpp"
+#include "fanDisableWarnings.hpp"
+WARNINGS_GLM_PUSH()
+#include "glm/glm.hpp"
+WARNINGS_POP()
 #include "core/memory/fanAlignedMemory.hpp"
 #include "render/core/fanPipeline.hpp"
 #include "render/fanRenderGlobal.hpp"

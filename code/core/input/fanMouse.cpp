@@ -1,6 +1,6 @@
 #include "core/input/fanMouse.hpp"
 
-#include "fanImgui.hpp"
+#include "imgui/imgui.h"
 #include "core/input/fanInput.hpp"
 
 namespace fan

@@ -1,7 +1,7 @@
 #pragma once
 
 #include <array>
-#include "fanGLFW.hpp"
+#include "glfw/glfw3.h"
 #include "core/fanSingleton.hpp"
 #include "core/math/fanVector2.hpp"
 

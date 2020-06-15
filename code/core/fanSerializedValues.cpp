@@ -1,7 +1,6 @@
 #include "core/fanSerializedValues.hpp"
 
 #include <fstream>
-#include "fanGLM.hpp"
 #include "core/fanDebug.hpp"
 #include "core/math/fanVector2.hpp"
 #include "core/fanColor.hpp"

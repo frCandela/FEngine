@@ -1,7 +1,10 @@
 #pragma once
 
 #include "render/core/fanPipeline.hpp"
-#include "fanGLM.hpp"
+#include "fanDisableWarnings.hpp"
+WARNINGS_GLM_PUSH()
+#include "glm/glm.hpp"
+WARNINGS_POP()
 
 namespace fan
 {
