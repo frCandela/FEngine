@@ -1,17 +1,39 @@
 #include "ecs/fanEcsSystem.hpp"
+#include "scene/components/fanRigidbody.hpp"
+#include "scene/components/fanMotionState.hpp"
+#include "scene/components/fanTransform.hpp"
 
 namespace fan
 {
-	class EcsWorld;
-
 	//==============================================================================================================================================================
 	// Updates the entity transform using the transform of the motion state of its rigidbody
 	// Called after the physics update
 	//==============================================================================================================================================================
 	struct S_SynchronizeTransformFromMotionState : EcsSystem
 	{
-		static EcsSignature GetSignature( const EcsWorld& _world );
-		static void Run( EcsWorld& _world, const EcsView& _view );
+		static EcsSignature GetSignature( const EcsWorld& _world )
+		{
+			return
+				_world.GetSignature<Transform>()
+				| _world.GetSignature<MotionState>()
+				| _world.GetSignature<Rigidbody>();
+		}
+
+		static void Run( EcsWorld& /*_world*/, const EcsView& _view )
+		{
+			auto motionStateIt = _view.begin<MotionState>();
+			auto rigidbodyIt = _view.begin<Rigidbody>();
+			auto transformIt = _view.begin<Transform>();
+			for( ; transformIt != _view.end<Transform>(); ++motionStateIt, ++rigidbodyIt, ++transformIt )
+			{
+				const MotionState& motionState = *motionStateIt;
+				const Rigidbody& rigidbody = *rigidbodyIt;
+				Transform& transform = *transformIt;
+
+				if( rigidbody.rigidbody->getInvMass() <= 0.f ) { continue; }
+				motionState.motionState->getWorldTransform( transform.transform );
+			}
+		}
 	};
 
 	//==============================================================================================================================================================
@@ -20,7 +42,28 @@ namespace fan
 	//==============================================================================================================================================================
 	struct S_SynchronizeMotionStateFromTransform : EcsSystem
 	{
-		static EcsSignature GetSignature( const EcsWorld& _world );
-		static void Run( EcsWorld& _world, const EcsView& _view );
+		static EcsSignature GetSignature( const EcsWorld& _world )
+		{
+			return
+				_world.GetSignature<Transform>()
+				| _world.GetSignature<MotionState>()
+				| _world.GetSignature<Rigidbody>();
+		}
+
+		static void Run( EcsWorld& /*_world*/, const EcsView& _view )
+		{
+			auto motionStateIt = _view.begin<MotionState>();
+			auto rigidbodyIt = _view.begin<Rigidbody>();
+			auto transformIt = _view.begin<Transform>();
+			for( ; transformIt != _view.end<Transform>(); ++motionStateIt, ++rigidbodyIt, ++transformIt )
+			{
+				MotionState& motionState = *motionStateIt;
+				Rigidbody& rigidbody = *rigidbodyIt;
+				const Transform& transform = *transformIt;
+
+				rigidbody.rigidbody->setWorldTransform( transform.transform );
+				motionState.motionState->setWorldTransform( transform.transform );
+			}
+		}
 	};
 }
