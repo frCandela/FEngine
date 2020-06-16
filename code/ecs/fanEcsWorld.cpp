@@ -403,25 +403,39 @@ namespace fan
 	EcsComponent& EcsWorld::GetComponent( const EcsEntity _entity, const uint32_t _type )
 	{
 		assert( HasComponent( _entity, _type ) );
-		const int componentIndex = GetIndex( _type );
+		return IndexedGetComponent( _entity, GetIndex( _type ) );
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
+	EcsComponent& EcsWorld::IndexedGetComponent( const EcsEntity _entity, const int _componentIndex ) {
+		assert( _componentIndex < NumComponents() );
 		if( _entity.archetype == &m_transitionArchetype )
 		{
 			const EcsEntityData& entityData = _entity.archetype->GetEntityData(_entity.index);
 			assert( entityData.transitionIndex != -1 );
-			return *static_cast<EcsComponent*>( m_transitionArchetype.GetChunkVector(componentIndex).At( entityData.transitionIndex ) );
+			return *static_cast<EcsComponent*>( m_transitionArchetype.GetChunkVector( _componentIndex ).At( entityData.transitionIndex ) );
 		}
 		else
 		{
-			if( _entity.archetype->GetSignature()[componentIndex] )
+			if( _entity.archetype->GetSignature()[_componentIndex] )
 			{
-				return *static_cast<EcsComponent*>( _entity.archetype->GetChunkVector(componentIndex).At( _entity.index ) );
+				return *static_cast<EcsComponent*>( _entity.archetype->GetChunkVector( _componentIndex ).At( _entity.index ) );
 			}
 			else
 			{
 				const EcsEntityData& entityData = _entity.archetype->GetEntityData(_entity.index);
-				return *static_cast<EcsComponent*>( m_transitionArchetype.GetChunkVector(componentIndex).At( entityData.transitionIndex ) );
+				return *static_cast<EcsComponent*>( m_transitionArchetype.GetChunkVector( _componentIndex ).At( entityData.transitionIndex ) );
 			}
 		}
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
+	const EcsComponentInfo& EcsWorld::IndexedGetComponentInfo( const int _componentIndex ) const
+	{ 
+		assert( _componentIndex < NumComponents() ); 
+		return  m_componentsInfo.at( _componentIndex ); 
 	}
 
 	//================================================================================================================================

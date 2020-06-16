@@ -78,17 +78,19 @@ namespace fan
 		void AddTagsFromSignature( const EcsEntity _entity, const EcsSignature& _signature );
 
 		// Components
-		template <typename _ComponentType >	void			AddComponentType();
-		template <typename _ComponentType > _ComponentType& AddComponent	( const EcsEntity _entity );
-		template <typename _ComponentType > void			RemoveComponent	( const EcsEntity _entity );
-		template <typename _ComponentType > bool			HasComponent	( const EcsEntity _entity );
-		template< typename _ComponentType >	_ComponentType& GetComponent	( const EcsEntity _entity );
-		EcsComponent&										AddComponent	( const EcsEntity _entity, const uint32_t _type );
-		void												RemoveComponent	( const EcsEntity _entity, const uint32_t _type );
-		bool												HasComponent	( const EcsEntity _entity, const uint32_t _type );
-		EcsComponent&										GetComponent	( const EcsEntity _entity, const uint32_t _type );
+		template <typename _ComponentType >	void			AddComponentType	();
+		template <typename _ComponentType > _ComponentType& AddComponent		( const EcsEntity _entity );
+		template <typename _ComponentType > void			RemoveComponent		( const EcsEntity _entity );
+		template <typename _ComponentType > bool			HasComponent		( const EcsEntity _entity );
+		template< typename _ComponentType >	_ComponentType& GetComponent		( const EcsEntity _entity );
+		EcsComponent&										AddComponent		( const EcsEntity _entity, const uint32_t _type );
+		void												RemoveComponent		( const EcsEntity _entity, const uint32_t _type );
+		bool												HasComponent		( const EcsEntity _entity, const uint32_t _type );
+		EcsComponent&										GetComponent		( const EcsEntity _entity, const uint32_t _type );
+		EcsComponent&										IndexedGetComponent ( const EcsEntity _entity, const int _componentIndex );
+		const EcsComponentInfo&								IndexedGetComponentInfo( const int _componentIndex ) const;
 		const EcsComponentInfo&					GetComponentInfo( const uint32_t _type ) const	{ return  m_componentsInfo.at( GetIndex(_type) ); }
-		const std::vector< EcsComponentInfo >&	GetVectorComponentInfo() const	{ return m_componentsInfo; }
+		const std::vector< EcsComponentInfo >&	GetComponentInfos() const	{ return m_componentsInfo; }
 
 		// Entities
 		EcsEntity	CreateEntity();
