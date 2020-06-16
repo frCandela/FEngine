@@ -18,6 +18,8 @@ namespace fan
 		_info.save  = &Rigidbody::Save;
 		_info.netSave= &Rigidbody::NetSave;
 		_info.netLoad = &Rigidbody::NetLoad;
+		_info.rollbackLoad = &Rigidbody::RollbackLoad;
+		_info.rollbackSave = &Rigidbody::RollbackSave;
 		_info.editorPath = "/";
 		_info.name = "rigidbody";
 	}
@@ -94,6 +96,42 @@ namespace fan
 		btVector3 velocity( 0.f, 0.f, 0.f );
 		_packet >> velocity[0] >> velocity[2];
 		rb.SetVelocity( velocity );
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================	
+	void Rigidbody::RollbackSave( const EcsComponent& _component, sf::Packet& _packet )
+	{
+		const Rigidbody&	rb = static_cast<const Rigidbody&>( _component );
+
+		const btVector3		position = rb.GetPosition();
+		const btQuaternion	rotation = rb.GetRotation();
+		const btVector3&	velocity = rb.GetVelocity();
+		const btVector3&	angularVelocity = rb.GetAngularVelocity();
+		_packet << position[0] << position[2];
+		_packet << velocity[0] << velocity[2];
+		_packet << rotation[0] << rotation[1] << rotation[2] << rotation[3];
+		_packet << angularVelocity[1];
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================	
+	void Rigidbody::RollbackLoad( EcsComponent& _component, sf::Packet& _packet )
+	{
+		btVector3		position( 0, 0, 0 );
+		btQuaternion	rotation = btQuaternion::getIdentity();
+		btVector3		velocity( 0, 0, 0 );
+		btVector3		angularVelocity( 0, 0, 0 );
+
+		_packet >> position[0] >> position[2];
+		_packet >> velocity[0] >> velocity[2];
+		_packet >> rotation[0] >> rotation[1] >> rotation[2] >> rotation[3];
+		_packet >> angularVelocity[1];
+
+		Rigidbody& rb = static_cast<Rigidbody&>( _component );
+		rb.SetTransform( btTransform( rotation, position ) );
+		rb.SetVelocity( velocity );
+		rb.SetAngularVelocity( angularVelocity );
 	}
 
 	//================================================================================================================================
@@ -192,8 +230,11 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================	
-	btVector3 Rigidbody::GetVelocity() const {	return rigidbody->getLinearVelocity();	}
-	btVector3 Rigidbody::GetAngularVelocity() const { return rigidbody->getAngularVelocity(); }
+	btVector3			Rigidbody::GetPosition() const { return rigidbody->getWorldTransform().getOrigin(); }
+	btQuaternion		Rigidbody::GetRotation() const { return rigidbody->getWorldTransform().getRotation(); }
+	const btVector3&	Rigidbody::GetVelocity() const { return rigidbody->getLinearVelocity(); }
+	const btVector3&	Rigidbody::GetAngularVelocity() const { return rigidbody->getAngularVelocity(); }
+	const btTransform&	Rigidbody::GetTransform() const { return rigidbody->getWorldTransform(); }
 
 	//================================================================================================================================
 	//================================================================================================================================	

@@ -49,10 +49,12 @@ namespace fan
 		void ( *init )( EcsWorld&, EcsEntity, EcsComponent& ) = nullptr;			// called at the creation of the component
 		void ( *destroy )( EcsWorld&, EcsEntity, EcsComponent& ) = nullptr;			// called at the destruction of the component
 		void ( *onGui )( EcsWorld&, EcsEntity, EcsComponent& ) = nullptr;			// called by the editor for gui display
-		void ( *save )( const EcsComponent&, Json& ) = nullptr;						// called when the scene is saved
-		void ( *load )( EcsComponent&, const Json& ) = nullptr;						// called when the scene is loaded ( after the init )
-		void ( *netSave ) ( const EcsComponent&, sf::Packet& _packet ) = nullptr;
-		void ( *netLoad ) ( EcsComponent&, sf::Packet& _packet ) = nullptr;
+		void ( *save )( const EcsComponent&, Json& ) = nullptr;						// Serializes the component when the scene is saved
+		void ( *load )( EcsComponent&, const Json& ) = nullptr;						// Deserializes the component the scene is loaded ( after the init )
+		void ( *netSave ) ( const EcsComponent&, sf::Packet& _packet ) = nullptr;	// Serializes the component into a packet to send over network
+		void ( *netLoad ) ( EcsComponent&, sf::Packet& _packet ) = nullptr;			// Deserializes the component from a packet
+		void ( *rollbackSave ) ( const EcsComponent&, sf::Packet& _packet ) = nullptr;	// Serializes the component rollback data
+		void ( *rollbackLoad ) ( EcsComponent&, sf::Packet& _packet ) = nullptr;		// Deserializes the component component rollback data
 		EcsComponent& ( *construct )( void* ) = nullptr;							// for constructing components
 		void* ( *copy )( void* _dst, const void* _src, size_t _count ) = nullptr;	// for copying components
 	};

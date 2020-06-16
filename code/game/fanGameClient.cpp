@@ -41,9 +41,11 @@
 #include "network/components/fanClientGameData.hpp"
 #include "network/components/fanReliabilityLayer.hpp"
 #include "network/components/fanClientConnection.hpp"
+#include "network/components/fanClientRollback.hpp"
 #include "network/systems/fanClientUpdates.hpp"
 #include "network/systems/fanClientSendReceive.hpp"
 #include "network/systems/fanTimeout.hpp"
+#include "network/systems/fanRollback.hpp"
 
 #include "game/singletons/fanClientNetworkManager.hpp"
 #include "game/singletons/fanSunLight.hpp"
@@ -119,6 +121,7 @@ namespace fan
 		world.AddComponentType<ClientReplication>();
 		world.AddComponentType<ClientRPC>();
 		world.AddComponentType<ClientGameData>();
+		world.AddComponentType<ClientRollback>();
 
 		// base singleton components
 		world.AddSingletonType<Scene>();
@@ -308,6 +311,7 @@ namespace fan
 			world.Run<S_MoveFollowTransformsUI>();
 
 			world.Run<S_ClientSaveState>( _delta );
+			world.Run<S_RollbackStateSave>( _delta );
 			
 			world.Run<S_FireWeapons>(			 _delta );
 			world.Run<S_GenerateLightMesh>(		 _delta );

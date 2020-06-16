@@ -79,7 +79,7 @@ namespace fan
 
 
 				// chunks
-				const std::vector< EcsComponentInfo >& infos = m_world->GetVectorComponentInfo();
+				const std::vector< EcsComponentInfo >& infos = m_world->GetComponentInfos();
 				for( int componentIndex = 0; componentIndex < m_world->NumComponents(); componentIndex++ )
 				{
 					if( archetype->GetSignature()[componentIndex] )

@@ -30,6 +30,8 @@ namespace fan
 		static void Load( EcsComponent& _component, const Json& _json );
 		static void NetSave( const EcsComponent& _component, sf::Packet& _packet );
 		static void NetLoad( EcsComponent& _component, sf::Packet& _packet );
+		static void RollbackSave( const EcsComponent& _component, sf::Packet& _packet );
+		static void RollbackLoad( EcsComponent& _component, sf::Packet& _packet );
 
 		EcsHandle	GetHandle(){ return static_cast<EcsHandle>( rigidbody->getUserIndex() ); }
 		EcsWorld&	GetWorld() { return *static_cast<EcsWorld*>( rigidbody->getUserPointer() ); }
@@ -44,8 +46,11 @@ namespace fan
 		void		SetIgnoreCollisionCheck( const Rigidbody& _rb, const bool state );
 		bool		IsDeactivationEnabled() const;
 		void		EnableDeactivation( const bool _enable );
-		btVector3	GetVelocity() const;
-		btVector3   GetAngularVelocity() const;
+		btVector3			GetPosition() const;
+		btQuaternion		GetRotation() const;
+		const btVector3&	GetVelocity() const;
+		const btVector3&	GetAngularVelocity() const;
+		const btTransform&	GetTransform() const;
 		void		SetAngularVelocity( const btVector3& _velocity );
 		void		SetVelocity( const btVector3& _velocity );
 		void		SetTransform( const btTransform& _transform ) { rigidbody->setWorldTransform( _transform ); }

@@ -217,7 +217,7 @@ namespace fan
 		{
 			EcsEntity entity = world.GetEntity( _node.handle );
 			unsigned nextIndex = 0;
-			for( const EcsComponentInfo& info : world.GetVectorComponentInfo() )
+			for( const EcsComponentInfo& info : world.GetComponentInfos() )
 			{
 				if( ! world.HasComponent( entity, info.type ) ) { continue; }
 

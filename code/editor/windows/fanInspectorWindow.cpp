@@ -46,7 +46,7 @@ namespace fan
 			ImGui::Text( "Scene node : %s", node.name.c_str() );
 
 			
-			for( const EcsComponentInfo& info : world.GetVectorComponentInfo() )
+			for( const EcsComponentInfo& info : world.GetComponentInfos() )
 			{
 				if( !world.HasComponent( entity, info.type ) ) { continue; }
 
@@ -113,7 +113,7 @@ namespace fan
 		if( ImGui::BeginPopup( "new_component" ) )
 		{
 			// Get components and remove components with an empty path
-			std::vector< EcsComponentInfo > components = m_world.GetVectorComponentInfo();			
+			std::vector< EcsComponentInfo > components = m_world.GetComponentInfos();			
 			for( int i = (int)components.size() - 1; i >= 0; i-- )
 			{
 				if( std::string( components[i].editorPath ).empty() )
