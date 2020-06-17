@@ -293,13 +293,20 @@ namespace fan
 			// Runs logic, renders ui
 			while( currentTime > lastLogicTime + game.logicDelta )
 			{
-				// checking the loop timing
+				// checking the loop timing is not late
 				const double loopDelayMilliseconds = 1000. * (currentTime - ( lastLogicTime + game.logicDelta ) );
  				if( loopDelayMilliseconds > 30 )
  				{
- 					Debug::Warning() << "logic is late of " << loopDelayMilliseconds << "ms" << Debug::Endl();
+ 					Debug::Warning() << "logic is late of " << loopDelayMilliseconds << "ms" << Debug::Endl();					
+					// if we are really really late, resets the timer
+					if( loopDelayMilliseconds > 100 )
+					{
+						lastLogicTime = currentTime - game.logicDelta;
+						Debug::Warning() << "reset logic timer " << Debug::Endl();
+					}
  				}
 
+				// increase the logic time of a timeScaleDelta with n timeScaleIncrements
 				if( std::abs( game.timeScaleDelta ) >= game.timeScaleIncrement )
 				{
 					const float increment = game.timeScaleDelta > 0.f ? game.timeScaleIncrement : -game.timeScaleIncrement;
