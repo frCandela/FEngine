@@ -18,6 +18,8 @@ namespace fan
 	struct EcsComponent {};
 
 	//================================
+	// Memcpy is a placement new that uses a copy constructor.
+	// If the component is trivially copyable, it is replaced with a fast std::memcpy
 	//================================
 	#define ECS_COMPONENT( _ComponentType)															\
 	public:																							\
@@ -38,13 +40,19 @@ namespace fan
 	//================================
 	struct EcsComponentInfo
 	{
+		enum ComponentFlags { 
+			None = 0, 
+			RollbackNoOverwrite = 1 // when a rollback happen, the old rollback states are not overwritten with the resimulated ones
+		};
+
 		std::string name;
 		ImGui::IconType icon = ImGui::IconType::NONE;	// editor icon
+		const char* editorPath = "";					// editor path ( for the addComponent ) popup of the inspector
 		uint32_t	type;
 		int			index;
 		uint32_t	size;
 		uint32_t	alignment;
-		const char* editorPath = "";					// editor path ( for the addComponent ) popup of the inspector
+		int			flags = ComponentFlags::None;
 
 		void ( *init )( EcsWorld&, EcsEntity, EcsComponent& ) = nullptr;			// called at the creation of the component
 		void ( *destroy )( EcsWorld&, EcsEntity, EcsComponent& ) = nullptr;			// called at the destruction of the component

@@ -16,6 +16,7 @@
 #include "game/components/fanPlayerInput.hpp"
 #include "game/components/fanPlayerController.hpp"
 #include "network/components/fanClientGameData.hpp"
+#include "network/components/fanClientRollback.hpp"
 
 namespace fan
 {
@@ -98,6 +99,7 @@ namespace fan
 			if( _hasPlayerController )
 			{
 				_world.AddComponent<PlayerController>( spaceshipID );
+				_world.AddComponent<ClientRollback>( spaceshipID );
 			}
 
 			if( _world.HasComponent<Transform>( spaceshipID )

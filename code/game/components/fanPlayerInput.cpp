@@ -4,6 +4,7 @@
 #include "core/input/fanJoystick.hpp"
 #include "ecs/fanEcsWorld.hpp"
 #include "editor/fanModals.hpp"	
+#include "network/fanPacket.hpp"
 
 namespace fan
 {
@@ -15,8 +16,11 @@ namespace fan
 		_info.onGui = &PlayerInput::OnGui;
 		_info.save = &PlayerInput::Save;
 		_info.load = &PlayerInput::Load;
+		_info.rollbackLoad = &PlayerInput::RollbackLoad;
+		_info.rollbackSave = &PlayerInput::RollbackSave;
 		_info.editorPath = "game/player/";
 		_info.name = "player_input";
+		_info.flags |= EcsComponentInfo::RollbackNoOverwrite;
 	}
 
 	//================================================================================================================================
@@ -29,6 +33,32 @@ namespace fan
 		playerInput.forward = 0.f;
 		playerInput.boost = 0.f;
 		playerInput.fire = 0.f;
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================	
+	void PlayerInput::RollbackSave( const EcsComponent& _component, sf::Packet& _packet )
+	{
+		const PlayerInput& playerInput = static_cast<const PlayerInput&>( _component );
+
+		_packet << playerInput.orientation[0] << playerInput.orientation[2];
+		_packet << playerInput.left;
+		_packet << playerInput.forward;
+		_packet << playerInput.boost;
+		_packet << playerInput.fire;
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================	
+	void PlayerInput::RollbackLoad( EcsComponent& _component, sf::Packet& _packet )
+	{
+		PlayerInput& playerInput = static_cast<PlayerInput&>( _component );
+
+		_packet >> playerInput.orientation[0] >> playerInput.orientation[2];
+		_packet >> playerInput.left;
+		_packet >> playerInput.forward;
+		_packet >> playerInput.boost;
+		_packet >> playerInput.fire;
 	}
 
 	//================================================================================================================================

@@ -17,6 +17,8 @@ namespace fan
 		_info.load = &Transform::Load;
 		_info.netSave = &Transform::NetSave;
 		_info.netLoad = &Transform::NetLoad;
+		_info.rollbackLoad = &Transform::RollbackLoad;
+		_info.rollbackSave = &Transform::RollbackSave;
 		_info.editorPath = "/";
 		_info.name = "transform";
 	}
@@ -59,8 +61,33 @@ namespace fan
  	}
 
 	//================================================================================================================================
+	//================================================================================================================================	
+	void Transform::RollbackSave( const EcsComponent& _component, sf::Packet& _packet )
+	{
+		const Transform& transform = static_cast<const Transform&>( _component );
+		const btVector3& position = transform.GetPosition();
+		const btVector3  rotation = transform.GetRotationEuler();
+
+		_packet << position[0] << position[2];
+		_packet << rotation[0] << rotation[1] << rotation[2];
+	}
+
 	//================================================================================================================================
-	btVector3			Transform::GetPosition() const		{ return transform.getOrigin(); }
+	//================================================================================================================================	
+	void Transform::RollbackLoad( EcsComponent& _component, sf::Packet& _packet )
+	{
+		Transform& transform = static_cast<Transform&>( _component );
+		btVector3 position( 0, 0, 0 );
+		btVector3 rotation( 0, 0, 0 );
+		_packet >> position[0] >> position[2];
+		_packet >> rotation[0] >> rotation[1] >> rotation[2];
+		transform.SetPosition( position );
+		transform.SetRotationEuler( rotation );
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
+	const btVector3&	Transform::GetPosition() const	{ return transform.getOrigin(); }
 	btVector3			Transform::GetScale() const		{ return scale; }
 	btQuaternion		Transform::GetRotationQuat() const { return transform.getRotation(); }
 	glm::mat4			Transform::GetNormalMatrix() const	{ return glm::transpose( glm::inverse( GetModelMatrix() ) ); }

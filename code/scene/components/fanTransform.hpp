@@ -25,6 +25,8 @@ namespace fan
 		static void Load( EcsComponent& _component, const Json& _json );
 		static void NetSave( const EcsComponent& _component, sf::Packet& _packet );
 		static void NetLoad( EcsComponent& _component, sf::Packet& _packet );
+		static void RollbackSave( const EcsComponent& _component, sf::Packet& _packet );
+		static void RollbackLoad( EcsComponent& _component, sf::Packet& _packet );
 
 		void SetPosition( btVector3 _newPosition );
 		void SetScale( btVector3 _newScale );
@@ -32,7 +34,7 @@ namespace fan
 		void SetRotationQuat( const btQuaternion _rotation );
 		void LookAt( const btVector3& _target, const btVector3& _up );
 
-		btVector3			GetPosition() const;
+		const btVector3&	GetPosition() const;
 		btVector3			GetScale() const;
 		btQuaternion		GetRotationQuat() const;
 		btVector3			GetRotationEuler() const;
