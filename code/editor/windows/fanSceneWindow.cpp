@@ -255,7 +255,7 @@ namespace fan
 		EcsWorld& world = *_node.scene->world;
 
 		std::stringstream ss;
-		ss << "##" << &_node; // Unique id
+		ss << "##" << _node.name; // @ todo create some sort of unique id not based on name
 
 		if( ImGui::IsWindowAppearing() || m_expandSceneHierarchy == true )
 		{
@@ -281,7 +281,7 @@ namespace fan
 
 		// Draw scene node empty selectable to display a hierarchy
 		std::stringstream ss2;
-		ss2 << _node.name << "##" << &_node; // Unique id
+		ss2 << _node.name; // @ todo create some sort of unique id not based on name
 		if( ImGui::Selectable( ss2.str().c_str(), &selected ) )
 		{
 			onSelectSceneNode.Emmit( &_node );
