@@ -51,7 +51,7 @@ namespace fan
 	//================================================================================================================================
 	void Game::OnShiftFrameIndex( const int _framesDelta )
 	{
-		if( std::abs( _framesDelta ) > ClientGameData::maxFrameDeltaBeforeShift )
+		if( std::abs( _framesDelta ) > ClientGameData::s_maxFrameDeltaBeforeShift )
 		{
 			frameIndex += _framesDelta;
 		}

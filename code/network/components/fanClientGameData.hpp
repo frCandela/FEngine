@@ -27,15 +27,16 @@ namespace fan
 			FrameIndex mostRecentFrame;		// most recent frame index when the inputs were sent
 		};
 
-		EcsHandle							spaceshipHandle;
-		std::deque< PacketInput::InputData >previousInputs; // inputs that need to be sent/acknowledged by the server
-		std::deque< InputSent>				inputsSent;
-		std::queue< PacketPlayerGameState > previousStates;
-		bool								frameSynced;
-		static const int					maxFrameDeltaBeforeShift = 20; // if the server/client frame delta > this, shift frameIndex. Otherwise use timescale
-		bool								spaceshipSynced;
-		int									maxInputSent;
-		PacketPlayerGameState				lastServerState;
+		EcsHandle							spaceshipHandle;	 // handle of the player spaceship
+		std::deque< PacketInput::InputData >previousInputs;		 // inputs that need to be sent/acknowledged by the server
+		std::deque< InputSent>				inputsSent;			 // inputs sent to server waiting ack
+		int									maxInputSent;		 // the maximum number of inputs to send in one packet
+		std::queue< PacketPlayerGameState > previousLocalStates; // local state of the client to compare with server state
+		PacketPlayerGameState				lastServerState;	 // the last know game state received from server ( useful for rollback )
+		bool								frameSynced;		 // false if frame index is not synchronized with the server
+		bool								spaceshipSynced;	 // if false, causes a rollback/resimulate to restore synchronization
+		
+		static const int					s_maxFrameDeltaBeforeShift = 20; // if the server/client frame delta > this, shift frameIndex. Otherwise use timescale
 
 		void Write( EcsWorld& _world, EcsEntity _entity, Packet& _packet );
 		void ProcessPacket( const PacketPlayerGameState& _packet );

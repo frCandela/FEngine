@@ -12,6 +12,7 @@ namespace fan
 	//================================================================================================================================
 	// Contains game data & a reference to the game client or server depending on which is used
 	// allows saving properties of the game into the scene & edition of parameters from the editor
+	// @todo, put time related stuff in a singleton in the scene lib
 	//================================================================================================================================	
 	struct Game : public EcsSingleton
 	{
@@ -31,7 +32,7 @@ namespace fan
 		FrameIndex	frameIndex;			// the index of the current time
 		FrameIndex	frameStart;			// the index of the first frame of the game
 		float		logicDelta;			// time between two frames in seconds
-		float		timeScaleDelta;		// accelerate, decelerates the logic frame rate
+		float		timeScaleDelta;		// (seconds) accelerate, decelerates the logic frame rate to resync frame index with server
 		float		timeScaleIncrement; // the maximum amount that can be added to each frame
 
 		// @hack for the editor, only one of these should be null

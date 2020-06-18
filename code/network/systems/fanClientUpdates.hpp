@@ -42,7 +42,7 @@ namespace fan
 					playerState.orientation = transform.GetRotationEuler();
 					playerState.velocity = rb.GetVelocity();
 					playerState.angularVelocity = rb.GetAngularVelocity();
-					gameData.previousStates.push( playerState );
+					gameData.previousLocalStates.push( playerState );
 				}
 			}
 		}

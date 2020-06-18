@@ -21,7 +21,7 @@ namespace fan
 		gameData.spaceshipHandle = 0;
 		gameData.frameSynced = false;
 		gameData.previousInputs					  = std::deque< PacketInput::InputData >();	// clear
-		gameData.previousStates					  = std::queue< PacketPlayerGameState >();	// clear	
+		gameData.previousLocalStates					  = std::queue< PacketPlayerGameState >();	// clear	
 		gameData.maxInputSent = 10;
 		gameData.spaceshipSynced = true;
 		gameData.lastServerState = {};
@@ -49,24 +49,16 @@ namespace fan
 //		} 
 
 		// get the corresponding game state for the client
-		while( !previousStates.empty() )
+		while( !previousLocalStates.empty() && previousLocalStates.front().frameIndex < _packet.frameIndex )
 		{
-			const PacketPlayerGameState& clientState = previousStates.front();
-			if( clientState.frameIndex < _packet.frameIndex )
-			{
-				previousStates.pop();
-			}
-			else
-			{
-				break;
-			}
+			previousLocalStates.pop();
 		}
 
 		// compares the server state & client state to verify we are synchronized				
-		if( !previousStates.empty() && previousStates.front().frameIndex == _packet.frameIndex )
+		if( !previousLocalStates.empty() && previousLocalStates.front().frameIndex == _packet.frameIndex )
 		{
-			const PacketPlayerGameState& packetState = previousStates.front();
-			previousStates.pop();
+			const PacketPlayerGameState& packetState = previousLocalStates.front();
+			previousLocalStates.pop();
 
 			if( packetState != _packet )
 			{
@@ -171,13 +163,13 @@ namespace fan
 	//================================================================================================================================
 	void ClientGameData::OnShiftFrameIndex( const int _framesDelta )
 	{
-		previousStates = std::queue< PacketPlayerGameState >(); // clear
+		previousLocalStates = std::queue< PacketPlayerGameState >(); // clear
 		frameSynced = true;
 
 		if( std::abs( _framesDelta ) > maxFrameDeltaBeforeShift )
 		{
 			Debug::Log() << "Shifted client frame index : " << _framesDelta << Debug::Endl();
-			previousStates = std::queue< PacketPlayerGameState >(); // clear
+			previousLocalStates = std::queue< PacketPlayerGameState >(); // clear
 		}
 	}
 
@@ -189,7 +181,7 @@ namespace fan
 		ImGui::PushItemWidth( 0.6f * ImGui::GetWindowWidth() - 16 );
 		{
 			ImGui::DragInt( "max input sent", &gameData.maxInputSent, 1.f, 0, 200 );
-			ImGui::Text( "size previous states:  %d", gameData.previousStates.size());
+			ImGui::Text( "size previous states:  %d", gameData.previousLocalStates.size());
 			ImGui::Text( "%s", gameData.frameSynced ? "frame synced" : "frame not synced" );
 			ImGui::Text( "size pending inputs:  %d", gameData.previousInputs.size() );
 			ImGui::Text( "size inputs sent:      %d", gameData.inputsSent.size() );
