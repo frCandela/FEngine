@@ -129,6 +129,7 @@ namespace fan
 		_packet >> angularVelocity[1];
 
 		Rigidbody& rb = static_cast<Rigidbody&>( _component );
+		rb.ClearForces();
 		rb.SetTransform( btTransform( rotation, position ) );
 		rb.SetVelocity( velocity );
 		rb.SetAngularVelocity( angularVelocity );

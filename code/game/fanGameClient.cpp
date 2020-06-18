@@ -210,8 +210,31 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void GameClient::RollbackResimulate( EcsWorld& /*_world*/ )
+	void GameClient::RollbackResimulate( EcsWorld& _world )
 	{
+		const EcsEntity persistentID = _world.GetEntity( netManager->persistentHandle );
+		ClientGameData& gameData = _world.GetComponent<ClientGameData>( persistentID );
+		if( !gameData.spaceshipSynced )
+		{
+			const FrameIndex lastFrame = game->frameIndex;
+			const FrameIndex firstFrame = gameData.lastServerState.frameIndex;
+			Debug::Highlight() << "rollback to frame " << firstFrame << Debug::Endl();
+
+			// Rollback at the frame we took the snapshot of the player game state
+			game->frameIndex = firstFrame;
+			const EcsEntity spaceshipID = _world.GetEntity( gameData.spaceshipHandle );
+
+			// Resets physics
+			PhysicsWorld& physicsWorld = world.GetSingleton<PhysicsWorld>();
+			physicsWorld.Reset();
+
+			// reset world to first frame
+			world.Run<S_RollbackRestoreState>( firstFrame );
+
+		}
+
+
+
 		/*const EcsEntity persistentID = _world.GetEntity( netManager->persistentHandle );
 		ClientGameData& gameData = _world.GetComponent<ClientGameData>( persistentID );
 		if( !gameData.spaceshipSynced && ! gameData.previousInputsSinceLastGameState.empty() )
