@@ -21,7 +21,6 @@ namespace fan
 		gameData.spaceshipHandle = 0;
 		gameData.frameSynced = false;
 		gameData.previousInputs					  = std::deque< PacketInput::InputData >();	// clear
-		gameData.previousInputsSinceLastGameState = std::deque< PacketInput::InputData >();	// clear
 		gameData.previousStates					  = std::queue< PacketPlayerGameState >();	// clear	
 		gameData.maxInputSent = 10;
 		gameData.spaceshipSynced = true;
@@ -35,19 +34,19 @@ namespace fan
 	{
 		lastServerState = _packet;
 
-		// removes all the previous inputs before the gameState
-		while( !previousInputsSinceLastGameState.empty() )
-		{
-			const PacketInput::InputData& input = previousInputsSinceLastGameState.back();
-			if( input.frameIndex < _packet.frameIndex )
-			{
-				previousInputsSinceLastGameState.pop_back();
-			}
-			else
-			{
-				break;
-			}
-		} 
+		// removes all the previous rollback state before the gameState
+//		while( !previousInputsSinceLastGameState.empty() )
+//		{
+// 			const PacketInput::InputData& input = previousInputsSinceLastGameState.back();
+// 			if( input.frameIndex < _packet.frameIndex )
+// 			{
+// 				previousInputsSinceLastGameState.pop_back();
+// 			}
+// 			else
+// 			{
+// 				break;
+// 			}
+//		} 
 
 		// get the corresponding game state for the client
 		while( !previousStates.empty() )
@@ -194,7 +193,6 @@ namespace fan
 			ImGui::Text( "%s", gameData.frameSynced ? "frame synced" : "frame not synced" );
 			ImGui::Text( "size pending inputs:  %d", gameData.previousInputs.size() );
 			ImGui::Text( "size inputs sent:      %d", gameData.inputsSent.size() );
-			ImGui::Text( "size previous inputs:  %d", gameData.previousInputsSinceLastGameState.size() );
 			
 		} ImGui::PopItemWidth();
 	}

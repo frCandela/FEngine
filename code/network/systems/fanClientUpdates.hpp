@@ -84,7 +84,6 @@ namespace fan
 					inputData.boost = input.boost > 0;
 					inputData.fire = input.fire > 0;
 					gameData.previousInputs.push_front( inputData );
-					gameData.previousInputsSinceLastGameState.push_front( inputData );
 				}
 			}
 		}

@@ -210,9 +210,9 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void GameClient::RollbackResimulate( EcsWorld& _world )
+	void GameClient::RollbackResimulate( EcsWorld& /*_world*/ )
 	{
-		const EcsEntity persistentID = _world.GetEntity( netManager->persistentHandle );
+		/*const EcsEntity persistentID = _world.GetEntity( netManager->persistentHandle );
 		ClientGameData& gameData = _world.GetComponent<ClientGameData>( persistentID );
 		if( !gameData.spaceshipSynced && ! gameData.previousInputsSinceLastGameState.empty() )
 		{
@@ -273,7 +273,7 @@ namespace fan
 				gameData.spaceshipSynced = true;
 				assert( game->frameIndex == mostRecent.frameIndex );
  			}		
-		}
+		}*/
 	}
 
 	//================================================================================================================================
@@ -283,6 +283,7 @@ namespace fan
 		{
 			SCOPED_PROFILE( scene_update );			
 			world.Run<S_ClientReceive>( _delta );
+			world.Run<S_RollbackRemoveOldStates>();
 
 			RollbackResimulate( world );
 

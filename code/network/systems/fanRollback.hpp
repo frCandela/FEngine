@@ -1,6 +1,6 @@
 #include "ecs/fanEcsSystem.hpp"
 #include "network/components/fanClientRollback.hpp"
-#include "game/singletons/fanGame.hpp"
+#include "game/singletons/fanClientNetworkManager.hpp"
 
 namespace fan
 {
@@ -42,11 +42,43 @@ namespace fan
 					}
 				}
 
-				// add rollback state to
+				// add rollback state
 				if( rollbackState.data.getDataSize() != 0 )
 				{
 					ClientRollback& clientRollback = *clientRollbackIt;
 					clientRollback.previousStates.push_back( rollbackState );
+				}
+			}
+		}
+	};
+
+	//==============================================================================================================================================================
+	// iterates over all ClientRollback components to remove rollback states older than a frame index
+	//==============================================================================================================================================================
+	struct S_RollbackRemoveOldStates : EcsSystem
+	{
+		static EcsSignature GetSignature( const EcsWorld& _world )
+		{
+			return _world.GetSignature<ClientRollback>();
+		}
+
+		static void Run( EcsWorld& _world, const EcsView& _view )
+		{
+			const ClientNetworkManager& netManager = _world.GetSingleton<ClientNetworkManager>();
+			const EcsEntity entity = _world.GetEntity( netManager.persistentHandle );
+			const ClientGameData& clientData = _world.GetComponent<ClientGameData>( entity );
+			const FrameIndex lastFrameIndex = clientData.lastServerState.frameIndex;
+
+			auto clientRollbackIt = _view.begin<ClientRollback>();
+			for( ; clientRollbackIt != _view.end<ClientRollback>(); ++clientRollbackIt )
+			{
+				ClientRollback& clientRollback = *clientRollbackIt;
+
+				// get the corresponding game state for the client
+				while( !clientRollback.previousStates.empty() 
+					&&  ( clientRollback.previousStates.front().frameIndex < lastFrameIndex || clientRollback.previousStates.size() > 100 ))
+				{
+					clientRollback.previousStates.pop_front();
 				}
 			}
 		}

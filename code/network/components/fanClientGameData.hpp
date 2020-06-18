@@ -28,8 +28,7 @@ namespace fan
 		};
 
 		EcsHandle							spaceshipHandle;
-		std::deque< PacketInput::InputData >previousInputs;
-		std::deque< PacketInput::InputData >previousInputsSinceLastGameState;
+		std::deque< PacketInput::InputData >previousInputs; // inputs that need to be sent/acknowledged by the server
 		std::deque< InputSent>				inputsSent;
 		std::queue< PacketPlayerGameState > previousStates;
 		bool								frameSynced;
