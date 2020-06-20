@@ -220,9 +220,8 @@ namespace fan
 			physicsWorld.dynamicsWorld->stepSimulation( _delta, 10, Time::Get().GetPhysicsDelta() );
 			world.Run<S_SynchronizeTransformFromMotionState>();
 			world.Run<S_MoveFollowTransforms>();
-			world.Run<S_MoveFollowTransformsUI>();
-			
-			world.Run<S_HostSaveState>(			_delta );
+			world.Run<S_MoveFollowTransformsUI>();			
+
 			world.Run<S_FireWeapons>(			_delta );
 			world.Run<S_GenerateLightMesh>(		_delta );
 			world.Run<S_UpdateSolarPannels>(	_delta );
@@ -247,6 +246,8 @@ namespace fan
 				world.Run<S_UpdateBoundsFromTransform>();
 				world.Run<S_UpdateGameCamera>(			_delta );
 			}
+
+			world.Run<S_HostSaveState>( _delta );
 
 			HostManager& hostManager = world.GetSingleton<HostManager>();
 			for( const std::pair<HostManager::IPPort, EcsHandle>& pair : hostManager.hostHandles )

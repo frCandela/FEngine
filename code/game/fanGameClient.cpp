@@ -218,85 +218,53 @@ namespace fan
 		{
 			const FrameIndex lastFrame = game->frameIndex;
 			const FrameIndex firstFrame = gameData.lastServerState.frameIndex;
+			world.Run<S_RollbackInit>();
 			Debug::Highlight() << "rollback to frame " << firstFrame << Debug::Endl();
 
 			// Rollback at the frame we took the snapshot of the player game state
 			game->frameIndex = firstFrame;
-			const EcsEntity spaceshipID = _world.GetEntity( gameData.spaceshipHandle );
 
-			// Resets physics
+			// reset world to first frame		
 			PhysicsWorld& physicsWorld = world.GetSingleton<PhysicsWorld>();
 			physicsWorld.Reset();
-
-			// reset world to first frame
 			world.Run<S_RollbackRestoreState>( firstFrame );
+			const EcsEntity spaceshipID = _world.GetEntity( gameData.spaceshipHandle );
+			Rigidbody& rigidbody = _world.GetComponent<Rigidbody>( spaceshipID );
+			physicsWorld.dynamicsWorld->removeRigidBody( rigidbody.rigidbody );
+			physicsWorld.dynamicsWorld->addRigidBody( rigidbody.rigidbody );
+			rigidbody.ClearForces();
+			Transform& transform = _world.GetComponent<Transform>( spaceshipID );
+			rigidbody.SetVelocity( gameData.lastServerState.velocity );
+			rigidbody.SetAngularVelocity( gameData.lastServerState.angularVelocity );
+			transform.SetPosition( gameData.lastServerState.position );
+			transform.SetRotationEuler( gameData.lastServerState.orientation );
 
-		}
+			// Clear previous states & saves the last correct server state
+			gameData.previousLocalStates = std::queue< PacketPlayerGameState >();
+			gameData.previousLocalStates.push( gameData.lastServerState );
 
-
-
-		/*const EcsEntity persistentID = _world.GetEntity( netManager->persistentHandle );
-		ClientGameData& gameData = _world.GetComponent<ClientGameData>( persistentID );
-		if( !gameData.spaceshipSynced && ! gameData.previousInputsSinceLastGameState.empty() )
-		{
-			const PacketInput::InputData mostRecent = gameData.previousInputsSinceLastGameState.front();
-			const PacketInput::InputData oldest = gameData.previousInputsSinceLastGameState.back();
-
-			if( mostRecent.frameIndex == game->frameIndex && 
-				oldest.frameIndex == gameData.lastServerState.frameIndex && 
-				( oldest.frameIndex + gameData.previousInputsSinceLastGameState.size() == mostRecent.frameIndex + 1 ))
+			// resimulate the last frames of input of the player
+			const float delta = game->logicDelta;
+			while( game->frameIndex < lastFrame )
 			{
-				// Rollback at the frame we took the snapshot of the player game state
-				game->frameIndex = oldest.frameIndex;
-				Debug::Highlight() << "rollback to frame " << oldest.frameIndex << Debug::Endl();
-				const EcsEntity spaceshipID = _world.GetEntity( gameData.spaceshipHandle );
-				
-				// Resets the player rigidbody & transform
-				PhysicsWorld& physicsWorld = world.GetSingleton<PhysicsWorld>();
-				physicsWorld.Reset();
-				Rigidbody& rigidbody = _world.GetComponent<Rigidbody>( spaceshipID );
-				physicsWorld.dynamicsWorld->removeRigidBody( rigidbody.rigidbody );
-				physicsWorld.dynamicsWorld->addRigidBody( rigidbody.rigidbody );
-				rigidbody.ClearForces();
-				Transform& transform = _world.GetComponent<Transform>( spaceshipID );
-				rigidbody.ClearForces();
-				rigidbody.SetVelocity(			gameData.lastServerState.velocity			);
-				rigidbody.SetAngularVelocity(	gameData.lastServerState.angularVelocity	);
-				transform.SetPosition(			gameData.lastServerState.position			);
-				transform.SetRotationEuler(		gameData.lastServerState.orientation		);
+				game->frameIndex++;
 
-				// Clear previous states & saves the last correct server state
- 				gameData.previousStates = std::queue< PacketPlayerGameState >(); 
- 				gameData.previousStates.push( gameData.lastServerState );
+				world.Run<S_RollbackRestoreState>( game->frameIndex );
 
-				// resimulate the last frames of input of the player
-				PlayerInput& input = _world.GetComponent<PlayerInput>( spaceshipID );
-				const float delta = game->logicDelta;
-				for (int i = 1; i < gameData.previousInputsSinceLastGameState.size(); i++)
-				{
-					game->frameIndex++;
+				world.Run<S_MovePlanets>( delta );
+				world.Run<S_MoveSpaceships>( delta );
 
-					const PacketInput::InputData& inputData = *( gameData.previousInputsSinceLastGameState.rbegin() + i );
-					assert( inputData.frameIndex == game->frameIndex );
-					input.orientation = btVector3( inputData.orientation.x, 0.f, inputData.orientation.y );
-					input.left = inputData.left ? 1.f : ( inputData.right ? -1.f : 0.f );
-					input.forward = inputData.forward ? 1.f : ( inputData.backward ? -1.f : 0.f );
-					input.boost = inputData.boost;
-					input.fire = inputData.fire;
+				world.Run<S_SynchronizeMotionStateFromTransform>();
+				physicsWorld.dynamicsWorld->stepSimulation( game->logicDelta, 10, Time::Get().GetPhysicsDelta() );
+				world.Run<S_SynchronizeTransformFromMotionState>();
 
-					world.Run<S_MovePlanets>( delta );
-					world.Run<S_MoveSpaceships>( delta );
+				world.Run<S_ClientSaveState>( delta );
+				world.Run<S_RollbackStateSave>( delta );
+			}
 
-					world.Run<S_SynchronizeMotionStateFromTransform>();
-					physicsWorld.dynamicsWorld->stepSimulation( game->logicDelta, 10, Time::Get().GetPhysicsDelta() );
-					world.Run<S_SynchronizeTransformFromMotionState>();
-					world.Run<S_ClientSaveState>( delta );
- 				}	
-
-				gameData.spaceshipSynced = true;
-				assert( game->frameIndex == mostRecent.frameIndex );
- 			}		
-		}*/
+			gameData.spaceshipSynced = true;
+			assert( game->frameIndex == lastFrame );
+		}
 	}
 
 	//================================================================================================================================
@@ -333,9 +301,6 @@ namespace fan
 			world.Run<S_SynchronizeTransformFromMotionState>();
 			world.Run<S_MoveFollowTransforms>();
 			world.Run<S_MoveFollowTransformsUI>();
-
-			world.Run<S_ClientSaveState>( _delta );
-			world.Run<S_RollbackStateSave>( _delta );
 			
 			world.Run<S_FireWeapons>(			 _delta );
 			world.Run<S_GenerateLightMesh>(		 _delta );
@@ -356,7 +321,11 @@ namespace fan
 			world.Run<S_UpdateBoundsFromRigidbody>(	_delta );
 			world.Run<S_UpdateBoundsFromModel>();
 			world.Run<S_UpdateBoundsFromTransform>();
-			world.Run<S_UpdateGameCamera>(			_delta );			
+			world.Run<S_UpdateGameCamera>(			_delta );
+
+			world.Run<S_ClientSaveState>( _delta );
+			world.Run<S_RollbackStateSave>( _delta );
+
 			world.Run<S_ClientSend>(				_delta );
 		}
 	}

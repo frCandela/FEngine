@@ -23,19 +23,16 @@ namespace fan
 		static void OnGui( EcsWorld& _world, EcsEntity _entityID, EcsComponent& _component );
 
 		//================================================================
-		// holds the rollback state data for a specific frame
+		// Holds the rollback data of one component at a secific frame
 		//================================================================
-		struct RollbackState
+		struct RollbackData
 		{
-			FrameIndex frameIndex;
-			sf::Packet data;
+			FrameIndex	frameIndex;
+			int			componentIndex;
+			sf::Packet	data;
 		};
 
-		FrameIndex GetNewestFrameIndex() const { return previousStates.empty() ? 0 : previousStates.back().frameIndex;  }
-		FrameIndex GetOldestFrameIndex() const { return previousStates.empty() ? 0 : previousStates.front().frameIndex; }
-		const RollbackState* GetState( const FrameIndex _frameIndex ) const;
-
-
-		std::deque<RollbackState> previousStates;
+		static const int s_rollbackDatasMaxSize = 100;
+		std::deque<RollbackData> rollbackDatas;
 	};
 }

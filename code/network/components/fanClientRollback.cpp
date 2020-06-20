@@ -21,7 +21,7 @@ namespace fan
 	void ClientRollback::Init( EcsWorld& /*_world*/, EcsEntity /*_entity*/, EcsComponent& _component )
 	{
 		ClientRollback& clientRollback = static_cast<ClientRollback&>( _component );
-		clientRollback.previousStates.clear();
+		clientRollback.rollbackDatas.clear();
 	}
 
 	//================================================================================================================================
@@ -30,33 +30,18 @@ namespace fan
 	void ClientRollback::Load( EcsComponent& /*_component*/, const Json& /*_json*/ ) {}
 
 	//================================================================================================================================
-	// @todo, ensure that rollback states indices are contiguous to allow constant access complexity
-	//================================================================================================================================
-	const ClientRollback::RollbackState* ClientRollback::GetState( const FrameIndex _frameIndex ) const
-	{
-		// if frame index is in range
-		if( _frameIndex <= GetNewestFrameIndex() && _frameIndex >= GetOldestFrameIndex() )
-		{
-			for( const RollbackState& state : previousStates )
-			{
-				if( state.frameIndex == _frameIndex )
-				{
-					return &state;
-				}
-			}
-		}
-		return nullptr;
-	}
-
-	//================================================================================================================================
 	//================================================================================================================================
 	void ClientRollback::OnGui( EcsWorld& /*_world*/, EcsEntity /*_entityID*/, EcsComponent& _component )
 	{
 		ImGui::Indent(); ImGui::Indent();
 		{
 			ClientRollback& clientRollback = static_cast<ClientRollback&>( _component );
-			ImGui::Text( "Num saved states: %d", clientRollback.previousStates.size() );
-			ImGui::Text( "Range [%d,%d]", clientRollback.GetOldestFrameIndex(), clientRollback.GetNewestFrameIndex() );
+
+			const FrameIndex newestFrameIndex = clientRollback.rollbackDatas.empty() ? 0 : clientRollback.rollbackDatas.back().frameIndex;
+			const FrameIndex oldestFrameIndex = clientRollback.rollbackDatas.empty() ? 0 : clientRollback.rollbackDatas.front().frameIndex;
+			
+			ImGui::Text( "Num saved states: %d", clientRollback.rollbackDatas.size() );
+			ImGui::Text( "Range [%d,%d]", oldestFrameIndex, newestFrameIndex );
 		}ImGui::Unindent(); ImGui::Unindent();
 	}
 }
