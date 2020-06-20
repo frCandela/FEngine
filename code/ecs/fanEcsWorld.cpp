@@ -6,8 +6,9 @@ namespace fan
 {
 	//================================================================================================================================
 	//================================================================================================================================
-	void EcsWorld::Create() //@todo delete this method and do it incrementally
+	void EcsWorld::Create()
 	{
+		// Create the transition archetype that has all components
 		m_transitionArchetype.Create( m_componentsInfo, ~EcsSignature( 0 ) );
 	}
 
@@ -241,7 +242,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void		EcsWorld::RemoveHandle( const EcsEntity _entity )
+	void EcsWorld::RemoveHandle( const EcsEntity _entity )
 	{
 		EcsEntityData& entity = _entity.archetype->GetEntityData(_entity.index);
 		if( entity.handle != 0 )
@@ -253,7 +254,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	const	    EcsSingletonInfo* EcsWorld::SafeGetSingletonInfo( const uint32_t _type ) const
+	const EcsSingletonInfo* EcsWorld::SafeGetSingletonInfo( const uint32_t _type ) const
 	{
 		const auto& it = m_singletonInfos.find( _type );
 		return it == m_singletonInfos.end() ? nullptr : &it->second;
@@ -497,13 +498,6 @@ namespace fan
 		const EcsEntityData& entityData = GetEntityData( _entity );
 		return entityData.transitionIndex < 0 || !m_transitions[entityData.transitionIndex].isDead;
 	}
-
-// 	//================================================================================================================================
-// 	//================================================================================================================================
-// 	EcsView EcsWorld::Match( const EcsSignature _signature ) const
-// 	{
-// 
-// 	}
 
 	//================================================================================================================================
 	//================================================================================================================================

@@ -92,7 +92,6 @@ namespace fan
 		m_world.AddSingletonType<EditorCopyPaste>();
 		m_world.AddSingletonType<EditorGizmos>();
 		m_world.AddTagType<tag_editorOnly>();
-		m_world.Create();
 
 		// window position
 		glm::ivec2 windowPosition = { 0,23 };

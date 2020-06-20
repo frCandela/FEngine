@@ -209,6 +209,8 @@ namespace fan
 		m_componentsInfo.push_back( info );
 
 		m_typeToIndex[_ComponentType::Info::s_type] = nextTypeIndex;
+
+		m_transitionArchetype.AddComponentType( info );
 	}
 
 	//================================================================================================================================

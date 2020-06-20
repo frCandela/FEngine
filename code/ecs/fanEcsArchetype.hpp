@@ -13,7 +13,9 @@ namespace fan
 	class EcsArchetype
 	{
 	public:
+		EcsArchetype();
 		void Create( const std::vector< EcsComponentInfo >& _componentsInfo, const EcsSignature& _signature );
+		void AddComponentType( const EcsComponentInfo& _componentsInfo );
 		void RemoveEntity( const int _entityIndex );
 		void Clear();
 		int	 Size() const{ return int( m_entities.size() ); }
@@ -22,14 +24,13 @@ namespace fan
 
 		const EcsEntityData&	GetEntityData ( const int _index ) const	{ return m_entities[_index];	}
 		EcsEntityData&			GetEntityData ( const int _index )			{ return m_entities[_index];	}
-		const EcsChunkVector&	GetChunkVector( const int _index ) const	{ return m_chunks[_index];		}
-		EcsChunkVector&			GetChunkVector( const int _index )			{ return m_chunks[_index];		}
+		const EcsChunkVector&	GetChunkVector( const int _index ) const	{ return m_chunkVectors[_index];}
+		EcsChunkVector&			GetChunkVector( const int _index )			{ return m_chunkVectors[_index];}
 		const EcsSignature&		GetSignature  () const						{ return m_signature;			}
-
 
 	private:
 		EcsSignature					m_signature;
-		std::vector< EcsChunkVector >	m_chunks;		// one index per component type
+		std::vector< EcsChunkVector >	m_chunkVectors;		// one index per component type
 		std::vector< EcsEntityData >	m_entities;
 	};
 }

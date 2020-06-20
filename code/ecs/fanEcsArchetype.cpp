@@ -1,24 +1,38 @@
 #include "ecs/fanEcsArchetype.hpp"
 
 namespace fan
-{
+{	
+	//================================================================================================================================
+	//================================================================================================================================
+	EcsArchetype::EcsArchetype()
+	{
+		m_chunkVectors.resize( ecsSignatureLength );
+	}
+
 	//================================================================================================================================
 	//================================================================================================================================
 	void EcsArchetype::Create( const std::vector< EcsComponentInfo >& _componentsInfo, const EcsSignature& _signature )
 	{
+		m_signature = EcsSignature(0);
+
 		const int numComponents = int( _componentsInfo.size() );
-
-		m_signature = _signature;
-		m_chunks.resize( numComponents );
-
 		for( int i = 0; i < numComponents; i++ )
 		{
-			if( m_signature[i] )
+			if( _signature[i] )
 			{
-				const EcsComponentInfo& info = _componentsInfo[i];
-				m_chunks[i].Create( info.copy, info.size, info.alignment );
+				assert( _componentsInfo[i].index == i );
+				AddComponentType( _componentsInfo[i] );
 			}
 		}
+	}
+
+	//================================================================================================================================
+	// Allocate chunks at the index of the new component
+	//================================================================================================================================
+	void EcsArchetype::AddComponentType( const EcsComponentInfo& _componentsInfo )
+	{
+		m_signature[ _componentsInfo.index ] = 1;
+		m_chunkVectors[ _componentsInfo.index ].Create( _componentsInfo.copy, _componentsInfo.size, _componentsInfo.alignment );
 	}
 
 	//================================================================================================================================
@@ -43,7 +57,7 @@ namespace fan
 	//================================================================================================================================
 	void EcsArchetype::Clear()
 	{
-		for( EcsChunkVector& chunkVector : m_chunks )
+		for( EcsChunkVector& chunkVector : m_chunkVectors )
 		{
 			chunkVector.Clear();
 		}
