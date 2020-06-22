@@ -81,7 +81,7 @@ namespace fan
 				return *static_cast<_ComponentType*>( m_currentChunk->At( m_elementIndex ) );
 			}
 
-			EcsEntity Entity() const
+			EcsEntity GetEntity() const
 			{
 				const uint32_t index = m_chunkIndex * m_currentChunk->Capacity() + m_elementIndex;
 				return { m_currentArchetype, index };

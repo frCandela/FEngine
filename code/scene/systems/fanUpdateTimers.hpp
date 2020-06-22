@@ -19,7 +19,7 @@ namespace fan
 
 			for( auto expirationeIt = _view.begin<ExpirationTime>(); expirationeIt != _view.end<ExpirationTime>(); ++expirationeIt )
 			{
-				const EcsEntity entity = expirationeIt.Entity();
+				const EcsEntity entity = expirationeIt.GetEntity();
 				ExpirationTime& expiration = *expirationeIt;
 
 				expiration.duration -= _delta;

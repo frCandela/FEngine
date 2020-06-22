@@ -210,7 +210,7 @@ namespace fan
 				const Health& health = *healthIt;
 				const Transform& transform = *transformIt;
 				const SpaceShip& spaceShip = *spaceShipIt;
-				const EcsEntity entity = healthIt.Entity();
+				const EcsEntity entity = healthIt.GetEntity();
 
 				if( health.currentHealth == 0.f && !health.invincible )
 				{

@@ -51,7 +51,7 @@ namespace fan
 					}
 				}
 
-				const EcsEntity entity = hostDataIt.Entity();
+				const EcsEntity entity = hostDataIt.GetEntity();
 				hostConnection.Write( _world, entity, packet );
 				hostReplication.Write( _world, entity, packet );
 

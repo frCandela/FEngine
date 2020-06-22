@@ -26,7 +26,7 @@ namespace fan
 			for( ; clientRollbackIt != _view.end<ClientRollback>(); ++clientRollbackIt )
 			{			
 				ClientRollback& clientRollback = *clientRollbackIt;
-				const EcsEntity entity = clientRollbackIt.Entity();
+				const EcsEntity entity = clientRollbackIt.GetEntity();
 				const EcsSignature& signature = entity.archetype->GetSignature();
 
 				// iterates over all components and saves rollback state
@@ -102,7 +102,7 @@ namespace fan
 			for( ; clientRollbackIt != _view.end<ClientRollback>(); ++clientRollbackIt )
 			{				
 				ClientRollback& clientRollback = *clientRollbackIt;
-				const EcsEntity entity = clientRollbackIt.Entity();
+				const EcsEntity entity = clientRollbackIt.GetEntity();
 				const EcsSignature& signature = entity.archetype->GetSignature();
 
 				// Iterates over all rollback Datas and load the ones with the correct frame index

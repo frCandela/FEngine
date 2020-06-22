@@ -20,7 +20,7 @@ namespace fan
 
 			for( auto particleIt = _view.begin<Particle>(); particleIt != _view.end<Particle>(); ++particleIt )
 			{
-				const EcsEntity entity = particleIt.Entity();
+				const EcsEntity entity = particleIt.GetEntity();
 				Particle& particle = *particleIt;
 
 				particle.durationLeft -= _delta;

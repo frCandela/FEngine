@@ -34,7 +34,7 @@ namespace fan
 			auto hostReplicationIt = _view.begin<HostReplication>();
 			for( ; hostConnectionIt != _view.end<HostConnection>(); ++hostConnectionIt, ++hostDataIt, ++hostReplicationIt )
 			{
-				const EcsEntity entity = hostConnectionIt.Entity();
+				const EcsEntity entity = hostConnectionIt.GetEntity();
 				const HostConnection& hostConnection = *hostConnectionIt;
 				HostGameData& hostData = *hostDataIt;
 				HostReplication& hostReplication = *hostReplicationIt;
@@ -143,7 +143,7 @@ namespace fan
 								, HostReplication::ResendUntilReplicated
 							);
 							hostConnection.lastSync = currentTime;
-							success.Connect( &HostConnection::OnSyncSuccess, _world, _world.GetHandle( hostConnectionIt.Entity() ) );
+							success.Connect( &HostConnection::OnSyncSuccess, _world, _world.GetHandle( hostConnectionIt.GetEntity() ) );
 							if( diff > 10 )
 							{
 								Debug::Log() << "shifting host frame index : " << min + targetFrameDifference;

@@ -25,7 +25,7 @@ namespace fan
 			PhysicsWorld& physicsWorld = _world.GetSingleton<PhysicsWorld>();
 			for( auto rigidbodyIt = _view.begin<Rigidbody>(); rigidbodyIt != _view.end<Rigidbody>(); ++rigidbodyIt )
 			{
-				const EcsEntity entity = rigidbodyIt.Entity();
+				const EcsEntity entity = rigidbodyIt.GetEntity();
 				Rigidbody& rb = *rigidbodyIt;
 
 				// find a collision shape

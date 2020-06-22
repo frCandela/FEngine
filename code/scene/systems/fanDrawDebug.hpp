@@ -249,7 +249,7 @@ namespace fan
 			auto transformIt = _view.begin<Transform>();
 			for( ; transformIt != _view.end<Transform>(); ++transformIt )
 			{
-				const EcsEntity entity = transformIt.Entity();
+				const EcsEntity entity = transformIt.GetEntity();
 				DrawCollisionShape( _world, entity );
 			}
 		}

@@ -39,7 +39,7 @@ namespace fan
 				Packet packet( reliabilityLayer.GetNextPacketTag() );
 
 				// write packet
-				const EcsEntity entity = gameDataIt.Entity();
+				const EcsEntity entity = gameDataIt.GetEntity();
 				connection.Write( _world, entity, packet );
 				gameData.Write( _world, entity, packet );
 

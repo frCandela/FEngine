@@ -45,7 +45,7 @@ namespace fan
 			auto TransformIt = _view.begin<Transform>();
 			for( ; boundsIt != _view.end<Bounds>(); ++boundsIt, ++sceneNodeIt, ++TransformIt )
 			{
-				const EcsEntity entity = boundsIt.Entity();
+				const EcsEntity entity = boundsIt.GetEntity();
 				const Bounds& bounds = *boundsIt;
 				const SceneNode& sceneNode = *sceneNodeIt;
 				const Transform transform = *TransformIt;

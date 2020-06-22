@@ -58,7 +58,7 @@ namespace fan
 					// Adds bullet to the spawn manager for spawning on hosts
 					if( game.IsServer() )
 					{
-						const EcsHandle ownerHandle = _world.GetHandle( transformIt.Entity() );
+						const EcsHandle ownerHandle = _world.GetHandle( transformIt.GetEntity() );
 						const NetID ownerID = linkingContext.EcsHandleToNetID.at( ownerHandle );
 						const btVector3 bulletPosition = transform.GetPosition() + transform.TransformDirection( weapon.originOffset );
 						const btVector3 bulletVelocity = rigidbody.GetVelocity() + weapon.bulletSpeed * transform.Forward();
