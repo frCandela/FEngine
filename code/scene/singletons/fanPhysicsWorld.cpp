@@ -1,6 +1,6 @@
 #include "scene/singletons/fanPhysicsWorld.hpp"
 
-#include "core/time/fanTime.hpp"
+#include "network/singletons/fanTime.hpp"
 #include "core/fanSerializable.hpp"
 #include "scene/components/fanRigidbody.hpp"
 #include "scene/components/fanMotionState.hpp"
@@ -92,7 +92,7 @@ namespace fan
 		dynamicsWorld->setGravity( btVector3::Zero() );
 
 		// Bullet physics is broken when its internal clock is zero, this prevents it from happening when the timestep is exactly equal to the fixed timestep
-		dynamicsWorld->stepSimulation( 0.015f, 1, Time::Get().GetPhysicsDelta() );
+		dynamicsWorld->stepSimulation( 0.015f, 1, Time::s_physicsDelta );
 	}
 
 	//================================================================================================================================

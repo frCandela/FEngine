@@ -1,6 +1,7 @@
 #include "network/singletons/fanSpawnManager.hpp"
 
 #include "core/fanDebug.hpp"
+#include "network/singletons/fanTime.hpp"
 #include "game/singletons/fanGame.hpp"
 #include "game/spawn/fanSpawnBullet.hpp"
 #include "game/spawn/fanSpawnShip.hpp"
@@ -49,16 +50,16 @@ namespace fan
 	//================================================================================================================================
 	void SpawnManager::Spawn( EcsWorld& _world )
 	{
-		const Game& game = _world.GetSingleton<Game>();
+		const Time& time = _world.GetSingleton<Time>();
 		SpawnManager& spawnManager = _world.GetSingleton<SpawnManager>();
 
 		// spawn
 		for (int spawnIndex = int(spawnManager.spawns.size()) - 1; spawnIndex >= 0 ; spawnIndex--)
 		{
 			SpawnInfo& spawnInfo = spawnManager.spawns[spawnIndex];
-			if( game.frameIndex >= spawnInfo.spawnFrameIndex )
+			if( time.frameIndex >= spawnInfo.spawnFrameIndex )
 			{
-				if( game.frameIndex > spawnInfo.spawnFrameIndex )
+				if( time.frameIndex > spawnInfo.spawnFrameIndex )
 				{
 					Debug::Warning() << "missed spawning for frame" << spawnInfo.spawnFrameIndex << Debug::Endl();
 				}

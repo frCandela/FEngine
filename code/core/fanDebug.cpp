@@ -1,7 +1,7 @@
 #include "core/fanDebug.hpp"
 
 #include <iostream>
-#include "core/time/fanTime.hpp"
+#include "network/singletons/fanTime.hpp"
 
 namespace fan
 {

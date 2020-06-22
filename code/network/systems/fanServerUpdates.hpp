@@ -3,7 +3,7 @@
 #include "network/components/fanHostReplication.hpp"
 #include "network/components/fanHostGameData.hpp"
 #include "game/spawn/fanSpawnShip.hpp"
-#include "game/singletons/fanGame.hpp"
+#include "network/singletons/fanTime.hpp"
 #include "game/components/fanPlayerInput.hpp"
 
 namespace fan
@@ -27,7 +27,7 @@ namespace fan
 
 			HostManager& hostManager = _world.GetSingleton<HostManager>();
 			LinkingContext& linkingContext = _world.GetSingleton<LinkingContext>();
-			const Game& game = _world.GetSingleton<Game>();
+			const Time& time = _world.GetSingleton<Time>();
 
 			auto hostConnectionIt = _view.begin<HostConnection>();
 			auto hostDataIt = _view.begin<HostGameData>();
@@ -49,7 +49,7 @@ namespace fan
 							hostData.spaceshipID = linkingContext.nextNetID++;
 							hostData.spaceshipHandle = Game::SpawnSpaceship( _world, true, false );
 							linkingContext.AddEntity( hostData.spaceshipHandle, hostData.spaceshipID );
-							const FrameIndex spawnFrame = game.frameIndex + 60;
+							const FrameIndex spawnFrame = time.frameIndex + 60;
 							const SpawnInfo spawnInfo0 = spawn::SpawnClientShip::GenerateInfo( spawnFrame, hostData.spaceshipID, btVector3::Zero() );
 							hostReplication.Replicate(
 								ClientRPC::RPCSpawn( spawnInfo0 )
@@ -107,7 +107,7 @@ namespace fan
 		{
 			if( _delta == 0.f ) { return; }
 
-			const Game& game = _world.GetSingleton<Game>();
+			const Time& time = _world.GetSingleton<Time>();
 
 			auto hostConnectionIt = _view.begin<HostConnection>();
 			auto hostReplicationIt = _view.begin<HostReplication>();
@@ -117,7 +117,7 @@ namespace fan
 				HostReplication& hostReplication = *hostReplicationIt;
 
 				// sync the client frame index with the server
-				const double currentTime = Time::Get().ElapsedSinceStartup();
+				const double currentTime = Time::ElapsedSinceStartup();
 				if( currentTime - hostConnection.lastSync > 1.f )
 				{
 					int max = hostConnection.framesDelta[0];
@@ -134,7 +134,7 @@ namespace fan
 						hostConnection.targetBufferSize = int( 1000.f * hostConnection.rtt * ( 5.f - 2.f ) / 100.f + 2.f ); // size 5 at 100 ms rtt
 						hostConnection.targetBufferSize = std::min( hostConnection.targetBufferSize, 15 );
 
-						const int targetFrameDifference = int( hostConnection.rtt / 2.f / game.logicDelta ) + hostConnection.targetBufferSize;
+						const int targetFrameDifference = int( hostConnection.rtt / 2.f / time.logicDelta ) + hostConnection.targetBufferSize;
 						const int diff = std::abs( min + targetFrameDifference );
 						if( diff > 1 ) // only sync when we have a big enough frame index difference
 						{
@@ -170,24 +170,24 @@ namespace fan
 		{
 			if( _delta == 0.f ) { return; }
 
-			const Game& game = _world.GetSingleton<Game>();
+			const Time& time = _world.GetSingleton<Time>();
 
 			for( auto hostDataIt = _view.begin<HostGameData>(); hostDataIt != _view.end<HostGameData>(); ++hostDataIt )
 			{
 				HostGameData& hostData = *hostDataIt;
 
-				if( hostData.spaceshipHandle != 0 && game.frameIndex >= hostData.nextPlayerStateFrame )
+				if( hostData.spaceshipHandle != 0 && time.frameIndex >= hostData.nextPlayerStateFrame )
 				{
 					const EcsEntity shipEntityID = _world.GetEntity( hostData.spaceshipHandle );
 					const Rigidbody& rb = _world.GetComponent<Rigidbody>( shipEntityID );
 					const Transform& transform = _world.GetComponent<Transform>( shipEntityID );
-					hostData.nextPlayerState.frameIndex = game.frameIndex;
+					hostData.nextPlayerState.frameIndex = time.frameIndex;
 					hostData.nextPlayerState.position = transform.GetPosition();
 					hostData.nextPlayerState.orientation = transform.GetRotationEuler();
 					hostData.nextPlayerState.velocity = rb.GetVelocity();
 					hostData.nextPlayerState.angularVelocity = rb.GetAngularVelocity();
 
-					hostData.nextPlayerStateFrame = game.frameIndex + 7;
+					hostData.nextPlayerStateFrame = time.frameIndex + 7;
 				}
 			}
 		}
@@ -206,7 +206,7 @@ namespace fan
 		{
 			if( _delta == 0.f ) { return; }
 
-			const Game& game = _world.GetSingleton<Game>();
+			const Time& time = _world.GetSingleton<Time>();
 
 			for( auto hostDataIt = _view.begin<HostGameData>(); hostDataIt != _view.end<HostGameData>(); ++hostDataIt )
 			{
@@ -218,7 +218,7 @@ namespace fan
 					while( !hostData.inputs.empty() )
 					{
 						const PacketInput::InputData& inputData = hostData.inputs.front();
-						if( inputData.frameIndex < game.frameIndex || inputData.frameIndex > game.frameIndex + 60 )
+						if( inputData.frameIndex < time.frameIndex || inputData.frameIndex > time.frameIndex + 60 )
 						{
 							hostData.inputs.pop();
 						}
@@ -229,7 +229,7 @@ namespace fan
 					}
 
 					// Updates spaceship input
-					if( !hostData.inputs.empty() && hostData.inputs.front().frameIndex == game.frameIndex )
+					if( !hostData.inputs.empty() && hostData.inputs.front().frameIndex == time.frameIndex )
 					{
 						const PacketInput::InputData& inputData = hostData.inputs.front();
 						hostData.inputs.pop();

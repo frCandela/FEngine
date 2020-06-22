@@ -1,7 +1,7 @@
 #include "game/singletons/fanClientNetworkManager.hpp"
 
 #include "core/fanDebug.hpp"
-#include "core/time/fanTime.hpp"
+#include "network/singletons/fanTime.hpp"
 #include "game/singletons/fanGame.hpp"
 #include "ecs/fanEcsWorld.hpp"
 #include "scene/fanSceneSerializable.hpp"
@@ -55,11 +55,11 @@ namespace fan
 		_world.AddComponent<ClientGameData>( persistentID );
 
 		// connect rpc
-		Game& game = _world.GetSingleton<Game>();
+		Time& time = _world.GetSingleton<Time>();
 		ClientRPC& rpcManager = _world.GetComponent<ClientRPC>( persistentID );
 		SpawnManager& spawnManager = _world.GetSingleton<SpawnManager>();
 		rpcManager.onShiftFrameIndex.Connect( &ClientGameData::OnShiftFrameIndex, _world, persistentHandle );
-		rpcManager.onShiftFrameIndex.Connect( &Game::OnShiftFrameIndex, &game );
+		rpcManager.onShiftFrameIndex.Connect( &Time::OnShiftFrameIndex, &time );
 		rpcManager.onSpawn.Connect( &SpawnManager::OnSpawn, &spawnManager );
 
 		// Bind socket

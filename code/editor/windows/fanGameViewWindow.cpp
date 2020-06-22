@@ -1,7 +1,7 @@
 #include "editor/windows/fanGameViewWindow.hpp"
 
 #include "core/input/fanMouse.hpp"
-#include "core/time/fanTime.hpp"
+#include "network/singletons/fanTime.hpp"
 #include "scene/singletons/fanScene.hpp"
 #include "game/singletons/fanGame.hpp"
 #include "ecs/fanEcsWorld.hpp"

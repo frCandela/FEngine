@@ -2,6 +2,7 @@
 #include "scene/components/fanTransform.hpp"
 #include "scene/components/fanRigidbody.hpp"
 #include "network/systems/fanHostReplication.hpp"
+#include "network/singletons/fanTime.hpp"
 #include "game/components/fanPlayerInput.hpp"
 #include "game/components/fanBattery.hpp"
 #include "game/components/fanWeapon.hpp"
@@ -28,6 +29,7 @@ namespace fan
 		{
 			if( _delta == 0.f ) { return; }
 
+			const Time& time = _world.GetSingleton<Time>();
 			const Game& game = _world.GetSingleton<Game>();
 			SpawnManager& spawnManager = _world.GetSingleton<SpawnManager>();
 			const LinkingContext& linkingContext = _world.GetSingleton<LinkingContext>();
@@ -60,7 +62,7 @@ namespace fan
 						const NetID ownerID = linkingContext.EcsHandleToNetID.at( ownerHandle );
 						const btVector3 bulletPosition = transform.GetPosition() + transform.TransformDirection( weapon.originOffset );
 						const btVector3 bulletVelocity = rigidbody.GetVelocity() + weapon.bulletSpeed * transform.Forward();
-						const SpawnInfo info = spawn::SpawnBullet::GenerateInfo( game.frameIndex + 5, ownerID, bulletPosition, bulletVelocity );
+						const SpawnInfo info = spawn::SpawnBullet::GenerateInfo( time.frameIndex + 5, ownerID, bulletPosition, bulletVelocity );
 
 						// spawn on server
 						spawnManager.spawns.push_back( info );

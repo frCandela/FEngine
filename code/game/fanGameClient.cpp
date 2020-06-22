@@ -1,7 +1,7 @@
 #include "game/fanGameClient.hpp"
 
 #include "core/time/fanProfiler.hpp"
-#include "core/time/fanTime.hpp"
+#include "network/singletons/fanTime.hpp"
 #include "core/input/fanInput.hpp"
 #include "core/input/fanInputManager.hpp"
 
@@ -36,6 +36,7 @@
 #include "network/fanPacket.hpp"
 
 #include "network/singletons/fanLinkingContext.hpp"
+#include "network/singletons/fanTime.hpp"
 #include "network/components/fanClientReplication.hpp"
 #include "network/components/fanClientRPC.hpp"
 #include "network/components/fanClientGameData.hpp"
@@ -46,6 +47,7 @@
 #include "network/systems/fanClientSendReceive.hpp"
 #include "network/systems/fanTimeout.hpp"
 #include "network/systems/fanRollback.hpp"
+#include "network/singletons/fanSpawnManager.hpp"
 
 #include "game/singletons/fanClientNetworkManager.hpp"
 #include "game/singletons/fanSunLight.hpp"
@@ -53,7 +55,6 @@
 #include "game/singletons/fanCollisionManager.hpp"
 #include "game/singletons/fanSolarEruption.hpp"
 #include "game/singletons/fanGame.hpp"
-#include "network/singletons/fanSpawnManager.hpp"
 
 #include "game/systems/fanUpdatePlanets.hpp"
 #include "game/systems/fanUpdateSpaceships.hpp"
@@ -136,10 +137,10 @@ namespace fan
 		world.AddSingletonType<SolarEruption>();
 		world.AddSingletonType<SpawnManager>();
 		world.AddSingletonType<ClientNetworkManager>();
-		// network singleton components
-		
+		// network singleton components		
 		world.AddSingletonType<LinkingContext>();
-
+		world.AddSingletonType<Time>();
+		
 		world.AddTagType<tag_sunlight_occlusion>();
 		
 		// @hack
@@ -152,18 +153,13 @@ namespace fan
 	//================================================================================================================================
 	void GameClient::Start()
 	{
-		game = &world.GetSingleton<Game>();
-		netManager = &world.GetSingleton<ClientNetworkManager>();
-
-		netManager->Start( world );
+		ClientNetworkManager& netManager = world.GetSingleton<ClientNetworkManager>();
+		netManager.Start( world );
 
 		// Init game
 		world.Run<S_RegisterAllRigidbodies>();
 		GameCamera::CreateGameCamera( world );
 		SolarEruption::Start( world );
-
-		Input::Get().Manager().FindEvent( "test" )->Clear();
-		Input::Get().Manager().FindEvent( "test" )->Connect( &GameClient::Test, this );
 	}
 
 	//================================================================================================================================
@@ -179,60 +175,38 @@ namespace fan
 
 		GameCamera::DeleteGameCamera( world );
 
-		netManager->Stop( world );
+		ClientNetworkManager& netManager = world.GetSingleton<ClientNetworkManager>();
+		netManager.Stop( world );
 	}
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void GameClient::Pause()
+	void GameClient::RollbackResimulate()
 	{
-
-	}
-
-	//================================================================================================================================
-	//================================================================================================================================
-	void GameClient::Resume()
-	{
-
-	}
-
-	//================================================================================================================================
-	//================================================================================================================================
-	void GameClient::Test()
-	{
-		const EcsEntity persistentID = world.GetEntity( netManager->persistentHandle );
+		ClientNetworkManager& netManager = world.GetSingleton<ClientNetworkManager>();
+		const EcsEntity persistentID = world.GetEntity( netManager.persistentHandle );
 		ClientGameData& gameData = world.GetComponent<ClientGameData>( persistentID );
-		const EcsEntity spaceshipID = world.GetEntity( gameData.spaceshipHandle );
-		Transform& transform = world.GetComponent<Transform>( spaceshipID );
-		transform.SetPosition( transform.GetPosition() + btVector3( 1, 0, 0 ) );
-	}
-
-	//================================================================================================================================
-	//================================================================================================================================
-	void GameClient::RollbackResimulate( EcsWorld& _world )
-	{
-		const EcsEntity persistentID = _world.GetEntity( netManager->persistentHandle );
-		ClientGameData& gameData = _world.GetComponent<ClientGameData>( persistentID );
 		if( !gameData.spaceshipSynced )
 		{
-			const FrameIndex lastFrame = game->frameIndex;
+			Time& time = world.GetSingleton<Time>();
+			const FrameIndex lastFrame = time.frameIndex;
 			const FrameIndex firstFrame = gameData.lastServerState.frameIndex;
 			world.Run<S_RollbackInit>();
 			Debug::Highlight() << "rollback to frame " << firstFrame << Debug::Endl();
 
 			// Rollback at the frame we took the snapshot of the player game state
-			game->frameIndex = firstFrame;
+			time.frameIndex = firstFrame;
 
 			// reset world to first frame		
 			PhysicsWorld& physicsWorld = world.GetSingleton<PhysicsWorld>();
 			physicsWorld.Reset();
 			world.Run<S_RollbackRestoreState>( firstFrame );
-			const EcsEntity spaceshipID = _world.GetEntity( gameData.spaceshipHandle );
-			Rigidbody& rigidbody = _world.GetComponent<Rigidbody>( spaceshipID );
+			const EcsEntity spaceshipID = world.GetEntity( gameData.spaceshipHandle );
+			Rigidbody& rigidbody = world.GetComponent<Rigidbody>( spaceshipID );
 			physicsWorld.dynamicsWorld->removeRigidBody( rigidbody.rigidbody );
 			physicsWorld.dynamicsWorld->addRigidBody( rigidbody.rigidbody );
 			rigidbody.ClearForces();
-			Transform& transform = _world.GetComponent<Transform>( spaceshipID );
+			Transform& transform = world.GetComponent<Transform>( spaceshipID );
 			rigidbody.SetVelocity( gameData.lastServerState.velocity );
 			rigidbody.SetAngularVelocity( gameData.lastServerState.angularVelocity );
 			transform.SetPosition( gameData.lastServerState.position );
@@ -243,18 +217,18 @@ namespace fan
 			gameData.previousLocalStates.push( gameData.lastServerState );
 
 			// resimulate the last frames of input of the player
-			const float delta = game->logicDelta;
-			while( game->frameIndex < lastFrame )
+			const float delta = time.logicDelta;
+			while( time.frameIndex < lastFrame )
 			{
-				game->frameIndex++;
+				time.frameIndex++;
 
-				world.Run<S_RollbackRestoreState>( game->frameIndex );
+				world.Run<S_RollbackRestoreState>( time.frameIndex );
 
 				world.Run<S_MovePlanets>( delta );
 				world.Run<S_MoveSpaceships>( delta );
 
 				world.Run<S_SynchronizeMotionStateFromTransform>();
-				physicsWorld.dynamicsWorld->stepSimulation( game->logicDelta, 10, Time::Get().GetPhysicsDelta() );
+				physicsWorld.dynamicsWorld->stepSimulation( time.logicDelta, 10, Time::s_physicsDelta );
 				world.Run<S_SynchronizeTransformFromMotionState>();
 
 				world.Run<S_ClientSaveState>( delta );
@@ -262,7 +236,7 @@ namespace fan
 			}
 
 			gameData.spaceshipSynced = true;
-			assert( game->frameIndex == lastFrame );
+			assert( time.frameIndex == lastFrame );
 		}
 	}
 
@@ -270,16 +244,18 @@ namespace fan
 	//================================================================================================================================
 	void  GameClient::Step( const float _delta )
 	{		
+		Time& time = world.GetSingleton<Time>();
+
 		{
 			SCOPED_PROFILE( scene_update );			
 			world.Run<S_ClientReceive>( _delta );
 			world.Run<S_RollbackRemoveOldStates>();
 
-			RollbackResimulate( world );
+			RollbackResimulate();
 
 			if( _delta > 0.f )
 			{
-				game->frameIndex++;
+				time.frameIndex++;
 			}
 
 			world.Run<S_ProcessTimedOutPackets>();
@@ -296,7 +272,7 @@ namespace fan
 			// physics & transforms
 			PhysicsWorld& physicsWorld = world.GetSingleton<PhysicsWorld>();
 			world.Run<S_SynchronizeMotionStateFromTransform>();
-			physicsWorld.dynamicsWorld->stepSimulation( _delta, 10, Time::Get().GetPhysicsDelta() );
+			physicsWorld.dynamicsWorld->stepSimulation( _delta, 10, Time::s_physicsDelta );
 			world.Run<S_SynchronizeTransformFromMotionState>();
 			world.Run<S_MoveFollowTransforms>();
 			world.Run<S_MoveFollowTransformsUI>();
@@ -322,10 +298,10 @@ namespace fan
 			world.Run<S_UpdateBoundsFromTransform>();
 			world.Run<S_UpdateGameCamera>(			_delta );
 
-			world.Run<S_ClientSaveState>( _delta );
+			world.Run<S_ClientSaveState>(	_delta );
 			world.Run<S_RollbackStateSave>( _delta );
 
-			world.Run<S_ClientSend>(				_delta );
+			world.Run<S_ClientSend>(		_delta );
 		}
 	}
 }

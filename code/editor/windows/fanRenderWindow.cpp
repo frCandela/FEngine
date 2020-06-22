@@ -2,7 +2,7 @@
 
 #include "editor/fanModals.hpp"
 #include "core/time/fanProfiler.hpp"
-#include "core/time/fanTime.hpp"
+#include "network/singletons/fanTime.hpp"
 #include "scene/fanPrefab.hpp"
 #include "render/pipelines/fanPostprocessPipeline.hpp"
 #include "render/pipelines/fanForwardPipeline.hpp"

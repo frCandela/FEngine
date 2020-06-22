@@ -1,7 +1,7 @@
 #include "game/singletons/fanServerNetworkManager.hpp"
 
 #include "core/fanDebug.hpp"
-#include "core/time/fanTime.hpp"
+#include "network/singletons/fanTime.hpp"
 #include "ecs/fanEcsWorld.hpp"
 #include "game/singletons/fanGame.hpp"
 #include "scene/fanSceneSerializable.hpp"

@@ -18,7 +18,7 @@ namespace fan
 		static void Run( EcsWorld& _world, const EcsView& _view )
 		{
 			HostManager& hostManager = _world.GetSingleton<HostManager>();
-			const double currentTime = Time::Get().ElapsedSinceStartup();
+			const double currentTime = Time::ElapsedSinceStartup();
 
 			auto sceneNodeIt = _view.begin<SceneNode>();
 			auto hostConnectionit = _view.begin<HostConnection>();
@@ -54,7 +54,7 @@ namespace fan
 			{
 				ReliabilityLayer& reliabilityLayer = *reliabilityLayerIt;
 
-				const double timoutTime = Time::Get().ElapsedSinceStartup() - reliabilityLayer.timeoutDuration;
+				const double timoutTime = Time::ElapsedSinceStartup() - reliabilityLayer.timeoutDuration;
 
 				//packets are sorted, so all timed out packets must be at front
 				while( !reliabilityLayer.inFlightPackets.empty() )

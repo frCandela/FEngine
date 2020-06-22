@@ -3,7 +3,7 @@
 #include "network/components/fanClientConnection.hpp"
 #include "network/components/fanClientGameData.hpp"
 #include "network/components/fanClientRPC.hpp"
-#include "game/singletons/fanGame.hpp"
+#include "network/singletons/fanTime.hpp"
 #include "game/components/fanPlayerInput.hpp"
 
 namespace fan
@@ -22,7 +22,7 @@ namespace fan
 		{
 			if( _delta == 0.f ) { return; }
 
-			const Game& game = _world.GetSingleton<Game>();
+			const Time& time = _world.GetSingleton<Time>();
 
 			for( auto gameDataIt = _view.begin<ClientGameData>(); gameDataIt != _view.end<ClientGameData>(); ++gameDataIt )
 			{
@@ -37,7 +37,7 @@ namespace fan
 					const Transform& transform = _world.GetComponent<Transform>( spaceshipID );
 					assert( rb.rigidbody->getTotalForce().isZero() );
 					PacketPlayerGameState playerState;
-					playerState.frameIndex = game.frameIndex;
+					playerState.frameIndex = time.frameIndex;
 					playerState.position = transform.GetPosition();
 					playerState.orientation = transform.GetRotationEuler();
 					playerState.velocity = rb.GetVelocity();
@@ -62,7 +62,7 @@ namespace fan
 		{
 			if( _delta == 0.f ) { return; }
 
-			const Game& game = _world.GetSingleton<Game>();
+			const Time& time = _world.GetSingleton<Time>();
 
 			for( auto gameDataIt = _view.begin<ClientGameData>(); gameDataIt != _view.end<ClientGameData>(); ++gameDataIt )
 			{
@@ -75,7 +75,7 @@ namespace fan
 
 					// streams input to the server
 					PacketInput::InputData inputData;
-					inputData.frameIndex = game.frameIndex;
+					inputData.frameIndex = time.frameIndex;
 					inputData.orientation = sf::Vector2f( input.orientation.x(), input.orientation.z() );
 					inputData.left = input.left > 0;
 					inputData.right = input.left < 0;
@@ -179,7 +179,7 @@ namespace fan
 
 				if( connection.state == ClientConnection::ClientState::Connected )
 				{
-					const double currentTime = Time::Get().ElapsedSinceStartup();
+					const double currentTime = Time::ElapsedSinceStartup();
 					if( connection.serverLastResponse + connection.timeoutDelay < currentTime )
 					{
 						Debug::Log() << "server timeout " << Debug::Endl();

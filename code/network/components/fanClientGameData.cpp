@@ -1,6 +1,7 @@
 #include "network/components/fanClientGameData.hpp"
 
 #include "ecs/fanEcsWorld.hpp"
+#include "network/singletons/fanTime.hpp"
 
 namespace fan
 {
@@ -166,7 +167,7 @@ namespace fan
 		previousLocalStates = std::queue< PacketPlayerGameState >(); // clear
 		frameSynced = true;
 
-		if( std::abs( _framesDelta ) > s_maxFrameDeltaBeforeShift )
+		if( std::abs( _framesDelta ) > Time::s_maxFrameDeltaBeforeShift )
 		{
 			Debug::Log() << "Shifted client frame index : " << _framesDelta << Debug::Endl();
 			previousLocalStates = std::queue< PacketPlayerGameState >(); // clear

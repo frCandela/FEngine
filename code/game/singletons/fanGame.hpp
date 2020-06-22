@@ -29,11 +29,6 @@ namespace fan
 		State	    state;
 		std::string name;
 		PrefabPtr	spaceshipPrefab;
-		FrameIndex	frameIndex;			// the index of the current time
-		FrameIndex	frameStart;			// the index of the first frame of the game
-		float		logicDelta;			// time between two frames in seconds
-		float		timeScaleDelta;		// (seconds) accelerate, decelerates the logic frame rate to resync frame index with server
-		float		timeScaleIncrement; // the maximum amount that can be added to each frame
 
 		// @hack for the editor, only one of these should be null
 		GameClient* gameClient = nullptr;
@@ -41,6 +36,5 @@ namespace fan
 
 		bool IsServer() const { return gameServer != nullptr; }
 		static EcsHandle SpawnSpaceship( EcsWorld& _world, const bool _hasPlayerInput, const bool _hasPlayerController );
-		void OnShiftFrameIndex( const int _framesDelta );
 	};
 }

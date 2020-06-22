@@ -1,6 +1,6 @@
 #include "game/singletons/fanGameCamera.hpp"
 
-#include "core/time/fanTime.hpp"
+#include "network/singletons/fanTime.hpp"
 #include "ecs/fanEcsWorld.hpp"
 #include "scene/singletons/fanScene.hpp"
 #include "scene/components/fanSceneNode.hpp"

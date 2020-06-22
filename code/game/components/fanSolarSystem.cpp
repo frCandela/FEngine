@@ -1,6 +1,6 @@
 #include "game/components/fanSolarSystem.hpp"
 #include "game/components/fanPlanet.hpp"
-#include "core/time/fanTime.hpp"
+#include "network/singletons/fanTime.hpp"
 #include "render/fanRendererDebug.hpp"
 
 namespace fan
@@ -130,7 +130,7 @@ namespace fan
 // 
 // 			RendererDebug::Get().DebugCircle( transform.GetPosition(), orbit.radius, transform.Up(), 32, Color::Cyan );
 // 
-// 			float const time = -orbit.speed * Time::ElapsedSinceStartup();
+// 			float const time = -orbit.speed * GameTime::ElapsedSinceStartup();
 // 			for ( int planetIndex = 0; planetIndex < orbit.planets.size(); planetIndex++ )
 // 			{
 // 				PlanetData& planet = orbit.planets[ planetIndex ];

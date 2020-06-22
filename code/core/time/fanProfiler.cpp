@@ -1,5 +1,5 @@
 #include "core/time/fanProfiler.hpp"
-#include "core/time/fanTime.hpp"
+#include "network/singletons/fanTime.hpp"
 
 namespace fan
 {

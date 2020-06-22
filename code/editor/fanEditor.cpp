@@ -1,15 +1,6 @@
 #include "fanEditor.hpp"
 
 #include <thread>
-#include "render/pipelines/fanForwardPipeline.hpp"
-#include "render/pipelines/fanDebugPipeline.hpp"
-#include "render/fanRendererDebug.hpp"
-#include "render/core/fanTexture.hpp"
-#include "render/util/fanWindow.hpp"
-#include "render/fanRenderer.hpp"
-#include "render/fanUIMesh.hpp"
-#include "render/fanMesh.hpp"
-#include "render/fanRendererDebug.hpp"
 #include "core/math/fanMathUtils.hpp"
 #include "core/math/shapes/fanConvexHull.hpp"
 #include "core/math/shapes/fanTriangle.hpp"
@@ -20,9 +11,20 @@
 #include "core/input/fanKeyboard.hpp"
 #include "core/input/fanJoystick.hpp"
 #include "core/time/fanProfiler.hpp"
+#include "core/time/fanScopedTimer.hpp"
 #include "core/input/fanMouse.hpp"
 #include "core/input/fanInput.hpp"
-#include "core/time/fanTime.hpp"
+#include "network/singletons/fanTime.hpp"
+#include "render/pipelines/fanForwardPipeline.hpp"
+#include "render/pipelines/fanDebugPipeline.hpp"
+#include "render/fanRendererDebug.hpp"
+#include "render/core/fanTexture.hpp"
+#include "render/util/fanWindow.hpp"
+#include "render/fanRenderer.hpp"
+#include "render/fanUIMesh.hpp"
+#include "render/fanMesh.hpp"
+#include "render/fanRendererDebug.hpp"
+#include "network/singletons/fanTime.hpp"
 #include "editor/windows/fanPreferencesWindow.hpp"	
 #include "editor/windows/fanSingletonsWindow.hpp"
 #include "editor/windows/fanInspectorWindow.hpp"	
@@ -71,11 +73,8 @@
 #include "scene/singletons/fanScenePointers.hpp"
 #include "scene/fanSceneTags.hpp"
 #include "scene/fanPrefab.hpp"
-
 #include "game/singletons/fanGameCamera.hpp"
 #include "game/singletons/fanGame.hpp"
-
-#include "core/time/fanScopedTimer.hpp"
 
 namespace fan
 {
@@ -278,42 +277,42 @@ namespace fan
 	//================================================================================================================================
 	void Editor::Run()
 	{
-		double lastLogicTime = Time::Get().ElapsedSinceStartup();
-		double lastRenderTime = Time::Get().ElapsedSinceStartup();
+		double lastLogicTime = Time::ElapsedSinceStartup();
+		double lastRenderTime = Time::ElapsedSinceStartup();
 
 		Profiler::Get().Begin();
 
-		Game& game = m_world.GetSingleton<Game>();
+		Time& time = m_world.GetSingleton<Time>();
 		while( m_applicationShouldExit == false && m_window->IsOpen() == true )
 		{
-			const double currentTime = Time::Get().ElapsedSinceStartup();
-			const float renderDelta = Time::Get().GetRenderDelta();
+			const double currentTime = Time::ElapsedSinceStartup();
+			const float renderDelta = Time::s_renderDelta;
 
 			// Runs logic, renders ui
-			while( currentTime > lastLogicTime + game.logicDelta )
+			while( currentTime > lastLogicTime + time.logicDelta )
 			{
 				// checking the loop timing is not late
-				const double loopDelayMilliseconds = 1000. * (currentTime - ( lastLogicTime + game.logicDelta ) );
+				const double loopDelayMilliseconds = 1000. * (currentTime - ( lastLogicTime + time.logicDelta ) );
  				if( loopDelayMilliseconds > 30 )
  				{
  					Debug::Warning() << "logic is late of " << loopDelayMilliseconds << "ms" << Debug::Endl();					
 					// if we are really really late, resets the timer
 					if( loopDelayMilliseconds > 100 )
 					{
-						lastLogicTime = currentTime - game.logicDelta;
+						lastLogicTime = currentTime - time.logicDelta;
 						Debug::Warning() << "reset logic timer " << Debug::Endl();
 					}
  				}
 
 				// increase the logic time of a timeScaleDelta with n timeScaleIncrements
-				if( std::abs( game.timeScaleDelta ) >= game.timeScaleIncrement )
+				if( std::abs( time.timeScaleDelta ) >= time.timeScaleIncrement )
 				{
-					const float increment = game.timeScaleDelta > 0.f ? game.timeScaleIncrement : -game.timeScaleIncrement;
+					const float increment = time.timeScaleDelta > 0.f ? time.timeScaleIncrement : -time.timeScaleIncrement;
 					lastLogicTime -= increment;
-					game.timeScaleDelta -= increment;
+					time.timeScaleDelta -= increment;
 				}
 
-				lastLogicTime += game.logicDelta;
+				lastLogicTime += time.logicDelta;
 
 				SCOPED_PROFILE( logic )
 				{
@@ -321,7 +320,7 @@ namespace fan
 						Input::Get().NewFrame();
 					Mouse::Get().Update( m_gameViewWindow->GetPosition(), m_gameViewWindow->GetSize(), m_gameViewWindow->IsHovered() );
 					ImGui::NewFrame();
-					ImGui::GetIO().DeltaTime = game.logicDelta;
+					ImGui::GetIO().DeltaTime = time.logicDelta;
 					m_renderer->GetRendererDebug().ClearDebug();
 
 					onLPPSynch.Emmit();
@@ -329,7 +328,7 @@ namespace fan
 
 				// update				
 				{
-					GameStep( game.logicDelta );
+					GameStep( time.logicDelta );
 
 					EditorCamera& editorCamera = m_world.GetSingleton<EditorCamera>();
 					Scene& scene = m_world.GetSingleton<Scene>();
@@ -337,7 +336,7 @@ namespace fan
 					// only update the editor camera when we are using it
 					if( scene.mainCameraHandle == editorCamera.cameraHandle )
 					{
-						EditorCamera::Update( m_world, game.logicDelta );
+						EditorCamera::Update( m_world, time.logicDelta );
 					}
 				}
 
@@ -398,7 +397,7 @@ namespace fan
 			{
 				lastRenderTime = currentTime;
 
-				Time::Get().RegisterFrameDrawn();	// used for stats
+				Time::RegisterFrameDrawn();	// used for stats
 
 				UpdateRenderWorld();
 
@@ -411,8 +410,8 @@ namespace fan
 			if( m_launchSettings.mainLoopSleep )
 			{
 				const double minSleepTime = 1;
-				const double endFrameTime = Time::Get().ElapsedSinceStartup();
-				const double timeBeforeNextLogic = lastLogicTime + game.logicDelta - endFrameTime;
+				const double endFrameTime = Time::ElapsedSinceStartup();
+				const double timeBeforeNextLogic = lastLogicTime + time.logicDelta - endFrameTime;
 				const double timeBeforeNextRender = lastRenderTime + renderDelta - endFrameTime;
 				const double sleepTimeMiliseconds = 1000. * std::min( timeBeforeNextLogic, timeBeforeNextRender );
 				if( sleepTimeMiliseconds > minSleepTime )
@@ -502,9 +501,6 @@ namespace fan
 		{
 			Debug::Highlight() << game.name << ": paused" << Debug::Endl();
 			game.state = Game::PAUSED;
-
-			if( game.gameServer != nullptr ) game.gameServer->Pause();
-			else							 game.gameClient->Pause();
 		}
 	}
 
@@ -517,9 +513,6 @@ namespace fan
 		{
 			Debug::Highlight() << game.name << ": resumed" << Debug::Endl();
 			game.state = Game::PLAYING;
-
-			if( game.gameServer != nullptr ) game.gameServer->Resume();
-			else							 game.gameClient->Resume();
 		}
 	}
 
@@ -651,19 +644,15 @@ namespace fan
 	void Editor::OnEditorStep()
 	{
 		Game& game = m_world.GetSingleton<Game>();
-		assert( game.state == Game::PAUSED );
+		Time& time = m_world.GetSingleton<Time>();
 
 		if( game.gameServer != nullptr )
 		{
-			game.gameServer->Resume();
-			game.gameServer->Step( game.logicDelta );
-			game.gameServer->Pause();
+			game.gameServer->Step( time.logicDelta );
 		}
 		else
 		{
-			game.gameClient->Resume();
-			game.gameClient->Step( game.logicDelta );
-			game.gameClient->Pause();
+			game.gameClient->Step( time.logicDelta );
 		}
 	}
 }

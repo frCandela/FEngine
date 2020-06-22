@@ -1,7 +1,7 @@
 #include "network/components/fanReliabilityLayer.hpp"
 
 #include "network/singletons/fanHostManager.hpp"
-#include "core/time/fanTime.hpp"
+#include "network/singletons/fanTime.hpp"
 #include "ecs/fanEcsWorld.hpp"
 
 namespace fan
@@ -71,7 +71,7 @@ namespace fan
 		inFlightPacket.tag = _packet.tag;
 		inFlightPacket.onFailure = _packet.onFail;
 		inFlightPacket.onSuccess = _packet.onSuccess;
-		inFlightPacket.timeDispatch = Time::Get().ElapsedSinceStartup();
+		inFlightPacket.timeDispatch = Time::ElapsedSinceStartup();
 		inFlightPackets.push( inFlightPacket );
 	}
 

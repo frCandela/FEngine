@@ -2,7 +2,7 @@
 
 #include "core/fanDebug.hpp"
 #include "ecs/fanEcsWorld.hpp"
-#include "core/time/fanTime.hpp"
+#include "network/singletons/fanTime.hpp"
 #include "network/fanImGuiNetwork.hpp"
 
 namespace fan
@@ -183,7 +183,7 @@ namespace fan
 			ImGui::Text( "rtt                  "); ImGui::SameLine();
 			ImGui::TextColored( GetRttColor( connection.rtt ), "%.1f", 1000.f * connection.rtt );
 			ImGui::Text( "bandwidth:            %.1f Ko/s", connection.bandwidth );
-			ImGui::Text( "server last response: %.1f", Time::Get().ElapsedSinceStartup() - connection.serverLastResponse );
+			ImGui::Text( "server last response: %.1f", Time::ElapsedSinceStartup() - connection.serverLastResponse );
 		}ImGui::Unindent(); ImGui::Unindent();
 	}
 }

@@ -1,7 +1,7 @@
 #include "core/time/fanScopedTimer.hpp"
 
 #include "core/fanDebug.hpp"
-#include "core/time/fanTime.hpp"
+#include "network/singletons/fanTime.hpp"
 
 namespace fan
 {

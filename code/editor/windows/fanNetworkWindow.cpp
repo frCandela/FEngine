@@ -3,7 +3,7 @@
 #include "game/fanGameServer.hpp"
 #include "game/fanGameClient.hpp"
 #include "game/singletons/fanGame.hpp"
-#include "core/time/fanTime.hpp"
+#include "network/singletons/fanTime.hpp"
 #include "network/singletons/fanServerConnection.hpp"
 
 namespace fan

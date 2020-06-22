@@ -17,6 +17,7 @@
 #include "game/components/fanPlayerController.hpp"
 #include "network/components/fanClientGameData.hpp"
 #include "network/components/fanClientRollback.hpp"
+#include "network/singletons/fanTime.hpp"
 
 namespace fan
 {
@@ -37,28 +38,6 @@ namespace fan
 		Game& gameData = static_cast<Game&>( _component );
 		gameData.state = STOPPED;
 		gameData.spaceshipPrefab.Set( nullptr );
-		gameData.frameIndex = 0;
-		gameData.logicDelta = 1.f / 60.f;
-		gameData.frameStart = 0;
-		gameData.timeScaleDelta = 0.f;
-		gameData.timeScaleIncrement = gameData.logicDelta / 20.f; // it takes 20 frames to time scale one frame ( 5% faster/slower )
-	}
-
-	//================================================================================================================================
-	// Client must adjust it frame index to be in sync with the server
-	// if the delta is small enough, use timescale
-	// if it's too big, offsets the frame index directly
-	//================================================================================================================================
-	void Game::OnShiftFrameIndex( const int _framesDelta )
-	{
-		if( std::abs( _framesDelta ) > ClientGameData::s_maxFrameDeltaBeforeShift )
-		{
-			frameIndex += _framesDelta;
-		}
-		else
-		{
-			timeScaleDelta = _framesDelta * logicDelta;
-		}
 	}
 
 	//================================================================================================================================
@@ -158,7 +137,6 @@ namespace fan
 			{
 				gameData.name = buffer;
 			}
-			ImGui::Text( "frame index: %d", gameData.frameIndex );
 
 			// game state
 			std::string stateStr =
@@ -168,7 +146,6 @@ namespace fan
 			ImGui::Text( "game state : %s", stateStr.c_str() );
 
 			ImGui::FanPrefab( "spaceship", gameData.spaceshipPrefab );
-			ImGui::DragFloat( "timescale", &gameData.timeScaleDelta, 0.1f );
 		}
 		ImGui::Unindent(); ImGui::Unindent();
 	}

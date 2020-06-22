@@ -1,8 +1,8 @@
 #include "network/components/fanHostConnection.hpp"
 
-#include "core/time/fanTime.hpp"
+#include "network/singletons/fanTime.hpp"
 #include "ecs/fanEcsWorld.hpp"
-#include "game/singletons/fanGame.hpp"
+#include "network/singletons/fanTime.hpp"
 #include "network/fanImGuiNetwork.hpp"
 
 namespace fan
@@ -47,7 +47,7 @@ namespace fan
 	//================================================================================================================================
 	void HostConnection::Write( EcsWorld& _world, EcsEntity _entity, Packet& _packet )
 	{
- 		const Game& game = _world.GetSingleton<Game>();
+ 		const Time& time = _world.GetSingleton<Time>();
 
 		// Send login packet
 		if( state == HostConnection::NeedingApprouval )
@@ -62,20 +62,20 @@ namespace fan
 		else if( state == HostConnection::Connected )
 		{
 			// Ping client
-			const double currentTime = Time::Get().ElapsedSinceStartup();
+			const double currentTime = Time::ElapsedSinceStartup();
 			if( currentTime - lastPingTime > pingDelay )
 			{
 				lastPingTime = currentTime;
 
 				PacketPing packetPing;
 				packetPing.previousRtt = rtt;
-				packetPing.serverFrame = game.frameIndex;
+				packetPing.serverFrame = time.frameIndex;
 				packetPing.Write( _packet );
 			}
 		}
 		else if( state == HostConnection::Disconnected )
 		{
-			const double currentTime = Time::Get().ElapsedSinceStartup();
+			const double currentTime = Time::ElapsedSinceStartup();
 			if( currentTime - lastDisconnectTime > disconnectDelay )
 			{
 				lastDisconnectTime = currentTime;
@@ -180,7 +180,7 @@ namespace fan
 	void HostConnection::OnGui( EcsWorld& /*_world*/, EcsEntity /*_entityID*/, EcsComponent& _component )
 	{
 		HostConnection& hostConnection = static_cast<HostConnection&>( _component );
-		const double currentTime = Time::Get().ElapsedSinceStartup();
+		const double currentTime = Time::ElapsedSinceStartup();
 		ImGui::PushItemWidth( 0.6f * ImGui::GetWindowWidth() - 16 );
 		{
 			ImGui::Text( "name:               %s", hostConnection.name.c_str() );

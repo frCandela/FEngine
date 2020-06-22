@@ -1,7 +1,7 @@
 #include "game/fanGameServer.hpp"
 
 #include "core/time/fanProfiler.hpp"
-#include "core/time/fanTime.hpp"
+#include "network/singletons/fanTime.hpp"
 #include "network/fanPacket.hpp"
 
 #include "scene/systems/fanSynchronizeMotionStates.hpp"
@@ -36,7 +36,7 @@
 #include "network/singletons/fanServerConnection.hpp"
 #include "network/singletons/fanLinkingContext.hpp"
 #include "network/singletons/fanHostManager.hpp"
-
+#include "network/singletons/fanTime.hpp"
 #include "network/components/fanHostGameData.hpp"
 #include "network/components/fanHostConnection.hpp"
 #include "network/components/fanHostReplication.hpp"
@@ -134,6 +134,7 @@ namespace fan
 		world.AddSingletonType<ServerConnection>();
 		world.AddSingletonType<LinkingContext>();
 		world.AddSingletonType<HostManager>();
+		world.AddSingletonType<Time>();
 		
 		world.AddTagType<tag_sunlight_occlusion>();
 
@@ -177,25 +178,13 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void GameServer::Pause()
-	{
-
-	}
-
-	//================================================================================================================================
-	//================================================================================================================================
-	void GameServer::Resume()
-	{
-
-	}
-
-	//================================================================================================================================
-	//================================================================================================================================
 	void  GameServer::Step( const float _delta )
-	{
+	{	
+		Time& time = world.GetSingleton<Time>();
+
 		if( _delta > 0.f )
 		{
-			game->frameIndex++;
+			time.frameIndex++;
 		}
 
 		{
@@ -216,7 +205,7 @@ namespace fan
 			// physics & transforms
 			PhysicsWorld& physicsWorld = world.GetSingleton<PhysicsWorld>();
 			world.Run<S_SynchronizeMotionStateFromTransform>();
-			physicsWorld.dynamicsWorld->stepSimulation( _delta, 10, Time::Get().GetPhysicsDelta() );
+			physicsWorld.dynamicsWorld->stepSimulation( _delta, 10, Time::s_physicsDelta );
 			world.Run<S_SynchronizeTransformFromMotionState>();
 			world.Run<S_MoveFollowTransforms>();
 			world.Run<S_MoveFollowTransformsUI>();			

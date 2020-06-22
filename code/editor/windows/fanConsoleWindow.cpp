@@ -3,7 +3,7 @@
 #include "core/time/fanProfiler.hpp"
 #include "core/input/fanInput.hpp"
 #include "core/input/fanMouse.hpp"
-#include "core/time/fanTime.hpp"
+#include "network/singletons/fanTime.hpp"
 
 namespace fan
 {

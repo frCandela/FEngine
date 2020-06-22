@@ -9,11 +9,12 @@
 #include "core/input/fanInput.hpp"
 #include "core/input/fanInputManager.hpp"
 #include "core/time/fanProfiler.hpp"
-#include "core/time/fanTime.hpp"
+#include "network/singletons/fanTime.hpp"
 #include "ecs/fanEcsWorld.hpp"
 #include "scene/singletons/fanScene.hpp"
 #include "scene/components/fanSceneNode.hpp"
 #include "scene/components/fanTransform.hpp"
+#include "network/singletons/fanTime.hpp"
 #include "game/singletons/fanGame.hpp"
 #include "render/fanRenderGlobal.hpp"
 
@@ -210,7 +211,7 @@ namespace fan
 
 			// Framerate
 			ImGui::SameLine( ImGui::GetWindowWidth() - 60 );
-			if ( ImGui::BeginMenu( std::to_string( Time::Get().GetRealFramerate() ).c_str(), false ) ) { ImGui::EndMenu(); }
+			if ( ImGui::BeginMenu( std::to_string( Time::s_realFramerateLastSecond ).c_str(), false ) ) { ImGui::EndMenu(); }
 			ImGui::FanToolTip( " Framerate. (Right click to set)" );
 
 			if ( ImGui::IsItemClicked( 1 ) )
@@ -221,23 +222,23 @@ namespace fan
 			// Framerate set popup
 			if ( ImGui::BeginPopup( "main_menu_bar_set_fps" ) )
 			{
-				Game& game = m_world->GetSingleton<Game>();
+				Time& time = m_world->GetSingleton<Time>();
 
 				ImGui::PushItemWidth( 80.f );
-				float maxFps = 1.f / Time::Get().GetRenderDelta();
+				float maxFps = 1.f / Time::s_renderDelta;
 				if ( ImGui::DragFloat( "fps", &maxFps, 1.f, 1.f, 3000.f, "%.f" ) )
 				{
-					Time::Get().SetRenderDelta( maxFps < 1.f ? 1.f : 1.f / maxFps );
+					Time::s_renderDelta = maxFps < 1.f ? 1.f : 1.f / maxFps ;
 				}
-				float maxLogicFrequency = 1.f / game.logicDelta;
+				float maxLogicFrequency = 1.f / time.logicDelta;
 				if ( ImGui::DragFloat( "logic frequency", &maxLogicFrequency, 1.f, 1.f, 3000.f, "%.f" ) )
 				{
-					game.logicDelta = maxLogicFrequency < 1.f ? 1.f : 1.f / maxLogicFrequency;
+					time.logicDelta = maxLogicFrequency < 1.f ? 1.f : 1.f / maxLogicFrequency;
 				}
-				float maxPhysicsFrequency = 1.f / Time::Get().GetPhysicsDelta();
+				float maxPhysicsFrequency = 1.f / Time::s_physicsDelta;
 				if ( ImGui::DragFloat( "physics frequency", &maxPhysicsFrequency, 1.f, 1.f, 3000.f, "%.f" ) )
 				{
-					Time::Get().SetPhysicsDelta( maxPhysicsFrequency < 1.f ? 1.f : 1.f / maxPhysicsFrequency );
+					Time::s_physicsDelta = maxPhysicsFrequency < 1.f ? 1.f : 1.f / maxPhysicsFrequency;
 				}
 				ImGui::PopItemWidth();
 				ImGui::EndPopup();

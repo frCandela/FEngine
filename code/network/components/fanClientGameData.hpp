@@ -34,9 +34,7 @@ namespace fan
 		std::queue< PacketPlayerGameState > previousLocalStates; // local state of the client to compare with server state
 		PacketPlayerGameState				lastServerState;	 // the last know game state received from server ( useful for rollback )
 		bool								frameSynced;		 // false if frame index is not synchronized with the server
-		bool								spaceshipSynced;	 // if false, causes a rollback/resimulate to restore synchronization
-		
-		static const int					s_maxFrameDeltaBeforeShift = 20; // if the server/client frame delta > this, shift frameIndex. Otherwise use timescale
+		bool								spaceshipSynced;	 // if false, causes a rollback/resimulate to restore synchronization		
 
 		void Write( EcsWorld& _world, EcsEntity _entity, Packet& _packet );
 		void ProcessPacket( const PacketPlayerGameState& _packet );

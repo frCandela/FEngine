@@ -25,7 +25,7 @@ namespace fan
 		{
 			if( _delta == 0.f ) { return; }
 
-			const Game& game = _world.GetSingleton<Game>();
+			const Time& time = _world.GetSingleton<Time>();
 			ServerConnection& connection = _world.GetSingleton<ServerConnection>();
 
 			auto hostConnectionIt = _view.begin<HostConnection>();
@@ -45,7 +45,7 @@ namespace fan
 				// write game data
 				if( hostData.spaceshipID != 0 )
 				{
-					if( hostData.nextPlayerState.frameIndex == game.frameIndex )
+					if( hostData.nextPlayerState.frameIndex == time.frameIndex )
 					{
 						hostData.nextPlayerState.Write( packet );
 					}
@@ -63,7 +63,7 @@ namespace fan
 				if( packet.GetSize() > sizeof( PacketTag ) )// don't send empty packets
 				{
 					reliabilityLayer.RegisterPacket( packet );
-					hostConnection.bandwidth = 1.f / game.logicDelta * float( packet.GetSize() ) / 1000.f; // in Ko/s
+					hostConnection.bandwidth = 1.f / time.logicDelta * float( packet.GetSize() ) / 1000.f; // in Ko/s
 					connection.socket.Send( packet, hostConnection.ip, hostConnection.port );
 				}
 				else
@@ -85,7 +85,7 @@ namespace fan
 
 			HostManager& hostManager = _world.GetSingleton<HostManager>();
 			ServerConnection& connection = _world.GetSingleton<ServerConnection>();
-			Game& game = _world.GetSingleton<Game>();
+			Time& time = _world.GetSingleton<Time>();
 
 			// receive
 			Packet			packet;
@@ -116,7 +116,7 @@ namespace fan
 					HostGameData& hostData = _world.GetComponent< HostGameData >( entity );
 					ReliabilityLayer& reliabilityLayer = _world.GetComponent<ReliabilityLayer>( entity );
 					HostConnection& hostConnection = _world.GetComponent<HostConnection>( entity );
-					hostConnection.lastResponseTime = Time::Get().ElapsedSinceStartup();
+					hostConnection.lastResponseTime = Time::ElapsedSinceStartup();
 
 					// read the first packet type separately
 					PacketType packetType = packet.ReadType();
@@ -165,7 +165,7 @@ namespace fan
 						{
 							PacketPing packetPing;
 							packetPing.Read( packet );
-							hostConnection.ProcessPacket( packetPing, game.frameIndex, game.logicDelta );
+							hostConnection.ProcessPacket( packetPing, time.frameIndex, time.logicDelta );
 						} break;
 						case PacketType::PlayerInput:
 						{

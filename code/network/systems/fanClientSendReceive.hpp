@@ -3,7 +3,7 @@
 #include "network/components/fanClientGameData.hpp"
 #include "network/components/fanReliabilityLayer.hpp"
 #include "network/components/fanClientReplication.hpp"
-#include "game/singletons/fanGame.hpp"
+#include "network/singletons/fanTime.hpp"
 
 namespace fan
 {
@@ -24,7 +24,7 @@ namespace fan
 		{
 			if( _delta == 0.f ) { return; }
 
-			Game& game = _world.GetSingleton<Game>();
+			Time& time = _world.GetSingleton<Time>();
 
 			auto reliabilityLayerIt = _view.begin<ReliabilityLayer>();
 			auto connectionIt = _view.begin<ClientConnection>();
@@ -51,7 +51,7 @@ namespace fan
 				if( packet.GetSize() > sizeof( PacketTag ) )
 				{
 					reliabilityLayer.RegisterPacket( packet );
-					connection.bandwidth = 1.f / game.logicDelta * float( packet.GetSize() ) / 1000.f; // in Ko/s
+					connection.bandwidth = 1.f / time.logicDelta * float( packet.GetSize() ) / 1000.f; // in Ko/s
 					connection.socket->Send( packet, connection.serverIP, connection.serverPort );
 				}
 				else
@@ -80,7 +80,7 @@ namespace fan
 		{
 			if( _delta == 0.f ) { return; }
 
-			const Game& game = _world.GetSingleton<Game>();
+			const Time& time = _world.GetSingleton<Time>();
 
 			auto reliabilityLayerIt = _view.begin<ReliabilityLayer>();
 			auto connectionIt = _view.begin<ClientConnection>();
@@ -114,7 +114,7 @@ namespace fan
 					{
 					case sf::UdpSocket::Done:
 					{
-						connection.serverLastResponse = Time::Get().ElapsedSinceStartup();
+						connection.serverLastResponse = Time::ElapsedSinceStartup();
 
 						// read the first packet type separately
 						PacketType packetType = packet.ReadType();
@@ -149,7 +149,7 @@ namespace fan
 							{
 								PacketPing packetPing;
 								packetPing.Read( packet );
-								connection.ProcessPacket( packetPing, game.frameIndex );
+								connection.ProcessPacket( packetPing, time.frameIndex );
 							} break;
 							case PacketType::LoggedIn:
 							{

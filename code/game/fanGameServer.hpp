@@ -17,8 +17,6 @@ namespace fan
 
 		void Start();
 		void Stop();
-		void Pause();
-		void Resume();
 		void Step( const float _delta );
 
 		EcsWorld			  world;

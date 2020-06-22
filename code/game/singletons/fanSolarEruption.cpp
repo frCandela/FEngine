@@ -5,7 +5,7 @@
 #include "scene/fanSceneSerializable.hpp"
 #include "ecs/fanEcsWorld.hpp"
 #include "game/singletons/fanSunLight.hpp"
-#include "game/singletons/fanGame.hpp"
+#include "network/singletons/fanTime.hpp"
 #include "game/fanGameTags.hpp"
 #include "core/fanRandom.hpp"
 #include "core/math/fanLerp.hpp"
@@ -57,10 +57,10 @@ namespace fan
 	//================================================================================================================================
 	// returns the next eruption start frame
 	//================================================================================================================================
-	FrameIndex SolarEruption::CalculateNextEruptionStartFrame( const SolarEruption& _eruption, const Game& game )
+	FrameIndex SolarEruption::CalculateNextEruptionStartFrame( const SolarEruption& _eruption, const Time& _time )
 	{
 		const float delay = _eruption.cooldown + Random::Float() * _eruption.randomCooldown;
-		return game.frameIndex + (FrameIndex)( delay / game.logicDelta);
+		return _time.frameIndex + (FrameIndex)( delay / _time.logicDelta);
 	}
 
 	//================================================================================================================================
@@ -117,8 +117,8 @@ namespace fan
 
 		if( eruption.state == State::WAITING )
 		{
-			const Game& game = _world.GetSingleton<Game>();
-			if( game.frameIndex == eruption.eruptionStartFrame )
+			const Time& time = _world.GetSingleton<Time>();
+			if( time.frameIndex == eruption.eruptionStartFrame )
 			{
 				eruption.stateDuration[WAITING] = 0;
 			}
@@ -271,11 +271,11 @@ namespace fan
 		{
 			ImGui::PushItemWidth( 200.f );
 			{
-				const Game& game = _world.GetSingleton<Game>();
+				const Time& time = _world.GetSingleton<Time>();
 				ImGui::Text( "state: %s", StateToString( solarEruption.state ).c_str() );
 				ImGui::Text( "timer: %f", solarEruption.timer );
 
-				const float nextEruptionTime = game.logicDelta * ( solarEruption.eruptionStartFrame - game.frameIndex );
+				const float nextEruptionTime = time.logicDelta * ( solarEruption.eruptionStartFrame - time.frameIndex );
 				ImGui::Text( "next eruption: %f", nextEruptionTime );
 
 				ImGui::Spacing();

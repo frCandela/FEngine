@@ -11,7 +11,7 @@
 
 namespace fan
 {
-	struct Game;
+	struct Time;
 
 	//================================================================================================================================
 	// SolarEruption is the fx of the sun exploding out and projecting matter all around it
@@ -57,6 +57,6 @@ namespace fan
 		float	stateParticleDuration[SIZE];
 		Color	stateParticleColor[SIZE];
 
-		static FrameIndex CalculateNextEruptionStartFrame( const SolarEruption& _eruption, const Game& game );
+		static FrameIndex CalculateNextEruptionStartFrame( const SolarEruption& _eruption, const Time& _time );
 	};
 }

@@ -1,5 +1,6 @@
 #include "ecs/fanEcsSystem.hpp"
 #include "network/components/fanClientRollback.hpp"
+#include "network/singletons/fanTime.hpp"
 #include "game/singletons/fanClientNetworkManager.hpp"
 
 namespace fan
@@ -19,7 +20,7 @@ namespace fan
 		{
 			if( _delta == 0.f ) { return; }
 
-			const Game& game = _world.GetSingleton<Game>();
+			const Time& time = _world.GetSingleton<Time>();
 
 			auto clientRollbackIt = _view.begin<ClientRollback>();
 			for( ; clientRollbackIt != _view.end<ClientRollback>(); ++clientRollbackIt )
@@ -37,7 +38,7 @@ namespace fan
 						if( componentInfo.rollbackSave != nullptr )
 						{
 							ClientRollback::RollbackData rollbackData;
-							rollbackData.frameIndex = game.frameIndex;
+							rollbackData.frameIndex = time.frameIndex;
 							rollbackData.componentIndex = i;
 
 							// save rollback state

@@ -21,8 +21,8 @@ namespace fan
 		{
 			if( _delta == 0.f ) { return; }
 
-			Game& game = _world.GetSingleton<Game>();
-			const float currentTime = game.frameIndex * game.logicDelta;
+			Time& time = _world.GetSingleton<Time>();
+			const float currentTime = time.frameIndex * time.logicDelta;
 
 			auto transformIt = _view.begin<Transform>();
 			auto planetIt = _view.begin<Planet>();
@@ -33,8 +33,8 @@ namespace fan
 				Transform& transform = *transformIt;
 				const Planet& planet = *planetIt;
 
-				float const time = -planet.speed * currentTime;
-				btVector3 position( std::cosf( time + planet.phase ), 0, std::sinf( time + planet.phase ) );
+				float const planetTime = -planet.speed * currentTime;
+				btVector3 position( std::cosf( planetTime + planet.phase ), 0, std::sinf( planetTime + planet.phase ) );
 				transform.SetPosition( /*parentTransform.getOrigin()*/ planet.radius * position );
 
 				sceneNode.AddFlag( SceneNode::BoundsOutdated );
