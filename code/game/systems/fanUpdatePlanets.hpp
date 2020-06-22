@@ -12,6 +12,7 @@ namespace fan
 		static EcsSignature GetSignature( const EcsWorld& _world )
 		{
 			return
+				_world.GetSignature<SceneNode>() |
 				_world.GetSignature<Transform>() |
 				_world.GetSignature<Planet>();
 		}
@@ -25,9 +26,10 @@ namespace fan
 
 			auto transformIt = _view.begin<Transform>();
 			auto planetIt = _view.begin<Planet>();
-			for( ; transformIt != _view.end<Transform>(); ++transformIt, ++planetIt )
+			auto sceneNodeIt = _view.begin<SceneNode>();
+			for( ; transformIt != _view.end<Transform>(); ++transformIt, ++planetIt, ++sceneNodeIt )
 			{
-				const EcsEntity entity = transformIt.Entity();
+				SceneNode& sceneNode = *sceneNodeIt;
 				Transform& transform = *transformIt;
 				const Planet& planet = *planetIt;
 
@@ -35,7 +37,7 @@ namespace fan
 				btVector3 position( std::cosf( time + planet.phase ), 0, std::sinf( time + planet.phase ) );
 				transform.SetPosition( /*parentTransform.getOrigin()*/ planet.radius * position );
 
-				_world.AddTag<tag_boundsOutdated>( entity );
+				sceneNode.AddFlag( SceneNode::BoundsOutdated );
 			}
 		}
 	};

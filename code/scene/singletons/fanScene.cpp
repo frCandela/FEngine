@@ -104,7 +104,11 @@ namespace fan
 
 		SceneNode& sceneNode = world->AddComponent<SceneNode>( entity );
 		world->AddComponent<Bounds>( entity );
-		world->AddTag<tag_boundsOutdated>( entity );
+		sceneNode.AddFlag( SceneNode::BoundsOutdated );
+		if( _parentNode == nullptr ) // root node
+		{
+			sceneNode.AddFlag( SceneNode::NoRaycast | SceneNode::NoDelete );
+		}
 
 		sceneNode.Build( _name, *this, handle, _parentNode );
 		return sceneNode;
@@ -159,7 +163,8 @@ namespace fan
 	void Scene::New()
 	{
 		Clear( );
-		rootNodeHandle = CreateSceneNode( "root", nullptr ).handle;
+		SceneNode& rootNode = CreateSceneNode( "root", nullptr );
+		rootNodeHandle = rootNode.handle;
 		onLoad.Emmit( *this );
 		world->ApplyTransitions();
 	}
@@ -240,7 +245,7 @@ namespace fan
 		{
 			const EcsHandle childHandle = _node.childs[sceneNodeIndex];
 			SceneNode& childNode = world.GetComponent<SceneNode>( world.GetEntity(childHandle ));
-			if( ! childNode.HasFlag( SceneNode::NOT_SAVED ) )
+			if( ! childNode.HasFlag( SceneNode::NoSave ) )
 			{
 				Json& jchild = jchilds[childIndex];
 				R_SaveToJson( childNode, jchild );

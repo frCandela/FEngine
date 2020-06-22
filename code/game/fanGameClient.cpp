@@ -140,7 +140,6 @@ namespace fan
 		
 		world.AddSingletonType<LinkingContext>();
 
-		world.AddTagType<tag_boundsOutdated>();
 		world.AddTagType<tag_sunlight_occlusion>();
 		
 		// @hack

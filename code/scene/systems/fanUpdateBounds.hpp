@@ -5,6 +5,7 @@
 #include "scene/components/fanTransform.hpp"
 #include "scene/components/fanMotionState.hpp"
 #include "scene/components/fanRigidbody.hpp"
+#include "scene/components/fanSceneNode.hpp"
 
 namespace fan
 {
@@ -16,22 +17,28 @@ namespace fan
 		static EcsSignature GetSignature( const EcsWorld& _world )
 		{
 			return
+				_world.GetSignature<SceneNode>() |
 				_world.GetSignature<Transform>() |
 				_world.GetSignature<MotionState>() |
 				_world.GetSignature<Rigidbody>() |
 				_world.GetSignature<Bounds>();
 		}
 
-		static void Run( EcsWorld& _world, const EcsView& _view, const float _delta )
+		static void Run( EcsWorld& /*_world*/, const EcsView& _view, const float _delta )
 		{
 			if( _delta == 0.f ) { return; }
 
-
 			auto rigidbodyIt = _view.begin<Rigidbody>();
 			auto boundsIt = _view.begin<Bounds>();
-			for( ; rigidbodyIt != _view.end<Rigidbody>(); ++rigidbodyIt, ++boundsIt )
+			auto sceneNodeIt = _view.begin<SceneNode>();
+			for( ; rigidbodyIt != _view.end<Rigidbody>(); ++rigidbodyIt, ++boundsIt, ++sceneNodeIt )
 			{
-				const EcsEntity entity = rigidbodyIt.Entity();
+				SceneNode& sceneNode = *sceneNodeIt;
+				if( !sceneNode.HasFlag( SceneNode::BoundsOutdated ) )
+				{
+					continue;
+				}
+
 				const Rigidbody& rb = *rigidbodyIt;
 				Bounds& bounds = *boundsIt;
 
@@ -42,7 +49,7 @@ namespace fan
 				rb.rigidbody->getAabb( low, high );
 				bounds.aabb = AABB( low, high );
 
-				_world.RemoveTag<tag_boundsOutdated>( entity );
+				sceneNode.RemoveFlag( SceneNode::BoundsOutdated );
 			}
 		}
 	};
@@ -55,19 +62,25 @@ namespace fan
 		static EcsSignature GetSignature( const EcsWorld& _world )
 		{
 			return
+				_world.GetSignature<SceneNode>() |
 				_world.GetSignature<MeshRenderer>() |
 				_world.GetSignature<Transform>() |
-				_world.GetSignature<Bounds>() |
-				_world.GetSignature<tag_boundsOutdated>();
+				_world.GetSignature<Bounds>();
 		}
-		static void Run( EcsWorld& _world, const EcsView& _view )
+
+		static void Run( EcsWorld& /*_world*/, const EcsView& _view )
 		{
 			auto meshRendererIt = _view.begin<MeshRenderer>();
 			auto transformIt = _view.begin<Transform>();
 			auto boundsIt = _view.begin<Bounds>();
-			for( ; meshRendererIt != _view.end<MeshRenderer>(); ++meshRendererIt, ++transformIt, ++boundsIt )
+			auto sceneNodeIt = _view.begin<SceneNode>();
+			for( ; meshRendererIt != _view.end<MeshRenderer>(); ++meshRendererIt, ++transformIt, ++boundsIt, ++sceneNodeIt )
 			{
-				const EcsEntity entity = meshRendererIt.Entity();
+				SceneNode& sceneNode = *sceneNodeIt;
+				if( !sceneNode.HasFlag( SceneNode::BoundsOutdated ) )
+				{
+					continue;
+				}
 				const MeshRenderer& renderer = *meshRendererIt;
 				const Transform& transform = *transformIt;
 				Bounds& bounds = *boundsIt;
@@ -85,7 +98,7 @@ namespace fan
 					// Set the bounds
 					bounds.aabb = AABB( hull.GetVertices(), modelMatrix );
 
-					_world.RemoveTag<tag_boundsOutdated>( entity );
+					sceneNode.RemoveFlag( SceneNode::BoundsOutdated );
 				}
 			}
 		}
@@ -99,24 +112,31 @@ namespace fan
 		static EcsSignature GetSignature( const EcsWorld& _world )
 		{
 			return
+				_world.GetSignature<SceneNode>() |
 				_world.GetSignature<Transform>() |
-				_world.GetSignature<Bounds>() |
-				_world.GetSignature<tag_boundsOutdated>();
+				_world.GetSignature<Bounds>();
 		}
-		static void Run( EcsWorld& _world, const EcsView& _view )
+
+		static void Run( EcsWorld& /*_world*/, const EcsView& _view )
 		{
 			auto transformIt = _view.begin<Transform>();
 			auto boundsIt = _view.begin<Bounds>();
-			for( ; transformIt != _view.end<Transform>(); ++transformIt, ++boundsIt )
+			auto sceneNodeIt = _view.begin<SceneNode>();
+			for( ; transformIt != _view.end<Transform>(); ++transformIt, ++boundsIt, ++sceneNodeIt )
 			{
-				const EcsEntity entity = transformIt.Entity();
+				SceneNode& sceneNode = *sceneNodeIt;
+				if( !sceneNode.HasFlag( SceneNode::BoundsOutdated ) )
+				{
+					continue;
+				}
+
 				const Transform& transform = *transformIt;
 				Bounds& bounds = *boundsIt;
 
 				const btVector3 origin = transform.GetPosition();
 				const float sizeBounds = 0.2f;
 				bounds.aabb = AABB( origin - sizeBounds * btVector3::One(), origin + sizeBounds * btVector3::One() );
-				_world.RemoveTag<tag_boundsOutdated>( entity );
+				sceneNode.RemoveFlag( SceneNode::BoundsOutdated );
 			}
 		}
 	};

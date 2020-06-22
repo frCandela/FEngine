@@ -51,7 +51,10 @@ namespace fan
 				const Transform transform = *TransformIt;
 
 				// check NO_RAYCAST flag
-				if( sceneNode.HasFlag( SceneNode::NO_RAYCAST ) ) { continue; }
+				if( sceneNode.HasFlag( SceneNode::NoRaycast ) ) 
+				{ 
+					continue; 
+				}
 
 				// raycast on bounds
 				btVector3 intersection;

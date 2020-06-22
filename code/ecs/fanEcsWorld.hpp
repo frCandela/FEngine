@@ -97,8 +97,9 @@ namespace fan
 		void		Kill	( const EcsEntity _entity );
 		bool		IsAlive	( const EcsEntity _entity ) const;
 
-		template< typename _SystemType, typename... _Args > void			Run( _Args... _args );
 		template< typename _tagOrComponentType >			EcsSignature	GetSignature() const;
+		template< typename _SystemType, typename... _Args > void			Run( _Args&&... _args );
+		template< typename _SystemType > EcsView							Match() const;
 
 		// Const accessors
 		const std::unordered_map< EcsHandle, EcsEntity >&		 GetHandles() const				{ return m_handles;				}
@@ -111,7 +112,7 @@ namespace fan
 		EcsArchetype*		FindArchetype( const EcsSignature _signature );
 		EcsArchetype&		CreateArchetype( const EcsSignature _signature );
 		EcsTransition&		FindOrCreateTransition( const EcsEntity _entity );
-		template< typename _SystemType > EcsView	Match() const;
+		
 
 		EcsHandle											m_nextHandle = 1;	// 0 is a null handle
 		int													m_nextTagIndex = ecsSignatureLength - 1;
@@ -247,7 +248,7 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	template< typename _SystemType, typename... _Args >	void EcsWorld::Run( _Args... _args )
+	template< typename _SystemType, typename... _Args > void EcsWorld::Run( _Args&&... _args )
 	{
 		static_assert( std::is_base_of< EcsSystem, _SystemType >::value );
 		_SystemType::Run( *this, Match<_SystemType>(), _args... );

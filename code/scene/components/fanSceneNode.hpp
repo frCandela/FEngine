@@ -16,10 +16,11 @@ namespace fan
 	public:
 		enum Flags
 		{
-			  NONE = 0
-			, NOT_SAVED  = 1 << 0 // node is ignored while saving the scene
-			, NO_DELETE  = 1 << 1 // node cannot be deleted in the ui
-			, NO_RAYCAST = 1 << 2 // node cannot be selected by raycast
+			  None = 0
+			, NoSave = 1 << 0			// node is ignored while saving the scene
+			, NoDelete = 1 << 1			// node cannot be deleted in the ui
+			, NoRaycast = 1 << 2		// node cannot be selected by raycast
+			, BoundsOutdated = 1 << 3	// bounds need to be recomputed
 		};
 
 		static void SetInfo( EcsComponentInfo& _info );

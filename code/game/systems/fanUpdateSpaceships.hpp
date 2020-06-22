@@ -1,6 +1,8 @@
 #include "ecs/fanEcsSystem.hpp"
 #include "scene/components/fanTransform.hpp"
 #include "scene/components/fanRigidbody.hpp"
+#include "scene/components/fanSceneNode.hpp"
+
 #include "game/components/fanBattery.hpp"
 #include "game/components/fanPlayerInput.hpp"
 #include "game/components/fanSpaceShip.hpp"
@@ -17,14 +19,16 @@ namespace fan
 	{
 		static EcsSignature GetSignature( const EcsWorld& _world )
 		{
-			return _world.GetSignature<Transform>() |
+			return 
+				_world.GetSignature<SceneNode>() |
+				_world.GetSignature<Transform>() |
 				_world.GetSignature<Rigidbody>() |
 				_world.GetSignature<Battery>() |
 				_world.GetSignature<PlayerInput>() |
 				_world.GetSignature<SpaceShip>();
 		}
 
-		static void Run( EcsWorld& _world, const EcsView& _view, const float _delta )
+		static void Run( EcsWorld& /*_world*/, const EcsView& _view, const float _delta )
 		{
 			if( _delta == 0.f ) { return; }
 
@@ -33,9 +37,9 @@ namespace fan
 			auto spaceshipIt = _view.begin<SpaceShip>();
 			auto batteryIt = _view.begin<Battery>();
 			auto playerInputIt = _view.begin<PlayerInput>();
-			for( ; rbIt != _view.end<Rigidbody>(); ++rbIt, ++transformIt, ++spaceshipIt, ++batteryIt, ++playerInputIt )
+			auto sceneNodeIt = _view.begin<SceneNode>();
+			for( ; rbIt != _view.end<Rigidbody>(); ++rbIt, ++transformIt, ++spaceshipIt, ++batteryIt, ++playerInputIt, ++sceneNodeIt )
 			{
-				const EcsEntity entity = rbIt.Entity();
 				const SpaceShip& spaceship = *spaceshipIt;
 				const PlayerInput& playerInput = *playerInputIt;
 				Rigidbody& rb = *rbIt;
@@ -136,7 +140,8 @@ namespace fan
 				newVelocity.setY( 0.f );
 				rb.SetVelocity( newVelocity );
 
-				_world.AddTag<tag_boundsOutdated>( entity );
+				SceneNode& sceneNode = *sceneNodeIt;
+				sceneNode.AddFlag( SceneNode::BoundsOutdated );
 			}
 		}
 	};

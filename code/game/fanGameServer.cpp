@@ -135,7 +135,6 @@ namespace fan
 		world.AddSingletonType<LinkingContext>();
 		world.AddSingletonType<HostManager>();
 		
-		world.AddTagType<tag_boundsOutdated>();
 		world.AddTagType<tag_sunlight_occlusion>();
 
 		// @hack

@@ -73,6 +73,7 @@ namespace fan
 	{
 		Scene& scene = _world.GetSingleton<Scene>();
 		SceneNode& cameraNode = scene.CreateSceneNode( "game_camera", &scene.GetRootNode() );
+		cameraNode.AddFlag( SceneNode::NoSave | SceneNode::NoDelete | SceneNode::NoRaycast );
 		const EcsEntity cameraID = _world.GetEntity( cameraNode.handle );
 		
 		Camera& camera = _world.AddComponent<Camera>( cameraID );

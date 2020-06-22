@@ -7,6 +7,7 @@
 #include "core/time/fanProfiler.hpp"
 #include "core/input/fanMouse.hpp"
 #include "core/math/shapes/fanRay.hpp"
+#include "core/fanDebug.hpp"
 #include "scene/components/fanSceneNode.hpp"
 #include "scene/components/fanTransform.hpp"
 #include "scene/components/fanCamera.hpp"
@@ -67,10 +68,17 @@ namespace fan
 	void EditorSelection::DeleteSelection()
 	{
 		SceneNode* selectedSceneNode = GetSelectedSceneNode();
-		if ( selectedSceneNode != nullptr &&  !selectedSceneNode->IsRoot() )
+		if ( selectedSceneNode != nullptr )
 		{
-			EcsWorld& world = *selectedSceneNode->scene->world;
-			world.Kill( world.GetEntity( selectedSceneNode->handle ) );
+			if( selectedSceneNode->HasFlag( SceneNode::NoDelete ) )
+			{
+				Debug::Warning() << "You cannot delete this node !" << Debug::Endl();
+			}
+			else
+			{
+				EcsWorld& world = *selectedSceneNode->scene->world;
+				world.Kill( world.GetEntity( selectedSceneNode->handle ) );
+			}
 		}
 	}
 
@@ -97,7 +105,7 @@ namespace fan
 				if( gizmos.DrawMoveGizmo( btTransform( btQuaternion( 0, 0, 0 ), transform.GetPosition() ), (size_t)&transform, newPosition ) )
 				{
 					transform.SetPosition( newPosition );
-					world.AddTag<tag_boundsOutdated>( entity );
+					selectedSceneNode->AddFlag( SceneNode::BoundsOutdated );
 					mouseCaptured = true;
 				}
 			}
