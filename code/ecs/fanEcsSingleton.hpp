@@ -20,7 +20,11 @@ namespace fan
 		static constexpr const char* s_name		{ #_SingletonType		  };	\
 		static constexpr uint32_t	 s_type		{ SSID( #_SingletonType ) };	
 
-	struct EcsSingleton {};
+	struct EcsSingleton {
+		EcsSingleton(){}
+		EcsSingleton( EcsSingleton const& ) = delete;
+		EcsSingleton& operator=( EcsSingleton const& ) = delete;
+	};
 	class EcsWorld;
 
 	//==============================================================================================================================================================
