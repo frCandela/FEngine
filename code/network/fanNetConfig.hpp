@@ -2,6 +2,7 @@
 
 #include "SFML/System.hpp"
 #include "SFML/Network.hpp"
+#include "ecs/fanEcsTypes.hpp"
 
 namespace fan
 {
@@ -15,6 +16,8 @@ namespace fan
 	using PacketTypeInt = sf::Uint8;	// the sf integer type encoding the PacketType enum
 	using FrameIndex = sf::Uint32;
 	using PlayerID = sf::Uint32;
+
+	static_assert( sizeof( PlayerID ) == sizeof( EcsHandle ) );
 
 	// all the types of packets of the network engine
 	enum class PacketType

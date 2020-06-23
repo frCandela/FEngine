@@ -2,8 +2,10 @@
 #include "network/components/fanHostConnection.hpp"
 #include "network/components/fanHostReplication.hpp"
 #include "network/components/fanHostGameData.hpp"
-#include "game/spawn/fanSpawnShip.hpp"
 #include "network/singletons/fanTime.hpp"
+#include "network/singletons/fanHostManager.hpp"
+#include "network/systems/fanHostReplication.hpp"
+#include "game/spawn/fanSpawnShip.hpp"
 #include "game/components/fanPlayerInput.hpp"
 
 namespace fan
@@ -25,8 +27,9 @@ namespace fan
 		{
 			if( _delta == 0.f ) { return; }
 
-			HostManager& hostManager = _world.GetSingleton<HostManager>();
 			LinkingContext& linkingContext = _world.GetSingleton<LinkingContext>();
+			SpawnManager& spawnManager = _world.GetSingleton<SpawnManager>();
+			HostManager& hostManager = _world.GetSingleton<HostManager>();
 			const Time& time = _world.GetSingleton<Time>();
 
 			auto hostConnectionIt = _view.begin<HostConnection>();
@@ -34,58 +37,41 @@ namespace fan
 			auto hostReplicationIt = _view.begin<HostReplication>();
 			for( ; hostConnectionIt != _view.end<HostConnection>(); ++hostConnectionIt, ++hostDataIt, ++hostReplicationIt )
 			{
-				const EcsEntity entity = hostConnectionIt.GetEntity();
+				const EcsHandle hostHandle = _world.GetHandle( hostConnectionIt.GetEntity() );
 				const HostConnection& hostConnection = *hostConnectionIt;
-				HostGameData& hostData = *hostDataIt;
 				HostReplication& hostReplication = *hostReplicationIt;
-
-				if( hostConnection.state == HostConnection::Connected )
+				HostGameData& hostData = *hostDataIt;
+				
+				if( hostConnection.state == HostConnection::Connected && hostConnection.synced  && hostData.spaceshipID == 0 )
 				{
-					if( hostConnection.synced == true )
+					// spawns new host spaceship
+					hostData.spaceshipID = linkingContext.nextNetID++;	// assigns net id for the new ship
+					const FrameIndex spawnFrame = time.frameIndex + 60;
+					const SpawnInfo spawnInfo = spawn::SpawnShip::GenerateInfo( hostHandle, spawnFrame, hostData.spaceshipID, btVector3::Zero() );
+					hostData.nextPlayerStateFrame = spawnFrame + 60;	// set the timing of the first player state snapshot					
+					spawnManager.spawns.push_back( spawnInfo );			// triggers spaceship spawn on server
+					
+					// spawn new ship on all hosts
+					_world.Run<S_ReplicateOnAllHosts>( ClientRPC::RPCSpawn( spawnInfo ), HostReplication::ResendUntilReplicated );	
+
+					// replicate all other hosts on new host
+					for( const auto& pair : hostManager.hostHandles )
 					{
-						if( hostData.spaceshipID == 0 )
+						// do not replicate  itself
+						const EcsHandle otherHostHandle = pair.second;
+						if( otherHostHandle == hostHandle )
 						{
-							// spawns new host spaceship
-							hostData.spaceshipID = linkingContext.nextNetID++;
-							hostData.spaceshipHandle = Game::SpawnSpaceship( _world, true, false );
-							linkingContext.AddEntity( hostData.spaceshipHandle, hostData.spaceshipID );
-							const FrameIndex spawnFrame = time.frameIndex + 60;
-							const SpawnInfo spawnInfo0 = spawn::SpawnClientShip::GenerateInfo( spawnFrame, hostData.spaceshipID, btVector3::Zero() );
-							hostReplication.Replicate(
-								ClientRPC::RPCSpawn( spawnInfo0 )
-								, HostReplication::ResendUntilReplicated
-							);
+							continue;
+						}	
 
-							hostData.nextPlayerStateFrame = spawnFrame + 60; // first player state snapshot will be done later to let time for input to arrive
-
-							// replicate other ships
-							for( const auto& pair : hostManager.hostHandles )
-							{
-								const EcsHandle hostHandle = _world.GetHandle( entity );
-								const EcsHandle otherHostHandle = pair.second;
-
-								if( otherHostHandle != hostHandle )
-								{
-									const EcsEntity otherHostEntity = _world.GetEntity( otherHostHandle );
-
-									// replicate new host on all other hosts
-									const SpawnInfo spawnInfo1 = spawn::SpawnShip::GenerateInfo( spawnFrame, hostData.spaceshipID, btVector3::Zero() );
-									HostReplication& otherHostReplication = _world.GetComponent< HostReplication >( otherHostEntity );
-									otherHostReplication.Replicate(
-										ClientRPC::RPCSpawn( spawnInfo1 )
-										, HostReplication::ResendUntilReplicated
-									);
-
-									// replicate all other hosts on new host		
-									HostGameData& otherHostData = _world.GetComponent< HostGameData >( otherHostEntity );
-									const SpawnInfo spawnInfo2 = spawn::SpawnShip::GenerateInfo( spawnFrame, otherHostData.spaceshipID, btVector3::Zero() );
-									hostReplication.Replicate(
-										ClientRPC::RPCSpawn( spawnInfo2 )
-										, HostReplication::ResendUntilReplicated
-									);
-								}
-							}
-						}
+						// replicate
+						HostGameData& otherHostData = _world.GetComponent< HostGameData >( _world.GetEntity( otherHostHandle ) );
+						const SpawnInfo otherHostspawnInfo = spawn::SpawnShip::GenerateInfo( otherHostHandle, spawnFrame, otherHostData.spaceshipID, btVector3::Zero() );
+						hostReplication.Replicate(
+							ClientRPC::RPCSpawn( otherHostspawnInfo )
+							, HostReplication::ResendUntilReplicated
+						);
+						
 					}
 				}
 			}
@@ -228,23 +214,26 @@ namespace fan
 						}
 					}
 
-					// Updates spaceship input
-					if( !hostData.inputs.empty() && hostData.inputs.front().frameIndex == time.frameIndex )
+					if( hostData.spaceshipHandle != 0 )
 					{
-						const PacketInput::InputData& inputData = hostData.inputs.front();
-						hostData.inputs.pop();
+						// Updates spaceship input
+						if( !hostData.inputs.empty() && hostData.inputs.front().frameIndex == time.frameIndex )
+						{
+							const PacketInput::InputData& inputData = hostData.inputs.front();
+							hostData.inputs.pop();
 
-						const EcsEntity shipEntityID = _world.GetEntity( hostData.spaceshipHandle );
-						PlayerInput& input = _world.GetComponent<PlayerInput>( shipEntityID );
-						input.orientation = btVector3( inputData.orientation.x, 0.f, inputData.orientation.y );
-						input.left = inputData.left ? 1.f : ( inputData.right ? -1.f : 0.f );
-						input.forward = inputData.forward ? 1.f : ( inputData.backward ? -1.f : 0.f );
-						input.boost = inputData.boost;
-						input.fire = inputData.fire;
-					}
-					else
-					{
-						Debug::Warning() << "no available input from player " << Debug::Endl();
+							const EcsEntity shipEntityID = _world.GetEntity( hostData.spaceshipHandle );
+							PlayerInput& input = _world.GetComponent<PlayerInput>( shipEntityID );
+							input.orientation = btVector3( inputData.orientation.x, 0.f, inputData.orientation.y );
+							input.left = inputData.left ? 1.f : ( inputData.right ? -1.f : 0.f );
+							input.forward = inputData.forward ? 1.f : ( inputData.backward ? -1.f : 0.f );
+							input.boost = inputData.boost;
+							input.fire = inputData.fire;
+						}
+						else
+						{
+							Debug::Warning() << "no available input from player " << Debug::Endl();
+						}
 					}
 				}
 			}

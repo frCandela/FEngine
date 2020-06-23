@@ -1,3 +1,5 @@
+#pragma once
+
 #include "ecs/fanEcsSystem.hpp"
 #include "network/components/fanHostReplication.hpp"
 

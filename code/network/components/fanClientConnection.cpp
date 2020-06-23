@@ -33,8 +33,8 @@ namespace fan
 		connection.bandwidth = 0.f;
 		connection.serverLastResponse = 0.f;
 		connection.lastPacketPing = PacketPing();
-		connection.mustSendBackPacketPing = false;
-		connection.playerID = 0;
+		connection.mustSendBackPacketPing = false;	
+		connection.onLoginSuccess.Clear();
 	}
 
 	//================================================================================================================================
@@ -110,8 +110,8 @@ namespace fan
 		{
 			Debug::Log() << "login success" << Debug::Endl();
 			state = ClientState::Connected;
-			playerID = _packetLogin.playerID;
-			assert( playerID != 0 );
+			assert( _packetLogin.playerID != 0 );
+			onLoginSuccess.Emmit( _packetLogin.playerID );//playerID = _packetLogin.playerID;a
 		}
 	}
 
@@ -185,7 +185,6 @@ namespace fan
 			ImGui::TextColored( GetRttColor( connection.rtt ), "%.1f", 1000.f * connection.rtt );
 			ImGui::Text( "bandwidth:            %.1f Ko/s", connection.bandwidth );
 			ImGui::Text( "server last response: %.1f", Time::ElapsedSinceStartup() - connection.serverLastResponse );
-			ImGui::Text( "player ID           : %u", connection.playerID );
 		}ImGui::Unindent(); ImGui::Unindent();
 	}
 }

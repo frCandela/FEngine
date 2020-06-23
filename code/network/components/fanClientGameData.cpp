@@ -26,6 +26,7 @@ namespace fan
 		gameData.maxInputSent = 10;
 		gameData.spaceshipSynced = true;
 		gameData.lastServerState = {};
+		gameData.playerID = 0;
 
 	}
 
@@ -33,21 +34,7 @@ namespace fan
 	//================================================================================================================================
 	void ClientGameData::ProcessPacket( const PacketPlayerGameState& _packet )
 	{
-		lastServerState = _packet;
-
-		// removes all the previous rollback state before the gameState
-//		while( !previousInputsSinceLastGameState.empty() )
-//		{
-// 			const PacketInput::InputData& input = previousInputsSinceLastGameState.back();
-// 			if( input.frameIndex < _packet.frameIndex )
-// 			{
-// 				previousInputsSinceLastGameState.pop_back();
-// 			}
-// 			else
-// 			{
-// 				break;
-// 			}
-//		} 
+		lastServerState = _packet; // @todo store multiple server states to allow deeper rollback
 
 		// get the corresponding game state for the client
 		while( !previousLocalStates.empty() && previousLocalStates.front().frameIndex < _packet.frameIndex )
@@ -181,6 +168,7 @@ namespace fan
 		ClientGameData& gameData = static_cast<ClientGameData&>( _component );
 		ImGui::PushItemWidth( 0.6f * ImGui::GetWindowWidth() - 16 );
 		{
+			ImGui::Text( "player ID           : %u", gameData.playerID );
 			ImGui::DragInt( "max input sent", &gameData.maxInputSent, 1.f, 0, 200 );
 			ImGui::Text( "size previous states:  %d", gameData.previousLocalStates.size());
 			ImGui::Text( "%s", gameData.frameSynced ? "frame synced" : "frame not synced" );

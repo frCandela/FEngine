@@ -27,6 +27,7 @@ namespace fan
 			FrameIndex mostRecentFrame;		// most recent frame index when the inputs were sent
 		};
 
+		PlayerID							playerID;			 // unique id of the player, corresponds to the server side player persistent handle
 		EcsHandle							spaceshipHandle;	 // handle of the player spaceship
 		std::deque< PacketInput::InputData >previousInputs;		 // inputs that need to be sent/acknowledged by the server
 		std::deque< InputSent>				inputsSent;			 // inputs sent to server waiting ack
@@ -42,6 +43,7 @@ namespace fan
 		// callbacks
 		void OnInputReceived( PacketTag _tag );
 		void OnShiftFrameIndex( const int _framesDelta );
+		void OnLoginSuccess( PlayerID _playerID ) { playerID = _playerID; }
 	};
 	static constexpr size_t sizeof_clientGameData = sizeof( ClientGameData );
 }

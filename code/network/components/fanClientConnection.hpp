@@ -28,6 +28,8 @@ namespace fan
 			Stopping			// Client is being stopped, a disconnect packet must be sent to the server
 		};
 		
+		Signal< PlayerID > onLoginSuccess;
+
 		UdpSocket*		socket;
 		Port			clientPort;
 		sf::IpAddress	serverIP;
@@ -37,8 +39,6 @@ namespace fan
 		float			timeoutDelay;			// disconnects from server after X seconds without a response
 		float			bandwidth;				// in Ko/s
 		double			serverLastResponse;
-		PlayerID		playerID;
-
 		PacketPing		lastPacketPing;
 		bool			mustSendBackPacketPing;
 

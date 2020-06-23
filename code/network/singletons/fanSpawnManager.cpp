@@ -2,7 +2,6 @@
 
 #include "core/fanDebug.hpp"
 #include "network/singletons/fanTime.hpp"
-#include "game/singletons/fanGame.hpp"
 #include "game/spawn/fanSpawnBullet.hpp"
 #include "game/spawn/fanSpawnShip.hpp"
 
@@ -42,7 +41,6 @@ namespace fan
 		spawnMethods.clear();		
 		RegisterSpawnMethod( spawn::SpawnBullet::s_id, &spawn::SpawnBullet::Spawn );
 		RegisterSpawnMethod( spawn::SpawnShip::s_id, &spawn::SpawnShip::Spawn );
-		RegisterSpawnMethod( spawn::SpawnClientShip::s_id, &spawn::SpawnClientShip::Spawn );
 	}
 
 	//================================================================================================================================
@@ -85,6 +83,10 @@ namespace fan
 	void SpawnManager::OnGui( EcsWorld&, EcsSingleton& _component )
 	{
 		const SpawnManager& spawnManager = static_cast<const SpawnManager&>( _component );
-		ImGui::Text( "pending bullets: %d", spawnManager.spawns.size() );
+		ImGui::Indent(); ImGui::Indent();
+		{
+			ImGui::Text( "pending spawns: %d", spawnManager.spawns.size() );
+		}
+		ImGui::Unindent(); ImGui::Unindent();		
 	}
 }

@@ -54,16 +54,18 @@ namespace fan
 		_world.AddComponent<ClientRPC>( persistentID );
 		_world.AddComponent<ClientGameData>( persistentID );
 
+		ClientRPC& rpcManager = _world.GetComponent<ClientRPC>( persistentID );
+		ClientConnection& connection = _world.GetComponent<ClientConnection>( persistentID );
+
 		// connect rpc
 		Time& time = _world.GetSingleton<Time>();
-		ClientRPC& rpcManager = _world.GetComponent<ClientRPC>( persistentID );
 		SpawnManager& spawnManager = _world.GetSingleton<SpawnManager>();
 		rpcManager.onShiftFrameIndex.Connect( &ClientGameData::OnShiftFrameIndex, _world, persistentHandle );
 		rpcManager.onShiftFrameIndex.Connect( &Time::OnShiftFrameIndex, &time );
+		connection.onLoginSuccess.Connect( &ClientGameData::OnLoginSuccess, _world, persistentHandle );
 		rpcManager.onSpawn.Connect( &SpawnManager::OnSpawn, &spawnManager );
 
 		// Bind socket
-		ClientConnection& connection = _world.GetComponent<ClientConnection>( persistentID );
 		sf::Socket::Status socketStatus = sf::Socket::Disconnected;
 		for( int tryIndex = 0; tryIndex < 10 && socketStatus != sf::Socket::Done; tryIndex++ )
 		{
