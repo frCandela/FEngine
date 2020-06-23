@@ -34,6 +34,7 @@ namespace fan
 		connection.serverLastResponse = 0.f;
 		connection.lastPacketPing = PacketPing();
 		connection.mustSendBackPacketPing = false;
+		connection.playerID = 0;
 	}
 
 	//================================================================================================================================
@@ -103,12 +104,14 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void ClientConnection::ProcessPacket( const PacketLoginSuccess& /*_packetLogin*/ )
+	void ClientConnection::ProcessPacket( const PacketLoginSuccess& _packetLogin )
 	{
 		if( state == ClientState::PendingConnection )
 		{
 			Debug::Log() << "login success" << Debug::Endl();
 			state = ClientState::Connected;
+			playerID = _packetLogin.playerID;
+			assert( playerID != 0 );
 		}
 	}
 
@@ -173,8 +176,6 @@ namespace fan
 		{
 			ClientConnection& connection = static_cast<ClientConnection&>( _component );
 
-			ImGui::Text( "Client" );
-			ImGui::Separator();
 			ImGui::DragFloat( "timeout time", &connection.timeoutDelay, 0.1f, 0.f, 10.f );
 			ImGui::Text( "state:               " ); ImGui::SameLine();
 			ImGui::TextColored( GetStateColor( connection.state ), "%s", GetStateName( connection.state ).c_str() );
@@ -184,6 +185,7 @@ namespace fan
 			ImGui::TextColored( GetRttColor( connection.rtt ), "%.1f", 1000.f * connection.rtt );
 			ImGui::Text( "bandwidth:            %.1f Ko/s", connection.bandwidth );
 			ImGui::Text( "server last response: %.1f", Time::ElapsedSinceStartup() - connection.serverLastResponse );
+			ImGui::Text( "player ID           : %u", connection.playerID );
 		}ImGui::Unindent(); ImGui::Unindent();
 	}
 }

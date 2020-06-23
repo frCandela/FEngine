@@ -145,10 +145,14 @@ namespace fan
 		void Write( Packet& _packet ) const
 		{
 			_packet << PacketTypeInt( PacketType::LoggedIn );
+			_packet << playerID;
 		}
-		void Read( Packet& /*_packet*/ )
+		void Read( Packet& _packet )
 		{
+			_packet >> playerID;
 		}
+
+		PlayerID playerID = 0; // corresponds to the player persistent entity handle
 	};
 
 	//================================================================================================================================

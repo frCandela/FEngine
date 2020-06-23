@@ -37,6 +37,7 @@ namespace fan
 		float			timeoutDelay;			// disconnects from server after X seconds without a response
 		float			bandwidth;				// in Ko/s
 		double			serverLastResponse;
+		PlayerID		playerID;
 
 		PacketPing		lastPacketPing;
 		bool			mustSendBackPacketPing;

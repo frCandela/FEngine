@@ -110,8 +110,8 @@ namespace fan
 		{
 			ImGui::Text( "frame index:          %d", gameTime.frameIndex );
 			ImGui::Text( "frame start:          %d", gameTime.frameStart );
-			ImGui::Text( "logic delta:          %d", gameTime.logicDelta );
-			ImGui::Text( "time scale increment: %d", gameTime.timeScaleIncrement );
+			ImGui::Text( "logic delta:          %.3f", gameTime.logicDelta );
+			ImGui::Text( "time scale increment: %.3f", gameTime.timeScaleIncrement );
 			ImGui::DragFloat( "timescale", &gameTime.timeScaleDelta, 0.1f );
 		}
 		ImGui::Unindent(); ImGui::Unindent();

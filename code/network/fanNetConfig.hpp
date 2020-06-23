@@ -14,6 +14,7 @@ namespace fan
 	using PacketTag = sf::Uint32;		// may change to uint16 on release
 	using PacketTypeInt = sf::Uint8;	// the sf integer type encoding the PacketType enum
 	using FrameIndex = sf::Uint32;
+	using PlayerID = sf::Uint32;
 
 	// all the types of packets of the network engine
 	enum class PacketType

@@ -52,9 +52,11 @@ namespace fan
 		// Send login packet
 		if( state == HostConnection::NeedingApprouval )
 		{
-			PacketLoginSuccess packetLogin;
-			packetLogin.Write( _packet );
 			const EcsHandle handle = _world.GetHandle( _entity );
+
+			PacketLoginSuccess packetLogin;
+			packetLogin.playerID = handle;
+			packetLogin.Write( _packet );			
 			_packet.onSuccess.Connect( &HostConnection::OnLoginSuccess, _world, handle );
 			_packet.onFail.Connect( &HostConnection::OnLoginFail, _world, handle );
 			state = HostConnection::PendingApprouval;
