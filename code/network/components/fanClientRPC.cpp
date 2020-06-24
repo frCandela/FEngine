@@ -79,8 +79,10 @@ namespace fan
 	void ClientRPC::UnwrapSpawn( sf::Packet& _packet )
 	{
 		FrameIndex frameIndex;
+		SpawnID spawnID;
+		_packet >> spawnID;
 		_packet >> frameIndex;
-		onSpawn.Emmit( frameIndex, _packet );
+		onSpawn.Emmit( spawnID, frameIndex, _packet );
 	}
 
 	//================================================================================================================================
@@ -93,6 +95,7 @@ namespace fan
 
 		packet.packetData.clear();
 		packet.packetData << s_rpcIdSpawn;
+		packet.packetData << spawnInfo.spawnID;
 		packet.packetData << spawnInfo.spawnFrameIndex;
 
 		sf::Packet dataCpy = spawnInfo.data;

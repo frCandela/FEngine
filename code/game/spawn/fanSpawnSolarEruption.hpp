@@ -1,0 +1,46 @@
+#pragma once
+
+#include "network/singletons/fanSpawnManager.hpp"
+#include "game/singletons/fanSolarEruption.hpp"
+#include "game/singletons/fanGame.hpp"
+
+namespace fan
+{
+	namespace spawn
+	{
+		//================================================================================================================================
+		//================================================================================================================================
+		struct SpawnSolarEruption
+		{
+			static const SpawnID  s_id = SSID( "SpawnEruption" );
+
+			//================================================================
+			//================================================================
+			static SpawnInfo GenerateInfo( const FrameIndex _spawnFrameIndex )
+			{
+				SpawnInfo info;
+				info.spawnFrameIndex = _spawnFrameIndex;
+				info.spawnID = s_id;
+
+				// Write data to packet
+				//info.data << s_id;
+
+				return info;
+			}
+
+			//================================================================
+			//================================================================
+			static void Spawn( EcsWorld& _world, sf::Packet /*_data*/ )
+			{
+				SolarEruption& eruption = _world.GetSingleton<SolarEruption>();
+				eruption.SpawnEruptionNow();
+
+				Game& game = _world.GetSingleton<Game>();
+				if( game.IsServer() )
+				{
+					eruption.ScheduleNextEruption( _world );
+				}
+			}
+		};
+	}
+}

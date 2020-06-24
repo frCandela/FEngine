@@ -11,11 +11,10 @@ namespace fan
 	namespace spawn
 	{
 		//================================================================================================================================
-		// @todo merge SpawnShip & SpawnClientShip into one spawn
 		//================================================================================================================================
 		struct SpawnShip
 		{
-			static const SpawnManager::SpawnID  s_id = SSID( "SpawnShip" );
+			static const SpawnID  s_id = SSID( "SpawnShip" );
 
 			//================================================================
 			//================================================================
@@ -23,9 +22,9 @@ namespace fan
 			{
 				SpawnInfo info;
 				info.spawnFrameIndex = _spawnFrameIndex;
+				info.spawnID = s_id;
 
 				// Write data to packet
-				info.data << s_id;
 				info.data << _owner;
 				info.data << _spaceshipID;
 				info.data << _position[0] << _position[2];

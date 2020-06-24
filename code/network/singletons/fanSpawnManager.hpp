@@ -2,7 +2,6 @@
 
 #include <unordered_map>
 #include "ecs/fanEcsSingleton.hpp"
-#include "network/fanPacket.hpp"
 #include "bullet/LinearMath/btVector3.h"
 #include "network/components/fanClientRPC.hpp"
 #include "network/fanPacket.hpp"
@@ -18,8 +17,9 @@ namespace fan
 	//================================================================
 	struct SpawnInfo
 	{
+		SpawnID spawnID = 0;
 		FrameIndex spawnFrameIndex = 0;
-		sf::Packet    data;
+		sf::Packet data;
 	};
 
 	//================================================================================================================================
@@ -27,8 +27,7 @@ namespace fan
 	struct SpawnManager : public EcsSingleton
 	{
 		ECS_SINGLETON( SpawnManager )
-	public:
-		using SpawnID = sf::Uint32;
+	public:		
 		using SpawnMethod = void ( * )( EcsWorld & _world, sf::Packet _data );
 
 		static void SetInfo( EcsSingletonInfo& _info );
@@ -39,7 +38,7 @@ namespace fan
 
 		void RegisterSpawnMethods();
 		void RegisterSpawnMethod( const SpawnID _spawnID, const SpawnMethod _spawnMethod );
-		void OnSpawn( const FrameIndex _frameIndex, sf::Packet _data );
+		void OnSpawn( const SpawnID _spawnID, const FrameIndex _frameIndex, sf::Packet _data );
 
 		std::vector< SpawnInfo > spawns;
 		std::unordered_map< SpawnID, SpawnMethod > spawnMethods;

@@ -37,7 +37,7 @@ namespace fan
 		void					 UnwrapShiftClientFrame( sf::Packet& _packet );
 		static PacketReplication RPCShiftClientFrame( const int _framesDelta );
 
-		Signal< FrameIndex, sf::Packet >	 onSpawn;
+		Signal< SpawnID, FrameIndex, sf::Packet >	 onSpawn;
 		static const RpcID		 s_rpcIdSpawn = SSID( "RPCSpawn" );
 		void					 UnwrapSpawn( sf::Packet& _packet );
 		static PacketReplication RPCSpawn( const SpawnInfo& spawnInfo );

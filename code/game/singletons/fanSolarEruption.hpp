@@ -27,12 +27,14 @@ namespace fan
 		static void Save( const EcsSingleton& _component, Json& _json );
 		static void Load( EcsSingleton& _component, const Json& _json );
 		static void NetSave( const EcsSingleton& _component, sf::Packet& _packet );
-		static void NetLoad( EcsSingleton& _component, sf::Packet& _packet );
 
 		enum State { WAITING = 0, WARMING = 1, COLLAPSING = 2, EXPODING= 3, BACK_TO_NORMAL = 4, SIZE = 5 };
 
-		static void  Start( EcsWorld& _world );
-		static void  Step( EcsWorld& _world, const float _delta );
+		static void Start( EcsWorld& _world );
+		static void Step( EcsWorld& _world, const float _delta );
+		void		SpawnEruptionNow();
+		void		ScheduleNextEruption( EcsWorld& _world );
+
 
 		ComponentPtr<Material>			sunlightMaterial;
 		ComponentPtr<MeshRenderer>		sunlightRenderer;
@@ -41,14 +43,13 @@ namespace fan
 		
 		float previousLightAttenuation;
 
-		FrameIndex eruptionStartFrame;// the eruption starts at this frame @todo make a spawner for this
-
-		bool	enabled;
-		State	state;
-		float   timer;				// time accumulator
-		float	cooldown;			// time between eruption in seconds
-		float	randomCooldown;		// adds [0-randomCooldown] seconds to the eruption cooldown
-		float	damagePerSecond;	// damage taken if the player stays in the sunlight
+		FrameIndex	spawnFrame; // the frame index at which the eruption is spawn
+		bool		enabled;
+		State		state;
+		float		timer;				// time accumulator
+		float		cooldown;			// time between eruption in seconds
+		float		randomCooldown;		// adds [0-randomCooldown] seconds to the eruption cooldown
+		float		damagePerSecond;	// damage taken if the player stays in the sunlight
 
 		float   stateDuration[SIZE];
 		float	stateLightAttenuation[SIZE];
@@ -57,6 +58,5 @@ namespace fan
 		float	stateParticleDuration[SIZE];
 		Color	stateParticleColor[SIZE];
 
-		static FrameIndex CalculateNextEruptionStartFrame( const SolarEruption& _eruption, const Time& _time );
 	};
 }

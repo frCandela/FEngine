@@ -154,7 +154,10 @@ namespace fan
 		netManager->Start( world );
 		world.Run<S_RegisterAllRigidbodies>();
 		GameCamera::CreateGameCamera( world );
-		SolarEruption::Start( world );		
+		SolarEruption::Start( world );	
+
+		SolarEruption& eruption = world.GetSingleton<SolarEruption>();
+		eruption.ScheduleNextEruption( world );
 	}
 
 	//================================================================================================================================

@@ -1,15 +1,18 @@
 #include "game/singletons/fanSolarEruption.hpp"
 
 #include "core/fanDebug.hpp"
-#include "editor/fanModals.hpp"
-#include "scene/fanSceneSerializable.hpp"
-#include "ecs/fanEcsWorld.hpp"
-#include "game/singletons/fanSunLight.hpp"
-#include "network/singletons/fanTime.hpp"
-#include "game/fanGameTags.hpp"
 #include "core/fanRandom.hpp"
 #include "core/math/fanLerp.hpp"
+#include "ecs/fanEcsWorld.hpp"
 #include "network/fanPacket.hpp"
+#include "network/singletons/fanTime.hpp"
+#include "network/singletons/fanSpawnManager.hpp"
+#include "network/systems/fanHostReplication.hpp"
+#include "scene/fanSceneSerializable.hpp"
+#include "game/spawn/fanSpawnSolarEruption.hpp"
+#include "game/singletons/fanSunLight.hpp"
+#include "game/fanGameTags.hpp"
+#include "editor/fanModals.hpp"
 
 namespace fan
 {
@@ -21,8 +24,6 @@ namespace fan
 		_info.onGui = &SolarEruption::OnGui;
 		_info.save = &SolarEruption::Save;
 		_info.load = &SolarEruption::Load;
-		_info.netSave = &SolarEruption::NetSave;
-		_info.netLoad = &SolarEruption::NetLoad;
 		_info.name = "solar eruption";
 	}
 
@@ -37,6 +38,7 @@ namespace fan
 		solarEruption.particleEmitter.Init( _world );
 		solarEruption.sunlightLight.Init( _world );
 
+		solarEruption.spawnFrame = 0;
 		solarEruption.timer = 0;
 		solarEruption.enabled = false;
 		solarEruption.state = State::WAITING;
@@ -55,15 +57,6 @@ namespace fan
 	}
 
 	//================================================================================================================================
-	// returns the next eruption start frame
-	//================================================================================================================================
-	FrameIndex SolarEruption::CalculateNextEruptionStartFrame( const SolarEruption& _eruption, const Time& _time )
-	{
-		const float delay = _eruption.cooldown + Random::Float() * _eruption.randomCooldown;
-		return _time.frameIndex + (FrameIndex)( delay / _time.logicDelta);
-	}
-
-	//================================================================================================================================
 	//================================================================================================================================
 	void SolarEruption::Start( EcsWorld& _world )
 	{
@@ -71,7 +64,6 @@ namespace fan
 
 		eruption.enabled = true;
 		eruption.stateDuration[WAITING] = std::numeric_limits<float>::max(); // wait forever
-		eruption.eruptionStartFrame = std::numeric_limits<FrameIndex>::max(); // no eruption planned
 
 		// pointers check
 		if( eruption.sunlightMaterial == nullptr
@@ -107,6 +99,30 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
+	void SolarEruption::SpawnEruptionNow()
+	{
+		state = State::WAITING;
+		stateDuration[WAITING] = 0;
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
+	void SolarEruption::ScheduleNextEruption( EcsWorld& _world )
+	{
+		// spawns the next eruption & replicates it on all hosts
+		SpawnManager& spawnManager = _world.GetSingleton<SpawnManager>();
+		const Time& time = _world.GetSingleton<Time>();
+
+		const float delay = cooldown + Random::Float() * randomCooldown;
+		spawnFrame = time.frameIndex + (FrameIndex)( delay / time.logicDelta );
+
+		SpawnInfo spawnInfo = spawn::SpawnSolarEruption::GenerateInfo( spawnFrame );
+		spawnManager.spawns.push_back( spawnInfo );
+		_world.Run<S_ReplicateOnAllHosts>( ClientRPC::RPCSpawn( spawnInfo ), HostReplication::ResendUntilReplicated );
+	}
+
+	//================================================================================================================================
+	//================================================================================================================================
 	void SolarEruption::Step( EcsWorld& _world, const float _delta )
 	{
 		SolarEruption& eruption = _world.GetSingleton<SolarEruption>();
@@ -114,15 +130,6 @@ namespace fan
 		if( !eruption.enabled || _delta == 0.f ) { return; }
 
 		eruption.timer += _delta;
-
-		if( eruption.state == State::WAITING )
-		{
-			const Time& time = _world.GetSingleton<Time>();
-			if( time.frameIndex == eruption.eruptionStartFrame )
-			{
-				eruption.stateDuration[WAITING] = 0;
-			}
-		}
 
 		// set particles
 		if( eruption.timer > eruption.stateDuration[eruption.state] )
@@ -187,26 +194,6 @@ namespace fan
 
 	//================================================================================================================================
 	//================================================================================================================================
-	void SolarEruption::NetSave( const EcsSingleton& _component, sf::Packet& _packet )
-	{
-		const SolarEruption& solarEruption = static_cast<const SolarEruption&>( _component );
-		_packet << FrameIndex( solarEruption.eruptionStartFrame);
-	}
-
-	//================================================================================================================================
-	//================================================================================================================================
-	void SolarEruption::NetLoad( EcsSingleton& _component, sf::Packet& _packet )
-	{
-		SolarEruption& solarEruption = static_cast< SolarEruption&>( _component );
-
-		FrameIndex eruptionStartFrame;
-		_packet >> eruptionStartFrame;
-
-		solarEruption.eruptionStartFrame = eruptionStartFrame;
-	}
-
-	//================================================================================================================================
-	//================================================================================================================================
 	void SolarEruption::Save( const EcsSingleton& _component, Json& _json )
 	{
 		const SolarEruption& solarEruption = static_cast<const SolarEruption&>( _component );
@@ -266,16 +253,16 @@ namespace fan
 	void SolarEruption::OnGui( EcsWorld& _world, EcsSingleton& _component )
 	{
 		SolarEruption& solarEruption = static_cast<SolarEruption&>( _component );
+		const Time& time = _world.GetSingleton<Time>();
 
 		ImGui::Indent(); ImGui::Indent();
 		{
 			ImGui::PushItemWidth( 200.f );
 			{
-				const Time& time = _world.GetSingleton<Time>();
+				if( ImGui::Button("spawn") ){ solarEruption.SpawnEruptionNow(); }
 				ImGui::Text( "state: %s", StateToString( solarEruption.state ).c_str() );
 				ImGui::Text( "timer: %f", solarEruption.timer );
-
-				const float nextEruptionTime = time.logicDelta * ( solarEruption.eruptionStartFrame - time.frameIndex );
+				const float nextEruptionTime = time.logicDelta * ( solarEruption.spawnFrame - time.frameIndex );
 				ImGui::Text( "next eruption: %f", nextEruptionTime );
 
 				ImGui::Spacing();

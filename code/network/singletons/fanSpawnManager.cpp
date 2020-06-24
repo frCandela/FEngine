@@ -4,6 +4,7 @@
 #include "network/singletons/fanTime.hpp"
 #include "game/spawn/fanSpawnBullet.hpp"
 #include "game/spawn/fanSpawnShip.hpp"
+#include "game/spawn/fanSpawnSolarEruption.hpp"
 
 namespace fan
 {
@@ -41,6 +42,7 @@ namespace fan
 		spawnMethods.clear();		
 		RegisterSpawnMethod( spawn::SpawnBullet::s_id, &spawn::SpawnBullet::Spawn );
 		RegisterSpawnMethod( spawn::SpawnShip::s_id, &spawn::SpawnShip::Spawn );
+		RegisterSpawnMethod( spawn::SpawnSolarEruption::s_id, &spawn::SpawnSolarEruption::Spawn );
 	}
 
 	//================================================================================================================================
@@ -62,9 +64,7 @@ namespace fan
 					Debug::Warning() << "missed spawning for frame" << spawnInfo.spawnFrameIndex << Debug::Endl();
 				}
 
-				SpawnID spawnId;
-				spawnInfo.data >> spawnId;
-				spawnManager.spawnMethods.at(spawnId)( _world, spawnInfo.data );
+				spawnManager.spawnMethods.at( spawnInfo.spawnID )( _world, spawnInfo.data );
 				spawnManager.spawns.erase( spawnManager.spawns.begin() + spawnIndex );
 			}
  		}
@@ -73,9 +73,9 @@ namespace fan
 	//================================================================================================================================
 	// Called by the rpc manager when a spawn is received
 	//================================================================================================================================
-	void SpawnManager::OnSpawn( const FrameIndex _frameIndex, sf::Packet _data )
+	void SpawnManager::OnSpawn( const sf::Uint32 _spawnID, const FrameIndex _frameIndex, sf::Packet _data )
 	{
-		spawns.push_back( { _frameIndex , _data } );
+		spawns.push_back( { _spawnID, _frameIndex , _data } );
 	}
 
 	//================================================================================================================================

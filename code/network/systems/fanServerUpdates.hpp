@@ -7,6 +7,8 @@
 #include "network/systems/fanHostReplication.hpp"
 #include "game/spawn/fanSpawnShip.hpp"
 #include "game/components/fanPlayerInput.hpp"
+#include "game/singletons/fanSolarEruption.hpp"
+#include "game/spawn/fanSpawnSolarEruption.hpp"
 
 namespace fan
 {
@@ -73,6 +75,14 @@ namespace fan
 						);
 						
 					}
+
+					// replicates solar eruption spawn
+					const SolarEruption& solarEruption = _world.GetSingleton<SolarEruption>();
+					const SpawnInfo eruptionSpawnInfo = spawn::SpawnSolarEruption::GenerateInfo( solarEruption.spawnFrame );
+					hostReplication.Replicate(
+						ClientRPC::RPCSpawn( eruptionSpawnInfo )
+						, HostReplication::ResendUntilReplicated
+					);
 				}
 			}
 		}
