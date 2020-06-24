@@ -35,6 +35,5 @@ namespace fan
 		GameServer* gameServer = nullptr;
 
 		bool IsServer() const { return gameServer != nullptr; }
-		static EcsHandle SpawnSpaceship( EcsWorld& _world, const bool _hasPlayerInput, const bool _hasPlayerController );
 	};
 }

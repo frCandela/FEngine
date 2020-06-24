@@ -3,8 +3,17 @@
 #include "network/singletons/fanSpawnManager.hpp"
 #include "network/components/fanClientGameData.hpp"
 #include "network/components/fanHostGameData.hpp"
+#include "network/components/fanClientRollback.hpp"
+#include "network/components/fanHostPersistentHandle.hpp"
+#include "scene/components/fanTransform.hpp"
+#include "scene/components/fanRigidbody.hpp"
+#include "scene/components/fanMotionState.hpp"
+#include "scene/components/fanBoxShape.hpp"
 #include "game/singletons/fanGame.hpp"
 #include "game/singletons/fanClientNetworkManager.hpp"
+#include "game/components/fanPlayerInput.hpp"
+#include "game/components/fanPlayerController.hpp"
+#include "game/singletons/fanCollisionManager.hpp"
 
 namespace fan
 {
@@ -54,7 +63,7 @@ namespace fan
 					if( game.IsServer() )
 					{
 						HostGameData& hostData = _world.GetComponent<HostGameData>( _world.GetEntity( playerID ) );
-						hostData.spaceshipHandle = Game::SpawnSpaceship( _world, true, false );
+						hostData.spaceshipHandle = SpawnShip::SpawnSpaceship( _world, true, false, playerID );
 						linkingContext.AddEntity( hostData.spaceshipHandle, spaceshipID );
 					}
 					else
@@ -68,17 +77,88 @@ namespace fan
 							// spawn this client ship
 							if( gameData.spaceshipHandle == 0 )
 							{
-								gameData.spaceshipHandle = Game::SpawnSpaceship( _world, true, true );
+								gameData.spaceshipHandle = SpawnShip::SpawnSpaceship( _world, true, true );
 								linkingContext.AddEntity( gameData.spaceshipHandle, spaceshipID );
 							}
 						}
 						else
 						{
 							// spawn remote player ship
-							const EcsHandle handle = Game::SpawnSpaceship( _world, false, false );
+							const EcsHandle handle = SpawnShip::SpawnSpaceship( _world, false, false );
 							linkingContext.AddEntity( handle, spaceshipID );
 						}
 					}
+				}
+			}
+
+			//================================================================================================================================
+			// Generates the spaceship entity from the game prefab
+			// PlayerInput component causes the ship to be driven by inputs ( forward, left, right, boost etc. )
+			// PlayerController automatically updates the PlayerInput with local inputs from mouse & keyboard
+			//================================================================================================================================
+			static EcsHandle SpawnSpaceship( EcsWorld& _world, const bool _hasPlayerInput, const bool _hasPlayerController, const EcsHandle _persistentHandle = 0 )
+			{
+				// spawn the spaceship	
+				Game& game = _world.GetSingleton< Game >();
+				if( game.spaceshipPrefab != nullptr )
+				{
+					Scene& scene = _world.GetSingleton<Scene>();
+					SceneNode& spaceshipNode = *game.spaceshipPrefab->Instanciate( scene.GetRootNode() );
+					EcsEntity spaceshipID = _world.GetEntity( spaceshipNode.handle );
+
+
+					if( _persistentHandle != 0 ) // server only
+					{						
+						_world.AddComponent<HostPersistentHandle>( spaceshipID ).handle = _persistentHandle;
+					}
+
+					if( _hasPlayerInput )
+					{
+						_world.AddComponent<PlayerInput>( spaceshipID );
+					}
+					if( _hasPlayerController )
+					{
+						_world.AddComponent<PlayerController>( spaceshipID );
+						_world.AddComponent<ClientRollback>( spaceshipID );
+					}
+
+					if( _world.HasComponent<Transform>( spaceshipID )
+						&& _world.HasComponent<Rigidbody>( spaceshipID )
+						&& _world.HasComponent<MotionState>( spaceshipID )
+						&& _world.HasComponent<BoxShape>( spaceshipID ) )
+					{
+						// set initial position
+						Transform& transform = _world.GetComponent<Transform>( spaceshipID );
+						transform.SetPosition( btVector3( 0, 0, 4.f ) );
+
+						// add rigidbody to the physics world
+						PhysicsWorld& physicsWorld = _world.GetSingleton<PhysicsWorld>();
+						Rigidbody& rigidbody = _world.GetComponent<Rigidbody>( spaceshipID );
+						MotionState& motionState = _world.GetComponent<MotionState>( spaceshipID );
+						BoxShape& boxShape = _world.GetComponent<BoxShape>( spaceshipID );
+						rigidbody.SetCollisionShape( boxShape.boxShape );
+						rigidbody.SetMotionState( motionState.motionState );
+						rigidbody.rigidbody->setWorldTransform( transform.transform );
+						physicsWorld.dynamicsWorld->addRigidBody( rigidbody.rigidbody );
+
+						// registers physics callbacks
+						CollisionManager& collisionManager = _world.GetSingleton<CollisionManager>();
+						rigidbody.onContactStarted.Connect( &CollisionManager::OnSpaceShipContact, &collisionManager );
+
+						return spaceshipNode.handle;
+					}
+					else
+					{
+						Debug::Error()
+							<< "Game: spaceship prefab is missing a component" << "\n"
+							<< "component needed: Transform, Rigidbody, MotionState, BoxShape" << Debug::Endl();
+						return 0;
+					}
+				}
+				else
+				{
+					Debug::Error() << game.name << " spaceship prefab is null" << Debug::Endl();
+					return 0;
 				}
 			}
 		};

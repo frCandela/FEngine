@@ -1,24 +1,5 @@
 #include "game/singletons/fanGame.hpp"
 
-#include "core/fanDebug.hpp"
-#include "ecs/fanEcsWorld.hpp"
-#include "scene/singletons/fanScene.hpp"
-#include "scene/singletons/fanPhysicsWorld.hpp"
-#include "scene/components/fanSceneNode.hpp"
-#include "scene/components/fanTransform.hpp"
-#include "scene/components/fanRigidbody.hpp"
-#include "scene/components/fanMotionState.hpp"
-#include "scene/components/fanBoxShape.hpp"
-#include "scene/fanSceneResourcePtr.hpp"
-#include "game/singletons/fanCollisionManager.hpp"
-#include "game/fanGameClient.hpp"
-#include "game/fanGameServer.hpp"
-#include "game/components/fanPlayerInput.hpp"
-#include "game/components/fanPlayerController.hpp"
-#include "network/components/fanClientGameData.hpp"
-#include "network/components/fanClientRollback.hpp"
-#include "network/singletons/fanTime.hpp"
-
 namespace fan
 {
 	//================================================================================================================================
@@ -54,71 +35,6 @@ namespace fan
 	{
 		Game& gameData = static_cast<Game&>( _component );
 		Serializable::LoadPrefabPtr( _json, "spaceship", gameData.spaceshipPrefab );
-	}
-
-	//================================================================================================================================
-	// Generates the spaceship entity from the game prefab
-	// PlayerInput component causes the ship to be driven by inputs ( forward, left, right, boost etc. )
-	// PlayerController automatically updates the PlayerInput with local inputs from mouse & keyboard
-	//================================================================================================================================
-	EcsHandle Game::SpawnSpaceship( EcsWorld& _world, const bool _hasPlayerInput, const bool _hasPlayerController )
-	{
-		// spawn the spaceship	
-		Game& game = _world.GetSingleton< Game >();
-		if( game.spaceshipPrefab != nullptr )
-		{
-			Scene& scene = _world.GetSingleton<Scene>();
-			SceneNode& spaceshipNode = *game.spaceshipPrefab->Instanciate( scene.GetRootNode() );
-			EcsEntity spaceshipID = _world.GetEntity( spaceshipNode.handle );
-			
-			if( _hasPlayerInput )
-			{
-				_world.AddComponent<PlayerInput>( spaceshipID );
-			}
-			if( _hasPlayerController )
-			{
-				_world.AddComponent<PlayerController>( spaceshipID );
-				_world.AddComponent<ClientRollback>( spaceshipID );
-			}
-
-			if( _world.HasComponent<Transform>( spaceshipID )
-				&& _world.HasComponent<Rigidbody>( spaceshipID )
-				&& _world.HasComponent<MotionState>( spaceshipID )
-				&& _world.HasComponent<BoxShape>( spaceshipID ) )
-			{
-				// set initial position
-				Transform& transform = _world.GetComponent<Transform>( spaceshipID );
-				transform.SetPosition( btVector3( 0, 0, 4.f ) );
-
-				// add rigidbody to the physics world
-				PhysicsWorld& physicsWorld = _world.GetSingleton<PhysicsWorld>();
-				Rigidbody& rigidbody = _world.GetComponent<Rigidbody>( spaceshipID );
-				MotionState& motionState = _world.GetComponent<MotionState>( spaceshipID );
-				BoxShape& boxShape = _world.GetComponent<BoxShape>( spaceshipID );
-				rigidbody.SetCollisionShape( boxShape.boxShape );
-				rigidbody.SetMotionState( motionState.motionState );
-				rigidbody.rigidbody->setWorldTransform( transform.transform );
-				physicsWorld.dynamicsWorld->addRigidBody( rigidbody.rigidbody );
-
-				// registers physics callbacks
-				CollisionManager& collisionManager = _world.GetSingleton<CollisionManager>();
-				rigidbody.onContactStarted.Connect( &CollisionManager::OnSpaceShipContact, &collisionManager );
-
-				return spaceshipNode.handle;
-			}
-			else
-			{
-				Debug::Error()
-					<< "Game: spaceship prefab is missing a component" << "\n"
-					<< "component needed: Transform, Rigidbody, MotionState, BoxShape" << Debug::Endl();
-				return 0;
-			}
-		}
-		else
-		{
-			Debug::Error() << game.name << " spaceship prefab is null" << Debug::Endl();
-			return 0;
-		}
 	}
 
 	//================================================================================================================================

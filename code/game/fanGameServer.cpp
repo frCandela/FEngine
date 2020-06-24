@@ -37,10 +37,12 @@
 #include "network/singletons/fanLinkingContext.hpp"
 #include "network/singletons/fanHostManager.hpp"
 #include "network/singletons/fanTime.hpp"
+#include "network/singletons/fanSpawnManager.hpp"
 #include "network/components/fanHostGameData.hpp"
 #include "network/components/fanHostConnection.hpp"
 #include "network/components/fanHostReplication.hpp"
 #include "network/components/fanReliabilityLayer.hpp"
+#include "network/components/fanHostPersistentHandle.hpp"
 #include "network/systems/fanServerUpdates.hpp"
 #include "network/systems/fanServerSendReceive.hpp"
 #include "network/systems/fanTimeout.hpp"
@@ -51,7 +53,6 @@
 #include "game/singletons/fanGameCamera.hpp"
 #include "game/singletons/fanSunLight.hpp"
 #include "game/singletons/fanGame.hpp"
-#include "network/singletons/fanSpawnManager.hpp"
 
 #include "game/systems/fanUpdatePlanets.hpp"
 #include "game/systems/fanUpdateSpaceships.hpp"
@@ -116,6 +117,7 @@ namespace fan
 		world.AddComponentType<HostConnection>();
 		world.AddComponentType<HostReplication>();
 		world.AddComponentType<ReliabilityLayer>();
+		world.AddComponentType<HostPersistentHandle>();
 
 		// base singleton components
 		world.AddSingletonType<Scene>();
